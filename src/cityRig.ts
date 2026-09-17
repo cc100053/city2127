@@ -128,8 +128,9 @@ export function cityRig(scene:T.Scene) {
   const kit:Kit={windows:[],signs:[],random};
   const staticGroup=new T.Group();scene.add(staticGroup);
   const road=paint('#71818a');
-  box(staticGroup,[64,1,54],[0,-.2,0],cream,.9);
-  box(staticGroup,[63,.12,53],[0,.36,0],trim,.5);
+  // Ground continues past the hero frame; fog closes it instead of a plate edge.
+  box(staticGroup,[150,1,140],[0,-.2,0],cream,.9);
+  box(staticGroup,[149,.12,139],[0,.36,0],trim,.5);
   for(const points of roads){
     const shape=new T.Shape();points.forEach(([x,z],i)=>i?shape.lineTo(x,-z):shape.moveTo(x,-z));shape.closePath();
     const pavement=new T.Mesh(new T.ShapeGeometry(shape),road);pavement.rotation.x=-Math.PI/2;pavement.position.y=.43;pavement.receiveShadow=true;staticGroup.add(pavement);
@@ -142,7 +143,7 @@ export function cityRig(scene:T.Scene) {
       box(staticGroup,[width,.025,.52],[p.x,.45,p.z],cream,.01).rotation.y=p.yaw;
     }
   }
-  for(let x=-29;x<31;x+=4)if(Math.abs(x)>15)box(staticGroup,[1.8,.02,.13],[x,.445,0],cream,.01);
+  for(let x=-73;x<75;x+=4)if(Math.abs(x)>15)box(staticGroup,[1.8,.02,.13],[x,.445,0],cream,.01);
   const q=landmarks[0],qfront=new T.Group();qfront.position.set(q.x,0,q.z);qfront.name='QFRONT';
   // Twin occupied cores carry a civic hall and an upper residential district.
   for(const x of [-3.7,3.7])box(qfront,[3.6,q.h-.8,q.d],[x,q.h/2+.4,0],teal);

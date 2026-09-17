@@ -1,6 +1,6 @@
 # Plan 02 — 實作進度與下一輪工作
 
-更新：2026-09-17（stage 1 量體完成後）。依據使用者提供的 **Plan 02 Visual + Spatial Implementation Brief**、[Pic 2](../asset/pic2.png)、目前工作樹、測試程式及已保存的畫面核對。這是進度與待辦文件，技術契約見 [PROJECT.md](PROJECT.md)，實際驗證記錄見 [VALIDATION.md](VALIDATION.md)。
+更新：2026-09-17（stage 2 鏡位完成後）。依據使用者提供的 **Plan 02 Visual + Spatial Implementation Brief**、[Pic 2](../asset/pic2.png)、目前工作樹、測試程式及已保存的畫面核對。這是進度與待辦文件，技術契約見 [PROJECT.md](PROJECT.md)，實際驗證記錄見 [VALIDATION.md](VALIDATION.md)。
 
 **目前完成首個多層空間原型與 stage 1 垂直街區量體，尚未完成 Plan 02 的視覺驗收。** 狀態以目前未提交的工作樹為準，不代表 main 已包含這些變更；不以完成百分比代替驗收。
 
@@ -12,9 +12,9 @@
 - **部分完成**：已有原型，但空間表達、可信度或驗證仍有缺口。
 - **待做／待驗證**：尚未有足夠實作或證據；不把設計意圖、註解或測試存在當成完成。
 
-Stage 1 畫面：[Daylight](../artifacts/plan02-block-neutral.png) · [Pulse](../artifacts/plan02-block-pulse.png) · [Still](../artifacts/plan02-block-still.png)；stage 1 前基線：[Daylight](../artifacts/plan02-neutral.jpg) · [Pulse](../artifacts/plan02-pulse.jpg) · [Still](../artifacts/plan02-still.jpg)。均為 1280×720、同一初始鏡位。與 Pic 2 的比較是美術判斷，不是量化相似度測試。
+Stage 2 畫面（新鏡位）：[Daylight](../artifacts/plan02-frame-neutral.png) · [Pulse](../artifacts/plan02-frame-pulse.png) · [Still](../artifacts/plan02-frame-still.png)。Stage 1 畫面（舊鏡位）：[Daylight](../artifacts/plan02-block-neutral.png) · [Pulse](../artifacts/plan02-block-pulse.png) · [Still](../artifacts/plan02-block-still.png)；stage 1 前基線：[Daylight](../artifacts/plan02-neutral.jpg) · [Pulse](../artifacts/plan02-pulse.jpg) · [Still](../artifacts/plan02-still.jpg)。均為 1280×720；stage 2 起鏡位已改，與之前的圖不是同鏡位比較。與 Pic 2 的比較是美術判斷，不是量化相似度測試。
 
-![Plan 02 stage 1 垂直街區量體](../artifacts/plan02-block-neutral.png)
+![Plan 02 stage 2 新鏡位](../artifacts/plan02-frame-neutral.png)
 
 ## 原定 A–G 階段進度
 
@@ -26,7 +26,7 @@ Stage 1 畫面：[Daylight](../artifacts/plan02-block-neutral.png) · [Pulse](..
 | D 工程化生態 | 部分完成 | 移除傳統樹冠與盆栽，加入膜片／鰭片形式 | 淨化、冷卻或水管理的用途尚不能從畫面清楚理解；沒有環境模擬 |
 | E 密度與預設動線 | 部分完成 | 降低人車與循環飛行器密度；分開地面／高架人流 | 尚未完成可比時刻的人數評估；高架行人共用中心線，個體差異與交會仍簡化 |
 | F 光照與材質呈現 | 部分完成 | 三態日光、輕霧、低 bloom、一次性環境反射 | 仍有模型底板、均質表面與微縮感；未達紀實照片質感 |
-| G 固定鏡頭截圖與評估 | 已完成本輪 | 三態截圖已保存／開啟檢查，缺口已記錄 | 下一輪修改後必須重新驗證；本輪截圖不構成最終美術通過 |
+| G 固定鏡頭截圖與評估 | 已完成本輪 | Stage 2 新鏡位三態截圖已保存／開啟檢查，缺口已記錄 | 下一輪修改後必須重新驗證；本輪截圖不構成最終美術通過 |
 
 ## 已完成的實作
 
@@ -79,13 +79,14 @@ Stage 1 畫面：[Daylight](../artifacts/plan02-block-neutral.png) · [Pulse](..
 
 **通過條件不變：** 不靠新增招牌，截圖已能讀出相連的巨型街區；地面路口仍開放，MAGNET 貨運站保留真實開口（stage 1 兩者均保持）。
 
-### 2. P0：把路口與人尺度放回構圖中心
+### 2. P0：把路口與人尺度放回構圖中心（stage 2 已實作，待使用者美術判斷）
 
-- [ ] 隨量體調整初始桌面鏡位，兼顧地面斜向 crossing、高架步道及建築入口；OrbitControls 已由使用者加入（5ad7dd0），不加自適應鏡頭。Y=24 公共層目前大半被環線軌道遮住，鏡位調整時要顧到。
-- [ ] 維持 QFRONT／八公廣場／車站的空間辨識，檢查介面與前景量體是否遮擋主要交叉動線。
-- [ ] 整理底板與地面邊界的視覺收尾，減少「模型放在展示台上」的觀感；不擴建第二個路口。
+- [x] 初始鏡位改為 `(34,34,76)` 看向 `(-3,17,-1)`、FOV 46°，OrbitControls 的 target 共用同一定義；沒有自適應鏡頭。路口、兩條高架步道、QFRONT 門楣與 Y=24 公共層在同一畫面可見，MAGNET 頂部與 express 走廊刻意出框。
+- [x] QFRONT／八公廣場／車站關係保持；控制列在左下，路口在畫面中下不被 UI 遮住。左側標題文字與 Dogenzaka 塊略有重疊，可接受。
+- [x] 底板放大到 150×140、五條道路臂延伸到 ±70–75，鏡位內看不到底板邊；沒有第二個路口，車輛行駛範圍不變。
+- [ ] 使用者判斷新鏡位是否成立；若要保留舊構圖比較，stage 1 的 `plan02-block-*.png` 仍在。
 
-**通過條件：** 同一張桌面截圖可辨認地面、公共步道、垂直入口與空中系統；人物仍可辨，建築是主體，路口沒有被高樓或 UI 遮住。
+**通過條件不變：** 同一張桌面截圖可辨認地面、公共步道、垂直入口與空中系統；人物仍可辨，建築是主體，路口沒有被高樓或 UI 遮住。
 
 ### 3. P1：改善材質、立面深度與光照
 
@@ -123,7 +124,7 @@ Stage 1 記錄見 [VALIDATION.md](VALIDATION.md) 的「Plan 02 stage 1」。上�
 - [ ] 對照 Pic 2 與本文件的視覺驗收表，逐項更新證據／缺口；P0 未成立前不擴充更多裝飾或交通種類。
 - [ ] 更新本文件、技術契約及驗收記錄；沒有量測就不宣稱 FPS，沒有視覺驗證就不宣稱美術通過。
 
-Stage 1 已重跑 `npm test`、`npm run build` 與 1280×720 三態截圖；1080p 效能未量測，美術通過待使用者判斷。
+Stage 1 與 stage 2 均已重跑 `npm test`、`npm run build` 與 1280×720 三態截圖；1080p 效能未量測，美術通過待使用者判斷。
 
 ## 範圍限制
 

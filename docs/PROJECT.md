@@ -41,7 +41,7 @@ Desktop-only presentation: the user explicitly excludes responsive/mobile work (
 | `src/mobility.ts` | Actor geometry and instancing, street timing, pedestrian poses, aircraft curves, delivery choreography and local navigation |
 | `src/presets.ts` | State names, WorldState type, numeric presets |
 | `src/worldState.ts` | Selection gate, transition, hold and verdict state; independent of DOM/rendering |
-| `src/heroCamera.ts` | Initial camera; currently `(39,42,92)`, target `(-4,29,0)`, FOV 48°. `main.ts` attaches OrbitControls (commit 5ad7dd0, 2026-09-17) with distance 45–180 and polar limits; screenshots use the untouched initial pose |
+| `src/heroCamera.ts` | Initial camera; `HERO_POSITION` `(34,34,76)`, `HERO_TARGET` `(-3,17,-1)`, FOV 46°, shared with the orbit target. `main.ts` attaches OrbitControls (commit 5ad7dd0, 2026-09-17) with distance 45–180 and polar limits; screenshots use the untouched initial pose |
 | `src/overlay.ts` | Keyboard/buttons, state labels, progress and accessible judgment text |
 | `src/style.css` | Fixed desktop overlay layout and typography; legacy responsive rules are not acceptance targets |
 | `tests/worldState.test.ts` | State timing, locking, repeated selection and neutral reset |
@@ -51,6 +51,7 @@ Frame flow: `main` advances `worldState` → updates lighting → calls `cityRig
 
 ## Geometry and motion conventions
 
+- The ground plate is 150×140 and the road arms run to ±70–75 so neither edge appears from the hero pose; fog closes the distance. Cars still use only the central ±24 of the east–west road.
 - Coordinates are meter-like art units, Y-up, ground near Y=0. Street seed is `2127`. Since 2026-09-17 the camera has OrbitControls around the initial hero pose; comparison screenshots must be taken without moving it.
 - Static architecture is transformed to world space and merged by material. Geometries must have compatible attributes/indexing; the static merge normalizes to non-indexed geometry. Source factory groups are removed after batching, so editing those groups afterwards will not move rendered buildings.
 - Windows and moving actors use `InstancedMesh`; update instance matrices/colors and mark them dirty. Avoid constructing geometry or materials every frame.
