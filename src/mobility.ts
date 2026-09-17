@@ -3,7 +3,8 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets.ts';
 
-export const DOCK={x:9,y:15,z:-3.5,berthZ:-6.2};
+import { crossings, crossingPoint, DOCK } from './layout.ts';
+export { DOCK } from './layout.ts';
 const ease=(t:number)=>T.MathUtils.smoothstep(t,0,1);
 // One scripted delivery cycle, shared by the aircraft, parcel, lift and receiver doors.
 export function deliveryMotion(time:number) {
@@ -37,14 +38,20 @@ export function streetMotion(time:number, index:number, walking:boolean) {
   return {progress,position:(progress*2-1)*(walking ? 8.3 : 24)*direction,direction,moving:cycle>start && cycle<start+duration};
 }
 
+export function pedestrianPose(time:number,index:number) {
+  const motion=streetMotion(time,index,true);
+  const p=crossingPoint(index%crossings.length,(motion.position/8.3+1)/2,(Math.floor(index/crossings.length)-2)*.42);
+  return {...p,yaw:p.yaw+(motion.direction<0?Math.PI:0)};
+}
+
 export function airRoutes() {
   const loop=new T.CatmullRomCurve3(Array.from({length:12},(_,i)=>{
     const angle=i/12*Math.PI*2;
-    return new T.Vector3(Math.cos(angle)*19,11.5+Math.sin(angle)*.6,8+Math.sin(angle)*8);
+    return new T.Vector3(Math.cos(angle)*27,14.5+Math.sin(angle)*.6,12+Math.sin(angle)*7);
   }),true);
   const express=new T.CatmullRomCurve3([
-    new T.Vector3(-24,23,-8),new T.Vector3(-16,24,-17),new T.Vector3(-4,23,-16),
-    new T.Vector3(-1,22,0),new T.Vector3(10,22,13),new T.Vector3(24,23,15),
+    new T.Vector3(-29,34,-12),new T.Vector3(-17,35,-22),new T.Vector3(-3,34,-20),
+    new T.Vector3(4,34,-3),new T.Vector3(18,34,12),new T.Vector3(30,34,18),
   ]);
   return [loop,express];
 }
@@ -97,7 +104,7 @@ export function mobility(scene:T.Scene) {
   const routes=airRoutes();
   const guideMaterial=new T.MeshBasicMaterial({color:new T.Color('#88d6d3').multiplyScalar(1.6)});
   const guides=fleet(scene,[part([.12,.035,.7],[0,0,0],guideMaterial,.01)],224,'on-demand-air-guides');
-  const streetGuides=fleet(scene,[part([.15,.015,.58],[0,0,0],guideMaterial,.005)],144,'adaptive-street-guides');
+  const streetGuides=fleet(scene,[part([.15,.015,.58],[0,0,0],guideMaterial,.005)],96+crossings.length*24,'adaptive-street-guides');
   const samples=routes.map(route=>Array.from({length:96},(_,i)=>({p:route.getPointAt(i/96),t:route.getTangentAt(i/96)})));
   const heads=new Float32Array(6),weights=new Float32Array(6),carPositions=new Float32Array(6),carWeights=new Float32Array(6);
   const pose=new T.Object3D(),limb=new T.Object3D(),p=new T.Vector3(),tangent=new T.Vector3();
@@ -111,12 +118,9 @@ export function mobility(scene:T.Scene) {
     }cars.flush();
     for(let i=0;i<24;i++){
       const motion=streetMotion(time,i,true),amount=T.MathUtils.smoothstep(state.crowd+.12-i/28,-.06,.06);
-      const lane=((i%6)-2.5)*.36;
-      const z=motion.position+(i%2?1:-1)*(Math.floor(i/6)%2)*.65;
-      const y=.46+T.MathUtils.smoothstep(Math.abs(z),7,8.2)*.35;
-      if(i<12)pose.position.set(-6.6+lane,y,z);
-      else pose.position.set(z,y,6.4+lane);
-      pose.rotation.set(0,(motion.direction>0?0:Math.PI)+(i<12?0:Math.PI/2),0);pose.scale.setScalar(amount);people.set(i,pose);
+      const p=pedestrianPose(time,i);
+      pose.position.set(p.x,.46,p.z);
+      pose.rotation.set(0,p.yaw,0);pose.scale.setScalar(amount);people.set(i,pose);
       for(let side=0;side<2;side++){
         limb.position.set((side?1:-1)*.13,.59,0);limb.position.multiplyScalar(amount).applyQuaternion(pose.quaternion).add(pose.position);
         limb.rotation.set(motion.moving?Math.sin(time*9+i+side*Math.PI)*.5:0,pose.rotation.y,0);limb.scale.setScalar(amount);legs.set(i*2+side,limb);
@@ -150,10 +154,10 @@ export function mobility(scene:T.Scene) {
       for(let i=lane;i<6;i+=2)strength=Math.max(strength,Math.max(0,1-Math.abs(x-carPositions[i]-(i%2?2:-2))/4)*carWeights[i]);
       pose.position.set(x,.465,lane?1.9:-1.9);pose.rotation.set(0,Math.PI/2,0);pose.scale.setScalar(strength);streetGuides.set(lane*48+j,pose);
     }
-    for(let path=0;path<2;path++)for(let j=0;j<24;j++){
-      const m=streetMotion(time,path*12,true),u=-8+j*16/23;
-      const strength=(m.moving?1:0)*Math.max(0,1-Math.abs(u-m.position)/4)*(.2+state.crowd*.8);
-      pose.position.set(path?u:-6.6,.467,path?6.4:u);pose.rotation.set(0,path?Math.PI/2:0,0);pose.scale.setScalar(strength);streetGuides.set(96+path*24+j,pose);
+    for(let path=0;path<crossings.length;path++)for(let j=0;j<24;j++){
+      const m=streetMotion(time,path,true),u=j/23,p=crossingPoint(path,u);
+      const strength=(m.moving?1:0)*Math.max(0,1-Math.abs(u-(m.position/8.3+1)/2)/.25)*(.2+state.crowd*.8);
+      pose.position.set(p.x,.467,p.z);pose.rotation.set(0,p.yaw,0);pose.scale.setScalar(strength);streetGuides.set(96+path*24+j,pose);
     }streetGuides.flush();
   };
 }

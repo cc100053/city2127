@@ -2,13 +2,17 @@
 
 ## Current direction
 
-One rounded Tokyo intersection in 2127 asks: **May a perfect future erase an imperfect past?** Keep painted surfaces, selective soft bevels, readable silhouettes, a pale ground pad, printed zebra crossings and bowl planters. Contrast warm rounded civic objects with thin, precise infrastructure rather than rounding everything. Avoid photoreal glass districts, gritty cyberpunk, disaster water and a second city.
+One painted Shibuya intersection spatial prototype in 2127 asks: **May a perfect future erase an imperfect past?** Keep painted surfaces, selective soft bevels, readable silhouettes, a pale ground pad, printed zebra crossings and bowl planters. Contrast warm rounded civic objects with thin, precise infrastructure rather than rounding everything. Avoid photoreal glass districts, gritty cyberpunk, disaster water and a second city.
 
 The user accepted version 1 as a starting point, then requested a more futuristic city with people, cars, flying drones and aerial routes. Version 2 adds curved tower ribs, cantilever gardens, a rooftop skyport, solar canopies, docking markers, capsule cars, walking pedestrians and two drone corridors. These ambient actors are authorized; they are not interactive NPCs or a character-led game. The original empty Still crossing and particle-only crowd are no longer strict requirements: Still now retains sparse activity.
 
 Version 3 was explicitly approved to strengthen the futuristic silhouette and behavior: a true open station floor separates the main tower volumes; thin-wing carriers replace quadrotors; one courier enters the berth, unloads onto a transfer lift, and delivers cargo into a street receiver. Local navigation lights replace permanent aerial rings and the old transit ribbon.
 
 The initial handoff proposed WebGPU references/fallbacks. The actual implementation uses **WebGL 2**, Three.js `WebGLRenderer`, Vite and TypeScript. Do not describe it as a WebGPU implementation or migrate renderers incidentally.
+
+Plan 01 replaces the generic four blocks with a compressed Shibuya layout: QFRONT to the northwest, a future MAGNET / air station to the northeast, western commercial blocks, and Hachiko plaza beside a low station mass to the southeast. This is a reference-based blockout, not a surveyed reconstruction. See [SHIBUYA.md](SHIBUYA.md).
+
+Desktop-only presentation: the user explicitly excludes responsive/mobile work (2026-09-17). Keep a fixed desktop composition and ordinary renderer resize handling; do not add adaptive framing or mobile layouts.
 
 ## Behavior to preserve
 
@@ -33,10 +37,11 @@ The initial handoff proposed WebGPU references/fallbacks. The actual implementat
 | --- | --- |
 | `src/main.ts` | Startup, renderer, lighting/fog, render loop, resize, GPU error message and diagnostics |
 | `src/cityRig.ts` | Seeded street kit, tower/shop/kiosk/glyph factories, static material batching, windows and vegetation |
+| `src/layout.ts` | Shared Shibuya roads, crossing endpoints, landmark footprints and relocated dock |
 | `src/mobility.ts` | Actor geometry and instancing, street timing, pedestrian poses, aircraft curves, delivery choreography and local navigation |
 | `src/presets.ts` | State names, WorldState type, numeric presets |
 | `src/worldState.ts` | Selection gate, transition, hold and verdict state; independent of DOM/rendering |
-| `src/heroCamera.ts` | Locked camera; currently `(47,39,64)`, target `(0,9,0)`, FOV 38° |
+| `src/heroCamera.ts` | Locked camera; currently `(34,52,88)`, target `(-6,7,0)`, FOV 38° |
 | `src/overlay.ts` | Keyboard/buttons, state labels, progress and accessible judgment text |
 | `src/style.css` | Overlay layout, typography and responsive rules |
 | `tests/worldState.test.ts` | State timing, locking, repeated selection and neutral reset |
@@ -50,10 +55,10 @@ Frame flow: `main` advances `worldState` → updates lighting → calls `cityRig
 - Static architecture is transformed to world space and merged by material. Geometries must have compatible attributes/indexing; the static merge normalizes to non-indexed geometry. Source factory groups are removed after batching, so editing those groups afterwards will not move rendered buildings.
 - Windows and moving actors use `InstancedMesh`; update instance matrices/colors and mark them dirty. Avoid constructing geometry or materials every frame.
 - Pools: 6 cars, 24 pedestrians, 48 legs, 7 thin-wing aircraft, 7 cargo pods, one lift and two receiving doors. Six aircraft circulate; one courier performs the delivery cycle. Visibility varies smoothly with presets. Pool capacity is not the visible count.
-- Street motion is an authored 30-second cycle, not a traffic simulation. Cars move in the early part; pedestrians cross in the later part and reverse direction on the next cycle. Check at least two cycles when changing it.
-- Circulation routes are a closed local loop around 11–12 units high and an open express curve around 22–24. Open-route aircraft fade at endpoints. A 32-second delivery cycle approaches the station at Y=15, berths at Z=-6.2, transfers cargo out to Z=-3.5 during seconds 10–12, lowers it during 12–18, departs during 20–29 and returns the empty lift during 22–30. `DOCK` and `deliveryMotion` are shared by aircraft/cargo/lift/doors; do not give those objects independent clocks.
+- Street motion is an authored 30-second cycle, not a traffic simulation. Cars move in the early part; pedestrians cross in the later part and reverse direction on the next cycle. Check at least two cycles when changing it. Five shared painted crossing paths include the QFRONT–Hachiko diagonal; all waiting positions are off the road. Cars currently use only the east–west road; the other arms are deliberately unserved in this prototype.
+- Circulation routes are a closed southern loop around 14–15 units high and an open express curve around 34–35, above the new landmark roofs. Open-route aircraft fade at endpoints. A 32-second delivery cycle approaches the station at Y=15, berths at X=15, Z=-15.2, transfers cargo out to Z=-12.5 during seconds 10–12, lowers it during 12–18, departs during 20–29 and returns the empty lift during 22–30. `DOCK` and `deliveryMotion` are shared by aircraft/cargo/lift/doors; do not give those objects independent clocks.
 - Air guides are preallocated segments illuminated only near active aircraft. Street segments respond to car and pedestrian movement; neither system rebuilds geometry. Still keeps fewer circulating aircraft but retains the single delivery service.
-- Building-clearance envelopes are hand-maintained in `tests/mobility.test.ts`. Update them with building dimensions/placements; never shrink test envelopes merely to pass a collision failure.
+- Building-clearance envelopes derive from `layout.ts` landmark dimensions plus conservative roof/awning allowances in `tests/mobility.test.ts`. Update these allowances when changing the factories; never shrink test envelopes merely to pass a collision failure.
 
 ## Rendering budget and limits
 

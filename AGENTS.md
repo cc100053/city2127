@@ -5,6 +5,7 @@ This repository is **2127 — Frozen Intersection**, a small procedural Three.js
 ## Working agreement
 
 - Reply to the user in Traditional Chinese; natural Cantonese is welcome. Keep existing English/Japanese product copy unless localization is requested.
+- Desktop presentation only: responsive/mobile adaptation is not required (user decision, 2026-09-17). Do not add responsive layouts, adaptive camera framing or mobile acceptance checks unless explicitly requested. Keep ordinary renderer resize handling.
 - Follow the latest user request. Version 2 explicitly allows pedestrians, cars, drones and aerial routes; the original “no characters/NPCs” restriction is superseded for these ambient actors.
 - Preserve one intersection, the warm painted civic-model style, three states and the locked presentation camera. Version 3 explicitly introduces thin wings, angular infrastructure and an open mid-tower station; do not round every object. State switching must never regenerate buildings.
 - Trace the changed code and its callers before editing. Reuse existing factories, materials and instancing; prefer Three.js/native features over new dependencies.

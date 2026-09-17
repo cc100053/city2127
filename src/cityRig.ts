@@ -2,7 +2,8 @@ import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets';
-import { mobility, DOCK } from './mobility';
+import { mobility } from './mobility';
+import { crossings, crossingPoint, roads, landmarks, DOCK } from './layout';
 
 const paint = (color: T.ColorRepresentation) => new T.MeshStandardMaterial({ color, roughness:.83, metalness:0 });
 const cream = paint('#e6debf'), teal = paint('#719993'), sage = paint('#a9b392'), pink = paint('#ca9c8e'), dark = paint('#3f5e61'), trim = paint('#ece6d3'), soil = paint('#53584a');
@@ -35,7 +36,7 @@ function sign(group:T.Group, kit:Kit, text:string, x:number,y:number,z:number,w:
   const panel=new T.Mesh(new T.PlaneGeometry(w,h),material);panel.position.set(x,y,z+.09);group.add(panel);
 }
 export function tower(kit:Kit) {
-  const g=new T.Group();g.name='tower';g.position.set(9,0,-10);
+  const g=new T.Group();g.name='tower';g.position.set(landmarks[1].x,0,landmarks[1].z);
   box(g,[10.5,2.2,10.5],[0,1.6,0],cream,.5);
   box(g,[9.4,7.4,9.4],[0,6,0],teal,.65);
   // Open from Y=10.6 to 19: no hidden solid tower or window layer in the station void.
@@ -65,7 +66,7 @@ export function tower(kit:Kit) {
   for(const [x,y,z] of [[-2.8,16.6,-1],[-2.2,16,-1.5],[-3.3,15.8,-.5]]){
     const leaf=new T.Mesh(new T.IcosahedronGeometry(1.2,1),sage);leaf.position.set(x,y,z);g.add(leaf);
   }
-  sign(g,kit,'TOKYO  2127',0,2.1,5.31,7.5,.8,'#425f63');
+  sign(g,kit,'MAGNET  /  2127',0,2.1,5.31,7.5,.8,'#425f63');
   sign(g,kit,'空中駅  /  AIR COMMONS',.5,20.1,5.66,8,.65,'#46676e');
   sign(g,kit,'01  /  CARGO',-2.2,11.25,7.72,2.7,.45,'#46676e');
   windows(g,kit,9.4,8,9.4);return g;
@@ -111,17 +112,47 @@ export function cityRig(scene:T.Scene) {
   const kit:Kit={windows:[],signs:[],random};
   const staticGroup=new T.Group();scene.add(staticGroup);
   const road=paint('#b1b6ad');
-  box(staticGroup,[47,1,42],[0,-.2,0],cream,.9);
-  box(staticGroup,[46,.12,41],[0,.36,0],road,.5);
-  for(const [x,z,w,d] of [[-14,-10,16,18],[13,-11,15,17],[-14,11,16,14],[14,12,14,12]]) box(staticGroup,[w,.42,d],[x,.6,z],trim,.65);
-  // Printed crossing, four approaches to one permanent intersection.
-  for(let i=0;i<9;i++) for(const s of [-1,1]){
-    box(staticGroup,[.65,.025,3.1],[-4+i,s*.001+.439,s*6.4],trim,.01);
-    box(staticGroup,[3.1,.025,.65],[s*6.6,.44,-3.6+i*.9],trim,.01);
+  box(staticGroup,[64,1,54],[0,-.2,0],cream,.9);
+  box(staticGroup,[63,.12,53],[0,.36,0],trim,.5);
+  for(const points of roads){
+    const shape=new T.Shape();points.forEach(([x,z],i)=>i?shape.lineTo(x,-z):shape.moveTo(x,-z));shape.closePath();
+    const pavement=new T.Mesh(new T.ShapeGeometry(shape),road);pavement.rotation.x=-Math.PI/2;pavement.position.y=.43;pavement.receiveShadow=true;staticGroup.add(pavement);
   }
-  for(let z=-19;z<20;z+=4) if(Math.abs(z)>9)box(staticGroup,[.13,.02,1.8],[0,.44,z],cream,.01);
-  for(let x=-21;x<22;x+=4) if(Math.abs(x)>9)box(staticGroup,[1.8,.02,.13],[x,.44,0],cream,.01);
-  staticGroup.add(tower(kit),shop(kit,-12,-12,8,11,8,pink,'喫茶  /  KISSA'),shop(kit,-20,-6,5.5,7,7,sage,'花  HANA'),shop(kit,-15,11,9,5.5,7,teal,'まちの本  BOOKS'),shop(kit,19,-13,5.5,9,7,cream,'2127'),kiosk(kit));
+  for(let path=0;path<crossings.length;path++){
+    const {from,to,width}=crossings[path],length=Math.hypot(to[0]-from[0],to[1]-from[1]);
+    const count=Math.floor(length/1.1);
+    for(let i=0;i<count;i++){
+      const p=crossingPoint(path,(i+.5)/count);
+      box(staticGroup,[width,.025,.52],[p.x,.45,p.z],cream,.01).rotation.y=p.yaw;
+    }
+  }
+  for(let x=-29;x<31;x+=4)if(Math.abs(x)>15)box(staticGroup,[1.8,.02,.13],[x,.445,0],cream,.01);
+  const q=landmarks[0],qfront=new T.Group();qfront.position.set(q.x,0,q.z);qfront.name='QFRONT';
+  box(qfront,[q.w,q.h,q.d],[0,q.h/2+.8,0],teal,.25);
+  box(qfront,[q.w+.4,.4,q.d+.4],[0,q.h+1,0],trim,.1);
+  // A broad, simple screen and tall mullions establish the landmark before fine facade work.
+  box(qfront,[10,8,.24],[0,11.6,5.1],dark,.08);
+  sign(qfront,kit,'QFRONT',0,15.7,5.27,9,1.25,'#395a61');
+  sign(qfront,kit,'SHIBUYA  /  2127',0,10.6,5.27,9,3.8,'#ba9181');
+  sign(qfront,kit,'TSUTAYA',0,4.1,5.12,9.5,.85,'#395a61');
+  for(let i=0;i<7;i++)box(qfront,[.09,3,.15],[-4.5+i*1.5,2.2,5.13],trim,.02);
+  staticGroup.add(qfront,tower(kit));
+  for(const [i,color] of [[2,sage],[3,pink],[4,cream]] as const){
+    const b=landmarks[i];staticGroup.add(shop(kit,b.x,b.z,b.w,b.h,b.d,color,b.name));
+  }
+  // Station-facing entrance; keep Hachiko plaza low and open in the foreground.
+  const entry=new T.Group();entry.position.set(18.8,0,12);entry.rotation.y=-Math.PI/2;staticGroup.add(entry);
+  sign(entry,kit,'渋谷駅  /  HACHIKO',0,3,0,10,1,'#536f66');
+  box(staticGroup,[6,.22,2.2],[14,3.8,19],teal,.12);
+  for(const x of [11.5,16.5])box(staticGroup,[.18,3.4,.18],[x,2,19],dark,.03);
+  const police=kiosk(kit);police.position.set(15,0,23);staticGroup.add(police);
+  // Small memory marker; intentionally a blockout, not a detailed sculpture.
+  const hachiko=new T.Group();hachiko.position.set(7,0,16);staticGroup.add(hachiko);
+  box(hachiko,[1.6,.7,1.6],[0,.8,0],cream,.12);
+  box(hachiko,[.55,.85,.65],[0,1.5,0],dark,.14);
+  box(hachiko,[.55,.5,.65],[0,2.1,.2],dark,.12);
+  for(const x of [-.2,.2])box(hachiko,[.13,.28,.18],[x,2.43,.15],dark,.02);
+  sign(hachiko,kit,'HACHIKO',0,.9,.85,1.35,.3,'#536f66');
   const depot=new T.Group();depot.position.set(DOCK.x,0,DOCK.z);staticGroup.add(depot);
   for(const x of [-.85,.85])box(depot,[.13,13.8,.18],[x,7.5,0],solar,.025);
   for(const x of [-.85,.85])box(depot,[.13,.16,DOCK.z-DOCK.berthZ],[x,DOCK.y-1,(DOCK.berthZ-DOCK.z)/2],solar,.025);
@@ -130,20 +161,19 @@ export function cityRig(scene:T.Scene) {
   box(depot,[1.9,2.3,.15],[0,1.95,-.78],cream,.06);
   box(depot,[1.9,1.8,.15],[0,1.7,.78],teal,.06);
   sign(depot,kit,'受取  /  PICKUP',0,1.8,.89,1.6,.4,'#46676e');
-  for(const [x,z] of [[-8,4.8],[7,-3.5]]){
+  for(const [x,z] of [[-12,12],[16,-7]]){
     const terminal=new T.Group();terminal.position.set(x,0,z);staticGroup.add(terminal);
     box(terminal,[.7,2.3,.5],[0,1.7,0],cream,.24);box(terminal,[.48,1.4,.08],[0,2,.28],futureLight,.035);
     sign(terminal,kit,'AIR / 02',0,3.1,.32,1.7,.48,'#467b86');
   }
-  // Fixed traffic island and civic seating.
-  box(staticGroup,[3.2,.35,7.5],[9,.6,7],cream,.9);
-  for(const [x,z] of [[-8,-9],[-9,12],[18,7]]){
+  // Civic seating stays outside the five crossing mouths.
+  for(const [x,z] of [[-18,-25],[8,20],[16,10]]){
     box(staticGroup,[3.1,.24,.9],[x,1.2,z],pink,.1);
     for(const dx of [-1,1])box(staticGroup,[.25,.7,.65],[x+dx,.8,z],dark,.06);
   }
   const foliage:T.Group[]=[];
   const leafMats=[paint('#859f70'),paint('#aec08b'),paint('#6f9479')];
-  for(const [x,z] of [[-7,-9],[-8,-16],[-20,17],[-9,15],[8,9],[18,8],[19,-5],[5,-18]]){
+  for(const [x,z] of [[-19,-21],[-29,24],[-16,22],[6,23],[15,7],[28,-8],[23,-22]]){
     const bowl=new T.Mesh(new T.CylinderGeometry(1.5,1.05,.95,24),cream);bowl.position.set(x,1.05,z);bowl.castShadow=true;bowl.receiveShadow=true;staticGroup.add(bowl);
     const earth=new T.Mesh(new T.CylinderGeometry(1.32,1.32,.1,24),soil);earth.position.set(x,1.56,z);staticGroup.add(earth);
     box(staticGroup,[.34,2.2,.34],[x,2.55,z],pink,.12);
@@ -151,14 +181,14 @@ export function cityRig(scene:T.Scene) {
     for(let j=0;j<5;j++){const leaf=new T.Mesh(new T.IcosahedronGeometry(1.35,2),leafMats[j%3]);leaf.position.set((random()-.5)*1.8,random()*1.7,(random()-.5)*1.8);leaf.scale.set(.8,1.15,.8);leaf.castShadow=true;crown.add(leaf);}
   }
   const lampMat=new T.MeshStandardMaterial({color:'#ffe1a3',emissive:'#ffe1a3',emissiveIntensity:1,roughness:.6});
-  for(const [x,z] of [[-6,-10],[6,-7],[-7,9],[7,16]]){
+  for(const [x,z] of [[-7,-10],[9,-8],[-13,8],[11,10]]){
     box(staticGroup,[.18,4.5,.18],[x,2.9,z],dark,.06);box(staticGroup,[1.5,.17,.17],[x+.65,5.1,z],dark,.05);box(staticGroup,[.85,.12,.55],[x+1.1,5,z],lampMat,.06);
   }
   // The two 2026 leftovers retain their imperfect silhouettes in the frozen kit.
-  const signal=new T.Group();signal.position.set(-6,.8,6);signal.rotation.z=.06;staticGroup.add(signal);
+  const signal=new T.Group();signal.position.set(-14,.45,5);signal.rotation.z=.06;staticGroup.add(signal);
   box(signal,[.14,3.7,.14],[0,1.8,0],dark,.04);box(signal,[1.25,.46,.45],[.4,3.6,0],dark,.14);
   for(let i=0;i<3;i++){const light=new T.Mesh(new T.SphereGeometry(.12,10,8),paint(['#b16e5c','#d0b474','#8fab83'][i]));light.position.set(i*.35+.05,3.6,.22);signal.add(light);}
-  const oldBox=new T.Group();oldBox.position.set(-8,.82,10);oldBox.rotation.z=-.065;oldBox.rotation.y=.16;staticGroup.add(oldBox);
+  const oldBox=new T.Group();oldBox.position.set(9,.45,18);oldBox.rotation.z=-.065;oldBox.rotation.y=.16;staticGroup.add(oldBox);
   box(oldBox,[1.05,1.7,.48],[0,.9,0],cream,.1);sign(oldBox,kit,'2026',0,1,.3,.85,.55,'#a78a68');
   // Batch static architecture by material; no geometry is created during transitions.
   staticGroup.updateMatrixWorld(true);
