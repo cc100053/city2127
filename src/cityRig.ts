@@ -9,6 +9,7 @@ const paint = (color: T.ColorRepresentation) => new T.MeshStandardMaterial({ col
 const cream = paint('#dce3e3'), teal = paint('#839da8'), sage = paint('#a9c5c2'), pink = paint('#b9b7ac'), dark = paint('#273e4b'), trim = paint('#edf0ed');
 const futureLight=new T.MeshStandardMaterial({color:'#8ce5d8',emissive:'#68d9de',emissiveIntensity:.8,roughness:.65});
 const solar=paint('#486b83');
+const membrane=new T.MeshStandardMaterial({color:'#9abdb9',roughness:.3,metalness:.25,transparent:true,opacity:.72,side:T.DoubleSide});
 const rounded = new Map<string, RoundedBoxGeometry>();
 function box(parent:T.Object3D, size:[number,number,number], position:[number,number,number], material:T.Material, radius=.18) {
   const key = [...size,radius].join(',');
@@ -44,19 +45,23 @@ export function tower(kit:Kit) {
   box(g,[10.8,.65,10.5],[0,10.25,0],cream,.16);
   box(g,[11.8,.7,11.2],[.5,19.35,0],trim,.12);
   box(g,[10.6,38.2,9.4],[.5,38.8,0],teal,.45);
+  // Wider commons collar breaks the straight shaft; the east wing continues it across the plaza.
+  box(g,[14,13,12.4],[.5,26.5,0],teal,.45);
+  for(const y of [20,33])box(g,[14.5,.5,12.9],[.5,y,0],trim,.12);
   box(g,[11.9,.4,10.8],[.5,58.05,0],cream,.12);
   // Thin dark photovoltaic fins contrast with the warm ceramic mass.
   for(let i=0;i<5;i++)box(g,[.12,1.15,7.8],[-3.4+i*1.9,58.75,0],solar,.025);
   for(const y of [22,26,30,34,38,42,46,50,54]){
-    box(g,[7.7,.65,.1],[.5,y,4.75],dark,.03);
-    box(g,[.1,.65,7.7],[5.85,y,0],dark,.03);
+    const [fz,fx]=y<33?[6.25,7.55]:[4.75,5.85];
+    box(g,[7.7,.65,.1],[.5,y,fz],dark,.03);
+    box(g,[.1,.65,7.7],[fx,y,0],dark,.03);
     for(let i=0;i<4;i++)for(let side=0;side<2;side++){
-      const slot=new T.Object3D();slot.position.set(side?5.92:-2.3+i*1.9,y,side?-2.9+i*1.9:4.82);
+      const slot=new T.Object3D();slot.position.set(side?fx+.07:-2.3+i*1.9,y,side?-2.9+i*1.9:fz+.07);
       slot.rotation.y=side?Math.PI/2:0;slot.scale.set(1.5,.42,.06);g.add(slot);
       kit.windows.push({object:slot,phase:i*.4,occupancy:kit.random()});
     }
   }
-  for(let y=23;y<57;y+=2.4){
+  for(let y=34.2;y<57;y+=2.4){
     box(g,[.09,1.35,8],[5.84,y,0],dark);
     for(let z=-3.5;z<=3.5;z+=1.4)box(g,[.18,1.5,.1],[5.93,y,z],trim);
   }
@@ -69,7 +74,7 @@ export function tower(kit:Kit) {
   for(let i=0;i<5;i++)box(g,[.12,5.4,5],[-3.8+i*.45,14.3,-.6],solar,.02);
   for(const x of [-5,6])box(g,[.36,38.2,9.8],[x,38.8,0],trim);
   sign(g,kit,'MAGNET  /  2127',0,2.1,5.31,7.5,.8,'#425f63');
-  sign(g,kit,'空中駅  /  AIR COMMONS',.5,20.1,5.66,8,.65,'#46676e');
+  sign(g,kit,'空中駅  /  AIR COMMONS',.5,21.4,6.46,8,.65,'#46676e');
   sign(g,kit,'01  /  CARGO',-2.2,11.25,7.72,2.7,.45,'#46676e');
   windows(g,kit,9.4,8,9.4);return g;
 }
@@ -140,18 +145,20 @@ export function cityRig(scene:T.Scene) {
   for(let x=-29;x<31;x+=4)if(Math.abs(x)>15)box(staticGroup,[1.8,.02,.13],[x,.445,0],cream,.01);
   const q=landmarks[0],qfront=new T.Group();qfront.position.set(q.x,0,q.z);qfront.name='QFRONT';
   // Twin occupied cores carry a civic hall and an upper residential district.
-  for(const x of [-3.7,3.7])box(qfront,[3.6,q.h,q.d],[x,q.h/2+.8,0],teal);
+  for(const x of [-3.7,3.7])box(qfront,[3.6,q.h-.8,q.d],[x,q.h/2+.4,0],teal);
   box(qfront,[q.w,5,q.d],[0,3.3,0],dark);
-  for(const y of [11,23,36,48])box(qfront,[q.w+.4,.6,q.d+.4],[0,y,0],trim);
-  for(const [y,h] of [[17,10],[30,10],[42,10]]){
+  for(const y of [11,23,36])box(qfront,[q.w+.4,.6,q.d+.4],[0,y,0],trim);
+  // Deck portal: the public route enters the open floor between the cores.
+  box(qfront,[4.4,.5,.6],[0,12.2,q.d/2+.1],trim,.08);
+  for(const [y,h] of [[17,10],[30,10]]){
     box(qfront,[q.w-.6,h,q.d-.5],[0,y,0],teal);
     for(let x=-4.5;x<=4.5;x+=1.5)box(qfront,[.12,h,.18],[x,y,5.03],trim);
     for(let f=y-h/2+1;f<y+h/2;f+=2)box(qfront,[q.w-1,.6,.12],[0,f,5.05],dark);
   }
-  box(qfront,[7,20,.25],[0,33,5.18],dark);
-  sign(qfront,kit,'QFRONT',0,43,5.4,8,1.2,'#294652');
-  sign(qfront,kit,'渋谷  /  SHIBUYA',0,36,5.4,6.4,1.7,'#527789');
-  sign(qfront,kit,'2 1 2 7',0,30,5.4,6.4,2.2,'#527789');
+  box(qfront,[7,11,.25],[0,30,5.18],dark);
+  sign(qfront,kit,'QFRONT',0,44,6.05,8,1.2,'#294652');
+  sign(qfront,kit,'渋谷  /  SHIBUYA',0,32.4,5.4,6.4,1.7,'#527789');
+  sign(qfront,kit,'2 1 2 7',0,28,5.4,6.4,2.2,'#527789');
   sign(qfront,kit,'TSUTAYA / COMMONS',0,4.1,5.12,9.5,.85,'#294652');
   staticGroup.add(qfront,tower(kit));
   for(const [i,color] of [[2,sage],[3,pink],[4,cream]] as const){
@@ -159,10 +166,21 @@ export function cityRig(scene:T.Scene) {
   }
   for(const link of upperLinks){
     const g=new T.Group();g.position.set(link.x,link.y,link.z);staticGroup.add(g);
-    box(g,[link.w,link.h,link.d],[0,0,0],dark);
     for(const y of [-link.h/2,link.h/2])box(g,[link.w+.4,.35,link.d+.5],[0,y,0],trim);
-    for(let x=-link.w/2+.8;x<link.w/2;x+=1.3)box(g,[.1,link.h,.2],[x,0,link.d/2+.08],trim);
-    for(const z of [-link.d/2,link.d/2])box(g,[link.w,1,.08],[0,link.h/2+.6,z],teal);
+    if(link.kind==='floor'){
+      // Open public colonnade: slab, roof, slender columns and glass rails; no enclosing wall.
+      for(let x=-link.w/2+1.2;x<link.w/2;x+=2.6)for(const z of [-link.d/2+.3,link.d/2-.3])box(g,[.3,link.h,.3],[x,0,z],trim,.05);
+      for(const z of [-link.d/2,link.d/2])box(g,[link.w,1.05,.06],[0,-link.h/2+.7,z],membrane);
+    } else if(link.kind==='link'){
+      box(g,[link.w,link.h,link.d],[0,0,0],dark);
+      for(let x=-link.w/2+.8;x<link.w/2;x+=1.3)box(g,[.1,link.h,.2],[x,0,link.d/2+.08],trim);
+      for(const z of [-link.d/2,link.d/2])box(g,[link.w,1,.08],[0,link.h/2+.6,z],teal);
+    } else {
+      box(g,[link.w,link.h,link.d],[0,0,0],teal);
+      const floors=new T.Group();floors.position.y=-link.h/2;g.add(floors);windows(floors,kit,link.w,link.h,link.d);
+      for(let y=-link.h/2+3.5;y<link.h/2-1;y+=3.5)box(g,[link.w+.2,.22,link.d+.2],[0,y,0],trim);
+    }
+    for(const [x,z] of link.columns)box(staticGroup,[1.2,link.y-link.h/2,1.2],[x,(link.y-link.h/2)/2,z],trim,.1);
   }
   // Station-facing entrance; keep Hachiko plaza low and open in the foreground.
   const entry=new T.Group();entry.position.set(18.8,0,12);entry.rotation.y=-Math.PI/2;staticGroup.add(entry);
@@ -195,7 +213,6 @@ export function cityRig(scene:T.Scene) {
     box(staticGroup,[3.1,.24,.9],[x,1.2,z],pink,.1);
     for(const dx of [-1,1])box(staticGroup,[.25,.7,.65],[x+dx,.8,z],dark,.06);
   }
-  const membrane=new T.MeshStandardMaterial({color:'#9abdb9',roughness:.3,metalness:.25,transparent:true,opacity:.72,side:T.DoubleSide});
   for(const [x,z] of [[-19,-21],[-29,24],[-16,22],[6,23],[28,-8],[23,-22]]){
     box(staticGroup,[2.2,.35,2.2],[x,.8,z],trim);
     for(let i=0;i<5;i++){

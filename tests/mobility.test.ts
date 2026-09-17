@@ -107,3 +107,27 @@ for(const route of airRoutes())for(let i=0;i<=500;i++){
   for(const b of upperLinks)assert.ok(!(Math.abs(p.x-b.x)<b.w/2+2.3 && Math.abs(p.z-b.z)<b.d/2+2.3 && Math.abs(p.y-b.y)<b.h/2+1),'Aircraft intersects occupied upper link');
 }
 console.log('PASS: public lift/deck continuity, architectural endpoints, cargo separation and upper-link air clearance.');
+
+// Every occupied upper volume bears on the cores it names, stays under their roofs, and clears the courier column and public walkers.
+const overlap=(c:number,w:number,bc:number,bw:number)=>Math.min(c+w/2,bc+bw/2)-Math.max(c-w/2,bc-bw/2);
+for(const link of upperLinks){
+  assert.ok(link.on.length>0,`${link.name} has no bearing`);
+  for(const name of link.on){
+    const b=landmarks.find(b=>b.name===name)!;
+    assert.ok(overlap(link.x,link.w,b.x,b.w)>=1.5 && overlap(link.z,link.d,b.z,b.d)>=1.5,`${link.name} does not bear on ${name}`);
+    assert.ok(link.y+link.h/2<=b.h+.5,`${link.name} rises above ${name}`);
+  }
+  for(const [x,z] of link.columns){
+    assert.ok(overlap(x,1.2,link.x,link.w)>1.19 && overlap(z,1.2,link.z,link.d)>1.19,`${link.name} column stands outside the volume`);
+    assert.ok(!roads.some(r=>onRoad(x,z,r)),`${link.name} column stands on a road`);
+  }
+  for(let t=0;t<32;t+=.05){
+    const d=deliveryMotion(t);
+    assert.ok(!(Math.abs(DOCK.x-link.x)<link.w/2+2.3 && Math.abs(d.z-link.z)<link.d/2+2.3 && Math.abs(DOCK.y-link.y)<link.h/2+1),`Courier meets ${link.name}`);
+  }
+  for(let i=0;i<12;i++)for(let t=0;t<96;t+=.25){
+    const p=publicJourney(t,i);
+    assert.ok(!(Math.abs(p.x-link.x)<link.w/2+.35 && Math.abs(p.z-link.z)<link.d/2+.35 && Math.abs(p.y-link.y)<link.h/2+1.9),`Walker meets ${link.name}`);
+  }
+}
+console.log('PASS: upper volumes bear on named cores, columns clear roads, courier and walkers clear occupied volumes.');

@@ -53,7 +53,12 @@ export function publicJourney(time:number,index:number) {
   return {...p,yaw:p.yaw+(forward?0:Math.PI),walking:u>.15&&u<.85};
 }
 
-// Upper occupied links join existing cores; include their true envelopes in air checks.
+// Occupied upper volumes bear on the named landmark cores; every entry is checked for air, courier and walker clearance.
+// kind: 'link' solid occupied bar, 'floor' open public colonnade, 'wing' housing/commons block with windows.
 export const upperLinks = [
-  {x:2.5,z:-19,w:25,h:4,d:7,y:39},
-];
+  {name:'SKY LINK',kind:'link',x:2.5,z:-19,w:25,h:4,d:7,y:39,on:['QFRONT','MAGNET / AIR COMMONS'],columns:[]},
+  {name:'COMMONS FLOOR',kind:'floor',x:2.5,z:-19,w:25,h:3.5,d:9,y:24,on:['QFRONT','MAGNET / AIR COMMONS'],columns:[]},
+  {name:'QFRONT CROWN',kind:'wing',x:-12.75,z:-18.5,w:17,h:8,d:11.5,y:44,on:['QFRONT'],columns:[]},
+  {name:'QFRONT WEST WING',kind:'wing',x:-18.5,z:-18.5,w:9,h:14,d:9.5,y:33,on:['QFRONT'],columns:[]},
+  {name:'MAGNET EAST WING',kind:'wing',x:24.25,z:-19,w:9.5,h:13,d:12,y:27.5,on:['MAGNET / AIR COMMONS'],columns:[[27.2,-23.2],[27.2,-14.8]]},
+] as const;
