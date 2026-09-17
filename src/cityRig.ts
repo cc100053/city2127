@@ -5,10 +5,11 @@ import type { WorldState } from './presets';
 import { mobility, airRoutes } from './mobility';
 import { crossings, crossingPoint, roads, landmarks, publicRoutes, upperLinks, DOCK } from './layout';
 
-const paint = (color: T.ColorRepresentation) => new T.MeshStandardMaterial({ color, roughness:.32, metalness:.08 });
-const cream = paint('#dce3e3'), teal = paint('#839da8'), sage = paint('#a9c5c2'), pink = paint('#b9b7ac'), dark = paint('#273e4b'), trim = paint('#edf0ed');
+// Three finishes: matte ceramic composite, refined metal, and reflective glass. Same shader, different response to the one environment map.
+const paint = (color: T.ColorRepresentation, roughness=.52, metalness=0) => new T.MeshStandardMaterial({ color, roughness, metalness });
+const cream = paint('#dce3e3',.58), teal = paint('#839da8',.44,.05), sage = paint('#a9c5c2',.5), pink = paint('#b9b7ac',.56), dark = paint('#27414f',.16,.7), trim = paint('#edf0ed',.48);
 const futureLight=new T.MeshStandardMaterial({color:'#8ce5d8',emissive:'#68d9de',emissiveIntensity:.8,roughness:.65});
-const solar=paint('#486b83');
+const solar=paint('#486b83',.3,.85);
 const membrane=new T.MeshStandardMaterial({color:'#9abdb9',roughness:.3,metalness:.25,transparent:true,opacity:.72,side:T.DoubleSide});
 const rounded = new Map<string, RoundedBoxGeometry>();
 function box(parent:T.Object3D, size:[number,number,number], position:[number,number,number], material:T.Material, radius=.18) {
@@ -26,6 +27,7 @@ function windows(group:T.Group, kit:Kit, width:number, height:number, depth:numb
     obj.rotation.y = side===0 ? 0 : Math.PI/2;
     obj.scale.set(1.13,1.3,.09); group.add(obj);
     kit.windows.push({object:obj,phase:floor*.75+col*.28,occupancy:kit.random()});
+    if(col===0)box(group,side===0?[width-.4,.1,.55]:[.55,.1,depth-.4],side===0?[0,3.2+floor*2.1+.85,depth/2+.2]:[width/2+.2,3.2+floor*2.1+.85,0],trim,.03);
   }
 }
 function sign(group:T.Group, kit:Kit, text:string, x:number,y:number,z:number,w:number,h:number,bg:string,fg='#eff3d3') {
@@ -55,6 +57,8 @@ export function tower(kit:Kit) {
     const [fz,fx]=y<33?[6.25,7.55]:[4.75,5.85];
     box(g,[7.7,.65,.1],[.5,y,fz],dark,.03);
     box(g,[.1,.65,7.7],[fx,y,0],dark,.03);
+    box(g,[8.1,.1,.5],[.5,y+.55,fz+.18],trim,.03);
+    box(g,[.5,.1,8.1],[fx+.18,y+.55,0],trim,.03);
     for(let i=0;i<4;i++)for(let side=0;side<2;side++){
       const slot=new T.Object3D();slot.position.set(side?fx+.07:-2.3+i*1.9,y,side?-2.9+i*1.9:fz+.07);
       slot.rotation.y=side?Math.PI/2:0;slot.scale.set(1.5,.42,.06);g.add(slot);
@@ -87,7 +91,8 @@ export function shop(kit:Kit,x:number,z:number,w:number,h:number,d:number,color:
   if(h>12)box(g,[w,h-10,d],[0,(h-10)/2+10.8,0],color);
   box(g,[w+.7,.3,d+.7],[0,10.5,0],trim);
   for(let y=13;y<h;y+=3.5){
-    box(g,[w+.2,.22,d+.2],[0,y,0],trim);
+    box(g,[w+.2,.34,d+.2],[0,y,0],trim);
+    box(g,[w-.6,.1,.5],[0,y+2,d/2+.2],trim,.03);
     box(g,[w-.8,1.3,.08],[0,y+1.2,d/2+.03],dark);
     for(let x=-w/2+1;x<w/2;x+=1.4)box(g,[.06,1.5,.18],[x,y+1.2,d/2+.1],trim);
   }
@@ -127,10 +132,10 @@ export function cityRig(scene:T.Scene) {
   const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
   const kit:Kit={windows:[],signs:[],random};
   const staticGroup=new T.Group();scene.add(staticGroup);
-  const road=paint('#71818a');
+  const road=paint('#71818a',.9),ground=paint('#d6dbd8',.78);
   // Ground continues past the hero frame; fog closes it instead of a plate edge.
   box(staticGroup,[150,1,140],[0,-.2,0],cream,.9);
-  box(staticGroup,[149,.12,139],[0,.36,0],trim,.5);
+  box(staticGroup,[149,.12,139],[0,.36,0],ground,.5);
   for(const points of roads){
     const shape=new T.Shape();points.forEach(([x,z],i)=>i?shape.lineTo(x,-z):shape.moveTo(x,-z));shape.closePath();
     const pavement=new T.Mesh(new T.ShapeGeometry(shape),road);pavement.rotation.x=-Math.PI/2;pavement.position.y=.43;pavement.receiveShadow=true;staticGroup.add(pavement);
@@ -154,7 +159,7 @@ export function cityRig(scene:T.Scene) {
   for(const [y,h] of [[17,10],[30,10]]){
     box(qfront,[q.w-.6,h,q.d-.5],[0,y,0],teal);
     for(let x=-4.5;x<=4.5;x+=1.5)box(qfront,[.12,h,.18],[x,y,5.03],trim);
-    for(let f=y-h/2+1;f<y+h/2;f+=2)box(qfront,[q.w-1,.6,.12],[0,f,5.05],dark);
+    for(let f=y-h/2+1;f<y+h/2;f+=2){box(qfront,[q.w-1,.6,.12],[0,f,5.05],dark);box(qfront,[q.w-.6,.1,.5],[0,f+.5,5.22],trim,.03);}
   }
   box(qfront,[7,11,.25],[0,30,5.18],dark);
   sign(qfront,kit,'QFRONT',0,44,6.05,8,1.2,'#294652');

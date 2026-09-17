@@ -15,12 +15,12 @@ try {
   const scene=new T.Scene();scene.background=new T.Color('#dfd6cd');scene.fog=new T.FogExp2('#dfd6cd',.008);
   const renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);
-  renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=.95;renderer.outputColorSpace=T.SRGBColorSpace;
+  renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=.9;renderer.outputColorSpace=T.SRGBColorSpace;
   renderer.info.autoReset=false;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
   renderer.domElement.setAttribute('aria-label','A multi-level Shibuya crossing in 2127. Drag to orbit, scroll to zoom, right-drag to pan. Use 0 for daylight, 1 for pulse, 2 for still.');
   document.querySelector('#app')!.appendChild(renderer.domElement);
   const environment=new T.PMREMGenerator(renderer),room=new RoomEnvironment();
-  scene.environment=environment.fromScene(room,.04).texture;scene.environmentIntensity=.3;room.dispose();environment.dispose();
+  scene.environment=environment.fromScene(room,.04).texture;scene.environmentIntensity=.6;room.dispose();environment.dispose();
   const camera=heroCamera(innerWidth,innerHeight);
   const ambient=new T.HemisphereLight('#edf1e4','#849184',2.2);scene.add(ambient);
   const sun=new T.DirectionalLight('#ffe4b8',3.4);sun.position.set(-20,38,18);sun.castShadow=true;
@@ -45,8 +45,8 @@ try {
     (scene.background as T.Color).copy(dusk).lerp(night,pulse).lerp(morning,still);
     (scene.fog as T.FogExp2).color.copy(scene.background as T.Color);(scene.fog as T.FogExp2).density=.0015+s.haze*.003;
     floor.material.color.copy(scene.background as T.Color);
-    sun.color.copy(sunWarm).lerp(sunCool,pulse);sun.intensity=2.6+pulse*.2+still*.4;
-    sun.position.set(-30+still*10,65,30);ambient.intensity=1.3+pulse*.15+still*.15;
+    sun.color.copy(sunWarm).lerp(sunCool,pulse);sun.intensity=3+pulse*.2+still*.4;
+    sun.position.set(-30+still*10,65,30);ambient.intensity=1.05+pulse*.15+still*.15;
     ambient.color.copy(ambientWarm).lerp(ambientCool,pulse);
     bloom.strength=.06+pulse*.04;
     controls.update();rig.update(s,now);updateOverlay(status);renderer.info.reset();composer.render();
