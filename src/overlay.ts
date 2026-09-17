@@ -6,7 +6,7 @@ export function overlay(choose: (name: StateName) => void) {
     <section class="intro"><p class="eyebrow">A SMALL PLACE. A BIG DECISION.</p><h1>The same street.<br>A different <em>tomorrow.</em></h1><p class="question">May a perfect future erase<br>an imperfect past?</p></section>
     <aside class="state-label"><span class="state-dot"></span><span id="state-name">DAYLIGHT TOKYO</span><span id="time">12:00</span></aside>
     <section class="verdict" aria-live="polite" aria-atomic="true"><p id="judgment"></p><span id="hold-note"></span></section>
-    <footer><span class="footnote">A FROZEN INTERSECTION<br><span>Built once. Three ways to belong.</span></span><div class="choices" role="group" aria-label="Choose a future"><button data-state="neutral" aria-pressed="true"><kbd>0</kbd><span>Daylight<small>The shared city</small></span></button><button data-state="pulse" aria-pressed="false"><kbd>1</kbd><span>Pulse<small>Always awake</small></span></button><button data-state="still" aria-pressed="false"><kbd>2</kbd><span>Still<small>Room to breathe</small></span></button><div class="progress"></div></div><span class="instruction" id="instruction">CHOOSE YOUR TOMORROW<br><span>Press 0, 1 or 2</span></span></footer>`;
+    <footer><span class="footnote">A FROZEN INTERSECTION<br><span>Built once. Three ways to belong.</span></span><div class="choices" role="group" aria-label="Choose a future"><button data-state="neutral" aria-pressed="true"><kbd>0</kbd><span>Daylight<small>The shared city</small></span></button><button data-state="pulse" aria-pressed="false"><kbd>1</kbd><span>Pulse<small>Always awake</small></span></button><button data-state="still" aria-pressed="false"><kbd>2</kbd><span>Still<small>Room to breathe</small></span></button><div class="progress"></div></div><span class="instruction" id="instruction">DRAG TO ORBIT · SCROLL TO ZOOM<br><span>Press 0, 1 or 2</span></span></footer>`;
   document.body.appendChild(host);
   const buttons = Array.from(host.querySelectorAll<HTMLButtonElement>('button'));
   buttons.forEach(button => button.onclick = () => choose(button.dataset.state as StateName));
@@ -29,7 +29,7 @@ export function overlay(choose: (name: StateName) => void) {
     host.querySelector('#time')!.textContent = times[status.target];
     host.querySelector('#judgment')!.textContent = status.judgment ? `JUDGMENT: YOU CHOSE ${names[status.target]}` : '';
     host.querySelector('#hold-note')!.textContent = status.judgment ? status.phase === 'hold' ? `A moment to live with your choice. ${Math.ceil(status.remaining)}s` : 'The same crossing. A future chosen by you.' : '';
-    host.querySelector('#instruction')!.textContent = status.phase === 'transition' ? 'THE CITY IS BECOMING…' : status.phase === 'hold' ? 'LET THE CHOICE SETTLE' : 'PRESS 0, 1 OR 2 · CHOOSE AGAIN';
+    host.querySelector('#instruction')!.innerHTML = status.phase === 'transition' ? 'THE CITY IS BECOMING…' : status.phase === 'hold' ? 'LET THE CHOICE SETTLE' : 'DRAG TO ORBIT · SCROLL TO ZOOM<br><span>Press 0, 1 or 2 to choose again</span>';
     buttons.forEach(button => { button.disabled = status.phase !== 'ready'; button.setAttribute('aria-pressed', String(button.dataset.state === status.target)); });
   };
 }
