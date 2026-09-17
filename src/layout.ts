@@ -35,23 +35,30 @@ export const publicRoutes = [
   {name:'QFRONT / STATION',points:[[-10,8,-13.2],[-6,8,-9.6],[6,10,9.5],[19,10,12]],width:2.4},
   {name:'DOGENZAKA / CENTER-GAI',points:[[-19.3,6,13],[-16,6,6],[-17,9,-5.4],[-24,9,-8]],width:2.2},
 ];
-const publicDistances=publicRoutes.map(({points})=>points.slice(1).map((p,i)=>Math.hypot(...p.map((v,j)=>v-points[i][j]))));
+// Unit lane offset at every vertex, mitred at corners, so a side lane is itself a continuous path.
+const publicNormals=publicRoutes.map(({points})=>{
+  const n=points.slice(1).map((p,i)=>{const dx=p[0]-points[i][0],dz=p[2]-points[i][2],l=Math.hypot(dx,dz);return [dz/l,-dx/l];});
+  return points.map((_,i)=>{const a=n[Math.max(0,i-1)],b=n[Math.min(n.length-1,i)],sx=a[0]+b[0],sz=a[1]+b[1],q=sx*sx+sz*sz;return [sx*2/q,sz*2/q];});
+});
 export function publicPoint(route:number,u:number,lane=0) {
-  const {points}=publicRoutes[route];
-  const distances=publicDistances[route];
+  const pts=publicRoutes[route].points.map((p,i)=>[p[0]+publicNormals[route][i][0]*lane,p[1],p[2]+publicNormals[route][i][1]*lane]);
+  const distances=pts.slice(1).map((p,i)=>Math.hypot(p[0]-pts[i][0],p[1]-pts[i][1],p[2]-pts[i][2]));
   let distance=Math.max(0,Math.min(1,u))*distances.reduce((a,b)=>a+b,0),i=0;
   while(i<distances.length-1 && distance>distances[i])distance-=distances[i++];
-  const a=points[i],b=points[i+1],t=distance/distances[i],dx=b[0]-a[0],dz=b[2]-a[2],length=Math.hypot(dx,dz);
-  return {x:a[0]+dx*t+dz/length*lane,y:a[1]+(b[1]-a[1])*t,z:a[2]+dz*t-dx/length*lane,yaw:Math.atan2(dx,dz)};
+  const a=pts[i],b=pts[i+1],t=distance/distances[i];
+  return {x:a[0]+(b[0]-a[0])*t,y:a[1]+(b[1]-a[1])*t,z:a[2]+(b[2]-a[2])*t,yaw:Math.atan2(b[0]-a[0],b[2]-a[2])};
 }
 // A lift ride, a walk, then the destination lift. Reverse the same journey next cycle.
+// Same-route walkers start 16 s apart, so no two ever share a lift. Each direction keeps its own side of the
+// deck; the rider drifts back to the shaft centreline during the lift ride so the reversal stays continuous.
 export function publicJourney(time:number,index:number) {
-  const phase=(time+index*6.7)/48,forward=Math.floor(phase)%2===0;
-  const u=forward?phase%1:1-phase%1,route=index%publicRoutes.length;
-  const p=publicPoint(route,Math.max(0,Math.min(1,(u-.15)/.7)),0);
+  const phase=(time+index*8)/48,forward=Math.floor(phase)%2===0;
+  const u=forward?phase%1:1-phase%1,route=index%publicRoutes.length,w=Math.max(0,Math.min(1,(u-.15)/.7));
+  const lane=(forward?.5:-.5)*Math.min(1,u/.15,(1-u)/.15);
+  const p=publicPoint(route,w,lane),shaft=publicPoint(route,w,0);
   if(u<.15)p.y=.46+(p.y-.46)*u/.15;
   if(u>.85)p.y=.46+(p.y-.46)*(1-u)/.15;
-  return {...p,yaw:p.yaw+(forward?0:Math.PI),walking:u>.15&&u<.85};
+  return {...p,yaw:p.yaw+(forward?0:Math.PI),walking:u>.15&&u<.85,liftX:shaft.x,liftZ:shaft.z};
 }
 
 // Occupied upper volumes bear on the named landmark cores; every entry is checked for air, courier and walker clearance.

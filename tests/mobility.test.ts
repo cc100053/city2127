@@ -106,7 +106,17 @@ for(const route of airRoutes())for(let i=0;i<=500;i++){
   const p=route.getPointAt(i/500);
   for(const b of upperLinks)assert.ok(!(Math.abs(p.x-b.x)<b.w/2+2.3 && Math.abs(p.z-b.z)<b.d/2+2.3 && Math.abs(p.y-b.y)<b.h/2+1),'Aircraft intersects occupied upper link');
 }
-console.log('PASS: public lift/deck continuity, architectural endpoints, cargo separation and upper-link air clearance.');
+// Same-route walkers never share a lift, opposing walkers pass on separate lanes, and riders stay on the platform.
+for(let t=0;t<96;t+=.1)for(let i=0;i<12;i++){
+  const a=publicJourney(t,i);
+  if(!a.walking)assert.ok(Math.hypot(a.x-a.liftX,a.z-a.liftZ)<=.5+1e-8,`Rider ${i} off the platform`);
+  for(let j=i+2;j<12;j+=2){
+    const b=publicJourney(t,j),gap=Math.hypot(a.x-b.x,a.z-b.z);
+    if(!a.walking&&!b.walking)assert.ok(gap>3,`Walkers ${i} and ${j} share a lift`);
+    else assert.ok(gap>.9,`Walkers ${i} and ${j} overlap at t=${t.toFixed(1)}`);
+  }
+}
+console.log('PASS: public lift/deck continuity, architectural endpoints, cargo separation, upper-link air clearance, lift exclusivity and passing lanes.');
 
 // Every occupied upper volume bears on the cores it names, stays under their roofs, and clears the courier column and public walkers.
 const overlap=(c:number,w:number,bc:number,bw:number)=>Math.min(c+w/2,bc+bw/2)-Math.max(c-w/2,bc-bw/2);

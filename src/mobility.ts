@@ -119,11 +119,11 @@ export function mobility(scene:T.Scene) {
     }cars.flush();
     for(let i=0;i<24;i++){
       const motion=streetMotion(time,i,true),amount=T.MathUtils.smoothstep(state.crowd*.3+.1-(i<12?i:i-12)/15,-.06,.06);
-      const p=i<12?{...pedestrianPose(time,i),y:.46,walking:motion.moving}:publicJourney(time,i-12);
+      const journey=i<12?null:publicJourney(time,i-12),p=journey??{...pedestrianPose(time,i),y:.46,walking:motion.moving};
       pose.position.set(p.x,p.y,p.z);
       pose.rotation.set(0,p.yaw,0);pose.scale.setScalar(amount);people.set(i,pose);
-      if(i>=12){
-        limb.position.copy(pose.position);limb.rotation.set(0,0,0);limb.scale.setScalar(p.walking?0:amount);publicLifts.set(i-12,limb);
+      if(journey){
+        limb.position.set(journey.liftX,p.y,journey.liftZ);limb.rotation.set(0,p.yaw,0);limb.scale.setScalar(p.walking?0:amount);publicLifts.set(i-12,limb);
       }
       for(let side=0;side<2;side++){
         limb.position.set((side?1:-1)*.13,.59,0);limb.position.multiplyScalar(amount).applyQuaternion(pose.quaternion).add(pose.position);

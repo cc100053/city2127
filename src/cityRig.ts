@@ -230,24 +230,31 @@ export function cityRig(scene:T.Scene) {
   // The decks use the same authored centerlines as the walkers.
   // Landing plates close the small angle gaps between straight segments.
   for(const route of publicRoutes){
+    const pts=route.points.map(p=>new T.Vector3(...p)),last=pts.length-1,dirs=pts.slice(1).map((p,i)=>p.clone().sub(pts[i]).normalize());
+    // Signed mitre length at each interior corner: the outer rail extends by it, the inner rail shortens, so corners close without crossing rails.
+    const mitre=pts.map((_,j)=>{if(!j||j===last)return 0;const p=dirs[j-1],d=dirs[j],c=p.x*d.z-p.z*d.x;return Math.sign(c)*route.width/2*Math.tan(Math.atan2(Math.abs(c),p.x*d.x+p.z*d.z)/2);});
     for(const [x,y,z] of route.points.slice(1,-1))box(staticGroup,[route.width+.2,.32,route.width+.2],[x,y-.16,z],trim);
-    for(let i=1;i<route.points.length;i++){
-      const a=new T.Vector3(...route.points[i-1]),b=new T.Vector3(...route.points[i]),mid=a.clone().add(b).multiplyScalar(.5);
-      const deck=new T.Group();deck.position.copy(mid);deck.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),b.clone().sub(a).normalize());
+    for(let i=1;i<=last;i++){
+      // Decks stop 1.5 short of each terminal so the platform rises through the landing frame, not a slab.
+      const dir=dirs[i-1];
+      const a=i===1?pts[0].clone().addScaledVector(dir,1.5):pts[i-1],b=i===last?pts[last].clone().addScaledVector(dir,-1.5):pts[i];
+      const deck=new T.Group();deck.position.copy(a).add(b).multiplyScalar(.5);deck.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),dir);
       staticGroup.add(deck);
       box(deck,[route.width,.3,a.distanceTo(b)],[0,-.15,0],trim);
       for(const x of [-route.width/2,route.width/2]){
-        box(deck,[.08,1.05,a.distanceTo(b)],[x,.53,0],membrane);
-        box(deck,[.1,.08,a.distanceTo(b)],[x,1.08,0],solar);
+        const e0=i>1?Math.sign(x)*mitre[i-1]:0,e1=i<last?Math.sign(x)*mitre[i]:0,length=a.distanceTo(b)+e0+e1,shift=(e1-e0)/2;
+        box(deck,[.08,1.05,length],[x,.53,shift],membrane);
+        box(deck,[.1,.08,length],[x,1.08,shift],solar);
       }
     }
-    for(const point of [route.points[0],route.points[route.points.length-1]]){
-      const [x,y,z]=point;
-      box(staticGroup,[3,.3,3],[x,y-.15,z],trim);
-      // Visible lift rails and transparent shaft, aligned with each route endpoint.
-      for(const dx of [-1.35,1.35])box(staticGroup,[.18,y+2,.18],[x+dx,(y+2)/2,z],solar);
-      box(staticGroup,[2.8,y+1,.07],[x,(y+1)/2,z-1.3],membrane);
-      box(staticGroup,[3,.2,3],[x,y+2,z],trim);
+    for(const end of [0,last]){
+      // Terminal aligned with its deck: a landing frame with a 1.6-unit opening for the platform, rails, back membrane, roof.
+      const {x,y,z}=pts[end],into=pts[end?last-1:1].clone().sub(pts[end]).setY(0).normalize();
+      const terminal=new T.Group();terminal.position.set(x,0,z);terminal.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),into);staticGroup.add(terminal);
+      for(const s of [-1,1]){box(terminal,[3,.3,.7],[0,y-.15,s*1.15],trim);box(terminal,[.7,.3,1.6],[s*1.15,y-.15,0],trim);}
+      for(const dx of [-1.35,1.35])box(terminal,[.18,y+2,.18],[dx,(y+2)/2,0],solar);
+      box(terminal,[2.8,y+1,.07],[0,(y+1)/2,-1.3],membrane);
+      box(terminal,[3,.2,3],[0,y+2,0],trim);
     }
   }
   // Paired corridor rails tie aircraft routes into a supported city-scale network.
