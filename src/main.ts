@@ -25,6 +25,11 @@ try {
   const ambient=new T.HemisphereLight('#edf1e4','#849184',2.2);scene.add(ambient);
   const sun=new T.DirectionalLight('#ffe4b8',3.4);sun.position.set(-20,38,18);sun.castShadow=true;
   sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-65,right:65,top:65,bottom:-65,near:1,far:180});sun.shadow.normalBias=.12;scene.add(sun);
+  // Gradient sky: horizon shares the fog colour, zenith is a deeper tone per state. Follows the camera so it never clips.
+  const sky=new T.Mesh(new T.SphereGeometry(150,24,12),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{top:{value:new T.Color()},horizon:{value:new T.Color()}},
+    vertexShader:'varying vec3 p;void main(){p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader:'uniform vec3 top,horizon;varying vec3 p;void main(){float h=clamp(normalize(p).y*1.8,0.,1.);gl_FragColor=vec4(mix(horizon,top,pow(h,.65)),1.);}'}));
+  sky.frustumCulled=false;sky.renderOrder=-1;scene.add(sky);
   const floor=new T.Mesh(new T.PlaneGeometry(500,500),new T.MeshStandardMaterial({color:'#e5ddcc',roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.76;floor.receiveShadow=true;scene.add(floor);
   const rig=cityRig(scene);
   const controls=new OrbitControls(camera,renderer.domElement);
@@ -35,6 +40,7 @@ try {
   const world=createWorldState();let now=0;
   const updateOverlay=overlay(name=>world.choose(name,now));
   const dusk=new T.Color('#c3d9e7'),night=new T.Color('#accbdc'),morning=new T.Color('#e0e6dc');
+  const duskTop=new T.Color('#7f9fbd'),nightTop=new T.Color('#6a8db0'),morningTop=new T.Color('#a9bcc4');
   const sunWarm=new T.Color('#ffe2b3'),sunCool=new T.Color('#e5f3ff'),ambientWarm=new T.Color('#eef0df'),ambientCool=new T.Color('#a7c9ed');
   const start=performance.now();
   let frames=0,measureStart=start;
@@ -45,6 +51,7 @@ try {
     (scene.background as T.Color).copy(dusk).lerp(night,pulse).lerp(morning,still);
     (scene.fog as T.FogExp2).color.copy(scene.background as T.Color);(scene.fog as T.FogExp2).density=.0015+s.haze*.003;
     floor.material.color.copy(scene.background as T.Color);
+    sky.position.copy(camera.position);sky.material.uniforms.horizon.value.copy(scene.background as T.Color);sky.material.uniforms.top.value.copy(duskTop).lerp(nightTop,pulse).lerp(morningTop,still);
     sun.color.copy(sunWarm).lerp(sunCool,pulse);sun.intensity=3+pulse*.2+still*.4;
     sun.position.set(-30+still*10,65,30);ambient.intensity=1.05+pulse*.15+still*.15;
     ambient.color.copy(ambientWarm).lerp(ambientCool,pulse);

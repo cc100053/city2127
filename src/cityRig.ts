@@ -132,7 +132,7 @@ export function cityRig(scene:T.Scene) {
   const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
   const kit:Kit={windows:[],signs:[],random};
   const staticGroup=new T.Group();scene.add(staticGroup);
-  const road=paint('#71818a',.9),ground=paint('#d6dbd8',.78);
+  const road=paint('#71818a',.9),ground=paint('#d6dbd8',.78),distant=paint('#c3d1db',.95);
   // Ground continues past the hero frame; fog closes it instead of a plate edge.
   box(staticGroup,[150,1,140],[0,-.2,0],cream,.9);
   box(staticGroup,[149,.12,139],[0,.36,0],ground,.5);
@@ -271,6 +271,11 @@ export function cityRig(scene:T.Scene) {
     for(const dx of [-2.7,2.7])box(staticGroup,[.28,67-base,.45],[x+dx,(67+base)/2,z],trim);
     box(staticGroup,[6,.3,3],[x,64.4,z],solar);
   }
+  // Distant city: a seeded ring of hazed blocks outside the plate, so the intersection sits in a city rather than on a stand.
+  for(let i=0;i<60;i++){
+    const angle=i/60*Math.PI*2+random()*.08,radius=125+random()*40,w=8+random()*10,h=6+random()*(i%5?20:38);
+    box(staticGroup,[w,h,w*(.6+random()*.8)],[Math.cos(angle)*radius,h/2-.7,Math.sin(angle)*radius],distant,.1).rotation.y=-angle;
+  }
   const lampMat=new T.MeshStandardMaterial({color:'#ffe1a3',emissive:'#ffe1a3',emissiveIntensity:1,roughness:.6});
   for(const [x,z] of [[-7,-10],[9,-8],[-13,8],[11,10]]){
     box(staticGroup,[.18,4.5,.18],[x,2.9,z],dark,.06);box(staticGroup,[1.5,.17,.17],[x+.65,5.1,z],dark,.05);box(staticGroup,[.85,.12,.55],[x+1.1,5,z],lampMat,.06);
@@ -289,6 +294,7 @@ export function cityRig(scene:T.Scene) {
   const glyph=glyphs();scene.add(glyph.group);
   const updateMobility=mobility(scene);
   const color=new T.Color(),cool=new T.Color('#80dfef'),warm=new T.Color('#ffcd83'),off=new T.Color('#254447'),windowColor=new T.Color();
+  const hazeNeutral=new T.Color('#c3d1db'),hazePulse=new T.Color('#b0c4d4'),hazeStill=new T.Color('#d0d6d0');
   return {
     update(state:WorldState,time:number) {
       const pulse=T.MathUtils.clamp((state.neon-.25)/.7,0,1),still=T.MathUtils.clamp((state.warmth-.55)/.3,0,1);
@@ -298,6 +304,7 @@ export function cityRig(scene:T.Scene) {
       futureLight.emissiveIntensity=.25+state.neon*.5;
       glyph.pulse.opacity=state.glyph*pulse;glyph.still.opacity=state.glyph*still;
       membrane.opacity=.6+state.greenery*.18;
+      distant.color.copy(hazeNeutral).lerp(hazePulse,pulse).lerp(hazeStill,still);
       color.copy(cool).lerp(warm,state.warmth);
       kit.windows.forEach((slot,i)=>{
         const occupied=T.MathUtils.smoothstep(state.windowLife-slot.occupancy,-.08,.08);

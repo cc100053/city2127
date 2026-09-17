@@ -3,7 +3,7 @@ import { PerspectiveCamera } from 'three';
 export const HERO_POSITION:[number,number,number]=[34,34,76];
 export const HERO_TARGET:[number,number,number]=[-3,17,-1];
 export function heroCamera(width: number, height: number) {
-  const camera = new PerspectiveCamera(46, width / height, .1, 240);
+  const camera = new PerspectiveCamera(46, width / height, .1, 320);
   camera.position.set(...HERO_POSITION);
   camera.lookAt(...HERO_TARGET);
   return camera;

@@ -1,6 +1,6 @@
 # Plan 02 — 實作進度與下一輪工作
 
-更新：2026-09-17（stage 3 材質完成後）。依據使用者提供的 **Plan 02 Visual + Spatial Implementation Brief**、[Pic 2](../asset/pic2.png)、目前工作樹、測試程式及已保存的畫面核對。這是進度與待辦文件，技術契約見 [PROJECT.md](PROJECT.md)，實際驗證記錄見 [VALIDATION.md](VALIDATION.md)。
+更新：2026-09-17（stage 4 天空完成後）。依據使用者提供的 **Plan 02 Visual + Spatial Implementation Brief**、[Pic 2](../asset/pic2.png)、目前工作樹、測試程式及已保存的畫面核對。這是進度與待辦文件，技術契約見 [PROJECT.md](PROJECT.md)，實際驗證記錄見 [VALIDATION.md](VALIDATION.md)。
 
 **目前完成首個多層空間原型與 stage 1 垂直街區量體，尚未完成 Plan 02 的視覺驗收。** 狀態以目前未提交的工作樹為準，不代表 main 已包含這些變更；不以完成百分比代替驗收。
 
@@ -12,9 +12,9 @@
 - **部分完成**：已有原型，但空間表達、可信度或驗證仍有缺口。
 - **待做／待驗證**：尚未有足夠實作或證據；不把設計意圖、註解或測試存在當成完成。
 
-Stage 3 畫面（材質／光照，鏡位同 stage 2）：[Daylight](../artifacts/plan02-surface-neutral.png) · [Pulse](../artifacts/plan02-surface-pulse.png) · [Still](../artifacts/plan02-surface-still.png)。Stage 2 畫面（新鏡位）：[Daylight](../artifacts/plan02-frame-neutral.png) · [Pulse](../artifacts/plan02-frame-pulse.png) · [Still](../artifacts/plan02-frame-still.png)。Stage 1 畫面（舊鏡位）：[Daylight](../artifacts/plan02-block-neutral.png) · [Pulse](../artifacts/plan02-block-pulse.png) · [Still](../artifacts/plan02-block-still.png)；stage 1 前基線：[Daylight](../artifacts/plan02-neutral.jpg) · [Pulse](../artifacts/plan02-pulse.jpg) · [Still](../artifacts/plan02-still.jpg)。均為 1280×720；stage 2 起鏡位已改，與之前的圖不是同鏡位比較。與 Pic 2 的比較是美術判斷，不是量化相似度測試。
+Stage 4 畫面（天空與遠景，鏡位同 stage 2）：[Daylight](../artifacts/plan02-sky-neutral.png) · [Pulse](../artifacts/plan02-sky-pulse.png) · [Still](../artifacts/plan02-sky-still.png)。Stage 3 畫面（材質／光照，鏡位同 stage 2）：[Daylight](../artifacts/plan02-surface-neutral.png) · [Pulse](../artifacts/plan02-surface-pulse.png) · [Still](../artifacts/plan02-surface-still.png)。Stage 2 畫面（新鏡位）：[Daylight](../artifacts/plan02-frame-neutral.png) · [Pulse](../artifacts/plan02-frame-pulse.png) · [Still](../artifacts/plan02-frame-still.png)。Stage 1 畫面（舊鏡位）：[Daylight](../artifacts/plan02-block-neutral.png) · [Pulse](../artifacts/plan02-block-pulse.png) · [Still](../artifacts/plan02-block-still.png)；stage 1 前基線：[Daylight](../artifacts/plan02-neutral.jpg) · [Pulse](../artifacts/plan02-pulse.jpg) · [Still](../artifacts/plan02-still.jpg)。均為 1280×720；stage 2 起鏡位已改，與之前的圖不是同鏡位比較。與 Pic 2 的比較是美術判斷，不是量化相似度測試。
 
-![Plan 02 stage 3 材質與光照](../artifacts/plan02-surface-neutral.png)
+![Plan 02 stage 4 天空與遠景](../artifacts/plan02-sky-neutral.png)
 
 ## 原定 A–G 階段進度
 
@@ -25,7 +25,7 @@ Stage 3 畫面（材質／光照，鏡位同 stage 2）：[Daylight](../artifact
 | C 有組織的天空基建 | 部分完成 | 雙軌走廊、屋頂支架、周邊支柱、既有貨運站 | 仍偏向附加線條；與建築整合、進出節點及支承可信度需加強 |
 | D 工程化生態 | 部分完成 | 移除傳統樹冠與盆栽，加入膜片／鰭片形式 | 淨化、冷卻或水管理的用途尚不能從畫面清楚理解；沒有環境模擬 |
 | E 密度與預設動線 | 部分完成 | 降低人車與循環飛行器密度；分開地面／高架人流 | 尚未完成可比時刻的人數評估；高架行人共用中心線，個體差異與交會仍簡化 |
-| F 光照與材質呈現 | 部分完成（stage 3 已改善） | 三種表面：霧面複合材、精製金屬、反射玻璃；每層遮陽鰭片投影；環境反射 .6、曝光 .9、日光 3.0 | 天空仍是單色背景、沒有城市遠景；仍有微縮感；未達紀實照片質感 |
+| F 光照與材質呈現 | 部分完成（stage 3 已改善） | 三種表面：霧面複合材、精製金屬、反射玻璃；每層遮陽鰭片投影；環境反射 .6、曝光 .9、日光 3.0 | Stage 4 加入漸層天空與霧化遠景；仍有微縮感；未達紀實照片質感 |
 | G 固定鏡頭截圖與評估 | 已完成本輪 | Stage 2 新鏡位三態截圖已保存／開啟檢查，缺口已記錄 | 下一輪修改後必須重新驗證；本輪截圖不構成最終美術通過 |
 
 ## 已完成的實作
@@ -97,6 +97,17 @@ Stage 3 畫面（材質／光照，鏡位同 stage 2）：[Daylight](../artifact
 
 **通過條件不變：** 材料能區分，樓層及陰影有深度；以新截圖重新判斷是否仍有模型感，不能只因材質參數改過就標記完成。
 
+### 4. 追加：天空層次與遠景（2026-09-17 使用者核准，stage 4 已實作）
+
+原計畫沒有這一項；stage 1–3 之後，單色天空與空白地平線成為最強的「模型感」來源，因此追加。
+
+- [x] 漸層天空球（150 單位、跟隨鏡頭、不受霧影響）：地平線色沿用各狀態背景色，天頂色另設三個較深色調。[main.ts](../src/main.ts)
+- [x] 固定種子的 60 座遠景霧化量體，半徑 125–165，落在底板外；單一材質依狀態微調色調。[cityRig.ts](../src/cityRig.ts)
+- [x] 鏡頭遠裁切 240→320 以容納遠景。
+- [ ] 使用者判斷遠景密度／高度是否恰當；若仍嫌搶眼，先降高度與對比，不加細節。
+
+**通過條件：** 路口被城市包圍而不是放在展示台上；遠景只是霧中剪影，不與地標競爭。
+
 ### 之後才處理的細節
 
 - [ ] 精修公共升降平台與樓板交接，檢查轉角、平台穿板、雙向交會及可見重疊；優先調整 authored 幾何與時序。
@@ -125,7 +136,7 @@ Stage 1 記錄見 [VALIDATION.md](VALIDATION.md) 的「Plan 02 stage 1」。上�
 - [ ] 對照 Pic 2 與本文件的視覺驗收表，逐項更新證據／缺口；P0 未成立前不擴充更多裝飾或交通種類。
 - [ ] 更新本文件、技術契約及驗收記錄；沒有量測就不宣稱 FPS，沒有視覺驗證就不宣稱美術通過。
 
-Stage 1、2、3 均已重跑 `npm test`、`npm run build` 與 1280×720 三態截圖；1080p 效能未量測，美術通過待使用者判斷。
+Stage 1–4 均已重跑 `npm test`、`npm run build` 與 1280×720 三態截圖；1080p 效能未量測，美術通過待使用者判斷。
 
 ## 範圍限制
 
