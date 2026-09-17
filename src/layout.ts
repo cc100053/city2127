@@ -16,11 +16,11 @@ export const roads = [
   [[-10,-5],[-4,-7],[6,-7],[8,-4],[8,5],[3,7],[-9,7]],
 ];
 export const landmarks = [
-  {name:'QFRONT',x:-10,z:-18.5,w:11,h:17,d:10},
-  {name:'MAGNET / AIR COMMONS',x:15,z:-19,w:12.5,h:30,d:15.5},
-  {name:'CENTER-GAI',x:-27,z:-8,w:5,h:10,d:3},
-  {name:'DOGENZAKA',x:-24,z:13,w:9,h:9,d:11},
-  {name:'SHIBUYA STATION',x:24,z:15,w:10,h:6,d:19},
+  {name:'QFRONT',x:-10,z:-18.5,w:11,h:48,d:10},
+  {name:'MAGNET / AIR COMMONS',x:15,z:-19,w:12.5,h:58,d:15.5},
+  {name:'CENTER-GAI',x:-27,z:-8,w:5,h:32,d:3},
+  {name:'DOGENZAKA',x:-24,z:13,w:9,h:24,d:11},
+  {name:'SHIBUYA STATION',x:24,z:15,w:10,h:18,d:19},
 ];
 export const DOCK={x:landmarks[1].x,y:15,z:landmarks[1].z+6.5,berthZ:landmarks[1].z+3.8};
 
@@ -28,3 +28,32 @@ export function crossingPoint(path:number,u:number,lane=0) {
   const {from,to}=crossings[path],dx=to[0]-from[0],dz=to[1]-from[1],length=Math.hypot(dx,dz);
   return {x:from[0]+dx*u+dz/length*lane,z:from[1]+dz*u-dx/length*lane,yaw:Math.atan2(dx,dz)};
 }
+
+// Public decks connect the existing landmark mouths; terminal lifts serve ground and deck.
+export const publicRoutes = [
+  {name:'QFRONT / STATION',points:[[-10,8,-13.2],[-6,8,-9.6],[6,10,9.5],[19,10,12]],width:2.4},
+  {name:'DOGENZAKA / CENTER-GAI',points:[[-19.3,6,13],[-16,6,6],[-17,9,-5.4],[-24,9,-8]],width:2.2},
+];
+const publicDistances=publicRoutes.map(({points})=>points.slice(1).map((p,i)=>Math.hypot(...p.map((v,j)=>v-points[i][j]))));
+export function publicPoint(route:number,u:number,lane=0) {
+  const {points}=publicRoutes[route];
+  const distances=publicDistances[route];
+  let distance=Math.max(0,Math.min(1,u))*distances.reduce((a,b)=>a+b,0),i=0;
+  while(i<distances.length-1 && distance>distances[i])distance-=distances[i++];
+  const a=points[i],b=points[i+1],t=distance/distances[i],dx=b[0]-a[0],dz=b[2]-a[2],length=Math.hypot(dx,dz);
+  return {x:a[0]+dx*t+dz/length*lane,y:a[1]+(b[1]-a[1])*t,z:a[2]+dz*t-dx/length*lane,yaw:Math.atan2(dx,dz)};
+}
+// A lift ride, a walk, then the destination lift. Reverse the same journey next cycle.
+export function publicJourney(time:number,index:number) {
+  const phase=(time+index*6.7)/48,forward=Math.floor(phase)%2===0;
+  const u=forward?phase%1:1-phase%1,route=index%publicRoutes.length;
+  const p=publicPoint(route,Math.max(0,Math.min(1,(u-.15)/.7)),0);
+  if(u<.15)p.y=.46+(p.y-.46)*u/.15;
+  if(u>.85)p.y=.46+(p.y-.46)*(1-u)/.15;
+  return {...p,yaw:p.yaw+(forward?0:Math.PI),walking:u>.15&&u<.85};
+}
+
+// Upper occupied links join existing cores; include their true envelopes in air checks.
+export const upperLinks = [
+  {x:2.5,z:-19,w:25,h:4,d:7,y:39},
+];

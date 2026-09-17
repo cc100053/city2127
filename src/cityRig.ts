@@ -2,17 +2,17 @@ import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets';
-import { mobility } from './mobility';
-import { crossings, crossingPoint, roads, landmarks, DOCK } from './layout';
+import { mobility, airRoutes } from './mobility';
+import { crossings, crossingPoint, roads, landmarks, publicRoutes, upperLinks, DOCK } from './layout';
 
-const paint = (color: T.ColorRepresentation) => new T.MeshStandardMaterial({ color, roughness:.83, metalness:0 });
-const cream = paint('#e6debf'), teal = paint('#719993'), sage = paint('#a9b392'), pink = paint('#ca9c8e'), dark = paint('#3f5e61'), trim = paint('#ece6d3'), soil = paint('#53584a');
+const paint = (color: T.ColorRepresentation) => new T.MeshStandardMaterial({ color, roughness:.32, metalness:.08 });
+const cream = paint('#dce3e3'), teal = paint('#839da8'), sage = paint('#a9c5c2'), pink = paint('#b9b7ac'), dark = paint('#273e4b'), trim = paint('#edf0ed');
 const futureLight=new T.MeshStandardMaterial({color:'#8ce5d8',emissive:'#68d9de',emissiveIntensity:.8,roughness:.65});
 const solar=paint('#486b83');
 const rounded = new Map<string, RoundedBoxGeometry>();
 function box(parent:T.Object3D, size:[number,number,number], position:[number,number,number], material:T.Material, radius=.18) {
   const key = [...size,radius].join(',');
-  if (!rounded.has(key)) rounded.set(key,new RoundedBoxGeometry(...size,2,Math.min(radius,...size.map(v=>v/2))));
+  if (!rounded.has(key)) rounded.set(key,new RoundedBoxGeometry(...size,2,Math.min(radius,.055,...size.map(v=>v/2))));
   const mesh = new T.Mesh(rounded.get(key),material); mesh.position.set(...position); mesh.castShadow=true; mesh.receiveShadow=true; parent.add(mesh); return mesh;
 }
 type WindowSlot = { object:T.Object3D; phase:number; occupancy:number };
@@ -43,11 +43,11 @@ export function tower(kit:Kit) {
   for(const x of [-4.25,4.25])box(g,[.85,9.2,8.6],[x,14.8,-.3],trim,.12);
   box(g,[10.8,.65,10.5],[0,10.25,0],cream,.16);
   box(g,[11.8,.7,11.2],[.5,19.35,0],trim,.12);
-  box(g,[10.6,8.2,9.4],[.5,23.8,0],teal,.45);
-  box(g,[11.9,.4,10.8],[.5,28.05,0],cream,.12);
+  box(g,[10.6,38.2,9.4],[.5,38.8,0],teal,.45);
+  box(g,[11.9,.4,10.8],[.5,58.05,0],cream,.12);
   // Thin dark photovoltaic fins contrast with the warm ceramic mass.
-  for(let i=0;i<5;i++)box(g,[.12,1.15,7.8],[-3.4+i*1.9,28.75,0],solar,.025);
-  for(const y of [21.2,24.9]){
+  for(let i=0;i<5;i++)box(g,[.12,1.15,7.8],[-3.4+i*1.9,58.75,0],solar,.025);
+  for(const y of [22,26,30,34,38,42,46,50,54]){
     box(g,[7.7,.65,.1],[.5,y,4.75],dark,.03);
     box(g,[.1,.65,7.7],[5.85,y,0],dark,.03);
     for(let i=0;i<4;i++)for(let side=0;side<2;side++){
@@ -56,16 +56,18 @@ export function tower(kit:Kit) {
       kit.windows.push({object:slot,phase:i*.4,occupancy:kit.random()});
     }
   }
+  for(let y=23;y<57;y+=2.4){
+    box(g,[.09,1.35,8],[5.84,y,0],dark);
+    for(let z=-3.5;z<=3.5;z+=1.4)box(g,[.18,1.5,.1],[5.93,y,z],trim);
+  }
   // Split apron leaves a real cargo-elevator opening between its two halves.
   for(const x of [-2.25,2.25]){
     box(g,[2.9,.42,3.3],[x,10.4,6.05],trim,.1);
     box(g,[.08,.06,2.8],[x*.5,10.65,6.05],futureLight,.02);
   }
-  box(g,[1.5,.5,7.6],[-2.8,10.85,0],sage,.2);
-  box(g,[.22,5.7,.22],[-2.8,13.8,-1],pink,.08);
-  for(const [x,y,z] of [[-2.8,16.6,-1],[-2.2,16,-1.5],[-3.3,15.8,-.5]]){
-    const leaf=new T.Mesh(new T.IcosahedronGeometry(1.2,1),sage);leaf.position.set(x,y,z);g.add(leaf);
-  }
+  // Service membranes filter air at the open transfer floor.
+  for(let i=0;i<5;i++)box(g,[.12,5.4,5],[-3.8+i*.45,14.3,-.6],solar,.02);
+  for(const x of [-5,6])box(g,[.36,38.2,9.8],[x,38.8,0],trim);
   sign(g,kit,'MAGNET  /  2127',0,2.1,5.31,7.5,.8,'#425f63');
   sign(g,kit,'空中駅  /  AIR COMMONS',.5,20.1,5.66,8,.65,'#46676e');
   sign(g,kit,'01  /  CARGO',-2.2,11.25,7.72,2.7,.45,'#46676e');
@@ -74,7 +76,16 @@ export function tower(kit:Kit) {
 export function shop(kit:Kit,x:number,z:number,w:number,h:number,d:number,color:T.Material,label:string) {
   const g=new T.Group();g.name=`shop-${label}`;g.position.set(x,0,z);
   box(g,[w+.5,.6,d+.5],[0,.6,0],cream,.25);
-  box(g,[w,h,d],[0,h/2+.8,0],color,.95);
+  box(g,[w,4,d],[0,2.8,0],color);
+  // A full-width public void is held by side cores, with housing above.
+  for(const x of [-w/2+.5,w/2-.5])for(const z of [-d/2+.5,d/2-.5])box(g,[1,5.5,1],[x,7.5,z],trim);
+  if(h>12)box(g,[w,h-10,d],[0,(h-10)/2+10.8,0],color);
+  box(g,[w+.7,.3,d+.7],[0,10.5,0],trim);
+  for(let y=13;y<h;y+=3.5){
+    box(g,[w+.2,.22,d+.2],[0,y,0],trim);
+    box(g,[w-.8,1.3,.08],[0,y+1.2,d/2+.03],dark);
+    for(let x=-w/2+1;x<w/2;x+=1.4)box(g,[.06,1.5,.18],[x,y+1.2,d/2+.1],trim);
+  }
   box(g,[w+.7,.55,d+.7],[0,h+1,0],cream,.25);
   box(g,[w-.7,.55,d-.7],[0,h+1.35,0],sage,.25);
   for(let c=0;c<3;c++) { box(g,[w/3-.5,2,.16],[(c-1)*w/3,1.9,d/2+.03],dark,.1);box(g,[.12,2.2,.25],[(c-1)*w/3,1.9,d/2+.12],trim,.04); }
@@ -85,7 +96,7 @@ export function shop(kit:Kit,x:number,z:number,w:number,h:number,d:number,color:
     box(g,[.07,.1,d*.55],[(c-1)*w/3,h+2,0],futureLight,.03);
   }
   sign(g,kit,label,0,4.1,d/2+.16,w-.8,1.05,'#536f66');
-  if(h>6) windows(g,kit,w,h,d);
+  windows(g,kit,w,5,d);
   return g;
 }
 export function kiosk(kit:Kit) {
@@ -111,7 +122,7 @@ export function cityRig(scene:T.Scene) {
   const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
   const kit:Kit={windows:[],signs:[],random};
   const staticGroup=new T.Group();scene.add(staticGroup);
-  const road=paint('#b1b6ad');
+  const road=paint('#71818a');
   box(staticGroup,[64,1,54],[0,-.2,0],cream,.9);
   box(staticGroup,[63,.12,53],[0,.36,0],trim,.5);
   for(const points of roads){
@@ -128,17 +139,30 @@ export function cityRig(scene:T.Scene) {
   }
   for(let x=-29;x<31;x+=4)if(Math.abs(x)>15)box(staticGroup,[1.8,.02,.13],[x,.445,0],cream,.01);
   const q=landmarks[0],qfront=new T.Group();qfront.position.set(q.x,0,q.z);qfront.name='QFRONT';
-  box(qfront,[q.w,q.h,q.d],[0,q.h/2+.8,0],teal,.25);
-  box(qfront,[q.w+.4,.4,q.d+.4],[0,q.h+1,0],trim,.1);
-  // A broad, simple screen and tall mullions establish the landmark before fine facade work.
-  box(qfront,[10,8,.24],[0,11.6,5.1],dark,.08);
-  sign(qfront,kit,'QFRONT',0,15.7,5.27,9,1.25,'#395a61');
-  sign(qfront,kit,'SHIBUYA  /  2127',0,10.6,5.27,9,3.8,'#ba9181');
-  sign(qfront,kit,'TSUTAYA',0,4.1,5.12,9.5,.85,'#395a61');
-  for(let i=0;i<7;i++)box(qfront,[.09,3,.15],[-4.5+i*1.5,2.2,5.13],trim,.02);
+  // Twin occupied cores carry a civic hall and an upper residential district.
+  for(const x of [-3.7,3.7])box(qfront,[3.6,q.h,q.d],[x,q.h/2+.8,0],teal);
+  box(qfront,[q.w,5,q.d],[0,3.3,0],dark);
+  for(const y of [11,23,36,48])box(qfront,[q.w+.4,.6,q.d+.4],[0,y,0],trim);
+  for(const [y,h] of [[17,10],[30,10],[42,10]]){
+    box(qfront,[q.w-.6,h,q.d-.5],[0,y,0],teal);
+    for(let x=-4.5;x<=4.5;x+=1.5)box(qfront,[.12,h,.18],[x,y,5.03],trim);
+    for(let f=y-h/2+1;f<y+h/2;f+=2)box(qfront,[q.w-1,.6,.12],[0,f,5.05],dark);
+  }
+  box(qfront,[7,20,.25],[0,33,5.18],dark);
+  sign(qfront,kit,'QFRONT',0,43,5.4,8,1.2,'#294652');
+  sign(qfront,kit,'渋谷  /  SHIBUYA',0,36,5.4,6.4,1.7,'#527789');
+  sign(qfront,kit,'2 1 2 7',0,30,5.4,6.4,2.2,'#527789');
+  sign(qfront,kit,'TSUTAYA / COMMONS',0,4.1,5.12,9.5,.85,'#294652');
   staticGroup.add(qfront,tower(kit));
   for(const [i,color] of [[2,sage],[3,pink],[4,cream]] as const){
     const b=landmarks[i];staticGroup.add(shop(kit,b.x,b.z,b.w,b.h,b.d,color,b.name));
+  }
+  for(const link of upperLinks){
+    const g=new T.Group();g.position.set(link.x,link.y,link.z);staticGroup.add(g);
+    box(g,[link.w,link.h,link.d],[0,0,0],dark);
+    for(const y of [-link.h/2,link.h/2])box(g,[link.w+.4,.35,link.d+.5],[0,y,0],trim);
+    for(let x=-link.w/2+.8;x<link.w/2;x+=1.3)box(g,[.1,link.h,.2],[x,0,link.d/2+.08],trim);
+    for(const z of [-link.d/2,link.d/2])box(g,[link.w,1,.08],[0,link.h/2+.6,z],teal);
   }
   // Station-facing entrance; keep Hachiko plaza low and open in the foreground.
   const entry=new T.Group();entry.position.set(18.8,0,12);entry.rotation.y=-Math.PI/2;staticGroup.add(entry);
@@ -171,25 +195,63 @@ export function cityRig(scene:T.Scene) {
     box(staticGroup,[3.1,.24,.9],[x,1.2,z],pink,.1);
     for(const dx of [-1,1])box(staticGroup,[.25,.7,.65],[x+dx,.8,z],dark,.06);
   }
-  const foliage:T.Group[]=[];
-  const leafMats=[paint('#859f70'),paint('#aec08b'),paint('#6f9479')];
-  for(const [x,z] of [[-19,-21],[-29,24],[-16,22],[6,23],[15,7],[28,-8],[23,-22]]){
-    const bowl=new T.Mesh(new T.CylinderGeometry(1.5,1.05,.95,24),cream);bowl.position.set(x,1.05,z);bowl.castShadow=true;bowl.receiveShadow=true;staticGroup.add(bowl);
-    const earth=new T.Mesh(new T.CylinderGeometry(1.32,1.32,.1,24),soil);earth.position.set(x,1.56,z);staticGroup.add(earth);
-    box(staticGroup,[.34,2.2,.34],[x,2.55,z],pink,.12);
-    const crown=new T.Group();crown.position.set(x,3.6,z);scene.add(crown);foliage.push(crown);
-    for(let j=0;j<5;j++){const leaf=new T.Mesh(new T.IcosahedronGeometry(1.35,2),leafMats[j%3]);leaf.position.set((random()-.5)*1.8,random()*1.7,(random()-.5)*1.8);leaf.scale.set(.8,1.15,.8);leaf.castShadow=true;crown.add(leaf);}
+  const membrane=new T.MeshStandardMaterial({color:'#9abdb9',roughness:.3,metalness:.25,transparent:true,opacity:.72,side:T.DoubleSide});
+  for(const [x,z] of [[-19,-21],[-29,24],[-16,22],[6,23],[28,-8],[23,-22]]){
+    box(staticGroup,[2.2,.35,2.2],[x,.8,z],trim);
+    for(let i=0;i<5;i++){
+      const fin=box(staticGroup,[.07,4.6,1.7],[x+(i-2)*.38,3.1,z],membrane);
+      fin.rotation.y=.25;
+    }
+    box(staticGroup,[2.2,.2,2.2],[x,5.45,z],trim);
+  }
+  // The decks use the same authored centerlines as the walkers.
+  // Landing plates close the small angle gaps between straight segments.
+  for(const route of publicRoutes){
+    for(const [x,y,z] of route.points.slice(1,-1))box(staticGroup,[route.width+.2,.32,route.width+.2],[x,y-.16,z],trim);
+    for(let i=1;i<route.points.length;i++){
+      const a=new T.Vector3(...route.points[i-1]),b=new T.Vector3(...route.points[i]),mid=a.clone().add(b).multiplyScalar(.5);
+      const deck=new T.Group();deck.position.copy(mid);deck.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),b.clone().sub(a).normalize());
+      staticGroup.add(deck);
+      box(deck,[route.width,.3,a.distanceTo(b)],[0,-.15,0],trim);
+      for(const x of [-route.width/2,route.width/2]){
+        box(deck,[.08,1.05,a.distanceTo(b)],[x,.53,0],membrane);
+        box(deck,[.1,.08,a.distanceTo(b)],[x,1.08,0],solar);
+      }
+    }
+    for(const point of [route.points[0],route.points[route.points.length-1]]){
+      const [x,y,z]=point;
+      box(staticGroup,[3,.3,3],[x,y-.15,z],trim);
+      // Visible lift rails and transparent shaft, aligned with each route endpoint.
+      for(const dx of [-1.35,1.35])box(staticGroup,[.18,y+2,.18],[x+dx,(y+2)/2,z],solar);
+      box(staticGroup,[2.8,y+1,.07],[x,(y+1)/2,z-1.3],membrane);
+      box(staticGroup,[3,.2,3],[x,y+2,z],trim);
+    }
+  }
+  // Paired corridor rails tie aircraft routes into a supported city-scale network.
+  for(const route of airRoutes()){
+    const points=route.getSpacedPoints(96);
+    for(const offset of [-2.8,2.8]){
+      const railPoints=points.map((p,i)=>{
+        const tangent=route.getTangentAt(i/96),normal=new T.Vector3(tangent.z,0,-tangent.x).normalize();
+        return p.clone().addScaledVector(normal,offset).add(new T.Vector3(0,-1.3,0));
+      });
+      const rail=new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(railPoints),192,.11,4,false),solar);rail.castShadow=true;staticGroup.add(rail);
+    }
+  }
+  // Perimeter pylons hold upper transport rails, outside the delivery approach.
+  for(const [x,z,y] of [[-27,12,32],[27,12,32]]){
+    for(const dx of [-3.2,3.2])box(staticGroup,[.4,y,.5],[x+dx,y/2,z],trim);
+    box(staticGroup,[7,.4,1],[x,y-1.3,z],solar);
+  }
+  // Roof-supported express portals frame a clear, intentionally sparse sky corridor.
+  for(const [x,z,base] of [[-10,-21.5,48],[15,-19,58]]){
+    for(const dx of [-2.7,2.7])box(staticGroup,[.28,67-base,.45],[x+dx,(67+base)/2,z],trim);
+    box(staticGroup,[6,.3,3],[x,64.4,z],solar);
   }
   const lampMat=new T.MeshStandardMaterial({color:'#ffe1a3',emissive:'#ffe1a3',emissiveIntensity:1,roughness:.6});
   for(const [x,z] of [[-7,-10],[9,-8],[-13,8],[11,10]]){
     box(staticGroup,[.18,4.5,.18],[x,2.9,z],dark,.06);box(staticGroup,[1.5,.17,.17],[x+.65,5.1,z],dark,.05);box(staticGroup,[.85,.12,.55],[x+1.1,5,z],lampMat,.06);
   }
-  // The two 2026 leftovers retain their imperfect silhouettes in the frozen kit.
-  const signal=new T.Group();signal.position.set(-14,.45,5);signal.rotation.z=.06;staticGroup.add(signal);
-  box(signal,[.14,3.7,.14],[0,1.8,0],dark,.04);box(signal,[1.25,.46,.45],[.4,3.6,0],dark,.14);
-  for(let i=0;i<3;i++){const light=new T.Mesh(new T.SphereGeometry(.12,10,8),paint(['#b16e5c','#d0b474','#8fab83'][i]));light.position.set(i*.35+.05,3.6,.22);signal.add(light);}
-  const oldBox=new T.Group();oldBox.position.set(9,.45,18);oldBox.rotation.z=-.065;oldBox.rotation.y=.16;staticGroup.add(oldBox);
-  box(oldBox,[1.05,1.7,.48],[0,.9,0],cream,.1);sign(oldBox,kit,'2026',0,1,.3,.85,.55,'#a78a68');
   // Batch static architecture by material; no geometry is created during transitions.
   staticGroup.updateMatrixWorld(true);
   const winGeo=new RoundedBoxGeometry(1,1,1,1,.08);
@@ -209,10 +271,10 @@ export function cityRig(scene:T.Scene) {
       const pulse=T.MathUtils.clamp((state.neon-.25)/.7,0,1),still=T.MathUtils.clamp((state.warmth-.55)/.3,0,1);
       road.roughness=.92-pulse*.42;
       lampMat.emissiveIntensity=.15+state.neon*2;
-      kit.signs.forEach(mat=>mat.emissiveIntensity=state.signage*2);
-      futureLight.emissiveIntensity=.45+state.neon*1.6;
+      kit.signs.forEach(mat=>mat.emissiveIntensity=state.signage*.45);
+      futureLight.emissiveIntensity=.25+state.neon*.5;
       glyph.pulse.opacity=state.glyph*pulse;glyph.still.opacity=state.glyph*still;
-      foliage.forEach(g=>g.scale.setScalar(.3+state.greenery*.95));
+      membrane.opacity=.6+state.greenery*.18;
       color.copy(cool).lerp(warm,state.warmth);
       kit.windows.forEach((slot,i)=>{
         const occupied=T.MathUtils.smoothstep(state.windowLife-slot.occupancy,-.08,.08);

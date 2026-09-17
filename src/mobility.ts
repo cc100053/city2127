@@ -3,7 +3,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets.ts';
 
-import { crossings, crossingPoint, DOCK } from './layout.ts';
+import { crossings, crossingPoint, publicJourney, DOCK } from './layout.ts';
 export { DOCK } from './layout.ts';
 const ease=(t:number)=>T.MathUtils.smoothstep(t,0,1);
 // One scripted delivery cycle, shared by the aircraft, parcel, lift and receiver doors.
@@ -47,11 +47,11 @@ export function pedestrianPose(time:number,index:number) {
 export function airRoutes() {
   const loop=new T.CatmullRomCurve3(Array.from({length:12},(_,i)=>{
     const angle=i/12*Math.PI*2;
-    return new T.Vector3(Math.cos(angle)*27,14.5+Math.sin(angle)*.6,12+Math.sin(angle)*7);
+    return new T.Vector3(Math.cos(angle)*27,32+Math.sin(angle)*.6,12+Math.sin(angle)*7);
   }),true);
   const express=new T.CatmullRomCurve3([
-    new T.Vector3(-29,34,-12),new T.Vector3(-17,35,-22),new T.Vector3(-3,34,-20),
-    new T.Vector3(4,34,-3),new T.Vector3(18,34,12),new T.Vector3(30,34,18),
+    new T.Vector3(-29,66,-12),new T.Vector3(-17,67,-22),new T.Vector3(-3,66,-20),
+    new T.Vector3(15,66,-19),new T.Vector3(26,66,-7),new T.Vector3(30,66,18),
   ]);
   return [loop,express];
 }
@@ -91,9 +91,10 @@ export function mobility(scene:T.Scene) {
   const coats=material('#bc8a76'),skin=material('#e3c8a6');
   const people=fleet(scene,[
     part([.48,.65,.36],[0,.91,0],coats,.17),part([.35,.37,.34],[0,1.43,0],skin,.16),
-    part([.36,.15,.36],[0,1.59,-.01],glass,.07),part([.22,.32,.18],[.28,.95,-.18],mint,.07),
+    part([.36,.15,.36],[0,1.59,-.01],glass,.07),
     part([.16,.55,.17],[-.32,.85,0],coats,.07),part([.16,.55,.17],[.32,.85,0],coats,.07),
   ],24,'pedestrians');
+  const publicLifts=fleet(scene,[part([1.35,.12,1.35],[0,-.08,0],shell,.02)],12,'public-transfer-platforms');
   const legs=fleet(scene,[part([.17,.55,.19],[0,-.23,0],glass,.06)],48,'walking-legs');
   const drones=fleet(scene,[wing(),part([.8,.35,2.5],[0,.1,0],shell,.15),part([.55,.2,1],[0,.34,.45],glass,.08),
     part([.6,.1,.16],[0,.11,-1.27],mint,.025),part([.09,.4,.65],[0,.32,-.8],glass,.02)],7,'thin-wing-carriers');
@@ -111,25 +112,28 @@ export function mobility(scene:T.Scene) {
   return (state:WorldState,time:number)=>{
     mint.emissiveIntensity=.65+state.neon*1.8;
     for(let i=0;i<6;i++){
-      const motion=streetMotion(time,i,false),amount=T.MathUtils.smoothstep(state.traffic+.16-i/8,-.08,.08);
+      const motion=streetMotion(time,i,false),amount=T.MathUtils.smoothstep(state.traffic*.25+.1-i/8,-.08,.08);
       const fade=T.MathUtils.smoothstep(motion.progress,0,.07)*(1-T.MathUtils.smoothstep(motion.progress,.93,1));
       pose.position.set(motion.position,.45,i%2?1.9:-1.9);pose.rotation.set(0,motion.direction*Math.PI/2,0);pose.scale.setScalar(amount*fade);cars.set(i,pose);
       carPositions[i]=motion.position;carWeights[i]=amount*fade;
     }cars.flush();
     for(let i=0;i<24;i++){
-      const motion=streetMotion(time,i,true),amount=T.MathUtils.smoothstep(state.crowd+.12-i/28,-.06,.06);
-      const p=pedestrianPose(time,i);
-      pose.position.set(p.x,.46,p.z);
+      const motion=streetMotion(time,i,true),amount=T.MathUtils.smoothstep(state.crowd*.3+.1-(i<12?i:i-12)/15,-.06,.06);
+      const p=i<12?{...pedestrianPose(time,i),y:.46,walking:motion.moving}:publicJourney(time,i-12);
+      pose.position.set(p.x,p.y,p.z);
       pose.rotation.set(0,p.yaw,0);pose.scale.setScalar(amount);people.set(i,pose);
+      if(i>=12){
+        limb.position.copy(pose.position);limb.rotation.set(0,0,0);limb.scale.setScalar(p.walking?0:amount);publicLifts.set(i-12,limb);
+      }
       for(let side=0;side<2;side++){
         limb.position.set((side?1:-1)*.13,.59,0);limb.position.multiplyScalar(amount).applyQuaternion(pose.quaternion).add(pose.position);
-        limb.rotation.set(motion.moving?Math.sin(time*9+i+side*Math.PI)*.5:0,pose.rotation.y,0);limb.scale.setScalar(amount);legs.set(i*2+side,limb);
+        limb.rotation.set(p.walking?Math.sin(time*9+i+side*Math.PI)*.5:0,pose.rotation.y,0);limb.scale.setScalar(amount);legs.set(i*2+side,limb);
       }
-    }people.flush();legs.flush();
+    }people.flush();legs.flush();publicLifts.flush();
     for(let i=0;i<6;i++){
       const route=routes[i%2],t=(time*(i%2?.014:.023)+i/7)%1;
       route.getPointAt(t,p);route.getTangentAt(t,tangent);
-      const density=T.MathUtils.smoothstep(.35+state.traffic*.65-i/9,-.07,.07);
+      const density=T.MathUtils.smoothstep(.13+state.traffic*.2-i/9,-.07,.07);
       const edge=i%2?T.MathUtils.smoothstep(t,0,.04)*(1-T.MathUtils.smoothstep(t,.96,1)):1;
       pose.position.copy(p);pose.rotation.set(0,Math.atan2(tangent.x,tangent.z),Math.sin(time+i)*.035);pose.scale.setScalar(density*edge);drones.set(i,pose);
       pose.position.y-=.6;cargo.set(i,pose);heads[i]=t;weights[i]=density*edge;

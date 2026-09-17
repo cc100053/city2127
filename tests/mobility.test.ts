@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { airRoutes, streetMotion, deliveryMotion, guideStrength, DOCK, pedestrianPose } from '../src/mobility.ts';
-import { landmarks, crossings, roads } from '../src/layout.ts';
+import { landmarks, crossings, roads, publicRoutes, publicPoint, publicJourney, upperLinks } from '../src/layout.ts';
 
 // Pedestrians can enter the carriageway only after every pod has cleared it.
 for(let t=0;t<90;t+=.05){
@@ -83,3 +83,27 @@ for(const b of landmarks)for(const dx of [-.5,0,.5])for(const dz of [-.5,0,.5]){
   assert.ok(!roads.some(r=>onRoad(b.x+w*dx,b.z+d*dz,r)),`${b.name} occupies a road arm`);
 }
 console.log('PASS: landmark ground footprints clear the road arms.');
+
+// Continuous ground → lift → deck → lift journeys, including both reversal boundaries.
+for(let i=0;i<12;i++){
+  for(let t=0;t<96;t+=.1){
+    const p=publicJourney(t,i),next=publicJourney(t+.0001,i);
+    assert.ok(Number.isFinite(p.x+p.y+p.z));
+    assert.ok(p.y>=.46-1e-8 && p.y<=10+1e-8);
+    assert.ok(Math.hypot(next.x-p.x,next.y-p.y,next.z-p.z)<.001,'Public journey jumps at a joint');
+    if(p.walking)assert.ok(p.y>=6,'Walker below public deck');
+    // Public decks must stay well below aircraft and clear the delivery column.
+    assert.ok(Math.abs(p.x-DOCK.x)>2.9 || Math.abs(p.z-DOCK.z)>2.9);
+  }
+}
+publicRoutes.forEach((route,i)=>{
+  for(const [u,index] of [[0,0],[1,route.points.length-1]]){
+    const p=publicPoint(i,u),point=route.points[index];
+    assert.ok(Math.hypot(p.x-point[0],p.y-point[1],p.z-point[2])<1e-8);
+  }
+});
+for(const route of airRoutes())for(let i=0;i<=500;i++){
+  const p=route.getPointAt(i/500);
+  for(const b of upperLinks)assert.ok(!(Math.abs(p.x-b.x)<b.w/2+2.3 && Math.abs(p.z-b.z)<b.d/2+2.3 && Math.abs(p.y-b.y)<b.h/2+1),'Aircraft intersects occupied upper link');
+}
+console.log('PASS: public lift/deck continuity, architectural endpoints, cargo separation and upper-link air clearance.');

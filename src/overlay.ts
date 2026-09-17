@@ -4,9 +4,9 @@ export function overlay(choose: (name: StateName) => void) {
   const host = document.createElement('main');
   host.innerHTML = `<header><a class="brand" href="/" aria-label="2127 home"><span class="mark">✳</span><span>2127<span class="brand-sub">TOKYO / CIVIC FUTURES</span></span></a><span class="edition">ONE CROSSING. TWO FUTURES.<br><span>STUDY № 001 — 35°40′ N 139°42′ E</span></span></header>
     <section class="intro"><p class="eyebrow">A SMALL PLACE. A BIG DECISION.</p><h1>The same street.<br>A different <em>tomorrow.</em></h1><p class="question">May a perfect future erase<br>an imperfect past?</p></section>
-    <aside class="state-label"><span class="state-dot"></span><span id="state-name">DUSK TOKYO</span><span id="time">18:40</span></aside>
+    <aside class="state-label"><span class="state-dot"></span><span id="state-name">DAYLIGHT TOKYO</span><span id="time">12:00</span></aside>
     <section class="verdict" aria-live="polite" aria-atomic="true"><p id="judgment"></p><span id="hold-note"></span></section>
-    <footer><span class="footnote">A FROZEN INTERSECTION<br><span>Built once. Three ways to belong.</span></span><div class="choices" role="group" aria-label="Choose a future"><button data-state="neutral" aria-pressed="true"><kbd>0</kbd><span>Dusk<small>The city before</small></span></button><button data-state="pulse" aria-pressed="false"><kbd>1</kbd><span>Pulse<small>Always awake</small></span></button><button data-state="still" aria-pressed="false"><kbd>2</kbd><span>Still<small>Room to breathe</small></span></button><div class="progress"></div></div><span class="instruction" id="instruction">CHOOSE YOUR TOMORROW<br><span>Press 0, 1 or 2</span></span></footer>`;
+    <footer><span class="footnote">A FROZEN INTERSECTION<br><span>Built once. Three ways to belong.</span></span><div class="choices" role="group" aria-label="Choose a future"><button data-state="neutral" aria-pressed="true"><kbd>0</kbd><span>Daylight<small>The shared city</small></span></button><button data-state="pulse" aria-pressed="false"><kbd>1</kbd><span>Pulse<small>Always awake</small></span></button><button data-state="still" aria-pressed="false"><kbd>2</kbd><span>Still<small>Room to breathe</small></span></button><div class="progress"></div></div><span class="instruction" id="instruction">CHOOSE YOUR TOMORROW<br><span>Press 0, 1 or 2</span></span></footer>`;
   document.body.appendChild(host);
   const buttons = Array.from(host.querySelectorAll<HTMLButtonElement>('button'));
   buttons.forEach(button => button.onclick = () => choose(button.dataset.state as StateName));
@@ -15,8 +15,8 @@ export function overlay(choose: (name: StateName) => void) {
     const name = ({ '0':'neutral', '1':'pulse', '2':'still' } as Record<string,StateName>)[event.key];
     if (name) choose(name);
   });
-  const names = { neutral:'DUSK TOKYO', pulse:'PULSE TOKYO', still:'STILL TOKYO' };
-  const times = { neutral:'18:40', pulse:'21:30 ∞', still:'06:12 ∞' };
+  const names = { neutral:'DAYLIGHT TOKYO', pulse:'PULSE TOKYO', still:'STILL TOKYO' };
+  const times = { neutral:'12:00', pulse:'12:00 / ACTIVE', still:'09:00 / CALM' };
   let previous = '';
   return (status: ReturnType<ReturnType<typeof createWorldState>['update']>) => {
     const key = `${status.target}:${status.phase}:${Math.ceil(status.remaining)}`;
