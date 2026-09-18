@@ -10,6 +10,16 @@ Copy to `docs/handoffs/<task-id>.md`. Use one file per task, not a central hando
 - Remote availability: <remote/branch and latest pushed SHA, or NOT PUSHED; required for partial work>
 - GitHub Issue (optional): <reference>
 
+## Session Git state
+
+Record the actual Git state observed during the [session preflight](../../AGENTS.md), not an assumed successful fetch or pull.
+
+- Session starting branch and HEAD: <branch and full SHA at session start>
+- Last fetched origin/main commit: <full SHA and fetch date, or FETCH FAILED — remote freshness unverified>
+- Local changes present at session start: <NONE, or the uncommitted/unrelated work preserved>
+- Upstream integration status: <NOT NEEDED / NOT INTEGRATED / merged origin/main SHA and date>
+- Pending Git conflicts or synchronization blockers: <details, or NONE>
+
 ## Goal and acceptance criteria
 
 <Concrete goal and observable completion criteria.>

@@ -16,13 +16,28 @@ This repository is **2127 — Frozen Intersection**, an exhibition project for c
 
 ## Start and finish
 
-Startup:
+Startup (mandatory preflight, every session):
 
-1. Inspect branch, HEAD, working tree and diff; preserve unrelated work and screenshots.
-2. Read this file and the relevant task-specific [handoff](docs/handoffs/TEMPLATE.md). Confirm one named owner and coordinate overlapping module or binary-asset edits before starting. Primary ownership areas guide coordination, but contributors may work across areas.
-3. Compare the handoff's base and last verified commit with actual code; check whether unfinished commits are available remotely. Do not assume chat history or a previous local clone is available.
-4. Read affected source, callers, tests and [architecture documentation](docs/PROJECT.md). For bugs, trace all callers and fix the shared cause.
-5. Resume from the next expected step within the assigned scope.
+1. Confirm the workspace is the `city2127` repository before running anything else.
+2. Inspect branch, HEAD, working tree and diff; preserve unrelated work and screenshots.
+3. Fetch the latest remote references so local knowledge of `origin/main` is current.
+4. Identify whether the local branch and its remote counterpart have diverged, and record what you found.
+5. Read this file and the relevant task-specific [handoff](docs/handoffs/TEMPLATE.md). Confirm one named owner and coordinate overlapping module or binary-asset edits before starting. Primary ownership areas guide coordination, but contributors may work across areas.
+6. Compare the handoff's base and last verified commit with actual code; check whether unfinished commits are available remotely. Do not assume chat history or a previous local clone is available.
+7. Read affected source, callers, tests and [architecture documentation](docs/PROJECT.md). For bugs, trace all callers and fix the shared cause.
+8. Resume from the next expected step within the assigned scope.
+
+```sh
+git status --short --branch      # branch, upstream divergence and dirty files
+git rev-parse HEAD               # exact starting commit
+git fetch --prune origin         # refresh remote references only
+```
+
+Fetching updates remote references only. It does not authorize switching branches, merging, pulling, resetting, stashing or discarding local work. Never automatically discard or overwrite local changes; preserve uncommitted work and coordinate instead.
+
+If the fetch fails, report that remote freshness cannot be verified and record it in the handoff. Do not assume local `main` is current, and do not start a new task from an unverified `main`.
+
+Starting a new task requires a clean working tree and an up-to-date `main`; resuming an existing task branch must not pull or merge `main` automatically. Follow the [Git workflow](docs/CONTRIBUTING.md) for both cases.
 
 Finish:
 
