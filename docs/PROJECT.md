@@ -1,12 +1,27 @@
 # Project contract and implementation map
 
-Plan 02 implementation status and next work: [進度與待辦](PLAN02.md).
+Exhibition priorities and historical Plan 02 implementation status: [方向與紀錄](PLAN02.md).
 
-## Current direction
+## Current product direction — 2026-09-18
 
-Plan 02 supersedes the painted civic-model direction. The primary reference is [Pic 2](../asset/pic2.png): monumental integrated architecture, a vertical city, authored efficient movement, maintained ceramic/composite/metal surfaces, restrained glazing and daylight. Do not copy the image's UFOs, vegetation or literal geometry. Preserve one Shibuya intersection, landmark relationships, ground crossing endpoints, seeded construction, WebGL 2 and the state machine.
+The goal is an exhibition in which guests collectively shape a futuristic Shibuya. Future identity, Shibuya recognition and visible consequences of choices take priority over producing an exceptionally beautiful model. Documentary-photograph realism is no longer a completion criterion.
 
-The first vertical slice adds QFRONT/MAGNET upper occupied links, open public floors, two elevated pedestrian routes with terminal lifts, roof-supported express infrastructure, a lower perimeter corridor, and environmental filtration membranes. Conventional trees and 2026 prop clutter are removed. Ground traffic and visible pedestrian counts are reduced. This is still a geometric prototype; the documentary-photograph acceptance criterion is not yet met.
+Confirmed experience flow (not implemented):
+
+1. A guest answers one question by selecting an option.
+2. The city changes from the accumulated result of previous guests, incorporating this choice.
+3. When that guest's experience ends, they immediately see the resulting visual change.
+4. The next guest continues with the next question and inherits the changed city. Changing guests does not reset it.
+
+Building count/density and pedestrian activity are candidate dimensions, not a committed parameter list or mapping. Question content/count, option effects, bounds and combination rules, transition timing, the exact experience-end trigger, input hardware, storage/recovery and reset rules (including end of questions or exhibition day) remain undecided. Immediate visible feedback is an experience requirement; it does not yet specify an animation duration or a technical latency budget. Cross-guest accumulation does not by itself decide persistence across reloads or days.
+
+The single Shibuya setting and desktop scope remain. Plan 02 and [Pic 2](../asset/pic2.png) provide reusable visual references; the old three-state model, unchanging buildings and 10-second / 4-second timing are current implementation facts, not constraints on the exhibition design. No question sequence, cumulative choice system or choice-driven building count is implemented. This stage changes documentation only; implementation needs a separately approved scope.
+
+## Current implementation baseline (unchanged by the direction update)
+
+Plan 02 superseded the painted civic-model direction. Its reference is [Pic 2](../asset/pic2.png): monumental integrated architecture, a vertical city, authored efficient movement, maintained ceramic/composite/metal surfaces, restrained glazing and daylight. The implemented baseline retains one Shibuya intersection, landmark relationships, ground crossing endpoints, seeded construction, WebGL 2 and the existing state machine.
+
+The first vertical slice adds QFRONT/MAGNET upper occupied links, open public floors, two elevated pedestrian routes with terminal lifts, roof-supported express infrastructure, a lower perimeter corridor, and environmental filtration membranes. Conventional trees and 2026 prop clutter are removed. Ground traffic and visible pedestrian counts are reduced. This is a geometric prototype; its historical realism gaps are recorded in Plan 02, not current product blockers.
 
 The initial handoff proposed WebGPU references/fallbacks. The actual implementation uses **WebGL 2**, Three.js `WebGLRenderer`, Vite and TypeScript. Do not describe it as a WebGPU implementation or migrate renderers incidentally.
 
@@ -14,7 +29,7 @@ Plan 01 replaces the generic four blocks with a compressed Shibuya layout: QFRON
 
 Desktop-only presentation: the user explicitly excludes responsive/mobile work (2026-09-17). Keep a fixed desktop composition and ordinary renderer resize handling; do not add adaptive framing or mobile layouts.
 
-## Behavior to preserve
+## Current prototype behavior (not the exhibition specification)
 
 | Input/state | Presentation |
 | --- | --- |
@@ -27,7 +42,7 @@ Desktop-only presentation: the user explicitly excludes responsive/mobile work (
 - At completion, immediately show `JUDGMENT: YOU CHOSE PULSE TOKYO` or `JUDGMENT: YOU CHOSE STILL TOKYO`. Neutral has no verdict.
 - Hold state selection for another **4 seconds**. Movement and window animation continue throughout; “frozen” means the street structure and temporary state lock, not paused animation.
 - Ignore selection during transition/hold. At 14 seconds another choice is allowed. The verdict remains until the next selection.
-- Buildings, footprints, seed and camera remain identical between states. Preallocate geometry; vary material/light parameters and existing actor transforms instead of rebuilding.
+- Preset selection does not change buildings, footprints, seed or camera; OrbitControls independently allow camera movement. Geometry is preallocated, while material/light parameters and existing actor transforms vary. Future building changes require a separately designed implementation rather than treating this baseline as a permanent prohibition.
 
 `src/presets.ts` is the numeric source of truth; do not duplicate the preset table in another module. Its fields are `timeOfDay`, `neon`, `traffic`, `crowd`, `signage`, `greenery`, `haze`, `windowLife`, `glyph`, `warmth`. Legacy numeric presets remain unchanged to preserve interpolation and activity mapping. `timeOfDay` no longer drives the sun; UI labels explicitly present Daylight/Pulse at noon and Still at 09:00.
 

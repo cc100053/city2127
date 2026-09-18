@@ -1,6 +1,24 @@
 # Validation and handoff
 
-## Automated checks
+## Exhibition acceptance direction — 2026-09-18 (not yet implemented or tested)
+
+The current product goal is collective guest-driven change in a futuristic Shibuya. Documentary-photograph realism is no longer a completion gate. Future implementation stages should turn the following experience requirements into concrete checks after question content and change rules are agreed:
+
+- Each guest answers one question; the next guest receives the next question.
+- Each choice acts on the accumulated city. A guest handoff retains previous contributions rather than restoring a preset or initial city.
+- At the end of their experience, the guest immediately sees a discernible visual consequence of their choice. Exact timing, animation duration and the experience-end trigger remain to be designed.
+- The shared city remains recognizably futuristic Shibuya as it changes. Building count/density and pedestrian activity are candidate effects, not mandatory implemented parameters.
+- Reset behavior, end-of-question handling, reload recovery and storage have no acceptance rules yet; define them before implementing or claiming exhibition readiness.
+
+The existing tests and captures below verify the three-preset prototype only. They do not establish a question sequence, cross-guest accumulation, dynamic buildings or exhibition readiness. The old invariant that buildings never change applies to current preset regression checks, not to future choice-driven geometry. New checks require the approved implementation scope; this documentation stage does not authorize them.
+
+## Documentation alignment — 2026-09-18
+
+Scope: README, AGENTS, PROJECT, PLAN02, VALIDATION and SHIBUYA only. Align the exhibition goal, one-question-per-guest sequence, cumulative city and undecided reset rules; preserve historical evidence. No executable changes, new screenshots or new runtime/performance claims. Verification covers local Markdown links, consistency of the new direction, and source checks of the unchanged preset behavior. No rendering or build rerun is needed for this stage.
+
+Results: all 86 local Markdown link targets across the six documents exist; `git diff --check` passed. Reviewed the diff for consistent scope and separation of current goals, prototype behavior and historical evidence. Checked `presets.ts`, `worldState.ts` and startup in `main.ts`: three presets, 10-second transition / 4-second hold and one-time rig initialization remain the baseline. `npm test`, `npm run build` and browser checks were not run for this documentation-only change.
+
+## Automated checks for the current prototype
 
 For executable changes, run from the project root:
 
@@ -15,7 +33,7 @@ The state test covers midpoint interpolation, the immediate verdict, the four-se
 
 A Vite warning about the single bundle exceeding 500 kB has been observed; it is not a build failure. Do not hide it or add code splitting solely to silence it. Measure loading needs before changing packaging.
 
-## Browser acceptance
+## Browser regression checks for the current prototype
 
 1. Start or reuse `npm run dev -- --port 5173`. Open the actual localhost URL. Reload after relevant changes if HMR has not applied them. Confirm the canvas renders and console has no new errors.
 2. Check all three states at the **same viewport and camera**. Confirm the tower, shops, kiosk, crossings and island retain their layout; transitions must not add/remove building meshes or produce a hybrid skyline.
@@ -49,6 +67,10 @@ Version 1 had a local observation near 60 FPS at a 1080p canvas. Version 2 had a
 - Leave a working preview when possible. Keep commands and behavior docs current. Final handoff should briefly name the change, checks actually completed, artifact/preview links, and any unresolved issue. Never report a proposed or timed-out check as passed.
 
 For documentation-only work, verify statements against current source and resolve local Markdown links. Do not rerun rendering or builds merely because prose changed.
+
+## Historical evidence (not exhibition acceptance)
+
+The dated records below retain their original criteria and observations. References to documentary realism or unfinished art describe the former Plan 02 goals; they do not override the 2026-09-18 direction.
 
 ## Plan 01 local acceptance — 2026-09-17
 

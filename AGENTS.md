@@ -1,13 +1,14 @@
 # AI agent workflow
 
-This repository is **2127 — Frozen Intersection**, a small procedural Three.js demo. Read [README.md](README.md), then [docs/PROJECT.md](docs/PROJECT.md) before changing behavior. Use [docs/VALIDATION.md](docs/VALIDATION.md) to verify changes and hand off work.
+This repository is **2127 — Frozen Intersection**, an exhibition project for collectively shaping a futuristic Shibuya, currently implemented as a procedural Three.js prototype. Read [README.md](README.md), then [docs/PROJECT.md](docs/PROJECT.md) before changing behavior. Use [docs/VALIDATION.md](docs/VALIDATION.md) to verify changes and hand off work.
 
 ## Working agreement
 
 - Reply to the user in Traditional Chinese; natural Cantonese is welcome. Keep existing English/Japanese product copy unless localization is requested.
 - Desktop presentation only: responsive/mobile adaptation is not required (user decision, 2026-09-17). Do not add responsive layouts, adaptive camera framing or mobile acceptance checks unless explicitly requested. Keep ordinary renderer resize handling.
 - Follow the latest user request. Version 2 explicitly allows pedestrians, cars, drones and aerial routes; the original “no characters/NPCs” restriction is superseded for these ambient actors.
-- Preserve one Shibuya intersection, three states and the locked presentation camera. Plan 02 (2026-09-17) supersedes the warm painted civic-model style: use maintained architectural materials, daylight, monumental connected massing, authored multi-level circulation and engineered ecology, with asset/pic2.png as the design-language reference. Keep thin wings and the open mid-tower station. State switching must never regenerate buildings.
+- Current product direction (2026-09-18): guests collectively shape a futuristic Shibuya at an exhibition. Each guest answers one question; the next guest continues with the next question. City changes accumulate across guests, and each guest sees the visual change immediately when their experience ends. Reset rules are undecided. Prioritize future identity, readable choice effects and continuity over a beautiful model or documentary realism.
+- Preserve the single Shibuya setting and desktop presentation scope. Plan 02 architecture, daylight and asset/pic2.png remain visual references, not the product's primary acceptance gate. Three presets, fixed building geometry and 10-second transitions / 4-second holds describe the current prototype only; they must not prohibit future choice-driven building counts or density. Parameter mappings, timing, question content, persistence and reset mechanisms require later design; none is implemented or authorized for code changes by the documentation alignment stage. Keep current code behavior until its replacement stage is approved.
 - Trace the changed code and its callers before editing. Reuse existing factories, materials and instancing; prefer Three.js/native features over new dependencies.
 - Make the smallest complete change. Avoid speculative abstractions, broad formatting rewrites, extra frameworks or infrastructure. Document a deliberate shortcut with a `ponytail:` comment only when it has a real limitation.
 - Work in this task. Do not spawn agents unless the user or applicable instructions explicitly request delegation.
