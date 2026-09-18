@@ -8,7 +8,7 @@ This repository is **2127 — Frozen Intersection**, an exhibition project for c
 - Desktop presentation only: responsive/mobile adaptation is not required (user decision, 2026-09-17). Do not add responsive layouts, adaptive camera framing or mobile acceptance checks unless explicitly requested. Keep ordinary renderer resize handling.
 - Follow the latest user request. Version 2 explicitly allows pedestrians, cars, drones and aerial routes; the original “no characters/NPCs” restriction is superseded for these ambient actors.
 - Current product direction (2026-09-18): guests collectively shape a futuristic Shibuya at an exhibition. Each guest answers one question; the next guest continues with the next question. City changes accumulate across guests, and each guest sees the visual change immediately when their experience ends. Reset rules are undecided. Prioritize future identity, readable choice effects and continuity over a beautiful model or documentary realism.
-- Preserve the single Shibuya setting and desktop presentation scope. Plan 02 architecture, daylight and asset/pic2.png remain visual references, not the product's primary acceptance gate. Three presets, fixed building geometry and 10-second transitions / 4-second holds describe the current prototype only; they must not prohibit future choice-driven building counts or density. Parameter mappings, timing, question content, persistence and reset mechanisms require later design; none is implemented or authorized for code changes by the documentation alignment stage. Keep current code behavior until its replacement stage is approved.
+- Preserve the single Shibuya setting and desktop presentation scope. Plan 02 architecture, daylight and asset/pic2.png remain visual references, not the product's primary acceptance gate. Three presets, fixed building geometry and 10-second transitions / 4-second holds describe the current prototype only; they must not prohibit future choice-driven building counts or density. Parameter mappings, timing, question content, persistence and reset mechanisms require later design; none is implemented or authorized for code changes by the documentation alignment stage. Keep current code behavior until a replacement task is explicitly assigned.
 - Trace the changed code and its callers before editing. Reuse existing factories, materials and instancing; prefer Three.js/native features over new dependencies.
 - Make the smallest complete change. Avoid speculative abstractions, broad formatting rewrites, extra frameworks or infrastructure. Document a deliberate shortcut with a `ponytail:` comment only when it has a real limitation.
 - Work in this task. Do not spawn agents unless the user or applicable instructions explicitly request delegation.
@@ -16,11 +16,21 @@ This repository is **2127 — Frozen Intersection**, an exhibition project for c
 
 ## Start and finish
 
-1. Inspect the working tree and applicable instructions. Use `git status --short` if this checkout is a Git repository; do not assume it is. Preserve unrelated work and existing screenshots.
-2. Read the relevant source, tests and the project contract. For a bug, trace all callers and fix the shared cause.
-3. Implement within the requested scope. Add or update a small runnable check for nontrivial logic; documentation-only edits need link/fact checks, not rendering tests.
-4. For code changes, run `npm test` and `npm run build`. For visual/motion changes, also use the browser checks in `docs/VALIDATION.md`; a build alone is not visual verification.
-5. Apply the documentation sync rules below before handing off each stage. Report what changed, actual checks performed, and any remaining limitation. Do not claim an unmeasured FPS or an untested platform.
+Startup:
+
+1. Inspect branch, HEAD, working tree and diff; preserve unrelated work and screenshots.
+2. Read this file and the relevant task-specific [handoff](docs/handoffs/TEMPLATE.md). Confirm one named owner and coordinate overlapping module or binary-asset edits before starting. Primary ownership areas guide coordination, but contributors may work across areas.
+3. Compare the handoff's base and last verified commit with actual code; check whether unfinished commits are available remotely. Do not assume chat history or a previous local clone is available.
+4. Read affected source, callers, tests and [architecture documentation](docs/PROJECT.md). For bugs, trace all callers and fix the shared cause.
+5. Resume from the next expected step within the assigned scope.
+
+Finish:
+
+1. Complete implementation and relevant checks. Add a small runnable check for nontrivial logic. Code changes require `npm test`, `npm run build` and `git diff --check`; visual/motion changes also require relevant [browser checks](docs/VALIDATION.md). Documentation-only changes need link/fact checks, not rendering tests.
+2. Self-review the exact diff, including new files.
+3. Apply the documentation sync rules below and update the task handoff.
+4. Record actual validation results, verified commit, unresolved issues and next step. Separate implementation completion from verification; never claim unmeasured FPS or an untested platform.
+5. Follow the [Git workflow](docs/CONTRIBUTING.md), including validation of the integrated result.
 
 ## Documentation sync
 
@@ -38,16 +48,13 @@ Keep documentation aligned with the actual working tree in the same implementati
 
 Document implemented behavior separately from proposals and pending approval. Date new evidence and identify the stage it describes; never reuse old test results or screenshots as proof of a new change. Preserve historical Plan 01 notes in [docs/SHIBUYA.md](docs/SHIBUYA.md) and earlier acceptance records; correct factual errors or add a clearly dated superseding note instead of rewriting history. Verify local Markdown links after documentation edits.
 
-## Stage approval gates
+## Scope-based autonomy
 
-- Read-only inspection may proceed to prepare a concrete proposal. Before implementation, present the stage's scope, intended files, documentation updates and validation plan, then obtain explicit user approval for that stage. A request explicitly authorizing a defined stage already supplies that approval; do not ask again for the same scope.
-- Keep approval scoped to the named stage and actions. A general request to finish a feature does not approve every later stage. Each subsequent implementation stage needs its own approval; changed scope or material changes to an approved proposal require renewed approval before proceeding.
-- Validation is a separate gate unless its specific checks were explicitly included in the approved stage. Prepare the check list before requesting approval. After approved checks, present the actual diff, documentation updates, results and unresolved limitations for stage acceptance; do not begin the next stage merely because checks passed.
-- Before staging or committing, show the exact intended file list, change summary, proposed commit message and validation results, then obtain explicit approval to stage and commit that reviewed change. Stage only those files or hunks; never include unrelated working-tree changes. Implementation approval, successful tests and stage acceptance alone do not authorize a commit.
-- Push, PR creation/publication, merge, release and deployment each require explicit approval for the named action and destination after the relevant result is ready to review. Commit approval does not authorize these later actions. Do not amend commits, rewrite history or perform destructive Git operations without approval for that exact operation.
-- At every gate, stop the dependent action until the user replies; silence, elapsed time and approval of an earlier stage are not approval. Explain briefly that this file's Stage approval gates require the pause, identify the pending action and link to this section. Record approval scope and stage status in the task conversation; no separate approval infrastructure is needed.
+An explicitly assigned task authorizes relevant inspection, implementation, tests and in-scope fixes, documentation updates, committing and pushing the task's feature branch, self-review, merging after required checks and pushing validated main. No PR or external reviewer is required. Follow [CONTRIBUTING.md](docs/CONTRIBUTING.md) for integration and the asset-only direct-main exception. Explicit task restrictions override these defaults; a documentation task that excludes commits does not authorize them.
 
-These gates apply to the Start and finish workflow and to referenced validation/handoff procedures.
+Do not independently expand a small task into a major architectural rewrite, change approved product direction, delete important shared assets, rewrite shared Git history, force-push main, deploy or introduce incidental infrastructure. Clarify changed scope before proceeding with work outside the assignment. Routine in-scope implementation, validation and Git steps do not require separate stage approvals.
+
+Each task has one named owner and a repository-based handoff under `docs/handoffs/`. Coordinate overlapping edits before modifying the same module or binary asset. Use independent local clones; worktrees and GitHub Issues are optional, not required. Historical Plan 02 prototype constraints are not permanent exhibition requirements.
 
 ## Commands
 
@@ -58,9 +65,10 @@ npm ci                       # when dependencies are absent or the lockfile chan
 npm run dev -- --port 5173    # loopback-only preview; use the URL Vite actually prints
 npm test                     # state timing + mobility/route checks
 npm run build                # strict source typecheck + production build
+git diff --check             # whitespace in uncommitted changes
 ```
 
-Reuse a running preview if it belongs to this project. If the port is occupied, inspect it or use another port; do not kill unrelated processes. Edit source, not `dist/` or `node_modules/`. There is no configured lint command or deployment workflow.
+Reuse a running preview if it belongs to this project. If the port is occupied, inspect it or use another port; do not kill unrelated processes. Edit source, not `dist/` or `node_modules/`. There is no configured lint command or deployment workflow. [CI](.github/workflows/ci.yml) uses Node 24 on branch pushes and optional PRs; remote execution is not yet verified. See [validation](docs/VALIDATION.md) for the committed-diff check and activation status.
 
 ## CodeGraph
 
