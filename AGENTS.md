@@ -68,7 +68,7 @@ npm run build                # strict source typecheck + production build
 git diff --check             # whitespace in uncommitted changes
 ```
 
-Reuse a running preview if it belongs to this project. If the port is occupied, inspect it or use another port; do not kill unrelated processes. Edit source, not `dist/` or `node_modules/`. There is no configured lint command or deployment workflow. [CI](.github/workflows/ci.yml) uses Node 24 on branch pushes and optional PRs; remote execution is not yet verified. See [validation](docs/VALIDATION.md) for the committed-diff check and activation status.
+Reuse a running preview if it belongs to this project. If the port is occupied, inspect it or use another port; do not kill unrelated processes. Edit source, not `dist/` or `node_modules/`. There is no configured lint command or deployment workflow. [CI](.github/workflows/ci.yml) uses Node 24 on branch pushes and optional PRs; remote execution passed on `2b0e8cc` (see validation evidence). See [validation](docs/VALIDATION.md) for the committed-diff check and activation status.
 
 ## CodeGraph
 

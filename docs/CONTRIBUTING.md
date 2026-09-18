@@ -52,7 +52,7 @@ git push -u origin <task-branch>
 
 Use Conventional Commits: `<type>(<scope>): <subject>` with a concise English title and English bullet points in the body. Check the committed task diff too (`git diff --check origin/main...HEAD`); an empty working-tree diff alone does not check committed changes.
 
-Self-review is sufficient; no PR or mandatory external review. The [CI workflow](../.github/workflows/ci.yml) is configured in Stage 2 for branch pushes and optional PRs: Node 24, `npm ci`, `npm test`, `npm run build` and diff whitespace checks. Remote execution has not yet been verified. Once the first remote run confirms it works, require successful checks on the current task-branch commit before merging, and verify main's checks after pushing. Do not describe a configured workflow as a passing run. No branch protection or deployment is configured.
+Self-review is sufficient; no PR or mandatory external review. The [CI workflow](../.github/workflows/ci.yml) is configured in Stage 2 for branch pushes and optional PRs: Node 24, `npm ci`, `npm test`, `npm run build` and diff whitespace checks. Remote execution passed on `2b0e8cc` ([run](https://github.com/cc100053/city2127/actions/runs/35356530469)). Require successful checks on the current task-branch commit before merging, and verify main's checks after pushing. Do not describe a configured workflow as a passing run. No branch protection or deployment is configured.
 
 ## Concurrent integration
 

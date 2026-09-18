@@ -1,11 +1,11 @@
 # Stage 2 — Minimal CI
 
 - Owner: Codex in the current city2127 task
-- Status: IN_PROGRESS (local implementation complete; remote verification pending)
-- Branch: main, uncommitted local changes
+- Status: DONE (implementation published and main CI passed)
+- Branch: main (user explicitly requested direct publication)
 - Base commit: 3d670b505c3730e7615caa02b68e3f4b435aa6a2
-- Last verified commit: no committed Stage 2 result; local checks cover the working tree based on the base SHA
-- Remote availability: NOT PUSHED
+- Last verified commit: 2b0e8cc46a88f3c1f1382ce7d5efe3f2a285a4c3 (GitHub main CI passed)
+- Remote availability: origin/main includes 2b0e8cc46a88f3c1f1382ce7d5efe3f2a285a4c3
 
 ## Goal and acceptance criteria
 
@@ -25,13 +25,14 @@ Added the workflow and updated collaboration/validation instructions. Self-revie
 
 - PASSED: `npm ci --offline`, `npm test`, `npm run build` (existing >500 kB warning).
 - PASSED: local YAML parsing, six temporary Git-repository cases executing the workflow shell (valid/invalid whitespace for normal, empty and zero bases), diff whitespace and local Markdown links.
-- NOT RUN: GitHub runner, Node 24, actionlint and browser checks (no visual changes).
-- Integration: NOT INTEGRATED; no commit, merge or push performed.
+- PASSED: GitHub runner / Node 24 install, tests, build and whitespace ([run](https://github.com/cc100053/city2127/actions/runs/35356530469)).
+- NOT RUN: actionlint, optional PR/new-branch remote events and browser checks (no visual changes).
+- Integration: 2b0e8cc committed directly to main and pushed as explicitly requested.
 - Changes since runtime verification: documentation/handoff only; checked separately.
 
 ## Known issues and blockers
 
-Remote behavior is unverified. The user subsequently explicitly authorized review, commit of Stage 1 + 2 and push to main; this supersedes the initial publication restriction. Local checks do not prove Node 24 runner success.
+Main-push CI passed; optional PR/new-branch remote events remain untested. The user subsequently explicitly authorized review, commit of Stage 1 + 2 and push to main; this supersedes the initial publication restriction. The linked remote run establishes Node 24 runner success for the published commit.
 
 ## Important decisions
 
@@ -39,4 +40,4 @@ PR remains optional. No new dependencies, CI framework, deployment or branch pro
 
 ## Next expected step
 
-Publish the reviewed combined changes directly to main as explicitly requested. Verify the exact pushed commit's CI run and update this handoff with actual SHA/run evidence. See [validation](../VALIDATION.md) and [Git workflow](../CONTRIBUTING.md).
+Publish this documentation-only evidence update and check its main CI run. Stage 3 Blender standards remain a separate, unassigned task. See [validation](../VALIDATION.md) and [Git workflow](../CONTRIBUTING.md).
