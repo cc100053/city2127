@@ -13,7 +13,7 @@ Provide usable manual Blender source/export, optimization and validation standar
 
 ## In-scope files and dependencies
 
-README.md; docs/BLENDER.md, CONTRIBUTING.md, PROJECT.md, VALIDATION.md; this handoff. Reuses the existing handoff template and Git workflow. No overlapping contributor changes found at startup.
+README.md; docs/BLENDER.md, CONTRIBUTING.md, PROJECT.md, VALIDATION.md; this handoff; `.github/workflows/ci.yml` for the new-branch comparison bug discovered during validation. Reuses the existing handoff template and Git workflow. No overlapping contributor changes found at startup.
 
 ## Completed work
 
@@ -23,7 +23,7 @@ Defined file pairing, ownership, portable source dependencies, coordinate/pivot 
 
 2026-09-18: local diff review, Markdown link checks and `git diff --check` passed. Checked source imports/startup and tracked model inventory against base f196b2e: procedural cityRig, no model loader or tracked blend/glb/gltf. No source/tests/assets/dependencies changed.
 
-Local npm tests/build, Blender, browser and performance checks: NOT RUN for this documentation-only task. CI publication checks: pending; do not reuse Stage 2 results as evidence for this branch.
+Local npm tests/build, Blender, browser and performance checks: NOT RUN for this documentation-only task. First branch CI: tests/build passed, whitespace failed on an unchanged skill file ([run](https://github.com/cc100053/city2127/actions/runs/35357676205)). Corrected the new-branch base selection; fresh CI pending.
 
 ## Known issues and blockers
 
@@ -31,7 +31,7 @@ No real model exists to exercise this recipe. No measured per-asset performance 
 
 ## Important decisions
 
-Stage 3 means the previously deferred manual standards. No export automation or arbitrary polygon limits. `.blend` and `.glb` remain in Git. Existing project scope-based autonomy covers branch publication, self-review, merge and main verification.
+Stage 3 means the previously deferred manual standards. No export automation or arbitrary polygon limits. First branch CI exposed a Stage 2 comparison bug: whole-tree whitespace inspection flagged an unchanged skill file; fixed the shared workflow to compare new branches against the main merge base, without editing unrelated content. `.blend` and `.glb` remain in Git. Existing project scope-based autonomy covers branch publication, self-review, merge and main verification.
 
 ## Next expected step
 
