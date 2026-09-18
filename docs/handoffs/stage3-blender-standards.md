@@ -1,11 +1,11 @@
 # Stage 3 — Blender export and optimization standards
 
 - Owner: Codex in the city2127 task
-- Status: IN_PROGRESS (documentation complete; publication checks pending)
-- Branch: codex/stage3-blender-standards
+- Status: DONE (standards complete; see verification and publication checkpoint below)
+- Branch: codex/stage3-blender-standards; integrated into main with --no-ff
 - Base commit: f196b2ea2d232dce3ae75d61d40f204bb562d978
-- Last verified commit: base plus the Stage 3 documentation working-tree delta; no asset verification
-- Remote availability: NOT PUSHED
+- Last verified commit: ea69b1ad5aa5a66c83c558838f2788739c37223e (local integration tests/build); no asset verification
+- Remote availability: origin/codex/stage3-blender-standards at efe20cdd07ac4cecd941b3aba41a6ac73644f2a6; main publication follows this evidence update
 
 ## Goal and acceptance criteria
 
@@ -23,7 +23,7 @@ Defined file pairing, ownership, portable source dependencies, coordinate/pivot 
 
 2026-09-18: local diff review, Markdown link checks and `git diff --check` passed. Checked source imports/startup and tracked model inventory against base f196b2e: procedural cityRig, no model loader or tracked blend/glb/gltf. No source/tests/assets/dependencies changed.
 
-Local npm tests/build, Blender, browser and performance checks: NOT RUN for this documentation-only task. First branch CI: tests/build passed, whitespace failed on an unchanged skill file ([run](https://github.com/cc100053/city2127/actions/runs/35357676205)). Corrected the new-branch base selection; fresh CI pending.
+After the CI fix, local npm tests/build passed on merge ea69b1a (Node 26; existing >500 kB build warning). Blender, browser and performance checks: NOT RUN; no model or visual behavior changed. First branch CI: tests/build passed, whitespace failed on an unchanged skill file ([run](https://github.com/cc100053/city2127/actions/runs/35357676205)). Corrected the new-branch base selection; eight local Git cases passed, including unchanged legacy whitespace and empty-tree fallback. [Fresh Node 24 CI passed](https://github.com/cc100053/city2127/actions/runs/35357826479) on efe20cd. No merge conflicts; integration tree matches the checked branch.
 
 ## Known issues and blockers
 
@@ -35,4 +35,4 @@ Stage 3 means the previously deferred manual standards. No export automation or 
 
 ## Next expected step
 
-Publish the task branch, verify its CI, merge with --no-ff after rechecking origin/main, then verify main CI. Record concrete commit/run evidence without claiming Blender validation.
+Publication checkpoint: push main with this documentation-only evidence update and verify the resulting CI; final run result is reported in the task conversation to avoid a self-referencing commit loop. Future work: assign a real asset and its first application consumer, then exercise the manual recipe. No asset integration is included in Stage 3.

@@ -40,6 +40,8 @@ At initial local handoff, remote GitHub Actions execution, Node 24 execution and
 
 This stage changes documentation only. At base `f196b2e`, no tracked Blender/glTF model or application model-loader reference was found. Local verification covers the complete diff, local Markdown links, consistency with `main.ts` → `cityRig`, and preservation of source/tests/assets/dependencies. Blender export/reimport, browser checks and performance measurements are NOT RUN because no asset or runtime behavior changed. [Stage 3 handoff](handoffs/stage3-blender-standards.md) records publication and verification status.
 
+Stage 3 integration evidence: branch `efe20cd` passed [Node 24 CI](https://github.com/cc100053/city2127/actions/runs/35357826479). The first branch run exposed unrelated historical whitespace because Stage 2 compared new branches with an empty tree; the corrected workflow uses the main merge base, with eight local Git cases passing. Local `npm test` and `npm run build` passed on merge `ea69b1a` (Node 26, existing >500 kB bundle warning). This is code/CI evidence, not model validation.
+
 ## Automated checks for the current prototype
 
 For executable changes, run from the project root:
