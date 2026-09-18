@@ -29,6 +29,10 @@ jobs:
           BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
           if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
-            BASE=$(git hash-object -t tree /dev/null)
+            if git show-ref --verify --quiet refs/remotes/origin/main; then
+              BASE=$(git merge-base HEAD origin/main)
+            else
+              BASE=$(git hash-object -t tree /dev/null)
+            fi
           fi
           git diff --check "$BASE" HEAD
