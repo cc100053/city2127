@@ -3,3 +3,17 @@ dist/
 *.log
 .DS_Store
 .vercel
+
+# Keep miscellaneous working assets out of Git, but allow reviewed model pairs.
+asset/*
+!asset/models/
+!asset/models/**
+
+# Blender/model working files that are not source/export deliverables.
+asset/models/**/*.blend1
+asset/models/**/*.blend2
+asset/models/**/*.blend@
+asset/models/**/backup*/
+asset/models/**/reference*/
+asset/models/**/browser*/
+asset/models/**/node_modules/
