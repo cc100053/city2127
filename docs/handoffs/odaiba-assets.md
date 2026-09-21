@@ -4,8 +4,8 @@
 - Status: IN_PROGRESS
 - Branch: feat/odaiba-assets
 - Base commit: 9ca007c2bbe8423eb52317724133d66b6006f695
-- Last verified commit: e680f9da7aa63eb9bb3721dd9fd887d4cb07697e
-- Remote availability: `origin/feat/odaiba-assets` at `e680f9da7aa63eb9bb3721dd9fd887d4cb07697e`
+- Last verified commit: b420e2b91003de3bf3f026aba45b2e2836880a34
+- Remote availability: `origin/feat/odaiba-assets` is pushed and synchronized. The full asset review baseline is `b420e2b91003de3bf3f026aba45b2e2836880a34`; resolve the current branch head from the Git ref.
 - GitHub Issue (optional): NONE
 
 ## Session Git state
@@ -13,7 +13,7 @@
 - Session starting branch and HEAD: `main` at `9ca007c2bbe8423eb52317724133d66b6006f695`; the clean checkout was then switched to the newly created `feat/odaiba-assets` branch.
 - Last fetched origin/main commit: `9ca007c2bbe8423eb52317724133d66b6006f695`, fetched 2026-09-19.
 - Local changes present at session start: NONE.
-- Upstream integration status: NOT NEEDED; local `main` and `origin/main` matched at session start. This work must not be merged into `main` yet.
+- Upstream integration status: NOT INTEGRATED; local `main` and `origin/main` matched at the latest review. This asset branch has completed the required checks and awaits owner-authorized integration.
 - Pending Git conflicts or synchronization blockers: NONE.
 
 ## Goal and acceptance criteria
@@ -46,7 +46,7 @@ The pairs were copied from the verified `C:\FutureCity` outputs. Source files we
 - Used Blender 5.2 verification results from the source work.
 - Recorded the common contract: Blender Z-up, standard glTF Y-up, Blender front `-Y`, Three.js front `+Z`, and a 20 m review grid. Standard glTF conversion is already baked; consumers must not rotate these Y-up exports a second time.
 - Building Inspector loaded all 5 of 5 assets successfully with no overlap. The measured review scene reported 206 render calls and 234,791 rendered triangles.
-- Narrowed asset ignore behavior so reviewed content under `asset/models/` can be tracked while Blender autosaves, backups, reference collections, browser profiles, and dependency folders remain ignored.
+- Added targeted ignore rules for Blender autosaves, backups, reference collections, browser profiles, and dependency folders without ignoring unrelated content under `asset/`.
 
 ### Asset inventory and known metrics
 
@@ -65,7 +65,7 @@ The pairs were copied from the verified `C:\FutureCity` outputs. Source files we
 - Commands/manual checks and results: source paths and copied destinations checked; all requested files present; source/export pairs had previously been reopened/export-validated with Blender 5.2 where reports were available; Building Inspector loaded 5/5 assets; perspective and true orthographic top views were checked for overlap, scale, orientation and footprint frames.
 - Evidence/environment: `docs/handoffs/odaiba-assets-angle.png` and `docs/handoffs/odaiba-assets-top.png`; Building Inspector result was 206 render calls and 234,791 rendered triangles on the review machine.
 - Integrated commit and checks: NOT INTEGRATED. The application in `city2127` does not load these models yet.
-- Changes since verification: this handoff wording update only; no model, screenshot or application code was regenerated or modified.
+- Changes since verification: handoff wording and `.gitignore` scope cleanup only; no model, screenshot or application code was regenerated or modified.
 
 ## Known issues and blockers
 
@@ -84,4 +84,4 @@ The pairs were copied from the verified `C:\FutureCity` outputs. Source files we
 
 ## Next expected step
 
-Teammates review the five Odaiba source/export pairs as the completed input to the next Odaiba stage. Odaiba runtime integration must proceed on a separate, independently scoped branch that defines loader URLs, Odaiba placement, axis handling (especially Grand Nikko), performance acceptance and venue-specific validation before modifying application code. It must not modify the Shibuya scene by inserting these landmarks.
+The owner integrates this reviewed asset-only branch into `main` using the repository workflow, records the integration checks, and only then changes this handoff to `DONE`. Odaiba runtime integration must proceed on a separate, independently scoped branch that defines loader URLs, Odaiba placement, axis handling (especially Grand Nikko), performance acceptance and venue-specific validation before modifying application code. It must not modify the Shibuya scene by inserting these landmarks.
