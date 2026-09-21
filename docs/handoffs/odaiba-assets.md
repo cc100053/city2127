@@ -1,11 +1,11 @@
-# odaiba-assets - Odaiba building asset study
+# odaiba-assets - Odaiba Plan building asset stage
 
 - Owner: cc100053
 - Status: IN_PROGRESS
 - Branch: feat/odaiba-assets
 - Base commit: 9ca007c2bbe8423eb52317724133d66b6006f695
-- Last verified commit: 9ca007c2bbe8423eb52317724133d66b6006f695 plus the uncommitted asset and handoff delta described below
-- Remote availability: NOT PUSHED
+- Last verified commit: e680f9da7aa63eb9bb3721dd9fd887d4cb07697e
+- Remote availability: `origin/feat/odaiba-assets` at `e680f9da7aa63eb9bb3721dd9fd887d4cb07697e`
 - GitHub Issue (optional): NONE
 
 ## Session Git state
@@ -18,7 +18,7 @@
 
 ## Goal and acceptance criteria
 
-Prepare five completed Odaiba building source/export pairs for team review without changing runtime behavior or the existing Shibuya product direction. Acceptance requires both `.blend` and `.glb` files for every building, two Building Inspector screenshots, documented metrics and limitations, standard axis/facing notes, and a clean Git review limited to the intended files.
+Prepare five completed Odaiba building source/export pairs for the building-asset stage of the Odaiba Plan. The Odaiba Plan is a venue proposal parallel to Shibuya Plan 02: it carries forward the same curatorial goals, interaction logic, future-city design method and technical principles, but uses Odaiba as its setting. These five landmarks belong exclusively to the Odaiba Plan and must not be mixed into the Shibuya venue; likewise, Shibuya landmarks must not be placed in Odaiba. This branch does not modify the existing Shibuya runtime. Acceptance requires both `.blend` and `.glb` files for every building, two Building Inspector screenshots, documented metrics and limitations, standard axis/facing notes, and a clean Git review limited to the intended files.
 
 ## In-scope files and dependencies
 
@@ -61,16 +61,17 @@ The pairs were copied from the verified `C:\FutureCity` outputs. Source files we
 ## Actual validation results
 
 - Verification status: PASSED for asset handoff preparation; runtime integration remains NOT INTEGRATED.
-- Date and checked commit/worktree: 2026-09-19; base commit `9ca007c2bbe8423eb52317724133d66b6006f695` with the uncommitted `feat/odaiba-assets` delta.
+- Date and checked commit/worktree: 2026-09-19; commit `e680f9da7aa63eb9bb3721dd9fd887d4cb07697e` on `feat/odaiba-assets`.
 - Commands/manual checks and results: source paths and copied destinations checked; all requested files present; source/export pairs had previously been reopened/export-validated with Blender 5.2 where reports were available; Building Inspector loaded 5/5 assets; perspective and true orthographic top views were checked for overlap, scale, orientation and footprint frames.
 - Evidence/environment: `docs/handoffs/odaiba-assets-angle.png` and `docs/handoffs/odaiba-assets-top.png`; Building Inspector result was 206 render calls and 234,791 rendered triangles on the review machine.
 - Integrated commit and checks: NOT INTEGRATED. The application in `city2127` does not load these models yet.
-- Changes since verification: copied binaries/screenshots, `.gitignore` adjustment and this documentation only; no model or application code was regenerated or modified.
+- Changes since verification: this handoff wording update only; no model, screenshot or application code was regenerated or modified.
 
 ## Known issues and blockers
 
 - Runtime integration status: NOT INTEGRATED.
-- The current work is an Odaiba asset study. It does not replace the repository's Shibuya product direction or authorize a setting change.
+- The current work is the building-asset stage of the Odaiba Plan, a venue proposal parallel to Shibuya Plan 02. It does not change or replace the existing Shibuya runtime.
+- Odaiba and Shibuya are separate venue plans. Their landmark buildings must not be mixed across settings.
 - The Grand Nikko source report records a legacy Z-up GLB workflow, unlike the newer standard Y-up pairs. The inspector's existing one-time adapter was used for review; a future application integration owner must confirm and document the consumer-side contract.
 - No runtime URL/import, layout placement, collision envelope, route integration, material tuning, loading budget or production-build validation has been implemented in `city2127`.
 
@@ -79,8 +80,8 @@ The pairs were copied from the verified `C:\FutureCity` outputs. Source files we
 - Preserve each editable `.blend` beside its matching `.glb`; do not install Git LFS or add decoder/compression dependencies in this task.
 - The shared review convention is a 20 m grid and front `+Z` in Three.js. Standard Y-up exports must not receive a second Blender-to-glTF rotation.
 - Inspector draw calls are measured review-scene totals, not the sum of mesh counts and not a production application budget.
-- Existing application behavior and all Shibuya assets remain unchanged.
+- These five landmark pairs are Odaiba-only assets. Existing application behavior and all Shibuya assets remain unchanged, and this branch must not place either venue's landmarks into the other venue.
 
 ## Next expected step
 
-Teammates review the five source/export pairs and coordinate which assets, if any, should be integrated into the application. Any selected runtime integration must be a separate scoped task that defines loader URLs, placement, axis handling (especially Grand Nikko), performance acceptance and Shibuya product-direction compatibility before modifying application code.
+Teammates review the five Odaiba source/export pairs as the completed input to the next Odaiba stage. Odaiba runtime integration must proceed on a separate, independently scoped branch that defines loader URLs, Odaiba placement, axis handling (especially Grand Nikko), performance acceptance and venue-specific validation before modifying application code. It must not modify the Shibuya scene by inserting these landmarks.
