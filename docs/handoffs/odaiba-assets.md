@@ -18,7 +18,7 @@
 
 ## Goal and acceptance criteria
 
-Prepare the current Odaiba building source/export pairs for team-lead progress review. The branch retains the five previously reviewed buildings and adds DiverCity Tokyo Plaza, DiverCity Tokyo Office Tower and Telecom Center. These landmarks belong exclusively to the Odaiba Plan and must not be mixed into the Shibuya venue; likewise, Shibuya landmarks must not be placed in Odaiba. This branch does not modify the existing Shibuya runtime. The three new pairs require matching `.blend` and `.glb` files, while Telecom Center also carries top and oblique source-render previews as progress evidence. Telecom Center has not yet been added to the formal Building Inspector review scene, so this progress branch is not declared ready to merge into `main`.
+Prepare the current Odaiba building source/export pairs for team-lead progress review. The branch retains the five previously reviewed buildings and adds DiverCity Tokyo Plaza, DiverCity Tokyo Office Tower and Telecom Center. These landmarks belong exclusively to the Odaiba Plan and must not be mixed into the Shibuya venue; likewise, Shibuya landmarks must not be placed in Odaiba. This branch does not modify the existing Shibuya runtime. The three new pairs require matching `.blend` and `.glb` files, while Telecom Center also carries top and oblique source-render previews as progress evidence. The formal Building Inspector now validates all eight buildings; this handoff remains `IN_PROGRESS` for team-lead review and runtime integration remains out of scope.
 
 ## In-scope files and dependencies
 
@@ -53,10 +53,12 @@ The pairs were copied from the verified `C:\FutureCity` outputs. Source files we
 - Copied the five-building perspective and true orthographic top-view evidence.
 - Used Blender 5.2 verification results from the source work.
 - Recorded the common contract: Blender Z-up, standard glTF Y-up, Blender front `-Y`, Three.js front `+Z`, and a 20 m review grid. Standard glTF conversion is already baked; consumers must not rotate these Y-up exports a second time.
-- Building Inspector loaded all 5 of 5 assets successfully with no overlap. The measured review scene reported 206 render calls and 234,791 rendered triangles.
+- Formal Building Inspector validation passed with 8 / 8 assets loaded. All eight footprint frames are mutually non-overlapping, with building-only totals of 271 draw calls and 339,919 triangles.
 - Added targeted ignore rules for Blender autosaves, backups, reference collections, browser profiles, and dependency folders without ignoring unrelated content under `asset/`.
 - Added the verified Blender source and GLB export pairs for DiverCity Tokyo Plaza, DiverCity Tokyo Office Tower and Telecom Center without copying backups, references, generators, reports or temporary output.
-- Added Telecom Center top and oblique source-render previews as progress evidence. These are not formal Building Inspector captures.
+- Added Telecom Center top and oblique source-render previews as progress evidence.
+- Replaced the formal oblique and true orthographic top-view Building Inspector evidence with the verified eight-building captures.
+- Verified Telecom Center at 46 draw calls and 48,156 triangles, grounded at 0.0000 m with Y-up, front +Z, scale `(1, 1, 1)` and no additional rotation.
 
 ### Asset inventory and known metrics
 
@@ -69,14 +71,14 @@ The pairs were copied from the verified `C:\FutureCity` outputs. Source files we
 | DECKS Tokyo Beach | 147.05 x 104.19 x 45.27 | 8 x 6 | 15,156 | 8 | 41 / 41 | Floor plans are diagrams rather than surveys. Center Deck bridge/stair positions and seaside massing are conservative approximations; detailed terrace treatment is limited to the supported 3F area. Unlocated sail canopies and night-sign facade, interiors and surrounding infrastructure are excluded. |
 | DiverCity Tokyo Plaza | 230.50 x 135.75 x 39.70 | 12 x 7 | 35,700 | 10 | 24 / 29 | Mall and connected parking only. Dimensions, facade bays, ramp geometry and roof plant are photo-led estimates; the office tower, Gundam/Unicorn statue, public ground and surrounding infrastructure are excluded. |
 | DiverCity Tokyo Office Tower | 67.86 x 42.10 x 106.09 | 4 x 3 | 21,412 | 7 | 18 / 18 | Dimensions, roof equipment, service elevation and former connection position are photographic estimates. The mall, connection volumes, public plaza and surrounding infrastructure are excluded. |
-| Telecom Center | 184.34 x 83.96 x 103.00 | 10 x 5 | 48,156 | 9 | 42 / 46 | Overall dimensions and detailed setbacks are photographic/satellite estimates; the 103 m maximum includes a representative antenna above the stated 99 m building height. The station, guideway, public bridge and surrounding infrastructure are excluded. Not yet reviewed in the formal Building Inspector. |
+| Telecom Center | 184.34 x 83.96 x 103.00 | 10 x 5 | 48,156 | 9 | 42 / 46 | Overall dimensions and detailed setbacks are photographic/satellite estimates; the 103 m maximum includes a representative antenna above the stated 99 m building height. The station, guideway, public bridge and surrounding infrastructure are excluded. Formal Building Inspector validation passed. |
 
 ## Actual validation results
 
-- Verification status: PARTIAL for the eight-building progress branch; runtime integration remains NOT INTEGRATED.
+- Asset review validation: PASSED for the eight-building progress branch; runtime integration remains NOT INTEGRATED.
 - Date and checked commit/worktree: 2026-09-23; `feat/odaiba-assets-progress-02` worktree based on `033631c8bf1881b18f164f684e320982a898af69` before the progress commit.
-- Commands/manual checks and results: the three source paths and eight copied destinations were checked; only the requested formal pairs and Telecom previews were copied. Their source inspection reports record Blender 5.2.2 reopen, GLB reparse and triangle-match validation. The earlier Building Inspector result remains 5/5 for the original five assets; Telecom Center has not been added to the formal Building Inspector.
-- Evidence/environment: earlier formal evidence remains `docs/handoffs/odaiba-assets-angle.png` and `docs/handoffs/odaiba-assets-top.png`; current Telecom source-render evidence is `docs/handoffs/telecom-center-top.png` and `docs/handoffs/telecom-center-oblique.png`.
+- Commands/manual checks and results: the three source paths and eight copied destinations were checked; only the requested formal pairs and Telecom previews were copied. Their source inspection reports record Blender 5.2.2 reopen, GLB reparse and triangle-match validation. The formal Building Inspector loaded 8 / 8, confirmed all footprint frames are mutually non-overlapping and measured building-only totals of 271 draw calls and 339,919 triangles. Telecom Center contributed 46 draw calls and 48,156 triangles and was verified grounded, Y-up, front +Z, scale `(1, 1, 1)` with no additional rotation.
+- Evidence/environment: current formal eight-building evidence is `docs/handoffs/odaiba-assets-angle.png` and `docs/handoffs/odaiba-assets-top.png`; Telecom source-render evidence remains `docs/handoffs/telecom-center-top.png` and `docs/handoffs/telecom-center-oblique.png`.
 - Integrated commit and checks: NOT INTEGRATED. The application in `city2127` does not load these models yet.
 - Changes since verification: three new source/export pairs, two Telecom Center source-render previews and this handoff update; no application code was modified.
 
@@ -87,7 +89,7 @@ The pairs were copied from the verified `C:\FutureCity` outputs. Source files we
 - Odaiba and Shibuya are separate venue plans. Their landmark buildings must not be mixed across settings.
 - The Grand Nikko source report records a legacy Z-up GLB workflow, unlike the newer standard Y-up pairs. The inspector's existing one-time adapter was used for review; a future application integration owner must confirm and document the consumer-side contract.
 - No runtime URL/import, layout placement, collision envelope, route integration, material tuning, loading budget or production-build validation has been implemented in `city2127`.
-- Telecom Center is not yet present in the formal Building Inspector review scene; the copied top and oblique images are source-render progress evidence only.
+- Formal eight-building asset review is complete; runtime URL/import, placement and production integration remain unimplemented.
 
 ## Important decisions
 
@@ -98,4 +100,4 @@ The pairs were copied from the verified `C:\FutureCity` outputs. Source files we
 
 ## Next expected step
 
-The team lead reviews `feat/odaiba-assets-progress-02` and the three added asset pairs. Before any main integration decision, add Telecom Center to the formal Building Inspector, validate the expanded set, and record new inspector evidence and metrics. Keep this handoff `IN_PROGRESS` until that review is complete. Odaiba runtime integration remains a separate scope and must not modify the Shibuya scene by inserting these landmarks.
+The team lead reviews `feat/odaiba-assets-progress-02`, the three added asset pairs and the passed eight-building Inspector evidence. Keep this handoff `IN_PROGRESS` until that review is complete. Odaiba runtime integration remains a separate scope and must not modify the Shibuya scene by inserting these landmarks.
