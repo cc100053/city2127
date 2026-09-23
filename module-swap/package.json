@@ -8,7 +8,9 @@
   "scripts": {
     "install:app": "npm --prefix app install",
     "dev": "npm --prefix app run dev",
-    "test": "npm --prefix app test",
+    "sync:models": "node scripts/sync-models.mjs",
+    "check:models": "node scripts/sync-models.mjs --check",
+    "test": "npm run check:models && npm --prefix app test",
     "build": "npm --prefix app run build",
     "preview": "npm --prefix app run preview"
   }

@@ -1,17 +1,29 @@
-# Module Swap Latest
+# Module Swap
 
-別ブランチへ移すために整理した、地面・区画・建物交換テストの自己完結パッケージです。
+地面・区画・建物の交換テスト用の自己完結パッケージです。
 
 配置状態は`CityLayoutState`で表し、アンケート側の`CitySurveyState`とは別物です。
 
 ## 内容
 
 - `app/`: Vite + Vanilla TypeScript + Three.js 0.180のテストアプリ
-- `app/public/assets/models/`: アプリが実行時に読む8個のGLB
 - `assets/`: 8アセットそれぞれの最新BlendとGLBの組
+- `app/public/assets/models/`: アプリが実行時に読む8個のGLB
+- `scripts/sync-models.mjs`: `assets/`から実行時GLBを同期・検証するスクリプト
 - `verification/modular-ground-reassembly-test.blend`: 個別GLBの再組立て検証Scene
 
-`app/public/assets/models/`のGLBと`assets/`の同名GLBは同一内容です。前者はWeb実行用、後者はBlender制作データとの対応確認用です。
+## GLBの正本
+
+**正本は`assets/<id>/<id>.glb`です。** `.blend`と対で置かれた、人が編集する側のファイルです。`app/public/assets/models/<id>.glb`はViteが配信するための出力で、正本からコピーされたものです。直接編集しないでください。
+
+Blenderから再exportしたあとは、必ず同期してください。
+
+```sh
+npm run sync:models    # assets/ → app/public/assets/models/ へコピー
+npm run check:models   # 8個が一致しているか検証。ズレていればexit 1
+```
+
+`npm test`は`check:models`を先に実行するので、同期を忘れたままテストを通すことはできません。
 
 バックアップBlend、`.blend1`、`node_modules`、`dist`は含めていません。
 
