@@ -27,11 +27,12 @@ nvmを使う場合は、作業前に`nvm use 24`でNode 24へ切り替えてく�
 
 ```sh
 nvm use 24
-cd app
-npm install
+npm run install:app
 npm test
 npm run dev
 ```
+
+アプリの実体は`app/`にありますが、上記コマンドはこのパッケージのルートから実行できます。
 
 本番ビルド:
 
