@@ -5,7 +5,7 @@
 - Branch: `codex/blender-shibuya-pipeline`
 - Base commit: `9ca007c2bbe8423eb52317724133d66b6006f695`
 - Last verified commit: `caa5cdf2cd5c59ea018cf1657d9866eecba7e77e` (integrated code/tests/build)
-- Remote availability: `origin/codex/blender-shibuya-pipeline` at `d014993ab8191acf023108fe9a255d15700d65e3`; main publication pending this handoff update
+- Remote availability: `origin/codex/blender-shibuya-pipeline` at `d014993ab8191acf023108fe9a255d15700d65e3`; `origin/main` published through `61d1e4522bf78233b178abd86a1ddf5868c5e86f` before this final handoff note
 
 ## Session Git state
 
@@ -34,8 +34,9 @@ Connect Codex desktop to the installed Blender, and make Blender GLBs previewabl
 - Blender 5.2.2 exported a temporary cube GLB. Local Vite preview at `http://127.0.0.1:5173/?asset-preview` loaded it; file input reported success and browser error log was empty. Temporary GLB is not in the repository.
 - `npm test`: PASSED on branch and integrated main. `npm run build`: PASSED on branch and integrated main after the initial missing Vite type reference was fixed. Existing bundle-size warning. Branch and integrated committed diff whitespace and changed-document local Markdown links: PASSED.
 - [Branch CI](https://github.com/cc100053/city2127/actions/runs/35834021115): PASSED on `d014993` (Node 24, install/test/build/whitespace).
+- [Main CI](https://github.com/cc100053/city2127/actions/runs/35834229023): PASSED on `61d1e45` after integration and the first handoff update.
 - Production model placement, visual comparison and performance: NOT RUN; no production asset exists.
-- Integrated commit/checks: local main `caa5cdf2cd5c59ea018cf1657d9866eecba7e77e`; test/build/diff check PASSED. Remote main CI pending push.
+- Integrated commit/checks: main merge `caa5cdf2cd5c59ea018cf1657d9866eecba7e77e`; test/build/diff check PASSED. Published main `61d1e45` CI PASSED. This final handoff note changes documentation only.
 
 ## Known issues and decisions
 
@@ -46,4 +47,4 @@ Connect Codex desktop to the installed Blender, and make Blender GLBs previewabl
 
 ## Next step
 
-Publish and verify main, then request the user's explicit approval to persist Blender's Online Access preference. Once the user supplies the first Shibuya model and placement, integrate it as a separate asset task.
+Request the user's explicit approval to persist Blender's Online Access preference. Once the user supplies the first Shibuya model and placement, integrate it as a separate asset task.
