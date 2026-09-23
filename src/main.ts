@@ -34,6 +34,8 @@ try {
   sky.frustumCulled=false;sky.renderOrder=-1;scene.add(sky);
   const floor=new T.Mesh(new T.PlaneGeometry(500,500),new T.MeshStandardMaterial({color:'#e5ddcc',roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.76;floor.receiveShadow=true;scene.add(floor);
   const rig=cityRig(scene);
+  addCityModel(scene,new URL('../asset/models/future-tree-2127/future-tree-2127.glb',import.meta.url).href,[11,0,23])
+    .catch(error=>console.error('Future tree failed to load',error));
   if(import.meta.env.DEV && new URLSearchParams(location.search).has('asset-preview')){
     const input=document.createElement('input');input.type='file';input.accept='.glb,model/gltf-binary';input.className='asset-preview';input.title='Preview a Blender GLB in the Shibuya scene';input.setAttribute('aria-label','Preview a Blender GLB');
     document.body.appendChild(input);
