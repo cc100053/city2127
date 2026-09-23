@@ -1,5 +1,10 @@
 # Validation and handoff
 
+## Future tree integration — 2026-09-23
+
+Blender 5.2.2 via MCP exported `asset/models/future-tree-2127/future-tree-2127.blend` and `.glb`. Empty-scene reimport found 25 meshes, 4 materials, 2,384 triangles and Blender XYZ bounds `[-2.748,2.755] × [-2.555,2.703] × [0.005,6.33]`; the GLB is 79,700 bytes. The initial export accidentally included Blender's default cube; it was removed and the reimport check repeated. The production Vite build emitted the GLB asset. `npm test`, `npm run build` and `git diff --check` passed; the existing bundle size warning remains. At 1280×720 in the in-app browser, the tree was visible near Hachiko plaza in Daylight, Pulse transition and Still transition; the browser error log was empty. Full motion cycles and 1080p FPS were not measured for this change.
+
+
 ## Exhibition acceptance direction — 2026-09-18 (not yet implemented or tested)
 
 The current product goal is collective guest-driven change in a futuristic Shibuya. Documentary-photograph realism is no longer a completion gate. Future implementation stages should turn the following experience requirements into concrete checks after question content and change rules are agreed:

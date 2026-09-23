@@ -175,3 +175,6 @@ Stage 1–5 均已重跑 `npm test`、`npm run build` 與 1280×720 三態截圖
 ## 範圍限制
 
 保持單一路口、固定種子、三態、固定桌面鏡頭、WebGL 2、instancing 及 shared materials。暫不新增飛行器種類、更多招牌、物理、通用尋路、後端、部署、外部資產包、新框架或 mobile／responsive 工作。這些不是必須補完的待辦；目前最重要的缺口是建築與空間表達。
+# Future tree asset — 2026-09-23
+
+Blender MCP produced a static, engineered tree with a ceramic trunk, titanium branches, sage photovoltaic crown and emissive cyan rings. The production GLB is placed at `(11,0,23)` beside Hachiko plaza. This later addition supersedes the Plan 02 prototype's absence of conventional trees; it does not change the historical Plan 02 captures or the preset system.
