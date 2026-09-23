@@ -1,11 +1,11 @@
 # Future tree 2127
 
 - Owner: Codex
-- Status: DONE locally; main publication and main CI pending
+- Status: DONE
 - Branch: `codex/future-tree`
 - Base commit: `f4a70b3265b6da3dfa1a5d7be2fd08a0164139c9`
 - Last verified commit: task `e584f2681b76a1a44c37ca9c09860d0993e4bed4`; integrated main `645596731f9ee4a867da5b4620e9bd6b06961967`
-- Remote availability: `origin/codex/future-tree` at `e584f26`; main integration not yet pushed
+- Remote availability: `origin/codex/future-tree` at `e584f26`; `origin/main` published through `8fd26e0`
 
 ## Session Git state
 
@@ -27,8 +27,8 @@ Blender 5.2.2 LTS, official pinned Blender Lab MCP on this Mac; a live scene-sum
 - `npm test`: passed. `npm run build`: passed and emitted the GLB; existing >500 kB JS bundle warning. `git diff --check`: passed.
 - In-app browser at 1280×720: tree visible near Hachiko plaza in Daylight, Pulse transition and Still transition; browser error log empty. Full 60-second motion and 1080p FPS: NOT RUN.
 - [Branch CI](https://github.com/cc100053/city2127/actions/runs/35836157579): passed on `e584f26`.
-- Integrated locally as `6455967`; `npm test`, `npm run build` and committed diff whitespace passed again. Main CI is pending publication. Changes since verification: this handoff update only.
+- Integrated as `6455967`; `npm test`, `npm run build` and committed diff whitespace passed again. Published main through `8fd26e0`; [main CI](https://github.com/cc100053/city2127/actions/runs/35836277962) passed. Changes since executable verification: handoff documentation only.
 
 ## Next step
 
-Commit this handoff update, recheck latest `origin/main`, push validated main and confirm main CI. Recheck tree clearance if placement changes.
+Asset and runtime integration are published. Recheck tree clearance if placement changes.
