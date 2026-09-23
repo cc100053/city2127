@@ -1,11 +1,11 @@
 # survey-state-mvp — Questionnaire state accumulation MVP
 
 - Owner: noifex
-- Status: IN_PROGRESS
+- Status: IN_PROGRESS — committed and pushed to its own branch; not integrated into `main`
 - Branch: `feat/survey-state-mvp`
 - Base commit: `5577195751f20b3de568d289425f534e85b2c2a4`
-- Last verified commit: NONE — everything below was checked in the uncommitted worktree of this branch
-- Remote availability: NOT PUSHED
+- Last verified commit: `963949c1076b49cac9286c723116ee3ef4962576` — the worktree that was verified is byte-identical to this commit; the only later change is this documentation update
+- Remote availability: `origin/feat/survey-state-mvp` at `963949c1076b49cac9286c723116ee3ef4962576`
 - GitHub Issue (optional): none
 
 ## Session Git state
@@ -61,8 +61,8 @@ Dependency note: `survey/` is a separate npm project whose only runtime dependen
   - Repository root: `npm test` — all existing suites passed; `npm run build` — succeeded; `git diff --check` — clean.
   - `git status --short` shows only the untracked new paths, confirming `node_modules/`, `dist/` and `data/` are ignored inside the new directory.
 - Evidence/environment: Node.js v24.21.0 from nvm (the shell default `node` is v20.16.0 and fails with `node: bad option: --experimental-strip-types`), npm 11, macOS 24.6.0. No browser session was driven for this package.
-- Integrated commit and checks: NOT INTEGRATED — nothing is staged, committed or pushed yet.
-- Changes since verification: none.
+- Integrated commit and checks: NOT INTEGRATED into `main`. The work is committed on this branch as `963949c1076b49cac9286c723116ee3ef4962576` and pushed to `origin/feat/survey-state-mvp`; `main` is unchanged at `5577195751f20b3de568d289425f534e85b2c2a4`.
+- Changes since verification: documentation only — this handoff was updated to record the commit SHA and remote availability. No source, asset or configuration file changed.
 
 ## Known issues and blockers
 
@@ -81,4 +81,8 @@ Dependency note: `survey/` is a separate npm project whose only runtime dependen
 
 ## Next expected step
 
-Owner reviews the untracked `survey/` contents, then stages and commits it on this branch (nothing is staged yet) and decides whether to push. Because neither branch has committed yet, both `module-swap/` and `survey/` are physically present in the single worktree; staging must be scoped per branch rather than using `git add -A`. The parallel branch `feat/city-module-swap` carries the 3D module package and was created from the same base commit.
+Owner decides whether to open integration into `main`. The package is committed as `963949c1076b49cac9286c723116ee3ef4962576` and available on `origin/feat/survey-state-mvp`.
+
+Before integration, note that `module-swap/` from the parallel branch `feat/city-module-swap` (`d29b02d4abdef8bdba869702610d318d83d930a1`) stays untracked in a shared worktree until both branches land; that is expected and must not be deleted. Both branches were created from the same base commit and do not conflict.
+
+The combined `CityState` that unifies `CitySurveyState` and `CityLayoutState` is the first task to do on `main` after both branches land.
