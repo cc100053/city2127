@@ -5,3 +5,4 @@
 /* Fixed desktop architectural presentation. */
 .intro{top:145px;max-width:250px}h1{font-size:38px}.question{font-size:11px}body[data-state=pulse]{color:#354139}body[data-state=pulse] h1 em{color:#526d79}.verdict{bottom:122px}.choices{border-radius:8px}button{border-radius:4px}
 footer .choices{position:absolute;left:44px;bottom:34px}.footnote{display:none}.instruction{margin-left:auto}.verdict{left:44px;right:auto;bottom:125px;width:320px;text-align:left}.verdict p{line-height:1.6}
+.asset-preview{position:fixed;right:20px;top:20px;z-index:10;background:#fff;padding:8px;color:#222}

@@ -36,6 +36,12 @@ At initial local handoff, remote GitHub Actions execution, Node 24 execution and
 
 ## Blender standards — collaboration Stage 3, 2026-09-18
 
+### Blender import channel — 2026-09-23
+
+On branch `codex/blender-shibuya-pipeline`, Codex registered the official Blender Lab MCP server from revision `ff54e4d8f6b09502f2f466189cca0e52b4a91643` and installed/enabled its add-on in Blender 5.2.2. A temporary background Blender process with `--online-mode` answered a read-only MCP scene-summary call; the server exposed 26 tools. Codex desktop may need a new task or restart to discover the newly registered server. The add-on must be started from Blender preferences for an interactive session; keep its default localhost socket. Blender's saved Online Access preference remains off: automatic approval review rejected persisting it because this would expand future sessions' network access.
+
+The development-only `?asset-preview` route loaded a cube GLB exported by Blender 5.2.2 into the running Shibuya scene; the file input reported it loaded and the browser console showed no error. The cube and export script were temporary, not committed. `npm test`, `npm run build` and `git diff --check` passed after the loader change; the existing bundle-size warning remains. No production Shibuya model or placement has been chosen, so production asset integration and its visual/performance checks remain NOT RUN.
+
 [BLENDER.md](BLENDER.md) defines source/export reproducibility, coordinate/material contracts, optimization evidence and asset-consumer checks. Asset authors record these in the existing task handoff. Source/export validation and application validation are separate; use NOT INTEGRATED when no consumer exists. Current CI runs code tests/build and whitespace only; it does not open Blender, inspect GLBs or verify asset appearance.
 
 This stage changes documentation only. At base `f196b2e`, no tracked Blender/glTF model or application model-loader reference was found. Local verification covers the complete diff, local Markdown links, consistency with `main.ts` → `cityRig`, and preservation of source/tests/assets/dependencies. Blender export/reimport, browser checks and performance measurements are NOT RUN because no asset or runtime behavior changed. [Stage 3 handoff](handoffs/stage3-blender-standards.md) records publication and verification status.
