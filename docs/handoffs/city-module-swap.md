@@ -28,11 +28,12 @@ Acceptance criteria:
 
 ## In-scope files and dependencies
 
-New directory `module-swap/` only (46 files, 2.4 MB):
+New directory `module-swap/` only (47 files, 2.4 MB):
 
 - `module-swap/app/` — Vite + vanilla TypeScript + Three.js 0.180.0 prototype, its own `package.json`, `tsconfig.json` and lockfile. Runtime GLBs live in `module-swap/app/public/assets/models/`.
 - `module-swap/assets/` — the eight authoring pairs (`.blend` + `.glb`) for `ground-cross`, `lot-empty`, `lot-park`, `lot-plaza`, `prop-kit`, `building-basic-small`, `building-basic-medium`, `building-basic-tall`.
 - `module-swap/verification/modular-ground-reassembly-test.blend` — reassembly check scene, not a production asset.
+- `module-swap/scripts/sync-models.mjs` — copies the authoring GLBs to the runtime directory, or verifies them with `--check`. Node built-ins only, no dependency.
 - `module-swap/README.md`, `module-swap/.gitignore`, `module-swap/package.json` — a thin package root whose scripts delegate to `app/` (`install:app`, `dev`, `test`, `build`, `preview`), so the package runs from `module-swap/` without `cd app`. It declares no dependencies and has no lockfile of its own.
 
 Explicitly excluded: `src/`, `asset/`, `tests/`, root `package.json` and root `tsconfig.json` are untouched. `node_modules/`, `dist/`, `tsconfig.tsbuildinfo`, `.blend1` and `.DS_Store` were excluded from the copy.
@@ -45,7 +46,7 @@ Dependency note: `module-swap/app` is a separate npm project. The root `tsconfig
 
 - Copied the package into `module-swap/`.
 - Added `module-swap/package.json` so `npm run dev`, `npm test` and `npm run build` work from the package root; previously only `module-swap/app/` had a `package.json` and running from the package root failed with `Missing script: "dev"`. Its `name` is `module-swap`, matching the directory here rather than the production folder it was copied from.
-- The GLBs under `module-swap/app/public/assets/models/` and `module-swap/assets/*/` are byte-identical duplicates: the former is what the app loads at runtime, the latter is the authoring pair next to its `.blend`. Which one is the source of truth is an open decision (see below).
+- Settled the duplicate-GLB question: `module-swap/assets/<id>/<id>.glb` is the source of truth and `module-swap/app/public/assets/models/<id>.glb` is a generated runtime copy. `scripts/sync-models.mjs` refreshes the runtime copies (`npm run sync:models`) and verifies them (`npm run check:models`); `npm test` runs the check first, so a forgotten re-export fails before the unit tests run. The script reports a missing copy, a content mismatch and a runtime GLB with no authoring source, and never deletes anything on its own.
 - Node names consumed by the app: `socket_lot_nw`, `socket_lot_ne`, `socket_lot_sw`, `socket_lot_se`, `socket_building_center`, `connector_road_north/east/south/west`. Buildings attach to `socket_building_center` inside `lot-empty`, not directly to the ground lot sockets.
 - The placement state type is named `CityLayoutState` (`module-swap/app/src/state/cityLayoutState.ts`) so that it does not collide with the survey-side `CitySurveyState` on `feat/survey-state-mvp`. The localStorage key `threejs-module-swap-test.city-state.v1` was deliberately left unchanged so existing saved version 1 data stays readable.
 
@@ -67,8 +68,7 @@ Dependency note: `module-swap/app` is a separate npm project. The root `tsconfig
 
 ## Known issues and blockers
 
-- The eight GLBs exist twice (runtime copy and authoring copy). They are byte-identical today, but nothing enforces that, so they can drift silently on the next export.
-- `module-swap/app` is not wired into the root `npm test` / `npm run build`, so CI at the root will not cover it.
+- `module-swap/` is not wired into the root `npm test` / `npm run build`, so repository CI covers neither its unit tests nor `check:models`. The GLB drift check only runs when someone runs `npm test` inside `module-swap/`. Wiring it into the root scripts is a separate decision.
 - The 500 kB Vite chunk warning is present and unaddressed by design.
 
 ## Important decisions
@@ -76,11 +76,10 @@ Dependency note: `module-swap/app` is a separate npm project. The root `tsconfig
 - The package lands as an independent top-level directory rather than being merged into `src/`, so the existing procedural city keeps working and the diff stays reviewable as a pure addition.
 - `CityState` was split into `CityLayoutState` (placement, this branch) and `CitySurveyState` (survey accumulation, `feat/survey-state-mvp`). A combined `CityState` that holds both is intentionally **not** created yet; it is to be introduced on `main` after both branches land.
 - The production folder outside this repository is kept; this branch received a copy.
+- `assets/` is the source of truth for the eight GLBs because it is where a person edits, next to the matching `.blend`; `app/public/assets/models/` only exists so Vite can serve them (owner decision, 2026-09-24). Serving `assets/` directly from Vite was rejected: the directory shapes differ (`assets/<id>/<id>.glb` versus `models/<id>.glb`), so it would need extra Vite configuration or a symlink and another round of production-build and offline verification for no gain at this stage.
 
 ## Next expected step
 
-Owner decides whether to open integration into `main`. The package is committed through `8051fda955dfd6afab4ce698e60af6a0c95e7f7a` and available on `origin/feat/city-module-swap`.
-
-Before integration, decide which copy of the eight GLBs is the source of truth: `module-swap/assets/<id>/<id>.glb` (next to its `.blend`) and `module-swap/app/public/assets/models/<id>.glb` (loaded at runtime) are byte-identical today, but nothing enforces that.
+Owner decides whether to open integration into `main`. The package is committed on this branch and available on `origin/feat/city-module-swap`; see the header for the exact SHA.
 
 Note that `survey/` from the parallel branch `feat/survey-state-mvp` (`2d4d7d5681ef1bd4e0d5e71ec7a3ad8aff4c9643`) stays untracked in a shared worktree until both branches land; that is expected and must not be deleted. Both branches were created from the same base commit and do not conflict.
