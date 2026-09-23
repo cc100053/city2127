@@ -2,11 +2,15 @@
 
 These are handoff standards for future assets, not an implemented import pipeline. At the Stage 3 baseline (`f196b2e`), the repository has no tracked `.blend`/`.glb` files; `main.ts` constructs `cityRig` procedurally and has no model loader. Follow [Git coordination](CONTRIBUTING.md) and the [project contract](PROJECT.md). Preserve the exhibition direction: futuristic Shibuya and readable guest-driven changes, not documentary realism as a gate.
 
+## Codex and Blender connection (2026-09-23)
+
+This workstation has Blender 5.2.2 and the [official Blender Lab MCP](https://projects.blender.org/lab/blender_mcp) installed. Codex's `blender` STDIO server is registered globally; check with `codex mcp get blender`. The Blender 5.2 add-on is installed and enabled. In an interactive Blender session, allow Online Access in Blender preferences (required by this official add-on), start its MCP server in the add-on preferences, then start a new Codex task or restart Codex so the tools are discovered. Keep the socket on localhost. The saved Online Access preference is currently off; changing it persistently needs user approval. MCP helps author and inspect Blender scenes; it does not install a GLB in this application's runtime.
+
 ## Ownership and files
 
 Assign one named owner per asset task. Coordinate edits to the same binary before starting. Commit editable `.blend` source and corresponding production `.glb` together; use Git history instead of `final-final` filenames. Do not add LFS, export automation or decoder dependencies incidentally.
 
-For new assets, use `asset/models/<asset-id>/<asset-id>.blend` and `<asset-id>.glb` in the same directory, with lowercase kebab-case IDs. Create directories only when a real asset exists. Keep existing references such as `asset/pic2.png` in place. This source/export location does not automatically make a model available to Vite: the first integration task must explicitly choose its runtime URL/import and test the production build.
+For new assets, use `asset/models/<asset-id>/<asset-id>.blend` and `<asset-id>.glb` in the same directory, with lowercase kebab-case IDs. Create directories only when a real asset exists. Keep existing references such as `asset/pic2.png` in place. This source/export location does not automatically make a model available to Vite. The development preview below reads a local file; a production integration must explicitly import/serve its GLB, call `addCityModel(scene, url, [x,y,z], rotationY)` from `src/modelAssets.ts`, and test the production build.
 
 Pack needed textures into the source or commit them under that asset directory with relative paths. Linked libraries must also be available from the clone, or made local for the deliverable. Exclude temporary backups and unused working exports from commits without deleting another contributor's files. Record provenance/licence for third-party material, if any; this stage does not authorize an external asset pack.
 
@@ -36,10 +40,12 @@ Use the smallest texture resolution that survives the intended view. Record expo
 
 ## Validate and hand off
 
+For a quick scene preview, run `npm run dev -- --port 5173`, open the URL Vite prints with `?asset-preview`, and choose a `.glb`. It loads once at scene origin in the existing Shibuya renderer, without changing saved project assets. Reload to test another model. This confirms parsing and placement only; use the checks below before calling an asset production-ready. The picker is absent from production builds.
+
 1. Open the committed source from a fresh clone or isolated copy without access to the author's private texture/library paths. Confirm all dependencies resolve and the recorded export steps reproduce a usable GLB; byte-identical output is not required.
 2. Import the GLB into an empty Blender scene. Check bounds, origin, facing, normals, materials, texture presence and any agreed animation clips. Inspect silhouette, openings and joins. Record actual results and a screenshot; do not mark an unperformed check as passed.
 3. If a runtime consumer exists, load the replacement in that application and follow relevant desktop/state/motion checks in [VALIDATION.md](VALIDATION.md). Check console/network errors, actual materials, footprint/route clearance and the production build. Run `npm test` and `npm run build` for code integration. A Blender reimport cannot prove Three.js compatibility.
 4. If there is no consumer yet, explicitly record `Application verification: NOT INTEGRATED`. A source/export pair may be handed off, but cannot be called application-ready. First loader integration and any coupled model replacement belong on a feature branch. Do not replace a used asset on main until its consumers pass.
 5. In the existing [task handoff](handoffs/TEMPLATE.md), record source/export paths and commit, owner, versions/settings, units/bounds/pivot/facing, runtime consumer or NONE, dependencies/provenance, exported metrics, actual checks/evidence, limitations and next step. No separate asset registry is required.
 
-This stage provides the manual standard only. No model has been authored, exported, optimized or visually verified by creating this document.
+The original Stage 3 provided manual standards only. The later import channel adds a development preview and reusable loader; no production Shibuya model has been authored or integrated here.

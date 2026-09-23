@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import * as T from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -9,6 +10,7 @@ import { cityRig } from './cityRig';
 import { heroCamera, HERO_TARGET } from './heroCamera';
 import { createWorldState } from './worldState';
 import { overlay } from './overlay';
+import { addCityModel } from './modelAssets';
 import './style.css';
 
 try {
@@ -32,6 +34,17 @@ try {
   sky.frustumCulled=false;sky.renderOrder=-1;scene.add(sky);
   const floor=new T.Mesh(new T.PlaneGeometry(500,500),new T.MeshStandardMaterial({color:'#e5ddcc',roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.76;floor.receiveShadow=true;scene.add(floor);
   const rig=cityRig(scene);
+  if(import.meta.env.DEV && new URLSearchParams(location.search).has('asset-preview')){
+    const input=document.createElement('input');input.type='file';input.accept='.glb,model/gltf-binary';input.className='asset-preview';input.title='Preview a Blender GLB in the Shibuya scene';input.setAttribute('aria-label','Preview a Blender GLB');
+    document.body.appendChild(input);
+    input.addEventListener('change',async()=>{
+      const file=input.files?.[0];if(!file)return;
+      const url=URL.createObjectURL(file);input.disabled=true;
+      try{await addCityModel(scene,url,[0,0,0]);input.title=`Loaded ${file.name}; reload to preview another model`;}
+      catch(error){input.disabled=false;console.error('GLB preview failed',error);alert(`GLB preview failed: ${error instanceof Error?error.message:String(error)}`);}
+      finally{URL.revokeObjectURL(url);}
+    });
+  }
   const controls=new OrbitControls(camera,renderer.domElement);
   controls.target.set(...HERO_TARGET);controls.enableDamping=true;controls.dampingFactor=.06;controls.rotateSpeed=.45;controls.zoomSpeed=.6;controls.panSpeed=.5;
   controls.minDistance=45;controls.maxDistance=180;controls.minPolarAngle=.35;controls.maxPolarAngle=1.42;controls.screenSpacePanning=false;controls.update();
