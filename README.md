@@ -6,7 +6,7 @@ AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/P
 
 三位協作者各自使用獨立 local clone；每項任務指定一位 owner，並以 `docs/handoffs/<task-id>.md` 保存可接續的任務狀態。主要負責範圍不限制跨區工作，但同一模組或二進位素材的重疊修改要先協調。
 
-開始前閱讀 [agent 工作規則](AGENTS.md)、[Git 協作流程](docs/CONTRIBUTING.md)、[程式架構](docs/PROJECT.md)及[驗證要求](docs/VALIDATION.md)，再用[交接模板](docs/handoffs/TEMPLATE.md)建立任務文件。程式修改使用短期分支，可自行檢查、合併及推送 main，無須 PR；Blender 素材另有直接提交 main 的流程，匯出與優化依照 [Blender 素材規範](docs/BLENDER.md)；目前仍未接入外部模型。
+開始前閱讀 [agent 工作規則](AGENTS.md)、[Git 協作流程](docs/CONTRIBUTING.md)、[程式架構](docs/PROJECT.md)及[驗證要求](docs/VALIDATION.md)，再用[交接模板](docs/handoffs/TEMPLATE.md)建立任務文件。程式修改使用短期分支，可自行檢查、合併及推送 main，無須 PR；Blender 素材另有直接提交 main 的流程。如需 Codex 操作 Blender，Mac／Windows 須各自安裝 MCP；素材匯出、驗證及本機設定差異見 [Blender 素材與跨平台交接規範](docs/BLENDER.md)；目前仍未接入外部模型。
 
 [CI workflow](.github/workflows/ci.yml) 已配置於 branch push／可選 PR 時以 Node 24 執行安裝、測試、build 及 diff whitespace 檢查；提交 `2b0e8cc` 嘅 [main CI 已通過](https://github.com/cc100053/city2127/actions/runs/35356530469)，沒有新增部署或 branch protection。詳細狀態見[驗證紀錄](docs/VALIDATION.md)。
 
