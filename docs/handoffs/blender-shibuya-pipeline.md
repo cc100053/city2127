@@ -1,18 +1,18 @@
 # Blender to Shibuya import channel
 
 - Owner: Codex
-- Status: IN_PROGRESS
+- Status: BLOCKED (repository integration complete; interactive MCP activation needs Online Access approval)
 - Branch: `codex/blender-shibuya-pipeline`
 - Base commit: `9ca007c2bbe8423eb52317724133d66b6006f695`
-- Last verified commit: NONE; working tree checks below
-- Remote availability: NOT PUSHED
+- Last verified commit: `caa5cdf2cd5c59ea018cf1657d9866eecba7e77e` (integrated code/tests/build)
+- Remote availability: `origin/codex/blender-shibuya-pipeline` at `d014993ab8191acf023108fe9a255d15700d65e3`; main publication pending this handoff update
 
 ## Session Git state
 
 - Starting branch and HEAD: clean `main` at `9ca007c2bbe8423eb52317724133d66b6006f695`.
 - Last fetched origin/main: same SHA, 2026-09-23; local and remote main had 0/0 divergence.
 - Local changes at start: NONE.
-- Upstream integration: NOT NEEDED.
+- Upstream integration: local main matched `origin/main` at the base SHA; task branch merged with `--no-ff` as `caa5cdf2cd5c59ea018cf1657d9866eecba7e77e` on 2026-09-23.
 - Conflicts: NONE.
 
 ## Goal and scope
@@ -28,13 +28,14 @@ Connect Codex desktop to the installed Blender, and make Blender GLBs previewabl
 
 ## Actual validation
 
-- Date/worktree: 2026-09-23, uncommitted task branch.
+- Date/worktree: 2026-09-23, task branch `d014993ab8191acf023108fe9a255d15700d65e3` and integrated local main `caa5cdf2cd5c59ea018cf1657d9866eecba7e77e`.
 - `codex mcp get blender`: enabled STDIO server. Blender extension list: `mcp` installed; headless preferences check: enabled.
 - Temporary Blender background server with `--online-mode`: MCP handshake listed 26 tools; `get_objects_summary` returned success. Stopped temporary server afterward.
 - Blender 5.2.2 exported a temporary cube GLB. Local Vite preview at `http://127.0.0.1:5173/?asset-preview` loaded it; file input reported success and browser error log was empty. Temporary GLB is not in the repository.
-- `npm test`: PASSED. `npm run build`: PASSED after the initial missing Vite type reference was fixed. Existing bundle-size warning. `git diff --check` and changed-document local Markdown link check: PASSED.
+- `npm test`: PASSED on branch and integrated main. `npm run build`: PASSED on branch and integrated main after the initial missing Vite type reference was fixed. Existing bundle-size warning. Branch and integrated committed diff whitespace and changed-document local Markdown links: PASSED.
+- [Branch CI](https://github.com/cc100053/city2127/actions/runs/35834021115): PASSED on `d014993` (Node 24, install/test/build/whitespace).
 - Production model placement, visual comparison and performance: NOT RUN; no production asset exists.
-- Integrated commit/checks: NOT INTEGRATED.
+- Integrated commit/checks: local main `caa5cdf2cd5c59ea018cf1657d9866eecba7e77e`; test/build/diff check PASSED. Remote main CI pending push.
 
 ## Known issues and decisions
 
@@ -45,4 +46,4 @@ Connect Codex desktop to the installed Blender, and make Blender GLBs previewabl
 
 ## Next step
 
-Complete final diff/link/check review, commit/push this branch, verify branch CI, integrate and validate main per `CONTRIBUTING.md`. Once the user supplies the first Shibuya model and placement, integrate it as a separate asset task.
+Publish and verify main, then request the user's explicit approval to persist Blender's Online Access preference. Once the user supplies the first Shibuya model and placement, integrate it as a separate asset task.
