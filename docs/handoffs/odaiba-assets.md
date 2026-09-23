@@ -18,7 +18,7 @@
 
 ## Goal and acceptance criteria
 
-Prepare the current Odaiba building source/export pairs for team-lead progress review. The branch retains the five previously reviewed buildings and adds DiverCity Tokyo Plaza, DiverCity Tokyo Office Tower and Telecom Center. These landmarks belong exclusively to the Odaiba Plan and must not be mixed into the Shibuya venue; likewise, Shibuya landmarks must not be placed in Odaiba. This branch does not modify the existing Shibuya runtime. The three new pairs require matching `.blend` and `.glb` files, while Telecom Center also carries top and oblique source-render previews as progress evidence. The formal Building Inspector now validates all eight buildings; this handoff remains `IN_PROGRESS` for team-lead review and runtime integration remains out of scope.
+Prepare the current Odaiba building and site-model progress for team-lead review and cross-computer continuation. The branch retains the eight reviewed building pairs and adds the latest Phase 03D Odaiba masterplan source, environment export, reports and previews. These landmarks belong exclusively to the Odaiba Plan and must not be mixed into the Shibuya venue; likewise, Shibuya landmarks must not be placed in Odaiba. This branch does not modify the existing Shibuya runtime. The formal Building Inspector validates all eight buildings; this handoff remains `IN_PROGRESS` for progress sharing and runtime integration remains out of scope.
 
 ## In-scope files and dependencies
 
@@ -42,6 +42,15 @@ Prepare the current Odaiba building source/export pairs for team-lead progress r
 - `asset/models/telecom-center/telecom-center.glb`
 - `docs/handoffs/telecom-center-top.png`
 - `docs/handoffs/telecom-center-oblique.png`
+- `asset/models/odaiba-masterplan/odaiba_masterplan_v01_phase03d.blend`
+- `asset/models/odaiba-masterplan/odaiba_masterplan_v01_phase03d_environment.glb`
+- `asset/models/odaiba-masterplan/odaiba_masterplan_v01_phase03d_generator.py`
+- `asset/models/odaiba-masterplan/odaiba_masterplan_v01_phase03d_manifest.json`
+- `asset/models/odaiba-masterplan/odaiba_masterplan_v01_phase03d_validation.json`
+- `asset/models/odaiba-masterplan/terrain_report.json`
+- `asset/models/odaiba-masterplan/tree_instances.json`
+- `asset/models/odaiba-masterplan/streetlight_instances.json`
+- `asset/models/odaiba-masterplan/odaiba_masterplan_v01_phase03d_preview_*.png`
 - `.gitignore`
 - This handoff.
 
@@ -59,6 +68,8 @@ The pairs were copied from the verified `C:\FutureCity` outputs. Source files we
 - Added Telecom Center top and oblique source-render previews as progress evidence.
 - Replaced the formal oblique and true orthographic top-view Building Inspector evidence with the verified eight-building captures.
 - Verified Telecom Center at 46 draw calls and 48,156 triangles, grounded at 0.0000 m with Y-up, front +Z, scale `(1, 1, 1)` and no additional rotation.
+- Added the Phase 03D Odaiba masterplan continuation package: editable BLEND, environment-only GLB, generator, manifest, validation, terrain/tree/streetlight data and five preview renders.
+- Phase 03D adds restrained DEM-based terrain, conformed roads and sidewalks, 528 simplified roadside trees, 168 streetlights and waterfront/guideway safety elements while preserving all eight building placement transforms.
 
 ### Asset inventory and known metrics
 
@@ -81,6 +92,7 @@ The pairs were copied from the verified `C:\FutureCity` outputs. Source files we
 - Evidence/environment: current formal eight-building evidence is `docs/handoffs/odaiba-assets-angle.png` and `docs/handoffs/odaiba-assets-top.png`; Telecom source-render evidence remains `docs/handoffs/telecom-center-top.png` and `docs/handoffs/telecom-center-oblique.png`.
 - Integrated commit and checks: NOT INTEGRATED. The application in `city2127` does not load these models yet.
 - Changes since verification: three new source/export pairs, two Telecom Center source-render previews and this handoff update; no application code was modified.
+- Phase 03D environment validation: BLEND reopened; environment GLB reparsed; 48,178 triangles, 37 meshes, 13 materials, 40 primitives and 2,635,512 bytes. Terrain ranges from -0.35 m to +1.0 m relative to the preserved building pads, sea is horizontal at Z=-0.8 m, maximum reported road slope is 4.92%, and accepted tree/streetlight collision counts are zero.
 
 ## Known issues and blockers
 
@@ -90,6 +102,8 @@ The pairs were copied from the verified `C:\FutureCity` outputs. Source files we
 - The Grand Nikko source report records a legacy Z-up GLB workflow, unlike the newer standard Y-up pairs. The inspector's existing one-time adapter was used for review; a future application integration owner must confirm and document the consumer-side contract.
 - No runtime URL/import, layout placement, collision envelope, route integration, material tuning, loading budget or production-build validation has been implemented in `city2127`.
 - Formal eight-building asset review is complete; runtime URL/import, placement and production integration remain unimplemented.
+- The Phase 03D generator records the original `C:\FutureCity` absolute source paths and depends on the earlier Phase 03C working source plus the local DEM cache. On another computer, open the committed Phase 03D BLEND directly for continuation unless those paths are recreated; the generator is included as provenance, not yet as a portable one-command build.
+- The tree and streetlight JSON files record placement data for later runtime instancing. The current GLB contains consolidated environment geometry and does not itself establish a Three.js `InstancedMesh` integration.
 
 ## Important decisions
 
@@ -100,4 +114,4 @@ The pairs were copied from the verified `C:\FutureCity` outputs. Source files we
 
 ## Next expected step
 
-The team lead reviews `feat/odaiba-assets-progress-02`, the three added asset pairs and the passed eight-building Inspector evidence. Keep this handoff `IN_PROGRESS` until that review is complete. Odaiba runtime integration remains a separate scope and must not modify the Shibuya scene by inserting these landmarks.
+Continue from `asset/models/odaiba-masterplan/odaiba_masterplan_v01_phase03d.blend` on the next computer and keep this handoff `IN_PROGRESS`. The team lead can review the branch as current site progress. Odaiba runtime integration remains a separate scope and must not modify the Shibuya scene by inserting these landmarks.

@@ -1,0 +1,74 @@
+{
+  "phase": "03D",
+  "complete": true,
+  "blendReopened": true,
+  "sourcePhase03CReadOnly": true,
+  "placementNodeCount": 8,
+  "placementTransformsExact": true,
+  "placementZChanges": [],
+  "parentScalesAllOne": true,
+  "sourceBuildingsModified": false,
+  "buildingLowestZByAssetM": {
+    "aqua": 0.0,
+    "decks": 0.0,
+    "divercity": 0.0,
+    "divercity-office": 0.0,
+    "fuji": 0.0,
+    "hilton": 0.0,
+    "nikko": -2e-06,
+    "telecom": 0.0
+  },
+  "buildingPadsTouchAtZ0": true,
+  "roadTerrainZFightAvoidanceOffsetM": 0.06,
+  "treeAcceptedCollisionCounts": {
+    "building": 0,
+    "road": 0,
+    "rail_or_station": 0,
+    "sea": 0
+  },
+  "streetlightAcceptedCollisionCounts": {
+    "building": 0,
+    "road": 0,
+    "rail_or_station": 0,
+    "sea": 0
+  },
+  "seaHorizontal": true,
+  "seaZ": -0.8,
+  "terrainDegenerateFaces": 0,
+  "terrainAbnormalSpikes": false,
+  "terrainMinZ": -0.35,
+  "terrainMaxZ": 1.0,
+  "maximumRoadSlopePercent": 4.919851121515085,
+  "environmentGlbReparsed": true,
+  "environmentMetrics": {
+    "boundsMin": [
+      -750.0,
+      -1337.0,
+      -0.8
+    ],
+    "boundsMax": [
+      700.0,
+      535.0,
+      151.199997
+    ],
+    "meshes": 37,
+    "materials": 13,
+    "primitives": 40,
+    "triangles": 48178,
+    "bytes": 2635512
+  },
+  "performance": {
+    "trianglesUnder80000": true,
+    "trianglesUnderHardLimit100000": true,
+    "meshesAtMost50": true,
+    "materialsAtMost16": true
+  },
+  "automaticBlendPreviewDisabled": true,
+  "previewFiles": [
+    "odaiba_masterplan_v01_phase03d_preview_top.png",
+    "odaiba_masterplan_v01_phase03d_preview_oblique.png",
+    "odaiba_masterplan_v01_phase03d_preview_street.png",
+    "odaiba_masterplan_v01_phase03d_preview_waterfront.png",
+    "odaiba_masterplan_v01_phase03d_preview_terrain.png"
+  ]
+}
