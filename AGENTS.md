@@ -23,6 +23,7 @@ Startup (mandatory preflight, every session):
 3. Fetch the latest remote references so local knowledge of `origin/main` is current.
 4. Identify whether the local branch and its remote counterpart have diverged, and record what you found.
 5. Read this file and the relevant task-specific [handoff](docs/handoffs/TEMPLATE.md). Confirm one named owner and coordinate overlapping module or binary-asset edits before starting. Primary ownership areas guide coordination, but contributors may work across areas.
+   For Blender work, also read [docs/BLENDER.md](docs/BLENDER.md): Mac/Windows MCP setup is per workstation, and a successful check on one collaborator's machine does not verify another's.
 6. Compare the handoff's base and last verified commit with actual code; check whether unfinished commits are available remotely. Do not assume chat history or a previous local clone is available.
 7. Read affected source, callers, tests and [architecture documentation](docs/PROJECT.md). For bugs, trace all callers and fix the shared cause.
 8. Resume from the next expected step within the assigned scope.
