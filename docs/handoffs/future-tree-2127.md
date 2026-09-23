@@ -1,11 +1,11 @@
 # Future tree 2127
 
 - Owner: Codex
-- Status: IN_PROGRESS (implementation and local verification passed; branch publication/integration pending)
+- Status: DONE locally; main publication and main CI pending
 - Branch: `codex/future-tree`
 - Base commit: `f4a70b3265b6da3dfa1a5d7be2fd08a0164139c9`
-- Last verified commit: NONE; verification covered the uncommitted task tree on 2026-09-23
-- Remote availability: NOT PUSHED
+- Last verified commit: task `e584f2681b76a1a44c37ca9c09860d0993e4bed4`; integrated main `645596731f9ee4a867da5b4620e9bd6b06961967`
+- Remote availability: `origin/codex/future-tree` at `e584f26`; main integration not yet pushed
 
 ## Session Git state
 
@@ -26,8 +26,9 @@ Blender 5.2.2 LTS, official pinned Blender Lab MCP on this Mac; a live scene-sum
 - GLB imported into an empty Blender scene on 2026-09-23: 25 meshes, 4 materials, 2,384 triangles, Blender XYZ bounds `[-2.748,2.755] × [-2.555,2.703] × [0.005,6.33]`, 79,700 bytes. No texture dependencies. The initial export had a default cube; it was removed before final reimport.
 - `npm test`: passed. `npm run build`: passed and emitted the GLB; existing >500 kB JS bundle warning. `git diff --check`: passed.
 - In-app browser at 1280×720: tree visible near Hachiko plaza in Daylight, Pulse transition and Still transition; browser error log empty. Full 60-second motion and 1080p FPS: NOT RUN.
-- Integrated commit/checks: NOT INTEGRATED. Changes since verification: documentation updates only.
+- [Branch CI](https://github.com/cc100053/city2127/actions/runs/35836157579): passed on `e584f26`.
+- Integrated locally as `6455967`; `npm test`, `npm run build` and committed diff whitespace passed again. Main CI is pending publication. Changes since verification: this handoff update only.
 
 ## Next step
 
-Review the complete diff and links, commit with a Conventional Commit message, push the branch, confirm CI, then merge/push validated main per `docs/CONTRIBUTING.md`. Recheck the other presets and tree clearance if placement changes.
+Commit this handoff update, recheck latest `origin/main`, push validated main and confirm main CI. Recheck tree clearance if placement changes.
