@@ -17,6 +17,39 @@ Building count/density and pedestrian activity are candidate dimensions, not a c
 
 The single Shibuya setting and desktop scope remain. Plan 02 and [Pic 2](../asset/pic2.png) provide reusable visual references; the old three-state model, unchanging buildings and 10-second / 4-second timing are current implementation facts, not constraints on the exhibition design. No question sequence, cumulative choice system or choice-driven building count is implemented. This stage changes documentation only; implementation needs a separately approved scope.
 
+**Update 2026-09-24:** a first causal vertical slice now exists outside the root prototype (next section). The root `src/` city, its three presets and `WorldState` are unchanged by it.
+
+## Causal choice → city MVP — 2026-09-24 (`survey/` + `module-swap/`)
+
+Implemented on `feat/causal-city-mvp`; handoff [causal-city-mvp](handoffs/causal-city-mvp.md). It proves one short causal history, not the exhibition question catalogue.
+
+Dependency direction (never reversed; Three.js cannot change policy or question eligibility):
+
+```text
+question (scenario metadata + trigger) → guest choice → append-only answer_events → policy scores
+  → deriveCityLayout() (survey/src/shared/cityView.ts) → CityView over WebSocket → module-swap ModuleManager
+```
+
+- **Policy axes** (`survey/src/shared/citySurveyState.ts`): `automation`, `publicSharing`, `environmentalPriority`, `urbanConcentration`; integers, start 0, clamped to −12..12. They replaced the placeholder environment/culture/technology/community/mobility axes and the three placeholder milestones (SQLite schema 2).
+- **Questions** (`survey/src/survey/questions.mvp.json`, server default): each has optional `year`, `pressure`, `background` (scenario metadata, not a simulation) and an optional `trigger` `{ axis: { gte?, lte? } }`, all bounds inclusive. A guest gets the first question in JSON order that is neither answered nor reserved in the active run **and** whose trigger matches current scores. Consequence questions come first; two untriggered fallbacks (`heat-stress`, `social-isolation`) keep every first choice from dead-ending.
+- **Decision history** is the run's `answer_events` (append-only, stored effects). `buildCityView()` (`survey/src/survey/decisionHistory.ts`) replays them to report each decision's actual policy change and the slots it changed; there is no separate history table.
+- **Derived layout** — the only policy → geometry mapping, in `deriveCityLayout()`. Each lot is persistent evidence of one axis, so later answers add rather than erase:
+
+  | Slot | Axis | Rule | Meaning shown to viewers |
+  | --- | --- | --- | --- |
+  | NW | automation | ≥2 medium, ≥4 tall building | 自動サービス拠点 / 大規模自動化インフラ |
+  | NE | environmentalPriority | ≥2 park lot | 都市公園 |
+  | SW | publicSharing | ≥2 plaza lot | 公共コモンズ広場 |
+  | SE | urbanConcentration | ≥1 medium, ≥2 tall building | 中層複合ビル / 高層集約タワー |
+
+  All-zero (or negative) scores give four empty lots with no buildings (the survey baseline). The standalone module-swap default layout is unchanged.
+- **Viewer**: `module-swap/app` with `?survey` (default `ws://<host>:8787/ws`, or `?survey=<ws url>`). Every WebSocket (re)connect starts with a full `city-state-snapshot` carrying the `CityView`, so reload/reconnect rebuilds the city from the server; `city-state-updated` / `run-reset` carry the next view. The viewer validates the layout with `validateCityLayout`, ignores older/repeated revisions of the same run (`supersedes`), and applies changes with `ModuleManager.transitionTo()`, which animates only changed slots. Survey mode never reads localStorage, hides the debug panel, uses a higher fixed camera `(-38,105,88)` so a tall SE tower does not hide NW, shows a CHOICE / POLICY / CITY EFFECT panel with the run history, and labels each occupied lot (CSS2DRenderer).
+- **Reset**: admin `RESET` starts a new zero run → empty history → baseline layout; earlier runs' events stay in SQLite.
+
+Exact demo: guest 1 `labour-shortage` → `automate-services` (automation +2, NW medium); guest 2 receives `automation-street-decline` (trigger automation ≥2) → `public-commons` (publicSharing +2, SW plaza); guest 3 receives `commons-land-pressure` (trigger publicSharing ≥2) → `build-upward` (urbanConcentration +2, SE tall). All three remain visible together.
+
+Known limits: sequential guests are assumed — while a question is reserved, a parallel guest is given the next eligible (often fallback) question from the current scores; question text shown in history comes from the current question JSON; slot meanings reuse generic `building-basic-*` GLBs explained by labels; module-swap is a separate Vite app, not the root Shibuya scene.
+
 ## Current implementation baseline (unchanged by the direction update)
 
 Plan 02 superseded the painted civic-model direction. Its reference is [Pic 2](../asset/pic2.png): monumental integrated architecture, a vertical city, authored efficient movement, maintained ceramic/composite/metal surfaces, restrained glazing and daylight. The implemented baseline retains one Shibuya intersection, landmark relationships, ground crossing endpoints, seeded construction, WebGL 2 and the existing state machine.

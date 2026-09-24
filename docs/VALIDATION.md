@@ -1,5 +1,18 @@
 # Validation and handoff
 
+## Causal choice → city MVP — 2026-09-24
+
+Checked commit `391e6fce9f35acf8f4f78e007c59224d50ddda46` on `feat/causal-city-mvp` (Node v26.0.0, macOS). Scope and design: [PROJECT.md](PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--module-swap), handoff [causal-city-mvp](handoffs/causal-city-mvp.md).
+
+- `survey/`: `npm ci`; `npm test` — 10 suites passed (question/trigger validation, score clamping, derived layout thresholds and accumulation, answer service, sessions, 8-thread concurrency, persistence incl. schema 1 → 2 migration, HTTP reset, WebSocket view payloads, three-guest causal flow with branching, restart and reset); `npm run build` succeeded.
+- `module-swap/`: `npm run install:app`; `npm test` — `check:models` plus 13 node tests passed (incl. survey view parsing, stale-revision guard, lot labels); `npm run build` succeeded with the existing >500 kB chunk warning.
+- Root: `npm test` (7 suites) and `npm run build` passed; `git diff --check` clean. Root CI does not run `survey/` or `module-swap/`.
+- Browser: headless Chrome 154 (SwiftShader WebGL), 1600×1000, survey server on a scratch SQLite DB, viewer `http://127.0.0.1:5173/?survey`, driven over CDP. The three guests were submitted through the same HTTP API the guest page uses (`/guest` was not clicked). Baseline showed four empty lots; guest 1 `automate-services` → NW medium; guest 2 was assigned `automation-street-decline` → SW plaza, NW kept; guest 3 was assigned `commons-land-pressure` → SE tall, NW and SW kept. Page reload rebuilt the identical layout, panel and labels; admin reset returned to the baseline with an empty history. Every slot had exactly one lot and ≤1 building attachment with exact final transforms, each GLB was requested once, and the console had no errors or exceptions. The standalone `tests/browserSmoke.mjs` self-test (no `?survey`) also passed with no runtime errors.
+- Visual finding fixed before the checked commit: at module-swap's default camera the SE tall tower hid the NW hub; survey mode now uses a higher fixed camera `(-38,105,88)`.
+- Evidence: `artifacts/causal-mvp-0-baseline.png`, `-1-automation.png`, `-2-commons.png`, `-3-vertical.png`, `-4-reset.png`.
+- Not checked: a real GPU browser, 1080p FPS, clicking the `/guest` debug page, phones on the LAN, concurrent guests in the browser.
+- Review fixes, 2026-09-24: a malformed `/api/guest-sessions/%E0/question` now returns 404 instead of 500 (session ids are UUIDs, so the path segment is no longer URL-decoded; new assert in `survey/tests/reset.test.ts`), and a non-`ws://`/`wss://` `?survey=` value (e.g. `?survey=1`) uses the default server URL instead of throwing in `new WebSocket`. Root, `survey/` and `module-swap/` `npm test` + `npm run build` and `git diff --check` passed. The `?survey=1` fallback was not rechecked in a browser.
+
 ## Future tree integration — 2026-09-23
 
 Blender 5.2.2 via MCP exported `asset/models/future-tree-2127/future-tree-2127.blend` and `.glb`. Empty-scene reimport found 25 meshes, 4 materials, 2,384 triangles and Blender XYZ bounds `[-2.748,2.755] × [-2.555,2.703] × [0.005,6.33]`; the GLB is 79,700 bytes. The initial export accidentally included Blender's default cube; it was removed and the reimport check repeated. The production Vite build emitted the GLB asset. `npm test`, `npm run build` and `git diff --check` passed; the existing bundle size warning remains. At 1280×720 in the in-app browser, the tree was visible near Hachiko plaza in Daylight, Pulse transition and Still transition; the browser error log was empty. Full motion cycles and 1080p FPS were not measured for this change.

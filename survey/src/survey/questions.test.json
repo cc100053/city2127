@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "id": "energy-01",
+      "text": "都市の余剰電力を何に使いますか？",
+      "options": [
+        { "id": "solar-canopy", "label": "建物と道路を太陽光設備で覆う", "effects": { "environmentalPriority": 3, "automation": 1 } },
+        { "id": "fusion-hub", "label": "次世代エネルギー研究へ集中する", "effects": { "automation": 3, "environmentalPriority": 1 } },
+        { "id": "district-microgrid", "label": "地域ごとの共同電力網を作る", "effects": { "publicSharing": 2, "environmentalPriority": 1, "automation": 1 } }
+      ]
+    },
+    {
+      "id": "mobility-01",
+      "text": "未来都市の移動手段を何に集中させますか？",
+      "options": [
+        { "id": "autonomous-transit", "label": "完全自動の公共交通", "effects": { "urbanConcentration": 3, "automation": 2 } },
+        { "id": "walkable-blocks", "label": "徒歩で生活できる小さな街区", "effects": { "environmentalPriority": 2, "publicSharing": 2, "urbanConcentration": 1 } },
+        { "id": "aerial-logistics", "label": "空中物流ネットワーク", "effects": { "urbanConcentration": 2, "automation": 2, "environmentalPriority": -1 } }
+      ]
+    },
+    {
+      "id": "land-01",
+      "text": "限られた都市空間をどう使いますか？",
+      "options": [
+        { "id": "vertical-density", "label": "超高層化して機能を集中させる", "effects": { "urbanConcentration": 2, "automation": 2, "environmentalPriority": -1 } },
+        { "id": "public-commons", "label": "公共広場と共有施設を増やす", "effects": { "publicSharing": 3 } },
+        { "id": "urban-forest", "label": "都市の一部を森へ戻す", "effects": { "environmentalPriority": 3, "publicSharing": 1 } }
+      ]
+    },
+    {
+      "id": "data-01",
+      "text": "都市データをどのように管理しますか？",
+      "options": [
+        { "id": "central-ai", "label": "中央AIに都市運営を任せる", "effects": { "automation": 3, "urbanConcentration": 1, "publicSharing": -1 } },
+        { "id": "citizen-data", "label": "市民がデータ利用を共同で決める", "effects": { "publicSharing": 3, "automation": 1 } },
+        { "id": "minimal-sensing", "label": "必要最小限のデータだけを集める", "effects": { "publicSharing": 1, "automation": -1 } }
+      ]
+    },
+    {
+      "id": "heritage-01",
+      "text": "古い街並みをどう扱いますか？",
+      "options": [
+        { "id": "preserve-layers", "label": "歴史的な街区をそのまま残す", "effects": { "publicSharing": 2 } },
+        { "id": "adaptive-reuse", "label": "古い建物を未来の用途へ転用する", "effects": { "publicSharing": 2, "environmentalPriority": 2, "automation": 1 } },
+        { "id": "replace-all", "label": "新しい都市へ全面的に建て替える", "effects": { "automation": 3, "urbanConcentration": 2, "publicSharing": -2 } }
+      ]
+    },
+    {
+      "id": "food-01",
+      "text": "都市の食料をどう確保しますか？",
+      "options": [
+        { "id": "automated-farms", "label": "自動化された立体農場", "effects": { "automation": 2, "environmentalPriority": 2 } },
+        { "id": "community-farms", "label": "住民が運営する共同農園", "effects": { "publicSharing": 3, "environmentalPriority": 1 } },
+        { "id": "import-logistics", "label": "高速物流で外部から供給する", "effects": { "urbanConcentration": 3, "publicSharing": -1, "environmentalPriority": -1 } }
+      ]
+    },
+    {
+      "id": "water-01",
+      "text": "都市の水資源をどう使いますか？",
+      "options": [
+        { "id": "closed-loop", "label": "完全循環型の水処理設備", "effects": { "environmentalPriority": 3, "automation": 2 } },
+        { "id": "public-waterways", "label": "水路を公共空間として開放する", "effects": { "publicSharing": 2, "environmentalPriority": 1 } },
+        { "id": "industrial-capacity", "label": "産業用水を優先して生産力を上げる", "effects": { "automation": 2, "urbanConcentration": 2, "environmentalPriority": -1 } }
+      ]
+    },
+    {
+      "id": "night-01",
+      "text": "未来都市の夜をどう過ごしますか？",
+      "options": [
+        { "id": "all-night-economy", "label": "24時間活動する都市にする", "effects": { "urbanConcentration": 2, "automation": 1, "publicSharing": -1 } },
+        { "id": "quiet-neighborhoods", "label": "夜は静かな生活環境を守る", "effects": { "publicSharing": 2, "environmentalPriority": 2, "urbanConcentration": -1 } },
+        { "id": "festival-circuit", "label": "地区ごとに夜の文化イベントを開く", "effects": { "publicSharing": 2, "environmentalPriority": -1 } }
+      ]
+    }
+  ]
+}
