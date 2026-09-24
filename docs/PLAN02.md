@@ -15,9 +15,13 @@
 3. 釐清展覽運作：題目用完後的安排、重設、重新載入後是否保留、輸入裝置與保存方式。跨 guest 累積不等於已選定後端或永久儲存方案。
 4. 按已定互動需要安排實作與美術，讓未來感、澀谷辨識度和變化可讀性支援展覽體驗。Pic 2 與既有多層城市可沿用作參考，不以完成舊美術清單作互動設計的前置條件。
 
-以上是後續設計順序，並非已批准的實作階段。新流程、累積系統及可變建築均未實作。今次只同步文檔；目前程式、測試、畫面及素材維持原樣。單一澀谷場景與桌面展示範圍保留，詳細契約見 [PROJECT.md](PROJECT.md)，未來驗收方向見 [VALIDATION.md](VALIDATION.md)。
+以上是 2026-09-18 定嘅設計順序。單一澀谷場景與桌面展示範圍保留，詳細契約見 [PROJECT.md](PROJECT.md)，未來驗收方向見 [VALIDATION.md](VALIDATION.md)。
 
 **更新 2026-09-24：** 第 1、2 點有首個最小實作——`survey/` 按累積政策分數及答案歷史分配題目，`module-swap/` 顯示由政策推導嘅四區畫變化（三步因果示範）。題目只係 MVP 劇本，完整題目、展覽運作及根目錄澀谷場景整合仍待定。詳見 [PROJECT.md](PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--module-swap)。
+
+**下一步方向（2026-09-24 使用者決定）：** 擴充因果 MVP——更多題目、更多場景／區域同城市物件，令 guest 清楚睇到城市變化，並打磨整體外觀。外觀打磨服務於變化可讀性；會唔會整合入根目錄澀谷場景仍未決定。
+
+**未來樹（2026-09-23）：** Blender MCP 製作嘅靜態工程化樹木 GLB 放喺八公廣場旁 `(11,0,23)`（見 [future-tree-2127](handoffs/future-tree-2127.md)）。佢取代咗 Plan 02 原型「無傳統樹木」嘅做法，但唔改變下面嘅歷史截圖或 preset 系統。
 
 ## 歷史：Plan 02 實作進度與當時待辦（2026-09-17）
 
@@ -177,6 +181,3 @@ Stage 1–5 均已重跑 `npm test`、`npm run build` 與 1280×720 三態截圖
 ## 範圍限制
 
 保持單一路口、固定種子、三態、固定桌面鏡頭、WebGL 2、instancing 及 shared materials。暫不新增飛行器種類、更多招牌、物理、通用尋路、後端、部署、外部資產包、新框架或 mobile／responsive 工作。這些不是必須補完的待辦；目前最重要的缺口是建築與空間表達。
-# Future tree asset — 2026-09-23
-
-Blender MCP produced a static, engineered tree with a ceramic trunk, titanium branches, sage photovoltaic crown and emissive cyan rings. The production GLB is placed at `(11,0,23)` beside Hachiko plaza. This later addition supersedes the Plan 02 prototype's absence of conventional trees; it does not change the historical Plan 02 captures or the preset system.

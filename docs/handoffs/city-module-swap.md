@@ -80,20 +80,21 @@ Dependency note: `module-swap/app` is a separate npm project. The root `tsconfig
 ## Important decisions
 
 - The package lands as an independent top-level directory rather than being merged into `src/`, so the existing procedural city keeps working and the diff stays reviewable as a pure addition.
-- `CityState` was split into `CityLayoutState` (placement, this branch) and `CitySurveyState` (survey accumulation, `feat/survey-state-mvp`). A combined `CityState` that holds both is intentionally **not** created yet; it is to be introduced on `main` after both branches land.
+- `CityState` was split into `CityLayoutState` (placement, this branch) and `CitySurveyState` (survey accumulation, `feat/survey-state-mvp`). The earlier plan for a combined `CityState` was dropped on 2026-09-24 (user decision): the server-derived `CityView` connects them instead.
 - The production folder outside this repository is kept; this branch received a copy.
 - Detail and swappability are treated as separate axes rather than a trade-off (owner decision, 2026-09-24). Measured against this package, one Odaiba landmark on `feat/odaiba-assets-progress-02` spans 8 to 16 of these 20 x 20 lots (`fuji-tv` is 162 x 123 x 81 and 127,928 triangles), so those models belong to the fixed layer as landmarks rather than to a lot socket. Detail inside the variable layer comes from splitting a building into parts on the existing sockets, not from one high-polygon mesh. The working budget for a swappable building is roughly 2,000 to 8,000 triangles and 2 to 4 materials, against `lot-park` at 1,404 and `ground-cross` at 3,780.
 - `assets/` is the source of truth for the eight GLBs because it is where a person edits, next to the matching `.blend`; `app/public/assets/models/` only exists so Vite can serve them (owner decision, 2026-09-24). Serving `assets/` directly from Vite was rejected: the directory shapes differ (`assets/<id>/<id>.glb` versus `models/<id>.glb`), so it would need extra Vite configuration or a symlink and another round of production-build and offline verification for no gain at this stage.
 
 ## Next expected step
 
-Integrated. `module-swap/` now lives on `main` as of merge commit `9a627988247362d5dd9f7e7a17c73a9c24185320`; the task branch `feat/city-module-swap` can be deleted once the merge is published.
+Integrated. `module-swap/` now lives on `main` as of merge commit `9a627988247362d5dd9f7e7a17c73a9c24185320`; the task branch `feat/city-module-swap` has been deleted on origin.
 
-Update 2026-09-24 (causal-city-mvp owner): item 1 is done — `feat/survey-state-mvp` reached `main` through `feat/causal-city-mvp` (merge `6f6fbb2`); both branches and `feat/city-module-swap` are deleted on origin. Items 2–4 remain open.
+Update 2026-09-24 (causal-city-mvp owner): item 1 is done — `feat/survey-state-mvp` reached `main` through `feat/causal-city-mvp` (merge `6f6fbb2`); both branches and `feat/city-module-swap` are deleted on origin.
+
+Update 2026-09-24 (docs-sync-post-mvp): item 2 is done in CI (install/test/build per package; root `npm test` itself is unchanged). The combined-`CityState` item was deleted by user decision (the server-derived `CityView` connects the two states). Only the building rebuild decision (now item 3) remains open.
 
 What is left, in the order it makes sense:
 
 1. Integrate `feat/survey-state-mvp` (`2d4d7d5681ef1bd4e0d5e71ec7a3ad8aff4c9643`), which was cut from the same base and which `git merge-tree` reports as conflict-free against this work.
 2. Wire `module-swap/` (and then `survey/`) into the repository root `npm test` so CI covers their tests and the `check:models` drift guard. The root scripts and `.github/workflows/ci.yml` are shared with the existing city, so this belongs on `main` and needs the root's owner to agree; the workflow also runs a single `npm ci` at the root, which does not install either package's dependencies.
-3. Introduce the combined `CityState` that unifies `CityLayoutState` here with `CitySurveyState` from the survey package, once both are on `main`.
-4. Decide whether to rebuild `building-basic-small` and `building-basic-tall` at the same density as the medium building.
+3. Decide whether to rebuild `building-basic-small` and `building-basic-tall` at the same density as the medium building.

@@ -6,7 +6,7 @@
 
 ## 実装済みの範囲
 
-- 質問 JSON の起動時検証（`src/survey/questions.test.json`、`version` 付き）
+- 質問 JSON の起動時検証（既定 `src/survey/questions.mvp.json`、`version` 付き）
 - 4つの政策軸（`automation` `publicSharing` `environmentalPriority` `urbanConcentration`、初期値 0、範囲 -12〜12）
 - 質問ごとのシナリオ情報（`year` `pressure` `background`）と出題条件 `trigger`
 - 政策状態と回答履歴からの配置導出（`deriveCityLayout` / `buildCityView`）

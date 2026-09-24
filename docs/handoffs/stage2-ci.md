@@ -41,3 +41,7 @@ PR remains optional. No new dependencies, CI framework, deployment or branch pro
 ## Next expected step
 
 Publish this documentation-only evidence update and check its main CI run. Stage 3 Blender standards remain a separate, unassigned task. See [validation](../VALIDATION.md) and [Git workflow](../CONTRIBUTING.md).
+
+## Superseded — 2026-09-24
+
+The new-branch rule above (check the full tracked tree) was replaced in Stage 3 by a merge-base comparison, and the "next step" publication is long complete. On 2026-09-24 CI was extended to install/test/build `survey/` and `module-swap/` ([docs-sync-post-mvp](docs-sync-post-mvp.md)).
