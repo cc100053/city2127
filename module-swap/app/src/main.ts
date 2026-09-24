@@ -105,8 +105,10 @@ function markerAt(node: Object3D, color: number, name: string): Mesh {
 }
 
 // `?survey` or `?survey=ws://host:port/ws` shows the survey-driven city instead of the local debug layout.
+// Any other value (e.g. `?survey=1`) uses the default server URL.
 const surveyParam = new URLSearchParams(location.search).get("survey");
-const surveyUrl = surveyParam === null ? null : surveyParam || `ws://${location.hostname}:8787/ws`;
+const surveyUrl =
+  surveyParam === null ? null : /^wss?:\/\//.test(surveyParam) ? surveyParam : `ws://${location.hostname}:8787/ws`;
 
 async function start(): Promise<void> {
   if (surveyUrl) document.body.dataset.mode = "survey";

@@ -11,6 +11,7 @@ Checked commit `391e6fce9f35acf8f4f78e007c59224d50ddda46` on `feat/causal-city-m
 - Visual finding fixed before the checked commit: at module-swap's default camera the SE tall tower hid the NW hub; survey mode now uses a higher fixed camera `(-38,105,88)`.
 - Evidence: `artifacts/causal-mvp-0-baseline.png`, `-1-automation.png`, `-2-commons.png`, `-3-vertical.png`, `-4-reset.png`.
 - Not checked: a real GPU browser, 1080p FPS, clicking the `/guest` debug page, phones on the LAN, concurrent guests in the browser.
+- Review fixes, 2026-09-24: a malformed `/api/guest-sessions/%E0/question` now returns 404 instead of 500 (session ids are UUIDs, so the path segment is no longer URL-decoded; new assert in `survey/tests/reset.test.ts`), and a non-`ws://`/`wss://` `?survey=` value (e.g. `?survey=1`) uses the default server URL instead of throwing in `new WebSocket`. Root, `survey/` and `module-swap/` `npm test` + `npm run build` and `git diff --check` passed. The `?survey=1` fallback was not rechecked in a browser.
 
 ## Future tree integration — 2026-09-23
 

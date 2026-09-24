@@ -41,7 +41,7 @@ See [PROJECT.md](../PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--modul
 - Commands/manual checks and results: recorded in [VALIDATION.md](../VALIDATION.md#causal-choice--city-mvp--2026-09-24)
 - Evidence/environment: `artifacts/causal-mvp-*.png`; headless Chrome 154, 1600×1000, Node v26.0.0
 - Integrated commit and checks: NOT INTEGRATED
-- Changes since verification: this handoff, VALIDATION entry and screenshots only
+- Changes since verification: this handoff, VALIDATION entry and screenshots, plus two low-severity review fixes (malformed session-id 404, `?survey=` URL fallback) re-checked with all three packages' `npm test` / `npm run build`
 
 ## Known issues and blockers
 

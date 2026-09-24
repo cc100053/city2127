@@ -107,7 +107,7 @@ export function createSurveyServer({ ctx, staticDir, remoteAddress = req => req.
     if (path === '/api/city-view' && method === 'GET') return sendJson<CityView>(res, { ok: true, data: currentView(ctx) });
     if (path === '/api/guest-sessions' && method === 'POST') return sendJson(res, createGuestSession(ctx), 201);
     const question = /^\/api\/guest-sessions\/([^/]+)\/question$/.exec(path);
-    if (question && method === 'GET') return sendJson(res, getGuestQuestion(ctx, decodeURIComponent(question[1])));
+    if (question && method === 'GET') return sendJson(res, getGuestQuestion(ctx, question[1]));
     if (path === '/api/answers' && method === 'POST') {
       const outcome = submitAnswer(ctx, await readJson(req));
       return publish(res, outcome, outcome.response.ok && !outcome.response.data.replayed ? 201 : 200);

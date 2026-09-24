@@ -33,6 +33,7 @@ try {
   const internal = await lan.request<AnswerData>('/api/answers', '{"answerId":');
   assert.ok(!internal.body.ok && !/SQL|sqlite|stack/i.test(internal.body.error.message));
   assert.equal((await local.request('/api/guest-sessions/nope/question')).status, 404);
+  assert.equal((await local.request('/api/guest-sessions/%E0/question')).status, 404);
 
   // Non-loopback admin access is refused, including the admin page.
   for (const path of ['/api/admin/current-run', '/api/admin/events', '/admin', '/admin.html']) {
