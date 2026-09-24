@@ -1,7 +1,7 @@
 # causal-city-mvp — Causal choice → policy → city change MVP
 
 - Owner: cc100053
-- Status: DONE on branch — integration into `main` is the next step
+- Status: DONE — integrated into `main` (`6f6fbb2`); task branch deleted
 - Branch: `feat/causal-city-mvp`
 - Base commit: `9400ccf7897e2b26def4e9c1377c7f9b5ff7f6aa` (`main`), plus merge of `origin/feat/survey-state-mvp` at `2d4d7d5`
 - Last verified commit: `391e6fce9f35acf8f4f78e007c59224d50ddda46` (later commits are documentation and screenshots only)
@@ -40,7 +40,7 @@ See [PROJECT.md](../PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--modul
 - Date and checked commit/worktree: 2026-09-24, `391e6fce9f35acf8f4f78e007c59224d50ddda46`
 - Commands/manual checks and results: recorded in [VALIDATION.md](../VALIDATION.md#causal-choice--city-mvp--2026-09-24)
 - Evidence/environment: `artifacts/causal-mvp-*.png`; headless Chrome 154, 1600×1000, Node v26.0.0
-- Integrated commit and checks: NOT INTEGRATED
+- Integrated commit and checks: `6f6fbb2` (2026-09-24, `--no-ff` merge of `7a26472`, whose branch CI passed); on the merge result root, `survey/` and `module-swap/` `npm test` + `npm run build` passed and `git diff --check origin/main..HEAD` was clean
 - Changes since verification: this handoff, VALIDATION entry and screenshots, plus two low-severity review fixes (malformed session-id 404, `?survey=` URL fallback) re-checked with all three packages' `npm test` / `npm run build`
 
 ## Known issues and blockers
@@ -60,4 +60,4 @@ See [PROJECT.md](../PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--modul
 
 ## Next expected step
 
-Owner merges `feat/causal-city-mvp` into `main` per [CONTRIBUTING](../CONTRIBUTING.md), re-running the three package checks on the merge result. Then decide whether the next step is exhibition question content or bringing the derived layout into the root Shibuya scene.
+Decide whether the next step is exhibition question content or bringing the derived layout into the root Shibuya scene.
