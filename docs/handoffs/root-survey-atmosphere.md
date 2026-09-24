@@ -26,7 +26,7 @@ Steps 1–2 of connecting the survey to the root scene (user decisions 2026-09-2
 
 ## Completed work
 
-See [PROJECT.md](../PROJECT.md#root-scene-survey-mode--2026-09-24-srcsurvey-steps-12-of-connecting-the-survey).
+See [PROJECT.md](../PROJECT.md#root-scene-survey-mode--2026-09-24-srcsurvey).
 
 ## Actual validation results
 
