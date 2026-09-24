@@ -1,0 +1,17 @@
+{
+  "name": "module-swap",
+  "private": true,
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "install:app": "npm --prefix app install",
+    "dev": "npm --prefix app run dev",
+    "sync:models": "node scripts/sync-models.mjs",
+    "check:models": "node scripts/sync-models.mjs --check",
+    "test": "npm run check:models && npm --prefix app test",
+    "build": "npm --prefix app run build",
+    "preview": "npm --prefix app run preview"
+  }
+}
