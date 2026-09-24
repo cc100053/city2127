@@ -1,7 +1,7 @@
 # city-module-swap — Modular ground, lot and building swap package
 
 - Owner: noifex
-- Status: IN_PROGRESS — committed and pushed to its own branch; not integrated into `main`
+- Status: DONE — merged into `main`
 - Branch: `feat/city-module-swap`
 - Base commit: `5577195751f20b3de568d289425f534e85b2c2a4`
 - Last verified commit: `ac689526fca545f6cf421e61888a1be8df925611` — the last commit that touched source or assets. Everything after it on this branch is documentation only.
@@ -68,7 +68,7 @@ Dependency note: `module-swap/app` is a separate npm project. The root `tsconfig
   - Pre-integration check against `origin/main` on 2026-09-24, with nothing merged: `main` and `origin/main` agree at `5577195` with zero divergence; the branch tip matches its remote with nothing unpushed; CI is green on the tip; the task diff is 48 files and every one is an addition, so no existing file is touched; `git diff --check origin/main...HEAD` exits 0; `git merge-tree` reports no conflict against `main`, nor against `origin/feat/survey-state-mvp`, `origin/feat/odaiba-assets-progress-02` or `origin/codex/odaiba-preview`; repository root `npm test` and `npm run build` pass, and so do `module-swap`'s own `npm test` (8 of 8, with `check:models` passing) and `npm run build`.
   - CI (`.github/workflows/ci.yml`, run on every push): the first push failed on the whitespace step with `module-swap/.gitignore:6: new blank line at EOF`; `npm ci`, `npm test` and `npm run build` had passed. Fixed in this branch and re-checked locally with the same command form, `git diff --check main..HEAD`, which now exits 0.
 - Evidence/environment: Node.js v24.21.0 from nvm (the shell default `node` is v20.16.0 and fails with `node: bad option: --experimental-strip-types`), npm 11, Chrome headless (new) on `http://127.0.0.1:5173`, macOS 24.6.0.
-- Integrated commit and checks: NOT INTEGRATED into `main`. The work is committed on this branch through `ac689526fca545f6cf421e61888a1be8df925611` and pushed; `main` is unchanged at `5577195751f20b3de568d289425f534e85b2c2a4`.
+- Integrated commit and checks: merged into `main` as `9a627988247362d5dd9f7e7a17c73a9c24185320` with `git merge --no-ff` on 2026-09-24, from base `5577195751f20b3de568d289425f534e85b2c2a4`. `main` was fast-forwarded to `origin/main` first and the two already agreed, so the merge introduced no upstream catch-up. Checks rerun on the merge result: repository root `npm test` and `npm run build` pass, `module-swap` `npm test` passes 8 of 8 with `check:models` green and `npm run build` succeeds, `git diff --check origin/main..HEAD` exits 0, the integrated diff is 48 files and every one is an addition, and the working tree is clean.
 - Changes since verification: documentation only. No source, asset or configuration file changed after the checks above. `building-basic-medium.blend` was re-saved by an interactive Blender session after it was committed; the re-saved file was proven equivalent (a fresh export from it is byte-identical to the committed GLB, and geometry, bounds, custom properties, sockets and materials all match) and the working tree was restored to the committed file rather than committing the session-state churn into a binary asset's history.
 
 ## Known issues and blockers
@@ -87,8 +87,11 @@ Dependency note: `module-swap/app` is a separate npm project. The root `tsconfig
 
 ## Next expected step
 
-Integration into `main` is pre-checked and unblocked; the owner decides when to run it. The procedure from `docs/CONTRIBUTING.md` is `git fetch --prune origin`, `git switch main`, `git merge --ff-only origin/main`, `git merge --no-ff feat/city-module-swap`, rerun the root checks, record the integrated commit here, then confirm `git merge-base --is-ancestor origin/main HEAD` before `git push origin main`. Re-fetch immediately before merging: three `codex/*` branches were deleted and `codex/odaiba-preview` appeared during this session, so `main` can move.
+Integrated. `module-swap/` now lives on `main` as of merge commit `9a627988247362d5dd9f7e7a17c73a9c24185320`; the task branch `feat/city-module-swap` can be deleted once the merge is published.
 
-Separately, decide whether to rebuild `building-basic-small` and `building-basic-tall` the same way as the medium building, and whether to wire `module-swap/` into the root `npm test` so CI covers its tests and the `check:models` drift guard. The root scripts are shared with the existing city, so that change belongs on `main` after both feature branches land, not on a feature branch.
+What is left, in the order it makes sense:
 
-Note that `survey/` from the parallel branch `feat/survey-state-mvp` (`2d4d7d5681ef1bd4e0d5e71ec7a3ad8aff4c9643`) stays untracked in a shared worktree until both branches land; that is expected and must not be deleted. Both branches were created from the same base commit and `git merge-tree` reports no conflict between them.
+1. Integrate `feat/survey-state-mvp` (`2d4d7d5681ef1bd4e0d5e71ec7a3ad8aff4c9643`), which was cut from the same base and which `git merge-tree` reports as conflict-free against this work.
+2. Wire `module-swap/` (and then `survey/`) into the repository root `npm test` so CI covers their tests and the `check:models` drift guard. The root scripts and `.github/workflows/ci.yml` are shared with the existing city, so this belongs on `main` and needs the root's owner to agree; the workflow also runs a single `npm ci` at the root, which does not install either package's dependencies.
+3. Introduce the combined `CityState` that unifies `CityLayoutState` here with `CitySurveyState` from the survey package, once both are on `main`.
+4. Decide whether to rebuild `building-basic-small` and `building-basic-tall` at the same density as the medium building.
