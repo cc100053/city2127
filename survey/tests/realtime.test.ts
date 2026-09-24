@@ -29,6 +29,7 @@ try {
   const hello = await a.next();
   assert.equal(hello.type, 'city-state-snapshot');
   assert.equal(hello.type === 'city-state-snapshot' && hello.state.revision, 0);
+  assert.equal(hello.type === 'city-state-snapshot' && hello.view.history.length, 0);
   assert.equal((await b.next()).type, 'city-state-snapshot');
 
   const guest = ok((await server.request<GuestQuestionData>('/api/guest-sessions', {})).body);
@@ -40,7 +41,9 @@ try {
     assert.equal(event.answerId, 'ws-1');
     assert.deepEqual(event.state, answer.state);
     assert.equal(event.optionLabel, '建物と道路を太陽光設備で覆う');
-    assert.deepEqual(event.change, { scores: { environment: 3, technology: 1 }, unlocked: [] });
+    assert.deepEqual(event.change, { scores: { environmentalPriority: 3, automation: 1 } });
+    assert.deepEqual(event.view.history.map(d => d.optionId), ['solar-canopy']);
+    assert.equal(event.view.layout.lots.ne.lot, 'park', 'environmentalPriority 3 derives the NE park');
   }
   // A replayed answer does not broadcast a second update.
   await server.request<AnswerData>('/api/answers', { answerId: 'ws-1', guestSessionId: guest.session.id, questionId: guest.question.id, optionId: 'solar-canopy', expectedRevision: 0 });
@@ -50,12 +53,15 @@ try {
   assert.equal(resetEvent.type, 'run-reset', 'next event after the replay is the reset, not a duplicate update');
   assert.equal(resetEvent.type === 'run-reset' && resetEvent.previousRunId, answer.state.runId);
   assert.deepEqual(resetEvent.type === 'run-reset' && resetEvent.state, reset.state);
+  assert.equal(resetEvent.type === 'run-reset' && resetEvent.view.history.length, 0);
+  assert.equal(resetEvent.type === 'run-reset' && resetEvent.view.layout.lots.ne.lot, 'empty', 'reset returns to the baseline layout');
 
   // A reconnecting monitor immediately receives the new run's full state.
   a.close();
   const c = await monitor(`ws://127.0.0.1:${server.port}/ws`);
   const again = await c.next();
   assert.equal(again.type === 'city-state-snapshot' && again.state.runId, reset.state.runId);
+  assert.equal(again.type === 'city-state-snapshot' && again.view.runId, reset.state.runId);
   b.close(); c.close();
   console.log('PASS: WebSocket snapshot on connect, city-state-updated after answers (not on replay), run-reset after reset.');
 } finally {

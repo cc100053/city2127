@@ -21,7 +21,7 @@ assert.equal(errorCode(submit({ ...request, expectedRevision: 3 })), 'revision_c
 // Normal save.
 const first = ok(submit(request));
 assert.equal(first.replayed, false);
-assert.deepEqual(first.event.effects, { technology: 3, environment: 1 });
+assert.deepEqual(first.event.effects, { automation: 3, environmentalPriority: 1 });
 assert.equal(first.event.questionVersion, 1);
 assert.equal(first.event.revisionBefore, 0);
 assert.equal(first.event.revisionAfter, 1);

@@ -10,7 +10,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "node --experimental-strip-types --test tests/cityLayoutState.test.ts"
+    "test": "node --experimental-strip-types --test tests/cityLayoutState.test.ts tests/surveyView.test.ts"
   },
   "dependencies": {
     "three": "0.180.0"

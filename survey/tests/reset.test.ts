@@ -63,7 +63,7 @@ try {
   const data = ok(reset.body);
   assert.equal(data.previousRunId, before.runId);
   assert.notEqual(data.state.runId, before.runId);
-  assert.deepEqual(data.state.scores, { environment: 0, culture: 0, technology: 0, community: 0, mobility: 0 });
+  assert.deepEqual(data.state.scores, { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 });
   assert.equal(data.state.revision, 0);
   const after = ok((await local.request<CitySurveyState>('/api/city-state')).body);
   assert.equal(after.runId, data.state.runId);

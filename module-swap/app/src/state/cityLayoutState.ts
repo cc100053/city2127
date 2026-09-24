@@ -33,6 +33,16 @@ export function createInitialCityLayout(): CityLayoutState {
   };
 }
 
+/** Survey-mode baseline: four empty lots, no buildings, before any guest decision. */
+export function createBaselineCityLayout(): CityLayoutState {
+  return {
+    version: 1,
+    lots: Object.fromEntries(
+      LOT_SOCKET_IDS.map((id) => [id, { socketId: id, lot: "empty", building: "none" }]),
+    ) as Record<LotSocketId, LotState>,
+  };
+}
+
 export function setLotKind(state: CityLayoutState, socketId: LotSocketId, lot: LotKind): CityLayoutState {
   const previous = state.lots[socketId];
   return {

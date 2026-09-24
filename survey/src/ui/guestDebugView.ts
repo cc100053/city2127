@@ -45,7 +45,9 @@ function renderQuestion(notice?: HTMLElement) {
   show(
     el('p', { class: 'meta' }, `session ${session.id} · question ${question.id} · expectedRevision ${state.revision} · `, countdown),
     ...(notice ? [notice] : []),
-    el('div', { class: 'panel' }, el('h2', {}, question.text), el('div', { class: 'options' }, ...options)),
+    el('div', { class: 'panel' },
+      ...(question.background ? [el('p', { class: 'meta' }, `${question.year ?? ''} ${question.background}`)] : []),
+      el('h2', {}, question.text), el('div', { class: 'options' }, ...options)),
     el('h2', {}, 'このセッション開始時の都市状態'), renderState(state),
   );
 }

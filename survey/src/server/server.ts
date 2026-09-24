@@ -5,12 +5,13 @@ import { extname, resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { ApiResponse, ErrorCode, HealthData } from '../shared/protocol.ts';
 import type { CitySurveyState } from '../shared/citySurveyState.ts';
+import type { CityView } from '../shared/cityView.ts';
 import { loadQuestionSetFile } from '../survey/questionLoader.ts';
 import { fail, type ServiceOutcome, type SurveyContext } from './context.ts';
 import { openDatabase } from './database.ts';
 import { restoreOrCreateRun } from './runStore.ts';
 import { createGuestSession, getGuestQuestion, RESERVATION_MS } from './sessionService.ts';
-import { currentState, submitAnswer } from './answerService.ts';
+import { currentState, currentView, submitAnswer, viewOf } from './answerService.ts';
 import { currentRun, isLoopbackAddress, recentEvents, resetRun } from './adminService.ts';
 import { attachRealtime } from './realtime.ts';
 
@@ -76,7 +77,7 @@ export function createSurveyServer({ ctx, staticDir, remoteAddress = req => req.
       else res.end();
     });
   });
-  const realtime = attachRealtime(server, () => currentState(ctx));
+  const realtime = attachRealtime(server, () => { const state = currentState(ctx); return { state, view: viewOf(ctx, state) }; });
   const publish = <T>(res: ServerResponse, outcome: ServiceOutcome<T>, okStatus = 200) => {
     sendJson(res, outcome.response, okStatus);
     if (outcome.event) realtime.broadcast(outcome.event);
@@ -103,6 +104,7 @@ export function createSurveyServer({ ctx, staticDir, remoteAddress = req => req.
       return sendJson<HealthData>(res, { ok: true, data: { status: 'ok', runId: state.runId, revision: state.revision, questionVersion: ctx.questions.version } });
     }
     if (path === '/api/city-state' && method === 'GET') return sendJson<CitySurveyState>(res, { ok: true, data: currentState(ctx) });
+    if (path === '/api/city-view' && method === 'GET') return sendJson<CityView>(res, { ok: true, data: currentView(ctx) });
     if (path === '/api/guest-sessions' && method === 'POST') return sendJson(res, createGuestSession(ctx), 201);
     const question = /^\/api\/guest-sessions\/([^/]+)\/question$/.exec(path);
     if (question && method === 'GET') return sendJson(res, getGuestQuestion(ctx, decodeURIComponent(question[1])));
@@ -143,7 +145,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const env = process.env;
   const port = Number(env.SURVEY_PORT ?? 8787), host = env.SURVEY_HOST ?? '127.0.0.1';
   const dbPath = resolve(env.SURVEY_DB_PATH ?? 'data/survey.sqlite');
-  const ctx = createContext({ dbPath, questionsPath: resolve(env.SURVEY_QUESTIONS ?? 'src/survey/questions.test.json') });
+  const ctx = createContext({ dbPath, questionsPath: resolve(env.SURVEY_QUESTIONS ?? 'src/survey/questions.mvp.json') });
   const { server, realtime } = createSurveyServer({ ctx, staticDir: resolve(env.SURVEY_STATIC_DIR ?? 'dist') });
   const state = currentState(ctx);
   server.listen(port, host, () => {

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { isCityAxis } from '../shared/citySurveyState.ts';
-import type { CityEffects, Question, QuestionOption, QuestionSet } from '../shared/question.ts';
+import type { CityEffects, Question, QuestionOption, QuestionSet, QuestionTrigger } from '../shared/question.ts';
 
 export const EFFECT_MIN = -3, EFFECT_MAX = 3;
 
@@ -28,6 +28,26 @@ function effects(value: unknown, where: string): CityEffects {
   return result;
 }
 
+function optionalText(value: unknown, where: string): string | undefined {
+  return value === undefined ? undefined : text(value, where);
+}
+
+function trigger(value: unknown, where: string): QuestionTrigger | undefined {
+  if (value === undefined) return undefined;
+  if (!isObject(value)) throw new QuestionSetError(`${where} must be an object`);
+  const result: QuestionTrigger = {};
+  for (const [axis, bound] of Object.entries(value)) {
+    if (!isCityAxis(axis)) throw new QuestionSetError(`${where} has unknown city axis "${axis}"`);
+    if (!isObject(bound) || Object.keys(bound).length === 0) throw new QuestionSetError(`${where}.${axis} must be an object with gte and/or lte`);
+    for (const [key, limit] of Object.entries(bound)) {
+      if (key !== 'gte' && key !== 'lte') throw new QuestionSetError(`${where}.${axis} has unknown bound "${key}"`);
+      if (typeof limit !== 'number' || !Number.isInteger(limit)) throw new QuestionSetError(`${where}.${axis}.${key} must be an integer`);
+    }
+    result[axis] = bound as { gte?: number; lte?: number };
+  }
+  return result;
+}
+
 /** Validates untrusted JSON into a question set; throws QuestionSetError naming the first problem. */
 export function parseQuestionSet(input: unknown): QuestionSet {
   if (!isObject(input)) throw new QuestionSetError('question set must be an object');
@@ -50,7 +70,14 @@ export function parseQuestionSet(input: unknown): QuestionSet {
       optionIds.add(optionId);
       return { id: optionId, label: text(option.label, `${where}.label`), effects: effects(option.effects, `${where}.effects`) };
     });
-    return { id, text: text(raw.text, `question "${id}".text`), options };
+    const year = raw.year;
+    if (year !== undefined && (typeof year !== 'number' || !Number.isInteger(year))) throw new QuestionSetError(`question "${id}".year must be an integer`);
+    return {
+      id, text: text(raw.text, `question "${id}".text`), options, year,
+      pressure: optionalText(raw.pressure, `question "${id}".pressure`),
+      background: optionalText(raw.background, `question "${id}".background`),
+      trigger: trigger(raw.trigger, `question "${id}".trigger`),
+    };
   });
   return { version, questions };
 }

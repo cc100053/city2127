@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "id": "labour-shortage",
+      "year": 2072,
+      "pressure": "労働力不足",
+      "background": "働き手が減り、店舗・交通・配達を維持する人が足りなくなっています。",
+      "text": "日常生活を回し続けるため、都市は何を優先すべきですか？",
+      "options": [
+        { "id": "automate-services", "label": "店舗と配達を自動化する", "effects": { "automation": 2 } },
+        { "id": "neighbourhood-cooperatives", "label": "住民どうしの共同運営で支え合う", "effects": { "publicSharing": 2 } },
+        { "id": "compact-services", "label": "サービスを都心に集めて効率化する", "effects": { "urbanConcentration": 1 } }
+      ]
+    },
+    {
+      "id": "automation-street-decline",
+      "year": 2082,
+      "pressure": "街のにぎわいの低下",
+      "background": "自動化でサービスは止まらずに済みましたが、店や通りのにぎわいが消えつつあります。",
+      "text": "人々が再び集まる理由を、都市はどうつくるべきですか？",
+      "trigger": { "automation": { "gte": 2 } },
+      "options": [
+        { "id": "public-commons", "label": "誰でも集まれる公共のコモンズをつくる", "effects": { "publicSharing": 2 } },
+        { "id": "green-streets", "label": "通りを緑の散歩道に変える", "effects": { "environmentalPriority": 2 } },
+        { "id": "automated-leisure", "label": "娯楽施設も自動運営にしてさらに効率化する", "effects": { "automation": 2 } }
+      ]
+    },
+    {
+      "id": "commons-land-pressure",
+      "year": 2092,
+      "pressure": "中心部の土地不足",
+      "background": "公共の場は広がりましたが、中心部で建てられる土地が足りなくなっています。",
+      "text": "都市は新しい容量をどこにつくるべきですか？",
+      "trigger": { "publicSharing": { "gte": 2 } },
+      "options": [
+        { "id": "build-upward", "label": "上へ伸ばし、機能を垂直に集約する", "effects": { "urbanConcentration": 2 } },
+        { "id": "underground-automation", "label": "物流や設備を地下の自動インフラへ移す", "effects": { "automation": 2 } },
+        { "id": "shared-green", "label": "建てずに、空き地を共有の緑地にする", "effects": { "environmentalPriority": 2 } }
+      ]
+    },
+    {
+      "id": "heat-stress",
+      "year": 2085,
+      "pressure": "気候ストレス",
+      "background": "夏の猛暑が長くなり、昼間に外で過ごすことが難しくなっています。",
+      "text": "都市は暑さにどう備えるべきですか？",
+      "options": [
+        { "id": "cooling-park", "label": "大きな公園と水辺で街を冷やす", "effects": { "environmentalPriority": 2 } },
+        { "id": "shaded-commons", "label": "日陰のある共有広場を増やす", "effects": { "publicSharing": 2 } },
+        { "id": "climate-towers", "label": "空調の効いた高層ビルに生活を集める", "effects": { "urbanConcentration": 2 } }
+      ]
+    },
+    {
+      "id": "social-isolation",
+      "year": 2088,
+      "pressure": "社会的孤立",
+      "background": "一人で暮らす人が増え、近所どうしの交流が減っています。",
+      "text": "都市はどうやって人のつながりを保つべきですか？",
+      "options": [
+        { "id": "open-plaza", "label": "誰でも使える広場をつくる", "effects": { "publicSharing": 2 } },
+        { "id": "care-robots", "label": "見守りロボットを街に配置する", "effects": { "automation": 2 } },
+        { "id": "shared-towers", "label": "共同住宅の高層棟に人を集める", "effects": { "urbanConcentration": 2 } }
+      ]
+    }
+  ]
+}

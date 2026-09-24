@@ -180,6 +180,30 @@ export class ModuleManager {
     });
   }
 
+  /**
+   * Animates only the slots whose lot or building differs from target, so earlier modules stay in place
+   * while a new decision appears. restore() rebuilds every slot instead.
+   */
+  async transitionTo(target: CityLayoutState): Promise<boolean> {
+    if (this.busy) return false;
+    return this.withLock(async () => {
+      for (const id of LOT_SOCKET_IDS) {
+        const want = target.lots[id];
+        const have = this.state.lots[id];
+        const slot = this.requireSlot(id);
+        if (want.lot === have.lot && want.building === have.building) continue;
+        await this.removeBuilding(slot, true);
+        if (want.lot !== have.lot) {
+          await this.removeLot(slot, true);
+          await this.installLot(slot, id, want.lot, true);
+        }
+        if (want.building !== "none") await this.installBuilding(slot, id, want.building, true);
+      }
+      this.state = structuredClone(target);
+      this.events.onStateChanged(this.getState());
+    });
+  }
+
   private requireSlot(id: LotSocketId): SlotRuntime {
     const slot = this.slots.get(id);
     if (!slot) throw new Error(`Unknown lot socket: ${id}`);

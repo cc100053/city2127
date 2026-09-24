@@ -53,6 +53,15 @@ npm run build
 npm run preview
 ```
 
+## `?survey`モード（因果MVP、2026-09-24）
+
+`survey/`サーバー（既定`127.0.0.1:8787`）を起動してから、ViteのURLに`?survey`（または`?survey=ws://host:port/ws`）を付けて開きます。
+
+- 配置はサーバーの`CityView.layout`だけから決まり、localStorageは読みません。接続・再接続のたびに全体スナップショットで再構築します。
+- 新しいrevisionだけを`ModuleManager.transitionTo()`で適用し、変わった区画だけをアニメーションします。
+- デバッグパネルは隠れ、CHOICE / POLICY / CITY EFFECTと決定履歴のパネル、各区画の意味ラベルを表示します。カメラは高めの固定位置`(-38,105,88)`です。
+- 通常モード（`?survey`なし）の初期配置、保存、自己テストは変わりません。
+
 ## 主要な検証済みNode
 
 - `socket_lot_nw`

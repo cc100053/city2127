@@ -1,9 +1,7 @@
 import type { DatabaseSync, SQLOutputValue } from 'node:sqlite';
-import { CITY_AXES, MILESTONE_KEYS, initialCitySurveyState, isCityAxis, type CitySurveyState } from '../shared/citySurveyState.ts';
+import { CITY_AXES, initialCitySurveyState, isCityAxis, type CitySurveyState } from '../shared/citySurveyState.ts';
 import type { AnswerEvent, RunSummary } from '../shared/protocol.ts';
-import type { CityEffects } from '../shared/question.ts';
 import { applyEffects } from '../survey/scoreEngine.ts';
-import { updateMilestones } from '../survey/milestoneEngine.ts';
 import { transaction } from './database.ts';
 
 /** Raised when stored state is inconsistent. The server refuses to start instead of reinitializing. */
@@ -26,12 +24,13 @@ export function optStr(row: Row, key: string): string | null {
   return row[key] === null ? null : str(row, key);
 }
 
-export function parseEffects(json: string): CityEffects {
+/** Axis names are not checked here: runs ended by the schema 2 migration keep their legacy axes. */
+export function parseEffects(json: string): Record<string, number> {
   const value: unknown = JSON.parse(json);
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new CorruptStateError('stored effects are not an object');
-  const effects: CityEffects = {};
+  const effects: Record<string, number> = {};
   for (const [axis, amount] of Object.entries(value)) {
-    if (!isCityAxis(axis) || typeof amount !== 'number') throw new CorruptStateError(`stored effect ${axis} is invalid`);
+    if (typeof amount !== 'number') throw new CorruptStateError(`stored effect ${axis} is invalid`);
     effects[axis] = amount;
   }
   return effects;
@@ -62,22 +61,22 @@ export function readSnapshot(db: DatabaseSync, runId: string): CitySurveyState |
   if (!row) return undefined;
   return {
     runId, revision: num(row, 'revision'), answerCount: num(row, 'answer_count'),
-    scores: { environment: num(row, 'environment'), culture: num(row, 'culture'), technology: num(row, 'technology'), community: num(row, 'community'), mobility: num(row, 'mobility') },
-    milestones: { greenNetwork: num(row, 'green_network') === 1, civicCommons: num(row, 'civic_commons') === 1, autonomousGrid: num(row, 'autonomous_grid') === 1 },
+    scores: {
+      automation: num(row, 'automation'), publicSharing: num(row, 'public_sharing'),
+      environmentalPriority: num(row, 'environmental_priority'), urbanConcentration: num(row, 'urban_concentration'),
+    },
     updatedAt: str(row, 'updated_at'),
   };
 }
 
 export function writeSnapshot(db: DatabaseSync, state: CitySurveyState): void {
-  const { scores: s, milestones: m } = state;
-  db.prepare(`INSERT INTO city_snapshots (run_id, revision, answer_count, environment, culture, technology, community, mobility,
-      green_network, civic_commons, autonomous_grid, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  const s = state.scores;
+  db.prepare(`INSERT INTO city_snapshots (run_id, revision, answer_count, automation, public_sharing, environmental_priority,
+      urban_concentration, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(run_id) DO UPDATE SET revision = excluded.revision, answer_count = excluded.answer_count,
-      environment = excluded.environment, culture = excluded.culture, technology = excluded.technology,
-      community = excluded.community, mobility = excluded.mobility, green_network = excluded.green_network,
-      civic_commons = excluded.civic_commons, autonomous_grid = excluded.autonomous_grid, updated_at = excluded.updated_at`)
-    .run(state.runId, state.revision, state.answerCount, s.environment, s.culture, s.technology, s.community, s.mobility,
-      Number(m.greenNetwork), Number(m.civicCommons), Number(m.autonomousGrid), state.updatedAt);
+      automation = excluded.automation, public_sharing = excluded.public_sharing, environmental_priority = excluded.environmental_priority,
+      urban_concentration = excluded.urban_concentration, updated_at = excluded.updated_at`)
+    .run(state.runId, state.revision, state.answerCount, s.automation, s.publicSharing, s.environmentalPriority, s.urbanConcentration, state.updatedAt);
 }
 
 /** Creates a run with its zero snapshot. Call inside a transaction. */
@@ -96,8 +95,9 @@ export function runAnswerEvents(db: DatabaseSync, runId: string): AnswerEvent[] 
 export function replayRun(db: DatabaseSync, runId: string, startedAt: string): CitySurveyState {
   let state = initialCitySurveyState(runId, startedAt);
   for (const event of runAnswerEvents(db, runId)) {
-    const scores = applyEffects(state.scores, event.effects);
-    state = { runId, revision: event.revisionAfter, answerCount: state.answerCount + 1, scores, milestones: updateMilestones(state.milestones, scores), updatedAt: event.answeredAt };
+    const unknown = Object.keys(event.effects).find(axis => !isCityAxis(axis));
+    if (unknown) throw new CorruptStateError(`answer ${event.id} of run ${runId} has unknown policy axis "${unknown}"`);
+    state = { runId, revision: event.revisionAfter, answerCount: state.answerCount + 1, scores: applyEffects(state.scores, event.effects), updatedAt: event.answeredAt };
   }
   return state;
 }
@@ -117,8 +117,7 @@ export function restoreOrCreateRun(db: DatabaseSync, newId: () => string, now: (
   if (!snapshot) throw new CorruptStateError(`active run ${run.id} has no city snapshot`);
   const replayed = replayRun(db, run.id, run.startedAt);
   const same = snapshot.revision === replayed.revision && snapshot.answerCount === replayed.answerCount
-    && CITY_AXES.every(axis => snapshot.scores[axis] === replayed.scores[axis])
-    && MILESTONE_KEYS.every(key => snapshot.milestones[key] === replayed.milestones[key]);
+    && CITY_AXES.every(axis => snapshot.scores[axis] === replayed.scores[axis]);
   if (!same) throw new CorruptStateError(`city snapshot of run ${run.id} does not match its answer events (snapshot revision ${snapshot.revision}, replay revision ${replayed.revision})`);
   return snapshot;
 }

@@ -1,6 +1,6 @@
 import type { SQLOutputValue } from 'node:sqlite';
 import type { ApiResponse, GuestQuestionData, GuestSession, GuestSessionStatus } from '../shared/protocol.ts';
-import { toPublicQuestion } from '../shared/question.ts';
+import { isEligible, toPublicQuestion } from '../shared/question.ts';
 import { transaction } from './database.ts';
 import { fail, type SurveyContext } from './context.ts';
 import { activeRun, CorruptStateError, num, optStr, readSnapshot, str } from './runStore.ts';
@@ -46,7 +46,11 @@ export function sessionCounts(ctx: SurveyContext, runId: string) {
   return { reserved: count('reserved'), answered: count('answered') };
 }
 
-/** Reserves the first question (in JSON order) that is neither answered nor reserved in the active run. */
+/**
+ * Reserves the first question (in JSON order) that is neither answered nor reserved in the active run and
+ * whose trigger matches the current policy scores. Consequence questions are listed before untriggered
+ * fallbacks, so an earlier choice decides what the next guest is asked.
+ */
 export function createGuestSession(ctx: SurveyContext): ApiResponse<GuestQuestionData> {
   return transaction(ctx.db, () => {
     const { run, state } = requireActiveRun(ctx);
@@ -55,8 +59,8 @@ export function createGuestSession(ctx: SurveyContext): ApiResponse<GuestQuestio
       .run(run.id, now.toISOString());
     const taken = new Set(ctx.db.prepare(`SELECT question_id FROM guest_sessions WHERE run_id = ? AND status IN ('reserved', 'answered')`)
       .all(run.id).map(row => str(row, 'question_id')));
-    const question = ctx.questions.questions.find(q => !taken.has(q.id));
-    if (!question) return fail('no_question_available', 'Every question in this run is answered or currently reserved.', state);
+    const question = ctx.questions.questions.find(q => !taken.has(q.id) && isEligible(q, state.scores));
+    if (!question) return fail('no_question_available', 'Every eligible question in this run is answered or currently reserved.', state);
     const session: GuestSession = {
       id: ctx.newId(), runId: run.id, questionId: question.id, status: 'reserved', createdAt: now.toISOString(),
       expiresAt: new Date(now.getTime() + ctx.reservationMs).toISOString(), answeredAt: null,

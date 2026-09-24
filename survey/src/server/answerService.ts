@@ -1,10 +1,11 @@
 import type { AnswerData, AnswerEvent, AnswerRequest } from '../shared/protocol.ts';
 import type { CitySurveyState } from '../shared/citySurveyState.ts';
+import type { CityView } from '../shared/cityView.ts';
 import { applyEffects, scoreChange } from '../survey/scoreEngine.ts';
-import { newlyUnlocked, updateMilestones } from '../survey/milestoneEngine.ts';
+import { buildCityView } from '../survey/decisionHistory.ts';
 import { transaction } from './database.ts';
 import { fail, type ServiceOutcome, type SurveyContext } from './context.ts';
-import { toAnswerEvent, writeSnapshot } from './runStore.ts';
+import { runAnswerEvents, toAnswerEvent, writeSnapshot } from './runStore.ts';
 import { findGuestSession, requireActiveRun, settleExpiry } from './sessionService.ts';
 
 const MAX_ID_LENGTH = 128;
@@ -64,7 +65,7 @@ export function submitAnswer(ctx: SurveyContext, body: unknown): ServiceOutcome<
     const scores = applyEffects(state.scores, effects);
     const next: CitySurveyState = {
       runId: run.id, revision: state.revision + 1, answerCount: state.answerCount + 1,
-      scores, milestones: updateMilestones(state.milestones, scores), updatedAt: answeredAt,
+      scores, updatedAt: answeredAt,
     };
     ctx.db.prepare(`INSERT INTO answer_events (id, run_id, guest_session_id, question_id, option_id, question_version,
         effects_json, revision_before, revision_after, answered_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
@@ -78,10 +79,15 @@ export function submitAnswer(ctx: SurveyContext, body: unknown): ServiceOutcome<
       response: { ok: true, data: { event, state: next, replayed: false } },
       event: {
         type: 'city-state-updated', answerId: event.id, state: next, answer: event, questionText: question.text, optionLabel: option.label,
-        change: { scores: scoreChange(state.scores, next.scores), unlocked: newlyUnlocked(state.milestones, next.milestones) },
+        change: { scores: scoreChange(state.scores, next.scores) }, view: viewOf(ctx, next),
       },
     };
   });
 }
 
 export const currentState = (ctx: SurveyContext): CitySurveyState => requireActiveRun(ctx).state;
+
+/** The viewer contract for a state of the active run: derived layout plus the run's decision history. */
+export const viewOf = (ctx: SurveyContext, state: CitySurveyState): CityView =>
+  buildCityView(state, runAnswerEvents(ctx.db, state.runId), ctx.questions);
+export const currentView = (ctx: SurveyContext): CityView => viewOf(ctx, currentState(ctx));

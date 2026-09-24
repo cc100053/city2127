@@ -7,14 +7,15 @@ import { loadQuestionSetFile } from '../src/survey/questionLoader.ts';
 import type { AnswerData, ApiResponse, GuestQuestionData } from '../src/shared/protocol.ts';
 
 export const QUESTIONS_PATH = new URL('../src/survey/questions.test.json', import.meta.url).pathname;
+export const MVP_QUESTIONS_PATH = new URL('../src/survey/questions.mvp.json', import.meta.url).pathname;
 
 /** In-memory (or given file) survey context with a controllable clock and readable sequential IDs. */
-export function fixture(dbPath = ':memory:', startMs = Date.parse('2026-09-23T10:00:00.000Z')) {
+export function fixture(dbPath = ':memory:', startMs = Date.parse('2026-09-23T10:00:00.000Z'), questionsPath = QUESTIONS_PATH) {
   const clock = { ms: startMs };
   let counter = 0;
   const db = openDatabase(dbPath);
   const ctx: SurveyContext = {
-    db, questions: loadQuestionSetFile(QUESTIONS_PATH), now: () => new Date(clock.ms),
+    db, questions: loadQuestionSetFile(questionsPath), now: () => new Date(clock.ms),
     newId: () => `id-${++counter}-${Math.random().toString(16).slice(2, 8)}`, reservationMs: RESERVATION_MS,
   };
   restoreOrCreateRun(db, ctx.newId, ctx.now);

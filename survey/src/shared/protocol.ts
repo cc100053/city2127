@@ -1,4 +1,5 @@
-import type { CityScores, CitySurveyState, MilestoneKey } from './citySurveyState.ts';
+import type { CityScores, CitySurveyState } from './citySurveyState.ts';
+import type { CityView } from './cityView.ts';
 import type { CityEffects, PublicQuestion } from './question.ts';
 
 export type GuestSessionStatus = 'reserved' | 'answered' | 'expired';
@@ -20,7 +21,8 @@ export type AnswerEvent = {
   questionId: string;
   optionId: string;
   questionVersion: number;
-  effects: CityEffects;
+  /** Effects as stored at answer time. Runs ended by the schema 2 migration hold legacy axis names. */
+  effects: CityEffects | Record<string, number>;
   revisionBefore: number;
   revisionAfter: number;
   answeredAt: string;
@@ -63,11 +65,11 @@ export type AdminEventsData = { answers: AnswerEvent[]; admin: AdminEvent[] };
 export type ResetRequest = { confirmation: string };
 export type ResetData = { previousRunId: string; state: CitySurveyState };
 
-/** What one answer actually changed after clamping, and which milestones it newly unlocked. */
-export type AppliedChange = { scores: Partial<CityScores>; unlocked: MilestoneKey[] };
+/** What one answer actually changed after clamping. */
+export type AppliedChange = { scores: Partial<CityScores> };
 
 export type ServerEvent =
-  | { type: 'city-state-snapshot'; state: CitySurveyState }
+  | { type: 'city-state-snapshot'; state: CitySurveyState; view: CityView }
   | {
       type: 'city-state-updated';
       answerId: string;
@@ -76,5 +78,6 @@ export type ServerEvent =
       questionText: string;
       optionLabel: string;
       change: AppliedChange;
+      view: CityView;
     }
-  | { type: 'run-reset'; previousRunId: string; state: CitySurveyState };
+  | { type: 'run-reset'; previousRunId: string; state: CitySurveyState; view: CityView };

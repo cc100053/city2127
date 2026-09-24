@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import type { DatabaseSync } from 'node:sqlite';
 
 export class SchemaVersionError extends Error {
@@ -5,7 +6,7 @@ export class SchemaVersionError extends Error {
 }
 
 /** Schema version is PRAGMA user_version. Append new steps; never edit an applied one. */
-const migrations: string[] = [
+export const migrations: (string | ((db: DatabaseSync) => void))[] = [
   `CREATE TABLE runs (
      id TEXT PRIMARY KEY,
      status TEXT NOT NULL CHECK (status IN ('active', 'ended')),
@@ -66,6 +67,32 @@ const migrations: string[] = [
      detail_json TEXT NOT NULL,
      created_at TEXT NOT NULL
    );`,
+  // 2: placeholder axes and milestones → four policy axes. Answers stored under the old axes cannot be
+  // replayed on the new ones, so the active run is ended exactly like an admin reset and a zero run starts.
+  // Nothing is deleted: old events stay in answer_events and old snapshots move to city_snapshots_v1.
+  db => {
+    db.exec(`ALTER TABLE city_snapshots RENAME TO city_snapshots_v1;
+      CREATE TABLE city_snapshots (
+        run_id TEXT PRIMARY KEY REFERENCES runs(id),
+        revision INTEGER NOT NULL CHECK (revision >= 0),
+        answer_count INTEGER NOT NULL CHECK (answer_count >= 0),
+        automation INTEGER NOT NULL CHECK (automation BETWEEN -12 AND 12),
+        public_sharing INTEGER NOT NULL CHECK (public_sharing BETWEEN -12 AND 12),
+        environmental_priority INTEGER NOT NULL CHECK (environmental_priority BETWEEN -12 AND 12),
+        urban_concentration INTEGER NOT NULL CHECK (urban_concentration BETWEEN -12 AND 12),
+        updated_at TEXT NOT NULL
+      );`);
+    const active = db.prepare(`SELECT id FROM runs WHERE status = 'active'`).get();
+    if (!active) return;
+    const at = new Date().toISOString(), nextRunId = randomUUID();
+    db.prepare(`UPDATE runs SET status = 'ended', ended_at = ? WHERE id = ?`).run(at, active.id);
+    db.prepare(`UPDATE guest_sessions SET status = 'expired' WHERE run_id = ? AND status = 'reserved'`).run(active.id);
+    db.prepare(`INSERT INTO admin_events (type, run_id, detail_json, created_at) VALUES ('run-reset', ?, ?, ?)`)
+      .run(active.id, JSON.stringify({ nextRunId, reason: 'schema 2: policy axes' }), at);
+    db.prepare(`INSERT INTO runs (id, status, started_at) VALUES (?, 'active', ?)`).run(nextRunId, at);
+    db.prepare(`INSERT INTO city_snapshots (run_id, revision, answer_count, automation, public_sharing, environmental_priority,
+      urban_concentration, updated_at) VALUES (?, 0, 0, 0, 0, 0, 0, ?)`).run(nextRunId, at);
+  },
 ];
 
 export const SCHEMA_VERSION = migrations.length;
@@ -84,7 +111,10 @@ export function migrate(db: DatabaseSync): void {
   if (current === SCHEMA_VERSION) return;
   db.exec('BEGIN IMMEDIATE');
   try {
-    for (let version = current; version < SCHEMA_VERSION; version++) db.exec(migrations[version]);
+    for (let version = current; version < SCHEMA_VERSION; version++) {
+      const step = migrations[version];
+      if (typeof step === 'string') db.exec(step); else step(db);
+    }
     db.exec(`PRAGMA user_version = ${SCHEMA_VERSION}`);
     db.exec('COMMIT');
   } catch (error) {

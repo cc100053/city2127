@@ -3,6 +3,7 @@ import { transaction } from './database.ts';
 import { fail, type ServiceOutcome, type SurveyContext } from './context.ts';
 import { createRun, num, str, toAnswerEvent } from './runStore.ts';
 import { requireActiveRun, sessionCounts } from './sessionService.ts';
+import { viewOf } from './answerService.ts';
 
 export const RESET_CONFIRMATION = 'RESET';
 
@@ -48,7 +49,7 @@ export function resetRun(ctx: SurveyContext, body: unknown): ServiceOutcome<Rese
     const state = createRun(ctx.db, nextRunId, at);
     return {
       response: { ok: true, data: { previousRunId: run.id, state } },
-      event: { type: 'run-reset', previousRunId: run.id, state },
+      event: { type: 'run-reset', previousRunId: run.id, state, view: viewOf(ctx, state) },
     };
   });
 }

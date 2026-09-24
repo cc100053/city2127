@@ -18,6 +18,17 @@ AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/P
 
 建築數量／密度、人流等是可能受選擇影響的參數，並非已定案的規則。題目、選項、參數映射、變化幅度、轉場及資料保存方式留待後續設計。今次只對齊文檔，沒有實作題目流程、累積選擇或動態建築。
 
+### 因果選擇 MVP（2026-09-24，`survey/` + `module-swap/`）
+
+第一個「選擇 → 政策 → 城市變化」垂直切片已實作，獨立於根目錄原型：`survey/` 伺服器按累積政策分數（自動化、公共共有、環境優先、都市集約）決定下一位 guest 嘅題目，並由答案歷史推導四個區畫嘅配置；`module-swap/` 以 `?survey` 模式即時顯示。示範流程：勞動力不足 → 自動化（NW 建築）→ 街道冷清 → 公共廣場（SW）→ 中心土地不足 → 向上發展（SE 高樓）。
+
+```sh
+cd survey && npm ci && npm run build && npm run server        # http://127.0.0.1:8787/guest
+cd module-swap && npm run install:app && npm run dev          # 打開 Vite 網址加 ?survey
+```
+
+設計同限制見 [PROJECT.md](docs/PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--module-swap)，驗證見 [VALIDATION.md](docs/VALIDATION.md)。
+
 ## 目前可執行原型
 
 固定鏡頭、固定種子 `2127` 的 Three.js 澀谷多層城市原型（Plan 02 首個垂直切片）。以 [Pic 2](asset/pic2.png) 為量體、垂直交通與材質方向參考，保留 Plan 01 的路口及地標關係。建築只建立一次，使用 Vite、TypeScript 與 WebGL 2；城市另載入一棵 Blender 樹木模型。

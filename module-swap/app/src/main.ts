@@ -17,8 +17,15 @@ import { runBrowserSelfTest } from "./browserSelfTest";
 import { ModuleManager } from "./placement/moduleManager";
 import { readWorldTransform } from "./placement/socketPlacement";
 import { createScene } from "./scene/createScene";
-import { createInitialCityLayout, type BuildingKind, type LotKind, type LotSocketId } from "./state/cityLayoutState";
+import {
+  createBaselineCityLayout,
+  createInitialCityLayout,
+  type BuildingKind,
+  type LotKind,
+  type LotSocketId,
+} from "./state/cityLayoutState";
 import { clearSavedCityLayout, loadCityLayout, saveCityLayout } from "./state/persistence";
+import { startSurveyMode } from "./surveyMode";
 import { DebugPanel, type DebugToggles } from "./ui/debugPanel";
 
 const PROP_NODE_NAMES = [
@@ -66,6 +73,7 @@ declare global {
       save(): void;
       load(): Promise<boolean>;
       diagnostics(): Diagnostics;
+      runtime(): ReturnType<ModuleManager["getRuntimeDiagnostics"]>;
     };
   }
 }
@@ -96,7 +104,12 @@ function markerAt(node: Object3D, color: number, name: string): Mesh {
   return marker;
 }
 
+// `?survey` or `?survey=ws://host:port/ws` shows the survey-driven city instead of the local debug layout.
+const surveyParam = new URLSearchParams(location.search).get("survey");
+const surveyUrl = surveyParam === null ? null : surveyParam || `ws://${location.hostname}:8787/ws`;
+
 async function start(): Promise<void> {
+  if (surveyUrl) document.body.dataset.mode = "survey";
   const viewport = requireHtmlElement("viewport");
   const panel = new DebugPanel(requireHtmlElement("debug-panel"));
   const context = createScene(viewport);
@@ -183,8 +196,9 @@ async function start(): Promise<void> {
     }
   }
 
-  const loadResult = loadCityLayout(localStorage);
-  if (loadResult.warning) warnings.push(loadResult.warning);
+  // Survey mode never reads localStorage: the server snapshot is the only layout source.
+  const loadResult = surveyUrl ? { state: createBaselineCityLayout() } : loadCityLayout(localStorage);
+  if ("warning" in loadResult && loadResult.warning) warnings.push(loadResult.warning);
   await manager.initialize(loadResult.state);
   latestState = manager.getState();
   enableShadows(groundRoot);
@@ -262,6 +276,7 @@ async function start(): Promise<void> {
     save: () => saveCityLayout(localStorage, manager.getState()),
     load: restoreSaved,
     diagnostics,
+    runtime: () => manager.getRuntimeDiagnostics(),
   };
 
   panel.setState(manager.getState(), false);
@@ -272,6 +287,10 @@ async function start(): Promise<void> {
     warnings.length > 0,
   );
   console.info("Module swap diagnostics", diagnostics());
+
+  const survey = surveyUrl
+    ? startSurveyMode(context, manager, viewport, requireHtmlElement("causal-panel"), surveyUrl)
+    : undefined;
 
   let lastInfoUpdate = 0;
   function rendererInfo(): string {
@@ -287,6 +306,7 @@ async function start(): Promise<void> {
   function render(now: number): void {
     context.controls.update();
     context.renderer.render(context.scene, context.camera);
+    survey?.render();
     if (now - lastInfoUpdate > 500 && panel) {
       lastInfoUpdate = now;
       const rendererElement = document.querySelector<HTMLElement>("[data-role='renderer']");
@@ -309,6 +329,7 @@ start().catch((error: unknown) => {
   console.error(error);
   const panelElement = document.getElementById("debug-panel");
   if (panelElement) {
+    panelElement.style.display = "block";
     const panel = new DebugPanel(panelElement);
     panel.showError(message);
   }
