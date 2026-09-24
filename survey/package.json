@@ -1,0 +1,23 @@
+{
+  "name": "exhibition-questionnaire",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "test": "node --experimental-strip-types tests/questionLoader.test.ts && node --experimental-strip-types tests/scoreEngine.test.ts && node --experimental-strip-types tests/milestoneEngine.test.ts && node --experimental-strip-types tests/answerService.test.ts && node --experimental-strip-types tests/sessionService.test.ts && node --experimental-strip-types tests/concurrency.test.ts && node --experimental-strip-types tests/persistence.test.ts && node --experimental-strip-types tests/reset.test.ts && node --experimental-strip-types tests/realtime.test.ts",
+    "server": "node --experimental-strip-types src/server/server.ts"
+  },
+  "dependencies": {
+    "ws": "^8.21.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.6",
+    "@types/ws": "^8.18.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.7"
+  }
+}
