@@ -1,11 +1,11 @@
 # root-causal-panel — Causal panel in the root Shibuya survey mode (step 3)
 
 - Owner: cc100053
-- Status: IN_PROGRESS
+- Status: DONE
 - Branch: feat/root-causal-panel
 - Base commit: 2d49990867d883392abe8fbb2ab335a401d09119
-- Last verified commit: uncommitted worktree on the base (checks below)
-- Remote availability: see branch push
+- Last verified commit: 2da3508848b444c36380bab5857e29e1e5c2e871; integrated as 994227d7fd6d25933a8440647cd18e489903677d
+- Remote availability: origin/feat/root-causal-panel and origin/main at 994227d
 - GitHub Issue (optional): none
 
 ## Session Git state
@@ -34,8 +34,8 @@ See [PROJECT.md](../PROJECT.md#root-scene-survey-mode--2026-09-24-srcsurvey), st
 - Date and checked commit/worktree: 2026-09-24, uncommitted worktree on 2d49990
 - Commands/manual checks and results: see [VALIDATION.md](../VALIDATION.md#root-scene-causal-panel--2026-09-24)
 - Evidence/environment: artifacts/causal-panel-*.png, headless Chromium 1280×720
-- Integrated commit and checks: NOT INTEGRATED
-- Changes since verification: documentation and handoff only
+- Integrated commit and checks: 994227d on main; local `npm test`, `npm run build`, `git diff --check origin/main...HEAD` passed; branch CI run 36009478385 (2da3508) and main CI run 36009607075 (994227d) succeeded
+- Changes since verification: this handoff update only
 
 ## Known issues and blockers
 
@@ -48,4 +48,4 @@ History shows only the latest three decisions; no labels in the 3D scene; perfor
 
 ## Next expected step
 
-Integrate into main after branch CI.
+Integrated. Next candidates (owner cc100053): labels in the 3D scene, FPS measurement with all sites up, more questions/sites as the scene grows.
