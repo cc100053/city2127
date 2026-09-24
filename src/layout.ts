@@ -70,3 +70,12 @@ export const upperLinks = [
   {name:'QFRONT WEST WING',kind:'wing',x:-18.5,z:-18.5,w:9,h:14,d:9.5,y:33,on:['QFRONT'],columns:[]},
   {name:'MAGNET EAST WING',kind:'wing',x:24.25,z:-19,w:9.5,h:13,d:12,y:27.5,on:['MAGNET / AIR COMMONS'],columns:[[27.2,-23.2],[27.2,-14.8]]},
 ] as const;
+
+// Survey change sites: one per CityView lot socket, on open ground the hero pose can see. h = tallest variant.
+// nw automation hub (east of MAGNET), ne park (east of the station), sw commons plaza (south of Dogenzaka), se tower (behind Center-gai, west).
+export const changeSites = {
+  nw:{name:'AUTO HUB',x:35,z:-11,w:8,d:7,h:32},
+  ne:{name:'PARK',x:37,z:11,w:10,d:10,h:8},
+  sw:{name:'COMMONS PLAZA',x:-24,z:32,w:12,d:10,h:5},
+  se:{name:'TOWER',x:-40,z:-10,w:9,d:9,h:46},
+} as const;

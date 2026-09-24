@@ -6,19 +6,19 @@ import { mobility, airRoutes } from './mobility';
 import { crossings, crossingPoint, roads, landmarks, publicRoutes, upperLinks, DOCK } from './layout';
 
 // Three finishes: matte ceramic composite, refined metal, and reflective glass. Same shader, different response to the one environment map.
-const paint = (color: T.ColorRepresentation, roughness=.52, metalness=0) => new T.MeshStandardMaterial({ color, roughness, metalness });
-const cream = paint('#dce3e3',.58), teal = paint('#839da8',.44,.05), sage = paint('#a9c5c2',.5), pink = paint('#b9b7ac',.56), dark = paint('#27414f',.16,.7), trim = paint('#edf0ed',.48);
-const futureLight=new T.MeshStandardMaterial({color:'#8ce5d8',emissive:'#68d9de',emissiveIntensity:.8,roughness:.65});
-const solar=paint('#486b83',.3,.85);
-const membrane=new T.MeshStandardMaterial({color:'#9abdb9',roughness:.3,metalness:.25,transparent:true,opacity:.72,side:T.DoubleSide});
+export const paint = (color: T.ColorRepresentation, roughness=.52, metalness=0) => new T.MeshStandardMaterial({ color, roughness, metalness });
+export const cream = paint('#dce3e3',.58), teal = paint('#839da8',.44,.05), sage = paint('#a9c5c2',.5), pink = paint('#b9b7ac',.56), dark = paint('#27414f',.16,.7), trim = paint('#edf0ed',.48);
+export const futureLight=new T.MeshStandardMaterial({color:'#8ce5d8',emissive:'#68d9de',emissiveIntensity:.8,roughness:.65});
+export const solar=paint('#486b83',.3,.85);
+export const membrane=new T.MeshStandardMaterial({color:'#9abdb9',roughness:.3,metalness:.25,transparent:true,opacity:.72,side:T.DoubleSide});
 const rounded = new Map<string, RoundedBoxGeometry>();
-function box(parent:T.Object3D, size:[number,number,number], position:[number,number,number], material:T.Material, radius=.18) {
+export function box(parent:T.Object3D, size:[number,number,number], position:[number,number,number], material:T.Material, radius=.18) {
   const key = [...size,radius].join(',');
   if (!rounded.has(key)) rounded.set(key,new RoundedBoxGeometry(...size,2,Math.min(radius,.055,...size.map(v=>v/2))));
   const mesh = new T.Mesh(rounded.get(key),material); mesh.position.set(...position); mesh.castShadow=true; mesh.receiveShadow=true; parent.add(mesh); return mesh;
 }
 type WindowSlot = { object:T.Object3D; phase:number; occupancy:number };
-type Kit = { windows:WindowSlot[]; signs:T.MeshStandardMaterial[]; random:()=>number };
+export type Kit = { windows:WindowSlot[]; signs:T.MeshStandardMaterial[]; random:()=>number };
 function windows(group:T.Group, kit:Kit, width:number, height:number, depth:number) {
   for (let floor=0;floor<Math.floor((height-3)/2.1);floor++) for (let side=0;side<2;side++) for(let col=0;col<Math.floor(width/1.8);col++) {
     const obj = new T.Object3D();
@@ -30,7 +30,7 @@ function windows(group:T.Group, kit:Kit, width:number, height:number, depth:numb
     if(col===0)box(group,side===0?[width-.4,.1,.55]:[.55,.1,depth-.4],side===0?[0,3.2+floor*2.1+.85,depth/2+.2]:[width/2+.2,3.2+floor*2.1+.85,0],trim,.03);
   }
 }
-function sign(group:T.Group, kit:Kit, text:string, x:number,y:number,z:number,w:number,h:number,bg:string,fg='#eff3d3') {
+export function sign(group:T.Group, kit:Kit, text:string, x:number,y:number,z:number,w:number,h:number,bg:string,fg='#eff3d3') {
   const canvas=document.createElement('canvas');canvas.width=512;canvas.height=128;
   const ctx=canvas.getContext('2d')!;ctx.fillStyle=bg;ctx.fillRect(0,0,512,128);ctx.fillStyle=fg;ctx.font='500 56px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,256,68);
   const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;

@@ -1,11 +1,24 @@
 import { presets, type WorldState } from './presets.ts';
 
 // Root-scene side of the survey server's CityView contract (survey/src/shared/cityView.ts).
-// Only the policy scores drive this scene for now; the four-lot layout stays module-swap's.
+// Scores drive the atmosphere; the four-lot layout raises the Shibuya change sites (surveySites.ts).
 export const AXES = ['automation', 'publicSharing', 'environmentalPriority', 'urbanConcentration'] as const;
 export type Scores = Record<typeof AXES[number], number>;
-export type Decision = { revision: number; optionLabel: string; policyChange: Record<string, number> };
-export type SurveyView = { runId: string; revision: number; scores: Scores; history: Decision[] };
+export type Decision = { revision: number; optionLabel: string; policyChange: Record<string, number>; cityChanges: { socketId: string; label: string }[] };
+const SOCKETS = ['nw', 'ne', 'sw', 'se'] as const;
+export type Lot = { lot: 'empty' | 'park' | 'plaza'; building: 'none' | 'small' | 'medium' | 'tall' };
+export type Layout = Record<typeof SOCKETS[number], Lot>;
+export type SurveyView = { runId: string; revision: number; scores: Scores; layout: Layout; history: Decision[] };
+
+/** Scene parts the layout can raise: NW automation hub, NE park, SW commons plaza, SE tower (see layout.ts changeSites). */
+export type SitePart = 'hubBase' | 'hubUpper' | 'park' | 'plaza' | 'towerBase' | 'towerUpper';
+export function siteTargets({ nw, ne, sw, se }: Layout): Record<SitePart, boolean> {
+  return {
+    hubBase: nw.building !== 'none', hubUpper: nw.building === 'tall',
+    park: ne.lot === 'park', plaza: sw.lot === 'plaza',
+    towerBase: se.building !== 'none', towerUpper: se.building === 'tall',
+  };
+}
 
 /** One answer is +2 on an axis; two answers on the same axis reach the full effect. */
 const FULL = 4;
@@ -35,11 +48,13 @@ const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'obj
 export function parseSurveyEvent(data: unknown): SurveyView | null {
   if (!isRecord(data) || !isRecord(data.view)) return null;
   if (data.type !== 'city-state-snapshot' && data.type !== 'city-state-updated' && data.type !== 'run-reset') return null;
-  const { runId, revision, scores, history } = data.view;
+  const { runId, revision, scores, history, layout } = data.view;
   if (typeof runId !== 'string' || typeof revision !== 'number' || !isRecord(scores) || !Array.isArray(history)) return null;
   if (!AXES.every(axis => typeof scores[axis] === 'number')) return null;
-  if (!history.every(d => isRecord(d) && typeof d.revision === 'number' && typeof d.optionLabel === 'string' && isRecord(d.policyChange))) return null;
-  return { runId, revision, scores: scores as Scores, history: history as Decision[] };
+  if (!history.every(d => isRecord(d) && typeof d.revision === 'number' && typeof d.optionLabel === 'string' && isRecord(d.policyChange) && Array.isArray(d.cityChanges) && d.cityChanges.every(c => isRecord(c) && typeof c.label === 'string'))) return null;
+  const lots = isRecord(layout) && isRecord(layout.lots) ? layout.lots : null;
+  if (!lots || !SOCKETS.every(id => isRecord(lots[id]) && ['empty', 'park', 'plaza'].includes(lots[id].lot as string) && ['none', 'small', 'medium', 'tall'].includes(lots[id].building as string))) return null;
+  return { runId, revision, scores: scores as Scores, layout: lots as Layout, history: history as Decision[] };
 }
 
 /** A view replaces the current one unless it is an older or repeated revision of the same run. */
@@ -70,24 +85,25 @@ export function connectSurvey(url: string, onView: (view: SurveyView) => void, o
 const LABELS: Record<keyof Scores, string> = { automation: '自動化', publicSharing: '公共共有', environmentalPriority: '環境優先', urbanConcentration: '都市集約' };
 const signed = (n: number) => (n > 0 ? `+${n}` : String(n));
 
-/** `?survey` mode: the survey server's policy scores are the only source of the atmosphere. */
-export function startSurveyAtmosphere(url: string, apply: (state: WorldState) => void) {
+/** `?survey` mode: the survey server is the only source of the atmosphere and the change sites. */
+export function startSurveyAtmosphere(url: string, apply: (state: WorldState, sites: Record<SitePart, boolean>) => void) {
   document.body.dataset.mode = 'survey';
   const panel = document.createElement('aside');
   panel.className = 'survey-panel';
   panel.setAttribute('aria-live', 'polite');
-  panel.innerHTML = '<p class="survey-status"></p><p class="survey-choice"></p><p class="survey-scores"></p>';
+  panel.innerHTML = '<p class="survey-status"></p><p class="survey-choice"></p><p class="survey-city"></p><p class="survey-scores"></p>';
   document.body.appendChild(panel);
-  const [status, choice, scores] = Array.from(panel.children) as HTMLElement[];
+  const [status, choice, city, scores] = Array.from(panel.children) as HTMLElement[];
   let current: SurveyView | undefined;
   connectSurvey(url, view => {
     if (!supersedes(current, view)) return;
     current = view;
-    apply(scoresToWorldState(view.scores));
+    apply(scoresToWorldState(view.scores), siteTargets(view.layout));
     const last = view.history.at(-1);
     choice.textContent = last
       ? `CHOICE ${last.optionLabel} → ${Object.entries(last.policyChange).map(([axis, d]) => `${LABELS[axis as keyof Scores] ?? axis} ${signed(d)}`).join(' / ')}`
       : 'CHOICE —';
+    city.textContent = last?.cityChanges.length ? `CITY ${last.cityChanges.map(c => c.label).join(' / ')}` : '';
     scores.textContent = AXES.map(axis => `${LABELS[axis]} ${signed(view.scores[axis])}`).join('  ·  ');
   }, text => { status.textContent = `SURVEY ${text}`; });
 }
