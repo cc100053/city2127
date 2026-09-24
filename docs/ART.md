@@ -1,6 +1,6 @@
 # Art rules — root Shibuya scene
 
-Status: **draft for user art review** (2026-09-24, task [art-direction](handoffs/art-direction.md)). The pilot area built to these rules is QFRONT's crossing face, Hachiko plaza, and the SW commons change site. The rest of the scene has not been restyled yet. Once the pilot is approved, apply these rules to the other landmarks, change sites, and new areas. Until then, the rules can still change.
+Status: **in use** (2026-09-24, task [art-direction](handoffs/art-direction.md)). The user reviewed the pilot (QFRONT's crossing face, Hachiko plaza, SW commons) and asked for the buildings to be polished next. The rules now apply to every landmark, the upper links, the koban and the NW/SE change-site buildings. New areas follow them too. The rules can still change after the next review.
 
 Reference: [Pic 2](../asset/pic2.png). Direction: Plan 02 daylight, a vertical city, and engineered nature, built procedurally in Three.js ([PLAN02](PLAN02.md) decision, 2026-09-24). What the city looks like serves how clearly its changes read. It is not a goal on its own.
 
@@ -12,8 +12,8 @@ Every surface uses one of the shared materials in `src/cityRig.ts`. Do not creat
 | --- | --- | --- | --- |
 | Ceramic mass | `cream`, `teal`, `sage`, `pink` | Building bodies; about 70% of any view | Glazing, accents |
 | Trim / structure | `trim` | Slab edges, columns, rims, frames, planter walls | Large flat walls |
-| Silvered glass | `glass` (physical, clearcoat) | Lobbies, window bands on pilot buildings; it picks up the sky | Opaque cores |
-| Dark glass / metal | `dark`, `solar` | Legacy window bands (non-pilot), PV fins, rails | New hero glazing (use `glass`) |
+| Silvered glass | `glass` (physical, clearcoat) | All building glazing: lobbies, window bands, shopfronts, the sky link, the corner drum; it picks up the sky | Opaque cores |
+| Dark metal | `dark`, `solar` | PV fins, rails, lamp posts, the Hachiko figure | Glazing (use `glass`) |
 | Stone paving | `stone` | Plazas, plinths, public floors | Roads |
 | Living green | `leaf` | Planter tops, hedge strips, shrubs | Paint on walls; "green" facades without a planter |
 | Membrane | `membrane` | Canopies, filtration fins, deck rails | Solid structure |
@@ -79,4 +79,13 @@ A guest-made change must be distinguishable from the base city at a glance and t
 - [x] SW commons site: round plaza, planted ring open to the street, ringed canopy on six columns, curved benches
 - [x] Guest outline on all four change sites
 - [x] MSAA and GTAO in the composer
-- [ ] User art review ([before/after](VALIDATION.md#art-direction-pilot--2026-09-24))
+- [x] User art review of the pilot ("ok, polish building", 2026-09-24) ([before/after](VALIDATION.md#art-direction-pilot--2026-09-24))
+
+## Building rollout (2026-09-24)
+
+- [x] All glazing on landmarks, upper links, the koban and the NW/SE site buildings switched to `glass`
+- [x] MAGNET: planted collar terraces (crossing and east faces) and a curved glass corner drum ringed by floor discs on the upper shaft
+- [x] Shops (Center-gai, Dogenzaka, Station): east-face glazing and sunshades, planted slabs on alternate floors and above the public void; large roofs (Dogenzaka, Station) get a ringed roof garden on the crossing half, with PV moved to the back half
+- [x] Commons floor: planters inside both rails
+- [x] SE tower base: planted slabs on alternate floors
+- [ ] User art review of the rollout ([evidence](VALIDATION.md#art-direction-building-rollout--2026-09-24))

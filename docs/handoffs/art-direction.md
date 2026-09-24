@@ -43,6 +43,8 @@ Pilot (2026-09-24):
 - `main.ts`: 4× MSAA composer target and a GTAO pass.
 - Site positions, footprints, rise/sink behaviour, camera and presets are unchanged.
 
+Building rollout (2026-09-24, after the user said "ok, polish building"): all glazing moved to `glass`. MAGNET got planted collar terraces and a curved glass corner drum. The shops got east-face glazing, planted slabs and ringed roof gardens on large roofs (PV moved to the back half). The commons floor got rail planters, and the SE tower base got planted slabs. See the [ART.md rollout list](../ART.md#building-rollout-2026-09-24).
+
 ## Actual validation results
 
 - Verification status: PARTIAL — code checks and screenshots done; real-GPU FPS not measured; user art review pending
@@ -66,4 +68,4 @@ Pilot (2026-09-24):
 
 ## Next expected step
 
-cc100053: measure FPS/draw calls in foreground desktop Chrome at 1280×720 and 1920×1080 (preset and `?survey` with all sites), then give the art review of the pilot screenshots. After approval, roll ART.md out to MAGNET, the other shops and the NW/NE/SE sites.
+cc100053: art review of the building rollout (`artifacts/art-buildings-*.png`), and bring Chrome to the foreground so the agent can measure FPS/draw calls at 1280×720 and 1920×1080. Still open: the NE park and NW hub restyle to the ringed language, the ground/crossing surface, and deciding whether GTAO stays.

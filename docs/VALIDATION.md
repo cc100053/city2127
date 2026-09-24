@@ -1,5 +1,11 @@
 # Validation and handoff
 
+## Art-direction building rollout — 2026-09-24
+
+After the user said "ok, polish building", [ART.md](ART.md) was rolled out to the buildings on `feat/art-direction`. `npm test` and `npm run build` passed, with the existing chunk-size warning only. `git diff --check` was clean. `survey/` and `module-swap/` are unchanged.
+
+Playwright CLI (headless SwiftShader) took captures at 1280×720 on the untouched hero pose. [Preset](../artifacts/art-buildings-preset.png) compares directly with [pilot preset](../artifacts/art-pilot-preset.png). [Survey, five guests](../artifacts/art-buildings-survey.png) compares with [pilot survey](../artifacts/art-pilot-survey.png) and uses the same scratch DB. Still (key `2`) was also checked at the same pose: the judgment was shown and nothing broke. Console output was only the existing favicon 404. Headless stats (not performance evidence): preset 337 draw calls / 86 geometries, and survey 466 / 120. Both are unchanged or +4, because the new detail goes through `bake()`. **Real-GPU FPS is still not measured**: the Chrome tab stayed `hidden`.
+
 ## Art-direction pilot — 2026-09-24
 
 Branch `feat/art-direction` (handoff [art-direction](handoffs/art-direction.md)), rules [ART.md](ART.md). `npm test` and `npm run build` passed, with the existing bundle-size warning only. `git diff --check` was clean. `survey/` and `module-swap/` are unchanged.

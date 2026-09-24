@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { box, sign, arc, shrubs, bake, cream, teal, sage, pink, dark, trim, futureLight, solar, membrane, stone, leaf, paint, type Kit } from './cityRig';
+import { box, sign, arc, shrubs, bake, cream, teal, sage, pink, trim, futureLight, solar, membrane, stone, leaf, glass, paint, type Kit } from './cityRig';
 import { changeSites } from './layout';
 import type { SitePart } from './surveyAtmosphere';
 
@@ -21,11 +21,11 @@ export function surveySites(scene: T.Scene) {
   const hub = site('nw'), hubBase = part(hub), hubUpper = part(hub, 12);
   box(hubBase, [8.4, .8, 7.4], [0, .8, 0], cream, .25);
   box(hubBase, [7, 10, 6], [0, 6.2, 0], teal, .3);
-  for (const y of [4, 7, 10]) { box(hubBase, [7.2, .9, .1], [0, y, 3.03], dark, .03); box(hubBase, [.1, .9, 6.2], [3.53, y, 0], dark, .03); }
+  for (const y of [4, 7, 10]) { box(hubBase, [7.2, .9, .1], [0, y, 3.03], glass, .03); box(hubBase, [.1, .9, 6.2], [3.53, y, 0], glass, .03); }
   box(hubBase, [7.6, .35, 6.6], [0, 11.4, 0], trim, .1);
   box(hubBase, [4, .08, 4], [0, 11.62, 0], futureLight, .03);
   sign(hubBase, kit, '自動サービス / AUTO HUB', 0, 2.2, 3.2, 6.2, .8, '#46676e');
-  box(hubUpper, [5.4, 19, 4.8], [0, 9.5, 0], dark, .2);
+  box(hubUpper, [5.4, 19, 4.8], [0, 9.5, 0], glass, .2);
   for (let y = 1.5; y < 19; y += 3) box(hubUpper, [5.8, .3, 5.2], [0, y, 0], trim, .05);
   for (let i = 0; i < 4; i++) box(hubUpper, [.12, 1.2, 4], [-1.8 + i * 1.2, 19.6, 0], solar, .02);
   box(hubUpper, [3, .1, 3], [0, 20.25, 0], futureLight, .03);
@@ -62,10 +62,13 @@ export function surveySites(scene: T.Scene) {
   const tower = site('se'), towerBase = part(tower), towerUpper = part(tower, 18);
   box(towerBase, [9, 1, 9], [0, .9, 0], cream, .25);
   box(towerBase, [8, 16.6, 8], [0, 9.6, 0], sage, .35);
-  for (let y = 4; y < 17; y += 3) { box(towerBase, [8.2, .3, 8.2], [0, y, 0], trim, .05); box(towerBase, [7, 1.3, .08], [0, y + 1.4, 4.03], dark, .03); box(towerBase, [.08, 1.3, 7], [4.03, y + 1.4, 0], dark, .03); }
+  for (let y = 4; y < 17; y += 3) {
+    box(towerBase, [8.2, .3, 8.2], [0, y, 0], trim, .05); box(towerBase, [7, 1.3, .08], [0, y + 1.4, 4.03], glass, .03); box(towerBase, [.08, 1.3, 7], [4.03, y + 1.4, 0], glass, .03);
+    if (y % 6 === 4) { box(towerBase, [7.6, .35, .4], [0, y + .32, 4.25], leaf, .15); box(towerBase, [.4, .35, 7.6], [4.25, y + .32, 0], leaf, .15); }
+  }
   sign(towerBase, kit, '都市集約 / 2127', 0, 2.4, 4.2, 5.5, .8, '#527789');
   box(towerUpper, [6.6, 26, 6.6], [0, 13, 0], cream, .3);
-  for (let y = 2; y < 26; y += 2.6) { box(towerUpper, [5.8, 1.2, .08], [0, y, 3.33], dark, .03); box(towerUpper, [.08, 1.2, 5.8], [3.33, y, 0], dark, .03); }
+  for (let y = 2; y < 26; y += 2.6) { box(towerUpper, [5.8, 1.2, .08], [0, y, 3.33], glass, .03); box(towerUpper, [.08, 1.2, 5.8], [3.33, y, 0], glass, .03); }
   box(towerUpper, [7.2, .5, 7.2], [0, 26.3, 0], trim, .1);
   for (let i = 0; i < 5; i++) box(towerUpper, [.12, 1.3, 5.6], [-2.4 + i * 1.2, 27.2, 0], solar, .02);
 
