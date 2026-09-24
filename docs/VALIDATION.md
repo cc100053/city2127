@@ -1,5 +1,9 @@
 # Validation and handoff
 
+## CI covers survey/ and module-swap/ — 2026-09-24
+
+[Workflow](../.github/workflows/ci.yml) now also runs `npm ci && npm test && npm run build` in `survey/` and `npm ci --prefix app && npm test && npm run build` in `module-swap/` (test includes `check:models`). The npm cache is keyed on all three lockfiles and the timeout is 15 minutes. Local Node 26 runs of both steps passed; [branch CI](https://github.com/cc100053/city2127/actions/runs/35998133060) passed on `398477e` with Node 24, every step green. Not covered: module-swap's `tests/browserSmoke.mjs` (needs Chrome and a dev server). Handoff: [docs-sync-post-mvp](handoffs/docs-sync-post-mvp.md).
+
 ## Causal choice → city MVP — 2026-09-24
 
 Checked commit `391e6fce9f35acf8f4f78e007c59224d50ddda46` on `feat/causal-city-mvp` (Node v26.0.0, macOS). Scope and design: [PROJECT.md](PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--module-swap), handoff [causal-city-mvp](handoffs/causal-city-mvp.md).

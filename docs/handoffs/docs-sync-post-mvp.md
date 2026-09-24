@@ -1,11 +1,11 @@
 # docs-sync-post-mvp — Post-MVP documentation sync and package CI
 
 - Owner: cc100053
-- Status: IN_PROGRESS
+- Status: DONE — merged into `main` with `--no-ff`
 - Branch: `docs/sync-post-mvp`
 - Base commit: `c2d6ebc139ada1122b393848153cd6a791dbcc62`
-- Last verified commit: uncommitted worktree on the base (see validation)
-- Remote availability: NOT PUSHED
+- Last verified commit: `398477e` (branch CI passed); later commits are documentation only
+- Remote availability: `origin/docs/sync-post-mvp`
 - GitHub Issue (optional): none
 
 ## Session Git state
@@ -34,17 +34,17 @@ Fix documentation that still said the question flow, accumulation, persistence a
 
 ## Actual validation results
 
-- Verification status: PARTIAL (remote CI pending)
+- Verification status: PASSED
 - Date and checked commit/worktree: 2026-09-24, uncommitted worktree on `c2d6ebc`, Node v26.0.0, macOS
 - Commands/manual checks and results: the new CI steps run locally: `survey` `npm ci && npm test && npm run build` passed; `module-swap` `npm ci --prefix app && npm test && npm run build` passed (existing >500 kB warning). Root `npm test` (7 PASS lines) and `npm run build` passed. `git diff --check` clean. 150 local Markdown links across root, docs, handoffs and package READMEs resolve (once this handoff exists).
 - Evidence/environment: none beyond command output
 - Integrated commit and checks: NOT INTEGRATED
-- Changes since verification: none
+- Remote: [branch CI](https://github.com/cc100053/city2127/actions/runs/35998133060) passed on `398477e` (Node 24; root, survey, module-swap and whitespace steps all green).
+- Changes since verification: this handoff and the VALIDATION CI entry (documentation only)
 
 ## Known issues and blockers
 
 - CI does not run module-swap's browser smoke test (`tests/browserSmoke.mjs`); it needs Chrome and a dev server.
-- Node 24 on the hosted runner has not yet run the survey `node:sqlite` tests; the branch CI run checks that.
 
 ## Important decisions
 
@@ -53,4 +53,4 @@ Fix documentation that still said the question flow, accumulation, persistence a
 
 ## Next expected step
 
-Push the branch, confirm CI (all three packages) passes, merge `--no-ff` into `main`, push and confirm main CI. Then open a task handoff for extending the causal MVP with a named owner.
+Merged; main CI result is reported in the task conversation to avoid a self-referencing commit. Next: open a task handoff for extending the causal MVP with a named owner.
