@@ -28,7 +28,7 @@ Fix documentation that still said the question flow, accumulation, persistence a
 
 - Replaced "not implemented / documentation-only stage" statements with the MVP's actual state; scoped "no backend or persistence" to the root prototype; corrected the `modelAssets.ts`, BLENDER and CONTRIBUTING claims that no loader or production model exists; fixed the default question file in `survey/README.md`.
 - Reworded AGENTS' authorization sentence: MVP mechanisms are implemented; exhibition questions, exhibition-day reset/recovery, input hardware and root preset changes still need an assigned task.
-- Recorded the user's decisions (2026-09-24): next direction is to extend the causal MVP (more questions, more scenes/areas and objects, visible city change, polished look); whether it moves into the root scene is undecided. The combined `CityState` plan was deleted.
+- Recorded the user's decisions (2026-09-24): next direction is to extend the causal MVP (more questions, more scenes/areas and objects, visible city change, polished look); clarified afterwards: the exhibition city is the root Shibuya scene, which is built and extended first (see [root-scene-direction note in PROJECT.md](../PROJECT.md#current-product-direction--2026-09-18)). The combined `CityState` plan was deleted.
 - VALIDATION: split the exhibition acceptance list into MVP-checked / partly / not checked; moved the 09-23 Blender import subsection out from under the 09-18 Stage 3 heading; moved the misplaced future-tree note in PLAN02 into the current-direction section.
 - CI: added `survey` and `module-swap` install/test/build steps, npm cache keyed on all three lockfiles, timeout 10 → 15 minutes. Root `npm test` itself is unchanged.
 

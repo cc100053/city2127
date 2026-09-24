@@ -60,4 +60,4 @@ See [PROJECT.md](../PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--modul
 
 ## Next expected step
 
-Decided 2026-09-24 (user): extend this MVP — more questions, more scenes/areas and city objects, guests clearly seeing the city change, and a polished look. Whether it moves into the root Shibuya scene is undecided. Needs a new task handoff with a named owner.
+Decided 2026-09-24 (user): extend this MVP — more questions, more scenes/areas and city objects, guests clearly seeing the city change, and a polished look. Clarified the same day: the exhibition city is the root Shibuya scene (`src/`); build and extend that scene first, and connect the survey to it afterwards. Needs a new task handoff with a named owner.

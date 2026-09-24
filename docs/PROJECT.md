@@ -17,7 +17,7 @@ Building count/density and pedestrian activity are candidate dimensions, not a c
 
 The single Shibuya setting and desktop scope remain. Plan 02 and [Pic 2](../asset/pic2.png) provide reusable visual references; the root prototype's three-state model, unchanging buildings and 10-second / 4-second timing are implementation facts, not constraints on the exhibition design. The question sequence, cumulative choices and choice-driven lots live in the causal MVP (next section), outside the root prototype; the root `src/` city, its three presets and `WorldState` are unchanged by it.
 
-**Next direction (user decision, 2026-09-24):** extend the causal MVP — more questions, more scenes/areas and city objects, guests clearly seeing the city change, and a polished look. Visual polish is in scope but serves readable change. Whether the MVP moves into the root `src/` scene is undecided.
+**Next direction (user decision, 2026-09-24):** the exhibition city is the root Shibuya scene (`src/`). Build and extend that scene first — more areas and city objects, visibly changeable city, polished look — and add more questions to the causal MVP. Connecting the survey to the root scene comes after; module-swap's four-lot viewer proves the causal chain but is not the target city. Visual polish is in scope, but it serves readable change rather than replacing it.
 
 ## Causal choice → city MVP — 2026-09-24 (`survey/` + `module-swap/`)
 
