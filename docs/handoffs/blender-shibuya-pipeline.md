@@ -59,3 +59,7 @@ The next agent should follow `docs/BLENDER.md` on their own Mac/Windows host, re
 - Documentation-only checks on this branch: full diff review, `git diff --check` and local Markdown links PASSED. No runtime source or asset changed; npm/browser checks were not rerun for this documentation update.
 - [Documentation branch CI](https://github.com/cc100053/city2127/actions/runs/35834939130) PASSED on `39413f2` (Node 24 install/test/build/whitespace). Integrated as local main merge `bb95905047e475a944f921ae31ac72f7e81fab55`; committed diff whitespace and local Markdown links PASSED. Final handoff note is documentation-only; publication and main CI still to verify.
 - On another collaborator's machine, run the documented local setup and record actual results before claiming that host works.
+
+## Superseded — 2026-09-24
+
+The "no production asset / no Shibuya `.blend`/`.glb` pair" statements above were overtaken the same day by [future-tree-2127](future-tree-2127.md), the first production model placed through this loader. Windows and interactive-GUI checks remain per-machine.

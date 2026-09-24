@@ -69,12 +69,12 @@ Dependency note: `survey/` is a separate npm project whose only runtime dependen
 - Not connected to the Three.js city in any way. `Application verification: NOT INTEGRATED` for the 3D side.
 - Question text and effect values are placeholder data, not exhibition content.
 - Out of scope and unimplemented: production question wording, the finished phone UI, QR onboarding, cloud DB, authentication, the `CityVisualState` mapping, GLB swap rules and deployment.
-- `survey/` is not wired into the root `npm test` / `npm run build`, so CI at the root will not cover it.
+- `survey/` is not wired into the root `npm test` / `npm run build`. (CI has run its tests/build since 2026-09-24.)
 
 ## Important decisions
 
 - The package lands as an independent top-level directory rather than being merged into `src/`, so the existing procedural city keeps working and the diff stays reviewable as a pure addition.
-- `CityState` was split into `CitySurveyState` (survey accumulation, this branch) and `CityLayoutState` (placement, `feat/city-module-swap`). A combined `CityState` that holds both is intentionally **not** created yet; it is to be introduced on `main` after both branches land.
+- `CityState` was split into `CitySurveyState` (survey accumulation, this branch) and `CityLayoutState` (placement, `feat/city-module-swap`). The earlier plan for a combined `CityState` was dropped on 2026-09-24 (user decision): the server-derived `CityView` connects them instead.
 - The survey-side `WorldState` concern (light, traffic, haze and other atmosphere parameters already in `src/presets.ts`) stays separate from `CitySurveyState`; they are not to be merged.
 - The production folder outside this repository is kept; this branch received a copy.
 - The package's own record was moved from `survey/docs/handoffs/` to `survey/docs/log/` (2026-09-24). Only this repository's root `docs/handoffs/` carries task handoffs; a package's internal history is a log. The same rename was applied in the production folder so the next copy does not reintroduce the collision.
@@ -87,4 +87,6 @@ Owner decides whether to open integration into `main`. The package is committed 
 
 Before integration, note that `module-swap/` from the parallel branch `feat/city-module-swap` (`d29b02d4abdef8bdba869702610d318d83d930a1`) stays untracked in a shared worktree until both branches land; that is expected and must not be deleted. Both branches were created from the same base commit and do not conflict.
 
-The combined `CityState` that unifies `CitySurveyState` and `CityLayoutState` is the first task to do on `main` after both branches land.
+## Superseded — 2026-09-24
+
+The causal MVP replaced this package's five placeholder axes, milestones and `toCityViewInput()` with four policy axes, `deriveCityLayout()` and `CityView` (schema 2), and connected it to the `module-swap` viewer. The "not connected to Three.js" and placeholder notes above describe this branch only; see [causal-city-mvp](causal-city-mvp.md) and [PROJECT.md](../PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--module-swap).

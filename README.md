@@ -8,15 +8,17 @@ AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/P
 
 開始前閱讀 [agent 工作規則](AGENTS.md)、[Git 協作流程](docs/CONTRIBUTING.md)、[程式架構](docs/PROJECT.md)及[驗證要求](docs/VALIDATION.md)，再用[交接模板](docs/handoffs/TEMPLATE.md)建立任務文件。程式修改使用短期分支，可自行檢查、合併及推送 main，無須 PR；Blender 素材另有直接提交 main 的流程。如需 Codex 操作 Blender，Mac／Windows 須各自安裝 MCP；素材匯出、驗證及本機設定差異見 [Blender 素材與跨平台交接規範](docs/BLENDER.md)；目前仍未接入外部模型。
 
-[CI workflow](.github/workflows/ci.yml) 已配置於 branch push／可選 PR 時以 Node 24 執行安裝、測試、build 及 diff whitespace 檢查；提交 `2b0e8cc` 嘅 [main CI 已通過](https://github.com/cc100053/city2127/actions/runs/35356530469)，沒有新增部署或 branch protection。詳細狀態見[驗證紀錄](docs/VALIDATION.md)。
+[CI workflow](.github/workflows/ci.yml) 於 branch push／可選 PR 時以 Node 24 執行根目錄、`survey/` 同 `module-swap/` 嘅安裝、測試、build，以及 diff whitespace 檢查（兩個子 package 由 2026-09-24 起納入）；沒有部署或 branch protection。詳細狀態見[驗證紀錄](docs/VALIDATION.md)。
 
-## 展覽目標（2026-09-18 更新，尚未實作）
+## 展覽目標（2026-09-18 定，2026-09-24 更新）
 
 **由觀眾共同塑造一個富有未來感的澀谷。** 城市是展覽中的共同創作結果；視覺設計服務於未來感、澀谷辨識度，以及觀眾能否看懂自己的選擇如何改變城市。精緻模型或紀實照片質感不再是首要目標或完成門檻。
 
 每位 guest 回答一條題目並選擇 option → 城市承接之前的累積結果作出變化 → 該位 guest 體驗完結時即時看見畫面變化 → 下一位 guest 接續下一條題目。城市跨 guest 累積，不因換人自動回到初始狀態；全部題目完成後及每日展覽的重設規則待定。
 
-建築數量／密度、人流等是可能受選擇影響的參數，並非已定案的規則。題目、選項、參數映射、變化幅度、轉場及資料保存方式留待後續設計。今次只對齊文檔，沒有實作題目流程、累積選擇或動態建築。
+建築數量／密度、人流等是可能受選擇影響的參數，並非已定案的規則。下面嘅因果 MVP 已實作一套最小題目流程、跨 guest 累積同由政策推導嘅區畫變化；正式展覽題目、每日重設及輸入裝置仍待定。
+
+**下一步方向（2026-09-24 決定）：** 擴充因果 MVP——更多題目、更多場景／區域同城市物件，令 guest 清楚睇到城市變化，並打磨整體外觀。
 
 ### 因果選擇 MVP（2026-09-24，`survey/` + `module-swap/`）
 

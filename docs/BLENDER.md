@@ -1,6 +1,6 @@
 # Blender asset standards — collaboration Stage 3
 
-These are handoff standards for future assets, not an implemented import pipeline. At the Stage 3 baseline (`f196b2e`), the repository has no tracked `.blend`/`.glb` files; `main.ts` constructs `cityRig` procedurally and has no model loader. Follow [Git coordination](CONTRIBUTING.md) and the [project contract](PROJECT.md). Preserve the exhibition direction: futuristic Shibuya and readable guest-driven changes, not documentary realism as a gate.
+These are manual handoff standards, not an automated import pipeline. At the Stage 3 baseline (`f196b2e`) the repository had no tracked `.blend`/`.glb` files or model loader. Current state (2026-09-24): `src/modelAssets.ts` loads GLBs, the root scene places [future-tree-2127](../asset/models/future-tree-2127/future-tree-2127.glb), and `module-swap/assets/` holds eight lot/building pairs for the causal MVP viewer. Follow [Git coordination](CONTRIBUTING.md) and the [project contract](PROJECT.md). Preserve the exhibition direction: futuristic Shibuya and readable guest-driven changes, not documentary realism as a gate.
 
 ## Codex and Blender connection (2026-09-23)
 
@@ -20,7 +20,7 @@ On **each** Mac/Windows machine: check `codex mcp get blender` before adding a s
 
 Assign one named owner per asset task. Coordinate edits to the same binary before starting. Commit editable `.blend` source and corresponding production `.glb` together; use Git history instead of `final-final` filenames. Do not add LFS, export automation or decoder dependencies incidentally.
 
-For new assets, use `asset/models/<asset-id>/<asset-id>.blend` and `<asset-id>.glb` in the same directory, with lowercase kebab-case IDs. Create directories only when a real asset exists. Keep existing references such as `asset/pic2.png` in place. This source/export location does not automatically make a model available to Vite. The development preview below reads a local file; a production integration must explicitly import/serve its GLB, call `addCityModel(scene, url, [x,y,z], rotationY)` from `src/modelAssets.ts`, and test the production build.
+For new root-scene assets, use `asset/models/<asset-id>/<asset-id>.blend` and `<asset-id>.glb` in the same directory; module-swap assets use `module-swap/assets/<asset-id>/` as the source of truth and `npm run sync:models` to copy the GLB into `module-swap/app/public/assets/models/` (see [module-swap README](../module-swap/README.md)). In both cases, with lowercase kebab-case IDs. Create directories only when a real asset exists. Keep existing references such as `asset/pic2.png` in place. This source/export location does not automatically make a model available to Vite. The development preview below reads a local file; a production integration must explicitly import/serve its GLB, call `addCityModel(scene, url, [x,y,z], rotationY)` from `src/modelAssets.ts`, and test the production build.
 
 Pack needed textures into the source or commit them under that asset directory with relative paths. Linked libraries must also be available from the clone, or made local for the deliverable. Exclude temporary backups and unused working exports from commits without deleting another contributor's files. Record provenance/licence for third-party material, if any; this stage does not authorize an external asset pack.
 
@@ -58,4 +58,4 @@ For a quick scene preview, run `npm run dev -- --port 5173`, open the URL Vite p
 4. If there is no consumer yet, explicitly record `Application verification: NOT INTEGRATED`. A source/export pair may be handed off, but cannot be called application-ready. First loader integration and any coupled model replacement belong on a feature branch. Do not replace a used asset on main until its consumers pass.
 5. In the existing [task handoff](handoffs/TEMPLATE.md), record source/export paths and commit, owner, versions/settings, units/bounds/pivot/facing, runtime consumer or NONE, dependencies/provenance, exported metrics, actual checks/evidence, limitations and next step. No separate asset registry is required.
 
-The original Stage 3 provided manual standards only. The later import channel adds a development preview and reusable loader; no production Shibuya model has been authored or integrated here.
+The original Stage 3 provided manual standards only. The later import channel adds a development preview and reusable loader; the future tree (2026-09-23) is the first production model integrated through it.

@@ -57,6 +57,8 @@ npm run build
 git diff --check
 ```
 
+If `survey/` or `module-swap/` changed, also run `npm test` and `npm run build` inside that package.
+
 Visual or motion changes also require the relevant [browser checks](VALIDATION.md). Documentation-only changes use local Markdown link/fact checks, full diff review and `git diff --check`; they do not require rendering or build reruns. Record actual results and limitations in the handoff, then stage only task files and review the staged diff:
 
 ```sh
@@ -69,7 +71,7 @@ git push -u origin <task-branch>
 
 Use Conventional Commits: `<type>(<scope>): <subject>` with a concise English title and English bullet points in the body. Check the committed task diff too (`git diff --check origin/main...HEAD`); an empty working-tree diff alone does not check committed changes.
 
-Self-review is sufficient; no PR or mandatory external review. The [CI workflow](../.github/workflows/ci.yml) is configured in Stage 2 for branch pushes and optional PRs: Node 24, `npm ci`, `npm test`, `npm run build` and diff whitespace checks. Remote execution passed on `2b0e8cc` ([run](https://github.com/cc100053/city2127/actions/runs/35356530469)). Require successful checks on the current task-branch commit before merging, and verify main's checks after pushing. Do not describe a configured workflow as a passing run. No branch protection or deployment is configured.
+Self-review is sufficient; no PR or mandatory external review. The [CI workflow](../.github/workflows/ci.yml) (Stage 2) runs on branch pushes and optional PRs: Node 24, install/test/build for the root and, since 2026-09-24, `survey/` and `module-swap/`, plus diff whitespace checks. Require successful checks on the current task-branch commit before merging, and verify main's checks after pushing. Do not describe a configured workflow as a passing run. No branch protection or deployment is configured.
 
 ## Concurrent integration
 
@@ -104,4 +106,4 @@ The asset-only exception allows Blender-related asset files on main. Confirm the
 3. Before committing, fetch and synchronize main again. If local asset edits prevent synchronization, preserve them and coordinate a safe save outside the checkout before retrying; do not discard them. Inspect concurrent asset changes and agree on the intended version rather than choosing a binary merge side blindly. Revalidate against the synchronized result.
 4. Review and commit only the asset files and their directly related documentation/handoff. Recheck remote main before pushing using the concurrent-integration procedure above; integrate and revalidate if it advances. Never force-push, never overwrite another contributor's binary asset and never choose a conflict side automatically.
 
-This exception does not cover unrelated TypeScript integration changes. If an asset requires code integration, use a feature branch for the code and any coupled asset replacement needed to keep main working. Follow the [Blender export and optimization standards](BLENDER.md) introduced in Stage 3. They define manual source/export handoff; no automated asset pipeline or runtime loader is introduced.
+This exception does not cover unrelated TypeScript integration changes. If an asset requires code integration, use a feature branch for the code and any coupled asset replacement needed to keep main working. Follow the [Blender export and optimization standards](BLENDER.md) introduced in Stage 3. They define manual source/export handoff; there is no automated asset pipeline. The runtime loader is `src/modelAssets.ts` (root scene); module-swap has its own loader and `sync:models` step.

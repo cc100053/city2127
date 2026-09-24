@@ -36,3 +36,7 @@ Stage 3 means the previously deferred manual standards. No export automation or 
 ## Next expected step
 
 Publication checkpoint: push main with this documentation-only evidence update and verify the resulting CI; final run result is reported in the task conversation to avoid a self-referencing commit loop. Future work: assign a real asset and its first application consumer, then exercise the manual recipe. No asset integration is included in Stage 3.
+
+## Superseded — 2026-09-24
+
+The future work named above happened: [future-tree-2127](future-tree-2127.md) is the first real asset and runtime consumer.

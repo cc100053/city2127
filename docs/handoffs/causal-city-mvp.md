@@ -48,7 +48,7 @@ See [PROJECT.md](../PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--modul
 - Guests are assumed sequential: a guest who arrives while another holds a reservation is allocated from the current scores (often a fallback question).
 - Decision text in the history comes from the current question JSON; stored effects remain authoritative for scores.
 - Slot meanings are conveyed by labels on generic `building-basic-*` / lot GLBs; no bespoke automation or tower assets.
-- The viewer is module-swap's separate Vite app, not the root Shibuya scene. Root CI covers neither `survey/` nor `module-swap/`.
+- The viewer is module-swap's separate Vite app, not the root Shibuya scene. (Root CI did not cover `survey/` or `module-swap/` at integration; added 2026-09-24.)
 - Only five MVP questions; the full exhibition catalogue, reset policy for exhibition days and LAN/phone checks remain undesigned or unverified.
 
 ## Important decisions
@@ -60,4 +60,4 @@ See [PROJECT.md](../PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--modul
 
 ## Next expected step
 
-Decide whether the next step is exhibition question content or bringing the derived layout into the root Shibuya scene.
+Decided 2026-09-24 (user): extend this MVP — more questions, more scenes/areas and city objects, guests clearly seeing the city change, and a polished look. Whether it moves into the root Shibuya scene is undecided. Needs a new task handoff with a named owner.

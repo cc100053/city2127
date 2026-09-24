@@ -1,14 +1,15 @@
 # AI agent workflow
 
-This repository is **2127 — Frozen Intersection**, an exhibition project for collectively shaping a futuristic Shibuya, currently implemented as a procedural Three.js prototype. Read [README.md](README.md), then [docs/PROJECT.md](docs/PROJECT.md) before changing behavior. Use [docs/VALIDATION.md](docs/VALIDATION.md) to verify changes and hand off work.
+This repository is **2127 — Frozen Intersection**, an exhibition project for collectively shaping a futuristic Shibuya. It holds the root procedural Three.js Shibuya prototype (`src/`) and the causal choice → city MVP (`survey/` server + `module-swap/` viewer). Read [README.md](README.md), then [docs/PROJECT.md](docs/PROJECT.md) before changing behavior. Use [docs/VALIDATION.md](docs/VALIDATION.md) to verify changes and hand off work.
 
 ## Working agreement
 
 - Reply to the user in Traditional Chinese; natural Cantonese is welcome. Keep existing English/Japanese product copy unless localization is requested.
 - Desktop presentation only: responsive/mobile adaptation is not required (user decision, 2026-09-17). Do not add responsive layouts, adaptive camera framing or mobile acceptance checks unless explicitly requested. Keep ordinary renderer resize handling.
 - Follow the latest user request. Version 2 explicitly allows pedestrians, cars, drones and aerial routes; the original “no characters/NPCs” restriction is superseded for these ambient actors.
-- Current product direction (2026-09-18): guests collectively shape a futuristic Shibuya at an exhibition. Each guest answers one question; the next guest continues with the next question. City changes accumulate across guests, and each guest sees the visual change immediately when their experience ends. Reset rules are undecided. Prioritize future identity, readable choice effects and continuity over a beautiful model or documentary realism.
-- Preserve the single Shibuya setting and desktop presentation scope. Plan 02 architecture, daylight and asset/pic2.png remain visual references, not the product's primary acceptance gate. Three presets, fixed building geometry and 10-second transitions / 4-second holds describe the current prototype only; they must not prohibit future choice-driven building counts or density. Parameter mappings, timing, question content, persistence and reset mechanisms require later design; none is implemented or authorized for code changes by the documentation alignment stage. Keep current code behavior until a replacement task is explicitly assigned.
+- Current product direction (2026-09-18): guests collectively shape a futuristic Shibuya at an exhibition. Each guest answers one question; the next guest continues with the next question. City changes accumulate across guests, and each guest sees the visual change immediately when their experience ends. Prioritize future identity, readable choice effects and continuity over documentary realism.
+- Next direction (user decision, 2026-09-24): extend the causal MVP — more questions, more scenes/areas and city objects, guests clearly seeing the city change, and a polished look. Visual polish is now in scope, but it serves readable change rather than replacing it. Whether the MVP moves into the root `src/` scene is undecided.
+- Preserve the single Shibuya setting and desktop presentation scope. Plan 02 architecture, daylight and asset/pic2.png remain visual references, not the product's primary acceptance gate. Three presets, fixed building geometry and 10-second transitions / 4-second holds describe the current prototype only; they must not prohibit future choice-driven building counts or density. The causal MVP implements its own question JSON, policy → layout mapping (`deriveCityLayout`), SQLite persistence and admin reset; these are MVP mechanisms, not final exhibition rules. Exhibition question content, exhibition-day reset/recovery policy, input hardware and changes to the root `src/` presets still need an explicitly assigned task. Keep existing behavior outside an assigned scope.
 - Trace the changed code and its callers before editing. Reuse existing factories, materials and instancing; prefer Three.js/native features over new dependencies.
 - Make the smallest complete change. Avoid speculative abstractions, broad formatting rewrites, extra frameworks or infrastructure. Document a deliberate shortcut with a `ponytail:` comment only when it has a real limitation.
 - Work in this task. Do not spawn agents unless the user or applicable instructions explicitly request delegation.
@@ -42,7 +43,7 @@ Starting a new task requires a clean working tree and an up-to-date `main`; resu
 
 Finish:
 
-1. Complete implementation and relevant checks. Add a small runnable check for nontrivial logic. Code changes require `npm test`, `npm run build` and `git diff --check`; visual/motion changes also require relevant [browser checks](docs/VALIDATION.md). Documentation-only changes need link/fact checks, not rendering tests.
+1. Complete implementation and relevant checks. Add a small runnable check for nontrivial logic. Code changes require `npm test`, `npm run build` and `git diff --check` (in each changed package: root, `survey/`, `module-swap/`); visual/motion changes also require relevant [browser checks](docs/VALIDATION.md). Documentation-only changes need link/fact checks, not rendering tests.
 2. Self-review the exact diff, including new files.
 3. Apply the documentation sync rules below and update the task handoff.
 4. Record actual validation results, verified commit, unresolved issues and next step. Separate implementation completion from verification; never claim unmeasured FPS or an untested platform.
@@ -82,9 +83,14 @@ npm run dev -- --port 5173    # loopback-only preview; use the URL Vite actually
 npm test                     # state timing + mobility/route checks
 npm run build                # strict source typecheck + production build
 git diff --check             # whitespace in uncommitted changes
+
+cd survey && npm ci && npm test && npm run build                  # survey server package
+cd module-swap && npm run install:app && npm test && npm run build  # viewer (test also runs check:models)
 ```
 
-Reuse a running preview if it belongs to this project. If the port is occupied, inspect it or use another port; do not kill unrelated processes. Edit source, not `dist/` or `node_modules/`. There is no configured lint command or deployment workflow. [CI](.github/workflows/ci.yml) uses Node 24 on branch pushes and optional PRs; remote execution passed on `2b0e8cc` (see validation evidence). See [validation](docs/VALIDATION.md) for the committed-diff check and activation status.
+`survey/` and `module-swap/` are separate npm projects; root `npm test`/`build` does not cover them. Run their checks when they change.
+
+Reuse a running preview if it belongs to this project. If the port is occupied, inspect it or use another port; do not kill unrelated processes. Edit source, not `dist/` or `node_modules/`. There is no configured lint command or deployment workflow. [CI](.github/workflows/ci.yml) uses Node 24 on branch pushes and optional PRs and runs install/test/build for the root, `survey/` and `module-swap/` (since 2026-09-24), plus the diff whitespace check. See [validation](docs/VALIDATION.md) for the committed-diff check and activation status.
 
 ## CodeGraph
 

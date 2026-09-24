@@ -6,7 +6,7 @@ Checked commit `391e6fce9f35acf8f4f78e007c59224d50ddda46` on `feat/causal-city-m
 
 - `survey/`: `npm ci`; `npm test` — 10 suites passed (question/trigger validation, score clamping, derived layout thresholds and accumulation, answer service, sessions, 8-thread concurrency, persistence incl. schema 1 → 2 migration, HTTP reset, WebSocket view payloads, three-guest causal flow with branching, restart and reset); `npm run build` succeeded.
 - `module-swap/`: `npm run install:app`; `npm test` — `check:models` plus 13 node tests passed (incl. survey view parsing, stale-revision guard, lot labels); `npm run build` succeeded with the existing >500 kB chunk warning.
-- Root: `npm test` (7 suites) and `npm run build` passed; `git diff --check` clean. Root CI does not run `survey/` or `module-swap/`.
+- Root: `npm test` (7 suites) and `npm run build` passed; `git diff --check` clean. Root CI did not run `survey/` or `module-swap/` at that time (added to CI on 2026-09-24, see below).
 - Browser: headless Chrome 154 (SwiftShader WebGL), 1600×1000, survey server on a scratch SQLite DB, viewer `http://127.0.0.1:5173/?survey`, driven over CDP. The three guests were submitted through the same HTTP API the guest page uses (`/guest` was not clicked). Baseline showed four empty lots; guest 1 `automate-services` → NW medium; guest 2 was assigned `automation-street-decline` → SW plaza, NW kept; guest 3 was assigned `commons-land-pressure` → SE tall, NW and SW kept. Page reload rebuilt the identical layout, panel and labels; admin reset returned to the baseline with an empty history. Every slot had exactly one lot and ≤1 building attachment with exact final transforms, each GLB was requested once, and the console had no errors or exceptions. The standalone `tests/browserSmoke.mjs` self-test (no `?survey`) also passed with no runtime errors.
 - Visual finding fixed before the checked commit: at module-swap's default camera the SE tall tower hid the NW hub; survey mode now uses a higher fixed camera `(-38,105,88)`.
 - Evidence: `artifacts/causal-mvp-0-baseline.png`, `-1-automation.png`, `-2-commons.png`, `-3-vertical.png`, `-4-reset.png`.
@@ -17,18 +17,17 @@ Checked commit `391e6fce9f35acf8f4f78e007c59224d50ddda46` on `feat/causal-city-m
 
 Blender 5.2.2 via MCP exported `asset/models/future-tree-2127/future-tree-2127.blend` and `.glb`. Empty-scene reimport found 25 meshes, 4 materials, 2,384 triangles and Blender XYZ bounds `[-2.748,2.755] × [-2.555,2.703] × [0.005,6.33]`; the GLB is 79,700 bytes. The initial export accidentally included Blender's default cube; it was removed and the reimport check repeated. The production Vite build emitted the GLB asset. `npm test`, `npm run build` and `git diff --check` passed; the existing bundle size warning remains. At 1280×720 in the in-app browser, the tree was visible near Hachiko plaza in Daylight, Pulse transition and Still transition; the browser error log was empty. Full motion cycles and 1080p FPS were not measured for this change.
 
+## Exhibition acceptance direction — 2026-09-18, updated 2026-09-24
 
-## Exhibition acceptance direction — 2026-09-18 (not yet implemented or tested)
+The current product goal is collective guest-driven change in a futuristic Shibuya. Documentary-photograph realism is no longer a completion gate. Status of each experience requirement:
 
-The current product goal is collective guest-driven change in a futuristic Shibuya. Documentary-photograph realism is no longer a completion gate. Future implementation stages should turn the following experience requirements into concrete checks after question content and change rules are agreed:
+- Each guest answers one question; the next guest receives the next question. **MVP-checked** (survey allocation tests and the three-guest browser run above; the next question depends on accumulated scores).
+- Each choice acts on the accumulated city; a guest handoff keeps earlier contributions. **MVP-checked** (`causalFlow` test and browser run: NW, SW and SE all remain).
+- At the end of their experience, the guest immediately sees a discernible visual consequence. **Partly checked**: the viewer animates the changed lot and labels it; the experience-end trigger and timing are not designed.
+- Reload recovery and reset. **MVP-checked** for server restart, viewer reload and admin reset; exhibition-day reset policy and end-of-questions handling have no acceptance rule yet.
+- The shared city remains recognizably futuristic Shibuya as it changes. **Not checked**: the MVP viewer is a generic four-lot module-swap scene, not the Shibuya scene.
 
-- Each guest answers one question; the next guest receives the next question.
-- Each choice acts on the accumulated city. A guest handoff retains previous contributions rather than restoring a preset or initial city.
-- At the end of their experience, the guest immediately sees a discernible visual consequence of their choice. Exact timing, animation duration and the experience-end trigger remain to be designed.
-- The shared city remains recognizably futuristic Shibuya as it changes. Building count/density and pedestrian activity are candidate effects, not mandatory implemented parameters.
-- Reset behavior, end-of-question handling, reload recovery and storage have no acceptance rules yet; define them before implementing or claiming exhibition readiness.
-
-The existing tests and captures below verify the three-preset prototype only. They do not establish a question sequence, cross-guest accumulation, dynamic buildings or exhibition readiness. The old invariant that buildings never change applies to current preset regression checks, not to future choice-driven geometry. New checks require the approved implementation scope; this documentation stage does not authorize them.
+The root-prototype tests and captures below verify the three-preset Shibuya scene only. Its invariant that buildings never change applies to preset regression checks, not to choice-driven geometry. Extending the MVP (more questions, scenes and objects, visual polish; 2026-09-24 direction) needs new checks for each added mapping and a browser check that each change is readable.
 
 ## Documentation alignment — 2026-09-18
 
@@ -54,17 +53,17 @@ At initial local handoff, remote GitHub Actions execution, Node 24 execution and
 
 ## Blender standards — collaboration Stage 3, 2026-09-18
 
-### Blender import channel — 2026-09-23
-
-On branch `codex/blender-shibuya-pipeline`, Codex registered the official Blender Lab MCP server from revision `ff54e4d8f6b09502f2f466189cca0e52b4a91643` and installed/enabled its add-on in Blender 5.2.2. A temporary background Blender process with `--online-mode` answered a read-only MCP scene-summary call; the server exposed 26 tools. After the user explicitly approved the persistent setting, a fresh Blender process without `--online-mode` reported Online Access saved and the add-on enabled; a second read-only scene-summary call succeeded through that process. This does not verify the interactive Blender GUI or any Windows workstation. Codex desktop may need a new task or restart to discover the newly registered server. Each collaborator must perform the [per-machine setup and live call check](BLENDER.md) locally; keep the add-on socket on localhost. The earlier automatic review rejection occurred before the user's explicit approval and did not change the setting.
-
-The development-only `?asset-preview` route loaded a cube GLB exported by Blender 5.2.2 into the running Shibuya scene; the file input reported it loaded and the browser console showed no error. The cube and export script were temporary, not committed. `npm test`, `npm run build` and `git diff --check` passed after the loader change; the existing bundle-size warning remains. No production Shibuya model or placement has been chosen, so production asset integration and its visual/performance checks remain NOT RUN.
-
 [BLENDER.md](BLENDER.md) defines source/export reproducibility, coordinate/material contracts, optimization evidence and asset-consumer checks. Asset authors record these in the existing task handoff. Source/export validation and application validation are separate; use NOT INTEGRATED when no consumer exists. Current CI runs code tests/build and whitespace only; it does not open Blender, inspect GLBs or verify asset appearance.
 
 This stage changes documentation only. At base `f196b2e`, no tracked Blender/glTF model or application model-loader reference was found. Local verification covers the complete diff, local Markdown links, consistency with `main.ts` → `cityRig`, and preservation of source/tests/assets/dependencies. Blender export/reimport, browser checks and performance measurements are NOT RUN because no asset or runtime behavior changed. [Stage 3 handoff](handoffs/stage3-blender-standards.md) records publication and verification status.
 
 Stage 3 integration evidence: branch `efe20cd` passed [Node 24 CI](https://github.com/cc100053/city2127/actions/runs/35357826479). The first branch run exposed unrelated historical whitespace because Stage 2 compared new branches with an empty tree; the corrected workflow uses the main merge base, with eight local Git cases passing. Local `npm test` and `npm run build` passed on merge `ea69b1a` (Node 26, existing >500 kB bundle warning). This is code/CI evidence, not model validation.
+
+## Blender import channel — 2026-09-23
+
+On branch `codex/blender-shibuya-pipeline`, Codex registered the official Blender Lab MCP server from revision `ff54e4d8f6b09502f2f466189cca0e52b4a91643` and installed/enabled its add-on in Blender 5.2.2. A temporary background Blender process with `--online-mode` answered a read-only MCP scene-summary call; the server exposed 26 tools. After the user explicitly approved the persistent setting, a fresh Blender process without `--online-mode` reported Online Access saved and the add-on enabled; a second read-only scene-summary call succeeded through that process. This does not verify the interactive Blender GUI or any Windows workstation. Codex desktop may need a new task or restart to discover the newly registered server. Each collaborator must perform the [per-machine setup and live call check](BLENDER.md) locally; keep the add-on socket on localhost. The earlier automatic review rejection occurred before the user's explicit approval and did not change the setting.
+
+The development-only `?asset-preview` route loaded a cube GLB exported by Blender 5.2.2 into the running Shibuya scene; the file input reported it loaded and the browser console showed no error. The cube and export script were temporary, not committed. `npm test`, `npm run build` and `git diff --check` passed after the loader change; the existing bundle-size warning remains. No production Shibuya model or placement has been chosen, so production asset integration and its visual/performance checks remain NOT RUN. (Superseded later on 2026-09-23: the future tree is the first production model; see its section above.)
 
 ## Automated checks for the current prototype
 
@@ -74,6 +73,8 @@ For executable changes, run from the project root:
 npm test
 npm run build
 ```
+
+For `survey/` or `module-swap/` changes, run `npm test` and `npm run build` in that package too (`module-swap` test first runs `check:models`). CI runs all three packages.
 
 Tests use `node:assert/strict` and Node's TypeScript stripping; keep new checks small and focused. `tsc` currently checks `src/`, while Node executes the test files. There is no separate lint/format command.
 
