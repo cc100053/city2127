@@ -49,7 +49,7 @@ Everything static goes through the `bake()` material merge. Detail costs vertice
 
 - Daylight is the base state. Glass reflects the environment map instead of glowing.
 - Light direction: a warm, fairly low sun (about 40°) casts long shadows across the crossing, and a weaker cool sky fill keeps shade blue-grey rather than black. Form comes from light/shadow contrast, not from darker paint. Neutral tone mapping keeps the pale palette from greying out. Expensive means soft: VSM penumbrae, broad corner AO, sunlit whites kept just below clipping, a faint highlight glow and a light vignette. AgX and a sky-colour environment map were tried and rejected, because both left the scene flat and grey.
-- Emissive light carries information: civic mint marks public service paths, and saffron marks guest changes. Windows and signs follow the WorldState presets.
+- Emissive light carries information: civic mint marks public service paths, and saffron marks guest changes. Windows and signs follow the WorldState presets and come on after dark (day cycle, 2026-09-25): at night the city reads through lit windows, lamps and mint lines against a navy sky.
 - The post chain is MSAA render target → GTAO contact shadows → bloom (low) → vignette → output. Contact shadows ground the objects where they meet the floor. Measure on a real GPU before adding more passes.
 
 ## 6. Signage and ambient data
