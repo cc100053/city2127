@@ -21,7 +21,7 @@ The single Shibuya setting and desktop scope remain. Plan 02 and [Pic 2](../asse
 
 ## Causal choice → city MVP — 2026-09-24 (`survey/` + `module-swap/`)
 
-Implemented on `feat/causal-city-mvp`; handoff [causal-city-mvp](handoffs/causal-city-mvp.md). It proves one short causal history, not the exhibition question catalogue.
+Implemented on `feat/causal-city-mvp` and integrated into `main` at `6f6fbb2` (2026-09-24); handoff [causal-city-mvp](handoffs/causal-city-mvp.md). It proves one short causal history, not the exhibition question catalogue.
 
 Dependency direction (never reversed; Three.js cannot change policy or question eligibility):
 
@@ -43,7 +43,7 @@ question (scenario metadata + trigger) → guest choice → append-only answer_e
   | SE | urbanConcentration | ≥1 medium, ≥2 tall building | 中層複合ビル / 高層集約タワー |
 
   All-zero (or negative) scores give four empty lots with no buildings (the survey baseline). The standalone module-swap default layout is unchanged.
-- **Viewer**: `module-swap/app` with `?survey` (default `ws://<host>:8787/ws`, or `?survey=<ws url>`). Every WebSocket (re)connect starts with a full `city-state-snapshot` carrying the `CityView`, so reload/reconnect rebuilds the city from the server; `city-state-updated` / `run-reset` carry the next view. The viewer validates the layout with `validateCityLayout`, ignores older/repeated revisions of the same run (`supersedes`), and applies changes with `ModuleManager.transitionTo()`, which animates only changed slots. Survey mode never reads localStorage, hides the debug panel, uses a higher fixed camera `(-38,105,88)` so a tall SE tower does not hide NW, shows a CHOICE / POLICY / CITY EFFECT panel with the run history, and labels each occupied lot (CSS2DRenderer).
+- **Viewer**: `module-swap/app` with `?survey` (default `ws://<host>:8787/ws`, or `?survey=<ws url>`; a value that is not a `ws://` / `wss://` URL, e.g. `?survey=1`, uses the default). Every WebSocket (re)connect starts with a full `city-state-snapshot` carrying the `CityView`, so reload/reconnect rebuilds the city from the server; `city-state-updated` / `run-reset` carry the next view. The viewer validates the layout with `validateCityLayout`, ignores older/repeated revisions of the same run (`supersedes`), and applies changes with `ModuleManager.transitionTo()`, which animates only changed slots. Survey mode never reads localStorage, hides the debug panel, uses a higher fixed camera `(-38,105,88)` so a tall SE tower does not hide NW, shows a CHOICE / POLICY / CITY EFFECT panel with the run history, and labels each occupied lot (CSS2DRenderer).
 - **Reset**: admin `RESET` starts a new zero run → empty history → baseline layout; earlier runs' events stay in SQLite.
 
 Exact demo: guest 1 `labour-shortage` → `automate-services` (automation +2, NW medium); guest 2 receives `automation-street-decline` (trigger automation ≥2) → `public-commons` (publicSharing +2, SW plaza); guest 3 receives `commons-land-pressure` (trigger publicSharing ≥2) → `build-upward` (urbanConcentration +2, SE tall). All three remain visible together.

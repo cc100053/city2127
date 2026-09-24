@@ -55,7 +55,7 @@ npm run preview
 
 ## `?survey`モード（因果MVP、2026-09-24）
 
-`survey/`サーバー（既定`127.0.0.1:8787`）を起動してから、ViteのURLに`?survey`（または`?survey=ws://host:port/ws`）を付けて開きます。
+`survey/`サーバー（既定`127.0.0.1:8787`）を起動してから、ViteのURLに`?survey`（または`?survey=ws://host:port/ws`）を付けて開きます。`ws://`／`wss://`で始まらない値（例：`?survey=1`）は既定URLになります。
 
 - 配置はサーバーの`CityView.layout`だけから決まり、localStorageは読みません。接続・再接続のたびに全体スナップショットで再構築します。
 - 新しいrevisionだけを`ModuleManager.transitionTo()`で適用し、変わった区画だけをアニメーションします。

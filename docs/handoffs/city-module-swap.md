@@ -89,6 +89,8 @@ Dependency note: `module-swap/app` is a separate npm project. The root `tsconfig
 
 Integrated. `module-swap/` now lives on `main` as of merge commit `9a627988247362d5dd9f7e7a17c73a9c24185320`; the task branch `feat/city-module-swap` can be deleted once the merge is published.
 
+Update 2026-09-24 (causal-city-mvp owner): item 1 is done — `feat/survey-state-mvp` reached `main` through `feat/causal-city-mvp` (merge `6f6fbb2`); both branches and `feat/city-module-swap` are deleted on origin. Items 2–4 remain open.
+
 What is left, in the order it makes sense:
 
 1. Integrate `feat/survey-state-mvp` (`2d4d7d5681ef1bd4e0d5e71ec7a3ad8aff4c9643`), which was cut from the same base and which `git merge-tree` reports as conflict-free against this work.
