@@ -11,7 +11,9 @@ for(let t=0;t<90;t+=.05){
 // Walking direction reverses on the next cycle without teleporting across the road.
 for(let i=0;i<24;i++)assert.ok(Math.abs(streetMotion(29.999,i,true).position-streetMotion(30,i,true).position)<.001);
 // Thin-wing aircraft (4.4m span) clear fixed buildings and sky gardens.
-const buildings=landmarks.map((b,i)=>({...b,w:b.w+(i===0?.4:.8),d:b.d+(i===0?.6:3.6),h:b.h+2.3}));
+// Roof allowances: MAGNET PV fins, Center-gai ring crown and mast, the station's glass vault.
+const roof:Record<string,number>={'CENTER-GAI':3.8,'SHIBUYA STATION':4.2};
+const buildings=landmarks.map((b,i)=>({...b,w:b.w+(i===0?.4:.8),d:b.d+(i===0?.6:3.6),h:b.h+(roof[b.name]??2.3)}));
 for(const route of airRoutes())for(let i=0;i<=500;i++){
   const p=route.getPointAt(i/500);
   assert.ok(Number.isFinite(p.x+p.y+p.z));

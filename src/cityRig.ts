@@ -47,15 +47,31 @@ export function bake(root:T.Object3D) {
 }
 type WindowSlot = { object:T.Object3D; phase:number; occupancy:number };
 export type Kit = { windows:WindowSlot[]; signs:T.MeshStandardMaterial[]; random:()=>number };
+/** Calls `face` for each side (0 +Z, 1 +X, 2 -Z, 3 -X) in a group turned so that side is local +Z: `across` is its width, `out` its distance from the centre. */
+export function faces(parent:T.Object3D, w:number, d:number, face:(g:T.Group,across:number,out:number,side:number)=>void, sides=[0,1,2,3]) {
+  for(const side of sides){const g=new T.Group();g.rotation.y=side*Math.PI/2;parent.add(g);face(g,side%2?d:w,side%2?w/2:d/2,side);}
+}
+/** Lit window slots with a sun-shade fin per floor on all four faces. */
 function windows(group:T.Group, kit:Kit, width:number, height:number, depth:number) {
-  for (let floor=0;floor<Math.floor((height-3)/2.1);floor++) for (let side=0;side<2;side++) for(let col=0;col<Math.floor(width/1.8);col++) {
-    const obj = new T.Object3D();
-    const u = (col-(Math.floor(width/1.8)-1)/2)*1.8;
-    obj.position.set(side === 0 ? u : width/2+.025, 3.2+floor*2.1, side === 0 ? depth/2+.025 : u);
-    obj.rotation.y = side===0 ? 0 : Math.PI/2;
-    obj.scale.set(1.13,1.3,.09); group.add(obj);
-    kit.windows.push({object:obj,phase:floor*.75+col*.28,occupancy:kit.random()});
-    if(col===0)box(group,side===0?[width-.4,.1,.55]:[.55,.1,depth-.4],side===0?[0,3.2+floor*2.1+.85,depth/2+.2]:[width/2+.2,3.2+floor*2.1+.85,0],trim,.03);
+  for (let floor=0;floor<Math.floor((height-3)/2.1);floor++) faces(group,width,depth,(face,across,out)=>{
+    const cols=Math.floor(across/1.8),y=3.2+floor*2.1;
+    for(let col=0;col<cols;col++){
+      const obj=new T.Object3D();obj.position.set((col-(cols-1)/2)*1.8,y,out+.025);obj.scale.set(1.13,1.3,.09);face.add(obj);
+      kit.windows.push({object:obj,phase:floor*.75+col*.28,occupancy:kit.random()});
+    }
+    box(face,[across-.4,.1,.55],[0,y+.85,out+.2],trim,.03);
+  });
+}
+/** Glazed floor bands on all four faces of a W×D block centred at (x,z): slab, glass band, mullions and sun-shade per floor. */
+function bands(g:T.Group, w:number, d:number, x:number, z:number, y0:number, y1:number, step=3.5, mullion=1.4) {
+  const at=new T.Group();at.position.set(x,0,z);g.add(at);
+  for(let y=y0;y<y1;y+=step){
+    box(at,[w+.2,.34,d+.2],[0,y,0],trim);
+    faces(at,w,d,(f,across,out)=>{
+      box(f,[across-.8,1.3,.08],[0,y+1.2,out+.03],glass);
+      box(f,[across-.6,.1,.5],[0,y+2,out+.2],trim,.03);
+      for(let u=-across/2+1;u<across/2;u+=mullion)box(f,[.06,1.5,.18],[u,y+1.2,out+.1],trim);
+    });
   }
 }
 export function sign(group:T.Group, kit:Kit, text:string, x:number,y:number,z:number,w:number,h:number,bg:string,fg='#eff3d3') {
@@ -88,21 +104,18 @@ export function tower(kit:Kit) {
   box(g,[11.9,.4,10.8],[.5,58.05,0],cream,.12);
   // Thin dark photovoltaic fins contrast with the warm ceramic mass.
   for(let i=0;i<5;i++)box(g,[.12,1.15,7.8],[-3.4+i*1.9,58.75,0],solar,.025);
+  // Glazed ribbons and lit slots on all four faces; above the collar the east/west faces are the full-height side frames.
+  const ribbons=new T.Group();ribbons.position.x=.5;g.add(ribbons);
   for(const y of [22,26,30,34,38,42,46,50,54]){
-    const [fz,fx]=y<33?[6.25,7.55]:[4.75,5.85];
-    box(g,[7.7,.65,.1],[.5,y,fz],glass,.03);
-    box(g,[.1,.65,7.7],[fx,y,0],glass,.03);
-    box(g,[8.1,.1,.5],[.5,y+.55,fz+.18],trim,.03);
-    box(g,[.5,.1,8.1],[fx+.18,y+.55,0],trim,.03);
-    for(let i=0;i<4;i++)for(let side=0;side<2;side++){
-      const slot=new T.Object3D();slot.position.set(side?fx+.07:-2.3+i*1.9,y,side?-2.9+i*1.9:fz+.07);
-      slot.rotation.y=side?Math.PI/2:0;slot.scale.set(1.5,.42,.06);g.add(slot);
-      kit.windows.push({object:slot,phase:i*.4,occupancy:kit.random()});
-    }
-  }
-  for(let y=34.2;y<57;y+=2.4){
-    box(g,[.09,1.35,8],[5.84,y,0],glass);
-    for(let z=-3.5;z<=3.5;z+=1.4)box(g,[.18,1.5,.1],[5.93,y,z],trim);
+    const [w,d]=y<33?[14,12.4]:[11.36,9.4];
+    faces(ribbons,w,d,(f,_across,out)=>{
+      box(f,[7.7,.65,.1],[0,y,out+.05],glass,.03);
+      box(f,[8.1,.1,.5],[0,y+.55,out+.23],trim,.03);
+      for(let i=0;i<4;i++){
+        const slot=new T.Object3D();slot.position.set(-2.85+i*1.9,y,out+.12);slot.scale.set(1.5,.42,.06);f.add(slot);
+        kit.windows.push({object:slot,phase:i*.4,occupancy:kit.random()});
+      }
+    });
   }
   // Split apron leaves a real cargo-elevator opening between its two halves.
   for(const x of [-2.25,2.25]){
@@ -136,44 +149,73 @@ function mediaDrum(g:T.Group, kit:Kit, face:number) {
   for(const y of [y0-.3,y0+height])arc(g,radius-.5,radius+.15,.3,[0,y,cz],trim,-Math.PI/2-half-.03,half*2+.06);
   for(const x of [-1,1])box(g,[.28,height+1.2,.5],[x*(chord/2+.1),y0+height/2,face+.1],trim,.12);
 }
-export function shop(kit:Kit,x:number,z:number,w:number,h:number,d:number,color:T.Material,label:string) {
+export type ShopStyle='slender'|'terrace'|'hall';
+/** Street block: shared ground floor and public void, then one of three upper typologies so no two blocks read alike. */
+export function shop(kit:Kit,x:number,z:number,w:number,h:number,d:number,color:T.Material,label:string,style:ShopStyle) {
   const g=new T.Group();g.name=`shop-${label}`;g.position.set(x,0,z);
   box(g,[w+.5,.6,d+.5],[0,.6,0],cream,.25);
   box(g,[w,4,d],[0,2.8,0],color);
-  // A full-width public void is held by side cores, with housing above.
-  for(const x of [-w/2+.5,w/2-.5])for(const z of [-d/2+.5,d/2-.5])box(g,[1,5.5,1],[x,7.5,z],trim);
-  if(h>12)box(g,[w,h-10,d],[0,(h-10)/2+10.8,0],color);
-  box(g,[w+.7,.3,d+.7],[0,10.5,0],trim);
-  for(let y=13;y<h;y+=3.5){
-    box(g,[w+.2,.34,d+.2],[0,y,0],trim);
-    box(g,[w-.6,.1,.5],[0,y+2,d/2+.2],trim,.03);
-    box(g,[w-.8,1.3,.08],[0,y+1.2,d/2+.03],glass);
-    for(let x=-w/2+1;x<w/2;x+=1.4)box(g,[.06,1.5,.18],[x,y+1.2,d/2+.1],trim);
-    // East face glazing and alternate planted slabs: every visible face carries floors, not a blank wall.
-    box(g,[.08,1.3,d-.8],[w/2+.03,y+1.2,0],glass);box(g,[.5,.1,d-.6],[w/2+.2,y+2,0],trim,.03);
-    if((y-13)%7===0)box(g,[w-.4,.4,.45],[0,y+.37,d/2+.28],leaf,.18);
-  }
-  box(g,[w-.2,.4,.45],[0,10.85,d/2+.1],leaf,.18);box(g,[.45,.4,d-.2],[w/2+.1,10.85,0],leaf,.18);
-  box(g,[w+.7,.55,d+.7],[0,h+1,0],cream,.25);
-  box(g,[w-.7,.55,d-.7],[0,h+1.35,0],sage,.25);
-  for(let c=0;c<3;c++) { box(g,[w/3-.5,2,.16],[(c-1)*w/3,1.9,d/2+.03],glass,.1);box(g,[.12,2.2,.25],[(c-1)*w/3,1.9,d/2+.12],trim,.04); }
+  // Shopfront bays on every face; the main entrance canopy stays on the crossing side.
+  faces(g,w,d,(f,across,out)=>{
+    const bays=Math.max(1,Math.round(across/3.4));
+    for(let c=0;c<bays;c++){const u=(c-(bays-1)/2)*across/bays;box(f,[across/bays-.5,2,.16],[u,1.9,out+.03],glass,.1);box(f,[.12,2.2,.25],[u+across/bays/2,1.9,out+.12],trim,.04);}
+  });
   box(g,[w+.8,.36,2.2],[0,3.1,d/2+.65],cream,.18);
   box(g,[w+.2,.1,.13],[0,3.05,d/2+1.76],futureLight,.045);
-  // Large roofs split: a ringed roof garden on the crossing half (ART.md §2/§4), PV on the back half.
-  const garden=Math.min(w,d/2)>=5,pv=garden?-d/4:0,depth=garden?d*.4:d*.6;
-  for(let c=0;c<3;c++){
-    const panel=box(g,[w/3-.45,.12,depth],[(c-1)*w/3,h+1.85,pv],solar,.04);panel.rotation.x=-.16;
-    box(g,[.07,.1,depth*.9],[(c-1)*w/3,h+2,pv],futureLight,.03);
-  }
-  if(garden){
-    const r=Math.min(w,d/2)/2-.4;
-    arc(g,0,r-.35,.12,[0,h+1.62,d/4],leaf);
-    arc(g,r-.35,r,.45,[0,h+1.62,d/4],trim);
-    const ring=new T.Group();ring.position.set(0,0,d/4);g.add(ring);
-    shrubs(ring,r-.8,h+1.7,0,Math.PI*2,Math.round(r*5));
-  }
+  // A full-width public void is held by side cores, with housing above; its edge is planted all round.
+  for(const x of [-w/2+.5,w/2-.5])for(const z of [-d/2+.5,d/2-.5])box(g,[1,5.5,1],[x,7.5,z],trim);
+  box(g,[w+.7,.3,d+.7],[0,10.5,0],trim);
+  faces(g,w,d,(f,across,out)=>box(f,[across-.2,.4,.45],[0,10.85,out+.1],leaf,.18));
   sign(g,kit,label,0,4.1,d/2+.16,w-.8,1.05,'#536f66');
-  windows(g,kit,w,5,d);
+  if(style==='slender'){
+    // Center-gai: a slim glass shaft between vertical fins, capped by stacked rings.
+    box(g,[w,h-10,d],[0,(h-10)/2+10.8,0],color);
+    faces(g,w,d,(f,across,out)=>{
+      box(f,[across-.3,h-11,.08],[0,(h+11.6)/2,out+.03],glass);
+      for(let u=-across/2+.15;u<=across/2;u+=across/Math.round(across/.9))box(f,[.12,h-11,.4],[u,(h+11.6)/2,out+.2],trim,.04);
+    });
+    for(let y=14.3;y<h;y+=3.5)box(g,[w+.3,.16,d+.3],[0,y,0],trim,.03);
+    box(g,[w+.5,.5,d+.5],[0,h+1,0],cream,.2);
+    for(const [r,y] of [[2.6,h+1.3],[2.1,h+1.9],[1.5,h+2.4]])arc(g,r-.35,r,.16,[0,y,0],trim);
+    const mast=new T.Mesh(new T.CylinderGeometry(.06,.1,1.4,8),solar);mast.position.y=h+2.9;g.add(mast);
+    box(g,[.25,.25,.25],[0,h+3.6,0],futureLight,.05);
+    return g;
+  }
+  if(style==='terrace'){
+    // Dogenzaka: the housing steps back on the crossing and east sides; each step is a planted terrace.
+    const tiers=[[10.8,20.2,0],[20.2,h+.8,1]] as const;
+    for(const [y0,y1,t] of tiers){
+      const tw=w-t*2,td=d-t*2.8,cx=-t,cz=-t*1.4;
+      box(g,[tw,y1-y0,td],[cx,(y0+y1)/2,cz],color);
+      bands(g,tw,td,cx,cz,y0+2.2,y1-1,3.5,1.5);
+      if(t){
+        box(g,[w,.35,d],[0,y0+.15,0],trim);
+        box(g,[w-.3,.45,2.6],[0,y0+.55,d/2-1.4],leaf,.18);box(g,[1.8,.45,d-.3],[w/2-1,y0+.55,0],leaf,.18);
+        const edge=new T.Group();edge.position.set(0,0,d/2-.9);g.add(edge);
+        for(let i=0;i<9;i++){const s=.35+(i%3)*.08;const m=new T.Mesh(shrubGeometry,leaf);m.position.set(-w/2+.7+i*(w-1.4)/8,y0+.9+s*.4,0);m.scale.set(s,s*.8,s);m.castShadow=true;edge.add(m);}
+        for(let u=-w/2+.4;u<w/2;u+=2.2)box(g,[.08,1,.08],[u,y0+.9,d/2-.1],trim,.02);
+        box(g,[w,.06,.08],[0,y0+1.4,d/2-.1],trim,.02);
+      }
+    }
+    box(g,[w-1.5,.5,d-2.3],[-1,h+1.05,-1.4],cream,.2);
+    box(g,[w-2.7,.4,d-3.5],[-1,h+1.4,-1.4],leaf,.2);
+    for(let c=0;c<2;c++){const panel=box(g,[(w-3)/2-.3,.12,2.4],[-1+(c-.5)*(w-3)/2,h+1.95,-d/2+2.4],solar,.04);panel.rotation.x=-.16;}
+    return g;
+  }
+  // Station hall: long glazed floors, a ringed roof garden towards the crossing and a glass barrel vault over the concourse.
+  box(g,[w,h-10,d],[0,(h-10)/2+10.8,0],color);
+  bands(g,w,d,0,0,13,h,3.5,1.4);
+  box(g,[w+.7,.55,d+.7],[0,h+1,0],cream,.25);
+  box(g,[w-.7,.55,d-.7],[0,h+1.35,0],sage,.25);
+  const r=Math.min(w,d/2)/2-.4;
+  arc(g,0,r-.35,.12,[0,h+1.62,d/4],leaf);
+  arc(g,r-.35,r,.45,[0,h+1.62,d/4],trim);
+  const ring=new T.Group();ring.position.set(0,0,d/4);g.add(ring);
+  shrubs(ring,r-.8,h+1.7,0,Math.PI*2,Math.round(r*5));
+  // Shallow vault: a half cylinder flattened to 60% height, ribbed every sixth of its length.
+  const vaultR=w/2-.9,vaultL=d*.42,vault=new T.Group();vault.position.set(0,h+1.62,-d/4);vault.scale.y=.6;g.add(vault);
+  const shell=new T.Mesh(new T.CylinderGeometry(vaultR,vaultR,vaultL,32,1,true,Math.PI/2,Math.PI),glass);shell.rotation.x=Math.PI/2;vault.add(shell);
+  for(let i=0;i<=6;i++){const rib=arc(vault,vaultR,vaultR+.14,.14,[0,0,-vaultL/2+i*vaultL/6-.07],trim,0,Math.PI);rib.rotation.x=Math.PI/2;}
   return g;
 }
 export function kiosk(kit:Kit) {
@@ -230,6 +272,10 @@ export function cityRig(scene:T.Scene) {
     for(let f=y-h/2+1;f<y+h/2;f+=2){box(qfront,[q.w-1,.6,.12],[0,f,5.05],glass);box(qfront,[q.w-.6,.1,.5],[0,f+.5,5.22],trim,.03);}
   }
   mediaDrum(qfront,kit,q.d/2);
+  // Side and back faces: continuous glass ribbons between the trim bands (the crown wing covers them above Y=40).
+  faces(qfront,q.w,q.d,(f,across,out)=>{
+    for(let y=13;y<40;y+=2.5)if(Math.abs(y-23)>.8 && Math.abs(y-36)>.8){box(f,[across-1.2,.6,.1],[0,y,out+.05],glass,.03);box(f,[across-.8,.1,.4],[0,y+.45,out+.2],trim,.03);}
+  },[1,2,3]);
   // Planted terraces on the crossing and east faces: greenery grows on the slabs, it is not stuck on as pots.
   for(const y of [11,23,36]){
     box(qfront,[.55,.5,q.d-.4],[q.w/2-.05,y+.55,0],leaf,.2);
@@ -238,8 +284,8 @@ export function cityRig(scene:T.Scene) {
   sign(qfront,kit,'QFRONT',0,44,6.05,8,1.2,'#294652');
   sign(qfront,kit,'TSUTAYA / COMMONS',0,4.1,5.12,9.5,.85,'#294652');
   staticGroup.add(qfront,tower(kit));
-  for(const [i,color] of [[2,sage],[3,pink],[4,cream]] as const){
-    const b=landmarks[i];staticGroup.add(shop(kit,b.x,b.z,b.w,b.h,b.d,color,b.name));
+  for(const [i,color,style] of [[2,sage,'slender'],[3,pink,'terrace'],[4,cream,'hall']] as const){
+    const b=landmarks[i];staticGroup.add(shop(kit,b.x,b.z,b.w,b.h,b.d,color,b.name,style));
   }
   for(const link of upperLinks){
     const g=new T.Group();g.position.set(link.x,link.y,link.z);staticGroup.add(g);
@@ -250,10 +296,11 @@ export function cityRig(scene:T.Scene) {
       for(const z of [-link.d/2,link.d/2]){box(g,[link.w,1.05,.06],[0,-link.h/2+.7,z],membrane);box(g,[link.w-1,.45,.5],[0,-link.h/2+.4,z*(1-1.6/link.d)],leaf,.18);}
     } else if(link.kind==='link'){
       box(g,[link.w,link.h,link.d],[0,0,0],glass);
-      for(let x=-link.w/2+.8;x<link.w/2;x+=1.3)box(g,[.1,link.h,.2],[x,0,link.d/2+.08],trim);
+      for(let x=-link.w/2+.8;x<link.w/2;x+=1.3)for(const z of [-1,1])box(g,[.1,link.h,.2],[x,0,z*(link.d/2+.08)],trim);
       for(const z of [-link.d/2,link.d/2])box(g,[link.w,1,.08],[0,link.h/2+.6,z],teal);
     } else {
-      box(g,[link.w,link.h,link.d],[0,0,0],teal);
+      // Each wing keeps its own ceramic tone so the upper district does not read as one repeated block.
+      box(g,[link.w,link.h,link.d],[0,0,0],{'QFRONT CROWN':cream,'QFRONT WEST WING':sage}[link.name as string]??teal);
       const floors=new T.Group();floors.position.y=-link.h/2;g.add(floors);windows(floors,kit,link.w,link.h,link.d);
       for(let y=-link.h/2+3.5;y<link.h/2-1;y+=3.5)box(g,[link.w+.2,.22,link.d+.2],[0,y,0],trim);
     }

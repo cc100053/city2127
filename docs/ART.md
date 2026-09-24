@@ -28,6 +28,8 @@ Light values stay high and saturation stays low: white, silver, and pale teal. C
 - Keep boxes as the base mass and add the curve at a readable spot: the crossing face, a canopy, or a crown. Do not round every edge.
 - Stack masses in terraces. Each set-back slab carries planting (§4).
 - Cores stay slender and vertical. Horizontal bands read as floors, and each band has a trim lip.
+- **Every face is a building face.** Glazing, floor lines and sun-shades wrap all four sides (`faces()`, `bands()`, `windows()`); a blank wall is allowed only where another mass abuts it.
+- **No two neighbours share a typology.** Street blocks share the ground floor and public void, then take one upper form: `slender` (vertical fins, full-height glass, stacked ring crown), `terrace` (housing steps back on the crossing/east sides, each step planted and railed), `hall` (long glazed floors, roof garden, glass barrel vault). Upper wings each keep their own ceramic tone.
 
 ## 3. Detail density by distance (hero pose)
 
@@ -88,4 +90,13 @@ A guest-made change must be distinguishable from the base city at a glance and t
 - [x] Shops (Center-gai, Dogenzaka, Station): east-face glazing and sunshades, planted slabs on alternate floors and above the public void; large roofs (Dogenzaka, Station) get a ringed roof garden on the crossing half, with PV moved to the back half
 - [x] Commons floor: planters inside both rails
 - [x] SE tower base: planted slabs on alternate floors
-- [ ] User art review of the rollout ([evidence](VALIDATION.md#art-direction-building-rollout--2026-09-24))
+- [x] User review of the rollout (2026-09-24): "only the front has windows" and "all buildings look identical" led to the second pass below
+
+## Building pass 2 (2026-09-24)
+
+- [x] `windows()` now places slots and sun-shades on all four faces, sized to each face. The east side had used the front width and overflowed deep wings.
+- [x] QFRONT: glass ribbons on the side and back faces. MAGNET: ribbons and lit slots on all four faces; above the collar they sit outside the full-height side frames, which previously hid the east glazing. Hidden louvres removed.
+- [x] Shops split into `slender` (Center-gai), `terrace` (Dogenzaka) and `hall` (Station); shopfront bays and void-edge planters on every face
+- [x] Sky link mullions on both sides; QFRONT crown cream and west wing sage (MAGNET east wing stays teal)
+- [x] NW hub and SE tower glazing on all four faces
+- [ ] User art review of pass 2 ([evidence](VALIDATION.md#art-direction-building-pass-2--2026-09-24))

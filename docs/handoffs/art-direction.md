@@ -43,11 +43,13 @@ Pilot (2026-09-24):
 - `main.ts`: 4× MSAA composer target and a GTAO pass.
 - Site positions, footprints, rise/sink behaviour, camera and presets are unchanged.
 
+Building pass 2 (2026-09-24, after user feedback): glazing now wraps all four faces (`faces()`/`bands()`/`windows()`); the shops split into slender/terrace/hall typologies; wing tones vary; test roof allowances were raised for the new crowns. Real-GPU FPS was measured with headed Chrome via Playwright; see [VALIDATION](../VALIDATION.md#art-direction-building-pass-2--2026-09-24).
+
 Building rollout (2026-09-24, after the user said "ok, polish building"): all glazing moved to `glass`. MAGNET got planted collar terraces and a curved glass corner drum. The shops got east-face glazing, planted slabs and ringed roof gardens on large roofs (PV moved to the back half). The commons floor got rail planters, and the SE tower base got planted slabs. See the [ART.md rollout list](../ART.md#building-rollout-2026-09-24).
 
 ## Actual validation results
 
-- Verification status: PARTIAL — code checks and screenshots done; real-GPU FPS not measured; user art review pending
+- Verification status: PARTIAL — code checks, screenshots and real-GPU FPS done (60 FPS at 720p/1080p, headed Chrome on Apple M6); user art review of building pass 2 pending
 - Date and checked commit/worktree: 2026-09-24, pilot worktree on feat/art-direction (commit recorded in git log)
 - Commands/manual checks and results: `npm test` PASS, `npm run build` PASS (existing chunk-size warning), `git diff --check` clean; Playwright 1280×720 before/after in preset and `?survey` modes, live-change outline check — see [VALIDATION](../VALIDATION.md#art-direction-pilot--2026-09-24)
 - Evidence/environment: `artifacts/art-before-*.png`, `artifacts/art-pilot-*.png`; headless SwiftShader stats only
@@ -57,7 +59,7 @@ Building rollout (2026-09-24, after the user said "ok, polish building"): all gl
 ## Known issues and blockers
 
 - Performance budget is unknown: the exhibition PC's GPU is not specified. Current baseline (2026-09-17, 1280×720) was ~60 FPS, ~120 draw calls; heavier materials and post-processing must be measured, not assumed.
-- Chrome extension connected on 2026-09-24 (M1 Pro, ANGLE Metal), but the tab was `hidden`, so no frames rendered and window resize was ignored. FPS at 1280×720 and 1920×1080 still needs Chrome in the foreground; the measurement harness is an iframe of exact CSS size on a same-origin page. GTAO doubles draw calls (preset 170 → 337); drop it if the real-GPU numbers do not hold.
+- The Claude-in-Chrome extension tab stayed `hidden` (no frames), even after the user brought Chrome forward. Real-GPU numbers instead come from `playwright-cli -s=gpu open --browser=chrome --headed`, which ran visible at pixel ratio 1. GTAO doubles draw calls (preset 170 → 337) but held 60 FPS at 1080p on an M6 Mac. The exhibition PC is still unmeasured.
 - Hachiko plaza is mostly hidden by the koban and station at the hero pose; only its NW half (planter, shrubs, plinth) reads. Moving it would change the landmark relationship, so it is left for user review.
 
 ## Important decisions
@@ -68,4 +70,4 @@ Building rollout (2026-09-24, after the user said "ok, polish building"): all gl
 
 ## Next expected step
 
-cc100053: art review of the building rollout (`artifacts/art-buildings-*.png`), and bring Chrome to the foreground so the agent can measure FPS/draw calls at 1280×720 and 1920×1080. Still open: the NE park and NW hub restyle to the ringed language, the ground/crossing surface, and deciding whether GTAO stays.
+cc100053: art review of building pass 2 (`artifacts/art-buildings2-*.png`). Still open: the NE park and NW hub restyle to the ringed language, the ground/crossing surface, and a performance check on the exhibition PC (GTAO holds 60 FPS on an M6 Mac at 1080p).

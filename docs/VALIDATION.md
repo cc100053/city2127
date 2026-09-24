@@ -1,5 +1,22 @@
 # Validation and handoff
 
+## Art-direction building pass 2 — 2026-09-24
+
+The user reviewed the rollout and said "only the front has windows" and "all buildings look identical". The fixes are on `feat/art-direction` ([ART.md pass 2](ART.md#building-pass-2-2026-09-24)). `npm test` passed. `tests/mobility.test.ts` roof allowances were raised, not shrunk, for Center-gai (3.8, ring crown and mast) and the station (4.2, glass vault). `npm run build` passed and `git diff --check` was clean.
+
+- Screenshots from Playwright (headless) at 1280×720: [preset hero](../artifacts/art-buildings2-preset.png) and [survey hero](../artifacts/art-buildings2-survey.png), both on the untouched pose. Orbit views [north](../artifacts/art-buildings2-orbit-north.png) and [west](../artifacts/art-buildings2-orbit-west.png) were taken after a mouse drag, so they are not comparison poses; they show glazing on the back and side faces. Console output was only the existing favicon 404.
+- Known side effect: `windows()` now makes a different number of `kit.random()` calls, so the seeded distant skyline ring changed shape. It is still 60 hazed blocks.
+- **Real-GPU performance.** Playwright launched headed Google Chrome 154 (`--browser=chrome --headed`) with renderer "ANGLE (Apple, ANGLE Metal Renderer: Apple M6)", pixel ratio 1 and the tab visible. After warm-up, each sample averaged 120 frames:
+
+  | Viewport | Mode | FPS | Draw calls | Geometries |
+  | --- | --- | --- | --- | --- |
+  | 1280×720 | preset (Daylight) | 60.0 | 337 | 86 |
+  | 1280×720 | `?survey`, all four sites up | 60.0 | 466 | 120 |
+  | 1920×1080 | preset (Daylight) | 60.0 | 337 | 86 |
+  | 1920×1080 | `?survey`, all four sites up | 56.0 → 60.0 | 466 | 120 |
+
+  The same numbers were measured before pass 2, on `b549785`. The display is capped at 60 Hz, so this shows headroom only up to vsync on this Mac. It says nothing about the exhibition PC. The Claude-in-Chrome extension tab stayed `hidden` and was not used.
+
 ## Art-direction building rollout — 2026-09-24
 
 After the user said "ok, polish building", [ART.md](ART.md) was rolled out to the buildings on `feat/art-direction`. `npm test` and `npm run build` passed, with the existing chunk-size warning only. `git diff --check` was clean. `survey/` and `module-swap/` are unchanged.
