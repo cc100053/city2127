@@ -43,6 +43,8 @@ Pilot (2026-09-24):
 - `main.ts`: 4× MSAA composer target and a GTAO pass.
 - Site positions, footprints, rise/sink behaviour, camera and presets are unchanged.
 
+Step 4 (2026-09-25): the NE park uses the ringed language with a pool; the NW hub has a round drone pad and a cylindrical shaft; the ground has a stone-slab map, the roads an asphalt map, and each crossing waiting edge a mint kerb strip. See [VALIDATION](../VALIDATION.md#art-direction-step-4-sites-and-ground--2026-09-25).
+
 Building pass 2 (2026-09-24, after user feedback): glazing now wraps all four faces (`faces()`/`bands()`/`windows()`); the shops split into slender/terrace/hall typologies; wing tones vary; test roof allowances were raised for the new crowns. Real-GPU FPS was measured with headed Chrome via Playwright; see [VALIDATION](../VALIDATION.md#art-direction-building-pass-2--2026-09-24).
 
 Building rollout (2026-09-24, after the user said "ok, polish building"): all glazing moved to `glass`. MAGNET got planted collar terraces and a curved glass corner drum. The shops got east-face glazing, planted slabs and ringed roof gardens on large roofs (PV moved to the back half). The commons floor got rail planters, and the SE tower base got planted slabs. See the [ART.md rollout list](../ART.md#building-rollout-2026-09-24).
@@ -70,4 +72,4 @@ Building rollout (2026-09-24, after the user said "ok, polish building"): all gl
 
 ## Next expected step
 
-cc100053: art review of building pass 2 (`artifacts/art-buildings2-*.png`). Still open: the NE park and NW hub restyle to the ringed language, the ground/crossing surface, and a performance check on the exhibition PC (GTAO holds 60 FPS on an M6 Mac at 1080p).
+cc100053: art review of step 4 (`artifacts/art-step4-*.png`). Candidate next polish: people/vehicle models (ART.md §7), ambient data totems (§6), the distant skyline, and a performance check on the exhibition PC. On the M6 Mac, 1080p survey mode runs at ~56 FPS, so GTAO is the first thing to cut if needed.

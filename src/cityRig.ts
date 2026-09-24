@@ -236,12 +236,27 @@ export function glyphs() {
   for(const x of [-.55,0,.55]){const dot=new T.Mesh(new T.CircleGeometry(.08,12),still);dot.rotation.x=-Math.PI/2;dot.position.set(x,.539,0);g.add(dot);}
   return {group:g,pulse,still};
 }
+/** Seeded tile/asphalt map: a light base the material colour multiplies, so presets still tint it. */
+function surface(kind:'tile'|'asphalt', repeat:[number,number]) {
+  const canvas=document.createElement('canvas');canvas.width=canvas.height=256;
+  const ctx=canvas.getContext('2d')!;let n=kind==='tile'?7:11;const rand=()=>((n=Math.imul(n,1103515245)+12345>>>0)/4294967296);
+  ctx.fillStyle='#f4f4f2';ctx.fillRect(0,0,256,256);
+  for(let i=0;i<(kind==='tile'?1800:9000);i++){const v=kind==='tile'?226+rand()*29:200+rand()*55;ctx.fillStyle=`rgb(${v},${v},${v})`;ctx.fillRect(rand()*256,rand()*256,kind==='tile'?2:1.5,kind==='tile'?2:1.5);}
+  if(kind==='tile'){
+    // Four 2-unit slabs per repeat, with a staggered joint every other row.
+    ctx.fillStyle='#d9dcda';for(let r=0;r<4;r++){ctx.fillRect(0,r*64,256,2);for(let c=0;c<4;c++)ctx.fillRect(c*64+(r%2)*32,r*64,2,64);}
+  }
+  const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;texture.wrapS=texture.wrapT=T.RepeatWrapping;texture.repeat.set(...repeat);texture.anisotropy=8;
+  return texture;
+}
 export function cityRig(scene:T.Scene) {
   let seed=2127;
   const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
   const kit:Kit={windows:[],signs:[],random};
   const staticGroup=new T.Group();scene.add(staticGroup);
-  const road=paint('#71818a',.9),ground=paint('#d6dbd8',.78),distant=paint('#c3d1db',.95);
+  const road=paint('#7a8990',.9),ground=paint('#dfe3e0',.78),distant=paint('#c3d1db',.95);
+  // Ground reads as laid stone and the carriageway as asphalt instead of flat paint (ART.md §3, hero band).
+  ground.map=surface('tile',[149/8,139/8]);road.map=surface('asphalt',[1/6,1/6]);
   // Ground continues past the hero frame; fog closes it instead of a plate edge.
   box(staticGroup,[150,1,140],[0,-.2,0],cream,.9);
   box(staticGroup,[149,.12,139],[0,.36,0],ground,.5);
@@ -256,6 +271,8 @@ export function cityRig(scene:T.Scene) {
       const p=crossingPoint(path,(i+.5)/count);
       box(staticGroup,[width,.025,.52],[p.x,.45,p.z],cream,.01).rotation.y=p.yaw;
     }
+    // Civic light: a mint kerb strip marks each waiting edge, just off the carriageway.
+    for(const u of [-.02,1.02]){const p=crossingPoint(path,u);box(staticGroup,[width+.4,.03,.14],[p.x,.46,p.z],futureLight,.02).rotation.y=p.yaw;}
   }
   for(let x=-73;x<75;x+=4)if(Math.abs(x)>15)box(staticGroup,[1.8,.02,.13],[x,.445,0],cream,.01);
   const q=landmarks[0],qfront=new T.Group();qfront.position.set(q.x,0,q.z);qfront.name='QFRONT';

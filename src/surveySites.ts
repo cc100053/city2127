@@ -5,7 +5,7 @@ import { changeSites } from './layout';
 import type { SitePart } from './surveyAtmosphere';
 
 const GROW = 3; // seconds a part takes to rise or sink
-const lawn = paint('#9fbf8a', .9);
+const lawn = paint('#9fbf8a', .9), water = new T.MeshStandardMaterial({ color: '#7fb4c4', roughness: .05, metalness: .3 });
 // Guest accent (docs/ART.md): saffron is reserved for city changes made by guests and appears nowhere else.
 const GUEST = '#ff9a2e', FRESH = 10; // seconds a new change keeps its pulsing outline
 
@@ -17,27 +17,37 @@ export function surveySites(scene: T.Scene) {
   };
   const part = (parent: T.Group, y = 0) => { const g = new T.Group(); g.position.y = y; g.visible = false; g.scale.y = 1e-3; parent.add(g); return g; };
 
-  // NW automation: a service hub with a drone pad; the tall variant adds a logistics shaft.
+  // NW automation: a service hub under a round drone pad; the tall variant adds a cylindrical logistics shaft.
   const hub = site('nw'), hubBase = part(hub), hubUpper = part(hub, 12);
   box(hubBase, [8.4, .8, 7.4], [0, .8, 0], cream, .25);
   box(hubBase, [7, 10, 6], [0, 6.2, 0], teal, .3);
-  for (const y of [4, 7, 10]) faces(hubBase, 7, 6, (f, across, out) => box(f, [across - .2, .9, .1], [0, y, out + .03], glass, .03));
+  for (const y of [4, 7, 10]) faces(hubBase, 7, 6, (f, across, out) => { box(f, [across - .2, .9, .1], [0, y, out + .03], glass, .03); box(f, [across, .08, .4], [0, y + .55, out + .2], trim, .02); });
   box(hubBase, [7.6, .35, 6.6], [0, 11.4, 0], trim, .1);
-  box(hubBase, [4, .08, 4], [0, 11.62, 0], futureLight, .03);
+  // Pad: a trim disc cantilevered over the roof, a mint landing ring and four slim edge posts.
+  arc(hubBase, 0, 3.9, .25, [0, 11.55, 0], trim);
+  arc(hubBase, 2.3, 2.45, .03, [0, 11.8, 0], futureLight);
+  arc(hubBase, 0, .6, .03, [0, 11.8, 0], futureLight);
+  for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + Math.PI / 4; box(hubBase, [.12, .7, .12], [Math.cos(a) * 3.7, 12.15, -Math.sin(a) * 3.7], solar, .02); }
   sign(hubBase, kit, '自動サービス / AUTO HUB', 0, 2.2, 3.2, 6.2, .8, '#46676e');
-  box(hubUpper, [5.4, 19, 4.8], [0, 9.5, 0], glass, .2);
-  for (let y = 1.5; y < 19; y += 3) box(hubUpper, [5.8, .3, 5.2], [0, y, 0], trim, .05);
-  for (let i = 0; i < 4; i++) box(hubUpper, [.12, 1.2, 4], [-1.8 + i * 1.2, 19.6, 0], solar, .02);
-  box(hubUpper, [3, .1, 3], [0, 20.25, 0], futureLight, .03);
+  const shaft = new T.Mesh(new T.CylinderGeometry(2.3, 2.3, 19, 40), glass); shaft.position.y = 9.5; hubUpper.add(shaft);
+  for (let y = 1.5; y < 19; y += 3) arc(hubUpper, 0, 2.6, .25, [0, y, 0], trim);
+  arc(hubUpper, 0, 2.9, .3, [0, 19, 0], trim);
+  arc(hubUpper, 1.6, 1.75, .03, [0, 19.3, 0], futureLight);
+  for (let i = 0; i < 3; i++) box(hubUpper, [.12, 1, 2.4], [-1 + i, 19.8, 0], solar, .02);
 
-  // NE environment: a lawn park with hedges and future trees.
-  const park = part(site('ne')), { w: pw, d: pd } = changeSites.ne;
-  box(park, [pw, .3, pd], [0, .55, 0], lawn, .1);
-  for (const [w, d] of [[pw, 1.4], [1.4, pd]] as const) box(park, [w, .06, d], [0, .72, 0], cream, .03);
-  for (const [x, z, w, d] of [[-pw / 2 + .4, 0, .8, pd - 1], [pw / 2 - .4, 0, .8, pd - 1], [0, -pd / 2 + .4, pw - 1, .8]] as const) box(park, [w, 1, d], [x, 1.1, z], sage, .3);
+  // NE environment: a round park — lawn, a shallow pool, a looping path and planted rings; the trees stand on the lawn.
+  const park = part(site('ne'));
+  arc(park, 0, 4.9, .2, [0, .42, 0], stone);
+  arc(park, 0, 4.5, .12, [0, .62, 0], lawn);
+  arc(park, 2.7, 3.2, .02, [0, .74, 0], stone);
+  arc(park, 0, 1.55, .08, [0, .7, 0], water);
+  arc(park, 1.55, 1.8, .18, [0, .62, 0], trim);
+  arc(park, 4.5, 4.95, .6, [0, .62, 0], trim, .5, 5.2);
+  shrubs(park, 4.2, .72, .5, 5.2, 30);
+  for (const [start, length] of [[.9, 1.6], [3.4, 1.8]]) { arc(park, 2.1, 2.5, .38, [0, .62, 0], pink, start, length); }
   new GLTFLoader().loadAsync(new URL('../asset/models/future-tree-2127/future-tree-2127.glb', import.meta.url).href).then(({ scene: tree }) => {
     const height = new T.Box3().setFromObject(tree).getSize(new T.Vector3()).y || 1, grove = new T.Group();
-    for (const [x, z, h] of [[-2.6, -2.6, 7], [2.6, -2.6, 5.5], [-2.6, 2.6, 5], [2.8, 2.6, 6.5], [0, 0, 4]] as const) {
+    for (const [x, z, h] of [[-2.9, -1.9, 7], [2.4, -2.9, 5.5], [-2, 3.1, 5], [3.3, 1.2, 6.5], [.4, 3.6, 4]] as const) {
       const copy = tree.clone(); copy.scale.setScalar(h / height); copy.position.set(x, .7, z); copy.rotation.y = x * z;
       grove.add(copy);
     }

@@ -99,4 +99,12 @@ A guest-made change must be distinguishable from the base city at a glance and t
 - [x] Shops split into `slender` (Center-gai), `terrace` (Dogenzaka) and `hall` (Station); shopfront bays and void-edge planters on every face
 - [x] Sky link mullions on both sides; QFRONT crown cream and west wing sage (MAGNET east wing stays teal)
 - [x] NW hub and SE tower glazing on all four faces
-- [ ] User art review of pass 2 ([evidence](VALIDATION.md#art-direction-building-pass-2--2026-09-24))
+- [x] User moved on to the next step ("打磨下一步", 2026-09-25)
+
+## Step 4: sites and ground (2026-09-25)
+
+- [x] NE park redone in the ringed language: stone rim, lawn disc, looping path, a shallow pool with a trim edge, a planted ring open to the south-east, curved benches, and trees on the lawn clear of the pool
+- [x] NW hub: a round drone pad on the roof with a mint landing ring and edge posts, sun-shades on all faces; the tall variant is a glass cylinder shaft with trim floor discs and a ringed crown
+- [x] Ground: seeded stone-slab map on the plate (2-unit staggered slabs) and an asphalt speckle map on the roads, both multiplied by the existing material colours, so the presets still tint them
+- [x] Crossings: a mint kerb strip marks each waiting edge, just off the carriageway (civic light, §5)
+- [ ] User art review of step 4 ([evidence](VALIDATION.md#art-direction-step-4-sites-and-ground--2026-09-25))

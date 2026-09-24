@@ -1,5 +1,20 @@
 # Validation and handoff
 
+## Art-direction step 4: sites and ground — 2026-09-25
+
+Branch `feat/art-direction`; see [ART.md step 4](ART.md#step-4-sites-and-ground-2026-09-25). `npm test`, `npm run build` and `git diff --check` all passed. Headless Playwright took [preset](../artifacts/art-step4-preset.png) and [survey, five guests](../artifacts/art-step4-survey.png) at 1280×720 on the untouched hero pose. Console output was only the existing favicon 404. Draw calls are 337 (preset, unchanged) and 482 (survey, up from 466; the new water material and pad pieces account for it).
+
+Real GPU: headed Chrome 154 via `playwright-cli -s=gpu open --browser=chrome --headed`, on ANGLE Metal Apple M6, pixel ratio 1, tab visible.
+
+| Viewport | Mode | FPS | Draw calls |
+| --- | --- | --- | --- |
+| 1280×720 | preset | 60.0 | 337 |
+| 1280×720 | survey, all sites | 59.9 | 482 |
+| 1920×1080 | preset | 59.9 | 337 |
+| 1920×1080 | survey, all sites | 56.1–56.7 | 482 |
+
+The first run had a headless SwiftShader session rendering in the background. With CPU contention it read 38–41 FPS at 1080p and 55 at 720p survey. Close every other browser session before measuring. The 1080p survey figure (~56) is the first below vsync on this Mac, so recheck GTAO first if the exhibition PC is weaker.
+
 ## Art-direction building pass 2 — 2026-09-24
 
 The user reviewed the rollout and said "only the front has windows" and "all buildings look identical". The fixes are on `feat/art-direction` ([ART.md pass 2](ART.md#building-pass-2-2026-09-24)). `npm test` passed. `tests/mobility.test.ts` roof allowances were raised, not shrunk, for Center-gai (3.8, ring crown and mast) and the station (4.2, glass vault). `npm run build` passed and `git diff --check` was clean.
