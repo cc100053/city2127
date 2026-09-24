@@ -50,6 +50,16 @@ Exact demo: guest 1 `labour-shortage` → `automate-services` (automation +2, NW
 
 Known limits: root CI runs `survey/` and `module-swap/` tests/builds since 2026-09-24, but not module-swap's browser smoke test; sequential guests are assumed — while a question is reserved, a parallel guest is given the next eligible (often fallback) question from the current scores; question text shown in history comes from the current question JSON; slot meanings reuse generic `building-basic-*` GLBs explained by labels; module-swap is a separate Vite app, not the root Shibuya scene.
 
+## Root scene survey mode — 2026-09-24 (`src/?survey`, steps 1–2 of connecting the survey)
+
+User decision 2026-09-24: start connecting the survey to the root Shibuya scene now (step 1 of 3: atmosphere → Shibuya change points → causal panel). Handoff [root-survey-atmosphere](handoffs/root-survey-atmosphere.md).
+
+- `?survey` (default `ws://<host>:8787/ws`) or `?survey=<ws url>` on the root app connects to the same survey WebSocket as module-swap. `src/surveyAtmosphere.ts` validates each `CityView`, drops older/repeated revisions of a run, and maps `scores` to a `WorldState` with `scoresToWorldState()`: offsets from `presets.neutral`, one answer (+2) = half effect, two answers on an axis = full (automation → traffic/glyph/neon; publicSharing → crowd/signage; environmentalPriority → greenery/warmth, less haze; urbanConcentration → windowLife/neon).
+- `worldState.blendTo()` starts the existing 10 s transition toward any state with no hold lock; a newer view restarts from the current blend. Survey mode hides the preset buttons, `0/1/2` do nothing, and a bottom-left panel shows connection status, the last choice with its policy change, and the four scores. Without `?survey` the preset prototype is unchanged.
+- Step 1 finding: the atmosphere alone is subtle in daylight (greenery only changes membrane opacity; crowd/traffic add a few actors), so step 2 carries the readable change.
+- **Step 2 — Shibuya change sites** (`src/surveySites.ts`, footprints in `layout.ts` `changeSites`): the CityView layout's four lots become four sites on open ground visible from the hero pose. `siteTargets()` (`surveyAtmosphere.ts`) maps the layout to six parts: NW automation → AUTO HUB east of MAGNET `(35,-11)`, base for any building, logistics shaft for `tall` (to 32); NE environment → PARK east of the station `(37,11)`, lawn, hedges and five clones of the future-tree GLB; SW public sharing → COMMONS PLAZA south of Dogenzaka `(-24,32)`, paving, membrane canopy, benches; SE concentration → TOWER behind Center-gai `(-40,-10)`, mid-rise base plus a tall residential tower (to 46). Every part is built once from `cityRig` materials/`box`/`sign` and stays outside the static batch; a changed target rises or sinks the part (Y scale, 3 s smoothstep, hidden at zero). `tests/mobility.test.ts` checks that the sites clear roads, landmarks and both air corridors. The panel adds a CITY line with the last decision's slot labels from the server.
+- Not yet: step 3 (full causal history panel), site labels in the scene, performance measurement with all sites up.
+
 ## Current implementation baseline (unchanged by the direction update)
 
 Plan 02 superseded the painted civic-model direction. Its reference is [Pic 2](../asset/pic2.png): monumental integrated architecture, a vertical city, authored efficient movement, maintained ceramic/composite/metal surfaces, restrained glazing and daylight. The implemented baseline retains one Shibuya intersection, landmark relationships, ground crossing endpoints, seeded construction, WebGL 2 and the existing state machine.
@@ -85,9 +95,11 @@ Desktop-only presentation: the user explicitly excludes responsive/mobile work (
 | --- | --- |
 | `src/main.ts` | Startup, renderer, lighting/fog, render loop, resize, GPU error message and diagnostics |
 | `src/cityRig.ts` | Seeded street kit, tower/shop/kiosk/glyph factories, static material batching, windows, engineered ecology and upper infrastructure |
-| `src/layout.ts` | Shared Shibuya roads, crossing endpoints, landmark footprints, public routes, upper links and relocated dock |
+| `src/layout.ts` | Shared Shibuya roads, crossing endpoints, landmark footprints, public routes, upper links, relocated dock and survey change-site footprints |
 | `src/mobility.ts` | Actor geometry and instancing, street timing, pedestrian poses, aircraft curves, delivery choreography and local navigation |
 | `src/presets.ts` | State names, WorldState type, numeric presets |
+| `src/surveyAtmosphere.ts` | `?survey` WebSocket client, CityView validation, scores → WorldState, layout → site targets, survey panel |
+| `src/surveySites.ts` | The four survey change sites and their rise/sink motion |
 | `src/worldState.ts` | Selection gate, transition, hold and verdict state; independent of DOM/rendering |
 | `src/heroCamera.ts` | Initial camera; `HERO_POSITION` `(34,34,76)`, `HERO_TARGET` `(-3,17,-1)`, FOV 46°, far 320, shared with the orbit target. `main.ts` attaches OrbitControls (commit 5ad7dd0, 2026-09-17) with distance 45–180 and polar limits; screenshots use the untouched initial pose |
 | `src/overlay.ts` | Keyboard/buttons, state labels, progress and accessible judgment text |

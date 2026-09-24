@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { airRoutes, streetMotion, deliveryMotion, guideStrength, DOCK, pedestrianPose } from '../src/mobility.ts';
-import { landmarks, crossings, roads, publicRoutes, publicPoint, publicJourney, upperLinks } from '../src/layout.ts';
+import { landmarks, crossings, roads, publicRoutes, publicPoint, publicJourney, upperLinks, changeSites } from '../src/layout.ts';
 
 // Pedestrians can enter the carriageway only after every pod has cleared it.
 for(let t=0;t<90;t+=.05){
@@ -83,6 +83,16 @@ for(const b of landmarks)for(const dx of [-.5,0,.5])for(const dz of [-.5,0,.5]){
   assert.ok(!roads.some(r=>onRoad(b.x+w*dx,b.z+d*dz,r)),`${b.name} occupies a road arm`);
 }
 console.log('PASS: landmark ground footprints clear the road arms.');
+// Survey change sites stay off the roads, clear of landmarks and outside the aircraft envelopes.
+for(const site of Object.values(changeSites)){
+  for(const dx of [-.5,0,.5])for(const dz of [-.5,0,.5])assert.ok(!roads.some(r=>onRoad(site.x+site.w*dx,site.z+site.d*dz,r)),`${site.name} occupies a road arm`);
+  for(const b of landmarks)assert.ok(Math.abs(site.x-b.x)>=(site.w+b.w)/2+1 || Math.abs(site.z-b.z)>=(site.d+b.d)/2+1,`${site.name} overlaps ${b.name}`);
+  for(const route of airRoutes())for(let i=0;i<=500;i++){
+    const p=route.getPointAt(i/500);
+    assert.ok(!(Math.abs(p.x-site.x)<site.w/2+2.3 && Math.abs(p.z-site.z)<site.d/2+2.3 && p.y<site.h+1),`Air corridor intersects ${site.name}`);
+  }
+}
+console.log('PASS: survey change sites clear roads, landmarks and air corridors.');
 
 // Continuous ground → lift → deck → lift journeys, including both reversal boundaries.
 for(let i=0;i<12;i++){

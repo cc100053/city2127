@@ -11,6 +11,8 @@ import { heroCamera, HERO_TARGET } from './heroCamera';
 import { createWorldState } from './worldState';
 import { overlay } from './overlay';
 import { addCityModel } from './modelAssets';
+import { startSurveyAtmosphere } from './surveyAtmosphere';
+import { surveySites } from './surveySites';
 import './style.css';
 
 try {
@@ -53,7 +55,12 @@ try {
   const composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));
   const bloom=new UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.2,.5,1.1);composer.addPass(bloom);composer.addPass(new OutputPass());
   const world=createWorldState();let now=0;
-  const updateOverlay=overlay(name=>world.choose(name,now));
+  // `?survey` or `?survey=ws://host:port/ws`: survey policy scores drive the atmosphere and the preset choices are disabled.
+  const surveyParam=new URLSearchParams(location.search).get('survey');
+  const surveyUrl=surveyParam===null?null:/^wss?:\/\//.test(surveyParam)?surveyParam:`ws://${location.hostname}:8787/ws`;
+  const updateOverlay=overlay(name=>{if(!surveyUrl)world.choose(name,now);});
+  const sites=surveyUrl?surveySites(scene):null;
+  if(surveyUrl)startSurveyAtmosphere(surveyUrl,(state,targets)=>{world.blendTo(state,now);sites!.apply(targets,now);});
   const dusk=new T.Color('#c3d9e7'),night=new T.Color('#accbdc'),morning=new T.Color('#e0e6dc');
   const duskTop=new T.Color('#7f9fbd'),nightTop=new T.Color('#6a8db0'),morningTop=new T.Color('#a9bcc4');
   const sunWarm=new T.Color('#ffe2b3'),sunCool=new T.Color('#e5f3ff'),ambientWarm=new T.Color('#eef0df'),ambientCool=new T.Color('#a7c9ed');
@@ -71,7 +78,7 @@ try {
     sun.position.set(-30+still*10,65,30);ambient.intensity=1.05+pulse*.15+still*.15;
     ambient.color.copy(ambientWarm).lerp(ambientCool,pulse);
     bloom.strength=.06+pulse*.04;
-    controls.update();rig.update(s,now);updateOverlay(status);renderer.info.reset();composer.render();
+    controls.update();rig.update(s,now);sites?.update(now);updateOverlay(status);renderer.info.reset();composer.render();
     if(++frames===120){renderer.domElement.dataset.time=now.toFixed(2);renderer.domElement.dataset.fps=(120000/(performance.now()-measureStart)).toFixed(1);renderer.domElement.dataset.drawCalls=String(renderer.info.render.calls);renderer.domElement.dataset.geometries=String(renderer.info.memory.geometries);frames=0;measureStart=performance.now();}
   });
   window.addEventListener('resize',()=>{
