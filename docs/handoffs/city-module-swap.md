@@ -4,8 +4,8 @@
 - Status: IN_PROGRESS — committed and pushed to its own branch; not integrated into `main`
 - Branch: `feat/city-module-swap`
 - Base commit: `5577195751f20b3de568d289425f534e85b2c2a4`
-- Last verified commit: `8051fda955dfd6afab4ce698e60af6a0c95e7f7a` — the worktree that was verified is byte-identical to this commit; the only later change is this documentation update
-- Remote availability: `origin/feat/city-module-swap` at `8051fda955dfd6afab4ce698e60af6a0c95e7f7a`
+- Last verified commit: `ac689526fca545f6cf421e61888a1be8df925611` — the last commit that touched source or assets. Everything after it on this branch is documentation only.
+- Remote availability: `origin/feat/city-module-swap` at `ac689526fca545f6cf421e61888a1be8df925611` and later; the branch tip is pushed.
 - GitHub Issue (optional): none
 
 ## Session Git state
@@ -65,10 +65,11 @@ Dependency note: `module-swap/app` is a separate npm project. The root `tsconfig
   - `building-basic-medium` rebuild, in Blender 5.2.2 LTS over the MCP bridge: `mesh.validate()` reported nothing on all seven meshes, with zero zero-area faces, zero non-manifold edges and zero loose vertices. Exported with the standard glTF 2.0 binary settings (whole scene, +Y up, extras on, no camera/light/animation, no Draco or Meshopt) and re-imported into an empty scene: 11 objects, 1,416 triangles, bounds exactly (-6, -6, 0) to (6, 6, 16), `ROOT_BUILDING_BASIC_MEDIUM` custom properties intact, `connector_entrance` at (0, -6, 0), `socket_roof_center` at (0, 0, 16), four materials, no camera, light, action or negative scale. GLB grew from 4 KB to 81 KB.
   - `npm run check:models` caught the stale runtime copy before the tests ran, `npm run sync:models` refreshed it and the check then passed — the drift guard worked on its first real use.
   - Browser after the rebuild: the same smoke test passes with `runtimeErrors: []`; draw calls went 97 to 102 and triangles 11,296 to 12,676, which is exactly the 1,380-triangle difference between the old and new building.
+  - Pre-integration check against `origin/main` on 2026-09-24, with nothing merged: `main` and `origin/main` agree at `5577195` with zero divergence; the branch tip matches its remote with nothing unpushed; CI is green on the tip; the task diff is 48 files and every one is an addition, so no existing file is touched; `git diff --check origin/main...HEAD` exits 0; `git merge-tree` reports no conflict against `main`, nor against `origin/feat/survey-state-mvp`, `origin/feat/odaiba-assets-progress-02` or `origin/codex/odaiba-preview`; repository root `npm test` and `npm run build` pass, and so do `module-swap`'s own `npm test` (8 of 8, with `check:models` passing) and `npm run build`.
   - CI (`.github/workflows/ci.yml`, run on every push): the first push failed on the whitespace step with `module-swap/.gitignore:6: new blank line at EOF`; `npm ci`, `npm test` and `npm run build` had passed. Fixed in this branch and re-checked locally with the same command form, `git diff --check main..HEAD`, which now exits 0.
 - Evidence/environment: Node.js v24.21.0 from nvm (the shell default `node` is v20.16.0 and fails with `node: bad option: --experimental-strip-types`), npm 11, Chrome headless (new) on `http://127.0.0.1:5173`, macOS 24.6.0.
-- Integrated commit and checks: NOT INTEGRATED into `main`. The work is committed on this branch through `8051fda955dfd6afab4ce698e60af6a0c95e7f7a` and pushed to `origin/feat/city-module-swap`; `main` is unchanged at `5577195751f20b3de568d289425f534e85b2c2a4`.
-- Changes since verification: documentation only — this handoff was updated to record the commit SHAs, the Blender inspection, the CI outcome and remote availability. No source, asset or configuration file changed after the checks above.
+- Integrated commit and checks: NOT INTEGRATED into `main`. The work is committed on this branch through `ac689526fca545f6cf421e61888a1be8df925611` and pushed; `main` is unchanged at `5577195751f20b3de568d289425f534e85b2c2a4`.
+- Changes since verification: documentation only. No source, asset or configuration file changed after the checks above. `building-basic-medium.blend` was re-saved by an interactive Blender session after it was committed; the re-saved file was proven equivalent (a fresh export from it is byte-identical to the committed GLB, and geometry, bounds, custom properties, sockets and materials all match) and the working tree was restored to the committed file rather than committing the session-state churn into a binary asset's history.
 
 ## Known issues and blockers
 
@@ -86,8 +87,8 @@ Dependency note: `module-swap/app` is a separate npm project. The root `tsconfig
 
 ## Next expected step
 
-Decide whether to rebuild `building-basic-small` and `building-basic-tall` the same way. The medium building is the proof that the approach holds: the same silhouette, the same sockets, the same declared footprint, about 1,400 triangles and no measurable cost beyond its own geometry.
+Integration into `main` is pre-checked and unblocked; the owner decides when to run it. The procedure from `docs/CONTRIBUTING.md` is `git fetch --prune origin`, `git switch main`, `git merge --ff-only origin/main`, `git merge --no-ff feat/city-module-swap`, rerun the root checks, record the integrated commit here, then confirm `git merge-base --is-ancestor origin/main HEAD` before `git push origin main`. Re-fetch immediately before merging: three `codex/*` branches were deleted and `codex/odaiba-preview` appeared during this session, so `main` can move.
 
-Owner also decides whether to open integration into `main`. The package is committed on this branch and available on `origin/feat/city-module-swap`; see the header for the exact SHA.
+Separately, decide whether to rebuild `building-basic-small` and `building-basic-tall` the same way as the medium building, and whether to wire `module-swap/` into the root `npm test` so CI covers its tests and the `check:models` drift guard. The root scripts are shared with the existing city, so that change belongs on `main` after both feature branches land, not on a feature branch.
 
-Note that `survey/` from the parallel branch `feat/survey-state-mvp` (`2d4d7d5681ef1bd4e0d5e71ec7a3ad8aff4c9643`) stays untracked in a shared worktree until both branches land; that is expected and must not be deleted. Both branches were created from the same base commit and do not conflict.
+Note that `survey/` from the parallel branch `feat/survey-state-mvp` (`2d4d7d5681ef1bd4e0d5e71ec7a3ad8aff4c9643`) stays untracked in a shared worktree until both branches land; that is expected and must not be deleted. Both branches were created from the same base commit and `git merge-tree` reports no conflict between them.
