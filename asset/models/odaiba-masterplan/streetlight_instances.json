@@ -1,0 +1,1694 @@
+{
+  "phase": "03D",
+  "seed": 2127,
+  "instanceStrategy": "Two deterministic prototypes; geometry consolidated to one mesh and one material",
+  "prototypeCount": 2,
+  "instanceCount": 168,
+  "individualRealLights": false,
+  "nominalSpacingM": [
+    25,
+    40
+  ],
+  "instances": [
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        138.528,
+        69.686,
+        -0.35
+      ],
+      "rotationZDeg": 0,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        182.092,
+        362.741,
+        -0.1
+      ],
+      "rotationZDeg": 29,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        152.198,
+        342.683,
+        -0.091
+      ],
+      "rotationZDeg": 58,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        122.304,
+        322.624,
+        -0.086
+      ],
+      "rotationZDeg": 87,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        92.41,
+        302.565,
+        -0.15
+      ],
+      "rotationZDeg": 116,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        62.533,
+        282.482,
+        -0.191
+      ],
+      "rotationZDeg": 145,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        32.66,
+        262.392,
+        -0.217
+      ],
+      "rotationZDeg": 174,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        2.685,
+        242.455,
+        -0.35
+      ],
+      "rotationZDeg": 203,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -27.31,
+        222.548,
+        -0.086
+      ],
+      "rotationZDeg": 232,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        -57.3,
+        202.632,
+        -0.279
+      ],
+      "rotationZDeg": 261,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -87.287,
+        182.713,
+        -0.21
+      ],
+      "rotationZDeg": 290,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -117.273,
+        162.793,
+        0.04
+      ],
+      "rotationZDeg": 319,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        -147.26,
+        142.873,
+        -0.005
+      ],
+      "rotationZDeg": 348,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -177.249,
+        122.957,
+        -0.159
+      ],
+      "rotationZDeg": 17,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -207.238,
+        103.041,
+        -0.051
+      ],
+      "rotationZDeg": 46,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        218.749,
+        326.999,
+        0.18
+      ],
+      "rotationZDeg": 75,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        238.15,
+        296.674,
+        0.176
+      ],
+      "rotationZDeg": 104,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        257.552,
+        266.35,
+        0.144
+      ],
+      "rotationZDeg": 133,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        -135.932,
+        -122.265,
+        -0.35
+      ],
+      "rotationZDeg": 162,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -155.81,
+        -92.25,
+        -0.035
+      ],
+      "rotationZDeg": 191,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -175.557,
+        -62.153,
+        0.017
+      ],
+      "rotationZDeg": 220,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        -202.325,
+        46.315,
+        0.12
+      ],
+      "rotationZDeg": 249,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -182.526,
+        16.249,
+        0.116
+      ],
+      "rotationZDeg": 278,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -162.678,
+        -13.785,
+        0.059
+      ],
+      "rotationZDeg": 307,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        225.264,
+        -1214.03,
+        0.522
+      ],
+      "rotationZDeg": 336,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        251.055,
+        -1188.998,
+        0.688
+      ],
+      "rotationZDeg": 5,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        270.497,
+        -1158.862,
+        0.64
+      ],
+      "rotationZDeg": 34,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        471.011,
+        -777.565,
+        0.378
+      ],
+      "rotationZDeg": 63,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        441.132,
+        -797.647,
+        0.609
+      ],
+      "rotationZDeg": 92,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        411.255,
+        -817.73,
+        0.707
+      ],
+      "rotationZDeg": 121,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        381.313,
+        -837.717,
+        0.806
+      ],
+      "rotationZDeg": 150,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        351.349,
+        -857.671,
+        0.87
+      ],
+      "rotationZDeg": 179,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        321.386,
+        -877.626,
+        0.836
+      ],
+      "rotationZDeg": 208,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        291.422,
+        -897.58,
+        0.807
+      ],
+      "rotationZDeg": 237,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        261.458,
+        -917.535,
+        0.762
+      ],
+      "rotationZDeg": 266,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        231.628,
+        -937.687,
+        0.729
+      ],
+      "rotationZDeg": 295,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        202.026,
+        -958.174,
+        0.726
+      ],
+      "rotationZDeg": 324,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        172.116,
+        -978.208,
+        0.648
+      ],
+      "rotationZDeg": 353,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        538.514,
+        -818.913,
+        0.345
+      ],
+      "rotationZDeg": 22,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        477.673,
+        -587.968,
+        0.249
+      ],
+      "rotationZDeg": 51,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        487.308,
+        -622.654,
+        0.316
+      ],
+      "rotationZDeg": 80,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        496.944,
+        -657.341,
+        0.402
+      ],
+      "rotationZDeg": 109,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        507.399,
+        -691.769,
+        0.212
+      ],
+      "rotationZDeg": 138,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        519.426,
+        -725.7,
+        0.116
+      ],
+      "rotationZDeg": 167,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        626.847,
+        -953.176,
+        0.477
+      ],
+      "rotationZDeg": 196,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        659.318,
+        -972.194,
+        0.424
+      ],
+      "rotationZDeg": 225,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        589.985,
+        -846.059,
+        0.156
+      ],
+      "rotationZDeg": 254,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        575.084,
+        -813.299,
+        0.168
+      ],
+      "rotationZDeg": 283,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        560.961,
+        -780.185,
+        0.138
+      ],
+      "rotationZDeg": 312,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        547.747,
+        -746.7,
+        0.08
+      ],
+      "rotationZDeg": 341,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        534.956,
+        -713.053,
+        0.07
+      ],
+      "rotationZDeg": 10,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        523.002,
+        -679.096,
+        0.217
+      ],
+      "rotationZDeg": 39,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        512.687,
+        -644.618,
+        0.258
+      ],
+      "rotationZDeg": 68,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        502.844,
+        -609.989,
+        0.318
+      ],
+      "rotationZDeg": 97,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        493.0,
+        -575.361,
+        0.235
+      ],
+      "rotationZDeg": 126,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        550.509,
+        -305.993,
+        0.22
+      ],
+      "rotationZDeg": 155,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        604.453,
+        -258.488,
+        0.185
+      ],
+      "rotationZDeg": 184,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        387.332,
+        -436.561,
+        0.49
+      ],
+      "rotationZDeg": 213,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        399.831,
+        -470.321,
+        0.415
+      ],
+      "rotationZDeg": 242,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -28.16,
+        -658.388,
+        0.41
+      ],
+      "rotationZDeg": 271,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        222.876,
+        -53.072,
+        -0.35
+      ],
+      "rotationZDeg": 300,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        242.175,
+        -83.403,
+        -0.114
+      ],
+      "rotationZDeg": 329,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        258.959,
+        -115.251,
+        -0.099
+      ],
+      "rotationZDeg": 358,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        602.161,
+        -514.105,
+        -0.35
+      ],
+      "rotationZDeg": 27,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        621.976,
+        -544.161,
+        -0.35
+      ],
+      "rotationZDeg": 56,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -137.742,
+        -51.082,
+        -0.041
+      ],
+      "rotationZDeg": 85,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        -118.002,
+        -81.188,
+        -0.145
+      ],
+      "rotationZDeg": 114,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -98.261,
+        -111.293,
+        -0.35
+      ],
+      "rotationZDeg": 143,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -302.444,
+        39.555,
+        -0.084
+      ],
+      "rotationZDeg": 172,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        -422.227,
+        -38.376,
+        -0.287
+      ],
+      "rotationZDeg": 201,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -445.845,
+        -64.808,
+        -0.212
+      ],
+      "rotationZDeg": 230,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -448.047,
+        -100.044,
+        -0.068
+      ],
+      "rotationZDeg": 259,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        -430.918,
+        -131.44,
+        0.053
+      ],
+      "rotationZDeg": 288,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -408.487,
+        -159.515,
+        0.075
+      ],
+      "rotationZDeg": 317,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -379.753,
+        -180.922,
+        0.105
+      ],
+      "rotationZDeg": 346,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        84.24,
+        180.74,
+        0.089
+      ],
+      "rotationZDeg": 15,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        64.495,
+        210.842,
+        0.116
+      ],
+      "rotationZDeg": 44,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        44.757,
+        240.948,
+        0.014
+      ],
+      "rotationZDeg": 73,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        340.1,
+        144.32,
+        -0.35
+      ],
+      "rotationZDeg": 102,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        14.568,
+        -857.171,
+        0.244
+      ],
+      "rotationZDeg": 131,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -13.279,
+        -879.629,
+        0.208
+      ],
+      "rotationZDeg": 160,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        -24.666,
+        -912.951,
+        0.147
+      ],
+      "rotationZDeg": 189,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -13.893,
+        -946.696,
+        0.232
+      ],
+      "rotationZDeg": 218,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        7.064,
+        -975.966,
+        0.445
+      ],
+      "rotationZDeg": 247,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        27.613,
+        -1005.523,
+        0.512
+      ],
+      "rotationZDeg": 276,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        47.559,
+        -1035.492,
+        0.287
+      ],
+      "rotationZDeg": 305,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        67.501,
+        -1065.464,
+        0.327
+      ],
+      "rotationZDeg": 334,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        87.443,
+        -1095.436,
+        0.41
+      ],
+      "rotationZDeg": 3,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        107.386,
+        -1125.408,
+        0.378
+      ],
+      "rotationZDeg": 32,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        127.233,
+        -1155.442,
+        0.405
+      ],
+      "rotationZDeg": 61,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        147.0,
+        -1185.53,
+        0.426
+      ],
+      "rotationZDeg": 90,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        166.689,
+        -1215.668,
+        0.392
+      ],
+      "rotationZDeg": 119,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        186.412,
+        -1245.785,
+        0.291
+      ],
+      "rotationZDeg": 148,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        437.718,
+        -1291.403,
+        0.812
+      ],
+      "rotationZDeg": 177,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        460.978,
+        -1264.682,
+        0.75
+      ],
+      "rotationZDeg": 206,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        462.691,
+        -1229.481,
+        0.697
+      ],
+      "rotationZDeg": 235,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        445.011,
+        -1198.35,
+        0.865
+      ],
+      "rotationZDeg": 264,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        425.16,
+        -1168.318,
+        0.865
+      ],
+      "rotationZDeg": 293,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        405.304,
+        -1138.289,
+        0.821
+      ],
+      "rotationZDeg": 322,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        385.649,
+        -1108.129,
+        0.769
+      ],
+      "rotationZDeg": 351,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -207.285,
+        -13.23,
+        0.128
+      ],
+      "rotationZDeg": 20,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -227.173,
+        16.777,
+        0.154
+      ],
+      "rotationZDeg": 49,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        -247.062,
+        46.785,
+        0.052
+      ],
+      "rotationZDeg": 78,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        349.762,
+        -1052.586,
+        0.888
+      ],
+      "rotationZDeg": 107,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        329.971,
+        -1022.514,
+        0.867
+      ],
+      "rotationZDeg": 136,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        310.155,
+        -992.459,
+        0.857
+      ],
+      "rotationZDeg": 165,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        290.206,
+        -962.491,
+        0.775
+      ],
+      "rotationZDeg": 194,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        537.597,
+        -796.672,
+        0.307
+      ],
+      "rotationZDeg": 223,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        521.905,
+        -764.272,
+        0.261
+      ],
+      "rotationZDeg": 252,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        479.671,
+        -664.882,
+        0.254
+      ],
+      "rotationZDeg": 281,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        467.496,
+        -631.003,
+        0.256
+      ],
+      "rotationZDeg": 310,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        455.321,
+        -597.125,
+        0.207
+      ],
+      "rotationZDeg": 339,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        365.182,
+        -362.199,
+        0.462
+      ],
+      "rotationZDeg": 8,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        352.305,
+        -328.581,
+        0.438
+      ],
+      "rotationZDeg": 37,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        339.429,
+        -294.962,
+        0.432
+      ],
+      "rotationZDeg": 66,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        326.552,
+        -261.344,
+        0.421
+      ],
+      "rotationZDeg": 95,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        313.676,
+        -227.725,
+        0.616
+      ],
+      "rotationZDeg": 124,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        -423.661,
+        -521.889,
+        -0.35
+      ],
+      "rotationZDeg": 153,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -449.132,
+        -547.33,
+        -0.35
+      ],
+      "rotationZDeg": 182,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        -474.602,
+        -572.771,
+        -0.35
+      ],
+      "rotationZDeg": 211,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        -500.072,
+        -598.213,
+        -0.35
+      ],
+      "rotationZDeg": 240,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        632.143,
+        283.308,
+        -0.196
+      ],
+      "rotationZDeg": 269,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        602.024,
+        263.59,
+        -0.322
+      ],
+      "rotationZDeg": 298,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        571.904,
+        243.871,
+        -0.35
+      ],
+      "rotationZDeg": 327,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        574.872,
+        261.797,
+        -0.35
+      ],
+      "rotationZDeg": 356,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        604.766,
+        281.856,
+        -0.35
+      ],
+      "rotationZDeg": 25,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        634.659,
+        301.916,
+        -0.199
+      ],
+      "rotationZDeg": 54,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        664.552,
+        321.975,
+        -0.11
+      ],
+      "rotationZDeg": 83,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        449.917,
+        161.065,
+        -0.35
+      ],
+      "rotationZDeg": 112,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        419.984,
+        141.064,
+        -0.35
+      ],
+      "rotationZDeg": 141,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        390.052,
+        121.063,
+        -0.35
+      ],
+      "rotationZDeg": 170,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        295.932,
+        -180.463,
+        0.791
+      ],
+      "rotationZDeg": 199,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        300.797,
+        -212.093,
+        0.891
+      ],
+      "rotationZDeg": 228,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        313.87,
+        -245.98,
+        0.536
+      ],
+      "rotationZDeg": 257,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        326.954,
+        -279.518,
+        0.427
+      ],
+      "rotationZDeg": 286,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        340.038,
+        -313.056,
+        0.45
+      ],
+      "rotationZDeg": 315,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        353.121,
+        -346.594,
+        0.467
+      ],
+      "rotationZDeg": 344,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        559.185,
+        289.315,
+        -0.35
+      ],
+      "rotationZDeg": 13,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        588.582,
+        310.093,
+        -0.35
+      ],
+      "rotationZDeg": 42,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        618.003,
+        330.83,
+        -0.263
+      ],
+      "rotationZDeg": 71,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        647.951,
+        350.802,
+        -0.35
+      ],
+      "rotationZDeg": 100,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        677.768,
+        370.973,
+        -0.323
+      ],
+      "rotationZDeg": 129,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        324.428,
+        -130.263,
+        0.535
+      ],
+      "rotationZDeg": 158,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        354.731,
+        -110.828,
+        0.658
+      ],
+      "rotationZDeg": 187,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        385.034,
+        -91.393,
+        0.805
+      ],
+      "rotationZDeg": 216,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        415.338,
+        -71.958,
+        0.69
+      ],
+      "rotationZDeg": 245,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        396.795,
+        -57.558,
+        0.382
+      ],
+      "rotationZDeg": 274,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        366.527,
+        -77.047,
+        0.401
+      ],
+      "rotationZDeg": 303,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        336.258,
+        -96.536,
+        0.411
+      ],
+      "rotationZDeg": 332,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        305.99,
+        -116.025,
+        0.26
+      ],
+      "rotationZDeg": 1,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        406.433,
+        6.537,
+        0.185
+      ],
+      "rotationZDeg": 30,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        436.221,
+        26.752,
+        0.215
+      ],
+      "rotationZDeg": 59,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        399.801,
+        -451.287,
+        0.404
+      ],
+      "rotationZDeg": 88,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        386.935,
+        -417.664,
+        0.476
+      ],
+      "rotationZDeg": 117,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        400.46,
+        -599.154,
+        0.309
+      ],
+      "rotationZDeg": 146,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        370.535,
+        -619.167,
+        0.399
+      ],
+      "rotationZDeg": 175,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        340.61,
+        -639.179,
+        0.429
+      ],
+      "rotationZDeg": 204,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        310.685,
+        -659.191,
+        0.519
+      ],
+      "rotationZDeg": 233,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        280.892,
+        -679.399,
+        0.573
+      ],
+      "rotationZDeg": 262,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        251.157,
+        -699.693,
+        0.629
+      ],
+      "rotationZDeg": 291,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        221.28,
+        -719.776,
+        0.647
+      ],
+      "rotationZDeg": 320,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        191.267,
+        -739.655,
+        0.711
+      ],
+      "rotationZDeg": 349,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        161.253,
+        -759.534,
+        0.677
+      ],
+      "rotationZDeg": 18,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        131.24,
+        -779.414,
+        0.892
+      ],
+      "rotationZDeg": 47,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        98.039,
+        -802.069,
+        0.839
+      ],
+      "rotationZDeg": 76,
+      "scale": 1.0
+    },
+    {
+      "type": "pedestrian_bollard",
+      "position": [
+        68.334,
+        -822.406,
+        0.684
+      ],
+      "rotationZDeg": 105,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        461.103,
+        -5.353,
+        0.265
+      ],
+      "rotationZDeg": 134,
+      "scale": 1.0
+    },
+    {
+      "type": "road_pole",
+      "position": [
+        431.363,
+        -25.613,
+        0.334
+      ],
+      "rotationZDeg": 163,
+      "scale": 1.0
+    }
+  ]
+}

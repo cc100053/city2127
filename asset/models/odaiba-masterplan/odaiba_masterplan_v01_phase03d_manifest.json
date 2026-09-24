@@ -1,0 +1,28 @@
+{
+  "asset": "Odaiba Masterplan Phase 03D environment",
+  "phase": "03D",
+  "units": "meters",
+  "sourcePhase": "03C validated, read-only input",
+  "environmentOnlyGlb": true,
+  "detailedBuildingReferences": 8,
+  "gsiDemCache": "phase03d_dem_cache",
+  "treeInstances": "tree_instances.json",
+  "streetlightInstances": "streetlight_instances.json",
+  "terrainReport": "terrain_report.json",
+  "waterSurfaceMayBeBelowZero": true,
+  "automaticBlendPreviewDisabled": true,
+  "outputs": [
+    "odaiba_masterplan_v01_phase03d.blend",
+    "odaiba_masterplan_v01_phase03d_environment.glb",
+    "odaiba_masterplan_v01_phase03d_manifest.json",
+    "odaiba_masterplan_v01_phase03d_validation.json",
+    "terrain_report.json",
+    "tree_instances.json",
+    "streetlight_instances.json",
+    "odaiba_masterplan_v01_phase03d_preview_top.png",
+    "odaiba_masterplan_v01_phase03d_preview_oblique.png",
+    "odaiba_masterplan_v01_phase03d_preview_street.png",
+    "odaiba_masterplan_v01_phase03d_preview_waterfront.png",
+    "odaiba_masterplan_v01_phase03d_preview_terrain.png"
+  ]
+}
