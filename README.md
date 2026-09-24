@@ -31,6 +31,8 @@ cd module-swap && npm run install:app && npm run dev          # 打開 Vite 網�
 
 設計同限制見 [PROJECT.md](docs/PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--module-swap)，驗證見 [VALIDATION.md](docs/VALIDATION.md)。
 
+**根目錄場景接 survey（第 1 步，2026-09-24）：** 根目錄 app 加 `?survey`（例如 `http://127.0.0.1:5173/?survey`，需先開 survey server）會由政策分數驅動澀谷場景氣氛（交通、人流、綠化、窗燈等），左下顯示最新選擇同分數；preset 按鈕停用。現時變化仍然細微，下一步係喺澀谷加可見變化點。詳見 [PROJECT.md](docs/PROJECT.md#root-scene-survey-atmosphere--2026-09-24-srcsurvey-step-1-of-connecting-the-survey)。
+
 ## 目前可執行原型
 
 固定鏡頭、固定種子 `2127` 的 Three.js 澀谷多層城市原型（Plan 02 首個垂直切片）。以 [Pic 2](asset/pic2.png) 為量體、垂直交通與材質方向參考，保留 Plan 01 的路口及地標關係。建築只建立一次，使用 Vite、TypeScript 與 WebGL 2；城市另載入一棵 Blender 樹木模型。

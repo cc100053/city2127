@@ -50,6 +50,14 @@ Exact demo: guest 1 `labour-shortage` → `automate-services` (automation +2, NW
 
 Known limits: root CI runs `survey/` and `module-swap/` tests/builds since 2026-09-24, but not module-swap's browser smoke test; sequential guests are assumed — while a question is reserved, a parallel guest is given the next eligible (often fallback) question from the current scores; question text shown in history comes from the current question JSON; slot meanings reuse generic `building-basic-*` GLBs explained by labels; module-swap is a separate Vite app, not the root Shibuya scene.
 
+## Root scene survey atmosphere — 2026-09-24 (`src/?survey`, step 1 of connecting the survey)
+
+User decision 2026-09-24: start connecting the survey to the root Shibuya scene now (step 1 of 3: atmosphere → Shibuya change points → causal panel). Handoff [root-survey-atmosphere](handoffs/root-survey-atmosphere.md).
+
+- `?survey` (default `ws://<host>:8787/ws`) or `?survey=<ws url>` on the root app connects to the same survey WebSocket as module-swap. `src/surveyAtmosphere.ts` validates each `CityView`, drops older/repeated revisions of a run, and maps only `scores` to a `WorldState` with `scoresToWorldState()`: offsets from `presets.neutral`, one answer (+2) = half effect, two answers on an axis = full (automation → traffic/glyph/neon; publicSharing → crowd/signage; environmentalPriority → greenery/warmth, less haze; urbanConcentration → windowLife/neon). The layout and its four lots are ignored here.
+- `worldState.blendTo()` starts the existing 10 s transition toward any state with no hold lock; a newer view restarts from the current blend. Survey mode hides the preset buttons, `0/1/2` do nothing, and a bottom-left panel shows connection status, the last choice with its policy change, and the four scores. Without `?survey` the preset prototype is unchanged.
+- Known limit: the scene's state-driven visuals are subtle in daylight (greenery only changes membrane opacity; crowd/traffic add a few actors), so three guests read as a small change. Readable change needs step 2 (visible Shibuya change points).
+
 ## Current implementation baseline (unchanged by the direction update)
 
 Plan 02 superseded the painted civic-model direction. Its reference is [Pic 2](../asset/pic2.png): monumental integrated architecture, a vertical city, authored efficient movement, maintained ceramic/composite/metal surfaces, restrained glazing and daylight. The implemented baseline retains one Shibuya intersection, landmark relationships, ground crossing endpoints, seeded construction, WebGL 2 and the existing state machine.

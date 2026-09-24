@@ -11,6 +11,7 @@ import { heroCamera, HERO_TARGET } from './heroCamera';
 import { createWorldState } from './worldState';
 import { overlay } from './overlay';
 import { addCityModel } from './modelAssets';
+import { startSurveyAtmosphere } from './surveyAtmosphere';
 import './style.css';
 
 try {
@@ -53,7 +54,11 @@ try {
   const composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));
   const bloom=new UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.2,.5,1.1);composer.addPass(bloom);composer.addPass(new OutputPass());
   const world=createWorldState();let now=0;
-  const updateOverlay=overlay(name=>world.choose(name,now));
+  // `?survey` or `?survey=ws://host:port/ws`: survey policy scores drive the atmosphere and the preset choices are disabled.
+  const surveyParam=new URLSearchParams(location.search).get('survey');
+  const surveyUrl=surveyParam===null?null:/^wss?:\/\//.test(surveyParam)?surveyParam:`ws://${location.hostname}:8787/ws`;
+  const updateOverlay=overlay(name=>{if(!surveyUrl)world.choose(name,now);});
+  if(surveyUrl)startSurveyAtmosphere(surveyUrl,state=>world.blendTo(state,now));
   const dusk=new T.Color('#c3d9e7'),night=new T.Color('#accbdc'),morning=new T.Color('#e0e6dc');
   const duskTop=new T.Color('#7f9fbd'),nightTop=new T.Color('#6a8db0'),morningTop=new T.Color('#a9bcc4');
   const sunWarm=new T.Color('#ffe2b3'),sunCool=new T.Color('#e5f3ff'),ambientWarm=new T.Color('#eef0df'),ambientCool=new T.Color('#a7c9ed');

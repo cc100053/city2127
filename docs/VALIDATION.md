@@ -1,5 +1,9 @@
 # Validation and handoff
 
+## Root scene survey atmosphere — 2026-09-24
+
+Branch `feat/root-survey-atmosphere`, handoff [root-survey-atmosphere](handoffs/root-survey-atmosphere.md). `npm test` (new `tests/surveyAtmosphere.test.ts`: mapping, parsing, revision order, `blendTo`) and `npm run build` passed; `survey/` and `module-swap/` unchanged. Browser: Playwright CLI (headless Chromium) at 1280×720, root dev server `?survey=ws://127.0.0.1:8788/ws`, scratch survey server/DB on port 8788, three guests submitted through the HTTP API: `automate-services`, `public-commons`, `shared-green`. The panel connected and showed each choice and the scores (自動化 +2 · 公共共有 +2 · 環境優先 +2 · 都市集約 0); console had only the pre-existing favicon 404. Screenshots [baseline](../artifacts/survey-atmosphere-baseline.png) and [after three guests](../artifacts/survey-atmosphere-three-guests.png), taken 11 s after each answer at the hero pose, differ only slightly (a few more actors and window/membrane tone). The wiring works; visual readability is **not** accepted. No FPS measured.
+
 ## CI covers survey/ and module-swap/ — 2026-09-24
 
 [Workflow](../.github/workflows/ci.yml) now also runs `npm ci && npm test && npm run build` in `survey/` and `npm ci --prefix app && npm test && npm run build` in `module-swap/` (test includes `check:models`). The npm cache is keyed on all three lockfiles and the timeout is 15 minutes. Local Node 26 runs of both steps passed; [branch CI](https://github.com/cc100053/city2127/actions/runs/35998133060) passed on `398477e` with Node 24, every step green. Not covered: module-swap's `tests/browserSmoke.mjs` (needs Chrome and a dev server). Handoff: [docs-sync-post-mvp](handoffs/docs-sync-post-mvp.md).

@@ -6,3 +6,4 @@
 .intro{top:145px;max-width:250px}h1{font-size:38px}.question{font-size:11px}body[data-state=pulse]{color:#354139}body[data-state=pulse] h1 em{color:#526d79}.verdict{bottom:122px}.choices{border-radius:8px}button{border-radius:4px}
 footer .choices{position:absolute;left:44px;bottom:34px}.footnote{display:none}.instruction{margin-left:auto}.verdict{left:44px;right:auto;bottom:125px;width:320px;text-align:left}.verdict p{line-height:1.6}
 .asset-preview{position:fixed;right:20px;top:20px;z-index:10;background:#fff;padding:8px;color:#222}
+[data-mode=survey] .choices,[data-mode=survey] .instruction,[data-mode=survey] .state-label{display:none}.survey-panel{position:fixed;left:44px;bottom:34px;max-width:420px;font-size:10px;letter-spacing:1px;line-height:1.8;pointer-events:none}.survey-panel p{margin:0}.survey-status{font-size:8px;letter-spacing:2px;opacity:.55}.survey-choice{font-size:12px;margin:6px 0 4px}
