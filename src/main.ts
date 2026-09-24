@@ -20,14 +20,14 @@ try {
   const scene=new T.Scene();scene.background=new T.Color('#dfd6cd');scene.fog=new T.FogExp2('#dfd6cd',.008);
   const renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);
-  renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=.9;renderer.outputColorSpace=T.SRGBColorSpace;
+  renderer.toneMapping=T.NeutralToneMapping;renderer.toneMappingExposure=.92;renderer.outputColorSpace=T.SRGBColorSpace;
   renderer.info.autoReset=false;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
   renderer.domElement.setAttribute('aria-label','A multi-level Shibuya crossing in 2127. Drag to orbit, scroll to zoom, right-drag to pan. Use 0 for daylight, 1 for pulse, 2 for still.');
   document.querySelector('#app')!.appendChild(renderer.domElement);
   const environment=new T.PMREMGenerator(renderer),room=new RoomEnvironment();
   scene.environment=environment.fromScene(room,.04).texture;scene.environmentIntensity=.6;room.dispose();environment.dispose();
   const camera=heroCamera(innerWidth,innerHeight);
-  const ambient=new T.HemisphereLight('#edf1e4','#849184',2.2);scene.add(ambient);
+  const ambient=new T.HemisphereLight('#edf1e4','#8a8274',2.2);scene.add(ambient);
   const sun=new T.DirectionalLight('#ffe4b8',3.4);sun.position.set(-20,38,18);sun.castShadow=true;
   sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-65,right:65,top:65,bottom:-65,near:1,far:180});sun.shadow.normalBias=.12;scene.add(sun);
   // Gradient sky: horizon shares the fog colour, zenith is a deeper tone per state. Follows the camera so it never clips.
@@ -67,7 +67,7 @@ try {
   if(surveyUrl)startSurveyAtmosphere(surveyUrl,(state,targets)=>{world.blendTo(state,now);sites!.apply(targets,now);});
   const dusk=new T.Color('#c3d9e7'),night=new T.Color('#accbdc'),morning=new T.Color('#e0e6dc');
   const duskTop=new T.Color('#7f9fbd'),nightTop=new T.Color('#6a8db0'),morningTop=new T.Color('#a9bcc4');
-  const sunWarm=new T.Color('#ffe2b3'),sunCool=new T.Color('#e5f3ff'),ambientWarm=new T.Color('#eef0df'),ambientCool=new T.Color('#a7c9ed');
+  const sunWarm=new T.Color('#ffe7c4'),sunCool=new T.Color('#e5f3ff'),ambientWarm=new T.Color('#e3ebee'),ambientCool=new T.Color('#a7c9ed');
   const start=performance.now();
   let frames=0,measureStart=start;
   renderer.setAnimationLoop(()=>{
@@ -78,8 +78,8 @@ try {
     (scene.fog as T.FogExp2).color.copy(scene.background as T.Color);(scene.fog as T.FogExp2).density=.0015+s.haze*.003;
     floor.material.color.copy(scene.background as T.Color);
     sky.position.copy(camera.position);sky.material.uniforms.horizon.value.copy(scene.background as T.Color);sky.material.uniforms.top.value.copy(duskTop).lerp(nightTop,pulse).lerp(morningTop,still);
-    sun.color.copy(sunWarm).lerp(sunCool,pulse);sun.intensity=3+pulse*.2+still*.4;
-    sun.position.set(-30+still*10,65,30);ambient.intensity=1.05+pulse*.15+still*.15;
+    sun.color.copy(sunWarm).lerp(sunCool,pulse);sun.intensity=2.55+pulse*.2+still*.05;
+    sun.position.set(-48+still*10,44,34);ambient.intensity=.62+pulse*.15+still*.15;
     ambient.color.copy(ambientWarm).lerp(ambientCool,pulse);
     bloom.strength=.06+pulse*.04;
     controls.update();rig.update(s,now);sites?.update(now);updateOverlay(status);renderer.info.reset();composer.render();

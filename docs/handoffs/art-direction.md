@@ -45,6 +45,8 @@ Pilot (2026-09-24):
 
 Building rollout (2026-09-24, after the user said "ok, polish building"): all glazing moved to `glass`. MAGNET got planted collar terraces and a curved glass corner drum. The shops got east-face glazing, planted slabs and ringed roof gardens on large roofs (PV moved to the back half). The commons floor got rail planters, and the SE tower base got planted slabs. See the [ART.md rollout list](../ART.md#building-rollout-2026-09-24).
 
+Lighting pass (2026-09-24, user asked for light and shadow polish in a second worktree): `feat/art-lighting` in `../city2127-lighting`, based on b549785, touches `src/main.ts` only. It uses Neutral tone mapping, a lower and warmer sun with longer shadows, a weaker cool fill, and a smaller Still boost. See [VALIDATION](../VALIDATION.md#art-direction-lighting-pass--2026-09-24). It is not merged into `feat/art-direction` yet and needs user review.
+
 ## Actual validation results
 
 - Verification status: PARTIAL — code checks and screenshots done; real-GPU FPS not measured; user art review pending

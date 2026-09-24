@@ -48,6 +48,7 @@ Everything static goes through the `bake()` material merge. Detail costs vertice
 ## 5. Glass and light
 
 - Daylight is the base state. Glass reflects the environment map instead of glowing.
+- Light direction: a warm, fairly low sun (about 40°) casts long shadows across the crossing, and a weaker cool sky fill keeps shade blue-grey rather than black. Form comes from light/shadow contrast, not from darker paint. Neutral tone mapping keeps the pale palette from greying out.
 - Emissive light carries information: civic mint marks public service paths, and saffron marks guest changes. Windows and signs follow the WorldState presets.
 - The post chain is MSAA render target → GTAO contact shadows → bloom (low) → output. Contact shadows ground the objects where they meet the floor. Measure on a real GPU before adding more passes.
 

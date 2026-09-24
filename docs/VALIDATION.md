@@ -1,5 +1,11 @@
 # Validation and handoff
 
+## Art-direction lighting pass — 2026-09-24
+
+Branch `feat/art-lighting` (separate worktree, based on b549785; the uncommitted second building rollout was not included). Change is `src/main.ts` lighting only: Neutral tone mapping (exposure .92), a lower, warmer sun (2.55), a cooler and weaker hemisphere fill (.62), and the Still sun boost cut from .4 to .05. A sky-gradient PMREM environment was also tried and rejected: it lit diffuse surfaces too blue and muddy, and did not visibly improve the glass at the hero distance. `RoomEnvironment` stays.
+
+Playwright CLI (headless SwiftShader) captures at 1280×720 on the untouched hero pose: [before, preset](../artifacts/light-before-preset.png); after: [preset](../artifacts/light-after-preset.png), [Pulse](../artifacts/light-after-pulse.png), [Still](../artifacts/light-after-still.png) and [survey, two guests](../artifacts/light-after-survey.png) (the survey server from the main worktree was running and was only read). Headless draw calls are unchanged: 337 for preset and 393 for survey with two guests. `npm test` PASS, `npm run build` PASS (existing chunk-size warning), `git diff --check` clean. Pulse and Still have no before capture from this session. Real-GPU FPS was not measured, but the pass adds no lights, passes or geometry.
+
 ## Art-direction building rollout — 2026-09-24
 
 After the user said "ok, polish building", [ART.md](ART.md) was rolled out to the buildings on `feat/art-direction`. `npm test` and `npm run build` passed, with the existing chunk-size warning only. `git diff --check` was clean. `survey/` and `module-swap/` are unchanged.
