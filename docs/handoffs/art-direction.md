@@ -4,14 +4,14 @@
 - Status: IN_PROGRESS
 - Branch: feat/art-direction
 - Base commit: 5894f872be1e35d759178786bfe2a2949b190b17
-- Last verified commit: NONE (task opened; no code changed)
+- Last verified commit: see Actual validation results (pilot commit on feat/art-direction)
 - Remote availability: origin/feat/art-direction (handoff commit)
 - GitHub Issue (optional): none
 
 ## Session Git state
 
-- Session starting branch and HEAD: main 5894f872be1e35d759178786bfe2a2949b190b17
-- Last fetched origin/main commit: 5894f872be1e35d759178786bfe2a2949b190b17 (2026-09-24)
+- Session starting branch and HEAD: feat/art-direction 81e1dfa5cde040f56511a76bd3b3db1055908a90 (pilot session, 2026-09-24; clean and in sync with origin/feat/art-direction)
+- Last fetched origin/main commit: 5894f872be1e35d759178786bfe2a2949b190b17 (2026-09-24; main has not moved since the task base)
 - Local changes present at session start: NONE
 - Upstream integration status: NOT NEEDED
 - Pending Git conflicts or synchronization blockers: NONE
@@ -33,21 +33,30 @@ Done when:
 
 ## Completed work
 
-Task opened: this handoff and the dated decision note in [PLAN02.md](../PLAN02.md). No code changed.
+Task opened: this handoff and the dated decision note in [PLAN02.md](../PLAN02.md).
+
+Pilot (2026-09-24):
+
+- The [ART.md](../ART.md) draft covers palette and material roles, massing, detail by distance, greenery, glass and light, signage and ambient data, actors, and how a survey change reads. It is linked from PROJECT and PLAN02.
+- `cityRig.ts`: `glass`/`leaf`/`stone` materials, `arc()` (rings, arcs, discs via `ExtrudeGeometry`), `shrubs()` (own hash, so the city seed sequence and distant skyline are unchanged) and `bake()` (the static material merge, now shared). QFRONT: a curved media drum replaces the flat 渋谷/2127 signs and the dark panel on the crossing face; the lobby and window bands are silvered glass; planted terraces sit on the crossing and east faces. Hachiko plaza: stone disc, mint ring, planter rings with shrubs (open NW to the crossing and E to the station), curved bench and round plinth; the square bench at `(8,20)` was removed.
+- `surveySites.ts`: the SW commons is restyled (round plaza, planted ring open east, ringed canopy on six columns, curved benches). All four sites get the saffron guest outline, which pulses for 10 s after a live change but not on snapshot restore. Parts and park trees are baked per material.
+- `main.ts`: 4× MSAA composer target and a GTAO pass.
+- Site positions, footprints, rise/sink behaviour, camera and presets are unchanged.
 
 ## Actual validation results
 
-- Verification status: NOT RUN
-- Date and checked commit/worktree: NONE
-- Commands/manual checks and results: NOT RUN
-- Evidence/environment: NONE
+- Verification status: PARTIAL — code checks and screenshots done; real-GPU FPS not measured; user art review pending
+- Date and checked commit/worktree: 2026-09-24, pilot worktree on feat/art-direction (commit recorded in git log)
+- Commands/manual checks and results: `npm test` PASS, `npm run build` PASS (existing chunk-size warning), `git diff --check` clean; Playwright 1280×720 before/after in preset and `?survey` modes, live-change outline check — see [VALIDATION](../VALIDATION.md#art-direction-pilot--2026-09-24)
+- Evidence/environment: `artifacts/art-before-*.png`, `artifacts/art-pilot-*.png`; headless SwiftShader stats only
 - Integrated commit and checks: NOT INTEGRATED
 - Changes since verification: NONE
 
 ## Known issues and blockers
 
 - Performance budget is unknown: the exhibition PC's GPU is not specified. Current baseline (2026-09-17, 1280×720) was ~60 FPS, ~120 draw calls; heavier materials and post-processing must be measured, not assumed.
-- Chrome extension browser automation was unavailable on 2026-09-24; headless checks use Playwright CLI (SwiftShader), which is fine for screenshots but not for FPS.
+- Chrome extension connected on 2026-09-24 (M1 Pro, ANGLE Metal), but the tab was `hidden`, so no frames rendered and window resize was ignored. FPS at 1280×720 and 1920×1080 still needs Chrome in the foreground; the measurement harness is an iframe of exact CSS size on a same-origin page. GTAO doubles draw calls (preset 170 → 337); drop it if the real-GPU numbers do not hold.
+- Hachiko plaza is mostly hidden by the koban and station at the hero pose; only its NW half (planter, shrubs, plinth) reads. Moving it would change the landmark relationship, so it is left for user review.
 
 ## Important decisions
 
@@ -57,4 +66,4 @@ Task opened: this handoff and the dated decision note in [PLAN02.md](../PLAN02.m
 
 ## Next expected step
 
-cc100053 / agent: draft `docs/ART.md` from Pic 2 and the Plan 02 open gaps (PLAN02 "視覺驗收：哪些還未過"), take the "before" screenshots, then build the pilot area.
+cc100053: measure FPS/draw calls in foreground desktop Chrome at 1280×720 and 1920×1080 (preset and `?survey` with all sites), then give the art review of the pilot screenshots. After approval, roll ART.md out to MAGNET, the other shops and the NW/NE/SE sites.

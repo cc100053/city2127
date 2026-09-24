@@ -11,11 +11,39 @@ export const cream = paint('#dce3e3',.58), teal = paint('#839da8',.44,.05), sage
 export const futureLight=new T.MeshStandardMaterial({color:'#8ce5d8',emissive:'#68d9de',emissiveIntensity:.8,roughness:.65});
 export const solar=paint('#486b83',.3,.85);
 export const membrane=new T.MeshStandardMaterial({color:'#9abdb9',roughness:.3,metalness:.25,transparent:true,opacity:.72,side:T.DoubleSide});
+// Pilot finishes (docs/ART.md): silvered glass that reads the sky, living green, pale stone paving.
+export const glass=new T.MeshPhysicalMaterial({color:'#a7c3cf',roughness:.08,metalness:.6,clearcoat:1,clearcoatRoughness:.06});
+export const leaf=paint('#7d9f68',.85), stone=paint('#ebe8e0',.66);
 const rounded = new Map<string, RoundedBoxGeometry>();
 export function box(parent:T.Object3D, size:[number,number,number], position:[number,number,number], material:T.Material, radius=.18) {
   const key = [...size,radius].join(',');
   if (!rounded.has(key)) rounded.set(key,new RoundedBoxGeometry(...size,2,Math.min(radius,.055,...size.map(v=>v/2))));
   const mesh = new T.Mesh(rounded.get(key),material); mesh.position.set(...position); mesh.castShadow=true; mesh.receiveShadow=true; parent.add(mesh); return mesh;
+}
+/** Flat-topped ring, arc or disc (inner=0) standing on `position`. Angles run from +X towards -Z. */
+export function arc(parent:T.Object3D, inner:number, outer:number, height:number, position:[number,number,number], material:T.Material, start=0, length=Math.PI*2) {
+  const shape=new T.Shape();
+  if(length>=Math.PI*2){shape.absarc(0,0,outer,0,Math.PI*2,false);if(inner>0){const hole=new T.Path();hole.absarc(0,0,inner,0,Math.PI*2,true);shape.holes.push(hole);}}
+  else{shape.absarc(0,0,outer,start,start+length,false);shape.absarc(0,0,inner,start+length,start,true);}
+  const geometry=new T.ExtrudeGeometry(shape,{depth:height,bevelEnabled:false,curveSegments:Math.max(8,Math.ceil(length*10))});geometry.rotateX(-Math.PI/2);
+  const mesh=new T.Mesh(geometry,material);mesh.position.set(...position);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;
+}
+const shrubGeometry=new T.IcosahedronGeometry(1,1);
+/** Planted edge: seeded shrubs along an arc, so greenery reads as grown rather than a flat green slab. */
+export function shrubs(parent:T.Object3D, radius:number, y:number, start:number, length:number, count:number) {
+  const jitter=(n:number)=>Math.abs(Math.sin(n*12.9898+radius*78.233)*43758.5453)%1; // own hash: leaves the city's seeded sequence untouched
+  for(let i=0;i<count;i++){
+    const a=start+(i+.5)/count*length,r=radius+(jitter(i)-.5)*.35,s=.32+jitter(i+.5)*.3;
+    const mesh=new T.Mesh(shrubGeometry,leaf);mesh.position.set(Math.cos(a)*r,y+s*.55,-Math.sin(a)*r);mesh.scale.set(s,s*.8,s);mesh.castShadow=true;parent.add(mesh);
+  }
+}
+/** Merge every single-material mesh under `root` into one mesh per material, in root space. Signs keep their own materials. */
+export function bake(root:T.Object3D) {
+  root.updateMatrixWorld(true);
+  const inverse=root.matrixWorld.clone().invert(),batches=new Map<T.Material,T.BufferGeometry[]>(),meshes:T.Mesh[]=[];
+  root.traverse(obj=>{if(obj instanceof T.Mesh && !Array.isArray(obj.material)){const geometries=batches.get(obj.material)??[];geometries.push((obj.geometry.index ? obj.geometry.toNonIndexed() : obj.geometry.clone()).applyMatrix4(inverse.clone().multiply(obj.matrixWorld)));batches.set(obj.material,geometries);meshes.push(obj);}});
+  meshes.forEach(mesh=>mesh.removeFromParent());
+  return [...batches].map(([material,geometries])=>{const mesh=new T.Mesh(mergeGeometries(geometries),material);mesh.castShadow=true;mesh.receiveShadow=true;mesh.name='fixed-kit';geometries.forEach(g=>g.dispose());return mesh;});
 }
 type WindowSlot = { object:T.Object3D; phase:number; occupancy:number };
 export type Kit = { windows:WindowSlot[]; signs:T.MeshStandardMaterial[]; random:()=>number };
@@ -81,6 +109,25 @@ export function tower(kit:Kit) {
   sign(g,kit,'空中駅  /  AIR COMMONS',.5,21.4,6.46,8,.65,'#46676e');
   sign(g,kit,'01  /  CARGO',-2.2,11.25,7.72,2.7,.45,'#46676e');
   windows(g,kit,9.4,8,9.4);return g;
+}
+/** QFRONT's crossing screen as a curved glass drum (Pic 2): a daylight landscape rather than an advert. */
+function mediaDrum(g:T.Group, kit:Kit, face:number) {
+  const chord=8,bulge=1.3,radius=(chord*chord/4+bulge*bulge)/(2*bulge),half=Math.asin(chord/2/radius),cz=face+bulge-radius,y0=24,height=11.5;
+  const canvas=document.createElement('canvas');canvas.width=512;canvas.height=Math.round(512*height/(radius*half*2));
+  const ctx=canvas.getContext('2d')!,H=canvas.height,sky=ctx.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,'#5f93bd');sky.addColorStop(.55,'#d7e7ee');sky.addColorStop(1,'#cfe0d6');ctx.fillStyle=sky;ctx.fillRect(0,0,512,H);
+  ctx.fillStyle='#b9c9d8';ctx.beginPath();ctx.moveTo(90,H*.58);ctx.lineTo(300,H*.36);ctx.lineTo(330,H*.37);ctx.lineTo(512,H*.56);ctx.lineTo(512,H*.62);ctx.lineTo(90,H*.62);ctx.fill();
+  ctx.fillStyle='#f4f7f8';ctx.beginPath();ctx.moveTo(262,H*.4);ctx.lineTo(300,H*.36);ctx.lineTo(330,H*.37);ctx.lineTo(372,H*.41);ctx.lineTo(318,H*.395);ctx.fill();
+  for(const [y,color] of [[.6,'#8fb38a'],[.7,'#6e9a6b'],[.82,'#557f58']] as const){ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(0,H);for(let x=0;x<=512;x+=32)ctx.lineTo(x,H*y+Math.sin(x/60+y*9)*H*.03);ctx.lineTo(512,H);ctx.fill();}
+  ctx.fillStyle='rgba(255,255,255,.8)';for(const [x,w,h] of [[60,16,.2],[84,10,.14],[420,14,.18],[444,9,.11]])ctx.fillRect(x,H*.6-H*h,w,H*h);
+  ctx.fillStyle='#ffffff';ctx.textAlign='center';ctx.font='500 34px sans-serif';ctx.fillText('渋谷',256,H*.1);
+  ctx.font='600 52px sans-serif';ctx.fillText('SHIBUYA',256,H*.18);ctx.font='300 46px sans-serif';ctx.fillText('2 1 2 7',256,H*.26);
+  const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;texture.anisotropy=4;
+  const material=new T.MeshStandardMaterial({map:texture,emissiveMap:texture,emissive:'#ffffff',emissiveIntensity:.3,roughness:.3,metalness:.1});kit.signs.push(material);
+  const screen=new T.Mesh(new T.CylinderGeometry(radius,radius,height,48,1,true,-half,half*2),material);screen.position.set(0,y0+height/2,cz);g.add(screen);
+  // Silver rims and slender fins frame the drum; the building behind stays readable at its edges.
+  for(const y of [y0-.3,y0+height])arc(g,radius-.5,radius+.15,.3,[0,y,cz],trim,-Math.PI/2-half-.03,half*2+.06);
+  for(const x of [-1,1])box(g,[.28,height+1.2,.5],[x*(chord/2+.1),y0+height/2,face+.1],trim,.12);
 }
 export function shop(kit:Kit,x:number,z:number,w:number,h:number,d:number,color:T.Material,label:string) {
   const g=new T.Group();g.name=`shop-${label}`;g.position.set(x,0,z);
@@ -152,19 +199,23 @@ export function cityRig(scene:T.Scene) {
   const q=landmarks[0],qfront=new T.Group();qfront.position.set(q.x,0,q.z);qfront.name='QFRONT';
   // Twin occupied cores carry a civic hall and an upper residential district.
   for(const x of [-3.7,3.7])box(qfront,[3.6,q.h-.8,q.d],[x,q.h/2+.4,0],teal);
-  box(qfront,[q.w,5,q.d],[0,3.3,0],dark);
+  box(qfront,[q.w,5,q.d],[0,3.3,0],glass);
   for(const y of [11,23,36])box(qfront,[q.w+.4,.6,q.d+.4],[0,y,0],trim);
   // Deck portal: the public route enters the open floor between the cores.
   box(qfront,[4.4,.5,.6],[0,12.2,q.d/2+.1],trim,.08);
   for(const [y,h] of [[17,10],[30,10]]){
     box(qfront,[q.w-.6,h,q.d-.5],[0,y,0],teal);
+    if(y>25)continue; // the media drum is this block's crossing face
     for(let x=-4.5;x<=4.5;x+=1.5)box(qfront,[.12,h,.18],[x,y,5.03],trim);
-    for(let f=y-h/2+1;f<y+h/2;f+=2){box(qfront,[q.w-1,.6,.12],[0,f,5.05],dark);box(qfront,[q.w-.6,.1,.5],[0,f+.5,5.22],trim,.03);}
+    for(let f=y-h/2+1;f<y+h/2;f+=2){box(qfront,[q.w-1,.6,.12],[0,f,5.05],glass);box(qfront,[q.w-.6,.1,.5],[0,f+.5,5.22],trim,.03);}
   }
-  box(qfront,[7,11,.25],[0,30,5.18],dark);
+  mediaDrum(qfront,kit,q.d/2);
+  // Planted terraces on the crossing and east faces: greenery grows on the slabs, it is not stuck on as pots.
+  for(const y of [11,23,36]){
+    box(qfront,[.55,.5,q.d-.4],[q.w/2-.05,y+.55,0],leaf,.2);
+    for(const x of y===11?[-3.9,3.9]:[-4.6,4.6])box(qfront,[y===11?3.1:1.6,.5,.55],[x,y+.55,q.d/2+.05],leaf,.2);
+  }
   sign(qfront,kit,'QFRONT',0,44,6.05,8,1.2,'#294652');
-  sign(qfront,kit,'渋谷  /  SHIBUYA',0,32.4,5.4,6.4,1.7,'#527789');
-  sign(qfront,kit,'2 1 2 7',0,28,5.4,6.4,2.2,'#527789');
   sign(qfront,kit,'TSUTAYA / COMMONS',0,4.1,5.12,9.5,.85,'#294652');
   staticGroup.add(qfront,tower(kit));
   for(const [i,color] of [[2,sage],[3,pink],[4,cream]] as const){
@@ -196,11 +247,21 @@ export function cityRig(scene:T.Scene) {
   const police=kiosk(kit);police.position.set(15,0,23);staticGroup.add(police);
   // Small memory marker; intentionally a blockout, not a detailed sculpture.
   const hachiko=new T.Group();hachiko.position.set(7,0,16);staticGroup.add(hachiko);
-  box(hachiko,[1.6,.7,1.6],[0,.8,0],cream,.12);
+  arc(hachiko,0,.95,.75,[0,.45,0],stone);
   box(hachiko,[.55,.85,.65],[0,1.5,0],dark,.14);
   box(hachiko,[.55,.5,.65],[0,2.1,.2],dark,.12);
   for(const x of [-.2,.2])box(hachiko,[.13,.28,.18],[x,2.43,.15],dark,.02);
   sign(hachiko,kit,'HACHIKO',0,.9,.85,1.35,.3,'#536f66');
+  // Hachiko plaza as a planted round room: open to the crossing (NW) and the station (E), sheltered from the road (W/S).
+  const plaza=new T.Group();plaza.position.set(8,0,17);staticGroup.add(plaza);
+  arc(plaza,0,5.2,.1,[0,.42,0],stone);
+  arc(plaza,3.55,3.68,.02,[0,.52,0],futureLight);
+  for(const [start,length] of [[2.75,2.6],[.3,.9]]){
+    arc(plaza,4.1,4.9,.55,[0,.52,0],trim,start,length);
+    arc(plaza,4.2,4.8,.08,[0,1.07,0],leaf,start,length);
+    shrubs(plaza,4.5,1.1,start,length,Math.round(length*7));
+  }
+  arc(plaza,2.55,2.95,.42,[0,.52,0],pink,3.9,1.6);
   const depot=new T.Group();depot.position.set(DOCK.x,0,DOCK.z);staticGroup.add(depot);
   for(const x of [-.85,.85])box(depot,[.13,13.8,.18],[x,7.5,0],solar,.025);
   for(const x of [-.85,.85])box(depot,[.13,.16,DOCK.z-DOCK.berthZ],[x,DOCK.y-1,(DOCK.berthZ-DOCK.z)/2],solar,.025);
@@ -215,7 +276,7 @@ export function cityRig(scene:T.Scene) {
     sign(terminal,kit,'AIR / 02',0,3.1,.32,1.7,.48,'#467b86');
   }
   // Civic seating stays outside the five crossing mouths.
-  for(const [x,z] of [[-18,-25],[8,20],[16,10]]){
+  for(const [x,z] of [[-18,-25],[16,10]]){
     box(staticGroup,[3.1,.24,.9],[x,1.2,z],pink,.1);
     for(const dx of [-1,1])box(staticGroup,[.25,.7,.65],[x+dx,.8,z],dark,.06);
   }
@@ -294,10 +355,7 @@ export function cityRig(scene:T.Scene) {
   const windowMesh=new T.InstancedMesh(winGeo,winMat,kit.windows.length);
   kit.windows.forEach((slot,i)=>{windowMesh.setMatrixAt(i,slot.object.matrixWorld);windowMesh.setColorAt(i,new T.Color('#274747'));});
   scene.add(windowMesh);
-  const batches=new Map<T.Material,T.BufferGeometry[]>();
-  staticGroup.traverse(obj=>{if(obj instanceof T.Mesh && !Array.isArray(obj.material)){const geometries=batches.get(obj.material)??[];geometries.push((obj.geometry.index ? obj.geometry.toNonIndexed() : obj.geometry.clone()).applyMatrix4(obj.matrixWorld));batches.set(obj.material,geometries);}});
-  scene.remove(staticGroup);
-  for(const [material,geometries] of batches){const merged=mergeGeometries(geometries);const mesh=new T.Mesh(merged,material);mesh.castShadow=true;mesh.receiveShadow=true;mesh.name='fixed-kit';scene.add(mesh);geometries.forEach(g=>g.dispose());}
+  scene.remove(staticGroup);scene.add(...bake(staticGroup));
   const glyph=glyphs();scene.add(glyph.group);
   const updateMobility=mobility(scene);
   const color=new T.Color(),cool=new T.Color('#80dfef'),warm=new T.Color('#ffcd83'),off=new T.Color('#254447'),windowColor=new T.Color();

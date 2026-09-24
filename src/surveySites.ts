@@ -1,11 +1,13 @@
 import * as T from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { box, sign, cream, teal, sage, pink, dark, trim, futureLight, solar, membrane, paint, type Kit } from './cityRig';
+import { box, sign, arc, shrubs, bake, cream, teal, sage, pink, dark, trim, futureLight, solar, membrane, stone, leaf, paint, type Kit } from './cityRig';
 import { changeSites } from './layout';
 import type { SitePart } from './surveyAtmosphere';
 
 const GROW = 3; // seconds a part takes to rise or sink
 const lawn = paint('#9fbf8a', .9);
+// Guest accent (docs/ART.md): saffron is reserved for city changes made by guests and appears nowhere else.
+const GUEST = '#ff9a2e', FRESH = 10; // seconds a new change keeps its pulsing outline
 
 /** Survey change sites in the Shibuya scene. Every variant is built once; answers only rise or sink parts. */
 export function surveySites(scene: T.Scene) {
@@ -34,22 +36,27 @@ export function surveySites(scene: T.Scene) {
   for (const [w, d] of [[pw, 1.4], [1.4, pd]] as const) box(park, [w, .06, d], [0, .72, 0], cream, .03);
   for (const [x, z, w, d] of [[-pw / 2 + .4, 0, .8, pd - 1], [pw / 2 - .4, 0, .8, pd - 1], [0, -pd / 2 + .4, pw - 1, .8]] as const) box(park, [w, 1, d], [x, 1.1, z], sage, .3);
   new GLTFLoader().loadAsync(new URL('../asset/models/future-tree-2127/future-tree-2127.glb', import.meta.url).href).then(({ scene: tree }) => {
-    const height = new T.Box3().setFromObject(tree).getSize(new T.Vector3()).y || 1;
+    const height = new T.Box3().setFromObject(tree).getSize(new T.Vector3()).y || 1, grove = new T.Group();
     for (const [x, z, h] of [[-2.6, -2.6, 7], [2.6, -2.6, 5.5], [-2.6, 2.6, 5], [2.8, 2.6, 6.5], [0, 0, 4]] as const) {
       const copy = tree.clone(); copy.scale.setScalar(h / height); copy.position.set(x, .7, z); copy.rotation.y = x * z;
-      copy.traverse(o => { if (o instanceof T.Mesh) { o.castShadow = true; o.receiveShadow = true; } });
-      park.add(copy);
+      grove.add(copy);
     }
+    park.add(...bake(grove), grove); // five GLB copies → one mesh per tree material; anything unbakeable stays in grove
   }).catch(error => console.error('Park trees failed to load', error));
 
-  // SW public sharing: an open commons plaza under a membrane canopy.
+  // SW public sharing: a round commons under a ringed canopy, the Hachiko plaza language at neighbourhood scale.
   const plaza = part(site('sw'));
-  box(plaza, [12, .25, 10], [0, .55, 0], trim, .08);
-  for (let x = -4.5; x <= 4.5; x += 3) box(plaza, [.08, .04, 9], [x, .69, 0], futureLight, .02);
-  for (const x of [-4, 4]) for (const z of [-3, 3]) box(plaza, [.25, 4.2, .25], [x, 2.8, z], trim, .05);
-  box(plaza, [9.4, .15, 7], [0, 4.95, 0], membrane, .05);
-  for (const [x, z] of [[-2, -1.5], [2, -1.5], [0, 1.8]] as const) box(plaza, [2.6, .45, .8], [x, 1, z], pink, .1);
-  sign(plaza, kit, '公共広場 / COMMONS', 0, 2, 4.6, 5, .7, '#536f66');
+  arc(plaza, 0, 5, .2, [0, .42, 0], stone);
+  arc(plaza, 2.05, 2.15, .02, [0, .62, 0], futureLight);
+  // The planted ring shelters the north, west and south; the plaza opens east to the street.
+  arc(plaza, 4.3, 5, .5, [0, .62, 0], trim, 1.2, 3.6);
+  arc(plaza, 4.4, 4.9, .08, [0, 1.12, 0], leaf, 1.2, 3.6);
+  shrubs(plaza, 4.65, 1.15, 1.2, 3.6, 23);
+  for (const [start, length] of [[.35, 1.2], [2.45, 1.2], [4.55, 1.2]]) arc(plaza, 2.6, 3, .42, [0, .62, 0], pink, start, length);
+  for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + .26; box(plaza, [.2, 4.3, .2], [Math.cos(a) * 3.8, 2.8, -Math.sin(a) * 3.8], trim, .05); }
+  arc(plaza, 3.1, 4.5, .22, [0, 4.95, 0], trim);
+  arc(plaza, 0, 3.1, .06, [0, 5.03, 0], membrane);
+  sign(plaza, kit, '公共広場 / COMMONS', 2.2, 2.1, 4, 4, .55, '#536f66');
 
   // SE urban concentration: a mid-rise block; the tall variant adds a residential tower.
   const tower = site('se'), towerBase = part(tower), towerUpper = part(tower, 18);
@@ -63,19 +70,37 @@ export function surveySites(scene: T.Scene) {
   for (let i = 0; i < 5; i++) box(towerUpper, [.12, 1.3, 5.6], [-2.4 + i * 1.2, 27.2, 0], solar, .02);
 
   const parts: Record<SitePart, T.Group> = { hubBase, hubUpper, park, plaza, towerBase, towerUpper };
-  const motion = new Map(Object.values(parts).map(g => [g, { from: 0, to: 0, start: -Infinity }]));
+  for (const g of Object.values(parts)) g.add(...bake(g)); // one draw call per material per part; trees load later and stay separate
+  const motion = new Map(Object.values(parts).map(g => [g, { from: 0, to: 0, start: -Infinity, fresh: -Infinity }]));
+  // Every site wears the same saffron footprint outline while it holds a guest's change; it pulses while the change is new.
+  const markers = (Object.keys(changeSites) as (keyof typeof changeSites)[]).map(id => {
+    const { w, d } = changeSites[id], material = new T.MeshStandardMaterial({ color: GUEST, emissive: GUEST, emissiveIntensity: .2, roughness: .5, transparent: true, depthWrite: false });
+    const outline = <P extends T.Path>(hw: number, hd: number, r: number, path: P): P => { path.moveTo(-hw + r, -hd); path.lineTo(hw - r, -hd); path.quadraticCurveTo(hw, -hd, hw, -hd + r); path.lineTo(hw, hd - r); path.quadraticCurveTo(hw, hd, hw - r, hd); path.lineTo(-hw + r, hd); path.quadraticCurveTo(-hw, hd, -hw, hd - r); path.lineTo(-hw, -hd + r); path.quadraticCurveTo(-hw, -hd, -hw + r, -hd); return path; };
+    const shape = outline(w / 2 + 1.2, d / 2 + 1.2, 1.4, new T.Shape()); shape.holes.push(outline(w / 2 + .8, d / 2 + .8, 1.05, new T.Path()));
+    const mesh = new T.Mesh(new T.ShapeGeometry(shape, 6).rotateX(-Math.PI / 2), material); mesh.position.y = .47; mesh.visible = false; mesh.name = `guest-marker-${id}`;
+    scene.getObjectByName(`survey-site-${id}`)!.add(mesh);
+    return { mesh, material, parts: { nw: [hubBase, hubUpper], ne: [park], sw: [plaza], se: [towerBase, towerUpper] }[id] };
+  });
+  let first = true; // the snapshot on (re)connect restores the city; only later answers count as new changes
   return {
     /** Starts a rise/sink for every part whose target changed; unchanged parts keep their state. */
     apply(targets: Record<SitePart, boolean>, now: number) {
       for (const [name, g] of Object.entries(parts) as [SitePart, T.Group][]) {
         const m = motion.get(g)!, to = targets[name] ? 1 : 0;
-        if (m.to !== to) { m.from = g.scale.y > 1e-3 ? g.scale.y : 0; m.to = to; m.start = now; }
+        if (m.to !== to) { m.from = g.scale.y > 1e-3 ? g.scale.y : 0; m.to = to; m.start = now; m.fresh = first ? -Infinity : now; }
       }
+      first = false;
     },
     update(now: number) {
       for (const [g, m] of motion) {
         const p = Math.min(1, Math.max(0, (now - m.start) / GROW)), v = m.from + (m.to - m.from) * p * p * (3 - 2 * p);
         g.scale.y = Math.max(1e-3, v); g.visible = v > 1e-3;
+      }
+      for (const { mesh, material, parts } of markers) {
+        const shown = Math.max(...parts.map(g => g.visible ? g.scale.y : 0)), rose = Math.max(...parts.map(g => motion.get(g)!.to ? motion.get(g)!.fresh : -Infinity));
+        mesh.visible = shown > 1e-3; material.opacity = Math.min(1, shown * 3); // the outline lands first, the building follows
+        const age = now - rose; // a fresh change breathes for FRESH seconds, then holds a steady saffron line
+        material.emissiveIntensity = .2 + (age < FRESH ? (1 - age / FRESH) * (1 - Math.cos(age * Math.PI * 2 / 1.25)) * .9 : 0);
       }
     },
   };

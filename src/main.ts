@@ -2,6 +2,7 @@
 import * as T from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -52,7 +53,10 @@ try {
   const controls=new OrbitControls(camera,renderer.domElement);
   controls.target.set(...HERO_TARGET);controls.enableDamping=true;controls.dampingFactor=.06;controls.rotateSpeed=.45;controls.zoomSpeed=.6;controls.panSpeed=.5;
   controls.minDistance=45;controls.maxDistance=180;controls.minPolarAngle=.35;controls.maxPolarAngle=1.42;controls.screenSpacePanning=false;controls.update();
-  const composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));
+  // MSAA target: the composer's default target has no samples, so edges were aliased once post-processing ran.
+  const composer=new EffectComposer(renderer,new T.WebGLRenderTarget(innerWidth,innerHeight,{type:T.HalfFloatType,samples:4}));composer.setSize(innerWidth,innerHeight);composer.addPass(new RenderPass(scene,camera));
+  // Contact shadows where slabs, planters and cores meet: the cheapest step from blockout to built object.
+  const ao=new GTAOPass(scene,camera,innerWidth,innerHeight);ao.updateGtaoMaterial({radius:1.6,distanceFallOff:.6,thickness:2,samples:12});ao.blendIntensity=.85;composer.addPass(ao);
   const bloom=new UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.2,.5,1.1);composer.addPass(bloom);composer.addPass(new OutputPass());
   const world=createWorldState();let now=0;
   // `?survey` or `?survey=ws://host:port/ws`: survey policy scores drive the atmosphere and the preset choices are disabled.

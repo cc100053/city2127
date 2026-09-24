@@ -1,5 +1,18 @@
 # Validation and handoff
 
+## Art-direction pilot — 2026-09-24
+
+Branch `feat/art-direction` (handoff [art-direction](handoffs/art-direction.md)), rules [ART.md](ART.md). `npm test` and `npm run build` passed, with the existing bundle-size warning only. `git diff --check` was clean. `survey/` and `module-swap/` are unchanged.
+
+Browser: Playwright CLI (headless Chromium, SwiftShader) at exactly 1280×720 on the untouched hero pose, root dev server on port 5180, and a scratch survey server/DB on port 8788. The five guests went through the HTTP API: `automate-services`, `public-commons`, `build-upward`, `cooling-park`, `open-plaza`. That gives scores 自動化 +2 · 公共共有 +4 · 環境優先 +2 · 都市集約 +2, with all four sites up and the SE tower at base height.
+
+- Before: [preset](../artifacts/art-before-preset.png) and [survey, five guests](../artifacts/art-before-survey.png). After: [preset](../artifacts/art-pilot-preset.png) and [survey, five guests, reloaded](../artifacts/art-pilot-survey.png). The after capture was reloaded from the snapshot, so its outlines are steady.
+- Live change: after an admin reset and one new guest (automation → AUTO HUB), the [guest 1](../artifacts/art-pilot-survey-guest1.png) frame was taken about 4 s later, during the pulse. Sequential frames showed the saffron outline at full opacity while the hub was still rising, a visible brightness pulse, and a steady saffron line after 10 s.
+- The Pulse preset (key `1`) was checked at the same pose: the drum screen and the terraces stay readable, and nothing else changed. Console output was only the existing favicon 404.
+- Headless stats (SwiftShader; **not** performance evidence): preset draw calls 170 → 337 and geometries 84 → 86. Survey with all sites went from 576 → 462 draw calls and 141 → 119 geometries. Before the parts and park trees were baked, it was 946.
+- **Real-GPU FPS: NOT MEASURED.** Claude in Chrome connected to desktop Chrome on an Apple M1 Pro (ANGLE Metal), but the tab reported `document.visibilityState = hidden`, so no frames rendered. Window resize was also ignored. The 1280×720 and 1920×1080 measurements need Chrome in the foreground.
+- Not verified: user art review, other Chrome sizes, and a full 32 s delivery cycle with the new passes.
+
 ## Root scene causal panel — 2026-09-24
 
 Step 3 on `feat/root-causal-panel` (handoff [root-causal-panel](handoffs/root-causal-panel.md)). `npm test` (`policyText`/`cityText` added to `tests/surveyAtmosphere.test.ts`) and `npm run build` passed; `survey/` and `module-swap/` unchanged. Browser: Playwright CLI (headless Chromium) at 1280×720, fresh scratch survey DB on port 8788, the same five guests through the HTTP API. The empty run showed the waiting message ([empty](../artifacts/causal-panel-empty.png)). After five guests the uncapped card reached y≈605 and covered the SW plaza; after capping the history at three (numbered 3–5) and the card at 400 px, a reload showed the latest decision, CHOICE / POLICY / CITY EFFECT with place names, and all four sites unobstructed ([five guests](../artifacts/causal-panel-five-guests.png)). Admin reset returned the panel to the waiting message with no history. Without `?survey` no panel was created and the intro was visible. Console: only the pre-existing favicon 404.
