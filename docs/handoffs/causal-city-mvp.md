@@ -5,7 +5,7 @@
 - Branch: `feat/causal-city-mvp`
 - Base commit: `9400ccf7897e2b26def4e9c1377c7f9b5ff7f6aa` (`main`), plus merge of `origin/feat/survey-state-mvp` at `2d4d7d5`
 - Last verified commit: `391e6fce9f35acf8f4f78e007c59224d50ddda46` (later commits are documentation and screenshots only)
-- Remote availability: NOT PUSHED at the time of writing
+- Remote availability: `origin/feat/causal-city-mvp` (pushed 2026-09-24; includes `f5334f4` and this update)
 - GitHub Issue (optional): none
 
 ## Session Git state
