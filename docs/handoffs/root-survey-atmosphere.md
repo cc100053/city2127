@@ -1,11 +1,11 @@
 # root-survey-atmosphere — Survey drives the root Shibuya scene (steps 1–2)
 
 - Owner: cc100053
-- Status: IN_PROGRESS
+- Status: DONE
 - Branch: feat/root-survey-atmosphere
 - Base commit: 47b36c93715000ee798a591f10eee399c9b0e7bb
-- Last verified commit: step 1 e04f39604b23bd43432785f03c11c860441c076f; step 2 checked as uncommitted worktree on it
-- Remote availability: see branch push
+- Last verified commit: 43c6d246d4b459c985b2b0ee1d8a6111a9035bbe (step 2); integrated as 691bd2b5705a9cfc18b6a3755bb482c88dc84c8b
+- Remote availability: origin/feat/root-survey-atmosphere and origin/main at 691bd2b
 - GitHub Issue (optional): none
 
 ## Session Git state
@@ -34,8 +34,8 @@ See [PROJECT.md](../PROJECT.md#root-scene-survey-mode--2026-09-24-srcsurvey-step
 - Date and checked commit/worktree: 2026-09-24, step 2 uncommitted worktree on e04f396
 - Commands/manual checks and results: see [VALIDATION.md](../VALIDATION.md#root-scene-survey-change-sites--2026-09-24) and the step 1 entry below it
 - Evidence/environment: artifacts/survey-sites-*.png, artifacts/survey-atmosphere-*.png, headless Chromium 1280×720
-- Integrated commit and checks: NOT INTEGRATED
-- Changes since verification: documentation and handoff only
+- Integrated commit and checks: 691bd2b on main; local `npm test`, `npm run build`, `git diff --check origin/main...HEAD` passed; branch CI run 36006962113 (43c6d24) and main CI run 36007086577 (691bd2b) succeeded
+- Changes since verification: this handoff update only
 
 ## Known issues and blockers
 
@@ -49,4 +49,4 @@ Atmosphere alone is subtle (step 1 finding); the change sites carry the readable
 
 ## Next expected step
 
-Integrate into main after branch CI. Then step 3: port the full causal history panel (CHOICE / POLICY / CITY EFFECT) and optionally label sites in the scene.
+Integrated. Next, step 3 (owner cc100053): port the full causal history panel (CHOICE / POLICY / CITY EFFECT) and optionally label sites in the scene.
