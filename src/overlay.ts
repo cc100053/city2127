@@ -3,6 +3,7 @@ import type { createWorldState } from './worldState';
 export function overlay(choose: (name: StateName) => void) {
   const host = document.createElement('main');
   host.innerHTML = `<header><a class="brand" href="/" aria-label="2127 home"><span class="mark">✳</span><span>2127<span class="brand-sub">TOKYO / CIVIC FUTURES</span></span></a><span class="edition">ONE CROSSING. TWO FUTURES.<br><span>STUDY № 001 — 35°40′ N 139°42′ E</span></span></header>
+    <a class="venue-link" href="./odaiba.html">Explore Odaiba ↗</a>
     <section class="intro"><p class="eyebrow">A SMALL PLACE. A BIG DECISION.</p><h1>The same street.<br>A different <em>tomorrow.</em></h1><p class="question">May a perfect future erase<br>an imperfect past?</p></section>
     <aside class="state-label"><span class="state-dot"></span><span id="state-name">DAYLIGHT TOKYO</span><span id="time">12:00</span></aside>
     <section class="verdict" aria-live="polite" aria-atomic="true"><p id="judgment"></p><span id="hold-note"></span></section>
