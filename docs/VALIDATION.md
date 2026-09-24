@@ -1,5 +1,9 @@
 # Validation and handoff
 
+## Art-direction lighting, "expensive" pass — 2026-09-25
+
+Branch `feat/art-lighting`, following the pass below; `src/main.ts` only. VSM soft shadows replace PCFSoft, with radius 5 and 12 blur samples. GTAO is broader (radius 3, 16 samples, blend 1), exposure is .84, and bloom uses threshold 1 and strength .1. A new `VignetteShader` pass (offset .9, darkness .9) sits before output. AgX (exposure 1.15) was tried and rejected as flat and grey. Playwright CLI (headless SwiftShader) captures at 1280×720 on the hero pose: [preset](../artifacts/light-expensive-preset.png), [Pulse](../artifacts/light-expensive-pulse.png), [Still](../artifacts/light-expensive-still.png) and [survey, two guests](../artifacts/light-expensive-survey.png). The comparison baseline is [light-after-preset](../artifacts/light-after-preset.png). Headless draw calls: preset 337 → 344 and survey 393 → 400; the extra calls are VSM blur and the vignette. `npm test` PASS, `npm run build` PASS, `git diff --check` clean. Real-GPU FPS was not measured. VSM blur and the heavier GTAO cost more GPU time, so measure them first if FPS drops.
+
 ## Art-direction lighting pass — 2026-09-24
 
 Branch `feat/art-lighting` (separate worktree, based on b549785; the uncommitted second building rollout was not included). Change is `src/main.ts` lighting only: Neutral tone mapping (exposure .92), a lower, warmer sun (2.55), a cooler and weaker hemisphere fill (.62), and the Still sun boost cut from .4 to .05. A sky-gradient PMREM environment was also tried and rejected: it lit diffuse surfaces too blue and muddy, and did not visibly improve the glass at the hero distance. `RoomEnvironment` stays.
