@@ -31,7 +31,7 @@ cd module-swap && npm run install:app && npm run dev          # 打開 Vite 網�
 
 設計同限制見 [PROJECT.md](docs/PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--module-swap)，驗證見 [VALIDATION.md](docs/VALIDATION.md)。
 
-**根目錄場景接 survey（第 1–2 步，2026-09-24）：** 根目錄 app 加 `?survey`（例如 `http://127.0.0.1:5173/?survey`，需先開 survey server）會由 survey 驅動澀谷場景：政策分數改變氣氛（交通、人流、綠化、窗燈等），區畫配置喺澀谷四個變化點升起建築——MAGNET 東面嘅自動化設施、車站東面嘅公園、道玄坂南面嘅公共廣場、センター街後面嘅高樓。左下顯示最新選擇、城市變化同分數；preset 按鈕停用。詳見 [PROJECT.md](docs/PROJECT.md#root-scene-survey-mode--2026-09-24-srcsurvey-steps-12-of-connecting-the-survey)。
+**根目錄場景接 survey（2026-09-24）：** 根目錄 app 加 `?survey`（例如 `http://127.0.0.1:5173/?survey`，需先開 survey server）會由 survey 驅動澀谷場景：政策分數改變氣氛（交通、人流、綠化、窗燈等），區畫配置喺澀谷四個變化點升起建築——MAGNET 東面嘅自動化設施、車站東面嘅公園、道玄坂南面嘅公共廣場、センター街後面嘅高樓。左上嘅因果面板顯示最新題目、選擇、政策變化、城市變化（連地點）、最近三個決定同分數；preset 按鈕同 intro 文案喺呢個模式隱藏。詳見 [PROJECT.md](docs/PROJECT.md#root-scene-survey-mode--2026-09-24-srcsurvey)。
 
 ## 目前可執行原型
 
