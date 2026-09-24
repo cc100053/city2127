@@ -1,7 +1,7 @@
 # survey-state-mvp — Questionnaire state accumulation MVP
 
 - Owner: noifex
-- Status: IN_PROGRESS — committed and pushed to its own branch; not integrated into `main`
+- Status: DONE — integrated into `main` via `feat/causal-city-mvp` (merged at `6f6fbb2`, 2026-09-24); branch deleted
 - Branch: `feat/survey-state-mvp`
 - Base commit: `5577195751f20b3de568d289425f534e85b2c2a4`
 - Last verified commit: `963949c1076b49cac9286c723116ee3ef4962576` — the worktree that was verified is byte-identical to this commit; the only later change is this documentation update
@@ -61,7 +61,7 @@ Dependency note: `survey/` is a separate npm project whose only runtime dependen
   - Repository root: `npm test` — all existing suites passed; `npm run build` — succeeded; `git diff --check` — clean.
   - `git status --short` shows only the untracked new paths, confirming `node_modules/`, `dist/` and `data/` are ignored inside the new directory.
 - Evidence/environment: Node.js v24.21.0 from nvm (the shell default `node` is v20.16.0 and fails with `node: bad option: --experimental-strip-types`), npm 11, macOS 24.6.0. No browser session was driven for this package.
-- Integrated commit and checks: NOT INTEGRATED into `main`. The work is committed on this branch as `963949c1076b49cac9286c723116ee3ef4962576` and pushed to `origin/feat/survey-state-mvp`; `main` is unchanged at `5577195751f20b3de568d289425f534e85b2c2a4`.
+- Integrated commit and checks (2026-09-24): reached `main` through `feat/causal-city-mvp` (merge `d1585b1`, then `6f6fbb2`); `survey/` `npm test` + `npm run build` passed on that merge result — see [causal-city-mvp](causal-city-mvp.md). `origin/feat/survey-state-mvp` (`2d4d7d5`) was fully contained in `main` and deleted. Historical note: The work is committed on this branch as `963949c1076b49cac9286c723116ee3ef4962576` and pushed to `origin/feat/survey-state-mvp`; `main` is unchanged at `5577195751f20b3de568d289425f534e85b2c2a4`.
 - Changes since verification: documentation only — this handoff was updated to record the commit SHA and remote availability. No source, asset or configuration file changed.
 
 ## Known issues and blockers
@@ -80,6 +80,8 @@ Dependency note: `survey/` is a separate npm project whose only runtime dependen
 - The package's own record was moved from `survey/docs/handoffs/` to `survey/docs/log/` (2026-09-24). Only this repository's root `docs/handoffs/` carries task handoffs; a package's internal history is a log. The same rename was applied in the production folder so the next copy does not reintroduce the collision.
 
 ## Next expected step
+
+Superseded 2026-09-24: this branch is integrated and deleted; the next step lives in the [causal-city-mvp handoff](causal-city-mvp.md). Original notes below.
 
 Owner decides whether to open integration into `main`. The package is committed as `963949c1076b49cac9286c723116ee3ef4962576` and available on `origin/feat/survey-state-mvp`.
 
