@@ -11,7 +11,7 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
         with:
@@ -21,9 +21,19 @@ jobs:
         with:
           node-version: '24'
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            survey/package-lock.json
+            module-swap/app/package-lock.json
       - run: npm ci
       - run: npm test
       - run: npm run build
+      - name: survey
+        working-directory: survey
+        run: npm ci && npm test && npm run build
+      - name: module-swap
+        working-directory: module-swap
+        run: npm ci --prefix app && npm test && npm run build
       - name: Check diff whitespace
         env:
           BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
