@@ -1,6 +1,6 @@
 # Art rules — root Shibuya scene
 
-Status: **in use** (2026-09-24, task [art-direction](handoffs/art-direction.md)). The user reviewed the pilot (QFRONT's crossing face, Hachiko plaza, SW commons) and asked for the buildings to be polished next. The rules now apply to every landmark, the upper links, the koban and the NW/SE change-site buildings. New areas follow them too. The rules can still change after the next review.
+Status: **in use** (since 2026-09-24, task [art-direction](handoffs/art-direction.md)). The pilot, building rollout, building pass 2, step 4 (sites and ground) and the lighting/day-cycle passes are implemented on `feat/art-direction`, and the combined scene is waiting for user art review. The rules apply to every landmark, the upper links, the koban, all four change sites and any new area. What is still open is listed under [Remaining work](handoffs/art-direction.md#remaining-work).
 
 Reference: [Pic 2](../asset/pic2.png). Direction: Plan 02 daylight, a vertical city, and engineered nature, built procedurally in Three.js ([PLAN02](PLAN02.md) decision, 2026-09-24). What the city looks like serves how clearly its changes read. It is not a goal on its own.
 
@@ -49,7 +49,7 @@ Everything static goes through the `bake()` material merge. Detail costs vertice
 
 ## 5. Glass and light
 
-- Daylight is the base state. Glass reflects the environment map instead of glowing.
+- Day is the reference look for art decisions; the city also runs an automatic day/night cycle (180 s per day, 2026-09-25). Glass reflects the environment map instead of glowing.
 - Light direction: a warm, fairly low sun (about 40°) casts long shadows across the crossing, and a weaker cool sky fill keeps shade blue-grey rather than black. Form comes from light/shadow contrast, not from darker paint. Neutral tone mapping keeps the pale palette from greying out. Expensive means soft: VSM penumbrae, broad corner AO, sunlit whites kept just below clipping, a faint highlight glow and a light vignette. AgX and a sky-colour environment map were tried and rejected, because both left the scene flat and grey.
 - Emissive light carries information: civic mint marks public service paths, and saffron marks guest changes. Windows and signs follow the WorldState presets and come on after dark (day cycle, 2026-09-25): at night the city reads through lit windows, lamps and mint lines against a navy sky.
 - The post chain is MSAA render target → GTAO contact shadows → bloom (low) → vignette → output. Contact shadows ground the objects where they meet the floor. Measure on a real GPU before adding more passes.

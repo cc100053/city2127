@@ -1,20 +1,20 @@
 # art-direction — Art rules and a polished pilot area for the root Shibuya scene
 
 - Owner: cc100053
-- Status: IN_PROGRESS
+- Status: IN_PROGRESS — pilot, building rollout, sites/ground and lighting/day cycle implemented; waiting for user art review of the combined scene, then merge to main
 - Branch: feat/art-direction
 - Base commit: 5894f872be1e35d759178786bfe2a2949b190b17
-- Last verified commit: see Actual validation results (pilot commit on feat/art-direction)
-- Remote availability: origin/feat/art-direction (handoff commit)
+- Last verified commit: 6e74eecde8ad387a0f2b8522ad00aa05c3a4a915 (Merge feat/art-lighting into feat/art-direction), checked 2026-09-25
+- Remote availability: origin/feat/art-direction (all work pushed); origin/feat/art-lighting (merged branch, kept for history)
 - GitHub Issue (optional): none
 
 ## Session Git state
 
-- Session starting branch and HEAD: feat/art-direction 81e1dfa5cde040f56511a76bd3b3db1055908a90 (pilot session, 2026-09-24; clean and in sync with origin/feat/art-direction)
-- Last fetched origin/main commit: 5894f872be1e35d759178786bfe2a2949b190b17 (2026-09-24; main has not moved since the task base)
+- Session starting branch and HEAD: feat/art-direction 6e74eecde8ad387a0f2b8522ad00aa05c3a4a915 (docs session, 2026-09-25; clean and in sync with origin/feat/art-direction)
+- Last fetched origin/main commit: 5894f872be1e35d759178786bfe2a2949b190b17 (2026-09-25; main has not moved since the task base, so the merge will be conflict-free on main's side)
 - Local changes present at session start: NONE
-- Upstream integration status: NOT NEEDED
-- Pending Git conflicts or synchronization blockers: NONE
+- Upstream integration status: NOT INTEGRATED — waiting for art review
+- Pending Git conflicts or synchronization blockers: NONE. The `../city2127-lighting` worktree has been removed.
 
 ## Goal and acceptance criteria
 
@@ -33,45 +33,95 @@ Done when:
 
 ## Completed work
 
-Task opened: this handoff and the dated decision note in [PLAN02.md](../PLAN02.md).
+In commit order on `feat/art-direction`:
 
-Pilot (2026-09-24):
+1. `81e1dfa`: task opened. This handoff plus the dated decision note in [PLAN02.md](../PLAN02.md).
+2. `2122d13`, pilot (2026-09-24):
+   - [ART.md](../ART.md) rules: palette and material roles, massing, detail by distance, greenery, glass and light, signage and ambient data, actors, and how a survey change reads.
+   - `cityRig.ts` gained the `glass`/`leaf`/`stone` materials and the `arc()`, `shrubs()` and `bake()` helpers.
+   - QFRONT: curved media drum, silvered glass, planted terraces.
+   - Hachiko plaza: now round, with planter rings, a mint ring and a curved bench.
+   - SW commons: now a ringed plaza.
+   - Saffron guest outline on all four sites. It pulses for 10 s after a live change, but not on snapshot restore.
+   - Site parts and park trees are baked per material. The survey scene went from 946 to 462 draw calls.
+   - 4× MSAA composer target and GTAO.
+3. `b549785`, building rollout ("ok, polish building"):
+   - All glazing uses `glass`.
+   - MAGNET: planted collar terraces and a curved glass corner drum.
+   - Shops: planted slabs and ringed roof gardens.
+   - Commons floor: planters. SE tower: planted slabs.
+4. `eb704ef`, building pass 2 (the user said "only the front has windows" and "all buildings look identical"):
+   - `faces()`, `bands()` and `windows()` glaze all four faces. `windows()` had also sized the east face with the front width.
+   - MAGNET's ribbons moved outside the side frames that hid them.
+   - Shops split into `slender` (Center-gai), `terrace` (Dogenzaka) and `hall` (Station). Wing tones vary.
+   - Test roof allowances were raised for the new crowns and vault.
+5. `374d84a`, lighting pass, and `e016911`, "expensive" lighting pass, both on `feat/art-lighting` in a second worktree:
+   - Neutral tone mapping, a lower warm sun and a cool fill.
+   - VSM soft shadows, broader GTAO, gentle bloom and a vignette.
+6. `7d879dc`, step 4, sites and ground:
+   - NE park: ringed, with a pool.
+   - NW hub: round drone pad and a cylindrical shaft.
+   - Stone-slab and asphalt maps on the ground and roads.
+   - Mint kerb strips at every crossing waiting edge.
+7. `7218a2a`, day/night cycle (user, 2026-09-25): `src/dayCycle.ts` replaces the three buttons and the `0/1/2` keys. One day lasts 180 s; dawn is Still, day is Daylight, night is Pulse. It adds a moonlit night with lit windows and `?hour=` for captures.
+8. `6e74eec`: merge of `feat/art-lighting`. The only conflicts were in docs.
 
-- The [ART.md](../ART.md) draft covers palette and material roles, massing, detail by distance, greenery, glass and light, signage and ambient data, actors, and how a survey change reads. It is linked from PROJECT and PLAN02.
-- `cityRig.ts`: `glass`/`leaf`/`stone` materials, `arc()` (rings, arcs, discs via `ExtrudeGeometry`), `shrubs()` (own hash, so the city seed sequence and distant skyline are unchanged) and `bake()` (the static material merge, now shared). QFRONT: a curved media drum replaces the flat 渋谷/2127 signs and the dark panel on the crossing face; the lobby and window bands are silvered glass; planted terraces sit on the crossing and east faces. Hachiko plaza: stone disc, mint ring, planter rings with shrubs (open NW to the crossing and E to the station), curved bench and round plinth; the square bench at `(8,20)` was removed.
-- `surveySites.ts`: the SW commons is restyled (round plaza, planted ring open east, ringed canopy on six columns, curved benches). All four sites get the saffron guest outline, which pulses for 10 s after a live change but not on snapshot restore. Parts and park trees are baked per material.
-- `main.ts`: 4× MSAA composer target and a GTAO pass.
-- Site positions, footprints, rise/sink behaviour, camera and presets are unchanged.
-
-Step 4 (2026-09-25): the NE park uses the ringed language with a pool; the NW hub has a round drone pad and a cylindrical shaft; the ground has a stone-slab map, the roads an asphalt map, and each crossing waiting edge a mint kerb strip. See [VALIDATION](../VALIDATION.md#art-direction-step-4-sites-and-ground--2026-09-25).
-
-Building pass 2 (2026-09-24, after user feedback): glazing now wraps all four faces (`faces()`/`bands()`/`windows()`); the shops split into slender/terrace/hall typologies; wing tones vary; test roof allowances were raised for the new crowns. Real-GPU FPS was measured with headed Chrome via Playwright; see [VALIDATION](../VALIDATION.md#art-direction-building-pass-2--2026-09-24).
-
-Building rollout (2026-09-24, after the user said "ok, polish building"): all glazing moved to `glass`. MAGNET got planted collar terraces and a curved glass corner drum. The shops got east-face glazing, planted slabs and ringed roof gardens on large roofs (PV moved to the back half). The commons floor got rail planters, and the SE tower base got planted slabs. See the [ART.md rollout list](../ART.md#building-rollout-2026-09-24).
-
-Lighting pass (2026-09-24, user asked for light and shadow polish in a second worktree): `feat/art-lighting` in `../city2127-lighting`, based on b549785, touches `src/main.ts` only. It uses Neutral tone mapping, a lower and warmer sun with longer shadows, a weaker cool fill, and a smaller Still boost. See [VALIDATION](../VALIDATION.md#art-direction-lighting-pass--2026-09-24). A second pass on 2026-09-25 ("make it feel expensive") added VSM soft shadows, broader GTAO, a gentle bloom, a vignette and exposure .84. See [VALIDATION](../VALIDATION.md#art-direction-lighting-expensive-pass--2026-09-25). On 2026-09-25 the user also asked to replace the three state buttons with an automatic day/night cycle. That work is on the same branch: `src/dayCycle.ts`, one day every 180 s, dawn = Still, day = Daylight, night = Pulse, and a moonlit night with lit windows. See [VALIDATION](../VALIDATION.md#daynight-cycle-replaces-the-preset-buttons--2026-09-25). Merged into `feat/art-direction` on 2026-09-25 at the user's request. The only conflicts were docs, in PROJECT and VALIDATION. After the merge, `npm test` and `npm run build` passed, and a headless noon and 22:00 look at the combined scene showed no console errors. Real-GPU FPS has not been remeasured since VSM, the broader GTAO and the day cycle.
+Unchanged throughout: site positions, footprints and rise/sink behaviour, the hero camera pose, landmark positions, the survey server and module-swap.
 
 ## Actual validation results
 
-- Verification status: PARTIAL — code checks, screenshots and real-GPU FPS done (60 FPS at 720p/1080p, headed Chrome on Apple M6); user art review of building pass 2 pending
-- Date and checked commit/worktree: 2026-09-24, pilot worktree on feat/art-direction (commit recorded in git log)
-- Commands/manual checks and results: `npm test` PASS, `npm run build` PASS (existing chunk-size warning), `git diff --check` clean; Playwright 1280×720 before/after in preset and `?survey` modes, live-change outline check — see [VALIDATION](../VALIDATION.md#art-direction-pilot--2026-09-24)
-- Evidence/environment: `artifacts/art-before-*.png`, `artifacts/art-pilot-*.png`; headless SwiftShader stats only
+- Verification status: PASS for code checks and real-GPU performance on the M6 Mac. **User art review of the combined scene is pending.**
+- Date and checked commit/worktree: 2026-09-25, `6e74eec` (clean worktree)
+- Commands/manual checks and results:
+  - `npm test`: 9 PASS lines.
+  - `npm run build`: PASS, with the existing chunk-size warning.
+  - `survey/` and `module-swap/` are unchanged, so their checks were not rerun.
+  - Headed Chrome, real GPU: 60 FPS at 1280×720 and 1920×1080, at 12:00 and 22:00, with and without `?survey` (five guests, all four sites up). See [VALIDATION](../VALIDATION.md#art-direction-status-and-real-gpu-recheck--2026-09-25).
+- Evidence/environment:
+  - Headed Google Chrome 154 via `playwright-cli -s=gpu open --browser=chrome --headed`, ANGLE Metal on an Apple M6, pixel ratio 1. No other browser session was running.
+  - Screenshots in `artifacts/`: `art-before-*`, `art-pilot-*`, `art-buildings-*`, `art-buildings2-*`, `light-*`, `art-step4-*` and `daycycle-*`. All are 1280×720 headless captures; the two `art-buildings2-orbit-*` views are not on the hero pose.
 - Integrated commit and checks: NOT INTEGRATED
-- Changes since verification: NONE
+- Changes since verification: docs only (this handoff, ART, PROJECT, PLAN02 and VALIDATION)
 
 ## Known issues and blockers
 
-- Performance budget is unknown: the exhibition PC's GPU is not specified. Current baseline (2026-09-17, 1280×720) was ~60 FPS, ~120 draw calls; heavier materials and post-processing must be measured, not assumed.
-- The Claude-in-Chrome extension tab stayed `hidden` (no frames), even after the user brought Chrome forward. Real-GPU numbers instead come from `playwright-cli -s=gpu open --browser=chrome --headed`, which ran visible at pixel ratio 1. GTAO doubles draw calls (preset 170 → 337) but held 60 FPS at 1080p on an M6 Mac. The exhibition PC is still unmeasured.
-- Hachiko plaza is mostly hidden by the koban and station at the hero pose; only its NW half (planter, shrubs, plinth) reads. Moving it would change the landmark relationship, so it is left for user review.
+- The exhibition PC's GPU is not specified. Real-GPU numbers come from one Apple M6 Mac with a 60 Hz display, so they show headroom only up to vsync. If a weaker PC drops frames, cut in this order: VSM blur samples, then the GTAO radius/samples, then GTAO entirely (it roughly doubles draw calls).
+- The Claude-in-Chrome extension tab stayed `hidden` (no frames), even with Chrome in front, so it cannot measure FPS on this machine. Use headed Playwright Chrome, and close every other browser session first: a background SwiftShader session cut 1080p to about 38 FPS on 2026-09-24.
+- Hachiko plaza is mostly hidden by the koban and station at the hero pose. Moving it would change the landmark relationship, so this is a user decision.
+- Pass 2 changed the number of `kit.random()` calls, which reshuffled the seeded distant skyline ring (still 60 blocks).
+- Existing Vite chunk-size warning; not caused by this task.
 
 ## Important decisions
 
 - Direction: Plan 02 / Pic 2, higher art quality; procedural first (user, 2026-09-24).
 - Order: rules → pilot area → user review → roll out → then new areas and questions.
 - The survey change sites (steps 1–3, `?survey`) keep their positions and behaviour; only their look is restyled.
+- The user approved the pilot by moving on ("ok, polish building", 2026-09-24) and asked for further polish (2026-09-24 and 25).
+- Saffron is reserved for guest-made changes ([ART.md §8](../ART.md#8-how-a-survey-change-reads)).
+- The day/night cycle replaces the preset buttons (user, 2026-09-25). WorldState presets remain, as the cycle's keyframes and as the survey target.
+
+## Remaining work
+
+Close this task (in order):
+
+1. **User art review of the combined scene** at the hero pose, day and night: `art-step4-*`, `daycycle-*` and `light-expensive-*`. Also check that the saffron guest outline still reads at night beside lit windows; nobody has reviewed that specifically.
+2. **Merge `feat/art-direction` into `main`** following [CONTRIBUTING](../CONTRIBUTING.md). After the merge, rerun `npm test` and `npm run build`, run a headless smoke check, and record the integrated commit here and in VALIDATION.
+
+Art polish not yet done (to take up after the review, or as a follow-up task):
+
+- People and vehicles ([ART.md §7](../ART.md#7-people-and-vehicles)): the actors are still simple block figures and pods.
+- Ambient data ([§6](../ART.md#6-signage-and-ambient-data)): no Pic 2-style civic totem (temperature, air, service status) yet; only the old AIR / PICKUP terminals.
+- SE tower change site: it has glazing and planted slabs but no curved, ringed element, so it is the only site not yet in the ringed language.
+- Public decks, lift terminals, air-corridor rails and pylons, and the membrane fin clusters are unchanged since Plan 02.
+- The upper wings (QFRONT crown and west wing, MAGNET east wing) are still boxes with window slots; only their tone varies.
+- The distant skyline is plain hazed blocks (allowed by §3). A few ringed or terraced silhouettes would help the future identity.
+- Hachiko plaza visibility: waiting for the user's decision (see Known issues).
+
+Outside this task (the PLAN02 order, after art):
+
+- New areas and city objects, and more survey questions.
+- Exhibition operations: question content, reset and recovery policy, input hardware, and a performance check on the exhibition PC.
 
 ## Next expected step
 
-cc100053: art review of step 4 (`artifacts/art-step4-*.png`). Candidate next polish: people/vehicle models (ART.md §7), ambient data totems (§6), the distant skyline, and a performance check on the exhibition PC. On the M6 Mac, 1080p survey mode runs at ~56 FPS, so GTAO is the first thing to cut if needed.
+cc100053: art review of the combined scene (Remaining work 1). The agent then merges to main (Remaining work 2), or takes the next art item the user picks.

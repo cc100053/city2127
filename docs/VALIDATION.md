@@ -1,5 +1,24 @@
 # Validation and handoff
 
+## Art-direction status and real-GPU recheck — 2026-09-25
+
+Checked commit `6e74eec` on `feat/art-direction`, which includes the lighting passes and the day/night cycle. `npm test` passed with 9 PASS lines. `npm run build` passed, with the existing chunk-size warning. `survey/` and `module-swap/` are unchanged.
+
+Real GPU: headed Google Chrome 154 via `playwright-cli -s=gpu open --browser=chrome --headed`, ANGLE Metal on an Apple M6, pixel ratio 1, tab visible, no other browser session running. Survey mode used the scratch DB on port 8788 with five guests (自動化 +2 · 公共共有 +4 · 環境優先 +2 · 都市集約 +2, all four sites up). Two samples were taken after 12 s of warm-up, each averaging 120 frames:
+
+| Viewport | Clock | Mode | FPS | Draw calls | Geometries |
+| --- | --- | --- | --- | --- | --- |
+| 1280×720 | `?hour=12` | city | 59.9 | 344 | 87 |
+| 1280×720 | `?hour=22` | city | 59.9–60.0 | 344 | 87 |
+| 1280×720 | `?hour=12` | survey | 60.0 | 489 | 125 |
+| 1280×720 | `?hour=22` | survey | 60.0 | 489 | 125 |
+| 1920×1080 | `?hour=12` | city | 60.0 | 344 | 87 |
+| 1920×1080 | `?hour=22` | city | 60.0 | 344 | 87 |
+| 1920×1080 | `?hour=12` | survey | 60.0 | 489 | 125 |
+| 1920×1080 | `?hour=22` | survey | 60.0 | 489 | 125 |
+
+The display is capped at 60 Hz. The ~56 FPS reading at 1080p survey on 2026-09-25 (step 4) did not recur here. The exhibition PC is still unmeasured. Remaining work and review status are listed in the [art-direction handoff](handoffs/art-direction.md#remaining-work).
+
 ## Day/night cycle replaces the preset buttons — 2026-09-25
 
 Branch `feat/art-lighting`. New `src/dayCycle.ts`; `main.ts`, `overlay.ts`, `worldState.ts`, `style.css` and `tests/worldState.test.ts` changed. `npm test` PASS (with new day-cycle assertions), `npm run build` PASS, `git diff --check` clean. Playwright CLI (headless SwiftShader) captures at 1280×720 on the hero pose, held with `?hour=`: [12:00](../artifacts/daycycle-1200.png), [06:18 dawn](../artifacts/daycycle-0618-dawn.png), [17:48 dusk](../artifacts/daycycle-1748-dusk.png), [22:00 night](../artifacts/daycycle-2200-night.png) and [survey at 22:00](../artifacts/daycycle-survey-2200.png) (reading the main worktree's survey server). Live clock without `?hour`: 12:25 at about 3 s and 17:54 at about 45 s, when the text had switched to night colours. [18:03 frame](../artifacts/daycycle-live-1803.png). No console errors. Draw calls are unchanged (preset 344, survey 400). Real-GPU FPS was not measured. The headless run reported 60 FPS, which is not evidence.
