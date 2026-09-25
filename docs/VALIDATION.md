@@ -1,5 +1,24 @@
 # Validation and handoff
 
+## Art-direction polish pass 3 — 2026-09-25
+
+Branch `feat/art-direction`, uncommitted pass on top of `adfa33d`; only `src/cityRig.ts` and `src/surveySites.ts` changed ([ART.md checklist](ART.md#polish-pass-3-2026-09-25)). `npm test` passed with 9 PASS lines, including upper-volume and site clearance. `npm run build` passed, with the existing chunk-size warning. `git diff --check` is clean. `survey/` and `module-swap/` are unchanged.
+
+Captures: Playwright CLI (headless SwiftShader) at 1280×720 on the untouched hero pose, with the scratch survey server on port 8788 (the same five guests: all four sites up, SE tall): [preset 12:00](../artifacts/art-polish-preset.png), [survey 12:00](../artifacts/art-polish-survey.png), [survey 22:00](../artifacts/art-polish-survey-2200.png). Compare with [step 4 survey](../artifacts/art-step4-survey.png). The only console entry is the existing favicon 404. Changing the window count of the wings changed the number of `kit.random()` calls, so the seeded skyline was reshuffled again (still 60 blocks).
+
+Real GPU: headed Google Chrome via `playwright-cli -s=gpu open --browser=chrome --headed`, ANGLE Metal on an Apple M6, pixel ratio 1. Samples were taken after 14 s and 17 s, each averaging 120 frames:
+
+| Viewport | Clock | Mode | FPS | Draw calls |
+| --- | --- | --- | --- | --- |
+| 1280×720 | `?hour=12` | city | 60.0 | 344 |
+| 1280×720 | `?hour=12` | survey | 60.0 / 59.9 | 493 |
+| 1280×720 | `?hour=22` | survey | 60.0 | 493 |
+| 1920×1080 | `?hour=12` | city | 60.0 | 344 |
+| 1920×1080 | `?hour=12` | survey | 60.0 / 60.1 | 493 |
+| 1920×1080 | `?hour=22` | survey | 60.0 / 60.1 | 493 |
+
+City draw calls are unchanged because everything is baked per material. Survey went from 489 to 493 because the SE tall part now also uses `leaf`. User art review is pending.
+
 ## Art-direction status and real-GPU recheck — 2026-09-25
 
 Checked commit `6e74eec` on `feat/art-direction`, which includes the lighting passes and the day/night cycle. `npm test` passed with 9 PASS lines. `npm run build` passed, with the existing chunk-size warning. `survey/` and `module-swap/` are unchanged.

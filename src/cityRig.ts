@@ -51,8 +51,8 @@ export type Kit = { windows:WindowSlot[]; signs:T.MeshStandardMaterial[]; random
 export function faces(parent:T.Object3D, w:number, d:number, face:(g:T.Group,across:number,out:number,side:number)=>void, sides=[0,1,2,3]) {
   for(const side of sides){const g=new T.Group();g.rotation.y=side*Math.PI/2;parent.add(g);face(g,side%2?d:w,side%2?w/2:d/2,side);}
 }
-/** Lit window slots with a sun-shade fin per floor on all four faces. */
-function windows(group:T.Group, kit:Kit, width:number, height:number, depth:number) {
+/** Lit window slots with a sun-shade fin per floor on all four faces (or the given sides). */
+function windows(group:T.Group, kit:Kit, width:number, height:number, depth:number, sides?:number[]) {
   for (let floor=0;floor<Math.floor((height-3)/2.1);floor++) faces(group,width,depth,(face,across,out)=>{
     const cols=Math.floor(across/1.8),y=3.2+floor*2.1;
     for(let col=0;col<cols;col++){
@@ -60,7 +60,7 @@ function windows(group:T.Group, kit:Kit, width:number, height:number, depth:numb
       kit.windows.push({object:obj,phase:floor*.75+col*.28,occupancy:kit.random()});
     }
     box(face,[across-.4,.1,.55],[0,y+.85,out+.2],trim,.03);
-  });
+  },sides);
 }
 /** Glazed floor bands on all four faces of a W×D block centred at (x,z): slab, glass band, mullions and sun-shade per floor. */
 function bands(g:T.Group, w:number, d:number, x:number, z:number, y0:number, y1:number, step=3.5, mullion=1.4) {
@@ -306,7 +306,7 @@ export function cityRig(scene:T.Scene) {
   }
   for(const link of upperLinks){
     const g=new T.Group();g.position.set(link.x,link.y,link.z);staticGroup.add(g);
-    for(const y of [-link.h/2,link.h/2])box(g,[link.w+.4,.35,link.d+.5],[0,y,0],trim);
+    if(link.kind!=='wing')for(const y of [-link.h/2,link.h/2])box(g,[link.w+.4,.35,link.d+.5],[0,y,0],trim);
     if(link.kind==='floor'){
       // Open public colonnade: slab, roof, slender columns and glass rails; no enclosing wall.
       for(let x=-link.w/2+1.2;x<link.w/2;x+=2.6)for(const z of [-link.d/2+.3,link.d/2-.3])box(g,[.3,link.h,.3],[x,0,z],trim,.05);
@@ -317,9 +317,19 @@ export function cityRig(scene:T.Scene) {
       for(const z of [-link.d/2,link.d/2])box(g,[link.w,1,.08],[0,link.h/2+.6,z],teal);
     } else {
       // Each wing keeps its own ceramic tone so the upper district does not read as one repeated block.
-      box(g,[link.w,link.h,link.d],[0,0,0],{'QFRONT CROWN':cream,'QFRONT WEST WING':sage}[link.name as string]??teal);
-      const floors=new T.Group();floors.position.y=-link.h/2;g.add(floors);windows(floors,kit,link.w,link.h,link.d);
-      for(let y=-link.h/2+3.5;y<link.h/2-1;y+=3.5)box(g,[link.w+.2,.22,link.d+.2],[0,y,0],trim);
+      // Its free end is a curved glass bay ringed by floor discs (ART.md §2), inside the wing's layout volume.
+      const end=Math.sign(link.x-landmarks.find(b=>b.name===link.on[0])!.x),bay=2,body=link.w-bay,r=link.d/2-.2;
+      const at=new T.Group();at.position.x=-end*bay/2;g.add(at);
+      box(at,[body,link.h,link.d],[0,0,0],{'QFRONT CROWN':cream,'QFRONT WEST WING':sage}[link.name as string]??teal);
+      const floors=new T.Group();floors.position.y=-link.h/2;at.add(floors);windows(floors,kit,body,link.h,link.d,end>0?[0,2,3]:[0,1,2]);
+      const cap=new T.Group();cap.position.x=end*(link.w/2-bay);cap.rotation.y=end>0?0:Math.PI;cap.scale.x=bay/r;g.add(cap);
+      cap.add(new T.Mesh(new T.CylinderGeometry(r,r,link.h,32,1,false,0,Math.PI),glass));
+      const slabs=[-link.h/2,link.h/2];for(let y=-link.h/2+3.5;y<link.h/2-1;y+=3.5)slabs.push(y);
+      for(const y of slabs){
+        const edge=Math.abs(y)===link.h/2;
+        box(at,[body+(edge?.4:.2),edge?.35:.22,link.d+(edge?.5:.2)],[0,y,0],trim);
+        arc(cap,0,r+(edge?.25:.1),edge?.35:.22,[0,y-(edge?.175:.11),0],trim,-Math.PI/2,Math.PI);
+      }
     }
     for(const [x,z] of link.columns)box(staticGroup,[1.2,link.y-link.h/2,1.2],[x,(link.y-link.h/2)/2,z],trim,.1);
   }
@@ -354,10 +364,24 @@ export function cityRig(scene:T.Scene) {
   box(depot,[1.9,2.3,.15],[0,1.95,-.78],cream,.06);
   box(depot,[1.9,1.8,.15],[0,1.7,.78],teal,.06);
   sign(depot,kit,'受取  /  PICKUP',0,1.8,.89,1.6,.4,'#46676e');
-  for(const [x,z] of [[-12,12],[16,-7]]){
+  // Civic totems (ART.md §6): the air line, temperature, air quality and next service, as Pic 2's side panels.
+  for(const [x,z,wait] of [[-12,12,2],[16,-7,4]]){
     const terminal=new T.Group();terminal.position.set(x,0,z);staticGroup.add(terminal);
-    box(terminal,[.7,2.3,.5],[0,1.7,0],cream,.24);box(terminal,[.48,1.4,.08],[0,2,.28],futureLight,.035);
-    sign(terminal,kit,'AIR / 02',0,3.1,.32,1.7,.48,'#467b86');
+    arc(terminal,0,.8,.1,[0,.42,0],stone);
+    box(terminal,[.86,3.6,.4],[0,2.3,0],trim,.18);
+    box(terminal,[.07,2.9,.07],[.47,2.3,.12],futureLight,.03);
+    box(terminal,[.98,.12,.5],[0,4.16,0],futureLight,.04);
+    const canvas=document.createElement('canvas');canvas.width=192;canvas.height=640;
+    const ctx=canvas.getContext('2d')!;ctx.fillStyle='#2f4f58';ctx.fillRect(0,0,192,640);ctx.textAlign='center';
+    const line=(text:string,y:number,font:string,color='#eef3e6')=>{ctx.fillStyle=color;ctx.font=font;ctx.fillText(text,96,y);};
+    line('AIR',70,'600 44px sans-serif','#8ce5d8');line('02',150,'300 84px sans-serif');
+    ctx.fillStyle='#8ce5d8';ctx.fillRect(36,190,120,3);
+    line('24°',290,'300 72px sans-serif');line('気温 / TEMP',330,'500 22px sans-serif','#b9ccc9');
+    line('良好',420,'500 46px sans-serif');line('空気 / AIR',460,'500 22px sans-serif','#b9ccc9');
+    line(`${wait} min`,550,'500 46px sans-serif','#8ce5d8');line('次便 / NEXT',590,'500 22px sans-serif','#b9ccc9');
+    const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;texture.anisotropy=4;
+    const material=new T.MeshStandardMaterial({map:texture,emissiveMap:texture,emissive:'#ffffff',emissiveIntensity:.3,roughness:.4});kit.signs.push(material);
+    const panel=new T.Mesh(new T.PlaneGeometry(.66,2.2),material);panel.position.set(0,2.45,.21);terminal.add(panel);
   }
   // Civic seating stays outside the five crossing mouths.
   for(const [x,z] of [[-18,-25],[16,10]]){
@@ -424,9 +448,17 @@ export function cityRig(scene:T.Scene) {
     box(staticGroup,[6,.3,3],[x,64.4,z],solar);
   }
   // Distant city: a seeded ring of hazed blocks outside the plate, so the intersection sits in a city rather than on a stand.
+  // Every seventh block is a ringed round tower and every seventh from 5 a stepped terrace, so the skyline carries the future silhouette too.
   for(let i=0;i<60;i++){
-    const angle=i/60*Math.PI*2+random()*.08,radius=125+random()*40,w=8+random()*10,h=6+random()*(i%5?20:38);
-    box(staticGroup,[w,h,w*(.6+random()*.8)],[Math.cos(angle)*radius,h/2-.7,Math.sin(angle)*radius],distant,.1).rotation.y=-angle;
+    const angle=i/60*Math.PI*2+random()*.08,radius=125+random()*40,w=8+random()*10,h=6+random()*(i%5?20:38),d=w*(.6+random()*.8);
+    const at=new T.Group();at.position.set(Math.cos(angle)*radius,-.7,Math.sin(angle)*radius);at.rotation.y=-angle;staticGroup.add(at);
+    if(i%7===2){
+      const r=w*.35,tall=h+14,core=new T.Mesh(new T.CylinderGeometry(r*.85,r,tall,20),distant);core.position.y=tall/2;at.add(core);
+      for(let y=tall*.35;y<tall;y+=tall*.2)arc(at,0,r+1.2,.6,[0,y,0],distant);
+    } else if(i%7===5){
+      box(at,[w,h,d],[0,h/2,0],distant,.1);
+      box(at,[w*.72,h*.45,d*.72],[w*.1,h*1.22,0],distant,.1);box(at,[w*.45,h*.3,d*.45],[w*.2,h*1.6,0],distant,.1);
+    } else box(at,[w,h,d],[0,h/2,0],distant,.1);
   }
   const lampMat=new T.MeshStandardMaterial({color:'#ffe1a3',emissive:'#ffe1a3',emissiveIntensity:1,roughness:.6});
   for(const [x,z] of [[-7,-10],[9,-8],[-13,8],[11,10]]){

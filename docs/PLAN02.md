@@ -23,7 +23,7 @@
 
 **下一步方向（2026-09-24 使用者決定）：** 展覽城市就係根目錄澀谷場景（`src/`）。先建立同擴充呢個場景——更多區域同城市物件、城市可以明顯變化、打磨外觀——同時為因果 MVP 加更多題目。之後先將 survey 接入根目錄場景；`module-swap/` 四區畫只係證明因果鏈，唔係目標城市。外觀打磨服務於變化可讀性。
 
-**美術方向（2026-09-24 使用者決定）：** 擴充場景同加題目之前，先打磨城市模型並定出美術規則，之後嘅區域同變化點跟規則做。沿用 Plan 02 方向（[Pic 2](../asset/pic2.png)：淺色陶瓷／金屬／玻璃、日光、工程化自然、多層公共交通），但提高美術質素；先用程式生成（Three.js 原生幾何、材質同後製），唔即刻轉 Blender。先做一個示範區再推廣。任務同計劃見 [art-direction](handoffs/art-direction.md)。美術規則見 [ART.md](ART.md)（2026-09-24 起使用）。截至 2026-09-25，`feat/art-direction` 已實作：示範區（QFRONT 曲面屏、八公圓形廣場、SW 廣場、guest 變化橙色輪廓）、全部建築打磨（四面窗、三種街區型態）、NE 公園／NW hub 環形化、地面紋理、燈光同晝夜循環；等緊使用者審查整體畫面，之後 merge 入 main。未做事項見 [handoff](handoffs/art-direction.md#remaining-work)。
+**美術方向（2026-09-24 使用者決定）：** 擴充場景同加題目之前，先打磨城市模型並定出美術規則，之後嘅區域同變化點跟規則做。沿用 Plan 02 方向（[Pic 2](../asset/pic2.png)：淺色陶瓷／金屬／玻璃、日光、工程化自然、多層公共交通），但提高美術質素；先用程式生成（Three.js 原生幾何、材質同後製），唔即刻轉 Blender。先做一個示範區再推廣。任務同計劃見 [art-direction](handoffs/art-direction.md)。美術規則見 [ART.md](ART.md)（2026-09-24 起使用）。截至 2026-09-25，`feat/art-direction` 已實作：示範區（QFRONT 曲面屏、八公圓形廣場、SW 廣場、guest 變化橙色輪廓）、全部建築打磨（四面窗、三種街區型態）、NE 公園／NW hub 環形化、地面紋理、燈光同晝夜循環，以及打磨第三輪（SE 圓形梯田塔、上層翼樓曲面玻璃端、AIR 資訊柱、遠景環形／梯級輪廓）；等緊使用者審查整體畫面，之後 merge 入 main。未做事項見 [handoff](handoffs/art-direction.md#remaining-work)。
 
 **未來樹（2026-09-23）：** Blender MCP 製作嘅靜態工程化樹木 GLB 放喺八公廣場旁 `(11,0,23)`（見 [future-tree-2127](handoffs/future-tree-2127.md)）。佢取代咗 Plan 02 原型「無傳統樹木」嘅做法，但唔改變下面嘅歷史截圖或 preset 系統。
 

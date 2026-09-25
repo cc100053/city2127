@@ -1,6 +1,6 @@
 # Art rules — root Shibuya scene
 
-Status: **in use** (since 2026-09-24, task [art-direction](handoffs/art-direction.md)). The pilot, building rollout, building pass 2, step 4 (sites and ground) and the lighting/day-cycle passes are implemented on `feat/art-direction`, and the combined scene is waiting for user art review. The rules apply to every landmark, the upper links, the koban, all four change sites and any new area. What is still open is listed under [Remaining work](handoffs/art-direction.md#remaining-work).
+Status: **in use** (since 2026-09-24, task [art-direction](handoffs/art-direction.md)). The pilot, building rollout, building pass 2, step 4 (sites and ground), the lighting/day-cycle passes and polish pass 3 are implemented on `feat/art-direction`, and the combined scene is waiting for user art review. The rules apply to every landmark, the upper links, the koban, all four change sites and any new area. What is still open is listed under [Remaining work](handoffs/art-direction.md#remaining-work).
 
 Reference: [Pic 2](../asset/pic2.png). Direction: Plan 02 daylight, a vertical city, and engineered nature, built procedurally in Three.js ([PLAN02](PLAN02.md) decision, 2026-09-24). What the city looks like serves how clearly its changes read. It is not a goal on its own.
 
@@ -57,7 +57,7 @@ Everything static goes through the `bake()` material merge. Detail costs vertice
 ## 6. Signage and ambient data
 
 - Each face carries one sign or screen at most. The large screen shows a place, not an advert: QFRONT's drum shows a daylight landscape with 渋谷 / SHIBUYA / 2127.
-- Ambient data (air, temperature, and service status, as in Pic 2's side panels) belongs on small civic totems and screens. It should never be a floating HUD. The AIR / PICKUP terminals are the existing instances.
+- Ambient data (air, temperature, and service status, as in Pic 2's side panels) belongs on small civic totems and screens. It should never be a floating HUD. The two AIR / 02 civic totems (air line, temperature, air quality, next service) and the PICKUP cabinet are the existing instances.
 - English and Japanese are paired with ` / `, which is the existing copy style.
 
 ## 7. People and vehicles
@@ -109,3 +109,12 @@ A guest-made change must be distinguishable from the base city at a glance and t
 - [x] Ground: seeded stone-slab map on the plate (2-unit staggered slabs) and an asphalt speckle map on the roads, both multiplied by the existing material colours, so the presets still tint them
 - [x] Crossings: a mint kerb strip marks each waiting edge, just off the carriageway (civic light, §5)
 - [ ] User art review of step 4 ([evidence](VALIDATION.md#art-direction-step-4-sites-and-ground--2026-09-25))
+
+## Polish pass 3 (2026-09-25)
+
+- [x] Upper wings (QFRONT crown and west wing, MAGNET east wing): the free end, away from the host core, is a curved glass bay ringed by trim floor discs, inside the wing's layout volume; windows skip the face the bay covers
+- [x] SE tower tall variant: a round tower — glass core, cream spandrels, trim floor lips, a planted balcony ring every third floor and a roof garden with PV fins. It is now in the ringed language and reads differently from the NW glass shaft
+- [x] AIR / 02 terminals are now civic totems (§6): stone base disc, slim trim pillar, a data panel (line, 24° temp, 良好 air, next service in minutes) and mint service edges; the panel dims and lights with the other signs
+- [x] Distant skyline: every seventh block is a tapered round tower with rings, and every seventh from 5 a stepped terrace. Still one `distant` material, with no windows, greenery or signs (§3)
+- [x] The saffron guest outline still reads at night beside lit windows ([22:00 survey](../artifacts/art-polish-survey-2200.png))
+- [ ] User art review of pass 3 ([evidence](VALIDATION.md#art-direction-polish-pass-3--2026-09-25))
