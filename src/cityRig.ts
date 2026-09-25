@@ -274,7 +274,16 @@ export function cityRig(scene:T.Scene) {
     // Civic light: a mint kerb strip marks each waiting edge, just off the carriageway.
     for(const u of [-.02,1.02]){const p=crossingPoint(path,u);box(staticGroup,[width+.4,.03,.14],[p.x,.46,p.z],futureLight,.02).rotation.y=p.yaw;}
   }
-  for(let x=-73;x<75;x+=4)if(Math.abs(x)>15)box(staticGroup,[1.8,.02,.13],[x,.445,0],cream,.01);
+  // Lane dashes are a mipmapped strip texture, not 0.13-wide boxes: when zoomed out the boxes fell below a pixel and crawled as the camera moved.
+  const dashes=document.createElement('canvas');dashes.width=64;dashes.height=16;
+  const dctx=dashes.getContext('2d')!;dctx.fillStyle='#000000';dctx.fillRect(0,0,64,16);dctx.fillStyle='#ffffff';dctx.fillRect(0,5,29,5); // alpha: 1.8 of every 4 units, .13 of a .4 strip
+  const dashMap=new T.CanvasTexture(dashes);dashMap.wrapS=T.RepeatWrapping;dashMap.anisotropy=8;
+  const dashMat=new T.MeshStandardMaterial({color:cream.color,alphaMap:dashMap,transparent:true,depthWrite:false,roughness:.58});
+  for(const [x0,x1] of [[-73.9,-15],[18.1,75]]){
+    const strip=new T.PlaneGeometry(x1-x0,.4).rotateX(-Math.PI/2),uv=strip.attributes.uv;
+    for(let i=0;i<uv.count;i++)uv.setX(i,uv.getX(i)*(x1-x0)/4);
+    const mesh=new T.Mesh(strip,dashMat);mesh.position.set((x0+x1)/2,.445,0);mesh.receiveShadow=true;staticGroup.add(mesh);
+  }
   const q=landmarks[0],qfront=new T.Group();qfront.position.set(q.x,0,q.z);qfront.name='QFRONT';
   // Twin occupied cores carry a civic hall and an upper residential district.
   for(const x of [-3.7,3.7])box(qfront,[3.6,q.h-.8,q.d],[x,q.h/2+.4,0],teal);

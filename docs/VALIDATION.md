@@ -1,5 +1,9 @@
 # Validation and handoff
 
+## Road flicker fix — 2026-09-25
+
+User report during review: the east–west road flickers, but only when the camera is zoomed out and moving. Held-clock frame diffs on the real GPU showed no change on the road with a still camera, so the moving sun was ruled out. Headed Chrome (ANGLE Metal, Apple M6) at 1280×720, zoomed fully out and dragged to a steep view with real mouse input: with the camera near plane at .1, large parts of the road z-fought with the ground plate (hatched and missing bands); with near = 1 the same view is clean ([comparison, top .1 / bottom 1](../artifacts/road-zfight-near-compare.png)). Fix: near plane 1 in `heroCamera.ts`. The lane dashes were also changed from 0.13-wide boxes to a mipmapped strip texture, because they fell below a pixel at a distance; at the hero pose they still read as crisp dashes. `npm test` 9 PASS, `npm run build` PASS, `git diff --check` clean. The user has not yet confirmed the fix in the review window.
+
 ## Art-direction actor pass — 2026-09-25
 
 Only `src/mobility.ts` changed (people and pod geometry, per-instance colours; counts, routes and timing unchanged). `npm test` 9 PASS, `npm run build` PASS (existing chunk-size warning), `git diff --check` clean. Headless 1280×720 capture at `?hour=12`, 6 s after load so pods are on the road: [actors](../artifacts/art-actors-preset.png). Headless draw calls: city 352 (was 344; the new body, tyre, hair and trousers materials). Real-GPU FPS for this pass was not measured.
