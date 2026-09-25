@@ -70,6 +70,7 @@ In commit order on `feat/art-direction`:
    - The SE tall variant is a round terraced tower.
    - The AIR / 02 terminals are civic data totems.
    - The distant skyline has ringed and stepped silhouettes.
+10. Actor pass (user: "做埋人&車", 2026-09-25): capsule people with per-person clothes/skin/hair colours, pods with canopy, wheels and mint side line ([ART.md](../ART.md#actor-pass-2026-09-25)).
 
 Unchanged throughout: site positions, footprints and rise/sink behaviour, the hero camera pose, landmark positions, the survey server and module-swap.
 
@@ -115,7 +116,8 @@ Close this task (in order):
 
 Art polish not yet done (to take up after the review, or as a follow-up task):
 
-- People and vehicles ([ART.md §7](../ART.md#7-people-and-vehicles)): the actors are still simple block figures and pods.
+- Drones and cargo pods are unchanged by the actor pass; only pedestrians and road pods were restyled.
+- Actor pass real-GPU FPS not measured (headless only).
 - Public decks, lift terminals, air-corridor rails and pylons, and the membrane fin clusters are unchanged since Plan 02.
 - SE tower base (the medium variant) is still a square block with planted slabs; only the tall variant is round.
 - The totem data is static text; it does not follow WorldState or the clock.

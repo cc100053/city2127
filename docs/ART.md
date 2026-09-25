@@ -118,3 +118,9 @@ A guest-made change must be distinguishable from the base city at a glance and t
 - [x] Distant skyline: every seventh block is a tapered round tower with rings, and every seventh from 5 a stepped terrace. Still one `distant` material, with no windows, greenery or signs (§3)
 - [x] The saffron guest outline still reads at night beside lit windows ([22:00 survey](../artifacts/art-polish-survey-2200.png))
 - [ ] User art review of pass 3 ([evidence](VALIDATION.md#art-direction-polish-pass-3--2026-09-25))
+
+## Actor pass (2026-09-25)
+
+- [x] People (§7): capsule torso, arms and legs, a round head and hair; each person gets clothes, skin and hair from muted palettes via instance colour. Mid-dark clothes keep them readable on the pale paving; no saffron
+- [x] Autonomous pods: a low rounded body under a long glass canopy, four wheels, a mint service line on each side and mint/coral light bars; six body tints
+- [ ] User art review ([capture](../artifacts/art-actors-preset.png))

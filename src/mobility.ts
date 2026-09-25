@@ -78,24 +78,35 @@ function fleet(scene:T.Scene,parts:Part[],count:number,name:string) {
   });
   return {
     set(index:number,pose:T.Object3D){pose.updateMatrix();meshes.forEach(m=>m.setMatrixAt(index,pose.matrix));},
+    /** Per-actor colour for the parts drawn with `mat` (a white base the instance colour multiplies); set once at build. */
+    tint(index:number,mat:T.Material,color:T.ColorRepresentation){meshes.forEach(m=>{if(m.material===mat)m.setColorAt(index,new T.Color(color));});},
     flush(){meshes.forEach(m=>m.instanceMatrix.needsUpdate=true);},
   };
 }
 
 export function mobility(scene:T.Scene) {
+  // Autonomous pods (ART.md §7): a low rounded body under a long glass canopy, real wheels, mint service line and light bars.
+  const body=material('#ffffff'),tyre=material('#2b3338');
+  const wheel=(x:number,z:number):Part=>({geometry:new T.CylinderGeometry(.3,.3,.2,16).rotateZ(Math.PI/2).translate(x,.32,z),material:tyre});
   const cars=fleet(scene,[
-    part([1.65,.65,3],[0,.62,0],shell,.32),part([1.35,.7,1.85],[0,1.15,-.2],glass,.3),
-    part([1.5,.12,.15],[0,.8,1.48],mint,.05),part([1.5,.12,.15],[0,.8,-1.48],coral,.05),
-    ...[-.72,.72].flatMap(x=>[-.9,.9].map(z=>part([.25,.38,.55],[x,.3,z],glass,.12))),
+    part([1.7,.5,3.3],[0,.6,0],body,.25),part([1.42,.6,2.15],[0,1.1,-.15],glass,.3),part([1.1,.05,1.3],[0,1.42,-.2],shell,.02),
+    part([1.45,.08,.1],[0,.74,1.66],mint,.04),part([1.45,.08,.1],[0,.74,-1.66],coral,.04),
+    ...[-.86,.86].map(x=>part([.04,.05,2.5],[x,.52,0],mint,.02)),
+    ...[-.78,.78].flatMap(x=>[-1.05,1.05].map(z=>wheel(x,z))),
   ],6,'autonomous-pods');
-  const coats=material('#bc8a76'),skin=material('#e3c8a6');
+  ['#e9eee9','#c9dcd8','#dfe3e8','#bcd0d6','#eee7dc','#d3ddd0'].forEach((c,i)=>cars.tint(i,body,c));
+  // People: capsule torso and limbs, round head and hair; clothes, skin and hair vary per person from a muted palette (no saffron).
+  const coats=material('#ffffff'),skin=material('#ffffff'),hair=material('#ffffff'),trousers=material('#3d4a52');
+  const capsule=(r:number,length:number,at:[number,number,number],mat:T.Material,depth=1):Part=>({geometry:new T.CapsuleGeometry(r,length,4,10).scale(1,1,depth).translate(...at),material:mat});
   const people=fleet(scene,[
-    part([.48,.65,.36],[0,.91,0],coats,.17),part([.35,.37,.34],[0,1.43,0],skin,.16),
-    part([.36,.15,.36],[0,1.59,-.01],glass,.07),
-    part([.16,.55,.17],[-.32,.85,0],coats,.07),part([.16,.55,.17],[.32,.85,0],coats,.07),
+    capsule(.22,.36,[0,.96,0],coats,.72),{geometry:new T.SphereGeometry(.15,14,10).translate(0,1.5,0),material:skin},
+    {geometry:new T.SphereGeometry(.162,14,6,0,Math.PI*2,0,Math.PI*.55).translate(0,1.52,-.012),material:hair},
+    capsule(.07,.42,[-.29,.98,0],coats),capsule(.07,.42,[.29,.98,0],coats),
   ],24,'pedestrians');
+  const clothes=['#4f6f7c','#b5836f','#6d8a5f','#2f3e48','#c9b48a','#8c6f8f','#3f5a52','#e4e1d8'],skins=['#e8cdb0','#c99e7c','#8d6348','#f0d9c2'],hairs=['#2f2a27','#5a4033','#1d2226','#b9a58c','#d8d8d4'];
+  for(let i=0;i<24;i++){people.tint(i,coats,clothes[(i*5)%clothes.length]);people.tint(i,skin,skins[(i*3)%skins.length]);people.tint(i,hair,hairs[(i*7)%hairs.length]);}
   const publicLifts=fleet(scene,[part([1.35,.12,1.35],[0,-.08,0],shell,.02)],12,'public-transfer-platforms');
-  const legs=fleet(scene,[part([.17,.55,.19],[0,-.23,0],glass,.06)],48,'walking-legs');
+  const legs=fleet(scene,[{geometry:new T.CapsuleGeometry(.08,.4,4,8).translate(0,-.26,0),material:trousers}],48,'walking-legs');
   const drones=fleet(scene,[wing(),part([.8,.35,2.5],[0,.1,0],shell,.15),part([.55,.2,1],[0,.34,.45],glass,.08),
     part([.6,.1,.16],[0,.11,-1.27],mint,.025),part([.09,.4,.65],[0,.32,-.8],glass,.02)],7,'thin-wing-carriers');
   const cargo=fleet(scene,[part([1.05,.65,.95],[0,0,0],coral,.08),part([.13,.67,.97],[0,0,0],shell,.02)],7,'detachable-cargo');

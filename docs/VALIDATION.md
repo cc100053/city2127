@@ -1,5 +1,9 @@
 # Validation and handoff
 
+## Art-direction actor pass — 2026-09-25
+
+Only `src/mobility.ts` changed (people and pod geometry, per-instance colours; counts, routes and timing unchanged). `npm test` 9 PASS, `npm run build` PASS (existing chunk-size warning), `git diff --check` clean. Headless 1280×720 capture at `?hour=12`, 6 s after load so pods are on the road: [actors](../artifacts/art-actors-preset.png). Headless draw calls: city 352 (was 344; the new body, tyre, hair and trousers materials). Real-GPU FPS for this pass was not measured.
+
 ## Art-direction polish pass 3 — 2026-09-25
 
 Branch `feat/art-direction`, uncommitted pass on top of `adfa33d`; only `src/cityRig.ts` and `src/surveySites.ts` changed ([ART.md checklist](ART.md#polish-pass-3-2026-09-25)). `npm test` passed with 9 PASS lines, including upper-volume and site clearance. `npm run build` passed, with the existing chunk-size warning. `git diff --check` is clean. `survey/` and `module-swap/` are unchanged.
