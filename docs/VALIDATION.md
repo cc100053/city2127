@@ -1,5 +1,9 @@
 # Validation and handoff
 
+## Art-direction integration — 2026-09-25
+
+`feat/art-direction` merged into main with `--no-ff` as `2126a2c` (origin/main was still the task base `5894f87`). Branch CI passed on `3ec57fd`. On the merge result: `npm test` 9 PASS, `npm run build` PASS (existing chunk-size warning), `git diff --check` clean. `survey/` and `module-swap/` are unchanged. Headless smoke at 1280×720 in city and `?survey` modes: no console errors except the favicon 404; draw calls city 356, survey 505.
+
 ## Road flicker fix — 2026-09-25
 
 User report during review: the east–west road flickers, but only when the camera is zoomed out and moving. Held-clock frame diffs on the real GPU showed no change on the road with a still camera, so the moving sun was ruled out. Headed Chrome (ANGLE Metal, Apple M6) at 1280×720, zoomed fully out and dragged to a steep view with real mouse input: with the camera near plane at .1, large parts of the road z-fought with the ground plate (hatched and missing bands); with near = 1 the same view is clean ([comparison, top .1 / bottom 1](../artifacts/road-zfight-near-compare.png)). Fix: near plane 1 in `heroCamera.ts`. The lane dashes were also changed from 0.13-wide boxes to a mipmapped strip texture, because they fell below a pixel at a distance; at the hero pose they still read as crisp dashes. `npm test` 9 PASS, `npm run build` PASS, `git diff --check` clean. The user has not yet confirmed the fix in the review window.

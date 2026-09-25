@@ -1,6 +1,6 @@
 # Art rules — root Shibuya scene
 
-Status: **in use** (since 2026-09-24, task [art-direction](handoffs/art-direction.md)). The pilot, building rollout, building pass 2, step 4 (sites and ground), the lighting/day-cycle passes and polish pass 3 are implemented on `feat/art-direction`, and the combined scene is waiting for user art review. The rules apply to every landmark, the upper links, the koban, all four change sites and any new area. What is still open is listed under [Remaining work](handoffs/art-direction.md#remaining-work).
+Status: **in use** (since 2026-09-24, task [art-direction](handoffs/art-direction.md)). The pilot, building rollout, building pass 2, step 4 (sites and ground), the lighting/day-cycle passes and polish pass 3 and the actor pass are on main (merge `2126a2c`, 2026-09-25), after the user reviewed the combined scene. The rules apply to every landmark, the upper links, the koban, all four change sites and any new area. What is still open is listed under [Remaining work](handoffs/art-direction.md#remaining-work).
 
 Reference: [Pic 2](../asset/pic2.png). Direction: Plan 02 daylight, a vertical city, and engineered nature, built procedurally in Three.js ([PLAN02](PLAN02.md) decision, 2026-09-24). What the city looks like serves how clearly its changes read. It is not a goal on its own.
 
@@ -108,7 +108,7 @@ A guest-made change must be distinguishable from the base city at a glance and t
 - [x] NW hub: a round drone pad on the roof with a mint landing ring and edge posts, sun-shades on all faces; the tall variant is a glass cylinder shaft with trim floor discs and a ringed crown
 - [x] Ground: seeded stone-slab map on the plate (2-unit staggered slabs) and an asphalt speckle map on the roads, both multiplied by the existing material colours, so the presets still tint them
 - [x] Crossings: a mint kerb strip marks each waiting edge, just off the carriageway (civic light, §5)
-- [ ] User art review of step 4 ([evidence](VALIDATION.md#art-direction-step-4-sites-and-ground--2026-09-25))
+- [x] User art review of step 4, in the combined-scene review before the merge (2026-09-25) ([evidence](VALIDATION.md#art-direction-step-4-sites-and-ground--2026-09-25))
 
 ## Polish pass 3 (2026-09-25)
 
@@ -117,10 +117,10 @@ A guest-made change must be distinguishable from the base city at a glance and t
 - [x] AIR / 02 terminals are now civic totems (§6): stone base disc, slim trim pillar, a data panel (line, 24° temp, 良好 air, next service in minutes) and mint service edges; the panel dims and lights with the other signs
 - [x] Distant skyline: every seventh block is a tapered round tower with rings, and every seventh from 5 a stepped terrace. Still one `distant` material, with no windows, greenery or signs (§3)
 - [x] The saffron guest outline still reads at night beside lit windows ([22:00 survey](../artifacts/art-polish-survey-2200.png))
-- [ ] User art review of pass 3 ([evidence](VALIDATION.md#art-direction-polish-pass-3--2026-09-25))
+- [x] User art review of pass 3, in the combined-scene review before the merge (2026-09-25) ([evidence](VALIDATION.md#art-direction-polish-pass-3--2026-09-25))
 
 ## Actor pass (2026-09-25)
 
 - [x] People (§7): capsule torso, arms and legs, a round head and hair; each person gets clothes, skin and hair from muted palettes via instance colour. Mid-dark clothes keep them readable on the pale paving; no saffron
 - [x] Autonomous pods: a low rounded body under a long glass canopy, four wheels, a mint service line on each side and mint/coral light bars; six body tints
-- [ ] User art review ([capture](../artifacts/art-actors-preset.png))
+- [x] User art review, in the combined-scene review before the merge (2026-09-25) ([capture](../artifacts/art-actors-preset.png))

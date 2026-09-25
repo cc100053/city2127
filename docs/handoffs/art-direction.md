@@ -1,11 +1,11 @@
 # art-direction — Art rules and a polished pilot area for the root Shibuya scene
 
 - Owner: cc100053
-- Status: IN_PROGRESS — pilot, building rollout, sites/ground, lighting/day cycle and polish pass 3 implemented; waiting for user art review of the combined scene, then merge to main
+- Status: DONE — integrated into main (merge `2126a2c`, 2026-09-25); `feat/art-direction` deleted
 - Branch: feat/art-direction
 - Base commit: 5894f872be1e35d759178786bfe2a2949b190b17
 - Last verified commit: the polish pass 3 commit on `feat/art-direction` (parent `adfa33d`), checked 2026-09-25
-- Remote availability: origin/feat/art-direction (all work pushed); origin/feat/art-lighting (merged branch, kept for history)
+- Remote availability: main only; `feat/art-direction` was deleted locally and on origin after the merge
 - GitHub Issue (optional): none
 
 ## Session Git state
@@ -13,7 +13,7 @@
 - Session starting branch and HEAD: feat/art-direction adfa33d903581c968a64784385daa274750d7701 (polish pass 3 session, 2026-09-25; clean and in sync with origin/feat/art-direction after `git fetch --prune origin`)
 - Last fetched origin/main commit: 5894f872be1e35d759178786bfe2a2949b190b17 (2026-09-25; main has not moved since the task base, so the merge will be conflict-free on main's side)
 - Local changes present at session start: NONE
-- Upstream integration status: NOT INTEGRATED — waiting for art review
+- Upstream integration status: INTEGRATED — `--no-ff` merge `2126a2c` on main (origin/main was still the task base `5894f87`)
 - Pending Git conflicts or synchronization blockers: NONE. The `../city2127-lighting` worktree has been removed.
 
 ## Goal and acceptance criteria
@@ -87,7 +87,7 @@ Unchanged throughout: site positions, footprints and rise/sink behaviour, the he
 - Evidence/environment:
   - Headed Google Chrome 154 via `playwright-cli -s=gpu open --browser=chrome --headed`, ANGLE Metal on an Apple M6, pixel ratio 1. No other browser session was running.
   - Screenshots in `artifacts/`: `art-before-*`, `art-pilot-*`, `art-buildings-*`, `art-buildings2-*`, `light-*`, `art-step4-*`, `daycycle-*` and `art-polish-*`. All are 1280×720 headless captures; the two `art-buildings2-orbit-*` views are not on the hero pose.
-- Integrated commit and checks: NOT INTEGRATED
+- Integrated commit and checks: `2126a2c` on main. Branch CI passed on `3ec57fd`. On the merge result `npm test` gave 9 PASS, `npm run build` passed and `git diff --check` was clean. Headless smoke (city and `?survey`): no console errors except the favicon 404; draw calls city 356, survey 505 (the dash strip adds a transparent material). `survey/` and `module-swap/` are unchanged.
 - Changes since verification: none (docs were updated in the same commit)
 
 ## Known issues and blockers
@@ -111,8 +111,8 @@ Unchanged throughout: site positions, footprints and rise/sink behaviour, the he
 
 Close this task (in order):
 
-1. **User art review of the combined scene** at the hero pose, day and night: `art-polish-*` (latest), `art-step4-*`, `daycycle-*` and `light-expensive-*`. The saffron outline was checked at 22:00 in `art-polish-survey-2200` and still reads beside lit windows; the user has not reviewed it.
-2. **Merge `feat/art-direction` into `main`** following [CONTRIBUTING](../CONTRIBUTING.md). After the merge, rerun `npm test` and `npm run build`, run a headless smoke check, and record the integrated commit here and in VALIDATION.
+1. ~~User art review~~: the user reviewed the scene in a headed browser, reported the road flicker (fixed in `3ec57fd`) and asked to merge (2026-09-25). Original item: **user art review of the combined scene** at the hero pose, day and night: `art-polish-*` (latest), `art-step4-*`, `daycycle-*` and `light-expensive-*`. The saffron outline was checked at 22:00 in `art-polish-survey-2200` and still reads beside lit windows; the user has not reviewed it.
+2. ~~Merge~~ done (`2126a2c`). Original item: **merge `feat/art-direction` into `main`** following [CONTRIBUTING](../CONTRIBUTING.md). After the merge, rerun `npm test` and `npm run build`, run a headless smoke check, and record the integrated commit here and in VALIDATION.
 
 Art polish not yet done (to take up after the review, or as a follow-up task):
 
@@ -130,4 +130,4 @@ Outside this task (the PLAN02 order, after art):
 
 ## Next expected step
 
-cc100053: art review of the combined scene (Remaining work 1). The agent then merges to main (Remaining work 2), or takes the next art item the user picks.
+Art direction is closed on main. The next task is either the art follow-ups listed under Remaining work (drones, SE medium variant, live totem data, Hachiko plaza visibility) or the PLAN02 order after art: new areas and city objects, and more survey questions. Start it from the updated main with its own handoff.
