@@ -1,5 +1,116 @@
 # Validation and handoff
 
+## Road flicker fix — 2026-09-25
+
+User report during review: the east–west road flickers, but only when the camera is zoomed out and moving. Held-clock frame diffs on the real GPU showed no change on the road with a still camera, so the moving sun was ruled out. Headed Chrome (ANGLE Metal, Apple M6) at 1280×720, zoomed fully out and dragged to a steep view with real mouse input: with the camera near plane at .1, large parts of the road z-fought with the ground plate (hatched and missing bands); with near = 1 the same view is clean ([comparison, top .1 / bottom 1](../artifacts/road-zfight-near-compare.png)). Fix: near plane 1 in `heroCamera.ts`. The lane dashes were also changed from 0.13-wide boxes to a mipmapped strip texture, because they fell below a pixel at a distance; at the hero pose they still read as crisp dashes. `npm test` 9 PASS, `npm run build` PASS, `git diff --check` clean. The user has not yet confirmed the fix in the review window.
+
+## Art-direction actor pass — 2026-09-25
+
+Only `src/mobility.ts` changed (people and pod geometry, per-instance colours; counts, routes and timing unchanged). `npm test` 9 PASS, `npm run build` PASS (existing chunk-size warning), `git diff --check` clean. Headless 1280×720 capture at `?hour=12`, 6 s after load so pods are on the road: [actors](../artifacts/art-actors-preset.png). Headless draw calls: city 352 (was 344; the new body, tyre, hair and trousers materials). Real-GPU FPS for this pass was not measured.
+
+## Art-direction polish pass 3 — 2026-09-25
+
+Branch `feat/art-direction`, uncommitted pass on top of `adfa33d`; only `src/cityRig.ts` and `src/surveySites.ts` changed ([ART.md checklist](ART.md#polish-pass-3-2026-09-25)). `npm test` passed with 9 PASS lines, including upper-volume and site clearance. `npm run build` passed, with the existing chunk-size warning. `git diff --check` is clean. `survey/` and `module-swap/` are unchanged.
+
+Captures: Playwright CLI (headless SwiftShader) at 1280×720 on the untouched hero pose, with the scratch survey server on port 8788 (the same five guests: all four sites up, SE tall): [preset 12:00](../artifacts/art-polish-preset.png), [survey 12:00](../artifacts/art-polish-survey.png), [survey 22:00](../artifacts/art-polish-survey-2200.png). Compare with [step 4 survey](../artifacts/art-step4-survey.png). The only console entry is the existing favicon 404. Changing the window count of the wings changed the number of `kit.random()` calls, so the seeded skyline was reshuffled again (still 60 blocks).
+
+Real GPU: headed Google Chrome via `playwright-cli -s=gpu open --browser=chrome --headed`, ANGLE Metal on an Apple M6, pixel ratio 1. Samples were taken after 14 s and 17 s, each averaging 120 frames:
+
+| Viewport | Clock | Mode | FPS | Draw calls |
+| --- | --- | --- | --- | --- |
+| 1280×720 | `?hour=12` | city | 60.0 | 344 |
+| 1280×720 | `?hour=12` | survey | 60.0 / 59.9 | 493 |
+| 1280×720 | `?hour=22` | survey | 60.0 | 493 |
+| 1920×1080 | `?hour=12` | city | 60.0 | 344 |
+| 1920×1080 | `?hour=12` | survey | 60.0 / 60.1 | 493 |
+| 1920×1080 | `?hour=22` | survey | 60.0 / 60.1 | 493 |
+
+City draw calls are unchanged because everything is baked per material. Survey went from 489 to 493 because the SE tall part now also uses `leaf`. User art review is pending.
+
+## Art-direction status and real-GPU recheck — 2026-09-25
+
+Checked commit `6e74eec` on `feat/art-direction`, which includes the lighting passes and the day/night cycle. `npm test` passed with 9 PASS lines. `npm run build` passed, with the existing chunk-size warning. `survey/` and `module-swap/` are unchanged.
+
+Real GPU: headed Google Chrome 154 via `playwright-cli -s=gpu open --browser=chrome --headed`, ANGLE Metal on an Apple M6, pixel ratio 1, tab visible, no other browser session running. Survey mode used the scratch DB on port 8788 with five guests (自動化 +2 · 公共共有 +4 · 環境優先 +2 · 都市集約 +2, all four sites up). Two samples were taken after 12 s of warm-up, each averaging 120 frames:
+
+| Viewport | Clock | Mode | FPS | Draw calls | Geometries |
+| --- | --- | --- | --- | --- | --- |
+| 1280×720 | `?hour=12` | city | 59.9 | 344 | 87 |
+| 1280×720 | `?hour=22` | city | 59.9–60.0 | 344 | 87 |
+| 1280×720 | `?hour=12` | survey | 60.0 | 489 | 125 |
+| 1280×720 | `?hour=22` | survey | 60.0 | 489 | 125 |
+| 1920×1080 | `?hour=12` | city | 60.0 | 344 | 87 |
+| 1920×1080 | `?hour=22` | city | 60.0 | 344 | 87 |
+| 1920×1080 | `?hour=12` | survey | 60.0 | 489 | 125 |
+| 1920×1080 | `?hour=22` | survey | 60.0 | 489 | 125 |
+
+The display is capped at 60 Hz. The ~56 FPS reading at 1080p survey on 2026-09-25 (step 4) did not recur here. The exhibition PC is still unmeasured. Remaining work and review status are listed in the [art-direction handoff](handoffs/art-direction.md#remaining-work).
+
+## Day/night cycle replaces the preset buttons — 2026-09-25
+
+Branch `feat/art-lighting`. New `src/dayCycle.ts`; `main.ts`, `overlay.ts`, `worldState.ts`, `style.css` and `tests/worldState.test.ts` changed. `npm test` PASS (with new day-cycle assertions), `npm run build` PASS, `git diff --check` clean. Playwright CLI (headless SwiftShader) captures at 1280×720 on the hero pose, held with `?hour=`: [12:00](../artifacts/daycycle-1200.png), [06:18 dawn](../artifacts/daycycle-0618-dawn.png), [17:48 dusk](../artifacts/daycycle-1748-dusk.png), [22:00 night](../artifacts/daycycle-2200-night.png) and [survey at 22:00](../artifacts/daycycle-survey-2200.png) (reading the main worktree's survey server). Live clock without `?hour`: 12:25 at about 3 s and 17:54 at about 45 s, when the text had switched to night colours. [18:03 frame](../artifacts/daycycle-live-1803.png). No console errors. Draw calls are unchanged (preset 344, survey 400). Real-GPU FPS was not measured. The headless run reported 60 FPS, which is not evidence.
+
+## Art-direction lighting, "expensive" pass — 2026-09-25
+
+Branch `feat/art-lighting`, following the pass below; `src/main.ts` only. VSM soft shadows replace PCFSoft, with radius 5 and 12 blur samples. GTAO is broader (radius 3, 16 samples, blend 1), exposure is .84, and bloom uses threshold 1 and strength .1. A new `VignetteShader` pass (offset .9, darkness .9) sits before output. AgX (exposure 1.15) was tried and rejected as flat and grey. Playwright CLI (headless SwiftShader) captures at 1280×720 on the hero pose: [preset](../artifacts/light-expensive-preset.png), [Pulse](../artifacts/light-expensive-pulse.png), [Still](../artifacts/light-expensive-still.png) and [survey, two guests](../artifacts/light-expensive-survey.png). The comparison baseline is [light-after-preset](../artifacts/light-after-preset.png). Headless draw calls: preset 337 → 344 and survey 393 → 400; the extra calls are VSM blur and the vignette. `npm test` PASS, `npm run build` PASS, `git diff --check` clean. Real-GPU FPS was not measured. VSM blur and the heavier GTAO cost more GPU time, so measure them first if FPS drops.
+
+## Art-direction lighting pass — 2026-09-24
+
+Branch `feat/art-lighting` (separate worktree, based on b549785; the uncommitted second building rollout was not included). Change is `src/main.ts` lighting only: Neutral tone mapping (exposure .92), a lower, warmer sun (2.55), a cooler and weaker hemisphere fill (.62), and the Still sun boost cut from .4 to .05. A sky-gradient PMREM environment was also tried and rejected: it lit diffuse surfaces too blue and muddy, and did not visibly improve the glass at the hero distance. `RoomEnvironment` stays.
+
+Playwright CLI (headless SwiftShader) captures at 1280×720 on the untouched hero pose: [before, preset](../artifacts/light-before-preset.png); after: [preset](../artifacts/light-after-preset.png), [Pulse](../artifacts/light-after-pulse.png), [Still](../artifacts/light-after-still.png) and [survey, two guests](../artifacts/light-after-survey.png) (the survey server from the main worktree was running and was only read). Headless draw calls are unchanged: 337 for preset and 393 for survey with two guests. `npm test` PASS, `npm run build` PASS (existing chunk-size warning), `git diff --check` clean. Pulse and Still have no before capture from this session. Real-GPU FPS was not measured, but the pass adds no lights, passes or geometry.
+
+## Art-direction step 4: sites and ground — 2026-09-25
+
+Branch `feat/art-direction`; see [ART.md step 4](ART.md#step-4-sites-and-ground-2026-09-25). `npm test`, `npm run build` and `git diff --check` all passed. Headless Playwright took [preset](../artifacts/art-step4-preset.png) and [survey, five guests](../artifacts/art-step4-survey.png) at 1280×720 on the untouched hero pose. Console output was only the existing favicon 404. Draw calls are 337 (preset, unchanged) and 482 (survey, up from 466; the new water material and pad pieces account for it).
+
+Real GPU: headed Chrome 154 via `playwright-cli -s=gpu open --browser=chrome --headed`, on ANGLE Metal Apple M6, pixel ratio 1, tab visible.
+
+| Viewport | Mode | FPS | Draw calls |
+| --- | --- | --- | --- |
+| 1280×720 | preset | 60.0 | 337 |
+| 1280×720 | survey, all sites | 59.9 | 482 |
+| 1920×1080 | preset | 59.9 | 337 |
+| 1920×1080 | survey, all sites | 56.1–56.7 | 482 |
+
+The first run had a headless SwiftShader session rendering in the background. With CPU contention it read 38–41 FPS at 1080p and 55 at 720p survey. Close every other browser session before measuring. The 1080p survey figure (~56) is the first below vsync on this Mac, so recheck GTAO first if the exhibition PC is weaker.
+
+## Art-direction building pass 2 — 2026-09-24
+
+The user reviewed the rollout and said "only the front has windows" and "all buildings look identical". The fixes are on `feat/art-direction` ([ART.md pass 2](ART.md#building-pass-2-2026-09-24)). `npm test` passed. `tests/mobility.test.ts` roof allowances were raised, not shrunk, for Center-gai (3.8, ring crown and mast) and the station (4.2, glass vault). `npm run build` passed and `git diff --check` was clean.
+
+- Screenshots from Playwright (headless) at 1280×720: [preset hero](../artifacts/art-buildings2-preset.png) and [survey hero](../artifacts/art-buildings2-survey.png), both on the untouched pose. Orbit views [north](../artifacts/art-buildings2-orbit-north.png) and [west](../artifacts/art-buildings2-orbit-west.png) were taken after a mouse drag, so they are not comparison poses; they show glazing on the back and side faces. Console output was only the existing favicon 404.
+- Known side effect: `windows()` now makes a different number of `kit.random()` calls, so the seeded distant skyline ring changed shape. It is still 60 hazed blocks.
+- **Real-GPU performance.** Playwright launched headed Google Chrome 154 (`--browser=chrome --headed`) with renderer "ANGLE (Apple, ANGLE Metal Renderer: Apple M6)", pixel ratio 1 and the tab visible. After warm-up, each sample averaged 120 frames:
+
+  | Viewport | Mode | FPS | Draw calls | Geometries |
+  | --- | --- | --- | --- | --- |
+  | 1280×720 | preset (Daylight) | 60.0 | 337 | 86 |
+  | 1280×720 | `?survey`, all four sites up | 60.0 | 466 | 120 |
+  | 1920×1080 | preset (Daylight) | 60.0 | 337 | 86 |
+  | 1920×1080 | `?survey`, all four sites up | 56.0 → 60.0 | 466 | 120 |
+
+  The same numbers were measured before pass 2, on `b549785`. The display is capped at 60 Hz, so this shows headroom only up to vsync on this Mac. It says nothing about the exhibition PC. The Claude-in-Chrome extension tab stayed `hidden` and was not used.
+
+## Art-direction building rollout — 2026-09-24
+
+After the user said "ok, polish building", [ART.md](ART.md) was rolled out to the buildings on `feat/art-direction`. `npm test` and `npm run build` passed, with the existing chunk-size warning only. `git diff --check` was clean. `survey/` and `module-swap/` are unchanged.
+
+Playwright CLI (headless SwiftShader) took captures at 1280×720 on the untouched hero pose. [Preset](../artifacts/art-buildings-preset.png) compares directly with [pilot preset](../artifacts/art-pilot-preset.png). [Survey, five guests](../artifacts/art-buildings-survey.png) compares with [pilot survey](../artifacts/art-pilot-survey.png) and uses the same scratch DB. Still (key `2`) was also checked at the same pose: the judgment was shown and nothing broke. Console output was only the existing favicon 404. Headless stats (not performance evidence): preset 337 draw calls / 86 geometries, and survey 466 / 120. Both are unchanged or +4, because the new detail goes through `bake()`. **Real-GPU FPS is still not measured**: the Chrome tab stayed `hidden`.
+
+## Art-direction pilot — 2026-09-24
+
+Branch `feat/art-direction` (handoff [art-direction](handoffs/art-direction.md)), rules [ART.md](ART.md). `npm test` and `npm run build` passed, with the existing bundle-size warning only. `git diff --check` was clean. `survey/` and `module-swap/` are unchanged.
+
+Browser: Playwright CLI (headless Chromium, SwiftShader) at exactly 1280×720 on the untouched hero pose, root dev server on port 5180, and a scratch survey server/DB on port 8788. The five guests went through the HTTP API: `automate-services`, `public-commons`, `build-upward`, `cooling-park`, `open-plaza`. That gives scores 自動化 +2 · 公共共有 +4 · 環境優先 +2 · 都市集約 +2, with all four sites up and the SE tower at base height.
+
+- Before: [preset](../artifacts/art-before-preset.png) and [survey, five guests](../artifacts/art-before-survey.png). After: [preset](../artifacts/art-pilot-preset.png) and [survey, five guests, reloaded](../artifacts/art-pilot-survey.png). The after capture was reloaded from the snapshot, so its outlines are steady.
+- Live change: after an admin reset and one new guest (automation → AUTO HUB), the [guest 1](../artifacts/art-pilot-survey-guest1.png) frame was taken about 4 s later, during the pulse. Sequential frames showed the saffron outline at full opacity while the hub was still rising, a visible brightness pulse, and a steady saffron line after 10 s.
+- The Pulse preset (key `1`) was checked at the same pose: the drum screen and the terraces stay readable, and nothing else changed. Console output was only the existing favicon 404.
+- Headless stats (SwiftShader; **not** performance evidence): preset draw calls 170 → 337 and geometries 84 → 86. Survey with all sites went from 576 → 462 draw calls and 141 → 119 geometries. Before the parts and park trees were baked, it was 946.
+- **Real-GPU FPS: NOT MEASURED.** Claude in Chrome connected to desktop Chrome on an Apple M1 Pro (ANGLE Metal), but the tab reported `document.visibilityState = hidden`, so no frames rendered. Window resize was also ignored. The 1280×720 and 1920×1080 measurements need Chrome in the foreground.
+- Not verified: user art review, other Chrome sizes, and a full 32 s delivery cycle with the new passes.
+
 ## Root scene causal panel — 2026-09-24
 
 Step 3 on `feat/root-causal-panel` (handoff [root-causal-panel](handoffs/root-causal-panel.md)). `npm test` (`policyText`/`cityText` added to `tests/surveyAtmosphere.test.ts`) and `npm run build` passed; `survey/` and `module-swap/` unchanged. Browser: Playwright CLI (headless Chromium) at 1280×720, fresh scratch survey DB on port 8788, the same five guests through the HTTP API. The empty run showed the waiting message ([empty](../artifacts/causal-panel-empty.png)). After five guests the uncapped card reached y≈605 and covered the SW plaza; after capping the history at three (numbered 3–5) and the card at 400 px, a reload showed the latest decision, CHOICE / POLICY / CITY EFFECT with place names, and all four sites unobstructed ([five guests](../artifacts/causal-panel-five-guests.png)). Admin reset returned the panel to the waiting message with no history. Without `?survey` no panel was created and the intro was visible. Console: only the pre-existing favicon 404.
@@ -94,7 +205,7 @@ For `survey/` or `module-swap/` changes, run `npm test` and `npm run build` in t
 
 Tests use `node:assert/strict` and Node's TypeScript stripping; keep new checks small and focused. `tsc` currently checks `src/`, while Node executes the test files. There is no separate lint/format command.
 
-The state test covers midpoint interpolation, the immediate verdict, the four-second lock and choosing again. The mobility test samples three traffic cycles, one walking-cycle boundary and 501 positions per circulation route against layout-derived landmark envelopes, plus delivery transfer/lift continuity and closed-route guide wraparound. The Shibuya checks also sample all five painted walking paths, off-road waiting endpoints and landmark ground footprints against the road polygons. These checks do **not** prove visual correctness, exact mesh collision, every pedestrian pose or drone-to-drone avoidance. Inspect the actual scene after geometry/motion changes.
+The state test covers the survey blend, the day clock wrap, the daylight curve, the mood keyframes (including midnight continuity) and the night lights. The mobility test samples three traffic cycles, one walking-cycle boundary and 501 positions per circulation route against layout-derived landmark envelopes, plus delivery transfer/lift continuity and closed-route guide wraparound. The Shibuya checks also sample all five painted walking paths, off-road waiting endpoints and landmark ground footprints against the road polygons. These checks do **not** prove visual correctness, exact mesh collision, every pedestrian pose or drone-to-drone avoidance. Inspect the actual scene after geometry/motion changes.
 
 A Vite warning about the single bundle exceeding 500 kB has been observed; it is not a build failure. Do not hide it or add code splitting solely to silence it. Measure loading needs before changing packaging.
 
@@ -105,7 +216,7 @@ A Vite warning about the single bundle exceeding 500 kB has been observed; it is
 3. Select Pulse. During the first 10 seconds, try another key: it must be ignored. At completion the verdict must appear immediately while controls stay locked for four more seconds. Aircraft, deliveries and window beats must keep moving. After the hold, select Still; then return to neutral and verify the verdict clears.
 4. Observe at least 60 seconds of motion. Check car headings, edge fades, walking legs, waiting/queue positions and the cycle boundary. People should cross on the intended zebra paths rather than walk through the tower or props. Inspect aircraft bodies and the 4.4-unit wing span against roofs, gardens and corridor turns. Watch a complete 32-second delivery cycle: berth, horizontal cargo transfer, descent, receiver doors, departure and empty-lift return. Cargo must clear the facade before descending, and the courier must enter the real station opening.
 5. Confirm Pulse is visibly busier than Still. All states must retain daylight, readable architectural surfaces and restrained bloom. Check both elevated walking routes, corner landings and terminal lift travel as well as the ground crossing.
-6. Exercise buttons and `0/1/2`, keyboard focus at the desktop viewport if the overlay/camera changed. Responsive/mobile acceptance is explicitly out of scope (user decision, 2026-09-17). Check that resize updates both camera projection and composer size. OrbitControls were added in commit 5ad7dd0 (2026-09-17); do not change the initial hero pose to solve framing problems, and take comparison screenshots before touching the camera.
+6. Check the day cycle with `?hour=` at 12, dawn (~6.3), dusk (~17.8) and night (22), and let the live clock run past sunset if the overlay/camera/lighting changed. Responsive/mobile acceptance is explicitly out of scope (user decision, 2026-09-17). Check that resize updates both camera projection and composer size. OrbitControls were added in commit 5ad7dd0 (2026-09-17); do not change the initial hero pose to solve framing problems, and take comparison screenshots before touching the camera.
 
 Use the available browser tool and its documented APIs. Browser handles, tab IDs, localhost processes and previous tool sessions can expire; rediscover an existing matching tab rather than assume a previous ID still works. Restore temporary viewport overrides after testing.
 
