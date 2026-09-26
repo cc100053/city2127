@@ -1,10 +1,12 @@
 import * as T from 'three';
 import { arc, bake, box, futureLight, leaf, membrane, pink, shrubs, sign, stone, trim, type Kit } from '../cityRig.ts';
+import { siteLayerDefinition } from '../changeCatalog.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, type BuiltSite } from './siteRuntime.ts';
 
 export function buildCommonsPlaza(scene: T.Scene, kit: Kit): BuiltSite {
   const root = createSiteRoot(scene, 'sw');
-  const plaza = createSiteLayer(root);
+  const plazaLayer = createSiteLayer(root, siteLayerDefinition('dogenzakaSouth', 'plaza'));
+  const plaza = plazaLayer.group;
   arc(plaza, 0, 5, .2, [0, .42, 0], stone);
   arc(plaza, 2.05, 2.15, .02, [0, .62, 0], futureLight);
   arc(plaza, 4.3, 5, .5, [0, .62, 0], trim, 1.2, 3.6);
@@ -19,5 +21,5 @@ export function buildCommonsPlaza(scene: T.Scene, kit: Kit): BuiltSite {
   arc(plaza, 0, 3.1, .06, [0, 5.03, 0], membrane);
   sign(plaza, kit, '公共広場 / COMMONS', 2.2, 2.1, 4, 4, .55, '#536f66');
   plaza.add(...bake(plaza));
-  return { id: 'dogenzakaSouth', root, layers: { plaza }, marker: createGuestMarker(root, 'sw') };
+  return { id: 'dogenzakaSouth', root, layers: { plaza: plazaLayer }, marker: createGuestMarker(root, 'sw') };
 }

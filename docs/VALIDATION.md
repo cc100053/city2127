@@ -1,5 +1,13 @@
 # Validation and handoff
 
+## Shibuya hybrid site assets Stage 2 — 2026-09-27
+
+Stacked branch `codex/shibuya-site-assets` contains Stage 1 plus Stage 2; compare it to `codex/shibuya-change-manager` for the Stage 2-only delta. The change catalogue now records layer kind/animation/asset ID, PARK is split into procedural surface and lazy GLB trees, and the future-tree GLB goes through a validating one-request-per-page cache. `CityChangeManager` starts optional asset preparation only on first activation and exposes layer readiness/fallback diagnostics without blocking snapshot/live/reset transitions.
+
+Node `24.21.0`: root `npm test` passed with 12 PASS lines, including cache reuse, retry after invalid load, root/bounds/Camera/Light/animation validation, compatibility and fallback diagnostics. `npm run build` passed with the existing >500 kB chunk warning and emitted the existing 79.70 kB tree GLB. `git diff --check` passed. No dependency, survey server, module-swap or binary asset changed.
+
+Browser smoke: headless Google Chrome, 1280×720, DPR 1, held noon, root Vite on 5173 and scratch survey DB/server on 8787. At the empty snapshot `parkTrees` was `idle`; only the base city's existing Hachiko tree was requested. The first three answers caused no site-tree request. `cooling-park` changed the layer to `ready` and made exactly one additional GLB request; all four sites/tall layers were 521 draw calls / 133 geometries. Reload restored the same state and reset returned to 356 draw calls with every variant at baseline. No console exception or non-favicon HTTP error occurred. These headless values are regression evidence, not a real-GPU FPS measurement.
+
 ## Shibuya change manager Stage 1 — 2026-09-27
 
 Branch `codex/shibuya-change-manager`, based on `aea125e` after the art-direction merge. The former monolithic `src/surveySites.ts` is split into the typed survey event boundary (`surveyView.ts`), data-driven Shibuya registry (`changeCatalog.ts`), renderer adapter (`cityChangeManager.ts`) and four procedural builders (`siteBuilders/`). The survey server remains authoritative: the client selects variants only from `CityView.layout`; no score trigger, priority resolver, schema, question or server change was added. Existing geometry, materials, per-layer `bake()`, 3 s rise/sink and 10 s saffron live-change semantics are preserved. Snapshots/reconnects/reset do not pulse, live updates animate changed layers only, and an in-flight transition can be retargeted from its current scale.

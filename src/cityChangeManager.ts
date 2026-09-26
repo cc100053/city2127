@@ -1,6 +1,6 @@
 import type * as T from 'three';
-import { CHANGE_CATALOG, SITE_IDS, selectSiteVariants, variantLayers, type SiteId, type SiteLayerId, type SiteVariantId } from './changeCatalog.ts';
-import type { BuiltSiteMap } from './siteBuilders/index.ts';
+import { CHANGE_CATALOG, SITE_IDS, selectSiteVariants, variantLayers, type SiteId, type SiteLayerDefinition, type SiteLayerId, type SiteVariantId } from './changeCatalog.ts';
+import type { BuiltSiteMap, SiteLayerRuntime } from './siteBuilders/index.ts';
 import type { SurveyView } from './surveyView.ts';
 
 export const SITE_TRANSITION_SECONDS = 3;
@@ -8,12 +8,27 @@ export const FRESH_MARKER_SECONDS = 10;
 const HIDDEN_SCALE = 1e-3;
 
 type LayerMotion = {
+  readonly layer: SiteLayerRuntime;
   readonly group: T.Group;
   from: number;
   to: number;
   start: number;
   fresh: number;
 };
+
+export interface SiteLayerDiagnostic {
+  readonly kind: SiteLayerDefinition['kind'];
+  readonly assetId?: SiteLayerDefinition['assetId'];
+  readonly assetStatus: SiteLayerRuntime['assetStatus'];
+  readonly assetError?: string;
+}
+
+export interface SiteDiagnostic {
+  readonly variant: SiteVariantId;
+  readonly layers: Readonly<Partial<Record<SiteLayerId, SiteLayerDiagnostic>>>;
+}
+
+export type CityChangeDiagnostics = Readonly<Record<SiteId, SiteDiagnostic>>;
 
 const smoothstep = (value: number) => value * value * (3 - 2 * value);
 
@@ -28,12 +43,16 @@ export class CityChangeManager {
     for (const siteId of SITE_IDS) {
       const built = sites[siteId];
       if (!built || built.id !== siteId) throw new Error(`Missing runtime for change site ${siteId}.`);
-      const layerIds = new Set(Object.values(CHANGE_CATALOG[siteId].variants).flatMap(definition => definition?.layers ?? []));
       const siteMotions = new Map<SiteLayerId, LayerMotion>();
-      for (const layerId of layerIds) {
-        const group = built.layers[layerId];
-        if (!group) throw new Error(`Missing layer ${layerId} for change site ${siteId}.`);
-        siteMotions.set(layerId, { group, from: 0, to: 0, start: -Infinity, fresh: -Infinity });
+      const definitions = Object.values(CHANGE_CATALOG[siteId].layers)
+        .filter((definition): definition is SiteLayerDefinition => definition !== undefined);
+      for (const definition of definitions) {
+        const layer = built.layers[definition.id];
+        if (!layer) throw new Error(`Missing layer ${definition.id} for change site ${siteId}.`);
+        if (layer.definition.kind !== definition.kind || layer.definition.assetId !== definition.assetId) {
+          throw new Error(`Runtime layer ${siteId}/${definition.id} does not match the change catalog.`);
+        }
+        siteMotions.set(definition.id, { layer, group: layer.group, from: 0, to: 0, start: -Infinity, fresh: -Infinity });
       }
       this.motions.set(siteId, siteMotions);
     }
@@ -51,6 +70,18 @@ export class CityChangeManager {
 
   getVariant(siteId: SiteId): SiteVariantId {
     return this.variants[siteId];
+  }
+
+  getDiagnostics(): CityChangeDiagnostics {
+    return Object.fromEntries(SITE_IDS.map(siteId => [siteId, {
+      variant: this.variants[siteId],
+      layers: Object.fromEntries([...this.motions.get(siteId)!].map(([layerId, motion]) => [layerId, {
+        kind: motion.layer.definition.kind,
+        assetId: motion.layer.definition.assetId,
+        assetStatus: motion.layer.assetStatus,
+        assetError: motion.layer.assetError,
+      }])),
+    }])) as CityChangeDiagnostics;
   }
 
   update(now: number): void {
@@ -83,6 +114,7 @@ export class CityChangeManager {
       for (const [layerId, motion] of this.motions.get(siteId)!) {
         const to = activeLayers.has(layerId) ? 1 : 0;
         if (motion.to === to) continue;
+        if (to === 1) void motion.layer.prepare();
         motion.from = motion.group.visible ? motion.group.scale.y : 0;
         motion.to = to;
         motion.start = now;

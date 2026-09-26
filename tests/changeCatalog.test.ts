@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { selectSiteVariants, variantLayers } from '../src/changeCatalog.ts';
+import { selectSiteVariants, siteLayerDefinition, variantLayers } from '../src/changeCatalog.ts';
 import type { Layout } from '../src/surveyView.ts';
 
 const lot = (kind: Layout['nw']['lot'] = 'empty', building: Layout['nw']['building'] = 'none') => ({ lot: kind, building });
@@ -21,7 +21,12 @@ assert.equal(selectSiteVariants(layout({ se: lot('empty', 'small') })).centerGai
 assert.equal(selectSiteVariants(layout({ se: lot('empty', 'medium') })).centerGaiRear, 'tower-medium');
 assert.equal(selectSiteVariants(layout({ se: lot('empty', 'tall') })).centerGaiRear, 'tower-tall');
 assert.deepEqual(variantLayers('magnetEast', 'automation-tall'), ['hubBase', 'hubUpper']);
+assert.deepEqual(variantLayers('stationEastPark', 'park'), ['parkSurface', 'parkTrees']);
 assert.deepEqual(variantLayers('centerGaiRear', 'tower-tall'), ['towerBase', 'towerUpper']);
+assert.deepEqual(siteLayerDefinition('stationEastPark', 'parkTrees'), {
+  id: 'parkTrees', kind: 'glb', assetId: 'future-tree-2127', enterAnimation: 'rise', exitAnimation: 'sink',
+});
 assert.throws(() => variantLayers('stationEastPark', 'plaza'), /Unknown variant/);
+assert.throws(() => siteLayerDefinition('magnetEast', 'parkTrees'), /Unknown layer/);
 
 console.log('PASS: layout selects explicit Shibuya site variants and additive layers.');

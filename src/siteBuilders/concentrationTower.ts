@@ -1,11 +1,14 @@
 import * as T from 'three';
 import { arc, bake, box, cream, faces, glass, leaf, sage, shrubs, sign, solar, trim, type Kit } from '../cityRig.ts';
+import { siteLayerDefinition } from '../changeCatalog.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, type BuiltSite } from './siteRuntime.ts';
 
 export function buildConcentrationTower(scene: T.Scene, kit: Kit): BuiltSite {
   const root = createSiteRoot(scene, 'se');
-  const towerBase = createSiteLayer(root);
-  const towerUpper = createSiteLayer(root, 18);
+  const towerBaseLayer = createSiteLayer(root, siteLayerDefinition('centerGaiRear', 'towerBase'));
+  const towerUpperLayer = createSiteLayer(root, siteLayerDefinition('centerGaiRear', 'towerUpper'), 18);
+  const towerBase = towerBaseLayer.group;
+  const towerUpper = towerUpperLayer.group;
   box(towerBase, [9, 1, 9], [0, .9, 0], cream, .25);
   box(towerBase, [8, 16.6, 8], [0, 9.6, 0], sage, .35);
   for (let y = 4; y < 17; y += 3) {
@@ -36,5 +39,5 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): BuiltSite {
   for (let i = 0; i < 4; i++) box(towerUpper, [.12, 1.1, 3], [-1.2 + i * .8, 27.1, 0], solar, .02);
 
   for (const layer of [towerBase, towerUpper]) layer.add(...bake(layer));
-  return { id: 'centerGaiRear', root, layers: { towerBase, towerUpper }, marker: createGuestMarker(root, 'se') };
+  return { id: 'centerGaiRear', root, layers: { towerBase: towerBaseLayer, towerUpper: towerUpperLayer }, marker: createGuestMarker(root, 'se') };
 }

@@ -1,11 +1,14 @@
 import * as T from 'three';
 import { arc, bake, box, cream, faces, futureLight, glass, sign, solar, teal, trim, type Kit } from '../cityRig.ts';
+import { siteLayerDefinition } from '../changeCatalog.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, type BuiltSite } from './siteRuntime.ts';
 
 export function buildAutomationHub(scene: T.Scene, kit: Kit): BuiltSite {
   const root = createSiteRoot(scene, 'nw');
-  const hubBase = createSiteLayer(root);
-  const hubUpper = createSiteLayer(root, 12);
+  const hubBaseLayer = createSiteLayer(root, siteLayerDefinition('magnetEast', 'hubBase'));
+  const hubUpperLayer = createSiteLayer(root, siteLayerDefinition('magnetEast', 'hubUpper'), 12);
+  const hubBase = hubBaseLayer.group;
+  const hubUpper = hubUpperLayer.group;
   box(hubBase, [8.4, .8, 7.4], [0, .8, 0], cream, .25);
   box(hubBase, [7, 10, 6], [0, 6.2, 0], teal, .3);
   for (const y of [4, 7, 10]) faces(hubBase, 7, 6, (face, across, out) => {
@@ -31,5 +34,5 @@ export function buildAutomationHub(scene: T.Scene, kit: Kit): BuiltSite {
   for (let i = 0; i < 3; i++) box(hubUpper, [.12, 1, 2.4], [-1 + i, 19.8, 0], solar, .02);
 
   for (const layer of [hubBase, hubUpper]) layer.add(...bake(layer));
-  return { id: 'magnetEast', root, layers: { hubBase, hubUpper }, marker: createGuestMarker(root, 'nw') };
+  return { id: 'magnetEast', root, layers: { hubBase: hubBaseLayer, hubUpper: hubUpperLayer }, marker: createGuestMarker(root, 'nw') };
 }
