@@ -51,7 +51,7 @@ export class MutableSiteLayerRuntime implements SiteLayerRuntime {
   }
 
   prepare(): Promise<void> {
-    if (!this.definition.assetId || this.assetStatus === 'ready' || this.assetStatus === 'fallback') return Promise.resolve();
+    if (!this.definition.assetId || this.assetStatus === 'ready') return Promise.resolve();
     if (this.task) return this.task;
     if (!this.prepareHandler) {
       this.assetStatus = 'fallback';
@@ -60,14 +60,22 @@ export class MutableSiteLayerRuntime implements SiteLayerRuntime {
       return Promise.resolve();
     }
     this.assetStatus = 'loading';
-    this.task = this.prepareHandler()
-      .then(() => { this.assetStatus = 'ready'; })
+    this.assetError = undefined;
+    const task = this.prepareHandler()
+      .then(() => {
+        this.assetStatus = 'ready';
+        this.assetError = undefined;
+      })
       .catch((error: unknown) => {
         this.assetStatus = 'fallback';
         this.assetError = error instanceof Error ? error.message : String(error);
         console.error(`Site layer ${this.definition.id} kept its procedural fallback`, error);
+      })
+      .finally(() => {
+        if (this.task === task) this.task = undefined;
       });
-    return this.task;
+    this.task = task;
+    return task;
   }
 }
 

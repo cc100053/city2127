@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { CHANGE_CATALOG, SITE_IDS, siteLayerDefinition, type SiteLayerDefinition, type SiteLayerId } from '../src/changeCatalog.ts';
-import { CityChangeManager } from '../src/cityChangeManager.ts';
+import { CityChangeManager, SITE_ASSET_RETRY_SECONDS } from '../src/cityChangeManager.ts';
 import type { BuiltSite, BuiltSiteMap } from '../src/siteBuilders/index.ts';
 import { MutableSiteLayerRuntime } from '../src/siteBuilders/siteRuntime.ts';
 import type { Layout, SurveyView } from '../src/surveyView.ts';
@@ -91,4 +91,37 @@ assert.throws(() => new CityChangeManager({
   ...sites,
   magnetEast: { ...sites.magnetEast, layers: { ...sites.magnetEast.layers, hubBase: mismatched } },
 } as BuiltSiteMap), /does not match/);
+
+let retryAttempts = 0;
+const retrySites = Object.fromEntries(SITE_IDS.map(siteId => {
+  const root = new T.Group();
+  const layers: BuiltSite['layers'] = {};
+  const definitions = Object.values(CHANGE_CATALOG[siteId].layers)
+    .filter((definition): definition is SiteLayerDefinition => definition !== undefined);
+  for (const definition of definitions) {
+    const layer = new MutableSiteLayerRuntime(definition, root);
+    if (definition.assetId) layer.setPreparation(async () => {
+      if (definition.id === 'parkTrees' && ++retryAttempts === 1) throw new Error('temporary network failure');
+    });
+    layers[definition.id] = layer;
+  }
+  const material = new T.MeshStandardMaterial({ emissiveIntensity: .2, transparent: true });
+  const marker = new T.Mesh(new T.BufferGeometry(), material); root.add(marker);
+  return [siteId, { id: siteId, root, layers, marker: { mesh: marker, material } } satisfies BuiltSite];
+})) as unknown as BuiltSiteMap;
+const retryManager = new CityChangeManager(retrySites);
+const originalError = console.error; console.error = () => {};
+try {
+  retryManager.applyIncrementalUpdate(view(layout({ ne: lot('park') }), 1), 0);
+  await new Promise<void>(resolve => setTimeout(resolve, 0));
+  assert.equal(retrySites.stationEastPark.layers.parkTrees?.assetStatus, 'fallback');
+  retryManager.update(SITE_ASSET_RETRY_SECONDS - .01);
+  assert.equal(retryAttempts, 1);
+  retryManager.update(SITE_ASSET_RETRY_SECONDS);
+  await new Promise<void>(resolve => setTimeout(resolve, 0));
+} finally {
+  console.error = originalError;
+}
+assert.equal(retryAttempts, 2);
+assert.equal(retrySites.stationEastPark.layers.parkTrees?.assetStatus, 'ready');
 console.log('PASS: snapshots, incremental updates, changed-only layers, retargeting, markers and reset transitions.');
