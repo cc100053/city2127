@@ -16,7 +16,7 @@ import { hourAt, sunHeight, daylight, moodAt, withNight } from './dayCycle';
 import { overlay } from './overlay';
 import { addCityModel } from './modelAssets';
 import { startSurveyAtmosphere } from './surveyAtmosphere';
-import { surveySites } from './surveySites';
+import { createCityChangeManager } from './createCityChangeManager';
 import './style.css';
 
 try {
@@ -70,8 +70,12 @@ try {
   // `?hour=21` holds the clock at one hour, for review captures.
   const heldHour=Number(params.get('hour')??NaN),hold=heldHour>=0&&heldHour<24?heldHour:null;
   const updateOverlay=overlay();
-  const sites=surveyUrl?surveySites(scene):null;
-  if(surveyUrl)startSurveyAtmosphere(surveyUrl,(state,targets)=>{world.blendTo(state,now);sites!.apply(targets,now);});
+  const cityChanges=surveyUrl?createCityChangeManager(scene):null;
+  if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view,state)=>{
+    world.blendTo(state,now);
+    if(kind==='city-state-updated')cityChanges!.applyIncrementalUpdate(view,now);
+    else cityChanges!.restoreFromSnapshot(view,now);
+  });
   // Day tints per mood (unchanged daylight look), then dusk and night colours laid over them by the clock.
   const dayBase=new T.Color('#c3d9e7'),dayPulse=new T.Color('#accbdc'),dayStill=new T.Color('#e0e6dc');
   const topBase=new T.Color('#7f9fbd'),topPulse=new T.Color('#6a8db0'),topStill=new T.Color('#a9bcc4');
@@ -98,7 +102,7 @@ try {
     ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientNight,dark);
     scene.environmentIntensity=.6*(.08+.92*day);renderer.toneMappingExposure=.84+dark*.1;
     bloom.strength=.1+pulse*.04+dark*.3;
-    controls.update();rig.update(s,now);sites?.update(now);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
+    controls.update();rig.update(s,now);cityChanges?.update(now);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
     if(++frames===120){renderer.domElement.dataset.time=now.toFixed(2);renderer.domElement.dataset.fps=(120000/(performance.now()-measureStart)).toFixed(1);renderer.domElement.dataset.drawCalls=String(renderer.info.render.calls);renderer.domElement.dataset.geometries=String(renderer.info.memory.geometries);frames=0;measureStart=performance.now();}
   });
   window.addEventListener('resize',()=>{

@@ -1,10 +1,10 @@
 # shibuya-change-manager — Data-driven root-scene change sites, Stage 1
 
 - Owner: Codex (implementation owner for this task)
-- Status: PLANNED
+- Status: IMPLEMENTED — verified locally, awaiting integration
 - Branch: `codex/shibuya-change-manager`
 - Base commit: `aea125eb15c50b67ed4f03b099aef7b9e8182929`
-- Last verified commit: `aea125eb15c50b67ed4f03b099aef7b9e8182929` (clean baseline only; implementation NOT STARTED)
+- Last verified commit: implementation worktree on planning commit `987b6c3d0bb3db88d31e43762f20464d82a934df` (commit pending)
 - Remote availability: NOT PUSHED
 - GitHub Issue (optional): none
 
@@ -31,12 +31,12 @@ Acceptance criteria:
 
 ## In-scope files and dependencies
 
-Planned source files:
+Implemented source files:
 
 - `src/changeCatalog.ts` — site IDs, variant IDs, socket-to-site mapping and pure layout-to-variant selection
 - `src/cityChangeManager.ts` — desired/current variant diff, snapshot/update/reset semantics, retargetable transitions and marker freshness
 - `src/siteBuilders/` — the four existing procedural site builders plus shared builder/runtime types; preserve current art and batching
-- `src/surveySites.ts` — reduce to a compatibility/factory boundary or remove after all callers migrate
+- `src/surveySites.ts` — removed after all callers migrated
 - `src/surveyAtmosphere.ts` — keep event kind through parsing/connection; retain atmosphere and causal-panel responsibilities
 - `src/main.ts` — construct and update the manager in `?survey` mode
 - root tests and `package.json` test script as needed
@@ -52,21 +52,27 @@ Explicitly excluded from Stage 1: survey schema or `deriveCityLayout()` changes,
 - Created a clean independent clone and this task branch from current main.
 - Traced the current root survey flow, integrated site art/batching, module-swap event-kind parser and changed-only transition pattern.
 - Confirmed no active remote branch overlaps the planned change-manager files.
+- Added `surveyView.ts` so event validation and reconnect handling preserve `city-state-snapshot`, `city-state-updated` and `run-reset` instead of collapsing all three to one view callback.
+- Added the four-site registry and explicit baseline/medium/tall/park/plaza variants. Internal Shibuya IDs stay separate from the server wire socket IDs.
+- Added `CityChangeManager`: snapshot/reset restore without a pulse, live changed-only updates, current-scale retargeting, additive medium/tall layers and runtime layer validation.
+- Moved the art-directed geometry unchanged into four focused builders and retained shared materials, per-layer `bake()` and the existing asynchronous park-tree GLB.
+- Migrated `main.ts`, removed the monolithic `surveySites.ts`, and added catalogue/manager tests to the root test command.
+- Updated the project map and validation record. No survey server, `module-swap`, Blender asset or dependency was changed.
 
 ## Actual validation results
 
-- Verification status: PASSED for the clean pre-change root baseline; implementation validation NOT RUN
-- Date and checked commit/worktree: 2026-09-27, clean `aea125eb15c50b67ed4f03b099aef7b9e8182929`
-- Commands/manual checks and results: with Node `24.21.0` / npm `11.19.0`, `npm ci` completed, `npm test` produced 9 PASS lines, `npm run build` passed with the existing >500 kB chunk warning, and `git diff --check` passed. The shell default Node `20.16.0` is unsupported: its test command cannot use type stripping and Vite warns that it is below the required version; those first-run results are not counted as validation.
-- Evidence/environment: command-line baseline only; browser checks NOT RUN
+- Verification status: PASSED for implementation
+- Date and checked commit/worktree: 2026-09-27, implementation worktree on `987b6c3`
+- Commands/manual checks and results: with Node `24.21.0` / npm `11.19.0`, root `npm test` produced 11 PASS lines, `npm run build` passed with the existing >500 kB chunk warning, and `git diff --check` passed. The shell default Node `20.16.0` remains unsupported.
+- Evidence/environment: headless Google Chrome, 1280×720, DPR 1, held noon, scratch survey SQLite DB/server. Baseline 356 draw calls / 90 geometries; five-answer all-sites state 521 / 133; reload 521 / 133; reset 356 / 133. No console exceptions or non-favicon HTTP errors. Non-survey mode had no causal panel and rendered 356 / 90 without such errors. The exact five-answer state on unchanged `aea125e` also measured 521 / 133, so the refactor adds no draw calls or geometries. Headless FPS is not performance evidence; real-GPU performance was not measured.
 - Integrated commit and checks: NOT INTEGRATED
-- Changes since verification: this planning handoff only
+- Changes since verification: documentation only
 
 ## Known issues and blockers
 
 - No implementation blocker. Always activate Node 24 before running project commands on this machine.
-- `surveySites.ts` currently uses one `first` boolean rather than the WebSocket event kind. A later reconnect snapshot that contains missed changes can therefore be treated as fresh; Stage 1 will make the documented snapshot/live distinction explicit.
 - The park's future-tree GLB loading remains the existing one-off loader in Stage 1. Asset caching and stale asynchronous GLB load handling belong to the later hybrid-GLB stage.
+- Real-GPU FPS with every site and upper layer visible remains unmeasured.
 
 ## Important decisions
 
@@ -78,4 +84,4 @@ Explicitly excluded from Stage 1: survey schema or `deriveCityLayout()` changes,
 
 ## Next expected step
 
-Codex: implement `changeCatalog.ts` first with exhaustive pure tests, then introduce the manager and migrate one site at a time into `siteBuilders/`, keeping `surveySites()` behavior available until all four sites and `main.ts` are migrated.
+Review and integrate this branch. After integration, the next implementation stage is a small GLB asset catalogue/cache plus one pilot variant layer; do not convert the whole city or add socket-placement behavior in that pilot.
