@@ -98,16 +98,21 @@ assert.equal(attempts, 2);
 
 const layer = new MutableSiteLayerRuntime(siteLayerDefinition('stationEastPark', 'parkTrees'), new T.Group());
 let preparations = 0;
-layer.setPreparation(async () => { preparations++; throw new Error('offline'); });
+layer.setPreparation(async () => {
+  preparations++;
+  if (preparations === 1) throw new Error('offline');
+});
 const originalError = console.error; console.error = () => {};
 try {
   await layer.prepare();
+  assert.equal(layer.assetStatus, 'fallback');
+  assert.match(layer.assetError ?? '', /offline/);
   await layer.prepare();
 } finally {
   console.error = originalError;
 }
-assert.equal(preparations, 1);
-assert.equal(layer.assetStatus, 'fallback');
-assert.match(layer.assetError ?? '', /offline/);
+assert.equal(preparations, 2);
+assert.equal(layer.assetStatus, 'ready');
+assert.equal(layer.assetError, undefined);
 
-console.log('PASS: site asset catalog validation, cache, compatibility, retry and fallback diagnostics.');
+console.log('PASS: site asset catalog validation, cache, compatibility, retry recovery and fallback diagnostics.');

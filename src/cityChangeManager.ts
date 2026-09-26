@@ -5,6 +5,7 @@ import type { SurveyView } from './surveyView.ts';
 
 export const SITE_TRANSITION_SECONDS = 3;
 export const FRESH_MARKER_SECONDS = 10;
+export const SITE_ASSET_RETRY_SECONDS = 5;
 const HIDDEN_SCALE = 1e-3;
 
 type LayerMotion = {
@@ -14,6 +15,7 @@ type LayerMotion = {
   to: number;
   start: number;
   fresh: number;
+  retryAt: number;
 };
 
 export interface SiteLayerDiagnostic {
@@ -37,6 +39,7 @@ export class CityChangeManager {
   private readonly motions = new Map<SiteId, Map<SiteLayerId, LayerMotion>>();
   private readonly variants = Object.fromEntries(SITE_IDS.map(id => [id, 'baseline'])) as Record<SiteId, SiteVariantId>;
   private readonly sites: BuiltSiteMap;
+  private lastUpdateNow = 0;
 
   constructor(sites: BuiltSiteMap) {
     this.sites = sites;
@@ -52,7 +55,9 @@ export class CityChangeManager {
         if (layer.definition.kind !== definition.kind || layer.definition.assetId !== definition.assetId) {
           throw new Error(`Runtime layer ${siteId}/${definition.id} does not match the change catalog.`);
         }
-        siteMotions.set(definition.id, { layer, group: layer.group, from: 0, to: 0, start: -Infinity, fresh: -Infinity });
+        siteMotions.set(definition.id, {
+          layer, group: layer.group, from: 0, to: 0, start: -Infinity, fresh: -Infinity, retryAt: Infinity,
+        });
       }
       this.motions.set(siteId, siteMotions);
     }
@@ -85,9 +90,13 @@ export class CityChangeManager {
   }
 
   update(now: number): void {
+    this.lastUpdateNow = now;
     for (const siteId of SITE_IDS) {
       const motions = this.motions.get(siteId)!;
       for (const motion of motions.values()) {
+        if (motion.to === 1 && motion.layer.assetStatus === 'fallback' && now >= motion.retryAt) {
+          this.prepareAsset(motion, now);
+        }
         const raw = Math.min(1, Math.max(0, (now - motion.start) / SITE_TRANSITION_SECONDS));
         const value = motion.from + (motion.to - motion.from) * smoothstep(raw);
         motion.group.scale.y = Math.max(HIDDEN_SCALE, value);
@@ -114,7 +123,7 @@ export class CityChangeManager {
       for (const [layerId, motion] of this.motions.get(siteId)!) {
         const to = activeLayers.has(layerId) ? 1 : 0;
         if (motion.to === to) continue;
-        if (to === 1) void motion.layer.prepare();
+        if (to === 1) this.prepareAsset(motion, now);
         motion.from = motion.group.visible ? motion.group.scale.y : 0;
         motion.to = to;
         motion.start = now;
@@ -122,5 +131,15 @@ export class CityChangeManager {
       }
       this.variants[siteId] = desired[siteId];
     }
+  }
+
+  private prepareAsset(motion: LayerMotion, now: number): void {
+    if (!motion.layer.definition.assetId || motion.layer.assetStatus === 'ready' || motion.layer.assetStatus === 'loading') return;
+    motion.retryAt = Infinity;
+    void motion.layer.prepare().then(() => {
+      if (motion.layer.assetStatus === 'fallback') {
+        motion.retryAt = Math.max(now, this.lastUpdateNow) + SITE_ASSET_RETRY_SECONDS;
+      }
+    });
   }
 }
