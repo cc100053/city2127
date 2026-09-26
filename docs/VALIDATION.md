@@ -1,5 +1,13 @@
 # Validation and handoff
 
+## AUTO HUB upper GLB Stage 3 — 2026-09-27
+
+Stacked branch `codex/automation-hub-upper-glb` contains Stages 1+2+3; compare it to `codex/shibuya-site-assets` for the Stage 3-only delta. Blender 5.2.2 produced the editable `automation-hub-upper.blend` and uncompressed 75,428-byte GLB. Empty-scene reimport verified root identity, stable root/front-marker names, metadata, four material roles, 12 meshes, 1,796 triangles, exact Blender bounds `(-2.9,-2.9,0)` to `(2.9,2.9,20.3)`, and no camera/light/animation.
+
+Node `24.21.0`: root `npm test` passed with 12 PASS lines; `npm run build` passed with the existing >500 kB chunk warning and emitted the 75.43 kB GLB; `git diff --check` passed. The tall AUTO HUB lazily validates and remaps the GLB to shared city materials, while medium makes no request. A failed load keeps the procedural upper and publishes fallback diagnostics.
+
+Browser smoke: headless Google Chrome, 1280×720, DPR 1, held noon, root Vite on 5173 and scratch survey DB/server on 8787. Baseline and medium made zero hub-asset requests; tall made one and reached `ready`; reload restored tall with one new-page request; reset returned every site to baseline. All-sites was 521 draw calls / 133 geometries with no console exception or non-favicon HTTP error. The saved all-sites frame was inspected for placement, scale and material continuity. A second run intercepted the GLB request: status became `fallback` and the procedural tall hub remained rendered at 521 / 133. Real-GPU FPS was NOT RUN. Full asset contract and limitations: [handoff](handoffs/automation-hub-upper-glb.md).
+
 ## Shibuya hybrid site assets Stage 2 — 2026-09-27
 
 Stacked branch `codex/shibuya-site-assets` contains Stage 1 plus Stage 2; compare it to `codex/shibuya-change-manager` for the Stage 2-only delta. The change catalogue now records layer kind/animation/asset ID, PARK is split into procedural surface and lazy GLB trees, and the future-tree GLB goes through a validating one-request-per-page cache. `CityChangeManager` starts optional asset preparation only on first activation and exposes layer readiness/fallback diagnostics without blocking snapshot/live/reset transitions.
