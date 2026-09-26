@@ -31,6 +31,7 @@ Add a reusable, validated and non-blocking GLB layer boundary to the Stage 1 man
 - Stage 2 does not add a new binary asset or generic socket placement.
 - The existing Hachiko tree uses the same GLB outside the site manager, so the browser sees one base-city request plus one site-cache request when PARK activates.
 - `preserve` is the only material policy exercised in Stage 2. Stage 3 adds and tests `city-roles` remapping for AUTO HUB.
+- This Stage 2 branch treats `fallback` as terminal for the page and has no substitute geometry for failed PARK trees. The later Stage 3 reliability follow-up `2a781c7` adds active-layer retries and a procedural PARK grove; review or deploy the Stage 3 branch when those guarantees are required.
 
 ## Next expected step
 

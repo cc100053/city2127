@@ -5,6 +5,7 @@
 - Branch: `codex/automation-hub-upper-glb`
 - Base branch/commit: `codex/shibuya-site-assets` at `66d93debc4e4a1303a60c32705df6e3cbdcd1b9e`
 - Implementation commit: `7ba868f749fe4a824f53ab7c723d4a78678b1025`
+- Reliability follow-up commit: `2a781c78a5c5411b918bdaf8310ce667a1e8bb6d`
 - Remote availability: NOT PUSHED
 - GitHub Issue: none
 
@@ -26,6 +27,8 @@
 
 `changeCatalog.ts` declares `hubUpper` as the `automation-hub-upper` GLB layer. The shared loader validates the stable root, identity transform, static contents, footprint/height, metadata, front marker and complete material-role set before cloning. The medium hub remains procedural and does not request this asset. First activation of the tall layer lazily loads and batches the GLB. Replacement is atomic: the validated/remapped GLB is attached before the matching procedural upper is removed. A fetch or contract failure records `fallback` diagnostics and leaves that procedural upper visible.
 
+The reliability follow-up makes `fallback` retryable. An active failed asset is retried after 5 seconds; repeated failures stay on the fallback and schedule the next attempt, while deactivation stops retries and a later activation retries immediately. Concurrent calls still share one in-flight task, and a successful retry clears the previous diagnostic. PARK now has a lightweight five-tree procedural grove as well: the grove participates in the normal rise animation, remains visible during failures, and is disposed only after the validated GLB grove has been attached. This prevents an empty tree layer from appearing suddenly after a slow load.
+
 The survey server, questions, score thresholds and `CityView` schema are unchanged. Snapshot restore, incremental changed-only transitions, reset and the existing 3 s rise/sink animation still run through `CityChangeManager`.
 
 ## Validation performed
@@ -37,12 +40,15 @@ The survey server, questions, score thresholds and `CityView` schema are unchang
 - Headless Google Chrome, 1280×720, DPR 1, held noon, scratch survey database: baseline and `automation-medium` made zero asset requests; `automation-tall` made one and reported `ready`; reload restored tall and requested once in the new page; reset restored all variants to baseline. No console exception or non-favicon HTTP error.
 - The all-sites frame was visually inspected for placement, scale and materials. It reported 521 draw calls / 133 geometries, matching the Stage 2 all-sites frame.
 - An intercepted failed GLB request reported `hubUpper = fallback` while retaining the procedural tall hub at 521 draw calls / 133 geometries.
+- Reliability follow-up: unit tests cover runtime failure → retry success and manager retry timing. A browser run failed the first site-tree and first hub request only; retries occurred after 5,039 ms and 5,049 ms, both layers recovered to `ready`, and no page exception occurred. Visual inspection confirmed the procedural PARK grove and HUB upper were present during failure, followed by the intended GLB versions.
 
 ## Not performed / known limits
 
 - Real-GPU FPS and exhibition-PC performance were not measured.
 - The asset is symmetric around its vertical axis; `front_marker` validates the facing contract but the current silhouette does not make facing visually obvious.
 - Loaded geometry stays cached after reset, as intended; reset hides the layer but does not reclaim its GPU geometry.
+- Lazy loading can still cause a visible detail-level swap if a GLB completes after the 3-second rise. It no longer causes missing geometry to pop in: both current GLB layers have a procedural silhouette until atomic replacement completes.
+- Automatic retries run only while the layer is active. An inactive failed layer makes no network requests; its next activation retries immediately.
 - No generic socket-placement system or additional GLB site variants were added.
 
 ## Next expected step
