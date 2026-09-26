@@ -4,7 +4,7 @@
 - Status: IMPLEMENTED — verified locally, awaiting stacked review
 - Branch: `codex/shibuya-site-assets`
 - Base branch/commit: `codex/shibuya-change-manager` at `2781dc9514be486d503a9ea966c857fc23e17d08`
-- Last verified commit: uncommitted Stage 2 worktree (commit pending)
+- Last verified commit: `604b94021bb885aae5b1e3e15dec04f126ded776`
 - Remote availability: NOT PUSHED
 - GitHub Issue: none
 
