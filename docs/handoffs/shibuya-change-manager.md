@@ -4,7 +4,7 @@
 - Status: IMPLEMENTED — verified locally, awaiting integration
 - Branch: `codex/shibuya-change-manager`
 - Base commit: `aea125eb15c50b67ed4f03b099aef7b9e8182929`
-- Last verified commit: implementation worktree on planning commit `987b6c3d0bb3db88d31e43762f20464d82a934df` (commit pending)
+- Last verified commit: `6af7d18a5885899d88fcbe295cecf85a399761a7`
 - Remote availability: NOT PUSHED
 - GitHub Issue (optional): none
 
@@ -62,7 +62,7 @@ Explicitly excluded from Stage 1: survey schema or `deriveCityLayout()` changes,
 ## Actual validation results
 
 - Verification status: PASSED for implementation
-- Date and checked commit/worktree: 2026-09-27, implementation worktree on `987b6c3`
+- Date and checked commit/worktree: 2026-09-27, implementation committed as `6af7d18`
 - Commands/manual checks and results: with Node `24.21.0` / npm `11.19.0`, root `npm test` produced 11 PASS lines, `npm run build` passed with the existing >500 kB chunk warning, and `git diff --check` passed. The shell default Node `20.16.0` remains unsupported.
 - Evidence/environment: headless Google Chrome, 1280×720, DPR 1, held noon, scratch survey SQLite DB/server. Baseline 356 draw calls / 90 geometries; five-answer all-sites state 521 / 133; reload 521 / 133; reset 356 / 133. No console exceptions or non-favicon HTTP errors. Non-survey mode had no causal panel and rendered 356 / 90 without such errors. The exact five-answer state on unchanged `aea125e` also measured 521 / 133, so the refactor adds no draw calls or geometries. Headless FPS is not performance evidence; real-GPU performance was not measured.
 - Integrated commit and checks: NOT INTEGRATED
