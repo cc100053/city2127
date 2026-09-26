@@ -12,7 +12,7 @@ export type { BuiltSite, BuiltSiteMap, SiteLayerRuntime, SiteMarkerRuntime } fro
 export function buildSurveySites(scene: T.Scene, assets = new SiteAssetLoaderCache()): BuiltSiteMap {
   const kit: Kit = { windows: [], signs: [], random: Math.random };
   const sites = [
-    buildAutomationHub(scene, kit),
+    buildAutomationHub(scene, kit, assets),
     buildEnvironmentPark(scene, kit, assets),
     buildCommonsPlaza(scene, kit),
     buildConcentrationTower(scene, kit),

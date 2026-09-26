@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import type { SiteAssetId, SiteId, SiteLayerId } from '../changeCatalog.ts';
-import { SITE_ASSET_CATALOG, type SiteAssetDefinition } from './assetCatalog.ts';
+import { SITE_ASSET_CATALOG, type CityMaterialRole, type SiteAssetDefinition } from './assetCatalog.ts';
 
 export interface LoadedSiteAsset {
   readonly definition: SiteAssetDefinition;
@@ -43,7 +43,53 @@ export function validateSiteAsset(definition: SiteAssetDefinition, gltf: Pick<GL
   if (bounds.min.y < -EPSILON || size.y > definition.maxHeight + EPSILON) {
     throw new Error(`${definition.id}: vertical bounds ${bounds.min.y.toFixed(3)}..${bounds.max.y.toFixed(3)} exceed the asset contract.`);
   }
+  if (definition.metadata) {
+    const expected = {
+      asset_id: definition.id,
+      category: definition.metadata.category,
+      compatible_site: definition.compatibleSite,
+      compatible_layer: definition.compatibleLayer,
+      footprint_x: definition.footprint[0],
+      footprint_y: definition.footprint[1],
+      height: definition.maxHeight,
+      forward_axis: definition.metadata.forwardAxis,
+    };
+    for (const [key, value] of Object.entries(expected)) {
+      if (root.userData[key] !== value) throw new Error(`${definition.id}: root metadata ${key} must be ${String(value)}.`);
+    }
+    if (!root.getObjectByName(definition.metadata.frontMarkerName)) {
+      throw new Error(`${definition.id}: expected ${definition.metadata.frontMarkerName} was not found.`);
+    }
+  }
+  if (definition.materialPolicy === 'city-roles') {
+    const allowed = new Set(definition.materialRoles ?? []);
+    const found = new Set<string>();
+    root.traverse(object => {
+      if (!(object instanceof T.Mesh)) return;
+      for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
+        found.add(material.name);
+        if (!allowed.has(material.name as CityMaterialRole)) {
+          throw new Error(`${definition.id}: unknown city material role ${material.name || '(unnamed)'}.`);
+        }
+      }
+    });
+    for (const role of allowed) if (!found.has(role)) throw new Error(`${definition.id}: required city material role ${role} was not found.`);
+  }
   return root;
+}
+
+export function remapCityMaterials(root: T.Object3D, materials: Readonly<Record<CityMaterialRole, T.Material>>): void {
+  root.traverse(object => {
+    if (!(object instanceof T.Mesh)) return;
+    const map = (material: T.Material) => {
+      const replacement = materials[material.name as CityMaterialRole];
+      if (!replacement) throw new Error(`Unknown city material role ${material.name || '(unnamed)'}.`);
+      return replacement;
+    };
+    object.material = Array.isArray(object.material) ? object.material.map(map) : map(object.material);
+    object.castShadow = true;
+    object.receiveShadow = true;
+  });
 }
 
 export class SiteAssetLoaderCache {

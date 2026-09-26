@@ -6,7 +6,7 @@ export type SiteId = typeof SITE_IDS[number];
 export const SITE_LAYER_IDS = ['hubBase', 'hubUpper', 'parkSurface', 'parkTrees', 'plaza', 'towerBase', 'towerUpper'] as const;
 export type SiteLayerId = typeof SITE_LAYER_IDS[number];
 export type SiteLayerKind = 'procedural' | 'glb' | 'prop' | 'effect';
-export type SiteAssetId = 'future-tree-2127';
+export type SiteAssetId = 'future-tree-2127' | 'automation-hub-upper';
 export type SiteEnterAnimation = 'rise';
 export type SiteExitAnimation = 'sink';
 
@@ -52,7 +52,7 @@ export const CHANGE_CATALOG: Readonly<Record<SiteId, SiteDefinition>> = {
     id: 'magnetEast', socketId: 'nw',
     layers: {
       hubBase: layer('hubBase', 'procedural'),
-      hubUpper: layer('hubUpper', 'procedural'),
+      hubUpper: layer('hubUpper', 'glb', 'automation-hub-upper'),
     },
     variants: {
       baseline: variant('baseline'),

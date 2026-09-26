@@ -16,6 +16,7 @@ const view = (value: Layout, revision: number, runId = 'run'): SurveyView => ({
 
 const groups = new Map<SiteLayerId, T.Group>();
 let parkTreePreparations = 0;
+let hubUpperPreparations = 0;
 const sites = Object.fromEntries(SITE_IDS.map(siteId => {
   const root = new T.Group();
   const layers: BuiltSite['layers'] = {};
@@ -23,7 +24,10 @@ const sites = Object.fromEntries(SITE_IDS.map(siteId => {
     .filter((definition): definition is SiteLayerDefinition => definition !== undefined);
   for (const definition of definitions) {
     const layer = new MutableSiteLayerRuntime(definition, root);
-    if (definition.id === 'parkTrees') layer.setPreparation(async () => { parkTreePreparations++; });
+    if (definition.assetId) layer.setPreparation(async () => {
+      if (definition.id === 'parkTrees') parkTreePreparations++;
+      if (definition.id === 'hubUpper') hubUpperPreparations++;
+    });
     layers[definition.id] = layer;
     groups.set(definition.id, layer.group);
   }
@@ -53,6 +57,7 @@ assert.ok(hubUpper.scale.y > 1e-3);
 assert.ok(hubMarker.material.emissiveIntensity > .2);
 manager.update(4.5);
 close(hubUpper.scale.y, .5);
+assert.equal(hubUpperPreparations, 1);
 
 // Reapplying an unchanged visual variant must not restart its transition.
 manager.applyIncrementalUpdate(view(layout({ nw: lot('empty', 'tall') }), 3), 4.5);
@@ -84,6 +89,7 @@ assert.equal(park.visible, false);
 close(park.scale.y, 1e-3);
 assert.equal(manager.getDiagnostics().stationEastPark.layers.parkTrees?.kind, 'glb');
 assert.equal(manager.getDiagnostics().stationEastPark.layers.parkTrees?.assetId, 'future-tree-2127');
+assert.equal(manager.getDiagnostics().magnetEast.layers.hubUpper?.assetId, 'automation-hub-upper');
 
 assert.throws(() => new CityChangeManager({ ...sites, magnetEast: undefined } as unknown as BuiltSiteMap), /Missing runtime/);
 const mismatched = new MutableSiteLayerRuntime(siteLayerDefinition('stationEastPark', 'parkTrees'), new T.Group());
