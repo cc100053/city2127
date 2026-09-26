@@ -1,11 +1,11 @@
 # shibuya-site-assets — Hybrid site asset boundary, Stage 2
 
 - Owner: Codex
-- Status: IMPLEMENTED — verified locally, awaiting stacked review
+- Status: DONE — integrated into `main`
 - Branch: `codex/shibuya-site-assets`
 - Base branch/commit: `codex/shibuya-change-manager` at `2781dc9514be486d503a9ea966c857fc23e17d08`
 - Last verified commit: `4ad839eb45dd2a2eb0227cab7eb2cad529d61268`
-- Remote availability: NOT PUSHED
+- Remote availability: `origin/main` at `17be43c9e00c9b9013684ea762ff7d83973b2852`
 - GitHub Issue: none
 
 ## Goal and acceptance criteria
@@ -36,4 +36,4 @@ Add a reusable, validated and non-blocking GLB layer boundary to the Stage 1 man
 
 ## Next expected step
 
-Create `codex/automation-hub-upper-glb` from this branch, produce the dedicated Blender/GLB pair through Blender MCP, and integrate it as the `hubUpper` GLB layer with the current procedural geometry retained as fallback.
+Integrated with the Stage 3 `hubUpper` GLB layer in `main` at `17be43c9e00c9b9013684ea762ff7d83973b2852` (2026-09-27).

@@ -1,11 +1,11 @@
 # shibuya-change-manager — Data-driven root-scene change sites, Stage 1
 
 - Owner: Codex (implementation owner for this task)
-- Status: IMPLEMENTED — verified locally, awaiting integration
+- Status: DONE — integrated into `main`
 - Branch: `codex/shibuya-change-manager`
 - Base commit: `aea125eb15c50b67ed4f03b099aef7b9e8182929`
 - Last verified commit: `6af7d18a5885899d88fcbe295cecf85a399761a7`
-- Remote availability: NOT PUSHED
+- Remote availability: `origin/main` at `17be43c9e00c9b9013684ea762ff7d83973b2852`
 - GitHub Issue (optional): none
 
 ## Session Git state
@@ -65,7 +65,7 @@ Explicitly excluded from Stage 1: survey schema or `deriveCityLayout()` changes,
 - Date and checked commit/worktree: 2026-09-27, implementation committed as `6af7d18`
 - Commands/manual checks and results: with Node `24.21.0` / npm `11.19.0`, root `npm test` produced 11 PASS lines, `npm run build` passed with the existing >500 kB chunk warning, and `git diff --check` passed. The shell default Node `20.16.0` remains unsupported.
 - Evidence/environment: headless Google Chrome, 1280×720, DPR 1, held noon, scratch survey SQLite DB/server. Baseline 356 draw calls / 90 geometries; five-answer all-sites state 521 / 133; reload 521 / 133; reset 356 / 133. No console exceptions or non-favicon HTTP errors. Non-survey mode had no causal panel and rendered 356 / 90 without such errors. The exact five-answer state on unchanged `aea125e` also measured 521 / 133, so the refactor adds no draw calls or geometries. Headless FPS is not performance evidence; real-GPU performance was not measured.
-- Integrated commit and checks: NOT INTEGRATED
+- Integrated commit and checks: fast-forwarded into `main` as `17be43c9e00c9b9013684ea762ff7d83973b2852` on 2026-09-27; root `npm test`, `npm run build` and `git diff --check origin/main..HEAD` passed before push (Node 26.0.0; existing >500 kB bundle warning only).
 - Changes since verification: documentation only
 
 ## Known issues and blockers
@@ -84,4 +84,4 @@ Explicitly excluded from Stage 1: survey schema or `deriveCityLayout()` changes,
 
 ## Next expected step
 
-Review and integrate this branch. After integration, the next implementation stage is a small GLB asset catalogue/cache plus one pilot variant layer; do not convert the whole city or add socket-placement behavior in that pilot.
+Integrated. The Stage 2 asset catalogue/cache and Stage 3 pilot GLB layer are also integrated in the same final commit; do not add socket-placement behavior without a new task.

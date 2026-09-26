@@ -1,12 +1,12 @@
 # automation-hub-upper — Stage 3 GLB site layer
 
 - Owner: Codex
-- Status: IMPLEMENTED — Blender, application and fallback paths verified locally
+- Status: DONE — integrated into `main`; Blender, application and fallback paths verified locally
 - Branch: `codex/automation-hub-upper-glb`
 - Base branch/commit: `codex/shibuya-site-assets` at `66d93debc4e4a1303a60c32705df6e3cbdcd1b9e`
 - Implementation commit: `7ba868f749fe4a824f53ab7c723d4a78678b1025`
 - Reliability follow-up commit: `2a781c78a5c5411b918bdaf8310ce667a1e8bb6d`
-- Remote availability: NOT PUSHED
+- Remote availability: `origin/main` at `17be43c9e00c9b9013684ea762ff7d83973b2852`
 - GitHub Issue: none
 
 ## Asset contract
@@ -53,4 +53,4 @@ The survey server, questions, score thresholds and `CityView` schema are unchang
 
 ## Next expected step
 
-Review the three stacked branches independently, then push them if the team wants remote review: Stage 1 `codex/shibuya-change-manager`, Stage 1+2 `codex/shibuya-site-assets`, and Stage 1+2+3 `codex/automation-hub-upper-glb`.
+Integrated and pushed to `origin/main` as `17be43c9e00c9b9013684ea762ff7d83973b2852` on 2026-09-27. Root `npm test`, `npm run build` and `git diff --check origin/main..HEAD` passed before integration; existing >500 kB bundle warning remains.
