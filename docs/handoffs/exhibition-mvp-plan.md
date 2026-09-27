@@ -1,11 +1,11 @@
 # exhibition-mvp-plan — 2127 baseline and agent implementation specification
 
 - Owner: Codex
-- Status: IN_PROGRESS — specification and documentation checks complete; Git integration pending
+- Status: DONE — specification integrated and published; runtime implementation remains PLANNED
 - Branch: `codex/exhibition-mvp-plan`
 - Base commit: `535a3c059302ac6c1059d84aef663b06510ac04c`
-- Last verified commit: base `535a3c059302ac6c1059d84aef663b06510ac04c` plus the seven-file documentation delta checked on 2026-09-28; commit verification follows below
-- Remote availability: NOT PUSHED
+- Last verified commit: `da01325414f1ac54b1d8db2f6b512191f39d383a` (integration); this follow-up only records the verified outcome
+- Remote availability: `origin/main` at `da01325414f1ac54b1d8db2f6b512191f39d383a`; source branch `origin/codex/exhibition-mvp-plan` at `d627e0718777826ca777aae8962d9d89a4d6b28a`
 - GitHub Issue: none
 
 ## Session Git state
@@ -14,7 +14,7 @@
 - Successfully fetched origin on 2026-09-28; `origin/main` was the same commit, divergence 0/0.
 - No pre-existing local changes or screenshots changed; `.codegraph/` absent.
 - Stage 1/2/3 site/GLB handoffs are already integrated through `17be43c`, reachable from the base; no unfinished prerequisite branch is required.
-- Upstream integration initially unnecessary; re-fetch before publishing/integration.
+- Upstream remained unchanged at integration. A new untracked `.codegraph/` appeared in the original checkout during this task; it was preserved. Integration used a clean managed checkout instead, without modifying that index.
 - Ownership limited to the new plan/handoff and documentation pointers; no overlapping module or binary edits.
 
 ## Goal and acceptance criteria
@@ -40,7 +40,9 @@ Write the prior design as a self-contained, detailed agent-oriented plan under `
 - Source/fact inspection: base commit; current scoreEngine/cityView/changeCatalog/schema and prior Stage 1/3 handoffs checked.
 - Local Markdown targets: 205 existing file targets checked. Numerical fixtures: 1/5/20/50 same-direction, reversal51, cohorts10/30/50 and 1,000 zero/alternating/cyclic votes passed in a Python assertion script. Exact documentation diff/new-file contents reviewed; `git diff --check` passed.
 - Local package tests/builds, browser, GPU FPS, exhibition PC and user study: NOT RUN (documentation-only task; no new runtime).
-- Integrated commit/checks: NOT INTEGRATED.
+- Integrated commit: `da01325414f1ac54b1d8db2f6b512191f39d383a`, pushed to main on 2026-09-28. Integrated tree matched the feature branch exactly; all 205 local link targets and committed diff whitespace passed.
+- CI: feature commit `d627e07` [run 36328998156](https://github.com/cc100053/city2127/actions/runs/36328998156) PASS; main integration `da01325` [run 36329106721](https://github.com/cc100053/city2127/actions/runs/36329106721) PASS. Both include root, survey and module-swap tests/builds plus whitespace.
+- Changes since verification: this handoff-only outcome update; local links/diff are rechecked before its commit, and its main CI is checked after push.
 
 ## Known issues and decisions
 
@@ -51,4 +53,4 @@ Write the prior design as a self-contained, detailed agent-oriented plan under `
 
 ## Next expected step
 
-Finish repository Git/CI integration; local documentation checks and self-review have passed. A later implementation task should start at S1 in [the plan](../EXHIBITION_MVP.md), naming its owner; this task does not initiate implementation.
+The planning specification is complete on main. A later explicitly assigned implementation task should start at S1 in [the plan](../EXHIBITION_MVP.md), naming its owner; this task does not initiate implementation.
