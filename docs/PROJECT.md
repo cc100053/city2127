@@ -2,6 +2,10 @@
 
 Exhibition priorities and historical Plan 02 implementation status: [方向與紀錄](PLAN02.md). Art rules for the root scene: [ART.md](ART.md), in use since 2026-09-24. Status and remaining art work: [art-direction handoff](handoffs/art-direction.md#remaining-work).
 
+## Next exhibition specification — 2026-09-28 (planned)
+
+The user confirmed that the starting city is already **2127**: every low, zero and high Meter state must retain a mature future identity. Low values describe different future services and spaces, never technological regression or an undeveloped city. [EXHIBITION_MVP.md](EXHIBITION_MVP.md) records the detailed four-question flow, history/recent accumulation, populated neutral sites, futuristic negative variants, versioned migration, implementation stages and acceptance criteria. These are next-version targets, **not implemented behavior**; this documentation task does not alter the one-question runtime, score engine, empty-lot baseline or assets described below. This file remains the current implementation map. The earlier “connect survey afterwards” decision is historical; the root integration described later in this file is already implemented.
+
 ## Current product direction — 2026-09-18
 
 The goal is an exhibition in which guests collectively shape a futuristic Shibuya. Future identity, Shibuya recognition and visible consequences of choices take priority over producing an exceptionally beautiful model. Documentary-photograph realism is no longer a completion criterion.

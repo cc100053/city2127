@@ -2,6 +2,8 @@
 
 AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/PROJECT.md) · [驗收與交接流程](docs/VALIDATION.md) · [展覽方向與 Plan 02 紀錄](docs/PLAN02.md)。
 
+**下一版規劃（2026-09-28，尚未實作）：** [共同城市 MVP 設計與 Agent 實作規劃](docs/EXHIBITION_MVP.md)包含四題、累積算法、四地點映射、資產範圍及分階段驗收。城市從開始已是2127年，低值／零值／高值都必須有未來感；低值不是退回現代或空地。以下每人一題等內容仍描述目前原型。
+
 ## 協作入門
 
 三位協作者各自使用獨立 local clone；每項任務指定一位 owner，並以 `docs/handoffs/<task-id>.md` 保存可接續的任務狀態。主要負責範圍不限制跨區工作，但同一模組或二進位素材的重疊修改要先協調。
