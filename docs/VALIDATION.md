@@ -1,5 +1,9 @@
 # Validation and handoff
 
+## Exhibition MVP planning — 2026-09-28 (documentation only)
+
+[EXHIBITION_MVP.md](EXHIBITION_MVP.md) defines next-version requirements and an explicitly **unexecuted** acceptance matrix, including populated neutral sites and futuristic low-value variants. Its numerical fixtures are specification checks, not evidence that the new runtime exists. The planning task changes no executable code or assets; it requires local Markdown link checks, source/fact comparison, numerical fixture verification and diff review, not new rendering or local package builds. Actual task results and Git integration are recorded in [the planning handoff](handoffs/exhibition-mvp-plan.md). Earlier screenshots and FPS records below must not be reused as proof of the proposed version.
+
 ## AUTO HUB upper GLB Stage 3 — 2026-09-27
 
 Stacked branch `codex/automation-hub-upper-glb` contains Stages 1+2+3; compare it to `codex/shibuya-site-assets` for the Stage 3-only delta. Blender 5.2.2 produced the editable `automation-hub-upper.blend` and uncompressed 75,428-byte GLB. Empty-scene reimport verified root identity, stable root/front-marker names, metadata, four material roles, 12 meshes, 1,796 triangles, exact Blender bounds `(-2.9,-2.9,0)` to `(2.9,2.9,20.3)`, and no camera/light/animation.
