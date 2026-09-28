@@ -53,4 +53,4 @@ Write the prior design as a self-contained, detailed agent-oriented plan under `
 
 ## Next expected step
 
-This planning task is complete on main. The later assigned S1 implementation is in progress; see [the current handoff](exhibition-s1.md) for source, validation and integration status. S2+ remain separate stages.
+This planning task is complete on main. S1 is implemented and integrated with package checks and main CI passing; see [the S1 handoff](exhibition-s1.md) for the recorded evidence. The next implementation stage is S2.

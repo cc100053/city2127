@@ -4,7 +4,7 @@
 
 使用者確認：**起始城市及所有Meter低值、零值、高值都必須有未來感。** 低值代表人員主導的未來協作站、可變私密休息艙、主動氣候廊、分散低層機能艙等不同未來方向，不代表落後年代或未開發空地。零值亦應是完整未來城市。
 
-詳細規劃見 [EXHIBITION_MVP.md](EXHIBITION_MVP.md)：每人四題、歷史平均與近期動向各半、四site三形態、資產預算及分階段驗收。**2026-09-28 S1 狀態：** v2 server 規則、提案儲存／API 和未知 viewer 版本拒絕已實作，本機套件檢查通過；CI／整合狀態見 [S1 handoff](handoffs/exhibition-s1.md)。Schema 3 migration 會結束 active v1 run 並建立全零 v2 run，舊歷史保留。舊 root/module-swap viewer 不渲染 v2；root site mapping（S2/S3）及四題 guest UI（S4）仍待實作。以下 2026-09-18 一題流程及四空地原型保留作歷史，不代表 v2 行為。root v1 survey 接線已完成，毋須重建。
+詳細規劃見 [EXHIBITION_MVP.md](EXHIBITION_MVP.md)：每人四題、歷史平均與近期動向各半、四site三形態、資產預算及分階段驗收。**2026-09-28 S1 狀態：** v2 server 規則、提案儲存／API 和未知 viewer 版本拒絕已實作及整合，package checks、feature CI 和 main CI 通過（見 [S1 handoff](handoffs/exhibition-s1.md)）。Schema 3 migration 會結束 active v1 run 並建立全零 v2 run，舊歷史保留。舊 root/module-swap viewer 不渲染 v2；root site mapping（S2/S3）及四題 guest UI（S4）仍待實作。以下 2026-09-18 一題流程及四空地原型保留作歷史，不代表 v2 行為。root v1 survey 接線已完成，毋須重建。
 
 ## 現行方向 — 2026-09-18
 

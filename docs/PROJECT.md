@@ -6,7 +6,7 @@ Exhibition priorities and historical Plan 02 implementation status: [方向與�
 
 The user confirmed that the starting city is already **2127**: every low, zero and high Meter state must retain a mature future identity. Low values describe different future services and spaces, never technological regression or an undeveloped city. [EXHIBITION_MVP.md](EXHIBITION_MVP.md) defines the four-question flow, history/recent accumulation, populated neutral sites, futuristic negative variants, versioned migration and later viewer/UI stages. S1 server rules, persistence and proposal APIs are implemented; the former one-question runtime remains as legacy v1 behavior/history. The S1 handoff records exact verification and integration status. This file remains the implementation map. The earlier “connect survey afterwards” decision is historical; the existing root integration supports v1 and explicitly rejects v2 until S2+.
 
-### S1 server contract (branch status)
+### S1 server contract (implemented)
 
 `survey/src/shared/citySurveyState.ts`, `survey/src/survey/scoreEngine.ts` and `survey/src/shared/cityView.ts` define the v2 state, four-axis reducer and server-derived layout. Each complete proposal updates all four axes once; the history average and recent vote signal are combined and clamped to −12…+12. The reusable four-question set is `survey/src/survey/questions.exhibition.json`, validated as exactly four questions × three options, one question per axis and one option for each vote −1/0/+1.
 

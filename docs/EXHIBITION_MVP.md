@@ -2,7 +2,7 @@
 
 - 日期：2026-09-28；文件 owner：Codex。
 - 核對基準：`535a3c059302ac6c1059d84aef663b06510ac04c`，當時 `main` 與已 fetch 的 `origin/main` 相同。
-- 狀態：**規劃已完成；S1 server/runtime 已實作且本機 package tests/builds 通過，整合仍待完成；S2–S5 尚未實作。**
+- 狀態：**規劃已完成；S1 已實作、整合並通過 package checks、feature CI 及 main CI；S2–S5 尚未實作。**
 - 使用者最新確認：**起始城市已是 2127 年；低值、零值、高值都必須有未來感。**
 - 本文件最初由規劃文件任務建立；2026-09-28 已明確指派 S1 實作。閱讀本文件不等於被指派一次實作全部階段；收到有界任務後，在授權範圍內完成，不另加逐階段批准要求。
 - 當前實作架構以 [PROJECT](PROJECT.md) 為準；本文件描述下一版本目標，不另立一份現況 architecture。
@@ -12,7 +12,7 @@
 
 S1 已加入四題重用題組、v2 四軸 reducer、proposal sessions／transaction、SQLite schema 3 migration/replay、admin/debug API 支援，以及帶明確版本的 CityView v2。Migration 會結束 active v1 run 並保留歷史，建立全零 v2 run；舊 one-question guest endpoint 在 v2 run 上回 `unsupported_version`，舊資料不會被轉成 v2 分數。四題題組位於 `survey/src/survey/questions.exhibition.json`，主要 API 為 `POST /api/proposal-sessions`、`GET /api/proposal-sessions/:id`、`POST /api/proposals` 與 `GET /api/city-view`。每個 proposal 在單一 transaction 中記錄四題、更新 snapshot 和完成 session；成功的相同 `submissionId` 會重播原結果，不重複累積。
 
-root 與 module-swap 的現有 viewer 現在會在改動 scene 前顯示 `Unsupported exhibition view version` 並拒絕 v2。這是 S1 的相容性閘，不是 v2 city rendering。root mapping（S2/S3）和四題 guest UI（S4）仍未完成，故舊 `/guest` 頁不能提交到 active v2 run。本機三個 package 的 tests/build、獨立 reducer／mapping、migration、request parser、proposal transaction/concurrency probes 及 browser checks 已通過；CI、整合及展覽硬體／效能驗收尚未完成。詳見 [S1 handoff](handoffs/exhibition-s1.md) 及 [驗證紀錄](VALIDATION.md#exhibition-s1-2026-09-28)。
+root 與 module-swap 的現有 viewer 現在會在改動 scene 前顯示 `Unsupported exhibition view version` 並拒絕 v2。這是 S1 的相容性閘，不是 v2 city rendering。root mapping（S2/S3）和四題 guest UI（S4）仍未完成，故舊 `/guest` 頁不能提交到 active v2 run。本機三個 package 的 tests/build、獨立 reducer／mapping、migration、request parser、proposal transaction/concurrency probes 及 browser checks 已通過；feature CI 和 main CI 亦通過。展覽硬體／效能驗收仍待完成。詳見 [S1 handoff](handoffs/exhibition-s1.md) 及 [驗證紀錄](VALIDATION.md#exhibition-s1-2026-09-28)。
 
 ## 0. Agent 先讀：任務邊界與完成判定
 
@@ -263,7 +263,7 @@ function updateAxis(before: AxisMemory, vote: Vote, n: number) {
 
 ## 8. Server資料、版本與傳輸契約
 
-以下是規格目標形狀；S1 已按此方向加入 v2 server API 與儲存，但 package 完整驗證／整合仍待完成。欄位及 HTTP wrapper 以 `survey/src/shared/`、`survey/src/server/server.ts` 的實作為準。盡量擴充既有module；只有在舊schema的真實約束下才新增儲存結構。
+以下是規格目標形狀；S1 已按此方向加入並整合 v2 server API 與儲存，package checks 及 main CI 通過。欄位及 HTTP wrapper 以 `survey/src/shared/`、`survey/src/server/server.ts` 的實作為準；驗證範圍見 [S1 handoff](handoffs/exhibition-s1.md)。盡量擴充既有module；只有在舊schema的真實約束下才新增儲存結構。
 
 ```ts
 type Axis = 'automation' | 'publicSharing' | 'environmentalPriority' | 'urbanConcentration';
@@ -405,11 +405,11 @@ type ProposalRecord = {
 
 ## 11. 可獨立交付的實作階段
 
-S1 實作及本機 package 驗證已完成；整合仍 pending；S2–S5 仍為 PLANNED。Owner由實際接任者在各task handoff填一名；不得假設文件owner自動獲派所有實作。階段依賴按順序，無需多agent。
+S1 實作及整合已完成，package checks 與 main CI 通過；S2–S5 仍待處理。Owner由實際接任者在各task handoff填一名；不得假設文件owner自動獲派所有實作。階段依賴按順序，無需多agent。
 
 | 階段 | 狀態／依賴 | 主要入口 | 交付與exit gate |
 | --- | --- | --- | --- |
-| S1 規則與儲存 | IMPLEMENTED；本機 tests/build 通過，整合 pending | survey shared／scoreEngine／migrations／runStore／sessionService／answerService／proposalService／decisionHistory；root/module-swap v2 rejection | 四題transaction、replay、version、重用題組及 viewer rejection 完成；CI與整合 review 尚未完成；精確分支／handoff 狀態見 [S1 handoff](handoffs/exhibition-s1.md) |
+| S1 規則與儲存 | IMPLEMENTED and integrated; package checks and feature/main CI pass | survey shared／scoreEngine／migrations／runStore／sessionService／answerService／proposalService／decisionHistory；root/module-swap v2 rejection | 四題transaction、replay、version、重用題組及 viewer rejection 完成；驗證紀錄見 [S1 handoff](handoffs/exhibition-s1.md) |
 | S2 第一條可見鏈 | PLANNED，依S1 | root surveyView／changeCatalog／manager／environmentPark；survey v2 mapping | 維持四題完整提交契約，先將Q3視覺打通；其他三site維持建成mixed基底並清楚標示未完成映射；負向氣候廊／正向樹冠、真實差異、reload/fallback通過，不宣稱四軸MVP完成 |
 | S3 其餘三site | PLANNED，依S2 | automationHub／commonsPlaza／concentrationTower＋catalog/mapping | 完成12配置、同band counts、低值未來感、路線clearance；四軸端到端通過 |
 | S4 正式觀眾體驗 | PLANNED，依S3 | survey guest UI、root causal panel、style | 四題back/edit/submit、idle/result/next、紀錄、錯誤恢復、accessibility；無人格誤導 |
@@ -425,7 +425,7 @@ S2不是建立另一套一題API或另一個score schema；使用S1四題session
 
 ## 12. 驗收矩陣（尚未完整執行）
 
-S1 有獨立 probe/browser 證據及本機三個 package 的通過結果，但本表是整體 exhibition acceptance；CI、整合與 S2–S5 尚未完成，不可標成通過。逐項證據與限制見 [S1 驗證紀錄](VALIDATION.md#exhibition-s1-2026-09-28)。
+S1 有獨立 probe/browser 證據及整合後本機三個 package、feature CI 和 main CI 的通過結果，但本表是整體 exhibition acceptance；S2–S5 尚未完成，不可標成通過。逐項證據與限制見 [S1 驗證紀錄](VALIDATION.md#exhibition-s1-2026-09-28)。
 
 | ID | 檢查 | 通過條件／證據 |
 | --- | --- | --- |
