@@ -1,5 +1,6 @@
 import './debug.css';
 import type { CityView } from '../shared/cityView.ts';
+import { isExhibitionCityView } from '../shared/cityView.ts';
 import type { ServerEvent } from '../shared/protocol.ts';
 import { api, connectEvents, el, renderView, signed } from './debugApi.ts';
 
@@ -29,9 +30,20 @@ function onEvent(event: ServerEvent) {
     return;
   }
   setState(event.view);
+  if ('proposal' in event) {
+    const proposal = event.proposal;
+    const choices = proposal.answers.map(answer => answer.optionLabel).join(' · ');
+    last.replaceChildren(
+      el('p', {}, choices),
+      el('p', {}, `提案 #${proposal.ordinal} · revision ${proposal.revisionBefore} → ${proposal.revisionAfter}`),
+      el('p', { class: 'meta' }, `提案ID ${proposal.id} · ${proposal.cityChanges.map(change => change.label).join('、') || '構成を維持'}`));
+    log.prepend(el('li', {}, `rev ${proposal.revisionAfter}: ${choices}`));
+    while (log.children.length > 30) log.lastElementChild?.remove();
+    return;
+  }
   const changes = Object.entries(event.change.scores).map(([axis, delta]) => `${axis} ${signed(delta)}`).join(', ') || '変化なし（上限/下限）';
   const nominal = Object.entries(event.answer.effects).map(([axis, delta]) => `${axis} ${signed(delta)}`).join(', ');
-  const city = event.view.history.at(-1)?.cityChanges.map(c => `${c.socketId.toUpperCase()} ${c.label}`).join(', ');
+  const city = isExhibitionCityView(event.view) ? undefined : event.view.history.at(-1)?.cityChanges.map(c => `${c.socketId.toUpperCase()} ${c.label}`).join(', ');
   const cityText = city ? ` · 都市: ${city}` : '';
   last.replaceChildren(
     el('p', {}, `${event.questionText} → ${event.optionLabel}`),

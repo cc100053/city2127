@@ -1,12 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { extname, resolve, sep } from 'node:path';
+import { dirname, extname, resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { ApiResponse, ErrorCode, HealthData } from '../shared/protocol.ts';
-import type { CitySurveyState } from '../shared/citySurveyState.ts';
+import type { CitySurveyState, ExhibitionState } from '../shared/citySurveyState.ts';
 import type { CityView } from '../shared/cityView.ts';
-import { loadQuestionSetFile } from '../survey/questionLoader.ts';
+import { loadQuestionSetFile, validateExhibitionQuestionSet } from '../survey/questionLoader.ts';
 import { fail, type ServiceOutcome, type SurveyContext } from './context.ts';
 import { openDatabase } from './database.ts';
 import { restoreOrCreateRun } from './runStore.ts';
@@ -14,9 +14,12 @@ import { createGuestSession, getGuestQuestion, RESERVATION_MS } from './sessionS
 import { currentState, currentView, submitAnswer, viewOf } from './answerService.ts';
 import { currentRun, isLoopbackAddress, recentEvents, resetRun } from './adminService.ts';
 import { attachRealtime } from './realtime.ts';
+import { createProposalSession, getProposalSession, submitProposal } from './proposalService.ts';
+import { UnsupportedRunVersionError } from './runStore.ts';
 
 const statusFor: Record<ErrorCode, number> = {
   bad_request: 400, not_found: 404, forbidden: 403, internal_error: 500,
+  unsupported_version: 409,
   no_question_available: 409, session_not_found: 404, session_expired: 410, already_answered: 409,
   unknown_question: 400, unknown_option: 400, option_question_mismatch: 400, question_not_assigned: 409,
   revision_conflict: 409, answer_conflict: 409, reset_confirmation_invalid: 400,
@@ -67,6 +70,10 @@ export type SurveyServerOptions = {
 export function createSurveyServer({ ctx, staticDir, remoteAddress = req => req.socket.remoteAddress }: SurveyServerOptions) {
   const server = createServer((req, res) => {
     handle(req, res).catch(error => {
+      if (error instanceof UnsupportedRunVersionError) {
+        sendJson(res, fail('unsupported_version', error.message));
+        return;
+      }
       if (error instanceof HttpError) {
         res.writeHead(error.status, { 'content-type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify(fail(error.code, error.message)));
@@ -103,13 +110,20 @@ export function createSurveyServer({ ctx, staticDir, remoteAddress = req => req.
       const state = currentState(ctx);
       return sendJson<HealthData>(res, { ok: true, data: { status: 'ok', runId: state.runId, revision: state.revision, questionVersion: ctx.questions.version } });
     }
-    if (path === '/api/city-state' && method === 'GET') return sendJson<CitySurveyState>(res, { ok: true, data: currentState(ctx) });
+    if (path === '/api/city-state' && method === 'GET') return sendJson<CitySurveyState | ExhibitionState>(res, { ok: true, data: currentState(ctx) });
     if (path === '/api/city-view' && method === 'GET') return sendJson<CityView>(res, { ok: true, data: currentView(ctx) });
     if (path === '/api/guest-sessions' && method === 'POST') return sendJson(res, createGuestSession(ctx), 201);
     const question = /^\/api\/guest-sessions\/([^/]+)\/question$/.exec(path);
     if (question && method === 'GET') return sendJson(res, getGuestQuestion(ctx, question[1]));
     if (path === '/api/answers' && method === 'POST') {
       const outcome = submitAnswer(ctx, await readJson(req));
+      return publish(res, outcome, outcome.response.ok && !outcome.response.data.replayed ? 201 : 200);
+    }
+    if (path === '/api/proposal-sessions' && method === 'POST') return sendJson(res, createProposalSession(ctx), 201);
+    const proposalSession = /^\/api\/proposal-sessions\/([^/]+)$/.exec(path);
+    if (proposalSession && method === 'GET') return sendJson(res, getProposalSession(ctx, proposalSession[1]));
+    if (path === '/api/proposals' && method === 'POST') {
+      const outcome = submitProposal(ctx, await readJson(req));
       return publish(res, outcome, outcome.response.ok && !outcome.response.data.replayed ? 201 : 200);
     }
     if (path === '/api/admin/current-run' && method === 'GET') return sendJson(res, { ok: true, data: currentRun(ctx) });
@@ -132,20 +146,21 @@ export function createSurveyServer({ ctx, staticDir, remoteAddress = req => req.
 }
 
 /** Builds the runtime context: validates the question JSON, migrates and restores the database. */
-export function createContext(options: { dbPath: string; questionsPath: string; now?: () => Date }): SurveyContext {
-  const questions = loadQuestionSetFile(options.questionsPath);
+export function createContext(options: { dbPath: string; questionsPath: string; legacyQuestionsPath?: string; now?: () => Date }): SurveyContext {
+  const questions = validateExhibitionQuestionSet(loadQuestionSetFile(options.questionsPath));
+  const legacyQuestions = loadQuestionSetFile(options.legacyQuestionsPath ?? resolve(dirname(options.questionsPath), 'questions.mvp.json'));
   const db = openDatabase(options.dbPath);
   const now = options.now ?? (() => new Date());
   try { restoreOrCreateRun(db, randomUUID, now); }
   catch (error) { db.close(); throw error; }
-  return { db, questions, now, newId: randomUUID, reservationMs: RESERVATION_MS };
+  return { db, questions, legacyQuestions, now, newId: randomUUID, reservationMs: RESERVATION_MS };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const env = process.env;
   const port = Number(env.SURVEY_PORT ?? 8787), host = env.SURVEY_HOST ?? '127.0.0.1';
   const dbPath = resolve(env.SURVEY_DB_PATH ?? 'data/survey.sqlite');
-  const ctx = createContext({ dbPath, questionsPath: resolve(env.SURVEY_QUESTIONS ?? 'src/survey/questions.mvp.json') });
+  const ctx = createContext({ dbPath, questionsPath: resolve(env.SURVEY_QUESTIONS ?? 'src/survey/questions.exhibition.json') });
   const { server, realtime } = createSurveyServer({ ctx, staticDir: resolve(env.SURVEY_STATIC_DIR ?? 'dist') });
   const state = currentState(ctx);
   server.listen(port, host, () => {

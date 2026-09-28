@@ -1,12 +1,12 @@
 import type { IncomingMessage, Server } from 'node:http';
 import type { Duplex } from 'node:stream';
 import { WebSocketServer, WebSocket } from 'ws';
-import type { CitySurveyState } from '../shared/citySurveyState.ts';
+import type { CitySurveyState, ExhibitionState } from '../shared/citySurveyState.ts';
 import type { CityView } from '../shared/cityView.ts';
 import type { ServerEvent } from '../shared/protocol.ts';
 
 /** Read-only monitor channel on /ws. HTTP GET /api/city-state and /api/city-view stay the recovery path after reconnects. */
-export function attachRealtime(server: Server, current: () => { state: CitySurveyState; view: CityView }) {
+export function attachRealtime(server: Server, current: () => { state: CitySurveyState | ExhibitionState; view: CityView }) {
   const wss = new WebSocketServer({ noServer: true, maxPayload: 1024 });
   const send = (socket: WebSocket, event: ServerEvent) => { if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify(event)); };
   server.on('upgrade', (request: IncomingMessage, socket: Duplex, head: Buffer) => {

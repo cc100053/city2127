@@ -63,7 +63,7 @@ async function answer(optionId: string) {
 async function send(request: AnswerRequest) {
   const result = await api<AnswerData>('/api/answers', request);
   if (result.ok) return renderAnswered(result.data);
-  if (result.error.code === 'revision_conflict' && result.state && current) {
+  if (result.error.code === 'revision_conflict' && result.state && 'answerCount' in result.state && current) {
     current = { ...current, state: result.state };
     const retry = el('button', { class: 'primary' }, `最新 revision ${result.state.revision} で送り直す`);
     retry.addEventListener('click', () => lastRequest && send({ ...lastRequest, expectedRevision: result.state!.revision }));

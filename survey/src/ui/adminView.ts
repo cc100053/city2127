@@ -27,13 +27,16 @@ async function refresh() {
   if (!run.ok) { summary.replaceChildren(el('p', { class: 'notice warn' }, `${run.error.code}: ${run.error.message}`)); return; }
   const d = run.data;
   summary.replaceChildren(el('table', {},
-    ...([['run ID', d.run.id], ['started', d.run.startedAt], ['revision', String(d.state.revision)], ['回答数', String(d.state.answerCount)],
+    ...([['run ID', d.run.id], ['started', d.run.startedAt], ['algorithm', String(d.run.algorithmVersion)], ['revision', String(d.state.revision)],
+      ['完了提案 / 回答数', String('guestCount' in d.state ? d.state.guestCount : d.state.answerCount)],
       ['予約中の guest session', String(d.reservedSessions)], ['回答済み / 質問数', `${d.answeredSessions} / ${d.totalQuestions}`], ['質問JSON version', String(d.questionVersion)]]
       .map(([k, v]) => el('tr', {}, el('th', {}, k), el('td', {}, v))))));
   stateBox.replaceChildren(renderState(d.state));
   if (log.ok) {
     events.replaceChildren(
       el('table', { class: 'log' }, ...log.data.answers.map(a => el('tr', {}, el('td', {}, `#${a.sequence}`), el('td', {}, a.runId.slice(0, 8)), el('td', {}, `${a.questionId} / ${a.optionId}`), el('td', {}, `rev ${a.revisionAfter}`), el('td', {}, a.answeredAt)))),
+      el('h2', {}, 'Recent proposals'),
+      el('table', { class: 'log' }, ...log.data.proposals.map(p => el('tr', {}, el('td', {}, `#${p.ordinal}`), el('td', {}, p.runId.slice(0, 8)), el('td', {}, p.answers.map(a => a.optionId).join(' / ')), el('td', {}, `rev ${p.revisionAfter}`), el('td', {}, p.submittedAt)))),
       el('h2', {}, 'Admin events'),
       el('table', { class: 'log' }, ...log.data.admin.map(a => el('tr', {}, el('td', {}, a.type), el('td', {}, `${a.runId.slice(0, 8)} → ${a.detail.nextRunId.slice(0, 8)}`), el('td', {}, a.createdAt)))));
   }

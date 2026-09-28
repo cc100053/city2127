@@ -2,11 +2,17 @@
 
 - 日期：2026-09-28；文件 owner：Codex。
 - 核對基準：`535a3c059302ac6c1059d84aef663b06510ac04c`，當時 `main` 與已 fetch 的 `origin/main` 相同。
-- 狀態：**規劃完成；本文件的新流程、算法、形態及資料契約尚未實作。**
+- 狀態：**規劃已完成；S1 server/runtime 已實作且本機 package tests/builds 通過，整合仍待完成；S2–S5 尚未實作。**
 - 使用者最新確認：**起始城市已是 2127 年；低值、零值、高值都必須有未來感。**
-- 本次任務只寫規劃及同步文件；閱讀本文件不等於被指派一次實作全部階段。收到實作任務後，在其授權範圍內自主完成，不另加逐階段批准要求。
+- 本文件最初由規劃文件任務建立；2026-09-28 已明確指派 S1 實作。閱讀本文件不等於被指派一次實作全部階段；收到有界任務後，在授權範圍內完成，不另加逐階段批准要求。
 - 當前實作架構以 [PROJECT](PROJECT.md) 為準；本文件描述下一版本目標，不另立一份現況 architecture。
 - 操作規則：[AGENTS](../AGENTS.md)、[Git workflow](CONTRIBUTING.md)、[驗收](VALIDATION.md)、[美術](ART.md)、[Blender](BLENDER.md)。本次交接：[exhibition-mvp-plan](handoffs/exhibition-mvp-plan.md)。
+
+### 2026-09-28 S1 現況（取代下文的原始「尚未實作」狀態）
+
+S1 已加入四題重用題組、v2 四軸 reducer、proposal sessions／transaction、SQLite schema 3 migration/replay、admin/debug API 支援，以及帶明確版本的 CityView v2。Migration 會結束 active v1 run 並保留歷史，建立全零 v2 run；舊 one-question guest endpoint 在 v2 run 上回 `unsupported_version`，舊資料不會被轉成 v2 分數。四題題組位於 `survey/src/survey/questions.exhibition.json`，主要 API 為 `POST /api/proposal-sessions`、`GET /api/proposal-sessions/:id`、`POST /api/proposals` 與 `GET /api/city-view`。每個 proposal 在單一 transaction 中記錄四題、更新 snapshot 和完成 session；成功的相同 `submissionId` 會重播原結果，不重複累積。
+
+root 與 module-swap 的現有 viewer 現在會在改動 scene 前顯示 `Unsupported exhibition view version` 並拒絕 v2。這是 S1 的相容性閘，不是 v2 city rendering。root mapping（S2/S3）和四題 guest UI（S4）仍未完成，故舊 `/guest` 頁不能提交到 active v2 run。本機三個 package 的 tests/build、獨立 reducer／mapping、migration、request parser、proposal transaction/concurrency probes 及 browser checks 已通過；CI、整合及展覽硬體／效能驗收尚未完成。詳見 [S1 handoff](handoffs/exhibition-s1.md) 及 [驗證紀錄](VALIDATION.md#exhibition-s1-2026-09-28)。
 
 ## 0. Agent 先讀：任務邊界與完成判定
 
@@ -257,7 +263,7 @@ function updateAxis(before: AxisMemory, vote: Vote, n: number) {
 
 ## 8. Server資料、版本與傳輸契約
 
-以下是建議目標形狀，不是已存在的API。盡量擴充既有module；只有在舊schema的真實約束下才新增儲存結構。
+以下是規格目標形狀；S1 已按此方向加入 v2 server API 與儲存，但 package 完整驗證／整合仍待完成。欄位及 HTTP wrapper 以 `survey/src/shared/`、`survey/src/server/server.ts` 的實作為準。盡量擴充既有module；只有在舊schema的真實約束下才新增儲存結構。
 
 ```ts
 type Axis = 'automation' | 'publicSharing' | 'environmentalPriority' | 'urbanConcentration';
@@ -331,9 +337,9 @@ type ProposalRecord = {
 - 保留既有snapshot／updated／run-reset事件類型；新view有顯式`version:2`，含runId、revision、scores、guestCount、layout及bounded近期提案。
 - server生成上一個與下一個layout的差異；結果UI只使用這些真實數值，不在DOM自己重算政策。
 - snapshot送目前完整狀態＋最多64份近期提案；完整歷史留SQLite，避免每次把全日所有事件broadcast。當前latest結果可附該提案的before/after scores及layout。
-- root parser驗證版本、Number.isFinite、Meter範圍、band枚舉及各count／fraction界限；不默認未知variant為空地。
+- S1 的舊 root／module-swap parser 先拒絕明確 v2，避免把新資料當成 v1 套用；S2/S3 接入 v2 時才應驗證 `Number.isFinite`、Meter範圍、band枚舉及各count／fraction界限，不默認未知variant為空地。
 - 保留舊revision忽略、重連及新run替換語義；先驗證支援版本再改場景。
-- module-swap暫不做新版渲染：加入清楚「Unsupported exhibition view version」提示並停止套用v2；原v1 standalone／demo保留。未來需要才加adapter，不能讓v2冒充v1。
+- module-swap暫不做新版渲染：目前已加入「Unsupported exhibition view version」提示並停止套用v2；原v1 standalone／demo保留。未來需要才加adapter，不能讓v2冒充v1。
 - 不改現有非survey日夜模式；新展覽基線與規則只屬於v2展示路徑。
 
 ## 9. Asset、生產規模與效能
@@ -399,11 +405,11 @@ type ProposalRecord = {
 
 ## 11. 可獨立交付的實作階段
 
-全部標為PLANNED。Owner由實際接任者在各task handoff填一名；不得假設文件owner自動獲派所有實作。階段依賴按順序，無需多agent。
+S1 實作及本機 package 驗證已完成；整合仍 pending；S2–S5 仍為 PLANNED。Owner由實際接任者在各task handoff填一名；不得假設文件owner自動獲派所有實作。階段依賴按順序，無需多agent。
 
 | 階段 | 狀態／依賴 | 主要入口 | 交付與exit gate |
 | --- | --- | --- | --- |
-| S1 規則與儲存 | PLANNED，先於其他階段 | survey shared／scoreEngine／migrations／runStore／sessionService／answerService／decisionHistory | 四題transaction、replay、version、重用題組；1/5/20/50與反向fixtures、idempotency、migration通過；v2 viewer需至少可辨識拒絕，不能舊client誤讀 |
+| S1 規則與儲存 | IMPLEMENTED；本機 tests/build 通過，整合 pending | survey shared／scoreEngine／migrations／runStore／sessionService／answerService／proposalService／decisionHistory；root/module-swap v2 rejection | 四題transaction、replay、version、重用題組及 viewer rejection 完成；CI與整合 review 尚未完成；精確分支／handoff 狀態見 [S1 handoff](handoffs/exhibition-s1.md) |
 | S2 第一條可見鏈 | PLANNED，依S1 | root surveyView／changeCatalog／manager／environmentPark；survey v2 mapping | 維持四題完整提交契約，先將Q3視覺打通；其他三site維持建成mixed基底並清楚標示未完成映射；負向氣候廊／正向樹冠、真實差異、reload/fallback通過，不宣稱四軸MVP完成 |
 | S3 其餘三site | PLANNED，依S2 | automationHub／commonsPlaza／concentrationTower＋catalog/mapping | 完成12配置、同band counts、低值未來感、路線clearance；四軸端到端通過 |
 | S4 正式觀眾體驗 | PLANNED，依S3 | survey guest UI、root causal panel、style | 四題back/edit/submit、idle/result/next、紀錄、錯誤恢復、accessibility；無人格誤導 |
@@ -417,7 +423,9 @@ S2不是建立另一套一題API或另一個score schema；使用S1四題session
 
 更改reducer必查live與replay；更改wire必查root及module-swap；更改樹數必查procedural fallback及GLB晚到；更改bounds必查layout與mobility tests；更改UI先確認不遮住道玄坂南site。
 
-## 12. 驗收矩陣（未執行）
+## 12. 驗收矩陣（尚未完整執行）
+
+S1 有獨立 probe/browser 證據及本機三個 package 的通過結果，但本表是整體 exhibition acceptance；CI、整合與 S2–S5 尚未完成，不可標成通過。逐項證據與限制見 [S1 驗證紀錄](VALIDATION.md#exhibition-s1-2026-09-28)。
 
 | ID | 檢查 | 通過條件／證據 |
 | --- | --- | --- |

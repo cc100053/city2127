@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import { initialCitySurveyState, zeroScores } from '../src/shared/citySurveyState.ts';
-import { applyEffects, scoreChange } from '../src/survey/scoreEngine.ts';
+import { initialCitySurveyState, initialExhibitionState, zeroScores } from '../src/shared/citySurveyState.ts';
+import { applyEffects, scoreChange, validateExhibitionState } from '../src/survey/scoreEngine.ts';
 import { submitAnswer } from '../src/server/answerService.ts';
 import { createGuestSession } from '../src/server/sessionService.ts';
 import { fixture, ok } from './surveyFixture.ts';
@@ -8,6 +8,9 @@ import { fixture, ok } from './surveyFixture.ts';
 const initial = initialCitySurveyState('run', '2026-09-23T00:00:00.000Z');
 assert.deepEqual(initial.scores, { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 });
 assert.equal(initial.revision, 0);
+const corruptInitial = initialExhibitionState('exhibition-run', '2026-09-28T00:00:00.000Z');
+corruptInitial.recentVotes.automation = 0.1;
+assert.throws(() => validateExhibitionState(corruptInitial), /initial exhibition state must be zero/);
 
 assert.deepEqual(applyEffects(zeroScores(), { environmentalPriority: 3, automation: 1 }), { automation: 1, publicSharing: 0, environmentalPriority: 3, urbanConcentration: 0 });
 assert.deepEqual(applyEffects({ ...zeroScores(), urbanConcentration: 2 }, { urbanConcentration: -3, publicSharing: 2 }), { automation: 0, publicSharing: 2, environmentalPriority: 0, urbanConcentration: -1 });

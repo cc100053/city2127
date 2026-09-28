@@ -1,5 +1,5 @@
-import type { CityScores, CitySurveyState } from './citySurveyState.ts';
-import type { CityView } from './cityView.ts';
+import type { CityScores, CitySurveyState, ExhibitionState, ExhibitionVotes } from './citySurveyState.ts';
+import type { CityView, ProposalRecord } from './cityView.ts';
 import type { CityEffects, PublicQuestion } from './question.ts';
 
 export type GuestSessionStatus = 'reserved' | 'answered' | 'expired';
@@ -39,37 +39,58 @@ export type AnswerRequest = {
 
 export type ErrorCode =
   | 'bad_request' | 'not_found' | 'forbidden' | 'internal_error'
+  | 'unsupported_version'
   | 'no_question_available' | 'session_not_found' | 'session_expired' | 'already_answered'
   | 'unknown_question' | 'unknown_option' | 'option_question_mismatch' | 'question_not_assigned'
   | 'revision_conflict' | 'answer_conflict' | 'reset_confirmation_invalid';
 
 export type ApiError = { code: ErrorCode; message: string };
 /** Every JSON response. Conflicts that the client can recover from carry the latest state. */
-export type ApiResponse<T> = { ok: true; data: T } | { ok: false; error: ApiError; state?: CitySurveyState };
+export type ApiResponse<T> = { ok: true; data: T } | { ok: false; error: ApiError; state?: CitySurveyState | ExhibitionState };
 
 export type GuestQuestionData = { session: GuestSession; question: PublicQuestion; state: CitySurveyState };
 export type AnswerData = { event: AnswerEvent; state: CitySurveyState; replayed: boolean };
 export type HealthData = { status: 'ok'; runId: string; revision: number; questionVersion: number };
 
-export type RunSummary = { id: string; status: 'active' | 'ended'; startedAt: string; endedAt: string | null };
+export type ProposalSessionStatus = 'reserved' | 'submitted' | 'expired';
+export type ProposalSession = {
+  id: string;
+  runId: string;
+  questionSetVersion: number;
+  questionIds: string[];
+  status: ProposalSessionStatus;
+  createdAt: string;
+  expiresAt: string;
+  submittedAt: string | null;
+};
+export type ProposalSessionData = { session: ProposalSession; questions: PublicQuestion[]; state: ExhibitionState };
+export type ProposalRequest = {
+  submissionId: string;
+  guestSessionId: string;
+  expectedRevision: number;
+  answers: { questionId: string; optionId: string }[];
+};
+export type ProposalData = { proposal: ProposalRecord; state: ExhibitionState; replayed: boolean };
+
+export type RunSummary = { id: string; status: 'active' | 'ended'; algorithmVersion: 1 | 2; startedAt: string; endedAt: string | null };
 export type AdminCurrentRun = {
   run: RunSummary;
-  state: CitySurveyState;
+  state: CitySurveyState | ExhibitionState;
   questionVersion: number;
   totalQuestions: number;
   reservedSessions: number;
   answeredSessions: number;
 };
 export type AdminEvent = { id: number; type: 'run-reset'; runId: string; detail: { nextRunId: string }; createdAt: string };
-export type AdminEventsData = { answers: AnswerEvent[]; admin: AdminEvent[] };
+export type AdminEventsData = { answers: AnswerEvent[]; proposals: ProposalRecord[]; admin: AdminEvent[] };
 export type ResetRequest = { confirmation: string };
-export type ResetData = { previousRunId: string; state: CitySurveyState };
+export type ResetData = { previousRunId: string; state: CitySurveyState | ExhibitionState };
 
 /** What one answer actually changed after clamping. */
 export type AppliedChange = { scores: Partial<CityScores> };
 
 export type ServerEvent =
-  | { type: 'city-state-snapshot'; state: CitySurveyState; view: CityView }
+  | { type: 'city-state-snapshot'; state: CitySurveyState | ExhibitionState; view: CityView }
   | {
       type: 'city-state-updated';
       answerId: string;
@@ -80,4 +101,11 @@ export type ServerEvent =
       change: AppliedChange;
       view: CityView;
     }
-  | { type: 'run-reset'; previousRunId: string; state: CitySurveyState; view: CityView };
+  | {
+      type: 'city-state-updated';
+      submissionId: string;
+      state: ExhibitionState;
+      proposal: ProposalRecord;
+      view: CityView;
+    }
+  | { type: 'run-reset'; previousRunId: string; state: CitySurveyState | ExhibitionState; view: CityView };

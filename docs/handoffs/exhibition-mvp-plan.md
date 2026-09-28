@@ -1,7 +1,7 @@
 # exhibition-mvp-plan — 2127 baseline and agent implementation specification
 
 - Owner: Codex
-- Status: DONE — specification integrated and published; runtime implementation remains PLANNED
+- Status: DONE — planning specification integrated and published; its runtime work was unimplemented at completion and is now tracked by [the S1 handoff](exhibition-s1.md)
 - Branch: `codex/exhibition-mvp-plan`
 - Base commit: `535a3c059302ac6c1059d84aef663b06510ac04c`
 - Last verified commit: `da01325414f1ac54b1d8db2f6b512191f39d383a` (integration); this follow-up only records the verified outcome
@@ -53,4 +53,4 @@ Write the prior design as a self-contained, detailed agent-oriented plan under `
 
 ## Next expected step
 
-The planning specification is complete on main. A later explicitly assigned implementation task should start at S1 in [the plan](../EXHIBITION_MVP.md), naming its owner; this task does not initiate implementation.
+This planning task is complete on main. The later assigned S1 implementation is in progress; see [the current handoff](exhibition-s1.md) for source, validation and integration status. S2+ remain separate stages.

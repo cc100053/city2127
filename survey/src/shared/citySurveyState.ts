@@ -18,6 +18,19 @@ export type CitySurveyState = {
   updatedAt: string;
 };
 
+export type Vote = -1 | 0 | 1;
+export type ExhibitionVotes = Record<CityAxis, Vote>;
+export type ExhibitionState = {
+  runId: string;
+  revision: number;
+  guestCount: number;
+  algorithmVersion: 2;
+  voteSums: CityScores;
+  recentVotes: CityScores;
+  scores: CityScores;
+  updatedAt: string;
+};
+
 export function isCityAxis(value: string): value is CityAxis {
   return (CITY_AXES as readonly string[]).includes(value);
 }
@@ -28,4 +41,8 @@ export function zeroScores(): CityScores {
 
 export function initialCitySurveyState(runId: string, updatedAt: string): CitySurveyState {
   return { runId, revision: 0, answerCount: 0, scores: zeroScores(), updatedAt };
+}
+
+export function initialExhibitionState(runId: string, updatedAt: string): ExhibitionState {
+  return { runId, revision: 0, guestCount: 0, algorithmVersion: 2, voteSums: zeroScores(), recentVotes: zeroScores(), scores: zeroScores(), updatedAt };
 }

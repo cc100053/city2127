@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createBaselineCityLayout, setBuildingKind, setLotKind } from "../src/state/cityLayoutState.ts";
-import { parseSurveyEvent, slotLabels, supersedes, type SurveyView } from "../src/state/surveyView.ts";
+import { connectSurvey, parseSurveyEvent, slotLabels, supersedes, type SurveyView } from "../src/state/surveyView.ts";
 
 const demoLayout = setBuildingKind(setLotKind(setBuildingKind(createBaselineCityLayout(), "nw", "medium"), "sw", "plaza"), "se", "tall");
 const demoHistory = [
@@ -18,9 +18,43 @@ test("baseline layout is four empty lots without buildings", () => {
 
 test("a server view parses into a validated layout and history", () => {
   const parsed = parseSurveyEvent(message({ runId: "r", revision: 3, layout: demoLayout, history: demoHistory }));
-  assert.equal(parsed?.kind, "city-state-updated");
-  assert.deepEqual(parsed?.view.layout, demoLayout);
-  assert.equal(parsed?.view.history.length, 3);
+  assert.ok(parsed && "kind" in parsed);
+  assert.equal(parsed.kind, "city-state-updated");
+  assert.deepEqual(parsed.view.layout, demoLayout);
+  assert.equal(parsed.view.history.length, 3);
+  const explicitV1 = parseSurveyEvent(message({ runId: "r", revision: 3, layout: demoLayout, history: demoHistory, version: 1 }));
+  assert.ok(explicitV1 && "kind" in explicitV1);
+  assert.equal(explicitV1.kind, "city-state-updated");
+});
+
+test("explicit unsupported exhibition view versions are rejected before v1 fields are parsed", () => {
+  assert.deepEqual(parseSurveyEvent(message({ version: 2, layout: { version: 2, bands: {} } })), { unsupportedVersion: 2 });
+  assert.deepEqual(parseSurveyEvent(message({ version: 3, layout: { version: 2, bands: {} } })), { unsupportedVersion: 3 });
+});
+
+test("connectSurvey reports unsupported versions without applying them and still applies v1", () => {
+  const webSocketDescriptor = Object.getOwnPropertyDescriptor(globalThis, "WebSocket");
+  let messageListener: ((event: { data: string }) => void) | undefined;
+  class FakeWebSocket {
+    constructor(_url: string) {}
+    addEventListener(type: string, listener: (event: { data: string }) => void) {
+      if (type === "message") messageListener = listener;
+    }
+  }
+  Object.defineProperty(globalThis, "WebSocket", { configurable: true, value: FakeWebSocket });
+  try {
+    const applied: string[] = [];
+    const statuses: string[] = [];
+    connectSurvey("ws://example.test/ws", (_kind, next) => applied.push(next.runId), (status) => statuses.push(status));
+    messageListener?.({ data: JSON.stringify(message({ version: 2, layout: { version: 2, bands: {} } })) });
+    assert.deepEqual(applied, []);
+    assert.ok(statuses.includes("Unsupported exhibition view version"));
+    messageListener?.({ data: JSON.stringify(message({ runId: "r", revision: 3, layout: demoLayout, history: demoHistory })) });
+    assert.deepEqual(applied, ["r"]);
+  } finally {
+    if (webSocketDescriptor) Object.defineProperty(globalThis, "WebSocket", webSocketDescriptor);
+    else delete (globalThis as { WebSocket?: unknown }).WebSocket;
+  }
 });
 
 test("malformed messages are rejected", () => {
@@ -43,7 +77,7 @@ test("old or repeated revisions of the same run are ignored; a new run always re
 
 test("each occupied lot is labelled by the decision that last changed it", () => {
   const parsed = parseSurveyEvent(message({ runId: "r", revision: 3, layout: demoLayout, history: demoHistory }));
-  assert.ok(parsed);
+  assert.ok(parsed && "kind" in parsed);
   assert.deepEqual(slotLabels(parsed.view), {
     nw: "自動サービス拠点（自動化）",
     sw: "公共コモンズ広場（公共共有）",

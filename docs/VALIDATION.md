@@ -1,5 +1,17 @@
 # Validation and handoff
 
+## Exhibition S1 2026-09-28
+
+Branch `codex/exhibition-s1`, based on `f8fa07ab58610c19e5764be6bec325cf9ddd53f9` (`origin/main` matched that commit when fetched). Work remains uncommitted in the managed worktree and is not integrated. The complete status and ownership record are in the [S1 handoff](handoffs/exhibition-s1.md).
+
+**Verification status: PARTIAL.** Root `npm test` and `npm run build`, survey `npm test` (13 scripts) and `npm run build`, and module-swap `npm test` and `npm run build` all passed. The focused rules check `cd survey && node --experimental-strip-types tests/exhibitionRules.test.ts` also passed before it was wired into the full suite. `git diff --check` passed. Repository CI and integrated-branch checks are **NOT RUN**; these local results do not verify the final integrated tree.
+
+Independent scratch probes passed for same-direction and reversal reducer fixtures, zero/alternating 1,000-proposal and axis-isolation cases, score-state validation, layout boundary mapping, request parsing, migration DDL/replay preservation and proposal transaction/idempotency/concurrency/rollback. These probes used temporary `/private/tmp/s1-*.ts` scripts and are not committed tests or artifacts.
+
+Browser compatibility was checked with mock WebSockets in headless browser sessions. Both root and module-swap displayed `Unsupported exhibition view version` for explicit v2 and left v2 scene content unapplied. Explicit v1 frames still connected in both viewers, and module-swap standalone mode still loaded its GLBs. A separate browser run against the built v2 survey app showed `/admin` and `/monitor` connected at revision 0; after one four-answer proposal, the monitor live-updated to revision 1 with all four bands high and the latest proposal, and admin showed one proposal. The mock viewer harness used `http://127.0.0.1:5173/?survey=ws://127.0.0.1:18787/ws` and module-swap on port 5174. This did not test a versionless legacy v1 frame, physical exhibition hardware or GPU performance.
+
+No CI, integration, 100-proposal/60-minute exhibition endurance, real-GPU FPS, exhibition-PC, Windows or user-understanding evidence is claimed. The guest UI still uses the legacy one-question flow and cannot submit against the active v2 run; S2/S3 rendering and S4 guest UI remain future work.
+
 ## Exhibition MVP planning — 2026-09-28 (documentation only)
 
 [EXHIBITION_MVP.md](EXHIBITION_MVP.md) defines next-version requirements and an explicitly **unexecuted** acceptance matrix, including populated neutral sites and futuristic low-value variants. Its numerical fixtures are specification checks, not evidence that the new runtime exists. The planning task changes no executable code or assets; it requires local Markdown link checks, source/fact comparison, numerical fixture verification and diff review, not new rendering or local package builds. Actual task results and Git integration are recorded in [the planning handoff](handoffs/exhibition-mvp-plan.md). Earlier screenshots and FPS records below must not be reused as proof of the proposed version.
