@@ -7,7 +7,7 @@ import { resetRun } from '../src/server/adminService.ts';
 import { createGuestSession } from '../src/server/sessionService.ts';
 import { createContext } from '../src/server/server.ts';
 import type { SurveyContext } from '../src/server/context.ts';
-import { answerNext, errorCode, fixture, MVP_QUESTIONS_PATH, ok } from './surveyFixture.ts';
+import { answerNext, errorCode, EXHIBITION_QUESTIONS_PATH, fixture, MVP_QUESTIONS_PATH, ok } from './surveyFixture.ts';
 
 const mvp = (dbPath = ':memory:') => fixture(dbPath, Date.parse('2026-09-24T10:00:00.000Z'), MVP_QUESTIONS_PATH).ctx;
 const slots = (ctx: SurveyContext) => Object.values(currentView(ctx).layout.lots).map(l => `${l.socketId}:${l.lot}/${l.building}`);
@@ -47,7 +47,7 @@ try {
   // Restart: the same policy state and the same derived city come back from the database.
   const before = currentState(ctx), view = currentView(ctx);
   ctx.db.close();
-  const restarted = createContext({ dbPath, questionsPath: MVP_QUESTIONS_PATH });
+  const restarted = createContext({ dbPath, questionsPath: EXHIBITION_QUESTIONS_PATH });
   assert.deepEqual(currentState(restarted), before);
   assert.deepEqual(currentView(restarted), view);
 

@@ -9,7 +9,7 @@ import { CorruptStateError, readSnapshot, replayRun, runAnswerEvents } from '../
 import { currentState } from '../src/server/answerService.ts';
 import { recentEvents } from '../src/server/adminService.ts';
 import { createContext } from '../src/server/server.ts';
-import { answerNext, fixture, QUESTIONS_PATH } from './surveyFixture.ts';
+import { answerNext, EXHIBITION_QUESTIONS_PATH, fixture } from './surveyFixture.ts';
 
 const dir = mkdtempSync(join(tmpdir(), 'survey-persistence-'));
 try {
@@ -22,7 +22,7 @@ try {
   first.ctx.db.close();
 
   // Restart: the same run and CitySurveyState come back, and match a replay of the stored events.
-  const restarted = createContext({ dbPath, questionsPath: QUESTIONS_PATH });
+  const restarted = createContext({ dbPath, questionsPath: EXHIBITION_QUESTIONS_PATH });
   assert.deepEqual(currentState(restarted), before);
   const events = runAnswerEvents(restarted.db, before.runId);
   assert.deepEqual(events.map(e => e.optionId), ['solar-canopy', 'walkable-blocks', 'urban-forest']);
@@ -35,7 +35,7 @@ try {
   // A snapshot that disagrees with its events stops startup instead of being reset.
   restarted.db.prepare('UPDATE city_snapshots SET environmental_priority = environmental_priority - 1').run();
   restarted.db.close();
-  assert.throws(() => createContext({ dbPath, questionsPath: QUESTIONS_PATH }), (e: unknown) => e instanceof CorruptStateError && /does not match/.test(e.message));
+  assert.throws(() => createContext({ dbPath, questionsPath: EXHIBITION_QUESTIONS_PATH }), (e: unknown) => e instanceof CorruptStateError && /does not match/.test(e.message));
   const inspect = new DatabaseSync(dbPath);
   assert.equal(Number(inspect.prepare('SELECT COUNT(*) AS n FROM runs').get()?.n), 1, 'no new run was created');
   assert.equal(Number(inspect.prepare('SELECT environmental_priority FROM city_snapshots').get()?.environmental_priority), before.scores.environmentalPriority - 1, 'corrupt row left for inspection');
@@ -43,12 +43,12 @@ try {
   // A missing snapshot is also refused.
   inspect.exec('DELETE FROM city_snapshots');
   inspect.close();
-  assert.throws(() => createContext({ dbPath, questionsPath: QUESTIONS_PATH }), (e: unknown) => e instanceof CorruptStateError && /no city snapshot/.test(e.message));
+  assert.throws(() => createContext({ dbPath, questionsPath: EXHIBITION_QUESTIONS_PATH }), (e: unknown) => e instanceof CorruptStateError && /no city snapshot/.test(e.message));
   // Runs exist but none is active.
   const noActive = new DatabaseSync(dbPath);
   noActive.exec(`UPDATE runs SET status = 'ended'`);
   noActive.close();
-  assert.throws(() => createContext({ dbPath, questionsPath: QUESTIONS_PATH }), (e: unknown) => e instanceof CorruptStateError && /none is active/.test(e.message));
+  assert.throws(() => createContext({ dbPath, questionsPath: EXHIBITION_QUESTIONS_PATH }), (e: unknown) => e instanceof CorruptStateError && /none is active/.test(e.message));
 
   // Schema version: a fresh database is migrated; a newer database is refused and left untouched.
   const fresh = openDatabase(join(dir, 'fresh.sqlite'));
@@ -74,7 +74,7 @@ try {
       VALUES ('old-answer', 'old-run', 'g-old', 'energy-01', 'solar-canopy', 1, '{"environment":3,"technology":1}', 0, 1, 'c');
     INSERT INTO city_snapshots VALUES ('old-run', 1, 1, 3, 0, 1, 0, 0, 0, 0, 0, 'c');`);
   v1.close();
-  const migrated = createContext({ dbPath: v1Path, questionsPath: QUESTIONS_PATH });
+  const migrated = createContext({ dbPath: v1Path, questionsPath: EXHIBITION_QUESTIONS_PATH });
   assert.equal(schemaVersion(migrated.db), SCHEMA_VERSION);
   const fresh2 = currentState(migrated);
   assert.notEqual(fresh2.runId, 'old-run');
@@ -84,13 +84,15 @@ try {
   assert.equal(Number(migrated.db.prepare('SELECT environment FROM city_snapshots_v1').get()?.environment), 3, 'old snapshot kept');
   const log = recentEvents(migrated);
   assert.deepEqual(log.answers.map(a => [a.id, a.effects]), [['old-answer', { environment: 3, technology: 1 }]], 'legacy events stay readable');
-  assert.deepEqual(log.admin.map(a => [a.runId, a.detail.nextRunId]), [['old-run', fresh2.runId]]);
+  const policyRunId = log.admin.find(event => event.runId !== 'old-run')?.runId;
+  assert.ok(policyRunId);
+  assert.deepEqual(log.admin.map(a => [a.runId, a.detail.nextRunId]), [[policyRunId, fresh2.runId], ['old-run', policyRunId]]);
   migrated.db.close();
 
   // Snapshot reader is used by restart; confirm it is not silently filled for an unknown run.
   const memory = fixture();
   assert.equal(readSnapshot(memory.ctx.db, 'unknown'), undefined);
-  console.log('PASS: restart restores run/state, events replay to the snapshot, corrupt/missing state refused, schema version enforced, v1 placeholder run migrated to a fresh policy run, foreign keys on.');
+  console.log('PASS: legacy restart and replay, corrupt/missing state refusal, schema-version enforcement, v1→v2→v3 migrations, foreign keys on.');
 } finally {
   rmSync(dir, { recursive: true, force: true });
 }

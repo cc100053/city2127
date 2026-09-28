@@ -3,7 +3,7 @@ import type { ApiResponse, GuestQuestionData, GuestSession, GuestSessionStatus }
 import { isEligible, toPublicQuestion } from '../shared/question.ts';
 import { transaction } from './database.ts';
 import { fail, type SurveyContext } from './context.ts';
-import { activeRun, CorruptStateError, num, optStr, readSnapshot, str } from './runStore.ts';
+import { activeRun, CorruptStateError, num, optStr, readSnapshot, str, UnsupportedRunVersionError } from './runStore.ts';
 
 export const RESERVATION_MS = 2 * 60 * 1000;
 
@@ -19,6 +19,7 @@ function toGuestSession(row: Record<string, SQLOutputValue>): GuestSession {
 
 export function requireActiveRun(ctx: SurveyContext) {
   const run = activeRun(ctx.db);
+  if (run?.algorithmVersion === 2) throw new UnsupportedRunVersionError('This endpoint only accepts legacy one-question runs.');
   const state = run && readSnapshot(ctx.db, run.id);
   if (!run || !state) throw new CorruptStateError('no active run with a city snapshot');
   return { run, state };
@@ -59,7 +60,7 @@ export function createGuestSession(ctx: SurveyContext): ApiResponse<GuestQuestio
       .run(run.id, now.toISOString());
     const taken = new Set(ctx.db.prepare(`SELECT question_id FROM guest_sessions WHERE run_id = ? AND status IN ('reserved', 'answered')`)
       .all(run.id).map(row => str(row, 'question_id')));
-    const question = ctx.questions.questions.find(q => !taken.has(q.id) && isEligible(q, state.scores));
+    const question = ctx.legacyQuestions.questions.find(q => !taken.has(q.id) && isEligible(q, state.scores));
     if (!question) return fail('no_question_available', 'Every eligible question in this run is answered or currently reserved.', state);
     const session: GuestSession = {
       id: ctx.newId(), runId: run.id, questionId: question.id, status: 'reserved', createdAt: now.toISOString(),
@@ -78,7 +79,7 @@ export function getGuestQuestion(ctx: SurveyContext, sessionId: string): ApiResp
     if (!found) return fail('session_not_found', 'Unknown guest session.');
     const session = settleExpiry(ctx, found, run.id);
     if (session.status === 'expired') return fail('session_expired', 'This guest session has expired.', state);
-    const question = ctx.questions.questions.find(q => q.id === session.questionId);
+    const question = ctx.legacyQuestions.questions.find(q => q.id === session.questionId);
     if (!question) return fail('unknown_question', 'The assigned question is not in the current question set.');
     return { ok: true, data: { session, question: toPublicQuestion(question), state } };
   });

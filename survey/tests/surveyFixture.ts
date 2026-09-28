@@ -1,22 +1,46 @@
 import { openDatabase } from '../src/server/database.ts';
 import type { SurveyContext } from '../src/server/context.ts';
-import { restoreOrCreateRun } from '../src/server/runStore.ts';
+import { activeRun, restoreOrCreateRun } from '../src/server/runStore.ts';
 import { createGuestSession, RESERVATION_MS } from '../src/server/sessionService.ts';
 import { submitAnswer } from '../src/server/answerService.ts';
-import { loadQuestionSetFile } from '../src/survey/questionLoader.ts';
+import { createRun, createExhibitionRun } from '../src/server/runStore.ts';
+import { transaction } from '../src/server/database.ts';
+import { loadQuestionSetFile, validateExhibitionQuestionSet } from '../src/survey/questionLoader.ts';
 import type { AnswerData, ApiResponse, GuestQuestionData } from '../src/shared/protocol.ts';
 
 export const QUESTIONS_PATH = new URL('../src/survey/questions.test.json', import.meta.url).pathname;
 export const MVP_QUESTIONS_PATH = new URL('../src/survey/questions.mvp.json', import.meta.url).pathname;
+export const EXHIBITION_QUESTIONS_PATH = new URL('../src/survey/questions.exhibition.json', import.meta.url).pathname;
 
 /** In-memory (or given file) survey context with a controllable clock and readable sequential IDs. */
 export function fixture(dbPath = ':memory:', startMs = Date.parse('2026-09-23T10:00:00.000Z'), questionsPath = QUESTIONS_PATH) {
   const clock = { ms: startMs };
   let counter = 0;
   const db = openDatabase(dbPath);
+  const questions = loadQuestionSetFile(questionsPath);
   const ctx: SurveyContext = {
-    db, questions: loadQuestionSetFile(questionsPath), now: () => new Date(clock.ms),
+    db, questions, legacyQuestions: questions, now: () => new Date(clock.ms),
     newId: () => `id-${++counter}-${Math.random().toString(16).slice(2, 8)}`, reservationMs: RESERVATION_MS,
+  };
+  if (activeRun(db)) restoreOrCreateRun(db, ctx.newId, ctx.now);
+  else {
+    const runs = Number(db.prepare('SELECT COUNT(*) AS n FROM runs').get()?.n ?? 0);
+    if (runs > 0) restoreOrCreateRun(db, ctx.newId, ctx.now);
+    else if (questions.version === 2) restoreOrCreateRun(db, ctx.newId, ctx.now);
+    else transaction(db, () => createRun(db, ctx.newId(), ctx.now().toISOString()));
+  }
+  return { ctx, clock };
+}
+
+/** V2 context for proposal transaction and persistence tests. */
+export function exhibitionFixture(dbPath = ':memory:', startMs = Date.parse('2026-09-28T10:00:00.000Z')) {
+  const clock = { ms: startMs };
+  let counter = 0;
+  const db = openDatabase(dbPath);
+  const ctx: SurveyContext = {
+    db, questions: validateExhibitionQuestionSet(loadQuestionSetFile(EXHIBITION_QUESTIONS_PATH)),
+    legacyQuestions: loadQuestionSetFile(MVP_QUESTIONS_PATH), now: () => new Date(clock.ms),
+    newId: () => `ex-${++counter}-${Math.random().toString(16).slice(2, 8)}`, reservationMs: RESERVATION_MS,
   };
   restoreOrCreateRun(db, ctx.newId, ctx.now);
   return { ctx, clock };

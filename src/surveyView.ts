@@ -18,7 +18,7 @@ export type Decision = {
 
 export type SurveyView = { runId: string; revision: number; scores: Scores; layout: Layout; history: Decision[] };
 export type SurveyEventKind = 'city-state-snapshot' | 'city-state-updated' | 'run-reset';
-export type ParsedSurveyEvent = { kind: SurveyEventKind; view: SurveyView };
+export type ParsedSurveyEvent = { kind: SurveyEventKind; view: SurveyView } | { unsupportedVersion: unknown };
 
 const LOT_KINDS = ['empty', 'park', 'plaza'] as const;
 const BUILDING_KINDS = ['none', 'small', 'medium', 'tall'] as const;
@@ -43,6 +43,7 @@ function isDecision(value: unknown): value is Decision {
 export function parseSurveyEvent(data: unknown): ParsedSurveyEvent | null {
   if (!isRecord(data) || !isRecord(data.view)) return null;
   if (data.type !== 'city-state-snapshot' && data.type !== 'city-state-updated' && data.type !== 'run-reset') return null;
+  if (Object.hasOwn(data.view, 'version') && data.view.version !== 1) return { unsupportedVersion: data.view.version };
   const { runId, revision, scores, history, layout } = data.view;
   if (typeof runId !== 'string' || typeof revision !== 'number' || !isRecord(scores) || !Array.isArray(history)) return null;
   if (!AXES.every(axis => typeof scores[axis] === 'number') || !history.every(isDecision)) return null;
@@ -74,7 +75,9 @@ export function connectSurvey(
     socket.addEventListener('message', message => {
       let event: ParsedSurveyEvent | null = null;
       try { event = parseSurveyEvent(JSON.parse(String(message.data))); } catch { event = null; }
-      if (event) onView(event.kind, event.view); else console.warn('Ignored malformed survey message', message.data);
+      if (event && 'unsupportedVersion' in event) onStatus('Unsupported exhibition view version');
+      else if (event) onView(event.kind, event.view);
+      else console.warn('Ignored malformed survey message', message.data);
     });
     socket.addEventListener('close', () => {
       onStatus(`切断 — ${delay / 1000}秒後に再接続`);

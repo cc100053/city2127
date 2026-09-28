@@ -1,9 +1,9 @@
 import type { AdminCurrentRun, AdminEvent, AdminEventsData, ResetData } from '../shared/protocol.ts';
 import { transaction } from './database.ts';
 import { fail, type ServiceOutcome, type SurveyContext } from './context.ts';
-import { createRun, num, str, toAnswerEvent } from './runStore.ts';
-import { requireActiveRun, sessionCounts } from './sessionService.ts';
-import { viewOf } from './answerService.ts';
+import { activeRun, createExhibitionRun, createRun, num, recentProposalEvents, str, toAnswerEvent } from './runStore.ts';
+import { sessionCounts } from './sessionService.ts';
+import { currentState, viewOf } from './answerService.ts';
 
 export const RESET_CONFIRMATION = 'RESET';
 
@@ -16,10 +16,20 @@ export function isLoopbackAddress(address: string | undefined): boolean {
 }
 
 export function currentRun(ctx: SurveyContext): AdminCurrentRun {
-  const { run, state } = requireActiveRun(ctx);
-  const counts = sessionCounts(ctx, run.id);
+  const run = activeRun(ctx.db);
+  if (!run) throw new Error('no active run');
+  const state = currentState(ctx);
+  const counts = run.algorithmVersion === 2
+    ? {
+      reserved: num(ctx.db.prepare("SELECT COUNT(*) AS n FROM proposal_sessions WHERE run_id = ? AND status = 'reserved'").get(run.id) ?? { n: 0 }, 'n'),
+      answered: num(ctx.db.prepare("SELECT COUNT(*) AS n FROM proposal_sessions WHERE run_id = ? AND status = 'submitted'").get(run.id) ?? { n: 0 }, 'n'),
+    }
+    : sessionCounts(ctx, run.id);
   return {
-    run, state, questionVersion: ctx.questions.version, totalQuestions: ctx.questions.questions.length,
+    run,
+    state,
+    questionVersion: run.algorithmVersion === 2 ? ctx.questions.version : ctx.legacyQuestions.version,
+    totalQuestions: run.algorithmVersion === 2 ? ctx.questions.questions.length : ctx.legacyQuestions.questions.length,
     reservedSessions: counts.reserved, answeredSessions: counts.answered,
   };
 }
@@ -27,12 +37,13 @@ export function currentRun(ctx: SurveyContext): AdminCurrentRun {
 /** Latest answer and admin events across all runs, newest first. */
 export function recentEvents(ctx: SurveyContext, limit = 50): AdminEventsData {
   const answers = ctx.db.prepare('SELECT * FROM answer_events ORDER BY sequence DESC LIMIT ?').all(limit).map(toAnswerEvent);
+  const proposals = recentProposalEvents(ctx.db, limit);
   const admin = ctx.db.prepare('SELECT * FROM admin_events ORDER BY id DESC LIMIT ?').all(limit).map((row): AdminEvent => {
     const detail: unknown = JSON.parse(str(row, 'detail_json'));
     const nextRunId = typeof detail === 'object' && detail !== null && 'nextRunId' in detail && typeof detail.nextRunId === 'string' ? detail.nextRunId : '';
     return { id: num(row, 'id'), type: 'run-reset', runId: str(row, 'run_id'), detail: { nextRunId }, createdAt: str(row, 'created_at') };
   });
-  return { answers, admin };
+  return { answers, proposals, admin };
 }
 
 /** Ends the active run and starts a new zero-state run. History is kept; nothing is deleted. */
@@ -40,13 +51,17 @@ export function resetRun(ctx: SurveyContext, body: unknown): ServiceOutcome<Rese
   const confirmation = typeof body === 'object' && body !== null && 'confirmation' in body ? body.confirmation : undefined;
   if (confirmation !== RESET_CONFIRMATION) return { response: fail('reset_confirmation_invalid', `Type ${RESET_CONFIRMATION} to confirm the reset.`) };
   return transaction(ctx.db, (): ServiceOutcome<ResetData> => {
-    const { run } = requireActiveRun(ctx);
+    const run = activeRun(ctx.db);
+    if (!run) throw new Error('no active run');
     const at = ctx.now().toISOString(), nextRunId = ctx.newId();
     ctx.db.prepare(`UPDATE runs SET status = 'ended', ended_at = ? WHERE id = ?`).run(at, run.id);
     ctx.db.prepare(`UPDATE guest_sessions SET status = 'expired' WHERE run_id = ? AND status = 'reserved'`).run(run.id);
+    ctx.db.prepare("UPDATE proposal_sessions SET status = 'expired' WHERE run_id = ? AND status = 'reserved'").run(run.id);
     ctx.db.prepare(`INSERT INTO admin_events (type, run_id, detail_json, created_at) VALUES ('run-reset', ?, ?, ?)`)
       .run(run.id, JSON.stringify({ nextRunId }), at);
-    const state = createRun(ctx.db, nextRunId, at);
+    const state = run.algorithmVersion === 2
+      ? createExhibitionRun(ctx.db, nextRunId, at)
+      : createRun(ctx.db, nextRunId, at);
     return {
       response: { ok: true, data: { previousRunId: run.id, state } },
       event: { type: 'run-reset', previousRunId: run.id, state, view: viewOf(ctx, state) },

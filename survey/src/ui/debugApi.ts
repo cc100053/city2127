@@ -1,5 +1,5 @@
-import { CITY_AXES, SCORE_MAX, type CitySurveyState } from '../shared/citySurveyState.ts';
-import { AXIS_LABELS, LOT_SOCKET_IDS, slotLabel, type CityView } from '../shared/cityView.ts';
+import { CITY_AXES, SCORE_MAX, type CitySurveyState, type ExhibitionState } from '../shared/citySurveyState.ts';
+import { AXIS_LABELS, LOT_SOCKET_IDS, slotLabel, isExhibitionCityView, type CityView } from '../shared/cityView.ts';
 import type { ApiResponse, ServerEvent } from '../shared/protocol.ts';
 
 /** Calls the survey server. Network failures become an ApiResponse error so views handle one shape. */
@@ -29,19 +29,30 @@ export function el<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Partial
 export const signed = (value: number) => (value > 0 ? `+${value}` : String(value));
 
 /** Policy score bars for a CitySurveyState. */
-export function renderState(state: CitySurveyState): HTMLElement {
+export function renderState(state: CitySurveyState | ExhibitionState): HTMLElement {
   const rows = CITY_AXES.map(axis => {
     const value = state.scores[axis], pct = Math.abs(value) / SCORE_MAX * 50;
     const bar = el('span', { class: 'bar' }, el('span', { class: value < 0 ? 'fill neg' : 'fill', style: `width:${pct}%;${value < 0 ? `right:50%` : 'left:50%'}` }));
     return el('tr', {}, el('th', {}, `${AXIS_LABELS[axis]} (${axis})`), el('td', { class: 'num' }, signed(value)), el('td', {}, bar));
   });
+  const count = 'guestCount' in state ? state.guestCount : state.answerCount;
   return el('div', {},
-    el('p', { class: 'meta' }, `run ${state.runId} · revision ${state.revision} · answers ${state.answerCount} · ${state.updatedAt}`),
+    el('p', { class: 'meta' }, `run ${state.runId} · revision ${state.revision} · proposals/answers ${count} · ${state.updatedAt}`),
     el('table', { class: 'scores' }, ...rows));
 }
 
 /** Derived four-lot layout and the decision history that explains it. */
 export function renderView(view: CityView): HTMLElement {
+  if (isExhibitionCityView(view)) {
+    const slots = LOT_SOCKET_IDS.map(id => el('tr', {},
+      el('th', {}, id.toUpperCase()), el('td', {}, view.layout.bands[id]),
+      el('td', {}, id === 'nw' ? `自動端口 ${view.layout.automatedPorts}/6`
+        : id === 'ne' ? `樹木 ${view.layout.treeCount} · 鰭片 ${view.layout.coolingFins} · 種植 ${Math.round(view.layout.plantedFraction * 100)}%`
+          : id === 'sw' ? `共有席 ${view.layout.sharedSeats}/8` : `機能ユニット ${view.layout.functionModules}`)));
+    const history = view.recentProposals.map(proposal => el('li', {},
+      `#${proposal.ordinal}: ${proposal.answers.map(answer => answer.optionLabel).join(' · ')}`));
+    return el('div', {}, el('table', { class: 'scores' }, ...slots), el('ol', { class: 'log' }, ...history));
+  }
   const slots = LOT_SOCKET_IDS.map(id => {
     const lot = view.layout.lots[id];
     return el('tr', {}, el('th', {}, id.toUpperCase()), el('td', {}, `${lot.lot} / ${lot.building}`), el('td', {}, slotLabel(lot)));

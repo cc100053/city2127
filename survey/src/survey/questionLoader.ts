@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { isCityAxis } from '../shared/citySurveyState.ts';
+import { CITY_AXES, isCityAxis } from '../shared/citySurveyState.ts';
 import type { CityEffects, Question, QuestionOption, QuestionSet, QuestionTrigger } from '../shared/question.ts';
 
 export const EFFECT_MIN = -3, EFFECT_MAX = 3;
@@ -90,4 +90,32 @@ export function loadQuestionSetFile(path: string): QuestionSet {
     throw new QuestionSetError(`cannot read question file ${path}: ${error instanceof Error ? error.message : String(error)}`);
   }
   return parseQuestionSet(json);
+}
+
+/** Enforces the fixed, reusable four-question schema used by exhibition algorithm v2. */
+export function validateExhibitionQuestionSet(set: QuestionSet): QuestionSet {
+  if (set.version !== 2 || set.questions.length !== CITY_AXES.length)
+    throw new QuestionSetError('exhibition question set must be version 2 with exactly four questions');
+  const axes = new Set<string>();
+  for (const question of set.questions) {
+    if (question.options.length !== 3) throw new QuestionSetError(`exhibition question "${question.id}" must have exactly three options`);
+    let axisForQuestion: string | undefined;
+    const votes = new Set<number>();
+    for (const option of question.options) {
+      const entries = Object.entries(option.effects);
+      if (entries.length !== 1) throw new QuestionSetError(`exhibition option "${option.id}" must vote on exactly one axis`);
+      const [axis, vote] = entries[0];
+      if (!isCityAxis(axis) || (vote !== -1 && vote !== 0 && vote !== 1))
+        throw new QuestionSetError(`exhibition option "${option.id}" must have a -1, 0, or 1 vote`);
+      if (axisForQuestion !== undefined && axisForQuestion !== axis)
+        throw new QuestionSetError(`exhibition question "${question.id}" must use one axis`);
+      axisForQuestion = axis;
+      votes.add(vote);
+    }
+    if (!axisForQuestion || axes.has(axisForQuestion)) throw new QuestionSetError('each exhibition axis must have exactly one question');
+    if (votes.size !== 3) throw new QuestionSetError(`exhibition question "${question.id}" must have one option for each vote -1, 0, and 1`);
+    axes.add(axisForQuestion);
+  }
+  if (axes.size !== CITY_AXES.length) throw new QuestionSetError('each exhibition axis must have exactly one question');
+  return set;
 }

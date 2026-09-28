@@ -1,5 +1,5 @@
-import { zeroScores, type CitySurveyState } from '../shared/citySurveyState.ts';
-import { deriveCityLayout, layoutChanges, type CityView, type Decision } from '../shared/cityView.ts';
+import { zeroScores, type CitySurveyState, type ExhibitionState } from '../shared/citySurveyState.ts';
+import { deriveCityLayout, deriveExhibitionLayout, layoutChanges, type Decision, type ExhibitionCityView, type LegacyCityView, type ProposalRecord } from '../shared/cityView.ts';
 import type { AnswerEvent } from '../shared/protocol.ts';
 import type { QuestionSet } from '../shared/question.ts';
 import { applyEffects, scoreChange } from './scoreEngine.ts';
@@ -9,7 +9,7 @@ import { applyEffects, scoreChange } from './scoreEngine.ts';
  * Each decision's policy and city change comes from replaying the stored effects, so the history
  * explains exactly why every visible element exists. Text comes from the current question set.
  */
-export function buildCityView(state: CitySurveyState, events: AnswerEvent[], questions: QuestionSet): CityView {
+export function buildCityView(state: CitySurveyState, events: AnswerEvent[], questions: QuestionSet): LegacyCityView {
   let scores = zeroScores();
   const history = events.map((event): Decision => {
     const before = scores;
@@ -25,4 +25,14 @@ export function buildCityView(state: CitySurveyState, events: AnswerEvent[], que
     };
   });
   return { runId: state.runId, revision: state.revision, scores: state.scores, layout: deriveCityLayout(state.scores), history };
+}
+
+export function buildExhibitionCityView(state: ExhibitionState, proposals: ProposalRecord[]): ExhibitionCityView {
+  const recentProposals = proposals.slice(-64);
+  return {
+    version: 2, runId: state.runId, revision: state.revision, guestCount: state.guestCount, algorithmVersion: 2,
+    voteSums: state.voteSums, recentVotes: state.recentVotes, scores: state.scores,
+    layout: deriveExhibitionLayout(state.scores), recentProposals,
+    latestProposal: recentProposals.at(-1),
+  };
 }

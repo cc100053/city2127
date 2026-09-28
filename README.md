@@ -2,7 +2,7 @@
 
 AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/PROJECT.md) · [驗收與交接流程](docs/VALIDATION.md) · [展覽方向與 Plan 02 紀錄](docs/PLAN02.md)。
 
-**下一版規劃（2026-09-28，尚未實作）：** [共同城市 MVP 設計與 Agent 實作規劃](docs/EXHIBITION_MVP.md)包含四題、累積算法、四地點映射、資產範圍及分階段驗收。城市從開始已是2127年，低值／零值／高值都必須有未來感；低值不是退回現代或空地。以下每人一題等內容仍描述目前原型。
+**展覽 MVP 狀態（2026-09-28）：** [共同城市 MVP 設計與 Agent 實作規劃](docs/EXHIBITION_MVP.md)的 S1 server 規則、SQLite v2 run／proposal 儲存及四題 API 已實作。v2 每位觀眾提交四題；schema 3 migration 會結束 active v1 run 並開新 v2 run，保留舊歷史。root 與 module-swap 舊 viewer 清楚拒絕 v2，直至 S2+ 加入渲染；guest UI 要待 S4 才支援。城市從開始已是2127年，低／零／高值都必須有未來感。下方一題流程及畫面內容是 v1 歷史實作，不代表新的 guest flow。檢查與整合狀態見 [S1 handoff](docs/handoffs/exhibition-s1.md)。
 
 ## 協作入門
 
@@ -16,24 +16,26 @@ AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/P
 
 **由觀眾共同塑造一個富有未來感的澀谷。** 城市是展覽中的共同創作結果；視覺設計服務於未來感、澀谷辨識度，以及觀眾能否看懂自己的選擇如何改變城市。精緻模型或紀實照片質感不再是首要目標或完成門檻。
 
-每位 guest 回答一條題目並選擇 option → 城市承接之前的累積結果作出變化 → 該位 guest 體驗完結時即時看見畫面變化 → 下一位 guest 接續下一條題目。城市跨 guest 累積，不因換人自動回到初始狀態；全部題目完成後及每日展覽的重設規則待定。
+新版每位 guest 回答四條題目並一次提交 → server 將四軸投票累積至共同城市狀態 → 下一位 guest 繼續使用累積結果。S1 已完成 server-side transaction、replay、migration 和 view API；S2/S3 的城市渲染及 S4 的 guest UI 尚未完成。每日展覽重設規則仍待定。
 
-建築數量／密度、人流等是可能受選擇影響的參數，並非已定案的規則。下面嘅因果 MVP 已實作一套最小題目流程、跨 guest 累積同由政策推導嘅區畫變化；正式展覽題目、每日重設及輸入裝置仍待定。
+原有 v1 因果 MVP 每人一題、由答案推導區畫變化；展覽 v2 S1 已改為可重用的四題題組及四軸累積。v1歷史資料保留，新的 v2 城市畫面和 guest UI 尚待後續階段；每日重設及輸入裝置仍待定。
 
-**下一步方向（2026-09-24 決定）：** 展覽城市就係根目錄澀谷場景（`src/`）。先建立同擴充呢個場景——更多區域同城市物件、城市可以明顯變化、打磨外觀——同時為因果 MVP 加更多題目。之後先將 survey 接入根目錄場景；`module-swap/` 四區畫只係證明因果鏈，唔係目標城市。
+**下一步方向（2026-09-24 決定）：** 展覽城市就係根目錄澀谷場景（`src/`）。先建立同擴充呢個場景——更多區域同城市物件、城市可以明顯變化、打磨外觀——同時為因果 MVP 加更多題目。v1 survey 已接入 root；新版 v2 城市渲染仍待 S2/S3。`module-swap/` 四區畫只係證明因果鏈，唔係目標城市。
 
 ### 因果選擇 MVP（2026-09-24，`survey/` + `module-swap/`）
 
 第一個「選擇 → 政策 → 城市變化」垂直切片已實作，獨立於根目錄原型：`survey/` 伺服器按累積政策分數（自動化、公共共有、環境優先、都市集約）決定下一位 guest 嘅題目，並由答案歷史推導四個區畫嘅配置；`module-swap/` 以 `?survey` 模式即時顯示。示範流程：勞動力不足 → 自動化（NW 建築）→ 街道冷清 → 公共廣場（SW）→ 中心土地不足 → 向上發展（SE 高樓）。
 
 ```sh
-cd survey && npm ci && npm run build && npm run server        # http://127.0.0.1:8787/guest
-cd module-swap && npm run install:app && npm run dev          # 打開 Vite 網址加 ?survey
+cd survey && npm ci && npm run build && npm run server        # v2 API at http://127.0.0.1:8787
+cd module-swap && npm run install:app && npm run dev          # ?survey rejects v2 until viewer integration (S2+)
 ```
+
+The `/guest` page is retained as the legacy v1 UI, but its requests are rejected against the active v2 run; there is no selector for reopening a historical v1 run. The root and module-swap viewers still support standalone/demo and explicit v1 frames, but reject v2 until S2+. See the [S1 handoff](docs/handoffs/exhibition-s1.md) for current checks and limitations.
 
 設計同限制見 [PROJECT.md](docs/PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--module-swap)，驗證見 [VALIDATION.md](docs/VALIDATION.md)。
 
-**根目錄場景接 survey（2026-09-24）：** 根目錄 app 加 `?survey`（例如 `http://127.0.0.1:5173/?survey`，需先開 survey server）會由 survey 驅動澀谷場景：政策分數改變氣氛（交通、人流、綠化、窗燈等），區畫配置喺澀谷四個變化點升起建築——MAGNET 東面嘅自動化設施、車站東面嘅公園、道玄坂南面嘅公共廣場、センター街後面嘅高樓。左上嘅因果面板顯示最新題目、選擇、政策變化、城市變化（連地點）、最近三個決定同分數；preset 按鈕同 intro 文案喺呢個模式隱藏。詳見 [PROJECT.md](docs/PROJECT.md#root-scene-survey-mode--2026-09-24-srcsurvey)。
+**根目錄場景接 survey v1（2026-09-24，legacy）：** 根目錄 app 加 `?survey` 會由 v1 survey 驅動澀谷場景，並顯示選擇及城市變化。當前 parser 明確拒絕 v2，直到 S2/S3 完成 root v2 rendering；standalone root scene 不變。詳見 [PROJECT.md](docs/PROJECT.md#root-scene-survey-mode--2026-09-24-srcsurvey) 及 [S1 handoff](docs/handoffs/exhibition-s1.md)。
 
 ## 目前可執行原型
 

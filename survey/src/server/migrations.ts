@@ -93,6 +93,74 @@ export const migrations: (string | ((db: DatabaseSync) => void))[] = [
     db.prepare(`INSERT INTO city_snapshots (run_id, revision, answer_count, automation, public_sharing, environmental_priority,
       urban_concentration, updated_at) VALUES (?, 0, 0, 0, 0, 0, 0, ?)`).run(nextRunId, at);
   },
+  // 3: keep schema-2 answer history intact and start the proposal-based exhibition algorithm in a new run.
+  db => {
+    db.exec(`ALTER TABLE runs ADD COLUMN algorithm_version INTEGER NOT NULL DEFAULT 1 CHECK (algorithm_version IN (1, 2));
+      CREATE TABLE proposal_sessions (
+        id TEXT PRIMARY KEY,
+        run_id TEXT NOT NULL REFERENCES runs(id),
+        question_set_version INTEGER NOT NULL,
+        question_ids_json TEXT NOT NULL,
+        status TEXT NOT NULL CHECK (status IN ('reserved', 'submitted', 'expired')),
+        created_at TEXT NOT NULL,
+        expires_at TEXT NOT NULL,
+        submitted_at TEXT
+      );
+      CREATE INDEX proposal_sessions_run_status ON proposal_sessions(run_id, status);
+      CREATE TABLE proposal_events (
+        sequence INTEGER PRIMARY KEY AUTOINCREMENT,
+        id TEXT NOT NULL UNIQUE,
+        run_id TEXT NOT NULL REFERENCES runs(id),
+        guest_session_id TEXT NOT NULL UNIQUE REFERENCES proposal_sessions(id),
+        canonical_request_json TEXT NOT NULL,
+        question_set_version INTEGER NOT NULL,
+        algorithm_version INTEGER NOT NULL CHECK (algorithm_version = 2),
+        answers_json TEXT NOT NULL,
+        votes_json TEXT NOT NULL,
+        revision_before INTEGER NOT NULL CHECK (revision_before >= 0),
+        revision_after INTEGER NOT NULL CHECK (revision_after = revision_before + 1),
+        before_state_json TEXT NOT NULL,
+        after_state_json TEXT NOT NULL,
+        submitted_at TEXT NOT NULL
+      );
+      CREATE INDEX proposal_events_run ON proposal_events(run_id, sequence);
+      CREATE TRIGGER proposal_events_no_update BEFORE UPDATE ON proposal_events
+        BEGIN SELECT RAISE(ABORT, 'proposal_events is append-only'); END;
+      CREATE TRIGGER proposal_events_no_delete BEFORE DELETE ON proposal_events
+        BEGIN SELECT RAISE(ABORT, 'proposal_events is append-only'); END;
+      CREATE TABLE exhibition_snapshots (
+        run_id TEXT PRIMARY KEY REFERENCES runs(id),
+        revision INTEGER NOT NULL CHECK (revision >= 0),
+        guest_count INTEGER NOT NULL CHECK (guest_count = revision),
+        algorithm_version INTEGER NOT NULL CHECK (algorithm_version = 2),
+        vote_sum_automation REAL NOT NULL,
+        vote_sum_public_sharing REAL NOT NULL,
+        vote_sum_environmental_priority REAL NOT NULL,
+        vote_sum_urban_concentration REAL NOT NULL,
+        recent_automation REAL NOT NULL CHECK (recent_automation BETWEEN -1 AND 1),
+        recent_public_sharing REAL NOT NULL CHECK (recent_public_sharing BETWEEN -1 AND 1),
+        recent_environmental_priority REAL NOT NULL CHECK (recent_environmental_priority BETWEEN -1 AND 1),
+        recent_urban_concentration REAL NOT NULL CHECK (recent_urban_concentration BETWEEN -1 AND 1),
+        automation REAL NOT NULL CHECK (automation BETWEEN -12 AND 12),
+        public_sharing REAL NOT NULL CHECK (public_sharing BETWEEN -12 AND 12),
+        environmental_priority REAL NOT NULL CHECK (environmental_priority BETWEEN -12 AND 12),
+        urban_concentration REAL NOT NULL CHECK (urban_concentration BETWEEN -12 AND 12),
+        updated_at TEXT NOT NULL
+      );`);
+    const active = db.prepare(`SELECT id FROM runs WHERE status = 'active'`).get();
+    if (!active) return;
+    const at = new Date().toISOString(), nextRunId = randomUUID();
+    db.prepare(`UPDATE runs SET status = 'ended', ended_at = ? WHERE id = ?`).run(at, active.id);
+    db.prepare(`UPDATE guest_sessions SET status = 'expired' WHERE run_id = ? AND status = 'reserved'`).run(active.id);
+    db.prepare(`INSERT INTO admin_events (type, run_id, detail_json, created_at) VALUES ('run-reset', ?, ?, ?)`)
+      .run(active.id, JSON.stringify({ nextRunId, reason: 'schema 3: proposal algorithm' }), at);
+    db.prepare(`INSERT INTO runs (id, status, started_at, algorithm_version) VALUES (?, 'active', ?, 2)`).run(nextRunId, at);
+    db.prepare(`INSERT INTO exhibition_snapshots (run_id, revision, guest_count, algorithm_version,
+      vote_sum_automation, vote_sum_public_sharing, vote_sum_environmental_priority, vote_sum_urban_concentration,
+      recent_automation, recent_public_sharing, recent_environmental_priority, recent_urban_concentration,
+      automation, public_sharing, environmental_priority, urban_concentration, updated_at)
+      VALUES (?, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ?)`).run(nextRunId, at);
+  },
 ];
 
 export const SCHEMA_VERSION = migrations.length;

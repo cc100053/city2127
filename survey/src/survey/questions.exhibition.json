@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "questions": [
+    {
+      "id": "service-2127",
+      "text": "2127年の渋谷。サービスを支える人が限られる中、毎日の買い物や相談をどう支えてほしい？",
+      "options": [
+        { "id": "human-led", "label": "待ち時間があっても、人が主役。技術は接客を支える", "effects": { "automation": -1 } },
+        { "id": "human-machine", "label": "普段は自動、困ったときは人に相談", "effects": { "automation": 0 } },
+        { "id": "autonomous", "label": "相談の機会より、いつでも使える自動サービス", "effects": { "automation": 1 } }
+      ]
+    },
+    {
+      "id": "commons-2127",
+      "text": "渋谷で1時間の空き時間。限られた広場を、どんな場所にしたい？",
+      "options": [
+        { "id": "private-pods", "label": "一人や小グループで予約できる、静かな空間", "effects": { "publicSharing": -1 } },
+        { "id": "mixed-seating", "label": "静かな席と、自由に集まれる場所を半分ずつ", "effects": { "publicSharing": 0 } },
+        { "id": "open-commons", "label": "予約なしで、誰でも一緒に使える場所", "effects": { "publicSharing": 1 } }
+      ]
+    },
+    {
+      "id": "cooling-2127",
+      "text": "2127年の厳しい夏。同じ予算を、駅前のどんな暑さ対策に使いますか？",
+      "options": [
+        { "id": "active-cooling", "label": "木陰より、日差しを調整する屋根と冷却設備", "effects": { "environmentalPriority": -1 } },
+        { "id": "hybrid-cooling", "label": "冷却設備と、木陰・植栽を半分ずつ", "effects": { "environmentalPriority": 0 } },
+        { "id": "canopy-cooling", "label": "設備より、木陰と植栽のある地面", "effects": { "environmentalPriority": 1 } }
+      ]
+    },
+    {
+      "id": "functions-2127",
+      "text": "新しい店や生活サービスを増やすなら、どんな渋谷で暮らしたい？",
+      "options": [
+        { "id": "distributed-pavilions", "label": "少し歩いても、低層の機能ポッドに分かれた街", "effects": { "urbanConcentration": -1 } },
+        { "id": "mixed-functions", "label": "低い建物と高い建物が混ざった街", "effects": { "urbanConcentration": 0 } },
+        { "id": "vertical-functions", "label": "上へ移動すれば、一つの建物で用事が済む街", "effects": { "urbanConcentration": 1 } }
+      ]
+    }
+  ]
+}

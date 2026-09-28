@@ -13,7 +13,8 @@ function arrive(step: number) {
   if (Atomics.add(counters, step, 1) + 1 === workers) Atomics.notify(counters, step);
   while (Atomics.load(counters, step) < workers) Atomics.wait(counters, step, Atomics.load(counters, step), 50);
 }
-const ctx = { db: openDatabase(dbPath), questions: loadQuestionSetFile(questionsPath), now: () => new Date(), newId: randomUUID, reservationMs: 120_000 };
+const questions = loadQuestionSetFile(questionsPath);
+const ctx = { db: openDatabase(dbPath), questions, legacyQuestions: questions, now: () => new Date(), newId: randomUUID, reservationMs: 120_000 };
 arrive(0);
 const session = createGuestSession(ctx);
 arrive(1);

@@ -2,13 +2,21 @@
 
 Exhibition priorities and historical Plan 02 implementation status: [方向與紀錄](PLAN02.md). Art rules for the root scene: [ART.md](ART.md), in use since 2026-09-24. Status and remaining art work: [art-direction handoff](handoffs/art-direction.md#remaining-work).
 
-## Next exhibition specification — 2026-09-28 (planned)
+## Exhibition specification and S1 status — 2026-09-28
 
-The user confirmed that the starting city is already **2127**: every low, zero and high Meter state must retain a mature future identity. Low values describe different future services and spaces, never technological regression or an undeveloped city. [EXHIBITION_MVP.md](EXHIBITION_MVP.md) records the detailed four-question flow, history/recent accumulation, populated neutral sites, futuristic negative variants, versioned migration, implementation stages and acceptance criteria. These are next-version targets, **not implemented behavior**; this documentation task does not alter the one-question runtime, score engine, empty-lot baseline or assets described below. This file remains the current implementation map. The earlier “connect survey afterwards” decision is historical; the root integration described later in this file is already implemented.
+The user confirmed that the starting city is already **2127**: every low, zero and high Meter state must retain a mature future identity. Low values describe different future services and spaces, never technological regression or an undeveloped city. [EXHIBITION_MVP.md](EXHIBITION_MVP.md) defines the four-question flow, history/recent accumulation, populated neutral sites, futuristic negative variants, versioned migration and later viewer/UI stages. S1 server rules, persistence and proposal APIs are implemented; the former one-question runtime remains as legacy v1 behavior/history. The S1 handoff records exact verification and integration status. This file remains the implementation map. The earlier “connect survey afterwards” decision is historical; the existing root integration supports v1 and explicitly rejects v2 until S2+.
 
-## Current product direction — 2026-09-18
+### S1 server contract (branch status)
 
-The goal is an exhibition in which guests collectively shape a futuristic Shibuya. Future identity, Shibuya recognition and visible consequences of choices take priority over producing an exceptionally beautiful model. Documentary-photograph realism is no longer a completion criterion.
+`survey/src/shared/citySurveyState.ts`, `survey/src/survey/scoreEngine.ts` and `survey/src/shared/cityView.ts` define the v2 state, four-axis reducer and server-derived layout. Each complete proposal updates all four axes once; the history average and recent vote signal are combined and clamped to −12…+12. The reusable four-question set is `survey/src/survey/questions.exhibition.json`, validated as exactly four questions × three options, one question per axis and one option for each vote −1/0/+1.
+
+The v2 HTTP contract is exposed by `survey/src/server/server.ts`: `POST /api/proposal-sessions`, `GET /api/proposal-sessions/:id`, `POST /api/proposals`, and `GET /api/city-view`; existing health, admin and WebSocket paths remain. A proposal carries `submissionId`, `guestSessionId`, `expectedRevision`, and four `{questionId, optionId}` answers. The server records proposal events and a floating-point snapshot atomically, supports idempotent retries, and checks startup replay against the snapshot. Schema 3 ends an active v1 run and starts a zeroed v2 run; it preserves prior v1 runs/events rather than translating their scores.
+
+The v2 CityView has explicit `version: 2` and includes the run/revision, guest count, scores, layout and bounded recent proposals. Current root and module-swap clients intentionally reject that version with “Unsupported exhibition view version” before applying scene state. The old guest page and viewers remain v1; they do not support the active v2 run. S2/S3 must add the root v2 rendering path and S4 the guest UI. Legacy v1 standalone/demo behavior remains available. These viewer/parser and API details are covered by the [S1 handoff](handoffs/exhibition-s1.md), not by a claim that the exhibition experience is complete.
+
+## Earlier product direction — 2026-09-18 (one-question v1)
+
+The goal is an exhibition in which guests collectively shape a futuristic Shibuya. Future identity, Shibuya recognition and visible consequences of choices take priority over producing an exceptionally beautiful model. Documentary-photograph realism is no longer a completion criterion. The one-question sequence below describes the earlier v1 flow; the S1 v2 server accepts a complete four-question proposal per guest.
 
 Confirmed experience flow (a minimal version is implemented by the causal MVP below):
 
@@ -21,11 +29,11 @@ Building count/density and pedestrian activity are candidate dimensions, not a c
 
 The single Shibuya setting and desktop scope remain. Plan 02 and [Pic 2](../asset/pic2.png) provide reusable visual references; the root prototype's automatic day cycle, unchanging buildings and three-minute day are implementation facts, not constraints on the exhibition design. The question sequence, cumulative choices and choice-driven lots live in the causal MVP (next section), outside the root prototype; the root `src/` presets and `WorldState` are unchanged by it.
 
-**Next direction (user decision, 2026-09-24):** the exhibition city is the root Shibuya scene (`src/`). Build and extend that scene first — more areas and city objects, visibly changeable city, polished look — and add more questions to the causal MVP. Connecting the survey to the root scene comes after; module-swap's four-lot viewer proves the causal chain but is not the target city. Visual polish is in scope, but it serves readable change rather than replacing it.
+**Next direction (user decision, 2026-09-24; root v1 hookup completed):** the exhibition city is the root Shibuya scene (`src/`). Build and extend that scene first — more areas and city objects, visibly changeable city, polished look — and add more questions to the causal MVP. The existing root hookup is v1 only; S2/S3 must map v2 layouts to that scene. `module-swap/` four-lot viewer remains a causal-chain test, not the target city. Visual polish is in scope, but it serves readable change rather than replacing it.
 
 ## Causal choice → city MVP — 2026-09-24 (`survey/` + `module-swap/`)
 
-Implemented on `feat/causal-city-mvp` and integrated into `main` at `6f6fbb2` (2026-09-24); handoff [causal-city-mvp](handoffs/causal-city-mvp.md). It proves one short causal history, not the exhibition question catalogue.
+Implemented on `feat/causal-city-mvp` and integrated into `main` at `6f6fbb2` (2026-09-24); handoff [causal-city-mvp](handoffs/causal-city-mvp.md). This section documents the preserved one-question v1 behavior and historical data model; the active v2 server is documented above.
 
 Dependency direction (never reversed; Three.js cannot change policy or question eligibility):
 
@@ -55,6 +63,8 @@ Exact demo: guest 1 `labour-shortage` → `automate-services` (automation +2, NW
 Known limits: root CI runs `survey/` and `module-swap/` tests/builds since 2026-09-24, but not module-swap's browser smoke test; sequential guests are assumed — while a question is reserved, a parallel guest is given the next eligible (often fallback) question from the current scores; question text shown in history comes from the current question JSON; slot meanings reuse generic `building-basic-*` GLBs explained by labels; module-swap is a separate Vite app, not the root Shibuya scene.
 
 ## Root scene survey mode — 2026-09-24 (`src/?survey`)
+
+This section records the legacy v1 viewer. Its parser rejects v2 with an explicit unsupported-version status before applying scene state; v2 rendering is still S2/S3 work.
 
 User decisions 2026-09-24: connect the survey to the root Shibuya scene in three steps — atmosphere, Shibuya change points, causal panel (all implemented). Handoffs [root-survey-atmosphere](handoffs/root-survey-atmosphere.md) (steps 1–2) and [root-causal-panel](handoffs/root-causal-panel.md) (step 3).
 

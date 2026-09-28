@@ -1,11 +1,11 @@
 import type { AnswerData, AnswerEvent, AnswerRequest } from '../shared/protocol.ts';
-import type { CitySurveyState } from '../shared/citySurveyState.ts';
+import type { CitySurveyState, ExhibitionState } from '../shared/citySurveyState.ts';
 import type { CityView } from '../shared/cityView.ts';
 import { applyEffects, scoreChange } from '../survey/scoreEngine.ts';
-import { buildCityView } from '../survey/decisionHistory.ts';
+import { buildCityView, buildExhibitionCityView } from '../survey/decisionHistory.ts';
 import { transaction } from './database.ts';
 import { fail, type ServiceOutcome, type SurveyContext } from './context.ts';
-import { runAnswerEvents, toAnswerEvent, writeSnapshot } from './runStore.ts';
+import { activeRun, CorruptStateError, readExhibitionSnapshot, runAnswerEvents, runProposalRecords, toAnswerEvent, writeSnapshot } from './runStore.ts';
 import { findGuestSession, requireActiveRun, settleExpiry } from './sessionService.ts';
 
 const MAX_ID_LENGTH = 128;
@@ -46,11 +46,11 @@ export function submitAnswer(ctx: SurveyContext, body: unknown): ServiceOutcome<
     if (session.status === 'answered') return { response: fail('already_answered', 'This guest session has already answered.', state) };
     if (session.status === 'expired') return { response: fail('session_expired', 'This guest session has expired.', state) };
 
-    const question = ctx.questions.questions.find(q => q.id === request.questionId);
+    const question = ctx.legacyQuestions.questions.find(q => q.id === request.questionId);
     if (!question) return { response: fail('unknown_question', 'Unknown question ID.') };
     const option = question.options.find(o => o.id === request.optionId);
     if (!option) {
-      const elsewhere = ctx.questions.questions.some(q => q.options.some(o => o.id === request.optionId));
+      const elsewhere = ctx.legacyQuestions.questions.some(q => q.options.some(o => o.id === request.optionId));
       return { response: elsewhere
         ? fail('option_question_mismatch', 'That option belongs to a different question.')
         : fail('unknown_option', 'Unknown option ID.') };
@@ -69,7 +69,7 @@ export function submitAnswer(ctx: SurveyContext, body: unknown): ServiceOutcome<
     };
     ctx.db.prepare(`INSERT INTO answer_events (id, run_id, guest_session_id, question_id, option_id, question_version,
         effects_json, revision_before, revision_after, answered_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-      .run(request.answerId, run.id, session.id, question.id, option.id, ctx.questions.version,
+      .run(request.answerId, run.id, session.id, question.id, option.id, ctx.legacyQuestions.version,
         JSON.stringify(effects), state.revision, next.revision, answeredAt);
     ctx.db.prepare(`UPDATE guest_sessions SET status = 'answered', answered_at = ? WHERE id = ?`).run(answeredAt, session.id);
     writeSnapshot(ctx.db, next);
@@ -85,9 +85,21 @@ export function submitAnswer(ctx: SurveyContext, body: unknown): ServiceOutcome<
   });
 }
 
-export const currentState = (ctx: SurveyContext): CitySurveyState => requireActiveRun(ctx).state;
+export function currentState(ctx: SurveyContext): CitySurveyState | ExhibitionState {
+  const run = activeRun(ctx.db);
+  if (!run) throw new CorruptStateError('no active run');
+  if (run.algorithmVersion === 2) {
+    const state = readExhibitionSnapshot(ctx.db, run.id);
+    if (!state) throw new CorruptStateError(`active exhibition run ${run.id} has no snapshot`);
+    return state;
+  }
+  return requireActiveRun(ctx).state;
+}
 
-/** The viewer contract for a state of the active run: derived layout plus the run's decision history. */
-export const viewOf = (ctx: SurveyContext, state: CitySurveyState): CityView =>
-  buildCityView(state, runAnswerEvents(ctx.db, state.runId), ctx.questions);
+/** The active viewer contract, selected by the run's persisted algorithm version. */
+export function viewOf(ctx: SurveyContext, state: CitySurveyState | ExhibitionState): CityView {
+  if ('algorithmVersion' in state)
+    return buildExhibitionCityView(state, runProposalRecords(ctx.db, state.runId, 64));
+  return buildCityView(state, runAnswerEvents(ctx.db, state.runId), ctx.legacyQuestions);
+}
 export const currentView = (ctx: SurveyContext): CityView => viewOf(ctx, currentState(ctx));
