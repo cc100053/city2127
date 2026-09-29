@@ -40,21 +40,14 @@ export const policyText = (d: Decision) =>
 export const cityText = (d: Decision) =>
   d.cityChanges.map(c => `${changeSites[c.socketId as keyof typeof changeSites]?.place ?? c.socketId.toUpperCase()} ${c.label}`).join('　') || '見た目の変化なし';
 
-export function exhibitionFeedback(proposal?: ExhibitionProposal) {
-  if (!proposal) return null;
-  const before = proposal.beforeLayout, after = proposal.afterLayout;
-  const q3 = proposal.answers.find(answer => answer.questionId === 'cooling-2127');
-  if (!q3) return null;
-  const changed = before.treeCount !== after.treeCount || before.coolingFins !== after.coolingFins
-    || before.plantedFraction !== after.plantedFraction;
-  const percent = (value: number) => `${(value * 100).toFixed(1)}%`;
-  return {
-    ordinal: proposal.ordinal,
-    reason: q3.optionLabel,
-    effect: `樹冠 ${before.treeCount} → ${after.treeCount} · 冷却設備 ${before.coolingFins} → ${after.coolingFins} · 植栽面 ${percent(before.plantedFraction)} → ${percent(after.plantedFraction)}`,
-    changed,
-    note: changed ? `提案 #${proposal.ordinal} を記録しました。` : `駅東の暑さ対策は維持されました。提案 #${proposal.ordinal} を記録しました。`,
-  };
+export function exhibitionCityChangesText(proposal?: {
+  readonly cityChanges: readonly Pick<ExhibitionProposal['cityChanges'][number], 'socketId' | 'label'>[];
+}) {
+  if (!proposal?.cityChanges.length) return 'この提案による都市構成の変更はありません。';
+  return proposal.cityChanges.map(change => {
+    const place = changeSites[change.socketId]?.place ?? change.socketId.toUpperCase();
+    return `${place} ${change.label}`;
+  }).join('　');
 }
 
 export const exhibitionScoresText = (scores: ExhibitionView['scores']) =>
@@ -84,14 +77,16 @@ export function startSurveyAtmosphere(
     apply(kind, view);
     if (isExhibitionView(view)) {
       pending.hidden = false;
-      pending.textContent = 'サービス・共有空間・機能配置の表示は準備中です。Meterは4軸を表示します。';
-      const feedback = exhibitionFeedback(view.latestProposal);
-      latest.replaceChildren(...(feedback
-        ? [el('p', 'causal-context', `提案 #${feedback.ordinal} · Q3 暑さ対策`), row('選択理由', feedback.reason), row('駅東の変化', feedback.effect), row(feedback.changed ? '記録' : '維持', feedback.note)]
-        : [el('p', 'causal-context', '提案を待っています。駅東の暑さ対策は現在の構成を維持します。')]));
+      pending.textContent = '四つのサイトはサーバーの最新レイアウトを反映しています。Meterは4軸を表示します。';
+      const proposal = view.latestProposal;
+      const changes = exhibitionCityChangesText(proposal);
+      const changed = Boolean(proposal?.cityChanges.length);
+      latest.replaceChildren(...(proposal
+        ? [el('p', 'causal-context', '最新の提案'), row('提案', `#${proposal.ordinal}`), row('都市の変化', changes), row(changed ? '記録' : '維持', changed ? `提案 #${proposal.ordinal} を記録しました。` : `提案 #${proposal.ordinal} による都市構成の変更はありません。`)]
+        : [el('p', 'causal-context', '提案を待っています。'), row('提案', '—'), row('都市の変化', '現在の都市構成を表示しています。'), row('状態', '新しい提案を待っています。')]));
       const shown = view.recentProposals.slice(-HISTORY_SHOWN);
       history.setAttribute('start', String(view.guestCount - shown.length + 1));
-      history.replaceChildren(...shown.map(proposal => el('li', '', `#${proposal.ordinal} Q3 ${proposal.answers.find(answer => answer.questionId === 'cooling-2127')!.optionLabel}`)));
+      history.replaceChildren(...shown.map(proposal => el('li', '', `#${proposal.ordinal} ${exhibitionCityChangesText(proposal)}`)));
       scores.textContent = exhibitionScoresText(view.scores);
     } else {
       pending.hidden = true;

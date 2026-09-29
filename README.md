@@ -2,7 +2,7 @@
 
 AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/PROJECT.md) · [驗收與交接流程](docs/VALIDATION.md) · [展覽方向與 Plan 02 紀錄](docs/PLAN02.md)。
 
-**展覽 MVP 狀態（2026-09-29）：** [共同城市 MVP 設計與 Agent 實作規劃](docs/EXHIBITION_MVP.md)的 S1 四題 API、SQLite v2 run／proposal 儲存已實作。S2 Q3→NE Park 切片已整合及通過 feature/main CI；其他三個 site 固定顯示成熟混合基底，映射待 S3；四題 guest UI 待 S4。城市從開始已是2127年，低／零／高值都必須有未來感。下方一題流程及畫面內容是 v1 歷史實作，不代表新的 guest flow。S1 與 S2 狀態分別見 [S1 handoff](docs/handoffs/exhibition-s1.md) 和 [S2 handoff](docs/handoffs/exhibition-s2.md)，完整驗證見[驗證紀錄](docs/VALIDATION.md)。
+**展覽 MVP 狀態（2026-09-29）：** [共同城市 MVP 設計與 Agent 實作規劃](docs/EXHIBITION_MVP.md)的 S1 四題 API、SQLite v2 run／proposal 儲存已實作。S2 Q3→NE Park 切片已整合及通過 feature/main CI；S3 其餘三個 root site 映射已實作，root `npm test`、`npm run build` 和 `git diff --check` 通過；browser review 和 feature CI 待完成，因此 S3 尚未 shipped。S4 guest UI 在遠端分支有部分實作，但尚未整合或驗證。城市從開始已是2127年，低／零／高值都必須有未來感。下方一題流程及畫面內容是 v1 歷史實作，不代表新的 guest flow。S1、S2、S3 狀態分別見 [S1 handoff](docs/handoffs/exhibition-s1.md)、[S2 handoff](docs/handoffs/exhibition-s2.md) 和 [S3 handoff](docs/handoffs/exhibition-s3.md)，完整驗證見[驗證紀錄](docs/VALIDATION.md)。
 
 ## 協作入門
 
@@ -16,11 +16,11 @@ AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/P
 
 **由觀眾共同塑造一個富有未來感的澀谷。** 城市是展覽中的共同創作結果；視覺設計服務於未來感、澀谷辨識度，以及觀眾能否看懂自己的選擇如何改變城市。精緻模型或紀實照片質感不再是首要目標或完成門檻。
 
-新版每位 guest 回答四條題目並一次提交 → server 將四軸投票累積至共同城市狀態 → 下一位 guest 繼續使用累積結果。S1 已完成 server-side transaction、replay、migration 和 view API；root Q3 公園切片已於 S2 完成及驗證。S3 其餘三site映射及 S4 guest UI 尚未完成；每日展覽重設規則仍待定。S2 檢查結果見 [handoff](docs/handoffs/exhibition-s2.md)。
+新版每位 guest 回答四條題目並一次提交 → server 將四軸投票累積至共同城市狀態 → 下一位 guest 繼續使用累積結果。S1 已完成 server-side transaction、replay、migration 和 view API；root 四site映射已實作，S3 root checks 通過，browser review 和 feature CI 尚待完成；S4 guest UI 遠端分支有部分實作但尚未整合及驗收；每日展覽重設規則仍待定。S2 和 S3 狀態分別見 [S2 handoff](docs/handoffs/exhibition-s2.md) 及 [S3 handoff](docs/handoffs/exhibition-s3.md)。
 
-原有 v1 因果 MVP 每人一題、由答案推導區畫變化；展覽 v2 S1 已改為可重用的四題題組及四軸累積。root 保留 v1／standalone；v2 目前只有 Q3 公園映射，四題 guest UI 尚待 S4；每日重設及輸入裝置仍待定。
+原有 v1 因果 MVP 每人一題、由答案推導區畫變化；展覽 v2 S1 已改為可重用的四題題組及四軸累積。S2 整合時 root v2 先提供 Q3 公園映射；S3 已加入其他三site，root checks 通過，browser review 和 feature CI 尚待完成。root 保留 v1／standalone；S4 guest UI 遠端分支有部分實作但尚未整合及驗收；每日重設及輸入裝置仍待定。
 
-**下一步方向（2026-09-24 決定）：** 展覽城市就係根目錄澀谷場景（`src/`）。先建立同擴充呢個場景——更多區域同城市物件、城市可以明顯變化、打磨外觀——同時為因果 MVP 加更多題目。v1 survey 已接入 root；2026-09-29 root v2 Q3 公園切片已接上，其他三個 site 映射留待 S3。`module-swap/` 四區畫只係證明因果鏈，唔係目標城市。
+**下一步方向（2026-09-24 決定）：** 展覽城市就係根目錄澀谷場景（`src/`）。先建立同擴充呢個場景——更多區域同城市物件、城市可以明顯變化、打磨外觀——同時為因果 MVP 加更多題目。v1 survey 已接入 root；2026-09-29 root v2 Q3 公園切片及 S3 其餘三site映射均已接上，S3 root checks 通過，browser review 和 feature CI 待完成。`module-swap/` 四區畫只係證明因果鏈，唔係目標城市。詳見 [S3 handoff](docs/handoffs/exhibition-s3.md)。
 
 ### 因果選擇 MVP（2026-09-24，`survey/` + `module-swap/`）
 
@@ -31,11 +31,11 @@ cd survey && npm ci && npm run build && npm run server        # v2 API at http:/
 cd module-swap && npm run install:app && npm run dev          # ?survey continues to reject v2; root supports the S2 Q3 slice
 ```
 
-The `/guest` page is retained as the legacy v1 UI, but its requests are rejected against the active v2 run; there is no selector for reopening a historical v1 run. Root `?survey` accepts validated v2 CityViews and changes the Park from server-authoritative Q3 parameters; module-swap still rejects v2. Both preserve standalone/demo and v1 behavior. The four-question guest UI remains S4 work. See the [S1 handoff](docs/handoffs/exhibition-s1.md) and [S2 handoff](docs/handoffs/exhibition-s2.md) for separate verification records.
+The `/guest` page is retained as the legacy v1 UI, but its requests are rejected against the active v2 run; there is no selector for reopening a historical v1 run. S2 integrated the root `?survey` parser and Q3 Park rendering from server parameters. S3 added the other three site mappings; root tests, build and diff check pass, while browser review and feature CI remain pending. Module-swap still rejects v2. Standalone/demo and v1 behavior remain supported. The four-question guest UI has a partial remote S4 branch that is not integrated or verified. See the [S1 handoff](docs/handoffs/exhibition-s1.md), [S2 handoff](docs/handoffs/exhibition-s2.md) and [S3 handoff](docs/handoffs/exhibition-s3.md) for separate verification records.
 
 設計同限制見 [PROJECT.md](docs/PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--module-swap)，驗證見 [VALIDATION.md](docs/VALIDATION.md)。
 
-**根目錄 v1 接線（2026-09-24，legacy）：** 根目錄 app 加 `?survey` 仍支援 v1 survey 驅動澀谷場景。root 另有已整合的 S2 v2 路徑：只套用 Q3 至車站東公園，不將四軸 Meter 轉成全城氣氛變化；公園 live 轉場 3 秒，snapshot/reset 立即還原且不發個人 pulse。其他三site固定為混合基底並標示映射準備中；v1 legacy 與 standalone 行為保留。詳見 [PROJECT.md](docs/PROJECT.md#root-scene-survey-mode--2026-09-24-srcsurvey)、[S1 handoff](docs/handoffs/exhibition-s1.md) 及 [S2 handoff](docs/handoffs/exhibition-s2.md)。
+**根目錄 survey 接線（2026-09-24，v1 legacy；2026-09-29 更新 v2）：** 根目錄 app 加 `?survey` 仍支援 v1 survey 驅動澀谷場景。root v2 直接套用四site server layout，不將四軸 Meter 轉成全城氣氛變化；S3 的 root tests、build 和 diff check 通過，browser review 及 feature CI 待完成。v1 legacy 與 standalone 行為保留。詳見 [PROJECT.md](docs/PROJECT.md#root-scene-survey-mode--2026-09-24-srcsurvey)、[S1 handoff](docs/handoffs/exhibition-s1.md)、[S2 handoff](docs/handoffs/exhibition-s2.md) 及 [S3 handoff](docs/handoffs/exhibition-s3.md)。
 
 ## 目前可執行原型
 

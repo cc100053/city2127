@@ -1,6 +1,6 @@
 import type * as T from 'three';
-import { CHANGE_CATALOG, SITE_IDS, environmentParkTarget, selectSiteVariants, variantLayers, type SiteId, type SiteLayerDefinition, type SiteLayerId, type SiteVariantId } from './changeCatalog.ts';
-import type { BuiltSiteMap, SiteLayerRuntime } from './siteBuilders/index.ts';
+import { CHANGE_CATALOG, SITE_IDS, environmentParkTarget, selectExhibitionSiteVariants, selectSiteVariants, variantLayers, type SiteId, type SiteLayerDefinition, type SiteLayerId, type SiteVariantId } from './changeCatalog.ts';
+import type { BuiltSite, BuiltSiteMap, SiteLayerRuntime } from './siteBuilders/index.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 import type { EnvironmentParkDiagnostics } from './siteBuilders/siteRuntime.ts';
 import type { SurveyView } from './surveyView.ts';
@@ -32,13 +32,16 @@ export interface SiteDiagnostic {
   readonly variant: SiteVariantId;
   readonly layers: Readonly<Partial<Record<SiteLayerId, SiteLayerDiagnostic>>>;
   readonly environmentPark?: EnvironmentParkDiagnostics;
+  readonly automationHub?: ReturnType<NonNullable<BuiltSite['automationHub']>['getDiagnostics']>;
+  readonly commonsPlaza?: ReturnType<NonNullable<BuiltSite['commonsPlaza']>['getDiagnostics']>;
+  readonly concentrationTower?: ReturnType<NonNullable<BuiltSite['concentrationTower']>['getDiagnostics']>;
 }
 
 export type CityChangeDiagnostics = Readonly<Record<SiteId, SiteDiagnostic>>;
 
 const EXHIBITION_BASE_VARIANTS: Record<SiteId, SiteVariantId> = {
-  magnetEast: 'exhibition-neutral', stationEastPark: 'exhibition-neutral',
-  dogenzakaSouth: 'exhibition-neutral', centerGaiRear: 'exhibition-neutral',
+  magnetEast: 'automation-mixed', stationEastPark: 'exhibition-neutral',
+  dogenzakaSouth: 'commons-mixed', centerGaiRear: 'tower-mixed',
 };
 
 const prefersReducedMotion = () => typeof globalThis.matchMedia === 'function'
@@ -88,21 +91,27 @@ export class CityChangeManager {
     this.transitionChangedSitesOnly(view, now, true);
   }
 
-  /** V2 values are authoritative; only the NE climate site is variable in S2. */
+  /** V2 bands and parameters are authoritative for all four sites. */
   applyExhibitionLayout(layout: ExhibitionLayout, kind: SurveyEventKind, now: number): void {
+    const automationHub = this.sites.magnetEast.automationHub;
+    const commonsPlaza = this.sites.dogenzakaSouth.commonsPlaza;
+    const concentrationTower = this.sites.centerGaiRear.concentrationTower;
+    const park = this.sites.stationEastPark.environmentPark;
+    if (!automationHub || !commonsPlaza || !concentrationTower || !park) {
+      throw new Error('Missing exhibition runtime for one or more change sites.');
+    }
     this.update(now);
     if (!this.exhibitionInitialized) this.restoreExhibitionBaseline(now);
-    const park = this.sites.stationEastPark.environmentPark;
-    if (!park) throw new Error('Missing environment-park runtime for exhibition layout.');
     const fresh = kind === 'city-state-updated' && !prefersReducedMotion();
-    const changed = park.setTarget(environmentParkTarget(layout), now, !fresh);
-    if (kind !== 'city-state-updated') {
-      for (const motion of this.motions.get('stationEastPark')!.values()) motion.fresh = -Infinity;
-    } else if (changed && fresh) {
-      for (const motion of this.motions.get('stationEastPark')!.values()) {
-        if (motion.to === 1) motion.fresh = now;
-      }
-    }
+    const immediate = !fresh;
+    this.transitionToVariants(selectExhibitionSiteVariants(layout), now, fresh, immediate);
+    const changed = [
+      ['magnetEast', automationHub.setTarget({ band: layout.bands.nw, automatedPorts: layout.automatedPorts }, now, immediate)],
+      ['dogenzakaSouth', commonsPlaza.setTarget({ band: layout.bands.sw, sharedSeats: layout.sharedSeats }, now, immediate)],
+      ['centerGaiRear', concentrationTower.setTarget({ band: layout.bands.se, functionModules: layout.functionModules }, now, immediate)],
+      ['stationEastPark', park.setTarget(environmentParkTarget(layout), now, immediate)],
+    ] as const;
+    for (const [siteId, siteChanged] of changed) if (siteChanged && fresh) this.markFresh(siteId, now);
   }
 
   getVariant(siteId: SiteId): SiteVariantId {
@@ -118,15 +127,19 @@ export class CityChangeManager {
         assetStatus: motion.layer.assetStatus,
         assetError: motion.layer.assetError,
       }])),
-      ...(this.sites[siteId].environmentPark
-        ? { environmentPark: this.sites[siteId].environmentPark.getDiagnostics() }
-        : {}),
+      ...(this.sites[siteId].environmentPark ? { environmentPark: this.sites[siteId].environmentPark.getDiagnostics() } : {}),
+      ...(this.sites[siteId].automationHub ? { automationHub: this.sites[siteId].automationHub.getDiagnostics() } : {}),
+      ...(this.sites[siteId].commonsPlaza ? { commonsPlaza: this.sites[siteId].commonsPlaza.getDiagnostics() } : {}),
+      ...(this.sites[siteId].concentrationTower ? { concentrationTower: this.sites[siteId].concentrationTower.getDiagnostics() } : {}),
     }])) as CityChangeDiagnostics;
   }
 
   update(now: number): void {
     this.lastUpdateNow = now;
     this.sites.stationEastPark.environmentPark?.update(now);
+    this.sites.magnetEast.automationHub?.update(now);
+    this.sites.dogenzakaSouth.commonsPlaza?.update(now);
+    this.sites.centerGaiRear.concentrationTower?.update(now);
     for (const siteId of SITE_IDS) {
       const motions = this.motions.get(siteId)!;
       for (const motion of motions.values()) {
@@ -152,12 +165,25 @@ export class CityChangeManager {
 
   private transitionChangedSitesOnly(view: SurveyView, now: number, fresh: boolean): void {
     this.update(now);
-    const desired = selectSiteVariants(view.layout);
+    this.transitionToVariants(selectSiteVariants(view.layout), now, fresh, false);
+  }
+
+  private transitionToVariants(desired: Record<SiteId, SiteVariantId>, now: number, fresh: boolean, immediate: boolean): void {
     for (const siteId of SITE_IDS) {
-      if (desired[siteId] === this.variants[siteId]) continue;
       const activeLayers = new Set(variantLayers(siteId, desired[siteId]));
       for (const [layerId, motion] of this.motions.get(siteId)!) {
         const to = activeLayers.has(layerId) ? 1 : 0;
+        if (immediate) {
+          if (to === 1 && motion.to !== 1) this.prepareAsset(motion, now);
+          motion.from = motion.to = to;
+          motion.start = now;
+          motion.fresh = -Infinity;
+          motion.retryAt = to ? motion.retryAt : Infinity;
+          motion.group.scale.y = to ? 1 : HIDDEN_SCALE;
+          motion.group.visible = to === 1;
+          this.sites[siteId].marker.material.emissiveIntensity = .2;
+          continue;
+        }
         if (motion.to === to) continue;
         if (to === 1) this.prepareAsset(motion, now);
         motion.from = motion.group.visible ? motion.group.scale.y : 0;
@@ -167,6 +193,10 @@ export class CityChangeManager {
       }
       this.variants[siteId] = desired[siteId];
     }
+  }
+
+  private markFresh(siteId: SiteId, now: number): void {
+    for (const motion of this.motions.get(siteId)!.values()) if (motion.to === 1) motion.fresh = now;
   }
 
   private restoreExhibitionBaseline(now: number): void {
@@ -190,7 +220,10 @@ export class CityChangeManager {
   private restoreLegacyMode(now: number): void {
     if (!this.exhibitionInitialized) return;
     this.sites.stationEastPark.environmentPark?.restoreLegacy();
-    for (const motion of this.motions.get('stationEastPark')!.values()) motion.fresh = -Infinity;
+    this.sites.magnetEast.automationHub?.restoreLegacy();
+    this.sites.dogenzakaSouth.commonsPlaza?.restoreLegacy();
+    this.sites.centerGaiRear.concentrationTower?.restoreLegacy();
+    for (const siteId of SITE_IDS) for (const motion of this.motions.get(siteId)!.values()) motion.fresh = -Infinity;
     this.exhibitionInitialized = false;
   }
 

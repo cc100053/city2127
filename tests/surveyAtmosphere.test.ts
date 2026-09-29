@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { cityText, exhibitionFeedback, exhibitionScoresText, policyText, scoresToWorldState } from '../src/surveyAtmosphere.ts';
+import { cityText, exhibitionCityChangesText, exhibitionScoresText, policyText, scoresToWorldState } from '../src/surveyAtmosphere.ts';
 import { presets } from '../src/presets.ts';
 import { connectSurvey, isExhibitionView, parseSurveyEvent, supersedes } from '../src/surveyView.ts';
 import { createWorldState } from '../src/worldState.ts';
@@ -81,29 +81,19 @@ assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2Vie
 const reorderedProposal = { ...v2Proposal, answers: [v2Proposal.answers[2], v2Proposal.answers[1], v2Proposal.answers[0], v2Proposal.answers[3]] };
 const reorderedV2 = parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, latestProposal: reorderedProposal, recentProposals: [reorderedProposal] } });
 if (!reorderedV2 || !('kind' in reorderedV2) || !isExhibitionView(reorderedV2.view)) throw new Error('expected reordered v2 answers to parse');
-assert.equal(exhibitionFeedback(reorderedV2.view.latestProposal)?.reason, '設備による暑さ対策を優先しました');
 const missingChangeProposal = { ...v2Proposal, cityChanges: [] };
 assert.equal(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, latestProposal: missingChangeProposal, recentProposals: [missingChangeProposal] } }), null);
-const feedback = exhibitionFeedback(parsedV2.view.latestProposal);
-assert.deepEqual(feedback, {
-  ordinal: 1, reason: '設備による暑さ対策を優先しました',
-  effect: '樹冠 8 → 5 · 冷却設備 3 → 5 · 植栽面 50.0% → 31.3%',
-  changed: true, note: '提案 #1 を記録しました。',
-});
 assert.ok(exhibitionScoresText(parsedV2.view.scores).includes('暑さへの備え -7.5'));
-
-const sameBandLayout = { ...v2AfterLayout, bands: { ...v2AfterLayout.bands, ne: 'high' }, treeCount: 9, plantedFraction: .6, coolingFins: 2 } as const;
-const sameBandAfter = { ...sameBandLayout, plantedFraction: .605 } as const;
-const sameBandFeedback = exhibitionFeedback({
-  ...v2Proposal, beforeScores: { ...zero, environmentalPriority: 4 }, afterScores: { ...zero, environmentalPriority: 4.2 },
-  beforeLayout: sameBandLayout, afterLayout: sameBandAfter,
-  cityChanges: [{ socketId: 'ne', label: '樹冠・冷却設備', before: { band: 'high', treeCount: 9, plantedFraction: .6, coolingFins: 2 }, after: { band: 'high', treeCount: 9, plantedFraction: .605, coolingFins: 2 } }],
-});
-assert.equal(sameBandFeedback?.changed, true);
-assert.equal(sameBandFeedback?.effect, '樹冠 9 → 9 · 冷却設備 2 → 2 · 植栽面 60.0% → 60.5%');
-const unchangedFeedback = exhibitionFeedback({ ...v2Proposal, beforeLayout: v2AfterLayout, cityChanges: [] });
-assert.equal(unchangedFeedback?.changed, false);
-assert.equal(unchangedFeedback?.note, '駅東の暑さ対策は維持されました。提案 #1 を記録しました。');
+const allSitesProposal = {
+  cityChanges: [
+    { socketId: 'nw', label: 'サービス配置' }, { socketId: 'sw', label: '共有席' },
+    { socketId: 'se', label: '機能配置' }, { socketId: 'ne', label: '樹冠と冷却設備' },
+  ] as const,
+};
+const allSitesSummary = exhibitionCityChangesText(allSitesProposal);
+for (const place of ['MAGNET東', '道玄坂南', 'センター街奥', '駅東']) assert.ok(allSitesSummary.includes(place));
+for (const label of ['サービス配置', '共有席', '機能配置', '樹冠と冷却設備']) assert.ok(allSitesSummary.includes(label));
+assert.equal(exhibitionCityChangesText({ ...v2Proposal, cityChanges: [] }), 'この提案による都市構成の変更はありません。');
 
 const webSocketDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'WebSocket');
 let messageListener: ((event: { data: string }) => void) | undefined;

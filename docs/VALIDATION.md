@@ -1,5 +1,11 @@
 # Validation and handoff
 
+## Exhibition S3 — remaining root site mappings — 2026-09-29
+
+**Status: IMPLEMENTED; local root checks passed; browser/CI verification pending.** The uncommitted branch work extends the root v2 mapping to NW automation, SW commons and SE concentration while retaining the S2 NE Park. The root causal panel summarizes proposal `cityChanges` and has explicit no-change copy. See the [S3 handoff](handoffs/exhibition-s3.md) for the exact base, scope and remaining gates.
+
+On 2026-09-29, the shared uncommitted S3 worktree passed root `npm test`, `npm run build` and `git diff --check`. Build completed with a chunk-size warning for a bundle over 500 kB. Desktop browser review and feature CI remain pending; no S3 browser captures or CI run are recorded. Do not treat S2 CI or screenshots as evidence for S3, and make no FPS or exhibition-hardware claim.
+
 ## Exhibition S2 — Q3 climate vertical slice — 2026-09-29
 
 **Status: SHIPPED.** Feature commit `2357f09526d17adbe1c52f4bb79c4fa025fe0d0d` passed [feature CI](https://github.com/cc100053/city2127/actions/runs/36516892136). It was merged with an identical tree as `3417760be33884c5d6a7697f0a8c1655a9ca4a10` and pushed to `origin/main`; integrated root `npm test`, `npm run build` and `git diff --check` passed. [Main CI](https://github.com/cc100053/city2127/actions/runs/36517115203) also passed. S2 covers only the Q3 NE Park slice; other site mappings remain S3, the guest UI remains S4, and full exhibition acceptance remains open. See the [S2 handoff](handoffs/exhibition-s2.md) for exact run IDs and the API/parser matrix.

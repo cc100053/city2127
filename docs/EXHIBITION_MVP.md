@@ -2,7 +2,7 @@
 
 - 文件建立日期：2026-09-28；文件 owner：Codex；狀態更新：2026-09-29。
 - 核對基準：`535a3c059302ac6c1059d84aef663b06510ac04c`，當時 `main` 與已 fetch 的 `origin/main` 相同。
-- 狀態：**規劃已完成；S1 已實作、整合並通過 package checks、feature CI 及 main CI。S2 Q3 Park 切片已整合並通過 feature/main CI；S3–S5 尚未完成。**
+- 狀態：**規劃已完成；S1 已實作、整合並通過 package checks、feature CI 及 main CI。S2 Q3 Park 切片已整合並通過 feature/main CI；S3 實作完成，root checks 已通過，browser review 和 feature CI 待完成；S4–S5 尚未完成。**
 - 使用者最新確認：**起始城市已是 2127 年；低值、零值、高值都必須有未來感。**
 - 本文件最初由規劃文件任務建立；2026-09-28 已明確指派 S1 實作。閱讀本文件不等於被指派一次實作全部階段；收到有界任務後，在授權範圍內完成，不另加逐階段批准要求。
 - 當前實作架構以 [PROJECT](PROJECT.md) 為準；本文件描述下一版本目標，不另立一份現況 architecture。
@@ -16,9 +16,15 @@ S1 已加入四題重用題組、v2 四軸 reducer、proposal sessions／transac
 
 ### 2026-09-29 S2 root Q3 現況
 
-root parser 現在接受 bounded v2 CityView，按明確版本分流，保留明確／versionless v1 並拒絕未知版本。v2 使用 server layout，不由客戶端重算 score-to-layout；Q3 只改車站東公園的 `treeCount`、`plantedFraction` 和 `coolingFins`。Live target 以 3 秒轉場；snapshot/run-reset 直接還原完整 2127 基底，不發 guest pulse，也不把 v2 scores 混入全城氣氛。其他三site維持固定 mixed 基底，畫面標示服務、共享空間及機能配置映射待 S3。四題 API 不變，正式 guest UI 待 S4。V1 survey 和 standalone 行為保留，Park 的種植面細節使用新版共用 builder。
+root parser 現在接受 bounded v2 CityView，按明確版本分流，保留明確／versionless v1 並拒絕未知版本。v2 使用 server layout，不由客戶端重算 score-to-layout；Q3 只改車站東公園的 `treeCount`、`plantedFraction` 和 `coolingFins`。Live target 以 3 秒轉場；snapshot/run-reset 直接還原完整 2127 基底，不發 guest pulse，也不把 v2 scores 混入全城氣氛。S2完成時，其他三site維持固定 mixed 基底，畫面標示服務、共享空間及機能配置映射待 S3。四題 API 不變，正式 guest UI 待 S4。V1 survey 和 standalone 行為保留，Park 的種植面細節使用新版共用 builder。
 
 實際12棵樹GLB與程序fallback已有NE ±5場地範圍測試。S2已完成並通過整合驗證，但此切片尚未代表展覽整體驗收完成；證據見 [handoff](handoffs/exhibition-s2.md) 及 [validation record](VALIDATION.md)。
+
+### 2026-09-29 S3 現況（已實作，本機 root checks 通過）
+
+S3 正在把 server-provided v2 mapping 接到 root 的其餘三個 site：NW automation 依 `bands.nw` 和 `automatedPorts`，SW commons 依 `bands.sw` 和 `sharedSeats`，SE concentration 依 `bands.se` 和 `functionModules`；NE Park 延續 S2 的 Q3 參數。客戶端使用收到的配置，不從 scores 另算形態。所有 low/mixed/high 都須維持成熟的 2127 未來城市。
+
+目前仍在未整合工作分支，尚未標記 shipped。Root `npm test`、`npm run build` 和 `git diff --check` 通過；browser review 和 feature CI 待完成。驗收範圍為四site總共12個配置，其中S3新增9個，並涵蓋同band數量更新、低值未來感、site／route clearance、真實 `cityChanges` feedback、live/snapshot/reset 及 v1相容。詳見 [S3 handoff](handoffs/exhibition-s3.md) 與 [validation record](VALIDATION.md)。
 
 ## 0. Agent 先讀：任務邊界與完成判定
 
@@ -259,7 +265,7 @@ function updateAxis(before: AxisMemory, vote: Vote, n: number) {
 ### 7.4 邊界、轉場與物件生命週期
 
 - 分數及UI數值由server決定，畫面在3秒內追到target；不把動畫中的數值當新權威狀態。
-- S2 實作範圍只有NE公園：Q3權威參數控制樹數、種植面積與冷卻鰭片；live更新3秒，snapshot/reset立即還原且不發guest pulse。此路徑不套用全城氣氛分數。其他三site固定mixed基底，完整參數映射留待S3。
+- S2 實作範圍只有NE公園：Q3權威參數控制樹數、種植面積與冷卻鰭片；live更新3秒，snapshot/reset立即還原且不發guest pulse。此路徑不套用全城氣氛分數。S2階段其他三site固定mixed基底；其餘映射已進入S3實作，驗證狀態見 [S3 handoff](handoffs/exhibition-s3.md)。
 - `tests/siteAssets.test.ts` 以實際未來樹GLB及程序fallback檢查12棵樹留在NE ±5場地範圍，並確認v1前五棵樹的transform還原。
 - 同形態變更數量必須更新；不要只比較variant ID。
 - 同一site換層重用已配置物件；共享資源不可被個別instance dispose。
@@ -413,14 +419,14 @@ type ProposalRecord = {
 
 ## 11. 可獨立交付的實作階段
 
-S1、S2 實作及整合已完成；S2 feature/main CI 通過。階段狀態及依賴如下。Owner由實際接任者在各task handoff填一名；不得假設文件owner自動獲派所有實作。階段依賴按順序，無需多agent。
+S1、S2 實作及整合已完成；S2 feature/main CI 通過。S3 實作已完成，root checks 通過，browser review 和 feature CI 待完成。階段狀態及依賴如下。Owner由實際接任者在各task handoff填一名；不得假設文件owner自動獲派所有實作。階段依賴按順序，無需多agent。
 
 | 階段 | 狀態／依賴 | 主要入口 | 交付與exit gate |
 | --- | --- | --- | --- |
 | S1 規則與儲存 | IMPLEMENTED and integrated; package checks and feature/main CI pass | survey shared／scoreEngine／migrations／runStore／sessionService／answerService／proposalService／decisionHistory；root/module-swap v2 rejection | 四題transaction、replay、version、重用題組及 viewer rejection 完成；驗證紀錄見 [S1 handoff](handoffs/exhibition-s1.md) |
 | S2 第一條可見鏈 | SHIPPED；整合及feature/main CI通過，依S1 | root surveyView／changeCatalog／manager／environmentPark；survey v2 mapping | 四題API不變；root bounded v2 parser及Q3→NE公園參數路徑已整合；live 3秒，snapshot/reset立即且無pulse，不改全城氣氛；其他三site為固定mixed基底並標示待S3。實際12棵樹GLB與fallback的NE範圍測試、browser evidence及checks見S2 handoff/validation |
-| S3 其餘三site | PLANNED，依S2 | automationHub／commonsPlaza／concentrationTower＋catalog/mapping | 完成12配置、同band counts、低值未來感、路線clearance；四軸端到端通過 |
-| S4 正式觀眾體驗 | PLANNED，依S3 | survey guest UI、root causal panel、style | 四題back/edit/submit、idle/result/next、紀錄、錯誤恢復、accessibility；無人格誤導 |
+| S3 其餘三site | IMPLEMENTED; local root checks pass; browser/CI pending，依S2 | automationHub／commonsPlaza／concentrationTower＋catalog/mapping | 驗證新增9個配置，並涵蓋四site總計12個配置、同band counts、低值未來感、路線clearance、真實 `cityChanges` feedback、四軸端到端及snapshot/reset；結果見 [S3 handoff](handoffs/exhibition-s3.md) |
+| S4 正式觀眾體驗 | PARTIAL on remote `codex/exhibition-s4` (`960d9b7`)，not integrated；驗證未完成，依S3 | survey guest UI、root causal panel、style | 完成並驗證四題back/edit/submit、idle/result/next、紀錄、錯誤恢復、accessibility；無人格誤導 |
 | S5 展覽驗收 | PLANNED，依S4 | tests／browser evidence／docs | 100份提案、60分鐘、實機效能、5人理解測試、每日操作交接 |
 
 S2不是建立另一套一題API或另一個score schema；重用S1四題session，以fixture／最小操作介面完成垂直切片，正式UI在S4精修。S2 handoff 記錄當前實際檢查、最高樹數邊界修正及剩餘驗收；不得把「實作在工作樹」寫成「已shipped」。
@@ -433,7 +439,7 @@ S2不是建立另一套一題API或另一個score schema；重用S1四題session
 
 ## 12. 驗收矩陣（尚未完整執行）
 
-S1、S2 各自完成的 package/CI 證據不代表 S3–S5 或整體展覽驗收完成。逐項 S1 證據見 [S1 驗證紀錄](VALIDATION.md#exhibition-s1-2026-09-28)，S2 證據見 [handoff](handoffs/exhibition-s2.md) 及 [驗證紀錄](VALIDATION.md)。
+S1、S2 各自完成的 package/CI 證據不代表 S3–S5 或整體展覽驗收完成。S3 root `npm test`、`npm run build` 和 `git diff --check` 已通過；browser review 及 feature CI 待完成。逐項 S1 證據見 [S1 驗證紀錄](VALIDATION.md#exhibition-s1-2026-09-28)，S2 證據見 [handoff](handoffs/exhibition-s2.md) 及 [驗證紀錄](VALIDATION.md)，S3 進度見 [S3 handoff](handoffs/exhibition-s3.md)。
 
 | ID | 檢查 | 通過條件／證據 |
 | --- | --- | --- |
