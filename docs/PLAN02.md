@@ -2,9 +2,9 @@
 
 ## 最新補充 — 2026-09-29：S2 root Q3 切片
 
-S1 的四題 server/API 保持不變。S2 工作樹已加入 root 的明確版本 v2 parser 和渲染路徑：只由 Q3 的 server-authoritative `treeCount`、`plantedFraction`、`coolingFins` 更新車站東公園；live 變更用 3 秒轉場，snapshot/run-reset 立即還原且不發 guest pulse。v2 不把 Meter 分數混入全城氣氛。其餘三site保持完整、固定的 mixed 基底，標示映射待 S3；四題 guest UI 仍待 S4。舊 root v1 與 standalone 路徑保留，公園種植面細節由共用 builder 更新。
+S1 的四題 server/API 保持不變。S2 已整合 root 的明確版本 v2 parser 和渲染路徑：只由 Q3 的 server-authoritative `treeCount`、`plantedFraction`、`coolingFins` 更新車站東公園；live 變更用 3 秒轉場，snapshot/run-reset 立即還原且不發 guest pulse。v2 不把 Meter 分數混入全城氣氛。其餘三site保持完整、固定的 mixed 基底，標示映射待 S3；四題 guest UI 仍待 S4。舊 root v1 與 standalone 路徑保留，公園種植面細節由共用 builder 更新。
 
-實際12棵樹GLB、程序fallback及v1還原已有NE邊界測試；Park slots、延遲GLB及bake batch的runtime細節見 [PROJECT implementation map](PROJECT.md)，當前驗證狀態見 [S2 handoff](handoffs/exhibition-s2.md)。
+實際12棵樹GLB、程序fallback及v1還原已有NE邊界測試。Feature CI、整合root checks及main CI均通過；commit和證據見 [S2 handoff](handoffs/exhibition-s2.md) 與 [validation record](VALIDATION.md)。Park slots、延遲GLB及bake batch的runtime細節見 [PROJECT implementation map](PROJECT.md)。
 
 ## 最新補充 — 2026-09-28：由開始已是2127
 
