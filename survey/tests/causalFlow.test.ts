@@ -3,11 +3,10 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { currentState, currentView, submitAnswer } from '../src/server/answerService.ts';
-import { resetRun } from '../src/server/adminService.ts';
 import { createGuestSession } from '../src/server/sessionService.ts';
 import { createContext } from '../src/server/server.ts';
 import type { SurveyContext } from '../src/server/context.ts';
-import { answerNext, errorCode, EXHIBITION_QUESTIONS_PATH, fixture, MVP_QUESTIONS_PATH, ok } from './surveyFixture.ts';
+import { answerNext, errorCode, EXHIBITION_QUESTIONS_PATH, fixture, MVP_QUESTIONS_PATH, ok, staff } from './surveyFixture.ts';
 
 const mvp = (dbPath = ':memory:') => fixture(dbPath, Date.parse('2026-09-24T10:00:00.000Z'), MVP_QUESTIONS_PATH).ctx;
 const slots = (ctx: SurveyContext) => Object.values(currentView(ctx).layout.lots).map(l => `${l.socketId}:${l.lot}/${l.building}`);
@@ -52,7 +51,7 @@ try {
   assert.deepEqual(currentView(restarted), view);
 
   // Reset: new run, empty history, baseline city; the old run's answers are kept.
-  ok(resetRun(restarted, { confirmation: 'RESET' }).response);
+  ok(staff(restarted, 'reset-city', 'RESET'));
   assert.deepEqual(slots(restarted), BASELINE);
   assert.equal(currentView(restarted).history.length, 0);
   assert.equal(Number(restarted.db.prepare('SELECT COUNT(*) AS n FROM answer_events WHERE run_id = ?').get(before.runId)?.n), 3);

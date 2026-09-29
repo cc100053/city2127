@@ -6,7 +6,8 @@ import { submitAnswer } from '../src/server/answerService.ts';
 import { createRun, createExhibitionRun } from '../src/server/runStore.ts';
 import { transaction } from '../src/server/database.ts';
 import { loadQuestionSetFile, validateExhibitionQuestionSet } from '../src/survey/questionLoader.ts';
-import type { AnswerData, ApiResponse, GuestQuestionData } from '../src/shared/protocol.ts';
+import { lifecycleCommand, readLifecycle } from '../src/server/adminService.ts';
+import type { AnswerData, ApiResponse, GuestQuestionData, LifecycleCommand, LifecycleData } from '../src/shared/protocol.ts';
 
 export const QUESTIONS_PATH = new URL('../src/survey/questions.test.json', import.meta.url).pathname;
 export const MVP_QUESTIONS_PATH = new URL('../src/survey/questions.mvp.json', import.meta.url).pathname;
@@ -54,6 +55,11 @@ export function ok<T>(response: ApiResponse<T>): T {
 export function errorCode<T>(response: ApiResponse<T>): string {
   if (response.ok) throw new Error('expected an error response');
   return response.error.code;
+}
+
+/** Issues a staff lifecycle command against the current lifecycle revision (as a fresh admin page would). */
+export function staff(ctx: SurveyContext, command: LifecycleCommand, confirmation?: string): ApiResponse<LifecycleData> {
+  return lifecycleCommand(ctx, { command, expectedRevision: readLifecycle(ctx.db).revision, confirmation }).response;
 }
 
 let answerCounter = 0;

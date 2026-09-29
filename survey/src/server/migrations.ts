@@ -161,6 +161,21 @@ export const migrations: (string | ((db: DatabaseSync) => void))[] = [
       automation, public_sharing, environmental_priority, urban_concentration, updated_at)
       VALUES (?, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ?)`).run(nextRunId, at);
   },
+  // 4: one-row installation lifecycle. Total guests are proposals after total_since_sequence, so a full
+  // data reset moves the watermark instead of deleting append-only history. Ready never holds a pending reset.
+  db => {
+    db.exec(`CREATE TABLE exhibition_lifecycle (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        revision INTEGER NOT NULL CHECK (revision >= 0),
+        phase TEXT NOT NULL CHECK (phase IN ('ready', 'in_experience', 'awaiting_exit')),
+        pending_reset TEXT NOT NULL CHECK (pending_reset IN ('none', 'city', 'full')),
+        total_since_sequence INTEGER NOT NULL CHECK (total_since_sequence >= 0),
+        updated_at TEXT NOT NULL,
+        CHECK (phase <> 'ready' OR pending_reset = 'none')
+      )`);
+    db.prepare(`INSERT INTO exhibition_lifecycle (id, revision, phase, pending_reset, total_since_sequence, updated_at)
+      VALUES (1, 0, 'ready', 'none', 0, ?)`).run(new Date().toISOString());
+  },
 ];
 
 export const SCHEMA_VERSION = migrations.length;

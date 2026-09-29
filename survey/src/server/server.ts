@@ -12,7 +12,7 @@ import { openDatabase } from './database.ts';
 import { restoreOrCreateRun } from './runStore.ts';
 import { createGuestSession, getGuestQuestion, RESERVATION_MS } from './sessionService.ts';
 import { currentState, currentView, submitAnswer, viewOf } from './answerService.ts';
-import { currentRun, isLoopbackAddress, recentEvents, resetRun } from './adminService.ts';
+import { currentRun, isLoopbackAddress, lifecycleCommand, recentEvents } from './adminService.ts';
 import { attachRealtime } from './realtime.ts';
 import { createProposalSession, getProposalSession, submitProposal } from './proposalService.ts';
 import { UnsupportedRunVersionError } from './runStore.ts';
@@ -23,6 +23,7 @@ const statusFor: Record<ErrorCode, number> = {
   no_question_available: 409, session_not_found: 404, session_expired: 410, already_answered: 409,
   unknown_question: 400, unknown_option: 400, option_question_mismatch: 400, question_not_assigned: 409,
   revision_conflict: 409, answer_conflict: 409, reset_confirmation_invalid: 400,
+  lifecycle_conflict: 409, lifecycle_blocked: 409,
 };
 
 const MAX_BODY = 16 * 1024;
@@ -131,11 +132,11 @@ export function createSurveyServer({ ctx, staticDir, remoteAddress = req => req.
       const limit = Math.min(200, Math.max(1, Number(url.searchParams.get('limit')) || 50));
       return sendJson(res, { ok: true, data: recentEvents(ctx, limit) });
     }
-    if (path === '/api/admin/reset' && method === 'POST') {
+    if (path === '/api/admin/lifecycle' && method === 'POST') {
       // Refuse cross-site posts from other pages open in the exhibition PC's browser.
       const origin = req.headers.origin;
       if (origin !== undefined && origin !== `http://${req.headers.host}`) throw new HttpError(403, 'forbidden', 'Cross-origin admin request refused.');
-      return publish(res, resetRun(ctx, await readJson(req)));
+      return publish(res, lifecycleCommand(ctx, await readJson(req)));
     }
     if (path.startsWith('/api/') || path === '/ws') throw new HttpError(404, 'not_found', 'Not found.');
     if (method !== 'GET' && method !== 'HEAD') throw new HttpError(405, 'bad_request', 'Method not allowed.');
