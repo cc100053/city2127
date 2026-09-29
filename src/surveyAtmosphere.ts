@@ -122,16 +122,23 @@ export function startSurveyAtmosphere(
       historyLegend.hidden = false;
       pending.hidden = false;
       pending.textContent = '四つのサイトはサーバーの最新レイアウトを反映しています。Meterは4軸を表示します。';
+      // The idle view must show the total and recent band without scrolling, so they precede the latest proposal.
+      panel.insertBefore(latest, scores);
       const feedback = exhibitionFeedback(view.latestProposal);
       latest.replaceChildren(...(feedback
         ? [
+          // City changes lead; answers are compact (question text on hover) so the panel fits 1280×720.
           el('p', 'causal-context', `提案 #${feedback.ordinal}`),
-          ...feedback.answers.map(answer => row(answer.questionText, answer.optionLabel)),
-          ...feedback.scores.map(score => row(score.label, `${score.before} → ${score.after}`)),
           ...(feedback.cityChanges.length
             ? feedback.cityChanges.map(change => row(`${change.place} · ${change.label}`, change.effect))
             : [row('街区構成', feedback.cityChanged ? '数値項目に変化はありません。' : 'サーバー記録上、変化はありません。')]),
           row(feedback.changed ? '記録' : '変化なし', feedback.note),
+          ...feedback.scores.map(score => row(score.label, `${score.before} → ${score.after}`)),
+          ...feedback.answers.map((answer, index) => {
+            const answerRow = row(`質問 ${index + 1}`, answer.optionLabel);
+            answerRow.title = answer.questionText;
+            return answerRow;
+          }),
         ]
         : [el('p', 'causal-context', 'まだ提案はありません。最初のゲストを待っています。')]));
       const shown = view.recentProposals;
@@ -159,6 +166,7 @@ export function startSurveyAtmosphere(
       history.removeAttribute('aria-label');
       pending.hidden = true;
       pending.textContent = '';
+      panel.insertBefore(latest, historyTitle);
       renderLegacyFeedback(view, latest, history, scores);
     }
   }, text => { status.textContent = `サーバー: ${text}`; });
