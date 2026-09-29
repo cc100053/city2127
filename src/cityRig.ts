@@ -2,8 +2,8 @@ import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets';
-import { mobility, airRoutes } from './mobility';
-import { crossings, crossingPoint, roads, landmarks, publicRoutes, upperLinks, DOCK } from './layout';
+import { mobility, airRoutes } from './mobility.ts';
+import { crossings, crossingPoint, roads, landmarks, publicRoutes, upperLinks, DOCK } from './layout.ts';
 
 // Three finishes: matte ceramic composite, refined metal, and reflective glass. Same shader, different response to the one environment map.
 export const paint = (color: T.ColorRepresentation, roughness=.52, metalness=0) => new T.MeshStandardMaterial({ color, roughness, metalness });

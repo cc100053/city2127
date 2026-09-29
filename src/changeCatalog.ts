@@ -1,17 +1,21 @@
-import type { Layout, LotSocketId } from './surveyView.ts';
+import type { ExhibitionLayout, Layout, LotSocketId } from './surveyView.ts';
 
 export const SITE_IDS = ['magnetEast', 'stationEastPark', 'dogenzakaSouth', 'centerGaiRear'] as const;
 export type SiteId = typeof SITE_IDS[number];
 
-export const SITE_LAYER_IDS = ['hubBase', 'hubUpper', 'parkSurface', 'parkTrees', 'plaza', 'towerBase', 'towerUpper'] as const;
+export const SITE_LAYER_IDS = ['hubBase', 'hubUpper', 'hubNeutralProps', 'parkSurface', 'parkTrees', 'parkCoolingFins', 'plaza', 'commonsNeutralProps', 'towerBase', 'towerUpper', 'towerNeutralProps'] as const;
 export type SiteLayerId = typeof SITE_LAYER_IDS[number];
 export type SiteLayerKind = 'procedural' | 'glb' | 'prop' | 'effect';
 export type SiteAssetId = 'future-tree-2127' | 'automation-hub-upper';
+export type EnvironmentParkTarget = Pick<ExhibitionLayout, 'treeCount' | 'plantedFraction' | 'coolingFins'> & {
+  readonly band: ExhibitionLayout['bands']['ne'];
+};
 export type SiteEnterAnimation = 'rise';
 export type SiteExitAnimation = 'sink';
 
 export type SiteVariantId =
   | 'baseline'
+  | 'exhibition-neutral'
   | 'automation-medium'
   | 'automation-tall'
   | 'park'
@@ -53,9 +57,11 @@ export const CHANGE_CATALOG: Readonly<Record<SiteId, SiteDefinition>> = {
     layers: {
       hubBase: layer('hubBase', 'procedural'),
       hubUpper: layer('hubUpper', 'glb', 'automation-hub-upper'),
+      hubNeutralProps: layer('hubNeutralProps', 'procedural'),
     },
     variants: {
       baseline: variant('baseline'),
+      'exhibition-neutral': variant('exhibition-neutral', 'hubBase', 'hubNeutralProps'),
       'automation-medium': variant('automation-medium', 'hubBase'),
       'automation-tall': variant('automation-tall', 'hubBase', 'hubUpper'),
     },
@@ -66,14 +72,26 @@ export const CHANGE_CATALOG: Readonly<Record<SiteId, SiteDefinition>> = {
     layers: {
       parkSurface: layer('parkSurface', 'procedural'),
       parkTrees: layer('parkTrees', 'glb', 'future-tree-2127'),
+      parkCoolingFins: layer('parkCoolingFins', 'procedural'),
     },
-    variants: { baseline: variant('baseline'), park: variant('park', 'parkSurface', 'parkTrees') },
+    variants: {
+      baseline: variant('baseline'),
+      park: variant('park', 'parkSurface', 'parkTrees'),
+      'exhibition-neutral': variant('exhibition-neutral', 'parkSurface', 'parkTrees', 'parkCoolingFins'),
+    },
     selectVariant: layout => layout.ne.lot === 'park' ? 'park' : 'baseline',
   },
   dogenzakaSouth: {
     id: 'dogenzakaSouth', socketId: 'sw',
-    layers: { plaza: layer('plaza', 'procedural') },
-    variants: { baseline: variant('baseline'), plaza: variant('plaza', 'plaza') },
+    layers: {
+      plaza: layer('plaza', 'procedural'),
+      commonsNeutralProps: layer('commonsNeutralProps', 'procedural'),
+    },
+    variants: {
+      baseline: variant('baseline'),
+      plaza: variant('plaza', 'plaza'),
+      'exhibition-neutral': variant('exhibition-neutral', 'plaza', 'commonsNeutralProps'),
+    },
     selectVariant: layout => layout.sw.lot === 'plaza' ? 'plaza' : 'baseline',
   },
   centerGaiRear: {
@@ -81,9 +99,11 @@ export const CHANGE_CATALOG: Readonly<Record<SiteId, SiteDefinition>> = {
     layers: {
       towerBase: layer('towerBase', 'procedural'),
       towerUpper: layer('towerUpper', 'procedural'),
+      towerNeutralProps: layer('towerNeutralProps', 'procedural'),
     },
     variants: {
       baseline: variant('baseline'),
+      'exhibition-neutral': variant('exhibition-neutral', 'towerBase', 'towerNeutralProps'),
       'tower-medium': variant('tower-medium', 'towerBase'),
       'tower-tall': variant('tower-tall', 'towerBase', 'towerUpper'),
     },
@@ -105,4 +125,13 @@ export function siteLayerDefinition(siteId: SiteId, layerId: SiteLayerId): SiteL
   const definition = CHANGE_CATALOG[siteId].layers[layerId];
   if (!definition) throw new Error(`Unknown layer ${layerId} for site ${siteId}.`);
   return definition;
+}
+
+export function environmentParkTarget(layout: ExhibitionLayout): EnvironmentParkTarget {
+  return {
+    band: layout.bands.ne,
+    treeCount: layout.treeCount,
+    plantedFraction: layout.plantedFraction,
+    coolingFins: layout.coolingFins,
+  };
 }

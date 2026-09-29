@@ -1,8 +1,8 @@
 # 2127 共同城市：展覽 MVP 設計與 Agent 實作規劃
 
-- 日期：2026-09-28；文件 owner：Codex。
+- 文件建立日期：2026-09-28；文件 owner：Codex；狀態更新：2026-09-29。
 - 核對基準：`535a3c059302ac6c1059d84aef663b06510ac04c`，當時 `main` 與已 fetch 的 `origin/main` 相同。
-- 狀態：**規劃已完成；S1 已實作、整合並通過 package checks、feature CI 及 main CI；S2–S5 尚未實作。**
+- 狀態：**規劃已完成；S1 已實作、整合並通過 package checks、feature CI 及 main CI。S2 root Q3 路徑已在工作樹中；S3–S5 尚未完成。**
 - 使用者最新確認：**起始城市已是 2127 年；低值、零值、高值都必須有未來感。**
 - 本文件最初由規劃文件任務建立；2026-09-28 已明確指派 S1 實作。閱讀本文件不等於被指派一次實作全部階段；收到有界任務後，在授權範圍內完成，不另加逐階段批准要求。
 - 當前實作架構以 [PROJECT](PROJECT.md) 為準；本文件描述下一版本目標，不另立一份現況 architecture。
@@ -12,7 +12,13 @@
 
 S1 已加入四題重用題組、v2 四軸 reducer、proposal sessions／transaction、SQLite schema 3 migration/replay、admin/debug API 支援，以及帶明確版本的 CityView v2。Migration 會結束 active v1 run 並保留歷史，建立全零 v2 run；舊 one-question guest endpoint 在 v2 run 上回 `unsupported_version`，舊資料不會被轉成 v2 分數。四題題組位於 `survey/src/survey/questions.exhibition.json`，主要 API 為 `POST /api/proposal-sessions`、`GET /api/proposal-sessions/:id`、`POST /api/proposals` 與 `GET /api/city-view`。每個 proposal 在單一 transaction 中記錄四題、更新 snapshot 和完成 session；成功的相同 `submissionId` 會重播原結果，不重複累積。
 
-root 與 module-swap 的現有 viewer 現在會在改動 scene 前顯示 `Unsupported exhibition view version` 並拒絕 v2。這是 S1 的相容性閘，不是 v2 city rendering。root mapping（S2/S3）和四題 guest UI（S4）仍未完成，故舊 `/guest` 頁不能提交到 active v2 run。本機三個 package 的 tests/build、獨立 reducer／mapping、migration、request parser、proposal transaction/concurrency probes 及 browser checks 已通過；feature CI 和 main CI 亦通過。展覽硬體／效能驗收仍待完成。詳見 [S1 handoff](handoffs/exhibition-s1.md) 及 [驗證紀錄](VALIDATION.md#exhibition-s1-2026-09-28)。
+2026-09-28 的 S1 驗證時，root 與 module-swap 都會在改動 scene 前顯示 `Unsupported exhibition view version` 並拒絕 v2；這是當時的相容性閘，不是 v2 rendering。舊 `/guest` 頁不能提交到 active v2 run。本機三個 package 的 tests/build、獨立 reducer／mapping、migration、request parser、proposal transaction/concurrency probes 及當時的 browser checks 已通過；feature CI 和 main CI 亦通過。這些是 2026-09-28 的 S1 歷史證據，不能代替 S2 驗證。展覽硬體／效能驗收仍待完成。詳見 [S1 handoff](handoffs/exhibition-s1.md) 及 [S1 驗證紀錄](VALIDATION.md#exhibition-s1-2026-09-28)。
+
+### 2026-09-29 S2 root Q3 現況
+
+root parser 現在接受 bounded v2 CityView，按明確版本分流，保留明確／versionless v1 並拒絕未知版本。v2 使用 server layout，不由客戶端重算 score-to-layout；Q3 只改車站東公園的 `treeCount`、`plantedFraction` 和 `coolingFins`。Live target 以 3 秒轉場；snapshot/run-reset 直接還原完整 2127 基底，不發 guest pulse，也不把 v2 scores 混入全城氣氛。其他三site維持固定 mixed 基底，畫面標示服務、共享空間及機能配置映射待 S3。四題 API 不變，正式 guest UI 待 S4。V1 survey 和 standalone 行為保留，Park 的種植面細節使用新版共用 builder。
+
+實際12棵樹GLB與程序fallback已有NE ±5場地範圍測試；S2當前驗證紀錄見 [handoff](handoffs/exhibition-s2.md)。此切片尚未代表展覽整體驗收完成。
 
 ## 0. Agent 先讀：任務邊界與完成判定
 
@@ -253,6 +259,8 @@ function updateAxis(before: AxisMemory, vote: Vote, n: number) {
 ### 7.4 邊界、轉場與物件生命週期
 
 - 分數及UI數值由server決定，畫面在3秒內追到target；不把動畫中的數值當新權威狀態。
+- S2 實作範圍只有NE公園：Q3權威參數控制樹數、種植面積與冷卻鰭片；live更新3秒，snapshot/reset立即還原且不發guest pulse。此路徑不套用全城氣氛分數。其他三site固定mixed基底，完整參數映射留待S3。
+- `tests/siteAssets.test.ts` 以實際未來樹GLB及程序fallback檢查12棵樹留在NE ±5場地範圍，並確認v1前五棵樹的transform還原。
 - 同形態變更數量必須更新；不要只比較variant ID。
 - 同一site換層重用已配置物件；共享資源不可被個別instance dispose。
 - 移除使用sink或屏風折收，結束後隱藏；低值永遠保留自己的基底／功能。
@@ -337,7 +345,7 @@ type ProposalRecord = {
 - 保留既有snapshot／updated／run-reset事件類型；新view有顯式`version:2`，含runId、revision、scores、guestCount、layout及bounded近期提案。
 - server生成上一個與下一個layout的差異；結果UI只使用這些真實數值，不在DOM自己重算政策。
 - snapshot送目前完整狀態＋最多64份近期提案；完整歷史留SQLite，避免每次把全日所有事件broadcast。當前latest結果可附該提案的before/after scores及layout。
-- S1 的舊 root／module-swap parser 先拒絕明確 v2，避免把新資料當成 v1 套用；S2/S3 接入 v2 時才應驗證 `Number.isFinite`、Meter範圍、band枚舉及各count／fraction界限，不默認未知variant為空地。
+- S1（2026-09-28）時，舊 root／module-swap parser 先拒絕明確 v2，避免把新資料當成 v1 套用。S2 root 現已加入bounded v2 parser，驗證有限分數、Meter範圍、band及count／fraction界限、proposal records和最新狀態一致性；module-swap仍明確拒絕v2。未知版本不可默認為空地。
 - 保留舊revision忽略、重連及新run替換語義；先驗證支援版本再改場景。
 - module-swap暫不做新版渲染：目前已加入「Unsupported exhibition view version」提示並停止套用v2；原v1 standalone／demo保留。未來需要才加adapter，不能讓v2冒充v1。
 - 不改現有非survey日夜模式；新展覽基線與規則只屬於v2展示路徑。
@@ -405,17 +413,17 @@ type ProposalRecord = {
 
 ## 11. 可獨立交付的實作階段
 
-S1 實作及整合已完成，package checks 與 main CI 通過；S2–S5 仍待處理。Owner由實際接任者在各task handoff填一名；不得假設文件owner自動獲派所有實作。階段依賴按順序，無需多agent。
+S1 實作及整合已完成，package checks 與 main CI 通過；階段狀態及依賴如下。Owner由實際接任者在各task handoff填一名；不得假設文件owner自動獲派所有實作。階段依賴按順序，無需多agent。
 
 | 階段 | 狀態／依賴 | 主要入口 | 交付與exit gate |
 | --- | --- | --- | --- |
 | S1 規則與儲存 | IMPLEMENTED and integrated; package checks and feature/main CI pass | survey shared／scoreEngine／migrations／runStore／sessionService／answerService／proposalService／decisionHistory；root/module-swap v2 rejection | 四題transaction、replay、version、重用題組及 viewer rejection 完成；驗證紀錄見 [S1 handoff](handoffs/exhibition-s1.md) |
-| S2 第一條可見鏈 | PLANNED，依S1 | root surveyView／changeCatalog／manager／environmentPark；survey v2 mapping | 維持四題完整提交契約，先將Q3視覺打通；其他三site維持建成mixed基底並清楚標示未完成映射；負向氣候廊／正向樹冠、真實差異、reload/fallback通過，不宣稱四軸MVP完成 |
+| S2 第一條可見鏈 | IN PROGRESS；整合驗證待完成，依S1 | root surveyView／changeCatalog／manager／environmentPark；survey v2 mapping | 四題API不變；root bounded v2 parser及Q3→NE公園參數路徑已在工作樹；live 3秒，snapshot/reset立即且無pulse，不改全城氣氛；其他三site為固定mixed基底並標示待S3。實際12棵樹GLB與fallback已有NE範圍測試；更新browser evidence及整合驗證後才可關閉S2 |
 | S3 其餘三site | PLANNED，依S2 | automationHub／commonsPlaza／concentrationTower＋catalog/mapping | 完成12配置、同band counts、低值未來感、路線clearance；四軸端到端通過 |
 | S4 正式觀眾體驗 | PLANNED，依S3 | survey guest UI、root causal panel、style | 四題back/edit/submit、idle/result/next、紀錄、錯誤恢復、accessibility；無人格誤導 |
 | S5 展覽驗收 | PLANNED，依S4 | tests／browser evidence／docs | 100份提案、60分鐘、實機效能、5人理解測試、每日操作交接 |
 
-S2不是建立另一套一題API或另一個score schema；使用S1四題session，以fixture／最小操作介面完成垂直切片，正式UI在S4精修。若整次任務已明確指派全部階段，順序完成即可，別每階段重問批准。
+S2不是建立另一套一題API或另一個score schema；重用S1四題session，以fixture／最小操作介面完成垂直切片，正式UI在S4精修。S2 handoff 記錄當前實際檢查、最高樹數邊界修正及剩餘驗收；不得把「實作在工作樹」寫成「已shipped」。
 
 ### 11.1 必须跟隨的變更路徑
 
@@ -425,7 +433,7 @@ S2不是建立另一套一題API或另一個score schema；使用S1四題session
 
 ## 12. 驗收矩陣（尚未完整執行）
 
-S1 有獨立 probe/browser 證據及整合後本機三個 package、feature CI 和 main CI 的通過結果，但本表是整體 exhibition acceptance；S2–S5 尚未完成，不可標成通過。逐項證據與限制見 [S1 驗證紀錄](VALIDATION.md#exhibition-s1-2026-09-28)。
+S1 有獨立 probe/browser 證據及整合後本機三個 package、feature CI 和 main CI 的通過結果；這不替代 S2–S5 的整體展覽驗收。逐項 S1 證據見 [S1 驗證紀錄](VALIDATION.md#exhibition-s1-2026-09-28)，S2 現況見 [handoff](handoffs/exhibition-s2.md)。
 
 | ID | 檢查 | 通過條件／證據 |
 | --- | --- | --- |
