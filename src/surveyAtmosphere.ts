@@ -121,7 +121,7 @@ export function startSurveyAtmosphere(
       historyCount.textContent = `累計 ${view.guestCount} 人`;
       historyLegend.hidden = false;
       pending.hidden = false;
-      pending.textContent = 'サービス・共有空間・機能配置の表示は準備中です。Meterは4軸を表示します。';
+      pending.textContent = '四つのサイトはサーバーの最新レイアウトを反映しています。Meterは4軸を表示します。';
       const feedback = exhibitionFeedback(view.latestProposal);
       latest.replaceChildren(...(feedback
         ? [

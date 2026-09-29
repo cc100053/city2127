@@ -1,11 +1,14 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { CHANGE_CATALOG, SITE_IDS, siteLayerDefinition, type EnvironmentParkTarget, type SiteLayerDefinition, type SiteLayerId } from '../src/changeCatalog.ts';
+import { CHANGE_CATALOG, SITE_IDS, selectExhibitionSiteVariants, siteLayerDefinition, type EnvironmentParkTarget, type SiteLayerDefinition, type SiteLayerId } from '../src/changeCatalog.ts';
 import { CityChangeManager, SITE_ASSET_RETRY_SECONDS } from '../src/cityChangeManager.ts';
 import type { BuiltSite, BuiltSiteMap } from '../src/siteBuilders/index.ts';
 import { MutableSiteLayerRuntime } from '../src/siteBuilders/siteRuntime.ts';
 import type { EnvironmentParkDiagnostics, EnvironmentParkRuntime } from '../src/siteBuilders/siteRuntime.ts';
-import type { ExhibitionLayout, Layout, SurveyView } from '../src/surveyView.ts';
+import { parseSurveyEvent, type ExhibitionLayout, type Layout, type SurveyView } from '../src/surveyView.ts';
+import type { AutomationHubDiagnostics, AutomationHubTarget } from '../src/siteBuilders/automationHub.ts';
+import type { CommonsPlazaDiagnostics, CommonsPlazaTarget } from '../src/siteBuilders/commonsPlaza.ts';
+import type { ConcentrationTowerDiagnostics, ConcentrationTowerTarget } from '../src/siteBuilders/concentrationTower.ts';
 
 const close = (actual: number, expected: number) => assert.ok(Math.abs(actual - expected) < 1e-6, `${actual} != ${expected}`);
 const lot = (kind: Layout['nw']['lot'] = 'empty', building: Layout['nw']['building'] = 'none') => ({ lot: kind, building });
@@ -16,9 +19,64 @@ const view = (value: Layout, revision: number, runId = 'run'): SurveyView => ({
 });
 const exhibitionLayout = (overrides: Partial<ExhibitionLayout> = {}): ExhibitionLayout => ({
   version: 2, bands: { nw: 'mixed', ne: 'mixed', sw: 'mixed', se: 'mixed' },
-  automatedPorts: 3, sharedSeats: 4, treeCount: 5, plantedFraction: .5, coolingFins: 0, functionModules: 4,
+  automatedPorts: 3, sharedSeats: 4, treeCount: 8, plantedFraction: .5, coolingFins: 3, functionModules: 4,
   ...overrides,
 });
+
+function createController<Target extends object, Diagnostics>(initial: Target, diagnostics: (target: Target) => Diagnostics) {
+  let target = initial, applied = false, transitionStart = -Infinity, transitioning = false, restores = 0, updates = 0;
+  const calls: { target: Target; now: number; immediate: boolean; changed: boolean }[] = [];
+  return {
+    calls,
+    get target() { return target; },
+    get transitionStart() { return transitionStart; },
+    get transitioning() { return transitioning; },
+    get restores() { return restores; },
+    get updates() { return updates; },
+    runtime: {
+      setTarget(next: Target, now: number, immediate: boolean) {
+        const changed = !applied || JSON.stringify(next) !== JSON.stringify(target);
+        target = next;
+        applied = true;
+        if (changed) transitionStart = now;
+        if (immediate) transitioning = false;
+        else if (changed) transitioning = true;
+        calls.push({ target: next, now, immediate, changed });
+        return changed;
+      },
+      update(now: number) {
+        updates++;
+        if (now >= transitionStart + 3) transitioning = false;
+      },
+      restoreLegacy() {
+        restores++;
+        target = initial;
+        applied = false;
+        transitioning = false;
+      },
+      getDiagnostics() { return diagnostics(target); },
+    },
+  };
+}
+
+const hubController = createController<AutomationHubTarget, AutomationHubDiagnostics>(
+  { band: 'mixed', automatedPorts: 3 }, target => ({
+    band: target.band, targetAutomatedPorts: target.automatedPorts, visibleAutomatedPorts: target.automatedPorts,
+    targetHumanCounters: 6 - target.automatedPorts, visibleHumanCounters: 6 - target.automatedPorts,
+  }),
+);
+const commonsController = createController<CommonsPlazaTarget, CommonsPlazaDiagnostics>(
+  { band: 'mixed', sharedSeats: 4 }, target => ({
+    band: target.band, targetSharedSeats: target.sharedSeats, visibleSharedSeats: target.sharedSeats,
+    targetScreenedSeats: 8 - target.sharedSeats, visibleScreenedSeats: 8 - target.sharedSeats,
+  }),
+);
+const towerController = createController<ConcentrationTowerTarget, ConcentrationTowerDiagnostics>(
+  { band: 'mixed', functionModules: 4 }, target => ({
+    band: target.band, targetFunctionModules: target.functionModules, activeFunctionModules: target.functionModules,
+    transitioning: false, representation: target.band === 'low' ? 'pavilion-pair' : target.band === 'mixed' ? 'mid-rise-hall' : 'vertical-tower',
+  }),
+);
 
 let parkTarget: EnvironmentParkTarget = { band: 'mixed', treeCount: 5, plantedFraction: .5, coolingFins: 0 };
 let parkExhibitionMode = false;
@@ -26,7 +84,7 @@ let parkTransitioning = false;
 let parkLegacyRestores = 0;
 const parkRuntime: EnvironmentParkRuntime = {
   setTarget(target, _now, immediate) {
-    const changed = !parkExhibitionMode || target.treeCount !== parkTarget.treeCount
+    const changed = !parkExhibitionMode || target.band !== parkTarget.band || target.treeCount !== parkTarget.treeCount
       || target.plantedFraction !== parkTarget.plantedFraction || target.coolingFins !== parkTarget.coolingFins;
     parkTarget = target;
     parkExhibitionMode = true;
@@ -73,6 +131,9 @@ const sites = Object.fromEntries(SITE_IDS.map(siteId => {
   return [siteId, {
     id: siteId, root, layers, marker: { mesh: marker, material },
     ...(siteId === 'stationEastPark' ? { environmentPark: parkRuntime } : {}),
+    ...(siteId === 'magnetEast' ? { automationHub: hubController.runtime } : {}),
+    ...(siteId === 'dogenzakaSouth' ? { commonsPlaza: commonsController.runtime } : {}),
+    ...(siteId === 'centerGaiRear' ? { concentrationTower: towerController.runtime } : {}),
   } satisfies BuiltSite];
 })) as unknown as BuiltSiteMap;
 
@@ -172,35 +233,156 @@ assert.equal(retryAttempts, 2);
 assert.equal(retrySites.magnetEast.layers.hubUpper?.assetStatus, 'ready');
 
 const neutral = exhibitionLayout();
+const zeroScores = { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 };
+const emptyServerView = {
+  version: 2, runId: 'bounds', revision: 0, guestCount: 0, algorithmVersion: 2,
+  voteSums: zeroScores, recentVotes: zeroScores, scores: zeroScores, layout: neutral, recentProposals: [],
+};
+for (const layout of [
+  { ...neutral, automatedPorts: 0, sharedSeats: 0, treeCount: 3, plantedFraction: .2, coolingFins: 0, functionModules: 2 },
+  { ...neutral, automatedPorts: 6, sharedSeats: 8, treeCount: 12, plantedFraction: .8, coolingFins: 6, functionModules: 6 },
+]) {
+  assert.ok(parseSurveyEvent({ type: 'city-state-snapshot', view: {
+    ...emptyServerView, layout,
+  } }), 'the server accepts each v2 count at its inclusive lower and upper bounds');
+}
+for (const layout of [
+  { ...neutral, automatedPorts: 7 }, { ...neutral, sharedSeats: 9 }, { ...neutral, treeCount: 2 },
+  { ...neutral, plantedFraction: .81 }, { ...neutral, coolingFins: 7 }, { ...neutral, functionModules: 1 },
+]) assert.equal(parseSurveyEvent({ type: 'city-state-snapshot', view: { ...emptyServerView, layout } }), null);
+const allBands = (band: 'low' | 'mixed' | 'high') => exhibitionLayout({ bands: { nw: band, ne: band, sw: band, se: band } });
+assert.deepEqual(selectExhibitionSiteVariants(allBands('low')), {
+  magnetEast: 'automation-low', stationEastPark: 'exhibition-neutral', dogenzakaSouth: 'commons-low', centerGaiRear: 'tower-low',
+});
+assert.deepEqual(selectExhibitionSiteVariants(allBands('mixed')), {
+  magnetEast: 'automation-mixed', stationEastPark: 'exhibition-neutral', dogenzakaSouth: 'commons-mixed', centerGaiRear: 'tower-mixed',
+});
+assert.deepEqual(selectExhibitionSiteVariants(allBands('high')), {
+  magnetEast: 'automation-high', stationEastPark: 'exhibition-neutral', dogenzakaSouth: 'commons-high', centerGaiRear: 'tower-high',
+});
 manager.applyExhibitionLayout(neutral, 'city-state-snapshot', 20);
-assert.equal(manager.getVariant('magnetEast'), 'exhibition-neutral');
+assert.equal(manager.getVariant('magnetEast'), 'automation-mixed');
 assert.equal(manager.getVariant('stationEastPark'), 'exhibition-neutral');
-assert.equal(manager.getVariant('dogenzakaSouth'), 'exhibition-neutral');
-assert.equal(manager.getVariant('centerGaiRear'), 'exhibition-neutral');
+assert.equal(manager.getVariant('dogenzakaSouth'), 'commons-mixed');
+assert.equal(manager.getVariant('centerGaiRear'), 'tower-mixed');
 assert.equal(groups.get('hubNeutralProps')?.visible, true);
-assert.equal(groups.get('commonsNeutralProps')?.visible, true);
+assert.equal(groups.get('plaza')?.visible, true);
+assert.equal(groups.get('commonsNeutralProps')?.visible, false);
 assert.equal(groups.get('towerNeutralProps')?.visible, true);
 assert.equal(groups.get('parkCoolingFins')?.visible, true);
-assert.equal(manager.getDiagnostics().stationEastPark.environmentPark?.visibleTreeCount, 5);
+assert.equal(manager.getDiagnostics().stationEastPark.environmentPark?.visibleTreeCount, 8);
+assert.equal(parkTarget.coolingFins, 3);
+assert.deepEqual(hubController.calls.at(-1), { target: { band: 'mixed', automatedPorts: 3 }, now: 20, immediate: true, changed: true });
+assert.deepEqual(commonsController.calls.at(-1), { target: { band: 'mixed', sharedSeats: 4 }, now: 20, immediate: true, changed: true });
+assert.deepEqual(towerController.calls.at(-1), { target: { band: 'mixed', functionModules: 4 }, now: 20, immediate: true, changed: true });
 
-manager.applyExhibitionLayout(exhibitionLayout({ treeCount: 10, plantedFraction: .65, coolingFins: 3 }), 'city-state-updated', 22);
-assert.equal(parkTransitioning, true);
-manager.update(22.3);
-assert.ok(parkMarker.material.emissiveIntensity > .2);
-manager.applyExhibitionLayout(exhibitionLayout({ treeCount: 10, plantedFraction: .65, coolingFins: 3 }), 'city-state-snapshot', 22.4);
-assert.equal(parkTransitioning, false);
+// A NW-only high proposal changes only AUTO HUB and animates its manager-owned upper layer.
+const nwHigh = exhibitionLayout({ bands: { nw: 'high', ne: 'mixed', sw: 'mixed', se: 'mixed' }, automatedPorts: 6 });
+manager.applyExhibitionLayout(nwHigh, 'city-state-updated', 21);
+assert.equal(manager.getVariant('magnetEast'), 'automation-high');
+assert.equal(manager.getVariant('dogenzakaSouth'), 'commons-mixed');
+assert.equal(manager.getVariant('centerGaiRear'), 'tower-mixed');
+assert.equal(hubController.calls.at(-1)?.changed, true);
+assert.equal(commonsController.calls.at(-1)?.changed, false);
+assert.equal(towerController.calls.at(-1)?.changed, false);
 manager.update(22.5);
+close(groups.get('hubUpper')!.scale.y, .5);
+assert.ok(hubMarker.material.emissiveIntensity > .2);
+close(sites.dogenzakaSouth.marker.material.emissiveIntensity, .2);
+close(sites.centerGaiRear.marker.material.emissiveIntensity, .2);
 close(parkMarker.material.emissiveIntensity, .2);
 
-manager.applyExhibitionLayout(exhibitionLayout({ treeCount: 8, coolingFins: 2 }), 'run-reset', 23);
+// Repeating a target does not restart its timer; a same-band count change does.
+const originalHubStart = hubController.transitionStart;
+manager.applyExhibitionLayout(nwHigh, 'city-state-updated', 22.5);
+assert.equal(hubController.calls.at(-1)?.changed, false);
+assert.equal(hubController.transitionStart, originalHubStart);
+const nwHighFivePorts = exhibitionLayout({ bands: nwHigh.bands, automatedPorts: 5 });
+manager.applyExhibitionLayout(nwHighFivePorts, 'city-state-updated', 22.6);
+assert.equal(manager.getVariant('magnetEast'), 'automation-high');
+assert.equal(hubController.calls.at(-1)?.changed, true);
+assert.equal(hubController.calls.at(-1)?.immediate, false);
+assert.equal(hubController.transitionStart, 22.6);
+
+// A snapshot settles a live transition and clears every site's pulse immediately.
+manager.applyExhibitionLayout(nwHighFivePorts, 'city-state-snapshot', 23);
+close(groups.get('hubUpper')!.scale.y, 1);
+for (const siteId of SITE_IDS) close(sites[siteId].marker.material.emissiveIntensity, .2);
+assert.equal(hubController.calls.at(-1)?.immediate, true);
+
+// SW low, SE high and NE low each affect only their authoritative site target.
+const swLow = exhibitionLayout({ bands: { nw: 'high', ne: 'mixed', sw: 'low', se: 'mixed' }, automatedPorts: 5, sharedSeats: 0 });
+manager.applyExhibitionLayout(swLow, 'city-state-updated', 24);
+assert.equal(commonsController.calls.at(-1)?.changed, true);
+assert.equal(hubController.calls.at(-1)?.changed, false);
+assert.equal(towerController.calls.at(-1)?.changed, false);
+assert.equal(parkTarget.treeCount, 8);
+manager.update(24.3);
+assert.ok(sites.dogenzakaSouth.marker.material.emissiveIntensity > .2);
+close(parkMarker.material.emissiveIntensity, .2);
+
+const seHigh = exhibitionLayout({ bands: { nw: 'high', ne: 'mixed', sw: 'low', se: 'high' }, automatedPorts: 5, sharedSeats: 0, functionModules: 6 });
+manager.applyExhibitionLayout(seHigh, 'city-state-updated', 25);
+assert.equal(towerController.calls.at(-1)?.changed, true);
+assert.equal(commonsController.calls.at(-1)?.changed, false);
+assert.equal(hubController.calls.at(-1)?.changed, false);
+manager.update(26.5);
+close(groups.get('towerUpper')!.scale.y, .5);
+assert.ok(sites.centerGaiRear.marker.material.emissiveIntensity > .2);
+
+const neLow = exhibitionLayout({ bands: { nw: 'high', ne: 'low', sw: 'low', se: 'high' }, automatedPorts: 5, sharedSeats: 0, treeCount: 3, plantedFraction: .2, coolingFins: 6, functionModules: 6 });
+manager.applyExhibitionLayout(neLow, 'city-state-updated', 27);
+assert.equal(parkTransitioning, true);
+assert.equal(hubController.calls.at(-1)?.changed, false);
+assert.equal(commonsController.calls.at(-1)?.changed, false);
+assert.equal(towerController.calls.at(-1)?.changed, false);
+manager.update(27.3);
+assert.ok(parkMarker.material.emissiveIntensity > .2);
+assert.ok(sites.dogenzakaSouth.marker.material.emissiveIntensity > .2, 'the prior SW proposal remains fresh through an unrelated NE update');
+
+// A live high-to-low downgrade fades the NW upper floor over the same three-second window.
+const nwLow = exhibitionLayout({ bands: { nw: 'low', ne: 'low', sw: 'low', se: 'high' }, automatedPorts: 0, sharedSeats: 0, functionModules: 6 });
+manager.applyExhibitionLayout(nwLow, 'city-state-updated', 27.5);
+assert.equal(manager.getVariant('magnetEast'), 'automation-low');
+assert.equal(hubController.calls.at(-1)?.immediate, false);
+manager.update(29);
+close(groups.get('hubUpper')!.scale.y, .5);
+assert.ok(sites.magnetEast.marker.material.emissiveIntensity > .2);
+
+// Server snapshots and run resets snap all four sites to their full 2127 baseline without pulses.
+manager.applyExhibitionLayout(neutral, 'run-reset', 30);
+assert.equal(manager.getVariant('magnetEast'), 'automation-mixed');
+assert.equal(manager.getVariant('dogenzakaSouth'), 'commons-mixed');
+assert.equal(manager.getVariant('centerGaiRear'), 'tower-mixed');
+assert.equal(groups.get('hubUpper')?.visible, false);
+assert.equal(groups.get('towerUpper')?.visible, false);
+assert.equal(hubController.calls.at(-1)?.immediate, true);
+assert.equal(commonsController.calls.at(-1)?.immediate, true);
+assert.equal(towerController.calls.at(-1)?.immediate, true);
+for (const siteId of SITE_IDS) close(sites[siteId].marker.material.emissiveIntensity, .2);
+
+manager.applyExhibitionLayout(exhibitionLayout({ treeCount: 10, plantedFraction: .65, coolingFins: 3 }), 'city-state-updated', 31);
+assert.equal(parkTransitioning, true);
+manager.update(31.3);
+assert.ok(parkMarker.material.emissiveIntensity > .2);
+manager.applyExhibitionLayout(exhibitionLayout({ treeCount: 10, plantedFraction: .65, coolingFins: 3 }), 'city-state-snapshot', 31.4);
+assert.equal(parkTransitioning, false);
+for (const siteId of SITE_IDS) close(sites[siteId].marker.material.emissiveIntensity, .2);
+manager.applyExhibitionLayout(neutral, 'run-reset', 32);
 assert.equal(parkTarget.treeCount, 8);
 assert.equal(manager.getDiagnostics().stationEastPark.environmentPark?.visibleTreeCount, 8);
-manager.update(23.1);
-close(parkMarker.material.emissiveIntensity, .2);
 
-manager.applyIncrementalUpdate(view(layout({ ne: lot('park') }), 8), 24);
+manager.applyIncrementalUpdate(view(layout({ ne: lot('park') }), 8), 33);
 assert.equal(parkLegacyRestores, 1);
+assert.equal(hubController.restores, 1);
+assert.equal(commonsController.restores, 1);
+assert.equal(towerController.restores, 1);
 assert.equal(parkExhibitionMode, false);
 assert.equal(manager.getVariant('stationEastPark'), 'park');
 assert.equal(manager.getDiagnostics().stationEastPark.environmentPark?.visibleTreeCount, 5);
-console.log('PASS: snapshots, incremental updates, changed-only layers, retargeting, markers and reset transitions.');
+assert.equal(manager.getDiagnostics().magnetEast.automationHub?.targetAutomatedPorts, 3);
+assert.equal(manager.getDiagnostics().dogenzakaSouth.commonsPlaza?.targetSharedSeats, 4);
+assert.equal(manager.getDiagnostics().centerGaiRear.concentrationTower?.targetFunctionModules, 4);
+assert.throws(() => new CityChangeManager({ ...sites, magnetEast: { ...sites.magnetEast, automationHub: undefined } } as BuiltSiteMap)
+  .applyExhibitionLayout(neutral, 'city-state-snapshot', 34), /Missing exhibition runtime/);
+console.log('PASS: four-site v2 targets, isolated axes, same-band retargets, snapshots/resets, and preserved v1 paths.');

@@ -18,10 +18,19 @@ export type SiteVariantId =
   | 'exhibition-neutral'
   | 'automation-medium'
   | 'automation-tall'
+  | 'automation-low'
+  | 'automation-mixed'
+  | 'automation-high'
   | 'park'
   | 'plaza'
+  | 'commons-low'
+  | 'commons-mixed'
+  | 'commons-high'
   | 'tower-medium'
-  | 'tower-tall';
+  | 'tower-tall'
+  | 'tower-low'
+  | 'tower-mixed'
+  | 'tower-high';
 
 export interface SiteVariantDefinition {
   readonly id: SiteVariantId;
@@ -64,6 +73,9 @@ export const CHANGE_CATALOG: Readonly<Record<SiteId, SiteDefinition>> = {
       'exhibition-neutral': variant('exhibition-neutral', 'hubBase', 'hubNeutralProps'),
       'automation-medium': variant('automation-medium', 'hubBase'),
       'automation-tall': variant('automation-tall', 'hubBase', 'hubUpper'),
+      'automation-low': variant('automation-low', 'hubBase', 'hubNeutralProps'),
+      'automation-mixed': variant('automation-mixed', 'hubBase', 'hubNeutralProps'),
+      'automation-high': variant('automation-high', 'hubBase', 'hubUpper', 'hubNeutralProps'),
     },
     selectVariant: layout => buildingVariant(layout.nw.building, 'automation-medium', 'automation-tall'),
   },
@@ -91,6 +103,9 @@ export const CHANGE_CATALOG: Readonly<Record<SiteId, SiteDefinition>> = {
       baseline: variant('baseline'),
       plaza: variant('plaza', 'plaza'),
       'exhibition-neutral': variant('exhibition-neutral', 'plaza', 'commonsNeutralProps'),
+      'commons-low': variant('commons-low', 'plaza'),
+      'commons-mixed': variant('commons-mixed', 'plaza'),
+      'commons-high': variant('commons-high', 'plaza'),
     },
     selectVariant: layout => layout.sw.lot === 'plaza' ? 'plaza' : 'baseline',
   },
@@ -106,6 +121,9 @@ export const CHANGE_CATALOG: Readonly<Record<SiteId, SiteDefinition>> = {
       'exhibition-neutral': variant('exhibition-neutral', 'towerBase', 'towerNeutralProps'),
       'tower-medium': variant('tower-medium', 'towerBase'),
       'tower-tall': variant('tower-tall', 'towerBase', 'towerUpper'),
+      'tower-low': variant('tower-low', 'towerBase'),
+      'tower-mixed': variant('tower-mixed', 'towerBase', 'towerNeutralProps'),
+      'tower-high': variant('tower-high', 'towerBase', 'towerUpper'),
     },
     selectVariant: layout => buildingVariant(layout.se.building, 'tower-medium', 'tower-tall'),
   },
@@ -113,6 +131,25 @@ export const CHANGE_CATALOG: Readonly<Record<SiteId, SiteDefinition>> = {
 
 export function selectSiteVariants(layout: Layout): Record<SiteId, SiteVariantId> {
   return Object.fromEntries(SITE_IDS.map(id => [id, CHANGE_CATALOG[id].selectVariant(layout)])) as Record<SiteId, SiteVariantId>;
+}
+
+const AUTOMATION_VARIANTS: Record<ExhibitionLayout['bands']['nw'], SiteVariantId> = {
+  low: 'automation-low', mixed: 'automation-mixed', high: 'automation-high',
+};
+const COMMONS_VARIANTS: Record<ExhibitionLayout['bands']['sw'], SiteVariantId> = {
+  low: 'commons-low', mixed: 'commons-mixed', high: 'commons-high',
+};
+const TOWER_VARIANTS: Record<ExhibitionLayout['bands']['se'], SiteVariantId> = {
+  low: 'tower-low', mixed: 'tower-mixed', high: 'tower-high',
+};
+
+export function selectExhibitionSiteVariants(layout: ExhibitionLayout): Record<SiteId, SiteVariantId> {
+  return {
+    magnetEast: AUTOMATION_VARIANTS[layout.bands.nw],
+    stationEastPark: 'exhibition-neutral',
+    dogenzakaSouth: COMMONS_VARIANTS[layout.bands.sw],
+    centerGaiRear: TOWER_VARIANTS[layout.bands.se],
+  };
 }
 
 export function variantLayers(siteId: SiteId, variantId: SiteVariantId): readonly SiteLayerId[] {

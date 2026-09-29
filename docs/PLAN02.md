@@ -1,5 +1,9 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
+## 最新補充 — 2026-09-30：S3 其餘三site映射與可見度修正
+
+S3 core commit `d51167b` 已推送且 feature CI 通過。其後工作樹改善 SW 私密座位的 2.4 m 電致變色屏，以及 SE 低值的成對地面 pavilion／DOGENZAKA 上方玻璃服務頭，並補了固定 hero camera 投影可讀性測試。合併後的 root `npm test`、`npm run build`、`git diff --check`、12 個一軸 API case、same-band、high→mixed→low、snapshot/reconnect/reset、standalone smoke 及 V01/V02 視覺檢查均通過；12 張桌面截圖及精確 mapping 數值見 [validation record](VALIDATION.md)。可見度修改已提交為 `36b5c18`，並已在 feature branch 與 main 的 lifecycle／S4 合併；最終 feature CI 和 main 整合待完成，因此不標為 shipped。固定 hero 畫面中的 SE 地面 pavilion 被前景遮擋，上方服務頭仍可見；SW 差異較細但可辨。狀態與後續證據見 [S3 handoff](handoffs/exhibition-s3.md)。
+
 ## 最新補充 — 2026-09-29：S4 feature branch 現況
 
 四題 guest UI 和 root v2 因果面板已在 `codex/exhibition-s4` feature branch；guest UI 含草稿恢復及提交重試，root 面板顯示實際 proposal feedback 與最多64人的四軸投票帶。S3 其餘三site映射尚未實作，且 S4 依賴 S3；feature branch 未整合，瀏覽器驗收亦未完成，故不代表 S4 完成或 SHIP。結果頁仍要手動按「次の方へ」，沒有規格目標的約10秒結果／約5秒交接計時；root panel 未依次播放兩項、共10秒的變化提示。最多64格目前排在較長 feedback 後，置於 max-height 400px 的可捲動面板內；1280×720 idle 可見度未驗證，可能需要捲動。詳見 [S4 handoff](handoffs/exhibition-s4.md) 和 [validation record](VALIDATION.md)。
@@ -51,7 +55,7 @@ S1 的四題 server/API 保持不變。S2 已整合 root 的明確版本 v2 pars
 
 **基線更正（2026-09-18，協作文件 Stage 1）：** 首個多層空間原型及 Plan 02 stage 1–5 已在提交歷史中；stage 5 實作提交為 `676f5ab`，本次開始時本機 `main`／HEAD 為 `3d670b5`（展覽方向文檔更新），工作樹乾淨。原先「只存在未提交工作樹」的說法已過時；這是本機提交證據，並非 remote 同步或重新驗證的宣稱。
 
-歷史 Plan 02 美術驗收、完整網格碰撞及 1080p 效能仍有未驗證項目，詳見下方原始紀錄。以下這段「現行展覽待辦」是2026-09-18當時的狀態紀錄；最新S1–S2狀態見本頁頂部，舊美術清單不是後續階段的前置門檻。
+歷史 Plan 02 美術驗收、完整網格碰撞及 1080p 效能仍有未驗證項目，詳見下方原始紀錄。以下這段「現行展覽待辦」是2026-09-18當時的狀態紀錄；最新S1–S3狀態見本頁頂部，舊美術清單不是後續階段的前置門檻。
 
 核心目標是「2127 年澀谷的紀實照片」：科技應融入建築、交通、公共空間與環境系統。Pic 2 用於量體、垂直性、層次與材質方向，不照搬 UFO、植物、招牌或建築形狀。舊有溫暖彩漆模型風格已被新 brief 取代。
 

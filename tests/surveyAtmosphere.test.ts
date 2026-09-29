@@ -115,6 +115,14 @@ const limitedFeedback = exhibitionFeedback({
 });
 assert.equal(limitedFeedback?.cityChanges.length, 2);
 assert.equal(limitedFeedback?.cityChanges[1]?.effect, '自律サービス端口 2 → 3');
+const nonParkFeedback = exhibitionFeedback({
+  ...v2Proposal,
+  cityChanges: [
+    { socketId: 'sw', label: '共有席', before: { sharedSeats: 4 }, after: { sharedSeats: 7 } },
+    { socketId: 'se', label: '機能配置', before: { functionModules: 4 }, after: { functionModules: 3 } },
+  ],
+});
+assert.deepEqual(nonParkFeedback?.cityChanges.map(change => change.place), ['道玄坂南', 'センター街奥']);
 
 const sameBandFeedback = exhibitionFeedback({
   ...v2Proposal, beforeScores: { ...zero, environmentalPriority: 4 }, afterScores: { ...zero, environmentalPriority: 4.2 },
