@@ -2,7 +2,7 @@
 
 AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/PROJECT.md) · [驗收與交接流程](docs/VALIDATION.md) · [展覽方向與 Plan 02 紀錄](docs/PLAN02.md)。
 
-**展覽 MVP 狀態（2026-09-29）：** [共同城市 MVP 設計與 Agent 實作規劃](docs/EXHIBITION_MVP.md)的 S1 四題 API、SQLite v2 run／proposal 儲存已實作。S2 Q3→NE Park 切片已整合及通過 feature/main CI；其他三個 site 固定顯示成熟混合基底，映射待 S3。S4 四題 guest UI 和 root 回饋／最多64格提案帶已在 `codex/exhibition-s4` feature branch，但尚未整合或完成瀏覽器驗收；S3 尚未實作，整體展覽仍未驗收。城市從開始已是2127年，低／零／高值都必須有未來感。下方一題流程及畫面內容是 v1 歷史實作，不代表新的 guest flow。S1、S2 和 S4 狀態見 [S1 handoff](docs/handoffs/exhibition-s1.md)、[S2 handoff](docs/handoffs/exhibition-s2.md) 和 [S4 handoff](docs/handoffs/exhibition-s4.md)，驗證細節見[驗證紀錄](docs/VALIDATION.md)。
+**展覽 MVP 狀態（2026-09-29）：** [共同城市 MVP 設計與 Agent 實作規劃](docs/EXHIBITION_MVP.md)的 S1 四題 API、SQLite v2 run／proposal 儲存已實作。S2 Q3→NE Park 切片已整合及通過 feature/main CI；其他三個 site 固定顯示成熟混合基底，映射待 S3。S4 四題 guest UI 和 root 回饋／最多64格提案帶已推送至 `origin/codex/exhibition-s4`，feature CI 狀態未能查證（沒有 run ID、status 或 conclusion 證據），尚未整合或完成瀏覽器驗收；S3 尚未實作，整體展覽仍未驗收。城市從開始已是2127年，低／零／高值都必須有未來感。下方一題流程及畫面內容是 v1 歷史實作，不代表新的 guest flow。S1、S2 和 S4 狀態見 [S1 handoff](docs/handoffs/exhibition-s1.md)、[S2 handoff](docs/handoffs/exhibition-s2.md) 和 [S4 handoff](docs/handoffs/exhibition-s4.md)，驗證細節見[驗證紀錄](docs/VALIDATION.md)。
 
 ## 協作入門
 
@@ -16,7 +16,7 @@ AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/P
 
 **由觀眾共同塑造一個富有未來感的澀谷。** 城市是展覽中的共同創作結果；視覺設計服務於未來感、澀谷辨識度，以及觀眾能否看懂自己的選擇如何改變城市。精緻模型或紀實照片質感不再是首要目標或完成門檻。
 
-新版每位 guest 回答四條題目並一次提交 → server 將四軸投票累積至共同城市狀態 → 下一位 guest 繼續使用累積結果。S1 已完成 server-side transaction、replay、migration 和 view API；root Q3 公園切片已於 S2 完成及驗證。S4 guest UI 與 root 回饋面板已在 `codex/exhibition-s4` feature branch，尚未整合或完成瀏覽器驗收；S3 其餘三site映射尚未實作，每日展覽重設規則仍待定。S2、S4 狀態分別見 [S2 handoff](docs/handoffs/exhibition-s2.md) 和 [S4 handoff](docs/handoffs/exhibition-s4.md)。
+新版每位 guest 回答四條題目並一次提交 → server 將四軸投票累積至共同城市狀態 → 下一位 guest 繼續使用累積結果。S1 已完成 server-side transaction、replay、migration 和 view API；root Q3 公園切片已於 S2 完成及驗證。S4 guest UI 與 root 回饋面板已推送至 `origin/codex/exhibition-s4`，尚未整合或完成瀏覽器驗收；S3 其餘三site映射尚未實作，每日展覽重設規則仍待定。S2、S4 狀態分別見 [S2 handoff](docs/handoffs/exhibition-s2.md) 和 [S4 handoff](docs/handoffs/exhibition-s4.md)。
 
 原有 v1 因果 MVP 每人一題、由答案推導區畫變化；展覽 v2 S1 已改為可重用的四題題組及四軸累積。root 保留 v1／standalone；v2 目前只有 Q3 公園映射，S4 guest UI 和回饋面板位於 feature branch，尚未整合或完成驗收；每日重設及輸入裝置仍待定。
 

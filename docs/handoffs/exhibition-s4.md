@@ -4,15 +4,15 @@
 - Status: IN_PROGRESS
 - Branch: `codex/exhibition-s4`
 - Base commit: `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68`
-- Last verified commit: NONE; checks below were run before commit on the S4 working tree based on this commit
-- Remote availability: NOT PUSHED; branch has no recorded upstream
+- Last verified commit: `960d9b7c520af7f845bb6c0a2df47d17ad222f9f`; local code checks below ran on the tracked source tree immediately before it was committed
+- Remote availability: feature branch is pushed to `origin/codex/exhibition-s4`; implementation commit `960d9b7c520af7f845bb6c0a2df47d17ad222f9f` is available remotely, and a documentation follow-up may advance branch HEAD; feature CI status is unverified (no run ID, status, or conclusion evidence)
 
 ## Session Git state
 
 - Session starting branch and HEAD: `main`, `f8fa07ab58610c19e5764be6bec325cf9ddd53f9`
 - Last fetched origin/main commit: `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68`, fetched during parent preflight on 2026-09-29
 - Local changes present at session start: `.codegraph/` was untracked; no S4 code changes were present. The local `main` was six commits behind `origin/main`, was fast-forwarded to the fetched `eaf230e...`, and `codex/exhibition-s4` was created from that commit before implementation began.
-- Upstream integration status: NOT INTEGRATED; the feature branch was created from the fast-forwarded `main` at `eaf230e...`
+- Upstream integration status: NOT INTEGRATED; `origin/main` remains at `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68`
 - Pending Git conflicts or synchronization blockers: NONE observed
 
 ## Goal and acceptance criteria
@@ -29,16 +29,16 @@ Survey UI: `survey/guest.html`, `survey/src/ui/guestDebugView.ts`, `survey/src/u
 - Stores the draft and pending request in `localStorage`; on reload, revalidates the server session, restores valid choices, detects revision changes and retries the same request idempotently.
 - Root v2 feedback shows all four answers, four Meter before→after rows, at most two actual city parameter changes (including a band-only transition), and truthful no-change wording. The legacy v1 three-decision list remains available.
 - Added the `最近64人` recent-proposal band, rendering up to 64 cells from `recentProposals`, with four vote symbols per cell and a separate cumulative guest count.
-- Implementation and focused tests are on the feature branch; the checks below were run before commit. No integration or push is recorded here.
+- Implementation and focused tests are committed and pushed on the feature branch. No integration to `main` is recorded here.
 
 ## Actual validation results
 
 - Verification status: PARTIAL
-- Date and checked commit/worktree: 2026-09-29; pre-commit working tree based on `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68`
-- Commands/manual checks and results: Root `npm test` and `npm run build` exited 0; build reported the existing >500 kB chunk warning. Survey `npm run build` and the focused `survey/tests/guestFlow.test.ts` check exited 0. Full `cd survey && npm test` failed in the sandbox when a server test attempted to listen and received `EPERM`; an escalated retry was attempted, but its outcome is unknown for this record, so the full suite is not marked passed. `git diff --check` and local Markdown link targets exited 0 after the documentation edits. Local root and survey endpoints returned HTTP 200 only.
+- Date and checked commit/worktree: 2026-09-29; local checks ran on the tracked source tree immediately before it was committed as `960d9b7c520af7f845bb6c0a2df47d17ad222f9f`.
+- Commands/manual checks and results: Root `npm test` and `npm run build` exited 0; build reported the existing >500 kB chunk warning. Survey `npm run build` and the focused `survey/tests/guestFlow.test.ts` check exited 0. Full `cd survey && npm test` failed in the sandbox when a server test attempted to listen and received `EPERM`; an escalated retry was attempted, but its outcome is unknown for this record, so the full suite is not marked passed. No feature CI run ID, status, or conclusion was verified. Local root and survey endpoints returned HTTP 200 only. `git diff --check` and local Markdown link checks for the docs-only update passed.
 - Evidence/environment: No screenshots. CUA reported the Mac was locked. Playwright was unavailable because its Chromium revision was missing and installed Chrome exited with SIGABRT. No browser rendering or interaction was verified.
-- Integrated commit and checks: NOT INTEGRATED
-- Changes since verification: S4 code checks ran before the documentation edits; final diff and link checks ran afterward.
+- Integrated commit and checks: NOT INTEGRATED; `origin/main` remains at `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68`. Feature CI status unverified; no run ID, status, or conclusion was verified.
+- Changes since verification: This handoff and the README/validation updates are documentation-only; their final diff and link checks are recorded after running them.
 
 ## Known issues and blockers
 
