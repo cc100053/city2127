@@ -1,5 +1,64 @@
 # 2127 — Frozen Intersection
 
+**語言 / Languages / 言語：** [繁體中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
+
+## 展覽啟動（Mac / Windows）
+
+需要 Git、Node.js **24 或以上**（連 npm），以及支援 WebGL 2 嘅桌面瀏覽器。喺 repo 根目錄執行；每個 terminal tab 要保持開住。首次安裝或 lockfile 更新先跑 `npm ci`。目前係本機展覽流程，未設公開部署。
+
+### Mac：Terminal 開兩個 tab
+
+**Tab 1 — 問卷 server**（API、WebSocket、guest／monitor／admin 頁面，同 SQLite 資料）：
+
+```sh
+cd survey
+npm ci
+npm run build
+npm run server
+```
+
+**Tab 2 — 3D 城市**（根目錄 Three.js 場景；另開一個 terminal tab，從 repo 根目錄執行）：
+
+```sh
+npm ci
+npm run dev -- --port 5173
+```
+
+### Windows：PowerShell 開兩個 tab
+
+**Tab 1 — 問卷 server**（由 repo 根目錄開始）：
+
+```powershell
+Set-Location survey
+npm ci
+npm run build
+npm run server
+```
+
+**Tab 2 — 3D 城市**（另開一個 PowerShell tab，從 repo 根目錄執行）：
+
+```powershell
+npm ci
+npm run dev -- --port 5173
+```
+
+`survey` server 預設喺 `127.0.0.1:8787`，root Vite 預設喺 `127.0.0.1:5173`。如果 Vite 顯示其他 port，城市網址請用 terminal 實際印出嚟嗰個；server port 如有更改，要喺城市網址指定完整 WebSocket URL。
+
+### 瀏覽器要開嘅頁面
+
+| 頁面 / tab | 網址（預設） | 用途 |
+| --- | --- | --- |
+| Guest | `http://127.0.0.1:8787/guest` | 觀眾完成四題、核對答案並提交一次提案。 |
+| City | `http://127.0.0.1:5173/?survey` | 展示共同塑造嘅 2127 澀谷；經 `ws://127.0.0.1:8787/ws` 即時接收變化。展覽城市要用呢個 `?survey` 網址。 |
+| Admin | `http://127.0.0.1:8787/admin` | 工作人員睇狀態、確認觀眾已離開、要求／取消 reset；只可喺運行 server 嗰部電腦以 localhost 開啟。 |
+| Monitor（可選） | `http://127.0.0.1:8787/monitor` | 文字方式檢查目前狀態同開頁後收到嘅提案／WebSocket 事件，唔係 3D 畫面。 |
+
+建議將 City 放展示屏、Guest 放輸入屏、Admin 留喺工作人員電腦。提案提交後 server 會等工作人員喺 Admin 按 **Confirm Guest Has Left**，先容許下一位開始；如有待執行 reset，亦會喺確認離場時套用。City 頁面唔需要獨立 host 或 build；Tab 2 嘅 Vite 已供應。Guest／Admin／Monitor 由 Tab 1 嘅 server 同一個 origin 供應，所以 `npm run build` 必須先完成。SQLite 預設寫入 `survey/data/survey.sqlite`；重開 server 會沿用已有城市狀態。
+
+要畀同一個可信 LAN 嘅另一部裝置開 Guest／City：server 用 `SURVEY_HOST=0.0.0.0 npm run server`（PowerShell：`$env:SURVEY_HOST='0.0.0.0'; npm run server`），root 用 `npm run dev -- --host 0.0.0.0 --port 5173`；以 host 電腦嘅 LAN IP 取代網址中嘅 `127.0.0.1`。兩個 port 都要可達；Admin 仍然只限 host 電腦嘅 localhost。預設 loopback 設定只供本機使用，LAN 並無 guest 身分驗證。若 server 改用其他 port，例如 `8790`，City 用 `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8790/ws`。
+
+想單獨睇城市原型，開 `http://127.0.0.1:5173/` 即可，無須 Tab 1；呢個模式唔會接收觀眾提案。`module-swap/` 係保留嘅 v1 因果示範，唔係展覽城市，亦唔接受 v2 CityView。
+
 AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/PROJECT.md) · [驗收與交接流程](docs/VALIDATION.md) · [展覽方向與 Plan 02 紀錄](docs/PLAN02.md)。
 
 **展覽 MVP 狀態（2026-09-30）：** [共同城市 MVP 設計與 Agent 實作規劃](docs/EXHIBITION_MVP.md)的 S1 四題 API、SQLite v2 run／proposal 儲存已實作。S2 Q3→NE Park 切片已整合及通過 feature/main CI。S3 四site映射（`d51167b`、SW／SE 可見度修正 `36b5c18`）的本機 root checks、API matrix、12 張 captures、snapshot/reset 與 standalone smoke 均已通過，已與 lifecycle／S4 合併並整合至 main（`63af1b6`），feature CI 及 main CI 均通過，S3 已 shipped。S4 四題 guest UI 與 root 回饋面板已於 2026-09-30 完成瀏覽器驗收並整合至 main（`5e14078`，main CI 通過；剩餘偏差見 S4 handoff）；整體展覽仍未驗收。城市從開始已是2127年，低／零／高值都必須有未來感。下方一題流程及畫面內容是 v1 歷史實作，不代表新的 guest flow。S1–S4 狀態分別見 [S1 handoff](docs/handoffs/exhibition-s1.md)、[S2 handoff](docs/handoffs/exhibition-s2.md)、[S3 handoff](docs/handoffs/exhibition-s3.md) 和 [S4 handoff](docs/handoffs/exhibition-s4.md)，完整驗證見[驗證紀錄](docs/VALIDATION.md)。
