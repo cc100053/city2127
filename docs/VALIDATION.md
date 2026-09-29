@@ -1,10 +1,39 @@
 # Validation and handoff
 
-## Exhibition S3 — remaining root site mappings — 2026-09-29
+## Exhibition S3 — visibility refinement and validation — 2026-09-30
 
-**Status: IMPLEMENTED; local root checks passed; browser/CI verification pending.** The uncommitted branch work extends the root v2 mapping to NW automation, SW commons and SE concentration while retaining the S2 NE Park. The root causal panel summarizes proposal `cityChanges` and has explicit no-change copy. See the [S3 handoff](handoffs/exhibition-s3.md) for the exact base, scope and remaining gates.
+**Status: IN_PROGRESS — implementation and local/API/browser checks are complete; final feature CI, commit and main integration are pending.** Core commit [`d51167bb1352c97e0b2135b3fb42852bd438699b`](https://github.com/cc100053/city2127/commit/d51167bb1352c97e0b2135b3fb42852bd438699b) is pushed to `origin/codex/exhibition-s3`; [feature CI run 36577963207](https://github.com/cc100053/city2127/actions/runs/36577963207) passed for that commit only. The post-CI SW/SE visibility changes and focused tests are present in the current worktree, so that historical CI run does not cover them. Local root checks and final browser/API verification passed on the combined visibility changes. The current code is not committed or merged; do not describe S3 as shipped.
 
-On 2026-09-29, the shared uncommitted S3 worktree passed root `npm test`, `npm run build` and `git diff --check`. Build completed with a chunk-size warning for a bundle over 500 kB. Desktop browser review and feature CI remain pending; no S3 browser captures or CI run are recorded. Do not treat S2 CI or screenshots as evidence for S3, and make no FPS or exhibition-hardware claim.
+### Current implementation and API evidence
+
+The post-CI visibility pass raises SW's dark electrochromic curved private screens to 2.4 m; as seats become shared, the screens fold flat. SE low uses two ground-level pavilions and twin glazed service heads above DOGENZAKA so the low configuration reads in the fixed hero view. Focused tests check screen material/height and projected SE cap separation/clearance at 1280×720 and 1920×1080. The heads are visible, but the SE ground pavilions remain occluded behind the foreground in the fixed hero view; the SW difference is subtle but discernible.
+
+A fresh isolated API matrix passed 12 one-axis low/mixed/high cases, with each proposal changing only its target site, plus same-band count updates and high→mixed→low transitions. Confirmed target values:
+
+| Site axis | Low | Mixed | High |
+| --- | ---: | ---: | ---: |
+| NW `automatedPorts` | 1 | 3 | 5 |
+| SW `sharedSeats` | 2 | 4 | 7 |
+| NE `treeCount` / planted fraction / cooling fins | 5 / .3125 / 5 | 8 / .5 / 3 | 10 / .6875 / 1 |
+| SE `functionModules` | 3 | 4 | 5 |
+
+Composite all-low reached −7.5 on each axis and `(ports=1, seats=2, trees=5, planted=.3125, fins=5, modules=3)`. Composite all-high reached +7.5 on each axis and `(ports=5, seats=7, trees=10, planted=.6875, fins=1, modules=5)`. Mixed returned `(ports=3, seats=4, trees=8, planted=.5, fins=3, modules=4)`. Scratch matrix output: `/private/tmp/city2127-s3.2AlzH7/api-matrix-final.json`.
+
+### Browser capture set — 2026-09-30 JST
+
+The 12 captures below were made from the isolated survey server on port 8790 and root Vite on port 5181. Final V01/V02 review accepted the low/mixed/high SW and SE distinctions at both viewports. Each screenshot is a current 2026-09-30 capture; earlier scratch candidates are not linked here.
+
+| State | 1280×720 | 1920×1080 |
+| --- | --- | --- |
+| Low | [low](../artifacts/future-s3-low-1280x720.png) · [all-low](../artifacts/future-s3-all-low-1280x720.png) | [low](../artifacts/future-s3-low-1920x1080.png) · [all-low](../artifacts/future-s3-all-low-1920x1080.png) |
+| Mixed | [mixed](../artifacts/future-s3-mixed-1280x720.png) · [all-mixed](../artifacts/future-s3-all-mixed-1280x720.png) | [mixed](../artifacts/future-s3-mixed-1920x1080.png) · [all-mixed](../artifacts/future-s3-all-mixed-1920x1080.png) |
+| High | [high](../artifacts/future-s3-high-1280x720.png) · [all-high](../artifacts/future-s3-all-high-1280x720.png) | [high](../artifacts/future-s3-high-1920x1080.png) · [all-high](../artifacts/future-s3-all-high-1920x1080.png) |
+
+Final local verification on the combined post-visibility worktree (2026-09-30 JST): root `npm test`, `npm run build` and `git diff --check` passed; build emitted only the existing warning for a bundle over 500 kB. The API matrix passed all 12 isolated one-axis low/mixed/high cases, each changing only its target site; same-band count updates and high→mixed→low passed. The site values are NW `automatedPorts` 1/3/5, SW `sharedSeats` 2/4/7, NE `treeCount` 5/8/10 with planted fractions .3125/.5/.6875 and fins 5/3/1, and SE `functionModules` 3/4/5. Composite all-low reached −7.5 on all axes with `(ports=1, seats=2, trees=5, planted=.3125, fins=5, modules=3)`; all-high reached +7.5 with `(5,7,10,.6875,1,5)`; mixed returned `(3,4,8,.5,3,4)`. API scratch output: `/private/tmp/city2127-s3.2AlzH7/api-matrix-final.json`.
+
+Snapshot and reconnect checks passed: reload restored an all-high v2 `city-state-snapshot` at revision 1; forced WebSocket reconnect returned the identical snapshot without `city-state-updated`. Admin reset from high emitted exactly `run-reset` with mixed revision 0, rendered within 100 ms and showed no visible flash/pulse. Frame comparison found mean absolute RGB difference .063 between 100 ms and 3 s, with 0.081% of pixels above 30 max-channel difference, attributable to moving actors; reconnect difference was below 0.16%. A standalone smoke at `http://127.0.0.1:5181/?hour=12`, 1280×720, showed scene/title/canvas with zero new console/page errors and no survey-server requests or socket (only Vite HMR WebSocket). Root v1 was not browser-tested in this final pass; existing root unit tests cover its code paths, but module-swap tests are not evidence for root v1. Scratch frame paths and API details are recorded in the S3 handoff. No FPS, physical exhibition-PC, hardware or cross-platform result is claimed.
+
+The earlier feature CI run validates only `d51167b`; the visibility commit `36b5c18` is pushed and its feature CI and main integration checks remain pending. Do not describe S3 as shipped or merged.
 
 ## Exhibition S2 — Q3 climate vertical slice — 2026-09-29
 

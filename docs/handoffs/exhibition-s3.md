@@ -1,11 +1,11 @@
 # exhibition-s3 — remaining root site mappings
 
 - Owner: Codex (Astra review; Luna Max implementation and testing)
-- Status: IMPLEMENTED — local root checks passed; browser/CI verification is pending
+- Status: IN_PROGRESS — implementation and local/API/browser checks passed; final feature CI and integration are pending
 - Branch: `codex/exhibition-s3`
 - Base commit: `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68`
-- Last verified commit: `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68` — integrated S2 base; S3 checks apply to the current uncommitted worktree, not a commit
-- Remote availability: NOT PUSHED; no `origin/codex/exhibition-s3` ref was present at preflight
+- Last verified commit: `d51167bb1352c97e0b2135b3fb42852bd438699b` — core S3 commit; root checks and feature CI passed for this commit only
+- Remote availability: core commit pushed to `origin/codex/exhibition-s3` at `d51167bb1352c97e0b2135b3fb42852bd438699b`; post-CI visibility commit `36b5c18b4adde9dba8e762e130f3fe19dd213243` and this docs update pushed on 2026-09-30
 - GitHub Issue: none
 
 ## Session Git state
@@ -14,8 +14,10 @@
 - Last fetched origin/main commit: `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68`, refreshed with `git fetch --prune origin` on 2026-09-29
 - Local changes present at task preflight: the tracked tree on `codex/exhibition-s4` was clean; the pre-existing untracked `.codegraph/` was preserved. After fetch, the integrator switched to clean/up-to-date `main` at `eaf230e` and created `codex/exhibition-s3` from it.
 - Documentation-lane preflight: branch `codex/exhibition-s3`, HEAD `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68`; shared uncommitted S3 source/test changes were already present and preserved.
-- Upstream integration status: S3 started from refreshed `origin/main` with no divergence. Remote `codex/exhibition-s4` contains partial work at `960d9b7` but is not integrated; S3 has no remote counterpart.
-- Pending Git conflicts or synchronization blockers: NONE known; the feature branch has no remote counterpart yet
+- 2026-09-30 follow-up preflight: branch `codex/exhibition-s3`, HEAD `d51167bb1352c97e0b2135b3fb42852bd438699b`; `git fetch --prune origin` succeeded, local/remote S3 divergence is 0/0, and `origin/main` remains `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68`. Post-CI SW/SE builder/test changes and prior docs updates were present and preserved; the code delta is uncommitted and unpushed.
+- Upstream integration status: S3 started from refreshed `origin/main` with no divergence; `origin/main` remains at the S2 base. Remote `codex/exhibition-s4` contains partial work at `960d9b7` but is not integrated. Core S3 `d51167b` is pushed; post-CI visibility changes remain local, uncommitted and unpushed.
+- Current untracked artifacts: `.codegraph/` and the 12 current S3 screenshots under `artifacts/` are preserved; `.playwright-cli/` was cleaned after the final browser run. Browser captures are documented in [VALIDATION](../VALIDATION.md).
+- Pending Git conflicts or synchronization blockers: NONE known; final S3 diff is not pushed or integrated
 
 ## Goal and acceptance criteria
 
@@ -29,24 +31,24 @@ Complete S3 from [EXHIBITION_MVP.md](../EXHIBITION_MVP.md): render the authorita
 
 ## In-scope files and dependencies
 
-The implementation owner is working in `src/changeCatalog.ts`, `src/cityChangeManager.ts`, `src/siteBuilders/automationHub.ts`, `src/siteBuilders/commonsPlaza.ts`, `src/siteBuilders/concentrationTower.ts`, `src/siteBuilders/siteRuntime.ts` and focused root tests. The central integrator owns the v2 causal-panel copy/summary in `src/surveyAtmosphere.ts`. Documentation scope is this handoff plus the affected project summary, implementation map, Plan 02/S3 status, MVP stage status and validation record. Reuse S1's v2 contract and S2's root parser, Park runtime and site transition model; no survey server, module-swap, asset, dependency or deployment change is in this task.
+The core implementation is in `src/changeCatalog.ts`, `src/cityChangeManager.ts`, `src/siteBuilders/` and root tests. The visibility commit `36b5c18` edits `src/siteBuilders/commonsPlaza.ts`, `src/siteBuilders/concentrationTower.ts`, `tests/commonsPlaza.test.ts` and `tests/concentrationTower.test.ts`; the central integrator owns the v2 causal-panel copy/summary in `src/surveyAtmosphere.ts`. Reuse S1's v2 contract and S2's root parser, Park runtime and site transition model; no survey server, module-swap, asset, dependency or deployment change is in this task.
 
 ## Completed work
 
-The shared worktree routes server-provided NW/SW/SE bands and counts to the automation hub, commons plaza and concentration tower; NE remains the existing S2 Park. The root causal panel summarizes current proposal `cityChanges` by site and label and states explicitly when a proposal makes no city change. V2 scores remain separate from global atmosphere; S2's three-second live transition and immediate snapshot/reset behavior are retained.
+The pushed core commit routes server-provided NW/SW/SE bands and counts to the automation hub, commons plaza and concentration tower; NE remains the existing S2 Park. The root causal panel summarizes current proposal `cityChanges` by site and label and states explicitly when a proposal makes no city change. The post-CI visibility pass adds 2.4 m dark electrochromic SW screens that fold flat as seats become shared, plus grounded SE low pavilions with twin glazed service heads above DOGENZAKA. The service heads are visible in the fixed hero view, while the ground pavilions remain occluded behind the foreground; the SW state distinction is subtle but discernible. V2 scores remain separate from global atmosphere, and S2's three-second live transition and immediate snapshot/reset behavior are retained.
 
 ## Actual validation results
 
-- Verification status: PARTIAL — implementation and local root checks complete; browser/CI pending
-- Date and checked commit/worktree: 2026-09-29, uncommitted S3 worktree based on `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68`
-- Commands/manual checks and results: on 2026-09-29, root `npm test`, `npm run build` and `git diff --check` passed on the shared uncommitted S3 worktree. The build completed with a chunk-size warning for a bundle over 500 kB. The final local Markdown-target check passed for 261 targets across the seven assigned documents.
-- Evidence/environment: no S3 browser captures or CI run recorded yet
-- Integrated commit and checks: NOT INTEGRATED
-- Changes since verification: S3 implementation and the above checks remain uncommitted; final documentation diff/link checks are pending
+- Verification status: PARTIAL — local root checks, API matrix, snapshot/reset, standalone smoke and V01/V02 visual review passed on the current combined worktree; final feature CI and main integration remain pending
+- Date and checked commit/worktree: 2026-09-30; core commit `d51167bb1352c97e0b2135b3fb42852bd438699b` pushed to `origin/codex/exhibition-s3`; SW/SE visibility commit `36b5c18` re-passed root `npm test`, `npm run build` and `git diff --check` on 2026-09-30; not merged to `origin/main`
+- Commands/manual checks and results: the core commit `d51167b` passed root `npm test`, `npm run build`, `git diff --check` and [feature CI run 36577963207](https://github.com/cc100053/city2127/actions/runs/36577963207); that CI covers only the core commit. The combined post-visibility worktree passed root `npm test`, `npm run build` and `git diff --check` on 2026-09-30 JST; the build emitted only the existing >500 kB chunk warning. The isolated API matrix passed all 12 one-axis site/band combinations, same-band count updates, high→mixed→low, and composite all-low/mixed/all-high values (full numbers in [VALIDATION](../VALIDATION.md)). Snapshot/reconnect/reset checks passed: revision-1 all-high snapshot restored identically after forced reconnect with no update event; admin reset emitted one mixed revision-0 `run-reset`, rendered within 100 ms, with no visible pulse. Standalone `?hour=12` smoke at 1280×720 passed with zero new console/page errors and no survey request/socket. V01/V02 visual review accepted the current 12 captures at 1280×720 and 1920×1080. Root v1 was not browser-tested in the final pass; existing root unit tests are the only evidence here.
+- Evidence/environment: 12 screenshots captured 2026-09-30 JST from isolated survey server `127.0.0.1:8790` and Vite `127.0.0.1:5181`; current files and exact links are in [VALIDATION](../VALIDATION.md). The fixed-hero limitation is that SE ground pavilions remain occluded although the two service heads read above DOGENZAKA; SW privacy/shared states remain subtle but visible. No FPS, physical hardware or cross-platform results.
+- Integrated commit and checks: core feature commit `d51167b` is pushed and its feature CI passed; visibility commit `36b5c18` and the docs update are pushed; their feature CI is pending. Final code commit, final feature CI and main integration are NOT complete. Do not label S3 shipped/merged.
+- Changes since verification: the current combined source/test diff was locally verified by the implementation owner; this documentation update is pending link/fact/diff checks. No code changes are included in this documentation task.
 
 ## Known issues and blockers
 
-Desktop browser behavior and feature CI are still unverified. Do not describe S3 as shipped until those gates finish. No FPS, exhibition-hardware or cross-platform results are claimed.
+The current combined source/test diff has passed local root checks and final API/browser verification, but feature CI still applies only to core commit `d51167b`. Final code commit, feature CI for that commit and main integration checks remain outstanding. The fixed hero view still occludes SE ground pavilions; SW's distinction is subtle. No FPS, exhibition-hardware or cross-platform results are claimed.
 
 ## Important decisions
 
@@ -54,4 +56,9 @@ All states remain in 2127. S3 maps server-supplied values and does not derive si
 
 ## Next expected step
 
-The implementation owner runs desktop browser review for S3 states and feature CI, then records exact results. The documentation owner checks the final local Markdown links and documentation diff. No commit or push is part of this documentation assignment.
+The implementation owner should commit/push the locally verified code and run feature CI, then integrate only after the gates pass. Update this handoff with exact final commit/CI/main results after they arrive. No commit or push is part of this documentation update.
+
+## 2026-09-30 resume (Claude)
+
+- Preflight: branch `codex/exhibition-s3`, HEAD `36b5c18` (1 ahead of origin S3, docs uncommitted); `git fetch --prune origin` succeeded. `origin/main` advanced to `4212b80` (lifecycle `963c090` and S4 guest UI `4212b80` integrated), so S3 is 2 ahead / 6 behind main.
+- Root `npm test`, `npm run build`, `git diff --check` and `git diff --check origin/main...HEAD` passed on `36b5c18` plus docs.

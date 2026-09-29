@@ -1,8 +1,8 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
-## 最新補充 — 2026-09-29：S3 其餘三site映射（已實作，本機驗證通過）
+## 最新補充 — 2026-09-30：S3 其餘三site映射與可見度修正
 
-S3 已把 authoritative v2 bands／counts 接到 root 的 NW automation、SW commons 和 SE concentration；NE Park 維持 S2 Q3 映射。四site共12個 low／mixed／high配置中，S3新增九個。Root `npm test`、`npm run build` 和 `git diff --check` 通過；browser review 和 feature CI 待完成，所以目前仍不標為 shipped。狀態與後續證據見 [S3 handoff](handoffs/exhibition-s3.md) 及 [validation record](VALIDATION.md)。
+S3 core commit `d51167b` 已推送且 feature CI 通過。其後工作樹改善 SW 私密座位的 2.4 m 電致變色屏，以及 SE 低值的成對地面 pavilion／DOGENZAKA 上方玻璃服務頭，並補了固定 hero camera 投影可讀性測試。合併後的 root `npm test`、`npm run build`、`git diff --check`、12 個一軸 API case、same-band、high→mixed→low、snapshot/reconnect/reset、standalone smoke 及 V01/V02 視覺檢查均通過；12 張桌面截圖及精確 mapping 數值見 [validation record](VALIDATION.md)。可見度修改仍未提交，最終 feature CI 和 main 整合待完成，因此不標為 shipped。固定 hero 畫面中的 SE 地面 pavilion 被前景遮擋，上方服務頭仍可見；SW 差異較細但可辨。狀態與後續證據見 [S3 handoff](handoffs/exhibition-s3.md)。
 
 ## S2 root Q3 切片 — 2026-09-29（已整合）
 
