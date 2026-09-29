@@ -1,0 +1,59 @@
+{
+  "phase": "03D",
+  "dataSource": {
+    "provider": "Geospatial Information Authority of Japan (GSI)",
+    "dataset": "DEM5A elevation tiles (Fundamental Geospatial Data digital elevation model)",
+    "tileUrlTemplate": "https://cyberjapandata.gsi.go.jp/xyz/dem5a/15/{x}/{y}.txt",
+    "tileRange": {
+      "zoom": 15,
+      "xMin": 29106,
+      "xMax": 29107,
+      "yMin": 12908,
+      "yMax": 12910,
+      "tileCount": 6
+    },
+    "coordinateSystem": "Web Mercator tile addressing; source heights are GSI elevation values, sampled into local ground metres",
+    "nominalResolutionM": 5,
+    "sourceMethod": "airborne laser survey; GSI elevation-tile values are linearly smoothed",
+    "missingSampleCount": 149355,
+    "validSampleCount": 243861,
+    "rawElevationMinM": -10.45,
+    "rawElevationMaxM": 13.53,
+    "sourceLinks": [
+      "https://maps.gsi.go.jp/development/ichiran.html",
+      "https://maps.gsi.go.jp/development/demtile.html"
+    ]
+  },
+  "sceneVerticalDatum": {
+    "localZ0": "DEM5A sample at Fuji TV control-point centre",
+    "sourceElevationAtLocalZ0M": 5.38,
+    "verticalExaggeration": false,
+    "verticalCompressionFactor": 0.35,
+    "terrainClampRelativeM": [
+      -0.35,
+      1.0
+    ],
+    "buildingPadsZ": 0.0
+  },
+  "terrainMesh": {
+    "samplingIntervalM": 20.0,
+    "vertices": 6935,
+    "triangles": 9126,
+    "minZ": -0.35,
+    "maxZ": 1.0,
+    "degenerateFaces": 0,
+    "seaHorizontalZ": -0.8
+  },
+  "road": {
+    "maximumSlopePercent": 4.919851121515085,
+    "surfaceOffsetAboveTerrainM": 0.06,
+    "sidewalkOffsetAboveTerrainM": 0.16
+  },
+  "placementZChanges": [],
+  "limitations": [
+    "DEM tile voids occur predominantly over water and are not interpolated into land terrain.",
+    "Building surroundings are deliberately blended to local Z=0 pads to preserve unchanged source-building placement.",
+    "A 40 m neighborhood low-pass and 0.35 vertical compression are used to avoid transferring isolated quay/structure samples into road slopes; this is conservative terrain presentation, not a survey-grade grading plan.",
+    "Displayed land is clamped above the horizontal sea surface so water does not cover reclaimed-land cells whose raw DEM neighborhood includes quay or water samples."
+  ]
+}
