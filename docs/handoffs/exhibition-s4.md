@@ -1,8 +1,8 @@
 # Exhibition S4 — guest UI and root feedback
 
 - Owner: Codex Luna Max (survey UI implementer)
-- Status: IN_PROGRESS
-- Branch: `codex/exhibition-s4`
+- Status: IN_PROGRESS — 2026-09-30 exit-gate browser checks passed (see acceptance pass); feature CI and main integration pending; deviations listed below
+- Branch: `codex/exhibition-s4` (original, integrated via `4212b80`); acceptance pass on `codex/exhibition-s4-acceptance`
 - Base commit: `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68`
 - Last verified commit: `960d9b7c520af7f845bb6c0a2df47d17ad222f9f`; local code checks below ran on the tracked source tree immediately before it was committed
 - Remote availability: feature branch is pushed to `origin/codex/exhibition-s4`; implementation commit `960d9b7c520af7f845bb6c0a2df47d17ad222f9f` is available remotely, and a documentation follow-up may advance branch HEAD; feature CI status is unverified (no run ID, status, or conclusion evidence)
@@ -56,3 +56,29 @@ Survey UI: `survey/guest.html`, `survey/src/ui/guestDebugView.ts`, `survey/src/u
 ## Next expected step
 
 Complete S3's three site mappings, then run the full survey package tests via CI. Obtain browser evidence for the four-question flow, reload/retry recovery, honest result text, visual/keyboard/reduced-motion behavior and recent-band visibility at 1280×720. Address the result/handoff and 10-second hint timing gaps against the spec; S4 remains IN_PROGRESS until its acceptance checks are complete.
+
+## 2026-09-30 acceptance pass (Claude)
+
+- Branch `codex/exhibition-s4-acceptance` from `main` `8de107b` (S1–S4 and lifecycle integrated; S3 shipped). Owner for this pass: Claude.
+- Code changes:
+  - `survey/src/ui/guestDebugView.ts`: result (~10 s) → handoff (~5 s; `次の方へどうぞ`, proposal number) → welcome auto-advance, with buttons to skip; recovery storage is cleared on entering handoff. `lifecycle_blocked` shows a Japanese wait message without the server's English detail. `変更` on the review screen returns straight to review once all four answers exist.
+  - `survey/src/ui/debug.css`: tighter vertical spacing so every question page and the review screen's submit button fit 1280×720.
+  - `src/surveyAtmosphere.ts` / `src/style.css`: in v2 mode the `最近64人` count and band precede the latest proposal (v1 order unchanged); latest feedback lists city changes → note → Meters → compact `質問 N` answers (question text as `title`); the band uses 12 columns so 64 cells take six rows.
+- Browser evidence (2026-09-30, isolated survey `127.0.0.1:8792` with a temp DB, root Vite `127.0.0.1:5184`, built-in browser):
+  - Guest 1280×720: keyboard-only Tab/arrow/Enter through four questions with a visible focus ring and text `選択中`; reload mid-draft restored Q4 and earlier answers; back kept Q3's answer; review listed four answers; review `変更` on Q2 returned to review with the new answer.
+  - A simulated lost response (server committed, client got a network error) locked edits and offered same-ID retry; reload replayed it as `#1`, `参加者 1 人` (counted once).
+  - Result → handoff → welcome advanced automatically (handoff measured 5.0 s) and cleared storage. Starting before staff exit showed `前の方の体験がまだ終了していません。スタッフが確認するまで少しお待ちください。`; admin `guest-left` returned lifecycle to `ready` and the next start succeeded.
+  - Idle: after 60 s the warning appeared with focus on `続ける`; 15 s later the draft ended (`草稿を終了しました`), storage was cleared and guest count stayed unchanged. A new session could start afterwards.
+  - Layout: every question page measured exactly 720 px tall (next button bottom 668 px); review submit button bottom 717 px (the frame's lower edge still scrolls ~37 px). The result page is longer than 720 px and scrolls; its summary and city changes are at the top.
+  - Reduced motion: the guest page animates only under `prefers-reduced-motion: no-preference`; the root panel has no animation.
+  - Root panel: before the change, at 1280×720 the panel spanned 120–520 px and the band was at 854 px. After it, with 70 guests (64 cells; oldest shown `#7`), the band spans 261–386 px and the first two change rows (409, 450 px) and note (490 px) are visible without scrolling; 1920×1080 gives the same positions and the panel does not cover the sites.
+  - No screenshots were archived; values above are DOM measurements plus visual review.
+- Checks: root `npm test`, `npm run build`, `git diff --check`; `survey/` `npm test` and `npm run build` passed on the final worktree. No new unit test: the changes are DOM ordering, CSS and timers, covered by the browser run above.
+
+## Remaining deviations (S4 exit gate otherwise met)
+
+- The guest result and root panel show up to two changes together rather than sequencing two hints over 10 s.
+- The welcome screen does not switch to the spec's inherited-city wording (`この街は、これまでの参加者がつくりました。`) when guests already exist.
+- The root scene's 3 s site transitions do not honour `prefers-reduced-motion`.
+- The result page scrolls at 1280×720; it is shown for ~10 s.
+- S5 items (100 proposals/60 min endurance, exhibition hardware/FPS, five-person understanding test) remain open.

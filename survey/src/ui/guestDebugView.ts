@@ -9,7 +9,7 @@ const app = document.querySelector<HTMLElement>('#app')!;
 app.classList.add('guest');
 document.body.classList.add('guest-page');
 
-type Screen = 'welcome' | 'starting' | 'question' | 'review' | 'submitting' | 'result' | 'abandoned';
+type Screen = 'welcome' | 'starting' | 'question' | 'review' | 'submitting' | 'result' | 'handoff' | 'abandoned';
 type GuestRecovery = {
   session: ProposalSessionData;
   choices: [string, string][];
@@ -28,8 +28,14 @@ let conflictState: ExhibitionState | undefined;
 let notice: { text: string; role: 'status' | 'alert' } | undefined;
 let idleTimer = 0;
 let abandonTimer = 0;
+/** Result (~10 s) → handoff (~5 s) → welcome, per the exhibition flow; buttons skip ahead. */
+let flowTimer = 0;
+const RESULT_MS = 10_000;
+const HANDOFF_MS = 5_000;
 let idleWarning = false;
 let busy = false;
+/** Set by a review-screen 変更: submitting that question returns to review. */
+let editingFromReview = false;
 let recoveryUnavailable = false;
 
 const axisNames: Record<keyof ExhibitionState['scores'], string> = {
@@ -309,7 +315,8 @@ function renderQuestion(focus = true) {
     event.preventDefault();
     if (!draft.has(question.id)) return;
     notice = undefined;
-    if (questionIndex < session!.questions.length - 1) {
+    const complete = session!.questions.every(item => draft.has(item.id));
+    if (questionIndex < session!.questions.length - 1 && !(editingFromReview && complete)) {
       questionIndex += 1;
       renderQuestion();
     } else {
@@ -330,7 +337,7 @@ function renderQuestion(focus = true) {
 function renderAnswerRow(index: number, editable: boolean) {
   const question = session!.questions[index];
   const selected = question.options.find(option => option.id === draft.get(question.id));
-  const edit = action('変更', () => { questionIndex = index; screen = 'question'; renderQuestion(); }, false, !editable);
+  const edit = action('変更', () => { questionIndex = index; screen = 'question'; editingFromReview = true; renderQuestion(); }, false, !editable);
   return el('li', { class: 'guest-review-row' },
     el('div', { class: 'guest-review-copy' },
       el('p', { class: 'guest-review-number' }, `質問 ${index + 1}`),
@@ -340,6 +347,7 @@ function renderAnswerRow(index: number, editable: boolean) {
 }
 
 function renderReview(focus = true) {
+  editingFromReview = false;
   const uncertain = pendingRequest !== undefined;
   const sessionBlocked = ['session_expired', 'already_answered', 'unsupported_version'].includes(lastErrorCode ?? '');
   const submitLabel = busy ? '記録しています…'
@@ -425,7 +433,10 @@ function errorText(code: string, detail: string) {
     already_answered: 'この予約はすでに送信済みです。',
     revision_conflict: '街の集計が更新されています。現在の状態を確認してください。',
     bad_request: '提案を確認できませんでした。草稿を見直してください。',
+    lifecycle_blocked: '前の方の体験がまだ終了していません。スタッフが確認するまで少しお待ちください。',
   };
+  // An expected wait, not a fault: the server's English detail would only confuse guests.
+  if (code === 'lifecycle_blocked') return title[code];
   return `${title[code] ?? (code === 'internal_error' ? '送信結果を確認できません。再試行できます。' : `通信エラー（${code}）`)} ${detail}`;
 }
 
@@ -484,12 +495,29 @@ function renderResult(focus = true) {
     el('h2', {}, '街の構成'), renderCityChanges(proposal),
     renderScores(proposal.beforeScores, proposal.afterScores),
     el('p', { class: 'guest-copy' }, '街はこの提案を含む集計結果を引き継ぎます。次の方の回答で、共同の街を続けてつくります。'),
-    el('div', { class: 'guest-actions' }, action('次の方へ', nextGuest, true)));
+    el('p', { class: 'guest-copy' }, 'この画面は約10秒後に次へ進みます。'),
+    el('div', { class: 'guest-actions' }, action('次の方へ', renderHandoff, true)));
   if (focus) focusTitle();
+  clearTimeout(flowTimer);
+  flowTimer = window.setTimeout(renderHandoff, RESULT_MS);
+}
+
+function renderHandoff() {
+  if (!saved) return nextGuest();
+  clearTimeout(flowTimer);
+  // The proposal is recorded; a reload from here must not replay the result.
+  clearRecovery();
+  screen = 'handoff';
+  page('次の方へどうぞ', `提案 #${saved.proposal.ordinal} を記録しました`,
+    el('p', { class: 'guest-lead' }, '街はこのまま次の方へ引き継がれます。'),
+    el('div', { class: 'guest-actions' }, action('はじめる画面へ', nextGuest, true)));
+  focusTitle();
+  flowTimer = window.setTimeout(nextGuest, HANDOFF_MS);
 }
 
 function nextGuest() {
   clearIdleTimers();
+  clearTimeout(flowTimer);
   clearRecovery();
   session = undefined;
   draft = new Map();
@@ -527,6 +555,7 @@ function renderCurrent(focus = true) {
   if (screen === 'question') return renderQuestion(focus);
   if (screen === 'review' || screen === 'submitting') return renderReview(focus);
   if (screen === 'result') return renderResult(focus);
+  if (screen === 'handoff') return renderHandoff();
   renderAbandoned();
 }
 
