@@ -1,9 +1,8 @@
 import assert from 'node:assert/strict';
-import type { ProposalData, ProposalRequest, ProposalSessionData, ResetData, ServerEvent } from '../src/shared/protocol.ts';
+import type { LifecycleData, ProposalData, ProposalRequest, ProposalSessionData, ServerEvent } from '../src/shared/protocol.ts';
 import { currentState, currentView } from '../src/server/answerService.ts';
 import { createProposalSession, parseProposalRequest, submitProposal } from '../src/server/proposalService.ts';
-import { resetRun } from '../src/server/adminService.ts';
-import { exhibitionFixture, ok, startServer } from './surveyFixture.ts';
+import { exhibitionFixture, ok, staff, startServer } from './surveyFixture.ts';
 
 function requestFor(ctx: ReturnType<typeof exhibitionFixture>['ctx'], session: ProposalSessionData, id: string): ProposalRequest {
   return {
@@ -33,6 +32,7 @@ for (let ordinal = 0; ordinal < 100; ordinal++) {
   const result = ok(submitProposal(ctx, request).response);
   assert.equal(result.replayed, false);
   assert.equal(result.proposal.ordinal, ordinal + 1);
+  ok(staff(ctx, 'guest-left'));
   if (ordinal === 0) { firstRequest = request; firstResult = result; }
 }
 assert.ok(firstRequest && firstResult);
@@ -53,7 +53,7 @@ assert.deepEqual(replay, { ...firstResult, replayed: true });
 const changed = { ...firstRequest, answers: firstRequest.answers.map((answer, i) => ({ ...answer, optionId: i === 0 ? 'different-option' : answer.optionId })) };
 const reusedId = submitProposal(ctx, changed).response;
 assert.equal(!reusedId.ok && reusedId.error.code, 'answer_conflict');
-const reset = ok(resetRun(ctx, { confirmation: 'RESET' }).response);
+const reset = ok(staff(ctx, 'reset-city', 'RESET'));
 assert.equal(reset.previousRunId, originalRunId);
 assert.equal(reset.state.revision, 0);
 assert.deepEqual(ok(submitProposal(ctx, firstRequest).response), { ...firstResult, replayed: true });
@@ -66,6 +66,7 @@ const left = requestFor(ctx, leftSession, 'same-revision-left'), right = request
 assert.equal(ok(submitProposal(ctx, left).response).state.revision, 1);
 const stale = submitProposal(ctx, right).response;
 assert.equal(!stale.ok && stale.error.code, 'revision_conflict');
+ok(staff(ctx, 'guest-left'));
 
 // Expiry is enforced for a fresh session, with no event or snapshot mutation.
 const expiring = ok(createProposalSession(ctx));
@@ -129,7 +130,10 @@ try {
   assert.equal(event.type, 'city-state-updated');
   assert.equal(event.type === 'city-state-updated' && 'proposal' in event && event.proposal.id, 'http-proposal');
   assert.equal((await server.request<ProposalData>('/api/proposals', request)).status, 200, 'idempotent HTTP retry');
-  const resetResponse = await server.request<ResetData>('/api/admin/reset', { confirmation: 'RESET' });
+  const staleReset = await server.request<LifecycleData>('/api/admin/lifecycle', { command: 'reset-city', expectedRevision: 0, confirmation: 'RESET' });
+  assert.equal(staleReset.status, 409, 'a stale admin page is refused');
+  assert.equal((await server.request<LifecycleData>('/api/admin/lifecycle', { command: 'guest-left', expectedRevision: 2 })).status, 200);
+  const resetResponse = await server.request<LifecycleData>('/api/admin/lifecycle', { command: 'reset-city', expectedRevision: 3, confirmation: 'RESET' });
   assert.equal(resetResponse.status, 200);
   const resetEvent = await client.next();
   assert.equal(resetEvent.type, 'run-reset', 'retry does not emit a second proposal event');

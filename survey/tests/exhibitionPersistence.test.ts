@@ -8,7 +8,7 @@ import { createContext } from '../src/server/server.ts';
 import { SCHEMA_VERSION, migrations, schemaVersion } from '../src/server/migrations.ts';
 import { CorruptStateError, replayExhibitionRun, replayRun, runAnswerEvents } from '../src/server/runStore.ts';
 import { createProposalSession, submitProposal } from '../src/server/proposalService.ts';
-import { ok, EXHIBITION_QUESTIONS_PATH } from './surveyFixture.ts';
+import { ok, EXHIBITION_QUESTIONS_PATH, staff } from './surveyFixture.ts';
 
 const dir = mkdtempSync(join(tmpdir(), 'survey-exhibition-migration-'));
 try {
@@ -72,6 +72,7 @@ try {
       answers: session.questions.map((question, j) => ({ questionId: question.id, optionId: question.options[choiceIndices[i][j]].id })),
     };
     const accepted = ok(submitProposal(migrated, request).response);
+    ok(staff(migrated, 'guest-left'));
     saved = accepted.state;
   }
   assert.ok(Object.values(saved.recentVotes).some(value => !Number.isInteger(value)), 'EMA history contains persisted fractions');

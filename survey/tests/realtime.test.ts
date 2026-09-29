@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import type { AnswerData, GuestQuestionData, ResetData, ServerEvent } from './protocolTypes.ts';
+import type { AnswerData, GuestQuestionData, LifecycleData, ServerEvent } from './protocolTypes.ts';
 import { fixture, ok, startServer } from './surveyFixture.ts';
 
 /** Collects WebSocket events and lets the test await the next one. */
@@ -48,7 +48,7 @@ try {
   // A replayed answer does not broadcast a second update.
   await server.request<AnswerData>('/api/answers', { answerId: 'ws-1', guestSessionId: guest.session.id, questionId: guest.question.id, optionId: 'solar-canopy', expectedRevision: 0 });
 
-  const reset = ok((await server.request<ResetData>('/api/admin/reset', { confirmation: 'RESET' })).body);
+  const reset = ok((await server.request<LifecycleData>('/api/admin/lifecycle', { command: 'reset-city', expectedRevision: 0, confirmation: 'RESET' })).body);
   const resetEvent = await a.next();
   assert.equal(resetEvent.type, 'run-reset', 'next event after the replay is the reset, not a duplicate update');
   assert.equal(resetEvent.type === 'run-reset' && resetEvent.previousRunId, answer.state.runId);

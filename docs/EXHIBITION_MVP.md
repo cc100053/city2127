@@ -144,6 +144,7 @@ Q1／Q3是未來情境，Q2／Q4是生活偏好。直接選擇城市取捨，不
 - 草稿可改，提交後不能偷偷修改歷史；server成功但回應遺失時以同一submissionId重試，不能重加分。
 - 等待server時按鈕防重按；重新連線收到snapshot只恢復，不重新播放「你剛剛改變」動畫。
 - 建議每日延續同一run；如工作人員要新run，使用admin操作並保留舊紀錄。每日政策仍待展覽負責人定案，不能於午夜自動清空。
+- 2026-09-29 已實作（[lifecycle handoff](handoffs/exhibition-lifecycle.md)）：server端 `ready → in_experience → awaiting_exit`，只有工作人員按「Confirm Guest Has Left」才回到 `ready`；觀眾在場時要求的 city／full reset 會保留至退出確認才執行。總參與人數只由full data reset歸零。S4 guest UI 仍需處理 `lifecycle_blocked`（等待上一位離開）。
 - 第N位以已完成提案數計，不以answer row數計；四題不是四位。
 - 建議驗收／展覽比較使用現有`?hour=12`；日夜仍是獨立系統，不由答案推進年份或時間。
 - 保留鍵盤操作、清晰focus、足夠對比、文字／符號、不只用色；reduced motion使用淡入／直接切換與前後數字。
