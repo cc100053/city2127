@@ -76,6 +76,8 @@ Each task has one named owner and a repository-based handoff under `docs/handoff
 
 ## Commands
 
+Standalone QR archive: `cd qr-hud`, then `npm ci`, `npm run build`, `npm test`, `npm start` (default port 4173). `npm run test:e2e` requires local Chrome and its preview. See [QR README](qr-hud/README.md). The root checks and existing CI do not cover this independent package; run its checks when changing it.
+
 Use Node.js 24+; this project has been run with Node 26. Tests execute TypeScript directly with Node's type stripping, without a test framework.
 
 ```sh

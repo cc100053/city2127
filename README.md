@@ -1,5 +1,11 @@
 # 2127 — Frozen Intersection
 
+## QR 成果展示模組
+
+獨立的日文 QR 終端、手機成果頁及媒體上傳服務位於 [qr-hud/](qr-hud/README.md)。在該目錄執行 `npm ci`、`npm run build`、`npm start`，開啟 `http://localhost:4173`。Windows 可使用 `npm.cmd`。
+
+此模組尚未接上城市投票、截圖或錄影；未設定 Supabase 時使用展示模式。真實雲端設定見 [部署說明](qr-hud/DEPLOYMENT.md)，不要提交 `.env`、金鑰或 `.data/`。手機成果頁是此獨立模組的功能，不改變原城市場景的桌面展示範圍。交接見 [QR HUD handoff](docs/handoffs/qr-hud-import.md)。
+
 AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/PROJECT.md) · [驗收與交接流程](docs/VALIDATION.md) · [展覽方向與 Plan 02 紀錄](docs/PLAN02.md)。
 
 **展覽 MVP 狀態（2026-09-29）：** [共同城市 MVP 設計與 Agent 實作規劃](docs/EXHIBITION_MVP.md)的 S1 四題 API、SQLite v2 run／proposal 儲存已實作。S2 Q3→NE Park 切片已整合及通過 feature/main CI；其他三個 site 固定顯示成熟混合基底，映射待 S3；四題 guest UI 待 S4。城市從開始已是2127年，低／零／高值都必須有未來感。下方一題流程及畫面內容是 v1 歷史實作，不代表新的 guest flow。S1 與 S2 狀態分別見 [S1 handoff](docs/handoffs/exhibition-s1.md) 和 [S2 handoff](docs/handoffs/exhibition-s2.md)，完整驗證見[驗證紀錄](docs/VALIDATION.md)。

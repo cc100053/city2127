@@ -1,5 +1,11 @@
 # Validation and handoff
 
+## Standalone QR HUD import — 2026-09-29
+
+Imported `qr-hud/` from the user's local project without runtime changes. In this checkout, QR `npm run build` and all 10 `npm test` cases passed (Node 22.16.0). `npm run test:e2e` passed QR decoding, session/URL editing, Japanese layouts, polling, image/MP4 playback, failure recovery and operator controls against the existing localhost:4173 preview of the matching source. These are isolated API/browser checks, not real Supabase or exhibition-phone acceptance. Current demo QR targets the HAL Tokyo website; it is not a published personal archive.
+
+Root tests and build passed under Node 24 via npm exec. Both builds retain bundle-size warnings. No survey or module-swap code changed. Existing CI does not run the new QR package. See [handoff](handoffs/qr-hud-import.md) for Git publication status; no merge or deployment is part of this import.
+
 ## Exhibition S2 — Q3 climate vertical slice — 2026-09-29
 
 **Status: SHIPPED.** Feature commit `2357f09526d17adbe1c52f4bb79c4fa025fe0d0d` passed [feature CI](https://github.com/cc100053/city2127/actions/runs/36516892136). It was merged with an identical tree as `3417760be33884c5d6a7697f0a8c1655a9ca4a10` and pushed to `origin/main`; integrated root `npm test`, `npm run build` and `git diff --check` passed. [Main CI](https://github.com/cc100053/city2127/actions/runs/36517115203) also passed. S2 covers only the Q3 NE Park slice; other site mappings remain S3, the guest UI remains S4, and full exhibition acceptance remains open. See the [S2 handoff](handoffs/exhibition-s2.md) for exact run IDs and the API/parser matrix.

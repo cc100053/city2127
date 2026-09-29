@@ -1,5 +1,11 @@
 # Project contract and implementation map
 
+## Standalone QR archive import — 2026-09-29
+
+`qr-hud/` imports the user's existing Japanese QR terminal as an independent npm package. Its Three.js HUD generates links to `/city/:sessionId`; the Node API serves the mobile result page and handles authenticated uploads through a persistent disk queue to Supabase Postgres/private Storage. See [package README](../qr-hud/README.md) and [deployment](../qr-hud/DEPLOYMENT.md).
+
+There is no connection yet to root city rendering, survey proposals, automatic capture or video recording. Supabase session IDs are independent of survey guest/proposal IDs. Cloud configuration, public hosting and real-phone end-to-end acceptance remain pending. Existing root/survey/module-swap behavior is unchanged; the imported mobile page is explicitly part of the user's QR scope.
+
 Exhibition priorities and historical Plan 02 implementation status: [方向與紀錄](PLAN02.md). Art rules for the root scene: [ART.md](ART.md), in use since 2026-09-24. Status and remaining art work: [art-direction handoff](handoffs/art-direction.md#remaining-work).
 
 ## Exhibition specification and S1–S2 status — 2026-09-29

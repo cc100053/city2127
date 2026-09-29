@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.log
+test-results/
+.env
+.env.*
+!.env.example
+.data/
+.data.lock/
+coverage/

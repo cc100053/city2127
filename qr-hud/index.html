@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b111d" />
+    <title>2127 — 都市アーカイブ端末</title>
+    <link rel="icon" type="image/svg+xml" href="/badge.svg" />
+  </head>
+  <body>
+    <main class="terminal" id="terminal" data-state="loading">
+      <div class="ambient" aria-hidden="true"></div>
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="2127 都市アーカイブ"><span class="brand-mark">21<span>27</span></span><span class="brand-copy">渋谷未来都市<br><strong>都市アーカイブシステム</strong></span></a>
+        <div class="top-meta"><span class="live-dot"></span> システム稼働中 <span class="divider">/</span> 東京 · 日本 <time id="clock"></time></div>
+      </header>
+
+      <section class="heading">
+        <p class="eyebrow"><span></span> 市民プロトコル / 01</p>
+        <h1>あなたの提案が、<span>未来につながる。</span></h1>
+        <p class="subtitle">あなたの声が、街の未来になる。</p>
+      </section>
+
+      <section class="workspace" aria-label="都市アーカイブ端末">
+        <aside class="side-panel left-panel">
+          <div class="section-label"><span>01</span> 提案アーカイブ</div>
+          <div class="record-number"><span>NO.</span><strong id="archive-number">148</strong><span class="record-cross">＋</span></div>
+          <p class="record-title">一人ひとりの想いが、街の次の一歩になる。</p>
+          <div class="data-row"><span>エリア</span><strong>SHIBUYA / 渋谷</strong></div>
+          <div class="data-row"><span>通信規格</span><strong>CIVIC-LINK 2.0</strong></div>
+          <div class="data-row"><span>公開範囲</span><strong class="cyan">公開アーカイブ</strong></div>
+          <div class="waveform" aria-hidden="true"></div>
+          <div class="micro spread"><span>都市ネットワーク</span><span class="cyan">安定</span></div>
+          <p class="side-note">新しい街へ。<br>ともにつくる未来へ。</p>
+        </aside>
+
+        <div class="portal">
+          <div id="hologram" aria-hidden="true"></div>
+          <div class="orbit-label orbit-top">35°39′35.0″N &nbsp; 139°42′06.0″E</div>
+          <div class="qr-shell" id="qr-shell">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div id="qr" aria-label="QRコードを読み取って提案を見る"></div>
+            <div class="transfer" id="transfer">
+              <div class="scan-line"></div>
+              <span class="transfer-symbol">⌘</span>
+              <span class="micro">都市データ通信</span>
+              <strong id="transfer-title">都市データを暗号化・送信中</strong>
+              <div class="transfer-value"><span id="progress-number">00</span><small>%</small></div>
+              <div class="progress-track" role="progressbar" aria-label="都市データの送信状況" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="progress-fill"></span></div>
+              <span class="micro transfer-bytes" id="transfer-bytes">0x0000 · 000 KB</span>
+            </div>
+          </div>
+          <div class="orbit-label orbit-bottom"><span class="tiny-cross">＋</span> QRコードから、未来の街へ <span class="tiny-cross">＋</span></div>
+        </div>
+
+        <aside class="side-panel right-panel">
+          <div class="section-label"><span>02</span> 接続状況</div>
+          <div class="status-block"><span class="micro">セッション</span><strong id="session-status">session_148</strong><span class="status-description"><i></i> セッション作成済み</span></div>
+          <div class="status-block"><span class="micro">ネットワーク</span><strong class="cyan" id="network-status">送信中</strong><span class="status-description" id="network-description">ローカルデモ</span></div>
+          <div class="status-block"><span class="micro">アーカイブ</span><strong id="archive-status">待機中</strong><span class="status-description" id="archive-description">アーカイブの作成待ち</span></div>
+          <div class="pipeline" aria-label="デモ送信の進行状況"><span data-stage="QUEUED">01</span><i></i><span data-stage="ENCRYPTING">02</span><i></i><span data-stage="UPLOADING">03</span><i></i><span data-stage="COMPLETE">04</span></div>
+          <div class="micro spread"><span>送信ステップ</span><span id="sequence">01 / 04</span></div>
+        </aside>
+      </section>
+
+      <section class="result" aria-live="polite">
+        <p class="ready-label" id="ready-label">2127 CIVIC ARCHIVE — 接続中</p>
+        <h2 id="result-title">あなたの想いを、街の記録に。</h2>
+        <p class="scan-hint" id="scan-hint">データを処理しています。しばらくお待ちください。</p>
+        <a id="target-link" class="target-link" target="_blank" rel="noopener noreferrer"></a>
+      </section>
+
+      <footer class="footer"><span>2127 SHIBUYA <span class="footer-dim">/ この街の未来を、ともに。</span></span><button id="simulate" class="simulate"><span>↻</span> 投票完了をテスト <span class="button-arrow">↗</span></button><span class="footer-right"><span class="live-dot"></span><span id="environment-label">デモモード</span><span class="footer-dim">V.02</span></span></footer>
+      <details class="dev-panel"><summary>⌘ &nbsp; 開発設定 <span>＋</span></summary><form id="dev-form"><label>セッションID<input id="session-input" name="session" required maxlength="64" pattern="[A-Za-z0-9_-]+" spellcheck="false" /></label><label>リンク先URL <span>セッションIDの変更を自動反映</span><input id="url-input" name="url" type="url" required maxlength="240" spellcheck="false" /></label><p id="form-error" role="alert"></p><button type="submit">適用して再生 ↗</button><small>デモ表示です。データは送信されません。</small></form></details>
+    </main>
+    <button class="operator-launch" id="operator-launch">↑ メディア管理</button>
+    <script type="module" src="/src/entry.js"></script>
+  </body>
+</html>
