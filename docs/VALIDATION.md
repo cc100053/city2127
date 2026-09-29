@@ -1,5 +1,9 @@
 # Validation and handoff
 
+## README language and startup guide — 2026-09-30
+
+Documentation-only change: the main README now has a Traditional Chinese Mac/Windows exhibition quick start, with separate English and Japanese guides. The guides identify the survey server and root city terminal tabs, the guest/city/admin/optional monitor browser tabs, default ports, SQLite persistence, staff exit confirmation, LAN binding and the legacy module-swap boundary. Startup commands and routes were checked against `package.json`, `survey/package.json`, `survey/src/server/server.ts`, `survey/vite.config.ts`, `src/main.ts` and the admin/monitor UI source. Local Markdown links in the three READMEs passed; Windows commands and a live cross-device LAN setup were not run. See the [README handoff](handoffs/readme-localization.md) for commit and integration status.
+
 ## Exhibition S3 — visibility refinement and validation — 2026-09-30
 
 **Status: SHIPPED — integrated into main as `63af1b6b4c3f2c9ba39faaf18dae68f276b5f972`; [feature CI run 36599413799](https://github.com/cc100053/city2127/actions/runs/36599413799) passed on merge commit `17e305b` and [main CI run 36599599701](https://github.com/cc100053/city2127/actions/runs/36599599701) passed.** Core commit [`d51167bb1352c97e0b2135b3fb42852bd438699b`](https://github.com/cc100053/city2127/commit/d51167bb1352c97e0b2135b3fb42852bd438699b) is pushed to `origin/codex/exhibition-s3`; [feature CI run 36577963207](https://github.com/cc100053/city2127/actions/runs/36577963207) passed for that commit only. The post-CI SW/SE visibility changes and focused tests are commit `36b5c18`, which that historical CI run does not cover. Local root checks and final browser/API verification passed on them. `origin/main` (lifecycle + S4) was then merged into the S3 branch; see the S3 handoff for merge checks. The integrated result passed root/survey checks and CI as recorded above.
