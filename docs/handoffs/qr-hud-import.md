@@ -1,11 +1,11 @@
 # QR HUD import
 
 - Owner: jerrycai88 (user), implemented with Codex
-- Status: BLOCKED on GitHub push authentication; local import and checks complete
+- Status: PUBLISHED to origin/feature/2127-qr-hud; no merge or deployment
 - Branch: feature/2127-qr-hud
 - Base commit: eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68
-- Last verified commit: base plus imported qr-hud files and documentation in this branch; see branch history for the import commit
-- Remote availability: NOT PUSHED
+- Last verified implementation commit: bd3505a8a853cb63f9637cd68a96d1d265d1a9cc (existing build/test evidence retained; implementation unchanged during publication)
+- Remote availability: PUSHED; upstream is origin/feature/2127-qr-hud
 
 ## Session Git state
 
@@ -30,8 +30,16 @@ Publish the user's QR project as a new feature branch of cc100053/city2127. Keep
 - Builds report bundle-size warnings. Real Supabase, physical phones and public hosting: NOT VERIFIED.
 - No executable changes to the imported project; only packaging ignore/docs changes. Root/survey/module-swap source untouched.
 
-## Blocker and next step
+## Publication verified - 2026-09-29
 
-Git fetch works with `git -c http.sslBackend=openssl fetch origin`. Push dry-runs failed; Git Credential Manager reports it cannot persist credentials with the Windows wincredman store in this environment. No token was requested or extracted. Open this checkout in the user's authenticated GitHub Desktop and Publish branch, or run `git push -u origin feature/2127-qr-hud` from an authenticated terminal. Do not merge main. Confirm the remote branch after publication.
+The earlier push failure was resolved by running Git in the Windows user environment, with a command-scoped safe.directory exception for this exact sandbox-owned checkout and http.sslBackend=openssl. Normal GitHub credential handling succeeded; no token or password was requested, extracted, or written into the repository. No global Git trust or SSL setting was changed.
+
+Preflight confirmed a clean feature/2127-qr-hud at bd3505a8a853cb63f9637cd68a96d1d265d1a9cc. A fresh fetch showed origin/main at eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68, with the task branch one commit ahead and zero behind; the remote task branch did not yet exist. A normal push with --set-upstream created it. An independent git ls-remote check then confirmed the remote task branch exactly at bd3505a8a853cb63f9637cd68a96d1d265d1a9cc and remote main still at eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68. Local upstream resolution and the ancestor check also passed.
+
+This follow-up changes only this handoff. Existing implementation tests were not rerun, as requested. Publication checks cover remote identity, commit availability, upstream tracking, clean starting worktree, and git diff --check. No code was reimported, no branch was merged or force-pushed, and CI results are not claimed by this publication record. No other repository documentation needed updating because runtime behavior and validation scope did not change.
+
+Branch: [feature/2127-qr-hud](https://github.com/cc100053/city2127/tree/feature/2127-qr-hud).
+
+Next step: collaborators can fetch the published feature branch. Integration into main, deployment, and real Supabase verification remain outside this task; wait for a separate assignment.
 
 The original D:/2127-qr-hud is still a separate source directory: later edits there do not automatically update this repository copy.
