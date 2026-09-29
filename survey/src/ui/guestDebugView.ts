@@ -1,103 +1,535 @@
 import './debug.css';
-import type { AnswerData, AnswerRequest, ApiResponse, GuestQuestionData } from '../shared/protocol.ts';
-import { api, el, newAnswerId, renderState } from './debugApi.ts';
+import type { ProposalRecord } from '../shared/cityView.ts';
+import type { ExhibitionState } from '../shared/citySurveyState.ts';
+import type { ProposalData, ProposalRequest, ProposalSessionData } from '../shared/protocol.ts';
+import { api, el, newAnswerId } from './debugApi.ts';
+import { buildProposalRequest } from './guestFlow.ts';
 
-// Debug surface for the future phone survey: one guest session, one assigned question, one answer.
 const app = document.querySelector<HTMLElement>('#app')!;
-let current: GuestQuestionData | undefined;
-let lastRequest: AnswerRequest | undefined;
-let expiryTimer = 0;
+app.classList.add('guest');
+document.body.classList.add('guest-page');
 
-function show(...children: (Node | string)[]) {
-  app.replaceChildren(el('h1', {}, 'Guest debug'), ...children);
+type Screen = 'welcome' | 'starting' | 'question' | 'review' | 'submitting' | 'result' | 'abandoned';
+type GuestRecovery = {
+  session: ProposalSessionData;
+  choices: [string, string][];
+  questionIndex: number;
+  screen: 'question' | 'review' | 'result';
+  pendingRequest?: ProposalRequest;
+};
+const recoveryKey = 'city2127.guest-draft.v2';
+let screen: Screen = 'welcome';
+let session: ProposalSessionData | undefined;
+let draft = new Map<string, string>();
+let questionIndex = 0;
+let pendingRequest: ProposalRequest | undefined;
+let saved: ProposalData | undefined;
+let conflictState: ExhibitionState | undefined;
+let notice: { text: string; role: 'status' | 'alert' } | undefined;
+let idleTimer = 0;
+let abandonTimer = 0;
+let idleWarning = false;
+let busy = false;
+let recoveryUnavailable = false;
+
+const axisNames: Record<keyof ExhibitionState['scores'], string> = {
+  automation: '自動化', publicSharing: '公共共有',
+  environmentalPriority: '環境優先', urbanConcentration: '都市集約',
+};
+
+function clearIdleTimers() {
+  clearTimeout(idleTimer);
+  clearTimeout(abandonTimer);
+  idleWarning = false;
 }
 
-function start() {
-  show(el('p', {}, '一人一問。セッションを作成すると未回答の質問が一つ予約されます（2分）。'),
-    el('button', { class: 'primary', id: 'start' }, 'ゲストセッションを開始'));
-  app.querySelector('#start')!.addEventListener('click', createSession);
+function clearRecovery() {
+  try { localStorage.removeItem(recoveryKey); } catch { /* Storage may be disabled. */ }
 }
 
-async function createSession() {
-  const result = await api<GuestQuestionData>('/api/guest-sessions', {});
-  if (!result.ok) return showError(result);
-  current = result.data;
-  lastRequest = undefined;
-  renderQuestion();
-}
-
-function renderQuestion(notice?: HTMLElement) {
-  if (!current) return start();
-  const { session, question, state } = current;
-  const countdown = el('span', { id: 'countdown' });
-  const tick = () => {
-    const left = Math.max(0, Math.round((Date.parse(session.expiresAt) - Date.now()) / 1000));
-    countdown.textContent = session.status === 'reserved' ? (left > 0 ? `予約残り ${left}s` : '予約期限切れ（送信すると確認します）') : session.status;
+function persistRecovery() {
+  if (!session || !['question', 'review', 'submitting', 'result'].includes(screen)) return;
+  const progressScreen = screen === 'result' ? 'result' : screen === 'question' ? 'question' : 'review';
+  const recovery: GuestRecovery = {
+    session, choices: [...draft], questionIndex, screen: progressScreen, pendingRequest,
   };
-  clearInterval(expiryTimer);
-  expiryTimer = window.setInterval(tick, 1000);
-  tick();
-  const options = question.options.map(option => {
-    const button = el('button', {}, option.label);
-    button.addEventListener('click', () => answer(option.id));
-    return button;
-  });
-  show(
-    el('p', { class: 'meta' }, `session ${session.id} · question ${question.id} · expectedRevision ${state.revision} · `, countdown),
-    ...(notice ? [notice] : []),
-    el('div', { class: 'panel' },
-      ...(question.background ? [el('p', { class: 'meta' }, `${question.year ?? ''} ${question.background}`)] : []),
-      el('h2', {}, question.text), el('div', { class: 'options' }, ...options)),
-    el('h2', {}, 'このセッション開始時の都市状態'), renderState(state),
-  );
+  try { localStorage.setItem(recoveryKey, JSON.stringify(recovery)); }
+  catch { recoveryUnavailable = true; }
 }
 
-async function answer(optionId: string) {
-  if (!current) return;
-  lastRequest = {
-    answerId: newAnswerId(), guestSessionId: current.session.id, questionId: current.question.id, optionId, expectedRevision: current.state.revision,
-  };
-  await send(lastRequest);
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-async function send(request: AnswerRequest) {
-  const result = await api<AnswerData>('/api/answers', request);
-  if (result.ok) return renderAnswered(result.data);
-  if (result.error.code === 'revision_conflict' && result.state && 'answerCount' in result.state && current) {
-    current = { ...current, state: result.state };
-    const retry = el('button', { class: 'primary' }, `最新 revision ${result.state.revision} で送り直す`);
-    retry.addEventListener('click', () => lastRequest && send({ ...lastRequest, expectedRevision: result.state!.revision }));
-    const notice = el('div', { class: 'notice warn' }, el('p', {}, `revision 競合: ${result.error.message}`), retry);
-    return renderQuestion(notice);
+function readRecovery(): GuestRecovery | undefined {
+  try {
+    const raw = localStorage.getItem(recoveryKey);
+    if (!raw) return undefined;
+    const value: unknown = JSON.parse(raw);
+    if (!isObject(value) || !isObject(value.session) || !isObject(value.session.session)
+        || typeof value.session.session.id !== 'string' || !Array.isArray(value.session.questions)
+        || value.session.questions.length !== 4 || !isObject(value.session.state)
+        || !isObject(value.session.state.scores) || !Array.isArray(value.choices)
+        || !value.choices.every(pair => Array.isArray(pair) && pair.length === 2 && pair.every(item => typeof item === 'string'))
+        || !Number.isSafeInteger(value.questionIndex) || (value.questionIndex as number) < 0
+        || !['question', 'review', 'result'].includes(String(value.screen))) {
+      clearRecovery();
+      return undefined;
+    }
+    const scores = value.session.state.scores;
+    if (!['automation', 'publicSharing', 'environmentalPriority', 'urbanConcentration']
+      .every(axis => typeof scores[axis] === 'number' && Number.isFinite(scores[axis]))
+        || !value.session.questions.every(question => isObject(question) && typeof question.id === 'string'
+          && typeof question.text === 'string' && Array.isArray(question.options)
+          && question.options.every(option => isObject(option) && typeof option.id === 'string' && typeof option.label === 'string'))) {
+      clearRecovery();
+      return undefined;
+    }
+    if (value.pendingRequest !== undefined && (!isObject(value.pendingRequest)
+        || typeof value.pendingRequest.submissionId !== 'string'
+        || typeof value.pendingRequest.guestSessionId !== 'string'
+        || !Number.isSafeInteger(value.pendingRequest.expectedRevision)
+        || !Array.isArray(value.pendingRequest.answers) || value.pendingRequest.answers.length !== 4
+        || !value.pendingRequest.answers.every(answer => isObject(answer)
+          && typeof answer.questionId === 'string' && typeof answer.optionId === 'string'))) {
+      clearRecovery();
+      return undefined;
+    }
+    return value as unknown as GuestRecovery;
+  } catch {
+    clearRecovery();
+    return undefined;
   }
-  showError(result);
 }
 
-function renderAnswered(data: AnswerData) {
-  clearInterval(expiryTimer);
-  const resend = el('button', {}, '同じ answer ID を再送（冪等性確認）');
-  resend.addEventListener('click', () => lastRequest && send({ ...lastRequest, expectedRevision: data.event.revisionBefore }));
-  const again = el('button', { class: 'primary' }, '次のゲストとして開始');
-  again.addEventListener('click', createSession);
-  show(
-    el('div', { class: 'notice' }, el('p', {}, data.replayed ? '回答済み（再送: 既存の結果を返しました。加算なし）' : '回答を受け付けました'),
-      el('p', { class: 'meta' }, `answer ${data.event.id} · sequence ${data.event.sequence} · revision ${data.event.revisionBefore} → ${data.event.revisionAfter}`)),
-    el('div', { class: 'row' }, resend, again),
-    el('h2', {}, '現在の都市状態'), renderState(data.state),
+function idleIsActive() {
+  return session !== undefined && (screen === 'question' || screen === 'review') && !busy && !pendingRequest;
+}
+
+function resetIdleTimer() {
+  clearIdleTimers();
+  if (!idleIsActive()) return;
+  idleTimer = window.setTimeout(() => {
+    idleWarning = true;
+    renderCurrent(false);
+    app.querySelector<HTMLElement>('.guest-notice--warn button')?.focus();
+    abandonTimer = window.setTimeout(abandonDraft, 15_000);
+  }, 60_000);
+}
+
+app.addEventListener('pointerdown', resetIdleTimer);
+app.addEventListener('keydown', resetIdleTimer);
+app.addEventListener('change', resetIdleTimer);
+
+function action(label: string, run: () => void, primary = false, disabled = false) {
+  const button = el('button', {
+    type: 'button',
+    class: primary ? 'primary' : 'secondary',
+    ...(disabled ? { disabled: '' } : {}),
+  }, label);
+  button.addEventListener('click', run);
+  return button;
+}
+
+function page(title: string, eyebrow: string, ...content: (HTMLElement | string)[]) {
+  persistRecovery();
+  app.replaceChildren(
+    el('div', { class: 'guest-frame' },
+      el('header', { class: 'guest-masthead' }, el('span', {}, '2127 · SHIBUYA'), el('span', {}, '共同のまちづくり')),
+      el('section', { class: 'guest-screen' },
+        el('p', { class: 'guest-eyebrow' }, eyebrow),
+        el('h1', { tabindex: '-1' }, title),
+        ...content)),
   );
 }
 
-function showError(result: Extract<ApiResponse<unknown>, { ok: false }>) {
-  clearInterval(expiryTimer);
-  const titles: Partial<Record<string, string>> = {
-    no_question_available: '質問なし：この run の質問はすべて回答済みまたは予約中です',
-    session_expired: '予約期限切れ：このセッションでは回答できません',
-    already_answered: '回答済み：このセッションは既に回答しています',
-  };
-  const again = el('button', { class: 'primary' }, 'もう一度ゲストセッションを開始');
-  again.addEventListener('click', createSession);
-  show(el('div', { class: 'notice warn' }, el('p', {}, titles[result.error.code] ?? `エラー: ${result.error.code}`), el('p', { class: 'meta' }, result.error.message)),
-    again, ...(result.state ? [el('h2', {}, '現在の都市状態'), renderState(result.state)] : []));
+function focusTitle() {
+  app.querySelector<HTMLElement>('h1')?.focus();
 }
 
-start();
+function renderNotice() {
+  return notice ? el('p', {
+    class: 'guest-notice', role: notice.role, 'aria-live': notice.role === 'alert' ? 'assertive' : 'polite',
+  }, notice.text) : undefined;
+}
+
+function noticeNodes() {
+  const node = renderNotice();
+  return node ? [node] : [];
+}
+
+function recoveryNodes() {
+  return recoveryUnavailable
+    ? [el('p', { class: 'guest-notice guest-notice--warn', role: 'status' }, 'このブラウザーでは草稿を保存できません。再読み込みすると回答が失われる場合があります。')]
+    : [];
+}
+
+function renderIdleWarning() {
+  if (!idleWarning) return undefined;
+  const keep = action('続ける', () => { resetIdleTimer(); renderCurrent(); }, true);
+  return el('div', { class: 'guest-notice guest-notice--warn', role: 'alert', 'aria-live': 'assertive' },
+    el('p', {}, '操作がないため、15秒後にこの草稿を終了します。提案はまだ記録されていません。'), keep);
+}
+
+function idleWarningNodes() {
+  const node = renderIdleWarning();
+  return node ? [node] : [];
+}
+
+function renderWelcome(focus = false) {
+  const button = action(screen === 'starting' ? '準備中…' : 'はじめる', () => startSession(session !== undefined && draft.size > 0), true, busy);
+  const status = screen === 'starting' ? el('p', { class: 'guest-status', role: 'status', 'aria-live': 'polite' }, '四つの質問を準備しています。') : undefined;
+  page('次の渋谷を一緒に選ぶ', '共同提案',
+    el('p', { class: 'guest-lead' }, 'ここは2127年の渋谷。四つの質問に答えて、これからの街のあり方を一緒に選びます。'),
+    el('p', { class: 'guest-copy' }, '回答は最後にまとめて確認してから記録します。選んでいる間、街の集計は変わりません。'),
+    ...noticeNodes(),
+    ...(status ? [status] : []),
+    el('div', { class: 'guest-actions' }, button));
+  if (focus) focusTitle();
+}
+
+async function startSession(keepDraft = false) {
+  if (busy) return;
+  const previous = keepDraft ? draft : new Map<string, string>();
+  clearIdleTimers();
+  screen = 'starting';
+  busy = true;
+  notice = undefined;
+  renderWelcome();
+  const result = await api<ProposalSessionData>('/api/proposal-sessions', {});
+  busy = false;
+  if (!result.ok) {
+    screen = 'welcome';
+    notice = { role: 'alert', text: errorText(result.error.code, result.error.message) };
+    renderWelcome(true);
+    return;
+  }
+  session = result.data;
+  draft = new Map([...previous].filter(([questionId, optionId]) => {
+    const question = session!.questions.find(item => item.id === questionId);
+    return question?.options.some(option => option.id === optionId) ?? false;
+  }));
+  pendingRequest = undefined;
+  saved = undefined;
+  conflictState = undefined;
+  lastErrorCode = undefined;
+  notice = undefined;
+  questionIndex = Math.max(0, session.questions.findIndex(question => !draft.has(question.id)));
+  screen = draft.size === session.questions.length ? 'review' : 'question';
+  resetIdleTimer();
+  renderCurrent();
+}
+
+async function restoreRecovery(recovery: GuestRecovery) {
+  session = recovery.session;
+  draft = new Map(recovery.choices);
+  questionIndex = Math.min(recovery.questionIndex, session.questions.length - 1);
+  pendingRequest = recovery.pendingRequest;
+  screen = 'starting';
+  busy = true;
+  renderWelcome();
+
+  const checked = await api<ProposalSessionData>(`/api/proposal-sessions/${encodeURIComponent(session.session.id)}`);
+  busy = false;
+  if (checked.ok) {
+    const initialState = recovery.session.state;
+    session = { ...checked.data, state: initialState };
+    draft = new Map([...draft].filter(([questionId, optionId]) => {
+      const question = session!.questions.find(item => item.id === questionId);
+      return question?.options.some(option => option.id === optionId) ?? false;
+    }));
+    conflictState = checked.data.state.revision > initialState.revision ? checked.data.state : undefined;
+    if (conflictState) {
+      lastErrorCode = 'revision_conflict';
+      notice = { role: 'status', text: '草稿を復元しました。回答中に街の集計が更新されています。最新のMeterを確認してから記録してください。' };
+    }
+  } else {
+    if (checked.state && 'guestCount' in checked.state && checked.state.revision > session.state.revision)
+      conflictState = checked.state;
+    lastErrorCode = checked.error.code;
+    notice = { role: 'alert', text: errorText(checked.error.code, checked.error.message) };
+  }
+
+  if (pendingRequest) {
+    screen = 'review';
+    renderReview(false);
+    await submitProposal();
+    return;
+  }
+
+  const complete = session.questions.every(question => question.options.some(option => option.id === draft.get(question.id)));
+  if (!complete) questionIndex = Math.max(0, session.questions.findIndex(question => !draft.has(question.id)));
+  screen = complete ? 'review' : 'question';
+  resetIdleTimer();
+  renderCurrent();
+}
+
+function renderProgress() {
+  const steps = session!.questions.map((_, index) => {
+    const item = el('li', {
+      class: index < questionIndex ? 'is-complete' : index === questionIndex ? 'is-current' : '',
+      ...(index === questionIndex ? { 'aria-current': 'step' } : {}),
+    }, `${index + 1}`);
+    return item;
+  });
+  const progress = el('progress', { max: '4', value: String(questionIndex + 1), 'aria-label': `質問 ${questionIndex + 1} / 4` });
+  return el('div', { class: 'guest-progress-block' },
+    el('ol', { class: 'guest-steps', 'aria-label': '質問の進行状況' }, ...steps), progress,
+    el('p', { class: 'guest-progress-copy' }, `質問 ${questionIndex + 1} / ${session!.questions.length}`));
+}
+
+function renderQuestion(focus = true) {
+  const question = session!.questions[questionIndex];
+  const fieldset = el('fieldset', { class: 'guest-choices' });
+  const next = el('button', {
+    type: 'submit', class: 'primary', ...(!draft.has(question.id) ? { disabled: '' } : {}),
+  }, questionIndex === session!.questions.length - 1 ? '回答を確認する' : '次の質問へ');
+  fieldset.append(el('legend', { class: 'visually-hidden' }, question.text));
+  question.options.forEach((option, optionIndex) => {
+    const input = el('input', {
+      type: 'radio', name: `question-${questionIndex}`, id: `guest-choice-${questionIndex}-${optionIndex}`,
+      value: option.id, ...(draft.get(question.id) === option.id ? { checked: '' } : {}),
+    });
+    input.addEventListener('change', () => {
+      if (input.checked) draft.set(question.id, option.id);
+      next.disabled = false;
+      persistRecovery();
+      resetIdleTimer();
+    });
+    fieldset.append(el('label', { class: 'guest-choice' }, input,
+      el('span', { class: 'guest-choice-copy' }, option.label),
+      el('span', { class: 'guest-choice-state' }, '選択中')));
+  });
+
+  const form = el('form', { class: 'guest-form' }, fieldset,
+    el('div', { class: 'guest-actions guest-actions--between' },
+      ...(questionIndex > 0 ? [action('前の質問へ', () => { questionIndex -= 1; renderQuestion(); })] : [el('span', { class: 'guest-action-spacer' })]),
+      next));
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    if (!draft.has(question.id)) return;
+    notice = undefined;
+    if (questionIndex < session!.questions.length - 1) {
+      questionIndex += 1;
+      renderQuestion();
+    } else {
+      screen = 'review';
+      renderReview();
+    }
+  });
+  const resume = notice && ['session_expired', 'already_answered', 'unsupported_version'].includes(lastErrorCode ?? '')
+    ? action('新しい予約で草稿を続ける', () => startSession(true), false, busy)
+    : undefined;
+  page(question.text, '質問', renderProgress(),
+    ...(question.background ? [el('p', { class: 'guest-copy' }, question.background)] : []),
+    ...noticeNodes(), ...recoveryNodes(), ...idleWarningNodes(), form,
+    ...(resume ? [el('div', { class: 'guest-actions' }, resume)] : []));
+  if (focus) focusTitle();
+}
+
+function renderAnswerRow(index: number, editable: boolean) {
+  const question = session!.questions[index];
+  const selected = question.options.find(option => option.id === draft.get(question.id));
+  const edit = action('変更', () => { questionIndex = index; screen = 'question'; renderQuestion(); }, false, !editable);
+  return el('li', { class: 'guest-review-row' },
+    el('div', { class: 'guest-review-copy' },
+      el('p', { class: 'guest-review-number' }, `質問 ${index + 1}`),
+      el('p', { class: 'guest-review-question' }, question.text),
+      el('p', { class: 'guest-review-answer' }, selected?.label ?? '未選択')),
+    edit);
+}
+
+function renderReview(focus = true) {
+  const uncertain = pendingRequest !== undefined;
+  const sessionBlocked = ['session_expired', 'already_answered', 'unsupported_version'].includes(lastErrorCode ?? '');
+  const submitLabel = busy ? '記録しています…'
+    : uncertain ? '同じ申込IDで結果を確認する'
+      : sessionBlocked ? '新しい予約で草稿を続けてください'
+      : conflictState ? `最新 revision ${conflictState.revision} を確認して記録する`
+        : 'この内容で街に記録する';
+  const submit = action(submitLabel, () => submitProposal(), true, busy || sessionBlocked);
+  const conflict = conflictState
+    ? el('div', { class: 'guest-conflict' },
+      el('p', {}, '確認中に別の提案が先に記録されました。草稿は保存されています。最新の集計を確認してから、もう一度記録してください。'),
+      renderScores(session!.state.scores, conflictState.scores))
+    : undefined;
+  const uncertainNotice = uncertain
+    ? el('p', { class: 'guest-copy', role: 'status', 'aria-live': 'polite' }, '送信結果をまだ確認できていません。内容は固定し、同じ申込IDで安全に再確認します。')
+    : undefined;
+  const resume = notice && ['session_expired', 'already_answered', 'unsupported_version'].includes(lastErrorCode ?? '')
+    ? action('新しい予約で草稿を続ける', () => startSession(true), false, busy)
+    : undefined;
+  page('回答を確認する', '送信前の確認',
+    el('p', { class: 'guest-copy' }, '変更する質問は「変更」から戻れます。記録後はこの提案を編集できません。'),
+    ...noticeNodes(), ...recoveryNodes(), ...idleWarningNodes(),
+    ...(conflict ? [conflict] : []),
+    ...(uncertainNotice ? [uncertainNotice] : []),
+    el('ol', { class: 'guest-review-list' }, ...session!.questions.map((_, index) => renderAnswerRow(index, !busy && !uncertain))),
+    el('div', { class: 'guest-actions guest-actions--between' },
+      ...(!uncertain ? [action('質問に戻る', () => { questionIndex = session!.questions.length - 1; screen = 'question'; renderQuestion(); }, false, busy)] : [el('span', { class: 'guest-action-spacer' })]),
+      submit),
+    ...(resume ? [el('div', { class: 'guest-actions' }, resume)] : []));
+  if (focus) focusTitle();
+}
+
+let lastErrorCode: string | undefined;
+
+async function submitProposal() {
+  if (!session || busy) return;
+  const request = pendingRequest ?? buildProposalRequest(
+    session.questions, draft, session.session.id, newAnswerId(), conflictState?.revision ?? session.state.revision,
+  );
+  if (!request) {
+    notice = { role: 'alert', text: '四つの質問それぞれで選択してください。草稿は保存されています。' };
+    renderReview();
+    return;
+  }
+  pendingRequest = request;
+  busy = true;
+  screen = 'submitting';
+  clearIdleTimers();
+  renderReview(false);
+  const result = await api<ProposalData>('/api/proposals', request);
+  busy = false;
+  if (result.ok) {
+    saved = result.data;
+    conflictState = undefined;
+    lastErrorCode = undefined;
+    notice = undefined;
+    screen = 'result';
+    // Keep the exact submission locally until handoff; a reload can replay it to recover the result.
+    renderResult();
+    return;
+  }
+
+  lastErrorCode = result.error.code;
+  notice = { role: 'alert', text: errorText(result.error.code, result.error.message) };
+  screen = 'review';
+  if (result.error.code === 'revision_conflict' && result.state && 'guestCount' in result.state) {
+    // A revision conflict is a definite rejection; after review, the next request gets a fresh ID.
+    pendingRequest = undefined;
+    conflictState = result.state;
+  } else if (result.error.code === 'internal_error') {
+    // Commit status may be unknown; keep the exact request so retry is idempotent.
+  } else {
+    pendingRequest = undefined;
+  }
+  resetIdleTimer();
+  renderReview();
+}
+
+function errorText(code: string, detail: string) {
+  const title: Record<string, string> = {
+    unsupported_version: '現在の展示runでは、この提案を受け付けられません。',
+    session_expired: '質問の予約期限が過ぎました。草稿を新しい予約へ引き継げます。',
+    already_answered: 'この予約はすでに送信済みです。',
+    revision_conflict: '街の集計が更新されています。現在の状態を確認してください。',
+    bad_request: '提案を確認できませんでした。草稿を見直してください。',
+  };
+  return `${title[code] ?? (code === 'internal_error' ? '送信結果を確認できません。再試行できます。' : `通信エラー（${code}）`)} ${detail}`;
+}
+
+function signed(value: number) {
+  return `${value > 0 ? '+' : ''}${value.toFixed(1)}`;
+}
+
+function renderScores(before: ExhibitionState['scores'], after: ExhibitionState['scores']) {
+  const rows = Object.keys(axisNames).map(axis => el('tr', {},
+    el('th', { scope: 'row' }, axisNames[axis as keyof typeof axisNames]),
+    el('td', { class: 'guest-number' }, signed(before[axis as keyof typeof axisNames])),
+    el('td', { class: 'guest-arrow', 'aria-label': 'から' }, '→'),
+    el('td', { class: 'guest-number' }, signed(after[axis as keyof typeof axisNames]))));
+  return el('table', { class: 'guest-score-table' },
+    el('caption', {}, '四つのMeter・提案前から提案後'),
+    el('thead', {}, el('tr', {}, el('th', { scope: 'col' }, '優先軸'), el('th', { scope: 'col' }, '前'), el('th', { scope: 'col' }), el('th', { scope: 'col' }, '後'))),
+    el('tbody', {}, ...rows));
+}
+
+const changeNames: Record<string, string> = {
+  band: 'Meter帯', automatedPorts: '自律サービス端口', sharedSeats: '共有席',
+  treeCount: '樹冠ユニット', plantedFraction: '植栽面積', coolingFins: '冷却フィン', functionModules: '機能モジュール',
+};
+
+function changeValue(key: string, value: number | string) {
+  if (key === 'band') return ({ low: '低', mixed: '中間', high: '高' } as Record<string, string>)[String(value)] ?? String(value);
+  if (key === 'plantedFraction' && typeof value === 'number') return `${Math.round(value * 100)}%`;
+  return String(value);
+}
+
+function renderCityChanges(proposal: ProposalRecord) {
+  if (!proposal.cityChanges.length) {
+    return el('p', { class: 'guest-notice guest-notice--quiet' }, '構成を維持する提案を記録しました。提案の記録は残り、変化のない数値を変化として表示していません。');
+  }
+  const rows = proposal.cityChanges.map(change => {
+    const keys = [...new Set([...Object.keys(change.before), ...Object.keys(change.after)])]
+      .filter(key => change.before[key] !== change.after[key]);
+    const values = keys.map(key => `${changeNames[key] ?? key} ${changeValue(key, change.before[key])} → ${changeValue(key, change.after[key])}`).join(' · ');
+    return el('li', { class: 'guest-change-row' },
+      el('strong', {}, change.label), el('span', {}, values));
+  });
+  return el('ul', { class: 'guest-change-list', 'aria-label': '記録された街の構成変化' }, ...rows);
+}
+
+function renderResult(focus = true) {
+  if (!saved) return renderWelcome(focus);
+  const { proposal, state, replayed } = saved;
+  page('この提案を記録しました', '街への反映',
+    el('div', { class: 'guest-result-summary' },
+      el('p', {}, replayed ? '保存済みの提案を確認しました。集計への加算は一度だけです。' : '提案を記録しました。'),
+      el('p', { class: 'guest-result-number' }, `#${proposal.ordinal}`),
+      el('p', { class: 'guest-copy' }, `参加者 ${state.guestCount} 人 · revision ${proposal.revisionBefore} → ${proposal.revisionAfter}`)),
+    el('h2', {}, '選んだ回答'),
+    el('ol', { class: 'guest-result-answers' }, ...proposal.answers.map((answer, index) =>
+      el('li', {}, el('span', { class: 'guest-review-number' }, `質問 ${index + 1}`), answer.optionLabel))),
+    el('h2', {}, '街の構成'), renderCityChanges(proposal),
+    renderScores(proposal.beforeScores, proposal.afterScores),
+    el('p', { class: 'guest-copy' }, '街はこの提案を含む集計結果を引き継ぎます。次の方の回答で、共同の街を続けてつくります。'),
+    el('div', { class: 'guest-actions' }, action('次の方へ', nextGuest, true)));
+  if (focus) focusTitle();
+}
+
+function nextGuest() {
+  clearIdleTimers();
+  clearRecovery();
+  session = undefined;
+  draft = new Map();
+  pendingRequest = undefined;
+  saved = undefined;
+  conflictState = undefined;
+  lastErrorCode = undefined;
+  notice = undefined;
+  screen = 'welcome';
+  renderWelcome(true);
+}
+
+function abandonDraft() {
+  clearIdleTimers();
+  clearRecovery();
+  session = undefined;
+  draft = new Map();
+  pendingRequest = undefined;
+  conflictState = undefined;
+  notice = undefined;
+  lastErrorCode = undefined;
+  screen = 'abandoned';
+  renderAbandoned();
+}
+
+function renderAbandoned() {
+  page('草稿を終了しました', 'セッション終了',
+    el('p', { class: 'guest-lead' }, '操作がなかったため、提案を送らずに終了しました。街の集計は変わっていません。'),
+    el('div', { class: 'guest-actions' }, action('最初からはじめる', nextGuest, true)));
+  focusTitle();
+}
+
+function renderCurrent(focus = true) {
+  if (screen === 'welcome' || screen === 'starting') return renderWelcome(focus);
+  if (screen === 'question') return renderQuestion(focus);
+  if (screen === 'review' || screen === 'submitting') return renderReview(focus);
+  if (screen === 'result') return renderResult(focus);
+  renderAbandoned();
+}
+
+const recovery = readRecovery();
+if (recovery) void restoreRecovery(recovery);
+else renderWelcome();

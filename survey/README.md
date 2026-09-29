@@ -91,9 +91,9 @@ type CitySurveyState = {
 | `GET /api/city-view` | 現在の `CityView`（導出配置と決定履歴） |
 | `GET /api/health` | run ID、revision、質問 version |
 | `WS /ws` | 接続直後に `city-state-snapshot`、その後 `city-state-updated` / `run-reset`。3種とも `state` と `view`（`CityView`）を含む |
-| `GET /api/admin/current-run` | run、状態、予約中・回答済み session 数（loopback のみ） |
-| `GET /api/admin/events?limit=50` | 最近の回答イベントと admin event（loopback のみ） |
-| `POST /api/admin/reset` | `{"confirmation":"RESET"}` で Reset（loopback のみ） |
+| `GET /api/admin/current-run` | run、`lifecycle`（phase、pending reset、総参加人数、revision）、状態、予約中・回答済み session 数（loopback のみ） |
+| `GET /api/admin/events?limit=50` | 最近の回答イベントと admin event（`scope: city/full`）（loopback のみ） |
+| `POST /api/admin/lifecycle` | `{"command","expectedRevision","confirmation"?}`。command は `reset-city`（`RESET`）、`full-reset`（`FULL RESET`）、`cancel-reset`、`guest-left`。古い revision は 409 `lifecycle_conflict`、状態に合わない操作は 409 `lifecycle_blocked`（loopback のみ） |
 
 WebSocket の `city-state-updated` には、仕様の `answerId` と `state` に加えて、モニター表示用に `answer`（AnswerEvent）、`questionText`、`optionLabel`、`change`（clamp 後の実際の変化）が入ります。回答の再送では通知しません。
 
@@ -101,8 +101,12 @@ WebSocket の `city-state-updated` には、仕様の `answerId` と `state` に
 
 - `/admin`、`/admin.html`、`/api/admin/*` は接続元が `127.0.0.1`、`::1`、`::ffff:127.0.0.1`（デュアルスタック socket 上の IPv4 loopback）のときだけ使えます。それ以外は 403 です。
 - 展示 PC 上で `http://127.0.0.1:8787/admin` を開きます。
-- Reset は `RESET` の入力が必要です。他サイトからの POST を防ぐため、`Origin` ヘッダーがあるときはサーバー自身の origin と一致する必要があります。
-- Reset は 1 つのトランザクションで、現在の run を `ended` にする → 未回答の予約を `expired` にする → admin event（`run-reset`）を記録 → 新しい run とスコア 0 の状態を保存する、の順に行い、コミット後に WebSocket へ `run-reset` を配信します。
+- **展示 lifecycle（2026-09-29, schema 4）**：`exhibition_lifecycle` 1 行が server 側の正本です。`ready` で proposal session を作ると `in_experience`、提案が commit されると `awaiting_exit` になります。質問の完了は「観客が去った」ことを意味しません。`awaiting_exit` 中は次の session 作成が 409 `lifecycle_blocked` になり、スタッフが `/admin` の **Confirm Guest Has Left** を押すと `ready` に戻ります（未完了の予約 session は expired）。
+- **Reset Current City** は `ready` なら即実行、観客がいる間は `pendingReset` に保留され、退出確認の transaction 内で実行されます。**Full Data Reset** は同じ規則で、`full` は `city` より優先します。`ready` では pending を持てません（DB CHECK）。**Cancel Pending Reset** で取り消せます。
+- 現在の都市の参加人数 = active run の `guestCount`。総参加人数 = 最後の full reset 以降の `proposal_events` 数（watermark `total_since_sequence`）。City reset は総数を保持し、full reset は watermark を進めて 0 にします。どちらも履歴は削除しません。
+- すべての admin command は画面が最後に読んだ lifecycle `revision` を送り、別タブ・別画面からの古い操作を拒否します。Admin 画面は WebSocket event と 2 秒 polling で更新します。
+- City reset は `RESET` の入力（画面では確認ダイアログ）が必要です。他サイトからの POST を防ぐため、`Origin` ヘッダーがあるときはサーバー自身の origin と一致する必要があります。
+- 実行される reset は 1 つのトランザクションで、現在の run を `ended` にする → 未回答の予約を `expired` にする → admin event（`run-reset`）を記録 → 新しい run とスコア 0 の状態を保存する、の順に行い、コミット後に WebSocket へ `run-reset` を配信します。
 - **Reset は何も削除しません。** 過去の run の回答イベントは DB に残ります。全履歴の物理削除機能はありません。
 - 管理者アカウント、PIN、セッションはありません。別端末から操作する要件が出たら、`adminService.ts` の `isLoopbackAddress` による判定を PIN と短時間セッションに置き換えることを想定しています。
 

@@ -2,7 +2,7 @@
 
 - 文件建立日期：2026-09-28；文件 owner：Codex；狀態更新：2026-09-30。
 - 核對基準：`535a3c059302ac6c1059d84aef663b06510ac04c`，當時 `main` 與已 fetch 的 `origin/main` 相同。
-- 狀態：**規劃已完成；S1 已實作、整合並通過 package checks、feature CI 及 main CI。S2 Q3 Park 切片已整合並通過 feature/main CI；S3 core commit `d51167b` 已通過 root checks 和 feature CI。後續 SW／SE 可見度修改的 local root checks、API matrix、snapshot/reset、standalone smoke 及 V01/V02 browser review 均通過；最終 feature CI 和 main 整合待完成；S4–S5 尚未完成。**
+- 狀態：**規劃已完成；S1 已實作、整合並通過 package checks、feature CI 及 main CI。S2 Q3 Park 切片已整合並通過 feature/main CI。S3 四site映射 local root checks、API matrix、snapshot/reset、standalone smoke 及 V01/V02 browser review 均通過，已在 feature branch 與 main 合併，最終 feature CI 和 main 整合待完成。S4 guest UI／root 面板已整合至 main 但未完成瀏覽器驗收；S5 尚未開始。**
 - 使用者最新確認：**起始城市已是 2127 年；低值、零值、高值都必須有未來感。**
 - 本文件最初由規劃文件任務建立；2026-09-28 已明確指派 S1 實作。閱讀本文件不等於被指派一次實作全部階段；收到有界任務後，在授權範圍內完成，不另加逐階段批准要求。
 - 當前實作架構以 [PROJECT](PROJECT.md) 為準；本文件描述下一版本目標，不另立一份現況 architecture。
@@ -22,9 +22,15 @@ root parser 現在接受 bounded v2 CityView，按明確版本分流，保留明
 
 ### 2026-09-30 S3 現況（本機/API/browser 驗證通過；最終 CI 待完成）
 
-S3 core commit `d51167b` 已把 server-provided v2 mapping 接到 root 的其餘三個 site：NW automation 依 `bands.nw` 和 `automatedPorts`，SW commons 依 `bands.sw` 和 `sharedSeats`，SE concentration 依 `bands.se` 和 `functionModules`；NE Park 延續 S2 的 Q3 參數。客戶端使用收到的配置，不從 scores 另算形態。所有 low/mixed/high 都須維持成熟的 2127 未來城市。當前未提交的可見度修正把 SW 2.4 m 深色電致變色曲面屏接到私密座位，座位共享時屏幕折平；SE low 用成對地面 pavilion，另設兩個高於 DOGENZAKA 的玻璃服務頭，以便固定 hero camera 可讀。
+S3 core commit `d51167b` 已把 server-provided v2 mapping 接到 root 的其餘三個 site：NW automation 依 `bands.nw` 和 `automatedPorts`，SW commons 依 `bands.sw` 和 `sharedSeats`，SE concentration 依 `bands.se` 和 `functionModules`；NE Park 延續 S2 的 Q3 參數。客戶端使用收到的配置，不從 scores 另算形態。所有 low/mixed/high 都須維持成熟的 2127 未來城市。可見度修正 `36b5c18`把 SW 2.4 m 深色電致變色曲面屏接到私密座位，座位共享時屏幕折平；SE low 用成對地面 pavilion，另設兩個高於 DOGENZAKA 的玻璃服務頭，以便固定 hero camera 可讀。
 
-`d51167b` 的 root `npm test`、`npm run build`、`git diff --check` 和 [feature CI](https://github.com/cc100053/city2127/actions/runs/36577963207) 通過；此 CI 不涵蓋後續可見度修改。合併後的本機 root checks、12個一軸 API case、同band更新、high→mixed→low、snapshot/reconnect/reset、standalone smoke 及 V01/V02 browser review 均通過；逐軸參數、複合結果與12張截圖見 [validation record](VALIDATION.md)。可見度 diff 尚未提交；最終 feature CI 和 main 整合待完成，所以 S3 尚未 shipped。Root v1 在最終 browser pass 未測，只記錄既有 root unit tests。固定 hero 畫面中的 SE 地面 pavilion 被前景遮住，上方服務頭可見；SW 差異較細但可辨。驗收範圍涵蓋四site共12配置（S3新增9個）、數量更新、低值未來感、site／route clearance、真實 `cityChanges` feedback、live/snapshot/reset 及 v1相容。詳見 [S3 handoff](handoffs/exhibition-s3.md)。
+`d51167b` 的 root `npm test`、`npm run build`、`git diff --check` 和 [feature CI](https://github.com/cc100053/city2127/actions/runs/36577963207) 通過；此 CI 不涵蓋後續可見度修改。合併後的本機 root checks、12個一軸 API case、同band更新、high→mixed→low、snapshot/reconnect/reset、standalone smoke 及 V01/V02 browser review 均通過；逐軸參數、複合結果與12張截圖見 [validation record](VALIDATION.md)。可見度修正已提交為 `36b5c18` 並已與 main 的 lifecycle／S4 合併；最終 feature CI 和 main 整合待完成，所以 S3 尚未 shipped。Root v1 在最終 browser pass 未測，只記錄既有 root unit tests。固定 hero 畫面中的 SE 地面 pavilion 被前景遮住，上方服務頭可見；SW 差異較細但可辨。驗收範圍涵蓋四site共12配置（S3新增9個）、數量更新、低值未來感、site／route clearance、真實 `cityChanges` feedback、live/snapshot/reset 及 v1相容。詳見 [S3 handoff](handoffs/exhibition-s3.md)。
+
+### 2026-09-29 S4 feature-branch implementation（未驗收）
+
+`survey/` 現有四題 guest UI：建立四題 session、作答後可返回編輯、送出前確認，再以單一 proposal transaction 記錄；頁面將草稿及待重試請求存入 `localStorage`，reload 時重新驗證 session、恢復有效回答並偵測 revision 衝突。root `?survey` 面板顯示最近提案的四題答案、四軸 Meter 前後值、最多兩項實際城市參數前後變化（包括只有 band 變化的情況），並以真實無變化文字處理沒有 city change 的提案。面板另以 `最近64人` 顯示 `recentProposals` 內最多64格、每格四軸投票符號，並分開顯示累計 guest 數；v1 三項歷史顯示保留。
+
+上述 S4 程式位於 feature branch，尚未整合或完成瀏覽器驗收，不能視為 S4 完成或 SHIP。S4 依賴的 S3 其餘三site映射尚不存在。root panel 把最多64格排在較長的最新提案內容之後，且容器上限 400px 並可捲動；1280×720 idle 時能否看到該帶尚未確認，可能需要捲動。另有時序缺口：結果頁要手動按「次の方へ」，未實施規格目標的約10秒結果與約5秒交接；root panel 亦未在10秒內依次提示兩項變化。故 S4 exit gate 未完成。當前 checks 與限制見 [S4 handoff](handoffs/exhibition-s4.md) 和 [validation record](VALIDATION.md)。
 
 ## 0. Agent 先讀：任務邊界與完成判定
 
@@ -150,6 +156,7 @@ Q1／Q3是未來情境，Q2／Q4是生活偏好。直接選擇城市取捨，不
 - 草稿可改，提交後不能偷偷修改歷史；server成功但回應遺失時以同一submissionId重試，不能重加分。
 - 等待server時按鈕防重按；重新連線收到snapshot只恢復，不重新播放「你剛剛改變」動畫。
 - 建議每日延續同一run；如工作人員要新run，使用admin操作並保留舊紀錄。每日政策仍待展覽負責人定案，不能於午夜自動清空。
+- 2026-09-29 已實作（[lifecycle handoff](handoffs/exhibition-lifecycle.md)）：server端 `ready → in_experience → awaiting_exit`，只有工作人員按「Confirm Guest Has Left」才回到 `ready`；觀眾在場時要求的 city／full reset 會保留至退出確認才執行。總參與人數只由full data reset歸零。S4 guest UI 仍需處理 `lifecycle_blocked`（等待上一位離開）。
 - 第N位以已完成提案數計，不以answer row數計；四題不是四位。
 - 建議驗收／展覽比較使用現有`?hour=12`；日夜仍是獨立系統，不由答案推進年份或時間。
 - 保留鍵盤操作、清晰focus、足夠對比、文字／符號、不只用色；reduced motion使用淡入／直接切換與前後數字。
@@ -425,8 +432,8 @@ S1、S2 實作及整合已完成；S2 feature/main CI 通過。S3 core 已推送
 | --- | --- | --- | --- |
 | S1 規則與儲存 | IMPLEMENTED and integrated; package checks and feature/main CI pass | survey shared／scoreEngine／migrations／runStore／sessionService／answerService／proposalService／decisionHistory；root/module-swap v2 rejection | 四題transaction、replay、version、重用題組及 viewer rejection 完成；驗證紀錄見 [S1 handoff](handoffs/exhibition-s1.md) |
 | S2 第一條可見鏈 | SHIPPED；整合及feature/main CI通過，依S1 | root surveyView／changeCatalog／manager／environmentPark；survey v2 mapping | 四題API不變；root bounded v2 parser及Q3→NE公園參數路徑已整合；live 3秒，snapshot/reset立即且無pulse，不改全城氣氛；其他三site為固定mixed基底並標示待S3。實際12棵樹GLB與fallback的NE範圍測試、browser evidence及checks見S2 handoff/validation |
-| S3 其餘三site | LOCAL/API/BROWSER CHECKS PASSED; final feature CI pending，依S2 | automationHub／commonsPlaza／concentrationTower＋catalog/mapping | 新增9個配置及四site共12配置、同band counts、低值未來感、路線clearance、真實 `cityChanges` feedback、四軸端到端、snapshot/reset、standalone 與最終視覺證據已通過；final feature CI 和整合待完成；見 [S3 handoff](handoffs/exhibition-s3.md) |
-| S4 正式觀眾體驗 | PARTIAL on remote `codex/exhibition-s4` (`960d9b7`)，not integrated；驗證未完成，依S3 | survey guest UI、root causal panel、style | 完成並驗證四題back/edit/submit、idle/result/next、紀錄、錯誤恢復、accessibility；無人格誤導 |
+| S3 其餘三site | LOCAL/API/BROWSER CHECKS PASSED；已與 main 合併於 feature branch，final feature CI 和整合待完成，依S2 | automationHub／commonsPlaza／concentrationTower＋catalog/mapping | 新增9個配置及四site共12配置、同band counts、低值未來感、路線clearance、真實 `cityChanges` feedback、四軸端到端、snapshot/reset、standalone 與最終視覺證據已通過；見 [S3 handoff](handoffs/exhibition-s3.md) |
+| S4 正式觀眾體驗 | IN PROGRESS；已整合至 main，瀏覽器驗收未完成，依S3 | survey guest UI、root causal panel、style | 四題back/edit/submit、idle/result/next、紀錄及錯誤恢復已實作；待 S3 整合後瀏覽器驗收及面板可見度／操作檢查。S4 未完成，見 [S4 handoff](handoffs/exhibition-s4.md) |
 | S5 展覽驗收 | PLANNED，依S4 | tests／browser evidence／docs | 100份提案、60分鐘、實機效能、5人理解測試、每日操作交接 |
 
 S2不是建立另一套一題API或另一個score schema；重用S1四題session，以fixture／最小操作介面完成垂直切片，正式UI在S4精修。S2 handoff 記錄當前實際檢查、最高樹數邊界修正及剩餘驗收；不得把「實作在工作樹」寫成「已shipped」。

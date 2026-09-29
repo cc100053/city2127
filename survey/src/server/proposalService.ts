@@ -8,6 +8,7 @@ import { applyProposalVotes, validateExhibitionState, voteForEffects } from '../
 import { viewOf } from './answerService.ts';
 import { transaction } from './database.ts';
 import { fail, type ServiceOutcome, type SurveyContext } from './context.ts';
+import { readLifecycle, setLifecycle } from './adminService.ts';
 import { activeRun, CorruptStateError, num, readExhibitionSnapshot, str, toProposalRecord, writeExhibitionSnapshot } from './runStore.ts';
 
 export const PROPOSAL_RESERVATION_MS = 5 * 60 * 1000;
@@ -48,6 +49,10 @@ export function createProposalSession(ctx: SurveyContext): ApiResponse<ProposalS
   return transaction(ctx.db, () => {
     const current = currentExhibition(ctx);
     if (!current) return failNoExhibition();
+    // The previous guest may still be looking at their city; staff must confirm they left first.
+    const lifecycle = readLifecycle(ctx.db);
+    if (lifecycle.phase === 'awaiting_exit') return fail('lifecycle_blocked', 'Waiting for staff to confirm the previous guest has left.', current.state);
+    if (lifecycle.phase === 'ready') setLifecycle(ctx, 'in_experience', 'none');
     const set = validateExhibitionQuestionSet(ctx.questions);
     const now = ctx.now(), createdAt = now.toISOString();
     const session: ProposalSession = {
@@ -164,6 +169,9 @@ export function submitProposal(ctx: SurveyContext, body: unknown): ServiceOutcom
       return { response: fail('question_not_assigned', 'A proposal must answer each assigned question exactly once.', current.state) };
     if (request.expectedRevision !== current.state.revision)
       return { response: fail('revision_conflict', `Expected revision ${request.expectedRevision}, but the city is at revision ${current.state.revision}.`, current.state) };
+    const lifecycle = readLifecycle(ctx.db);
+    if (lifecycle.phase !== 'in_experience')
+      return { response: fail('lifecycle_blocked', 'This installation has already recorded a proposal for the current guest.', current.state) };
 
     const byId = new Map(request.answers.map(answer => [answer.questionId, answer.optionId]));
     const votes: Partial<ExhibitionVotes> = {};
@@ -195,6 +203,8 @@ export function submitProposal(ctx: SurveyContext, body: unknown): ServiceOutcom
         JSON.stringify(normalizedVotes), current.state.revision, next.revision, JSON.stringify(current.state), JSON.stringify(next), submittedAt);
     ctx.db.prepare("UPDATE proposal_sessions SET status = 'submitted', submitted_at = ? WHERE id = ?").run(submittedAt, session.id);
     writeExhibitionSnapshot(ctx.db, next);
+    // The guest keeps viewing the result; any pending reset waits for staff to confirm they left.
+    setLifecycle(ctx, 'awaiting_exit', lifecycle.pendingReset);
 
     const row = ctx.db.prepare('SELECT * FROM proposal_events WHERE id = ?').get(request.submissionId);
     if (!row) throw new CorruptStateError('proposal insert did not produce a row');

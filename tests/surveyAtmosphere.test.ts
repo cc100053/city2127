@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { cityText, exhibitionCityChangesText, exhibitionScoresText, policyText, scoresToWorldState } from '../src/surveyAtmosphere.ts';
+import { cityText, exhibitionFeedback, exhibitionScoresText, exhibitionVoteMarks, policyText, scoresToWorldState } from '../src/surveyAtmosphere.ts';
 import { presets } from '../src/presets.ts';
 import { connectSurvey, isExhibitionView, parseSurveyEvent, supersedes } from '../src/surveyView.ts';
 import { createWorldState } from '../src/worldState.ts';
@@ -81,19 +81,66 @@ assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2Vie
 const reorderedProposal = { ...v2Proposal, answers: [v2Proposal.answers[2], v2Proposal.answers[1], v2Proposal.answers[0], v2Proposal.answers[3]] };
 const reorderedV2 = parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, latestProposal: reorderedProposal, recentProposals: [reorderedProposal] } });
 if (!reorderedV2 || !('kind' in reorderedV2) || !isExhibitionView(reorderedV2.view)) throw new Error('expected reordered v2 answers to parse');
+assert.equal(exhibitionFeedback(reorderedV2.view.latestProposal)?.answers[0]?.optionLabel, '設備による暑さ対策を優先しました');
 const missingChangeProposal = { ...v2Proposal, cityChanges: [] };
 assert.equal(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, latestProposal: missingChangeProposal, recentProposals: [missingChangeProposal] } }), null);
+const feedback = exhibitionFeedback(parsedV2.view.latestProposal);
+assert.equal(feedback?.ordinal, 1);
+assert.deepEqual(feedback?.scores.map(score => [score.label, score.before, score.after]), [
+  ['サービスの担い手', '0.0', '0.0'],
+  ['空間の使い方', '0.0', '0.0'],
+  ['暑さへの備え', '0.0', '-7.5'],
+  ['機能の配置', '0.0', '0.0'],
+]);
+assert.equal(feedback?.cityChanges.length, 1);
+assert.equal(feedback?.cityChanges[0]?.effect, '樹冠 8 → 5 · 植栽面 50.0% → 31.3% · 冷却設備 3 → 5');
+assert.equal(feedback?.changed, true);
+assert.equal(feedback?.cityChanged, true);
+assert.equal(feedback?.note, '提案 #1 の街区構成変更を記録しました。');
 assert.ok(exhibitionScoresText(parsedV2.view.scores).includes('暑さへの備え -7.5'));
-const allSitesProposal = {
+assert.deepEqual(exhibitionVoteMarks({ automation: 1, publicSharing: 0, environmentalPriority: -1, urbanConcentration: 1 }), [
+  { label: 'サービスの担い手', vote: 1, symbol: '＋' },
+  { label: '空間の使い方', vote: 0, symbol: '·' },
+  { label: '暑さへの備え', vote: -1, symbol: '−' },
+  { label: '機能の配置', vote: 1, symbol: '＋' },
+]);
+
+const limitedFeedback = exhibitionFeedback({
+  ...v2Proposal,
   cityChanges: [
-    { socketId: 'nw', label: 'サービス配置' }, { socketId: 'sw', label: '共有席' },
-    { socketId: 'se', label: '機能配置' }, { socketId: 'ne', label: '樹冠と冷却設備' },
-  ] as const,
-};
-const allSitesSummary = exhibitionCityChangesText(allSitesProposal);
-for (const place of ['MAGNET東', '道玄坂南', 'センター街奥', '駅東']) assert.ok(allSitesSummary.includes(place));
-for (const label of ['サービス配置', '共有席', '機能配置', '樹冠と冷却設備']) assert.ok(allSitesSummary.includes(label));
-assert.equal(exhibitionCityChangesText({ ...v2Proposal, cityChanges: [] }), 'この提案による都市構成の変更はありません。');
+    ...v2Proposal.cityChanges,
+    { socketId: 'nw', label: '自律サービス端口', before: { automatedPorts: 2 }, after: { automatedPorts: 3 } },
+    { socketId: 'sw', label: '共有席', before: { sharedSeats: 4 }, after: { sharedSeats: 5 } },
+  ],
+});
+assert.equal(limitedFeedback?.cityChanges.length, 2);
+assert.equal(limitedFeedback?.cityChanges[1]?.effect, '自律サービス端口 2 → 3');
+const nonParkFeedback = exhibitionFeedback({
+  ...v2Proposal,
+  cityChanges: [
+    { socketId: 'sw', label: '共有席', before: { sharedSeats: 4 }, after: { sharedSeats: 7 } },
+    { socketId: 'se', label: '機能配置', before: { functionModules: 4 }, after: { functionModules: 3 } },
+  ],
+});
+assert.deepEqual(nonParkFeedback?.cityChanges.map(change => change.place), ['道玄坂南', 'センター街奥']);
+
+const sameBandFeedback = exhibitionFeedback({
+  ...v2Proposal, beforeScores: { ...zero, environmentalPriority: 4 }, afterScores: { ...zero, environmentalPriority: 4.2 },
+  cityChanges: [{ socketId: 'ne', label: '樹冠・冷却設備', before: { band: 'high', treeCount: 9, plantedFraction: .6, coolingFins: 2 }, after: { band: 'high', treeCount: 9, plantedFraction: .605, coolingFins: 2 } }],
+});
+assert.equal(sameBandFeedback?.changed, true);
+assert.equal(sameBandFeedback?.cityChanges[0]?.effect, '植栽面 60.0% → 60.5%');
+const bandOnlyFeedback = exhibitionFeedback({
+  ...v2Proposal, beforeScores: zero, afterScores: zero,
+  cityChanges: [{ socketId: 'ne', label: '樹冠・冷却設備', before: { band: 'mixed' }, after: { band: 'high' } }],
+});
+assert.equal(bandOnlyFeedback?.cityChanges.length, 1);
+assert.equal(bandOnlyFeedback?.cityChanges[0]?.effect, 'Meter帯 mixed → high');
+assert.equal(bandOnlyFeedback?.cityChanged, true);
+const unchangedFeedback = exhibitionFeedback({ ...v2Proposal, beforeScores: zero, afterScores: zero, cityChanges: [] });
+assert.equal(unchangedFeedback?.changed, false);
+assert.equal(unchangedFeedback?.cityChanged, false);
+assert.equal(unchangedFeedback?.note, 'Meter値と街区構成は維持されました。提案 #1 を記録しました。');
 
 const webSocketDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'WebSocket');
 let messageListener: ((event: { data: string }) => void) | undefined;

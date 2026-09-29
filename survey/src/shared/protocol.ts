@@ -42,7 +42,8 @@ export type ErrorCode =
   | 'unsupported_version'
   | 'no_question_available' | 'session_not_found' | 'session_expired' | 'already_answered'
   | 'unknown_question' | 'unknown_option' | 'option_question_mismatch' | 'question_not_assigned'
-  | 'revision_conflict' | 'answer_conflict' | 'reset_confirmation_invalid';
+  | 'revision_conflict' | 'answer_conflict' | 'reset_confirmation_invalid'
+  | 'lifecycle_conflict' | 'lifecycle_blocked';
 
 export type ApiError = { code: ErrorCode; message: string };
 /** Every JSON response. Conflicts that the client can recover from carry the latest state. */
@@ -73,18 +74,43 @@ export type ProposalRequest = {
 export type ProposalData = { proposal: ProposalRecord; state: ExhibitionState; replayed: boolean };
 
 export type RunSummary = { id: string; status: 'active' | 'ended'; algorithmVersion: 1 | 2; startedAt: string; endedAt: string | null };
+/**
+ * Installation lifecycle, persisted server-side. Finishing the questionnaire moves `in_experience` to
+ * `awaiting_exit`; only staff confirming the guest has physically left returns to `ready`. A reset is
+ * queued in `pendingReset` until then (`full` supersedes `city`); in `ready` it is always `none`.
+ */
+export type LifecyclePhase = 'ready' | 'in_experience' | 'awaiting_exit';
+export type PendingReset = 'none' | 'city' | 'full';
+export type LifecycleStatus = {
+  revision: number;
+  phase: LifecyclePhase;
+  pendingReset: PendingReset;
+  /** Completed proposals since the last full data reset; city resets keep it. */
+  totalGuestCount: number;
+  updatedAt: string;
+};
+export type LifecycleCommand = 'reset-city' | 'full-reset' | 'cancel-reset' | 'guest-left';
+/** `confirmation` is required for reset-city (`RESET`) and full-reset (`FULL RESET`). */
+export type LifecycleRequest = { command: LifecycleCommand; expectedRevision: number; confirmation?: string };
+export type LifecycleData = {
+  lifecycle: LifecycleStatus;
+  state: CitySurveyState | ExhibitionState;
+  /** The reset performed by this command, or null when nothing was reset (queued, cancelled, plain exit). */
+  executedReset: 'city' | 'full' | null;
+  previousRunId: string | null;
+};
+
 export type AdminCurrentRun = {
   run: RunSummary;
+  lifecycle: LifecycleStatus;
   state: CitySurveyState | ExhibitionState;
   questionVersion: number;
   totalQuestions: number;
   reservedSessions: number;
   answeredSessions: number;
 };
-export type AdminEvent = { id: number; type: 'run-reset'; runId: string; detail: { nextRunId: string }; createdAt: string };
+export type AdminEvent = { id: number; type: 'run-reset'; runId: string; detail: { nextRunId: string; scope: 'city' | 'full' }; createdAt: string };
 export type AdminEventsData = { answers: AnswerEvent[]; proposals: ProposalRecord[]; admin: AdminEvent[] };
-export type ResetRequest = { confirmation: string };
-export type ResetData = { previousRunId: string; state: CitySurveyState | ExhibitionState };
 
 /** What one answer actually changed after clamping. */
 export type AppliedChange = { scores: Partial<CityScores> };

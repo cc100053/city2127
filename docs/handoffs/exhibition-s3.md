@@ -62,3 +62,11 @@ The implementation owner should commit/push the locally verified code and run fe
 
 - Preflight: branch `codex/exhibition-s3`, HEAD `36b5c18` (1 ahead of origin S3, docs uncommitted); `git fetch --prune origin` succeeded. `origin/main` advanced to `4212b80` (lifecycle `963c090` and S4 guest UI `4212b80` integrated), so S3 is 2 ahead / 6 behind main.
 - Root `npm test`, `npm run build`, `git diff --check` and `git diff --check origin/main...HEAD` passed on `36b5c18` plus docs.
+- Merged `origin/main` `4212b80` into `codex/exhibition-s3` (after docs commit `f36e392`). Code conflicts: `src/surveyAtmosphere.ts` and `tests/surveyAtmosphere.test.ts`. Resolution: kept S4's `exhibitionFeedback` panel (per-site before→after, capped at two changes per S4's spec) and dropped S3's `exhibitionCityChangesText`, which it supersedes; kept S3's pending copy (all four sites render) instead of main's "準備中" text; added a non-Park (SW/SE) place assertion. Doc conflicts were status narratives, resolved as combined S3+S4+lifecycle status.
+- Merge-result checks (2026-09-30): root `npm test`, `npm run build`, `git diff --check`; `survey/` `npm test` (including lifecycle/guestFlow) and `npm run build` all passed. `module-swap/` unchanged.
+- Merge-result browser check: isolated survey server `127.0.0.1:8791` (temp DB) + Vite `127.0.0.1:5183`, 1280×720. One proposal (autonomous / open-commons / hybrid-cooling / vertical-functions) moved NW/SW/SE mixed→high. The root panel showed four answers, four Meter rows, `MAGNET東 · 自律サービス端口 3 → 5` and `道玄坂南 · 共有座位 共有席 4 → 7` (SE omitted by the two-change cap), the `最近64人` band and `累計 1 人`; the scene showed the high site states; zero console errors. No screenshot was archived; root v1 not browser-tested.
+- Known gap carried from S4: the two-change cap means a three- or four-site proposal names only the first two sites in the panel; the scene still renders all of them.
+
+## Next step (2026-09-30)
+
+Push the merge commit, wait for feature CI on it, then `--no-ff` merge `codex/exhibition-s3` into `main`, rerun root/survey checks, push main and verify main CI. Then record final commit/CI IDs here and flip S3 to SHIPPED across the status docs.
