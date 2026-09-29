@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import { cityText, policyText, scoresToWorldState } from '../src/surveyAtmosphere.ts';
+import { cityText, exhibitionFeedback, exhibitionScoresText, policyText, scoresToWorldState } from '../src/surveyAtmosphere.ts';
 import { presets } from '../src/presets.ts';
-import { connectSurvey, parseSurveyEvent, supersedes } from '../src/surveyView.ts';
+import { connectSurvey, isExhibitionView, parseSurveyEvent, supersedes } from '../src/surveyView.ts';
 import { createWorldState } from '../src/worldState.ts';
 
 const zero = { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 };
@@ -19,7 +19,7 @@ const lot = (l = 'empty', b = 'none') => ({ lot: l, building: b });
 const layout = { version: 1, lots: { nw: lot('empty', 'medium'), ne: lot(), sw: lot(), se: lot() } };
 const view = { runId: 'r', revision: 1, scores: { ...zero, automation: 2 }, layout, history: [{ revision: 1, questionText: 'q', optionLabel: 'x', policyChange: { automation: 2 }, cityChanges: [{ socketId: 'nw', label: 'hub' }] }] };
 const parsed = parseSurveyEvent({ type: 'city-state-updated', view });
-assert.ok(parsed && 'kind' in parsed);
+if (!parsed || !('kind' in parsed) || parsed.view.version !== 1) throw new Error('expected a normalized v1 event');
 assert.equal(parsed.kind, 'city-state-updated');
 const snapshot = parseSurveyEvent({ type: 'city-state-snapshot', view });
 assert.ok(snapshot && 'kind' in snapshot);
@@ -30,7 +30,8 @@ assert.equal(reset.kind, 'run-reset');
 const explicitV1 = parseSurveyEvent({ type: 'city-state-updated', view: { ...view, version: 1 } });
 assert.ok(explicitV1 && 'kind' in explicitV1);
 assert.equal(explicitV1.kind, 'city-state-updated');
-assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', state: view, view: { ...view, version: 2, layout: { version: 2, bands: {} } } }), { unsupportedVersion: 2 });
+assert.equal(explicitV1.view.version, 1);
+assert.equal(parseSurveyEvent({ type: 'city-state-updated', state: view, view: { ...view, version: 2, layout: { version: 2, bands: {} } } }), null);
 assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...view, version: 3 } }), { unsupportedVersion: 3 });
 assert.equal(parseSurveyEvent({ type: 'other', view }), null);
 assert.equal(policyText(parsed.view.history[0]), '自動化 ↑ +2');
@@ -42,6 +43,67 @@ assert.equal(parseSurveyEvent({ type: 'city-state-updated', view: { ...view, his
 assert.equal(supersedes(parsed.view, parsed.view), false);
 assert.equal(supersedes(parsed.view, { ...parsed.view, revision: 2 }), true);
 assert.equal(supersedes(parsed.view, { ...parsed.view, runId: 'reset', revision: 0 }), true);
+
+const v2BeforeLayout = { version: 2, bands: { nw: 'mixed', ne: 'mixed', sw: 'mixed', se: 'mixed' }, automatedPorts: 3, sharedSeats: 4, treeCount: 8, plantedFraction: .5, coolingFins: 3, functionModules: 4 } as const;
+const v2AfterLayout = { ...v2BeforeLayout, bands: { ...v2BeforeLayout.bands, ne: 'low' }, treeCount: 5, plantedFraction: .3125, coolingFins: 5 } as const;
+const v2BeforeScores = { ...zero };
+const v2Scores = { ...zero, environmentalPriority: -7.5 };
+const v2Proposal = {
+  id: 'proposal-1', runId: 'r2', guestSessionId: 'guest-1', ordinal: 1, questionSetVersion: 2, algorithmVersion: 2,
+  answers: [
+    { questionId: 'service-2127', optionId: 'human-machine', questionText: 'Q1', optionLabel: '人と機械の協力' },
+    { questionId: 'commons-2127', optionId: 'open-commons', questionText: 'Q2', optionLabel: '共有空間' },
+    { questionId: 'cooling-2127', optionId: 'active-cooling', questionText: 'Q3', optionLabel: '設備による暑さ対策を優先しました' },
+    { questionId: 'functions-2127', optionId: 'vertical-functions', questionText: 'Q4', optionLabel: '垂直機能' },
+  ],
+  votes: { ...zero, environmentalPriority: -1 }, revisionBefore: 0, revisionAfter: 1, submittedAt: '2026-09-28T00:00:00.000Z',
+  beforeScores: v2BeforeScores, afterScores: v2Scores, beforeLayout: v2BeforeLayout, afterLayout: v2AfterLayout,
+  cityChanges: [{ socketId: 'ne', label: '樹冠・冷却設備', before: { band: 'mixed', treeCount: 8, plantedFraction: .5, coolingFins: 3 }, after: { band: 'low', treeCount: 5, plantedFraction: .3125, coolingFins: 5 } }],
+};
+const v2View = {
+  version: 2, runId: 'r2', revision: 1, guestCount: 1, algorithmVersion: 2, voteSums: { ...v2Proposal.votes },
+  recentVotes: { ...zero, environmentalPriority: -.25 }, scores: v2Scores, layout: v2AfterLayout,
+  recentProposals: [v2Proposal], latestProposal: v2Proposal,
+};
+const initialV2 = { version: 2, runId: 'r2', revision: 0, guestCount: 0, algorithmVersion: 2, voteSums: { ...zero }, recentVotes: { ...zero }, scores: { ...zero }, layout: v2BeforeLayout, recentProposals: [] };
+const parsedInitialV2 = parseSurveyEvent({ type: 'city-state-snapshot', view: initialV2 });
+assert.ok(parsedInitialV2 && 'kind' in parsedInitialV2 && isExhibitionView(parsedInitialV2.view));
+const parsedV2 = parseSurveyEvent({ type: 'city-state-updated', view: v2View });
+if (!parsedV2 || !('kind' in parsedV2) || !isExhibitionView(parsedV2.view)) throw new Error('expected a validated v2 event');
+assert.equal(parsedV2.view.layout, v2AfterLayout);
+assert.equal(supersedes(parsedV2.view, parsedV2.view), false);
+assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, scores: { ...v2Scores, environmentalPriority: Infinity } } }), null);
+assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, layout: { ...v2AfterLayout, coolingFins: 7 } } }), null);
+assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, layout: { ...v2AfterLayout, bands: { ...v2AfterLayout.bands, ne: 'wild' } } } }), null);
+assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, recentProposals: Array(65).fill(v2Proposal) } }), null);
+assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, latestProposal: { ...v2Proposal, afterLayout: { ...v2AfterLayout, treeCount: 6 } } } }), null);
+assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, latestProposal: { ...v2Proposal, answers: [v2Proposal.answers[0], { ...v2Proposal.answers[1], questionId: v2Proposal.answers[0].questionId }, ...v2Proposal.answers.slice(2)] } } }), null);
+const reorderedProposal = { ...v2Proposal, answers: [v2Proposal.answers[2], v2Proposal.answers[1], v2Proposal.answers[0], v2Proposal.answers[3]] };
+const reorderedV2 = parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, latestProposal: reorderedProposal, recentProposals: [reorderedProposal] } });
+if (!reorderedV2 || !('kind' in reorderedV2) || !isExhibitionView(reorderedV2.view)) throw new Error('expected reordered v2 answers to parse');
+assert.equal(exhibitionFeedback(reorderedV2.view.latestProposal)?.reason, '設備による暑さ対策を優先しました');
+const missingChangeProposal = { ...v2Proposal, cityChanges: [] };
+assert.equal(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, latestProposal: missingChangeProposal, recentProposals: [missingChangeProposal] } }), null);
+const feedback = exhibitionFeedback(parsedV2.view.latestProposal);
+assert.deepEqual(feedback, {
+  ordinal: 1, reason: '設備による暑さ対策を優先しました',
+  effect: '樹冠 8 → 5 · 冷却設備 3 → 5 · 植栽面 50.0% → 31.3%',
+  changed: true, note: '提案 #1 を記録しました。',
+});
+assert.ok(exhibitionScoresText(parsedV2.view.scores).includes('暑さへの備え -7.5'));
+
+const sameBandLayout = { ...v2AfterLayout, bands: { ...v2AfterLayout.bands, ne: 'high' }, treeCount: 9, plantedFraction: .6, coolingFins: 2 } as const;
+const sameBandAfter = { ...sameBandLayout, plantedFraction: .605 } as const;
+const sameBandFeedback = exhibitionFeedback({
+  ...v2Proposal, beforeScores: { ...zero, environmentalPriority: 4 }, afterScores: { ...zero, environmentalPriority: 4.2 },
+  beforeLayout: sameBandLayout, afterLayout: sameBandAfter,
+  cityChanges: [{ socketId: 'ne', label: '樹冠・冷却設備', before: { band: 'high', treeCount: 9, plantedFraction: .6, coolingFins: 2 }, after: { band: 'high', treeCount: 9, plantedFraction: .605, coolingFins: 2 } }],
+});
+assert.equal(sameBandFeedback?.changed, true);
+assert.equal(sameBandFeedback?.effect, '樹冠 9 → 9 · 冷却設備 2 → 2 · 植栽面 60.0% → 60.5%');
+const unchangedFeedback = exhibitionFeedback({ ...v2Proposal, beforeLayout: v2AfterLayout, cityChanges: [] });
+assert.equal(unchangedFeedback?.changed, false);
+assert.equal(unchangedFeedback?.note, '駅東の暑さ対策は維持されました。提案 #1 を記録しました。');
 
 const webSocketDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'WebSocket');
 let messageListener: ((event: { data: string }) => void) | undefined;
@@ -58,9 +120,12 @@ try {
   connectSurvey('ws://example.test/ws', (_kind, next) => applied.push(next.runId), status => statuses.push(status));
   messageListener?.({ data: JSON.stringify({ type: 'city-state-updated', state: view, view: { ...view, version: 2, layout: { version: 2, bands: {} } } }) });
   assert.deepEqual(applied, []);
+  messageListener?.({ data: JSON.stringify({ type: 'city-state-updated', view: { ...view, version: 3 } }) });
   assert.ok(statuses.includes('Unsupported exhibition view version'));
+  messageListener?.({ data: JSON.stringify({ type: 'city-state-updated', view: v2View }) });
+  assert.deepEqual(applied, ['r2']);
   messageListener?.({ data: JSON.stringify({ type: 'city-state-updated', view }) });
-  assert.deepEqual(applied, ['r']);
+  assert.deepEqual(applied, ['r2', 'r']);
 } finally {
   if (webSocketDescriptor) Object.defineProperty(globalThis, 'WebSocket', webSocketDescriptor);
   else delete (globalThis as { WebSocket?: unknown }).WebSocket;

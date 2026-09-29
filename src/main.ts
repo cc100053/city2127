@@ -15,7 +15,8 @@ import { createWorldState } from './worldState';
 import { hourAt, sunHeight, daylight, moodAt, withNight } from './dayCycle';
 import { overlay } from './overlay';
 import { addCityModel } from './modelAssets';
-import { startSurveyAtmosphere } from './surveyAtmosphere';
+import { scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
+import { isExhibitionView } from './surveyView';
 import { createCityChangeManager } from './createCityChangeManager';
 import './style.css';
 
@@ -71,8 +72,14 @@ try {
   const heldHour=Number(params.get('hour')??NaN),hold=heldHour>=0&&heldHour<24?heldHour:null;
   const updateOverlay=overlay();
   const cityChanges=surveyUrl?createCityChangeManager(scene):null;
-  if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view,state)=>{
-    world.blendTo(state,now);
+  if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view)=>{
+    if(isExhibitionView(view)){
+      // Cancel any legacy score blend while preserving its current rendered atmosphere.
+      world.blendTo(world.state,now);
+      cityChanges!.applyExhibitionLayout(view.layout,kind,now);
+      return;
+    }
+    world.blendTo(scoresToWorldState(view.scores),now);
     if(kind==='city-state-updated')cityChanges!.applyIncrementalUpdate(view,now);
     else cityChanges!.restoreFromSnapshot(view,now);
   });

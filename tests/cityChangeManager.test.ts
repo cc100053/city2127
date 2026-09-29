@@ -1,18 +1,55 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { CHANGE_CATALOG, SITE_IDS, siteLayerDefinition, type SiteLayerDefinition, type SiteLayerId } from '../src/changeCatalog.ts';
+import { CHANGE_CATALOG, SITE_IDS, siteLayerDefinition, type EnvironmentParkTarget, type SiteLayerDefinition, type SiteLayerId } from '../src/changeCatalog.ts';
 import { CityChangeManager, SITE_ASSET_RETRY_SECONDS } from '../src/cityChangeManager.ts';
 import type { BuiltSite, BuiltSiteMap } from '../src/siteBuilders/index.ts';
 import { MutableSiteLayerRuntime } from '../src/siteBuilders/siteRuntime.ts';
-import type { Layout, SurveyView } from '../src/surveyView.ts';
+import type { EnvironmentParkDiagnostics, EnvironmentParkRuntime } from '../src/siteBuilders/siteRuntime.ts';
+import type { ExhibitionLayout, Layout, SurveyView } from '../src/surveyView.ts';
 
 const close = (actual: number, expected: number) => assert.ok(Math.abs(actual - expected) < 1e-6, `${actual} != ${expected}`);
 const lot = (kind: Layout['nw']['lot'] = 'empty', building: Layout['nw']['building'] = 'none') => ({ lot: kind, building });
 const layout = (overrides: Partial<Layout> = {}): Layout => ({ nw: lot(), ne: lot(), sw: lot(), se: lot(), ...overrides });
 const view = (value: Layout, revision: number, runId = 'run'): SurveyView => ({
-  runId, revision, layout: value, history: [],
+  version: 1, runId, revision, layout: value, history: [],
   scores: { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 },
 });
+const exhibitionLayout = (overrides: Partial<ExhibitionLayout> = {}): ExhibitionLayout => ({
+  version: 2, bands: { nw: 'mixed', ne: 'mixed', sw: 'mixed', se: 'mixed' },
+  automatedPorts: 3, sharedSeats: 4, treeCount: 5, plantedFraction: .5, coolingFins: 0, functionModules: 4,
+  ...overrides,
+});
+
+let parkTarget: EnvironmentParkTarget = { band: 'mixed', treeCount: 5, plantedFraction: .5, coolingFins: 0 };
+let parkExhibitionMode = false;
+let parkTransitioning = false;
+let parkLegacyRestores = 0;
+const parkRuntime: EnvironmentParkRuntime = {
+  setTarget(target, _now, immediate) {
+    const changed = !parkExhibitionMode || target.treeCount !== parkTarget.treeCount
+      || target.plantedFraction !== parkTarget.plantedFraction || target.coolingFins !== parkTarget.coolingFins;
+    parkTarget = target;
+    parkExhibitionMode = true;
+    parkTransitioning = changed && !immediate;
+    return changed;
+  },
+  restoreLegacy() {
+    parkLegacyRestores++;
+    parkTarget = { band: 'mixed', treeCount: 5, plantedFraction: .5, coolingFins: 0 };
+    parkExhibitionMode = false;
+    parkTransitioning = false;
+  },
+  update() {},
+  getDiagnostics(): EnvironmentParkDiagnostics {
+    return {
+      ...parkTarget,
+      targetTreeCount: parkTarget.treeCount, visibleTreeCount: parkTarget.treeCount,
+      targetPlantedFraction: parkTarget.plantedFraction, plantedFraction: parkTarget.plantedFraction,
+      targetCoolingFins: parkTarget.coolingFins, visibleCoolingFins: parkTarget.coolingFins,
+      representation: 'fallback',
+    };
+  },
+};
 
 const groups = new Map<SiteLayerId, T.Group>();
 let parkTreePreparations = 0;
@@ -33,7 +70,10 @@ const sites = Object.fromEntries(SITE_IDS.map(siteId => {
   }
   const material = new T.MeshStandardMaterial({ emissiveIntensity: .2, transparent: true });
   const marker = new T.Mesh(new T.BufferGeometry(), material); marker.visible = false; root.add(marker);
-  return [siteId, { id: siteId, root, layers, marker: { mesh: marker, material } } satisfies BuiltSite];
+  return [siteId, {
+    id: siteId, root, layers, marker: { mesh: marker, material },
+    ...(siteId === 'stationEastPark' ? { environmentPark: parkRuntime } : {}),
+  } satisfies BuiltSite];
 })) as unknown as BuiltSiteMap;
 
 const manager = new CityChangeManager(sites);
@@ -130,4 +170,37 @@ try {
 }
 assert.equal(retryAttempts, 2);
 assert.equal(retrySites.magnetEast.layers.hubUpper?.assetStatus, 'ready');
+
+const neutral = exhibitionLayout();
+manager.applyExhibitionLayout(neutral, 'city-state-snapshot', 20);
+assert.equal(manager.getVariant('magnetEast'), 'exhibition-neutral');
+assert.equal(manager.getVariant('stationEastPark'), 'exhibition-neutral');
+assert.equal(manager.getVariant('dogenzakaSouth'), 'exhibition-neutral');
+assert.equal(manager.getVariant('centerGaiRear'), 'exhibition-neutral');
+assert.equal(groups.get('hubNeutralProps')?.visible, true);
+assert.equal(groups.get('commonsNeutralProps')?.visible, true);
+assert.equal(groups.get('towerNeutralProps')?.visible, true);
+assert.equal(groups.get('parkCoolingFins')?.visible, true);
+assert.equal(manager.getDiagnostics().stationEastPark.environmentPark?.visibleTreeCount, 5);
+
+manager.applyExhibitionLayout(exhibitionLayout({ treeCount: 10, plantedFraction: .65, coolingFins: 3 }), 'city-state-updated', 22);
+assert.equal(parkTransitioning, true);
+manager.update(22.3);
+assert.ok(parkMarker.material.emissiveIntensity > .2);
+manager.applyExhibitionLayout(exhibitionLayout({ treeCount: 10, plantedFraction: .65, coolingFins: 3 }), 'city-state-snapshot', 22.4);
+assert.equal(parkTransitioning, false);
+manager.update(22.5);
+close(parkMarker.material.emissiveIntensity, .2);
+
+manager.applyExhibitionLayout(exhibitionLayout({ treeCount: 8, coolingFins: 2 }), 'run-reset', 23);
+assert.equal(parkTarget.treeCount, 8);
+assert.equal(manager.getDiagnostics().stationEastPark.environmentPark?.visibleTreeCount, 8);
+manager.update(23.1);
+close(parkMarker.material.emissiveIntensity, .2);
+
+manager.applyIncrementalUpdate(view(layout({ ne: lot('park') }), 8), 24);
+assert.equal(parkLegacyRestores, 1);
+assert.equal(parkExhibitionMode, false);
+assert.equal(manager.getVariant('stationEastPark'), 'park');
+assert.equal(manager.getDiagnostics().stationEastPark.environmentPark?.visibleTreeCount, 5);
 console.log('PASS: snapshots, incremental updates, changed-only layers, retargeting, markers and reset transitions.');

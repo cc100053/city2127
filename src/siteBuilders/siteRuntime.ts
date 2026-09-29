@@ -1,13 +1,32 @@
 import * as T from 'three';
 import { changeSites } from '../layout.ts';
-import type { SiteId, SiteLayerDefinition, SiteLayerId } from '../changeCatalog.ts';
+import type { EnvironmentParkTarget, SiteId, SiteLayerDefinition, SiteLayerId } from '../changeCatalog.ts';
 import type { LotSocketId } from '../surveyView.ts';
 
 const GUEST = '#ff9a2e';
+export const SITE_TRANSITION_SECONDS = 3;
 
 export interface SiteMarkerRuntime {
   readonly mesh: T.Mesh;
   readonly material: T.MeshStandardMaterial;
+}
+
+export interface EnvironmentParkDiagnostics {
+  readonly band: EnvironmentParkTarget['band'];
+  readonly targetTreeCount: number;
+  readonly visibleTreeCount: number;
+  readonly targetPlantedFraction: number;
+  readonly plantedFraction: number;
+  readonly targetCoolingFins: number;
+  readonly visibleCoolingFins: number;
+  readonly representation: 'fallback' | 'glb';
+}
+
+export interface EnvironmentParkRuntime {
+  setTarget(target: EnvironmentParkTarget, now: number, immediate: boolean): boolean;
+  restoreLegacy(): void;
+  update(now: number): void;
+  getDiagnostics(): EnvironmentParkDiagnostics;
 }
 
 export interface BuiltSite {
@@ -15,6 +34,7 @@ export interface BuiltSite {
   readonly root: T.Group;
   readonly layers: Readonly<Partial<Record<SiteLayerId, SiteLayerRuntime>>>;
   readonly marker: SiteMarkerRuntime;
+  readonly environmentPark?: EnvironmentParkRuntime;
 }
 
 export type BuiltSiteMap = Readonly<Record<SiteId, BuiltSite>>;

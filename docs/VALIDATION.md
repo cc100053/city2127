@@ -1,5 +1,15 @@
 # Validation and handoff
 
+## Exhibition S2 — Q3 climate vertical slice — 2026-09-29
+
+Local verification is complete on `codex/exhibition-s2`, based on `08cf113d9e9e15c9655187e369a9eb6401008bb9` with uncommitted S2 changes; integration is pending. Root `npm test` passed all six scripts, `npm run build` passed with the existing >500 kB bundle advisory, and `git diff --check` passed. See the [S2 handoff](handoffs/exhibition-s2.md) for exact run IDs and the API/parser matrix.
+
+Real four-question proposals on the scratch survey DB produced distinct mature NE low/mixed/high Park states; same-band accumulation and retargeting changed the tree count as expected. The other three sites stayed on their populated mixed baseline. The v2 root path applies the server layout without blending Q3 scores into global atmosphere; sampled clear-sky pixels matched across the fixed-hour low/mixed/high screenshots. The read-only parser probe rejected five malformed v2 payloads before renderer application and ignored duplicate/stale revisions.
+
+Headless Chrome at 1280×720/DPR 1 and hour 12 matched rendered Park counts to the API. The actual 12-tree GLB and fallback fit the NE ±5 m site. An intentional GLB failure rendered the procedural grove and the automatic retry restored the same authoritative count; clean reload and reduced-motion checks passed. Three-item history fit at 1280×720 and 1920×1080; those panel-only frames predate the tree-fit correction and are not geometry evidence.
+
+Final post-containment scene evidence: [low](../artifacts/future-s2-q3-low-verified-1280x720.png) ([Park crop](../artifacts/future-s2-q3-low-park-verified-1280x720.png)), [mixed](../artifacts/future-s2-q3-mixed-verified-1280x720.png) ([Park crop](../artifacts/future-s2-q3-mixed-park-verified-1280x720.png)), and [high](../artifacts/future-s2-q3-high-verified-1280x720.png) ([Park crop](../artifacts/future-s2-q3-high-park-verified-1280x720.png)). Three-item panel frames: [1280×720](../artifacts/future-s2-panel-3history-1280x720.png), [1920×1080](../artifacts/future-s2-panel-3history-1920x1080.png). Captures represent the base commit plus uncommitted source and were taken 2026-09-29. No real-GPU FPS, physical exhibition hardware, S3/S4 mapping, or 100-guest endurance claim is made. Scratch API writes did not touch display data.
+
 ## Exhibition S1 2026-09-28
 
 S1 was implemented on `codex/exhibition-s1` from base `f8fa07ab58610c19e5764be6bec325cf9ddd53f9`. Feature commit `c52bfda444ac4e4bd764c8133e02a59fab35f94d` was pushed and its feature CI passed. Integrated commit `7beff5e238eb680ef4bc66997f6281ac0bf50282` is pushed to `origin/main`, with the same tree and no conflicts; all local integrated package checks passed. [Main CI run 36382621824](https://github.com/cc100053/city2127/actions/runs/36382621824) passed. The complete ownership and publish record is in the [S1 handoff](handoffs/exhibition-s1.md).

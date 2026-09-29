@@ -2,9 +2,9 @@
 
 Exhibition priorities and historical Plan 02 implementation status: [方向與紀錄](PLAN02.md). Art rules for the root scene: [ART.md](ART.md), in use since 2026-09-24. Status and remaining art work: [art-direction handoff](handoffs/art-direction.md#remaining-work).
 
-## Exhibition specification and S1 status — 2026-09-28
+## Exhibition specification and S1–S2 status — 2026-09-29
 
-The user confirmed that the starting city is already **2127**: every low, zero and high Meter state must retain a mature future identity. Low values describe different future services and spaces, never technological regression or an undeveloped city. [EXHIBITION_MVP.md](EXHIBITION_MVP.md) defines the four-question flow, history/recent accumulation, populated neutral sites, futuristic negative variants, versioned migration and later viewer/UI stages. S1 server rules, persistence and proposal APIs are implemented; the former one-question runtime remains as legacy v1 behavior/history. The S1 handoff records exact verification and integration status. This file remains the implementation map. The earlier “connect survey afterwards” decision is historical; the existing root integration supports v1 and explicitly rejects v2 until S2+.
+The user confirmed that the starting city is already **2127**: every low, zero and high Meter state must retain a mature future identity. Low values describe different future services and spaces, never technological regression or an undeveloped city. [EXHIBITION_MVP.md](EXHIBITION_MVP.md) defines the four-question flow, history/recent accumulation, populated neutral sites, futuristic negative variants, versioned migration and later viewer/UI stages. S1 server rules, persistence and proposal APIs are implemented; the former one-question runtime remains as legacy v1 behavior/history. Root S2 accepts bounded v2 CityViews and renders only the Q3 Park effect. Other three site mappings are S3 work, and the four-question guest UI is S4 work; current S2 verification is in its handoff. This file remains the implementation map. The earlier “connect survey afterwards” decision is historical.
 
 ### S1 server contract (implemented)
 
@@ -12,7 +12,7 @@ The user confirmed that the starting city is already **2127**: every low, zero a
 
 The v2 HTTP contract is exposed by `survey/src/server/server.ts`: `POST /api/proposal-sessions`, `GET /api/proposal-sessions/:id`, `POST /api/proposals`, and `GET /api/city-view`; existing health, admin and WebSocket paths remain. A proposal carries `submissionId`, `guestSessionId`, `expectedRevision`, and four `{questionId, optionId}` answers. The server records proposal events and a floating-point snapshot atomically, supports idempotent retries, and checks startup replay against the snapshot. Schema 3 ends an active v1 run and starts a zeroed v2 run; it preserves prior v1 runs/events rather than translating their scores.
 
-The v2 CityView has explicit `version: 2` and includes the run/revision, guest count, scores, layout and bounded recent proposals. Current root and module-swap clients intentionally reject that version with “Unsupported exhibition view version” before applying scene state. The old guest page and viewers remain v1; they do not support the active v2 run. S2/S3 must add the root v2 rendering path and S4 the guest UI. Legacy v1 standalone/demo behavior remains available. These viewer/parser and API details are covered by the [S1 handoff](handoffs/exhibition-s1.md), not by a claim that the exhibition experience is complete.
+The v2 CityView has explicit `version: 2` and includes the run/revision, guest count, scores, layout and bounded recent proposals. Root `?survey` accepts valid v2 views; `module-swap` continues to show “Unsupported exhibition view version” before applying them. The old guest page remains v1 and cannot submit to the active v2 run. Legacy v1 and standalone/demo behavior remain available. S2 is still in progress; the current root effect and its limits are described below and in the [S2 handoff](handoffs/exhibition-s2.md). This does not mean the full exhibition experience is complete.
 
 ## Earlier product direction — 2026-09-18 (one-question v1)
 
@@ -29,7 +29,7 @@ Building count/density and pedestrian activity are candidate dimensions, not a c
 
 The single Shibuya setting and desktop scope remain. Plan 02 and [Pic 2](../asset/pic2.png) provide reusable visual references; the root prototype's automatic day cycle, unchanging buildings and three-minute day are implementation facts, not constraints on the exhibition design. The question sequence, cumulative choices and choice-driven lots live in the causal MVP (next section), outside the root prototype; the root `src/` presets and `WorldState` are unchanged by it.
 
-**Next direction (user decision, 2026-09-24; root v1 hookup completed):** the exhibition city is the root Shibuya scene (`src/`). Build and extend that scene first — more areas and city objects, visibly changeable city, polished look — and add more questions to the causal MVP. The existing root hookup is v1 only; S2/S3 must map v2 layouts to that scene. `module-swap/` four-lot viewer remains a causal-chain test, not the target city. Visual polish is in scope, but it serves readable change rather than replacing it.
+**Next direction (user decision, 2026-09-24; root v1 hookup completed):** the exhibition city is the root Shibuya scene (`src/`). Build and extend that scene first — more areas and city objects, visibly changeable city, polished look — and add more questions to the causal MVP. At that decision point the root hookup was v1 only; the S2 Q3 Park route is now documented below, while full four-site v2 mapping remains S3 work. `module-swap/` four-lot viewer remains a causal-chain test, not the target city. Visual polish is in scope, but it serves readable change rather than replacing it.
 
 ## Causal choice → city MVP — 2026-09-24 (`survey/` + `module-swap/`)
 
@@ -64,7 +64,7 @@ Known limits: root CI runs `survey/` and `module-swap/` tests/builds since 2026-
 
 ## Root scene survey mode — 2026-09-24 (`src/?survey`)
 
-This section records the legacy v1 viewer. Its parser rejects v2 with an explicit unsupported-version status before applying scene state; v2 rendering is still S2/S3 work.
+This section records the preserved legacy v1 viewer and its original implementation. The current root also has a separate v2 route described under “S2 root v2 slice” below; `module-swap` remains v1-only.
 
 User decisions 2026-09-24: connect the survey to the root Shibuya scene in three steps — atmosphere, Shibuya change points, causal panel (all implemented). Handoffs [root-survey-atmosphere](handoffs/root-survey-atmosphere.md) (steps 1–2) and [root-causal-panel](handoffs/root-causal-panel.md) (step 3).
 
@@ -76,6 +76,16 @@ User decisions 2026-09-24: connect the survey to the root Shibuya scene in three
 - Art-direction pilot (2026-09-24): the SW commons is restyled to the ringed-plaza language and every site shows a saffron footprint outline that pulses for 10 s after a live change (not on snapshot restore). Parts are baked per material, so all-sites-up draw calls fell from 946 to 462 with GTAO enabled; they were 576 before GTAO.
 - Stage 2 adds the hybrid asset boundary without changing the survey contract. Each catalogued layer declares `procedural`, `glb`, `prop` or `effect`; the PARK is split into a procedural surface and a lazy GLB tree layer. `SiteAssetLoaderCache` validates the asset root, identity transform, static contents and bounds, caches one load per page and reports readiness/fallback through `CityChangeManager.getDiagnostics()`. Asset preparation starts only when its layer first becomes active and never blocks the answer transition. PARK keeps a lightweight procedural grove until its detailed GLB is attached; an active failed asset retries after 5 seconds, while an inactive layer waits for its next activation. The existing future tree is the first catalogued asset; socket placement and additional GLB variants remain later work. Not yet: labels in the 3D scene, real-GPU performance with all sites up.
 - Stage 3 makes AUTO HUB's additive tall upper layer the first dedicated interchangeable site GLB. Its `.blend` and `.glb` live together under `asset/models/automation-hub-upper/`; the asset catalog validates root metadata, footprint/height, `front_marker` and four named material roles before remapping them to the root city's shared materials. `automation-medium` stays procedural and makes no request. On first `automation-tall`, the validated GLB atomically replaces the matching procedural upper; any load or validation failure retains that fallback. Active failed assets retry every 5 seconds, and PARK now keeps a lightweight procedural grove until its GLB trees are ready. This prevents blank late pop-in while preserving lazy loading; a delayed GLB may still produce a visible detail swap. The survey contract and fixed city remain unchanged. Asset details and evidence: [automation-hub-upper handoff](handoffs/automation-hub-upper-glb.md).
+
+### S2 root v2 slice — 2026-09-29 (verification in progress)
+
+Root `?survey` discriminates views by explicit version. The parser validates bounded v2 scores, layout values, proposal records and their current-state consistency before applying them; it continues to accept explicit or versionless v1 and rejects unknown versions. The v2 renderer passes the server-provided layout directly to the site manager and does not convert v2 scores into global atmosphere changes.
+
+S2 makes only the NE Park variable: Q3's server-authoritative `treeCount`, `plantedFraction` and `coolingFins` control the mature park. A live change transitions over 3 seconds; snapshots and run resets restore immediately without a guest pulse. The other three sites remain fully built at fixed mixed values, and the panel says their service, shared-space and function mappings are pending S3. The four-question server API is unchanged; the legacy `/guest` UI remains unsupported for an active v2 run until S4. V1 survey and standalone behavior remain available with the shared Park planting detail updated by the new builder.
+
+The runtime preallocates 12 tree slots and six cooling-fin instances. Procedural fallback trunks/crowns and the loaded GLB use those slots; each target writes the current authoritative counts, so a late GLB attaches at the latest tree count. The GLB's measured bounds and yaw-aware per-slot fit keep the 12-tree grove inside the NE lot, and restore tests preserve the five legacy v1 tree transforms. The loaded GLB clone is baked once with the existing `bake()` before its `InstancedMesh` objects are created; this retains the cached source geometry/materials while all instances reuse the batched geometry/materials. Static park surfaces and fixed neutral site geometry continue using existing bake batches. `tests/siteAssets.test.ts` checks actual GLB and fallback bounds within the NE ±5 half extents.
+
+See the [S2 handoff](handoffs/exhibition-s2.md) for the current implementation and verification record.
 
 ## Current implementation baseline (unchanged by the direction update)
 

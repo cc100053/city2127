@@ -2,7 +2,7 @@
 
 AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/PROJECT.md) · [驗收與交接流程](docs/VALIDATION.md) · [展覽方向與 Plan 02 紀錄](docs/PLAN02.md)。
 
-**展覽 MVP 狀態（2026-09-28）：** [共同城市 MVP 設計與 Agent 實作規劃](docs/EXHIBITION_MVP.md)的 S1 server 規則、SQLite v2 run／proposal 儲存及四題 API 已實作。v2 每位觀眾提交四題；schema 3 migration 會結束 active v1 run 並開新 v2 run，保留舊歷史。root 與 module-swap 舊 viewer 清楚拒絕 v2，直至 S2+ 加入渲染；guest UI 要待 S4 才支援。城市從開始已是2127年，低／零／高值都必須有未來感。下方一題流程及畫面內容是 v1 歷史實作，不代表新的 guest flow。檢查與整合狀態見 [S1 handoff](docs/handoffs/exhibition-s1.md)。
+**展覽 MVP 狀態（2026-09-29）：** [共同城市 MVP 設計與 Agent 實作規劃](docs/EXHIBITION_MVP.md)的 S1 四題 API、SQLite v2 run／proposal 儲存已實作。S2 正在把明確版本的 v2 CityView 接到 root：目前只有 Q3 的權威環境參數會改變車站東公園；其他三個 site 固定顯示成熟混合基底，映射待 S3。S2 的整合及桌面視覺驗證仍進行中；四題 guest UI 待 S4。城市從開始已是2127年，低／零／高值都必須有未來感。下方一題流程及畫面內容是 v1 歷史實作，不代表新的 guest flow。S1 與 S2 狀態分別見 [S1 handoff](docs/handoffs/exhibition-s1.md) 和 [S2 handoff](docs/handoffs/exhibition-s2.md)。
 
 ## 協作入門
 
@@ -16,11 +16,11 @@ AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/P
 
 **由觀眾共同塑造一個富有未來感的澀谷。** 城市是展覽中的共同創作結果；視覺設計服務於未來感、澀谷辨識度，以及觀眾能否看懂自己的選擇如何改變城市。精緻模型或紀實照片質感不再是首要目標或完成門檻。
 
-新版每位 guest 回答四條題目並一次提交 → server 將四軸投票累積至共同城市狀態 → 下一位 guest 繼續使用累積結果。S1 已完成 server-side transaction、replay、migration 和 view API；S2/S3 的城市渲染及 S4 的 guest UI 尚未完成。每日展覽重設規則仍待定。
+新版每位 guest 回答四條題目並一次提交 → server 將四軸投票累積至共同城市狀態 → 下一位 guest 繼續使用累積結果。S1 已完成 server-side transaction、replay、migration 和 view API；root Q3 公園切片及其最新驗證狀態見 [S2 handoff](docs/handoffs/exhibition-s2.md)。S3 其餘三site映射及 S4 guest UI 尚未完成；每日展覽重設規則仍待定。
 
-原有 v1 因果 MVP 每人一題、由答案推導區畫變化；展覽 v2 S1 已改為可重用的四題題組及四軸累積。v1歷史資料保留，新的 v2 城市畫面和 guest UI 尚待後續階段；每日重設及輸入裝置仍待定。
+原有 v1 因果 MVP 每人一題、由答案推導區畫變化；展覽 v2 S1 已改為可重用的四題題組及四軸累積。root 保留 v1／standalone；v2 目前只有 Q3 公園映射，四題 guest UI 尚待 S4；每日重設及輸入裝置仍待定。
 
-**下一步方向（2026-09-24 決定）：** 展覽城市就係根目錄澀谷場景（`src/`）。先建立同擴充呢個場景——更多區域同城市物件、城市可以明顯變化、打磨外觀——同時為因果 MVP 加更多題目。v1 survey 已接入 root；新版 v2 城市渲染仍待 S2/S3。`module-swap/` 四區畫只係證明因果鏈，唔係目標城市。
+**下一步方向（2026-09-24 決定）：** 展覽城市就係根目錄澀谷場景（`src/`）。先建立同擴充呢個場景——更多區域同城市物件、城市可以明顯變化、打磨外觀——同時為因果 MVP 加更多題目。v1 survey 已接入 root；2026-09-29 root v2 Q3 公園切片已接上，其他三個 site 映射留待 S3。`module-swap/` 四區畫只係證明因果鏈，唔係目標城市。
 
 ### 因果選擇 MVP（2026-09-24，`survey/` + `module-swap/`）
 
@@ -28,14 +28,14 @@ AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/P
 
 ```sh
 cd survey && npm ci && npm run build && npm run server        # v2 API at http://127.0.0.1:8787
-cd module-swap && npm run install:app && npm run dev          # ?survey rejects v2 until viewer integration (S2+)
+cd module-swap && npm run install:app && npm run dev          # ?survey continues to reject v2; root supports the S2 Q3 slice
 ```
 
-The `/guest` page is retained as the legacy v1 UI, but its requests are rejected against the active v2 run; there is no selector for reopening a historical v1 run. The root and module-swap viewers still support standalone/demo and explicit v1 frames, but reject v2 until S2+. See the [S1 handoff](docs/handoffs/exhibition-s1.md) for current checks and limitations.
+The `/guest` page is retained as the legacy v1 UI, but its requests are rejected against the active v2 run; there is no selector for reopening a historical v1 run. Root `?survey` accepts validated v2 CityViews and changes the Park from server-authoritative Q3 parameters; module-swap still rejects v2. Both preserve standalone/demo and v1 behavior. The four-question guest UI remains S4 work. See the [S1 handoff](docs/handoffs/exhibition-s1.md) and [S2 handoff](docs/handoffs/exhibition-s2.md) for separate verification records.
 
 設計同限制見 [PROJECT.md](docs/PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--module-swap)，驗證見 [VALIDATION.md](docs/VALIDATION.md)。
 
-**根目錄場景接 survey v1（2026-09-24，legacy）：** 根目錄 app 加 `?survey` 會由 v1 survey 驅動澀谷場景，並顯示選擇及城市變化。當前 parser 明確拒絕 v2，直到 S2/S3 完成 root v2 rendering；standalone root scene 不變。詳見 [PROJECT.md](docs/PROJECT.md#root-scene-survey-mode--2026-09-24-srcsurvey) 及 [S1 handoff](docs/handoffs/exhibition-s1.md)。
+**根目錄 v1 接線（2026-09-24，legacy）：** 根目錄 app 加 `?survey` 仍支援 v1 survey 驅動澀谷場景。root 另有 S2 v2 路徑：只套用 Q3 至車站東公園，不將四軸 Meter 轉成全城氣氛變化；公園 live 轉場 3 秒，snapshot/reset 立即還原且不發個人 pulse。其他三site固定為混合基底並標示映射準備中；最終場景及整合驗證未完成。v1 legacy 與 standalone 行為保留。詳見 [PROJECT.md](docs/PROJECT.md#root-scene-survey-mode--2026-09-24-srcsurvey)、[S1 handoff](docs/handoffs/exhibition-s1.md) 及 [S2 handoff](docs/handoffs/exhibition-s2.md)。
 
 ## 目前可執行原型
 

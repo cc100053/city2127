@@ -8,6 +8,7 @@ export function buildAutomationHub(scene: T.Scene, kit: Kit, assets: SiteAssetLo
   const root = createSiteRoot(scene, 'nw');
   const hubBaseLayer = createSiteLayer(root, siteLayerDefinition('magnetEast', 'hubBase'));
   const hubUpperLayer = createSiteLayer(root, siteLayerDefinition('magnetEast', 'hubUpper'), 12);
+  const neutralPropsLayer = createSiteLayer(root, siteLayerDefinition('magnetEast', 'hubNeutralProps'));
   const hubBase = hubBaseLayer.group;
   const hubUpper = hubUpperLayer.group;
   box(hubBase, [8.4, .8, 7.4], [0, .8, 0], cream, .25);
@@ -25,6 +26,16 @@ export function buildAutomationHub(scene: T.Scene, kit: Kit, assets: SiteAssetLo
     box(hubBase, [.12, .7, .12], [Math.cos(angle) * 3.7, 12.15, -Math.sin(angle) * 3.7], solar, .02);
   }
   sign(hubBase, kit, '自動サービス / AUTO HUB', 0, 2.2, 3.2, 6.2, .8, '#46676e');
+
+  // S2 zero-value baseline: three automated ports and three human service counters.
+  for (let i = 0; i < 3; i++) {
+    const x = (i - 1) * 1.7;
+    box(neutralPropsLayer.group, [.8, .9, .42], [x, 1.05, 3.35], cream, .06);
+    box(neutralPropsLayer.group, [.18, .2, .06], [x, 1.45, 3.59], futureLight, .02);
+    box(neutralPropsLayer.group, [.9, .55, .48], [x, .8, -3.25], trim, .05);
+    box(neutralPropsLayer.group, [.62, .12, .36], [x, 1.12, -3.25], cream, .04);
+  }
+  neutralPropsLayer.group.add(...bake(neutralPropsLayer.group));
 
   const hubUpperFallback = new T.Group();
   hubUpperFallback.name = 'automation-hub-upper-procedural-fallback';
@@ -58,5 +69,5 @@ export function buildAutomationHub(scene: T.Scene, kit: Kit, assets: SiteAssetLo
   });
 
   hubBase.add(...bake(hubBase));
-  return { id: 'magnetEast', root, layers: { hubBase: hubBaseLayer, hubUpper: hubUpperLayer }, marker: createGuestMarker(root, 'nw') };
+  return { id: 'magnetEast', root, layers: { hubBase: hubBaseLayer, hubUpper: hubUpperLayer, hubNeutralProps: neutralPropsLayer }, marker: createGuestMarker(root, 'nw') };
 }

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { selectSiteVariants, siteLayerDefinition, variantLayers } from '../src/changeCatalog.ts';
+import { environmentParkTarget, selectSiteVariants, siteLayerDefinition, variantLayers } from '../src/changeCatalog.ts';
 import type { Layout } from '../src/surveyView.ts';
 
 const lot = (kind: Layout['nw']['lot'] = 'empty', building: Layout['nw']['building'] = 'none') => ({ lot: kind, building });
@@ -23,6 +23,14 @@ assert.equal(selectSiteVariants(layout({ se: lot('empty', 'tall') })).centerGaiR
 assert.deepEqual(variantLayers('magnetEast', 'automation-tall'), ['hubBase', 'hubUpper']);
 assert.deepEqual(variantLayers('stationEastPark', 'park'), ['parkSurface', 'parkTrees']);
 assert.deepEqual(variantLayers('centerGaiRear', 'tower-tall'), ['towerBase', 'towerUpper']);
+assert.deepEqual(variantLayers('magnetEast', 'exhibition-neutral'), ['hubBase', 'hubNeutralProps']);
+assert.deepEqual(variantLayers('stationEastPark', 'exhibition-neutral'), ['parkSurface', 'parkTrees', 'parkCoolingFins']);
+assert.deepEqual(variantLayers('dogenzakaSouth', 'exhibition-neutral'), ['plaza', 'commonsNeutralProps']);
+assert.deepEqual(variantLayers('centerGaiRear', 'exhibition-neutral'), ['towerBase', 'towerNeutralProps']);
+assert.deepEqual(environmentParkTarget({
+  version: 2, bands: { nw: 'low', ne: 'high', sw: 'mixed', se: 'low' },
+  automatedPorts: 3, sharedSeats: 4, treeCount: 12, plantedFraction: .8, coolingFins: 6, functionModules: 4,
+}), { band: 'high', treeCount: 12, plantedFraction: .8, coolingFins: 6 });
 assert.deepEqual(siteLayerDefinition('stationEastPark', 'parkTrees'), {
   id: 'parkTrees', kind: 'glb', assetId: 'future-tree-2127', enterAnimation: 'rise', exitAnimation: 'sink',
 });

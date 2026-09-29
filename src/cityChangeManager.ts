@@ -1,9 +1,12 @@
 import type * as T from 'three';
-import { CHANGE_CATALOG, SITE_IDS, selectSiteVariants, variantLayers, type SiteId, type SiteLayerDefinition, type SiteLayerId, type SiteVariantId } from './changeCatalog.ts';
+import { CHANGE_CATALOG, SITE_IDS, environmentParkTarget, selectSiteVariants, variantLayers, type SiteId, type SiteLayerDefinition, type SiteLayerId, type SiteVariantId } from './changeCatalog.ts';
 import type { BuiltSiteMap, SiteLayerRuntime } from './siteBuilders/index.ts';
+import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
+import type { EnvironmentParkDiagnostics } from './siteBuilders/siteRuntime.ts';
 import type { SurveyView } from './surveyView.ts';
+import type { ExhibitionLayout, SurveyEventKind } from './surveyView.ts';
 
-export const SITE_TRANSITION_SECONDS = 3;
+export { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 export const FRESH_MARKER_SECONDS = 10;
 export const SITE_ASSET_RETRY_SECONDS = 5;
 const HIDDEN_SCALE = 1e-3;
@@ -28,9 +31,18 @@ export interface SiteLayerDiagnostic {
 export interface SiteDiagnostic {
   readonly variant: SiteVariantId;
   readonly layers: Readonly<Partial<Record<SiteLayerId, SiteLayerDiagnostic>>>;
+  readonly environmentPark?: EnvironmentParkDiagnostics;
 }
 
 export type CityChangeDiagnostics = Readonly<Record<SiteId, SiteDiagnostic>>;
+
+const EXHIBITION_BASE_VARIANTS: Record<SiteId, SiteVariantId> = {
+  magnetEast: 'exhibition-neutral', stationEastPark: 'exhibition-neutral',
+  dogenzakaSouth: 'exhibition-neutral', centerGaiRear: 'exhibition-neutral',
+};
+
+const prefersReducedMotion = () => typeof globalThis.matchMedia === 'function'
+  && globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const smoothstep = (value: number) => value * value * (3 - 2 * value);
 
@@ -40,6 +52,7 @@ export class CityChangeManager {
   private readonly variants = Object.fromEntries(SITE_IDS.map(id => [id, 'baseline'])) as Record<SiteId, SiteVariantId>;
   private readonly sites: BuiltSiteMap;
   private lastUpdateNow = 0;
+  private exhibitionInitialized = false;
 
   constructor(sites: BuiltSiteMap) {
     this.sites = sites;
@@ -65,12 +78,31 @@ export class CityChangeManager {
 
   /** Full snapshots and resets converge over the normal 3-second motion but never count as a fresh guest change. */
   restoreFromSnapshot(view: SurveyView, now: number): void {
+    this.restoreLegacyMode(now);
     this.transitionChangedSitesOnly(view, now, false);
   }
 
   /** A live answer animates only changed layers and pulses sites that gain a visible layer. */
   applyIncrementalUpdate(view: SurveyView, now: number): void {
+    this.restoreLegacyMode(now);
     this.transitionChangedSitesOnly(view, now, true);
+  }
+
+  /** V2 values are authoritative; only the NE climate site is variable in S2. */
+  applyExhibitionLayout(layout: ExhibitionLayout, kind: SurveyEventKind, now: number): void {
+    this.update(now);
+    if (!this.exhibitionInitialized) this.restoreExhibitionBaseline(now);
+    const park = this.sites.stationEastPark.environmentPark;
+    if (!park) throw new Error('Missing environment-park runtime for exhibition layout.');
+    const fresh = kind === 'city-state-updated' && !prefersReducedMotion();
+    const changed = park.setTarget(environmentParkTarget(layout), now, !fresh);
+    if (kind !== 'city-state-updated') {
+      for (const motion of this.motions.get('stationEastPark')!.values()) motion.fresh = -Infinity;
+    } else if (changed && fresh) {
+      for (const motion of this.motions.get('stationEastPark')!.values()) {
+        if (motion.to === 1) motion.fresh = now;
+      }
+    }
   }
 
   getVariant(siteId: SiteId): SiteVariantId {
@@ -86,11 +118,15 @@ export class CityChangeManager {
         assetStatus: motion.layer.assetStatus,
         assetError: motion.layer.assetError,
       }])),
+      ...(this.sites[siteId].environmentPark
+        ? { environmentPark: this.sites[siteId].environmentPark.getDiagnostics() }
+        : {}),
     }])) as CityChangeDiagnostics;
   }
 
   update(now: number): void {
     this.lastUpdateNow = now;
+    this.sites.stationEastPark.environmentPark?.update(now);
     for (const siteId of SITE_IDS) {
       const motions = this.motions.get(siteId)!;
       for (const motion of motions.values()) {
@@ -131,6 +167,31 @@ export class CityChangeManager {
       }
       this.variants[siteId] = desired[siteId];
     }
+  }
+
+  private restoreExhibitionBaseline(now: number): void {
+    for (const siteId of SITE_IDS) {
+      const activeLayers = new Set(variantLayers(siteId, EXHIBITION_BASE_VARIANTS[siteId]));
+      for (const [layerId, motion] of this.motions.get(siteId)!) {
+        const active = activeLayers.has(layerId);
+        motion.from = motion.to = active ? 1 : 0;
+        motion.start = now;
+        motion.fresh = -Infinity;
+        motion.retryAt = Infinity;
+        motion.group.scale.y = active ? 1 : HIDDEN_SCALE;
+        motion.group.visible = active;
+        if (active) this.prepareAsset(motion, now);
+      }
+      this.variants[siteId] = EXHIBITION_BASE_VARIANTS[siteId];
+    }
+    this.exhibitionInitialized = true;
+  }
+
+  private restoreLegacyMode(now: number): void {
+    if (!this.exhibitionInitialized) return;
+    this.sites.stationEastPark.environmentPark?.restoreLegacy();
+    for (const motion of this.motions.get('stationEastPark')!.values()) motion.fresh = -Infinity;
+    this.exhibitionInitialized = false;
   }
 
   private prepareAsset(motion: LayerMotion, now: number): void {

@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { arc, bake, box, cream, faces, glass, leaf, sage, shrubs, sign, solar, trim, type Kit } from '../cityRig.ts';
+import { arc, bake, box, cream, faces, futureLight, glass, leaf, sage, shrubs, sign, solar, trim, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, type BuiltSite } from './siteRuntime.ts';
 
@@ -7,6 +7,7 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): BuiltSite {
   const root = createSiteRoot(scene, 'se');
   const towerBaseLayer = createSiteLayer(root, siteLayerDefinition('centerGaiRear', 'towerBase'));
   const towerUpperLayer = createSiteLayer(root, siteLayerDefinition('centerGaiRear', 'towerUpper'), 18);
+  const neutralPropsLayer = createSiteLayer(root, siteLayerDefinition('centerGaiRear', 'towerNeutralProps'));
   const towerBase = towerBaseLayer.group;
   const towerUpper = towerUpperLayer.group;
   box(towerBase, [9, 1, 9], [0, .9, 0], cream, .25);
@@ -38,6 +39,20 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): BuiltSite {
   shrubs(towerUpper, 2.8, 26.5, 0, Math.PI * 2, 18);
   for (let i = 0; i < 4; i++) box(towerUpper, [.12, 1.1, 3], [-1.2 + i * .8, 27.1, 0], solar, .02);
 
+  // S2's mature neutral tower exposes four working civic service modules at its base.
+  for (let i = 0; i < 4; i++) {
+    const x = (i - 1.5) * 1.65;
+    box(neutralPropsLayer.group, [1.28, .92, .88], [x, 1.02, 4.15], cream, .08);
+    box(neutralPropsLayer.group, [1.02, .46, .12], [x, 1.04, 4.65], glass, .04);
+    box(neutralPropsLayer.group, [.68, .08, .05], [x, 1.38, 4.72], futureLight, .02);
+    box(neutralPropsLayer.group, [.82, .08, .12], [x, .53, 4.65], trim, .02);
+  }
+  neutralPropsLayer.group.add(...bake(neutralPropsLayer.group));
+
   for (const layer of [towerBase, towerUpper]) layer.add(...bake(layer));
-  return { id: 'centerGaiRear', root, layers: { towerBase: towerBaseLayer, towerUpper: towerUpperLayer }, marker: createGuestMarker(root, 'se') };
+  return {
+    id: 'centerGaiRear', root,
+    layers: { towerBase: towerBaseLayer, towerUpper: towerUpperLayer, towerNeutralProps: neutralPropsLayer },
+    marker: createGuestMarker(root, 'se'),
+  };
 }
