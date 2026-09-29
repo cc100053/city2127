@@ -2,7 +2,7 @@
 
 - 文件建立日期：2026-09-28；文件 owner：Codex；狀態更新：2026-09-30。
 - 核對基準：`535a3c059302ac6c1059d84aef663b06510ac04c`，當時 `main` 與已 fetch 的 `origin/main` 相同。
-- 狀態：**規劃已完成；S1 已實作、整合並通過 package checks、feature CI 及 main CI。S2 Q3 Park 切片已整合並通過 feature/main CI。S3 四site映射 local root checks、API matrix、snapshot/reset、standalone smoke 及 V01/V02 browser review 均通過，已整合至 main（`63af1b6`）並通過 feature/main CI。S4 guest UI／root 面板已整合至 main 但未完成瀏覽器驗收；S5 尚未開始。**
+- 狀態：**規劃已完成；S1 已實作、整合並通過 package checks、feature CI 及 main CI。S2 Q3 Park 切片已整合並通過 feature/main CI。S3 四site映射 local root checks、API matrix、snapshot/reset、standalone smoke 及 V01/V02 browser review 均通過，已整合至 main（`63af1b6`）並通過 feature/main CI。S4 guest UI／root 面板已完成瀏覽器驗收並整合至 main（`5e14078`，main CI 通過）；S5 尚未開始。**
 - 使用者最新確認：**起始城市已是 2127 年；低值、零值、高值都必須有未來感。**
 - 本文件最初由規劃文件任務建立；2026-09-28 已明確指派 S1 實作。閱讀本文件不等於被指派一次實作全部階段；收到有界任務後，在授權範圍內完成，不另加逐階段批准要求。
 - 當前實作架構以 [PROJECT](PROJECT.md) 為準；本文件描述下一版本目標，不另立一份現況 architecture。
@@ -433,7 +433,7 @@ S1、S2 實作及整合已完成；S2 feature/main CI 通過。S3 core 已推送
 | S1 規則與儲存 | IMPLEMENTED and integrated; package checks and feature/main CI pass | survey shared／scoreEngine／migrations／runStore／sessionService／answerService／proposalService／decisionHistory；root/module-swap v2 rejection | 四題transaction、replay、version、重用題組及 viewer rejection 完成；驗證紀錄見 [S1 handoff](handoffs/exhibition-s1.md) |
 | S2 第一條可見鏈 | SHIPPED；整合及feature/main CI通過，依S1 | root surveyView／changeCatalog／manager／environmentPark；survey v2 mapping | 四題API不變；root bounded v2 parser及Q3→NE公園參數路徑已整合；live 3秒，snapshot/reset立即且無pulse，不改全城氣氛；其他三site為固定mixed基底並標示待S3。實際12棵樹GLB與fallback的NE範圍測試、browser evidence及checks見S2 handoff/validation |
 | S3 其餘三site | SHIPPED（main `63af1b6`，feature/main CI 通過），依S2 | automationHub／commonsPlaza／concentrationTower＋catalog/mapping | 新增9個配置及四site共12配置、同band counts、低值未來感、路線clearance、真實 `cityChanges` feedback、四軸端到端、snapshot/reset、standalone 與最終視覺證據已通過；見 [S3 handoff](handoffs/exhibition-s3.md) |
-| S4 正式觀眾體驗 | IN PROGRESS；已整合至 main，瀏覽器驗收未完成，依S3 | survey guest UI、root causal panel、style | 四題back/edit/submit、idle/result/next、紀錄及錯誤恢復已實作；待 S3 整合後瀏覽器驗收及面板可見度／操作檢查。S4 未完成，見 [S4 handoff](handoffs/exhibition-s4.md) |
+| S4 正式觀眾體驗 | SHIPPED（main `5e14078`，feature/main CI 通過），依S3 | survey guest UI、root causal panel、style | 四題back/edit/submit、idle/result/next、紀錄、錯誤恢復、鍵盤／focus／reduced motion 及 1280×720 面板可見度已於 2026-09-30 瀏覽器驗收；剩餘偏差（未依次播放兩項提示、歡迎頁未用繼承文案、root 轉場未跟 reduced motion）見 [S4 handoff](handoffs/exhibition-s4.md) |
 | S5 展覽驗收 | PLANNED，依S4 | tests／browser evidence／docs | 100份提案、60分鐘、實機效能、5人理解測試、每日操作交接 |
 
 S2不是建立另一套一題API或另一個score schema；重用S1四題session，以fixture／最小操作介面完成垂直切片，正式UI在S4精修。S2 handoff 記錄當前實際檢查、最高樹數邊界修正及剩餘驗收；不得把「實作在工作樹」寫成「已shipped」。

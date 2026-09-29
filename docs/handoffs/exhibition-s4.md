@@ -1,7 +1,7 @@
 # Exhibition S4 — guest UI and root feedback
 
 - Owner: Codex Luna Max (survey UI implementer)
-- Status: IN_PROGRESS — 2026-09-30 exit-gate browser checks passed (see acceptance pass); feature CI and main integration pending; deviations listed below
+- Status: SHIPPED — 2026-09-30 exit-gate browser checks passed; `5ae6e35` passed [feature CI 36631026705](https://github.com/cc100053/city2127/actions/runs/36631026705); integrated as `5e14078` and [main CI 36631134812](https://github.com/cc100053/city2127/actions/runs/36631134812) passed; deviations listed below
 - Branch: `codex/exhibition-s4` (original, integrated via `4212b80`); acceptance pass on `codex/exhibition-s4-acceptance`
 - Base commit: `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68`
 - Last verified commit: `960d9b7c520af7f845bb6c0a2df47d17ad222f9f`; local code checks below ran on the tracked source tree immediately before it was committed
@@ -82,3 +82,7 @@ Complete S3's three site mappings, then run the full survey package tests via CI
 - The root scene's 3 s site transitions do not honour `prefers-reduced-motion`.
 - The result page scrolls at 1280×720; it is shown for ~10 s.
 - S5 items (100 proposals/60 min endurance, exhibition hardware/FPS, five-person understanding test) remain open.
+
+## Next step (2026-09-30)
+
+S4 is complete. Next is S5 exhibition acceptance (100 proposals / 60 min endurance, exhibition-PC FPS, five-person understanding test, daily staff handoff) and, if the owner wants, the remaining S4 deviations above.
