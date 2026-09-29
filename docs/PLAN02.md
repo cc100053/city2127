@@ -2,7 +2,7 @@
 
 ## 最新補充 — 2026-09-30：S3 其餘三site映射與可見度修正
 
-S3 core commit `d51167b` 已推送且 feature CI 通過。其後工作樹改善 SW 私密座位的 2.4 m 電致變色屏，以及 SE 低值的成對地面 pavilion／DOGENZAKA 上方玻璃服務頭，並補了固定 hero camera 投影可讀性測試。合併後的 root `npm test`、`npm run build`、`git diff --check`、12 個一軸 API case、same-band、high→mixed→low、snapshot/reconnect/reset、standalone smoke 及 V01/V02 視覺檢查均通過；12 張桌面截圖及精確 mapping 數值見 [validation record](VALIDATION.md)。可見度修改已提交為 `36b5c18`，並已在 feature branch 與 main 的 lifecycle／S4 合併；最終 feature CI 和 main 整合待完成，因此不標為 shipped。固定 hero 畫面中的 SE 地面 pavilion 被前景遮擋，上方服務頭仍可見；SW 差異較細但可辨。狀態與後續證據見 [S3 handoff](handoffs/exhibition-s3.md)。
+S3 core commit `d51167b` 已推送且 feature CI 通過。其後工作樹改善 SW 私密座位的 2.4 m 電致變色屏，以及 SE 低值的成對地面 pavilion／DOGENZAKA 上方玻璃服務頭，並補了固定 hero camera 投影可讀性測試。合併後的 root `npm test`、`npm run build`、`git diff --check`、12 個一軸 API case、same-band、high→mixed→low、snapshot/reconnect/reset、standalone smoke 及 V01/V02 視覺檢查均通過；12 張桌面截圖及精確 mapping 數值見 [validation record](VALIDATION.md)。可見度修改已提交為 `36b5c18`，與 lifecycle／S4 合併後整合至 main `63af1b6`，feature/main CI 通過，S3 已 shipped。固定 hero 畫面中的 SE 地面 pavilion 被前景遮擋，上方服務頭仍可見；SW 差異較細但可辨。狀態與後續證據見 [S3 handoff](handoffs/exhibition-s3.md)。
 
 ## 最新補充 — 2026-09-29：S4 feature branch 現況
 

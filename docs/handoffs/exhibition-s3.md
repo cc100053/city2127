@@ -1,10 +1,10 @@
 # exhibition-s3 — remaining root site mappings
 
 - Owner: Codex (Astra review; Luna Max implementation and testing)
-- Status: IN_PROGRESS — implementation and local/API/browser checks passed; final feature CI and integration are pending
+- Status: SHIPPED — integrated into `main` as `63af1b6b4c3f2c9ba39faaf18dae68f276b5f972` on 2026-09-30; feature and main CI passed
 - Branch: `codex/exhibition-s3`
 - Base commit: `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68`
-- Last verified commit: `d51167bb1352c97e0b2135b3fb42852bd438699b` — core S3 commit; root checks and feature CI passed for this commit only
+- Last verified commit: `63af1b6b4c3f2c9ba39faaf18dae68f276b5f972` (main integration of branch head `17e305b39749f1b305a16c9d1d45b982275e96cd`)
 - Remote availability: core commit pushed to `origin/codex/exhibition-s3` at `d51167bb1352c97e0b2135b3fb42852bd438699b`; post-CI visibility commit `36b5c18b4adde9dba8e762e130f3fe19dd213243` and this docs update pushed on 2026-09-30
 - GitHub Issue: none
 
@@ -39,16 +39,16 @@ The pushed core commit routes server-provided NW/SW/SE bands and counts to the a
 
 ## Actual validation results
 
-- Verification status: PARTIAL — local root checks, API matrix, snapshot/reset, standalone smoke and V01/V02 visual review passed on the current combined worktree; final feature CI and main integration remain pending
-- Date and checked commit/worktree: 2026-09-30; core commit `d51167bb1352c97e0b2135b3fb42852bd438699b` pushed to `origin/codex/exhibition-s3`; SW/SE visibility commit `36b5c18` re-passed root `npm test`, `npm run build` and `git diff --check` on 2026-09-30; not merged to `origin/main`
+- Verification status: PASSED for the S3 scope — local root checks, API matrix, snapshot/reset, standalone smoke, V01/V02 visual review, merge-result checks, feature CI and main CI
+- Date and checked commit/worktree: 2026-09-30; core commit `d51167bb1352c97e0b2135b3fb42852bd438699b` pushed to `origin/codex/exhibition-s3`; SW/SE visibility commit `36b5c18` re-passed root `npm test`, `npm run build` and `git diff --check` on 2026-09-30; integrated as `63af1b6`
 - Commands/manual checks and results: the core commit `d51167b` passed root `npm test`, `npm run build`, `git diff --check` and [feature CI run 36577963207](https://github.com/cc100053/city2127/actions/runs/36577963207); that CI covers only the core commit. The combined post-visibility worktree passed root `npm test`, `npm run build` and `git diff --check` on 2026-09-30 JST; the build emitted only the existing >500 kB chunk warning. The isolated API matrix passed all 12 one-axis site/band combinations, same-band count updates, high→mixed→low, and composite all-low/mixed/all-high values (full numbers in [VALIDATION](../VALIDATION.md)). Snapshot/reconnect/reset checks passed: revision-1 all-high snapshot restored identically after forced reconnect with no update event; admin reset emitted one mixed revision-0 `run-reset`, rendered within 100 ms, with no visible pulse. Standalone `?hour=12` smoke at 1280×720 passed with zero new console/page errors and no survey request/socket. V01/V02 visual review accepted the current 12 captures at 1280×720 and 1920×1080. Root v1 was not browser-tested in the final pass; existing root unit tests are the only evidence here.
 - Evidence/environment: 12 screenshots captured 2026-09-30 JST from isolated survey server `127.0.0.1:8790` and Vite `127.0.0.1:5181`; current files and exact links are in [VALIDATION](../VALIDATION.md). The fixed-hero limitation is that SE ground pavilions remain occluded although the two service heads read above DOGENZAKA; SW privacy/shared states remain subtle but visible. No FPS, physical hardware or cross-platform results.
-- Integrated commit and checks: core feature commit `d51167b` is pushed and its feature CI passed; visibility commit `36b5c18` and the docs update are pushed; their feature CI is pending. Final code commit, final feature CI and main integration are NOT complete. Do not label S3 shipped/merged.
-- Changes since verification: the current combined source/test diff was locally verified by the implementation owner; this documentation update is pending link/fact/diff checks. No code changes are included in this documentation task.
+- Integrated commit and checks: feature CI passed on `d51167b` ([36577963207](https://github.com/cc100053/city2127/actions/runs/36577963207)), `f36e392` incl. visibility commit `36b5c18` ([36598935005](https://github.com/cc100053/city2127/actions/runs/36598935005)) and main-merged head `17e305b` ([36599413799](https://github.com/cc100053/city2127/actions/runs/36599413799)). `63af1b6` (`--no-ff`, tree identical to `17e305b`) re-passed root `npm test`/`npm run build`, `survey/` `npm test`/`npm run build` and `git diff --check origin/main..HEAD`, was pushed to `origin/main`, and passed [main CI 36599599701](https://github.com/cc100053/city2127/actions/runs/36599599701).
+- Changes since verification: only this documentation status update (no code).
 
 ## Known issues and blockers
 
-The current combined source/test diff has passed local root checks and final API/browser verification, but feature CI still applies only to core commit `d51167b`. Final code commit, feature CI for that commit and main integration checks remain outstanding. The fixed hero view still occludes SE ground pavilions; SW's distinction is subtle. No FPS, exhibition-hardware or cross-platform results are claimed.
+No S3 blockers. The fixed hero view still occludes SE ground pavilions; SW's distinction is subtle. No FPS, exhibition-hardware or cross-platform results are claimed.
 
 ## Important decisions
 
@@ -56,7 +56,7 @@ All states remain in 2127. S3 maps server-supplied values and does not derive si
 
 ## Next expected step
 
-The implementation owner should commit/push the locally verified code and run feature CI, then integrate only after the gates pass. Update this handoff with exact final commit/CI/main results after they arrive. No commit or push is part of this documentation update.
+Superseded by the 2026-09-30 “Next step” section at the end of this file.
 
 ## 2026-09-30 resume (Claude)
 
@@ -67,6 +67,8 @@ The implementation owner should commit/push the locally verified code and run fe
 - Merge-result browser check: isolated survey server `127.0.0.1:8791` (temp DB) + Vite `127.0.0.1:5183`, 1280×720. One proposal (autonomous / open-commons / hybrid-cooling / vertical-functions) moved NW/SW/SE mixed→high. The root panel showed four answers, four Meter rows, `MAGNET東 · 自律サービス端口 3 → 5` and `道玄坂南 · 共有座位 共有席 4 → 7` (SE omitted by the two-change cap), the `最近64人` band and `累計 1 人`; the scene showed the high site states; zero console errors. No screenshot was archived; root v1 not browser-tested.
 - Known gap carried from S4: the two-change cap means a three- or four-site proposal names only the first two sites in the panel; the scene still renders all of them.
 
+- Integration: `codex/exhibition-s3` → `main` `--no-ff` as `63af1b6`; pushed and main CI passed (IDs above).
+
 ## Next step (2026-09-30)
 
-Push the merge commit, wait for feature CI on it, then `--no-ff` merge `codex/exhibition-s3` into `main`, rerun root/survey checks, push main and verify main CI. Then record final commit/CI IDs here and flip S3 to SHIPPED across the status docs.
+S3 is complete. Next is S4 acceptance on the integrated main: browser-check the four-question guest flow, recovery and root panel with real S3 site changes (see [S4 handoff](exhibition-s4.md)); the lifecycle `lifecycle_blocked` wait screen and the 10-second result/handoff timing remain S4 gaps.

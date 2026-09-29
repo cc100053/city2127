@@ -2,7 +2,7 @@
 
 - 文件建立日期：2026-09-28；文件 owner：Codex；狀態更新：2026-09-30。
 - 核對基準：`535a3c059302ac6c1059d84aef663b06510ac04c`，當時 `main` 與已 fetch 的 `origin/main` 相同。
-- 狀態：**規劃已完成；S1 已實作、整合並通過 package checks、feature CI 及 main CI。S2 Q3 Park 切片已整合並通過 feature/main CI。S3 四site映射 local root checks、API matrix、snapshot/reset、standalone smoke 及 V01/V02 browser review 均通過，已在 feature branch 與 main 合併，最終 feature CI 和 main 整合待完成。S4 guest UI／root 面板已整合至 main 但未完成瀏覽器驗收；S5 尚未開始。**
+- 狀態：**規劃已完成；S1 已實作、整合並通過 package checks、feature CI 及 main CI。S2 Q3 Park 切片已整合並通過 feature/main CI。S3 四site映射 local root checks、API matrix、snapshot/reset、standalone smoke 及 V01/V02 browser review 均通過，已整合至 main（`63af1b6`）並通過 feature/main CI。S4 guest UI／root 面板已整合至 main 但未完成瀏覽器驗收；S5 尚未開始。**
 - 使用者最新確認：**起始城市已是 2127 年；低值、零值、高值都必須有未來感。**
 - 本文件最初由規劃文件任務建立；2026-09-28 已明確指派 S1 實作。閱讀本文件不等於被指派一次實作全部階段；收到有界任務後，在授權範圍內完成，不另加逐階段批准要求。
 - 當前實作架構以 [PROJECT](PROJECT.md) 為準；本文件描述下一版本目標，不另立一份現況 architecture。
@@ -20,11 +20,11 @@ root parser 現在接受 bounded v2 CityView，按明確版本分流，保留明
 
 實際12棵樹GLB與程序fallback已有NE ±5場地範圍測試。S2已完成並通過整合驗證，但此切片尚未代表展覽整體驗收完成；證據見 [handoff](handoffs/exhibition-s2.md) 及 [validation record](VALIDATION.md)。
 
-### 2026-09-30 S3 現況（本機/API/browser 驗證通過；最終 CI 待完成）
+### 2026-09-30 S3 現況（已整合；feature/main CI 通過）
 
 S3 core commit `d51167b` 已把 server-provided v2 mapping 接到 root 的其餘三個 site：NW automation 依 `bands.nw` 和 `automatedPorts`，SW commons 依 `bands.sw` 和 `sharedSeats`，SE concentration 依 `bands.se` 和 `functionModules`；NE Park 延續 S2 的 Q3 參數。客戶端使用收到的配置，不從 scores 另算形態。所有 low/mixed/high 都須維持成熟的 2127 未來城市。可見度修正 `36b5c18`把 SW 2.4 m 深色電致變色曲面屏接到私密座位，座位共享時屏幕折平；SE low 用成對地面 pavilion，另設兩個高於 DOGENZAKA 的玻璃服務頭，以便固定 hero camera 可讀。
 
-`d51167b` 的 root `npm test`、`npm run build`、`git diff --check` 和 [feature CI](https://github.com/cc100053/city2127/actions/runs/36577963207) 通過；此 CI 不涵蓋後續可見度修改。合併後的本機 root checks、12個一軸 API case、同band更新、high→mixed→low、snapshot/reconnect/reset、standalone smoke 及 V01/V02 browser review 均通過；逐軸參數、複合結果與12張截圖見 [validation record](VALIDATION.md)。可見度修正已提交為 `36b5c18` 並已與 main 的 lifecycle／S4 合併；最終 feature CI 和 main 整合待完成，所以 S3 尚未 shipped。Root v1 在最終 browser pass 未測，只記錄既有 root unit tests。固定 hero 畫面中的 SE 地面 pavilion 被前景遮住，上方服務頭可見；SW 差異較細但可辨。驗收範圍涵蓋四site共12配置（S3新增9個）、數量更新、低值未來感、site／route clearance、真實 `cityChanges` feedback、live/snapshot/reset 及 v1相容。詳見 [S3 handoff](handoffs/exhibition-s3.md)。
+`d51167b` 的 root `npm test`、`npm run build`、`git diff --check` 和 [feature CI](https://github.com/cc100053/city2127/actions/runs/36577963207) 通過；此 CI 不涵蓋後續可見度修改。合併後的本機 root checks、12個一軸 API case、同band更新、high→mixed→low、snapshot/reconnect/reset、standalone smoke 及 V01/V02 browser review 均通過；逐軸參數、複合結果與12張截圖見 [validation record](VALIDATION.md)。可見度修正已提交為 `36b5c18` ，與 lifecycle／S4 合併後整合至 main `63af1b6`；[feature CI run 36599413799](https://github.com/cc100053/city2127/actions/runs/36599413799) 及 [main CI run 36599599701](https://github.com/cc100053/city2127/actions/runs/36599599701) 通過，S3 已 shipped。Root v1 在最終 browser pass 未測，只記錄既有 root unit tests。固定 hero 畫面中的 SE 地面 pavilion 被前景遮住，上方服務頭可見；SW 差異較細但可辨。驗收範圍涵蓋四site共12配置（S3新增9個）、數量更新、低值未來感、site／route clearance、真實 `cityChanges` feedback、live/snapshot/reset 及 v1相容。詳見 [S3 handoff](handoffs/exhibition-s3.md)。
 
 ### 2026-09-29 S4 feature-branch implementation（未驗收）
 
@@ -426,13 +426,13 @@ type ProposalRecord = {
 
 ## 11. 可獨立交付的實作階段
 
-S1、S2 實作及整合已完成；S2 feature/main CI 通過。S3 core 已推送並通過 feature CI；後續可見度修正及 snapshot/reset/standalone checks 已通過本機驗證，final feature CI 和整合待完成。階段狀態及依賴如下。Owner由實際接任者在各task handoff填一名；不得假設文件owner自動獲派所有實作。階段依賴按順序，無需多agent。
+S1、S2 實作及整合已完成；S2 feature/main CI 通過。S3 core 已推送並通過 feature CI；後續可見度修正及 snapshot/reset/standalone checks 已通過本機驗證，已整合至 main 並通過 CI。階段狀態及依賴如下。Owner由實際接任者在各task handoff填一名；不得假設文件owner自動獲派所有實作。階段依賴按順序，無需多agent。
 
 | 階段 | 狀態／依賴 | 主要入口 | 交付與exit gate |
 | --- | --- | --- | --- |
 | S1 規則與儲存 | IMPLEMENTED and integrated; package checks and feature/main CI pass | survey shared／scoreEngine／migrations／runStore／sessionService／answerService／proposalService／decisionHistory；root/module-swap v2 rejection | 四題transaction、replay、version、重用題組及 viewer rejection 完成；驗證紀錄見 [S1 handoff](handoffs/exhibition-s1.md) |
 | S2 第一條可見鏈 | SHIPPED；整合及feature/main CI通過，依S1 | root surveyView／changeCatalog／manager／environmentPark；survey v2 mapping | 四題API不變；root bounded v2 parser及Q3→NE公園參數路徑已整合；live 3秒，snapshot/reset立即且無pulse，不改全城氣氛；其他三site為固定mixed基底並標示待S3。實際12棵樹GLB與fallback的NE範圍測試、browser evidence及checks見S2 handoff/validation |
-| S3 其餘三site | LOCAL/API/BROWSER CHECKS PASSED；已與 main 合併於 feature branch，final feature CI 和整合待完成，依S2 | automationHub／commonsPlaza／concentrationTower＋catalog/mapping | 新增9個配置及四site共12配置、同band counts、低值未來感、路線clearance、真實 `cityChanges` feedback、四軸端到端、snapshot/reset、standalone 與最終視覺證據已通過；見 [S3 handoff](handoffs/exhibition-s3.md) |
+| S3 其餘三site | SHIPPED（main `63af1b6`，feature/main CI 通過），依S2 | automationHub／commonsPlaza／concentrationTower＋catalog/mapping | 新增9個配置及四site共12配置、同band counts、低值未來感、路線clearance、真實 `cityChanges` feedback、四軸端到端、snapshot/reset、standalone 與最終視覺證據已通過；見 [S3 handoff](handoffs/exhibition-s3.md) |
 | S4 正式觀眾體驗 | IN PROGRESS；已整合至 main，瀏覽器驗收未完成，依S3 | survey guest UI、root causal panel、style | 四題back/edit/submit、idle/result/next、紀錄及錯誤恢復已實作；待 S3 整合後瀏覽器驗收及面板可見度／操作檢查。S4 未完成，見 [S4 handoff](handoffs/exhibition-s4.md) |
 | S5 展覽驗收 | PLANNED，依S4 | tests／browser evidence／docs | 100份提案、60分鐘、實機效能、5人理解測試、每日操作交接 |
 
@@ -446,7 +446,7 @@ S2不是建立另一套一題API或另一個score schema；重用S1四題session
 
 ## 12. 驗收矩陣（尚未完整執行）
 
-S1、S2 各自完成的 package/CI 證據不代表 S3–S5 或整體展覽驗收完成。S3 core `d51167b` 的 root checks 和 feature CI 通過；當前可見度修改的本機 root checks、API matrix、snapshot/reset/standalone 及 browser review 均通過，final feature CI 和整合待完成。逐項 S1 證據見 [S1 驗證紀錄](VALIDATION.md#exhibition-s1-2026-09-28)，S2 證據見 [handoff](handoffs/exhibition-s2.md) 及 [驗證紀錄](VALIDATION.md)，S3 進度見 [S3 handoff](handoffs/exhibition-s3.md)。
+S1、S2 各自完成的 package/CI 證據不代表 S3–S5 或整體展覽驗收完成。S3 core `d51167b` 的 root checks 和 feature CI 通過；當前可見度修改的本機 root checks、API matrix、snapshot/reset/standalone 及 browser review 均通過，已整合至 main 並通過 CI。逐項 S1 證據見 [S1 驗證紀錄](VALIDATION.md#exhibition-s1-2026-09-28)，S2 證據見 [handoff](handoffs/exhibition-s2.md) 及 [驗證紀錄](VALIDATION.md)，S3 進度見 [S3 handoff](handoffs/exhibition-s3.md)。
 
 | ID | 檢查 | 通過條件／證據 |
 | --- | --- | --- |
