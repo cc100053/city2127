@@ -1,5 +1,15 @@
 # Validation and handoff
 
+## Exhibition S4 feature-branch implementation — 2026-09-29
+
+**Status: PARTIAL; not shipped or accepted.** The `codex/exhibition-s4` feature branch adds a four-question guest UI with localStorage draft/session recovery and proposal retry, plus root latest-proposal feedback and a vote band that renders up to 64 recent proposals. The branch is not integrated or accepted. S3's other three site mappings are absent and S4 depends on S3; full S4 acceptance and exhibition acceptance remain open. The owner and exact Git state are recorded in the [S4 handoff](handoffs/exhibition-s4.md).
+
+Pre-commit checks on the S4 feature working tree based on `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68`: root `npm test` and `npm run build` exited 0; build printed the existing >500 kB chunk warning. Survey `npm run build` exited 0, and the focused `survey/tests/guestFlow.test.ts` check exited 0. Full `survey/ npm test` failed in the sandbox when a server test attempted to listen and received `EPERM`; an escalated retry was attempted, but its outcome is unknown for this record, so the full suite is not marked passed. `git diff --check` and local Markdown link targets exited 0 after these documentation edits. The checks do not establish browser or integrated acceptance.
+
+Timing gap against the spec: the result screen requires a manual `次の方へ` action and does not implement the approximate 10-second result / 5-second handoff; the root panel does not sequence two change hints over 10 seconds. These are open S4 exit-gate items.
+
+Browser status: the root and survey local endpoints returned HTTP 200 only. CUA could not inspect the UI because the Mac was locked. Playwright browser launch was unavailable because its Chromium revision was missing and the installed Chrome exited with SIGABRT. No screenshots were captured. The `最近64人` band displays up to 64 cells from `recentProposals` and follows the long latest-feedback rows in a 400px scroll panel; visibility at idle at 1280×720 is unverified and may require scrolling. No browser, visual, accessibility, physical-display or S3 checks are claimed.
+
 ## Exhibition S2 — Q3 climate vertical slice — 2026-09-29
 
 **Status: SHIPPED.** Feature commit `2357f09526d17adbe1c52f4bb79c4fa025fe0d0d` passed [feature CI](https://github.com/cc100053/city2127/actions/runs/36516892136). It was merged with an identical tree as `3417760be33884c5d6a7697f0a8c1655a9ca4a10` and pushed to `origin/main`; integrated root `npm test`, `npm run build` and `git diff --check` passed. [Main CI](https://github.com/cc100053/city2127/actions/runs/36517115203) also passed. S2 covers only the Q3 NE Park slice; other site mappings remain S3, the guest UI remains S4, and full exhibition acceptance remains open. See the [S2 handoff](handoffs/exhibition-s2.md) for exact run IDs and the API/parser matrix.

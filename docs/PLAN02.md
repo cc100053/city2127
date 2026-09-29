@@ -1,8 +1,12 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
+## 最新補充 — 2026-09-29：S4 feature branch 現況
+
+四題 guest UI 和 root v2 因果面板已在 `codex/exhibition-s4` feature branch；guest UI 含草稿恢復及提交重試，root 面板顯示實際 proposal feedback 與最多64人的四軸投票帶。S3 其餘三site映射尚未實作，且 S4 依賴 S3；feature branch 未整合，瀏覽器驗收亦未完成，故不代表 S4 完成或 SHIP。結果頁仍要手動按「次の方へ」，沒有規格目標的約10秒結果／約5秒交接計時；root panel 未依次播放兩項、共10秒的變化提示。最多64格目前排在較長 feedback 後，置於 max-height 400px 的可捲動面板內；1280×720 idle 可見度未驗證，可能需要捲動。詳見 [S4 handoff](handoffs/exhibition-s4.md) 和 [validation record](VALIDATION.md)。
+
 ## 最新補充 — 2026-09-29：S2 root Q3 切片
 
-S1 的四題 server/API 保持不變。S2 已整合 root 的明確版本 v2 parser 和渲染路徑：只由 Q3 的 server-authoritative `treeCount`、`plantedFraction`、`coolingFins` 更新車站東公園；live 變更用 3 秒轉場，snapshot/run-reset 立即還原且不發 guest pulse。v2 不把 Meter 分數混入全城氣氛。其餘三site保持完整、固定的 mixed 基底，標示映射待 S3；四題 guest UI 仍待 S4。舊 root v1 與 standalone 路徑保留，公園種植面細節由共用 builder 更新。
+S1 的四題 server/API 保持不變。S2 已整合 root 的明確版本 v2 parser 和渲染路徑：只由 Q3 的 server-authoritative `treeCount`、`plantedFraction`、`coolingFins` 更新車站東公園；live 變更用 3 秒轉場，snapshot/run-reset 立即還原且不發 guest pulse。v2 不把 Meter 分數混入全城氣氛。其餘三site保持完整、固定的 mixed 基底，標示映射待 S3；S4 UI／root 面板位於 feature branch，尚未整合或通過瀏覽器驗收。舊 root v1 與 standalone 路徑保留，公園種植面細節由共用 builder 更新。
 
 實際12棵樹GLB、程序fallback及v1還原已有NE邊界測試。Feature CI、整合root checks及main CI均通過；commit和證據見 [S2 handoff](handoffs/exhibition-s2.md) 與 [validation record](VALIDATION.md)。Park slots、延遲GLB及bake batch的runtime細節見 [PROJECT implementation map](PROJECT.md)。
 
