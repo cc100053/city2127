@@ -4,8 +4,8 @@
 - Status: IN_PROGRESS (implemented and verified locally; not integrated)
 - Branch: `feat/exhibition-lifecycle`
 - Base commit: `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68` (origin/main on 2026-09-29)
-- Last verified commit: branch working tree before the first commit; see the branch head
-- Remote availability: NOT PUSHED
+- Last verified commit: `0586ed0` (local checks ran on the identical pre-commit tree; feature CI passed on the commit)
+- Remote availability: `origin/feat/exhibition-lifecycle` at `0586ed0`
 
 ## Session Git state
 
@@ -33,7 +33,7 @@ A guest never sees the city reset. Completing the questionnaire is not the same 
 
 ## Actual validation results
 
-See [VALIDATION](../VALIDATION.md#exhibition-lifecycle-and-admin-reset--2026-09-29). Survey `npm test`/`npm run build` and `git diff --check` passed; headless admin-page flow passed on a scratch DB. CI: NOT RUN (not pushed).
+See [VALIDATION](../VALIDATION.md#exhibition-lifecycle-and-admin-reset--2026-09-29). Survey `npm test`/`npm run build` and `git diff --check` passed; headless admin-page flow passed on a scratch DB. [Feature CI](https://github.com/cc100053/city2127/actions/runs/36587708136) passed on `0586ed0`.
 
 ## Known issues and blockers
 
@@ -50,4 +50,4 @@ See [VALIDATION](../VALIDATION.md#exhibition-lifecycle-and-admin-reset--2026-09-
 
 ## Next expected step
 
-Owner reviews, pushes the branch, waits for CI, then integrates per [CONTRIBUTING](../CONTRIBUTING.md). S4 wires the guest UI to `lifecycle_blocked`.
+Owner reviews the pushed branch, then integrates per [CONTRIBUTING](../CONTRIBUTING.md). S4 wires the guest UI to `lifecycle_blocked`.
