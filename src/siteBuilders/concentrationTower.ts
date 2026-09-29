@@ -188,6 +188,33 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
   }
   pavilions.add(...bake(pavilions));
 
+  const serviceSpines = new T.Group();
+  serviceSpines.name = 'tower-low-service-spines';
+  pavilions.add(serviceSpines);
+  // Twin glazed service heads clear the foreground roofline; the occupied pavilion bodies remain at ground height.
+  for (const [i, x] of [-3.1, 3.1].entries()) {
+    const spine = new T.Group();
+    spine.name = `tower-low-service-spine-${i + 1}`;
+    spine.position.x = x;
+    serviceSpines.add(spine);
+    const mast = new T.Group();
+    mast.name = `tower-low-service-mast-${i + 1}`;
+    spine.add(mast);
+    box(mast, [.18, 32.45, .18], [0, 18.225, 0], solar, .03);
+    mast.add(...bake(mast));
+
+    const cap = new T.Group();
+    cap.name = `tower-low-service-cap-${i + 1}`;
+    spine.add(cap);
+    box(cap, [2.5, 1.2, .08], [0, 33.84, 1.04], glass, .03);
+    box(cap, [.08, 1.2, 2], [1.21, 33.84, 0], glass, .03);
+    box(cap, [2.6, .18, 2.2], [0, 34.52, 0], cream, .1);
+    box(cap, [1.5, .06, 1.35], [0, 34.65, 0], solar, .04);
+    box(cap, [2, .06, .1], [0, 34.65, 1.02], futureLight, .02);
+    box(cap, [.1, .06, 1.7], [1.17, 34.65, 0], futureLight, .02);
+    cap.add(...bake(cap));
+  }
+
   const core = new T.Mesh(new T.CylinderGeometry(3, 3, 26, 40), glass);
   core.position.y = 13;
   towerUpper.add(core);

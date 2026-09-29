@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import type { Kit } from '../src/cityRig.ts';
-import { changeSites, publicRoutes } from '../src/layout.ts';
+import { changeSites, landmarks, publicRoutes } from '../src/layout.ts';
 import { airRoutes } from '../src/mobility.ts';
+import { heroCamera } from '../src/heroCamera.ts';
 import { buildConcentrationTower } from '../src/siteBuilders/concentrationTower.ts';
 
 const HIDDEN = 1e-3;
@@ -53,6 +54,16 @@ function publicRouteClearance(bounds: T.Box3): number {
     }
   }
   return minimum;
+}
+
+function projectedBounds(bounds: T.Box3, camera: T.Camera): T.Box3 {
+  const projected = new T.Box3().makeEmpty();
+  for (const x of [bounds.min.x, bounds.max.x]) {
+    for (const y of [bounds.min.y, bounds.max.y]) {
+      for (const z of [bounds.min.z, bounds.max.z]) projected.expandByPoint(new T.Vector3(x, y, z).project(camera));
+    }
+  }
+  return projected;
 }
 
 try {
@@ -129,6 +140,34 @@ try {
     const publicClearance = publicRouteClearance(bounds);
     assert.ok(Math.min(...airClearances) > 2.5, `${band} enters the aerial vehicle envelope: ${airClearances}`);
     assert.ok(publicClearance > 2, `${band} enters the public route envelope: ${publicClearance}`);
+    if (band === 'low') {
+      const dogenzaka = landmarks.find(site => site.name === 'DOGENZAKA')!;
+      const roof = new T.Box3(
+        new T.Vector3(dogenzaka.x - dogenzaka.w / 2 - .5, 0, dogenzaka.z - dogenzaka.d / 2 - .5),
+        new T.Vector3(dogenzaka.x + dogenzaka.w / 2 + .5, dogenzaka.h + 4, dogenzaka.z + dogenzaka.d / 2 + .5),
+      );
+      for (const [width, height] of [[1280, 720], [1920, 1080]]) {
+        const camera = heroCamera(width, height);
+        camera.updateMatrixWorld(true);
+        const roofTop = projectedBounds(roof, camera).max.y;
+        const capCenters: number[] = [];
+        const capPixelSizes: string[] = [];
+        let minimumRoofClearance = Infinity;
+        for (const i of [1, 2]) {
+          const cap = projectedBounds(visibleBounds(group(`tower-low-service-cap-${i}`)), camera);
+          assert.ok(cap.max.y > roofTop + .08, `low SE pavilion cap ${i} is hidden by Dogenzaka at ${width}×${height}`);
+          assert.ok(cap.max.x - cap.min.x > .035, `low SE pavilion cap ${i} is too small to read at ${width}×${height}`);
+          assert.ok(cap.max.y - cap.min.y > .03, `low SE pavilion cap ${i} is too flat to read at ${width}×${height}`);
+          assert.ok(cap.min.x > -1 && cap.max.x < 1, `low SE pavilion cap ${i} leaves the hero frame at ${width}×${height}`);
+          capCenters.push((cap.min.x + cap.max.x) / 2);
+          capPixelSizes.push(`${((cap.max.x - cap.min.x) * width / 2).toFixed(0)}×${((cap.max.y - cap.min.y) * height / 2).toFixed(0)}px`);
+          minimumRoofClearance = Math.min(minimumRoofClearance, (cap.max.y - roofTop) * height / 2);
+        }
+        const capSpacing = Math.abs(capCenters[1] - capCenters[0]) * width / 2;
+        assert.ok(capSpacing > width * .015, `low SE pavilion caps merge at ${width}×${height}`);
+        console.log(`low SE hero ${width}×${height}: cap projections ${capPixelSizes.join('/')}, center spacing=${capSpacing.toFixed(0)}px, minimum DOGENZAKA roof clearance=${minimumRoofClearance.toFixed(0)}px`);
+      }
+    }
     console.log(`concentrationTower ${band} bounds x=${local.min.x.toFixed(2)}..${local.max.x.toFixed(2)} y=${local.min.y.toFixed(2)}..${local.max.y.toFixed(2)} z=${local.min.z.toFixed(2)}..${local.max.z.toFixed(2)}; modules z=${localModules.min.z.toFixed(2)}..${localModules.max.z.toFixed(2)}; air clearance=${airClearances.map(value => value.toFixed(2)).join('/')}m, public=${publicClearance.toFixed(2)}m`);
   }
 } finally {

@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { arc, bake, box, futureLight, glass, leaf, membrane, pink, shrubs, sign, stone, trim, type Kit } from '../cityRig.ts';
+import { arc, bake, box, dark, futureLight, leaf, membrane, pink, shrubs, sign, stone, trim, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, SITE_TRANSITION_SECONDS, type BuiltSite } from './siteRuntime.ts';
 import type { ExhibitionLayout } from '../surveyView.ts';
@@ -50,8 +50,8 @@ function createCommonsPlazaRuntime(plaza: T.Group): CommonsPlazaRuntime {
   const sharedSeats = createInstancedBox(plaza, 'commons-shared-seats', [1.35, .34, .48], leaf);
   const sharedBacks = createInstancedBox(plaza, 'commons-shared-backs', [1.35, .4, .12], trim);
   const screenedSeats = createInstancedBox(plaza, 'commons-screened-seats', [.82, .34, .48], leaf);
-  const screenGeometry = new T.CylinderGeometry(.62, .62, 1.45, 24, 1, true, Math.PI / 4, Math.PI * 1.5).translate(0, .85, 0);
-  const curvedScreens = new T.InstancedMesh(screenGeometry, glass, SEAT_COUNT);
+  const screenGeometry = new T.CylinderGeometry(.62, .62, 2.4, 24, 1, true, Math.PI / 4, Math.PI * 1.5).translate(0, 1.25, 0);
+  const curvedScreens = new T.InstancedMesh(screenGeometry, dark, SEAT_COUNT);
   curvedScreens.name = 'commons-curved-screens';
   curvedScreens.castShadow = curvedScreens.receiveShadow = true;
   curvedScreens.frustumCulled = false;
@@ -96,7 +96,7 @@ function createCommonsPlazaRuntime(plaza: T.Group): CommonsPlazaRuntime {
 
       // The open side faces the plaza; its rear arc folds flat as the unit becomes shared.
       transform.position.set(x, .12, z);
-      transform.rotation.set(-shared * Math.PI / 2, yaw, 0, 'YXZ');
+      transform.rotation.set(shared * Math.PI / 2, yaw, 0, 'YXZ');
       transform.scale.set(1, 1, 1);
       transform.updateMatrix();
       curvedScreens.setMatrixAt(i, transform.matrix);

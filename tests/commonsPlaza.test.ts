@@ -3,7 +3,7 @@ import test from 'node:test';
 import * as T from 'three';
 import { buildCommonsPlaza } from '../src/siteBuilders/commonsPlaza.ts';
 import { changeSites } from '../src/layout.ts';
-import type { Kit } from '../src/cityRig.ts';
+import { dark, type Kit } from '../src/cityRig.ts';
 
 function buildSite() {
   const previousDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
@@ -36,6 +36,10 @@ test('commons seats are preallocated, retarget smoothly, fold screens and stay i
   });
 
   const screens = instances.find(mesh => mesh.name === 'commons-curved-screens')!;
+  assert.equal(screens.material, dark, 'private screens should read as opaque electrochromic pods');
+  screens.geometry.computeBoundingBox();
+  assert.ok(screens.geometry.boundingBox!.max.y > 2 && screens.geometry.boundingBox!.max.y < 6,
+    'private screens should read above the seats and remain below public-route height');
   const matrix = new T.Matrix4();
   screens.getMatrixAt(0, matrix);
   assert.ok(Math.abs(new T.Vector3().setFromMatrixColumn(matrix, 1).y - 1) < .001);
