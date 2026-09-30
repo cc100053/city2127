@@ -74,9 +74,10 @@ export function answerNext(ctx: SurveyContext, option: number | string = 0): { g
 }
 
 /** Starts the real HTTP/WebSocket server on an ephemeral loopback port. */
-export async function startServer(ctx: SurveyContext, remoteAddress?: (req: import('node:http').IncomingMessage) => string | undefined) {
+export async function startServer(ctx: SurveyContext, remoteAddress?: (req: import('node:http').IncomingMessage) => string | undefined,
+  options: { devAuto?: boolean } = {}) {
   const { createSurveyServer } = await import('../src/server/server.ts');
-  const { server, realtime } = createSurveyServer({ ctx, remoteAddress });
+  const { server, realtime } = createSurveyServer({ ctx, remoteAddress, ...options });
   await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
   const address = server.address();
   if (address === null || typeof address === 'string') throw new Error('no port');

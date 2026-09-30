@@ -1,5 +1,21 @@
 # Exhibition questionnaire — アンケート状態管理 MVP
 
+## 開発用の自動回答（DEV-ONLY、2026-09-30）
+
+このディレクトリで `npm run dev:auto` を実行し、`http://127.0.0.1:8788/guest?dev-auto` を開きます。ルートの Vite も起動し、街を `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8788/ws` に接続してください。毎回、新しい一時 SQLite を作成し、パスを表示します。既存の展示 DB は使いません。検査のためテスト DB は残ります。ポートが使用中なら `SURVEY_PORT` を変更してください。
+
+「自動回答を開始」で、既存 Guest の radio／次へ／確認／送信フローを繰り返します。全 −1／0／+1、輪替混合、軸ごとの指定、seed ランダムを選べます。既定は10提案、seed 2127、各問0.3秒、結果10秒＋引継ぎ5秒、追加待ち0秒です。選択肢の順番ではなく、server の投票定義を使います。負の回答でも過去の集計を引き継ぐため、すぐ low になるとは限りません。
+
+localhost と `SURVEY_DEV_AUTO=1` の両方が必要です（launcher が設定）。通常の `/guest` は変更されません。自身の提案成功後だけ退出確認し、pending reset／他 guest／通信エラー／競合で停止します。停止後は草稿を手動で続けられます。通信結果が不明な場合は同じ申込IDで確認し、再読み込みしてもバッチは自動再開しません。
+
+**展示前に削除するか、Admin へ移し、退出をスタッフが確認する動作に戻してください。** Guest の import/adapter、`autoAnswerPanel`／`autoAnswers`、dev config route/types、launcher に `DEV-ONLY` コメントがあります。[設計](../docs/EXHIBITION_MVP.md#development-auto-answer-and-meter-contract-tests--2026-09-30)も参照。
+
+### 再利用できる Meter テスト
+
+`npm run test:meters` は実際の質問 JSON を読み、全81組合せの投票→Meter→SQLite→layout／event を検証します。`npm run test:auto` は自動回答と開発APIの gate を検証します。両方は `npm test` に含まれます。ルート `npm test` は実際の site builders/controllers と HTTP／WebSocket も検証します。
+
+新しい Meter のテストは `tests/meterContract.ts` の定義表（軸、質問／選択肢ID、投票、独立した期待値）とルートモデル adapter を追加します。生成・検証関数は Meter 数を固定しません。製品の四題 v2 契約を増やす schema/UI/model 作業は別途必要です。構造検証だけで通る「選択肢の正負を逆にした定義」も意味検証で検出します。
+
 未来都市展示（`city2127`）向けに、ゲストのアンケート回答を都市の政策状態へ変換・蓄積する仕組みです。最終展示UIではありません。
 
 **2026-09-24（因果 MVP）:** 回答は4つの政策軸に効き、政策状態と回答履歴から4区画の配置（`CityView`）を導出して WebSocket で配信します。3D 表示は `module-swap/` の `?survey` モードです（`docs/PROJECT.md` 参照）。既定の質問は `src/survey/questions.mvp.json`（因果デモ用の5問）。`questions.test.json` は仕組みのテスト用です。

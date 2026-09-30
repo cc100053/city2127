@@ -139,6 +139,7 @@ function action(label: string, run: () => void, primary = false, disabled = fals
 
 function page(title: string, eyebrow: string, ...content: (HTMLElement | string)[]) {
   persistRecovery();
+  app.dataset.screen = screen;
   app.replaceChildren(
     el('div', { class: 'guest-frame' },
       el('header', { class: 'guest-masthead' }, el('span', {}, '2127 · ODAIBA'), el('span', {}, '共同のまちづくり')),
@@ -184,6 +185,7 @@ function idleWarningNodes() {
 
 function renderWelcome(focus = false) {
   const button = action(screen === 'starting' ? '準備中…' : 'はじめる', () => startSession(session !== undefined && draft.size > 0), true, busy);
+  button.dataset.autoAction = 'start';
   const status = screen === 'starting' ? el('p', { class: 'guest-status', role: 'status', 'aria-live': 'polite' }, '四つの質問を準備しています。') : undefined;
   page('次のお台場を一緒に選ぶ', '共同提案',
     el('p', { class: 'guest-lead' }, 'ここは2127年のお台場。四つの質問に答えて、これからの街のあり方を一緒に選びます。'),
@@ -288,12 +290,13 @@ function renderQuestion(focus = true) {
   const question = session!.questions[questionIndex];
   const fieldset = el('fieldset', { class: 'guest-choices' });
   const next = el('button', {
-    type: 'submit', class: 'primary', ...(!draft.has(question.id) ? { disabled: '' } : {}),
+    type: 'submit', class: 'primary', 'data-auto-action': 'next', ...(!draft.has(question.id) ? { disabled: '' } : {}),
   }, questionIndex === session!.questions.length - 1 ? '回答を確認する' : '次の質問へ');
   fieldset.append(el('legend', { class: 'visually-hidden' }, question.text));
   question.options.forEach((option, optionIndex) => {
     const input = el('input', {
       type: 'radio', name: `question-${questionIndex}`, id: `guest-choice-${questionIndex}-${optionIndex}`,
+      'data-question-id': question.id,
       value: option.id, ...(draft.get(question.id) === option.id ? { checked: '' } : {}),
     });
     input.addEventListener('change', () => {
@@ -356,6 +359,7 @@ function renderReview(focus = true) {
       : conflictState ? `最新 revision ${conflictState.revision} を確認して記録する`
         : 'この内容で街に記録する';
   const submit = action(submitLabel, () => submitProposal(), true, busy || sessionBlocked);
+  submit.dataset.autoAction = 'submit';
   const conflict = conflictState
     ? el('div', { class: 'guest-conflict' },
       el('p', {}, '確認中に別の提案が先に記録されました。草稿は保存されています。最新の集計を確認してから、もう一度記録してください。'),
@@ -562,3 +566,37 @@ function renderCurrent(focus = true) {
 const recovery = readRecovery();
 if (recovery) void restoreRecovery(recovery);
 else renderWelcome();
+
+// DEV-ONLY: remove this import/adapter, or move the controls to Admin before exhibition.
+// The runner uses the same radio events, form submission, draft and idempotent submit path.
+if (new URLSearchParams(location.search).has('dev-auto')) {
+  void import('./autoAnswerPanel.ts').then(({ mountAutoAnswerPanel }) => mountAutoAnswerPanel({
+    async start(signal) {
+      // Result/handoff use chained timers that a hidden tab may delay; never race them.
+      for (const deadline = Date.now() + 10_000; (screen === 'result' || screen === 'handoff') && Date.now() < deadline;) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        signal.throwIfAborted();
+      }
+      if (screen !== 'welcome' || busy || session || pendingRequest)
+        throw new Error('草稿や送信を先に完了してください。自動回答は開始画面から実行します。');
+      await startSession();
+      if (!session || app.dataset.screen !== 'question') throw new Error(notice?.text ?? '質問を開始できません。');
+      return session;
+    },
+    answer(questionId, optionId) {
+      if (screen !== 'question' || busy || session?.questions[questionIndex]?.id !== questionId)
+        throw new Error('質問画面が変わりました。');
+      const input = Array.from(app.querySelectorAll<HTMLInputElement>('input[type=radio]'))
+        .find(input => input.dataset.questionId === questionId && input.value === optionId);
+      if (!input) throw new Error('回答の選択肢が見つかりません。');
+      input.click();
+      app.querySelector<HTMLFormElement>('form')!.requestSubmit();
+    },
+    async submit() {
+      if (screen !== 'review' || busy || pendingRequest) throw new Error('確認画面が変わりました。');
+      await submitProposal();
+      if (!saved) throw new Error(notice?.text ?? '記録できませんでした。');
+      return saved;
+    },
+  })).catch(error => console.error('Development auto-answer:', error));
+}
