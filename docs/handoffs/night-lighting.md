@@ -1,11 +1,11 @@
 # night-lighting — Readable futuristic night city
 
 - Owner: Codex
-- Status: IN_PROGRESS
+- Status: DONE — integrated into main 2026-09-30
 - Branch: codex/night-lighting
 - Base commit: b87a0b44488b8d71cb19e10dd4b0ad1fff104280
-- Last verified commit: implementation delta over b87a0b44488b8d71cb19e10dd4b0ad1fff104280, checked 2026-09-30
-- Remote availability: NOT PUSHED
+- Last verified commit: 3d6651329a8f546dccbd19053fccbecc1d31f490 (integrated code; root checks and main CI passed 2026-09-30)
+- Remote availability: origin/main at integration 3d6651329a8f546dccbd19053fccbecc1d31f490; feature 1e662282aebba23aa5ec1b8073ac7c265a1a55e7 remains on origin/codex/night-lighting
 
 ## Session Git state
 
@@ -28,7 +28,7 @@ Implemented brighter night fill and restrained bloom/vignette, embedded cold-whi
 
 ## Actual validation results
 
-PASSED locally on the implementation delta over the base SHA, 2026-09-30: root npm test/build, git diff --check; fixed-pose day/dawn/dusk/night, v2 low/mixed/high snapshots, resize, orbit and live sunset. Foreground Chrome on Apple M6 at 1920×1080/DPR1 observed 60.1 FPS standalone and v2-high after warm-up. See [VALIDATION](../VALIDATION.md#readable-futuristic-night-lighting--2026-09-30) for exact fixtures, screenshots and limits. Feature/main CI and integration pending.
+PASSED locally on the implementation delta over the base SHA, 2026-09-30: root npm test/build, git diff --check; fixed-pose day/dawn/dusk/night, v2 low/mixed/high snapshots, resize, orbit and live sunset. Foreground Chrome on Apple M6 at 1920×1080/DPR1 observed 60.1 FPS standalone and v2-high after warm-up. See [VALIDATION](../VALIDATION.md#readable-futuristic-night-lighting--2026-09-30) for exact fixtures, screenshots and limits. Feature [CI 36652867312](https://github.com/cc100053/city2127/actions/runs/36652867312) passed on 1e662282aebba23aa5ec1b8073ac7c265a1a55e7. Integrated with no conflicts as 3d6651329a8f546dccbd19053fccbecc1d31f490; root test/build and committed diff whitespace passed again, tree equals the browser-verified feature tree. Main [CI 36652968711](https://github.com/cc100053/city2127/actions/runs/36652968711) passed (root, survey and module-swap). This closure update changes documentation only.
 
 ## Known issues and blockers
 
@@ -40,4 +40,4 @@ Use shared materials and baked light geometry; a small fixed pool of local light
 
 ## Next expected step
 
-Commit/push, require feature CI, then integrate following [CONTRIBUTING](../CONTRIBUTING.md).
+Shipped to main. User can review the local 22:00 preview and the saved before/after captures. Exhibition hardware performance remains a later installation check; no further implementation required in this task.
