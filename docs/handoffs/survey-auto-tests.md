@@ -45,3 +45,9 @@ Keep the four-axis v2 product contract. Generic test helpers iterate descriptors
 ## Remaining verification and next step
 
 User authorized branch → CI → `--no-ff` main integration on 2026-09-30 (not a direct main commit). Remove/move DEV-ONLY tooling before exhibition; keep reusable tests.
+
+## Integration — 2026-09-30
+
+- Task commit `03382c2` pushed to `origin/codex/survey-auto-tests`; branch CI run 36703009527 PASSED (root with survey install, survey, module-swap, diff whitespace).
+- Merged into `main` with `--no-ff` as `fb83f87` on base `b97f859` (origin/main unchanged). Integrated result: root/survey/module-swap `npm test` and `npm run build`, and `git diff --check origin/main..HEAD` PASSED locally.
+- Main CI for the pushed result: see `gh run list --branch main`; record any failure here.
