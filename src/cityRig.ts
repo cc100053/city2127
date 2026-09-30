@@ -7,7 +7,7 @@ import { mobility } from './mobility.ts';
 
 // Three finishes: matte ceramic composite, refined metal, and reflective glass. Same shader, different response to the one environment map.
 export const paint = (color: T.ColorRepresentation, roughness=.52, metalness=0) => new T.MeshStandardMaterial({ color, roughness, metalness });
-export const cream = paint('#dce3e3',.58), teal = paint('#839da8',.44,.05), sage = paint('#a9c5c2',.5), pink = paint('#b9b7ac',.56), dark = paint('#27414f',.16,.7), trim = paint('#edf0ed',.48);
+export const cream = paint('#e2ddd2',.58), teal = paint('#839da8',.44,.05), sage = paint('#a9c5c2',.5), pink = paint('#b9b7ac',.56), dark = paint('#27414f',.16,.7), trim = paint('#eee9df',.48);
 export const futureLight=new T.MeshStandardMaterial({color:'#8ce5d8',emissive:'#68d9de',emissiveIntensity:.8,roughness:.65});
 export const publicLight=new T.MeshStandardMaterial({color:'#ecf4ed',emissive:'#dcebe6',emissiveIntensity:.15,roughness:.6});
 export const solar=paint('#486b83',.3,.85);
@@ -44,7 +44,11 @@ export function bake(root:T.Object3D) {
   const inverse=root.matrixWorld.clone().invert(),batches=new Map<T.Material,T.BufferGeometry[]>(),meshes:T.Mesh[]=[];
   root.traverse(obj=>{if(obj instanceof T.Mesh && !Array.isArray(obj.material)){const geometries=batches.get(obj.material)??[];geometries.push((obj.geometry.index ? obj.geometry.toNonIndexed() : obj.geometry.clone()).applyMatrix4(inverse.clone().multiply(obj.matrixWorld)));batches.set(obj.material,geometries);meshes.push(obj);}});
   meshes.forEach(mesh=>mesh.removeFromParent());
-  return [...batches].map(([material,geometries])=>{const mesh=new T.Mesh(mergeGeometries(geometries),material);mesh.castShadow=true;mesh.receiveShadow=true;mesh.name='fixed-kit';geometries.forEach(g=>g.dispose());return mesh;});
+  return [...batches].map(([material,geometries])=>{
+    // Merge only attributes every piece has (e.g. surveyed GLB parts without UVs under an untextured material).
+    const shared=Object.keys(geometries[0].attributes).filter(name=>geometries.every(g=>g.hasAttribute(name)));
+    geometries.forEach(g=>Object.keys(g.attributes).filter(name=>!shared.includes(name)).forEach(name=>g.deleteAttribute(name)));
+    const mesh=new T.Mesh(mergeGeometries(geometries),material);mesh.castShadow=true;mesh.receiveShadow=true;mesh.name='fixed-kit';geometries.forEach(g=>g.dispose());return mesh;});
 }
 type WindowSlot = { object:T.Object3D; phase:number; occupancy:number };
 export type Kit = { windows:WindowSlot[]; signs:T.MeshStandardMaterial[]; random:()=>number };

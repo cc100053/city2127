@@ -536,3 +536,23 @@ Resume `45277d3` on `feat/art-direction`; root test/build/whitespace passed per 
 Headed Chrome: original hero, fixed 16:00 / actor20 s; [day](../artifacts/odaiba-dream-pass6.jpg) and [night](../artifacts/odaiba-dream-pass6-night.jpg) at 1920×929/DPR1, plus inspected 6.3 and 17.8. Scratch server 8794/temp continuation SQLite rendered [high](../artifacts/odaiba-dream-pass6-high.jpg)/[low](../artifacts/odaiba-dream-pass6-low.jpg) at 1920×873/DPR1. Twenty positive/negative proposals, actual diagnostics match all four site layouts and finished live transitions; reset/reload restores mixed baseline. No localhost/shader errors; existing wallet-extension errors excluded. No full guest/lifecycle or transition-timing rerun.
 
 Standalone rolling observation: 32.8 FPS / 1388 draws / 356 geometries at 1920×929/DPR1. Not comparable to the prior DPR1.5 session, not controlled 1080p/exhibition hardware/60FPS acceptance. Target still not reached: isolated shore platforms, contemporary mall/hotel/context typologies, geometric trees, background and detail density remain. Six passes implemented, human art review pending; no main merge. See [continuation handoff](handoffs/odaiba-dream-loop.md#continuation-passes-46--2026-09-30-locally-verified-human-art-review-pending).
+
+## Odaiba hero district P1 — 2026-09-30
+
+`feat/odaiba-district` (stacked on `feat/art-direction` `55f9473`): root `npm test` PASS with new district assertions, `npm run build` PASS, `git diff --check` clean. Browser hero pose at 800×600: 1,310 → 1,195 draw calls and 1.89 M → 1.58 M triangles per frame; day/night without console errors. Details and unverified items: [district handoff](handoffs/odaiba-district.md).
+
+## Odaiba hero district P2 — 2026-09-30
+
+`feat/odaiba-district`: environment replaced by the headless-Blender-derived `odaiba_district_v01_environment.glb` (48,178 → 11,343 triangles, 2.6 → 0.6 MB) with a hashed-alpha apron dissolve. Root `npm test` and `npm run build` PASS, `git diff --check` clean. Browser hero pose (`hour=21`, 800×600): 1,185 draw calls / 1.47 M triangles per frame; day, night and top view without console errors or visible plate edges. Details: [district handoff](handoffs/odaiba-district.md).
+
+## Odaiba hero district P3a — 2026-09-30
+
+`feat/odaiba-district`: retained landmarks merged per material at load with the shared `bake()` (now attribute-safe). Root `npm test` and `npm run build` PASS, `git diff --check` clean. Browser hero pose (800×600): 1,185 → 509 draw calls, 1.47 M triangles unchanged; day/night visually unchanged, no console errors. Details: [district handoff](handoffs/odaiba-district.md).
+
+## Odaiba hero district Dream Loop P3b — 2026-10-01
+
+`feat/odaiba-district`: three Dream Loop Plus passes on the tier-1 district (Fuji core, Aqua City, DECKS, north waterfront). Root `npm test`, `npm run build` and `git diff --check` PASS after each pass. 1920×929 headless captures: [baseline](../artifacts/odaiba-district-baseline.jpg), [pass 3](../artifacts/odaiba-district-pass3.jpg), [night](../artifacts/odaiba-district-pass3-night.jpg). Built-in pane 800×600 at `?hour=16&reviewTime=20`: 529 draw calls / 1.84 M triangles, no console errors. Human art review pending. Details: [district handoff](handoffs/odaiba-district.md).
+
+## Odaiba connected backdrop P4 — 2026-10-01
+
+`feat/odaiba-district`: island edge replaced by a receding Odaiba backdrop plus `bayContext()` (Rainbow Bridge, Tokyo Gate Bridge, Ariake link, nine shore skylines; 4 draws, 16,144 triangles). Root `npm test`, `npm run build`, `git diff --check` PASS. Captures: [day](../artifacts/odaiba-district-bay-hero3.jpg), [night](../artifacts/odaiba-district-bay-night.jpg); orbit view shows the Rainbow Bridge; no console errors. Details: [district handoff](handoffs/odaiba-district.md).
