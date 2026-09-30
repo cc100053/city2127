@@ -1,11 +1,11 @@
 # admin-japanese — Japanese admin UI
 
 - Owner: Codex
-- Status: IN_PROGRESS
+- Status: DONE
 - Branch: codex/admin-japanese
 - Base commit: 957b5bcea6411076acca072b0ff94c1adc01df4a
-- Last verified commit: base plus current localization delta
-- Remote availability: NOT PUSHED
+- Last verified commit: 1fc8c1f52dde9eb269008c9fd207098f0e928177 (integrated code)
+- Remote availability: feature d4fef13 and main integration 1fc8c1f pushed; both CI passed
 
 ## Session Git state
 
@@ -21,4 +21,8 @@ Localize all Admin interface copy into Japanese, including browser title, contro
 
 ## Known issues and next expected step
 
-Finish diff/link review, feature CI and integration. Existing production server need not restart for these client-only changes; refresh Admin after the new survey build.
+Diff/Markdown links/committed whitespace passed. No implementation work remains. Existing production server need not restart for these client-only changes; refresh Admin after the new survey build.
+
+## Integration evidence
+
+Feature `d4fef13ccd403009af2084e0e1d93831b0f00162` passed [CI 36655653034](https://github.com/cc100053/city2127/actions/runs/36655653034). Main `1fc8c1f52dde9eb269008c9fd207098f0e928177` re-passed root/survey tests/builds and committed whitespace locally, and passed [main CI 36655782933](https://github.com/cc100053/city2127/actions/runs/36655782933) covering all three packages. Remote main confirmed after push. Existing 8787 current-run read-only check confirms displayMode support; a refresh can load the new built UI. Closure changes documentation only.
