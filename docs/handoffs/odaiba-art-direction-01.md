@@ -6,7 +6,8 @@
 - Preflight 2026-09-30: started on main `b97f859`, fetched origin successfully; main/origin main 0/0 divergence. Resumed existing remote `origin/feat/art-direction` at `e587b54`, local/remote 0/0. No main merge needed. Unrelated untracked `.claude/launch.json` preserved.
 - Existing venue handoff compared with actual code: P0–P5 are available in main, eight GLBs and 2127 retrofit layer present. Prior art-direction handoff describes Shibuya history, not this pass's source of truth.
 - Ownership: no binary asset edits, no overlapping binary work. Source reference PNGs and master taste unchanged.
-- Last verified implementation: final pass worktree over `e587b54`; exact feature commit recorded in Git. No use of historical FPS as new evidence.
+- Last verified implementation: `274167ef44fa7f0f53647ed06791f0ef4268e5a6` (root checks and browser evidence on the identical implementation tree). No use of historical FPS as new evidence.
+- Committed-diff review found trailing whitespace already present in the base reference document's Status line. Replaced its Markdown hard-break spaces with `<br>`; visual/design rules and reference PNGs unchanged. Working-tree and full `origin/main...HEAD` whitespace checks pass after this formatting-only correction.
 
 ## Current implementation inspected
 

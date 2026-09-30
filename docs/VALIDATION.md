@@ -2,7 +2,7 @@
 
 ## Odaiba art direction pass 1 — 2026-09-30
 
-`feat/art-direction`, base `e587b54`, final implementation worktree. Scope: replace the rendered Fuji office/podium/observation GLB with a civic chassis; retain original assets, hero, lighting, actor routes, seven other landmarks and survey contracts. Human art acceptance pending; no main integration. [Full audit / self-review](handoffs/odaiba-art-direction-01.md).
+`feat/art-direction`, base `e587b54`, verified implementation `274167e`. Scope: replace the rendered Fuji office/podium/observation GLB with a civic chassis; retain original assets, hero, lighting, actor routes, seven other landmarks and survey contracts. Human art acceptance pending; no main integration. [Full audit / self-review](handoffs/odaiba-art-direction-01.md).
 
 Root `npm test` (all ten scripts, including actual new-core aerial/bridge/site/actor raycasts), `npm run build` (strict TypeScript + Vite), and `git diff --check` passed. Existing >500 kB bundle warning remains. New core: six static material batches, 50,876 triangles, no per-frame geometry. Eight original source assets still match their hashes/bounds; runtime now uses seven GLBs plus the new core. Survey and module-swap sources unchanged; their package checks were not rerun for this root-only change.
 

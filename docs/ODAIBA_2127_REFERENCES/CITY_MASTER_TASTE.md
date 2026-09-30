@@ -1,6 +1,6 @@
 # CITY MASTER TASTE — ODAIBA 2127
 
-**Status:** Master visual / architectural direction  
+**Status:** Master visual / architectural direction<br>
 **Use:** Mandatory reference for every building evolution, new object, mobility system, landscape intervention, public space, prop, and future city asset in Odaiba 2127.
 
 ---
