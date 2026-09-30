@@ -17,6 +17,7 @@ Every surface uses one of the shared materials in `src/cityRig.ts`. Do not creat
 | Stone paving | `stone` | Plazas, plinths, public floors | Roads |
 | Living green | `leaf` | Planter tops, hedge strips, shrubs | Paint on walls; "green" facades without a planter |
 | Membrane | `membrane` | Canopies, filtration fins, deck rails | Solid structure |
+| Public illumination | `publicLight` (cold white) | Embedded soffit/floor strips and slim civic lamp heads | Guest accents, large luminous walls |
 | Civic light | `futureLight` (mint) | Inlaid paving rings, deck edges, service lights | Signage text, guest changes |
 | **Guest accent** | saffron `#ff9a2e` (`surveySites.ts`) | **Only** the outline of a guest-made change | Anything else |
 
@@ -124,3 +125,7 @@ A guest-made change must be distinguishable from the base city at a glance and t
 - [x] People (§7): capsule torso, arms and legs, a round head and hair; each person gets clothes, skin and hair from muted palettes via instance colour. Mid-dark clothes keep them readable on the pale paving; no saffron
 - [x] Autonomous pods: a low rounded body under a long glass canopy, four wheels, a mint service line on each side and mint/coral light bars; six body tints
 - [x] User art review, in the combined-scene review before the merge (2026-09-25) ([capture](../artifacts/art-actors-preset.png))
+
+## Night readability pass (2026-09-30)
+
+User-approved direction: readable 2127 night surfaces against a navy sky. Raised moon, hemisphere and material-environment fill; reduced bloom and vignette radius. Cold-white embedded strips articulate public slabs and site rims, mint marks paths/services, and warm windows retain the existing occupancy palette. Eight slim civic masts provide actual local point illumination. Geometry stays baked by shared material; no new post pass or assets. Shadowless local lights can leak through walls; use a baked lightmap if this becomes visible. Evidence and limits: [night-lighting handoff](handoffs/night-lighting.md).

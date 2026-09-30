@@ -421,3 +421,24 @@ The dated records below retain their original criteria and observations. Referen
 ## CI publication verification — 2026-09-18
 
 User-authorized Stage 1 + 2 publication: `2b0e8cc46a88f3c1f1382ce7d5efe3f2a285a4c3` pushed directly to `origin/main`. [GitHub Actions run](https://github.com/cc100053/city2127/actions/runs/35356530469) passed: checkout, Node 24 setup, `npm ci`, `npm test`, `npm run build` and committed-diff whitespace. This verifies the main-push path on the hosted runner; optional PR/new-branch events were not exercised remotely. Actionlint remains NOT RUN. Subsequent changes only update documentation with this evidence; their own CI result must be checked after push.
+
+## Readable futuristic night lighting — 2026-09-30
+
+Owner Codex; branch `codex/night-lighting`, base `b87a0b44488b8d71cb19e10dd4b0ad1fff104280`, checked implementation delta on that base. Root `npm test`, `npm run build` and `git diff --check` passed (Node 26; existing >500 kB warning). Added runnable night-fill floor, unchanged day settings and dusk-continuity assertions to `tests/worldState.test.ts`. Survey/module-swap code is unchanged.
+
+Same untouched hero pose at 1280×720: [before 22:00](../artifacts/night-light-before-2200.png), [after 22:00](../artifacts/night-light-after-2200.png), [12:00](../artifacts/night-light-after-12.png), [02:00](../artifacts/night-light-after-2.png), [06:18](../artifacts/night-light-after-6_3.png), [17:48](../artifacts/night-light-after-17_8.png). Reopened captures show readable facade/ground detail, navy sky, distinct embedded mint/cold-white accents and no broad bloom wash. Additional geometry changes daytime appearance, but the daytime global light settings are unchanged.
+
+V2 layout-only visual fixtures were sent through an intercepted `ws://127.0.0.1:8799/ws`, with no real server/database writes. The fixture snapshots have zero guests/scores and explicitly supplied low/mixed/high layouts: they exercise renderer alternatives, not server score derivation. [Low](../artifacts/night-light-survey-low-2200.png), [mixed](../artifacts/night-light-survey-mixed-2200.png), [high](../artifacts/night-light-survey-high-2200.png). Runtime diagnostics matched ports 1/3/5, shared seats 2/4/7, trees 5/8/10, planted fraction .3125/.5/.6875, fins 5/3/1 and modules 3/4/5; high AUTO HUB and all Park assets were ready. Saffron outlines remained distinct. Existing SE ground occlusion at the hero pose remains; the low twin heads and high tower read above DOGENZAKA.
+
+Foreground headed Google Chrome, ANGLE Metal Apple M6, DPR 1, waited 4–8 seconds after navigation (at least 120 frames), sampled renderer dataset:
+
+| Viewport | Mode/time | FPS observed | Draw calls | Geometries |
+| --- | --- | --- | --- | --- |
+| 1280×720 | standalone, 12/02/dawn/dusk | 59.9–60.0 | 356 | 90 |
+| 1280×720 | v2 low/mixed/high, 22:00 | 59.9–60.1 | 658/638/694 | 167/162/176 |
+| 1920×1080 | standalone, 22:00 | 60.1 | 356 | 90 |
+| 1920×1080 | v2 high, 22:00 | 60.1 | 694 | 176 |
+
+1080p canvas dimensions and `document.visibilityState=visible` were verified: [city](../artifacts/night-light-1080-city.png), [v2 high](../artifacts/night-light-1080-survey-high.png). These are local vsync-limited observations, not a performance guarantee on exhibition hardware. Ordinary resize and orbit were exercised; [orbit sample](../artifacts/night-light-orbit.png) is not a hero-pose comparison. Live clock reached 18:40 around 50 seconds, switched body to night colours and retained 90 geometries: [sunset](../artifacts/night-light-live-sunset.png). No uncaught page errors in the matrix; the accumulated session log retained one tree-load fetch interrupted during earlier reload/HMR, which did not recur as a final matrix runtime failure. Final asset readiness was checked independently in diagnostics.
+
+Limits: eight local point lights intentionally have no shadows and can illuminate through walls. They provide entrance/ground fill; upper structures use global fill plus emissive strips. No extra render pass, dependency or asset was added. Exhibition PC, live guest submissions and full motion-cycle collision were not revalidated in this lighting task. Integration/CI evidence is recorded in the [handoff](handoffs/night-lighting.md).

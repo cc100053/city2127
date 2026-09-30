@@ -37,3 +37,12 @@ export const withNight = (s: WorldState, night: number): WorldState => ({
   neon: s.neon + (1 - s.neon) * night * .6,
   signage: s.signage + (1 - s.signage) * night * .5,
 });
+
+/** Night fill keeps pale surfaces readable while the sky remains dark. Day values stay unchanged. */
+export const nightLighting = (night: number) => ({
+  ambient: 1 - night * .55,
+  environment: .6 * (1 - night * .65),
+  exposure: .84 + night * .08,
+  bloom: .1 + night * .14,
+  vignette: .9 - night * .25,
+});

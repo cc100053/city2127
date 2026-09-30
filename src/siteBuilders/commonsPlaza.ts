@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { arc, bake, box, dark, futureLight, leaf, membrane, pink, shrubs, sign, stone, trim, type Kit } from '../cityRig.ts';
+import { arc, bake, box, dark, futureLight, leaf, membrane, pink, publicLight, shrubs, sign, stone, trim, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, SITE_TRANSITION_SECONDS, type BuiltSite } from './siteRuntime.ts';
 import type { ExhibitionLayout } from '../surveyView.ts';
@@ -190,6 +190,7 @@ export function buildCommonsPlaza(scene: T.Scene, kit: Kit): CommonsPlazaSite {
     box(plaza, [.2, 4.3, .2], [Math.cos(angle) * 3.8, 2.8, -Math.sin(angle) * 3.8], trim, .05);
   }
   arc(plaza, 3.1, 4.5, .22, [0, 4.95, 0], trim);
+  arc(plaza, 3.35, 3.48, .04, [0, 4.91, 0], publicLight);
   arc(plaza, 0, 3.1, .06, [0, 5.03, 0], membrane);
   sign(plaza, kit, '公共広場 / COMMONS', 2.2, 2.1, 4, 4, .55, '#536f66');
   plaza.add(...bake(plaza));

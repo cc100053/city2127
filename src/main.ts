@@ -12,7 +12,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { cityRig } from './cityRig';
 import { heroCamera, HERO_TARGET } from './heroCamera';
 import { createWorldState } from './worldState';
-import { hourAt, sunHeight, daylight, moodAt, withNight } from './dayCycle';
+import { hourAt, sunHeight, daylight, moodAt, withNight, nightLighting } from './dayCycle';
 import { overlay } from './overlay';
 import { addCityModel } from './modelAssets';
 import { scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
@@ -87,7 +87,7 @@ try {
   const dayBase=new T.Color('#c3d9e7'),dayPulse=new T.Color('#accbdc'),dayStill=new T.Color('#e0e6dc');
   const topBase=new T.Color('#7f9fbd'),topPulse=new T.Color('#6a8db0'),topStill=new T.Color('#a9bcc4');
   const duskHorizon=new T.Color('#f6b58a'),duskTop=new T.Color('#7a86ad'),nightHorizon=new T.Color('#1c2941'),nightTop=new T.Color('#070d1c');
-  const sunLow=new T.Color('#ffae78'),sunHigh=new T.Color('#ffe7c4'),moon=new T.Color('#7d9be0'),ambientDay=new T.Color('#e3ebee'),ambientPulse=new T.Color('#a7c9ed'),ambientNight=new T.Color('#3b5796');
+  const sunLow=new T.Color('#ffae78'),sunHigh=new T.Color('#ffe7c4'),moon=new T.Color('#7d9be0'),ambientDay=new T.Color('#e3ebee'),ambientPulse=new T.Color('#a7c9ed'),ambientNight=new T.Color('#899dbd');
   const start=performance.now();
   let frames=0,measureStart=start;
   renderer.setAnimationLoop(()=>{
@@ -104,12 +104,13 @@ try {
     const arc=Math.PI*(hour-6)/12,up=height>0?1:-1;
     sun.position.set(70*Math.cos(arc)*up,40*Math.abs(height)+4,34);
     sun.color.copy(sunLow).lerp(sunHigh,T.MathUtils.smoothstep(height,0,.45)).lerp(moon,dark);
-    sun.intensity=(2.55+pulse*.2+still*.05)*T.MathUtils.smoothstep(height,-.02,.2)+.2*T.MathUtils.smoothstep(-height,.02,.25);
-    ambient.intensity=(.62+pulse*.15+still*.15)*(.15+.85*day);
+    sun.intensity=(2.55+pulse*.2+still*.05)*T.MathUtils.smoothstep(height,-.02,.2)+.55*T.MathUtils.smoothstep(-height,.02,.25);
+    const light=nightLighting(dark);
+    ambient.intensity=(.62+pulse*.15+still*.15)*light.ambient;
     ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientNight,dark);
-    scene.environmentIntensity=.6*(.08+.92*day);renderer.toneMappingExposure=.84+dark*.1;
-    bloom.strength=.1+pulse*.04+dark*.3;
-    controls.update();rig.update(s,now);cityChanges?.update(now);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
+    scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure;
+    bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
+    controls.update();rig.update(s,now,dark);cityChanges?.update(now);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
     if(++frames===120){renderer.domElement.dataset.time=now.toFixed(2);renderer.domElement.dataset.fps=(120000/(performance.now()-measureStart)).toFixed(1);renderer.domElement.dataset.drawCalls=String(renderer.info.render.calls);renderer.domElement.dataset.geometries=String(renderer.info.memory.geometries);if(cityChanges)renderer.domElement.dataset.siteAssets=JSON.stringify(cityChanges.getDiagnostics());frames=0;measureStart=performance.now();}
   });
   window.addEventListener('resize',()=>{

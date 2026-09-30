@@ -122,7 +122,8 @@ Desktop-only presentation: the user explicitly excludes responsive/mobile work (
 User decision 2026-09-25: the three buttons and the `0/1/2` keys are gone. The city runs its own day/night cycle (`src/dayCycle.ts`).
 
 - One city day lasts **180 seconds** (`DAY_SECONDS`). The clock starts at 12:00 (`START_HOUR`), and the overlay shows the hour and a mood label: STILL TOKYO 05:00–10:00, DAYLIGHT TOKYO 10:00–19:30, PULSE TOKYO otherwise.
-- The sun arcs from east (6:00) to west (18:00), with its height as the sine of the arc. Below the horizon, the same shadow-casting light becomes a dim blue moon from the opposite side. `daylight()` fades from 1 to 0 through dawn and dusk. It drives the sun/moon intensity, the hemisphere fill, the environment intensity, exposure (+.1 at night) and bloom (+.3 at night).
+- The sun arcs from east (6:00) to west (18:00), with its height as the sine of the arc. Below the horizon, the same shadow-casting light becomes a dim blue moon from the opposite side. `daylight()` fades from 1 to 0 through dawn and dusk. It drives the sun/moon intensity, the hemisphere fill, the environment intensity, exposure (+.08 at night) and bloom (+.14 at night). Since 2026-09-30 the night hemisphere factor is .45 (was .15), environment intensity .21 (was .048), moon intensity .55 (was .2), and vignette offset .65 (day .9, darkness stays .9).
+- Civic lighting (2026-09-30): eight fixed shadowless point lights, intensity 95 × darkness, range 19, serve four crossing edges and the four site entrances in both standalone and survey modes. Shared `publicLight` cold-white emissive strips mark QFRONT/MAGNET public slabs, shop voids, AUTO HUB canopy, Commons underside and SE floor rims; existing mint `futureLight` gains night intensity and adds deck/path edges. Site accents are baked into their existing layers and inherit transitions; civic infrastructure stays fixed. Brightness follows the clock, independently of v2 scores.
 - Sky and fog: the per-mood day tint gets a warm dusk/dawn glow near the horizon and then fades into navy night colours. Overlay text turns light at night (`body[data-time=night]`).
 - City state (preset mode): `moodAt(hour)` blends the existing presets as keyframes: pulse 21:00–02:00, still 05:30–09:00, neutral 11:30–17:00, with smoothstep between them and wrapping at midnight. `withNight()` then raises windows, neon and signage by darkness.
 - `?hour=<0–24>` holds the clock at one hour, for review captures.
@@ -146,7 +147,7 @@ User decision 2026-09-25: the three buttons and the `0/1/2` keys are gone. The c
 | `src/createCityChangeManager.ts`, `src/siteBuilders/` | Factory and four hybrid site builders, including per-site v2 runtimes; preserve shared `cityRig` materials, procedural fallbacks, art geometry and per-layer `bake()` batching |
 | `src/siteAssets/` | Root-scene GLB catalogue, compatibility/bounds validation, lazy loader/cache and clone boundary for change-site assets |
 | `src/worldState.ts` | Survey-mode blend toward a target state over 10 s; independent of DOM/rendering |
-| `src/dayCycle.ts` | Day clock, sun height, daylight curve, preset keyframes by hour (`moodAt`) and night lights (`withNight`); pure |
+| `src/dayCycle.ts` | Day clock, sun height, daylight curve, preset keyframes by hour (`moodAt`) and night lights (`withNight`) and fill/post settings (`nightLighting`); pure |
 | `src/heroCamera.ts` | Initial camera; `HERO_POSITION` `(34,34,76)`, `HERO_TARGET` `(-3,17,-1)`, FOV 46°, far 320, shared with the orbit target. `main.ts` attaches OrbitControls (commit 5ad7dd0, 2026-09-17) with distance 45–180 and polar limits; screenshots use the untouched initial pose |
 | `src/overlay.ts` | Title, mood label and clock; day/night text colour |
 | `src/modelAssets.ts` | Load a Blender GLB with Three.js GLTFLoader and place it in scene coordinates; used by `main.ts` for the future tree and the dev `?asset-preview` picker |
@@ -154,7 +155,7 @@ User decision 2026-09-25: the three buttons and the `0/1/2` keys are gone. The c
 | `tests/worldState.test.ts` | Survey blend, day clock wrap, daylight curve, mood keyframes, midnight continuity and night lights |
 | `tests/mobility.test.ts` | Street phase separation, walking-cycle continuity and sampled wing/building clearance, delivery continuity and guide wraparound |
 
-Frame flow: `main` reads the day clock (`hourAt`, or `?hour`) → the city state is `moodAt(hour)` (or, in survey mode, `worldState` blending toward the survey target), passed through `withNight()` → sky, fog, sun/moon and fill are lit for that hour → `cityRig.update(state,time)` updates materials, windows and membranes and calls mobility → `CityChangeManager.update(time)` advances survey-site layers and markers → the overlay shows the clock → the composer renders. One clock drives all motion.
+Frame flow: `main` reads the day clock (`hourAt`, or `?hour`) → the city state is `moodAt(hour)` (or, in survey mode, `worldState` blending toward the survey target), passed through `withNight()` → sky, fog, sun/moon and fill are lit for that hour → `cityRig.update(state,time,darkness)` updates materials, windows and membranes and calls mobility → `CityChangeManager.update(time)` advances survey-site layers and markers → the overlay shows the clock → the composer renders. One clock drives all motion.
 
 ## Geometry and motion conventions
 

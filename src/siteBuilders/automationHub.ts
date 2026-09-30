@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { arc, bake, box, cream, faces, futureLight, glass, sign, solar, teal, trim, type Kit } from '../cityRig.ts';
+import { arc, bake, box, cream, faces, futureLight, glass, publicLight, sign, solar, teal, trim, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import { remapCityMaterials, type SiteAssetLoaderCache } from '../siteAssets/assetLoader.ts';
 import type { Band } from '../surveyView.ts';
@@ -118,6 +118,7 @@ export function buildAutomationHub(scene: T.Scene, kit: Kit, assets: SiteAssetLo
     box(face, [across, .08, .4], [0, y + .55, out + .2], trim, .02);
   });
   box(hubBase, [7.6, .35, 6.6], [0, 11.4, 0], trim, .1);
+  faces(hubBase, 7.6, 6.6, (face, across, out) => box(face, [across - .3, .07, .08], [0, 11.25, out + .04], publicLight, .02));
   arc(hubBase, 0, 3.9, .25, [0, 11.55, 0], trim);
   arc(hubBase, 2.3, 2.45, .03, [0, 11.8, 0], futureLight);
   arc(hubBase, 0, .6, .03, [0, 11.8, 0], futureLight);

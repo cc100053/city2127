@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { createWorldState } from '../src/worldState.ts';
 import { presets, type WorldState } from '../src/presets.ts';
-import { DAY_SECONDS, hourAt, daylight, moodAt, withNight } from '../src/dayCycle.ts';
+import { DAY_SECONDS, hourAt, daylight, moodAt, withNight, nightLighting } from '../src/dayCycle.ts';
 const close = (a: WorldState, b: WorldState, skip: keyof WorldState = 'timeOfDay') => { for (const key of Object.keys(a) as (keyof WorldState)[]) if (key !== skip) assert.ok(Math.abs(a[key] - b[key]) < 1e-9, key); };
 
 const world = createWorldState();
@@ -31,3 +31,17 @@ assert.deepEqual(withNight(presets.still, 0), presets.still);
 const lit = withNight(presets.still, 1);
 assert.ok(lit.windowLife > presets.still.windowLife && lit.neon > presets.still.neon && lit.greenery === presets.still.greenery);
 console.log('PASS: survey blend, day clock wrap, daylight curve, mood keyframes and midnight continuity, night lights.');
+
+// Day rendering stays unchanged; night fill has a floor and dusk interpolates without a step.
+assert.deepEqual(nightLighting(0), { ambient: 1, environment: .6, exposure: .84, bloom: .1, vignette: .9 });
+const night = nightLighting(1);
+assert.ok(night.ambient >= .4 && night.environment >= .2);
+assert.ok(night.bloom < .3 && night.vignette <= .65);
+for (let hour = 0; hour < 24; hour += .1) {
+  const a = nightLighting(1 - daylight(hour)), b = nightLighting(1 - daylight(hour + .001));
+  for (const key of Object.keys(a) as (keyof typeof a)[]) {
+    assert.ok(Number.isFinite(a[key]) && a[key] > 0);
+    assert.ok(Math.abs(a[key] - b[key]) < .002, `lighting continuity: ${hour}, ${key}`);
+  }
+}
+console.log('PASS: daylight lighting preserved, night readability floors and continuous dusk lighting.');
