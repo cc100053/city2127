@@ -55,7 +55,7 @@ npm run dev -- --port 5173
 | Admin | `http://127.0.0.1:8787/admin` | スタッフが状態を確認し、来場者の退出を確定し、リセットを要求・取消します。サーバー PC の localhost からのみ利用可能です。 |
 | Monitor（任意） | `http://127.0.0.1:8787/monitor` | 現在の状態と、画面を開いてから受信した提案・WebSocket イベントを文字で確認する画面。3D の街ではありません。 |
 
-City を展示スクリーン、Guest を入力スクリーンで開き、Admin はスタッフ用 PC に置きます。提案後、次の来場者を開始するにはスタッフが Admin の **Confirm Guest Has Left** を押す必要があります。保留中のリセットも、この退出確認後に実行されます。サーバーはビルド済み画面と API を同じ origin で提供し、Vite は街を別に提供します。標準の DB は `survey/data/survey.sqlite` で、サーバーを再起動しても街の状態は残ります。`npm ci` は初回と lockfile 更新時に実行します。通常の再起動ではタブ 1 の build／server とタブ 2 の dev を実行してください。
+City を展示スクリーン、Guest を入力スクリーンで開き、Admin はスタッフ用 PC に置きます。提案後、次の来場者を開始するにはスタッフが Admin の **観客の退出を確認** を押す必要があります。保留中のリセットも、この退出確認後に実行されます。サーバーはビルド済み画面と API を同じ origin で提供し、Vite は街を別に提供します。標準の DB は `survey/data/survey.sqlite` で、サーバーを再起動しても街の状態は残ります。`npm ci` は初回と lockfile 更新時に実行します。通常の再起動ではタブ 1 の build／server とタブ 2 の dev を実行してください。
 
 **信頼できる同一 LAN** の別端末から Guest／City を開く場合は、両サービスを LAN に公開し、URL の `127.0.0.1` をホスト PC の LAN IP に置き換えます。
 

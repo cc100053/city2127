@@ -33,11 +33,11 @@ export function renderState(state: CitySurveyState | ExhibitionState): HTMLEleme
   const rows = CITY_AXES.map(axis => {
     const value = state.scores[axis], pct = Math.abs(value) / SCORE_MAX * 50;
     const bar = el('span', { class: 'bar' }, el('span', { class: value < 0 ? 'fill neg' : 'fill', style: `width:${pct}%;${value < 0 ? `right:50%` : 'left:50%'}` }));
-    return el('tr', {}, el('th', {}, `${AXIS_LABELS[axis]} (${axis})`), el('td', { class: 'num' }, signed(value)), el('td', {}, bar));
+    return el('tr', {}, el('th', {}, AXIS_LABELS[axis]), el('td', { class: 'num' }, signed(value)), el('td', {}, bar));
   });
   const count = 'guestCount' in state ? state.guestCount : state.answerCount;
   return el('div', {},
-    el('p', { class: 'meta' }, `run ${state.runId} · revision ${state.revision} · proposals/answers ${count} · ${state.updatedAt}`),
+    el('p', { class: 'meta' }, `都市の実行ID ${state.runId} · 更新番号 ${state.revision} · 提案／回答数 ${count} · 更新日時 ${state.updatedAt}`),
     el('table', { class: 'scores' }, ...rows));
 }
 
