@@ -1,11 +1,11 @@
 # admin-day-night — Admin city lighting control
 
 - Owner: Codex
-- Status: IN_PROGRESS
+- Status: DONE
 - Branch: codex/admin-day-night
 - Base commit: f094dee39f79c9a6eb42655c85e3b8f6101ab2ca
-- Last verified commit: NONE for this task
-- Remote availability: NOT PUSHED
+- Last verified commit: 8a1e07b596ea3bdfe604d090e013c5b8524e25f5 (integrated code)
+- Remote availability: feature and integration pushed; main CI passed
 
 ## Session Git state
 
@@ -37,4 +37,8 @@ Day=12:00, Night=22:00, Auto=existing 180-second cycle. Schema 5 stores one disp
 
 ## Next expected step
 
-Push feature, require CI, then integrate and verify main per [CONTRIBUTING](../CONTRIBUTING.md).
+After the current guest is handled, restart the existing survey server with the same SQLite and reload Admin. No implementation work remains.
+
+## Integration evidence
+
+Feature `c5f5c5af27b42732a4c6ec1b8a60166bf1f2da65` passed [CI 36654085450](https://github.com/cc100053/city2127/actions/runs/36654085450). Main merge `8a1e07b596ea3bdfe604d090e013c5b8524e25f5` has an identical tree, passed root/survey tests and builds plus committed-diff whitespace locally, and passed [main CI 36654194714](https://github.com/cc100053/city2127/actions/runs/36654194714) including all three packages. Final closure is documentation only; runtime 8787 was preserved.
