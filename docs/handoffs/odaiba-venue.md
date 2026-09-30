@@ -1,7 +1,7 @@
 # odaiba-venue — Odaiba replaces Shibuya as the exhibition city
 
 - Owner: cc100053 (runtime work by Claude Code sessions)
-- Status: IN_PROGRESS
+- Status: INTEGRATED (P0–P5); P6 pending
 - Branch: codex/odaiba-venue
 - Base commit: 4bc16463a34879083d64debb4587a0d036297d4d
 - Last verified commit: this branch's P0 commit (assets import + plan); verified as the uncommitted delta on the base
@@ -13,7 +13,7 @@
 - Session starting branch and HEAD: clean `main` at `4bc16463a34879083d64debb4587a0d036297d4d`.
 - Last fetched origin/main commit: `4bc16463a34879083d64debb4587a0d036297d4d`, fetched 2026-09-30.
 - Local changes present at session start: NONE.
-- Upstream integration status: NOT INTEGRATED.
+- Upstream integration status: INTEGRATED into `main` as merge `e6c7966` (2026-09-30).
 - Pending Git conflicts or synchronization blockers: NONE. `origin/codex/odaiba-preview` (base `5577195`) was not merged; files were checked out path-wise.
 
 ## Goal and acceptance criteria
@@ -44,7 +44,7 @@ P0: Odaiba GLB/blend pairs and masterplan outputs under `asset/models/`, `src/od
 - P4 (2026-09-30): root `npm test`/`npm run build` passed; exhibition machine 60.0–60.1 FPS, 1,340–1,342 draw calls, no page errors; captures `artifacts/odaiba-p4-*.png`.
 - P5 (2026-09-30): root and `survey/` `npm test`/`npm run build` passed; guest and overlay copy checked in the browser.
 - Evidence/environment: temporary spike (reverted) measured 60.0 FPS at 1920×1080, 1,223–1,311 draw calls, headed Chrome 154 / ANGLE Metal Apple M6, pixel ratio 1. See the plan's P0 result.
-- Integrated commit and checks: NOT INTEGRATED.
+- Integrated commit and checks: `e6c7966` (`--no-ff` onto `4bc1646`, origin/main unchanged, tree identical to `30d0a7f`). 2026-09-30 review: root `npm test`/`npm run build` and `survey/` `npm test`/`npm run build` passed, `git diff --check origin/main...` clean; `module-swap/` unchanged. Main CI: see push.
 - Changes since verification: NONE.
 
 ## Known issues and blockers
@@ -59,4 +59,4 @@ See the plan's "Decisions (user, 2026-09-30)". Real metres are kept; the camera 
 
 ## Next expected step
 
-Integrate `codex/odaiba-venue` into `main` per [CONTRIBUTING.md](../CONTRIBUTING.md) (fetch, merge, rerun root/survey checks, push, CI), then P6: full guest flow on the exhibition machine with the Odaiba questions. Owner cc100053.
+P6: full guest flow on the exhibition machine with the Odaiba questions. Owner cc100053.
