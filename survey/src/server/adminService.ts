@@ -1,5 +1,5 @@
 import type {
-  AdminCurrentRun, AdminEvent, AdminEventsData, LifecycleCommand, LifecycleData, LifecyclePhase, LifecycleRequest, LifecycleStatus, PendingReset,
+  AdminCurrentRun, DisplayMode, AdminEvent, AdminEventsData, LifecycleCommand, LifecycleData, LifecyclePhase, LifecycleRequest, LifecycleStatus, PendingReset,
 } from '../shared/protocol.ts';
 import type { CitySurveyState, ExhibitionState } from '../shared/citySurveyState.ts';
 import type { DatabaseSync } from 'node:sqlite';
@@ -33,6 +33,7 @@ export function currentRun(ctx: SurveyContext): AdminCurrentRun {
     : sessionCounts(ctx, run.id);
   return {
     run,
+    displayMode: readDisplayMode(ctx.db),
     lifecycle: readLifecycle(ctx.db),
     state,
     questionVersion: run.algorithmVersion === 2 ? ctx.questions.version : ctx.legacyQuestions.version,
@@ -138,5 +139,24 @@ export function lifecycleCommand(ctx: SurveyContext, body: unknown): ServiceOutc
       response: { ok: true, data: { lifecycle: readLifecycle(ctx.db), state, executedReset: reset === 'none' ? null : reset, previousRunId: executed?.previousRunId ?? null } },
       event: executed && { type: 'run-reset', previousRunId: executed.previousRunId, state, view: viewOf(ctx, state) },
     };
+  });
+}
+
+export function readDisplayMode(db: DatabaseSync): DisplayMode {
+  const row = db.prepare('SELECT mode FROM display_settings WHERE id = 1').get();
+  if (!row) throw new CorruptStateError('display settings row is missing');
+  return str(row, 'mode') as DisplayMode;
+}
+
+export function setDisplayMode(ctx: SurveyContext, body: unknown): ServiceOutcome<{ mode: DisplayMode }> {
+  if (typeof body !== 'object' || body === null || Array.isArray(body)
+      || Object.keys(body).length !== 1 || !('mode' in body)
+      || (body.mode !== 'auto' && body.mode !== 'day' && body.mode !== 'night'))
+    return { response: fail('bad_request', 'Expected mode: auto, day or night.') };
+  const mode = body.mode;
+  return transaction(ctx.db, () => {
+    ctx.db.prepare('UPDATE display_settings SET mode = ? WHERE id = 1').run(mode);
+    const state = currentState(ctx);
+    return { response: { ok: true, data: { mode } }, event: { type: 'city-state-snapshot', displayMode: mode, state, view: viewOf(ctx, state) } };
   });
 }

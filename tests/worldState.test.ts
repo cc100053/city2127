@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { createWorldState } from '../src/worldState.ts';
 import { presets, type WorldState } from '../src/presets.ts';
-import { DAY_SECONDS, hourAt, daylight, moodAt, withNight, nightLighting } from '../src/dayCycle.ts';
+import { DAY_SECONDS, hourAt, daylight, moodAt, withNight, nightLighting, displayHour, isDisplayMode } from '../src/dayCycle.ts';
 const close = (a: WorldState, b: WorldState, skip: keyof WorldState = 'timeOfDay') => { for (const key of Object.keys(a) as (keyof WorldState)[]) if (key !== skip) assert.ok(Math.abs(a[key] - b[key]) < 1e-9, key); };
 
 const world = createWorldState();
@@ -45,3 +45,12 @@ for (let hour = 0; hour < 24; hour += .1) {
   }
 }
 console.log('PASS: daylight lighting preserved, night readability floors and continuous dusk lighting.');
+
+for (const seconds of [0, 45, 180, 400]) {
+  assert.equal(displayHour('day', seconds), 12);
+  assert.equal(displayHour('night', seconds), 22);
+  assert.equal(displayHour('auto', seconds), hourAt(seconds));
+}
+assert.ok(isDisplayMode('auto') && isDisplayMode('day') && isDisplayMode('night'));
+assert.ok(!isDisplayMode(null) && !isDisplayMode('dusk') && !isDisplayMode(12));
+console.log('PASS: admin clock holds day/night and Auto preserves the running cycle.');

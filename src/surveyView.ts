@@ -1,3 +1,4 @@
+import { isDisplayMode, type DisplayMode } from './dayCycle.ts';
 export const AXES = ['automation', 'publicSharing', 'environmentalPriority', 'urbanConcentration'] as const;
 export type Scores = Record<typeof AXES[number], number>;
 
@@ -238,6 +239,7 @@ export function connectSurvey(
   url: string,
   onView: (kind: SurveyEventKind, view: CityView) => void,
   onStatus: (status: string) => void,
+  onDisplayMode?: (mode: DisplayMode) => void,
 ) {
   let delay = 500;
   const open = () => {
@@ -246,7 +248,12 @@ export function connectSurvey(
     socket.addEventListener('open', () => { delay = 500; onStatus('接続済み'); });
     socket.addEventListener('message', message => {
       let event: ParsedSurveyEvent | null = null;
-      try { event = parseSurveyEvent(JSON.parse(String(message.data))); } catch { event = null; }
+      let data: unknown;
+      try { data = JSON.parse(String(message.data)); event = parseSurveyEvent(data); } catch { event = null; }
+      if (event && 'kind' in event && event.kind === 'city-state-snapshot' && isRecord(data)) {
+        const mode = data.displayMode === undefined ? 'auto' : data.displayMode;
+        if (isDisplayMode(mode)) onDisplayMode?.(mode);
+      }
       if (event && 'unsupportedVersion' in event) onStatus('Unsupported exhibition view version');
       else if (event) onView(event.kind, event.view);
       else console.warn('Ignored malformed survey message', message.data);

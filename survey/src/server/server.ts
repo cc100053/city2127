@@ -12,7 +12,7 @@ import { openDatabase } from './database.ts';
 import { restoreOrCreateRun } from './runStore.ts';
 import { createGuestSession, getGuestQuestion, RESERVATION_MS } from './sessionService.ts';
 import { currentState, currentView, submitAnswer, viewOf } from './answerService.ts';
-import { currentRun, isLoopbackAddress, lifecycleCommand, recentEvents } from './adminService.ts';
+import { currentRun, isLoopbackAddress, lifecycleCommand, readDisplayMode, setDisplayMode, recentEvents } from './adminService.ts';
 import { attachRealtime } from './realtime.ts';
 import { createProposalSession, getProposalSession, submitProposal } from './proposalService.ts';
 import { UnsupportedRunVersionError } from './runStore.ts';
@@ -85,7 +85,7 @@ export function createSurveyServer({ ctx, staticDir, remoteAddress = req => req.
       else res.end();
     });
   });
-  const realtime = attachRealtime(server, () => { const state = currentState(ctx); return { state, view: viewOf(ctx, state) }; });
+  const realtime = attachRealtime(server, () => { const state = currentState(ctx); return { state, view: viewOf(ctx, state), displayMode: readDisplayMode(ctx.db) }; });
   const publish = <T>(res: ServerResponse, outcome: ServiceOutcome<T>, okStatus = 200) => {
     sendJson(res, outcome.response, okStatus);
     if (outcome.event) realtime.broadcast(outcome.event);
@@ -107,6 +107,9 @@ export function createSurveyServer({ ctx, staticDir, remoteAddress = req => req.
     const isAdmin = path === '/admin' || path === '/admin.html' || path.startsWith('/api/admin/');
     if (isAdmin && !isLoopbackAddress(remoteAddress(req))) throw new HttpError(403, 'forbidden', 'Admin is available only from the exhibition PC (loopback).');
 
+    if (isAdmin && method === 'POST' && req.headers.origin !== undefined && req.headers.origin !== `http://${req.headers.host}`)
+      throw new HttpError(403, 'forbidden', 'Cross-origin admin request refused.');
+
     if (path === '/api/health' && method === 'GET') {
       const state = currentState(ctx);
       return sendJson<HealthData>(res, { ok: true, data: { status: 'ok', runId: state.runId, revision: state.revision, questionVersion: ctx.questions.version } });
@@ -127,15 +130,13 @@ export function createSurveyServer({ ctx, staticDir, remoteAddress = req => req.
       const outcome = submitProposal(ctx, await readJson(req));
       return publish(res, outcome, outcome.response.ok && !outcome.response.data.replayed ? 201 : 200);
     }
+    if (path === '/api/admin/display-mode' && method === 'POST') return publish(res, setDisplayMode(ctx, await readJson(req)));
     if (path === '/api/admin/current-run' && method === 'GET') return sendJson(res, { ok: true, data: currentRun(ctx) });
     if (path === '/api/admin/events' && method === 'GET') {
       const limit = Math.min(200, Math.max(1, Number(url.searchParams.get('limit')) || 50));
       return sendJson(res, { ok: true, data: recentEvents(ctx, limit) });
     }
     if (path === '/api/admin/lifecycle' && method === 'POST') {
-      // Refuse cross-site posts from other pages open in the exhibition PC's browser.
-      const origin = req.headers.origin;
-      if (origin !== undefined && origin !== `http://${req.headers.host}`) throw new HttpError(403, 'forbidden', 'Cross-origin admin request refused.');
       return publish(res, lifecycleCommand(ctx, await readJson(req)));
     }
     if (path.startsWith('/api/') || path === '/ws') throw new HttpError(404, 'not_found', 'Not found.');

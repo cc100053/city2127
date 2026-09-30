@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import type { AnswerData, GuestQuestionData, LifecycleData, ServerEvent } from './protocolTypes.ts';
+import { readDisplayMode } from '../src/server/adminService.ts';
 import { fixture, ok, startServer } from './surveyFixture.ts';
 
 /** Collects WebSocket events and lets the test await the next one. */
@@ -31,6 +32,27 @@ try {
   assert.equal(hello.type === 'city-state-snapshot' && hello.state.revision, 0);
   assert.equal(hello.type === 'city-state-snapshot' && hello.view.history.length, 0);
   assert.equal((await b.next()).type, 'city-state-snapshot');
+  assert.equal(hello.type === 'city-state-snapshot' && hello.displayMode, 'auto');
+  for (const mode of ['day', 'night', 'auto'] as const) {
+    assert.equal((await server.request('/api/admin/display-mode', { mode }, { origin: server.base })).status, 200);
+    assert.equal(readDisplayMode(ctx.db), mode);
+    for (const client of [a, b]) {
+      const event = await client.next();
+      assert.equal(event.type, 'city-state-snapshot');
+      if (event.type !== 'city-state-snapshot') throw new Error('expected display snapshot');
+      assert.equal(event.displayMode, mode);
+      assert.deepEqual(event.state, hello.type === 'city-state-snapshot' && hello.state, 'lighting does not change city state');
+    }
+  }
+  for (const body of [null, {}, { mode: 'dusk' }, { mode: 12 }, { mode: 'night', scores: {} }, []]) {
+    assert.equal((await server.request('/api/admin/display-mode', body)).status, 400);
+  }
+  assert.equal((await server.request('/api/admin/display-mode', { mode: 'night' }, { origin: 'http://evil.test' })).status, 403);
+  assert.equal(readDisplayMode(ctx.db), 'auto');
+  const lan = await startServer(ctx, () => '192.168.1.20');
+  try { assert.equal((await lan.request('/api/admin/display-mode', { mode: 'night' })).status, 403); }
+  finally { await lan.close(); }
+
 
   const guest = ok((await server.request<GuestQuestionData>('/api/guest-sessions', {})).body);
   const answer = ok((await server.request<AnswerData>('/api/answers', { answerId: 'ws-1', guestSessionId: guest.session.id, questionId: guest.question.id, optionId: 'solar-canopy', expectedRevision: 0 })).body);
@@ -48,6 +70,8 @@ try {
   // A replayed answer does not broadcast a second update.
   await server.request<AnswerData>('/api/answers', { answerId: 'ws-1', guestSessionId: guest.session.id, questionId: guest.question.id, optionId: 'solar-canopy', expectedRevision: 0 });
 
+  await server.request('/api/admin/display-mode', { mode: 'night' });
+  await a.next(); await b.next();
   const reset = ok((await server.request<LifecycleData>('/api/admin/lifecycle', { command: 'reset-city', expectedRevision: 0, confirmation: 'RESET' })).body);
   const resetEvent = await a.next();
   assert.equal(resetEvent.type, 'run-reset', 'next event after the replay is the reset, not a duplicate update');
@@ -62,6 +86,7 @@ try {
   const again = await c.next();
   assert.equal(again.type === 'city-state-snapshot' && again.state.runId, reset.state.runId);
   assert.equal(again.type === 'city-state-snapshot' && again.view.runId, reset.state.runId);
+  assert.equal(again.type === 'city-state-snapshot' && again.displayMode, 'night', 'reconnect and city reset retain lighting');
   b.close(); c.close();
   console.log('PASS: WebSocket snapshot on connect, city-state-updated after answers (not on replay), run-reset after reset.');
 } finally {

@@ -176,6 +176,12 @@ export const migrations: (string | ((db: DatabaseSync) => void))[] = [
     db.prepare(`INSERT INTO exhibition_lifecycle (id, revision, phase, pending_reset, total_since_sequence, updated_at)
       VALUES (1, 0, 'ready', 'none', 0, ?)`).run(new Date().toISOString());
   },
+  // 5: staff display choice is installation-wide, independent of proposals and city resets.
+  `CREATE TABLE display_settings (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    mode TEXT NOT NULL CHECK (mode IN ('auto', 'day', 'night'))
+  ); INSERT INTO display_settings (id, mode) VALUES (1, 'auto');`,
+
 ];
 
 export const SCHEMA_VERSION = migrations.length;

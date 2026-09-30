@@ -46,3 +46,8 @@ export const nightLighting = (night: number) => ({
   bloom: .1 + night * .14,
   vignette: .9 - night * .25,
 });
+
+export type DisplayMode = 'auto' | 'day' | 'night';
+export const isDisplayMode = (value: unknown): value is DisplayMode => value === 'auto' || value === 'day' || value === 'night';
+/** Admin overrides the light clock only; returning to Auto resumes the running local cycle. */
+export const displayHour = (mode: DisplayMode, seconds: number) => mode === 'day' ? 12 : mode === 'night' ? 22 : hourAt(seconds);
