@@ -8,6 +8,7 @@ import { changeSites, skyBridges, floatingDecks, inDistrict, DISTRICT } from '..
 import { heroCamera } from '../src/heroCamera.ts';
 import { routes } from '../src/mobility.ts';
 import { civicCore } from '../src/civicCore.ts';
+import { bake } from '../src/cityRig.ts';
 import { contextFacades } from '../src/contextFacades.ts';
 import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from '../src/coastalCanopy.ts';
 import { amphibiousShore } from '../src/amphibiousShore.ts';
@@ -47,7 +48,16 @@ for (const placement of layout.buildings) {
       `${placement.id} bound ${side}/${axis}: ${v} differs from source ${expected[side][axis]}`);
   }));
   assert.ok(Math.abs(actual.min.y) < .002, `${placement.id} grounded at source pad`);
-  if(placement.id!=='fuji-tv'){city.add(scene);landmarks.push(scene);}
+  if(placement.id!=='fuji-tv' && placement.id!=='telecom-center'){
+    // Runtime merge (odaibaScene): one mesh per finish, identical triangles, same placed bounds.
+    const materials=new Set<unknown>(),tris=(root:Group)=>{let n=0;root.traverse(o=>{if(o instanceof Mesh){materials.add(o.material);n+=(o.geometry.index?.count??o.geometry.attributes.position.count)/3;}});return n;};
+    const before=tris(scene),merged=bake(scene);scene.clear();scene.add(...merged);
+    assert.equal(merged.length,materials.size,`${placement.id} merges to one mesh per material`);
+    assert.equal(tris(scene),before,`${placement.id} keeps every triangle when merged`);
+    const mergedBounds=new Box3().setFromObject(scene,true);
+    assert.ok(mergedBounds.min.distanceTo(actual.min)<.01 && mergedBounds.max.distanceTo(actual.max)<.01,`${placement.id} merged bounds unchanged`);
+    city.add(scene);landmarks.push(scene);
+  }
   if(placement.id==='aqua-city-odaiba' || placement.id==='decks-tokyo-beach')plantRoofCanopy(city,scene);
 }
 assert.equal(triangles, 339919, 'All eight complete GLBs retain reviewed geometry');

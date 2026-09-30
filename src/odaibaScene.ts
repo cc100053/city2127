@@ -6,6 +6,7 @@ import { civicCore } from './civicCore';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
 import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
 import { contextFacades } from './contextFacades';
+import { bake } from './cityRig';
 import { DISTRICT, inDistrict } from './layout';
 
 // Literal paths bundle the district-cropped environment (scripts/crop-odaiba-district.py) and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
@@ -90,6 +91,10 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
         if (/glass|glazing|window/i.test(material.name) && !glazing.has(material)) { material.emissive.copy(warm); material.emissiveIntensity = 0; material.roughness=.22;material.metalness=.38;glazing.add(material); }
         else if (roofRetrofit[material.name]) { const [color, roughness, metalness] = roofRetrofit[material.name]; material.color.set(color); material.roughness = roughness; material.metalness = metalness; }
     });
+    // One draw per finish instead of one per surveyed part (30–50 per landmark); materials stay shared, so night glazing still applies.
+    const parts: T.BufferGeometry[] = []; model.traverse(object => { if (object instanceof T.Mesh) parts.push(object.geometry); });
+    const merged = bake(model); model.clear(); parts.forEach(geometry => geometry.dispose());
+    merged.forEach(mesh => { mesh.name = placement.id; model.add(mesh); });
   }));
   plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name)));
 }

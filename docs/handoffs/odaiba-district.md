@@ -1,7 +1,7 @@
 # Odaiba hero district — 2026-09-30
 
 - Owner: cc100053 (Claude Code session)
-- Status: IN_PROGRESS — P1 and P2 implemented and locally verified; P3 planned.
+- Status: IN_PROGRESS — P1, P2 and the P3 draw-call merge implemented and locally verified; P3 tier-1 art pass awaiting art direction.
 - Branch: `feat/odaiba-district`, stacked on `feat/art-direction` (not `main`): P1 edits `odaibaScene`, `coastalCanopy` and `contextFacades`, which exist only on the art branch pending human art review. Integrate after, or together with, `feat/art-direction`.
 - Base commit: `55f9473e5b8ac63c9b9e441e5835432a914d717b` (`feat/art-direction`).
 - Last verified commit: see Git log for the P1 commit; checks below were run on its exact working tree.
@@ -49,6 +49,18 @@ User review of P1 (top view) flagged: straight cut lines at the plate corners, t
 - Browser (built-in pane, 800×600): hero pose, day and `hour=21`, no console errors. Top view (orbit + max zoom-out): no straight plate edges, no ghost plate; the district reads as a round-cornered island dissolving into the sea. Measurement at hero pose `?reviewTime=12&hour=21`: 1,185 draw calls / 1.47 M triangles per frame (P0 baseline 1,310 / 1.89 M, P1 1,195 / 1.58 M). A day re-measurement was not possible because the pane was hidden (rAF paused).
 - Not verified: live `?survey` mode, human art review of the dithered edge, exhibition-hardware FPS.
 
+## P3a — landmark draw-call merge (2026-09-30)
+
+- `odaibaScene`: after the glazing/roof material retrofit, each of the six retained landmarks is baked with the existing `bake()` (`src/cityRig.ts`) into one mesh per material, the source geometries are disposed, and merged meshes carry the landmark id. No GLB binaries changed.
+- `bake()` shared fix: merges only attributes present in every piece of a material. DiverCity Plaza's `Parking_Concrete` mixes primitives with and without `TEXCOORD_0`, which would make `mergeGeometries` fail. All existing site-builder callers still pass.
+- Test: each landmark merges to exactly one mesh per material, keeps every triangle and keeps its precise placed bounds within 1 cm.
+
+### Actual validation (P3a)
+
+- `npm test`: PASS. `npm run build`: PASS. `git diff --check`: clean.
+- Browser (built-in pane, 800×600, hero pose `?reviewTime=12`): 509 WebGL draw calls / 1.47 M triangles per frame (P2 1,185; P0 baseline 1,310 / 1.89 M). Day and `hour=21` screenshots show no visible change from P2; night glazing still glows; no console errors.
+- Not verified: exhibition-hardware FPS, live `?survey` mode.
+
 ## Next step
 
-P3 focus polish: merge each landmark GLB's meshes by material (30–50 meshes each) for the main draw-call win, then art passes on tier 1 (Fuji core, Aqua City, DECKS, north waterfront).
+P3b tier-1 art pass (Fuji core, Aqua City, DECKS, north waterfront) — overlaps the `feat/art-direction` work awaiting human art review; agree the direction with the user before editing.

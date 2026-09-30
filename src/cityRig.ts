@@ -44,7 +44,11 @@ export function bake(root:T.Object3D) {
   const inverse=root.matrixWorld.clone().invert(),batches=new Map<T.Material,T.BufferGeometry[]>(),meshes:T.Mesh[]=[];
   root.traverse(obj=>{if(obj instanceof T.Mesh && !Array.isArray(obj.material)){const geometries=batches.get(obj.material)??[];geometries.push((obj.geometry.index ? obj.geometry.toNonIndexed() : obj.geometry.clone()).applyMatrix4(inverse.clone().multiply(obj.matrixWorld)));batches.set(obj.material,geometries);meshes.push(obj);}});
   meshes.forEach(mesh=>mesh.removeFromParent());
-  return [...batches].map(([material,geometries])=>{const mesh=new T.Mesh(mergeGeometries(geometries),material);mesh.castShadow=true;mesh.receiveShadow=true;mesh.name='fixed-kit';geometries.forEach(g=>g.dispose());return mesh;});
+  return [...batches].map(([material,geometries])=>{
+    // Merge only attributes every piece has (e.g. surveyed GLB parts without UVs under an untextured material).
+    const shared=Object.keys(geometries[0].attributes).filter(name=>geometries.every(g=>g.hasAttribute(name)));
+    geometries.forEach(g=>Object.keys(g.attributes).filter(name=>!shared.includes(name)).forEach(name=>g.deleteAttribute(name)));
+    const mesh=new T.Mesh(mergeGeometries(geometries),material);mesh.castShadow=true;mesh.receiveShadow=true;mesh.name='fixed-kit';geometries.forEach(g=>g.dispose());return mesh;});
 }
 type WindowSlot = { object:T.Object3D; phase:number; occupancy:number };
 export type Kit = { windows:WindowSlot[]; signs:T.MeshStandardMaterial[]; random:()=>number };
