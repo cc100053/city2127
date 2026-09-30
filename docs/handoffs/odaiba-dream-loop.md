@@ -8,7 +8,9 @@
 - Scope: polish the existing Odaiba model against a generated target using the Dream Loop Plus workflow: three sequential implementation passes, each followed by root checks and a new browser screenshot. Preserve venue, four-question contract, site/route clearances, desktop scope and UI copy. No source binary replacement, new dependencies, deployment or external asset packs.
 - Working context: ignored `.dream-loop/`, including `baseline.png`, locked `target.png` and per-pass screenshots. Target generated with the built-in image tool from the current browser screenshot plus the approved [R01](../ODAIBA_2127_REFERENCES/R01_MASTER_HERO.png); [master taste](../ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) remains visual authority.
 - Baseline: headed Chrome, 1920×929 screenshot, original hero camera, `?hour=16&reviewTime=20` (16:00 / actor time 20 s).
-- Status: three passes implemented and locally verified; human art review pending. Feature publication/CI recorded below.
+- Status: three passes implemented and locally verified; human art review pending.
+- Last verified implementation: `3466168437d7ce8f9fda8a4c19bb7df2e3a71682`, pushed to `origin/feat/art-direction`. Validation above/below was performed on the identical executable working tree before commit. Closure changes are documentation/image filenames only.
+- Feature CI: [run 36697005144](https://github.com/cc100053/city2127/actions/runs/36697005144), PASSED for all three packages on the implementation commit.
 
 ## Target prompt
 
@@ -44,11 +46,11 @@ Sky prompt:
 
 | Evidence | File |
 | --- | --- |
-| Baseline / locked generated target / final | [Before](../../artifacts/odaiba-dream-before.png), [Target](../../artifacts/odaiba-dream-target.png), [After](../../artifacts/odaiba-dream-after.png) |
-| Night | [22:00](../../artifacts/odaiba-dream-night.png) |
-| Survey bands | [High](../../artifacts/odaiba-dream-high.png), [Low](../../artifacts/odaiba-dream-low.png) |
+| Baseline / locked generated target / final | [Before](../../artifacts/odaiba-dream-before.jpg), [Target](../../artifacts/odaiba-dream-target.png), [After](../../artifacts/odaiba-dream-after.jpg) |
+| Night | [22:00](../../artifacts/odaiba-dream-night.jpg) |
+| Survey bands | [High](../../artifacts/odaiba-dream-high.jpg), [Low](../../artifacts/odaiba-dream-low.jpg) |
 
-Target is 1800×872 (image tool output), compared proportionally to the 1920×929 browser frame. Pass 1/2 and additional light-condition captures are kept in ignored `.dream-loop/`.
+Target is 1802×872 (image tool output), compared proportionally to the 1920×929 browser frame. Pass 1/2 and additional light-condition captures are kept in ignored `.dream-loop/`.
 
 ## Remaining visual gaps and next step
 
