@@ -7,7 +7,7 @@ import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
 import { plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
 import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
-import { inDistrict } from './layout';
+import { inDistrict, SEAWARD_GLSL } from './layout';
 import { bayContext, recedeBeyondDistrict } from './bayContext';
 
 // Literal paths bundle the district-detailed environment (scripts/crop-odaiba-district.py) and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
@@ -57,12 +57,24 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
   };
   material.customProgramCacheKey = () => 'curtain-wall';
 }
-const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a'), dayGlow = .15;
+const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a'), dayGlow = .26;
 /** Retained landmark glazing glows warm, strongest at night; the civic chassis uses the shared city finishes. */
 export function updateOdaiba(night: number) {
   // A faint daytime glow keeps the dark glazing reading as occupied, warm interiors (CITY_MASTER_TASTE) instead of voids.
   for (const material of glazing) material.emissiveIntensity = dayGlow + night * (.55 - dayGlow);
-  curtainGlow.value = .42 + night * .7;
+  curtainGlow.value = .55 + night * .6;
+}
+
+// Ground finishes that stop at the seaward cut; massing, guideway and revetment keep their geometry.
+const cutGround = new Set(['landscape', 'road', 'sidewalk', 'road_marking']);
+function openBay(material: T.Material) {
+  const compile = material.onBeforeCompile.bind(material), key = material.customProgramCacheKey.bind(material);
+  material.onBeforeCompile = (shader, renderer) => {
+    compile(shader, renderer);
+    shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 bayCut;').replace('#include <project_vertex>', '#include <project_vertex>\nbayCut=(modelMatrix*vec4(transformed,1.)).xz;');
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 bayCut;').replace('#include <clipping_planes_fragment>', `{ vec2 p=bayCut; if(${SEAWARD_GLSL}) discard; }\n#include <clipping_planes_fragment>`);
+  };
+  material.customProgramCacheKey = () => key() + '|open-bay';
 }
 
 /** Phase 03D environment (detail inside the district only), the bay context, six surveyed landmarks and the Fuji civic core, in metres. */
@@ -79,7 +91,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     // Context massing (district and backdrop) carries the same storey-banded curtain wall and lit bays as Aqua City and DECKS.
     if (finish && material.name.startsWith('context_') && material.customProgramCacheKey() !== 'curtain-wall') curtainWall(material, finish[0]);
     if(material.name==='landscape'){
-      material.map=grass;material.color.set('#cbd8b5');
+      material.map=grass;material.color.set('#bfc7a5');
       // World metres keep the authored terrain patches at one consistent texture scale.
       material.onBeforeCompile=shader=>{
         shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\ngrassUv=(modelMatrix*vec4(transformed,1.)).xz/32.;');
@@ -92,7 +104,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   });
   // After finishes: shared materials are re-tuned once per mesh above, which would drop an earlier wrap.
   environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) receded.add(object.material); });
-  receded.forEach(material => recedeBeyondDistrict(material));
+  receded.forEach(material => { if (cutGround.has(material.name)) openBay(material); recedeBeyondDistrict(material); });
   scene.add(contextFacades(environment), bayContext());
   plantCanopy(scene,trees);
   plantBackdropGrove(scene,environment);
