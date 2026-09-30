@@ -71,11 +71,13 @@ export const upperLinks = [
   {name:'MAGNET EAST WING',kind:'wing',x:24.25,z:-19,w:9.5,h:13,d:12,y:27.5,on:['MAGNET / AIR COMMONS'],columns:[[27.2,-23.2],[27.2,-14.8]]},
 ] as const;
 
-// Survey change sites: one per CityView lot socket, on open ground the hero pose can see. h = tallest variant; place = where viewers look.
-// nw automation hub (east of MAGNET), ne park (east of the station), sw commons plaza (south of Dogenzaka), se tower (behind Center-gai, west).
+// Survey change sites on Odaiba open ground the hero pose can see, clear of roads, landmarks and the guideway (tests/odaiba.test.ts).
+// x/z: metres in the Odaiba scene. w/d/h: the builders' own units (h = tallest variant); scale: metres per unit at the site root. place = the name guests read.
+// nw automation hub on the waterfront west of DECKS, ne park on the seaside lawn, sw commons between Aqua City and Hilton, se tower east of Fuji TV.
+// Hub and tower sit on different hero bearings (30° / 40°) so they never stack into one silhouette.
 export const changeSites = {
-  nw:{name:'AUTO HUB',place:'MAGNET東',x:35,z:-11,w:8,d:7,h:32},
-  ne:{name:'PARK',place:'駅東',x:37,z:11,w:10,d:10,h:8},
-  sw:{name:'COMMONS PLAZA',place:'道玄坂南',x:-24,z:32,w:12,d:10,h:5},
-  se:{name:'TOWER',place:'センター街奥',x:-40,z:-10,w:9,d:9,h:46},
+  nw:{name:'AUTO HUB',place:'デックス西',x:40,z:-300,w:8,d:7,h:32,scale:3},
+  ne:{name:'PARK',place:'お台場海浜公園',x:-210,z:-135,w:10,d:10,h:8,scale:4},
+  sw:{name:'COMMONS PLAZA',place:'アクアシティ南',x:-105,z:60,w:12,d:10,h:5,scale:4},
+  se:{name:'TOWER',place:'フジテレビ東',x:175,z:-45,w:9,d:9,h:46,scale:3},
 } as const;

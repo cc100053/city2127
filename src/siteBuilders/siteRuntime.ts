@@ -109,6 +109,7 @@ export function createSiteRoot(scene: T.Scene, socketId: LotSocketId): T.Group {
   const root = new T.Group();
   root.name = `survey-site-${socketId}`;
   root.position.set(changeSites[socketId].x, 0, changeSites[socketId].z);
+  root.scale.setScalar(changeSites[socketId].scale);
   scene.add(root);
   return root;
 }

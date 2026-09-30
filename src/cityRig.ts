@@ -64,19 +64,21 @@ export function cityRig(scene:T.Scene) {
   const civicLights:T.PointLight[]=[];
   // ponytail: four shadowless site lights; use a baked lightmap if wall leakage becomes visible.
   for(const site of Object.values(changeSites)){
-    const x=site.x+site.w/2+1,z=site.z+site.d/2,mast=new T.Group();mast.position.set(x,0,z);scene.add(mast);
+    // Built in site units and scaled with the site, so the mast reads at the same size beside it.
+    const s=site.scale,mast=new T.Group();mast.position.set(site.x+(site.w/2+1)*s,0,site.z+site.d/2*s);mast.scale.setScalar(s);scene.add(mast);
     // A slim split mast with a luminous underside, shared across site entrances.
     box(mast,[.22,6,.28],[0,3.45,0],trim,.06);
     box(mast,[.07,4.8,.07],[0,3.3,.18],futureLight,.02);
     box(mast,[2.6,.18,.8],[-.95,6.5,0],trim,.08);
     box(mast,[2.25,.06,.65],[-.95,6.38,0],publicLight,.02);
-    const light=new T.PointLight('#e0eee5',0,19,2);light.position.set(x-.95,6.15,z);
-    light.name='civic-night-light';scene.add(light);civicLights.push(light);
+    // Range and peak grow with the site so the lit area keeps its proportion (inverse-square decay).
+    const light=new T.PointLight('#e0eee5',0,19*s,2);light.position.set(-.95,6.15,0);light.userData.peak=95*s*s;
+    light.name='civic-night-light';mast.add(light);civicLights.push(light);
   }
   return {
     update(state:WorldState,_time:number,night:number) {
       publicLight.emissiveIntensity=.15+night*1.3;
-      civicLights.forEach(light=>light.intensity=night*95);
+      civicLights.forEach(light=>light.intensity=night*light.userData.peak);
       futureLight.emissiveIntensity=.25+state.neon*.5+night*.45;
       membrane.opacity=.6+state.greenery*.18;
     },

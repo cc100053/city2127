@@ -1,6 +1,6 @@
 # Odaiba 2127 — venue transition plan (DRAFT)
 
-- Status: APPROVED 2026-09-30 (decisions below). P0 and P1 done on `codex/odaiba-venue`; next P2.
+- Status: APPROVED 2026-09-30 (decisions below). P0–P2 done on `codex/odaiba-venue`; next P3.
 - Drafted: 2026-09-30 against `main` `4bc1646`; Odaiba sources read from `origin/codex/odaiba-preview` `3a8a5f2` (contains all of `origin/feat/odaiba-assets-progress-02` `40d696e`).
 - Supersedes on approval: the "single Shibuya setting" constraint in [AGENTS.md](../AGENTS.md), [PROJECT.md](PROJECT.md) and [PLAN02.md](PLAN02.md). Shibuya is **replaced**, not kept selectable; it stays in Git history.
 
@@ -55,16 +55,16 @@ Shibuya is compressed art units (roughly metres, whole scene ±75). Odaiba is su
 - A 1.7 m pedestrian is a few pixels at 600 m. Actors read as *flows* (lines of light on decks, pod trains, drone swarms), not individuals. That fits 2127 better anyway.
 - Site builders were sized for 8–12 unit lots next to 48 m towers. Add one `scale` per `changeSites` entry, applied at the `siteRuntime` root, instead of rewriting four builders.
 
-## Four change sites on Odaiba (chosen; exact coordinates set in P2 from the P1 hero frame)
+## Four change sites on Odaiba (placed in P2, 2026-09-30)
 
 Same sockets, same axes, same builders — only location, scale and name change.
 
 | Socket / axis | Builder | Odaiba candidate | Why it reads |
 | --- | --- | --- | --- |
-| nw · automation | Automation hub | Daiba station deck, between Aqua City and the Yurikamome guideway | Logistics/pod interchange at the transit node. |
-| ne · environment | Environment park | Fuji TV front open plaza → Odaiba Seaside Park edge | Waterfront canopy vs. active-cooling shade roofs; trees from the instance data already sit here. |
-| sw · public sharing | Commons plaza | Symbol Promenade between Fuji TV and DiverCity | Existing public spine; reserved pods vs. open commons is visible from the hero. |
-| se · concentration | Concentration tower | Vacant parcel south of the guideway (visible as empty ground in the Phase 03D oblique preview) | Only site with room for a tall/low swing without hiding Fuji TV. |
+| nw · automation | Automation hub ×3 | Waterfront west of DECKS (40, −300) · デックス西 | Beach-front service node; the station deck was too close to the tower's hero bearing, so the two stacked into one silhouette. |
+| ne · environment | Environment park ×4 | Odaiba Seaside Park lawn west of Aqua City (−210, −135) · お台場海浜公園 | Waterfront canopy vs. active-cooling shade roofs, in the foreground of the hero. |
+| sw · public sharing | Commons plaza ×4 | Open ground between Aqua City and Hilton (−105, 60) · アクアシティ南 | The Fuji TV–DiverCity promenade is hidden behind Fuji TV from the hero; this open lawn is visible and public. |
+| se · concentration | Concentration tower ×3 | Service ground east of Fuji TV (175, −45) · フジテレビ東 | Tall variant (138 m) stands beside the sphere; low variant stays a readable pavilion pair. |
 
 ## Making it feel 2127
 
@@ -85,7 +85,7 @@ Each phase is one branch, merged after `npm test`, `npm run build`, `git diff --
 | --- | --- | --- |
 | P0 ✅ | **Approval + spike.** Path-wise import (command above). Load environment + 8 buildings into root `main.ts` with the existing post chain; temporary hero pose. | Measured FPS / draw calls at 1920×1080 on the exhibition machine (Shibuya baseline 60 FPS, 356 draws). If it fails, decimate Fuji TV / DiverCity in Blender or drop Telecom first. The asset inspector's 3.3 FPS was not on exhibition hardware — measure, don't assume. |
 | P1 ✅ | **Ground swap.** Remove Shibuya landmark builders from runtime; terrain + sea + buildings; (trees/streetlights are already consolidated in the environment GLB, so no instancing is needed); hero camera, orbit limits, fog, shadow box; material remap. | Browser capture day/dusk/night; no console errors; Shibuya-only tests updated or retired. |
-| P2 | **Sites.** New `changeSites` coordinates + per-site scale; place names; `surveyAtmosphere` panel. | `?survey` shows all four sites changing with 3 s transitions; snapshot/reset immediate; site tests pass. |
+| P2 ✅ | **Sites.** New `changeSites` coordinates + per-site scale; place names; `surveyAtmosphere` panel. | `?survey` shows all four sites changing with 3 s transitions; snapshot/reset immediate; site tests pass. |
 | P3 | **Mobility.** Deck walkers, guideway pods, sphere drones, water taxis. | `tests/mobility.test.ts` route checks rewritten for Odaiba routes; no actor clips a building. |
 | P4 | **2127 layer.** Raised sea + tidal promenade, sphere hub, retrofit kit, sky bridges, night media globe. | Art review against this section; FPS re-measured. |
 | P5 | **Copy + docs.** Questions (お台場, ids unchanged), guest UI, overlay, README, PROJECT, PLAN02, AGENTS, VALIDATION. | `survey` tests/build; local Markdown links. |

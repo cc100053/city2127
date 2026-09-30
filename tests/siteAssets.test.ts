@@ -189,7 +189,8 @@ const maxRadius = (group: T.Object3D) => {
     const positions = object.geometry.getAttribute('position');
     for (let index = 0; index < positions.count; index++) {
       point.fromBufferAttribute(positions, index).applyMatrix4(object.matrixWorld);
-      max = Math.max(max, Math.hypot(point.x - builtPark.root.position.x, point.z - builtPark.root.position.z));
+      // Lot radius is in site units; the root carries the Odaiba scale.
+      max = Math.max(max, Math.hypot(point.x - builtPark.root.position.x, point.z - builtPark.root.position.z) / builtPark.root.scale.x);
     }
   });
   return max;
@@ -242,11 +243,11 @@ const boundsOfVisibleInstances = () => {
       if (Math.abs(instance.elements[5]) <= 1e-4) continue;
       world.multiplyMatrices(object.matrixWorld, instance);
       for (const [x, y, z] of corners) {
-        point.set(x, y, z).applyMatrix4(world);
-        minX = Math.min(minX, point.x - fittedPark.root.position.x);
-        maxX = Math.max(maxX, point.x - fittedPark.root.position.x);
-        minZ = Math.min(minZ, point.z - fittedPark.root.position.z);
-        maxZ = Math.max(maxZ, point.z - fittedPark.root.position.z);
+        point.set(x, y, z).applyMatrix4(world).sub(fittedPark.root.position).divideScalar(fittedPark.root.scale.x);
+        minX = Math.min(minX, point.x);
+        maxX = Math.max(maxX, point.x);
+        minZ = Math.min(minZ, point.z);
+        maxZ = Math.max(maxZ, point.z);
       }
     }
   });
