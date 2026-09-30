@@ -82,6 +82,41 @@ export function civicCore() {
   // Elevated public continuity through the chassis: one bay-facing ring floor and a rear transfer deck.
   arc(root,25,34,2,[-18,61,23],stone,Math.PI*.05,Math.PI*1.8);
   box(root,[132,2.5,12],[-2,61,64],stone);
+  // Transfer beams carry inhabited ecological terraces; the centre stays open around the chamber.
+  const crown=new T.IcosahedronGeometry(1,2);
+  const grove=(x:number,y:number,z:number,i:number)=>{
+    box(root,[.55,3,.55],[x,y+1.5,z],solar);
+    for(let j=0;j<3;j++){
+      const tree=new T.Mesh(crown,leaf),a=j*2.4+i;
+      tree.position.set(x+Math.cos(a)*1.2,y+3.6+(j%2),z+Math.sin(a)*1.2);
+      tree.scale.set(2.4,2+(i%3)*.35,2.2);root.add(tree);
+    }
+  };
+  for(const y of [62.5,133]){
+    box(root,[132,2,19],[-2,y,64],stone);
+    for(const z of [56,72]){
+      box(root,[116,1.1,3],[-2,y+1.5,z],leaf);
+      box(root,[128,1.3,.25],[-2,y+1.7,z+(z===56?-1.7:1.7)],membrane);
+      for(let x=-54;x<55;x+=12)grove(x,y+2.1,z,x);
+    }
+  }
+  // A climate gallery hangs from the roof transfer, its lower deck returning to the rear cores.
+  box(root,[88,2,16],[-2,112,64],stone);
+  box(root,[86,10,13],[-2,118,64],glass);
+  box(root,[90,1.2,18],[-2,124,64],trim);
+  for(let x=-44;x<=40;x+=12){
+    member([x,112,56],[x,132,56],.55,.65,solar);
+    member([x,112,72],[x,132,72],.55,.65,solar);
+  }
+  for(const x of [-68,64])member([x,62,64],[x<0?-44:40,112,64],2.5,3);
+  // Soil ribbons follow the occupied ring without closing its bay-facing public edge.
+  for(const a of [.35,1.7,3.1,4.5]){
+    arc(root,30,33,1.1,[-18,63,23],leaf,a,.65);
+    for(let i=0;i<3;i++){
+      const angle=a+.12+i*.2;
+      grove(-18+Math.cos(angle)*31.5,64.1,23-Math.sin(angle)*31.5,i);
+    }
+  }
   const generated=new Set<T.BufferGeometry>();
   root.traverse(object=>{if(object instanceof T.Mesh && object.geometry.type!=='RoundedBoxGeometry')generated.add(object.geometry);});
   const batches=bake(root);root.clear();batches.forEach(mesh=>{mesh.name='fuji-civic-chassis';root.add(mesh);});

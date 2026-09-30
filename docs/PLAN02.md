@@ -1,5 +1,9 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
+## 台場 Dream Loop 第4–6輪 — 2026-09-30，仍未達視覺目標
+
+使用者要求再跑三輪；同一目標、鏡位與 R01–R06 保留。新增三組分層潮汐平台、核心公共花園及懸掛廊、避開 site／路線的地面樹群，修正日間反射與樹冠重複染色。實際路徑碰撞及日間變暗回退已修正並重新驗證。見 [第六輪日間](../artifacts/odaiba-dream-pass6.jpg)、[夜間](../artifacts/odaiba-dream-pass6-night.jpg)、[交接](handoffs/odaiba-dream-loop.md)。仍有商場／酒店量體、連續海岸、遠景與細節密度差距，不宣稱已接近逐像素重現；第六輪後供美術審閱，未整合 main。
+
 ## 台場 Dream Loop — 2026-09-30，三輪後待美術審閱
 
 延續 `feat/art-direction`：依現況截圖生成固定目標，完成三輪材質／植栽／立面打磨。新增共用波紋海水、草地與日間天空貼圖、原植栽位置的 instanced 樹冠、Aqua／DECKS 屋頂植栽與背景立面 panel。原 hero 鏡位、海岸形狀、交通路線、四個 survey site 和二進位模型保留。這是現有模型的打磨，尚未完成 master taste 的厚海岸、連續 civic terrain 與建築類型轉換；不宣稱已達生成目標。見 [前圖](../artifacts/odaiba-dream-before.jpg)、[目標](../artifacts/odaiba-dream-target.png)、[後圖](../artifacts/odaiba-dream-after.jpg) 及 [交接](handoffs/odaiba-dream-loop.md)。三輪後按 Dream Loop Plus 流程停止視覺迭代，交由使用者審閱；未整合 main。

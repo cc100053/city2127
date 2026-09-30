@@ -4,7 +4,7 @@ import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
 import { civicCore } from './civicCore';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
-import { plantCanopy, plantRoofCanopy } from './coastalCanopy';
+import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
 import { contextFacades } from './contextFacades';
 
 // Literal paths bundle the environment and seven retained landmarks; Fuji is now the procedural civic chassis.
@@ -74,4 +74,5 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
         else if (roofRetrofit[material.name]) { const [color, roughness, metalness] = roofRetrofit[material.name]; material.color.set(color); material.roughness = roughness; material.metalness = metalness; }
     });
   }));
+  plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name)));
 }

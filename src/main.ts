@@ -31,8 +31,7 @@ try {
   renderer.info.autoReset=false;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.VSMShadowMap;
   renderer.domElement.setAttribute('aria-label','The Odaiba waterfront around the Fuji TV sphere in 2127. Drag to orbit, scroll to zoom, right-drag to pan. One city day, dawn to night, passes every three minutes.');
   document.querySelector('#app')!.appendChild(renderer.domElement);
-  const environment=new T.PMREMGenerator(renderer),room=new RoomEnvironment();
-  scene.environment=environment.fromScene(room,.04).texture;scene.environmentIntensity=.6;room.dispose();environment.dispose();
+  scene.environmentIntensity=.6;
   const camera=heroCamera(innerWidth,innerHeight);
   const reviewParams=new URLSearchParams(location.search);
   const civicReview=import.meta.env.DEV && reviewParams.get('review')==='civic';
@@ -43,10 +42,18 @@ try {
   // Shadow box fitted to the hero cluster (Fuji TV, Aqua City, DECKS, Hilton, Nikko, DiverCity), in metres.
   sun.shadow.mapSize.set(4096,4096);Object.assign(sun.shadow.camera,{left:-480,right:480,top:480,bottom:-480,near:10,far:2400});sun.shadow.normalBias=.3;sun.shadow.radius=5;sun.shadow.blurSamples=12;scene.add(sun);
   // Generated clouds fade into the clock-driven gradient at dusk; the sky follows the camera.
-  const skyTexture=new T.TextureLoader().load(new URL('../asset/textures/maritime-sky.png',import.meta.url).href);skyTexture.colorSpace=T.SRGBColorSpace;
+  const skyTexture=new T.TextureLoader().load(new URL('../asset/textures/maritime-sky.png',import.meta.url).href,texture=>{
+    // The generated sky is LDR: preserve HDR light-card energy while replacing enclosed-room reflections.
+    const capture=new RoomEnvironment(),pmrem=new T.PMREMGenerator(renderer);
+    capture.background=texture;
+    capture.traverse(object=>{if(object instanceof T.Mesh && object.material instanceof T.MeshStandardMaterial)object.visible=false;});
+    scene.environment=pmrem.fromScene(capture,.04).texture;
+    capture.dispose();pmrem.dispose();
+  });skyTexture.colorSpace=T.SRGBColorSpace;
+  skyTexture.mapping=T.EquirectangularReflectionMapping;
   const sky=new T.Mesh(new T.SphereGeometry(1500,24,12),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{top:{value:new T.Color()},horizon:{value:new T.Color()},clouds:{value:skyTexture},day:{value:1}},
     vertexShader:'varying vec3 p;varying vec2 skyUv;void main(){p=position;skyUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader:'uniform vec3 top,horizon;uniform sampler2D clouds;uniform float day;varying vec3 p;varying vec2 skyUv;void main(){float h=clamp(normalize(p).y*1.8,0.,1.);vec3 gradient=mix(horizon,top,pow(h,.65));vec3 cloud=texture2D(clouds,skyUv).rgb;gl_FragColor=vec4(mix(gradient,cloud,day*.8*smoothstep(-.04,.12,normalize(p).y)),1.);}'}));
+    fragmentShader:'uniform vec3 top,horizon;uniform sampler2D clouds;uniform float day;varying vec3 p;varying vec2 skyUv;void main(){float altitude=normalize(p).y;float h=clamp(altitude*1.8,0.,1.);vec3 gradient=mix(horizon,top,pow(h,.65));vec3 cloud=texture2D(clouds,vec2(skyUv.x,min(1.,skyUv.y+.1))).rgb;gl_FragColor=vec4(mix(gradient,cloud,day*.9*smoothstep(-.06,.035,altitude)),1.);}'}));
   sky.frustumCulled=false;sky.renderOrder=-1;scene.add(sky);
   // Open sea beyond the masterplan plate; fog closes the horizon.
   const water=bayWater();
@@ -121,7 +128,7 @@ try {
     const light=nightLighting(dark);
     ambient.intensity=(.7+pulse*.15+still*.15)*light.ambient;
     ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientNight,dark);
-    scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure*(1+.1*day);
+    scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure*(1+.16*day);
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
     controls.update();rig.update(s,now,dark);updateOdaiba(dark);cityChanges?.update(now);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
     if(++frames===120){renderer.domElement.dataset.hour=hour.toFixed(2);renderer.domElement.dataset.displayMode=displayMode;renderer.domElement.dataset.time=now.toFixed(2);renderer.domElement.dataset.fps=(120000/(performance.now()-measureStart)).toFixed(1);renderer.domElement.dataset.drawCalls=String(renderer.info.render.calls);renderer.domElement.dataset.geometries=String(renderer.info.memory.geometries);if(cityChanges)renderer.domElement.dataset.siteAssets=JSON.stringify(cityChanges.getDiagnostics());frames=0;measureStart=performance.now();}

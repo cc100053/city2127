@@ -1,5 +1,11 @@
 # Project contract and implementation map
 
+## Odaiba Dream Loop passes 4–6 — 2026-09-30 (human art review pending)
+
+`build2127` now adds `amphibiousShore()`: three tiered crescent water rooms at the existing deck positions, with landward openings and five merged shared finishes. `civicCore` adds planted rear transfer terraces and a suspended climate gallery within the existing frame. After landmarks load, `plantLandscapeCanopy` raycasts authored landscape patches and excludes landmark pads, the four sites and sampled train/walker paths before adding two instanced batches. These are architectural/planting proxies, without tide, filtering or additional actor simulation.
+
+`main` captures the existing generated sky behind RoomEnvironment's HDR light cards with native PMREM; indoor walls/boxes are hidden from that capture. The visible sky still fades its texture at night, while the fixed reflection map follows existing clock-dependent intensity. The cloud belt appears at a lower angle; daylight exposure multiplier is 1.16 and canopy instance colours no longer receive a second green multiplier. No new textures, dependencies, model binaries, camera, routes or survey rules. Actual-mesh tests include new terraces/groves/core. [Handoff](handoffs/odaiba-dream-loop.md) records verification and remaining large visual gaps; six passes are not target acceptance.
+
 ## Odaiba Dream Loop material pass — 2026-09-30 (three passes; human art review pending)
 
 The three-pass continuation on `feat/art-direction` adds `bayWater()` shared by the surveyed sea and extended sea plane, generated world-scaled grass on existing landscape surfaces, generated cloud imagery blended with the existing clock-driven sky (zero texture contribution at night), and retained-landmark glazing response. `plantCanopy` replaces the roadside tree blockout using existing surveyed positions; `plantRoofCanopy` samples authored planted roofs; `contextFacades` adds instanced panels to context massing. The hero camera, model binaries, route data and survey contract remain unchanged. Maritime fog is now `.00024 + haze × .00016`. See the [Dream Loop handoff](handoffs/odaiba-dream-loop.md) for texture provenance, staged validation and remaining target gaps. Earlier art-pass lighting statements below describe that earlier stage.
