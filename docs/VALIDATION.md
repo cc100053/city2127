@@ -472,3 +472,7 @@ Branch `codex/odaiba-venue`. Root `npm test` and `npm run build` passed (existin
 ## Odaiba venue P2 — 2026-09-30
 
 Branch `codex/odaiba-venue`. Root `npm test` and `npm run build` passed; `git diff --check` clean; `survey/` and `module-swap/` unchanged. `tests/odaiba.test.ts` passes the new lot-ground and hero-visibility checks for all four sites. Scratch survey server (port 8791, scratch SQLite) with root `?survey=ws://127.0.0.1:8791/ws` on the exhibition machine (headed Chrome 154, ANGLE Metal Apple M6, 1920×1080): baseline 59.6 FPS / 1,525 draws; all-high (31 guests) 59.1 / 1,581; all-low (17 guests) 59.5 / 1,545 at 12:00 and 59.2 / 1,547 at 22:00; no page errors. Captures: [baseline](../artifacts/odaiba-p2-baseline.png), [high](../artifacts/odaiba-p2-high.png), [low](../artifacts/odaiba-p2-low.png), [low 22:00](../artifacts/odaiba-p2-low-2200.png). Not checked: 1280×720, transition timing re-measure, art acceptance.
+
+## Odaiba venue P3 — 2026-09-30
+
+Branch `codex/odaiba-venue`. Root `npm test` (new Odaiba mobility suite plus raycast route checks in `tests/odaiba.test.ts`) and `npm run build` passed; `git diff --check` clean; `survey/` and `module-swap/` unchanged. Exhibition machine (headed Chrome 154, ANGLE Metal Apple M6, 1920×1080): 60.3 FPS / 1,307 draws at 12:00 and 60.2 / 1,309 at 22:00, no page errors. Captures: [12:00](../artifacts/odaiba-p3-1200.png), [22:00](../artifacts/odaiba-p3-2200.png), [zoomed](../artifacts/odaiba-p3-close.png). Not checked: `?survey` with actors (site/route separation is covered by tests), art acceptance.

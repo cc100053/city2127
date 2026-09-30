@@ -6,6 +6,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
 import { changeSites } from '../src/layout.ts';
 import { heroCamera } from '../src/heroCamera.ts';
+import { routes } from '../src/mobility.ts';
 
 const layout = JSON.parse(readFileSync(new URL('../src/odaiba-layout.json', import.meta.url), 'utf8'));
 const hash = (bytes: Buffer) => createHash('sha256').update(bytes).digest('hex');
@@ -67,5 +68,30 @@ for (const site of Object.values(changeSites)) {
   const blocker = ray.intersectObject(city, true)[0];
   assert.ok(!blocker || blocker.distance > camera.position.distanceTo(look) - 1, `${site.name} hidden from the hero pose by ${blocker?.object.name}`);
 }
+// Actors: pods ride on the guideway deck, walkers (both lanes) stay on open ground outside the site lots, boats stay on water.
+const actorPaths = routes(), side = new Vector3(), tangent = new Vector3(), up = new Vector3(0, 1, 0);
+const groundAt = (x: number, z: number, from = 500) => { ray.set(new Vector3(x, from, z), down); return ray.intersectObject(city, true)[0]; };
+for (let i = 0; i <= 400; i++) {
+  // Guardrails and station roofs sit on the deck; only landmark geometry above it would block a pod.
+  const p = actorPaths.guideway.getPointAt(i / 400);
+  ray.set(new Vector3(p.x, p.y + 6, p.z), down);
+  const hits = ray.intersectObject(city, true), deck = hits.find(h => /^YURIKAMOME/.test(h.object.name));
+  assert.ok(deck && Math.abs(deck.point.y - p.y) < .5, `pod path leaves the guideway at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
+  assert.ok(!hits.some(h => h.distance < deck.distance && !/^(YURIKAMOME|PHASE03D_GUARDRAILS|STATIONS|PUBLIC_LINK_BRIDGES)/.test(h.object.name)), `pod path blocked at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
+}
+for (const promenade of actorPaths.promenades) for (let i = 0; i <= 400; i++) for (const lane of [-2.8, 0, 2.8]) {
+  const p = promenade.getPointAt(i / 400); promenade.getTangentAt(i / 400, tangent);
+  p.addScaledVector(side.crossVectors(up, tangent).normalize(), lane);
+  const hit = groundAt(p.x, p.z);
+  assert.ok(hit && openGround.test(hit.object.name) && hit.point.y < 3, `walker lane ${lane} meets ${hit?.object.name} at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
+  for (const site of Object.values(changeSites))
+    assert.ok(Math.abs(p.x - site.x) > site.w * site.scale / 2 + 1 || Math.abs(p.z - site.z) > site.d * site.scale / 2 + 1, `walker path crosses the ${site.name} lot`);
+}
+for (const [name, route] of [['water loop', actorPaths.water], ['ferry lane', actorPaths.ferry]] as const) for (let i = 0; i <= 400; i++) for (const beam of [-6, 0, 6]) {
+  const p = route.getPointAt(i / 400); route.getTangentAt(i / 400, tangent); p.addScaledVector(side.crossVectors(up, tangent).normalize(), beam);
+  const hit = groundAt(p.x, p.z);
+  assert.ok(!hit || /^WATER/.test(hit.object.name), `${name} runs aground on ${hit?.object.name} at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
+}
+console.log('Odaiba: pods ride the guideway deck, walkers keep to open ground outside site lots, water taxis stay afloat.');
 console.log('Odaiba: survey sites sit on open ground, clear of roads, landmarks and guideway, and are visible from the hero pose.');
 console.log('Odaiba: eight GLBs match Phase 03D world bounds within 2 mm, grounded, unit scale, legacy axis verified.');

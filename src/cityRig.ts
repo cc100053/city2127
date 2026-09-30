@@ -3,6 +3,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets';
 import { changeSites } from './layout.ts';
+import { mobility } from './mobility.ts';
 
 // Three finishes: matte ceramic composite, refined metal, and reflective glass. Same shader, different response to the one environment map.
 export const paint = (color: T.ColorRepresentation, roughness=.52, metalness=0) => new T.MeshStandardMaterial({ color, roughness, metalness });
@@ -59,7 +60,7 @@ export function sign(group:T.Group, kit:Kit, text:string, x:number,y:number,z:nu
   box(group,[w+.2,h+.2,.25],[x,y,z-.05],trim,.1);
   const panel=new T.Mesh(new T.PlaneGeometry(w,h),material);panel.position.set(x,y,z+.09);group.add(panel);
 }
-/** Shared finishes and the civic lights at the survey sites; the Odaiba ground and landmarks load in `odaibaScene`. */
+/** Shared finishes, the civic lights at the survey sites and the ambient actors; the Odaiba ground and landmarks load in `odaibaScene`. */
 export function cityRig(scene:T.Scene) {
   const civicLights:T.PointLight[]=[];
   // ponytail: four shadowless site lights; use a baked lightmap if wall leakage becomes visible.
@@ -75,12 +76,14 @@ export function cityRig(scene:T.Scene) {
     const light=new T.PointLight('#e0eee5',0,19*s,2);light.position.set(-.95,6.15,0);light.userData.peak=95*s*s;
     light.name='civic-night-light';mast.add(light);civicLights.push(light);
   }
+  const updateMobility=mobility(scene);
   return {
-    update(state:WorldState,_time:number,night:number) {
+    update(state:WorldState,time:number,night:number) {
       publicLight.emissiveIntensity=.15+night*1.3;
       civicLights.forEach(light=>light.intensity=night*light.userData.peak);
       futureLight.emissiveIntensity=.25+state.neon*.5+night*.45;
       membrane.opacity=.6+state.greenery*.18;
+      updateMobility(state,time);
     },
   };
 }
