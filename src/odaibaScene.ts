@@ -2,15 +2,15 @@ import * as T from 'three';
 import { addCityModel } from './modelAssets';
 import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
+import { civicCore } from './civicCore';
 
-// Literal paths so Vite bundles exactly the environment and the eight named buildings.
+// Literal paths bundle the environment and seven retained landmarks; Fuji is now the procedural civic chassis.
 const environmentUrl = new URL('../asset/models/odaiba-masterplan/odaiba_masterplan_v01_phase03d_environment.glb', import.meta.url).href;
 const buildingUrls: Record<string, string> = {
   'aqua-city-odaiba': new URL('../asset/models/aqua-city-odaiba/aqua-city-odaiba.glb', import.meta.url).href,
   'decks-tokyo-beach': new URL('../asset/models/decks-tokyo-beach/decks-tokyo-beach.glb', import.meta.url).href,
   'divercity-tokyo-plaza': new URL('../asset/models/divercity-tokyo-plaza/divercity-tokyo-plaza.glb', import.meta.url).href,
   'divercity-office-tower': new URL('../asset/models/divercity-office-tower/divercity-office-tower.glb', import.meta.url).href,
-  'fuji-tv': new URL('../asset/models/fuji-tv/fuji-tv.glb', import.meta.url).href,
   'hilton-tokyo-odaiba': new URL('../asset/models/hilton-tokyo-odaiba/hilton-tokyo-odaiba.glb', import.meta.url).href,
   'grand-nikko-tokyo-daiba': new URL('../asset/models/grand-nikko-tokyo-daiba/grand-nikko-tokyo-daiba.glb', import.meta.url).href,
   'telecom-center': new URL('../asset/models/telecom-center/telecom-center.glb', import.meta.url).href,
@@ -28,14 +28,12 @@ const roofRetrofit: Record<string, [color: string, roughness: number, metalness:
   'Roof and Shadow': ['#7d9f68', .85, 0], 'Standing seam roof.001': ['#486b83', .3, .85], 'Gray roof metal': ['#486b83', .3, .85],
 };
 const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a');
-let sphere: T.MeshStandardMaterial | undefined;
-/** Night: glazing glows warm so the landmarks keep their silhouettes; the Fuji TV sphere becomes a soft mint beacon. */
+/** Night: retained landmark glazing glows warm; the civic chassis uses the shared city finishes. */
 export function updateOdaiba(night: number) {
   for (const material of glazing) material.emissiveIntensity = night * .55;
-  if (sphere) sphere.emissiveIntensity = night * .5;
 }
 
-/** Phase 03D environment plus the eight landmark buildings at their surveyed placements, in metres. */
+/** Phase 03D environment, seven surveyed landmarks and the replacement Fuji civic core, in metres. */
 export async function loadOdaiba(scene: T.Scene) {
   const environment = await addCityModel(scene, environmentUrl, [0, 0, 0]);
   environment.name = 'odaiba-environment';
@@ -47,6 +45,7 @@ export async function loadOdaiba(scene: T.Scene) {
     if (material.name === 'water') object.castShadow = object.receiveShadow = false;
   });
   await Promise.all(layout.buildings.map(async placement => {
+    if(placement.id==='fuji-tv'){scene.add(civicCore());return;}
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);
     model.name = placement.id;
     placeOdaibaModel(model, placement);
@@ -55,7 +54,6 @@ export async function loadOdaiba(scene: T.Scene) {
       for (const material of [object.material].flat() as T.MeshStandardMaterial[])
         if (/glass|glazing|window/i.test(material.name) && !glazing.has(material)) { material.emissive.copy(warm); material.emissiveIntensity = 0; glazing.add(material); }
         else if (roofRetrofit[material.name]) { const [color, roughness, metalness] = roofRetrofit[material.name]; material.color.set(color); material.roughness = roughness; material.metalness = metalness; }
-        else if (material.name === 'Sphere - titanium panels') { sphere = material; material.emissive.set('#8ce5d8'); material.emissiveIntensity = 0; }
     });
   }));
 }

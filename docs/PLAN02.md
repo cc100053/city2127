@@ -1,5 +1,9 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
+## 台場視覺方向 pass 1 — 2026-09-30，待人類美術審閱
+
+[R01–R06／CITY_MASTER_TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) 是現行視覺依據，優先於以下歷史 Plan 02。今次在 `feat/art-direction` 只替換 Fuji 辦公樓類型：開放城市巨構、懸吊公共 chamber、斜向 circulation 及可讀承重路徑。道路地塊、商場／酒店、海岸及原有光照仍未達參考圖；不代表全城美術完成或展覽驗收。下一個最高優先 gap 是核心到海岸之間仍由商場／道路地塊主導的城市組織。詳細 audit、固定前後圖及 GLB 候選見 [交接](handoffs/odaiba-art-direction-01.md)。此 pass 不整合 main，等人類決定方向。
+
 ## 最新補充 — 2026-09-30：場地改為台場（P0–P5 已實作，未整合）
 
 用戶決定台場富士電視台一帶取代澀谷做展覽城市。`codex/odaiba-venue`（未整合）已完成 P0–P5：Phase 03D 地形、海同八棟地標；四個改變地點、交通路線、2127 改造層同海濱版題目都已對位台場。見 [ODAIBA_PLAN.md](ODAIBA_PLAN.md)。以下澀谷內容係歷史紀錄。

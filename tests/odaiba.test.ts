@@ -7,6 +7,7 @@ import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
 import { changeSites, skyBridges, floatingDecks } from '../src/layout.ts';
 import { heroCamera } from '../src/heroCamera.ts';
 import { routes } from '../src/mobility.ts';
+import { civicCore } from '../src/civicCore.ts';
 
 const layout = JSON.parse(readFileSync(new URL('../src/odaiba-layout.json', import.meta.url), 'utf8'));
 const hash = (bytes: Buffer) => createHash('sha256').update(bytes).digest('hex');
@@ -42,9 +43,25 @@ for (const placement of layout.buildings) {
       `${placement.id} bound ${side}/${axis}: ${v} differs from source ${expected[side][axis]}`);
   }));
   assert.ok(Math.abs(actual.min.y) < .002, `${placement.id} grounded at source pad`);
-  city.add(scene);
+  if(placement.id!=='fuji-tv')city.add(scene);
 }
 assert.equal(triangles, 339919, 'All eight complete GLBs retain reviewed geometry');
+const core=civicCore();city.add(core);
+const coreBounds=new Box3().setFromObject(core);
+assert.ok(coreBounds.min.y>=-5 && coreBounds.max.y<155, 'Civic chassis stays below the district aerial corridor');
+assert.ok(core.children.length<=8, 'Static civic chassis batches by shared material');
+assert.ok(core.children.every(object=>object instanceof Mesh && !Array.isArray(object.material)), 'No per-member draws');
+// Actual chassis must preserve the bay approach and berth, including a 22 m aircraft wing envelope.
+core.updateMatrixWorld(true);
+const approach=routes().approach,clearanceRay=new Raycaster();
+for(let i=0;i<=160;i++) {
+  const p=approach.getPointAt(i/160);
+  for(const dx of [-11,0,11]) {
+    clearanceRay.set(p.clone().add(new Vector3(dx,0,0)),new Vector3(0,-1,0));
+    const hit=clearanceRay.intersectObject(core,true)[0];
+    assert.ok(!hit || hit.distance>5, `Civic core obstructs aerial approach at ${i}, wing ${dx}`);
+  }
+}
 
 // Survey sites: the whole scaled lot (plus a 5 m margin) lands on open ground, and the hero pose sees each site unobstructed.
 const environmentBytes = readFileSync(new URL('../asset/models/odaiba-masterplan/odaiba_masterplan_v01_phase03d_environment.glb', import.meta.url));

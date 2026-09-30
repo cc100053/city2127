@@ -33,6 +33,10 @@ try {
   const environment=new T.PMREMGenerator(renderer),room=new RoomEnvironment();
   scene.environment=environment.fromScene(room,.04).texture;scene.environmentIntensity=.6;room.dispose();environment.dispose();
   const camera=heroCamera(innerWidth,innerHeight);
+  const reviewParams=new URLSearchParams(location.search);
+  const civicReview=import.meta.env.DEV && reviewParams.get('review')==='civic';
+  if(civicReview){camera.position.set(-180,105,-235);camera.lookAt(-10,78,20);}
+  const reviewTime=import.meta.env.DEV && reviewParams.has('reviewTime') ? Number(reviewParams.get('reviewTime')) : NaN;
   const ambient=new T.HemisphereLight('#edf1e4','#8a8274',2.2);scene.add(ambient);
   const sun=new T.DirectionalLight('#ffe4b8',3.4);sun.position.set(-20,38,18);sun.castShadow=true;
   // Shadow box fitted to the hero cluster (Fuji TV, Aqua City, DECKS, Hilton, Nikko, DiverCity), in metres.
@@ -60,6 +64,7 @@ try {
   }
   const controls=new OrbitControls(camera,renderer.domElement);
   controls.target.set(...HERO_TARGET);controls.enableDamping=true;controls.dampingFactor=.06;controls.rotateSpeed=.45;controls.zoomSpeed=.6;controls.panSpeed=.8;
+  if(civicReview)controls.target.set(-10,78,20);
   controls.minDistance=150;controls.maxDistance=1400;controls.minPolarAngle=.35;controls.maxPolarAngle=1.42;controls.screenSpacePanning=false;controls.update();
   // MSAA target: the composer's default target has no samples, so edges were aliased once post-processing ran.
   const composer=new EffectComposer(renderer,new T.WebGLRenderTarget(innerWidth,innerHeight,{type:T.HalfFloatType,samples:4}));composer.setSize(innerWidth,innerHeight);composer.addPass(new RenderPass(scene,camera));
@@ -96,7 +101,7 @@ try {
   const start=performance.now();
   let frames=0,measureStart=start;
   renderer.setAnimationLoop(()=>{
-    now=(performance.now()-start)/1000;
+    now=Number.isFinite(reviewTime)&&reviewTime>=0 ? reviewTime : (performance.now()-start)/1000;
     const hour=hold??displayHour(displayMode,now),height=sunHeight(hour),day=daylight(hour),dark=1-day,glow=1-T.MathUtils.smoothstep(Math.abs(height),0,.4),nightSky=T.MathUtils.smoothstep(dark,.35,1);
     if(surveyUrl)world.update(now);
     const s=withNight(surveyUrl?world.state:moodAt(hour),dark);
