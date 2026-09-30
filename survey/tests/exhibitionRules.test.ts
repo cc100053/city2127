@@ -87,7 +87,7 @@ assert.deepEqual({
 assert.throws(() => exhibitionBand(Number.POSITIVE_INFINITY), RangeError);
 assert.throws(() => deriveExhibitionLayout({ ...zeroScores(), automation: -13 }), RangeError);
 
-const questionPath = new URL('../src/survey/questions.exhibition.json', import.meta.url).pathname;
+const questionPath = (await import('node:url')).fileURLToPath(new URL('../src/survey/questions.exhibition.json', import.meta.url));
 const questionSet = validateExhibitionQuestionSet(loadQuestionSetFile(questionPath));
 assert.equal(questionSet.version, 2);
 assert.equal(questionSet.questions.length, 4);

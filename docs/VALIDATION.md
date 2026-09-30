@@ -1,5 +1,17 @@
 # Validation and handoff
 
+## Single Fuji TV QR — 2026-09-30 latest local check
+
+On base `4bc1646` plus the current worktree, both QR production builds and all 10 package tests passed after the final detailed-geometry change. Chrome `verify-building-qr.mjs` passed single-building identity, view toggles, actual canvas QR decoding for demo and longer personal URL, URL replacement, repeated scanning, embedded layout and no-WebGL fallback. Reviewed building and scan screenshots in `qr-hud/test-results/`. Fuji now retains original authored normals and 127,928 triangles. Expected bundle-size warning: main about 14.3 MB raw / 1.42 MB gzip. Physical phone scan, exhibition hardware performance and full questionnaire flow were not rerun in this appearance-only change; previous integration evidence is historical. Fetch failed again, so remote freshness remains unverified. The existing merge/other integration edits are preserved and unpublished.
+
+## Odaiba QR update — 2026-09-30
+
+QR normal/exhibition builds and all 10 package tests passed. Browser building-QR suite passed after the Odaiba change: all three landmark IDs, Japanese Odaiba branding, actual rendered scan decoding for short and long personal URLs, view toggles, embedded layout and no-WebGL fallback. Reviewed updated city screenshot. Generated model vertices stay inside their QR parcels. Initial browser attempt failed because the preview server was stopped; after starting port5198 the suite passed. Prior full questionnaire integration evidence below predates this appearance-only update; it was not rerun. Physical camera/phone and Docker remain unverified. Source assets came from cached Git commit40d696e; network fetch failed, so remote freshness is not claimed.
+
+## Building QR — 2026-09-30 local worktree
+
+`feature/qr-city-results` on base `4bc1646`: QR 10 tests, normal/exhibition builds and whitespace check passed. `qr-hud/scripts/verify-building-qr.mjs` passed Chrome visual/actual-canvas decoding for demo URL and personal LAN URL, repeated view switching, URL regeneration, 750x620 embedded layout and no-WebGL standard QR fallback. Final screenshots reviewed in ignored `qr-hud/test-results/building-qr-{city,scan,embedded}.png`. Full `verify-integration.mjs` also passed against isolated port8796 SQLite: questionnaire → building QR decode → interactive personal 3D, touch rotation/button zoom, no live socket, later proposal/reset isolation. No physical phone scan, load benchmark or Docker build claimed. Existing integration merge remains uncommitted and unpublished; see [handoff](handoffs/building-qr.md).
+
 ## README language and startup guide — 2026-09-30
 
 Documentation-only change: the main README now has a Traditional Chinese Mac/Windows exhibition quick start, with separate English and Japanese guides. The guides identify the survey server and root city terminal tabs, the guest/city/admin/optional monitor browser tabs, default ports, SQLite persistence, staff exit confirmation, LAN binding and the legacy module-swap boundary. Startup commands and routes were checked against `package.json`, `survey/package.json`, `survey/src/server/server.ts`, `survey/vite.config.ts`, `src/main.ts` and the admin/monitor UI source. Local Markdown links in the three READMEs passed; Windows commands and a live cross-device LAN setup were not run. See the [README handoff](handoffs/readme-localization.md) for commit and integration status.
@@ -60,6 +72,11 @@ Browser status: the root and survey local endpoints returned HTTP 200 only. CUA 
 ## Exhibition lifecycle and admin reset — 2026-09-29
 
 **Status: IMPLEMENTED on `feat/exhibition-lifecycle`, not integrated.** Checked on the branch working tree (base `eaf230e`). `survey/`: `npm test` (14 suites, including the new `tests/lifecycle.test.ts`) and `npm run build` passed; `git diff --check` passed. Root and `module-swap/` sources are unchanged. The lifecycle test covers cumulative inheritance, a reset queued during an experience that survives submission and runs only on `guest-left`, an immediate reset in `ready`, full-reset precedence/cancel/total clearing, stale `expectedRevision` and double exit confirmation, replayed submissions counted once, an abandoned session, the ready/pending CHECK and restart persistence. Headless Chromium (playwright-cli) against a scratch DB showed the admin page's phase, both counters and four meters; a city reset queued from one admin session appeared in a second session, the next guest session was refused, and confirming the exit from the second session executed the reset (new run, 0 guests). No root-scene browser capture was taken for this change: the scene uses the existing `run-reset` path unchanged. Remote LAN admin access is still not available (loopback only).
+## Standalone QR HUD import — 2026-09-29
+
+Imported `qr-hud/` from the user's local project without runtime changes. In this checkout, QR `npm run build` and all 10 `npm test` cases passed (Node 22.16.0). `npm run test:e2e` passed QR decoding, session/URL editing, Japanese layouts, polling, image/MP4 playback, failure recovery and operator controls against the existing localhost:4173 preview of the matching source. These are isolated API/browser checks, not real Supabase or exhibition-phone acceptance. Current demo QR targets the HAL Tokyo website; it is not a published personal archive.
+
+Root tests and build passed under Node 24 via npm exec. Both builds retain bundle-size warnings. No survey or module-swap code changed. Existing CI does not run the new QR package. See [handoff](handoffs/qr-hud-import.md) for Git publication status; no merge or deployment is part of this import.
 
 ## Exhibition S2 — Q3 climate vertical slice — 2026-09-29
 

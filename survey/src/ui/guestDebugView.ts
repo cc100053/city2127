@@ -9,7 +9,7 @@ const app = document.querySelector<HTMLElement>('#app')!;
 app.classList.add('guest');
 document.body.classList.add('guest-page');
 
-type Screen = 'welcome' | 'starting' | 'question' | 'review' | 'submitting' | 'result' | 'handoff' | 'abandoned';
+type Screen = 'welcome' | 'starting' | 'question' | 'review' | 'submitting' | 'result' | 'archive' | 'handoff' | 'abandoned';
 type GuestRecovery = {
   session: ProposalSessionData;
   choices: [string, string][];
@@ -495,11 +495,22 @@ function renderResult(focus = true) {
     el('h2', {}, '街の構成'), renderCityChanges(proposal),
     renderScores(proposal.beforeScores, proposal.afterScores),
     el('p', { class: 'guest-copy' }, '街はこの提案を含む集計結果を引き継ぎます。次の方の回答で、共同の街を続けてつくります。'),
-    el('p', { class: 'guest-copy' }, 'この画面は約10秒後に次へ進みます。'),
-    el('div', { class: 'guest-actions' }, action('次の方へ', renderHandoff, true)));
+    el('p', { class: 'guest-copy' }, '約10秒後に、あなたの3D都市を開くQRコードを表示します。'),
+    el('div', { class: 'guest-actions' }, action('QRで街を持ち帰る', renderArchive, true)));
   if (focus) focusTitle();
   clearTimeout(flowTimer);
-  flowTimer = window.setTimeout(renderHandoff, RESULT_MS);
+  flowTimer = window.setTimeout(renderArchive, RESULT_MS);
+}
+
+function renderArchive() {
+  if (!saved) return renderWelcome();
+  clearTimeout(flowTimer); clearIdleTimers();
+  screen = 'archive';
+  page('あなたの街を持ち帰る', `提案 #${saved.proposal.ordinal}`,
+    el('p', { class: 'guest-copy' }, '会場Wi-Fiに接続してQRコードを読み取ってください。あなたが変えた3D都市を、スマートフォンで回転・拡大できます。'),
+    el('iframe', { src: `/qr/?archive=${encodeURIComponent(saved.proposal.id)}`, title: '都市の結果QRコード', class: 'guest-archive-frame' }),
+    el('div', { class: 'guest-actions' }, action('読み取りを終えて次へ', renderHandoff, true)));
+  focusTitle();
 }
 
 function renderHandoff() {
@@ -555,6 +566,7 @@ function renderCurrent(focus = true) {
   if (screen === 'question') return renderQuestion(focus);
   if (screen === 'review' || screen === 'submitting') return renderReview(focus);
   if (screen === 'result') return renderResult(focus);
+  if (screen === 'archive') return renderArchive();
   if (screen === 'handoff') return renderHandoff();
   renderAbandoned();
 }

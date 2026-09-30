@@ -19,18 +19,22 @@ import { scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
 import { createCityChangeManager } from './createCityChangeManager';
 import './style.css';
+import { loadPersonalCity, personalCityControls } from './personalCity';
 
-try {
+async function start() {
+  const archiveId=/^\/city\/([A-Za-z0-9_-]{1,128})\/?$/.exec(location.pathname)?.[1];
+  const personalView=archiveId?await loadPersonalCity(archiveId):null;
   const scene=new T.Scene();scene.background=new T.Color('#dfd6cd');scene.fog=new T.FogExp2('#dfd6cd',.008);
   const renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio,personalView?1:1.5));renderer.setSize(innerWidth,innerHeight);
   renderer.toneMapping=T.NeutralToneMapping;renderer.toneMappingExposure=.84;renderer.outputColorSpace=T.SRGBColorSpace;
-  renderer.info.autoReset=false;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.VSMShadowMap;
+  renderer.info.autoReset=false;renderer.shadowMap.enabled=!personalView;renderer.shadowMap.type=T.VSMShadowMap;
   renderer.domElement.setAttribute('aria-label','A multi-level Shibuya crossing in 2127. Drag to orbit, scroll to zoom, right-drag to pan. One city day, dawn to night, passes every three minutes.');
   document.querySelector('#app')!.appendChild(renderer.domElement);
   const environment=new T.PMREMGenerator(renderer),room=new RoomEnvironment();
   scene.environment=environment.fromScene(room,.04).texture;scene.environmentIntensity=.6;room.dispose();environment.dispose();
   const camera=heroCamera(innerWidth,innerHeight);
+  if(personalView){camera.position.sub(new T.Vector3(...HERO_TARGET)).multiplyScalar(Math.min(1.8,Math.max(1,Math.sqrt(innerHeight/innerWidth)))).add(new T.Vector3(...HERO_TARGET));}
   const ambient=new T.HemisphereLight('#edf1e4','#8a8274',2.2);scene.add(ambient);
   const sun=new T.DirectionalLight('#ffe4b8',3.4);sun.position.set(-20,38,18);sun.castShadow=true;
   sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-65,right:65,top:65,bottom:-65,near:1,far:180});sun.shadow.normalBias=.12;sun.shadow.radius=5;sun.shadow.blurSamples=12;scene.add(sun);
@@ -57,22 +61,34 @@ try {
   const controls=new OrbitControls(camera,renderer.domElement);
   controls.target.set(...HERO_TARGET);controls.enableDamping=true;controls.dampingFactor=.06;controls.rotateSpeed=.45;controls.zoomSpeed=.6;controls.panSpeed=.5;
   controls.minDistance=45;controls.maxDistance=180;controls.minPolarAngle=.35;controls.maxPolarAngle=1.42;controls.screenSpacePanning=false;controls.update();
+  if(personalView){controls.maxDistance=280;renderer.domElement.setAttribute('aria-label','あなたの3D都市。1本指で回転、2本指で拡大・縮小。');}
+  const personalReady=personalView?personalCityControls(personalView,camera,controls):null;
+  controls.addEventListener('change',()=>{renderer.domElement.dataset.camera=camera.position.toArray().map(n=>n.toFixed(2)).join(',');});
   // MSAA target: the composer's default target has no samples, so edges were aliased once post-processing ran.
-  const composer=new EffectComposer(renderer,new T.WebGLRenderTarget(innerWidth,innerHeight,{type:T.HalfFloatType,samples:4}));composer.setSize(innerWidth,innerHeight);composer.addPass(new RenderPass(scene,camera));
+  const composer=new EffectComposer(renderer,new T.WebGLRenderTarget(innerWidth,innerHeight,{type:T.HalfFloatType,samples:personalView?0:4}));composer.setSize(innerWidth,innerHeight);composer.addPass(new RenderPass(scene,camera));
   // Contact shadows where slabs, planters and cores meet: the cheapest step from blockout to built object.
   const ao=new GTAOPass(scene,camera,innerWidth,innerHeight);ao.updateGtaoMaterial({radius:3,distanceFallOff:.8,thickness:3,samples:16});ao.blendIntensity=1;composer.addPass(ao);
+  ao.enabled=!personalView;
   const bloom=new UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.2,.7,1);composer.addPass(bloom);
   const vignette=new ShaderPass(VignetteShader);vignette.uniforms.offset.value=.9;vignette.uniforms.darkness.value=.9;composer.addPass(vignette);composer.addPass(new OutputPass());
   const world=createWorldState();let now=0;
   const params=new URLSearchParams(location.search);
   // `?survey` or `?survey=ws://host:port/ws`: survey policy scores drive the city state; the day/night light still runs.
   const surveyParam=params.get('survey');
-  const surveyUrl=surveyParam===null?null:/^wss?:\/\//.test(surveyParam)?surveyParam:`ws://${location.hostname}:8787/ws`;
+  const integratedDisplay=location.pathname.startsWith('/display/');
+  const surveyUrl=personalView||surveyParam===null?null:/^wss?:\/\//.test(surveyParam)?surveyParam:integratedDisplay?`${location.protocol==='https:'?'wss':'ws'}://${location.host}/ws`:`ws://${location.hostname}:8787/ws`;
   // `?hour=21` holds the clock at one hour, for review captures.
-  const heldHour=Number(params.get('hour')??NaN),hold=heldHour>=0&&heldHour<24?heldHour:null;
+  const heldHour=Number(params.get('hour')??NaN),hold=personalView?12:heldHour>=0&&heldHour<24?heldHour:null;
   let displayMode: DisplayMode = 'auto';
-  const updateOverlay=overlay();
-  const cityChanges=surveyUrl?createCityChangeManager(scene):null;
+  const updateOverlay=personalView?()=>{}:overlay();
+  const cityChanges=surveyUrl||personalView?createCityChangeManager(scene):null;
+  if(personalView){
+    cityChanges!.applyExhibitionLayout(personalView.layout,'city-state-snapshot',0);
+    renderer.domElement.dataset.archiveId=archiveId;
+    renderer.domElement.dataset.revision=String(personalView.revision);
+    renderer.domElement.dataset.layout=JSON.stringify(personalView.layout);
+    renderer.domElement.dataset.siteAssets=JSON.stringify(cityChanges!.getDiagnostics());
+  }
   if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view)=>{
     if(isExhibitionView(view)){
       // Cancel any legacy score blend while preserving its current rendered atmosphere.
@@ -90,12 +106,13 @@ try {
   const duskHorizon=new T.Color('#f6b58a'),duskTop=new T.Color('#7a86ad'),nightHorizon=new T.Color('#1c2941'),nightTop=new T.Color('#070d1c');
   const sunLow=new T.Color('#ffae78'),sunHigh=new T.Color('#ffe7c4'),moon=new T.Color('#7d9be0'),ambientDay=new T.Color('#e3ebee'),ambientPulse=new T.Color('#a7c9ed'),ambientNight=new T.Color('#899dbd');
   const start=performance.now();
-  let frames=0,measureStart=start;
+  let frames=0,measureStart=start,lastPersonalFrame=-1;
   renderer.setAnimationLoop(()=>{
     now=(performance.now()-start)/1000;
+    if(personalView){if(document.hidden||now-lastPersonalFrame<1/30)return;lastPersonalFrame=now;}
     const hour=hold??displayHour(displayMode,now),height=sunHeight(hour),day=daylight(hour),dark=1-day,glow=1-T.MathUtils.smoothstep(Math.abs(height),0,.4),nightSky=T.MathUtils.smoothstep(dark,.35,1);
-    if(surveyUrl)world.update(now);
-    const s=withNight(surveyUrl?world.state:moodAt(hour),dark);
+    if(surveyUrl||personalView)world.update(now);
+    const s=withNight(surveyUrl||personalView?world.state:moodAt(hour),dark);
     const pulse=T.MathUtils.clamp((s.neon-.25)/.7,0,1)*day,still=T.MathUtils.clamp((s.warmth-.55)/.3,0,1);
     (scene.background as T.Color).copy(dayBase).lerp(dayPulse,pulse).lerp(dayStill,still).lerp(duskHorizon,glow*.7).lerp(nightHorizon,nightSky);
     (scene.fog as T.FogExp2).color.copy(scene.background as T.Color);(scene.fog as T.FogExp2).density=.0015+s.haze*.003;
@@ -111,13 +128,15 @@ try {
     ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientNight,dark);
     scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure;
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
-    controls.update();rig.update(s,now,dark);cityChanges?.update(now);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
+    controls.update();rig.update(s,now,dark);cityChanges?.update(now);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();personalReady?.();
     if(++frames===120){renderer.domElement.dataset.hour=hour.toFixed(2);renderer.domElement.dataset.displayMode=displayMode;renderer.domElement.dataset.time=now.toFixed(2);renderer.domElement.dataset.fps=(120000/(performance.now()-measureStart)).toFixed(1);renderer.domElement.dataset.drawCalls=String(renderer.info.render.calls);renderer.domElement.dataset.geometries=String(renderer.info.memory.geometries);if(cityChanges)renderer.domElement.dataset.siteAssets=JSON.stringify(cityChanges.getDiagnostics());frames=0;measureStart=performance.now();}
   });
   window.addEventListener('resize',()=>{
     camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight);
   });
   renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();renderer.setAnimationLoop(null);const message=document.createElement('p');message.className='error';message.textContent='The graphics context was lost. Reload to return to the crossing.';document.body.appendChild(message);});
-} catch(error) {
-  const message=document.createElement('p');message.className='error';message.textContent='The crossing could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);
 }
+start().catch(error=>{
+  document.querySelector('.personal-loading')?.remove();
+  const message=document.createElement('p');message.className='error';message.textContent='The crossing could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);
+});

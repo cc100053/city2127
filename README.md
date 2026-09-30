@@ -4,6 +4,12 @@
 
 ## 展覽啟動（Mac / Windows）
 
+目前 QR 展示採用單棟富士電視台：可按「フジテレビを見る」看建築，或「真上からスキャン」轉俯視掃碼。依每位觀眾更換建築是後續功能。
+
+成果預覽：[富士電視台展示](artifacts/fuji-tv-qr-building.png) · [俯視掃描畫面](artifacts/fuji-tv-qr-scan.png)。此功能分支包含問卷 → QR → 個人 3D 城市整合，供組員試跑；尚未與後續 main 的台場城市遷移整合。
+
+**問卷＋QR Code＋手機專屬 3D 城市整合版**：請用 [整合版啟動與操作說明](docs/QR_CITY_RESULTS.md)。手機可旋轉、縮放回答完成時的城市，不是圖片；使用同一個 Wi-Fi 與本機伺服器，尚未公開部署。下方仍保留原本分開啟動的開發方式。
+
 需要 Git、Node.js **24 或以上**（連 npm），以及支援 WebGL 2 嘅桌面瀏覽器。喺 repo 根目錄執行；每個 terminal tab 要保持開住。首次安裝或 lockfile 更新先跑 `npm ci`。目前係本機展覽流程，未設公開部署。
 
 ### Mac：Terminal 開兩個 tab
@@ -58,6 +64,11 @@ npm run dev -- --port 5173
 要畀同一個可信 LAN 嘅另一部裝置開 Guest／City：server 用 `SURVEY_HOST=0.0.0.0 npm run server`（PowerShell：`$env:SURVEY_HOST='0.0.0.0'; npm run server`），root 用 `npm run dev -- --host 0.0.0.0 --port 5173`；以 host 電腦嘅 LAN IP 取代網址中嘅 `127.0.0.1`。兩個 port 都要可達；Admin 仍然只限 host 電腦嘅 localhost。預設 loopback 設定只供本機使用，LAN 並無 guest 身分驗證。若 server 改用其他 port，例如 `8790`，City 用 `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8790/ws`。
 
 想單獨睇城市原型，開 `http://127.0.0.1:5173/` 即可，無須 Tab 1；呢個模式唔會接收觀眾提案。`module-swap/` 係保留嘅 v1 因果示範，唔係展覽城市，亦唔接受 v2 CityView。
+## QR 成果展示模組
+
+獨立的日文 QR 終端、手機成果頁及媒體上傳服務位於 [qr-hud/](qr-hud/README.md)。在該目錄執行 `npm ci`、`npm run build`、`npm start`，開啟 `http://localhost:4173`。Windows 可使用 `npm.cmd`。
+
+此模組尚未接上城市投票、截圖或錄影；未設定 Supabase 時使用展示模式。真實雲端設定見 [部署說明](qr-hud/DEPLOYMENT.md)，不要提交 `.env`、金鑰或 `.data/`。手機成果頁是此獨立模組的功能，不改變原城市場景的桌面展示範圍。交接見 [QR HUD handoff](docs/handoffs/qr-hud-import.md)。
 
 AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/PROJECT.md) · [驗收與交接流程](docs/VALIDATION.md) · [展覽方向與 Plan 02 紀錄](docs/PLAN02.md)。
 

@@ -76,6 +76,10 @@ Each task has one named owner and a repository-based handoff under `docs/handoff
 
 ## Commands
 
+Personal 3D archive (2026-09-30 user scope): mobile interaction is explicitly permitted for `/city/:proposalId` only. Root exhibition layout remains desktop. After installing root, survey and qr-hud dependencies, `node scripts/exhibition.mjs build` builds all three entry points; `node scripts/exhibition.mjs start` serves them on one LAN port. See [integration guide](docs/QR_CITY_RESULTS.md). Keep old proposal views isolated from live WebSocket updates. Do not delete the SQLite history when resetting the exhibition.
+
+Standalone QR archive: `cd qr-hud`, then `npm ci`, `npm run build`, `npm test`, `npm start` (default port 4173). `npm run test:e2e` requires local Chrome and its preview. See [QR README](qr-hud/README.md). The root checks and existing CI do not cover this independent package; run its checks when changing it.
+
 Use Node.js 24+; this project has been run with Node 26. Tests execute TypeScript directly with Node's type stripping, without a test framework.
 
 ```sh

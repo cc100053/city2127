@@ -1,5 +1,25 @@
 # Project contract and implementation map
 
+## Single Fuji TV QR — 2026-09-30 latest direction
+
+User replaced the multiple-miniature direction with one Fuji TV landmark. `qr-hud/src/buildingQr.js` now renders one Mesh from the team's existing Fuji TV asset. The generator preserves its panel depth and authored normals (127,928 triangles); the other two templates remain available in generated data but are not rendered. The oblique view shows the complete building. During the orthographic top-view transition, a nearest-filter QR DataTexture controls vertical cutouts in that same mesh and its material becomes dark; low dark module plinths complete the QR footprint. This is an animated adaptation, not an unchanged building whose natural silhouette happens to encode any URL. Camera interpolation, growth, automatic scan timing, URL destination and WebGL fallback remain supported. Controls read `フジテレビを見る` / `真上からスキャン`. Geometry, mask textures and instance resources are released on rebuild/disposal. Personal per-guest building selection is not implemented; everyone currently sees Fuji TV, while their archive URLs remain individual. The larger detailed model increases the QR bundle to about 14.3 MB raw / 1.42 MB gzip; exhibition hardware loading/FPS remain unmeasured. Earlier multi-building sections below are historical.
+
+## Odaiba QR landmarks — 2026-09-30 superseding update
+
+User selected Odaiba as the venue. QR presentation now uses Fuji TV, Telecom Center and DiverCity Office Tower from the team's existing `feat/odaiba-assets-progress-02` assets, pinned to `40d696e09f5d119a3ba6aff72c19d935c8838333`. `qr-hud/scripts/prepare-odaiba-qr.mjs` reads those Git GLBs without modifying them, clusters vertices and saves a 349 KB `odaiba-qr-models.json`. Original landmark proportions/colors are retained; geometry counts are 3,737 / 2,429 / 3,448 triangles. Runtime no longer imports root city factories. Ordinary parcels contain unit-scale miniatures; finder dark centers contain 2.8x examples within the 3x3 dark region. QR terminal branding reads ODAIBA. Historical Shibuya QR notes below are superseded; the desktop and phone city scenes have not been migrated by this presentation change.
+
+## Building QR and personal city integration — 2026-09-30 worktree
+
+The current integration worktree connects the survey proposal ID to `/city/:id`, a read-only interactive root scene restored from saved proposal state. See [operating guide](QR_CITY_RESULTS.md). The import-only section below is historical. `qr-hud/src/buildingQr.js` generates the QR matrix using qrcode-generator, creates miniature templates from existing root tower/shop factories, simplifies detail geometry, and batches copies with InstancedMesh. Dark parcel plinths exactly fill QR modules; all building bounds remain inside their parcel. Three empty-center finder patterns and a five-module border are preserved. The orthographic top view uses unlit dark materials; the oblique view uses the city palette. Prepared links retain their original destination. No QR-Bloom code, tree assets, weights or training are used.
+
+The HUD introduces a 3.5-second building-growth view after link readiness, then an 850-ms top-view transition and a stable scan view. Two buttons override the view; reduced-motion preference skips growth and camera interpolation. On initial WebGL failure it retains the standard Canvas QR. The package imports root city source; Vite deduplicates Three.js, and building QR is no longer buildable from a detached qr-hud folder. This changes only QR presentation, not proposal calculations or the phone's archived city. See [handoff](handoffs/building-qr.md).
+
+## Standalone QR archive import — 2026-09-29
+
+`qr-hud/` imports the user's existing Japanese QR terminal as an independent npm package. Its Three.js HUD generates links to `/city/:sessionId`; the Node API serves the mobile result page and handles authenticated uploads through a persistent disk queue to Supabase Postgres/private Storage. See [package README](../qr-hud/README.md) and [deployment](../qr-hud/DEPLOYMENT.md).
+
+There is no connection yet to root city rendering, survey proposals, automatic capture or video recording. Supabase session IDs are independent of survey guest/proposal IDs. Cloud configuration, public hosting and real-phone end-to-end acceptance remain pending. Existing root/survey/module-swap behavior is unchanged; the imported mobile page is explicitly part of the user's QR scope.
+
 Exhibition priorities and historical Plan 02 implementation status: [方向與紀錄](PLAN02.md). Art rules for the root scene: [ART.md](ART.md), in use since 2026-09-24. Status and remaining art work: [art-direction handoff](handoffs/art-direction.md#remaining-work).
 
 ## Exhibition specification and S1–S4 status — 2026-09-30

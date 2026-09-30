@@ -1,5 +1,7 @@
 # 2127 — Frozen Intersection
 
+Questionnaire → QR → personal interactive 3D city: see the [integrated startup guide](docs/QR_CITY_RESULTS.md). This LAN-only feature preserves each proposal's city layout; it is not an image or public cloud deployment. The separate development workflow below remains available.
+
 **Language:** [繁體中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
 
 Guests collectively shape a futuristic Shibuya. Each guest answers four questions and submits one proposal; the next guest inherits the accumulated city. The root Three.js scene (`src/`) is the exhibition city. The `survey/` server owns the questions, state, SQLite database, and live WebSocket updates. The separate `module-swap/` viewer is a legacy v1 causal demo and does not accept the current v2 CityView.
