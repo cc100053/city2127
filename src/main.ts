@@ -56,12 +56,13 @@ try {
     capture.dispose();pmrem.dispose();reflected.dispose();
   });skyTexture.colorSpace=T.SRGBColorSpace;skyTexture.wrapS=T.RepeatWrapping;
   skyTexture.mapping=T.EquirectangularReflectionMapping;
-  const sky=new T.Mesh(new T.SphereGeometry(1500,24,12),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{top:{value:new T.Color()},horizon:{value:new T.Color()},clouds:{value:skyTexture},day:{value:1},tint:{value:new T.Color(1,1,1)}},
+  const sky=new T.Mesh(new T.SphereGeometry(1500,24,12),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{top:{value:new T.Color()},horizon:{value:new T.Color()},clouds:{value:skyTexture},day:{value:1},tint:{value:new T.Color(1,1,1)},sunDir:{value:new T.Vector3(0,1,0)},sunGlow:{value:new T.Color()}},
     vertexShader:'varying vec3 p;varying vec2 skyUv;void main(){p=position;skyUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    // A broad warm bloom around the sun's bearing lights the horizon and cloud edges on that side of the frame (target: backlit bay to the right).
     // Altitude is measured from the curved sea's horizon (about 4.7° below level, see EARTH in bayContext), so a warm haze band sits on the sea and clouds rise above it.
     // The hero frame shows only ~6° of sky, so the generated cumulus band (texture rows ~.40–.50) is mapped just above the sea horizon,
     // tiled twice around; its saturated blue is keyed out (blue minus red) so the clock gradient shows between warm, desaturated clouds.
-    fragmentShader:'uniform vec3 top,horizon,tint;uniform sampler2D clouds;uniform float day;varying vec3 p;varying vec2 skyUv;void main(){float altitude=normalize(p).y+.085;float h=clamp(altitude*4.,0.,1.);vec3 gradient=mix(horizon,top,pow(h,.65));vec3 c=texture2D(clouds,vec2(skyUv.x*2.,clamp(.4+(skyUv.y-.474)*2.2,.02,.98))).rgb;float mask=1.-smoothstep(.1,.4,c.b-c.r);vec3 cloud=mix(vec3(dot(c,vec3(.299,.587,.114))),c,.55)*tint*1.08;gl_FragColor=vec4(mix(gradient,cloud,day*mask*.95*smoothstep(.006,.035,altitude)),1.);}'}));
+    fragmentShader:'uniform vec3 top,horizon,tint,sunDir,sunGlow;uniform sampler2D clouds;uniform float day;varying vec3 p;varying vec2 skyUv;void main(){vec3 v=normalize(p);float altitude=v.y+.085;float h=clamp(altitude*7.,0.,1.);vec3 gradient=mix(horizon,top,pow(h,.8));float toSun=max(dot(v,sunDir),0.);gradient+=sunGlow*(pow(toSun,5.)*.45+pow(toSun,48.)*.6)*(1.-.5*h);vec3 c=texture2D(clouds,vec2(skyUv.x*2.,clamp(.4+(skyUv.y-.474)*2.2,.02,.98))).rgb;float mask=1.-smoothstep(.1,.4,c.b-c.r);vec3 cloud=mix(vec3(dot(c,vec3(.299,.587,.114))),c,.5)*tint*1.14+sunGlow*pow(toSun,6.)*.25;gl_FragColor=vec4(mix(gradient,cloud,day*mask*.95*smoothstep(.006,.035,altitude)),1.);}'}));
   sky.frustumCulled=false;sky.renderOrder=-1;scene.add(sky);
   // Open sea beyond the masterplan plate; fog closes the horizon.
   const water=bayWater();
@@ -126,9 +127,9 @@ try {
   }, mode => { displayMode = mode; });
   // Day tints per mood, then dusk and night colours laid over them by the clock.
   const dayBase=new T.Color('#d3dde0'),dayPulse=new T.Color('#accbdc'),dayStill=new T.Color('#e0e6dc');
-  const topBase=new T.Color('#86a9c4'),topPulse=new T.Color('#6a8db0'),topStill=new T.Color('#a9bcc4');
+  const topBase=new T.Color('#6e9cc6'),topPulse=new T.Color('#6a8db0'),topStill=new T.Color('#a9bcc4');
   const duskHorizon=new T.Color('#f6b58a'),duskTop=new T.Color('#7a86ad'),nightHorizon=new T.Color('#1c2941'),nightTop=new T.Color('#070d1c');
-  const sunLow=new T.Color('#ffae78'),sunHigh=new T.Color('#ffe7c4'),moon=new T.Color('#7d9be0'),ambientDay=new T.Color('#e3ebee'),ambientPulse=new T.Color('#a7c9ed'),ambientNight=new T.Color('#899dbd'),ambientLate=new T.Color('#f4dcc0'),white=new T.Color('#ffffff'),cloudGold=new T.Color('#ffcf98'),seaHaze=new T.Color('#9dbad0'),horizonCream=new T.Color('#fde3bd');
+  const sunLow=new T.Color('#ffae78'),sunHigh=new T.Color('#ffe7c4'),moon=new T.Color('#7d9be0'),ambientDay=new T.Color('#e3ebee'),ambientPulse=new T.Color('#a7c9ed'),ambientNight=new T.Color('#899dbd'),ambientLate=new T.Color('#f4dcc0'),white=new T.Color('#ffffff'),cloudGold=new T.Color('#ffcf98'),seaHaze=new T.Color('#a9c4d6'),horizonCream=new T.Color('#f7ead8'),sunBloom=new T.Color('#ffe2b0'),sunDirection=new T.Vector3();
   const start=performance.now();
   let frames=0,measureStart=start;
   renderer.setAnimationLoop(()=>{
@@ -139,13 +140,14 @@ try {
     const pulse=T.MathUtils.clamp((s.neon-.25)/.7,0,1)*day,still=T.MathUtils.clamp((s.warmth-.55)/.3,0,1);
     (scene.background as T.Color).copy(dayBase).lerp(dayPulse,pulse).lerp(dayStill,still).lerp(duskHorizon,glow*.85).lerp(nightHorizon,nightSky);
     // Clear bay air by day: the district stays crisp, the sea keeps its blue to the horizon and far shores fade to a cool haze.
-    (scene.fog as T.FogExp2).color.copy(scene.background as T.Color).lerp(seaHaze,day*.6);(scene.fog as T.FogExp2).density=.00011+s.haze*.0001;grade.uniforms.amount.value=.35+.65*day;
-    sky.material.uniforms.day.value=day;sky.material.uniforms.tint.value.copy(white).lerp(cloudGold,glow*.8);
+    (scene.fog as T.FogExp2).color.copy(scene.background as T.Color).lerp(seaHaze,day*.6);(scene.fog as T.FogExp2).density=.00015+s.haze*.0001;grade.uniforms.amount.value=.35+.65*day;
+    sky.material.uniforms.day.value=day;sky.material.uniforms.tint.value.copy(white).lerp(cloudGold,glow*.45);
     sky.position.copy(camera.position);sky.material.uniforms.horizon.value.copy(scene.background as T.Color).lerp(horizonCream,day*.6);sky.material.uniforms.top.value.copy(topBase).lerp(topPulse,pulse).lerp(topStill,still).lerp(duskTop,glow*.5).lerp(nightTop,nightSky);
     // The sun arcs east to west; below the horizon the same light becomes a dim moon from the opposite side, so shadows never stop.
     const arc=Math.PI*(hour-6)/12,up=height>0?1:-1;
     // The arc runs south of the island (+Z), so late-afternoon light rakes across the waterfront toward the hero pose and glints on the bay.
     sun.position.set(840*Math.cos(arc)*up,480*Math.abs(height)+48,760);
+    sky.material.uniforms.sunDir.value.copy(sunDirection.copy(sun.position).normalize());sky.material.uniforms.sunGlow.value.copy(sunBloom).multiplyScalar(day*T.MathUtils.smoothstep(height,-.05,.1));
     sun.color.copy(sunLow).lerp(sunHigh,T.MathUtils.smoothstep(height,.25,1)).lerp(moon,dark);
     sun.intensity=(3.15+pulse*.2+still*.05+glow*.5)*T.MathUtils.smoothstep(height,-.02,.2)+.55*T.MathUtils.smoothstep(-height,.02,.25);
     const light=nightLighting(dark);

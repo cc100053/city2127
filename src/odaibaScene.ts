@@ -7,7 +7,7 @@ import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
 import { plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
 import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
-import { inDistrict, SEAWARD_GLSL } from './layout';
+import { changeSites, DISTRICT, inDistrict, SEAWARD_GLSL } from './layout';
 import { bayContext, recedeBeyondDistrict } from './bayContext';
 
 // Literal paths bundle the district-detailed environment (scripts/crop-odaiba-district.py) and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
@@ -50,9 +50,11 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
     shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float curtainGlow;\nvarying vec3 curtainP;')
       .replace('#include <map_fragment>', `#include <map_fragment>
       float storey = fract(curtainP.y / 4.2), mullion = fract(curtainP.x / 1.8);
-      float pane = step(.32, storey) * step(storey, .94) * step(mullion, .9) * (1. - step(.5, curtainP.z)) * step(1.2, curtainP.y);
+      float pane = step(.24, storey) * step(storey, .94) * step(mullion, .9) * (1. - step(.5, curtainP.z)) * step(1.2, curtainP.y);
       float occupied = step(.3, fract(sin(dot(floor(vec2(curtainP.x / 5.4, curtainP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453));
-      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.13, .16, .18), pane * .88);`)
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.2, .25, .29), pane * .88);`)
+      // Panes are glass: glossy and partly metallic so they pick up the sky instead of reading as flat dark dots.
+      .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, .1, pane);\nmetalnessFactor = mix(metalnessFactor, .55, pane);')
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1., .76, .48) * pane * curtainGlow * (.25 + .75 * occupied);');
   };
   material.customProgramCacheKey = () => 'curtain-wall';
@@ -95,9 +97,19 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
       // World metres keep the authored terrain patches at one consistent texture scale.
       material.onBeforeCompile=shader=>{
         shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\ngrassUv=(modelMatrix*vec4(transformed,1.)).xz/32.;');
-        shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <map_fragment>','diffuseColor.rgb *= mix(texture2D(map,grassUv).rgb,texture2D(map,grassUv*.19).rgb,.35);');
+        // Inside the district the lawns become a park landscape: reflecting ponds in the grove swales (the same field plantLandscapeCanopy
+        // leaves clear, so no crowns stand in water; survey sites stay dry) with pale stone rims, and meandering gravel walks along another field's contours.
+        shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <map_fragment>',`diffuseColor.rgb *= mix(texture2D(map,grassUv).rgb,texture2D(map,grassUv*.19).rgb,.35);
+          vec2 w=grassUv*32.;
+          float inside=step(${DISTRICT.minX.toFixed(1)},w.x)*step(w.x,${DISTRICT.maxX.toFixed(1)})*step(${DISTRICT.minZ.toFixed(1)},w.y)*step(w.y,${DISTRICT.maxZ.toFixed(1)});
+          float swale=sin(w.x*.023+sin(w.y*.018)*2.)+cos(w.y*.031);
+          float site=${Object.values(changeSites).map(c=>`step(abs(w.x-(${c.x.toFixed(1)})),${(c.w*c.scale/2+14).toFixed(1)})*step(abs(w.y-(${c.z.toFixed(1)})),${(c.d*c.scale/2+14).toFixed(1)})`).join('+')};
+          float pond=inside*(1.-min(site,1.))*(1.-smoothstep(-1.28,-1.24,swale)),rim=inside*(1.-min(site,1.))*(1.-smoothstep(-1.17,-1.13,swale))-pond;
+          float walk=inside*(1.-smoothstep(.06,.1,abs(sin(w.x*.037+cos(w.y*.029)*1.6)+sin(w.y*.033+w.x*.011))));
+          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.72,.67,.58),max(walk,rim)*(1.-pond));
+          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.16,.36,.46),pond);`).replace('#include <metalnessmap_fragment>','#include <metalnessmap_fragment>\nroughnessFactor=mix(roughnessFactor,.06,pond);metalnessFactor=mix(metalnessFactor,.35,pond);');
       };
-      material.customProgramCacheKey=()=>'coastal-grass-world';
+      material.customProgramCacheKey=()=>'coastal-grass-ponds';
     }
     // The sea lies under the whole plate; grazing shadows on it only produce acne.
     if (material.name === 'water') { object.castShadow = object.receiveShadow = false; if(water) object.material=water; }

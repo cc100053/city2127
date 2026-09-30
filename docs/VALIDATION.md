@@ -1,5 +1,9 @@
 # Validation and handoff
 
+## Odaiba Dream Loop r2 — 2026-10-01
+
+Three Dream Loop passes on `feat/odaiba-dream-loop-2`: root `npm test`/`npm run build`/`git diff --check` passed after each pass and fix; built-in browser day/night without console errors. Live `?survey`, FPS and exhibition hardware not verified. Details, evidence and open decisions: [handoff](handoffs/odaiba-dream-loop-2.md).
+
 ## Odaiba art direction pass 1 — 2026-09-30
 
 `feat/art-direction`, base `e587b54`, verified implementation `274167e`. Scope: replace the rendered Fuji office/podium/observation GLB with a civic chassis; retain original assets, hero, lighting, actor routes, seven other landmarks and survey contracts. Human art acceptance pending; no main integration. [Full audit / self-review](handoffs/odaiba-art-direction-01.md).

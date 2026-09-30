@@ -6,7 +6,7 @@ export function bayWater() {
   const normal = new T.TextureLoader().load(new URL('../asset/textures/bay-ripple-normal.png', import.meta.url).href);
   normal.wrapS = normal.wrapT = T.RepeatWrapping;
   normal.anisotropy = 8;
-  const material = new T.MeshPhysicalMaterial({color:'#1d4a68',roughness:.18,metalness:.12,normalMap:normal,normalScale:new T.Vector2(.65,.65),clearcoat:.4,clearcoatRoughness:.2});
+  const material = new T.MeshPhysicalMaterial({color:'#2c6e98',roughness:.16,metalness:.1,normalMap:normal,normalScale:new T.Vector2(.65,.65),clearcoat:.4,clearcoatRoughness:.2});
   material.onBeforeCompile = shader => {
     shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 bayUv;')
       .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nbayUv=(modelMatrix*vec4(transformed,1.)).xz/65.;');

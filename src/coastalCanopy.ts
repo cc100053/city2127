@@ -3,9 +3,12 @@ import { changeSites, DISTRICT, inDistrict, seaward } from './layout.ts';
 import { routes } from './mobility.ts';
 import { recedeBeyondDistrict } from './bayContext.ts';
 
+/** Grove field: plantLandscapeCanopy leaves swales below -.35 clear and the landscape shader (odaibaScene.ts) fills those below -1.24 with ponds. */
+const swale=(x:number,z:number)=>Math.sin(x*.023+Math.sin(z*.018)*2)+Math.cos(z*.031);
+
 /** Reuse the surveyed planting locations; layered crowns replace the tiny blockout cones. */
 export function plantCanopy(scene: T.Object3D, trees: { instances: { position: number[]; scale: number; type: string }[] }) {
-  const positions=trees.instances.filter(tree=>inDistrict(tree.position[0],-tree.position[1]) && !seaward(tree.position[0],-tree.position[1]) && !Object.values(changeSites).some(site=>Math.abs(tree.position[0]-site.x)<site.w*site.scale/2+9 && Math.abs(-tree.position[1]-site.z)<site.d*site.scale/2+9));
+  const positions=trees.instances.filter(tree=>inDistrict(tree.position[0],-tree.position[1]) && !seaward(tree.position[0],-tree.position[1]) && !(tree.position[2]<3 && swale(tree.position[0],-tree.position[1])<-1.1) && !Object.values(changeSites).some(site=>Math.abs(tree.position[0]-site.x)<site.w*site.scale/2+9 && Math.abs(-tree.position[1]-site.z)<site.d*site.scale/2+9));
   // Instance colours already provide the leaf pigment; a second green tint crushed the lit canopy.
   const foliage=new T.InstancedMesh(new T.IcosahedronGeometry(1,2),new T.MeshStandardMaterial({color:'#ffffff',roughness:.92}),positions.length*4);
   const trunks=new T.InstancedMesh(new T.CylinderGeometry(.35,.6,1,6),new T.MeshStandardMaterial({color:'#776957',roughness:1}),positions.length);
@@ -58,7 +61,7 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
   };
   for(let x=DISTRICT.minX;x<DISTRICT.maxX;x+=17)for(let z=DISTRICT.minZ;z<DISTRICT.maxZ;z+=17){
     // Staggered clusters leave long clear swales instead of another plantation grid.
-    if(Math.sin(x*.023+Math.sin(z*.018)*2)+Math.cos(z*.031)<-.35)continue;
+    if(swale(x,z)<-.35)continue;
     const px=x+Math.sin(z*1.7+x)*6,pz=z+Math.cos(x*1.3-z)*6;
     if(seaward(px,pz) || pads.some(pad=>px>pad.min.x && px<pad.max.x && pz>pad.min.z && pz<pad.max.z)
       || Object.values(changeSites).some(site=>Math.abs(px-site.x)<site.w*site.scale/2+22 && Math.abs(pz-site.z)<site.d*site.scale/2+22)
