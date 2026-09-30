@@ -49,7 +49,7 @@ npm run dev -- --port 5173
 | 頁面 / tab | 網址（預設） | 用途 |
 | --- | --- | --- |
 | Guest | `http://127.0.0.1:8787/guest` | 觀眾完成四題、核對答案並提交一次提案。 |
-| City | `http://127.0.0.1:5173/?survey` | 展示共同塑造嘅 2127 澀谷；經 `ws://127.0.0.1:8787/ws` 即時接收變化。展覽城市要用呢個 `?survey` 網址。 |
+| City | `http://127.0.0.1:5173/?survey` | 展示共同塑造嘅 2127 台場；經 `ws://127.0.0.1:8787/ws` 即時接收變化。展覽城市要用呢個 `?survey` 網址。 |
 | Admin | `http://127.0.0.1:8787/admin` | 工作人員睇狀態、確認觀眾已離開、要求／取消 reset；只可喺運行 server 嗰部電腦以 localhost 開啟。 |
 | Monitor（可選） | `http://127.0.0.1:8787/monitor` | 文字方式檢查目前狀態同開頁後收到嘅提案／WebSocket 事件，唔係 3D 畫面。 |
 
@@ -71,7 +71,9 @@ AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/P
 
 [CI workflow](.github/workflows/ci.yml) 於 branch push／可選 PR 時以 Node 24 執行根目錄、`survey/` 同 `module-swap/` 嘅安裝、測試、build，以及 diff whitespace 檢查（兩個子 package 由 2026-09-24 起納入）；沒有部署或 branch protection。詳細狀態見[驗證紀錄](docs/VALIDATION.md)。
 
-## 展覽目標（2026-09-18 定，2026-09-24 更新）
+## 展覽目標（2026-09-18 定，2026-09-30 更新）
+
+**場地改為台場（2026-09-30 用戶決定）：** 富士電視台／台場海濱取代澀谷，成為唯一展覽城市（不設切換）。四題、四軸、四個改變地點、lifecycle 同日夜循環照舊，只換場地、地標、路線同文案。計劃同各階段結果見 [ODAIBA_PLAN.md](docs/ODAIBA_PLAN.md)，交接見 [odaiba-venue handoff](docs/handoffs/odaiba-venue.md)。以下澀谷描述係歷史紀錄。
 
 **由觀眾共同塑造一個富有未來感的澀谷。** 城市是展覽中的共同創作結果；視覺設計服務於未來感、澀谷辨識度，以及觀眾能否看懂自己的選擇如何改變城市。精緻模型或紀實照片質感不再是首要目標或完成門檻。
 
@@ -98,7 +100,7 @@ The `/guest` page has the S4 four-question v2 UI, integrated on main and browser
 
 ## 目前可執行原型
 
-固定鏡頭、固定種子 `2127` 的 Three.js 澀谷多層城市原型（Plan 02 首個垂直切片）。以 [Pic 2](asset/pic2.png) 為量體、垂直交通與材質方向參考，保留 Plan 01 的路口及地標關係。建築只建立一次，使用 Vite、TypeScript 與 WebGL 2；城市另載入一棵 Blender 樹木模型。
+2127 年台場海濱（Vite、TypeScript、WebGL 2，米制）：`src/odaibaScene.ts` 載入 Phase 03D 地形、海同八棟地標 GLB（富士電視台、Aqua City、DECKS、DiverCity × 2、Hilton、日航、Telecom Center），`src/odaiba2127.ts` 加上 2127 改造層（空中天橋、球頂泊位、單軌燈線、海濱浮台，屋頂綠化／太陽能）。鏡頭由海面望向富士電視台同 Aqua City。
 
 ```sh
 npm install
@@ -109,9 +111,9 @@ npm test
 
 城市會自動行日夜循環（2026-09-25 起取代原本嘅三個掣同 `0/1/2` 鍵）：一日 3 分鐘，由中午開始。太陽由東行到西，日落後轉做藍色月光；天空經過黃昏、夜晚、清晨。清晨係 Still（安靜），日間係 Daylight，夜晚係 Pulse（窗戶、街燈、招牌亮起，人車較多）。`?hour=22` 可以固定喺某個鐘數，方便截圖。呢個係原型展示，唔係展覽題目或累積機制。
 
-`layout.ts` 保存道路、地標、兩條公共步道與上層建築連接；`cityRig.ts` 產生建築、商業／住宅樓層、開放公共層、運輸軌道和環境膜片；`mobility.ts` 處理地面交通、公共升降與步行、薄翼貨機和原有 32 秒物流流程。共享材質、靜態批次、InstancedMesh 和固定鏡頭保留。材料改為淺色建築複合材、金屬與半透明膜片；一次性產生室內環境反射，後製仍只有輕微 bloom。
+`layout.ts` 保存台場路線（單軌中線、海濱步道、水路、空中航道、球頂泊位）、2127 改造位置同四個改變地點；`cityRig.ts` 提供共用材質同 site 燈柱；`mobility.ts` 處理單軌列車、步道行人、水上的士／渡輪同空中的士。共享材質、靜態批次、InstancedMesh 保留；後製仍只有輕微 bloom。
 
-Blender 模型可用 `npm run dev -- --port 5173` 啟動後，在 Vite 顯示的網址加上 `?asset-preview`，選取本機 `.glb` 作澀谷場景預覽（模型按原尺寸置於原點，重新整理後可換另一件）。正式素材需按 [Blender 規範](docs/BLENDER.md) 保存 `.blend`／`.glb`，再於程式指定位置。首件正式素材係 [2127 未來樹](asset/models/future-tree-2127/future-tree-2127.glb)，放喺八公廣場旁 `(11, 0, 23)`；[Blender 原檔](asset/models/future-tree-2127/future-tree-2127.blend) 一併保存。
+Blender 模型可用 `npm run dev -- --port 5173` 啟動後，在 Vite 顯示的網址加上 `?asset-preview`，選取本機 `.glb` 作城市場景預覽（模型按原尺寸置於原點，重新整理後可換另一件）。正式素材需按 [Blender 規範](docs/BLENDER.md) 保存 `.blend`／`.glb`，再於程式指定位置。[2127 未來樹](asset/models/future-tree-2127/future-tree-2127.glb) 由 Park site 使用。
 
 Plan 02 截圖使用 `artifacts/plan02-*`；原有截圖保留，只證明當時的空間與交通原型，不代表展覽互動已完成。完整驗證與限制見 [驗收流程](docs/VALIDATION.md)。
 

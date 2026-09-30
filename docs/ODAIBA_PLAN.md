@@ -1,6 +1,6 @@
 # Odaiba 2127 — venue transition plan (DRAFT)
 
-- Status: APPROVED 2026-09-30 (decisions below). P0–P4 done on `codex/odaiba-venue`; next P5.
+- Status: APPROVED 2026-09-30 (decisions below). P0–P5 done on `codex/odaiba-venue`; next: integrate into `main`, then P6.
 - Drafted: 2026-09-30 against `main` `4bc1646`; Odaiba sources read from `origin/codex/odaiba-preview` `3a8a5f2` (contains all of `origin/feat/odaiba-assets-progress-02` `40d696e`).
 - Supersedes on approval: the "single Shibuya setting" constraint in [AGENTS.md](../AGENTS.md), [PROJECT.md](PROJECT.md) and [PLAN02.md](PLAN02.md). Shibuya is **replaced**, not kept selectable; it stays in Git history.
 
@@ -88,7 +88,7 @@ Each phase is one branch, merged after `npm test`, `npm run build`, `git diff --
 | P2 ✅ | **Sites.** New `changeSites` coordinates + per-site scale; place names; `surveyAtmosphere` panel. | `?survey` shows all four sites changing with 3 s transitions; snapshot/reset immediate; site tests pass. |
 | P3 ✅ | **Mobility.** Deck walkers, guideway pods, sphere drones, water taxis. | `tests/mobility.test.ts` route checks rewritten for Odaiba routes; no actor clips a building. |
 | P4 ✅ | **2127 layer.** Raised sea + tidal promenade, sphere hub, retrofit kit, sky bridges, night media globe. | Art review against this section; FPS re-measured. |
-| P5 | **Copy + docs.** Questions (お台場, ids unchanged), guest UI, overlay, README, PROJECT, PLAN02, AGENTS, VALIDATION. | `survey` tests/build; local Markdown links. |
+| P5 ✅ | **Copy + docs.** Questions (お台場, ids unchanged), guest UI, overlay, README, PROJECT, PLAN02, AGENTS, VALIDATION. | `survey` tests/build; local Markdown links. |
 | P6 | **Exhibition acceptance (S5) on Odaiba.** | Full guest flow on exhibition hardware. |
 
 ## Phase results
@@ -100,10 +100,11 @@ Measurements are on the exhibition machine (the user confirmed on 2026-09-30 tha
 - **P2** — `changeSites` in Odaiba metres with a per-site `scale` at the site root (table above); lot-ground and hero-visibility test; lot-bound tests in site-local units. Scratch survey server: 59–60 FPS, 1,525–1,581 draws. [baseline](../artifacts/odaiba-p2-baseline.png) · [high](../artifacts/odaiba-p2-high.png) · [low](../artifacts/odaiba-p2-low.png) · [low 22:00](../artifacts/odaiba-p2-low-2200.png)
 - **P3** — `layout.ts` holds only Odaiba routes: guideway centreline traced on the deck, east/west promenades (the park lot reaches the revetment), sphere berth, water loop and ferry lane, air loop and bay approach. `mobility.ts` rewritten: two teal six-car trains, 40 walkers, four water taxis and a ferry, six air taxis at 5× plus a 40 s berth shuttle. Tests: 20 m air clearance, continuity, pod spacing; raycasts onto deck, ground and water. 60.2–60.3 FPS, ~1,308 draws. Walkers read only when zoomed; trains are often behind Aqua City from the hero; no road traffic. [12:00](../artifacts/odaiba-p3-1200.png) · [22:00](../artifacts/odaiba-p3-2200.png) · [zoomed](../artifacts/odaiba-p3-close.png)
 - **P4** — `src/odaiba2127.ts`: two 24 m sky bridges (Aqua City ↔ Fuji TV over the guideway, Aqua City ↔ DECKS) between raycast facade points, a lit berth ring above the sphere, guideway edge light lines, three planted floating decks. Roofs retrofitted by material (malls planted, hotels photovoltaic); the sphere glows mint at night. Skipped from the plan: a stepped promenade edge (the floating decks carry the waterfront cue), a media texture on the sphere (a glow reads at hero distance; its UV layout was not checked), per-building PV fins. Known: Aqua City's `Roof and Shadow` material also covers a few facade recesses, which now read green. 60.0–60.1 FPS, ~1,341 draws. [12:00](../artifacts/odaiba-p4-1200.png) · [22:00](../artifacts/odaiba-p4-2200.png) · [zoomed 12:00](../artifacts/odaiba-p4-close-1200.png) · [zoomed 22:00](../artifacts/odaiba-p4-close-2200.png)
+- **P5** — `survey/src/survey/questions.exhibition.json` rewritten for the waterfront (ids, option ids, effects and version unchanged, so the server contract and history hold); guest welcome/masthead say お台場 / ODAIBA; root overlay reads "ONE WATERFRONT. TWO FUTURES.", "The same shore.", 35°37′ N 139°46′ E; page title and remaining Shibuya strings in code updated; README, AGENTS, PROJECT and PLAN02 note the venue. `survey/` 15 suites and build pass.
 
-## Draft waterfront questions (P5)
+## Waterfront questions (implemented in P5)
 
-Ids, option ids and effects are unchanged; only `text`/`label` change. Final wording to be reviewed by the user.
+Ids, option ids and effects are unchanged; only `text`/`label` change. Implemented from this draft on 2026-09-30 at the user's go-ahead; wording can still be revised.
 
 | id | text | options (−1 / 0 / +1) |
 | --- | --- | --- |
