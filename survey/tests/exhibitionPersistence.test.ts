@@ -1,3 +1,4 @@
+import { readDisplayMode, setDisplayMode } from '../src/server/adminService.ts';
 import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -80,11 +81,14 @@ try {
   migrated.questions.questions[0].text = 'Question text changed after the event was stored';
   const stored = migrated.db.prepare('SELECT answers_json FROM proposal_events WHERE id = ?').get('after-migration-0');
   assert.equal(JSON.parse(String(stored?.answers_json))[0].questionText, frozenQuestionText, 'event text is copied when the proposal commits');
+  assert.equal(readDisplayMode(migrated.db), 'auto', 'migration defaults to the existing cycle');
+  assert.ok(setDisplayMode(migrated, { mode: 'night' }).response.ok);
   migrated.db.close();
 
   // Restart recomputes the complete v2 state from immutable proposal events and checks the snapshot.
   const restarted = createContext({ dbPath, questionsPath: EXHIBITION_QUESTIONS_PATH });
   assert.deepEqual(currentState(restarted), saved);
+  assert.equal(readDisplayMode(restarted.db), 'night', 'staff lighting choice survives server restart');
   const exhibitionRun = restarted.db.prepare("SELECT started_at FROM runs WHERE id = ?").get(saved.runId);
   assert.deepEqual(replayExhibitionRun(restarted.db, saved.runId, String(exhibitionRun?.started_at)), saved);
   assert.equal(Number(restarted.db.prepare('SELECT typeof(vote_sum_automation) AS t FROM exhibition_snapshots').get()?.t === 'real'), 1);

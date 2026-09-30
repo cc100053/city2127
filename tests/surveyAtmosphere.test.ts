@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { cityText, exhibitionFeedback, exhibitionScoresText, exhibitionVoteMarks, policyText, scoresToWorldState } from '../src/surveyAtmosphere.ts';
 import { presets } from '../src/presets.ts';
-import { connectSurvey, isExhibitionView, parseSurveyEvent, supersedes } from '../src/surveyView.ts';
+import { connectSurvey, isExhibitionView, parseSurveyEvent, supersedes, type CityView } from '../src/surveyView.ts';
 import { createWorldState } from '../src/worldState.ts';
 
 const zero = { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 };
@@ -163,6 +163,20 @@ try {
   assert.deepEqual(applied, ['r2']);
   messageListener?.({ data: JSON.stringify({ type: 'city-state-updated', view }) });
   assert.deepEqual(applied, ['r2', 'r']);
+  const modes: string[] = [], changes: string[] = [];
+  let current: CityView | undefined;
+  connectSurvey('ws://example.test/ws', (_kind, next) => {
+    if (!supersedes(current, next)) return;
+    current = next; changes.push(next.runId);
+  }, () => {}, mode => modes.push(mode));
+  for (const mode of ['day', 'night', 'auto', null, 'dusk']) {
+    messageListener?.({ data: JSON.stringify({ type: 'city-state-snapshot', displayMode: mode, view: v2View }) });
+  }
+  assert.deepEqual(modes, ['day', 'night', 'auto']);
+  assert.deepEqual(changes, ['r2'], 'lighting metadata does not reapply unchanged city revisions');
+  messageListener?.({ data: JSON.stringify({ type: 'city-state-snapshot', view: v2View }) });
+  assert.deepEqual(modes, ['day', 'night', 'auto', 'auto'], 'older servers default to Auto');
+
 } finally {
   if (webSocketDescriptor) Object.defineProperty(globalThis, 'WebSocket', webSocketDescriptor);
   else delete (globalThis as { WebSocket?: unknown }).WebSocket;

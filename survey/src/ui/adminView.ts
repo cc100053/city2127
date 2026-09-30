@@ -1,5 +1,5 @@
 import './debug.css';
-import type { AdminCurrentRun, AdminEventsData, LifecycleCommand, LifecycleData, LifecyclePhase, LifecycleStatus } from '../shared/protocol.ts';
+import type { AdminCurrentRun, DisplayMode, AdminEventsData, LifecycleCommand, LifecycleData, LifecyclePhase, LifecycleStatus } from '../shared/protocol.ts';
 import { api, connectEvents, el, renderState } from './debugApi.ts';
 
 // Exhibition-PC admin page. The server returns 403 for this page and its API from non-loopback clients.
@@ -11,6 +11,12 @@ const PHASE_TEXT: Record<LifecyclePhase, string> = {
 };
 const app = document.querySelector<HTMLElement>('#app')!;
 const status = el('div', { class: 'notice' }), summary = el('div'), stateBox = el('div'), events = el('div'), message = el('p');
+const lightingStatus = el('p'), lightingMessage = el('p', { 'aria-live': 'polite' });
+const lightingButtons = (['day', 'night', 'auto'] as const).map(mode => {
+  const button = el('button', { disabled: '', 'aria-pressed': 'false' }, { day: 'Day', night: 'Night', auto: 'Auto' }[mode]);
+  button.addEventListener('click', () => void changeLighting(mode));
+  return { mode, button };
+});
 const guestLeft = el('button', { class: 'primary', disabled: '' }, 'Confirm Guest Has Left');
 const resetCity = el('button', { disabled: '' }, 'Reset Current City');
 const cancel = el('button', { disabled: '' }, 'Cancel Pending Reset');
@@ -20,20 +26,36 @@ app.append(el('h1', {}, 'Exhibition admin (localhost only)'), status, summary,
   el('div', { class: 'panel' }, el('h2', {}, 'Operation'),
     el('p', {}, '観客が体験エリアから離れたことを目で確認してから押してください。保留中の reset はこの時に実行されます。'),
     el('div', { class: 'row' }, guestLeft, resetCity, cancel), message),
+  el('div', { class: 'panel' }, el('h2', {}, 'City lighting'),
+    el('p', {}, 'Day: 12:00 · Night: 22:00 · Auto: 日夜サイクル。接続中の都市に反映され、再起動後も保持されます。'),
+    el('div', { class: 'row' }, ...lightingButtons.map(({ button }) => button)), lightingStatus, lightingMessage),
   stateBox,
   el('div', { class: 'panel' }, el('h2', {}, 'Full data reset（テスト／展示初期化用）'),
     el('p', {}, '総参加人数と現在の都市を0に戻します。記録は削除されません。観客がいる場合は退出確認まで保留されます。'),
     el('div', { class: 'row' }, fullInput, fullReset)),
   el('h2', {}, '最近のイベント'), events);
 
-let lifecycle: LifecycleStatus | undefined, busy = false;
+let lifecycle: LifecycleStatus | undefined, displayMode: DisplayMode | undefined, busy = false, lightingBusy = false;
 
 function updateButtons() {
+  for (const { mode, button } of lightingButtons) {
+    button.disabled = lightingBusy || !displayMode;
+    button.setAttribute('aria-pressed', String(mode === displayMode));
+    button.className = mode === displayMode ? 'primary' : '';
+  }
   const lc = lifecycle;
   guestLeft.disabled = busy || !lc || lc.phase === 'ready';
   resetCity.disabled = busy || !lc || lc.pendingReset !== 'none';
   cancel.disabled = busy || !lc || lc.pendingReset === 'none';
   fullReset.disabled = busy || !lc || lc.pendingReset === 'full' || fullInput.value !== 'FULL RESET';
+}
+
+async function changeLighting(mode: DisplayMode) {
+  lightingBusy = true; updateButtons();
+  const result = await api<{ mode: DisplayMode }>('/api/admin/display-mode', { mode });
+  lightingMessage.textContent = result.ok ? `City lighting: ${result.data.mode}` : `失敗: ${result.error.message}`;
+  lightingBusy = false;
+  await refresh();
 }
 
 async function send(command: LifecycleCommand, confirmation?: string) {
@@ -68,9 +90,11 @@ fullReset.addEventListener('click', () => {
 
 async function refresh() {
   const [run, log] = await Promise.all([api<AdminCurrentRun>('/api/admin/current-run'), api<AdminEventsData>('/api/admin/events?limit=20')]);
-  if (!run.ok) { lifecycle = undefined; updateButtons(); summary.replaceChildren(el('p', { class: 'notice warn' }, `${run.error.code}: ${run.error.message}`)); return; }
+  if (!run.ok) { lifecycle = undefined; displayMode = undefined; updateButtons(); summary.replaceChildren(el('p', { class: 'notice warn' }, `${run.error.code}: ${run.error.message}`)); return; }
   const d = run.data;
   lifecycle = d.lifecycle;
+  displayMode = d.displayMode;
+  if (!lightingBusy) lightingStatus.textContent = `City lighting: ${displayMode}`;
   status.className = d.lifecycle.pendingReset === 'none' ? 'notice status' : 'notice warn status';
   status.replaceChildren(el('strong', {}, PHASE_TEXT[d.lifecycle.phase]),
     ...(d.lifecycle.pendingReset === 'none' ? [] : [el('br'), `RESET PENDING: ${d.lifecycle.pendingReset === 'full' ? 'full data reset' : 'city reset'}（観客の退出確認後に実行）`]));

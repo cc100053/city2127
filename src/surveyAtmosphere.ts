@@ -1,3 +1,4 @@
+import type { DisplayMode } from './dayCycle.ts';
 import { presets, type WorldState } from './presets.ts';
 import { changeSites } from './layout.ts';
 import { AXES, connectSurvey, isExhibitionView, supersedes, type CityView, type Decision, type ExhibitionProposal, type ExhibitionView, type SurveyEventKind, type SurveyView } from './surveyView.ts';
@@ -97,6 +98,7 @@ const row = (term: string, value: string) => { const r = el('div', 'causal-row')
 export function startSurveyAtmosphere(
   url: string,
   apply: (kind: SurveyEventKind, view: CityView) => void,
+  onDisplayMode?: (mode: DisplayMode) => void,
 ) {
   document.body.dataset.mode = 'survey';
   // Latest choice → policy change → city effect, then the run's history (ported from module-swap's CausalPanel).
@@ -169,7 +171,7 @@ export function startSurveyAtmosphere(
       panel.insertBefore(latest, historyTitle);
       renderLegacyFeedback(view, latest, history, scores);
     }
-  }, text => { status.textContent = `サーバー: ${text}`; });
+  }, text => { status.textContent = `サーバー: ${text}`; }, onDisplayMode);
 }
 
 function renderLegacyFeedback(view: SurveyView, latest: HTMLElement, history: HTMLElement, scores: HTMLElement) {

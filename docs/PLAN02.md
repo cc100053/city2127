@@ -213,3 +213,7 @@ Stage 1–5 均已重跑 `npm test`、`npm run build` 與 1280×720 三態截圖
 ## Night lighting — 2026-09-30
 
 The user approved a brighter futuristic night city: visible facade/ground detail, embedded cold-white building and canopy strips, mint deck/park edges and actual local civic illumination. Implemented in the root scene with eight fixed shadowless lights, stronger night fill and restrained bloom; navy sky, fixed hero camera and the 180-second clock remain. Lighting is independent of v2 bands so low/mixed/high all retain future identity. This supersedes the darker 2026-09-25 night light balance, not earlier acceptance evidence. See [handoff](handoffs/night-lighting.md) and [validation](VALIDATION.md) for current checks and hardware limits.
+
+## Staff day/night control — 2026-09-30
+
+User requested Day/Night buttons on Admin. Implemented Day (12:00), Night (22:00) and Auto (original cycle), persisted independently of city data in schema 5 and synchronized over the existing snapshot channel. Explicit `?hour` keeps capture priority. No camera, geometry, palette, cycle duration or proposal behavior change. See [handoff](handoffs/admin-day-night.md) for verification and integration status.

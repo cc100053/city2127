@@ -165,3 +165,9 @@ npm run build
 ## 未実装（今回の範囲外）
 
 本番用の質問一式、完成したスマホ UI、QR コード接続、クラウド DB、認証、リポジトリ直下（`src/`）の渋谷シーンへの接続、デプロイ。
+
+## Admin city lighting — 2026-09-30
+
+`/admin` の **Day / Night / Auto** は、接続中の root `?survey` 都市を12:00 / 22:00 / 既存の日夜サイクルに切り替えます。`POST /api/admin/display-mode` は `{ "mode": "day" | "night" | "auto" }` のみ受け付け、Admin と同じ localhost・同一 origin の制限があります。`GET /api/admin/current-run` は `displayMode` を返します。
+
+Schema 5 の `display_settings` に保存し、再起動・city/full reset 後も保持します。初期値は Auto。WebSocket の既存 `city-state-snapshot` に optional `displayMode` を付けて変更時・再接続時に配信します。CityView、提案、スコア、都市 revision、lifecycle は変更しません。明示的な root `?hour` は優先され、standalone / module-swap はこの制御の対象外です。Auto は各 viewer の動作中の時計を再開します。更新後は既存 SQLite を保ったまま server を再起動し Admin を再読み込みしてください。

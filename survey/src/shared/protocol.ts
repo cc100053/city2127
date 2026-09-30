@@ -100,7 +100,10 @@ export type LifecycleData = {
   previousRunId: string | null;
 };
 
+export type DisplayMode = 'auto' | 'day' | 'night';
+
 export type AdminCurrentRun = {
+  displayMode: DisplayMode;
   run: RunSummary;
   lifecycle: LifecycleStatus;
   state: CitySurveyState | ExhibitionState;
@@ -116,7 +119,7 @@ export type AdminEventsData = { answers: AnswerEvent[]; proposals: ProposalRecor
 export type AppliedChange = { scores: Partial<CityScores> };
 
 export type ServerEvent =
-  | { type: 'city-state-snapshot'; state: CitySurveyState | ExhibitionState; view: CityView }
+  | { type: 'city-state-snapshot'; displayMode?: DisplayMode; state: CitySurveyState | ExhibitionState; view: CityView }
   | {
       type: 'city-state-updated';
       answerId: string;
