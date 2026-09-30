@@ -16,6 +16,7 @@ import { displayHour, type DisplayMode, sunHeight, daylight, moodAt, withNight, 
 import { overlay } from './overlay';
 import { addCityModel } from './modelAssets';
 import { loadOdaiba, updateOdaiba } from './odaibaScene';
+import { build2127 } from './odaiba2127';
 import { scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
 import { createCityChangeManager } from './createCityChangeManager';
@@ -44,6 +45,7 @@ try {
   // Open sea beyond the masterplan plate; fog closes the horizon.
   const floor=new T.Mesh(new T.PlaneGeometry(20000,20000),new T.MeshStandardMaterial({color:'#5a93a8',roughness:.62}));floor.rotation.x=-Math.PI/2;floor.position.y=-1.2;floor.receiveShadow=true;scene.add(floor);
   const rig=cityRig(scene);
+  build2127(scene);
   loadOdaiba(scene).catch(error=>{const message=document.createElement('p');message.className='error';message.textContent='Odaiba could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);});
   if(import.meta.env.DEV && new URLSearchParams(location.search).has('asset-preview')){
     const input=document.createElement('input');input.type='file';input.accept='.glb,model/gltf-binary';input.className='asset-preview';input.title='Preview a Blender GLB in the city scene';input.setAttribute('aria-label','Preview a Blender GLB');

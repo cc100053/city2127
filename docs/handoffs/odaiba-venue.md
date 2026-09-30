@@ -30,6 +30,7 @@ P0: Odaiba GLB/blend pairs and masterplan outputs under `asset/models/`, `src/od
 - P1: root scene is Odaiba (`src/odaibaScene.ts`, trimmed `src/cityRig.ts`, `heroCamera`, `main.ts` scale/fog/shadow/sea). Shibuya hero-visibility test block removed.
 - P2: four sites on Odaiba open ground with per-site scale; place names デックス西 / お台場海浜公園 / アクアシティ南 / フジテレビ東; Odaiba ground + hero-visibility test; lot-bound tests in site-local units; Shibuya site clearance tests removed.
 - P3: Odaiba-only `layout.ts` routes; rewritten `mobility.ts` (trains, walkers, water taxis/ferry, air taxis, sphere berth) wired back through `cityRig`; new pure and raycast actor tests.
+- P4: `src/odaiba2127.ts` (sky bridges, sphere berth, guideway light lines, floating decks), roof retrofit and sphere night glow in `odaibaScene`; bridge/deck raycast tests.
 
 ## Actual validation results
 
@@ -39,6 +40,7 @@ P0: Odaiba GLB/blend pairs and masterplan outputs under `asset/models/`, `src/od
 - P1 (2026-09-30): root `npm test`/`npm run build` passed, `git diff --check` clean; exhibition machine 60.0 FPS, 1,243–1,245 draw calls at 12:00/18:30/22:00, no console errors; captures `artifacts/odaiba-p1-{1200,1830,2200}.png`.
 - P2 (2026-09-30): root `npm test` (15 PASS lines plus Odaiba site checks) and `npm run build` passed; scratch survey server on 8791 (scratch SQLite, not the exhibition DB): 59–60 FPS, 1,525–1,581 draw calls, no page errors; captures `artifacts/odaiba-p2-{baseline,high,low,low-2200}.png`.
 - P3 (2026-09-30): root `npm test`/`npm run build` passed; exhibition machine 60.2–60.3 FPS, 1,307–1,309 draw calls, no page errors; captures `artifacts/odaiba-p3-{1200,2200,close}.png`.
+- P4 (2026-09-30): root `npm test`/`npm run build` passed; exhibition machine 60.0–60.1 FPS, 1,340–1,342 draw calls, no page errors; captures `artifacts/odaiba-p4-*.png`.
 - Evidence/environment: temporary spike (reverted) measured 60.0 FPS at 1920×1080, 1,223–1,311 draw calls, headed Chrome 154 / ANGLE Metal Apple M6, pixel ratio 1. See the plan's P0 result.
 - Integrated commit and checks: NOT INTEGRATED.
 - Changes since verification: NONE.
@@ -55,4 +57,4 @@ See the plan's "Decisions (user, 2026-09-30)". Real metres are kept; the camera 
 
 ## Next expected step
 
-P4 on this branch: the 2127 layer — waterfront promenade edge, sphere berth/media globe, retrofit kit (PV skins, green roofs, sky bridges Fuji TV ↔ Aqua City ↔ DECKS), guideway light lines; then art review and FPS re-measure.
+P5 on this branch: rewrite the four exhibition questions for the waterfront (draft in the plan; ids/effects unchanged) after user wording review, update guest UI and overlay copy (お台場, 35°37′N 139°46′E), README/PROJECT/PLAN02/AGENTS, and run `survey/` tests/build.

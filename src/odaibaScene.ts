@@ -23,10 +23,16 @@ const environmentFinish: Record<string, [color: string, roughness: number, metal
   context_unknown: ['#d2d9dc', .9, 0], context_office_commercial: ['#c9d3da', .85, 0], context_utility_service: ['#cfd3d0', .9, 0], context_public_cultural: ['#d0d8cf', .9, 0],
 };
 
+// 2127 retrofit by material: mall roofs become planted, hotel roofs photovoltaic; no extra geometry.
+const roofRetrofit: Record<string, [color: string, roughness: number, metalness: number]> = {
+  'Roof and Shadow': ['#7d9f68', .85, 0], 'Standing seam roof.001': ['#486b83', .3, .85], 'Gray roof metal': ['#486b83', .3, .85],
+};
 const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a');
-/** Night: every building's glazing glows warm, so the landmarks keep their silhouettes after dark. */
+let sphere: T.MeshStandardMaterial | undefined;
+/** Night: glazing glows warm so the landmarks keep their silhouettes; the Fuji TV sphere becomes a soft mint beacon. */
 export function updateOdaiba(night: number) {
   for (const material of glazing) material.emissiveIntensity = night * .55;
+  if (sphere) sphere.emissiveIntensity = night * .5;
 }
 
 /** Phase 03D environment plus the eight landmark buildings at their surveyed placements, in metres. */
@@ -48,6 +54,8 @@ export async function loadOdaiba(scene: T.Scene) {
       if (!(object instanceof T.Mesh)) return;
       for (const material of [object.material].flat() as T.MeshStandardMaterial[])
         if (/glass|glazing|window/i.test(material.name) && !glazing.has(material)) { material.emissive.copy(warm); material.emissiveIntensity = 0; glazing.add(material); }
+        else if (roofRetrofit[material.name]) { const [color, roughness, metalness] = roofRetrofit[material.name]; material.color.set(color); material.roughness = roughness; material.metalness = metalness; }
+        else if (material.name === 'Sphere - titanium panels') { sphere = material; material.emissive.set('#8ce5d8'); material.emissiveIntensity = 0; }
     });
   }));
 }

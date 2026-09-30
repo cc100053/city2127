@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { Box3, Group, Mesh, Raycaster, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
-import { changeSites } from '../src/layout.ts';
+import { changeSites, skyBridges, floatingDecks } from '../src/layout.ts';
 import { heroCamera } from '../src/heroCamera.ts';
 import { routes } from '../src/mobility.ts';
 
@@ -92,6 +92,30 @@ for (const [name, route] of [['water loop', actorPaths.water], ['ferry lane', ac
   const hit = groundAt(p.x, p.z);
   assert.ok(!hit || /^WATER/.test(hit.object.name), `${name} runs aground on ${hit?.object.name} at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
 }
+// 2127 layer: each sky bridge spans open air between its two facades and clears the trains; floating decks float clear of boat routes.
+for (const bridge of skyBridges) {
+  const a = new Vector3(...bridge.from), b = new Vector3(...bridge.to), dir = b.clone().sub(a).normalize();
+  for (const [x, y] of [[-4, -2.5], [4, -2.5], [-4, 2.5], [4, 2.5], [0, 0]]) {
+    const offset = new Vector3(-dir.z, 0, dir.x).multiplyScalar(x).setY(y);
+    ray.set(a.clone().add(offset).addScaledVector(dir, 3), dir);
+    const first = ray.intersectObject(city, true)[0];
+    assert.ok(first && first.distance > a.distanceTo(b) - 12, `${bridge.name} hits ${first?.object.name} after ${first?.distance.toFixed(0)} m`);
+  }
+  for (let i = 0; i <= 100; i++) {
+    const p = a.clone().lerp(b, i / 100);
+    for (let j = 0; j <= 400; j++) { const g = actorPaths.guideway.getPointAt(j / 400); if (Math.hypot(g.x - p.x, g.z - p.z) < 8) assert.ok(p.y - 2.5 - (g.y + 3) > 3, `${bridge.name} too low over the guideway`); }
+  }
+}
+const boatPoints = [actorPaths.water, actorPaths.ferry].flatMap(route => Array.from({ length: 400 }, (_, i) => route.getPointAt(i / 400)));
+for (const [x, z, yaw] of floatingDecks) {
+  const along = new Vector3(Math.sin(yaw), 0, Math.cos(yaw)), across = new Vector3(along.z, 0, -along.x);
+  for (const [u, v] of [[-18, -5], [18, -5], [-18, 5], [18, 5], [0, 0]]) {
+    const p = new Vector3(x, 0, z).addScaledVector(along, u).addScaledVector(across, v), hit = groundAt(p.x, p.z);
+    assert.ok(!hit || /^WATER/.test(hit.object.name), `floating deck at ${x},${z} grounds on ${hit?.object.name}`);
+  }
+  assert.ok(Math.min(...boatPoints.map(p => Math.hypot(p.x - x, p.z - z))) > 30, `floating deck at ${x},${z} sits in a boat route`);
+}
+console.log('Odaiba: sky bridges span clear air above the trains; floating decks float clear of boat routes.');
 console.log('Odaiba: pods ride the guideway deck, walkers keep to open ground outside site lots, water taxis stay afloat.');
 console.log('Odaiba: survey sites sit on open ground, clear of roads, landmarks and guideway, and are visible from the hero pose.');
 console.log('Odaiba: eight GLBs match Phase 03D world bounds within 2 mm, grounded, unit scale, legacy axis verified.');

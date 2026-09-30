@@ -476,3 +476,7 @@ Branch `codex/odaiba-venue`. Root `npm test` and `npm run build` passed; `git di
 ## Odaiba venue P3 — 2026-09-30
 
 Branch `codex/odaiba-venue`. Root `npm test` (new Odaiba mobility suite plus raycast route checks in `tests/odaiba.test.ts`) and `npm run build` passed; `git diff --check` clean; `survey/` and `module-swap/` unchanged. Exhibition machine (headed Chrome 154, ANGLE Metal Apple M6, 1920×1080): 60.3 FPS / 1,307 draws at 12:00 and 60.2 / 1,309 at 22:00, no page errors. Captures: [12:00](../artifacts/odaiba-p3-1200.png), [22:00](../artifacts/odaiba-p3-2200.png), [zoomed](../artifacts/odaiba-p3-close.png). Not checked: `?survey` with actors (site/route separation is covered by tests), art acceptance.
+
+## Odaiba venue P4 — 2026-09-30
+
+Branch `codex/odaiba-venue`. Root `npm test` (new sky-bridge and floating-deck raycast checks) and `npm run build` passed; `git diff --check` clean. Exhibition machine (headed Chrome 154, ANGLE Metal Apple M6, 1920×1080): 60.0 FPS / 1,340 draws at 12:00, 60.1 / 1,342 at 22:00; no page errors. Captures: [12:00](../artifacts/odaiba-p4-1200.png), [22:00](../artifacts/odaiba-p4-2200.png), [zoomed 12:00](../artifacts/odaiba-p4-close-1200.png), [zoomed 22:00](../artifacts/odaiba-p4-close-2200.png). Not checked: `?survey` with the 2127 layer, art acceptance.

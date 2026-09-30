@@ -38,3 +38,11 @@ export const changeSites = {
   sw:{name:'COMMONS PLAZA',place:'アクアシティ南',x:-105,z:60,w:12,d:10,h:5,scale:4},
   se:{name:'TOWER',place:'フジテレビ東',x:175,z:-45,w:9,d:9,h:46,scale:3},
 } as const;
+
+// 2127 retrofit (src/odaiba2127.ts). Sky bridges at 24 m between facade points found by raycast; each clear of all other geometry.
+export const skyBridges: readonly {name:string;from:P3;to:P3}[] = [
+  {name:'AQUA ↔ FUJI TV',from:[-49,24,-90],to:[-15,24,-32]}, // crosses 10 m above the guideway trains
+  {name:'AQUA ↔ DECKS',from:[31,24,-177],to:[90,24,-216]},
+];
+// Floating decks off the east promenade: [x, z, yaw], 10 × 36 m, long axis along the shore; on water and 30 m from boat routes.
+export const floatingDecks: readonly (readonly [number,number,number])[] = [[-62,-281,-1.12],[-131,-238,-1.03],[-180,-199,-1.02]];
