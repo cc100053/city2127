@@ -1,8 +1,9 @@
 // Odaiba scene, metres: +X east, -Z north, Y up; ground pads at 0, sea at -0.8. One source for the actor routes and survey sites.
 type P3 = readonly [number, number, number];
 
-// Hero district (720 × 680 m around the landmark cluster): detail outside it is not built; bare ground beyond fades into haze.
-export const DISTRICT = {minX:-460,maxX:260,minZ:-360,maxZ:320} as const;
+// Hero district (720 × 680 m around the landmark cluster): detail outside it is not built; ground, roads and guideway continue
+// for `apron` metres with round corners and fade into haze (scripts/crop-odaiba-district.py mirrors these numbers).
+export const DISTRICT = {minX:-460,maxX:260,minZ:-360,maxZ:320,apron:150} as const;
 export const inDistrict = (x:number,z:number) => x>=DISTRICT.minX && x<=DISTRICT.maxX && z>=DISTRICT.minZ && z<=DISTRICT.maxZ;
 
 // Yurikamome guideway centreline, traced every 25 m across the Phase 03D guideway deck (top at 14.2 m), north-east to south-west.

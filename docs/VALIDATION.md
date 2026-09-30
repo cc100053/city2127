@@ -523,3 +523,7 @@ Standalone rolling observation: 32.8 FPS / 1388 draws / 356 geometries at 1920×
 ## Odaiba hero district P1 — 2026-09-30
 
 `feat/odaiba-district` (stacked on `feat/art-direction` `55f9473`): root `npm test` PASS with new district assertions, `npm run build` PASS, `git diff --check` clean. Browser hero pose at 800×600: 1,310 → 1,195 draw calls and 1.89 M → 1.58 M triangles per frame; day/night without console errors. Details and unverified items: [district handoff](handoffs/odaiba-district.md).
+
+## Odaiba hero district P2 — 2026-09-30
+
+`feat/odaiba-district`: environment replaced by the headless-Blender-derived `odaiba_district_v01_environment.glb` (48,178 → 11,343 triangles, 2.6 → 0.6 MB) with a hashed-alpha apron dissolve. Root `npm test` and `npm run build` PASS, `git diff --check` clean. Browser hero pose (`hour=21`, 800×600): 1,185 draw calls / 1.47 M triangles per frame; day, night and top view without console errors or visible plate edges. Details: [district handoff](handoffs/odaiba-district.md).

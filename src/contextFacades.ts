@@ -1,38 +1,4 @@
 import * as T from 'three';
-import { inDistrict } from './layout.ts';
-
-// Context blocks, street furniture and stations outside the hero district are dropped; ground, roads and guideway stay as the hazed backdrop.
-const districtDetail = /^(CTX_|PUBLIC_|STREETLIGHT_|LANDSCAPE_TREE|STATIONS)/;
-/** Drop each connected piece (one block, lamp or bench) whose centre lies outside the district. */
-export function cropToDistrict(environment: T.Object3D) {
-  environment.updateMatrixWorld(true);
-  const empty: T.Object3D[] = [];
-  environment.traverse(object => {
-    if (!(object instanceof T.Mesh) || !districtDetail.test(object.name)) return;
-    const geometry = object.geometry as T.BufferGeometry, position = geometry.attributes.position;
-    const index = geometry.index ? Array.from(geometry.index.array) : Array.from({length: position.count}, (_, i) => i);
-    // Union-find over position-welded vertices: split attributes (normals/UVs) must not split a block.
-    const parent = Array.from({length: position.count}, (_, i) => i), welded = new Map<string, number>(), p = new T.Vector3();
-    const root = (i: number): number => parent[i] === i ? i : (parent[i] = root(parent[i]));
-    const join = (a: number, b: number) => { parent[root(a)] = root(b); };
-    for (let i = 0; i < position.count; i++) {
-      const key = p.fromBufferAttribute(position, i).toArray().map(v => v.toFixed(3)).join();
-      const first = welded.get(key);
-      if (first === undefined) welded.set(key, i); else join(i, first);
-    }
-    for (let i = 0; i < index.length; i += 3) { join(index[i], index[i + 1]); join(index[i], index[i + 2]); }
-    const bounds = new Map<number, T.Box3>();
-    for (let i = 0; i < position.count; i++) {
-      const r = root(i);
-      if (!bounds.has(r)) bounds.set(r, new T.Box3());
-      bounds.get(r)!.expandByPoint(p.fromBufferAttribute(position, i).applyMatrix4(object.matrixWorld));
-    }
-    const keep = new Map([...bounds].map(([r, box]) => { const c = box.getCenter(p); return [r, inDistrict(c.x, c.z)]; }));
-    const kept = index.filter((_, i) => keep.get(root(index[i - i % 3])));
-    if (kept.length) geometry.setIndex(kept); else empty.push(object);
-  });
-  empty.forEach(object => object.removeFromParent());
-}
 
 /** Give surveyed context massing a panel rhythm without changing its silhouette. */
 export function contextFacades(environment: T.Object3D) {

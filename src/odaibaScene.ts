@@ -5,11 +5,11 @@ import layout from './odaiba-layout.json';
 import { civicCore } from './civicCore';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
 import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
-import { contextFacades, cropToDistrict } from './contextFacades';
+import { contextFacades } from './contextFacades';
 import { DISTRICT, inDistrict } from './layout';
 
-// Literal paths bundle the environment and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
-const environmentUrl = new URL('../asset/models/odaiba-masterplan/odaiba_masterplan_v01_phase03d_environment.glb', import.meta.url).href;
+// Literal paths bundle the district-cropped environment (scripts/crop-odaiba-district.py) and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
+const environmentUrl = new URL('../asset/models/odaiba-masterplan/odaiba_district_v01_environment.glb', import.meta.url).href;
 const buildingUrls: Record<string, string> = {
   'aqua-city-odaiba': new URL('../asset/models/aqua-city-odaiba/aqua-city-odaiba.glb', import.meta.url).href,
   'decks-tokyo-beach': new URL('../asset/models/decks-tokyo-beach/decks-tokyo-beach.glb', import.meta.url).href,
@@ -30,17 +30,18 @@ const environmentFinish: Record<string, [color: string, roughness: number, metal
 const roofRetrofit: Record<string, [color: string, roughness: number, metalness: number]> = {
   'Roof and Shadow': ['#7d9f68', .85, 0], 'Standing seam roof.001': ['#486b83', .3, .85], 'Gray roof metal': ['#486b83', .3, .85],
 };
-// Outside the district, ground, roads and guideway blend into the fog colour over 300 m.
-function hazeBeyondDistrict(material: T.Material) {
+// Across the apron, ground, roads and guideway dissolve (hashed alpha, still opaque-sorted) into the sea, hiding the cut edge.
+function fadeBeyondDistrict(material: T.Material) {
   const compile = material.onBeforeCompile.bind(material), key = material.customProgramCacheKey.bind(material);
+  material.alphaHash = true;
   material.onBeforeCompile = (shader, renderer) => {
     compile(shader, renderer);
     shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 districtXz;').replace('#include <project_vertex>', '#include <project_vertex>\ndistrictXz=(modelMatrix*vec4(transformed,1.)).xz;');
-    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 districtXz;').replace('#include <fog_fragment>', `#include <fog_fragment>
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 districtXz;').replace('#include <alphatest_fragment>', `#include <alphatest_fragment>
       vec2 beyond=max(vec2(${DISTRICT.minX.toFixed(1)},${DISTRICT.minZ.toFixed(1)})-districtXz,districtXz-vec2(${DISTRICT.maxX.toFixed(1)},${DISTRICT.maxZ.toFixed(1)}));
-      gl_FragColor.rgb=mix(gl_FragColor.rgb,fogColor,.85*smoothstep(0.,300.,length(max(beyond,0.))));`);
+      diffuseColor.a*=1.-smoothstep(0.,${(DISTRICT.apron*.9).toFixed(1)},length(max(beyond,0.)));`);
   };
-  material.customProgramCacheKey = () => key() + '|district-haze';
+  material.customProgramCacheKey = () => key() + '|district-fade';
 }
 
 const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a');
@@ -49,14 +50,13 @@ export function updateOdaiba(night: number) {
   for (const material of glazing) material.emissiveIntensity = night * .55;
 }
 
-/** Phase 03D environment, seven surveyed landmarks and the replacement Fuji civic core, in metres. */
+/** District-cropped Phase 03D environment, six surveyed landmarks and the replacement Fuji civic core, in metres. */
 export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   const grass=new T.TextureLoader().load(new URL('../asset/textures/coastal-grass.png',import.meta.url).href);
   grass.colorSpace=T.SRGBColorSpace;grass.wrapS=grass.wrapT=T.RepeatWrapping;grass.anisotropy=8;
   const environment = await addCityModel(scene, environmentUrl, [0, 0, 0]);
   environment.name = 'odaiba-environment';
-  cropToDistrict(environment);
-  const hazed = new Set<T.Material>();
+  const faded = new Set<T.Material>();
   environment.traverse(object => {
     if (!(object instanceof T.Mesh)) return;
     const material = object.material as T.MeshStandardMaterial, finish = environmentFinish[material.name];
@@ -72,11 +72,10 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     }
     // The sea lies under the whole plate; grazing shadows on it only produce acne.
     if (material.name === 'water') { object.castShadow = object.receiveShadow = false; if(water) object.material=water; }
-    if(object.name==='ROADSIDE_TREE_INSTANCES') object.visible=false;
   });
-  // After finishes: shared materials are re-tuned once per mesh above, which would drop an earlier haze wrap.
-  environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) hazed.add(object.material); });
-  hazed.forEach(hazeBeyondDistrict);
+  // After finishes: shared materials are re-tuned once per mesh above, which would drop an earlier fade wrap.
+  environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) faded.add(object.material); });
+  faded.forEach(fadeBeyondDistrict);
   scene.add(contextFacades(environment));
   plantCanopy(scene,trees);
   await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1])).map(async placement => {
