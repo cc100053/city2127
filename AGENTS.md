@@ -81,12 +81,14 @@ Use Node.js 24+; this project has been run with Node 26. Tests execute TypeScrip
 
 ```sh
 npm ci                       # when dependencies are absent or the lockfile changed
+npm ci --prefix survey       # root Meter pipeline tests use the real survey HTTP/WebSocket server
 npm run dev -- --port 5173    # loopback-only preview; use the URL Vite actually prints
 npm test                     # state timing + mobility/route checks
 npm run build                # strict source typecheck + production build
 git diff --check             # whitespace in uncommitted changes
 
 cd survey && npm ci && npm test && npm run build                  # survey server package
+cd survey && npm run dev:auto                                   # DEV-ONLY: fresh scratch SQLite, localhost:8788/guest?dev-auto
 cd module-swap && npm run install:app && npm test && npm run build  # viewer (test also runs check:models)
 ```
 

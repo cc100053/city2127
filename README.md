@@ -61,6 +61,14 @@ npm run dev -- --port 5173
 
 AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/PROJECT.md) · [驗收與交接流程](docs/VALIDATION.md) · [展覽方向與 Plan 02 紀錄](docs/PLAN02.md)。
 
+### 開發用自動答題（DEV-ONLY，2026-09-30）
+
+在 `survey/` 執行 `npm run dev:auto`，再開 `http://127.0.0.1:8788/guest?dev-auto`；城市 Vite 保持開住，連到 `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8788/ws`（Vite port 如不同請替換）。每次啟動建立新的獨立暫存 SQLite，terminal 會印出位置；不改動展覽的 `survey/data/survey.sqlite`，暫存資料保留供檢查。
+
+面板可選全 −1／0／+1、輪替混合、逐 Meter 指定或 seed 隨機，設定提案數並按 **自動回答を開始**。預設 10 份、seed 2127；沿用 Guest 草稿／確認／提交，每題 0.3 秒、結果 10 秒、交接 5 秒後自動確認本次 guest 離場。停止或錯誤不再建立下一份；已送出的請求仍會完成，未知結果沿用原本同 ID 重試。一般 `/guest` 不顯示面板。功能只限 localhost，server 必須開 `SURVEY_DEV_AUTO=1`（launcher 已設定）；遇到其他 guest、衝突或待 reset 會停止，不會自動 reset。
+
+**展覽前須移除，或將控制面板移到 Admin 並恢復工作人員確認離場。** 程式入口與[設計書](docs/EXHIBITION_MVP.md#development-auto-answer-and-meter-contract-tests--2026-09-30)已有 `DEV-ONLY` 移除／遷移註記。單獨跑 Meter 測試：`cd survey && npm run test:meters`；完整串接亦已加入 root／survey 的 `npm test`。
+
 **展覽 MVP 狀態（2026-09-30）：** [共同城市 MVP 設計與 Agent 實作規劃](docs/EXHIBITION_MVP.md)的 S1 四題 API、SQLite v2 run／proposal 儲存已實作。S2 Q3→NE Park 切片已整合及通過 feature/main CI。S3 四site映射（`d51167b`、SW／SE 可見度修正 `36b5c18`）的本機 root checks、API matrix、12 張 captures、snapshot/reset 與 standalone smoke 均已通過，已與 lifecycle／S4 合併並整合至 main（`63af1b6`），feature CI 及 main CI 均通過，S3 已 shipped。S4 四題 guest UI 與 root 回饋面板已於 2026-09-30 完成瀏覽器驗收並整合至 main（`5e14078`，main CI 通過；剩餘偏差見 S4 handoff）；整體展覽仍未驗收。城市從開始已是2127年，低／零／高值都必須有未來感。下方一題流程及畫面內容是 v1 歷史實作，不代表新的 guest flow。S1–S4 狀態分別見 [S1 handoff](docs/handoffs/exhibition-s1.md)、[S2 handoff](docs/handoffs/exhibition-s2.md)、[S3 handoff](docs/handoffs/exhibition-s3.md) 和 [S4 handoff](docs/handoffs/exhibition-s4.md)，完整驗證見[驗證紀錄](docs/VALIDATION.md)。
 
 ## 協作入門

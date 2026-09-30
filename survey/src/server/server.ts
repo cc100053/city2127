@@ -16,6 +16,7 @@ import { currentRun, isLoopbackAddress, lifecycleCommand, readDisplayMode, setDi
 import { attachRealtime } from './realtime.ts';
 import { createProposalSession, getProposalSession, submitProposal } from './proposalService.ts';
 import { UnsupportedRunVersionError } from './runStore.ts';
+import { devSurveyConfig } from './devSurvey.ts';
 
 const statusFor: Record<ErrorCode, number> = {
   bad_request: 400, not_found: 404, forbidden: 403, internal_error: 500,
@@ -62,13 +63,15 @@ async function readJson(req: IncomingMessage): Promise<unknown> {
 
 export type SurveyServerOptions = {
   ctx: SurveyContext;
+  /** DEV-ONLY: disabled by default. Remove/migrate auto-answer tooling before exhibition. */
+  devAuto?: boolean;
   /** Directory with the Vite build (guest.html, monitor.html, admin.html, assets/). */
   staticDir?: string;
   /** Source address used for the loopback check; tests substitute a LAN address here. */
   remoteAddress?: (req: IncomingMessage) => string | undefined;
 };
 
-export function createSurveyServer({ ctx, staticDir, remoteAddress = req => req.socket.remoteAddress }: SurveyServerOptions) {
+export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddress = req => req.socket.remoteAddress }: SurveyServerOptions) {
   const server = createServer((req, res) => {
     handle(req, res).catch(error => {
       if (error instanceof UnsupportedRunVersionError) {
@@ -109,6 +112,12 @@ export function createSurveyServer({ ctx, staticDir, remoteAddress = req => req.
 
     if (isAdmin && method === 'POST' && req.headers.origin !== undefined && req.headers.origin !== `http://${req.headers.host}`)
       throw new HttpError(403, 'forbidden', 'Cross-origin admin request refused.');
+
+    // DEV-ONLY: never add option effects to the public guest/session API.
+    if (path === '/api/admin/dev-survey-config' && method === 'GET') {
+      if (!devAuto) throw new HttpError(404, 'not_found', 'Development auto-answer is disabled.');
+      return sendJson(res, { ok: true, data: devSurveyConfig(ctx.questions) });
+    }
 
     if (path === '/api/health' && method === 'GET') {
       const state = currentState(ctx);
@@ -163,7 +172,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const port = Number(env.SURVEY_PORT ?? 8787), host = env.SURVEY_HOST ?? '127.0.0.1';
   const dbPath = resolve(env.SURVEY_DB_PATH ?? 'data/survey.sqlite');
   const ctx = createContext({ dbPath, questionsPath: resolve(env.SURVEY_QUESTIONS ?? 'src/survey/questions.exhibition.json') });
-  const { server, realtime } = createSurveyServer({ ctx, staticDir: resolve(env.SURVEY_STATIC_DIR ?? 'dist') });
+  const { server, realtime } = createSurveyServer({ ctx, staticDir: resolve(env.SURVEY_STATIC_DIR ?? 'dist'), devAuto: env.SURVEY_DEV_AUTO === '1' });
   const state = currentState(ctx);
   server.listen(port, host, () => {
     console.log(`Survey server on http://${host === '0.0.0.0' ? '127.0.0.1' : host}:${port}  (db ${dbPath})`);
