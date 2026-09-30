@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { arc, bake, leaf, membrane, paint, pink, shrubs, stone, trim, type Kit } from '../cityRig.ts';
+import { arc, bake, futureLight, leaf, membrane, paint, pink, shrubs, stone, trim, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition, type EnvironmentParkTarget } from '../changeCatalog.ts';
 import { changeSites } from '../layout.ts';
 import type { SiteAssetLoaderCache } from '../siteAssets/assetLoader.ts';
@@ -259,6 +259,7 @@ export function buildEnvironmentPark(scene: T.Scene, _kit: Kit, assets: SiteAsse
   // Fixed paved ground remains visible outside the authoritative planted-area footprint.
   arc(park, 0, 4.5, .12, [0, .62, 0], stone);
   arc(park, 2.7, 3.2, .02, [0, .74, 0], stone);
+  arc(park, 3.2, 3.29, .025, [0, .74, 0], futureLight);
   arc(park, 0, 1.55, .08, [0, .7, 0], water);
   arc(park, 1.55, 1.8, .18, [0, .62, 0], trim);
   arc(park, 4.5, 4.95, .6, [0, .62, 0], trim, .5, 5.2);

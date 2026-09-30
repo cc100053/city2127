@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { arc, bake, box, cream, faces, futureLight, glass, leaf, sage, shrubs, sign, solar, trim, type Kit } from '../cityRig.ts';
+import { arc, bake, box, cream, faces, futureLight, glass, leaf, publicLight, sage, shrubs, sign, solar, trim, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import type { Band } from '../surveyView.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, SITE_TRANSITION_SECONDS, type BuiltSite } from './siteRuntime.ts';
@@ -163,6 +163,7 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
   box(base, [8, 16.6, 8], [0, 9.6, 0], sage, .35);
   for (let y = 4; y < 17; y += 3) {
     box(base, [8.2, .3, 8.2], [0, y, 0], trim, .05);
+    faces(base, 8.2, 8.2, (face, across, out) => box(face, [across - .4, .07, .08], [0, y - .12, out + .04], publicLight, .02));
     faces(base, 8, 8, (face, across, out) => box(face, [across - 1, 1.3, .08], [0, y + 1.4, out + .03], glass, .03));
     if (y % 6 === 4) {
       box(base, [7.6, .35, .4], [0, y + .32, 4.25], leaf, .15);
@@ -221,6 +222,7 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
   for (let y = 0, floor = 0; y < 25; y += 2.6, floor++) {
     arc(towerUpper, 0, 3.2, 1, [0, y, 0], cream);
     arc(towerUpper, 0, 3.45, .14, [0, y + 1, 0], trim);
+    arc(towerUpper, 3.35, 3.46, .035, [0, y + .97, 0], publicLight);
     if (floor % 3 === 1) {
       arc(towerUpper, 3.05, 3.45, .3, [0, y + 1.14, 0], leaf);
       shrubs(towerUpper, 3.25, y + 1.2, 0, Math.PI * 2, 16);

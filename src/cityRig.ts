@@ -3,12 +3,13 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets';
 import { mobility, airRoutes } from './mobility.ts';
-import { crossings, crossingPoint, roads, landmarks, publicRoutes, upperLinks, DOCK } from './layout.ts';
+import { crossings, crossingPoint, roads, landmarks, publicRoutes, upperLinks, changeSites, DOCK } from './layout.ts';
 
 // Three finishes: matte ceramic composite, refined metal, and reflective glass. Same shader, different response to the one environment map.
 export const paint = (color: T.ColorRepresentation, roughness=.52, metalness=0) => new T.MeshStandardMaterial({ color, roughness, metalness });
 export const cream = paint('#dce3e3',.58), teal = paint('#839da8',.44,.05), sage = paint('#a9c5c2',.5), pink = paint('#b9b7ac',.56), dark = paint('#27414f',.16,.7), trim = paint('#edf0ed',.48);
 export const futureLight=new T.MeshStandardMaterial({color:'#8ce5d8',emissive:'#68d9de',emissiveIntensity:.8,roughness:.65});
+export const publicLight=new T.MeshStandardMaterial({color:'#ecf4ed',emissive:'#dcebe6',emissiveIntensity:.15,roughness:.6});
 export const solar=paint('#486b83',.3,.85);
 export const membrane=new T.MeshStandardMaterial({color:'#9abdb9',roughness:.3,metalness:.25,transparent:true,opacity:.72,side:T.DoubleSide});
 // Pilot finishes (docs/ART.md): silvered glass that reads the sky, living green, pale stone paving.
@@ -95,6 +96,8 @@ export function tower(kit:Kit) {
   box(g,[14,13,12.4],[.5,26.5,0],teal,.45);
   for(const y of [20,33]){
     box(g,[14.5,.5,12.9],[.5,y,0],trim,.12);
+    const lights=new T.Group();lights.position.x=.5;g.add(lights);
+    faces(lights,14.5,12.9,(f,across,out)=>box(f,[across-.6,.08,.08],[0,y-.2,out+.04],publicLight,.02));
     // Planted collar terraces on the crossing and east faces (ART.md §4).
     box(g,[13.3,.45,.5],[.5,y+.47,6.1],leaf,.2);box(g,[.5,.45,11.7],[7.4,y+.47,0],leaf,.2);
   }
@@ -165,6 +168,7 @@ export function shop(kit:Kit,x:number,z:number,w:number,h:number,d:number,color:
   // A full-width public void is held by side cores, with housing above; its edge is planted all round.
   for(const x of [-w/2+.5,w/2-.5])for(const z of [-d/2+.5,d/2-.5])box(g,[1,5.5,1],[x,7.5,z],trim);
   box(g,[w+.7,.3,d+.7],[0,10.5,0],trim);
+  faces(g,w+.7,d+.7,(f,across,out)=>box(f,[across-.4,.08,.08],[0,10.38,out+.04],publicLight,.02));
   faces(g,w,d,(f,across,out)=>box(f,[across-.2,.4,.45],[0,10.85,out+.1],leaf,.18));
   sign(g,kit,label,0,4.1,d/2+.16,w-.8,1.05,'#536f66');
   if(style==='slender'){
@@ -288,7 +292,10 @@ export function cityRig(scene:T.Scene) {
   // Twin occupied cores carry a civic hall and an upper residential district.
   for(const x of [-3.7,3.7])box(qfront,[3.6,q.h-.8,q.d],[x,q.h/2+.4,0],teal);
   box(qfront,[q.w,5,q.d],[0,3.3,0],glass);
-  for(const y of [11,23,36])box(qfront,[q.w+.4,.6,q.d+.4],[0,y,0],trim);
+  for(const y of [11,23,36]){
+    box(qfront,[q.w+.4,.6,q.d+.4],[0,y,0],trim);
+    faces(qfront,q.w+.4,q.d+.4,(f,across,out)=>box(f,[across-.4,.08,.08],[0,y-.22,out+.04],publicLight,.02));
+  }
   // Deck portal: the public route enters the open floor between the cores.
   box(qfront,[4.4,.5,.6],[0,12.2,q.d/2+.1],trim,.08);
   for(const [y,h] of [[17,10],[30,10]]){
@@ -423,6 +430,7 @@ export function cityRig(scene:T.Scene) {
         const e0=i>1?Math.sign(x)*mitre[i-1]:0,e1=i<last?Math.sign(x)*mitre[i]:0,length=a.distanceTo(b)+e0+e1,shift=(e1-e0)/2;
         box(deck,[.08,1.05,length],[x,.53,shift],membrane);
         box(deck,[.1,.08,length],[x,1.08,shift],solar);
+        box(deck,[.04,.06,length],[x,.12,shift],futureLight,.015);
       }
     }
     for(const end of [0,last]){
@@ -469,9 +477,18 @@ export function cityRig(scene:T.Scene) {
       box(at,[w*.72,h*.45,d*.72],[w*.1,h*1.22,0],distant,.1);box(at,[w*.45,h*.3,d*.45],[w*.2,h*1.6,0],distant,.1);
     } else box(at,[w,h,d],[0,h/2,0],distant,.1);
   }
-  const lampMat=new T.MeshStandardMaterial({color:'#ffe1a3',emissive:'#ffe1a3',emissiveIntensity:1,roughness:.6});
-  for(const [x,z] of [[-7,-10],[9,-8],[-13,8],[11,10]]){
-    box(staticGroup,[.18,4.5,.18],[x,2.9,z],dark,.06);box(staticGroup,[1.5,.17,.17],[x+.65,5.1,z],dark,.05);box(staticGroup,[.85,.12,.55],[x+1.1,5,z],lampMat,.06);
+  const civicLights:T.PointLight[]=[];
+  // ponytail: eight shadowless civic lights; use a baked lightmap if wall leakage becomes visible.
+  const lampPositions=[[-7,-10],[9,-8],[-13,8],[11,10],
+    ...Object.values(changeSites).map(site=>[site.x+site.w/2+1,site.z+site.d/2])];
+  for(const [x,z] of lampPositions){
+    // A slim split mast with a luminous underside, shared across streets and site entrances.
+    box(staticGroup,[.22,6,.28],[x,3.45,z],trim,.06);
+    box(staticGroup,[.07,4.8,.07],[x,.9+2.4,z+.18],futureLight,.02);
+    box(staticGroup,[2.6,.18,.8],[x-.95,6.5,z],trim,.08);
+    box(staticGroup,[2.25,.06,.65],[x-.95,6.38,z],publicLight,.02);
+    const light=new T.PointLight('#e0eee5',0,19,2);light.position.set(x-.95,6.15,z);
+    light.name='civic-night-light';scene.add(light);civicLights.push(light);
   }
   // Batch static architecture by material; no geometry is created during transitions.
   staticGroup.updateMatrixWorld(true);
@@ -486,12 +503,13 @@ export function cityRig(scene:T.Scene) {
   const color=new T.Color(),cool=new T.Color('#80dfef'),warm=new T.Color('#ffcd83'),off=new T.Color('#254447'),windowColor=new T.Color();
   const hazeNeutral=new T.Color('#c3d1db'),hazePulse=new T.Color('#b0c4d4'),hazeStill=new T.Color('#d0d6d0');
   return {
-    update(state:WorldState,time:number) {
+    update(state:WorldState,time:number,night:number) {
       const pulse=T.MathUtils.clamp((state.neon-.25)/.7,0,1),still=T.MathUtils.clamp((state.warmth-.55)/.3,0,1);
       road.roughness=.92-pulse*.42;
-      lampMat.emissiveIntensity=.15+state.neon*2;
+      publicLight.emissiveIntensity=.15+night*1.3;
+      civicLights.forEach(light=>light.intensity=night*95);
       kit.signs.forEach(mat=>mat.emissiveIntensity=state.signage*.45);
-      futureLight.emissiveIntensity=.25+state.neon*.5;
+      futureLight.emissiveIntensity=.25+state.neon*.5+night*.45;
       glyph.pulse.opacity=state.glyph*pulse;glyph.still.opacity=state.glyph*still;
       membrane.opacity=.6+state.greenery*.18;
       distant.color.copy(hazeNeutral).lerp(hazePulse,pulse).lerp(hazeStill,still);
