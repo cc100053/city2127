@@ -1,5 +1,9 @@
 # Project contract and implementation map
 
+## Odaiba Dream Loop material pass — 2026-09-30 (three passes; human art review pending)
+
+The three-pass continuation on `feat/art-direction` adds `bayWater()` shared by the surveyed sea and extended sea plane, generated world-scaled grass on existing landscape surfaces, generated cloud imagery blended with the existing clock-driven sky (zero texture contribution at night), and retained-landmark glazing response. `plantCanopy` replaces the roadside tree blockout using existing surveyed positions; `plantRoofCanopy` samples authored planted roofs; `contextFacades` adds instanced panels to context massing. The hero camera, model binaries, route data and survey contract remain unchanged. Maritime fog is now `.00024 + haze × .00016`. See the [Dream Loop handoff](handoffs/odaiba-dream-loop.md) for texture provenance, staged validation and remaining target gaps. Earlier art-pass lighting statements below describe that earlier stage.
+
 ## Odaiba art direction pass 1 — 2026-09-30 (`feat/art-direction`, human review pending)
 
 Visual authority is [R01–R06 and CITY_MASTER_TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md), above the historical ART/Plan 02 references. The venue work is integrated on main (`e6c7966`, recorded by `b97f859`); the historical P1 heading below reflects its original stage.

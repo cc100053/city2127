@@ -8,6 +8,8 @@ import { changeSites, skyBridges, floatingDecks } from '../src/layout.ts';
 import { heroCamera } from '../src/heroCamera.ts';
 import { routes } from '../src/mobility.ts';
 import { civicCore } from '../src/civicCore.ts';
+import { contextFacades } from '../src/contextFacades.ts';
+import { plantCanopy, plantRoofCanopy } from '../src/coastalCanopy.ts';
 
 const layout = JSON.parse(readFileSync(new URL('../src/odaiba-layout.json', import.meta.url), 'utf8'));
 const hash = (bytes: Buffer) => createHash('sha256').update(bytes).digest('hex');
@@ -44,6 +46,7 @@ for (const placement of layout.buildings) {
   }));
   assert.ok(Math.abs(actual.min.y) < .002, `${placement.id} grounded at source pad`);
   if(placement.id!=='fuji-tv')city.add(scene);
+  if(placement.id==='aqua-city-odaiba' || placement.id==='decks-tokyo-beach')plantRoofCanopy(city,scene);
 }
 assert.equal(triangles, 339919, 'All eight complete GLBs retain reviewed geometry');
 const core=civicCore();city.add(core);
@@ -65,7 +68,11 @@ for(let i=0;i<=160;i++) {
 
 // Survey sites: the whole scaled lot (plus a 5 m margin) lands on open ground, and the hero pose sees each site unobstructed.
 const environmentBytes = readFileSync(new URL('../asset/models/odaiba-masterplan/odaiba_masterplan_v01_phase03d_environment.glb', import.meta.url));
-city.add((await new GLTFLoader().parseAsync(environmentBytes.buffer.slice(environmentBytes.byteOffset, environmentBytes.byteOffset + environmentBytes.byteLength), '')).scene);
+const environment=(await new GLTFLoader().parseAsync(environmentBytes.buffer.slice(environmentBytes.byteOffset, environmentBytes.byteOffset + environmentBytes.byteLength), '')).scene;
+const panels=contextFacades(environment);
+assert.ok(panels.count>100, 'Context facades have occupied panel rows');
+city.add(environment,panels);
+plantCanopy(city, JSON.parse(readFileSync(new URL('../asset/models/odaiba-masterplan/tree_instances.json', import.meta.url), 'utf8')));
 city.updateMatrixWorld(true);
 const openGround = /^(TERRAIN|PHASE03C_LANDSCAPE|PHASE03C_PLAZA|PRIMARY_PLAZA|PHASE03C_SERVICE|SERVICE_BAY|SIDEWALK|WATERFRONT_PROMENADE)/;
 const ray = new Raycaster(), down = new Vector3(0, -1, 0);
