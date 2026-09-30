@@ -29,3 +29,10 @@
 - Pass 1 removed the Ariake shore/viaduct and pass 2 cut back the north-east backdrop to open water. This reverses part of `deb634e` ("keep a connected Odaiba backdrop with bay bridges and shores"). Keep or revert is the user's call.
 - Remaining gaps vs target: district density (many small buildings, layered promenade), dense far Tokyo skyline, boat wakes, lit glass towers; sun glint sits bottom-right rather than toward the horizon (real 16:00 sun azimuth).
 - Next step: user reviews the pass images; then either run another three-pass group or merge.
+
+## Target v2 — future identity (2026-10-01)
+
+User review: model detail improved but the 2127 future identity does not read; the v1 target itself is a contemporary waterfront. Decision: fix future identity first, then loop. The user supplied a new target (1804×872, same hero pose and UI), derived from pass 3 plus R01 DNA: district-wide megaframe links at height, suspended glass spheres, ring/looped guideways with light trails, circular floating terraces with small waterfalls stepping into the bay, water taxis, cherry groves and ponds.
+
+- Locked: `.dream-loop/target.png` (ignored); committed copy [target v2](../../artifacts/odaiba-dream2-target-v2.jpg). The previous target is kept as `.dream-loop/target-v1.png`.
+- Next session: resume on `feat/odaiba-dream-loop-2`, run Dream Loop Plus (three passes) against target v2 with `.dream-loop/r2-pass3.png` as the starting screenshot. The Ariake/backdrop decision above is still open.
