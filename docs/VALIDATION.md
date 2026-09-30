@@ -552,3 +552,7 @@ Standalone rolling observation: 32.8 FPS / 1388 draws / 356 geometries at 1920×
 ## Odaiba hero district Dream Loop P3b — 2026-10-01
 
 `feat/odaiba-district`: three Dream Loop Plus passes on the tier-1 district (Fuji core, Aqua City, DECKS, north waterfront). Root `npm test`, `npm run build` and `git diff --check` PASS after each pass. 1920×929 headless captures: [baseline](../artifacts/odaiba-district-baseline.jpg), [pass 3](../artifacts/odaiba-district-pass3.jpg), [night](../artifacts/odaiba-district-pass3-night.jpg). Built-in pane 800×600 at `?hour=16&reviewTime=20`: 529 draw calls / 1.84 M triangles, no console errors. Human art review pending. Details: [district handoff](handoffs/odaiba-district.md).
+
+## Odaiba connected backdrop P4 — 2026-10-01
+
+`feat/odaiba-district`: island edge replaced by a receding Odaiba backdrop plus `bayContext()` (Rainbow Bridge, Tokyo Gate Bridge, Ariake link, nine shore skylines; 4 draws, 16,144 triangles). Root `npm test`, `npm run build`, `git diff --check` PASS. Captures: [day](../artifacts/odaiba-district-bay-hero3.jpg), [night](../artifacts/odaiba-district-bay-night.jpg); orbit view shows the Rainbow Bridge; no console errors. Details: [district handoff](handoffs/odaiba-district.md).

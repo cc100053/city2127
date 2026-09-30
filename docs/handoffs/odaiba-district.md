@@ -78,6 +78,22 @@ User direction (2026-09-30): merge `feat/art-direction` into main (done: `e3185b
 - Built-in pane, 800×600, `?hour=16&reviewTime=20`: 529 draw calls / 1.84 M triangles per frame (P3a 509 / 1.47 M at `reviewTime=12`); the increase is the denser groves and tidal edge. No console errors. Night (`hour=21`) capture renders lit facades and shore.
 - Not verified: live `?survey` mode, exhibition-hardware FPS, human art acceptance. Target similarity is a visual judgment, not a measured completion claim.
 
+## P4 — connected Odaiba backdrop and bay context (2026-10-01)
+
+User review of P3b: the far edge must keep Odaiba's surroundings — Odaiba is linked by bridges to other districts, not an island in open sea. User accepted the Rainbow Bridge sitting behind the hero camera and block silhouettes for far shores.
+
+- `scripts/crop-odaiba-district.py`: no more apron bisect; only street detail (`PUBLIC_`, `STREETLIGHT_`, `LANDSCAPE_TREE`, `STATIONS`) outside the district is removed and the roadside blockout dropped. Ground, roads, guideway, `CTX_*` massing and sea stay whole. Blender 5.2.2 headless; 36 meshes, 13 materials, 25,510 triangles, 1,437,924 bytes.
+- Runtime: the island coastline/discard edge is replaced by `recedeBeyondDistrict` (desaturate + fog mix, 60 % over 400 m); context facade panels only inside the district; backdrop context finishes darkened.
+- `src/bayContext.ts` + `layout.ts` `bayShores`, `rainbowBridge`, `gateBridge`, `ariakeLink`: positions from latitude/longitude relative to the Fuji TV control point (Fuji TV 35.62715 N 139.77485 E, Rainbow Bridge centre 35.63639 N 139.76361 E from Wikipedia; other shores approximate). Four baked/instanced draws, 16,144 triangles, no shadows, 82 % recede.
+- Route change: the ferry lane previously ran along the new bridge axis into the Daiba anchorage; it now heads west (`(-760,-560)` → `(-1250,-520)`).
+- Tests: street detail within 60 m of the district, backdrop ground/roads/massing extend past it, facade panels inside, bay context ≤ 4 children, boats never under or on bay context, air routes ≥ 20 m above it.
+
+### Actual validation (P4)
+
+- Root `npm test` PASS, `npm run build` PASS, `tsc --noEmit` clean, `git diff --check` clean.
+- Headless Chrome 1920×929 `?hour=16&reviewTime=20`: [day](../../artifacts/odaiba-district-bay-hero3.jpg), [night](../../artifacts/odaiba-district-bay-night.jpg). Built-in pane orbit toward the north showed the Shibaura skyline and the Rainbow Bridge towers, cables and deck; no console errors.
+- Not measured: whole-frame draw calls (pane hidden, rAF paused); by construction +4 draws over P3b. Not verified: live `?survey`, exhibition FPS, human art review. Night backdrop has no lights.
+
 ## Next step
 
-User art review of the three passes (especially the island-coastline edge). Offer further Dream Loop passes if needed.
+User review of the connected backdrop. Possible follow-ups: night lights on far shores, more Odaiba-specific backdrop landmarks (Big Sight, Telecom silhouette), further Dream Loop passes.

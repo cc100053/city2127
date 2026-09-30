@@ -7,9 +7,10 @@ import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
 import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
 import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
-import { DISTRICT, inDistrict } from './layout';
+import { inDistrict } from './layout';
+import { bayContext, recedeBeyondDistrict } from './bayContext';
 
-// Literal paths bundle the district-cropped environment (scripts/crop-odaiba-district.py) and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
+// Literal paths bundle the district-detailed environment (scripts/crop-odaiba-district.py) and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
 const environmentUrl = new URL('../asset/models/odaiba-masterplan/odaiba_district_v01_environment.glb', import.meta.url).href;
 const buildingUrls: Record<string, string> = {
   'aqua-city-odaiba': new URL('../asset/models/aqua-city-odaiba/aqua-city-odaiba.glb', import.meta.url).href,
@@ -24,7 +25,7 @@ const buildingUrls: Record<string, string> = {
 const environmentFinish: Record<string, [color: string, roughness: number, metalness: number]> = {
   road: ['#7d8a90', .88, 0], sidewalk: ['#ddd8cc', .78, 0], plaza: ['#e6dfd1', .66, 0], service_area: ['#d3d5ce', .8, 0],
   landscape: ['#839768', .9, 0], water: ['#5a93a8', .62, 0], rail_structure: ['#e6ebea', .42, .35], station: ['#a7c3cf', .12, .55],
-  context_unknown: ['#d2d9dc', .9, 0], context_office_commercial: ['#c9d3da', .85, 0], context_utility_service: ['#cfd3d0', .9, 0], context_public_cultural: ['#d0d8cf', .9, 0],
+  context_unknown: ['#b9c1c4', .9, 0], context_office_commercial: ['#b3bdc4', .85, 0], context_utility_service: ['#b9bdba', .9, 0], context_public_cultural: ['#b8c0b7', .9, 0],
 };
 
 // 2127 retrofit by material: mall roofs become planted, hotel roofs photovoltaic, stark white cladding warm ceramic; no extra geometry.
@@ -56,23 +57,6 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
   };
   material.customProgramCacheKey = () => 'curtain-wall';
 }
-// Across the apron, ground, roads and guideway end at an irregular coastline with a pale stone rim, hiding the straight cut edge.
-function fadeBeyondDistrict(material: T.Material) {
-  const compile = material.onBeforeCompile.bind(material), key = material.customProgramCacheKey.bind(material);
-  material.onBeforeCompile = (shader, renderer) => {
-    compile(shader, renderer);
-    shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 districtP;').replace('#include <project_vertex>', '#include <project_vertex>\ndistrictP=(modelMatrix*vec4(transformed,1.)).xyz;');
-    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 districtP;').replace('#include <alphatest_fragment>', `#include <alphatest_fragment>
-      vec2 beyond=max(vec2(${DISTRICT.minX.toFixed(1)},${DISTRICT.minZ.toFixed(1)})-districtP.xz,districtP.xz-vec2(${DISTRICT.maxX.toFixed(1)},${DISTRICT.maxZ.toFixed(1)}));
-      float districtFade=length(max(beyond,0.))/${DISTRICT.apron.toFixed(1)};
-      // Coast 35–85 % across the apron: a clean shoreline reads as an island, where a per-pixel dissolve read as speckle.
-      float coast=.6+.12*(sin(districtP.x*.019+sin(districtP.z*.013)*2.3)+sin(districtP.z*.023+sin(districtP.x*.011)*1.9));
-      if(districtFade>coast)discard;
-      diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.8,.77,.7),smoothstep(coast-.12,coast-.03,districtFade)*step(districtP.y,2.));`);
-  };
-  material.customProgramCacheKey = () => key() + '|district-fade';
-}
-
 const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a'), dayGlow = .15;
 /** Retained landmark glazing glows warm, strongest at night; the civic chassis uses the shared city finishes. */
 export function updateOdaiba(night: number) {
@@ -81,13 +65,13 @@ export function updateOdaiba(night: number) {
   curtainGlow.value = .42 + night * .7;
 }
 
-/** District-cropped Phase 03D environment, six surveyed landmarks and the replacement Fuji civic core, in metres. */
+/** Phase 03D environment (detail inside the district only), the bay context, six surveyed landmarks and the Fuji civic core, in metres. */
 export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   const grass=new T.TextureLoader().load(new URL('../asset/textures/coastal-grass.png',import.meta.url).href);
   grass.colorSpace=T.SRGBColorSpace;grass.wrapS=grass.wrapT=T.RepeatWrapping;grass.anisotropy=8;
   const environment = await addCityModel(scene, environmentUrl, [0, 0, 0]);
   environment.name = 'odaiba-environment';
-  const faded = new Set<T.Material>();
+  const receded = new Set<T.Material>();
   environment.traverse(object => {
     if (!(object instanceof T.Mesh)) return;
     const material = object.material as T.MeshStandardMaterial, finish = environmentFinish[material.name];
@@ -104,10 +88,10 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     // The sea lies under the whole plate; grazing shadows on it only produce acne.
     if (material.name === 'water') { object.castShadow = object.receiveShadow = false; if(water) object.material=water; }
   });
-  // After finishes: shared materials are re-tuned once per mesh above, which would drop an earlier fade wrap.
-  environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) faded.add(object.material); });
-  faded.forEach(fadeBeyondDistrict);
-  scene.add(contextFacades(environment));
+  // After finishes: shared materials are re-tuned once per mesh above, which would drop an earlier wrap.
+  environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) receded.add(object.material); });
+  receded.forEach(material => recedeBeyondDistrict(material));
+  scene.add(contextFacades(environment), bayContext());
   plantCanopy(scene,trees);
   await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1])).map(async placement => {
     if(placement.id==='fuji-tv'){scene.add(civicCore());return;}

@@ -1,6 +1,7 @@
 import * as T from 'three';
+import { inDistrict } from './layout.ts';
 
-/** Give surveyed context massing a panel rhythm without changing its silhouette. */
+/** Give surveyed context massing inside the hero district a panel rhythm without changing its silhouette; backdrop massing stays plain. */
 export function contextFacades(environment: T.Object3D) {
   const panels: T.Matrix4[] = [], shades: T.Color[] = [], occupied = new Set<string>();
   const triangle = new T.Triangle(), normal = new T.Vector3(), across = new T.Vector3(), point = new T.Vector3();
@@ -19,7 +20,7 @@ export function contextFacades(environment: T.Object3D) {
       for (let y = Math.ceil(Math.min(...ys) / 4) * 4 + 2; y < Math.max(...ys) - 1.2; y += 4) {
         for (let u = Math.ceil(Math.min(...us) / 4) * 4 + 2; u < Math.max(...us) - 1.2; u += 4) {
           point.copy(normal).multiplyScalar(plane).addScaledVector(across, u).setY(y);
-          if (!triangle.containsPoint(point)) continue;
+          if (!triangle.containsPoint(point) || !inDistrict(point.x, point.z)) continue;
           const key = point.toArray().map(v => v.toFixed(2)).join(',');
           if (occupied.has(key)) continue;
           occupied.add(key);
