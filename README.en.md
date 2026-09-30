@@ -6,6 +6,8 @@ Guests collectively shape a futuristic Shibuya. Each guest answers four question
 
 ## Start the exhibition locally
 
+Development auto-answer (DEV-ONLY): run `cd survey && npm run dev:auto`, open `http://127.0.0.1:8788/guest?dev-auto`, and connect root Vite at `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8788/ws`. Every launch creates a new retained scratch SQLite; it never uses the exhibition DB. The opt-in localhost panel drives the existing Guest flow and confirms only its own submitted guest exit. Remove it or move it to Admin and restore staff exit confirmation before exhibition use. See the [survey guide](survey/README.md).
+
 Install Git and **Node.js 24+** (including npm). Use a desktop browser with WebGL 2. Keep both terminal tabs running. Run each command from the repository root unless a step changes directory. The project has no public deployment setup.
 
 ### macOS — two Terminal tabs

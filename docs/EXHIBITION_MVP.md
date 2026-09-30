@@ -513,3 +513,15 @@ Scope cut可簡化三形態的幾何差異，但不得刪掉低值未來身份�
 - [ ] 同步PROJECT（當前架構）、PLAN02（方向／差距）、VALIDATION（實際證據）、必要README／AGENTS；不要把提案寫成已完成。
 - [ ] exact diff自檢、適用package checks、CI與integrated結果完成後再標DONE。
 - [ ] 清楚記錄剩餘限制與下一步；不必為每個常規階段另請批准。
+
+## Development auto-answer and Meter contract tests — 2026-09-30
+
+**DEV-ONLY, temporary tooling; not an exhibition guest feature.** `/guest?dev-auto` can load an isolated development panel when the server enables `SURVEY_DEV_AUTO=1` and the client is localhost. The server-only Admin config route supplies authoritative question/option/vote metadata; public questions continue hiding effects. Existing four-axis v2 rules and production lifecycle remain unchanged.
+
+`npm run dev:auto` in `survey/` builds and launches a fresh scratch SQLite on loopback port 8788, retaining its path for inspection. The city connects to that server explicitly. The runner selects actual option IDs and uses existing Guest radio/form, draft, confirmation, submission and recovery logic, rather than bypassing the front end. Profiles: all −1/0/+1, rotating mixed, per-Meter custom, seeded random (default 2127); default count 10, question delay 300 ms, existing result/handoff 10 s/5 s, optional additional delay. Start is explicit; a refresh never resumes a batch automatically.
+
+The batch may simulate staff exit only for its own successful proposal after showing the result. Before submission it requires one reserved draft and the same run/revision; before exit it requires zero reserved drafts, the same committed run/revision, `awaiting_exit`, and no pending reset. It uses the existing revision-checked Admin command. Stops, uncertain responses, conflicts, other guests and pending resets halt the batch; no automatic resets or deletion. A submitted request may complete after Stop; same-ID retry/reload remains available. Low vote profiles are inputs, not a guarantee of immediate low bands: accumulated history is preserved.
+
+Reusable test functions in `survey/tests/meterContract.ts` take Meter descriptors and generate combinations/semantic checks with independent golden values. Root model adapters connect each descriptor's parameters to visible diagnostics from real Three.js site builders/controllers. Registry coverage catches missing test definitions. All current 81 combinations cover question semantics → votes → Meter → SQLite → layout/events → real model parameters; real HTTP/WebSocket, retries, snapshots/resets and opt-in gates are also checked. Adding a future Meter requires a descriptor/model adapter plus separately extending the production question/schema/UI/model contract; this task does not make the four-axis protocol dynamic.
+
+**Removal/migration before exhibition:** remove the Guest dev import/adapter and panel/runner modules, dev configuration types/route and scratch launcher, or move the panel to Admin and restore staff-confirmed exit. Keep the Meter tests. These deletion/migration boundaries carry `DEV-ONLY` comments in code. Implementation and actual evidence: [handoff](handoffs/survey-auto-tests.md), [validation](VALIDATION.md#survey-meter-tests-and-development-auto-answer--2026-09-30).

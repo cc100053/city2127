@@ -233,3 +233,7 @@ The user approved a brighter futuristic night city: visible facade/ground detail
 ## Staff day/night control — 2026-09-30
 
 User requested Day/Night buttons on Admin. Implemented Day (12:00), Night (22:00) and Auto (original cycle), persisted independently of city data in schema 5 and synchronized over the existing snapshot channel. Explicit `?hour` keeps capture priority. No camera, geometry, palette, cycle duration or proposal behavior change. See [handoff](handoffs/admin-day-night.md) for verification and integration status.
+
+## Development verification addition — 2026-09-30
+
+Survey auto-answer adds a localhost-only Guest development panel and scratch database launcher, with reusable answer→Meter→model tests. This is testing tooling, not a new visual direction or a change to Odaiba geometry/materials. It preserves the existing 3-second city transitions and 10/5-second result/handoff. Remove the panel or move it to Admin before exhibition. Current acceptance evidence is recorded separately in [VALIDATION](VALIDATION.md#survey-meter-tests-and-development-auto-answer--2026-09-30) and the [task handoff](handoffs/survey-auto-tests.md); earlier captures do not verify this addition.
