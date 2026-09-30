@@ -1,12 +1,10 @@
 import * as T from 'three';
-import { arc, bake, box, leaf, paint, stone, trim } from './cityRig.ts';
+import { arc, bake, box, leaf, paint, stone, trail, trim } from './cityRig.ts';
 import { changeSites, DISTRICT, floatingDecks, northShore } from './layout.ts';
 import { routes } from './mobility.ts';
 import layout from './odaiba-layout.json';
 
 type P3 = [number, number, number];
-// Blue-white light trails: above the bloom threshold in daylight, so the 2127 network reads as lit movement from the hero pose.
-export const trail = new T.MeshBasicMaterial({ color: new T.Color('#a9d8ff').multiplyScalar(2.6) });
 // Silvered glass: pale and warm so the spheres read as mirrors of the golden sky, not blue domes.
 const chrome = new T.MeshPhysicalMaterial({ color: '#f1efe8', metalness: .78, roughness: .1, clearcoat: 1, clearcoatRoughness: .04, envMapIntensity: 1.35 });
 const waterfall = new T.MeshStandardMaterial({ color: '#f3fbff', emissive: '#d8f0ff', emissiveIntensity: .35, roughness: .25, transparent: true, opacity: .85 });
@@ -123,12 +121,11 @@ function shoreTerraces(root: T.Object3D) {
     const [ax, az] = northShore[i], [bx, bz] = northShore[i + 1], length = Math.hypot(bx - ax, bz - az), yaw = Math.atan2(bx - ax, bz - az);
     for (let d = 22; d < length; d += 46) {
       const t = d / length, sx = ax + (bx - ax) * t, sz = az + (bz - az) * t;
-      // Local -X faces the sea (as in tidalEdge); the terrace centre sits 40 m out, past the tidal islets.
-      const cx = sx - Math.cos(yaw) * 40, cz = sz + Math.sin(yaw) * 40;
-      if (cx < DISTRICT.minX || cx > 250 || cz > DISTRICT.maxZ || floatingDecks.some(([x, z]) => Math.hypot(cx - x, cz - z) < 55) || boats.some(p => Math.hypot(p.x - cx, p.z - cz) < 32)) continue;
+      // Local -X faces the sea (as in tidalEdge); the terrace centre sits OUT m out, clear of the tidal islets (to 28.5 m).
+      const r = 12.5 + (n % 3) * 2, OUT = 46, cx = sx - Math.cos(yaw) * OUT, cz = sz + Math.sin(yaw) * OUT;
+      if (cx < DISTRICT.minX || cx > 250 || cz > DISTRICT.maxZ || floatingDecks.some(([x, z]) => Math.hypot(cx - x, cz - z) < 60) || boats.some(p => Math.hypot(p.x - cx, p.z - cz) < r + 24)) continue;
       const g = new T.Group(); g.position.set(sx, 0, sz); g.rotation.y = yaw; root.add(g);
-      const c = new T.Group(); c.position.set(-40, 0, 0); c.rotation.y = n * 1.7; g.add(c);
-      const r = 10 + (n % 3) * 1.5;
+      const c = new T.Group(); c.position.set(-OUT, 0, 0); c.rotation.y = n * 1.7; g.add(c);
       arc(c, 0, r, 1.6, [0, -1.2, 0], stone);
       arc(c, r - .5, r + .3, .6, [0, .4, 0], trim);
       arc(c, 0, r - .6, .25, [0, .4, 0], leaf);
@@ -146,7 +143,7 @@ function shoreTerraces(root: T.Object3D) {
       box(fall, [.35, 1.9, 4.4], [-r - .45, -.5, 0], waterfall, .1);
       arc(fall, 0, 3.2, .05, [-r - 1.8, -.72, 0], foam);
       // Footbridge back to the tidal edge.
-      box(g, [28 - r, .5, 2.4], [-(52 - r) / 2, .5, 0], trim, .15);
+      box(g, [OUT - 12 - r, .5, 2.4], [-(OUT + 12 - r) / 2, .5, 0], trim, .15);
       n++;
     }
   }

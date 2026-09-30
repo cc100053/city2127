@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { arc, bake, box, leaf, membrane, publicLight, solar, stone, trim } from './cityRig.ts';
+import { arc, bake, box, leaf, membrane, solar, stone, trail, trim } from './cityRig.ts';
 import { floatingDecks, northShore } from './layout.ts';
 
 /** Tidal public rooms: open-water basins, descending terraces and landward habitat beds. */
@@ -57,7 +57,8 @@ export function tidalEdge() {
       box(g,[.5,.5,step+.6],[-.25,.2,0],trim,.1);
       box(g,[4.5,1.1,step+.6],[-2.75,-.6,0],stone,.1);
       box(g,[4,1,step+.6],[-7,-.95,0],stone,.1);
-      box(g,[.14,.14,step+.6],[-5.05,-.12,0],publicLight,.05);
+      // Lit blue rim: the waterfront edge joins the 2127 light-trail network.
+      box(g,[.4,.3,step+.6],[-5.05,-.04,0],trail,.05);
       box(g,[3.2,.6,step+.6],[-10.6,-1.05,0],leaf,.1);
       if(chunk%4===1){
         // Pavilion straddling both terraces: warm room, planted roof slab.
@@ -74,6 +75,6 @@ export function tidalEdge() {
     }
   }
   const merged=bake(root);sourceGeometry.forEach(geometry=>geometry.dispose());root.clear();
-  for(const mesh of merged)mesh.name='tidal-edge';
+  for(const mesh of merged){mesh.name='tidal-edge';if(mesh.material===trail)mesh.castShadow=false;}
   root.add(...merged);return root;
 }

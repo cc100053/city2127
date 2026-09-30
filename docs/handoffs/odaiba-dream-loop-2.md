@@ -4,7 +4,7 @@
 - Branch: `feat/odaiba-dream-loop-2`, from `main` `6301794` (0/0 with `origin/main` after a successful fetch; clean tree).
 - Scope: user asked to "create branch and use dream-loop to polish city". Dream Loop Plus, three passes, then stop for human review. Target: the existing locked `.dream-loop/target.png` (see [earlier Dream Loop](odaiba-dream-loop.md)); no new target generated. Fable was unavailable (usage credits), so workers ran on Opus.
 - Capture: headless Chrome 1920×929, `?hour=16&reviewTime=20` (`.dream-loop/shot.sh`, ignored).
-- Status: three passes implemented and locally verified; target NOT reached; human art review pending. No main integration.
+- Status: round 2 (three passes, target v1) and round 3 (three passes, target v2) implemented and locally verified; target NOT reached; human art review pending. No main integration.
 
 ## Passes
 
@@ -36,3 +36,22 @@ User review: model detail improved but the 2127 future identity does not read; t
 
 - Locked: `.dream-loop/target.png` (ignored); committed copy [target v2](../../artifacts/odaiba-dream2-target-v2.jpg). The previous target is kept as `.dream-loop/target-v1.png`.
 - Next session: resume on `feat/odaiba-dream-loop-2`, run Dream Loop Plus (three passes) against target v2 with `.dream-loop/r2-pass3.png` as the starting screenshot. Target v2 shows open water where Ariake is; Ariake stays by user decision (2026-10-01), so workers must not remove it to match the target.
+
+## Round 3 — target v2 (2026-10-01)
+
+Dream Loop Plus, three Opus worker passes against target v2, starting from a fresh HEAD capture (`d3911d2`, identical in content to `r2-pass3-ariake.png`). Branch was 0/0 with its remote and `main` 0/0 with `origin/main` after a successful fetch.
+
+- Pass 1 (`aafbb50`): new `src/skyways.ts` — skyway rings/links with blue light trails, three glass spheres, round waterfall terraces off the north shore; 7 larger water taxis with wakes.
+- Pass 2 (`776a613`): Ariake slab becomes green parkland (Ariake, `ariakeLink` and viaduct kept); `bayCruisers` (9 runs); silver, larger spheres; roof groves on tall towers.
+- Pass 3: bluer, stronger `trail`; larger terraces; blue tidal-edge rim; 6 more foreground cruisers.
+
+Orchestrator fixes:
+- Pass 1: transparent wakes (no normals) entered GTAO's normal/depth prepass and rendered as black fans → hidden there with the sea (`src/main.ts`).
+- Pass 2: the new parkland finish made `bay-context` five draws → test cap 4 → 5 (`tests/odaiba.test.ts`). The pale day accent word "tomorrow." lost contrast over green Ariake → darkened by day (`src/style.css`; copy unchanged).
+- Pass 3: `amphibiousShore.ts` imported `trail` from `skyways.ts`, pulling the Vite-only JSON import into Node tests (`ERR_IMPORT_ATTRIBUTE_MISSING`) → `trail` moved to `cityRig.ts` with the other shared materials.
+
+Validation: after each pass and fix, root `npm test` PASS (incl. 81-combination survey pipeline), `npm run build` PASS (existing >500 kB warning), `git diff --check` clean; built-in browser 16:00 no console errors. Evidence: [baseline](../../artifacts/odaiba-dream3-baseline.jpg), [pass 1](../../artifacts/odaiba-dream3-pass1.jpg), [pass 2](../../artifacts/odaiba-dream3-pass2.jpg), [pass 3](../../artifacts/odaiba-dream3-pass3.jpg), [pass 3 night](../../artifacts/odaiba-dream3-pass3-night.jpg). Not verified: live `?survey` with a scratch server, FPS/draw calls (skyways, 30 boats + wakes, tower roof raycast load time), exhibition hardware. No test covers skyway/terrace/cruiser collisions (placed by hand).
+
+Remaining gaps vs target v2: long front-left skyway and right-side monorail sweep, district density and layered promenade, spheres read as blue domes rather than clear glass, dense far skyline, sun glint position.
+
+Next step: user reviews the round 3 images; then another three-pass round or merge.

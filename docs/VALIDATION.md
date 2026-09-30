@@ -1,5 +1,9 @@
 # Validation and handoff
 
+## Odaiba Dream Loop r3 (target v2) — 2026-10-01
+
+Three more passes on `feat/odaiba-dream-loop-2` (`aafbb50`, `776a613`, pass 3): root `npm test`/`npm run build`/`git diff --check` passed after each pass and fix; headless day/night captures and built-in browser (16:00) without console errors. The bay-context draw cap in `tests/odaiba.test.ts` rose from 4 to 5 for Ariake parkland. Live `?survey`, FPS/draw calls and exhibition hardware not verified. Details: [handoff](handoffs/odaiba-dream-loop-2.md#round-3--target-v2-2026-10-01).
+
 ## Odaiba Dream Loop r2 — 2026-10-01
 
 Three Dream Loop passes on `feat/odaiba-dream-loop-2`: root `npm test`/`npm run build`/`git diff --check` passed after each pass and fix; built-in browser day/night without console errors. Live `?survey`, FPS and exhibition hardware not verified. Details, evidence and open decisions: [handoff](handoffs/odaiba-dream-loop-2.md).
