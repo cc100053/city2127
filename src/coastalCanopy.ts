@@ -1,6 +1,7 @@
 import * as T from 'three';
 import { changeSites, DISTRICT, inDistrict } from './layout.ts';
 import { routes } from './mobility.ts';
+import { recedeBeyondDistrict } from './bayContext.ts';
 
 /** Reuse the surveyed planting locations; layered crowns replace the tiny blockout cones. */
 export function plantCanopy(scene: T.Object3D, trees: { instances: { position: number[]; scale: number; type: string }[] }) {
@@ -65,4 +66,26 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
     instances.push({position:[px,-pz,y],scale:.85+(Math.sin(x+z)+1)*.2,type:Math.sin(x-z)>.7?'columnar':'broadleaf'});
   }
   plantCanopy(scene,{instances});
+}
+
+/** The Odaiba backdrop beyond the district keeps its parks as one unshadowed batch of low crowns, receding with the ground it stands on. */
+export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
+  environment.updateMatrixWorld(true);
+  const bounds=new T.Box3().setFromObject(environment),ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),matrices:T.Matrix4[]=[],dummy=new T.Object3D();
+  // ponytail: one unaccelerated ray per 26 m cell (~3k rays at load); add a BVH if the plate grows.
+  for(let x=bounds.min.x;x<bounds.max.x;x+=26)for(let z=bounds.min.z;z<bounds.max.z;z+=26){
+    if(inDistrict(x,z) || Math.sin(x*.019+Math.sin(z*.021)*2)+Math.cos(z*.027)<-.35)continue;
+    const px=x+Math.sin(z*1.7+x)*8,pz=z+Math.cos(x*1.3-z)*8;
+    ray.set(new T.Vector3(px,300,pz),down);
+    const hit=ray.intersectObject(environment,true)[0];
+    if(!hit || !(hit.object instanceof T.Mesh) || Array.isArray(hit.object.material) || hit.object.material.name!=='landscape' || hit.point.y>=9)continue;
+    for(let j=0;j<2;j++){
+      const a=j*3.1+x*.1,s=4.2+(Math.sin(x*3.1+z+j)+1)*1.3;
+      dummy.position.set(px+Math.cos(a)*5,hit.point.y+s*.9,pz+Math.sin(a)*5);dummy.scale.set(s,s*.85,s);dummy.rotation.set(0,a,0);dummy.updateMatrix();matrices.push(dummy.matrix.clone());
+    }
+  }
+  const material=new T.MeshStandardMaterial({color:'#ffffff',roughness:.95});recedeBeyondDistrict(material);
+  const grove=new T.InstancedMesh(new T.IcosahedronGeometry(1,1),material,matrices.length),color=new T.Color();
+  matrices.forEach((matrix,i)=>{grove.setMatrixAt(i,matrix);grove.setColorAt(i,color.setHSL(.22+(i%5)*.01,.3+(i%3)*.04,.22+(i%7)*.02));});
+  grove.name='backdrop-grove';grove.receiveShadow=true;scene.add(grove);
 }

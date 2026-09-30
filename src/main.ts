@@ -54,11 +54,13 @@ try {
   skyTexture.mapping=T.EquirectangularReflectionMapping;
   const sky=new T.Mesh(new T.SphereGeometry(1500,24,12),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{top:{value:new T.Color()},horizon:{value:new T.Color()},clouds:{value:skyTexture},day:{value:1},tint:{value:new T.Color(1,1,1)}},
     vertexShader:'varying vec3 p;varying vec2 skyUv;void main(){p=position;skyUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader:'uniform vec3 top,horizon,tint;uniform sampler2D clouds;uniform float day;varying vec3 p;varying vec2 skyUv;void main(){float altitude=normalize(p).y;float h=clamp(altitude*1.8,0.,1.);vec3 gradient=mix(horizon,top,pow(h,.65));vec3 cloud=texture2D(clouds,vec2(skyUv.x,min(1.,skyUv.y+.1))).rgb*tint;gl_FragColor=vec4(mix(gradient,cloud,day*.9*smoothstep(-.06,.035,altitude)),1.);}'}));
+    // Altitude is measured from the curved sea's horizon (about 4.7° below level, see EARTH in bayContext), so a warm haze band sits on the sea and clouds rise above it.
+    fragmentShader:'uniform vec3 top,horizon,tint;uniform sampler2D clouds;uniform float day;varying vec3 p;varying vec2 skyUv;void main(){float altitude=normalize(p).y+.085;float h=clamp(altitude*4.,0.,1.);vec3 gradient=mix(horizon,top,pow(h,.65));vec3 cloud=texture2D(clouds,vec2(skyUv.x,min(1.,skyUv.y+.1))).rgb*tint;gl_FragColor=vec4(mix(gradient,cloud,day*.9*smoothstep(.004,.05,altitude)),1.);}'}));
   sky.frustumCulled=false;sky.renderOrder=-1;scene.add(sky);
   // Open sea beyond the masterplan plate; fog closes the horizon.
   const water=bayWater();
-  const floor=new T.Mesh(new T.PlaneGeometry(20000,20000),water);floor.rotation.x=-Math.PI/2;floor.position.y=-1.2;floor.receiveShadow=true;scene.add(floor);
+  // 100 m cells so the sea can curve down to its horizon beyond the plate.
+  const floor=new T.Mesh(new T.PlaneGeometry(18000,18000,180,180),water);floor.rotation.x=-Math.PI/2;floor.position.y=-1.2;floor.receiveShadow=true;scene.add(floor);
   const rig=cityRig(scene);
   build2127(scene);
   loadOdaiba(scene,water).catch(error=>{const message=document.createElement('p');message.className='error';message.textContent='Odaiba could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);});
@@ -85,6 +87,11 @@ try {
   const ao=new GTAOPass(scene,camera,innerWidth,innerHeight);ao.updateGtaoMaterial({radius:3,distanceFallOff:.8,thickness:3,samples:16});ao.blendIntensity=1;composer.addPass(ao);
   const bloom=new UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.2,.7,1);composer.addPass(bloom);
   const vignette=new ShaderPass(VignetteShader);vignette.uniforms.offset.value=.9;vignette.uniforms.darkness.value=.9;composer.addPass(vignette);composer.addPass(new OutputPass());
+  // Display-space grade after tone mapping: richer colour and contrast by day, warm highlights over cool shadows (golden-hour print look).
+  const grade=new ShaderPass({uniforms:{tDiffuse:{value:null},amount:{value:1}},
+    vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader:'uniform sampler2D tDiffuse;uniform float amount;varying vec2 vUv;void main(){vec4 c=texture2D(tDiffuse,vUv);float l=dot(c.rgb,vec3(.2126,.7152,.0722));vec3 g=mix(vec3(l),c.rgb,1.2);g=(g-.45)*1.1+.45;g*=mix(vec3(.96,.99,1.04),vec3(1.05,1.01,.93),smoothstep(.15,.85,l));gl_FragColor=vec4(mix(c.rgb,clamp(g,0.,1.),amount),c.a);}'});
+  composer.addPass(grade);
   const world=createWorldState();let now=0;
   const params=new URLSearchParams(location.search);
   // `?survey` or `?survey=ws://host:port/ws`: survey policy scores drive the city state; the day/night light still runs.
@@ -110,7 +117,7 @@ try {
   const dayBase=new T.Color('#bed9ec'),dayPulse=new T.Color('#accbdc'),dayStill=new T.Color('#e0e6dc');
   const topBase=new T.Color('#6699c0'),topPulse=new T.Color('#6a8db0'),topStill=new T.Color('#a9bcc4');
   const duskHorizon=new T.Color('#f6b58a'),duskTop=new T.Color('#7a86ad'),nightHorizon=new T.Color('#1c2941'),nightTop=new T.Color('#070d1c');
-  const sunLow=new T.Color('#ffae78'),sunHigh=new T.Color('#ffe7c4'),moon=new T.Color('#7d9be0'),ambientDay=new T.Color('#e3ebee'),ambientPulse=new T.Color('#a7c9ed'),ambientNight=new T.Color('#899dbd'),ambientLate=new T.Color('#f4dcc0'),white=new T.Color('#ffffff'),cloudGold=new T.Color('#ffcf98');
+  const sunLow=new T.Color('#ffae78'),sunHigh=new T.Color('#ffe7c4'),moon=new T.Color('#7d9be0'),ambientDay=new T.Color('#e3ebee'),ambientPulse=new T.Color('#a7c9ed'),ambientNight=new T.Color('#899dbd'),ambientLate=new T.Color('#f4dcc0'),white=new T.Color('#ffffff'),cloudGold=new T.Color('#ffcf98'),seaHaze=new T.Color('#9dbad0'),horizonCream=new T.Color('#fde3bd');
   const start=performance.now();
   let frames=0,measureStart=start;
   renderer.setAnimationLoop(()=>{
@@ -120,9 +127,10 @@ try {
     const s=withNight(surveyUrl?world.state:moodAt(hour),dark);
     const pulse=T.MathUtils.clamp((s.neon-.25)/.7,0,1)*day,still=T.MathUtils.clamp((s.warmth-.55)/.3,0,1);
     (scene.background as T.Color).copy(dayBase).lerp(dayPulse,pulse).lerp(dayStill,still).lerp(duskHorizon,glow*.85).lerp(nightHorizon,nightSky);
-    (scene.fog as T.FogExp2).color.copy(scene.background as T.Color);(scene.fog as T.FogExp2).density=.00024+s.haze*.00016;
+    // Clear bay air by day: the district stays crisp, the sea keeps its blue to the horizon and far shores fade to a cool haze.
+    (scene.fog as T.FogExp2).color.copy(scene.background as T.Color).lerp(seaHaze,day*.6);(scene.fog as T.FogExp2).density=.00011+s.haze*.0001;grade.uniforms.amount.value=.35+.65*day;
     sky.material.uniforms.day.value=day;sky.material.uniforms.tint.value.copy(white).lerp(cloudGold,glow*.8);
-    sky.position.copy(camera.position);sky.material.uniforms.horizon.value.copy(scene.background as T.Color);sky.material.uniforms.top.value.copy(topBase).lerp(topPulse,pulse).lerp(topStill,still).lerp(duskTop,glow*.5).lerp(nightTop,nightSky);
+    sky.position.copy(camera.position);sky.material.uniforms.horizon.value.copy(scene.background as T.Color).lerp(horizonCream,day*.45);sky.material.uniforms.top.value.copy(topBase).lerp(topPulse,pulse).lerp(topStill,still).lerp(duskTop,glow*.5).lerp(nightTop,nightSky);
     // The sun arcs east to west; below the horizon the same light becomes a dim moon from the opposite side, so shadows never stop.
     const arc=Math.PI*(hour-6)/12,up=height>0?1:-1;
     sun.position.set(840*Math.cos(arc)*up,480*Math.abs(height)+48,408);

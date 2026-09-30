@@ -4,7 +4,7 @@ import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
 import { civicCore } from './civicCore';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
-import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
+import { plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
 import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
 import { inDistrict } from './layout';
@@ -25,7 +25,7 @@ const buildingUrls: Record<string, string> = {
 const environmentFinish: Record<string, [color: string, roughness: number, metalness: number]> = {
   road: ['#7d8a90', .88, 0], sidewalk: ['#ddd8cc', .78, 0], plaza: ['#e6dfd1', .66, 0], service_area: ['#d3d5ce', .8, 0],
   landscape: ['#839768', .9, 0], water: ['#5a93a8', .62, 0], rail_structure: ['#e6ebea', .42, .35], station: ['#a7c3cf', .12, .55],
-  context_unknown: ['#b9c1c4', .9, 0], context_office_commercial: ['#b3bdc4', .85, 0], context_utility_service: ['#b9bdba', .9, 0], context_public_cultural: ['#b8c0b7', .9, 0],
+  context_unknown: ['#d8cfbf', .9, 0], context_office_commercial: ['#d1c8b8', .85, 0], context_utility_service: ['#cbc6ba', .9, 0], context_public_cultural: ['#d6cebe', .9, 0],
 };
 
 // 2127 retrofit by material: mall roofs become planted, hotel roofs photovoltaic, stark white cladding warm ceramic; no extra geometry.
@@ -76,6 +76,8 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     if (!(object instanceof T.Mesh)) return;
     const material = object.material as T.MeshStandardMaterial, finish = environmentFinish[material.name];
     if (finish) { material.color.set(finish[0]); material.roughness = finish[1]; material.metalness = finish[2]; }
+    // Context massing (district and backdrop) carries the same storey-banded curtain wall and lit bays as Aqua City and DECKS.
+    if (finish && material.name.startsWith('context_') && material.customProgramCacheKey() !== 'curtain-wall') curtainWall(material, finish[0]);
     if(material.name==='landscape'){
       material.map=grass;material.color.set('#cbd8b5');
       // World metres keep the authored terrain patches at one consistent texture scale.
@@ -93,6 +95,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   receded.forEach(material => recedeBeyondDistrict(material));
   scene.add(contextFacades(environment), bayContext());
   plantCanopy(scene,trees);
+  plantBackdropGrove(scene,environment);
   await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1])).map(async placement => {
     if(placement.id==='fuji-tv'){scene.add(civicCore());return;}
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);

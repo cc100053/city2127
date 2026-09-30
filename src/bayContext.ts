@@ -1,12 +1,12 @@
 import * as T from 'three';
 import { bake, paint } from './cityRig.ts';
-import { ariakeLink, bayShores, DISTRICT, gateBridge, rainbowBridge } from './layout.ts';
+import { bayShores, DISTRICT, gateBridge, rainbowBridge } from './layout.ts';
 
 const ground = paint('#737f78', 1), bridgeWhite = paint('#cfd3d2', .55, .15), gateSteel = paint('#aab5b9', .45, .35);
 const skyline = new T.MeshStandardMaterial({ color: '#ffffff', roughness: .9 });
 // Far shores recede harder than the Odaiba backdrop: silhouettes in the bay haze, never competing with the district.
-for (const material of [ground, bridgeWhite, gateSteel, skyline]) recedeBeyondDistrict(material, .82);
-const unitBox = new T.BoxGeometry(1, 1, 1);
+for (const material of [ground, bridgeWhite, gateSteel, skyline]) { recedeBeyondDistrict(material, .82); curveBeyondPlate(material); }
+const unitBox = new T.BoxGeometry(1, 1, 1), slabBox = new T.BoxGeometry(1, 1, 1, 24, 1, 24);
 
 /** A box spanning a to b (centre line), `width` across and `depth` tall. */
 function beam(parent: T.Object3D, a: T.Vector3, b: T.Vector3, width: number, depth: number, material: T.Material) {
@@ -26,7 +26,7 @@ function viaduct(parent: T.Object3D, points: readonly (readonly [number, number,
 
 // Beyond the district the surveyed ground, roads, guideway and context massing stay as Odaiba's connected backdrop, but lose
 // saturation and contrast into the bay haze over DISTRICT.recede metres so detail and attention stay on the hero district.
-export function recedeBeyondDistrict(material: T.Material, strength = .6) {
+export function recedeBeyondDistrict(material: T.Material, strength = .35) {
   const compile = material.onBeforeCompile.bind(material), key = material.customProgramCacheKey.bind(material);
   material.onBeforeCompile = (shader, renderer) => {
     compile(shader, renderer);
@@ -34,10 +34,31 @@ export function recedeBeyondDistrict(material: T.Material, strength = .6) {
     shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 districtXz;').replace('#include <fog_fragment>', `#include <fog_fragment>
       vec2 beyond=max(vec2(${DISTRICT.minX.toFixed(1)},${DISTRICT.minZ.toFixed(1)})-districtXz,districtXz-vec2(${DISTRICT.maxX.toFixed(1)},${DISTRICT.maxZ.toFixed(1)}));
       float recede=smoothstep(0.,${DISTRICT.recede.toFixed(1)},length(max(beyond,0.)));
-      vec3 muted=mix(vec3(dot(gl_FragColor.rgb,vec3(.299,.587,.114))),fogColor,.45);
+      vec3 muted=mix(mix(vec3(dot(gl_FragColor.rgb,vec3(.299,.587,.114))),gl_FragColor.rgb,.35),fogColor,.45);
       gl_FragColor.rgb=mix(gl_FragColor.rgb,muted,recede*${strength.toFixed(2)});`);
   };
   material.customProgramCacheKey = () => key() + '|district-recede' + strength;
+}
+
+// Beyond the surveyed plate (every vertex lies within 1.55 km of the origin) the bay and its far shores fall away on a small
+// planet, so the sea ends at a crisp horizon about 4.7° below level from the hero pose, sky shows above it and far skylines sink behind it.
+export const EARTH = { plate: 1600, radius: 30000 } as const;
+/** Drop world y by the curvature beyond `EARTH.plate`; wrap after any other vertex edit (recede appends after project_vertex). */
+export function curveBeyondPlate(material: T.Material) {
+  const compile = material.onBeforeCompile.bind(material), key = material.customProgramCacheKey.bind(material);
+  material.onBeforeCompile = (shader, renderer) => {
+    compile(shader, renderer);
+    shader.vertexShader = shader.vertexShader.replace('#include <project_vertex>', `vec4 mvPosition = vec4(transformed, 1.);
+      #ifdef USE_INSTANCING
+      mvPosition = instanceMatrix * mvPosition;
+      #endif
+      vec4 curved = modelMatrix * mvPosition;
+      float fall = max(length(curved.xz) - ${EARTH.plate.toFixed(1)}, 0.);
+      curved.y -= fall * fall / ${(2 * EARTH.radius).toFixed(1)};
+      mvPosition = viewMatrix * curved;
+      gl_Position = projectionMatrix * mvPosition;`);
+  };
+  material.customProgramCacheKey = () => key() + '|earth-curve';
 }
 
 /** Tokyo Bay beyond the plate: neighbouring shores with block skylines and the bridges that tie Odaiba to them. Silhouettes, no shadows. */
@@ -52,7 +73,7 @@ export function bayContext() {
   let i = 0;
   for (const shore of bayShores) {
     const [x0, x1] = shore.x, [z0, z1] = shore.z;
-    const slab = new T.Mesh(unitBox, ground); slab.position.set((x0 + x1) / 2, -.7, (z0 + z1) / 2); slab.scale.set(x1 - x0, 3, z1 - z0); parts.add(slab);
+    const slab = new T.Mesh(slabBox, ground); slab.position.set((x0 + x1) / 2, -.7, (z0 + z1) / 2); slab.scale.set(x1 - x0, 3, z1 - z0); parts.add(slab);
     for (let k = 0; k < shore.count; k++, i++) {
       const w = 25 + random() * 55, d = 25 + random() * 55, h = shore.h[0] + (shore.h[1] - shore.h[0]) * random() ** 2.4;
       dummy.position.set(x0 + w + random() * (x1 - x0 - 2 * w), h / 2 + .8, z0 + d + random() * (z1 - z0 - 2 * d));
@@ -79,7 +100,6 @@ export function bayContext() {
   }
   for (const anchorage of [s, d]) { const a = new T.Mesh(unitBox, bridgeWhite); a.position.set(anchorage.x, rainbowBridge.deck / 2, anchorage.z); a.scale.set(45, rainbowBridge.deck + 6, 45); a.lookAt(anchorage.clone().add(along).setY(rainbowBridge.deck / 2)); parts.add(a); }
   for (const approach of rainbowBridge.approaches) viaduct(parts, approach, 20, bridgeWhite);
-  viaduct(parts, ariakeLink, 12, bridgeWhite);
   // Tokyo Gate Bridge: ramps to a 55 m deck, two facing truss humps crowning over their piers.
   const a = new T.Vector3(gateBridge.from[0], 0, gateBridge.from[1]), b = new T.Vector3(gateBridge.to[0], 0, gateBridge.to[1]);
   const gAlong = b.clone().sub(a).normalize(), gAcross = new T.Vector3(-gAlong.z, 0, gAlong.x), mid = a.clone().lerp(b, .5), half = a.distanceTo(b) / 2;

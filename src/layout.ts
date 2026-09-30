@@ -66,7 +66,6 @@ export const bayShores: readonly {name:string;x:readonly [number,number];z:reado
   {name:'Takeshiba–Hamamatsucho',x:[-1500,-300],z:[-3600,-2500],h:[30,190],count:90},
   {name:'Harumi–Toyosu',x:[0,2800],z:[-3600,-2400],h:[30,180],count:130},
   {name:'Toyosu south',x:[900,2800],z:[-2300,-1300],h:[20,120],count:60},
-  {name:'Ariake',x:[720,2400],z:[-1150,800],h:[12,70],count:55},
   {name:'Shinagawa–Tennozu',x:[-3600,-1700],z:[-1400,1400],h:[25,160],count:260},
   {name:'Oi',x:[-2800,-1300],z:[1500,3600],h:[8,30],count:50},
   {name:'Central breakwater',x:[-300,2300],z:[1700,3300],h:[6,20],count:25},
@@ -81,7 +80,6 @@ export const rainbowBridge = {
     [[-720,52,-760],[-420,36,-700],[-100,22,-640],[260,15,-560],[496,14.2,-415]],
   ] as readonly (readonly P3[])[],
 };
-// Tokyo Gate Bridge (Central breakwater ↔ Wakasu, 2.6 km, twin "dinosaur" trusses up to 87 m) on the south-east horizon;
-// the Yurikamome guideway continues from its east plate exit onto Ariake.
+// Tokyo Gate Bridge (Central breakwater ↔ Wakasu, 2.6 km, twin "dinosaur" trusses up to 87 m) on the south-east horizon.
+// Ariake is left as open water (Dream Loop r2): the hero view reads Odaiba as a peninsula in the open bay.
 export const gateBridge = {from:[2400,2950] as const, to:[4550,1600] as const, deck:55, crown:87};
-export const ariakeLink: readonly P3[] = [[668,14.2,211],[900,14.2,235],[1150,14.2,260]];
