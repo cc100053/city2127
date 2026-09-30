@@ -5,3 +5,8 @@ dist/
 .vercel
 .codegraph
 .claude/settings.json
+
+# Blender/model working files that are not source/export deliverables.
+asset/models/**/*.blend1
+asset/models/**/*.blend2
+asset/models/**/*.blend@
