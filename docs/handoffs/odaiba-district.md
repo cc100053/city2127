@@ -1,7 +1,7 @@
 # Odaiba hero district — 2026-09-30
 
 - Owner: cc100053 (Claude Code session)
-- Status: IN_PROGRESS — P1, P2 and the P3 draw-call merge implemented and locally verified; P3 tier-1 art pass awaiting art direction.
+- Status: DONE (integrated into main) — earlier status: P1, P2 and the P3 draw-call merge implemented and locally verified; P3 tier-1 art pass awaiting art direction.
 - Branch: `feat/odaiba-district`, stacked on `feat/art-direction` (not `main`): P1 edits `odaibaScene`, `coastalCanopy` and `contextFacades`, which exist only on the art branch pending human art review. Integrate after, or together with, `feat/art-direction`.
 - Base commit: `55f9473e5b8ac63c9b9e441e5835432a914d717b` (`feat/art-direction`).
 - Last verified commit: see Git log for the P1 commit; checks below were run on its exact working tree.
@@ -97,3 +97,7 @@ User review of P3b: the far edge must keep Odaiba's surroundings — Odaiba is l
 ## Next step
 
 User review of the connected backdrop. Possible follow-ups: night lights on far shores, more Odaiba-specific backdrop landmarks (Big Sight, Telecom silhouette), further Dream Loop passes.
+
+## Main integration — 2026-10-01
+
+User instructed merging `feat/odaiba-district` and `feat/art-direction` into main and deleting both branches. `feat/art-direction` was already contained in main (`e3185b3`). `feat/odaiba-district` `deb634e` (feature CI PASSED) merged with `--no-ff` as `f2826cc` on `origin/main` `3a36797`, no conflicts. Integrated checks: root `npm test`, `npm run build` PASS; `survey` `npm test` PASS; `git diff --check origin/main..HEAD` clean. module-swap unchanged, not rerun. Both branches deleted locally and on origin after the push; their history remains in main.
