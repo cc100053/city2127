@@ -2,7 +2,7 @@ import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets.ts';
-import { guideway, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK } from './layout.ts';
+import { guideway, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers } from './layout.ts';
 
 const ease=(t:number)=>T.MathUtils.smoothstep(t,0,1);
 const curve=(points:readonly (readonly [number,number,number])[],closed=false)=>new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p)),closed,'centripetal');
@@ -53,12 +53,12 @@ function wake() {
   const position:number[]=[],color:number[]=[];
   const strip=(x0:number,x1:number,w0:number,w1:number,a0:number)=>{
     for(let i=0;i<12;i++){
-      const u=i/12,v=(i+1)/12,z=(t:number)=>-5.5-t*38,x=(t:number)=>x0+(x1-x0)*t,w=(t:number)=>w0+(w1-w0)*t,a=(t:number)=>a0*(1-t)**1.6;
+      const u=i/12,v=(i+1)/12,z=(t:number)=>-5.5-t*30,x=(t:number)=>x0+(x1-x0)*t,w=(t:number)=>w0+(w1-w0)*t,a=(t:number)=>a0*(1-t)**1.6;
       const q=[[x(u)-w(u),z(u),a(u)],[x(u)+w(u),z(u),a(u)],[x(v)+w(v),z(v),a(v)],[x(v)-w(v),z(v),a(v)]];
       for(const k of [0,1,2,0,2,3]){position.push(q[k][0],-.05,q[k][1]);color.push(1,1,1,q[k][2]);}
     }
   };
-  strip(-1.2,-13,.5,1.4,.75);strip(1.2,13,.5,1.4,.75);strip(0,0,1.4,3.5,.55);
+  strip(-1.2,-6,.22,.6,.45);strip(1.2,6,.22,.6,.45);strip(0,0,.9,2.2,.5);
   const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.Float32BufferAttribute(position,3));geometry.setAttribute('color',new T.Float32BufferAttribute(color,4));
   return geometry;
 }
@@ -101,9 +101,9 @@ export function mobility(scene:T.Scene) {
   const clothes=['#4f6f7c','#b5836f','#6d8a5f','#2f3e48','#c9b48a','#8c6f8f','#3f5a52','#e4e1d8'],skins=['#e8cdb0','#c99e7c','#8d6348','#f0d9c2'],hairs=['#2f2a27','#5a4033','#1d2226','#b9a58c','#d8d8d4'];
   for(let i=0;i<WALKERS;i++){people.tint(i,coats,clothes[(i*5)%clothes.length]);people.tint(i,skin,skins[(i*3)%skins.length]);people.tint(i,hair,hairs[(i*7)%hairs.length]);}
   // Water taxis: a low hull with a glass cabin and a mint waterline, 11 m long.
-  const boats=fleet(scene,[part([3.6,1.2,11],[0,.4,0],shell,.5),part([2.8,1.3,5],[0,1.5,-.6],glass,.4),part([3.7,.12,11.1],[0,.25,0],mint,.05),part([2.4,.12,.12],[0,1,5.5],coral,.05)],BOATS+1,'water-taxis');
+  const boats=fleet(scene,[part([3.6,1.2,11],[0,.4,0],shell,.5),part([2.8,1.3,5],[0,1.5,-.6],glass,.4),part([3.7,.12,11.1],[0,.25,0],mint,.05),part([2.4,.12,.12],[0,1,5.5],coral,.05)],BOATS+1+bayCruisers.length,'water-taxis');
   // Wakes: a fading V and prop wash trailing each taxi on the water (no shadow).
-  const wakes=fleet(scene,[{geometry:wake(),material:new T.MeshBasicMaterial({vertexColors:true,transparent:true,depthWrite:false})}],BOATS+1,'water-taxi-wakes',false);
+  const wakes=fleet(scene,[{geometry:wake(),material:new T.MeshBasicMaterial({vertexColors:true,transparent:true,depthWrite:false})}],BOATS+1+bayCruisers.length,'water-taxi-wakes',false);
   // Air taxis: the thin-wing carrier at 5× (22 m span), readable at district distance.
   const drones=fleet(scene,[wing(),part([.8,.35,2.5],[0,.1,0],shell,.15),part([.55,.2,1],[0,.34,.45],glass,.08),
     part([.6,.1,.16],[0,.11,-1.27],mint,.025),part([.09,.4,.65],[0,.32,-.8],glass,.02)],7,'air-taxis');
@@ -129,7 +129,14 @@ export function mobility(scene:T.Scene) {
       const u=(time*.009+i/BOATS)%1;place(path.water,u);pose.position.y+=Math.sin(time*1.3+i)*.08;pose.rotation.z=Math.sin(time*.9+i)*.02;
       pose.scale.setScalar(BOAT_SCALE*T.MathUtils.smoothstep(state.traffic*.6+.4-i/(BOATS+1),-.05,.05));boats.set(i,pose);pose.rotation.z=0;wakes.set(i,pose);
     }
-    const ferry=pingPong(time,150);place(path.ferry,ferry.u,!ferry.forward);pose.scale.setScalar(BOAT_SCALE*(1-ease((ferry.u-.85)/.15)));boats.set(BOATS,pose);wakes.set(BOATS,pose);boats.flush();wakes.flush();
+    const ferry=pingPong(time,150);place(path.ferry,ferry.u,!ferry.forward);pose.scale.setScalar(BOAT_SCALE*(1-ease((ferry.u-.85)/.15)));boats.set(BOATS,pose);wakes.set(BOATS,pose);
+    // Bay cruisers: straight 300 m runs across the open bay, fading in and out at each end of the run.
+    bayCruisers.forEach(([x,z,heading],i)=>{
+      const d=((time*6+i*83)%300+300)%300,fade=ease(d/25)*ease((300-d)/25);
+      pose.position.set(x+Math.sin(heading)*(d-150),-.6+Math.sin(time*1.1+i)*.08,z+Math.cos(heading)*(d-150));pose.rotation.set(0,heading,0);
+      pose.scale.setScalar(1.35*fade);boats.set(BOATS+1+i,pose);wakes.set(BOATS+1+i,pose);
+    });
+    boats.flush();wakes.flush();
     for(let i=0;i<6;i++){
       const t=(time*(.004+i%3*.0015)+i/6)%1,density=T.MathUtils.smoothstep(.2+state.traffic*.35-i/9,-.07,.07);
       place(path.air,t);pose.rotation.z=Math.sin(time+i)*.035;pose.scale.setScalar(AIR_SCALE*density);drones.set(i,pose);heads[i]=t;weights[i]=density;

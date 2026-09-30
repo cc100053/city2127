@@ -6,6 +6,26 @@ const ground = paint('#737f78', 1), bridgeWhite = paint('#cfd3d2', .55, .15), ga
 const skyline = new T.MeshStandardMaterial({ color: '#ffffff', roughness: .9 });
 // Far shores recede harder than the Odaiba backdrop: silhouettes in the bay haze, never competing with the district.
 for (const material of [ground, bridgeWhite, gateSteel, skyline]) { recedeBeyondDistrict(material, .82); curveBeyondPlate(material); }
+// Ariake in 2127: a wooded park shore rather than a grey plain; grove mottling and pale walks from world-space noise (reuses recede's varying).
+const parkland = paint('#6f8a5c', 1);
+recedeBeyondDistrict(parkland, .55);
+{
+  const compile = parkland.onBeforeCompile.bind(parkland);
+  parkland.onBeforeCompile = (shader, renderer) => {
+    compile(shader, renderer);
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', `#include <common>
+      float groveHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+      float groveNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(groveHash(i),groveHash(i+vec2(1,0)),f.x),mix(groveHash(i+vec2(0,1)),groveHash(i+1.),f.x),f.y);}`)
+      .replace('#include <color_fragment>', `#include <color_fragment>
+      float grove=groveNoise(districtXz/70.)*.6+groveNoise(districtXz/17.)*.4;
+      diffuseColor.rgb*=mix(vec3(.55,.72,.52),vec3(1.1,1.06,.92),smoothstep(.38,.62,grove));
+      float walk=1.-smoothstep(.03,.07,abs(sin(districtXz.x*.011+sin(districtXz.y*.009)*2.)));
+      diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.86,.82,.74),walk*.8);`);
+  };
+  const key = parkland.customProgramCacheKey.bind(parkland);
+  parkland.customProgramCacheKey = () => key() + '|ariake-park';
+  curveBeyondPlate(parkland);
+}
 const unitBox = new T.BoxGeometry(1, 1, 1), slabBox = new T.BoxGeometry(1, 1, 1, 24, 1, 24);
 
 /** A box spanning a to b (centre line), `width` across and `depth` tall. */
@@ -73,7 +93,7 @@ export function bayContext() {
   let i = 0;
   for (const shore of bayShores) {
     const [x0, x1] = shore.x, [z0, z1] = shore.z;
-    const slab = new T.Mesh(slabBox, ground); slab.position.set((x0 + x1) / 2, -.7, (z0 + z1) / 2); slab.scale.set(x1 - x0, 3, z1 - z0); parts.add(slab);
+    const slab = new T.Mesh(slabBox, shore.name === 'Ariake' ? parkland : ground); slab.position.set((x0 + x1) / 2, -.7, (z0 + z1) / 2); slab.scale.set(x1 - x0, 3, z1 - z0); parts.add(slab);
     for (let k = 0; k < shore.count; k++, i++) {
       const w = 25 + random() * 55, d = 25 + random() * 55, h = shore.h[0] + (shore.h[1] - shore.h[0]) * random() ** 2.4;
       dummy.position.set(x0 + w + random() * (x1 - x0 - 2 * w), h / 2 + .8, z0 + d + random() * (z1 - z0 - 2 * d));

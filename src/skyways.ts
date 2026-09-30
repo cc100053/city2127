@@ -1,13 +1,14 @@
 import * as T from 'three';
 import { arc, bake, box, leaf, paint, stone, trim } from './cityRig.ts';
-import { changeSites, floatingDecks, inDistrict, northShore } from './layout.ts';
+import { changeSites, DISTRICT, floatingDecks, northShore } from './layout.ts';
 import { routes } from './mobility.ts';
 import layout from './odaiba-layout.json';
 
 type P3 = [number, number, number];
 // Blue-white light trails: above the bloom threshold in daylight, so the 2127 network reads as lit movement from the hero pose.
-export const trail = new T.MeshBasicMaterial({ color: new T.Color('#bfe4ff').multiplyScalar(2.4) });
-const chrome = new T.MeshPhysicalMaterial({ color: '#d6e4ec', metalness: .9, roughness: .07, clearcoat: 1, clearcoatRoughness: .05 });
+export const trail = new T.MeshBasicMaterial({ color: new T.Color('#a9d8ff').multiplyScalar(2.6) });
+// Silvered glass: pale and warm so the spheres read as mirrors of the golden sky, not blue domes.
+const chrome = new T.MeshPhysicalMaterial({ color: '#f1efe8', metalness: .78, roughness: .1, clearcoat: 1, clearcoatRoughness: .04, envMapIntensity: 1.35 });
 const waterfall = new T.MeshStandardMaterial({ color: '#f3fbff', emissive: '#d8f0ff', emissiveIntensity: .35, roughness: .25, transparent: true, opacity: .85 });
 const foam = new T.MeshBasicMaterial({ color: '#f4fbff', transparent: true, opacity: .55, depthWrite: false });
 const cherry = paint('#efc2cf', .8);
@@ -21,9 +22,9 @@ const RINGS: { centre: P3; radius: number }[] = [
   { centre: [-240, 92, 178], radius: 100 },
 ];
 const SPHERES: { centre: P3; radius: number; deck?: number }[] = [
-  { centre: [160, 92, 40], radius: 15, deck: 23 },
-  { centre: [-80, 100, 180], radius: 16, deck: 26 },
-  { centre: [-300, 104, 40], radius: 13, deck: 24 },
+  { centre: [160, 92, 40], radius: 20, deck: 28 },
+  { centre: [-80, 100, 180], radius: 22, deck: 30 },
+  { centre: [-300, 104, 40], radius: 17, deck: 26 },
 ];
 const LINKS: P3[][] = [
   [[276.3, 90, -304.1], [300, 78, -240], [285, 67, -150], [262, 62, -60], [215, 62, 0], [140, 62, 20], [70, 62.5, 14], [12.3, 63, 7.6]],
@@ -70,7 +71,7 @@ function skyway(root: T.Object3D, curve: T.Curve<T.Vector3>, closed: boolean) {
   const length = curve.getLength(), samples = Math.ceil(length / 3);
   root.add(new T.Mesh(deck(curve, 9, 2.6, samples), trim));
   for (const side of [-4.65, 4.65]) {
-    root.add(new T.Mesh(offsetTube(curve, side, -1.1, .38, closed), trail));
+    root.add(new T.Mesh(offsetTube(curve, side, -1.1, .55, closed), trail));
     root.add(new T.Mesh(parapet(curve, side * .98, samples), stone));
   }
   for (let d = 30; d < length - 10; d += 64) {
@@ -93,8 +94,8 @@ function parapet(curve: T.Curve<T.Vector3>, offset: number, samples: number) {
 function sphere(root: T.Object3D, [x, y, z]: P3, r: number, deckRadius?: number) {
   const g = new T.Group(); g.position.set(x, y, z); root.add(g);
   g.add(new T.Mesh(new T.SphereGeometry(r, 48, 24), chrome));
-  for (let i = 0; i < 6; i++) { const rib = new T.Mesh(new T.TorusGeometry(r + .08, .2, 4, 64), trim); rib.rotation.y = i * Math.PI / 6; g.add(rib); }
-  for (const f of [-.55, 0, .55]) { const lat = new T.Mesh(new T.TorusGeometry(Math.sqrt(1 - f * f) * r + .08, .24, 4, 64), trim); lat.rotation.x = Math.PI / 2; lat.position.y = f * r; g.add(lat); }
+  for (let i = 0; i < 8; i++) { const rib = new T.Mesh(new T.TorusGeometry(r + .08, .18, 4, 64), trim); rib.rotation.y = i * Math.PI / 8; g.add(rib); }
+  for (const f of [-.7, -.35, 0, .35, .7]) { const lat = new T.Mesh(new T.TorusGeometry(Math.sqrt(1 - f * f) * r + .08, .24, 4, 64), trim); lat.rotation.x = Math.PI / 2; lat.position.y = f * r; g.add(lat); }
   // Cradle and a single mast with three splayed struts to the ground.
   arc(g, r * .45, r * .8, 1.4, [0, -r * .78, 0], trim);
   const mast = new T.Mesh(pole, trim); mast.scale.set(2, y - r * .7, 2); mast.position.set(0, -(y + r * .7) / 2, 0); g.add(mast);
@@ -120,11 +121,11 @@ function shoreTerraces(root: T.Object3D) {
   let n = 0;
   for (let i = 0; i < northShore.length - 1; i++) {
     const [ax, az] = northShore[i], [bx, bz] = northShore[i + 1], length = Math.hypot(bx - ax, bz - az), yaw = Math.atan2(bx - ax, bz - az);
-    for (let d = 25; d < length; d += 58) {
+    for (let d = 22; d < length; d += 46) {
       const t = d / length, sx = ax + (bx - ax) * t, sz = az + (bz - az) * t;
       // Local -X faces the sea (as in tidalEdge); the terrace centre sits 40 m out, past the tidal islets.
       const cx = sx - Math.cos(yaw) * 40, cz = sz + Math.sin(yaw) * 40;
-      if (!inDistrict(cx, cz) || floatingDecks.some(([x, z]) => Math.hypot(cx - x, cz - z) < 55) || boats.some(p => Math.hypot(p.x - cx, p.z - cz) < 32)) continue;
+      if (cx < DISTRICT.minX || cx > 250 || cz > DISTRICT.maxZ || floatingDecks.some(([x, z]) => Math.hypot(cx - x, cz - z) < 55) || boats.some(p => Math.hypot(p.x - cx, p.z - cz) < 32)) continue;
       const g = new T.Group(); g.position.set(sx, 0, sz); g.rotation.y = yaw; root.add(g);
       const c = new T.Group(); c.position.set(-40, 0, 0); c.rotation.y = n * 1.7; g.add(c);
       const r = 10 + (n % 3) * 1.5;

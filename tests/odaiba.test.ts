@@ -109,7 +109,7 @@ assert.ok(shore.children.length<=6, 'Tidal terraces batch by shared finish');
 const edge=tidalEdge();
 assert.ok(edge.children.length>0 && edge.children.length<=5, 'North tidal edge batches by shared finish');
 const bay=bayContext();
-assert.ok(bay.children.length<=4, 'Bay bridges and shores batch by finish; skyline is one instanced draw');
+assert.ok(bay.children.length<=5, 'Bay bridges, shores and Ariake parkland batch by finish; skyline is one instanced draw');
 city.add(environment,panels,shore,edge,bay);
 plantCanopy(city, JSON.parse(readFileSync(new URL('../asset/models/odaiba-masterplan/tree_instances.json', import.meta.url), 'utf8')));
 const groveStart=city.children.length;

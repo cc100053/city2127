@@ -11,4 +11,6 @@
 .causal-history-total,.causal-vote-legend{font-size:9px;opacity:.55;margin:0!important}.causal-vote-legend{margin-bottom:6px!important}.causal-proposal-band{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:2px;margin:0!important;padding:0!important;list-style:none}.causal-proposal-cell{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,1fr);gap:1px;min-width:0;aspect-ratio:1;padding:1px;border-radius:3px;background:#fff9}.causal-vote{display:grid;place-items:center;border-radius:2px;font-size:8px;font-weight:700;line-height:1}.causal-vote-up{background:#dce9dd;color:#356147}.causal-vote-down{background:#f1ded8;color:#8d493e}.causal-vote-flat{background:#e7e8e2;color:#586057}
 /* Dream Loop r2: the intro now sits over open sea; a soft pale halo keeps the day copy legible. */
 body:not([data-time=night]) .intro{text-shadow:0 0 12px rgba(236,232,222,.85),0 0 3px rgba(236,232,222,.7)}
+/* r3: Ariake parkland is green behind the intro, so the day accent word darkens to keep its contrast. */
+body:not([data-time=night]) h1 em{color:#56613f}
 body[data-time=night] footer{text-shadow:0 0 10px rgba(7,13,28,.95),0 0 3px rgba(7,13,28,.8)}

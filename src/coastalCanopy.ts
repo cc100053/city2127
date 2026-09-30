@@ -29,21 +29,22 @@ export function plantCanopy(scene: T.Object3D, trees: { instances: { position: n
   foliage.castShadow=trunks.castShadow=true;foliage.receiveShadow=trunks.receiveShadow=true;scene.add(foliage,trunks);
 }
 
-/** Plant only on authored flat planted roofs, inset from their edges. */
-export function plantRoofCanopy(scene: T.Object3D, model: T.Object3D) {
+/** Plant only on authored flat planted roofs, inset from their edges; `tower` instead crowns any flat roof above 30 m with larger trees (2127 sky gardens). */
+export function plantRoofCanopy(scene: T.Object3D, model: T.Object3D, tower=false) {
   const bounds=new T.Box3().setFromObject(model),ray=new T.Raycaster(),down=new T.Vector3(0,-1,0);
+  bounds.min.x=Math.max(bounds.min.x,DISTRICT.minX);bounds.max.x=Math.min(bounds.max.x,DISTRICT.maxX);bounds.min.z=Math.max(bounds.min.z,DISTRICT.minZ);bounds.max.z=Math.min(bounds.max.z,DISTRICT.maxZ);
   const instances: {position:number[];scale:number;type:string}[]=[];
   const roofAt=(x:number,z:number)=>{
     ray.set(new T.Vector3(x,bounds.max.y+1,z),down);
     const hit=ray.intersectObject(model,true)[0];
     if(!hit || !(hit.object instanceof T.Mesh))return null;
     const material=Array.isArray(hit.object.material)?hit.object.material[hit.face?.materialIndex??0]:hit.object.material;
-    return material.name==='Roof and Shadow' && hit.face && hit.face.normal.clone().transformDirection(hit.object.matrixWorld).y>.98 ? hit.point : null;
+    return (tower ? hit.point.y>30 : material.name==='Roof and Shadow') && hit.face && hit.face.normal.clone().transformDirection(hit.object.matrixWorld).y>.98 ? hit.point : null;
   };
   for(let x=bounds.min.x+6;x<bounds.max.x-6;x+=11)for(let z=bounds.min.z+6;z<bounds.max.z-6;z+=11){
     const p=roofAt(x,z);
     if(!p || p.y<12 || ![[4,0],[-4,0],[0,4],[0,-4]].every(([dx,dz])=>{const edge=roofAt(x+dx,z+dz);return edge && Math.abs(edge.y-p.y)<.3;}))continue;
-    instances.push({position:[x,-z,p.y],scale:.55,type:'broadleaf'});
+    instances.push({position:[x,-z,p.y],scale:tower?.9:.55,type:'broadleaf'});
   }
   plantCanopy(scene,{instances});
 }

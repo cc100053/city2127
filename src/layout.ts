@@ -29,6 +29,10 @@ export const waterLoop: readonly P3[] = [
 ];
 // The ferry heads west for the Shinagawa channel, clear of the Rainbow Bridge anchorage and Daiba approach piers.
 export const ferryLane: readonly P3[] = [[-230,-.6,-290],[-420,-.6,-470],[-760,-.6,-560],[-1250,-.6,-520]];
+// Bay cruisers [x, z, heading]: centres of straight 300 m runs on open water in front of and beyond the district, clear of the shore and piers.
+export const bayCruisers: readonly (readonly [number,number,number])[] = [
+  [-300,-560,.9],[-120,-620,-2.2],[-560,-430,2.6],[40,-600,-.4],[-640,-300,.3],[-700,250,1.4],[-650,-40,-1.7],[-150,1420,1.2],[250,1480,-1.9],
+];
 // Air-taxi corridors: a district loop above every landmark and tall site, and an approach from the bay that ends above the sphere berth.
 export const airLoop: readonly P3[] = Array.from({length:12},(_,i)=>{
   const a=i/12*Math.PI*2;return [-40+Math.cos(a)*330,170+Math.sin(a*2)*6,-40+Math.sin(a)*250] as const;
