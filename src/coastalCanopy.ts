@@ -1,10 +1,10 @@
 import * as T from 'three';
-import { changeSites } from './layout.ts';
+import { changeSites, DISTRICT, inDistrict } from './layout.ts';
 import { routes } from './mobility.ts';
 
 /** Reuse the surveyed planting locations; layered crowns replace the tiny blockout cones. */
 export function plantCanopy(scene: T.Object3D, trees: { instances: { position: number[]; scale: number; type: string }[] }) {
-  const positions=trees.instances.filter(tree=>!Object.values(changeSites).some(site=>Math.abs(tree.position[0]-site.x)<site.w*site.scale/2+9 && Math.abs(-tree.position[1]-site.z)<site.d*site.scale/2+9));
+  const positions=trees.instances.filter(tree=>inDistrict(tree.position[0],-tree.position[1]) && !Object.values(changeSites).some(site=>Math.abs(tree.position[0]-site.x)<site.w*site.scale/2+9 && Math.abs(-tree.position[1]-site.z)<site.d*site.scale/2+9));
   // Instance colours already provide the leaf pigment; a second green tint crushed the lit canopy.
   const foliage=new T.InstancedMesh(new T.IcosahedronGeometry(1,2),new T.MeshStandardMaterial({color:'#ffffff',roughness:.92}),positions.length*4);
   const trunks=new T.InstancedMesh(new T.CylinderGeometry(.35,.6,1,6),new T.MeshStandardMaterial({color:'#776957',roughness:1}),positions.length);
@@ -53,7 +53,7 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
     const hit=ray.intersectObject(environment,true)[0];
     return hit && hit.object instanceof T.Mesh && !Array.isArray(hit.object.material) && hit.object.material.name==='landscape' && hit.point.y<3 ? hit.point.y : null;
   };
-  for(let x=-480;x<600;x+=21)for(let z=-430;z<900;z+=21){
+  for(let x=DISTRICT.minX;x<DISTRICT.maxX;x+=21)for(let z=DISTRICT.minZ;z<DISTRICT.maxZ;z+=21){
     // Staggered clusters leave long clear swales instead of another plantation grid.
     if(Math.sin(x*.023+Math.sin(z*.018)*2)+Math.cos(z*.031)<.15)continue;
     const px=x+Math.sin(z*1.7+x)*6,pz=z+Math.cos(x*1.3-z)*6;

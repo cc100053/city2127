@@ -5,9 +5,10 @@ import layout from './odaiba-layout.json';
 import { civicCore } from './civicCore';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
 import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
-import { contextFacades } from './contextFacades';
+import { contextFacades, cropToDistrict } from './contextFacades';
+import { DISTRICT, inDistrict } from './layout';
 
-// Literal paths bundle the environment and seven retained landmarks; Fuji is now the procedural civic chassis.
+// Literal paths bundle the environment and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
 const environmentUrl = new URL('../asset/models/odaiba-masterplan/odaiba_masterplan_v01_phase03d_environment.glb', import.meta.url).href;
 const buildingUrls: Record<string, string> = {
   'aqua-city-odaiba': new URL('../asset/models/aqua-city-odaiba/aqua-city-odaiba.glb', import.meta.url).href,
@@ -16,7 +17,6 @@ const buildingUrls: Record<string, string> = {
   'divercity-office-tower': new URL('../asset/models/divercity-office-tower/divercity-office-tower.glb', import.meta.url).href,
   'hilton-tokyo-odaiba': new URL('../asset/models/hilton-tokyo-odaiba/hilton-tokyo-odaiba.glb', import.meta.url).href,
   'grand-nikko-tokyo-daiba': new URL('../asset/models/grand-nikko-tokyo-daiba/grand-nikko-tokyo-daiba.glb', import.meta.url).href,
-  'telecom-center': new URL('../asset/models/telecom-center/telecom-center.glb', import.meta.url).href,
 };
 
 // Masterplan blockout materials retuned to the project palette (ART.md): pale stone ground, soft green, context pushed back into the haze.
@@ -30,6 +30,19 @@ const environmentFinish: Record<string, [color: string, roughness: number, metal
 const roofRetrofit: Record<string, [color: string, roughness: number, metalness: number]> = {
   'Roof and Shadow': ['#7d9f68', .85, 0], 'Standing seam roof.001': ['#486b83', .3, .85], 'Gray roof metal': ['#486b83', .3, .85],
 };
+// Outside the district, ground, roads and guideway blend into the fog colour over 300 m.
+function hazeBeyondDistrict(material: T.Material) {
+  const compile = material.onBeforeCompile.bind(material), key = material.customProgramCacheKey.bind(material);
+  material.onBeforeCompile = (shader, renderer) => {
+    compile(shader, renderer);
+    shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 districtXz;').replace('#include <project_vertex>', '#include <project_vertex>\ndistrictXz=(modelMatrix*vec4(transformed,1.)).xz;');
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 districtXz;').replace('#include <fog_fragment>', `#include <fog_fragment>
+      vec2 beyond=max(vec2(${DISTRICT.minX.toFixed(1)},${DISTRICT.minZ.toFixed(1)})-districtXz,districtXz-vec2(${DISTRICT.maxX.toFixed(1)},${DISTRICT.maxZ.toFixed(1)}));
+      gl_FragColor.rgb=mix(gl_FragColor.rgb,fogColor,.85*smoothstep(0.,300.,length(max(beyond,0.))));`);
+  };
+  material.customProgramCacheKey = () => key() + '|district-haze';
+}
+
 const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a');
 /** Night: retained landmark glazing glows warm; the civic chassis uses the shared city finishes. */
 export function updateOdaiba(night: number) {
@@ -42,6 +55,8 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   grass.colorSpace=T.SRGBColorSpace;grass.wrapS=grass.wrapT=T.RepeatWrapping;grass.anisotropy=8;
   const environment = await addCityModel(scene, environmentUrl, [0, 0, 0]);
   environment.name = 'odaiba-environment';
+  cropToDistrict(environment);
+  const hazed = new Set<T.Material>();
   environment.traverse(object => {
     if (!(object instanceof T.Mesh)) return;
     const material = object.material as T.MeshStandardMaterial, finish = environmentFinish[material.name];
@@ -59,9 +74,12 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     if (material.name === 'water') { object.castShadow = object.receiveShadow = false; if(water) object.material=water; }
     if(object.name==='ROADSIDE_TREE_INSTANCES') object.visible=false;
   });
+  // After finishes: shared materials are re-tuned once per mesh above, which would drop an earlier haze wrap.
+  environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) hazed.add(object.material); });
+  hazed.forEach(hazeBeyondDistrict);
   scene.add(contextFacades(environment));
   plantCanopy(scene,trees);
-  await Promise.all(layout.buildings.map(async placement => {
+  await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1])).map(async placement => {
     if(placement.id==='fuji-tv'){scene.add(civicCore());return;}
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);
     model.name = placement.id;

@@ -1,14 +1,14 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { Box3, Group, InstancedMesh, Mesh, Raycaster, Vector3 } from 'three';
+import { Box3, Group, InstancedMesh, Matrix4, Mesh, Raycaster, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
-import { changeSites, skyBridges, floatingDecks } from '../src/layout.ts';
+import { changeSites, skyBridges, floatingDecks, inDistrict } from '../src/layout.ts';
 import { heroCamera } from '../src/heroCamera.ts';
 import { routes } from '../src/mobility.ts';
 import { civicCore } from '../src/civicCore.ts';
-import { contextFacades } from '../src/contextFacades.ts';
+import { contextFacades, cropToDistrict } from '../src/contextFacades.ts';
 import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from '../src/coastalCanopy.ts';
 import { amphibiousShore } from '../src/amphibiousShore.ts';
 
@@ -72,6 +72,20 @@ for(let i=0;i<=160;i++) {
 // Survey sites: the whole scaled lot (plus a 5 m margin) lands on open ground, and the hero pose sees each site unobstructed.
 const environmentBytes = readFileSync(new URL('../asset/models/odaiba-masterplan/odaiba_masterplan_v01_phase03d_environment.glb', import.meta.url));
 const environment=(await new GLTFLoader().parseAsync(environmentBytes.buffer.slice(environmentBytes.byteOffset, environmentBytes.byteOffset + environmentBytes.byteLength), '')).scene;
+// Hero district: every site and retained landmark inside, Telecom Center the only one cut; detail pieces outside are dropped whole.
+assert.deepEqual(layout.buildings.filter((p: {positionBlender:number[]}) => !inDistrict(p.positionBlender[0], -p.positionBlender[1])).map((p: {id:string}) => p.id), ['telecom-center']);
+for (const site of Object.values(changeSites)) assert.ok(inDistrict(site.x, site.z), `${site.name} outside the district`);
+const detailBefore = new Set<string>();
+environment.traverse(object => { if (object instanceof Mesh) detailBefore.add(object.name); });
+cropToDistrict(environment);
+environment.updateMatrixWorld(true);
+environment.traverse(object => {
+  if (!(object instanceof Mesh) || !/^(CTX_|PUBLIC_|STREETLIGHT_|LANDSCAPE_TREE|STATIONS)/.test(object.name)) return;
+  const index = object.geometry.index!, position = object.geometry.attributes.position, c = new Vector3();
+  for (let i = 0; i < index.count; i++) { c.fromBufferAttribute(position, index.getX(i)).applyMatrix4(object.matrixWorld); assert.ok(inDistrict(c.x, c.z) || Math.hypot(Math.max(0, c.x - 260, -460 - c.x), Math.max(0, c.z - 320, -360 - c.z)) < 60, `${object.name} keeps detail at ${c.x.toFixed(0)},${c.z.toFixed(0)}`); }
+});
+assert.ok(['CTX_south_east_unknown', 'CTX_south_public_cultural'].every(name => detailBefore.has(name) && !environment.getObjectByName(name)), 'Southern context blocks are cut');
+assert.ok(environment.getObjectByName('TERRAIN_LOW_DENSITY') && environment.getObjectByName('ROAD_MAJOR'), 'Ground and roads remain as backdrop');
 const panels=contextFacades(environment);
 assert.ok(panels.count>100, 'Context facades have occupied panel rows');
 const shore=amphibiousShore();
@@ -81,6 +95,10 @@ plantCanopy(city, JSON.parse(readFileSync(new URL('../asset/models/odaiba-master
 const groveStart=city.children.length;
 plantLandscapeCanopy(city,environment,landmarks);
 assert.ok(city.children[groveStart] instanceof InstancedMesh && city.children[groveStart].count>100, 'Authored landscape carries coastal groves');
+for (const grove of city.children.filter(o => o instanceof InstancedMesh && o.name === 'surveyed-coastal-trunks') as InstancedMesh[]) {
+  const m = new Matrix4(), c = new Vector3();
+  for (let i = 0; i < grove.count; i++) { grove.getMatrixAt(i, m); c.setFromMatrixPosition(m); assert.ok(inDistrict(c.x, c.z), `tree outside the district at ${c.x.toFixed(0)},${c.z.toFixed(0)}`); }
+}
 city.updateMatrixWorld(true);
 const openGround = /^(TERRAIN|PHASE03C_LANDSCAPE|PHASE03C_PLAZA|PRIMARY_PLAZA|PHASE03C_SERVICE|SERVICE_BAY|SIDEWALK|WATERFRONT_PROMENADE)/;
 const ray = new Raycaster(), down = new Vector3(0, -1, 0);
@@ -149,6 +167,7 @@ for (const [x, z, yaw] of floatingDecks) {
   }
   assert.ok(Math.min(...boatPoints.map(p => Math.hypot(p.x - x, p.z - z))) > 30, `floating deck at ${x},${z} sits in a boat route`);
 }
+console.log('Odaiba: hero district keeps six landmarks and four sites; detail and trees beyond it are cut, ground and roads remain.');
 console.log('Odaiba: sky bridges span clear air above the trains; floating decks float clear of boat routes.');
 console.log('Odaiba: pods ride the guideway deck, walkers keep to open ground outside site lots, water taxis stay afloat.');
 console.log('Odaiba: survey sites sit on open ground, clear of roads, landmarks and guideway, and are visible from the hero pose.');
