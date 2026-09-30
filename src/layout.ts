@@ -54,7 +54,7 @@ export const skyBridges: readonly {name:string;from:P3;to:P3}[] = [
 // Floating decks off the east promenade: [x, z, yaw], 10 × 36 m, long axis along the shore; on water and 30 m from boat routes.
 export const floatingDecks: readonly (readonly [number,number,number])[] = [[-62,-281,-1.12],[-131,-238,-1.03],[-180,-199,-1.02]];
 // North shore: seaward edge of COAST_REVETMENT from the DECKS pier west past Hilton, traced from the district GLB (x, z). The tidal edge steps down into the sea from it.
-// Dream Loop r2: east of the DECKS pier the backdrop ground is cut back to `seaward` (open bay, as in Ariake), and the tidal edge follows that cut first.
+// Dream Loop r2: east of the DECKS pier the backdrop ground is cut back to `seaward` (open bay), and the tidal edge follows that cut first.
 export const northShore: readonly (readonly [number,number])[] = [
   [500,-534],[380,-489],[200,-420],[20,-352],[-3,-336],[-21,-291],[-60,-266],[-128,-220],[-194,-173],[-231,-170],[-266,-173],[-269,-158],[-275,-143],
   [-310,-104],[-339,-77],[-366,-63],[-405,-32],[-423,-27],[-436,-20],[-449,-6],[-465,3],
@@ -71,6 +71,7 @@ export const bayShores: readonly {name:string;x:readonly [number,number];z:reado
   {name:'Takeshiba–Hamamatsucho',x:[-1500,-300],z:[-3600,-2500],h:[30,190],count:90},
   {name:'Harumi–Toyosu',x:[0,2800],z:[-3600,-2400],h:[30,180],count:130},
   {name:'Toyosu south',x:[900,2800],z:[-2300,-1300],h:[20,120],count:60},
+  {name:'Ariake',x:[720,2400],z:[-1150,800],h:[12,70],count:55},
   {name:'Shinagawa–Tennozu',x:[-3600,-1700],z:[-1400,1400],h:[25,160],count:260},
   {name:'Oi',x:[-2800,-1300],z:[1500,3600],h:[8,30],count:50},
   // Only the far rim of the breakwater carries a skyline: from the hero pose it reads as a horizon silhouette, not a grey plain; kept low so it stays below the top-right clock overlay.
@@ -86,6 +87,7 @@ export const rainbowBridge = {
     [[-720,52,-760],[-420,36,-700],[-100,22,-640],[260,15,-560],[496,14.2,-415]],
   ] as readonly (readonly P3[])[],
 };
-// Tokyo Gate Bridge (Central breakwater ↔ Wakasu, 2.6 km, twin "dinosaur" trusses up to 87 m) on the south-east horizon.
-// Ariake is left as open water (Dream Loop r2): the hero view reads Odaiba as a peninsula in the open bay.
+// Tokyo Gate Bridge (Central breakwater ↔ Wakasu, 2.6 km, twin "dinosaur" trusses up to 87 m) on the south-east horizon;
+// the Yurikamome guideway continues from its east plate exit onto Ariake.
 export const gateBridge = {from:[2400,2950] as const, to:[4550,1600] as const, deck:55, crown:87};
+export const ariakeLink: readonly P3[] = [[668,14.2,211],[900,14.2,235],[1150,14.2,260]];

@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { bake, paint } from './cityRig.ts';
-import { bayShores, DISTRICT, gateBridge, rainbowBridge } from './layout.ts';
+import { ariakeLink, bayShores, DISTRICT, gateBridge, rainbowBridge } from './layout.ts';
 
 const ground = paint('#737f78', 1), bridgeWhite = paint('#cfd3d2', .55, .15), gateSteel = paint('#aab5b9', .45, .35);
 const skyline = new T.MeshStandardMaterial({ color: '#ffffff', roughness: .9 });
@@ -100,6 +100,7 @@ export function bayContext() {
   }
   for (const anchorage of [s, d]) { const a = new T.Mesh(unitBox, bridgeWhite); a.position.set(anchorage.x, rainbowBridge.deck / 2, anchorage.z); a.scale.set(45, rainbowBridge.deck + 6, 45); a.lookAt(anchorage.clone().add(along).setY(rainbowBridge.deck / 2)); parts.add(a); }
   for (const approach of rainbowBridge.approaches) viaduct(parts, approach, 20, bridgeWhite);
+  viaduct(parts, ariakeLink, 12, bridgeWhite);
   // Tokyo Gate Bridge: ramps to a 55 m deck, two facing truss humps crowning over their piers.
   const a = new T.Vector3(gateBridge.from[0], 0, gateBridge.from[1]), b = new T.Vector3(gateBridge.to[0], 0, gateBridge.to[1]);
   const gAlong = b.clone().sub(a).normalize(), gAcross = new T.Vector3(-gAlong.z, 0, gAlong.x), mid = a.clone().lerp(b, .5), half = a.distanceTo(b) / 2;
