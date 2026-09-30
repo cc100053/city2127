@@ -27,21 +27,22 @@ P0: Odaiba GLB/blend pairs and masterplan outputs under `asset/models/`, `src/od
 ## Completed work
 
 - P0: path-wise import of 8 building pairs + Phase 03D masterplan; placement test added to root `npm test`; plan approved with the user's decisions (replace Shibuya, recommended sites, waterfront question rewrite, no sea-level-rise emphasis, provisional ownership).
-- No runtime code changed; the root scene is still Shibuya.
+- P1: root scene is Odaiba (`src/odaibaScene.ts`, trimmed `src/cityRig.ts`, `heroCamera`, `main.ts` scale/fog/shadow/sea). Mobility unwired; `changeSites` still Shibuya coordinates. Shibuya hero-visibility test block removed.
 
 ## Actual validation results
 
 - Verification status: PASSED (P0 scope)
 - Date and checked commit/worktree: 2026-09-30, base `4bc1646` + P0 delta.
 - Commands/manual checks and results: root `npm test` passed including the Odaiba bounds/hash test; `npm run build` passed (existing chunk-size warning); `git diff --check` clean. `survey/` and `module-swap/` unchanged.
+- P1 (2026-09-30): root `npm test`/`npm run build` passed, `git diff --check` clean; exhibition machine 60.0 FPS, 1,243–1,245 draw calls at 12:00/18:30/22:00, no console errors; captures `artifacts/odaiba-p1-{1200,1830,2200}.png`.
 - Evidence/environment: temporary spike (reverted) measured 60.0 FPS at 1920×1080, 1,223–1,311 draw calls, headed Chrome 154 / ANGLE Metal Apple M6, pixel ratio 1. See the plan's P0 result.
 - Integrated commit and checks: NOT INTEGRATED.
 - Changes since verification: NONE.
 
 ## Known issues and blockers
 
-- Exhibition hardware FPS unmeasured.
-- Fog, camera, shadow box and materials are tuned for Shibuya units; the Odaiba view is unreadable until P1.
+- `?survey` sites render near the origin (inside the Fuji TV area) until P2.
+- No mobility actors until P3. HUD/overlay copy is still Shibuya until P5.
 - Grand Nikko keeps the legacy Z-up adapter (handled by `placeOdaibaModel`).
 - The Phase 03D generator references original `C:\FutureCity` paths; edit the committed `.blend` directly.
 
@@ -51,4 +52,4 @@ See the plan's "Decisions (user, 2026-09-30)". Real metres are kept; the camera 
 
 ## Next expected step
 
-P1 ground swap on this branch: remove Shibuya landmark builders from the runtime, load terrain/sea/buildings in `main.ts`, instance trees/streetlights, set the Odaiba hero camera/orbit/fog/shadow box, remap materials, then day/dusk/night browser captures.
+P2 on this branch: set the four `changeSites` to the Odaiba candidates in the plan with a per-site scale at the `siteRuntime` root, update place names, add an Odaiba hero-visibility check, then `?survey` browser checks.

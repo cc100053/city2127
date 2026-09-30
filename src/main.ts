@@ -15,36 +15,38 @@ import { createWorldState } from './worldState';
 import { displayHour, type DisplayMode, sunHeight, daylight, moodAt, withNight, nightLighting } from './dayCycle';
 import { overlay } from './overlay';
 import { addCityModel } from './modelAssets';
+import { loadOdaiba, updateOdaiba } from './odaibaScene';
 import { scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
 import { createCityChangeManager } from './createCityChangeManager';
 import './style.css';
 
 try {
-  const scene=new T.Scene();scene.background=new T.Color('#dfd6cd');scene.fog=new T.FogExp2('#dfd6cd',.008);
+  const scene=new T.Scene();scene.background=new T.Color('#dfd6cd');scene.fog=new T.FogExp2('#dfd6cd',.0005);
   const renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);
   renderer.toneMapping=T.NeutralToneMapping;renderer.toneMappingExposure=.84;renderer.outputColorSpace=T.SRGBColorSpace;
   renderer.info.autoReset=false;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.VSMShadowMap;
-  renderer.domElement.setAttribute('aria-label','A multi-level Shibuya crossing in 2127. Drag to orbit, scroll to zoom, right-drag to pan. One city day, dawn to night, passes every three minutes.');
+  renderer.domElement.setAttribute('aria-label','The Odaiba waterfront around the Fuji TV sphere in 2127. Drag to orbit, scroll to zoom, right-drag to pan. One city day, dawn to night, passes every three minutes.');
   document.querySelector('#app')!.appendChild(renderer.domElement);
   const environment=new T.PMREMGenerator(renderer),room=new RoomEnvironment();
   scene.environment=environment.fromScene(room,.04).texture;scene.environmentIntensity=.6;room.dispose();environment.dispose();
   const camera=heroCamera(innerWidth,innerHeight);
   const ambient=new T.HemisphereLight('#edf1e4','#8a8274',2.2);scene.add(ambient);
   const sun=new T.DirectionalLight('#ffe4b8',3.4);sun.position.set(-20,38,18);sun.castShadow=true;
-  sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-65,right:65,top:65,bottom:-65,near:1,far:180});sun.shadow.normalBias=.12;sun.shadow.radius=5;sun.shadow.blurSamples=12;scene.add(sun);
+  // Shadow box fitted to the hero cluster (Fuji TV, Aqua City, DECKS, Hilton, Nikko, DiverCity), in metres.
+  sun.shadow.mapSize.set(4096,4096);Object.assign(sun.shadow.camera,{left:-480,right:480,top:480,bottom:-480,near:10,far:2400});sun.shadow.normalBias=.3;sun.shadow.radius=5;sun.shadow.blurSamples=12;scene.add(sun);
   // Gradient sky: horizon shares the fog colour, zenith is a deeper tone per state. Follows the camera so it never clips.
-  const sky=new T.Mesh(new T.SphereGeometry(150,24,12),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{top:{value:new T.Color()},horizon:{value:new T.Color()}},
+  const sky=new T.Mesh(new T.SphereGeometry(1500,24,12),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{top:{value:new T.Color()},horizon:{value:new T.Color()}},
     vertexShader:'varying vec3 p;void main(){p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
     fragmentShader:'uniform vec3 top,horizon;varying vec3 p;void main(){float h=clamp(normalize(p).y*1.8,0.,1.);gl_FragColor=vec4(mix(horizon,top,pow(h,.65)),1.);}'}));
   sky.frustumCulled=false;sky.renderOrder=-1;scene.add(sky);
-  const floor=new T.Mesh(new T.PlaneGeometry(500,500),new T.MeshStandardMaterial({color:'#e5ddcc',roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.76;floor.receiveShadow=true;scene.add(floor);
+  // Open sea beyond the masterplan plate; fog closes the horizon.
+  const floor=new T.Mesh(new T.PlaneGeometry(20000,20000),new T.MeshStandardMaterial({color:'#5a93a8',roughness:.62}));floor.rotation.x=-Math.PI/2;floor.position.y=-1.2;floor.receiveShadow=true;scene.add(floor);
   const rig=cityRig(scene);
-  addCityModel(scene,new URL('../asset/models/future-tree-2127/future-tree-2127.glb',import.meta.url).href,[11,0,23])
-    .catch(error=>console.error('Future tree failed to load',error));
+  loadOdaiba(scene).catch(error=>{const message=document.createElement('p');message.className='error';message.textContent='Odaiba could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);});
   if(import.meta.env.DEV && new URLSearchParams(location.search).has('asset-preview')){
-    const input=document.createElement('input');input.type='file';input.accept='.glb,model/gltf-binary';input.className='asset-preview';input.title='Preview a Blender GLB in the Shibuya scene';input.setAttribute('aria-label','Preview a Blender GLB');
+    const input=document.createElement('input');input.type='file';input.accept='.glb,model/gltf-binary';input.className='asset-preview';input.title='Preview a Blender GLB in the city scene';input.setAttribute('aria-label','Preview a Blender GLB');
     document.body.appendChild(input);
     input.addEventListener('change',async()=>{
       const file=input.files?.[0];if(!file)return;
@@ -55,8 +57,8 @@ try {
     });
   }
   const controls=new OrbitControls(camera,renderer.domElement);
-  controls.target.set(...HERO_TARGET);controls.enableDamping=true;controls.dampingFactor=.06;controls.rotateSpeed=.45;controls.zoomSpeed=.6;controls.panSpeed=.5;
-  controls.minDistance=45;controls.maxDistance=180;controls.minPolarAngle=.35;controls.maxPolarAngle=1.42;controls.screenSpacePanning=false;controls.update();
+  controls.target.set(...HERO_TARGET);controls.enableDamping=true;controls.dampingFactor=.06;controls.rotateSpeed=.45;controls.zoomSpeed=.6;controls.panSpeed=.8;
+  controls.minDistance=150;controls.maxDistance=1400;controls.minPolarAngle=.35;controls.maxPolarAngle=1.42;controls.screenSpacePanning=false;controls.update();
   // MSAA target: the composer's default target has no samples, so edges were aliased once post-processing ran.
   const composer=new EffectComposer(renderer,new T.WebGLRenderTarget(innerWidth,innerHeight,{type:T.HalfFloatType,samples:4}));composer.setSize(innerWidth,innerHeight);composer.addPass(new RenderPass(scene,camera));
   // Contact shadows where slabs, planters and cores meet: the cheapest step from blockout to built object.
@@ -98,12 +100,11 @@ try {
     const s=withNight(surveyUrl?world.state:moodAt(hour),dark);
     const pulse=T.MathUtils.clamp((s.neon-.25)/.7,0,1)*day,still=T.MathUtils.clamp((s.warmth-.55)/.3,0,1);
     (scene.background as T.Color).copy(dayBase).lerp(dayPulse,pulse).lerp(dayStill,still).lerp(duskHorizon,glow*.7).lerp(nightHorizon,nightSky);
-    (scene.fog as T.FogExp2).color.copy(scene.background as T.Color);(scene.fog as T.FogExp2).density=.0015+s.haze*.003;
-    floor.material.color.copy(scene.background as T.Color);
+    (scene.fog as T.FogExp2).color.copy(scene.background as T.Color);(scene.fog as T.FogExp2).density=.00035+s.haze*.0006;
     sky.position.copy(camera.position);sky.material.uniforms.horizon.value.copy(scene.background as T.Color);sky.material.uniforms.top.value.copy(topBase).lerp(topPulse,pulse).lerp(topStill,still).lerp(duskTop,glow*.5).lerp(nightTop,nightSky);
     // The sun arcs east to west; below the horizon the same light becomes a dim moon from the opposite side, so shadows never stop.
     const arc=Math.PI*(hour-6)/12,up=height>0?1:-1;
-    sun.position.set(70*Math.cos(arc)*up,40*Math.abs(height)+4,34);
+    sun.position.set(840*Math.cos(arc)*up,480*Math.abs(height)+48,408);
     sun.color.copy(sunLow).lerp(sunHigh,T.MathUtils.smoothstep(height,0,.45)).lerp(moon,dark);
     sun.intensity=(2.55+pulse*.2+still*.05)*T.MathUtils.smoothstep(height,-.02,.2)+.55*T.MathUtils.smoothstep(-height,.02,.25);
     const light=nightLighting(dark);
@@ -111,13 +112,13 @@ try {
     ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientNight,dark);
     scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure;
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
-    controls.update();rig.update(s,now,dark);cityChanges?.update(now);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
+    controls.update();rig.update(s,now,dark);updateOdaiba(dark);cityChanges?.update(now);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
     if(++frames===120){renderer.domElement.dataset.hour=hour.toFixed(2);renderer.domElement.dataset.displayMode=displayMode;renderer.domElement.dataset.time=now.toFixed(2);renderer.domElement.dataset.fps=(120000/(performance.now()-measureStart)).toFixed(1);renderer.domElement.dataset.drawCalls=String(renderer.info.render.calls);renderer.domElement.dataset.geometries=String(renderer.info.memory.geometries);if(cityChanges)renderer.domElement.dataset.siteAssets=JSON.stringify(cityChanges.getDiagnostics());frames=0;measureStart=performance.now();}
   });
   window.addEventListener('resize',()=>{
     camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight);
   });
-  renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();renderer.setAnimationLoop(null);const message=document.createElement('p');message.className='error';message.textContent='The graphics context was lost. Reload to return to the crossing.';document.body.appendChild(message);});
+  renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();renderer.setAnimationLoop(null);const message=document.createElement('p');message.className='error';message.textContent='The graphics context was lost. Reload to return to the city.';document.body.appendChild(message);});
 } catch(error) {
-  const message=document.createElement('p');message.className='error';message.textContent='The crossing could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);
+  const message=document.createElement('p');message.className='error';message.textContent='The city could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);
 }

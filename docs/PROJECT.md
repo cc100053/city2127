@@ -1,5 +1,9 @@
 # Project contract and implementation map
 
+## Odaiba venue P1 — 2026-09-30 (branch `codex/odaiba-venue`, not integrated)
+
+The root scene is the Fuji TV / Daiba waterfront in metres; Shibuya landmarks are no longer built ([plan](ODAIBA_PLAN.md), [handoff](handoffs/odaiba-venue.md)). `src/odaibaScene.ts` loads the Phase 03D environment GLB and the eight building GLBs via `placeOdaibaModel`, retunes environment materials by name to the ART palette and gives building glazing a warm night emission (`updateOdaiba`). `src/cityRig.ts` now only exports the shared kit/finishes used by the site builders plus four site masts with night point lights. `heroCamera` looks over the bay at Fuji TV / Aqua City (orbit 150–1400 m, far 6000); `main.ts` uses a 20 km sea floor, fitted 4096² shadow box (±480 m) and fog `.00035–.00095`. **Temporarily not wired:** `mobility` (P3 re-routes it) and correct site placement (P2; `changeSites` still hold Shibuya coordinates, so `?survey` sites sit near the origin). Sections below describe the Shibuya runtime unless superseded here.
+
 Exhibition priorities and historical Plan 02 implementation status: [方向與紀錄](PLAN02.md). Art rules for the root scene: [ART.md](ART.md), in use since 2026-09-24. Status and remaining art work: [art-direction handoff](handoffs/art-direction.md#remaining-work).
 
 ## Exhibition specification and S1–S4 status — 2026-09-30

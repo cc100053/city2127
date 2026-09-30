@@ -463,4 +463,8 @@ Integration: feature `d4fef13` passed [CI 36655653034](https://github.com/cc1000
 
 ## Odaiba venue P0 — 2026-09-30
 
-Branch `codex/odaiba-venue`, base `4bc1646`. Odaiba assets imported path-wise from `codex/odaiba-preview` `3a8a5f2`; root `npm test` (now including `tests/odaiba.test.ts`) and `npm run build` passed, `git diff --check` clean. Reverted spike with environment + 8 buildings over the Shibuya root and full post chain: headed Chrome 154, ANGLE Metal Apple M6, 1920×1080, pixel ratio 1 → 60.0 FPS, 1,223 draw calls (12:00) / 1,311 (22:00); Shibuya alone 60.0 FPS, 356. Not exhibition hardware. See [ODAIBA_PLAN.md](ODAIBA_PLAN.md).
+Branch `codex/odaiba-venue`, base `4bc1646`. Odaiba assets imported path-wise from `codex/odaiba-preview` `3a8a5f2`; root `npm test` (now including `tests/odaiba.test.ts`) and `npm run build` passed, `git diff --check` clean. Reverted spike with environment + 8 buildings over the Shibuya root and full post chain: headed Chrome 154, ANGLE Metal Apple M6, 1920×1080, pixel ratio 1 → 60.0 FPS, 1,223 draw calls (12:00) / 1,311 (22:00); Shibuya alone 60.0 FPS, 356. The user confirmed the Apple M6 is the exhibition machine. See [ODAIBA_PLAN.md](ODAIBA_PLAN.md).
+
+## Odaiba venue P1 — 2026-09-30
+
+Branch `codex/odaiba-venue`. Root `npm test` and `npm run build` passed (existing chunk warning); `git diff --check` clean; `survey/` and `module-swap/` unchanged. Headed Chrome 154, ANGLE Metal Apple M6 (exhibition machine), 1920×1080, pixel ratio 1, 14 s warm-up then 3 s rAF sample: 60.0 FPS and 1,243 / 1,245 / 1,245 draw calls at `?hour=12` / `18.5` / `22`; no console errors. Captures: [12:00](../artifacts/odaiba-p1-1200.png), [18:30](../artifacts/odaiba-p1-1830.png), [22:00](../artifacts/odaiba-p1-2200.png). Not checked: `?survey` (sites still at Shibuya coordinates until P2), mobility (unwired until P3), art acceptance.

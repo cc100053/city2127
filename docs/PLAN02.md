@@ -1,5 +1,9 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
+## 最新補充 — 2026-09-30：場地改為台場（P1 進行中）
+
+用戶決定台場富士電視台一帶取代澀谷做展覽城市。P1（`codex/odaiba-venue`，未整合）已換成 Phase 03D 地形、海同八棟地標，鏡頭由海面望向富士電視台同 Aqua City；交通同四個改變地點喺 P2/P3 重新對位。見 [ODAIBA_PLAN.md](ODAIBA_PLAN.md)。以下澀谷內容係歷史紀錄。
+
 ## 最新補充 — 2026-09-30：S4 驗收完成
 
 S4 四題 guest flow 及 root 回饋面板已完成瀏覽器驗收並整合至 main（`5e14078`，main CI 通過）：結果約10秒→交接約5秒自動前進、`lifecycle_blocked` 等待提示、閒置60＋15秒放棄草稿、斷線重試只計一次，以及 1280×720 面板可直接看到「最近64人」。剩餘偏差與 S5 待辦見 [S4 handoff](handoffs/exhibition-s4.md)。

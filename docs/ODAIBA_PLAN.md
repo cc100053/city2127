@@ -1,6 +1,6 @@
 # Odaiba 2127 — venue transition plan (DRAFT)
 
-- Status: APPROVED 2026-09-30 (decisions below). Implementation starts at P0 on `codex/odaiba-venue`.
+- Status: APPROVED 2026-09-30 (decisions below). P0 and P1 done on `codex/odaiba-venue`; next P2.
 - Drafted: 2026-09-30 against `main` `4bc1646`; Odaiba sources read from `origin/codex/odaiba-preview` `3a8a5f2` (contains all of `origin/feat/odaiba-assets-progress-02` `40d696e`).
 - Supersedes on approval: the "single Shibuya setting" constraint in [AGENTS.md](../AGENTS.md), [PROJECT.md](PROJECT.md) and [PLAN02.md](PLAN02.md). Shibuya is **replaced**, not kept selectable; it stays in Git history.
 
@@ -83,8 +83,8 @@ Each phase is one branch, merged after `npm test`, `npm run build`, `git diff --
 
 | # | Scope | Gate |
 | --- | --- | --- |
-| P0 ✅ | **Approval + spike.** Path-wise import (command above). Load environment + 8 buildings into root `main.ts` with the existing post chain; temporary hero pose. | Measured FPS / draw calls at 1920×1080 on the exhibition machine (baseline: `main` ≈ 60 FPS, 120 draws at 1280×720). If it fails, decimate Fuji TV / DiverCity in Blender or drop Telecom first. The asset inspector's 3.3 FPS was not on exhibition hardware — measure, don't assume. |
-| P1 | **Ground swap.** Remove Shibuya landmark builders from runtime; terrain + sea + buildings; tree/streetlight `InstancedMesh`; hero camera, orbit limits, fog, shadow box; material remap. | Browser capture day/dusk/night; no console errors; Shibuya-only tests updated or retired. |
+| P0 ✅ | **Approval + spike.** Path-wise import (command above). Load environment + 8 buildings into root `main.ts` with the existing post chain; temporary hero pose. | Measured FPS / draw calls at 1920×1080 on the exhibition machine (Shibuya baseline 60 FPS, 356 draws). If it fails, decimate Fuji TV / DiverCity in Blender or drop Telecom first. The asset inspector's 3.3 FPS was not on exhibition hardware — measure, don't assume. |
+| P1 ✅ | **Ground swap.** Remove Shibuya landmark builders from runtime; terrain + sea + buildings; (trees/streetlights are already consolidated in the environment GLB, so no instancing is needed); hero camera, orbit limits, fog, shadow box; material remap. | Browser capture day/dusk/night; no console errors; Shibuya-only tests updated or retired. |
 | P2 | **Sites.** New `changeSites` coordinates + per-site scale; place names; `surveyAtmosphere` panel. | `?survey` shows all four sites changing with 3 s transitions; snapshot/reset immediate; site tests pass. |
 | P3 | **Mobility.** Deck walkers, guideway pods, sphere drones, water taxis. | `tests/mobility.test.ts` route checks rewritten for Odaiba routes; no actor clips a building. |
 | P4 | **2127 layer.** Raised sea + tidal promenade, sphere hub, retrofit kit, sky bridges, night media globe. | Art review against this section; FPS re-measured. |
