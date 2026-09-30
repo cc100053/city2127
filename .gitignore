@@ -4,7 +4,7 @@ dist/
 .DS_Store
 .vercel
 .codegraph
-.claude/settings.json
+.claude/
 .dream-loop/
 
 # Blender/model working files that are not source/export deliverables.
