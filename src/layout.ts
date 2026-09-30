@@ -51,3 +51,8 @@ export const skyBridges: readonly {name:string;from:P3;to:P3}[] = [
 ];
 // Floating decks off the east promenade: [x, z, yaw], 10 × 36 m, long axis along the shore; on water and 30 m from boat routes.
 export const floatingDecks: readonly (readonly [number,number,number])[] = [[-62,-281,-1.12],[-131,-238,-1.03],[-180,-199,-1.02]];
+// North shore: seaward edge of COAST_REVETMENT from the DECKS pier west past Hilton, traced from the district GLB (x, z). The tidal edge steps down into the sea from it.
+export const northShore: readonly (readonly [number,number])[] = [
+  [-3,-336],[-21,-291],[-60,-266],[-128,-220],[-194,-173],[-231,-170],[-266,-173],[-269,-158],[-275,-143],
+  [-310,-104],[-339,-77],[-366,-63],[-405,-32],[-423,-27],[-436,-20],[-449,-6],[-465,3],
+];

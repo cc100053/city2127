@@ -2,7 +2,7 @@ import * as T from 'three';
 import { arc, bake, box, futureLight, glass, leaf, membrane, publicLight, solar, stone, trim } from './cityRig';
 import { floatingDecks, skyBridges, SPHERE_DOCK } from './layout';
 import { routes } from './mobility';
-import { amphibiousShore } from './amphibiousShore';
+import { amphibiousShore, tidalEdge } from './amphibiousShore';
 
 /** What 2127 added around the existing landmarks: sky bridges, the sphere berth, guideway light lines and floating decks. */
 export function build2127(scene: T.Scene) {
@@ -40,5 +40,5 @@ export function build2127(scene: T.Scene) {
     box(g, [.12, 1.1, 36], [4.8, 1, 0], membrane, .04);
     box(g, [10.1, .12, .3], [0, .55, 18], futureLight, .04);
   }
-  scene.add(...bake(root),amphibiousShore());
+  scene.add(...bake(root),amphibiousShore(),tidalEdge());
 }

@@ -548,3 +548,7 @@ Standalone rolling observation: 32.8 FPS / 1388 draws / 356 geometries at 1920×
 ## Odaiba hero district P3a — 2026-09-30
 
 `feat/odaiba-district`: retained landmarks merged per material at load with the shared `bake()` (now attribute-safe). Root `npm test` and `npm run build` PASS, `git diff --check` clean. Browser hero pose (800×600): 1,185 → 509 draw calls, 1.47 M triangles unchanged; day/night visually unchanged, no console errors. Details: [district handoff](handoffs/odaiba-district.md).
+
+## Odaiba hero district Dream Loop P3b — 2026-10-01
+
+`feat/odaiba-district`: three Dream Loop Plus passes on the tier-1 district (Fuji core, Aqua City, DECKS, north waterfront). Root `npm test`, `npm run build` and `git diff --check` PASS after each pass. 1920×929 headless captures: [baseline](../artifacts/odaiba-district-baseline.jpg), [pass 3](../artifacts/odaiba-district-pass3.jpg), [night](../artifacts/odaiba-district-pass3-night.jpg). Built-in pane 800×600 at `?hour=16&reviewTime=20`: 529 draw calls / 1.84 M triangles, no console errors. Human art review pending. Details: [district handoff](handoffs/odaiba-district.md).

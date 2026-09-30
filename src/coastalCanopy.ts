@@ -53,7 +53,7 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
     const hit=ray.intersectObject(environment,true)[0];
     return hit && hit.object instanceof T.Mesh && !Array.isArray(hit.object.material) && hit.object.material.name==='landscape' && hit.point.y<3 ? hit.point.y : null;
   };
-  for(let x=DISTRICT.minX;x<DISTRICT.maxX;x+=21)for(let z=DISTRICT.minZ;z<DISTRICT.maxZ;z+=21){
+  for(let x=DISTRICT.minX;x<DISTRICT.maxX;x+=17)for(let z=DISTRICT.minZ;z<DISTRICT.maxZ;z+=17){
     // Staggered clusters leave long clear swales instead of another plantation grid.
     if(Math.sin(x*.023+Math.sin(z*.018)*2)+Math.cos(z*.031)<.15)continue;
     const px=x+Math.sin(z*1.7+x)*6,pz=z+Math.cos(x*1.3-z)*6;

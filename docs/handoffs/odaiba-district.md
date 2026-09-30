@@ -61,6 +61,23 @@ User review of P1 (top view) flagged: straight cut lines at the plate corners, t
 - Browser (built-in pane, 800×600, hero pose `?reviewTime=12`): 509 WebGL draw calls / 1.47 M triangles per frame (P2 1,185; P0 baseline 1,310 / 1.89 M). Day and `hour=21` screenshots show no visible change from P2; night glazing still glows; no console errors.
 - Not verified: exhibition-hardware FPS, live `?survey` mode.
 
+## P3b — tier-1 Dream Loop, three passes (2026-10-01)
+
+User direction (2026-09-30): merge `feat/art-direction` into main (done: `e3185b3`, pushed with record `3a36797`), then Dream Loop option 1 — tier-1 polish (Fuji core, Aqua City, DECKS, north waterfront) following CITY_MASTER_TASTE and R01. `origin/main` merged into this branch first.
+
+- Workflow: Dream Loop Plus. Target: the existing locked `.dream-loop/target.png` from the earlier Odaiba Dream Loop (same hero pose, generated from R01; no image-generation tool in this session, so no new target). Workers: fresh Opus subagents (Fable was unavailable: usage credits), one per pass, implementing only; the orchestrator ran checks and captures.
+- Capture: headless Chrome 1920×929 against the local dev server, `?hour=16&reviewTime=20` (`.dream-loop/shot.sh`, ignored). Evidence: [baseline](../../artifacts/odaiba-district-baseline.jpg), [pass 3](../../artifacts/odaiba-district-pass3.jpg), [pass 3 night](../../artifacts/odaiba-district-pass3-night.jpg).
+- Pass 1: apron fade tinted toward sea colour; faint daytime landmark window glow; glass regex no longer catches Hilton/Nikko frames and mullions; warm horizon glow spans higher sun.
+- Pass 2: hashed-alpha dissolve replaced by an irregular discarded coastline across the apron with a pale rim; warmer paving and DiverCity cladding; late-afternoon sun/ambient grade; groves every 17 m.
+- Pass 3: `tidalEdge()` stepped tidal shore with pavilions and islets (baked to five meshes, included in the Odaiba test city); `curtainWall` facade shader on Aqua City/DECKS; stronger golden hour and warm sky tint; warm-ivory shared `trim`/`cream`.
+- Decision needed: pass 2 turns the district edge into a visible island coastline. The user chose option 2b (fade, not an island cut) on 2026-09-30; keep or revert is the user's call.
+
+### Actual validation (P3b)
+
+- After each pass: root `npm test` PASS, `npm run build` PASS, `git diff --check` clean; pass screenshots inspected, no loading or orientation bugs found, no orchestrator fixes needed.
+- Built-in pane, 800×600, `?hour=16&reviewTime=20`: 529 draw calls / 1.84 M triangles per frame (P3a 509 / 1.47 M at `reviewTime=12`); the increase is the denser groves and tidal edge. No console errors. Night (`hour=21`) capture renders lit facades and shore.
+- Not verified: live `?survey` mode, exhibition-hardware FPS, human art acceptance. Target similarity is a visual judgment, not a measured completion claim.
+
 ## Next step
 
-P3b tier-1 art pass (Fuji core, Aqua City, DECKS, north waterfront) — overlaps the `feat/art-direction` work awaiting human art review; agree the direction with the user before editing.
+User art review of the three passes (especially the island-coastline edge). Offer further Dream Loop passes if needed.

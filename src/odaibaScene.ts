@@ -22,33 +22,63 @@ const buildingUrls: Record<string, string> = {
 
 // Masterplan blockout materials retuned to the project palette (ART.md): pale stone ground, soft green, context pushed back into the haze.
 const environmentFinish: Record<string, [color: string, roughness: number, metalness: number]> = {
-  road: ['#7d8a90', .88, 0], sidewalk: ['#dfe2dd', .78, 0], plaza: ['#ebe8e0', .66, 0], service_area: ['#d3d5ce', .8, 0],
+  road: ['#7d8a90', .88, 0], sidewalk: ['#ddd8cc', .78, 0], plaza: ['#e6dfd1', .66, 0], service_area: ['#d3d5ce', .8, 0],
   landscape: ['#839768', .9, 0], water: ['#5a93a8', .62, 0], rail_structure: ['#e6ebea', .42, .35], station: ['#a7c3cf', .12, .55],
   context_unknown: ['#d2d9dc', .9, 0], context_office_commercial: ['#c9d3da', .85, 0], context_utility_service: ['#cfd3d0', .9, 0], context_public_cultural: ['#d0d8cf', .9, 0],
 };
 
-// 2127 retrofit by material: mall roofs become planted, hotel roofs photovoltaic; no extra geometry.
+// 2127 retrofit by material: mall roofs become planted, hotel roofs photovoltaic, stark white cladding warm ceramic; no extra geometry.
 const roofRetrofit: Record<string, [color: string, roughness: number, metalness: number]> = {
   'Roof and Shadow': ['#7d9f68', .85, 0], 'Standing seam roof.001': ['#486b83', .3, .85], 'Gray roof metal': ['#486b83', .3, .85],
+  'PCa_Panel_OffWhite': ['#e4d9c5', .62, 0], 'Facade_White': ['#e2d8c6', .6, 0],
+  'Warm Ivory Structure': ['#e8dcc8', .6, 0], 'Pale balcony slab and crown': ['#e9dfcd', .6, 0], 'Light vertical piers.001': ['#ebe0cd', .6, 0],
 };
-// Across the apron, ground, roads and guideway dissolve (hashed alpha, still opaque-sorted) into the sea, hiding the cut edge.
+// Aqua City and DECKS flat facade panels become storey-banded curtain walls: warm spandrels, dark panes with lit interiors per bay.
+const curtainWalls: Record<string, string> = {
+  'Muted Pink Panels': '#a9785f', 'Pale Mint Panels': '#d4c7ae', 'Ochre Commercial Panels': '#c9a676', 'Blue Gray Cladding': '#c7bca8', 'Dark Blue Gray Glazing': '#b9ae9a',
+};
+const curtainGlow = { value: .5 };
+function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
+  material.color.set(spandrel); material.roughness = .45; material.metalness = .1;
+  material.onBeforeCompile = shader => {
+    shader.uniforms.curtainGlow = curtainGlow;
+    // Along-facade coordinate from the world normal, so bays run on every face orientation; roofs (normal up) stay plain.
+    shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 curtainP;')
+      .replace('#include <worldpos_vertex>', `#include <worldpos_vertex>
+      { vec3 n = normalize(mat3(modelMatrix) * objectNormal); vec4 w = modelMatrix * vec4(transformed, 1.); curtainP = vec3(abs(n.x) > abs(n.z) ? w.z : w.x, w.y, abs(n.y)); }`);
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float curtainGlow;\nvarying vec3 curtainP;')
+      .replace('#include <map_fragment>', `#include <map_fragment>
+      float storey = fract(curtainP.y / 4.2), mullion = fract(curtainP.x / 1.8);
+      float pane = step(.32, storey) * step(storey, .94) * step(mullion, .9) * (1. - step(.5, curtainP.z)) * step(1.2, curtainP.y);
+      float occupied = step(.3, fract(sin(dot(floor(vec2(curtainP.x / 5.4, curtainP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453));
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.13, .16, .18), pane * .88);`)
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1., .76, .48) * pane * curtainGlow * (.25 + .75 * occupied);');
+  };
+  material.customProgramCacheKey = () => 'curtain-wall';
+}
+// Across the apron, ground, roads and guideway end at an irregular coastline with a pale stone rim, hiding the straight cut edge.
 function fadeBeyondDistrict(material: T.Material) {
   const compile = material.onBeforeCompile.bind(material), key = material.customProgramCacheKey.bind(material);
-  material.alphaHash = true;
   material.onBeforeCompile = (shader, renderer) => {
     compile(shader, renderer);
-    shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 districtXz;').replace('#include <project_vertex>', '#include <project_vertex>\ndistrictXz=(modelMatrix*vec4(transformed,1.)).xz;');
-    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 districtXz;').replace('#include <alphatest_fragment>', `#include <alphatest_fragment>
-      vec2 beyond=max(vec2(${DISTRICT.minX.toFixed(1)},${DISTRICT.minZ.toFixed(1)})-districtXz,districtXz-vec2(${DISTRICT.maxX.toFixed(1)},${DISTRICT.maxZ.toFixed(1)}));
-      diffuseColor.a*=1.-smoothstep(0.,${(DISTRICT.apron*.9).toFixed(1)},length(max(beyond,0.)));`);
+    shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 districtP;').replace('#include <project_vertex>', '#include <project_vertex>\ndistrictP=(modelMatrix*vec4(transformed,1.)).xyz;');
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 districtP;').replace('#include <alphatest_fragment>', `#include <alphatest_fragment>
+      vec2 beyond=max(vec2(${DISTRICT.minX.toFixed(1)},${DISTRICT.minZ.toFixed(1)})-districtP.xz,districtP.xz-vec2(${DISTRICT.maxX.toFixed(1)},${DISTRICT.maxZ.toFixed(1)}));
+      float districtFade=length(max(beyond,0.))/${DISTRICT.apron.toFixed(1)};
+      // Coast 35–85 % across the apron: a clean shoreline reads as an island, where a per-pixel dissolve read as speckle.
+      float coast=.6+.12*(sin(districtP.x*.019+sin(districtP.z*.013)*2.3)+sin(districtP.z*.023+sin(districtP.x*.011)*1.9));
+      if(districtFade>coast)discard;
+      diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.8,.77,.7),smoothstep(coast-.12,coast-.03,districtFade)*step(districtP.y,2.));`);
   };
   material.customProgramCacheKey = () => key() + '|district-fade';
 }
 
-const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a');
-/** Night: retained landmark glazing glows warm; the civic chassis uses the shared city finishes. */
+const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a'), dayGlow = .15;
+/** Retained landmark glazing glows warm, strongest at night; the civic chassis uses the shared city finishes. */
 export function updateOdaiba(night: number) {
-  for (const material of glazing) material.emissiveIntensity = night * .55;
+  // A faint daytime glow keeps the dark glazing reading as occupied, warm interiors (CITY_MASTER_TASTE) instead of voids.
+  for (const material of glazing) material.emissiveIntensity = dayGlow + night * (.55 - dayGlow);
+  curtainGlow.value = .42 + night * .7;
 }
 
 /** District-cropped Phase 03D environment, six surveyed landmarks and the replacement Fuji civic core, in metres. */
@@ -88,7 +118,8 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     model.traverse(object => {
       if (!(object instanceof T.Mesh)) return;
       for (const material of [object.material].flat() as T.MeshStandardMaterial[])
-        if (/glass|glazing|window/i.test(material.name) && !glazing.has(material)) { material.emissive.copy(warm); material.emissiveIntensity = 0; material.roughness=.22;material.metalness=.38;glazing.add(material); }
+        if (curtainWalls[material.name]) { if (!material.customProgramCacheKey().startsWith('curtain')) curtainWall(material, curtainWalls[material.name]); }
+        else if (/glass|glazing|window reflection/i.test(material.name) && !glazing.has(material)) { material.emissive.copy(warm); material.emissiveIntensity = dayGlow; material.roughness=.22;material.metalness=.38;glazing.add(material); }
         else if (roofRetrofit[material.name]) { const [color, roughness, metalness] = roofRetrofit[material.name]; material.color.set(color); material.roughness = roughness; material.metalness = metalness; }
     });
     // One draw per finish instead of one per surveyed part (30–50 per landmark); materials stay shared, so night glazing still applies.

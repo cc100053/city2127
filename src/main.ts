@@ -52,9 +52,9 @@ try {
     capture.dispose();pmrem.dispose();
   });skyTexture.colorSpace=T.SRGBColorSpace;
   skyTexture.mapping=T.EquirectangularReflectionMapping;
-  const sky=new T.Mesh(new T.SphereGeometry(1500,24,12),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{top:{value:new T.Color()},horizon:{value:new T.Color()},clouds:{value:skyTexture},day:{value:1}},
+  const sky=new T.Mesh(new T.SphereGeometry(1500,24,12),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{top:{value:new T.Color()},horizon:{value:new T.Color()},clouds:{value:skyTexture},day:{value:1},tint:{value:new T.Color(1,1,1)}},
     vertexShader:'varying vec3 p;varying vec2 skyUv;void main(){p=position;skyUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader:'uniform vec3 top,horizon;uniform sampler2D clouds;uniform float day;varying vec3 p;varying vec2 skyUv;void main(){float altitude=normalize(p).y;float h=clamp(altitude*1.8,0.,1.);vec3 gradient=mix(horizon,top,pow(h,.65));vec3 cloud=texture2D(clouds,vec2(skyUv.x,min(1.,skyUv.y+.1))).rgb;gl_FragColor=vec4(mix(gradient,cloud,day*.9*smoothstep(-.06,.035,altitude)),1.);}'}));
+    fragmentShader:'uniform vec3 top,horizon,tint;uniform sampler2D clouds;uniform float day;varying vec3 p;varying vec2 skyUv;void main(){float altitude=normalize(p).y;float h=clamp(altitude*1.8,0.,1.);vec3 gradient=mix(horizon,top,pow(h,.65));vec3 cloud=texture2D(clouds,vec2(skyUv.x,min(1.,skyUv.y+.1))).rgb*tint;gl_FragColor=vec4(mix(gradient,cloud,day*.9*smoothstep(-.06,.035,altitude)),1.);}'}));
   sky.frustumCulled=false;sky.renderOrder=-1;scene.add(sky);
   // Open sea beyond the masterplan plate; fog closes the horizon.
   const water=bayWater();
@@ -110,27 +110,27 @@ try {
   const dayBase=new T.Color('#bed9ec'),dayPulse=new T.Color('#accbdc'),dayStill=new T.Color('#e0e6dc');
   const topBase=new T.Color('#6699c0'),topPulse=new T.Color('#6a8db0'),topStill=new T.Color('#a9bcc4');
   const duskHorizon=new T.Color('#f6b58a'),duskTop=new T.Color('#7a86ad'),nightHorizon=new T.Color('#1c2941'),nightTop=new T.Color('#070d1c');
-  const sunLow=new T.Color('#ffae78'),sunHigh=new T.Color('#ffe7c4'),moon=new T.Color('#7d9be0'),ambientDay=new T.Color('#e3ebee'),ambientPulse=new T.Color('#a7c9ed'),ambientNight=new T.Color('#899dbd');
+  const sunLow=new T.Color('#ffae78'),sunHigh=new T.Color('#ffe7c4'),moon=new T.Color('#7d9be0'),ambientDay=new T.Color('#e3ebee'),ambientPulse=new T.Color('#a7c9ed'),ambientNight=new T.Color('#899dbd'),ambientLate=new T.Color('#f4dcc0'),white=new T.Color('#ffffff'),cloudGold=new T.Color('#ffcf98');
   const start=performance.now();
   let frames=0,measureStart=start;
   renderer.setAnimationLoop(()=>{
     now=Number.isFinite(reviewTime)&&reviewTime>=0 ? reviewTime : (performance.now()-start)/1000;
-    const hour=hold??displayHour(displayMode,now),height=sunHeight(hour),day=daylight(hour),dark=1-day,glow=1-T.MathUtils.smoothstep(Math.abs(height),0,.4),nightSky=T.MathUtils.smoothstep(dark,.35,1);
+    const hour=hold??displayHour(displayMode,now),height=sunHeight(hour),day=daylight(hour),dark=1-day,glow=1-T.MathUtils.smoothstep(Math.abs(height),0,1),nightSky=T.MathUtils.smoothstep(dark,.35,1);
     if(surveyUrl)world.update(now);
     const s=withNight(surveyUrl?world.state:moodAt(hour),dark);
     const pulse=T.MathUtils.clamp((s.neon-.25)/.7,0,1)*day,still=T.MathUtils.clamp((s.warmth-.55)/.3,0,1);
-    (scene.background as T.Color).copy(dayBase).lerp(dayPulse,pulse).lerp(dayStill,still).lerp(duskHorizon,glow*.7).lerp(nightHorizon,nightSky);
+    (scene.background as T.Color).copy(dayBase).lerp(dayPulse,pulse).lerp(dayStill,still).lerp(duskHorizon,glow*.85).lerp(nightHorizon,nightSky);
     (scene.fog as T.FogExp2).color.copy(scene.background as T.Color);(scene.fog as T.FogExp2).density=.00024+s.haze*.00016;
-    sky.material.uniforms.day.value=day;
+    sky.material.uniforms.day.value=day;sky.material.uniforms.tint.value.copy(white).lerp(cloudGold,glow*.8);
     sky.position.copy(camera.position);sky.material.uniforms.horizon.value.copy(scene.background as T.Color);sky.material.uniforms.top.value.copy(topBase).lerp(topPulse,pulse).lerp(topStill,still).lerp(duskTop,glow*.5).lerp(nightTop,nightSky);
     // The sun arcs east to west; below the horizon the same light becomes a dim moon from the opposite side, so shadows never stop.
     const arc=Math.PI*(hour-6)/12,up=height>0?1:-1;
     sun.position.set(840*Math.cos(arc)*up,480*Math.abs(height)+48,408);
-    sun.color.copy(sunLow).lerp(sunHigh,T.MathUtils.smoothstep(height,0,.8)).lerp(moon,dark);
-    sun.intensity=(3.15+pulse*.2+still*.05)*T.MathUtils.smoothstep(height,-.02,.2)+.55*T.MathUtils.smoothstep(-height,.02,.25);
+    sun.color.copy(sunLow).lerp(sunHigh,T.MathUtils.smoothstep(height,.1,1)).lerp(moon,dark);
+    sun.intensity=(3.15+pulse*.2+still*.05+glow*.5)*T.MathUtils.smoothstep(height,-.02,.2)+.55*T.MathUtils.smoothstep(-height,.02,.25);
     const light=nightLighting(dark);
-    ambient.intensity=(.7+pulse*.15+still*.15)*light.ambient;
-    ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientNight,dark);
+    ambient.intensity=(.7+pulse*.15+still*.15)*(1-glow*.18*day)*light.ambient;
+    ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientLate,glow*.6).lerp(ambientNight,dark);
     scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure*(1+.16*day);
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
     controls.update();panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);rig.update(s,now,dark);updateOdaiba(dark);cityChanges?.update(now);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
