@@ -1,12 +1,16 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { Box3, Group, Mesh, Raycaster, Vector3 } from 'three';
+import { Box3, Group, InstancedMesh, Mesh, Raycaster, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
 import { changeSites, skyBridges, floatingDecks } from '../src/layout.ts';
 import { heroCamera } from '../src/heroCamera.ts';
 import { routes } from '../src/mobility.ts';
+import { civicCore } from '../src/civicCore.ts';
+import { contextFacades } from '../src/contextFacades.ts';
+import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from '../src/coastalCanopy.ts';
+import { amphibiousShore } from '../src/amphibiousShore.ts';
 
 const layout = JSON.parse(readFileSync(new URL('../src/odaiba-layout.json', import.meta.url), 'utf8'));
 const hash = (bytes: Buffer) => createHash('sha256').update(bytes).digest('hex');
@@ -16,6 +20,7 @@ assert.equal(layout.buildings.length, 8);
 assert.equal(new Set(layout.buildings.map((p: { id: string }) => p.id)).size, 8);
 let triangles = 0;
 const city = new Group();
+const landmarks: Group[]=[];
 for (const placement of layout.buildings) {
   assert.deepEqual(placement.scale, [1, 1, 1], 'Preserve authored metres');
   assert.equal(placement.adapterRotationX !== 0, placement.id === 'grand-nikko-tokyo-daiba');
@@ -42,13 +47,40 @@ for (const placement of layout.buildings) {
       `${placement.id} bound ${side}/${axis}: ${v} differs from source ${expected[side][axis]}`);
   }));
   assert.ok(Math.abs(actual.min.y) < .002, `${placement.id} grounded at source pad`);
-  city.add(scene);
+  if(placement.id!=='fuji-tv'){city.add(scene);landmarks.push(scene);}
+  if(placement.id==='aqua-city-odaiba' || placement.id==='decks-tokyo-beach')plantRoofCanopy(city,scene);
 }
 assert.equal(triangles, 339919, 'All eight complete GLBs retain reviewed geometry');
+const core=civicCore();city.add(core);
+landmarks.push(core);
+const coreBounds=new Box3().setFromObject(core);
+assert.ok(coreBounds.min.y>=-5 && coreBounds.max.y<155, 'Civic chassis stays below the district aerial corridor');
+assert.ok(core.children.length<=8, 'Static civic chassis batches by shared material');
+assert.ok(core.children.every(object=>object instanceof Mesh && !Array.isArray(object.material)), 'No per-member draws');
+// Actual chassis must preserve the bay approach and berth, including a 22 m aircraft wing envelope.
+core.updateMatrixWorld(true);
+const approach=routes().approach,clearanceRay=new Raycaster();
+for(let i=0;i<=160;i++) {
+  const p=approach.getPointAt(i/160);
+  for(const dx of [-11,0,11]) {
+    clearanceRay.set(p.clone().add(new Vector3(dx,0,0)),new Vector3(0,-1,0));
+    const hit=clearanceRay.intersectObject(core,true)[0];
+    assert.ok(!hit || hit.distance>5, `Civic core obstructs aerial approach at ${i}, wing ${dx}`);
+  }
+}
 
 // Survey sites: the whole scaled lot (plus a 5 m margin) lands on open ground, and the hero pose sees each site unobstructed.
 const environmentBytes = readFileSync(new URL('../asset/models/odaiba-masterplan/odaiba_masterplan_v01_phase03d_environment.glb', import.meta.url));
-city.add((await new GLTFLoader().parseAsync(environmentBytes.buffer.slice(environmentBytes.byteOffset, environmentBytes.byteOffset + environmentBytes.byteLength), '')).scene);
+const environment=(await new GLTFLoader().parseAsync(environmentBytes.buffer.slice(environmentBytes.byteOffset, environmentBytes.byteOffset + environmentBytes.byteLength), '')).scene;
+const panels=contextFacades(environment);
+assert.ok(panels.count>100, 'Context facades have occupied panel rows');
+const shore=amphibiousShore();
+assert.ok(shore.children.length<=6, 'Tidal terraces batch by shared finish');
+city.add(environment,panels,shore);
+plantCanopy(city, JSON.parse(readFileSync(new URL('../asset/models/odaiba-masterplan/tree_instances.json', import.meta.url), 'utf8')));
+const groveStart=city.children.length;
+plantLandscapeCanopy(city,environment,landmarks);
+assert.ok(city.children[groveStart] instanceof InstancedMesh && city.children[groveStart].count>100, 'Authored landscape carries coastal groves');
 city.updateMatrixWorld(true);
 const openGround = /^(TERRAIN|PHASE03C_LANDSCAPE|PHASE03C_PLAZA|PRIMARY_PLAZA|PHASE03C_SERVICE|SERVICE_BAY|SIDEWALK|WATERFRONT_PROMENADE)/;
 const ray = new Raycaster(), down = new Vector3(0, -1, 0);
@@ -110,7 +142,9 @@ const boatPoints = [actorPaths.water, actorPaths.ferry].flatMap(route => Array.f
 for (const [x, z, yaw] of floatingDecks) {
   const along = new Vector3(Math.sin(yaw), 0, Math.cos(yaw)), across = new Vector3(along.z, 0, -along.x);
   for (const [u, v] of [[-18, -5], [18, -5], [-18, 5], [18, 5], [0, 0]]) {
-    const p = new Vector3(x, 0, z).addScaledVector(along, u).addScaledVector(across, v), hit = groundAt(p.x, p.z);
+    const p = new Vector3(x, 0, z).addScaledVector(along, u).addScaledVector(across, v);
+    ray.set(new Vector3(p.x,500,p.z),down);
+    const hit=ray.intersectObject(environment,true)[0];
     assert.ok(!hit || /^WATER/.test(hit.object.name), `floating deck at ${x},${z} grounds on ${hit?.object.name}`);
   }
   assert.ok(Math.min(...boatPoints.map(p => Math.hypot(p.x - x, p.z - z))) > 30, `floating deck at ${x},${z} sits in a boat route`);

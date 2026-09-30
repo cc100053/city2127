@@ -5,6 +5,7 @@ dist/
 .vercel
 .codegraph
 .claude/settings.json
+.dream-loop/
 
 # Blender/model working files that are not source/export deliverables.
 asset/models/**/*.blend1

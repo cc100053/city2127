@@ -1,5 +1,24 @@
 # Validation and handoff
 
+## Odaiba art direction pass 1 — 2026-09-30
+
+`feat/art-direction`, base `e587b54`, verified implementation `274167e`. Scope: replace the rendered Fuji office/podium/observation GLB with a civic chassis; retain original assets, hero, lighting, actor routes, seven other landmarks and survey contracts. Human art acceptance pending; no main integration. [Full audit / self-review](handoffs/odaiba-art-direction-01.md).
+
+Root `npm test` (all ten scripts, including actual new-core aerial/bridge/site/actor raycasts), `npm run build` (strict TypeScript + Vite), and `git diff --check` passed. Existing >500 kB bundle warning remains. New core: six static material batches, 50,876 triangles, no per-frame geometry. Eight original source assets still match their hashes/bounds; runtime now uses seven GLBs plus the new core. Survey and module-swap sources unchanged; their package checks were not rerun for this root-only change.
+
+Comparable evidence: headed Chrome / ANGLE Metal Apple M6, CSS 1920×1080, DPR 1, standalone, `?hour=16&reviewTime=20`, original untouched hero camera. Second pair adds the same `&review=civic` camera on both versions. Exact baseline loader from `e587b54` was served through a temporary development module/browser route; review harness identical on both, temporary source removed after evidence. Lighting, exposure, post chain, weather/state and actor time identical. [Hero before](../artifacts/odaiba-art1-before-hero.png) / [after](../artifacts/odaiba-art1-after-hero.png); [civic before](../artifacts/odaiba-art1-before-civic.png) / [after](../artifacts/odaiba-art1-after-civic.png).
+
+| Fixed view | Before FPS / draws / geometries | After FPS / draws / geometries |
+| --- | --- | --- |
+| Hero | 21.5 / 1,338 / 343 | 21.3 / 1,331 / 341 |
+| Civic | 23.2 / 1,067 / 343 | 23.2 / 1,060 / 341 |
+
+FPS is the existing canvas's last 120-frame wall-clock sample after 12 s warm-up, not an isolated GPU benchmark. Both versions are well below 60 FPS in this session; **performance acceptance remains open**. This evidence supports reduced draw submissions, not a 60 FPS claim or equivalence to earlier M6 measurements. No renderer-quality reduction was used to improve the after frame.
+
+Runtime smoke uses a separate loopback survey server at 8793 and `/private/tmp/odaiba-art1-survey.sqlite`: mixed baseline → one four-answer all-high proposal (ports 5, seats 7, trees 10, modules 5), staff `guest-left` → city reset → mixed (3/4/8/4), then one all-low proposal (1/2/5/3). The high diagnostics matched targets; reset UI returned to zero guests and the renderer's baseline port target was checked. Low's four final visible counts and non-transitioning concentration representation were checked at 16:00 and 22:00. No changes to exhibition data. Browser page errors/scene error UI absent; the existing `/favicon.ico` 404 is unrelated and remains. No 100-guest endurance, Windows, full guest UI acceptance, exact mesh-to-actor collision proof or structural engineering approval claimed.
+
+Visual self-review: primary office slabs/window repetition are replaced by suspension, major void, diagonal circulation and a ring chamber. Original documentary Fuji silhouette and mint sphere beacon are intentionally gone. Core remains schematic, underoccupied and below R02 envelope quality; road/mall parcels, secondary buildings, thin coast, water and overall atmospheric treatment remain large gaps. The next single art priority is core-to-waterfront civic organization; this task stops for human review before another pass.
+
 ## README language and startup guide — 2026-09-30
 
 Documentation-only change: the main README now has a Traditional Chinese Mac/Windows exhibition quick start, with separate English and Japanese guides. The guides identify the survey server and root city terminal tabs, the guest/city/admin/optional monitor browser tabs, default ports, SQLite persistence, staff exit confirmation, LAN binding and the legacy module-swap boundary. Startup commands and routes were checked against `package.json`, `survey/package.json`, `survey/src/server/server.ts`, `survey/vite.config.ts`, `src/main.ts` and the admin/monitor UI source. Local Markdown links in the three READMEs passed; Windows commands and a live cross-device LAN setup were not run. See the [README handoff](handoffs/readme-localization.md) for commit and integration status.
@@ -501,3 +520,19 @@ Final browser script passed: normal Guest has no panel; two high, four low, two 
 - [High-profile city after 2 proposals](../artifacts/survey-auto-high-city.png)
 - [Low-profile city after 6 cumulative proposals](../artifacts/survey-auto-low-city.png)
 - [Mixed-profile city after 8 cumulative proposals](../artifacts/survey-auto-mixed-city.png)
+
+## Odaiba Dream Loop — 2026-09-30
+
+`feat/art-direction`, base `102b6bb` plus three sequential passes. Root tests/build passed per pass; final whitespace check clean, existing bundle-size warning remains. Actual-mesh Odaiba checks now include surveyed canopy, mall roof planting and context facade panels. No source GLB/blend, route or survey contract changes. Survey/module-swap local suites not rerun (packages unchanged).
+
+Headed Chrome screenshots: original hero, 16:00 / actor 20 s, 1920×929, device DPR 2 (renderer cap 1.5): [before](../artifacts/odaiba-dream-before.jpg), [generated target](../artifacts/odaiba-dream-target.png), [after](../artifacts/odaiba-dream-after.jpg). Browser also checked 12:00, 6.3, 17.8 and [22:00](../artifacts/odaiba-dream-night.jpg), with no localhost application or shader errors. Existing browser-wallet extension errors excluded. Scratch server 8794/temp SQLite rendered [all-high](../artifacts/odaiba-dream-high.jpg) and [all-low](../artifacts/odaiba-dream-low.jpg) at 1920×873; actual visible counts matched server layouts. Reset/reloaded snapshot restored mixed baseline; one live proposal converged to 5 ports, 10 trees, 7 shared seats and 5 modules. No guest-flow acceptance/timing rerun.
+
+Rolling canvas observations at 1920×929/DPR cap 1.5: baseline 26.6 FPS/1,331 draws; final 23.7 FPS/1,359 draws/348 geometries. Not a controlled 1080p DPR-1 benchmark, GPU identity check or 60 FPS guarantee. Target not reached: broad lawns, contemporary secondary archetypes, thin shore, sea horizon edge and weak daylight overlay contrast remain. Three-pass Plus stopping point; human art review pending, no main integration. Full [handoff](handoffs/odaiba-dream-loop.md) records asset prompts and limits.
+
+## Odaiba Dream Loop continuation 4–6 — 2026-09-30
+
+Resume `45277d3` on `feat/art-direction`; root test/build/whitespace passed per final pass version. Added actual-mesh terrace/grove/core coverage to existing site, hero, train, walker, boat and bridge checks. Initial walker collision and LDR reflection darkening were fixed and rechecked before capture. No model binary, dependency, route or survey-contract change; root bundle warning remains. Survey/module-swap local suites not rerun (unchanged).
+
+Headed Chrome: original hero, fixed 16:00 / actor20 s; [day](../artifacts/odaiba-dream-pass6.jpg) and [night](../artifacts/odaiba-dream-pass6-night.jpg) at 1920×929/DPR1, plus inspected 6.3 and 17.8. Scratch server 8794/temp continuation SQLite rendered [high](../artifacts/odaiba-dream-pass6-high.jpg)/[low](../artifacts/odaiba-dream-pass6-low.jpg) at 1920×873/DPR1. Twenty positive/negative proposals, actual diagnostics match all four site layouts and finished live transitions; reset/reload restores mixed baseline. No localhost/shader errors; existing wallet-extension errors excluded. No full guest/lifecycle or transition-timing rerun.
+
+Standalone rolling observation: 32.8 FPS / 1388 draws / 356 geometries at 1920×929/DPR1. Not comparable to the prior DPR1.5 session, not controlled 1080p/exhibition hardware/60FPS acceptance. Target still not reached: isolated shore platforms, contemporary mall/hotel/context typologies, geometric trees, background and detail density remain. Six passes implemented, human art review pending; no main merge. See [continuation handoff](handoffs/odaiba-dream-loop.md#continuation-passes-46--2026-09-30-locally-verified-human-art-review-pending).

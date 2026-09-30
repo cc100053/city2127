@@ -17,6 +17,7 @@ import { overlay } from './overlay';
 import { addCityModel } from './modelAssets';
 import { loadOdaiba, updateOdaiba } from './odaibaScene';
 import { build2127 } from './odaiba2127';
+import { bayWater } from './bayWater';
 import { scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
 import { createCityChangeManager } from './createCityChangeManager';
@@ -30,23 +31,36 @@ try {
   renderer.info.autoReset=false;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.VSMShadowMap;
   renderer.domElement.setAttribute('aria-label','The Odaiba waterfront around the Fuji TV sphere in 2127. Drag to orbit, scroll to zoom, right-drag to pan. One city day, dawn to night, passes every three minutes.');
   document.querySelector('#app')!.appendChild(renderer.domElement);
-  const environment=new T.PMREMGenerator(renderer),room=new RoomEnvironment();
-  scene.environment=environment.fromScene(room,.04).texture;scene.environmentIntensity=.6;room.dispose();environment.dispose();
+  scene.environmentIntensity=.6;
   const camera=heroCamera(innerWidth,innerHeight);
+  const reviewParams=new URLSearchParams(location.search);
+  const civicReview=import.meta.env.DEV && reviewParams.get('review')==='civic';
+  if(civicReview){camera.position.set(-180,105,-235);camera.lookAt(-10,78,20);}
+  const reviewTime=import.meta.env.DEV && reviewParams.has('reviewTime') ? Number(reviewParams.get('reviewTime')) : NaN;
   const ambient=new T.HemisphereLight('#edf1e4','#8a8274',2.2);scene.add(ambient);
   const sun=new T.DirectionalLight('#ffe4b8',3.4);sun.position.set(-20,38,18);sun.castShadow=true;
   // Shadow box fitted to the hero cluster (Fuji TV, Aqua City, DECKS, Hilton, Nikko, DiverCity), in metres.
   sun.shadow.mapSize.set(4096,4096);Object.assign(sun.shadow.camera,{left:-480,right:480,top:480,bottom:-480,near:10,far:2400});sun.shadow.normalBias=.3;sun.shadow.radius=5;sun.shadow.blurSamples=12;scene.add(sun);
-  // Gradient sky: horizon shares the fog colour, zenith is a deeper tone per state. Follows the camera so it never clips.
-  const sky=new T.Mesh(new T.SphereGeometry(1500,24,12),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{top:{value:new T.Color()},horizon:{value:new T.Color()}},
-    vertexShader:'varying vec3 p;void main(){p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader:'uniform vec3 top,horizon;varying vec3 p;void main(){float h=clamp(normalize(p).y*1.8,0.,1.);gl_FragColor=vec4(mix(horizon,top,pow(h,.65)),1.);}'}));
+  // Generated clouds fade into the clock-driven gradient at dusk; the sky follows the camera.
+  const skyTexture=new T.TextureLoader().load(new URL('../asset/textures/maritime-sky.png',import.meta.url).href,texture=>{
+    // The generated sky is LDR: preserve HDR light-card energy while replacing enclosed-room reflections.
+    const capture=new RoomEnvironment(),pmrem=new T.PMREMGenerator(renderer);
+    capture.background=texture;
+    capture.traverse(object=>{if(object instanceof T.Mesh && object.material instanceof T.MeshStandardMaterial)object.visible=false;});
+    scene.environment=pmrem.fromScene(capture,.04).texture;
+    capture.dispose();pmrem.dispose();
+  });skyTexture.colorSpace=T.SRGBColorSpace;
+  skyTexture.mapping=T.EquirectangularReflectionMapping;
+  const sky=new T.Mesh(new T.SphereGeometry(1500,24,12),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{top:{value:new T.Color()},horizon:{value:new T.Color()},clouds:{value:skyTexture},day:{value:1}},
+    vertexShader:'varying vec3 p;varying vec2 skyUv;void main(){p=position;skyUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader:'uniform vec3 top,horizon;uniform sampler2D clouds;uniform float day;varying vec3 p;varying vec2 skyUv;void main(){float altitude=normalize(p).y;float h=clamp(altitude*1.8,0.,1.);vec3 gradient=mix(horizon,top,pow(h,.65));vec3 cloud=texture2D(clouds,vec2(skyUv.x,min(1.,skyUv.y+.1))).rgb;gl_FragColor=vec4(mix(gradient,cloud,day*.9*smoothstep(-.06,.035,altitude)),1.);}'}));
   sky.frustumCulled=false;sky.renderOrder=-1;scene.add(sky);
   // Open sea beyond the masterplan plate; fog closes the horizon.
-  const floor=new T.Mesh(new T.PlaneGeometry(20000,20000),new T.MeshStandardMaterial({color:'#5a93a8',roughness:.62}));floor.rotation.x=-Math.PI/2;floor.position.y=-1.2;floor.receiveShadow=true;scene.add(floor);
+  const water=bayWater();
+  const floor=new T.Mesh(new T.PlaneGeometry(20000,20000),water);floor.rotation.x=-Math.PI/2;floor.position.y=-1.2;floor.receiveShadow=true;scene.add(floor);
   const rig=cityRig(scene);
   build2127(scene);
-  loadOdaiba(scene).catch(error=>{const message=document.createElement('p');message.className='error';message.textContent='Odaiba could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);});
+  loadOdaiba(scene,water).catch(error=>{const message=document.createElement('p');message.className='error';message.textContent='Odaiba could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);});
   if(import.meta.env.DEV && new URLSearchParams(location.search).has('asset-preview')){
     const input=document.createElement('input');input.type='file';input.accept='.glb,model/gltf-binary';input.className='asset-preview';input.title='Preview a Blender GLB in the city scene';input.setAttribute('aria-label','Preview a Blender GLB');
     document.body.appendChild(input);
@@ -60,6 +74,7 @@ try {
   }
   const controls=new OrbitControls(camera,renderer.domElement);
   controls.target.set(...HERO_TARGET);controls.enableDamping=true;controls.dampingFactor=.06;controls.rotateSpeed=.45;controls.zoomSpeed=.6;controls.panSpeed=.8;
+  if(civicReview)controls.target.set(-10,78,20);
   controls.minDistance=150;controls.maxDistance=1400;controls.minPolarAngle=.35;controls.maxPolarAngle=1.42;controls.screenSpacePanning=false;controls.update();
   // MSAA target: the composer's default target has no samples, so edges were aliased once post-processing ran.
   const composer=new EffectComposer(renderer,new T.WebGLRenderTarget(innerWidth,innerHeight,{type:T.HalfFloatType,samples:4}));composer.setSize(innerWidth,innerHeight);composer.addPass(new RenderPass(scene,camera));
@@ -88,31 +103,32 @@ try {
     if(kind==='city-state-updated')cityChanges!.applyIncrementalUpdate(view,now);
     else cityChanges!.restoreFromSnapshot(view,now);
   }, mode => { displayMode = mode; });
-  // Day tints per mood (unchanged daylight look), then dusk and night colours laid over them by the clock.
-  const dayBase=new T.Color('#c3d9e7'),dayPulse=new T.Color('#accbdc'),dayStill=new T.Color('#e0e6dc');
-  const topBase=new T.Color('#7f9fbd'),topPulse=new T.Color('#6a8db0'),topStill=new T.Color('#a9bcc4');
+  // Day tints per mood, then dusk and night colours laid over them by the clock.
+  const dayBase=new T.Color('#bed9ec'),dayPulse=new T.Color('#accbdc'),dayStill=new T.Color('#e0e6dc');
+  const topBase=new T.Color('#6699c0'),topPulse=new T.Color('#6a8db0'),topStill=new T.Color('#a9bcc4');
   const duskHorizon=new T.Color('#f6b58a'),duskTop=new T.Color('#7a86ad'),nightHorizon=new T.Color('#1c2941'),nightTop=new T.Color('#070d1c');
   const sunLow=new T.Color('#ffae78'),sunHigh=new T.Color('#ffe7c4'),moon=new T.Color('#7d9be0'),ambientDay=new T.Color('#e3ebee'),ambientPulse=new T.Color('#a7c9ed'),ambientNight=new T.Color('#899dbd');
   const start=performance.now();
   let frames=0,measureStart=start;
   renderer.setAnimationLoop(()=>{
-    now=(performance.now()-start)/1000;
+    now=Number.isFinite(reviewTime)&&reviewTime>=0 ? reviewTime : (performance.now()-start)/1000;
     const hour=hold??displayHour(displayMode,now),height=sunHeight(hour),day=daylight(hour),dark=1-day,glow=1-T.MathUtils.smoothstep(Math.abs(height),0,.4),nightSky=T.MathUtils.smoothstep(dark,.35,1);
     if(surveyUrl)world.update(now);
     const s=withNight(surveyUrl?world.state:moodAt(hour),dark);
     const pulse=T.MathUtils.clamp((s.neon-.25)/.7,0,1)*day,still=T.MathUtils.clamp((s.warmth-.55)/.3,0,1);
     (scene.background as T.Color).copy(dayBase).lerp(dayPulse,pulse).lerp(dayStill,still).lerp(duskHorizon,glow*.7).lerp(nightHorizon,nightSky);
-    (scene.fog as T.FogExp2).color.copy(scene.background as T.Color);(scene.fog as T.FogExp2).density=.00035+s.haze*.0006;
+    (scene.fog as T.FogExp2).color.copy(scene.background as T.Color);(scene.fog as T.FogExp2).density=.00024+s.haze*.00016;
+    sky.material.uniforms.day.value=day;
     sky.position.copy(camera.position);sky.material.uniforms.horizon.value.copy(scene.background as T.Color);sky.material.uniforms.top.value.copy(topBase).lerp(topPulse,pulse).lerp(topStill,still).lerp(duskTop,glow*.5).lerp(nightTop,nightSky);
     // The sun arcs east to west; below the horizon the same light becomes a dim moon from the opposite side, so shadows never stop.
     const arc=Math.PI*(hour-6)/12,up=height>0?1:-1;
     sun.position.set(840*Math.cos(arc)*up,480*Math.abs(height)+48,408);
-    sun.color.copy(sunLow).lerp(sunHigh,T.MathUtils.smoothstep(height,0,.45)).lerp(moon,dark);
-    sun.intensity=(2.55+pulse*.2+still*.05)*T.MathUtils.smoothstep(height,-.02,.2)+.55*T.MathUtils.smoothstep(-height,.02,.25);
+    sun.color.copy(sunLow).lerp(sunHigh,T.MathUtils.smoothstep(height,0,.8)).lerp(moon,dark);
+    sun.intensity=(3.15+pulse*.2+still*.05)*T.MathUtils.smoothstep(height,-.02,.2)+.55*T.MathUtils.smoothstep(-height,.02,.25);
     const light=nightLighting(dark);
-    ambient.intensity=(.62+pulse*.15+still*.15)*light.ambient;
+    ambient.intensity=(.7+pulse*.15+still*.15)*light.ambient;
     ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientNight,dark);
-    scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure;
+    scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure*(1+.16*day);
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
     controls.update();rig.update(s,now,dark);updateOdaiba(dark);cityChanges?.update(now);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
     if(++frames===120){renderer.domElement.dataset.hour=hour.toFixed(2);renderer.domElement.dataset.displayMode=displayMode;renderer.domElement.dataset.time=now.toFixed(2);renderer.domElement.dataset.fps=(120000/(performance.now()-measureStart)).toFixed(1);renderer.domElement.dataset.drawCalls=String(renderer.info.render.calls);renderer.domElement.dataset.geometries=String(renderer.info.memory.geometries);if(cityChanges)renderer.domElement.dataset.siteAssets=JSON.stringify(cityChanges.getDiagnostics());frames=0;measureStart=performance.now();}

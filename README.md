@@ -108,7 +108,7 @@ The `/guest` page has the S4 four-question v2 UI, integrated on main and browser
 
 ## 目前可執行原型
 
-2127 年台場海濱（Vite、TypeScript、WebGL 2，米制）：`src/odaibaScene.ts` 載入 Phase 03D 地形、海同八棟地標 GLB（富士電視台、Aqua City、DECKS、DiverCity × 2、Hilton、日航、Telecom Center），`src/odaiba2127.ts` 加上 2127 改造層（空中天橋、球頂泊位、單軌燈線、海濱浮台，屋頂綠化／太陽能）。鏡頭由海面望向富士電視台同 Aqua City。
+2127 年台場海濱（Vite、TypeScript、WebGL 2，米制）：`src/odaibaScene.ts` 載入 Phase 03D 地形、海及七棟地標 GLB（Aqua City、DECKS、DiverCity × 2、Hilton、日航、Telecom Center）；`feat/art-direction` 的第一個視覺 pass 用 `src/civicCore.ts` 將富士電視台替換為開放巨構及懸吊公共 chamber，原始資產保留。`src/odaiba2127.ts` 提供既有空中天橋、球頂泊位、guideway 燈線及海濱浮台。鏡頭仍由海面望向 Fuji 核心同 Aqua City。視覺依據是 [ODAIBA 2127 references](docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)；[前後比較與限制](docs/handoffs/odaiba-art-direction-01.md)待人類美術審閱。
 
 ```sh
 npm install
