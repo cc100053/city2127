@@ -92,10 +92,10 @@ try {
   const composer=new EffectComposer(renderer,new T.WebGLRenderTarget(innerWidth,innerHeight,{type:T.HalfFloatType,samples:4}));composer.setSize(innerWidth,innerHeight);composer.addPass(new RenderPass(scene,camera));
   // Contact shadows where slabs, planters and cores meet: the cheapest step from blockout to built object.
   const ao=new GTAOPass(scene,camera,innerWidth,innerHeight);ao.updateGtaoMaterial({radius:3,distanceFallOff:.8,thickness:3,samples:16});ao.blendIntensity=1;composer.addPass(ao);
-  // GTAO's normal/depth prepass uses an override material without the earth curvature, so the far bay would ghost above the horizon: skip the curved sea and bay context there.
+  // GTAO's normal/depth prepass uses an override material without the earth curvature, so the far bay would ghost above the horizon: skip the curved sea and bay context there, and the transparent boat wakes (no normals; they read as black AO).
   const aoPass=ao as unknown as {_overrideVisibility():void;_restoreVisibility():void},hideFlat=aoPass._overrideVisibility.bind(aoPass),showFlat=aoPass._restoreVisibility.bind(aoPass);
   let flat:T.Object3D[]=[];
-  aoPass._overrideVisibility=()=>{hideFlat();flat=[floor,scene.getObjectByName('bay-context')].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
+  aoPass._overrideVisibility=()=>{hideFlat();flat=[floor,scene.getObjectByName('bay-context'),scene.getObjectByName('water-taxi-wakes')].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
   aoPass._restoreVisibility=()=>{showFlat();for(const o of flat)o.visible=true;};
   const bloom=new UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.2,.7,1);composer.addPass(bloom);
   const vignette=new ShaderPass(VignetteShader);vignette.uniforms.offset.value=.9;vignette.uniforms.darkness.value=.9;composer.addPass(vignette);composer.addPass(new OutputPass());
