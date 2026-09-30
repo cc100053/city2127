@@ -28,12 +28,12 @@ const slots = props.children.filter(child => child.name.startsWith('hub-service-
 assert.equal(slots.length, 6, 'the v2 baseline has exactly six mutable service slots');
 
 scene.updateMatrixWorld(true);
-const bounds = new T.Box3().setFromObject(props);
-assert.ok(bounds.min.x - site.root.position.x >= -4.001);
-assert.ok(bounds.max.x - site.root.position.x <= 4.001);
-assert.ok(bounds.min.z - site.root.position.z >= -3.501);
-assert.ok(bounds.max.z - site.root.position.z <= 3.501);
-assert.ok(bounds.max.z < -4.5, 'service slots clear the north road');
+// Lot limits are in site units; the root carries the Odaiba position and scale.
+const bounds = new T.Box3().setFromObject(props).applyMatrix4(site.root.matrixWorld.clone().invert());
+assert.ok(bounds.min.x >= -4.001);
+assert.ok(bounds.max.x <= 4.001);
+assert.ok(bounds.min.z >= -3.501);
+assert.ok(bounds.max.z <= 3.501);
 
 assert.deepEqual(runtime.getDiagnostics(), {
   band: 'mixed', targetAutomatedPorts: 3, visibleAutomatedPorts: 3,

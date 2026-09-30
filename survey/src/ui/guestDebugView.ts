@@ -141,7 +141,7 @@ function page(title: string, eyebrow: string, ...content: (HTMLElement | string)
   persistRecovery();
   app.replaceChildren(
     el('div', { class: 'guest-frame' },
-      el('header', { class: 'guest-masthead' }, el('span', {}, '2127 · SHIBUYA'), el('span', {}, '共同のまちづくり')),
+      el('header', { class: 'guest-masthead' }, el('span', {}, '2127 · ODAIBA'), el('span', {}, '共同のまちづくり')),
       el('section', { class: 'guest-screen' },
         el('p', { class: 'guest-eyebrow' }, eyebrow),
         el('h1', { tabindex: '-1' }, title),
@@ -185,8 +185,8 @@ function idleWarningNodes() {
 function renderWelcome(focus = false) {
   const button = action(screen === 'starting' ? '準備中…' : 'はじめる', () => startSession(session !== undefined && draft.size > 0), true, busy);
   const status = screen === 'starting' ? el('p', { class: 'guest-status', role: 'status', 'aria-live': 'polite' }, '四つの質問を準備しています。') : undefined;
-  page('次の渋谷を一緒に選ぶ', '共同提案',
-    el('p', { class: 'guest-lead' }, 'ここは2127年の渋谷。四つの質問に答えて、これからの街のあり方を一緒に選びます。'),
+  page('次のお台場を一緒に選ぶ', '共同提案',
+    el('p', { class: 'guest-lead' }, 'ここは2127年のお台場。四つの質問に答えて、これからの街のあり方を一緒に選びます。'),
     el('p', { class: 'guest-copy' }, '回答は最後にまとめて確認してから記録します。選んでいる間、街の集計は変わりません。'),
     ...noticeNodes(),
     ...(status ? [status] : []),

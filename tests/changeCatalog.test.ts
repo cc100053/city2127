@@ -40,4 +40,4 @@ assert.deepEqual(siteLayerDefinition('magnetEast', 'hubUpper'), {
 assert.throws(() => variantLayers('stationEastPark', 'plaza'), /Unknown variant/);
 assert.throws(() => siteLayerDefinition('magnetEast', 'parkTrees'), /Unknown layer/);
 
-console.log('PASS: layout selects explicit Shibuya site variants and additive layers.');
+console.log('PASS: layout selects explicit site variants and additive layers.');

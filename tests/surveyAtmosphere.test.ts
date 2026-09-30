@@ -35,7 +35,7 @@ assert.equal(parseSurveyEvent({ type: 'city-state-updated', state: view, view: {
 assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...view, version: 3 } }), { unsupportedVersion: 3 });
 assert.equal(parseSurveyEvent({ type: 'other', view }), null);
 assert.equal(policyText(parsed.view.history[0]), '自動化 ↑ +2');
-assert.equal(cityText(parsed.view.history[0]), 'MAGNET東 hub');
+assert.equal(cityText(parsed.view.history[0]), 'デックス西 hub');
 assert.equal(cityText({ ...parsed.view.history[0], cityChanges: [] }), '見た目の変化なし');
 assert.equal(parseSurveyEvent({ type: 'city-state-updated', view: { ...view, layout: { lots: { ...layout.lots, se: lot('lake') } } } }), null);
 assert.equal(parseSurveyEvent({ type: 'city-state-updated', view: { ...view, scores: { automation: 2 } } }), null);
@@ -122,7 +122,7 @@ const nonParkFeedback = exhibitionFeedback({
     { socketId: 'se', label: '機能配置', before: { functionModules: 4 }, after: { functionModules: 3 } },
   ],
 });
-assert.deepEqual(nonParkFeedback?.cityChanges.map(change => change.place), ['道玄坂南', 'センター街奥']);
+assert.deepEqual(nonParkFeedback?.cityChanges.map(change => change.place), ['アクアシティ南', 'フジテレビ東']);
 
 const sameBandFeedback = exhibitionFeedback({
   ...v2Proposal, beforeScores: { ...zero, environmentalPriority: 4 }, afterScores: { ...zero, environmentalPriority: 4.2 },

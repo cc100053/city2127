@@ -460,3 +460,27 @@ Integration: feature `c5f5c5af27b42732a4c6ec1b8a60166bf1f2da65` passed [CI 36654
 At base `957b5bc` plus the localization delta, root and survey tests/builds passed (survey loopback tests required an elevated retry after sandbox EPERM). Admin title, controls, accessible confirmation label, lifecycle/lighting/score labels, dialogs, success/history and network errors use Japanese. In-app browser checked Night feedback and full-reset enablement; its native dialog stalled automation, so headed Chrome completed the confirmation via native UI and verified a new run plus Japanese full-reset success/history. Isolated server 8793/temp SQLite only; existing 8787 data/process were preserved. No layout or motion change. [Screenshot](../artifacts/admin-japanese.jpg); [handoff](handoffs/admin-japanese.md). Full-reset UI phrase is `全データ初期化`; API token remains `FULL RESET`.
 
 Integration: feature `d4fef13` passed [CI 36655653034](https://github.com/cc100053/city2127/actions/runs/36655653034); main `1fc8c1f` re-passed root/survey local checks and passed [CI 36655782933](https://github.com/cc100053/city2127/actions/runs/36655782933) for all three packages. Existing 8787 current-run supports displayMode; refresh Admin to load the new build. Closure update is documentation only.
+
+## Odaiba venue P0 — 2026-09-30
+
+Branch `codex/odaiba-venue`, base `4bc1646`. Odaiba assets imported path-wise from `codex/odaiba-preview` `3a8a5f2`; root `npm test` (now including `tests/odaiba.test.ts`) and `npm run build` passed, `git diff --check` clean. Reverted spike with environment + 8 buildings over the Shibuya root and full post chain: headed Chrome 154, ANGLE Metal Apple M6, 1920×1080, pixel ratio 1 → 60.0 FPS, 1,223 draw calls (12:00) / 1,311 (22:00); Shibuya alone 60.0 FPS, 356. The user confirmed the Apple M6 is the exhibition machine. See [ODAIBA_PLAN.md](ODAIBA_PLAN.md).
+
+## Odaiba venue P1 — 2026-09-30
+
+Branch `codex/odaiba-venue`. Root `npm test` and `npm run build` passed (existing chunk warning); `git diff --check` clean; `survey/` and `module-swap/` unchanged. Headed Chrome 154, ANGLE Metal Apple M6 (exhibition machine), 1920×1080, pixel ratio 1, 14 s warm-up then 3 s rAF sample: 60.0 FPS and 1,243 / 1,245 / 1,245 draw calls at `?hour=12` / `18.5` / `22`; no console errors. Captures: [12:00](../artifacts/odaiba-p1-1200.png), [18:30](../artifacts/odaiba-p1-1830.png), [22:00](../artifacts/odaiba-p1-2200.png). Not checked: `?survey` (sites still at Shibuya coordinates until P2), mobility (unwired until P3), art acceptance.
+
+## Odaiba venue P2 — 2026-09-30
+
+Branch `codex/odaiba-venue`. Root `npm test` and `npm run build` passed; `git diff --check` clean; `survey/` and `module-swap/` unchanged. `tests/odaiba.test.ts` passes the new lot-ground and hero-visibility checks for all four sites. Scratch survey server (port 8791, scratch SQLite) with root `?survey=ws://127.0.0.1:8791/ws` on the exhibition machine (headed Chrome 154, ANGLE Metal Apple M6, 1920×1080): baseline 59.6 FPS / 1,525 draws; all-high (31 guests) 59.1 / 1,581; all-low (17 guests) 59.5 / 1,545 at 12:00 and 59.2 / 1,547 at 22:00; no page errors. Captures: [baseline](../artifacts/odaiba-p2-baseline.png), [high](../artifacts/odaiba-p2-high.png), [low](../artifacts/odaiba-p2-low.png), [low 22:00](../artifacts/odaiba-p2-low-2200.png). Not checked: 1280×720, transition timing re-measure, art acceptance.
+
+## Odaiba venue P3 — 2026-09-30
+
+Branch `codex/odaiba-venue`. Root `npm test` (new Odaiba mobility suite plus raycast route checks in `tests/odaiba.test.ts`) and `npm run build` passed; `git diff --check` clean; `survey/` and `module-swap/` unchanged. Exhibition machine (headed Chrome 154, ANGLE Metal Apple M6, 1920×1080): 60.3 FPS / 1,307 draws at 12:00 and 60.2 / 1,309 at 22:00, no page errors. Captures: [12:00](../artifacts/odaiba-p3-1200.png), [22:00](../artifacts/odaiba-p3-2200.png), [zoomed](../artifacts/odaiba-p3-close.png). Not checked: `?survey` with actors (site/route separation is covered by tests), art acceptance.
+
+## Odaiba venue P4 — 2026-09-30
+
+Branch `codex/odaiba-venue`. Root `npm test` (new sky-bridge and floating-deck raycast checks) and `npm run build` passed; `git diff --check` clean. Exhibition machine (headed Chrome 154, ANGLE Metal Apple M6, 1920×1080): 60.0 FPS / 1,340 draws at 12:00, 60.1 / 1,342 at 22:00; no page errors. Captures: [12:00](../artifacts/odaiba-p4-1200.png), [22:00](../artifacts/odaiba-p4-2200.png), [zoomed 12:00](../artifacts/odaiba-p4-close-1200.png), [zoomed 22:00](../artifacts/odaiba-p4-close-2200.png). Not checked: `?survey` with the 2127 layer, art acceptance.
+
+## Odaiba venue P5 — 2026-09-30
+
+Branch `codex/odaiba-venue`. Waterfront question text (ids, option ids, effects and question-set version unchanged), guest masthead/welcome, root overlay, page title and remaining Shibuya strings in code. `survey/` `npm test` (15 suites) and `npm run build` passed; root `npm test` and `npm run build` passed; `git diff --check` clean. Headed Chrome on the exhibition machine with a scratch survey server (8791): `/guest` welcome reads 次のお台場を一緒に選ぶ / 2127 · ODAIBA, the first question shows the Odaiba service text and its three options, and the root overlay reads "ONE WATERFRONT. TWO FUTURES." / 35°37′ N 139°46′ E / "The same shore."; no console errors. Captures: [guest](../artifacts/odaiba-p5-guest.png), [question 1](../artifacts/odaiba-p5-question.png), [city](../artifacts/odaiba-p5-city.png). Not checked: a full four-question submission (P6), module-swap (unchanged; still rejects v2).

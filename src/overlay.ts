@@ -1,7 +1,7 @@
 export function overlay() {
   const host = document.createElement('main');
-  host.innerHTML = `<header><a class="brand" href="/" aria-label="2127 home"><span class="mark">✳</span><span>2127<span class="brand-sub">TOKYO / CIVIC FUTURES</span></span></a><span class="edition">ONE CROSSING. TWO FUTURES.<br><span>STUDY № 001 — 35°40′ N 139°42′ E</span></span></header>
-    <section class="intro"><p class="eyebrow">A SMALL PLACE. A BIG DECISION.</p><h1>The same street.<br>A different <em>tomorrow.</em></h1><p class="question">May a perfect future erase<br>an imperfect past?</p></section>
+  host.innerHTML = `<header><a class="brand" href="/" aria-label="2127 home"><span class="mark">✳</span><span>2127<span class="brand-sub">TOKYO / CIVIC FUTURES</span></span></a><span class="edition">ONE WATERFRONT. TWO FUTURES.<br><span>STUDY № 002 — 35°37′ N 139°46′ E · ODAIBA</span></span></header>
+    <section class="intro"><p class="eyebrow">A SMALL PLACE. A BIG DECISION.</p><h1>The same shore.<br>A different <em>tomorrow.</em></h1><p class="question">May a perfect future erase<br>an imperfect past?</p></section>
     <aside class="state-label"><span class="state-dot"></span><span id="state-name">DAYLIGHT TOKYO</span><span id="time">12:00</span></aside>
     <footer><span class="footnote">A FROZEN INTERSECTION<br><span>Built once. One day at a time.</span></span><span class="instruction">DRAG TO ORBIT · SCROLL TO ZOOM<br><span>One city day passes every three minutes</span></span></footer>`;
   document.body.appendChild(host);

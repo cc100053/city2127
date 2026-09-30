@@ -48,7 +48,7 @@ export const exhibitionVoteMarks = (votes: ExhibitionProposal['votes']) => AXES.
   label: EXHIBITION_LABELS[axis], vote: votes[axis], symbol: voteSymbol(votes[axis]),
 }));
 
-/** Causal panel text: policy deltas, and city changes named by the Shibuya place where they appear. */
+/** Causal panel text: policy deltas, and city changes named by the Odaiba place where they appear. */
 export const policyText = (d: Decision) =>
   Object.entries(d.policyChange).map(([axis, n]) => `${LABELS[axis] ?? axis} ${n > 0 ? '↑' : '↓'} ${signed(n)}`).join('　') || '変化なし';
 export const cityText = (d: Decision) =>
