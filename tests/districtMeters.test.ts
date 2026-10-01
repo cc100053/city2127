@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { AutomationDistrict, EnvironmentDistrict, SlotLevels, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
+import { AutomationDistrict, EnvironmentDistrict, SharingDistrict, SlotLevels, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
 import { mobility } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
@@ -109,3 +109,40 @@ for (const [ports, aircraft, pods, walkers] of [[1, 3, 12, 160], [3, 17, 18, 100
 updateActors(presets.neutral, 20);
 names.forEach((name, i) => assert.deepEqual([...fleet(name).instanceMatrix.array], legacyMatrices[i], `${name} restores legacy matrices`));
 console.log('PASS: actual P2 actor matrices match low/mixed/high independently of day mood; original standalone/legacy poses restored.');
+
+const sharing = new SharingDistrict(new T.Scene());
+sharing.setTarget({ sharedSeats: 2 }, 0, true);
+assert.equal(sharing.getDiagnostics().visiblePrivateRooms, sharing.bays.length);
+assert.equal(sharing.getDiagnostics().visibleOpenRooms, 0);
+sharing.setTarget({ sharedSeats: 7 }, 1, false);
+sharing.update(2.5);
+const screens = sharing.root.getObjectByName('sharing-private-gardens') as T.InstancedMesh;
+const matrix = new T.Matrix4(), scale = new T.Vector3();
+screens.getMatrixAt(0, matrix); scale.setFromMatrixScale(matrix);
+assert.equal(scale.y, 14, 'private wall lowers halfway through the 3-second transition');
+assert.equal(sharing.setTarget({ sharedSeats: 7 }, 2.5, false), false);
+sharing.update(4);
+assert.equal(sharing.getDiagnostics().visibleOpenRooms, sharing.bays.length);
+assert.equal(sharing.getDiagnostics().visiblePrivateRooms, 0);
+for (const object of sharing.root.children) {
+  const mesh = object as T.InstancedMesh;
+  for (let i = 0; i < mesh.count; i++) {
+    mesh.getMatrixAt(i, matrix);
+    assert.ok(matrix.determinant() > 0, 'hidden parts keep invertible matrices for G-buffer normals');
+  }
+}
+sharing.setTarget({ sharedSeats: 0 }, 5, false); sharing.update(6);
+screens.getMatrixAt(0, matrix); scale.setFromMatrixScale(matrix); const interruptedHeight = scale.y;
+sharing.setTarget({ sharedSeats: 4 }, 6, false);
+screens.getMatrixAt(0, matrix); scale.setFromMatrixScale(matrix);
+assert.equal(scale.y, interruptedHeight, 'retarget does not jump');
+sharing.update(9);
+const hybrid = sharing.getDiagnostics();
+assert.ok(hybrid.visibleOpenRooms > 0 && hybrid.visiblePrivateRooms > 0);
+assert.equal(hybrid.visibleOpenRooms + hybrid.visiblePrivateRooms, hybrid.rooms);
+sharing.setTarget({ sharedSeats: 8 }, 10, true);
+assert.equal(sharing.getDiagnostics().visibleOpenRooms, hybrid.rooms, 'snapshot/reset is immediate');
+sharing.hide(); sharing.update(20);
+assert.equal(sharing.root.visible, false);
+assert.equal(sharing.getDiagnostics().visibleOpenRooms + sharing.getDiagnostics().visiblePrivateRooms, 0);
+console.log(`PASS: sharing — ${hybrid.rooms} water gardens, actual screen matrices, mixed, same target, interruption, snapshot and legacy hide.`);

@@ -1,7 +1,7 @@
 # meter-variety — Readable, district-wide Meter changes
 
-- Owner: cc100053 (P0/P1: Claude Code; P2: this Codex session)
-- Status: IN_PROGRESS — P0 + P1 + P2 implemented; P3–P5 planned; P6 evidence recorded per stage
+- Owner: cc100053 (P0/P1: Claude Code; P2/P3: this Codex session)
+- Status: IN_PROGRESS — P0 + P1 + P2 + P3 implemented; P4–P5 planned; P6 evidence recorded per stage
 - Branch: `feat/meter-variety`
 - Base commit: `33227a687ac9d18281e90494a4e9b2ce27f861ce`
 - Last verified commit: P2 implementation `d03efa7e7ec2afb871e9bbac82b278b940a4e2fa` (local checks, lossless captures, real WebSocket browser smoke and feature CI PASS)
@@ -28,7 +28,7 @@ Each Meter keeps its site as the focal anchor and additionally drives 2–3 larg
 | P0 | DEV `?meters=` + `window.cityMeters()`, `scripts/meter-diff.py` | done |
 | P1 | Environment: promenade sails/pergolas, mist towers, roof sails/forest, facade louvres/planted bays | done |
 | P2 | Automation: drones, pods, walker density, staffed pavilions | done; local/browser/feature CI passed |
-| P3 | Sharing: floating decks as private pods vs open steps, water rooms | planned |
+| P3 | Sharing: floating decks as private pods vs open steps, water rooms | done; local/browser passed; feature CI pending |
 | P4 | Concentration: context tower crowns vs scattered pavilion pods | planned |
 | P5 | Change-moment pulse in the Meter's colour | planned |
 | P6 | Pipeline diagnostics, docs, draw-call measurement | per stage |
@@ -78,6 +78,27 @@ Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920�
 - P2 implementation `d03efa7e7ec2afb871e9bbac82b278b940a4e2fa` pushed to `origin/feat/meter-variety`; [feature CI 36840452458](https://github.com/cc100053/city2127/actions/runs/36840452458) PASS (root, survey, module-swap and committed-diff whitespace). Self-review includes all source/tests/docs and five new lossless captures. `git diff --check origin/main...HEAD` passed.
 - Latest fetched `origin/main` remains `33227a6`; no upstream-only work or task-branch divergence. No main integration: the existing capture-review-before-main condition remains. This closure is documentation only.
 
+## P3 — Sharing (2026-10-01)
+
+- Preflight: resumed `feat/meter-variety` at `6f2bd3563f881bfb505a0e7eba6e33485a9dcbdb`, clean; fetched origin successfully; task branch vs remote **0/0**. `origin/main` remained `33227a6` (three task commits, no main-only work). P0–P2 and the handoff are available remotely. Owner remains cc100053; this Codex session owns P3 source/captures, with no overlapping dirty modules/assets. No automatic upstream integration.
+- `SharingDistrict` in `src/districtMeters.ts` is held by the SW built site. The manager applies `sharedSeats / 8`, updates it and hides it on legacy v1. `src/waterRooms.ts` shares the existing shore-island position/boat-exclusion calculation with `skyways`, without changing standalone island geometry. No server contract or actor route changes.
+- **14 rooms**: eleven existing planted waterfall islands and three existing crescent/floating-deck rooms. Low (2 seats): 14 rose ceramic private garden pods; mixed (4): 10 private / 4 open; high (7): 14 open waterfront commons. Zero and endpoints remain fully developed. Private canopies are 28 m high, with a top oculus and landward entry; open rooms have three seating tiers expanding to 1.24× their rim radius. A warm rose rim remains in both modes. Existing gardens, waterfalls, plates and footbridges remain. The three deck rooms retain their authored elliptical footprint.
+- Sharing smoothsteps seats 2..7 into a fixed scattered slot order. `SlotLevels` lowers the canopy and expands seating over 3 seconds; snapshots/reset/reduced motion settle immediately, retargeting preserves the current shape. Six instanced batches, three cloned shared finishes, no per-frame geometry, new texture/model/dependency/render pass. Architectural proxies: no occupancy, tide or structural simulation.
+
+### P3 validation
+
+- Root `npm test`, `npm run build`, working-tree `git diff --check`: PASS. Tests cover actual canopy matrices, same target / interruption / snapshot / legacy hide, all 81 real server-answer combinations and manager v2→legacy→v2 restore. Actual room meshes preserve both boat routes with ±6 m beams, pedestrian lanes with ±2.8 m width and their landward entrances at seats 0/4/8. `survey/` and `module-swap/` sources unchanged; existing root bundle-size warning remains.
+- Readability: headless Chrome **154.0.8037.58**, 1920×929 CSS pixels, DPR 1, untouched hero, `?hour=16&reviewTime=20&meters=sw:<band>`; only Q2 differs. Low ↔ high **3.51%** (before P3 at `6f2bd35`: **0.07%**); low ↔ mixed **1.06%**, mixed ↔ high **2.64%**. Night (`hour=21`) low ↔ high **3.32%** (before **0.03%**). Both ≥3% gates pass. Lossless PNGs, any RGB channel changed by >24/255; no camera, clock, lighting or post-process adjustment.
+- Captures: [low](meter-variety-p3-sharing-low.png), [mixed](meter-variety-p3-sharing-mixed.png), [high](meter-variety-p3-sharing-high.png), [night low](meter-variety-p3-sharing-night-low.png), [night high](meter-variety-p3-sharing-night-high.png). Reproduce with `python3 scripts/meter-diff.py docs/handoffs/meter-variety-p3-sharing-low.png docs/handoffs/meter-variety-p3-sharing-high.png` and the night pair.
+- Same-condition full-pipeline draws before → after: day all three bands **1131 → 1155**; night **1137 → 1161**. Six new instanced batches plus existing shadow/G-buffer passes, **+24** submissions. This is a draw-call measurement, not an FPS/hardware acceptance.
+- Browser verification found a completely flattened curved canopy could corrupt G-buffer normals and blacken the scene at high. Hidden matrices now keep a small nonzero scale; a determinant regression and fresh day/night captures verify the correction. Final capture console: existing favicon 404 only; no application/page/shader errors.
+- Real HTTP/WebSocket browser smoke PASS with a fresh retained scratch SQLite: mixed snapshot → Q2-only +1 → observed animated high → same-ID retry → reload high → reset → Q2-only −1 → low → night reload/reset → reduced-motion immediate high → standalone. Other three sites stay mixed; no page exceptions. Scratch DB: `/var/folders/st/ml4_0zfx7g129gh2305ynz5c0000gn/T/city2127-meter-p3-JwCl5g/survey.sqlite`; exhibition DB untouched.
+- PROJECT records SW ownership, shared island positions and runtime behavior; PLAN02/VALIDATION record this stage. README/AGENTS need no edit because startup, UI, server contract and project constraints are unchanged. Not verified: human art acceptance, Windows, controlled real-GPU FPS, exhibition endurance, occupancy/structural engineering. Pixel readability does not establish those.
+
+### P3 Git / CI closure
+
+Pending source commit and feature CI; no main integration under the existing capture-review condition.
+
 ## Next step
 
-P3 (sharing) on this branch, using `SlotLevels` and the same capture/diff gate. P0–P2 remain on the feature branch for capture review; preserve the existing handoff's review-before-main integration condition.
+P4 (concentration) on this branch, using `SlotLevels` and the same capture/diff gate. P0–P3 remain on the feature branch for capture review; preserve the existing review-before-main integration condition.

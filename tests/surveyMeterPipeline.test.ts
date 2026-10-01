@@ -50,6 +50,12 @@ function assertModels(view: ExhibitionCityView) {
   assert.equal(automation.enabled, true);
   assert.equal(automation.targetAutomation, view.layout.automatedPorts / 6);
   assert.ok(Math.abs(manager.automationLevel! - view.layout.automatedPorts / 6) < 1e-7);
+  const sharing = diagnostics.dogenzakaSouth.sharingDistrict!;
+  assert.equal(sharing.enabled, true);
+  assert.equal(sharing.targetSharing, view.layout.sharedSeats / 8);
+  assert.equal(sharing.visibleOpenRooms + sharing.visiblePrivateRooms, sharing.rooms);
+  if (view.layout.sharedSeats <= 2) assert.equal(sharing.visiblePrivateRooms, sharing.rooms);
+  if (view.layout.sharedSeats >= 7) assert.equal(sharing.visibleOpenRooms, sharing.rooms);
 }
 function applyEvent(event: unknown, now: number) {
   const parsed = parseSurveyEvent(event);
@@ -110,5 +116,10 @@ try {
   const reset = await server.request('/api/admin/lifecycle', { command: 'reset-city', confirmation: 'RESET', expectedRevision: readLifecycle(ctx.db).revision });
   assert.equal(reset.status, 200);
   const resetEvent = await next(); assert.equal(resetEvent.type, 'run-reset'); applyEvent(resetEvent, 424);
+  manager.restoreFromSnapshot({ version: 1, runId: 'legacy', revision: 0, history: [],
+    scores: view.scores, layout: { nw: { lot: 'empty', building: 'none' }, ne: { lot: 'empty', building: 'none' },
+      sw: { lot: 'empty', building: 'none' }, se: { lot: 'empty', building: 'none' } } }, 428);
+  assert.equal(manager.getDiagnostics().dogenzakaSouth.sharingDistrict!.enabled, false, 'manager hides sharing in legacy v1');
+  applyEvent(resetEvent, 432);
   console.log(`PASS: ${count} actual answer combinations → client parser → real four-site models; HTTP/WebSocket, retry, snapshot and reset.`);
 } finally { socket.close(); await server.close(); ctx.db.close(); }

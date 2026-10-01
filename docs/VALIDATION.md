@@ -1,5 +1,11 @@
 # Validation and handoff
 
+## Meter variety P3 — 2026-10-01 (`feat/meter-variety`, not integrated)
+
+Root `npm test`, `npm run build` and `git diff --check` passed on the P3 working tree based on `6f2bd35`; survey/module-swap sources unchanged. Checks cover actual canopy transforms (including invertible hidden matrices), live interruption/unchanged targets, immediate snapshots, all 81 real server-answer combinations, v2→legacy→v2 restore, boat beams / walker lanes / landward entrances in all three sharing identities. Browser capture found a zero-height curved-normal rendering failure; nonzero hidden scales fixed it, with a regression and fresh clean captures.
+
+Headless Chrome 154.0.8037.58, 1920×929, DPR 1, original hero, `reviewTime=20`, only Q2 changed via `?meters=sw:<band>`: low ↔ high **3.51%** at 16:00 (before P3 0.07%), **3.32%** at 21:00 (before 0.03%). Day low ↔ mixed 1.06%, mixed ↔ high 2.64%. Full-pipeline draws: day 1131→1155, night 1137→1161 (+24, six instanced batches); no controlled FPS claim. Final console: existing favicon 404 only. Real scratch HTTP/WebSocket browser smoke passed snapshot, observed live transition, same-ID retry, reload, reset, low/night, reduced motion and standalone. Lossless captures, scratch DB and Git/CI closure: [P3 handoff](handoffs/meter-variety.md#p3--sharing-2026-10-01). Human art review, Windows, hardware/endurance and main integration remain pending.
+
 ## Meter variety P2 — 2026-10-01 (`feat/meter-variety`, not integrated)
 
 Root `npm test`, `npm run build` and `git diff --check` passed on P2 implementation `d03efa7` (based on `8b21ae2`); survey/module-swap code unchanged. New checks cover actual instanced actor counts, 160 walker/four-train continuity, unchanged fractional targets during a transition, interruption, reset/legacy restore, all 81 server-answer combinations and actual GLB service-pavilion placement/route clearance. Existing bundle-size warning remains.

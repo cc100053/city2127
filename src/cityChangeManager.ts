@@ -36,6 +36,7 @@ export interface SiteDiagnostic {
   readonly environmentDistrict?: EnvironmentDistrictDiagnostics;
   readonly automationDistrict?: ReturnType<NonNullable<BuiltSite['automationDistrict']>['getDiagnostics']>;
   readonly automationHub?: ReturnType<NonNullable<BuiltSite['automationHub']>['getDiagnostics']>;
+  readonly sharingDistrict?: ReturnType<NonNullable<BuiltSite['sharingDistrict']>['getDiagnostics']>;
   readonly commonsPlaza?: ReturnType<NonNullable<BuiltSite['commonsPlaza']>['getDiagnostics']>;
   readonly concentrationTower?: ReturnType<NonNullable<BuiltSite['concentrationTower']>['getDiagnostics']>;
 }
@@ -113,7 +114,10 @@ export class CityChangeManager {
         automationHub.setTarget({ band: layout.bands.nw, automatedPorts: layout.automatedPorts }, now, immediate),
         this.sites.magnetEast.automationDistrict?.setTarget(layout, now, immediate) ?? false,
       ].some(Boolean)],
-      ['dogenzakaSouth', commonsPlaza.setTarget({ band: layout.bands.sw, sharedSeats: layout.sharedSeats }, now, immediate)],
+      ['dogenzakaSouth', [
+        commonsPlaza.setTarget({ band: layout.bands.sw, sharedSeats: layout.sharedSeats }, now, immediate),
+        this.sites.dogenzakaSouth.sharingDistrict?.setTarget(layout, now, immediate) ?? false,
+      ].some(Boolean)],
       ['centerGaiRear', concentrationTower.setTarget({ band: layout.bands.se, functionModules: layout.functionModules }, now, immediate)],
       ['stationEastPark', [
         park.setTarget(environmentParkTarget(layout), now, immediate),
@@ -142,6 +146,7 @@ export class CityChangeManager {
       ...(this.sites[siteId].environmentDistrict ? { environmentDistrict: this.sites[siteId].environmentDistrict.getDiagnostics() } : {}),
       ...(this.sites[siteId].automationDistrict ? { automationDistrict: this.sites[siteId].automationDistrict.getDiagnostics() } : {}),
       ...(this.sites[siteId].automationHub ? { automationHub: this.sites[siteId].automationHub.getDiagnostics() } : {}),
+      ...(this.sites[siteId].sharingDistrict ? { sharingDistrict: this.sites[siteId].sharingDistrict.getDiagnostics() } : {}),
       ...(this.sites[siteId].commonsPlaza ? { commonsPlaza: this.sites[siteId].commonsPlaza.getDiagnostics() } : {}),
       ...(this.sites[siteId].concentrationTower ? { concentrationTower: this.sites[siteId].concentrationTower.getDiagnostics() } : {}),
     }])) as CityChangeDiagnostics;
@@ -154,6 +159,7 @@ export class CityChangeManager {
     this.sites.magnetEast.automationHub?.update(now);
     this.sites.magnetEast.automationDistrict?.update(now);
     this.sites.dogenzakaSouth.commonsPlaza?.update(now);
+    this.sites.dogenzakaSouth.sharingDistrict?.update(now);
     this.sites.centerGaiRear.concentrationTower?.update(now);
     for (const siteId of SITE_IDS) {
       const motions = this.motions.get(siteId)!;
@@ -239,6 +245,7 @@ export class CityChangeManager {
     this.sites.magnetEast.automationHub?.restoreLegacy();
     this.sites.magnetEast.automationDistrict?.hide();
     this.sites.dogenzakaSouth.commonsPlaza?.restoreLegacy();
+    this.sites.dogenzakaSouth.sharingDistrict?.hide();
     this.sites.centerGaiRear.concentrationTower?.restoreLegacy();
     for (const siteId of SITE_IDS) for (const motion of this.motions.get(siteId)!.values()) motion.fresh = -Infinity;
     this.exhibitionInitialized = false;

@@ -1,5 +1,9 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
+## Meter variety P3 — 2026-10-01，feature branch 待視覺審閱
+
+sharing Meter 現在控制 14 個既有水岸房間：低值用帶天窗、岸側入口的玫瑰陶瓷私密花園 pods，高值展開三層公共階梯，混合值保留兩種空間。原有花園、瀑布、浮台和通道保留；沒有改鏡位、日夜或問卷規則。固定 hero 日／夜差異 **3.51%／3.32%**，均過 3% 可讀性門檻；實際船道／步道及 live server 檢查通過。截圖、驗證與限制見 [P3 交接](handoffs/meter-variety.md#p3--sharing-2026-10-01)。可讀性不等於美術、結構或 FPS 驗收；保留既有 capture review 後才整合 main 的條件。
+
 ## Meter variety P2 — 2026-10-01，feature branch 待視覺審閱
 
 `feat/meter-variety` 的自動化 Meter 現在改變街區交通與服務模式：低值用 11 個高架有人服務亭、較多人流；高值保留成熟城市和基本人流，以更多軌道 pods、空中載具及較清晰的 mint 空中導引線呈現自律服務。零值是混合模式，沿用固定 hero、日夜、既有路線和 3 秒過渡。程式及實際模型位置／路線檢查通過；最終像素量度、截圖、browser smoke 和 Git/CI 證據見 [交接](handoffs/meter-variety.md#p2--automation-2026-10-01)。可讀性量度不等於人類美術或 FPS 驗收；按既有 handoff 保留在 feature branch 待 capture review。

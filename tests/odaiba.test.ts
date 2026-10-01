@@ -12,7 +12,7 @@ import { bake } from '../src/cityRig.ts';
 import { contextFacades } from '../src/contextFacades.ts';
 import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from '../src/coastalCanopy.ts';
 import { amphibiousShore, tidalEdge } from '../src/amphibiousShore.ts';
-import { AutomationDistrict } from '../src/districtMeters.ts';
+import { AutomationDistrict, SharingDistrict } from '../src/districtMeters.ts';
 import { bayContext } from '../src/bayContext.ts';
 
 const layout = JSON.parse(readFileSync(new URL('../src/odaiba-layout.json', import.meta.url), 'utf8'));
@@ -226,3 +226,27 @@ for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promen
   }
 }
 console.log(`Odaiba: ${serviceDistrict.bays.length} raised staffed pavilions clear context and actor routes; piers land on open ground.`);
+
+// Both water-room identities preserve boat beams, promenade lanes and the landward entrance.
+const sharingDistrict = new SharingDistrict(new Group());
+for (const seats of [0, 4, 8]) {
+  sharingDistrict.setTarget({ sharedSeats: seats }, 0, true);
+  sharingDistrict.root.updateMatrixWorld(true);
+  for (const route of [actorPaths.water, actorPaths.ferry, ...actorPaths.promenades]) for (let i = 0; i <= 400; i++) {
+    const p = route.getPointAt(i / 400), beam = route === actorPaths.water || route === actorPaths.ferry ? 6 : 2.8;
+    route.getTangentAt(i / 400, tangent);
+    for (const lane of [-beam, 0, beam]) {
+      const position = p.clone().addScaledVector(side.crossVectors(up, tangent).normalize(), lane);
+      ray.set(position.setY(80), down);
+      assert.equal(ray.intersectObject(sharingDistrict.root, true).length, 0, `sharing ${seats} obstructs boat / pedestrian route`);
+    }
+  }
+  for (const bay of sharingDistrict.bays) {
+    const outward = new Vector3(Math.cos(bay.yaw), 0, -Math.sin(bay.yaw));
+    const start = new Vector3(bay.x, bay.y + 1, bay.z).addScaledVector(outward, bay.r * bay.sx * 1.3);
+    ray.set(start, outward.clone().negate()); ray.far = bay.r * bay.sx * .5;
+    assert.equal(ray.intersectObject(sharingDistrict.root, true).length, 0, 'landward entrance stays open');
+    ray.far = Infinity;
+  }
+}
+console.log(`Odaiba: ${sharingDistrict.bays.length} private / open water rooms preserve boat beams, walker lanes and landward access.`);

@@ -1,6 +1,7 @@
 import * as T from 'three';
-import { bake, box, glass, leaf, leafyCrown, publicLight, trail, trim } from './cityRig.ts';
-import { changeSites, seaward } from './layout.ts';
+import { arc, bake, box, glass, leaf, leafyCrown, publicLight, stone, trail, trim } from './cityRig.ts';
+import { changeSites, floatingDecks, seaward } from './layout.ts';
+import { shoreRoomBays } from './waterRooms.ts';
 import { automationActivity, routes } from './mobility.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 import type { ExhibitionLayout } from './surveyView.ts';
@@ -53,6 +54,82 @@ export class SlotLevels {
 
 /** Fixed pseudo-random rank per slot, so a share of slots switches in a scattered rather than end-to-end order. */
 const rank = (i: number) => { const s = Math.sin(i * 12.9898 + 4.1) * 43758.5453; return s - Math.floor(s); };
+
+/** Existing planted islands become screened water gardens or open, stepped waterfront commons. */
+export class SharingDistrict {
+  readonly root = new T.Group();
+  readonly bays = [
+    ...shoreRoomBays().map(b => ({ x: b.x, z: b.z, yaw: b.yaw, r: b.r + 1.5, y: 2.8, sx: 1, sz: 1 })),
+    ...floatingDecks.map(([x, z, yaw]) => ({ x, z, yaw, r: 19, y: 2.3, sx: .8, sz: 1.12 })),
+  ];
+  private readonly levels = new SlotLevels(this.bays.length);
+  private readonly screens: T.InstancedMesh;
+  private readonly rims: T.InstancedMesh;
+  private readonly skylights: T.InstancedMesh;
+  private readonly steps: T.InstancedMesh[];
+  private readonly dummy = new T.Object3D();
+  private target = .5;
+
+  constructor(parent: T.Object3D) {
+    this.root.name = 'sharing-district';
+    const privacy = trim.clone(); privacy.color.set('#d5b7aa'); privacy.emissive.set('#b98274'); privacy.emissiveIntensity = .45; privacy.side = T.DoubleSide;
+    const commons = stone.clone(); commons.emissive.set('#eac0b2'); commons.emissiveIntensity = .3;
+    const light = publicLight.clone(); light.emissive.set('#ffa9b1'); light.emissiveIntensity = 1.8;
+    const instance = (geometry: T.BufferGeometry, material: T.Material, name: string) => {
+      const mesh = new T.InstancedMesh(geometry, material, this.bays.length);
+      mesh.name = name; mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;
+      mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); this.root.add(mesh); return mesh;
+    };
+    // The landward gap aligns with each existing footbridge; the garden and waterfalls remain inside.
+    this.screens = instance(new T.SphereGeometry(1, 64, 24, Math.PI + .3, Math.PI * 2 - .6, .18, Math.PI / 2 - .18), privacy, 'sharing-private-gardens');
+    const ring = (inner: number, outer: number, height: number, material: T.Material, name: string) => {
+      const source = arc(new T.Group(), inner, outer, height, [0, 0, 0], material, .3, Math.PI * 2 - .6);
+      return instance(source.geometry, material, name);
+    };
+    this.rims = ring(.99, 1.025, .025, light, 'sharing-room-rims');
+    this.skylights = ring(.17, .19, .012, light, 'sharing-private-skylights');
+    this.steps = Array.from({ length: 3 }, (_, i) => ring(1 + i * .08, 1.08 + i * .08, .045, commons, 'sharing-open-steps'));
+    this.root.visible = false; parent.add(this.root); this.write();
+  }
+
+  setTarget(layout: Pick<ExhibitionLayout, 'sharedSeats'>, now: number, immediate: boolean): boolean {
+    this.target = layout.sharedSeats / 8;
+    // The first low / high proposals (2 / 7 seats) already read as distinct mature alternatives.
+    const share = T.MathUtils.smoothstep(this.target, .25, .875);
+    this.root.visible = true;
+    const changed = this.levels.setTargets(i => rank(i + 401) < share ? 1 : 0, now, immediate);
+    this.write(); return changed;
+  }
+
+  update(now: number): void { if (this.levels.update(now)) this.write(); }
+  hide(): void { this.root.visible = false; }
+  getDiagnostics() {
+    const open = this.root.visible ? this.levels.visible() : 0;
+    return { enabled: this.root.visible, targetSharing: this.target, rooms: this.bays.length,
+      visibleOpenRooms: open, visiblePrivateRooms: this.root.visible ? this.levels.value.filter(v => 1 - v > HIDDEN).length : 0 };
+  }
+
+  private write(): void {
+    this.bays.forEach((bay, i) => {
+      const open = this.levels.value[i], height = 28 * (1 - open);
+      // Keep hidden matrices invertible: flattened curved normals otherwise poison the G-buffer / SSR.
+      const privateScale = Math.max(HIDDEN, 1 - open), publicScale = Math.max(HIDDEN, open);
+      this.dummy.position.set(bay.x, bay.y, bay.z); this.dummy.rotation.set(0, bay.yaw, 0);
+      this.dummy.scale.set(bay.r * bay.sx, Math.max(HIDDEN, height), bay.r * bay.sz); this.dummy.updateMatrix();
+      this.screens.setMatrixAt(i, this.dummy.matrix);
+      this.dummy.scale.y = bay.r; this.dummy.updateMatrix(); this.rims.setMatrixAt(i, this.dummy.matrix);
+      this.dummy.position.y = bay.y + height * Math.cos(.18);
+      this.dummy.scale.set(bay.r * bay.sx * privateScale, bay.r * privateScale, bay.r * bay.sz * privateScale);
+      this.dummy.updateMatrix(); this.skylights.setMatrixAt(i, this.dummy.matrix);
+      this.steps.forEach((mesh, tier) => {
+        this.dummy.position.y = bay.y + tier * .7;
+        this.dummy.scale.set(bay.r * bay.sx * publicScale, bay.r * publicScale, bay.r * bay.sz * publicScale);
+        this.dummy.updateMatrix(); mesh.setMatrixAt(i, this.dummy.matrix);
+      });
+    });
+    for (const mesh of [this.screens, this.rims, this.skylights, ...this.steps]) mesh.instanceMatrix.needsUpdate = true;
+  }
+}
 
 /** Shared curtain-wall uniforms (odaibaScene.ts): share of facade bays planted (canopy) or louvred (active cooling). */
 export const facadeClimate = { green: { value: 0 }, louvre: { value: 0 } };
