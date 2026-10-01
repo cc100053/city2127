@@ -33,7 +33,7 @@ export const ferryLane: readonly P3[] = [[-230,-.6,-290],[-420,-.6,-470],[-760,-
 export const bayCruisers: readonly (readonly [number,number,number])[] = [
   [-300,-560,.9],[-120,-620,-2.2],[-560,-430,2.6],[40,-600,-.4],[-640,-300,.3],[-700,250,1.4],[-650,-40,-1.7],[-150,1420,1.2],[250,1480,-1.9],
   // Nearer the hero pose: the foreground bay reads busy with taxis, as in the 2127 target (runs checked clear of the north shore).
-  [100,-470,1.93],[-160,-470,.95],[-330,-420,-.6],[-40,-560,2.3],[-500,-500,1.2],[260,-620,-1.6],
+  [100,-470,1.93],[-160,-470,.95],[-250,-380,-.9],[-330,-420,-.6],[-40,-560,2.3],[-500,-500,1.2],[260,-620,-1.6],
   // Open water south-west of the island, upper right of the hero frame.
   [133,1442,.4],[-333,908,2.1],[797,1695,-1],[-250,1180,1.1],
 ];

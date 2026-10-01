@@ -91,7 +91,7 @@ export function mobility(scene:T.Scene) {
   // 2127 white trains with a dark glass band (target v2), lightly warm/cool per train.
   for(let i=0;i<TRAINS*CARS;i++)pods.tint(i,body,i<CARS?'#f4f3ee':'#e9eef0');
   // Sweep train: four cars shuttling on the descending skyway, pitched with the deck.
-  const SWEEP_CARS=4,sweepLength=path.sweep.getLength(),sweepPods=fleet(scene,podParts(),SWEEP_CARS,'sweep-pods');
+  const SWEEP_CARS=4,SWEEP_SCALE=1.7,sweepLength=path.sweep.getLength(),sweepPods=fleet(scene,podParts(),SWEEP_CARS,'sweep-pods');
   for(let i=0;i<SWEEP_CARS;i++)sweepPods.tint(i,body,'#f6f5f1');
   // People: capsule torso and limbs, round head and hair; clothes, skin and hair vary per person from a muted palette (no saffron).
   const coats=material('#ffffff'),skin=material('#ffffff'),hair=material('#ffffff'),trousers=material('#3d4a52');
@@ -128,8 +128,9 @@ export function mobility(scene:T.Scene) {
       place(path.guideway,u,!forward);pose.scale.setScalar(T.MathUtils.smoothstep(state.traffic*.5+.5-train*.3,0,.1));pods.set(train*CARS+car,pose);
     }pods.flush();
     for(let car=0;car<SWEEP_CARS;car++){
-      const {u,forward}=podPose(time+20,0,car,sweepLength);
-      place(path.sweep,u,!forward);pose.rotation.x=-Math.asin(T.MathUtils.clamp(tangent.y,-1,1));pose.scale.setScalar(T.MathUtils.smoothstep(state.traffic*.5+.5,0,.1));sweepPods.set(car,pose);
+      // Drawn at SWEEP_SCALE so the train reads at hero distance; the shortened length spaces the cars by the same factor.
+      const {u,forward}=podPose(time+20,0,car,sweepLength/SWEEP_SCALE);
+      place(path.sweep,u,!forward);pose.rotation.x=-Math.asin(T.MathUtils.clamp(tangent.y,-1,1));pose.scale.setScalar(SWEEP_SCALE*T.MathUtils.smoothstep(state.traffic*.5+.5,0,.1));sweepPods.set(car,pose);
     }sweepPods.flush();
     for(let i=0;i<WALKERS;i++){
       const w=walkerPose(time,i),amount=T.MathUtils.smoothstep(state.crowd*.8+.2-i/WALKERS,-.05,.05);

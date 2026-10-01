@@ -141,8 +141,12 @@ function shoreTerraces(root: T.Object3D) {
       arc(c, 0, r * .6 - .4, .3, [0, 2.6 + L, 0], leaf);
       for (let k = 0; k < 6; k++) {
         const a = k * 1.05 + n, rr = k < 2 ? r * .25 : r * .75, top = (k < 2 ? 2.9 : .65) + L, s = 1.6 + (k % 3) * .5;
-        const trunk = new T.Mesh(pole, trim); trunk.scale.set(.25, 2.2, .25); trunk.position.set(Math.cos(a) * rr, top + 1.1, Math.sin(a) * rr); c.add(trunk);
-        const tree = new T.Mesh(crown, (k + n) % 4 === 0 ? cherry : leaf); tree.position.set(Math.cos(a) * rr, top + 2.2 + s * .7, Math.sin(a) * rr); tree.scale.set(s * 1.2, s, s * 1.2); c.add(tree);
+        // Mostly palms (target v2's seaside palms): a tall slim trunk under a wide, flat crown; every fourth tree a round cherry.
+        const palm = (k + n) % 4 !== 0, h = palm ? 5.5 + (k % 2) * 1.5 : 2.2;
+        const trunk = new T.Mesh(pole, trim); trunk.scale.set(palm ? .3 : .25, h, palm ? .3 : .25); trunk.position.set(Math.cos(a) * rr, top + h / 2, Math.sin(a) * rr); c.add(trunk);
+        const tree = new T.Mesh(crown, palm ? leaf : cherry); tree.position.set(Math.cos(a) * rr, top + h + (palm ? .3 : s * .7), Math.sin(a) * rr);
+        if (palm) tree.scale.set(s * 1.5, s * .4, s * 1.5); else tree.scale.set(s * 1.2, s, s * 1.2);
+        c.add(tree);
       }
       // Waterfalls on the seaward side: an upper sheet onto the drum, then three wide sheets down the drum into the sea, each with foam.
       const fall = new T.Group(); fall.rotation.y = -c.rotation.y; c.add(fall);

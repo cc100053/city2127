@@ -28,9 +28,9 @@ const environmentFinish: Record<string, [color: string, roughness: number, metal
   context_unknown: ['#e3dccf', .9, 0], context_office_commercial: ['#dfd8ca', .85, 0], context_utility_service: ['#d8d4c9', .9, 0], context_public_cultural: ['#e2dbcd', .9, 0],
 };
 
-// 2127 retrofit by material: mall roofs become planted, hotel roofs photovoltaic, stark white cladding warm ceramic; no extra geometry.
+// 2127 retrofit by material: mall roofs become planted, hotel roofs pale ceramic terraces (r5 pass 2: target v2 has no blue metal roofs), stark white cladding warm ceramic; no extra geometry.
 const roofRetrofit: Record<string, [color: string, roughness: number, metalness: number]> = {
-  'Roof and Shadow': ['#7d9f68', .85, 0], 'Standing seam roof.001': ['#486b83', .3, .85], 'Gray roof metal': ['#486b83', .3, .85],
+  'Roof and Shadow': ['#7d9f68', .85, 0], 'Standing seam roof.001': ['#e6ddcc', .55, .05], 'Gray roof metal': ['#e6ddcc', .55, .05],
   'PCa_Panel_OffWhite': ['#e4d9c5', .62, 0], 'Facade_White': ['#e2d8c6', .6, 0],
   'Warm Ivory Structure': ['#e8dcc8', .6, 0], 'Pale balcony slab and crown': ['#e9dfcd', .6, 0], 'Light vertical piers.001': ['#ebe0cd', .6, 0],
 };
@@ -60,7 +60,7 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
   };
   material.customProgramCacheKey = () => 'curtain-wall';
 }
-const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a'), dayGlow = .34;
+const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a'), dayGlow = .42; // r5 pass 2: warmer lit bands by day (target v2's golden hotel glazing)
 /** Retained landmark glazing glows warm, strongest at night; the civic chassis uses the shared city finishes. */
 export function updateOdaiba(night: number) {
   // A faint daytime glow keeps the dark glazing reading as occupied, warm interiors (CITY_MASTER_TASTE) instead of voids.

@@ -26,18 +26,17 @@ export function contextFacades(environment: T.Object3D) {
           occupied.add(key);
           transform.position.copy(point).addScaledVector(normal, .045);
           transform.quaternion.setFromUnitVectors(forward, normal);
-          // Glass-dominant bays (thin mullions, a slim spandrel) so towers read as curtain-wall glass, not dotted masonry.
-          transform.scale.set(3.6, 3.15, 1);transform.updateMatrix();panels.push(transform.matrix.clone());
+          // r5 pass 2: one even glass grid per tower (target v2) — full-width panes, thin mullions and a 1.1 m pale floor band between storeys.
+          transform.scale.set(3.75, 2.9, 1);transform.updateMatrix();panels.push(transform.matrix.clone());
           const row = Math.floor(y / 4), col = Math.floor(u / 4);
-          // Even sky-blue glazing; lit warm rooms come in runs of three bays on about one storey-run in six (2127 target: golden interiors).
-          const lit = Math.abs(Math.sin(row * 12.9898 + Math.floor(col / 3) * 78.233) * 43758.5453) % 1 < .12;
-          // r4 pass 4: paler, cooler glass so the context towers read as light curtain walls (target v2), not beige-speckled masonry.
-          shades.push(lit ? new T.Color().setHSL(.1, .55, .74) : new T.Color().setHSL(.56, .2, .6 + Math.abs(row * 7 + col * 3) % 5 * .018));
+          // Lit warm rooms come as whole floor runs of eight bays on about one storey in seven; the rest is uniform blue-grey glass.
+          const lit = Math.abs(Math.sin(row * 12.9898 + Math.floor(col / 8) * 78.233) * 43758.5453) % 1 < .14;
+          shades.push(lit ? new T.Color().setHSL(.09, .5, .64) : new T.Color().setHSL(.57, .17, .45 + (row % 2) * .015));
         }
       }
     }
   });
-  const mesh = new T.InstancedMesh(new T.PlaneGeometry(1, 1), new T.MeshStandardMaterial({color: '#ffffff', roughness: .22, metalness: .3}), panels.length);
+  const mesh = new T.InstancedMesh(new T.PlaneGeometry(1, 1), new T.MeshStandardMaterial({color: '#ffffff', roughness: .2, metalness: .3}), panels.length);
   panels.forEach((matrix, i) => {mesh.setMatrixAt(i, matrix);mesh.setColorAt(i, shades[i]);});
   mesh.name = 'context-recessed-facades';mesh.receiveShadow = true;
   return mesh;
