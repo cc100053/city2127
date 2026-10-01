@@ -8,6 +8,10 @@
 
 都市集約 Meter 現在改變 district 嘅 skyline：高值喺 SE site 旁、DECKS 海濱同西面草地升起 10 座淡藍玻璃塔（100–140 m，兩層有植栽同暖光嘅 sky lobby，相近嘅塔有 sky bridge 相連）；低值喺同一片草地散佈 26 個低層玻璃 pod；混合值各保留約一半。夜晚塔身按樓層亮暖光窗格。固定 hero 日／夜差異 **4.47%／3.81%**（P4 前 0.38%／0.29%），均過 3% 門檻；實際地面、建築、路線、site 可見度檢查通過。截圖與限制見 [P4 交接](handoffs/meter-variety.md#p4--concentration-2026-10-01)。可讀性不等於美術、結構或 FPS 驗收；保留 capture review 後才整合 main 的條件。
 
+## Meter variety P3d — 2026-10-01，海邊收細＋內陸共享庭院
+
+海邊只留 6 個 room（3 玻璃圓頂、3 綠化花園島），3 個浮台連新月形水上房間拎走；內陸加 10 個 40 m 共享庭院（私人：白牆花園＋玻璃房；公共：鋪地廣場＋白色傘蓋）。sharing 日／夜差異 **1.63%／1.85%**，用家決定接受低過 3% 門檻以換取較靜的海岸。詳見 [P3d 交接](handoffs/meter-variety.md#p3d--calmer-shore-and-inland-sharing-courts-2026-10-01)。
+
 ## Meter variety P3c — 2026-10-01，sharing 收細＋光環廣場
 
 玻璃圓頂減到 7 個，肋改象牙白，rose 只留底邊同天窗；高 sharing 改為階梯廣場同綠化「光環頂棚」交替，頂棚下浮台夜晚亮燈。日／夜差異 **3.30%／3.84%**。詳見 [P3c 交接](handoffs/meter-variety.md#p3c--fewer-calmer-vaults-and-halo-commons-2026-10-01)；美術驗收待審。

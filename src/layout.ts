@@ -65,7 +65,6 @@ export const skyBridges: readonly {name:string;from:P3;to:P3}[] = [
   {name:'AQUA ↔ DECKS',from:[31,24,-177],to:[90,24,-216]},
 ];
 // Floating decks off the east promenade: [x, z, yaw], 10 × 36 m, long axis along the shore; on water and 30 m from boat routes.
-export const floatingDecks: readonly (readonly [number,number,number])[] = [[-62,-281,-1.12],[-131,-238,-1.03],[-180,-199,-1.02]];
 // North shore: seaward edge of COAST_REVETMENT from the DECKS pier west past Hilton, traced from the district GLB (x, z). The tidal edge steps down into the sea from it.
 // Dream Loop r2: east of the DECKS pier the backdrop ground is cut back to `seaward` (open bay), and the tidal edge follows that cut first.
 export const northShore: readonly (readonly [number,number])[] = [

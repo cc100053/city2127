@@ -33,7 +33,7 @@ Each Meter keeps its site as the focal anchor and additionally drives 2–3 larg
 | P5 | Change-moment pulse in the Meter's colour | done; local/browser checks passed |
 | P6 | Pipeline diagnostics, docs, draw-call measurement | per stage |
 
-Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920×929 hero frame (`scripts/meter-diff.py`), day and night.
+Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920×929 hero frame (`scripts/meter-diff.py`), day and night. Exception (user, 2026-10-01): sharing accepted at ~1.6–1.9 % for a calmer shore (P3d).
 
 ## P0 + P1 implementation
 
@@ -151,6 +151,16 @@ Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920�
 - Root `npm test` (new checks: 7 vaults, glass only on vaulted rooms, steps / halos alternate when open), `npm run build`, `git diff --check`: PASS; boat beams, walker lanes and landward entrances recheck the new halos.
 - Readability (same conditions as P3b, repeat noise 0.02 %): low ↔ high **3.30 %** day, **3.84 %** night; low ↔ mixed 0.90 %, mixed ↔ high 2.48 %. Captures: [low](meter-variety-p3c-sharing-low.png), [mixed](meter-variety-p3c-sharing-mixed.png), [high](meter-variety-p3c-sharing-high.png), [night low](meter-variety-p3c-sharing-night-low.png), [night high](meter-variety-p3c-sharing-night-high.png). P3b captures remain as history.
 - Batches vs P3b: rib + beam merged (−1), four halo batches (+4); draw calls not re-measured. Not verified: human art acceptance, real-GPU FPS, Windows.
+
+## P3d — Calmer shore and inland sharing courts (2026-10-01)
+
+- User review of P3c: too many waterfront structures; keep three glass vaults and three garden islands. The user also removed the three floating decks (and their `amphibiousShore` crescents) from the venue, standalone included.
+- `waterRooms.ts` keeps six evenly spread shore islands (`ROOMS`); `floatingDecks`, `amphibiousShore()` and the deck plates in `odaiba2127.ts` are deleted; `tidalEdge` now runs continuously past the former deck site. Sharing rooms 0/2/4 carry vaults (steps when open), 1/3/5 stay garden islands (halo canopies when open).
+- Six rooms halved the change: 1.37 % day / 1.47 % night. A sky-gallery carrier on the plain skyway links (glazed galleries vs sky parks) added only 0.17 % and was discarded. The user chose inland courts: ten 40 m `COURT_SITES` from a scan (`SCAN_COURTS=20`) of open ground clear of context, routes, P2 pavilions and P4 towers / pods, centre visible from the hero pose. Private: 2.4 m ivory walls with an entrance gap, a glass garden room, six crowns; open: pale paving and three white funnel parasols about 10 m up. Courts add about 0.3 %: most inland ground is occluded by landmarks from the hero pose; a 2× bolder court only reached 1.72 %.
+- **User decision (2026-10-01): sharing is accepted below the 3 % gate** in exchange for a calmer shore.
+- Root `npm test` (new: court ground / clearance / route / site-visibility checks in both identities; six rooms, three vaults), `npm run build`, `git diff --check`: PASS.
+- Readability (same conditions, only Q2 changes): low ↔ high **1.63 %** day, **1.85 %** night; low ↔ mixed 0.91 %, mixed ↔ high 0.77 %. Captures: [low](meter-variety-p3d-sharing-low.png), [mixed](meter-variety-p3d-sharing-mixed.png), [high](meter-variety-p3d-sharing-high.png), [night low](meter-variety-p3d-sharing-night-low.png), [night high](meter-variety-p3d-sharing-night-high.png), [standalone](meter-variety-p3d-sharing-standalone.png).
+- Batches: +5 court batches; the deck plates / crescents merged meshes are gone. Draw calls not re-measured. Not verified: close-up court review (hero only), human art acceptance, real-GPU FPS, Windows.
 
 ## Next step
 

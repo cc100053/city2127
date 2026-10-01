@@ -4,14 +4,14 @@ import { createHash } from 'node:crypto';
 import { Box3, Group, InstancedMesh, Matrix4, Mesh, Raycaster, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
-import { changeSites, skyBridges, floatingDecks, inDistrict, DISTRICT } from '../src/layout.ts';
+import { changeSites, skyBridges, inDistrict, DISTRICT } from '../src/layout.ts';
 import { heroCamera } from '../src/heroCamera.ts';
 import { routes } from '../src/mobility.ts';
 import { civicCore } from '../src/civicCore.ts';
 import { bake } from '../src/cityRig.ts';
 import { contextFacades } from '../src/contextFacades.ts';
 import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from '../src/coastalCanopy.ts';
-import { amphibiousShore, tidalEdge } from '../src/amphibiousShore.ts';
+import { tidalEdge } from '../src/amphibiousShore.ts';
 import { AutomationDistrict, ConcentrationDistrict, SharingDistrict } from '../src/districtMeters.ts';
 import { bayContext } from '../src/bayContext.ts';
 
@@ -105,13 +105,11 @@ assert.ok(environment.getObjectByName('CTX_south_east_unknown') && environment.g
 const panels=contextFacades(environment);
 assert.ok(panels.count>100, 'Context facades have occupied panel rows');
 { const m = new Matrix4(), c = new Vector3(); for (let i = 0; i < panels.count; i++) { panels.getMatrixAt(i, m); c.setFromMatrixPosition(m); assert.ok(inDistrict(c.x, c.z), 'Facade panels stay inside the district'); } }
-const shore=amphibiousShore();
-assert.ok(shore.children.length<=6, 'Tidal terraces batch by shared finish');
 const edge=tidalEdge();
 assert.ok(edge.children.length>0 && edge.children.length<=5, 'North tidal edge batches by shared finish');
 const bay=bayContext();
 assert.ok(bay.children.length<=5, 'Bay bridges, shores and Ariake parkland batch by finish; skyline is one instanced draw');
-city.add(environment,panels,shore,edge,bay);
+city.add(environment,panels,edge,bay);
 plantCanopy(city, JSON.parse(readFileSync(new URL('../asset/models/odaiba-masterplan/tree_instances.json', import.meta.url), 'utf8')));
 const groveStart=city.children.length;
 plantLandscapeCanopy(city,environment,landmarks);
@@ -183,19 +181,8 @@ for (const bridge of skyBridges) {
     for (let j = 0; j <= 400; j++) { const g = actorPaths.guideway.getPointAt(j / 400); if (Math.hypot(g.x - p.x, g.z - p.z) < 8) assert.ok(p.y - 2.5 - (g.y + 3) > 3, `${bridge.name} too low over the guideway`); }
   }
 }
-const boatPoints = [actorPaths.water, actorPaths.ferry].flatMap(route => Array.from({ length: 400 }, (_, i) => route.getPointAt(i / 400)));
-for (const [x, z, yaw] of floatingDecks) {
-  const along = new Vector3(Math.sin(yaw), 0, Math.cos(yaw)), across = new Vector3(along.z, 0, -along.x);
-  for (const [u, v] of [[-18, -5], [18, -5], [-18, 5], [18, 5], [0, 0]]) {
-    const p = new Vector3(x, 0, z).addScaledVector(along, u).addScaledVector(across, v);
-    ray.set(new Vector3(p.x,500,p.z),down);
-    const hit=ray.intersectObject(environment,true)[0];
-    assert.ok(!hit || /^WATER/.test(hit.object.name), `floating deck at ${x},${z} grounds on ${hit?.object.name}`);
-  }
-  assert.ok(Math.min(...boatPoints.map(p => Math.hypot(p.x - x, p.z - z))) > 30, `floating deck at ${x},${z} sits in a boat route`);
-}
 console.log('Odaiba: hero district keeps six landmarks and four sites; street detail, trees and facades stay inside it; the Odaiba backdrop and bay bridges stay clear of every route.');
-console.log('Odaiba: sky bridges span clear air above the trains; floating decks float clear of boat routes.');
+console.log('Odaiba: sky bridges span clear air above the trains.');
 console.log('Odaiba: pods ride the guideway deck, walkers keep to open ground outside site lots, water taxis stay afloat.');
 console.log('Odaiba: survey sites sit on open ground, clear of roads, landmarks and guideway, and are visible from the hero pose.');
 console.log('Odaiba: eight GLBs match Phase 03D world bounds within 2 mm, grounded, unit scale, legacy axis verified.');
@@ -311,3 +298,44 @@ for (const functionModules of [2, 4, 6]) {
   city.remove(concentration.root);
 }
 console.log(`Odaiba: ${concentration.towers.length} vertical towers, ${concentration.bridges.length} sky bridges and ${concentration.pods.length} pods stand on open ground, clear of landmarks, context and routes; sites stay visible.`);
+// Sharing courts: open ground, clear of context, routes, P2 pavilions and P4 towers / pods in both identities; sites stay visible.
+for (const court of sharingDistrict.courts) {
+  assert.equal(offGround(court.x, court.z, 20) ?? blocked(court.x, court.z, 3, 20) ?? blocked(court.x, court.z, 10, 20), undefined, `court at ${court.x},${court.z}`);
+  assert.ok(concentration.towers.every(t => Math.hypot(t.x - court.x, t.z - court.z) > 48) && concentration.pods.every(p => Math.hypot(p.x - court.x, p.z - court.z) > 36), 'courts share no ground with towers / pods');
+  assert.ok(serviceDistrict.bays.every(b => Math.hypot(b.x - court.x, b.z - court.z) > 54), 'courts share no ground with staffed pavilions');
+}
+for (const sharedSeats of [0, 8]) {
+  sharingDistrict.setTarget({ sharedSeats }, 0, true);
+  sharingDistrict.root.updateMatrixWorld(true);
+  for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
+    const p = route.getPointAt(i / 200);
+    ray.set(p.clone().add(new Vector3(0, 3, 0)), down);
+    assert.equal(ray.intersectObject(sharingDistrict.root, true).length, 0, `sharing ${sharedSeats} court blocks a pod/walker route`);
+  }
+  city.add(sharingDistrict.root);
+  for (const site of Object.values(changeSites)) {
+    const look = new Vector3(site.x, site.h * site.scale / 4, site.z);
+    ray.set(camera.position, look.clone().sub(camera.position).normalize());
+    const blocker = ray.intersectObject(city, true)[0];
+    assert.ok(!blocker || blocker.distance > camera.position.distanceTo(look) - 1, `${site.name} hidden by ${blocker?.object.name} at sharing ${sharedSeats}`);
+  }
+  city.remove(sharingDistrict.root);
+}
+console.log(`Odaiba: ${sharingDistrict.courts.length} sharing courts stand on open ground clear of context, routes and other Meter sites; sites stay visible.`);
+
+if (process.env.SCAN_COURTS) {
+  const R = Number(process.env.SCAN_COURTS), routePoints = [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades].flatMap(r => r.getSpacedPoints(400));
+  const out: string[] = [];
+  for (let x = DISTRICT.minX; x <= DISTRICT.maxX; x += 10) for (let z = DISTRICT.minZ; z <= DISTRICT.maxZ; z += 10) {
+    if (concentration.towers.some(t => Math.hypot(t.x - x, t.z - z) < R + 28) || concentration.pods.some(p => Math.hypot(p.x - x, p.z - z) < R + 16)) continue;
+    if (serviceDistrict.bays.some(b => Math.hypot(b.x - x, b.z - z) < R + 34) || routePoints.some(p => Math.hypot(p.x - x, p.z - z) < R + 4)) continue;
+    if (offGround(x, z, R) ?? blocked(x, z, 3, R) ?? blocked(x, z, 10, R)) continue;
+    const ndc = new Vector3(x, 0, z).project(camera);
+    if (Math.abs(ndc.x) > .95 || Math.abs(ndc.y) > .95) continue;
+    const look = new Vector3(x, 1, z); ray.set(camera.position, look.clone().sub(camera.position).normalize());
+    const hit = ray.intersectObject(city, true)[0];
+    if (hit && hit.distance < camera.position.distanceTo(look) - 6) continue;
+    out.push(`${x},${z} sy=${Math.round((1 - ndc.y) * 540)}`);
+  }
+  console.log('COURTS', out.join(' | '));
+}

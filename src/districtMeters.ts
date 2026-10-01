@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { arc, bake, box, glass, leaf, leafyCrown, publicLight, stone, trail, trim } from './cityRig.ts';
-import { changeSites, floatingDecks, seaward } from './layout.ts';
+import { changeSites, seaward } from './layout.ts';
 import { shoreRoomBays } from './waterRooms.ts';
 import { automationActivity, routes } from './mobility.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
@@ -135,18 +135,33 @@ export const PRIVATE_RISE = 1.15;
 const SPREAD = 1.45;
 /** Halo canopy height as a share of room radius (about 6–8 m). */
 const HALO = .42;
+/** Inland sharing courts [x, z, yaw]: open ground scanned clear of landmarks, context, routes, P2 pavilions and P4 towers / pods,
+ * and visible from the hero pose (`SCAN_COURTS=20` in tests/odaiba.test.ts lists candidates). */
+const COURT_SITES: readonly (readonly [number, number, number])[] = [
+  [-220, -140, .4], [-410, 120, 1.1], [-100, 60, 2.3], [250, -180, .9], [180, -50, 3.6], [-70, 180, 1.7], [-290, 290, 5.1], [-140, 230, .2], [220, 0, 2.8], [-20, 210, 4.4],
+];
+const COURT = 40;
+/** Garden crowns inside a private court [x, z, size], clear of the glass room and the entrance. */
+const COURT_TREES: readonly (readonly [number, number, number])[] = [[-10, 8, 4.2], [0, -3, 3.4], [8, 9, 3.8], [10, -9, 3.2], [-2, 13, 2.8], [-14, -14, 2.6]];
+/** Parasol centres in a shared plaza. */
+const PARASOLS: readonly (readonly [number, number])[] = [[-6, -6], [8, -2], [-2, 9]];
 /** Existing planted islands become private water gardens (every other one under a glass vault) or open waterfront commons:
  * stepped seating where the vaults stood, planted halo canopies on the others. */
 export class SharingDistrict {
   readonly root = new T.Group();
-  readonly bays = [
-    ...shoreRoomBays().map(b => ({ x: b.x, z: b.z, yaw: b.yaw, r: b.r + 1.5, y: 2.8, sx: 1, sz: 1 })),
-    ...floatingDecks.map(([x, z, yaw]) => ({ x, z, yaw, r: 19, y: 2.3, sx: .8, sz: 1.12 })),
-  ];
+  readonly bays = shoreRoomBays().map(b => ({ x: b.x, z: b.z, yaw: b.yaw, r: b.r + 1.5, y: 2.8, sx: 1, sz: 1 }));
   private readonly levels = new SlotLevels(this.bays.length);
   private readonly screens: T.InstancedMesh;
   /** Rooms that carry a glass vault when private; the rest stay open gardens and become halo commons. */
   readonly vaulted = this.bays.map((_, i) => i % 2 === 0);
+  /** Second carrier, inland: 40 m courts that are walled private gardens or open shared plazas under parasols. */
+  readonly courts = COURT_SITES.map(([x, z, yaw]) => ({ x, z, yaw }));
+  private readonly court = new SlotLevels(COURT_SITES.length);
+  private readonly courtWalls: T.InstancedMesh;
+  private readonly courtPavilions: T.InstancedMesh;
+  private readonly courtCrowns: T.InstancedMesh;
+  private readonly plazaPaving: T.InstancedMesh;
+  private readonly plazaParasols: T.InstancedMesh;
   private readonly ribs: T.InstancedMesh;
   private readonly halos: T.InstancedMesh;
   private readonly haloGardens: T.InstancedMesh;
@@ -205,7 +220,30 @@ export class SharingDistrict {
     this.rims = ring(.99, 1.025, .025, light, 'sharing-room-rims');
     this.skylights = ring(.17, .19, .012, light, 'sharing-private-skylights');
     this.steps = Array.from({ length: 3 }, (_, i) => ring(1 + i * .14, 1.1 + i * .14, .06, commons, 'sharing-open-steps'));
-    this.pulses = new PulseRings(this.root, METER_COLORS.publicSharing, (this.bays.length + 1) * PULSE_WAVES);
+    const n = this.courts.length;
+    const batch = (geometry: T.BufferGeometry, material: T.Material, name: string, count = n) => {
+      const mesh = new T.InstancedMesh(geometry, material, count);
+      mesh.name = name; mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;
+      mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); this.root.add(mesh); return mesh;
+    };
+    // Private court (court-local metres, entrance gap on +X): 2.4 m ivory walls, a glass garden room and dense crowns.
+    const H = COURT / 2;
+    this.courtWalls = batch(mergeGeometries([
+      new T.BoxGeometry(COURT, 2.4, .6).translate(0, 1.2, -H), new T.BoxGeometry(COURT, 2.4, .6).translate(0, 1.2, H),
+      new T.BoxGeometry(.6, 2.4, COURT).translate(-H, 1.2, 0),
+      new T.BoxGeometry(.6, 2.4, H - 5).translate(H, 1.2, -(H + 5) / 2), new T.BoxGeometry(.6, 2.4, H - 5).translate(H, 1.2, (H + 5) / 2),
+    ]), trim, 'sharing-private-courts');
+    this.courtPavilions = batch(new T.BoxGeometry(12, 4.2, 9).translate(-8, 2.1, -7), privacy, 'sharing-private-courts');
+    this.courtCrowns = batch(leafyCrown(1), new T.MeshStandardMaterial({ color: '#ffffff', roughness: .92 }), 'sharing-private-courts', n * COURT_TREES.length);
+    const color = new T.Color();
+    for (let i = 0; i < n * COURT_TREES.length; i++) this.courtCrowns.setColorAt(i, i % 4 === 2 ? color.set('#efc2cf') : color.setHSL(.26 + (i % 5) * .01, .4, .22 + (i % 3) * .02));
+    // Shared plaza: a pale paved disc with three white parasols on slim masts (9 m canopies about 9 m up).
+    this.plazaPaving = batch(new T.CylinderGeometry(H - 1, H - 1, .3, 48).translate(0, .15, 0), commons, 'sharing-open-plazas');
+    this.plazaParasols = batch(mergeGeometries(PARASOLS.flatMap(([x, z]) => [
+      new T.ConeGeometry(9, 2.2, 24, 1, true).rotateX(Math.PI).translate(x, 9.1, z).toNonIndexed(),
+      new T.CylinderGeometry(.25, .3, 9, 8).translate(x, 4.5, z).toNonIndexed(),
+    ])), trim, 'sharing-open-plazas');
+    this.pulses = new PulseRings(this.root, METER_COLORS.publicSharing, (this.bays.length + n + 1) * PULSE_WAVES);
     this.root.visible = false; parent.add(this.root); this.write();
   }
 
@@ -214,22 +252,25 @@ export class SharingDistrict {
     // The first low / high proposals (2 / 7 seats) already read as distinct mature alternatives.
     const share = T.MathUtils.smoothstep(this.target, .25, .875);
     this.root.visible = true;
-    const changed = this.levels.setTargets(i => rank(i + 401) < share ? 1 : 0, now, immediate);
-    if (changed && !immediate) this.pulses.emit([sitePulse('sw'), ...this.levels.changed.map(i => {
+    const rooms = this.levels.setTargets(i => rank(i + 401) < share ? 1 : 0, now, immediate);
+    const courts = this.court.setTargets(i => rank(i + 977) < share ? 1 : 0, now, immediate), changed = rooms || courts;
+    if (changed && !immediate) this.pulses.emit([sitePulse('sw'), ...(rooms ? this.levels.changed : []).map(i => {
       const b = this.bays[i]; return { x: b.x, y: b.y, z: b.z, r: b.r * b.sx * 1.3 };
-    })], now);
+    }), ...(courts ? this.court.changed : []).map(i => ({ x: this.courts[i].x, y: 0, z: this.courts[i].z, r: COURT * .75 }))], now);
     this.write(); return changed;
   }
 
   update(now: number): void {
     this.now = now; this.deckGlow.emissiveIntensity = .2 + 2 * (towerGlow.value - .3);
-    if (this.levels.update(now)) this.write(); this.pulses.update(now);
+    const rooms = this.levels.update(now), courts = this.court.update(now);
+    if (rooms || courts) this.write(); this.pulses.update(now);
   }
   hide(): void { this.root.visible = false; this.pulses.clear(); }
   getDiagnostics() {
     const open = this.root.visible ? this.levels.visible() : 0;
     return { enabled: this.root.visible, targetSharing: this.target, rooms: this.bays.length, activePulses: this.pulses.active(this.now),
-      vaults: this.vaulted.filter(Boolean).length, visibleOpenRooms: open, visiblePrivateRooms: this.root.visible ? this.levels.value.filter(v => 1 - v > HIDDEN).length : 0 };
+      vaults: this.vaulted.filter(Boolean).length, courts: this.courts.length,
+      visibleOpenCourts: this.root.visible ? this.court.visible() : 0, visibleOpenRooms: open, visiblePrivateRooms: this.root.visible ? this.levels.value.filter(v => 1 - v > HIDDEN).length : 0 };
   }
 
   private write(): void {
@@ -255,6 +296,22 @@ export class SharingDistrict {
       this.dummy.position.y = bay.y; this.dummy.scale.set(bay.r * bay.sx * haloScale, bay.r * haloScale, bay.r * bay.sz * haloScale);
       this.dummy.updateMatrix(); for (const mesh of [this.halos, this.haloGardens, this.haloLights, this.haloDecks]) mesh.setMatrixAt(i, this.dummy.matrix);
     });
+    this.courts.forEach(({ x, z, yaw }, i) => {
+      const open = this.court.value[i], walled = Math.max(HIDDEN, 1 - open), shared = Math.max(HIDDEN, open);
+      this.dummy.position.set(x, 0, z); this.dummy.rotation.set(0, yaw, 0);
+      // Walls and the garden room sink into the ground; the plaza paving spreads and the parasols open.
+      this.dummy.scale.set(1, walled, 1); this.dummy.updateMatrix();
+      this.courtWalls.setMatrixAt(i, this.dummy.matrix); this.courtPavilions.setMatrixAt(i, this.dummy.matrix);
+      this.dummy.scale.set(shared, 1, shared); this.dummy.updateMatrix(); this.plazaPaving.setMatrixAt(i, this.dummy.matrix);
+      this.dummy.scale.set(shared, shared, shared); this.dummy.updateMatrix(); this.plazaParasols.setMatrixAt(i, this.dummy.matrix);
+      const c = Math.cos(yaw), s = Math.sin(yaw);
+      COURT_TREES.forEach(([tx, tz, size], k) => {
+        const r = size * walled;
+        this.dummy.position.set(x + tx * c + tz * s, r * .75, z - tx * s + tz * c); this.dummy.rotation.set(0, 0, 0);
+        this.dummy.scale.set(r * 1.2, r, r * 1.2); this.dummy.updateMatrix(); this.courtCrowns.setMatrixAt(i * COURT_TREES.length + k, this.dummy.matrix);
+      });
+    });
+    for (const mesh of [this.courtWalls, this.courtPavilions, this.courtCrowns, this.plazaPaving, this.plazaParasols]) mesh.instanceMatrix.needsUpdate = true;
     for (const mesh of [this.screens, this.ribs, this.halos, this.haloGardens, this.haloLights, this.haloDecks, this.rims, this.skylights, ...this.steps]) mesh.instanceMatrix.needsUpdate = true;
   }
 }
