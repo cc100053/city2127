@@ -4,7 +4,7 @@ import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
 import { civicCore } from './civicCore';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
-import { plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
+import { CORRIDOR_GLSL, plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
 import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
 import { changeSites, DISTRICT, inDistrict, SEAWARD_GLSL } from './layout';
@@ -30,7 +30,7 @@ const environmentFinish: Record<string, [color: string, roughness: number, metal
 
 // 2127 retrofit by material: mall roofs become planted, hotel roofs pale ceramic terraces (r5 pass 2: target v2 has no blue metal roofs), stark white cladding warm ceramic; no extra geometry.
 const roofRetrofit: Record<string, [color: string, roughness: number, metalness: number]> = {
-  'Roof and Shadow': ['#7d9f68', .85, 0], 'Standing seam roof.001': ['#e6ddcc', .55, .05], 'Gray roof metal': ['#e6ddcc', .55, .05],
+  'Roof and Shadow': ['#7f9b6d', .85, 0], 'Standing seam roof.001': ['#e6ddcc', .55, .05], 'Gray roof metal': ['#e6ddcc', .55, .05],
   'PCa_Panel_OffWhite': ['#e4d9c5', .62, 0],
   // r6 pass 2: DECKS' coral and ochre fins read as red stripes; target v2's mid-rises are ivory only.
   'Muted Coral Vertical Structure': ['#ebe2d2', .58, 0], 'Ochre Accent Structure': ['#ebe2d2', .58, 0], 'Facade_White': ['#e2d8c6', .6, 0],
@@ -102,7 +102,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     // Context massing (district and backdrop) carries the same storey-banded curtain wall and lit bays as Aqua City and DECKS.
     if (finish && material.name.startsWith('context_') && material.customProgramCacheKey() !== 'curtain-wall') curtainWall(material, finish[0]);
     if(material.name==='landscape'){
-      material.map=grass;material.color.set('#b2cc98'); // r6 pass 2: lusher green (target v2)
+      material.map=grass;material.color.set('#b6c6a2'); // r8: as lush, a touch less saturated than game green (user)
       // World metres keep the authored terrain patches at one consistent texture scale.
       material.onBeforeCompile=shader=>{
         shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\ngrassUv=(modelMatrix*vec4(transformed,1.)).xz/32.;');
@@ -113,9 +113,13 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
           float inside=step(${DISTRICT.minX.toFixed(1)},w.x)*step(w.x,${DISTRICT.maxX.toFixed(1)})*step(${DISTRICT.minZ.toFixed(1)},w.y)*step(w.y,${DISTRICT.maxZ.toFixed(1)});
           float swale=sin(w.x*.023+sin(w.y*.018)*2.)+cos(w.y*.031);
           float site=${Object.values(changeSites).map(c=>`step(abs(w.x-(${c.x.toFixed(1)})),${(c.w*c.scale/2+14).toFixed(1)})*step(abs(w.y-(${c.z.toFixed(1)})),${(c.d*c.scale/2+14).toFixed(1)})`).join('+')};
-          float pond=inside*(1.-min(site,1.))*(1.-smoothstep(-1.28,-1.24,swale)),rim=inside*(1.-min(site,1.))*(1.-smoothstep(-1.17,-1.13,swale))-pond;
+          // r8: the corridor channel (coastalCanopy.corridor) joins the ponds into one water/climate corridor, all edged in crisp white.
+          float lawnOpen=inside*(1.-min(site,1.)),corridor=${CORRIDOR_GLSL};
+          float pond=lawnOpen*max(1.-smoothstep(-1.28,-1.24,swale),1.-smoothstep(.09,.1,corridor));
+          float rim=max(lawnOpen*max(1.-smoothstep(-1.17,-1.13,swale),1.-smoothstep(.13,.14,corridor))-pond,0.);
           float walk=inside*(1.-smoothstep(.06,.1,abs(sin(w.x*.037+cos(w.y*.029)*1.6)+sin(w.y*.033+w.x*.011))));
-          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.72,.67,.58),max(walk,rim)*(1.-pond));
+          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.72,.67,.58),walk*(1.-pond));
+          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.9,.89,.85),rim);
           diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.16,.36,.46),pond);`).replace('#include <metalnessmap_fragment>','#include <metalnessmap_fragment>\nroughnessFactor=mix(roughnessFactor,.06,pond);metalnessFactor=mix(metalnessFactor,.35,pond);');
       };
       material.customProgramCacheKey=()=>'coastal-grass-ponds';

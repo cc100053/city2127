@@ -179,9 +179,10 @@ function shoreTerraces(root: T.Object3D) {
 /** 2127 identity at height: lit skyways, tower rings and suspended glass spheres, plus the round waterfall terraces on the bay. */
 export function skyways() {
   const root = new T.Group(); root.name = 'skyways';
-  // Planted decks (target v2's tree-lined halos and middle layer): a lawn bed down the deck's middle with a tree every ~9 m, every third a cherry.
-  const garden = (curve: T.Curve<T.Vector3>, closed: boolean) => {
-    const length = curve.getLength(), count = Math.round(length / 9);
+  // Planted decks (target v2's tree-lined middle layer): a lawn bed down the deck's middle with a tree every ~9 m, every third a cherry.
+  // r8 (user): tower rings keep the bed but no trees.
+  const garden = (curve: T.Curve<T.Vector3>, closed: boolean, trees = true) => {
+    const length = curve.getLength(), count = trees ? Math.round(length / 9) : 0;
     root.add(new T.Mesh(deck(curve, 5.2, .45, Math.ceil(length / 3)), leaf)); root.children.at(-1)!.position.y = .45;
     for (let i = closed ? 0 : 1; i < count; i++) {
       const p = curve.getPointAt(i / count), s = 1.9 + (i % 3) * .4;
@@ -189,7 +190,7 @@ export function skyways() {
       const tree = new T.Mesh(crown, i % 3 === 1 ? cherry : leaf); tree.scale.set(s * 1.15, s, s * 1.15); tree.position.set(p.x, p.y + 2.6 + s * .8, p.z); root.add(tree);
     }
   };
-  for (const ring of RINGS) { skyway(root, circle(ring), true); garden(circle(ring), true); }
+  for (const ring of RINGS) { skyway(root, circle(ring), true); garden(circle(ring), true, false); }
   for (const points of [...LINKS, sweepway.map(p => [...p] as P3)]) skyway(root, new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'), false);
   for (const points of GARDEN_LINKS) { const curve = new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'); skyway(root, curve, false); garden(curve, false); }
   for (const s of SPHERES) sphere(root, s.centre, s.radius, s.deck);

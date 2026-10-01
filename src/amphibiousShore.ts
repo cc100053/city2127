@@ -59,7 +59,11 @@ export function tidalEdge() {
       box(g,[4,1,step+.6],[-7,-.95,0],stone,.1);
       // Lit blue rim: the waterfront edge joins the 2127 light-trail network.
       box(g,[.4,.3,step+.6],[-5.05,-.04,0],trail,.05);
-      box(g,[3.2,.6,step+.6],[-10.6,-1.05,0],leaf,.1);
+      // r8: stepped tidal wetland — the marsh shelf, a white weir, then a lower reed shelf just above the tide, framed by a second weir.
+      box(g,[3.2,.6,step+.6],[-10.6,-.9,0],leaf,.1);
+      box(g,[.35,.45,step+.6],[-12.35,-.725,0],trim,.05);
+      box(g,[3.6,.5,step+.6],[-14.35,-.99,0],leaf,.1);
+      box(g,[.3,.35,step+.6],[-16.3,-.825,0],trim,.05);
       if(chunk%4===1){
         // Pavilion straddling both terraces: warm room, planted roof slab.
         box(g,[6,3.2,8.4],[-5,1.3,0],lantern,.1);
