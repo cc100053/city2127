@@ -6,13 +6,13 @@ const ground = paint('#737f78', 1), bridgeWhite = paint('#cfd3d2', .55, .15), ga
 const skyline = new T.MeshStandardMaterial({ color: '#ffffff', roughness: .9 });
 // Far shores recede harder than the Odaiba backdrop: silhouettes in the bay haze, never competing with the district.
 for (const material of [ground, bridgeWhite, gateSteel, skyline]) { recedeBeyondDistrict(material, .82); curveBeyondPlate(material); }
-// Ariake in 2127: a wooded park archipelago rather than a grey plain; bay lagoons cut through it so the shore beside the district reads as open water
+// Ariake in 2127: a tidal wetland archipelago (reed beds, stepped silt terraces) rather than a grey plain or lawn; bay lagoons cut through it so the shore beside the district reads as open water
 // with planted islands (target), grove mottling and pale walks from world-space noise (reuses recede's varying). Lagoons [x, z, radius] in metres.
 const lagoons: readonly (readonly [number, number, number])[] = [
   [870, -260, 230], [1190, -60, 200], [880, 540, 170], [1320, 430, 190], [1660, 140, 220], [1930, -260, 250], [1520, -520, 210], [2120, 560, 220],
 ];
 const inLagoon = (x: number, z: number, margin: number) => lagoons.some(([cx, cz, r]) => Math.hypot(x - cx, z - cz) < r + margin);
-const parkland = paint('#5f7d4c', 1);
+const parkland = paint('#8b8f78', 1); // r7: reed/tidal-flat tone, not lawn green
 recedeBeyondDistrict(parkland, .4);
 {
   const compile = parkland.onBeforeCompile.bind(parkland);
@@ -26,7 +26,11 @@ recedeBeyondDistrict(parkland, .4);
       .replace('#include <clipping_planes_fragment>', 'float lagoon=lagoonDist(districtXz);\nif(lagoon<0.) discard;\n#include <clipping_planes_fragment>')
       .replace('#include <color_fragment>', `#include <color_fragment>
       float grove=groveNoise(districtXz/70.)*.6+groveNoise(districtXz/17.)*.4;
-      diffuseColor.rgb*=mix(vec3(.5,.66,.48),vec3(1.05,1.02,.9),smoothstep(.38,.62,grove));
+      diffuseColor.rgb*=mix(vec3(.82,.86,.78),vec3(1.04,1.02,.95),smoothstep(.38,.62,grove));
+      // Stepped tidal wetland terraces round each lagoon: alternating wet reed and pale silt shelves (14 m), a white curb at each step.
+      float tier=floor(lagoon/14.),shelf=1.-step(4.,tier),tread=fract(lagoon/14.);
+      diffuseColor.rgb=mix(diffuseColor.rgb,mod(tier,2.)<.5?vec3(.5,.56,.5):vec3(.76,.75,.67),shelf*.85);
+      diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.93,.92,.88),shelf*(1.-smoothstep(.04,.09,tread)));
       float walk=1.-smoothstep(.03,.07,abs(sin(districtXz.x*.011+sin(districtXz.y*.009)*2.)));
       diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.86,.82,.74),max(walk*.8,1.-smoothstep(4.,10.,lagoon)));`);
   };

@@ -4,7 +4,7 @@ import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
 import { civicCore } from './civicCore';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
-import { plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
+import { CORRIDOR, plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
 import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
 import { changeSites, DISTRICT, inDistrict, SEAWARD_GLSL } from './layout';
@@ -30,7 +30,7 @@ const environmentFinish: Record<string, [color: string, roughness: number, metal
 
 // 2127 retrofit by material: mall roofs become planted, hotel roofs pale ceramic terraces (r5 pass 2: target v2 has no blue metal roofs), stark white cladding warm ceramic; no extra geometry.
 const roofRetrofit: Record<string, [color: string, roughness: number, metalness: number]> = {
-  'Roof and Shadow': ['#7d9f68', .85, 0], 'Standing seam roof.001': ['#e6ddcc', .55, .05], 'Gray roof metal': ['#e6ddcc', .55, .05],
+  'Roof and Shadow': ['#9eaa92', .88, 0], 'Standing seam roof.001': ['#e6ddcc', .55, .05], 'Gray roof metal': ['#e6ddcc', .55, .05],
   'PCa_Panel_OffWhite': ['#e4d9c5', .62, 0],
   // r6 pass 2: DECKS' coral and ochre fins read as red stripes; target v2's mid-rises are ivory only.
   'Muted Coral Vertical Structure': ['#ebe2d2', .58, 0], 'Ochre Accent Structure': ['#ebe2d2', .58, 0], 'Facade_White': ['#e2d8c6', .6, 0],
@@ -102,20 +102,24 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     // Context massing (district and backdrop) carries the same storey-banded curtain wall and lit bays as Aqua City and DECKS.
     if (finish && material.name.startsWith('context_') && material.customProgramCacheKey() !== 'curtain-wall') curtainWall(material, finish[0]);
     if(material.name==='landscape'){
-      material.map=grass;material.color.set('#b2cc98'); // r6 pass 2: lusher green (target v2)
+      material.map=grass;material.color.set('#b4bba6'); // r7: sage/silver-green, not game-green lawn
       // World metres keep the authored terrain patches at one consistent texture scale.
       material.onBeforeCompile=shader=>{
         shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\ngrassUv=(modelMatrix*vec4(transformed,1.)).xz/32.;');
-        // Inside the district the lawns become a park landscape: reflecting ponds in the grove swales (the same field plantLandscapeCanopy
-        // leaves clear, so no crowns stand in water; survey sites stay dry) with pale stone rims, and meandering gravel walks along another field's contours.
+        // Inside the district the landscape is ivory paving holding hard-edged sage beds on the street grid (gridUV, coastalCanopy.ts),
+        // white curbs round every bed, and one straight climate corridor with white rims (CORRIDOR, kept clear of trees); survey sites stay dry.
         shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <map_fragment>',`diffuseColor.rgb *= mix(texture2D(map,grassUv).rgb,texture2D(map,grassUv*.19).rgb,.35);
           vec2 w=grassUv*32.;
           float inside=step(${DISTRICT.minX.toFixed(1)},w.x)*step(w.x,${DISTRICT.maxX.toFixed(1)})*step(${DISTRICT.minZ.toFixed(1)},w.y)*step(w.y,${DISTRICT.maxZ.toFixed(1)});
-          float swale=sin(w.x*.023+sin(w.y*.018)*2.)+cos(w.y*.031);
+          vec2 q=vec2(dot(w,vec2(-.832,.555)),dot(w,vec2(.555,.832)));
+          vec2 cell=(.5-abs(fract(q/vec2(30.,18.))-.5))*vec2(30.,18.);
+          float edge=min(cell.x,cell.y);
           float site=${Object.values(changeSites).map(c=>`step(abs(w.x-(${c.x.toFixed(1)})),${(c.w*c.scale/2+14).toFixed(1)})*step(abs(w.y-(${c.z.toFixed(1)})),${(c.d*c.scale/2+14).toFixed(1)})`).join('+')};
-          float pond=inside*(1.-min(site,1.))*(1.-smoothstep(-1.28,-1.24,swale)),rim=inside*(1.-min(site,1.))*(1.-smoothstep(-1.17,-1.13,swale))-pond;
-          float walk=inside*(1.-smoothstep(.06,.1,abs(sin(w.x*.037+cos(w.y*.029)*1.6)+sin(w.y*.033+w.x*.011))));
-          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.72,.67,.58),max(walk,rim)*(1.-pond));
+          float cv=abs(q.y-(${CORRIDOR.v.toFixed(1)}));
+          float pond=inside*(1.-min(site,1.))*step(cv,${CORRIDOR.half.toFixed(1)}),rim=inside*(1.-min(site,1.))*step(cv,${(CORRIDOR.half+1.2).toFixed(1)})-pond;
+          float bed=step(3.,edge),curb=step(2.4,edge)*(1.-bed);
+          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.87,.85,.79),inside*(1.-bed)*(1.-pond));
+          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.96,.95,.91),inside*max(curb,rim)*(1.-pond));
           diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.16,.36,.46),pond);`).replace('#include <metalnessmap_fragment>','#include <metalnessmap_fragment>\nroughnessFactor=mix(roughnessFactor,.06,pond);metalnessFactor=mix(metalnessFactor,.35,pond);');
       };
       material.customProgramCacheKey=()=>'coastal-grass-ponds';
@@ -129,15 +133,13 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   scene.add(contextFacades(environment), bayContext());
   plantCanopy(scene,trees);
   plantBackdropGrove(scene,environment);
-  // Sky gardens crown the tall context towers (the only CTX mesh above 30 m inside the district).
-  environment.traverse(object=>{if(object instanceof T.Mesh && object.name.startsWith('CTX_') && new T.Box3().setFromObject(object).max.y>30)plantRoofCanopy(scene,object,true);});
   await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1])).map(async placement => {
     if(placement.id==='fuji-tv'){scene.add(civicCore());return;}
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);
     model.name = placement.id;
     placeOdaibaModel(model, placement);
+    // r7: tower roof groves cut (CITY_MASTER_TASTE rejects rooftop gardens); only the authored planted roofs keep sparse rows.
     if(placement.id==='aqua-city-odaiba' || placement.id==='decks-tokyo-beach')plantRoofCanopy(scene,model);
-    else if(placement.id==='grand-nikko-tokyo-daiba' || placement.id==='divercity-office-tower')plantRoofCanopy(scene,model,true);
     model.traverse(object => {
       if (!(object instanceof T.Mesh)) return;
       for (const material of [object.material].flat() as T.MeshStandardMaterial[])

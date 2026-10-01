@@ -99,7 +99,7 @@ export function civicCore() {
     for(const z of [56,72]){
       box(root,[116,1.1,3],[-2,y+1.5,z],leaf);
       box(root,[128,1.3,.25],[-2,y+1.7,z+(z===56?-1.7:1.7)],membrane);
-      for(let x=-54;x<55;x+=12)grove(x,y+2.1,z,x);
+      for(let x=-48;x<55;x+=24)grove(x,y+2.1,z,x); // r7: sparse row, the bed carries the green
     }
   }
   // A climate gallery hangs from the roof transfer, its lower deck returning to the rear cores.
@@ -114,10 +114,7 @@ export function civicCore() {
   // Soil ribbons follow the occupied ring without closing its bay-facing public edge.
   for(const a of [.35,1.7,3.1,4.5]){
     arc(root,30,33,1.1,[-18,63,23],leaf,a,.65);
-    for(let i=0;i<3;i++){
-      const angle=a+.12+i*.2;
-      grove(-18+Math.cos(angle)*31.5,64.1,23-Math.sin(angle)*31.5,i);
-    }
+    const angle=a+.32;grove(-18+Math.cos(angle)*31.5,64.1,23-Math.sin(angle)*31.5,1);
   }
   const generated=new Set<T.BufferGeometry>();
   root.traverse(object=>{if(object instanceof T.Mesh && object.geometry.type!=='RoundedBoxGeometry')generated.add(object.geometry);});

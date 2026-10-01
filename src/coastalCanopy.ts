@@ -3,12 +3,15 @@ import { changeSites, DISTRICT, inDistrict, seaward } from './layout.ts';
 import { routes } from './mobility.ts';
 import { recedeBeyondDistrict } from './bayContext.ts';
 
-/** Grove field: plantLandscapeCanopy leaves swales below -.35 clear and the landscape shader (odaibaScene.ts) fills those below -1.24 with ponds. */
-const swale=(x:number,z:number)=>Math.sin(x*.023+Math.sin(z*.018)*2)+Math.cos(z*.031);
+/** Street-grid frame of the district (u along the Yurikamome guideway, v across it): landscape beds, tree rows and the climate corridor all follow it. */
+export const gridUV=(x:number,z:number)=>[-.832*x+.555*z,.555*x+.832*z] as const;
+/** One straight climate corridor (water-retention channel) in the continuous landscape strip seaward of the guideway; odaibaScene.ts paints it. */
+export const CORRIDOR={v:-80,half:5} as const;
+const inCorridor=(x:number,z:number,margin:number)=>Math.abs(gridUV(x,z)[1]-CORRIDOR.v)<CORRIDOR.half+margin;
 
 /** Reuse the surveyed planting locations; layered crowns replace the tiny blockout cones. */
 export function plantCanopy(scene: T.Object3D, trees: { instances: { position: number[]; scale: number; type: string }[] }) {
-  const positions=trees.instances.filter(tree=>inDistrict(tree.position[0],-tree.position[1]) && !seaward(tree.position[0],-tree.position[1]) && !(tree.position[2]<3 && swale(tree.position[0],-tree.position[1])<-1.1) && !Object.values(changeSites).some(site=>Math.abs(tree.position[0]-site.x)<site.w*site.scale/2+9 && Math.abs(-tree.position[1]-site.z)<site.d*site.scale/2+9));
+  const positions=trees.instances.filter(tree=>inDistrict(tree.position[0],-tree.position[1]) && !seaward(tree.position[0],-tree.position[1]) && !(tree.position[2]<3 && inCorridor(tree.position[0],-tree.position[1],2)) && !Object.values(changeSites).some(site=>Math.abs(tree.position[0]-site.x)<site.w*site.scale/2+9 && Math.abs(-tree.position[1]-site.z)<site.d*site.scale/2+9));
   // Instance colours already provide the leaf pigment; a second green tint crushed the lit canopy.
   const foliage=new T.InstancedMesh(new T.IcosahedronGeometry(1,2),new T.MeshStandardMaterial({color:'#ffffff',roughness:.92}),positions.length*4);
   const trunks=new T.InstancedMesh(new T.CylinderGeometry(.35,.6,1,6),new T.MeshStandardMaterial({color:'#776957',roughness:1}),positions.length);
@@ -20,8 +23,8 @@ export function plantCanopy(scene: T.Object3D, trees: { instances: { position: n
       const a=j*2.4+i;
       dummy.position.set(x+Math.cos(a)*1.9*s,z+h+(j%2)*1.2,-y+Math.sin(a)*1.9*s);
       dummy.scale.set(3.4*s,(tree.type==='columnar'?4.4:2.9)*s,3*s);dummy.rotation.set(.1*i,a,.15*j);dummy.updateMatrix();foliage.setMatrixAt(i*4+j,dummy.matrix);
-      // About one tree in eleven is a flowering cherry: pale pink crowns scattered through the green (target reference).
-      if(i%11===5)color.setHSL(.95+(j%2)*.01,.38,.7+(j%3)*.03);else color.setHSL(.21+(i%5)*.008,.28+(j%3)*.05,.23+(i%7)*.018);
+      // About one tree in eleven is a flowering cherry; the rest are sage/silver-green rather than saturated game green (user, r7).
+      if(i%11===5)color.setHSL(.95+(j%2)*.01,.32,.72+(j%3)*.03);else color.setHSL(.24+(i%5)*.008,.12+(j%3)*.03,.33+(i%7)*.016);
       foliage.setColorAt(i*4+j,color);
     }
   });
@@ -29,8 +32,8 @@ export function plantCanopy(scene: T.Object3D, trees: { instances: { position: n
   foliage.castShadow=trunks.castShadow=true;foliage.receiveShadow=trunks.receiveShadow=true;scene.add(foliage,trunks);
 }
 
-/** Plant only on authored flat planted roofs, inset from their edges; `tower` instead crowns any flat roof above 30 m with larger trees (2127 sky gardens). */
-export function plantRoofCanopy(scene: T.Object3D, model: T.Object3D, tower=false) {
+/** Plant only on authored flat planted roofs, inset from their edges: sparse single rows, not a rooftop grove. */
+export function plantRoofCanopy(scene: T.Object3D, model: T.Object3D) {
   const bounds=new T.Box3().setFromObject(model),ray=new T.Raycaster(),down=new T.Vector3(0,-1,0);
   bounds.min.x=Math.max(bounds.min.x,DISTRICT.minX);bounds.max.x=Math.min(bounds.max.x,DISTRICT.maxX);bounds.min.z=Math.max(bounds.min.z,DISTRICT.minZ);bounds.max.z=Math.min(bounds.max.z,DISTRICT.maxZ);
   const instances: {position:number[];scale:number;type:string}[]=[];
@@ -39,17 +42,17 @@ export function plantRoofCanopy(scene: T.Object3D, model: T.Object3D, tower=fals
     const hit=ray.intersectObject(model,true)[0];
     if(!hit || !(hit.object instanceof T.Mesh))return null;
     const material=Array.isArray(hit.object.material)?hit.object.material[hit.face?.materialIndex??0]:hit.object.material;
-    return (tower ? hit.point.y>30 : material.name==='Roof and Shadow') && hit.face && hit.face.normal.clone().transformDirection(hit.object.matrixWorld).y>.98 ? hit.point : null;
+    return material.name==='Roof and Shadow' && hit.face && hit.face.normal.clone().transformDirection(hit.object.matrixWorld).y>.98 ? hit.point : null;
   };
-  for(let x=bounds.min.x+6;x<bounds.max.x-6;x+=11)for(let z=bounds.min.z+6;z<bounds.max.z-6;z+=11){
+  for(let x=bounds.min.x+6;x<bounds.max.x-6;x+=12)for(let z=bounds.min.z+6;z<bounds.max.z-6;z+=36){
     const p=roofAt(x,z);
     if(!p || p.y<12 || ![[4,0],[-4,0],[0,4],[0,-4]].every(([dx,dz])=>{const edge=roofAt(x+dx,z+dz);return edge && Math.abs(edge.y-p.y)<.3;}))continue;
-    instances.push({position:[x,-z,p.y],scale:tower?.9:.55,type:'broadleaf'});
+    instances.push({position:[x,-z,p.y],scale:.55,type:'columnar'});
   }
   plantCanopy(scene,{instances});
 }
 
-/** Coastal groves occupy authored landscape only; circulation and landmark pads remain open. */
+/** Ordered tree rows on authored landscape only, centred in every third row of grid beds (odaibaScene.ts); circulation, landmark pads and the corridor stay open. */
 export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,buildings:T.Object3D[]) {
   environment.updateMatrixWorld(true);
   const pads=buildings.map(building=>new T.Box3().setFromObject(building).expandByScalar(8));
@@ -60,16 +63,15 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
     const hit=ray.intersectObject(environment,true)[0];
     return hit && hit.object instanceof T.Mesh && !Array.isArray(hit.object.material) && hit.object.material.name==='landscape' && hit.point.y<3 ? hit.point.y : null;
   };
-  for(let x=DISTRICT.minX;x<DISTRICT.maxX;x+=17)for(let z=DISTRICT.minZ;z<DISTRICT.maxZ;z+=17){
-    // Staggered clusters leave long clear swales instead of another plantation grid.
-    if(swale(x,z)<-.35)continue;
-    const px=x+Math.sin(z*1.7+x)*6,pz=z+Math.cos(x*1.3-z)*6;
-    if(seaward(px,pz) || pads.some(pad=>px>pad.min.x && px<pad.max.x && pz>pad.min.z && pz<pad.max.z)
+  // Bed centres sit at u = 30n+15, v = 18n+9 (see the landscape shader); two trees per bed along its long axis.
+  for(let v=-333;v<320;v+=54)for(let u=-502.5;u<500;u+=15){
+    const px=-.832*u+.555*v,pz=.555*u+.832*v;
+    if(!inDistrict(px,pz) || inCorridor(px,pz,8) || seaward(px,pz) || pads.some(pad=>px>pad.min.x && px<pad.max.x && pz>pad.min.z && pz<pad.max.z)
       || Object.values(changeSites).some(site=>Math.abs(px-site.x)<site.w*site.scale/2+22 && Math.abs(pz-site.z)<site.d*site.scale/2+22)
       || clearPaths.some(p=>Math.hypot(p.x-px,p.z-pz)<17))continue;
     const y=landscapeAt(px,pz);
     if(y===null || ![[7,0],[-7,0],[0,7],[0,-7]].every(([dx,dz])=>landscapeAt(px+dx,pz+dz)!==null))continue;
-    instances.push({position:[px,-pz,y],scale:.85+(Math.sin(x+z)+1)*.2,type:Math.sin(x-z)>.7?'columnar':'broadleaf'});
+    instances.push({position:[px,-pz,y],scale:.9,type:'columnar'});
   }
   plantCanopy(scene,{instances});
 }
@@ -93,6 +95,6 @@ export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
   }
   const material=new T.MeshStandardMaterial({color:'#ffffff',roughness:.95});recedeBeyondDistrict(material);
   const grove=new T.InstancedMesh(new T.IcosahedronGeometry(1,1),material,matrices.length),color=new T.Color();
-  matrices.forEach((matrix,i)=>{grove.setMatrixAt(i,matrix);grove.setColorAt(i,color.setHSL(.22+(i%5)*.01,.3+(i%3)*.04,.22+(i%7)*.02));});
+  matrices.forEach((matrix,i)=>{grove.setMatrixAt(i,matrix);grove.setColorAt(i,color.setHSL(.23+(i%5)*.01,.12+(i%3)*.03,.3+(i%7)*.02));});
   grove.name='backdrop-grove';grove.receiveShadow=true;scene.add(grove);
 }
