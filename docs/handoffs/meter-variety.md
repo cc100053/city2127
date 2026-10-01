@@ -142,6 +142,16 @@ Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920�
 - Readability (headless Chrome, 1920×929, `?hour=16|21&reviewTime=20&meters=sw:<band>`, repeat-capture noise 0.02 %): low ↔ high **3.26 %** day, **3.03 %** night (thin margin); low ↔ mixed 0.97 %, mixed ↔ high 2.40 %. Captures: [low](meter-variety-p3b-gridshell-low.png), [mixed](meter-variety-p3b-gridshell-mixed.png), [high](meter-variety-p3b-gridshell-high.png), [night low](meter-variety-p3b-gridshell-night-low.png), [night high](meter-variety-p3b-gridshell-night-high.png). A `metersTo=sw:high&metersAge=1.5` capture showed vaults lowering and steps widening under the pulse.
 - +2 instanced batches (plus their shadow / G-buffer passes); draw calls not re-measured. Not verified: human art acceptance, real-GPU FPS, Windows.
 
+## P3c — Fewer, calmer vaults and halo commons (2026-10-01)
+
+- User review of P3b: rose ribs too loud, too many vaults and ribs; wanted a second open-commons design for high sharing.
+- Every other room (`vaulted`, 7 of 14) carries the glass vault; the other seven stay open planted islands while private. Vault: 9 ivory meridian ribs + 3 ring beams in one `trim` batch, spread 1.45 × radius, rise 1.15 × radius (`PRIVATE_RISE`); rose only on the base rim and oculus.
+- High sharing alternates: vaulted rooms open into the stepped seating; the others gain a **halo canopy** — an open annular roof (0.5–1.38 × radius at 0.42 × radius ≈ 6–8 m) on seven slim columns clear of the landward gap, planted on top, with a warm edge light and a lit boardwalk ring beneath. The boardwalk's emission follows `towerGlow` (0.2 by day → 2.0 at night).
+- Gate history while tuning: halving the vaults cost readability (2.39 % day); larger halo/vault footprints recovered the day gate, but night stayed ≈ 2.8 % until the user chose night lighting for the commons (option 3).
+- Root `npm test` (new checks: 7 vaults, glass only on vaulted rooms, steps / halos alternate when open), `npm run build`, `git diff --check`: PASS; boat beams, walker lanes and landward entrances recheck the new halos.
+- Readability (same conditions as P3b, repeat noise 0.02 %): low ↔ high **3.30 %** day, **3.84 %** night; low ↔ mixed 0.90 %, mixed ↔ high 2.48 %. Captures: [low](meter-variety-p3c-sharing-low.png), [mixed](meter-variety-p3c-sharing-mixed.png), [high](meter-variety-p3c-sharing-high.png), [night low](meter-variety-p3c-sharing-night-low.png), [night high](meter-variety-p3c-sharing-night-high.png). P3b captures remain as history.
+- Batches vs P3b: rib + beam merged (−1), four halo batches (+4); draw calls not re-measured. Not verified: human art acceptance, real-GPU FPS, Windows.
+
 ## Next step
 
 Capture review of P0–P5 with the user, then integrate `feat/meter-variety` into `main` per CONTRIBUTING (preserve the review-before-main condition). P6 remains per-stage evidence.

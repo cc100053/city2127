@@ -130,10 +130,13 @@ const sitePulse = (socket: keyof typeof changeSites): PulsePoint => {
 const rank = (i: number) => { const s = Math.sin(i * 12.9898 + 4.1) * 43758.5453; return s - Math.floor(s); };
 
 /** Private shell height as a share of its radius: a hemispherical vault rather than the former 28 m egg. */
-export const PRIVATE_RISE = 1;
+export const PRIVATE_RISE = 1.15;
 /** The vault overhangs its island like a shell parasol; the open steps reach 1.38 × radius. */
-const SPREAD = 1.3;
-/** Existing planted islands become screened water gardens or open, stepped waterfront commons. */
+const SPREAD = 1.45;
+/** Halo canopy height as a share of room radius (about 6–8 m). */
+const HALO = .42;
+/** Existing planted islands become private water gardens (every other one under a glass vault) or open waterfront commons:
+ * stepped seating where the vaults stood, planted halo canopies on the others. */
 export class SharingDistrict {
   readonly root = new T.Group();
   readonly bays = [
@@ -142,8 +145,14 @@ export class SharingDistrict {
   ];
   private readonly levels = new SlotLevels(this.bays.length);
   private readonly screens: T.InstancedMesh;
+  /** Rooms that carry a glass vault when private; the rest stay open gardens and become halo commons. */
+  readonly vaulted = this.bays.map((_, i) => i % 2 === 0);
   private readonly ribs: T.InstancedMesh;
-  private readonly beams: T.InstancedMesh;
+  private readonly halos: T.InstancedMesh;
+  private readonly haloGardens: T.InstancedMesh;
+  private readonly haloLights: T.InstancedMesh;
+  private readonly haloDecks: T.InstancedMesh;
+  private readonly deckGlow = publicLight.clone();
   private readonly rims: T.InstancedMesh;
   private readonly skylights: T.InstancedMesh;
   private readonly steps: T.InstancedMesh[];
@@ -154,12 +163,13 @@ export class SharingDistrict {
 
   constructor(parent: T.Object3D) {
     this.root.name = 'sharing-district';
-    // Gridshell vault: frosted pearl glass over the garden, rose meridian ribs (the sharing colour), ivory ring beams.
+    // Gridshell vault: frosted pearl glass over the garden on ivory ribs and ring beams; rose (the sharing colour) stays on the rim and oculus.
     const privacy = glass.clone(); privacy.color.set('#f4f1ea'); privacy.emissive.set('#ffe2cf'); privacy.emissiveIntensity = .3;
     privacy.side = T.DoubleSide; privacy.transparent = true; privacy.opacity = .62; privacy.depthWrite = false;
-    const ribMaterial = trim.clone(); ribMaterial.color.set('#e0788c'); ribMaterial.emissive.set('#ff6f91'); ribMaterial.emissiveIntensity = .7;
     const commons = stone.clone(); commons.emissive.set('#eac0b2'); commons.emissiveIntensity = .3;
     const light = publicLight.clone(); light.emissive.set('#ffa9b1'); light.emissiveIntensity = 1.8;
+    const warm = publicLight.clone(); warm.emissive.set('#ffd6a0'); warm.emissiveIntensity = 1.6;
+    this.deckGlow.emissive.set('#ffcf94');
     const instance = (geometry: T.BufferGeometry, material: T.Material, name: string) => {
       const mesh = new T.InstancedMesh(geometry, material, this.bays.length);
       mesh.name = name; mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;
@@ -171,18 +181,27 @@ export class SharingDistrict {
     // Unit-sphere point at longitude φ / polar θ, matching SphereGeometry so ribs sit on the glass.
     const at = (phi: number, theta: number) => new T.Vector3(-Math.cos(phi) * Math.sin(theta), Math.cos(theta), Math.sin(phi) * Math.sin(theta));
     const tube = (points: T.Vector3[], radius: number) => new T.TubeGeometry(new T.CatmullRomCurve3(points), points.length * 2, radius, 6);
-    const ribs = mergeGeometries(Array.from({ length: 17 }, (_, i) =>
-      tube(Array.from({ length: 13 }, (_, k) => at(START + LENGTH * i / 16, OCULUS + (Math.PI / 2 - OCULUS) * k / 12)), .032)));
-    const beams = mergeGeometries([OCULUS, .62, 1.05].map(theta =>
-      tube(Array.from({ length: 41 }, (_, k) => at(START + LENGTH * k / 40, theta)), .026)));
+    const ribs = mergeGeometries([
+      ...Array.from({ length: 9 }, (_, i) =>
+        tube(Array.from({ length: 13 }, (_, k) => at(START + LENGTH * i / 8, OCULUS + (Math.PI / 2 - OCULUS) * k / 12)), .032)),
+      ...[OCULUS, .62, 1.05].map(theta => tube(Array.from({ length: 41 }, (_, k) => at(START + LENGTH * k / 40, theta)), .026)),
+    ]);
     this.screens = instance(shell, privacy, 'sharing-private-gardens');
     this.screens.castShadow = false;
-    this.ribs = instance(ribs, ribMaterial, 'sharing-private-ribs');
-    this.beams = instance(beams, trim, 'sharing-private-beams');
-    const ring = (inner: number, outer: number, height: number, material: T.Material, name: string) => {
-      const source = arc(new T.Group(), inner, outer, height, [0, 0, 0], material, .3, Math.PI * 2 - .6);
-      return instance(source.geometry, material, name);
-    };
+    this.ribs = instance(ribs, trim, 'sharing-private-ribs');
+    const ringGeometry = (inner: number, outer: number, height: number, y = 0) =>
+      arc(new T.Group(), inner, outer, height, [0, 0, 0], trim, .3, Math.PI * 2 - .6).geometry.translate(0, y, 0);
+    const ring = (inner: number, outer: number, height: number, material: T.Material, name: string) => instance(ringGeometry(inner, outer, height), material, name);
+    // Halo commons: an open annular roof on seven slim columns (clear of the landward gap), planted on top.
+    const columns = Array.from({ length: 7 }, (_, k) => {
+      const a = .3 + LENGTH * (k + .5) / 7;
+      return new T.CylinderGeometry(.022, .028, HALO, 8).translate(Math.cos(a) * .9, HALO / 2, -Math.sin(a) * .9).toNonIndexed();
+    });
+    this.halos = instance(mergeGeometries([ringGeometry(.5, 1.38, .035, HALO), ...columns]), trim, 'sharing-open-halos');
+    this.haloGardens = instance(ringGeometry(.58, 1.3, .03, HALO + .035), leaf, 'sharing-open-halos');
+    this.haloLights = instance(ringGeometry(1.31, 1.38, .05, HALO + .035), warm, 'sharing-open-halos');
+    // Lit boardwalk ring under the canopy: brightens with the city's night glow so the commons read after dark.
+    this.haloDecks = instance(ringGeometry(.92, 1.3, .04), this.deckGlow, 'sharing-open-halos');
     this.rims = ring(.99, 1.025, .025, light, 'sharing-room-rims');
     this.skylights = ring(.17, .19, .012, light, 'sharing-private-skylights');
     this.steps = Array.from({ length: 3 }, (_, i) => ring(1 + i * .14, 1.1 + i * .14, .06, commons, 'sharing-open-steps'));
@@ -202,33 +221,41 @@ export class SharingDistrict {
     this.write(); return changed;
   }
 
-  update(now: number): void { this.now = now; if (this.levels.update(now)) this.write(); this.pulses.update(now); }
+  update(now: number): void {
+    this.now = now; this.deckGlow.emissiveIntensity = .2 + 2 * (towerGlow.value - .3);
+    if (this.levels.update(now)) this.write(); this.pulses.update(now);
+  }
   hide(): void { this.root.visible = false; this.pulses.clear(); }
   getDiagnostics() {
     const open = this.root.visible ? this.levels.visible() : 0;
     return { enabled: this.root.visible, targetSharing: this.target, rooms: this.bays.length, activePulses: this.pulses.active(this.now),
-      visibleOpenRooms: open, visiblePrivateRooms: this.root.visible ? this.levels.value.filter(v => 1 - v > HIDDEN).length : 0 };
+      vaults: this.vaulted.filter(Boolean).length, visibleOpenRooms: open, visiblePrivateRooms: this.root.visible ? this.levels.value.filter(v => 1 - v > HIDDEN).length : 0 };
   }
 
   private write(): void {
     this.bays.forEach((bay, i) => {
-      const open = this.levels.value[i], height = PRIVATE_RISE * bay.r * (1 - open);
+      const open = this.levels.value[i], vaulted = this.vaulted[i], height = vaulted ? PRIVATE_RISE * bay.r * (1 - open) : 0;
       // Keep hidden matrices invertible: flattened curved normals otherwise poison the G-buffer / SSR.
-      const privateScale = Math.max(HIDDEN, 1 - open), publicScale = Math.max(HIDDEN, open);
+      const privateScale = vaulted ? Math.max(HIDDEN, 1 - open) : HIDDEN, publicScale = Math.max(HIDDEN, open);
+      const stepScale = vaulted ? publicScale : HIDDEN, haloScale = vaulted ? HIDDEN : publicScale;
       this.dummy.position.set(bay.x, bay.y, bay.z); this.dummy.rotation.set(0, bay.yaw, 0);
-      this.dummy.scale.set(bay.r * bay.sx * SPREAD, Math.max(HIDDEN, height), bay.r * bay.sz * SPREAD); this.dummy.updateMatrix();
-      for (const mesh of [this.screens, this.ribs, this.beams]) mesh.setMatrixAt(i, this.dummy.matrix);
+      // A settled-open vault collapses completely; a flat glass disc would otherwise tint the garden.
+      const footprint = height > HIDDEN ? SPREAD : HIDDEN;
+      this.dummy.scale.set(bay.r * bay.sx * footprint, Math.max(HIDDEN, height), bay.r * bay.sz * footprint); this.dummy.updateMatrix();
+      for (const mesh of [this.screens, this.ribs]) mesh.setMatrixAt(i, this.dummy.matrix);
       this.dummy.scale.y = bay.r; this.dummy.updateMatrix(); this.rims.setMatrixAt(i, this.dummy.matrix);
       this.dummy.position.y = bay.y + height * Math.cos(.18);
       this.dummy.scale.set(bay.r * bay.sx * SPREAD * privateScale, bay.r * privateScale, bay.r * bay.sz * SPREAD * privateScale);
       this.dummy.updateMatrix(); this.skylights.setMatrixAt(i, this.dummy.matrix);
       this.steps.forEach((mesh, tier) => {
         this.dummy.position.y = bay.y + tier * .7;
-        this.dummy.scale.set(bay.r * bay.sx * publicScale, bay.r * publicScale, bay.r * bay.sz * publicScale);
+        this.dummy.scale.set(bay.r * bay.sx * stepScale, bay.r * stepScale, bay.r * bay.sz * stepScale);
         this.dummy.updateMatrix(); mesh.setMatrixAt(i, this.dummy.matrix);
       });
+      this.dummy.position.y = bay.y; this.dummy.scale.set(bay.r * bay.sx * haloScale, bay.r * haloScale, bay.r * bay.sz * haloScale);
+      this.dummy.updateMatrix(); for (const mesh of [this.halos, this.haloGardens, this.haloLights, this.haloDecks]) mesh.setMatrixAt(i, this.dummy.matrix);
     });
-    for (const mesh of [this.screens, this.ribs, this.beams, this.rims, this.skylights, ...this.steps]) mesh.instanceMatrix.needsUpdate = true;
+    for (const mesh of [this.screens, this.ribs, this.halos, this.haloGardens, this.haloLights, this.haloDecks, this.rims, this.skylights, ...this.steps]) mesh.instanceMatrix.needsUpdate = true;
   }
 }
 

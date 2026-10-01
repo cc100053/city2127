@@ -114,6 +114,12 @@ const sharing = new SharingDistrict(new T.Scene());
 sharing.setTarget({ sharedSeats: 2 }, 0, true);
 assert.equal(sharing.getDiagnostics().visiblePrivateRooms, sharing.bays.length);
 assert.equal(sharing.getDiagnostics().visibleOpenRooms, 0);
+assert.equal(sharing.getDiagnostics().vaults, Math.ceil(sharing.bays.length / 2), 'every other room carries a vault');
+{
+  const vaultScale = (i: number) => { const m = new T.Matrix4(), v = new T.Vector3();
+    (sharing.root.getObjectByName('sharing-private-gardens') as T.InstancedMesh).getMatrixAt(i, m); return v.setFromMatrixScale(m).x; };
+  assert.ok(vaultScale(0) > 10 && vaultScale(1) < 1e-2, 'only vaulted rooms show glass when private');
+}
 sharing.setTarget({ sharedSeats: 7 }, 1, false);
 sharing.update(2.5);
 const screens = sharing.root.getObjectByName('sharing-private-gardens') as T.InstancedMesh;
@@ -124,6 +130,12 @@ assert.equal(sharing.setTarget({ sharedSeats: 7 }, 2.5, false), false);
 sharing.update(4);
 assert.equal(sharing.getDiagnostics().visibleOpenRooms, sharing.bays.length);
 assert.equal(sharing.getDiagnostics().visiblePrivateRooms, 0);
+{
+  const scaleOf = (mesh: T.InstancedMesh, i: number) => { const m = new T.Matrix4(), v = new T.Vector3(); mesh.getMatrixAt(i, m); return v.setFromMatrixScale(m).x; };
+  const halos = sharing.root.getObjectsByProperty('name', 'sharing-open-halos')[0] as T.InstancedMesh;
+  const steps = sharing.root.getObjectByName('sharing-open-steps') as T.InstancedMesh;
+  assert.ok(scaleOf(steps, 0) > 10 && scaleOf(halos, 0) < 1e-2 && scaleOf(halos, 1) > 10 && scaleOf(steps, 1) < 1e-2, 'open rooms alternate steps / halo canopies');
+}
 for (const object of sharing.root.children) {
   const mesh = object as T.InstancedMesh;
   for (let i = 0; i < mesh.count; i++) {
