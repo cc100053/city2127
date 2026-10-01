@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS — P0–P5 and P7–P11 implemented; P6 evidence recorded per stage; awaiting capture review before main
 - Branch: `feat/meter-variety`
 - Base commit: `33227a687ac9d18281e90494a4e9b2ce27f861ce`
-- Last verified commit: previous P10 `261e036c26cb1fca62c7a3c3487d5b6122fd28c3` (feature CI PASS); P11 working tree passed local and browser checks below; commit/CI closure follows.
+- Last verified commit: P11 source `ab6a3a165ff6c5448699661c23f7e23d59c0372c` (root/survey local checks, lossless captures, real HTTP/WebSocket browser smoke and [feature CI run 36886838863](https://github.com/cc100053/city2127/actions/runs/36886838863) PASS).
 - Remote availability: `origin/feat/meter-variety`
 
 ## Session Git state
@@ -271,6 +271,7 @@ Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920�
 
 ### P11 validation
 
+- Source commit `ab6a3a165ff6c5448699661c23f7e23d59c0372c` is pushed to `origin/feat/meter-variety`; [CI run 36886838863](https://github.com/cc100053/city2127/actions/runs/36886838863) PASS (Node 24, root/survey/module-swap install/test/build and whitespace). This closure changes documentation only. P11 implementation and verification are complete; branch integration remains blocked on the existing human capture review, with P12 unimplemented.
 - Root and `survey/` `npm test`, `npm run build`: PASS; existing root chunk-size warning only. Tests requiring localhost sockets initially hit sandbox `EPERM`; authorized elevated reruns passed. `module-swap/` source unchanged. Whitespace and local Markdown links checked before commit.
 - `surveyMeterPipeline` checks two real 142-proposal histories: `+1,−1` vs `−1,+1`, followed by the same 140 alternating votes on all axes. The final scores are **exactly equal**, layouts and latest 64 votes match, but full-history seeds and actual instance transforms differ in **all four districts**. Live → serialized snapshot, same-ID retries, reset / old retry after reset, interrupted snapshot with zero lingering pulses, and full replay with fresh run / session / submission IDs restore exact transforms. P10 assertions now also cover non-extreme carriers and use the actual .7/.3 thresholds rather than assuming every high band is saturated.
 - Small checks cover seeded count preservation / complementary covers / same target / smooth retarget, late roof publication, malformed and missing uint32 seeds, old-server compatibility, and actual SQLite server restart restoring the whole seeded view.
