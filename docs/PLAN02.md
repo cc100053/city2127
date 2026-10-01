@@ -1,5 +1,9 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
+## Meter variety P5 — 2026-10-01，feature branch 待視覺審閱
+
+每次 live 提案改變某個 Meter，嗰個 district 會喺 site 同每個實際有改動嘅位置發出兩波擴散光環同向上漸淡嘅光柱，用該 Meter 嘅顏色（自動化藍、共有玫瑰粉、環境綠、集約琥珀），約 4.2 秒後消失；snapshot、reset 同 reduced motion 唔會發光，亦唔會令共用城市材質閃動。冇 pulse 時唔增加 draw call。截圖與限制見 [P5 交接](handoffs/meter-variety.md#p5--change-moment-pulse-2026-10-01)。保留 capture review 後才整合 main 的條件。
+
 ## Meter variety P4 — 2026-10-01，feature branch 待視覺審閱
 
 都市集約 Meter 現在改變 district 嘅 skyline：高值喺 SE site 旁、DECKS 海濱同西面草地升起 10 座淡藍玻璃塔（100–140 m，兩層有植栽同暖光嘅 sky lobby，相近嘅塔有 sky bridge 相連）；低值喺同一片草地散佈 26 個低層玻璃 pod；混合值各保留約一半。夜晚塔身按樓層亮暖光窗格。固定 hero 日／夜差異 **4.47%／3.81%**（P4 前 0.38%／0.29%），均過 3% 門檻；實際地面、建築、路線、site 可見度檢查通過。截圖與限制見 [P4 交接](handoffs/meter-variety.md#p4--concentration-2026-10-01)。可讀性不等於美術、結構或 FPS 驗收；保留 capture review 後才整合 main 的條件。

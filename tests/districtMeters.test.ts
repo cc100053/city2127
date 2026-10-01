@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, SharingDistrict, SlotLevels, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
+import { AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
 import { mobility } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
@@ -172,3 +172,30 @@ concentration.hide();
 assert.deepEqual(counts(), [0, 0]);
 assert.equal(concentration.root.visible, false);
 console.log(`PASS: concentration district — ${concentration.towers.length} towers / ${concentration.bridges.length} sky bridges vs ${concentration.pods.length} pods, rise, same target, mixed hybrid, invertible hidden matrices, legacy hide.`);
+
+// P5: a live change pulses only where its district changed, in two waves that fade within PULSE_WAVE_GAP + PULSE_SECONDS;
+// snapshots / resets / reduced motion (immediate) never pulse, and a legacy hide clears pulses.
+const pulseCases: [string, { setTarget(l: never, now: number, immediate: boolean): boolean; update(now: number): void; hide(): void; getDiagnostics(): { activePulses: number }; root: T.Group }, object, object][] = [
+  ['environment', new EnvironmentDistrict(new T.Scene()) as never, env(-7.5), env(7.5)],
+  ['automation', new AutomationDistrict(new T.Scene()) as never, { automatedPorts: 1 }, { automatedPorts: 5 }],
+  ['sharing', new SharingDistrict(new T.Scene()) as never, { sharedSeats: 2 }, { sharedSeats: 7 }],
+  ['concentration', new ConcentrationDistrict(new T.Scene()) as never, { functionModules: 3 }, { functionModules: 5 }],
+];
+for (const [name, district, low, high] of pulseCases) {
+  district.setTarget(low as never, 0, true); district.update(.5);
+  assert.equal(district.getDiagnostics().activePulses, 0, `${name}: snapshot does not pulse`);
+  district.setTarget(high as never, 1, false); district.update(1.2);
+  const first = district.getDiagnostics().activePulses;
+  assert.ok(first > 1, `${name}: live change pulses its site and changed slots`);
+  district.update(1 + PULSE_WAVE_GAP + .1);
+  assert.equal(district.getDiagnostics().activePulses, first * 2, `${name}: second wave follows`);
+  district.update(1 + PULSE_WAVE_GAP + PULSE_SECONDS + .1);
+  assert.equal(district.getDiagnostics().activePulses, 0, `${name}: pulses fade`);
+  assert.equal(district.setTarget(high as never, 6, false), false); district.update(6.2);
+  assert.equal(district.getDiagnostics().activePulses, 0, `${name}: unchanged target does not pulse`);
+  district.setTarget(low as never, 7, false); district.update(7.2);
+  district.hide(); district.update(7.3);
+  assert.equal(district.getDiagnostics().activePulses, 0, `${name}: legacy hide clears pulses`);
+  assert.equal(district.root.getObjectsByProperty('name', 'meter-pulse').length, 2, `${name}: GTAO-excluded pulse batches`);
+}
+console.log('PASS: P5 pulses — live changes only, two waves, fade, no pulse on snapshot / unchanged target, cleared on legacy hide, GTAO-excluded.');

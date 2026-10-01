@@ -117,7 +117,7 @@ npm run build
 npm test
 ```
 
-城市會自動行日夜循環（2026-09-25 起取代原本嘅三個掣同 `0/1/2` 鍵）：一日 3 分鐘，由中午開始。太陽由東行到西，日落後轉做藍色月光；天空經過黃昏、夜晚、清晨。清晨係 Still（安靜），日間係 Daylight，夜晚係 Pulse（窗戶、街燈、招牌亮起，人車較多）。`?hour=22` 可以固定喺某個鐘數，方便截圖。開發模式下 `?meters=nw:high,ne:low`（band 或 −12..12 分數）唔使 server 就套用 v2 城市 layout；console 用 `cityMeters('ne:high')` 睇 3 秒過渡；`scripts/meter-diff.py a.png b.png` 量兩張截圖改咗幾多畫面。呢個係原型展示，唔係展覽題目或累積機制。
+城市會自動行日夜循環（2026-09-25 起取代原本嘅三個掣同 `0/1/2` 鍵）：一日 3 分鐘，由中午開始。太陽由東行到西，日落後轉做藍色月光；天空經過黃昏、夜晚、清晨。清晨係 Still（安靜），日間係 Daylight，夜晚係 Pulse（窗戶、街燈、招牌亮起，人車較多）。`?hour=22` 可以固定喺某個鐘數，方便截圖。開發模式下 `?meters=nw:high,ne:low`（band 或 −12..12 分數）唔使 server 就套用 v2 城市 layout；console 用 `cityMeters('ne:high')` 睇 3 秒過渡；`&metersTo=ne:high&metersAge=0.7` 模擬 0.7 秒前開始嘅 live 變化，配合 `reviewTime` 截圖過渡同變化光環；`scripts/meter-diff.py a.png b.png` 量兩張截圖改咗幾多畫面。呢個係原型展示，唔係展覽題目或累積機制。
 
 `layout.ts` 保存台場路線（單軌中線、海濱步道、水路、空中航道、球頂泊位）、2127 改造位置同四個改變地點；`cityRig.ts` 提供共用材質同 site 燈柱；`mobility.ts` 處理單軌列車、步道行人、水上的士／渡輪同空中的士。共享材質、靜態批次、InstancedMesh 保留；後製仍只有輕微 bloom。
 

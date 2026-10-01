@@ -11,6 +11,8 @@ const HIDDEN = 1e-4;
 /** 0..1 level per slot, eased toward its target over the shared 3-second site transition. */
 export class SlotLevels {
   readonly value: Float32Array;
+  /** Slots whose target changed in the latest `setTargets` call. */
+  readonly changed: number[] = [];
   private readonly from: Float32Array;
   private readonly to: Float32Array;
   private start = -Infinity;
@@ -26,9 +28,10 @@ export class SlotLevels {
   setTargets(target: (i: number) => number, now: number, immediate: boolean): boolean {
     this.update(now);
     let changed = false;
+    this.changed.length = 0;
     for (let i = 0; i < this.to.length; i++) {
       const next = Math.fround(target(i));
-      if (next !== this.to[i]) changed = true;
+      if (next !== this.to[i]) { changed = true; this.changed.push(i); }
       this.to[i] = next;
     }
     if (immediate) { this.value.set(this.to); this.active = false; }
@@ -52,6 +55,76 @@ export class SlotLevels {
   }
 }
 
+/** P5: each Meter's change-moment colour (the visual language of its district layer). */
+export const METER_COLORS = { automation: '#3fa9ff', publicSharing: '#ff6f91', environmentalPriority: '#5fe08a', urbanConcentration: '#ffb347' } as const;
+export type PulsePoint = { x: number; y: number; z: number; r: number };
+export const PULSE_SECONDS = 3, PULSE_WAVES = 2, PULSE_WAVE_GAP = 1.2;
+
+/** A live change marks where it happened: each changed slot (and the Meter's site) sends two expanding light rings with a fading
+ * light shaft, in the Meter's colour. Additive and unlit, so shared city materials never flash; snapshots and resets emit nothing. */
+export class PulseRings {
+  private readonly rings: T.InstancedMesh;
+  private readonly beams: T.InstancedMesh;
+  private readonly pulses: (PulsePoint & { start: number })[] = [];
+  private readonly dummy = new T.Object3D();
+  private readonly tint = new T.Color();
+  private readonly capacity: number;
+
+  constructor(parent: T.Object3D, color: T.ColorRepresentation, capacity: number) {
+    this.capacity = capacity;
+    const material = (vertexColors: boolean) => new T.MeshBasicMaterial({ color, vertexColors, transparent: true, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide, toneMapped: false });
+    this.rings = new T.InstancedMesh(new T.RingGeometry(.8, 1, 48).rotateX(-Math.PI / 2), material(false), capacity);
+    // Unit shaft, bright at its foot and fading to nothing 1 unit up.
+    const beam = new T.CylinderGeometry(1, 1, 1, 24, 1, true).translate(0, .5, 0), shade = new Float32Array(beam.attributes.position.count * 3);
+    for (let i = 0; i < beam.attributes.position.count; i++) shade.fill(1 - beam.attributes.position.getY(i), i * 3, i * 3 + 3);
+    beam.setAttribute('color', new T.BufferAttribute(shade, 3));
+    this.beams = new T.InstancedMesh(beam, material(true), capacity);
+    for (const mesh of [this.rings, this.beams]) {
+      // Named for main.ts, which keeps these unlit overlays out of GTAO's normal prepass.
+      mesh.name = 'meter-pulse'; mesh.frustumCulled = false; mesh.count = 0; mesh.renderOrder = 2;
+      mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); mesh.setColorAt(0, this.tint.setRGB(0, 0, 0)); parent.add(mesh);
+    }
+  }
+
+  emit(points: readonly PulsePoint[], now: number): void {
+    for (let wave = 0; wave < PULSE_WAVES; wave++) for (const p of points) this.pulses.push({ ...p, start: now + wave * PULSE_WAVE_GAP });
+    // ponytail: oldest pulses drop past capacity; capacity is two waves of every slot, so only rapid repeated changes lose rings.
+    if (this.pulses.length > this.capacity) this.pulses.splice(0, this.pulses.length - this.capacity);
+  }
+
+  clear(): void { this.pulses.length = 0; this.rings.count = this.beams.count = 0; }
+
+  /** Pulses currently drawing (started and not yet faded). */
+  active(now: number): number { return this.pulses.filter(p => now >= p.start && now - p.start < PULSE_SECONDS).length; }
+
+  update(now: number): void {
+    for (let i = this.pulses.length - 1; i >= 0; i--) if (now - this.pulses[i].start >= PULSE_SECONDS) this.pulses.splice(i, 1);
+    this.pulses.forEach((p, i) => {
+      const age = (now - p.start) / PULSE_SECONDS, t = Math.min(1, Math.max(0, age));
+      // Not yet started: zero colour (additive, so it adds nothing) at its own position.
+      const glow = age < 0 ? 0 : T.MathUtils.smoothstep(t, 0, .08) * (1 - t) ** 2;
+      this.dummy.position.set(p.x, p.y + .5, p.z); this.dummy.rotation.set(0, 0, 0);
+      this.dummy.scale.setScalar(p.r * (.6 + 1.6 * t)); this.dummy.updateMatrix();
+      this.rings.setMatrixAt(i, this.dummy.matrix);
+      this.dummy.scale.set(p.r * .25, 40 + p.r * 2, p.r * .25); this.dummy.updateMatrix();
+      this.beams.setMatrixAt(i, this.dummy.matrix);
+      this.tint.setRGB(glow * 2.2, glow * 2.2, glow * 2.2);
+      this.rings.setColorAt(i, this.tint);
+      this.tint.multiplyScalar(.35); this.beams.setColorAt(i, this.tint);
+    });
+    for (const mesh of [this.rings, this.beams]) {
+      mesh.count = this.pulses.length; mesh.instanceMatrix.needsUpdate = true;
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    }
+  }
+}
+
+/** The site's own anchor pulses with its district, tying the lot to the district-wide change. */
+const sitePulse = (socket: keyof typeof changeSites): PulsePoint => {
+  const s = changeSites[socket];
+  return { x: s.x, y: 1, z: s.z, r: Math.max(s.w, s.d) * s.scale * .9 };
+};
+
 /** Fixed pseudo-random rank per slot, so a share of slots switches in a scattered rather than end-to-end order. */
 const rank = (i: number) => { const s = Math.sin(i * 12.9898 + 4.1) * 43758.5453; return s - Math.floor(s); };
 
@@ -67,8 +140,10 @@ export class SharingDistrict {
   private readonly rims: T.InstancedMesh;
   private readonly skylights: T.InstancedMesh;
   private readonly steps: T.InstancedMesh[];
+  private readonly pulses: PulseRings;
   private readonly dummy = new T.Object3D();
   private target = .5;
+  private now = 0;
 
   constructor(parent: T.Object3D) {
     this.root.name = 'sharing-district';
@@ -89,6 +164,7 @@ export class SharingDistrict {
     this.rims = ring(.99, 1.025, .025, light, 'sharing-room-rims');
     this.skylights = ring(.17, .19, .012, light, 'sharing-private-skylights');
     this.steps = Array.from({ length: 3 }, (_, i) => ring(1 + i * .08, 1.08 + i * .08, .045, commons, 'sharing-open-steps'));
+    this.pulses = new PulseRings(this.root, METER_COLORS.publicSharing, (this.bays.length + 1) * PULSE_WAVES);
     this.root.visible = false; parent.add(this.root); this.write();
   }
 
@@ -98,14 +174,17 @@ export class SharingDistrict {
     const share = T.MathUtils.smoothstep(this.target, .25, .875);
     this.root.visible = true;
     const changed = this.levels.setTargets(i => rank(i + 401) < share ? 1 : 0, now, immediate);
+    if (changed && !immediate) this.pulses.emit([sitePulse('sw'), ...this.levels.changed.map(i => {
+      const b = this.bays[i]; return { x: b.x, y: b.y, z: b.z, r: b.r * b.sx * 1.3 };
+    })], now);
     this.write(); return changed;
   }
 
-  update(now: number): void { if (this.levels.update(now)) this.write(); }
-  hide(): void { this.root.visible = false; }
+  update(now: number): void { this.now = now; if (this.levels.update(now)) this.write(); this.pulses.update(now); }
+  hide(): void { this.root.visible = false; this.pulses.clear(); }
   getDiagnostics() {
     const open = this.root.visible ? this.levels.visible() : 0;
-    return { enabled: this.root.visible, targetSharing: this.target, rooms: this.bays.length,
+    return { enabled: this.root.visible, targetSharing: this.target, rooms: this.bays.length, activePulses: this.pulses.active(this.now),
       visibleOpenRooms: open, visiblePrivateRooms: this.root.visible ? this.levels.value.filter(v => 1 - v > HIDDEN).length : 0 };
   }
 
@@ -154,6 +233,7 @@ export interface EnvironmentDistrictDiagnostics {
   readonly roofs: number;
   readonly visibleRoofSails: number;
   readonly visibleRoofCrowns: number;
+  readonly activePulses: number;
 }
 
 const SLOT_STEP = 24, SPAN = 18, WIDTH = 12, ROOF = 8, TOWER = 22;
@@ -176,6 +256,7 @@ export class EnvironmentDistrict {
   private readonly facade = new SlotLevels(2);
   private roofSail = new SlotLevels(0);
   private roofCrown = new SlotLevels(0);
+  private readonly pulses: PulseRings;
   private roofMeshes?: { sails: T.InstancedMesh; posts: T.InstancedMesh; crowns: T.InstancedMesh };
   private readonly sailMaterial = new T.MeshStandardMaterial({ color: '#fbf8f1', roughness: .55, side: T.DoubleSide, emissive: '#fff4e0', emissiveIntensity: .08 });
   private readonly crownMaterial = new T.MeshStandardMaterial({ color: '#ffffff', roughness: .92 });
@@ -228,6 +309,8 @@ export class EnvironmentDistrict {
     this.shafts.name = this.rings.name = 'environment-district-cooling-towers';
     for (const mesh of [posts, this.sails, this.slabs, this.crowns, this.shafts]) mesh.castShadow = mesh.receiveShadow = true;
     this.root.add(posts, this.sails, this.slabs, this.crowns, this.shafts, this.rings);
+    // ponytail: capacity allows two waves over ~90 roof terraces (53 today); more roofs only drop the oldest rings.
+    this.pulses = new PulseRings(this.root, METER_COLORS.environmentalPriority, (n + 90 + 1) * PULSE_WAVES);
     this.root.visible = false;
     parent.add(this.root);
     this.write();
@@ -277,6 +360,15 @@ export class EnvironmentDistrict {
     const c = this.tower.setTargets(i => rank(i + 101) >= share * 2 ? 1 : 0, now, immediate);
     const d = this.setRoofTargets(now, immediate);
     this.facade.setTargets(i => facadeShare(i ? 1 - share : share), now, immediate);
+    if ((a || b || c || d) && !immediate) {
+      const bays = new Set([...this.canopy.changed, ...this.sail.changed, ...this.tower.changed.map(j => this.towerBays[j])]);
+      const roofs = new Set([...this.roofSail.changed, ...this.roofCrown.changed]);
+      this.pulses.emit([
+        sitePulse('ne'),
+        ...[...bays].map(i => ({ x: this.bays[i].x, y: this.bays[i].y + ROOF, z: this.bays[i].z, r: 13 })),
+        ...[...roofs].map(i => { const [x, z, y, r] = this.roofs[i]; return { x, y: y + 9, z, r: r * 1.6 }; }),
+      ], now);
+    }
     this.write();
     return a || b || c || d;
   }
@@ -284,6 +376,7 @@ export class EnvironmentDistrict {
   /** Legacy v1 views and the standalone city do not show the v2 district layer. */
   hide(): void {
     this.root.visible = false;
+    this.pulses.clear();
     this.facade.setTargets(() => 0, 0, true);
     this.writeFacade();
   }
@@ -293,6 +386,7 @@ export class EnvironmentDistrict {
     if (this.facade.update(now)) this.writeFacade();
     const moved = [this.canopy.update(now), this.sail.update(now), this.tower.update(now), this.roofSail.update(now), this.roofCrown.update(now)].some(Boolean);
     if (moved) this.write();
+    this.pulses.update(now);
   }
 
   getDiagnostics(): EnvironmentDistrictDiagnostics {
@@ -300,6 +394,7 @@ export class EnvironmentDistrict {
       slots: this.bays.length, targetCanopy: this.targetCanopy,
       visibleCanopies: this.canopy.visible(), visibleSails: this.sail.visible(), visibleCoolingTowers: this.tower.visible(),
       roofs: this.roofs.length, visibleRoofSails: this.roofSail.visible(), visibleRoofCrowns: this.roofCrown.visible(),
+      activePulses: this.pulses.active(this.now),
     };
   }
 
@@ -367,8 +462,10 @@ export class AutomationDistrict {
   private readonly automation = new SlotLevels(1);
   private readonly staffed: SlotLevels;
   private readonly meshes: T.InstancedMesh[];
+  private readonly pulses: PulseRings;
   private readonly dummy = new T.Object3D();
   private target = .5;
+  private now = 0;
 
   constructor(parent: T.Object3D) {
     this.root.name = 'automation-district';
@@ -413,6 +510,7 @@ export class AutomationDistrict {
       mesh.name = 'automation-staffed-pavilions'; mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;
       mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); this.root.add(mesh); return mesh;
     });
+    this.pulses = new PulseRings(this.root, METER_COLORS.automation, (this.bays.length + 1) * PULSE_WAVES);
     this.root.visible = false; parent.add(this.root); this.write();
   }
 
@@ -424,19 +522,23 @@ export class AutomationDistrict {
     this.root.visible = true;
     const a = this.automation.setTargets(() => this.target, now, immediate);
     const b = this.staffed.setTargets(i => rank(i + 203) >= activity.level ? 1 : 0, now, immediate);
+    // The fleets change everywhere at once, so the hub anchors the pulse; changed staffed pavilions mark their terraces.
+    if ((a || b) && !immediate) this.pulses.emit([sitePulse('nw'), ...this.staffed.changed.map(i => ({ x: this.bays[i].x, y: this.bays[i].y + 20, z: this.bays[i].z, r: 26 }))], now);
     this.write(); return a || b;
   }
 
   update(now: number): void {
+    this.now = now;
     this.automation.update(now);
     if (this.staffed.update(now)) this.write();
+    this.pulses.update(now);
   }
 
-  hide(): void { this.root.visible = false; }
+  hide(): void { this.root.visible = false; this.pulses.clear(); }
 
   getDiagnostics() {
     const activity = automationActivity(this.level ?? .5);
-    return { enabled: this.root.visible, targetAutomation: this.target, automation: this.level,
+    return { enabled: this.root.visible, targetAutomation: this.target, automation: this.level, activePulses: this.pulses.active(this.now),
       pavilions: this.bays.length, visibleStaffedPavilions: this.root.visible ? this.staffed.visible() : 0,
       loopAircraft: this.root.visible ? Math.ceil(activity.aircraft) : undefined,
       guidewayPods: this.root.visible ? Math.ceil(activity.pods) : undefined, walkers: this.root.visible ? Math.ceil(activity.walkers) : undefined };
@@ -479,8 +581,10 @@ export class ConcentrationDistrict {
   private readonly podMeshes: T.InstancedMesh[];
   readonly bridges: { i: number; j: number; y: number }[] = [];
   private readonly bridgeMeshes: T.InstancedMesh[];
+  private readonly pulses: PulseRings;
   private readonly dummy = new T.Object3D();
   private target = .5;
+  private now = 0;
 
   constructor(parent: T.Object3D) {
     this.root.name = 'concentration-district';
@@ -535,6 +639,7 @@ export class ConcentrationDistrict {
     const disc = new T.Mesh(new T.CylinderGeometry(10.5, 9, 1.4, 32), trim); disc.position.y = 8.8; pod.add(disc);
     const bed = new T.Mesh(new T.CylinderGeometry(9.2, 9.2, .4, 28), leaf); bed.position.y = 9.6; pod.add(bed);
     this.podMeshes = this.instances(bake(pod), this.pods.length, 'concentration-distributed-pods');
+    this.pulses = new PulseRings(this.root, METER_COLORS.urbanConcentration, (this.towers.length + this.pods.length + 1) * PULSE_WAVES);
     this.root.visible = false; parent.add(this.root); this.write();
   }
 
@@ -547,18 +652,25 @@ export class ConcentrationDistrict {
     const order = (i: number, offset: number) => (i * .6180339887 + offset) % 1;
     const a = this.towerLevels.setTargets(i => order(i, .31) < share ? 1 : 0, now, immediate);
     const b = this.podLevels.setTargets(i => order(i, .77) >= share ? 1 : 0, now, immediate);
+    if ((a || b) && !immediate) this.pulses.emit([
+      sitePulse('se'),
+      ...this.towerLevels.changed.map(i => ({ x: this.towers[i].x, y: 1, z: this.towers[i].z, r: 30 })),
+      ...this.podLevels.changed.map(i => ({ x: this.pods[i].x, y: 1, z: this.pods[i].z, r: 14 })),
+    ], now);
     this.write(); return a || b;
   }
 
   update(now: number): void {
+    this.now = now;
     const a = this.towerLevels.update(now), b = this.podLevels.update(now);
     if (a || b) this.write();
+    this.pulses.update(now);
   }
 
-  hide(): void { this.root.visible = false; }
+  hide(): void { this.root.visible = false; this.pulses.clear(); }
 
   getDiagnostics() {
-    return { enabled: this.root.visible, targetConcentration: this.target, towers: this.towers.length, pods: this.pods.length,
+    return { enabled: this.root.visible, targetConcentration: this.target, towers: this.towers.length, pods: this.pods.length, activePulses: this.pulses.active(this.now),
       visibleTowers: this.root.visible ? this.towerLevels.visible() : 0, visiblePods: this.root.visible ? this.podLevels.visible() : 0 };
   }
 

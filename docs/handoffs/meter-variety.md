@@ -1,7 +1,7 @@
 # meter-variety — Readable, district-wide Meter changes
 
-- Owner: cc100053 (P0/P1/P4: Claude Code; P2/P3: Codex session)
-- Status: IN_PROGRESS — P0–P4 implemented; P5 planned; P6 evidence recorded per stage
+- Owner: cc100053 (P0/P1/P4/P5: Claude Code; P2/P3: Codex session)
+- Status: IN_PROGRESS — P0–P5 implemented; P6 evidence recorded per stage; awaiting capture review before main
 - Branch: `feat/meter-variety`
 - Base commit: `33227a687ac9d18281e90494a4e9b2ce27f861ce`
 - Last verified commit: P3 source + whitespace correction `357b91784910d1bdc4411659ab8b8acdd99c13b6` (local checks, lossless captures, real WebSocket browser smoke and feature CI PASS)
@@ -30,7 +30,7 @@ Each Meter keeps its site as the focal anchor and additionally drives 2–3 larg
 | P2 | Automation: drones, pods, walker density, staffed pavilions | done; local/browser/feature CI passed |
 | P3 | Sharing: floating decks as private pods vs open steps, water rooms | done; local/browser/feature CI passed |
 | P4 | Concentration: glass towers with sky lobbies vs scattered pavilion pods | done; local/browser checks passed |
-| P5 | Change-moment pulse in the Meter's colour | planned |
+| P5 | Change-moment pulse in the Meter's colour | done; local/browser checks passed |
 | P6 | Pipeline diagnostics, docs, draw-call measurement | per stage |
 
 Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920×929 hero frame (`scripts/meter-diff.py`), day and night.
@@ -118,6 +118,22 @@ Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920�
 - Built-in browser: `cityMeters('se:high')` from low converged to 10 towers / 0 pods; no console errors. Skyway clearance against the live skyway triangles: 0 conflicts for the final towers, lobbies, bridges and pods.
 - Not verified: real HTTP/WebSocket browser smoke for P4 (server → client → model is covered by the 81-combination pipeline test), human art review (towers read partly as banded cylinders; the low pods are modest in the hero frame), Windows, real-GPU FPS, exhibition endurance.
 
+## P5 — Change-moment pulse (2026-10-01)
+
+- Preflight: resumed `feat/meter-variety` at `7ffb43c`, clean, 0/0 with its remote; `origin/main` still `33227a6`. P4 [feature CI 36852613307](https://github.com/cc100053/city2127/actions/runs/36852613307) passed on `7ffb43c` (root, survey, module-swap, committed whitespace). No upstream integration.
+- `METER_COLORS` follows each district's visual language: automation blue `#3fa9ff` (the `trail` lines), sharing rose `#ff6f91` (water-room rims), environment green `#5fe08a`, concentration amber `#ffb347` (lobby light). No per-axis colour existed in the UI to reuse.
+- `PulseRings` per district: an additive unlit ring (expands .6 → 2.2 × radius) and a vertically fading shaft (height 40 m + 2 × radius), two waves 1.2 s apart, 3 s each. Emitted from `setTarget` only when targets changed and the change is not `immediate`; the manager already passes `immediate` for snapshots, resets and reduced motion, so `CityChangeManager` needed no change. Points: the district's site anchor plus each changed slot (`SlotLevels.changed`) — environment bays, mist towers and roof terraces; staffed pavilions; water rooms; towers and pods. Automation's fleet changes have no slot positions, so its hub anchors the pulse.
+- Pulses are additive overlays: shared city finishes (trim, leaf, curtain walls) never flash. Batches are named `meter-pulse`; `main.ts` hides them during GTAO's normal prepass like the boat wakes. Idle batches have `count = 0`. Capacity is two waves of every slot (environment allows ~90 roof terraces; `ponytail:` notes the overflow behaviour).
+- DEV capture aid: `&metersTo=<sites>&metersAge=<s>` applies a live change that started `s` seconds earlier; the DEV hook now waits for the first frame so `now` already holds the held `reviewTime`.
+
+### P5 validation
+
+- Root `npm test`, `npm run build`, `git diff --check`: PASS. P5 unit block covers all four districts (snapshot no pulse, live pulse with site + changed slots, second wave, fade, unchanged target, legacy clear, GTAO-excluded batch names).
+- Captures (real-time headless Chrome via DevTools protocol, 1920×929, `hour=16&reviewTime=20&meters=<site>:low&metersTo=<site>:high&metersAge=0.7`; each capture waits until the DEV hook has applied): [NW automation](meter-variety-p5-pulse-nw.png), [NE environment](meter-variety-p5-pulse-ne.png), [SW sharing](meter-variety-p5-pulse-sw.png), [SE concentration](meter-variety-p5-pulse-se.png), [NE at 21:00](meter-variety-p5-pulse-ne-night.png). Difference to the settled high frame 4.83 / 5.92 / 5.19 / 5.16 % (includes the transition itself); SE at 4.6 s matches settled within 0.09 %.
+- Draw submissions (DevTools protocol): idle SE low / high 1211 / 1231, identical to P4; 1347 mid-change.
+- Capture-tool finding: in zsh, `"$m:low"` / `"$m:high"` expand through the `:l` / `:h` history modifiers (`nwow`, `.igh`), so ad-hoc loops silently loaded standalone frames. P5 captures use `${m}` plus a readiness gate. P1 used `ne:$b`, P4 `se:$b` (literal prefixes), so their recorded numbers are unaffected; `--virtual-time-budget` captures were also not used for P5.
+- Not verified: real HTTP/WebSocket browser smoke for P5 (live path covered by unit tests and the DEV live hook), human review of pulse strength/colour/timing, Windows, real-GPU FPS, exhibition hardware.
+
 ## Next step
 
-P5 (change-moment pulse) on this branch. P0–P4 remain on the feature branch for capture review; preserve the existing review-before-main integration condition.
+Capture review of P0–P5 with the user, then integrate `feat/meter-variety` into `main` per CONTRIBUTING (preserve the review-before-main condition). P6 remains per-stage evidence.
