@@ -258,7 +258,7 @@ const offGround = (x: number, z: number, radius: number) => {
 /** Podium on open ground; trees may stand beside it but not above the podium; shaft, lobbies and crown clear of everything. */
 const towerProblem = (x: number, z: number, h: number) => offGround(x, z, 18.5) ?? blocked(x, z, 3, 18.5)
   ?? [.4 * h, .72 * h, h].map(y => blocked(x, z, y, 24)).find(Boolean) ?? (h * 1.06 < 165 ? undefined : 'air-taxi loop');
-const podProblem = (x: number, z: number) => offGround(x, z, 10.5) ?? blocked(x, z, 6, 11);
+const podProblem = (x: number, z: number) => offGround(x, z, 10.5) ?? blocked(x, z, 6, 11) ?? blocked(x, z, 9, 12.5) ?? blocked(x, z, 13, 9.5);
 if (process.env.PROBE_CONCENTRATION) {
   // Dev aid: PROBE_CONCENTRATION=x,z,h;x,z;... prints the problem (or OK) for candidate tower [x,z,h] / pod [x,z] sites.
   for (const entry of process.env.PROBE_CONCENTRATION.split(';')) {
@@ -323,19 +323,37 @@ for (const sharedSeats of [0, 8]) {
 }
 console.log(`Odaiba: ${sharingDistrict.courts.length} sharing courts stand on open ground clear of context, routes and other Meter sites; sites stay visible.`);
 
+/** Estimated hero-frame pixels (1920 × 929 capture) of a court's 40 m ground square left visible: a 9 × 9 sample grid, each visible
+ * sample weighted by its share of the square's projected area. Replaces a single centre ray, which kept courts that landmarks mostly hide. */
+const capture = heroCamera(1920, 929); capture.updateMatrixWorld(true);
+const courtPixels = (x: number, z: number, yaw = 0, half = 20) => {
+  const corners = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, b]) => new Vector3(x + a * half, 0, z + b * half).project(capture))
+    .map(p => [(p.x + 1) * 960, (1 - p.y) * 464.5]);
+  const area = Math.abs(corners.reduce((sum, [ax, ay], k) => { const [bx, by] = corners[(k + 1) % 4]; return sum + ax * by - bx * ay; }, 0)) / 2;
+  let seen = 0;
+  for (let i = 0; i < 9; i++) for (let k = 0; k < 9; k++) {
+    const u = (i - 4) / 4.5 * half, v = (k - 4) / 4.5 * half;
+    const look = new Vector3(x + u * Math.cos(yaw) + v * Math.sin(yaw), 1, z - u * Math.sin(yaw) + v * Math.cos(yaw)), ndc = look.clone().project(capture);
+    if (Math.abs(ndc.x) > 1 || Math.abs(ndc.y) > 1) continue;
+    ray.set(capture.position, look.clone().sub(capture.position).normalize());
+    const hit = ray.intersectObject(city, true)[0];
+    if (!hit || hit.distance > capture.position.distanceTo(look) - 2) seen++;
+  }
+  return area * seen / 81;
+};
+const courtVisibility = sharingDistrict.courts.map(c => courtPixels(c.x, c.z, c.yaw));
+for (const [i, px] of courtVisibility.entries()) assert.ok(px >= 600, `court ${i} shows only ${px.toFixed(0)} px from the hero pose`);
+console.log(`Odaiba: sharing courts show ${courtVisibility.map(px => px.toFixed(0)).join(' / ')} px of ground in the hero frame.`);
+
 if (process.env.SCAN_COURTS) {
   const R = Number(process.env.SCAN_COURTS), routePoints = [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades].flatMap(r => r.getSpacedPoints(400));
-  const out: string[] = [];
+  const out: [number, string][] = [];
   for (let x = DISTRICT.minX; x <= DISTRICT.maxX; x += 10) for (let z = DISTRICT.minZ; z <= DISTRICT.maxZ; z += 10) {
     if (concentration.towers.some(t => Math.hypot(t.x - x, t.z - z) < R + 28) || concentration.pods.some(p => Math.hypot(p.x - x, p.z - z) < R + 16)) continue;
     if (serviceDistrict.bays.some(b => Math.hypot(b.x - x, b.z - z) < R + 34) || routePoints.some(p => Math.hypot(p.x - x, p.z - z) < R + 4)) continue;
     if (offGround(x, z, R) ?? blocked(x, z, 3, R) ?? blocked(x, z, 10, R)) continue;
-    const ndc = new Vector3(x, 0, z).project(camera);
-    if (Math.abs(ndc.x) > .95 || Math.abs(ndc.y) > .95) continue;
-    const look = new Vector3(x, 1, z); ray.set(camera.position, look.clone().sub(camera.position).normalize());
-    const hit = ray.intersectObject(city, true)[0];
-    if (hit && hit.distance < camera.position.distanceTo(look) - 6) continue;
-    out.push(`${x},${z} sy=${Math.round((1 - ndc.y) * 540)}`);
+    const px = courtPixels(x, z);
+    if (px > 0) out.push([px, `${x},${z} ${px.toFixed(0)}px`]);
   }
-  console.log('COURTS', out.join(' | '));
+  console.log('COURTS', out.sort((a, b) => b[0] - a[0]).map(o => o[1]).join(' | '));
 }

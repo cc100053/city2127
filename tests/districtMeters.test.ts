@@ -63,6 +63,7 @@ automation.setTarget({ automatedPorts: 1 }, 0, true);
 const low = automation.getDiagnostics();
 assert.ok(low.pavilions >= 6);
 assert.equal(low.visibleStaffedPavilions, low.pavilions);
+assert.equal(low.visibleDronePorts, 0, 'human-led bays carry no drone ports');
 assert.deepEqual([low.loopAircraft, low.guidewayPods, low.walkers], [2, 12, 160]);
 automation.setTarget({ automatedPorts: 5 }, 1, false);
 automation.update(2.5);
@@ -72,6 +73,10 @@ assert.equal(automation.setTarget({ automatedPorts: 5 }, 2.5, false), false);
 automation.update(4);
 const high = automation.getDiagnostics();
 assert.equal(high.visibleStaffedPavilions, 0);
+assert.equal(high.visibleDronePorts, high.pavilions, 'P7: every bay becomes a drone port, not empty ground');
+const portMatrix = new T.Matrix4(), portScale = new T.Vector3();
+(automation.root.getObjectByName('automation-drone-ports') as T.InstancedMesh).getMatrixAt(0, portMatrix);
+assert.ok(Math.abs(portScale.setFromMatrixScale(portMatrix).y - 1) < 1e-6, 'drone port stands at full size');
 assert.deepEqual([high.loopAircraft, high.guidewayPods, high.walkers], [30, 24, 40]);
 automation.setTarget({ automatedPorts: 1 }, 5, false);
 automation.update(6);
@@ -81,13 +86,14 @@ assert.equal(automation.level, interrupted, 'retarget preserves current level');
 automation.update(9);
 const mixed = automation.getDiagnostics();
 assert.ok(mixed.visibleStaffedPavilions > 0 && mixed.visibleStaffedPavilions < mixed.pavilions);
+assert.equal(mixed.visibleStaffedPavilions + mixed.visibleDronePorts, mixed.pavilions, 'mixed bays are each staffed or autonomous');
 assert.deepEqual([mixed.loopAircraft, mixed.guidewayPods, mixed.walkers], [16, 18, 100]);
 automation.setTarget({ automatedPorts: 1 }, 10, true);
 assert.equal(automation.getDiagnostics().walkers, 160, 'snapshot/reset is immediate');
 automation.hide(); automation.update(20);
 assert.equal(automation.level, undefined);
 assert.equal(automation.root.visible, false);
-console.log(`PASS: automation district — ${low.pavilions} staffed pavilions, aircraft/pods/walker mapping, same targets, live retarget, reset and legacy hide.`);
+console.log(`PASS: automation district — ${low.pavilions} staffed pavilions ↔ drone ports, aircraft/pods/walker mapping, same targets, live retarget, reset and legacy hide.`);
 
 // Check the actual actor matrices, not just the diagnostic counts, and preserve standalone/legacy poses.
 const actorScene = new T.Scene(), updateActors = mobility(actorScene);
@@ -167,6 +173,9 @@ assert.deepEqual(counts(), [0, concentration.pods.length]);
 concentration.setTarget({ functionModules: 5 }, 1, false);
 concentration.update(2.5);
 const towerMesh = concentration.root.getObjectByName('concentration-vertical-towers') as T.InstancedMesh;
+// P7: three silhouette families (twisted / terraced / twin) split the slots; their batches hold exactly the ten towers.
+const towerBatches = concentration.root.children.filter(o => o.name === 'concentration-vertical-towers') as T.InstancedMesh[];
+assert.deepEqual([...new Set(towerBatches.map(m => m.count))].sort(), [3, 4], 'towers split into three families of 4 / 3 / 3');
 const rising = new T.Vector3();
 towerMesh.getMatrixAt(0, matrix); rising.setFromMatrixScale(matrix);
 assert.ok(rising.y > concentration.towers[0].h * .3 && rising.y < concentration.towers[0].h * .7, 'towers rise over the 3-second transition');
@@ -183,7 +192,7 @@ assert.ok(mixedTowers > 0 && mixedTowers < concentration.towers.length && mixedP
 concentration.hide();
 assert.deepEqual(counts(), [0, 0]);
 assert.equal(concentration.root.visible, false);
-console.log(`PASS: concentration district — ${concentration.towers.length} towers / ${concentration.bridges.length} sky bridges vs ${concentration.pods.length} pods, rise, same target, mixed hybrid, invertible hidden matrices, legacy hide.`);
+console.log(`PASS: concentration district — ${concentration.towers.length} towers in 3 silhouette families / ${concentration.bridges.length} sky bridges vs ${concentration.pods.length} pods, rise, same target, mixed hybrid, invertible hidden matrices, legacy hide.`);
 
 // P5: a live change pulses only where its district changed, in two waves that fade within PULSE_WAVE_GAP + PULSE_SECONDS;
 // snapshots / resets / reduced motion (immediate) never pulse, and a legacy hide clears pulses.

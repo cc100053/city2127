@@ -1,5 +1,9 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
+## Meter variety P7 — 2026-10-01，feature branch 待視覺審閱
+
+補三個弱點：自動化高值唔再係空地，每個人手服務館位置換成無人機升降塔（46 m 降落台、藍色光環、充電塔、停泊無人機）；集約塔改為三款剪影（扭轉塔、退台綠化塔、連體雙塔），pod 加高成兩層；共享庭院改用 hero 畫面「可見像素」評分，三個被地標遮住嘅庭院搬去最易睇到嘅空地。日／夜差異：自動化 **4.02%／3.58%**、共享 **1.89%／2.10%**（冇低過 1.6%）、集約 **4.04%／3.42%**，全部過門檻。詳見 [P7 交接](handoffs/meter-variety.md#p7--weak-spots-2026-10-01)。P8–P12 仍為建議；保留 capture review 後才整合 main 的條件。
+
 ## Meter variety P5 — 2026-10-01，feature branch 待視覺審閱
 
 每次 live 提案改變某個 Meter，嗰個 district 會喺 site 同每個實際有改動嘅位置發出兩波擴散光環同向上漸淡嘅光柱，用該 Meter 嘅顏色（自動化藍、共有玫瑰粉、環境綠、集約琥珀），約 4.2 秒後消失；snapshot、reset 同 reduced motion 唔會發光，亦唔會令共用城市材質閃動。冇 pulse 時唔增加 draw call。截圖與限制見 [P5 交接](handoffs/meter-variety.md#p5--change-moment-pulse-2026-10-01)。保留 capture review 後才整合 main 的條件。
@@ -10,7 +14,7 @@
 
 ## Meter variety P7–P12 — 2026-10-01，建議（待用家批准）
 
-下一步加強每個 Meter 的 variety：P7 補弱點（P4 塔剪影、sharing 庭院可見度、automation 高值唔再係「空地」）、P8 每個載體 2–3 款設計、P9 mixed 有自己的混合款、P10 跨 Meter 組合；P11 路徑依賴、P12 生活感為可選。未實作。詳見 [P7–P12 建議](handoffs/meter-variety.md#proposed-p7p12--more-variety-per-meter-2026-10-01-pending-user-approval)。
+下一步加強每個 Meter 的 variety：P7 補弱點（已完成，見上）（P4 塔剪影、sharing 庭院可見度、automation 高值唔再係「空地」）、P8 每個載體 2–3 款設計、P9 mixed 有自己的混合款、P10 跨 Meter 組合；P11 路徑依賴、P12 生活感為可選。P8–P12 未實作。詳見 [P7–P12 建議](handoffs/meter-variety.md#proposed-p7p12--more-variety-per-meter-2026-10-01-pending-user-approval)。
 
 ## Meter variety P3d — 2026-10-01，海邊收細＋內陸共享庭院
 

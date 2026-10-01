@@ -1,7 +1,7 @@
 # meter-variety — Readable, district-wide Meter changes
 
 - Owner: cc100053 (P0/P1/P4/P5: Claude Code; P2/P3: Codex session)
-- Status: IN_PROGRESS — P0–P5 implemented; P6 evidence recorded per stage; awaiting capture review before main
+- Status: IN_PROGRESS — P0–P5 and P7 implemented; P6 evidence recorded per stage; awaiting capture review before main
 - Branch: `feat/meter-variety`
 - Base commit: `33227a687ac9d18281e90494a4e9b2ce27f861ce`
 - Last verified commit: P3 source + whitespace correction `357b91784910d1bdc4411659ab8b8acdd99c13b6` (local checks, lossless captures, real WebSocket browser smoke and feature CI PASS)
@@ -162,6 +162,29 @@ Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920�
 - Readability (same conditions, only Q2 changes): low ↔ high **1.63 %** day, **1.85 %** night; low ↔ mixed 0.91 %, mixed ↔ high 0.77 %. Captures: [low](meter-variety-p3d-sharing-low.png), [mixed](meter-variety-p3d-sharing-mixed.png), [high](meter-variety-p3d-sharing-high.png), [night low](meter-variety-p3d-sharing-night-low.png), [night high](meter-variety-p3d-sharing-night-high.png), [standalone](meter-variety-p3d-sharing-standalone.png).
 - Batches: +5 court batches; the deck plates / crescents merged meshes are gone. Draw calls not re-measured. Not verified: close-up court review (hero only), human art acceptance, real-GPU FPS, Windows.
 
+## P7 — Weak spots (2026-10-01)
+
+- Preflight: resumed `feat/meter-variety` at `18da54a`, clean; fetch succeeded; branch 0/0 with its remote; `origin/main` still `33227a6`. Owner cc100053 (Claude Code session); no overlapping dirty modules or assets. The user asked to "do p7"; P8–P12 remain proposals.
+- **Automation** (`AutomationDistrict`): every bay now carries an autonomous counterpart that rises as its staffed pavilion folds away on the same `SlotLevels` — a slate mast lifting a 31 m landing deck at `PORT_DECK` = 46 m (above the 42 m pavilion dome), blue `trail` apron rings, a ringed charging spire to 64 m and three parked drones. High therefore reads as 11 drone ports, not empty ground; mixed bays are each staffed or autonomous. Diagnostics add `visibleDronePorts`. +4 instanced batches (slate / trim / trail / glass).
+- **Concentration** (`ConcentrationDistrict`): the single banded cylinder is replaced by three silhouette families by slot (`i % 3`, 4 / 3 / 3 towers): a twisted shaft (18 square storeys turning 100°, two sky lobbies), a terraced setback tower (three stepped tiers with planted, lit terraces at the .4 / .72 lobby levels) and linked twin shafts (unequal heights joined by lit links at both levels). All keep the podium footprint, `towerGlow` glass and bridge levels. Pods became two-tier (stacked lit drums under two ivory discs, about 15 m tall, 24 m across). Five pods moved (≤ 15 m) where the wider discs met tree crowns or overhung the guideway: `[-218,-23]`, `[-183,-43]`, `[-168,-128]`, `[7,-58]`, `[252,147]`. Deviation: "pod clusters" became larger two-tier pods; a multi-pod cluster would not fit the traced open ground. Tower batches 4 → 12.
+- **Sharing**: `tests/odaiba.test.ts` now estimates each court's visible ground pixels in the 1920 × 929 hero frame (9 × 9 sample rays weighted by projected area) instead of one centre ray, asserts ≥ 600 px per court, and `SCAN_COURTS=20` lists candidates best first. The three most hidden courts (485 / 542 / 654 px) moved to `[50,-340]`, `[170,-360]`, `[-460,290]` (2545 / 1938 / 1434 px); total visible court ground 10.7k → 14.8k px.
+
+### P7 validation
+
+- Root `npm test` (new: drone ports 0 / all / complementary at low / high / mixed and full-size matrix; three tower families of 4 / 3 / 3; pod clearance at 9 m and 13 m; court pixel floor), `npm run build`, `git diff --check`: PASS. `survey/` and `module-swap/` unchanged.
+- Readability (headless Chrome via DevTools protocol, 1920 × 929, DPR 1, untouched hero, `?hour=16|21&reviewTime=20&meters=<site>:<band>`, readiness gate on DEV hook + loaded fonts, repeat noise 0.05 %), before at `18da54a` → after:
+
+| Meter | Day low ↔ high | Night low ↔ high | Day low ↔ mixed / mixed ↔ high |
+| --- | --- | --- | --- |
+| Automation (NW) | 3.77 → **4.02 %** | 3.11 → **3.58 %** | 2.21 / 1.78 → 2.42 / 1.88 % |
+| Sharing (SW) | 1.63 → **1.89 %** | 1.85 → **2.10 %** | 0.91 / 0.78 → 1.12 / 0.82 % |
+| Concentration (SE) | 4.49 → **4.04 %** | 3.81 → **3.42 %** | 2.72 / 2.39 → 2.45 / 2.19 % |
+
+  All gates pass (automation / concentration ≥ 3 %, sharing no regression below 1.6 %). Concentration dropped about 0.4 % because the twisted and twin silhouettes are slimmer than the old 23 m lobby discs; it stays above the gate. The NW day "before" (3.77 %) is lower than P2's 3.98 % because later stages share the frame.
+- Captures: automation [low](meter-variety-p7-auto-low.png) / [mixed](meter-variety-p7-auto-mixed.png) / [high](meter-variety-p7-auto-high.png) / [night low](meter-variety-p7-auto-night-low.png) / [night high](meter-variety-p7-auto-night-high.png); sharing [low](meter-variety-p7-sharing-low.png) / [mixed](meter-variety-p7-sharing-mixed.png) / [high](meter-variety-p7-sharing-high.png) / [night low](meter-variety-p7-sharing-night-low.png) / [night high](meter-variety-p7-sharing-night-high.png); concentration [low](meter-variety-p7-concentration-low.png) / [mixed](meter-variety-p7-concentration-mixed.png) / [high](meter-variety-p7-concentration-high.png) / [night low](meter-variety-p7-concentration-night-low.png) / [night high](meter-variety-p7-concentration-night-high.png). Before captures were not committed (they match the P2 / P3d / P4 forms).
+- Same-condition draw submissions (`data-draw-calls`): all-mixed day 1204 → 1252, NW high 1220 → 1268, SE low / high 1224 / 1244 → 1272 / 1292 (**+48**: 4 port + 8 extra tower batches with their shadow / G-buffer passes). Draw-call comparison only, not an FPS acceptance.
+- Not verified: skyway clearance of the new tower silhouettes in the browser (footprints stay inside the checked 24 m reach; the new pod sites were not rechecked against skyways), real HTTP/WebSocket smoke for P7, human art review, Windows, real-GPU FPS.
+
 ## Proposed P7–P12 — More variety per Meter (2026-10-01, pending user approval)
 
 Not implemented. Goal: each Meter reads as several distinct mature 2127 identities, not one object family that is present or absent. Constraints carry over: desktop hero pose unchanged, no server contract change (P11 excepted), every value futuristic, greenery stays lush with no uniform grids, no new assets, dependencies or render passes.
@@ -181,7 +204,7 @@ Mixed values only scatter the two endpoint designs (low ↔ mixed 0.9–2.7 %).
 
 | Stage | Scope | Acceptance beyond the standard checks |
 | --- | --- | --- |
-| P7 | Weak spots. **Concentration**: three tower silhouette families by slot (twisted shaft, terraced setback, linked twin) and pod clusters large enough to read. **Sharing**: rank court sites by rendered visible pixels, not a centre ray; move the hidden ones. **Automation**: high gets autonomous counterparts on the pavilion bays (drone ports / charging masts) instead of empty ground. | Each touched Meter ≥ 3 % day and night (sharing: no regression below 1.6 %); before/after captures |
+| P7 (done, see [P7](#p7--weak-spots-2026-10-01)) | Weak spots. **Concentration**: three tower silhouette families by slot (twisted shaft, terraced setback, linked twin) and pod clusters large enough to read. **Sharing**: rank court sites by rendered visible pixels, not a centre ray; move the hidden ones. **Automation**: high gets autonomous counterparts on the pavilion bays (drone ports / charging masts) instead of empty ground. | Each touched Meter ≥ 3 % day and night (sharing: no regression below 1.6 %); before/after captures |
 | P8 | Design families. Every slot-based carrier gets 2–3 variants chosen by a fixed per-slot hash, e.g. environment bays: sail / pergola / vertical garden screen; roofs: sail / forest / meadow terraces; sharing courts: walled garden / glass winter garden / courtyard cluster and parasols / long-table pergola / amphitheatre lawn; automation pavilions: domed / stacked deck / garden kiosk. | New check: within one band, slots of a carrier use ≥ 2 families; gate unchanged |
 | P9 | Mixed identity. At mid values a share of slots shows a hybrid design (half-open room, shared-staffed pavilion, terraced mid-rise), so low / mixed / high read as three identities. | low ↔ mixed and mixed ↔ high each ≥ 1.5 % |
 | P10 | Cross-Meter combinations. 4–6 pairings add visible extras only when both axes agree, e.g. sharing + automation high → drone kiosks in shared plazas; environment + concentration high → vertical-forest tower crowns. | 81-combination pipeline test asserts each extra appears only in its pairing |
@@ -199,4 +222,4 @@ P6 (pipeline diagnostics, docs, draw-call measurement) stays per stage: each sta
 
 ## Next step
 
-Capture review of P0–P5 (with P3b–P3d) with the user, then decide on the [P7–P12 proposal](#proposed-p7p12--more-variety-per-meter-2026-10-01-pending-user-approval) and integrate `feat/meter-variety` into `main` per CONTRIBUTING (preserve the review-before-main condition). P6 remains per-stage evidence.
+Capture review of P0–P5, P3b–P3d and P7 with the user; then decide P8 (design families) and the remaining open questions above, and integrate `feat/meter-variety` into `main` per CONTRIBUTING (preserve the review-before-main condition).

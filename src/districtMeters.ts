@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { arc, bake, box, glass, leaf, leafyCrown, publicLight, stone, trail, trim } from './cityRig.ts';
+import { arc, bake, box, glass, leaf, leafyCrown, publicLight, solar, stone, trail, trim } from './cityRig.ts';
 import { changeSites, seaward } from './layout.ts';
 import { shoreRoomBays } from './waterRooms.ts';
 import { automationActivity, routes } from './mobility.ts';
@@ -135,10 +135,10 @@ export const PRIVATE_RISE = 1.15;
 const SPREAD = 1.45;
 /** Halo canopy height as a share of room radius (about 6–8 m). */
 const HALO = .42;
-/** Inland sharing courts [x, z, yaw]: open ground scanned clear of landmarks, context, routes, P2 pavilions and P4 towers / pods,
- * and visible from the hero pose (`SCAN_COURTS=20` in tests/odaiba.test.ts lists candidates). */
+/** Inland sharing courts [x, z, yaw]: open ground scanned clear of landmarks, context, routes, P2 pavilions and P4 towers / pods.
+ * P7 ranks by estimated visible hero-frame pixels (`SCAN_COURTS=20` in tests/odaiba.test.ts lists candidates best first). */
 const COURT_SITES: readonly (readonly [number, number, number])[] = [
-  [-220, -140, .4], [-410, 120, 1.1], [-100, 60, 2.3], [250, -180, .9], [180, -50, 3.6], [-70, 180, 1.7], [-290, 290, 5.1], [-140, 230, .2], [220, 0, 2.8], [-20, 210, 4.4],
+  [-220, -140, .4], [-410, 120, 1.1], [-100, 60, 2.3], [50, -340, .9], [170, -360, 3.6], [-70, 180, 1.7], [-290, 290, 5.1], [-460, 290, .2], [220, 0, 2.8], [-20, 210, 4.4],
 ];
 const COURT = 40;
 /** Garden crowns inside a private court [x, z, size], clear of the glass room and the entrance. */
@@ -560,7 +560,9 @@ export class EnvironmentDistrict {
   }
 }
 
-/** Q1: staffed waterfront pavilions give way to autonomous district circulation.
+/** Drone port deck height: well above the 42 m pavilion dome, so the autonomous counterpart reads as a new silhouette. */
+export const PORT_DECK = 46;
+/** Q1: staffed waterfront pavilions give way to autonomous drone ports on the same bays, with denser district circulation.
  * World-space batches stay independent of the hub's scaled lot and use the same 3 s clock. */
 export class AutomationDistrict {
   readonly root = new T.Group();
@@ -568,6 +570,7 @@ export class AutomationDistrict {
   private readonly automation = new SlotLevels(1);
   private readonly staffed: SlotLevels;
   private readonly meshes: T.InstancedMesh[];
+  private readonly ports: T.InstancedMesh[];
   private readonly pulses: PulseRings;
   private readonly dummy = new T.Object3D();
   private target = .5;
@@ -611,11 +614,31 @@ export class AutomationDistrict {
       head.position.set(torso.position.x, 22.35, 4); pavilion.add(head);
       for (const dx of [-.14, .14]) box(pavilion, [.15, .8, .18], [torso.position.x + dx, 20.85, 4], glass, .04);
     }
-    this.meshes = bake(pavilion).map(source => {
+    const instances = (group: T.Object3D, name: string) => bake(group).map(source => {
       const mesh = new T.InstancedMesh(source.geometry, source.material, this.bays.length);
-      mesh.name = 'automation-staffed-pavilions'; mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;
+      mesh.name = name; mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;
       mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); this.root.add(mesh); return mesh;
     });
+    this.meshes = instances(pavilion, 'automation-staffed-pavilions');
+    // Autonomous counterpart on the same bay: a slate mast lifts a round landing deck with a lit blue apron ring, a charging spire
+    // and parked drones; no people. A single-footed silhouette above the old dome, so absence never stands in for the identity.
+    const port = new T.Group();
+    const at = (geometry: T.BufferGeometry, material: T.Material, x: number, y: number, z: number) => {
+      const m = new T.Mesh(geometry, material); m.position.set(x, y, z); port.add(m);
+    };
+    at(new T.CylinderGeometry(1.6, 2.4, PORT_DECK, 12), solar, 0, PORT_DECK / 2, 0);
+    at(new T.CylinderGeometry(15, 6, 3, 40), solar, 0, PORT_DECK - 1.5, 0);
+    at(new T.CylinderGeometry(15.4, 15.4, .5, 48), trim, 0, PORT_DECK + .25, 0);
+    at(new T.TorusGeometry(12, .45, 6, 48).rotateX(Math.PI / 2), trail, 0, PORT_DECK + .6, 0);
+    at(new T.TorusGeometry(15.4, .35, 6, 48).rotateX(Math.PI / 2), trail, 0, PORT_DECK - .2, 0);
+    at(new T.CylinderGeometry(.5, 1, 18, 8), solar, 0, PORT_DECK + 9, 0);
+    for (const y of [5, 10, 15]) at(new T.TorusGeometry(1.6 - y * .04, .22, 6, 20).rotateX(Math.PI / 2), trail, 0, PORT_DECK + y, 0);
+    for (const a of [0, 2.1, 4.2]) {
+      const x = Math.cos(a) * 8, z = Math.sin(a) * 8;
+      at(new T.SphereGeometry(1.4, 12, 8).scale(1.4, .6, 1), glass, x, PORT_DECK + 1.3, z);
+      for (const [dx, dz] of [[-1.8, -1.8], [1.8, -1.8], [-1.8, 1.8], [1.8, 1.8]]) at(new T.CylinderGeometry(1, 1, .12, 12), trim, x + dx, PORT_DECK + 1.6, z + dz);
+    }
+    this.ports = instances(port, 'automation-drone-ports');
     this.pulses = new PulseRings(this.root, METER_COLORS.automation, (this.bays.length + 1) * PULSE_WAVES);
     this.root.visible = false; parent.add(this.root); this.write();
   }
@@ -628,7 +651,7 @@ export class AutomationDistrict {
     this.root.visible = true;
     const a = this.automation.setTargets(() => this.target, now, immediate);
     const b = this.staffed.setTargets(i => rank(i + 203) >= activity.level ? 1 : 0, now, immediate);
-    // The fleets change everywhere at once, so the hub anchors the pulse; changed staffed pavilions mark their terraces.
+    // The fleets change everywhere at once, so the hub anchors the pulse; changed bays (pavilion ↔ drone port) mark their terraces.
     if ((a || b) && !immediate) this.pulses.emit([sitePulse('nw'), ...this.staffed.changed.map(i => ({ x: this.bays[i].x, y: this.bays[i].y + 20, z: this.bays[i].z, r: 26 }))], now);
     this.write(); return a || b;
   }
@@ -646,6 +669,7 @@ export class AutomationDistrict {
     const activity = automationActivity(this.level ?? .5);
     return { enabled: this.root.visible, targetAutomation: this.target, automation: this.level, activePulses: this.pulses.active(this.now),
       pavilions: this.bays.length, visibleStaffedPavilions: this.root.visible ? this.staffed.visible() : 0,
+      visibleDronePorts: this.root.visible ? this.staffed.value.filter(v => 1 - v > HIDDEN).length : 0,
       loopAircraft: this.root.visible ? Math.ceil(activity.aircraft) : undefined,
       guidewayPods: this.root.visible ? Math.ceil(activity.pods) : undefined, walkers: this.root.visible ? Math.ceil(activity.walkers) : undefined };
   }
@@ -655,8 +679,12 @@ export class AutomationDistrict {
       this.dummy.position.set(bay.x, bay.y, bay.z); this.dummy.rotation.set(0, bay.yaw, 0);
       this.dummy.scale.setScalar(this.staffed.value[i]); this.dummy.updateMatrix();
       for (const mesh of this.meshes) mesh.setMatrixAt(i, this.dummy.matrix);
+      // The port rises from its mast foot as the pavilion folds away (same 3 s clock); hidden ports keep an invertible tiny scale.
+      const port = Math.max(HIDDEN, 1 - this.staffed.value[i]);
+      this.dummy.scale.set(port, port, port); this.dummy.updateMatrix();
+      for (const mesh of this.ports) mesh.setMatrixAt(i, this.dummy.matrix);
     });
-    for (const mesh of this.meshes) mesh.instanceMatrix.needsUpdate = true;
+    for (const mesh of [...this.meshes, ...this.ports]) mesh.instanceMatrix.needsUpdate = true;
   }
 }
 
@@ -670,7 +698,7 @@ const TOWER_SITES: readonly (readonly [number, number, number])[] = [
   [115, -25, 128], [67, -89, 112], [27, -249, 120], [83, -305, 104], [-189, -1, 140], [-221, -73, 116], [-157, 63, 124], [-61, 111, 104], [179, 287, 120], [-13, 279, 110],
 ];
 const POD_SITES: readonly (readonly [number, number])[] = [
-  [-293, 147], [-253, -33], [-233, 47], [-223, -23], [-173, -53], [-163, -133], [-103, 17], [-53, 147], [-33, 167], [-23, 107], [-3, -53], [27, 87], [77, 107], [87, 57], [97, -73], [107, -123], [107, 77], [117, 7], [137, -103], [207, 37], [217, -43], [217, 87], [237, -73], [237, 57], [247, -103], [247, 147],
+  [-293, 147], [-253, -33], [-233, 47], [-218, -23], [-183, -43], [-168, -128], [-103, 17], [-53, 147], [-33, 167], [-23, 107], [7, -58], [27, 87], [77, 107], [87, 57], [97, -73], [107, -123], [107, 77], [117, 7], [137, -103], [207, 37], [217, -43], [217, 87], [237, -73], [237, 57], [247, -103], [252, 147],
 ];
 
 /** Q4: one walkable vertical district or functions spread through the parks.
@@ -683,7 +711,8 @@ export class ConcentrationDistrict {
   readonly pods: readonly { x: number; z: number; yaw: number }[] = POD_SITES.map(([x, z], i) => ({ x, z, yaw: i * 2.1 }));
   private readonly towerLevels = new SlotLevels(this.towers.length);
   private readonly podLevels = new SlotLevels(this.pods.length);
-  private readonly towerMeshes: T.InstancedMesh[];
+  /** Tower meshes per silhouette family (slot i uses family i % 3, instance ⌊i / 3⌋). */
+  private readonly families: T.InstancedMesh[][];
   private readonly podMeshes: T.InstancedMesh[];
   readonly bridges: { i: number; j: number; y: number }[] = [];
   private readonly bridgeMeshes: T.InstancedMesh[];
@@ -714,22 +743,54 @@ export class ConcentrationDistrict {
     };
     facade.customProgramCacheKey = () => 'concentration-tower-glass';
     const lobby = publicLight.clone(); lobby.emissive.set('#ffe1b8'); lobby.emissiveIntensity = .9;
-    // Unit-height tower (1 m tall, scaled per site): podium, glass shaft with ivory floor bands, two lit sky lobbies, planted crown.
-    const tower = new T.Group();
-    const unit = (geometry: T.BufferGeometry, material: T.Material, y: number) => { const m = new T.Mesh(geometry, material); m.position.y = y; tower.add(m); };
-    unit(new T.CylinderGeometry(17.5, 18.5, .05, 32), trim, .025);
-    unit(new T.CylinderGeometry(13.5, 16, .94, 32), facade, .52);
-    for (let y = .1; y < .94; y += .09) unit(new T.CylinderGeometry(16.1 - y * 2.6, 16.1 - y * 2.6, .005, 32), trim, y);
-    // Two sky lobbies: wide ivory decks with a planted outer ring and a warm-lit glazed band (a street lifted into the air).
-    for (const y of [.4, .72]) {
-      unit(new T.CylinderGeometry(23, 23, .02, 40), trim, y);
-      unit(new T.CylinderGeometry(22.6, 22.6, .006, 40), leaf, y + .013);
-      unit(new T.CylinderGeometry(17.5, 17.5, .03, 40, 1, true), lobby, y + .03);
-    }
-    unit(new T.CylinderGeometry(16, 13, .035, 32), trim, .97);
-    unit(new T.SphereGeometry(13, 24, 10, 0, Math.PI * 2, 0, Math.PI / 2).scale(1, .002, 1), leaf, .99);
-    unit(new T.CylinderGeometry(.5, .9, .12, 8), trim, 1.05);
-    this.towerMeshes = this.instances(bake(tower), this.towers.length, 'concentration-vertical-towers');
+    // Three unit-height (1 m, scaled per site) silhouette families by slot, all on an ivory podium and all marked at the .4 / .72 sky-lobby
+    // levels where bridges land: a twisted glass shaft, a terraced setback tower with planted terraces, and linked twin shafts.
+    const family = (build: (unit: (geometry: T.BufferGeometry, material: T.Material, x: number, y: number, z?: number, yaw?: number) => void) => void) => {
+      const tower = new T.Group();
+      build((geometry, material, x, y, z = 0, yaw = 0) => { const m = new T.Mesh(geometry, material); m.position.set(x, y, z); m.rotation.y = yaw; tower.add(m); });
+      tower.add(new T.Mesh(new T.CylinderGeometry(17.5, 18.5, .05, 32).translate(0, .025, 0), trim));
+      return tower;
+    };
+    const skyLobby = (unit: (geometry: T.BufferGeometry, material: T.Material, x: number, y: number) => void, y: number, r: number) => {
+      unit(new T.CylinderGeometry(r, r, .02, 40), trim, 0, y);
+      unit(new T.CylinderGeometry(r - .4, r - .4, .006, 40), leaf, 0, y + .013);
+      unit(new T.CylinderGeometry(r - 5.5, r - 5.5, .03, 40, 1, true), lobby, 0, y + .03);
+    };
+    const twisted = family(unit => {
+      // 18 square glass storeys turning 100° over the height, each with an ivory floor plate.
+      for (let k = 0; k < 18; k++) {
+        const y = .05 + k * .05, side = 24 - k * .35, yaw = k * .097;
+        unit(new T.BoxGeometry(side, .046, side), facade, 0, y + .023, 0, yaw);
+        unit(new T.BoxGeometry(side + 1, .004, side + 1), trim, 0, y + .048, 0, yaw);
+      }
+      for (const y of [.4, .72]) skyLobby(unit, y, 21);
+      unit(new T.SphereGeometry(9, 20, 8, 0, Math.PI * 2, 0, Math.PI / 2).scale(1, .002, 1), leaf, 0, .95);
+      unit(new T.CylinderGeometry(.5, .9, .12, 8), trim, 0, 1.01);
+    });
+    const terraced = family(unit => {
+      // Three stepped glass tiers; each setback (.4 / .72) is a planted terrace over a warm-lit band.
+      for (const [y0, y1, w, d] of [[.05, .4, 32, 26], [.4, .72, 24, 20], [.72, 1, 16, 14]]) {
+        unit(new T.BoxGeometry(w, y1 - y0, d), facade, 0, (y0 + y1) / 2);
+        unit(new T.BoxGeometry(w + 1.2, .012, d + 1.2), trim, 0, y1);
+        unit(new T.BoxGeometry(w - 1, .006, d - 1), leaf, 0, y1 + .008);
+        unit(new T.BoxGeometry(w + .3, .02, d + .3), lobby, 0, y1 - .02);
+      }
+      for (const [x, z] of [[-13, -10], [13, 9], [-10, 9], [9, -8]]) unit(leafyCrown(1).scale(2.4, .02, 2.4), leaf, x, .42, z);
+      unit(new T.CylinderGeometry(.5, .9, .1, 8), trim, 0, 1.06);
+    });
+    const twin = family(unit => {
+      // Two slim shafts of unequal height joined at both lobby levels by lit glass links.
+      for (const [x, top] of [[-10.5, 1], [10.5, .84]]) {
+        unit(new T.CylinderGeometry(8, 9, top - .05, 24), facade, x, .05 + (top - .05) / 2);
+        for (let y = .12; y < top; y += .08) unit(new T.CylinderGeometry(9.1 - y, 9.1 - y, .005, 24), trim, x, y);
+        unit(new T.CylinderGeometry(8.6, 8, .03, 24), trim, x, top);
+        unit(new T.SphereGeometry(7.6, 16, 6, 0, Math.PI * 2, 0, Math.PI / 2).scale(1, .002, 1), leaf, x, top + .015);
+      }
+      for (const y of [.4, .72]) { unit(new T.BoxGeometry(14, .03, 7), trim, 0, y); unit(new T.BoxGeometry(13, .02, 6), lobby, 0, y + .025); }
+      unit(new T.CylinderGeometry(.4, .8, .12, 8), trim, -10.5, 1.06);
+    });
+    this.families = [twisted, terraced, twin].map((group, f) =>
+      this.instances(bake(group), this.towers.filter((_, i) => i % 3 === f).length, 'concentration-vertical-towers'));
     // Sky bridges join neighbouring towers at both lobby levels of the lower one (a connected vertical street).
     this.towers.forEach((a, i) => this.towers.forEach((b, j) => {
       if (j > i && Math.hypot(a.x - b.x, a.z - b.z) < 80) for (const level of [.4, .72]) this.bridges.push({ i, j, y: level * Math.min(a.h, b.h) });
@@ -738,12 +799,17 @@ export class ConcentrationDistrict {
     box(bridge, [1, 4.5, 10], [0, 0, 0], trim);
     box(bridge, [1, 2, 10.4], [0, .8, 0], lobby);
     this.bridgeMeshes = this.instances(bake(bridge), this.bridges.length, 'concentration-sky-bridges');
-    // Pod: a ring of warm-lit glass under a floating ivory disc with a planted top, on a slim stem.
+    // Pod: two stacked rings of warm-lit glass under floating ivory discs (the upper one planted) on a slim stem, about 15 m tall and
+    // 24 m across, so the scattered alternative reads at hero distance.
     const pod = new T.Group();
     box(pod, [2.4, 4, 2.4], [0, 2, 0], trim);
-    const drum = new T.Mesh(new T.CylinderGeometry(7, 7, 4.2, 28), lobby); drum.position.y = 6; pod.add(drum);
-    const disc = new T.Mesh(new T.CylinderGeometry(10.5, 9, 1.4, 32), trim); disc.position.y = 8.8; pod.add(disc);
-    const bed = new T.Mesh(new T.CylinderGeometry(9.2, 9.2, .4, 28), leaf); bed.position.y = 9.6; pod.add(bed);
+    const piece = (geometry: T.BufferGeometry, material: T.Material, y: number) => { const m = new T.Mesh(geometry, material); m.position.y = y; pod.add(m); };
+    piece(new T.CylinderGeometry(7, 7, 4.2, 28), lobby, 6);
+    piece(new T.CylinderGeometry(12, 9.5, 1.4, 36), trim, 8.8);
+    piece(new T.CylinderGeometry(6, 6, 3.6, 24), lobby, 11.3);
+    piece(new T.CylinderGeometry(9, 7.5, 1.2, 32), trim, 13.7);
+    piece(new T.CylinderGeometry(8, 8, .4, 28), leaf, 14.5);
+    piece(new T.CylinderGeometry(11.6, 11.6, .3, 36), leaf, 9.6);
     this.podMeshes = this.instances(bake(pod), this.pods.length, 'concentration-distributed-pods');
     this.pulses = new PulseRings(this.root, METER_COLORS.urbanConcentration, (this.towers.length + this.pods.length + 1) * PULSE_WAVES);
     this.root.visible = false; parent.add(this.root); this.write();
@@ -794,7 +860,7 @@ export class ConcentrationDistrict {
       const level = this.towerLevels.value[i], footprint = level > .02 ? 1 : HIDDEN;
       this.dummy.position.set(site.x, 0, site.z); this.dummy.rotation.set(0, i, 0);
       this.dummy.scale.set(footprint, Math.max(HIDDEN, level) * site.h, footprint); this.dummy.updateMatrix();
-      for (const mesh of this.towerMeshes) mesh.setMatrixAt(i, this.dummy.matrix);
+      for (const mesh of this.families[i % 3]) mesh.setMatrixAt(Math.floor(i / 3), this.dummy.matrix);
     });
     this.pods.forEach((site, i) => {
       this.dummy.position.set(site.x, 0, site.z); this.dummy.rotation.set(0, site.yaw, 0);
@@ -810,6 +876,6 @@ export class ConcentrationDistrict {
       this.dummy.scale.set(length * s, s, s); this.dummy.updateMatrix();
       for (const mesh of this.bridgeMeshes) mesh.setMatrixAt(k, this.dummy.matrix);
     });
-    for (const mesh of [...this.towerMeshes, ...this.podMeshes, ...this.bridgeMeshes]) mesh.instanceMatrix.needsUpdate = true;
+    for (const mesh of [...this.families.flat(), ...this.podMeshes, ...this.bridgeMeshes]) mesh.instanceMatrix.needsUpdate = true;
   }
 }
