@@ -36,6 +36,8 @@ export const bayCruisers: readonly (readonly [number,number,number])[] = [
   [100,-470,1.93],[-160,-470,.95],[-250,-380,-.9],[-330,-420,-.6],[-40,-560,2.3],[-500,-500,1.2],[260,-620,-1.6],
   // Open water south-west of the island, upper right of the hero frame.
   [133,1442,.4],[-333,908,2.1],[797,1695,-1],[-250,1180,1.1],
+  // Far water beyond the island's south-west shore, top middle of the hero frame (target v2's distant boats).
+  [450,1000,2.5],[700,1100,1.2],[1000,1250,-.4],[1200,1000,1.9],[250,1250,-1.3],
 ];
 // Sweep: a lit transit skyway descending from the Grand Nikko ring (92 m) west past Hilton and out of the frame's lower right,
 // above the Yurikamome deck and clear of Nikko and Hilton footprints; a short white train shuttles on it (mobility).

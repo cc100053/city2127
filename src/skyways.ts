@@ -31,6 +31,8 @@ const LINKS: P3[][] = [
   [[304, 90, -373], [350, 80, -400], [410, 68, -440], [480, 60, -490], [560, 56, -545]],
   // Mid-level (r5 pass 3, target v2's layered district): Aqua City's east end to Hilton at 30 m, behind the PARK site from the hero pose.
   [[-183, 30, -50], [-205, 30.5, -30], [-228, 30.5, -8], [-248, 30, 8]],
+  // Mid-level (r6): Fuji chassis west face to Hilton at 40 m, south of the COMMONS PLAZA lot, so the gap between them reads layered.
+  [[-86, 40, 18], [-130, 40.5, 26], [-180, 41, 34], [-220, 40.5, 40], [-250, 40, 44]],
 ];
 
 /** Box-section deck along a curve, `top` at the curve and `depth` below it; outward winding, flat-shaded quads. */

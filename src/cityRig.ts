@@ -24,7 +24,8 @@ export const leaf=paint('#7d9f68',.85), stone=paint('#ebe8e0',.66);
 // A float DataTexture (no DOM), so Node tests can import this module; three converts it to PMREM on first use.
 const mirrorSky=(()=>{
   const W=128,H=64,data=new Float32Array(W*H*4),c=new T.Color(),sun=new T.Vector3(-.66,.22,.72).normalize(),dir=new T.Vector3();
-  const below=new T.Color('#8e8f7c'),low=new T.Color('#d8ccb2'),horizon=new T.Color('#fff2dc'),sky=new T.Color('#f1e3c8'),zenith=new T.Color('#c3d0d6'),glow=new T.Color('#ffd7a0');
+  // r6: cooled to silver (target v2's spheres read silver-glass, not gold): bay blue below, white horizon band, pale blue-grey sky, a small warm sun spot.
+  const below=new T.Color('#6f8fa2'),low=new T.Color('#b9c6cc'),horizon=new T.Color('#ffffff'),sky=new T.Color('#e4e9ec'),zenith=new T.Color('#b7cad8'),glow=new T.Color('#fff0d8');
   for(let j=0;j<H;j++)for(let i=0;i<W;i++){
     const lat=((j+.5)/H-.5)*Math.PI,lon=((i+.5)/W-.5)*Math.PI*2,e=lat*180/Math.PI; // three's equirect: u=atan(z,x)/2π+.5, v=asin(y)/π+.5
     dir.set(Math.cos(lat)*Math.cos(lon),Math.sin(lat),Math.cos(lat)*Math.sin(lon));
@@ -37,7 +38,7 @@ const mirrorSky=(()=>{
   const texture=new T.DataTexture(data,W,H,T.RGBAFormat,T.FloatType);texture.mapping=T.EquirectangularReflectionMapping;texture.magFilter=texture.minFilter=T.LinearFilter;texture.needsUpdate=true;
   return texture;
 })();
-export const chrome=new T.MeshPhysicalMaterial({color:'#f6f2ea',metalness:.92,roughness:.05,clearcoat:1,clearcoatRoughness:.02,envMap:mirrorSky,envMapIntensity:1});
+export const chrome=new T.MeshPhysicalMaterial({color:'#f1f4f6',metalness:.92,roughness:.05,clearcoat:1,clearcoatRoughness:.02,envMap:mirrorSky,envMapIntensity:1});
 /** Materials that use `mirrorSky` (its own envMap skips scene.environmentIntensity), dimmed with the night in `cityRig().update`. */
 export const mirrors:T.MeshStandardMaterial[]=[chrome];
 const rounded = new Map<string, RoundedBoxGeometry>();
