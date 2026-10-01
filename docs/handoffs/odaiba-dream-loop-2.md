@@ -129,3 +129,21 @@ Art note: the district now reads as a regular paved grid of strips — ordered a
 Remaining gaps vs target v2: beds should follow buildings/megaframe rather than a uniform grid; terraced/inclined gardens on structure; shore wetland terraces; facade tone; dense far skyline; sun glint.
 
 Next step: user review; another round or merge.
+
+## Round 8 — lush green, engineered form (2026-10-01)
+
+User review of round 7: over-corrected — "純粹變到路面咁樣更加冇生氣". Decision: green volume stays at target-v2 level; future identity comes from form (clusters following structure, white rims, stepped terraces, connected water), not from cutting. Round 7's code was reverted (`6950738`, restores `119e25a` src/tests); its docs and evidence stay as history.
+
+- Pass 1 (`a9aa39c`): `plantClusters` — two-tier oval terraces with white rims, a crown ring and a raised inner tier, placed only near pads, guideway, promenades, ponds and the corridor; roof terraces of the same kind on Aqua City/DECKS and tall roofs; one connected pond/swale `corridor` channel with near-white edges; tower rings keep a bed but no trees (`garden(…, trees)`); the tidal edge steps down through white weirs to a lower reed shelf; lawn `#b6c6a2`, `leaf` `#7f9b6d`.
+- Pass 2 (`e2f4916`): `waterfront` surveyed trees become palms; ground trees stand in white planter rings (`plantCanopy(…, pits)`); cherry centres in every other cluster; backdrop grove becomes oval groves on white-rimmed plinths.
+- Pass 3: denser cluster sampling (21 m, no overlaps) and fuller rim tiers; tree-lined promenades (palms seaward, broadleaf/cherry landward) in planter rings; denser backdrop groves (44 m); lawn `#c6d0ae`; ivory walks.
+
+Orchestrator fix (pass 3): promenade trees at 7 m crowded the walker lanes (`walker lane 2.8 meets surveyed-coastal-canopy at 5,-312`) → offset 9 m and skipped within 8.5 m of any promenade/guideway (`src/coastalCanopy.ts`).
+
+Validation: after each pass, root `npm test` PASS (incl. 81-combination survey pipeline), `npm run build` PASS (existing >500 kB warning), `git diff --check` clean; built-in browser 16:00 console clean after pass 1. Evidence: [baseline](../../artifacts/odaiba-dream8-baseline.jpg), [pass 1](../../artifacts/odaiba-dream8-pass1.jpg), [pass 2](../../artifacts/odaiba-dream8-pass2.jpg), [pass 3](../../artifacts/odaiba-dream8-pass3.jpg), [pass 3 night](../../artifacts/odaiba-dream8-pass3-night.jpg). Not verified: live `?survey`, FPS/draw calls, load time from the extra raycasts, exhibition hardware.
+
+Known issue (pre-existing, also at `119e25a`): at 22:00 a bright blue bloom flares at the central pond/shore below DECKS in the headless capture; not investigated.
+
+Remaining gaps vs target v2: groves still read as round-crown blobs at hero distance; inclined gardens on the megaframe; facade tone; dense far skyline; sun glint.
+
+Next step: user review; another round or merge.

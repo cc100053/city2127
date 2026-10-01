@@ -102,7 +102,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     // Context massing (district and backdrop) carries the same storey-banded curtain wall and lit bays as Aqua City and DECKS.
     if (finish && material.name.startsWith('context_') && material.customProgramCacheKey() !== 'curtain-wall') curtainWall(material, finish[0]);
     if(material.name==='landscape'){
-      material.map=grass;material.color.set('#bccaa9'); // r8: as lush, a touch less saturated and lighter than game green (user)
+      material.map=grass;material.color.set('#c6d0ae'); // r8: as lush, a touch less saturated and lighter than game green (user)
       // World metres keep the authored terrain patches at one consistent texture scale.
       material.onBeforeCompile=shader=>{
         shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\ngrassUv=(modelMatrix*vec4(transformed,1.)).xz/32.;');
@@ -118,7 +118,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
           float pond=lawnOpen*max(1.-smoothstep(-1.28,-1.24,swale),1.-smoothstep(.09,.1,corridor));
           float rim=max(lawnOpen*max(1.-smoothstep(-1.17,-1.13,swale),1.-smoothstep(.13,.14,corridor))-pond,0.);
           float walk=inside*(1.-smoothstep(.06,.1,abs(sin(w.x*.037+cos(w.y*.029)*1.6)+sin(w.y*.033+w.x*.011))));
-          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.72,.67,.58),walk*(1.-pond));
+          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.84,.81,.74),walk*(1.-pond)); // r8 pass 3: pale ivory walks, crisper engineered edge than tan gravel
           diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.9,.89,.85),rim);
           diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.16,.36,.46),pond);`).replace('#include <metalnessmap_fragment>','#include <metalnessmap_fragment>\nroughnessFactor=mix(roughnessFactor,.06,pond);metalnessFactor=mix(metalnessFactor,.35,pond);');
       };

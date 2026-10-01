@@ -69,7 +69,8 @@ function plantClusters(scene:T.Object3D,clusters:[number,number,number,number][]
       dummy.position.set(x,y+top/2,z);dummy.scale.set(R*f*stretch,top,R*f/stretch);dummy.updateMatrix();rims.setMatrixAt(i*2+k,dummy.matrix);
       dummy.position.set(x,y+top+.02,z);dummy.scale.set(R*f*stretch-.5,.06,R*f/stretch-.5);dummy.updateMatrix();beds.setMatrixAt(i*2+k,dummy.matrix);
     });
-    const ring=Math.max(3,Math.round(R*.6));
+    // r8 pass 3: denser rim tier (about one crown per 6 m of rim) so each grove reads as one closed canopy mass.
+    const ring=Math.max(4,Math.round(R*.8));
     for(let j=0;j<ring;j++){const [tx,tz]=at(.74,j/ring*Math.PI*2+i);trees.push({position:[tx,-tz,y+.7],scale:scale*(.85+((i+j)%4)*.1),type:(i+j)%5===0?'columnar':'broadleaf'});}
     // Every other cluster crowns its raised tier with a cherry (target v2's pink scattered through the groves).
     for(let j=0;j<3;j++){const [tx,tz]=at(j?.28:0,j*Math.PI+i);trees.push({position:[tx,-tz,y+1.9],scale:scale*1.15,type:!j && i%2?'cherry':'broadleaf'});}
@@ -115,7 +116,7 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
   };
   const padGap=(x:number,z:number)=>Math.min(Infinity,...pads.map(p=>Math.hypot(Math.max(p.min.x-x,0,x-p.max.x),Math.max(p.min.z-z,0,z-p.max.z))));
   const pathGap=(x:number,z:number)=>Math.min(...clearPaths.map(p=>Math.hypot(p.x-x,p.z-z)));
-  for(let x=DISTRICT.minX+26;x<DISTRICT.maxX-26;x+=26)for(let z=DISTRICT.minZ+26;z<DISTRICT.maxZ-26;z+=26){
+  for(let x=DISTRICT.minX+26;x<DISTRICT.maxX-26;x+=21)for(let z=DISTRICT.minZ+26;z<DISTRICT.maxZ-26;z+=21){
     const px=x+Math.sin(z*1.7+x)*8,pz=z+Math.cos(x*1.3-z)*8,R=8+(Math.sin(x*.7+z)+1)*2.5,reach=R*1.4;
     if(seaward(px,pz) || Object.values(changeSites).some(site=>Math.abs(px-site.x)<site.w*site.scale/2+16+reach && Math.abs(pz-site.z)<site.d*site.scale/2+16+reach))continue;
     const pad=padGap(px,pz),path=pathGap(px,pz),sw=swale(px,pz),cor=corridor(px,pz);
@@ -124,24 +125,44 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
     if(!(pad<reach+36 || path<reach+28 || cor<.14+reach*.045+.8 || sw<-.4))continue;
     const y=landscapeAt(px,pz);
     if(y===null || ![[reach,0],[-reach,0],[0,reach],[0,-reach]].every(([dx,dz])=>landscapeAt(px+dx,pz+dz)!==null))continue;
+    // Denser grid (r8 pass 3): terraces may not overlap, or their coplanar lawn tiers would z-fight.
+    if(clusters.some(([cx,cz,,cr])=>Math.hypot(cx-px,cz-pz)<(cr+R)*1.4))continue;
     clusters.push([px,pz,y,R]);
   }
   plantClusters(scene,clusters);
+  // r8 pass 3: the waterfront promenades become planted allées in white planter rings (target v2's tree-lined shore walk) —
+  // palms on the side facing the water, broadleaf with cherry accents on the landward side, every ~8 m.
+  const allee:{position:number[];scale:number;type:string}[]=[];
+  for(const path of paths.promenades){
+    const count=Math.round(path.getLength()/8);
+    for(let i=1;i<count;i++){
+      const p=path.getPointAt(i/count),t=path.getTangentAt(i/count);
+      for(const side of [1,-1]){
+        const nx=-t.z*side,nz=t.x*side,x=p.x+nx*9,z=p.z+nz*9;
+        if(seaward(x,z) || padGap(x,z)<4 || pathGap(x,z)<8.5)continue; // pathGap: keep crowns off other promenade or guideway bends
+        const y=landscapeAt(x,z);
+        if(y===null)continue;
+        const shore=landscapeAt(p.x+nx*25,p.z+nz*25)===null;
+        allee.push({position:[x,-z,y],scale:.8+(i%3)*.1,type:shore?'waterfront':i%4===2?'cherry':'broadleaf'});
+      }
+    }
+  }
+  plantCanopy(scene,{instances:allee},true);
 }
 
 /** The Odaiba backdrop beyond the district keeps its parks as one unshadowed batch of low crowns, receding with the ground it stands on.
- * r8 pass 2: the same crown count gathers into tight oval groves on white-rimmed plinths (52 m cells, eight crowns each) instead of
+ * r8 pass 2: the same crown count gathers into tight oval groves on white-rimmed plinths (44 m cells since r8 pass 3, eight crowns each) instead of
  * pairs dotted evenly every 26 m — open lawn between, every green mass framed by an engineered edge. */
 export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
   environment.updateMatrixWorld(true);
-  const bounds=new T.Box3().setFromObject(environment),ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),matrices:T.Matrix4[]=[],plinths:T.Matrix4[]=[],lawns:T.Matrix4[]=[],dummy=new T.Object3D();
+  const bounds=new T.Box3().setFromObject(environment),ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),matrices:T.Matrix4[]=[],plinths:T.Matrix4[]=[],lawns:T.Matrix4[]=[],centres:[number,number,number][]=[],dummy=new T.Object3D();
   const groundAt=(x:number,z:number)=>{
     ray.set(new T.Vector3(x,300,z),down);
     const hit=ray.intersectObject(environment,true)[0];
     return hit && hit.object instanceof T.Mesh && !Array.isArray(hit.object.material) && hit.object.material.name==='landscape' && hit.point.y<9 ? hit.point.y : null;
   };
-  // ponytail: one unaccelerated ray per crown (~3k rays at load, as before); add a BVH if the plate grows.
-  for(let x=bounds.min.x;x<bounds.max.x;x+=52)for(let z=bounds.min.z;z<bounds.max.z;z+=52){
+  // ponytail: one unaccelerated ray per crown (~4k rays at load); add a BVH if the plate grows.
+  for(let x=bounds.min.x;x<bounds.max.x;x+=44)for(let z=bounds.min.z;z<bounds.max.z;z+=44){
     const px=x+Math.sin(z*1.7+x)*12,pz=z+Math.cos(x*1.3-z)*12;
     if(inDistrict(px,pz) || seaward(px,pz) || Math.sin(px*.019+Math.sin(pz*.021)*2)+Math.cos(pz*.027)<-.35)continue;
     const y=groundAt(px,pz);
@@ -156,8 +177,9 @@ export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
       const s=(j<6?4.2:5.6)+(Math.sin(x*3.1+z+j)+1)*1.1;
       dummy.position.set(tx,ty+.6+s*.9,tz);dummy.scale.set(s,s*.85,s);dummy.rotation.set(0,a,0);dummy.updateMatrix();crowns.push(dummy.matrix.clone());
     }
-    // Only whole groves: a clipped one would leave crowns off the plinth.
-    if(crowns.length<5)continue;
+    // Only whole groves: a clipped one would leave crowns off the plinth; plinths may not overlap (r8 pass 3's denser cells).
+    if(crowns.length<5 || centres.some(([cx,cz,cr])=>Math.hypot(cx-px,cz-pz)<(cr+R)*1.3))continue;
+    centres.push([px,pz,R]);
     matrices.push(...crowns);
     dummy.position.set(px,y+.3,pz);dummy.scale.set(R*1.3,.6,R/1.3);dummy.rotation.set(0,yaw,0);dummy.updateMatrix();plinths.push(dummy.matrix.clone());
     dummy.position.y=y+.62;dummy.scale.set(R*1.3-.6,.04,R/1.3-.6);dummy.updateMatrix();lawns.push(dummy.matrix.clone());
