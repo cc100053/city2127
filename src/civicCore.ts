@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { arc, bake, box, chrome, glass, leaf, membrane, solar, stone, trim } from './cityRig.ts';
+import { arc, bake, box, chrome, glass, mirrors, leaf, membrane, solar, stone, trim } from './cityRig.ts';
 
 /** Fuji's office blocks become a load-bearing civic chassis, keeping the sphere berth and site alignment. Metres. */
 export function civicCore() {
@@ -47,7 +47,7 @@ export function civicCore() {
   const transfer=box(root,[7,2.5,transferA.distanceTo(transferB)],transferA.clone().add(transferB).multiplyScalar(.5).toArray(),stone);
   transfer.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),transferB.sub(transferA).normalize());
   // Silvered glass skin (target v2): the same warm mirror as the skyway spheres, faintly see-through to the planted floors.
-  const silverGlass=chrome.clone();silverGlass.transparent=true;silverGlass.opacity=.82;
+  const silverGlass=chrome.clone();silverGlass.transparent=true;silverGlass.opacity=.82;mirrors.push(silverGlass);
   // The titanium observation object becomes a suspended, inhabitable environmental chamber.
   const chamber=new T.Group();chamber.position.set(-18,100,23);root.add(chamber);
   const skin=new T.Mesh(new T.SphereGeometry(24,48,24,0,Math.PI*2,0,Math.PI*.7),silverGlass);chamber.add(skin);

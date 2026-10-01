@@ -4,7 +4,7 @@
 - Branch: `feat/odaiba-dream-loop-2`, from `main` `6301794` (0/0 with `origin/main` after a successful fetch; clean tree).
 - Scope: user asked to "create branch and use dream-loop to polish city". Dream Loop Plus, three passes, then stop for human review. Target: the existing locked `.dream-loop/target.png` (see [earlier Dream Loop](odaiba-dream-loop.md)); no new target generated. Fable was unavailable (usage credits), so workers ran on Opus.
 - Capture: headless Chrome 1920×929, `?hour=16&reviewTime=20` (`.dream-loop/shot.sh`, ignored).
-- Status: round 2 (three passes, target v1) and rounds 3 and 4 (three passes each, target v2) implemented and locally verified; target NOT reached; human art review pending. No main integration.
+- Status: round 2 (three passes, target v1) and rounds 3–5 (three passes each, target v2) implemented and locally verified; target NOT reached; human art review pending. No main integration.
 
 ## Passes
 
@@ -71,5 +71,23 @@ Validation: after each pass and fix, root `npm test` PASS (incl. 81-combination 
 Decision for the user: the Ariake lagoons move Ariake toward the target's open water while keeping the shore — confirm this fits the 2026-10-01 "keep Ariake" decision, or revert that part of pass 3 (`src/bayContext.ts`).
 
 Remaining gaps vs target v2: district density and layered promenade, spheres still read partly as domes, dense far skyline, sun glint position, sweep pods barely visible at hero distance.
+
+Next step: user review; another round or merge.
+
+## Round 5 — target v2 (2026-10-01)
+
+User asked to run another round without answering the Ariake-lagoon question, so the lagoons stay and workers were told not to change Ariake further. Start: `r4-pass3.png` (`0db607f`); branch 0/0 with its remote, `main` 0/0 with `origin/main` after fetch.
+
+- Pass 1 (`77daacb`): near-mirror `chrome`; sphere decks become open rings; blue light lines along both seaside promenades; thicker Yurikamome edge lines; ivory Aqua City/DECKS spandrels and context finishes; paler tower glass.
+- Pass 2 (`6ae6cc0`): even blue-grey glass grid with lit eight-bay runs on context buildings; pale ceramic hotel roofs; warmer landmark glazing (.42); sweep shuttle at 1.7×; one more foreground cruiser; palms on terraces (checked upright).
+- Pass 3: `mirrorSky` warm equirect for `chrome` with night dimming via `mirrors`; hairline sphere ribs; planted tower rings; 30 m Aqua City–Hilton link.
+
+Orchestrator fixes: none needed this round.
+
+Validation: after each pass, root `npm test` PASS (incl. 81-combination survey pipeline), `npm run build` PASS (existing >500 kB warning), `git diff --check` clean; built-in browser 16:00 console clean. Evidence: [pass 1](../../artifacts/odaiba-dream5-pass1.jpg), [pass 2](../../artifacts/odaiba-dream5-pass2.jpg), [pass 3](../../artifacts/odaiba-dream5-pass3.jpg), [pass 3 night](../../artifacts/odaiba-dream5-pass3-night.jpg). Not verified: live `?survey`, FPS/draw calls, exhibition hardware; hand-placed links/cruisers have no collision test; the Aqua City–Hilton link ends were placed from bounding boxes.
+
+Open decision (from round 4): keep or revert the Ariake lagoons.
+
+Remaining gaps vs target v2: spheres now read gold rather than silver-glass; district density and mid-level walkway network; dense far skyline; sun glint position.
 
 Next step: user review; another round or merge.

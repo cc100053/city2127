@@ -19,7 +19,27 @@ export const glass=new T.MeshPhysicalMaterial({color:'#a7c3cf',roughness:.08,met
 export const leaf=paint('#7d9f68',.85), stone=paint('#ebe8e0',.66);
 // Silvered glass for the 2127 spheres: warm and only partly metallic, so they read as polished silver mirrors of the golden sky, not blue domes.
 // r4 pass 4: near-full mirror with a boosted env response, so each sphere reads as one bright silver ball (target v2), not a dome over a dark band.
-export const chrome=new T.MeshPhysicalMaterial({color:'#f6f2ea',metalness:.92,roughness:.05,clearcoat:1,clearcoatRoughness:.02,envMapIntensity:1.9});
+// r5 pass 3: the mirrors see their own warm golden-hour panorama (pale gold sky, bright cream horizon, sun glow to the south-west,
+// warm city below) instead of the saturated blue sky capture, so each sphere reads as bright silver (target v2), not a dark blue dome.
+// A float DataTexture (no DOM), so Node tests can import this module; three converts it to PMREM on first use.
+const mirrorSky=(()=>{
+  const W=128,H=64,data=new Float32Array(W*H*4),c=new T.Color(),sun=new T.Vector3(-.66,.22,.72).normalize(),dir=new T.Vector3();
+  const below=new T.Color('#8e8f7c'),low=new T.Color('#d8ccb2'),horizon=new T.Color('#fff2dc'),sky=new T.Color('#f1e3c8'),zenith=new T.Color('#c3d0d6'),glow=new T.Color('#ffd7a0');
+  for(let j=0;j<H;j++)for(let i=0;i<W;i++){
+    const lat=((j+.5)/H-.5)*Math.PI,lon=((i+.5)/W-.5)*Math.PI*2,e=lat*180/Math.PI; // three's equirect: u=atan(z,x)/2π+.5, v=asin(y)/π+.5
+    dir.set(Math.cos(lat)*Math.cos(lon),Math.sin(lat),Math.cos(lat)*Math.sin(lon));
+    if(e<-4)c.copy(low).lerp(below,T.MathUtils.smoothstep(-e,4,40));
+    else if(e<8)c.copy(low).lerp(horizon,T.MathUtils.smoothstep(e,-4,2)).multiplyScalar(1+.35*T.MathUtils.smoothstep(e,-2,3)*(1-T.MathUtils.smoothstep(e,3,8)));
+    else c.copy(horizon).lerp(sky,T.MathUtils.smoothstep(e,8,20)).lerp(zenith,T.MathUtils.smoothstep(e,20,75));
+    c.add(glow.clone().multiplyScalar(2.2*Math.pow(Math.max(dir.dot(sun),0),10)));
+    data.set([c.r,c.g,c.b,1],(j*W+i)*4);
+  }
+  const texture=new T.DataTexture(data,W,H,T.RGBAFormat,T.FloatType);texture.mapping=T.EquirectangularReflectionMapping;texture.magFilter=texture.minFilter=T.LinearFilter;texture.needsUpdate=true;
+  return texture;
+})();
+export const chrome=new T.MeshPhysicalMaterial({color:'#f6f2ea',metalness:.92,roughness:.05,clearcoat:1,clearcoatRoughness:.02,envMap:mirrorSky,envMapIntensity:1});
+/** Materials that use `mirrorSky` (its own envMap skips scene.environmentIntensity), dimmed with the night in `cityRig().update`. */
+export const mirrors:T.MeshStandardMaterial[]=[chrome];
 const rounded = new Map<string, RoundedBoxGeometry>();
 export function box(parent:T.Object3D, size:[number,number,number], position:[number,number,number], material:T.Material, radius=.18) {
   const key = [...size,radius].join(',');
@@ -89,6 +109,7 @@ export function cityRig(scene:T.Scene) {
   return {
     update(state:WorldState,time:number,night:number) {
       publicLight.emissiveIntensity=.15+night*1.3;
+      for(const m of mirrors)m.envMapIntensity=1-night*.85;
       civicLights.forEach(light=>light.intensity=night*light.userData.peak);
       futureLight.emissiveIntensity=.25+state.neon*.5+night*.45;
       membrane.opacity=.6+state.greenery*.18;

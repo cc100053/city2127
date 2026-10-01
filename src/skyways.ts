@@ -29,6 +29,8 @@ const LINKS: P3[][] = [
   [[-291.6, 102, 59.3], [-285, 97, 75], [-280, 92, 86.3]],
   // Front-left: out of the 151 m tower ring over the north-east waterfront to the frame edge (target v2's long front-left skyway).
   [[304, 90, -373], [350, 80, -400], [410, 68, -440], [480, 60, -490], [560, 56, -545]],
+  // Mid-level (r5 pass 3, target v2's layered district): Aqua City's east end to Hilton at 30 m, behind the PARK site from the hero pose.
+  [[-183, 30, -50], [-205, 30.5, -30], [-228, 30.5, -8], [-248, 30, 8]],
 ];
 
 /** Box-section deck along a curve, `top` at the curve and `depth` below it; outward winding, flat-shaded quads. */
@@ -92,8 +94,9 @@ function parapet(curve: T.Curve<T.Vector3>, offset: number, samples: number) {
 function sphere(root: T.Object3D, [x, y, z]: P3, r: number, deckRadius?: number) {
   const g = new T.Group(); g.position.set(x, y, z); root.add(g);
   g.add(new T.Mesh(new T.SphereGeometry(r, 48, 24), chrome));
-  for (let i = 0; i < 8; i++) { const rib = new T.Mesh(new T.TorusGeometry(r + .08, .18, 4, 64), trim); rib.rotation.y = i * Math.PI / 8; g.add(rib); }
-  for (const f of [-.7, -.35, 0, .35, .7]) { const lat = new T.Mesh(new T.TorusGeometry(Math.sqrt(1 - f * f) * r + .08, .24, 4, 64), trim); lat.rotation.x = Math.PI / 2; lat.position.y = f * r; g.add(lat); }
+  // Hairline mullions (r5 pass 3): the panel grid reads only up close, so from the hero pose the sphere is one silver ball, not a geodesic dome.
+  for (let i = 0; i < 6; i++) { const rib = new T.Mesh(new T.TorusGeometry(r + .05, .09, 4, 64), trim); rib.rotation.y = i * Math.PI / 6; g.add(rib); }
+  for (const f of [-.5, 0, .5]) { const lat = new T.Mesh(new T.TorusGeometry(Math.sqrt(1 - f * f) * r + .05, .11, 4, 64), trim); lat.rotation.x = Math.PI / 2; lat.position.y = f * r; g.add(lat); }
   // Cradle and a single mast with three splayed struts to the ground.
   arc(g, r * .45, r * .8, 1.4, [0, -r * .78, 0], trim);
   const mast = new T.Mesh(pole, trim); mast.scale.set(2, y - r * .7, 2); mast.position.set(0, -(y + r * .7) / 2, 0); g.add(mast);
@@ -166,7 +169,17 @@ function shoreTerraces(root: T.Object3D) {
 /** 2127 identity at height: lit skyways, tower rings and suspended glass spheres, plus the round waterfall terraces on the bay. */
 export function skyways() {
   const root = new T.Group(); root.name = 'skyways';
-  for (const ring of RINGS) skyway(root, circle(ring), true);
+  for (const ring of RINGS) {
+    skyway(root, circle(ring), true);
+    // Planted ring (target v2's tree-lined tower halos): a lawn bed down the deck's middle with a tree every ~9 m, every third a cherry.
+    const { centre: [x, y, z], radius } = ring, count = Math.round(radius * Math.PI * 2 / 9);
+    arc(root, radius - 2.6, radius + 2.6, .45, [x, y, z], leaf);
+    for (let i = 0; i < count; i++) {
+      const a = i / count * Math.PI * 2, s = 1.9 + (i % 3) * .4, tx = x + Math.cos(a) * radius, tz = z + Math.sin(a) * radius;
+      const trunk = new T.Mesh(pole, trim); trunk.scale.set(.3, 2.6, .3); trunk.position.set(tx, y + 1.5, tz); root.add(trunk);
+      const tree = new T.Mesh(crown, i % 3 === 1 ? cherry : leaf); tree.scale.set(s * 1.15, s, s * 1.15); tree.position.set(tx, y + 2.6 + s * .8, tz); root.add(tree);
+    }
+  }
   for (const points of [...LINKS, sweepway.map(p => [...p] as P3)]) skyway(root, new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'), false);
   for (const s of SPHERES) sphere(root, s.centre, s.radius, s.deck);
   // Lit blue lines at street level too (target v2): both edges of the seaside promenades.
