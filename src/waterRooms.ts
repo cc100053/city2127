@@ -18,4 +18,3 @@ export function shoreRoomBays() {
   }
   return bays;
 }
-
