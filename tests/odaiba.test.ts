@@ -267,6 +267,8 @@ if (process.env.PROBE_CONCENTRATION) {
   }
 }
 for (const tower of concentration.towers) assert.equal(towerProblem(tower.x, tower.z, tower.h), undefined, `tower at ${tower.x},${tower.z}`);
+// P10 drone dock rings (radius 26 at the upper lobby) and kiosks in court corners clear existing geometry.
+for (const tower of concentration.towers) assert.equal(blocked(tower.x, tower.z, .72 * tower.h, 27.5), undefined, `drone dock at ${tower.x},${tower.z}`);
 for (const pod of concentration.pods) assert.equal(podProblem(pod.x, pod.z), undefined, `pod at ${pod.x},${pod.z}`);
 for (const tower of concentration.towers) for (const pod of concentration.pods) assert.ok(Math.hypot(tower.x - pod.x, tower.z - pod.z) > 30, 'pods and towers share no ground');
 for (const { i, j, y } of concentration.bridges) {
@@ -279,7 +281,8 @@ for (const { i, j, y } of concentration.bridges) {
   }
 }
 for (const functionModules of [2, 4, 6]) {
-  concentration.setTarget({ functionModules }, 0, true);
+  // Ends also show their pairings: high with forest crowns and drone docks, low with solar pods.
+  concentration.setTarget({ functionModules, automatedPorts: functionModules === 6 ? 6 : 3, plantedFraction: [.2, .5, .8][functionModules / 2 - 1] }, 0, true);
   concentration.root.updateMatrixWorld(true);
   for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
     const p = route.getPointAt(i / 200);
@@ -304,8 +307,10 @@ for (const court of sharingDistrict.courts) {
   assert.ok(concentration.towers.every(t => Math.hypot(t.x - court.x, t.z - court.z) > 48) && concentration.pods.every(p => Math.hypot(p.x - court.x, p.z - court.z) > 36), 'courts share no ground with towers / pods');
   assert.ok(serviceDistrict.bays.every(b => Math.hypot(b.x - court.x, b.z - court.z) > 54), 'courts share no ground with staffed pavilions');
 }
+for (const court of sharingDistrict.courts) assert.equal(blocked(court.x, court.z, 12.5, 21.5), undefined, `drone kiosk at court ${court.x},${court.z}`);
 for (const sharedSeats of [0, 8]) {
-  sharingDistrict.setTarget({ sharedSeats }, 0, true);
+  // Sharing high also shows its high pairings (kiosks, orchards) in the route / site-visibility checks.
+  sharingDistrict.setTarget({ sharedSeats, automatedPorts: sharedSeats ? 6 : 3, plantedFraction: sharedSeats ? .8 : .5 }, 0, true);
   sharingDistrict.root.updateMatrixWorld(true);
   for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
     const p = route.getPointAt(i / 200);

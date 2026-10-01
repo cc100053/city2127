@@ -1,8 +1,12 @@
 # Validation and handoff
 
+## Meter variety P10 — 2026-10-02 (`feat/meter-variety`, not integrated)
+
+Five cross-Meter extras shown only when both axes agree. Root `npm test` (81-combination pipeline asserts each extra on every slot exactly in its pairing and that all five occur; placement checks for dock rings and court kiosks; route / site checks with pairings shown), `npm run build` and `git diff --check`: PASS (existing bundle-size warning only); survey/module-swap unchanged. Pairing captures recorded; single-Meter gates unchanged (partners at mixed show no extras; all-mixed draws 1337). Not verified: browser skyway clearance of dock rings, close-up and human art review, Windows, hardware. Details: [P10 handoff](handoffs/meter-variety.md#p10--cross-meter-combinations-2026-10-02).
+
 ## Meter variety P9 — 2026-10-02 (`feat/meter-variety`, not integrated)
 
-Hybrid designs around mixed via `hybridShare`. Root `npm test` (new P9 block: no hybrids at low / high, hybrids on all four Meters at mixed, composed kiosk / deck and 45 % mid-rise matrices), `npm run build` and `git diff --check`: PASS (existing bundle-size warning only); survey/module-swap unchanged. Same capture conditions as P7, low ↔ mixed / mixed ↔ high day: environment 2.20 / 2.49%, automation 2.27 / 2.23%, sharing **1.11 / 1.26%**, concentration 2.73 / 2.01%; night 2.16 / 2.42, 2.11 / 1.96, **1.12 / 1.42**, 2.27 / 1.64%. Sharing fails the 1.5% mixed gate (pending user decision); the others pass. Draw submissions unchanged (1337). Not verified: close-up review, real HTTP/WebSocket smoke, human art review, Windows, hardware. Details: [P9 handoff](handoffs/meter-variety.md#p9--mixed-identity-2026-10-02).
+Hybrid designs around mixed via `hybridShare`. Root `npm test` (new P9 block: no hybrids at low / high, hybrids on all four Meters at mixed, composed kiosk / deck and 45 % mid-rise matrices), `npm run build` and `git diff --check`: PASS (existing bundle-size warning only); survey/module-swap unchanged. Same capture conditions as P7, low ↔ mixed / mixed ↔ high day: environment 2.20 / 2.49%, automation 2.27 / 2.23%, sharing **1.11 / 1.26%**, concentration 2.73 / 2.01%; night 2.16 / 2.42, 2.11 / 1.96, **1.12 / 1.42**, 2.27 / 1.64%. Sharing fails the 1.5% mixed gate (accepted by the user, 2026-10-02); the others pass. Draw submissions unchanged (1337). Not verified: close-up review, real HTTP/WebSocket smoke, human art review, Windows, hardware. Details: [P9 handoff](handoffs/meter-variety.md#p9--mixed-identity-2026-10-02).
 
 ## Meter variety P8 — 2026-10-01 (`feat/meter-variety`, not integrated)
 

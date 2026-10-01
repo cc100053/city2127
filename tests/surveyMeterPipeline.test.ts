@@ -61,7 +61,21 @@ function assertModels(view: ExhibitionCityView) {
   assert.equal(concentration.targetConcentration, (view.layout.functionModules - 2) / 4);
   if (view.layout.functionModules <= 3) assert.deepEqual([concentration.visibleTowers, concentration.visiblePods], [0, concentration.pods]);
   if (view.layout.functionModules >= 5) assert.deepEqual([concentration.visibleTowers, concentration.visiblePods], [concentration.towers, 0]);
+  // P10: each cross-Meter extra appears exactly when its two axes agree (both high, or both low for solar pods), never otherwise.
+  const band = view.layout.bands, both = (a: 'nw' | 'sw' | 'ne' | 'se', b: 'nw' | 'sw' | 'ne' | 'se', side: string) => band[a] === side && band[b] === side;
+  const pairings: [string, number, boolean, number][] = [
+    ['drone kiosks (sharing + automation high)', sharing.droneKiosks, both('sw', 'nw', 'high'), sharing.courts],
+    ['orchards (sharing + environment high)', sharing.orchardCourts, both('sw', 'ne', 'high'), sharing.courts],
+    ['vertical forest (concentration + environment high)', concentration.forestTowers, both('se', 'ne', 'high'), concentration.towers],
+    ['drone docks (concentration + automation high)', concentration.droneDocks, both('se', 'nw', 'high'), concentration.towers],
+    ['solar pods (concentration + environment low)', concentration.solarPods, both('se', 'ne', 'low'), concentration.pods],
+  ];
+  for (const [name, visible, expected, all] of pairings) {
+    assert.equal(visible, expected ? all : 0, `${name}: ${JSON.stringify(band)}`);
+    if (expected) pairingHits.add(name);
+  }
 }
+const pairingHits = new Set<string>();
 function applyEvent(event: unknown, now: number) {
   const parsed = parseSurveyEvent(event);
   assert.ok(parsed && parsed.view.version === 2, 'real server event passes client validation');
@@ -127,5 +141,6 @@ try {
   assert.equal(manager.getDiagnostics().dogenzakaSouth.sharingDistrict!.enabled, false, 'manager hides sharing in legacy v1');
   assert.equal(manager.getDiagnostics().centerGaiRear.concentrationDistrict!.enabled, false, 'manager hides concentration in legacy v1');
   applyEvent(resetEvent, 432);
+  assert.equal(pairingHits.size, 5, 'every P10 pairing occurs in the 81 combinations');
   console.log(`PASS: ${count} actual answer combinations → client parser → real four-site models; HTTP/WebSocket, retry, snapshot and reset.`);
 } finally { socket.close(); await server.close(); ctx.db.close(); }

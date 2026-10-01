@@ -132,6 +132,14 @@ const rank = (i: number) => { const s = Math.sin(i * 12.9898 + 4.1) * 43758.5453
 export const designOf = (i: number, salt: number, n: number) => Math.floor(rank(i * 7.31 + salt) * n);
 /** P9: share of slots showing a hybrid design, peaking at 60 % at mixed (axis position .5) and zero at every low / high band (≤ .25, ≥ .75). */
 export const hybridShare = (t: number) => .6 * Math.max(0, 1 - Math.abs(t - .5) / .25);
+/** P10: the other axes a district reads for its cross-Meter extras (the manager passes the whole layout; absent axes read as mixed). */
+export type PairingAxes = Partial<Pick<ExhibitionLayout, 'automatedPorts' | 'sharedSeats' | 'plantedFraction' | 'functionModules'>>;
+const axes = (l: PairingAxes) => ({
+  automation: l.automatedPorts === undefined ? .5 : l.automatedPorts / 6, sharing: l.sharedSeats === undefined ? .5 : l.sharedSeats / 8,
+  environment: l.plantedFraction === undefined ? .5 : (l.plantedFraction - .2) / .6, concentration: l.functionModules === undefined ? .5 : (l.functionModules - 2) / 4,
+});
+/** A pairing shows only when both axes agree: both high (≥ .7) or both low (≤ .3); every first low / high proposal clears these. */
+export const agree = (a: number, b: number, side: 'high' | 'low') => side === 'high' ? Math.min(a, b) >= .7 : Math.max(a, b) <= .3;
 
 /** Private shell height as a share of its radius: a hemispherical vault rather than the former 28 m egg. */
 export const PRIVATE_RISE = 1.15;
@@ -147,6 +155,8 @@ const COURT_SITES: readonly (readonly [number, number, number])[] = [
 const COURT = 40;
 /** Garden crowns inside a private court [x, z, size], clear of the glass room and the entrance. */
 const COURT_TREES: readonly (readonly [number, number, number])[] = [[-10, 8, 4.2], [0, -3, 3.4], [8, 9, 3.8], [10, -9, 3.2], [-2, 13, 2.8], [-14, -14, 2.6]];
+/** Blossom orchard crowns around a shared court's edge [x, z], clear of parasols, pergola and the kiosk corner (13, 12). */
+const ORCHARD: readonly (readonly [number, number])[] = [[-15, -15], [0, -16], [15, -15], [-17, 9], [17, -8], [-12, 16]];
 /** Parasol centres in a shared plaza. */
 const PARASOLS: readonly (readonly [number, number])[] = [[-6, -6], [8, -2], [-2, 9]];
 /** Existing planted islands become private water gardens (every other one under a glass vault) or open waterfront commons:
@@ -174,6 +184,11 @@ export class SharingDistrict {
   readonly privateDesign = COURT_SITES.map((_, i) => designOf(i, 1013, 2));
   // Salt picked so court 2, in the COMMONS PLAZA sight line, keeps the open parasols (a solid pergola roof would hide the site).
   readonly openDesign = COURT_SITES.map((_, i) => designOf(i, 1052, 2));
+  /** P10 extras on open courts: drone kiosks (sharing + automation high) and blossom orchards (sharing + environment high). */
+  private readonly kiosk = new SlotLevels(COURT_SITES.length);
+  private readonly orchard = new SlotLevels(COURT_SITES.length);
+  private readonly kioskMeshes: T.InstancedMesh[];
+  private readonly orchardCrowns: T.InstancedMesh;
   private readonly winterGardens: T.InstancedMesh;
   private readonly winterFrames: T.InstancedMesh;
   private readonly pergolaFrames: T.InstancedMesh;
@@ -274,12 +289,23 @@ export class SharingDistrict {
       new T.BoxGeometry(28, .9, 1.4).translate(0, .75, -1.6), new T.BoxGeometry(28, .9, 1.4).translate(0, .75, 1.6),
     ]), trim, 'sharing-open-plazas');
     this.pergolaRoofs = batch(mergeGeometries(Array.from({ length: 6 }, (_, k) => new T.BoxGeometry(4.6, .5, 8.6).translate(-13.75 + k * 5.5, 6.6, 0))), leaf, 'sharing-open-plazas');
+    // Drone kiosk in a court corner: a 12 m mast and landing disc with a lit blue ring and a docked drone.
+    this.kioskMeshes = [
+      batch(mergeGeometries([new T.CylinderGeometry(.35, .6, 12, 8).translate(0, 6, 0), new T.CylinderGeometry(3.2, 1.2, .6, 24).translate(0, 12, 0)]), trim, 'sharing-drone-kiosks'),
+      batch(new T.TorusGeometry(3.2, .22, 6, 24).rotateX(Math.PI / 2).translate(0, 12.4, 0), trail, 'sharing-drone-kiosks'),
+      batch(new T.SphereGeometry(1, 12, 8).scale(1.3, .55, 1).translate(0, 13, 0), glass, 'sharing-drone-kiosks'),
+    ];
+    this.orchardCrowns = batch(leafyCrown(1), new T.MeshStandardMaterial({ color: '#ffffff', roughness: .9 }), 'sharing-orchards', n * ORCHARD.length);
+    for (let i = 0; i < n * ORCHARD.length; i++) this.orchardCrowns.setColorAt(i, color.set(i % 3 === 0 ? '#f6f1e8' : i % 3 === 1 ? '#f2bfd0' : '#7fa35e'));
     this.pulses = new PulseRings(this.root, METER_COLORS.publicSharing, (this.bays.length + n + 1) * PULSE_WAVES);
     this.root.visible = false; parent.add(this.root); this.write();
   }
 
-  setTarget(layout: Pick<ExhibitionLayout, 'sharedSeats'>, now: number, immediate: boolean): boolean {
+  setTarget(layout: Pick<ExhibitionLayout, 'sharedSeats'> & PairingAxes, now: number, immediate: boolean): boolean {
     this.target = layout.sharedSeats / 8;
+    const axis = axes(layout);
+    const kiosks = this.kiosk.setTargets(() => agree(axis.sharing, axis.automation, 'high') ? 1 : 0, now, immediate);
+    const orchards = this.orchard.setTargets(() => agree(axis.sharing, axis.environment, 'high') ? 1 : 0, now, immediate);
     // The first low / high proposals (2 / 7 seats) already read as distinct mature alternatives.
     const share = T.MathUtils.smoothstep(this.target, .25, .875);
     this.root.visible = true;
@@ -288,9 +314,10 @@ export class SharingDistrict {
     const hybrid = hybridShare(this.target);
     const hr = this.hybridRooms.setTargets(i => rank(i + 433) < hybrid ? 1 : 0, now, immediate);
     const hc = this.hybridCourts.setTargets(i => rank(i + 1019) < hybrid ? 1 : 0, now, immediate);
-    const changed = rooms || courts || hr || hc;
+    const changed = rooms || courts || hr || hc || kiosks || orchards;
     const roomSlots = new Set([...(rooms ? this.levels.changed : []), ...(hr ? this.hybridRooms.changed : [])]);
-    const courtSlots = new Set([...(courts ? this.court.changed : []), ...(hc ? this.hybridCourts.changed : [])]);
+    const courtSlots = new Set([...(courts ? this.court.changed : []), ...(hc ? this.hybridCourts.changed : []), ...(kiosks ? this.kiosk.changed : []),
+      ...(orchards ? this.orchard.changed : [])]);
     if (changed && !immediate) this.pulses.emit([sitePulse('sw'), ...[...roomSlots].map(i => {
       const b = this.bays[i]; return { x: b.x, y: b.y, z: b.z, r: b.r * b.sx * 1.3 };
     }), ...[...courtSlots].map(i => ({ x: this.courts[i].x, y: 0, z: this.courts[i].z, r: COURT * .75 }))], now);
@@ -299,7 +326,8 @@ export class SharingDistrict {
 
   update(now: number): void {
     this.now = now; this.deckGlow.emissiveIntensity = .2 + 2 * (towerGlow.value - .3);
-    const moved = [this.levels.update(now), this.court.update(now), this.hybridRooms.update(now), this.hybridCourts.update(now)].some(Boolean);
+    const moved = [this.levels.update(now), this.court.update(now), this.hybridRooms.update(now), this.hybridCourts.update(now), this.kiosk.update(now),
+      this.orchard.update(now)].some(Boolean);
     if (moved) this.write(); this.pulses.update(now);
   }
   hide(): void { this.root.visible = false; this.pulses.clear(); }
@@ -308,6 +336,8 @@ export class SharingDistrict {
     return { enabled: this.root.visible, targetSharing: this.target, rooms: this.bays.length, activePulses: this.pulses.active(this.now),
       vaults: this.vaulted.filter(Boolean).length, courts: this.courts.length,
       hybridRooms: this.root.visible ? this.hybridRooms.visible() : 0, hybridCourts: this.root.visible ? this.hybridCourts.visible() : 0,
+      droneKiosks: this.root.visible ? this.courts.filter((_, i) => this.kiosk.value[i] * this.court.value[i] > HIDDEN).length : 0,
+      orchardCourts: this.root.visible ? this.courts.filter((_, i) => this.orchard.value[i] * this.court.value[i] > HIDDEN).length : 0,
       visibleOpenCourts: this.root.visible ? this.court.visible() : 0, visibleOpenRooms: open, visiblePrivateRooms: this.root.visible ? this.levels.value.filter(v => 1 - v > HIDDEN).length : 0 };
   }
 
@@ -353,7 +383,15 @@ export class SharingDistrict {
       this.dummy.scale.set(parasols, parasols, parasols); this.dummy.updateMatrix(); this.plazaParasols.setMatrixAt(i, this.dummy.matrix);
       this.dummy.scale.set(tables, tables, tables); this.dummy.updateMatrix();
       this.pergolaFrames.setMatrixAt(i, this.dummy.matrix); this.pergolaRoofs.setMatrixAt(i, this.dummy.matrix);
-      const c = Math.cos(yaw), s = Math.sin(yaw);
+      const c = Math.cos(yaw), s = Math.sin(yaw), kiosk = Math.max(HIDDEN, this.kiosk.value[i] * open), orchard = Math.max(HIDDEN, this.orchard.value[i] * open);
+      this.dummy.position.set(x + 13 * c + 12 * s, 0, z - 13 * s + 12 * c); this.dummy.scale.setScalar(kiosk); this.dummy.updateMatrix();
+      for (const mesh of this.kioskMeshes) mesh.setMatrixAt(i, this.dummy.matrix);
+      ORCHARD.forEach(([tx, tz], k) => {
+        const r = (3.2 + (k % 3) * .5) * orchard;
+        this.dummy.position.set(x + tx * c + tz * s, r * .8, z - tx * s + tz * c); this.dummy.rotation.set(0, 0, 0);
+        this.dummy.scale.set(r * 1.15, r, r * 1.15); this.dummy.updateMatrix(); this.orchardCrowns.setMatrixAt(i * ORCHARD.length + k, this.dummy.matrix);
+      });
+      this.dummy.rotation.set(0, yaw, 0);
       COURT_TREES.forEach(([tx, tz, size], k) => {
         const r = size * walled;
         this.dummy.position.set(x + tx * c + tz * s, r * .75, z - tx * s + tz * c); this.dummy.rotation.set(0, 0, 0);
@@ -361,7 +399,10 @@ export class SharingDistrict {
       });
     });
     for (const mesh of [this.courtWalls, this.courtPavilions, this.courtCrowns, this.plazaPaving, this.plazaParasols, this.winterGardens, this.winterFrames,
-      this.pergolaFrames, this.pergolaRoofs]) mesh.instanceMatrix.needsUpdate = true;
+      this.pergolaFrames, this.pergolaRoofs, ...this.kioskMeshes, this.orchardCrowns]) mesh.instanceMatrix.needsUpdate = true;
+    // Inactive pairings submit no draws.
+    for (const mesh of this.kioskMeshes) mesh.visible = this.kiosk.visible() > 0;
+    this.orchardCrowns.visible = this.orchard.visible() > 0;
     for (const mesh of [this.screens, this.ribs, this.halos, this.haloGardens, this.haloLights, this.haloDecks, this.rims, this.skylights, ...this.steps]) mesh.instanceMatrix.needsUpdate = true;
   }
 }
@@ -878,6 +919,14 @@ export class ConcentrationDistrict {
   /** P8 design per pod site: two-tier pod (0) / garden ring pavilion (1). */
   readonly podDesign: number[] = POD_SITES.map((_, i) => designOf(i, 1201, 2));
   private readonly ringMeshes: T.InstancedMesh[];
+  /** P10 extras: vertical-forest crowns (concentration + environment high), drone docks (concentration + automation high) on towers,
+   * and solar canopies over pods (concentration + environment low). */
+  private readonly forest = new SlotLevels(TOWER_SITES.length);
+  private readonly docks = new SlotLevels(TOWER_SITES.length);
+  private readonly solarPods = new SlotLevels(POD_SITES.length);
+  private readonly forestCrowns: T.InstancedMesh;
+  private readonly dockMeshes: T.InstancedMesh[];
+  private readonly solarDiscs: T.InstancedMesh;
   readonly bridges: { i: number; j: number; y: number }[] = [];
   private readonly bridgeMeshes: T.InstancedMesh[];
   private readonly pulses: PulseRings;
@@ -983,12 +1032,30 @@ export class ConcentrationDistrict {
     box(ring, [1, 5, 1], [0, 2.5, 0], trim);
     const tree = new T.Mesh(new T.IcosahedronGeometry(1, 1), leaf); tree.position.y = 7.5; tree.scale.set(4.6, 3.6, 4.6); ring.add(tree);
     this.ringMeshes = this.instances(bake(ring), this.pods.length, 'concentration-distributed-pods');
+    const extra = (geometry: T.BufferGeometry, material: T.Material, count: number, name: string) => {
+      const mesh = new T.InstancedMesh(geometry, material, count);
+      mesh.name = name; mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;
+      mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); this.root.add(mesh); return mesh;
+    };
+    this.forestCrowns = extra(leafyCrown(1), new T.MeshStandardMaterial({ color: '#ffffff', roughness: .92 }), this.towers.length * 4, 'concentration-vertical-forest');
+    const green = new T.Color();
+    for (let i = 0; i < this.towers.length * 4; i++) this.forestCrowns.setColorAt(i, green.setHSL(.25 + (i % 5) * .01, .42, .24 + (i % 3) * .03));
+    this.dockMeshes = [
+      extra(new T.TorusGeometry(26, .7, 8, 64).rotateX(Math.PI / 2), trail, this.towers.length, 'concentration-drone-docks'),
+      extra(mergeGeometries([0, Math.PI].map(a => new T.SphereGeometry(1.6, 12, 8).scale(1.4, .6, 1).translate(Math.cos(a) * 26, 1.4, Math.sin(a) * 26))), glass,
+        this.towers.length, 'concentration-drone-docks'),
+    ];
+    this.solarDiscs = extra(new T.CylinderGeometry(11, 11, .4, 32).rotateZ(.12), solar, this.pods.length, 'concentration-solar-pods');
     this.pulses = new PulseRings(this.root, METER_COLORS.urbanConcentration, (this.towers.length + this.pods.length + 1) * PULSE_WAVES);
     this.root.visible = false; parent.add(this.root); this.write();
   }
 
-  setTarget(layout: Pick<ExhibitionLayout, 'functionModules'>, now: number, immediate: boolean): boolean {
+  setTarget(layout: Pick<ExhibitionLayout, 'functionModules'> & PairingAxes, now: number, immediate: boolean): boolean {
     this.target = (layout.functionModules - 2) / 4;
+    const axis = axes(layout);
+    const f = this.forest.setTargets(() => agree(axis.concentration, axis.environment, 'high') ? 1 : 0, now, immediate);
+    const d = this.docks.setTargets(() => agree(axis.concentration, axis.automation, 'high') ? 1 : 0, now, immediate);
+    const sp = this.solarPods.setTargets(() => agree(axis.concentration, axis.environment, 'low') ? 1 : 0, now, immediate);
     // First low / high proposals (3 / 5 modules) read as the two complete forms; mixed (4) keeps about half of each.
     const share = T.MathUtils.smoothstep(this.target, .3, .75);
     this.root.visible = true;
@@ -997,18 +1064,20 @@ export class ConcentrationDistrict {
     const a = this.towerLevels.setTargets(i => order(i, .31) < share ? 1 : 0, now, immediate);
     const b = this.podLevels.setTargets(i => order(i, .77) >= share ? 1 : 0, now, immediate);
     const m = this.midRise.setTargets(i => rank(i + 1301) < hybridShare(this.target) ? 1 : 0, now, immediate);
-    if ((a || b || m) && !immediate) this.pulses.emit([
+    if ((a || b || m || f || d || sp) && !immediate) this.pulses.emit([
       sitePulse('se'),
-      ...[...new Set([...(a ? this.towerLevels.changed : []), ...(m ? this.midRise.changed : [])])].map(i => ({ x: this.towers[i].x, y: 1, z: this.towers[i].z, r: 30 })),
-      ...this.podLevels.changed.map(i => ({ x: this.pods[i].x, y: 1, z: this.pods[i].z, r: 14 })),
+      ...[...new Set([...(a ? this.towerLevels.changed : []), ...(m ? this.midRise.changed : []), ...(f ? this.forest.changed : []), ...(d ? this.docks.changed : [])])]
+        .map(i => ({ x: this.towers[i].x, y: 1, z: this.towers[i].z, r: 30 })),
+      ...[...new Set([...(b ? this.podLevels.changed : []), ...(sp ? this.solarPods.changed : [])])].map(i => ({ x: this.pods[i].x, y: 1, z: this.pods[i].z, r: 14 })),
     ], now);
-    this.write(); return a || b || m;
+    this.write(); return a || b || m || f || d || sp;
   }
 
   update(now: number): void {
     this.now = now;
-    const a = this.towerLevels.update(now), b = this.podLevels.update(now), m = this.midRise.update(now);
-    if (a || b || m) this.write();
+    const moved = [this.towerLevels.update(now), this.podLevels.update(now), this.midRise.update(now), this.forest.update(now), this.docks.update(now),
+      this.solarPods.update(now)].some(Boolean);
+    if (moved) this.write();
     this.pulses.update(now);
   }
 
@@ -1017,7 +1086,10 @@ export class ConcentrationDistrict {
   getDiagnostics() {
     return { enabled: this.root.visible, targetConcentration: this.target, towers: this.towers.length, pods: this.pods.length, activePulses: this.pulses.active(this.now),
       visibleTowers: this.root.visible ? this.towerLevels.visible() : 0, visiblePods: this.root.visible ? this.podLevels.visible() : 0,
-      midRises: this.root.visible ? this.towers.filter((_, i) => this.midRise.value[i] > HIDDEN && this.towerLevels.value[i] <= HIDDEN).length : 0 };
+      midRises: this.root.visible ? this.towers.filter((_, i) => this.midRise.value[i] > HIDDEN && this.towerLevels.value[i] <= HIDDEN).length : 0,
+      forestTowers: this.root.visible ? this.towers.filter((_, i) => this.forest.value[i] * this.towerLevels.value[i] > HIDDEN).length : 0,
+      droneDocks: this.root.visible ? this.towers.filter((_, i) => this.docks.value[i] * this.towerLevels.value[i] > HIDDEN).length : 0,
+      solarPods: this.root.visible ? this.pods.filter((_, i) => this.solarPods.value[i] * this.podLevels.value[i] > HIDDEN).length : 0 };
   }
 
   private instances(sources: T.Mesh[], count: number, name: string): T.InstancedMesh[] {
@@ -1038,6 +1110,21 @@ export class ConcentrationDistrict {
       this.dummy.position.set(site.x, 0, site.z); this.dummy.rotation.set(0, i, 0);
       this.dummy.scale.set(footprint, Math.max(HIDDEN, level) * site.h, footprint); this.dummy.updateMatrix();
       for (const mesh of this.families[i % 3]) mesh.setMatrixAt(Math.floor(i / 3), this.dummy.matrix);
+      // Pairing extras ride full towers only (never mid-rises): a crown on the roof plus three at the lower lobby edge, and a dock ring
+      // with two drones at the upper lobby.
+      const full = this.towerLevels.value[i], forest = this.forest.value[i] * full, dock = this.docks.value[i] * full, h = full * site.h;
+      const family = i % 3, roof = [.95, 1, 1][family] * h, c = Math.cos(i), s = Math.sin(i), ox = family === 2 ? -10.5 * c : 0, oz = family === 2 ? 10.5 * s : 0;
+      const crown = (k: number, x: number, y: number, z: number, r: number) => {
+        this.dummy.position.set(x, y + r * .4, z); this.dummy.rotation.set(0, 0, 0);
+        this.dummy.scale.set(r, r * .7, r).multiplyScalar(Math.max(HIDDEN, forest)); this.dummy.updateMatrix(); this.forestCrowns.setMatrixAt(i * 4 + k, this.dummy.matrix);
+      };
+      crown(0, site.x + ox, roof, site.z + oz, family === 0 ? 9 : 7);
+      for (let k = 0; k < 3; k++) {
+        const a = i + k * 2.1, r = [19, 14, 12][family];
+        crown(k + 1, site.x + Math.cos(a) * r, .4 * h, site.z + Math.sin(a) * r, 4.5);
+      }
+      this.dummy.position.set(site.x, .72 * h, site.z); this.dummy.rotation.set(0, i, 0); this.dummy.scale.setScalar(Math.max(HIDDEN, dock)); this.dummy.updateMatrix();
+      for (const mesh of this.dockMeshes) mesh.setMatrixAt(i, this.dummy.matrix);
     });
     this.pods.forEach((site, i) => {
       this.dummy.position.set(site.x, 0, site.z); this.dummy.rotation.set(0, site.yaw, 0);
@@ -1046,6 +1133,10 @@ export class ConcentrationDistrict {
       for (const mesh of this.podMeshes) mesh.setMatrixAt(i, this.dummy.matrix);
       this.dummy.scale.setScalar(Math.max(HIDDEN, ring ? level : 0)); this.dummy.updateMatrix();
       for (const mesh of this.ringMeshes) mesh.setMatrixAt(i, this.dummy.matrix);
+      // Solar canopy just above the pod's planted top (14.7 m two-tier pod, 11.1 m ring-pavilion tree).
+      const solarLevel = this.solarPods.value[i] * level;
+      this.dummy.position.y = ring ? 12.6 : 16.2; this.dummy.scale.setScalar(Math.max(HIDDEN, solarLevel)); this.dummy.updateMatrix();
+      this.solarDiscs.setMatrixAt(i, this.dummy.matrix);
     });
     this.bridges.forEach(({ i, j, y }, k) => {
       // A bridge spans only once both towers stand; it grows out from the midpoint.
@@ -1057,6 +1148,10 @@ export class ConcentrationDistrict {
       this.dummy.scale.set(length * s, s, s); this.dummy.updateMatrix();
       for (const mesh of this.bridgeMeshes) mesh.setMatrixAt(k, this.dummy.matrix);
     });
-    for (const mesh of [...this.families.flat(), ...this.podMeshes, ...this.ringMeshes, ...this.bridgeMeshes]) mesh.instanceMatrix.needsUpdate = true;
+    for (const mesh of [...this.families.flat(), ...this.podMeshes, ...this.ringMeshes, ...this.bridgeMeshes, this.forestCrowns, ...this.dockMeshes, this.solarDiscs]) mesh.instanceMatrix.needsUpdate = true;
+    // Inactive pairings submit no draws.
+    this.forestCrowns.visible = this.forest.visible() > 0;
+    for (const mesh of this.dockMeshes) mesh.visible = this.docks.visible() > 0;
+    this.solarDiscs.visible = this.solarPods.visible() > 0;
   }
 }
