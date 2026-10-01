@@ -123,7 +123,8 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
     const pad=padGap(px,pz),path=pathGap(px,pz),sw=swale(px,pz),cor=corridor(px,pz);
     // Keep the terrace off pads, paths, ponds (swale changes up to ~.05 per metre) and the corridor channel.
     if(pad<reach+6 || path<reach+10 || sw<-1.15+reach*.05 || cor<.14+reach*.045)continue;
-    if(!(pad<reach+36 || path<reach+28 || cor<.14+reach*.045+.8 || sw<-.4))continue;
+    // r9 pass 2: groves reach further out from structure (target v2's near-continuous canopy) — still terraced clusters, open lawn only far from it.
+    if(!(pad<reach+70 || path<reach+56 || cor<.14+reach*.045+1.4 || sw<-.1))continue;
     const y=landscapeAt(px,pz);
     if(y===null || ![[reach,0],[-reach,0],[0,reach],[0,-reach]].every(([dx,dz])=>landscapeAt(px+dx,pz+dz)!==null))continue;
     // Denser grid (r8 pass 3): terraces may not overlap, or their coplanar lawn tiers would z-fight.
@@ -163,9 +164,10 @@ export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
     return hit && hit.object instanceof T.Mesh && !Array.isArray(hit.object.material) && hit.object.material.name==='landscape' && hit.point.y<9 ? hit.point.y : null;
   };
   // ponytail: one unaccelerated ray per crown (~4k rays at load); add a BVH if the plate grows.
-  for(let x=bounds.min.x;x<bounds.max.x;x+=44)for(let z=bounds.min.z;z<bounds.max.z;z+=44){
+  // r9 pass 2: 36 m cells and a smaller open-lawn field, so the backdrop reads as dense parkland (target v2) rather than dotted groves.
+  for(let x=bounds.min.x;x<bounds.max.x;x+=36)for(let z=bounds.min.z;z<bounds.max.z;z+=36){
     const px=x+Math.sin(z*1.7+x)*12,pz=z+Math.cos(x*1.3-z)*12;
-    if(inDistrict(px,pz) || seaward(px,pz) || Math.sin(px*.019+Math.sin(pz*.021)*2)+Math.cos(pz*.027)<-.35)continue;
+    if(inDistrict(px,pz) || seaward(px,pz) || Math.sin(px*.019+Math.sin(pz*.021)*2)+Math.cos(pz*.027)<-.8)continue;
     const y=groundAt(px,pz);
     if(y===null)continue;
     const yaw=Math.sin(px*.37+pz*.11)*3,R=11+(Math.sin(px*.7+pz)+1)*2,c=Math.cos(yaw),sn=Math.sin(yaw);
@@ -179,7 +181,7 @@ export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
       dummy.position.set(tx,ty+.6+s*.9,tz);dummy.scale.set(s,s*.85,s);dummy.rotation.set(0,a,0);dummy.updateMatrix();crowns.push(dummy.matrix.clone());
     }
     // Only whole groves: a clipped one would leave crowns off the plinth; plinths may not overlap (r8 pass 3's denser cells).
-    if(crowns.length<5 || centres.some(([cx,cz,cr])=>Math.hypot(cx-px,cz-pz)<(cr+R)*1.3))continue;
+    if(crowns.length<5 || centres.some(([cx,cz,cr])=>Math.hypot(cx-px,cz-pz)<(cr+R)*1.16))continue;
     centres.push([px,pz,R]);
     matrices.push(...crowns);
     dummy.position.set(px,y+.3,pz);dummy.scale.set(R*1.3,.6,R/1.3);dummy.rotation.set(0,yaw,0);dummy.updateMatrix();plinths.push(dummy.matrix.clone());

@@ -31,11 +31,12 @@ export function contextFacades(environment: T.Object3D) {
           const row = Math.floor(y / 4), col = Math.floor(u / 4);
           // r6 pass 3: warm champagne glass (the same tone as the curtain-wall shader underneath, so uncovered faces no longer show as
           // beige blocks against blue-grey) with a soft per-bay brightness; whole lit floor runs on about one storey in four.
-          const lit = Math.abs(Math.sin(row * 12.9898 + Math.floor(col / 8) * 78.233) * 43758.5453) % 1 < .25;
+          // r9 pass 2: lit runs two panes wide on ~18% of bays (fine golden flecks, target v2) instead of 32 m runs, which read as beige/grey blocks.
+          const lit = Math.abs(Math.sin(row * 12.9898 + Math.floor(col / 2) * 78.233) * 43758.5453) % 1 < .18;
           const jitter = Math.abs(Math.sin(row * 4.1 + col * 7.3) * 1e4) % 1;
           // r9: the unlit panes become cool blue-grey glass reading the sky (target v2: ivory frames, blue-grey glazing, golden lit floors);
           // the champagne panes made towers read as sandstone brick. The curtain-wall shader's panes match, so faces stay one system.
-          shades.push(lit ? new T.Color().setHSL(.1, .55, .66 + jitter * .06) : new T.Color().setHSL(.57, .14, .54 + jitter * .07));
+          shades.push(lit ? new T.Color().setHSL(.09, .62, .62 + jitter * .05) : new T.Color().setHSL(.58, .12, .57 + jitter * .04));
         }
       }
     }
