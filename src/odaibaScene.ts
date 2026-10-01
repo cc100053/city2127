@@ -59,7 +59,7 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
   };
   material.customProgramCacheKey = () => 'curtain-wall';
 }
-const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a'), dayGlow = .26;
+const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a'), dayGlow = .34;
 /** Retained landmark glazing glows warm, strongest at night; the civic chassis uses the shared city finishes. */
 export function updateOdaiba(night: number) {
   // A faint daytime glow keeps the dark glazing reading as occupied, warm interiors (CITY_MASTER_TASTE) instead of voids.

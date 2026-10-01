@@ -17,8 +17,8 @@ export function contextFacades(environment: T.Object3D) {
       across.set(normal.z, 0, -normal.x).normalize();
       const vertices = [triangle.a, triangle.b, triangle.c], plane = normal.dot(triangle.a);
       const us = vertices.map(p => p.dot(across)), ys = vertices.map(p => p.y);
-      for (let y = Math.ceil(Math.min(...ys) / 4) * 4 + 2; y < Math.max(...ys) - 1.2; y += 4) {
-        for (let u = Math.ceil(Math.min(...us) / 4) * 4 + 2; u < Math.max(...us) - 1.2; u += 4) {
+      for (let y = Math.ceil(Math.min(...ys) / 4) * 4 + 2; y < Math.max(...ys) - 1.6; y += 4) {
+        for (let u = Math.ceil(Math.min(...us) / 4) * 4 + 2; u < Math.max(...us) - 1.8; u += 4) {
           point.copy(normal).multiplyScalar(plane).addScaledVector(across, u).setY(y);
           if (!triangle.containsPoint(point) || !inDistrict(point.x, point.z)) continue;
           const key = point.toArray().map(v => v.toFixed(2)).join(',');
@@ -26,10 +26,12 @@ export function contextFacades(environment: T.Object3D) {
           occupied.add(key);
           transform.position.copy(point).addScaledVector(normal, .045);
           transform.quaternion.setFromUnitVectors(forward, normal);
-          transform.scale.set(3.05, 2.65, 1);transform.updateMatrix();panels.push(transform.matrix.clone());
-          const variation = (Math.abs(Math.floor(u / 4) * 17 + Math.floor(y / 4) * 7) % 11) / 11;
-          // About one bay in five reads as a warm occupied room (2127 target: golden glass), the rest as sky-blue glazing.
-          shades.push(variation < .2 ? new T.Color().setHSL(.09, .55, .62 + variation * .4) : new T.Color().setHSL(.57, .2, .4 + variation * .18));
+          // Glass-dominant bays (thin mullions, a slim spandrel) so towers read as curtain-wall glass, not dotted masonry.
+          transform.scale.set(3.6, 3.15, 1);transform.updateMatrix();panels.push(transform.matrix.clone());
+          const row = Math.floor(y / 4), col = Math.floor(u / 4);
+          // Even sky-blue glazing; lit warm rooms come in runs of three bays on about one storey-run in six (2127 target: golden interiors).
+          const lit = Math.abs(Math.sin(row * 12.9898 + Math.floor(col / 3) * 78.233) * 43758.5453) % 1 < .16;
+          shades.push(lit ? new T.Color().setHSL(.09, .6, .66) : new T.Color().setHSL(.57, .22, .47 + Math.abs(row * 7 + col * 3) % 5 * .015));
         }
       }
     }

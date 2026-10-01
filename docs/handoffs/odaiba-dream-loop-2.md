@@ -4,7 +4,7 @@
 - Branch: `feat/odaiba-dream-loop-2`, from `main` `6301794` (0/0 with `origin/main` after a successful fetch; clean tree).
 - Scope: user asked to "create branch and use dream-loop to polish city". Dream Loop Plus, three passes, then stop for human review. Target: the existing locked `.dream-loop/target.png` (see [earlier Dream Loop](odaiba-dream-loop.md)); no new target generated. Fable was unavailable (usage credits), so workers ran on Opus.
 - Capture: headless Chrome 1920×929, `?hour=16&reviewTime=20` (`.dream-loop/shot.sh`, ignored).
-- Status: round 2 (three passes, target v1) and round 3 (three passes, target v2) implemented and locally verified; target NOT reached; human art review pending. No main integration.
+- Status: round 2 (three passes, target v1) and rounds 3 and 4 (three passes each, target v2) implemented and locally verified; target NOT reached; human art review pending. No main integration.
 
 ## Passes
 
@@ -55,3 +55,21 @@ Validation: after each pass and fix, root `npm test` PASS (incl. 81-combination 
 Remaining gaps vs target v2: long front-left skyway and right-side monorail sweep, district density and layered promenade, spheres read as blue domes rather than clear glass, dense far skyline, sun glint position.
 
 Next step: user reviews the round 3 images; then another three-pass round or merge.
+
+## Round 4 — target v2 (2026-10-01)
+
+User asked to run another round. Start: `r3-pass3.png` (`699d85c`); branch 0/0 with its remote, `main` 0/0 with `origin/main` after fetch.
+
+- Pass 1 (`e4ce8ea`): silver spheres (narrow lit walk instead of the dome-hiding deck), Fuji sphere in `chrome`, front-left skyway, right-side `sweepway` with a white 4-car shuttle, white Yurikamome pods, four more cruisers.
+- Pass 2 (`8e1afe3`): terraces raised to 2.8 m with three wide waterfalls; white yacht hulls (bow orientation checked against wakes); thicker trails; amber-lit context glazing.
+- Pass 3: Ariake parkland gets eight lagoons (slab, buildings, `ariakeLink` and viaduct kept); larger sky-blue facade panels with lit runs; warmer landmark glazing by day.
+
+Orchestrator fix: pass 3's lagoons put open water behind the intro question line, which became unreadable by day → denser pale halo (`src/style.css`; copy unchanged). No other bugs found in captures.
+
+Validation: after each pass and fix, root `npm test` PASS (incl. 81-combination survey pipeline), `npm run build` PASS (existing >500 kB warning), `git diff --check` clean; built-in browser 16:00 no console errors. Evidence: [pass 1](../../artifacts/odaiba-dream4-pass1.jpg), [pass 2](../../artifacts/odaiba-dream4-pass2.jpg), [pass 3](../../artifacts/odaiba-dream4-pass3.jpg), [pass 3 night](../../artifacts/odaiba-dream4-pass3-night.jpg). Not verified: live `?survey`, FPS/draw calls, exhibition hardware; no test covers hand-placed skyway/sweep/cruiser collisions.
+
+Decision for the user: the Ariake lagoons move Ariake toward the target's open water while keeping the shore — confirm this fits the 2026-10-01 "keep Ariake" decision, or revert that part of pass 3 (`src/bayContext.ts`).
+
+Remaining gaps vs target v2: district density and layered promenade, spheres still read partly as domes, dense far skyline, sun glint position, sweep pods barely visible at hero distance.
+
+Next step: user review; another round or merge.

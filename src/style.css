@@ -13,4 +13,6 @@
 body:not([data-time=night]) .intro{text-shadow:0 0 12px rgba(236,232,222,.85),0 0 3px rgba(236,232,222,.7)}
 /* r3: Ariake parkland is green behind the intro, so the day accent word darkens to keep its contrast. */
 body:not([data-time=night]) h1 em{color:#56613f}
+/* r4: Ariake lagoons put open water behind the small question line; a denser halo keeps it legible. */
+body:not([data-time=night]) .question{opacity:.85;text-shadow:0 0 10px rgba(240,236,226,.95),0 0 4px rgba(240,236,226,.95),0 0 2px rgba(240,236,226,1)}
 body[data-time=night] footer{text-shadow:0 0 10px rgba(7,13,28,.95),0 0 3px rgba(7,13,28,.8)}

@@ -6,21 +6,29 @@ const ground = paint('#737f78', 1), bridgeWhite = paint('#cfd3d2', .55, .15), ga
 const skyline = new T.MeshStandardMaterial({ color: '#ffffff', roughness: .9 });
 // Far shores recede harder than the Odaiba backdrop: silhouettes in the bay haze, never competing with the district.
 for (const material of [ground, bridgeWhite, gateSteel, skyline]) { recedeBeyondDistrict(material, .82); curveBeyondPlate(material); }
-// Ariake in 2127: a wooded park shore rather than a grey plain; grove mottling and pale walks from world-space noise (reuses recede's varying).
-const parkland = paint('#6f8a5c', 1);
-recedeBeyondDistrict(parkland, .55);
+// Ariake in 2127: a wooded park archipelago rather than a grey plain; bay lagoons cut through it so the shore beside the district reads as open water
+// with planted islands (target), grove mottling and pale walks from world-space noise (reuses recede's varying). Lagoons [x, z, radius] in metres.
+const lagoons: readonly (readonly [number, number, number])[] = [
+  [870, -260, 230], [1190, -60, 200], [880, 540, 170], [1320, 430, 190], [1660, 140, 220], [1930, -260, 250], [1520, -520, 210], [2120, 560, 220],
+];
+const inLagoon = (x: number, z: number, margin: number) => lagoons.some(([cx, cz, r]) => Math.hypot(x - cx, z - cz) < r + margin);
+const parkland = paint('#5f7d4c', 1);
+recedeBeyondDistrict(parkland, .4);
 {
   const compile = parkland.onBeforeCompile.bind(parkland);
   parkland.onBeforeCompile = (shader, renderer) => {
     compile(shader, renderer);
     shader.fragmentShader = shader.fragmentShader.replace('#include <common>', `#include <common>
       float groveHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-      float groveNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(groveHash(i),groveHash(i+vec2(1,0)),f.x),mix(groveHash(i+vec2(0,1)),groveHash(i+1.),f.x),f.y);}`)
+      float groveNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(groveHash(i),groveHash(i+vec2(1,0)),f.x),mix(groveHash(i+vec2(0,1)),groveHash(i+1.),f.x),f.y);}
+      float lagoonDist(vec2 p){float d=1e5;${lagoons.map(([x, z, r]) => `d=min(d,length(p-vec2(${x.toFixed(1)},${z.toFixed(1)}))-${r.toFixed(1)});`).join('')}return d+(groveNoise(p/60.)-.5)*40.;}`)
+      // Lagoons open onto the sea plane below; a pale promenade rims each island.
+      .replace('#include <clipping_planes_fragment>', 'float lagoon=lagoonDist(districtXz);\nif(lagoon<0.) discard;\n#include <clipping_planes_fragment>')
       .replace('#include <color_fragment>', `#include <color_fragment>
       float grove=groveNoise(districtXz/70.)*.6+groveNoise(districtXz/17.)*.4;
-      diffuseColor.rgb*=mix(vec3(.55,.72,.52),vec3(1.1,1.06,.92),smoothstep(.38,.62,grove));
+      diffuseColor.rgb*=mix(vec3(.5,.66,.48),vec3(1.05,1.02,.9),smoothstep(.38,.62,grove));
       float walk=1.-smoothstep(.03,.07,abs(sin(districtXz.x*.011+sin(districtXz.y*.009)*2.)));
-      diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.86,.82,.74),walk*.8);`);
+      diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.86,.82,.74),max(walk*.8,1.-smoothstep(4.,10.,lagoon)));`);
   };
   const key = parkland.customProgramCacheKey.bind(parkland);
   parkland.customProgramCacheKey = () => key() + '|ariake-park';
@@ -97,8 +105,12 @@ export function bayContext() {
     for (let k = 0; k < shore.count; k++, i++) {
       const w = 25 + random() * 55, d = 25 + random() * 55, h = shore.h[0] + (shore.h[1] - shore.h[0]) * random() ** 2.4;
       dummy.position.set(x0 + w + random() * (x1 - x0 - 2 * w), h / 2 + .8, z0 + d + random() * (z1 - z0 - 2 * d));
+      // Ariake blocks stand on the islands (own retry sequence, so the other shores keep their seeded layout) as darker blue glass.
+      const ariake = shore.name === 'Ariake';
+      for (let t = 1; ariake && t < 40 && inLagoon(dummy.position.x, dummy.position.z, 70); t++) dummy.position.set(x0 + w + (Math.sin(k * 91.7 + t * 12.9) * .5 + .5) * (x1 - x0 - 2 * w), dummy.position.y, z0 + d + (Math.sin(k * 37.3 + t * 78.2) * .5 + .5) * (z1 - z0 - 2 * d));
       dummy.rotation.set(0, .58, 0); dummy.scale.set(w, h, d); dummy.updateMatrix(); blocks.setMatrixAt(i, dummy.matrix);
-      blocks.setColorAt(i, color.setHSL(.58, .1, .46 + random() * .12));
+      const tone = random();
+      blocks.setColorAt(i, ariake ? color.setHSL(.57, .22, .3 + tone * .12) : color.setHSL(.58, .1, .46 + tone * .12));
     }
   }
   blocks.name = 'bay-skyline';
