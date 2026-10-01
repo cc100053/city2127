@@ -29,9 +29,11 @@ export function contextFacades(environment: T.Object3D) {
           // r5 pass 2: one even glass grid per tower (target v2) — full-width panes, thin mullions and a 1.1 m pale floor band between storeys.
           transform.scale.set(3.75, 2.9, 1);transform.updateMatrix();panels.push(transform.matrix.clone());
           const row = Math.floor(y / 4), col = Math.floor(u / 4);
-          // Lit warm rooms come as whole floor runs of eight bays on about one storey in seven; the rest is uniform blue-grey glass.
-          const lit = Math.abs(Math.sin(row * 12.9898 + Math.floor(col / 8) * 78.233) * 43758.5453) % 1 < .14;
-          shades.push(lit ? new T.Color().setHSL(.09, .5, .64) : new T.Color().setHSL(.57, .17, .45 + (row % 2) * .015));
+          // r6 pass 3: warm champagne glass (the same tone as the curtain-wall shader underneath, so uncovered faces no longer show as
+          // beige blocks against blue-grey) with a soft per-bay brightness; whole lit floor runs on about one storey in four.
+          const lit = Math.abs(Math.sin(row * 12.9898 + Math.floor(col / 8) * 78.233) * 43758.5453) % 1 < .25;
+          const jitter = Math.abs(Math.sin(row * 4.1 + col * 7.3) * 1e4) % 1;
+          shades.push(lit ? new T.Color().setHSL(.1, .55, .66 + jitter * .06) : new T.Color().setHSL(.09, .14, .56 + jitter * .06));
         }
       }
     }

@@ -34,6 +34,14 @@ const LINKS: P3[][] = [
   // Mid-level (r6): Fuji chassis west face to Hilton at 40 m, south of the COMMONS PLAZA lot, so the gap between them reads layered.
   [[-86, 40, 18], [-130, 40.5, 26], [-180, 41, 34], [-220, 40.5, 40], [-250, 40, 44]],
 ];
+// Planted mid-level decks (r6 pass 3, target v2's tree-lined middle layer). Raycast-checked against the environment, landmarks and
+// Fuji chassis: clear between their docked ends, and off every survey site's line of sight from the hero pose.
+const GARDEN_LINKS: P3[][] = [
+  // DECKS south face over the open ground to a landing on Aqua City's planted roof (30 m).
+  [[150, 40, -222], [150, 39, -195], [125, 37, -168], [85, 35.5, -150], [40, 34.5, -145], [20, 34.5, -142]],
+  // The 151 m tower down to DECKS' east face at 42 m.
+  [[252, 42, -346], [250, 42, -315], [232, 42, -290], [195, 42, -281], [168, 42, -280]],
+];
 
 /** Box-section deck along a curve, `top` at the curve and `depth` below it; outward winding, flat-shaded quads. */
 function deck(curve: T.Curve<T.Vector3>, width: number, depth: number, samples: number) {
@@ -171,18 +179,19 @@ function shoreTerraces(root: T.Object3D) {
 /** 2127 identity at height: lit skyways, tower rings and suspended glass spheres, plus the round waterfall terraces on the bay. */
 export function skyways() {
   const root = new T.Group(); root.name = 'skyways';
-  for (const ring of RINGS) {
-    skyway(root, circle(ring), true);
-    // Planted ring (target v2's tree-lined tower halos): a lawn bed down the deck's middle with a tree every ~9 m, every third a cherry.
-    const { centre: [x, y, z], radius } = ring, count = Math.round(radius * Math.PI * 2 / 9);
-    arc(root, radius - 2.6, radius + 2.6, .45, [x, y, z], leaf);
-    for (let i = 0; i < count; i++) {
-      const a = i / count * Math.PI * 2, s = 1.9 + (i % 3) * .4, tx = x + Math.cos(a) * radius, tz = z + Math.sin(a) * radius;
-      const trunk = new T.Mesh(pole, trim); trunk.scale.set(.3, 2.6, .3); trunk.position.set(tx, y + 1.5, tz); root.add(trunk);
-      const tree = new T.Mesh(crown, i % 3 === 1 ? cherry : leaf); tree.scale.set(s * 1.15, s, s * 1.15); tree.position.set(tx, y + 2.6 + s * .8, tz); root.add(tree);
+  // Planted decks (target v2's tree-lined halos and middle layer): a lawn bed down the deck's middle with a tree every ~9 m, every third a cherry.
+  const garden = (curve: T.Curve<T.Vector3>, closed: boolean) => {
+    const length = curve.getLength(), count = Math.round(length / 9);
+    root.add(new T.Mesh(deck(curve, 5.2, .45, Math.ceil(length / 3)), leaf)); root.children.at(-1)!.position.y = .45;
+    for (let i = closed ? 0 : 1; i < count; i++) {
+      const p = curve.getPointAt(i / count), s = 1.9 + (i % 3) * .4;
+      const trunk = new T.Mesh(pole, trim); trunk.scale.set(.3, 2.6, .3); trunk.position.set(p.x, p.y + 1.5, p.z); root.add(trunk);
+      const tree = new T.Mesh(crown, i % 3 === 1 ? cherry : leaf); tree.scale.set(s * 1.15, s, s * 1.15); tree.position.set(p.x, p.y + 2.6 + s * .8, p.z); root.add(tree);
     }
-  }
+  };
+  for (const ring of RINGS) { skyway(root, circle(ring), true); garden(circle(ring), true); }
   for (const points of [...LINKS, sweepway.map(p => [...p] as P3)]) skyway(root, new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'), false);
+  for (const points of GARDEN_LINKS) { const curve = new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'); skyway(root, curve, false); garden(curve, false); }
   for (const s of SPHERES) sphere(root, s.centre, s.radius, s.deck);
   // Lit blue lines at street level too (target v2): both edges of the seaside promenades.
   for (const walk of routes().promenades) for (const side of [-3.6, 3.6]) root.add(new T.Mesh(offsetTube(walk, side, .25, .3, false), trail));

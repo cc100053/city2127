@@ -43,7 +43,7 @@ const curtainWalls: Record<string, string> = {
   // r6 pass 2: the hotel walls and the Grand Nikko tower become the same banded curtain wall (target v2's glass hotels).
   'Warm ivory facade': '#e8ddc9', 'Warm off white facade.001': '#e8ddc9', 'Pale Mint Panels': '#e6ddcb', 'Ochre Commercial Panels': '#ddcfb6', 'Blue Gray Cladding': '#e3dacb', 'Dark Blue Gray Glazing': '#d9cfbd',
 };
-const curtainGlow = { value: .6 }, curtainNight = { value: 0 };
+const curtainGlow = { value: .45 }, curtainNight = { value: 0 };
 function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
   material.color.set(spandrel); material.roughness = .45; material.metalness = .1;
   material.onBeforeCompile = shader => {
@@ -58,10 +58,12 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
       .replace('#include <map_fragment>', `#include <map_fragment>
       float storey = fract(curtainP.y / 4.2), mullion = fract(curtainP.x / 1.8);
       float pane = step(.2, storey) * step(storey, .96) * step(mullion, .93) * (1. - step(.5, curtainP.z)) * step(1.2, curtainP.y);
-      float occupied = step(.64, fract(sin(dot(floor(vec2(curtainP.x / 9., curtainP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453));
-      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.24, .31, .37), pane);`)
+      // r6 pass 3: soft occupancy (no on/off blocks) and warm champagne glass, matching contextFacades' panels, so towers read as one
+      // even, golden glass grid (target v2) instead of a patchwork of dark blue and beige where the two facade systems meet.
+      float occupied = .35 + .65 * fract(sin(dot(floor(vec2(curtainP.x / 5.4, curtainP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453);
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.36, .33, .28), pane);`)
       // Panes are glass: glossy and partly metallic so they pick up the sky instead of reading as flat dark dots.
-      .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, .12, pane);\nmetalnessFactor = mix(metalnessFactor, .45, pane);')
+      .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, .14, pane);\nmetalnessFactor = mix(metalnessFactor, .4, pane);')
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1., .78, .5) * pane * (curtainGlow * occupied + curtainNight * .3);');
   };
   material.customProgramCacheKey = () => 'curtain-wall';
@@ -71,7 +73,7 @@ const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a')
 export function updateOdaiba(night: number) {
   // A faint daytime glow keeps the dark glazing reading as occupied, warm interiors (CITY_MASTER_TASTE) instead of voids.
   for (const material of glazing) material.emissiveIntensity = dayGlow + night * (.55 - dayGlow);
-  curtainGlow.value = .6 + night * .7; curtainNight.value = night;
+  curtainGlow.value = .45 + night * .8; curtainNight.value = night;
 }
 
 // Ground finishes that stop at the seaward cut; massing, guideway and revetment keep their geometry.

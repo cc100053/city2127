@@ -1,5 +1,9 @@
 # Validation and handoff
 
+## Odaiba Dream Loop r6 (target v2) — 2026-10-01
+
+Three more passes on `feat/odaiba-dream-loop-2` (`581ab7c`, `15772bf`, pass 3): root `npm test`/`npm run build`/`git diff --check` passed after each pass; headless day/night captures; built-in browser 16:00 console clean. Live `?survey`, FPS/draw calls and exhibition hardware not verified. Details: [handoff](handoffs/odaiba-dream-loop-2.md#round-6--target-v2-2026-10-01).
+
 ## Odaiba Dream Loop r5 (target v2) — 2026-10-01
 
 Three more passes on `feat/odaiba-dream-loop-2` (`77daacb`, `6ae6cc0`, pass 3): root `npm test`/`npm run build`/`git diff --check` passed after each pass; headless day/night captures; built-in browser 16:00 without console errors or warnings. Live `?survey`, FPS/draw calls and exhibition hardware not verified. Details: [handoff](handoffs/odaiba-dream-loop-2.md#round-5--target-v2-2026-10-01).
