@@ -23,9 +23,17 @@ export function podPose(time:number,train:number,car:number,length:number) {
   return {u:head+(forward?-1:1)*car*CAR_GAP/length,forward};
 }
 export const WALKERS=40, AIR_SCALE=5;
+const MAX_WALKERS=160, MAX_TRAINS=4, LOOP_AIRCRAFT=30;
+/** Human-led and autonomous service both retain a complete transit system. Ports 1..5 span the readable alternatives. */
+export function automationActivity(share:number) {
+  const level=T.MathUtils.smoothstep(share,1/6,5/6);
+  // Drop Float32 endpoint noise so integer capacities do not expose a phantom extra actor.
+  const count=(n:number)=>Math.round(n*1e6)/1e6;
+  return {level,aircraft:count(2+28*level),pods:count(CARS*(2+2*level)),walkers:count(40+120*(1-level))};
+}
 /** Promenade walkers (even: east promenade, odd: west): slow out-and-back strolls, keeping right for their direction. */
-export function walkerPose(time:number,index:number) {
-  const {u,forward}=pingPong(time,420+(index%7)*23,index/WALKERS*2);
+export function walkerPose(time:number,index:number,count=WALKERS) {
+  const {u,forward}=pingPong(time,420+(index%7)*23,index/count*2);
   return {u,forward,lane:(forward?1:-1)*(1.2+(index%3)*.8),stride:Math.sin(time*6+index)};
 }
 /** Sphere shuttle: a 40 s cycle — approach from the bay, settle onto the berth, lift off and return. */
@@ -62,9 +70,9 @@ function wake() {
   const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.Float32BufferAttribute(position,3));geometry.setAttribute('color',new T.Float32BufferAttribute(color,4));
   return geometry;
 }
-function wing():Part {
+function wing(mat:T.Material=shell):Part {
   const shape=new T.Shape();shape.moveTo(-2.2,-.8);shape.lineTo(-.5,.8);shape.lineTo(.5,.8);shape.lineTo(2.2,-.8);shape.lineTo(.55,-.4);shape.lineTo(-.55,-.4);shape.closePath();
-  const geometry=new T.ExtrudeGeometry(shape,{depth:.1,bevelEnabled:false});geometry.rotateX(-Math.PI/2);return {geometry,material:shell};
+  const geometry=new T.ExtrudeGeometry(shape,{depth:.1,bevelEnabled:false});geometry.rotateX(-Math.PI/2);return {geometry,material:mat};
 }
 function fleet(scene:T.Scene,parts:Part[],count:number,name:string,shadow=true) {
   const batches=new Map<T.Material,T.BufferGeometry[]>();
@@ -87,9 +95,9 @@ export function mobility(scene:T.Scene) {
   // Guideway pods (ART.md §7): rounded white cars with a glass band and a mint service line, 9 m long.
   const body=material('#ffffff');
   const podParts=()=>[part([2.7,2.6,9],[0,1.5,0],body,.6),part([2.76,.9,7.6],[0,2,0],glass,.3),part([2.8,.14,8],[0,.9,0],mint,.05),part([2.2,.12,.12],[0,1.3,4.5],coral,.05)];
-  const pods=fleet(scene,podParts(),TRAINS*CARS,'guideway-pods');
+  const pods=fleet(scene,podParts(),MAX_TRAINS*CARS,'guideway-pods');
   // 2127 white trains with a dark glass band (target v2), lightly warm/cool per train.
-  for(let i=0;i<TRAINS*CARS;i++)pods.tint(i,body,i<CARS?'#f4f3ee':'#e9eef0');
+  for(let i=0;i<MAX_TRAINS*CARS;i++)pods.tint(i,body,i<CARS?'#f4f3ee':'#e9eef0');
   // Sweep train: four cars shuttling on the descending skyway, pitched with the deck.
   const SWEEP_CARS=4,SWEEP_SCALE=1.7,sweepLength=path.sweep.getLength(),sweepPods=fleet(scene,podParts(),SWEEP_CARS,'sweep-pods');
   for(let i=0;i<SWEEP_CARS;i++)sweepPods.tint(i,body,'#f6f5f1');
@@ -101,9 +109,9 @@ export function mobility(scene:T.Scene) {
     {geometry:new T.SphereGeometry(.162,14,6,0,Math.PI*2,0,Math.PI*.55).translate(0,1.52,-.012),material:hair},
     capsule(.07,.42,[-.29,.98,0],coats),capsule(.07,.42,[.29,.98,0],coats),
     {geometry:new T.CapsuleGeometry(.08,.4,4,8).translate(-.13,.33,0),material:trousers},{geometry:new T.CapsuleGeometry(.08,.4,4,8).translate(.13,.33,0),material:trousers},
-  ],WALKERS,'promenade-walkers');
+  ],MAX_WALKERS,'promenade-walkers');
   const clothes=['#4f6f7c','#b5836f','#6d8a5f','#2f3e48','#c9b48a','#8c6f8f','#3f5a52','#e4e1d8'],skins=['#e8cdb0','#c99e7c','#8d6348','#f0d9c2'],hairs=['#2f2a27','#5a4033','#1d2226','#b9a58c','#d8d8d4'];
-  for(let i=0;i<WALKERS;i++){people.tint(i,coats,clothes[(i*5)%clothes.length]);people.tint(i,skin,skins[(i*3)%skins.length]);people.tint(i,hair,hairs[(i*7)%hairs.length]);}
+  for(let i=0;i<MAX_WALKERS;i++){people.tint(i,coats,clothes[(i*5)%clothes.length]);people.tint(i,skin,skins[(i*3)%skins.length]);people.tint(i,hair,hairs[(i*7)%hairs.length]);}
   // Water taxis: 11 m white yachts with a glass cabin and a mint waterline.
   // White yacht hull with a pointed bow (plan in x/-z), a raised aft deck, a dark glass cabin band under a white roof.
   const plan=new T.Shape([[-1.8,5.5],[1.8,5.5],[1.8,-2],[0,-6.2],[-1.8,-2]].map(([x,y])=>new T.Vector2(x,y)));
@@ -111,31 +119,35 @@ export function mobility(scene:T.Scene) {
   const boats=fleet(scene,[{geometry:hull,material:shell},part([2.9,1.1,5.4],[0,1.55,-1],glass,.4),part([3,.3,5.8],[0,2.2,-1.1],shell,.15),part([3.7,.12,11.1],[0,.25,-.2],mint,.05),part([2.4,.12,.12],[0,1,5.5],coral,.05)],BOATS+1+bayCruisers.length,'water-taxis');
   // Wakes: a fading V and prop wash trailing each taxi on the water (no shadow).
   const wakes=fleet(scene,[{geometry:wake(),material:new T.MeshBasicMaterial({vertexColors:true,transparent:true,depthWrite:false})}],BOATS+1+bayCruisers.length,'water-taxi-wakes',false);
-  // Air taxis: the thin-wing carrier at 5× (22 m span), readable at district distance.
-  const drones=fleet(scene,[wing(),part([.8,.35,2.5],[0,.1,0],shell,.15),part([.55,.2,1],[0,.34,.45],glass,.08),
-    part([.6,.1,.16],[0,.11,-1.27],mint,.025),part([.09,.4,.65],[0,.32,-.8],glass,.02)],7,'air-taxis');
+  // Air taxis: 22 m span in legacy/human-led mode, up to 31 m for the autonomous carrier.
+  const airShell=shell.clone(); airShell.emissive.set('#c1e9e4');
+  const drones=fleet(scene,[wing(airShell),part([.8,.35,2.5],[0,.1,0],airShell,.15),part([.55,.2,1],[0,.34,.45],glass,.08),
+    part([.6,.1,.16],[0,.11,-1.27],mint,.025),part([.09,.4,.65],[0,.32,-.8],glass,.02)],LOOP_AIRCRAFT+1,'air-taxis');
   const berthLight=new T.PointLight('#b9e2cf',0,60,2);berthLight.position.set(SPHERE_DOCK[0],SPHERE_DOCK[1]+4,SPHERE_DOCK[2]);scene.add(berthLight);
   const guideMaterial=new T.MeshBasicMaterial({color:new T.Color('#88d6d3').multiplyScalar(1.6)});
   const guides=fleet(scene,[part([.36,.1,2.1],[0,0,0],guideMaterial,.03)],192,'air-corridor-guides');
   const airCurves=[path.air,path.approach],samples=airCurves.map(route=>Array.from({length:96},(_,i)=>({p:route.getPointAt(i/96),t:route.getTangentAt(i/96)})));
-  const heads=new Float32Array(7),weights=new Float32Array(7);
+  const heads=new Float32Array(LOOP_AIRCRAFT+1),weights=new Float32Array(LOOP_AIRCRAFT+1);
   const pose=new T.Object3D();pose.rotation.order='YXZ';const p=new T.Vector3(),tangent=new T.Vector3(),side=new T.Vector3(),up=new T.Vector3(0,1,0);
   const place=(route:T.Curve<T.Vector3>,u:number,reverse=false)=>{route.getPointAt(T.MathUtils.clamp(u,0,1),p);route.getTangentAt(T.MathUtils.clamp(u,0,1),tangent);if(reverse)tangent.negate();pose.position.copy(p);pose.rotation.set(0,Math.atan2(tangent.x,tangent.z),0);};
-  return (state:WorldState,time:number)=>{
+  return (state:WorldState,time:number,automationShare?:number)=>{
+    const activity=automationShare===undefined?null:automationActivity(automationShare);
+    const amount=(count:number,index:number)=>T.MathUtils.clamp(count-index,0,1);
     mint.emissiveIntensity=.65+state.neon*1.8;
-    for(let train=0;train<TRAINS;train++)for(let car=0;car<CARS;car++){
-      const {u,forward}=podPose(time,train,car,guideLength);
-      place(path.guideway,u,!forward);pose.scale.setScalar(T.MathUtils.smoothstep(state.traffic*.5+.5-train*.3,0,.1));pods.set(train*CARS+car,pose);
+    airShell.emissiveIntensity=activity?activity.level*.85:0;
+    for(let train=0;train<MAX_TRAINS;train++)for(let car=0;car<CARS;car++){
+      const {u,forward}=podPose(time,train<2?train:train-1.5,car,guideLength);
+      place(path.guideway,u,!forward);pose.scale.setScalar(activity?amount(activity.pods,train*CARS+car):train<TRAINS?T.MathUtils.smoothstep(state.traffic*.5+.5-train*.3,0,.1):0);pods.set(train*CARS+car,pose);
     }pods.flush();
     for(let car=0;car<SWEEP_CARS;car++){
       // Drawn at SWEEP_SCALE so the train reads at hero distance; the shortened length spaces the cars by the same factor.
       const {u,forward}=podPose(time+20,0,car,sweepLength/SWEEP_SCALE);
       place(path.sweep,u,!forward);pose.rotation.x=-Math.asin(T.MathUtils.clamp(tangent.y,-1,1));pose.scale.setScalar(SWEEP_SCALE*T.MathUtils.smoothstep(state.traffic*.5+.5,0,.1));sweepPods.set(car,pose);
     }sweepPods.flush();
-    for(let i=0;i<WALKERS;i++){
-      const w=walkerPose(time,i),amount=T.MathUtils.smoothstep(state.crowd*.8+.2-i/WALKERS,-.05,.05);
+    for(let i=0;i<MAX_WALKERS;i++){
+      const w=walkerPose(time,i,i<WALKERS?WALKERS:MAX_WALKERS),weight=activity?amount(activity.walkers,i):i<WALKERS?T.MathUtils.smoothstep(state.crowd*.8+.2-i/WALKERS,-.05,.05):0;
       place(path.promenades[i%2],w.u,!w.forward);side.crossVectors(up,tangent).normalize();pose.position.addScaledVector(side,-w.lane);
-      pose.rotation.z=w.stride*.03;pose.scale.setScalar(amount);people.set(i,pose);
+      pose.rotation.z=w.stride*.03;pose.scale.setScalar(weight);people.set(i,pose);
     }people.flush();
     for(let i=0;i<BOATS;i++){
       const u=(time*.009+i/BOATS)%1;place(path.water,u);pose.position.y+=Math.sin(time*1.3+i)*.08;pose.rotation.z=Math.sin(time*.9+i)*.02;
@@ -149,19 +161,19 @@ export function mobility(scene:T.Scene) {
       pose.scale.setScalar(1.35*fade);boats.set(BOATS+1+i,pose);wakes.set(BOATS+1+i,pose);
     });
     boats.flush();wakes.flush();
-    for(let i=0;i<6;i++){
-      const t=(time*(.004+i%3*.0015)+i/6)%1,density=T.MathUtils.smoothstep(.2+state.traffic*.35-i/9,-.07,.07);
-      place(path.air,t);pose.rotation.z=Math.sin(time+i)*.035;pose.scale.setScalar(AIR_SCALE*density);drones.set(i,pose);heads[i]=t;weights[i]=density;
+    for(let i=0;i<LOOP_AIRCRAFT;i++){
+      const t=activity?(time*.004+(i*13%LOOP_AIRCRAFT)/LOOP_AIRCRAFT)%1:(time*(.004+i%3*.0015)+i/6)%1,density=activity?amount(activity.aircraft,i):i<6?T.MathUtils.smoothstep(.2+state.traffic*.35-i/9,-.07,.07):0;
+      place(path.air,t);pose.rotation.z=Math.sin(time+i)*.035;pose.scale.setScalar((AIR_SCALE+(activity?.level??0)*2)*density);drones.set(i,pose);heads[i]=t;weights[i]=density;
     }
     const dock=dockMotion(time);
-    place(path.approach,dock.u,dock.u>0&&!dock.docked&&((time%40)+40)%40>=26);pose.position.y-=dock.settle*6;pose.scale.setScalar(AIR_SCALE*dock.visible);drones.set(6,pose);drones.flush();
-    heads[6]=dock.u;weights[6]=dock.visible*(dock.docked?0:1);
+    place(path.approach,dock.u,dock.u>0&&!dock.docked&&((time%40)+40)%40>=26);pose.position.y-=dock.settle*6;pose.scale.setScalar(AIR_SCALE*dock.visible);drones.set(LOOP_AIRCRAFT,pose);drones.flush();
+    heads[LOOP_AIRCRAFT]=dock.u;weights[LOOP_AIRCRAFT]=dock.visible*(dock.docked?0:1);
     berthLight.intensity=4000*dock.settle*(.4+state.neon*.6);
     for(let r=0;r<2;r++)for(let j=0;j<96;j++){
       let strength=0;
-      if(r===0)for(let i=0;i<6;i++)strength=Math.max(strength,guideStrength(j/96,heads[i],true)*weights[i]);
-      else strength=guideStrength(j/96,heads[6],false)*weights[6];
-      const sample=samples[r][j];pose.position.copy(sample.p).y-=2;pose.rotation.set(0,Math.atan2(sample.t.x,sample.t.z),0);pose.scale.setScalar(strength*3);guides.set(r*96+j,pose);
+      if(r===0)for(let i=0;i<LOOP_AIRCRAFT;i++)strength=Math.max(strength,guideStrength(j/96,heads[i],true)*weights[i]);
+      else strength=guideStrength(j/96,heads[LOOP_AIRCRAFT],false)*weights[LOOP_AIRCRAFT];
+      const sample=samples[r][j];pose.position.copy(sample.p).y-=2;pose.rotation.set(0,Math.atan2(sample.t.x,sample.t.z),0);pose.scale.setScalar(strength*(r===0&&activity?3+activity.level*7:3));guides.set(r*96+j,pose);
     }guides.flush();
   };
 }

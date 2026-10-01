@@ -1,5 +1,11 @@
 # Validation and handoff
 
+## Meter variety P2 — 2026-10-01 (`feat/meter-variety`, not integrated)
+
+Root `npm test`, `npm run build` and `git diff --check` passed on the final P2 working tree based on `8b21ae2`; survey/module-swap code unchanged. New checks cover actual instanced actor counts, 160 walker/four-train continuity, unchanged fractional targets during a transition, interruption, reset/legacy restore, all 81 server-answer combinations and actual GLB service-pavilion placement/route clearance. Existing bundle-size warning remains.
+
+Headless Chrome 154.0.8037.58, 1920×929, DPR 1, original hero, fixed actor time 20 s and only Q1 changed: low ↔ high **3.98 %** at 16:00 (before 0.35 %), **3.17 %** at 21:00 (before 0.17 %), both above the 3 % gate. Day low ↔ mixed 2.35 %, mixed ↔ high 1.85 %. Full-pipeline draws increase by 16: day low/mixed 1115→1131, high 1131→1147; night low/mixed 1121→1137, high 1137→1153. Console contains only the existing favicon 404. No controlled FPS or hardware claim. Lossless captures and real WebSocket smoke/CI closure: [handoff](handoffs/meter-variety.md#p2--automation-2026-10-01). Human art review and main integration remain pending under the existing handoff condition.
+
 ## Meter variety P0 + P1 — 2026-10-01 (`feat/meter-variety`)
 
 Root `npm test` (new `tests/districtMeters.test.ts`; district assertions on all 81 combinations in `surveyMeterPipeline`), `npm run build` and `git diff --check` passed; `survey/` and `module-swap/` unchanged. Readability gate (`scripts/meter-diff.py`, headless Chrome 1920×929, `?hour=16&reviewTime=20&meters=ne:<band>`): environment low ↔ high changed 4.33 % of the frame (0.16 % before), low ↔ mixed 2.05 %, mixed ↔ high 2.60 %, night 4.34 %. A built-in browser `window.cityMeters()` change eased over 3 s. Live `?survey` against the real server, real-GPU FPS, exhibition hardware and human art review not verified. Details and captures: [handoff](handoffs/meter-variety.md).

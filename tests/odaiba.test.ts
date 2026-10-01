@@ -12,6 +12,7 @@ import { bake } from '../src/cityRig.ts';
 import { contextFacades } from '../src/contextFacades.ts';
 import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from '../src/coastalCanopy.ts';
 import { amphibiousShore, tidalEdge } from '../src/amphibiousShore.ts';
+import { AutomationDistrict } from '../src/districtMeters.ts';
 import { bayContext } from '../src/bayContext.ts';
 
 const layout = JSON.parse(readFileSync(new URL('../src/odaiba-layout.json', import.meta.url), 'utf8'));
@@ -198,3 +199,30 @@ console.log('Odaiba: sky bridges span clear air above the trains; floating decks
 console.log('Odaiba: pods ride the guideway deck, walkers keep to open ground outside site lots, water taxis stay afloat.');
 console.log('Odaiba: survey sites sit on open ground, clear of roads, landmarks and guideway, and are visible from the hero pose.');
 console.log('Odaiba: eight GLBs match Phase 03D world bounds within 2 mm, grounded, unit scale, legacy axis verified.');
+
+// P2 raised service pavilions: terraces clear existing context/trees; piers land off roads and routes remain unobstructed.
+const serviceDistrict = new AutomationDistrict(new Group());
+serviceDistrict.setTarget({ automatedPorts: 1 }, 0, true);
+serviceDistrict.root.updateMatrixWorld(true);
+for (const bay of serviceDistrict.bays) {
+  const at = (x: number, z: number) => new Vector3(bay.x + x * Math.cos(bay.yaw) + z * Math.sin(bay.yaw), 0,
+    bay.z - x * Math.sin(bay.yaw) + z * Math.cos(bay.yaw));
+  for (const x of [-19, 0, 19]) for (const z of [-27, 0, 27]) {
+    const p = at(x, z), hit = groundAt(p.x, p.z);
+    assert.ok(hit && hit.point.y < 18, `service terrace obstructed by ${hit?.object.name} at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
+  }
+  for (const x of [-16, 16]) for (const z of [-12, 12]) {
+    const p = at(x, z), hit = groundAt(p.x, p.z, 18);
+    assert.ok(hit && (openGround.test(hit.object.name) || /canopy/.test(hit.object.name)), `service pier on ${hit?.object.name} at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
+    const foot = groundAt(p.x, p.z, 3);
+    assert.ok(foot && openGround.test(foot.object.name), `service pier foot on ${foot?.object.name}`);
+  }
+}
+for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
+  const p = route.getPointAt(i / 200);
+  for (const dx of [-3, 0, 3]) for (const dz of [-3, 0, 3]) {
+    ray.set(p.clone().add(new Vector3(dx, 3, dz)), down);
+    assert.equal(ray.intersectObject(serviceDistrict.root, true).length, 0, 'service pavilions block pod/walker route');
+  }
+}
+console.log(`Odaiba: ${serviceDistrict.bays.length} raised staffed pavilions clear context and actor routes; piers land on open ground.`);

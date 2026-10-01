@@ -1,7 +1,7 @@
 import * as T from 'three';
-import { leaf, leafyCrown, trail, trim } from './cityRig.ts';
+import { bake, box, glass, leaf, leafyCrown, publicLight, trail, trim } from './cityRig.ts';
 import { changeSites, seaward } from './layout.ts';
-import { routes } from './mobility.ts';
+import { automationActivity, routes } from './mobility.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 import type { ExhibitionLayout } from './surveyView.ts';
 
@@ -26,13 +26,12 @@ export class SlotLevels {
     this.update(now);
     let changed = false;
     for (let i = 0; i < this.to.length; i++) {
-      const next = target(i);
+      const next = Math.fround(target(i));
       if (next !== this.to[i]) changed = true;
-      this.from[i] = this.value[i];
       this.to[i] = next;
     }
     if (immediate) { this.value.set(this.to); this.active = false; }
-    else if (changed) { this.start = now; this.active = true; }
+    else if (changed) { this.from.set(this.value); this.start = now; this.active = true; }
     return changed;
   }
 
@@ -280,5 +279,98 @@ export class EnvironmentDistrict {
       roof.crowns.setMatrixAt(i, this.dummy.matrix);
     });
     for (const mesh of [this.sails, this.slabs, this.crowns, this.shafts, this.rings, ...(roof ? Object.values(roof) : [])]) mesh.instanceMatrix.needsUpdate = true;
+  }
+}
+
+/** Q1: staffed waterfront pavilions give way to autonomous district circulation.
+ * World-space batches stay independent of the hub's scaled lot and use the same 3 s clock. */
+export class AutomationDistrict {
+  readonly root = new T.Group();
+  readonly bays: { x: number; y: number; z: number; yaw: number }[] = [];
+  private readonly automation = new SlotLevels(1);
+  private readonly staffed: SlotLevels;
+  private readonly meshes: T.InstancedMesh[];
+  private readonly dummy = new T.Object3D();
+  private target = .5;
+
+  constructor(parent: T.Object3D) {
+    this.root.name = 'automation-district';
+    for (const path of routes().promenades) {
+      const n = Math.floor(path.getLength() / 40);
+      for (let i = 1; i < n; i++) {
+        const p = path.getPointAt(i / n), t = path.getTangentAt(i / n), yaw = Math.atan2(-t.z, t.x);
+        p.x -= Math.sin(yaw) * 22; p.z -= Math.cos(yaw) * 22;
+        if (Object.values(changeSites).some(s => Math.abs(p.x - s.x) < s.w * s.scale / 2 + 24 && Math.abs(p.z - s.z) < s.d * s.scale / 2 + 24)) continue;
+        if (p.x > -65 && p.x < -25) continue; // Existing north-west context block.
+        this.bays.push({ x: p.x, y: p.y, z: p.z, yaw });
+      }
+    }
+    // Traced open plazas at the mall approaches and western waterfront (actual-mesh checks in odaiba.test.ts).
+    for (const [x, z, yaw] of [[20, 145, 0], [-200, 80, 0], [-130, 170, 0], [75, -160, 0], [-438, 45, -.9]])
+      this.bays.push({ x, y: 0, z, yaw });
+    this.staffed = new SlotLevels(this.bays.length);
+    const pavilion = new T.Group();
+    const ceramic = trim.clone(); ceramic.emissive.set('#e5cab0'); ceramic.emissiveIntensity = 1;
+    // Open service hall: ivory canopy, glass service bar and warm-lit fascia, with people behind the counter.
+    box(pavilion, [38, .8, 34], [0, 20, 0], ceramic);
+    for (const x of [-16, 16]) for (const z of [-12, 12]) box(pavilion, [.8, 20, .8], [x, 10, z], trim);
+    const roof = new T.Mesh(new T.SphereGeometry(1, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), ceramic);
+    roof.scale.set(19, 10, 27); roof.position.y = 32; pavilion.add(roof);
+    box(pavilion, [32, .2, .3], [0, 31.3, -13.8], publicLight);
+    for (const x of [-14, 14]) for (const z of [-7, 7]) {
+      const height = 32 + 10 * Math.sqrt(1 - (x / 19) ** 2 - (z / 27) ** 2) - 20.4;
+      box(pavilion, [.6, height + .2, .6], [x, 20.4 + height / 2, z], trim);
+    }
+    box(pavilion, [2.4, 20, 2.4], [16, 10, -12], glass); // Lift access to the staffed terrace.
+    box(pavilion, [26, 1, 2], [0, 20.95, 2], glass);
+    box(pavilion, [26, .18, 3], [0, 21.54, 2], trim);
+    for (let i = 0; i < 6; i++) {
+      const torso = new T.Mesh(new T.CapsuleGeometry(.35, .65, 4, 8), glass);
+      torso.position.set((i - 2.5) * 4.2, 21.5, 4); pavilion.add(torso);
+      const head = new T.Mesh(new T.SphereGeometry(.25, 10, 8), trim);
+      head.position.set(torso.position.x, 22.35, 4); pavilion.add(head);
+      for (const dx of [-.14, .14]) box(pavilion, [.15, .8, .18], [torso.position.x + dx, 20.85, 4], glass, .04);
+    }
+    this.meshes = bake(pavilion).map(source => {
+      const mesh = new T.InstancedMesh(source.geometry, source.material, this.bays.length);
+      mesh.name = 'automation-staffed-pavilions'; mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;
+      mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); this.root.add(mesh); return mesh;
+    });
+    this.root.visible = false; parent.add(this.root); this.write();
+  }
+
+  get level(): number | undefined { return this.root.visible ? this.automation.value[0] : undefined; }
+
+  setTarget(layout: Pick<ExhibitionLayout, 'automatedPorts'>, now: number, immediate: boolean): boolean {
+    this.target = layout.automatedPorts / 6;
+    const activity = automationActivity(this.target);
+    this.root.visible = true;
+    const a = this.automation.setTargets(() => this.target, now, immediate);
+    const b = this.staffed.setTargets(i => rank(i + 203) >= activity.level ? 1 : 0, now, immediate);
+    this.write(); return a || b;
+  }
+
+  update(now: number): void {
+    this.automation.update(now);
+    if (this.staffed.update(now)) this.write();
+  }
+
+  hide(): void { this.root.visible = false; }
+
+  getDiagnostics() {
+    const activity = automationActivity(this.level ?? .5);
+    return { enabled: this.root.visible, targetAutomation: this.target, automation: this.level,
+      pavilions: this.bays.length, visibleStaffedPavilions: this.root.visible ? this.staffed.visible() : 0,
+      loopAircraft: this.root.visible ? Math.ceil(activity.aircraft) : undefined,
+      guidewayPods: this.root.visible ? Math.ceil(activity.pods) : undefined, walkers: this.root.visible ? Math.ceil(activity.walkers) : undefined };
+  }
+
+  private write(): void {
+    this.bays.forEach((bay, i) => {
+      this.dummy.position.set(bay.x, bay.y, bay.z); this.dummy.rotation.set(0, bay.yaw, 0);
+      this.dummy.scale.setScalar(this.staffed.value[i]); this.dummy.updateMatrix();
+      for (const mesh of this.meshes) mesh.setMatrixAt(i, this.dummy.matrix);
+    });
+    for (const mesh of this.meshes) mesh.instanceMatrix.needsUpdate = true;
   }
 }

@@ -121,13 +121,13 @@ export function cityRig(scene:T.Scene) {
   }
   const updateMobility=mobility(scene);
   return {
-    update(state:WorldState,time:number,night:number) {
+    update(state:WorldState,time:number,night:number,automationShare?:number) {
       publicLight.emissiveIntensity=.15+night*1.3;
       for(const m of mirrors)m.envMapIntensity=1-night*.85;
       civicLights.forEach(light=>light.intensity=night*light.userData.peak);
       futureLight.emissiveIntensity=.25+state.neon*.5+night*.45;
       membrane.opacity=.6+state.greenery*.18;
-      updateMobility(state,time);
+      updateMobility(state,time,automationShare);
     },
   };
 }

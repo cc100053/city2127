@@ -1,5 +1,9 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
+## Meter variety P2 — 2026-10-01，feature branch 待視覺審閱
+
+`feat/meter-variety` 的自動化 Meter 現在改變街區交通與服務模式：低值用 11 個高架有人服務亭、較多人流；高值保留成熟城市和基本人流，以更多軌道 pods、空中載具及較清晰的 mint 空中導引線呈現自律服務。零值是混合模式，沿用固定 hero、日夜、既有路線和 3 秒過渡。程式及實際模型位置／路線檢查通過；最終像素量度、截圖、browser smoke 和 Git/CI 證據見 [交接](handoffs/meter-variety.md#p2--automation-2026-10-01)。可讀性量度不等於人類美術或 FPS 驗收；按既有 handoff 保留在 feature branch 待 capture review。
+
 ## 台場 Dream Loop 第4–6輪 — 2026-09-30，仍未達視覺目標
 
 使用者要求再跑三輪；同一目標、鏡位與 R01–R06 保留。新增三組分層潮汐平台、核心公共花園及懸掛廊、避開 site／路線的地面樹群，修正日間反射與樹冠重複染色。實際路徑碰撞及日間變暗回退已修正並重新驗證。見 [第六輪日間](../artifacts/odaiba-dream-pass6.jpg)、[夜間](../artifacts/odaiba-dream-pass6-night.jpg)、[交接](handoffs/odaiba-dream-loop.md)。仍有商場／酒店量體、連續海岸、遠景與細節密度差距，不宣稱已接近逐像素重現；第六輪後供美術審閱，未整合 main。

@@ -46,6 +46,10 @@ function assertModels(view: ExhibitionCityView) {
   const district = diagnostics.stationEastPark.environmentDistrict!;
   assert.equal(district.visibleCanopies + district.visibleSails, district.slots);
   assert.ok(Math.abs(district.targetCanopy - (view.layout.plantedFraction - .2) / .6) < 1e-9);
+  const automation = diagnostics.magnetEast.automationDistrict!;
+  assert.equal(automation.enabled, true);
+  assert.equal(automation.targetAutomation, view.layout.automatedPorts / 6);
+  assert.ok(Math.abs(manager.automationLevel! - view.layout.automatedPorts / 6) < 1e-7);
 }
 function applyEvent(event: unknown, now: number) {
   const parsed = parseSurveyEvent(event);

@@ -18,7 +18,7 @@ const clearance = (x: number, y: number, z: number) => Math.min(...solids.map(s 
   return Math.hypot(dx, dy, dz);
 }));
 
-// Air taxis (22 m span) keep 20 m (11 m half-span plus margin) from every landmark and tall site; the approach only descends at the sphere berth.
+// Air taxis (up to 31 m span) keep 20 m (15.4 m half-span plus margin) from every landmark and tall site; the approach only descends at the sphere berth.
 for (const [name, route] of [['district loop', path.air], ['sphere approach', path.approach]] as const) {
   for (let i = 0; i <= 1000; i++) {
     const p = route.getPointAt(i / 1000);
@@ -40,17 +40,17 @@ for (const t of [0, 2, 14, 17, 23, 26, 38, 40]) {
 for (let t = 17; t <= 23; t += .5) assert.ok(dockMotion(t).u === 1 && dockMotion(t).settle > .999);
 
 // Guideway pods: cars keep their spacing, never leave the guideway, and turn back without jumping.
-for (let t = 0; t < 300; t += .25) for (let train = 0; train < TRAINS; train++) {
-  const cars = Array.from({ length: CARS }, (_, car) => podPose(t, train, car, guideLength));
+for (let t = 0; t < 300; t += .25) for (let train = 0; train < TRAINS + 2; train++) {
+  const cars = Array.from({ length: CARS }, (_, car) => podPose(t, train < 2 ? train : train - 1.5, car, guideLength));
   cars.forEach(c => assert.ok(c.u >= -1e-9 && c.u <= 1 + 1e-9, 'pod leaves the guideway'));
   for (let car = 1; car < CARS; car++) assert.ok(Math.abs(Math.abs(cars[car].u - cars[car - 1].u) * guideLength - CAR_GAP) < 1e-6);
-  const next = podPose(t + .05, train, 0, guideLength);
+  const next = podPose(t + .05, train < 2 ? train : train - 1.5, 0, guideLength);
   assert.ok(Math.abs(next.u - cars[0].u) * guideLength < 1.5, 'pod jumps along the guideway');
 }
 
 // Walkers stroll continuously (≤ 2 m/s) and switch lanes only at the ends of the promenade.
-for (let i = 0; i < WALKERS; i++) for (let t = 0; t < 1200; t += 1) {
-  const a = walkerPose(t, i), b = walkerPose(t + 1, i);
+for (let i = 0; i < 160; i++) for (let t = 0; t < 1200; t += 1) {
+  const a = walkerPose(t, i, i < WALKERS ? WALKERS : 160), b = walkerPose(t + 1, i, i < WALKERS ? WALKERS : 160);
   assert.ok(Math.abs(a.u - b.u) * path.promenades[i % 2].getLength() < 2, `walker ${i} jumps`);
   if (a.forward !== b.forward) assert.ok(a.u < .01 || a.u > .99, `walker ${i} turns mid-promenade`);
 }

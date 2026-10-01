@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { EnvironmentDistrict, SlotLevels, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
+import { AutomationDistrict, EnvironmentDistrict, SlotLevels, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
+import { mobility } from '../src/mobility.ts';
+import { presets } from '../src/presets.ts';
 import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
 
 const env = (score: number) => deriveExhibitionLayout({ automation: 0, publicSharing: 0, environmentalPriority: score, urbanConcentration: 0 });
@@ -46,3 +48,64 @@ assert.equal(d.visibleRoofCrowns + d.visibleRoofSails, 3);
 district.hide();
 assert.equal(facadeClimate.green.value + facadeClimate.louvre.value, 0);
 console.log(`PASS: environment district — ${d.slots} promenade bays, sails/pergolas/mist towers, roof sails/forest, facade shares, late roofs, legacy hide.`);
+
+// Reapplying an unchanged fractional target must keep the running ease (including Float32 rounding).
+const repeated = new SlotLevels(1);
+repeated.setTargets(() => 1 / 6, 0, false);
+assert.equal(repeated.setTargets(() => 1 / 6, 1, false), false);
+repeated.update(1.5);
+assert.ok(Math.abs(repeated.value[0] - 1 / 12) < 1e-7);
+
+// Automation uses authoritative ports; same-target events, interrupted live changes and reset/legacy remain deterministic.
+const automation = new AutomationDistrict(new T.Scene());
+assert.equal(automation.level, undefined);
+automation.setTarget({ automatedPorts: 1 }, 0, true);
+const low = automation.getDiagnostics();
+assert.ok(low.pavilions >= 6);
+assert.equal(low.visibleStaffedPavilions, low.pavilions);
+assert.deepEqual([low.loopAircraft, low.guidewayPods, low.walkers], [2, 12, 160]);
+automation.setTarget({ automatedPorts: 5 }, 1, false);
+automation.update(2.5);
+const midway = automation.level!;
+assert.ok(Math.abs(midway - .5) < 1e-7);
+assert.equal(automation.setTarget({ automatedPorts: 5 }, 2.5, false), false);
+automation.update(4);
+const high = automation.getDiagnostics();
+assert.equal(high.visibleStaffedPavilions, 0);
+assert.deepEqual([high.loopAircraft, high.guidewayPods, high.walkers], [30, 24, 40]);
+automation.setTarget({ automatedPorts: 1 }, 5, false);
+automation.update(6);
+const interrupted = automation.level!;
+automation.setTarget({ automatedPorts: 3 }, 6, false);
+assert.equal(automation.level, interrupted, 'retarget preserves current level');
+automation.update(9);
+const mixed = automation.getDiagnostics();
+assert.ok(mixed.visibleStaffedPavilions > 0 && mixed.visibleStaffedPavilions < mixed.pavilions);
+assert.deepEqual([mixed.loopAircraft, mixed.guidewayPods, mixed.walkers], [16, 18, 100]);
+automation.setTarget({ automatedPorts: 1 }, 10, true);
+assert.equal(automation.getDiagnostics().walkers, 160, 'snapshot/reset is immediate');
+automation.hide(); automation.update(20);
+assert.equal(automation.level, undefined);
+assert.equal(automation.root.visible, false);
+console.log(`PASS: automation district — ${low.pavilions} staffed pavilions, aircraft/pods/walker mapping, same targets, live retarget, reset and legacy hide.`);
+
+// Check the actual actor matrices, not just the diagnostic counts, and preserve standalone/legacy poses.
+const actorScene = new T.Scene(), updateActors = mobility(actorScene);
+const fleet = (name: string) => actorScene.children.find(o => o.name === name) as T.InstancedMesh;
+const visible = (name: string) => {
+  const mesh = fleet(name), matrix = new T.Matrix4(), scale = new T.Vector3(); let count = 0;
+  for (let i = 0; i < mesh.count; i++) { mesh.getMatrixAt(i, matrix); scale.setFromMatrixScale(matrix); if (scale.length() > 1e-4) count++; }
+  return count;
+};
+updateActors(presets.neutral, 20);
+const names = ['guideway-pods', 'promenade-walkers', 'air-taxis', 'water-taxis'];
+const legacyMatrices = names.map(name => [...fleet(name).instanceMatrix.array]);
+for (const [ports, aircraft, pods, walkers] of [[1, 3, 12, 160], [3, 17, 18, 100], [5, 31, 24, 40]]) {
+  for (const state of [presets.still, presets.pulse]) {
+    updateActors(state, 20, ports / 6);
+    assert.deepEqual([visible('air-taxis'), visible('guideway-pods'), visible('promenade-walkers')], [aircraft, pods, walkers]);
+  }
+}
+updateActors(presets.neutral, 20);
+names.forEach((name, i) => assert.deepEqual([...fleet(name).instanceMatrix.array], legacyMatrices[i], `${name} restores legacy matrices`));
+console.log('PASS: actual P2 actor matrices match low/mixed/high independently of day mood; original standalone/legacy poses restored.');
