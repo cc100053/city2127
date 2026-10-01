@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS — P0 + P1 + P2 implemented; P3–P5 planned; P6 evidence recorded per stage
 - Branch: `feat/meter-variety`
 - Base commit: `33227a687ac9d18281e90494a4e9b2ce27f861ce`
-- Last verified commit: P0 + P1 `8b21ae2b98d29cffa5879d06e4fd419259f0382a`; P2 working tree on that commit locally verified below (Git/CI closure follows)
+- Last verified commit: P2 implementation `d03efa7e7ec2afb871e9bbac82b278b940a4e2fa` (local checks, lossless captures, real WebSocket browser smoke and feature CI PASS)
 - Remote availability: `origin/feat/meter-variety`
 
 ## Session Git state
@@ -27,7 +27,7 @@ Each Meter keeps its site as the focal anchor and additionally drives 2–3 larg
 | --- | --- | --- |
 | P0 | DEV `?meters=` + `window.cityMeters()`, `scripts/meter-diff.py` | done |
 | P1 | Environment: promenade sails/pergolas, mist towers, roof sails/forest, facade louvres/planted bays | done |
-| P2 | Automation: drones, pods, walker density, staffed pavilions | implemented; local checks passed |
+| P2 | Automation: drones, pods, walker density, staffed pavilions | done; local/browser/feature CI passed |
 | P3 | Sharing: floating decks as private pods vs open steps, water rooms | planned |
 | P4 | Concentration: context tower crowns vs scattered pavilion pods | planned |
 | P5 | Change-moment pulse in the Meter's colour | planned |
@@ -72,6 +72,11 @@ Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920�
 - Real HTTP/WebSocket browser smoke uses a fresh scratch SQLite: mixed snapshot → Q1-only +1 proposal → animated high (observed mid-transition) → same-ID retry → reload high → city reset → Q1-only −1 → low → night reload/reset → reduced-motion live high → standalone. Other three site variants stay mixed. Final full rerun PASS, no page exceptions; scratch DB retained at `/var/folders/st/ml4_0zfx7g129gh2305ynz5c0000gn/T/city2127-meter-p2-PF81Uw/survey.sqlite`. A prior rerun was interrupted when the reused Vite preview stopped; restarting loopback 5173 restored the check. No exhibition database was touched.
 - Documentation: PROJECT records the controller/actor flow and counts; PLAN02/VALIDATION record this dated stage. README and AGENTS need no edit: startup, server API, guest UI and product constraints are unchanged.
 - Not verified: controlled real-GPU FPS, Windows, exhibition endurance, human art acceptance, exact actor-to-actor avoidance or structural engineering. A pixel-change gate is a visibility measurement, not art acceptance.
+
+### P2 Git / CI closure
+
+- P2 implementation `d03efa7e7ec2afb871e9bbac82b278b940a4e2fa` pushed to `origin/feat/meter-variety`; [feature CI 36840452458](https://github.com/cc100053/city2127/actions/runs/36840452458) PASS (root, survey, module-swap and committed-diff whitespace). Self-review includes all source/tests/docs and five new lossless captures. `git diff --check origin/main...HEAD` passed.
+- Latest fetched `origin/main` remains `33227a6`; no upstream-only work or task-branch divergence. No main integration: the existing capture-review-before-main condition remains. This closure is documentation only.
 
 ## Next step
 
