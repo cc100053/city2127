@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { arc, bake, box, chrome, leaf, paint, stone, trail, trim } from './cityRig.ts';
+import { arc, bake, box, chrome, leaf, leafyCrown, paint, stone, trail, trim } from './cityRig.ts';
 import { changeSites, DISTRICT, floatingDecks, northShore, sweepway } from './layout.ts';
 import { routes } from './mobility.ts';
 import layout from './odaiba-layout.json';
@@ -8,7 +8,7 @@ type P3 = [number, number, number];
 const waterfall = new T.MeshStandardMaterial({ color: '#f3fbff', emissive: '#d8f0ff', emissiveIntensity: .35, roughness: .25, transparent: true, opacity: .85 });
 const foam = new T.MeshBasicMaterial({ color: '#f4fbff', transparent: true, opacity: .55, depthWrite: false });
 const cherry = paint('#efc2cf', .8);
-const crown = new T.IcosahedronGeometry(1, 1), pole = new T.CylinderGeometry(1, 1, 1, 10);
+const crown = leafyCrown(1), pole = new T.CylinderGeometry(1, 1, 1, 10);
 
 // Skyway network (metres, deck top): a ring around the 151 m tower east of DECKS, a link into the Fuji chassis ring floor (61 m),
 // on to a ring around Grand Nikko (92 m, above Hilton's 83 m roof) and two suspended glass spheres. Routed clear of every

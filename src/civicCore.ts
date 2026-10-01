@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { arc, bake, box, chrome, glass, mirrors, leaf, membrane, solar, stone, trim } from './cityRig.ts';
+import { arc, bake, box, chrome, glass, mirrors, leaf, leafyCrown, membrane, solar, stone, trim } from './cityRig.ts';
 
 /** Fuji's office blocks become a load-bearing civic chassis, keeping the sphere berth and site alignment. Metres. */
 export function civicCore() {
@@ -85,7 +85,7 @@ export function civicCore() {
   arc(root,25,34,2,[-18,61,23],stone,Math.PI*.05,Math.PI*1.8);
   box(root,[132,2.5,12],[-2,61,64],stone);
   // Transfer beams carry inhabited ecological terraces; the centre stays open around the chamber.
-  const crown=new T.IcosahedronGeometry(1,2);
+  const crown=leafyCrown();
   const grove=(x:number,y:number,z:number,i:number)=>{
     box(root,[.55,3,.55],[x,y+1.5,z],solar);
     for(let j=0;j<3;j++){

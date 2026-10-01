@@ -33,7 +33,9 @@ export function contextFacades(environment: T.Object3D) {
           // beige blocks against blue-grey) with a soft per-bay brightness; whole lit floor runs on about one storey in four.
           const lit = Math.abs(Math.sin(row * 12.9898 + Math.floor(col / 8) * 78.233) * 43758.5453) % 1 < .25;
           const jitter = Math.abs(Math.sin(row * 4.1 + col * 7.3) * 1e4) % 1;
-          shades.push(lit ? new T.Color().setHSL(.1, .55, .66 + jitter * .06) : new T.Color().setHSL(.09, .14, .56 + jitter * .06));
+          // r9: the unlit panes become cool blue-grey glass reading the sky (target v2: ivory frames, blue-grey glazing, golden lit floors);
+          // the champagne panes made towers read as sandstone brick. The curtain-wall shader's panes match, so faces stay one system.
+          shades.push(lit ? new T.Color().setHSL(.1, .55, .66 + jitter * .06) : new T.Color().setHSL(.57, .14, .54 + jitter * .07));
         }
       }
     }

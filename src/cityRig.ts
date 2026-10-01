@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets';
 import { changeSites } from './layout.ts';
 import { mobility } from './mobility.ts';
@@ -17,6 +17,19 @@ export const membrane=new T.MeshStandardMaterial({color:'#9abdb9',roughness:.3,m
 // Pilot finishes (docs/ART.md): silvered glass that reads the sky, living green, pale stone paving.
 export const glass=new T.MeshPhysicalMaterial({color:'#a7c3cf',roughness:.08,metalness:.6,clearcoat:1,clearcoatRoughness:.06});
 export const leaf=paint('#7f9b6d',.85), stone=paint('#ebe8e0',.66);
+/** r9: leafy crown — a lumpy sphere with a flattened underside and shared (smooth) normals, so crowns read as foliage masses instead of
+ * smooth balls at hero distance (target v2's dense groves). Max radius ~1.06, so footprints stay within the old unit-sphere crowns' clearances. */
+export function leafyCrown(detail=2) {
+  const source=new T.IcosahedronGeometry(1,detail);source.deleteAttribute('normal');source.deleteAttribute('uv');
+  const g=mergeVertices(source),p=g.attributes.position as T.BufferAttribute,v=new T.Vector3();source.dispose();
+  for(let i=0;i<p.count;i++){
+    v.fromBufferAttribute(p,i);
+    const n=Math.sin(v.x*5.3+v.y*2.1)*Math.sin(v.y*4.7-v.z*3.9)*Math.sin(v.z*5.1+v.x*3.3);
+    v.multiplyScalar(.9+.12*n+.04*Math.sin(v.x*11+v.z*13));if(v.y<0)v.y*=.72;
+    p.setXYZ(i,v.x,v.y,v.z);
+  }
+  g.computeVertexNormals();return g;
+}
 // Silvered glass for the 2127 spheres: warm and only partly metallic, so they read as polished silver mirrors of the golden sky, not blue domes.
 // r4 pass 4: near-full mirror with a boosted env response, so each sphere reads as one bright silver ball (target v2), not a dome over a dark band.
 // r5 pass 3: the mirrors see their own warm golden-hour panorama (pale gold sky, bright cream horizon, sun glow to the south-west,

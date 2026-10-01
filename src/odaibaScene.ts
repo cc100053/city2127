@@ -38,10 +38,10 @@ const roofRetrofit: Record<string, [color: string, roughness: number, metalness:
 };
 // Aqua City and DECKS flat facade panels become storey-banded curtain walls: warm spandrels, dark panes with lit interiors per bay.
 const curtainWalls: Record<string, string> = {
-  // r4 pass 4: warm ivory spandrels (target v2's cream mid-rises), no brown or ochre bands.
-  'Muted Pink Panels': '#e0d3be',
+  // r4 pass 4: warm ivory spandrels (target v2's cream mid-rises), no brown or ochre bands; r9: paler ivory so frames read white, not sandstone.
+  'Muted Pink Panels': '#e8e2d5',
   // r6 pass 2: the hotel walls and the Grand Nikko tower become the same banded curtain wall (target v2's glass hotels).
-  'Warm ivory facade': '#e8ddc9', 'Warm off white facade.001': '#e8ddc9', 'Pale Mint Panels': '#e6ddcb', 'Ochre Commercial Panels': '#ddcfb6', 'Blue Gray Cladding': '#e3dacb', 'Dark Blue Gray Glazing': '#d9cfbd',
+  'Warm ivory facade': '#ede8dd', 'Warm off white facade.001': '#ede8dd', 'Pale Mint Panels': '#ebe6db', 'Ochre Commercial Panels': '#e5dfd1', 'Blue Gray Cladding': '#e9e4d9', 'Dark Blue Gray Glazing': '#e2ddd1',
 };
 const curtainGlow = { value: .45 }, curtainNight = { value: 0 };
 function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
@@ -61,7 +61,9 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
       // r6 pass 3: soft occupancy (no on/off blocks) and warm champagne glass, matching contextFacades' panels, so towers read as one
       // even, golden glass grid (target v2) instead of a patchwork of dark blue and beige where the two facade systems meet.
       float occupied = .35 + .65 * fract(sin(dot(floor(vec2(curtainP.x / 5.4, curtainP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453);
-      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.36, .33, .28), pane);`)
+      // r9: cool blue-grey glass with whole lit floor runs on about one bay in three (matches contextFacades), not a warm champagne wash.
+      occupied = .08 + .92 * step(.78, occupied);
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.27, .32, .37), pane);`)
       // Panes are glass: glossy and partly metallic so they pick up the sky instead of reading as flat dark dots.
       .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, .14, pane);\nmetalnessFactor = mix(metalnessFactor, .4, pane);')
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1., .78, .5) * pane * (curtainGlow * occupied + curtainNight * .3);');

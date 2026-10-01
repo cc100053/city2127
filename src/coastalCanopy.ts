@@ -2,7 +2,7 @@ import * as T from 'three';
 import { changeSites, DISTRICT, inDistrict, seaward } from './layout.ts';
 import { routes } from './mobility.ts';
 import { recedeBeyondDistrict } from './bayContext.ts';
-import { leaf, trim } from './cityRig.ts';
+import { leaf, leafyCrown, trim } from './cityRig.ts';
 
 /** Grove field: the landscape shader (odaibaScene.ts) fills swales below -1.24 with ponds; groves keep clear of them. */
 const swale=(x:number,z:number)=>Math.sin(x*.023+Math.sin(z*.018)*2)+Math.cos(z*.031);
@@ -11,14 +11,14 @@ const swale=(x:number,z:number)=>Math.sin(x*.023+Math.sin(z*.018)*2)+Math.cos(z*
 export const corridor=(x:number,z:number)=>Math.abs(x*.023+Math.sin(z*.018)*2+Math.PI/2);
 export const CORRIDOR_GLSL='abs(w.x*.023+sin(w.y*.018)*2.+1.5708)';
 
-const drum=new T.CylinderGeometry(1,1,1,40);
+const drum=new T.CylinderGeometry(1,1,1,40),crown=leafyCrown(),lowCrown=leafyCrown(1);
 /** Reuse the surveyed planting locations; layered crowns replace the tiny blockout cones.
  * r8 pass 2: surveyed `waterfront` trees become palms (tall slim trunk, flat radiating crown — target v2's seaside palms), and with
  * `pits` every ground tree stands in a crisp white raised planter ring instead of loose on the lawn (2127 engineered edge, same volume). */
 export function plantCanopy(scene: T.Object3D, trees: { instances: { position: number[]; scale: number; type: string }[] }, pits=false) {
   const positions=trees.instances.filter(tree=>inDistrict(tree.position[0],-tree.position[1]) && !seaward(tree.position[0],-tree.position[1]) && !(tree.position[2]<3 && (swale(tree.position[0],-tree.position[1])<-1.1 || corridor(tree.position[0],-tree.position[1])<.2)) && !Object.values(changeSites).some(site=>Math.abs(tree.position[0]-site.x)<site.w*site.scale/2+9 && Math.abs(-tree.position[1]-site.z)<site.d*site.scale/2+9));
   // Instance colours already provide the leaf pigment; a second green tint crushed the lit canopy.
-  const foliage=new T.InstancedMesh(new T.IcosahedronGeometry(1,2),new T.MeshStandardMaterial({color:'#ffffff',roughness:.92}),positions.length*4);
+  const foliage=new T.InstancedMesh(crown,new T.MeshStandardMaterial({color:'#ffffff',roughness:.92}),positions.length*4);
   const trunks=new T.InstancedMesh(new T.CylinderGeometry(.35,.6,1,6),new T.MeshStandardMaterial({color:'#776957',roughness:1}),positions.length);
   const planted=pits?positions.filter(tree=>tree.position[2]<3):[];
   const rims=new T.InstancedMesh(drum,trim,planted.length),beds=new T.InstancedMesh(drum,leaf,planted.length);
@@ -40,7 +40,8 @@ export function plantCanopy(scene: T.Object3D, trees: { instances: { position: n
       // About one tree in eleven (and every `cherry`) is a flowering cherry: pale pink crowns through the green (target reference).
       if(!palm && (tree.type==='cherry' || i%11===5))color.setHSL(.95+(j%2)*.01,.38,.7+(j%3)*.03);
       else if(palm)color.setHSL(.24+(j%2)*.01,.34,.3+(j%3)*.02);
-      else color.setHSL(.21+(i%5)*.008,.28+(j%3)*.05,.23+(i%7)*.018);
+      // r9: deeper, cooler leaf green (target v2's lush groves) with a lighter sunlit upper lobe, instead of pale olive balls.
+      else color.setHSL(.24+(i%5)*.009,.34+(j%3)*.05,.19+(i%7)*.016+(j%2)*.04);
       foliage.setColorAt(i*4+j,color);
     }
   });
@@ -185,8 +186,8 @@ export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
     dummy.position.y=y+.62;dummy.scale.set(R*1.3-.6,.04,R/1.3-.6);dummy.updateMatrix();lawns.push(dummy.matrix.clone());
   }
   const material=new T.MeshStandardMaterial({color:'#ffffff',roughness:.95});recedeBeyondDistrict(material);
-  const grove=new T.InstancedMesh(new T.IcosahedronGeometry(1,1),material,matrices.length),color=new T.Color();
-  matrices.forEach((matrix,i)=>{grove.setMatrixAt(i,matrix);grove.setColorAt(i,i%13===4?color.setHSL(.95,.32,.72):color.setHSL(.22+(i%5)*.01,.3+(i%3)*.04,.22+(i%7)*.02));});
+  const grove=new T.InstancedMesh(lowCrown,material,matrices.length),color=new T.Color();
+  matrices.forEach((matrix,i)=>{grove.setMatrixAt(i,matrix);grove.setColorAt(i,i%13===4?color.setHSL(.95,.32,.72):color.setHSL(.24+(i%5)*.01,.32+(i%3)*.04,.2+(i%7)*.02));});
   const rimMaterial=new T.MeshStandardMaterial({color:'#e2ded3',roughness:.7});recedeBeyondDistrict(rimMaterial);
   const bedMaterial=new T.MeshStandardMaterial({color:'#7f9b6d',roughness:.9});recedeBeyondDistrict(bedMaterial);
   const rims=new T.InstancedMesh(drum,rimMaterial,plinths.length),beds=new T.InstancedMesh(drum,bedMaterial,lawns.length);
