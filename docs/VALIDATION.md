@@ -1,5 +1,9 @@
 # Validation and handoff
 
+## Meter variety P8 — 2026-10-01 (`feat/meter-variety`, not integrated)
+
+Two design families per band on every slot-based carrier via `designOf`. Root `npm test` (new P8 family and own-design matrix checks; existing sight-line checks caught and fixed two court designs), `npm run build` and `git diff --check`: PASS (existing bundle-size warning only); survey/module-swap unchanged. Same capture conditions as P7, before `9ba4292` → after, low ↔ high day / night: environment 3.93 / 3.96 → **4.09 / 4.05%**, automation 4.02 / 3.58 → **4.03 / 3.51%**, sharing 1.89 / 2.10 → **1.86 / 2.10%**, concentration 4.04 / 3.42 → **4.07 / 3.42%**; gates met. Draw submissions 1252 → 1337 (all-mixed day). Not verified: browser skyway clearance of the new tall designs, close-up review, real HTTP/WebSocket smoke, human art review, Windows, hardware. Details: [P8 handoff](handoffs/meter-variety.md#p8--design-families-2026-10-01).
+
 ## Meter variety P7 — 2026-10-01 (`feat/meter-variety`, not integrated)
 
 Automation drone ports, three concentration tower families with two-tier pods, and pixel-ranked sharing courts. Root `npm test` (new drone-port, tower-family, pod-clearance and court-visibility checks), `npm run build` and `git diff --check`: PASS (existing bundle-size warning only); survey/module-swap unchanged. Headless Chrome (DevTools protocol, 1920×929, DPR 1, held `reviewTime=20`, readiness gate incl. fonts, repeat noise 0.05%), before `18da54a` → after, low ↔ high day / night: automation 3.77 / 3.11 → **4.02 / 3.58%**, sharing 1.63 / 1.85 → **1.89 / 2.10%**, concentration 4.49 / 3.81 → **4.04 / 3.42%**; all gates pass. Draw submissions +48 at the same condition (1204 → 1252 all-mixed day). Not verified: browser skyway clearance of the new silhouettes / moved pods, real HTTP/WebSocket smoke, human art review, Windows, hardware. Details: [P7 handoff](handoffs/meter-variety.md#p7--weak-spots-2026-10-01).

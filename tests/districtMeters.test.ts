@@ -75,7 +75,7 @@ const high = automation.getDiagnostics();
 assert.equal(high.visibleStaffedPavilions, 0);
 assert.equal(high.visibleDronePorts, high.pavilions, 'P7: every bay becomes a drone port, not empty ground');
 const portMatrix = new T.Matrix4(), portScale = new T.Vector3();
-(automation.root.getObjectByName('automation-drone-ports') as T.InstancedMesh).getMatrixAt(0, portMatrix);
+(automation.root.getObjectByName('automation-drone-ports') as T.InstancedMesh).getMatrixAt(automation.autonomousDesign.indexOf(0), portMatrix);
 assert.ok(Math.abs(portScale.setFromMatrixScale(portMatrix).y - 1) < 1e-6, 'drone port stands at full size');
 assert.deepEqual([high.loopAircraft, high.guidewayPods, high.walkers], [30, 24, 40]);
 automation.setTarget({ automatedPorts: 1 }, 5, false);
@@ -193,6 +193,30 @@ concentration.hide();
 assert.deepEqual(counts(), [0, 0]);
 assert.equal(concentration.root.visible, false);
 console.log(`PASS: concentration district — ${concentration.towers.length} towers in 3 silhouette families / ${concentration.bridges.length} sky bridges vs ${concentration.pods.length} pods, rise, same target, mixed hybrid, invertible hidden matrices, legacy hide.`);
+
+// P8: every slot-based carrier mixes ≥ 2 design families within each band, and only the slot's own design is drawn.
+{
+  const families = (designs: readonly number[]) => new Set(designs).size;
+  const environment = new EnvironmentDistrict(new T.Scene());
+  publishRoofGardens([[0, 0, 40, 10], [30, 0, 40, 10], [60, 0, 40, 10], [90, 0, 40, 10], [120, 0, 40, 10], [150, 0, 40, 10]]);
+  const roofs = environment as unknown as { roofLow: number[]; roofHigh: number[] };
+  const automationDesigns = new AutomationDistrict(new T.Scene()), sharingDesigns = new SharingDistrict(new T.Scene()), podDesigns = new ConcentrationDistrict(new T.Scene());
+  for (const [name, designs] of Object.entries({
+    'promenade low': environment.lowDesign, 'promenade high': environment.highDesign, 'mist towers': environment.towerDesign,
+    'roof low': roofs.roofLow, 'roof high': roofs.roofHigh, 'staffed halls': automationDesigns.staffedDesign, 'autonomous bays': automationDesigns.autonomousDesign,
+    'private courts': sharingDesigns.privateDesign, 'open courts': sharingDesigns.openDesign, pods: podDesigns.podDesign,
+  })) assert.ok(families(designs) >= 2, `${name} use ≥ 2 design families`);
+  // Actual matrices at high automation: a mast bay draws the mast, never the port, and vice versa.
+  automationDesigns.setTarget({ automatedPorts: 6 }, 0, true);
+  // First batch belongs to the port group, last to the mast group (both share the name).
+  const autonomous = automationDesigns.root.children.filter(o => o.name === 'automation-drone-ports') as T.InstancedMesh[];
+  const ports = autonomous[0], masts = autonomous.at(-1)!;
+  const size = (mesh: T.InstancedMesh, i: number) => { mesh.getMatrixAt(i, matrix); return new T.Vector3().setFromMatrixScale(matrix).y; };
+  automationDesigns.autonomousDesign.forEach((d, i) => {
+    assert.ok(Math.abs(size(d ? masts : ports, i) - 1) < 1e-6 && size(d ? ports : masts, i) < 1e-3, `bay ${i} draws only its own autonomous design`);
+  });
+  console.log('PASS: P8 design families — every carrier mixes ≥ 2 families per band; each slot draws only its own design.');
+}
 
 // P5: a live change pulses only where its district changed, in two waves that fade within PULSE_WAVE_GAP + PULSE_SECONDS;
 // snapshots / resets / reduced motion (immediate) never pulse, and a legacy hide clears pulses.

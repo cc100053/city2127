@@ -1,7 +1,7 @@
 # meter-variety — Readable, district-wide Meter changes
 
 - Owner: cc100053 (P0/P1/P4/P5: Claude Code; P2/P3: Codex session)
-- Status: IN_PROGRESS — P0–P5 and P7 implemented; P6 evidence recorded per stage; awaiting capture review before main
+- Status: IN_PROGRESS — P0–P5, P7 and P8 implemented; P6 evidence recorded per stage; awaiting capture review before main
 - Branch: `feat/meter-variety`
 - Base commit: `33227a687ac9d18281e90494a4e9b2ce27f861ce`
 - Last verified commit: P3 source + whitespace correction `357b91784910d1bdc4411659ab8b8acdd99c13b6` (local checks, lossless captures, real WebSocket browser smoke and feature CI PASS)
@@ -185,6 +185,32 @@ Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920�
 - Same-condition draw submissions (`data-draw-calls`): all-mixed day 1204 → 1252, NW high 1220 → 1268, SE low / high 1224 / 1244 → 1272 / 1292 (**+48**: 4 port + 8 extra tower batches with their shadow / G-buffer passes). Draw-call comparison only, not an FPS acceptance.
 - Not verified: skyway clearance of the new tower silhouettes in the browser (footprints stay inside the checked 24 m reach; the new pod sites were not rechecked against skyways), real HTTP/WebSocket smoke for P7, human art review, Windows, real-GPU FPS.
 
+## P8 — Design families (2026-10-01)
+
+- Preflight: resumed `feat/meter-variety` at `9ba4292` (P7), clean, 0/0 with its remote; `origin/main` still `33227a6`. The user asked for "p8" without choosing variants, so the proposal's examples were used where they fit the hero view.
+- `designOf(i, salt, n)` in `src/districtMeters.ts` gives each slot a fixed family (a 7.31 stride breaks the long runs neighbouring slots give `rank`; the salt decorrelates carriers). Switching order, transitions, pulses and the server contract are unchanged; each slot draws only its own design and the others keep an invertible tiny scale.
+
+| Carrier | Low / private / staffed | High / open / autonomous |
+| --- | --- | --- |
+| Environment promenade bays (17) | hypar sail / solar louvre roof (six slate slats) | planted pergola / green screen (planted edge wall with a half-width planted canopy, clear of the walker lanes) |
+| Environment roofs | solar sail / photovoltaic pergola | roof-forest crown / stepped meadow terraces |
+| Environment mist towers | slender shaft / squat cooling drum (same batch, scaled) | — |
+| Automation bays (11) | domed hall / stacked-deck hall (terraces at 20 m and 28.5 m, flat lit roof at 37 m, staff on both bars) | drone port / charging mast (72 m, three cantilevered docks with lit rings and drones) |
+| Sharing courts (10) | walled garden / glass winter garden (30 × 24 × 6.5 m on seven portal frames, crowns inside) | parasol plaza / long-table pergola (34 m planted pergola over two shared tables) |
+| Concentration pods (26) | two-tier pod / garden ring pavilion (lit glass ring, planted roof, courtyard tree) | towers keep the P7 three families |
+| Sharing water rooms (6) | already vault / garden island | already steps / halo |
+
+- Sight lines found by `tests/odaiba.test.ts`: a 9 m winter garden on court 0 hid PARK, so the glass house is 6.5 m; a pergola roof on court 2 hid COMMONS PLAZA, so the open-court salt (1052) keeps parasols there. The stacked-deck hall's first draft had a 12 m terrace over the guideway; it now starts at the domed hall's 20 m.
+- New check (`tests/districtMeters.test.ts`): every carrier above uses ≥ 2 families, and at high automation each bay's matrices draw only its own autonomous design.
+
+### P8 validation
+
+- Root `npm test`, `npm run build`, `git diff --check`: PASS. `survey/` and `module-swap/` unchanged.
+- Readability (same capture conditions as P7, repeat noise 0.05 %), before at `9ba4292` → after, low ↔ high day / night: environment 3.93 / 3.96 → **4.09 / 4.05 %**, automation 4.02 / 3.58 → **4.03 / 3.51 %**, sharing 1.89 / 2.10 → **1.86 / 2.10 %**, concentration 4.04 / 3.42 → **4.07 / 3.42 %**. Gate unchanged and met (sharing stays above its 1.6 % floor). Environment's 3.93 % before is below P1's 4.33 % because later stages share the frame.
+- Captures: environment [low](meter-variety-p8-env-low.png) / [mixed](meter-variety-p8-env-mixed.png) / [high](meter-variety-p8-env-high.png) / [night low](meter-variety-p8-env-night-low.png) / [night high](meter-variety-p8-env-night-high.png); automation [low](meter-variety-p8-auto-low.png) / [mixed](meter-variety-p8-auto-mixed.png) / [high](meter-variety-p8-auto-high.png) / [night low](meter-variety-p8-auto-night-low.png) / [night high](meter-variety-p8-auto-night-high.png); sharing [low](meter-variety-p8-sharing-low.png) / [mixed](meter-variety-p8-sharing-mixed.png) / [high](meter-variety-p8-sharing-high.png) / [night low](meter-variety-p8-sharing-night-low.png) / [night high](meter-variety-p8-sharing-night-high.png); concentration [low](meter-variety-p8-concentration-low.png) / [mixed](meter-variety-p8-concentration-mixed.png) / [high](meter-variety-p8-concentration-high.png) / [night low](meter-variety-p8-concentration-night-low.png) / [night high](meter-variety-p8-concentration-night-high.png).
+- Draw submissions (`data-draw-calls`, all-mixed day): 1252 → **1337** (+85; 17 new instanced batches with their shadow / G-buffer passes). This is the largest single-stage increase; merging same-material variant batches is the upgrade path if real-GPU FPS needs it. Not an FPS acceptance.
+- Not verified: browser skyway clearance of the charging masts (72 m, at bays already clear of skyways) and stacked-deck halls, close-up review of the new designs (hero only), human art review, real HTTP/WebSocket smoke, Windows, real-GPU FPS.
+
 ## Proposed P7–P12 — More variety per Meter (2026-10-01, pending user approval)
 
 Not implemented. Goal: each Meter reads as several distinct mature 2127 identities, not one object family that is present or absent. Constraints carry over: desktop hero pose unchanged, no server contract change (P11 excepted), every value futuristic, greenery stays lush with no uniform grids, no new assets, dependencies or render passes.
@@ -205,7 +231,7 @@ Mixed values only scatter the two endpoint designs (low ↔ mixed 0.9–2.7 %).
 | Stage | Scope | Acceptance beyond the standard checks |
 | --- | --- | --- |
 | P7 (done, see [P7](#p7--weak-spots-2026-10-01)) | Weak spots. **Concentration**: three tower silhouette families by slot (twisted shaft, terraced setback, linked twin) and pod clusters large enough to read. **Sharing**: rank court sites by rendered visible pixels, not a centre ray; move the hidden ones. **Automation**: high gets autonomous counterparts on the pavilion bays (drone ports / charging masts) instead of empty ground. | Each touched Meter ≥ 3 % day and night (sharing: no regression below 1.6 %); before/after captures |
-| P8 | Design families. Every slot-based carrier gets 2–3 variants chosen by a fixed per-slot hash, e.g. environment bays: sail / pergola / vertical garden screen; roofs: sail / forest / meadow terraces; sharing courts: walled garden / glass winter garden / courtyard cluster and parasols / long-table pergola / amphitheatre lawn; automation pavilions: domed / stacked deck / garden kiosk. | New check: within one band, slots of a carrier use ≥ 2 families; gate unchanged |
+| P8 (done, see [P8](#p8--design-families-2026-10-01)) | Design families. Every slot-based carrier gets 2–3 variants chosen by a fixed per-slot hash, e.g. environment bays: sail / pergola / vertical garden screen; roofs: sail / forest / meadow terraces; sharing courts: walled garden / glass winter garden / courtyard cluster and parasols / long-table pergola / amphitheatre lawn; automation pavilions: domed / stacked deck / garden kiosk. | New check: within one band, slots of a carrier use ≥ 2 families; gate unchanged |
 | P9 | Mixed identity. At mid values a share of slots shows a hybrid design (half-open room, shared-staffed pavilion, terraced mid-rise), so low / mixed / high read as three identities. | low ↔ mixed and mixed ↔ high each ≥ 1.5 % |
 | P10 | Cross-Meter combinations. 4–6 pairings add visible extras only when both axes agree, e.g. sharing + automation high → drone kiosks in shared plazas; environment + concentration high → vertical-forest tower crowns. | 81-combination pipeline test asserts each extra appears only in its pairing |
 | P11 (optional) | Path dependence: proposal history seeds which slots switch first, so equal scores grown in a different order give different cities. Needs the client to read history and identical results after reload / reset. | Determinism test over reload, reset and replay; user approval of the contract use |
@@ -222,4 +248,4 @@ P6 (pipeline diagnostics, docs, draw-call measurement) stays per stage: each sta
 
 ## Next step
 
-Capture review of P0–P5, P3b–P3d and P7 with the user; then decide P8 (design families) and the remaining open questions above, and integrate `feat/meter-variety` into `main` per CONTRIBUTING (preserve the review-before-main condition).
+Capture review of P0–P5, P3b–P3d, P7 and P8 with the user; then decide P9 (mixed identity) and the remaining open questions above, and integrate `feat/meter-variety` into `main` per CONTRIBUTING (preserve the review-before-main condition).

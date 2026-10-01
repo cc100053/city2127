@@ -1,5 +1,9 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
+## Meter variety P8 — 2026-10-01，feature branch 待視覺審閱
+
+每個以位置計嘅結構而家每個狀態都有兩款設計，按固定 hash 分配：海濱棚架（帆／太陽能百葉；綠棚／垂直綠牆）、屋頂（帆／光伏棚；樹冠／草甸梯台）、霧化塔（高瘦／矮闊）、自動化（圓頂館／疊層平台；無人機塔／充電桅杆）、共享庭院（圍牆花園／玻璃溫室；傘廣場／長枱棚架）、集約 pod（兩層 pod／環形花園館）。可讀性維持：環境 **4.09%／4.05%**、自動化 **4.03%／3.51%**、共享 **1.86%／2.10%**、集約 **4.07%／3.42%**。Draw call +85。詳見 [P8 交接](handoffs/meter-variety.md#p8--design-families-2026-10-01)。保留 capture review 後才整合 main 的條件。
+
 ## Meter variety P7 — 2026-10-01，feature branch 待視覺審閱
 
 補三個弱點：自動化高值唔再係空地，每個人手服務館位置換成無人機升降塔（46 m 降落台、藍色光環、充電塔、停泊無人機）；集約塔改為三款剪影（扭轉塔、退台綠化塔、連體雙塔），pod 加高成兩層；共享庭院改用 hero 畫面「可見像素」評分，三個被地標遮住嘅庭院搬去最易睇到嘅空地。日／夜差異：自動化 **4.02%／3.58%**、共享 **1.89%／2.10%**（冇低過 1.6%）、集約 **4.04%／3.42%**，全部過門檻。詳見 [P7 交接](handoffs/meter-variety.md#p7--weak-spots-2026-10-01)。P8–P12 仍為建議；保留 capture review 後才整合 main 的條件。
@@ -14,7 +18,7 @@
 
 ## Meter variety P7–P12 — 2026-10-01，建議（待用家批准）
 
-下一步加強每個 Meter 的 variety：P7 補弱點（已完成，見上）（P4 塔剪影、sharing 庭院可見度、automation 高值唔再係「空地」）、P8 每個載體 2–3 款設計、P9 mixed 有自己的混合款、P10 跨 Meter 組合；P11 路徑依賴、P12 生活感為可選。P8–P12 未實作。詳見 [P7–P12 建議](handoffs/meter-variety.md#proposed-p7p12--more-variety-per-meter-2026-10-01-pending-user-approval)。
+下一步加強每個 Meter 的 variety：P7 補弱點（已完成，見上）（P4 塔剪影、sharing 庭院可見度、automation 高值唔再係「空地」）、P8 每個載體 2–3 款設計（已完成）、P9 mixed 有自己的混合款、P10 跨 Meter 組合；P11 路徑依賴、P12 生活感為可選。P9–P12 未實作。詳見 [P7–P12 建議](handoffs/meter-variety.md#proposed-p7p12--more-variety-per-meter-2026-10-01-pending-user-approval)。
 
 ## Meter variety P3d — 2026-10-01，海邊收細＋內陸共享庭院
 
