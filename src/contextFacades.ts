@@ -28,7 +28,8 @@ export function contextFacades(environment: T.Object3D) {
           transform.quaternion.setFromUnitVectors(forward, normal);
           transform.scale.set(3.05, 2.65, 1);transform.updateMatrix();panels.push(transform.matrix.clone());
           const variation = (Math.abs(Math.floor(u / 4) * 17 + Math.floor(y / 4) * 7) % 11) / 11;
-          shades.push(new T.Color().setHSL(.56, .13, .34 + variation * .16));
+          // About one bay in five reads as a warm occupied room (2127 target: golden glass), the rest as sky-blue glazing.
+          shades.push(variation < .2 ? new T.Color().setHSL(.09, .55, .62 + variation * .4) : new T.Color().setHSL(.57, .2, .4 + variation * .18));
         }
       }
     }

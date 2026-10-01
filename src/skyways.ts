@@ -69,7 +69,7 @@ function skyway(root: T.Object3D, curve: T.Curve<T.Vector3>, closed: boolean) {
   const length = curve.getLength(), samples = Math.ceil(length / 3);
   root.add(new T.Mesh(deck(curve, 9, 2.6, samples), trim));
   for (const side of [-4.65, 4.65]) {
-    root.add(new T.Mesh(offsetTube(curve, side, -1.1, .55, closed), trail));
+    root.add(new T.Mesh(offsetTube(curve, side, -1.1, .75, closed), trail));
     root.add(new T.Mesh(parapet(curve, side * .98, samples), stone));
   }
   for (let d = 30; d < length - 10; d += 64) {
@@ -129,24 +129,29 @@ function shoreTerraces(root: T.Object3D) {
       if (cx < DISTRICT.minX || cx > 250 || cz > DISTRICT.maxZ || floatingDecks.some(([x, z]) => Math.hypot(cx - x, cz - z) < 60) || boats.some(p => Math.hypot(p.x - cx, p.z - cz) < r + 24)) continue;
       const g = new T.Group(); g.position.set(sx, 0, sz); g.rotation.y = yaw; root.add(g);
       const c = new T.Group(); c.position.set(-OUT, 0, 0); c.rotation.y = n * 1.7; g.add(c);
-      arc(c, 0, r, 1.6, [0, -1.2, 0], stone);
-      arc(c, r - .5, r + .3, .6, [0, .4, 0], trim);
-      arc(c, 0, r - .6, .25, [0, .4, 0], leaf);
-      arc(c, 0, r * .62, 2.2, [0, .4, 0], stone);
-      arc(c, r * .62 - .4, r * .62 + .2, .5, [0, 2.6, 0], trim);
-      arc(c, 0, r * .6 - .4, .3, [0, 2.6, 0], leaf);
+      // Tall white drum (2.8 m above the water) so the terrace reads as a raised island with a visible rim, as in the target.
+      const L = 2.4;
+      arc(c, 0, r, 4, [0, -1.2, 0], stone);
+      arc(c, r - .5, r + .3, .6, [0, .4 + L, 0], trim);
+      arc(c, 0, r - .6, .25, [0, .4 + L, 0], leaf);
+      arc(c, 0, r * .62, 2.2, [0, .4 + L, 0], stone);
+      arc(c, r * .62 - .4, r * .62 + .2, .5, [0, 2.6 + L, 0], trim);
+      arc(c, 0, r * .6 - .4, .3, [0, 2.6 + L, 0], leaf);
       for (let k = 0; k < 6; k++) {
-        const a = k * 1.05 + n, rr = k < 2 ? r * .25 : r * .75, top = k < 2 ? 2.9 : .65, s = 1.6 + (k % 3) * .5;
+        const a = k * 1.05 + n, rr = k < 2 ? r * .25 : r * .75, top = (k < 2 ? 2.9 : .65) + L, s = 1.6 + (k % 3) * .5;
         const trunk = new T.Mesh(pole, trim); trunk.scale.set(.25, 2.2, .25); trunk.position.set(Math.cos(a) * rr, top + 1.1, Math.sin(a) * rr); c.add(trunk);
         const tree = new T.Mesh(crown, (k + n) % 4 === 0 ? cherry : leaf); tree.position.set(Math.cos(a) * rr, top + 2.2 + s * .7, Math.sin(a) * rr); tree.scale.set(s * 1.2, s, s * 1.2); c.add(tree);
       }
-      // Two-step waterfall on the seaward side: upper tier onto the base, base into the sea, with a foam disc.
+      // Waterfalls on the seaward side: an upper sheet onto the drum, then three wide sheets down the drum into the sea, each with foam.
       const fall = new T.Group(); fall.rotation.y = -c.rotation.y; c.add(fall);
-      box(fall, [.35, 2.2, 3.4], [-r * .62 - .2, 1.5, 0], waterfall, .1);
-      box(fall, [.35, 1.9, 4.4], [-r - .45, -.5, 0], waterfall, .1);
-      arc(fall, 0, 3.2, .05, [-r - 1.8, -.72, 0], foam);
+      box(fall, [.35, 2.2, 3.4], [-r * .62 - .2, 1.5 + L, 0], waterfall, .1);
+      for (const a of [-.45, 0, .45]) {
+        const sheet = new T.Group(); sheet.rotation.y = a; fall.add(sheet);
+        box(sheet, [.35, 4.1, 4.6], [-r - .4, .75, 0], waterfall, .1);
+        arc(sheet, 0, 3.4, .05, [-r - 2, -.72, 0], foam);
+      }
       // Footbridge back to the tidal edge.
-      box(g, [OUT - 12 - r, .5, 2.4], [-(OUT + 12 - r) / 2, .5, 0], trim, .15);
+      box(g, [OUT - 12 - r, .5, 2.4], [-(OUT + 12 - r) / 2, 1.2, 0], trim, .15);
       n++;
     }
   }

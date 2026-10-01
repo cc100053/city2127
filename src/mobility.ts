@@ -43,7 +43,7 @@ export function guideStrength(sample:number,head:number,closed:boolean) {
 function material(color:string,emissive=false) {
   return new T.MeshStandardMaterial({color,roughness:.65,emissive:emissive?color:0,emissiveIntensity:emissive?1.3:0});
 }
-const shell=material('#dfebd9'),glass=material('#284f65'),mint=material('#74dace',true),coral=material('#e7a097');
+const shell=material('#f4f3ee'),glass=material('#284f65'),mint=material('#74dace',true),coral=material('#e7a097');
 type Part={geometry:T.BufferGeometry;material:T.Material};
 function part(size:[number,number,number],at:[number,number,number],mat:T.Material,radius=.15):Part {
   return {geometry:new RoundedBoxGeometry(...size,2,Math.min(radius,...size.map(n=>n/2))).translate(...at),material:mat};
@@ -104,8 +104,11 @@ export function mobility(scene:T.Scene) {
   ],WALKERS,'promenade-walkers');
   const clothes=['#4f6f7c','#b5836f','#6d8a5f','#2f3e48','#c9b48a','#8c6f8f','#3f5a52','#e4e1d8'],skins=['#e8cdb0','#c99e7c','#8d6348','#f0d9c2'],hairs=['#2f2a27','#5a4033','#1d2226','#b9a58c','#d8d8d4'];
   for(let i=0;i<WALKERS;i++){people.tint(i,coats,clothes[(i*5)%clothes.length]);people.tint(i,skin,skins[(i*3)%skins.length]);people.tint(i,hair,hairs[(i*7)%hairs.length]);}
-  // Water taxis: a low hull with a glass cabin and a mint waterline, 11 m long.
-  const boats=fleet(scene,[part([3.6,1.2,11],[0,.4,0],shell,.5),part([2.8,1.3,5],[0,1.5,-.6],glass,.4),part([3.7,.12,11.1],[0,.25,0],mint,.05),part([2.4,.12,.12],[0,1,5.5],coral,.05)],BOATS+1+bayCruisers.length,'water-taxis');
+  // Water taxis: 11 m white yachts with a glass cabin and a mint waterline.
+  // White yacht hull with a pointed bow (plan in x/-z), a raised aft deck, a dark glass cabin band under a white roof.
+  const plan=new T.Shape([[-1.8,5.5],[1.8,5.5],[1.8,-2],[0,-6.2],[-1.8,-2]].map(([x,y])=>new T.Vector2(x,y)));
+  const hull=new T.ExtrudeGeometry(plan,{depth:1.3,bevelEnabled:true,bevelThickness:.15,bevelSize:.15,bevelSegments:2}).rotateX(-Math.PI/2).translate(0,-.2,0);
+  const boats=fleet(scene,[{geometry:hull,material:shell},part([2.9,1.1,5.4],[0,1.55,-1],glass,.4),part([3,.3,5.8],[0,2.2,-1.1],shell,.15),part([3.7,.12,11.1],[0,.25,-.2],mint,.05),part([2.4,.12,.12],[0,1,5.5],coral,.05)],BOATS+1+bayCruisers.length,'water-taxis');
   // Wakes: a fading V and prop wash trailing each taxi on the water (no shadow).
   const wakes=fleet(scene,[{geometry:wake(),material:new T.MeshBasicMaterial({vertexColors:true,transparent:true,depthWrite:false})}],BOATS+1+bayCruisers.length,'water-taxi-wakes',false);
   // Air taxis: the thin-wing carrier at 5× (22 m span), readable at district distance.
