@@ -1,5 +1,25 @@
 # Validation and handoff
 
+## Odaiba Dream Loop r6 (target v2) — 2026-10-01
+
+Three more passes on `feat/odaiba-dream-loop-2` (`581ab7c`, `15772bf`, pass 3): root `npm test`/`npm run build`/`git diff --check` passed after each pass; headless day/night captures; built-in browser 16:00 console clean. Live `?survey`, FPS/draw calls and exhibition hardware not verified. Details: [handoff](handoffs/odaiba-dream-loop-2.md#round-6--target-v2-2026-10-01).
+
+## Odaiba Dream Loop r5 (target v2) — 2026-10-01
+
+Three more passes on `feat/odaiba-dream-loop-2` (`77daacb`, `6ae6cc0`, pass 3): root `npm test`/`npm run build`/`git diff --check` passed after each pass; headless day/night captures; built-in browser 16:00 without console errors or warnings. Live `?survey`, FPS/draw calls and exhibition hardware not verified. Details: [handoff](handoffs/odaiba-dream-loop-2.md#round-5--target-v2-2026-10-01).
+
+## Odaiba Dream Loop r4 (target v2) — 2026-10-01
+
+Three more passes on `feat/odaiba-dream-loop-2` (`e4ce8ea`, `8e1afe3`, pass 3): root `npm test`/`npm run build`/`git diff --check` passed after each pass and fix; headless day/night captures; built-in browser 16:00 without console errors. Live `?survey`, FPS/draw calls and exhibition hardware not verified. Details: [handoff](handoffs/odaiba-dream-loop-2.md#round-4--target-v2-2026-10-01).
+
+## Odaiba Dream Loop r3 (target v2) — 2026-10-01
+
+Three more passes on `feat/odaiba-dream-loop-2` (`aafbb50`, `776a613`, pass 3): root `npm test`/`npm run build`/`git diff --check` passed after each pass and fix; headless day/night captures and built-in browser (16:00) without console errors. The bay-context draw cap in `tests/odaiba.test.ts` rose from 4 to 5 for Ariake parkland. Live `?survey`, FPS/draw calls and exhibition hardware not verified. Details: [handoff](handoffs/odaiba-dream-loop-2.md#round-3--target-v2-2026-10-01).
+
+## Odaiba Dream Loop r2 — 2026-10-01
+
+Three Dream Loop passes on `feat/odaiba-dream-loop-2`: root `npm test`/`npm run build`/`git diff --check` passed after each pass and fix; built-in browser day/night without console errors. Live `?survey`, FPS and exhibition hardware not verified. Details, evidence and open decisions: [handoff](handoffs/odaiba-dream-loop-2.md).
+
 ## Odaiba art direction pass 1 — 2026-09-30
 
 `feat/art-direction`, base `e587b54`, verified implementation `274167e`. Scope: replace the rendered Fuji office/podium/observation GLB with a civic chassis; retain original assets, hero, lighting, actor routes, seven other landmarks and survey contracts. Human art acceptance pending; no main integration. [Full audit / self-review](handoffs/odaiba-art-direction-01.md).

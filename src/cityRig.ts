@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets';
 import { changeSites } from './layout.ts';
 import { mobility } from './mobility.ts';
@@ -10,11 +10,50 @@ export const paint = (color: T.ColorRepresentation, roughness=.52, metalness=0) 
 export const cream = paint('#e2ddd2',.58), teal = paint('#839da8',.44,.05), sage = paint('#a9c5c2',.5), pink = paint('#b9b7ac',.56), dark = paint('#27414f',.16,.7), trim = paint('#eee9df',.48);
 export const futureLight=new T.MeshStandardMaterial({color:'#8ce5d8',emissive:'#68d9de',emissiveIntensity:.8,roughness:.65});
 export const publicLight=new T.MeshStandardMaterial({color:'#ecf4ed',emissive:'#dcebe6',emissiveIntensity:.15,roughness:.6});
+// Blue light trails: saturated and above the bloom threshold in daylight, so the 2127 network reads as lit blue lines (not white trim) from the hero pose.
+export const trail = new T.MeshBasicMaterial({ color: new T.Color('#4da3ff').multiplyScalar(3) });
 export const solar=paint('#486b83',.3,.85);
 export const membrane=new T.MeshStandardMaterial({color:'#9abdb9',roughness:.3,metalness:.25,transparent:true,opacity:.72,side:T.DoubleSide});
 // Pilot finishes (docs/ART.md): silvered glass that reads the sky, living green, pale stone paving.
 export const glass=new T.MeshPhysicalMaterial({color:'#a7c3cf',roughness:.08,metalness:.6,clearcoat:1,clearcoatRoughness:.06});
-export const leaf=paint('#7d9f68',.85), stone=paint('#ebe8e0',.66);
+export const leaf=paint('#7f9b6d',.85), stone=paint('#ebe8e0',.66);
+/** r9: leafy crown — a lumpy sphere with a flattened underside and shared (smooth) normals, so crowns read as foliage masses instead of
+ * smooth balls at hero distance (target v2's dense groves). Max radius ~1.06, so footprints stay within the old unit-sphere crowns' clearances. */
+export function leafyCrown(detail=2) {
+  const source=new T.IcosahedronGeometry(1,detail);source.deleteAttribute('normal');source.deleteAttribute('uv');
+  const g=mergeVertices(source),p=g.attributes.position as T.BufferAttribute,v=new T.Vector3();source.dispose();
+  for(let i=0;i<p.count;i++){
+    v.fromBufferAttribute(p,i);
+    const n=Math.sin(v.x*5.3+v.y*2.1)*Math.sin(v.y*4.7-v.z*3.9)*Math.sin(v.z*5.1+v.x*3.3);
+    v.multiplyScalar(.9+.12*n+.04*Math.sin(v.x*11+v.z*13));if(v.y<0)v.y*=.72;
+    p.setXYZ(i,v.x,v.y,v.z);
+  }
+  g.computeVertexNormals();return g;
+}
+// Silvered glass for the 2127 spheres: warm and only partly metallic, so they read as polished silver mirrors of the golden sky, not blue domes.
+// r4 pass 4: near-full mirror with a boosted env response, so each sphere reads as one bright silver ball (target v2), not a dome over a dark band.
+// r5 pass 3: the mirrors see their own warm golden-hour panorama (pale gold sky, bright cream horizon, sun glow to the south-west,
+// warm city below) instead of the saturated blue sky capture, so each sphere reads as bright silver (target v2), not a dark blue dome.
+// A float DataTexture (no DOM), so Node tests can import this module; three converts it to PMREM on first use.
+const mirrorSky=(()=>{
+  const W=128,H=64,data=new Float32Array(W*H*4),c=new T.Color(),sun=new T.Vector3(-.66,.22,.72).normalize(),dir=new T.Vector3();
+  // r6: cooled to silver (target v2's spheres read silver-glass, not gold): bay blue below, white horizon band, pale blue-grey sky, a small warm sun spot.
+  const below=new T.Color('#6f8fa2'),low=new T.Color('#b9c6cc'),horizon=new T.Color('#ffffff'),sky=new T.Color('#e4e9ec'),zenith=new T.Color('#b7cad8'),glow=new T.Color('#fff0d8');
+  for(let j=0;j<H;j++)for(let i=0;i<W;i++){
+    const lat=((j+.5)/H-.5)*Math.PI,lon=((i+.5)/W-.5)*Math.PI*2,e=lat*180/Math.PI; // three's equirect: u=atan(z,x)/2π+.5, v=asin(y)/π+.5
+    dir.set(Math.cos(lat)*Math.cos(lon),Math.sin(lat),Math.cos(lat)*Math.sin(lon));
+    if(e<-4)c.copy(low).lerp(below,T.MathUtils.smoothstep(-e,4,40));
+    else if(e<8)c.copy(low).lerp(horizon,T.MathUtils.smoothstep(e,-4,2)).multiplyScalar(1+.35*T.MathUtils.smoothstep(e,-2,3)*(1-T.MathUtils.smoothstep(e,3,8)));
+    else c.copy(horizon).lerp(sky,T.MathUtils.smoothstep(e,8,20)).lerp(zenith,T.MathUtils.smoothstep(e,20,75));
+    c.add(glow.clone().multiplyScalar(2.2*Math.pow(Math.max(dir.dot(sun),0),10)));
+    data.set([c.r,c.g,c.b,1],(j*W+i)*4);
+  }
+  const texture=new T.DataTexture(data,W,H,T.RGBAFormat,T.FloatType);texture.mapping=T.EquirectangularReflectionMapping;texture.magFilter=texture.minFilter=T.LinearFilter;texture.needsUpdate=true;
+  return texture;
+})();
+export const chrome=new T.MeshPhysicalMaterial({color:'#f1f4f6',metalness:.92,roughness:.05,clearcoat:1,clearcoatRoughness:.02,envMap:mirrorSky,envMapIntensity:1});
+/** Materials that use `mirrorSky` (its own envMap skips scene.environmentIntensity), dimmed with the night in `cityRig().update`. */
+export const mirrors:T.MeshStandardMaterial[]=[chrome];
 const rounded = new Map<string, RoundedBoxGeometry>();
 export function box(parent:T.Object3D, size:[number,number,number], position:[number,number,number], material:T.Material, radius=.18) {
   const key = [...size,radius].join(',');
@@ -84,6 +123,7 @@ export function cityRig(scene:T.Scene) {
   return {
     update(state:WorldState,time:number,night:number) {
       publicLight.emissiveIntensity=.15+night*1.3;
+      for(const m of mirrors)m.envMapIntensity=1-night*.85;
       civicLights.forEach(light=>light.intensity=night*light.userData.peak);
       futureLight.emissiveIntensity=.25+state.neon*.5+night*.45;
       membrane.opacity=.6+state.greenery*.18;

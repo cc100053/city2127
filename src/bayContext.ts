@@ -5,8 +5,36 @@ import { ariakeLink, bayShores, DISTRICT, gateBridge, rainbowBridge } from './la
 const ground = paint('#737f78', 1), bridgeWhite = paint('#cfd3d2', .55, .15), gateSteel = paint('#aab5b9', .45, .35);
 const skyline = new T.MeshStandardMaterial({ color: '#ffffff', roughness: .9 });
 // Far shores recede harder than the Odaiba backdrop: silhouettes in the bay haze, never competing with the district.
-for (const material of [ground, bridgeWhite, gateSteel, skyline]) recedeBeyondDistrict(material, .82);
-const unitBox = new T.BoxGeometry(1, 1, 1);
+for (const material of [ground, bridgeWhite, gateSteel, skyline]) { recedeBeyondDistrict(material, .82); curveBeyondPlate(material); }
+// Ariake in 2127: a wooded park archipelago rather than a grey plain; bay lagoons cut through it so the shore beside the district reads as open water
+// with planted islands (target), grove mottling and pale walks from world-space noise (reuses recede's varying). Lagoons [x, z, radius] in metres.
+const lagoons: readonly (readonly [number, number, number])[] = [
+  [870, -260, 230], [1190, -60, 200], [880, 540, 170], [1320, 430, 190], [1660, 140, 220], [1930, -260, 250], [1520, -520, 210], [2120, 560, 220],
+];
+const inLagoon = (x: number, z: number, margin: number) => lagoons.some(([cx, cz, r]) => Math.hypot(x - cx, z - cz) < r + margin);
+const parkland = paint('#5f7d4c', 1);
+recedeBeyondDistrict(parkland, .4);
+{
+  const compile = parkland.onBeforeCompile.bind(parkland);
+  parkland.onBeforeCompile = (shader, renderer) => {
+    compile(shader, renderer);
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', `#include <common>
+      float groveHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+      float groveNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(groveHash(i),groveHash(i+vec2(1,0)),f.x),mix(groveHash(i+vec2(0,1)),groveHash(i+1.),f.x),f.y);}
+      float lagoonDist(vec2 p){float d=1e5;${lagoons.map(([x, z, r]) => `d=min(d,length(p-vec2(${x.toFixed(1)},${z.toFixed(1)}))-${r.toFixed(1)});`).join('')}return d+(groveNoise(p/60.)-.5)*40.;}`)
+      // Lagoons open onto the sea plane below; a pale promenade rims each island.
+      .replace('#include <clipping_planes_fragment>', 'float lagoon=lagoonDist(districtXz);\nif(lagoon<0.) discard;\n#include <clipping_planes_fragment>')
+      .replace('#include <color_fragment>', `#include <color_fragment>
+      float grove=groveNoise(districtXz/70.)*.6+groveNoise(districtXz/17.)*.4;
+      diffuseColor.rgb*=mix(vec3(.5,.66,.48),vec3(1.05,1.02,.9),smoothstep(.38,.62,grove));
+      float walk=1.-smoothstep(.03,.07,abs(sin(districtXz.x*.011+sin(districtXz.y*.009)*2.)));
+      diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.86,.82,.74),max(walk*.8,1.-smoothstep(4.,10.,lagoon)));`);
+  };
+  const key = parkland.customProgramCacheKey.bind(parkland);
+  parkland.customProgramCacheKey = () => key() + '|ariake-park';
+  curveBeyondPlate(parkland);
+}
+const unitBox = new T.BoxGeometry(1, 1, 1), slabBox = new T.BoxGeometry(1, 1, 1, 24, 1, 24);
 
 /** A box spanning a to b (centre line), `width` across and `depth` tall. */
 function beam(parent: T.Object3D, a: T.Vector3, b: T.Vector3, width: number, depth: number, material: T.Material) {
@@ -26,7 +54,7 @@ function viaduct(parent: T.Object3D, points: readonly (readonly [number, number,
 
 // Beyond the district the surveyed ground, roads, guideway and context massing stay as Odaiba's connected backdrop, but lose
 // saturation and contrast into the bay haze over DISTRICT.recede metres so detail and attention stay on the hero district.
-export function recedeBeyondDistrict(material: T.Material, strength = .6) {
+export function recedeBeyondDistrict(material: T.Material, strength = .35) {
   const compile = material.onBeforeCompile.bind(material), key = material.customProgramCacheKey.bind(material);
   material.onBeforeCompile = (shader, renderer) => {
     compile(shader, renderer);
@@ -34,10 +62,31 @@ export function recedeBeyondDistrict(material: T.Material, strength = .6) {
     shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 districtXz;').replace('#include <fog_fragment>', `#include <fog_fragment>
       vec2 beyond=max(vec2(${DISTRICT.minX.toFixed(1)},${DISTRICT.minZ.toFixed(1)})-districtXz,districtXz-vec2(${DISTRICT.maxX.toFixed(1)},${DISTRICT.maxZ.toFixed(1)}));
       float recede=smoothstep(0.,${DISTRICT.recede.toFixed(1)},length(max(beyond,0.)));
-      vec3 muted=mix(vec3(dot(gl_FragColor.rgb,vec3(.299,.587,.114))),fogColor,.45);
+      vec3 muted=mix(mix(vec3(dot(gl_FragColor.rgb,vec3(.299,.587,.114))),gl_FragColor.rgb,.35),fogColor,.45);
       gl_FragColor.rgb=mix(gl_FragColor.rgb,muted,recede*${strength.toFixed(2)});`);
   };
   material.customProgramCacheKey = () => key() + '|district-recede' + strength;
+}
+
+// Beyond the surveyed plate (every vertex lies within 1.55 km of the origin) the bay and its far shores fall away on a small
+// planet, so the sea ends at a crisp horizon about 4.7° below level from the hero pose, sky shows above it and far skylines sink behind it.
+export const EARTH = { plate: 1600, radius: 30000 } as const;
+/** Drop world y by the curvature beyond `EARTH.plate`; wrap after any other vertex edit (recede appends after project_vertex). */
+export function curveBeyondPlate(material: T.Material) {
+  const compile = material.onBeforeCompile.bind(material), key = material.customProgramCacheKey.bind(material);
+  material.onBeforeCompile = (shader, renderer) => {
+    compile(shader, renderer);
+    shader.vertexShader = shader.vertexShader.replace('#include <project_vertex>', `vec4 mvPosition = vec4(transformed, 1.);
+      #ifdef USE_INSTANCING
+      mvPosition = instanceMatrix * mvPosition;
+      #endif
+      vec4 curved = modelMatrix * mvPosition;
+      float fall = max(length(curved.xz) - ${EARTH.plate.toFixed(1)}, 0.);
+      curved.y -= fall * fall / ${(2 * EARTH.radius).toFixed(1)};
+      mvPosition = viewMatrix * curved;
+      gl_Position = projectionMatrix * mvPosition;`);
+  };
+  material.customProgramCacheKey = () => key() + '|earth-curve';
 }
 
 /** Tokyo Bay beyond the plate: neighbouring shores with block skylines and the bridges that tie Odaiba to them. Silhouettes, no shadows. */
@@ -52,12 +101,16 @@ export function bayContext() {
   let i = 0;
   for (const shore of bayShores) {
     const [x0, x1] = shore.x, [z0, z1] = shore.z;
-    const slab = new T.Mesh(unitBox, ground); slab.position.set((x0 + x1) / 2, -.7, (z0 + z1) / 2); slab.scale.set(x1 - x0, 3, z1 - z0); parts.add(slab);
+    const slab = new T.Mesh(slabBox, shore.name === 'Ariake' ? parkland : ground); slab.position.set((x0 + x1) / 2, -.7, (z0 + z1) / 2); slab.scale.set(x1 - x0, 3, z1 - z0); parts.add(slab);
     for (let k = 0; k < shore.count; k++, i++) {
       const w = 25 + random() * 55, d = 25 + random() * 55, h = shore.h[0] + (shore.h[1] - shore.h[0]) * random() ** 2.4;
       dummy.position.set(x0 + w + random() * (x1 - x0 - 2 * w), h / 2 + .8, z0 + d + random() * (z1 - z0 - 2 * d));
+      // Ariake blocks stand on the islands (own retry sequence, so the other shores keep their seeded layout) as darker blue glass.
+      const ariake = shore.name === 'Ariake';
+      for (let t = 1; ariake && t < 40 && inLagoon(dummy.position.x, dummy.position.z, 70); t++) dummy.position.set(x0 + w + (Math.sin(k * 91.7 + t * 12.9) * .5 + .5) * (x1 - x0 - 2 * w), dummy.position.y, z0 + d + (Math.sin(k * 37.3 + t * 78.2) * .5 + .5) * (z1 - z0 - 2 * d));
       dummy.rotation.set(0, .58, 0); dummy.scale.set(w, h, d); dummy.updateMatrix(); blocks.setMatrixAt(i, dummy.matrix);
-      blocks.setColorAt(i, color.setHSL(.58, .1, .46 + random() * .12));
+      const tone = random();
+      blocks.setColorAt(i, ariake ? color.setHSL(.57, .22, .3 + tone * .12) : color.setHSL(.58, .1, .46 + tone * .12));
     }
   }
   blocks.name = 'bay-skyline';

@@ -1,8 +1,9 @@
 import * as T from 'three';
-import { arc, bake, box, futureLight, glass, leaf, membrane, publicLight, solar, stone, trim } from './cityRig';
+import { arc, bake, box, futureLight, glass, leaf, membrane, publicLight, solar, stone, trail, trim } from './cityRig';
 import { floatingDecks, skyBridges, SPHERE_DOCK } from './layout';
 import { routes } from './mobility';
 import { amphibiousShore, tidalEdge } from './amphibiousShore';
+import { skyways } from './skyways';
 
 /** What 2127 added around the existing landmarks: sky bridges, the sphere berth, guideway light lines and floating decks. */
 export function build2127(scene: T.Scene) {
@@ -22,14 +23,14 @@ export function build2127(scene: T.Scene) {
   arc(berth, 7.2, 7.8, .2, [0, by - 1.3, 0], futureLight);
   arc(berth, 3.5, 3.8, .05, [0, by - 1.15, 0], publicLight);
   for (let i = 0; i < 4; i++) { const t = i * Math.PI / 2; box(berth, [.6, 5, .6], [Math.cos(t) * 6, by - 4.2, Math.sin(t) * 6], solar, .1); }
-  // Guideway light lines along both deck edges.
+  // Guideway light trails along both deck edges (the same blue-white as the 2127 skyways).
   const guideway = routes().guideway, up = new T.Vector3(0, 1, 0);
   for (const offset of [-6.8, 6.8]) {
     const points = Array.from({ length: 160 }, (_, i) => {
       const u = i / 159, p = guideway.getPointAt(u), side = new T.Vector3().crossVectors(up, guideway.getTangentAt(u)).normalize();
       return p.addScaledVector(side, offset).setY(14.45);
     });
-    root.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points), 320, .22, 4), futureLight));
+    root.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points), 320, .5, 5), trail));
   }
   // Floating decks: stone plates with planted edges and rails, riding just above the sea.
   for (const [x, z, yaw] of floatingDecks) {
@@ -40,5 +41,5 @@ export function build2127(scene: T.Scene) {
     box(g, [.12, 1.1, 36], [4.8, 1, 0], membrane, .04);
     box(g, [10.1, .12, .3], [0, .55, 18], futureLight, .04);
   }
-  scene.add(...bake(root),amphibiousShore(),tidalEdge());
+  scene.add(...bake(root),amphibiousShore(),tidalEdge(),skyways());
 }

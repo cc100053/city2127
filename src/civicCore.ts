@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { arc, bake, box, glass, leaf, membrane, solar, stone, trim } from './cityRig.ts';
+import { arc, bake, box, chrome, glass, mirrors, leaf, leafyCrown, membrane, solar, stone, trim } from './cityRig.ts';
 
 /** Fuji's office blocks become a load-bearing civic chassis, keeping the sphere berth and site alignment. Metres. */
 export function civicCore() {
@@ -46,9 +46,11 @@ export function civicCore() {
   const transferA=new T.Vector3(14,100,-12),transferB=new T.Vector3(-18,100,-1);
   const transfer=box(root,[7,2.5,transferA.distanceTo(transferB)],transferA.clone().add(transferB).multiplyScalar(.5).toArray(),stone);
   transfer.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),transferB.sub(transferA).normalize());
+  // Silvered glass skin (target v2): the same warm mirror as the skyway spheres, faintly see-through to the planted floors.
+  const silverGlass=chrome.clone();silverGlass.transparent=true;silverGlass.opacity=.82;mirrors.push(silverGlass);
   // The titanium observation object becomes a suspended, inhabitable environmental chamber.
   const chamber=new T.Group();chamber.position.set(-18,100,23);root.add(chamber);
-  const skin=new T.Mesh(new T.SphereGeometry(24,48,24,0,Math.PI*2,0,Math.PI*.7),membrane);chamber.add(skin);
+  const skin=new T.Mesh(new T.SphereGeometry(24,48,24,0,Math.PI*2,0,Math.PI*.7),silverGlass);chamber.add(skin);
   const bowl=new T.Mesh(new T.SphereGeometry(24,48,12,0,Math.PI*2,Math.PI*.7,Math.PI*.3),trim);chamber.add(bowl);
   for(const y of [-12,0,12]) {
     const r=Math.sqrt(24*24-y*y);
@@ -83,7 +85,7 @@ export function civicCore() {
   arc(root,25,34,2,[-18,61,23],stone,Math.PI*.05,Math.PI*1.8);
   box(root,[132,2.5,12],[-2,61,64],stone);
   // Transfer beams carry inhabited ecological terraces; the centre stays open around the chamber.
-  const crown=new T.IcosahedronGeometry(1,2);
+  const crown=leafyCrown();
   const grove=(x:number,y:number,z:number,i:number)=>{
     box(root,[.55,3,.55],[x,y+1.5,z],solar);
     for(let j=0;j<3;j++){
