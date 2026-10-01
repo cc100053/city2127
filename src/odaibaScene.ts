@@ -130,6 +130,9 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
           float cv=abs(q.y-(${CORRIDOR.v.toFixed(1)}));
           float pond=inside*(1.-min(site,1.))*step(cv,${CORRIDOR.half.toFixed(1)}),rim=inside*(1.-min(site,1.))*step(cv,${(CORRIDOR.half+1.2).toFixed(1)})-pond;
           float bed=step(4.,cell.x)*step(6.,cell.y),curb=step(3.3,cell.x)*step(5.3,cell.y)*(1.-bed);
+          // r7 pass 3: every bed, and the backdrop lawn, desaturated toward a lifted sage/silver-green (no game-green lawn).
+          float lum=dot(diffuseColor.rgb,vec3(.3,.59,.11));
+          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.30,.34,.28)+lum*vec3(1.,1.1,.9),mix(.75,1.,inside*bed));
           diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.87,.85,.79),inside*(1.-bed)*(1.-pond));
           diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.96,.95,.91),inside*max(curb,rim)*(1.-pond));
           diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.16,.36,.46),pond);`).replace('#include <metalnessmap_fragment>','#include <metalnessmap_fragment>\nroughnessFactor=mix(roughnessFactor,.06,pond);metalnessFactor=mix(metalnessFactor,.35,pond);');

@@ -56,7 +56,7 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
   plantCanopy(scene,{instances});
 }
 
-/** The Odaiba backdrop beyond the district keeps its parks as ordered sage bed blocks in white curbs on the street grid (r7 pass 2: no round crown clumps),
+/** The Odaiba backdrop beyond the district keeps its parks as ordered, flush sage retention beds in white curbs on the street grid (r7 pass 2: no round crown clumps),
  *  one unshadowed instanced batch receding with the ground it stands on. */
 export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
   environment.updateMatrixWorld(true);
@@ -64,15 +64,16 @@ export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
   const reach=Math.max(...[bounds.min.x,bounds.max.x,bounds.min.z,bounds.max.z].map(Math.abs))*1.42,yaw=Math.atan2(-.555,-.832);
   // ponytail: one unaccelerated ray per 30×24 m grid cell over the rotated plate (~4k rays at load); add a BVH if the plate grows.
   for(let u=-reach;u<reach;u+=30)for(let v=-reach;v<reach;v+=24){
-    // Every third row stays open as a paved lane.
-    if(Math.round(v/24)%3===0)continue;
+    // Every other row stays open as a paved lane, and one bed in three along a row is left out, so the pale ground leads (r7 pass 3).
+    if(Math.round(v/24)%2===0 || Math.round(u/30)%3===0)continue;
     const px=-.832*u+.555*v,pz=.555*u+.832*v;
     if(px<bounds.min.x || px>bounds.max.x || pz<bounds.min.z || pz>bounds.max.z || inDistrict(px,pz) || seaward(px,pz))continue;
     ray.set(new T.Vector3(px,300,pz),down);
     const hit=ray.intersectObject(environment,true)[0];
     if(!hit || !(hit.object instanceof T.Mesh) || Array.isArray(hit.object.material) || hit.object.material.name!=='landscape' || hit.point.y>=9)continue;
     const i=matrices.length,y=hit.point.y;
-    for(const [l,hgt,w,base,color] of [[25,.9,10,0,new T.Color('#e9e5da')],[22,3.6+(i%3)*.8,7,.9,new T.Color().setHSL(.23+(i%5)*.01,.12+(i%3)*.03,.3+(i%7)*.02)]] as const){
+    // r7 pass 3: a flush water-retention bed sunk in a white curb (bed top 0.3 m proud of the rim), not a dark hedge box; pale sage/silver-green.
+    for(const [l,hgt,w,base,color] of [[25,1,10,0,new T.Color('#ece8de')],[22,1.3,7,0,new T.Color().setHSL(.22+(i%5)*.01,.1+(i%3)*.02,.46+(i%7)*.015)]] as const){
       dummy.position.set(px,y+base+hgt/2,pz);dummy.scale.set(l,hgt,w);dummy.rotation.set(0,yaw,0);dummy.updateMatrix();matrices.push(dummy.matrix.clone());colors.push(color);
     }
   }

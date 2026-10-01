@@ -111,3 +111,21 @@ Open decision (from round 4): keep or revert the Ariake lagoons.
 Remaining gaps vs target v2: facade tone (see art note), dense far skyline, sun glint position, more terraced greenery on building edges.
 
 Next step: user review; another round or merge.
+
+## Round 7 — greenery as infrastructure (2026-10-01)
+
+User review: the greenery read as a 2020s eco-render (generic round trees everywhere, saturated lawns, trees on every roof and tower ring). Per [CITY_MASTER_TASTE](../ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) (planter trees and rooftop gardens are 2027 vocabulary), the user approved this direction: cut first, then hard edges, then reorganise; ivory structure and paving lead and green sits in crisp engineered containers. This supersedes round 6's "more terraced greenery on building edges" gap. Start: `r6-pass3` (`119e25a`); branch 0/0 with its remote after fetch.
+
+- Pass 1 (`6d0e8de`): roof groves cut (context towers, Grand Nikko, DiverCity); tower rings unplanted; garden links and shore terraces thinned; sage `leaf` and crowns; district landscape becomes ivory paving with curbed sage beds on the street grid and one straight white-rimmed climate corridor (old swale ponds removed); Ariake parkland reed-toned with stepped tidal terraces in each lagoon; shore tidal edge gains a lower reed shelf.
+- Pass 2 (`bb7463e`): beds become long 32×8 m curbed strips on a 40×20 m grid; Aqua City/DECKS roofs ivory with ruled sage strips (`roofBeds`), no roof trees (`plantRoofCanopy` deleted); half the surveyed trees; columnar three-crown trees; backdrop grove becomes curbed sage blocks on the grid.
+- Pass 3: backdrop beds thinned and flush in white curbs; landscape outside the district desaturated toward pale sage; shore terraces lose cherry crowns.
+
+Orchestrator fix (pass 3): desaturating the dark grass texture to its own luminance turned the backdrop ground charcoal → lifted toward a pale sage base (`src/odaibaScene.ts`).
+
+Validation: after each pass, root `npm test` PASS (incl. 81-combination survey pipeline), `npm run build` PASS (existing >500 kB warning), `git diff --check` clean; built-in browser 16:00 console clean after pass 2. Evidence: [baseline](../../artifacts/odaiba-dream7-baseline.jpg), [pass 1](../../artifacts/odaiba-dream7-pass1.jpg), [pass 2](../../artifacts/odaiba-dream7-pass2.jpg), [pass 3](../../artifacts/odaiba-dream7-pass3.jpg), [pass 3 night](../../artifacts/odaiba-dream7-pass3-night.jpg). Not verified: live `?survey`, FPS/draw calls, exhibition hardware.
+
+Art note: the district now reads as a regular paved grid of strips — ordered and pale, but close to a car-park/solar-field pattern; the target's beds follow structure and terraces rather than a uniform grid. Stepped shore wetland terraces and a corridor that joins the ponds are only partly done.
+
+Remaining gaps vs target v2: beds should follow buildings/megaframe rather than a uniform grid; terraced/inclined gardens on structure; shore wetland terraces; facade tone; dense far skyline; sun glint.
+
+Next step: user review; another round or merge.
