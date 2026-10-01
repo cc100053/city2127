@@ -11,30 +11,50 @@ const swale=(x:number,z:number)=>Math.sin(x*.023+Math.sin(z*.018)*2)+Math.cos(z*
 export const corridor=(x:number,z:number)=>Math.abs(x*.023+Math.sin(z*.018)*2+Math.PI/2);
 export const CORRIDOR_GLSL='abs(w.x*.023+sin(w.y*.018)*2.+1.5708)';
 
-/** Reuse the surveyed planting locations; layered crowns replace the tiny blockout cones. */
-export function plantCanopy(scene: T.Object3D, trees: { instances: { position: number[]; scale: number; type: string }[] }) {
+const drum=new T.CylinderGeometry(1,1,1,40);
+/** Reuse the surveyed planting locations; layered crowns replace the tiny blockout cones.
+ * r8 pass 2: surveyed `waterfront` trees become palms (tall slim trunk, flat radiating crown — target v2's seaside palms), and with
+ * `pits` every ground tree stands in a crisp white raised planter ring instead of loose on the lawn (2127 engineered edge, same volume). */
+export function plantCanopy(scene: T.Object3D, trees: { instances: { position: number[]; scale: number; type: string }[] }, pits=false) {
   const positions=trees.instances.filter(tree=>inDistrict(tree.position[0],-tree.position[1]) && !seaward(tree.position[0],-tree.position[1]) && !(tree.position[2]<3 && (swale(tree.position[0],-tree.position[1])<-1.1 || corridor(tree.position[0],-tree.position[1])<.2)) && !Object.values(changeSites).some(site=>Math.abs(tree.position[0]-site.x)<site.w*site.scale/2+9 && Math.abs(-tree.position[1]-site.z)<site.d*site.scale/2+9));
   // Instance colours already provide the leaf pigment; a second green tint crushed the lit canopy.
   const foliage=new T.InstancedMesh(new T.IcosahedronGeometry(1,2),new T.MeshStandardMaterial({color:'#ffffff',roughness:.92}),positions.length*4);
   const trunks=new T.InstancedMesh(new T.CylinderGeometry(.35,.6,1,6),new T.MeshStandardMaterial({color:'#776957',roughness:1}),positions.length);
+  const planted=pits?positions.filter(tree=>tree.position[2]<3):[];
+  const rims=new T.InstancedMesh(drum,trim,planted.length),beds=new T.InstancedMesh(drum,leaf,planted.length);
   const dummy=new T.Object3D(),color=new T.Color();
   positions.forEach((tree,i)=>{
-    const [x,y,z]=tree.position,s=tree.scale,h=(tree.type==='columnar'?10:7)*s;
-    dummy.position.set(x,z+h*.35,-y);dummy.scale.set(s,h*.7,s);dummy.rotation.set(0,0,0);dummy.updateMatrix();trunks.setMatrixAt(i,dummy.matrix);
+    const [x,y,z]=tree.position,s=tree.scale,palm=tree.type==='waterfront',h=(tree.type==='columnar'?10:palm?9.5:7)*s;
+    dummy.position.set(x,z+h*.35,-y);dummy.scale.set(palm?s*.55:s,h*.7,palm?s*.55:s);dummy.rotation.set(0,0,0);dummy.updateMatrix();trunks.setMatrixAt(i,dummy.matrix);
     for(let j=0;j<4;j++){
-      const a=j*2.4+i;
-      dummy.position.set(x+Math.cos(a)*1.9*s,z+h+(j%2)*1.2,-y+Math.sin(a)*1.9*s);
-      dummy.scale.set(3.4*s,(tree.type==='columnar'?4.4:2.9)*s,3*s);dummy.rotation.set(.1*i,a,.15*j);dummy.updateMatrix();foliage.setMatrixAt(i*4+j,dummy.matrix);
-      // About one tree in eleven is a flowering cherry: pale pink crowns scattered through the green (target reference).
-      if(i%11===5)color.setHSL(.95+(j%2)*.01,.38,.7+(j%3)*.03);else color.setHSL(.21+(i%5)*.008,.28+(j%3)*.05,.23+(i%7)*.018);
+      const a=j*(palm?Math.PI/2:2.4)+i;
+      if(palm){
+        // Four flat fronds radiating from the crown, drooping outward.
+        dummy.position.set(x+Math.cos(a)*1.7*s,z+h*.72,-y+Math.sin(a)*1.7*s);
+        dummy.scale.set(2.6*s,.45*s,1.1*s);dummy.rotation.set(0,-a,-.28);
+      }else{
+        dummy.position.set(x+Math.cos(a)*1.9*s,z+h+(j%2)*1.2,-y+Math.sin(a)*1.9*s);
+        dummy.scale.set(3.4*s,(tree.type==='columnar'?4.4:2.9)*s,3*s);dummy.rotation.set(.1*i,a,.15*j);
+      }
+      dummy.updateMatrix();foliage.setMatrixAt(i*4+j,dummy.matrix);
+      // About one tree in eleven (and every `cherry`) is a flowering cherry: pale pink crowns through the green (target reference).
+      if(!palm && (tree.type==='cherry' || i%11===5))color.setHSL(.95+(j%2)*.01,.38,.7+(j%3)*.03);
+      else if(palm)color.setHSL(.24+(j%2)*.01,.34,.3+(j%3)*.02);
+      else color.setHSL(.21+(i%5)*.008,.28+(j%3)*.05,.23+(i%7)*.018);
       foliage.setColorAt(i*4+j,color);
     }
   });
-  foliage.name='surveyed-coastal-canopy';trunks.name='surveyed-coastal-trunks';
-  foliage.castShadow=trunks.castShadow=true;foliage.receiveShadow=trunks.receiveShadow=true;scene.add(foliage,trunks);
+  planted.forEach((tree,i)=>{
+    const [x,y,z]=tree.position,r=(tree.type==='waterfront'?1.6:2.6)*tree.scale;
+    dummy.rotation.set(0,0,0);
+    dummy.position.set(x,z+.3,-y);dummy.scale.set(r,.6,r);dummy.updateMatrix();rims.setMatrixAt(i,dummy.matrix);
+    dummy.position.set(x,z+.62,-y);dummy.scale.set(r-.35,.04,r-.35);dummy.updateMatrix();beds.setMatrixAt(i,dummy.matrix);
+  });
+  foliage.name='surveyed-coastal-canopy';trunks.name='surveyed-coastal-trunks';rims.name=beds.name='tree-planters';
+  foliage.castShadow=trunks.castShadow=true;foliage.receiveShadow=trunks.receiveShadow=true;rims.receiveShadow=beds.receiveShadow=true;
+  scene.add(foliage,trunks);if(planted.length)scene.add(rims,beds);
 }
 
-const drum=new T.CylinderGeometry(1,1,1,40);
 /** r8 (user: 2127 form, same green volume): green gathers in dense clusters on engineered two-step terraces — a wide white-rimmed
  * lawn tier with a ring of crowns and a raised inner tier with taller ones — instead of trees spread evenly. [x, z, ground y, radius]. */
 function plantClusters(scene:T.Object3D,clusters:[number,number,number,number][],scale=1){
@@ -51,7 +71,8 @@ function plantClusters(scene:T.Object3D,clusters:[number,number,number,number][]
     });
     const ring=Math.max(3,Math.round(R*.6));
     for(let j=0;j<ring;j++){const [tx,tz]=at(.74,j/ring*Math.PI*2+i);trees.push({position:[tx,-tz,y+.7],scale:scale*(.85+((i+j)%4)*.1),type:(i+j)%5===0?'columnar':'broadleaf'});}
-    for(let j=0;j<3;j++){const [tx,tz]=at(j?.28:0,j*Math.PI+i);trees.push({position:[tx,-tz,y+1.9],scale:scale*1.15,type:'broadleaf'});}
+    // Every other cluster crowns its raised tier with a cherry (target v2's pink scattered through the groves).
+    for(let j=0;j<3;j++){const [tx,tz]=at(j?.28:0,j*Math.PI+i);trees.push({position:[tx,-tz,y+1.9],scale:scale*1.15,type:!j && i%2?'cherry':'broadleaf'});}
   });
   plantCanopy(scene,{instances:trees});
   rims.name=beds.name='grove-terraces';rims.castShadow=beds.castShadow=true;rims.receiveShadow=beds.receiveShadow=true;scene.add(rims,beds);
@@ -108,25 +129,45 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
   plantClusters(scene,clusters);
 }
 
-/** The Odaiba backdrop beyond the district keeps its parks as one unshadowed batch of low crowns, receding with the ground it stands on. */
+/** The Odaiba backdrop beyond the district keeps its parks as one unshadowed batch of low crowns, receding with the ground it stands on.
+ * r8 pass 2: the same crown count gathers into tight oval groves on white-rimmed plinths (52 m cells, eight crowns each) instead of
+ * pairs dotted evenly every 26 m — open lawn between, every green mass framed by an engineered edge. */
 export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
   environment.updateMatrixWorld(true);
-  const bounds=new T.Box3().setFromObject(environment),ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),matrices:T.Matrix4[]=[],dummy=new T.Object3D();
-  // ponytail: one unaccelerated ray per 26 m cell (~3k rays at load); add a BVH if the plate grows.
-  for(let x=bounds.min.x;x<bounds.max.x;x+=26)for(let z=bounds.min.z;z<bounds.max.z;z+=26){
-    if(inDistrict(x,z) || Math.sin(x*.019+Math.sin(z*.021)*2)+Math.cos(z*.027)<-.35)continue;
-    const px=x+Math.sin(z*1.7+x)*8,pz=z+Math.cos(x*1.3-z)*8;
-    if(seaward(px,pz))continue;
-    ray.set(new T.Vector3(px,300,pz),down);
+  const bounds=new T.Box3().setFromObject(environment),ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),matrices:T.Matrix4[]=[],plinths:T.Matrix4[]=[],lawns:T.Matrix4[]=[],dummy=new T.Object3D();
+  const groundAt=(x:number,z:number)=>{
+    ray.set(new T.Vector3(x,300,z),down);
     const hit=ray.intersectObject(environment,true)[0];
-    if(!hit || !(hit.object instanceof T.Mesh) || Array.isArray(hit.object.material) || hit.object.material.name!=='landscape' || hit.point.y>=9)continue;
-    for(let j=0;j<2;j++){
-      const a=j*3.1+x*.1,s=4.2+(Math.sin(x*3.1+z+j)+1)*1.3;
-      dummy.position.set(px+Math.cos(a)*5,hit.point.y+s*.9,pz+Math.sin(a)*5);dummy.scale.set(s,s*.85,s);dummy.rotation.set(0,a,0);dummy.updateMatrix();matrices.push(dummy.matrix.clone());
+    return hit && hit.object instanceof T.Mesh && !Array.isArray(hit.object.material) && hit.object.material.name==='landscape' && hit.point.y<9 ? hit.point.y : null;
+  };
+  // ponytail: one unaccelerated ray per crown (~3k rays at load, as before); add a BVH if the plate grows.
+  for(let x=bounds.min.x;x<bounds.max.x;x+=52)for(let z=bounds.min.z;z<bounds.max.z;z+=52){
+    const px=x+Math.sin(z*1.7+x)*12,pz=z+Math.cos(x*1.3-z)*12;
+    if(inDistrict(px,pz) || seaward(px,pz) || Math.sin(px*.019+Math.sin(pz*.021)*2)+Math.cos(pz*.027)<-.35)continue;
+    const y=groundAt(px,pz);
+    if(y===null)continue;
+    const yaw=Math.sin(px*.37+pz*.11)*3,R=11+(Math.sin(px*.7+pz)+1)*2,c=Math.cos(yaw),sn=Math.sin(yaw);
+    const crowns:T.Matrix4[]=[];
+    for(let j=0;j<8;j++){
+      // Ring of six on the rim tier, two taller at the heart.
+      const f=j<6?.68:.22,a=j<6?j/6*Math.PI*2:j*Math.PI,lx=Math.cos(a)*f*R*1.3,lz=Math.sin(a)*f*R/1.3;
+      const tx=px+lx*c+lz*sn,tz=pz-lx*sn+lz*c,ty=groundAt(tx,tz);
+      if(ty===null || inDistrict(tx,tz) || seaward(tx,tz))continue;
+      const s=(j<6?4.2:5.6)+(Math.sin(x*3.1+z+j)+1)*1.1;
+      dummy.position.set(tx,ty+.6+s*.9,tz);dummy.scale.set(s,s*.85,s);dummy.rotation.set(0,a,0);dummy.updateMatrix();crowns.push(dummy.matrix.clone());
     }
+    // Only whole groves: a clipped one would leave crowns off the plinth.
+    if(crowns.length<5)continue;
+    matrices.push(...crowns);
+    dummy.position.set(px,y+.3,pz);dummy.scale.set(R*1.3,.6,R/1.3);dummy.rotation.set(0,yaw,0);dummy.updateMatrix();plinths.push(dummy.matrix.clone());
+    dummy.position.y=y+.62;dummy.scale.set(R*1.3-.6,.04,R/1.3-.6);dummy.updateMatrix();lawns.push(dummy.matrix.clone());
   }
   const material=new T.MeshStandardMaterial({color:'#ffffff',roughness:.95});recedeBeyondDistrict(material);
   const grove=new T.InstancedMesh(new T.IcosahedronGeometry(1,1),material,matrices.length),color=new T.Color();
-  matrices.forEach((matrix,i)=>{grove.setMatrixAt(i,matrix);grove.setColorAt(i,color.setHSL(.22+(i%5)*.01,.3+(i%3)*.04,.22+(i%7)*.02));});
-  grove.name='backdrop-grove';grove.receiveShadow=true;scene.add(grove);
+  matrices.forEach((matrix,i)=>{grove.setMatrixAt(i,matrix);grove.setColorAt(i,i%13===4?color.setHSL(.95,.32,.72):color.setHSL(.22+(i%5)*.01,.3+(i%3)*.04,.22+(i%7)*.02));});
+  const rimMaterial=new T.MeshStandardMaterial({color:'#e2ded3',roughness:.7});recedeBeyondDistrict(rimMaterial);
+  const bedMaterial=new T.MeshStandardMaterial({color:'#7f9b6d',roughness:.9});recedeBeyondDistrict(bedMaterial);
+  const rims=new T.InstancedMesh(drum,rimMaterial,plinths.length),beds=new T.InstancedMesh(drum,bedMaterial,lawns.length);
+  plinths.forEach((matrix,i)=>rims.setMatrixAt(i,matrix));lawns.forEach((matrix,i)=>beds.setMatrixAt(i,matrix));
+  grove.name='backdrop-grove';rims.name=beds.name='backdrop-grove-plinths';grove.receiveShadow=rims.receiveShadow=beds.receiveShadow=true;scene.add(grove,rims,beds);
 }
