@@ -60,20 +60,17 @@ export function tidalEdge() {
       // Lit blue rim: the waterfront edge joins the 2127 light-trail network.
       box(g,[.4,.3,step+.6],[-5.05,-.04,0],trail,.05);
       box(g,[3.2,.6,step+.6],[-10.6,-1.05,0],leaf,.1);
-      // r7: the marsh steps down once more as a tidal reed shelf, each step held by a white curb (stepped wetland terraces).
-      box(g,[.35,.8,step+.6],[-12.35,-.85,0],trim,.05);
-      box(g,[3.2,.5,step+.6],[-14.1,-1.4,0],leaf,.1);
-      box(g,[.35,.6,step+.6],[-15.85,-1.25,0],trim,.05);
       if(chunk%4===1){
-        // Pavilion straddling both terraces: warm room under a pale stepped roof (r7: no planted roof).
+        // Pavilion straddling both terraces: warm room, planted roof slab.
         box(g,[6,3.2,8.4],[-5,1.3,0],lantern,.1);
         box(g,[7.6,.35,10.4],[-5,3.08,0],trim,.1);
-        box(g,[6.4,.3,9.2],[-5,3.4,0],stone,.1);
+        box(g,[6.4,.3,9.2],[-5,3.4,0],leaf,.1);
       }
       if(chunk%7===3 && clear(x,z,48)){
-        // Reed islet riding off the marsh edge: a white-rimmed habitat bed, no shrub mounds.
+        // Planted islet riding off the marsh edge.
         box(g,[9,1.2,16],[-24,-.6,0],stone,.2);
         box(g,[7.6,.5,14.6],[-24,.2,0],leaf,.2);
+        for(let j=0;j<4;j++)sourceGeometry.add(arc(g,0,1.4+(j%2)*.5,2+(j%3)*.9,[-24+(j%2?1.6:-1.6),.45,-5+j*3.3],leaf).geometry);
       }
     }
   }

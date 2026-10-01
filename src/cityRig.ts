@@ -16,7 +16,7 @@ export const solar=paint('#486b83',.3,.85);
 export const membrane=new T.MeshStandardMaterial({color:'#9abdb9',roughness:.3,metalness:.25,transparent:true,opacity:.72,side:T.DoubleSide});
 // Pilot finishes (docs/ART.md): silvered glass that reads the sky, living green, pale stone paving.
 export const glass=new T.MeshPhysicalMaterial({color:'#a7c3cf',roughness:.08,metalness:.6,clearcoat:1,clearcoatRoughness:.06});
-export const leaf=paint('#93a38a',.88), stone=paint('#ebe8e0',.66);
+export const leaf=paint('#7d9f68',.85), stone=paint('#ebe8e0',.66);
 // Silvered glass for the 2127 spheres: warm and only partly metallic, so they read as polished silver mirrors of the golden sky, not blue domes.
 // r4 pass 4: near-full mirror with a boosted env response, so each sphere reads as one bright silver ball (target v2), not a dome over a dark band.
 // r5 pass 3: the mirrors see their own warm golden-hour panorama (pale gold sky, bright cream horizon, sun glow to the south-west,

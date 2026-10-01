@@ -4,7 +4,7 @@ import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
 import { civicCore } from './civicCore';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
-import { CORRIDOR, plantBackdropGrove, plantCanopy, plantLandscapeCanopy } from './coastalCanopy';
+import { plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
 import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
 import { changeSites, DISTRICT, inDistrict, SEAWARD_GLSL } from './layout';
@@ -28,27 +28,14 @@ const environmentFinish: Record<string, [color: string, roughness: number, metal
   context_unknown: ['#e3dccf', .9, 0], context_office_commercial: ['#dfd8ca', .85, 0], context_utility_service: ['#d8d4c9', .9, 0], context_public_cultural: ['#e2dbcd', .9, 0],
 };
 
-// 2127 retrofit by material: mall roofs become ivory decks with ruled sage beds (roofBeds), hotel roofs pale ceramic terraces (r5 pass 2: target v2 has no blue metal roofs), stark white cladding warm ceramic; no extra geometry.
+// 2127 retrofit by material: mall roofs become planted, hotel roofs pale ceramic terraces (r5 pass 2: target v2 has no blue metal roofs), stark white cladding warm ceramic; no extra geometry.
 const roofRetrofit: Record<string, [color: string, roughness: number, metalness: number]> = {
-  'Roof and Shadow': ['#e6e0d3', .7, 0], 'Standing seam roof.001': ['#e6ddcc', .55, .05], 'Gray roof metal': ['#e6ddcc', .55, .05],
+  'Roof and Shadow': ['#7d9f68', .85, 0], 'Standing seam roof.001': ['#e6ddcc', .55, .05], 'Gray roof metal': ['#e6ddcc', .55, .05],
   'PCa_Panel_OffWhite': ['#e4d9c5', .62, 0],
   // r6 pass 2: DECKS' coral and ochre fins read as red stripes; target v2's mid-rises are ivory only.
   'Muted Coral Vertical Structure': ['#ebe2d2', .58, 0], 'Ochre Accent Structure': ['#ebe2d2', .58, 0], 'Facade_White': ['#e2d8c6', .6, 0],
   'Warm Ivory Structure': ['#e8dcc8', .6, 0], 'Pale balcony slab and crown': ['#e9dfcd', .6, 0], 'Light vertical piers.001': ['#ebe0cd', .6, 0],
 };
-// Planted roofs as engineered beds: ivory deck ruled into 6 m sage strips on the street grid (gridUV), each held by a white curb, 10 m pitch.
-function roofBeds(material: T.MeshStandardMaterial) {
-  material.onBeforeCompile = shader => {
-    shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 roofXz;').replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nroofXz=(modelMatrix*vec4(transformed,1.)).xz;');
-    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 roofXz;').replace('#include <color_fragment>', `#include <color_fragment>
-      float rv=fract(dot(roofXz,vec2(.555,.832))/10.)*10.;
-      float bed=step(2.,rv)*step(rv,8.),curb=step(1.5,rv)*step(rv,8.5)*(1.-bed);
-      diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.6,.65,.55),bed);
-      diffuseColor.rgb=mix(diffuseColor.rgb,vec3(1.),curb*.8);`);
-  };
-  material.customProgramCacheKey = () => 'roof-beds';
-}
-
 // Aqua City and DECKS flat facade panels become storey-banded curtain walls: warm spandrels, dark panes with lit interiors per bay.
 const curtainWalls: Record<string, string> = {
   // r4 pass 4: warm ivory spandrels (target v2's cream mid-rises), no brown or ochre bands.
@@ -115,26 +102,20 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     // Context massing (district and backdrop) carries the same storey-banded curtain wall and lit bays as Aqua City and DECKS.
     if (finish && material.name.startsWith('context_') && material.customProgramCacheKey() !== 'curtain-wall') curtainWall(material, finish[0]);
     if(material.name==='landscape'){
-      material.map=grass;material.color.set('#b4bba6'); // r7: sage/silver-green, not game-green lawn
+      material.map=grass;material.color.set('#b2cc98'); // r6 pass 2: lusher green (target v2)
       // World metres keep the authored terrain patches at one consistent texture scale.
       material.onBeforeCompile=shader=>{
         shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\ngrassUv=(modelMatrix*vec4(transformed,1.)).xz/32.;');
-        // Inside the district the landscape is ivory paving holding long, narrow hard-edged sage bed strips (32×8 m in 40×20 m cells, r7 pass 2) on the street grid (gridUV, coastalCanopy.ts),
-        // white curbs round every bed, and one straight climate corridor with white rims (CORRIDOR, kept clear of trees); survey sites stay dry.
+        // Inside the district the lawns become a park landscape: reflecting ponds in the grove swales (the same field plantLandscapeCanopy
+        // leaves clear, so no crowns stand in water; survey sites stay dry) with pale stone rims, and meandering gravel walks along another field's contours.
         shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <map_fragment>',`diffuseColor.rgb *= mix(texture2D(map,grassUv).rgb,texture2D(map,grassUv*.19).rgb,.35);
           vec2 w=grassUv*32.;
           float inside=step(${DISTRICT.minX.toFixed(1)},w.x)*step(w.x,${DISTRICT.maxX.toFixed(1)})*step(${DISTRICT.minZ.toFixed(1)},w.y)*step(w.y,${DISTRICT.maxZ.toFixed(1)});
-          vec2 q=vec2(dot(w,vec2(-.832,.555)),dot(w,vec2(.555,.832)));
-          vec2 cell=(.5-abs(fract(q/vec2(40.,20.))-.5))*vec2(40.,20.);
+          float swale=sin(w.x*.023+sin(w.y*.018)*2.)+cos(w.y*.031);
           float site=${Object.values(changeSites).map(c=>`step(abs(w.x-(${c.x.toFixed(1)})),${(c.w*c.scale/2+14).toFixed(1)})*step(abs(w.y-(${c.z.toFixed(1)})),${(c.d*c.scale/2+14).toFixed(1)})`).join('+')};
-          float cv=abs(q.y-(${CORRIDOR.v.toFixed(1)}));
-          float pond=inside*(1.-min(site,1.))*step(cv,${CORRIDOR.half.toFixed(1)}),rim=inside*(1.-min(site,1.))*step(cv,${(CORRIDOR.half+1.2).toFixed(1)})-pond;
-          float bed=step(4.,cell.x)*step(6.,cell.y),curb=step(3.3,cell.x)*step(5.3,cell.y)*(1.-bed);
-          // r7 pass 3: every bed, and the backdrop lawn, desaturated toward a lifted sage/silver-green (no game-green lawn).
-          float lum=dot(diffuseColor.rgb,vec3(.3,.59,.11));
-          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.30,.34,.28)+lum*vec3(1.,1.1,.9),mix(.75,1.,inside*bed));
-          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.87,.85,.79),inside*(1.-bed)*(1.-pond));
-          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.96,.95,.91),inside*max(curb,rim)*(1.-pond));
+          float pond=inside*(1.-min(site,1.))*(1.-smoothstep(-1.28,-1.24,swale)),rim=inside*(1.-min(site,1.))*(1.-smoothstep(-1.17,-1.13,swale))-pond;
+          float walk=inside*(1.-smoothstep(.06,.1,abs(sin(w.x*.037+cos(w.y*.029)*1.6)+sin(w.y*.033+w.x*.011))));
+          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.72,.67,.58),max(walk,rim)*(1.-pond));
           diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.16,.36,.46),pond);`).replace('#include <metalnessmap_fragment>','#include <metalnessmap_fragment>\nroughnessFactor=mix(roughnessFactor,.06,pond);metalnessFactor=mix(metalnessFactor,.35,pond);');
       };
       material.customProgramCacheKey=()=>'coastal-grass-ponds';
@@ -146,20 +127,23 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) receded.add(object.material); });
   receded.forEach(material => { if (cutGround.has(material.name)) openBay(material); recedeBeyondDistrict(material); });
   scene.add(contextFacades(environment), bayContext());
-  plantCanopy(scene,{instances:trees.instances.filter((_,i)=>i%2===0)}); // r7 pass 2: half the surveyed trees, the paving carries the district
+  plantCanopy(scene,trees);
   plantBackdropGrove(scene,environment);
+  // Sky gardens crown the tall context towers (the only CTX mesh above 30 m inside the district).
+  environment.traverse(object=>{if(object instanceof T.Mesh && object.name.startsWith('CTX_') && new T.Box3().setFromObject(object).max.y>30)plantRoofCanopy(scene,object,true);});
   await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1])).map(async placement => {
     if(placement.id==='fuji-tv'){scene.add(civicCore());return;}
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);
     model.name = placement.id;
     placeOdaibaModel(model, placement);
-    // r7 pass 2: no roof trees anywhere (CITY_MASTER_TASTE rejects rooftop gardens); planted roofs become ivory decks with ruled sage beds (roofBeds).
+    if(placement.id==='aqua-city-odaiba' || placement.id==='decks-tokyo-beach')plantRoofCanopy(scene,model);
+    else if(placement.id==='grand-nikko-tokyo-daiba' || placement.id==='divercity-office-tower')plantRoofCanopy(scene,model,true);
     model.traverse(object => {
       if (!(object instanceof T.Mesh)) return;
       for (const material of [object.material].flat() as T.MeshStandardMaterial[])
         if (curtainWalls[material.name]) { if (!material.customProgramCacheKey().startsWith('curtain')) curtainWall(material, curtainWalls[material.name]); }
         else if (/glass|glazing|window reflection/i.test(material.name) && !glazing.has(material)) { material.emissive.copy(warm); material.emissiveIntensity = dayGlow; material.roughness=.22;material.metalness=.38;glazing.add(material); }
-        else if (roofRetrofit[material.name]) { const [color, roughness, metalness] = roofRetrofit[material.name]; material.color.set(color); material.roughness = roughness; material.metalness = metalness; if (material.name === 'Roof and Shadow' && material.customProgramCacheKey() !== 'roof-beds') roofBeds(material); }
+        else if (roofRetrofit[material.name]) { const [color, roughness, metalness] = roofRetrofit[material.name]; material.color.set(color); material.roughness = roughness; material.metalness = metalness; }
     });
     // One draw per finish instead of one per surveyed part (30–50 per landmark); materials stay shared, so night glazing still applies.
     const parts: T.BufferGeometry[] = []; model.traverse(object => { if (object instanceof T.Mesh) parts.push(object.geometry); });

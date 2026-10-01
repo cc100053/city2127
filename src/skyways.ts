@@ -152,12 +152,13 @@ function shoreTerraces(root: T.Object3D) {
       arc(c, 0, r * .62, 2.2, [0, .4 + L, 0], stone);
       arc(c, r * .62 - .4, r * .62 + .2, .5, [0, 2.6 + L, 0], trim);
       arc(c, 0, r * .6 - .4, .3, [0, 2.6 + L, 0], leaf);
-      for (let k = 0; k < 3; k++) {
-        const a = k * 2.1 + n, rr = k < 2 ? r * .25 : r * .75, top = (k < 2 ? 2.9 : .65) + L, s = 1.6 + (k % 3) * .5;
-        // Palms only (target v2's seaside palms): a tall slim trunk under a wide, flat crown; r7 pass 3 drops the round cherry blobs here.
-        const h = 5.5 + (k % 2) * 1.5;
-        const trunk = new T.Mesh(pole, trim); trunk.scale.set(.3, h, .3); trunk.position.set(Math.cos(a) * rr, top + h / 2, Math.sin(a) * rr); c.add(trunk);
-        const tree = new T.Mesh(crown, leaf); tree.position.set(Math.cos(a) * rr, top + h + .3, Math.sin(a) * rr); tree.scale.set(s * 1.5, s * .4, s * 1.5);
+      for (let k = 0; k < 6; k++) {
+        const a = k * 1.05 + n, rr = k < 2 ? r * .25 : r * .75, top = (k < 2 ? 2.9 : .65) + L, s = 1.6 + (k % 3) * .5;
+        // Mostly palms (target v2's seaside palms): a tall slim trunk under a wide, flat crown; every fourth tree a round cherry.
+        const palm = (k + n) % 4 !== 0, h = palm ? 5.5 + (k % 2) * 1.5 : 2.2;
+        const trunk = new T.Mesh(pole, trim); trunk.scale.set(palm ? .3 : .25, h, palm ? .3 : .25); trunk.position.set(Math.cos(a) * rr, top + h / 2, Math.sin(a) * rr); c.add(trunk);
+        const tree = new T.Mesh(crown, palm ? leaf : cherry); tree.position.set(Math.cos(a) * rr, top + h + (palm ? .3 : s * .7), Math.sin(a) * rr);
+        if (palm) tree.scale.set(s * 1.5, s * .4, s * 1.5); else tree.scale.set(s * 1.2, s, s * 1.2);
         c.add(tree);
       }
       // Waterfalls on the seaward side: an upper sheet onto the drum, then three wide sheets down the drum into the sea, each with foam.
@@ -178,21 +179,19 @@ function shoreTerraces(root: T.Object3D) {
 /** 2127 identity at height: lit skyways, tower rings and suspended glass spheres, plus the round waterfall terraces on the bay. */
 export function skyways() {
   const root = new T.Group(); root.name = 'skyways';
-  // Planted mid-level decks: a sage bed held in a white curb down the deck's middle, one row of trees every ~18 m, every third a cherry.
-  // r7: the tower rings carry no planting (CITY_MASTER_TASTE rejects planted rings/rooftop gardens).
-  const garden = (curve: T.Curve<T.Vector3>) => {
-    const length = curve.getLength(), count = Math.round(length / 18), segments = Math.ceil(length / 3);
-    root.add(new T.Mesh(deck(curve, 5.2, .5, segments), trim)); root.children.at(-1)!.position.y = .4;
-    root.add(new T.Mesh(deck(curve, 4.2, .5, segments), leaf)); root.children.at(-1)!.position.y = .5;
-    for (let i = 1; i < count; i++) {
+  // Planted decks (target v2's tree-lined halos and middle layer): a lawn bed down the deck's middle with a tree every ~9 m, every third a cherry.
+  const garden = (curve: T.Curve<T.Vector3>, closed: boolean) => {
+    const length = curve.getLength(), count = Math.round(length / 9);
+    root.add(new T.Mesh(deck(curve, 5.2, .45, Math.ceil(length / 3)), leaf)); root.children.at(-1)!.position.y = .45;
+    for (let i = closed ? 0 : 1; i < count; i++) {
       const p = curve.getPointAt(i / count), s = 1.9 + (i % 3) * .4;
       const trunk = new T.Mesh(pole, trim); trunk.scale.set(.3, 2.6, .3); trunk.position.set(p.x, p.y + 1.5, p.z); root.add(trunk);
       const tree = new T.Mesh(crown, i % 3 === 1 ? cherry : leaf); tree.scale.set(s * 1.15, s, s * 1.15); tree.position.set(p.x, p.y + 2.6 + s * .8, p.z); root.add(tree);
     }
   };
-  for (const ring of RINGS) skyway(root, circle(ring), true);
+  for (const ring of RINGS) { skyway(root, circle(ring), true); garden(circle(ring), true); }
   for (const points of [...LINKS, sweepway.map(p => [...p] as P3)]) skyway(root, new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'), false);
-  for (const points of GARDEN_LINKS) { const curve = new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'); skyway(root, curve, false); garden(curve); }
+  for (const points of GARDEN_LINKS) { const curve = new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'); skyway(root, curve, false); garden(curve, false); }
   for (const s of SPHERES) sphere(root, s.centre, s.radius, s.deck);
   // Lit blue lines at street level too (target v2): both edges of the seaside promenades.
   for (const walk of routes().promenades) for (const side of [-3.6, 3.6]) root.add(new T.Mesh(offsetTube(walk, side, .25, .3, false), trail));

@@ -10,7 +10,7 @@ import { routes } from '../src/mobility.ts';
 import { civicCore } from '../src/civicCore.ts';
 import { bake } from '../src/cityRig.ts';
 import { contextFacades } from '../src/contextFacades.ts';
-import { plantCanopy, plantLandscapeCanopy } from '../src/coastalCanopy.ts';
+import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from '../src/coastalCanopy.ts';
 import { amphibiousShore, tidalEdge } from '../src/amphibiousShore.ts';
 import { bayContext } from '../src/bayContext.ts';
 
@@ -59,6 +59,7 @@ for (const placement of layout.buildings) {
     assert.ok(mergedBounds.min.distanceTo(actual.min)<.01 && mergedBounds.max.distanceTo(actual.max)<.01,`${placement.id} merged bounds unchanged`);
     city.add(scene);landmarks.push(scene);
   }
+  if(placement.id==='aqua-city-odaiba' || placement.id==='decks-tokyo-beach')plantRoofCanopy(city,scene);
 }
 assert.equal(triangles, 339919, 'All eight complete GLBs retain reviewed geometry');
 const core=civicCore();city.add(core);
