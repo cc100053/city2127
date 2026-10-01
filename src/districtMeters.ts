@@ -451,3 +451,147 @@ export class AutomationDistrict {
     for (const mesh of this.meshes) mesh.instanceMatrix.needsUpdate = true;
   }
 }
+
+/** Lit-room strength on the concentration towers' glass (odaibaScene.updateOdaiba follows the night). */
+export const towerGlow = { value: .3 };
+
+// Traced open ground (tests/odaiba.test.ts checks ground, landmarks, context and routes): towers rise beside the SE site, at the DECKS
+// waterfront and from the western lawns where low concentration scatters its pods.
+// ponytail: skyway clearance was checked once in the browser (skyways.ts imports JSON Node cannot load); recheck these sites if skyways move.
+const TOWER_SITES: readonly (readonly [number, number, number])[] = [
+  [115, -25, 128], [67, -89, 112], [27, -249, 120], [83, -305, 104], [-189, -1, 140], [-221, -73, 116], [-157, 63, 124], [-61, 111, 104], [179, 287, 120], [-13, 279, 110],
+];
+const POD_SITES: readonly (readonly [number, number])[] = [
+  [-293, 147], [-253, -33], [-233, 47], [-223, -23], [-173, -53], [-163, -133], [-103, 17], [-53, 147], [-33, 167], [-23, 107], [-3, -53], [27, 87], [77, 107], [87, 57], [97, -73], [107, -123], [107, 77], [117, 7], [137, -103], [207, 37], [217, -43], [217, 87], [237, -73], [237, 57], [247, -103], [247, 147],
+];
+
+/** Q4: one walkable vertical district or functions spread through the parks.
+ * High raises slender glass towers with lit sky lobbies on open ground; low scatters low glass pavilion pods across the lawns.
+ * Both are complete 2127 forms; mixed shows about half of each. Positions are traced open ground (actual-mesh checks in odaiba.test.ts). */
+export class ConcentrationDistrict {
+  readonly root = new T.Group();
+  /** [x, z, height]: spire tips (1.06 × height) stay below the 170 m air-taxi loop. */
+  readonly towers: readonly { x: number; z: number; h: number }[] = TOWER_SITES.map(([x, z, h]) => ({ x, z, h }));
+  readonly pods: readonly { x: number; z: number; yaw: number }[] = POD_SITES.map(([x, z], i) => ({ x, z, yaw: i * 2.1 }));
+  private readonly towerLevels = new SlotLevels(this.towers.length);
+  private readonly podLevels = new SlotLevels(this.pods.length);
+  private readonly towerMeshes: T.InstancedMesh[];
+  private readonly podMeshes: T.InstancedMesh[];
+  readonly bridges: { i: number; j: number; y: number }[] = [];
+  private readonly bridgeMeshes: T.InstancedMesh[];
+  private readonly dummy = new T.Object3D();
+  private target = .5;
+
+  constructor(parent: T.Object3D) {
+    this.root.name = 'concentration-district';
+    // Sky-blue glass with warm-lit rooms on 4.2 m storeys (about half the bays occupied): the new vertical district reads apart from the
+    // ivory mid-rise city by day and as lit towers at night (`towerGlow`, driven by updateOdaiba).
+    const facade = new T.MeshStandardMaterial({ color: '#6f9cbd', roughness: .18, metalness: .15, emissive: '#ffd6a0' });
+    facade.onBeforeCompile = shader => {
+      shader.uniforms.towerGlow = towerGlow;
+      shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 towerP;\nvarying vec2 towerC;')
+        .replace('#include <project_vertex>', `#include <project_vertex>
+        { vec4 w = vec4(transformed, 1.), c = vec4(0., 0., 0., 1.);
+        #ifdef USE_INSTANCING
+          w = instanceMatrix * w; c = instanceMatrix * c;
+        #endif
+          towerP = (modelMatrix * w).xyz; towerC = (modelMatrix * c).xz; }`);
+      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float towerGlow;\nvarying vec3 towerP;\nvarying vec2 towerC;')
+        .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+        vec2 room = vec2(floor(atan(towerP.x - towerC.x, towerP.z - towerC.y) * 2.546), floor(towerP.y / 4.2));
+        float lit = step(.5, fract(sin(dot(room + towerC, vec2(12.9898, 78.233))) * 43758.5453)) * step(.25, fract(towerP.y / 4.2));
+        totalEmissiveRadiance *= lit * towerGlow;`);
+    };
+    facade.customProgramCacheKey = () => 'concentration-tower-glass';
+    const lobby = publicLight.clone(); lobby.emissive.set('#ffe1b8'); lobby.emissiveIntensity = .9;
+    // Unit-height tower (1 m tall, scaled per site): podium, glass shaft with ivory floor bands, two lit sky lobbies, planted crown.
+    const tower = new T.Group();
+    const unit = (geometry: T.BufferGeometry, material: T.Material, y: number) => { const m = new T.Mesh(geometry, material); m.position.y = y; tower.add(m); };
+    unit(new T.CylinderGeometry(17.5, 18.5, .05, 32), trim, .025);
+    unit(new T.CylinderGeometry(13.5, 16, .94, 32), facade, .52);
+    for (let y = .1; y < .94; y += .09) unit(new T.CylinderGeometry(16.1 - y * 2.6, 16.1 - y * 2.6, .005, 32), trim, y);
+    // Two sky lobbies: wide ivory decks with a planted outer ring and a warm-lit glazed band (a street lifted into the air).
+    for (const y of [.4, .72]) {
+      unit(new T.CylinderGeometry(23, 23, .02, 40), trim, y);
+      unit(new T.CylinderGeometry(22.6, 22.6, .006, 40), leaf, y + .013);
+      unit(new T.CylinderGeometry(17.5, 17.5, .03, 40, 1, true), lobby, y + .03);
+    }
+    unit(new T.CylinderGeometry(16, 13, .035, 32), trim, .97);
+    unit(new T.SphereGeometry(13, 24, 10, 0, Math.PI * 2, 0, Math.PI / 2).scale(1, .002, 1), leaf, .99);
+    unit(new T.CylinderGeometry(.5, .9, .12, 8), trim, 1.05);
+    this.towerMeshes = this.instances(bake(tower), this.towers.length, 'concentration-vertical-towers');
+    // Sky bridges join neighbouring towers at both lobby levels of the lower one (a connected vertical street).
+    this.towers.forEach((a, i) => this.towers.forEach((b, j) => {
+      if (j > i && Math.hypot(a.x - b.x, a.z - b.z) < 80) for (const level of [.4, .72]) this.bridges.push({ i, j, y: level * Math.min(a.h, b.h) });
+    }));
+    const bridge = new T.Group();
+    box(bridge, [1, 4.5, 10], [0, 0, 0], trim);
+    box(bridge, [1, 2, 10.4], [0, .8, 0], lobby);
+    this.bridgeMeshes = this.instances(bake(bridge), this.bridges.length, 'concentration-sky-bridges');
+    // Pod: a ring of warm-lit glass under a floating ivory disc with a planted top, on a slim stem.
+    const pod = new T.Group();
+    box(pod, [2.4, 4, 2.4], [0, 2, 0], trim);
+    const drum = new T.Mesh(new T.CylinderGeometry(7, 7, 4.2, 28), lobby); drum.position.y = 6; pod.add(drum);
+    const disc = new T.Mesh(new T.CylinderGeometry(10.5, 9, 1.4, 32), trim); disc.position.y = 8.8; pod.add(disc);
+    const bed = new T.Mesh(new T.CylinderGeometry(9.2, 9.2, .4, 28), leaf); bed.position.y = 9.6; pod.add(bed);
+    this.podMeshes = this.instances(bake(pod), this.pods.length, 'concentration-distributed-pods');
+    this.root.visible = false; parent.add(this.root); this.write();
+  }
+
+  setTarget(layout: Pick<ExhibitionLayout, 'functionModules'>, now: number, immediate: boolean): boolean {
+    this.target = (layout.functionModules - 2) / 4;
+    // First low / high proposals (3 / 5 modules) read as the two complete forms; mixed (4) keeps about half of each.
+    const share = T.MathUtils.smoothstep(this.target, .3, .75);
+    this.root.visible = true;
+    // Golden-ratio order: with only ten towers a hash rank clusters, this keeps any share evenly spread across both groups.
+    const order = (i: number, offset: number) => (i * .6180339887 + offset) % 1;
+    const a = this.towerLevels.setTargets(i => order(i, .31) < share ? 1 : 0, now, immediate);
+    const b = this.podLevels.setTargets(i => order(i, .77) >= share ? 1 : 0, now, immediate);
+    this.write(); return a || b;
+  }
+
+  update(now: number): void {
+    const a = this.towerLevels.update(now), b = this.podLevels.update(now);
+    if (a || b) this.write();
+  }
+
+  hide(): void { this.root.visible = false; }
+
+  getDiagnostics() {
+    return { enabled: this.root.visible, targetConcentration: this.target, towers: this.towers.length, pods: this.pods.length,
+      visibleTowers: this.root.visible ? this.towerLevels.visible() : 0, visiblePods: this.root.visible ? this.podLevels.visible() : 0 };
+  }
+
+  private instances(sources: T.Mesh[], count: number, name: string): T.InstancedMesh[] {
+    return sources.map(source => {
+      const mesh = new T.InstancedMesh(source.geometry, source.material, count);
+      mesh.name = name; mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;
+      mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); this.root.add(mesh); return mesh;
+    });
+  }
+
+  private write(): void {
+    this.towers.forEach((site, i) => {
+      // Towers rise from the plaza; hidden ones keep a tiny invertible scale (flattened normals poison the G-buffer).
+      const level = this.towerLevels.value[i], footprint = level > .02 ? 1 : HIDDEN;
+      this.dummy.position.set(site.x, 0, site.z); this.dummy.rotation.set(0, i, 0);
+      this.dummy.scale.set(footprint, Math.max(HIDDEN, level) * site.h, footprint); this.dummy.updateMatrix();
+      for (const mesh of this.towerMeshes) mesh.setMatrixAt(i, this.dummy.matrix);
+    });
+    this.pods.forEach((site, i) => {
+      this.dummy.position.set(site.x, 0, site.z); this.dummy.rotation.set(0, site.yaw, 0);
+      this.dummy.scale.setScalar(Math.max(HIDDEN, this.podLevels.value[i])); this.dummy.updateMatrix();
+      for (const mesh of this.podMeshes) mesh.setMatrixAt(i, this.dummy.matrix);
+    });
+    this.bridges.forEach(({ i, j, y }, k) => {
+      // A bridge spans only once both towers stand; it grows out from the midpoint.
+      const a = this.towers[i], b = this.towers[j], level = Math.min(this.towerLevels.value[i], this.towerLevels.value[j]);
+      const length = Math.hypot(b.x - a.x, b.z - a.z) - 30, s = Math.max(HIDDEN, level);
+      this.dummy.position.set((a.x + b.x) / 2, y * s, (a.z + b.z) / 2);
+      this.dummy.rotation.set(0, Math.atan2(-(b.z - a.z), b.x - a.x), 0);
+      this.dummy.scale.set(length * s, s, s); this.dummy.updateMatrix();
+      for (const mesh of this.bridgeMeshes) mesh.setMatrixAt(k, this.dummy.matrix);
+    });
+    for (const mesh of [...this.towerMeshes, ...this.podMeshes, ...this.bridgeMeshes]) mesh.instanceMatrix.needsUpdate = true;
+  }
+}

@@ -56,6 +56,11 @@ function assertModels(view: ExhibitionCityView) {
   assert.equal(sharing.visibleOpenRooms + sharing.visiblePrivateRooms, sharing.rooms);
   if (view.layout.sharedSeats <= 2) assert.equal(sharing.visiblePrivateRooms, sharing.rooms);
   if (view.layout.sharedSeats >= 7) assert.equal(sharing.visibleOpenRooms, sharing.rooms);
+  const concentration = diagnostics.centerGaiRear.concentrationDistrict!;
+  assert.equal(concentration.enabled, true);
+  assert.equal(concentration.targetConcentration, (view.layout.functionModules - 2) / 4);
+  if (view.layout.functionModules <= 3) assert.deepEqual([concentration.visibleTowers, concentration.visiblePods], [0, concentration.pods]);
+  if (view.layout.functionModules >= 5) assert.deepEqual([concentration.visibleTowers, concentration.visiblePods], [concentration.towers, 0]);
 }
 function applyEvent(event: unknown, now: number) {
   const parsed = parseSurveyEvent(event);
@@ -120,6 +125,7 @@ try {
     scores: view.scores, layout: { nw: { lot: 'empty', building: 'none' }, ne: { lot: 'empty', building: 'none' },
       sw: { lot: 'empty', building: 'none' }, se: { lot: 'empty', building: 'none' } } }, 428);
   assert.equal(manager.getDiagnostics().dogenzakaSouth.sharingDistrict!.enabled, false, 'manager hides sharing in legacy v1');
+  assert.equal(manager.getDiagnostics().centerGaiRear.concentrationDistrict!.enabled, false, 'manager hides concentration in legacy v1');
   applyEvent(resetEvent, 432);
   console.log(`PASS: ${count} actual answer combinations → client parser → real four-site models; HTTP/WebSocket, retry, snapshot and reset.`);
 } finally { socket.close(); await server.close(); ctx.db.close(); }

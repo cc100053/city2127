@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { AutomationDistrict, EnvironmentDistrict, SharingDistrict, SlotLevels, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
+import { AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, SharingDistrict, SlotLevels, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
 import { mobility } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
@@ -146,3 +146,29 @@ sharing.hide(); sharing.update(20);
 assert.equal(sharing.root.visible, false);
 assert.equal(sharing.getDiagnostics().visibleOpenRooms + sharing.getDiagnostics().visiblePrivateRooms, 0);
 console.log(`PASS: sharing — ${hybrid.rooms} water gardens, actual screen matrices, mixed, same target, interruption, snapshot and legacy hide.`);
+
+// P4: low scatters every pod with no towers; high raises every tower with no pods; mixed keeps about half of each.
+const concentration = new ConcentrationDistrict(new T.Scene());
+const counts = () => { const d = concentration.getDiagnostics(); return [d.visibleTowers, d.visiblePods]; };
+concentration.setTarget({ functionModules: 3 }, 0, true);
+assert.deepEqual(counts(), [0, concentration.pods.length]);
+concentration.setTarget({ functionModules: 5 }, 1, false);
+concentration.update(2.5);
+const towerMesh = concentration.root.getObjectByName('concentration-vertical-towers') as T.InstancedMesh;
+const rising = new T.Vector3();
+towerMesh.getMatrixAt(0, matrix); rising.setFromMatrixScale(matrix);
+assert.ok(rising.y > concentration.towers[0].h * .3 && rising.y < concentration.towers[0].h * .7, 'towers rise over the 3-second transition');
+assert.equal(concentration.setTarget({ functionModules: 5 }, 2.5, false), false);
+concentration.update(4);
+assert.deepEqual(counts(), [concentration.towers.length, 0]);
+for (const object of concentration.root.children) {
+  const mesh = object as T.InstancedMesh;
+  for (let i = 0; i < mesh.count; i++) { mesh.getMatrixAt(i, matrix); assert.ok(matrix.determinant() > 0, `${mesh.name} keeps invertible matrices`); }
+}
+concentration.setTarget({ functionModules: 4 }, 5, true);
+const [mixedTowers, mixedPods] = counts();
+assert.ok(mixedTowers > 0 && mixedTowers < concentration.towers.length && mixedPods > 0 && mixedPods < concentration.pods.length, 'mixed is a hybrid');
+concentration.hide();
+assert.deepEqual(counts(), [0, 0]);
+assert.equal(concentration.root.visible, false);
+console.log(`PASS: concentration district — ${concentration.towers.length} towers / ${concentration.bridges.length} sky bridges vs ${concentration.pods.length} pods, rise, same target, mixed hybrid, invertible hidden matrices, legacy hide.`);

@@ -4,7 +4,7 @@ import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
 import { civicCore } from './civicCore';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
-import { facadeClimate, publishRoofGardens } from './districtMeters';
+import { facadeClimate, publishRoofGardens, towerGlow } from './districtMeters';
 import { CORRIDOR_GLSL, plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
 import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
@@ -88,7 +88,7 @@ const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a')
 export function updateOdaiba(night: number) {
   // A faint daytime glow keeps the dark glazing reading as occupied, warm interiors (CITY_MASTER_TASTE) instead of voids.
   for (const material of glazing) material.emissiveIntensity = dayGlow + night * (.55 - dayGlow);
-  curtainGlow.value = .45 + night * .8; curtainNight.value = night;
+  curtainGlow.value = .45 + night * .8; curtainNight.value = night; towerGlow.value = .3 + night * .9;
 }
 
 // Ground finishes that stop at the seaward cut; massing, guideway and revetment keep their geometry.

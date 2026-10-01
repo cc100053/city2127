@@ -12,7 +12,7 @@ import { bake } from '../src/cityRig.ts';
 import { contextFacades } from '../src/contextFacades.ts';
 import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from '../src/coastalCanopy.ts';
 import { amphibiousShore, tidalEdge } from '../src/amphibiousShore.ts';
-import { AutomationDistrict, SharingDistrict } from '../src/districtMeters.ts';
+import { AutomationDistrict, ConcentrationDistrict, SharingDistrict } from '../src/districtMeters.ts';
 import { bayContext } from '../src/bayContext.ts';
 
 const layout = JSON.parse(readFileSync(new URL('../src/odaiba-layout.json', import.meta.url), 'utf8'));
@@ -250,3 +250,64 @@ for (const seats of [0, 4, 8]) {
   }
 }
 console.log(`Odaiba: ${sharingDistrict.bays.length} private / open water rooms preserve boat beams, walker lanes and landward access.`);
+
+// P4 concentration: towers, sky bridges and pods stand on open ground clear of landmarks, context and actor routes; sites stay visible.
+const concentration = new ConcentrationDistrict(new Group());
+const blocked = (x: number, z: number, y: number, reach: number) => {
+  for (let k = 0; k < 12; k++) {
+    ray.set(new Vector3(x, y, z), new Vector3(Math.cos(k / 12 * Math.PI * 2), 0, Math.sin(k / 12 * Math.PI * 2))); ray.far = reach;
+    const hit = ray.intersectObject(city, true)[0]; ray.far = Infinity;
+    if (hit) return hit.object.name;
+  }
+  return undefined;
+};
+const offGround = (x: number, z: number, radius: number) => {
+  for (const f of [0, .5, 1]) for (let k = 0; k < (f ? 8 : 1); k++) {
+    const a = k / 8 * Math.PI * 2, hit = groundAt(x + Math.cos(a) * radius * f, z + Math.sin(a) * radius * f);
+    if (!hit || !openGround.test(hit.object.name) || hit.point.y > 3) return hit?.object.name ?? 'nothing';
+  }
+  return undefined;
+};
+/** Podium on open ground; trees may stand beside it but not above the podium; shaft, lobbies and crown clear of everything. */
+const towerProblem = (x: number, z: number, h: number) => offGround(x, z, 18.5) ?? blocked(x, z, 3, 18.5)
+  ?? [.4 * h, .72 * h, h].map(y => blocked(x, z, y, 24)).find(Boolean) ?? (h * 1.06 < 165 ? undefined : 'air-taxi loop');
+const podProblem = (x: number, z: number) => offGround(x, z, 10.5) ?? blocked(x, z, 6, 11);
+if (process.env.PROBE_CONCENTRATION) {
+  // Dev aid: PROBE_CONCENTRATION=x,z,h;x,z;... prints the problem (or OK) for candidate tower [x,z,h] / pod [x,z] sites.
+  for (const entry of process.env.PROBE_CONCENTRATION.split(';')) {
+    const [x, z, h] = entry.split(',').map(Number);
+    console.log('PROBE', entry, (h ? towerProblem(x, z, h) : podProblem(x, z)) ?? 'OK');
+  }
+}
+for (const tower of concentration.towers) assert.equal(towerProblem(tower.x, tower.z, tower.h), undefined, `tower at ${tower.x},${tower.z}`);
+for (const pod of concentration.pods) assert.equal(podProblem(pod.x, pod.z), undefined, `pod at ${pod.x},${pod.z}`);
+for (const tower of concentration.towers) for (const pod of concentration.pods) assert.ok(Math.hypot(tower.x - pod.x, tower.z - pod.z) > 30, 'pods and towers share no ground');
+for (const { i, j, y } of concentration.bridges) {
+  const a = concentration.towers[i], b = concentration.towers[j], dir = new Vector3(b.x - a.x, 0, b.z - a.z), length = dir.length();
+  dir.normalize();
+  for (const dy of [-2, 2]) {
+    ray.set(new Vector3(a.x, y + dy, a.z).addScaledVector(dir, 15), dir); ray.far = length - 30;
+    assert.equal(ray.intersectObject(city, true)[0]?.object.name, undefined, `sky bridge ${i}-${j} crosses existing geometry`);
+    ray.far = Infinity;
+  }
+}
+for (const functionModules of [2, 4, 6]) {
+  concentration.setTarget({ functionModules }, 0, true);
+  concentration.root.updateMatrixWorld(true);
+  for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
+    const p = route.getPointAt(i / 200);
+    for (const dx of [-3, 0, 3]) for (const dz of [-3, 0, 3]) {
+      ray.set(p.clone().add(new Vector3(dx, 3, dz)), down);
+      assert.equal(ray.intersectObject(concentration.root, true).length, 0, `concentration ${functionModules} blocks a pod/walker route`);
+    }
+  }
+  city.add(concentration.root);
+  for (const site of Object.values(changeSites)) {
+    const look = new Vector3(site.x, site.h * site.scale / 4, site.z);
+    ray.set(camera.position, look.clone().sub(camera.position).normalize());
+    const blocker = ray.intersectObject(city, true)[0];
+    assert.ok(!blocker || blocker.distance > camera.position.distanceTo(look) - 1, `${site.name} hidden by ${blocker?.object.name} at concentration ${functionModules}`);
+  }
+  city.remove(concentration.root);
+}
+console.log(`Odaiba: ${concentration.towers.length} vertical towers, ${concentration.bridges.length} sky bridges and ${concentration.pods.length} pods stand on open ground, clear of landmarks, context and routes; sites stay visible.`);

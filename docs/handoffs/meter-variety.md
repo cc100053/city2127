@@ -1,7 +1,7 @@
 # meter-variety — Readable, district-wide Meter changes
 
-- Owner: cc100053 (P0/P1: Claude Code; P2/P3: this Codex session)
-- Status: IN_PROGRESS — P0 + P1 + P2 + P3 implemented; P4–P5 planned; P6 evidence recorded per stage
+- Owner: cc100053 (P0/P1/P4: Claude Code; P2/P3: Codex session)
+- Status: IN_PROGRESS — P0–P4 implemented; P5 planned; P6 evidence recorded per stage
 - Branch: `feat/meter-variety`
 - Base commit: `33227a687ac9d18281e90494a4e9b2ce27f861ce`
 - Last verified commit: P3 source + whitespace correction `357b91784910d1bdc4411659ab8b8acdd99c13b6` (local checks, lossless captures, real WebSocket browser smoke and feature CI PASS)
@@ -29,7 +29,7 @@ Each Meter keeps its site as the focal anchor and additionally drives 2–3 larg
 | P1 | Environment: promenade sails/pergolas, mist towers, roof sails/forest, facade louvres/planted bays | done |
 | P2 | Automation: drones, pods, walker density, staffed pavilions | done; local/browser/feature CI passed |
 | P3 | Sharing: floating decks as private pods vs open steps, water rooms | done; local/browser/feature CI passed |
-| P4 | Concentration: context tower crowns vs scattered pavilion pods | planned |
+| P4 | Concentration: glass towers with sky lobbies vs scattered pavilion pods | done; local/browser checks passed |
 | P5 | Change-moment pulse in the Meter's colour | planned |
 | P6 | Pipeline diagnostics, docs, draw-call measurement | per stage |
 
@@ -102,6 +102,22 @@ Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920�
 - Independent temporary Node comparison against `6f2bd35` confirmed every merged `skyways` geometry attribute, material property and shadow flag is unchanged byte-for-byte in standalone. This supplements the browser standalone smoke; no temporary comparison module is shipped.
 - Latest fetched `origin/main` remains `33227a6`; task branch has no divergence or upstream-only work. No main integration under the existing capture-review condition. This closure changes documentation only; next scope remains P4.
 
+## P4 — Concentration (2026-10-01)
+
+- Preflight: resumed `feat/meter-variety` at `73d3dda`, clean; fetch succeeded; branch 0/0 with its remote; `origin/main` still `33227a6`. P2/P3 (Codex) were already pushed with passing CI; no overlapping dirty modules. No upstream integration.
+- Design change from the plan: the district has only one large flat context roof (raycast survey of `CTX_*` roofs), so "context tower crowns" became new towers on traced open ground. Candidate sites came from a grid scan with the same checks the test now runs, plus a hero-pose visibility pass and a browser check against live skyway triangles; four first-choice towers that hit skyways, two that hit context massing and one that hid the SE site were replaced.
+- `ConcentrationDistrict` (`src/districtMeters.ts`, held by the SE built site): 10 towers `[x, z, h]` with podium, tapered sky-blue glass shaft, ivory floor bands, two planted/lit sky lobbies, planted crown and spire; 6 sky bridges between towers within 80 m at both lobby levels of the lower tower (they grow with the lower of the two towers); 26 pods. `share = smoothstep((functionModules − 2)/4, .3, .75)` in golden-ratio order (a hash rank clustered with only ten towers): 3 / 4 / 5 modules → 0 / 5 / 10 towers, 26 / 15 / 0 pods. Towers keep footprint 1 and rise in height; hidden ones keep an invertible tiny scale.
+- Tower glass uses its own shader hook: 4.2 m storeys, about half the rooms lit, strength `towerGlow` (.3 by day → 1.2 at night via `updateOdaiba`). Without it the towers read grey at night (night gate 2.66 %).
+- Nine instanced batches (tower: trim / glass / leaf / lobby light; pod: trim / lobby / leaf; bridge: trim / lobby). No new textures, models, dependencies, render passes or server rules. Architectural proxies only: no interior, structure or occupancy simulation.
+
+### P4 validation
+
+- Root `npm test`, `npm run build`, `git diff --check`: PASS. New unit checks in `tests/districtMeters.test.ts`; actual-mesh placement/route/site-visibility checks in `tests/odaiba.test.ts` (with a `PROBE_CONCENTRATION` dev aid that prints the first problem for candidate sites); district assertions on all 81 combinations and the legacy hide in `surveyMeterPipeline`. `survey/` and `module-swap/` unchanged.
+- Readability (headless Chrome, 1920×929, DPR 1, untouched hero, `?hour=16|21&reviewTime=20&meters=se:<band>`, other axes mixed): low ↔ high **4.47 %** day (before P4 at `73d3dda`: 0.38 %), **3.81 %** night (before 0.29 %); day low ↔ mixed 2.69 %, mixed ↔ high 2.39 %; night 2.29 % / 1.87 %. Lossless captures: [low](meter-variety-p4-concentration-low.png), [mixed](meter-variety-p4-concentration-mixed.png), [high](meter-variety-p4-concentration-high.png), [night low](meter-variety-p4-concentration-night-low.png), [night high](meter-variety-p4-concentration-night-high.png). Reproduce with `python3 scripts/meter-diff.py docs/handoffs/meter-variety-p4-concentration-low.png docs/handoffs/meter-variety-p4-concentration-high.png` and the night pair.
+- Same-condition full-pipeline draws (`data-draw-calls` via DevTools protocol, before = `73d3dda` worktree): day low 1175 → 1211, high 1195 → 1231; night low 1181 → 1217, high 1201 → 1237 (**+36**). Draw-call comparison only, not an FPS acceptance.
+- Built-in browser: `cityMeters('se:high')` from low converged to 10 towers / 0 pods; no console errors. Skyway clearance against the live skyway triangles: 0 conflicts for the final towers, lobbies, bridges and pods.
+- Not verified: real HTTP/WebSocket browser smoke for P4 (server → client → model is covered by the 81-combination pipeline test), human art review (towers read partly as banded cylinders; the low pods are modest in the hero frame), Windows, real-GPU FPS, exhibition endurance.
+
 ## Next step
 
-P4 (concentration) on this branch, using `SlotLevels` and the same capture/diff gate. P0–P3 remain on the feature branch for capture review; preserve the existing review-before-main integration condition.
+P5 (change-moment pulse) on this branch. P0–P4 remain on the feature branch for capture review; preserve the existing review-before-main integration condition.

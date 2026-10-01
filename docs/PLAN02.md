@@ -1,5 +1,9 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
+## Meter variety P4 — 2026-10-01，feature branch 待視覺審閱
+
+都市集約 Meter 現在改變 district 嘅 skyline：高值喺 SE site 旁、DECKS 海濱同西面草地升起 10 座淡藍玻璃塔（100–140 m，兩層有植栽同暖光嘅 sky lobby，相近嘅塔有 sky bridge 相連）；低值喺同一片草地散佈 26 個低層玻璃 pod；混合值各保留約一半。夜晚塔身按樓層亮暖光窗格。固定 hero 日／夜差異 **4.47%／3.81%**（P4 前 0.38%／0.29%），均過 3% 門檻；實際地面、建築、路線、site 可見度檢查通過。截圖與限制見 [P4 交接](handoffs/meter-variety.md#p4--concentration-2026-10-01)。可讀性不等於美術、結構或 FPS 驗收；保留 capture review 後才整合 main 的條件。
+
 ## Meter variety P3 — 2026-10-01，feature branch 待視覺審閱
 
 sharing Meter 現在控制 14 個既有水岸房間：低值用帶天窗、岸側入口的玫瑰陶瓷私密花園 pods，高值展開三層公共階梯，混合值保留兩種空間。原有花園、瀑布、浮台和通道保留；沒有改鏡位、日夜或問卷規則。固定 hero 日／夜差異 **3.51%／3.32%**，均過 3% 可讀性門檻；實際船道／步道及 live server 檢查通過。截圖、驗證與限制見 [P3 交接](handoffs/meter-variety.md#p3--sharing-2026-10-01)。可讀性不等於美術、結構或 FPS 驗收；保留既有 capture review 後才整合 main 的條件。
