@@ -2,13 +2,13 @@ import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets.ts';
-import { guideway, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers } from './layout.ts';
+import { guideway, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers, sweepway } from './layout.ts';
 
 const ease=(t:number)=>T.MathUtils.smoothstep(t,0,1);
 const curve=(points:readonly (readonly [number,number,number])[],closed=false)=>new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p)),closed,'centripetal');
 /** Every actor path in the Odaiba scene, in metres. */
 export function routes() {
-  return {guideway:curve(guideway),promenades:promenades.map(p=>curve(p)),water:curve(waterLoop,true),ferry:curve(ferryLane),air:curve(airLoop,true),approach:curve(sphereApproach)};
+  return {guideway:curve(guideway),promenades:promenades.map(p=>curve(p)),water:curve(waterLoop,true),ferry:curve(ferryLane),air:curve(airLoop,true),approach:curve(sphereApproach),sweep:curve(sweepway)};
 }
 /** 0→1→0 over `period` seconds: out-and-back routes reverse instead of jumping. */
 const pingPong=(time:number,period:number,offset=0)=>{const p=((time/period+offset)%2+2)%2;return {u:p<1?p:2-p,forward:p<1};};
@@ -86,9 +86,13 @@ export function mobility(scene:T.Scene) {
   const path=routes(),guideLength=path.guideway.getLength();
   // Guideway pods (ART.md §7): rounded white cars with a glass band and a mint service line, 9 m long.
   const body=material('#ffffff');
-  const pods=fleet(scene,[part([2.7,2.6,9],[0,1.5,0],body,.6),part([2.76,.9,7.6],[0,2,0],glass,.3),part([2.8,.14,8],[0,.9,0],mint,.05),part([2.2,.12,.12],[0,1.3,4.5],coral,.05)],TRAINS*CARS,'guideway-pods');
-  // Deep teal against the pale guideway so the trains read from the hero pose.
-  for(let i=0;i<TRAINS*CARS;i++)pods.tint(i,body,i<CARS?'#3f7f86':'#5a8f7a');
+  const podParts=()=>[part([2.7,2.6,9],[0,1.5,0],body,.6),part([2.76,.9,7.6],[0,2,0],glass,.3),part([2.8,.14,8],[0,.9,0],mint,.05),part([2.2,.12,.12],[0,1.3,4.5],coral,.05)];
+  const pods=fleet(scene,podParts(),TRAINS*CARS,'guideway-pods');
+  // 2127 white trains with a dark glass band (target v2), lightly warm/cool per train.
+  for(let i=0;i<TRAINS*CARS;i++)pods.tint(i,body,i<CARS?'#f4f3ee':'#e9eef0');
+  // Sweep train: four cars shuttling on the descending skyway, pitched with the deck.
+  const SWEEP_CARS=4,sweepLength=path.sweep.getLength(),sweepPods=fleet(scene,podParts(),SWEEP_CARS,'sweep-pods');
+  for(let i=0;i<SWEEP_CARS;i++)sweepPods.tint(i,body,'#f6f5f1');
   // People: capsule torso and limbs, round head and hair; clothes, skin and hair vary per person from a muted palette (no saffron).
   const coats=material('#ffffff'),skin=material('#ffffff'),hair=material('#ffffff'),trousers=material('#3d4a52');
   const capsule=(r:number,length:number,at:[number,number,number],mat:T.Material,depth=1):Part=>({geometry:new T.CapsuleGeometry(r,length,4,10).scale(1,1,depth).translate(...at),material:mat});
@@ -112,7 +116,7 @@ export function mobility(scene:T.Scene) {
   const guides=fleet(scene,[part([.36,.1,2.1],[0,0,0],guideMaterial,.03)],192,'air-corridor-guides');
   const airCurves=[path.air,path.approach],samples=airCurves.map(route=>Array.from({length:96},(_,i)=>({p:route.getPointAt(i/96),t:route.getTangentAt(i/96)})));
   const heads=new Float32Array(7),weights=new Float32Array(7);
-  const pose=new T.Object3D(),p=new T.Vector3(),tangent=new T.Vector3(),side=new T.Vector3(),up=new T.Vector3(0,1,0);
+  const pose=new T.Object3D();pose.rotation.order='YXZ';const p=new T.Vector3(),tangent=new T.Vector3(),side=new T.Vector3(),up=new T.Vector3(0,1,0);
   const place=(route:T.Curve<T.Vector3>,u:number,reverse=false)=>{route.getPointAt(T.MathUtils.clamp(u,0,1),p);route.getTangentAt(T.MathUtils.clamp(u,0,1),tangent);if(reverse)tangent.negate();pose.position.copy(p);pose.rotation.set(0,Math.atan2(tangent.x,tangent.z),0);};
   return (state:WorldState,time:number)=>{
     mint.emissiveIntensity=.65+state.neon*1.8;
@@ -120,6 +124,10 @@ export function mobility(scene:T.Scene) {
       const {u,forward}=podPose(time,train,car,guideLength);
       place(path.guideway,u,!forward);pose.scale.setScalar(T.MathUtils.smoothstep(state.traffic*.5+.5-train*.3,0,.1));pods.set(train*CARS+car,pose);
     }pods.flush();
+    for(let car=0;car<SWEEP_CARS;car++){
+      const {u,forward}=podPose(time+20,0,car,sweepLength);
+      place(path.sweep,u,!forward);pose.rotation.x=-Math.asin(T.MathUtils.clamp(tangent.y,-1,1));pose.scale.setScalar(T.MathUtils.smoothstep(state.traffic*.5+.5,0,.1));sweepPods.set(car,pose);
+    }sweepPods.flush();
     for(let i=0;i<WALKERS;i++){
       const w=walkerPose(time,i),amount=T.MathUtils.smoothstep(state.crowd*.8+.2-i/WALKERS,-.05,.05);
       place(path.promenades[i%2],w.u,!w.forward);side.crossVectors(up,tangent).normalize();pose.position.addScaledVector(side,-w.lane);

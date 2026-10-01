@@ -1,12 +1,10 @@
 import * as T from 'three';
-import { arc, bake, box, leaf, paint, stone, trail, trim } from './cityRig.ts';
-import { changeSites, DISTRICT, floatingDecks, northShore } from './layout.ts';
+import { arc, bake, box, chrome, leaf, paint, stone, trail, trim } from './cityRig.ts';
+import { changeSites, DISTRICT, floatingDecks, northShore, sweepway } from './layout.ts';
 import { routes } from './mobility.ts';
 import layout from './odaiba-layout.json';
 
 type P3 = [number, number, number];
-// Silvered glass: pale and warm so the spheres read as mirrors of the golden sky, not blue domes.
-const chrome = new T.MeshPhysicalMaterial({ color: '#f1efe8', metalness: .78, roughness: .1, clearcoat: 1, clearcoatRoughness: .04, envMapIntensity: 1.35 });
 const waterfall = new T.MeshStandardMaterial({ color: '#f3fbff', emissive: '#d8f0ff', emissiveIntensity: .35, roughness: .25, transparent: true, opacity: .85 });
 const foam = new T.MeshBasicMaterial({ color: '#f4fbff', transparent: true, opacity: .55, depthWrite: false });
 const cherry = paint('#efc2cf', .8);
@@ -28,7 +26,9 @@ const LINKS: P3[][] = [
   [[276.3, 90, -304.1], [300, 78, -240], [285, 67, -150], [262, 62, -60], [215, 62, 0], [140, 62, 20], [70, 62.5, 14], [12.3, 63, 7.6]],
   [[-41.3, 63, 47.8], [-75, 64, 50], [-120, 79, 94], [-159.4, 92, 118.9]],
   [[-106, 98, 180], [-124, 95, 179], [-140, 92, 178]],
-  [[-289.6, 102.4, 63.9], [-285, 97, 75], [-280, 92, 86.3]],
+  [[-291.6, 102, 59.3], [-285, 97, 75], [-280, 92, 86.3]],
+  // Front-left: out of the 151 m tower ring over the north-east waterfront to the frame edge (target v2's long front-left skyway).
+  [[304, 90, -373], [350, 80, -400], [410, 68, -440], [480, 60, -490], [560, 56, -545]],
 ];
 
 /** Box-section deck along a curve, `top` at the curve and `depth` below it; outward winding, flat-shaded quads. */
@@ -102,11 +102,14 @@ function sphere(root: T.Object3D, [x, y, z]: P3, r: number, deckRadius?: number)
     const strut = new T.Mesh(pole, trim); strut.position.copy(foot).add(top).multiplyScalar(.5); strut.scale.set(.8, foot.distanceTo(top), .8);
     strut.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), top.sub(foot).normalize()); g.add(strut);
   }
+  // Narrow equatorial walk (where skyway links dock) with a lit outer band; the lower half of the sphere stays visible.
+  arc(g, r + .2, r + 4.5, 1.2, [0, -r * .12 - 1.2, 0], trim);
+  const band = new T.Mesh(new T.TorusGeometry(r + 4.6, .4, 6, 72), trail); band.rotation.x = Math.PI / 2; band.position.y = -r * .12 - .6; g.add(band);
   if (deckRadius) {
-    // Equatorial promenade ring, lit at its outer edge, held by four spokes.
-    arc(g, deckRadius - 5, deckRadius + 4.5, 2.6, [0, -r * .12 - 2.6, 0], trim);
-    for (const [inner, outer] of [[deckRadius + 4.4, deckRadius + 4.9], [deckRadius - 5.3, deckRadius - 4.8]]) arc(g, inner, outer, .5, [0, -r * .12 - 1.6, 0], trail);
-    for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + .3; box(g, [2, 1.2, deckRadius - 5 - r + 1], [Math.cos(a) * (deckRadius - 5 + r) / 2, -r * .12 - 1.2, Math.sin(a) * (deckRadius - 5 + r) / 2], trim).rotation.y = -a + Math.PI / 2; }
+    // Promenade ring under the sphere (not at its equator), so the whole silver sphere stays visible from above; lit at its outer edge.
+    const y = -r * .78 - 2.6;
+    arc(g, r * .45, deckRadius + 4.5, 2.6, [0, y, 0], trim);
+    arc(g, deckRadius + 4.4, deckRadius + 4.9, .5, [0, y + 1, 0], trail);
   }
 }
 
@@ -153,7 +156,7 @@ function shoreTerraces(root: T.Object3D) {
 export function skyways() {
   const root = new T.Group(); root.name = 'skyways';
   for (const ring of RINGS) skyway(root, circle(ring), true);
-  for (const points of LINKS) skyway(root, new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'), false);
+  for (const points of [...LINKS, sweepway.map(p => [...p] as P3)]) skyway(root, new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'), false);
   for (const s of SPHERES) sphere(root, s.centre, s.radius, s.deck);
   shoreTerraces(root);
   const generated = new Set<T.BufferGeometry>();

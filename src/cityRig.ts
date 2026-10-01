@@ -17,6 +17,8 @@ export const membrane=new T.MeshStandardMaterial({color:'#9abdb9',roughness:.3,m
 // Pilot finishes (docs/ART.md): silvered glass that reads the sky, living green, pale stone paving.
 export const glass=new T.MeshPhysicalMaterial({color:'#a7c3cf',roughness:.08,metalness:.6,clearcoat:1,clearcoatRoughness:.06});
 export const leaf=paint('#7d9f68',.85), stone=paint('#ebe8e0',.66);
+// Silvered glass for the 2127 spheres: warm and only partly metallic, so they read as polished silver mirrors of the golden sky, not blue domes.
+export const chrome=new T.MeshPhysicalMaterial({color:'#f7eedf',metalness:.6,roughness:.12,clearcoat:1,clearcoatRoughness:.03,envMapIntensity:1.15});
 const rounded = new Map<string, RoundedBoxGeometry>();
 export function box(parent:T.Object3D, size:[number,number,number], position:[number,number,number], material:T.Material, radius=.18) {
   const key = [...size,radius].join(',');

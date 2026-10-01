@@ -34,7 +34,12 @@ export const bayCruisers: readonly (readonly [number,number,number])[] = [
   [-300,-560,.9],[-120,-620,-2.2],[-560,-430,2.6],[40,-600,-.4],[-640,-300,.3],[-700,250,1.4],[-650,-40,-1.7],[-150,1420,1.2],[250,1480,-1.9],
   // Nearer the hero pose: the foreground bay reads busy with taxis, as in the 2127 target (runs checked clear of the north shore).
   [100,-470,1.93],[-160,-470,.95],[-330,-420,-.6],[-40,-560,2.3],[-500,-500,1.2],[260,-620,-1.6],
+  // Open water south-west of the island, upper right of the hero frame.
+  [133,1442,.4],[-333,908,2.1],[797,1695,-1],[-250,1180,1.1],
 ];
+// Sweep: a lit transit skyway descending from the Grand Nikko ring (92 m) west past Hilton and out of the frame's lower right,
+// above the Yurikamome deck and clear of Nikko and Hilton footprints; a short white train shuttles on it (mobility).
+export const sweepway: readonly P3[] = [[-290,92,265],[-345,74,250],[-400,56,205],[-440,44,152],[-475,34,92],[-520,28,40],[-580,24,-10]];
 // Air-taxi corridors: a district loop above every landmark and tall site, and an approach from the bay that ends above the sphere berth.
 export const airLoop: readonly P3[] = Array.from({length:12},(_,i)=>{
   const a=i/12*Math.PI*2;return [-40+Math.cos(a)*330,170+Math.sin(a*2)*6,-40+Math.sin(a)*250] as const;
