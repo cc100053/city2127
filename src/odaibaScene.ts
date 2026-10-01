@@ -63,7 +63,8 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
       float occupied = .35 + .65 * fract(sin(dot(floor(vec2(curtainP.x / 5.4, curtainP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453);
       // r9: cool blue-grey glass with whole lit floor runs on about one bay in three (matches contextFacades), not a warm champagne wash.
       occupied = .08 + .92 * step(.78, occupied);
-      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.27, .32, .37), pane);`)
+      // r9 pass 3: lighter sky-grey glass so mid-rises read ivory and glazed (target v2), not dark-striped.
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.42, .45, .48), pane);`)
       // Panes are glass: glossy and partly metallic so they pick up the sky instead of reading as flat dark dots.
       .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, .14, pane);\nmetalnessFactor = mix(metalnessFactor, .4, pane);')
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1., .78, .5) * pane * (curtainGlow * occupied + curtainNight * .3);');

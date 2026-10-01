@@ -27,16 +27,18 @@ export function contextFacades(environment: T.Object3D) {
           transform.position.copy(point).addScaledVector(normal, .045);
           transform.quaternion.setFromUnitVectors(forward, normal);
           // r5 pass 2: one even glass grid per tower (target v2) — full-width panes, thin mullions and a 1.1 m pale floor band between storeys.
-          transform.scale.set(3.75, 2.9, 1);transform.updateMatrix();panels.push(transform.matrix.clone());
+          // r9 pass 3: narrower panes so ivory piers and floor bands frame each bay (target v2's light ivory towers, not dark glass slabs).
+          transform.scale.set(3.2, 2.6, 1);transform.updateMatrix();panels.push(transform.matrix.clone());
           const row = Math.floor(y / 4), col = Math.floor(u / 4);
           // r6 pass 3: warm champagne glass (the same tone as the curtain-wall shader underneath, so uncovered faces no longer show as
           // beige blocks against blue-grey) with a soft per-bay brightness; whole lit floor runs on about one storey in four.
           // r9 pass 2: lit runs two panes wide on ~18% of bays (fine golden flecks, target v2) instead of 32 m runs, which read as beige/grey blocks.
-          const lit = Math.abs(Math.sin(row * 12.9898 + Math.floor(col / 2) * 78.233) * 43758.5453) % 1 < .18;
-          const jitter = Math.abs(Math.sin(row * 4.1 + col * 7.3) * 1e4) % 1;
+          // r9 pass 3: fewer, softer lit runs and per-storey (not per-pane) tone, so faces band horizontally instead of a grey/tan patchwork.
+          const lit = Math.abs(Math.sin(row * 12.9898 + Math.floor(col / 3) * 78.233) * 43758.5453) % 1 < .1;
+          const jitter = Math.abs(Math.sin(row * 4.1) * 1e4) % 1;
           // r9: the unlit panes become cool blue-grey glass reading the sky (target v2: ivory frames, blue-grey glazing, golden lit floors);
           // the champagne panes made towers read as sandstone brick. The curtain-wall shader's panes match, so faces stay one system.
-          shades.push(lit ? new T.Color().setHSL(.09, .62, .62 + jitter * .05) : new T.Color().setHSL(.58, .12, .57 + jitter * .04));
+          shades.push(lit ? new T.Color().setHSL(.1, .48, .74 + jitter * .04) : new T.Color().setHSL(.57, .1, .68 + jitter * .04));
         }
       }
     }

@@ -5,7 +5,7 @@ import { routes } from './mobility.ts';
 import layout from './odaiba-layout.json';
 
 type P3 = [number, number, number];
-const waterfall = new T.MeshStandardMaterial({ color: '#f3fbff', emissive: '#d8f0ff', emissiveIntensity: .35, roughness: .25, transparent: true, opacity: .85 });
+const waterfall = new T.MeshStandardMaterial({ color: '#f3fbff', emissive: '#d8f0ff', emissiveIntensity: .6, roughness: .25, transparent: true, opacity: .85 });
 const foam = new T.MeshBasicMaterial({ color: '#f4fbff', transparent: true, opacity: .55, depthWrite: false });
 const cherry = paint('#efc2cf', .8);
 const crown = leafyCrown(1), pole = new T.CylinderGeometry(1, 1, 1, 10);
@@ -152,8 +152,9 @@ function shoreTerraces(root: T.Object3D) {
       arc(c, 0, r * .62, 2.2, [0, .4 + L, 0], stone);
       arc(c, r * .62 - .4, r * .62 + .2, .5, [0, 2.6 + L, 0], trim);
       arc(c, 0, r * .6 - .4, .3, [0, 2.6 + L, 0], leaf);
-      for (let k = 0; k < 6; k++) {
-        const a = k * 1.05 + n, rr = k < 2 ? r * .25 : r * .75, top = (k < 2 ? 2.9 : .65) + L, s = 1.6 + (k % 3) * .5;
+      // r9 pass 3: nine trees (three on the upper tier, six round the rim) so each island reads as a lush palm grove (target v2).
+      for (let k = 0; k < 9; k++) {
+        const a = k < 3 ? k * 2.09 + n : (k - 3) * 1.047 + n + .5, rr = k < 3 ? r * .3 : r * .78, top = (k < 3 ? 2.9 : .65) + L, s = 1.6 + (k % 3) * .5;
         // Mostly palms (target v2's seaside palms): a tall slim trunk under a wide, flat crown; every fourth tree a round cherry.
         const palm = (k + n) % 4 !== 0, h = palm ? 5.5 + (k % 2) * 1.5 : 2.2;
         const trunk = new T.Mesh(pole, trim); trunk.scale.set(palm ? .3 : .25, h, palm ? .3 : .25); trunk.position.set(Math.cos(a) * rr, top + h / 2, Math.sin(a) * rr); c.add(trunk);
@@ -166,8 +167,9 @@ function shoreTerraces(root: T.Object3D) {
       box(fall, [.35, 2.2, 3.4], [-r * .62 - .2, 1.5 + L, 0], waterfall, .1);
       for (const a of [-.45, 0, .45]) {
         const sheet = new T.Group(); sheet.rotation.y = a; fall.add(sheet);
-        box(sheet, [.35, 4.1, 4.6], [-r - .4, .75, 0], waterfall, .1);
-        arc(sheet, 0, 3.4, .05, [-r - 2, -.72, 0], foam);
+        // r9 pass 3: wider sheets and foam so the cascades read at hero distance (target v2's white falls off each island).
+        box(sheet, [.35, 4.1, 6.2], [-r - .4, .75, 0], waterfall, .1);
+        arc(sheet, 0, 4.6, .05, [-r - 2.4, -.72, 0], foam);
       }
       // Footbridge back to the tidal edge.
       box(g, [OUT - 12 - r, .5, 2.4], [-(OUT + 12 - r) / 2, 1.2, 0], trim, .15);

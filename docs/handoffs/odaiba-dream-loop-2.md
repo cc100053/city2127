@@ -147,3 +147,21 @@ Known issue (pre-existing, also at `119e25a`): at 22:00 a bright blue bloom flar
 Remaining gaps vs target v2: groves still read as round-crown blobs at hero distance; inclined gardens on the megaframe; facade tone; dense far skyline; sun glint.
 
 Next step: user review; another round or merge.
+
+## Round 9 — continue round 8 (2026-10-01)
+
+User approved round 8's direction ("方向ok 再跑"). Start: `r8-pass3` (`e2411d6`); branch 0/0 with its remote after fetch.
+
+- Pass 1 (`6e4a5e4`): `leafyCrown` (`cityRig.ts`, lumpy crown with flattened underside via three's `mergeVertices`) replaces the smooth crown in groves, roof terraces, allées, civic-core and skyway planting; deeper, cooler broadleaf green; curtain-wall panes blue-grey with one-in-three whole lit bays and paler ivory bases; context panels blue-grey glass.
+- Pass 2 (`b5dc511`): district clusters may stand further from structure, so groves fill most open lawn (site, pad, path, pond and corridor clearances unchanged); backdrop groves at 36 m cells; context lit runs become two-pane golden flecks on ~18% of bays.
+- Pass 3: context panels narrower with ivory piers, per-storey glass tone, lighter sky-grey glass and ~10% three-pane lit runs; curtain-wall panes `vec3(.42,.45,.48)`; shore waterfall terraces carry nine trees and wider, brighter falls with larger foam rings.
+
+Orchestrator fixes: none needed.
+
+Validation: after each pass, root `npm test` PASS (incl. 81-combination survey pipeline), `npm run build` PASS (existing >500 kB warning), `git diff --check` clean; built-in browser 16:00 console clean after pass 1. Evidence: [pass 1](../../artifacts/odaiba-dream9-pass1.jpg), [pass 2](../../artifacts/odaiba-dream9-pass2.jpg), [pass 3](../../artifacts/odaiba-dream9-pass3.jpg), [pass 3 night](../../artifacts/odaiba-dream9-pass3-night.jpg). Not verified: live `?survey`, FPS/draw calls, load time, exhibition hardware. The pre-existing 22:00 pond bloom remains.
+
+Art note: facades moved from round 6's champagne to blue-grey/sky-grey glass with ivory piers — user call. Groves now cover most lawns; check the balance between canopy and open ground.
+
+Remaining gaps vs target v2: inclined gardens on the megaframe, dense far skyline, sun glint, more skyway density.
+
+Next step: user review; another round or merge.
