@@ -16,6 +16,22 @@ levels.update(3);
 assert.deepEqual([...levels.value], [1, 1]);
 assert.equal(levels.setTargets(() => 1, 4, false), false, 'same target is not a change');
 
+// History changes the order, not the number of selected slots; matching complements still cover every slot.
+const seeded = new SlotLevels(17), complement = new SlotLevels(17);
+seeded.setTargets(i => i < 8 ? 1 : 0, 0, true, 1234);
+const originalOrder = [...seeded.value];
+assert.equal(seeded.visible(), 8);
+complement.setTargets(i => i < 8 ? 0 : 1, 0, true, 1234);
+seeded.value.forEach((v, i) => assert.equal(v + complement.value[i], 1));
+assert.equal(seeded.setTargets(i => i < 8 ? 1 : 0, 1, false, 1234), false);
+assert.equal(seeded.setTargets(i => i < 8 ? 1 : 0, 2, false, 5678), true);
+assert.deepEqual([...seeded.value], originalOrder, 'history retarget preserves current transforms');
+seeded.update(3.5);
+assert.ok(seeded.value.some(v => v > 0 && v < 1));
+seeded.update(5);
+assert.equal(seeded.visible(), 8);
+assert.notDeepEqual([...seeded.value], originalOrder);
+
 const district = new EnvironmentDistrict(new T.Scene());
 let d = district.getDiagnostics();
 assert.ok(d.slots >= 12, `promenade bays: ${d.slots}`);
@@ -48,6 +64,17 @@ assert.equal(d.visibleRoofCrowns + d.visibleRoofSails, 3);
 district.hide();
 assert.equal(facadeClimate.green.value + facadeClimate.louvre.value, 0);
 console.log(`PASS: environment district — ${d.slots} promenade bays, sails/pergolas/mist towers, roof sails/forest, facade shares, late roofs, legacy hide.`);
+
+// Roof assets arriving after the survey snapshot use its remembered history seed.
+district.setTarget(env(0), 6, true, 1234);
+publishRoofGardens(Array.from({ length: 12 }, (_, i) => [i * 30, 0, 20, 8]));
+const roofCover = district.root.getObjectByName('environment-district-roof-sails') as T.InstancedMesh;
+const lateRoofs = [...roofCover.instanceMatrix.array];
+district.setTarget(env(0), 7, true, 1234);
+assert.deepEqual([...roofCover.instanceMatrix.array], lateRoofs);
+district.setTarget(env(0), 8, true, 5678);
+assert.notDeepEqual([...roofCover.instanceMatrix.array], lateRoofs);
+district.hide();
 
 // Reapplying an unchanged fractional target must keep the running ease (including Float32 rounding).
 const repeated = new SlotLevels(1);

@@ -1,16 +1,16 @@
 # meter-variety — Readable, district-wide Meter changes
 
-- Owner: cc100053 (P0/P1/P4/P5: Claude Code; P2/P3: Codex session)
-- Status: IN_PROGRESS — P0–P5 and P7–P10 implemented; P6 evidence recorded per stage; awaiting capture review before main
+- Owner: cc100053 (P0/P1/P4/P5: Claude Code; P2/P3/P11: Codex session)
+- Status: IN_PROGRESS — P0–P5 and P7–P11 implemented; P6 evidence recorded per stage; awaiting capture review before main
 - Branch: `feat/meter-variety`
 - Base commit: `33227a687ac9d18281e90494a4e9b2ce27f861ce`
-- Last verified commit: P3 source + whitespace correction `357b91784910d1bdc4411659ab8b8acdd99c13b6` (local checks, lossless captures, real WebSocket browser smoke and feature CI PASS)
+- Last verified commit: previous P10 `261e036c26cb1fca62c7a3c3487d5b6122fd28c3` (feature CI PASS); P11 working tree passed local and browser checks below; commit/CI closure follows.
 - Remote availability: `origin/feat/meter-variety`
 
 ## Session Git state
 
-- Session starting branch and HEAD: `main` `33227a6`, clean.
-- Last fetched origin/main commit: `33227a6` (2026-10-01; local `main` 0/0 with `origin/main`).
+- P11 session starting branch and HEAD: `feat/meter-variety` `261e036`, clean.
+- Last fetched origin/main commit: `33227a6` (2026-10-02; feature vs origin/main 16/0 at startup; feature vs remote counterpart 0/0).
 - Local changes present at session start: NONE.
 - Upstream integration status: NOT INTEGRATED.
 - Pending Git conflicts or synchronization blockers: NONE.
@@ -261,9 +261,30 @@ Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920�
 - Single-Meter gates are unaffected: their frames keep the other axes at mixed, where no pairing shows (all-mixed draw submissions unchanged at 1337). Draws with a pairing active: +4 to +28 (e.g. kiosks 1365 vs 1337, docks 1407 vs 1383 at night).
 - Not verified: browser skyway clearance of the dock rings, close-up review, human art review (forest crowns are modest at hero distance), real HTTP/WebSocket smoke beyond the pipeline test, Windows, real-GPU FPS.
 
+## P11 — Path dependence (2026-10-02)
+
+- Owner: cc100053; implementation in this task: Codex. User request `do docs/handoffs/meter-variety.md p11` authorizes the history contract use. Resumed `feat/meter-variety` at `261e036c26cb1fca62c7a3c3487d5b6122fd28c3`, clean; fetch succeeded, branch vs remote 0/0, vs `origin/main` (`33227a6`) 16/0. P0–P10 are available remotely; no overlapping local module / asset changes. Keep the existing capture-review-before-main restriction.
+- `viewOf` sends four uint32 `slotSeeds` on v2 CityView. `runProposalSlotSeeds` streams every active-run proposal in sequence order, hashes each axis' nonzero votes (`Math.imul(seed ^ (vote + 2), 16777619) >>> 0`), and ignores IDs, times and other axes. Full history is used even though the feedback band stays at 64. Seeds are derived from existing append-only SQLite events, so restart / replay need no migration or additional persistence. Empty / all-neutral histories use zero. The deliberate O(guests) view scan is marked `ponytail:`; incremental persisted hashes are deferred until cost is measured.
+- Root validates the optional field (exact four axes, integers 0..2³²−1, zero for an empty run), accepts older servers without it using the original fixed order, and passes it through `main` → manager → the four districts. `SlotLevels` shuffles the old selection ranks with an integer Fisher–Yates permutation; the same seed restores the same slot targets, preserving selection counts and sail/canopy complements. Fixed design families, footprints, site parameters, actor counts, pairings, lighting and camera are unchanged. Roofs published later adopt the remembered environment seed.
+- Each directional proposal can retarget the axis' slot pattern, including at equal layout values; it does not enforce monotonic building growth. Live retargets retain the current transforms and use the existing 3 s ease / pulses. Snapshot/reset/reduced motion are immediate and clear old pulses. Fully saturated carriers can look identical across histories; path dependence reads where a carrier has a mix of slots. A 32-bit seed does not promise a unique city for every possible history.
+- Compatibility: older root clients reject the added field under their strict parser. Update/restart survey and refresh root together; new root supports both seeded and unseeded v2. v1 and module-swap behavior is unchanged.
+
+### P11 validation
+
+- Root and `survey/` `npm test`, `npm run build`: PASS; existing root chunk-size warning only. Tests requiring localhost sockets initially hit sandbox `EPERM`; authorized elevated reruns passed. `module-swap/` source unchanged. Whitespace and local Markdown links checked before commit.
+- `surveyMeterPipeline` checks two real 142-proposal histories: `+1,−1` vs `−1,+1`, followed by the same 140 alternating votes on all axes. The final scores are **exactly equal**, layouts and latest 64 votes match, but full-history seeds and actual instance transforms differ in **all four districts**. Live → serialized snapshot, same-ID retries, reset / old retry after reset, interrupted snapshot with zero lingering pulses, and full replay with fresh run / session / submission IDs restore exact transforms. P10 assertions now also cover non-extreme carriers and use the actual .7/.3 thresholds rather than assuming every high band is saturated.
+- Small checks cover seeded count preservation / complementary covers / same target / smooth retarget, late roof publication, malformed and missing uint32 seeds, old-server compatibility, and actual SQLite server restart restoring the whole seeded view.
+- Headless Chrome **154.0.8037.58**, 1920×929 CSS, DPR 1, original hero, held `reviewTime=20`, 16:00 / 21:00, actual GLBs and fonts ready. Two real HTTP/WebSocket 142-proposal sequences reproduce the Node equal-score case (all scores −0.8571428571428571; seeds 362594520 vs 371612256). Fresh-page reload restores **every actual district instance matrix**, and reset plus reset reload return exactly to the initial city. Neutral proposals keep seeds unchanged. No application / shader console errors or page exceptions. The test observer is injected only into the served main module; no production test hook.
+- Equal-score order A ↔ B changes **5.27 % day / 4.76 % night** of the hero frame (`scripts/meter-diff.py`, >24/255), with identical feedback-band votes, score/layout and clock. Captures: [A day](meter-variety-p11-order-1-day.png) / [B day](meter-variety-p11-order-2-day.png), [A night](meter-variety-p11-order-1-night.png) / [B night](meter-variety-p11-order-2-night.png). Selected day/night captures reopened and visually inspected: tower, service-bay, shade and shore patterns differ while the venue remains continuous.
+- P6 full-city band reference captures: [low day](meter-variety-p11-low-day.png) / [mixed day](meter-variety-p11-mixed-day.png) / [high day](meter-variety-p11-high-day.png); [low night](meter-variety-p11-low-night.png) / [mixed night](meter-variety-p11-mixed-night.png) / [high night](meter-variety-p11-high-night.png); [reset day](meter-variety-p11-reset-day.png). These move **all four Meters**, with a different causal panel, so their full-frame deltas (low ↔ high 12.33 / 11.78 %, low ↔ mixed 10.26 / 9.82 %, mixed ↔ high 10.16 / 9.82 %, day / night) are references, **not single-Meter gates**. DEV `?meters` without seeds retains its prior order and geometry; no new single-Meter gate claim.
+- Draw submissions: P10's recorded all-mixed day **1337 → P11 1337** (same full pipeline, hero, held time); both seeded equal-score histories also **1337 day / 1343 night**. Full-city seeded low **1361 / 1367**, high **1421 / 1427** (extras active). No meshes, assets, materials or render passes added by P11.
+- Scratch databases retained at `/var/folders/st/ml4_0zfx7g129gh2305ynz5c0000gn/T/city2127-meter-p11-CnWWqc/survey.sqlite` (history smoke) and `city2127-meter-p11-GM4dq6/survey.sqlite` in the same temp parent (band references). Existing Vite 5173 was reused; no exhibition SQLite or unrelated process changed. Temporary browser harnesses: `/private/tmp/meter-p11-browser.mjs`, `/private/tmp/meter-p11-bands.mjs`.
+- Not verified: controlled real-GPU FPS, Windows, exhibition hardware/endurance, human art acceptance or fresh browser skyway mesh-clearance sampling. Geometry/route footprints are unchanged; existing complete geometry checks passed.
+- Documentation: PROJECT records wire / ownership / hash / renderer flow and compatibility; PLAN02 and VALIDATION record this stage. README/AGENTS startup commands, controls and product scope stay the same; no edits needed there.
+
 ## Proposed P7–P12 — More variety per Meter (2026-10-01, pending user approval)
 
-Not implemented. Goal: each Meter reads as several distinct mature 2127 identities, not one object family that is present or absent. Constraints carry over: desktop hero pose unchanged, no server contract change (P11 excepted), every value futuristic, greenery stays lush with no uniform grids, no new assets, dependencies or render passes.
+P7–P11 implemented (P11 requested by the user on 2026-10-02); P12 remains optional and unimplemented. Goal: each Meter reads as several distinct mature 2127 identities, not one object family that is present or absent. Constraints carry over: desktop hero pose unchanged, no server contract change (P11 excepted), every value futuristic, greenery stays lush with no uniform grids, no new assets, dependencies or render passes.
 
 ### Where each Meter stands
 
@@ -284,7 +305,7 @@ Mixed values only scatter the two endpoint designs (low ↔ mixed 0.9–2.7 %).
 | P8 (done, see [P8](#p8--design-families-2026-10-01)) | Design families. Every slot-based carrier gets 2–3 variants chosen by a fixed per-slot hash, e.g. environment bays: sail / pergola / vertical garden screen; roofs: sail / forest / meadow terraces; sharing courts: walled garden / glass winter garden / courtyard cluster and parasols / long-table pergola / amphitheatre lawn; automation pavilions: domed / stacked deck / garden kiosk. | New check: within one band, slots of a carrier use ≥ 2 families; gate unchanged |
 | P9 (done, see [P9](#p9--mixed-identity-2026-10-02)) | Mixed identity. At mid values a share of slots shows a hybrid design (half-open room, shared-staffed pavilion, terraced mid-rise), so low / mixed / high read as three identities. | low ↔ mixed and mixed ↔ high each ≥ 1.5 % |
 | P10 (done, see [P10](#p10--cross-meter-combinations-2026-10-02)) | Cross-Meter combinations. 4–6 pairings add visible extras only when both axes agree, e.g. sharing + automation high → drone kiosks in shared plazas; environment + concentration high → vertical-forest tower crowns. | 81-combination pipeline test asserts each extra appears only in its pairing |
-| P11 (optional) | Path dependence: proposal history seeds which slots switch first, so equal scores grown in a different order give different cities. Needs the client to read history and identical results after reload / reset. | Determinism test over reload, reset and replay; user approval of the contract use |
+| P11 (done, see [P11](#p11--path-dependence-2026-10-02)) | Path dependence: proposal history seeds which slots switch first, so equal scores grown in a different order give different cities. Needs the client to read history and identical results after reload / reset. | Determinism test over reload, reset and replay; user approval of the contract use |
 | P12 (optional) | Life and motion: crowds in open plazas, drones landing at pavilions, a per-Meter night light rhythm. | Actor route / avoidance checks as in P2 |
 
 P6 (pipeline diagnostics, docs, draw-call measurement) stays per stage: each stage records lossless low / mixed / high day and night captures, `scripts/meter-diff.py` results and a same-condition draw-call before / after.
@@ -298,4 +319,4 @@ P6 (pipeline diagnostics, docs, draw-call measurement) stays per stage: each sta
 
 ## Next step
 
-Capture review of P0–P10 with the user; decide whether P11 (path dependence) / P12 (life and motion) are wanted, and integrate `feat/meter-variety` into `main` per CONTRIBUTING (preserve the review-before-main condition).
+Capture review of P0–P11 with the user; decide whether P12 (life and motion) is wanted, and integrate `feat/meter-variety` into `main` per CONTRIBUTING (preserve the review-before-main condition).

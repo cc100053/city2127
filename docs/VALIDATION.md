@@ -1,5 +1,9 @@
 # Validation and handoff
 
+## Meter variety P11 — 2026-10-02 (`feat/meter-variety`, not integrated)
+
+Full-run per-axis `slotSeeds` on CityView deterministically shuffle existing district slot ranks. Root and survey test/build passed, including 142-proposal equal-score/different-order cities in all four districts, >64 history retention, reload/reset/fresh-ID replay, unchanged retries, late roof publication, parser bounds, snapshot pulse clearing and SQLite restart. Real HTTP/WebSocket Chrome smoke confirms exact fresh-page matrix restore and reset across both histories; equal-score order A ↔ B changes 5.27% day / 4.76% night at 1920×929, DPR 1, held actor time, no application/page/shader errors. Draw submissions remain 1337 day / 1343 night; full-city low/mixed/high reference captures and their limitations are recorded in the [P11 handoff](handoffs/meter-variety.md#p11--path-dependence-2026-10-02). Existing review-before-main condition remains. No hardware/FPS/Windows acceptance claimed.
+
 ## Meter variety P10 — 2026-10-02 (`feat/meter-variety`, not integrated)
 
 Five cross-Meter extras shown only when both axes agree. Root `npm test` (81-combination pipeline asserts each extra on every slot exactly in its pairing and that all five occur; placement checks for dock rings and court kiosks; route / site checks with pairings shown), `npm run build` and `git diff --check`: PASS (existing bundle-size warning only); survey/module-swap unchanged. Pairing captures recorded; single-Meter gates unchanged (partners at mixed show no extras; all-mixed draws 1337). Not verified: browser skyway clearance of dock rings, close-up and human art review, Windows, hardware. Details: [P10 handoff](handoffs/meter-variety.md#p10--cross-meter-combinations-2026-10-02).

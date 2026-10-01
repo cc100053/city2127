@@ -63,6 +63,8 @@ export type ExhibitionView = {
   voteSums: Scores;
   recentVotes: Scores;
   scores: Scores;
+  /** Older v2 servers omit this field and retain the original fixed slot order. */
+  slotSeeds?: Scores;
   layout: ExhibitionLayout;
   recentProposals: ExhibitionProposal[];
   latestProposal?: ExhibitionProposal;
@@ -164,14 +166,16 @@ function isExhibitionProposal(value: unknown, runId: string, revision: number): 
 }
 
 function parseExhibitionView(value: unknown): ExhibitionView | null {
-  if (!isRecord(value) || !hasExactKeys(value, ['version', 'runId', 'revision', 'guestCount', 'algorithmVersion', 'voteSums', 'recentVotes', 'scores', 'layout', 'recentProposals', ...(Object.hasOwn(value, 'latestProposal') ? ['latestProposal'] : [])])
+  if (!isRecord(value) || !hasExactKeys(value, ['version', 'runId', 'revision', 'guestCount', 'algorithmVersion', 'voteSums', 'recentVotes', 'scores', 'layout', 'recentProposals', ...(Object.hasOwn(value, 'slotSeeds') ? ['slotSeeds'] : []), ...(Object.hasOwn(value, 'latestProposal') ? ['latestProposal'] : [])])
     || value.version !== 2 || !isBoundedText(value.runId, 128)
     || !isSafeCount(value.revision) || !isSafeCount(value.guestCount) || value.revision !== value.guestCount
     || value.algorithmVersion !== 2 || !isIntegerScores(value.voteSums, -value.guestCount, value.guestCount)
     || !isScores(value.recentVotes, -1, 1) || !isMeterScores(value.scores) || !isExhibitionLayout(value.layout)
+    || (Object.hasOwn(value, 'slotSeeds') && !isIntegerScores(value.slotSeeds, 0, 0xffffffff))
     || !Array.isArray(value.recentProposals) || value.recentProposals.length > 64
     || !value.recentProposals.every(proposal => isExhibitionProposal(proposal, value.runId as string, value.revision as number))) return null;
   const recent = value.recentProposals as ExhibitionProposal[];
+  if (value.guestCount === 0 && value.slotSeeds && AXES.some(axis => (value.slotSeeds as Scores)[axis] !== 0)) return null;
   if (recent.some((proposal, i) => i > 0 && proposal.ordinal <= recent[i - 1].ordinal)) return null;
   const latest = value.latestProposal;
   if (value.guestCount === 0) return recent.length === 0 && latest === undefined && !Object.hasOwn(value, 'latestProposal') ? value as ExhibitionView : null;

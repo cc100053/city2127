@@ -5,7 +5,7 @@ import { applyEffects, scoreChange } from '../survey/scoreEngine.ts';
 import { buildCityView, buildExhibitionCityView } from '../survey/decisionHistory.ts';
 import { transaction } from './database.ts';
 import { fail, type ServiceOutcome, type SurveyContext } from './context.ts';
-import { activeRun, CorruptStateError, readExhibitionSnapshot, runAnswerEvents, runProposalRecords, toAnswerEvent, writeSnapshot } from './runStore.ts';
+import { activeRun, CorruptStateError, readExhibitionSnapshot, runAnswerEvents, runProposalRecords, runProposalSlotSeeds, toAnswerEvent, writeSnapshot } from './runStore.ts';
 import { findGuestSession, requireActiveRun, settleExpiry } from './sessionService.ts';
 
 const MAX_ID_LENGTH = 128;
@@ -99,7 +99,7 @@ export function currentState(ctx: SurveyContext): CitySurveyState | ExhibitionSt
 /** The active viewer contract, selected by the run's persisted algorithm version. */
 export function viewOf(ctx: SurveyContext, state: CitySurveyState | ExhibitionState): CityView {
   if ('algorithmVersion' in state)
-    return buildExhibitionCityView(state, runProposalRecords(ctx.db, state.runId, 64));
+    return buildExhibitionCityView(state, runProposalRecords(ctx.db, state.runId, 64), runProposalSlotSeeds(ctx.db, state.runId));
   return buildCityView(state, runAnswerEvents(ctx.db, state.runId), ctx.legacyQuestions);
 }
 export const currentView = (ctx: SurveyContext): CityView => viewOf(ctx, currentState(ctx));

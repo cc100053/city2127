@@ -1,5 +1,9 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
+## Meter variety P11 — 2026-10-02，feature branch 待視覺審閱
+
+用家要求實作 P11：完整提案歷史產生四個 slot seed，同分數但早期提交次序不同，可保留不同街區位置。保留原有數量、設計、鏡位及 3 秒過渡；reload／reset／replay 可重建同一城市。毋須資料庫 migration；更新 server 同 city 要一起進行。驗證及日夜截圖見 [P11 交接](handoffs/meter-variety.md#p11--path-dependence-2026-10-02)。保留 capture review 後才整合 main 的條件。P12 未實作。
+
 ## Meter variety P10 — 2026-10-02，feature branch 待視覺審閱
 
 兩個 Meter 同時一致先出現嘅組合效果：共享＋自動化高 → 開放庭院有無人機亭；共享＋環境高 → 庭院開花果園；集約＋環境高 → 塔頂垂直森林；集約＋自動化高 → 塔身無人機停靠環；集約＋環境低 → pod 頂太陽能板。81 個真實答案組合測試確認每個效果只喺佢嘅配對出現。單一 Meter 數據不變；未觸發時唔加 draw call。詳見 [P10 交接](handoffs/meter-variety.md#p10--cross-meter-combinations-2026-10-02)。
@@ -26,7 +30,7 @@ mixed 而家有自己嘅混合款（只喺 mixed 附近出現，low／high 唔�
 
 ## Meter variety P7–P12 — 2026-10-01，建議（待用家批准）
 
-下一步加強每個 Meter 的 variety：P7 補弱點（已完成，見上）（P4 塔剪影、sharing 庭院可見度、automation 高值唔再係「空地」）、P8 每個載體 2–3 款設計（已完成）、P9 mixed 有自己的混合款（已完成）、P10 跨 Meter 組合（已完成）；P11 路徑依賴、P12 生活感為可選。P11–P12 未實作。詳見 [P7–P12 建議](handoffs/meter-variety.md#proposed-p7p12--more-variety-per-meter-2026-10-01-pending-user-approval)。
+下一步加強每個 Meter 的 variety：P7 補弱點（已完成，見上）（P4 塔剪影、sharing 庭院可見度、automation 高值唔再係「空地」）、P8 每個載體 2–3 款設計（已完成）、P9 mixed 有自己的混合款（已完成）、P10 跨 Meter 組合（已完成）；P11 路徑依賴已按用家要求實作；P12 生活感仍為可選及未實作。詳見 [P7–P12 建議](handoffs/meter-variety.md#proposed-p7p12--more-variety-per-meter-2026-10-01-pending-user-approval)。
 
 ## Meter variety P3d — 2026-10-01，海邊收細＋內陸共享庭院
 

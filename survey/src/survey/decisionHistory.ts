@@ -27,11 +27,11 @@ export function buildCityView(state: CitySurveyState, events: AnswerEvent[], que
   return { runId: state.runId, revision: state.revision, scores: state.scores, layout: deriveCityLayout(state.scores), history };
 }
 
-export function buildExhibitionCityView(state: ExhibitionState, proposals: ProposalRecord[]): ExhibitionCityView {
+export function buildExhibitionCityView(state: ExhibitionState, proposals: ProposalRecord[], slotSeeds: ExhibitionCityView['slotSeeds']): ExhibitionCityView {
   const recentProposals = proposals.slice(-64);
   return {
     version: 2, runId: state.runId, revision: state.revision, guestCount: state.guestCount, algorithmVersion: 2,
-    voteSums: state.voteSums, recentVotes: state.recentVotes, scores: state.scores,
+    voteSums: state.voteSums, recentVotes: state.recentVotes, scores: state.scores, slotSeeds,
     layout: deriveExhibitionLayout(state.scores), recentProposals,
     latestProposal: recentProposals.at(-1),
   };

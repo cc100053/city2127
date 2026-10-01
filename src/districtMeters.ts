@@ -26,12 +26,20 @@ export class SlotLevels {
   }
 
   /** Returns whether any target changed. `immediate` jumps (snapshots, resets, reduced motion). */
-  setTargets(target: (i: number) => number, now: number, immediate: boolean): boolean {
+  setTargets(target: (i: number) => number, now: number, immediate: boolean, seed = 0): boolean {
     this.update(now);
+    // Shuffle the existing ranks, preserving their counts and complementary covers. Zero keeps the original order.
+    const order = Array.from({ length: this.to.length }, (_, i) => i);
+    let random = seed;
+    if (seed) for (let i = order.length - 1; i > 0; i--) {
+      random = (Math.imul(random, 1664525) + 1013904223) >>> 0;
+      const j = Math.floor(random / 0x100000000 * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
     let changed = false;
     this.changed.length = 0;
     for (let i = 0; i < this.to.length; i++) {
-      const next = Math.fround(target(i));
+      const next = Math.fround(target(order[i]));
       if (next !== this.to[i]) { changed = true; this.changed.push(i); }
       this.to[i] = next;
     }
@@ -301,7 +309,8 @@ export class SharingDistrict {
     this.root.visible = false; parent.add(this.root); this.write();
   }
 
-  setTarget(layout: Pick<ExhibitionLayout, 'sharedSeats'> & PairingAxes, now: number, immediate: boolean): boolean {
+  setTarget(layout: Pick<ExhibitionLayout, 'sharedSeats'> & PairingAxes, now: number, immediate: boolean, seed = 0): boolean {
+    if (immediate) this.pulses.clear();
     this.target = layout.sharedSeats / 8;
     const axis = axes(layout);
     const kiosks = this.kiosk.setTargets(() => agree(axis.sharing, axis.automation, 'high') ? 1 : 0, now, immediate);
@@ -309,11 +318,11 @@ export class SharingDistrict {
     // The first low / high proposals (2 / 7 seats) already read as distinct mature alternatives.
     const share = T.MathUtils.smoothstep(this.target, .25, .875);
     this.root.visible = true;
-    const rooms = this.levels.setTargets(i => rank(i + 401) < share ? 1 : 0, now, immediate);
-    const courts = this.court.setTargets(i => rank(i + 977) < share ? 1 : 0, now, immediate);
+    const rooms = this.levels.setTargets(i => rank(i + 401) < share ? 1 : 0, now, immediate, seed);
+    const courts = this.court.setTargets(i => rank(i + 977) < share ? 1 : 0, now, immediate, seed);
     const hybrid = hybridShare(this.target);
-    const hr = this.hybridRooms.setTargets(i => rank(i + 433) < hybrid ? 1 : 0, now, immediate);
-    const hc = this.hybridCourts.setTargets(i => rank(i + 1019) < hybrid ? 1 : 0, now, immediate);
+    const hr = this.hybridRooms.setTargets(i => rank(i + 433) < hybrid ? 1 : 0, now, immediate, seed);
+    const hc = this.hybridCourts.setTargets(i => rank(i + 1019) < hybrid ? 1 : 0, now, immediate, seed);
     const changed = rooms || courts || hr || hc || kiosks || orchards;
     const roomSlots = new Set([...(rooms ? this.levels.changed : []), ...(hr ? this.hybridRooms.changed : [])]);
     const courtSlots = new Set([...(courts ? this.court.changed : []), ...(hc ? this.hybridCourts.changed : []), ...(kiosks ? this.kiosk.changed : []),
@@ -482,6 +491,7 @@ export class EnvironmentDistrict {
   private sailGeometry!: T.BufferGeometry;
   private readonly postGeometry = new T.CylinderGeometry(.22, .3, ROOF, 8);
   private targetCanopy = .5;
+  private orderSeed = 0;
   private now = 0;
   private applied = false;
 
@@ -585,25 +595,27 @@ export class EnvironmentDistrict {
 
   private setRoofTargets(now: number, immediate: boolean): boolean {
     const green = (i: number) => rank(i + 37) < this.targetCanopy ? 1 : 0;
-    const a = this.roofSail.setTargets(i => 1 - green(i), now, immediate);
-    const b = this.roofCrown.setTargets(green, now, immediate);
-    const c = this.roofHybrid.setTargets(i => rank(i + 887) < hybridShare(this.targetCanopy) ? 1 : 0, now, immediate);
+    const a = this.roofSail.setTargets(i => 1 - green(i), now, immediate, this.orderSeed);
+    const b = this.roofCrown.setTargets(green, now, immediate, this.orderSeed);
+    const c = this.roofHybrid.setTargets(i => rank(i + 887) < hybridShare(this.targetCanopy) ? 1 : 0, now, immediate, this.orderSeed);
     return a || b || c;
   }
 
   /** `plantedFraction` runs .2–.8 over the environment axis; its 0..1 position is the share of canopy-shaded bays. */
-  setTarget(layout: Pick<ExhibitionLayout, 'plantedFraction'>, now: number, immediate: boolean): boolean {
+  setTarget(layout: Pick<ExhibitionLayout, 'plantedFraction'>, now: number, immediate: boolean, seed = 0): boolean {
+    if (immediate) this.pulses.clear();
     const share = Math.min(1, Math.max(0, (layout.plantedFraction - .2) / .6));
     this.targetCanopy = share;
+    this.orderSeed = seed;
     this.now = now;
     this.applied = true;
     this.root.visible = true;
     const green = (i: number) => rank(i) < share ? 1 : 0;
-    const a = this.canopy.setTargets(green, now, immediate);
-    const b = this.sail.setTargets(i => 1 - green(i), now, immediate);
+    const a = this.canopy.setTargets(green, now, immediate, seed);
+    const b = this.sail.setTargets(i => 1 - green(i), now, immediate, seed);
     // Mist towers only below the midpoint: most at the low end, none from mixed upward.
-    const c = this.tower.setTargets(i => rank(i + 101) >= share * 2 ? 1 : 0, now, immediate);
-    const h = this.hybrid.setTargets(i => rank(i + 577) < hybridShare(share) ? 1 : 0, now, immediate);
+    const c = this.tower.setTargets(i => rank(i + 101) >= share * 2 ? 1 : 0, now, immediate, seed);
+    const h = this.hybrid.setTargets(i => rank(i + 577) < hybridShare(share) ? 1 : 0, now, immediate, seed);
     const d = this.setRoofTargets(now, immediate) || h;
     this.facade.setTargets(i => facadeShare(i ? 1 - share : share), now, immediate);
     if ((a || b || c || d) && !immediate) {
@@ -839,13 +851,14 @@ export class AutomationDistrict {
 
   get level(): number | undefined { return this.root.visible ? this.automation.value[0] : undefined; }
 
-  setTarget(layout: Pick<ExhibitionLayout, 'automatedPorts'>, now: number, immediate: boolean): boolean {
+  setTarget(layout: Pick<ExhibitionLayout, 'automatedPorts'>, now: number, immediate: boolean, seed = 0): boolean {
+    if (immediate) this.pulses.clear();
     this.target = layout.automatedPorts / 6;
     const activity = automationActivity(this.target);
     this.root.visible = true;
     const a = this.automation.setTargets(() => this.target, now, immediate);
-    const b = this.staffed.setTargets(i => rank(i + 203) >= activity.level ? 1 : 0, now, immediate);
-    const h = this.hybrid.setTargets(i => rank(i + 307) < hybridShare(this.target) ? 1 : 0, now, immediate);
+    const b = this.staffed.setTargets(i => rank(i + 203) >= activity.level ? 1 : 0, now, immediate, seed);
+    const h = this.hybrid.setTargets(i => rank(i + 307) < hybridShare(this.target) ? 1 : 0, now, immediate, seed);
     // The fleets change everywhere at once, so the hub anchors the pulse; changed bays (pavilion ↔ drone port ↔ hybrid) mark their terraces.
     const bays = new Set([...(b ? this.staffed.changed : []), ...(h ? this.hybrid.changed : [])]);
     if ((a || b || h) && !immediate) this.pulses.emit([sitePulse('nw'), ...[...bays].map(i => ({ x: this.bays[i].x, y: this.bays[i].y + 20, z: this.bays[i].z, r: 26 }))], now);
@@ -1050,7 +1063,8 @@ export class ConcentrationDistrict {
     this.root.visible = false; parent.add(this.root); this.write();
   }
 
-  setTarget(layout: Pick<ExhibitionLayout, 'functionModules'> & PairingAxes, now: number, immediate: boolean): boolean {
+  setTarget(layout: Pick<ExhibitionLayout, 'functionModules'> & PairingAxes, now: number, immediate: boolean, seed = 0): boolean {
+    if (immediate) this.pulses.clear();
     this.target = (layout.functionModules - 2) / 4;
     const axis = axes(layout);
     const f = this.forest.setTargets(() => agree(axis.concentration, axis.environment, 'high') ? 1 : 0, now, immediate);
@@ -1061,9 +1075,9 @@ export class ConcentrationDistrict {
     this.root.visible = true;
     // Golden-ratio order: with only ten towers a hash rank clusters, this keeps any share evenly spread across both groups.
     const order = (i: number, offset: number) => (i * .6180339887 + offset) % 1;
-    const a = this.towerLevels.setTargets(i => order(i, .31) < share ? 1 : 0, now, immediate);
-    const b = this.podLevels.setTargets(i => order(i, .77) >= share ? 1 : 0, now, immediate);
-    const m = this.midRise.setTargets(i => rank(i + 1301) < hybridShare(this.target) ? 1 : 0, now, immediate);
+    const a = this.towerLevels.setTargets(i => order(i, .31) < share ? 1 : 0, now, immediate, seed);
+    const b = this.podLevels.setTargets(i => order(i, .77) >= share ? 1 : 0, now, immediate, seed);
+    const m = this.midRise.setTargets(i => rank(i + 1301) < hybridShare(this.target) ? 1 : 0, now, immediate, seed);
     if ((a || b || m || f || d || sp) && !immediate) this.pulses.emit([
       sitePulse('se'),
       ...[...new Set([...(a ? this.towerLevels.changed : []), ...(m ? this.midRise.changed : []), ...(f ? this.forest.changed : []), ...(d ? this.docks.changed : [])])]

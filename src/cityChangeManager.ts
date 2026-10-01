@@ -4,7 +4,7 @@ import type { BuiltSite, BuiltSiteMap, SiteLayerRuntime } from './siteBuilders/i
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 import type { EnvironmentParkDiagnostics } from './siteBuilders/siteRuntime.ts';
 import type { EnvironmentDistrictDiagnostics } from './districtMeters.ts';
-import type { SurveyView } from './surveyView.ts';
+import type { Scores, SurveyView } from './surveyView.ts';
 import type { ExhibitionLayout, SurveyEventKind } from './surveyView.ts';
 
 export { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
@@ -97,7 +97,7 @@ export class CityChangeManager {
   }
 
   /** V2 bands and parameters are authoritative for all four sites. */
-  applyExhibitionLayout(layout: ExhibitionLayout, kind: SurveyEventKind, now: number): void {
+  applyExhibitionLayout(layout: ExhibitionLayout, kind: SurveyEventKind, now: number, slotSeeds?: Scores): void {
     const automationHub = this.sites.magnetEast.automationHub;
     const commonsPlaza = this.sites.dogenzakaSouth.commonsPlaza;
     const concentrationTower = this.sites.centerGaiRear.concentrationTower;
@@ -113,19 +113,19 @@ export class CityChangeManager {
     const changed = [
       ['magnetEast', [
         automationHub.setTarget({ band: layout.bands.nw, automatedPorts: layout.automatedPorts }, now, immediate),
-        this.sites.magnetEast.automationDistrict?.setTarget(layout, now, immediate) ?? false,
+        this.sites.magnetEast.automationDistrict?.setTarget(layout, now, immediate, slotSeeds?.automation) ?? false,
       ].some(Boolean)],
       ['dogenzakaSouth', [
         commonsPlaza.setTarget({ band: layout.bands.sw, sharedSeats: layout.sharedSeats }, now, immediate),
-        this.sites.dogenzakaSouth.sharingDistrict?.setTarget(layout, now, immediate) ?? false,
+        this.sites.dogenzakaSouth.sharingDistrict?.setTarget(layout, now, immediate, slotSeeds?.publicSharing) ?? false,
       ].some(Boolean)],
       ['centerGaiRear', [
         concentrationTower.setTarget({ band: layout.bands.se, functionModules: layout.functionModules }, now, immediate),
-        this.sites.centerGaiRear.concentrationDistrict?.setTarget(layout, now, immediate) ?? false,
+        this.sites.centerGaiRear.concentrationDistrict?.setTarget(layout, now, immediate, slotSeeds?.urbanConcentration) ?? false,
       ].some(Boolean)],
       ['stationEastPark', [
         park.setTarget(environmentParkTarget(layout), now, immediate),
-        this.sites.stationEastPark.environmentDistrict?.setTarget(layout, now, immediate) ?? false,
+        this.sites.stationEastPark.environmentDistrict?.setTarget(layout, now, immediate, slotSeeds?.environmentalPriority) ?? false,
       ].some(Boolean)],
     ] as const;
     for (const [siteId, siteChanged] of changed) if (siteChanged && fresh) this.markFresh(siteId, now);

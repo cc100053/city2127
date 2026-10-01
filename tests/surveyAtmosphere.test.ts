@@ -71,6 +71,14 @@ assert.ok(parsedInitialV2 && 'kind' in parsedInitialV2 && isExhibitionView(parse
 const parsedV2 = parseSurveyEvent({ type: 'city-state-updated', view: v2View });
 if (!parsedV2 || !('kind' in parsedV2) || !isExhibitionView(parsedV2.view)) throw new Error('expected a validated v2 event');
 assert.equal(parsedV2.view.layout, v2AfterLayout);
+const seededV2 = parseSurveyEvent({ type: 'city-state-snapshot', view: { ...v2View, slotSeeds: { ...zero, environmentalPriority: 0xffffffff } } });
+assert.ok(seededV2 && 'kind' in seededV2 && seededV2.view.version === 2);
+assert.equal(seededV2.view.slotSeeds?.environmentalPriority, 0xffffffff);
+for (const slotSeeds of [null, [], {}, { ...zero, extra: 1 }, { ...zero, automation: undefined },
+  ...[-1, .5, 0x100000000, Infinity, NaN, '1'].map(automation => ({ ...zero, automation }))]) {
+  assert.equal(parseSurveyEvent({ type: 'city-state-snapshot', view: { ...v2View, slotSeeds } }), null, 'reject malformed uint32 seeds');
+}
+assert.equal(parseSurveyEvent({ type: 'run-reset', view: { ...initialV2, slotSeeds: { ...zero, automation: 1 } } }), null);
 assert.equal(supersedes(parsedV2.view, parsedV2.view), false);
 assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, scores: { ...v2Scores, environmentalPriority: Infinity } } }), null);
 assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, layout: { ...v2AfterLayout, coolingFins: 7 } } }), null);
