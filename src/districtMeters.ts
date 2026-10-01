@@ -130,6 +130,8 @@ const sitePulse = (socket: keyof typeof changeSites): PulsePoint => {
 const rank = (i: number) => { const s = Math.sin(i * 12.9898 + 4.1) * 43758.5453; return s - Math.floor(s); };
 /** P8: fixed design family (0..n − 1) per slot; the 7.31 stride breaks the long runs neighbouring slots give `rank`, the salt decorrelates carriers. */
 export const designOf = (i: number, salt: number, n: number) => Math.floor(rank(i * 7.31 + salt) * n);
+/** P9: share of slots showing a hybrid design, peaking at 60 % at mixed (axis position .5) and zero at every low / high band (≤ .25, ≥ .75). */
+export const hybridShare = (t: number) => .6 * Math.max(0, 1 - Math.abs(t - .5) / .25);
 
 /** Private shell height as a share of its radius: a hemispherical vault rather than the former 28 m egg. */
 export const PRIVATE_RISE = 1.15;
@@ -159,6 +161,10 @@ export class SharingDistrict {
   /** Second carrier, inland: 40 m courts that are walled private gardens or open shared plazas under parasols. */
   readonly courts = COURT_SITES.map(([x, z, yaw]) => ({ x, z, yaw }));
   private readonly court = new SlotLevels(COURT_SITES.length);
+  /** P9 hybrids at mixed: half-open rooms (a half-height vault over the open steps; garden islands gain the steps instead of a halo)
+   * and shared garden courts (walls, crowns, paving, parasols). */
+  private readonly hybridRooms: SlotLevels;
+  private readonly hybridCourts = new SlotLevels(COURT_SITES.length);
   private readonly courtWalls: T.InstancedMesh;
   private readonly courtPavilions: T.InstancedMesh;
   private readonly courtCrowns: T.InstancedMesh;
@@ -188,6 +194,7 @@ export class SharingDistrict {
 
   constructor(parent: T.Object3D) {
     this.root.name = 'sharing-district';
+    this.hybridRooms = new SlotLevels(this.bays.length);
     // Gridshell vault: frosted pearl glass over the garden on ivory ribs and ring beams; rose (the sharing colour) stays on the rim and oculus.
     const privacy = glass.clone(); privacy.color.set('#f4f1ea'); privacy.emissive.set('#ffe2cf'); privacy.emissiveIntensity = .3;
     privacy.side = T.DoubleSide; privacy.transparent = true; privacy.opacity = .62; privacy.depthWrite = false;
@@ -277,32 +284,41 @@ export class SharingDistrict {
     const share = T.MathUtils.smoothstep(this.target, .25, .875);
     this.root.visible = true;
     const rooms = this.levels.setTargets(i => rank(i + 401) < share ? 1 : 0, now, immediate);
-    const courts = this.court.setTargets(i => rank(i + 977) < share ? 1 : 0, now, immediate), changed = rooms || courts;
-    if (changed && !immediate) this.pulses.emit([sitePulse('sw'), ...(rooms ? this.levels.changed : []).map(i => {
+    const courts = this.court.setTargets(i => rank(i + 977) < share ? 1 : 0, now, immediate);
+    const hybrid = hybridShare(this.target);
+    const hr = this.hybridRooms.setTargets(i => rank(i + 433) < hybrid ? 1 : 0, now, immediate);
+    const hc = this.hybridCourts.setTargets(i => rank(i + 1019) < hybrid ? 1 : 0, now, immediate);
+    const changed = rooms || courts || hr || hc;
+    const roomSlots = new Set([...(rooms ? this.levels.changed : []), ...(hr ? this.hybridRooms.changed : [])]);
+    const courtSlots = new Set([...(courts ? this.court.changed : []), ...(hc ? this.hybridCourts.changed : [])]);
+    if (changed && !immediate) this.pulses.emit([sitePulse('sw'), ...[...roomSlots].map(i => {
       const b = this.bays[i]; return { x: b.x, y: b.y, z: b.z, r: b.r * b.sx * 1.3 };
-    }), ...(courts ? this.court.changed : []).map(i => ({ x: this.courts[i].x, y: 0, z: this.courts[i].z, r: COURT * .75 }))], now);
+    }), ...[...courtSlots].map(i => ({ x: this.courts[i].x, y: 0, z: this.courts[i].z, r: COURT * .75 }))], now);
     this.write(); return changed;
   }
 
   update(now: number): void {
     this.now = now; this.deckGlow.emissiveIntensity = .2 + 2 * (towerGlow.value - .3);
-    const rooms = this.levels.update(now), courts = this.court.update(now);
-    if (rooms || courts) this.write(); this.pulses.update(now);
+    const moved = [this.levels.update(now), this.court.update(now), this.hybridRooms.update(now), this.hybridCourts.update(now)].some(Boolean);
+    if (moved) this.write(); this.pulses.update(now);
   }
   hide(): void { this.root.visible = false; this.pulses.clear(); }
   getDiagnostics() {
     const open = this.root.visible ? this.levels.visible() : 0;
     return { enabled: this.root.visible, targetSharing: this.target, rooms: this.bays.length, activePulses: this.pulses.active(this.now),
       vaults: this.vaulted.filter(Boolean).length, courts: this.courts.length,
+      hybridRooms: this.root.visible ? this.hybridRooms.visible() : 0, hybridCourts: this.root.visible ? this.hybridCourts.visible() : 0,
       visibleOpenCourts: this.root.visible ? this.court.visible() : 0, visibleOpenRooms: open, visiblePrivateRooms: this.root.visible ? this.levels.value.filter(v => 1 - v > HIDDEN).length : 0 };
   }
 
   private write(): void {
     this.bays.forEach((bay, i) => {
-      const open = this.levels.value[i], vaulted = this.vaulted[i], height = vaulted ? PRIVATE_RISE * bay.r * (1 - open) : 0;
+      // A hybrid (half-open) room keeps its vault at half height over the open steps.
+      const hybrid = this.hybridRooms.value[i], open = this.levels.value[i], vaulted = this.vaulted[i];
+      const vault = Math.max(1 - open, hybrid), height = vaulted ? PRIVATE_RISE * bay.r * vault * (1 - .5 * hybrid) : 0;
       // Keep hidden matrices invertible: flattened curved normals otherwise poison the G-buffer / SSR.
-      const privateScale = vaulted ? Math.max(HIDDEN, 1 - open) : HIDDEN, publicScale = Math.max(HIDDEN, open);
-      const stepScale = vaulted ? publicScale : HIDDEN, haloScale = vaulted ? HIDDEN : publicScale;
+      const privateScale = vaulted ? Math.max(HIDDEN, vault) : HIDDEN, publicScale = Math.max(HIDDEN, open, hybrid);
+      const stepScale = vaulted ? publicScale : Math.max(HIDDEN, hybrid), haloScale = vaulted ? HIDDEN : Math.max(HIDDEN, open * (1 - hybrid));
       this.dummy.position.set(bay.x, bay.y, bay.z); this.dummy.rotation.set(0, bay.yaw, 0);
       // A settled-open vault collapses completely; a flat glass disc would otherwise tint the garden.
       const footprint = height > HIDDEN ? SPREAD : HIDDEN;
@@ -312,6 +328,7 @@ export class SharingDistrict {
       this.dummy.position.y = bay.y + height * Math.cos(.18);
       this.dummy.scale.set(bay.r * bay.sx * SPREAD * privateScale, bay.r * privateScale, bay.r * bay.sz * SPREAD * privateScale);
       this.dummy.updateMatrix(); this.skylights.setMatrixAt(i, this.dummy.matrix);
+      // ponytail: the oculus ring keeps the full-vault radius on a half-height hybrid vault; at hero distance it reads as the rim of the shell.
       this.steps.forEach((mesh, tier) => {
         this.dummy.position.y = bay.y + tier * .7;
         this.dummy.scale.set(bay.r * bay.sx * stepScale, bay.r * stepScale, bay.r * bay.sz * stepScale);
@@ -321,16 +338,18 @@ export class SharingDistrict {
       this.dummy.updateMatrix(); for (const mesh of [this.halos, this.haloGardens, this.haloLights, this.haloDecks]) mesh.setMatrixAt(i, this.dummy.matrix);
     });
     this.courts.forEach(({ x, z, yaw }, i) => {
-      const open = this.court.value[i], walled = Math.max(HIDDEN, 1 - open), shared = Math.max(HIDDEN, open);
+      // A hybrid (shared garden) court composes the walled garden with the parasol plaza, whatever the slot's own designs.
+      const hybrid = this.hybridCourts.value[i], open = this.court.value[i];
+      const walled = Math.max(HIDDEN, 1 - open, hybrid), shared = Math.max(HIDDEN, open, hybrid);
       this.dummy.position.set(x, 0, z); this.dummy.rotation.set(0, yaw, 0);
       // Walls and the garden room sink into the ground; the plaza paving spreads and the parasols open.
       const glasshouse = this.privateDesign[i] === 1, pergola = this.openDesign[i] === 1;
-      this.dummy.scale.set(1, glasshouse ? HIDDEN : walled, 1); this.dummy.updateMatrix();
+      this.dummy.scale.set(1, glasshouse ? Math.max(HIDDEN, hybrid) : walled, 1); this.dummy.updateMatrix();
       this.courtWalls.setMatrixAt(i, this.dummy.matrix); this.courtPavilions.setMatrixAt(i, this.dummy.matrix);
-      this.dummy.scale.set(1, glasshouse ? walled : HIDDEN, 1); this.dummy.updateMatrix();
+      this.dummy.scale.set(1, glasshouse ? Math.max(HIDDEN, (1 - open) * (1 - hybrid)) : HIDDEN, 1); this.dummy.updateMatrix();
       this.winterGardens.setMatrixAt(i, this.dummy.matrix); this.winterFrames.setMatrixAt(i, this.dummy.matrix);
       this.dummy.scale.set(shared, 1, shared); this.dummy.updateMatrix(); this.plazaPaving.setMatrixAt(i, this.dummy.matrix);
-      const parasols = pergola ? HIDDEN : shared, tables = pergola ? shared : HIDDEN;
+      const parasols = pergola ? Math.max(HIDDEN, hybrid) : shared, tables = pergola ? Math.max(HIDDEN, open * (1 - hybrid)) : HIDDEN;
       this.dummy.scale.set(parasols, parasols, parasols); this.dummy.updateMatrix(); this.plazaParasols.setMatrixAt(i, this.dummy.matrix);
       this.dummy.scale.set(tables, tables, tables); this.dummy.updateMatrix();
       this.pergolaFrames.setMatrixAt(i, this.dummy.matrix); this.pergolaRoofs.setMatrixAt(i, this.dummy.matrix);
@@ -370,6 +389,8 @@ export interface EnvironmentDistrictDiagnostics {
   readonly roofs: number;
   readonly visibleRoofSails: number;
   readonly visibleRoofCrowns: number;
+  readonly hybridBays: number;
+  readonly hybridRoofs: number;
   readonly activePulses: number;
 }
 
@@ -382,6 +403,10 @@ export class EnvironmentDistrict {
   private readonly canopy: SlotLevels;
   private readonly sail: SlotLevels;
   private readonly tower: SlotLevels;
+  /** P9 hybrids at mixed: a bay keeps its planted cover with its low design lifted above (greenery growing through the sail / louvres);
+   * a roof keeps its sail / PV over the forest / meadow. */
+  private readonly hybrid: SlotLevels;
+  private roofHybrid = new SlotLevels(0);
   private readonly towerBays: number[];
   /** P8 design per bay: low = hypar sail (0) / solar louvre roof (1); high = planted pergola (0) / green screen (1). */
   readonly lowDesign: number[];
@@ -434,6 +459,7 @@ export class EnvironmentDistrict {
     this.towerBays = this.bays.map((_, i) => i).filter(i => i % 3 === 1);
     this.canopy = new SlotLevels(n);
     this.sail = new SlotLevels(n);
+    this.hybrid = new SlotLevels(n);
     this.tower = new SlotLevels(this.towerBays.length);
     this.lowDesign = this.bays.map((_, i) => designOf(i, 503, 2));
     this.highDesign = this.bays.map((_, i) => designOf(i, 541, 2));
@@ -511,6 +537,7 @@ export class EnvironmentDistrict {
     this.roofHigh = this.roofs.map((_, i) => designOf(i, 857, 2));
     this.roofSail = new SlotLevels(n);
     this.roofCrown = new SlotLevels(n);
+    this.roofHybrid = new SlotLevels(n);
     if (this.applied) this.setRoofTargets(this.now, true);
     this.write();
   }
@@ -519,7 +546,8 @@ export class EnvironmentDistrict {
     const green = (i: number) => rank(i + 37) < this.targetCanopy ? 1 : 0;
     const a = this.roofSail.setTargets(i => 1 - green(i), now, immediate);
     const b = this.roofCrown.setTargets(green, now, immediate);
-    return a || b;
+    const c = this.roofHybrid.setTargets(i => rank(i + 887) < hybridShare(this.targetCanopy) ? 1 : 0, now, immediate);
+    return a || b || c;
   }
 
   /** `plantedFraction` runs .2–.8 over the environment axis; its 0..1 position is the share of canopy-shaded bays. */
@@ -534,11 +562,12 @@ export class EnvironmentDistrict {
     const b = this.sail.setTargets(i => 1 - green(i), now, immediate);
     // Mist towers only below the midpoint: most at the low end, none from mixed upward.
     const c = this.tower.setTargets(i => rank(i + 101) >= share * 2 ? 1 : 0, now, immediate);
-    const d = this.setRoofTargets(now, immediate);
+    const h = this.hybrid.setTargets(i => rank(i + 577) < hybridShare(share) ? 1 : 0, now, immediate);
+    const d = this.setRoofTargets(now, immediate) || h;
     this.facade.setTargets(i => facadeShare(i ? 1 - share : share), now, immediate);
     if ((a || b || c || d) && !immediate) {
-      const bays = new Set([...this.canopy.changed, ...this.sail.changed, ...this.tower.changed.map(j => this.towerBays[j])]);
-      const roofs = new Set([...this.roofSail.changed, ...this.roofCrown.changed]);
+      const bays = new Set([...this.canopy.changed, ...this.sail.changed, ...this.hybrid.changed, ...this.tower.changed.map(j => this.towerBays[j])]);
+      const roofs = new Set([...this.roofSail.changed, ...this.roofCrown.changed, ...this.roofHybrid.changed]);
       this.pulses.emit([
         sitePulse('ne'),
         ...[...bays].map(i => ({ x: this.bays[i].x, y: this.bays[i].y + ROOF, z: this.bays[i].z, r: 13 })),
@@ -560,7 +589,8 @@ export class EnvironmentDistrict {
   update(now: number): void {
     this.now = now;
     if (this.facade.update(now)) this.writeFacade();
-    const moved = [this.canopy.update(now), this.sail.update(now), this.tower.update(now), this.roofSail.update(now), this.roofCrown.update(now)].some(Boolean);
+    const moved = [this.canopy.update(now), this.sail.update(now), this.hybrid.update(now), this.tower.update(now), this.roofSail.update(now), this.roofCrown.update(now),
+      this.roofHybrid.update(now)].some(Boolean);
     if (moved) this.write();
     this.pulses.update(now);
   }
@@ -570,6 +600,7 @@ export class EnvironmentDistrict {
       slots: this.bays.length, targetCanopy: this.targetCanopy,
       visibleCanopies: this.canopy.visible(), visibleSails: this.sail.visible(), visibleCoolingTowers: this.tower.visible(),
       roofs: this.roofs.length, visibleRoofSails: this.roofSail.visible(), visibleRoofCrowns: this.roofCrown.visible(),
+      hybridBays: this.hybrid.visible(), hybridRoofs: this.roofHybrid.visible(),
       activePulses: this.pulses.active(this.now),
     };
   }
@@ -591,10 +622,10 @@ export class EnvironmentDistrict {
     this.writeFacade();
     this.bays.forEach((bay, i) => {
       // Covers unfurl from the bay centre; hidden covers stay as zero-scale instances (degenerate, nothing rasterised).
-      const g = this.canopy.value[i], w = this.sail.value[i];
+      const h = this.hybrid.value[i], g = Math.max(this.canopy.value[i], h), w = Math.max(this.sail.value[i], h), lift = 1.2 * h;
       const sail = this.lowDesign[i] ? 0 : w, louvre = this.lowDesign[i] ? w : 0, pergola = this.highDesign[i] ? 0 : g, screen = this.highDesign[i] ? g : 0;
-      this.place(bay, 0, ROOF + .4, 0, sail); this.sails.setMatrixAt(i, this.dummy.matrix);
-      this.place(bay, 0, ROOF + .3, 0, louvre); this.louvres.setMatrixAt(i, this.dummy.matrix);
+      this.place(bay, 0, ROOF + .4 + lift, 0, sail); this.sails.setMatrixAt(i, this.dummy.matrix);
+      this.place(bay, 0, ROOF + .3 + lift, 0, louvre); this.louvres.setMatrixAt(i, this.dummy.matrix);
       this.place(bay, 0, 0, 0, screen); this.screens.setMatrixAt(i, this.dummy.matrix); this.screenCaps.setMatrixAt(i, this.dummy.matrix);
       this.place(bay, 0, ROOF + .2, 0, pergola); this.slabs.setMatrixAt(i, this.dummy.matrix);
       for (let k = 0; k < 3; k++) {
@@ -618,7 +649,7 @@ export class EnvironmentDistrict {
     const roof = this.roofMeshes;
     if (roof) this.roofs.forEach(([x, z, y, r], i) => {
       // A solar shade sail over each roof terrace (posts rise with it), or one large roof-forest crown at its heart.
-      const w = this.roofSail.value[i], g = this.roofCrown.value[i], size = r * 2.4 / SPAN, bay = { x, y, z, yaw: Math.sin(x * .37 + z * .11) * 3 };
+      const h = this.roofHybrid.value[i], w = Math.max(this.roofSail.value[i], h), g = Math.max(this.roofCrown.value[i], h), size = r * 2.4 / SPAN, bay = { x, y, z, yaw: Math.sin(x * .37 + z * .11) * 3 };
       const pv = this.roofLow[i] ? w : 0, forest = this.roofHigh[i] ? 0 : g, meadow = this.roofHigh[i] ? g : 0;
       this.place(bay, 0, 9 * w, 0, (w - pv) * size, w - pv);
       roof.sails.setMatrixAt(i, this.dummy.matrix);
@@ -649,6 +680,8 @@ export class AutomationDistrict {
   readonly bays: { x: number; y: number; z: number; yaw: number }[] = [];
   private readonly automation = new SlotLevels(1);
   private readonly staffed: SlotLevels;
+  /** P9: hybrid bays at mixed show both designs composed — a smaller (60 %) staffed kiosk under its drone deck / charging mast. */
+  private readonly hybrid: SlotLevels;
   private readonly meshes: T.InstancedMesh[];
   private readonly ports: T.InstancedMesh[];
   /** P8 design per bay: staffed = domed hall (0) / stacked-deck hall (1); autonomous = drone port (0) / charging mast (1). */
@@ -677,6 +710,7 @@ export class AutomationDistrict {
     for (const [x, z, yaw] of [[20, 145, 0], [-200, 80, 0], [-130, 170, 0], [75, -160, 0], [-438, 45, -.9]])
       this.bays.push({ x, y: 0, z, yaw });
     this.staffed = new SlotLevels(this.bays.length);
+    this.hybrid = new SlotLevels(this.bays.length);
     const pavilion = new T.Group();
     const ceramic = trim.clone(); ceramic.emissive.set('#e5cab0'); ceramic.emissiveIntensity = 1;
     // Open service hall: ivory canopy, glass service bar and warm-lit fascia, with people behind the counter.
@@ -770,15 +804,18 @@ export class AutomationDistrict {
     this.root.visible = true;
     const a = this.automation.setTargets(() => this.target, now, immediate);
     const b = this.staffed.setTargets(i => rank(i + 203) >= activity.level ? 1 : 0, now, immediate);
-    // The fleets change everywhere at once, so the hub anchors the pulse; changed bays (pavilion ↔ drone port) mark their terraces.
-    if ((a || b) && !immediate) this.pulses.emit([sitePulse('nw'), ...this.staffed.changed.map(i => ({ x: this.bays[i].x, y: this.bays[i].y + 20, z: this.bays[i].z, r: 26 }))], now);
-    this.write(); return a || b;
+    const h = this.hybrid.setTargets(i => rank(i + 307) < hybridShare(this.target) ? 1 : 0, now, immediate);
+    // The fleets change everywhere at once, so the hub anchors the pulse; changed bays (pavilion ↔ drone port ↔ hybrid) mark their terraces.
+    const bays = new Set([...(b ? this.staffed.changed : []), ...(h ? this.hybrid.changed : [])]);
+    if ((a || b || h) && !immediate) this.pulses.emit([sitePulse('nw'), ...[...bays].map(i => ({ x: this.bays[i].x, y: this.bays[i].y + 20, z: this.bays[i].z, r: 26 }))], now);
+    this.write(); return a || b || h;
   }
 
   update(now: number): void {
     this.now = now;
     this.automation.update(now);
-    if (this.staffed.update(now)) this.write();
+    const b = this.staffed.update(now), h = this.hybrid.update(now);
+    if (b || h) this.write();
     this.pulses.update(now);
   }
 
@@ -789,6 +826,7 @@ export class AutomationDistrict {
     return { enabled: this.root.visible, targetAutomation: this.target, automation: this.level, activePulses: this.pulses.active(this.now),
       pavilions: this.bays.length, visibleStaffedPavilions: this.root.visible ? this.staffed.visible() : 0,
       visibleDronePorts: this.root.visible ? this.staffed.value.filter(v => 1 - v > HIDDEN).length : 0,
+      hybridBays: this.root.visible ? this.hybrid.visible() : 0,
       loopAircraft: this.root.visible ? Math.ceil(activity.aircraft) : undefined,
       guidewayPods: this.root.visible ? Math.ceil(activity.pods) : undefined, walkers: this.root.visible ? Math.ceil(activity.walkers) : undefined };
   }
@@ -797,7 +835,7 @@ export class AutomationDistrict {
     this.bays.forEach((bay, i) => {
       this.dummy.position.set(bay.x, bay.y, bay.z); this.dummy.rotation.set(0, bay.yaw, 0);
       // The autonomous design rises from its foot as the staffed hall folds away (same 3 s clock); hidden designs keep an invertible tiny scale.
-      const staffed = this.staffed.value[i], autonomous = 1 - staffed;
+      const hybrid = this.hybrid.value[i], staffed = Math.max(this.staffed.value[i], .6 * hybrid), autonomous = Math.max(1 - this.staffed.value[i], hybrid);
       const scales: [T.InstancedMesh[], number][] = [[this.meshes, this.staffedDesign[i] ? 0 : staffed], [this.decks, this.staffedDesign[i] ? staffed : 0],
         [this.ports, this.autonomousDesign[i] ? 0 : autonomous], [this.masts, this.autonomousDesign[i] ? autonomous : 0]];
       for (const [meshes, level] of scales) {
@@ -831,6 +869,8 @@ export class ConcentrationDistrict {
   readonly towers: readonly { x: number; z: number; h: number }[] = TOWER_SITES.map(([x, z, h]) => ({ x, z, h }));
   readonly pods: readonly { x: number; z: number; yaw: number }[] = POD_SITES.map(([x, z], i) => ({ x, z, yaw: i * 2.1 }));
   private readonly towerLevels = new SlotLevels(this.towers.length);
+  /** P9: at mixed a share of tower sites stands as a terraced mid-rise (45 % of the tower height) instead of open lawn. */
+  private readonly midRise = new SlotLevels(this.towers.length);
   private readonly podLevels = new SlotLevels(this.pods.length);
   /** Tower meshes per silhouette family (slot i uses family i % 3, instance ⌊i / 3⌋). */
   private readonly families: T.InstancedMesh[][];
@@ -956,18 +996,19 @@ export class ConcentrationDistrict {
     const order = (i: number, offset: number) => (i * .6180339887 + offset) % 1;
     const a = this.towerLevels.setTargets(i => order(i, .31) < share ? 1 : 0, now, immediate);
     const b = this.podLevels.setTargets(i => order(i, .77) >= share ? 1 : 0, now, immediate);
-    if ((a || b) && !immediate) this.pulses.emit([
+    const m = this.midRise.setTargets(i => rank(i + 1301) < hybridShare(this.target) ? 1 : 0, now, immediate);
+    if ((a || b || m) && !immediate) this.pulses.emit([
       sitePulse('se'),
-      ...this.towerLevels.changed.map(i => ({ x: this.towers[i].x, y: 1, z: this.towers[i].z, r: 30 })),
+      ...[...new Set([...(a ? this.towerLevels.changed : []), ...(m ? this.midRise.changed : [])])].map(i => ({ x: this.towers[i].x, y: 1, z: this.towers[i].z, r: 30 })),
       ...this.podLevels.changed.map(i => ({ x: this.pods[i].x, y: 1, z: this.pods[i].z, r: 14 })),
     ], now);
-    this.write(); return a || b;
+    this.write(); return a || b || m;
   }
 
   update(now: number): void {
     this.now = now;
-    const a = this.towerLevels.update(now), b = this.podLevels.update(now);
-    if (a || b) this.write();
+    const a = this.towerLevels.update(now), b = this.podLevels.update(now), m = this.midRise.update(now);
+    if (a || b || m) this.write();
     this.pulses.update(now);
   }
 
@@ -975,7 +1016,8 @@ export class ConcentrationDistrict {
 
   getDiagnostics() {
     return { enabled: this.root.visible, targetConcentration: this.target, towers: this.towers.length, pods: this.pods.length, activePulses: this.pulses.active(this.now),
-      visibleTowers: this.root.visible ? this.towerLevels.visible() : 0, visiblePods: this.root.visible ? this.podLevels.visible() : 0 };
+      visibleTowers: this.root.visible ? this.towerLevels.visible() : 0, visiblePods: this.root.visible ? this.podLevels.visible() : 0,
+      midRises: this.root.visible ? this.towers.filter((_, i) => this.midRise.value[i] > HIDDEN && this.towerLevels.value[i] <= HIDDEN).length : 0 };
   }
 
   private instances(sources: T.Mesh[], count: number, name: string): T.InstancedMesh[] {
@@ -986,10 +1028,13 @@ export class ConcentrationDistrict {
     });
   }
 
+  /** Tower height share: full tower, or a 45 % mid-rise on hybrid sites. */
+  private height(i: number): number { return Math.max(this.towerLevels.value[i], .45 * this.midRise.value[i]); }
+
   private write(): void {
     this.towers.forEach((site, i) => {
       // Towers rise from the plaza; hidden ones keep a tiny invertible scale (flattened normals poison the G-buffer).
-      const level = this.towerLevels.value[i], footprint = level > .02 ? 1 : HIDDEN;
+      const level = this.height(i), footprint = level > .02 ? 1 : HIDDEN;
       this.dummy.position.set(site.x, 0, site.z); this.dummy.rotation.set(0, i, 0);
       this.dummy.scale.set(footprint, Math.max(HIDDEN, level) * site.h, footprint); this.dummy.updateMatrix();
       for (const mesh of this.families[i % 3]) mesh.setMatrixAt(Math.floor(i / 3), this.dummy.matrix);
@@ -1004,8 +1049,9 @@ export class ConcentrationDistrict {
     });
     this.bridges.forEach(({ i, j, y }, k) => {
       // A bridge spans only once both towers stand; it grows out from the midpoint.
-      const a = this.towers[i], b = this.towers[j], level = Math.min(this.towerLevels.value[i], this.towerLevels.value[j]);
-      const length = Math.hypot(b.x - a.x, b.z - a.z) - 30, s = Math.max(HIDDEN, level);
+      // Mid-rises stay below the lobby levels, so a bridge only spans between full towers (growing over their upper half).
+      const a = this.towers[i], b = this.towers[j], level = Math.min(this.height(i), this.height(j));
+      const length = Math.hypot(b.x - a.x, b.z - a.z) - 30, s = Math.max(HIDDEN, T.MathUtils.smoothstep(level, .5, 1));
       this.dummy.position.set((a.x + b.x) / 2, y * s, (a.z + b.z) / 2);
       this.dummy.rotation.set(0, Math.atan2(-(b.z - a.z), b.x - a.x), 0);
       this.dummy.scale.set(length * s, s, s); this.dummy.updateMatrix();

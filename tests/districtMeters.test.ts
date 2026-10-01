@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, PRIVATE_RISE, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
+import { hybridShare, AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, PRIVATE_RISE, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
 import { mobility } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
@@ -216,6 +216,31 @@ console.log(`PASS: concentration district — ${concentration.towers.length} tow
     assert.ok(Math.abs(size(d ? masts : ports, i) - 1) < 1e-6 && size(d ? ports : masts, i) < 1e-3, `bay ${i} draws only its own autonomous design`);
   });
   console.log('PASS: P8 design families — every carrier mixes ≥ 2 families per band; each slot draws only its own design.');
+}
+
+// P9: hybrids appear only around mixed (never at a low / high band) and compose both designs on the same slot.
+{
+  assert.deepEqual([hybridShare(.25), hybridShare(.5), hybridShare(.75), hybridShare(.1875), hybridShare(.8125)], [0, .6, 0, 0, 0]);
+  const a = new AutomationDistrict(new T.Scene()), sh = new SharingDistrict(new T.Scene()), c = new ConcentrationDistrict(new T.Scene()), e = new EnvironmentDistrict(new T.Scene());
+  const counts = () => [a.getDiagnostics().hybridBays, sh.getDiagnostics().hybridRooms + sh.getDiagnostics().hybridCourts, c.getDiagnostics().midRises, e.getDiagnostics().hybridBays];
+  const band = (name: string) => { const l = deriveExhibitionLayout({ automation: { low: -7.5, mixed: 0, high: 7.5 }[name]!, publicSharing: { low: -7.5, mixed: 0, high: 7.5 }[name]!,
+    environmentalPriority: { low: -7.5, mixed: 0, high: 7.5 }[name]!, urbanConcentration: { low: -7.5, mixed: 0, high: 7.5 }[name]! });
+    a.setTarget(l, 0, true); sh.setTarget(l, 0, true); c.setTarget(l, 0, true); e.setTarget(l, 0, true); return counts(); };
+  assert.deepEqual(band('low'), [0, 0, 0, 0], 'no hybrids at low');
+  assert.deepEqual(band('high'), [0, 0, 0, 0], 'no hybrids at high');
+  const mixedHybrids = band('mixed');
+  assert.ok(mixedHybrids.every(n => n > 0), `every Meter shows hybrids at mixed (${mixedHybrids})`);
+  // A hybrid automation bay draws its autonomous design at full size over a 60 % staffed kiosk (full hall where the bay stays staffed).
+  const staffing = a as unknown as { hybrid: SlotLevels; staffed: SlotLevels };
+  const i = staffing.hybrid.value.findIndex((h, k) => h === 1 && staffing.staffed.value[k] === 0);
+  const full = (name: string, slot: number, y = 1) => (a.root.children.concat(c.root.children).filter(o => o.name === name) as T.InstancedMesh[])
+    .some(mesh => slot < mesh.count && (mesh.getMatrixAt(slot, matrix), Math.abs(new T.Vector3().setFromMatrixScale(matrix).y - y) < 1e-4));
+  assert.ok(i >= 0 && full('automation-staffed-pavilions', i, .6) && full('automation-drone-ports', i), 'hybrid bay composes staffed kiosk and autonomous deck');
+  // A mid-rise (hybrid site without a full tower) stands at 45 % of its tower height in its family batch.
+  const levels = c as unknown as { midRise: SlotLevels; towerLevels: SlotLevels };
+  const m = c.towers.findIndex((_, k) => levels.midRise.value[k] === 1 && levels.towerLevels.value[k] === 0);
+  assert.ok(m >= 0 && full('concentration-vertical-towers', Math.floor(m / 3), .45 * c.towers[m].h), 'mid-rise at 45 % height');
+  console.log(`PASS: P9 hybrids — none at low / high, ${mixedHybrids.join(' / ')} (automation / sharing / mid-rise / environment) at mixed; hybrid bay composes both designs.`);
 }
 
 // P5: a live change pulses only where its district changed, in two waves that fade within PULSE_WAVE_GAP + PULSE_SECONDS;

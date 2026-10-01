@@ -1,7 +1,7 @@
 # meter-variety — Readable, district-wide Meter changes
 
 - Owner: cc100053 (P0/P1/P4/P5: Claude Code; P2/P3: Codex session)
-- Status: IN_PROGRESS — P0–P5, P7 and P8 implemented; P6 evidence recorded per stage; awaiting capture review before main
+- Status: IN_PROGRESS — P0–P5, P7, P8 and P9 implemented (P9 sharing below its mixed gate, pending user decision); P6 evidence recorded per stage; awaiting capture review before main
 - Branch: `feat/meter-variety`
 - Base commit: `33227a687ac9d18281e90494a4e9b2ce27f861ce`
 - Last verified commit: P3 source + whitespace correction `357b91784910d1bdc4411659ab8b8acdd99c13b6` (local checks, lossless captures, real WebSocket browser smoke and feature CI PASS)
@@ -211,6 +211,34 @@ Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920�
 - Draw submissions (`data-draw-calls`, all-mixed day): 1252 → **1337** (+85; 17 new instanced batches with their shadow / G-buffer passes). This is the largest single-stage increase; merging same-material variant batches is the upgrade path if real-GPU FPS needs it. Not an FPS acceptance.
 - Not verified: browser skyway clearance of the charging masts (72 m, at bays already clear of skyways) and stacked-deck halls, close-up review of the new designs (hero only), human art review, real HTTP/WebSocket smoke, Windows, real-GPU FPS.
 
+## P9 — Mixed identity (2026-10-02)
+
+- Preflight: resumed `feat/meter-variety` at `b3923b6` (P8), clean, 0/0 with its remote; `origin/main` still `33227a6`.
+- `hybridShare(t) = .6 × max(0, 1 − |t − .5| / .25)`: hybrids peak at 60 % of slots at mixed (axis position .5) and are zero at every low / high band (positions ≤ .25 / ≥ .75 for all four Meters). Each carrier has one extra `SlotLevels` on the shared 3 s clock; changed hybrid slots pulse like other changes. A hybrid mostly composes the two endpoint designs on the same slot:
+  - Automation: a 60 % staffed kiosk under the bay's drone port / charging mast (`hybridBays`).
+  - Sharing: half-open rooms — vaulted rooms keep the vault at half height over the open steps; garden islands get the steps instead of the halo. Shared garden courts compose walls, crowns, paving and parasols (`hybridRooms`, `hybridCourts`).
+  - Concentration: hybrid tower sites without a full tower stand as 45 % mid-rises in their P7 family; bridges only span between towers above half height (`midRises`).
+  - Environment: bays keep their planted cover with the low design lifted 1.2 m above it (greenery through sails / louvres); roofs keep sail / PV over forest / meadow (`hybridBays`, `hybridRoofs`).
+- Tuning: full-size halls made mixed automation look like low (low ↔ mixed 1.36 %), so the kiosk is 60 %; halo-only hybrids on garden islands matched high, so they show steps.
+- New check (`tests/districtMeters.test.ts`): no hybrids at any low / high band, hybrids on every Meter at mixed (6 automation bays / 8 sharing rooms + courts / 2 mid-rises / 12 environment bays), a hybrid bay draws its kiosk at 60 % and its autonomous design at full size, and a mid-rise stands at 45 % height.
+
+### P9 validation
+
+- Root `npm test`, `npm run build`, `git diff --check`: PASS. `survey/` and `module-swap/` unchanged.
+- Low ↔ mixed / mixed ↔ high (gate ≥ 1.5 % each), before at `b3923b6` → after, day | night:
+
+| Meter | Day | Night | Low ↔ high day / night |
+| --- | --- | --- | --- |
+| Environment | 1.91 / 2.48 → **2.20 / 2.49 %** | 1.97 / 2.42 → **2.16 / 2.42 %** | 4.07 / 4.01 % |
+| Automation | 2.39 / 1.86 → **2.27 / 2.23 %** | 2.17 / 1.61 → **2.11 / 1.96 %** | 4.01 / 3.50 % |
+| Sharing | 1.11 / 0.81 → **1.11 / 1.26 %** | 1.26 / 0.86 → **1.12 / 1.42 %** | 1.87 / 2.10 % |
+| Concentration | 2.44 / 2.21 → **2.73 / 2.01 %** | 2.01 / 1.83 → **2.27 / 1.64 %** | 4.04 / 3.41 % |
+
+  Environment, automation and concentration pass. **Sharing does not**: its whole low ↔ high change is 1.87 % day, so both halves ≥ 1.5 % would need mixed to differ from each end by about 80 % of the total; composed hybrids of the same small shore / court elements raise the weaker half (0.81 → 1.11 %) but cannot reach it. This mirrors the existing user-accepted sharing exception and needs a user decision. Low ↔ high values move slightly because the other three Meters sit at mixed in every frame and now show their hybrids.
+- Captures: environment [low](meter-variety-p9-env-low.png) / [mixed](meter-variety-p9-env-mixed.png) / [high](meter-variety-p9-env-high.png) / [night low](meter-variety-p9-env-night-low.png) / [night mixed](meter-variety-p9-env-night-mixed.png) / [night high](meter-variety-p9-env-night-high.png); automation [low](meter-variety-p9-auto-low.png) / [mixed](meter-variety-p9-auto-mixed.png) / [high](meter-variety-p9-auto-high.png) / [night low](meter-variety-p9-auto-night-low.png) / [night mixed](meter-variety-p9-auto-night-mixed.png) / [night high](meter-variety-p9-auto-night-high.png); sharing [low](meter-variety-p9-sharing-low.png) / [mixed](meter-variety-p9-sharing-mixed.png) / [high](meter-variety-p9-sharing-high.png) / [night low](meter-variety-p9-sharing-night-low.png) / [night mixed](meter-variety-p9-sharing-night-mixed.png) / [night high](meter-variety-p9-sharing-night-high.png); concentration [low](meter-variety-p9-concentration-low.png) / [mixed](meter-variety-p9-concentration-mixed.png) / [high](meter-variety-p9-concentration-high.png) / [night low](meter-variety-p9-concentration-night-low.png) / [night mixed](meter-variety-p9-concentration-night-mixed.png) / [night high](meter-variety-p9-concentration-night-high.png).
+- Draw submissions: unchanged at 1337 (all-mixed day) — hybrids reuse existing batches.
+- Not verified: browser skyway clearance (no new geometry footprints), close-up review, human art review, real HTTP/WebSocket smoke, Windows, real-GPU FPS.
+
 ## Proposed P7–P12 — More variety per Meter (2026-10-01, pending user approval)
 
 Not implemented. Goal: each Meter reads as several distinct mature 2127 identities, not one object family that is present or absent. Constraints carry over: desktop hero pose unchanged, no server contract change (P11 excepted), every value futuristic, greenery stays lush with no uniform grids, no new assets, dependencies or render passes.
@@ -232,7 +260,7 @@ Mixed values only scatter the two endpoint designs (low ↔ mixed 0.9–2.7 %).
 | --- | --- | --- |
 | P7 (done, see [P7](#p7--weak-spots-2026-10-01)) | Weak spots. **Concentration**: three tower silhouette families by slot (twisted shaft, terraced setback, linked twin) and pod clusters large enough to read. **Sharing**: rank court sites by rendered visible pixels, not a centre ray; move the hidden ones. **Automation**: high gets autonomous counterparts on the pavilion bays (drone ports / charging masts) instead of empty ground. | Each touched Meter ≥ 3 % day and night (sharing: no regression below 1.6 %); before/after captures |
 | P8 (done, see [P8](#p8--design-families-2026-10-01)) | Design families. Every slot-based carrier gets 2–3 variants chosen by a fixed per-slot hash, e.g. environment bays: sail / pergola / vertical garden screen; roofs: sail / forest / meadow terraces; sharing courts: walled garden / glass winter garden / courtyard cluster and parasols / long-table pergola / amphitheatre lawn; automation pavilions: domed / stacked deck / garden kiosk. | New check: within one band, slots of a carrier use ≥ 2 families; gate unchanged |
-| P9 | Mixed identity. At mid values a share of slots shows a hybrid design (half-open room, shared-staffed pavilion, terraced mid-rise), so low / mixed / high read as three identities. | low ↔ mixed and mixed ↔ high each ≥ 1.5 % |
+| P9 (done, see [P9](#p9--mixed-identity-2026-10-02)) | Mixed identity. At mid values a share of slots shows a hybrid design (half-open room, shared-staffed pavilion, terraced mid-rise), so low / mixed / high read as three identities. | low ↔ mixed and mixed ↔ high each ≥ 1.5 % |
 | P10 | Cross-Meter combinations. 4–6 pairings add visible extras only when both axes agree, e.g. sharing + automation high → drone kiosks in shared plazas; environment + concentration high → vertical-forest tower crowns. | 81-combination pipeline test asserts each extra appears only in its pairing |
 | P11 (optional) | Path dependence: proposal history seeds which slots switch first, so equal scores grown in a different order give different cities. Needs the client to read history and identical results after reload / reset. | Determinism test over reload, reset and replay; user approval of the contract use |
 | P12 (optional) | Life and motion: crowds in open plazas, drones landing at pavilions, a per-Meter night light rhythm. | Actor route / avoidance checks as in P2 |
@@ -248,4 +276,4 @@ P6 (pipeline diagnostics, docs, draw-call measurement) stays per stage: each sta
 
 ## Next step
 
-Capture review of P0–P5, P3b–P3d, P7 and P8 with the user; then decide P9 (mixed identity) and the remaining open questions above, and integrate `feat/meter-variety` into `main` per CONTRIBUTING (preserve the review-before-main condition).
+User decision on sharing's P9 mixed gate (accept like the 3 % exception, or ask for a larger mixed-only sharing carrier). Then capture review of P0–P9, decide P10 (cross-Meter combinations), and integrate `feat/meter-variety` into `main` per CONTRIBUTING (preserve the review-before-main condition).
