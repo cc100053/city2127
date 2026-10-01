@@ -4,7 +4,7 @@
 - Branch: `feat/odaiba-dream-loop-2`, from `main` `6301794` (0/0 with `origin/main` after a successful fetch; clean tree).
 - Scope: user asked to "create branch and use dream-loop to polish city". Dream Loop Plus, three passes, then stop for human review. Target: the existing locked `.dream-loop/target.png` (see [earlier Dream Loop](odaiba-dream-loop.md)); no new target generated. Fable was unavailable (usage credits), so workers ran on Opus.
 - Capture: headless Chrome 1920×929, `?hour=16&reviewTime=20` (`.dream-loop/shot.sh`, ignored).
-- Status: round 2 (three passes, target v1) and rounds 3–6 (three passes each, target v2) implemented and locally verified; target NOT reached; human art review pending. No main integration.
+- Status: rounds 2–9 implemented and locally verified (round 7 reverted); target NOT reached. Integrated into `main` as `53790a2` on 2026-10-01 at the user's request ("merge 落 main, 遲下再polish"); feature CI passed on `e6fe03b`. Further polish deferred.
 
 ## Passes
 
@@ -165,3 +165,7 @@ Art note: facades moved from round 6's champagne to blue-grey/sky-grey glass wit
 Remaining gaps vs target v2: inclined gardens on the megaframe, dense far skyline, sun glint, more skyway density.
 
 Next step: user review; another round or merge.
+
+## Integration (2026-10-01)
+
+Merged `feat/odaiba-dream-loop-2` (`e6fe03b`, feature CI [run 36831176021](https://github.com/cc100053/city2127/actions/runs/36831176021) passed) into `main` with `--no-ff` as `53790a2`; `origin/main` had not advanced. On the merge result: root `npm test` PASS, `npm run build` PASS, `git diff --check origin/main..HEAD` clean; `survey/` and `module-swap/` unchanged, their suites not rerun locally. Open for a later polish round: facade tone and grove/lawn balance (user art calls), megaframe inclined gardens, far skyline, sun glint, the pre-existing 22:00 pond bloom.
