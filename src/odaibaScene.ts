@@ -4,6 +4,7 @@ import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
 import { civicCore } from './civicCore';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
+import { facadeClimate, publishRoofGardens } from './districtMeters';
 import { CORRIDOR_GLSL, plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
 import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
@@ -48,13 +49,14 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
   material.color.set(spandrel); material.roughness = .45; material.metalness = .1;
   material.onBeforeCompile = shader => {
     shader.uniforms.curtainGlow = curtainGlow; shader.uniforms.curtainNight = curtainNight;
+    shader.uniforms.facadeGreen = facadeClimate.green; shader.uniforms.facadeLouvre = facadeClimate.louvre;
     // Along-facade coordinate from the world normal, so bays run on every face orientation; roofs (normal up) stay plain.
     shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 curtainP;')
       .replace('#include <worldpos_vertex>', `#include <worldpos_vertex>
       { vec3 n = normalize(mat3(modelMatrix) * objectNormal); vec4 w = modelMatrix * vec4(transformed, 1.); curtainP = vec3(abs(n.x) > abs(n.z) ? w.z : w.x, w.y, abs(n.y)); }`);
     // r6 pass 2 (target v2): full-height glass storeys between thin pale slab bands. Only whole floor runs of occupied bays glow warm;
     // the rest is clear blue-grey glass, so facades read as glazing with lit rooms instead of a beige wash with dark dots.
-    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float curtainGlow, curtainNight;\nvarying vec3 curtainP;')
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float curtainGlow, curtainNight, facadeGreen, facadeLouvre;\nvarying vec3 curtainP;')
       .replace('#include <map_fragment>', `#include <map_fragment>
       float storey = fract(curtainP.y / 4.2), mullion = fract(curtainP.x / 1.8);
       float pane = step(.2, storey) * step(storey, .96) * step(mullion, .93) * (1. - step(.5, curtainP.z)) * step(1.2, curtainP.y);
@@ -64,7 +66,17 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
       // r9: cool blue-grey glass with whole lit floor runs on about one bay in three (matches contextFacades), not a warm champagne wash.
       occupied = .08 + .92 * step(.78, occupied);
       // r9 pass 3: lighter sky-grey glass so mid-rises read ivory and glazed (target v2), not dark-striped.
-      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.42, .45, .48), pane);`)
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.42, .45, .48), pane);
+      // Environment Meter (districtMeters.ts): a share of bays becomes planted balconies (canopy cooling) or white solar louvres
+      // (active cooling); one hash splits the two sets, so they never overlap and bays switch one by one as the share eases.
+      vec2 bay = floor(vec2(curtainP.x / 5.4, curtainP.y / 4.2));
+      float h = fract(sin(dot(bay, vec2(39.3468, 11.135))) * 24634.6345), wall = (1. - step(.5, curtainP.z)) * step(4.5, curtainP.y);
+      float foliage = wall * step(h, facadeGreen) * step(storey, .64 + .12 * sin(curtainP.x * 2.3 + bay.y * 1.7));
+      float louvre = wall * step(1. - facadeLouvre, h) * step(.45, fract(curtainP.x / .9)) * step(.08, storey);
+      float leafNoise = fract(sin(dot(floor(curtainP.xy * 1.6), vec2(12.99, 78.23))) * 43758.5);
+      diffuseColor.rgb = mix(diffuseColor.rgb, mix(vec3(.05, .12, .03), vec3(.13, .24, .07), leafNoise), foliage);
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.86, .85, .8), louvre);
+      pane *= (1. - foliage) * (1. - louvre);`)
       // Panes are glass: glossy and partly metallic so they pick up the sky instead of reading as flat dark dots.
       .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, .14, pane);\nmetalnessFactor = mix(metalnessFactor, .4, pane);')
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1., .78, .5) * pane * (curtainGlow * occupied + curtainNight * .3);');
@@ -137,14 +149,14 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   plantCanopy(scene,trees,true);
   plantBackdropGrove(scene,environment);
   // Sky gardens crown the tall context towers (the only CTX mesh above 30 m inside the district).
-  environment.traverse(object=>{if(object instanceof T.Mesh && object.name.startsWith('CTX_') && new T.Box3().setFromObject(object).max.y>30)plantRoofCanopy(scene,object,true);});
+  environment.traverse(object=>{if(object instanceof T.Mesh && object.name.startsWith('CTX_') && new T.Box3().setFromObject(object).max.y>30)publishRoofGardens(plantRoofCanopy(scene,object,true));});
   await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1])).map(async placement => {
     if(placement.id==='fuji-tv'){scene.add(civicCore());return;}
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);
     model.name = placement.id;
     placeOdaibaModel(model, placement);
-    if(placement.id==='aqua-city-odaiba' || placement.id==='decks-tokyo-beach')plantRoofCanopy(scene,model);
-    else if(placement.id==='grand-nikko-tokyo-daiba' || placement.id==='divercity-office-tower')plantRoofCanopy(scene,model,true);
+    if(placement.id==='aqua-city-odaiba' || placement.id==='decks-tokyo-beach')publishRoofGardens(plantRoofCanopy(scene,model));
+    else if(placement.id==='grand-nikko-tokyo-daiba' || placement.id==='divercity-office-tower')publishRoofGardens(plantRoofCanopy(scene,model,true));
     model.traverse(object => {
       if (!(object instanceof T.Mesh)) return;
       for (const material of [object.material].flat() as T.MeshStandardMaterial[])

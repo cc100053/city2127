@@ -1,5 +1,9 @@
 # Validation and handoff
 
+## Meter variety P0 + P1 — 2026-10-01 (`feat/meter-variety`)
+
+Root `npm test` (new `tests/districtMeters.test.ts`; district assertions on all 81 combinations in `surveyMeterPipeline`), `npm run build` and `git diff --check` passed; `survey/` and `module-swap/` unchanged. Readability gate (`scripts/meter-diff.py`, headless Chrome 1920×929, `?hour=16&reviewTime=20&meters=ne:<band>`): environment low ↔ high changed 4.33 % of the frame (0.16 % before), low ↔ mixed 2.05 %, mixed ↔ high 2.60 %, night 4.34 %. A built-in browser `window.cityMeters()` change eased over 3 s. Live `?survey` against the real server, real-GPU FPS, exhibition hardware and human art review not verified. Details and captures: [handoff](handoffs/meter-variety.md).
+
 ## Odaiba Dream Loop r6 (target v2) — 2026-10-01
 
 Three more passes on `feat/odaiba-dream-loop-2` (`581ab7c`, `15772bf`, pass 3): root `npm test`/`npm run build`/`git diff --check` passed after each pass; headless day/night captures; built-in browser 16:00 console clean. Live `?survey`, FPS/draw calls and exhibition hardware not verified. Details: [handoff](handoffs/odaiba-dream-loop-2.md#round-6--target-v2-2026-10-01).

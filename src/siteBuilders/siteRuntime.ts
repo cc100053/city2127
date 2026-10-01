@@ -3,6 +3,7 @@ import { changeSites } from '../layout.ts';
 import type { EnvironmentParkTarget, SiteId, SiteLayerDefinition, SiteLayerId } from '../changeCatalog.ts';
 import type { LotSocketId } from '../surveyView.ts';
 import type { AutomationHubRuntime } from './automationHub.ts';
+import type { EnvironmentDistrict } from '../districtMeters.ts';
 import type { CommonsPlazaRuntime } from './commonsPlaza.ts';
 import type { ConcentrationTowerRuntime } from './concentrationTower.ts';
 
@@ -38,6 +39,7 @@ export interface BuiltSite {
   readonly layers: Readonly<Partial<Record<SiteLayerId, SiteLayerRuntime>>>;
   readonly marker: SiteMarkerRuntime;
   readonly environmentPark?: EnvironmentParkRuntime;
+  readonly environmentDistrict?: EnvironmentDistrict;
   readonly automationHub?: AutomationHubRuntime;
   readonly commonsPlaza?: CommonsPlazaRuntime;
   readonly concentrationTower?: ConcentrationTowerRuntime;

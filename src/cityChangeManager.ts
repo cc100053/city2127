@@ -3,6 +3,7 @@ import { CHANGE_CATALOG, SITE_IDS, environmentParkTarget, selectExhibitionSiteVa
 import type { BuiltSite, BuiltSiteMap, SiteLayerRuntime } from './siteBuilders/index.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 import type { EnvironmentParkDiagnostics } from './siteBuilders/siteRuntime.ts';
+import type { EnvironmentDistrictDiagnostics } from './districtMeters.ts';
 import type { SurveyView } from './surveyView.ts';
 import type { ExhibitionLayout, SurveyEventKind } from './surveyView.ts';
 
@@ -32,6 +33,7 @@ export interface SiteDiagnostic {
   readonly variant: SiteVariantId;
   readonly layers: Readonly<Partial<Record<SiteLayerId, SiteLayerDiagnostic>>>;
   readonly environmentPark?: EnvironmentParkDiagnostics;
+  readonly environmentDistrict?: EnvironmentDistrictDiagnostics;
   readonly automationHub?: ReturnType<NonNullable<BuiltSite['automationHub']>['getDiagnostics']>;
   readonly commonsPlaza?: ReturnType<NonNullable<BuiltSite['commonsPlaza']>['getDiagnostics']>;
   readonly concentrationTower?: ReturnType<NonNullable<BuiltSite['concentrationTower']>['getDiagnostics']>;
@@ -109,7 +111,10 @@ export class CityChangeManager {
       ['magnetEast', automationHub.setTarget({ band: layout.bands.nw, automatedPorts: layout.automatedPorts }, now, immediate)],
       ['dogenzakaSouth', commonsPlaza.setTarget({ band: layout.bands.sw, sharedSeats: layout.sharedSeats }, now, immediate)],
       ['centerGaiRear', concentrationTower.setTarget({ band: layout.bands.se, functionModules: layout.functionModules }, now, immediate)],
-      ['stationEastPark', park.setTarget(environmentParkTarget(layout), now, immediate)],
+      ['stationEastPark', [
+        park.setTarget(environmentParkTarget(layout), now, immediate),
+        this.sites.stationEastPark.environmentDistrict?.setTarget(layout, now, immediate) ?? false,
+      ].some(Boolean)],
     ] as const;
     for (const [siteId, siteChanged] of changed) if (siteChanged && fresh) this.markFresh(siteId, now);
   }
@@ -128,6 +133,7 @@ export class CityChangeManager {
         assetError: motion.layer.assetError,
       }])),
       ...(this.sites[siteId].environmentPark ? { environmentPark: this.sites[siteId].environmentPark.getDiagnostics() } : {}),
+      ...(this.sites[siteId].environmentDistrict ? { environmentDistrict: this.sites[siteId].environmentDistrict.getDiagnostics() } : {}),
       ...(this.sites[siteId].automationHub ? { automationHub: this.sites[siteId].automationHub.getDiagnostics() } : {}),
       ...(this.sites[siteId].commonsPlaza ? { commonsPlaza: this.sites[siteId].commonsPlaza.getDiagnostics() } : {}),
       ...(this.sites[siteId].concentrationTower ? { concentrationTower: this.sites[siteId].concentrationTower.getDiagnostics() } : {}),
@@ -137,6 +143,7 @@ export class CityChangeManager {
   update(now: number): void {
     this.lastUpdateNow = now;
     this.sites.stationEastPark.environmentPark?.update(now);
+    this.sites.stationEastPark.environmentDistrict?.update(now);
     this.sites.magnetEast.automationHub?.update(now);
     this.sites.dogenzakaSouth.commonsPlaza?.update(now);
     this.sites.centerGaiRear.concentrationTower?.update(now);
@@ -220,6 +227,7 @@ export class CityChangeManager {
   private restoreLegacyMode(now: number): void {
     if (!this.exhibitionInitialized) return;
     this.sites.stationEastPark.environmentPark?.restoreLegacy();
+    this.sites.stationEastPark.environmentDistrict?.hide();
     this.sites.magnetEast.automationHub?.restoreLegacy();
     this.sites.dogenzakaSouth.commonsPlaza?.restoreLegacy();
     this.sites.centerGaiRear.concentrationTower?.restoreLegacy();

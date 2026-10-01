@@ -113,7 +113,13 @@ try {
   const heldHour=Number(params.get('hour')??NaN),hold=heldHour>=0&&heldHour<24?heldHour:null;
   let displayMode: DisplayMode = 'auto';
   const updateOverlay=overlay();
-  const cityChanges=surveyUrl?createCityChangeManager(scene):null;
+  // DEV-only `?meters=nw:high,ne:low` (band or score −12..12 per site, unlisted = 0) applies a v2 layout without the survey server, for review captures; `window.cityMeters('ne:high')` then animates a live change.
+  const metersParam=import.meta.env.DEV?params.get('meters'):null;
+  const cityChanges=surveyUrl||metersParam!==null?createCityChangeManager(scene):null;
+  if(import.meta.env.DEV && metersParam!==null)import('./devMeters').then(({devLayout})=>{
+    cityChanges!.applyExhibitionLayout(devLayout(metersParam),'city-state-snapshot',now);
+    Object.assign(window,{cityMeters:(meters:string)=>cityChanges!.applyExhibitionLayout(devLayout(meters),'city-state-updated',now)});
+  });
   if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view)=>{
     if(isExhibitionView(view)){
       // Cancel any legacy score blend while preserving its current rendered atmosphere.

@@ -81,7 +81,7 @@ function plantClusters(scene:T.Object3D,clusters:[number,number,number,number][]
 }
 
 /** Clusters on authored flat planted roofs (white-rimmed podium terraces); `tower` instead crowns any flat roof above 30 m (2127 sky gardens). */
-export function plantRoofCanopy(scene: T.Object3D, model: T.Object3D, tower=false) {
+export function plantRoofCanopy(scene: T.Object3D, model: T.Object3D, tower=false): [number,number,number,number][] {
   const bounds=new T.Box3().setFromObject(model),ray=new T.Raycaster(),down=new T.Vector3(0,-1,0);
   bounds.min.x=Math.max(bounds.min.x,DISTRICT.minX);bounds.max.x=Math.min(bounds.max.x,DISTRICT.maxX);bounds.min.z=Math.max(bounds.min.z,DISTRICT.minZ);bounds.max.z=Math.min(bounds.max.z,DISTRICT.maxZ);
   const clusters:[number,number,number,number][]=[];
@@ -102,6 +102,7 @@ export function plantRoofCanopy(scene: T.Object3D, model: T.Object3D, tower=fals
     if(r)clusters.push([x,z,p.y,r]);
   }
   plantClusters(scene,clusters,tower?.9:.6);
+  return clusters;
 }
 
 /** Coastal groves gather along structure — building edges, guideway, promenades and the water corridor — on authored landscape only, leaving open lawns between; circulation and landmark pads remain open. */

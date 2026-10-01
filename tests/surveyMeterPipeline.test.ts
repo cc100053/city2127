@@ -42,6 +42,10 @@ function assertModels(view: ExhibitionCityView) {
       assert.ok(Math.abs(actual.parameters[key] - Number(view.layout[key as keyof typeof view.layout])) < 1e-9, `${meter.axis}/${key}: actual model must use server parameter`);
     }
   }
+  // District layer (P1 meter variety): every promenade bay is covered by exactly one shade type, sized by the server's planted fraction.
+  const district = diagnostics.stationEastPark.environmentDistrict!;
+  assert.equal(district.visibleCanopies + district.visibleSails, district.slots);
+  assert.ok(Math.abs(district.targetCanopy - (view.layout.plantedFraction - .2) / .6) < 1e-9);
 }
 function applyEvent(event: unknown, now: number) {
   const parsed = parseSurveyEvent(event);
