@@ -162,6 +162,41 @@ Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920�
 - Readability (same conditions, only Q2 changes): low ↔ high **1.63 %** day, **1.85 %** night; low ↔ mixed 0.91 %, mixed ↔ high 0.77 %. Captures: [low](meter-variety-p3d-sharing-low.png), [mixed](meter-variety-p3d-sharing-mixed.png), [high](meter-variety-p3d-sharing-high.png), [night low](meter-variety-p3d-sharing-night-low.png), [night high](meter-variety-p3d-sharing-night-high.png), [standalone](meter-variety-p3d-sharing-standalone.png).
 - Batches: +5 court batches; the deck plates / crescents merged meshes are gone. Draw calls not re-measured. Not verified: close-up court review (hero only), human art acceptance, real-GPU FPS, Windows.
 
+## Proposed P7–P12 — More variety per Meter (2026-10-01, pending user approval)
+
+Not implemented. Goal: each Meter reads as several distinct mature 2127 identities, not one object family that is present or absent. Constraints carry over: desktop hero pose unchanged, no server contract change (P11 excepted), every value futuristic, greenery stays lush with no uniform grids, no new assets, dependencies or render passes.
+
+### Where each Meter stands
+
+| Meter (site) | Carriers today | Day / night low ↔ high | Known weakness |
+| --- | --- | --- | --- |
+| Automation (NW) | 11 staffed pavilions; walker, pod and aircraft fleet counts | 3.98 / 3.17 % | High = pavilions disappear (absence, not an identity); thin night margin |
+| Sharing (SW) | 6 water rooms (vault / garden → steps / halo); 10 inland courts | 1.63 / 1.85 % | Below gate by user decision; courts mostly hidden by landmarks |
+| Environment (NE) | Promenade sails / pergolas, mist towers, roof sails / forest, facade louvres / balconies | 4.33 / 4.34 % | One design per state |
+| Concentration (SE) | 10 towers + 6 bridges vs 26 pods | 4.47 / 3.81 % | Towers read as banded cylinders; low pods small in the hero frame |
+
+Mixed values only scatter the two endpoint designs (low ↔ mixed 0.9–2.7 %).
+
+### Stages (recommended order)
+
+| Stage | Scope | Acceptance beyond the standard checks |
+| --- | --- | --- |
+| P7 | Weak spots. **Concentration**: three tower silhouette families by slot (twisted shaft, terraced setback, linked twin) and pod clusters large enough to read. **Sharing**: rank court sites by rendered visible pixels, not a centre ray; move the hidden ones. **Automation**: high gets autonomous counterparts on the pavilion bays (drone ports / charging masts) instead of empty ground. | Each touched Meter ≥ 3 % day and night (sharing: no regression below 1.6 %); before/after captures |
+| P8 | Design families. Every slot-based carrier gets 2–3 variants chosen by a fixed per-slot hash, e.g. environment bays: sail / pergola / vertical garden screen; roofs: sail / forest / meadow terraces; sharing courts: walled garden / glass winter garden / courtyard cluster and parasols / long-table pergola / amphitheatre lawn; automation pavilions: domed / stacked deck / garden kiosk. | New check: within one band, slots of a carrier use ≥ 2 families; gate unchanged |
+| P9 | Mixed identity. At mid values a share of slots shows a hybrid design (half-open room, shared-staffed pavilion, terraced mid-rise), so low / mixed / high read as three identities. | low ↔ mixed and mixed ↔ high each ≥ 1.5 % |
+| P10 | Cross-Meter combinations. 4–6 pairings add visible extras only when both axes agree, e.g. sharing + automation high → drone kiosks in shared plazas; environment + concentration high → vertical-forest tower crowns. | 81-combination pipeline test asserts each extra appears only in its pairing |
+| P11 (optional) | Path dependence: proposal history seeds which slots switch first, so equal scores grown in a different order give different cities. Needs the client to read history and identical results after reload / reset. | Determinism test over reload, reset and replay; user approval of the contract use |
+| P12 (optional) | Life and motion: crowds in open plazas, drones landing at pavilions, a per-Meter night light rhythm. | Actor route / avoidance checks as in P2 |
+
+P6 (pipeline diagnostics, docs, draw-call measurement) stays per stage: each stage records lossless low / mixed / high day and night captures, `scripts/meter-diff.py` results and a same-condition draw-call before / after.
+
+### Open questions for the user
+
+- Approve P7 → P10 in this order, or start from a different stage?
+- Preferred variants for each Meter in P8 (the examples above are proposals).
+- Whether P11 / P12 are wanted for the exhibition.
+- Whether to integrate P0–P5 + P3b–P3d into `main` before P7, or keep one branch.
+
 ## Next step
 
-Capture review of P0–P5 with the user, then integrate `feat/meter-variety` into `main` per CONTRIBUTING (preserve the review-before-main condition). P6 remains per-stage evidence.
+Capture review of P0–P5 (with P3b–P3d) with the user, then decide on the [P7–P12 proposal](#proposed-p7p12--more-variety-per-meter-2026-10-01-pending-user-approval) and integrate `feat/meter-variety` into `main` per CONTRIBUTING (preserve the review-before-main condition). P6 remains per-stage evidence.
