@@ -30,13 +30,14 @@ export function contextFacades(environment: T.Object3D) {
           transform.scale.set(3.6, 3.15, 1);transform.updateMatrix();panels.push(transform.matrix.clone());
           const row = Math.floor(y / 4), col = Math.floor(u / 4);
           // Even sky-blue glazing; lit warm rooms come in runs of three bays on about one storey-run in six (2127 target: golden interiors).
-          const lit = Math.abs(Math.sin(row * 12.9898 + Math.floor(col / 3) * 78.233) * 43758.5453) % 1 < .16;
-          shades.push(lit ? new T.Color().setHSL(.09, .6, .66) : new T.Color().setHSL(.57, .22, .47 + Math.abs(row * 7 + col * 3) % 5 * .015));
+          const lit = Math.abs(Math.sin(row * 12.9898 + Math.floor(col / 3) * 78.233) * 43758.5453) % 1 < .12;
+          // r4 pass 4: paler, cooler glass so the context towers read as light curtain walls (target v2), not beige-speckled masonry.
+          shades.push(lit ? new T.Color().setHSL(.1, .55, .74) : new T.Color().setHSL(.56, .2, .6 + Math.abs(row * 7 + col * 3) % 5 * .018));
         }
       }
     }
   });
-  const mesh = new T.InstancedMesh(new T.PlaneGeometry(1, 1), new T.MeshStandardMaterial({color: '#ffffff', roughness: .3, metalness: .42}), panels.length);
+  const mesh = new T.InstancedMesh(new T.PlaneGeometry(1, 1), new T.MeshStandardMaterial({color: '#ffffff', roughness: .22, metalness: .3}), panels.length);
   panels.forEach((matrix, i) => {mesh.setMatrixAt(i, matrix);mesh.setColorAt(i, shades[i]);});
   mesh.name = 'context-recessed-facades';mesh.receiveShadow = true;
   return mesh;

@@ -30,7 +30,7 @@ export function build2127(scene: T.Scene) {
       const u = i / 159, p = guideway.getPointAt(u), side = new T.Vector3().crossVectors(up, guideway.getTangentAt(u)).normalize();
       return p.addScaledVector(side, offset).setY(14.45);
     });
-    root.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points), 320, .26, 4), trail));
+    root.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points), 320, .5, 5), trail));
   }
   // Floating decks: stone plates with planted edges and rails, riding just above the sea.
   for (const [x, z, yaw] of floatingDecks) {

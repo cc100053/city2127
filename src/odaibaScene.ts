@@ -25,7 +25,7 @@ const buildingUrls: Record<string, string> = {
 const environmentFinish: Record<string, [color: string, roughness: number, metalness: number]> = {
   road: ['#7d8a90', .88, 0], sidewalk: ['#ddd8cc', .78, 0], plaza: ['#e6dfd1', .66, 0], service_area: ['#d3d5ce', .8, 0],
   landscape: ['#839768', .9, 0], water: ['#5a93a8', .62, 0], rail_structure: ['#e6ebea', .42, .35], station: ['#a7c3cf', .12, .55],
-  context_unknown: ['#d8cfbf', .9, 0], context_office_commercial: ['#d1c8b8', .85, 0], context_utility_service: ['#cbc6ba', .9, 0], context_public_cultural: ['#d6cebe', .9, 0],
+  context_unknown: ['#e3dccf', .9, 0], context_office_commercial: ['#dfd8ca', .85, 0], context_utility_service: ['#d8d4c9', .9, 0], context_public_cultural: ['#e2dbcd', .9, 0],
 };
 
 // 2127 retrofit by material: mall roofs become planted, hotel roofs photovoltaic, stark white cladding warm ceramic; no extra geometry.
@@ -36,7 +36,8 @@ const roofRetrofit: Record<string, [color: string, roughness: number, metalness:
 };
 // Aqua City and DECKS flat facade panels become storey-banded curtain walls: warm spandrels, dark panes with lit interiors per bay.
 const curtainWalls: Record<string, string> = {
-  'Muted Pink Panels': '#a9785f', 'Pale Mint Panels': '#d4c7ae', 'Ochre Commercial Panels': '#c9a676', 'Blue Gray Cladding': '#c7bca8', 'Dark Blue Gray Glazing': '#b9ae9a',
+  // r4 pass 4: warm ivory spandrels (target v2's cream mid-rises), no brown or ochre bands.
+  'Muted Pink Panels': '#e0d3be', 'Pale Mint Panels': '#e6ddcb', 'Ochre Commercial Panels': '#ddcfb6', 'Blue Gray Cladding': '#e3dacb', 'Dark Blue Gray Glazing': '#d9cfbd',
 };
 const curtainGlow = { value: .5 };
 function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
@@ -52,7 +53,7 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
       float storey = fract(curtainP.y / 4.2), mullion = fract(curtainP.x / 1.8);
       float pane = step(.24, storey) * step(storey, .94) * step(mullion, .9) * (1. - step(.5, curtainP.z)) * step(1.2, curtainP.y);
       float occupied = step(.3, fract(sin(dot(floor(vec2(curtainP.x / 5.4, curtainP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453));
-      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.2, .25, .29), pane * .88);`)
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.34, .42, .48), pane * .85);`)
       // Panes are glass: glossy and partly metallic so they pick up the sky instead of reading as flat dark dots.
       .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, .1, pane);\nmetalnessFactor = mix(metalnessFactor, .55, pane);')
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1., .76, .48) * pane * curtainGlow * (.25 + .75 * occupied);');

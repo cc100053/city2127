@@ -107,9 +107,11 @@ function sphere(root: T.Object3D, [x, y, z]: P3, r: number, deckRadius?: number)
   const band = new T.Mesh(new T.TorusGeometry(r + 4.6, .4, 6, 72), trail); band.rotation.x = Math.PI / 2; band.position.y = -r * .12 - .6; g.add(band);
   if (deckRadius) {
     // Promenade ring under the sphere (not at its equator), so the whole silver sphere stays visible from above; lit at its outer edge.
+    // An open annulus on four spokes (not a solid disc), so the silver sphere reads whole against the city below.
     const y = -r * .78 - 2.6;
-    arc(g, r * .45, deckRadius + 4.5, 2.6, [0, y, 0], trim);
+    arc(g, deckRadius - 2, deckRadius + 4.5, 2.6, [0, y, 0], trim);
     arc(g, deckRadius + 4.4, deckRadius + 4.9, .5, [0, y + 1, 0], trail);
+    for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + .4, m = (r * .45 + deckRadius) / 2; const spoke = box(g, [deckRadius - r * .45, 1.6, 2.4], [Math.cos(a) * m, y + 1.2, -Math.sin(a) * m], trim, .2); spoke.rotation.y = a; }
   }
 }
 
@@ -163,6 +165,8 @@ export function skyways() {
   for (const ring of RINGS) skyway(root, circle(ring), true);
   for (const points of [...LINKS, sweepway.map(p => [...p] as P3)]) skyway(root, new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'), false);
   for (const s of SPHERES) sphere(root, s.centre, s.radius, s.deck);
+  // Lit blue lines at street level too (target v2): both edges of the seaside promenades.
+  for (const walk of routes().promenades) for (const side of [-3.6, 3.6]) root.add(new T.Mesh(offsetTube(walk, side, .25, .3, false), trail));
   shoreTerraces(root);
   const generated = new Set<T.BufferGeometry>();
   root.traverse(o => { if (o instanceof T.Mesh && o.geometry !== pole && o.geometry !== crown && o.geometry.type !== 'RoundedBoxGeometry') generated.add(o.geometry); });
