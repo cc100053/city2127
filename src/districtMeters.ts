@@ -1,4 +1,5 @@
 import * as T from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { arc, bake, box, glass, leaf, leafyCrown, publicLight, stone, trail, trim } from './cityRig.ts';
 import { changeSites, floatingDecks, seaward } from './layout.ts';
 import { shoreRoomBays } from './waterRooms.ts';
@@ -128,6 +129,10 @@ const sitePulse = (socket: keyof typeof changeSites): PulsePoint => {
 /** Fixed pseudo-random rank per slot, so a share of slots switches in a scattered rather than end-to-end order. */
 const rank = (i: number) => { const s = Math.sin(i * 12.9898 + 4.1) * 43758.5453; return s - Math.floor(s); };
 
+/** Private shell height as a share of its radius: a hemispherical vault rather than the former 28 m egg. */
+export const PRIVATE_RISE = 1;
+/** The vault overhangs its island like a shell parasol; the open steps reach 1.38 × radius. */
+const SPREAD = 1.3;
 /** Existing planted islands become screened water gardens or open, stepped waterfront commons. */
 export class SharingDistrict {
   readonly root = new T.Group();
@@ -137,6 +142,8 @@ export class SharingDistrict {
   ];
   private readonly levels = new SlotLevels(this.bays.length);
   private readonly screens: T.InstancedMesh;
+  private readonly ribs: T.InstancedMesh;
+  private readonly beams: T.InstancedMesh;
   private readonly rims: T.InstancedMesh;
   private readonly skylights: T.InstancedMesh;
   private readonly steps: T.InstancedMesh[];
@@ -147,7 +154,10 @@ export class SharingDistrict {
 
   constructor(parent: T.Object3D) {
     this.root.name = 'sharing-district';
-    const privacy = trim.clone(); privacy.color.set('#d5b7aa'); privacy.emissive.set('#b98274'); privacy.emissiveIntensity = .45; privacy.side = T.DoubleSide;
+    // Gridshell vault: frosted pearl glass over the garden, rose meridian ribs (the sharing colour), ivory ring beams.
+    const privacy = glass.clone(); privacy.color.set('#f4f1ea'); privacy.emissive.set('#ffe2cf'); privacy.emissiveIntensity = .3;
+    privacy.side = T.DoubleSide; privacy.transparent = true; privacy.opacity = .62; privacy.depthWrite = false;
+    const ribMaterial = trim.clone(); ribMaterial.color.set('#e0788c'); ribMaterial.emissive.set('#ff6f91'); ribMaterial.emissiveIntensity = .7;
     const commons = stone.clone(); commons.emissive.set('#eac0b2'); commons.emissiveIntensity = .3;
     const light = publicLight.clone(); light.emissive.set('#ffa9b1'); light.emissiveIntensity = 1.8;
     const instance = (geometry: T.BufferGeometry, material: T.Material, name: string) => {
@@ -156,14 +166,26 @@ export class SharingDistrict {
       mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); this.root.add(mesh); return mesh;
     };
     // The landward gap aligns with each existing footbridge; the garden and waterfalls remain inside.
-    this.screens = instance(new T.SphereGeometry(1, 64, 24, Math.PI + .3, Math.PI * 2 - .6, .18, Math.PI / 2 - .18), privacy, 'sharing-private-gardens');
+    const START = Math.PI + .3, LENGTH = Math.PI * 2 - .6, OCULUS = .18;
+    const shell = new T.SphereGeometry(1, 64, 24, START, LENGTH, OCULUS, Math.PI / 2 - OCULUS);
+    // Unit-sphere point at longitude φ / polar θ, matching SphereGeometry so ribs sit on the glass.
+    const at = (phi: number, theta: number) => new T.Vector3(-Math.cos(phi) * Math.sin(theta), Math.cos(theta), Math.sin(phi) * Math.sin(theta));
+    const tube = (points: T.Vector3[], radius: number) => new T.TubeGeometry(new T.CatmullRomCurve3(points), points.length * 2, radius, 6);
+    const ribs = mergeGeometries(Array.from({ length: 17 }, (_, i) =>
+      tube(Array.from({ length: 13 }, (_, k) => at(START + LENGTH * i / 16, OCULUS + (Math.PI / 2 - OCULUS) * k / 12)), .032)));
+    const beams = mergeGeometries([OCULUS, .62, 1.05].map(theta =>
+      tube(Array.from({ length: 41 }, (_, k) => at(START + LENGTH * k / 40, theta)), .026)));
+    this.screens = instance(shell, privacy, 'sharing-private-gardens');
+    this.screens.castShadow = false;
+    this.ribs = instance(ribs, ribMaterial, 'sharing-private-ribs');
+    this.beams = instance(beams, trim, 'sharing-private-beams');
     const ring = (inner: number, outer: number, height: number, material: T.Material, name: string) => {
       const source = arc(new T.Group(), inner, outer, height, [0, 0, 0], material, .3, Math.PI * 2 - .6);
       return instance(source.geometry, material, name);
     };
     this.rims = ring(.99, 1.025, .025, light, 'sharing-room-rims');
     this.skylights = ring(.17, .19, .012, light, 'sharing-private-skylights');
-    this.steps = Array.from({ length: 3 }, (_, i) => ring(1 + i * .08, 1.08 + i * .08, .045, commons, 'sharing-open-steps'));
+    this.steps = Array.from({ length: 3 }, (_, i) => ring(1 + i * .14, 1.1 + i * .14, .06, commons, 'sharing-open-steps'));
     this.pulses = new PulseRings(this.root, METER_COLORS.publicSharing, (this.bays.length + 1) * PULSE_WAVES);
     this.root.visible = false; parent.add(this.root); this.write();
   }
@@ -190,15 +212,15 @@ export class SharingDistrict {
 
   private write(): void {
     this.bays.forEach((bay, i) => {
-      const open = this.levels.value[i], height = 28 * (1 - open);
+      const open = this.levels.value[i], height = PRIVATE_RISE * bay.r * (1 - open);
       // Keep hidden matrices invertible: flattened curved normals otherwise poison the G-buffer / SSR.
       const privateScale = Math.max(HIDDEN, 1 - open), publicScale = Math.max(HIDDEN, open);
       this.dummy.position.set(bay.x, bay.y, bay.z); this.dummy.rotation.set(0, bay.yaw, 0);
-      this.dummy.scale.set(bay.r * bay.sx, Math.max(HIDDEN, height), bay.r * bay.sz); this.dummy.updateMatrix();
-      this.screens.setMatrixAt(i, this.dummy.matrix);
+      this.dummy.scale.set(bay.r * bay.sx * SPREAD, Math.max(HIDDEN, height), bay.r * bay.sz * SPREAD); this.dummy.updateMatrix();
+      for (const mesh of [this.screens, this.ribs, this.beams]) mesh.setMatrixAt(i, this.dummy.matrix);
       this.dummy.scale.y = bay.r; this.dummy.updateMatrix(); this.rims.setMatrixAt(i, this.dummy.matrix);
       this.dummy.position.y = bay.y + height * Math.cos(.18);
-      this.dummy.scale.set(bay.r * bay.sx * privateScale, bay.r * privateScale, bay.r * bay.sz * privateScale);
+      this.dummy.scale.set(bay.r * bay.sx * SPREAD * privateScale, bay.r * privateScale, bay.r * bay.sz * SPREAD * privateScale);
       this.dummy.updateMatrix(); this.skylights.setMatrixAt(i, this.dummy.matrix);
       this.steps.forEach((mesh, tier) => {
         this.dummy.position.y = bay.y + tier * .7;
@@ -206,7 +228,7 @@ export class SharingDistrict {
         this.dummy.updateMatrix(); mesh.setMatrixAt(i, this.dummy.matrix);
       });
     });
-    for (const mesh of [this.screens, this.rims, this.skylights, ...this.steps]) mesh.instanceMatrix.needsUpdate = true;
+    for (const mesh of [this.screens, this.ribs, this.beams, this.rims, this.skylights, ...this.steps]) mesh.instanceMatrix.needsUpdate = true;
   }
 }
 

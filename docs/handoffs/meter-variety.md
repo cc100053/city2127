@@ -134,6 +134,14 @@ Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920�
 - Capture-tool finding: in zsh, `"$m:low"` / `"$m:high"` expand through the `:l` / `:h` history modifiers (`nwow`, `.igh`), so ad-hoc loops silently loaded standalone frames. P5 captures use `${m}` plus a readiness gate. P1 used `ne:$b`, P4 `se:$b` (literal prefixes), so their recorded numbers are unaffected; `--virtual-time-budget` captures were also not used for P5.
 - Not verified: real HTTP/WebSocket browser smoke for P5 (live path covered by unit tests and the DEV live hook), human review of pulse strength/colour/timing, Windows, real-GPU FPS, exhibition hardware.
 
+## P3b — Sharing pod polish (2026-10-01)
+
+- User review of a hero frame: the low-sharing private pods read as skin-toned blobs. Cause: a 28 m fixed height over 14–19 m radii (an egg), `#d5b7aa` / `#b98274` emissive in the skin range, a smooth opaque shell hiding the garden, plus rose pulse shafts on top. A minimal ivory / hemispherical retint passed visually but fell to 2.43 % day / 2.29 % night, so the user chose the gridshell route.
+- `SharingDistrict` private vault: frosted pearl glass (`glass` clone, opacity .62, no depth write, no shadow), 17 glowing rose meridian ribs (the sharing colour) and three ivory ring beams (oculus, mid, haunch) as two merged-tube instanced batches; spread 1.3 × room radius, rise = radius (`PRIVATE_RISE`), about 14–19 m. Open steps widen to 1.38 × radius (was 1.24). Behaviour, slot order, pulses, transitions and the server contract are unchanged.
+- Root `npm test`, `npm run build`, `git diff --check`: PASS (boat beams, walker lanes and landward entrances recheck the wider steps and vault). `survey/` and `module-swap/` unchanged.
+- Readability (headless Chrome, 1920×929, `?hour=16|21&reviewTime=20&meters=sw:<band>`, repeat-capture noise 0.02 %): low ↔ high **3.26 %** day, **3.03 %** night (thin margin); low ↔ mixed 0.97 %, mixed ↔ high 2.40 %. Captures: [low](meter-variety-p3b-gridshell-low.png), [mixed](meter-variety-p3b-gridshell-mixed.png), [high](meter-variety-p3b-gridshell-high.png), [night low](meter-variety-p3b-gridshell-night-low.png), [night high](meter-variety-p3b-gridshell-night-high.png). A `metersTo=sw:high&metersAge=1.5` capture showed vaults lowering and steps widening under the pulse.
+- +2 instanced batches (plus their shadow / G-buffer passes); draw calls not re-measured. Not verified: human art acceptance, real-GPU FPS, Windows.
+
 ## Next step
 
 Capture review of P0–P5 with the user, then integrate `feat/meter-variety` into `main` per CONTRIBUTING (preserve the review-before-main condition). P6 remains per-stage evidence.

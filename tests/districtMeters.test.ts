@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
+import { AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, PRIVATE_RISE, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
 import { mobility } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
@@ -119,7 +119,7 @@ sharing.update(2.5);
 const screens = sharing.root.getObjectByName('sharing-private-gardens') as T.InstancedMesh;
 const matrix = new T.Matrix4(), scale = new T.Vector3();
 screens.getMatrixAt(0, matrix); scale.setFromMatrixScale(matrix);
-assert.equal(scale.y, 14, 'private wall lowers halfway through the 3-second transition');
+assert.ok(Math.abs(scale.y - PRIVATE_RISE * sharing.bays[0].r / 2) < 1e-4, 'private wall lowers halfway through the 3-second transition');
 assert.equal(sharing.setTarget({ sharedSeats: 7 }, 2.5, false), false);
 sharing.update(4);
 assert.equal(sharing.getDiagnostics().visibleOpenRooms, sharing.bays.length);
