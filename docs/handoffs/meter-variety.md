@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS — P0 + P1 + P2 + P3 implemented; P4–P5 planned; P6 evidence recorded per stage
 - Branch: `feat/meter-variety`
 - Base commit: `33227a687ac9d18281e90494a4e9b2ce27f861ce`
-- Last verified commit: P2 implementation `d03efa7e7ec2afb871e9bbac82b278b940a4e2fa` (local checks, lossless captures, real WebSocket browser smoke and feature CI PASS)
+- Last verified commit: P3 source + whitespace correction `357b91784910d1bdc4411659ab8b8acdd99c13b6` (local checks, lossless captures, real WebSocket browser smoke and feature CI PASS)
 - Remote availability: `origin/feat/meter-variety`
 
 ## Session Git state
@@ -28,7 +28,7 @@ Each Meter keeps its site as the focal anchor and additionally drives 2–3 larg
 | P0 | DEV `?meters=` + `window.cityMeters()`, `scripts/meter-diff.py` | done |
 | P1 | Environment: promenade sails/pergolas, mist towers, roof sails/forest, facade louvres/planted bays | done |
 | P2 | Automation: drones, pods, walker density, staffed pavilions | done; local/browser/feature CI passed |
-| P3 | Sharing: floating decks as private pods vs open steps, water rooms | done; local/browser passed; feature CI pending |
+| P3 | Sharing: floating decks as private pods vs open steps, water rooms | done; local/browser/feature CI passed |
 | P4 | Concentration: context tower crowns vs scattered pavilion pods | planned |
 | P5 | Change-moment pulse in the Meter's colour | planned |
 | P6 | Pipeline diagnostics, docs, draw-call measurement | per stage |
@@ -97,7 +97,10 @@ Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920�
 
 ### P3 Git / CI closure
 
-Pending source commit and feature CI; no main integration under the existing capture-review condition.
+- P3 implementation `30db2043e76f6e2541b4aaf92becaec6afa828c3` and whitespace correction `357b91784910d1bdc4411659ab8b8acdd99c13b6` pushed to `origin/feat/meter-variety`. The initial new file had an extra blank line at EOF (the first CI run 36844973965 failed its whitespace step); it was corrected without rewriting pushed history. Final committed task diff `git diff --check origin/main...HEAD` PASS.
+- [Feature CI 36845024909](https://github.com/cc100053/city2127/actions/runs/36845024909) PASS on `357b917`: root, survey, module-swap and committed-diff whitespace. All P3 source/tests/docs, the new shared placement file and five lossless captures were self-reviewed; local Markdown targets passed.
+- Independent temporary Node comparison against `6f2bd35` confirmed every merged `skyways` geometry attribute, material property and shadow flag is unchanged byte-for-byte in standalone. This supplements the browser standalone smoke; no temporary comparison module is shipped.
+- Latest fetched `origin/main` remains `33227a6`; task branch has no divergence or upstream-only work. No main integration under the existing capture-review condition. This closure changes documentation only; next scope remains P4.
 
 ## Next step
 
