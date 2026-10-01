@@ -31,32 +31,38 @@ const environmentFinish: Record<string, [color: string, roughness: number, metal
 // 2127 retrofit by material: mall roofs become planted, hotel roofs pale ceramic terraces (r5 pass 2: target v2 has no blue metal roofs), stark white cladding warm ceramic; no extra geometry.
 const roofRetrofit: Record<string, [color: string, roughness: number, metalness: number]> = {
   'Roof and Shadow': ['#7d9f68', .85, 0], 'Standing seam roof.001': ['#e6ddcc', .55, .05], 'Gray roof metal': ['#e6ddcc', .55, .05],
-  'PCa_Panel_OffWhite': ['#e4d9c5', .62, 0], 'Facade_White': ['#e2d8c6', .6, 0],
+  'PCa_Panel_OffWhite': ['#e4d9c5', .62, 0],
+  // r6 pass 2: DECKS' coral and ochre fins read as red stripes; target v2's mid-rises are ivory only.
+  'Muted Coral Vertical Structure': ['#ebe2d2', .58, 0], 'Ochre Accent Structure': ['#ebe2d2', .58, 0], 'Facade_White': ['#e2d8c6', .6, 0],
   'Warm Ivory Structure': ['#e8dcc8', .6, 0], 'Pale balcony slab and crown': ['#e9dfcd', .6, 0], 'Light vertical piers.001': ['#ebe0cd', .6, 0],
 };
 // Aqua City and DECKS flat facade panels become storey-banded curtain walls: warm spandrels, dark panes with lit interiors per bay.
 const curtainWalls: Record<string, string> = {
   // r4 pass 4: warm ivory spandrels (target v2's cream mid-rises), no brown or ochre bands.
-  'Muted Pink Panels': '#e0d3be', 'Pale Mint Panels': '#e6ddcb', 'Ochre Commercial Panels': '#ddcfb6', 'Blue Gray Cladding': '#e3dacb', 'Dark Blue Gray Glazing': '#d9cfbd',
+  'Muted Pink Panels': '#e0d3be',
+  // r6 pass 2: the hotel walls and the Grand Nikko tower become the same banded curtain wall (target v2's glass hotels).
+  'Warm ivory facade': '#e8ddc9', 'Warm off white facade.001': '#e8ddc9', 'Pale Mint Panels': '#e6ddcb', 'Ochre Commercial Panels': '#ddcfb6', 'Blue Gray Cladding': '#e3dacb', 'Dark Blue Gray Glazing': '#d9cfbd',
 };
-const curtainGlow = { value: .5 };
+const curtainGlow = { value: .6 }, curtainNight = { value: 0 };
 function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
   material.color.set(spandrel); material.roughness = .45; material.metalness = .1;
   material.onBeforeCompile = shader => {
-    shader.uniforms.curtainGlow = curtainGlow;
+    shader.uniforms.curtainGlow = curtainGlow; shader.uniforms.curtainNight = curtainNight;
     // Along-facade coordinate from the world normal, so bays run on every face orientation; roofs (normal up) stay plain.
     shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 curtainP;')
       .replace('#include <worldpos_vertex>', `#include <worldpos_vertex>
       { vec3 n = normalize(mat3(modelMatrix) * objectNormal); vec4 w = modelMatrix * vec4(transformed, 1.); curtainP = vec3(abs(n.x) > abs(n.z) ? w.z : w.x, w.y, abs(n.y)); }`);
-    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float curtainGlow;\nvarying vec3 curtainP;')
+    // r6 pass 2 (target v2): full-height glass storeys between thin pale slab bands. Only whole floor runs of occupied bays glow warm;
+    // the rest is clear blue-grey glass, so facades read as glazing with lit rooms instead of a beige wash with dark dots.
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float curtainGlow, curtainNight;\nvarying vec3 curtainP;')
       .replace('#include <map_fragment>', `#include <map_fragment>
       float storey = fract(curtainP.y / 4.2), mullion = fract(curtainP.x / 1.8);
-      float pane = step(.24, storey) * step(storey, .94) * step(mullion, .9) * (1. - step(.5, curtainP.z)) * step(1.2, curtainP.y);
-      float occupied = step(.3, fract(sin(dot(floor(vec2(curtainP.x / 5.4, curtainP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453));
-      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.34, .42, .48), pane * .85);`)
+      float pane = step(.2, storey) * step(storey, .96) * step(mullion, .93) * (1. - step(.5, curtainP.z)) * step(1.2, curtainP.y);
+      float occupied = step(.64, fract(sin(dot(floor(vec2(curtainP.x / 9., curtainP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453));
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.24, .31, .37), pane);`)
       // Panes are glass: glossy and partly metallic so they pick up the sky instead of reading as flat dark dots.
-      .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, .1, pane);\nmetalnessFactor = mix(metalnessFactor, .55, pane);')
-      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1., .76, .48) * pane * curtainGlow * (.25 + .75 * occupied);');
+      .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, .12, pane);\nmetalnessFactor = mix(metalnessFactor, .45, pane);')
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1., .78, .5) * pane * (curtainGlow * occupied + curtainNight * .3);');
   };
   material.customProgramCacheKey = () => 'curtain-wall';
 }
@@ -65,7 +71,7 @@ const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a')
 export function updateOdaiba(night: number) {
   // A faint daytime glow keeps the dark glazing reading as occupied, warm interiors (CITY_MASTER_TASTE) instead of voids.
   for (const material of glazing) material.emissiveIntensity = dayGlow + night * (.55 - dayGlow);
-  curtainGlow.value = .55 + night * .6;
+  curtainGlow.value = .6 + night * .7; curtainNight.value = night;
 }
 
 // Ground finishes that stop at the seaward cut; massing, guideway and revetment keep their geometry.
@@ -94,7 +100,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     // Context massing (district and backdrop) carries the same storey-banded curtain wall and lit bays as Aqua City and DECKS.
     if (finish && material.name.startsWith('context_') && material.customProgramCacheKey() !== 'curtain-wall') curtainWall(material, finish[0]);
     if(material.name==='landscape'){
-      material.map=grass;material.color.set('#bfc7a5');
+      material.map=grass;material.color.set('#b2cc98'); // r6 pass 2: lusher green (target v2)
       // World metres keep the authored terrain patches at one consistent texture scale.
       material.onBeforeCompile=shader=>{
         shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\ngrassUv=(modelMatrix*vec4(transformed,1.)).xz/32.;');
