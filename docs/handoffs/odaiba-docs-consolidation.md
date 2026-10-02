@@ -4,7 +4,7 @@
 - Status: IMPLEMENTED; local documentation checks PASS, feature/main CI and integration pending
 - Branch: docs/odaiba-docs-consolidation
 - Base commit: 94cad605b87ddc83b626c843b77f2255b379cd2f
-- Last verified worktree: documentation delta on base `94cad605b87ddc83b626c843b77f2255b379cd2f` (2026-10-02); exact implementation commit recorded after publication
+- Last verified worktree: documentation delta on base `94cad605b87ddc83b626c843b77f2255b379cd2f` (2026-10-02); first implementation `c748eae`; historical-scope pointer correction included in the final feature commit
 - Remote availability: NOT PUSHED
 
 ## Session Git state

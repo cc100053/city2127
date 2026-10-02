@@ -39,7 +39,7 @@ In commit order on `feat/art-direction`:
 
 1. `81e1dfa`: task opened. This handoff plus the dated decision note in [PLAN02.md](../history/SHIBUYA_PLAN02.md).
 2. `2122d13`, pilot (2026-09-24):
-   - [ART.md](../ART.md) rules: palette and material roles, massing, detail by distance, greenery, glass and light, signage and ambient data, actors, and how a survey change reads.
+   - [archived ART rules](../history/SHIBUYA_ART.md) rules: palette and material roles, massing, detail by distance, greenery, glass and light, signage and ambient data, actors, and how a survey change reads.
    - `cityRig.ts` gained the `glass`/`leaf`/`stone` materials and the `arc()`, `shrubs()` and `bake()` helpers.
    - QFRONT: curved media drum, silvered glass, planted terraces.
    - Hachiko plaza: now round, with planter rings, a mint ring and a curved bench.

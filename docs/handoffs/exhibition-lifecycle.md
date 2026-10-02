@@ -16,7 +16,7 @@
 - Session starting branch and HEAD: `codex/exhibition-s3` at `d51167b` in `/Users/fatboy/city2127`, with uncommitted S3 work (docs, `src/siteBuilders/*`, tests) and untracked `artifacts/future-s3-*.png`. That work was left untouched; this task uses a separate worktree `../city2127-lifecycle` created from `origin/main`.
 - Last fetched origin/main commit: `eaf230e`, fetched 2026-09-29.
 - Upstream integration status: NOT INTEGRATED. S3 (`d51167b`) is not on main; this branch does not touch root `src/`, so no overlap is expected.
-- Pending Git conflicts: NONE known. `AGENTS.md`, `docs/PROJECT.md`, `docs/VALIDATION.md` and `docs/EXHIBITION_SPEC.md` are also edited by the uncommitted S3 work; expect small documentation merges.
+- Pending Git conflicts: NONE known. `AGENTS.md`, `docs/PROJECT.md`, `docs/VALIDATION.md` and `docs/history/EXHIBITION_MVP.md` are also edited by the uncommitted S3 work; expect small documentation merges.
 
 ## Goal and acceptance criteria
 

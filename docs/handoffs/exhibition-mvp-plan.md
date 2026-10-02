@@ -25,7 +25,7 @@ Write the prior design as a self-contained, detailed agent-oriented plan under `
 
 ## In-scope files and dependencies
 
-- `docs/EXHIBITION_SPEC.md`, this handoff.
+- `docs/history/EXHIBITION_MVP.md`, this handoff.
 - `AGENTS.md`, `README.md`, `docs/PROJECT.md`, `docs/history/SHIBUYA_PLAN02.md`, `docs/VALIDATION.md`: dated direction/entry-point/status synchronization only.
 - Excluded: runtime code, dependencies, questions JSON, database, GLB/.blend, assets, screenshots, deployment. No implementation stages executed.
 
