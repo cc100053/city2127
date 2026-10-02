@@ -13,6 +13,12 @@
 
 ## 提案與共同城市
 
+### 居民敘事與畫面分工（2026-10-02）
+
+觀眾是 **2127 年台場的一位居民**；四題表達生活偏好，城市呈現居民累積想法與近期聲音形成的生活配置。輸入裝置暫定 iPad，負責問題、選擇、核對及操作提示；共享大屏幕負責城市背景、設施與結果解說。年份固定，畫面濃縮呈現城市回應生活需求的過程。
+
+[居民文案 P1](RESIDENT_COPY.md) 已完成，尚未接入 runtime。現有 Guest 結果表與 root 數值 feedback 仍在；P2 才實作畫面分工。建議每位居民 10 秒的大屏幕展示屬 P3 後續方案，未取代現行 A/B ≥3 秒間隔。文案不改四軸算法、ids 或 effects；個人選擇不能被描述成單獨決定城市，結果須對應實際變化。交接見 [resident-copy-p1](handoffs/resident-copy-p1.md)。
+
 每位觀眾回答同一組四題，核對後提交**一份完整提案**。四題沒有逐題改城；下一位繼承累積結果。問題／option ids 與 effects 由 [正式 JSON](../survey/src/survey/questions.exhibition.json) 定義；保留日文產品文案。
 
 | 問題 id | Meter | 主 site（內部 socket） | low → mixed → high |

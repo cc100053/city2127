@@ -75,6 +75,7 @@ Measure current Odaiba on the stated real GPU, ideally the exhibition machine at
 | Concurrent A/B | [two stations](handoffs/two-guest-devices.md); integration `45fcde7`, main CI [36976457465](https://github.com/cc100053/city2127/actions/runs/36976457465) |
 | DEV-only runner / pipeline | [auto-tests](handoffs/survey-auto-tests.md); temporary exhibition removal still required |
 | Documentation consolidation | [this task](handoffs/odaiba-docs-consolidation.md); prose/link verification, not new runtime acceptance |
+| Resident narrative P1 (2026-10-02) | [copy](RESIDENT_COPY.md), [handoff](handoffs/resident-copy-p1.md); documentation only, new screen/copy wiring and reading-time/iPad acceptance remain untested |
 
 **Still open:** S5 full exhibition acceptance, actual input hardware, exhibition-day reset/recovery policy, sustained runtime/device testing. Use current browser procedures above, record a named owner and a new task handoff; do not reopen old Shibuya tasks.
 

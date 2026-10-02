@@ -14,6 +14,8 @@ The single exhibition venue is the **Odaiba waterfront in 2127**. Shibuya is a c
 
 Desktop-only presentation, with normal renderer resize. Do not add adaptive camera/mobile acceptance. Ambient people, vehicles, drones and aerial routes are allowed. Low/zero/high Meter values all depict mature 2127 alternatives. No deployment workflow is configured.
 
+Resident narrative and input/shared-screen responsibilities were established on 2026-10-02; Japanese [P1 copy](RESIDENT_COPY.md) is documentation only. Current Guest still renders answers, scores and city changes in its result screen; root still renders numeric feedback. P2/P3 will wire the new presentation and conditional explanations. The provisional iPad does not establish hardware acceptance or a generic responsive requirement; current architecture/timings below remain unchanged.
+
 ## Root source ownership
 
 | File / module | Responsibility |
