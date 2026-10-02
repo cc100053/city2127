@@ -3,11 +3,16 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { arc, bake, box, glass, leaf, leafyCrown, publicLight, solar, stone, trail, trim } from './cityRig.ts';
 import { changeSites, seaward } from './layout.ts';
 import { shoreRoomBays } from './waterRooms.ts';
-import { automationActivity, routes } from './mobility.ts';
+import { automationActivity, pavilionFlight, pedestrians, plazaPose, routes, serviceDrones } from './mobility.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 import type { ExhibitionLayout } from './surveyView.ts';
 
 const HIDDEN = 1e-4;
+
+/** Slow, bounded breathing of district-owned accents; daylight remains steady. */
+export const meterNightRhythm = (now: number, share: number, axis: number, darkness: number) =>
+  1 + .25 * darkness * Math.sin(now * Math.PI * 2 / (12 + axis * 4 + (1 - share) * 8) + axis);
+const mean = (levels: SlotLevels) => levels.value.reduce((a, b) => a + b, 0) / levels.value.length;
 
 /** 0..1 level per slot, eased toward its target over the shared 3-second site transition. */
 export class SlotLevels {
@@ -211,6 +216,9 @@ export class SharingDistrict {
   private readonly skylights: T.InstancedMesh;
   private readonly steps: T.InstancedMesh[];
   private readonly pulses: PulseRings;
+  private readonly crowd: ReturnType<typeof pedestrians>;
+  private readonly lights: T.MeshStandardMaterial[];
+  private nightRhythm = 1;
   private readonly dummy = new T.Object3D();
   private target = .5;
   private now = 0;
@@ -224,6 +232,7 @@ export class SharingDistrict {
     const commons = stone.clone(); commons.emissive.set('#eac0b2'); commons.emissiveIntensity = .3;
     const light = publicLight.clone(); light.emissive.set('#ffa9b1'); light.emissiveIntensity = 1.8;
     const warm = publicLight.clone(); warm.emissive.set('#ffd6a0'); warm.emissiveIntensity = 1.6;
+    this.lights = [light, warm];
     this.deckGlow.emissive.set('#ffcf94');
     const instance = (geometry: T.BufferGeometry, material: T.Material, name: string) => {
       const mesh = new T.InstancedMesh(geometry, material, this.bays.length);
@@ -305,6 +314,7 @@ export class SharingDistrict {
     ];
     this.orchardCrowns = batch(leafyCrown(1), new T.MeshStandardMaterial({ color: '#ffffff', roughness: .9 }), 'sharing-orchards', n * ORCHARD.length);
     for (let i = 0; i < n * ORCHARD.length; i++) this.orchardCrowns.setColorAt(i, color.set(i % 3 === 0 ? '#f6f1e8' : i % 3 === 1 ? '#f2bfd0' : '#7fa35e'));
+    this.crowd = pedestrians(this.root, this.courts.length * 12, 'plaza-crowds');
     this.pulses = new PulseRings(this.root, METER_COLORS.publicSharing, (this.bays.length + n + 1) * PULSE_WAVES);
     this.root.visible = false; parent.add(this.root); this.write();
   }
@@ -333,16 +343,20 @@ export class SharingDistrict {
     this.write(); return changed;
   }
 
-  update(now: number): void {
-    this.now = now; this.deckGlow.emissiveIntensity = .2 + 2 * (towerGlow.value - .3);
+  update(now: number, darkness = 0): void {
+    this.now = now;
     const moved = [this.levels.update(now), this.court.update(now), this.hybridRooms.update(now), this.hybridCourts.update(now), this.kiosk.update(now),
       this.orchard.update(now)].some(Boolean);
-    if (moved) this.write(); this.pulses.update(now);
+    if (moved) this.write();
+    this.nightRhythm = meterNightRhythm(now, mean(this.court), 1, darkness);
+    this.lights.forEach((light, i) => light.emissiveIntensity = (i ? 1.6 : 1.8) * this.nightRhythm);
+    this.deckGlow.emissiveIntensity = (.2 + darkness * 1.8) * this.nightRhythm;
+    this.writeCrowd(now); this.pulses.update(now);
   }
   hide(): void { this.root.visible = false; this.pulses.clear(); }
   getDiagnostics() {
     const open = this.root.visible ? this.levels.visible() : 0;
-    return { enabled: this.root.visible, targetSharing: this.target, rooms: this.bays.length, activePulses: this.pulses.active(this.now),
+    return { enabled: this.root.visible, nightRhythm: this.nightRhythm, plazaPeople: this.root.visible ? this.courts.reduce((n, _, i) => n + (this.crowdLevel(i) > HIDDEN ? 12 : 0), 0) : 0, targetSharing: this.target, rooms: this.bays.length, activePulses: this.pulses.active(this.now),
       vaults: this.vaulted.filter(Boolean).length, courts: this.courts.length,
       hybridRooms: this.root.visible ? this.hybridRooms.visible() : 0, hybridCourts: this.root.visible ? this.hybridCourts.visible() : 0,
       droneKiosks: this.root.visible ? this.courts.filter((_, i) => this.kiosk.value[i] * this.court.value[i] > HIDDEN).length : 0,
@@ -350,7 +364,29 @@ export class SharingDistrict {
       visibleOpenCourts: this.root.visible ? this.court.visible() : 0, visibleOpenRooms: open, visiblePrivateRooms: this.root.visible ? this.levels.value.filter(v => 1 - v > HIDDEN).length : 0 };
   }
 
+  private crowdLevel(i: number): number {
+    const c = this.courts[i];
+    // Two legacy courts overlap PARK / COMMONS lot geometry; keep their new actors outside those occupied footprints.
+    if (Object.values(changeSites).some(s => Math.abs(c.x - s.x) < s.w * s.scale / 2 + 6 && Math.abs(c.z - s.z) < s.d * s.scale / 2 + 12)) return 0;
+    // Wait until private geometry is nearly gone; hybrid garden crowns keep their gathering lanes unoccupied.
+    return T.MathUtils.smoothstep(this.court.value[i], .98, 1) * T.MathUtils.smoothstep(1 - this.hybridCourts.value[i], .98, 1);
+  }
+
+  private writeCrowd(now: number): void {
+    this.courts.forEach(({ x, z, yaw }, i) => {
+      const level = this.crowdLevel(i), c = Math.cos(yaw), s = Math.sin(yaw);
+      for (let k = 0; k < 12; k++) {
+        const p = plazaPose(now, k);
+        this.dummy.position.set(x + p.x * c + p.z * s, .3, z - p.x * s + p.z * c);
+        this.dummy.rotation.set(0, yaw + p.yaw, 0); this.dummy.scale.setScalar(Math.max(HIDDEN, level));
+        this.crowd.set(i * 12 + k, this.dummy);
+      }
+    });
+    this.crowd.flush(); this.crowd.show(this.courts.some((_, i) => this.crowdLevel(i) > HIDDEN));
+  }
+
   private write(): void {
+    this.writeCrowd(this.now);
     this.bays.forEach((bay, i) => {
       // A hybrid (half-open) room keeps its vault at half height over the open steps.
       const hybrid = this.hybridRooms.value[i], open = this.levels.value[i], vaulted = this.vaulted[i];
@@ -431,6 +467,7 @@ export function publishRoofGardens(gardens: readonly RoofGarden[]): void {
 }
 
 export interface EnvironmentDistrictDiagnostics {
+  readonly nightRhythm: number;
   readonly slots: number;
   readonly targetCanopy: number;
   readonly visibleCanopies: number;
@@ -471,6 +508,8 @@ export class EnvironmentDistrict {
   private readonly crowns: T.InstancedMesh;
   private readonly shafts: T.InstancedMesh;
   private readonly rings: T.InstancedMesh;
+  private readonly light = trail.clone();
+  private nightRhythm = 1;
   private readonly dummy = new T.Object3D();
   private readonly roofs: RoofGarden[] = [];
   private readonly facade = new SlotLevels(2);
@@ -547,7 +586,7 @@ export class EnvironmentDistrict {
     for (let i = 0; i < n * 3; i++) this.crowns.setColorAt(i, color.setHSL(.24 + (i % 5) * .009, .36 + (i % 3) * .05, .22 + (i % 7) * .015));
     const towerGeometry = new T.CylinderGeometry(.7, 1.5, TOWER, 12).translate(0, TOWER / 2, 0);
     this.shafts = new T.InstancedMesh(towerGeometry, trim, this.towerBays.length);
-    this.rings = new T.InstancedMesh(new T.TorusGeometry(2.6, .35, 6, 24).rotateX(Math.PI / 2), trail, this.towerBays.length * 2);
+    this.rings = new T.InstancedMesh(new T.TorusGeometry(2.6, .35, 6, 24).rotateX(Math.PI / 2), this.light, this.towerBays.length * 2);
     posts.name = 'environment-district-posts';
     this.sails.name = this.louvres.name = 'environment-district-sails';
     this.screens.name = this.screenCaps.name = 'environment-district-canopy';
@@ -639,18 +678,21 @@ export class EnvironmentDistrict {
     this.writeFacade();
   }
 
-  update(now: number): void {
+  update(now: number, darkness = 0): void {
     this.now = now;
     if (this.facade.update(now)) this.writeFacade();
     const moved = [this.canopy.update(now), this.sail.update(now), this.hybrid.update(now), this.tower.update(now), this.roofSail.update(now), this.roofCrown.update(now),
       this.roofHybrid.update(now)].some(Boolean);
     if (moved) this.write();
+    this.nightRhythm = meterNightRhythm(now, mean(this.canopy), 2, darkness);
+    this.light.color.copy(trail.color).multiplyScalar(this.nightRhythm);
+    this.sailMaterial.emissiveIntensity = .08 + darkness * .35 * this.nightRhythm;
     this.pulses.update(now);
   }
 
   getDiagnostics(): EnvironmentDistrictDiagnostics {
     return {
-      slots: this.bays.length, targetCanopy: this.targetCanopy,
+      nightRhythm: this.nightRhythm, slots: this.bays.length, targetCanopy: this.targetCanopy,
       visibleCanopies: this.canopy.visible(), visibleSails: this.sail.visible(), visibleCoolingTowers: this.tower.visible(),
       roofs: this.roofs.length, visibleRoofSails: this.roofSail.visible(), visibleRoofCrowns: this.roofCrown.visible(),
       hybridBays: this.hybrid.visible(), hybridRoofs: this.roofHybrid.visible(),
@@ -743,6 +785,9 @@ export class AutomationDistrict {
   private readonly decks: T.InstancedMesh[];
   private readonly masts: T.InstancedMesh[];
   private readonly pulses: PulseRings;
+  private readonly drones: ReturnType<typeof serviceDrones>;
+  private readonly light = trail.clone();
+  private nightRhythm = 1;
   private readonly dummy = new T.Object3D();
   private target = .5;
   private now = 0;
@@ -791,6 +836,12 @@ export class AutomationDistrict {
       mesh.name = name; mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;
       mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); this.root.add(mesh); return mesh;
     });
+    const pad = (group: T.Group) => {
+      box(group, [.6, 8, .6], [10, 40, 0], trim);
+      const deck = new T.Mesh(new T.CylinderGeometry(3.5, 3.5, .4, 24), trim); deck.position.set(10, 44, 0); group.add(deck);
+      const rim = new T.Mesh(new T.TorusGeometry(3.5, .2, 6, 24).rotateX(Math.PI / 2), this.light); rim.position.set(10, 44.3, 0); group.add(rim);
+    };
+    pad(pavilion);
     this.meshes = instances(pavilion, 'automation-staffed-pavilions');
     // Autonomous counterpart on the same bay: a slate mast lifts a round landing deck with a lit blue apron ring, a charging spire
     // and parked drones; no people. A single-footed silhouette above the old dome, so absence never stands in for the identity.
@@ -801,11 +852,11 @@ export class AutomationDistrict {
     at(new T.CylinderGeometry(1.6, 2.4, PORT_DECK, 12), solar, 0, PORT_DECK / 2, 0);
     at(new T.CylinderGeometry(15, 6, 3, 40), solar, 0, PORT_DECK - 1.5, 0);
     at(new T.CylinderGeometry(15.4, 15.4, .5, 48), trim, 0, PORT_DECK + .25, 0);
-    at(new T.TorusGeometry(12, .45, 6, 48).rotateX(Math.PI / 2), trail, 0, PORT_DECK + .6, 0);
-    at(new T.TorusGeometry(15.4, .35, 6, 48).rotateX(Math.PI / 2), trail, 0, PORT_DECK - .2, 0);
+    at(new T.TorusGeometry(12, .45, 6, 48).rotateX(Math.PI / 2), this.light, 0, PORT_DECK + .6, 0);
+    at(new T.TorusGeometry(15.4, .35, 6, 48).rotateX(Math.PI / 2), this.light, 0, PORT_DECK - .2, 0);
     at(new T.CylinderGeometry(.5, 1, 18, 8), solar, 0, PORT_DECK + 9, 0);
-    for (const y of [5, 10, 15]) at(new T.TorusGeometry(1.6 - y * .04, .22, 6, 20).rotateX(Math.PI / 2), trail, 0, PORT_DECK + y, 0);
-    for (const a of [0, 2.1, 4.2]) {
+    for (const y of [5, 10, 15]) at(new T.TorusGeometry(1.6 - y * .04, .22, 6, 20).rotateX(Math.PI / 2), this.light, 0, PORT_DECK + y, 0);
+    for (const a of [2.1, 4.2]) {
       const x = Math.cos(a) * 8, z = Math.sin(a) * 8;
       at(new T.SphereGeometry(1.4, 12, 8).scale(1.4, .6, 1), glass, x, PORT_DECK + 1.3, z);
       for (const [dx, dz] of [[-1.8, -1.8], [1.8, -1.8], [-1.8, 1.8], [1.8, 1.8]]) at(new T.CylinderGeometry(1, 1, .12, 12), trim, x + dx, PORT_DECK + 1.6, z + dz);
@@ -827,6 +878,7 @@ export class AutomationDistrict {
       const torso = new T.Mesh(new T.CapsuleGeometry(.35, .65, 4, 8), glass); torso.position.set(x, y, 4); deck.add(torso);
       const head = new T.Mesh(new T.SphereGeometry(.25, 10, 8), trim); head.position.set(x, y + .85, 4); deck.add(head);
     }
+    pad(deck);
     this.decks = instances(deck, 'automation-staffed-pavilions');
     // Charging mast: a slender slate mast with three cantilevered charging arms, each with a lit dock ring and a drone docked.
     const mast = new T.Group();
@@ -835,16 +887,17 @@ export class AutomationDistrict {
     };
     piece(new T.CylinderGeometry(4, 5, 1.2, 16), trim, 0, .6, 0);
     piece(new T.CylinderGeometry(1, 2.2, 72, 12), solar, 0, 36, 0);
-    piece(new T.TorusGeometry(2.2, .3, 6, 20).rotateX(Math.PI / 2), trail, 0, 72, 0);
+    piece(new T.TorusGeometry(2.2, .3, 6, 20).rotateX(Math.PI / 2), this.light, 0, 72, 0);
     [[40, 0], [52, 2.1], [64, 4.2]].forEach(([y, a]) => {
       const x = Math.cos(a) * 9, z = -Math.sin(a) * 9;
       piece(new T.BoxGeometry(14, .9, 1.4).rotateY(a), solar, x / 2 * 1.4, y, z / 2 * 1.4);
-      piece(new T.TorusGeometry(3.4, .3, 6, 24).rotateX(Math.PI / 2), trail, x * 1.4, y + .6, z * 1.4);
-      piece(new T.SphereGeometry(1.5, 12, 8).scale(1.4, .6, 1), glass, x * 1.4, y + 1.4, z * 1.4);
+      piece(new T.TorusGeometry(3.4, .3, 6, 24).rotateX(Math.PI / 2), this.light, x * 1.4, y + .6, z * 1.4);
+      if (a) piece(new T.SphereGeometry(1.5, 12, 8).scale(1.4, .6, 1), glass, x * 1.4, y + 1.4, z * 1.4);
     });
     this.masts = instances(mast, 'automation-drone-ports');
     this.staffedDesign = this.bays.map((_, i) => designOf(i, 233, 2));
     this.autonomousDesign = this.bays.map((_, i) => designOf(i, 271, 2));
+    this.drones = serviceDrones(this.root, this.bays.length);
     this.pulses = new PulseRings(this.root, METER_COLORS.automation, (this.bays.length + 1) * PULSE_WAVES);
     this.root.visible = false; parent.add(this.root); this.write();
   }
@@ -865,19 +918,21 @@ export class AutomationDistrict {
     this.write(); return a || b || h;
   }
 
-  update(now: number): void {
+  update(now: number, darkness = 0): void {
     this.now = now;
     this.automation.update(now);
     const b = this.staffed.update(now), h = this.hybrid.update(now);
     if (b || h) this.write();
-    this.pulses.update(now);
+    this.nightRhythm = meterNightRhythm(now, this.automation.value[0], 0, darkness);
+    this.light.color.copy(trail.color).multiplyScalar(this.nightRhythm);
+    this.writeDrones(now); this.pulses.update(now);
   }
 
   hide(): void { this.root.visible = false; this.pulses.clear(); }
 
   getDiagnostics() {
     const activity = automationActivity(this.level ?? .5);
-    return { enabled: this.root.visible, targetAutomation: this.target, automation: this.level, activePulses: this.pulses.active(this.now),
+    return { enabled: this.root.visible, serviceDrones: this.root.visible ? this.bays.length : 0, nightRhythm: this.nightRhythm, targetAutomation: this.target, automation: this.level, activePulses: this.pulses.active(this.now),
       pavilions: this.bays.length, visibleStaffedPavilions: this.root.visible ? this.staffed.visible() : 0,
       visibleDronePorts: this.root.visible ? this.staffed.value.filter(v => 1 - v > HIDDEN).length : 0,
       hybridBays: this.root.visible ? this.hybrid.visible() : 0,
@@ -885,7 +940,24 @@ export class AutomationDistrict {
       guidewayPods: this.root.visible ? Math.ceil(activity.pods) : undefined, walkers: this.root.visible ? Math.ceil(activity.walkers) : undefined };
   }
 
+  private writeDrones(now: number): void {
+    this.bays.forEach((bay, i) => {
+      // ponytail: one reserved vertical service column per bay, no inter-bay travel; add dispatch only if journeys are required.
+      const staffed = this.staffed.value[i] * (1 - this.hybrid.value[i]), autonomous = 1 - staffed;
+      const useStaff = staffed >= autonomous, level = useStaff ? staffed : autonomous;
+      const x = useStaff ? 10 : this.autonomousDesign[i] ? 12.6 : 8;
+      const y = useStaff ? 45.2 : this.autonomousDesign[i] ? 41.4 : PORT_DECK + 1.4;
+      const c = Math.cos(bay.yaw), s = Math.sin(bay.yaw);
+      this.dummy.position.set(bay.x + x * c, bay.y + y + 24 * pavilionFlight(now, i), bay.z - x * s);
+      this.dummy.rotation.set(0, bay.yaw, 0);
+      // Fade through the carrier handover rather than teleport a visible drone to its other landing column.
+      this.dummy.scale.setScalar(Math.max(HIDDEN, T.MathUtils.smoothstep(level, .98, 1)));
+      this.drones.set(i, this.dummy);
+    }); this.drones.flush();
+  }
+
   private write(): void {
+    this.writeDrones(this.now);
     this.bays.forEach((bay, i) => {
       this.dummy.position.set(bay.x, bay.y, bay.z); this.dummy.rotation.set(0, bay.yaw, 0);
       // The autonomous design rises from its foot as the staffed hall folds away (same 3 s clock); hidden designs keep an invertible tiny scale.
@@ -943,6 +1015,8 @@ export class ConcentrationDistrict {
   readonly bridges: { i: number; j: number; y: number }[] = [];
   private readonly bridgeMeshes: T.InstancedMesh[];
   private readonly pulses: PulseRings;
+  private readonly light = publicLight.clone();
+  private nightRhythm = 1;
   private readonly dummy = new T.Object3D();
   private target = .5;
   private now = 0;
@@ -968,7 +1042,7 @@ export class ConcentrationDistrict {
         totalEmissiveRadiance *= lit * towerGlow;`);
     };
     facade.customProgramCacheKey = () => 'concentration-tower-glass';
-    const lobby = publicLight.clone(); lobby.emissive.set('#ffe1b8'); lobby.emissiveIntensity = .9;
+    const lobby = this.light; lobby.emissive.set('#ffe1b8'); lobby.emissiveIntensity = .9;
     // Three unit-height (1 m, scaled per site) silhouette families by slot, all on an ivory podium and all marked at the .4 / .72 sky-lobby
     // levels where bridges land: a twisted glass shaft, a terraced setback tower with planted terraces, and linked twin shafts.
     const family = (build: (unit: (geometry: T.BufferGeometry, material: T.Material, x: number, y: number, z?: number, yaw?: number) => void) => void) => {
@@ -1087,18 +1161,20 @@ export class ConcentrationDistrict {
     this.write(); return a || b || m || f || d || sp;
   }
 
-  update(now: number): void {
+  update(now: number, darkness = 0): void {
     this.now = now;
     const moved = [this.towerLevels.update(now), this.podLevels.update(now), this.midRise.update(now), this.forest.update(now), this.docks.update(now),
       this.solarPods.update(now)].some(Boolean);
     if (moved) this.write();
+    this.nightRhythm = meterNightRhythm(now, mean(this.towerLevels), 3, darkness);
+    this.light.emissiveIntensity = .9 * this.nightRhythm;
     this.pulses.update(now);
   }
 
   hide(): void { this.root.visible = false; this.pulses.clear(); }
 
   getDiagnostics() {
-    return { enabled: this.root.visible, targetConcentration: this.target, towers: this.towers.length, pods: this.pods.length, activePulses: this.pulses.active(this.now),
+    return { enabled: this.root.visible, nightRhythm: this.nightRhythm, targetConcentration: this.target, towers: this.towers.length, pods: this.pods.length, activePulses: this.pulses.active(this.now),
       visibleTowers: this.root.visible ? this.towerLevels.visible() : 0, visiblePods: this.root.visible ? this.podLevels.visible() : 0,
       midRises: this.root.visible ? this.towers.filter((_, i) => this.midRise.value[i] > HIDDEN && this.towerLevels.value[i] <= HIDDEN).length : 0,
       forestTowers: this.root.visible ? this.towers.filter((_, i) => this.forest.value[i] * this.towerLevels.value[i] > HIDDEN).length : 0,

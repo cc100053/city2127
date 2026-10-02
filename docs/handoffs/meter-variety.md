@@ -1,7 +1,7 @@
 # meter-variety — Readable, district-wide Meter changes
 
-- Owner: cc100053 (P0/P1/P4/P5: Claude Code; P2/P3/P11: Codex session)
-- Status: IN_PROGRESS — P0–P5 and P7–P11 implemented; P6 evidence recorded per stage; awaiting capture review before main
+- Owner: cc100053 (P0/P1/P4/P5: Claude Code; P2/P3/P11/P12: Codex session)
+- Status: IN_PROGRESS — P0–P5 and P7–P12 implemented; P6 evidence recorded per stage; awaiting capture review before main
 - Branch: `feat/meter-variety`
 - Base commit: `33227a687ac9d18281e90494a4e9b2ce27f861ce`
 - Last verified commit: P11 source `ab6a3a165ff6c5448699661c23f7e23d59c0372c` (root/survey local checks, lossless captures, real HTTP/WebSocket browser smoke and [feature CI run 36886838863](https://github.com/cc100053/city2127/actions/runs/36886838863) PASS).
@@ -9,8 +9,8 @@
 
 ## Session Git state
 
-- P11 session starting branch and HEAD: `feat/meter-variety` `261e036`, clean.
-- Last fetched origin/main commit: `33227a6` (2026-10-02; feature vs origin/main 16/0 at startup; feature vs remote counterpart 0/0).
+- P12 session starting branch and HEAD: `feat/meter-variety` `0e2efdf`, clean.
+- Last fetched origin/main commit: `33227a6` (2026-10-02; feature vs origin/main 18/0 at startup; feature vs remote counterpart 0/0).
 - Local changes present at session start: NONE.
 - Upstream integration status: NOT INTEGRATED.
 - Pending Git conflicts or synchronization blockers: NONE.
@@ -283,9 +283,20 @@ Readability gate: a low ↔ high change of one Meter alters ≥ 3 % of the 1920�
 - Not verified: controlled real-GPU FPS, Windows, exhibition hardware/endurance, human art acceptance or fresh browser skyway mesh-clearance sampling. Geometry/route footprints are unchanged; existing complete geometry checks passed.
 - Documentation: PROJECT records wire / ownership / hash / renderer flow and compatibility; PLAN02 and VALIDATION record this stage. README/AGENTS startup commands, controls and product scope stay the same; no edits needed there.
 
+## P12 — Life and motion (2026-10-02)
+
+- Preflight: resumed `feat/meter-variety` at `0e2efdf2f6ad3b9717911ffed3c334412ebc9e57`, clean. Fetch succeeded; feature/remote **0/0**, feature/`origin/main` **18/0** (`33227a6`), no automatic integration. Owner cc100053 (Codex execution); no overlapping modules or binary edits at startup. P11 source and closure available remotely. User explicitly requested optional P12.
+- Open courts reuse the promenade capsule/palette factory: **12 gathering figures per open non-hybrid court**, low/mixed/high seed-zero **0/24/96**. The existing SlotLevels drive visibility; crowds fade only once private/hybrid geometry is >98% cleared. Two courts overlap PARK / COMMONS site footprints and exclude the new actors; the other eight are eligible. Two bounded gathering lanes remain inside the paving and clear of parasol masts, pergola tables, trees, orchards and drone kiosks. No crowd draws when all courts are private. These are authored gatherings, not a crowd simulation or interior occupancy.
+- **11 service quadrotors**, one per automation bay. Staffed domed/stacked pavilions gain a small rooftop pad at 44 m; drone ports and charging masts replace one static parked drone with the animated actor. Staggered **48 s** descent/dock/ascent/hover, **12 s each**, inside a **24 m vertical column**. Carrier handover fades the drone before changing landing columns; legacy hides the whole layer. Existing air loop, berth shuttle, pods and promenade traffic remain intact. `ponytail:` no inter-bay dispatch; add it only for required journeys.
+- Four independent **night light rhythms** follow current eased carrier shares and the day clock's darkness; factor .75–1.25, steady in daylight. Period automation **12–20 s**, sharing **16–24 s**, environment **20–28 s**, concentration **24–32 s**. Reuses district-owned pad/tower rings, sharing rims/halos, environment sails/cooling rings and concentration lobbies/pods. Shared civic/route materials do not pulse. The manager remembers darkness for target callbacks; no global light flash, new assets/dependencies/render passes or per-frame geometry/material allocation.
+- P6 lossless references, headless Chrome **154.0.8037.58**, 1920×929 CSS, DPR 1, fixed hero, hour 16/21, `reviewTime=20`, all four Meters changed together, seed zero: [low day](meter-variety-p12-low-day.png), [mixed day](meter-variety-p12-mixed-day.png), [high day](meter-variety-p12-high-day.png); [low night](meter-variety-p12-low-night.png), [mixed night](meter-variety-p12-mixed-night.png), [high night](meter-variety-p12-high-night.png). Additional [night phase 26](meter-variety-p12-high-night-phase26.png), [staffed pavilion](meter-variety-p12-pavilion-night.png), [overhead crowd review](meter-variety-p12-plaza-night.png). The last two use temporary test-only camera poses, not product camera changes.
+- Full-city low ↔ mixed / mixed ↔ high / low ↔ high: **7.92 / 7.91 / 13.19% day**, **7.56 / 7.68 / 12.79% night** (`scripts/meter-diff.py`, >24/255). These are composite reference deltas, **not single-Meter gates**. Same-condition draw calls before → after: day **1361→1377 / 1337→1369 / 1421→1453**, night **1367→1383 / 1343→1375 / 1427→1459**, low/mixed/high. +16 when crowds hidden, +32 with crowds; no measured FPS claim.
+- Real HTTP/WebSocket Chrome smoke PASS: running-clock mixed → high live → reload → reset mixed → low live → reduced-motion reset/proposal → standalone. Actual drone matrices change over time; crowd diagnostics follow targets. Low/high body/rotor-centre samples along the full drone columns checked against browser-loaded geometry **including skyways**; final all-high body rays for all 96 crowd figures clear the complete loaded scene, including site assets. The first crowd pass exposed PARK/COMMONS intersections; the occupied-lot exclusion fixes them. No application/page/shader errors; existing favicon 404 excluded. Scratch DB: `/var/folders/st/ml4_0zfx7g129gh2305ynz5c0000gn/T/city2127-meter-p12-Kwfk06/survey.sqlite`; exhibition data untouched.
+- Local root `npm test`, `npm run build` and `git diff --check`: PASS (existing bundle-size warning only). New checks cover current-slot visibility, occupied-site footprint exclusion, transitions/snapshot/legacy, material isolation, bounded night rhythms, two flight cycles, actor separation and sampled actual-mesh clearance with orchard/kiosk extras. P11 architecture determinism remains exact; P12 animated actor matrices restore at a common clock phase across reload/reset/full replay. The first full suite failed its old animated-matrix comparison at different times; corrected phase-aware checks and final full suite PASS. Feature CI pending push. Survey/module-swap unchanged. README has no control/setup changes to synchronize; PROJECT and PLAN02 document runtime/visual scope, VALIDATION records this stage's evidence. Human art review, hardware/FPS, Windows and exhaustive arbitrary-history/interior collision acceptance remain open. Existing capture-review-before-main condition remains.
+
 ## Proposed P7–P12 — More variety per Meter (2026-10-01, pending user approval)
 
-P7–P11 implemented (P11 requested by the user on 2026-10-02); P12 remains optional and unimplemented. Goal: each Meter reads as several distinct mature 2127 identities, not one object family that is present or absent. Constraints carry over: desktop hero pose unchanged, no server contract change (P11 excepted), every value futuristic, greenery stays lush with no uniform grids, no new assets, dependencies or render passes.
+P7–P12 implemented (P11 and optional P12 requested by the user on 2026-10-02). Goal: each Meter reads as several distinct mature 2127 identities, not one object family that is present or absent. Constraints carry over: desktop hero pose unchanged, no server contract change (P11 excepted), every value futuristic, greenery stays lush with no uniform grids, no new assets, dependencies or render passes.
 
 ### Where each Meter stands
 
@@ -307,7 +318,7 @@ Mixed values only scatter the two endpoint designs (low ↔ mixed 0.9–2.7 %).
 | P9 (done, see [P9](#p9--mixed-identity-2026-10-02)) | Mixed identity. At mid values a share of slots shows a hybrid design (half-open room, shared-staffed pavilion, terraced mid-rise), so low / mixed / high read as three identities. | low ↔ mixed and mixed ↔ high each ≥ 1.5 % |
 | P10 (done, see [P10](#p10--cross-meter-combinations-2026-10-02)) | Cross-Meter combinations. 4–6 pairings add visible extras only when both axes agree, e.g. sharing + automation high → drone kiosks in shared plazas; environment + concentration high → vertical-forest tower crowns. | 81-combination pipeline test asserts each extra appears only in its pairing |
 | P11 (done, see [P11](#p11--path-dependence-2026-10-02)) | Path dependence: proposal history seeds which slots switch first, so equal scores grown in a different order give different cities. Needs the client to read history and identical results after reload / reset. | Determinism test over reload, reset and replay; user approval of the contract use |
-| P12 (optional) | Life and motion: crowds in open plazas, drones landing at pavilions, a per-Meter night light rhythm. | Actor route / avoidance checks as in P2 |
+| P12 (done, see [P12](#p12--life-and-motion-2026-10-02)) | Life and motion: crowds in open plazas, drones landing at pavilions, a per-Meter night light rhythm. | Actor route / avoidance checks as in P2 |
 
 P6 (pipeline diagnostics, docs, draw-call measurement) stays per stage: each stage records lossless low / mixed / high day and night captures, `scripts/meter-diff.py` results and a same-condition draw-call before / after.
 
@@ -315,9 +326,9 @@ P6 (pipeline diagnostics, docs, draw-call measurement) stays per stage: each sta
 
 - Approve P7 → P10 in this order, or start from a different stage?
 - Preferred variants for each Meter in P8 (the examples above are proposals).
-- Whether P11 / P12 are wanted for the exhibition.
+- P11 / P12 were requested and implemented on 2026-10-02; final human visual review remains open.
 - Whether to integrate P0–P5 + P3b–P3d into `main` before P7, or keep one branch.
 
 ## Next step
 
-Capture review of P0–P11 with the user; decide whether P12 (life and motion) is wanted, and integrate `feat/meter-variety` into `main` per CONTRIBUTING (preserve the review-before-main condition).
+Capture review of P0–P12 with the user, then integrate `feat/meter-variety` into `main` per CONTRIBUTING (preserve the review-before-main condition).

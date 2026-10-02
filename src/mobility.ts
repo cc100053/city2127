@@ -74,7 +74,7 @@ function wing(mat:T.Material=shell):Part {
   const shape=new T.Shape();shape.moveTo(-2.2,-.8);shape.lineTo(-.5,.8);shape.lineTo(.5,.8);shape.lineTo(2.2,-.8);shape.lineTo(.55,-.4);shape.lineTo(-.55,-.4);shape.closePath();
   const geometry=new T.ExtrudeGeometry(shape,{depth:.1,bevelEnabled:false});geometry.rotateX(-Math.PI/2);return {geometry,material:mat};
 }
-function fleet(scene:T.Scene,parts:Part[],count:number,name:string,shadow=true) {
+function fleet(scene:T.Object3D,parts:Part[],count:number,name:string,shadow=true) {
   const batches=new Map<T.Material,T.BufferGeometry[]>();
   parts.forEach(p=>{const list=batches.get(p.material)??[];list.push(p.geometry.index?p.geometry.toNonIndexed():p.geometry);batches.set(p.material,list);});
   const meshes=[...batches].map(([mat,geometries])=>{
@@ -87,7 +87,40 @@ function fleet(scene:T.Scene,parts:Part[],count:number,name:string,shadow=true) 
     /** Per-actor colour for the parts drawn with `mat` (a white base the instance colour multiplies); set once at build. */
     tint(index:number,mat:T.Material,color:T.ColorRepresentation){meshes.forEach(m=>{if(m.material===mat)m.setColorAt(index,new T.Color(color));});},
     flush(){meshes.forEach(m=>m.instanceMatrix.needsUpdate=true);},
+    show(visible:boolean){meshes.forEach(m=>m.visible=visible);},
   };
+}
+
+/** Shared capsule figures and palette, used by promenade and plaza crowds. */
+export function pedestrians(scene:T.Object3D,count:number,name:string) {
+  // People: capsule torso and limbs, round head and hair; clothes, skin and hair vary per person from a muted palette (no saffron).
+  const coats=material('#ffffff'),skin=material('#ffffff'),hair=material('#ffffff'),trousers=material('#3d4a52');
+  const capsule=(r:number,length:number,at:[number,number,number],mat:T.Material,depth=1):Part=>({geometry:new T.CapsuleGeometry(r,length,4,10).scale(1,1,depth).translate(...at),material:mat});
+  const people=fleet(scene,[
+    capsule(.22,.36,[0,.96,0],coats,.72),{geometry:new T.SphereGeometry(.15,14,10).translate(0,1.5,0),material:skin},
+    {geometry:new T.SphereGeometry(.162,14,6,0,Math.PI*2,0,Math.PI*.55).translate(0,1.52,-.012),material:hair},
+    capsule(.07,.42,[-.29,.98,0],coats),capsule(.07,.42,[.29,.98,0],coats),
+    {geometry:new T.CapsuleGeometry(.08,.4,4,8).translate(-.13,.33,0),material:trousers},{geometry:new T.CapsuleGeometry(.08,.4,4,8).translate(.13,.33,0),material:trousers},
+  ],count,name);
+  const clothes=['#4f6f7c','#b5836f','#6d8a5f','#2f3e48','#c9b48a','#8c6f8f','#3f5a52','#e4e1d8'],skins=['#e8cdb0','#c99e7c','#8d6348','#f0d9c2'],hairs=['#2f2a27','#5a4033','#1d2226','#b9a58c','#d8d8d4'];
+  for(let i=0;i<count;i++){people.tint(i,coats,clothes[(i*5)%clothes.length]);people.tint(i,skin,skins[(i*3)%skins.length]);people.tint(i,hair,hairs[(i*7)%hairs.length]);}
+  return people;
+}
+
+/** Small service quadrotors match the parked district drones; four rotors share the trim batch. */
+export function serviceDrones(scene:T.Object3D,count:number) {
+  return fleet(scene,[{geometry:new T.SphereGeometry(1.4,12,8).scale(1.4,.6,1),material:glass},
+    ...[[-1.8,-1.8],[1.8,-1.8],[-1.8,1.8],[1.8,1.8]].map(([x,z])=>({geometry:new T.CylinderGeometry(1,1,.12,12).translate(x,.3,z),material:shell}))],count,'service-drones');
+}
+
+/** Bounded, separated gathering lanes inside either open court design. */
+export function plazaPose(time:number,index:number) {
+  return {x:(index%6-2.5)*2+.4*Math.sin(time*.35+index),z:index<6?-11:11,yaw:Math.cos(time*.35+index)*.3};
+}
+/** One column per bay: 12 s descent, 12 s docked, 12 s ascent, 12 s hover; no wrap teleport. */
+export function pavilionFlight(time:number,index:number) {
+  const t=((time+index*7)%48+48)%48;
+  return t<12?1-ease(t/12):t<24?0:t<36?ease((t-24)/12):1;
 }
 
 export function mobility(scene:T.Scene) {
@@ -101,17 +134,7 @@ export function mobility(scene:T.Scene) {
   // Sweep train: four cars shuttling on the descending skyway, pitched with the deck.
   const SWEEP_CARS=4,SWEEP_SCALE=1.7,sweepLength=path.sweep.getLength(),sweepPods=fleet(scene,podParts(),SWEEP_CARS,'sweep-pods');
   for(let i=0;i<SWEEP_CARS;i++)sweepPods.tint(i,body,'#f6f5f1');
-  // People: capsule torso and limbs, round head and hair; clothes, skin and hair vary per person from a muted palette (no saffron).
-  const coats=material('#ffffff'),skin=material('#ffffff'),hair=material('#ffffff'),trousers=material('#3d4a52');
-  const capsule=(r:number,length:number,at:[number,number,number],mat:T.Material,depth=1):Part=>({geometry:new T.CapsuleGeometry(r,length,4,10).scale(1,1,depth).translate(...at),material:mat});
-  const people=fleet(scene,[
-    capsule(.22,.36,[0,.96,0],coats,.72),{geometry:new T.SphereGeometry(.15,14,10).translate(0,1.5,0),material:skin},
-    {geometry:new T.SphereGeometry(.162,14,6,0,Math.PI*2,0,Math.PI*.55).translate(0,1.52,-.012),material:hair},
-    capsule(.07,.42,[-.29,.98,0],coats),capsule(.07,.42,[.29,.98,0],coats),
-    {geometry:new T.CapsuleGeometry(.08,.4,4,8).translate(-.13,.33,0),material:trousers},{geometry:new T.CapsuleGeometry(.08,.4,4,8).translate(.13,.33,0),material:trousers},
-  ],MAX_WALKERS,'promenade-walkers');
-  const clothes=['#4f6f7c','#b5836f','#6d8a5f','#2f3e48','#c9b48a','#8c6f8f','#3f5a52','#e4e1d8'],skins=['#e8cdb0','#c99e7c','#8d6348','#f0d9c2'],hairs=['#2f2a27','#5a4033','#1d2226','#b9a58c','#d8d8d4'];
-  for(let i=0;i<MAX_WALKERS;i++){people.tint(i,coats,clothes[(i*5)%clothes.length]);people.tint(i,skin,skins[(i*3)%skins.length]);people.tint(i,hair,hairs[(i*7)%hairs.length]);}
+  const people=pedestrians(scene,MAX_WALKERS,'promenade-walkers');
   // Water taxis: 11 m white yachts with a glass cabin and a mint waterline.
   // White yacht hull with a pointed bow (plan in x/-z), a raised aft deck, a dark glass cabin band under a white roof.
   const plan=new T.Shape([[-1.8,5.5],[1.8,5.5],[1.8,-2],[0,-6.2],[-1.8,-2]].map(([x,y])=>new T.Vector2(x,y)));

@@ -106,8 +106,14 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
   const histories = [[1, -1], [-1, 1]].map(prefix => [...prefix, ...Array.from({ length: 140 }, (_, i) => i % 2 ? -1 : 1)]);
   const districtRoots = [sites.magnetEast.automationDistrict!.root, sites.dogenzakaSouth.sharingDistrict!.root,
     sites.stationEastPark.environmentDistrict!.root, sites.centerGaiRear.concentrationDistrict!.root];
-  const matrices = () => districtRoots.map(root => root.children.filter(o => o instanceof T.InstancedMesh && o.name !== 'meter-pulse')
+  const matrices = () => districtRoots.map(root => root.children.filter(o => o instanceof T.InstancedMesh && !['meter-pulse', 'plaza-crowds', 'service-drones'].includes(o.name))
     .map(o => [...(o as T.InstancedMesh).instanceMatrix.array]));
+  // Architecture restores independently of animation time; P12 actors restore at a common held phase.
+  const actorsAt = (now: number) => {
+    manager.update(now, 1);
+    return districtRoots.map(root => root.children.filter(o => o instanceof T.InstancedMesh && ['plaza-crowds', 'service-drones'].includes(o.name))
+      .map(o => [...(o as T.InstancedMesh).instanceMatrix.array]));
+  };
   const views: ExhibitionCityView[] = [], cities: ReturnType<typeof matrices>[] = [];
   for (const history of histories) {
     const time = 1000 + views.length * 800;
@@ -127,20 +133,22 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
         ok(staff(ctx, 'guest-left'));
       }
       const view = currentView(ctx) as ExhibitionCityView;
-      const city = matrices(); views.push(view); cities.push(city);
+      const city = matrices(), actors = actorsAt(time + 700); views.push(view); cities.push(city);
       applyEvent(JSON.parse(JSON.stringify({ type: 'city-state-snapshot', view })), time + 600);
       assert.deepEqual(matrices(), city, 'serialized reload restores exact instance transforms');
+      assert.deepEqual(actorsAt(time + 700), actors, 'P12 reload restores actors at the same clock phase');
       const reset = ok(staff(ctx, 'reset-city', 'RESET'));
       const resetView = currentView(ctx) as ExhibitionCityView;
       assert.deepEqual(Object.values(resetView.slotSeeds), [0, 0, 0, 0]);
       applyEvent({ type: 'run-reset', view: resetView }, time + 601);
-      const baseline = matrices();
+      const baseline = matrices(), baselineActors = actorsAt(time + 700);
       // Replaying an old submission after reset cannot seed the new run.
       assert.equal(ok(submitProposal(ctx, firstRequest!).response).replayed, true);
       assert.deepEqual(currentView(ctx), resetView);
       assert.equal(currentView(ctx).runId, reset.state.runId);
       applyEvent({ type: 'city-state-snapshot', view: resetView }, time + 602);
       assert.deepEqual(matrices(), baseline, 'reset and reloaded reset have identical cities');
+      assert.deepEqual(actorsAt(time + 700), baselineActors, 'P12 reset and reload restore actors at the same phase');
       // A snapshot in the middle of a live retarget settles immediately and clears all old pulses.
       manager.applyExhibitionLayout(view.layout, 'city-state-updated', time + 603, view.slotSeeds);
       manager.update(time + 604);
@@ -158,6 +166,7 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
       assert.deepEqual(replayed.slotSeeds, view.slotSeeds, 'rebuilding the same votes in a new run yields identical seeds');
       applyEvent({ type: 'city-state-snapshot', view: replayed }, time + 605);
       assert.deepEqual(matrices(), city, 'full replay restores exact city transforms regardless of new IDs');
+      assert.deepEqual(actorsAt(time + 700), actors, 'P12 replay restores actors at the same phase');
     } finally { ctx.db.close(); }
   }
   assert.deepEqual(views[0].scores, views[1].scores, 'different early orders converge to exactly equal Meter scores');

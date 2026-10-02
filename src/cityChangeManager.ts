@@ -60,6 +60,7 @@ export class CityChangeManager {
   private readonly variants = Object.fromEntries(SITE_IDS.map(id => [id, 'baseline'])) as Record<SiteId, SiteVariantId>;
   private readonly sites: BuiltSiteMap;
   private lastUpdateNow = 0;
+  private darkness = 0;
   private exhibitionInitialized = false;
 
   constructor(sites: BuiltSiteMap) {
@@ -157,15 +158,15 @@ export class CityChangeManager {
     }])) as CityChangeDiagnostics;
   }
 
-  update(now: number): void {
-    this.lastUpdateNow = now;
+  update(now: number, darkness = this.darkness): void {
+    this.lastUpdateNow = now; this.darkness = darkness;
     this.sites.stationEastPark.environmentPark?.update(now);
-    this.sites.stationEastPark.environmentDistrict?.update(now);
+    this.sites.stationEastPark.environmentDistrict?.update(now, darkness);
     this.sites.magnetEast.automationHub?.update(now);
-    this.sites.magnetEast.automationDistrict?.update(now);
+    this.sites.magnetEast.automationDistrict?.update(now, darkness);
     this.sites.dogenzakaSouth.commonsPlaza?.update(now);
-    this.sites.dogenzakaSouth.sharingDistrict?.update(now);
-    this.sites.centerGaiRear.concentrationDistrict?.update(now);
+    this.sites.dogenzakaSouth.sharingDistrict?.update(now, darkness);
+    this.sites.centerGaiRear.concentrationDistrict?.update(now, darkness);
     this.sites.centerGaiRear.concentrationTower?.update(now);
     for (const siteId of SITE_IDS) {
       const motions = this.motions.get(siteId)!;

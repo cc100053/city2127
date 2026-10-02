@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
 import { changeSites, skyBridges, inDistrict, DISTRICT } from '../src/layout.ts';
 import { heroCamera } from '../src/heroCamera.ts';
-import { routes } from '../src/mobility.ts';
+import { pavilionFlight, plazaPose, routes } from '../src/mobility.ts';
 import { civicCore } from '../src/civicCore.ts';
 import { bake } from '../src/cityRig.ts';
 import { contextFacades } from '../src/contextFacades.ts';
@@ -362,3 +362,54 @@ if (process.env.SCAN_COURTS) {
   }
   console.log('COURTS', out.sort((a, b) => b[0] - a[0]).map(o => o[1]).join(' | '));
 }
+
+// P12: two full flight cycles are continuous; gathering lanes preserve person-to-person clearance.
+for (let time = 0; time <= 96; time += .25) {
+  for (let i = 0; i < serviceDistrict.bays.length; i++) {
+    const altitude = pavilionFlight(time, i);
+    assert.ok(altitude >= 0 && altitude <= 1);
+    assert.ok(Math.abs(altitude - pavilionFlight(time + .001, i)) < .001);
+  }
+  for (let i = 0; i < 12; i++) {
+    const a = plazaPose(time, i);
+    assert.ok(Math.hypot(a.x, a.z) < 18, 'crowd remains on the plaza paving');
+    for (let j = i + 1; j < 12; j++) {
+      const b = plazaPose(time, j);
+      assert.ok(Math.hypot(a.x - b.x, a.z - b.z) > .9, 'gathering lanes never overlap actors');
+    }
+  }
+}
+const crowdMatrix = new Matrix4(), actorPosition = new Vector3();
+for (const share of [0, 4, 8]) {
+  sharingDistrict.setTarget({ sharedSeats: share, automatedPorts: 6, plantedFraction: .8 }, 0, true);
+  const crowd = sharingDistrict.root.children.find(o => o.name === 'plaza-crowds') as InstancedMesh;
+  const obstacles = sharingDistrict.root.children.filter(o => o.name !== 'plaza-crowds' && o.name !== 'meter-pulse');
+  for (const time of [0, 12, 24]) {
+    sharingDistrict.update(time, 1); sharingDistrict.root.updateMatrixWorld(true);
+    for (let i = 0; i < crowd.count; i++) {
+      crowd.getMatrixAt(i, crowdMatrix); if (new Vector3().setFromMatrixScale(crowdMatrix).x < .001) continue;
+      actorPosition.setFromMatrixPosition(crowdMatrix);
+      for (const height of [.4, 1, 1.55]) for (const direction of [new Vector3(1,0,0),new Vector3(-1,0,0),new Vector3(0,0,1),new Vector3(0,0,-1)]) {
+        ray.set(actorPosition.clone().add(new Vector3(0,height,0)), direction); ray.far = .45;
+        assert.equal(ray.intersectObjects([...city.children, ...obstacles], true).length, 0, 'crowd intersects garden / orchard / kiosk / pavilion geometry');
+      }
+    }
+  }
+}
+// The entire 24 m drone column (body / rotor-centre samples) clears real city and its own carrier; the landing surface is below the body.
+for (const automatedPorts of [0, 3, 6]) {
+  serviceDistrict.setTarget({ automatedPorts }, 0, true); serviceDistrict.update(0, 1); serviceDistrict.root.updateMatrixWorld(true);
+  const drone = serviceDistrict.root.children.find(o => o.name === 'service-drones') as InstancedMesh;
+  const obstacles = [...city.children, ...serviceDistrict.root.children.filter(o => o.name !== 'service-drones' && o.name !== 'meter-pulse')];
+  for (let i = 0; i < drone.count; i++) {
+    drone.getMatrixAt(i, crowdMatrix); actorPosition.setFromMatrixPosition(crowdMatrix);
+    const bottom = actorPosition.y - 24 * pavilionFlight(0, i) - .84;
+    for (const dx of [-1.8, 0, 1.8]) for (const dz of [-1.8, 0, 1.8]) {
+      ray.set(new Vector3(actorPosition.x + dx, bottom + 25.68, actorPosition.z + dz), down); ray.far = 25.68;
+      const hit = ray.intersectObjects(obstacles, true)[0];
+      assert.equal(hit?.object.name, undefined, `service drone column ${i} intersects ${hit?.object.name}`);
+    }
+  }
+}
+ray.far = Infinity;
+console.log('Odaiba: P12 two-cycle continuity, separated plaza crowds, orchard/kiosk clearance and full service-drone columns pass actual geometry checks.');

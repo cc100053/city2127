@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { hybridShare, AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, PRIVATE_RISE, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
+import { changeSites } from '../src/layout.ts';
+import { publicLight, trail } from '../src/cityRig.ts';
 import { mobility } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
@@ -296,3 +298,46 @@ for (const [name, district, low, high] of pulseCases) {
   assert.equal(district.root.getObjectsByProperty('name', 'meter-pulse').length, 2, `${name}: GTAO-excluded pulse batches`);
 }
 console.log('PASS: P5 pulses — live changes only, two waves, fade, no pulse on snapshot / unchanged target, cleared on legacy hide, GTAO-excluded.');
+
+// P12 actors follow current carrier visibility; owned lighting never mutates civic materials.
+const life = new SharingDistrict(new T.Scene()), service = new AutomationDistrict(new T.Scene());
+const lifeEnv = new EnvironmentDistrict(new T.Scene()), lifeTower = new ConcentrationDistrict(new T.Scene());
+const ownDistricts = [service, life, lifeEnv, lifeTower];
+const civicTrail = trail.color.clone(), civicEmission = publicLight.emissiveIntensity;
+for (const score of [-7.5, 0, 7.5]) {
+  const layout = deriveExhibitionLayout({ automation: score, publicSharing: score, environmentalPriority: score, urbanConcentration: score });
+  ownDistricts.forEach(d => d.setTarget(layout, 0, true));
+  ownDistricts.forEach(d => d.update(20, 0));
+  assert.ok(ownDistricts.every(d => d.getDiagnostics().nightRhythm === 1), 'day lights stay steady');
+  const crowd = life.root.children.find(o => o.name === 'plaza-crowds') as T.InstancedMesh;
+  const drone = service.root.children.find(o => o.name === 'service-drones') as T.InstancedMesh;
+  const matrix = new T.Matrix4(), position = new T.Vector3(), rotation = new T.Quaternion(), scale = new T.Vector3();
+  let drawn = 0;
+  for (let i = 0; i < crowd.count; i++) {
+    crowd.getMatrixAt(i, matrix); matrix.decompose(position, rotation, scale);
+    if (scale.x > 1e-3) {
+      drawn++;
+      assert.ok(Object.values(changeSites).every(s => Math.abs(position.x - s.x) > s.w * s.scale / 2 + .45
+        || Math.abs(position.z - s.z) > s.d * s.scale / 2 + .45), 'crowd bodies stay outside occupied site footprints');
+    }
+  }
+  assert.equal(drawn, life.getDiagnostics().plazaPeople);
+  assert.equal(crowd.visible, drawn > 0);
+  assert.equal(service.getDiagnostics().serviceDrones, drone.count);
+  assert.equal(life.getDiagnostics().plazaPeople, score < 0 ? 0 : score > 0 ? 96 : 24);
+  const before = Array.from(drone.instanceMatrix.array);
+  ownDistricts.forEach(d => d.update(26, 1));
+  assert.notDeepEqual(Array.from(drone.instanceMatrix.array), before, 'service drones move on the shared clock');
+  assert.equal(new Set(ownDistricts.map(d => d.getDiagnostics().nightRhythm)).size, 4, 'four distinct night rhythms');
+  assert.ok(ownDistricts.every(d => d.getDiagnostics().nightRhythm >= .75 && d.getDiagnostics().nightRhythm <= 1.25));
+}
+assert.ok(trail.color.equals(civicTrail)); assert.equal(publicLight.emissiveIntensity, civicEmission);
+const highLife = deriveExhibitionLayout({ automation: 7.5, publicSharing: 7.5, environmentalPriority: 7.5, urbanConcentration: 7.5 });
+life.setTarget(highLife, 30, true);
+life.setTarget({ ...highLife, sharedSeats: 0 }, 30, false); life.update(31.5, 1);
+assert.equal(life.getDiagnostics().plazaPeople, 0, 'crowds clear before private gardens grow');
+life.setTarget(highLife, 31.5, true); life.update(31.5, 1);
+assert.equal(life.getDiagnostics().plazaPeople, 96, 'snapshot immediately restores settled crowd');
+life.hide(); service.hide();
+assert.equal(life.getDiagnostics().plazaPeople + service.getDiagnostics().serviceDrones, 0);
+console.log('PASS: P12 current-slot crowds, live/snapshot/legacy, moving service drones, four night rhythms and civic material isolation.');
