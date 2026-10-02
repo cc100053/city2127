@@ -1,6 +1,7 @@
 import * as T from 'three';
 import { arc, bake, box, cream, faces, futureLight, glass, leaf, publicLight, sage, shrubs, sign, solar, trim, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
+import { ConcentrationDistrict } from '../districtMeters.ts';
 import type { Band } from '../surveyView.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, SITE_TRANSITION_SECONDS, type BuiltSite } from './siteRuntime.ts';
 
@@ -265,6 +266,6 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
     id: 'centerGaiRear', root,
     layers: { towerBase: towerBaseLayer, towerUpper: towerUpperLayer, towerNeutralProps: neutralPropsLayer },
     marker: createGuestMarker(root, 'se'),
-    concentrationTower,
+    concentrationTower, concentrationDistrict: new ConcentrationDistrict(scene),
   };
 }

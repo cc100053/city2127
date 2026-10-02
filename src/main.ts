@@ -92,10 +92,10 @@ try {
   const composer=new EffectComposer(renderer,new T.WebGLRenderTarget(innerWidth,innerHeight,{type:T.HalfFloatType,samples:4}));composer.setSize(innerWidth,innerHeight);composer.addPass(new RenderPass(scene,camera));
   // Contact shadows where slabs, planters and cores meet: the cheapest step from blockout to built object.
   const ao=new GTAOPass(scene,camera,innerWidth,innerHeight);ao.updateGtaoMaterial({radius:3,distanceFallOff:.8,thickness:3,samples:16});ao.blendIntensity=1;composer.addPass(ao);
-  // GTAO's normal/depth prepass uses an override material without the earth curvature, so the far bay would ghost above the horizon: skip the curved sea and bay context there, and the transparent boat wakes (no normals; they read as black AO).
+  // GTAO's normal/depth prepass uses an override material without the earth curvature, so the far bay would ghost above the horizon: skip the curved sea and bay context there, and the transparent boat wakes and Meter pulses (no normals; they read as black AO).
   const aoPass=ao as unknown as {_overrideVisibility():void;_restoreVisibility():void},hideFlat=aoPass._overrideVisibility.bind(aoPass),showFlat=aoPass._restoreVisibility.bind(aoPass);
   let flat:T.Object3D[]=[];
-  aoPass._overrideVisibility=()=>{hideFlat();flat=[floor,scene.getObjectByName('bay-context'),scene.getObjectByName('water-taxi-wakes')].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
+  aoPass._overrideVisibility=()=>{hideFlat();flat=[floor,scene.getObjectByName('bay-context'),scene.getObjectByName('water-taxi-wakes'),...scene.getObjectsByProperty('name','meter-pulse')].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
   aoPass._restoreVisibility=()=>{showFlat();for(const o of flat)o.visible=true;};
   const bloom=new UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.2,.7,1);composer.addPass(bloom);
   const vignette=new ShaderPass(VignetteShader);vignette.uniforms.offset.value=.9;vignette.uniforms.darkness.value=.9;composer.addPass(vignette);composer.addPass(new OutputPass());
@@ -113,12 +113,23 @@ try {
   const heldHour=Number(params.get('hour')??NaN),hold=heldHour>=0&&heldHour<24?heldHour:null;
   let displayMode: DisplayMode = 'auto';
   const updateOverlay=overlay();
-  const cityChanges=surveyUrl?createCityChangeManager(scene):null;
+  // DEV-only `?meters=nw:high,ne:low` (band or score −12..12 per site, unlisted = 0) applies a v2 layout without the survey server, for review captures; `window.cityMeters('ne:high')` then animates a live change.
+  const metersParam=import.meta.env.DEV?params.get('meters'):null;
+  const cityChanges=surveyUrl||metersParam!==null?createCityChangeManager(scene):null;
+  // Applied after the first frame, so `now` already holds the clock (or a held `reviewTime`) rather than its initial 0.
+  if(import.meta.env.DEV && metersParam!==null)import('./devMeters').then(async({devLayout})=>{
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    cityChanges!.applyExhibitionLayout(devLayout(metersParam),'city-state-snapshot',now);
+    Object.assign(window,{cityMeters:(meters:string)=>cityChanges!.applyExhibitionLayout(devLayout(meters),'city-state-updated',now)});
+    // `&metersTo=se:high&metersAge=1.2`: a live change that started 1.2 s ago, so a held `reviewTime` capture shows the transition and pulse.
+    const to=params.get('metersTo');
+    if(to!==null)cityChanges!.applyExhibitionLayout(devLayout(to),'city-state-updated',now-Number(params.get('metersAge')??1));
+  });
   if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view)=>{
     if(isExhibitionView(view)){
       // Cancel any legacy score blend while preserving its current rendered atmosphere.
       world.blendTo(world.state,now);
-      cityChanges!.applyExhibitionLayout(view.layout,kind,now);
+      cityChanges!.applyExhibitionLayout(view.layout,kind,now,view.slotSeeds);
       return;
     }
     world.blendTo(scoresToWorldState(view.scores),now);
@@ -155,7 +166,7 @@ try {
     ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientLate,glow*.6).lerp(ambientNight,dark);
     scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure*(1+.16*day);
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
-    controls.update();panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);rig.update(s,now,dark);updateOdaiba(dark);cityChanges?.update(now);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
+    controls.update();panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);cityChanges?.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
     if(++frames===120){renderer.domElement.dataset.hour=hour.toFixed(2);renderer.domElement.dataset.displayMode=displayMode;renderer.domElement.dataset.time=now.toFixed(2);renderer.domElement.dataset.fps=(120000/(performance.now()-measureStart)).toFixed(1);renderer.domElement.dataset.drawCalls=String(renderer.info.render.calls);renderer.domElement.dataset.geometries=String(renderer.info.memory.geometries);if(cityChanges)renderer.domElement.dataset.siteAssets=JSON.stringify(cityChanges.getDiagnostics());frames=0;measureStart=performance.now();}
   });
   window.addEventListener('resize',()=>{

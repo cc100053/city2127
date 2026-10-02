@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
-import { currentState } from '../src/server/answerService.ts';
+import { currentState, currentView } from '../src/server/answerService.ts';
 import { createContext } from '../src/server/server.ts';
 import { SCHEMA_VERSION, migrations, schemaVersion } from '../src/server/migrations.ts';
 import { CorruptStateError, replayExhibitionRun, replayRun, runAnswerEvents } from '../src/server/runStore.ts';
@@ -83,11 +83,13 @@ try {
   assert.equal(JSON.parse(String(stored?.answers_json))[0].questionText, frozenQuestionText, 'event text is copied when the proposal commits');
   assert.equal(readDisplayMode(migrated.db), 'auto', 'migration defaults to the existing cycle');
   assert.ok(setDisplayMode(migrated, { mode: 'night' }).response.ok);
+  const savedView = currentView(migrated);
   migrated.db.close();
 
   // Restart recomputes the complete v2 state from immutable proposal events and checks the snapshot.
   const restarted = createContext({ dbPath, questionsPath: EXHIBITION_QUESTIONS_PATH });
   assert.deepEqual(currentState(restarted), saved);
+  assert.deepEqual(currentView(restarted), savedView, 'full-history slot seeds survive a real SQLite restart');
   assert.equal(readDisplayMode(restarted.db), 'night', 'staff lighting choice survives server restart');
   const exhibitionRun = restarted.db.prepare("SELECT started_at FROM runs WHERE id = ?").get(saved.runId);
   assert.deepEqual(replayExhibitionRun(restarted.db, saved.runId, String(exhibitionRun?.started_at)), saved);

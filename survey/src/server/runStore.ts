@@ -1,5 +1,5 @@
 import type { DatabaseSync, SQLOutputValue } from 'node:sqlite';
-import { CITY_AXES, initialCitySurveyState, initialExhibitionState, isCityAxis, type CitySurveyState, type ExhibitionState, type ExhibitionVotes } from '../shared/citySurveyState.ts';
+import { CITY_AXES, zeroScores, initialCitySurveyState, initialExhibitionState, isCityAxis, type CitySurveyState, type ExhibitionState, type ExhibitionVotes } from '../shared/citySurveyState.ts';
 import type { AnswerEvent, RunSummary } from '../shared/protocol.ts';
 import { deriveExhibitionLayout, exhibitionLayoutChanges, type ProposalAnswerRecord, type ProposalRecord } from '../shared/cityView.ts';
 import { applyEffects, applyProposalVotes, validateExhibitionState } from '../survey/scoreEngine.ts';
@@ -232,6 +232,17 @@ export function toProposalRecord(row: Row): ProposalRecord {
     revisionBefore, revisionAfter, submittedAt, beforeScores: before.scores, afterScores: after.scores,
     beforeLayout, afterLayout, cityChanges: exhibitionLayoutChanges(beforeLayout, afterLayout),
   };
+}
+
+/** Ordered integer hash; IDs, timestamps and neutral votes never shuffle a district. */
+export function runProposalSlotSeeds(db: DatabaseSync, runId: string) {
+  const seeds = zeroScores();
+  // ponytail: O(guests) per view, streaming only votes; persist incremental hashes if long runs make this measurable.
+  for (const row of db.prepare('SELECT votes_json FROM proposal_events WHERE run_id = ? ORDER BY sequence').iterate(runId)) {
+    const votes = parseVotes(str(row, 'votes_json'));
+    for (const axis of CITY_AXES) if (votes[axis] !== 0) seeds[axis] = Math.imul(seeds[axis] ^ (votes[axis] + 2), 16777619) >>> 0;
+  }
+  return seeds;
 }
 
 export function runProposalRecords(db: DatabaseSync, runId: string, requestedLimit = 64): ProposalRecord[] {

@@ -1,6 +1,7 @@
 import * as T from 'three';
 import { arc, bake, futureLight, leaf, membrane, paint, pink, shrubs, stone, trim, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition, type EnvironmentParkTarget } from '../changeCatalog.ts';
+import { EnvironmentDistrict } from '../districtMeters.ts';
 import { changeSites } from '../layout.ts';
 import type { SiteAssetLoaderCache } from '../siteAssets/assetLoader.ts';
 import { SITE_TRANSITION_SECONDS, createGuestMarker, createSiteLayer, createSiteRoot, type BuiltSite, type EnvironmentParkDiagnostics, type EnvironmentParkRuntime } from './siteRuntime.ts';
@@ -304,5 +305,7 @@ export function buildEnvironmentPark(scene: T.Scene, _kit: Kit, assets: SiteAsse
     id: 'stationEastPark', root,
     layers: { parkSurface: surfaceLayer, parkTrees: treeLayer, parkCoolingFins: finLayer },
     marker: createGuestMarker(root, 'ne'), environmentPark,
+    // The same Q3 choice also shades every promenade bay across the district (P1 meter variety).
+    environmentDistrict: new EnvironmentDistrict(scene),
   };
 }

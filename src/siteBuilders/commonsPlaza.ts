@@ -2,6 +2,7 @@ import * as T from 'three';
 import { arc, bake, box, dark, futureLight, leaf, membrane, pink, publicLight, shrubs, sign, stone, trim, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, SITE_TRANSITION_SECONDS, type BuiltSite } from './siteRuntime.ts';
+import { SharingDistrict } from '../districtMeters.ts';
 import type { ExhibitionLayout } from '../surveyView.ts';
 
 const SEAT_COUNT = 8;
@@ -201,6 +202,6 @@ export function buildCommonsPlaza(scene: T.Scene, kit: Kit): CommonsPlazaSite {
     id: 'dogenzakaSouth', root,
     layers: { plaza: plazaLayer, commonsNeutralProps: neutralPropsLayer },
     marker: createGuestMarker(root, 'sw'),
-    commonsPlaza,
+    commonsPlaza, sharingDistrict: new SharingDistrict(scene),
   };
 }

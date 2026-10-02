@@ -1,5 +1,61 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
+## Meter variety P12 — 2026-10-02，feature branch 待視覺審閱
+
+用家要求實作 P12：開放庭院加入沿用既有造型嘅人群（low／mixed／high：0／24／96），11 個服務 bay 有錯開時間嘅無人機升降；四個 Meter 嘅局部夜燈各自做慢速節奏。人群避開私密／混合花園；無人機只用設施上方嘅垂直航線。既有鏡位、空中環線及 3 秒轉場保留；沒有新依賴或 render pass。證據與限制見 [P12 交接](handoffs/meter-variety.md#p12--life-and-motion-2026-10-02)。保留 capture review 後才整合 main 的條件。
+
+## Meter variety P11 — 2026-10-02，feature branch 待視覺審閱
+
+用家要求實作 P11：完整提案歷史產生四個 slot seed，同分數但早期提交次序不同，可保留不同街區位置。保留原有數量、設計、鏡位及 3 秒過渡；reload／reset／replay 可重建同一城市。毋須資料庫 migration；更新 server 同 city 要一起進行。驗證及日夜截圖見 [P11 交接](handoffs/meter-variety.md#p11--path-dependence-2026-10-02)。保留 capture review 後才整合 main 的條件。P12 後續已按用家要求實作，見上。
+
+## Meter variety P10 — 2026-10-02，feature branch 待視覺審閱
+
+兩個 Meter 同時一致先出現嘅組合效果：共享＋自動化高 → 開放庭院有無人機亭；共享＋環境高 → 庭院開花果園；集約＋環境高 → 塔頂垂直森林；集約＋自動化高 → 塔身無人機停靠環；集約＋環境低 → pod 頂太陽能板。81 個真實答案組合測試確認每個效果只喺佢嘅配對出現。單一 Meter 數據不變；未觸發時唔加 draw call。詳見 [P10 交接](handoffs/meter-variety.md#p10--cross-meter-combinations-2026-10-02)。
+
+## Meter variety P9 — 2026-10-02，feature branch 待視覺審閱
+
+mixed 而家有自己嘅混合款（只喺 mixed 附近出現，low／high 唔受影響）：自動化係無人機台下面嘅細人手亭；共享係半高玻璃圓頂加階梯座位、花園島加階梯、庭院圍牆花園加傘；集約係 45% 高嘅中層退台樓；環境係綠棚上面加帆／百葉、屋頂兩種覆蓋疊埋。low↔mixed／mixed↔high：環境 2.20／2.49%、自動化 2.27／2.23%、集約 2.73／2.01%（日），全部過 1.5%；**共享 1.11／1.26% 未過**（共享總變化得 1.87%；用家 2026-10-02 接受）。Draw call 不變。詳見 [P9 交接](handoffs/meter-variety.md#p9--mixed-identity-2026-10-02)。
+
+## Meter variety P8 — 2026-10-01，feature branch 待視覺審閱
+
+每個以位置計嘅結構而家每個狀態都有兩款設計，按固定 hash 分配：海濱棚架（帆／太陽能百葉；綠棚／垂直綠牆）、屋頂（帆／光伏棚；樹冠／草甸梯台）、霧化塔（高瘦／矮闊）、自動化（圓頂館／疊層平台；無人機塔／充電桅杆）、共享庭院（圍牆花園／玻璃溫室；傘廣場／長枱棚架）、集約 pod（兩層 pod／環形花園館）。可讀性維持：環境 **4.09%／4.05%**、自動化 **4.03%／3.51%**、共享 **1.86%／2.10%**、集約 **4.07%／3.42%**。Draw call +85。詳見 [P8 交接](handoffs/meter-variety.md#p8--design-families-2026-10-01)。保留 capture review 後才整合 main 的條件。
+
+## Meter variety P7 — 2026-10-01，feature branch 待視覺審閱
+
+補三個弱點：自動化高值唔再係空地，每個人手服務館位置換成無人機升降塔（46 m 降落台、藍色光環、充電塔、停泊無人機）；集約塔改為三款剪影（扭轉塔、退台綠化塔、連體雙塔），pod 加高成兩層；共享庭院改用 hero 畫面「可見像素」評分，三個被地標遮住嘅庭院搬去最易睇到嘅空地。日／夜差異：自動化 **4.02%／3.58%**、共享 **1.89%／2.10%**（冇低過 1.6%）、集約 **4.04%／3.42%**，全部過門檻。詳見 [P7 交接](handoffs/meter-variety.md#p7--weak-spots-2026-10-01)。P8–P12 仍為建議；保留 capture review 後才整合 main 的條件。
+
+## Meter variety P5 — 2026-10-01，feature branch 待視覺審閱
+
+每次 live 提案改變某個 Meter，嗰個 district 會喺 site 同每個實際有改動嘅位置發出兩波擴散光環同向上漸淡嘅光柱，用該 Meter 嘅顏色（自動化藍、共有玫瑰粉、環境綠、集約琥珀），約 4.2 秒後消失；snapshot、reset 同 reduced motion 唔會發光，亦唔會令共用城市材質閃動。冇 pulse 時唔增加 draw call。截圖與限制見 [P5 交接](handoffs/meter-variety.md#p5--change-moment-pulse-2026-10-01)。保留 capture review 後才整合 main 的條件。
+
+## Meter variety P4 — 2026-10-01，feature branch 待視覺審閱
+
+都市集約 Meter 現在改變 district 嘅 skyline：高值喺 SE site 旁、DECKS 海濱同西面草地升起 10 座淡藍玻璃塔（100–140 m，兩層有植栽同暖光嘅 sky lobby，相近嘅塔有 sky bridge 相連）；低值喺同一片草地散佈 26 個低層玻璃 pod；混合值各保留約一半。夜晚塔身按樓層亮暖光窗格。固定 hero 日／夜差異 **4.47%／3.81%**（P4 前 0.38%／0.29%），均過 3% 門檻；實際地面、建築、路線、site 可見度檢查通過。截圖與限制見 [P4 交接](handoffs/meter-variety.md#p4--concentration-2026-10-01)。可讀性不等於美術、結構或 FPS 驗收；保留 capture review 後才整合 main 的條件。
+
+## Meter variety P7–P12 — 2026-10-01，建議（待用家批准）
+
+下一步加強每個 Meter 的 variety：P7 補弱點（已完成，見上）（P4 塔剪影、sharing 庭院可見度、automation 高值唔再係「空地」）、P8 每個載體 2–3 款設計（已完成）、P9 mixed 有自己的混合款（已完成）、P10 跨 Meter 組合（已完成）；P11 路徑依賴已按用家要求實作；P12 生活感亦已按用家要求實作。詳見 [P7–P12 建議](handoffs/meter-variety.md#proposed-p7p12--more-variety-per-meter-2026-10-01-pending-user-approval)。
+
+## Meter variety P3d — 2026-10-01，海邊收細＋內陸共享庭院
+
+海邊只留 6 個 room（3 玻璃圓頂、3 綠化花園島），3 個浮台連新月形水上房間拎走；內陸加 10 個 40 m 共享庭院（私人：白牆花園＋玻璃房；公共：鋪地廣場＋白色傘蓋）。sharing 日／夜差異 **1.63%／1.85%**，用家決定接受低過 3% 門檻以換取較靜的海岸。詳見 [P3d 交接](handoffs/meter-variety.md#p3d--calmer-shore-and-inland-sharing-courts-2026-10-01)。
+
+## Meter variety P3c — 2026-10-01，sharing 收細＋光環廣場
+
+玻璃圓頂減到 7 個，肋改象牙白，rose 只留底邊同天窗；高 sharing 改為階梯廣場同綠化「光環頂棚」交替，頂棚下浮台夜晚亮燈。日／夜差異 **3.30%／3.84%**。詳見 [P3c 交接](handoffs/meter-variety.md#p3c--fewer-calmer-vaults-and-halo-commons-2026-10-01)；美術驗收待審。
+
+## Meter variety P3b — 2026-10-01，sharing pods 外形修正
+
+低 sharing 的私密 pods 由 28 m 高、膚色、不透明的蛋形圓頂，改為磨砂珍珠玻璃 gridshell 圓頂：玫瑰色發光肋、象牙白環梁，可以見到入面的花園；開放階梯加闊。固定 hero 日／夜差異 **3.26%／3.03%**，仍過 3% 門檻（夜間 margin 細）。詳見 [P3b 交接](handoffs/meter-variety.md#p3b--sharing-pod-polish-2026-10-01)；美術驗收待審。
+
+## Meter variety P3 — 2026-10-01，feature branch 待視覺審閱
+
+sharing Meter 現在控制 14 個既有水岸房間：低值用帶天窗、岸側入口的玫瑰陶瓷私密花園 pods，高值展開三層公共階梯，混合值保留兩種空間。原有花園、瀑布、浮台和通道保留；沒有改鏡位、日夜或問卷規則。固定 hero 日／夜差異 **3.51%／3.32%**，均過 3% 可讀性門檻；實際船道／步道及 live server 檢查通過。截圖、驗證與限制見 [P3 交接](handoffs/meter-variety.md#p3--sharing-2026-10-01)。可讀性不等於美術、結構或 FPS 驗收；保留既有 capture review 後才整合 main 的條件。
+
+## Meter variety P2 — 2026-10-01，feature branch 待視覺審閱
+
+`feat/meter-variety` 的自動化 Meter 現在改變街區交通與服務模式：低值用 11 個高架有人服務亭、較多人流；高值保留成熟城市和基本人流，以更多軌道 pods、空中載具及較清晰的 mint 空中導引線呈現自律服務。零值是混合模式，沿用固定 hero、日夜、既有路線和 3 秒過渡。程式及實際模型位置／路線檢查通過；最終像素量度、截圖、browser smoke 和 Git/CI 證據見 [交接](handoffs/meter-variety.md#p2--automation-2026-10-01)。可讀性量度不等於人類美術或 FPS 驗收；按既有 handoff 保留在 feature branch 待 capture review。
+
 ## 台場 Dream Loop 第4–6輪 — 2026-09-30，仍未達視覺目標
 
 使用者要求再跑三輪；同一目標、鏡位與 R01–R06 保留。新增三組分層潮汐平台、核心公共花園及懸掛廊、避開 site／路線的地面樹群，修正日間反射與樹冠重複染色。實際路徑碰撞及日間變暗回退已修正並重新驗證。見 [第六輪日間](../artifacts/odaiba-dream-pass6.jpg)、[夜間](../artifacts/odaiba-dream-pass6-night.jpg)、[交接](handoffs/odaiba-dream-loop.md)。仍有商場／酒店量體、連續海岸、遠景與細節密度差距，不宣稱已接近逐像素重現；第六輪後供美術審閱，未整合 main。

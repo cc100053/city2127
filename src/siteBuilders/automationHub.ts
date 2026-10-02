@@ -1,4 +1,5 @@
 import * as T from 'three';
+import { AutomationDistrict } from '../districtMeters.ts';
 import { arc, bake, box, cream, faces, futureLight, glass, publicLight, sign, solar, teal, trim, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import { remapCityMaterials, type SiteAssetLoaderCache } from '../siteAssets/assetLoader.ts';
@@ -152,6 +153,7 @@ export function buildAutomationHub(scene: T.Scene, kit: Kit, assets: SiteAssetLo
     slots.push({ automated, human, level: 0, from: 0, to: 0 });
   }
   const automationHub = createAutomationHubRuntime(slots);
+  const automationDistrict = new AutomationDistrict(scene);
 
   const hubUpperFallback = new T.Group();
   hubUpperFallback.name = 'automation-hub-upper-procedural-fallback';
@@ -185,5 +187,5 @@ export function buildAutomationHub(scene: T.Scene, kit: Kit, assets: SiteAssetLo
   });
 
   hubBase.add(...bake(hubBase));
-  return { id: 'magnetEast', root, layers: { hubBase: hubBaseLayer, hubUpper: hubUpperLayer, hubNeutralProps: neutralPropsLayer }, marker: createGuestMarker(root, 'nw'), automationHub };
+  return { id: 'magnetEast', root, layers: { hubBase: hubBaseLayer, hubUpper: hubUpperLayer, hubNeutralProps: neutralPropsLayer }, marker: createGuestMarker(root, 'nw'), automationHub, automationDistrict };
 }

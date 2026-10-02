@@ -74,6 +74,8 @@ export type ExhibitionCityView = {
   voteSums: CityScores;
   recentVotes: CityScores;
   scores: CityScores;
+  /** Per-axis slot order from the run's complete proposal history (uint32; zero before any directional vote). */
+  slotSeeds: CityScores;
   layout: ExhibitionLayout;
   recentProposals: ProposalRecord[];
   latestProposal?: ProposalRecord;

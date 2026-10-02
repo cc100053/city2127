@@ -1,8 +1,9 @@
 import * as T from 'three';
 import { arc, bake, box, chrome, leaf, leafyCrown, paint, stone, trail, trim } from './cityRig.ts';
-import { changeSites, DISTRICT, floatingDecks, northShore, sweepway } from './layout.ts';
+import { changeSites, sweepway } from './layout.ts';
 import { routes } from './mobility.ts';
 import layout from './odaiba-layout.json';
+import { shoreRoomBays } from './waterRooms.ts';
 
 type P3 = [number, number, number];
 const waterfall = new T.MeshStandardMaterial({ color: '#f3fbff', emissive: '#d8f0ff', emissiveIntensity: .6, roughness: .25, transparent: true, opacity: .85 });
@@ -133,49 +134,40 @@ const circle = ({ centre: [x, y, z], radius }: { centre: P3; radius: number }) =
 
 /** Round floating terraces stepping into the bay off the north shore, each with a small waterfall on its seaward face. */
 function shoreTerraces(root: T.Object3D) {
-  const boats = [routes().water, routes().ferry].flatMap(route => route.getSpacedPoints(300));
-  let n = 0;
-  for (let i = 0; i < northShore.length - 1; i++) {
-    const [ax, az] = northShore[i], [bx, bz] = northShore[i + 1], length = Math.hypot(bx - ax, bz - az), yaw = Math.atan2(bx - ax, bz - az);
-    for (let d = 22; d < length; d += 46) {
-      const t = d / length, sx = ax + (bx - ax) * t, sz = az + (bz - az) * t;
-      // Local -X faces the sea (as in tidalEdge); the terrace centre sits OUT m out, clear of the tidal islets (to 28.5 m).
-      const r = 12.5 + (n % 3) * 2, OUT = 46, cx = sx - Math.cos(yaw) * OUT, cz = sz + Math.sin(yaw) * OUT;
-      if (cx < DISTRICT.minX || cx > 250 || cz > DISTRICT.maxZ || floatingDecks.some(([x, z]) => Math.hypot(cx - x, cz - z) < 60) || boats.some(p => Math.hypot(p.x - cx, p.z - cz) < r + 24)) continue;
-      const g = new T.Group(); g.position.set(sx, 0, sz); g.rotation.y = yaw; root.add(g);
-      const c = new T.Group(); c.position.set(-OUT, 0, 0); c.rotation.y = n * 1.7; g.add(c);
-      // Tall white drum (2.8 m above the water) so the terrace reads as a raised island with a visible rim, as in the target.
-      const L = 2.4;
-      arc(c, 0, r, 4, [0, -1.2, 0], stone);
-      arc(c, r - .5, r + .3, .6, [0, .4 + L, 0], trim);
-      arc(c, 0, r - .6, .25, [0, .4 + L, 0], leaf);
-      arc(c, 0, r * .62, 2.2, [0, .4 + L, 0], stone);
-      arc(c, r * .62 - .4, r * .62 + .2, .5, [0, 2.6 + L, 0], trim);
-      arc(c, 0, r * .6 - .4, .3, [0, 2.6 + L, 0], leaf);
-      // r9 pass 3: nine trees (three on the upper tier, six round the rim) so each island reads as a lush palm grove (target v2).
-      for (let k = 0; k < 9; k++) {
-        const a = k < 3 ? k * 2.09 + n : (k - 3) * 1.047 + n + .5, rr = k < 3 ? r * .3 : r * .78, top = (k < 3 ? 2.9 : .65) + L, s = 1.6 + (k % 3) * .5;
-        // Mostly palms (target v2's seaside palms): a tall slim trunk under a wide, flat crown; every fourth tree a round cherry.
-        const palm = (k + n) % 4 !== 0, h = palm ? 5.5 + (k % 2) * 1.5 : 2.2;
-        const trunk = new T.Mesh(pole, trim); trunk.scale.set(palm ? .3 : .25, h, palm ? .3 : .25); trunk.position.set(Math.cos(a) * rr, top + h / 2, Math.sin(a) * rr); c.add(trunk);
-        const tree = new T.Mesh(crown, palm ? leaf : cherry); tree.position.set(Math.cos(a) * rr, top + h + (palm ? .3 : s * .7), Math.sin(a) * rr);
-        if (palm) tree.scale.set(s * 1.5, s * .4, s * 1.5); else tree.scale.set(s * 1.2, s, s * 1.2);
-        c.add(tree);
-      }
-      // Waterfalls on the seaward side: an upper sheet onto the drum, then three wide sheets down the drum into the sea, each with foam.
-      const fall = new T.Group(); fall.rotation.y = -c.rotation.y; c.add(fall);
-      box(fall, [.35, 2.2, 3.4], [-r * .62 - .2, 1.5 + L, 0], waterfall, .1);
-      for (const a of [-.45, 0, .45]) {
-        const sheet = new T.Group(); sheet.rotation.y = a; fall.add(sheet);
-        // r9 pass 3: wider sheets and foam so the cascades read at hero distance (target v2's white falls off each island).
-        box(sheet, [.35, 4.1, 6.2], [-r - .4, .75, 0], waterfall, .1);
-        arc(sheet, 0, 4.6, .05, [-r - 2.4, -.72, 0], foam);
-      }
-      // Footbridge back to the tidal edge.
-      box(g, [OUT - 12 - r, .5, 2.4], [-(OUT + 12 - r) / 2, 1.2, 0], trim, .15);
-      n++;
+  shoreRoomBays().forEach(({ sx, sz, yaw, r }, n) => {
+    const OUT = 46;
+    const g = new T.Group(); g.position.set(sx, 0, sz); g.rotation.y = yaw; root.add(g);
+    const c = new T.Group(); c.position.set(-OUT, 0, 0); c.rotation.y = n * 1.7; g.add(c);
+    // Tall white drum (2.8 m above the water) so the terrace reads as a raised island with a visible rim, as in the target.
+    const L = 2.4;
+    arc(c, 0, r, 4, [0, -1.2, 0], stone);
+    arc(c, r - .5, r + .3, .6, [0, .4 + L, 0], trim);
+    arc(c, 0, r - .6, .25, [0, .4 + L, 0], leaf);
+    arc(c, 0, r * .62, 2.2, [0, .4 + L, 0], stone);
+    arc(c, r * .62 - .4, r * .62 + .2, .5, [0, 2.6 + L, 0], trim);
+    arc(c, 0, r * .6 - .4, .3, [0, 2.6 + L, 0], leaf);
+    // r9 pass 3: nine trees (three on the upper tier, six round the rim) so each island reads as a lush palm grove (target v2).
+    for (let k = 0; k < 9; k++) {
+      const a = k < 3 ? k * 2.09 + n : (k - 3) * 1.047 + n + .5, rr = k < 3 ? r * .3 : r * .78, top = (k < 3 ? 2.9 : .65) + L, s = 1.6 + (k % 3) * .5;
+      // Mostly palms (target v2's seaside palms): a tall slim trunk under a wide, flat crown; every fourth tree a round cherry.
+      const palm = (k + n) % 4 !== 0, h = palm ? 5.5 + (k % 2) * 1.5 : 2.2;
+      const trunk = new T.Mesh(pole, trim); trunk.scale.set(palm ? .3 : .25, h, palm ? .3 : .25); trunk.position.set(Math.cos(a) * rr, top + h / 2, Math.sin(a) * rr); c.add(trunk);
+      const tree = new T.Mesh(crown, palm ? leaf : cherry); tree.position.set(Math.cos(a) * rr, top + h + (palm ? .3 : s * .7), Math.sin(a) * rr);
+      if (palm) tree.scale.set(s * 1.5, s * .4, s * 1.5); else tree.scale.set(s * 1.2, s, s * 1.2);
+      c.add(tree);
     }
-  }
+    // Waterfalls on the seaward side: an upper sheet onto the drum, then three wide sheets down the drum into the sea, each with foam.
+    const fall = new T.Group(); fall.rotation.y = -c.rotation.y; c.add(fall);
+    box(fall, [.35, 2.2, 3.4], [-r * .62 - .2, 1.5 + L, 0], waterfall, .1);
+    for (const a of [-.45, 0, .45]) {
+      const sheet = new T.Group(); sheet.rotation.y = a; fall.add(sheet);
+      // r9 pass 3: wider sheets and foam so the cascades read at hero distance (target v2's white falls off each island).
+      box(sheet, [.35, 4.1, 6.2], [-r - .4, .75, 0], waterfall, .1);
+      arc(sheet, 0, 4.6, .05, [-r - 2.4, -.72, 0], foam);
+    }
+    // Footbridge back to the tidal edge.
+    box(g, [OUT - 12 - r, .5, 2.4], [-(OUT + 12 - r) / 2, 1.2, 0], trim, .15);
+  });
 }
 
 /** 2127 identity at height: lit skyways, tower rings and suspended glass spheres, plus the round waterfall terraces on the bay. */

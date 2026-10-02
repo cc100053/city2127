@@ -1,11 +1,11 @@
 import * as T from 'three';
-import { arc, bake, box, futureLight, glass, leaf, membrane, publicLight, solar, stone, trail, trim } from './cityRig';
-import { floatingDecks, skyBridges, SPHERE_DOCK } from './layout';
+import { arc, bake, box, futureLight, glass, membrane, publicLight, solar, trail, trim } from './cityRig';
+import { skyBridges, SPHERE_DOCK } from './layout';
 import { routes } from './mobility';
-import { amphibiousShore, tidalEdge } from './amphibiousShore';
+import { tidalEdge } from './amphibiousShore';
 import { skyways } from './skyways';
 
-/** What 2127 added around the existing landmarks: sky bridges, the sphere berth, guideway light lines and floating decks. */
+/** What 2127 added around the existing landmarks: sky bridges, the sphere berth, and guideway light lines. */
 export function build2127(scene: T.Scene) {
   const root = new T.Group(); root.name = 'odaiba-2127';
   // Sky bridges: an enclosed glass link between trim slabs, membrane rails and a mint light line, sunk 1 m into each facade.
@@ -32,14 +32,5 @@ export function build2127(scene: T.Scene) {
     });
     root.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points), 320, .5, 5), trail));
   }
-  // Floating decks: stone plates with planted edges and rails, riding just above the sea.
-  for (const [x, z, yaw] of floatingDecks) {
-    const g = new T.Group(); g.position.set(x, 0, z); g.rotation.y = yaw; root.add(g);
-    box(g, [10, 1.2, 36], [0, -.1, 0], stone, .3);
-    box(g, [2, .8, 34], [-3.8, .9, 0], leaf, .3);
-    for (let i = 0; i < 6; i++) arc(g, 0, 1.1 + (i % 3) * .3, 1.6 + (i % 2), [-3.8, .6, -14 + i * 5.6], leaf);
-    box(g, [.12, 1.1, 36], [4.8, 1, 0], membrane, .04);
-    box(g, [10.1, .12, .3], [0, .55, 18], futureLight, .04);
-  }
-  scene.add(...bake(root),amphibiousShore(),tidalEdge(),skyways());
+  scene.add(...bake(root),tidalEdge(),skyways());
 }
