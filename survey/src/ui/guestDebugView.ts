@@ -2,6 +2,7 @@ import './debug.css';
 import type { ExhibitionState } from '../shared/citySurveyState.ts';
 import type { ProposalData, ProposalRequest, ProposalSessionData } from '../shared/protocol.ts';
 import { api, connectEvents, el, newAnswerId } from './debugApi.ts';
+import { DISPLAY_MS, HANDOFF_MS } from '../shared/displayTiming.ts';
 import { buildProposalRequest } from './guestFlow.ts';
 
 const app = document.querySelector<HTMLElement>('#app')!;
@@ -20,6 +21,7 @@ const stationParam = new URLSearchParams(location.search).get('station');
 const stationId = stationParam === 'A' || stationParam === 'B' ? stationParam : undefined;
 const recoveryKey = `city2127.guest-draft.v2${stationId ? `.${stationId}` : ''}`;
 let resultReadyAt = 0;
+let resultEndsAt = 0;
 let screen: Screen = 'welcome';
 let session: ProposalSessionData | undefined;
 let draft = new Map<string, string>();
@@ -31,10 +33,8 @@ let conflictState: ExhibitionState | undefined;
 let notice: { text: string; role: 'status' | 'alert' } | undefined;
 let idleTimer = 0;
 let abandonTimer = 0;
-/** Result (~10 s) → handoff (~5 s) → welcome, per the exhibition flow; buttons skip ahead. */
+/** Scheduled reading slot → handoff → welcome; handoff cannot truncate the reading slot. */
 let flowTimer = 0;
-const RESULT_MS = 10_000;
-const HANDOFF_MS = 5_000;
 let idleWarning = false;
 let busy = false;
 /** Set by a review-screen 変更: submitting that question returns to review. */
@@ -422,8 +422,9 @@ async function submitProposal() {
       || (result.ok && result.data.proposal.id === undoneSubmissionId)) return showUndone();
   if (result.ok) {
     saved = result.data;
-    if (saved.experienceFinished) { void nextGuest(); return; }
+    if (saved.experienceFinished) { resultEndsAt = 0; void nextGuest(); return; }
     resultReadyAt = performance.now() + (saved.displayWaitMs ?? 0);
+    resultEndsAt = resultReadyAt + (saved.displayRemainingMs ?? DISPLAY_MS);
     conflictState = undefined;
     lastErrorCode = undefined;
     notice = undefined;
@@ -496,6 +497,7 @@ function renderResult(focus = true) {
     if (focus) focusTitle();
     return;
   }
+  if (performance.now() >= resultEndsAt) return renderHandoff();
   const { proposal } = saved;
   page('街の画面をご覧ください。', 'あなたの思いを記録しました',
     el('p', { class: 'guest-result-number' }, residentIdentity(proposal)),
@@ -503,24 +505,25 @@ function renderResult(focus = true) {
     el('div', { class: 'guest-actions' }, action('次の方へ', renderHandoff, true)));
   if (focus) focusTitle();
   clearTimeout(flowTimer);
-  flowTimer = window.setTimeout(renderHandoff, RESULT_MS);
+  flowTimer = window.setTimeout(renderHandoff, Math.max(0, resultEndsAt - performance.now()));
 }
 
 function renderHandoff() {
   if (!saved) return nextGuest();
   clearTimeout(flowTimer);
-  // The proposal is recorded; a reload from here must not replay the result.
-  clearRecovery();
+  // Keep the saved request while the slot is protected; reload resumes its remaining time.
+  if (performance.now() >= resultEndsAt) clearRecovery();
   screen = 'handoff';
   page('次の方へどうぞ。', residentIdentity(saved.proposal),
     el('p', { class: 'guest-lead' }, '街はこのまま次の方へ引き継がれます。'),
     ...noticeNodes(),
     el('div', { class: 'guest-actions' }, action('はじめる画面へ', nextGuest, true)));
   focusTitle();
-  flowTimer = window.setTimeout(nextGuest, HANDOFF_MS);
+  flowTimer = window.setTimeout(nextGuest, Math.max(HANDOFF_MS, resultEndsAt - performance.now()));
 }
 
 async function nextGuest() {
+  if (saved && performance.now() < resultEndsAt) { renderHandoff(); return; }
   if (stationId && session) {
     if (busy) return;
     busy = true;
@@ -576,6 +579,7 @@ function renderCurrent(focus = true) {
 }
 
 async function showUndone() {
+  resultEndsAt = 0; // Authoritative Undo cancels the reading protection before normal cleanup.
   await nextGuest();
   notice = { role: 'status', text: '管理者が直前の提案を取り消し、変更前の街に戻しました。もう一度回答するには「はじめる」を押してください。' };
   renderWelcome(true);

@@ -198,3 +198,5 @@
 - 基礎故事對照 [視覺 authority](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)；具體設施對照 root、district 與 [當前規格](EXHIBITION_SPEC.md)。沒有新增能源輸出、防洪成效、人口變化、冷卻度數或等容量承諾。
 - P2 接入文案與畫面分工；P3 接入結果條件與播放排程。未執行新畫面、字距、閱讀時間、iPad Safari、A/B 新排程或觀眾理解驗收。
 - 先用大屏幕原型驗證每張卡一次能否讀完，再決定實際文字停留時間。固定橫向輸入裝置尺寸待選定；不引入泛用手機／responsive 改版。
+
+2026-10-02 P3接入補充：上述個人偏好句維持；runtime每張結果選一項偏好＋一項實際結果。Focal用「この拠点／この水辺／この公園」限定數量影響；district-only用配置調整／生活用途，未量度全區增加不套用上表增加句。Carrier evidence比較effective targets、可見配對乘積與實際slot分布；無前後baseline只確認保存。只有scores變動用方向句；相同effective targets用維持句；詳見 [P3](handoffs/resident-experience-p3.md)。P1原有提案與驗收條件保留為歷史。

@@ -30,17 +30,17 @@ try {
   assert.equal(readLifecycle(ctx.db).phase, 'in_experience', 'B can still answer after A commits');
   const savedB = ok(submitProposal(ctx, rb).response);
   assert.deepEqual([savedA.state.guestCount, savedB.state.guestCount, savedB.proposal.revisionBefore], [1, 2, 1]);
-  assert.equal(savedB.displayWaitMs, 3000);
+  assert.equal(savedB.displayWaitMs, 10_000);
   assert.equal(savedB.proposal.stationId, 'B');
   assert.equal(ok(submitProposal(ctx, rb).response).replayed, true);
   assert.equal(errorCode(submitProposal(ctx, { ...rb, answers: ra.answers }).response), 'answer_conflict');
-  assert.equal(errorCode(endStationSession(ctx, a.session.id).response), 'lifecycle_blocked', 'cannot skip a queued transition');
+  assert.equal(errorCode(endStationSession(ctx, a.session.id).response), 'lifecycle_blocked', 'cannot skip a reading slot');
   const beforeRestart = currentView(ctx);
   ctx.db.close();
   ctx = exhibitionFixture(join(dir, 'survey.sqlite'), clock.ms).ctx;
   assert.deepEqual(currentView(ctx), beforeRestart, 'station attribution, schedule and state survive restart');
   assert.equal(currentRun(ctx).stations.length, 2);
-  clock.ms += 3100;
+  clock.ms += 10_000;
   ctx.now = () => new Date(clock.ms);
   ok(endStationSession(ctx, a.session.id).response);
   const nextA = start('A');
@@ -59,7 +59,7 @@ try {
   assert.equal(errorCode(createProposalSession(ctx, { stationId: 'A' }).response), 'lifecycle_blocked');
   assert.equal(settleStations(ctx), undefined, 'B result protects the city until its experience ends');
   assert.equal(currentState(ctx).runId, a.state.runId);
-  clock.ms += 3000;
+  clock.ms += 10_000;
   const endedB = endStationSession(ctx, b.session.id);
   ok(endedB.response);
   assert.equal(endedB.event?.type, 'run-reset');
@@ -80,11 +80,11 @@ try {
   const pending = request(survivor, 'survivor');
   ok(submitProposal(ctx, pending).response);
   clock.ms += 10_000;
-  ok(submitProposal(ctx, pending).response); // A lost response/reload extends only B's result lease.
+  ok(submitProposal(ctx, pending).response); // A lost response/reload resumes the original slot without extending the lease.
   ok(staff(ctx, 'reset-city', 'RESET'));
   clock.ms += 6000;
   settleStations(ctx);
-  assert.equal(currentRun(ctx).stations.find(s => s.stationId === 'B')?.status, 'submitted');
+  assert.equal(currentRun(ctx).stations.find(s => s.stationId === 'B'), undefined, 'a retry never extends the abandoned result lease');
   clock.ms += 5 * 60_000;
   assert.equal(settleStations(ctx)?.event?.type, 'run-reset', 'disconnect/expiry eventually releases the queued reset');
   assert.equal(readLifecycle(ctx.db).totalGuestCount, 1, 'city reset retains total participation');
@@ -102,7 +102,7 @@ try {
     assert.deepEqual(results.map(r => ok(r.body).proposal.ordinal).sort(), [1, 2]);
     const second = results.map(r => ok(r.body)).find(r => r.proposal.ordinal === 2)!;
     assert.equal(second.proposal.revisionBefore, 1);
-    assert.equal(second.displayWaitMs, 3000);
+    assert.equal(second.displayWaitMs, 10_000);
     await server.request('/api/proposals', requests[0]);
     await new Promise(resolve => setTimeout(resolve, 50));
     assert.equal(events.filter(e => e.type === 'city-state-updated').length, 2);

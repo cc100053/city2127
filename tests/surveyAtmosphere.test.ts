@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { cityText, residentCards, residentIdentity, exhibitionFeedback, exhibitionScoresText, exhibitionVoteMarks, policyText, scoresToWorldState } from '../src/surveyAtmosphere.ts';
+import { cityText, residentResult, residentCards, residentIdentity, exhibitionFeedback, exhibitionScoresText, exhibitionVoteMarks, policyText, scoresToWorldState } from '../src/surveyAtmosphere.ts';
 import { presets } from '../src/presets.ts';
 import { connectSurvey, isExhibitionView, parseSurveyEvent, supersedes, type CityView } from '../src/surveyView.ts';
 import { createWorldState } from '../src/worldState.ts';
@@ -176,12 +176,30 @@ for (const [automatedPorts, sharedSeats, coolingFins, band, expected] of [
 assert.equal(residentIdentity(parsedV2.view.latestProposal!), '暮らしの声 #1');
 assert.equal(residentIdentity({ ...parsedV2.view.latestProposal!, stationId: 'B' }), 'ステーション B · 暮らしの声 #1');
 
+// P3: personal preference and collective effect are independent, and require actual renderer evidence.
+const opposed = { ...v2Proposal, answers: [{ questionId: 'service-2127', optionId: 'human-machine', questionText: 'q', optionLabel: 'mixed' }],
+  beforeLayout: { ...v2BeforeLayout, automatedPorts: 4 }, afterLayout: { ...v2AfterLayout, automatedPorts: 3 } };
+const causal = residentResult(opposed, [{ socketId: 'nw', focal: true, district: true }]);
+assert.ok(causal.preference.includes('自動の便利さ'));
+assert.ok(causal.effect.includes('人に相談できる窓口が増え'));
+assert.equal(causal.place, 'デックス西');
+assert.ok(!causal.effect.includes('半分'), 'mixed answer never implies a mixed city');
+assert.equal(residentResult(v2Proposal).kind, 'recorded', 'missing before/after evidence makes no visual claim');
+assert.equal(residentResult(v2Proposal, []).kind, 'direction');
+assert.equal(residentResult({ ...v2Proposal, beforeScores: zero, afterScores: zero }, []).kind, 'maintained');
+const redistributed = residentResult({ ...v2Proposal, beforeScores: zero, afterScores: zero, cityChanges: [] }, [{ socketId: 'sw', focal: false, district: true }]);
+assert.equal(redistributed.kind, 'configuration', 'same scores can have different actual distribution');
+assert.equal(redistributed.place, '水辺の居場所・庭の広場');
+assert.ok(!redistributed.effect.includes('増え'), 'no population or global count claim');
+
 const webSocketDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'WebSocket');
+let closeListener: ((event: { data: string }) => void) | undefined;
 let messageListener: ((event: { data: string }) => void) | undefined;
 class FakeWebSocket {
   constructor(_url: string) {}
   addEventListener(type: string, listener: (event: { data: string }) => void) {
     if (type === 'message') messageListener = listener;
+    if (type === 'close') closeListener = listener;
   }
 }
 Object.defineProperty(globalThis, 'WebSocket', { configurable: true, value: FakeWebSocket });
@@ -221,11 +239,11 @@ try {
   connectSurvey('ws://example.test/ws', (_kind, next) => stationChanges.push(next.revision), () => {});
   const stationEvent = (stationView: unknown, displayWaitMs: number) => messageListener?.({ data: JSON.stringify({ type: 'city-state-updated', view: stationView, displayWaitMs }) });
   stationEvent(stationViewA, 0);
-  stationEvent(stationViewB, 0); // A delayed burst still gives each transition its full three seconds.
+  stationEvent(stationViewB, 10_000); // Each on-time result has its ten-second reading slot.
   assert.deepEqual(stationChanges, [1]);
   messageListener?.({ data: JSON.stringify({ type: 'city-state-snapshot', view: stationViewB, displayMode: 'night' }) });
   assert.deepEqual(stationChanges, [1], 'lighting cannot skip a queued proposal');
-  await new Promise(resolve => setTimeout(resolve, 3100));
+  await new Promise(resolve => setTimeout(resolve, 10_050));
   assert.deepEqual(stationChanges, [1, 2]);
   stationEvent(stationViewB, 10_000);
   messageListener?.({ data: JSON.stringify({ type: 'city-state-snapshot', view: initialV2, undoneProposalId: 'station-b' }) });
@@ -233,6 +251,38 @@ try {
   for (const metadata of [{ stationId: 'C', displayAt: stationA.displayAt }, { stationId: 'A', displayAt: 'bad-date' }, { stationId: 'A' }]) {
     const malformed = { ...v2Proposal, ...metadata };
     assert.equal(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, recentProposals: [malformed], latestProposal: malformed } }), null);
+  }
+
+
+  const recovery: string[] = [];
+  connectSurvey('ws://example.test/ws', (kind, next) => recovery.push(`${kind}:${next.revision}`), () => {});
+  messageListener?.({ data: JSON.stringify({ type: 'city-state-snapshot', view: initialV2 }) });
+  stationEvent(stationViewA, 0);
+  stationEvent(stationViewB, 10_000);
+  const originalTimeout = globalThis.setTimeout;
+  // Test disconnect restoration without starting a real reconnect after restoring the socket mock.
+  globalThis.setTimeout = ((callback, ms, ...args) => ms === 500
+    ? originalTimeout(() => {}, 0) : originalTimeout(callback, ms, ...args)) as typeof setTimeout;
+  try { closeListener?.({ data: '' }); } finally { globalThis.setTimeout = originalTimeout; }
+  assert.deepEqual(recovery, ['city-state-snapshot:0', 'city-state-updated:1', 'city-state-snapshot:2'], 'disconnect settles latest queued authority immediately');
+  const mediaDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'matchMedia');
+  let mediaChange: (() => void) | undefined;
+  const media = { matches: false, addEventListener(_type: string, callback: () => void) { mediaChange = callback; } };
+  Object.defineProperty(globalThis, 'matchMedia', { configurable: true, value: () => media });
+  try {
+    const motion: string[] = [];
+    connectSurvey('ws://example.test/ws', (kind, next) => motion.push(`${kind}:${next.revision}`), () => {});
+    messageListener?.({ data: JSON.stringify({ type: 'city-state-snapshot', view: initialV2 }) });
+    stationEvent(stationViewA, 0); stationEvent(stationViewB, 10_000);
+    media.matches = true; mediaChange?.();
+    assert.deepEqual(motion, ['city-state-snapshot:0', 'city-state-updated:1', 'city-state-snapshot:2'], 'reduced-motion changes clear queue immediately');
+    const late: string[] = [];
+    connectSurvey('ws://example.test/ws', (kind, next) => late.push(`${kind}:${next.revision}`), () => {});
+    messageListener?.({ data: JSON.stringify({ type: 'city-state-updated', view: stationViewA, displayWaitMs: 0, displayRemainingMs: 0 }) });
+    assert.deepEqual(late, ['city-state-snapshot:1'], 'expired display never replays its story');
+  } finally {
+    if (mediaDescriptor) Object.defineProperty(globalThis, 'matchMedia', mediaDescriptor);
+    else delete (globalThis as { matchMedia?: unknown }).matchMedia;
   }
 
 } finally {

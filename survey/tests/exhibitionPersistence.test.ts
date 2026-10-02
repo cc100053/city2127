@@ -32,7 +32,7 @@ try {
       answers: data.questions.map(q => ({ questionId: q.id, optionId: q.options[2].id })) });
     const recordedRequest = requestFor(first, 'old-submitted');
     const recorded = ok(submitProposal(old, recordedRequest).response);
-    nowMs += 4000;
+    nowMs += 10_000;
     if (stationId) ok(endStationSession(old, first.session.id).response);
     const draft = start(), draftRequest = requestFor(draft, 'old-draft');
     const beforeUpgrade = currentView(old);

@@ -1,3 +1,6 @@
+import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
+import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
+import type { CarrierChange } from './cityChangeManager.ts';
 import type { DisplayMode } from './dayCycle.ts';
 import { presets, type WorldState } from './presets.ts';
 import { changeSites } from './layout.ts';
@@ -131,6 +134,64 @@ export function residentCards(view: ExhibitionView): ResidentCard[] {
 export const residentIdentity = (proposal: ExhibitionProposal) =>
   `${proposal.stationId ? `ステーション ${proposal.stationId} · ` : ''}暮らしの声 #${proposal.ordinal}`;
 
+const RESIDENT_PREFERENCES: Record<string, string> = {
+  'human-led': 'あなたは、人に相談できる日常を大切にしました。',
+  'human-machine': 'あなたは、自動の便利さと、人に相談できる安心を選びました。',
+  autonomous: 'あなたは、自分の都合でいつでも使えるサービスを大切にしました。',
+  'private-pods': 'あなたは、一人や親しい人と静かに過ごす時間を大切にしました。',
+  'mixed-seating': 'あなたは、静かな時間と、人が集まれる場所の両方を選びました。',
+  'open-commons': 'あなたは、予約せずに誰でも使える海辺を大切にしました。',
+  'active-cooling': 'あなたは、屋根と冷却設備に支えられた夏の道を選びました。',
+  'hybrid-cooling': 'あなたは、設備と木陰を組み合わせた夏の道を選びました。',
+  'canopy-cooling': 'あなたは、海風が通る木陰と緑のある道を選びました。',
+  'distributed-pavilions': 'あなたは、水辺を歩いて用事を済ませる日常を選びました。',
+  'mixed-functions': 'あなたは、高さの違う建物をめぐる日常を選びました。',
+  'vertical-functions': 'あなたは、一つのタワーで用事を済ませる日常を選びました。',
+};
+const RESULT_AXES = { nw: 'service-2127', sw: 'commons-2127', ne: 'cooling-2127', se: 'functions-2127' } as const;
+const DISTRICT_RESULTS = {
+  nw: ['水辺のサービス拠点・移動ルート', 'サービス拠点と移動の構成が変わり、日々の用事を支える配置が調整されました。'],
+  sw: ['水辺の居場所・庭の広場', '水辺や庭の構成が変わり、静かに休む場所と集まれる場所の配置が調整されました。'],
+  ne: ['海辺の歩道・屋根・建物の外壁', '海辺の暑さへの備えが変わり、設備や植栽が支える居場所の配置が調整されました。'],
+  se: ['街に点在する建物', '建物の構成が変わり、暮らしの用事を分け合う場所の配置が調整されました。'],
+} as const;
+
+/** Evidence is the renderer's before/after targets, including visible pairings and shuffled slots. */
+export function residentResult(proposal: ExhibitionProposal, changes?: readonly CarrierChange[]) {
+  const change = changes?.[0];
+  const questionId = change ? RESULT_AXES[change.socketId]
+    : Object.values(RESULT_AXES)[AXES.findIndex(axis => proposal.votes[axis] !== 0)];
+  const answer = proposal.answers.find(answer => answer.questionId === questionId) ?? proposal.answers[0];
+  const preference = RESIDENT_PREFERENCES[answer?.optionId] ?? 'あなたの思いが、住民の声に加わりました。';
+  let effect = '回答を記録しました。', place = 'お台場全景', kind = 'recorded';
+  if (change) {
+    kind = 'configuration';
+    place = change.focal ? changeSites[change.socketId].place : DISTRICT_RESULTS[change.socketId][0];
+    effect = DISTRICT_RESULTS[change.socketId][1];
+    if (change.focal) {
+      const before = proposal.beforeLayout, after = proposal.afterLayout;
+      if (change.socketId === 'nw') effect = after.automatedPorts > before.automatedPorts
+        ? 'この拠点では、自分の都合で使える自律サービスの端口が増えました。'
+        : after.automatedPorts < before.automatedPorts ? 'この拠点では、人に相談できる窓口が増えました。' : 'この拠点のサービスの構成が変わりました。';
+      if (change.socketId === 'sw') effect = after.sharedSeats > before.sharedSeats
+        ? 'この水辺では、予約せずに使える共有席が増えました。'
+        : after.sharedSeats < before.sharedSeats ? 'この水辺では、静かに過ごすための囲われた席が増えました。' : 'この水辺の居場所の構成が変わりました。';
+      if (change.socketId === 'ne') effect = after.treeCount > before.treeCount
+        ? 'この公園では、木陰を支える樹冠が増えました。'
+        : after.coolingFins > before.coolingFins ? 'この公園では、夏の居場所を支える冷却設備が増えました。' : 'この公園では、設備と植栽が支える夏の居場所の構成が変わりました。';
+      if (change.socketId === 'se') effect = after.bands.se === 'low'
+        ? 'この拠点では、歩いて用事を済ませる低い建物が暮らしを支える構成になりました。'
+        : after.bands.se === 'high' ? 'この拠点では、上下に用事をつなぐタワーが暮らしを支える構成になりました。' : 'この拠点では、高さの違う建物が用事を分け合う構成になりました。';
+    }
+    effect = `ほかの住民の声と重なり、${effect}`;
+  } else if (changes) {
+    const direction = AXES.some(axis => proposal.beforeScores[axis] !== proposal.afterScores[axis]);
+    kind = direction ? 'direction' : 'maintained';
+    effect = direction ? '街の方向は少し動きましたが、見えている施設の構成は維持されました。' : '思いは記録され、見えている施設の構成は維持されました。';
+  }
+  return { preference, effect, place, kind };
+}
+
 const LEGACY_HISTORY_SHOWN = 3;
 const el = (tag: string, className: string, text = '') => { const e = document.createElement(tag); e.className = className; e.textContent = text; return e; };
 const row = (term: string, value: string) => { const r = el('div', 'causal-row'); r.append(el('span', 'causal-term', term), el('span', '', value)); return r; };
@@ -138,7 +199,7 @@ const row = (term: string, value: string) => { const r = el('div', 'causal-row')
 /** `?survey` mode: the survey server is the only source of the atmosphere, the change sites and the causal panel. */
 export function startSurveyAtmosphere(
   url: string,
-  apply: (kind: SurveyEventKind, view: CityView) => void,
+  apply: (kind: SurveyEventKind, view: CityView) => CarrierChange[] | void,
   onDisplayMode?: (mode: DisplayMode) => void,
 ) {
   document.body.dataset.mode = 'survey';
@@ -157,19 +218,23 @@ export function startSurveyAtmosphere(
   let current: CityView | undefined;
   let cardIndex = 0;
   let storyTimer = 0;
+  let reasonTimer = 0;
   const showAmbient = () => {
     if (!current || !isExhibitionView(current)) return;
     const cards = residentCards(current), card = cards[cardIndex++ % cards.length];
     panel.dataset.presentation = 'ambient';
+    delete panel.dataset.resultKind;
     latest.replaceChildren(el('p', 'causal-context', 'この街の暮らし'),
       el('h3', 'resident-card-title', card.title), el('p', 'resident-card-copy', card.text),
       el('p', 'resident-place', `街の画面：${card.place}`));
     storyTimer = window.setTimeout(showAmbient, 12_000);
   };
-  connectSurvey(url, (kind, view) => {
-    if (!supersedes(current, view, kind)) return;
+  connectSurvey(url, (kind, view, displayMs = DISPLAY_MS) => {
+    if (kind !== 'city-state-snapshot' && !supersedes(current, view, kind)) return;
+    const previous = current;
     current = view;
-    apply(kind, view);
+    const changes = apply(kind, view);
+    clearTimeout(reasonTimer);
     if (isExhibitionView(view)) {
       panel.classList.add('resident-panel');
       panel.dataset.guestCount = String(view.guestCount);
@@ -179,13 +244,22 @@ export function startSurveyAtmosphere(
       if (kind === 'city-state-updated' && view.latestProposal) {
         panel.dataset.presentation = 'result';
         const proposal = view.latestProposal;
-        // ponytail: P2 has no district-before/after evidence; P3 must verify carriers before claiming a visual effect.
+        const evidence = previous && isExhibitionView(previous) && previous.runId === proposal.runId
+          && previous.revision === proposal.revisionBefore && JSON.stringify(previous.layout) === JSON.stringify(proposal.beforeLayout)
+          ? changes || undefined : undefined;
+        const result = residentResult(proposal, evidence);
+        panel.dataset.resultKind = result.kind;
         latest.replaceChildren(el('p', 'causal-context', residentIdentity(proposal)),
           el('h3', 'resident-card-title', '思いが重なり、街が応える。'),
-          el('p', 'resident-card-copy', 'あなたの思いが、住民の声に加わりました。街には、これまでの声も引き継がれています。'),
-          el('p', 'resident-place', `街の画面：${proposal.cityChanges[0] ? changeSites[proposal.cityChanges[0].socketId].place : 'お台場全景'}`));
-        // Local P2 presentation only; A/B still replaces this at its existing >=3s display start.
-        storyTimer = window.setTimeout(showAmbient, 10_000);
+          el('p', 'resident-card-copy', '街の画面をご覧ください。'),
+          el('p', 'resident-place', `街の画面：${result.place}`));
+        const showReason = () => {
+          latest.querySelector('.resident-card-copy')!.textContent = `${result.preference}${result.effect}`;
+        };
+        const transitionMs = SITE_TRANSITION_SECONDS * 1000;
+        if (displayMs < DISPLAY_MS - 100) showReason();
+        else reasonTimer = window.setTimeout(showReason, transitionMs);
+        storyTimer = window.setTimeout(showAmbient, displayMs);
       } else {
         cardIndex = 0;
         showAmbient();

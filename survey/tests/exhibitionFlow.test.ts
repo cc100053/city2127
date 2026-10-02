@@ -33,6 +33,7 @@ for (let ordinal = 0; ordinal < 100; ordinal++) {
   assert.equal(result.replayed, false);
   assert.equal(result.proposal.ordinal, ordinal + 1);
   if (ordinal === 0) { firstRequest = request; firstResult = result; }
+  clock.ms += 10_000;
 }
 assert.ok(firstRequest && firstResult);
 assert.equal(currentState(ctx).revision, 100);
@@ -48,7 +49,7 @@ if (view.version === 2) {
 const reordered = { ...firstRequest, answers: [...firstRequest.answers].reverse() };
 const replay = ok(submitProposal(ctx, reordered).response);
 assert.equal(replay.replayed, true);
-assert.deepEqual(replay, { ...firstResult, replayed: true });
+assert.deepEqual(replay, { ...firstResult, replayed: true, displayRemainingMs: 0 });
 const changed = { ...firstRequest, answers: firstRequest.answers.map((answer, i) => ({ ...answer, optionId: i === 0 ? 'different-option' : answer.optionId })) };
 const reusedId = submitProposal(ctx, changed).response;
 assert.equal(!reusedId.ok && reusedId.error.code, 'answer_conflict');
@@ -56,7 +57,7 @@ ok(staff(ctx, 'guest-left')); // Enter ready to exercise the immediate Admin res
 const reset = ok(staff(ctx, 'reset-city', 'RESET'));
 assert.equal(reset.previousRunId, originalRunId);
 assert.equal(reset.state.revision, 0);
-assert.deepEqual(ok(submitProposal(ctx, firstRequest).response), { ...firstResult, replayed: true });
+assert.deepEqual(ok(submitProposal(ctx, firstRequest).response), { ...firstResult, replayed: true, displayRemainingMs: 0 });
 assert.equal(currentState(ctx).runId, reset.state.runId);
 assert.equal(currentState(ctx).revision, 0, 'retry after reset does not mutate the new run');
 
@@ -135,6 +136,8 @@ try {
   const resetResponse = await server.request<LifecycleData>('/api/admin/lifecycle', { command: 'reset-city', expectedRevision: 2, confirmation: 'RESET' });
   assert.equal(resetResponse.status, 200);
   assert.equal(ok(resetResponse.body).executedReset, null, 'the result remains visible until the next guest starts');
+  assert.equal((await server.request('/api/proposal-sessions', {})).status, 409, 'reading slot guards an early reset/handoff');
+  httpFixture.clock.ms += 10_000;
   const nextResponse = await server.request<ProposalSessionData>('/api/proposal-sessions', {});
   assert.equal(nextResponse.status, 201, 'no Admin exit confirmation is required');
   const nextSession = ok(nextResponse.body);

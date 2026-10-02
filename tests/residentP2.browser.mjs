@@ -90,7 +90,8 @@ try {
   assert.equal(await pages[0].locator('table, .guest-result-answers, .guest-change-list').count(), 0);
   await city.waitForFunction(() => document.querySelector('.causal-panel')?.dataset.presentation === 'result');
   assert.equal(await city.locator('section .causal-context').textContent(), await pages[0].locator('.guest-result-number').textContent());
-  assert.ok((await city.locator('.resident-card-copy').textContent()).includes('住民の声に加わりました'));
+  await city.waitForFunction(() => document.querySelector('.resident-card-copy')?.textContent.includes('あなたは'));
+  assert.ok((await city.locator('.resident-card-copy').textContent()).includes('ほかの住民の声と重なり'));
   await pages[0].screenshot({ path: 'artifacts/resident-p2-look-up.png' });
   await city.screenshot({ path: 'artifacts/resident-p2-city-result.png' });
   await city.reload();

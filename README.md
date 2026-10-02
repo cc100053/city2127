@@ -64,7 +64,7 @@ Admin 新增 **直前の提案を取り消す**：只可撤銷最後一份已完
 
 兩部答題裝置用同一個 LAN／同一個 survey server，各開 `http://<展覽電腦 LAN IP>:8787/guest?station=A` 同 `/guest?station=B`。展覽電腦按上方 LAN 指示啟動 server；如果 City 留喺展覽電腦，root Vite 可維持 loopback。每站有獨立草稿、四題、結果同交接，一站完成唔會清掉另一站；server 按收到提交嘅順序累積，重試只計一次。每站同時只接受一個體驗；同一站唔好重複開多個頁面。原本 `/guest` 單站流程保留，但未完成體驗期間唔可混用單站／A/B。
 
-城市 live 變化依記錄順序相隔至少3秒，標示提案編號同 A/B；排隊嘅 Guest 顯示已保存、等待展示，再顯示自己嘅結果10秒／交接5秒。City 重新連接會直接復原最新完整狀態。A/B reset 會暫停新開始，等兩站問卷及結果／交接完成先執行；Admin 可單獨中止 **A／B の未完了の体験を終了**。離線站會喺問卷5分鐘期限，或已提交結果租期（展示開始後15秒）結束後釋放；Admin 無須確認離場。City reset 保留總人數，full reset 清零但保留歷史。
+城市live結果依記錄順序保留至少10秒觀看時段，動畫仍3秒，標示提案編號同 A/B；排隊嘅 Guest 顯示已保存、等待展示，再顯示自己嘅結果10秒／交接5秒。City 重新連接會直接復原最新完整狀態。A/B reset 會暫停新開始，等兩站問卷及結果／交接完成先執行；Admin 可單獨中止 **A／B の未完了の体験を終了**。離線站會喺問卷5分鐘期限，或已提交結果租期（展示開始後15秒）結束後釋放；Admin 無須確認離場。City reset 保留總人數，full reset 清零但保留歷史。
 
 更新後重新 build／啟動 survey server，同時刷新 Guest／City／Admin；SQLite 自動升至 schema 7，保留既有城市及歷史。實作及驗證見 [雙裝置交接](docs/handoffs/two-guest-devices.md)。
 
@@ -97,3 +97,5 @@ S1–S4、Odaiba 換場及 Meter P0–P12 已整合；**S5／展覽硬件、輸�
 Google Fonts 無法連線時用系統字體；其他 runtime 資源由本機供應。
 
 2026-10-02居民P2：更新後重新build／啟動survey server並刷新Guest／City。四題改用居民日常文案；核對仍在提交前，結果只顯示保存／等待、站號／暮らしの声編號及抬頭提示。City顯示背景／當前設施與保守保存確認。Question-set升至3，既有SQLite及已保存原文保留；舊草稿選「新しい予約で草稿を続ける」接續有效答案，A/B會先結束自己的舊預約。3秒過渡／A-B間隔、result10秒／handoff5秒維持；完整閱讀時段及原因屬P3。見 [P2交接](docs/handoffs/resident-experience-p2.md)。
+
+2026-10-02居民P3：重新build／啟動survey並刷新Guest／City。每份回答保留10秒閱讀（0–3秒身份／位置／城市過渡，3–10秒偏好＋實際結果）；A/B順序展示，等待／提前交接／reset及重試接續原slot。結果比較實際carrier配置，某地點增加不推論全城或人口增加。重連／Undo／reduced motion立即恢復，照明保留有效展示。詳見 [P3交接](docs/handoffs/resident-experience-p3.md)；P4／P5仍待驗收。

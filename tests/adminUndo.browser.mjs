@@ -66,6 +66,7 @@ try {
   await admin.waitForFunction(() => [...document.querySelectorAll('button')].some(b => b.textContent === '直前の提案を取り消す' && !b.disabled));
   await guest.getByRole('button', { name: '次の方へ', exact: true }).click();
   await guest.getByRole('button', { name: 'はじめる画面へ', exact: true }).click();
+  await guest.waitForFunction(() => document.querySelector('#app')?.dataset.screen === 'welcome');
   await guest.getByRole('button', { name: 'はじめる', exact: true }).click();
   await admin.waitForFunction(() => [...document.querySelectorAll('button')].some(b => b.textContent === '直前の提案を取り消す' && b.disabled));
   const current = await read('/api/admin/current-run');

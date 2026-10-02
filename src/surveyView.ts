@@ -1,3 +1,4 @@
+import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 import { isDisplayMode, type DisplayMode } from './dayCycle.ts';
 export const AXES = ['automation', 'publicSharing', 'environmentalPriority', 'urbanConcentration'] as const;
 export type Scores = Record<typeof AXES[number], number>;
@@ -146,8 +147,9 @@ function isExhibitionCityChange(value: unknown, before: ExhibitionLayout, after:
 }
 
 function isExhibitionProposal(value: unknown, runId: string, revision: number): value is ExhibitionProposal {
-  if (!isRecord(value) || !hasExactKeys(value, ['id', 'runId', 'guestSessionId', 'ordinal', 'questionSetVersion', 'algorithmVersion', 'answers', 'votes', 'revisionBefore', 'revisionAfter', 'submittedAt', 'beforeScores', 'afterScores', 'beforeLayout', 'afterLayout', 'cityChanges', ...(Object.hasOwn(value, 'stationId') ? ['stationId', 'displayAt'] : [])])
-    || (Object.hasOwn(value, 'stationId') && (!isOneOf(value.stationId, ['A', 'B']) || !isBoundedText(value.displayAt, 80) || !Number.isFinite(Date.parse(value.displayAt))))
+  if (!isRecord(value) || !hasExactKeys(value, ['id', 'runId', 'guestSessionId', 'ordinal', 'questionSetVersion', 'algorithmVersion', 'answers', 'votes', 'revisionBefore', 'revisionAfter', 'submittedAt', 'beforeScores', 'afterScores', 'beforeLayout', 'afterLayout', 'cityChanges', ...(Object.hasOwn(value, 'stationId') ? ['stationId'] : []), ...(Object.hasOwn(value, 'displayAt') ? ['displayAt'] : [])])
+    || (Object.hasOwn(value, 'stationId') && (!isOneOf(value.stationId, ['A', 'B']) || !Object.hasOwn(value, 'displayAt')))
+    || (Object.hasOwn(value, 'displayAt') && (!isBoundedText(value.displayAt, 80) || !Number.isFinite(Date.parse(value.displayAt))))
     || !isBoundedText(value.id, 128) || value.runId !== runId
     || !isBoundedText(value.guestSessionId, 128) || !isSafeCount(value.ordinal) || value.ordinal < 1
     || !isSafeCount(value.questionSetVersion) || value.questionSetVersion < 1 || value.algorithmVersion !== 2
@@ -245,14 +247,16 @@ export const supersedes = (current: CityView | undefined, next: CityView, kind?:
 /** Keeps a WebSocket to the survey server open; every (re)connect starts with a full snapshot. */
 export function connectSurvey(
   url: string,
-  onView: (kind: SurveyEventKind, view: CityView) => void,
+  onView: (kind: SurveyEventKind, view: CityView, displayMs?: number) => void,
   onStatus: (status: string) => void,
   onDisplayMode?: (mode: DisplayMode) => void,
 ) {
   let delay = 500;
-  const pending: { kind: SurveyEventKind; view: CityView; at: number }[] = [];
+  const pending: { kind: SurveyEventKind; view: CityView; at: number; until: number }[] = [];
   let displayTimer: ReturnType<typeof setTimeout> | undefined;
   let lastDisplay = -Infinity;
+  let authoritative: CityView | undefined;
+  const reduced = typeof globalThis.matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : undefined;
   const clearDisplay = () => { clearTimeout(displayTimer); pending.length = 0; lastDisplay = -Infinity; };
   const showNext = () => {
     clearTimeout(displayTimer);
@@ -260,13 +264,20 @@ export function connectSurvey(
     if (!next) return;
     const wait = next.at - performance.now();
     if (wait > 0) { displayTimer = setTimeout(showNext, wait); return; }
+    if (next.until <= performance.now()) { restore(); return; }
     pending.shift();
     lastDisplay = performance.now();
-    onView(next.kind, next.view);
-    if (pending[0]) pending[0].at = Math.max(pending[0].at, lastDisplay + 3000);
+    onView(next.kind, next.view, Math.min(DISPLAY_MS, next.until - performance.now()));
+    if (pending[0]) pending[0].at = Math.max(pending[0].at, lastDisplay + DISPLAY_MS);
     showNext();
   };
+  const restore = () => {
+    clearDisplay();
+    if (authoritative) onView('city-state-snapshot', authoritative);
+  };
+  reduced?.addEventListener('change', restore);
   const open = () => {
+    let firstSnapshot = true;
     const socket = new WebSocket(url);
     onStatus('接続中…');
     socket.addEventListener('open', () => { delay = 500; onStatus('接続済み'); });
@@ -281,15 +292,28 @@ export function connectSurvey(
       if (event && 'unsupportedVersion' in event) onStatus('Unsupported exhibition view version');
       else if (event) {
         const wait = isRecord(data) ? data.displayWaitMs : undefined;
-        if (event.kind === 'city-state-updated' && isExhibitionView(event.view) && event.view.latestProposal?.stationId) {
+        const remaining = isRecord(data) ? data.displayRemainingMs : undefined;
+        // A lighting-only snapshot must preserve both the queue and the current reading slot.
+        if (event.kind === 'city-state-snapshot') {
+          const same = JSON.stringify(authoritative) === JSON.stringify(event.view);
+          if (!firstSnapshot && same && !(isRecord(data) && data.undoneProposalId)) return;
+          firstSnapshot = false;
+        }
+        if (event.kind === 'city-state-updated' && isExhibitionView(event.view) && event.view.latestProposal?.displayAt) {
           if (typeof wait !== 'number' || !Number.isFinite(wait) || wait < 0 || wait > 300_000) {
-            console.warn('Ignored malformed station display delay'); return;
+            console.warn('Ignored malformed display delay'); return;
           }
-          pending.push({ ...event, at: Math.max(performance.now() + wait, lastDisplay + 3000, (pending.at(-1)?.at ?? -Infinity) + 3000) });
+          if (remaining !== undefined && (typeof remaining !== 'number' || !Number.isFinite(remaining) || remaining < 0 || remaining > DISPLAY_MS)) {
+            console.warn('Ignored malformed display duration'); return;
+          }
+          if (authoritative && !supersedes(authoritative, event.view, event.kind)) return;
+          authoritative = event.view;
+          firstSnapshot = false;
+          if (reduced?.matches || remaining === 0) { restore(); return; }
+          pending.push({ ...event, until: performance.now() + wait + (typeof remaining === 'number' ? remaining : DISPLAY_MS), at: Math.max(performance.now() + wait, lastDisplay + DISPLAY_MS, (pending.at(-1)?.at ?? -Infinity) + DISPLAY_MS) });
           showNext();
         } else {
-          // Lighting snapshots describe the already queued final state; do not skip its earlier proposals.
-          if (event.kind === 'city-state-snapshot' && JSON.stringify(pending.at(-1)?.view) === JSON.stringify(event.view)) return;
+          authoritative = event.view;
           clearDisplay();
           onView(event.kind, event.view);
         }
@@ -297,7 +321,7 @@ export function connectSurvey(
       else console.warn('Ignored malformed survey message', message.data);
     });
     socket.addEventListener('close', () => {
-      clearDisplay();
+      restore();
       onStatus(`切断 — ${delay / 1000}秒後に再接続`);
       setTimeout(open, delay);
       delay = Math.min(delay * 2, 8000);

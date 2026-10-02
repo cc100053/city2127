@@ -35,11 +35,11 @@ v2 state は `voteSums`、`recentVotes`、`guestCount`、`revision` と四軸 sc
 
 ## Guest、A/B、Reset、Undo
 
-単独 `/guest` は Start → 四問 → review → submit → result 10 秒／handoff 5 秒。次の Start が完了済み体験を自動終了し、保留 reset を適用します。Admin の離場確認は不要で、未完了問卷の中止は可能です。
+単独 `/guest` は Start → 四問 → review → submit → result 10 秒／handoff 5 秒。10秒閲覧枠が終わると次のStartが完了済み体験を自動終了し、保留resetを適用します。早い交代操作も表示を中断しません。Admin の離場確認は不要で、未完了問卷の中止は可能です。
 
 `/guest?station=A` と `B` は独立した session／recovery key／draft／result。各 station は一体験、活躍中は単独と A/B を混在できません。A/B は古い city revision でも最新 state に順次累積し、未来 revision は拒否；単独は一致必須。Submission ID と session uniqueness で retry は一回だけ計数します。未知の送信結果には同じ ID で再送します。
 
-City display を commit order で最低3秒間隔に予約し、Guest は保存済み／表示待ちの後、自分の結果を表示します。A/B reset は新開始を止め、両 station の問卷／result／handoff を排出して実行。指定 session のみ中止可能。問卷期限は5分、result lease は display start +15秒；server の1秒 sweep は離線 station も解放します。
+City display を commit order で最低10秒間隔（都市転換は3秒）に予約し、Guest は保存済み／表示待ちの後、自分の結果を表示します。A/B reset は新開始を止め、両 station の問卷／result／handoff を排出して実行。指定 session のみ中止可能。問卷期限は5分、result lease は display start +15秒；server の1秒 sweep は離線 station も解放します。
 
 City reset は新しい街にして総人数を保持、full reset は表示計数をゼロにして immutable history を保持。Undo は最後の完了提案だけ、次の開始前に使用；新しい draft が後で中止されても旧 Undo は復活しません。独立 display setting は Day 12:00／Night 22:00／Auto、reset 後も保持します。
 
@@ -51,7 +51,7 @@ v1 endpoint は互換コードで、既定の v2 run を v1 に変換しませ�
 | `POST /api/proposal-sessions` | v2：単独は `{}`、2台は `{ "stationId": "A" }` または `B`。四問を予約（201）、同じステーションの体験中・mode混在・reset保留中のA/B開始は409 |
 | `GET /api/proposal-sessions/:id` | v2：割当四問、session、現在状態。草稿復元／期限確認 |
 | `POST /api/proposals` | v2：`submissionId`、`guestSessionId`、`expectedRevision`、四組のanswers。新規201、同一IDの成功再送200。A/Bは旧revision可、未来revision不可；単独は完全一致 |
-| `POST /api/proposal-sessions/:id/end` | A/Bのみ：指定sessionを終了。提出済み提案は保持し、予定展示の3秒転換が終わる前は409 |
+| `POST /api/proposal-sessions/:id/end` | A/Bのみ：指定sessionを終了。提出済み提案は保持し、予定展示の10秒閲覧枠が終わる前は409 |
 | `POST /api/guest-sessions` | legacy v1：session 作成と質問予約（201）。質問なしは 409 `no_question_available` |
 | `GET /api/guest-sessions/:id/question` | legacy v1：割り当てられた質問と現在状態。期限切れは 410、回答済みは `status: "answered"` |
 | `POST /api/answers` | legacy v1：回答（新規 201、再送 200）。400 不明な question/option・別の質問の option、404 不明な session、409 revision 競合・回答済み・answer ID 競合・未割り当て質問、410 期限切れ |
@@ -64,7 +64,7 @@ v1 endpoint は互換コードで、既定の v2 run を v1 に変換しませ�
 | `POST /api/admin/lifecycle` | `{command, expectedRevision, confirmation?, proposalId?, guestSessionId?}`。command は `reset-city`（`RESET`）、`full-reset`（`FULL RESET`）、`cancel-reset`、`guest-left`、`undo-proposal`。A/B の `guest-left` は未完了の `guestSessionId` 必須、Undo は `proposalId` 必須。古い revision は 409 `lifecycle_conflict`、状態に合わない操作は 409 `lifecycle_blocked`（loopback のみ） |
 | `POST /api/admin/display-mode` | `{mode: "auto" / "day" / "night"}`。独立した保存設定（loopback / same-origin） |
 
-v2 の `city-state-updated` は `submissionId`、`proposal`、`state`、`view` を含み、A/B のみ `displayWaitMs` と proposal 内の `stationId`／`displayAt` を追加します。サーバー通知は commit 後に即配信され、root が表示を3秒以上離します。再送では再通知しません。Monitor は最新記録を表示し、root の表示待ち列とは別です。
+v2 の `city-state-updated` は `submissionId`、`proposal`、`state`、`view` を含み、単独／A-Bとも `displayWaitMs`／`displayRemainingMs` とproposal内の `displayAt` を追加します（旧記録では省略可能）；`stationId`はA/Bのみ。サーバー通知はcommit後に即配信され、rootが表示を10秒以上離します。時刻は予定でありviewerの再生確認ではありません。retryは元の閲覧枠の残り時間だけを返し、leaseを延長しません。再送では再通知しません。Monitor は最新記録を表示し、root の表示待ち列とは別です。
 
 v1 WebSocket の `city-state-updated` には、仕様の `answerId` と `state` に加えて、モニター表示用に `answer`（AnswerEvent）、`questionText`、`optionLabel`、`change`（clamp 後の実際の変化）が入ります。回答の再送では通知しません。
 
@@ -108,3 +108,5 @@ v1 の質問予約／trigger／加算 clamp／一人一問コードと tests は
 原 schema-1 [制作 log](docs/log/survey-state-mvp.md)、[repo import](../docs/handoffs/survey-state-mvp.md)、[causal MVP](../docs/handoffs/causal-city-mvp.md) は過去の基準。現行 limits は[展示会仕様](../docs/EXHIBITION_SPEC.md)、A/B evidence は[handoff](../docs/handoffs/two-guest-devices.md)を参照。S5、入力機器と展示当日の recovery policy は未検証です。
 
 2026-10-02 P2：正式question-setはversion3です（algorithm／CityView v2、schema7とは別）。住民の問い／背景、送信前確認、保存／待機／街を見る案内をGuestに接続し、結果の回答／Meter／施設表はCity側の短い解説に置き換えました。旧草稿は新しい予約へ有効な選択を引き継ぎ、A/Bは自分の旧予約を既存end endpointで終了します。保存済みversion2提案は原文のまま同IDで回復でき、SQLiteを削除しません。時刻／lease／resetは変更していません。[P2 handoff](../docs/handoffs/resident-experience-p2.md)。
+
+2026-10-02 P3は上記P2の時刻条件を更新します：server/root/Guestは共通10秒閲覧枠を予約し、3秒の都市転換を保持。早い交代はreleaseを枠の終わりまで待ち、resetは両stationをdrainします。retry/reloadは残り時間のみ、result leaseは開始+15秒で固定。rootはeffective carrier配置／可視pairing／seed後の実分布を比較し、個人の声と共同結果を区別。切断／再接続／Undo／reduced motion／期限切れイベントは即復元、照明のみのsnapshotは有効queueを保持。[P3 handoff](../docs/handoffs/resident-experience-p3.md)。

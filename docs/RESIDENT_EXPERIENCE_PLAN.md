@@ -1,6 +1,6 @@
 # 居民體驗計劃 — 2127 台場
 
-日期：2026-10-02。Owner：Codex。**P1／P2 已完成；P3–P5 尚未實作。** P2接入證據見 [階段交接](handoffs/resident-experience-p2.md)；本文件保留後續計劃，不代表P3排程或實際裝置驗收已完成。產品契約以 [SPEC](EXHIBITION_SPEC.md) 為準；文案唯一來源是 [RESIDENT_COPY](RESIDENT_COPY.md)，接手入口是 [handoff](handoffs/resident-experience-plan.md)。
+日期：2026-10-02。Owner：Codex。**P1–P3 已實作；P4／P5 尚待驗收。** P2接入證據見 [階段交接](handoffs/resident-experience-p2.md)；P3排程／carrier證據見 [P3交接](handoffs/resident-experience-p3.md)；本文件保留P4／P5計劃，不代表實際裝置驗收已完成。產品契約以 [SPEC](EXHIBITION_SPEC.md) 為準；文案唯一來源是 [RESIDENT_COPY](RESIDENT_COPY.md)，接手入口是 [handoff](handoffs/resident-experience-plan.md)。
 
 ## 目標與已確認方向
 
@@ -18,7 +18,7 @@
 
 P1 source `9273f88decbfa4ec8844585d439b8271179421ea` 已由 `2669de628907ef25d13b198c5a387c864b28548c` 整合，發布 main `6ed44dfcd6e9fdf08943bcc5e509bd46e9fda83a`。[main CI 36995697291](https://github.com/cc100053/city2127/actions/runs/36995697291) PASS；這證明原有 package checks 通過，不是新畫面／iPad 驗收。
 
-P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibition.json) version3（ids/effects不變）。Guest 結果只保留保存／等待／站號／編號／抬頭／交接；root 顯示背景／當前focal設施與保守結果卡。城市 live 過渡 3 秒；A/B 展示起點最少相隔 3 秒；Guest result10秒／handoff5秒。SQLite schema7／CityView與algorithm v2 保持。
+P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibition.json) version3（ids/effects不變）。Guest 結果只保留保存／等待／站號／編號／抬頭／交接；root 顯示背景／當前focal設施與保守結果卡。P3城市live過渡仍3秒，單站／A-B展示起點最少相隔10秒；Guest按排定時段等待，result接續剩餘10秒slot／handoff5秒。SQLite schema7／CityView與algorithm v2 保持。
 
 ## 畫面分工與完整流程
 
@@ -53,9 +53,9 @@ P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibitio
 
 2026-10-02實作：question-set version3，原SQLite／version2歷史保留，單站／A-B新預約接續舊草稿；Guest結果精簡，root重用固定卡片。日常卡每12秒、live fallback本機最多10秒；A/B≥3秒仍可覆蓋，並非P3保留閱讀時段。卡片按focal實際數量／塔形態選擇；配對／district因果判斷未接入。新截圖、root/survey checks與三項scratch-DB browser回歸見 [P2 handoff](handoffs/resident-experience-p2.md)。這些checks不等於P4全部案例／P5實機驗收。
 
-### P3 — 真實原因與展示節奏：PLANNED
+### P3 — 真實原因與展示節奏：DONE
 
-建議每份回答預留 **10 秒觀看時段**：0–3秒識別＋位置提示＋現有城市過渡；3–10秒保留原因與生活影響。這是待接入／實測的方案，不是現行行為或已驗證的閱讀時間。
+每份回答預留 **10秒觀看時段**：0–3秒識別＋位置提示＋現有城市過渡；3–10秒保留一項偏好與真實配置影響。2026-10-02已接入排程／root／Guest／lease／guard／drain，軟件計時證據見 [P3交接](handoffs/resident-experience-p3.md)。這不是已驗證的實際閱讀時間或理解程度。以下保留P3的驗收契約。
 
 - A/B 按 server 提交順序呈現；一份結果的閱讀時段未完，不被下一份覆蓋。兩站仍能獨立作答；等待頁清楚顯示回答已保存。
 - 一起調整 server 的 display scheduling、root queue、Guest 等待、result lease、提前交接 guard 與 reset drain。分開管理「3秒過渡」與「10秒觀看」，不能把所有3秒常數盲目改為10秒。
@@ -68,6 +68,8 @@ P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibitio
 必須涵蓋：設施改變、只有累積方向改變、分數相同但配置改變、完全維持；低／混合／高、混合選項卻未到 mixed、個人方向與累積結果不同。某個 site count 增加，不推論全區同軸 carrier、行人或人口都增加。
 
 完成門檻：原因與畫面一致；A/B 各自看得完結果；Guest 抬頭提示對應排定時段；恢復／取消沒有殘留字幕或舊動畫。若10秒不夠，先縮短文案；需要變更總時段時同步修改排程與租期並記錄新實測。
+
+2026-10-02交付：共用reading10秒／handoff5秒／lease15秒常數，server為單站及A/B排程，root保留順序及有效期限。重試只回原slot剩餘時間；提前交接保留recovery並延後release。`CityChangeManager`比較四區的effective targets，包含hybrid／可見配對乘積／屋頂／facade／fleet counts及seed後分布；不改geometry。結果以一項個人偏好＋一項實際結果保持兩句，focal限定地點、district-only用配置調整；無前後baseline則保存fallback。日常卡暫停；照明不打斷，斷線／重連／Undo／reset／reduced motion／過期late事件立即settle並清timer。新native／scratch Chrome計時及screenshots在P3交接；P4完整案例、P5實機／閱讀理解保持未驗。
 
 ### P4 — 軟件與雙屏流程驗證：PLANNED
 
@@ -112,4 +114,4 @@ P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibitio
 
 ## 接手順序
 
-先讀 [P2 handoff](handoffs/resident-experience-p2.md) → [P1文案](RESIDENT_COPY.md) → [PROJECT](PROJECT.md) 與當前source。按mandatory preflight核對remote／owner／dirty files／available commits。下一個實作階段是 **P3**：追actual carrier前後配置，再協調server排程、root queue、Guest等待／lease／guard／drain；不可只把3秒常數改為10秒。P2交付不自動啟動P3。
+先讀 [P2 handoff](handoffs/resident-experience-p2.md) → [P1文案](RESIDENT_COPY.md) → [PROJECT](PROJECT.md) 與當前source。按mandatory preflight核對remote／owner／dirty files／available commits。P3已交付，接手先讀 [P3 handoff](handoffs/resident-experience-p3.md)；下一個可分派階段是 **P4** 完整軟件／雙屏流程驗證，再到P5現場。P3實作不自動啟動P4／P5。
