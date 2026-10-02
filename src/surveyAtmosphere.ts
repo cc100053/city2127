@@ -114,7 +114,7 @@ export function startSurveyAtmosphere(
   document.body.appendChild(panel);
   let current: CityView | undefined;
   connectSurvey(url, (kind, view) => {
-    if (!supersedes(current, view)) return;
+    if (!supersedes(current, view, kind)) return;
     current = view;
     apply(kind, view);
     if (isExhibitionView(view)) {

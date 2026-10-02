@@ -1,5 +1,10 @@
 # Project contract and implementation map
 
+## Admin-only latest-proposal Undo — 2026-10-02
+
+`adminService.ts` accepts `undo-proposal` on the existing loopback/same-origin lifecycle endpoint, bound to lifecycle revision and explicit proposal ID. Only the last completed proposal is eligible in `awaiting_exit`, before the next session starts; one Undo never exposes an older proposal. Schema 6 adds immutable `proposal_undos` markers and the `active_proposal_events` SQL view. Replay, snapshot restoration, participation counts, latest-64 history and complete-history slot seeds exclude revoked proposals; Admin retains originals with `undoneAt` and `proposal-undone` audit events. Undo restores the exact previous state in the same run, preserves lighting and queued resets, and broadcasts a `city-state-snapshot`. Root accepts changed authoritative snapshots at lower/equal revisions; unchanged snapshots still do not reapply the city. Monitor relies on ordered socket snapshots. Connected Guest clears a revoked result/recovery; reload/retry detects `proposal_undone` and returns to Start. Re-answer starts a fresh session. Active city revision/ordinal can be reused after Undo; submission IDs remain immutable and lifecycle revisions increase. See [handoff](handoffs/admin-undo.md) for checks and limits.
+
+
 ## Meter variety main integration — 2026-10-02
 
 User authorized P0–P12 integration; no-conflict merge `e7afbee` exactly preserves the verified feature tree. The district controllers, history-seeded layouts and P12 motion below are now on published main `68b669a`; [main CI 36954967651](https://github.com/cc100053/city2127/actions/runs/36954967651) PASS. Local/remote feature branch retired. Earlier “not integrated” statements are dated stage history, superseded by this record. Root and survey must be updated together for P11; restart survey using the existing SQLite and refresh City. See the [integration handoff](handoffs/meter-variety.md#main-integration--2026-10-02).

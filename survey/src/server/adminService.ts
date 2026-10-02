@@ -5,13 +5,13 @@ import type { CitySurveyState, ExhibitionState } from '../shared/citySurveyState
 import type { DatabaseSync } from 'node:sqlite';
 import { transaction } from './database.ts';
 import { fail, type ServiceOutcome, type SurveyContext } from './context.ts';
-import { activeRun, CorruptStateError, createExhibitionRun, createRun, num, recentProposalEvents, str, toAnswerEvent } from './runStore.ts';
+import { activeRun, CorruptStateError, createExhibitionRun, createRun, num, recentProposalEvents, replayExhibitionRun, writeExhibitionSnapshot, str, toAnswerEvent } from './runStore.ts';
 import { sessionCounts } from './sessionService.ts';
 import { currentState, viewOf } from './answerService.ts';
 
 export const RESET_CONFIRMATION = 'RESET';
 export const FULL_RESET_CONFIRMATION = 'FULL RESET';
-const COMMANDS: readonly LifecycleCommand[] = ['reset-city', 'full-reset', 'cancel-reset', 'guest-left'];
+const COMMANDS: readonly LifecycleCommand[] = ['reset-city', 'full-reset', 'cancel-reset', 'guest-left', 'undo-proposal'];
 
 /**
  * Admin access is limited to the exhibition PC's loopback interface. `::ffff:127.0.0.1` is the same
@@ -28,11 +28,12 @@ export function currentRun(ctx: SurveyContext): AdminCurrentRun {
   const counts = run.algorithmVersion === 2
     ? {
       reserved: num(ctx.db.prepare("SELECT COUNT(*) AS n FROM proposal_sessions WHERE run_id = ? AND status = 'reserved'").get(run.id) ?? { n: 0 }, 'n'),
-      answered: num(ctx.db.prepare("SELECT COUNT(*) AS n FROM proposal_sessions WHERE run_id = ? AND status = 'submitted'").get(run.id) ?? { n: 0 }, 'n'),
+      answered: num(ctx.db.prepare('SELECT COUNT(*) AS n FROM active_proposal_events WHERE run_id = ?').get(run.id) ?? { n: 0 }, 'n'),
     }
     : sessionCounts(ctx, run.id);
   return {
     run,
+    undoProposal: undoableProposal(ctx),
     displayMode: readDisplayMode(ctx.db),
     lifecycle: readLifecycle(ctx.db),
     state,
@@ -48,6 +49,12 @@ export function recentEvents(ctx: SurveyContext, limit = 50): AdminEventsData {
   const proposals = recentProposalEvents(ctx.db, limit);
   const admin = ctx.db.prepare('SELECT * FROM admin_events ORDER BY id DESC LIMIT ?').all(limit).map((row): AdminEvent => {
     const detail: unknown = JSON.parse(str(row, 'detail_json'));
+    if (str(row, 'type') === 'proposal-undone') {
+      if (typeof detail !== 'object' || detail === null || !('proposalId' in detail) || typeof detail.proposalId !== 'string'
+          || !('ordinal' in detail) || !Number.isSafeInteger(detail.ordinal)) throw new CorruptStateError('invalid proposal undo event');
+      return { id: num(row, 'id'), type: 'proposal-undone', runId: str(row, 'run_id'),
+        detail: { proposalId: detail.proposalId, ordinal: detail.ordinal as number }, createdAt: str(row, 'created_at') };
+    }
     const nextRunId = typeof detail === 'object' && detail !== null && 'nextRunId' in detail && typeof detail.nextRunId === 'string' ? detail.nextRunId : '';
     const scope = typeof detail === 'object' && detail !== null && 'scope' in detail && detail.scope === 'full' ? 'full' : 'city';
     return { id: num(row, 'id'), type: 'run-reset', runId: str(row, 'run_id'), detail: { nextRunId, scope }, createdAt: str(row, 'created_at') };
@@ -58,7 +65,7 @@ export function recentEvents(ctx: SurveyContext, limit = 50): AdminEventsData {
 export function readLifecycle(db: DatabaseSync): LifecycleStatus {
   const row = db.prepare('SELECT * FROM exhibition_lifecycle WHERE id = 1').get();
   if (!row) throw new CorruptStateError('exhibition lifecycle row is missing');
-  const total = db.prepare('SELECT COUNT(*) AS n FROM proposal_events WHERE sequence > ?').get(num(row, 'total_since_sequence'));
+  const total = db.prepare('SELECT COUNT(*) AS n FROM active_proposal_events WHERE sequence > ?').get(num(row, 'total_since_sequence'));
   // Phase and pending values are enforced by the table's CHECK constraints.
   return {
     revision: num(row, 'revision'), phase: str(row, 'phase') as LifecyclePhase, pendingReset: str(row, 'pending_reset') as PendingReset,
@@ -100,12 +107,42 @@ export function finishGuest(ctx: SurveyContext, lifecycle: LifecycleStatus): Ser
   };
 }
 
+/** The last raw event must still be active; an undo never opens an older proposal to another undo. */
+function undoableProposal(ctx: SurveyContext): AdminCurrentRun['undoProposal'] {
+  if (readLifecycle(ctx.db).phase !== 'awaiting_exit') return null;
+  const run = activeRun(ctx.db);
+  if (!run || run.algorithmVersion !== 2) return null;
+  const row = ctx.db.prepare(`SELECT p.id, p.revision_after, u.proposal_id AS undone FROM proposal_events p
+    LEFT JOIN proposal_undos u ON u.proposal_id = p.id WHERE p.run_id = ? ORDER BY p.sequence DESC LIMIT 1`).get(run.id);
+  return row && row.undone === null ? { id: str(row, 'id'), ordinal: num(row, 'revision_after') } : null;
+}
+
+/** Called in the lifecycle transaction; the original proposal and its submission ID remain immutable. */
+function undoProposal(ctx: SurveyContext, proposalId: string, lifecycle: LifecycleStatus): ServiceOutcome<LifecycleData> {
+  const target = undoableProposal(ctx);
+  if (!target || target.id !== proposalId)
+    return { response: fail('lifecycle_blocked', 'Only the latest proposal can be undone before the next guest starts.') };
+  const run = activeRun(ctx.db)!;
+  ctx.db.prepare('INSERT INTO proposal_undos (proposal_id, created_at) VALUES (?, ?)').run(proposalId, ctx.now().toISOString());
+  const state = replayExhibitionRun(ctx.db, run.id, run.startedAt);
+  writeExhibitionSnapshot(ctx.db, state);
+  ctx.db.prepare("INSERT INTO admin_events (type, run_id, detail_json, created_at) VALUES ('proposal-undone', ?, ?, ?)")
+    .run(run.id, JSON.stringify({ proposalId, ordinal: target.ordinal }), ctx.now().toISOString());
+  // Keep queued resets deferred until the next start, just like an ordinary completed experience.
+  setLifecycle(ctx, 'awaiting_exit', lifecycle.pendingReset);
+  return {
+    response: { ok: true, data: { lifecycle: readLifecycle(ctx.db), state, executedReset: null, previousRunId: null } },
+    event: { type: 'city-state-snapshot', undoneProposalId: proposalId, displayMode: readDisplayMode(ctx.db), state, view: viewOf(ctx, state) },
+  };
+}
+
 function parseLifecycleRequest(body: unknown): LifecycleRequest | undefined {
   if (typeof body !== 'object' || body === null || Array.isArray(body)) return undefined;
-  const { command, expectedRevision, confirmation } = body as Record<string, unknown>;
+  const { command, expectedRevision, confirmation, proposalId } = body as Record<string, unknown>;
   if (!COMMANDS.includes(command as LifecycleCommand) || typeof expectedRevision !== 'number' || !Number.isSafeInteger(expectedRevision)
       || expectedRevision < 0 || (confirmation !== undefined && typeof confirmation !== 'string')) return undefined;
-  return { command: command as LifecycleCommand, expectedRevision, confirmation };
+  if (command === 'undo-proposal' && (typeof proposalId !== 'string' || !proposalId.trim() || proposalId.length > 128)) return undefined;
+  return { command: command as LifecycleCommand, expectedRevision, confirmation, proposalId: typeof proposalId === 'string' ? proposalId : undefined };
 }
 
 /**
@@ -126,6 +163,7 @@ export function lifecycleCommand(ctx: SurveyContext, body: unknown): ServiceOutc
       return { response: fail('lifecycle_conflict', `Expected lifecycle revision ${request.expectedRevision}, but it is ${lifecycle.revision}. Reload and try again.`) };
     let reset: PendingReset = 'none';
     switch (request.command) {
+      case 'undo-proposal': return undoProposal(ctx, request.proposalId!, lifecycle);
       case 'reset-city':
       case 'full-reset': {
         const scope = request.command === 'full-reset' ? 'full' : 'city';

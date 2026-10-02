@@ -1,5 +1,10 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
+## Admin-only Undo — 2026-10-02
+
+Guest keeps the existing four-question flow. Staff can undo the latest completed proposal before the next Guest starts, restoring inherited city/counts with no change pulse, keeping the original marked as undone, and allowing a fresh re-answer. No multi-step history editing or geometry/camera/material change. Queued resets still apply at next start. Implementation/evidence: [handoff](handoffs/admin-undo.md), [validation](VALIDATION.md#admin-only-undo--2026-10-02).
+
+
 ## Meter variety main 整合 — 2026-10-02
 
 用家明確要求合併 main 同刪除 branch，取代之前 capture review 後才合併嘅條件。P0–P12 已無衝突合併（`e7afbee`），已推送 main（`68b669a`，[main CI 36954967651](https://github.com/cc100053/city2127/actions/runs/36954967651) PASS），本機及 remote feature branch 已刪除；以下各階段「未整合／待審閱」係歷史狀態，由本紀錄取代。此決定不代表實機 FPS、Windows 或整體展覽驗收。見 [整合交接](handoffs/meter-variety.md#main-integration--2026-10-02)。

@@ -2,7 +2,7 @@ import './debug.css';
 import type { CityView } from '../shared/cityView.ts';
 import { isExhibitionCityView } from '../shared/cityView.ts';
 import type { ServerEvent } from '../shared/protocol.ts';
-import { api, connectEvents, el, renderView, signed } from './debugApi.ts';
+import { connectEvents, el, renderView, signed } from './debugApi.ts';
 
 // Debug monitor: the derived layout and decision history as text. The 3D viewer is module-swap's ?survey mode.
 const app = document.querySelector<HTMLElement>('#app')!;
@@ -13,15 +13,22 @@ const log = el('ol', { class: 'log', reversed: '' });
 app.append(el('h1', {}, 'Monitor debug'), status, stateBox, el('h2', {}, '最後に適用された回答'), last, el('h2', {}, '変化の履歴（受信順）'), log);
 
 let latest: CityView | undefined;
-function setState(view: CityView) {
-  // Ignore anything older than what is already shown (e.g. a slow HTTP response after a WS update).
-  if (latest && latest.runId === view.runId && view.revision < latest.revision) return;
+function setState(view: CityView, snapshot = false) {
+  // Live frames advance; authoritative snapshots can restore an earlier city.
+  if (!snapshot && latest && latest.runId === view.runId && view.revision < latest.revision) return;
   latest = view;
   stateBox.replaceChildren(el('p', { class: 'meta' }, `run ${view.runId} · revision ${view.revision}`), renderView(view));
 }
 
 function onEvent(event: ServerEvent) {
-  if (event.type === 'city-state-snapshot') return setState(event.view);
+  if (event.type === 'city-state-snapshot') {
+    setState(event.view, true);
+    if (event.undoneProposalId) {
+      last.replaceChildren('管理者が直前の提案を取り消しました。');
+      log.prepend(el('li', {}, `UNDO: ${event.undoneProposalId}`));
+    }
+    return;
+  }
   if (event.type === 'run-reset') {
     latest = undefined;
     setState(event.view);
@@ -53,13 +60,4 @@ function onEvent(event: ServerEvent) {
   while (log.children.length > 30) log.lastElementChild?.remove();
 }
 
-async function refresh() {
-  const result = await api<CityView>('/api/city-view');
-  if (result.ok) setState(result.data);
-}
-
-connectEvents(onEvent, text => {
-  status.textContent = `WebSocket: ${text}`;
-  if (text === 'connected') void refresh();
-});
-void refresh();
+connectEvents(onEvent, text => { status.textContent = `WebSocket: ${text}`; });

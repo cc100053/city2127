@@ -80,6 +80,8 @@ export function getProposalSession(ctx: SurveyContext, sessionId: string): ApiRe
       session = { ...session, status: 'expired' };
     }
     if (session.status === 'expired') return fail('session_expired', 'This proposal session has expired.', current.state);
+    if (ctx.db.prepare('SELECT u.proposal_id FROM proposal_undos u JOIN proposal_events p ON p.id = u.proposal_id WHERE p.guest_session_id = ?').get(session.id))
+      return fail('proposal_undone', 'This proposal was undone by an administrator. Start a new questionnaire.', current.state);
     if (session.status === 'submitted') return fail('already_answered', 'This proposal session has already been submitted.', current.state);
     if (session.questionSetVersion !== ctx.questions.version
         || JSON.stringify(session.questionIds) !== JSON.stringify(ctx.questions.questions.map(question => question.id)))
@@ -137,6 +139,8 @@ function duplicateResult(ctx: SurveyContext, row: Row, request: ProposalRequest)
     const current = currentExhibition(ctx);
     return { response: fail('answer_conflict', 'This submission ID was already used for a different proposal.', current?.state) };
   }
+  if (ctx.db.prepare('SELECT proposal_id FROM proposal_undos WHERE proposal_id = ?').get(request.submissionId))
+    return { response: fail('proposal_undone', 'This proposal was undone by an administrator. Start a new questionnaire.', currentExhibition(ctx)?.state) };
   const proposal = toProposalRecord(row);
   return { response: { ok: true, data: { proposal, state: savedState(row), replayed: true } } };
 }
