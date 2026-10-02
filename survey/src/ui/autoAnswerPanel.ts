@@ -1,5 +1,5 @@
 import type { DevSurveyConfig } from '../shared/devSurvey.ts';
-import type { ApiResponse, AdminCurrentRun, LifecycleData } from '../shared/protocol.ts';
+import type { ApiResponse, AdminCurrentRun } from '../shared/protocol.ts';
 import type { Vote } from '../shared/citySurveyState.ts';
 import { api, el } from './debugApi.ts';
 import { autoWait, runAutoAnswers, type AutoDriver, type AutoProfile } from './autoAnswers.ts';
@@ -50,16 +50,12 @@ export async function mountAutoAnswerPanel(guest: Pick<AutoDriver, 'start' | 'an
       await runAutoAnswers(config, settings, {
         ...guest, wait: autoWait,
         readAdmin: async () => data(await api<AdminCurrentRun>('/api/admin/current-run')),
-        finish: async (_sessionId, expectedRevision) => {
-          const result = data(await api<LifecycleData>('/api/admin/lifecycle', { command: 'guest-left', expectedRevision }));
-          if (result.executedReset || result.lifecycle.phase !== 'ready') throw new Error('退出確認の状態が変わりました。');
-        },
       }, controller.signal, (done, result) => {
-        status.textContent = `${done} / ${settings.count} 記録済み · 結果と退出確認を待機中`;
+        status.textContent = `${done} / ${settings.count} 記録済み · 結果と交代画面を待機中`;
         if (result) output.textContent = JSON.stringify({ answers: result.proposal.answers.map(answer => answer.optionLabel),
           meters: result.state.scores, layout: result.proposal.afterLayout }, null, 2);
       });
-      status.textContent = `${settings.count} / ${settings.count} 完了・退出確認済み`;
+      status.textContent = `${settings.count} / ${settings.count} 完了`;
     } catch (error) {
       status.textContent = error instanceof Error ? error.message : String(error);
     } finally {
@@ -71,8 +67,8 @@ export async function mountAutoAnswerPanel(guest: Pick<AutoDriver, 'start' | 'an
   });
   document.body.append(el('aside', { class: 'dev-auto-panel', 'aria-label': '開発用自動回答' },
     el('h2', {}, '開発専用・自動回答'),
-    el('p', {}, 'このサーバーのDBに記録します。npm run dev:auto の独立テストDBを使ってください。記録した観客の退出を自動確認します。展示前に削除、または管理画面へ移動してください。'),
-    el('p', {}, '観客の退出確認・都市のリセットは ', el('a', { href: '/admin', target: '_blank' }, '管理画面（/admin）'), ' で操作してください。'),
+    el('p', {}, 'このサーバーのDBに記録します。npm run dev:auto の独立テストDBを使ってください。次の質問開始時に自動で交代します。展示前に削除、または管理画面へ移動してください。'),
+    el('p', {}, '未完了の体験の終了・都市のリセットは ', el('a', { href: '/admin', target: '_blank' }, '管理画面（/admin）'), ' で操作してください。'),
     el('label', {}, '回答パターン', profile), el('label', {}, '提案数', count), el('label', {}, 'シード', seed),
     el('label', {}, '追加待ち時間（秒）', wait), customRows,
     el('p', {}, '各問 0.3 秒 · 結果 10 秒 · 引継ぎ 5 秒'), start, stop, status, output));

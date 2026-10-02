@@ -22,11 +22,11 @@ assert.throws(() => selectAutoAnswers(config, { ...settings, profile: 'custom' }
 assert.deepEqual(selectAutoAnswers(config, { ...settings, profile: 'custom', custom: Object.fromEntries(config.meters.map(m => [m.axis, 1])) }, 0), selectAutoAnswers(config, settings, 0));
 assert.equal(selectAutoAnswers({ ...config, meters: [...config.meters, { ...config.meters[0], axis: 'futureMeter', questionId: 'future' }] }, settings, 0).length, 5);
 
-let session: ProposalSessionData, answers: { questionId: string; optionId: string }[] = [], exits = 0, submits = 0;
+let session: ProposalSessionData, answers: { questionId: string; optionId: string }[] = [], submits = 0;
 let latest: ProposalData | undefined, startSignal: AbortSignal | undefined;
 const driver: AutoDriver = {
   async readAdmin() { return currentRun(ctx); },
-  async start(signal) { startSignal = signal; answers = []; return session = ok(createProposalSession(ctx)); },
+  async start(signal) { startSignal = signal; answers = []; return session = ok(createProposalSession(ctx).response); },
   answer(questionId, optionId) { answers.push({ questionId, optionId }); },
   async submit() {
     const request = { submissionId: `auto-${++submits}`, guestSessionId: session.session.id, expectedRevision: session.state.revision, answers };
@@ -34,20 +34,16 @@ const driver: AutoDriver = {
     assert.equal(ok(submitProposal(ctx, request).response).replayed, true, 'the normal same-ID path survives a lost response');
     return latest;
   },
-  async finish(id, revision) {
-    assert.equal(id, latest?.proposal.guestSessionId);
-    assert.equal(revision, currentRun(ctx).lifecycle.revision);
-    ok(staff(ctx, 'guest-left')); exits++;
-  },
   async wait(_ms, signal) { signal.throwIfAborted(); },
 };
 try {
   const first = new AbortController();
   await runAutoAnswers(config, settings, driver, first.signal, () => {});
   assert.equal(startSignal, first.signal, 'Stop must cancel waiting for the Guest welcome screen');
-  assert.equal(submits, 3); assert.equal(exits, 3);
+  assert.equal(submits, 3);
   assert.equal(currentRun(ctx).state.revision, 3);
-  assert.equal(currentRun(ctx).lifecycle.phase, 'ready');
+  assert.equal(currentRun(ctx).lifecycle.phase, 'awaiting_exit');
+  assert.equal(notReadyReason(currentRun(ctx)), undefined, 'completed guests need no Admin confirmation');
   const stopped = new AbortController(); stopped.abort();
   await assert.rejects(runAutoAnswers(config, settings, driver, stopped.signal, () => {}));
   assert.equal(submits, 3);
@@ -55,27 +51,24 @@ try {
   await assert.rejects(runAutoAnswers(config, settings, { ...driver, async submit() {
     const result = await driver.submit(); duringSubmit.abort(); return result;
   } }, duringSubmit.signal, () => {}));
-  assert.equal(submits, 4); assert.equal(exits, 3, 'stopping an in-flight submit must not auto-confirm exit');
+  assert.equal(submits, 4);
   assert.equal(currentRun(ctx).lifecycle.phase, 'awaiting_exit');
-  await assert.rejects(runAutoAnswers(config, settings, driver, new AbortController().signal, () => {}), /退出確認待ち/);
+  assert.equal(notReadyReason(currentRun(ctx)), undefined);
   ok(staff(ctx, 'guest-left'));
   await assert.rejects(runAutoAnswers(config, settings, { ...driver, async submit() { throw new Error('uncertain same-ID submission'); } }, new AbortController().signal, () => {}), /uncertain/);
-  assert.equal(exits, 3, 'network failure must stop before another guest or exit');
   ok(staff(ctx, 'guest-left'));
   await assert.rejects(runAutoAnswers(config, { ...settings, count: 1 }, { ...driver, async wait(ms) {
     if (ms > 1000) ok(staff(ctx, 'reset-city', 'RESET'));
   } }, new AbortController().signal, () => {}), /スタッフ/);
-  assert.equal(exits, 3, 'pending reset must not be executed by auto-answer');
   ok(staff(ctx, 'cancel-reset')); ok(staff(ctx, 'guest-left'));
   await assert.rejects(runAutoAnswers(config, { ...settings, count: 1 }, { ...driver, async submit() {
-    ok(createProposalSession(ctx)); // Another guest starts between preflight and our commit.
+    ok(createProposalSession(ctx).response); // Another guest starts between preflight and our commit.
     return driver.submit();
   } }, new AbortController().signal, () => {}), /スタッフ/);
-  assert.equal(exits, 3, 'never confirm exit while another guest has a reserved draft');
   ok(staff(ctx, 'guest-left'));
   const ready = currentRun(ctx);
   assert.equal(notReadyReason(ready), undefined);
-  ok(createProposalSession(ctx)); // A manual draft left open blocks the batch with a draft-specific reason.
+  ok(createProposalSession(ctx).response); // A manual draft left open blocks the batch with a draft-specific reason.
   await assert.rejects(runAutoAnswers(config, settings, driver, new AbortController().signal, () => {}), /回答中の草稿/);
   assert.match(notReadyReason({ ...ready, lifecycle: { ...ready.lifecycle, pendingReset: 'city' } })!, /リセット待ち/);
   ok(staff(ctx, 'guest-left'));

@@ -11,7 +11,7 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
   const { ctx } = exhibitionFixture();
   try {
     assertMeterQuestions(ctx.questions, CITY_AXES, METER_CONTRACTS);
-    const session = ok(createProposalSession(ctx));
+    const session = ok(createProposalSession(ctx).response);
     assert.ok(session.questions.every(question => question.options.every(option => !('effects' in option))), 'public API hides effects');
     const request = { submissionId: `matrix-${cases}`, guestSessionId: session.session.id, expectedRevision: 0,
       answers: answersForVotes(METER_CONTRACTS, votes) };

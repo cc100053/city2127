@@ -91,7 +91,7 @@ let count = 0;
 for (const votes of meterCombinations(METER_CONTRACTS)) {
   const { ctx } = exhibitionFixture();
   try {
-    const session = ok(createProposalSession(ctx));
+    const session = ok(createProposalSession(ctx).response);
     const outcome = submitProposal(ctx, { submissionId: `mesh-${count}`, guestSessionId: session.session.id, expectedRevision: 0,
       answers: answersForVotes(METER_CONTRACTS, votes) });
     const result = ok(outcome.response);
@@ -121,7 +121,7 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
     try {
       let firstRequest: ProposalRequest | undefined;
       for (const [ordinal, vote] of history.entries()) {
-        const session = ok(createProposalSession(ctx));
+        const session = ok(createProposalSession(ctx).response);
         const request = { submissionId: `path-${ordinal}`, guestSessionId: session.session.id, expectedRevision: ordinal,
           answers: answersForVotes(METER_CONTRACTS, Object.fromEntries(METER_CONTRACTS.map(m => [m.axis, vote])) as Record<string, -1 | 0 | 1>) };
         firstRequest ??= request;
@@ -157,7 +157,7 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
       assert.ok(Object.values(manager.getDiagnostics()).every(d =>
         [d.environmentDistrict, d.automationDistrict, d.sharingDistrict, d.concentrationDistrict].every(c => !c || c.activePulses === 0)));
       for (const [ordinal, vote] of history.entries()) {
-        const session = ok(createProposalSession(ctx));
+        const session = ok(createProposalSession(ctx).response);
         ok(submitProposal(ctx, { submissionId: `rebuild-${ordinal}`, guestSessionId: session.session.id, expectedRevision: ordinal,
           answers: answersForVotes(METER_CONTRACTS, Object.fromEntries(METER_CONTRACTS.map(m => [m.axis, vote])) as Record<string, -1 | 0 | 1>) }).response);
         ok(staff(ctx, 'guest-left'));

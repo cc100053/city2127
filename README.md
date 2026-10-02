@@ -50,10 +50,10 @@ npm run dev -- --port 5173
 | --- | --- | --- |
 | Guest | `http://127.0.0.1:8787/guest` | 觀眾完成四題、核對答案並提交一次提案。 |
 | City | `http://127.0.0.1:5173/?survey` | 展示共同塑造嘅 2127 台場；經 `ws://127.0.0.1:8787/ws` 即時接收變化。展覽城市要用呢個 `?survey` 網址。 |
-| Admin | `http://127.0.0.1:8787/admin` | 工作人員睇狀態、確認觀眾已離開、要求／取消 reset；只可喺運行 server 嗰部電腦以 localhost 開啟。 |
+| Admin | `http://127.0.0.1:8787/admin` | 工作人員睇狀態、中止未完成體驗、要求／取消 reset；只可喺運行 server 嗰部電腦以 localhost 開啟。 |
 | Monitor（可選） | `http://127.0.0.1:8787/monitor` | 文字方式檢查目前狀態同開頁後收到嘅提案／WebSocket 事件，唔係 3D 畫面。 |
 
-建議將 City 放展示屏、Guest 放輸入屏、Admin 留喺工作人員電腦。提案提交後 server 會等工作人員喺 Admin 按 **観客の退出を確認**，先容許下一位開始；如有待執行 reset，亦會喺確認離場時套用。City 頁面唔需要獨立 host 或 build；Tab 2 嘅 Vite 已供應。Guest／Admin／Monitor 由 Tab 1 嘅 server 同一個 origin 供應，所以 `npm run build` 必須先完成。Admin 嘅 **昼／夜／自動** 可將已連接嘅 City 固定喺 12:00／22:00，或恢復日夜循環；設定會保存，唔影響提案同分數。城市網址若有 `?hour`，該固定時間會優先。更新呢項功能後要重開 survey server（保留原本 SQLite），再刷新 Admin。SQLite 預設寫入 `survey/data/survey.sqlite`；重開 server 會沿用已有城市狀態。
+建議將 City 放展示屏、Guest 放輸入屏、Admin 留喺工作人員電腦。提案提交後 Guest 照常顯示結果同交接畫面；下一位撳 **はじめる** 就會自動交接，毋須 Admin 確認上一位離開。冇 reset 時會沿用累積城市；如有待執行 reset，會喺下一位開始時套用。Admin 嘅 **未完了の体験を終了** 只用作中止未完成問卷，並執行保留 reset。City 頁面唔需要獨立 host 或 build；Tab 2 嘅 Vite 已供應。Guest／Admin／Monitor 由 Tab 1 嘅 server 同一個 origin 供應，所以 `npm run build` 必須先完成。Admin 嘅 **昼／夜／自動** 可將已連接嘅 City 固定喺 12:00／22:00，或恢復日夜循環；設定會保存，唔影響提案同分數。城市網址若有 `?hour`，該固定時間會優先。更新呢項功能後要重開 survey server（保留原本 SQLite），再刷新 Admin。SQLite 預設寫入 `survey/data/survey.sqlite`；重開 server 會沿用已有城市狀態。
 
 要畀同一個可信 LAN 嘅另一部裝置開 Guest／City：server 用 `SURVEY_HOST=0.0.0.0 npm run server`（PowerShell：`$env:SURVEY_HOST='0.0.0.0'; npm run server`），root 用 `npm run dev -- --host 0.0.0.0 --port 5173`；以 host 電腦嘅 LAN IP 取代網址中嘅 `127.0.0.1`。兩個 port 都要可達；Admin 仍然只限 host 電腦嘅 localhost。預設 loopback 設定只供本機使用，LAN 並無 guest 身分驗證。若 server 改用其他 port，例如 `8790`，City 用 `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8790/ws`。
 
@@ -65,7 +65,7 @@ AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/P
 
 在 `survey/` 執行 `npm run dev:auto`，再開 `http://127.0.0.1:8788/guest?dev-auto`；城市 Vite 保持開住，連到 `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8788/ws`（Vite port 如不同請替換）。每次啟動建立新的獨立暫存 SQLite，terminal 會印出位置；不改動展覽的 `survey/data/survey.sqlite`，暫存資料保留供檢查。
 
-面板可選全 −1／0／+1、輪替混合、逐 Meter 指定或 seed 隨機，設定提案數並按 **自動回答を開始**。預設 10 份、seed 2127；沿用 Guest 草稿／確認／提交，每題 0.3 秒、結果 10 秒、交接 5 秒後自動確認本次 guest 離場。停止或錯誤不再建立下一份；已送出的請求仍會完成，未知結果沿用原本同 ID 重試。一般 `/guest` 不顯示面板。功能只限 localhost，server 必須開 `SURVEY_DEV_AUTO=1`（launcher 已設定）；遇到其他 guest、衝突或待 reset 會停止，不會自動 reset。
+面板可選全 −1／0／+1、輪替混合、逐 Meter 指定或 seed 隨機，設定提案數並按 **自動回答を開始**。預設 10 份、seed 2127；沿用 Guest 草稿／確認／提交，每題 0.3 秒、結果 10 秒、交接 5 秒後返開始畫面；下一份開始時自動交接。停止或錯誤不再建立下一份；已送出的請求仍會完成，未知結果沿用原本同 ID 重試。一般 `/guest` 不顯示面板。功能只限 localhost，server 必須開 `SURVEY_DEV_AUTO=1`（launcher 已設定）；遇到其他 guest、衝突或待 reset 會停止，不會自動 reset。
 
 **展覽前須移除，或將控制面板移到 Admin 並恢復工作人員確認離場。** 程式入口與[設計書](docs/EXHIBITION_MVP.md#development-auto-answer-and-meter-contract-tests--2026-09-30)已有 `DEV-ONLY` 移除／遷移註記。單獨跑 Meter 測試：`cd survey && npm run test:meters`；完整串接亦已加入 root／survey 的 `npm test`。
 

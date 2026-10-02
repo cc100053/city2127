@@ -66,7 +66,7 @@ try {
   let saved = exhibition;
   let frozenQuestionText = '';
   for (let i = 0; i < choiceIndices.length; i++) {
-    const session = ok(createProposalSession(migrated));
+    const session = ok(createProposalSession(migrated).response);
     frozenQuestionText ||= session.questions[0].text;
     const request = {
       submissionId: `after-migration-${i}`, guestSessionId: session.session.id, expectedRevision: i,

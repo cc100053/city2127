@@ -6,9 +6,9 @@
 
 「自動回答を開始」で、既存 Guest の radio／次へ／確認／送信フローを繰り返します。全 −1／0／+1、輪替混合、軸ごとの指定、seed ランダムを選べます。既定は10提案、seed 2127、各問0.3秒、結果10秒＋引継ぎ5秒、追加待ち0秒です。選択肢の順番ではなく、server の投票定義を使います。負の回答でも過去の集計を引き継ぐため、すぐ low になるとは限りません。
 
-localhost と `SURVEY_DEV_AUTO=1` の両方が必要です（launcher が設定）。通常の `/guest` は変更されません。自身の提案成功後だけ退出確認し、pending reset／他 guest／通信エラー／競合で停止します。停止後は草稿を手動で続けられます。通信結果が不明な場合は同じ申込IDで確認し、再読み込みしてもバッチは自動再開しません。
+localhost と `SURVEY_DEV_AUTO=1` の両方が必要です（launcher が設定）。通常の `/guest` は変更されません。次の質問開始時に自動交代し、pending reset／他 guest／通信エラー／競合で停止します。停止後は草稿を手動で続けられます。通信結果が不明な場合は同じ申込IDで確認し、再読み込みしてもバッチは自動再開しません。
 
-**展示前に削除するか、Admin へ移し、退出をスタッフが確認する動作に戻してください。** Guest の import/adapter、`autoAnswerPanel`／`autoAnswers`、dev config route/types、launcher に `DEV-ONLY` コメントがあります。[設計](../docs/EXHIBITION_MVP.md#development-auto-answer-and-meter-contract-tests--2026-09-30)も参照。
+**展示前に削除するか、Admin へ移してください。** Guest の import/adapter、`autoAnswerPanel`／`autoAnswers`、dev config route/types、launcher に `DEV-ONLY` コメントがあります。[設計](../docs/EXHIBITION_MVP.md#development-auto-answer-and-meter-contract-tests--2026-09-30)も参照。
 
 ### 再利用できる Meter テスト
 
@@ -117,8 +117,8 @@ WebSocket の `city-state-updated` には、仕様の `answerId` と `state` に
 
 - `/admin`、`/admin.html`、`/api/admin/*` は接続元が `127.0.0.1`、`::1`、`::ffff:127.0.0.1`（デュアルスタック socket 上の IPv4 loopback）のときだけ使えます。それ以外は 403 です。
 - 展示 PC 上で `http://127.0.0.1:8787/admin` を開きます。
-- **展示 lifecycle（2026-09-29, schema 4）**：`exhibition_lifecycle` 1 行が server 側の正本です。`ready` で proposal session を作ると `in_experience`、提案が commit されると `awaiting_exit` になります。質問の完了は「観客が去った」ことを意味しません。`awaiting_exit` 中は次の session 作成が 409 `lifecycle_blocked` になり、スタッフが `/admin` の **Confirm Guest Has Left** を押すと `ready` に戻ります（未完了の予約 session は expired）。
-- **Reset Current City** は `ready` なら即実行、観客がいる間は `pendingReset` に保留され、退出確認の transaction 内で実行されます。**Full Data Reset** は同じ規則で、`full` は `city` より優先します。`ready` では pending を持てません（DB CHECK）。**Cancel Pending Reset** で取り消せます。
+- **展示 lifecycle（2026-10-02 更新、schema 4）**：session 開始で `in_experience`、提案 commit で `awaiting_exit`。次の session 開始時に前の体験を自動終了するため、Admin の退出確認は不要です。通常は累積した街を引き継ぎます。**未完了の体験を終了** は `in_experience` の質問を中止する操作です（既存 `guest-left` API を使用）。
+- **Reset Current City** は `ready` なら即実行、それ以外は次の session 開始まで保留。**Full Data Reset** も同じで、`full` が `city` より優先し、**Cancel Pending Reset** で取り消せます。未完了の体験を Admin で終了した場合も保留 reset を実行します。Reset と次の予約は同一 transaction で保存し、commit 後に `run-reset` を配信します。`ready` は pending を持てません（DB CHECK）。
 - 現在の都市の参加人数 = active run の `guestCount`。総参加人数 = 最後の full reset 以降の `proposal_events` 数（watermark `total_since_sequence`）。City reset は総数を保持し、full reset は watermark を進めて 0 にします。どちらも履歴は削除しません。
 - すべての admin command は画面が最後に読んだ lifecycle `revision` を送り、別タブ・別画面からの古い操作を拒否します。Admin 画面は WebSocket event と 2 秒 polling で更新します。
 - City reset は `RESET` の入力（画面では確認ダイアログ）が必要です。他サイトからの POST を防ぐため、`Origin` ヘッダーがあるときはサーバー自身の origin と一致する必要があります。
@@ -187,3 +187,5 @@ npm run build
 `/admin` の **Day / Night / Auto** は、接続中の root `?survey` 都市を12:00 / 22:00 / 既存の日夜サイクルに切り替えます。`POST /api/admin/display-mode` は `{ "mode": "day" | "night" | "auto" }` のみ受け付け、Admin と同じ localhost・同一 origin の制限があります。`GET /api/admin/current-run` は `displayMode` を返します。
 
 Schema 5 の `display_settings` に保存し、再起動・city/full reset 後も保持します。初期値は Auto。WebSocket の既存 `city-state-snapshot` に optional `displayMode` を付けて変更時・再接続時に配信します。CityView、提案、スコア、都市 revision、lifecycle は変更しません。明示的な root `?hour` は優先され、standalone / module-swap はこの制御の対象外です。Auto は各 viewer の動作中の時計を再開します。更新後は既存 SQLite を保ったまま server を再起動し Admin を再読み込みしてください。
+
+2026-10-02: 開発用自動回答も通常の Guest と同じ開始時の自動交代を使用し、Admin の退出確認を送りません。結果10秒・交代5秒の表示と、停止・不明な送信結果の同ID復旧は維持します。

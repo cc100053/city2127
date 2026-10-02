@@ -8,7 +8,7 @@ import { applyProposalVotes, validateExhibitionState, voteForEffects } from '../
 import { viewOf } from './answerService.ts';
 import { transaction } from './database.ts';
 import { fail, type ServiceOutcome, type SurveyContext } from './context.ts';
-import { readLifecycle, setLifecycle } from './adminService.ts';
+import { finishGuest, readLifecycle, setLifecycle } from './adminService.ts';
 import { activeRun, CorruptStateError, num, readExhibitionSnapshot, str, toProposalRecord, writeExhibitionSnapshot } from './runStore.ts';
 
 export const PROPOSAL_RESERVATION_MS = 5 * 60 * 1000;
@@ -45,15 +45,16 @@ function failNoExhibition(): ApiResponse<never> {
   return fail('unsupported_version', 'The active run does not use exhibition algorithm version 2.');
 }
 
-export function createProposalSession(ctx: SurveyContext): ApiResponse<ProposalSessionData> {
+export function createProposalSession(ctx: SurveyContext): ServiceOutcome<ProposalSessionData> {
   return transaction(ctx.db, () => {
-    const current = currentExhibition(ctx);
-    if (!current) return failNoExhibition();
-    // The previous guest may still be looking at their city; staff must confirm they left first.
-    const lifecycle = readLifecycle(ctx.db);
-    if (lifecycle.phase === 'awaiting_exit') return fail('lifecycle_blocked', 'Waiting for staff to confirm the previous guest has left.', current.state);
-    if (lifecycle.phase === 'ready') setLifecycle(ctx, 'in_experience', 'none');
+    let current = currentExhibition(ctx);
+    if (!current) return { response: failNoExhibition() };
     const set = validateExhibitionQuestionSet(ctx.questions);
+    // Starting the next questionnaire is the handoff; no Admin confirmation is required.
+    const lifecycle = readLifecycle(ctx.db);
+    const handoff = lifecycle.phase === 'awaiting_exit' ? finishGuest(ctx, lifecycle) : undefined;
+    if (handoff) current = currentExhibition(ctx)!;
+    if (lifecycle.phase !== 'in_experience') setLifecycle(ctx, 'in_experience', 'none');
     const now = ctx.now(), createdAt = now.toISOString();
     const session: ProposalSession = {
       id: ctx.newId(), runId: current.runId, questionSetVersion: set.version,
@@ -63,7 +64,7 @@ export function createProposalSession(ctx: SurveyContext): ApiResponse<ProposalS
     ctx.db.prepare(`INSERT INTO proposal_sessions (id, run_id, question_set_version, question_ids_json, status, created_at, expires_at)
       VALUES (?, ?, ?, ?, 'reserved', ?, ?)`)
       .run(session.id, session.runId, session.questionSetVersion, JSON.stringify(session.questionIds), session.createdAt, session.expiresAt);
-    return { ok: true, data: { session, questions: set.questions.map(toPublicQuestion), state: current.state } };
+    return { response: { ok: true as const, data: { session, questions: set.questions.map(toPublicQuestion), state: current.state } }, event: handoff?.event };
   });
 }
 
@@ -203,7 +204,7 @@ export function submitProposal(ctx: SurveyContext, body: unknown): ServiceOutcom
         JSON.stringify(normalizedVotes), current.state.revision, next.revision, JSON.stringify(current.state), JSON.stringify(next), submittedAt);
     ctx.db.prepare("UPDATE proposal_sessions SET status = 'submitted', submitted_at = ? WHERE id = ?").run(submittedAt, session.id);
     writeExhibitionSnapshot(ctx.db, next);
-    // The guest keeps viewing the result; any pending reset waits for staff to confirm they left.
+    // Preserve the result; any pending reset waits until the next guest starts.
     setLifecycle(ctx, 'awaiting_exit', lifecycle.pendingReset);
 
     const row = ctx.db.prepare('SELECT * FROM proposal_events WHERE id = ?').get(request.submissionId);

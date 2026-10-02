@@ -297,3 +297,7 @@ User requested Day/Night buttons on Admin. Implemented Day (12:00), Night (22:00
 ## Development verification addition — 2026-09-30
 
 Survey auto-answer adds a localhost-only Guest development panel and scratch database launcher, with reusable answer→Meter→model tests. This is testing tooling, not a new visual direction or a change to Odaiba geometry/materials. It preserves the existing 3-second city transitions and 10/5-second result/handoff. Remove the panel or move it to Admin before exhibition. Current acceptance evidence is recorded separately in [VALIDATION](VALIDATION.md#survey-meter-tests-and-development-auto-answer--2026-09-30) and the [task handoff](handoffs/survey-auto-tests.md); earlier captures do not verify this addition.
+
+## Guest 自動交接更新 — 2026-10-02
+
+此決定取代早前必須由 Admin 確認觀眾離開的要求。下一位開始四題問卷時，server 自動完成交接；通常沿用累積城市，有保留 reset 則先執行再開始。Admin 只保留中止未完成體驗操作。結果約10秒、交接約5秒及略過按鈕沿用。詳見 [交接 handoff](handoffs/remove-guest-exit-lock.md)。

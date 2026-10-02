@@ -437,9 +437,9 @@ function errorText(code: string, detail: string) {
     already_answered: 'この予約はすでに送信済みです。',
     revision_conflict: '街の集計が更新されています。現在の状態を確認してください。',
     bad_request: '提案を確認できませんでした。草稿を見直してください。',
-    lifecycle_blocked: '前の方の体験がまだ終了していません。スタッフが確認するまで少しお待ちください。',
+    lifecycle_blocked: 'この体験の提案はすでに記録されています。はじめる画面に戻ってください。',
   };
-  // An expected wait, not a fault: the server's English detail would only confuse guests.
+  // Keep duplicate-experience feedback in the guest page's language.
   if (code === 'lifecycle_blocked') return title[code];
   return `${title[code] ?? (code === 'internal_error' ? '送信結果を確認できません。再試行できます。' : `通信エラー（${code}）`)} ${detail}`;
 }
