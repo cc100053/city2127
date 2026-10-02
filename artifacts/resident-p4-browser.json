@@ -1,0 +1,42 @@
+{
+  "browser": "154.0.8037.93",
+  "viewport": {
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "deviceScaleFactor": 1
+  },
+  "checkedBase": "ab9dbba094dcce78b7afed17f0b2b5b39d79f320",
+  "exceptions": [],
+  "consoleErrors": [
+    {
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:56384/favicon.ico"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:5173/favicon.ico"
+    },
+    {
+      "text": "Failed to load resource: net::ERR_FAILED",
+      "url": "http://127.0.0.1:56384/api/proposals"
+    },
+    {
+      "text": "WebSocket connection to 'ws://127.0.0.1:56384/ws' failed: Error in connection establishment: net::ERR_INTERNET_DISCONNECTED",
+      "url": "http://127.0.0.1:5173/src/surveyView.ts?t=1790944901689"
+    }
+  ],
+  "failures": [
+    {
+      "url": "http://127.0.0.1:56384/api/proposals",
+      "error": "net::ERR_FAILED"
+    }
+  ],
+  "badResponses": [],
+  "leaseClockJumpsMs": [
+    16000,
+    300000
+  ],
+  "guestCountBeforeReset": 3
+}

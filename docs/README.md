@@ -10,7 +10,7 @@
 | [EXHIBITION_SPEC](EXHIBITION_SPEC.md) | 場地、產品契約、累積／變化、當前決策及尚待驗收事項 |
 | [PROJECT](PROJECT.md) | 現行模組、source/data/render flow、資源 lifecycle |
 | [RESIDENT_COPY](RESIDENT_COPY.md) | P1 日文居民文案與接入條件；P2文案／P3結果接入；設施增加仍須符合實際證據 |
-| [RESIDENT_EXPERIENCE_PLAN](RESIDENT_EXPERIENCE_PLAN.md) | 居民雙屏體驗 P1–P5 計劃、交付及驗收；P1–P3已實作，P4／P5待驗收 |
+| [RESIDENT_EXPERIENCE_PLAN](RESIDENT_EXPERIENCE_PLAN.md) | 居民雙屏體驗 P1–P5 計劃、交付及驗收；P1–P3已實作，P4軟件驗證通過，P5待實機驗收 |
 | [ART](ART.md)／[CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) | 實作美術規則／視覺與世界觀 authority |
 | [VALIDATION](VALIDATION.md) | 今日可執行 checks、dated evidence 入口；不複製全部 handoff |
 | [BLENDER](BLENDER.md) | 素材 source/export/placement 及每台工作站的 MCP 設定契約 |
@@ -67,6 +67,7 @@
 | [resident-experience-plan](handoffs/resident-experience-plan.md) | resident-experience-plan — Two-screen resident experience planning |
 | [resident-experience-p2](handoffs/resident-experience-p2.md) | resident-experience-p2 — Resident copy and two-screen presentation |
 | [resident-experience-p3](handoffs/resident-experience-p3.md) | Actual carrier results and coordinated reading slots |
+| [resident-experience-p4](handoffs/resident-experience-p4.md) | Software and two-screen acceptance |
 | [remove-guest-exit-lock](handoffs/remove-guest-exit-lock.md) | remove-guest-exit-lock — Automatic next-guest handoff |
 | [root-causal-panel](handoffs/root-causal-panel.md) | root-causal-panel — Causal panel in the root Shibuya survey mode (step 3) |
 | [root-survey-atmosphere](handoffs/root-survey-atmosphere.md) | root-survey-atmosphere — Survey drives the root Shibuya scene (steps 1–2) |

@@ -7,7 +7,8 @@ const cityURL = process.env.CITY2127_CITY_URL ?? 'http://127.0.0.1:5173';
 const browser = await chromium.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true });
 const options = { viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 };
 const ca = await browser.newContext(options), cb = await browser.newContext(options), display = await browser.newContext(options);
-const a = await ca.newPage(), b = await cb.newPage(), city = await display.newPage(), admin = await display.newPage();
+let a = await ca.newPage(), b = await cb.newPage();
+const city = await display.newPage(), admin = await display.newPage();
 const errors = [];
 for (const page of [a, b, city, admin]) page.on('pageerror', error => errors.push(error.message));
 admin.on('dialog', dialog => dialog.accept());
@@ -55,10 +56,19 @@ try {
   await Promise.all([answer(a), answer(b, 0)]);
   // Lose B's response after the real commit. Reload must reuse its exact pending request.
   await b.route('**/api/proposals', async route => { await route.fetch(); await route.abort('failed'); }, { times: 1 });
+  // Both submit buttons fire together; a short network delay exercises the formerly broken B-first order.
+  await a.route('**/api/proposals', async route => {
+    await new Promise(resolve => setTimeout(resolve, 150)); await route.continue();
+  }, { times: 1 });
+  const replyA = a.waitForResponse(r => r.url().endsWith('/api/proposals') && r.request().method() === 'POST');
   await Promise.all([a.locator('[data-auto-action=submit]').click(), b.locator('[data-auto-action=submit]').click()]);
-  await screen(a, 'result'); await b.getByRole('button', { name: '記録を確認する' }).waitFor();
+  assert.ok((await (await replyA).json()).ok);
+  await b.getByRole('button', { name: '記録を確認する' }).waitFor();
   assert.equal((await read('/api/city-view')).guestCount, 2);
-  await b.reload(); await screen(b, 'result');
+  await b.reload();
+  // Either station can commit first. Check identities before waiting for the final City,
+  // otherwise the earlier station's reading slot may already have finished on reload.
+  for (const page of [a, b]) await page.waitForFunction(() => ['waiting', 'result'].includes(document.querySelector('#app')?.dataset.screen));
   const combined = await read('/api/city-view');
   assert.equal(combined.guestCount, 2);
   assert.deepEqual(combined.recentProposals.map(p => p.stationId).sort(), ['A', 'B']);
@@ -71,9 +81,12 @@ try {
   assert.ok(displays[1].at - displays[0].at >= 9950, `separate reading slots: ${displays[1].at - displays[0].at} ms`);
   await a.screenshot({ path: 'artifacts/resident-p2-two-stations-a.png' }); await b.screenshot({ path: 'artifacts/resident-p2-two-stations-b.png' });
   await city.screenshot({ path: 'artifacts/resident-p2-two-stations-city.png' });
+  // Exercise next-start while the later station is still protected, whichever committed first.
+  if (ownA.ordinal > ownB.ordinal) [a, b] = [b, a];
+  const early = combined.recentProposals[0], late = combined.recentProposals[1];
   await finish(a); await start(a);
   const afterA = await read('/api/admin/current-run');
-  assert.equal(afterA.stations.find(s => s.stationId === 'B')?.sessionId, ownB.guestSessionId);
+  assert.equal(afterA.stations.find(s => s.stationId === late.stationId)?.sessionId, late.guestSessionId);
   await a.locator('input[type=radio]').first().check(); await a.locator('[data-auto-action=next]').click();
   await a.reload(); await screen(a, 'question');
   assert.equal(await a.locator('.guest-progress-copy').textContent(), '質問 2 / 4');
@@ -102,7 +115,7 @@ try {
   // Named Admin cancellation leaves the peer's draft usable and Guest sees the cancellation.
   await Promise.all([start(a), start(b)]);
   await Promise.all([answer(a), answer(b)]);
-  await admin.getByRole('button', { name: 'A の未完了の体験を終了', exact: true }).click();
+  await admin.getByRole('button', { name: `${early.stationId} の未完了の体験を終了`, exact: true }).click();
   await screen(a, 'abandoned');
   assert.equal(await b.locator('#app').getAttribute('data-screen'), 'review');
   await b.locator('[data-auto-action=submit]').click(); await screen(b, 'result');
@@ -110,5 +123,5 @@ try {
   await admin.screenshot({ path: 'artifacts/resident-p2-two-stations-admin.png' });
   await city.reload(); await checkCity(await read('/api/city-view'));
   assert.deepEqual(errors, []);
-  console.log(`PASS browser: two isolated clients, simultaneous submit/lost-response reload counted once, own results, ${Math.round(displays[1].at - displays[0].at)} ms display order, draft reload, independent next Guest, reset draining/admission/counts, targeted Admin cancellation and actual City/reload; no page exceptions.`);
+  console.log(`PASS browser: two isolated clients, simultaneous submit/lost-response reload counted once, own results, ${Math.round(displays[1].at - displays[0].at)} ms display order (${early.stationId} then ${late.stationId}), draft reload, independent next Guest, reset draining/admission/counts, targeted Admin cancellation and actual City/reload; no page exceptions.`);
 } finally { await browser.close(); }

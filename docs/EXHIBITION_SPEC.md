@@ -21,7 +21,7 @@
 
 Root 用固定360px卡片顯示背景、當前實際 focal 設施及位置；一個標題、最多兩句。開場 identity 取 P1 內文首兩句。日常卡本機每12秒輪換；[P3](handoffs/resident-experience-p3.md) 的每份live結果保留10秒，0–3秒身份／位置／原有過渡，3–10秒一項個人偏好＋一項共同城市實際結果，再恢復日常卡。Root比較實際effective carrier targets／可見配對及slot分布；同分不同配置、只有方向改變、完全維持分開處理，seed本身或隱藏配對不算可見變化。Focal count只描述該地點，district-only用實際區域及配置調整文案；沒有前後證據只確認保存，不將個人答案當共同城市變化方向。Snapshot/reset/Undo即時替換，reload不重播舊結果；照明-only snapshot不打斷有效queue。
 
-完整 [P1–P5計劃](RESIDENT_EXPERIENCE_PLAN.md) 保留；P1–P3已實作，P3軟件排程檢查不代表10秒足夠閱讀。P4全面軟件流程／P5與S5、實際iPad／理解程度／閱讀時間仍待驗收。
+完整 [P1–P5計劃](RESIDENT_EXPERIENCE_PLAN.md) 保留；P1–P3已實作，P3軟件排程檢查不代表10秒足夠閱讀。[P4全面軟件流程](handoffs/resident-experience-p4.md) 已通過 native／scratch Chrome browser 驗證；P5與S5、實際iPad／理解程度／閱讀時間仍待驗收。
 
 每位觀眾回答同一組四題，核對後提交**一份完整提案**。四題沒有逐題改城；下一位繼承累積結果。問題／option ids 與 effects 由 [正式 JSON](../survey/src/survey/questions.exhibition.json) 定義；保留日文產品文案。
 
