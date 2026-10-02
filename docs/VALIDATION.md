@@ -76,6 +76,7 @@ Measure current Odaiba on the stated real GPU, ideally the exhibition machine at
 | DEV-only runner / pipeline | [auto-tests](handoffs/survey-auto-tests.md); temporary exhibition removal still required |
 | Documentation consolidation | [this task](handoffs/odaiba-docs-consolidation.md); prose/link verification, not new runtime acceptance |
 | Resident narrative P1 (2026-10-02) | [copy](RESIDENT_COPY.md), [handoff](handoffs/resident-copy-p1.md); documentation only, new screen/copy wiring and reading-time/iPad acceptance remain untested |
+| Resident experience plan (2026-10-02) | [P1–P5 plan](RESIDENT_EXPERIENCE_PLAN.md), [handoff](handoffs/resident-experience-plan.md); documentation evidence only; proposed P2–P5 acceptance is not a passing runtime/device check |
 
 **Still open:** S5 full exhibition acceptance, actual input hardware, exhibition-day reset/recovery policy, sustained runtime/device testing. Use current browser procedures above, record a named owner and a new task handoff; do not reopen old Shibuya tasks.
 
