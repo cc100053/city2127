@@ -59,6 +59,14 @@ npm run dev -- --port 5173
 
 Admin 新增 **直前の提案を取り消す**：只可撤銷最後一份已完成提案，而且必須喺下一位開始前使用。會還原提交前城市同人數，原提案保留並標記撤銷；Guest 可重新開始四題。更新後重新 build／啟動 survey server，再刷新 City／Guest／Admin；既有 SQLite 自動升至 schema 6，毋須刪除資料。
 
+### 兩部裝置同時作答（2026-10-02）
+
+兩部答題裝置用同一個 LAN／同一個 survey server，各開 `http://<展覽電腦 LAN IP>:8787/guest?station=A` 同 `/guest?station=B`。展覽電腦按上方 LAN 指示啟動 server；如果 City 留喺展覽電腦，root Vite 可維持 loopback。每站有獨立草稿、四題、結果同交接，一站完成唔會清掉另一站；server 按收到提交嘅順序累積，重試只計一次。每站同時只接受一個體驗；同一站唔好重複開多個頁面。原本 `/guest` 單站流程保留，但未完成體驗期間唔可混用單站／A/B。
+
+城市 live 變化依記錄順序相隔至少3秒，標示提案編號同 A/B；排隊嘅 Guest 顯示已保存、等待展示，再顯示自己嘅結果10秒／交接5秒。City 重新連接會直接復原最新完整狀態。A/B reset 會暫停新開始，等兩站問卷及結果／交接完成先執行；Admin 可單獨中止 **A／B の未完了の体験を終了**。離線站會喺問卷5分鐘期限，或已提交結果租期（展示開始後15秒）結束後釋放；Admin 無須確認離場。City reset 保留總人數，full reset 清零但保留歷史。
+
+更新後重新 build／啟動 survey server，同時刷新 Guest／City／Admin；SQLite 自動升至 schema 7，保留既有城市及歷史。實作及驗證見 [雙裝置交接](docs/handoffs/two-guest-devices.md)。
+
 想單獨睇城市原型，開 `http://127.0.0.1:5173/` 即可，無須 Tab 1；呢個模式唔會接收觀眾提案。`module-swap/` 係保留嘅 v1 因果示範，唔係展覽城市，亦唔接受 v2 CityView。
 
 AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/PROJECT.md) · [驗收與交接流程](docs/VALIDATION.md) · [展覽方向與 Plan 02 紀錄](docs/PLAN02.md)。

@@ -228,6 +228,7 @@ export function toProposalRecord(row: Row): ProposalRecord {
   const beforeLayout = deriveExhibitionLayout(before.scores), afterLayout = deriveExhibitionLayout(after.scores);
   return {
     id: str(row, 'id'), runId, guestSessionId: str(row, 'guest_session_id'), ordinal: after.guestCount,
+    ...(row.station_id ? { stationId: str(row, 'station_id') as 'A' | 'B', displayAt: str(row, 'display_at') } : {}),
     questionSetVersion: num(row, 'question_set_version'), algorithmVersion: 2, answers, votes,
     revisionBefore, revisionAfter, submittedAt, beforeScores: before.scores, afterScores: after.scores,
     beforeLayout, afterLayout, cityChanges: exhibitionLayoutChanges(beforeLayout, afterLayout),

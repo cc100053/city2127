@@ -9,7 +9,7 @@ const app = document.querySelector<HTMLElement>('#app')!;
 app.classList.add('guest');
 document.body.classList.add('guest-page');
 
-type Screen = 'welcome' | 'starting' | 'question' | 'review' | 'submitting' | 'result' | 'handoff' | 'abandoned';
+type Screen = 'welcome' | 'starting' | 'question' | 'review' | 'submitting' | 'waiting' | 'result' | 'handoff' | 'abandoned';
 type GuestRecovery = {
   session: ProposalSessionData;
   choices: [string, string][];
@@ -17,7 +17,10 @@ type GuestRecovery = {
   screen: 'question' | 'review' | 'result';
   pendingRequest?: ProposalRequest;
 };
-const recoveryKey = 'city2127.guest-draft.v2';
+const stationParam = new URLSearchParams(location.search).get('station');
+const stationId = stationParam === 'A' || stationParam === 'B' ? stationParam : undefined;
+const recoveryKey = `city2127.guest-draft.v2${stationId ? `.${stationId}` : ''}`;
+let resultReadyAt = 0;
 let screen: Screen = 'welcome';
 let session: ProposalSessionData | undefined;
 let draft = new Map<string, string>();
@@ -55,8 +58,8 @@ function clearRecovery() {
 }
 
 function persistRecovery() {
-  if (!session || !['question', 'review', 'submitting', 'result'].includes(screen)) return;
-  const progressScreen = screen === 'result' ? 'result' : screen === 'question' ? 'question' : 'review';
+  if (!session || !['question', 'review', 'submitting', 'waiting', 'result'].includes(screen)) return;
+  const progressScreen = screen === 'result' || screen === 'waiting' ? 'result' : screen === 'question' ? 'question' : 'review';
   const recovery: GuestRecovery = {
     session, choices: [...draft], questionIndex, screen: progressScreen, pendingRequest,
   };
@@ -143,7 +146,7 @@ function page(title: string, eyebrow: string, ...content: (HTMLElement | string)
   app.dataset.screen = screen;
   app.replaceChildren(
     el('div', { class: 'guest-frame' },
-      el('header', { class: 'guest-masthead' }, el('span', {}, '2127 · ODAIBA'), el('span', {}, '共同のまちづくり')),
+      el('header', { class: 'guest-masthead' }, el('span', {}, '2127 · ODAIBA'), el('span', {}, stationId ? `ステーション ${stationId} · 共同のまちづくり` : '共同のまちづくり')),
       el('section', { class: 'guest-screen' },
         el('p', { class: 'guest-eyebrow' }, eyebrow),
         el('h1', { tabindex: '-1' }, title),
@@ -199,13 +202,16 @@ function renderWelcome(focus = false) {
 
 async function startSession(keepDraft = false) {
   if (busy) return;
+  if (stationParam !== null && !stationId) {
+    notice = { role: 'alert', text: 'ステーション A または B のリンクを開いてください。' }; renderWelcome(true); return;
+  }
   const previous = keepDraft ? draft : new Map<string, string>();
   clearIdleTimers();
   screen = 'starting';
   busy = true;
   notice = undefined;
   renderWelcome();
-  const result = await api<ProposalSessionData>('/api/proposal-sessions', {});
+  const result = await api<ProposalSessionData>('/api/proposal-sessions', stationId ? { stationId } : {});
   busy = false;
   if (!result.ok) {
     screen = 'welcome';
@@ -247,7 +253,7 @@ async function restoreRecovery(recovery: GuestRecovery) {
       const question = session!.questions.find(item => item.id === questionId);
       return question?.options.some(option => option.id === optionId) ?? false;
     }));
-    conflictState = checked.data.state.revision > initialState.revision ? checked.data.state : undefined;
+    conflictState = !stationId && checked.data.state.revision > initialState.revision ? checked.data.state : undefined;
     if (conflictState) {
       lastErrorCode = 'revision_conflict';
       notice = { role: 'status', text: '草稿を復元しました。回答中に街の集計が更新されています。最新のMeterを確認してから記録してください。' };
@@ -409,6 +415,8 @@ async function submitProposal() {
       || (result.ok && result.data.proposal.id === undoneSubmissionId)) return showUndone();
   if (result.ok) {
     saved = result.data;
+    if (saved.experienceFinished) { void nextGuest(); return; }
+    resultReadyAt = performance.now() + (saved.displayWaitMs ?? 0);
     conflictState = undefined;
     lastErrorCode = undefined;
     notice = undefined;
@@ -444,7 +452,7 @@ function errorText(code: string, detail: string) {
     lifecycle_blocked: 'この体験の提案はすでに記録されています。はじめる画面に戻ってください。',
   };
   // Keep duplicate-experience feedback in the guest page's language.
-  if (code === 'lifecycle_blocked') return title[code];
+  if (code === 'lifecycle_blocked') return stationId ? 'このステーションは体験中、またはリセット待ちです。少し待ってから開始してください。' : title[code];
   return `${title[code] ?? (code === 'internal_error' ? '送信結果を確認できません。再試行できます。' : `通信エラー（${code}）`)} ${detail}`;
 }
 
@@ -491,6 +499,16 @@ function renderCityChanges(proposal: ProposalRecord) {
 
 function renderResult(focus = true) {
   if (!saved) return renderWelcome(focus);
+  const wait = resultReadyAt - performance.now();
+  if (wait > 0) {
+    screen = 'waiting';
+    page('提案を記録しました', '街への反映を待っています',
+      el('p', { class: 'guest-lead', role: 'status' }, `提案 #${saved.proposal.ordinal} · 他の提案に続いて展示します。回答は保存済みです。`));
+    clearTimeout(flowTimer);
+    flowTimer = window.setTimeout(() => { screen = 'result'; renderResult(); }, wait);
+    if (focus) focusTitle();
+    return;
+  }
   const { proposal, state, replayed } = saved;
   page('この提案を記録しました', '街への反映',
     el('div', { class: 'guest-result-summary' },
@@ -518,12 +536,23 @@ function renderHandoff() {
   screen = 'handoff';
   page('次の方へどうぞ', `提案 #${saved.proposal.ordinal} を記録しました`,
     el('p', { class: 'guest-lead' }, '街はこのまま次の方へ引き継がれます。'),
+    ...noticeNodes(),
     el('div', { class: 'guest-actions' }, action('はじめる画面へ', nextGuest, true)));
   focusTitle();
   flowTimer = window.setTimeout(nextGuest, HANDOFF_MS);
 }
 
-function nextGuest() {
+async function nextGuest() {
+  if (stationId && session) {
+    if (busy) return;
+    busy = true;
+    const ended = await api<{ ended: true }>(`/api/proposal-sessions/${encodeURIComponent(session.session.id)}/end`, {});
+    busy = false;
+    if (!ended.ok) {
+      notice = { role: 'alert', text: '街への反映が完了するまでお待ちください。通信を確認して、もう一度お試しください。' };
+      renderHandoff(); return;
+    }
+  }
   clearIdleTimers();
   clearTimeout(flowTimer);
   clearRecovery();
@@ -539,6 +568,7 @@ function nextGuest() {
 }
 
 function abandonDraft() {
+  if (stationId && session) void api(`/api/proposal-sessions/${encodeURIComponent(session.session.id)}/end`, {});
   clearIdleTimers();
   clearRecovery();
   session = undefined;
@@ -562,13 +592,13 @@ function renderCurrent(focus = true) {
   if (screen === 'welcome' || screen === 'starting') return renderWelcome(focus);
   if (screen === 'question') return renderQuestion(focus);
   if (screen === 'review' || screen === 'submitting') return renderReview(focus);
-  if (screen === 'result') return renderResult(focus);
+  if (screen === 'result' || screen === 'waiting') return renderResult(focus);
   if (screen === 'handoff') return renderHandoff();
   renderAbandoned();
 }
 
-function showUndone() {
-  nextGuest();
+async function showUndone() {
+  await nextGuest();
   notice = { role: 'status', text: '管理者が直前の提案を取り消し、変更前の街に戻しました。もう一度回答するには「はじめる」を押してください。' };
   renderWelcome(true);
 }
@@ -582,6 +612,16 @@ connectEvents(event => {
 const recovery = readRecovery();
 if (recovery) void restoreRecovery(recovery);
 else renderWelcome();
+
+if (stationId) setInterval(async () => {
+  if (!session || busy || pendingRequest || (screen !== 'question' && screen !== 'review')) return;
+  const id = session.session.id;
+  const checked = await api<ProposalSessionData>(`/api/proposal-sessions/${encodeURIComponent(id)}`);
+  if (session?.session.id === id && !busy && !pendingRequest && !checked.ok && checked.error.code === 'session_expired') {
+    abandonDraft();
+    app.querySelector('.guest-lead')!.textContent = 'この草稿の体験は終了しました。提案は記録されていません。新しく開始できます。';
+  }
+}, 2000);
 
 // DEV-ONLY: remove this import/adapter, or move the controls to Admin before exhibition.
 // The runner uses the same radio events, form submission, draft and idempotent submit path.

@@ -56,6 +56,7 @@ export type HealthData = { status: 'ok'; runId: string; revision: number; questi
 export type ProposalSessionStatus = 'reserved' | 'submitted' | 'expired';
 export type ProposalSession = {
   id: string;
+  stationId?: 'A' | 'B';
   runId: string;
   questionSetVersion: number;
   questionIds: string[];
@@ -71,13 +72,14 @@ export type ProposalRequest = {
   expectedRevision: number;
   answers: { questionId: string; optionId: string }[];
 };
-export type ProposalData = { proposal: ProposalRecord; state: ExhibitionState; replayed: boolean };
+export type ProposalData = { proposal: ProposalRecord; state: ExhibitionState; replayed: boolean; displayWaitMs?: number; experienceFinished?: boolean };
 
 export type RunSummary = { id: string; status: 'active' | 'ended'; algorithmVersion: 1 | 2; startedAt: string; endedAt: string | null };
 /**
  * Installation lifecycle, persisted server-side. Finishing the questionnaire moves `in_experience` to
  * `awaiting_exit` while the result is displayed. Starting the next questionnaire automatically ends
  * that experience and applies any `pendingReset` (`full` supersedes `city`); `ready` holds none.
+ * A/B stations aggregate their independent experiences: a reset stops admission and drains both.
  */
 export type LifecyclePhase = 'ready' | 'in_experience' | 'awaiting_exit';
 export type PendingReset = 'none' | 'city' | 'full';
@@ -91,7 +93,7 @@ export type LifecycleStatus = {
 };
 export type LifecycleCommand = 'reset-city' | 'full-reset' | 'cancel-reset' | 'guest-left' | 'undo-proposal';
 /** `confirmation` is required for reset-city (`RESET`) and full-reset (`FULL RESET`). */
-export type LifecycleRequest = { command: LifecycleCommand; expectedRevision: number; confirmation?: string; proposalId?: string };
+export type LifecycleRequest = { command: LifecycleCommand; expectedRevision: number; confirmation?: string; proposalId?: string; guestSessionId?: string };
 export type LifecycleData = {
   lifecycle: LifecycleStatus;
   state: CitySurveyState | ExhibitionState;
@@ -112,6 +114,7 @@ export type AdminCurrentRun = {
   reservedSessions: number;
   answeredSessions: number;
   undoProposal: { id: string; ordinal: number } | null;
+  stations: { stationId: 'A' | 'B'; sessionId: string; status: 'reserved' | 'submitted' }[];
 };
 export type AdminEvent = { id: number; runId: string; createdAt: string } & (
   | { type: 'run-reset'; detail: { nextRunId: string; scope: 'city' | 'full' } }
@@ -137,6 +140,7 @@ export type ServerEvent =
   | {
       type: 'city-state-updated';
       submissionId: string;
+      displayWaitMs?: number;
       state: ExhibitionState;
       proposal: ProposalRecord;
       view: CityView;

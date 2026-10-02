@@ -1,5 +1,13 @@
 # Exhibition questionnaire — アンケート状態管理 MVP
 
+## A/B 同時回答（2026-10-02、schema 7）
+
+2台で `/guest?station=A` と `/guest?station=B` を開き、同じ server に接続します。各ステーションの草稿・四問・結果・交代は独立し、提案は受信順に最新の街へ累積します。旧 revision による再確認は不要、未来 revision は拒否します。申込IDの再送は一度だけ加算します。各ステーション同時1体験、既存の単独 `/guest` とは体験中に混在できません。
+
+記録済み提案の展示開始を3秒以上の間隔で保存し、Guest は `displayWaitMs` の待機後に結果10秒／交代5秒を表示します。結果復元は同じ申込IDを再送し、終了済み体験は開始に戻ります。リセットは新規開始を停止し、両体験終了後に実行します。`POST /api/proposal-sessions/:id/end` はそのステーションだけを終了し、未展示の3秒変化は飛ばせません。Admin の `guest-left` は A/B では `guestSessionId` が必須、未完了の指定草稿だけを破棄します。current-run の `stations` は各ステーションの session ID／状態です。
+
+server の1秒周期で通信断も解放します：草稿は開始から5分、提出済み結果は予定展示から15秒（結果復元時に租期更新）。リセット／終了情報は SQLite に保存し、再起動後も有効です。schema 7 は既存データを保持します。LAN 設定は[起動ガイド](../README.md)、コード／検証は[handoff](../docs/handoffs/two-guest-devices.md)を参照。`npm test` にA/B transaction／HTTP／WebSocket／再起動／reset テストを追加しました。
+
 ## 管理者専用 Undo（2026-10-02）
 
 Admin の **直前の提案を取り消す** は、次の Guest が開始する前だけ利用できます。元の提案を削除せず取消済みとして残し、街の全状態・配置順・参加人数を変更前に戻します。Guest の結果は開始画面に戻り、再回答は新しい四問の体験です。保留中のリセットは次の開始まで保留されます。既存 DB は起動時に schema 6 に移行します。survey を build／再起動し、City／Guest／Admin を更新してください。

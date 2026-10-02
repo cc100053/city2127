@@ -33,6 +33,7 @@ export function currentRun(ctx: SurveyContext): AdminCurrentRun {
     : sessionCounts(ctx, run.id);
   return {
     run,
+    stations: stationSessions(ctx),
     undoProposal: undoableProposal(ctx),
     displayMode: readDisplayMode(ctx.db),
     lifecycle: readLifecycle(ctx.db),
@@ -80,6 +81,36 @@ export function setLifecycle(ctx: SurveyContext, phase: LifecyclePhase, pendingR
     .run(phase, pendingReset, ctx.now().toISOString());
 }
 
+export function isStationMode(ctx: SurveyContext): boolean {
+  return Boolean(ctx.db.prepare("SELECT station_id FROM proposal_sessions WHERE run_id = (SELECT id FROM runs WHERE status = 'active') ORDER BY rowid DESC LIMIT 1").get()?.station_id);
+}
+
+export function stationSessions(ctx: SurveyContext): AdminCurrentRun['stations'] {
+  return ctx.db.prepare(`SELECT id, station_id, status FROM proposal_sessions
+    WHERE run_id = (SELECT id FROM runs WHERE status = 'active')
+      AND station_id IS NOT NULL AND ended_at IS NULL AND status IN ('reserved', 'submitted') ORDER BY station_id`)
+    .all().map(row => ({ stationId: str(row, 'station_id') as 'A' | 'B', sessionId: str(row, 'id'), status: str(row, 'status') as 'reserved' | 'submitted' }));
+}
+
+/** Call inside a transaction. Leases let a disconnected station eventually release a queued reset. */
+export function syncStations(ctx: SurveyContext): ServiceOutcome<LifecycleData> | undefined {
+  if (!isStationMode(ctx)) return;
+  const now = ctx.now().toISOString();
+  ctx.db.prepare(`UPDATE proposal_sessions SET ended_at = ?, status = CASE WHEN status = 'reserved' THEN 'expired' ELSE status END
+    WHERE station_id IS NOT NULL AND ended_at IS NULL
+      AND ((status = 'reserved' AND expires_at <= ?) OR (status = 'submitted' AND experience_until <= ?))`).run(now, now, now);
+  const sessions = stationSessions(ctx), lifecycle = readLifecycle(ctx.db);
+  if (!sessions.length && lifecycle.pendingReset !== 'none') return finishGuest(ctx, lifecycle);
+  const last = ctx.db.prepare("SELECT status FROM proposal_sessions WHERE run_id = (SELECT id FROM runs WHERE status = 'active') ORDER BY rowid DESC LIMIT 1").get();
+  const phase = sessions.some(s => s.status === 'reserved') ? 'in_experience'
+    : sessions.length || last?.status === 'submitted' ? 'awaiting_exit' : 'ready';
+  if (phase !== lifecycle.phase) setLifecycle(ctx, phase, lifecycle.pendingReset);
+}
+
+export function settleStations(ctx: SurveyContext): ServiceOutcome<LifecycleData> | undefined {
+  return transaction(ctx.db, () => syncStations(ctx));
+}
+
 /** Ends the active run and starts a zero-state run (a new city cycle). History is kept. Call inside a transaction. */
 function executeReset(ctx: SurveyContext, scope: 'city' | 'full'): { previousRunId: string; state: CitySurveyState | ExhibitionState } {
   const run = activeRun(ctx.db);
@@ -114,6 +145,8 @@ function undoableProposal(ctx: SurveyContext): AdminCurrentRun['undoProposal'] {
   if (!run || run.algorithmVersion !== 2) return null;
   const row = ctx.db.prepare(`SELECT p.id, p.revision_after, u.proposal_id AS undone FROM proposal_events p
     LEFT JOIN proposal_undos u ON u.proposal_id = p.id WHERE p.run_id = ? ORDER BY p.sequence DESC LIMIT 1`).get(run.id);
+  if (row && isStationMode(ctx) && ctx.db.prepare(`SELECT 1 FROM proposal_sessions WHERE rowid >
+    (SELECT s.rowid FROM proposal_sessions s JOIN proposal_events p ON p.guest_session_id = s.id WHERE p.id = ?) LIMIT 1`).get(str(row, 'id'))) return null;
   return row && row.undone === null ? { id: str(row, 'id'), ordinal: num(row, 'revision_after') } : null;
 }
 
@@ -138,11 +171,13 @@ function undoProposal(ctx: SurveyContext, proposalId: string, lifecycle: Lifecyc
 
 function parseLifecycleRequest(body: unknown): LifecycleRequest | undefined {
   if (typeof body !== 'object' || body === null || Array.isArray(body)) return undefined;
-  const { command, expectedRevision, confirmation, proposalId } = body as Record<string, unknown>;
+  const { command, expectedRevision, confirmation, proposalId, guestSessionId } = body as Record<string, unknown>;
   if (!COMMANDS.includes(command as LifecycleCommand) || typeof expectedRevision !== 'number' || !Number.isSafeInteger(expectedRevision)
       || expectedRevision < 0 || (confirmation !== undefined && typeof confirmation !== 'string')) return undefined;
   if (command === 'undo-proposal' && (typeof proposalId !== 'string' || !proposalId.trim() || proposalId.length > 128)) return undefined;
-  return { command: command as LifecycleCommand, expectedRevision, confirmation, proposalId: typeof proposalId === 'string' ? proposalId : undefined };
+  if (guestSessionId !== undefined && (typeof guestSessionId !== 'string' || !guestSessionId.trim() || guestSessionId.length > 128)) return undefined;
+  return { command: command as LifecycleCommand, expectedRevision, confirmation, proposalId: typeof proposalId === 'string' ? proposalId : undefined,
+    guestSessionId: typeof guestSessionId === 'string' ? guestSessionId : undefined };
 }
 
 /**
@@ -167,7 +202,7 @@ export function lifecycleCommand(ctx: SurveyContext, body: unknown): ServiceOutc
       case 'reset-city':
       case 'full-reset': {
         const scope = request.command === 'full-reset' ? 'full' : 'city';
-        if (lifecycle.phase === 'ready') reset = scope;
+        if (lifecycle.phase === 'ready' || (isStationMode(ctx) && !stationSessions(ctx).length)) reset = scope;
         else setLifecycle(ctx, lifecycle.phase, lifecycle.pendingReset === 'full' ? 'full' : scope);
         break;
       }
@@ -176,6 +211,16 @@ export function lifecycleCommand(ctx: SurveyContext, body: unknown): ServiceOutc
         setLifecycle(ctx, lifecycle.phase, 'none');
         break;
       case 'guest-left': {
+        if (isStationMode(ctx)) {
+          const target = stationSessions(ctx).find(s => s.sessionId === request.guestSessionId && s.status === 'reserved');
+          if (!target) return { response: fail('lifecycle_blocked', 'Name the unfinished station session to end.') };
+          ctx.db.prepare("UPDATE proposal_sessions SET status = 'expired', ended_at = ? WHERE id = ?").run(ctx.now().toISOString(), target.sessionId);
+          setLifecycle(ctx, lifecycle.phase, lifecycle.pendingReset);
+          const settled = syncStations(ctx);
+          if (settled) return settled;
+          return { response: { ok: true, data: { lifecycle: readLifecycle(ctx.db), state: currentState(ctx), executedReset: null, previousRunId: null } } };
+        }
+        if (request.guestSessionId) return { response: fail('lifecycle_blocked', 'This station session is no longer active.') };
         if (lifecycle.phase === 'ready') return { response: fail('lifecycle_blocked', 'The installation is already ready for the next guest.') };
         return finishGuest(ctx, lifecycle);
       }

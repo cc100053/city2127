@@ -193,6 +193,30 @@ try {
   messageListener?.({ data: JSON.stringify({ type: 'city-state-snapshot', view: v2View }) });
   assert.deepEqual(modes, ['day', 'night', 'auto', 'auto'], 'older servers default to Auto');
 
+  const stationA = { ...v2Proposal, stationId: 'A', displayAt: v2Proposal.submittedAt };
+  const stationB = { ...stationA, id: 'station-b', guestSessionId: 'guest-b', stationId: 'B', ordinal: 2,
+    revisionBefore: 1, revisionAfter: 2, beforeScores: v2Scores, beforeLayout: v2AfterLayout, cityChanges: [] };
+  const stationViewA = { ...v2View, recentProposals: [stationA], latestProposal: stationA };
+  const stationViewB = { ...v2View, revision: 2, guestCount: 2,
+    voteSums: { ...zero, environmentalPriority: -2 }, recentProposals: [stationA, stationB], latestProposal: stationB };
+  const stationChanges: number[] = [];
+  connectSurvey('ws://example.test/ws', (_kind, next) => stationChanges.push(next.revision), () => {});
+  const stationEvent = (stationView: unknown, displayWaitMs: number) => messageListener?.({ data: JSON.stringify({ type: 'city-state-updated', view: stationView, displayWaitMs }) });
+  stationEvent(stationViewA, 0);
+  stationEvent(stationViewB, 0); // A delayed burst still gives each transition its full three seconds.
+  assert.deepEqual(stationChanges, [1]);
+  messageListener?.({ data: JSON.stringify({ type: 'city-state-snapshot', view: stationViewB, displayMode: 'night' }) });
+  assert.deepEqual(stationChanges, [1], 'lighting cannot skip a queued proposal');
+  await new Promise(resolve => setTimeout(resolve, 3100));
+  assert.deepEqual(stationChanges, [1, 2]);
+  stationEvent(stationViewB, 10_000);
+  messageListener?.({ data: JSON.stringify({ type: 'city-state-snapshot', view: initialV2, undoneProposalId: 'station-b' }) });
+  assert.deepEqual(stationChanges, [1, 2, 0], 'Undo/reset snapshots clear queued live views and restore immediately');
+  for (const metadata of [{ stationId: 'C', displayAt: stationA.displayAt }, { stationId: 'A', displayAt: 'bad-date' }, { stationId: 'A' }]) {
+    const malformed = { ...v2Proposal, ...metadata };
+    assert.equal(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, recentProposals: [malformed], latestProposal: malformed } }), null);
+  }
+
 } finally {
   if (webSocketDescriptor) Object.defineProperty(globalThis, 'WebSocket', webSocketDescriptor);
   else delete (globalThis as { WebSocket?: unknown }).WebSocket;
