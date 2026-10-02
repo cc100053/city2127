@@ -4,84 +4,84 @@
 
 ## 雙裝置 Guest — 2026-10-02
 
-A/B 已整合至 main `45fcde7`，feature／[main CI 36976457465](https://github.com/cc100053/city2127/actions/runs/36976457465) 通過。兩站獨立四題體驗，共用同一個累積台場城市。Live 提案按記錄順序相隔至少3秒展示，標示提案編號及站名；Guest 保留自己的結果。Reset 暫停新開始，等兩站問卷／結果／交接完成；單站入口仍沿用既有自動交接。City 的 reset／Undo／重新連接 snapshot 即時復原，不重播漏掉的動畫。模型、鏡頭、材質、場地和桌面範圍不變。桌面雙瀏覽器流程已驗證，實體 LAN 裝置／展覽硬件仍待驗收；詳見 [交接](../handoffs/two-guest-devices.md)及[驗證](VALIDATION_2026-10-02.md#concurrent-guest-stations-ab--2026-10-02)。
+A/B 已整合至 main `45fcde7`，feature／[main CI 36976457465](https://github.com/cc100053/city2127/actions/runs/36976457465) 通過。兩站獨立四題體驗，共用同一個累積台場城市。Live 提案按記錄順序相隔至少3秒展示，標示提案編號及站名；Guest 保留自己的結果。Reset 暫停新開始，等兩站問卷／結果／交接完成；單站入口仍沿用既有自動交接。City 的 reset／Undo／重新連接 snapshot 即時復原，不重播漏掉的動畫。模型、鏡頭、材質、場地和桌面範圍不變。桌面雙瀏覽器流程已驗證，實體 LAN 裝置／展覽硬件仍待驗收；詳見 [交接](../handoffs/archive/two-guest-devices.md)及[驗證](VALIDATION_2026-10-02.md#concurrent-guest-stations-ab--2026-10-02)。
 
 ## Admin-only Undo — 2026-10-02
 
-Guest keeps the existing four-question flow. Staff can undo the latest completed proposal before the next Guest starts, restoring inherited city/counts with no change pulse, keeping the original marked as undone, and allowing a fresh re-answer. No multi-step history editing or geometry/camera/material change. Queued resets still apply at next start. Implementation/evidence: [handoff](../handoffs/admin-undo.md), [validation](VALIDATION_2026-10-02.md#admin-only-undo--2026-10-02).
+Guest keeps the existing four-question flow. Staff can undo the latest completed proposal before the next Guest starts, restoring inherited city/counts with no change pulse, keeping the original marked as undone, and allowing a fresh re-answer. No multi-step history editing or geometry/camera/material change. Queued resets still apply at next start. Implementation/evidence: [handoff](../handoffs/archive/admin-undo.md), [validation](VALIDATION_2026-10-02.md#admin-only-undo--2026-10-02).
 
 
 ## Meter variety main 整合 — 2026-10-02
 
-用家明確要求合併 main 同刪除 branch，取代之前 capture review 後才合併嘅條件。P0–P12 已無衝突合併（`e7afbee`），已推送 main（`68b669a`，[main CI 36954967651](https://github.com/cc100053/city2127/actions/runs/36954967651) PASS），本機及 remote feature branch 已刪除；以下各階段「未整合／待審閱」係歷史狀態，由本紀錄取代。此決定不代表實機 FPS、Windows 或整體展覽驗收。見 [整合交接](../handoffs/meter-variety.md#main-integration--2026-10-02)。
+用家明確要求合併 main 同刪除 branch，取代之前 capture review 後才合併嘅條件。P0–P12 已無衝突合併（`e7afbee`），已推送 main（`68b669a`，[main CI 36954967651](https://github.com/cc100053/city2127/actions/runs/36954967651) PASS），本機及 remote feature branch 已刪除；以下各階段「未整合／待審閱」係歷史狀態，由本紀錄取代。此決定不代表實機 FPS、Windows 或整體展覽驗收。見 [整合交接](../handoffs/archive/meter-variety.md#main-integration--2026-10-02)。
 
 ## Meter variety P12 — 2026-10-02，feature branch 待視覺審閱
 
-用家要求實作 P12：開放庭院加入沿用既有造型嘅人群（low／mixed／high：0／24／96），11 個服務 bay 有錯開時間嘅無人機升降；四個 Meter 嘅局部夜燈各自做慢速節奏。人群避開私密／混合花園；無人機只用設施上方嘅垂直航線。既有鏡位、空中環線及 3 秒轉場保留；沒有新依賴或 render pass。證據與限制見 [P12 交接](../handoffs/meter-variety.md#p12--life-and-motion-2026-10-02)。保留 capture review 後才整合 main 的條件。
+用家要求實作 P12：開放庭院加入沿用既有造型嘅人群（low／mixed／high：0／24／96），11 個服務 bay 有錯開時間嘅無人機升降；四個 Meter 嘅局部夜燈各自做慢速節奏。人群避開私密／混合花園；無人機只用設施上方嘅垂直航線。既有鏡位、空中環線及 3 秒轉場保留；沒有新依賴或 render pass。證據與限制見 [P12 交接](../handoffs/archive/meter-variety.md#p12--life-and-motion-2026-10-02)。保留 capture review 後才整合 main 的條件。
 
 ## Meter variety P11 — 2026-10-02，feature branch 待視覺審閱
 
-用家要求實作 P11：完整提案歷史產生四個 slot seed，同分數但早期提交次序不同，可保留不同街區位置。保留原有數量、設計、鏡位及 3 秒過渡；reload／reset／replay 可重建同一城市。毋須資料庫 migration；更新 server 同 city 要一起進行。驗證及日夜截圖見 [P11 交接](../handoffs/meter-variety.md#p11--path-dependence-2026-10-02)。保留 capture review 後才整合 main 的條件。P12 後續已按用家要求實作，見上。
+用家要求實作 P11：完整提案歷史產生四個 slot seed，同分數但早期提交次序不同，可保留不同街區位置。保留原有數量、設計、鏡位及 3 秒過渡；reload／reset／replay 可重建同一城市。毋須資料庫 migration；更新 server 同 city 要一起進行。驗證及日夜截圖見 [P11 交接](../handoffs/archive/meter-variety.md#p11--path-dependence-2026-10-02)。保留 capture review 後才整合 main 的條件。P12 後續已按用家要求實作，見上。
 
 ## Meter variety P10 — 2026-10-02，feature branch 待視覺審閱
 
-兩個 Meter 同時一致先出現嘅組合效果：共享＋自動化高 → 開放庭院有無人機亭；共享＋環境高 → 庭院開花果園；集約＋環境高 → 塔頂垂直森林；集約＋自動化高 → 塔身無人機停靠環；集約＋環境低 → pod 頂太陽能板。81 個真實答案組合測試確認每個效果只喺佢嘅配對出現。單一 Meter 數據不變；未觸發時唔加 draw call。詳見 [P10 交接](../handoffs/meter-variety.md#p10--cross-meter-combinations-2026-10-02)。
+兩個 Meter 同時一致先出現嘅組合效果：共享＋自動化高 → 開放庭院有無人機亭；共享＋環境高 → 庭院開花果園；集約＋環境高 → 塔頂垂直森林；集約＋自動化高 → 塔身無人機停靠環；集約＋環境低 → pod 頂太陽能板。81 個真實答案組合測試確認每個效果只喺佢嘅配對出現。單一 Meter 數據不變；未觸發時唔加 draw call。詳見 [P10 交接](../handoffs/archive/meter-variety.md#p10--cross-meter-combinations-2026-10-02)。
 
 ## Meter variety P9 — 2026-10-02，feature branch 待視覺審閱
 
-mixed 而家有自己嘅混合款（只喺 mixed 附近出現，low／high 唔受影響）：自動化係無人機台下面嘅細人手亭；共享係半高玻璃圓頂加階梯座位、花園島加階梯、庭院圍牆花園加傘；集約係 45% 高嘅中層退台樓；環境係綠棚上面加帆／百葉、屋頂兩種覆蓋疊埋。low↔mixed／mixed↔high：環境 2.20／2.49%、自動化 2.27／2.23%、集約 2.73／2.01%（日），全部過 1.5%；**共享 1.11／1.26% 未過**（共享總變化得 1.87%；用家 2026-10-02 接受）。Draw call 不變。詳見 [P9 交接](../handoffs/meter-variety.md#p9--mixed-identity-2026-10-02)。
+mixed 而家有自己嘅混合款（只喺 mixed 附近出現，low／high 唔受影響）：自動化係無人機台下面嘅細人手亭；共享係半高玻璃圓頂加階梯座位、花園島加階梯、庭院圍牆花園加傘；集約係 45% 高嘅中層退台樓；環境係綠棚上面加帆／百葉、屋頂兩種覆蓋疊埋。low↔mixed／mixed↔high：環境 2.20／2.49%、自動化 2.27／2.23%、集約 2.73／2.01%（日），全部過 1.5%；**共享 1.11／1.26% 未過**（共享總變化得 1.87%；用家 2026-10-02 接受）。Draw call 不變。詳見 [P9 交接](../handoffs/archive/meter-variety.md#p9--mixed-identity-2026-10-02)。
 
 ## Meter variety P8 — 2026-10-01，feature branch 待視覺審閱
 
-每個以位置計嘅結構而家每個狀態都有兩款設計，按固定 hash 分配：海濱棚架（帆／太陽能百葉；綠棚／垂直綠牆）、屋頂（帆／光伏棚；樹冠／草甸梯台）、霧化塔（高瘦／矮闊）、自動化（圓頂館／疊層平台；無人機塔／充電桅杆）、共享庭院（圍牆花園／玻璃溫室；傘廣場／長枱棚架）、集約 pod（兩層 pod／環形花園館）。可讀性維持：環境 **4.09%／4.05%**、自動化 **4.03%／3.51%**、共享 **1.86%／2.10%**、集約 **4.07%／3.42%**。Draw call +85。詳見 [P8 交接](../handoffs/meter-variety.md#p8--design-families-2026-10-01)。保留 capture review 後才整合 main 的條件。
+每個以位置計嘅結構而家每個狀態都有兩款設計，按固定 hash 分配：海濱棚架（帆／太陽能百葉；綠棚／垂直綠牆）、屋頂（帆／光伏棚；樹冠／草甸梯台）、霧化塔（高瘦／矮闊）、自動化（圓頂館／疊層平台；無人機塔／充電桅杆）、共享庭院（圍牆花園／玻璃溫室；傘廣場／長枱棚架）、集約 pod（兩層 pod／環形花園館）。可讀性維持：環境 **4.09%／4.05%**、自動化 **4.03%／3.51%**、共享 **1.86%／2.10%**、集約 **4.07%／3.42%**。Draw call +85。詳見 [P8 交接](../handoffs/archive/meter-variety.md#p8--design-families-2026-10-01)。保留 capture review 後才整合 main 的條件。
 
 ## Meter variety P7 — 2026-10-01，feature branch 待視覺審閱
 
-補三個弱點：自動化高值唔再係空地，每個人手服務館位置換成無人機升降塔（46 m 降落台、藍色光環、充電塔、停泊無人機）；集約塔改為三款剪影（扭轉塔、退台綠化塔、連體雙塔），pod 加高成兩層；共享庭院改用 hero 畫面「可見像素」評分，三個被地標遮住嘅庭院搬去最易睇到嘅空地。日／夜差異：自動化 **4.02%／3.58%**、共享 **1.89%／2.10%**（冇低過 1.6%）、集約 **4.04%／3.42%**，全部過門檻。詳見 [P7 交接](../handoffs/meter-variety.md#p7--weak-spots-2026-10-01)。P8–P12 仍為建議；保留 capture review 後才整合 main 的條件。
+補三個弱點：自動化高值唔再係空地，每個人手服務館位置換成無人機升降塔（46 m 降落台、藍色光環、充電塔、停泊無人機）；集約塔改為三款剪影（扭轉塔、退台綠化塔、連體雙塔），pod 加高成兩層；共享庭院改用 hero 畫面「可見像素」評分，三個被地標遮住嘅庭院搬去最易睇到嘅空地。日／夜差異：自動化 **4.02%／3.58%**、共享 **1.89%／2.10%**（冇低過 1.6%）、集約 **4.04%／3.42%**，全部過門檻。詳見 [P7 交接](../handoffs/archive/meter-variety.md#p7--weak-spots-2026-10-01)。P8–P12 仍為建議；保留 capture review 後才整合 main 的條件。
 
 ## Meter variety P5 — 2026-10-01，feature branch 待視覺審閱
 
-每次 live 提案改變某個 Meter，嗰個 district 會喺 site 同每個實際有改動嘅位置發出兩波擴散光環同向上漸淡嘅光柱，用該 Meter 嘅顏色（自動化藍、共有玫瑰粉、環境綠、集約琥珀），約 4.2 秒後消失；snapshot、reset 同 reduced motion 唔會發光，亦唔會令共用城市材質閃動。冇 pulse 時唔增加 draw call。截圖與限制見 [P5 交接](../handoffs/meter-variety.md#p5--change-moment-pulse-2026-10-01)。保留 capture review 後才整合 main 的條件。
+每次 live 提案改變某個 Meter，嗰個 district 會喺 site 同每個實際有改動嘅位置發出兩波擴散光環同向上漸淡嘅光柱，用該 Meter 嘅顏色（自動化藍、共有玫瑰粉、環境綠、集約琥珀），約 4.2 秒後消失；snapshot、reset 同 reduced motion 唔會發光，亦唔會令共用城市材質閃動。冇 pulse 時唔增加 draw call。截圖與限制見 [P5 交接](../handoffs/archive/meter-variety.md#p5--change-moment-pulse-2026-10-01)。保留 capture review 後才整合 main 的條件。
 
 ## Meter variety P4 — 2026-10-01，feature branch 待視覺審閱
 
-都市集約 Meter 現在改變 district 嘅 skyline：高值喺 SE site 旁、DECKS 海濱同西面草地升起 10 座淡藍玻璃塔（100–140 m，兩層有植栽同暖光嘅 sky lobby，相近嘅塔有 sky bridge 相連）；低值喺同一片草地散佈 26 個低層玻璃 pod；混合值各保留約一半。夜晚塔身按樓層亮暖光窗格。固定 hero 日／夜差異 **4.47%／3.81%**（P4 前 0.38%／0.29%），均過 3% 門檻；實際地面、建築、路線、site 可見度檢查通過。截圖與限制見 [P4 交接](../handoffs/meter-variety.md#p4--concentration-2026-10-01)。可讀性不等於美術、結構或 FPS 驗收；保留 capture review 後才整合 main 的條件。
+都市集約 Meter 現在改變 district 嘅 skyline：高值喺 SE site 旁、DECKS 海濱同西面草地升起 10 座淡藍玻璃塔（100–140 m，兩層有植栽同暖光嘅 sky lobby，相近嘅塔有 sky bridge 相連）；低值喺同一片草地散佈 26 個低層玻璃 pod；混合值各保留約一半。夜晚塔身按樓層亮暖光窗格。固定 hero 日／夜差異 **4.47%／3.81%**（P4 前 0.38%／0.29%），均過 3% 門檻；實際地面、建築、路線、site 可見度檢查通過。截圖與限制見 [P4 交接](../handoffs/archive/meter-variety.md#p4--concentration-2026-10-01)。可讀性不等於美術、結構或 FPS 驗收；保留 capture review 後才整合 main 的條件。
 
 ## Meter variety P7–P12 — 2026-10-01，建議（待用家批准）
 
-下一步加強每個 Meter 的 variety：P7 補弱點（已完成，見上）（P4 塔剪影、sharing 庭院可見度、automation 高值唔再係「空地」）、P8 每個載體 2–3 款設計（已完成）、P9 mixed 有自己的混合款（已完成）、P10 跨 Meter 組合（已完成）；P11 路徑依賴已按用家要求實作；P12 生活感亦已按用家要求實作。詳見 [P7–P12 建議](../handoffs/meter-variety.md#proposed-p7p12--more-variety-per-meter-2026-10-01-pending-user-approval)。
+下一步加強每個 Meter 的 variety：P7 補弱點（已完成，見上）（P4 塔剪影、sharing 庭院可見度、automation 高值唔再係「空地」）、P8 每個載體 2–3 款設計（已完成）、P9 mixed 有自己的混合款（已完成）、P10 跨 Meter 組合（已完成）；P11 路徑依賴已按用家要求實作；P12 生活感亦已按用家要求實作。詳見 [P7–P12 建議](../handoffs/archive/meter-variety.md#proposed-p7p12--more-variety-per-meter-2026-10-01-pending-user-approval)。
 
 ## Meter variety P3d — 2026-10-01，海邊收細＋內陸共享庭院
 
-海邊只留 6 個 room（3 玻璃圓頂、3 綠化花園島），3 個浮台連新月形水上房間拎走；內陸加 10 個 40 m 共享庭院（私人：白牆花園＋玻璃房；公共：鋪地廣場＋白色傘蓋）。sharing 日／夜差異 **1.63%／1.85%**，用家決定接受低過 3% 門檻以換取較靜的海岸。詳見 [P3d 交接](../handoffs/meter-variety.md#p3d--calmer-shore-and-inland-sharing-courts-2026-10-01)。
+海邊只留 6 個 room（3 玻璃圓頂、3 綠化花園島），3 個浮台連新月形水上房間拎走；內陸加 10 個 40 m 共享庭院（私人：白牆花園＋玻璃房；公共：鋪地廣場＋白色傘蓋）。sharing 日／夜差異 **1.63%／1.85%**，用家決定接受低過 3% 門檻以換取較靜的海岸。詳見 [P3d 交接](../handoffs/archive/meter-variety.md#p3d--calmer-shore-and-inland-sharing-courts-2026-10-01)。
 
 ## Meter variety P3c — 2026-10-01，sharing 收細＋光環廣場
 
-玻璃圓頂減到 7 個，肋改象牙白，rose 只留底邊同天窗；高 sharing 改為階梯廣場同綠化「光環頂棚」交替，頂棚下浮台夜晚亮燈。日／夜差異 **3.30%／3.84%**。詳見 [P3c 交接](../handoffs/meter-variety.md#p3c--fewer-calmer-vaults-and-halo-commons-2026-10-01)；美術驗收待審。
+玻璃圓頂減到 7 個，肋改象牙白，rose 只留底邊同天窗；高 sharing 改為階梯廣場同綠化「光環頂棚」交替，頂棚下浮台夜晚亮燈。日／夜差異 **3.30%／3.84%**。詳見 [P3c 交接](../handoffs/archive/meter-variety.md#p3c--fewer-calmer-vaults-and-halo-commons-2026-10-01)；美術驗收待審。
 
 ## Meter variety P3b — 2026-10-01，sharing pods 外形修正
 
-低 sharing 的私密 pods 由 28 m 高、膚色、不透明的蛋形圓頂，改為磨砂珍珠玻璃 gridshell 圓頂：玫瑰色發光肋、象牙白環梁，可以見到入面的花園；開放階梯加闊。固定 hero 日／夜差異 **3.26%／3.03%**，仍過 3% 門檻（夜間 margin 細）。詳見 [P3b 交接](../handoffs/meter-variety.md#p3b--sharing-pod-polish-2026-10-01)；美術驗收待審。
+低 sharing 的私密 pods 由 28 m 高、膚色、不透明的蛋形圓頂，改為磨砂珍珠玻璃 gridshell 圓頂：玫瑰色發光肋、象牙白環梁，可以見到入面的花園；開放階梯加闊。固定 hero 日／夜差異 **3.26%／3.03%**，仍過 3% 門檻（夜間 margin 細）。詳見 [P3b 交接](../handoffs/archive/meter-variety.md#p3b--sharing-pod-polish-2026-10-01)；美術驗收待審。
 
 ## Meter variety P3 — 2026-10-01，feature branch 待視覺審閱
 
-sharing Meter 現在控制 14 個既有水岸房間：低值用帶天窗、岸側入口的玫瑰陶瓷私密花園 pods，高值展開三層公共階梯，混合值保留兩種空間。原有花園、瀑布、浮台和通道保留；沒有改鏡位、日夜或問卷規則。固定 hero 日／夜差異 **3.51%／3.32%**，均過 3% 可讀性門檻；實際船道／步道及 live server 檢查通過。截圖、驗證與限制見 [P3 交接](../handoffs/meter-variety.md#p3--sharing-2026-10-01)。可讀性不等於美術、結構或 FPS 驗收；保留既有 capture review 後才整合 main 的條件。
+sharing Meter 現在控制 14 個既有水岸房間：低值用帶天窗、岸側入口的玫瑰陶瓷私密花園 pods，高值展開三層公共階梯，混合值保留兩種空間。原有花園、瀑布、浮台和通道保留；沒有改鏡位、日夜或問卷規則。固定 hero 日／夜差異 **3.51%／3.32%**，均過 3% 可讀性門檻；實際船道／步道及 live server 檢查通過。截圖、驗證與限制見 [P3 交接](../handoffs/archive/meter-variety.md#p3--sharing-2026-10-01)。可讀性不等於美術、結構或 FPS 驗收；保留既有 capture review 後才整合 main 的條件。
 
 ## Meter variety P2 — 2026-10-01，feature branch 待視覺審閱
 
-`feat/meter-variety` 的自動化 Meter 現在改變街區交通與服務模式：低值用 11 個高架有人服務亭、較多人流；高值保留成熟城市和基本人流，以更多軌道 pods、空中載具及較清晰的 mint 空中導引線呈現自律服務。零值是混合模式，沿用固定 hero、日夜、既有路線和 3 秒過渡。程式及實際模型位置／路線檢查通過；最終像素量度、截圖、browser smoke 和 Git/CI 證據見 [交接](../handoffs/meter-variety.md#p2--automation-2026-10-01)。可讀性量度不等於人類美術或 FPS 驗收；按既有 handoff 保留在 feature branch 待 capture review。
+`feat/meter-variety` 的自動化 Meter 現在改變街區交通與服務模式：低值用 11 個高架有人服務亭、較多人流；高值保留成熟城市和基本人流，以更多軌道 pods、空中載具及較清晰的 mint 空中導引線呈現自律服務。零值是混合模式，沿用固定 hero、日夜、既有路線和 3 秒過渡。程式及實際模型位置／路線檢查通過；最終像素量度、截圖、browser smoke 和 Git/CI 證據見 [交接](../handoffs/archive/meter-variety.md#p2--automation-2026-10-01)。可讀性量度不等於人類美術或 FPS 驗收；按既有 handoff 保留在 feature branch 待 capture review。
 
 ## 台場 Dream Loop 第4–6輪 — 2026-09-30，仍未達視覺目標
 
-使用者要求再跑三輪；同一目標、鏡位與 R01–R06 保留。新增三組分層潮汐平台、核心公共花園及懸掛廊、避開 site／路線的地面樹群，修正日間反射與樹冠重複染色。實際路徑碰撞及日間變暗回退已修正並重新驗證。見 [第六輪日間](../../artifacts/odaiba-dream-pass6.jpg)、[夜間](../../artifacts/odaiba-dream-pass6-night.jpg)、[交接](../handoffs/odaiba-dream-loop.md)。仍有商場／酒店量體、連續海岸、遠景與細節密度差距，不宣稱已接近逐像素重現；第六輪後供美術審閱，未整合 main。
+使用者要求再跑三輪；同一目標、鏡位與 R01–R06 保留。新增三組分層潮汐平台、核心公共花園及懸掛廊、避開 site／路線的地面樹群，修正日間反射與樹冠重複染色。實際路徑碰撞及日間變暗回退已修正並重新驗證。見 [第六輪日間](../../artifacts/odaiba-dream-pass6.jpg)、[夜間](../../artifacts/odaiba-dream-pass6-night.jpg)、[交接](../handoffs/archive/odaiba-dream-loop.md)。仍有商場／酒店量體、連續海岸、遠景與細節密度差距，不宣稱已接近逐像素重現；第六輪後供美術審閱，未整合 main。
 
 ## 台場 Dream Loop — 2026-09-30，三輪後待美術審閱
 
-延續 `feat/art-direction`：依現況截圖生成固定目標，完成三輪材質／植栽／立面打磨。新增共用波紋海水、草地與日間天空貼圖、原植栽位置的 instanced 樹冠、Aqua／DECKS 屋頂植栽與背景立面 panel。原 hero 鏡位、海岸形狀、交通路線、四個 survey site 和二進位模型保留。這是現有模型的打磨，尚未完成 master taste 的厚海岸、連續 civic terrain 與建築類型轉換；不宣稱已達生成目標。見 [前圖](../../artifacts/odaiba-dream-before.jpg)、[目標](../../artifacts/odaiba-dream-target.png)、[後圖](../../artifacts/odaiba-dream-after.jpg) 及 [交接](../handoffs/odaiba-dream-loop.md)。三輪後按 Dream Loop Plus 流程停止視覺迭代，交由使用者審閱；未整合 main。
+延續 `feat/art-direction`：依現況截圖生成固定目標，完成三輪材質／植栽／立面打磨。新增共用波紋海水、草地與日間天空貼圖、原植栽位置的 instanced 樹冠、Aqua／DECKS 屋頂植栽與背景立面 panel。原 hero 鏡位、海岸形狀、交通路線、四個 survey site 和二進位模型保留。這是現有模型的打磨，尚未完成 master taste 的厚海岸、連續 civic terrain 與建築類型轉換；不宣稱已達生成目標。見 [前圖](../../artifacts/odaiba-dream-before.jpg)、[目標](../../artifacts/odaiba-dream-target.png)、[後圖](../../artifacts/odaiba-dream-after.jpg) 及 [交接](../handoffs/archive/odaiba-dream-loop.md)。三輪後按 Dream Loop Plus 流程停止視覺迭代，交由使用者審閱；未整合 main。
 
 ## 台場視覺方向 pass 1 — 2026-09-30，待人類美術審閱
 
-[R01–R06／CITY_MASTER_TASTE](../ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) 是現行視覺依據，優先於以下歷史 Plan 02。今次在 `feat/art-direction` 只替換 Fuji 辦公樓類型：開放城市巨構、懸吊公共 chamber、斜向 circulation 及可讀承重路徑。道路地塊、商場／酒店、海岸及原有光照仍未達參考圖；不代表全城美術完成或展覽驗收。下一個最高優先 gap 是核心到海岸之間仍由商場／道路地塊主導的城市組織。詳細 audit、固定前後圖及 GLB 候選見 [交接](../handoffs/odaiba-art-direction-01.md)。此 pass 不整合 main，等人類決定方向。
+[R01–R06／CITY_MASTER_TASTE](../ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) 是現行視覺依據，優先於以下歷史 Plan 02。今次在 `feat/art-direction` 只替換 Fuji 辦公樓類型：開放城市巨構、懸吊公共 chamber、斜向 circulation 及可讀承重路徑。道路地塊、商場／酒店、海岸及原有光照仍未達參考圖；不代表全城美術完成或展覽驗收。下一個最高優先 gap 是核心到海岸之間仍由商場／道路地塊主導的城市組織。詳細 audit、固定前後圖及 GLB 候選見 [交接](../handoffs/archive/odaiba-art-direction-01.md)。此 pass 不整合 main，等人類決定方向。
 
 ## 最新補充 — 2026-09-30：場地改為台場（P0–P5 已實作，未整合）
 
@@ -89,27 +89,27 @@ sharing Meter 現在控制 14 個既有水岸房間：低值用帶天窗、岸�
 
 ## 最新補充 — 2026-09-30：S4 驗收完成
 
-S4 四題 guest flow 及 root 回饋面板已完成瀏覽器驗收並整合至 main（`5e14078`，main CI 通過）：結果約10秒→交接約5秒自動前進、`lifecycle_blocked` 等待提示、閒置60＋15秒放棄草稿、斷線重試只計一次，以及 1280×720 面板可直接看到「最近64人」。剩餘偏差與 S5 待辦見 [S4 handoff](../handoffs/exhibition-s4.md)。
+S4 四題 guest flow 及 root 回饋面板已完成瀏覽器驗收並整合至 main（`5e14078`，main CI 通過）：結果約10秒→交接約5秒自動前進、`lifecycle_blocked` 等待提示、閒置60＋15秒放棄草稿、斷線重試只計一次，以及 1280×720 面板可直接看到「最近64人」。剩餘偏差與 S5 待辦見 [S4 handoff](../handoffs/archive/exhibition-s4.md)。
 
 ## 最新補充 — 2026-09-30：S3 其餘三site映射與可見度修正
 
-S3 core commit `d51167b` 已推送且 feature CI 通過。其後工作樹改善 SW 私密座位的 2.4 m 電致變色屏，以及 SE 低值的成對地面 pavilion／DOGENZAKA 上方玻璃服務頭，並補了固定 hero camera 投影可讀性測試。合併後的 root `npm test`、`npm run build`、`git diff --check`、12 個一軸 API case、same-band、high→mixed→low、snapshot/reconnect/reset、standalone smoke 及 V01/V02 視覺檢查均通過；12 張桌面截圖及精確 mapping 數值見 [validation record](VALIDATION_2026-10-02.md)。可見度修改已提交為 `36b5c18`，與 lifecycle／S4 合併後整合至 main `63af1b6`，feature/main CI 通過，S3 已 shipped。固定 hero 畫面中的 SE 地面 pavilion 被前景遮擋，上方服務頭仍可見；SW 差異較細但可辨。狀態與後續證據見 [S3 handoff](../handoffs/exhibition-s3.md)。
+S3 core commit `d51167b` 已推送且 feature CI 通過。其後工作樹改善 SW 私密座位的 2.4 m 電致變色屏，以及 SE 低值的成對地面 pavilion／DOGENZAKA 上方玻璃服務頭，並補了固定 hero camera 投影可讀性測試。合併後的 root `npm test`、`npm run build`、`git diff --check`、12 個一軸 API case、same-band、high→mixed→low、snapshot/reconnect/reset、standalone smoke 及 V01/V02 視覺檢查均通過；12 張桌面截圖及精確 mapping 數值見 [validation record](VALIDATION_2026-10-02.md)。可見度修改已提交為 `36b5c18`，與 lifecycle／S4 合併後整合至 main `63af1b6`，feature/main CI 通過，S3 已 shipped。固定 hero 畫面中的 SE 地面 pavilion 被前景遮擋，上方服務頭仍可見；SW 差異較細但可辨。狀態與後續證據見 [S3 handoff](../handoffs/archive/exhibition-s3.md)。
 
 ## 最新補充 — 2026-09-29：S4 feature branch 現況
 
-四題 guest UI 和 root v2 因果面板已在 `codex/exhibition-s4` feature branch；guest UI 含草稿恢復及提交重試，root 面板顯示實際 proposal feedback 與最多64人的四軸投票帶。S3 其餘三site映射尚未實作，且 S4 依賴 S3；feature branch 未整合，瀏覽器驗收亦未完成，故不代表 S4 完成或 SHIP。結果頁仍要手動按「次の方へ」，沒有規格目標的約10秒結果／約5秒交接計時；root panel 未依次播放兩項、共10秒的變化提示。最多64格目前排在較長 feedback 後，置於 max-height 400px 的可捲動面板內；1280×720 idle 可見度未驗證，可能需要捲動。詳見 [S4 handoff](../handoffs/exhibition-s4.md) 和 [validation record](VALIDATION_2026-10-02.md)。
+四題 guest UI 和 root v2 因果面板已在 `codex/exhibition-s4` feature branch；guest UI 含草稿恢復及提交重試，root 面板顯示實際 proposal feedback 與最多64人的四軸投票帶。S3 其餘三site映射尚未實作，且 S4 依賴 S3；feature branch 未整合，瀏覽器驗收亦未完成，故不代表 S4 完成或 SHIP。結果頁仍要手動按「次の方へ」，沒有規格目標的約10秒結果／約5秒交接計時；root panel 未依次播放兩項、共10秒的變化提示。最多64格目前排在較長 feedback 後，置於 max-height 400px 的可捲動面板內；1280×720 idle 可見度未驗證，可能需要捲動。詳見 [S4 handoff](../handoffs/archive/exhibition-s4.md) 和 [validation record](VALIDATION_2026-10-02.md)。
 
 ## 最新補充 — 2026-09-29：S2 root Q3 切片
 
 S1 的四題 server/API 保持不變。S2 已整合 root 的明確版本 v2 parser 和渲染路徑：只由 Q3 的 server-authoritative `treeCount`、`plantedFraction`、`coolingFins` 更新車站東公園；live 變更用 3 秒轉場，snapshot/run-reset 立即還原且不發 guest pulse。v2 不把 Meter 分數混入全城氣氛。其餘三site保持完整、固定的 mixed 基底，標示映射待 S3；S4 UI／root 面板位於 feature branch，尚未整合或通過瀏覽器驗收。舊 root v1 與 standalone 路徑保留，公園種植面細節由共用 builder 更新。
 
-實際12棵樹GLB、程序fallback及v1還原已有NE邊界測試。Feature CI、整合root checks及main CI均通過；commit和證據見 [S2 handoff](../handoffs/exhibition-s2.md) 與 [validation record](VALIDATION_2026-10-02.md)。Park slots、延遲GLB及bake batch的runtime細節見 [PROJECT implementation map](PROJECT_2026-10-02.md)。
+實際12棵樹GLB、程序fallback及v1還原已有NE邊界測試。Feature CI、整合root checks及main CI均通過；commit和證據見 [S2 handoff](../handoffs/archive/exhibition-s2.md) 與 [validation record](VALIDATION_2026-10-02.md)。Park slots、延遲GLB及bake batch的runtime細節見 [PROJECT implementation map](PROJECT_2026-10-02.md)。
 
 ## 最新補充 — 2026-09-28：由開始已是2127
 
 使用者確認：**起始城市及所有Meter低值、零值、高值都必須有未來感。** 低值代表人員主導的未來協作站、可變私密休息艙、主動氣候廊、分散低層機能艙等不同未來方向，不代表落後年代或未開發空地。零值亦應是完整未來城市。
 
-詳細規劃見 [EXHIBITION_MVP.md](EXHIBITION_MVP.md)：每人四題、歷史平均與近期動向各半、四site三形態、資產預算及分階段驗收。**2026-09-28 S1 狀態：** v2 server 規則、提案儲存／API 和未知 viewer 版本拒絕已實作及整合，package checks、feature CI 和 main CI 通過（見 [S1 handoff](../handoffs/exhibition-s1.md)）。Schema 3 migration 會結束 active v1 run 並建立全零 v2 run，舊歷史保留。舊 root/module-swap viewer 不渲染 v2；root site mapping（S2/S3）及四題 guest UI（S4）仍待實作。以下 2026-09-18 一題流程及四空地原型保留作歷史，不代表 v2 行為。root v1 survey 接線已完成，毋須重建。
+詳細規劃見 [EXHIBITION_MVP.md](EXHIBITION_MVP.md)：每人四題、歷史平均與近期動向各半、四site三形態、資產預算及分階段驗收。**2026-09-28 S1 狀態：** v2 server 規則、提案儲存／API 和未知 viewer 版本拒絕已實作及整合，package checks、feature CI 和 main CI 通過（見 [S1 handoff](../handoffs/archive/exhibition-s1.md)）。Schema 3 migration 會結束 active v1 run 並建立全零 v2 run，舊歷史保留。舊 root/module-swap viewer 不渲染 v2；root site mapping（S2/S3）及四題 guest UI（S4）仍待實作。以下 2026-09-18 一題流程及四空地原型保留作歷史，不代表 v2 行為。root v1 survey 接線已完成，毋須重建。
 
 ## 現行方向 — 2026-09-18
 
@@ -134,9 +134,9 @@ S1 的四題 server/API 保持不變。S2 已整合 root 的明確版本 v2 pars
 
 **下一步方向（2026-09-24 使用者決定）：** 展覽城市就係根目錄澀谷場景（`src/`）。先建立同擴充呢個場景——更多區域同城市物件、城市可以明顯變化、打磨外觀——同時為因果 MVP 加更多題目。之後先將 survey 接入根目錄場景；`module-swap/` 四區畫只係證明因果鏈，唔係目標城市。外觀打磨服務於變化可讀性。
 
-**美術方向（2026-09-24 使用者決定）：** 擴充場景同加題目之前，先打磨城市模型並定出美術規則，之後嘅區域同變化點跟規則做。沿用 Plan 02 方向（[Pic 2](../../asset/pic2.png)：淺色陶瓷／金屬／玻璃、日光、工程化自然、多層公共交通），但提高美術質素；先用程式生成（Three.js 原生幾何、材質同後製），唔即刻轉 Blender。先做一個示範區再推廣。任務同計劃見 [art-direction](../handoffs/art-direction.md)。美術規則見 [ART.md](SHIBUYA_ART.md)（2026-09-24 起使用）。截至 2026-09-25，美術方向已實作：示範區（QFRONT 曲面屏、八公圓形廣場、SW 廣場、guest 變化橙色輪廓）、全部建築打磨（四面窗、三種街區型態）、NE 公園／NW hub 環形化、地面紋理、燈光同晝夜循環，以及打磨第三輪（SE 圓形梯田塔、上層翼樓曲面玻璃端、AIR 資訊柱、遠景環形／梯級輪廓）、人同車造型；使用者審查整體畫面後已 merge 入 main（`2126a2c`，2026-09-25）。未做事項見 [handoff](../handoffs/art-direction.md#remaining-work)。
+**美術方向（2026-09-24 使用者決定）：** 擴充場景同加題目之前，先打磨城市模型並定出美術規則，之後嘅區域同變化點跟規則做。沿用 Plan 02 方向（[Pic 2](../../asset/pic2.png)：淺色陶瓷／金屬／玻璃、日光、工程化自然、多層公共交通），但提高美術質素；先用程式生成（Three.js 原生幾何、材質同後製），唔即刻轉 Blender。先做一個示範區再推廣。任務同計劃見 [art-direction](../handoffs/archive/art-direction.md)。美術規則見 [ART.md](SHIBUYA_ART.md)（2026-09-24 起使用）。截至 2026-09-25，美術方向已實作：示範區（QFRONT 曲面屏、八公圓形廣場、SW 廣場、guest 變化橙色輪廓）、全部建築打磨（四面窗、三種街區型態）、NE 公園／NW hub 環形化、地面紋理、燈光同晝夜循環，以及打磨第三輪（SE 圓形梯田塔、上層翼樓曲面玻璃端、AIR 資訊柱、遠景環形／梯級輪廓）、人同車造型；使用者審查整體畫面後已 merge 入 main（`2126a2c`，2026-09-25）。未做事項見 [handoff](../handoffs/archive/art-direction.md#remaining-work)。
 
-**未來樹（2026-09-23）：** Blender MCP 製作嘅靜態工程化樹木 GLB 放喺八公廣場旁 `(11,0,23)`（見 [future-tree-2127](../handoffs/future-tree-2127.md)）。佢取代咗 Plan 02 原型「無傳統樹木」嘅做法，但唔改變下面嘅歷史截圖或 preset 系統。
+**未來樹（2026-09-23）：** Blender MCP 製作嘅靜態工程化樹木 GLB 放喺八公廣場旁 `(11,0,23)`（見 [future-tree-2127](../handoffs/archive/future-tree-2127.md)）。佢取代咗 Plan 02 原型「無傳統樹木」嘅做法，但唔改變下面嘅歷史截圖或 preset 系統。
 
 ## 歷史：Plan 02 實作進度與當時待辦（2026-09-17）
 
@@ -299,16 +299,16 @@ Stage 1–5 均已重跑 `npm test`、`npm run build` 與 1280×720 三態截圖
 
 ## Night lighting — 2026-09-30
 
-The user approved a brighter futuristic night city: visible facade/ground detail, embedded cold-white building and canopy strips, mint deck/park edges and actual local civic illumination. Implemented in the root scene with eight fixed shadowless lights, stronger night fill and restrained bloom; navy sky, fixed hero camera and the 180-second clock remain. Lighting is independent of v2 bands so low/mixed/high all retain future identity. This supersedes the darker 2026-09-25 night light balance, not earlier acceptance evidence. See [handoff](../handoffs/night-lighting.md) and [validation](VALIDATION_2026-10-02.md) for current checks and hardware limits.
+The user approved a brighter futuristic night city: visible facade/ground detail, embedded cold-white building and canopy strips, mint deck/park edges and actual local civic illumination. Implemented in the root scene with eight fixed shadowless lights, stronger night fill and restrained bloom; navy sky, fixed hero camera and the 180-second clock remain. Lighting is independent of v2 bands so low/mixed/high all retain future identity. This supersedes the darker 2026-09-25 night light balance, not earlier acceptance evidence. See [handoff](../handoffs/archive/night-lighting.md) and [validation](VALIDATION_2026-10-02.md) for current checks and hardware limits.
 
 ## Staff day/night control — 2026-09-30
 
-User requested Day/Night buttons on Admin. Implemented Day (12:00), Night (22:00) and Auto (original cycle), persisted independently of city data in schema 5 and synchronized over the existing snapshot channel. Explicit `?hour` keeps capture priority. No camera, geometry, palette, cycle duration or proposal behavior change. See [handoff](../handoffs/admin-day-night.md) for verification and integration status.
+User requested Day/Night buttons on Admin. Implemented Day (12:00), Night (22:00) and Auto (original cycle), persisted independently of city data in schema 5 and synchronized over the existing snapshot channel. Explicit `?hour` keeps capture priority. No camera, geometry, palette, cycle duration or proposal behavior change. See [handoff](../handoffs/archive/admin-day-night.md) for verification and integration status.
 
 ## Development verification addition — 2026-09-30
 
-Survey auto-answer adds a localhost-only Guest development panel and scratch database launcher, with reusable answer→Meter→model tests. This is testing tooling, not a new visual direction or a change to Odaiba geometry/materials. It preserves the existing 3-second city transitions and 10/5-second result/handoff. Remove the panel or move it to Admin before exhibition. Current acceptance evidence is recorded separately in [VALIDATION](VALIDATION_2026-10-02.md#survey-meter-tests-and-development-auto-answer--2026-09-30) and the [task handoff](../handoffs/survey-auto-tests.md); earlier captures do not verify this addition.
+Survey auto-answer adds a localhost-only Guest development panel and scratch database launcher, with reusable answer→Meter→model tests. This is testing tooling, not a new visual direction or a change to Odaiba geometry/materials. It preserves the existing 3-second city transitions and 10/5-second result/handoff. Remove the panel or move it to Admin before exhibition. Current acceptance evidence is recorded separately in [VALIDATION](VALIDATION_2026-10-02.md#survey-meter-tests-and-development-auto-answer--2026-09-30) and the [task handoff](../handoffs/archive/survey-auto-tests.md); earlier captures do not verify this addition.
 
 ## Guest 自動交接更新 — 2026-10-02
 
-此決定取代早前必須由 Admin 確認觀眾離開的要求。下一位開始四題問卷時，server 自動完成交接；通常沿用累積城市，有保留 reset 則先執行再開始。Admin 只保留中止未完成體驗操作。結果約10秒、交接約5秒及略過按鈕沿用。詳見 [交接 handoff](../handoffs/remove-guest-exit-lock.md)。
+此決定取代早前必須由 Admin 確認觀眾離開的要求。下一位開始四題問卷時，server 自動完成交接；通常沿用累積城市，有保留 reset 則先執行再開始。Admin 只保留中止未完成體驗操作。結果約10秒、交接約5秒及略過按鈕沿用。詳見 [交接 handoff](../handoffs/archive/remove-guest-exit-lock.md)。

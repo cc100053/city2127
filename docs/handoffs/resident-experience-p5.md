@@ -1,12 +1,14 @@
 # resident-experience-p5 — 展場與實際裝置驗收
 
+> 現行接續核對 — 2026-10-03：P5準備文件 `8399a26` 及publication closure `92a97c1` 已在 `origin/main`，原P5分支已退休。文件發布完成與實機驗收分開；D0–D10、理解程度、長跑及S5仍未完成。
+
 - Owner: Codex；展覽決策 owner：cc100053，現場操作人待指定
 - Status: IN_PROGRESS — 已準備驗收表；實機／理解程度尚未測試
 - Branch: `codex/resident-experience-p5`
 - Base commit: `88e2d62e03095edd41172cf1044219b11bc99bae`
 - Source commit: `8399a2601de3824b8fa58d50fc2b3e26328e5e79`
 - Last verified commit: `8399a2601de3824b8fa58d50fc2b3e26328e5e79`（文件檢查PASS）；另有本交接的publication metadata更新，實機 NOT RUN
-- Remote availability: source已推送 `origin/codex/resident-experience-p5` 的上述SHA；本交接closure接續發布於同一分支，最新tip可用 `git rev-parse origin/codex/resident-experience-p5` 取得
+- Remote availability: 準備source `8399a2601de3824b8fa58d50fc2b3e26328e5e79` 及publication closure `92a97c117b06cd76adb1e293374a39c1ef3f45a5` 均在 `origin/main`；原P5分支已退休，實機工作仍待接續。
 
 ## Session Git state
 
@@ -18,7 +20,7 @@
 
 ## In-scope files and dependencies
 
-本交接兼作驗收表，沿用 [P4](resident-experience-p4.md)、[VALIDATION](../VALIDATION.md) 及 [README啟動流程](../../README.md#展覽啟動mac--windows)。只同步本交接、計劃、驗證入口與索引。實測問題出現後才trace callers並修正；不新增泛用手機responsive／adaptive camera、依賴或服務，不改展覽DB。
+本交接兼作驗收表，沿用 [P4](archive/resident-experience-p4.md)、[VALIDATION](../VALIDATION.md) 及 [README啟動流程](../../README.md#展覽啟動mac--windows)。只同步本交接、計劃、驗證入口與索引。實測問題出現後才trace callers並修正；不新增泛用手機responsive／adaptive camera、依賴或服務，不改展覽DB。
 
 ## 裝置與場地記錄
 
@@ -99,7 +101,7 @@
 - 起始main [CI37013068059](https://github.com/cc100053/city2127/actions/runs/37013068059) 在上述base上PASS；不代表P5實機通過。
 - Hardware/browser/visitor/long-run/FPS: NOT RUN；P4軟件證據不轉為P5結果。
 - Tests/builds: NOT RUN（documentation only，repository規則不要求重跑）。
-- Integrated commit/checks: NOT INTEGRATED；P5待實機，任務分支供接續。
+- Integrated commit/checks: 文件準備已在 `origin/main`，publication closure `92a97c117b06cd76adb1e293374a39c1ef3f45a5` 的 [main CI37016236163](https://github.com/cc100053/city2127/actions/runs/37016236163) PASS（2026-10-03核對）；P5實機仍NOT RUN。
 - Publication: source已commit／push；staged／committed `git diff --check origin/main...HEAD` PASS，發布前fetch與main divergence仍0/0。分支CI在最後push後核對，實際結果於本次最終回覆提供，不預先宣稱PASS。
 
 ## Known issues, important decisions and next expected step

@@ -1,6 +1,6 @@
 # 居民體驗計劃 — 2127 台場
 
-日期：2026-10-02。Owner：Codex。**P1–P3 已實作；P4 軟件驗證已通過，P5 尚待實機驗收。** P2接入證據見 [階段交接](handoffs/resident-experience-p2.md)；P3排程／carrier證據見 [P3交接](handoffs/resident-experience-p3.md)；本文件保留P4／P5計劃，不代表實際裝置驗收已完成。產品契約以 [SPEC](EXHIBITION_SPEC.md) 為準；文案唯一來源是 [RESIDENT_COPY](RESIDENT_COPY.md)，接手入口是 [handoff](handoffs/resident-experience-plan.md)。
+日期：2026-10-02。Owner：Codex。**P1–P3 已實作；P4 軟件驗證已通過，P5 尚待實機驗收。** P2接入證據見 [階段交接](handoffs/archive/resident-experience-p2.md)；P3排程／carrier證據見 [P3交接](handoffs/archive/resident-experience-p3.md)；本文件保留P4／P5計劃，不代表實際裝置驗收已完成。產品契約以 [SPEC](EXHIBITION_SPEC.md) 為準；文案唯一來源是 [RESIDENT_COPY](RESIDENT_COPY.md)，接手入口是 [handoff](handoffs/archive/resident-experience-plan.md)。
 
 ## 目標與已確認方向
 
@@ -40,7 +40,7 @@ P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibitio
 
 ### P1 — 居民文案：DONE（documentation only）
 
-交付為 [RESIDENT_COPY](RESIDENT_COPY.md)：居民開場、四題／12 選項、設施卡、結果句型、核對／等待／重試用語。原有 ids／effects／次序已比對，文件與現行設施關係已核對；[P1 handoff](handoffs/resident-copy-p1.md) 保留證據。P1交付時尚未接入；P2現已接入JSON／UI。日文是作者自審，沒有外部語言審核或實測閱讀時間。
+交付為 [RESIDENT_COPY](RESIDENT_COPY.md)：居民開場、四題／12 選項、設施卡、結果句型、核對／等待／重試用語。原有 ids／effects／次序已比對，文件與現行設施關係已核對；[P1 handoff](handoffs/archive/resident-copy-p1.md) 保留證據。P1交付時尚未接入；P2現已接入JSON／UI。日文是作者自審，沒有外部語言審核或實測閱讀時間。
 
 ### P2 — 文案接入與畫面分工：DONE
 
@@ -51,11 +51,11 @@ P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibitio
 
 完成門檻：四題居民文案可作答；partial answers 不改城；iPad 結果沒有觀看用表格；大屏幕可讀、城市不被大面積遮擋；單站與 A/B 各自的保存／重試／交接仍工作。提供新畫面證據，不沿用 P1 CI 當 UI 驗收。
 
-2026-10-02實作：question-set version3，原SQLite／version2歷史保留，單站／A-B新預約接續舊草稿；Guest結果精簡，root重用固定卡片。日常卡每12秒、live fallback本機最多10秒；A/B≥3秒仍可覆蓋，並非P3保留閱讀時段。卡片按focal實際數量／塔形態選擇；配對／district因果判斷未接入。新截圖、root/survey checks與三項scratch-DB browser回歸見 [P2 handoff](handoffs/resident-experience-p2.md)。這些checks不等於P4全部案例／P5實機驗收。
+2026-10-02實作：question-set version3，原SQLite／version2歷史保留，單站／A-B新預約接續舊草稿；Guest結果精簡，root重用固定卡片。日常卡每12秒、live fallback本機最多10秒；A/B≥3秒仍可覆蓋，並非P3保留閱讀時段。卡片按focal實際數量／塔形態選擇；配對／district因果判斷未接入。新截圖、root/survey checks與三項scratch-DB browser回歸見 [P2 handoff](handoffs/archive/resident-experience-p2.md)。這些checks不等於P4全部案例／P5實機驗收。
 
 ### P3 — 真實原因與展示節奏：DONE
 
-每份回答預留 **10秒觀看時段**：0–3秒識別＋位置提示＋現有城市過渡；3–10秒保留一項偏好與真實配置影響。2026-10-02已接入排程／root／Guest／lease／guard／drain，軟件計時證據見 [P3交接](handoffs/resident-experience-p3.md)。這不是已驗證的實際閱讀時間或理解程度。以下保留P3的驗收契約。
+每份回答預留 **10秒觀看時段**：0–3秒識別＋位置提示＋現有城市過渡；3–10秒保留一項偏好與真實配置影響。2026-10-02已接入排程／root／Guest／lease／guard／drain，軟件計時證據見 [P3交接](handoffs/archive/resident-experience-p3.md)。這不是已驗證的實際閱讀時間或理解程度。以下保留P3的驗收契約。
 
 - A/B 按 server 提交順序呈現；一份結果的閱讀時段未完，不被下一份覆蓋。兩站仍能獨立作答；等待頁清楚顯示回答已保存。
 - 一起調整 server 的 display scheduling、root queue、Guest 等待、result lease、提前交接 guard 與 reset drain。分開管理「3秒過渡」與「10秒觀看」，不能把所有3秒常數盲目改為10秒。
@@ -73,7 +73,7 @@ P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibitio
 
 ### P4 — 軟件與雙屏流程驗證：DONE
 
-2026-10-02 已以 scratch SQLite／Chrome 154.0.8037.93／1280×720／deviceScaleFactor1 完成下列軟件案例；[P4交接](handoffs/resident-experience-p4.md) 逐列列出 native／browser 證據、source/integration commit、展示計時、console/network 記錄及限制。City 固定 hero／`?hour=16`；觸控為桌面 Chromium 模擬，離線租期採明列的 server clock jumps，不作實際閱讀或裝置證據。以下保留驗收契約。
+2026-10-02 已以 scratch SQLite／Chrome 154.0.8037.93／1280×720／deviceScaleFactor1 完成下列軟件案例；[P4交接](handoffs/archive/resident-experience-p4.md) 逐列列出 native／browser 證據、source/integration commit、展示計時、console/network 記錄及限制。City 固定 hero／`?hour=16`；觸控為桌面 Chromium 模擬，離線租期採明列的 server clock jumps，不作實際閱讀或裝置證據。以下保留驗收契約。
 
 | 驗收案例 | 預期 |
 | --- | --- |
@@ -116,4 +116,4 @@ P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibitio
 
 ## 接手順序
 
-先讀 [P2 handoff](handoffs/resident-experience-p2.md) → [P1文案](RESIDENT_COPY.md) → [PROJECT](PROJECT.md) 與當前source。按mandatory preflight核對remote／owner／dirty files／available commits。P4已交付，接手先讀 [P4 handoff](handoffs/resident-experience-p4.md)；下一個可分派階段是 **P5** 指定實際裝置／展場與理解程度驗收。P4軟件驗證不自動啟動P5，亦不代表S5完成。
+先讀 [P2 handoff](handoffs/archive/resident-experience-p2.md) → [P1文案](RESIDENT_COPY.md) → [PROJECT](PROJECT.md) 與當前source。按mandatory preflight核對remote／owner／dirty files／available commits。P4已交付，接手先讀 [P4 handoff](handoffs/archive/resident-experience-p4.md)；下一個可分派階段是 **P5** 指定實際裝置／展場與理解程度驗收。P4軟件驗證不自動啟動P5，亦不代表S5完成。

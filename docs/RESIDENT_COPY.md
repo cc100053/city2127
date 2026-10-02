@@ -1,6 +1,6 @@
 # 2127 居民文案 — P1
 
-日期：2026-10-02。Owner：Codex。**P1 文案已完成；2026-10-02由 [P2](handoffs/resident-experience-p2.md) 接入runtime。** 下文保留P1原交付與P2/P3條件；當前接入／驗證以P2交接為準。 產品方向見 [SPEC](EXHIBITION_SPEC.md)，交接見 [resident-copy-p1](handoffs/resident-copy-p1.md)。以下日文是接入用產品文案，中文是編輯／實作說明。
+日期：2026-10-02。Owner：Codex。**P1 文案已完成；2026-10-02由 [P2](handoffs/archive/resident-experience-p2.md) 接入runtime。** 下文保留P1原交付與P2/P3條件；當前接入／驗證以P2交接為準。 產品方向見 [SPEC](EXHIBITION_SPEC.md)，交接見 [resident-copy-p1](handoffs/archive/resident-copy-p1.md)。以下日文是接入用產品文案，中文是編輯／實作說明。
 
 ## 故事與畫面契約
 
@@ -86,7 +86,7 @@
 
 ## 大屏幕：設施解說
 
-每張卡只呈現標題＋兩句。按**目前實際形態**選卡；表內模式是編輯分類，不是直接以 band 判斷每個 carrier。Mixed 與配對設施各有實際出現條件。關係核對來源：[PROJECT](PROJECT.md)、[Meter handoff](handoffs/meter-variety.md)。
+每張卡只呈現標題＋兩句。按**目前實際形態**選卡；表內模式是編輯分類，不是直接以 band 判斷每個 carrier。Mixed 與配對設施各有實際出現條件。關係核對來源：[PROJECT](PROJECT.md)、[Meter handoff](handoffs/archive/meter-variety.md)。
 
 | Copy ID／形態 | 標題 | 內文（日文） |
 | --- | --- | --- |
@@ -199,4 +199,4 @@
 - P2 接入文案與畫面分工；P3 接入結果條件與播放排程。未執行新畫面、字距、閱讀時間、iPad Safari、A/B 新排程或觀眾理解驗收。
 - 先用大屏幕原型驗證每張卡一次能否讀完，再決定實際文字停留時間。固定橫向輸入裝置尺寸待選定；不引入泛用手機／responsive 改版。
 
-2026-10-02 P3接入補充：上述個人偏好句維持；runtime每張結果選一項偏好＋一項實際結果。Focal用「この拠点／この水辺／この公園」限定數量影響；district-only用配置調整／生活用途，未量度全區增加不套用上表增加句。Carrier evidence比較effective targets、可見配對乘積與實際slot分布；無前後baseline只確認保存。只有scores變動用方向句；相同effective targets用維持句；詳見 [P3](handoffs/resident-experience-p3.md)。P1原有提案與驗收條件保留為歷史。
+2026-10-02 P3接入補充：上述個人偏好句維持；runtime每張結果選一項偏好＋一項實際結果。Focal用「この拠点／この水辺／この公園」限定數量影響；district-only用配置調整／生活用途，未量度全區增加不套用上表增加句。Carrier evidence比較effective targets、可見配對乘積與實際slot分布；無前後baseline只確認保存。只有scores變動用方向句；相同effective targets用維持句；詳見 [P3](handoffs/archive/resident-experience-p3.md)。P1原有提案與驗收條件保留為歷史。

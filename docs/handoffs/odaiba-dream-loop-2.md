@@ -1,8 +1,10 @@
 # Odaiba Dream Loop r2 — 2026-10-01
 
+> 現行接續核對 — 2026-10-03：實作已整合、原分支已退休；polish仍延後，target未達及原視覺限制保留。下面各輪「resume／another round／merge」屬歷史步驟；owner指定新polish任務後，從當時核對過的main及現行視覺authority開新分支，勿復用舊分支指示。
+
 - Owner: cc100053 (Claude Code session). Sequential Opus worker subagents implemented each pass; the orchestrator ran checks, captures and bug fixes.
 - Branch: `feat/odaiba-dream-loop-2`, from `main` `6301794` (0/0 with `origin/main` after a successful fetch; clean tree).
-- Scope: user asked to "create branch and use dream-loop to polish city". Dream Loop Plus, three passes, then stop for human review. Target: the existing locked `.dream-loop/target.png` (see [earlier Dream Loop](odaiba-dream-loop.md)); no new target generated. Fable was unavailable (usage credits), so workers ran on Opus.
+- Scope: user asked to "create branch and use dream-loop to polish city". Dream Loop Plus, three passes, then stop for human review. Target: the existing locked `.dream-loop/target.png` (see [earlier Dream Loop](archive/odaiba-dream-loop.md)); no new target generated. Fable was unavailable (usage credits), so workers ran on Opus.
 - Capture: headless Chrome 1920×929, `?hour=16&reviewTime=20` (`.dream-loop/shot.sh`, ignored).
 - Status: rounds 2–9 implemented and locally verified (round 7 reverted); target NOT reached. Integrated into `main` as `53790a2` on 2026-10-01 at the user's request ("merge 落 main, 遲下再polish"); feature CI passed on `e6fe03b`. Further polish deferred.
 

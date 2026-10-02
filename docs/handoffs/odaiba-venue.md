@@ -1,5 +1,7 @@
 # odaiba-venue — Odaiba replaces Shibuya as the exhibition city
 
+> 現行接續核對 — 2026-10-03：P0–P5已在遠端main；原分支已退休。保留此交接只追蹤未完成P6/S5，實機操作與證據使用 [P5驗收表](resident-experience-p5.md)，不重跑歷史換場工作。
+
 > Closure correction — 2026-10-02: P0–P5 integrated as `e6c7966`; task branch retired. P6/S5 is still pending; current runtime after art/district/Meter changes is in [PROJECT](../PROJECT.md).
 
 - Owner: cc100053 (runtime work by Claude Code sessions)

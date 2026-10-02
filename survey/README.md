@@ -99,14 +99,14 @@ npm run dev:auto
 
 Fresh scratch SQLite、localhost port 8788、`/guest?dev-auto`。Root City は `?survey=ws://127.0.0.1:8788/ws` に接続。既定 DB を変更しません。Panel はサーバーの vote map から option を選び、普通の draft/review/submit/retry を使います。停止は送信済み request を撤回せず、reset や他 Guest と衝突したら停止します。次の提案は普通の自動 Start handoff、Admin exit command は送りません。
 
-**DEV-ONLY：展示会前に panel／endpoint／launcher を除去、または別途 Admin への移動を決定してください。旧 staff-exit lock は復活させません。** 再利用可能な tests は残します。実装履歴：[auto-tests](../docs/handoffs/survey-auto-tests.md)。
+**DEV-ONLY：展示会前に panel／endpoint／launcher を除去、または別途 Admin への移動を決定してください。旧 staff-exit lock は復活させません。** 再利用可能な tests は残します。実装履歴：[auto-tests](../docs/handoffs/archive/survey-auto-tests.md)。
 
 ## Legacy and historical records
 
 v1 の質問予約／trigger／加算 clamp／一人一問コードと tests は互換性のため保持します。`questions.mvp.json` を既定設定にするだけでは current v2 run は v1 に戻りません。現在の Guest は四問 UI、root との接続は実装済みです。
 
-原 schema-1 [制作 log](docs/log/survey-state-mvp.md)、[repo import](../docs/handoffs/survey-state-mvp.md)、[causal MVP](../docs/handoffs/causal-city-mvp.md) は過去の基準。現行 limits は[展示会仕様](../docs/EXHIBITION_SPEC.md)、A/B evidence は[handoff](../docs/handoffs/two-guest-devices.md)を参照。S5、入力機器と展示当日の recovery policy は未検証です。
+原 schema-1 [制作 log](docs/log/survey-state-mvp.md)、[repo import](../docs/handoffs/archive/survey-state-mvp.md)、[causal MVP](../docs/handoffs/archive/causal-city-mvp.md) は過去の基準。現行 limits は[展示会仕様](../docs/EXHIBITION_SPEC.md)、A/B evidence は[handoff](../docs/handoffs/archive/two-guest-devices.md)を参照。S5、入力機器と展示当日の recovery policy は未検証です。
 
-2026-10-02 P2：正式question-setはversion3です（algorithm／CityView v2、schema7とは別）。住民の問い／背景、送信前確認、保存／待機／街を見る案内をGuestに接続し、結果の回答／Meter／施設表はCity側の短い解説に置き換えました。旧草稿は新しい予約へ有効な選択を引き継ぎ、A/Bは自分の旧予約を既存end endpointで終了します。保存済みversion2提案は原文のまま同IDで回復でき、SQLiteを削除しません。時刻／lease／resetは変更していません。[P2 handoff](../docs/handoffs/resident-experience-p2.md)。
+2026-10-02 P2：正式question-setはversion3です（algorithm／CityView v2、schema7とは別）。住民の問い／背景、送信前確認、保存／待機／街を見る案内をGuestに接続し、結果の回答／Meter／施設表はCity側の短い解説に置き換えました。旧草稿は新しい予約へ有効な選択を引き継ぎ、A/Bは自分の旧予約を既存end endpointで終了します。保存済みversion2提案は原文のまま同IDで回復でき、SQLiteを削除しません。時刻／lease／resetは変更していません。[P2 handoff](../docs/handoffs/archive/resident-experience-p2.md)。
 
-2026-10-02 P3は上記P2の時刻条件を更新します：server/root/Guestは共通10秒閲覧枠を予約し、3秒の都市転換を保持。早い交代はreleaseを枠の終わりまで待ち、resetは両stationをdrainします。retry/reloadは残り時間のみ、result leaseは開始+15秒で固定。rootはeffective carrier配置／可視pairing／seed後の実分布を比較し、個人の声と共同結果を区別。切断／再接続／Undo／reduced motion／期限切れイベントは即復元、照明のみのsnapshotは有効queueを保持。[P3 handoff](../docs/handoffs/resident-experience-p3.md)。
+2026-10-02 P3は上記P2の時刻条件を更新します：server/root/Guestは共通10秒閲覧枠を予約し、3秒の都市転換を保持。早い交代はreleaseを枠の終わりまで待ち、resetは両stationをdrainします。retry/reloadは残り時間のみ、result leaseは開始+15秒で固定。rootはeffective carrier配置／可視pairing／seed後の実分布を比較し、個人の声と共同結果を区別。切断／再接続／Undo／reduced motion／期限切れイベントは即復元、照明のみのsnapshotは有効queueを保持。[P3 handoff](../docs/handoffs/archive/resident-experience-p3.md)。
