@@ -1,11 +1,11 @@
 # admin-undo — Staff-only latest-proposal Undo
 
 - Owner: cc100053 (implemented by Codex in this task)
-- Status: IN_PROGRESS
+- Status: DONE (implementation and local integrated validation; main CI checked after push in this task)
 - Branch: `codex/admin-undo`
 - Base commit: `cfd62c92d6a672297f9ae3b2129fd1ff3a8f9519`
-- Last verified commit: uncommitted task tree; local root/survey test/build PASS; browser PASS
-- Remote availability: NOT PUSHED
+- Last verified commit: `aaf291821765f41fdc77c1cdee03ac73cc7b18db` (integrated local checks; browser-verified feature tree is identical)
+- Remote availability: `origin/codex/admin-undo` at `d4bf456eb0b74ce13b51eed4cf403180d642b13f`; integrated main contains `aaf2918` plus this documentation-only closure
 
 ## Session Git state
 
@@ -25,7 +25,7 @@ Undo broadcasts an authoritative snapshot including the undone ID and current li
 
 2026-10-02, Node26.0.0: root/survey `npm test` and `npm run build` PASS; root retains existing bundle-size warning. New `survey/tests/adminUndo.test.ts` covers >64 history restore, exact scores/EMA/seeds/layout/latest history, counters, timing, stale/duplicate/wrong-target requests, rollback, append-only marker, revoked retries, real SQLite restart, queued reset, lighting and real HTTP/WebSocket Admin authorization. Root tests cover lower/equal-revision authoritative snapshot and unchanged lighting. First new test failed comparing wire JSON with an undefined optional property; corrected the assertion to compare wire JSON, then full suite PASS.
 
-Browser: `tests/adminUndo.browser.mjs` PASS on headless Chrome, 1280×720 DPR1 (running clock, hour16). Native Admin confirmation/Undo, disabled-before-submit/after-undo/after-next-start, exact API restore, visible site diagnostics, City reload, Guest cleared result/storage, Monitor and retained audit/revoked retry passed with no page exceptions. Test initially froze the animation clock and timed out on live transition, then corrected to a running clock; a subsequent selector matched repeated ordinals in retained history, corrected to select the latest row. Screenshots: [Admin](../../artifacts/admin-undo-admin.png), [city before](../../artifacts/admin-undo-city-before.png), [city restored](../../artifacts/admin-undo-city-restored.png). Scratch DB `/private/tmp/city2127-admin-undo-browser.sqlite`, survey8795 and Vite5173. Server/Chrome sandbox launch denials retried with approval. Exhibition DB untouched. Exact diff including new tests reviewed; whitespace/local Markdown targets PASS. CI/integration pending.
+Browser: `tests/adminUndo.browser.mjs` PASS on headless Chrome, 1280×720 DPR1 (running clock, hour16). Native Admin confirmation/Undo, disabled-before-submit/after-undo/after-next-start, exact API restore, visible site diagnostics, City reload, Guest cleared result/storage, Monitor and retained audit/revoked retry passed with no page exceptions. Test initially froze the animation clock and timed out on live transition, then corrected to a running clock; a subsequent selector matched repeated ordinals in retained history, corrected to select the latest row. Screenshots: [Admin](../../artifacts/admin-undo-admin.png), [city before](../../artifacts/admin-undo-city-before.png), [city restored](../../artifacts/admin-undo-city-restored.png). Scratch DB `/private/tmp/city2127-admin-undo-browser.sqlite`, survey8795 and Vite5173. Server/Chrome sandbox launch denials retried with approval. Exhibition DB untouched. Exact diff including new tests reviewed; whitespace/local Markdown targets PASS. Feature [CI 36969101787](https://github.com/cc100053/city2127/actions/runs/36969101787) PASS on `d4bf456` (Node24 root/survey/module-swap and whitespace). No-conflict merge `aaf2918` exactly preserves the feature tree. Integrated root/survey tests/builds and committed diff check PASS. Git ff-only check hit a sandbox ORIG_HEAD denial and succeeded on approved retry. This closure changes documentation only. Main CI is checked after push; this record does not pre-claim its outcome. See [main CI history](https://github.com/cc100053/city2127/actions?query=branch%3Amain) and the task final response.
 
 ## Decisions and limits
 
@@ -33,4 +33,4 @@ No new dependency/endpoint or generalized history editor. Revision/ordinal remai
 
 ## Next step
 
-Finish browser verification, documentation/link/diff review, feature commit/push and CI, then integrate and validate main per [workflow](../CONTRIBUTING.md).
+Implementation integrated on main; rebuild/restart survey with the existing SQLite, then refresh City/Guest/Admin to load it. The task verifies remote main and its CI after pushing this record per [workflow](../CONTRIBUTING.md).
