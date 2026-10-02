@@ -10,6 +10,8 @@ Development auto-answer (DEV-ONLY): run `cd survey && npm run dev:auto`, open `h
 
 Install Git and **Node.js 24+** (including npm). Use a desktop browser with WebGL 2. Keep both terminal tabs running. Run each command from the repository root unless a step changes directory. The project has no public deployment setup.
 
+Admin **直前の提案を取り消す** undoes only the latest completed proposal before the next guest starts. It restores the previous city and counts, keeps the proposal marked as undone, and lets the guest start a fresh four-question session. Rebuild/restart the survey server and refresh City/Guest/Admin; the existing SQLite migrates to schema 6 without deleting data.
+
 ### macOS — two Terminal tabs
 
 **Tab 1: survey server** — hosts the API, WebSocket, guest/monitor/admin pages, and SQLite state. Build the pages before starting the server.

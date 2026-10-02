@@ -2,7 +2,7 @@ import './debug.css';
 import type { ProposalRecord } from '../shared/cityView.ts';
 import type { ExhibitionState } from '../shared/citySurveyState.ts';
 import type { ProposalData, ProposalRequest, ProposalSessionData } from '../shared/protocol.ts';
-import { api, el, newAnswerId } from './debugApi.ts';
+import { api, connectEvents, el, newAnswerId } from './debugApi.ts';
 import { buildProposalRequest } from './guestFlow.ts';
 
 const app = document.querySelector<HTMLElement>('#app')!;
@@ -24,6 +24,7 @@ let draft = new Map<string, string>();
 let questionIndex = 0;
 let pendingRequest: ProposalRequest | undefined;
 let saved: ProposalData | undefined;
+let undoneSubmissionId: string | undefined;
 let conflictState: ExhibitionState | undefined;
 let notice: { text: string; role: 'status' | 'alert' } | undefined;
 let idleTimer = 0;
@@ -258,6 +259,7 @@ async function restoreRecovery(recovery: GuestRecovery) {
     notice = { role: 'alert', text: errorText(checked.error.code, checked.error.message) };
   }
 
+  if (!checked.ok && checked.error.code === 'proposal_undone') return showUndone();
   if (pendingRequest) {
     screen = 'review';
     renderReview(false);
@@ -403,6 +405,8 @@ async function submitProposal() {
   renderReview(false);
   const result = await api<ProposalData>('/api/proposals', request);
   busy = false;
+  if ((!result.ok && result.error.code === 'proposal_undone')
+      || (result.ok && result.data.proposal.id === undoneSubmissionId)) return showUndone();
   if (result.ok) {
     saved = result.data;
     conflictState = undefined;
@@ -562,6 +566,18 @@ function renderCurrent(focus = true) {
   if (screen === 'handoff') return renderHandoff();
   renderAbandoned();
 }
+
+function showUndone() {
+  nextGuest();
+  notice = { role: 'status', text: '管理者が直前の提案を取り消し、変更前の街に戻しました。もう一度回答するには「はじめる」を押してください。' };
+  renderWelcome(true);
+}
+
+connectEvents(event => {
+  if (event.type !== 'city-state-snapshot' || !event.undoneProposalId) return;
+  undoneSubmissionId = event.undoneProposalId;
+  if (saved?.proposal.id === undoneSubmissionId || pendingRequest?.submissionId === undoneSubmissionId) showUndone();
+}, () => {});
 
 const recovery = readRecovery();
 if (recovery) void restoreRecovery(recovery);

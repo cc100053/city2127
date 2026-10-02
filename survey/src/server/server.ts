@@ -23,7 +23,7 @@ const statusFor: Record<ErrorCode, number> = {
   unsupported_version: 409,
   no_question_available: 409, session_not_found: 404, session_expired: 410, already_answered: 409,
   unknown_question: 400, unknown_option: 400, option_question_mismatch: 400, question_not_assigned: 409,
-  revision_conflict: 409, answer_conflict: 409, reset_confirmation_invalid: 400,
+  revision_conflict: 409, answer_conflict: 409, reset_confirmation_invalid: 400, proposal_undone: 409,
   lifecycle_conflict: 409, lifecycle_blocked: 409,
 };
 

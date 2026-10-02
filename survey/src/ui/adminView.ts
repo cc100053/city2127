@@ -29,6 +29,8 @@ const lightingButtons = (['day', 'night', 'auto'] as const).map(mode => {
   return { mode, button };
 });
 const guestLeft = el('button', { class: 'primary', disabled: '' }, '未完了の体験を終了');
+const undo = el('button', { disabled: '' }, '直前の提案を取り消す');
+const undoStatus = el('p');
 const resetCity = el('button', { disabled: '' }, '現在の都市をリセット');
 const cancel = el('button', { disabled: '' }, '保留中のリセットを取り消す');
 const fullInput = el('input', { placeholder: '全データ初期化 と入力', autocomplete: 'off', 'aria-label': '全データ初期化の確認' });
@@ -36,7 +38,7 @@ const fullReset = el('button', { class: 'danger', disabled: '' }, '全データ�
 app.append(el('h1', {}, '展示管理（このパソコンのみ）'), status, summary,
   el('div', { class: 'panel' }, el('h2', {}, '展示の操作'),
     el('p', {}, '次の観客は管理操作なしで開始できます。未完了の体験を終了すると、草稿を破棄し、保留中のリセットを実行します。'),
-    el('div', { class: 'row' }, guestLeft, resetCity, cancel), message),
+    el('div', { class: 'row' }, guestLeft, undo, resetCity, cancel), undoStatus, message),
   el('div', { class: 'panel' }, el('h2', {}, '都市の照明'),
     el('p', {}, '昼：12:00 · 夜：22:00 · 自動：日夜サイクル。接続中の都市に反映され、再起動後も保持されます。'),
     el('div', { class: 'row' }, ...lightingButtons.map(({ button }) => button)), lightingStatus, lightingMessage),
@@ -46,6 +48,7 @@ app.append(el('h1', {}, '展示管理（このパソコンのみ）'), status, s
     el('div', { class: 'row' }, fullInput, fullReset)),
   el('h2', {}, '最近のイベント'), events);
 
+let undoProposal: AdminCurrentRun['undoProposal'] = null;
 let lifecycle: LifecycleStatus | undefined, displayMode: DisplayMode | undefined, busy = false, lightingBusy = false;
 
 function updateButtons() {
@@ -55,6 +58,7 @@ function updateButtons() {
     button.className = mode === displayMode ? 'primary' : '';
   }
   const lc = lifecycle;
+  undo.disabled = busy || !undoProposal;
   guestLeft.disabled = busy || !lc || lc.phase !== 'in_experience';
   resetCity.disabled = busy || !lc || lc.pendingReset !== 'none';
   cancel.disabled = busy || !lc || lc.pendingReset === 'none';
@@ -69,13 +73,13 @@ async function changeLighting(mode: DisplayMode) {
   await refresh();
 }
 
-async function send(command: LifecycleCommand, confirmation?: string) {
+async function send(command: LifecycleCommand, confirmation?: string, proposalId?: string) {
   if (!lifecycle) return;
   busy = true; updateButtons();
-  const result = await api<LifecycleData>('/api/admin/lifecycle', { command, expectedRevision: lifecycle.revision, confirmation });
+  const result = await api<LifecycleData>('/api/admin/lifecycle', { command, expectedRevision: lifecycle.revision, confirmation, proposalId });
   message.textContent = !result.ok ? errorText(result.error)
     : result.data.executedReset ? `${result.data.executedReset === 'full' ? '全データの初期化' : '都市のリセット'} 完了: ${result.data.previousRunId?.slice(0, 8)} → ${result.data.state.runId.slice(0, 8)}`
-      : command === 'guest-left' ? '未完了の体験を終了しました。' : command === 'cancel-reset' ? '保留中のリセットを取り消しました。' : 'リセットを保留しました（次の観客の開始時に実行）。';
+      : command === 'undo-proposal' ? '直前の提案を取り消し、変更前の街に戻しました。' : command === 'guest-left' ? '未完了の体験を終了しました。' : command === 'cancel-reset' ? '保留中のリセットを取り消しました。' : 'リセットを保留しました（次の観客の開始時に実行）。';
   busy = false;
   await refresh();
 }
@@ -84,6 +88,10 @@ guestLeft.addEventListener('click', () => {
   const pending = lifecycle?.pendingReset;
   if (pending !== 'none' && !confirm(`未完了の草稿を破棄し、保留中の${pending === 'full' ? '全データの初期化' : '都市のリセット'} を実行します。`)) return;
   void send('guest-left');
+});
+undo.addEventListener('click', () => {
+  if (!undoProposal || !confirm(`提案 #${undoProposal.ordinal} を取り消し、変更前の街に戻します。記録は履歴に残ります。`)) return;
+  void send('undo-proposal', undefined, undoProposal.id);
 });
 resetCity.addEventListener('click', () => {
   if (!lifecycle || !confirm(lifecycle.phase === 'ready'
@@ -101,9 +109,12 @@ fullReset.addEventListener('click', () => {
 
 async function refresh() {
   const [run, log] = await Promise.all([api<AdminCurrentRun>('/api/admin/current-run'), api<AdminEventsData>('/api/admin/events?limit=20')]);
-  if (!run.ok) { lifecycle = undefined; displayMode = undefined; updateButtons(); summary.replaceChildren(el('p', { class: 'notice warn' }, errorText(run.error))); return; }
+  if (!run.ok) { undoProposal = null; lifecycle = undefined; displayMode = undefined; updateButtons(); summary.replaceChildren(el('p', { class: 'notice warn' }, errorText(run.error))); return; }
   const d = run.data;
   lifecycle = d.lifecycle;
+  undoProposal = d.undoProposal;
+  undoStatus.textContent = undoProposal ? `対象：提案 #${undoProposal.ordinal} · 次の観客が始める前のみ取り消せます。`
+    : '取り消せる提案はありません（記録後、次の観客が始める前のみ利用可能）。';
   displayMode = d.displayMode;
   if (!lightingBusy) lightingStatus.textContent = `都市の照明：${LIGHTING_TEXT[displayMode]}`;
   status.className = d.lifecycle.pendingReset === 'none' ? 'notice status' : 'notice warn status';
@@ -121,9 +132,9 @@ async function refresh() {
     events.replaceChildren(
       el('table', { class: 'log' }, ...log.data.answers.map(a => el('tr', {}, el('td', {}, `#${a.sequence}`), el('td', {}, a.runId.slice(0, 8)), el('td', {}, `${a.questionId} / ${a.optionId}`), el('td', {}, `更新 ${a.revisionAfter}`), el('td', {}, a.answeredAt)))),
       el('h2', {}, '最近の提案'),
-      el('table', { class: 'log' }, ...log.data.proposals.map(p => el('tr', {}, el('td', {}, `#${p.ordinal}`), el('td', {}, p.runId.slice(0, 8)), el('td', {}, p.answers.map(a => a.optionId).join(' / ')), el('td', {}, `更新 ${p.revisionAfter}`), el('td', {}, p.submittedAt)))),
+      el('table', { class: 'log' }, ...log.data.proposals.map(p => el('tr', {}, el('td', {}, `#${p.ordinal}${p.undoneAt ? ' · 取り消し済み' : ''}`), el('td', {}, p.runId.slice(0, 8)), el('td', {}, p.answers.map(a => a.optionId).join(' / ')), el('td', {}, `更新 ${p.revisionAfter}`), el('td', {}, p.submittedAt)))),
       el('h2', {}, '管理操作の履歴'),
-      el('table', { class: 'log' }, ...log.data.admin.map(a => el('tr', {}, el('td', {}, `都市の実行を切り替え（${a.detail.scope === 'full' ? '全データの初期化' : '都市のリセット'}）`), el('td', {}, `${a.runId.slice(0, 8)} → ${a.detail.nextRunId.slice(0, 8)}`), el('td', {}, a.createdAt)))));
+      el('table', { class: 'log' }, ...log.data.admin.map(a => el('tr', {}, el('td', {}, a.type === 'proposal-undone' ? `提案 #${a.detail.ordinal} を取り消し` : `都市の実行を切り替え（${a.detail.scope === 'full' ? '全データの初期化' : '都市のリセット'}）`), el('td', {}, a.type === 'proposal-undone' ? a.detail.proposalId : `${a.runId.slice(0, 8)} → ${a.detail.nextRunId.slice(0, 8)}`), el('td', {}, a.createdAt)))));
   }
 }
 

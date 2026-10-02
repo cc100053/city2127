@@ -182,6 +182,17 @@ export const migrations: (string | ((db: DatabaseSync) => void))[] = [
     mode TEXT NOT NULL CHECK (mode IN ('auto', 'day', 'night'))
   ); INSERT INTO display_settings (id, mode) VALUES (1, 'auto');`,
 
+  // 6: append-only undo markers; active history is shared by replay, counters and city layout seeds.
+  `CREATE TABLE proposal_undos (
+    proposal_id TEXT PRIMARY KEY REFERENCES proposal_events(id),
+    created_at TEXT NOT NULL
+  );
+  CREATE TRIGGER proposal_undos_no_update BEFORE UPDATE ON proposal_undos
+    BEGIN SELECT RAISE(ABORT, 'proposal_undos is append-only'); END;
+  CREATE TRIGGER proposal_undos_no_delete BEFORE DELETE ON proposal_undos
+    BEGIN SELECT RAISE(ABORT, 'proposal_undos is append-only'); END;
+  CREATE VIEW active_proposal_events AS SELECT * FROM proposal_events
+    WHERE id NOT IN (SELECT proposal_id FROM proposal_undos);`,
 ];
 
 export const SCHEMA_VERSION = migrations.length;

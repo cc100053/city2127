@@ -80,6 +80,14 @@ for (const slotSeeds of [null, [], {}, { ...zero, extra: 1 }, { ...zero, automat
 }
 assert.equal(parseSurveyEvent({ type: 'run-reset', view: { ...initialV2, slotSeeds: { ...zero, automation: 1 } } }), null);
 assert.equal(supersedes(parsedV2.view, parsedV2.view), false);
+const restored = parseSurveyEvent({ type: 'city-state-snapshot', view: initialV2 });
+assert.ok(restored && 'view' in restored);
+assert.equal(supersedes(parsedV2.view, restored.view), false, 'live revisions still reject older frames');
+assert.equal(supersedes(parsedV2.view, restored.view, 'city-state-snapshot'), true, 'Admin Undo restores a lower revision');
+assert.equal(supersedes(parsedV2.view, parsedV2.view, 'city-state-snapshot'), false, 'lighting snapshots do not reapply an unchanged city');
+const replacementView = { ...parsedV2.view, latestProposal: { ...v2Proposal, id: 'replacement' }, recentProposals: [{ ...v2Proposal, id: 'replacement' }] };
+assert.equal(supersedes(parsedV2.view, replacementView as CityView, 'city-state-snapshot'), true, 'reconnect after Undo and re-answer accepts a changed equal revision');
+
 assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, scores: { ...v2Scores, environmentalPriority: Infinity } } }), null);
 assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, layout: { ...v2AfterLayout, coolingFins: 7 } } }), null);
 assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, layout: { ...v2AfterLayout, bands: { ...v2AfterLayout.bands, ne: 'wild' } } } }), null);

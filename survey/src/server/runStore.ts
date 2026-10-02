@@ -238,7 +238,7 @@ export function toProposalRecord(row: Row): ProposalRecord {
 export function runProposalSlotSeeds(db: DatabaseSync, runId: string) {
   const seeds = zeroScores();
   // ponytail: O(guests) per view, streaming only votes; persist incremental hashes if long runs make this measurable.
-  for (const row of db.prepare('SELECT votes_json FROM proposal_events WHERE run_id = ? ORDER BY sequence').iterate(runId)) {
+  for (const row of db.prepare('SELECT votes_json FROM active_proposal_events WHERE run_id = ? ORDER BY sequence').iterate(runId)) {
     const votes = parseVotes(str(row, 'votes_json'));
     for (const axis of CITY_AXES) if (votes[axis] !== 0) seeds[axis] = Math.imul(seeds[axis] ^ (votes[axis] + 2), 16777619) >>> 0;
   }
@@ -248,19 +248,20 @@ export function runProposalSlotSeeds(db: DatabaseSync, runId: string) {
 export function runProposalRecords(db: DatabaseSync, runId: string, requestedLimit = 64): ProposalRecord[] {
   const limit = Math.max(0, Math.min(64, Math.trunc(requestedLimit)));
   if (limit === 0) return [];
-  return db.prepare('SELECT * FROM proposal_events WHERE run_id = ? ORDER BY sequence DESC LIMIT ?')
+  return db.prepare('SELECT * FROM active_proposal_events WHERE run_id = ? ORDER BY sequence DESC LIMIT ?')
     .all(runId, limit).reverse().map(toProposalRecord);
 }
 
-export function recentProposalEvents(db: DatabaseSync, requestedLimit = 50): ProposalRecord[] {
+export function recentProposalEvents(db: DatabaseSync, requestedLimit = 50): (ProposalRecord & { undoneAt: string | null })[] {
   const limit = Math.max(0, Math.min(200, Math.trunc(requestedLimit)));
   if (limit === 0) return [];
-  return db.prepare('SELECT * FROM proposal_events ORDER BY sequence DESC LIMIT ?').all(limit).map(toProposalRecord);
+  return db.prepare('SELECT p.*, u.created_at AS undone_at FROM proposal_events p LEFT JOIN proposal_undos u ON u.proposal_id = p.id ORDER BY p.sequence DESC LIMIT ?')
+    .all(limit).map(row => ({ ...toProposalRecord(row), undoneAt: optStr(row, 'undone_at') }));
 }
 
 export function replayExhibitionRun(db: DatabaseSync, runId: string, startedAt: string): ExhibitionState {
   let state = initialExhibitionState(runId, startedAt);
-  const rows = db.prepare('SELECT * FROM proposal_events WHERE run_id = ? ORDER BY sequence').all(runId);
+  const rows = db.prepare('SELECT * FROM active_proposal_events WHERE run_id = ? ORDER BY sequence').all(runId);
   for (const row of rows) {
     const record = toProposalRecord(row);
     const savedBefore = parseExhibitionState(str(row, 'before_state_json'), 'proposal before state');

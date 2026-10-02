@@ -234,9 +234,10 @@ export function parseSurveyEvent(data: unknown): ParsedSurveyEvent | null {
   };
 }
 
-/** A view replaces the current one unless it is an older or repeated revision of the same run. */
-export const supersedes = (current: CityView | undefined, next: CityView) =>
-  !current || next.runId !== current.runId || next.revision > current.revision;
+/** Live updates advance; authoritative snapshots also restore undo or missed equal-revision replacements. */
+export const supersedes = (current: CityView | undefined, next: CityView, kind?: SurveyEventKind) =>
+  !current || next.runId !== current.runId || next.revision > current.revision
+  || (kind === 'city-state-snapshot' && JSON.stringify(next) !== JSON.stringify(current));
 
 /** Keeps a WebSocket to the survey server open; every (re)connect starts with a full snapshot. */
 export function connectSurvey(

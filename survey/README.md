@@ -1,5 +1,12 @@
 # Exhibition questionnaire — アンケート状態管理 MVP
 
+## 管理者専用 Undo（2026-10-02）
+
+Admin の **直前の提案を取り消す** は、次の Guest が開始する前だけ利用できます。元の提案を削除せず取消済みとして残し、街の全状態・配置順・参加人数を変更前に戻します。Guest の結果は開始画面に戻り、再回答は新しい四問の体験です。保留中のリセットは次の開始まで保留されます。既存 DB は起動時に schema 6 に移行します。survey を build／再起動し、City／Guest／Admin を更新してください。
+
+API は既存 `POST /api/admin/lifecycle` に `{ command: "undo-proposal", proposalId, expectedRevision }` を送ります（localhost／同一 origin のみ）。取消済み申込 ID の再送は `proposal_undone`（409）で拒否されます。元の提案と取消記録は追加専用です。検証と制約は [handoff](../docs/handoffs/admin-undo.md) を参照。
+
+
 ## 開発用の自動回答（DEV-ONLY、2026-09-30）
 
 このディレクトリで `npm run dev:auto` を実行し、`http://127.0.0.1:8788/guest?dev-auto` を開きます。ルートの Vite も起動し、街を `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8788/ws` に接続してください。毎回、新しい一時 SQLite を作成し、パスを表示します。既存の展示 DB は使いません。検査のためテスト DB は残ります。ポートが使用中なら `SURVEY_PORT` を変更してください。

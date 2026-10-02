@@ -43,7 +43,7 @@ export type ErrorCode =
   | 'no_question_available' | 'session_not_found' | 'session_expired' | 'already_answered'
   | 'unknown_question' | 'unknown_option' | 'option_question_mismatch' | 'question_not_assigned'
   | 'revision_conflict' | 'answer_conflict' | 'reset_confirmation_invalid'
-  | 'lifecycle_conflict' | 'lifecycle_blocked';
+  | 'lifecycle_conflict' | 'lifecycle_blocked' | 'proposal_undone';
 
 export type ApiError = { code: ErrorCode; message: string };
 /** Every JSON response. Conflicts that the client can recover from carry the latest state. */
@@ -89,9 +89,9 @@ export type LifecycleStatus = {
   totalGuestCount: number;
   updatedAt: string;
 };
-export type LifecycleCommand = 'reset-city' | 'full-reset' | 'cancel-reset' | 'guest-left';
+export type LifecycleCommand = 'reset-city' | 'full-reset' | 'cancel-reset' | 'guest-left' | 'undo-proposal';
 /** `confirmation` is required for reset-city (`RESET`) and full-reset (`FULL RESET`). */
-export type LifecycleRequest = { command: LifecycleCommand; expectedRevision: number; confirmation?: string };
+export type LifecycleRequest = { command: LifecycleCommand; expectedRevision: number; confirmation?: string; proposalId?: string };
 export type LifecycleData = {
   lifecycle: LifecycleStatus;
   state: CitySurveyState | ExhibitionState;
@@ -111,15 +111,19 @@ export type AdminCurrentRun = {
   totalQuestions: number;
   reservedSessions: number;
   answeredSessions: number;
+  undoProposal: { id: string; ordinal: number } | null;
 };
-export type AdminEvent = { id: number; type: 'run-reset'; runId: string; detail: { nextRunId: string; scope: 'city' | 'full' }; createdAt: string };
-export type AdminEventsData = { answers: AnswerEvent[]; proposals: ProposalRecord[]; admin: AdminEvent[] };
+export type AdminEvent = { id: number; runId: string; createdAt: string } & (
+  | { type: 'run-reset'; detail: { nextRunId: string; scope: 'city' | 'full' } }
+  | { type: 'proposal-undone'; detail: { proposalId: string; ordinal: number } }
+);
+export type AdminEventsData = { answers: AnswerEvent[]; proposals: (ProposalRecord & { undoneAt: string | null })[]; admin: AdminEvent[] };
 
 /** What one answer actually changed after clamping. */
 export type AppliedChange = { scores: Partial<CityScores> };
 
 export type ServerEvent =
-  | { type: 'city-state-snapshot'; displayMode?: DisplayMode; state: CitySurveyState | ExhibitionState; view: CityView }
+  | { type: 'city-state-snapshot'; undoneProposalId?: string; displayMode?: DisplayMode; state: CitySurveyState | ExhibitionState; view: CityView }
   | {
       type: 'city-state-updated';
       answerId: string;
