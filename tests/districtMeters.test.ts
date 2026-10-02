@@ -341,3 +341,25 @@ assert.equal(life.getDiagnostics().plazaPeople, 96, 'snapshot immediately restor
 life.hide(); service.hide();
 assert.equal(life.getDiagnostics().plazaPeople + service.getDiagnostics().serviceDrones, 0);
 console.log('PASS: P12 current-slot crowds, live/snapshot/legacy, moving service drones, four night rhythms and civic material isolation.');
+
+// P3 signatures follow effective rendered configurations, never a seed alone or a hidden pairing flag.
+for (const controller of [district, automation, sharing, concentration]) {
+  const target = deriveExhibitionLayout({ automation: 12, publicSharing: 12, environmentalPriority: 12, urbanConcentration: 12 });
+  controller.setTarget(target, 200, true, 1234);
+  const full = controller.getConfiguration();
+  controller.setTarget(target, 201, false, 5678);
+  assert.deepEqual(controller.getConfiguration(), full, 'seed changes cannot redistribute uniform extremes');
+  const mixed = deriveExhibitionLayout({ automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 });
+  controller.setTarget(mixed, 205, false, 1234);
+  const configuration = controller.getConfiguration();
+  controller.update(208);
+  assert.deepEqual(controller.getConfiguration(), configuration, 'configuration is the settled target, independent of animation');
+  controller.setTarget(mixed, 209, true, 5678);
+  assert.notDeepEqual(controller.getConfiguration(), configuration, 'same quantities with different rendered distribution are a real change');
+}
+const lowFunctions = deriveExhibitionLayout({ automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: -12 });
+concentration.setTarget(lowFunctions, 220, true);
+const lowConfig = concentration.getConfiguration();
+concentration.setTarget({ ...lowFunctions, automatedPorts: 6, plantedFraction: .8 }, 221, true);
+assert.deepEqual(concentration.getConfiguration(), lowConfig, 'forest/dock flags on absent towers never claim visible change');
+console.log('PASS: P3 carrier evidence covers uniform seed no-op, same-score redistribution, animation-independent targets and hidden pairings.');

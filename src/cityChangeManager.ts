@@ -5,7 +5,7 @@ import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 import type { EnvironmentParkDiagnostics } from './siteBuilders/siteRuntime.ts';
 import type { EnvironmentDistrictDiagnostics } from './districtMeters.ts';
 import type { Scores, SurveyView } from './surveyView.ts';
-import type { ExhibitionLayout, SurveyEventKind } from './surveyView.ts';
+import type { ExhibitionLayout, LotSocketId, SurveyEventKind } from './surveyView.ts';
 
 export { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 export const FRESH_MARKER_SECONDS = 10;
@@ -41,6 +41,8 @@ export interface SiteDiagnostic {
   readonly commonsPlaza?: ReturnType<NonNullable<BuiltSite['commonsPlaza']>['getDiagnostics']>;
   readonly concentrationTower?: ReturnType<NonNullable<BuiltSite['concentrationTower']>['getDiagnostics']>;
 }
+
+export type CarrierChange = { socketId: LotSocketId; focal: boolean; district: boolean };
 
 export type CityChangeDiagnostics = Readonly<Record<SiteId, SiteDiagnostic>>;
 
@@ -98,7 +100,7 @@ export class CityChangeManager {
   }
 
   /** V2 bands and parameters are authoritative for all four sites. */
-  applyExhibitionLayout(layout: ExhibitionLayout, kind: SurveyEventKind, now: number, slotSeeds?: Scores): void {
+  applyExhibitionLayout(layout: ExhibitionLayout, kind: SurveyEventKind, now: number, slotSeeds?: Scores): CarrierChange[] {
     const automationHub = this.sites.magnetEast.automationHub;
     const commonsPlaza = this.sites.dogenzakaSouth.commonsPlaza;
     const concentrationTower = this.sites.centerGaiRear.concentrationTower;
@@ -111,25 +113,39 @@ export class CityChangeManager {
     const fresh = kind === 'city-state-updated' && !prefersReducedMotion();
     const immediate = !fresh;
     this.transitionToVariants(selectExhibitionSiteVariants(layout), now, fresh, immediate);
+    const districts = {
+      nw: this.sites.magnetEast.automationDistrict, sw: this.sites.dogenzakaSouth.sharingDistrict,
+      ne: this.sites.stationEastPark.environmentDistrict, se: this.sites.centerGaiRear.concentrationDistrict,
+    };
+    const before = Object.fromEntries(Object.entries(districts).map(([id, district]) => [id, JSON.stringify(district?.getConfiguration())]));
+    const focal = {
+      nw: automationHub.setTarget({ band: layout.bands.nw, automatedPorts: layout.automatedPorts }, now, immediate),
+      sw: commonsPlaza.setTarget({ band: layout.bands.sw, sharedSeats: layout.sharedSeats }, now, immediate),
+      se: concentrationTower.setTarget({ band: layout.bands.se, functionModules: layout.functionModules }, now, immediate),
+      ne: park.setTarget(environmentParkTarget(layout), now, immediate),
+    };
     const changed = [
       ['magnetEast', [
-        automationHub.setTarget({ band: layout.bands.nw, automatedPorts: layout.automatedPorts }, now, immediate),
+        focal.nw,
         this.sites.magnetEast.automationDistrict?.setTarget(layout, now, immediate, slotSeeds?.automation) ?? false,
       ].some(Boolean)],
       ['dogenzakaSouth', [
-        commonsPlaza.setTarget({ band: layout.bands.sw, sharedSeats: layout.sharedSeats }, now, immediate),
+        focal.sw,
         this.sites.dogenzakaSouth.sharingDistrict?.setTarget(layout, now, immediate, slotSeeds?.publicSharing) ?? false,
       ].some(Boolean)],
       ['centerGaiRear', [
-        concentrationTower.setTarget({ band: layout.bands.se, functionModules: layout.functionModules }, now, immediate),
+        focal.se,
         this.sites.centerGaiRear.concentrationDistrict?.setTarget(layout, now, immediate, slotSeeds?.urbanConcentration) ?? false,
       ].some(Boolean)],
       ['stationEastPark', [
-        park.setTarget(environmentParkTarget(layout), now, immediate),
+        focal.ne,
         this.sites.stationEastPark.environmentDistrict?.setTarget(layout, now, immediate, slotSeeds?.environmentalPriority) ?? false,
       ].some(Boolean)],
     ] as const;
     for (const [siteId, siteChanged] of changed) if (siteChanged && fresh) this.markFresh(siteId, now);
+    return (Object.keys(districts) as LotSocketId[]).map(socketId => ({ socketId, focal: focal[socketId],
+      district: before[socketId] !== JSON.stringify(districts[socketId]?.getConfiguration()),
+    })).filter(change => change.focal || change.district);
   }
 
   get automationLevel(): number | undefined { return this.sites.magnetEast.automationDistrict?.level; }

@@ -6,7 +6,7 @@ import { createProposalSession, submitProposal } from '../src/server/proposalSer
 import { currentRun } from '../src/server/adminService.ts';
 import type { ProposalSessionData, ProposalData } from '../src/shared/protocol.ts';
 
-const { ctx } = exhibitionFixture();
+const { ctx, clock } = exhibitionFixture();
 const config = devSurveyConfig(ctx.questions);
 const settings: AutoSettings = { profile: 'high', count: 3, seed: 2127, extraWaitMs: 0, custom: {} };
 for (const [profile, vote] of [['low', -1], ['zero', 0], ['high', 1]] as const) {
@@ -34,7 +34,7 @@ const driver: AutoDriver = {
     assert.equal(ok(submitProposal(ctx, request).response).replayed, true, 'the normal same-ID path survives a lost response');
     return latest;
   },
-  async wait(_ms, signal) { signal.throwIfAborted(); },
+  async wait(ms, signal) { signal.throwIfAborted(); clock.ms += ms; },
 };
 try {
   const first = new AbortController();

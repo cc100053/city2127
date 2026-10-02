@@ -22,7 +22,7 @@ const submit = (ctx: SurveyContext, session: ProposalSessionData, id?: string) =
 const guest = (ctx: SurveyContext) => ok(submit(ctx, ok(createProposalSession(ctx).response)).response);
 
 // Normal cumulative flow: a finished guest keeps their city; the next one inherits it without an Admin command.
-const { ctx } = exhibitionFixture();
+const { ctx, clock } = exhibitionFixture();
 assert.deepEqual([readLifecycle(ctx.db).phase, readLifecycle(ctx.db).pendingReset, readLifecycle(ctx.db).totalGuestCount], ['ready', 'none', 0]);
 const sessionA = ok(createProposalSession(ctx).response);
 assert.equal(readLifecycle(ctx.db).phase, 'in_experience', 'starting the questionnaire marks the installation busy');
@@ -30,6 +30,8 @@ const a = ok(submit(ctx, sessionA, 'guest-a').response);
 assert.equal(readLifecycle(ctx.db).phase, 'awaiting_exit', 'finishing the questionnaire does not mean the guest has left');
 assert.deepEqual([a.state.guestCount, readLifecycle(ctx.db).totalGuestCount], [1, 1]);
 assert.deepEqual(state(ctx), a.state, 'no reset between normal guests');
+assert.equal(errorCode(createProposalSession(ctx).response), 'lifecycle_blocked', 'early next Start preserves the reading slot');
+clock.ms += 10_000;
 const sessionB = ok(createProposalSession(ctx).response);
 assert.deepEqual(sessionB.state, a.state, 'guest B inherits guest A\'s city');
 
@@ -40,6 +42,8 @@ const b = ok(submit(ctx, sessionB, 'guest-b').response);
 assert.deepEqual([b.state.guestCount, b.state.runId], [2, a.state.runId], 'guest B still contributes to the current city');
 assert.deepEqual([readLifecycle(ctx.db).phase, readLifecycle(ctx.db).pendingReset], ['awaiting_exit', 'city']);
 assert.deepEqual(state(ctx), b.state, 'the result stays visible after submission');
+assert.equal(errorCode(createProposalSession(ctx).response), 'lifecycle_blocked', 'queued reset cannot truncate a result');
+clock.ms += 10_000;
 ctx.db.exec(`CREATE TRIGGER fail_next_guest BEFORE INSERT ON proposal_sessions
   BEGIN SELECT RAISE(ABORT, 'injected handoff failure'); END`);
 const beforeHandoff = readLifecycle(ctx.db);
@@ -106,6 +110,7 @@ assert.equal(readLifecycle(ctx.db).pendingReset, 'full');
 ok(submit(ctx, sessionD).response);
 const beforeFull = state(ctx);
 assert.equal(beforeFull.guestCount, 2);
+clock.ms = Date.parse(String(ctx.db.prepare('SELECT display_at FROM active_proposal_events ORDER BY sequence DESC LIMIT 1').get()?.display_at)) + 10_000;
 const full = createProposalSession(ctx);
 assert.equal(full.event?.type === 'run-reset' && full.event.previousRunId, beforeFull.runId);
 assert.deepEqual([readLifecycle(ctx.db).phase, readLifecycle(ctx.db).pendingReset, readLifecycle(ctx.db).totalGuestCount],
@@ -133,6 +138,9 @@ try {
   assert.deepEqual([saved.phase, saved.pendingReset], ['in_experience', 'city']);
   const result = ok(submit(restarted, session).response);
   assert.equal(result.state.guestCount, 1, 'the guest finishes after a restart without the reset firing');
+  const displayEnd = Date.parse(result.proposal.displayAt!) + 10_000;
+  assert.equal(errorCode(createProposalSession(restarted).response), 'lifecycle_blocked');
+  restarted.now = () => new Date(displayEnd);
   const handoff = createProposalSession(restarted);
   assert.equal(handoff.event?.type, 'run-reset');
   assert.equal(ok(handoff.response).state.guestCount, 0);

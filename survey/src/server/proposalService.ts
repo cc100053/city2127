@@ -11,6 +11,8 @@ import { fail, type ServiceOutcome, type SurveyContext } from './context.ts';
 import { finishGuest, readLifecycle, setLifecycle, isStationMode, stationSessions, syncStations } from './adminService.ts';
 import { activeRun, CorruptStateError, num, readExhibitionSnapshot, str, toProposalRecord, writeExhibitionSnapshot } from './runStore.ts';
 
+import { DISPLAY_MS, RESULT_LEASE_MS } from '../shared/displayTiming.ts';
+
 export const PROPOSAL_RESERVATION_MS = 5 * 60 * 1000;
 const MAX_ID_LENGTH = 128;
 const isId = (value: unknown): value is string => typeof value === 'string' && value.trim() !== '' && value.length <= MAX_ID_LENGTH;
@@ -64,6 +66,11 @@ export function createProposalSession(ctx: SurveyContext, body: unknown = {}): S
       return { response: fail('lifecycle_blocked', 'Finish the single-station questionnaire before opening A/B.') };
     if (stationId && lifecycle.pendingReset !== 'none') return { response: fail('lifecycle_blocked', 'Reset pending. Wait for both stations to finish.') };
     if (stationId && stations.some(s => s.stationId === stationId)) return { response: fail('lifecycle_blocked', 'This station already has an active experience. Resume its saved draft or wait.') };
+    if (!stations.length && lifecycle.phase === 'awaiting_exit') {
+      const display = ctx.db.prepare('SELECT display_at, submitted_at FROM active_proposal_events WHERE run_id = ? ORDER BY sequence DESC LIMIT 1').get(current.runId);
+      if (display && Date.parse(String(display.display_at ?? display.submitted_at)) + DISPLAY_MS > ctx.now().getTime())
+        return { response: fail('lifecycle_blocked', 'Wait for the city reading slot to finish.') };
+    }
     const handoff = !stations.length && lifecycle.phase === 'awaiting_exit' ? finishGuest(ctx, lifecycle) : undefined;
     if (handoff) current = currentExhibition(ctx)!;
     if (stationId || lifecycle.phase !== 'in_experience') setLifecycle(ctx, 'in_experience', 'none');
@@ -87,10 +94,10 @@ export function endStationSession(ctx: SurveyContext, id: string): ServiceOutcom
     const row = ctx.db.prepare('SELECT * FROM proposal_sessions WHERE id = ?').get(id);
     if (!row || !row.station_id) return { response: fail('session_not_found', 'Unknown station session.') };
     const now = ctx.now().toISOString();
-    // Never release a queued display before its three-second transition finishes.
+    // Never release a queued display before its ten-second reading slot finishes.
     const display = ctx.db.prepare('SELECT display_at FROM active_proposal_events WHERE guest_session_id = ?').get(id);
-    if (row.status === 'submitted' && display && Date.parse(str(display, 'display_at')) + 3000 > ctx.now().getTime())
-      return { response: fail('lifecycle_blocked', 'Wait for the city transition to finish.') };
+    if (row.status === 'submitted' && display && Date.parse(str(display, 'display_at')) + DISPLAY_MS > ctx.now().getTime())
+      return { response: fail('lifecycle_blocked', 'Wait for the city reading slot to finish.') };
     ctx.db.prepare(`UPDATE proposal_sessions SET ended_at = ?, status = CASE WHEN status = 'reserved' THEN 'expired' ELSE status END WHERE id = ?`)
       .run(now, id);
     const outcome = syncStations(ctx);
@@ -174,15 +181,15 @@ function duplicateResult(ctx: SurveyContext, row: Row, request: ProposalRequest)
   const proposal = toProposalRecord(row);
   const wait = displayWait(ctx, proposal);
   const session = ctx.db.prepare('SELECT ended_at FROM proposal_sessions WHERE id = ?').get(proposal.guestSessionId);
-  if (proposal.stationId && session?.ended_at === null)
-    ctx.db.prepare('UPDATE proposal_sessions SET experience_until = ? WHERE id = ?')
-      .run(new Date(ctx.now().getTime() + (wait.displayWaitMs ?? 0) + 15000).toISOString(), proposal.guestSessionId);
   return { response: { ok: true, data: { proposal, state: savedState(row), replayed: true, ...wait,
     ...(proposal.stationId && session?.ended_at !== null ? { experienceFinished: true } : {}) } } };
 }
 
 const displayWait = (ctx: SurveyContext, proposal: ProposalRecord) =>
-  proposal.displayAt ? { displayWaitMs: Math.max(0, Date.parse(proposal.displayAt) - ctx.now().getTime()) } : {};
+  proposal.displayAt ? {
+    displayWaitMs: Math.max(0, Date.parse(proposal.displayAt) - ctx.now().getTime()),
+    displayRemainingMs: Math.max(0, Math.min(DISPLAY_MS, Date.parse(proposal.displayAt) + DISPLAY_MS - ctx.now().getTime())),
+  } : {};
 
 export function submitProposal(ctx: SurveyContext, body: unknown): ServiceOutcome<ProposalData> {
   const request = parseProposalRequest(body);
@@ -239,8 +246,8 @@ export function submitProposal(ctx: SurveyContext, body: unknown): ServiceOutcom
     const normalizedVotes = votes as ExhibitionVotes;
     const submittedAt = ctx.now().toISOString();
     const lastDisplay = ctx.db.prepare('SELECT display_at, submitted_at FROM active_proposal_events WHERE run_id = ? ORDER BY sequence DESC LIMIT 1').get(current.runId);
-    const displayMs = Math.max(ctx.now().getTime(), lastDisplay ? Date.parse(String(lastDisplay.display_at ?? lastDisplay.submitted_at)) + 3000 : 0);
-    const displayAt = session.stationId ? new Date(displayMs).toISOString() : null;
+    const displayMs = Math.max(ctx.now().getTime(), lastDisplay ? Date.parse(String(lastDisplay.display_at ?? lastDisplay.submitted_at)) + DISPLAY_MS : 0);
+    const displayAt = new Date(displayMs).toISOString();
     const next = applyProposalVotes(current.state, normalizedVotes, submittedAt);
     const requestJson = canonicalRequest(request);
     ctx.db.prepare(`INSERT INTO proposal_events (id, run_id, guest_session_id, canonical_request_json, question_set_version,
@@ -249,7 +256,7 @@ export function submitProposal(ctx: SurveyContext, body: unknown): ServiceOutcom
       .run(request.submissionId, current.runId, session.id, requestJson, questionSet.version, JSON.stringify(answers),
         JSON.stringify(normalizedVotes), current.state.revision, next.revision, JSON.stringify(current.state), JSON.stringify(next), submittedAt, session.stationId ?? null, displayAt);
     ctx.db.prepare("UPDATE proposal_sessions SET status = 'submitted', submitted_at = ?, experience_until = ? WHERE id = ?")
-      .run(submittedAt, session.stationId ? new Date(displayMs + 15000).toISOString() : null, session.id);
+      .run(submittedAt, session.stationId ? new Date(displayMs + RESULT_LEASE_MS).toISOString() : null, session.id);
     writeExhibitionSnapshot(ctx.db, next);
     // Single mode waits for the next start; A/B waits for both experiences to end.
     setLifecycle(ctx, 'awaiting_exit', lifecycle.pendingReset);

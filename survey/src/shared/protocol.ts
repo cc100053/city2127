@@ -72,7 +72,7 @@ export type ProposalRequest = {
   expectedRevision: number;
   answers: { questionId: string; optionId: string }[];
 };
-export type ProposalData = { proposal: ProposalRecord; state: ExhibitionState; replayed: boolean; displayWaitMs?: number; experienceFinished?: boolean };
+export type ProposalData = { proposal: ProposalRecord; state: ExhibitionState; replayed: boolean; displayWaitMs?: number; displayRemainingMs?: number; experienceFinished?: boolean };
 
 export type RunSummary = { id: string; status: 'active' | 'ended'; algorithmVersion: 1 | 2; startedAt: string; endedAt: string | null };
 /**
@@ -141,6 +141,7 @@ export type ServerEvent =
       type: 'city-state-updated';
       submissionId: string;
       displayWaitMs?: number;
+      displayRemainingMs?: number;
       state: ExhibitionState;
       proposal: ProposalRecord;
       view: CityView;

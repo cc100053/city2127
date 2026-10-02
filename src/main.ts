@@ -129,8 +129,7 @@ try {
     if(isExhibitionView(view)){
       // Cancel any legacy score blend while preserving its current rendered atmosphere.
       world.blendTo(world.state,now);
-      cityChanges!.applyExhibitionLayout(view.layout,kind,now,view.slotSeeds);
-      return;
+      return cityChanges!.applyExhibitionLayout(view.layout,kind,now,view.slotSeeds);
     }
     world.blendTo(scoresToWorldState(view.scores),now);
     if(kind==='city-state-updated')cityChanges!.applyIncrementalUpdate(view,now);

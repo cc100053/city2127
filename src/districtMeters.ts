@@ -62,6 +62,9 @@ export class SlotLevels {
     return true;
   }
 
+  /** Settled targets, independent of animation time; used to describe actual carrier configuration. */
+  get targets(): Readonly<Float32Array> { return this.to; }
+
   visible(): number {
     let n = 0;
     for (const level of this.value) if (level > HIDDEN) n++;
@@ -354,6 +357,20 @@ export class SharingDistrict {
     this.writeCrowd(now); this.pulses.update(now);
   }
   hide(): void { this.root.visible = false; this.pulses.clear(); }
+  // ponytail: mirrors settled write() transforms; update this projection when adding carrier geometry.
+  getConfiguration() {
+    return [Array.from(this.levels.targets, (open, i) => {
+      const hybrid = this.hybridRooms.targets[i], vault = Math.max(1 - open, hybrid), vaulted = this.vaulted[i];
+      return [vaulted ? vault * (1 - .5 * hybrid) : 0, vaulted ? vault : 0,
+        vaulted ? Math.max(open, hybrid) : hybrid, vaulted ? 0 : open * (1 - hybrid)];
+    }), Array.from(this.court.targets, (open, i) => {
+      const hybrid = this.hybridCourts.targets[i], walled = Math.max(1 - open, hybrid), shared = Math.max(open, hybrid);
+      const glasshouse = this.privateDesign[i] === 1, pergola = this.openDesign[i] === 1;
+      return [glasshouse ? hybrid : walled, glasshouse ? (1 - open) * (1 - hybrid) : 0, shared,
+        pergola ? hybrid : shared, pergola ? open * (1 - hybrid) : 0, walled, this.kiosk.targets[i] * open, this.orchard.targets[i] * open];
+    })];
+  }
+
   getDiagnostics() {
     const open = this.root.visible ? this.levels.visible() : 0;
     return { enabled: this.root.visible, nightRhythm: this.nightRhythm, plazaPeople: this.root.visible ? this.courts.reduce((n, _, i) => n + (this.crowdLevel(i) > HIDDEN ? 12 : 0), 0) : 0, targetSharing: this.target, rooms: this.bays.length, activePulses: this.pulses.active(this.now),
@@ -690,6 +707,13 @@ export class EnvironmentDistrict {
     this.pulses.update(now);
   }
 
+  // ponytail: mirrors settled write() transforms; update this projection when adding carrier geometry.
+  getConfiguration() {
+    return [Array.from(this.canopy.targets, (green, i) => [Math.max(green, this.hybrid.targets[i]), Math.max(this.sail.targets[i], this.hybrid.targets[i]), this.hybrid.targets[i]]),
+      Array.from(this.tower.targets), Array.from(this.facade.targets),
+      Array.from(this.roofCrown.targets, (green, i) => [Math.max(green, this.roofHybrid.targets[i]), Math.max(this.roofSail.targets[i], this.roofHybrid.targets[i])])];
+  }
+
   getDiagnostics(): EnvironmentDistrictDiagnostics {
     return {
       nightRhythm: this.nightRhythm, slots: this.bays.length, targetCanopy: this.targetCanopy,
@@ -929,6 +953,13 @@ export class AutomationDistrict {
   }
 
   hide(): void { this.root.visible = false; this.pulses.clear(); }
+
+  // ponytail: mirrors settled write() transforms; update this projection when adding carrier geometry.
+  getConfiguration() {
+    const activity = automationActivity(this.automation.targets[0]);
+    return [[Math.ceil(activity.walkers), Math.ceil(activity.pods), Math.ceil(activity.aircraft)],
+      Array.from(this.staffed.targets, (staffed, i) => [Math.max(staffed, .6 * this.hybrid.targets[i]), Math.max(1 - staffed, this.hybrid.targets[i])])];
+  }
 
   getDiagnostics() {
     const activity = automationActivity(this.level ?? .5);
@@ -1172,6 +1203,12 @@ export class ConcentrationDistrict {
   }
 
   hide(): void { this.root.visible = false; this.pulses.clear(); }
+
+  // ponytail: mirrors settled write() transforms; update this projection when adding carrier geometry.
+  getConfiguration() {
+    return [Array.from(this.towerLevels.targets, (tower, i) => [Math.max(tower, .45 * this.midRise.targets[i]), this.forest.targets[i] * tower, this.docks.targets[i] * tower]),
+      Array.from(this.podLevels.targets, (pod, i) => [pod, this.solarPods.targets[i] * pod])];
+  }
 
   getDiagnostics() {
     return { enabled: this.root.visible, nightRhythm: this.nightRhythm, targetConcentration: this.target, towers: this.towers.length, pods: this.pods.length, activePulses: this.pulses.active(this.now),

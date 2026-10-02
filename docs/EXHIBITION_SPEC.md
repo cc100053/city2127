@@ -19,9 +19,9 @@
 
 [居民文案 P1](RESIDENT_COPY.md) 已由 [P2](handoffs/resident-experience-p2.md) 接入：question-set version3、四題／背景、提交前核對，以及 Guest 保存／等待／「街の画面をご覧ください。」和站號／暮らしの声編號。結果頁收起答案、Meter 與設施表格；單站 revision conflict 的復原核對仍保留數值資訊。舊草稿可重新預約並保留有效選項，A/B 先結束自己的舊預約；舊已保存回答原文／version2不重寫，未知提交結果維持同 ID 重試。
 
-Root 用固定360px卡片顯示背景、當前實際 focal 設施及位置；一個標題、最多兩句。開場 identity 取 P1 內文首兩句。日常卡本機每12秒輪換，live 結果先用保守保存確認，10秒後回日常卡；A/B 仍可依現有≥3秒間隔取代上一張結果。結果不是已核實 district 的變化原因；不將個人答案當共同城市變化方向。Snapshot/reset/Undo即時替換，reload不重播舊結果；照明-only snapshot不打斷有效queue。
+Root 用固定360px卡片顯示背景、當前實際 focal 設施及位置；一個標題、最多兩句。開場 identity 取 P1 內文首兩句。日常卡本機每12秒輪換；[P3](handoffs/resident-experience-p3.md) 的每份live結果保留10秒，0–3秒身份／位置／原有過渡，3–10秒一項個人偏好＋一項共同城市實際結果，再恢復日常卡。Root比較實際effective carrier targets／可見配對及slot分布；同分不同配置、只有方向改變、完全維持分開處理，seed本身或隱藏配對不算可見變化。Focal count只描述該地點，district-only用實際區域及配置調整文案；沒有前後證據只確認保存，不將個人答案當共同城市變化方向。Snapshot/reset/Undo即時替換，reload不重播舊結果；照明-only snapshot不打斷有效queue。
 
-完整 [P1–P5計劃](RESIDENT_EXPERIENCE_PLAN.md) 保留；下一階段 **P3** 才接入真實carrier原因及完整觀看時段。P2本機10秒timer不代表server保留10秒閱讀slot。P4/P5與S5、實際iPad／理解程度／閱讀時間仍待驗收。
+完整 [P1–P5計劃](RESIDENT_EXPERIENCE_PLAN.md) 保留；P1–P3已實作，P3軟件排程檢查不代表10秒足夠閱讀。P4全面軟件流程／P5與S5、實際iPad／理解程度／閱讀時間仍待驗收。
 
 每位觀眾回答同一組四題，核對後提交**一份完整提案**。四題沒有逐題改城；下一位繼承累積結果。問題／option ids 與 effects 由 [正式 JSON](../survey/src/survey/questions.exhibition.json) 定義；保留日文產品文案。
 
@@ -70,7 +70,7 @@ Live 使用可重新定向的 **3 秒**過渡；pulse 只標示真的 live 變�
 | 單站 `/guest` | 下一位 Start 自動結束已提交體驗，毋須 Admin 確認離場 | 保留中的 reset 在下一位 Start 套用；Admin 可中止未完成問卷 |
 | `/guest?station=A`／`B` | 獨立 session／草稿／結果；同一站一個體驗。不能混用活躍單站與 A/B | 停止新開始，等兩站問卷及結果／交接排出；Admin 中止必須指定一個未完成 session |
 
-A/B 按 server transaction 提交順序累積，容許舊 city revision、拒絕未來 revision；單站仍要求完全一致。City 顯示起點相隔至少 3 秒；Guest 排隊顯示已保存／等待展示，再顯示自己的結果。問卷 5 分鐘期限、已提交 result lease（展示開始後 15 秒）釋放離線站；重連直接恢復最新完整城市，不重播漏掉的過渡。
+A/B 按 server transaction 提交順序累積，容許舊 city revision、拒絕未來 revision；單站仍要求完全一致。單站／A-B City 顯示起點相隔至少 10 秒，城市動畫保持3秒；Guest 排隊顯示已保存／等待展示，再顯示自己的結果。提前Guest交接不截斷已排定展示；server拒絕在10秒閱讀結束前release／下一單站Start，reset遵守drain。問卷5分鐘期限、已提交result lease固定於展示開始後15秒釋放離線站；同ID retry／reload只接續剩餘時段，不延長lease；重連／斷線／過期late事件／reduced motion直接恢復最新完整城市並清掉舊字幕timer，不重播漏掉的過渡。`displayWaitMs`／`displayAt`只表示排程，不確認viewer在線或播放；不新增viewer-ack服務。
 
 ## Admin、資料與照明
 

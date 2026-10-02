@@ -10,7 +10,9 @@ import { exhibitionFixture, errorCode, ok, staff, startServer } from './surveyFi
 
 const dir = mkdtempSync(join(tmpdir(), 'admin-undo-'));
 const dbPath = join(dir, 'survey.sqlite');
-let { ctx } = exhibitionFixture(dbPath);
+const fixture = exhibitionFixture(dbPath);
+let { ctx } = fixture;
+const { clock } = fixture;
 function request(session: ProposalSessionData, id: string, option = 0): ProposalRequest {
   return { submissionId: id, guestSessionId: session.session.id, expectedRevision: session.state.revision,
     answers: session.questions.map(q => ({ questionId: q.id, optionId: q.options[option].id })) };
@@ -21,7 +23,10 @@ try {
   assert.equal(errorCode(undo('missing').response), 'lifecycle_blocked');
   assert.equal(errorCode(staff(ctx, 'undo-proposal')), 'bad_request', 'target ID is required');
   // More than the visible 64 proposals: Undo restores the full-history hash, not just the visible band.
-  for (let i = 0; i < 65; i++) ok(submitProposal(ctx, request(ok(createProposalSession(ctx).response), `history-${i}`, i % 3)).response);
+  for (let i = 0; i < 65; i++) {
+    ok(submitProposal(ctx, request(ok(createProposalSession(ctx).response), `history-${i}`, i % 3)).response);
+    clock.ms += 10_000;
+  }
   const before = currentState(ctx), beforeView = currentView(ctx);
   const session = ok(createProposalSession(ctx).response);
   const proposalRequest = request(session, 'target', 2);
@@ -58,7 +63,7 @@ try {
   assert.equal(ctx.db.prepare('SELECT COUNT(*) AS n FROM proposal_events').get()?.n, 66, 'original records are retained');
   assert.throws(() => ctx.db.exec("DELETE FROM proposal_undos WHERE proposal_id = 'target'"), /append-only/);
   ctx.db.close();
-  ctx = exhibitionFixture(dbPath).ctx;
+  ctx = exhibitionFixture(dbPath, clock.ms).ctx;
   assert.deepEqual(currentState(ctx), before);
   assert.deepEqual(currentView(ctx), beforeView, 'restart replay ignores revoked proposals');
   const next = ok(createProposalSession(ctx).response);

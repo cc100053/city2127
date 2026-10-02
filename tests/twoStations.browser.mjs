@@ -18,7 +18,9 @@ async function answer(page, option = 2) {
 }
 async function start(page) { await page.locator('[data-auto-action=start]').click(); await screen(page, 'question'); }
 async function finish(page) {
-  await page.getByRole('button', { name: '次の方へ', exact: true }).click();
+  if (await page.locator('#app').getAttribute('data-screen') === 'welcome') return;
+  if (await page.locator('#app').getAttribute('data-screen') === 'result')
+    await page.getByRole('button', { name: '次の方へ', exact: true }).click();
   await page.getByRole('button', { name: 'はじめる画面へ', exact: true }).click();
   await screen(page, 'welcome');
 }
@@ -61,12 +63,12 @@ try {
   assert.equal(combined.guestCount, 2);
   assert.deepEqual(combined.recentProposals.map(p => p.stationId).sort(), ['A', 'B']);
   const ownA = combined.recentProposals.find(p => p.stationId === 'A'), ownB = combined.recentProposals.find(p => p.stationId === 'B');
-  assert.equal(await a.locator('.guest-result-number').textContent(), `ステーション A · 暮らしの声 #${ownA.ordinal}`);
+  assert.ok((await a.locator('#app').innerText()).includes(`ステーション A · 暮らしの声 #${ownA.ordinal}`));
   assert.equal(await b.locator('.guest-result-number').textContent(), `ステーション B · 暮らしの声 #${ownB.ordinal}`);
   await checkCity(combined);
   const displays = await city.evaluate(() => window.stationDisplays);
   assert.deepEqual(displays.slice(0, 2).map(d => d.label), combined.recentProposals.map(p => `ステーション ${p.stationId} · 暮らしの声 #${p.ordinal}`));
-  assert.ok(displays[1].at - displays[0].at >= 2950, `separate transitions: ${displays[1].at - displays[0].at} ms`);
+  assert.ok(displays[1].at - displays[0].at >= 9950, `separate reading slots: ${displays[1].at - displays[0].at} ms`);
   await a.screenshot({ path: 'artifacts/resident-p2-two-stations-a.png' }); await b.screenshot({ path: 'artifacts/resident-p2-two-stations-b.png' });
   await city.screenshot({ path: 'artifacts/resident-p2-two-stations-city.png' });
   await finish(a); await start(a);
