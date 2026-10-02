@@ -1,5 +1,11 @@
 # 2127 — Frozen Intersection
 
+## 2台で同時に回答 — 2026-10-02
+
+同じ信頼できる LAN の survey server に接続し、1台で `http://<展示PCのLAN IP>:8787/guest?station=A`、もう1台で `/guest?station=B` を開きます。server は `SURVEY_HOST=0.0.0.0`（PowerShell：`$env:SURVEY_HOST='0.0.0.0'`）で起動します。各ステーションの四問・草稿・結果・交代は独立し、提案は server の受信順に累積、再送は一度だけ加算します。City の変化は3秒以上の間隔で展示し、提案番号と A/B を表示します。再接続は最新 snapshot に復元します。既存 `/guest` の単独モードは維持し、体験中の A/B と混在させないでください。
+
+A/B のリセットは新しい開始を停止し、両方の回答・結果・交代が終わるまで保留します。Admin は指定した未完了ステーションだけを終了できます。通信断の草稿は開始から5分、記録済みの結果は予定展示から15秒で解放されます（結果復元時は表示租期を更新）。survey を build／再起動し Guest／City／Admin を更新してください。schema 7 は既存データを保持します。[handoff](docs/handoffs/two-guest-devices.md)を参照。
+
 **言語：** [繁體中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
 
 来場者が一緒に未来の渋谷をつくる展示です。各来場者は四つの質問に答え、一つの提案を送信します。次の来場者は、それまでの選択が反映された街を引き継ぎます。展示用の街はリポジトリ直下の Three.js シーン（`src/`）です。`survey/` サーバーが質問、状態、SQLite データベース、WebSocket 配信を管理します。`module-swap/` は旧 v1 の因果デモで、現在の v2 CityView には対応していません。

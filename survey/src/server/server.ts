@@ -12,9 +12,9 @@ import { openDatabase } from './database.ts';
 import { restoreOrCreateRun } from './runStore.ts';
 import { createGuestSession, getGuestQuestion, RESERVATION_MS } from './sessionService.ts';
 import { currentState, currentView, submitAnswer, viewOf } from './answerService.ts';
-import { currentRun, isLoopbackAddress, lifecycleCommand, readDisplayMode, setDisplayMode, recentEvents } from './adminService.ts';
+import { currentRun, isLoopbackAddress, lifecycleCommand, readDisplayMode, setDisplayMode, recentEvents, settleStations } from './adminService.ts';
 import { attachRealtime } from './realtime.ts';
-import { createProposalSession, getProposalSession, submitProposal } from './proposalService.ts';
+import { createProposalSession, getProposalSession, submitProposal, endStationSession } from './proposalService.ts';
 import { UnsupportedRunVersionError } from './runStore.ts';
 import { devSurveyConfig } from './devSurvey.ts';
 
@@ -89,6 +89,12 @@ export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddr
     });
   });
   const realtime = attachRealtime(server, () => { const state = currentState(ctx); return { state, view: viewOf(ctx, state), displayMode: readDisplayMode(ctx.db) }; });
+  const stationTimer = setInterval(() => {
+    try { const outcome = settleStations(ctx); if (outcome?.event) realtime.broadcast(outcome.event); }
+    catch (error) { console.error('Station lifecycle error', error); }
+  }, 1000);
+  stationTimer.unref();
+  server.on('close', () => clearInterval(stationTimer));
   const publish = <T>(res: ServerResponse, outcome: ServiceOutcome<T>, okStatus = 200) => {
     sendJson(res, outcome.response, okStatus);
     if (outcome.event) realtime.broadcast(outcome.event);
@@ -132,7 +138,9 @@ export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddr
       const outcome = submitAnswer(ctx, await readJson(req));
       return publish(res, outcome, outcome.response.ok && !outcome.response.data.replayed ? 201 : 200);
     }
-    if (path === '/api/proposal-sessions' && method === 'POST') return publish(res, createProposalSession(ctx), 201);
+    if (path === '/api/proposal-sessions' && method === 'POST') return publish(res, createProposalSession(ctx, await readJson(req)), 201);
+    const endSession = /^\/api\/proposal-sessions\/([^/]+)\/end$/.exec(path);
+    if (endSession && method === 'POST') return publish(res, endStationSession(ctx, endSession[1]));
     const proposalSession = /^\/api\/proposal-sessions\/([^/]+)$/.exec(path);
     if (proposalSession && method === 'GET') return sendJson(res, getProposalSession(ctx, proposalSession[1]));
     if (path === '/api/proposals' && method === 'POST') {

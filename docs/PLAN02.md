@@ -1,5 +1,9 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
+## 雙裝置 Guest — 2026-10-02
+
+已實作 A/B 獨立四題體驗，共用同一個累積台場城市。Live 提案按記錄順序相隔至少3秒展示，標示提案編號及站名；Guest 保留自己的結果。Reset 暫停新開始，等兩站問卷／結果／交接完成；單站入口仍沿用既有自動交接。City 的 reset／Undo／重新連接 snapshot 即時復原，不重播漏掉的動畫。模型、鏡頭、材質、場地和桌面範圍不變。桌面雙瀏覽器流程已驗證，實體 LAN 裝置／展覽硬件仍待驗收；詳見 [交接](handoffs/two-guest-devices.md)及[驗證](VALIDATION.md#concurrent-guest-stations-ab--2026-10-02)。
+
 ## Admin-only Undo — 2026-10-02
 
 Guest keeps the existing four-question flow. Staff can undo the latest completed proposal before the next Guest starts, restoring inherited city/counts with no change pulse, keeping the original marked as undone, and allowing a fresh re-answer. No multi-step history editing or geometry/camera/material change. Queued resets still apply at next start. Implementation/evidence: [handoff](handoffs/admin-undo.md), [validation](VALIDATION.md#admin-only-undo--2026-10-02).

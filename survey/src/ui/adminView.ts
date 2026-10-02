@@ -29,6 +29,7 @@ const lightingButtons = (['day', 'night', 'auto'] as const).map(mode => {
   return { mode, button };
 });
 const guestLeft = el('button', { class: 'primary', disabled: '' }, '未完了の体験を終了');
+const stationBox = el('div');
 const undo = el('button', { disabled: '' }, '直前の提案を取り消す');
 const undoStatus = el('p');
 const resetCity = el('button', { disabled: '' }, '現在の都市をリセット');
@@ -37,18 +38,19 @@ const fullInput = el('input', { placeholder: '全データ初期化 と入力', 
 const fullReset = el('button', { class: 'danger', disabled: '' }, '全データを初期化');
 app.append(el('h1', {}, '展示管理（このパソコンのみ）'), status, summary,
   el('div', { class: 'panel' }, el('h2', {}, '展示の操作'),
-    el('p', {}, '次の観客は管理操作なしで開始できます。未完了の体験を終了すると、草稿を破棄し、保留中のリセットを実行します。'),
-    el('div', { class: 'row' }, guestLeft, undo, resetCity, cancel), undoStatus, message),
+    el('p', {}, '次の観客は管理操作なしで開始できます。A/B は独立して回答します。リセットは両ステーションの回答・結果表示が終わるまで保留され、新しい開始を停止します。'),
+    stationBox, el('div', { class: 'row' }, guestLeft, undo, resetCity, cancel), undoStatus, message),
   el('div', { class: 'panel' }, el('h2', {}, '都市の照明'),
     el('p', {}, '昼：12:00 · 夜：22:00 · 自動：日夜サイクル。接続中の都市に反映され、再起動後も保持されます。'),
     el('div', { class: 'row' }, ...lightingButtons.map(({ button }) => button)), lightingStatus, lightingMessage),
   stateBox,
   el('div', { class: 'panel' }, el('h2', {}, '全データの初期化（テスト／展示開始用）'),
-    el('p', {}, '総参加人数と現在の都市を0に戻します。記録は削除されません。体験中は次の観客の開始まで保留されます。'),
+    el('p', {}, '総参加人数と現在の都市を0に戻します。記録は削除されません。A/B は両体験の終了まで、単独モードは次の開始まで保留されます。'),
     el('div', { class: 'row' }, fullInput, fullReset)),
   el('h2', {}, '最近のイベント'), events);
 
 let undoProposal: AdminCurrentRun['undoProposal'] = null;
+let stations: AdminCurrentRun['stations'] = [];
 let lifecycle: LifecycleStatus | undefined, displayMode: DisplayMode | undefined, busy = false, lightingBusy = false;
 
 function updateButtons() {
@@ -59,7 +61,8 @@ function updateButtons() {
   }
   const lc = lifecycle;
   undo.disabled = busy || !undoProposal;
-  guestLeft.disabled = busy || !lc || lc.phase !== 'in_experience';
+  guestLeft.disabled = busy || !lc || lc.phase !== 'in_experience' || stations.length > 0;
+  for (const button of Array.from(stationBox.querySelectorAll<HTMLButtonElement>('button'))) button.disabled = busy;
   resetCity.disabled = busy || !lc || lc.pendingReset !== 'none';
   cancel.disabled = busy || !lc || lc.pendingReset === 'none';
   fullReset.disabled = busy || !lc || lc.pendingReset === 'full' || fullInput.value !== '全データ初期化';
@@ -73,13 +76,13 @@ async function changeLighting(mode: DisplayMode) {
   await refresh();
 }
 
-async function send(command: LifecycleCommand, confirmation?: string, proposalId?: string) {
+async function send(command: LifecycleCommand, confirmation?: string, proposalId?: string, guestSessionId?: string) {
   if (!lifecycle) return;
   busy = true; updateButtons();
-  const result = await api<LifecycleData>('/api/admin/lifecycle', { command, expectedRevision: lifecycle.revision, confirmation, proposalId });
+  const result = await api<LifecycleData>('/api/admin/lifecycle', { command, expectedRevision: lifecycle.revision, confirmation, proposalId, guestSessionId });
   message.textContent = !result.ok ? errorText(result.error)
     : result.data.executedReset ? `${result.data.executedReset === 'full' ? '全データの初期化' : '都市のリセット'} 完了: ${result.data.previousRunId?.slice(0, 8)} → ${result.data.state.runId.slice(0, 8)}`
-      : command === 'undo-proposal' ? '直前の提案を取り消し、変更前の街に戻しました。' : command === 'guest-left' ? '未完了の体験を終了しました。' : command === 'cancel-reset' ? '保留中のリセットを取り消しました。' : 'リセットを保留しました（次の観客の開始時に実行）。';
+      : command === 'undo-proposal' ? '直前の提案を取り消し、変更前の街に戻しました。' : command === 'guest-left' ? '指定した未完了の体験を終了しました。' : command === 'cancel-reset' ? '保留中のリセットを取り消しました。' : 'リセットを保留しました。A/B は両体験の終了後、単独モードは次の開始時に実行します。';
   busy = false;
   await refresh();
 }
@@ -96,7 +99,7 @@ undo.addEventListener('click', () => {
 resetCity.addEventListener('click', () => {
   if (!lifecycle || !confirm(lifecycle.phase === 'ready'
     ? '体験エリアは空いていますか？ 現在の都市を今すぐリセットします（総参加人数は保持）。'
-    : '観客がいるためリセットは保留され、次の観客の開始時に実行されます。')) return;
+    : 'リセットを保留します。A/B は新しい開始を停止し、両体験が終了してから実行します。単独モードは次の開始時に実行します。')) return;
   void send('reset-city', 'RESET');
 });
 cancel.addEventListener('click', () => void send('cancel-reset'));
@@ -112,6 +115,18 @@ async function refresh() {
   if (!run.ok) { undoProposal = null; lifecycle = undefined; displayMode = undefined; updateButtons(); summary.replaceChildren(el('p', { class: 'notice warn' }, errorText(run.error))); return; }
   const d = run.data;
   lifecycle = d.lifecycle;
+  stations = d.stations;
+  stationBox.replaceChildren(...stations.map(station => {
+    const row = el('div', { class: 'row' }, `ステーション ${station.stationId}：${station.status === 'reserved' ? '回答中' : '記録済み・結果表示中'}`);
+    if (station.status === 'reserved') {
+      const end = el('button', {}, `${station.stationId} の未完了の体験を終了`);
+      end.addEventListener('click', () => {
+        if (confirm(`ステーション ${station.stationId} の草稿だけを破棄します。もう一方の体験は続きます。`)) void send('guest-left', undefined, undefined, station.sessionId);
+      });
+      row.append(end);
+    }
+    return row;
+  }));
   undoProposal = d.undoProposal;
   undoStatus.textContent = undoProposal ? `対象：提案 #${undoProposal.ordinal} · 次の観客が始める前のみ取り消せます。`
     : '取り消せる提案はありません（記録後、次の観客が始める前のみ利用可能）。';
@@ -119,7 +134,7 @@ async function refresh() {
   if (!lightingBusy) lightingStatus.textContent = `都市の照明：${LIGHTING_TEXT[displayMode]}`;
   status.className = d.lifecycle.pendingReset === 'none' ? 'notice status' : 'notice warn status';
   status.replaceChildren(el('strong', {}, PHASE_TEXT[d.lifecycle.phase]),
-    ...(d.lifecycle.pendingReset === 'none' ? [] : [el('br'), `リセット保留中：${d.lifecycle.pendingReset === 'full' ? '全データの初期化' : '都市のリセット'}（次の観客の開始時に実行）`]));
+    ...(d.lifecycle.pendingReset === 'none' ? [] : [el('br'), `リセット保留中：${d.lifecycle.pendingReset === 'full' ? '全データの初期化' : '都市のリセット'}（A/B は両体験終了後、単独モードは次の開始時）`]));
   summary.replaceChildren(el('table', {},
     ...([['総参加人数', String(d.lifecycle.totalGuestCount)],
       ['現在の都市の参加人数', String('guestCount' in d.state ? d.state.guestCount : d.state.answerCount)],
@@ -132,7 +147,7 @@ async function refresh() {
     events.replaceChildren(
       el('table', { class: 'log' }, ...log.data.answers.map(a => el('tr', {}, el('td', {}, `#${a.sequence}`), el('td', {}, a.runId.slice(0, 8)), el('td', {}, `${a.questionId} / ${a.optionId}`), el('td', {}, `更新 ${a.revisionAfter}`), el('td', {}, a.answeredAt)))),
       el('h2', {}, '最近の提案'),
-      el('table', { class: 'log' }, ...log.data.proposals.map(p => el('tr', {}, el('td', {}, `#${p.ordinal}${p.undoneAt ? ' · 取り消し済み' : ''}`), el('td', {}, p.runId.slice(0, 8)), el('td', {}, p.answers.map(a => a.optionId).join(' / ')), el('td', {}, `更新 ${p.revisionAfter}`), el('td', {}, p.submittedAt)))),
+      el('table', { class: 'log' }, ...log.data.proposals.map(p => el('tr', {}, el('td', {}, `#${p.ordinal}${p.undoneAt ? ' · 取り消し済み' : ''}${p.stationId ? ` · ${p.stationId}` : ''}`), el('td', {}, p.runId.slice(0, 8)), el('td', {}, p.answers.map(a => a.optionId).join(' / ')), el('td', {}, `更新 ${p.revisionAfter}`), el('td', {}, p.submittedAt)))),
       el('h2', {}, '管理操作の履歴'),
       el('table', { class: 'log' }, ...log.data.admin.map(a => el('tr', {}, el('td', {}, a.type === 'proposal-undone' ? `提案 #${a.detail.ordinal} を取り消し` : `都市の実行を切り替え（${a.detail.scope === 'full' ? '全データの初期化' : '都市のリセット'}）`), el('td', {}, a.type === 'proposal-undone' ? a.detail.proposalId : `${a.runId.slice(0, 8)} → ${a.detail.nextRunId.slice(0, 8)}`), el('td', {}, a.createdAt)))));
   }

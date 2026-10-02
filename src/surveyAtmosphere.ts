@@ -123,14 +123,14 @@ export function startSurveyAtmosphere(
       historyCount.textContent = `累計 ${view.guestCount} 人`;
       historyLegend.hidden = false;
       pending.hidden = false;
-      pending.textContent = '四つのサイトはサーバーの最新レイアウトを反映しています。Meterは4軸を表示します。';
+      pending.textContent = '四つのサイトは提案の記録順に変化します。Meterは4軸を表示します。';
       // The idle view must show the total and recent band without scrolling, so they precede the latest proposal.
       panel.insertBefore(latest, scores);
       const feedback = exhibitionFeedback(view.latestProposal);
       latest.replaceChildren(...(feedback
         ? [
           // City changes lead; answers are compact (question text on hover) so the panel fits 1280×720.
-          el('p', 'causal-context', `提案 #${feedback.ordinal}`),
+          el('p', 'causal-context', `提案 #${feedback.ordinal}${view.latestProposal?.stationId ? ` · ステーション ${view.latestProposal.stationId}` : ''}`),
           ...(feedback.cityChanges.length
             ? feedback.cityChanges.map(change => row(`${change.place} · ${change.label}`, change.effect))
             : [row('街区構成', feedback.cityChanged ? '数値項目に変化はありません。' : 'サーバー記録上、変化はありません。')]),

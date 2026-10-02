@@ -193,6 +193,14 @@ export const migrations: (string | ((db: DatabaseSync) => void))[] = [
     BEGIN SELECT RAISE(ABORT, 'proposal_undos is append-only'); END;
   CREATE VIEW active_proposal_events AS SELECT * FROM proposal_events
     WHERE id NOT IN (SELECT proposal_id FROM proposal_undos);`,
+  // 7: optional A/B stations; existing single-station runs and immutable proposal history stay intact.
+  `ALTER TABLE proposal_sessions ADD COLUMN station_id TEXT CHECK (station_id IN ('A', 'B'));
+   ALTER TABLE proposal_sessions ADD COLUMN ended_at TEXT;
+   ALTER TABLE proposal_sessions ADD COLUMN experience_until TEXT;
+   CREATE UNIQUE INDEX proposal_station_active ON proposal_sessions(station_id)
+     WHERE station_id IS NOT NULL AND ended_at IS NULL AND status IN ('reserved', 'submitted');
+   ALTER TABLE proposal_events ADD COLUMN station_id TEXT CHECK (station_id IN ('A', 'B'));
+   ALTER TABLE proposal_events ADD COLUMN display_at TEXT;`,
 ];
 
 export const SCHEMA_VERSION = migrations.length;

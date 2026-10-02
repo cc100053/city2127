@@ -1,14 +1,14 @@
 import type { SQLOutputValue } from 'node:sqlite';
 import { CITY_AXES, type ExhibitionState, type ExhibitionVotes } from '../shared/citySurveyState.ts';
 import type { ApiResponse, ProposalData, ProposalRequest, ProposalSession, ProposalSessionData } from '../shared/protocol.ts';
-import type { ProposalAnswerRecord } from '../shared/cityView.ts';
+import type { ProposalAnswerRecord, ProposalRecord } from '../shared/cityView.ts';
 import { toPublicQuestion } from '../shared/question.ts';
 import { validateExhibitionQuestionSet } from '../survey/questionLoader.ts';
 import { applyProposalVotes, validateExhibitionState, voteForEffects } from '../survey/scoreEngine.ts';
 import { viewOf } from './answerService.ts';
 import { transaction } from './database.ts';
 import { fail, type ServiceOutcome, type SurveyContext } from './context.ts';
-import { finishGuest, readLifecycle, setLifecycle } from './adminService.ts';
+import { finishGuest, readLifecycle, setLifecycle, isStationMode, stationSessions, syncStations } from './adminService.ts';
 import { activeRun, CorruptStateError, num, readExhibitionSnapshot, str, toProposalRecord, writeExhibitionSnapshot } from './runStore.ts';
 
 export const PROPOSAL_RESERVATION_MS = 5 * 60 * 1000;
@@ -36,6 +36,7 @@ function parseProposalSession(row: Row): ProposalSession {
     throw new CorruptStateError('proposal session question IDs are malformed');
   return {
     id: str(row, 'id'), runId: str(row, 'run_id'), questionSetVersion: num(row, 'question_set_version'),
+    ...(row.station_id ? { stationId: str(row, 'station_id') as 'A' | 'B' } : {}),
     questionIds, status, createdAt: str(row, 'created_at'), expiresAt: str(row, 'expires_at'),
     submittedAt: row.submitted_at === null ? null : str(row, 'submitted_at'),
   };
@@ -45,26 +46,55 @@ function failNoExhibition(): ApiResponse<never> {
   return fail('unsupported_version', 'The active run does not use exhibition algorithm version 2.');
 }
 
-export function createProposalSession(ctx: SurveyContext): ServiceOutcome<ProposalSessionData> {
+export function createProposalSession(ctx: SurveyContext, body: unknown = {}): ServiceOutcome<ProposalSessionData> {
+  if (typeof body !== 'object' || body === null || Array.isArray(body)
+      || Object.keys(body).some(key => key !== 'stationId')
+      || ('stationId' in body && body.stationId !== 'A' && body.stationId !== 'B'))
+    return { response: fail('bad_request', 'Expected an empty object or stationId A/B.') };
+  const stationId = 'stationId' in body ? body.stationId as 'A' | 'B' : undefined;
   return transaction(ctx.db, () => {
     let current = currentExhibition(ctx);
     if (!current) return { response: failNoExhibition() };
     const set = validateExhibitionQuestionSet(ctx.questions);
     // Starting the next questionnaire is the handoff; no Admin confirmation is required.
+    const stations = stationSessions(ctx);
     const lifecycle = readLifecycle(ctx.db);
-    const handoff = lifecycle.phase === 'awaiting_exit' ? finishGuest(ctx, lifecycle) : undefined;
+    if (stations.length && !stationId) return { response: fail('lifecycle_blocked', 'Use the A/B station links while stations are active.') };
+    if (stationId && !isStationMode(ctx) && lifecycle.phase === 'in_experience')
+      return { response: fail('lifecycle_blocked', 'Finish the single-station questionnaire before opening A/B.') };
+    if (stationId && lifecycle.pendingReset !== 'none') return { response: fail('lifecycle_blocked', 'Reset pending. Wait for both stations to finish.') };
+    if (stationId && stations.some(s => s.stationId === stationId)) return { response: fail('lifecycle_blocked', 'This station already has an active experience. Resume its saved draft or wait.') };
+    const handoff = !stations.length && lifecycle.phase === 'awaiting_exit' ? finishGuest(ctx, lifecycle) : undefined;
     if (handoff) current = currentExhibition(ctx)!;
-    if (lifecycle.phase !== 'in_experience') setLifecycle(ctx, 'in_experience', 'none');
+    if (stationId || lifecycle.phase !== 'in_experience') setLifecycle(ctx, 'in_experience', 'none');
     const now = ctx.now(), createdAt = now.toISOString();
     const session: ProposalSession = {
       id: ctx.newId(), runId: current.runId, questionSetVersion: set.version,
+      ...(stationId ? { stationId } : {}),
       questionIds: set.questions.map(question => question.id), status: 'reserved', createdAt,
       expiresAt: new Date(now.getTime() + PROPOSAL_RESERVATION_MS).toISOString(), submittedAt: null,
     };
-    ctx.db.prepare(`INSERT INTO proposal_sessions (id, run_id, question_set_version, question_ids_json, status, created_at, expires_at)
-      VALUES (?, ?, ?, ?, 'reserved', ?, ?)`)
-      .run(session.id, session.runId, session.questionSetVersion, JSON.stringify(session.questionIds), session.createdAt, session.expiresAt);
+    ctx.db.prepare(`INSERT INTO proposal_sessions (id, run_id, question_set_version, question_ids_json, status, created_at, expires_at, station_id)
+      VALUES (?, ?, ?, ?, 'reserved', ?, ?, ?)`)
+      .run(session.id, session.runId, session.questionSetVersion, JSON.stringify(session.questionIds), session.createdAt, session.expiresAt, stationId ?? null);
     return { response: { ok: true as const, data: { session, questions: set.questions.map(toPublicQuestion), state: current.state } }, event: handoff?.event };
+  });
+}
+
+/** A client may finish only its own station session; submitted proposals are never cancelled here. */
+export function endStationSession(ctx: SurveyContext, id: string): ServiceOutcome<{ ended: true }> {
+  return transaction(ctx.db, () => {
+    const row = ctx.db.prepare('SELECT * FROM proposal_sessions WHERE id = ?').get(id);
+    if (!row || !row.station_id) return { response: fail('session_not_found', 'Unknown station session.') };
+    const now = ctx.now().toISOString();
+    // Never release a queued display before its three-second transition finishes.
+    const display = ctx.db.prepare('SELECT display_at FROM active_proposal_events WHERE guest_session_id = ?').get(id);
+    if (row.status === 'submitted' && display && Date.parse(str(display, 'display_at')) + 3000 > ctx.now().getTime())
+      return { response: fail('lifecycle_blocked', 'Wait for the city transition to finish.') };
+    ctx.db.prepare(`UPDATE proposal_sessions SET ended_at = ?, status = CASE WHEN status = 'reserved' THEN 'expired' ELSE status END WHERE id = ?`)
+      .run(now, id);
+    const outcome = syncStations(ctx);
+    return { response: { ok: true, data: { ended: true } }, event: outcome?.event };
   });
 }
 
@@ -142,8 +172,17 @@ function duplicateResult(ctx: SurveyContext, row: Row, request: ProposalRequest)
   if (ctx.db.prepare('SELECT proposal_id FROM proposal_undos WHERE proposal_id = ?').get(request.submissionId))
     return { response: fail('proposal_undone', 'This proposal was undone by an administrator. Start a new questionnaire.', currentExhibition(ctx)?.state) };
   const proposal = toProposalRecord(row);
-  return { response: { ok: true, data: { proposal, state: savedState(row), replayed: true } } };
+  const wait = displayWait(ctx, proposal);
+  const session = ctx.db.prepare('SELECT ended_at FROM proposal_sessions WHERE id = ?').get(proposal.guestSessionId);
+  if (proposal.stationId && session?.ended_at === null)
+    ctx.db.prepare('UPDATE proposal_sessions SET experience_until = ? WHERE id = ?')
+      .run(new Date(ctx.now().getTime() + (wait.displayWaitMs ?? 0) + 15000).toISOString(), proposal.guestSessionId);
+  return { response: { ok: true, data: { proposal, state: savedState(row), replayed: true, ...wait,
+    ...(proposal.stationId && session?.ended_at !== null ? { experienceFinished: true } : {}) } } };
 }
+
+const displayWait = (ctx: SurveyContext, proposal: ProposalRecord) =>
+  proposal.displayAt ? { displayWaitMs: Math.max(0, Date.parse(proposal.displayAt) - ctx.now().getTime()) } : {};
 
 export function submitProposal(ctx: SurveyContext, body: unknown): ServiceOutcome<ProposalData> {
   const request = parseProposalRequest(body);
@@ -172,7 +211,7 @@ export function submitProposal(ctx: SurveyContext, body: unknown): ServiceOutcom
     if (request.answers.length !== session.questionIds.length
         || request.answers.some(answer => !session.questionIds.includes(answer.questionId)))
       return { response: fail('question_not_assigned', 'A proposal must answer each assigned question exactly once.', current.state) };
-    if (request.expectedRevision !== current.state.revision)
+    if (request.expectedRevision > current.state.revision || (!session.stationId && request.expectedRevision !== current.state.revision))
       return { response: fail('revision_conflict', `Expected revision ${request.expectedRevision}, but the city is at revision ${current.state.revision}.`, current.state) };
     const lifecycle = readLifecycle(ctx.db);
     if (lifecycle.phase !== 'in_experience')
@@ -199,24 +238,29 @@ export function submitProposal(ctx: SurveyContext, body: unknown): ServiceOutcom
       return { response: fail('bad_request', 'Question set does not cover every city axis.', current.state) };
     const normalizedVotes = votes as ExhibitionVotes;
     const submittedAt = ctx.now().toISOString();
+    const lastDisplay = ctx.db.prepare('SELECT display_at, submitted_at FROM active_proposal_events WHERE run_id = ? ORDER BY sequence DESC LIMIT 1').get(current.runId);
+    const displayMs = Math.max(ctx.now().getTime(), lastDisplay ? Date.parse(String(lastDisplay.display_at ?? lastDisplay.submitted_at)) + 3000 : 0);
+    const displayAt = session.stationId ? new Date(displayMs).toISOString() : null;
     const next = applyProposalVotes(current.state, normalizedVotes, submittedAt);
     const requestJson = canonicalRequest(request);
     ctx.db.prepare(`INSERT INTO proposal_events (id, run_id, guest_session_id, canonical_request_json, question_set_version,
-        algorithm_version, answers_json, votes_json, revision_before, revision_after, before_state_json, after_state_json, submitted_at)
-      VALUES (?, ?, ?, ?, ?, 2, ?, ?, ?, ?, ?, ?, ?)`)
+        algorithm_version, answers_json, votes_json, revision_before, revision_after, before_state_json, after_state_json, submitted_at, station_id, display_at)
+      VALUES (?, ?, ?, ?, ?, 2, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
       .run(request.submissionId, current.runId, session.id, requestJson, questionSet.version, JSON.stringify(answers),
-        JSON.stringify(normalizedVotes), current.state.revision, next.revision, JSON.stringify(current.state), JSON.stringify(next), submittedAt);
-    ctx.db.prepare("UPDATE proposal_sessions SET status = 'submitted', submitted_at = ? WHERE id = ?").run(submittedAt, session.id);
+        JSON.stringify(normalizedVotes), current.state.revision, next.revision, JSON.stringify(current.state), JSON.stringify(next), submittedAt, session.stationId ?? null, displayAt);
+    ctx.db.prepare("UPDATE proposal_sessions SET status = 'submitted', submitted_at = ?, experience_until = ? WHERE id = ?")
+      .run(submittedAt, session.stationId ? new Date(displayMs + 15000).toISOString() : null, session.id);
     writeExhibitionSnapshot(ctx.db, next);
-    // Preserve the result; any pending reset waits until the next guest starts.
+    // Single mode waits for the next start; A/B waits for both experiences to end.
     setLifecycle(ctx, 'awaiting_exit', lifecycle.pendingReset);
+    if (session.stationId) syncStations(ctx);
 
     const row = ctx.db.prepare('SELECT * FROM proposal_events WHERE id = ?').get(request.submissionId);
     if (!row) throw new CorruptStateError('proposal insert did not produce a row');
     const proposal = toProposalRecord(row);
     return {
-      response: { ok: true, data: { proposal, state: next, replayed: false } },
-      event: { type: 'city-state-updated', submissionId: proposal.id, state: next, proposal, view: viewOf(ctx, next) },
+      response: { ok: true, data: { proposal, state: next, replayed: false, ...displayWait(ctx, proposal) } },
+      event: { type: 'city-state-updated', submissionId: proposal.id, state: next, proposal, view: viewOf(ctx, next), ...displayWait(ctx, proposal) },
     };
   });
 }

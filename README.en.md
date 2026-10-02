@@ -1,5 +1,11 @@
 # 2127 — Frozen Intersection
 
+## Two concurrent Guest devices — 2026-10-02
+
+Use one survey server on the trusted LAN. Open `http://<exhibition-PC LAN IP>:8787/guest?station=A` on one device and `/guest?station=B` on the other. Bind the survey server with `SURVEY_HOST=0.0.0.0` (PowerShell: `$env:SURVEY_HOST='0.0.0.0'`). Each station has its own four-question draft/result/handoff; submissions accumulate in server arrival order and retries count once. Live City changes are shown at least three seconds apart with proposal/station labels. City reconnect restores the latest snapshot immediately. The existing `/guest` single-station flow remains; do not mix it with active A/B experiences.
+
+A/B reset stops new starts and waits for both experiences, including results/handoffs. Admin can end only the named unfinished station. Disconnected questionnaires expire after five minutes; submitted result leases finish 15 seconds after their scheduled display (active result recovery renews that lease). Rebuild/restart survey and refresh Guest/City/Admin; schema 7 preserves existing data. See [handoff](docs/handoffs/two-guest-devices.md).
+
 **Language:** [繁體中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
 
 Guests collectively shape a futuristic Shibuya. Each guest answers four questions and submits one proposal; the next guest inherits the accumulated city. The root Three.js scene (`src/`) is the exhibition city. The `survey/` server owns the questions, state, SQLite database, and live WebSocket updates. The separate `module-swap/` viewer is a legacy v1 causal demo and does not accept the current v2 CityView.

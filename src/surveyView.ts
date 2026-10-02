@@ -38,6 +38,8 @@ export type ExhibitionCityChange = {
 };
 export type ExhibitionProposal = {
   id: string;
+  stationId?: 'A' | 'B';
+  displayAt?: string;
   runId: string;
   guestSessionId: string;
   ordinal: number;
@@ -144,7 +146,8 @@ function isExhibitionCityChange(value: unknown, before: ExhibitionLayout, after:
 }
 
 function isExhibitionProposal(value: unknown, runId: string, revision: number): value is ExhibitionProposal {
-  if (!isRecord(value) || !hasExactKeys(value, ['id', 'runId', 'guestSessionId', 'ordinal', 'questionSetVersion', 'algorithmVersion', 'answers', 'votes', 'revisionBefore', 'revisionAfter', 'submittedAt', 'beforeScores', 'afterScores', 'beforeLayout', 'afterLayout', 'cityChanges'])
+  if (!isRecord(value) || !hasExactKeys(value, ['id', 'runId', 'guestSessionId', 'ordinal', 'questionSetVersion', 'algorithmVersion', 'answers', 'votes', 'revisionBefore', 'revisionAfter', 'submittedAt', 'beforeScores', 'afterScores', 'beforeLayout', 'afterLayout', 'cityChanges', ...(Object.hasOwn(value, 'stationId') ? ['stationId', 'displayAt'] : [])])
+    || (Object.hasOwn(value, 'stationId') && (!isOneOf(value.stationId, ['A', 'B']) || !isBoundedText(value.displayAt, 80) || !Number.isFinite(Date.parse(value.displayAt))))
     || !isBoundedText(value.id, 128) || value.runId !== runId
     || !isBoundedText(value.guestSessionId, 128) || !isSafeCount(value.ordinal) || value.ordinal < 1
     || !isSafeCount(value.questionSetVersion) || value.questionSetVersion < 1 || value.algorithmVersion !== 2
@@ -247,6 +250,22 @@ export function connectSurvey(
   onDisplayMode?: (mode: DisplayMode) => void,
 ) {
   let delay = 500;
+  const pending: { kind: SurveyEventKind; view: CityView; at: number }[] = [];
+  let displayTimer: ReturnType<typeof setTimeout> | undefined;
+  let lastDisplay = -Infinity;
+  const clearDisplay = () => { clearTimeout(displayTimer); pending.length = 0; lastDisplay = -Infinity; };
+  const showNext = () => {
+    clearTimeout(displayTimer);
+    const next = pending[0];
+    if (!next) return;
+    const wait = next.at - performance.now();
+    if (wait > 0) { displayTimer = setTimeout(showNext, wait); return; }
+    pending.shift();
+    lastDisplay = performance.now();
+    onView(next.kind, next.view);
+    if (pending[0]) pending[0].at = Math.max(pending[0].at, lastDisplay + 3000);
+    showNext();
+  };
   const open = () => {
     const socket = new WebSocket(url);
     onStatus('接続中…');
@@ -260,10 +279,25 @@ export function connectSurvey(
         if (isDisplayMode(mode)) onDisplayMode?.(mode);
       }
       if (event && 'unsupportedVersion' in event) onStatus('Unsupported exhibition view version');
-      else if (event) onView(event.kind, event.view);
+      else if (event) {
+        const wait = isRecord(data) ? data.displayWaitMs : undefined;
+        if (event.kind === 'city-state-updated' && isExhibitionView(event.view) && event.view.latestProposal?.stationId) {
+          if (typeof wait !== 'number' || !Number.isFinite(wait) || wait < 0 || wait > 300_000) {
+            console.warn('Ignored malformed station display delay'); return;
+          }
+          pending.push({ ...event, at: Math.max(performance.now() + wait, lastDisplay + 3000, (pending.at(-1)?.at ?? -Infinity) + 3000) });
+          showNext();
+        } else {
+          // Lighting snapshots describe the already queued final state; do not skip its earlier proposals.
+          if (event.kind === 'city-state-snapshot' && JSON.stringify(pending.at(-1)?.view) === JSON.stringify(event.view)) return;
+          clearDisplay();
+          onView(event.kind, event.view);
+        }
+      }
       else console.warn('Ignored malformed survey message', message.data);
     });
     socket.addEventListener('close', () => {
+      clearDisplay();
       onStatus(`切断 — ${delay / 1000}秒後に再接続`);
       setTimeout(open, delay);
       delay = Math.min(delay * 2, 8000);

@@ -49,6 +49,8 @@ export type ExhibitionCityChange = {
 };
 export type ProposalRecord = {
   id: string;
+  stationId?: 'A' | 'B';
+  displayAt?: string;
   runId: string;
   guestSessionId: string;
   ordinal: number;
