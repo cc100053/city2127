@@ -9,8 +9,8 @@
 | [README 繁中](../README.md)／[English](../README.en.md)／[日本語](../README.ja.md) | 本機／LAN 啟動及展覽操作 |
 | [EXHIBITION_SPEC](EXHIBITION_SPEC.md) | 場地、產品契約、累積／變化、當前決策及尚待驗收事項 |
 | [PROJECT](PROJECT.md) | 現行模組、source/data/render flow、資源 lifecycle |
-| [RESIDENT_COPY](RESIDENT_COPY.md) | P1 日文居民文案與接入條件；文案完成，runtime 尚未接入 |
-| [RESIDENT_EXPERIENCE_PLAN](RESIDENT_EXPERIENCE_PLAN.md) | 居民雙屏體驗 P1–P5 計劃、交付及驗收；P2–P5 尚未實作 |
+| [RESIDENT_COPY](RESIDENT_COPY.md) | P1 日文居民文案與接入條件；P2已接入，結果條件／配對為P3 |
+| [RESIDENT_EXPERIENCE_PLAN](RESIDENT_EXPERIENCE_PLAN.md) | 居民雙屏體驗 P1–P5 計劃、交付及驗收；P2已完成，P3–P5待實作 |
 | [ART](ART.md)／[CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) | 實作美術規則／視覺與世界觀 authority |
 | [VALIDATION](VALIDATION.md) | 今日可執行 checks、dated evidence 入口；不複製全部 handoff |
 | [BLENDER](BLENDER.md) | 素材 source/export/placement 及每台工作站的 MCP 設定契約 |
@@ -65,6 +65,7 @@
 | [readme-localization](handoffs/readme-localization.md) | readme-localization — Three-language exhibition startup guide |
 | [resident-copy-p1](handoffs/resident-copy-p1.md) | resident-copy-p1 — Resident narrative and Japanese exhibition copy |
 | [resident-experience-plan](handoffs/resident-experience-plan.md) | resident-experience-plan — Two-screen resident experience planning |
+| [resident-experience-p2](handoffs/resident-experience-p2.md) | resident-experience-p2 — Resident copy and two-screen presentation |
 | [remove-guest-exit-lock](handoffs/remove-guest-exit-lock.md) | remove-guest-exit-lock — Automatic next-guest handoff |
 | [root-causal-panel](handoffs/root-causal-panel.md) | root-causal-panel — Causal panel in the root Shibuya survey mode (step 3) |
 | [root-survey-atmosphere](handoffs/root-survey-atmosphere.md) | root-survey-atmosphere — Survey drives the root Shibuya scene (steps 1–2) |

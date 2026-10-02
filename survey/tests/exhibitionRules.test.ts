@@ -89,7 +89,11 @@ assert.throws(() => deriveExhibitionLayout({ ...zeroScores(), automation: -13 })
 
 const questionPath = new URL('../src/survey/questions.exhibition.json', import.meta.url).pathname;
 const questionSet = validateExhibitionQuestionSet(loadQuestionSetFile(questionPath));
-assert.equal(questionSet.version, 2);
+assert.equal(questionSet.version, 3);
+assert.equal(validateExhibitionQuestionSet({ ...questionSet, version: 2 }).version, 2);
+for (const version of [1, 0, -1, 2.5, NaN])
+  assert.throws(() => validateExhibitionQuestionSet({ ...questionSet, version }), QuestionSetError);
+assert.ok(questionSet.questions.every(question => question.background));
 assert.equal(questionSet.questions.length, 4);
 assert.ok(questionSet.questions.every(question => question.options.length === 3));
 assert.throws(() => validateExhibitionQuestionSet({ ...questionSet, questions: questionSet.questions.slice(1) }), QuestionSetError);

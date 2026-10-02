@@ -13,7 +13,7 @@ for (const test of [{ enabled: false, address: '127.0.0.1', status: 404 },
     assert.equal(response.status, test.status);
     if (test.status === 200) {
       const config = ok(response.body);
-      assert.equal(config.questionSetVersion, 2);
+      assert.equal(config.questionSetVersion, ctx.questions.version);
       for (const contract of METER_CONTRACTS) {
         const meter = config.meters.find(meter => meter.axis === contract.axis)!;
         assert.equal(meter.questionId, contract.questionId);

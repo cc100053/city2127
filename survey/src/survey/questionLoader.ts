@@ -94,8 +94,8 @@ export function loadQuestionSetFile(path: string): QuestionSet {
 
 /** Enforces the fixed, reusable four-question schema used by exhibition algorithm v2. */
 export function validateExhibitionQuestionSet(set: QuestionSet): QuestionSet {
-  if (set.version !== 2 || set.questions.length !== CITY_AXES.length)
-    throw new QuestionSetError('exhibition question set must be version 2 with exactly four questions');
+  if (!Number.isSafeInteger(set.version) || set.version < 2 || set.questions.length !== CITY_AXES.length)
+    throw new QuestionSetError('exhibition question set must have a question-set version >= 2 with exactly four questions');
   const axes = new Set<string>();
   for (const question of set.questions) {
     if (question.options.length !== 3) throw new QuestionSetError(`exhibition question "${question.id}" must have exactly three options`);

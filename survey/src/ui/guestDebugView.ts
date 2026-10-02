@@ -1,5 +1,4 @@
 import './debug.css';
-import type { ProposalRecord } from '../shared/cityView.ts';
 import type { ExhibitionState } from '../shared/citySurveyState.ts';
 import type { ProposalData, ProposalRequest, ProposalSessionData } from '../shared/protocol.ts';
 import { api, connectEvents, el, newAnswerId } from './debugApi.ts';
@@ -146,7 +145,7 @@ function page(title: string, eyebrow: string, ...content: (HTMLElement | string)
   app.dataset.screen = screen;
   app.replaceChildren(
     el('div', { class: 'guest-frame' },
-      el('header', { class: 'guest-masthead' }, el('span', {}, '2127 · ODAIBA'), el('span', {}, stationId ? `ステーション ${stationId} · 共同のまちづくり` : '共同のまちづくり')),
+      el('header', { class: 'guest-masthead' }, el('span', {}, '2127 · ODAIBA'), el('span', {}, stationId ? `ステーション ${stationId} · この街で暮らすあなたへ` : 'この街で暮らすあなたへ')),
       el('section', { class: 'guest-screen' },
         el('p', { class: 'guest-eyebrow' }, eyebrow),
         el('h1', { tabindex: '-1' }, title),
@@ -191,8 +190,8 @@ function renderWelcome(focus = false) {
   const button = action(screen === 'starting' ? '準備中…' : 'はじめる', () => startSession(session !== undefined && draft.size > 0), true, busy);
   button.dataset.autoAction = 'start';
   const status = screen === 'starting' ? el('p', { class: 'guest-status', role: 'status', 'aria-live': 'polite' }, '四つの質問を準備しています。') : undefined;
-  page('次のお台場を一緒に選ぶ', '共同提案',
-    el('p', { class: 'guest-lead' }, 'ここは2127年のお台場。四つの質問に答えて、これからの街のあり方を一緒に選びます。'),
+  page('あなたの日常を教えてください。', '2127年の暮らし',
+    el('p', { class: 'guest-lead' }, '四つの問いに答えたら、街の画面をご覧ください。'),
     el('p', { class: 'guest-copy' }, '回答は最後にまとめて確認してから記録します。選んでいる間、街の集計は変わりません。'),
     ...noticeNodes(),
     ...(status ? [status] : []),
@@ -211,6 +210,14 @@ async function startSession(keepDraft = false) {
   busy = true;
   notice = undefined;
   renderWelcome();
+  if (keepDraft && stationId && session && ['unsupported_version', 'session_expired'].includes(lastErrorCode ?? '')) {
+    const ended = await api<{ ended: true }>(`/api/proposal-sessions/${encodeURIComponent(session.session.id)}/end`, {});
+    if (!ended.ok) {
+      busy = false; screen = 'welcome';
+      notice = { role: 'alert', text: errorText(ended.error.code, ended.error.message) };
+      renderWelcome(true); return;
+    }
+  }
   const result = await api<ProposalSessionData>('/api/proposal-sessions', stationId ? { stationId } : {});
   busy = false;
   if (!result.ok) {
@@ -299,7 +306,7 @@ function renderQuestion(focus = true) {
   const fieldset = el('fieldset', { class: 'guest-choices' });
   const next = el('button', {
     type: 'submit', class: 'primary', 'data-auto-action': 'next', ...(!draft.has(question.id) ? { disabled: '' } : {}),
-  }, questionIndex === session!.questions.length - 1 ? '回答を確認する' : '次の質問へ');
+  }, questionIndex === session!.questions.length - 1 ? '回答を確認する' : '次へ');
   fieldset.append(el('legend', { class: 'visually-hidden' }, question.text));
   question.options.forEach((option, optionIndex) => {
     const input = el('input', {
@@ -361,11 +368,11 @@ function renderReview(focus = true) {
   editingFromReview = false;
   const uncertain = pendingRequest !== undefined;
   const sessionBlocked = ['session_expired', 'already_answered', 'unsupported_version'].includes(lastErrorCode ?? '');
-  const submitLabel = busy ? '記録しています…'
-    : uncertain ? '同じ申込IDで結果を確認する'
+  const submitLabel = busy ? '回答を記録しています。'
+    : uncertain ? '記録を確認する'
       : sessionBlocked ? '新しい予約で草稿を続けてください'
       : conflictState ? `最新 revision ${conflictState.revision} を確認して記録する`
-        : 'この内容で街に記録する';
+        : '回答を終える';
   const submit = action(submitLabel, () => submitProposal(), true, busy || sessionBlocked);
   submit.dataset.autoAction = 'submit';
   const conflict = conflictState
@@ -374,12 +381,12 @@ function renderReview(focus = true) {
       renderScores(session!.state.scores, conflictState.scores))
     : undefined;
   const uncertainNotice = uncertain
-    ? el('p', { class: 'guest-copy', role: 'status', 'aria-live': 'polite' }, '送信結果をまだ確認できていません。内容は固定し、同じ申込IDで安全に再確認します。')
+    ? el('p', { class: 'guest-copy', role: 'status', 'aria-live': 'polite' }, '回答の記録を確認できませんでした。もう一度、確認してください。回答内容はそのまま確認します。')
     : undefined;
   const resume = notice && ['session_expired', 'already_answered', 'unsupported_version'].includes(lastErrorCode ?? '')
     ? action('新しい予約で草稿を続ける', () => startSession(true), false, busy)
     : undefined;
-  page('回答を確認する', '送信前の確認',
+  page('あなたの思いを確認してください。', '送信前の確認',
     el('p', { class: 'guest-copy' }, '変更する質問は「変更」から戻れます。記録後はこの提案を編集できません。'),
     ...noticeNodes(), ...recoveryNodes(), ...idleWarningNodes(),
     ...(conflict ? [conflict] : []),
@@ -472,29 +479,8 @@ function renderScores(before: ExhibitionState['scores'], after: ExhibitionState[
     el('tbody', {}, ...rows));
 }
 
-const changeNames: Record<string, string> = {
-  band: 'Meter帯', automatedPorts: '自律サービス端口', sharedSeats: '共有席',
-  treeCount: '樹冠ユニット', plantedFraction: '植栽面積', coolingFins: '冷却フィン', functionModules: '機能モジュール',
-};
-
-function changeValue(key: string, value: number | string) {
-  if (key === 'band') return ({ low: '低', mixed: '中間', high: '高' } as Record<string, string>)[String(value)] ?? String(value);
-  if (key === 'plantedFraction' && typeof value === 'number') return `${Math.round(value * 100)}%`;
-  return String(value);
-}
-
-function renderCityChanges(proposal: ProposalRecord) {
-  if (!proposal.cityChanges.length) {
-    return el('p', { class: 'guest-notice guest-notice--quiet' }, '構成を維持する提案を記録しました。提案の記録は残り、変化のない数値を変化として表示していません。');
-  }
-  const rows = proposal.cityChanges.map(change => {
-    const keys = [...new Set([...Object.keys(change.before), ...Object.keys(change.after)])]
-      .filter(key => change.before[key] !== change.after[key]);
-    const values = keys.map(key => `${changeNames[key] ?? key} ${changeValue(key, change.before[key])} → ${changeValue(key, change.after[key])}`).join(' · ');
-    return el('li', { class: 'guest-change-row' },
-      el('strong', {}, change.label), el('span', {}, values));
-  });
-  return el('ul', { class: 'guest-change-list', 'aria-label': '記録された街の構成変化' }, ...rows);
+function residentIdentity(proposal: ProposalData['proposal']) {
+  return `${proposal.stationId ? `ステーション ${proposal.stationId} · ` : ''}暮らしの声 #${proposal.ordinal}`;
 }
 
 function renderResult(focus = true) {
@@ -502,26 +488,18 @@ function renderResult(focus = true) {
   const wait = resultReadyAt - performance.now();
   if (wait > 0) {
     screen = 'waiting';
-    page('提案を記録しました', '街への反映を待っています',
-      el('p', { class: 'guest-lead', role: 'status' }, `提案 #${saved.proposal.ordinal} · 他の提案に続いて展示します。回答は保存済みです。`));
+    page('回答を記録しました。', '街へのご案内を待っています',
+      el('p', { class: 'guest-result-number' }, residentIdentity(saved.proposal)),
+      el('p', { class: 'guest-lead', role: 'status' }, '回答を記録しました。街の画面で順番にご案内しますので、お待ちください。'));
     clearTimeout(flowTimer);
     flowTimer = window.setTimeout(() => { screen = 'result'; renderResult(); }, wait);
     if (focus) focusTitle();
     return;
   }
-  const { proposal, state, replayed } = saved;
-  page('この提案を記録しました', '街への反映',
-    el('div', { class: 'guest-result-summary' },
-      el('p', {}, replayed ? '保存済みの提案を確認しました。集計への加算は一度だけです。' : '提案を記録しました。'),
-      el('p', { class: 'guest-result-number' }, `#${proposal.ordinal}`),
-      el('p', { class: 'guest-copy' }, `参加者 ${state.guestCount} 人 · revision ${proposal.revisionBefore} → ${proposal.revisionAfter}`)),
-    el('h2', {}, '選んだ回答'),
-    el('ol', { class: 'guest-result-answers' }, ...proposal.answers.map((answer, index) =>
-      el('li', {}, el('span', { class: 'guest-review-number' }, `質問 ${index + 1}`), answer.optionLabel))),
-    el('h2', {}, '街の構成'), renderCityChanges(proposal),
-    renderScores(proposal.beforeScores, proposal.afterScores),
-    el('p', { class: 'guest-copy' }, '街はこの提案を含む集計結果を引き継ぎます。次の方の回答で、共同の街を続けてつくります。'),
-    el('p', { class: 'guest-copy' }, 'この画面は約10秒後に次へ進みます。'),
+  const { proposal } = saved;
+  page('街の画面をご覧ください。', 'あなたの思いを記録しました',
+    el('p', { class: 'guest-result-number' }, residentIdentity(proposal)),
+    el('p', { class: 'guest-copy', role: 'status' }, '回答を記録しました。'),
     el('div', { class: 'guest-actions' }, action('次の方へ', renderHandoff, true)));
   if (focus) focusTitle();
   clearTimeout(flowTimer);
@@ -534,7 +512,7 @@ function renderHandoff() {
   // The proposal is recorded; a reload from here must not replay the result.
   clearRecovery();
   screen = 'handoff';
-  page('次の方へどうぞ', `提案 #${saved.proposal.ordinal} を記録しました`,
+  page('次の方へどうぞ。', residentIdentity(saved.proposal),
     el('p', { class: 'guest-lead' }, '街はこのまま次の方へ引き継がれます。'),
     ...noticeNodes(),
     el('div', { class: 'guest-actions' }, action('はじめる画面へ', nextGuest, true)));

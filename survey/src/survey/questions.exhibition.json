@@ -1,41 +1,45 @@
 {
-  "version": 2,
+  "version": 3,
   "questions": [
     {
       "id": "service-2127",
-      "text": "2127年のお台場。訪れる人も暮らす人も多いベイエリアで、駅やモールの案内・買い物をどう支えてほしい？",
+      "text": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
       "options": [
-        { "id": "human-led", "label": "待ち時間があっても、人が主役。技術は接客を支える", "effects": { "automation": -1 } },
-        { "id": "human-machine", "label": "普段は自動、困ったときは人に相談", "effects": { "automation": 0 } },
-        { "id": "autonomous", "label": "相談の機会より、いつでも使える自動サービス", "effects": { "automation": 1 } }
-      ]
+        { "id": "human-led", "label": "待ち時間があっても、人に相談したい。技術はその人を支えてほしい", "effects": { "automation": -1 } },
+        { "id": "human-machine", "label": "普段は自動で、困ったときは人に相談したい", "effects": { "automation": 0 } },
+        { "id": "autonomous", "label": "人に相談する機会は少なくても、いつでも自動で利用したい", "effects": { "automation": 1 } }
+      ],
+      "background": "人に相談する時間と、いつでも使える便利さ。どちらも、この街の暮らしを支えています。"
     },
     {
       "id": "commons-2127",
-      "text": "海辺で1時間の空き時間。限られた水辺の広場を、どんな場所にしたい？",
+      "text": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
       "options": [
-        { "id": "private-pods", "label": "一人や小グループで予約できる、海の見える静かな空間", "effects": { "publicSharing": -1 } },
-        { "id": "mixed-seating", "label": "静かな席と、自由に集まれる場所を半分ずつ", "effects": { "publicSharing": 0 } },
-        { "id": "open-commons", "label": "予約なしで、誰でも一緒に使える水辺", "effects": { "publicSharing": 1 } }
-      ]
+        { "id": "private-pods", "label": "予約して、一人や親しい人と静かに過ごせる場所", "effects": { "publicSharing": -1 } },
+        { "id": "mixed-seating", "label": "静かな席と、自由に集まれる場所が半分ずつある海辺", "effects": { "publicSharing": 0 } },
+        { "id": "open-commons", "label": "予約せず、誰でも一緒に使える開かれた海辺", "effects": { "publicSharing": 1 } }
+      ],
+      "background": "水辺の空間には限りがあります。静かに過ごす場所と、誰でも集まれる場所が、同じ海辺を分け合っています。"
     },
     {
       "id": "cooling-2127",
-      "text": "2127年の厳しい夏。同じ予算を、海辺のプロムナードのどんな暑さ対策に使いますか？",
+      "text": "厳しい夏の日、海辺を歩くなら。あなたは、どんな涼しさが心地よいですか？",
       "options": [
-        { "id": "active-cooling", "label": "木陰より、日差しを調整する屋根と冷却設備", "effects": { "environmentalPriority": -1 } },
-        { "id": "hybrid-cooling", "label": "冷却設備と、木陰・植栽を半分ずつ", "effects": { "environmentalPriority": 0 } },
-        { "id": "canopy-cooling", "label": "設備より、海風が通る木陰と植栽", "effects": { "environmentalPriority": 1 } }
-      ]
+        { "id": "active-cooling", "label": "木陰より、日差しを調整する屋根と冷却設備のある道", "effects": { "environmentalPriority": -1 } },
+        { "id": "hybrid-cooling", "label": "冷却設備と、木陰・植栽が半分ずつある道", "effects": { "environmentalPriority": 0 } },
+        { "id": "canopy-cooling", "label": "設備より、海風が通る木陰と植栽のある道", "effects": { "environmentalPriority": 1 } }
+      ],
+      "background": "同じ費用でも、屋根や冷却設備を中心にするか、木陰や植栽を中心にするかで、海辺の過ごし方は変わります。"
     },
     {
       "id": "functions-2127",
-      "text": "新しい店や生活サービスを増やすなら、どんなお台場で暮らしたい？",
+      "text": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
       "options": [
-        { "id": "distributed-pavilions", "label": "少し歩いても、水辺に点在する低層の機能ポッド", "effects": { "urbanConcentration": -1 } },
-        { "id": "mixed-functions", "label": "低い建物と高い建物が混ざった街", "effects": { "urbanConcentration": 0 } },
-        { "id": "vertical-functions", "label": "上へ移動すれば、一つのタワーで用事が済む街", "effects": { "urbanConcentration": 1 } }
-      ]
+        { "id": "distributed-pavilions", "label": "少し歩いても、水辺に点在する低い建物をめぐりたい", "effects": { "urbanConcentration": -1 } },
+        { "id": "mixed-functions", "label": "低い建物と高い建物が混ざる街で暮らしたい", "effects": { "urbanConcentration": 0 } },
+        { "id": "vertical-functions", "label": "上へ移動して、一つのタワーで用事を済ませたい", "effects": { "urbanConcentration": 1 } }
+      ],
+      "background": "暮らしを支える店やサービスは、水辺に分かれて並ぶことも、一つの建物に集まることもできます。"
     }
   ]
 }

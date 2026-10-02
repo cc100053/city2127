@@ -1,6 +1,6 @@
 # 2127 居民文案 — P1
 
-日期：2026-10-02。Owner：Codex。**P1 文案已完成；尚未接入 runtime。** 產品方向見 [SPEC](EXHIBITION_SPEC.md)，交接見 [resident-copy-p1](handoffs/resident-copy-p1.md)。以下日文是接入用產品文案，中文是編輯／實作說明。
+日期：2026-10-02。Owner：Codex。**P1 文案已完成；2026-10-02由 [P2](handoffs/resident-experience-p2.md) 接入runtime。** 下文保留P1原交付與P2/P3條件；當前接入／驗證以P2交接為準。 產品方向見 [SPEC](EXHIBITION_SPEC.md)，交接見 [resident-copy-p1](handoffs/resident-copy-p1.md)。以下日文是接入用產品文案，中文是編輯／實作說明。
 
 ## 故事與畫面契約
 

@@ -17,9 +17,11 @@
 
 觀眾是 **2127 年台場的一位居民**；四題表達生活偏好，城市呈現居民累積想法與近期聲音形成的生活配置。輸入裝置暫定 iPad，負責問題、選擇、核對及操作提示；共享大屏幕負責城市背景、設施與結果解說。年份固定，畫面濃縮呈現城市回應生活需求的過程。
 
-[居民文案 P1](RESIDENT_COPY.md) 已完成，尚未接入 runtime。現有 Guest 結果表與 root 數值 feedback 仍在；P2 才實作畫面分工。建議每位居民 10 秒的大屏幕展示屬 P3 後續方案，未取代現行 A/B ≥3 秒間隔。文案不改四軸算法、ids 或 effects；個人選擇不能被描述成單獨決定城市，結果須對應實際變化。交接見 [resident-copy-p1](handoffs/resident-copy-p1.md)。
+[居民文案 P1](RESIDENT_COPY.md) 已由 [P2](handoffs/resident-experience-p2.md) 接入：question-set version3、四題／背景、提交前核對，以及 Guest 保存／等待／「街の画面をご覧ください。」和站號／暮らしの声編號。結果頁收起答案、Meter 與設施表格；單站 revision conflict 的復原核對仍保留數值資訊。舊草稿可重新預約並保留有效選項，A/B 先結束自己的舊預約；舊已保存回答原文／version2不重寫，未知提交結果維持同 ID 重試。
 
-完整 [P1–P5 居民體驗計劃](RESIDENT_EXPERIENCE_PLAN.md) 與 [計劃交接](handoffs/resident-experience-plan.md) 已保存；下一個實作階段是 P2。後續畫面、結果條件、10秒排程、軟件／實際裝置驗收仍屬計劃，未因本文件建立而完成。
+Root 用固定360px卡片顯示背景、當前實際 focal 設施及位置；一個標題、最多兩句。開場 identity 取 P1 內文首兩句。日常卡本機每12秒輪換，live 結果先用保守保存確認，10秒後回日常卡；A/B 仍可依現有≥3秒間隔取代上一張結果。結果不是已核實 district 的變化原因；不將個人答案當共同城市變化方向。Snapshot/reset/Undo即時替換，reload不重播舊結果；照明-only snapshot不打斷有效queue。
+
+完整 [P1–P5計劃](RESIDENT_EXPERIENCE_PLAN.md) 保留；下一階段 **P3** 才接入真實carrier原因及完整觀看時段。P2本機10秒timer不代表server保留10秒閱讀slot。P4/P5與S5、實際iPad／理解程度／閱讀時間仍待驗收。
 
 每位觀眾回答同一組四題，核對後提交**一份完整提案**。四題沒有逐題改城；下一位繼承累積結果。問題／option ids 與 effects 由 [正式 JSON](../survey/src/survey/questions.exhibition.json) 定義；保留日文產品文案。
 
@@ -74,7 +76,7 @@ A/B 按 server transaction 提交順序累積，容許舊 city revision、拒絕
 
 Admin 只限 server 電腦 loopback，POST 另檢查 same-origin。City reset 開新城市、保留總人數；full reset 清零展示計數但保留 append-only 歷史。保留中的 reset 可取消。Undo 只可撤銷最後一份已完成提案、且下一位開始前；新草稿即使稍後取消亦不重開舊 Undo。保存不可變撤銷標記，還原提交前狀態／counts／seeds。
 
-目前 SQLite **schema 7**、algorithm／CityView **v2**；schema 3 轉換曾結束 v1 run 並保留歷史，schema 7 保留現有 v2 城市及歷史。重啟使用原 SQLite，不刪資料。Root／survey 配合更新，尤其 slotSeeds。`module-swap` 只接受 legacy v1，不是展覽城市。
+目前 question-set **version3**、SQLite **schema 7**、algorithm／CityView **v2**；schema 3 轉換曾結束 v1 run 並保留歷史，schema 7 保留現有 v2 城市及歷史。重啟使用原 SQLite，不刪資料。Root／survey 配合更新，尤其 slotSeeds。`module-swap` 只接受 legacy v1，不是展覽城市。
 
 Admin Day／Night／Auto 保存為獨立 display setting：12:00／22:00／180 秒日循環。Reset 不改照明；City `?hour` 優先。多 viewer 的 Auto 時鐘不作跨裝置同步。
 

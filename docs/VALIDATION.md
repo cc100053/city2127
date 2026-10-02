@@ -55,7 +55,7 @@ Start the services and use their printed ports as described in [README](../READM
 | Persistence | Restart existing SQLite and reconnect pages; state/history/settings recover; do not delete DB to simulate recovery |
 | Routes/actors | Sample repeated guideway, promenade, boats, aerial loop/berth, district crowd/drone cycles; no ground/landmark/site collisions or stale visible batches |
 
-Optional runnable browser checks use installed Playwright and local services: [surveyAuto.browser.mjs](../tests/surveyAuto.browser.mjs), [adminUndo.browser.mjs](../tests/adminUndo.browser.mjs), [twoStations.browser.mjs](../tests/twoStations.browser.mjs). Read each script's environment/ports before execution. These are focused regressions, not proof of exhibition-day hardware acceptance.
+Optional runnable browser checks use installed Playwright and local services: [surveyAuto.browser.mjs](../tests/surveyAuto.browser.mjs), [adminUndo.browser.mjs](../tests/adminUndo.browser.mjs), [twoStations.browser.mjs](../tests/twoStations.browser.mjs), [residentP2.browser.mjs](../tests/residentP2.browser.mjs). Read each script's environment/ports before execution. These are focused regressions, not proof of exhibition-day hardware acceptance.
 
 ## Performance evidence
 
@@ -77,6 +77,11 @@ Measure current Odaiba on the stated real GPU, ideally the exhibition machine at
 | Documentation consolidation | [this task](handoffs/odaiba-docs-consolidation.md); prose/link verification, not new runtime acceptance |
 | Resident narrative P1 (2026-10-02) | [copy](RESIDENT_COPY.md), [handoff](handoffs/resident-copy-p1.md); documentation only, new screen/copy wiring and reading-time/iPad acceptance remain untested |
 | Resident experience plan (2026-10-02) | [P1–P5 plan](RESIDENT_EXPERIENCE_PLAN.md), [handoff](handoffs/resident-experience-plan.md); documentation evidence only; proposed P2–P5 acceptance is not a passing runtime/device check |
+| Resident P2 (2026-10-02) | [P2 handoff](handoffs/resident-experience-p2.md); root/survey tests/build, real SQLite question2→3 history/retry, Chrome1280×720 old A/B draft/keyboard/review, single Undo and A/B reset/cancel/lost-response regressions; new screen evidence below. P3/P4/P5 remain open |
+
+P2 current checks: question-set version3 keeps ids/effects and original history; Guest result has no viewing table and shares `ステーション A/B · 暮らしの声 #n` with City. Native radio selection/focus/review edit and pre/post-commit network loss retain the request ID. City background/focal facility cards use actual quantities, lifetime count alone never enables inherited-run copy, and reload/reset/Undo replaces an old result. The local card10s timeout does not reserve10s between A/B results; P3 must coordinate scheduling/lease/reading and district evidence.
+
+New 2026-10-02 desktop evidence (Chrome1280×720, root `?hour=16`, scratch SQLite; exact checked commit in P2 handoff): [question](../artifacts/resident-p2-question-A.png), [review](../artifacts/resident-p2-review.png), [look up](../artifacts/resident-p2-look-up.png), [ambient city](../artifacts/resident-p2-city-ambient.png), [facility](../artifacts/resident-p2-city-facility.png), [result](../artifacts/resident-p2-city-result.png). Panel coverage checked below16% at1280×720; screenshots visually reviewed. This does not measure real viewing distance, FPS, touch hardware, Safari or reading comprehension. Browser scripts report page exceptions; deliberate aborted submission requests are test inputs.
 
 **Still open:** S5 full exhibition acceptance, actual input hardware, exhibition-day reset/recovery policy, sustained runtime/device testing. Use current browser procedures above, record a named owner and a new task handoff; do not reopen old Shibuya tasks.
 

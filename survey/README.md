@@ -106,3 +106,5 @@ Fresh scratch SQLite、localhost port 8788、`/guest?dev-auto`。Root City は `
 v1 の質問予約／trigger／加算 clamp／一人一問コードと tests は互換性のため保持します。`questions.mvp.json` を既定設定にするだけでは current v2 run は v1 に戻りません。現在の Guest は四問 UI、root との接続は実装済みです。
 
 原 schema-1 [制作 log](docs/log/survey-state-mvp.md)、[repo import](../docs/handoffs/survey-state-mvp.md)、[causal MVP](../docs/handoffs/causal-city-mvp.md) は過去の基準。現行 limits は[展示会仕様](../docs/EXHIBITION_SPEC.md)、A/B evidence は[handoff](../docs/handoffs/two-guest-devices.md)を参照。S5、入力機器と展示当日の recovery policy は未検証です。
+
+2026-10-02 P2：正式question-setはversion3です（algorithm／CityView v2、schema7とは別）。住民の問い／背景、送信前確認、保存／待機／街を見る案内をGuestに接続し、結果の回答／Meter／施設表はCity側の短い解説に置き換えました。旧草稿は新しい予約へ有効な選択を引き継ぎ、A/Bは自分の旧予約を既存end endpointで終了します。保存済みversion2提案は原文のまま同IDで回復でき、SQLiteを削除しません。時刻／lease／resetは変更していません。[P2 handoff](../docs/handoffs/resident-experience-p2.md)。

@@ -1,6 +1,6 @@
 import { readDisplayMode, setDisplayMode } from '../src/server/adminService.ts';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
@@ -8,11 +8,49 @@ import { currentState, currentView } from '../src/server/answerService.ts';
 import { createContext } from '../src/server/server.ts';
 import { SCHEMA_VERSION, migrations, schemaVersion } from '../src/server/migrations.ts';
 import { CorruptStateError, replayExhibitionRun, replayRun, runAnswerEvents } from '../src/server/runStore.ts';
-import { createProposalSession, submitProposal } from '../src/server/proposalService.ts';
-import { ok, EXHIBITION_QUESTIONS_PATH, staff } from './surveyFixture.ts';
+import { createProposalSession, getProposalSession, endStationSession, submitProposal } from '../src/server/proposalService.ts';
+import { ok, errorCode, EXHIBITION_QUESTIONS_PATH, staff } from './surveyFixture.ts';
 
 const dir = mkdtempSync(join(tmpdir(), 'survey-exhibition-migration-'));
 try {
+  // Copy revisions are independent of algorithm v2. Reopen real SQLite without rewriting old answers.
+  const oldQuestions = JSON.parse(readFileSync(EXHIBITION_QUESTIONS_PATH, 'utf8'));
+  oldQuestions.version = 2;
+  oldQuestions.questions[0].text = 'Previous question copy';
+  oldQuestions.questions[0].options[2].label = 'Previous option copy';
+  const oldPath = join(dir, 'questions.old.json');
+  writeFileSync(oldPath, JSON.stringify(oldQuestions));
+  for (const stationId of [undefined, 'A', 'B'] as const) {
+    const upgradeDb = join(dir, `upgrade-${stationId ?? 'single'}.sqlite`);
+    let nowMs = Date.parse('2026-10-02T00:00:00.000Z');
+    const old = createContext({ dbPath: upgradeDb, questionsPath: oldPath,
+      legacyQuestionsPath: new URL('../src/survey/questions.mvp.json', import.meta.url).pathname, now: () => new Date(nowMs) });
+    const start = () => ok(createProposalSession(old, stationId ? { stationId } : {}).response);
+    const first = start();
+    const requestFor = (data: typeof first, id: string) => ({ submissionId: id,
+      guestSessionId: data.session.id, expectedRevision: data.state.revision,
+      answers: data.questions.map(q => ({ questionId: q.id, optionId: q.options[2].id })) });
+    const recordedRequest = requestFor(first, 'old-submitted');
+    const recorded = ok(submitProposal(old, recordedRequest).response);
+    nowMs += 4000;
+    if (stationId) ok(endStationSession(old, first.session.id).response);
+    const draft = start(), draftRequest = requestFor(draft, 'old-draft');
+    const beforeUpgrade = currentView(old);
+    old.db.close();
+    const upgraded = createContext({ dbPath: upgradeDb, questionsPath: EXHIBITION_QUESTIONS_PATH, now: () => new Date(nowMs) });
+    assert.deepEqual(currentView(upgraded), beforeUpgrade);
+    assert.equal(errorCode(getProposalSession(upgraded, draft.session.id)), 'unsupported_version');
+    assert.equal(errorCode(submitProposal(upgraded, draftRequest).response), 'unsupported_version');
+    assert.deepEqual(ok(submitProposal(upgraded, recordedRequest).response).proposal, recorded.proposal,
+      'a lost-result retry returns the original version/text/effects after upgrade');
+    if (stationId) ok(endStationSession(upgraded, draft.session.id).response);
+    const resumed = ok(createProposalSession(upgraded, stationId ? { stationId } : {}).response);
+    assert.equal(resumed.session.questionSetVersion, 3);
+    assert.deepEqual(resumed.questions.map(q => q.options.map(o => o.id)), draft.questions.map(q => q.options.map(o => o.id)));
+    assert.deepEqual(currentView(upgraded), beforeUpgrade, 'reserving again does not cast a vote');
+    assert.equal(schemaVersion(upgraded.db), 7);
+    upgraded.db.close();
+  }
   const dbPath = join(dir, 'schema2.sqlite');
   const db = new DatabaseSync(dbPath);
   db.exec('PRAGMA foreign_keys = ON');
