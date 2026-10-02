@@ -4,8 +4,9 @@
 - Status: IN_PROGRESS — 已準備驗收表；實機／理解程度尚未測試
 - Branch: `codex/resident-experience-p5`
 - Base commit: `88e2d62e03095edd41172cf1044219b11bc99bae`
-- Last verified commit: `88e2d62e03095edd41172cf1044219b11bc99bae` + 本次四份文件差異，文件檢查PASS；實機 NOT RUN
-- Remote availability: NOT PUSHED
+- Source commit: `8399a2601de3824b8fa58d50fc2b3e26328e5e79`
+- Last verified commit: `8399a2601de3824b8fa58d50fc2b3e26328e5e79`（文件檢查PASS）；另有本交接的publication metadata更新，實機 NOT RUN
+- Remote availability: source已推送 `origin/codex/resident-experience-p5` 的上述SHA；本交接closure接續發布於同一分支，最新tip可用 `git rev-parse origin/codex/resident-experience-p5` 取得
 
 ## Session Git state
 
@@ -92,13 +93,14 @@
 ## Actual validation results
 
 - Verification status: PARTIAL — 文件準備已驗證，實機NOT RUN。
-- Date and checked tree: 2026-10-02，base加本次文件，沒有runtime差異。
+- Date and checked tree: 2026-10-02，上述source及本交接publication metadata差異，沒有runtime差異。
 - 文件170個本地Markdown target／anchor及tracked-target檢查PASS；完整diff／新檔自審、`git diff --check` PASS。新增P5路徑已核對，沒有更名或刪除舊路徑。
 - Source fact checks: server環境變數、各站URL、3秒動畫／10秒slot／15秒lease與現行source／PROJECT／P4一致；City性能dataset已核對。外部Sidecar事實以Apple來源核對，舊文件不當現行雙裝置驗證。
 - 起始main [CI37013068059](https://github.com/cc100053/city2127/actions/runs/37013068059) 在上述base上PASS；不代表P5實機通過。
 - Hardware/browser/visitor/long-run/FPS: NOT RUN；P4軟件證據不轉為P5結果。
 - Tests/builds: NOT RUN（documentation only，repository規則不要求重跑）。
 - Integrated commit/checks: NOT INTEGRATED；P5待實機，任務分支供接續。
+- Publication: source已commit／push；staged／committed `git diff --check origin/main...HEAD` PASS，發布前fetch與main divergence仍0/0。分支CI在最後push後核對，實際結果於本次最終回覆提供，不預先宣稱PASS。
 
 ## Known issues, important decisions and next expected step
 
