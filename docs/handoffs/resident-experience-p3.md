@@ -1,11 +1,12 @@
 # resident-experience-p3 — Causal results and reading slots
 
 - Owner: Codex
-- Status: IMPLEMENTED — source checks PASS; integration pending
+- Status: DONE — implementation and integrated local verification PASS
 - Branch: `codex/resident-experience-p3`
 - Base commit: `e82b8f57ccfb36d6106f6cdf7954d76a5efba4d5`
-- Last verified commit: final uncommitted P3 worktree on base below; source commit/CI recorded after publication
-- Remote availability: NOT PUSHED
+- Source commit: `fba729277cd8a9c5d45367cfbb565b3f700695fa`
+- Last verified integrated commit: `44feae903b5664189834995215fe6ea9064d0db3`
+- Remote availability: source on `origin/codex/resident-experience-p3`; integrated main published with this focused handoff closure
 
 ## Session Git state
 
@@ -25,7 +26,7 @@ Implement [P3](../RESIDENT_EXPERIENCE_PLAN.md): ten-second reading slots indepen
 
 ## Actual validation results
 
-- Verification status: source worktree PASS; integrated result pending
+- Verification status: source worktree and integrated commit PASS
 - Date/worktree: 2026-10-02, uncommitted P3 on base above
 - Final root `npm test` and `npm run build`: PASS, including full-history and81 real answer combinations through HTTP/WebSocket/client parser/four-site models. Existing bundle-size warning remains.
 - Final survey `npm test --prefix survey` and `npm run build --prefix survey`: PASS, including persistence/lifecycle/leases/idempotent remaining-time recovery and81 answer combinations.
@@ -33,10 +34,12 @@ Implement [P3](../RESIDENT_EXPERIENCE_PLAN.md): ten-second reading slots indepen
 - Existing A/B browser PASS (10001ms), residentP2 browser PASS (old copy/draft, keyboard, review, retry/reload), final Admin Undo browser PASS (exact restoration, Guest storage cleanup, replacement, disabled timing, audit and Monitor). Each uses separate fresh scratch SQLite; historical screenshots preserved by temporary output directories.
 - `git diff --check`: PASS. Final local Markdown target/anchor check:358 links PASS. Exact task diff and new source files self-reviewed.
 - Initial failures: sandbox denied loopback listening, rerun with authorized escalation; stale3s tests updated to new10s contract; disconnect-test mock caused post-test reconnect, corrected cleanup and full root suite rerun PASS; new browser identity assertion raced City WebSocket, corrected explicit City wait; early-handoff guard initially blocked authoritative Admin Undo Guest cleanup, fixed the shared deadline reset and native/single Undo browser rerun PASS. No initial failure is used as acceptance evidence.
-- Integrated commit/CI: NOT INTEGRATED / NOT RUN
+- Source [CI37007345027](https://github.com/cc100053/city2127/actions/runs/37007345027): PASS on exact `fba729277cd8a9c5d45367cfbb565b3f700695fa`, Node24, root/survey/module-swap install/test/build and committed diff whitespace.
+- 2026-10-02 integrated `44feae903b5664189834995215fe6ea9064d0db3`: fresh fetch confirms main/origin/main0/0, clean tree, no-ff merge without conflicts; integration tree equals source tree. Node26 root/survey full tests and builds rerun PASS; P3 scratch browser rerun PASS10012ms, no page exceptions. Evidence saved outside repository at `/private/tmp/city2127-resident-p3-integrated` to preserve source screenshots. `git diff --check origin/main..HEAD` PASS.
+- Publication: focused documentation closure records the verified integration above. Final pushed main HEAD/CI must be checked after publication; its actual run is reported in this task’s final response (no future CI pass is claimed here).
 
 ## Known issues and next expected step
 
-Publish the reviewed source branch, require CI on its exact commit, integrate per [CONTRIBUTING](../CONTRIBUTING.md), rerun applicable checks and record verified integration before pushing main.
+P3 implementation is complete. Next separately assignable stage is P4 comprehensive software/two-screen validation from the [resident plan](../RESIDENT_EXPERIENCE_PLAN.md); do not automatically start it. Before ending this publication task, verify remote main and its actual CI after push per [CONTRIBUTING](../CONTRIBUTING.md).
 
 The `getConfiguration()` projections mirror settled renderer transforms; update them when adding carrier geometry (`ponytail:` comments document this maintenance limit). Scheduling metadata is not a viewer acknowledgement. Hardware, Safari/iPad/Windows, real reading time/comprehension, FPS and sustained exhibition operation are unverified; P4 comprehensive software cases, P5 and S5 remain separate. No automatic P4/P5 work is authorized by this handoff.
