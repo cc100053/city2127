@@ -16,6 +16,8 @@ Desktop-only presentation, with normal renderer resize. Do not add adaptive came
 
 Resident narrative and input/shared-screen responsibilities were established on 2026-10-02; Japanese [P1 copy](RESIDENT_COPY.md) is documentation only. Current Guest still renders answers, scores and city changes in its result screen; root still renders numeric feedback. P2/P3 will wire the new presentation and conditional explanations. The provisional iPad does not establish hardware acceptance or a generic responsive requirement; current architecture/timings below remain unchanged.
 
+The [resident experience plan](RESIDENT_EXPERIENCE_PLAN.md) maps P2–P5 scope, existing entry points and future acceptance gates; its [handoff](handoffs/resident-experience-plan.md) is the resume entry. This roadmap does not replace the current source map or establish new runtime behavior.
+
 ## Root source ownership
 
 | File / module | Responsibility |
