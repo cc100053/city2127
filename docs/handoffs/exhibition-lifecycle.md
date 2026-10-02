@@ -1,5 +1,7 @@
 # exhibition-lifecycle — City lifecycle and admin reset workflow
 
+> 2026-10-02 current behavior: this handoff preserves its dated implementation evidence. A/B concurrent stations now use independent sessions/results, ordered displays and reset draining; single `/guest` keeps automatic next-start handoff. Admin ends only a named unfinished station, and a newer cancelled draft never reopens an older Undo. See [dual-station handoff](two-guest-devices.md) and [current architecture](../PROJECT.md). Earlier staff-exit requirements are historical.
+
 - Owner: cc100053 (implemented by Claude Code)
 - Status: IN_PROGRESS (implemented and verified locally; not integrated)
 - Branch: `feat/exhibition-lifecycle`

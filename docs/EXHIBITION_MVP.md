@@ -1,5 +1,11 @@
 # 2127 共同城市：展覽 MVP 設計與 Agent 實作規劃
 
+## 2026-10-02 現況：A/B 雙裝置已整合
+
+展示城市現為台場；A/B 功能已整合至 main `45fcde7` 並通過 [main CI 36976457465](https://github.com/cc100053/city2127/actions/runs/36976457465)。同一 survey server 的 `/guest?station=A`／`B` 可同時完成四題；各站獨立草稿、冪等提交、結果及交接，按 transaction 順序累積最新城市。Live 變化相隔至少3秒，等待展示時 Guest 顯示已保存，再顯示自己的結果10秒／交接5秒。A/B reset 暫停新開始並等待兩體驗結束；Admin 只可中止指定未提交草稿。單站 `/guest` 保留下一位開始時執行 reset 的規則。Schema 7 保留既有資料。
+
+此更新取代下文單站限定、Admin 必須確認離場及同 revision 只能成功一份的舊要求；原 S1–S4 規劃／證據保留其日期。雙瀏覽器驗證已通過，實體 LAN、展覽 PC／效能和使用者理解驗收仍待完成。操作見 [README](../README.md#兩部裝置同時作答2026-10-02)，契約見 [PROJECT](PROJECT.md#concurrent-guest-stations-ab--2026-10-02)，實際證據見 [雙站 handoff](handoffs/two-guest-devices.md)。
+
 - 文件建立日期：2026-09-28；文件 owner：Codex；狀態更新：2026-09-30。
 - 核對基準：`535a3c059302ac6c1059d84aef663b06510ac04c`，當時 `main` 與已 fetch 的 `origin/main` 相同。
 - 狀態：**規劃已完成；S1 已實作、整合並通過 package checks、feature CI 及 main CI。S2 Q3 Park 切片已整合並通過 feature/main CI。S3 四site映射 local root checks、API matrix、snapshot/reset、standalone smoke 及 V01/V02 browser review 均通過，已整合至 main（`63af1b6`）並通過 feature/main CI。S4 guest UI／root 面板已完成瀏覽器驗收並整合至 main（`5e14078`，main CI 通過）；S5 尚未開始。**
@@ -146,17 +152,17 @@ Q1／Q3是未來情境，Q2／Q4是生活偏好。直接選擇城市取捨，不
 | Idle | 持續 | 目前共同城市＋總參與人數＋最近提案；不reset |
 | Start | 5秒 | 「この街は、これまでの参加者がつくりました。」；零人時用「ここは2127年の渋谷。次の暮らし方を選んでください。」 |
 | Q1–Q4 | 每題10–15秒 | 顯示進度、三大選項、上一題；只保存草稿 |
-| Submit | server回應目標≤1秒 | 驗證、原子保存、成功後開始結果；失敗不可假裝完成 |
-| City transition | 3秒 | 四site同步過渡，從當前顯示狀態retarget |
+| Submit | server回應目標≤1秒 | 驗證、原子保存、成功後按展示排程等待／開始結果；失敗不可假裝完成 |
+| City transition | 3秒 | 四site同步過渡，從當前顯示狀態retarget；A/B提案依記錄順序相隔至少3秒 |
 | Result | 約10秒 | 最大兩項實際差異依次提示，其餘短行；四Meter前後值 |
 | Handoff | 約5秒 | 提案編號、下一位；保留城市 |
 
-- 先做一個本機桌面展示站，重用guest頁與root城市頁；不把手機／跨網路配對列為前置。
+- 展示採桌面 City 加同 LAN 的 A/B 兩部答題裝置，重用guest頁與root城市頁；既有單站仍支援，不新增手機版面／跨網路配對。
 - Start建立一份四題session，建議有效期5分鐘；UI在60秒無操作時提示，再15秒放棄草稿。UI閒置與server session expiry是不同計時。
 - 草稿可改，提交後不能偷偷修改歷史；server成功但回應遺失時以同一submissionId重試，不能重加分。
 - 等待server時按鈕防重按；重新連線收到snapshot只恢復，不重新播放「你剛剛改變」動畫。
 - 建議每日延續同一run；如工作人員要新run，使用admin操作並保留舊紀錄。每日政策仍待展覽負責人定案，不能於午夜自動清空。
-- 2026-09-29 已實作（[lifecycle handoff](handoffs/exhibition-lifecycle.md)）：server端 `ready → in_experience → awaiting_exit`，只有工作人員按「Confirm Guest Has Left」才回到 `ready`；觀眾在場時要求的 city／full reset 會保留至退出確認才執行。總參與人數只由full data reset歸零。S4 guest UI 仍需處理 `lifecycle_blocked`（等待上一位離開）。
+- 歷史規則（已由本文件頂部 2026-10-02 更新取代）：2026-09-29 已實作（[lifecycle handoff](handoffs/exhibition-lifecycle.md)）：server端 `ready → in_experience → awaiting_exit`，只有工作人員按「Confirm Guest Has Left」才回到 `ready`；觀眾在場時要求的 city／full reset 會保留至退出確認才執行。總參與人數只由full data reset歸零。S4 guest UI 仍需處理 `lifecycle_blocked`（等待上一位離開）。
 - 第N位以已完成提案數計，不以answer row數計；四題不是四位。
 - 建議驗收／展覽比較使用現有`?hour=12`；日夜仍是獨立系統，不由答案推進年份或時間。
 - 保留鍵盤操作、清晰focus、足夠對比、文字／符號、不只用色；reduced motion使用淡入／直接切換與前後數字。
@@ -454,10 +460,12 @@ S1、S2 各自完成的 package/CI 證據不代表 S3–S5 或整體展覽驗收
 | R02 | 各軸邊界與混合 | −12、−3、0、+3、+12正確；其他軸不被意外修改 |
 | R03 | 50人同向後反向 | 第51人M≈8.7647033339；無永久卡死 |
 | R04 | 1000份合法votes | 所有score有限且範圍正確，零票／交替票正確 |
-| R05 | 提案完整性 | 缺題／重題／foreign option／過期／錯revision拒絕；DB及city不半更新 |
-| R06 | 冪等與競態 | 成功重試只計一次；同revision併發最多一份成功；重連不重播 |
+| R05 | 提案完整性 | 缺題／重題／foreign option／過期拒絕；單站錯revision拒絕，A/B可舊revision但拒絕未來revision；DB及city不半更新 |
+| R06 | 冪等與競態 | 成功重試只計一次；A/B同revision兩份均可成功，依最新狀態累積；單站保留exact revision；重連不重播 |
 | R07 | migration／replay | 舊run可讀、事件未改、v2完整重播與snapshot一致；文字版本固定 |
 | R08 | question reuse | 100位都可答同題組，不因已答題而耗盡 |
+| R09 | 雙站隔離／恢復 | A/B同時作答／提交、同站容量、遺失回應同ID恢復、各自結果／草稿；一站next Guest不清另一站 |
+| R10 | 雙站reset／Admin | 暫停新開始、兩站問卷／結果排空、離線期限、新run不繼承舊phase；具名中止不影響另一站；full優先／city總數保留 |
 | V01 | 未來感 | 初始／四軸各low/mixed/high固定鏡位日光截圖，無標籤仍見成熟未來設施 |
 | V02 | 低值不落後 | 第3節每個low輪廓可辨；不靠全黑/移光/空地表達 |
 | V03 | 同band／降低 | 數量更新、負向轉場、真實before/after均正確 |
@@ -465,6 +473,7 @@ S1、S2 各自完成的 package/CI 證據不代表 S3–S5 或整體展覽驗收
 | V05 | 空間 | 地標與既有route保留、最大樹群及最高形態不穿路／機流；檢查12配置及all-low/all-high/mixed組合 |
 | V06 | 無變化票 | 構成維持文案＋提案印記；不偽造幾何差異 |
 | V07 | UI | 1280×720及1920×1080可讀，不遮site，鍵盤／focus／reduced motion可用 |
+| V08 | 雙站展示次序 | 四site採權威配置，提案／站名可讀，live相隔至少3秒；lighting不跳過隊列，Undo／reset即時清隊列 |
 | P01 | 展覽機 | 1080p真GPU、day/night、最壞形態／轉場測量；記錄device/browser/DPR/calls/frame time |
 | P02 | 耐久 | 100次提交＋60分鐘，無無限geometry/cache增長、無重複初始化listener、reconnect正常 |
 | U01 | 5位非組員 | 至少4人5秒內指出變化位置、說出答案原因、理解跨人累積；中位完成≤90秒 |
@@ -528,4 +537,4 @@ Reusable test functions in `survey/tests/meterContract.ts` take Meter descriptor
 
 ## Guest 自動交接更新 — 2026-10-02
 
-此決定取代早前必須由 Admin 確認觀眾離開的要求。下一位開始四題問卷時，server 自動完成交接；通常沿用累積城市，有保留 reset 則先執行再開始。Admin 只保留中止未完成體驗操作。結果約10秒、交接約5秒及略過按鈕沿用。詳見 [交接 handoff](handoffs/remove-guest-exit-lock.md)。
+此段描述單站 `/guest`；A/B 採本文件頂部的雙站排空規則。此決定取代早前必須由 Admin 確認觀眾離開的要求。下一位開始四題問卷時，server 自動完成交接；通常沿用累積城市，有保留 reset 則先執行再開始。Admin 只保留中止未完成體驗操作。結果約10秒、交接約5秒及略過按鈕沿用。詳見 [交接 handoff](handoffs/remove-guest-exit-lock.md)。

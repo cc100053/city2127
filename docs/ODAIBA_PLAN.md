@@ -1,5 +1,7 @@
 # Odaiba 2127 — venue transition plan (DRAFT)
 
+> 2026-10-02 operation update: the Odaiba venue is already integrated on main. Its four-question experience now supports two independent A/B devices on the same survey server, with ordered city displays and reset draining. This venue plan keeps its dated P0–P6 scope; current station operation and evidence are in the [dual-station handoff](handoffs/two-guest-devices.md).
+
 - Status: APPROVED 2026-09-30 (decisions below). P0–P5 done on `codex/odaiba-venue`; next: integrate into `main`, then P6.
 - Drafted: 2026-09-30 against `main` `4bc1646`; Odaiba sources read from `origin/codex/odaiba-preview` `3a8a5f2` (contains all of `origin/feat/odaiba-assets-progress-02` `40d696e`).
 - Supersedes on approval: the "single Shibuya setting" constraint in [AGENTS.md](../AGENTS.md), [PROJECT.md](PROJECT.md) and [PLAN02.md](PLAN02.md). Shibuya is **replaced**, not kept selectable; it stays in Git history.

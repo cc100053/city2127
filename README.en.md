@@ -2,7 +2,7 @@
 
 ## Two concurrent Guest devices — 2026-10-02
 
-Use one survey server on the trusted LAN. Open `http://<exhibition-PC LAN IP>:8787/guest?station=A` on one device and `/guest?station=B` on the other. Bind the survey server with `SURVEY_HOST=0.0.0.0` (PowerShell: `$env:SURVEY_HOST='0.0.0.0'`). Each station has its own four-question draft/result/handoff; submissions accumulate in server arrival order and retries count once. Live City changes are shown at least three seconds apart with proposal/station labels. City reconnect restores the latest snapshot immediately. The existing `/guest` single-station flow remains; do not mix it with active A/B experiences.
+Use one survey server on the trusted LAN. Open `http://<exhibition-PC LAN IP>:8787/guest?station=A` on one device and `http://<exhibition-PC LAN IP>:8787/guest?station=B` on the other. Use only one page per station; each station admits one active experience. Bind the survey server with `SURVEY_HOST=0.0.0.0` (PowerShell: `$env:SURVEY_HOST='0.0.0.0'`). Each station has its own four-question draft/result/handoff; submissions accumulate in server arrival order and retries count once. Live City changes are shown at least three seconds apart with proposal/station labels. City reconnect restores the latest snapshot immediately. The existing `/guest` single-station flow remains; do not mix it with active A/B experiences.
 
 A/B reset stops new starts and waits for both experiences, including results/handoffs. Admin can end only the named unfinished station. Disconnected questionnaires expire after five minutes; submitted result leases finish 15 seconds after their scheduled display (active result recovery renews that lease). Rebuild/restart survey and refresh Guest/City/Admin; schema 7 preserves existing data. See [handoff](docs/handoffs/two-guest-devices.md).
 
@@ -16,7 +16,7 @@ Development auto-answer (DEV-ONLY): run `cd survey && npm run dev:auto`, open `h
 
 Install Git and **Node.js 24+** (including npm). Use a desktop browser with WebGL 2. Keep both terminal tabs running. Run each command from the repository root unless a step changes directory. The project has no public deployment setup.
 
-Admin **直前の提案を取り消す** undoes only the latest completed proposal before the next guest starts. It restores the previous city and counts, keeps the proposal marked as undone, and lets the guest start a fresh four-question session. Rebuild/restart the survey server and refresh City/Guest/Admin; the existing SQLite migrates to schema 6 without deleting data.
+Admin **直前の提案を取り消す** undoes only the latest completed proposal before the next guest starts. It restores the previous city and counts, keeps the proposal marked as undone, and lets the guest start a fresh four-question session. Rebuild/restart the survey server and refresh City/Guest/Admin. Undo was introduced in schema 6; the current SQLite migrates to schema 7 without deleting data. A newer A/B draft closes Undo for an older proposal even if that draft is later cancelled.
 
 ### macOS — two Terminal tabs
 
@@ -60,14 +60,15 @@ The survey server uses `127.0.0.1:8787` by default. Use the actual URL printed b
 
 | Browser tab | Default URL | Purpose |
 | --- | --- | --- |
-| Guest | `http://127.0.0.1:8787/guest` | Guest answers four questions, reviews the choices, and submits one proposal. |
+| Guest (single station) | `http://127.0.0.1:8787/guest` | Guest answers four questions, reviews the choices, and submits one proposal. |
+| Guest A/B (two stations) | `http://<exhibition-PC LAN IP>:8787/guest?station=A` / `?station=B` | Independent four-question experiences share the accumulated city. |
 | City | `http://127.0.0.1:5173/?survey` | Exhibition's 2127 Shibuya scene; receives live state through `ws://127.0.0.1:8787/ws`. Keep `?survey` in the URL. |
 | Admin | `http://127.0.0.1:8787/admin` | Staff view the lifecycle, end an unfinished experience, and request/cancel resets. Available only on the server computer through localhost. |
 | Monitor (optional) | `http://127.0.0.1:8787/monitor` | Text view of current state and proposals/WebSocket events received since the tab opened; it is not the 3D city. |
 
-Put City on the exhibition display and Guest on the input screen. Keep Admin on the staff computer. After a proposal, the next guest can press **はじめる** without Admin confirmation. Any queued reset runs at that next start; otherwise the accumulated city continues. Admin’s **未完了の体験を終了** only ends unfinished questionnaires. The survey server hosts its built pages and API on the same origin; Vite hosts the city separately. The default database is `survey/data/survey.sqlite`, so restarting the server retains the city. `npm ci` is needed on first setup and after lockfile changes; on subsequent starts, keep the build and server commands in Tab 1 and the dev command in Tab 2.
+Put City on the exhibition display and Guest on the input screen. Keep Admin on the staff computer. The following next-start reset rule applies to unlabelled `/guest`; A/B reset blocks admission and drains both experiences as described above. After a proposal, the next guest can press **はじめる** without Admin confirmation. Any queued reset runs at that next start; otherwise the accumulated city continues. Admin’s **未完了の体験を終了** only ends unfinished questionnaires. The survey server hosts its built pages and API on the same origin; Vite hosts the city separately. The default database is `survey/data/survey.sqlite`, so restarting the server retains the city. `npm ci` is needed on first setup and after lockfile changes; on subsequent starts, keep the build and server commands in Tab 1 and the dev command in Tab 2.
 
-For a second device on a **trusted local network**, bind both services to the network and replace `127.0.0.1` in Guest and City URLs with the host computer's LAN IP:
+For Guest devices on a **trusted local network**, bind survey to the network. Bind Vite too if City is on a separate device (it may stay loopback when City runs on the host) and replace `127.0.0.1` in Guest and City URLs with the host computer's LAN IP:
 
 ```sh
 # macOS, in survey/ (Tab 1)

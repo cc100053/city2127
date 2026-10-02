@@ -2,7 +2,7 @@
 
 ## 雙裝置 Guest — 2026-10-02
 
-已實作 A/B 獨立四題體驗，共用同一個累積台場城市。Live 提案按記錄順序相隔至少3秒展示，標示提案編號及站名；Guest 保留自己的結果。Reset 暫停新開始，等兩站問卷／結果／交接完成；單站入口仍沿用既有自動交接。City 的 reset／Undo／重新連接 snapshot 即時復原，不重播漏掉的動畫。模型、鏡頭、材質、場地和桌面範圍不變。桌面雙瀏覽器流程已驗證，實體 LAN 裝置／展覽硬件仍待驗收；詳見 [交接](handoffs/two-guest-devices.md)及[驗證](VALIDATION.md#concurrent-guest-stations-ab--2026-10-02)。
+A/B 已整合至 main `45fcde7`，feature／[main CI 36976457465](https://github.com/cc100053/city2127/actions/runs/36976457465) 通過。兩站獨立四題體驗，共用同一個累積台場城市。Live 提案按記錄順序相隔至少3秒展示，標示提案編號及站名；Guest 保留自己的結果。Reset 暫停新開始，等兩站問卷／結果／交接完成；單站入口仍沿用既有自動交接。City 的 reset／Undo／重新連接 snapshot 即時復原，不重播漏掉的動畫。模型、鏡頭、材質、場地和桌面範圍不變。桌面雙瀏覽器流程已驗證，實體 LAN 裝置／展覽硬件仍待驗收；詳見 [交接](handoffs/two-guest-devices.md)及[驗證](VALIDATION.md#concurrent-guest-stations-ab--2026-10-02)。
 
 ## Admin-only Undo — 2026-10-02
 
