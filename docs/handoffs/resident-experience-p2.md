@@ -1,11 +1,11 @@
 # resident-experience-p2 — Resident copy and two-screen presentation
 
 - Owner: Codex
-- Status: IN_PROGRESS
+- Status: DONE — P2 implemented, local/source CI checks complete and main integration validated; final main CI checked after publication
 - Branch: `codex/resident-experience-p2`
 - Base commit: `a2271b5e8cd9fb9e86ecc5caea92e6ad9cd0a392`
-- Last verified commit: base `a2271b5e8cd9fb9e86ecc5caea92e6ad9cd0a392` + uncommitted P2 delta verified; source SHA recorded after commit
-- Remote availability: NOT PUSHED
+- Last verified commit: integrated `4d8e107fe652b4f40eb30450ce02fffc019ad321` (tree identical to source `1bdbaaaad4598eb72d99d925cd2e310d4c80bc9f`); final handoff-only closure checked separately
+- Remote availability: source `1bdbaaaad4598eb72d99d925cd2e310d4c80bc9f` on `origin/codex/resident-experience-p2`; validated main integration published with this closure
 
 ## Session Git state
 
@@ -23,9 +23,9 @@ Root reuses the panel for title + at most2 sentences + actual focal place: ambie
 
 ## Actual validation results
 
-- Verification status: PASSED locally; source/main CI and integration pending
+- Verification status: PASSED locally and source CI; main CI verified after publication in the task completion response
 - Supplementary task screenshots retained outside checkout at `/private/tmp/city2127-resident-p2-extra-evidence`; six focused screenshots committed as current evidence
-- Date/worktree: 2026-10-02, P2 delta against base above; exact source SHA recorded after commit
+- Date/checked commits: 2026-10-02; source `1bdbaaaad4598eb72d99d925cd2e310d4c80bc9f` and integrated `4d8e107fe652b4f40eb30450ce02fffc019ad321`
 - Root `npm test` + `npm run build`: PASS (Node26.0.0). Survey `npm test` + `npm run build`: PASS. Existing root bundle-size warning remains; no new dependency/code split.
 - Initial sandbox test attempt reached real local socket checks and failed with `listen EPERM`; reran with approved execution permissions and all checks passed. No application failure hidden.
 - Expanded native checks: real SQLite question2→3 restart in single/A/B; immutable original text/version/effects and same-ID saved retry, reserved-version rejection/new reservation, no extra vote, schema7 unchanged. Card selections/counts/places, current-run inherited guard and identity PASS; existing81-combination/Meter/HTTP/WebSocket suites PASS.
@@ -34,7 +34,9 @@ Root reuses the panel for title + at most2 sentences + actual focal place: ambie
 - Browser environment: installed Google Chrome headless,1280×720, deviceScaleFactor1, Mac; root loopback Vite5173, `?hour=16`. Page exceptions NONE; aborted submission requests are deliberate test inputs. This is not actual iPad/Safari/touch/GPU/FPS acceptance.
 - Evidence: [question](../../artifacts/resident-p2-question-A.png), [review](../../artifacts/resident-p2-review.png), [look up](../../artifacts/resident-p2-look-up.png), [ambient city](../../artifacts/resident-p2-city-ambient.png), [facility](../../artifacts/resident-p2-city-facility.png), [result](../../artifacts/resident-p2-city-result.png). Visual review plus panel bounding-area assertion <16% of1280×720; no reading-time claim.
 - Whitespace/full diff/Markdown links: PASS;347 local links, ordered4 question/12 option ids/effects against base, exact tracked diff and new files/screenshots reviewed
-- Integrated commit/checks: NOT INTEGRATED
+- Source [CI37002441332](https://github.com/cc100053/city2127/actions/runs/37002441332): SUCCESS on exact `1bdbaaa` (Node24; root/survey/module-swap install/test/build and committed whitespace).
+- Integrated `4d8e107fe652b4f40eb30450ce02fffc019ad321`: no conflicts; identical source tree. Root/survey tests/build rerun PASS, P2 scratch browser rerun PASS (screenshots retained in `/private/tmp/city2127-resident-p2-integrated/artifacts`),347 tracked links/local anchor and committed whitespace PASS. The single/A-B/Undo source browser evidence remains valid for the identical integrated runtime.
+- Changes since runtime verification: this handoff-only closure; reviewed links/full diff/whitespace. Main CI is checked after pushing this closure and reported in the completion message; this record does not claim an unrun check passed.
 
 ## Documentation sync and limits
 
@@ -44,4 +46,4 @@ P3/P4/P5/S5 remain open: P2 local result may be replaced at existing≥3s A/B st
 
 ## Next expected step
 
-Complete final checks, source commit/push/CI, self-review and main integration/revalidation under [Git workflow](../CONTRIBUTING.md). After completion, next assigned implementation is P3; Codex does not start it implicitly. Existing preview is only local; no deployment.
+P2 is complete and published through the source/main integration above; task branch retained. The next assigned implementation is **P3**: actual carrier before/after evidence and coordinated display/read/lease/guard/drain behavior. No implicit P3 work. Local scratch preview retained; no deployment. Final main publication/CI outcome is verified and reported in this task's completion response.
