@@ -89,4 +89,4 @@ Before integration, note that `module-swap/` from the parallel branch `feat/city
 
 ## Superseded — 2026-09-24
 
-The causal MVP replaced this package's five placeholder axes, milestones and `toCityViewInput()` with four policy axes, `deriveCityLayout()` and `CityView` (schema 2), and connected it to the `module-swap` viewer. The "not connected to Three.js" and placeholder notes above describe this branch only; see [causal-city-mvp](causal-city-mvp.md) and [PROJECT.md](../PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--module-swap).
+The causal MVP replaced this package's five placeholder axes, milestones and `toCityViewInput()` with four policy axes, `deriveCityLayout()` and `CityView` (schema 2), and connected it to the `module-swap` viewer. The "not connected to Three.js" and placeholder notes above describe this branch only; see [causal-city-mvp](causal-city-mvp.md) and [PROJECT.md](../history/PROJECT_2026-10-02.md#causal-choice--city-mvp--2026-09-24-survey--module-swap).

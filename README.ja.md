@@ -8,7 +8,7 @@ A/B のリセットは新しい開始を停止し、両方の回答・結果・�
 
 **言語：** [繁體中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
 
-来場者が一緒に未来の渋谷をつくる展示です。各来場者は四つの質問に答え、一つの提案を送信します。次の来場者は、それまでの選択が反映された街を引き継ぎます。展示用の街はリポジトリ直下の Three.js シーン（`src/`）です。`survey/` サーバーが質問、状態、SQLite データベース、WebSocket 配信を管理します。`module-swap/` は旧 v1 の因果デモで、現在の v2 CityView には対応していません。
+来場者が一緒に未来のお台場をつくる展示です。各来場者は四つの質問に答え、一つの提案を送信します。次の来場者は、それまでの選択が反映された街を引き継ぎます。展示用の街はリポジトリ直下の Three.js シーン（`src/`）です。`survey/` サーバーが質問、状態、SQLite データベース、WebSocket 配信を管理します。`module-swap/` は旧 v1 の因果デモで、現在の v2 CityView には対応していません。
 
 ## 展示をローカルで起動する
 
@@ -62,7 +62,7 @@ npm run dev -- --port 5173
 | --- | --- | --- |
 | Guest（単独） | `http://127.0.0.1:8787/guest` | 四つの質問への回答、確認、一つの提案の送信。 |
 | Guest A/B（2台） | `http://<展示PCのLAN IP>:8787/guest?station=A` ／ `?station=B` | 独立した四問の体験で同じ街に提案します。 |
-| City | `http://127.0.0.1:5173/?survey` | 展示用の 2127 年の渋谷。`ws://127.0.0.1:8787/ws` から変化を受信します。`?survey` を付けて開きます。 |
+| City | `http://127.0.0.1:5173/?survey` | 展示用の 2127 年のお台場。`ws://127.0.0.1:8787/ws` から変化を受信します。`?survey` を付けて開きます。 |
 | Admin | `http://127.0.0.1:8787/admin` | スタッフが状態を確認し、未完了の体験を終了し、リセットを要求・取消します。サーバー PC の localhost からのみ利用可能です。 |
 | Monitor（任意） | `http://127.0.0.1:8787/monitor` | 現在の状態と、画面を開いてから受信した提案・WebSocket イベントを文字で確認する画面。3D の街ではありません。 |
 
@@ -91,5 +91,11 @@ npm run dev -- --host 0.0.0.0 --port 5173
 ## 関連文書
 
 - [Agent の作業手順](AGENTS.md)、[Git の運用](docs/CONTRIBUTING.md)、[構成](docs/PROJECT.md)、[検証](docs/VALIDATION.md)。
-- [展示 MVP 仕様](docs/EXHIBITION_MVP.md)と[S4 引き継ぎ](docs/handoffs/exhibition-s4.md)に、現在の四問フローと既知の制約を記載しています。
-- [繁體中文 README](README.md)には、プロジェクトの詳細な履歴、Plan 02、および初期プロトタイプの参考資料があります。
+- [現行展示仕様](docs/EXHIBITION_SPEC.md)と[S4 引き継ぎ](docs/handoffs/exhibition-s4.md)は、現行契約と当時の S4 検証記録をそれぞれ記載しています。
+- [繁體中文 README](README.md)には DEV-only review tools の説明があります。過去の Plan 02 と証拠は文書索引の「歴史」を参照してください。
+
+## 現在の方針
+
+展示会はお台場のみ。渋谷は終了した過去の決定で、今後は開発しません（2026-10-02）。旧計画の未完了項目は今後のタスクではありません。S5、入力機器、展示当日の reset／recovery 方針は未検証です。
+
+資料の役割と過去の記録は[文書索引](docs/README.md)、視覚方針は[CITY MASTER TASTE](docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)、実装規則は[ART](docs/ART.md)を参照してください。`module-swap` は現行 v2 CityView を受け付けません。

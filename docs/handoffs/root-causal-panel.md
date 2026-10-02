@@ -1,5 +1,7 @@
 # root-causal-panel — Causal panel in the root Shibuya survey mode (step 3)
 
+> Historical scope — 2026-10-02: Shibuya development is closed and will not resume. Any unfinished Shibuya next steps below are cancelled as product work. Reused assets/legacy contracts do not imply a second venue. Current scope: [EXHIBITION_SPEC](../EXHIBITION_SPEC.md); retained source may still serve Odaiba or legacy tests.
+
 - Owner: cc100053
 - Status: DONE
 - Branch: feat/root-causal-panel
@@ -26,13 +28,13 @@ Step 3 of connecting the survey to the root scene (user decision 2026-09-24; ste
 
 ## Completed work
 
-See [PROJECT.md](../PROJECT.md#root-scene-survey-mode--2026-09-24-srcsurvey), step 3.
+See [PROJECT.md](../history/PROJECT_2026-10-02.md#root-scene-survey-mode--2026-09-24-srcsurvey), step 3.
 
 ## Actual validation results
 
 - Verification status: PASSED for local checks and browser flow; FPS not measured
 - Date and checked commit/worktree: 2026-09-24, uncommitted worktree on 2d49990
-- Commands/manual checks and results: see [VALIDATION.md](../VALIDATION.md#root-scene-causal-panel--2026-09-24)
+- Commands/manual checks and results: see [VALIDATION.md](../history/VALIDATION_2026-10-02.md#root-scene-causal-panel--2026-09-24)
 - Evidence/environment: artifacts/causal-panel-*.png, headless Chromium 1280×720
 - Integrated commit and checks: 994227d on main; local `npm test`, `npm run build`, `git diff --check origin/main...HEAD` passed; branch CI run 36009478385 (2da3508) and main CI run 36009607075 (994227d) succeeded
 - Changes since verification: this handoff update only

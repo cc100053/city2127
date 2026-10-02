@@ -1,5 +1,7 @@
 # exhibition-s3 — remaining root site mappings
 
+> Stage history — 2026-10-02: retain the original implementation/validation scope below. Current Odaiba behavior is in [EXHIBITION_SPEC](../EXHIBITION_SPEC.md); Shibuya will not be developed again. Historical resume/next-step instructions do not create a new assignment.
+
 - Owner: Codex (Astra review; Luna Max implementation and testing)
 - Status: SHIPPED — integrated into `main` as `63af1b6b4c3f2c9ba39faaf18dae68f276b5f972` on 2026-09-30; feature and main CI passed
 - Branch: `codex/exhibition-s3`
@@ -21,7 +23,7 @@
 
 ## Goal and acceptance criteria
 
-Complete S3 from [EXHIBITION_MVP.md](../EXHIBITION_MVP.md): render the authoritative v2 automation, public-sharing and urban-concentration mappings in the root Shibuya scene while retaining the S2 Q3 Park mapping.
+Complete S3 from [original MVP plan](../history/EXHIBITION_MVP.md): render the authoritative v2 automation, public-sharing and urban-concentration mappings in the root Shibuya scene while retaining the S2 Q3 Park mapping.
 
 - Verify all 12 low/mixed/high configurations across the four sites, including the nine new configurations at the three S3 sites.
 - Verify within-band count changes, mature futuristic low variants, and site/route clearance.

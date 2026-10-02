@@ -36,7 +36,7 @@ Survey lifecycle/session service, HTTP publishing, Admin/Guest/auto-answer UI, t
 
 - 2026-10-02, Node26.0.0: root and survey `npm test` / `npm run build` PASS. Initial sandbox port failures retried with approval. Root existing bundle-size warning only.
 - Automated checks cover 100 no-Admin handoffs, accumulation, city/full reset, atomic rollback, restart, HTTP/WebSocket reset and existing retry/count/history protections.
-- In-app browser1265×712 on scratch server8795: next Guest starts without Admin; two submitted proposals retain run/count/revision2. One intervening unused draft timed out normally. [Evidence](../../artifacts/guest-handoff-admin-2026-10-02.jpg); [validation](../VALIDATION.md#guest-handoff-without-admin-exit-lock--2026-10-02).
+- In-app browser1265×712 on scratch server8795: next Guest starts without Admin; two submitted proposals retain run/count/revision2. One intervening unused draft timed out normally. [Evidence](../../artifacts/guest-handoff-admin-2026-10-02.jpg); [validation](../history/VALIDATION_2026-10-02.md#guest-handoff-without-admin-exit-lock--2026-10-02).
 - Feature [CI run 36960169992](https://github.com/cc100053/city2127/actions/runs/36960169992) PASS on `604f94c` (root, survey, module-swap and whitespace).
 - Integrated commit: `405088401e0e167f2ac88fbf7bceaa290f389cbb`, no conflicts and identical feature tree. Integrated root/survey tests and builds PASS (Node26.0.0), and committed-diff/Markdown target checks PASS. Changes since verification: this documentation-only record. Main CI is checked after push; this record does not pre-claim its outcome. See [main CI history](https://github.com/cc100053/city2127/actions?query=branch%3Amain) and the task final response.
 

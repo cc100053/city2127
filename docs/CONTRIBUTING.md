@@ -99,7 +99,7 @@ Run the push only if the ancestor check succeeds. If remote main advanced, integ
 
 ## Blender asset workflow
 
-The asset-only exception allows Blender-related asset files on main. Confirm the asset owner before editing; avoid simultaneous edits to the same binary file. Keep both source `.blend` and production `.glb` in Git. Do not install Git LFS now; it remains an option for large assets later.
+The asset-only exception allows Blender-related asset files on main. Confirm the asset owner before editing; avoid simultaneous edits to the same binary file. Keep both source `.blend` and production `.glb` in Git for hand-authored assets. The script-derived Odaiba district GLB keeps its masterplan input, derivation script and output as documented in [BLENDER](BLENDER.md). Do not install Git LFS now; it remains an option for large assets later.
 
 1. For new asset work, start from a clean tree and update main first (`git fetch --prune origin`, then `git pull --ff-only origin main`); record ownership, source/export paths and the base commit in the task handoff. If unfinished local asset changes exist, preserve them before attempting any synchronization; never discard or overwrite them to make the fast-forward succeed.
 2. Validate the changed files: open the `.blend` in Blender, verify the `.glb` imports, and check any existing application consumers with the relevant browser checks. Run code checks if executable integration is affected. Never publish a broken replacement for an asset currently used by the app. If validation cannot be performed, record the blocker and do not publish the replacement.

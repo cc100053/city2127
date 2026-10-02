@@ -1,5 +1,7 @@
 # root-survey-atmosphere — Survey drives the root Shibuya scene (steps 1–2)
 
+> Historical scope — 2026-10-02: Shibuya development is closed and will not resume. Any unfinished Shibuya next steps below are cancelled as product work. Reused assets/legacy contracts do not imply a second venue. Current scope: [EXHIBITION_SPEC](../EXHIBITION_SPEC.md); retained source may still serve Odaiba or legacy tests.
+
 - Owner: cc100053
 - Status: DONE
 - Branch: feat/root-survey-atmosphere
@@ -26,13 +28,13 @@ Steps 1–2 of connecting the survey to the root scene (user decisions 2026-09-2
 
 ## Completed work
 
-See [PROJECT.md](../PROJECT.md#root-scene-survey-mode--2026-09-24-srcsurvey).
+See [PROJECT.md](../history/PROJECT_2026-10-02.md#root-scene-survey-mode--2026-09-24-srcsurvey).
 
 ## Actual validation results
 
 - Verification status: PASSED for local checks and browser flow; FPS not measured
 - Date and checked commit/worktree: 2026-09-24, step 2 uncommitted worktree on e04f396
-- Commands/manual checks and results: see [VALIDATION.md](../VALIDATION.md#root-scene-survey-change-sites--2026-09-24) and the step 1 entry below it
+- Commands/manual checks and results: see [VALIDATION.md](../history/VALIDATION_2026-10-02.md#root-scene-survey-change-sites--2026-09-24) and the step 1 entry below it
 - Evidence/environment: artifacts/survey-sites-*.png, artifacts/survey-atmosphere-*.png, headless Chromium 1280×720
 - Integrated commit and checks: 691bd2b on main; local `npm test`, `npm run build`, `git diff --check origin/main...HEAD` passed; branch CI run 36006962113 (43c6d24) and main CI run 36007086577 (691bd2b) succeeded
 - Changes since verification: this handoff update only

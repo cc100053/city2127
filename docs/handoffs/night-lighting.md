@@ -1,5 +1,7 @@
 # night-lighting — Readable futuristic night city
 
+> Historical scope — 2026-10-02: Shibuya development is closed and will not resume. Any unfinished Shibuya next steps below are cancelled as product work. Reused assets/legacy contracts do not imply a second venue. Current scope: [EXHIBITION_SPEC](../EXHIBITION_SPEC.md); retained source may still serve Odaiba or legacy tests.
+
 - Owner: Codex
 - Status: DONE — integrated into main 2026-09-30
 - Branch: codex/night-lighting
@@ -28,7 +30,7 @@ Implemented brighter night fill and restrained bloom/vignette, embedded cold-whi
 
 ## Actual validation results
 
-PASSED locally on the implementation delta over the base SHA, 2026-09-30: root npm test/build, git diff --check; fixed-pose day/dawn/dusk/night, v2 low/mixed/high snapshots, resize, orbit and live sunset. Foreground Chrome on Apple M6 at 1920×1080/DPR1 observed 60.1 FPS standalone and v2-high after warm-up. See [VALIDATION](../VALIDATION.md#readable-futuristic-night-lighting--2026-09-30) for exact fixtures, screenshots and limits. Feature [CI 36652867312](https://github.com/cc100053/city2127/actions/runs/36652867312) passed on 1e662282aebba23aa5ec1b8073ac7c265a1a55e7. Integrated with no conflicts as 3d6651329a8f546dccbd19053fccbecc1d31f490; root test/build and committed diff whitespace passed again, tree equals the browser-verified feature tree. Main [CI 36652968711](https://github.com/cc100053/city2127/actions/runs/36652968711) passed (root, survey and module-swap). This closure update changes documentation only.
+PASSED locally on the implementation delta over the base SHA, 2026-09-30: root npm test/build, git diff --check; fixed-pose day/dawn/dusk/night, v2 low/mixed/high snapshots, resize, orbit and live sunset. Foreground Chrome on Apple M6 at 1920×1080/DPR1 observed 60.1 FPS standalone and v2-high after warm-up. See [VALIDATION](../history/VALIDATION_2026-10-02.md#readable-futuristic-night-lighting--2026-09-30) for exact fixtures, screenshots and limits. Feature [CI 36652867312](https://github.com/cc100053/city2127/actions/runs/36652867312) passed on 1e662282aebba23aa5ec1b8073ac7c265a1a55e7. Integrated with no conflicts as 3d6651329a8f546dccbd19053fccbecc1d31f490; root test/build and committed diff whitespace passed again, tree equals the browser-verified feature tree. Main [CI 36652968711](https://github.com/cc100053/city2127/actions/runs/36652968711) passed (root, survey and module-swap). This closure update changes documentation only.
 
 ## Known issues and blockers
 

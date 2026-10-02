@@ -1,6 +1,6 @@
 # Module Swap
 
-地面・区画・建物の交換テスト用の自己完結パッケージです。
+地面・区画・建物の交換テスト用の自己完結パッケージです。**legacy v1 専用で、現行 v2 CityView は拒否します。** 展示会の街は[ルートの Odaiba](../README.ja.md)です。
 
 配置状態は`CityLayoutState`で表し、アンケート側の`CitySurveyState`とは別物です。
 
@@ -55,7 +55,9 @@ npm run preview
 
 ## `?survey`モード（因果MVP、2026-09-24）
 
-`survey/`サーバー（既定`127.0.0.1:8787`）を起動してから、ViteのURLに`?survey`（または`?survey=ws://host:port/ws`）を付けて開きます。`ws://`／`wss://`で始まらない値（例：`?survey=1`）は既定URLになります。
+以下は v1 対応サーバーがある場合だけの旧接続手順です。現行 `survey/` の既定起動は v2 で互換性がありません。質問 JSON の差し替えだけでは v1 run になりません。通常は `?survey` なしの standalone を使ってください。
+
+v1 サーバー（例：`127.0.0.1:8787`）を起動してから、ViteのURLに`?survey`（または`?survey=ws://host:port/ws`）を付けて開きます。`ws://`／`wss://`で始まらない値（例：`?survey=1`）は既定URLになります。
 
 - 配置はサーバーの`CityView.layout`だけから決まり、localStorageは読みません。接続・再接続のたびに全体スナップショットで再構築します。
 - 新しいrevisionだけを`ModuleManager.transitionTo()`で適用し、変わった区画だけをアニメーションします。

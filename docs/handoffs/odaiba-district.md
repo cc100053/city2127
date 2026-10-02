@@ -1,13 +1,15 @@
 # Odaiba hero district — 2026-09-30
 
+> Closure correction — 2026-10-02: Integrated into main as `f2826cc`; original task branch retired. Earlier branch-stack/import/dissolve instructions below are stage history; current backdrop is connected.
+
 - Owner: cc100053 (Claude Code session)
 - Status: DONE (integrated into main) — earlier status: P1, P2 and the P3 draw-call merge implemented and locally verified; P3 tier-1 art pass awaiting art direction.
-- Branch: `feat/odaiba-district`, stacked on `feat/art-direction` (not `main`): P1 edits `odaibaScene`, `coastalCanopy` and `contextFacades`, which exist only on the art branch pending human art review. Integrate after, or together with, `feat/art-direction`.
+- Branch: retired `feat/odaiba-district`; original stack was `feat/art-direction`, both integrated. Do not repeat the old stack integration.
 - Base commit: `55f9473e5b8ac63c9b9e441e5835432a914d717b` (`feat/art-direction`).
-- Last verified commit: see Git log for the P1 commit; checks below were run on its exact working tree.
-- Remote availability: `origin/feat/odaiba-district` once pushed.
+- Last verified scope: dated P1–P4 checks below, with their recorded worktrees; integrated at `f2826cc`. No fresh runtime verification performed by this closure correction.
+- Remote availability: task branch retired; main integration `f2826cc` retains this work.
 
-## Session Git state
+## Original session Git state (historical)
 
 - Starting branch/HEAD: `feat/art-direction` `55f9473`, 0/0 with its upstream; 7 ahead / 3 behind `origin/main`.
 - Last fetched `origin/main`: `0027eb1516e934754f05fb831d2a3b09bb39a69c` (2026-09-30).

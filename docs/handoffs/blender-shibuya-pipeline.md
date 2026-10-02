@@ -1,5 +1,7 @@
 # Blender to Shibuya import channel
 
+> Historical scope — 2026-10-02: Shibuya development is closed and will not resume. Any unfinished Shibuya next steps below are cancelled as product work. Reused assets/legacy contracts do not imply a second venue. Current scope: [EXHIBITION_SPEC](../EXHIBITION_SPEC.md); retained source may still serve Odaiba or legacy tests.
+
 - Owner: Codex
 - Status: DONE for the Mac setup and shared import preview; Windows and interactive desktop checks remain per-machine handoffs
 - Branch: `codex/blender-shibuya-pipeline`

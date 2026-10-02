@@ -1,14 +1,16 @@
 # odaiba-venue — Odaiba replaces Shibuya as the exhibition city
 
+> Closure correction — 2026-10-02: P0–P5 integrated as `e6c7966`; task branch retired. P6/S5 is still pending; current runtime after art/district/Meter changes is in [PROJECT](../PROJECT.md).
+
 - Owner: cc100053 (runtime work by Claude Code sessions)
 - Status: INTEGRATED (P0–P5); P6 pending
 - Branch: codex/odaiba-venue
 - Base commit: 4bc16463a34879083d64debb4587a0d036297d4d
-- Last verified commit: this branch's P0 commit (assets import + plan); verified as the uncommitted delta on the base
-- Remote availability: origin/codex/odaiba-venue
+- Last verified scope: P0–P5 dated checks below / transition record; integration `e6c7966`. P0 pre-commit delta was the initial check, not the final scope.
+- Remote availability: task branch retired; main integration `e6c7966` retains P0–P5.
 - GitHub Issue (optional): NONE
 
-## Session Git state
+## Original session Git state (historical)
 
 - Session starting branch and HEAD: clean `main` at `4bc16463a34879083d64debb4587a0d036297d4d`.
 - Last fetched origin/main commit: `4bc16463a34879083d64debb4587a0d036297d4d`, fetched 2026-09-30.
@@ -18,7 +20,7 @@
 
 ## Goal and acceptance criteria
 
-Execute [ODAIBA_PLAN.md](../ODAIBA_PLAN.md) P0–P6: the root exhibition scene becomes the Fuji TV / Daiba waterfront in 2127 with the same four-question v2 contract, four change sites, lifecycle and day/night.
+Execute [completed venue transition record](../ODAIBA_VENUE_TRANSITION.md) P0–P6: the root exhibition scene becomes the Fuji TV / Daiba waterfront in 2127 with the same four-question v2 contract, four change sites, lifecycle and day/night.
 
 ## In-scope files and dependencies
 
@@ -57,6 +59,6 @@ P0: Odaiba GLB/blend pairs and masterplan outputs under `asset/models/`, `src/od
 
 See the plan's "Decisions (user, 2026-09-30)". Real metres are kept; the camera and per-site scale adapt instead. Questions keep ids/effects.
 
-## Next expected step
+## Original next expected step (superseded)
 
 P6: full guest flow on the exhibition machine with the Odaiba questions. Owner cc100053.

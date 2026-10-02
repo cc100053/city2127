@@ -3,6 +3,18 @@
 **Status:** Master visual / architectural direction<br>
 **Use:** Mandatory reference for every building evolution, new object, mobility system, landscape intervention, public space, prop, and future city asset in Odaiba 2127.
 
+
+**Decision owner:** cc100053. Navigation checked 2026-10-02; this does not constitute new visual acceptance. Runtime status and limits: [ART](../ART.md) / [PROJECT](../PROJECT.md). Shibuya is historical and closed.
+
+| Reference | Image |
+| --- | --- |
+| R01 Master hero | [R01_MASTER_HERO.png](R01_MASTER_HERO.png) |
+| R02 Civic core | [R02_CIVIC_CORE.png](R02_CIVIC_CORE.png) |
+| R03 Ground level | [R03_GROUND_LEVEL.png](R03_GROUND_LEVEL.png) |
+| R04 Waterfront | [R04_WATERFRONT.png](R04_WATERFRONT.png) |
+| R05 Mobility | [R05_MOBILITY.png](R05_MOBILITY.png) |
+| R06 Secondary district | [R06_SECONDARY_DISTRICT.png](R06_SECONDARY_DISTRICT.png) |
+
 ---
 
 ## 0. Purpose

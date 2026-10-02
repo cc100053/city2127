@@ -1,5 +1,7 @@
 # odaiba-assets - Odaiba Plan building asset stage
 
+> Closure correction — 2026-10-02: Venue runtime uses imported assets through `e6c7966`; this does not close the separate asset-study task. Asset commits were imported path-wise, not merged into main ancestry. Source branch `origin/feat/odaiba-assets-progress-02` remains available at review. See [venue](odaiba-venue.md); coordinate with asset owner before source edits.
+
 - Owner: cc100053
 - Status: IN_PROGRESS
 - Branch: feat/odaiba-assets-progress-02

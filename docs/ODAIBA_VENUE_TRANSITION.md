@@ -1,10 +1,10 @@
-# Odaiba 2127 — venue transition plan (DRAFT)
+# Odaiba 2127 — venue transition plan (completed transition record)
 
 > 2026-10-02 operation update: the Odaiba venue is already integrated on main. Its four-question experience now supports two independent A/B devices on the same survey server, with ordered city displays and reset draining. This venue plan keeps its dated P0–P6 scope; current station operation and evidence are in the [dual-station handoff](handoffs/two-guest-devices.md).
 
-- Status: APPROVED 2026-09-30 (decisions below). P0–P5 done on `codex/odaiba-venue`; next: integrate into `main`, then P6.
+- Status: P0–P5 INTEGRATED into main as `e6c7966` (2026-09-30); P6/S5 acceptance remains pending. Current behavior is in [EXHIBITION_SPEC](EXHIBITION_SPEC.md), not the original estimates below.
 - Drafted: 2026-09-30 against `main` `4bc1646`; Odaiba sources read from `origin/codex/odaiba-preview` `3a8a5f2` (contains all of `origin/feat/odaiba-assets-progress-02` `40d696e`).
-- Supersedes on approval: the "single Shibuya setting" constraint in [AGENTS.md](../AGENTS.md), [PROJECT.md](PROJECT.md) and [PLAN02.md](PLAN02.md). Shibuya is **replaced**, not kept selectable; it stays in Git history.
+- Superseded on 2026-09-30: the "single Shibuya setting" constraint in [AGENTS.md](../AGENTS.md), [PROJECT.md](history/PROJECT_2026-10-02.md) and [archived Shibuya Plan 02](history/SHIBUYA_PLAN02.md). Shibuya is **replaced**, not kept selectable; it stays in Git history. User confirmed on 2026-10-02 that no future Shibuya work will be done.
 
 ## Goal
 
@@ -12,7 +12,7 @@ The exhibition city moves from the Shibuya crossing to the **Fuji TV / Daiba wat
 
 Non-goals for this transition: new question axes, server contract changes, module-swap support for v2, responsive/mobile layout, deployment.
 
-## What the Odaiba branches already give us
+## Original source inventory — 2026-09-30
 
 | Item on `codex/odaiba-preview` | Reuse | Notes |
 | --- | --- | --- |
@@ -24,7 +24,7 @@ Non-goals for this transition: new question axes, server contract changes, modul
 | `overlay.ts` "Explore Odaiba ↗" link, `style.css` `.venue-link` | **No** | Based on old `main` `5577195`; overlay has changed since. |
 | Previews / handoff PNGs | Reference only | Keep in `docs/handoffs/`. |
 
-**Do not merge the branch wholesale** — its base is `5577195`, 30+ commits behind `main`, and it carries a stale `package.json` / `overlay.ts`. Bring files over path-wise on a fresh branch:
+**Historical import recipe — already executed; do not restart this transition. Do not merge the branch wholesale** — its base is `5577195`, 30+ commits behind `main`, and it carries a stale `package.json` / `overlay.ts`. Bring files over path-wise on a fresh branch:
 
 ```sh
 git checkout -b codex/odaiba-venue origin/main
@@ -68,7 +68,7 @@ Same sockets, same axes, same builders — only location, scale and name change.
 | sw · public sharing | Commons plaza ×4 | Open ground between Aqua City and Hilton (−105, 60) · アクアシティ南 | The Fuji TV–DiverCity promenade is hidden behind Fuji TV from the hero; this open lawn is visible and public. |
 | se · concentration | Concentration tower ×3 | Service ground east of Fuji TV (175, −45) · フジテレビ東 | Tall variant (138 m) stands beside the sphere; low variant stays a readable pavilion pair. |
 
-## Making it feel 2127
+## Original 2127 retrofit plan — subsequent implementation may differ
 
 The landmarks are 1990s–2000s buildings modelled from photographs. 2127 comes from **what has been added and adapted around them**, never from ruin. Low/zero/high Meter values all stay mature futures (AGENTS rule, 2026-09-28).
 
@@ -76,10 +76,10 @@ The landmarks are 1990s–2000s buildings modelled from photographs. 2127 comes 
 2. **The sphere becomes a hub.** Fuji TV's sphere is the obvious 2127 anchor: a drone/air-taxi dock (reuse the `DOCK` berth logic) and, at night, an emissive media globe showing landscape rather than adverts (the QFRONT drum idea moved).
 3. **Retrofit, not replace.** One shared kit on the existing GLBs: PV/fin skins on south faces, green roofs, deck-level sky bridges linking Fuji TV ↔ Aqua City ↔ DECKS (reuse `publicRoutes`/`upperLinks` concepts), light lines along the Yurikamome guideway.
 4. **Mobility on water and air.** Autonomous water taxis crossing to the Rainbow Bridge side, pod trains on the guideway, drone lanes over the bay. All reuse the `mobility` fleet instancing.
-5. **One material language.** On load, remap the photo-estimate materials to the project palette in [ART.md](ART.md) (by material name), add night emissive windows. This is what stops the scene looking like a GIS blockout.
+5. **One material language.** On load, remap the photo-estimate materials to the project palette in [ART.md](history/SHIBUYA_ART.md) (by material name), add night emissive windows. This is what stops the scene looking like a GIS blockout.
 6. **De-brand.** No Fuji TV / Aqua City / DECKS logos or trademarked characters (e.g. the DiverCity statue). Place names in UI copy are fine; signage on the models is not.
 
-## Phases
+## Historical phase plan
 
 Each phase is one branch, merged after `npm test`, `npm run build`, `git diff --check` and the relevant browser check, per [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -95,7 +95,7 @@ Each phase is one branch, merged after `npm test`, `npm run build`, `git diff --
 
 ## Phase results
 
-Measurements are on the exhibition machine (the user confirmed on 2026-09-30 that this Apple M6 is it): headed Chrome 154, ANGLE Metal, 1920×1080, pixel ratio 1. Full records: [VALIDATION.md](VALIDATION.md) "Odaiba venue P0–P4".
+Measurements are on the exhibition machine (the user confirmed on 2026-09-30 that this Apple M6 is it): headed Chrome 154, ANGLE Metal, 1920×1080, pixel ratio 1. Full records: [VALIDATION.md](history/VALIDATION_2026-10-02.md) "Odaiba venue P0–P4".
 
 - **P0** — Assets imported path-wise; `tests/odaiba.test.ts` in root `npm test`. Spike (reverted) with environment + 8 buildings over Shibuya: 60.0 FPS, 1,223–1,311 draw calls (Shibuya alone 60.0 / 356).
 - **P1** — Shibuya landmark builders removed; `src/odaibaScene.ts` loads terrain, sea and buildings with a palette remap and warm night glazing; hero over the bay, open-sea floor, fitted shadow box and fog. Trees/streetlights were already consolidated in the environment GLB, so no instancing. 60.0 FPS, ~1,245 draws. [12:00](../artifacts/odaiba-p1-1200.png) · [18:30](../artifacts/odaiba-p1-1830.png) · [22:00](../artifacts/odaiba-p1-2200.png)
