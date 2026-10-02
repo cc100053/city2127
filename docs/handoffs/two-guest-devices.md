@@ -5,7 +5,7 @@
 - Branch: `codex/two-guest-devices`
 - Base commit: `5e901afe6cbf0b568e318450cd490263a1a3209a`
 - Last verified commit: `689670a3b9f8badf658d195e1994228d71965e00` (integrated tree identical to source `b9dbad82fc5101a24266e069fb20762fa21c70ec`)
-- Remote availability: source `b9dbad8` available on `origin/codex/two-guest-devices`; main published after closure
+- Remote availability: source `b9dbad8` available on `origin/codex/two-guest-devices`; published main `45fcde7cdcfde1ed9031a1c10ff7749206b7faeb`
 
 ## Session Git state
 
@@ -40,4 +40,4 @@ Physical LAN/device and exhibition hardware acceptance are the next product step
 
 Source `b9dbad82fc5101a24266e069fb20762fa21c70ec` pushed; [feature CI 36975551689](https://github.com/cc100053/city2127/actions/runs/36975551689) PASS on Node24 (root, survey and module-swap install/test/build plus whitespace). Fresh origin fetch confirmed main unchanged at `5e901af`; no-conflict merge `689670a` has exactly the source tree. Integrated root/survey `npm test`, `npm run build`, committed whitespace and changed Markdown file targets PASS. Root retains the existing >500 kB bundle warning. The final browser acceptance above used the same source tree; no additional source changes followed it. Full new-file and staged/committed diff reviewed.
 
-This closure updates only the handoff and validation record. Fetch/ancestry is checked before publishing main. Main CI is verified after that push; its actual outcome is reported in the task final response and can be checked in [main CI history](https://github.com/cc100053/city2127/actions?query=branch%3Amain). Feature branch retained; no deployment performed.
+This closure updates only the handoff and validation record. Fetch/ancestry is checked before publishing main. Published main `45fcde7cdcfde1ed9031a1c10ff7749206b7faeb`; [main CI 36976457465](https://github.com/cc100053/city2127/actions/runs/36976457465) PASS (Node24 all three packages and whitespace), confirmed again during the documentation audit on 2026-10-02. Feature branch retained; no deployment performed.

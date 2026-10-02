@@ -1,5 +1,7 @@
 # Exhibition S4 — guest UI and root feedback
 
+> 2026-10-02 current behavior: this handoff preserves its dated implementation evidence. A/B concurrent stations now use independent sessions/results, ordered displays and reset draining; single `/guest` keeps automatic next-start handoff. Admin ends only a named unfinished station, and a newer cancelled draft never reopens an older Undo. See [dual-station handoff](two-guest-devices.md) and [current architecture](../PROJECT.md). Earlier staff-exit requirements are historical.
+
 - Owner: Codex Luna Max (survey UI implementer)
 - Status: SHIPPED — 2026-09-30 exit-gate browser checks passed; `5ae6e35` passed [feature CI 36631026705](https://github.com/cc100053/city2127/actions/runs/36631026705); integrated as `5e14078` and [main CI 36631134812](https://github.com/cc100053/city2127/actions/runs/36631134812) passed; deviations listed below
 - Branch: `codex/exhibition-s4` (original, integrated via `4212b80`); acceptance pass on `codex/exhibition-s4-acceptance`

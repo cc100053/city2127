@@ -1,5 +1,7 @@
 # remove-guest-exit-lock — Automatic next-guest handoff
 
+> 2026-10-02 current behavior: this handoff preserves its dated implementation evidence. A/B concurrent stations now use independent sessions/results, ordered displays and reset draining; single `/guest` keeps automatic next-start handoff. Admin ends only a named unfinished station, and a newer cancelled draft never reopens an older Undo. See [dual-station handoff](two-guest-devices.md) and [current architecture](../PROJECT.md). Earlier staff-exit requirements are historical.
+
 - Owner: cc100053 (implemented by Codex in this task)
 - Status: DONE (implementation and integrated local validation; main CI checked after push in this task)
 - Branch: `codex/remove-guest-exit-lock`

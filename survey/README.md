@@ -10,7 +10,7 @@ server の1秒周期で通信断も解放します：草稿は開始から5分�
 
 ## 管理者専用 Undo（2026-10-02）
 
-Admin の **直前の提案を取り消す** は、次の Guest が開始する前だけ利用できます。元の提案を削除せず取消済みとして残し、街の全状態・配置順・参加人数を変更前に戻します。Guest の結果は開始画面に戻り、再回答は新しい四問の体験です。保留中のリセットは次の開始まで保留されます。既存 DB は起動時に schema 6 に移行します。survey を build／再起動し、City／Guest／Admin を更新してください。
+Admin の **直前の提案を取り消す** は、次の Guest が開始する前だけ利用できます。元の提案を削除せず取消済みとして残し、街の全状態・配置順・参加人数を変更前に戻します。Guest の結果は開始画面に戻り、再回答は新しい四問の体験です。保留中のリセットは単独モードでは次の開始まで、A/B では両体験終了まで保留されます。新しい A/B 草稿を開始すると、中止後も古い提案の Undo は再び使えません。Undo は schema 6 で導入され、現在の DB は起動時に schema 7 に移行します。survey を build／再起動し、City／Guest／Admin を更新してください。
 
 API は既存 `POST /api/admin/lifecycle` に `{ command: "undo-proposal", proposalId, expectedRevision }` を送ります（localhost／同一 origin のみ）。取消済み申込 ID の再送は `proposal_undone`（409）で拒否されます。元の提案と取消記録は追加専用です。検証と制約は [handoff](../docs/handoffs/admin-undo.md) を参照。
 
@@ -100,7 +100,7 @@ type CitySurveyState = {
 
 起動時は、有効な run のスナップショットをその run の回答イベントから再計算した結果と照合します。一致しない、スナップショットがない、有効な run がない（run は存在する）場合は `CorruptStateError` で起動を止め、黙って初期化しません。
 
-## guest session と質問予約
+## legacy v1 guest session と質問予約
 
 - ゲスト一人は一つの run で一問だけ回答します。
 - `POST /api/guest-sessions` で、JSON の順番で「回答済みでも予約中でもなく、`trigger` が現在のスコアを満たす」最初の質問をトランザクション内で予約します。
@@ -115,6 +115,10 @@ type CitySurveyState = {
 
 | メソッドとパス | 内容 |
 | --- | --- |
+| `POST /api/proposal-sessions` | v2：単独は `{}`、2台は `{ "stationId": "A" }` または `B`。四問を予約（201）、同じステーションの体験中・mode混在・reset保留中のA/B開始は409 |
+| `GET /api/proposal-sessions/:id` | v2：割当四問、session、現在状態。草稿復元／期限確認 |
+| `POST /api/proposals` | v2：`submissionId`、`guestSessionId`、`expectedRevision`、四組のanswers。新規201、同一IDの成功再送200。A/Bは旧revision可、未来revision不可；単独は完全一致 |
+| `POST /api/proposal-sessions/:id/end` | A/Bのみ：指定sessionを終了。提出済み提案は保持し、予定展示の3秒転換が終わる前は409 |
 | `POST /api/guest-sessions` | session 作成と質問予約（201）。質問なしは 409 `no_question_available` |
 | `GET /api/guest-sessions/:id/question` | 割り当てられた質問と現在状態。期限切れは 410、回答済みは `status: "answered"` |
 | `POST /api/answers` | 回答（新規 201、再送 200）。400 不明な question/option・別の質問の option、404 不明な session、409 revision 競合・回答済み・answer ID 競合・未割り当て質問、410 期限切れ |
@@ -122,19 +126,22 @@ type CitySurveyState = {
 | `GET /api/city-view` | 現在の `CityView`（導出配置と決定履歴） |
 | `GET /api/health` | run ID、revision、質問 version |
 | `WS /ws` | 接続直後に `city-state-snapshot`、その後 `city-state-updated` / `run-reset`。3種とも `state` と `view`（`CityView`）を含む |
-| `GET /api/admin/current-run` | run、`lifecycle`（phase、pending reset、総参加人数、revision）、状態、予約中・回答済み session 数（loopback のみ） |
-| `GET /api/admin/events?limit=50` | 最近の回答イベントと admin event（`scope: city/full`）（loopback のみ） |
-| `POST /api/admin/lifecycle` | `{"command","expectedRevision","confirmation"?}`。command は `reset-city`（`RESET`）、`full-reset`（`FULL RESET`）、`cancel-reset`、`guest-left`。古い revision は 409 `lifecycle_conflict`、状態に合わない操作は 409 `lifecycle_blocked`（loopback のみ） |
+| `GET /api/admin/current-run` | run、`lifecycle`（phase、pending reset、総参加人数、revision）、状態、予約中・回答済み session 数、`stations`、`undoProposal`、`displayMode`（loopback のみ） |
+| `GET /api/admin/events?limit=50` | 最近の回答・提案（A/B情報と取消記録）および admin event（reset／proposal-undone）（loopback のみ） |
+| `POST /api/admin/lifecycle` | `{command, expectedRevision, confirmation?, proposalId?, guestSessionId?}`。command は `reset-city`（`RESET`）、`full-reset`（`FULL RESET`）、`cancel-reset`、`guest-left`、`undo-proposal`。A/B の `guest-left` は未完了の `guestSessionId` 必須、Undo は `proposalId` 必須。古い revision は 409 `lifecycle_conflict`、状態に合わない操作は 409 `lifecycle_blocked`（loopback のみ） |
 
-WebSocket の `city-state-updated` には、仕様の `answerId` と `state` に加えて、モニター表示用に `answer`（AnswerEvent）、`questionText`、`optionLabel`、`change`（clamp 後の実際の変化）が入ります。回答の再送では通知しません。
+v2 の `city-state-updated` は `submissionId`、`proposal`、`state`、`view` を含み、A/B のみ `displayWaitMs` と proposal 内の `stationId`／`displayAt` を追加します。サーバー通知は commit 後に即配信され、root が表示を3秒以上離します。再送では再通知しません。Monitor は最新記録を表示し、root の表示待ち列とは別です。
+
+v1 WebSocket の `city-state-updated` には、仕様の `answerId` と `state` に加えて、モニター表示用に `answer`（AnswerEvent）、`questionText`、`optionLabel`、`change`（clamp 後の実際の変化）が入ります。回答の再送では通知しません。
 
 ## 管理画面と Reset
 
 - `/admin`、`/admin.html`、`/api/admin/*` は接続元が `127.0.0.1`、`::1`、`::ffff:127.0.0.1`（デュアルスタック socket 上の IPv4 loopback）のときだけ使えます。それ以外は 403 です。
 - 展示 PC 上で `http://127.0.0.1:8787/admin` を開きます。
-- **展示 lifecycle（2026-10-02 更新、schema 4）**：session 開始で `in_experience`、提案 commit で `awaiting_exit`。次の session 開始時に前の体験を自動終了するため、Admin の退出確認は不要です。通常は累積した街を引き継ぎます。**未完了の体験を終了** は `in_experience` の質問を中止する操作です（既存 `guest-left` API を使用）。
-- **Reset Current City** は `ready` なら即実行、それ以外は次の session 開始まで保留。**Full Data Reset** も同じで、`full` が `city` より優先し、**Cancel Pending Reset** で取り消せます。未完了の体験を Admin で終了した場合も保留 reset を実行します。Reset と次の予約は同一 transaction で保存し、commit 後に `run-reset` を配信します。`ready` は pending を持てません（DB CHECK）。
-- 現在の都市の参加人数 = active run の `guestCount`。総参加人数 = 最後の full reset 以降の `proposal_events` 数（watermark `total_since_sequence`）。City reset は総数を保持し、full reset は watermark を進めて 0 にします。どちらも履歴は削除しません。
+- **単独 `/guest` lifecycle（schema 4 由来、現在 schema 7）**：session 開始で `in_experience`、提案 commit で `awaiting_exit`。次の session 開始時に前の体験を自動終了するため、Admin の退出確認は不要です。通常は累積した街を引き継ぎます。**未完了の体験を終了** は `in_experience` の質問を中止する操作です（既存 `guest-left` API を使用）。
+- **単独モードの Reset Current City** は `ready` なら即実行、それ以外は次の session 開始まで保留。**Full Data Reset** も同じで、`full` が `city` より優先し、**Cancel Pending Reset** で取り消せます。未完了の体験を Admin で終了した場合も保留 reset を実行します。Reset と次の予約は同一 transaction で保存し、commit 後に `run-reset` を配信します。`ready` は pending を持てません（DB CHECK）。
+- **A/B（schema 7）**：一つでも未提出の草稿があれば `in_experience`、結果のみなら `awaiting_exit`。Reset は両体験が空いていれば即実行、体験中なら新規開始を停止して両体験の終了／期限切れを待ちます。Admin は A/B の指定草稿だけを終了し、相手の体験を保持します。上記単独モードの次開始ルールとは異なります。
+- 現在の都市の参加人数 = active run の `guestCount`。総参加人数 = 最後の full reset 以降の取消されていない `active_proposal_events` 数（watermark `total_since_sequence`）。City reset は総数を保持し、full reset は watermark を進めて 0 にします。どちらも履歴は削除しません。
 - すべての admin command は画面が最後に読んだ lifecycle `revision` を送り、別タブ・別画面からの古い操作を拒否します。Admin 画面は WebSocket event と 2 秒 polling で更新します。
 - City reset は `RESET` の入力（画面では確認ダイアログ）が必要です。他サイトからの POST を防ぐため、`Origin` ヘッダーがあるときはサーバー自身の origin と一致する必要があります。
 - 実行される reset は 1 つのトランザクションで、現在の run を `ended` にする → 未回答の予約を `expired` にする → admin event（`run-reset`）を記録 → 新しい run とスコア 0 の状態を保存する、の順に行い、コミット後に WebSocket へ `run-reset` を配信します。
@@ -185,6 +192,7 @@ npm run build
 | `tests/cityView.test.ts` | 中立の配置、軸ごとの閾値、累積、公園・広場に建物なし、決定的な導出、変化ラベル |
 | `tests/answerService.test.ts` | 保存、不明・不一致 ID、冪等な再送、answer ID 競合、古い revision、sequence/revision の単調増加、追加専用 |
 | `tests/sessionService.test.ts` | 一人一問、重複予約なし、再回答不可、期限切れの再割り当て、全問使い切り |
+| `tests/twoStations.test.ts` | A/B の同時送信、最新状態累積、再送、指定中止、reset排出／期限、再起動、HTTP／WebSocket |
 | `tests/concurrency.test.ts` | 8 本の worker thread（それぞれ別の SQLite 接続）を同時に動かし、異なる質問の割り当てと更新の欠落がないことを確認 |
 | `tests/persistence.test.ts` | 再起動相当での復元、イベント再計算との照合、壊れた状態・スナップショット欠落を拒否、schema version 不一致、schema 1 → 2 移行、外部キー |
 | `tests/reset.test.ts` | 実 HTTP サーバーで API のステータス、LAN からの管理 API 403、確認文字列、新しい run、履歴保持、reset event |
