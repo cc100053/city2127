@@ -1,11 +1,11 @@
 # two-guest-devices — Concurrent A/B Guest stations
 
 - Owner: cc100053 (implemented by Codex in this task)
-- Status: IMPLEMENTED AND LOCALLY VERIFIED; Git/CI integration pending
+- Status: IMPLEMENTED, VERIFIED AND INTEGRATED
 - Branch: `codex/two-guest-devices`
 - Base commit: `5e901afe6cbf0b568e318450cd490263a1a3209a`
-- Last verified commit: working tree based on `5e901af`; source commit recorded after staging
-- Remote availability: NOT PUSHED
+- Last verified commit: `689670a3b9f8badf658d195e1994228d71965e00` (integrated tree identical to source `b9dbad82fc5101a24266e069fb20762fa21c70ec`)
+- Remote availability: source `b9dbad8` available on `origin/codex/two-guest-devices`; main published after closure
 
 ## Session Git state
 
@@ -34,4 +34,10 @@ Root queues station updates at least 3 s apart, labels their station/proposal an
 
 No physical two-device LAN, Windows, FPS or exhibition input-hardware acceptance. Background/disconnected stations use leases; reconnect restores the latest city rather than replaying every missed transition. Optional browser command is in [VALIDATION](../VALIDATION.md). No new dependency, deployment or mobile adaptation. All affected architecture, behavior and validation documents are synced; screenshot assets are owned by this task.
 
-Finish Markdown targets, exact diff review and whitespace checks; push feature, require feature CI, integrate and validate main per [workflow](../CONTRIBUTING.md). Record source/merge commits and actual CI outcomes here.
+Physical LAN/device and exhibition hardware acceptance are the next product step. Rebuild/restart survey and refresh Guest/City/Admin on an existing installation; schema 7 migrates automatically without deleting the DB.
+
+## Git integration and verification
+
+Source `b9dbad82fc5101a24266e069fb20762fa21c70ec` pushed; [feature CI 36975551689](https://github.com/cc100053/city2127/actions/runs/36975551689) PASS on Node24 (root, survey and module-swap install/test/build plus whitespace). Fresh origin fetch confirmed main unchanged at `5e901af`; no-conflict merge `689670a` has exactly the source tree. Integrated root/survey `npm test`, `npm run build`, committed whitespace and changed Markdown file targets PASS. Root retains the existing >500 kB bundle warning. The final browser acceptance above used the same source tree; no additional source changes followed it. Full new-file and staged/committed diff reviewed.
+
+This closure updates only the handoff and validation record. Fetch/ancestry is checked before publishing main. Main CI is verified after that push; its actual outcome is reported in the task final response and can be checked in [main CI history](https://github.com/cc100053/city2127/actions?query=branch%3Amain). Feature branch retained; no deployment performed.
