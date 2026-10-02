@@ -1,11 +1,11 @@
 # resident-experience-plan — Two-screen resident experience planning
 
 - Owner: Codex
-- Status: IN_PROGRESS — plan and documentation checks complete; publication/integration pending. P2–P5 remain PLANNED.
+- Status: DONE — planning/handoff recorded and verified. P2–P5 remain PLANNED; no runtime implementation in this task.
 - Branch: `codex/resident-experience-plan`
 - Base commit: `6ed44dfcd6e9fdf08943bcc5e509bd46e9fda83a`
-- Last verified commit: base `6ed44dfcd6e9fdf08943bcc5e509bd46e9fda83a` plus the complete uncommitted documentation delta checked on 2026-10-02
-- Remote availability: NOT PUSHED for this task; P1 is available on `origin/main`
+- Last verified commit: integrated `41c1dc1d40580a1f4938bec0f9815fbefa253724` (tree identical to source `08f6f4dcea283e9312c383df798c897ada1ebcc9`); final handoff-only closure checked separately
+- Remote availability: source `08f6f4dcea283e9312c383df798c897ada1ebcc9` on `origin/codex/resident-experience-plan`; validated main integration is published with this closure
 
 ## Session Git state
 
@@ -34,9 +34,10 @@ Confirmed current Guest result still contains answers/scores/city changes and ro
 - Verification status: PASSED — documentation only
 - Checked worktree: documentation against base above, 2026-10-02
 - Native Python assertions PASS: 223 local Markdown targets across six task files resolve to tracked or task-new files; no local anchor links occur. P1/P2–P5 status and current/proposed timing boundaries checked. No files renamed or deleted.
-- Source/state facts reviewed against CodeGraph, P1 history and verified current main; full tracked diff and both new files reviewed. Working-tree whitespace PASS; staged/committed checks follow publication.
+- Source/state facts reviewed against CodeGraph, P1 history and verified current main; full tracked diff and both new files reviewed. Working-tree, staged and committed whitespace PASS.
 - Local runtime test/build/browser: NOT RUN; documentation only
-- Current-task CI/integration: NOT RUN / NOT INTEGRATED
+- Current-task source CI [36997529549](https://github.com/cc100053/city2127/actions/runs/36997529549): SUCCESS on exact `08f6f4d` (Node24, root/survey/module-swap install/test/build and committed whitespace).
+- Integration `41c1dc1d40580a1f4938bec0f9815fbefa253724`: no conflicts, identical source tree, 223 links/status/timing assertions and committed whitespace PASS again. This final closure changes only the handoff, separately reviewed/checked. Main CI will be checked after publication; its final result is reported in the task completion message.
 - Previous P1 CI is verified historical evidence only; it does not validate this new plan or future UI
 
 ## Decisions and known limits
@@ -47,4 +48,4 @@ README operation instructions, AGENTS narrative constraints and ART need no new 
 
 ## Next expected step
 
-Commit/push and integrate after required checks. Following a P2 assignment, Codex should perform preflight, read the plan/P1/current source, confirm overlap ownership, create a P2 handoff and implement copy/screen separation. Do not silently start P2 or change timing as part of this documentation task. Input hardware and venue recovery decisions are needed for P5, not as a prerequisite to write P2.
+Following a P2 assignment, Codex should perform preflight, read the plan/P1/current source, confirm overlap ownership, create a P2 handoff and implement copy/screen separation. Do not silently start P2 or change timing as part of this documentation task. Input hardware and venue recovery decisions are needed for P5, not as a prerequisite to write P2. Plan/handoff are published via the main integration above; task branch retained, no deployment.
