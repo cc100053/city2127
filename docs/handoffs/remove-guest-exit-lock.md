@@ -1,11 +1,11 @@
 # remove-guest-exit-lock — Automatic next-guest handoff
 
 - Owner: cc100053 (implemented by Codex in this task)
-- Status: IN_PROGRESS (local implementation and checks complete; awaiting feature CI/integration)
+- Status: DONE (implementation and integrated local validation; main CI checked after push in this task)
 - Branch: `codex/remove-guest-exit-lock`
 - Base commit: `382aa342f794b5db5c4a279c274437d0eeb14a39`
-- Last verified commit: base plus this task's uncommitted code/test delta
-- Remote availability: NOT PUSHED
+- Last verified feature commit: `604f94c8f98e9b2580fbd668b1624ff6d7f51539` (local checks and feature CI PASS)
+- Remote availability: `origin/codex/remove-guest-exit-lock` at `604f94c8f98e9b2580fbd668b1624ff6d7f51539`; integrated main contains `405088401e0e167f2ac88fbf7bceaa290f389cbb` plus this documentation-only followup
 
 ## Session Git state
 
@@ -35,11 +35,12 @@ Survey lifecycle/session service, HTTP publishing, Admin/Guest/auto-answer UI, t
 - 2026-10-02, Node26.0.0: root and survey `npm test` / `npm run build` PASS. Initial sandbox port failures retried with approval. Root existing bundle-size warning only.
 - Automated checks cover 100 no-Admin handoffs, accumulation, city/full reset, atomic rollback, restart, HTTP/WebSocket reset and existing retry/count/history protections.
 - In-app browser1265×712 on scratch server8795: next Guest starts without Admin; two submitted proposals retain run/count/revision2. One intervening unused draft timed out normally. [Evidence](../../artifacts/guest-handoff-admin-2026-10-02.jpg); [validation](../VALIDATION.md#guest-handoff-without-admin-exit-lock--2026-10-02).
-- Integrated commit/checks: NOT INTEGRATED. Final diff/Markdown target checks PASS; feature/main CI pending.
+- Feature [CI run 36960169992](https://github.com/cc100053/city2127/actions/runs/36960169992) PASS on `604f94c` (root, survey, module-swap and whitespace).
+- Integrated commit: `405088401e0e167f2ac88fbf7bceaa290f389cbb`, no conflicts and identical feature tree. Integrated root/survey tests and builds PASS (Node26.0.0), and committed-diff/Markdown target checks PASS. Changes since verification: this documentation-only record. Main CI is checked after push; this record does not pre-claim its outcome. See [main CI history](https://github.com/cc100053/city2127/actions?query=branch%3Amain) and the task final response.
 
 ## Known issues and blockers
 
-No implementation blocker. Existing result phase name `awaiting_exit` remains for stored/API compatibility but no longer blocks a new session. Auto-answer still stops for pending resets and other unfinished drafts; ordinary Guest start applies queued resets. No Windows/browser performance check; no rendering changes.
+No implementation blocker. Additional in-app-browser reset-confirmation smoke could not complete: CDP timed out on the unchanged confirm dialog, including cleanup attempts. The reset/session transaction and WebSocket path are covered by passing HTTP tests; no browser reset success is claimed. Existing result phase name `awaiting_exit` remains for stored/API compatibility but no longer blocks a new session. Auto-answer still stops for pending resets and other unfinished drafts; ordinary Guest start applies queued resets. No Windows/browser performance check; no rendering changes.
 
 ## Important decisions
 
@@ -47,4 +48,4 @@ Starting the next questionnaire is now the handoff trigger. Pending reset is def
 
 ## Next expected step
 
-Review complete task diff and local Markdown links, commit/push feature, wait for CI, integrate and validate main per [CONTRIBUTING](../CONTRIBUTING.md).
+Implementation integrated on main; use the normal survey build/server restart and refresh Guest/Admin to load it. The task verifies remote main and its CI after pushing this record per [CONTRIBUTING](../CONTRIBUTING.md).
