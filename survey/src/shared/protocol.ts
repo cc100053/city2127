@@ -76,8 +76,8 @@ export type ProposalData = { proposal: ProposalRecord; state: ExhibitionState; r
 export type RunSummary = { id: string; status: 'active' | 'ended'; algorithmVersion: 1 | 2; startedAt: string; endedAt: string | null };
 /**
  * Installation lifecycle, persisted server-side. Finishing the questionnaire moves `in_experience` to
- * `awaiting_exit`; only staff confirming the guest has physically left returns to `ready`. A reset is
- * queued in `pendingReset` until then (`full` supersedes `city`); in `ready` it is always `none`.
+ * `awaiting_exit` while the result is displayed. Starting the next questionnaire automatically ends
+ * that experience and applies any `pendingReset` (`full` supersedes `city`); `ready` holds none.
  */
 export type LifecyclePhase = 'ready' | 'in_experience' | 'awaiting_exit';
 export type PendingReset = 'none' | 'city' | 'full';

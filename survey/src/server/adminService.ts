@@ -87,6 +87,19 @@ function executeReset(ctx: SurveyContext, scope: 'city' | 'full'): { previousRun
   return { previousRunId: run.id, state };
 }
 
+/** End the previous experience and apply a queued reset. Call inside a transaction. */
+export function finishGuest(ctx: SurveyContext, lifecycle: LifecycleStatus): ServiceOutcome<LifecycleData> {
+  ctx.db.prepare("UPDATE proposal_sessions SET status = 'expired' WHERE status = 'reserved'").run();
+  const reset = lifecycle.pendingReset;
+  const executed = reset === 'none' ? undefined : executeReset(ctx, reset);
+  setLifecycle(ctx, 'ready', 'none', reset === 'full');
+  const state = executed?.state ?? currentState(ctx);
+  return {
+    response: { ok: true, data: { lifecycle: readLifecycle(ctx.db), state, executedReset: reset === 'none' ? null : reset, previousRunId: executed?.previousRunId ?? null } },
+    event: executed && { type: 'run-reset', previousRunId: executed.previousRunId, state, view: viewOf(ctx, state) },
+  };
+}
+
 function parseLifecycleRequest(body: unknown): LifecycleRequest | undefined {
   if (typeof body !== 'object' || body === null || Array.isArray(body)) return undefined;
   const { command, expectedRevision, confirmation } = body as Record<string, unknown>;
@@ -97,8 +110,8 @@ function parseLifecycleRequest(body: unknown): LifecycleRequest | undefined {
 
 /**
  * Staff lifecycle commands. Each one names the lifecycle revision it was issued against, so a stale admin
- * page cannot act on a newer guest. A reset runs at once only in `ready` (staff already confirmed the area
- * is clear); otherwise it waits in `pendingReset` for `guest-left`. Guest submissions never run a reset.
+ * page cannot act on a newer guest. A reset runs at once only in `ready`; otherwise it waits for the next
+ * guest to start or an unfinished experience to be ended. Guest submissions never run a reset.
  */
 export function lifecycleCommand(ctx: SurveyContext, body: unknown): ServiceOutcome<LifecycleData> {
   const request = parseLifecycleRequest(body);
@@ -126,14 +139,11 @@ export function lifecycleCommand(ctx: SurveyContext, body: unknown): ServiceOutc
         break;
       case 'guest-left': {
         if (lifecycle.phase === 'ready') return { response: fail('lifecycle_blocked', 'The installation is already ready for the next guest.') };
-        // An unfinished questionnaire is abandoned: the guest has gone.
-        ctx.db.prepare(`UPDATE proposal_sessions SET status = 'expired' WHERE status = 'reserved'`).run();
-        reset = lifecycle.pendingReset;
-        break;
+        return finishGuest(ctx, lifecycle);
       }
     }
     const executed = reset === 'none' ? undefined : executeReset(ctx, reset);
-    if (reset !== 'none' || request.command === 'guest-left') setLifecycle(ctx, 'ready', 'none', reset === 'full');
+    if (reset !== 'none') setLifecycle(ctx, 'ready', 'none', reset === 'full');
     const state = executed?.state ?? currentState(ctx);
     return {
       response: { ok: true, data: { lifecycle: readLifecycle(ctx.db), state, executedReset: reset === 'none' ? null : reset, previousRunId: executed?.previousRunId ?? null } },

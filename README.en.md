@@ -6,7 +6,7 @@ Guests collectively shape a futuristic Shibuya. Each guest answers four question
 
 ## Start the exhibition locally
 
-Development auto-answer (DEV-ONLY): run `cd survey && npm run dev:auto`, open `http://127.0.0.1:8788/guest?dev-auto`, and connect root Vite at `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8788/ws`. Every launch creates a new retained scratch SQLite; it never uses the exhibition DB. The opt-in localhost panel drives the existing Guest flow and confirms only its own submitted guest exit. Remove it or move it to Admin and restore staff exit confirmation before exhibition use. See the [survey guide](survey/README.md).
+Development auto-answer (DEV-ONLY): run `cd survey && npm run dev:auto`, open `http://127.0.0.1:8788/guest?dev-auto`, and connect root Vite at `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8788/ws`. Every launch creates a new retained scratch SQLite; it never uses the exhibition DB. The opt-in localhost panel drives the existing Guest flow and uses the same automatic next-session handoff as normal guests. Remove the development panel or move it to Admin before exhibition use. See the [survey guide](survey/README.md).
 
 Install Git and **Node.js 24+** (including npm). Use a desktop browser with WebGL 2. Keep both terminal tabs running. Run each command from the repository root unless a step changes directory. The project has no public deployment setup.
 
@@ -54,10 +54,10 @@ The survey server uses `127.0.0.1:8787` by default. Use the actual URL printed b
 | --- | --- | --- |
 | Guest | `http://127.0.0.1:8787/guest` | Guest answers four questions, reviews the choices, and submits one proposal. |
 | City | `http://127.0.0.1:5173/?survey` | Exhibition's 2127 Shibuya scene; receives live state through `ws://127.0.0.1:8787/ws`. Keep `?survey` in the URL. |
-| Admin | `http://127.0.0.1:8787/admin` | Staff view the lifecycle, confirm that a guest has left, and request/cancel resets. Available only on the server computer through localhost. |
+| Admin | `http://127.0.0.1:8787/admin` | Staff view the lifecycle, end an unfinished experience, and request/cancel resets. Available only on the server computer through localhost. |
 | Monitor (optional) | `http://127.0.0.1:8787/monitor` | Text view of current state and proposals/WebSocket events received since the tab opened; it is not the 3D city. |
 
-Put City on the exhibition display and Guest on the input screen. Keep Admin on the staff computer. After a proposal, staff must click **観客の退出を確認** before the next guest can start. A pending reset also runs after this confirmation. The survey server hosts its built pages and API on the same origin; Vite hosts the city separately. The default database is `survey/data/survey.sqlite`, so restarting the server retains the city. `npm ci` is needed on first setup and after lockfile changes; on subsequent starts, keep the build and server commands in Tab 1 and the dev command in Tab 2.
+Put City on the exhibition display and Guest on the input screen. Keep Admin on the staff computer. After a proposal, the next guest can press **はじめる** without Admin confirmation. Any queued reset runs at that next start; otherwise the accumulated city continues. Admin’s **未完了の体験を終了** only ends unfinished questionnaires. The survey server hosts its built pages and API on the same origin; Vite hosts the city separately. The default database is `survey/data/survey.sqlite`, so restarting the server retains the city. `npm ci` is needed on first setup and after lockfile changes; on subsequent starts, keep the build and server commands in Tab 1 and the dev command in Tab 2.
 
 For a second device on a **trusted local network**, bind both services to the network and replace `127.0.0.1` in Guest and City URLs with the host computer's LAN IP:
 

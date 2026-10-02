@@ -24,7 +24,7 @@ const originalRunId = currentState(ctx).runId;
 let firstRequest: ProposalRequest | undefined, firstResult: ProposalData | undefined;
 let questionIds: string[] | undefined;
 for (let ordinal = 0; ordinal < 100; ordinal++) {
-  const session = ok(createProposalSession(ctx));
+  const session = ok(createProposalSession(ctx).response);
   const ids = session.questions.map(question => question.id);
   questionIds ??= ids;
   assert.deepEqual(ids, questionIds, 'the same four questions are reusable by every guest');
@@ -32,7 +32,6 @@ for (let ordinal = 0; ordinal < 100; ordinal++) {
   const result = ok(submitProposal(ctx, request).response);
   assert.equal(result.replayed, false);
   assert.equal(result.proposal.ordinal, ordinal + 1);
-  ok(staff(ctx, 'guest-left'));
   if (ordinal === 0) { firstRequest = request; firstResult = result; }
 }
 assert.ok(firstRequest && firstResult);
@@ -53,6 +52,7 @@ assert.deepEqual(replay, { ...firstResult, replayed: true });
 const changed = { ...firstRequest, answers: firstRequest.answers.map((answer, i) => ({ ...answer, optionId: i === 0 ? 'different-option' : answer.optionId })) };
 const reusedId = submitProposal(ctx, changed).response;
 assert.equal(!reusedId.ok && reusedId.error.code, 'answer_conflict');
+ok(staff(ctx, 'guest-left')); // Enter ready to exercise the immediate Admin reset path.
 const reset = ok(staff(ctx, 'reset-city', 'RESET'));
 assert.equal(reset.previousRunId, originalRunId);
 assert.equal(reset.state.revision, 0);
@@ -61,7 +61,7 @@ assert.equal(currentState(ctx).runId, reset.state.runId);
 assert.equal(currentState(ctx).revision, 0, 'retry after reset does not mutate the new run');
 
 // Two sessions can read one revision; the transaction lets one proposal commit and rejects the stale one.
-const leftSession = ok(createProposalSession(ctx)), rightSession = ok(createProposalSession(ctx));
+const leftSession = ok(createProposalSession(ctx).response), rightSession = ok(createProposalSession(ctx).response);
 const left = requestFor(ctx, leftSession, 'same-revision-left'), right = requestFor(ctx, rightSession, 'same-revision-right');
 assert.equal(ok(submitProposal(ctx, left).response).state.revision, 1);
 const stale = submitProposal(ctx, right).response;
@@ -69,7 +69,7 @@ assert.equal(!stale.ok && stale.error.code, 'revision_conflict');
 ok(staff(ctx, 'guest-left'));
 
 // Expiry is enforced for a fresh session, with no event or snapshot mutation.
-const expiring = ok(createProposalSession(ctx));
+const expiring = ok(createProposalSession(ctx).response);
 const expiredRequest = requestFor(ctx, expiring, 'expired-proposal');
 clock.ms += 6 * 60 * 1000;
 const expired = submitProposal(ctx, expiredRequest).response;
@@ -79,7 +79,7 @@ assert.equal(Number(ctx.db.prepare("SELECT COUNT(*) AS n FROM proposal_events WH
 
 // An exception in the final snapshot write rolls the event and session update back together.
 const rollbackFixture = exhibitionFixture();
-const rollbackSession = ok(createProposalSession(rollbackFixture.ctx));
+const rollbackSession = ok(createProposalSession(rollbackFixture.ctx).response);
 const rollbackRequest = requestFor(rollbackFixture.ctx, rollbackSession, 'rollback-proposal');
 rollbackFixture.ctx.db.exec(`CREATE TRIGGER fail_exhibition_snapshot BEFORE UPDATE ON exhibition_snapshots
   BEGIN SELECT RAISE(ABORT, 'injected snapshot failure'); END`);
@@ -132,13 +132,18 @@ try {
   assert.equal((await server.request<ProposalData>('/api/proposals', request)).status, 200, 'idempotent HTTP retry');
   const staleReset = await server.request<LifecycleData>('/api/admin/lifecycle', { command: 'reset-city', expectedRevision: 0, confirmation: 'RESET' });
   assert.equal(staleReset.status, 409, 'a stale admin page is refused');
-  assert.equal((await server.request<LifecycleData>('/api/admin/lifecycle', { command: 'guest-left', expectedRevision: 2 })).status, 200);
-  const resetResponse = await server.request<LifecycleData>('/api/admin/lifecycle', { command: 'reset-city', expectedRevision: 3, confirmation: 'RESET' });
+  const resetResponse = await server.request<LifecycleData>('/api/admin/lifecycle', { command: 'reset-city', expectedRevision: 2, confirmation: 'RESET' });
   assert.equal(resetResponse.status, 200);
+  assert.equal(ok(resetResponse.body).executedReset, null, 'the result remains visible until the next guest starts');
+  const nextResponse = await server.request<ProposalSessionData>('/api/proposal-sessions', {});
+  assert.equal(nextResponse.status, 201, 'no Admin exit confirmation is required');
+  const nextSession = ok(nextResponse.body);
+  assert.notEqual(nextSession.state.runId, saved.state.runId);
+  assert.equal(nextSession.session.runId, nextSession.state.runId);
   const resetEvent = await client.next();
   assert.equal(resetEvent.type, 'run-reset', 'retry does not emit a second proposal event');
   assert.equal(resetEvent.type === 'run-reset' && resetEvent.state.algorithmVersion, 2);
-  assert.equal(ok(resetResponse.body).state.revision, 0);
+  assert.equal(nextSession.state.revision, 0);
   assert.equal(saved.state.revision, 1);
   console.log('PASS: reusable four-question proposals, canonical idempotency across reset, expiry, rollback, 100 guests, latest-64 history, HTTP and post-commit WebSocket updates.');
 } finally {

@@ -25,12 +25,10 @@ export type AutoDriver = {
   start(signal: AbortSignal): Promise<ProposalSessionData>;
   answer(questionId: string, optionId: string): void;
   submit(): Promise<ProposalData>;
-  finish(guestSessionId: string, lifecycleRevision: number): Promise<void>;
   wait(ms: number, signal: AbortSignal): Promise<void>;
 };
 
-/** DEV-ONLY: run the real guest UI and confirm ONLY this runner's recorded guest exit.
- * Remove automatic guest-left before exhibition, or move the controls to staff Admin.
+/** DEV-ONLY: run the real guest UI; the next session performs the normal handoff.
  * An uncertain submission stays in Guest's existing same-ID recovery path.
  */
 export async function runAutoAnswers(config: DevSurveyConfig, settings: AutoSettings, driver: AutoDriver,
@@ -77,9 +75,7 @@ export async function runAutoAnswers(config: DevSurveyConfig, settings: AutoSett
     active();
     if (after.lifecycle.phase !== 'awaiting_exit' || after.lifecycle.pendingReset !== 'none' || after.reservedSessions !== 0
         || after.state.runId !== result.state.runId || after.state.revision !== result.state.revision)
-      throw new Error('都市またはスタッフの状態が変わりました。自動退出確認を停止しました。');
-    await driver.finish(session.session.id, after.lifecycle.revision);
-    active();
+      throw new Error('都市またはスタッフの状態が変わりました。自動回答を停止しました。');
     if (ordinal + 1 < settings.count) await driver.wait(settings.extraWaitMs, signal);
   }
 }
@@ -87,10 +83,9 @@ export async function runAutoAnswers(config: DevSurveyConfig, settings: AutoSett
 /** Explains why a batch cannot start, so the tester knows which manual step clears it. */
 export function notReadyReason(admin: AdminCurrentRun): string | undefined {
   const { phase, pendingReset } = admin.lifecycle;
-  if (pendingReset !== 'none') return 'リセット待ちです。Admin（/admin）でリセットを実行または取消してから開始してください。';
-  if (phase === 'awaiting_exit') return '前の観客の退出確認待ちです。Admin（/admin）で退出確認してから開始してください。';
-  if (phase !== 'ready' || admin.reservedSessions !== 0)
-    return '回答中の草稿があります。送信するか、Admin（/admin）で退出確認して草稿を破棄してから、開始画面で開始してください。';
+  if (pendingReset !== 'none') return 'リセット待ちです。通常のGuest開始で適用するか、Admin（/admin）で取り消してから開始してください。';
+  if (phase === 'in_experience' || admin.reservedSessions !== 0)
+    return '回答中の草稿があります。送信するか、Admin（/admin）で未完了の体験を終了して草稿を破棄してから、開始画面で開始してください。';
   return undefined;
 }
 

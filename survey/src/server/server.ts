@@ -132,7 +132,7 @@ export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddr
       const outcome = submitAnswer(ctx, await readJson(req));
       return publish(res, outcome, outcome.response.ok && !outcome.response.data.replayed ? 201 : 200);
     }
-    if (path === '/api/proposal-sessions' && method === 'POST') return sendJson(res, createProposalSession(ctx), 201);
+    if (path === '/api/proposal-sessions' && method === 'POST') return publish(res, createProposalSession(ctx), 201);
     const proposalSession = /^\/api\/proposal-sessions\/([^/]+)$/.exec(path);
     if (proposalSession && method === 'GET') return sendJson(res, getProposalSession(ctx, proposalSession[1]));
     if (path === '/api/proposals' && method === 'POST') {

@@ -642,3 +642,11 @@ Standalone rolling observation: 32.8 FPS / 1388 draws / 356 geometries at 1920×
 ## Odaiba connected backdrop P4 — 2026-10-01
 
 `feat/odaiba-district`: island edge replaced by a receding Odaiba backdrop plus `bayContext()` (Rainbow Bridge, Tokyo Gate Bridge, Ariake link, nine shore skylines; 4 draws, 16,144 triangles). Root `npm test`, `npm run build`, `git diff --check` PASS. Captures: [day](../artifacts/odaiba-district-bay-hero3.jpg), [night](../artifacts/odaiba-district-bay-night.jpg); orbit view shows the Rainbow Bridge; no console errors. Details: [district handoff](handoffs/odaiba-district.md).
+
+## Guest handoff without Admin exit lock — 2026-10-02
+
+Stage: `codex/remove-guest-exit-lock`, base `382aa34`; [handoff](handoffs/remove-guest-exit-lock.md). Root and survey `npm test` / `npm run build` passed (Node 26.0.0); root retains the existing >500 kB bundle warning. The initial sandbox runs could not listen on loopback (`EPERM`); approved retries passed. No module-swap changes.
+
+Regression checks: 100 sequential proposals without Admin exit commands; next guest inherits the previous state; queued city/full resets execute atomically with the next reservation; failed reservation rolls back the reset; persisted phase/queued reset survives restart; HTTP returns 201 for the next guest and publishes `run-reset` after commit. Existing same-ID retries, counts/history, stale Admin commands, cancellation and unfinished-draft recovery still pass.
+
+In-app browser (1265×712) on scratch SQLite `/private/tmp/city2127-exit-lock-test.sqlite`, server 8795: submitted high proposal #1, waited through existing result/handoff to welcome, then started the next questionnaire with no Admin operation. That unused draft later hit the existing idle timeout; a fresh draft submitted neutral #2 and retained the same run with count/revision 2. Admin shows `記録完了 — 次の観客を迎えられます`; its renamed unfinished-experience button is disabled after submission. [Screenshot](../artifacts/guest-handoff-admin-2026-10-02.jpg). No scene/camera/motion changes; no rendering benchmark or Windows browser check claimed.

@@ -525,3 +525,7 @@ The batch may simulate staff exit only for its own successful proposal after sho
 Reusable test functions in `survey/tests/meterContract.ts` take Meter descriptors and generate combinations/semantic checks with independent golden values. Root model adapters connect each descriptor's parameters to visible diagnostics from real Three.js site builders/controllers. Registry coverage catches missing test definitions. All current 81 combinations cover question semantics → votes → Meter → SQLite → layout/events → real model parameters; real HTTP/WebSocket, retries, snapshots/resets and opt-in gates are also checked. Adding a future Meter requires a descriptor/model adapter plus separately extending the production question/schema/UI/model contract; this task does not make the four-axis protocol dynamic.
 
 **Removal/migration before exhibition:** remove the Guest dev import/adapter and panel/runner modules, dev configuration types/route and scratch launcher, or move the panel to Admin and restore staff-confirmed exit. Keep the Meter tests. These deletion/migration boundaries carry `DEV-ONLY` comments in code. Implementation and actual evidence: [handoff](handoffs/survey-auto-tests.md), [validation](VALIDATION.md#survey-meter-tests-and-development-auto-answer--2026-09-30).
+
+## Guest 自動交接更新 — 2026-10-02
+
+此決定取代早前必須由 Admin 確認觀眾離開的要求。下一位開始四題問卷時，server 自動完成交接；通常沿用累積城市，有保留 reset 則先執行再開始。Admin 只保留中止未完成體驗操作。結果約10秒、交接約5秒及略過按鈕沿用。詳見 [交接 handoff](handoffs/remove-guest-exit-lock.md)。
