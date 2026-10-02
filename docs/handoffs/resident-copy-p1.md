@@ -1,11 +1,11 @@
 # resident-copy-p1 — Resident narrative and Japanese exhibition copy
 
 - Owner: Codex
-- Status: IN_PROGRESS — P1 copy complete and documentation verified; integration pending
+- Status: DONE — P1 copy and documentation checks complete; P2/P3 not implemented
 - Branch: `codex/resident-copy-p1`
 - Base commit: `ba055d88afc1d4123f2a7f5f826848e247fe9403`
-- Last verified commit: base `ba055d88afc1d4123f2a7f5f826848e247fe9403` plus the complete uncommitted P1 documentation delta checked on 2026-10-02
-- Remote availability: NOT PUSHED
+- Last verified commit: integrated `2669de628907ef25d13b198c5a387c864b28548c` (tree identical to source `9273f88decbfa4ec8844585d439b8271179421ea`); final handoff-only closure checked separately
+- Remote availability: source `9273f88decbfa4ec8844585d439b8271179421ea` on `origin/codex/resident-copy-p1`; validated main integration is published with this closure
 
 ## Session Git state
 
@@ -31,8 +31,9 @@ README startup instructions and ART need no change: this stage does not alter op
 - Date/worktree: 2026-10-02, documentation delta against base above
 - Python native assertions: all 230 local Markdown targets across seven task files exist; four question ids and all 12 ordered option ids/axes/effects match unchanged exhibition JSON. PASS.
 - Facility/factual self-review against current layout/feedback/district source and visual authority: PASS; full tracked diff and both new files reviewed, `git diff --check` PASS. Text-only corrections to one Chinese word and the waiting sentence were reviewed after the initial checks.
-- Runtime tests/build/browser: NOT RUN; this stage changes documentation only
-- Integrated commit/CI: NOT INTEGRATED
+- Local runtime tests/build/browser: NOT RUN; this stage changes documentation only
+- Source CI [36994837646](https://github.com/cc100053/city2127/actions/runs/36994837646): PASS on exact source `9273f88` (Node24, root/survey/module-swap install/test/build and whitespace). This is not new visual/hardware acceptance.
+- Integrated `2669de6`: no conflicts, tree identical to source; integrated local Markdown targets/question correspondence and committed whitespace checked again. Closure changes only this handoff and is reviewed separately. Main CI is verified after publication in the task completion report; this record does not claim an unrun check passed.
 
 ## Known limits and decisions
 
@@ -40,4 +41,4 @@ Japanese copy is authored and self-reviewed, not externally language-reviewed. N
 
 ## Next expected step
 
-Publish through [Git workflow](../CONTRIBUTING.md). Then P2 can wire the copy and simplify the screen presentation; P3 must coordinate truthful feedback, 10-second proposed viewing slots and A/B/session recovery. Owner: Codex upon assignment; no subsequent stage has been implemented.
+P2 can wire the copy and simplify the screen presentation; P3 must coordinate truthful feedback, 10-second proposed viewing slots and A/B/session recovery. Owner: Codex upon assignment; no subsequent stage has been implemented. Task branch retained; no deployment.
