@@ -1,5 +1,9 @@
 # 展覽方向與 Plan 02 歷史紀錄
 
+## Meter variety main 整合 — 2026-10-02
+
+用家明確要求合併 main 同刪除 branch，取代之前 capture review 後才合併嘅條件。P0–P12 已無衝突合併（`e7afbee`），main 發佈／CI 待完成；以下各階段「未整合／待審閱」係歷史狀態，由本紀錄取代。此決定不代表實機 FPS、Windows 或整體展覽驗收。見 [整合交接](handoffs/meter-variety.md#main-integration--2026-10-02)。
+
 ## Meter variety P12 — 2026-10-02，feature branch 待視覺審閱
 
 用家要求實作 P12：開放庭院加入沿用既有造型嘅人群（low／mixed／high：0／24／96），11 個服務 bay 有錯開時間嘅無人機升降；四個 Meter 嘅局部夜燈各自做慢速節奏。人群避開私密／混合花園；無人機只用設施上方嘅垂直航線。既有鏡位、空中環線及 3 秒轉場保留；沒有新依賴或 render pass。證據與限制見 [P12 交接](handoffs/meter-variety.md#p12--life-and-motion-2026-10-02)。保留 capture review 後才整合 main 的條件。

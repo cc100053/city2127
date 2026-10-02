@@ -1,5 +1,9 @@
 # Validation and handoff
 
+## Meter variety main integration — 2026-10-02
+
+User authorized integration and branch retirement. No-conflict merge `e7afbee` exactly matches feature HEAD `58fd479` ([exact-head feature CI](https://github.com/cc100053/city2127/actions/runs/36952702662) PASS). Integrated root/survey test/build, working-tree and committed whitespace, and fresh Chrome HTTP/WebSocket smoke PASS (live/reload/reset/reduced motion/standalone and actual drone columns including skyways); existing root chunk warning only. Main publication/CI pending. No source differences from the verified feature tree. Historical stage evidence below remains dated to its source; earlier review-before-main conditions are superseded by this authorization. Details: [integration handoff](handoffs/meter-variety.md#main-integration--2026-10-02).
+
 ## Meter variety P12 — 2026-10-02 (`feat/meter-variety`, not integrated)
 
 Root `npm test`, `npm run build`, `git diff --check`: PASS (existing bundle warning only). New checks cover current-slot crowd visibility, occupied-lot exclusion, live/snapshot/legacy, material isolation, distinct bounded night rhythms, two flight cycles, person separation and sampled actual geometry clearance including orchard/kiosk extras. The 81-answer HTTP/WebSocket pipeline passes; P11 architecture determinism remains exact, and P12 actor matrices restore at a common clock phase across reload/reset/full replay. An initial old assertion comparing animated matrices at different times failed and was corrected with separate architecture and held-phase actor assertions.

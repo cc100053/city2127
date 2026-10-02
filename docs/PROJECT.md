@@ -1,5 +1,9 @@
 # Project contract and implementation map
 
+## Meter variety main integration — 2026-10-02
+
+User authorized P0–P12 integration; no-conflict merge `e7afbee` exactly preserves the verified feature tree. The district controllers, history-seeded layouts and P12 motion below are now on local main; publication/CI pending. Earlier “not integrated” statements are dated stage history, superseded by this record. Root and survey must be updated together for P11; restart survey using the existing SQLite and refresh City. See the [integration handoff](handoffs/meter-variety.md#main-integration--2026-10-02).
+
 ## Meter variety P12 — 2026-10-02 (`feat/meter-variety`, not integrated)
 
 `mobility.ts` now exports the existing capsule/palette factory for district crowds plus small instanced service quadrotors and bounded pose helpers. `SharingDistrict` reserves 12 people per eligible open, non-hybrid court (120 capacity, seed-zero low/mixed/high = 0/24/96). The two courts overlapping PARK/COMMONS site footprints exclude actors. Figures gather within two separated lanes; they fade in only after private/hybrid geometry is >98% cleared, inherit the existing slot transition and disappear with legacy hide. Inactive crowd batches submit no draws. This supplements the existing promenade fleet; private and hybrid gardens remain occupied only by their existing representation.
