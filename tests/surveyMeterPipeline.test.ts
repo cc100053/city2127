@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import * as T from 'three';
 import { CityChangeManager } from '../src/cityChangeManager.ts';
 import { buildSurveySites } from '../src/siteBuilders/index.ts';
-import { parseSurveyEvent } from '../src/surveyView.ts';
+import { AXES, parseSurveyEvent } from '../src/surveyView.ts';
+import { residentResult } from '../src/surveyAtmosphere.ts';
 import { exhibitionFixture, ok, staff, startServer } from '../survey/tests/surveyFixture.ts';
 import { createProposalSession, submitProposal } from '../survey/src/server/proposalService.ts';
 import { answersForVotes, firstProposalGolden, METER_CONTRACTS, meterCombinations } from '../survey/tests/meterContract.ts';
@@ -82,9 +83,16 @@ const pairingHits = new Set<string>();
 function applyEvent(event: unknown, now: number) {
   const parsed = parseSurveyEvent(JSON.parse(JSON.stringify(event)));
   assert.ok(parsed && parsed.view.version === 2, 'real server event passes client validation');
-  manager.applyExhibitionLayout(parsed.view.layout, parsed.kind, now, parsed.view.slotSeeds);
+  const changes = manager.applyExhibitionLayout(parsed.view.layout, parsed.kind, now, parsed.view.slotSeeds);
   manager.update(now + 3.1);
   assertModels(parsed.view as ExhibitionCityView);
+  if (parsed.kind === 'city-state-updated' && parsed.view.latestProposal) {
+    const result = residentResult(parsed.view.latestProposal, changes);
+    assert.equal(result.kind, changes.length ? 'configuration'
+      : AXES.some(axis => parsed.view.latestProposal!.beforeScores[axis] !== parsed.view.scores[axis]) ? 'direction' : 'maintained');
+    assert.ok(!result.effect.includes('人口'), 'carrier changes never imply a population change');
+    return { changes, result };
+  }
 }
 
 let count = 0;
@@ -92,12 +100,47 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
   const { ctx } = exhibitionFixture();
   try {
     const session = ok(createProposalSession(ctx).response);
+    applyEvent({ type: 'city-state-snapshot', view: currentView(ctx) }, count * 8);
     const outcome = submitProposal(ctx, { submissionId: `mesh-${count}`, guestSessionId: session.session.id, expectedRevision: 0,
       answers: answersForVotes(METER_CONTRACTS, votes) });
     const result = ok(outcome.response);
     assert.deepEqual(result.proposal.afterLayout, firstProposalGolden(METER_CONTRACTS, votes).layout);
-    applyEvent(outcome.event, count * 4);
+    const causal = applyEvent(outcome.event, count * 8 + 4)!;
+    if (Object.values(votes).every(vote => vote === 0)) assert.equal(causal.result.kind, 'maintained');
     count++;
+  } finally { ctx.db.close(); }
+}
+
+// P4: a mixed personal answer can leave a high collective city; direction-only results
+// must be demonstrated with real history, layout targets and district evidence together.
+{
+  const { ctx } = exhibitionFixture();
+  const kinds = new Set<string>();
+  try {
+    applyEvent({ type: 'city-state-snapshot', view: currentView(ctx) }, 7000);
+    for (let i = 0; i < 25; i++) {
+      const session = ok(createProposalSession(ctx).response);
+      const votes = { automation: i === 24 ? -1 : i === 23 ? 0 : 1, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 } as const;
+      const outcome = submitProposal(ctx, { submissionId: `resident-cause-${i}`, guestSessionId: session.session.id,
+        expectedRevision: session.state.revision, answers: answersForVotes(METER_CONTRACTS, votes) });
+      const saved = ok(outcome.response), causal = applyEvent(outcome.event, 7004 + i * 4)!;
+      kinds.add(causal.result.kind);
+      if (i === 23) {
+        assert.equal(saved.proposal.votes.automation, 0);
+        assert.equal(saved.proposal.afterLayout.bands.nw, 'high', 'mixed answer does not imply a mixed collective city');
+        assert.ok(causal.result.preference.includes('自動の便利さ'));
+        assert.ok(!causal.result.effect.includes('半分'));
+      }
+      if (i === 24) {
+        assert.equal(saved.proposal.votes.automation, -1);
+        assert.equal(saved.proposal.afterLayout.bands.nw, 'high', 'opposing personal vote leaves the accumulated city high');
+        assert.ok(causal.result.preference.includes('人に相談'));
+        assert.ok(causal.result.effect.includes('この拠点では、人に相談できる窓口が増え'));
+      }
+      ok(staff(ctx, 'guest-left'));
+    }
+    assert.ok(kinds.has('direction'), 'changed scores with identical actual carrier targets use direction wording');
+    console.log('PASS: P4 real accumulated history → carrier evidence → resident reason; direction-only, mixed and opposing preference/high collective city.');
   } finally { ctx.db.close(); }
 }
 
@@ -174,6 +217,14 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
   assert.deepEqual(views[0].recentProposals.map(p => p.votes), views[1].recentProposals.map(p => p.votes));
   assert.notDeepEqual(views[0].slotSeeds, views[1].slotSeeds, 'full history, not only the identical latest 64, determines order');
   cities[0].forEach((city, i) => assert.notDeepEqual(city, cities[1][i], `district ${i}: equal scores can produce different cities`));
+  applyEvent({ type: 'city-state-snapshot', view: views[0] }, 9000);
+  const redistributed = manager.applyExhibitionLayout(views[1].layout, 'city-state-updated', 9004, views[1].slotSeeds);
+  assert.equal(redistributed.length, 4);
+  assert.ok(redistributed.every(change => change.district && !change.focal));
+  const reason = residentResult({ ...views[1].latestProposal!, beforeScores: views[0].scores }, redistributed);
+  assert.equal(reason.kind, 'configuration');
+  assert.equal(reason.place, '水辺のサービス拠点・移動ルート');
+  assert.ok(!reason.effect.includes('増え'), 'same-score redistribution cannot claim extra facilities');
   console.log('PASS: P11 full-history order, equal-score/different-city in all four districts, >64 guests, retry, reload, reset and interrupted snapshot.');
 }
 

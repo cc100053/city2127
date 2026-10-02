@@ -1,6 +1,6 @@
 # 居民體驗計劃 — 2127 台場
 
-日期：2026-10-02。Owner：Codex。**P1–P3 已實作；P4／P5 尚待驗收。** P2接入證據見 [階段交接](handoffs/resident-experience-p2.md)；P3排程／carrier證據見 [P3交接](handoffs/resident-experience-p3.md)；本文件保留P4／P5計劃，不代表實際裝置驗收已完成。產品契約以 [SPEC](EXHIBITION_SPEC.md) 為準；文案唯一來源是 [RESIDENT_COPY](RESIDENT_COPY.md)，接手入口是 [handoff](handoffs/resident-experience-plan.md)。
+日期：2026-10-02。Owner：Codex。**P1–P3 已實作；P4 軟件驗證已通過，P5 尚待實機驗收。** P2接入證據見 [階段交接](handoffs/resident-experience-p2.md)；P3排程／carrier證據見 [P3交接](handoffs/resident-experience-p3.md)；本文件保留P4／P5計劃，不代表實際裝置驗收已完成。產品契約以 [SPEC](EXHIBITION_SPEC.md) 為準；文案唯一來源是 [RESIDENT_COPY](RESIDENT_COPY.md)，接手入口是 [handoff](handoffs/resident-experience-plan.md)。
 
 ## 目標與已確認方向
 
@@ -71,9 +71,9 @@ P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibitio
 
 2026-10-02交付：共用reading10秒／handoff5秒／lease15秒常數，server為單站及A/B排程，root保留順序及有效期限。重試只回原slot剩餘時間；提前交接保留recovery並延後release。`CityChangeManager`比較四區的effective targets，包含hybrid／可見配對乘積／屋頂／facade／fleet counts及seed後分布；不改geometry。結果以一項個人偏好＋一項實際結果保持兩句，focal限定地點、district-only用配置調整；無前後baseline則保存fallback。日常卡暫停；照明不打斷，斷線／重連／Undo／reset／reduced motion／過期late事件立即settle並清timer。新native／scratch Chrome計時及screenshots在P3交接；P4完整案例、P5實機／閱讀理解保持未驗。
 
-### P4 — 軟件與雙屏流程驗證：PLANNED
+### P4 — 軟件與雙屏流程驗證：DONE
 
-用 scratch SQLite，同時啟動 Guest／City／Admin；記錄新 commit、browser、viewport、station、展示計時與 console/network 結果。
+2026-10-02 已以 scratch SQLite／Chrome 154.0.8037.93／1280×720／deviceScaleFactor1 完成下列軟件案例；[P4交接](handoffs/resident-experience-p4.md) 逐列列出 native／browser 證據、source/integration commit、展示計時、console/network 記錄及限制。City 固定 hero／`?hour=16`；觸控為桌面 Chromium 模擬，離線租期採明列的 server clock jumps，不作實際閱讀或裝置證據。以下保留驗收契約。
 
 | 驗收案例 | 預期 |
 | --- | --- |
@@ -114,4 +114,4 @@ P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibitio
 
 ## 接手順序
 
-先讀 [P2 handoff](handoffs/resident-experience-p2.md) → [P1文案](RESIDENT_COPY.md) → [PROJECT](PROJECT.md) 與當前source。按mandatory preflight核對remote／owner／dirty files／available commits。P3已交付，接手先讀 [P3 handoff](handoffs/resident-experience-p3.md)；下一個可分派階段是 **P4** 完整軟件／雙屏流程驗證，再到P5現場。P3實作不自動啟動P4／P5。
+先讀 [P2 handoff](handoffs/resident-experience-p2.md) → [P1文案](RESIDENT_COPY.md) → [PROJECT](PROJECT.md) 與當前source。按mandatory preflight核對remote／owner／dirty files／available commits。P4已交付，接手先讀 [P4 handoff](handoffs/resident-experience-p4.md)；下一個可分派階段是 **P5** 指定實際裝置／展場與理解程度驗收。P4軟件驗證不自動啟動P5，亦不代表S5完成。
