@@ -18,7 +18,7 @@ async function checkCity(view) {
     const text = document.querySelector('canvas')?.dataset.siteAssets;
     if (!text) return false;
     const d = JSON.parse(text), p = d.stationEastPark.environmentPark, l = v.layout;
-    return document.querySelector('.causal-history-total')?.textContent === `累計 ${v.guestCount} 人`
+    return document.querySelector('.causal-panel')?.dataset.guestCount === String(v.guestCount)
       && d.magnetEast.automationHub?.visibleAutomatedPorts === l.automatedPorts
       && d.dogenzakaSouth.commonsPlaza?.visibleSharedSeats === l.sharedSeats
       && d.centerGaiRear.concentrationTower?.activeFunctionModules === l.functionModules
@@ -43,7 +43,7 @@ try {
   await monitor.goto(`${survey}/monitor`);
   await city.goto(`${cityURL}/?survey=${encodeURIComponent(survey.replace('http', 'ws') + '/ws')}&hour=16`);
   await checkCity(initial);
-  await city.screenshot({ path: 'artifacts/admin-undo-city-before.png' });
+  await city.screenshot({ path: 'artifacts/resident-p2-admin-undo-city-before.png' });
   assert.equal(await undoButton.isDisabled(), true);
   await answerAll();
   await checkCity(await read('/api/city-view'));
@@ -56,8 +56,8 @@ try {
   assert.deepEqual(await read('/api/city-view'), initial);
   await checkCity(initial);
   await monitor.getByText('管理者が直前の提案を取り消しました。', { exact: true }).waitFor();
-  await city.screenshot({ path: 'artifacts/admin-undo-city-restored.png' });
-  await admin.screenshot({ path: 'artifacts/admin-undo-admin.png' });
+  await city.screenshot({ path: 'artifacts/resident-p2-admin-undo-city-restored.png' });
+  await admin.screenshot({ path: 'artifacts/resident-p2-admin-undo-admin.png' });
   await city.reload(); await checkCity(initial);
   // A replacement is counted once; next Guest start closes Undo even if staff end that draft.
   await answerAll();

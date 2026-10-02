@@ -1,6 +1,6 @@
 # 居民體驗計劃 — 2127 台場
 
-日期：2026-10-02。Owner：Codex。**P1 已完成；P2–P5 尚未實作。** 本文件保存完整後續計劃，不代表新 UI／排程已上線。產品契約以 [SPEC](EXHIBITION_SPEC.md) 為準；文案唯一來源是 [RESIDENT_COPY](RESIDENT_COPY.md)，接手入口是 [handoff](handoffs/resident-experience-plan.md)。
+日期：2026-10-02。Owner：Codex。**P1／P2 已完成；P3–P5 尚未實作。** P2接入證據見 [階段交接](handoffs/resident-experience-p2.md)；本文件保留後續計劃，不代表P3排程或實際裝置驗收已完成。產品契約以 [SPEC](EXHIBITION_SPEC.md) 為準；文案唯一來源是 [RESIDENT_COPY](RESIDENT_COPY.md)，接手入口是 [handoff](handoffs/resident-experience-plan.md)。
 
 ## 目標與已確認方向
 
@@ -18,7 +18,7 @@
 
 P1 source `9273f88decbfa4ec8844585d439b8271179421ea` 已由 `2669de628907ef25d13b198c5a387c864b28548c` 整合，發布 main `6ed44dfcd6e9fdf08943bcc5e509bd46e9fda83a`。[main CI 36995697291](https://github.com/cc100053/city2127/actions/runs/36995697291) PASS；這證明原有 package checks 通過，不是新畫面／iPad 驗收。
 
-目前 runtime 仍使用原 [question JSON](../survey/src/survey/questions.exhibition.json)。Guest 結果仍顯示答案、Meter 表與設施數值；root 仍顯示數值 feedback。城市 live 過渡 3 秒；A/B 展示起點最少相隔 3 秒；Guest result10秒／handoff5秒。SQLite schema7／CityView與algorithm v2 保持。
+P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibition.json) version3（ids/effects不變）。Guest 結果只保留保存／等待／站號／編號／抬頭／交接；root 顯示背景／當前focal設施與保守結果卡。城市 live 過渡 3 秒；A/B 展示起點最少相隔 3 秒；Guest result10秒／handoff5秒。SQLite schema7／CityView與algorithm v2 保持。
 
 ## 畫面分工與完整流程
 
@@ -40,9 +40,9 @@ P1 source `9273f88decbfa4ec8844585d439b8271179421ea` 已由 `2669de628907ef25d13
 
 ### P1 — 居民文案：DONE（documentation only）
 
-交付為 [RESIDENT_COPY](RESIDENT_COPY.md)：居民開場、四題／12 選項、設施卡、結果句型、核對／等待／重試用語。原有 ids／effects／次序已比對，文件與現行設施關係已核對；[P1 handoff](handoffs/resident-copy-p1.md) 保留證據。尚未接入 JSON／UI；日文是作者自審，沒有外部語言審核或實測閱讀時間。
+交付為 [RESIDENT_COPY](RESIDENT_COPY.md)：居民開場、四題／12 選項、設施卡、結果句型、核對／等待／重試用語。原有 ids／effects／次序已比對，文件與現行設施關係已核對；[P1 handoff](handoffs/resident-copy-p1.md) 保留證據。P1交付時尚未接入；P2現已接入JSON／UI。日文是作者自審，沒有外部語言審核或實測閱讀時間。
 
-### P2 — 文案接入與畫面分工：PLANNED
+### P2 — 文案接入與畫面分工：DONE
 
 1. 將 P1 問題與必要背景接入正式 question set，保留原 effects／ids。依現有 loader/session/history 流程處理 question-set version；它與 CityView／algorithm v2 不同。核對更新前草稿的恢復行為，既有回答歷史不被重寫，不以刪 SQLite 解決。
 2. 精簡 Guest 結果：保存／等待／站號／編號／抬頭提示及交接；核對答案仍在提交前。通訊錯誤、未知提交結果的同 ID 重試、鍵盤焦點與可見選取狀態保留。
@@ -50,6 +50,8 @@ P1 source `9273f88decbfa4ec8844585d439b8271179421ea` 已由 `2669de628907ef25d13
 4. 重用原有 panel、樣式與事件流；P2 不改計分、3秒過渡、A/B 排程或租期。它是畫面接入階段，尚未具備 P3 的完整閱讀時段與 district 結果判斷。
 
 完成門檻：四題居民文案可作答；partial answers 不改城；iPad 結果沒有觀看用表格；大屏幕可讀、城市不被大面積遮擋；單站與 A/B 各自的保存／重試／交接仍工作。提供新畫面證據，不沿用 P1 CI 當 UI 驗收。
+
+2026-10-02實作：question-set version3，原SQLite／version2歷史保留，單站／A-B新預約接續舊草稿；Guest結果精簡，root重用固定卡片。日常卡每12秒、live fallback本機最多10秒；A/B≥3秒仍可覆蓋，並非P3保留閱讀時段。卡片按focal實際數量／塔形態選擇；配對／district因果判斷未接入。新截圖、root/survey checks與三項scratch-DB browser回歸見 [P2 handoff](handoffs/resident-experience-p2.md)。這些checks不等於P4全部案例／P5實機驗收。
 
 ### P3 — 真實原因與展示節奏：PLANNED
 
@@ -110,4 +112,4 @@ P1 source `9273f88decbfa4ec8844585d439b8271179421ea` 已由 `2669de628907ef25d13
 
 ## 接手順序
 
-先讀 [handoff](handoffs/resident-experience-plan.md) → [P1 文案](RESIDENT_COPY.md) → [PROJECT](PROJECT.md) 與當前 source。按 mandatory preflight 更新 remote refs、核對 owner／dirty files／available commits。下一個實作階段是 **P2**；本次「寫下 planning 和 handoff」不啟動 P2。P2 開始時建立自己的階段 handoff，沿用此計劃並只更新當次已實作／已驗證狀態。
+先讀 [P2 handoff](handoffs/resident-experience-p2.md) → [P1文案](RESIDENT_COPY.md) → [PROJECT](PROJECT.md) 與當前source。按mandatory preflight核對remote／owner／dirty files／available commits。下一個實作階段是 **P3**：追actual carrier前後配置，再協調server排程、root queue、Guest等待／lease／guard／drain；不可只把3秒常數改為10秒。P2交付不自動啟動P3。

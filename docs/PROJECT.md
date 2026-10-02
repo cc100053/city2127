@@ -1,6 +1,6 @@
 # Project contract and implementation map — Odaiba 2127
 
-Current source map, checked against `94cad605b87ddc83b626c843b77f2255b379cd2f` on 2026-10-02. Product decisions belong in [EXHIBITION_SPEC](EXHIBITION_SPEC.md), startup in [README](../README.md), art implementation in [ART](ART.md), and dated checks in [VALIDATION](VALIDATION.md). Owner: cc100053; documentation consolidation: Codex.
+Current source map, updated for resident P2 against base `a2271b5e8cd9fb9e86ecc5caea92e6ad9cd0a392` on 2026-10-02; exact verified/integrated commits are in the [P2 handoff](handoffs/resident-experience-p2.md). Product decisions belong in [EXHIBITION_SPEC](EXHIBITION_SPEC.md), startup in [README](../README.md), art implementation in [ART](ART.md), and dated checks in [VALIDATION](VALIDATION.md). Owner: cc100053; documentation consolidation: Codex.
 
 ## Product and package boundaries
 
@@ -14,9 +14,11 @@ The single exhibition venue is the **Odaiba waterfront in 2127**. Shibuya is a c
 
 Desktop-only presentation, with normal renderer resize. Do not add adaptive camera/mobile acceptance. Ambient people, vehicles, drones and aerial routes are allowed. Low/zero/high Meter values all depict mature 2127 alternatives. No deployment workflow is configured.
 
-Resident narrative and input/shared-screen responsibilities were established on 2026-10-02; Japanese [P1 copy](RESIDENT_COPY.md) is documentation only. Current Guest still renders answers, scores and city changes in its result screen; root still renders numeric feedback. P2/P3 will wire the new presentation and conditional explanations. The provisional iPad does not establish hardware acceptance or a generic responsive requirement; current architecture/timings below remain unchanged.
+Resident [P1 copy](RESIDENT_COPY.md) is wired by [P2](handoffs/resident-experience-p2.md). Guest handles questions/background, choices, review, save/wait/retry, shared station/ordinal identity and the look-up prompt; results have no answer/score/facility tables. The existing single-revision conflict review still displays scores for recovery. Question-set version **3** is independent of algorithm/CityView v2 and SQLite schema7. Older reserved drafts are rejected by the existing version guard, then valid choices can be carried into a fresh reservation; A/B ends its own obsolete reservation through the existing endpoint first. Stored version2 proposals retain their original question/option copy and remain idempotently recoverable after upgrade.
 
-The [resident experience plan](RESIDENT_EXPERIENCE_PLAN.md) maps P2–P5 scope, existing entry points and future acceptance gates; its [handoff](handoffs/resident-experience-plan.md) is the resume entry. This roadmap does not replace the current source map or establish new runtime behavior.
+Root reuses `surveyAtmosphere`'s panel for one fixed desktop reading card: title, at most two sentences and named location. Ambient background/facility cards rotate locally every12s; current-run proposals, never lifetime participation alone, allow the inherited-city card. Service/shared-seat counts, Park tree/cooling quantities and the tower's rendered band select focal facility descriptions. Even low Park retains trees, so trees+cooling uses the combined card; these are descriptions of current facilities, not district change inference. The opening identity body is shortened to its first two P1 sentences. Live updates show the shared identity and P1 recorded fallback, then return to ambient after10s; another A/B display may replace it after the existing ≥3s spacing. Snapshot/reset/Undo replaces the card immediately; reload does not replay an old result. Lighting-only snapshots do not restart cards or skip queued changes.
+
+The [resident experience plan](RESIDENT_EXPERIENCE_PLAN.md) retains P3–P5: actual district causal evidence, coordinated reading slots and software/device acceptance. P2 local card timers are not a reserved10s server reading slot. Provisional iPad hardware/Safari/visitor understanding remains unverified; no generic responsive requirement. Geometry, camera, server schedule, transition and Guest timings remain unchanged.
 
 ## Root source ownership
 
@@ -32,7 +34,7 @@ The [resident experience plan](RESIDENT_EXPERIENCE_PLAN.md) maps P2–P5 scope, 
 | [cityRig.ts](../src/cityRig.ts) | Shared materials/factories, static batching, site lighting and mobility update; no Shibuya landmark runtime |
 | [mobility.ts](../src/mobility.ts) | Instanced pods, walkers, boats, aircraft, sphere-berth choreography and reusable district crowd/drone geometry |
 | [surveyView.ts](../src/surveyView.ts) | Strict wire validation, revision handling, reconnect and ordered A/B display queue; mirrors survey contract |
-| [surveyAtmosphere.ts](../src/surveyAtmosphere.ts) | Legacy v1 atmosphere mapping and current causal feedback panel; forwards authoritative v2 views |
+| [surveyAtmosphere.ts](../src/surveyAtmosphere.ts) | Legacy v1 atmosphere/feedback and v2 resident ambient/result panel; forwards authoritative views |
 | [changeCatalog.ts](../src/changeCatalog.ts), [cityChangeManager.ts](../src/cityChangeManager.ts), [createCityChangeManager.ts](../src/createCityChangeManager.ts) | Compatible internal site registry, layout targets, site/district lifecycle, 3 s retargeting and live markers |
 | [siteBuilders](../src/siteBuilders/index.ts), [siteRuntime.ts](../src/siteBuilders/siteRuntime.ts), [siteAssets](../src/siteAssets/assetCatalog.ts) | Four focal site builders, additive layers, GLB bounds/cache/fallback and late-load synchronization |
 | [districtMeters.ts](../src/districtMeters.ts), [devMeters.ts](../src/devMeters.ts) | District carriers, hybrid/pairing/seeded slot selection, pulse/motion; DEV-only Meter review controls |
@@ -79,7 +81,7 @@ Live targets ease over 3 s; changed slots emit Meter-colour rings/shafts (two wa
 | Area | Responsibility |
 | --- | --- |
 | [shared](../survey/src/shared/cityView.ts) | v1/v2 state/view/protocol contracts; authoritative policy → layout |
-| [questionLoader](../survey/src/survey/questionLoader.ts), [scoreEngine](../survey/src/survey/scoreEngine.ts), [decisionHistory](../survey/src/survey/decisionHistory.ts) | Validated four-axis questions, shared reducer/replay, view history |
+| [questionLoader](../survey/src/survey/questionLoader.ts), [scoreEngine](../survey/src/survey/scoreEngine.ts), [decisionHistory](../survey/src/survey/decisionHistory.ts) | Versioned four-axis question copy (currently3), shared reducer/replay, immutable view history |
 | [server](../survey/src/server/server.ts), [realtime](../survey/src/server/realtime.ts) | HTTP/static pages, loopback/same-origin Admin guard, snapshots/updates/reset broadcasts |
 | [database](../survey/src/server/database.ts), [migrations](../survey/src/server/migrations.ts), [runStore](../survey/src/server/runStore.ts) | SQLite schema 7, transaction/restoration, active proposal replay, seeds/counts |
 | [proposalService](../survey/src/server/proposalService.ts), [adminService](../survey/src/server/adminService.ts) | Atomic submission/idempotency, single/A/B sessions, leases/reset drain, Undo, display mode |

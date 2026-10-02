@@ -95,3 +95,5 @@ Root `src/` 以 Three.js / WebGL 2 載入 Odaiba district 地形、六棟地標 
 S1–S4、Odaiba 換場及 Meter P0–P12 已整合；**S5／展覽硬件、輸入裝置、展覽日 reset／recovery 政策仍待驗收**。各 stage 實測、CI、限制及歷史來源統一由 [VALIDATION](docs/VALIDATION.md) 和 [文件索引](docs/README.md) 連入，不以舊 Shibuya FPS 證明現行效能。
 
 Google Fonts 無法連線時用系統字體；其他 runtime 資源由本機供應。
+
+2026-10-02居民P2：更新後重新build／啟動survey server並刷新Guest／City。四題改用居民日常文案；核對仍在提交前，結果只顯示保存／等待、站號／暮らしの声編號及抬頭提示。City顯示背景／當前設施與保守保存確認。Question-set升至3，既有SQLite及已保存原文保留；舊草稿選「新しい予約で草稿を続ける」接續有效答案，A/B會先結束自己的舊預約。3秒過渡／A-B間隔、result10秒／handoff5秒維持；完整閱讀時段及原因屬P3。見 [P2交接](docs/handoffs/resident-experience-p2.md)。

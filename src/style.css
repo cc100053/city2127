@@ -16,3 +16,11 @@ body:not([data-time=night]) h1 em{color:#56613f}
 /* r4: Ariake lagoons put open water behind the small question line; a denser halo keeps it legible. */
 body:not([data-time=night]) .question{opacity:.85;text-shadow:0 0 10px rgba(240,236,226,.95),0 0 4px rgba(240,236,226,.95),0 0 2px rgba(240,236,226,1)}
 body[data-time=night] footer{text-shadow:0 0 10px rgba(7,13,28,.95),0 0 3px rgba(7,13,28,.8)}
+
+/* P2: one fixed desktop reading card; keep the hero city visible. */
+.causal-panel.resident-panel{width:360px;max-height:none;overflow:visible;padding:18px 20px;font-size:16px;line-height:1.7}
+.resident-panel .causal-title{font-size:13px;letter-spacing:1px;margin-bottom:12px!important}
+.resident-panel .causal-context{font-size:15px;opacity:1;color:#46676e;margin-bottom:10px!important}
+.resident-card-title{font-size:21px;line-height:1.5;margin-bottom:10px!important}
+.resident-card-copy{font-size:17px;line-height:1.85}
+.resident-place{font-size:13px;color:#46676e;margin-top:14px!important}

@@ -90,6 +90,47 @@ export function exhibitionFeedback(proposal?: ExhibitionProposal) {
 export const exhibitionScoresText = (scores: ExhibitionView['scores']) =>
   AXES.map(axis => `${EXHIBITION_LABELS[axis]} ${scores[axis] > 0 ? '+' : ''}${scores[axis].toFixed(1)}`).join(' · ');
 
+type ResidentCard = { id: string; title: string; text: string; place: string };
+// P1 copy; facility selection follows rendered focal quantities, not the resident's vote.
+const RESIDENT_CARDS: Record<string, readonly [string, string]> = {
+  "intro.identity": ["あなたも、この街の住民です。", "ここは2127年のお台場。あなたは、この街で暮らす一人です。"],
+  "intro.inherited": ["街には、これまでの思いが重なっています。", "あなたの前にも、住民たちが暮らしへの思いを残しました。目の前の街は、その積み重ねを受け継いでいます。"],
+  "intro.lineage": ["台場の記憶が、街の骨組みに。", "骨組み、球体、大きな空洞。かつてのフジテレビの形は、2127年の街をつなぐ構造へと受け継がれています。"],
+  "intro.participation": ["あなたは、どんな毎日を過ごしたい？", "手元の画面で、四つの問いに答えてください。あなたの思いも、ほかの住民の声と重なって街に反映されます。"],
+  "service.human": ["人に相談できる街", "人と話しながら用事を済ませたい。その思いに応えるため、街には対面のサービスを支える場所があります。"],
+  "service.hybrid": ["普段は自動、困ったら人へ", "日常の便利さと、人に相談できる安心を組み合わせる。サービス拠点には、人と自動設備が役割を分け合う場所があります。"],
+  "service.autonomous": ["時間に縛られないサービス", "自分の都合でサービスを使いたい。街には、自律サービスの端口や、配送を支える発着の場所があります。"],
+  "commons.private": ["海辺に、自分の時間を", "一人や親しい人と静かに過ごしたい。庭や囲われた小さな空間が、海辺に落ち着ける居場所をつくっています。"],
+  "commons.hybrid": ["静けさと出会いのあいだ", "静かに休む日も、人と集まる日もある。庭と座席を組み合わせた場所が、二つの過ごし方をつないでいます。"],
+  "commons.open": ["予約せずに、海辺へ", "思い立ったときに、誰でも海辺で過ごしたい。開かれた座席や広場が、集まれる場所を支えています。"],
+  "climate.equipment": ["設備がつくる夏の居場所", "暑い日も、海辺を歩いて過ごしたい。日差しを調整する屋根や冷却設備が、歩く道と休む場所を支えています。"],
+  "climate.hybrid": ["設備と木陰が支え合う道", "涼しさを、一つの方法だけに任せない。屋根や冷却設備と植栽を組み合わせて、夏の居場所をつくっています。"],
+  "climate.canopy": ["木陰をつないで、海辺を歩く", "木陰や緑のそばで、夏を過ごしたい。歩道、屋根、建物の植栽が、緑のある居場所を街に広げています。"],
+  "functions.distributed": ["用事のあいだに、海辺を歩く", "暮らしの用事を、街を歩きながら済ませたい。低い機能ポッドが点在し、いくつかの場所をめぐる日常を支えています。"],
+  "functions.hybrid": ["歩く日も、上へ向かう日も", "用事や気分に合わせて、街をめぐりたい。高さの違う建物が、歩いて向かう場所と、上へ向かう場所を組み合わせています。"],
+  "functions.vertical": ["暮らしを、縦につなぐ", "一つの場所で、いくつもの用事を済ませたい。タワーや空中のつながりが、上下に広がる日常を支えています。"],
+};
+
+export function residentCards(view: ExhibitionView): ResidentCard[] {
+  const l = view.layout;
+  const ids = ['intro.identity', 'intro.lineage', 'intro.participation'];
+  if (view.recentProposals.length) ids.splice(1, 0, 'intro.inherited');
+  const facilityIds = [
+    l.automatedPorts === 0 ? 'service.human' : l.automatedPorts === 6 ? 'service.autonomous' : 'service.hybrid',
+    l.sharedSeats === 0 ? 'commons.private' : l.sharedSeats === 8 ? 'commons.open' : 'commons.hybrid',
+    l.coolingFins === 0 ? 'climate.canopy' : l.treeCount === 0 ? 'climate.equipment' : 'climate.hybrid',
+    l.bands.se === 'low' ? 'functions.distributed' : l.bands.se === 'high' ? 'functions.vertical' : 'functions.hybrid',
+  ];
+  const places = ['nw', 'sw', 'ne', 'se'] as const;
+  return [...ids, ...facilityIds].map((id, index) => ({
+    id, title: RESIDENT_CARDS[id][0], text: RESIDENT_CARDS[id][1],
+    place: index < ids.length ? 'お台場全景' : changeSites[places[index - ids.length]].place,
+  }));
+}
+
+export const residentIdentity = (proposal: ExhibitionProposal) =>
+  `${proposal.stationId ? `ステーション ${proposal.stationId} · ` : ''}暮らしの声 #${proposal.ordinal}`;
+
 const LEGACY_HISTORY_SHOWN = 3;
 const el = (tag: string, className: string, text = '') => { const e = document.createElement(tag); e.className = className; e.textContent = text; return e; };
 const row = (term: string, value: string) => { const r = el('div', 'causal-row'); r.append(el('span', 'causal-term', term), el('span', '', value)); return r; };
@@ -110,56 +151,52 @@ export function startSurveyAtmosphere(
   pending.hidden = true;
   historyCount.hidden = true;
   historyLegend.hidden = true;
-  panel.append(el('h2', 'causal-title', '2127 — 選択が都市を変える'), pending, latest, historyTitle, historyCount, historyLegend, history, scores, status);
+  const title = el('h2', 'causal-title', '2127 — 選択が都市を変える');
+  panel.append(title, pending, latest, historyTitle, historyCount, historyLegend, history, scores, status);
   document.body.appendChild(panel);
   let current: CityView | undefined;
+  let cardIndex = 0;
+  let storyTimer = 0;
+  const showAmbient = () => {
+    if (!current || !isExhibitionView(current)) return;
+    const cards = residentCards(current), card = cards[cardIndex++ % cards.length];
+    panel.dataset.presentation = 'ambient';
+    latest.replaceChildren(el('p', 'causal-context', 'この街の暮らし'),
+      el('h3', 'resident-card-title', card.title), el('p', 'resident-card-copy', card.text),
+      el('p', 'resident-place', `街の画面：${card.place}`));
+    storyTimer = window.setTimeout(showAmbient, 12_000);
+  };
   connectSurvey(url, (kind, view) => {
     if (!supersedes(current, view, kind)) return;
     current = view;
     apply(kind, view);
     if (isExhibitionView(view)) {
-      historyTitle.textContent = '最近64人';
-      historyCount.hidden = false;
-      historyCount.textContent = `累計 ${view.guestCount} 人`;
-      historyLegend.hidden = false;
-      pending.hidden = false;
-      pending.textContent = '四つのサイトは提案の記録順に変化します。Meterは4軸を表示します。';
-      // The idle view must show the total and recent band without scrolling, so they precede the latest proposal.
-      panel.insertBefore(latest, scores);
-      const feedback = exhibitionFeedback(view.latestProposal);
-      latest.replaceChildren(...(feedback
-        ? [
-          // City changes lead; answers are compact (question text on hover) so the panel fits 1280×720.
-          el('p', 'causal-context', `提案 #${feedback.ordinal}${view.latestProposal?.stationId ? ` · ステーション ${view.latestProposal.stationId}` : ''}`),
-          ...(feedback.cityChanges.length
-            ? feedback.cityChanges.map(change => row(`${change.place} · ${change.label}`, change.effect))
-            : [row('街区構成', feedback.cityChanged ? '数値項目に変化はありません。' : 'サーバー記録上、変化はありません。')]),
-          row(feedback.changed ? '記録' : '変化なし', feedback.note),
-          ...feedback.scores.map(score => row(score.label, `${score.before} → ${score.after}`)),
-          ...feedback.answers.map((answer, index) => {
-            const answerRow = row(`質問 ${index + 1}`, answer.optionLabel);
-            answerRow.title = answer.questionText;
-            return answerRow;
-          }),
-        ]
-        : [el('p', 'causal-context', 'まだ提案はありません。最初のゲストを待っています。')]));
-      const shown = view.recentProposals;
-      history.setAttribute('start', String(shown[0]?.ordinal ?? view.guestCount + 1));
-      history.className = 'causal-proposal-band';
-      history.setAttribute('aria-label', '4軸投票の順序はサービスの担い手、空間の使い方、暑さへの備え、機能の配置です。');
-      history.replaceChildren(...shown.map(proposal => {
-        const cell = el('li', 'causal-proposal-cell');
-        const marks = exhibitionVoteMarks(proposal.votes);
-        cell.setAttribute('aria-label', `提案 #${proposal.ordinal}: ${marks.map(({ label, vote }) => `${label} ${signed(vote)}`).join('、')}`);
-        cell.append(...marks.map(({ label, vote, symbol }) => {
-          const mark = el('span', `causal-vote ${vote > 0 ? 'causal-vote-up' : vote < 0 ? 'causal-vote-down' : 'causal-vote-flat'}`, symbol);
-          mark.title = `${label} ${signed(vote)}`;
-          return mark;
-        }));
-        return cell;
-      }));
-      scores.textContent = exhibitionScoresText(view.scores);
+      panel.classList.add('resident-panel');
+      panel.dataset.guestCount = String(view.guestCount);
+      title.textContent = '2127 · お台場の暮らし';
+      for (const node of [pending, historyTitle, historyCount, historyLegend, history, scores]) node.hidden = true;
+      clearTimeout(storyTimer);
+      if (kind === 'city-state-updated' && view.latestProposal) {
+        panel.dataset.presentation = 'result';
+        const proposal = view.latestProposal;
+        // ponytail: P2 has no district-before/after evidence; P3 must verify carriers before claiming a visual effect.
+        latest.replaceChildren(el('p', 'causal-context', residentIdentity(proposal)),
+          el('h3', 'resident-card-title', '思いが重なり、街が応える。'),
+          el('p', 'resident-card-copy', 'あなたの思いが、住民の声に加わりました。街には、これまでの声も引き継がれています。'),
+          el('p', 'resident-place', `街の画面：${proposal.cityChanges[0] ? changeSites[proposal.cityChanges[0].socketId].place : 'お台場全景'}`));
+        // Local P2 presentation only; A/B still replaces this at its existing >=3s display start.
+        storyTimer = window.setTimeout(showAmbient, 10_000);
+      } else {
+        cardIndex = 0;
+        showAmbient();
+      }
     } else {
+      clearTimeout(storyTimer);
+      panel.classList.remove('resident-panel');
+      delete panel.dataset.presentation;
+      delete panel.dataset.guestCount;
+      title.textContent = '2127 — 選択が都市を変える';
+      for (const node of [historyTitle, history, scores]) node.hidden = false;
       historyTitle.textContent = 'これまでの決定';
       historyCount.hidden = true;
       historyCount.textContent = '';

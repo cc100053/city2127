@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { cityText, exhibitionFeedback, exhibitionScoresText, exhibitionVoteMarks, policyText, scoresToWorldState } from '../src/surveyAtmosphere.ts';
+import { cityText, residentCards, residentIdentity, exhibitionFeedback, exhibitionScoresText, exhibitionVoteMarks, policyText, scoresToWorldState } from '../src/surveyAtmosphere.ts';
 import { presets } from '../src/presets.ts';
 import { connectSurvey, isExhibitionView, parseSurveyEvent, supersedes, type CityView } from '../src/surveyView.ts';
 import { createWorldState } from '../src/worldState.ts';
@@ -157,6 +157,24 @@ const unchangedFeedback = exhibitionFeedback({ ...v2Proposal, beforeScores: zero
 assert.equal(unchangedFeedback?.changed, false);
 assert.equal(unchangedFeedback?.cityChanged, false);
 assert.equal(unchangedFeedback?.note, 'Meter値と街区構成は維持されました。提案 #1 を記録しました。');
+
+const baseCards = residentCards(parsedInitialV2.view);
+assert.equal(baseCards.some(card => card.id === 'intro.inherited'), false);
+assert.equal(residentCards({ ...parsedInitialV2.view, guestCount: 100 }).some(card => card.id === 'intro.inherited'), false,
+  'city-reset lifetime participation never implies answers in this run');
+assert.equal(residentCards(parsedV2.view).some(card => card.id === 'intro.inherited'), true);
+assert.deepEqual(baseCards.slice(-4).map(card => card.id), ['service.hybrid', 'commons.hybrid', 'climate.hybrid', 'functions.hybrid']);
+assert.deepEqual(baseCards.slice(-4).map(card => card.place), ['デックス西', 'アクアシティ南', 'お台場海浜公園', 'フジテレビ東']);
+for (const [automatedPorts, sharedSeats, coolingFins, band, expected] of [
+  [0, 0, 6, 'low', ['service.human', 'commons.private', 'climate.hybrid', 'functions.distributed']],
+  [6, 8, 0, 'high', ['service.autonomous', 'commons.open', 'climate.canopy', 'functions.vertical']],
+] as const) {
+  const next = { ...parsedInitialV2.view, layout: { ...parsedInitialV2.view.layout, automatedPorts, sharedSeats, coolingFins,
+    bands: { ...parsedInitialV2.view.layout.bands, se: band } } };
+  assert.deepEqual(residentCards(next).slice(-4).map(card => card.id), expected);
+}
+assert.equal(residentIdentity(parsedV2.view.latestProposal!), '暮らしの声 #1');
+assert.equal(residentIdentity({ ...parsedV2.view.latestProposal!, stationId: 'B' }), 'ステーション B · 暮らしの声 #1');
 
 const webSocketDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'WebSocket');
 let messageListener: ((event: { data: string }) => void) | undefined;

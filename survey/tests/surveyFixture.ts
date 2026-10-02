@@ -27,7 +27,7 @@ export function fixture(dbPath = ':memory:', startMs = Date.parse('2026-09-23T10
   else {
     const runs = Number(db.prepare('SELECT COUNT(*) AS n FROM runs').get()?.n ?? 0);
     if (runs > 0) restoreOrCreateRun(db, ctx.newId, ctx.now);
-    else if (questions.version === 2) restoreOrCreateRun(db, ctx.newId, ctx.now);
+    else if (questionsPath === EXHIBITION_QUESTIONS_PATH) restoreOrCreateRun(db, ctx.newId, ctx.now);
     else transaction(db, () => createRun(db, ctx.newId(), ctx.now().toISOString()));
   }
   return { ctx, clock };

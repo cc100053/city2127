@@ -6,7 +6,7 @@ import type { QuestionSet } from '../shared/question.ts';
 /** Dependencies shared by the services; tests inject a clock and an in-memory database. */
 export type SurveyContext = {
   db: DatabaseSync;
-  /** Version 2 question set for reusable complete proposals. */
+  /** Versioned four-question exhibition set for reusable complete proposals. */
   questions: QuestionSet;
   /** Original one-answer set used only when replaying legacy runs. */
   legacyQuestions: QuestionSet;

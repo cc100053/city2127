@@ -99,3 +99,5 @@ npm run dev -- --host 0.0.0.0 --port 5173
 展示会はお台場のみ。渋谷は終了した過去の決定で、今後は開発しません（2026-10-02）。旧計画の未完了項目は今後のタスクではありません。S5、入力機器、展示当日の reset／recovery 方針は未検証です。
 
 資料の役割と過去の記録は[文書索引](docs/README.md)、視覚方針は[CITY MASTER TASTE](docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)、実装規則は[ART](docs/ART.md)を参照してください。`module-swap` は現行 v2 CityView を受け付けません。
+
+住民P2（2026-10-02）：surveyを再build／再起動し、Guest／Cityを更新してください。四つの問いを日常の希望に改め、確認は送信前に残しています。結果は保存／待機、ステーション／暮らしの声番号、街を見る案内のみ；Cityは背景／現在の施設と記録確認を表示します。Question-set version3でもSQLiteと保存済み回答の原文は保持します。旧草稿は「新しい予約で草稿を続ける」で有効な選択を引き継ぎます；A/Bは自分の旧予約を終了してから再予約します。3秒の変化／表示間隔、result10秒／handoff5秒は維持；閲覧枠と変化の理由はP3です。[P2引き継ぎ](docs/handoffs/resident-experience-p2.md)。
