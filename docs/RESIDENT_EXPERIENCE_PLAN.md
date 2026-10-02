@@ -91,7 +91,9 @@ P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibitio
 
 完成門檻：自動／browser checks 通過；記錄時間與新截圖；產品文件與 handoff 同步。剩餘硬件、理解程度、長時間穩定性明列未驗，不宣稱 S5 展覽驗收完成。
 
-### P5 — 展場與實際裝置驗收：PLANNED
+### P5 — 展場與實際裝置驗收：IN_PROGRESS
+
+2026-10-02 已開始驗收準備；[P5交接／驗收表](handoffs/resident-experience-p5.md) 記錄實機D0–D10、理解訪談及待決復原政策。使用者預計65吋HDMI主屏、觀看約4米、Mac mini M6，並確認兩部iPad直接接收主機輸出畫面、型號未定。輸出方案／雙路獨立觸控及實際配置須先驗D0，不改成LAN Guest假設。全部實機結果為 NOT RUN；P5及S5未完成。
 
 確認輸入裝置型號／橫向尺寸、Safari／其他 browser、LAN、主屏幕尺寸、觀看距離與實際電腦。使用該固定裝置檢查觸控、焦點、字體、抬頭視線、反光、睡眠／重連與完整單站／A/B 流程；這是指定展覽裝置測試，不增加泛用手機 responsive 或 adaptive camera。
 

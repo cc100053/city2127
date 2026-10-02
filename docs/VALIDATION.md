@@ -93,7 +93,9 @@ New P4 evidence (Chrome154.0.8037.93, viewport1280×720, deviceScaleFactor1, fix
 
 P4 browser starts its own temporary real SQLite/server and uses the existing project City preview. Set `CITY2127_PLAYWRIGHT_PATH` to an already installed Playwright `index.mjs`; optional `CITY2127_CITY_URL` selects the preview, `CITY2127_EVIDENCE_DIR` preserves previous screenshots and `CITY2127_CHECKED_COMMIT` records the checked baseline/commit. Run `node tests/residentP4.browser.mjs` after building survey. Do not use the exhibition database for destructive checks.
 
-**Still open:** S5 full exhibition acceptance, actual input hardware, exhibition-day reset/recovery policy, sustained runtime/device testing. Use current browser procedures above, record a named owner and a new task handoff; do not reopen old Shibuya tasks.
+P5（2026-10-02）：[實機驗收表／交接](handoffs/resident-experience-p5.md) 記錄預計65吋HDMI／約4米／兩部iPad／Mac mini M6配置；使用者指定兩部iPad接收主機輸出，D0先驗雙路獨立畫面／觸控，再驗睡眠／復原、閱讀／理解、長跑及政策。全部實機項目仍為 NOT RUN；P4模擬觸控、clock jumps或CI不替代實機證據。
+
+**Still open:** S5 full exhibition acceptance, actual input hardware, exhibition-day reset/recovery policy, sustained runtime/device testing. Use current browser procedures and the P5 handoff above; do not reopen old Shibuya tasks.
 
 ## Historical evidence (not exhibition acceptance)
 
