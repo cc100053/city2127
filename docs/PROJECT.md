@@ -2,7 +2,7 @@
 
 ## Meter variety main integration — 2026-10-02
 
-User authorized P0–P12 integration; no-conflict merge `e7afbee` exactly preserves the verified feature tree. The district controllers, history-seeded layouts and P12 motion below are now on local main; publication/CI pending. Earlier “not integrated” statements are dated stage history, superseded by this record. Root and survey must be updated together for P11; restart survey using the existing SQLite and refresh City. See the [integration handoff](handoffs/meter-variety.md#main-integration--2026-10-02).
+User authorized P0–P12 integration; no-conflict merge `e7afbee` exactly preserves the verified feature tree. The district controllers, history-seeded layouts and P12 motion below are now on published main `68b669a`; [main CI 36954967651](https://github.com/cc100053/city2127/actions/runs/36954967651) PASS. Local/remote feature branch retired. Earlier “not integrated” statements are dated stage history, superseded by this record. Root and survey must be updated together for P11; restart survey using the existing SQLite and refresh City. See the [integration handoff](handoffs/meter-variety.md#main-integration--2026-10-02).
 
 ## Meter variety P12 — 2026-10-02 (`feat/meter-variety`, not integrated)
 

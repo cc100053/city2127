@@ -1,18 +1,18 @@
 # meter-variety — Readable, district-wide Meter changes
 
 - Owner: cc100053 (P0/P1/P4/P5: Claude Code; P2/P3/P11/P12: Codex session)
-- Status: INTEGRATED locally — P0–P12; user authorized main integration and feature-branch deletion on 2026-10-02; integrated local validation PASS; main publication/CI pending
-- Branch: `main` (merged `feat/meter-variety`; retirement pending main CI)
+- Status: SHIPPED — P0–P12 integrated; local checks, fresh browser smoke and main CI PASS; feature branch retired (2026-10-02)
+- Branch: `main`; local and remote `feat/meter-variety` deleted after main CI PASS
 - Base commit: `33227a687ac9d18281e90494a4e9b2ce27f861ce`
 - Last verified commit: integrated source `e7afbeeac538e727dadf119a593d61c6f245f727` (root/survey local checks and fresh browser smoke PASS). P12 source `e38fee1e3809922eefc90a73ab42785cd4fcc960` (root local checks, lossless captures and real HTTP/WebSocket browser smoke PASS; [feature CI run 36952186063](https://github.com/cc100053/city2127/actions/runs/36952186063) PASS).
-- Remote availability: `origin/feat/meter-variety`
+- Remote availability: `origin/main`; feature HEAD `58fd479` preserved through merge `e7afbee`
 
 ## Session Git state
 
-- P12 session starting branch and HEAD: `feat/meter-variety` `0e2efdf`, clean.
-- Last fetched origin/main commit: `33227a6` (2026-10-02; feature vs origin/main 18/0 at startup; feature vs remote counterpart 0/0).
+- Integration session starting branch and HEAD: `feat/meter-variety` `58fd479`, clean (P12 implementation session started at `0e2efdf`).
+- Last fetched origin/main commit: `68b669a7c13be548f7b8970c81cca8f9ad5d0ecf` (2026-10-02; local/remote main 0/0 before this documentation closure). Integration startup: main `33227a6`, feature/main 20/0, feature/remote 0/0.
 - Local changes present at session start: NONE.
-- Upstream integration status: merge `e7afbeeac538e727dadf119a593d61c6f245f727` on local main; remote push/CI pending.
+- Upstream integration status: merge `e7afbeeac538e727dadf119a593d61c6f245f727` pushed in verified main `68b669a`; [main CI 36954967651](https://github.com/cc100053/city2127/actions/runs/36954967651) PASS.
 - Pending Git conflicts or synchronization blockers: NONE.
 
 ## Main integration — 2026-10-02
@@ -20,7 +20,7 @@
 - User explicitly requested “合併 main, delete branch”; this supersedes the earlier capture-review-before-main condition without claiming broader art/hardware acceptance. Owner remains cc100053 (Codex execution).
 - Clean `feat/meter-variety` at `58fd479a51fc9a0c027055adcc3dc0aeb8359e73`; fetch succeeded, feature/remote 0/0, local/remote main 0/0 at `33227a6`, feature/main 20/0. [Exact-head feature CI 36952702662](https://github.com/cc100053/city2127/actions/runs/36952702662) PASS.
 - No-ff merge `e7afbeeac538e727dadf119a593d61c6f245f727`, no conflicts; merged tree exactly matches the verified feature tree. Complete task diff and committed whitespace reviewed; captures preserved. Historical stage records below describe their pre-integration states.
-- Integrated root and survey `npm test` / `npm run build`, working-tree and committed `git diff --check`: PASS; existing root chunk-size warning only. Module-swap unchanged. Fresh Chrome HTTP/WebSocket smoke PASS: running mixed → high live → reload → reset → low → reduced-motion reset/proposal → standalone; full drone-column checks including skyways pass, no application errors. Scratch SQLite retained at `/var/folders/st/ml4_0zfx7g129gh2305ynz5c0000gn/T/city2127-meter-p12-GqiL5x/survey.sqlite`; new captures in `/private/tmp`, historical captures and exhibition database untouched. Main push/CI and feature retirement: pending.
+- Integrated root and survey `npm test` / `npm run build`, working-tree and committed `git diff --check`: PASS; existing root chunk-size warning only. Module-swap unchanged. Fresh Chrome HTTP/WebSocket smoke PASS: running mixed → high live → reload → reset → low → reduced-motion reset/proposal → standalone; full drone-column checks including skyways pass, no application errors. Scratch SQLite retained at `/var/folders/st/ml4_0zfx7g129gh2305ynz5c0000gn/T/city2127-meter-p12-GqiL5x/survey.sqlite`; new captures in `/private/tmp`, historical captures and exhibition database untouched. Main `68b669a` pushed; [main CI 36954967651](https://github.com/cc100053/city2127/actions/runs/36954967651) PASS (Node 24, root/survey/module-swap install/test/build and committed whitespace). Local/remote feature branch deleted after verifying its remote HEAD is an ancestor of remote main; no force deletion.
 - P11 updates root and survey together; restart the updated survey server with its existing SQLite and refresh City. No database migration or reset required. Existing unverified FPS, Windows and exhibition endurance remain separate.
 
 ## Problem (measured 2026-10-01)
@@ -341,4 +341,4 @@ P6 (pipeline diagnostics, docs, draw-call measurement) stays per stage: each sta
 
 ## Next step
 
-User authorized integration and branch deletion on 2026-10-02. Finish integrated-main validation, push, verify main CI, then retire the feature branch. Remaining exhibition hardware/FPS/Windows acceptance is separate.
+Integration and feature-branch retirement complete. Update root and survey together, restart survey with existing SQLite and refresh City. Remaining exhibition hardware/FPS/Windows and broader human art acceptance are separate.
