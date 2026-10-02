@@ -1,11 +1,12 @@
 # resident-experience-p4 — Software and two-screen acceptance
 
 - Owner: Codex
-- Status: IN_PROGRESS — software acceptance PASS; publication/integration pending
+- Status: DONE — software acceptance and integrated local verification PASS
 - Branch: `codex/resident-experience-p4`
 - Base commit: `ab9dbba094dcce78b7afed17f0b2b5b39d79f320`
-- Last verified commit: base above plus final P4 test/docs/evidence delta (source worktree PASS)
-- Remote availability: NOT PUSHED
+- Source commit: `7b36dd65da03289e224c31bc825b9cbef4fed19b`
+- Last verified integrated commit: `9f7741921805551724d2608c9ac249e0e194dc21`
+- Remote availability: source on `origin/codex/resident-experience-p4`; verified main integration published together with this focused documentation closure
 
 ## Session Git state
 
@@ -47,8 +48,12 @@ Complete [resident plan P4](../RESIDENT_EXPERIENCE_PLAN.md): comprehensive softw
 - Local Markdown target/anchor check:267 links PASS before publication; `git diff --check` PASS. Exact diff/new-file review completed; final staged/committed checks and CI recorded at publication.
 - Initial failures are not passing evidence: loopback sandbox denial rerun with authorized escalation; new fixture incorrectly used state.layout, corrected to proposal.afterLayout; Start/save assertions raced async completion, corrected explicit screen waits; Chrome offline emulation retained an existing socket, so test destroys the real City TCP transport; async browser polling replaced by direct server-state polling; existing A/B assumed A-first, corrected attribution and response waiting; favicon404 classified by exact URL, not silently ignored.
 
+- Source [CI37011691429](https://github.com/cc100053/city2127/actions/runs/37011691429): PASS on exact `7b36dd65da03289e224c31bc825b9cbef4fed19b`; Node24 root/survey/module-swap install/test/build and committed whitespace.
+- Integrated `9f7741921805551724d2608c9ac249e0e194dc21`: fresh fetch, clean tree, no concurrent main changes; no-ff merge without conflicts; integration tree equals validated source tree. Node26 root/survey full tests/builds rerun PASS; P4 scratch browser rerun PASS with no unexpected console/network errors. Temporary evidence in `/private/tmp/city2127-p4-integrated` preserves committed screenshots. The caller-supplied commit label was corrected to actual `git rev-parse HEAD`; this did not change the tested integration tree. `git diff --check origin/main..HEAD` PASS.
+- Changes since integrated verification: this documentation-only handoff closure records source/integrated commits and actual checks; runtime/tests/evidence are unchanged. Local links/staged/committed whitespace checked again at closure. Final main publication/CI is checked after push and its actual run reported in the task’s final response; no future CI pass is claimed here.
+
 README/AGENTS/ART/survey guide need no updates: setup/product controls/agent policy/art/API are unchanged. PROJECT/SPEC/plan/index/VALIDATION/handoff update only the completed software acceptance and runnable test/evidence entry points. module-swap has no changed files or incidental checks.
 
 ## Known limits and next expected step
 
-Software acceptance complete; source commit/push/CI and main integration/verification remain in progress. P5 is the next separately assignable stage; do not automatically start it. P5 device/LAN/Safari/reading comprehension, sustained operation, FPS, Windows and S5 remain unverified. Scheduling metadata remains no viewer playback acknowledgement; no new recovery service or exhibition-day policy added.
+P4 software acceptance and main local integration are complete. Before ending publication, verify pushed main and its actual CI. P5 is the next separately assignable stage; do not automatically start it. P5 device/LAN/Safari/reading comprehension, sustained operation, FPS, Windows and S5 remain unverified. Scheduling metadata remains no viewer playback acknowledgement; no new recovery service or exhibition-day policy added.
