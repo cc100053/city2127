@@ -1,5 +1,7 @@
 # exhibition-mvp-plan — 2127 baseline and agent implementation specification
 
+> Stage history — 2026-10-02: retain the original implementation/validation scope below. Current Odaiba behavior is in [EXHIBITION_SPEC](../EXHIBITION_SPEC.md); Shibuya will not be developed again. Historical resume/next-step instructions do not create a new assignment.
+
 - Owner: Codex
 - Status: DONE — planning specification integrated and published; its runtime work was unimplemented at completion and is now tracked by [the S1 handoff](exhibition-s1.md)
 - Branch: `codex/exhibition-mvp-plan`
@@ -23,8 +25,8 @@ Write the prior design as a self-contained, detailed agent-oriented plan under `
 
 ## In-scope files and dependencies
 
-- `docs/EXHIBITION_MVP.md`, this handoff.
-- `AGENTS.md`, `README.md`, `docs/PROJECT.md`, `docs/PLAN02.md`, `docs/VALIDATION.md`: dated direction/entry-point/status synchronization only.
+- `docs/EXHIBITION_SPEC.md`, this handoff.
+- `AGENTS.md`, `README.md`, `docs/PROJECT.md`, `docs/history/SHIBUYA_PLAN02.md`, `docs/VALIDATION.md`: dated direction/entry-point/status synchronization only.
 - Excluded: runtime code, dependencies, questions JSON, database, GLB/.blend, assets, screenshots, deployment. No implementation stages executed.
 
 ## Completed work

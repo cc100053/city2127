@@ -1,5 +1,7 @@
 # Shibuya spatial study — Plan 01
 
+> Shibuya Plan 01 is closed history. User confirmed 2026-10-02 that Shibuya will not be developed again; unfinished items are not future tasks. Current venue: [Odaiba specification](EXHIBITION_SPEC.md).
+
 2026-09-18 superseding note: this document preserves historical Plan 01 research and evidence. The current goal is a futuristic Shibuya shaped by successive guests: one question per guest, accumulated city changes and immediate visible results at the end of each experience. See [PROJECT.md](PROJECT.md) for the current contract. Fixed buildings, three presets, timing and proposed facade work below describe that earlier stage, not constraints or priorities for the exhibition.
 
 Implemented from the existing ChatGPT Plan 01 on 2026-09-17. This iteration establishes spatial identity, not finished facades or a geographically exact replica.
@@ -31,3 +33,5 @@ Same fixed camera `(34,52,88)` looking at `(-6,7,0)`, FOV 38°, at 1280×720:
 - [Still](../artifacts/shibuya-still.png)
 
 Animation phases differ between screenshots. See [VALIDATION.md](VALIDATION.md) for checks and limits.
+
+Historical external reference check (2026-10-02): the Tokyo Pocket Guide map PDF returned HTTP 403; access is restricted/unverified, not confirmed deleted.

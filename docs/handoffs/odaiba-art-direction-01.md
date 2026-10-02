@@ -1,7 +1,9 @@
 # Odaiba art direction 01 — Fuji civic chassis
 
+> Closure correction — 2026-10-02: Implementation `274167e` is in main through `e3185b3`; first-pass review limits remain dated evidence. Continued work: [Dream Loop](odaiba-dream-loop.md) and [district](odaiba-district.md).
+
 - Owner: Codex (this task), sole owner of the runtime delta.
-- Branch: `feat/art-direction`; implementation complete, human art review pending. Stop after this pass; no main integration.
+- Branch: retired `feat/art-direction`; implementation integrated through `e3185b3`. Original single-pass restrictions below describe that stage only.
 - Base: `e587b54` (approved references), on top of main `b97f859`.
 - Preflight 2026-09-30: started on main `b97f859`, fetched origin successfully; main/origin main 0/0 divergence. Resumed existing remote `origin/feat/art-direction` at `e587b54`, local/remote 0/0. No main merge needed. Unrelated untracked `.claude/launch.json` preserved.
 - Existing venue handoff compared with actual code: P0–P5 are available in main, eight GLBs and 2127 retrofit layer present. Prior art-direction handoff describes Shibuya history, not this pass's source of truth.
@@ -77,6 +79,6 @@ GLB candidate: the **suspended civic chamber and its transfer joints**, once thi
 
 ## Validation and next step
 
-See [dated validation](../VALIDATION.md#odaiba-art-direction-pass-1--2026-09-30) for current results. Full root tests/build and whitespace checks pass; survey/module-swap code unchanged. New actual-mesh raycasts cover aerial approach, original bridge landing, all four site visibility/ground checks and existing actor routes. A top-frame conflict was found and fixed by lowering transfer headers; the test retains the original flight envelope.
+See [dated validation](../history/VALIDATION_2026-10-02.md#odaiba-art-direction-pass-1--2026-09-30) for current results. Full root tests/build and whitespace checks pass; survey/module-swap code unchanged. New actual-mesh raycasts cover aerial approach, original bridge landing, all four site visibility/ground checks and existing actor routes. A top-frame conflict was found and fixed by lowering transfer headers; the test retains the original flight envelope.
 
 Human art director reviews the paired images and decides whether this architectural direction should proceed. No target reached / polish complete claim. No main merge, deployment or second pass.

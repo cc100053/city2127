@@ -8,7 +8,7 @@ A/B reset stops new starts and waits for both experiences, including results/han
 
 **Language:** [繁體中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
 
-Guests collectively shape a futuristic Shibuya. Each guest answers four questions and submits one proposal; the next guest inherits the accumulated city. The root Three.js scene (`src/`) is the exhibition city. The `survey/` server owns the questions, state, SQLite database, and live WebSocket updates. The separate `module-swap/` viewer is a legacy v1 causal demo and does not accept the current v2 CityView.
+Guests collectively shape a futuristic Odaiba. Each guest answers four questions and submits one proposal; the next guest inherits the accumulated city. The root Three.js scene (`src/`) is the exhibition city. The `survey/` server owns the questions, state, SQLite database, and live WebSocket updates. The separate `module-swap/` viewer is a legacy v1 causal demo and does not accept the current v2 CityView.
 
 ## Start the exhibition locally
 
@@ -62,7 +62,7 @@ The survey server uses `127.0.0.1:8787` by default. Use the actual URL printed b
 | --- | --- | --- |
 | Guest (single station) | `http://127.0.0.1:8787/guest` | Guest answers four questions, reviews the choices, and submits one proposal. |
 | Guest A/B (two stations) | `http://<exhibition-PC LAN IP>:8787/guest?station=A` / `?station=B` | Independent four-question experiences share the accumulated city. |
-| City | `http://127.0.0.1:5173/?survey` | Exhibition's 2127 Shibuya scene; receives live state through `ws://127.0.0.1:8787/ws`. Keep `?survey` in the URL. |
+| City | `http://127.0.0.1:5173/?survey` | Exhibition's 2127 Odaiba scene; receives live state through `ws://127.0.0.1:8787/ws`. Keep `?survey` in the URL. |
 | Admin | `http://127.0.0.1:8787/admin` | Staff view the lifecycle, end an unfinished experience, and request/cancel resets. Available only on the server computer through localhost. |
 | Monitor (optional) | `http://127.0.0.1:8787/monitor` | Text view of current state and proposals/WebSocket events received since the tab opened; it is not the 3D city. |
 
@@ -88,8 +88,13 @@ Both ports must be reachable. Admin stays restricted to localhost on the server 
 
 To view the standalone city without survey state, open `http://127.0.0.1:5173/`; Tab 1 is unnecessary in that mode. For the older v1 module-swap demo, see its [handoff](docs/handoffs/causal-city-mvp.md); it is not the exhibition city.
 
+## Current direction
+
+Odaiba is the only exhibition venue. Shibuya is a closed historical decision and will not be developed again (2026-10-02); its unfinished plans are not a future backlog. Meter choices affect both focal sites and the wider district. S5, input hardware and exhibition-day reset/recovery policy remain unaccepted.
+
 ## Project references
 
 - [Agent workflow](AGENTS.md), [Git workflow](docs/CONTRIBUTING.md), [architecture](docs/PROJECT.md), and [validation](docs/VALIDATION.md).
-- [Exhibition MVP specification](docs/EXHIBITION_MVP.md) and [S4 handoff](docs/handoffs/exhibition-s4.md) describe the current four-question flow and known limits.
-- The [Traditional Chinese README](README.md) retains the detailed project history, Plan 02 notes, and original prototype references.
+- [Current exhibition specification](docs/EXHIBITION_SPEC.md) and [S4 handoff](docs/handoffs/exhibition-s4.md) document the current contract and dated S4 evidence respectively.
+- [Document index](docs/README.md) separates current rules from archived plans and task evidence; [visual direction](docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) and [runtime art rules](docs/ART.md) guide Odaiba changes.
+- The [Traditional Chinese README](README.md) also describes DEV-only review tools. Module-swap rejects current v2 CityViews; use the root city for the exhibition.

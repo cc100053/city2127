@@ -1,6 +1,6 @@
-# Blender asset standards — collaboration Stage 3
+# Blender asset and export standards
 
-These are manual handoff standards, not an automated import pipeline. At the Stage 3 baseline (`f196b2e`) the repository had no tracked `.blend`/`.glb` files or model loader. Current state (2026-09-24): `src/modelAssets.ts` loads GLBs, the root scene places [future-tree-2127](../asset/models/future-tree-2127/future-tree-2127.glb), and `module-swap/assets/` holds eight lot/building pairs for the causal MVP viewer. Follow [Git coordination](CONTRIBUTING.md) and the [project contract](PROJECT.md). Preserve the exhibition direction: futuristic Shibuya and readable guest-driven changes, not documentary realism as a gate.
+Current scope: Odaiba 2127. These are manual asset handoff standards; [Git coordination](CONTRIBUTING.md), [architecture](PROJECT.md) and [ART](ART.md) govern integration. Shibuya's old asset backlog is closed. `odaibaScene` loads six landmark GLBs and the derived district environment; `civicCore` replaces the rendered Fuji TV form. Park uses the future-tree GLB. Module-swap's eight pairs are legacy demonstrator assets.
 
 ## Codex and Blender connection (2026-09-23)
 
@@ -18,19 +18,21 @@ On **each** Mac/Windows machine: check `codex mcp get blender` before adding a s
 
 ## Ownership and files
 
-Assign one named owner per asset task. Coordinate edits to the same binary before starting. Commit editable `.blend` source and corresponding production `.glb` together; use Git history instead of `final-final` filenames. Do not add LFS, export automation or decoder dependencies incidentally.
+Assign one named owner per asset task. Coordinate edits to the same binary before starting. For hand-authored assets, commit editable `.blend` source and corresponding production `.glb` together; use Git history instead of `final-final` filenames. Do not add LFS, export automation or decoder dependencies incidentally.
 
 For new root-scene assets, use `asset/models/<asset-id>/<asset-id>.blend` and `<asset-id>.glb` in the same directory; module-swap assets use `module-swap/assets/<asset-id>/` as the source of truth and `npm run sync:models` to copy the GLB into `module-swap/app/public/assets/models/` (see [module-swap README](../module-swap/README.md)). In both cases, with lowercase kebab-case IDs. Create directories only when a real asset exists. Keep existing references such as `asset/pic2.png` in place. This source/export location does not automatically make a model available to Vite. The development preview below reads a local file; a production integration must explicitly import/serve its GLB, call `addCityModel(scene, url, [x,y,z], rotationY)` from `src/modelAssets.ts`, and test the production build.
 
 Pack needed textures into the source or commit them under that asset directory with relative paths. Linked libraries must also be available from the clone, or made local for the deliverable. Exclude temporary backups and unused working exports from commits without deleting another contributor's files. Record provenance/licence for third-party material, if any; this stage does not authorize an external asset pack.
 
+The derived district environment is a deliberate exception: [crop-odaiba-district.py](../scripts/crop-odaiba-district.py) transforms the preserved masterplan GLB into the runtime GLB. Keep input, script and output tracked; do not invent a separate hand-authored `.blend` for the derived file. Record reproducibility and bounds in the owning handoff.
+
 ## Scene contract
 
-- Author at a documented scale: default one Blender unit to one scene art unit. Existing scene units are meter-like, not a surveyed Shibuya reconstruction. Record expected exported X/Y/Z bounds and compare them with the target footprint in `src/layout.ts` before integration.
-- For static buildings, put the local origin at the ground-contact centre. For moving objects, agree on the functional pivot and forward direction with the consumer. Record orientation explicitly; do not compensate for an unexplained rotation or scale in application code.
+- Author Odaiba at real metres (one unit = one metre). Use [odaibaPlacement](../src/odaibaPlacement.ts) / [placement JSON](../src/odaiba-layout.json) for existing surveyed landmarks; legacy art-unit assets require an explicit target scale. Record expected exported X/Y/Z bounds and compare them with the target footprint in `src/layout.ts` before integration.
+- For static buildings, put the local origin at the ground-contact centre. For moving objects, agree on the functional pivot and forward direction with the consumer. Record orientation explicitly; do not compensate for an unexplained rotation or scale in application code. The documented Grand Nikko legacy −90° adapter is intentional; preserve it and the Odaiba placement test.
 - Use Blender's normal Z-up workspace and glTF's +Y-up export conversion. Check an asymmetric feature on reimport to detect flipped facing; do not rotate the model again merely to repeat the exporter conversion.
 - Keep a clearly named export root and stable child names for any nodes the app will address. Apply rotation/scale on a static export copy where needed, keeping editable source. Do not blindly apply transforms to rigs or shape keys. Animated assets require an explicit clip/pivot contract in their task.
-- Preserve necessary openings and clearance at crossings, lifts and the cargo dock. Exported geometry does not automatically update layout-derived collision envelopes or routes.
+- Preserve necessary openings and clearance at promenades, guideway, skyways, four change sites and the sphere berth. Exported geometry does not automatically update layout-derived collision envelopes or routes.
 
 ## Export recipe
 
@@ -50,7 +52,7 @@ Use the smallest texture resolution that survives the intended view. Record expo
 
 ## Validate and hand off
 
-For a quick scene preview, run `npm run dev -- --port 5173`, open the URL Vite prints with `?asset-preview`, and choose a `.glb`. It loads once at scene origin in the existing Shibuya renderer, without changing saved project assets. Reload to test another model. This confirms parsing and placement only; use the checks below before calling an asset production-ready. The picker is absent from production builds.
+For a quick scene preview, run `npm run dev -- --port 5173`, open the URL Vite prints with `?asset-preview`, and choose a `.glb`. It loads once at scene origin in the existing Odaiba renderer, without changing saved project assets. Reload to test another model. This confirms parsing and placement only; use the checks below before calling an asset production-ready. The picker is absent from production builds.
 
 1. Open the committed source from a fresh clone or isolated copy without access to the author's private texture/library paths. Confirm all dependencies resolve and the recorded export steps reproduce a usable GLB; byte-identical output is not required.
 2. Import the GLB into an empty Blender scene. Check bounds, origin, facing, normals, materials, texture presence and any agreed animation clips. Inspect silhouette, openings and joins. Record actual results and a screenshot; do not mark an unperformed check as passed.

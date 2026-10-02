@@ -1,5 +1,7 @@
 # causal-city-mvp — Causal choice → policy → city change MVP
 
+> Historical scope — 2026-10-02: Shibuya development is closed and will not resume. Any unfinished Shibuya next steps below are cancelled as product work. Reused assets/legacy contracts do not imply a second venue. Current scope: [EXHIBITION_SPEC](../EXHIBITION_SPEC.md); retained source may still serve Odaiba or legacy tests.
+
 - Owner: cc100053
 - Status: DONE — integrated into `main` (`6f6fbb2`); task branch deleted
 - Branch: `feat/causal-city-mvp`
@@ -32,13 +34,13 @@ Prove one causal history end-to-end: a guest choice changes accumulated policy s
 
 ## Completed work
 
-See [PROJECT.md](../PROJECT.md#causal-choice--city-mvp--2026-09-24-survey--module-swap) for the architecture, axis table, trigger semantics, slot meanings, reconnect and reset behaviour and the exact demo.
+See [PROJECT.md](../history/PROJECT_2026-10-02.md#causal-choice--city-mvp--2026-09-24-survey--module-swap) for the architecture, axis table, trigger semantics, slot meanings, reconnect and reset behaviour and the exact demo.
 
 ## Actual validation results
 
 - Verification status: PASSED
 - Date and checked commit/worktree: 2026-09-24, `391e6fce9f35acf8f4f78e007c59224d50ddda46`
-- Commands/manual checks and results: recorded in [VALIDATION.md](../VALIDATION.md#causal-choice--city-mvp--2026-09-24)
+- Commands/manual checks and results: recorded in [VALIDATION.md](../history/VALIDATION_2026-10-02.md#causal-choice--city-mvp--2026-09-24)
 - Evidence/environment: `artifacts/causal-mvp-*.png`; headless Chrome 154, 1600×1000, Node v26.0.0
 - Integrated commit and checks: `6f6fbb2` (2026-09-24, `--no-ff` merge of `7a26472`, whose branch CI passed); on the merge result root, `survey/` and `module-swap/` `npm test` + `npm run build` passed and `git diff --check origin/main..HEAD` was clean
 - Changes since verification: this handoff, VALIDATION entry and screenshots, plus two low-severity review fixes (malformed session-id 404, `?survey=` URL fallback) re-checked with all three packages' `npm test` / `npm run build`

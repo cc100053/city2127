@@ -1,5 +1,7 @@
 # art-direction — Art rules and a polished pilot area for the root Shibuya scene
 
+> Historical scope — 2026-10-02: Shibuya development is closed and will not resume. Any unfinished Shibuya next steps below are cancelled as product work. Reused assets/legacy contracts do not imply a second venue. Current scope: [EXHIBITION_SPEC](../EXHIBITION_SPEC.md); retained source may still serve Odaiba or legacy tests.
+
 - Owner: cc100053
 - Status: DONE — integrated into main (merge `2126a2c`, 2026-09-25); `feat/art-direction` deleted
 - Branch: feat/art-direction
@@ -35,7 +37,7 @@ Done when:
 
 In commit order on `feat/art-direction`:
 
-1. `81e1dfa`: task opened. This handoff plus the dated decision note in [PLAN02.md](../PLAN02.md).
+1. `81e1dfa`: task opened. This handoff plus the dated decision note in [PLAN02.md](../history/SHIBUYA_PLAN02.md).
 2. `2122d13`, pilot (2026-09-24):
    - [ART.md](../ART.md) rules: palette and material roles, massing, detail by distance, greenery, glass and light, signage and ambient data, actors, and how a survey change reads.
    - `cityRig.ts` gained the `glass`/`leaf`/`stone` materials and the `arc()`, `shrubs()` and `bake()` helpers.
@@ -65,12 +67,12 @@ In commit order on `feat/art-direction`:
    - Mint kerb strips at every crossing waiting edge.
 7. `7218a2a`, day/night cycle (user, 2026-09-25): `src/dayCycle.ts` replaces the three buttons and the `0/1/2` keys. One day lasts 180 s; dawn is Still, day is Daylight, night is Pulse. It adds a moonlit night with lit windows and `?hour=` for captures.
 8. `6e74eec`: merge of `feat/art-lighting`. The only conflicts were in docs.
-9. Polish pass 3 (user: "continue the polish", 2026-09-25), see [ART.md](../ART.md#polish-pass-3-2026-09-25):
+9. Polish pass 3 (user: "continue the polish", 2026-09-25), see [ART.md](../history/SHIBUYA_ART.md#polish-pass-3-2026-09-25):
    - Upper wings end in a curved glass bay with trim floor discs.
    - The SE tall variant is a round terraced tower.
    - The AIR / 02 terminals are civic data totems.
    - The distant skyline has ringed and stepped silhouettes.
-10. Actor pass (user: "做埋人&車", 2026-09-25): capsule people with per-person clothes/skin/hair colours, pods with canopy, wheels and mint side line ([ART.md](../ART.md#actor-pass-2026-09-25)).
+10. Actor pass (user: "做埋人&車", 2026-09-25): capsule people with per-person clothes/skin/hair colours, pods with canopy, wheels and mint side line ([ART.md](../history/SHIBUYA_ART.md#actor-pass-2026-09-25)).
 
 Unchanged throughout: site positions, footprints and rise/sink behaviour, the hero camera pose, landmark positions, the survey server and module-swap.
 
@@ -82,8 +84,8 @@ Unchanged throughout: site positions, footprints and rise/sink behaviour, the he
   - `npm test`: 9 PASS lines.
   - `npm run build`: PASS, with the existing chunk-size warning.
   - `survey/` and `module-swap/` are unchanged, so their checks were not rerun.
-  - Headed Chrome, real GPU: 60 FPS at 1280×720 and 1920×1080, at 12:00 and 22:00, with and without `?survey` (five guests, all four sites up). See [VALIDATION](../VALIDATION.md#art-direction-status-and-real-gpu-recheck--2026-09-25).
-  - Pass 3: `npm test` 9 PASS, `npm run build` PASS, `git diff --check` clean; headed Chrome on the M6 still 60 FPS at both sizes (city 344, survey 493 draw calls). See [VALIDATION](../VALIDATION.md#art-direction-polish-pass-3--2026-09-25).
+  - Headed Chrome, real GPU: 60 FPS at 1280×720 and 1920×1080, at 12:00 and 22:00, with and without `?survey` (five guests, all four sites up). See [VALIDATION](../history/VALIDATION_2026-10-02.md#art-direction-status-and-real-gpu-recheck--2026-09-25).
+  - Pass 3: `npm test` 9 PASS, `npm run build` PASS, `git diff --check` clean; headed Chrome on the M6 still 60 FPS at both sizes (city 344, survey 493 draw calls). See [VALIDATION](../history/VALIDATION_2026-10-02.md#art-direction-polish-pass-3--2026-09-25).
 - Evidence/environment:
   - Headed Google Chrome 154 via `playwright-cli -s=gpu open --browser=chrome --headed`, ANGLE Metal on an Apple M6, pixel ratio 1. No other browser session was running.
   - Screenshots in `artifacts/`: `art-before-*`, `art-pilot-*`, `art-buildings-*`, `art-buildings2-*`, `light-*`, `art-step4-*`, `daycycle-*` and `art-polish-*`. All are 1280×720 headless captures; the two `art-buildings2-orbit-*` views are not on the hero pose.
@@ -104,7 +106,7 @@ Unchanged throughout: site positions, footprints and rise/sink behaviour, the he
 - Order: rules → pilot area → user review → roll out → then new areas and questions.
 - The survey change sites (steps 1–3, `?survey`) keep their positions and behaviour; only their look is restyled.
 - The user approved the pilot by moving on ("ok, polish building", 2026-09-24) and asked for further polish (2026-09-24 and 25).
-- Saffron is reserved for guest-made changes ([ART.md §8](../ART.md#8-how-a-survey-change-reads)).
+- Saffron is reserved for guest-made changes ([ART.md §8](../history/SHIBUYA_ART.md#8-how-a-survey-change-reads)).
 - The day/night cycle replaces the preset buttons (user, 2026-09-25). WorldState presets remain, as the cycle's keyframes and as the survey target.
 
 ## Remaining work

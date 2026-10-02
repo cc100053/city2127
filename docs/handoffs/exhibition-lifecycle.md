@@ -1,20 +1,22 @@
 # exhibition-lifecycle — City lifecycle and admin reset workflow
 
+> Closure correction — 2026-10-02: Integrated: `0586ed0` is contained in current main; original task branch retired. Staff-exit requirements below are historical, superseded by automatic single/A-B handoff.
+
 > 2026-10-02 current behavior: this handoff preserves its dated implementation evidence. A/B concurrent stations now use independent sessions/results, ordered displays and reset draining; single `/guest` keeps automatic next-start handoff. Admin ends only a named unfinished station, and a newer cancelled draft never reopens an older Undo. See [dual-station handoff](two-guest-devices.md) and [current architecture](../PROJECT.md). Earlier staff-exit requirements are historical.
 
 - Owner: cc100053 (implemented by Claude Code)
-- Status: IN_PROGRESS (implemented and verified locally; not integrated)
+- Status: DONE (integrated; current lifecycle supersedes dated staff-exit requirements)
 - Branch: `feat/exhibition-lifecycle`
 - Base commit: `eaf230e80babb66cc04f0e99e7da4ec5ee4ebd68` (origin/main on 2026-09-29)
 - Last verified commit: `0586ed0` (local checks ran on the identical pre-commit tree; feature CI passed on the commit)
-- Remote availability: `origin/feat/exhibition-lifecycle` at `0586ed0`
+- Remote availability: task branch retired; `0586ed0` is reachable from `origin/main`.
 
-## Session Git state
+## Original session Git state (historical)
 
 - Session starting branch and HEAD: `codex/exhibition-s3` at `d51167b` in `/Users/fatboy/city2127`, with uncommitted S3 work (docs, `src/siteBuilders/*`, tests) and untracked `artifacts/future-s3-*.png`. That work was left untouched; this task uses a separate worktree `../city2127-lifecycle` created from `origin/main`.
 - Last fetched origin/main commit: `eaf230e`, fetched 2026-09-29.
 - Upstream integration status: NOT INTEGRATED. S3 (`d51167b`) is not on main; this branch does not touch root `src/`, so no overlap is expected.
-- Pending Git conflicts: NONE known. `AGENTS.md`, `docs/PROJECT.md`, `docs/VALIDATION.md` and `docs/EXHIBITION_MVP.md` are also edited by the uncommitted S3 work; expect small documentation merges.
+- Pending Git conflicts: NONE known. `AGENTS.md`, `docs/PROJECT.md`, `docs/VALIDATION.md` and `docs/EXHIBITION_SPEC.md` are also edited by the uncommitted S3 work; expect small documentation merges.
 
 ## Goal and acceptance criteria
 
@@ -35,7 +37,7 @@ A guest never sees the city reset. Completing the questionnaire is not the same 
 
 ## Actual validation results
 
-See [VALIDATION](../VALIDATION.md#exhibition-lifecycle-and-admin-reset--2026-09-29). Survey `npm test`/`npm run build` and `git diff --check` passed; headless admin-page flow passed on a scratch DB. [Feature CI](https://github.com/cc100053/city2127/actions/runs/36587708136) passed on `0586ed0`.
+See [VALIDATION](../history/VALIDATION_2026-10-02.md#exhibition-lifecycle-and-admin-reset--2026-09-29). Survey `npm test`/`npm run build` and `git diff --check` passed; headless admin-page flow passed on a scratch DB. [Feature CI](https://github.com/cc100053/city2127/actions/runs/36587708136) passed on `0586ed0`.
 
 ## Known issues and blockers
 
@@ -50,6 +52,6 @@ See [VALIDATION](../VALIDATION.md#exhibition-lifecycle-and-admin-reset--2026-09-
 - One `pending_reset` enum instead of flags so precedence is unambiguous.
 - A reset requested in `ready` runs immediately: `ready` is only reached through a staff exit confirmation.
 
-## Next expected step
+## Original next expected step (superseded)
 
 Owner reviews the pushed branch, then integrates per [CONTRIBUTING](../CONTRIBUTING.md). S4 wires the guest UI to `lifecycle_blocked`.

@@ -1,5 +1,7 @@
 # exhibition-s1 — four-question server and compatibility gate
 
+> Stage history — 2026-10-02: retain the original implementation/validation scope below. Current Odaiba behavior is in [EXHIBITION_SPEC](../EXHIBITION_SPEC.md); Shibuya will not be developed again. Historical resume/next-step instructions do not create a new assignment.
+
 - Owner: Codex (Astra coordination/review; Luna Max implementation/testing)
 - Status: DONE — S1 is implemented, integrated and validated; next stage is S2
 - Branch: `codex/exhibition-s1`
@@ -18,13 +20,13 @@
 
 ## Goal and acceptance criteria
 
-Implement S1 of [the exhibition plan](../EXHIBITION_MVP.md): a versioned four-question proposal flow, deterministic four-axis accumulation, durable v2 runs/events/snapshots and explicit rejection by v1 viewers. A v2 frame must never be silently applied as v1. Preserve legacy history and standalone/demo behavior. This stage does not render the new layout in the city or add the final guest UI.
+Implement S1 of [the exhibition plan](../EXHIBITION_SPEC.md): a versioned four-question proposal flow, deterministic four-axis accumulation, durable v2 runs/events/snapshots and explicit rejection by v1 viewers. A v2 frame must never be silently applied as v1. Preserve legacy history and standalone/demo behavior. This stage does not render the new layout in the city or add the final guest UI.
 
 ## In-scope files and dependencies
 
 - Survey server and shared rules: `survey/src/server/`, `survey/src/shared/`, `survey/src/survey/`, `survey/src/ui/`; question set `survey/src/survey/questions.exhibition.json`; tests under `survey/tests/` and the `survey/package.json` test script.
 - Viewer compatibility: `src/surveyView.ts`, `tests/surveyAtmosphere.test.ts`, `module-swap/app/src/state/surveyView.ts`, and `module-swap/app/tests/surveyView.test.ts`.
-- Documentation sync: `AGENTS.md`, `README.md`, `docs/EXHIBITION_MVP.md`, `docs/PLAN02.md`, `docs/PROJECT.md`, `docs/VALIDATION.md`, this handoff and the superseding note in [the planning handoff](exhibition-mvp-plan.md).
+- Documentation sync: `AGENTS.md`, `README.md`, `docs/EXHIBITION_SPEC.md`, `docs/history/SHIBUYA_PLAN02.md`, `docs/PROJECT.md`, `docs/VALIDATION.md`, this handoff and the superseding note in [the planning handoff](exhibition-mvp-plan.md).
 - Excluded: root v2 site rendering (S2/S3), the four-question guest UI (S4), deployment, real exhibition hardware and performance tuning. No dependency was added.
 
 ## Completed work

@@ -1,13 +1,15 @@
 # Survey tests and development auto-answer
 
+> Closure correction — 2026-10-02: Integrated as `fb83f87` (task `03382c2`, branch CI 36703009527 passed). Original task branch retired; the historical record did not pin main CI, so this note claims no new main CI result. Single automatic handoff supersedes old DEV staff-exit copy.
+
 - Owner: Codex
-- Status: IMPLEMENTED; user authorized branch publication and main integration (2026-09-30)
+- Status: DONE (integrated `fb83f87`; DEV-only exhibition removal remains)
 - Branch: codex/survey-auto-tests
 - Base commit: b97f859e0ddee679302f08d571f9e1187888d925
 - Last verified commit: task commit on `codex/survey-auto-tests` (see Integration below)
-- Remote availability: pushed to `origin/codex/survey-auto-tests` (see Integration below)
+- Remote availability: task branch retired; `03382c2` / integration `fb83f87` remain in origin/main.
 
-## Session Git state
+## Original session Git state (historical)
 
 - Starting branch/HEAD: clean main at b97f859e0ddee679302f08d571f9e1187888d925.
 - HTTPS fetch succeeded 2026-09-30; origin/main is the same commit (0 ahead / 0 behind). SSH was unresponsive in the prior session; origin URL is preserved.
@@ -35,14 +37,14 @@ Keep the four-axis v2 product contract. Generic test helpers iterate descriptors
 ## Actual validation — 2026-09-30
 
 - Root `npm test` / `npm run build`, survey `npm test` / `npm run build` and `git diff --check`: PASSED on final code worktree. Node 24.21.0; existing root chunk warning only. `module-swap/` unchanged locally; CI still checks it.
-- Browser script `tests/surveyAuto.browser.mjs`: PASSED on scratch 8790 + Vite 5173, headless installed Chrome, 1280×720 DPR 1, held noon, real GLBs. Eight automatic proposals (high 2/low 4/mixed 2) reached matching actual-model diagnostics and final exits; cancellation then manual #9; response lost after committing #10, stopped runner, reload/same-ID recovery counted once, batch idle; city reload restored models; no page exceptions. Four screenshots were inspected; links/results in [VALIDATION](../VALIDATION.md#survey-meter-tests-and-development-auto-answer--2026-09-30).
+- Browser script `tests/surveyAuto.browser.mjs`: PASSED on scratch 8790 + Vite 5173, headless installed Chrome, 1280×720 DPR 1, held noon, real GLBs. Eight automatic proposals (high 2/low 4/mixed 2) reached matching actual-model diagnostics and final exits; cancellation then manual #9; response lost after committing #10, stopped runner, reload/same-ID recovery counted once, batch idle; city reload restored models; no page exceptions. Four screenshots were inspected; links/results in [VALIDATION](../history/VALIDATION_2026-10-02.md#survey-meter-tests-and-development-auto-answer--2026-09-30).
 - Initial scratch 8788 six-proposal check also passed, superseded by full 8790 run. Retained DB paths: `/var/folders/wr/db1pm2v16jd73h5fn6sj6fh00000gn/T/city2127-auto-vSQzFt/survey.sqlite` (initial) and `city2127-auto-90d0Kp/survey.sqlite` (full run); no exhibition DB touched.
 - No Windows, exhibition hardware, FPS or endurance verification. Generic tests do not by themselves extend the four-axis production protocol. Node mesh tests keep external detailed GLB loading pending and verify the real fallback runtime; browser uses actual models.
 - Final diff/new files reviewed, `git diff --check` and 378 local Markdown link targets passed. HEAD remains the task base; index empty, all task changes uncommitted. Remote main comparison remains 0/0. No commit, push or merge was performed.
 
 - User manual browser test (2026-09-30, headed Brave, scratch 8788 + Vite 5173): after clearing the open draft via Admin, automatic batches reached the city and the Guest panel/root feedback showed parameters; the user confirmed it works. Panel now also tells testers to use Admin (/admin) for guest exit and city reset (text only, no new controls, by user decision).
 
-## Remaining verification and next step
+## Original remaining verification and next step (superseded)
 
 User authorized branch → CI → `--no-ff` main integration on 2026-09-30 (not a direct main commit). Remove/move DEV-ONLY tooling before exhibition; keep reusable tests.
 

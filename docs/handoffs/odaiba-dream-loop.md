@@ -1,7 +1,9 @@
 # Odaiba Dream Loop — 2026-09-30
 
+> Closure correction — 2026-10-02: Integrated into main as `e3185b3`; original task branch retired. Target-not-reached remains a visual limitation, not an integration blocker still awaiting the old branch.
+
 - Owner: Codex; sequential Dream Loop workers share this task's runtime ownership.
-- Branch: `feat/art-direction`; resume the existing Odaiba art work, no main integration before human art review.
+- Branch: retired `feat/art-direction`; integrated `e3185b3`. Earlier resume/approval instructions below are historical.
 - Base: `102b6bbc16bc2bf60375da1b79cd5990a77d7ef7`.
 - Preflight: repository confirmed, origin fetched; HEAD/upstream divergence 0/0. `origin/main` is `b97f859`, an ancestor three commits behind this art branch. Unrelated untracked `.claude/launch.json` preserved.
 - Prior handoff: [Odaiba art direction 01](odaiba-art-direction-01.md), verified implementation `274167e`, available remotely and contained in this base. This new user request authorizes continuation beyond its one-pass stopping point.
