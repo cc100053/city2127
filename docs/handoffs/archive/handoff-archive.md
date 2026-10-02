@@ -1,11 +1,11 @@
 # handoff-archive — 整理現行交接與歸檔
 
 - Owner: Codex（文件整理；產品決策owner cc100053）
-- Status: IN_PROGRESS — 文件整理及本地檢查完成；Git整合／發布待執行
+- Status: DONE — 文件整理及main本地整合已完成；發布後main CI於本次最終回覆記錄
 - Branch: `codex/handoff-archive`
 - Base commit: `92a97c117b06cd76adb1e293374a39c1ef3f45a5`
-- Last verified commit: 上述base＋本次文件／路徑搬移delta；2026-10-03本地檢查PASS
-- Remote availability: 本次任務尚未推送；既有任務的完成實作均保留在origin/main，素材研究分支另行保留
+- Last verified commit: `4d0ba709560f2716ab9a49f511d61a5d03b98185`（整合tree等同feature `62ebcfb79ac6758f4f9d4d82809456aacbe90efe`）；本交接closure為文件metadata差異，另檢links／whitespace
+- Remote availability: feature `62ebcfb79ac6758f4f9d4d82809456aacbe90efe` 已在 `origin/codex/handoff-archive`；main整合與本交接closure一起發布，最終remote HEAD／CI於任務回覆核對。素材研究分支另行保留
 
 ## Session Git state
 
@@ -28,10 +28,12 @@
 - PASS：已搬移舊路徑全文搜尋、完整diff／新文件自審、`git diff --check`；stage／committed檢查按[Git workflow](../../CONTRIBUTING.md)執行。
 - 本機npm tests/build/browser：NOT RUN，只有文件及既有證據搬移，無runtime／model內容改動；push CI仍須通過。
 - 起始main [CI37016236163](https://github.com/cc100053/city2127/actions/runs/37016236163) PASS；不作本次改動或P5實機證據。
-- Integrated commit/checks: NOT INTEGRATED；feature/main CI尚未執行，不預稱PASS。
+- PASS：feature [CI37034484051](https://github.com/cc100053/city2127/actions/runs/37034484051) 在 `62ebcfb79ac6758f4f9d4d82809456aacbe90efe` 完成，Node24 root／survey／module-swap tests/build及whitespace全部通過。
+- PASS：2026-10-03再次fetch，main／origin-main仍0/0，乾淨tree；no-ff整合 `4d0ba709560f2716ab9a49f511d61a5d03b98185` 無衝突，tree等同已通過CI的feature；78份Markdown／1,183個本地target／anchor及 `git diff --check origin/main..HEAD` 再查PASS。
+- Changes since integrated verification: 只更新本交接status／source與integration／實際CI結果；closure links及staged／committed whitespace另查。Main CI於push後核對，未在此預稱PASS。
 
 ## Known limits and next expected step
 
 P6/S5、P5實機／理解程度／長跑／復原政策、台場素材研究及延後視覺目標均仍未完成。Shibuya已結束，歸檔不建立新backlog。PROJECT／SPEC／ART等僅需路徑修正，source map／產品契約／視覺規則沒有改變。
 
-下一步Codex發布feature、確認該commit CI，按workflow整合main、重查文件／圖片保存及committed whitespace，記錄整合結果並發布main；最後核對remote main與實際main CI。
+文件整理沒有未完成實作。Codex發布整合與本closure後，核對remote main及實際main CI；其後產品工作從現行四項交接接續，不能據歸檔歷史重開任務。
