@@ -1,5 +1,7 @@
 # odaiba-assets - Odaiba Plan building asset stage
 
+> 現行接續核對 — 2026-10-03：素材研究仍為 IN_PROGRESS；`origin/feat/odaiba-assets-progress-02` 最新可用 SHA 為 `40d696e09f5d119a3ba6aff72c19d935c8838333`。舊場地／runtime未整合敘述是原素材階段歷史；台場已是唯一展覽城市，runtime匯入已完成。素材owner cc100053確認後才接續來源素材，不能據舊下一步重開Shibuya。
+
 > Closure correction — 2026-10-02: Venue runtime uses imported assets through `e6c7966`; this does not close the separate asset-study task. Asset commits were imported path-wise, not merged into main ancestry. Source branch `origin/feat/odaiba-assets-progress-02` remains available at review. See [venue](odaiba-venue.md); coordinate with asset owner before source edits.
 
 - Owner: cc100053

@@ -4,7 +4,7 @@
 
 Use one survey server on the trusted LAN. Open `http://<exhibition-PC LAN IP>:8787/guest?station=A` on one device and `http://<exhibition-PC LAN IP>:8787/guest?station=B` on the other. Use only one page per station; each station admits one active experience. Bind the survey server with `SURVEY_HOST=0.0.0.0` (PowerShell: `$env:SURVEY_HOST='0.0.0.0'`). Each station has its own four-question draft/result/handoff; submissions accumulate in server arrival order and retries count once. Live City results reserve ten-second reading slots with three-second transitions and proposal/station labels. City reconnect restores the latest snapshot immediately. The existing `/guest` single-station flow remains; do not mix it with active A/B experiences.
 
-A/B reset stops new starts and waits for both experiences, including results/handoffs. Admin can end only the named unfinished station. Disconnected questionnaires expire after five minutes; submitted result leases finish 15 seconds after their scheduled display (retry resumes the remaining slot without renewing the lease). Rebuild/restart survey and refresh Guest/City/Admin; schema 7 preserves existing data. See [handoff](docs/handoffs/two-guest-devices.md).
+A/B reset stops new starts and waits for both experiences, including results/handoffs. Admin can end only the named unfinished station. Disconnected questionnaires expire after five minutes; submitted result leases finish 15 seconds after their scheduled display (retry resumes the remaining slot without renewing the lease). Rebuild/restart survey and refresh Guest/City/Admin; schema 7 preserves existing data. See [handoff](docs/handoffs/archive/two-guest-devices.md).
 
 **Language:** [繁體中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
 
@@ -86,7 +86,7 @@ npm run dev -- --host 0.0.0.0 --port 5173
 
 Both ports must be reachable. Admin stays restricted to localhost on the server computer. The guest endpoint has no authentication, so use a trusted exhibition LAN. If the survey server instead runs on port 8790, for example, open `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8790/ws` for the city (replace the host for LAN access).
 
-To view the standalone city without survey state, open `http://127.0.0.1:5173/`; Tab 1 is unnecessary in that mode. For the older v1 module-swap demo, see its [handoff](docs/handoffs/causal-city-mvp.md); it is not the exhibition city.
+To view the standalone city without survey state, open `http://127.0.0.1:5173/`; Tab 1 is unnecessary in that mode. For the older v1 module-swap demo, see its [handoff](docs/handoffs/archive/causal-city-mvp.md); it is not the exhibition city.
 
 ## Current direction
 
@@ -95,10 +95,10 @@ Odaiba is the only exhibition venue. Shibuya is a closed historical decision and
 ## Project references
 
 - [Agent workflow](AGENTS.md), [Git workflow](docs/CONTRIBUTING.md), [architecture](docs/PROJECT.md), and [validation](docs/VALIDATION.md).
-- [Current exhibition specification](docs/EXHIBITION_SPEC.md) and [S4 handoff](docs/handoffs/exhibition-s4.md) document the current contract and dated S4 evidence respectively.
+- [Current exhibition specification](docs/EXHIBITION_SPEC.md) and [S4 handoff](docs/handoffs/archive/exhibition-s4.md) document the current contract and dated S4 evidence respectively.
 - [Document index](docs/README.md) separates current rules from archived plans and task evidence; [visual direction](docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) and [runtime art rules](docs/ART.md) guide Odaiba changes.
 - The [Traditional Chinese README](README.md) also describes DEV-only review tools. Module-swap rejects current v2 CityViews; use the root city for the exhibition.
 
-Resident P2 (2026-10-02): rebuild/restart survey and refresh Guest/City. Questions now use resident daily-life copy; review remains before submission. Guest results show save/wait status, station/voice ordinal and a look-up prompt; City shows background/current facilities and a conservative recorded message. Question-set version3 preserves SQLite and stored answer text. Use 「新しい予約で草稿を続ける」 for old drafts; A/B releases its own obsolete reservation and carries valid choices forward. Existing3s transitions/display spacing and result10s/handoff5s remain; coordinated reading slots and causal explanations are P3. See [P2 handoff](docs/handoffs/resident-experience-p2.md).
+Resident P2 (2026-10-02): rebuild/restart survey and refresh Guest/City. Questions now use resident daily-life copy; review remains before submission. Guest results show save/wait status, station/voice ordinal and a look-up prompt; City shows background/current facilities and a conservative recorded message. Question-set version3 preserves SQLite and stored answer text. Use 「新しい予約で草稿を続ける」 for old drafts; A/B releases its own obsolete reservation and carries valid choices forward. Existing3s transitions/display spacing and result10s/handoff5s remain; coordinated reading slots and causal explanations are P3. See [P2 handoff](docs/handoffs/archive/resident-experience-p2.md).
 
-Resident P3 (2026-10-02) supersedes P2 timing: rebuild/restart survey and refresh Guest/City. Each proposal reserves 10s (identity/place and 3s transition, then selected preference plus actual collective configuration). A/B results stay ordered; early handoff/reset/retry cannot truncate or renew the slot. Renderer carrier evidence includes distribution and visible pairings; local increases never imply more population. Reconnect/Undo/reduced motion restore immediately; lighting preserves valid displays. [P3 handoff](docs/handoffs/resident-experience-p3.md); P4/P5 acceptance remains open.
+Resident P3 (2026-10-02) supersedes P2 timing: rebuild/restart survey and refresh Guest/City. Each proposal reserves 10s (identity/place and 3s transition, then selected preference plus actual collective configuration). A/B results stay ordered; early handoff/reset/retry cannot truncate or renew the slot. Renderer carrier evidence includes distribution and visible pairings; local increases never imply more population. Reconnect/Undo/reduced motion restore immediately; lighting preserves valid displays. [P3 handoff](docs/handoffs/archive/resident-experience-p3.md); P4/P5 acceptance remains open.

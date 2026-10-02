@@ -1,13 +1,13 @@
 # survey-state-mvp — アンケート状態管理 MVP 開発ログ
 
-> Archived original schema-1 implementation log (2026-09-23). Its uncommitted/push statements describe that source handoff, not current repository status. See [repo import handoff](../../../docs/handoffs/survey-state-mvp.md) and [current survey guide](../../README.md).
+> Archived original schema-1 implementation log (2026-09-23). Its uncommitted/push statements describe that source handoff, not current repository status. See [repo import handoff](../../../docs/handoffs/archive/survey-state-mvp.md) and [current survey guide](../../README.md).
 
-このパッケージ自身の開発ログです。city2127 のタスク handoff ではありません（そちらはリポジトリrootの `docs/handoffs/survey-state-mvp.md`）。構成は `city2127` の handoff テンプレートを流用しています。
+このパッケージ自身の開発ログです。city2127 のタスク handoff ではありません（そちらはリポジトリrootの `docs/handoffs/archive/survey-state-mvp.md`）。構成は `city2127` の handoff テンプレートを流用しています。
 
 - Owner: Claude (Claude Code session, 2026-09-23)。人の担当者はまだ決まっていません
 - Status: DONE（実装と検証は完了、未コミット）
 - Location: このパッケージのroot（制作フォルダーでは `exhibition-questionnaire`、city2127 では `survey/`）
-- Branch / Base commit / Last verified commit: なし。この作業は git リポジトリ外の制作フォルダーで行いました。city2127 へ取り込んだ後のブランチと base commit は、リポジトリrootの `docs/handoffs/survey-state-mvp.md` を参照してください
+- Branch / Base commit / Last verified commit: なし。この作業は git リポジトリ外の制作フォルダーで行いました。city2127 へ取り込んだ後のブランチと base commit は、リポジトリrootの `docs/handoffs/archive/survey-state-mvp.md` を参照してください
 - Remote availability: NOT PUSHED（remote なし）
 
 ## Session Git state

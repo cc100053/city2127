@@ -2,7 +2,7 @@
 
 Current implementation rules, checked 2026-10-02. [CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) is the visual/world authority; this file documents materials, batching, lighting and choice semantics. [PROJECT](PROJECT.md) maps the source. Owner: cc100053; documentation: Codex.
 
-Shibuya art passes and Pic 2 are historical references; their remaining work is closed. They are not a second visual target. See the [archived rules](history/SHIBUYA_ART.md) and original [art handoff](handoffs/art-direction.md) for dated evidence.
+Shibuya art passes and Pic 2 are historical references; their remaining work is closed. They are not a second visual target. See the [archived rules](history/SHIBUYA_ART.md) and original [art handoff](handoffs/archive/art-direction.md) for dated evidence.
 
 ## Palette and material roles
 
@@ -43,4 +43,4 @@ Batch static geometry by material; use InstancedMesh for repeated/moving pieces.
 
 Check future identity, readable low/mixed/high differences, complete hybrid states, public access/support, site visibility, night readability, 3 s retargeting, immediate recovery and route clearance. Performance must be measured on stated hardware; old Shibuya captures are not current evidence.
 
-Odaiba visual history: [first civic pass](handoffs/odaiba-art-direction-01.md), [Dream Loop](handoffs/odaiba-dream-loop.md), [second target](handoffs/odaiba-dream-loop-2.md), [hero district/backdrop](handoffs/odaiba-district.md), [Meter variety](handoffs/meter-variety.md). Integration does not prove a previously unmet generated target was reached. Current procedures and dated evidence index: [VALIDATION](VALIDATION.md).
+Odaiba visual history: [first civic pass](handoffs/archive/odaiba-art-direction-01.md), [Dream Loop](handoffs/archive/odaiba-dream-loop.md), [second target](handoffs/odaiba-dream-loop-2.md), [hero district/backdrop](handoffs/archive/odaiba-district.md), [Meter variety](handoffs/archive/meter-variety.md). Integration does not prove a previously unmet generated target was reached. Current procedures and dated evidence index: [VALIDATION](VALIDATION.md).

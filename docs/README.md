@@ -32,54 +32,7 @@
 
 ## 任務 handoffs
 
-標題／metadata 記錄各階段責任，不能單憑舊「下一步」重開任務。Shibuya 名稱只表示歷史來源；現行開發以 SPEC 為準。每 task 保留一份，不合成巨大交接。
-
-| Task | 題目 |
-| --- | --- |
-| [TEMPLATE](handoffs/TEMPLATE.md) | <Task ID> — <Title> |
-| [admin-day-night](handoffs/admin-day-night.md) | admin-day-night — Admin city lighting control |
-| [admin-japanese](handoffs/admin-japanese.md) | admin-japanese — Japanese admin UI |
-| [admin-undo](handoffs/admin-undo.md) | admin-undo — Staff-only latest-proposal Undo |
-| [art-direction](handoffs/art-direction.md) | art-direction — Art rules and a polished pilot area for the root Shibuya scene |
-| [automation-hub-upper-glb](handoffs/automation-hub-upper-glb.md) | automation-hub-upper — Stage 3 GLB site layer |
-| [blender-shibuya-pipeline](handoffs/blender-shibuya-pipeline.md) | Blender to Shibuya import channel |
-| [causal-city-mvp](handoffs/causal-city-mvp.md) | causal-city-mvp — Causal choice → policy → city change MVP |
-| [city-module-swap](handoffs/city-module-swap.md) | city-module-swap — Modular ground, lot and building swap package |
-| [docs-sync-post-mvp](handoffs/docs-sync-post-mvp.md) | docs-sync-post-mvp — Post-MVP documentation sync and package CI |
-| [exhibition-lifecycle](handoffs/exhibition-lifecycle.md) | exhibition-lifecycle — City lifecycle and admin reset workflow |
-| [exhibition-mvp-plan](handoffs/exhibition-mvp-plan.md) | exhibition-mvp-plan — 2127 baseline and agent implementation specification |
-| [exhibition-s1](handoffs/exhibition-s1.md) | exhibition-s1 — four-question server and compatibility gate |
-| [exhibition-s2](handoffs/exhibition-s2.md) | exhibition-s2 — Q3 climate vertical slice |
-| [exhibition-s3](handoffs/exhibition-s3.md) | exhibition-s3 — remaining root site mappings |
-| [exhibition-s4](handoffs/exhibition-s4.md) | Exhibition S4 — guest UI and root feedback |
-| [future-tree-2127](handoffs/future-tree-2127.md) | Future tree 2127 |
-| [meter-variety](handoffs/meter-variety.md) | meter-variety — Readable, district-wide Meter changes |
-| [night-lighting](handoffs/night-lighting.md) | night-lighting — Readable futuristic night city |
-| [odaiba-art-direction-01](handoffs/odaiba-art-direction-01.md) | Odaiba art direction 01 — Fuji civic chassis |
-| [odaiba-assets](handoffs/odaiba-assets.md) | odaiba-assets - Odaiba Plan building asset stage |
-| [odaiba-district](handoffs/odaiba-district.md) | Odaiba hero district — 2026-09-30 |
-| [odaiba-docs-consolidation](handoffs/odaiba-docs-consolidation.md) | odaiba-docs-consolidation — current Odaiba documents and closed Shibuya history |
-| [odaiba-dream-loop-2](handoffs/odaiba-dream-loop-2.md) | Odaiba Dream Loop r2 — 2026-10-01 |
-| [odaiba-dream-loop](handoffs/odaiba-dream-loop.md) | Odaiba Dream Loop — 2026-09-30 |
-| [odaiba-venue](handoffs/odaiba-venue.md) | odaiba-venue — Odaiba replaces Shibuya as the exhibition city |
-| [readme-localization](handoffs/readme-localization.md) | readme-localization — Three-language exhibition startup guide |
-| [resident-copy-p1](handoffs/resident-copy-p1.md) | resident-copy-p1 — Resident narrative and Japanese exhibition copy |
-| [resident-experience-plan](handoffs/resident-experience-plan.md) | resident-experience-plan — Two-screen resident experience planning |
-| [resident-experience-p2](handoffs/resident-experience-p2.md) | resident-experience-p2 — Resident copy and two-screen presentation |
-| [resident-experience-p3](handoffs/resident-experience-p3.md) | Actual carrier results and coordinated reading slots |
-| [resident-experience-p4](handoffs/resident-experience-p4.md) | Software and two-screen acceptance |
-| [resident-experience-p5](handoffs/resident-experience-p5.md) | 展場與實際裝置驗收；準備中，實機未測 |
-| [remove-guest-exit-lock](handoffs/remove-guest-exit-lock.md) | remove-guest-exit-lock — Automatic next-guest handoff |
-| [root-causal-panel](handoffs/root-causal-panel.md) | root-causal-panel — Causal panel in the root Shibuya survey mode (step 3) |
-| [root-survey-atmosphere](handoffs/root-survey-atmosphere.md) | root-survey-atmosphere — Survey drives the root Shibuya scene (steps 1–2) |
-| [shibuya-change-manager](handoffs/shibuya-change-manager.md) | shibuya-change-manager — Data-driven root-scene change sites, Stage 1 |
-| [shibuya-site-assets](handoffs/shibuya-site-assets.md) | shibuya-site-assets — Hybrid site asset boundary, Stage 2 |
-| [stage2-ci](handoffs/stage2-ci.md) | Stage 2 — Minimal CI |
-| [stage3-blender-standards](handoffs/stage3-blender-standards.md) | Stage 3 — Blender export and optimization standards |
-| [survey-auto-tests](handoffs/survey-auto-tests.md) | Survey tests and development auto-answer |
-| [survey-state-mvp](handoffs/survey-state-mvp.md) | survey-state-mvp — Questionnaire state accumulation MVP |
-| [two-guest-devices-docs](handoffs/two-guest-devices-docs.md) | two-guest-devices-docs — Complete A/B documentation sync |
-| [two-guest-devices](handoffs/two-guest-devices.md) | two-guest-devices — Concurrent A/B Guest stations |
+2026-10-03：交接目錄已分開 [現行任務](handoffs/README.md) 與 [已完成／已取代的歸檔](handoffs/archive/README.md)。現行保留台場素材、P6/S5、延後視覺polish及居民P5實機驗收；其餘39份交接保留原日期／commit／證據，舊下一步不重新建立任務。新任務用 [TEMPLATE](handoffs/TEMPLATE.md)。
 
 ## Repository skill
 

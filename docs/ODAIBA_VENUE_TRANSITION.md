@@ -1,6 +1,6 @@
 # Odaiba 2127 — venue transition plan (completed transition record)
 
-> 2026-10-02 operation update: the Odaiba venue is already integrated on main. Its four-question experience now supports two independent A/B devices on the same survey server, with ordered city displays and reset draining. This venue plan keeps its dated P0–P6 scope; current station operation and evidence are in the [dual-station handoff](handoffs/two-guest-devices.md).
+> 2026-10-02 operation update: the Odaiba venue is already integrated on main. Its four-question experience now supports two independent A/B devices on the same survey server, with ordered city displays and reset draining. This venue plan keeps its dated P0–P6 scope; current station operation and evidence are in the [dual-station handoff](handoffs/archive/two-guest-devices.md).
 
 - Status: P0–P5 INTEGRATED into main as `e6c7966` (2026-09-30); P6/S5 acceptance remains pending. Current behavior is in [EXHIBITION_SPEC](EXHIBITION_SPEC.md), not the original estimates below.
 - Drafted: 2026-09-30 against `main` `4bc1646`; Odaiba sources read from `origin/codex/odaiba-preview` `3a8a5f2` (contains all of `origin/feat/odaiba-assets-progress-02` `40d696e`).

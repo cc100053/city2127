@@ -4,7 +4,7 @@
 
 同じ信頼できる LAN の survey server に接続し、1台で `http://<展示PCのLAN IP>:8787/guest?station=A`、もう1台で `http://<展示PCのLAN IP>:8787/guest?station=B` を開きます。各ステーション同時1体験なので、同じステーションのページを複数開かないでください。server は `SURVEY_HOST=0.0.0.0`（PowerShell：`$env:SURVEY_HOST='0.0.0.0'`）で起動します。各ステーションの四問・草稿・結果・交代は独立し、提案は server の受信順に累積、再送は一度だけ加算します。Cityの結果は10秒以上の閲覧枠を予約し（都市転換は3秒）、提案番号と A/B を表示します。再接続は最新 snapshot に復元します。既存 `/guest` の単独モードは維持し、体験中の A/B と混在させないでください。
 
-A/B のリセットは新しい開始を停止し、両方の回答・結果・交代が終わるまで保留します。Admin は指定した未完了ステーションだけを終了できます。通信断の草稿は開始から5分、記録済みの結果は予定展示から15秒で解放されます（結果復元は元の枠の残り時間を接続し、租期は延長しません）。survey を build／再起動し Guest／City／Admin を更新してください。schema 7 は既存データを保持します。[handoff](docs/handoffs/two-guest-devices.md)を参照。
+A/B のリセットは新しい開始を停止し、両方の回答・結果・交代が終わるまで保留します。Admin は指定した未完了ステーションだけを終了できます。通信断の草稿は開始から5分、記録済みの結果は予定展示から15秒で解放されます（結果復元は元の枠の残り時間を接続し、租期は延長しません）。survey を build／再起動し Guest／City／Admin を更新してください。schema 7 は既存データを保持します。[handoff](docs/handoffs/archive/two-guest-devices.md)を参照。
 
 **言語：** [繁體中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
 
@@ -86,12 +86,12 @@ npm run dev -- --host 0.0.0.0 --port 5173
 
 両ポートに接続できる必要があります。Admin は引き続きサーバー PC の localhost 専用です。Guest には認証がないため、信頼できる展示 LAN で利用してください。例えばサーバーを 8790 番で動かす場合、街の URL は `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8790/ws` です（LAN ではホスト名も置き換えます）。
 
-アンケートに接続しない街の単独表示は `http://127.0.0.1:5173/` で開けます。この場合、タブ 1 は不要です。旧 v1 の module-swap デモは[引き継ぎ文書](docs/handoffs/causal-city-mvp.md)を参照してください。展示用の街ではありません。
+アンケートに接続しない街の単独表示は `http://127.0.0.1:5173/` で開けます。この場合、タブ 1 は不要です。旧 v1 の module-swap デモは[引き継ぎ文書](docs/handoffs/archive/causal-city-mvp.md)を参照してください。展示用の街ではありません。
 
 ## 関連文書
 
 - [Agent の作業手順](AGENTS.md)、[Git の運用](docs/CONTRIBUTING.md)、[構成](docs/PROJECT.md)、[検証](docs/VALIDATION.md)。
-- [現行展示仕様](docs/EXHIBITION_SPEC.md)と[S4 引き継ぎ](docs/handoffs/exhibition-s4.md)は、現行契約と当時の S4 検証記録をそれぞれ記載しています。
+- [現行展示仕様](docs/EXHIBITION_SPEC.md)と[S4 引き継ぎ](docs/handoffs/archive/exhibition-s4.md)は、現行契約と当時の S4 検証記録をそれぞれ記載しています。
 - [繁體中文 README](README.md)には DEV-only review tools の説明があります。過去の Plan 02 と証拠は文書索引の「歴史」を参照してください。
 
 ## 現在の方針
@@ -100,6 +100,6 @@ npm run dev -- --host 0.0.0.0 --port 5173
 
 資料の役割と過去の記録は[文書索引](docs/README.md)、視覚方針は[CITY MASTER TASTE](docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)、実装規則は[ART](docs/ART.md)を参照してください。`module-swap` は現行 v2 CityView を受け付けません。
 
-住民P2（2026-10-02）：surveyを再build／再起動し、Guest／Cityを更新してください。四つの問いを日常の希望に改め、確認は送信前に残しています。結果は保存／待機、ステーション／暮らしの声番号、街を見る案内のみ；Cityは背景／現在の施設と記録確認を表示します。Question-set version3でもSQLiteと保存済み回答の原文は保持します。旧草稿は「新しい予約で草稿を続ける」で有効な選択を引き継ぎます；A/Bは自分の旧予約を終了してから再予約します。3秒の変化／表示間隔、result10秒／handoff5秒は維持；閲覧枠と変化の理由はP3です。[P2引き継ぎ](docs/handoffs/resident-experience-p2.md)。
+住民P2（2026-10-02）：surveyを再build／再起動し、Guest／Cityを更新してください。四つの問いを日常の希望に改め、確認は送信前に残しています。結果は保存／待機、ステーション／暮らしの声番号、街を見る案内のみ；Cityは背景／現在の施設と記録確認を表示します。Question-set version3でもSQLiteと保存済み回答の原文は保持します。旧草稿は「新しい予約で草稿を続ける」で有効な選択を引き継ぎます；A/Bは自分の旧予約を終了してから再予約します。3秒の変化／表示間隔、result10秒／handoff5秒は維持；閲覧枠と変化の理由はP3です。[P2引き継ぎ](docs/handoffs/archive/resident-experience-p2.md)。
 
-住民P3（2026-10-02）はP2の表示間隔を更新します：surveyをbuild／再起動しGuest／Cityを更新。各回答に10秒の閲覧枠を予約（最初3秒は識別／場所／転換、残りは選んだ暮らしと街の実際の構成）。A/Bは順番を保持し、早い交代／reset／retryも元の枠を中断・延長しません。実際のcarrier配置と可視の組合せで説明し、局所の増加から街全体や人口を推論しません。再接続／Undo／reduced motionは即復元、照明は有効表示を保持。[P3引き継ぎ](docs/handoffs/resident-experience-p3.md)。P4／P5は未検証。
+住民P3（2026-10-02）はP2の表示間隔を更新します：surveyをbuild／再起動しGuest／Cityを更新。各回答に10秒の閲覧枠を予約（最初3秒は識別／場所／転換、残りは選んだ暮らしと街の実際の構成）。A/Bは順番を保持し、早い交代／reset／retryも元の枠を中断・延長しません。実際のcarrier配置と可視の組合せで説明し、局所の増加から街全体や人口を推論しません。再接続／Undo／reduced motionは即復元、照明は有効表示を保持。[P3引き継ぎ](docs/handoffs/archive/resident-experience-p3.md)。P4／P5は未検証。
