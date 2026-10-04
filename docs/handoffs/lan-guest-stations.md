@@ -1,7 +1,7 @@
 # lan-guest-stations — 兩部 iPad 經 LAN 開 Guest A／B
 
 - Owner: cc100053（軟件細修：Claude Code session）
-- Status: IN_PROGRESS — 軟件細修已驗證；router／iPad 現場設定及實機 NOT RUN
+- Status: IN_PROGRESS — 軟件已整合；單機 station A 經 LAN PASS；第二部裝置測試延後
 - Branch: `feat/lan-guest-stations`
 - Base commit: `4edf90a97fde8ce0396cf1a637503ebb708aa3a0`
 - Last verified commit: `a96b61c59bf4dfbb2da9504ab7a7044214b2d904`（本機 checks＋branch CI PASS）；之後只有本交接 metadata
@@ -82,6 +82,8 @@ LAN 冇 guest 身分驗證，所以只用自己控制嘅 router；場館 Wi-Fi �
 - 內置 browser（Chromium）以 LAN IP 開 `station=A`，viewport 1180×820：頁面渲染「ステーション A」，computed `touch-action: manipulation`。唔代表 iPad Safari／觸控已測。
 - Branch CI [37172173768](https://github.com/cc100053/city2127/actions/runs/37172173768) PASS on `a96b61c`。整合後 main CI 結果喺發布回覆提供，唔預先宣稱。
 - Hardware／Safari／Wi-Fi 中斷／長跑：NOT RUN。
+
+- 2026-10-04 單機現場試（main `2fdb1f9`）：L0 用現有 TP-Link Archer AX3000（fw 1.1.3）；Mac Wi-Fi 私人地址設「固定」，使用者自行喺 router 設 DHCP 預約 `192.168.0.215`（我未能睇到 router 設定核實）。一部輸入裝置經 LAN 完成 station A 一份提案，scratch DB 1 份提交、無重複。B／雙機／瞓機 NOT RUN：暫時只有一部裝置，使用者決定延後。
 
 ## Known issues and blockers
 
