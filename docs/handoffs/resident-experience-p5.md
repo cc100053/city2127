@@ -32,7 +32,7 @@
 | 觀看距離 | 預計約4米；實際站位、輸入裝置高度／角度、燈光／反光待測 |
 | 輸入裝置／模式 | 預計兩部iPad接收主機畫面、A/B；型號、尺寸、iPadOS、主機Guest browser版本、各站橫向CSS viewport／縮放待提供 |
 | 運行電腦 | 使用者提供「Mac mini M6」作預計主機；實際型號／OS／CPU／GPU／Node版本尚未核驗 |
-| 裝置連接／LAN | 使用者已確認主機直接輸出畫面到兩部iPad；採用哪種軟件／接線、雙路獨立畫面及觸控回傳待核驗。現行LAN Guest模式不是使用者選定方案 |
+| 裝置連接／LAN | 2026-10-04 使用者改選：兩部iPad用Safari經專用router LAN開 `/guest?station=A`／`B`，City留主機HDMI；取代早前「主機直接輸出畫面到iPad」方案。設定步驟見 [LAN雙站](lan-guest-stations.md) |
 | 現場操作人／日期／場所 | 待指定 |
 | 被測完整commit／工作樹差異 | 待提供；文件base不等於實機已驗commit |
 | 測試資料／URL | 獨立scratch SQLite路徑／runId、Guest A/B、City WebSocket、Admin loopback URL待記錄 |
@@ -40,14 +40,14 @@
 
 ## 實機操作與驗收表
 
-1. 先完成D0，記錄實際輸出方案、軟件版本及接線。不自行將iPad改為LAN browser，也不新增顯示驅動／第三方服務。依README build／啟動並記錄實際ports；若Guest browser都運行於主機，server／Vite可維持loopback，兩個獨立Guest視窗分別開 `/guest?station=A` 和 `/guest?station=B`，City視窗放HDMI主屏。測試server用 `SURVEY_DB_PATH` 指定獨立scratch SQLite；Admin始終使用host localhost。不使用展覽DB做reset／Undo演練，也不依賴DEV-ONLY自動答題。
+1. 先完成D0：按 [LAN雙站](lan-guest-stations.md) 設定router及iPad，記錄軟件版本及接線。不新增顯示驅動／第三方服務。依README build；survey server用 `SURVEY_HOST=0.0.0.0` 並抄下terminal印出嘅 `LAN Guest:` A／B網址，Vite維持loopback，City視窗放HDMI主屏。（2026-10-04前此步驟寫「主機直接輸出畫面到iPad」，已由使用者改選LAN取代。）測試server用 `SURVEY_DB_PATH` 指定獨立scratch SQLite；Admin始終使用host localhost。不使用展覽DB做reset／Undo演練，也不依賴DEV-ONLY自動答題。
 2. 在指定橫向iPad、65吋HDMI主屏與約4米站位逐項執行。睡眠、斷網、租期及長跑使用真實時間，不以P4 clock jumps或Chromium觸控模擬當實機證據。
 3. 訪談先記錄原話，再解釋設計。實測需要縮短文案時同步 [P1 copy](../RESIDENT_COPY.md) 與正式callers；先縮句。如仍需改10秒時段，同步server排程、Guest、lease／guard／drain並重新驗證。
 4. 由展覽owner確認復原政策，現場操作人演練並留下結果；完成相關修正／checks／新證據後才關閉P5。
 
 | ID／檢查 | 通過條件 | 結果／證據 |
 | --- | --- | --- |
-| D0 雙iPad直接輸出／觸控回傳 | HDMI City及兩個不同Guest A/B畫面同時維持；兩位同時觸控只操作自己的視窗／站號，不搶另一站或Admin焦點；重連後站號／視窗配置仍正確 | NOT RUN；輸出方案未選定，後續實機流程的前提 |
+| D0 雙iPad LAN接駁 | HDMI City及兩部iPad Guest A/B同時維持；各自只操作自己站號；iPad瞓機／重連後站號仍正確 | NOT RUN；方案已選LAN（2026-10-04），待router及iPad |
 | D1 iPad觸控／焦點／核對修改 | 選項、返回、下一題、修改、提交可用；選取／焦點清楚；題目與操作可達 | NOT RUN |
 | D2 約4米可讀性／抬頭／反光 | 正常站位可讀Guest及City；找到自己的站號／編號及變化位置，城市仍可觀看 | NOT RUN |
 | D3 單站／下一位 | 四題只累積一次；Guest／City識別一致；下一Start自動交接並繼承城市 | NOT RUN |

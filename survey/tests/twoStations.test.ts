@@ -6,6 +6,7 @@ import type { ProposalData, ProposalSessionData, ServerEvent } from '../src/shar
 import { currentState, currentView } from '../src/server/answerService.ts';
 import { currentRun, lifecycleCommand, readLifecycle, settleStations } from '../src/server/adminService.ts';
 import { createProposalSession, endStationSession, submitProposal } from '../src/server/proposalService.ts';
+import { lanGuestUrls } from '../src/server/server.ts';
 import { errorCode, exhibitionFixture, ok, staff, startServer } from './surveyFixture.ts';
 
 const dir = mkdtempSync(join(tmpdir(), 'city2127-two-stations-'));
@@ -112,3 +113,10 @@ try {
   } finally { socket.close(); await server.close(); }
   console.log('PASS: concurrent A/B, latest-state accumulation, station capacity, retries/recovery/restart, targeted Admin cancellation, atomic rollback, reset draining/expiry and real parallel HTTP/WebSocket.');
 } finally { ctx.db.close(); rmSync(dir, { recursive: true, force: true }); }
+
+const nic = (address: string, internal = false, family: 'IPv4' | 'IPv6' = 'IPv4') => ({ address, internal, family, netmask: '', mac: '', cidr: null }) as import('node:os').NetworkInterfaceInfo;
+assert.deepEqual(lanGuestUrls('127.0.0.1', 8787, { en0: [nic('192.168.8.10')] }), [], 'loopback server prints no LAN URLs');
+assert.deepEqual(lanGuestUrls('0.0.0.0', 8787, { lo0: [nic('127.0.0.1', true)], en0: [nic('fe80::1', false, 'IPv6'), nic('192.168.8.10')] }),
+  ['http://192.168.8.10:8787/guest?station=A', 'http://192.168.8.10:8787/guest?station=B'], 'external IPv4 only');
+assert.deepEqual(lanGuestUrls('192.168.8.10', 8790, {}), ['http://192.168.8.10:8790/guest?station=A', 'http://192.168.8.10:8790/guest?station=B']);
+console.log('PASS: LAN Guest A/B URLs.');
