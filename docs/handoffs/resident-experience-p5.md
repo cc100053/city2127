@@ -47,7 +47,7 @@
 
 | ID／檢查 | 通過條件 | 結果／證據 |
 | --- | --- | --- |
-| D0 雙iPad LAN接駁 | HDMI City及兩部iPad Guest A/B同時維持；各自只操作自己站號；iPad瞓機／重連後站號仍正確 | NOT RUN；方案已選LAN（2026-10-04），待router及iPad |
+| D0 雙iPad LAN接駁 | HDMI City及兩部iPad Guest A/B同時維持；各自只操作自己站號；iPad瞓機／重連後站號仍正確 | PARTIAL（2026-10-04，main `2fdb1f9`）：TP-Link Archer AX3000 Wi-Fi，Mac Wi-Fi `192.168.0.215`（私人地址固定＋router DHCP預約，由使用者設定）；一部輸入裝置（型號未記錄）經LAN開station A完成一份提案，scratch DB記錄1份A提交、無重複、正常交接，City `?survey`接收。Station B、雙機同時及瞓機NOT RUN（暫時只有一部裝置）。測試router係屋企網絡，唔係展覽專用router |
 | D1 iPad觸控／焦點／核對修改 | 選項、返回、下一題、修改、提交可用；選取／焦點清楚；題目與操作可達 | NOT RUN |
 | D2 約4米可讀性／抬頭／反光 | 正常站位可讀Guest及City；找到自己的站號／編號及變化位置，城市仍可觀看 | NOT RUN |
 | D3 單站／下一位 | 四題只累積一次；Guest／City識別一致；下一Start自動交接並繼承城市 | NOT RUN |
