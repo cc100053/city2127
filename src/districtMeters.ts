@@ -74,11 +74,12 @@ export class SlotLevels {
 
 /** P5: each Meter's change-moment colour (the visual language of its district layer). */
 export const METER_COLORS = { automation: '#3fa9ff', publicSharing: '#ff6f91', environmentalPriority: '#5fe08a', urbanConcentration: '#ffb347' } as const;
-export type PulsePoint = { x: number; y: number; z: number; r: number };
+/** `focus`: the Meter's site anchor, the one place a change is read from; other changed slots only ring faintly. */
+export type PulsePoint = { x: number; y: number; z: number; r: number; focus?: boolean };
 export const PULSE_SECONDS = 3, PULSE_WAVES = 2, PULSE_WAVE_GAP = 1.2;
 
-/** A live change marks where it happened: each changed slot (and the Meter's site) sends two expanding light rings with a fading
- * light shaft, in the Meter's colour. Additive and unlit, so shared city materials never flash; snapshots and resets emit nothing. */
+/** A live change marks where it happened: each changed slot sends two faint expanding light rings and the Meter's site sends bright
+ * rings with a fading light shaft, in the Meter's colour. Additive and unlit, so shared city materials never flash; snapshots and resets emit nothing. */
 export class PulseRings {
   private readonly rings: T.InstancedMesh;
   private readonly beams: T.InstancedMesh;
@@ -125,9 +126,11 @@ export class PulseRings {
       this.rings.setMatrixAt(i, this.dummy.matrix);
       this.dummy.scale.set(p.r * .25, 40 + p.r * 2, p.r * .25); this.dummy.updateMatrix();
       this.beams.setMatrixAt(i, this.dummy.matrix);
-      this.tint.setRGB(glow * 2.2, glow * 2.2, glow * 2.2);
+      // Only the site carries a shaft, so a whole-district change still reads as one place per Meter.
+      const ring = glow * (p.focus ? 2.2 : .8);
+      this.tint.setRGB(ring, ring, ring);
       this.rings.setColorAt(i, this.tint);
-      this.tint.multiplyScalar(.35); this.beams.setColorAt(i, this.tint);
+      this.tint.multiplyScalar(p.focus ? .5 : 0); this.beams.setColorAt(i, this.tint);
     });
     for (const mesh of [this.rings, this.beams]) {
       mesh.count = this.pulses.length; mesh.instanceMatrix.needsUpdate = true;
@@ -139,7 +142,7 @@ export class PulseRings {
 /** The site's own anchor pulses with its district, tying the lot to the district-wide change. */
 const sitePulse = (socket: keyof typeof changeSites): PulsePoint => {
   const s = changeSites[socket];
-  return { x: s.x, y: 1, z: s.z, r: Math.max(s.w, s.d) * s.scale * .9 };
+  return { x: s.x, y: 1, z: s.z, r: Math.max(s.w, s.d) * s.scale * .9, focus: true };
 };
 
 /** Fixed pseudo-random rank per slot, so a share of slots switches in a scattered rather than end-to-end order. */

@@ -35,7 +35,7 @@ Glass reads through reflections by day and room bands by night. Civic light foll
 
 ## Change semantics and resources
 
-Live changes ease over 3 s and mark changed sites/slots with local pulses. Snapshot/reset/Undo/reconnect/reduced motion apply immediately without a pulse. Do not animate an upgrade from an old era. Preserve fixed footprints and complementary carrier coverage; late GLBs/roof publication must use the latest target/seed.
+Live changes ease over 3 s and mark changed sites/slots with local pulses: bright ring + shaft at the site, faint rings only at district slots. Snapshot/reset/Undo/reconnect/reduced motion apply immediately without a pulse. Do not animate an upgrade from an old era. Preserve fixed footprints and complementary carrier coverage; late GLBs/roof publication must use the latest target/seed.
 
 Batch static geometry by material; use InstancedMesh for repeated/moving pieces. Inactive batches draw nothing; hidden transforms stay invertible for G-buffer normals. Reuse cached GLBs/fallbacks and shared resources. Do not build geometry/materials per frame. Assets follow [BLENDER](BLENDER.md).
 
