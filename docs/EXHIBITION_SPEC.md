@@ -19,7 +19,7 @@
 
 [居民文案 P1](RESIDENT_COPY.md) 已由 [P2](handoffs/archive/resident-experience-p2.md) 接入：question-set version3、四題／背景、提交前核對，以及 Guest 保存／等待／「街の画面をご覧ください。」和站號／暮らしの声編號。結果頁收起答案、Meter 與設施表格；單站 revision conflict 的復原核對仍保留數值資訊。舊草稿可重新預約並保留有效選項，A/B 先結束自己的舊預約；舊已保存回答原文／version2不重寫，未知提交結果維持同 ID 重試。
 
-Root 用固定360px卡片顯示背景、當前實際 focal 設施及位置；一個標題、最多兩句。開場 identity 取 P1 內文首兩句。日常卡本機每12秒輪換；[P3](handoffs/archive/resident-experience-p3.md) 的每份live結果保留10秒，0–3秒身份／位置／原有過渡，3–10秒一項個人偏好＋一項共同城市實際結果，再恢復日常卡。Root比較實際effective carrier targets／可見配對及slot分布；同分不同配置、只有方向改變、完全維持分開處理，seed本身或隱藏配對不算可見變化。Focal count只描述該地點，district-only用實際區域及配置調整文案；沒有前後證據只確認保存，不將個人答案當共同城市變化方向。Snapshot/reset/Undo即時替換，reload不重播舊結果；照明-only snapshot不打斷有效queue。
+Root 用固定360px右上卡片（2026-10-04由左移右，避免遮住focal site）顯示背景、當前實際 focal 設施及位置；一個標題、最多兩句。開場 identity 取 P1 內文首兩句。日常卡本機每12秒輪換；[P3](handoffs/archive/resident-experience-p3.md) 的每份live結果保留10秒，0–3秒身份／位置／原有過渡，3–10秒一項個人偏好＋一項共同城市實際結果，再恢復日常卡。Root比較實際effective carrier targets／可見配對及slot分布；同分不同配置、只有方向改變、完全維持分開處理，seed本身或隱藏配對不算可見變化。Focal count只描述該地點，district-only用實際區域及配置調整文案；沒有前後證據只確認保存，不將個人答案當共同城市變化方向。Snapshot/reset/Undo即時替換，reload不重播舊結果；照明-only snapshot不打斷有效queue。
 
 完整 [P1–P5計劃](RESIDENT_EXPERIENCE_PLAN.md) 保留；P1–P3已實作，P3軟件排程檢查不代表10秒足夠閱讀。[P4全面軟件流程](handoffs/archive/resident-experience-p4.md) 已通過 native／scratch Chrome browser 驗證；P5與S5、實際iPad／理解程度／閱讀時間仍待驗收。
 
@@ -59,7 +59,7 @@ Root 用固定360px卡片顯示背景、當前實際 focal 設施及位置；一
 - Concentration：低層 pods／中間高度／十座塔、sky lobbies 與連橋。
 - Mixed 有自己的 hybrid 組合；跨 Meter 條件產生配對設施；完整 active run 的投票次序推導四軸 `slotSeeds`，相同分數可保留不同槽位分布。最新 64 份顯示 history 不截斷 seed 來源。
 
-Live 使用可重新定向的 **3 秒**過渡；pulse 只標示真的 live 變化。Snapshot、reset、Undo、reconnect、reduced motion 直接恢復權威狀態，清除排隊及 pulse。重複事件不重播。配對、counts、固定 footprint 及限制見 [Meter handoff](handoffs/archive/meter-variety.md)。
+Live 使用可重新定向的 **3 秒**過渡；pulse 只標示真的 live 變化；每個改變嘅 Meter 只喺其 site 出光柱，district slots 只有淡色光圈（2026-10-04）。Snapshot、reset、Undo、reconnect、reduced motion 直接恢復權威狀態，清除排隊及 pulse。重複事件不重播。配對、counts、固定 footprint 及限制見 [Meter handoff](handoffs/archive/meter-variety.md)。
 
 ## Guest、單站與 A/B
 

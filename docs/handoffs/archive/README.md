@@ -2,12 +2,13 @@
 
 2026-10-03；整理 owner：Codex。返回 [現行交接](../README.md)／[文件索引](../../README.md)。
 
-以下39份交接已完成、已整合或被後續階段取代。保留原本日期、owner、commit、驗證限制與下一步歷史；舊分支／舊「待整合」或「下一步」不代表現行指示。Shibuya 已結束，不再開發。
+以下40份交接已完成、已整合或被後續階段取代。保留原本日期、owner、commit、驗證限制與下一步歷史；舊分支／舊「待整合」或「下一步」不代表現行指示。Shibuya 已結束，不再開發。
 
 歸檔不等於未達成的視覺目標、實機／Windows／各工作站 Blender 驗證已通過。仍待處理的台場素材、P6/S5、延後 polish 及 P5 實機驗收見現行交接；產品與驗證 authority 仍是 [SPEC](../../EXHIBITION_SPEC.md)／[VALIDATION](../../VALIDATION.md)。Meter截圖跟隨其交接歸檔，圖片內容不變。
 
 | Task | 原標題 |
 | --- | --- |
+| [city-readability](city-readability.md) | city-readability — 結果卡位置、site 光柱、夜間標語 |
 | [admin-day-night](admin-day-night.md) | admin-day-night — Admin city lighting control |
 | [admin-japanese](admin-japanese.md) | admin-japanese — Japanese admin UI |
 | [admin-undo](admin-undo.md) | admin-undo — Staff-only latest-proposal Undo |

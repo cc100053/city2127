@@ -95,6 +95,8 @@ P4 browser starts its own temporary real SQLite/server and uses the existing pro
 
 P5（2026-10-02）：[實機驗收表／交接](handoffs/resident-experience-p5.md) 記錄預計65吋HDMI／約4米／兩部iPad／Mac mini M6配置；使用者指定兩部iPad接收主機輸出，D0先驗雙路獨立畫面／觸控，再驗睡眠／復原、閱讀／理解、長跑及政策。全部實機項目仍為 NOT RUN；P4模擬觸控、clock jumps或CI不替代實機證據。
 
+City readability (2026-10-04, branch `fix/city-readability`): resident card moved top-right, site-only pulse shafts, night intro halo. Root `npm test`／`npm run build`／`git diff --check` PASS; P3 browser PASS (Chrome1280×720, hour16, ordered reading 10,017ms) with new evidence in [artifacts/readability](../artifacts/readability/) — [A reason](../artifacts/readability/resident-p3-city-A-reason.png), [pulse before](../artifacts/readability/pulse-before-1920.png)／[after](../artifacts/readability/pulse-site-focus-1920.png) (Chrome1920×1080 `?meters`, 0→5 all axes, 0.7s), [night intro](../artifacts/readability/night-intro-1920.png). Focal-site screen positions computed from `heroCamera` at 1280×720／1920×1080／3840×2160 all fall left of x = viewport − 404. No FPS／hardware claim.
+
 **Still open:** S5 full exhibition acceptance, actual input hardware, exhibition-day reset/recovery policy, sustained runtime/device testing. Use current browser procedures and the P5 handoff above; do not reopen old Shibuya tasks.
 
 ## Historical evidence (not exhibition acceptance)
