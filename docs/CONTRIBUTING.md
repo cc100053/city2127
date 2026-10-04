@@ -73,6 +73,22 @@ Use Conventional Commits: `<type>(<scope>): <subject>` with a concise English ti
 
 Self-review is sufficient; no PR or mandatory external review. The [CI workflow](../.github/workflows/ci.yml) (Stage 2) runs on branch pushes and optional PRs: Node 24, install/test/build for the root and, since 2026-09-24, `survey/` and `module-swap/`, plus diff whitespace checks. Require successful checks on the current task-branch commit before merging, and verify main's checks after pushing. Do not describe a configured workflow as a passing run. No branch protection or deployment is configured.
 
+### Documentation sync
+
+Keep documentation aligned with the actual working tree in the same implementation stage as the change. Review the relevant rows below; update only affected documents. If no documentation update is needed, briefly explain why in the stage handoff.
+
+| Change | Documents to review and update |
+| --- | --- |
+| Module ownership, entry points, call/data flow, rendering pipeline, dependencies, resource lifecycle or architectural constraints | [PROJECT.md](PROJECT.md), the current architecture and implementation map; do not create a duplicate `architecture.md` |
+| State behavior, controls, timing, actor counts, routes or supported capabilities | [PROJECT.md](PROJECT.md); [README.md](../README.md) when the user-facing summary or instructions change |
+| Geometry, landmark relationships, camera, materials, lighting, UI layout or motion | [PROJECT.md](PROJECT.md), [EXHIBITION_SPEC.md](EXHIBITION_SPEC.md) and the affected checks/evidence in [VALIDATION.md](VALIDATION.md) |
+| Setup, runtime requirements, dependencies, scripts or development commands | [README.md](../README.md), the Commands section of [AGENTS.md](../AGENTS.md) and [VALIDATION.md](VALIDATION.md) where commands or checks are affected |
+| Tests, acceptance criteria, actual validation results, screenshots, performance measurements or known limitations | [VALIDATION.md](VALIDATION.md); [EXHIBITION_SPEC.md](EXHIBITION_SPEC.md) when completion status or remaining gaps change |
+| Scope, visual direction, priorities, milestones or accepted design decisions | [EXHIBITION_SPEC.md](EXHIBITION_SPEC.md); [PROJECT.md](PROJECT.md) and [AGENTS.md](../AGENTS.md) when project constraints change |
+| Agent workflow or approval policy | [AGENTS.md](../AGENTS.md) and this file; [VALIDATION.md](VALIDATION.md) if handoff procedures change |
+
+Document implemented behavior separately from proposals and pending approval. Date new evidence and identify the stage it describes; never reuse old test results or screenshots as proof of a new change. Preserve closed historical Plan 01 notes in [SHIBUYA.md](SHIBUYA.md), [Plan 02](history/SHIBUYA_PLAN02.md) and earlier acceptance records; correct factual errors or add a clearly dated superseding note instead of rewriting history. Verify local Markdown links after documentation edits.
+
 ## Concurrent integration
 
 Only integrate with a clean working tree. Immediately before merging or pushing, fetch origin again and inspect remote main; confirm the latest remote main is incorporated into the intended result:
