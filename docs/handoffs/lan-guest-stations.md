@@ -4,8 +4,8 @@
 - Status: IN_PROGRESS — 軟件細修已驗證；router／iPad 現場設定及實機 NOT RUN
 - Branch: `feat/lan-guest-stations`
 - Base commit: `4edf90a97fde8ce0396cf1a637503ebb708aa3a0`
-- Last verified commit: 見下方 Actual validation（commit 前工作樹已驗）
-- Remote availability: 見最終 push 結果
+- Last verified commit: `a96b61c59bf4dfbb2da9504ab7a7044214b2d904`（本機 checks＋branch CI PASS）；之後只有本交接 metadata
+- Remote availability: `origin/feat/lan-guest-stations`；以 `--no-ff` 整合入 `main`
 - GitHub Issue (optional): NONE
 
 ## Session Git state
@@ -80,6 +80,7 @@ LAN 冇 guest 身分驗證，所以只用自己控制嘅 router；場館 Wi-Fi �
 - `survey`：`npm test` PASS（含新 `PASS: LAN Guest A/B URLs.`）、`npm run build` PASS、`git diff --check` PASS。Root 冇改動，未重跑。
 - 本機 LAN smoke（scratch SQLite，port 8791，`SURVEY_HOST=0.0.0.0`）：terminal 印出 `LAN Guest: http://192.168.0.215:8791/guest?station=A／B`；經 LAN IP 取 Guest 頁標題「2127 お台場の暮らし」及 apple meta 正確；經 LAN IP 取 `/api/admin/current-run` 403，經 loopback 200。
 - 內置 browser（Chromium）以 LAN IP 開 `station=A`，viewport 1180×820：頁面渲染「ステーション A」，computed `touch-action: manipulation`。唔代表 iPad Safari／觸控已測。
+- Branch CI [37172173768](https://github.com/cc100053/city2127/actions/runs/37172173768) PASS on `a96b61c`。整合後 main CI 結果喺發布回覆提供，唔預先宣稱。
 - Hardware／Safari／Wi-Fi 中斷／長跑：NOT RUN。
 
 ## Known issues and blockers
@@ -95,4 +96,4 @@ LAN 冇 guest 身分驗證，所以只用自己控制嘅 router；場館 Wi-Fi �
 
 ## Next expected step
 
-cc100053 準備 router 及固定 IP（L0），之後現場操作人按 L2／L3 設定，再做 P5 D0。軟件 branch 驗證及整合結果見本次發布紀錄。
+cc100053 準備 router 及固定 IP（L0），之後現場操作人按 L2／L3 設定，再做 P5 D0。軟件部分已整合入 main。
