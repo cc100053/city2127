@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import { networkInterfaces, type NetworkInterfaceInfo } from 'node:os';
 import { dirname, extname, resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { ApiResponse, ErrorCode, HealthData } from '../shared/protocol.ts';
@@ -175,6 +176,14 @@ export function createContext(options: { dbPath: string; questionsPath: string; 
   return { db, questions, legacyQuestions, now, newId: randomUUID, reservationMs: RESERVATION_MS };
 }
 
+/** Guest A/B URLs staff type on the iPads; empty unless the server listens beyond loopback. */
+export function lanGuestUrls(host: string, port: number, interfaces: NodeJS.Dict<NetworkInterfaceInfo[]> = networkInterfaces()): string[] {
+  if (host !== '0.0.0.0') return host === 'localhost' || isLoopbackAddress(host) ? [] : [`http://${host}:${port}/guest?station=A`, `http://${host}:${port}/guest?station=B`];
+  return Object.values(interfaces).flat()
+    .filter((i): i is NetworkInterfaceInfo => !!i && i.family === 'IPv4' && !i.internal)
+    .flatMap(i => [`http://${i.address}:${port}/guest?station=A`, `http://${i.address}:${port}/guest?station=B`]);
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const env = process.env;
   const port = Number(env.SURVEY_PORT ?? 8787), host = env.SURVEY_HOST ?? '127.0.0.1';
@@ -186,6 +195,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     console.log(`Survey server on http://${host === '0.0.0.0' ? '127.0.0.1' : host}:${port}  (db ${dbPath})`);
     console.log(`Run ${state.runId}, revision ${state.revision}, ${ctx.questions.questions.length} questions (version ${ctx.questions.version})`);
     console.log('Pages: /guest  /monitor  /admin (loopback only)');
+    for (const url of lanGuestUrls(host, port)) console.log(`LAN Guest: ${url}`);
   });
   const stop = () => { realtime.close(); server.close(() => { ctx.db.close(); process.exit(0); }); };
   process.on('SIGINT', stop);

@@ -1,4 +1,4 @@
-:root { color-scheme: light dark; font-family: system-ui, sans-serif; --line: #8884; --accent: #1f7a6b; --warn: #b3541e; }
+:root { color-scheme: light dark; touch-action: manipulation; -webkit-text-size-adjust: 100%; font-family: system-ui, sans-serif; --line: #8884; --accent: #1f7a6b; --warn: #b3541e; }
 body { margin: 0 auto; padding: 16px; max-width: 760px; line-height: 1.5; }
 h1 { font-size: 1.25rem; margin: 0 0 12px; }
 h2 { font-size: 1rem; margin: 20px 0 8px; }
