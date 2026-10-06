@@ -62,6 +62,7 @@ outbound/stay/return/indoor timing. `odaiba.test.ts` publishes real landmark doo
 visitor curves on actual paving and clear of buildings/sites, then samples each journey against actual people/robots for 240 s
 at .25 s in low/mixed/high, hours 12/21. Every journey must actually be drawn in all six cases; seated matrices and folded legs
 remain fixed. Repeat visual checks with companion gaze/hand gestures, visitor arrival/chat/turn/return, and held day/dusk/night.
+The same loop asserts doorway people (0.62 m) and robots (0.85 m) never overlap and that no promenade walker, and at most 2 % of slow doorway frames (tight forecourt corners), strides in place; `districtMeters.test.ts` checks street cars → pods at low/mixed/high with unchanged traffic.
 Dated results and any integration limits belong in the [street-life handoff](handoffs/street-life.md).
 
 Building interactions (round 9, 2026-10-06): `mobility.test.ts` checks arrival/wait/exit/greeting/departure/indoor stages,
@@ -74,6 +75,12 @@ use explicit `nw:-12/0/12` for 0/3/6 automated ports (band shorthand `low/high` 
 ## Performance evidence
 
 Measure current Odaiba on the stated real GPU, ideally the exhibition machine at 1920×1080. State pixel ratio, actual viewport, camera/hour/mode, frame sampling interval, draw calls/triangles and console/network results. Mesh counts, source file size, headless/software FPS and old Shibuya 60 FPS are not equivalent to a current measurement. Do not claim Windows or another workstation was tested from Mac evidence.
+
+Street traffic round 10 (2026-10-07, development Mac, not the exhibition machine): Apple M6, headed Chromium 151.0.7922.34 (Playwright,
+ANGLE Metal), Vite DEV, 1920×1080 viewport, deviceScaleFactor 1 (renderer pixel ratio 1), authored hero camera, canvas `data-fps`
+(mean over 120 frames) sampled 5× at 2.5 s after 8 s warm-up: standalone `?hour=16` 56 FPS / 946 draws; `meters=nw:low` 53 / 1585;
+`nw:0` 53 / 1585; `nw:high` 53 / 1601; `nw:high` at hour 21 52 / 1607. Triangles not recorded; console shows only the missing `/favicon.ico` 404, no page errors.
+[report](../artifacts/street-traffic-automation/browser.json). Exhibition-machine FPS remains unmeasured.
 
 ## Current evidence and open acceptance
 

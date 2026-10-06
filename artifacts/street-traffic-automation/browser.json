@@ -1,0 +1,174 @@
+{
+ "browser": "151.0.7922.34",
+ "shots": [],
+ "fps": [
+  {
+   "label": "standalone",
+   "q": "?hour=16",
+   "samples": [
+    {
+     "fps": 56,
+     "calls": 946
+    },
+    {
+     "fps": 56.5,
+     "calls": 946
+    },
+    {
+     "fps": 55.9,
+     "calls": 946
+    },
+    {
+     "fps": 55.9,
+     "calls": 946
+    },
+    {
+     "fps": 56.3,
+     "calls": 946
+    }
+   ],
+   "viewport": [
+    1920,
+    1080,
+    1,
+    1920,
+    1080
+   ]
+  },
+  {
+   "label": "low",
+   "q": "?hour=16&meters=nw:low",
+   "samples": [
+    {
+     "fps": 53.7,
+     "calls": 1585
+    },
+    {
+     "fps": 53.6,
+     "calls": 1585
+    },
+    {
+     "fps": 53.1,
+     "calls": 1585
+    },
+    {
+     "fps": 53.7,
+     "calls": 1585
+    },
+    {
+     "fps": 53.7,
+     "calls": 1585
+    }
+   ],
+   "viewport": [
+    1920,
+    1080,
+    1,
+    1920,
+    1080
+   ]
+  },
+  {
+   "label": "mixed",
+   "q": "?hour=16&meters=nw:0",
+   "samples": [
+    {
+     "fps": 53.4,
+     "calls": 1585
+    },
+    {
+     "fps": 53.2,
+     "calls": 1585
+    },
+    {
+     "fps": 52.8,
+     "calls": 1585
+    },
+    {
+     "fps": 52.9,
+     "calls": 1585
+    },
+    {
+     "fps": 53.5,
+     "calls": 1585
+    }
+   ],
+   "viewport": [
+    1920,
+    1080,
+    1,
+    1920,
+    1080
+   ]
+  },
+  {
+   "label": "high",
+   "q": "?hour=16&meters=nw:high",
+   "samples": [
+    {
+     "fps": 53.3,
+     "calls": 1601
+    },
+    {
+     "fps": 53.2,
+     "calls": 1601
+    },
+    {
+     "fps": 52.1,
+     "calls": 1601
+    },
+    {
+     "fps": 52.9,
+     "calls": 1601
+    },
+    {
+     "fps": 53.4,
+     "calls": 1601
+    }
+   ],
+   "viewport": [
+    1920,
+    1080,
+    1,
+    1920,
+    1080
+   ]
+  },
+  {
+   "label": "high-night",
+   "q": "?hour=21&meters=nw:high",
+   "samples": [
+    {
+     "fps": 52.5,
+     "calls": 1607
+    },
+    {
+     "fps": 52.1,
+     "calls": 1607
+    },
+    {
+     "fps": 52,
+     "calls": 1607
+    },
+    {
+     "fps": 52.6,
+     "calls": 1607
+    },
+    {
+     "fps": 52.6,
+     "calls": 1607
+    }
+   ],
+   "viewport": [
+    1920,
+    1080,
+    1,
+    1920,
+    1080
+   ]
+  }
+ ],
+ "errors": [
+  "?hour=16 console Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ]
+}

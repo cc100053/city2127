@@ -1,7 +1,7 @@
 # street-life — Pedestrian and street-traffic polish
 
 - Owner: cc100053
-- Status: COMPLETE (round 9 building interaction items 1–3; earlier limitations and exhibition-machine FPS remain open)
+- Status: COMPLETE (round 10 traffic/yielding items 1, 4, 6; exhibition-machine FPS and earlier limitations remain open)
 - Branch: feat/pedestrian-traffic-life
 - Base commit: 9476fd8b82da523d6f7acee6f1893e5028fb35a0
 - Last verified commit: 0c734bf25c8d3d359ecda83ce0a727275d126e43 (integrated main: root tests/build/diff-check PASS; tree identical to browser-verified round 9)
@@ -274,3 +274,47 @@ carrier changes and immediate reset/Undo/reconnect. No new dependency, interior 
   module-swap and whitespace. The remaining update only records this evidence; the feature branch fast-forwards to the same
   main metadata commit. No further implementation is pending for items 1–3; exhibition-machine FPS and unselected proposals
   require a separate scope.
+
+### Traffic and pedestrian proposal (2026-10-07; items 1, 4, 6 selected)
+
+- Inspection by Claude for owner cc100053 on `feat/pedestrian-traffic-life` at `cddc016a366393834506b5bea4ef7f63f15305a5`,
+  clean; fetch succeeded; branch/upstream and branch/`origin/main` both 0/0.
+- Finding: street cars ignore the automation Meter (density reads only `state.traffic`, which v2 leaves alone, and the commute
+  rhythm), every lane runs one speed with fixed phase gaps, one body plus a van, and people never meet the carriageway.
+
+1. **Street fleet follows automation** (selected): each car slot swaps from a human-driven car to a rounded autonomous street pod by
+   `podShare`, as the aircraft do; 0 / mixed / high all remain complete, mature traffic.
+2. Shared-space crossings without signals: cars ease for people at two or three paved crossings (later).
+3. Car-following: cars behind a stopping drop-off car slow instead of relying on phase gaps (later).
+4. **Credible yielding** (selected): clear the collector/doorway grazes; feet follow actual ground travel so queued people stop
+   stepping; a sidestep turns the body along its actual path.
+5. Fill the ~10 m guideway-avenue junction mouth without a road triangle (later).
+6. **Measure FPS** (selected) before adding more actors, using the canvas `data-fps` sample on a real GPU.
+
+Not proposed: signals, pathfinding, new dependencies, interiors, population inference.
+
+### Round 10 — street pods, credible yielding, FPS (2026-10-07)
+
+- Claude implements for owner cc100053 on `feat/pedestrian-traffic-life` from `cddc016`; no upstream merge needed.
+- 1 Street fleet: new `street-pods` fleet (rounded pale cabin, wraparound glass, thin mint roof line, head/tail lamps; van slots
+  become cargo pods). Each car slot draws car or pod by `podShare(activity.level, slot)`, so low 65 cars / 0 pods, mixed 33 / 32,
+  high 0 / 65 in the browser at reviewTime 60, hour 17; standalone keeps cars. Density and drop-off cues are unchanged.
+- 4 Yielding. Cause of the recorded grazes (0.30–0.42 m): a walker between a halted robot and its collector, both `fixed`, was
+  pushed toward its narrow inner side (zero lane gap picks the walker's own right), then queued along into the collector.
+  `passingLanes` now sends a mover passing a fixed one round the side with room for the full clearance. Feet: walker/doorway gait
+  phase now comes from ground covered (trip distance + solver along offset, clamped to the trip) and swing scales by actual pace
+  (smoothed ~.3 s between frames; jumps/snapshots start still); stoppers settle their legs within 1 s; sidesteps turn walkers,
+  doorway walkers and moving robots by up to .6 rad toward the actual path.
+- Checks: `odaiba.test.ts` now asserts doorway people > .62 m and robots > .85 m over 240 s × low/mixed/high × hours 12/21 (fails on
+  the old code at `doorway-walkers#111/#124`, 1.5 s), and strides in place: promenade 0 of 10011 slow frames (old 1300), doorway
+  14 of 999 (old 1083; the remainder pivots on the inside of a tight forecourt corner). `districtMeters.test.ts` checks the street
+  fleet at low/mixed/high and the standalone restore. Two same-direction doorway walkers on a curved bend still come within
+  0.636 m (solver spacing 0.65 m on the path's straight-line metric).
+- 6 FPS (development Mac, Apple M6, headed Chromium 151, 1920×1080, DPR 1, hero, `data-fps`): standalone 56, low/mixed/high 53,
+  high night 52; see [VALIDATION](../VALIDATION.md#performance-evidence) and
+  [report](../../artifacts/street-traffic-automation/browser.json). Avenue captures behind the drop-off car (camera set through
+  the three.js devtools hook): [low](../../artifacts/street-traffic-automation/avenue-low.png),
+  [mixed](../../artifacts/street-traffic-automation/avenue-mixed.png), [high](../../artifacts/street-traffic-automation/avenue-high.png),
+  [high night](../../artifacts/street-traffic-automation/avenue-high-night.png). The built-in pane was hidden, so it was not used.
+- Limits: exhibition-machine FPS, Safari/Windows unverified; proposal items 2, 3, 5 not implemented; rest-pose shadows remain.
+- Next: measure on the exhibition machine; then select from items 2 (crossings), 3 (car-following), 5 (junction mouth).
