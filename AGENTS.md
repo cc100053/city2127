@@ -53,7 +53,7 @@ Finish:
 
 ## Scope-based autonomy
 
-An explicitly assigned task authorizes relevant inspection, implementation, tests and in-scope fixes, documentation updates, committing and pushing the task's feature branch, self-review, merging after required checks and pushing validated main. No PR or external reviewer is required. Follow [CONTRIBUTING.md](docs/CONTRIBUTING.md) for integration and the asset-only direct-main exception. Explicit task restrictions override these defaults; a documentation task that excludes commits does not authorize them.
+An explicitly assigned task authorizes relevant inspection, implementation, tests and in-scope fixes, documentation updates, committing and pushing the task's feature branch, self-review, merging after the required local checks and pushing validated main (then confirming main CI). No PR or external reviewer is required. Follow [CONTRIBUTING.md](docs/CONTRIBUTING.md) for integration and the asset-only direct-main exception. Explicit task restrictions override these defaults; a documentation task that excludes commits does not authorize them.
 
 Clarify before going beyond the assignment: a major architectural rewrite, a change to approved product direction, deleting important shared assets, rewriting shared Git history, force-pushing main, deploying or adding infrastructure. Routine in-scope implementation, validation and Git steps need no separate stage approvals. Use independent local clones; worktrees and GitHub Issues are optional.
 
