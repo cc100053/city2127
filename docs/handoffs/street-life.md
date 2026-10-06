@@ -1,18 +1,18 @@
 # street-life — Pedestrian and street-traffic polish
 
 - Owner: cc100053
-- Status: IN_PROGRESS
+- Status: COMPLETE (round 8 selected scope; earlier limitations and exhibition-machine FPS remain open)
 - Branch: feat/pedestrian-traffic-life
 - Base commit: 9476fd8b82da523d6f7acee6f1893e5028fb35a0
-- Last verified commit: 50ac74a (round 7: tests/build/diff-check; clash census and headless hero on the same tree before commit)
-- Remote availability: origin/feat/pedestrian-traffic-life @ 50ac74a
+- Last verified commit: a055e4faed7a364601ee87455752b0bbe67cc1d8 (integrated main: root tests/build/diff-check PASS; tree identical to browser-verified round 8)
+- Remote availability: origin/feat/pedestrian-traffic-life contains 77e44d7cabc869648f99792f0619b3389af6d055; origin/main contains a055e4faed7a364601ee87455752b0bbe67cc1d8
 
 ## Session Git state
 
-- Session starting branch and HEAD: main, 9476fd8b82da523d6f7acee6f1893e5028fb35a0, clean
-- Last fetched origin/main commit: 9476fd8b82da523d6f7acee6f1893e5028fb35a0 (fetched 2026-10-06)
+- Latest session starting branch and HEAD: feat/pedestrian-traffic-life, dbf5d1533cf4fa340bf691ca3a8dc1356fa015a8, clean
+- Last fetched origin/main before integration: 9476fd8b82da523d6f7acee6f1893e5028fb35a0 (fetched 2026-10-06)
 - Local changes present at session start: NONE
-- Upstream integration status: NOT NEEDED (branched from current origin/main)
+- Upstream integration status: COMPLETE; task merged with --no-ff as a055e4f and pushed to main; no conflicts
 - Pending Git conflicts or synchronization blockers: NONE
 
 ## Goal and acceptance criteria
@@ -196,5 +196,10 @@ pathfinding framework, guest controls or Meter-to-population inference is propos
   Continuous drawn-visitor movement is checked over 140 s in .25 s steps, including stopped feet during conversation.
 - Scope limits: no promenade connector/pathfinding, no robot interaction upgrade, no general yielding/gait repair. Earlier
   collector grazes and rest-pose shadows/GTAO remain recorded limitations. Exhibition-machine FPS/Safari/hardware NOT RUN.
-- Implementation complete; integration/remote SHA and main CI will be recorded after the Git workflow. Next: hardware FPS or a
-  separately assigned interaction round; the proposal's items 1–3 remain unimplemented.
+- Implementation commit: `77e44d7cabc869648f99792f0619b3389af6d055`, pushed to the assigned feature branch. Integrated as
+  `a055e4faed7a364601ee87455752b0bbe67cc1d8`; root `npm test`, `npm run build` and committed diff whitespace checks PASS again
+  on the merge result. Its tree is identical to the browser-verified feature tree. Main was pushed without rewriting history.
+- [Main CI](https://github.com/cc100053/city2127/actions/runs/37460807614) PASS on that exact integration commit: Node 24,
+  root/survey/module-swap install, tests, builds and diff whitespace. Handoff metadata is a documentation-only follow-up;
+  local Markdown targets and diff whitespace checks PASS. The requested feature branch is fast-forwarded to the recorded result.
+- Next: exhibition-machine FPS or a separately assigned interaction round; proposal items 1–3 remain unimplemented.
