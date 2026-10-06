@@ -203,3 +203,38 @@ pathfinding framework, guest controls or Meter-to-population inference is propos
   root/survey/module-swap install, tests, builds and diff whitespace. Handoff metadata is a documentation-only follow-up;
   local Markdown targets and diff whitespace checks PASS. The requested feature branch is fast-forwarded to the recorded result.
 - Next: exhibition-machine FPS or a separately assigned interaction round; proposal items 1–3 remain unimplemented.
+
+### Building interaction proposal (2026-10-06; proposed, NOT IMPLEMENTED)
+
+- User requested further building-interaction proposals. Inspection on `feat/pedestrian-traffic-life` at
+  `519fa6d19840ff82dca20dc8b1454588739f15f1`, clean; fetch succeeded, branch/upstream and branch/main both 0/0.
+  Round-8 implementation and verified main integration are available remotely. This update changes documentation only;
+  it adds no runtime, browser or performance evidence.
+- Current limit: `publishDoorways` infers ground-floor entry points from facade raycasts, rather than authored door metadata.
+  Existing visitors, delivery collectors and kerb passengers use those points; journeys do not model building interiors.
+
+1. **Recognizable entrance zones.** Select one or two validated entries per pilot landmark, with a restrained door frame,
+   canopy/threshold light and clear waiting space. People slow, orient to the entrance and yield to an exiting person.
+   Retain inside-facade fading; do not imply a cut-through opening or model interior that does not exist.
+2. **Meet at the door.** One resident waits beside the entry, a companion emerges, both acknowledge, then walk together
+   to the existing forecourt group or enter together. Reserve the approach and waiting spot; keep the through lane clear.
+3. **Use the actual service frontage.** At a visible service carrier, a resident approaches, pauses for a staff exchange,
+   human/machine collaboration or autonomous pickup, then leaves. Select behaviour from the rendered configuration,
+   keeping all alternatives active and mature. A disappearing carrier must release its actors during live changes/reset.
+4. **Readable collection.** Extend the existing robot/collector encounter with a reach and one small parcel transferring
+   once to the person, who carries it through the entry. No parcel duplication or unrelated delivery route; first resolve
+   the recorded collector grazes and verify the extended arm/prop envelope.
+5. **Different frontage rhythms.** Pilot an office entry with staggered arrivals/departures, a waterfront frontage with
+   short social visits, and a hotel entry with greeting/waiting/drop-off. Use the existing hour and group clocks;
+   stagger the scenes, keep night activity, and avoid treating the choreography as occupancy or population simulation.
+6. **Use terraces and climate amenities.** Where a rendered ground-level shared seat, canopy or climate garden actually
+   exists, residents arrive, sit/rest, acknowledge others and leave. Bind to the published position and available seat;
+   preserve body/seat clearance and handle changing geometry. Do not claim measured cooling effects.
+7. **Later: building-to-building journeys.** Author two or three short connections on verified continuous paving;
+   leave one entry, visit another frontage, and return. Validate the full corridor and simultaneous actors. Rooftop visits
+   require an actual authored lift/stair/deck connection and are a separate route/asset scope, never a teleport.
+
+Recommended first slice: **1 + 2 + 3**, on a small number of visible frontages, reusing the current person instances,
+conversation timing and reserved curves. Next expected step: select the proposal scope. Acceptance should cover a continuous
+arrival/use/departure cycle, existing hero/street cameras, low/mixed/high day/night, doorway/actor/prop clearance, actual
+carrier changes and immediate reset/Undo/reconnect. No new dependency, interior simulation or guest controls are proposed.
