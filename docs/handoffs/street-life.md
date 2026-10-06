@@ -58,6 +58,15 @@ doorways per landmark), `src/main.ts` (DEV `?review=street`), `tests/mobility.te
   sitters set at -0.10 m so thighs rest on the seat; items are hidden while seated (backpacks hit the backrest).
 - Test: `districtMeters.test.ts` asserts every resting person is drawn at ~0 or full scale (fails on the old code at 0.05).
 
+### Round 4 (user report 2026-10-06: sitters' legs still through the bench, bench too close to the lit edge)
+
+- Cause 1: the knee blend used `smoothstep(.29,.23,…)` (edge0 > edge1, undefined in GLSL; garbage on Metal/ANGLE), so legs did not
+  fold reliably. Now `1 - smoothstep(.23,.29,…)`.
+- Cause 2: the knee sat at the seat's front edge and the bench 3.1 m out put feet against the 3.3 m edge tube. Knee pivot moved to .26
+  (knee .31 m forward of the hip, past the seat's .18 m front), hip/knee fold 1.5 rad, seat .40 deep, sitters −.08 m; benches 2.75 m
+  out; walker lanes narrowed to ≤ 2.35 m so the backrest still clears them. Test asserts both clearances.
+- Close-up captures must stay > 2 m from people: the hero camera's near plane is 2 m, which slices nearby figures.
+
 ## Actual validation results
 
 - Verification status: PARTIAL
@@ -77,4 +86,4 @@ doorways per landmark), `src/main.ts` (DEV `?review=street`), `tests/mobility.te
 - Re-measure FPS after round 2 on the exhibition machine (adds ~150 resting people, benches, robots, gait shader).
 - One ~10 m junction mouth on the guideway avenue has no road triangle; cars cross it on terrain.
 - No cross streets or signals, by decision (2127 cars need none).
-- Shadows and GTAO use the rest pose (no custom depth material for the gait shader).
+- Shadows and GTAO use the rest pose (no custom depth material for the gait shader): a sitter's shadow is a standing figure's.

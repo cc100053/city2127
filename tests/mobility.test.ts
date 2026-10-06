@@ -171,10 +171,11 @@ for (let h = 0; h < 24; h += .1) {
 assert.ok(Object.values(streetRhythm()).every(v => v === 1));
 assert.ok(streetRhythm(18).people > 3 * streetRhythm(4).people && streetRhythm(4).children === 0 && streetRhythm(23.99).robots > .9);
 
-// Benches lie on the promenade paving (±3.6 m) beyond the walker lanes (≤ 2.6 m incl. parties abreast).
+// Benches: the backrest (.27 m behind the bench line) clears walker lanes (≤ 2.35 m incl. parties abreast and a .25 m body), and a
+// sitter's feet (knee .31 m forward plus the .08 m shin) stop short of the lit edge tube (3.6 m − .3 m).
 const benches = promenadeBenches(path.promenades.map(c => c.getLength()));
-assert.ok(benches.length >= 16 && benches.every(b => b.u > 0 && b.rail < 1) && BENCH_OUT - .25 > 2.6 && BENCH_OUT + .25 < 3.6);
-assert.ok(Array.from({ length: 400 }, (_, i) => Math.abs(walkerPose(0, i).lane) + .65).every(v => v <= 2.6));
+assert.ok(benches.length >= 16 && benches.every(b => b.u > 0 && b.rail < 1) && BENCH_OUT - .27 > 2.35 && BENCH_OUT + .39 < 3.3);
+assert.ok(Array.from({ length: 400 }, (_, i) => Math.abs(walkerPose(0, i).lane) + .6 + .25).every(v => v <= 2.35));
 
 // Interchange transfers: ≤ 2 m/s on the pier, appear/vanish only at the shore end or the boat, and board only while it is docked.
 for (let k = 0; k < TRANSFERS; k++) for (let t = 0; t < 120; t += .1) {

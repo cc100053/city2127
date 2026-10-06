@@ -72,7 +72,7 @@ export function walkerPose(time:number,index:number,length=240) {
   const start=stops?(.3+.4*hash(index,7))*walk:Infinity,walked=Math.min(walk,s<start?s:s<start+DWELL?start:s-DWELL);
   const dwell=stops?T.MathUtils.clamp(Math.min(s-start,start+DWELL-s)/4,0,1):0,d=walked*speed;
   const visible=s>=walk+(stops?DWELL:0)?0:T.MathUtils.clamp(d/4,0,1)*T.MathUtils.clamp((length-d)/4,0,1);
-  return {u:forward?d/length:1-d/length,forward,lane:(forward?1:-1)*(1+(index%3)*.45),phase:time*speed*5.5+index,stride:Math.sin(time*speed*5.5+index)*(1-dwell),dwell,visible,speed,jog,stops};
+  return {u:forward?d/length:1-d/length,forward,lane:(forward?1:-1)*(.8+(index%3)*.35),phase:time*speed*5.5+index,stride:Math.sin(time*speed*5.5+index)*(1-dwell),dwell,visible,speed,jog,stops};
 }
 /** Interchange transfer `index` at `time`: `d` metres out along the pier (head at INTERCHANGE.pier), `side` across it, `visible` 0..1
  * (fading only at the shore end and at the boat), on the boat's 40 s `dockMotion` cycle. */
@@ -151,8 +151,8 @@ function fleet(scene:T.Object3D,parts:Part[],count:number,name:string,shadow=tru
 
 /** Gait per person (`gait` instance attribute, see `pedestrians`): x stride phase (rad), y swing (rad), z carried item (0 none,
  * 1 backpack, 2 shoulder bag), w seated 0..1. Legs swing about the hip and arms about the shoulder in the vertex shader, so a walk
- * costs no extra draws. Seated, the thigh folds forward at the hip (.58) and the shin back down at the knee (.33), so the figure sits
- * with its thighs level and shins hanging. */
+ * costs no extra draws. Seated, the thigh folds forward at the hip (.58) and the shin back down at the knee (.26), so the figure sits
+ * with its thighs level, the knee .31 m forward (clear of the seat edge) and the shin hanging straight. */
 function articulate(mat:T.Material,body:string) {
   mat.onBeforeCompile=shader=>{
     shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nattribute vec4 gait;\nvec3 swingX(vec3 p,float pivot,float a){p.y-=pivot;return vec3(p.x,p.y*cos(a)-p.z*sin(a),p.y*sin(a)+p.z*cos(a))+vec3(0.,pivot,0.);}')
@@ -160,7 +160,7 @@ function articulate(mat:T.Material,body:string) {
   };
   mat.customProgramCacheKey=()=>'gait-'+body;
 }
-const LEGS='float side=sign(position.x);transformed=swingX(transformed,.33,smoothstep(.36,.3,position.y)*1.35*gait.w);transformed=swingX(transformed,.58,mix(sin(gait.x)*gait.y*side,-1.35,gait.w));';
+const LEGS='float side=sign(position.x);transformed=swingX(transformed,.26,(1.-smoothstep(.23,.29,position.y))*1.5*gait.w);transformed=swingX(transformed,.58,mix(sin(gait.x)*gait.y*side,-1.5,gait.w));';
 const ARMS='float side=sign(position.x);transformed=swingX(transformed,1.25,-sin(gait.x)*gait.y*.8*side*(1.-gait.w));';
 // Backpack behind the torso (z < -.12), bag at the right hip (x > .25): keep only the item this person carries; sitters set it down.
 const GEAR='transformed*=gait.w>.5||gait.z<.5?0.:gait.z<1.5?step(position.z,-.12):step(.25,position.x);';
@@ -299,9 +299,10 @@ export function streetRhythm(hour?:number) {
   };
   return Object.fromEntries(Object.entries(RHYTHM).map(([k,keys])=>[k,at(keys)])) as Record<keyof typeof RHYTHM,number>;
 }
-/** Promenade benches every 24 m on the seaward edge (3.1 m out, clear of walker lanes ≤ 2.6 m), two seats each; between each pair of
+/** Promenade benches every 24 m facing the sea, 2.75 m out: the backrest (2.48 m) clears walker lanes (≤ 2.35 m) and sitters' feet
+ * (3.15 m) stop short of the lit edge (3.3 m). Two seats each; between each pair of
  * benches a couple stands at the rail. `u` along the promenade route. */
-export const BENCH_STEP=24, BENCH_OUT=3.1;
+export const BENCH_STEP=24, BENCH_OUT=2.75;
 export function promenadeBenches(lengths:readonly number[]) {
   return lengths.flatMap((length,route)=>Array.from({length:Math.floor((length-16)/BENCH_STEP)},(_,k)=>({route,u:(12+k*BENCH_STEP)/length,rail:(24+k*BENCH_STEP)/length})));
 }
@@ -377,7 +378,7 @@ export function mobility(scene:T.Scene) {
   const [seaX,seaZ]=[INTERCHANGE.shore[0]-INTERCHANGE.head[0],INTERCHANGE.shore[2]-INTERCHANGE.head[2]].map(v=>-v/INTERCHANGE.pier),seaYaw=Math.atan2(seaX,seaZ);
   const alongX=seaZ,alongZ=-seaX; // Westward along the shore, as in layout.ts.
   // Promenade benches face the sea with their backs landward; per bench four resting slots: two seats, then a couple at the rail beyond.
-  const benches=promenadeBenches(walkLength.slice(0,2)),benchFleet=fleet(scene,[part([1.8,.08,.46],[0,.36,0],shell,.03),part([1.8,.4,.06],[0,.62,-.24],shell,.03),
+  const benches=promenadeBenches(walkLength.slice(0,2)),benchFleet=fleet(scene,[part([1.8,.08,.4],[0,.36,-.02],shell,.03),part([1.8,.4,.06],[0,.62,-.24],shell,.03),
     part([.08,.32,.42],[-.8,.16,0],glass,.02),part([.08,.32,.42],[.8,.16,0],glass,.02)],benches.length,'promenade-benches');
   const spots:{at:T.Vector3;yaw:number;seated:number}[]=[];
   benches.forEach((b,k)=>{
@@ -385,9 +386,9 @@ export function mobility(scene:T.Scene) {
       place(walks[b.route],u);side.crossVectors(up,tangent).normalize();
       const sea=Math.sign(side.x*seaX+side.z*seaZ)||1,yaw=Math.atan2(side.x*sea,side.z*sea),at=pose.position.clone().addScaledVector(side,sea*out);
       if(!rail){pose.position.copy(at);pose.rotation.set(0,yaw,0);benchFleet.set(k,pose);}
-      // Sitters drop .10 m so the folded thighs (.08 m radius under the .58 m hip) rest on the .40 m seat top; the rail couple stand half
+      // Sitters drop .08 m so the folded thighs (.08 m radius under the .58 m hip) rest on the .40 m seat top; the rail couple stand half
       // a metre apart, turned a little toward each other.
-      for(const j of [-1,1])spots.push({at:at.clone().addScaledVector(tangent,j*(rail?.28:.45)).setY(rail?0:-.1),yaw:yaw-(rail?j*.35:0),seated:rail?0:1});
+      for(const j of [-1,1])spots.push({at:at.clone().addScaledVector(tangent,j*(rail?.28:.45)).setY(rail?0:-.08),yaw:yaw-(rail?j*.35:0),seated:rail?0:1});
     }
   });benchFleet.flush();
   const resting=pedestrians(scene,spots.length+FORECOURT_GROUPS*3,'resting-people');
@@ -435,7 +436,7 @@ export function mobility(scene:T.Scene) {
       const weight=walkerGate(i,(activity?true:i<WALKERS&&state.crowd*.8+.2>i/WALKERS)&&share>hash(party.leader,20))*(activity?amount(activity.walkers,i):1);
       place(walks[route],w.u,!w.forward);side.crossVectors(up,tangent).normalize();
       // Parties walk abreast; deck walkers keep to the 9 m deck's outer lanes, clear of the planted middle bed.
-      const abreast=(party.slot-(party.size-1)/2)*.65,lane=onDeck?(w.forward?1:-1)*(3.5+(party.size===1?(i%2-.5)*.6:abreast)):w.lane+(w.forward?abreast:-abreast);
+      const abreast=(party.slot-(party.size-1)/2)*.6,lane=onDeck?(w.forward?1:-1)*(3.5+(party.size===1?(i%2-.5)*.6:abreast)):w.lane+(w.forward?abreast:-abreast);
       pose.position.addScaledVector(side,-lane);pose.position.y+=Math.abs(w.stride)*.025*w.speed;
       // A stopped walker turns to face the bay.
       if(w.dwell>0)pose.rotation.y+=w.dwell*(((seaYaw-pose.rotation.y)%(Math.PI*2)+Math.PI*3)%(Math.PI*2)-Math.PI);
