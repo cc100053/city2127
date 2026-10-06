@@ -10,6 +10,6 @@
 | [LAN 雙站 iPad](lan-guest-stations.md) | IN_PROGRESS；軟件已整合，單機 station A 經 LAN PASS；雙機／瞓機待第二部裝置 | cc100053 |
 | [居民體驗 P5](resident-experience-p5.md) | IN_PROGRESS；文件準備已發布，D0–D10／理解程度／長跑實機NOT RUN。先提供輸出方案及可測硬件 | Codex；展覽決策cc100053，現場操作人待指定 |
 
-已完成或不再適用的40份交接及Meter截圖見 [歸檔索引](archive/README.md)。歷史下一步不會自動變成backlog；Shibuya不再開發。人類美術review／實機未測等限制保留，不因歸檔而結案。
+已完成或不再適用的41份交接及Meter截圖見 [歸檔索引](archive/README.md)。歷史下一步不會自動變成backlog；Shibuya不再開發。人類美術review／實機未測等限制保留，不因歸檔而結案。
 
 新交接沿用 [TEMPLATE](TEMPLATE.md)。完成後歸檔並修正連結；任務日期／commit／實際驗證仍留在各自文件。現行入口：[文件索引](../README.md)、[SPEC](../EXHIBITION_SPEC.md)、[PROJECT](../PROJECT.md)、[VALIDATION](../VALIDATION.md)。

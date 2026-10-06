@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { arc, bake, box, chrome, leaf, leafyCrown, paint, stone, trail, trim } from './cityRig.ts';
-import { changeSites, sweepway } from './layout.ts';
+import { changeSites, gardenDecks, midDecks, sweepway } from './layout.ts';
 import { routes } from './mobility.ts';
 import layout from './odaiba-layout.json';
 import { shoreRoomBays } from './waterRooms.ts';
@@ -23,25 +23,14 @@ const SPHERES: { centre: P3; radius: number; deck?: number }[] = [
   { centre: [-80, 100, 180], radius: 22, deck: 30 },
   { centre: [-300, 104, 40], radius: 17, deck: 26 },
 ];
-const LINKS: P3[][] = [
+const LINKS: (readonly (readonly [number, number, number])[])[] = [
   [[276.3, 90, -304.1], [300, 78, -240], [285, 67, -150], [262, 62, -60], [215, 62, 0], [140, 62, 20], [70, 62.5, 14], [12.3, 63, 7.6]],
   [[-41.3, 63, 47.8], [-75, 64, 50], [-120, 79, 94], [-159.4, 92, 118.9]],
   [[-106, 98, 180], [-124, 95, 179], [-140, 92, 178]],
   [[-291.6, 102, 59.3], [-285, 97, 75], [-280, 92, 86.3]],
   // Front-left: out of the 151 m tower ring over the north-east waterfront to the frame edge (target v2's long front-left skyway).
   [[304, 90, -373], [350, 80, -400], [410, 68, -440], [480, 60, -490], [560, 56, -545]],
-  // Mid-level (r5 pass 3, target v2's layered district): Aqua City's east end to Hilton at 30 m, behind the PARK site from the hero pose.
-  [[-183, 30, -50], [-205, 30.5, -30], [-228, 30.5, -8], [-248, 30, 8]],
-  // Mid-level (r6): Fuji chassis west face to Hilton at 40 m, south of the COMMONS PLAZA lot, so the gap between them reads layered.
-  [[-86, 40, 18], [-130, 40.5, 26], [-180, 41, 34], [-220, 40.5, 40], [-250, 40, 44]],
-];
-// Planted mid-level decks (r6 pass 3, target v2's tree-lined middle layer). Raycast-checked against the environment, landmarks and
-// Fuji chassis: clear between their docked ends, and off every survey site's line of sight from the hero pose.
-const GARDEN_LINKS: P3[][] = [
-  // DECKS south face over the open ground to a landing on Aqua City's planted roof (30 m).
-  [[150, 40, -222], [150, 39, -195], [125, 37, -168], [85, 35.5, -150], [40, 34.5, -145], [20, 34.5, -142]],
-  // The 151 m tower down to DECKS' east face at 42 m.
-  [[252, 42, -346], [250, 42, -315], [232, 42, -290], [195, 42, -281], [168, 42, -280]],
+  ...midDecks,
 ];
 
 /** Box-section deck along a curve, `top` at the curve and `depth` below it; outward winding, flat-shaded quads. */
@@ -186,7 +175,7 @@ export function skyways() {
   };
   for (const ring of RINGS) { skyway(root, circle(ring), true); garden(circle(ring), true, false); }
   for (const points of [...LINKS, sweepway.map(p => [...p] as P3)]) skyway(root, new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'), false);
-  for (const points of GARDEN_LINKS) { const curve = new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'); skyway(root, curve, false); garden(curve, false); }
+  for (const points of gardenDecks) { const curve = new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'); skyway(root, curve, false); garden(curve, false); }
   for (const s of SPHERES) sphere(root, s.centre, s.radius, s.deck);
   // Lit blue lines at street level too (target v2): both edges of the seaside promenades.
   for (const walk of routes().promenades) for (const side of [-3.6, 3.6]) root.add(new T.Mesh(offsetTube(walk, side, .25, .3, false), trail));

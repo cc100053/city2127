@@ -8,7 +8,7 @@
 - **Shibuya 已結束，未來不再做**（使用者確認，2026-10-02）。不保留場地切換，不將舊 Plan 01／02 的未完成項目列為後續工作。舊模型、內部識別碼與 Git／文件證據可保留；它們不代表場地或任務仍有效。
 - 2127 是固定時代。四個 Meter 的 low、mixed、high 都是成熟未來；低值不能代表舊時代、空城、缺乏技術或未開發。
 - Desktop presentation only；不加入 mobile／responsive 驗收。普通 renderer resize 保留。
-- 未來身份、可讀的選擇效果及城市延續性優先。行人、車、drones、空中航線已獲允許。
+- 未來身份、可讀的選擇效果及城市延續性優先。行人、車、drones、空中航線已獲允許。交通分層（2026-10-06 user決定）：空中分區域160–170m／城市80–100m／服務30–45m三層，航道有地標及建築泊位；行人有停留、架空層、海邊轉乘及夜間光環，細節見 [PROJECT](PROJECT.md)。
 - 現行視覺方向是 [CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)；材質及動畫實作規則見 [ART](ART.md)。Shibuya／Pic 2 只作歷史來源。
 
 ## 提案與共同城市
