@@ -64,6 +64,13 @@ at .25 s in low/mixed/high, hours 12/21. Every journey must actually be drawn in
 remain fixed. Repeat visual checks with companion gaze/hand gestures, visitor arrival/chat/turn/return, and held day/dusk/night.
 Dated results and any integration limits belong in the [street-life handoff](handoffs/street-life.md).
 
+Building interactions (round 9, 2026-10-06): `mobility.test.ts` checks arrival/wait/exit/greeting/departure/indoor stages,
+bounded continuous movement and stopped service feet. `odaiba.test.ts` samples the actual four entrance people against paving,
+static city geometry and all existing person/robot fleets at low/mixed/high, hours 12/21. `automationHub.test.ts` checks actual
+service actor size, platform support and counter/facade clearance, human/assisted/autonomous use, live handover, immediate
+recovery and hidden frontage. Review entrance stages and service scenes in the browser, keeping the original hero day/dusk/night;
+use explicit `nw:-12/0/12` for 0/3/6 automated ports (band shorthand `low/high` maps to scores −7.5/+7.5, not the endpoints).
+
 ## Performance evidence
 
 Measure current Odaiba on the stated real GPU, ideally the exhibition machine at 1920×1080. State pixel ratio, actual viewport, camera/hour/mode, frame sampling interval, draw calls/triangles and console/network results. Mesh counts, source file size, headless/software FPS and old Shibuya 60 FPS are not equivalent to a current measurement. Do not claim Windows or another workstation was tested from Mac evidence.

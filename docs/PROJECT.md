@@ -87,6 +87,21 @@ groups have a lower presence threshold so journeys remain inhabited at high auto
 slot carries the visitor, without adding a fleet or dependency. `forecourtVisits` exposes published curves for actual-geometry and
 actor-clearance checks; this is a small authored network, not pathfinding or occupancy simulation.
 
+Street-life round 9 (2026-10-06): after all landmarks and landscape load, `odaibaScene` calls `publishEntrances` to reserve two
+additional routes, one per selected landmark, checking the lane envelope on paving against complete static geometry.
+`entranceJourneys` exposes them for verification. Four
+door frames/canopies and threshold lights mark the inferred entries as facade overlays. The last four ordinary doorway-person
+slots run `entrancePose`: arrival slows to a door-side wait, a companion emerges on the other side, both turn/gesture, then leave
+together through the far entry. Ordinary walkers/robots do not use those routes; the four pilots stay active at every automation
+level and hour. Walls/interiors are not remodelled. Route selection still follows asynchronous landmark publication.
+The focal Automation Hub uses two opposite service slots (0/5): customers walk from podium waiting places, stop for 12 s,
+use the actual settled counter/port, return and wait. Staff serve human counters, assist at ports when another full human counter
+exists, and disappear in the fully autonomous configuration. `servicePose` drives stopped feet and eased turns; actor scale
+cancels the site's 3× scale. Existing counters now sit on the 1.2-unit podium rather than inside it; a lower port panel is reachable,
+and the podium bevel keeps the pilots' footing flat without changing its bounds. Service actors hide during their counter's
+handover or while the base/props layer is folded; immediate snapshots restore the matching pose through the existing Hub runtime.
+These are small ambient scenes, not a queue, transaction or interior simulation; district raised-hall staff are unchanged.
+
 ## Survey ownership and persistence
 
 | Area | Responsibility |
