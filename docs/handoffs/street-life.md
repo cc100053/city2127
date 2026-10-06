@@ -1,18 +1,18 @@
 # street-life — Pedestrian and street-traffic polish
 
 - Owner: cc100053
-- Status: VERIFIED LOCALLY (round 9 building interaction items 1–3; integration/main CI pending; earlier limitations and exhibition-machine FPS remain open)
+- Status: COMPLETE (round 9 building interaction items 1–3; earlier limitations and exhibition-machine FPS remain open)
 - Branch: feat/pedestrian-traffic-life
 - Base commit: 9476fd8b82da523d6f7acee6f1893e5028fb35a0
-- Last verified commit: a055e4faed7a364601ee87455752b0bbe67cc1d8 (integrated main: root tests/build/diff-check PASS; tree identical to browser-verified round 8)
-- Remote availability: origin/feat/pedestrian-traffic-life contains 77e44d7cabc869648f99792f0619b3389af6d055; origin/main contains a055e4faed7a364601ee87455752b0bbe67cc1d8
+- Last verified commit: 0c734bf25c8d3d359ecda83ce0a727275d126e43 (integrated main: root tests/build/diff-check PASS; tree identical to browser-verified round 9)
+- Remote availability: origin/feat/pedestrian-traffic-life contains 1267833; origin/main contains 0c734bf25c8d3d359ecda83ce0a727275d126e43
 
 ## Session Git state
 
 - Latest session starting branch and HEAD: feat/pedestrian-traffic-life, 52b6445478752496abea879f9ff8ed116a50892c, clean
 - Last fetched origin/main before integration: 52b6445478752496abea879f9ff8ed116a50892c (fetched 2026-10-06)
 - Local changes present at session start: NONE
-- Upstream integration status: round 9 pending; round 8 merged as a055e4f, later proposal documentation integrated as 52b6445
+- Upstream integration status: round 9 merged with --no-ff as 0c734bf and pushed to main; no conflicts; exact main CI PASS
 - Pending Git conflicts or synchronization blockers: NONE
 
 ## Goal and acceptance criteria
@@ -267,4 +267,10 @@ carrier changes and immediate reset/Undo/reconnect. No new dependency, interior 
   excess speed around a curved offset lane; complete-scene selection and slower entrance timing resolved those findings.
 - Limits: inferred door overlays, no wall cuts/interiors, queue or transaction simulation; proposal items 4–7 remain proposals.
   Prior collector/body-shadow limitations remain. FPS, Safari/Windows and exhibition hardware are unverified.
-  Implementation is complete; integration, integrated checks and exact main CI are the next step.
+  Implementation is complete. Feature `1267833` pushed; integrated as `0c734bf25c8d3d359ecda83ce0a727275d126e43`, identical tree,
+  root tests/build and committed whitespace check PASS again. Fresh fetch before merge/push confirmed main ancestry; fetch
+  after push confirmed local/remote main 0/0. All 170 local Markdown targets across four changed documents exist.
+  Exact main [CI run 37469282004](https://github.com/cc100053/city2127/actions/runs/37469282004) PASS: root, survey,
+  module-swap and whitespace. The remaining update only records this evidence; the feature branch fast-forwards to the same
+  main metadata commit. No further implementation is pending for items 1–3; exhibition-machine FPS and unselected proposals
+  require a separate scope.
