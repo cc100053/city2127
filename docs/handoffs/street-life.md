@@ -4,8 +4,8 @@
 - Status: IN_PROGRESS
 - Branch: feat/pedestrian-traffic-life
 - Base commit: 9476fd8b82da523d6f7acee6f1893e5028fb35a0
-- Last verified commit: 03668d6 (round 5: tests/build/diff-check; headless stool and robot hand-off captures on the same tree before commit)
-- Remote availability: origin/feat/pedestrian-traffic-life @ 03668d6
+- Last verified commit: 8a6320f (round 6: tests/build/diff-check/tsc; headless drop-off cue captures on the same tree before commit)
+- Remote availability: origin/feat/pedestrian-traffic-life @ 8a6320f
 
 ## Session Git state
 
