@@ -39,11 +39,25 @@ doorways per landmark), `src/main.ts` (DEV `?review=street`), `tests/mobility.te
 - Street cars: two avenues traced from the environment GLB's road triangles (seaside avenue 5 m, guideway avenue 7 m), left-hand
   traffic, irregular non-closing gaps, vans, head/tail lights at night, density from `traffic`.
 
+### Round 2 (user request 2026-10-06: items 2, 3, 4, 6, 7; no traffic signals — 2127 cars need none)
+
+- 2 Paved promenades: 7.2 m boardwalk under the lit edges (`skyways.ts`).
+- 3 Stationary people: benches every 24 m with two sitters, rail couples between, standing groups on up to 20 forecourts.
+- 4 Day rhythm: `streetRhythm(hour)`; `hour` now flows main → cityRig → mobility.
+- 6 Kerbside drop-offs (two cars, guideway avenue westbound, paved bays south of Aqua City; passengers walk to the nearest door) and
+  14 delivery robots on doorway forecourts. Forecourt walks/groups now keep 4–5 m off carriageways (Aqua City's pad overlaps the
+  seaside avenue).
+- 7 Gait shader (leg/arm swing, seated legs), backpacks and shoulder bags.
+
 ## Actual validation results
 
 - Verification status: PARTIAL
 - Date and checked commit/worktree: 2026-10-06, uncommitted worktree on feat/pedestrian-traffic-life
-- Commands/manual checks and results: root `npm test` PASS; `npm run build` PASS; `git diff --check` PASS. Browser (Vite DEV,
+- Round 2 (2026-10-06, worktree before commit): root `npm test` PASS, `npm run build` PASS, `git diff --check` PASS. Headless
+  Chromium (installed Playwright, 1400×900): promenade at 17:00 with parties, items, gait, bench sitters; drop-off bay at reviewTime 39
+  with a passenger stepping out; hero 12/19/4 h and bench view at 21 h. Headless FPS is not exhibition evidence; user reported FPS OK
+  after round 1.
+- Round 1: root `npm test` PASS; `npm run build` PASS; `git diff --check` PASS. Browser (Vite DEV,
   1400×900 emulated, built-in pane): `?hour=12&review=street` and `&meters=nw:low` show parties on the promenade and cars on the
   seaside avenue; DECKS forecourt shows doorway walkers and cars under the guideway; `?hour=21&meters=nw:low` shows collar lights and
   car lights. FPS NOT RUN (pane hidden; rAF throttled).
@@ -51,7 +65,7 @@ doorways per landmark), `src/main.ts` (DEV `?review=street`), `tests/mobility.te
 
 ## Unresolved issues and next step
 
-- Measure FPS/draws at the hero pose at low automation (most actors) on the exhibition machine.
-- The seaside promenades are lawn between two lit edge lines (pre-existing); walkers read as walking on grass up close.
+- Re-measure FPS after round 2 on the exhibition machine (adds ~150 resting people, benches, robots, gait shader).
 - One ~10 m junction mouth on the guideway avenue has no road triangle; cars cross it on terrain.
-- No cross streets or signals; adding them needs stop logic at crossings.
+- No cross streets or signals, by decision (2127 cars need none).
+- Shadows and GTAO use the rest pose (no custom depth material for the gait shader).

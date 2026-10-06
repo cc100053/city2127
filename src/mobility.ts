@@ -24,7 +24,7 @@ export function podPose(time:number,train:number,car:number,length:number) {
   return {u:head+(forward?-1:1)*car*CAR_GAP/length,forward};
 }
 export const WALKERS=120, AIR_SCALE=5;
-const MAX_WALKERS=400, DOOR_WALKERS=120, MAX_TRAINS=4, LOOP_AIRCRAFT=30;
+const MAX_WALKERS=400, DOOR_WALKERS=120, ROBOTS=14, FORECOURT_GROUPS=20, MAX_TRAINS=4, LOOP_AIRCRAFT=30;
 /** Aircraft slot: groups 0..9 spread evenly, even groups on the regional district loop, odd on the city shore lane; slots 10+ join a
  * group as wingmen `k` × PLATOON m behind, so platoons form only as automation fills the fleet. */
 export const PLATOON=34;
@@ -72,7 +72,7 @@ export function walkerPose(time:number,index:number,length=240) {
   const start=stops?(.3+.4*hash(index,7))*walk:Infinity,walked=Math.min(walk,s<start?s:s<start+DWELL?start:s-DWELL);
   const dwell=stops?T.MathUtils.clamp(Math.min(s-start,start+DWELL-s)/4,0,1):0,d=walked*speed;
   const visible=s>=walk+(stops?DWELL:0)?0:T.MathUtils.clamp(d/4,0,1)*T.MathUtils.clamp((length-d)/4,0,1);
-  return {u:forward?d/length:1-d/length,forward,lane:(forward?1:-1)*(1.3+(index%3)*.55),stride:Math.sin(time*speed*5.5+index)*(1-dwell),dwell,visible,speed};
+  return {u:forward?d/length:1-d/length,forward,lane:(forward?1:-1)*(1+(index%3)*.45),phase:time*speed*5.5+index,stride:Math.sin(time*speed*5.5+index)*(1-dwell),dwell,visible,speed,jog,stops};
 }
 /** Interchange transfer `index` at `time`: `d` metres out along the pier (head at INTERCHANGE.pier), `side` across it, `visible` 0..1
  * (fading only at the shore end and at the boat), on the boat's 40 s `dockMotion` cycle. */
@@ -145,29 +145,60 @@ function fleet(scene:T.Object3D,parts:Part[],count:number,name:string,shadow=tru
     tint(index:number,mat:T.Material,color:T.ColorRepresentation){meshes.forEach(m=>{if(m.material===mat)m.setColorAt(index,new T.Color(color));});},
     flush(){meshes.forEach(m=>m.instanceMatrix.needsUpdate=true);},
     show(visible:boolean){meshes.forEach(m=>m.visible=visible);},
+    meshes,
   };
 }
 
-/** Shared capsule figures and palette, used by promenade and plaza crowds. */
+/** Gait per person (`gait` instance attribute, see `pedestrians`): x stride phase (rad), y swing (rad), z carried item (0 none,
+ * 1 backpack, 2 shoulder bag), w seated 0..1. Legs swing about the hip and arms about the shoulder in the vertex shader, so a walk
+ * costs no extra draws; seated legs fold forward. */
+function articulate(mat:T.Material,body:string) {
+  mat.onBeforeCompile=shader=>{
+    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nattribute vec4 gait;\nvec3 swingX(vec3 p,float pivot,float a){p.y-=pivot;return vec3(p.x,p.y*cos(a)-p.z*sin(a),p.y*sin(a)+p.z*cos(a))+vec3(0.,pivot,0.);}')
+      .replace('#include <begin_vertex>','#include <begin_vertex>\n'+body);
+  };
+  mat.customProgramCacheKey=()=>'gait-'+body;
+}
+const LEGS='float side=sign(position.x);transformed=swingX(transformed,.58,mix(sin(gait.x)*gait.y*side,-1.35,gait.w));';
+const ARMS='float side=sign(position.x);transformed=swingX(transformed,1.25,-sin(gait.x)*gait.y*.8*side*(1.-gait.w));';
+// Backpack behind the torso (z < -.12), bag at the right hip (x > .25): keep only the item this person carries.
+const GEAR='transformed*=gait.z<.5?0.:gait.z<1.5?step(position.z,-.12):step(.25,position.x);';
+/** Shared capsule figures and palette, used by promenade, doorway, resting and plaza crowds. `gait(i, phase, swing, item, seated)`
+ * sets one person's walk; items are fixed per slot at build. */
 export function pedestrians(scene:T.Object3D,count:number,name:string) {
   // People (several hundred, so modest segment counts): capsule torso and limbs, round head and hair; clothes, skin and hair vary per person from a muted palette (no saffron).
-  const coats=material('#ffffff'),skin=material('#ffffff'),hair=material('#ffffff'),trousers=material('#ffffff');
+  const coats=material('#ffffff'),sleeves=material('#ffffff'),skin=material('#ffffff'),hair=material('#ffffff'),trousers=material('#ffffff'),gear=material('#ffffff');
+  articulate(trousers,LEGS);articulate(sleeves,ARMS);articulate(gear,GEAR);
   const capsule=(r:number,length:number,at:[number,number,number],mat:T.Material,depth=1):Part=>({geometry:new T.CapsuleGeometry(r,length,3,7).scale(1,1,depth).translate(...at),material:mat});
   const people=fleet(scene,[
     capsule(.22,.36,[0,.96,0],coats,.72),{geometry:new T.SphereGeometry(.15,10,7).translate(0,1.5,0),material:skin},
     {geometry:new T.SphereGeometry(.162,10,4,0,Math.PI*2,0,Math.PI*.55).translate(0,1.52,-.012),material:hair},
-    capsule(.07,.42,[-.29,.98,0],coats),capsule(.07,.42,[.29,.98,0],coats),
+    capsule(.07,.42,[-.29,.98,0],sleeves),capsule(.07,.42,[.29,.98,0],sleeves),
     {geometry:new T.CapsuleGeometry(.08,.4,3,6).translate(-.13,.33,0),material:trousers},{geometry:new T.CapsuleGeometry(.08,.4,3,6).translate(.13,.33,0),material:trousers},
     {geometry:new T.TorusGeometry(.2,.06,4,12).rotateX(Math.PI/2).translate(0,1.34,0),material:collar},
+    part([.3,.38,.15],[0,1.02,-.25],gear,.05),part([.1,.3,.26],[.33,.78,0],gear,.04),
   ],count,name);
-  const clothes=['#4f6f7c','#b5836f','#6d8a5f','#2f3e48','#c9b48a','#8c6f8f','#3f5a52','#e4e1d8'],skins=['#e8cdb0','#c99e7c','#8d6348','#f0d9c2'],hairs=['#2f2a27','#5a4033','#1d2226','#b9a58c','#d8d8d4'],bottoms=['#3d4a52','#2b3036','#6b6258','#c8c0b0','#45524a','#1f2a3a'];
-  for(let i=0;i<count;i++){people.tint(i,coats,clothes[(i*5)%clothes.length]);people.tint(i,skin,skins[(i*3)%skins.length]);people.tint(i,hair,hairs[(i*7)%hairs.length]);people.tint(i,trousers,bottoms[(i*11)%bottoms.length]);}
-  return people;
+  const gait=new T.InstancedBufferAttribute(new Float32Array(count*4),4).setUsage(T.DynamicDrawUsage);
+  people.meshes.forEach(m=>m.geometry.setAttribute('gait',gait));
+  const clothes=['#4f6f7c','#b5836f','#6d8a5f','#2f3e48','#c9b48a','#8c6f8f','#3f5a52','#e4e1d8'],skins=['#e8cdb0','#c99e7c','#8d6348','#f0d9c2'],hairs=['#2f2a27','#5a4033','#1d2226','#b9a58c','#d8d8d4'],bottoms=['#3d4a52','#2b3036','#6b6258','#c8c0b0','#45524a','#1f2a3a'],packs=['#2f3a40','#8c4a3a','#c9b48a','#4f6f7c','#e4e1d8'];
+  for(let i=0;i<count;i++){
+    const coat=clothes[(i*5)%clothes.length];people.tint(i,coats,coat);people.tint(i,sleeves,coat);people.tint(i,skin,skins[(i*3)%skins.length]);people.tint(i,hair,hairs[(i*7)%hairs.length]);
+    people.tint(i,trousers,bottoms[(i*11)%bottoms.length]);people.tint(i,gear,packs[(i*13)%packs.length]);
+    // A quarter carry a backpack, a fifth a shoulder bag.
+    const item=hash(i,19);gait.setZ(i,item<.25?1:item<.45?2:0);
+  }
+  return {...people,
+    gait(index:number,phase:number,swing:number,seated=0){gait.setX(index,phase);gait.setY(index,swing);gait.setW(index,seated);},
+    flush(){people.flush();gait.needsUpdate=true;}};
 }
 
 /** Doorway trips in front of the landmarks: [door, forecourt, forecourt, door] at ground level, published once each landmark loads. */
-const doorTrips:T.Vector3[][]=[];
+const doorTrips:T.Vector3[][]=[],doorSpots:T.Vector3[]=[],doorPoints:T.Vector3[]=[];
 const PAVED=new Set(['sidewalk','plaza']);
+// Landmark pads overlap the avenues in places (Aqua City's north side), so forecourt walks also keep clear of every carriageway.
+let streetSamples:{p:T.Vector3;clear:number}[]|null=null;
+const offStreet=(p:T.Vector3)=>(streetSamples??=routes().streets.flatMap((c,r)=>c.getSpacedPoints(400).map(q=>({p:q,clear:r?5:4}))))
+  .every(s=>Math.hypot(s.p.x-p.x,s.p.z-p.z)>s.clear);
 /** Finds ground-floor facade points by casting inward from all four sides of `model`'s bounds, and joins neighbouring doors on one face
  * with a short walk 4–10 m out across the paved pad (`ground`: the environment). Each walk is raycast clear of the building. */
 export function publishDoorways(model:T.Object3D,ground:T.Object3D) {
@@ -188,14 +219,19 @@ export function publishDoorways(model:T.Object3D,ground:T.Object3D) {
       const out=hit.face.normal.clone().transformDirection(hit.object.matrixWorld).setY(0);
       if(out.lengthSq()<.25||out.normalize()[axis]*sign<.4)continue;
       doors.push({at:hit.point.clone().addScaledVector(out,.4).setY(0),out});
+      // Every ground-floor door (forecourt walk or not) can take a drop-off passenger.
+      if(!doorPoints.some(d=>d.distanceTo(doors[doors.length-1].at)<4))doorPoints.push(doors[doors.length-1].at);
     }
     for(let k=1;k<doors.length;k++){
       const a=doors[k-1],b=doors[k],gap=a.at.distanceTo(b.at),reach=4+6*hash(doorTrips.length,9);
       // One face only (a corner's two normals diverge), and once: the x and z scans of a rotated landmark find the same doors.
       if(gap<8||gap>40||a.out.dot(b.out)<.9||doorTrips.some(trip=>trip[0].distanceTo(a.at)<4))continue;
       const fa=a.at.clone().addScaledVector(a.out,reach),fb=b.at.clone().addScaledVector(b.out,reach),lift=new T.Vector3(0,1.2,0);
-      if(![fa,fb,fa.clone().lerp(fb,.5)].every(paved)||!clear(fa.clone().add(lift),fb.clone().add(lift))||!clear(a.at.clone().add(lift),fa.clone().add(lift))||!clear(b.at.clone().add(lift),fb.clone().add(lift)))continue;
+      if(![fa,fb,fa.clone().lerp(fb,.5)].every(p=>paved(p)&&offStreet(p))||!clear(fa.clone().add(lift),fb.clone().add(lift))||!clear(a.at.clone().add(lift),fa.clone().add(lift))||!clear(b.at.clone().add(lift),fb.clone().add(lift)))continue;
       doorTrips.push([a.at,fa,fb,b.at]);
+      // Every other forecourt also holds a standing group 3.5 m beyond the walk, on paving and in sight of the doors.
+      const spot=fa.clone().lerp(fb,.5).addScaledVector(a.out.clone().add(b.out).normalize(),3.5);
+      if(doorTrips.length%2&&paved(spot)&&offStreet(spot)&&clear(spot.clone().add(lift),fa.clone().lerp(fb,.5).add(lift)))doorSpots.push(spot);
     }
   }
 }
@@ -204,17 +240,69 @@ export function publishDoorways(model:T.Object3D,ground:T.Object3D) {
 export function doorwayPose(time:number,index:number,length:number) {
   const speed=.9+.5*hash(index,10),walk=length/speed,cycle=walk+10+40*hash(index,11),clock=time+hash(index,12)*cycle;
   const trip=Math.floor(clock/cycle),s=clock-trip*cycle,d=Math.min(s,walk)*speed,reverse=hash(index*17+trip,13)<.5;
-  return {d:reverse?length-d:d,reverse,visible:s>walk?0:T.MathUtils.clamp(d/1.5,0,1)*T.MathUtils.clamp((length-d)/1.5,0,1),stride:Math.sin(time*speed*5.5+index)};
+  return {d:reverse?length-d:d,reverse,visible:s>walk?0:T.MathUtils.clamp(d/1.5,0,1)*T.MathUtils.clamp((length-d)/1.5,0,1),phase:time*speed*5.5+index};
 }
 /** Street cars per lane on each avenue: `cars` spread round the lane's loop (the avenue plus 40 m out of sight) at irregular gaps of
  * 0.45–1.6× the mean, moving at one lane speed (8–11 m/s with a shared ±15 % surge), so they never close up. They fade in and out at the
  * avenue ends. Lane 0 drives with the route, lane 1 against it; Japan keeps left. Returns `d` metres along the route. */
 export const STREET_GAP=27;
-export function streetCarPose(time:number,road:number,lane:number,car:number,cars:number,length:number) {
+/** A lane car's travel `x` from its lane's start (-20 … length + 20, the ends out of sight) and its lap count. */
+function laneTravel(time:number,road:number,lane:number,car:number,cars:number,length:number) {
   const id=road*2+lane,speed=8+3*hash(id,14),span=length+40,weight=(k:number)=>1+2.5*hash(id*97+k,15);
   let before=0,total=0;for(let k=0;k<cars;k++){if(k<car)before+=weight(k);total+=weight(k);}
-  const travelled=speed*(time+3*Math.sin(time*.05+id*1.7)),d=((travelled-span*before/total)%span+span)%span-20;
-  return {d:lane?length-d:d,visible:T.MathUtils.clamp(d/12,0,1)*T.MathUtils.clamp((length-d)/12,0,1)};
+  const travelled=speed*(time+3*Math.sin(time*.05+id*1.7))-span*before/total,lap=Math.floor(travelled/span);
+  return {x:travelled-lap*span-20,lap,speed,span};
+}
+const fadeEnds=(x:number,length:number)=>T.MathUtils.clamp(x/12,0,1)*T.MathUtils.clamp((length-x)/12,0,1);
+export function streetCarPose(time:number,road:number,lane:number,car:number,cars:number,length:number) {
+  const {x}=laneTravel(time,road,lane,car,cars,length);
+  return {d:lane?length-x:x,visible:fadeEnds(x,length)};
+}
+/** Kerbside drop-off on the paved forecourt south of Aqua City, beside the guideway avenue's westbound lane: two cars, each stopping at
+ * its own bay `stops` m along the lane, `bay` m beyond the lane centre. On even laps the car eases over SHIFT m into the bay at speed,
+ * brakes over 2·BRAKE m of its slot's travel to rest BRAKE m on, waits a whole lap, and rejoins exactly its own slot as it comes round,
+ * so it never meets another car. */
+export const DROP_OFF={road:1,lane:1,cars:[0,14],stops:[330,380],bay:3.5} as const;
+const BRAKE=12,SHIFT=35;
+export function dropOffPose(time:number,car:number,cars:number,length:number,stop:number) {
+  const {x,lap,speed,span}=laneTravel(time,DROP_OFF.road,DROP_OFF.lane,car,cars,length),even=lap%2===0,rest=stop+BRAKE;
+  // `steer`: heading offset (rad, toward the kerb) while easing in or out, so the car turns rather than slides.
+  let p=x,bay=0,parked=-1,leaving=-1,steer=0;
+  const slope=(u:number)=>6*u*(1-u)*DROP_OFF.bay/SHIFT;
+  if(even&&x>=stop-SHIFT&&x<stop){const u=(x-stop+SHIFT)/SHIFT;bay=ease(u);steer=Math.atan(slope(u));}
+  else if(even&&x>=stop){const u=Math.min((x-stop)/(2*BRAKE),1);p=stop+BRAKE*(1-(1-u)**2);bay=1;if(u===1)parked=(x-stop-2*BRAKE)/speed;}
+  else if(!even&&x<stop){p=rest;bay=1;parked=(x+span-stop-2*BRAKE)/speed;}
+  else if(!even&&x<stop+2*BRAKE){const u=(x-stop)/(2*BRAKE);p=rest+BRAKE*u*u;bay=1;}
+  else if(!even&&x<stop+2*BRAKE+SHIFT){const u=(x-stop-2*BRAKE)/SHIFT;bay=1-ease(u);steer=-Math.atan(slope(u));}
+  // While parked: seconds since stopping and until it pulls away (passengers time their walks to these).
+  if(parked>=0)leaving=(((stop-x)%span+span)%span)/speed;
+  return {d:DROP_OFF.lane?length-p:p,bay,steer,visible:fadeEnds(p,length),parked,leaving};
+}
+/** City day rhythm, 0..1 per group at `hour` (undefined: everything at full, as the standalone and Meter tests expect). Most people out
+ * in the evening, joggers at dawn and dusk, strollers toward sunset, children by day, sitters from late morning, delivery robots
+ * busiest at night, cars at the two commutes. */
+const RHYTHM={
+  people:[[0,.15],[5,.12],[7,.6],[9,.8],[12,.85],[15,.8],[18,1],[20,.9],[22,.45],[24,.15]],
+  joggers:[[0,.05],[5,.3],[6.5,1],[9,.6],[12,.2],[17,.5],[19,.8],[21,.3],[24,.05]],
+  strollers:[[0,.1],[7,.3],[12,.6],[16,.9],[18,1],[20,.7],[23,.2],[24,.1]],
+  children:[[0,0],[7,0],[9,.8],[17,1],[20,.4],[21,0],[24,0]],
+  sitters:[[0,.1],[7,.3],[11,.8],[13,1],[18,1],[21,.6],[23,.2],[24,.1]],
+  robots:[[0,1],[6,.8],[9,.5],[12,.7],[18,.6],[21,.9],[24,1]],
+  cars:[[0,.25],[5,.2],[7,.9],[9,1],[12,.75],[17,.95],[19,1],[22,.5],[24,.25]],
+} as const satisfies Record<string,readonly (readonly [number,number])[]>;
+export function streetRhythm(hour?:number) {
+  const at=(keys:readonly (readonly [number,number])[])=>{
+    if(hour===undefined)return 1;
+    const h=((hour%24)+24)%24;let k=1;while(k<keys.length-1&&h>keys[k][0])k++;
+    const [h0,v0]=keys[k-1],[h1,v1]=keys[k];return v0+(v1-v0)*T.MathUtils.clamp((h-h0)/(h1-h0),0,1);
+  };
+  return Object.fromEntries(Object.entries(RHYTHM).map(([k,keys])=>[k,at(keys)])) as Record<keyof typeof RHYTHM,number>;
+}
+/** Promenade benches every 24 m on the seaward edge (3.1 m out, clear of walker lanes ≤ 2.6 m), two seats each; between each pair of
+ * benches a couple stands at the rail. `u` along the promenade route. */
+export const BENCH_STEP=24, BENCH_OUT=3.1;
+export function promenadeBenches(lengths:readonly number[]) {
+  return lengths.flatMap((length,route)=>Array.from({length:Math.floor((length-16)/BENCH_STEP)},(_,k)=>({route,u:(12+k*BENCH_STEP)/length,rail:(24+k*BENCH_STEP)/length})));
 }
 
 /** Small service quadrotors match the parked district drones; four rotors share the trim batch. */
@@ -264,7 +352,9 @@ export function mobility(scene:T.Scene) {
   const airPods=fleet(scene,[part([1.5,.8,2.4],[0,.1,0],airShell,.35),part([1.56,.3,1.5],[0,.32,.25],glass,.12),part([1.2,.08,2],[0,-.3,0],mint,.03),
     ...[[-1.15,-.95],[1.15,-.95],[-1.15,.95],[1.15,.95]].map(([x,z])=>({geometry:new T.TorusGeometry(.55,.08,6,20).rotateX(Math.PI/2).translate(x,.15,z),material:airShell}))],LOOP_AIRCRAFT+2,'air-pods');
   // Doorway walkers step in and out of the landmarks (publishDoorways); street cars: 4.6 m autonomous cabs, every seventh a 7 m van.
-  const doorPeople=pedestrians(scene,DOOR_WALKERS,'doorway-walkers');
+  const doorPeople=pedestrians(scene,DOOR_WALKERS+2*DROP_OFF.cars.length,'doorway-walkers');
+  // Delivery robots: 0.8 m rovers with a lit lid, on the doorway forecourts.
+  const robots=fleet(scene,[part([.62,.5,.8],[0,.42,0],shell,.12),part([.5,.05,.5],[0,.68,0],mint,.02),part([.66,.16,.7],[0,.12,0],glass,.05)],ROBOTS,'delivery-robots');
   const carBody=material('#ffffff'),headlight=new T.MeshStandardMaterial({color:'#f4f6f2',emissive:'#fff6e0',emissiveIntensity:0,roughness:.3}),taillight=new T.MeshStandardMaterial({color:'#b85a50',emissive:'#ff4a3a',emissiveIntensity:0,roughness:.3});
   const streetLength=path.streets.map(c=>c.getLength()),streetCars=streetLength.map(length=>Math.round((length+40)/STREET_GAP)),carSlots=streetCars.reduce((n,c)=>n+2*c,0);
   const cars=fleet(scene,[part([1.85,1.1,4.6],[0,.75,0],carBody,.45),part([1.7,.6,2.6],[0,1.45,-.2],glass,.25),part([1.9,.1,4.3],[0,.45,0],mint,.04),
@@ -285,8 +375,36 @@ export function mobility(scene:T.Scene) {
   const place=(route:T.Curve<T.Vector3>,u:number,reverse=false)=>{route.getPointAt(T.MathUtils.clamp(u,0,1),p);route.getTangentAt(T.MathUtils.clamp(u,0,1),tangent);if(reverse)tangent.negate();pose.position.copy(p);pose.rotation.set(0,Math.atan2(tangent.x,tangent.z),0);};
   const [seaX,seaZ]=[INTERCHANGE.shore[0]-INTERCHANGE.head[0],INTERCHANGE.shore[2]-INTERCHANGE.head[2]].map(v=>-v/INTERCHANGE.pier),seaYaw=Math.atan2(seaX,seaZ);
   const alongX=seaZ,alongZ=-seaX; // Westward along the shore, as in layout.ts.
-  return (state:WorldState,time:number,automationShare?:number,night=0)=>{
-    const activity=automationShare===undefined?null:automationActivity(automationShare);
+  // Promenade benches face the sea with their backs landward; per bench four resting slots: two seats, then a couple at the rail beyond.
+  const benches=promenadeBenches(walkLength.slice(0,2)),benchFleet=fleet(scene,[part([1.8,.08,.46],[0,.45,0],shell,.03),part([1.8,.4,.06],[0,.72,-.24],shell,.03),
+    part([.08,.45,.42],[-.8,.22,0],glass,.02),part([.08,.45,.42],[.8,.22,0],glass,.02)],benches.length,'promenade-benches');
+  const spots:{at:T.Vector3;yaw:number;seated:number}[]=[];
+  benches.forEach((b,k)=>{
+    for(const [u,out,rail] of [[b.u,BENCH_OUT,0],[b.rail,2.95,1]] as const){
+      place(walks[b.route],u);side.crossVectors(up,tangent).normalize();
+      const sea=Math.sign(side.x*seaX+side.z*seaZ)||1,yaw=Math.atan2(side.x*sea,side.z*sea),at=pose.position.clone().addScaledVector(side,sea*out);
+      if(!rail){pose.position.copy(at);pose.rotation.set(0,yaw,0);benchFleet.set(k,pose);}
+      // Seats sit .11 m lower (hips on the slab); the rail couple stand half a metre apart, turned a little toward each other.
+      for(const j of [-1,1])spots.push({at:at.clone().addScaledVector(tangent,j*(rail?.28:.45)).setY(rail?0:-.11),yaw:yaw-(rail?j*.35:0),seated:rail?0:1});
+    }
+  });benchFleet.flush();
+  const resting=pedestrians(scene,spots.length+FORECOURT_GROUPS*3,'resting-people');
+  /** Drop-off passengers: one steps out 2 s after the car parks and walks to the nearest landmark door; another walks out to arrive
+   * 2 s before it leaves. Hidden when no door lies within 35 m. */
+  const nearDoor=(at:T.Vector3)=>{let best:T.Vector3|null=null;for(const door of doorPoints)if(door.distanceTo(at)<35&&(!best||door.distanceTo(at)<best.distanceTo(at)))best=door;return best;};
+  const passengers=(drop:number,car:ReturnType<typeof dropOffPose>,kerb:T.Vector3)=>{
+    const door=car.parked>=0?nearDoor(kerb):null,walk=door?door.distanceTo(kerb)/1.2:0;
+    for(const [j,t] of [[0,car.parked-2],[1,walk-(car.leaving-2)]] as const){
+      const slot=DOOR_WALKERS+drop*2+j,f=T.MathUtils.clamp(t/walk,0,1),from=j?door:kerb,to=j?kerb:door;
+      if(!door||!from||!to||t<0||t>walk){pose.scale.setScalar(0);doorPeople.set(slot,pose);continue;}
+      pose.position.lerpVectors(from,to,f);pose.rotation.set(0,Math.atan2(to.x-from.x,to.z-from.z),0);
+      pose.scale.setScalar(Math.min(1,f*walk*1.2,(1-f)*walk*1.2));doorPeople.set(slot,pose);doorPeople.gait(slot,t*6.6+slot,.45);
+    }
+  };
+  return (state:WorldState,time:number,automationShare?:number,night=0,hour?:number)=>{
+    const activity=automationShare===undefined?null:automationActivity(automationShare),rhythm=streetRhythm(hour);
+    // Day rhythm hides a share of each group, keyed by a stable hash so the same people come and go; at full nobody is touched.
+    const present=(share:number,key:number)=>share>=1?1:T.MathUtils.smoothstep(share-key,-.06,.06);
     const amount=(count:number,index:number)=>T.MathUtils.clamp(count-index,0,1);
     mint.emissiveIntensity=.65+state.neon*1.8;
     airShell.emissiveIntensity=activity?activity.level*.85:0;
@@ -303,7 +421,8 @@ export function mobility(scene:T.Scene) {
     }sweepPods.flush();
     for(let i=0;i<MAX_WALKERS;i++){
       const party=walkerParty(i),route=walkerRoute(party.id),onDeck=route>1,w=walkerPose(time,party.leader,walkLength[route]);
-      const weight=activity?amount(activity.walkers,i):i<WALKERS?T.MathUtils.smoothstep(state.crowd*.8+.2-i/WALKERS,-.05,.05):0;
+      const weight=(activity?amount(activity.walkers,i):i<WALKERS?T.MathUtils.smoothstep(state.crowd*.8+.2-i/WALKERS,-.05,.05):0)
+        *present(party.size===3?rhythm.children:w.jog?rhythm.joggers:w.stops?rhythm.strollers:rhythm.people,hash(party.leader,20));
       place(walks[route],w.u,!w.forward);side.crossVectors(up,tangent).normalize();
       // Parties walk abreast; deck walkers keep to the 9 m deck's outer lanes, clear of the planted middle bed.
       const abreast=(party.slot-(party.size-1)/2)*.65,lane=onDeck?(w.forward?1:-1)*(3.5+(party.size===1?(i%2-.5)*.6:abreast)):w.lane+(w.forward?abreast:-abreast);
@@ -311,11 +430,13 @@ export function mobility(scene:T.Scene) {
       // A stopped walker turns to face the bay.
       if(w.dwell>0)pose.rotation.y+=w.dwell*(((seaYaw-pose.rotation.y)%(Math.PI*2)+Math.PI*3)%(Math.PI*2)-Math.PI);
       pose.rotation.z=w.stride*.03;pose.scale.setScalar(weight*w.visible*(party.child?.62:.93+.12*hash(i,8)));people.set(i,pose);
+      people.gait(i,w.phase+party.slot*2.1,(w.jog?.8:.45)*(1-w.dwell));
     }
     for(let k=0;k<TRANSFERS;k++){
       const tp=transferPose(time,k);
       pose.position.set(INTERCHANGE.shore[0]+seaX*tp.d+alongX*tp.side,.5,INTERCHANGE.shore[2]+seaZ*tp.d+alongZ*tp.side);
       pose.rotation.set(0,k%2?seaYaw:seaYaw+Math.PI,tp.moving?Math.sin(time*6+k)*.03:0);pose.scale.setScalar(tp.visible);people.set(MAX_WALKERS+k,pose);
+      people.gait(MAX_WALKERS+k,time*6+k,tp.moving?.45:0);
     }people.flush();
     const doorShare=activity?activity.walkers/MAX_WALKERS:T.MathUtils.clamp(state.crowd*.8+.2,0,1);
     for(let k=0;k<DOOR_WALKERS;k++){
@@ -324,17 +445,39 @@ export function mobility(scene:T.Scene) {
       const legs=[trip[0].distanceTo(trip[1]),trip[1].distanceTo(trip[2]),trip[2].distanceTo(trip[3])],w=doorwayPose(time,k,legs[0]+legs[1]+legs[2]);
       let d=w.d,leg=0;while(leg<2&&d>legs[leg]){d-=legs[leg];leg++;}
       const a=trip[leg],b=trip[leg+1];pose.position.lerpVectors(a,b,Math.min(d/legs[leg],1));
-      pose.rotation.set(0,Math.atan2(b.x-a.x,b.z-a.z)+(w.reverse?Math.PI:0),w.stride*.03);
-      pose.scale.setScalar(amount(doorShare*DOOR_WALKERS,k)*w.visible*(.93+.12*hash(k,8)));doorPeople.set(k,pose);
-    }doorPeople.flush();
+      pose.rotation.set(0,Math.atan2(b.x-a.x,b.z-a.z)+(w.reverse?Math.PI:0),Math.sin(w.phase)*.03);
+      pose.scale.setScalar(amount(doorShare*DOOR_WALKERS,k)*w.visible*present(rhythm.people,hash(k,20))*(.93+.12*hash(k,8)));doorPeople.set(k,pose);doorPeople.gait(k,w.phase,.45);
+    }
+    for(let k=0;k<ROBOTS;k++){
+      const trip=doorTrips[(k*5+3)%Math.max(doorTrips.length,1)];
+      if(!trip){pose.scale.setScalar(0);robots.set(k,pose);continue;}
+      const legs=[trip[0].distanceTo(trip[1]),trip[1].distanceTo(trip[2]),trip[2].distanceTo(trip[3])],w=doorwayPose(time,500+k,legs[0]+legs[1]+legs[2]);
+      let d=w.d,leg=0;while(leg<2&&d>legs[leg]){d-=legs[leg];leg++;}
+      const a=trip[leg],b=trip[leg+1];pose.position.lerpVectors(a,b,Math.min(d/legs[leg],1));
+      pose.rotation.set(0,Math.atan2(b.x-a.x,b.z-a.z)+(w.reverse?Math.PI:0),0);pose.scale.setScalar(w.visible*present(rhythm.robots,hash(k,24)));robots.set(k,pose);
+    }robots.flush();
+    // Resting people: bench sitters, rail couples, then forecourt groups of two or three facing each other; a slow sway of the head-turn.
+    const occupied=(share:number,key:number)=>Math.min(1,doorShare*1.4)*present(share,key);
+    spots.forEach((spot,k)=>{
+      pose.position.copy(spot.at);pose.rotation.set(0,spot.yaw+Math.sin(time*.3+k*1.7)*.12,0);
+      pose.scale.setScalar(occupied(spot.seated?rhythm.sitters:rhythm.strollers,hash(k,21))*(.93+.12*hash(k,8)));resting.set(k,pose);resting.gait(k,0,0,spot.seated);
+    });
+    for(let g=0;g<FORECOURT_GROUPS;g++)for(let j=0;j<3;j++){
+      const k=spots.length+g*3+j,spot=doorSpots[g],a=j*Math.PI*2/3+hash(g,25)*6.28;
+      if(!spot||(j===2&&hash(g,26)<.4)){pose.scale.setScalar(0);resting.set(k,pose);continue;}
+      pose.position.set(spot.x+Math.sin(a)*.65,0,spot.z+Math.cos(a)*.65);pose.rotation.set(0,a+Math.PI+Math.sin(time*.4+k)*.15,0);
+      pose.scale.setScalar(occupied(rhythm.people,hash(g,27))*(.93+.12*hash(k,8)));resting.set(k,pose);resting.gait(k,0,0);
+    }resting.flush();
     for(let r=0,slot=0;r<path.streets.length;r++)for(let lane=0;lane<2;lane++)for(let c=0;c<streetCars[r];c++,slot++){
-      const car=streetCarPose(time,r,lane,c,streetCars[r],streetLength[r]);
+      const drop=r===DROP_OFF.road&&lane===DROP_OFF.lane?(DROP_OFF.cars as readonly number[]).indexOf(c):-1;
+      const car=drop<0?{...streetCarPose(time,r,lane,c,streetCars[r],streetLength[r]),bay:0,steer:0}:dropOffPose(time,c,streetCars[r],streetLength[r],DROP_OFF.stops[drop]);
       place(path.streets[r],car.d/streetLength[r],lane===1);side.crossVectors(up,tangent).normalize();
-      pose.position.addScaledVector(side,r?1.75:1.25).y+=.1;
-      // Every seventh car is a 7 m van; traffic density thins the fleet as on the water.
-      const van=hash(slot,17)<.14,density=T.MathUtils.smoothstep(state.traffic*.6+.5-hash(slot,18),-.05,.05);
+      pose.position.addScaledVector(side,(r?1.75:1.25)+car.bay*DROP_OFF.bay).y+=.1;pose.rotation.y+=car.steer;
+      // Every seventh car is a 7 m van; traffic density and the commute rhythm thin the fleet (drop-off cars always run).
+      const van=drop<0&&hash(slot,17)<.14,density=drop<0?T.MathUtils.smoothstep(state.traffic*.6+.5-hash(slot,18),-.05,.05)*present(rhythm.cars,hash(slot,22)):1;
       pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(car.visible*density);cars.set(slot,pose);
-    }cars.flush();
+      if(drop>=0)passengers(drop,car as ReturnType<typeof dropOffPose>,pose.position.clone().addScaledVector(side,1.4).setY(0));
+    }cars.flush();doorPeople.flush();
     for(let i=0;i<BOATS;i++){
       const u=(time*.009+i/BOATS)%1;place(path.water,u);pose.position.y+=Math.sin(time*1.3+i)*.08;pose.rotation.z=Math.sin(time*.9+i)*.02;
       pose.scale.setScalar(BOAT_SCALE*T.MathUtils.smoothstep(state.traffic*.6+.4-i/(BOATS+1),-.05,.05));boats.set(i,pose);pose.rotation.z=0;wakes.set(i,pose);
