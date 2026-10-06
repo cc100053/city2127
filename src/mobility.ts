@@ -2,13 +2,13 @@ import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets.ts';
-import { guideway, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers, sweepway, streets, shoreLane, interchangeApproach, interchangeBoatLane, INTERCHANGE, midDecks, gardenDecks } from './layout.ts';
+import { guideway, guidewayTracks, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers, sweepway, streets, shoreLane, interchangeApproach, interchangeBoatLane, INTERCHANGE, midDecks, gardenDecks } from './layout.ts';
 
 const ease=(t:number)=>T.MathUtils.smoothstep(t,0,1);
 const curve=(points:readonly (readonly [number,number,number])[],closed=false)=>new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p)),closed,'centripetal');
 /** Every actor path in the Odaiba scene, in metres. */
 export function routes() {
-  return {guideway:curve(guideway),promenades:promenades.map(p=>curve(p)),water:curve(waterLoop,true),ferry:curve(ferryLane),air:curve(airLoop,true),approach:curve(sphereApproach),sweep:curve(sweepway),
+  return {guideway:curve(guideway),tracks:guidewayTracks.map(p=>curve(p)),promenades:promenades.map(p=>curve(p)),water:curve(waterLoop,true),ferry:curve(ferryLane),air:curve(airLoop,true),approach:curve(sphereApproach),sweep:curve(sweepway),
     shore:curve(shoreLane,true),ixApproach:curve(interchangeApproach),ixBoat:curve(interchangeBoatLane),decks:[...midDecks,...gardenDecks].map(p=>curve(p)),streets:streets.map(p=>curve(p))};
 }
 /** 0→1→0 over `period` seconds: out-and-back routes reverse instead of jumping. */
@@ -22,6 +22,15 @@ export function podPose(time:number,train:number,car:number,length:number) {
   const margin=CARS*CAR_GAP/length,{u,forward}=pingPong(time,70,train);
   const head=margin+u*(1-2*margin);
   return {u:head+(forward?-1:1)*car*CAR_GAP/length,forward};
+}
+/** Guideway train `train` (0..`trains`-1 on its track) at `time`, car `car`: each one-way track (layout `guidewayTracks`) runs its trains
+ * at TRAIN_SPEED, evenly spread round a loop of the track plus 300 m out of sight, so trains on a track never close up and the two
+ * directions never share a beam. Cars trail the lead car CAR_GAP apart; `visible` fades over the 20 m at each track end, beyond the
+ * district. `u` along the track. */
+export const TRAIN_SPEED=12;
+export function trainPose(time:number,train:number,trains:number,car:number,length:number) {
+  const span=length+300,head=((time*TRAIN_SPEED+span*train/trains)%span+span)%span,at=head-car*CAR_GAP;
+  return {u:T.MathUtils.clamp(at/length,0,1),visible:T.MathUtils.clamp(at/20,0,1)*T.MathUtils.clamp((length-at)/20,0,1)};
 }
 export const WALKERS=120, AIR_SCALE=5;
 const MAX_WALKERS=400, DOOR_WALKERS=120, ROBOTS=14, FORECOURT_GROUPS=20, MAX_TRAINS=4, LOOP_AIRCRAFT=30;
@@ -54,30 +63,71 @@ export function automationActivity(share:number) {
 /** Stable 0..1 hash per actor `index` and salt `k`. */
 export const hash=(index:number,k=0)=>{const v=Math.sin(index*12.9898+k*78.233)*43758.5453;return v-Math.floor(v);};
 /** Walkers move in parties: per block of six slots, one alone, a pair and a trio whose third is a child. Members share the leader's pose;
- * `id` numbers the parties for `walkerRoute`. */
+ * `id` numbers the parties for `walkerRoute`. Formation: a pair walks abreast 0.6 m apart; in a trio the child walks beside the leader
+ * and the other adult 0.9 m behind, so every party is at most 0.6 m wide (`ext`: half the spread of member centres). `side` is metres
+ * outward from the leader's lane, `along` metres ahead (followers drift a little); `file` is the single-file spacing for narrow decks,
+ * `lineup` the order along a rail (kept from the formation, so nobody crosses another while lining up). */
 export function walkerParty(index:number) {
-  const k=index%6,[slot,size]=k===0?[0,1]:k<3?[k-1,2]:[k-3,3];
-  return {leader:index-slot,id:Math.floor(index/6)*3+size-1,slot,size,child:size===3&&slot===2};
+  const k=index%6,[slot,size]=k===0?[0,1]:k<3?[k-1,2]:[k-3,3],child=size===3&&slot===2;
+  const behind=size===3&&slot===1,side=size===1?0:slot===0?-.3:behind?0:.3,along=!slot?0:behind?-.9+(hash(index,30)-.5)*.3:hash(index,30)*.3;
+  return {leader:index-slot,id:Math.floor(index/6)*3+size-1,slot,size,child,side,along,ext:size===1?0:.3,file:-[0,.8,1.6][slot],lineup:size===1?0:behind?-1.2:side*4/3};
+}
+/** One party (or doorway walker, or robot) on a shared path for `passingLanes`: `d` metres along the path, `dir` ±1 its travel along
+ * it, `lane` metres right of the path for its direction, `ext` half its width between member centres, `front`/`back` how far its
+ * members reach ahead of / behind `d` in its travel direction, `inner`..`outer` the lanes its members may use; `fixed` ones (stopping, veering to
+ * a seat, halted) only push others. */
+export type Mover={path:number;dir:number;d:number;lane:number;ext:number;front?:number;back?:number;inner:number;outer:number;fixed?:boolean};
+/** Lanes that keep movers on one path from walking through each other: any two whose nearest members come within EASE m along the
+ * path are pushed apart sideways until 0.65 m (shoulders clear) lies between those members, the push easing in to full at PASS m, so
+ * passing and meeting become a smooth sidestep. Both share the step (a fixed one does not move) and nobody leaves their room, so
+ * directions keep their sides. Where a crowd leaves no room to the side they also give way along the path, up to GIVE m either way
+ * (`along`), so a jam queues instead. Returns each mover's lane and along offset (metres in its travel direction). */
+const PASS=.5,EASE=1.8,GIVE=2.5;
+export function passingLanes(movers:readonly Mover[]) {
+  const x=Float32Array.from(movers,m=>m.dir*m.lane),o=new Float32Array(movers.length);
+  const order=movers.map((_,k)=>k).sort((a,b)=>movers[a].path-movers[b].path||movers[a].d-movers[b].d);
+  const clamp=(k:number)=>{const m=movers[k],lo=m.inner+m.ext,hi=Math.max(lo,m.outer-m.ext);x[k]=m.dir>0?T.MathUtils.clamp(x[k],lo,hi):T.MathUtils.clamp(x[k],-hi,-lo);o[k]=T.MathUtils.clamp(o[k],-GIVE,GIVE);};
+  const reach=(r:number,g:number)=>r*(1-T.MathUtils.smoothstep(g,PASS,EASE));
+  for(let pass=0;pass<8;pass++)for(let i=0;i<order.length;i++)for(let j=i+1;j<order.length;j++){
+    const ka=order[i],kb=order[j],a=movers[ka],b=movers[kb];
+    if(a.path!==b.path||b.d-a.d>EASE+2*GIVE+2)break;
+    if(a.fixed&&b.fixed)continue;
+    const r=a.ext+b.ext+.65,pa=a.fixed?0:b.fixed?1:.5,span=(m:Mover,k:number)=>{const lo=m.d+o[k]-(m.dir>0?m.back??0:m.front??0);return [lo,lo+(m.front??0)+(m.back??0)];};
+    const [a0,a1]=span(a,ka),[b0,b1]=span(b,kb),ahead=b0+b1>=a0+a1?1:-1;
+    let g=Math.max(0,b0-a1,a0-b1)*ahead,gap=x[ka]-x[kb];
+    if(Math.abs(g)>=EASE||Math.abs(gap)>=reach(r,Math.abs(g)))continue;
+    // Sideways first (equal lanes part toward each mover's own right)…
+    const sign=gap?Math.sign(gap):a.dir,push=reach(r,Math.abs(g))-Math.abs(gap);
+    x[ka]+=sign*push*pa;x[kb]-=sign*push*(1-pa);clamp(ka);clamp(kb);
+    gap=x[ka]-x[kb];
+    if(Math.abs(gap)>=reach(r,Math.abs(g)))continue;
+    // …then along: open the gap until the eased reach no longer overlaps (bisection on the smoothstep).
+    let lo=Math.abs(g),hi=EASE;for(let n=0;n<10;n++){const mid=(lo+hi)/2;if(reach(r,mid)>Math.abs(gap))lo=mid;else hi=mid;}
+    const open=(hi-Math.abs(g))*ahead;
+    o[ka]-=open*pa;o[kb]+=open*(1-pa);clamp(ka);clamp(kb);
+  }
+  return movers.map((m,k)=>({lane:x[k]*m.dir,along:o[k]*m.dir}));
 }
 /** Walkers (route: `walkerRoute`, `length` m): one-way trips at each person's own pace, keeping right for their direction, then a rest
  * out of sight; trips begin and end at the route's ends (DECKS, the park, Hilton, deck landings), so people come from and go into
  * buildings. A third of lone walkers jog, in the outer lane so they pass slower parties; two in five others stop once at a viewpoint
  * for `stop.dwell` s (`dwell` eases 0→1→0 so the figure can turn to the sea or sit). `stop`: a fixed spot `at` m along the route (see
- * `promenadeStops`), false for none, omitted for a random spot .3–.7 of the way. `approach` rises 0→1 over the 6–1 m before the stop
+ * `promenadeStops`), taken only on trips in its `forward` direction (the sea on the walker's right, so reaching it crosses no oncoming
+ * lane; other trips rest that long out of sight instead), false for none, omitted for a random spot .3–.7 of the way. `approach` rises 0→1 over the 6–1 m before the stop
  * (and falls after it), so the walker can veer out of the lane to it. `visible` fades over the first and last 4 m; each trip picks
- * its direction afresh. */
+ * its direction afresh. `lane`: the leader's metres right of the centre line, for its own direction. */
 const DWELL=40;
-export function walkerPose(time:number,index:number,length=240,stop?:{at:number;dwell:number}|false) {
+export function walkerPose(time:number,index:number,length=240,stop?:{at:number;dwell:number;forward:boolean}|false) {
   const jog=index%6===0&&hash(index,1)<.33,speed=jog?2.3+.5*hash(index,2):.9+.55*hash(index,2),stops=!jog&&hash(index,3)<.4&&stop!==false;
   const dwellFor=stops?stop?.dwell??DWELL:0,walk=length/speed,cycle=walk+dwellFor+8+40*hash(index,4),clock=time+hash(index,5)*cycle;
-  const trip=Math.floor(clock/cycle),s=clock-trip*cycle,forward=hash(index*31+trip,6)<.5;
+  const trip=Math.floor(clock/cycle),s=clock-trip*cycle,forward=hash(index*31+trip,6)<.5,stopping=stops&&(!stop||stop.forward===forward);
   // The stop `at` metres into the trip, reached `start` s in.
-  const at=stop?(forward?stop.at:length-stop.at):(.3+.4*hash(index,7))*length,start=stops?at/speed:Infinity;
+  const at=stop?(forward?stop.at:length-stop.at):(.3+.4*hash(index,7))*length,start=stopping?at/speed:Infinity;
   const walked=Math.min(walk,s<start?s:s<start+dwellFor?start:s-dwellFor);
-  const dwell=stops?T.MathUtils.clamp(Math.min(s-start,start+dwellFor-s)/4,0,1):0,d=walked*speed;
-  const approach=stops?T.MathUtils.clamp((6-Math.abs(d-at))/5,0,1):0;
-  const visible=s>=walk+dwellFor?0:T.MathUtils.clamp(d/4,0,1)*T.MathUtils.clamp((length-d)/4,0,1);
-  return {u:forward?d/length:1-d/length,forward,lane:(forward?1:-1)*(jog?2.1:.8+(index%3)*.15),phase:time*speed*5.5+index,stride:Math.sin(time*speed*5.5+index)*(1-dwell),
+  const dwell=stopping?T.MathUtils.clamp(Math.min(s-start,start+dwellFor-s)/4,0,1):0,d=walked*speed;
+  const approach=stopping?T.MathUtils.clamp((6-Math.abs(d-at))/5,0,1):0;
+  const visible=s>=walk+(stopping?dwellFor:0)?0:T.MathUtils.clamp(d/4,0,1)*T.MathUtils.clamp((length-d)/4,0,1);
+  return {u:forward?d/length:1-d/length,forward,lane:jog?2.05:(index%6?.75:.5)+.1*hash(index,31),phase:time*speed*5.5+index,stride:Math.sin(time*speed*5.5+index)*(1-dwell),
     dwell,approach,leaving:s>=start,visible,speed,jog,stops};
 }
 /** Interchange transfer `index` at `time`: `d` metres out along the pier (head at INTERCHANGE.pier), `side` across it, `visible` 0..1
@@ -200,7 +250,7 @@ export function pedestrians(scene:T.Object3D,count:number,name:string) {
 }
 
 /** Doorway trips in front of the landmarks: [door, forecourt, forecourt, door] at ground level, published once each landmark loads. */
-const doorTrips:{curve:T.CatmullRomCurve3;length:number;start:T.Vector3}[]=[],doorSpots:T.Vector3[]=[],doorPoints:T.Vector3[]=[];
+const doorTrips:{curve:T.CatmullRomCurve3;length:number;start:T.Vector3;end:T.Vector3;samples:T.Vector3[]}[]=[],doorSpots:T.Vector3[]=[],doorPoints:T.Vector3[]=[];
 const PAVED=new Set(['sidewalk','plaza']);
 // Landmark pads overlap the avenues in places (Aqua City's north side), so forecourt walks also keep clear of every carriageway.
 let streetSamples:{p:T.Vector3;clear:number}[]|null=null;
@@ -233,15 +283,20 @@ export function publishDoorways(model:T.Object3D,ground:T.Object3D) {
     }
     for(let k=1;k<doors.length;k++){
       const a=doors[k-1],b=doors[k],gap=a.at.distanceTo(b.at),reach=4+6*hash(doorTrips.length,9);
-      // One face only (a corner's two normals diverge), and once: the x and z scans of a rotated landmark find the same doors.
-      if(gap<8||gap>40||a.out.dot(b.out)<.9||doorTrips.some(trip=>trip.start.distanceTo(a.at)<4))continue;
+      // One face only (a corner's two normals diverge), and each door on one trip only (the x and z scans of a rotated landmark find the
+      // same doors, and people from two trips would meet in one doorway).
+      if(gap<8||gap>40||a.out.dot(b.out)<.9||doorTrips.some(trip=>[trip.start,trip.end].some(d=>d.distanceTo(a.at)<4||d.distanceTo(b.at)<4)))continue;
       const fa=a.at.clone().addScaledVector(a.out,reach),fb=b.at.clone().addScaledVector(b.out,reach),lift=new T.Vector3(0,1.2,0);
       if(![fa,fb,fa.clone().lerp(fb,.5)].every(p=>paved(p)&&offStreet(p))||!clear(fa.clone().add(lift),fb.clone().add(lift))||!clear(a.at.clone().add(lift),fa.clone().add(lift))||!clear(b.at.clone().add(lift),fb.clone().add(lift)))continue;
       const curve=new T.CatmullRomCurve3([a.at.clone().addScaledVector(a.out,-1),a.at,fa,fb,b.at,b.at.clone().addScaledVector(b.out,-1)],false,'centripetal');
-      doorTrips.push({curve,length:curve.getLength(),start:a.at});
-      // Every other forecourt also holds a standing group 3.5 m beyond the walk, on paving and in sight of the doors.
-      const spot=fa.clone().lerp(fb,.5).addScaledVector(a.out.clone().add(b.out).normalize(),3.5);
-      if(doorTrips.length%2&&paved(spot)&&offStreet(spot)&&clear(spot.clone().add(lift),fa.clone().lerp(fb,.5).add(lift)))doorSpots.push(spot);
+      // Clear of every other trip by 3 m, so their people never share ground (passingLanes only separates people on one trip).
+      const samples=curve.getSpacedPoints(60);
+      if(doorTrips.some(trip=>trip.samples.some(p=>samples.some(q=>p.distanceTo(q)<3))))continue;
+      doorTrips.push({curve,length:curve.getLength(),start:a.at,end:b.at,samples});
+      // Every other forecourt also holds a standing group 4 m beyond the walk, on paving, in sight of the doors and 2.6 m clear of the
+      // rounded walk (group radius, a walker and the widest passing lane).
+      const spot=fa.clone().lerp(fb,.5).addScaledVector(a.out.clone().add(b.out).normalize(),4);
+      if(doorTrips.length%2&&paved(spot)&&offStreet(spot)&&clear(spot.clone().add(lift),fa.clone().lerp(fb,.5).add(lift))&&samples.every(p=>p.distanceTo(spot)>2.6))doorSpots.push(spot);
     }
   }
 }
@@ -338,14 +393,19 @@ export function promenadeBenches(lengths:readonly number[]) {
 }
 /** Promenade viewpoints by walker leader slot: each promenade party that stops gets its own spot, first come by slot (so the
  * always-present low slots get them) — a stool for lone walkers, who sit 70 s, a rail spot for parties, who stand 40 s. Stoppers left
- * over walk on (`false`); deck walkers are absent and keep a random in-lane viewpoint. `out`: standing offset from the centre line
+ * over walk on (`false`), as do deck walkers (a group standing in a deck lane would block it). `out`: standing offset from the centre line
  * (the stool's front, or the rail); `seat`: the stool's centre, where a sitter settles. */
 export function promenadeStops(lengths:readonly number[]) {
-  const free=promenadeBenches(lengths).flatMap(b=>[{route:b.route,at:b.stool*lengths[b.route],out:STOOL_FRONT,seat:BENCH_OUT,dwell:70},{route:b.route,at:b.view*lengths[b.route],out:RAIL_OUT,seat:0,dwell:DWELL}]);
+  // `forward`: the route direction with the sea on the walker's right.
+  const walks=routes().promenades,sea=[INTERCHANGE.head[0]-INTERCHANGE.shore[0],INTERCHANGE.head[2]-INTERCHANGE.shore[2]];
+  const seaRight=(route:number,u:number)=>{const t=walks[route].getTangentAt(u);return t.x*sea[1]-t.z*sea[0]>0;};
+  const free=promenadeBenches(lengths).flatMap(b=>[{route:b.route,at:b.stool*lengths[b.route],out:STOOL_FRONT,seat:BENCH_OUT,dwell:70,forward:seaRight(b.route,b.stool)},
+    {route:b.route,at:b.view*lengths[b.route],out:RAIL_OUT,seat:0,dwell:DWELL,forward:seaRight(b.route,b.view)}]);
   const stops=new Map<number,typeof free[number]|false>();
   for(let i=0;i<MAX_WALKERS;i++){
     const party=walkerParty(i),route=walkerRoute(party.id);
-    if(party.slot||route>1||!walkerPose(0,i).stops)continue;
+    if(party.slot||!walkerPose(0,i).stops)continue;
+    if(route>1){stops.set(i,false);continue;}
     const k=free.findIndex(s=>s.route===route&&(s.seat>0)===(party.size===1));
     stops.set(i,k<0?false:free.splice(k,1)[0]);
   }
@@ -370,7 +430,7 @@ export function pavilionFlight(time:number,index:number) {
 
 
 export function mobility(scene:T.Scene) {
-  const path=routes(),guideLength=path.guideway.getLength();
+  const path=routes(),trackLength=path.tracks.map(c=>c.getLength());
   // Guideway pods (ART.md §7): rounded white cars with a glass band and a mint service line, 9 m long.
   const body=material('#ffffff');
   const podParts=()=>[part([2.7,2.6,9],[0,1.5,0],body,.6),part([2.76,.9,7.6],[0,2,0],glass,.3),part([2.8,.14,8],[0,.9,0],mint,.05),part([2.2,.12,.12],[0,1.3,4.5],coral,.05)];
@@ -478,29 +538,48 @@ export function mobility(scene:T.Scene) {
     airShell.emissiveIntensity=activity?activity.level*.85:0;
     collar.emissiveIntensity=night*4;
     headlight.emissiveIntensity=.2+night*4;taillight.emissiveIntensity=.15+night*3;
+    // Trains alternate between the south-west (even) and north-east (odd) tracks, two places per track whether or not both run.
     for(let train=0;train<MAX_TRAINS;train++)for(let car=0;car<CARS;car++){
-      const {u,forward}=podPose(time,train<2?train:train-1.5,car,guideLength);
-      place(path.guideway,u,!forward);pose.scale.setScalar(activity?amount(activity.pods,train*CARS+car):train<TRAINS?T.MathUtils.smoothstep(state.traffic*.5+.5-train*.3,0,.1):0);pods.set(train*CARS+car,pose);
+      const track=train%2,{u,visible}=trainPose(time,train>>1,MAX_TRAINS/2,car,trackLength[track]);
+      place(path.tracks[track],u);pose.scale.setScalar(visible*(activity?amount(activity.pods,train*CARS+car):train<TRAINS?T.MathUtils.smoothstep(state.traffic*.5+.5-train*.3,0,.1):0));pods.set(train*CARS+car,pose);
     }pods.flush();
     for(let car=0;car<SWEEP_CARS;car++){
       // Drawn at SWEEP_SCALE so the train reads at hero distance; the shortened length spaces the cars by the same factor.
       const {u,forward}=podPose(time+20,0,car,sweepLength/SWEEP_SCALE);
       place(path.sweep,u,!forward);pose.rotation.x=-Math.asin(T.MathUtils.clamp(tangent.y,-1,1));pose.scale.setScalar(SWEEP_SCALE*T.MathUtils.smoothstep(state.traffic*.5+.5,0,.1));sweepPods.set(car,pose);
     }sweepPods.flush();
+    // Leaders first: each party's pose, then the sidesteps that let faster parties pass slower ones (stoppers veer on their own).
+    const leads:{w:ReturnType<typeof walkerPose>;stop:ReturnType<typeof stops.get>;lane:number}[]=[],movers:Mover[]=[],moverOf:number[]=[];
+    for(let i=0;i<MAX_WALKERS;i+=walkerParty(i).size){
+      const party=walkerParty(i),route=walkerRoute(party.id),onDeck=route>1,stop=stops.get(i),w=walkerPose(time,i,walkLength[route],stop);
+      // Deck walkers keep to the 9 m deck's outer lanes, clear of the 5.2 m planted middle bed, in single file and without stopping (too
+      // narrow to pass a party abreast or a group standing in the lane).
+      const lane=onDeck?3.5+(party.size===1?(i%2-.5)*.6:0):w.lane,share=party.size===3?rhythm.children:w.jog?rhythm.joggers:w.stops?rhythm.strollers:rhythm.people;
+      leads[i]={w,stop,lane};
+      if(w.visible>0&&(activity?amount(activity.walkers,i)>0:i<WALKERS&&state.crowd*.8+.2>i/WALKERS)&&share>hash(i,20)){
+        // A stopper veering to its spot (or there) holds its own line, given by the approach below; others make room around it.
+        let held=lane;
+        if(stop&&w.approach){place(walks[route],w.u,!w.forward);held=T.MathUtils.lerp(lane,-seaward().sea*(stop.seat?T.MathUtils.lerp(stop.out,stop.seat,w.dwell):stop.out),ease(w.approach));}
+        // Lane centres stay 0.25 m off the centre line and, on the promenade, 2.1 m out (a shoulder clears the bench backrest at 2.48 m).
+        moverOf[i]=movers.length;movers.push({path:route,dir:w.forward?1:-1,d:w.u*walkLength[route],lane:held,ext:onDeck?0:party.ext,front:onDeck||party.size===1?0:.3,
+          back:onDeck?(party.size-1)*.8:party.size===3?1.05:0,inner:onDeck?2.85:.25,outer:onDeck?4.2:2.1,fixed:held!==lane||w.dwell>0});
+      }
+    }
+    const passing=passingLanes(movers);
     for(let i=0;i<MAX_WALKERS;i++){
-      const party=walkerParty(i),route=walkerRoute(party.id),onDeck=route>1,stop=onDeck?undefined:stops.get(party.leader),w=walkerPose(time,party.leader,walkLength[route],stop);
+      const party=walkerParty(i),route=walkerRoute(party.id),{w,stop,lane:base}=leads[party.leader];
       const share=party.size===3?rhythm.children:w.jog?rhythm.joggers:w.stops?rhythm.strollers:rhythm.people;
       const weight=walkerGate(i,(activity?true:i<WALKERS&&state.crowd*.8+.2>i/WALKERS)&&share>hash(party.leader,20))*(activity?amount(activity.walkers,i):1);
       place(walks[route],w.u,!w.forward);const {sea,yaw:facing}=seaward();
-      // Parties walk abreast, followers a little ahead or behind and drifting; deck walkers keep to the 9 m deck's outer lanes, clear of
-      // the planted middle bed.
-      const abreast=(party.slot-(party.size-1)/2)*.6,base=onDeck?(w.forward?1:-1)*(3.5+(party.size===1?(i%2-.5)*.6:abreast)):w.lane+(w.forward?abreast:-abreast);
-      let lane=base+.04*Math.sin(time*.5+i*2.3)*(1-w.dwell),along=party.slot?(hash(i,30)-.5)*.6:0,slope=0;
+      // In formation (see walkerParty), drifting a little; `lane` is metres right of the centre line for this direction.
+      const moved=moverOf[party.leader]===undefined||stop&&w.approach?null:passing[moverOf[party.leader]],lead=moved?moved.lane:base;
+      const onDeck=route>1;
+      let lane=lead+(onDeck?0:party.side)+.04*Math.sin(time*.5+i*2.3)*(1-w.dwell),along=(onDeck?party.file:party.along)+(moved?moved.along:0),slope=0;
       // Promenade stoppers veer out of the lane to their stool's front or rail spot (a party lines up along the rail), a sitter settles
       // back onto the seat, and all veer back in after; `slope` turns the body along the diagonal.
       if(stop){
-        const a=ease(w.approach),target=-sea*(stop.seat?T.MathUtils.lerp(stop.out,stop.seat,w.dwell):stop.out);
-        lane=T.MathUtils.lerp(lane,target,a);along+=abreast*a;slope=(target-base)*6*w.approach*(1-w.approach)/5*(w.leaving?-1:1);
+        const a=ease(w.approach),target=-sea*(stop.seat?T.MathUtils.lerp(stop.out,stop.seat,w.dwell):stop.out),lineup=party.lineup;
+        lane=T.MathUtils.lerp(lane,target,a);along=T.MathUtils.lerp(along,lineup,a);slope=(target-lead)*6*w.approach*(1-w.approach)/5*(w.leaving?-1:1);
       }
       pose.position.addScaledVector(side,-lane).addScaledVector(tangent,along);pose.position.y+=Math.abs(w.stride)*.025*w.speed-(stop&&stop.seat?.08*w.dwell:0);
       if(slope)pose.rotation.y=Math.atan2(tangent.x-side.x*slope,tangent.z-side.z*slope);
@@ -516,25 +595,46 @@ export function mobility(scene:T.Scene) {
       people.gait(MAX_WALKERS+k,time*6+k,tp.moving?.45:0);
     }people.flush();
     const doorShare=activity?activity.walkers/MAX_WALKERS:T.MathUtils.clamp(state.crowd*.8+.2,0,1);
-    // Doorway trips follow their rounded curve; a reverse trip faces back along it.
-    const onTrip=(trip:typeof doorTrips[number],d:number,reverse:boolean)=>{
-      const u=T.MathUtils.clamp(d/trip.length,0,1);trip.curve.getPointAt(u,pose.position);trip.curve.getTangentAt(u,tangent);
-      pose.position.y=0;pose.rotation.set(0,Math.atan2(tangent.x,tangent.z)+(reverse?Math.PI:0),0);
+    // Doorway trips follow their rounded curve; a reverse trip faces back along it. `lane` metres right of travel, `along` ahead.
+    const onTrip=(trip:typeof doorTrips[number],d:number,reverse:boolean,lane=0,along=0)=>{
+      const dir=reverse?-1:1,u=T.MathUtils.clamp((d+along*dir)/trip.length,0,1);trip.curve.getPointAt(u,pose.position);trip.curve.getTangentAt(u,tangent);
+      pose.position.x-=dir*tangent.z*lane;pose.position.z+=dir*tangent.x*lane;pose.position.y=0;pose.rotation.set(0,Math.atan2(tangent.x,tangent.z)+(reverse?Math.PI:0),0);
     };
+    // Forecourt walkers and robots keep right on their trip and make way for each other (passingLanes); a halted robot and its
+    // collector hold still. Movers' `path` is the trip.
+    const tripOf=(k:number)=>k%Math.max(doorTrips.length,1),robotTrip=(k:number)=>(k+3)%Math.max(doorTrips.length,1); // one robot per trip while trips ≥ ROBOTS
+    const doorMovers:Mover[]=[],doorMover:number[]=[],robotMover:number[]=[],doorPoses=[] as ReturnType<typeof doorwayPose>[],robotPoses=[] as ReturnType<typeof robotPose>[];
+    const lane={inner:.15,outer:1.3};
     for(let k=0;k<DOOR_WALKERS;k++){
-      const trip=doorTrips[k%Math.max(doorTrips.length,1)];
+      const trip=doorTrips[tripOf(k)];if(!trip)break;
+      const w=doorPoses[k]=doorwayPose(time,k,trip.length);
+      if(w.visible>0&&amount(doorShare*DOOR_WALKERS,k)>0&&rhythm.people>hash(k,20)){doorMover[k]=doorMovers.length;doorMovers.push({path:tripOf(k),dir:w.reverse?-1:1,d:w.d,lane:.45,ext:0,...lane});}
+    }
+    for(let k=0;k<ROBOTS;k++){
+      const trip=doorTrips[robotTrip(k)];if(!trip)break;
+      const w=robotPoses[k]=robotPose(time,500+k,trip.length),dir=w.reverse?-1:1;
+      if(w.visible>0&&rhythm.robots>hash(k,24)){
+        robotMover[k]=doorMovers.length;doorMovers.push({path:robotTrip(k),dir,d:w.d,lane:.45,ext:.3,front:.45,back:.45,...lane,fixed:w.waited>=0});
+        // The collector stands on the robot's line, between it and the door.
+        if(w.waited>=0)doorMovers.push({path:robotTrip(k),dir,d:w.reverse?collectorPose(w.waited).e:trip.length-collectorPose(w.waited).e,lane:.45,ext:0,...lane,fixed:true});
+      }
+    }
+    const doorPassing=passingLanes(doorMovers);
+    for(let k=0;k<DOOR_WALKERS;k++){
+      const trip=doorTrips[tripOf(k)];
       if(!trip){pose.scale.setScalar(0);doorPeople.set(k,pose);continue;}
-      const w=doorwayPose(time,k,trip.length);onTrip(trip,w.d,w.reverse);pose.rotation.z=Math.sin(w.phase)*.03;
+      const w=doorPoses[k],m=doorMover[k]===undefined?null:doorPassing[doorMover[k]];
+      onTrip(trip,w.d,w.reverse,m?m.lane:.45,m?m.along:0);pose.rotation.z=Math.sin(w.phase)*.03;
       pose.scale.setScalar(amount(doorShare*DOOR_WALKERS,k)*w.visible*doorGate(k,rhythm.people>hash(k,20))*(.93+.12*hash(k,8)));doorPeople.set(k,pose);doorPeople.gait(k,w.phase,.45);
     }
     // Delivery robots roll to the next door and wait while a collector steps out to meet them, then both go in.
     for(let k=0;k<ROBOTS;k++){
-      const trip=doorTrips[(k*5+3)%Math.max(doorTrips.length,1)],slot=COLLECTORS+k;
+      const trip=doorTrips[robotTrip(k)],slot=COLLECTORS+k;
       if(!trip){pose.scale.setScalar(0);robots.set(k,pose);doorPeople.set(slot,pose);continue;}
-      const w=robotPose(time,500+k,trip.length),present=robotGate(k,rhythm.robots>hash(k,24));
-      onTrip(trip,w.d,w.reverse);pose.scale.setScalar(w.visible*present);robots.set(k,pose);
+      const w=robotPoses[k],present=robotGate(k,rhythm.robots>hash(k,24)),m=robotMover[k]===undefined?null:doorPassing[robotMover[k]];
+      onTrip(trip,w.d,w.reverse,m?m.lane:.45,m?m.along:0);pose.scale.setScalar(w.visible*present);robots.set(k,pose);
       const c=collectorPose(w.waited);
-      onTrip(trip,w.reverse?c.e:trip.length-c.e,!w.reverse);pose.rotation.y+=Math.PI*(1-c.facing);
+      onTrip(trip,w.reverse?c.e:trip.length-c.e,!w.reverse,-.45);pose.rotation.y+=Math.PI*(1-c.facing);
       pose.scale.setScalar(w.waited<0?0:present*T.MathUtils.clamp(c.e/.5,0,1)*(.93+.12*hash(slot,8)));doorPeople.set(slot,pose);
       doorPeople.gait(slot,time*6+slot,c.walking?.45:0);
     }robots.flush();

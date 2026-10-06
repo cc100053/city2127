@@ -117,3 +117,17 @@ doorways per landmark), `src/main.ts` (DEV `?review=street`), `tests/mobility.te
 - One ~10 m junction mouth on the guideway avenue has no road triangle; cars cross it on terrain.
 - No cross streets or signals, by decision (2127 cars need none).
 - Shadows and GTAO use the rest pose (no custom depth material for the gait shader): a sitter's shadow is a standing figure's.
+
+### Round 7 (user request 2026-10-06: nothing passes through anything) — IN PROGRESS
+
+- Done (commit below; tests/build/diff-check PASS; clash census in a scratch node harness running the real `mobility()` with published
+  doorways, 600 s at .25 s, shares 0/.5/1): people 4199 → 3–6 brief grazes per 600 s; rail 18–216 → 0; air and street cars 0.
+  - Root bug: opposite-direction walkers shared one physical lane (lane sign flipped with the reversed tangent). Lanes are now metres
+    right of travel; parties walk in a ≤ 0.6 m formation (deck parties single file); `passingLanes` sidesteps and, in jams, queues
+    (≤ 2.5 m) movers on one path; promenade stops happen only on trips with the sea on the right; deck walkers no longer stop.
+  - Doorways: each door on one trip, trips 3 m apart, one robot per trip, forecourt groups 2.6 m clear of the rounded walk.
+  - Trains: two one-way tracks traced from the GLB's two beams (`guidewayTracks`), fading beyond the district; no more reversing.
+- Left: water (15 pairs / 600 s): the taxi loop's return leg crosses its outbound leg (legs only ~9 m apart); the interchange boat and
+  bay cruisers cross the loop. Plan: move the return leg ~25 m seaward, make periods commensurate (cruisers 50 s, loop spacing 50/3 s,
+  interchange 40 s, ferry 300 s → 600 s), then choose cruiser/loop phases so no pair meets; add a clash test (water/rail/people) and a
+  browser check; update PROJECT/VALIDATION.

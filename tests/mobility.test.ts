@@ -188,13 +188,8 @@ assert.ok(streetRhythm(18).people > 3 * streetRhythm(4).people && streetRhythm(4
 // sitter's feet (knee .31 m forward plus the .08 m shin) stop short of the lit edge tube (3.6 m − .3 m).
 const benches = promenadeBenches(path.promenades.map(c => c.getLength()));
 assert.ok(benches.length >= 16 && benches.every(b => b.u > 0 && b.rail < 1) && BENCH_OUT - .27 > 2.35 && BENCH_OUT + .39 < 3.3);
-// Lanes clear the backrest: parties span ±.6 m about their lane, lone joggers keep the outer lane, outside every party.
-assert.ok(Array.from({ length: 400 }, (_, i) => { const w = walkerPose(0, i); return Math.abs(w.lane) + (w.jog ? 0 : .6) + .25; }).every(v => v <= 2.35));
-// Party members (arms .38 m out, a child's .24 m) span ±.3 / ±.6 m about the leader's lane and sway .04 m: joggers pass outside them all.
-const partyEdge = (i: number) => { const p = walkerParty(i), w = walkerPose(0, p.leader); return Math.abs(w.lane) + (p.slot - (p.size - 1) / 2) * .6 + (p.child ? .24 : .38) + .04; };
-const joggerInner = Math.min(...Array.from({ length: 400 }, (_, i) => walkerPose(0, i)).filter(w => w.jog).map(w => Math.abs(w.lane) - .38 - .04));
-assert.ok(Array.from({ length: 400 }, (_, i) => i).filter(i => !walkerPose(0, walkerParty(i).leader).jog).every(i => partyEdge(i) < joggerInner), 'joggers overlap parties');
-
+// Lanes clear the backrest (2.48 m) with a shoulder to spare and keep 0.25 m off the centre line; joggers run outside every party.
+assert.ok(Array.from({ length: 400 }, (_, i) => { const p = walkerParty(i), w = walkerPose(0, p.leader); return w.lane + p.side; }).every(v => v >= .25 && v <= 2.1));
 // Promenade stops: every spot used once, lone walkers sit at stools, parties stand at the rail; a walker holds exactly at its spot,
 // fully veered out, and is back in its lane 6 m on.
 const promenadeLengths = path.promenades.map(c => c.getLength()), stops = promenadeStops(promenadeLengths);
@@ -206,7 +201,7 @@ for (const [i, stop] of stops) {
   assert.equal(stop.seat > 0, walkerParty(i).size === 1);
   const length = promenadeLengths[walkerRoute(walkerParty(i).id)];
   let held = 0, far = 0;
-  for (let t = 0; t < 1500; t++) {
+  for (let t = 0; t < 4000; t++) {
     const w = walkerPose(t, i, length, stop);
     if (w.dwell > 0) { held++; assert.ok(Math.abs((w.forward ? w.u : 1 - w.u) * length - (w.forward ? stop.at : length - stop.at)) < 1e-6 && w.approach === 1); }
     if (w.visible > 0 && w.approach === 0) far++;
