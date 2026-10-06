@@ -118,7 +118,15 @@ export function passingLanes(movers:readonly Mover[]) {
     let g=Math.max(0,b0-a1,a0-b1)*ahead,gap=x[ka]-x[kb];
     if(Math.abs(g)>=EASE||Math.abs(gap)>=reach(r,Math.abs(g)))continue;
     // Sideways first (equal lanes part toward each mover's own right)…
-    const sign=gap?Math.sign(gap):a.dir,push=reach(r,Math.abs(g))-Math.abs(gap);
+    let sign=gap?Math.sign(gap):a.dir,push=reach(r,Math.abs(g))-Math.abs(gap);
+    // …except that one passing a fixed mover goes round the side with room for it (a walker between a halted robot and its collector
+    // was squeezed into the narrow side and then queued into the collector).
+    const free=a.fixed?kb:b.fixed?ka:-1;
+    if(free>=0){
+      const m=movers[free],lo=m.inner+m.ext,hi=Math.max(lo,m.outer-m.ext),[min,max]=m.dir>0?[lo,hi]:[-hi,-lo],way=free===ka?sign:-sign;
+      const room=(s:number)=>s>0?max-x[free]:x[free]-min,flip=reach(r,Math.abs(g))+Math.abs(gap);
+      if(room(way)<push&&room(-way)>=flip){sign=-sign;push=flip;}
+    }
     x[ka]+=sign*push*pa;x[kb]-=sign*push*(1-pa);clamp(ka);clamp(kb);
     gap=x[ka]-x[kb];
     if(Math.abs(gap)>=reach(r,Math.abs(g)))continue;
@@ -148,7 +156,7 @@ export function walkerPose(time:number,index:number,length=240,stop?:{at:number;
   const dwell=stopping?T.MathUtils.clamp(Math.min(s-start,start+dwellFor-s)/4,0,1):0,d=walked*speed;
   const approach=stopping?T.MathUtils.clamp((6-Math.abs(d-at))/5,0,1):0;
   const visible=s>=walk+(stopping?dwellFor:0)?0:T.MathUtils.clamp(d/4,0,1)*T.MathUtils.clamp((length-d)/4,0,1);
-  return {u:forward?d/length:1-d/length,forward,lane:jog?2.05:(index%6?.75:.5)+.1*hash(index,31),phase:time*speed*5.5+index,stride:Math.sin(time*speed*5.5+index)*(1-dwell),
+  return {u:forward?d/length:1-d/length,forward,lane:jog?2.05:(index%6?.75:.5)+.1*hash(index,31),
     dwell,approach,leaving:s>=start,visible,speed,jog,stops};
 }
 /** Interchange transfer `index` at `time`: `d` metres out along the pier (head at INTERCHANGE.pier), `side` across it, `visible` 0..1
@@ -379,7 +387,7 @@ export function publishEntrances(scene:T.Object3D,ground:T.Object3D) {
 export function doorwayPose(time:number,index:number,length:number) {
   const speed=.9+.5*hash(index,10),walk=length/speed,cycle=walk+10+40*hash(index,11),clock=time+hash(index,12)*cycle;
   const trip=Math.floor(clock/cycle),s=clock-trip*cycle,d=Math.min(s,walk)*speed,reverse=hash(index*17+trip,13)<.5;
-  return {d:reverse?length-d:d,reverse,visible:s>walk?0:T.MathUtils.clamp(d/.5,0,1)*T.MathUtils.clamp((length-d)/.5,0,1),phase:time*speed*5.5+index};
+  return {d:reverse?length-d:d,reverse,visible:s>walk?0:T.MathUtils.clamp(d/.5,0,1)*T.MathUtils.clamp((length-d)/.5,0,1),speed};
 }
 /** Delivery robot `index` on a doorway trip `length` m long: rolls out of one door at a steady ROBOT_SPEED, halts with its centre
  * ROBOT_HALT m short of the far end (just outside the next door) for HANDOFF s while someone comes out to collect, then rolls in and
@@ -571,7 +579,7 @@ export function mobility(scene:T.Scene) {
   // Autonomous pods: a rounded cabin on four ducted rotors, 17 m across; they take a winged craft's slot as automation rises (podShare).
   const airPods=fleet(scene,[part([1.5,.8,2.4],[0,.1,0],airShell,.35),part([1.56,.3,1.5],[0,.32,.25],glass,.12),part([1.2,.08,2],[0,-.3,0],mint,.03),
     ...[[-1.15,-.95],[1.15,-.95],[-1.15,.95],[1.15,.95]].map(([x,z])=>({geometry:new T.TorusGeometry(.55,.08,6,20).rotateX(Math.PI/2).translate(x,.15,z),material:airShell}))],LOOP_AIRCRAFT+2,'air-pods');
-  // Doorway walkers step in and out of the landmarks (publishDoorways); street cars: 4.6 m autonomous cabs, every seventh a 7 m van.
+  // Doorway walkers step in and out of the landmarks (publishDoorways); street cars: 4.6 m human-driven cars, every seventh a 7 m van.
   // Slots: forecourt walkers, drop-off passengers, then one collector per delivery robot.
   const COLLECTORS=DOOR_WALKERS+2*DROP_OFF.cars.length,doorPeople=pedestrians(scene,COLLECTORS+ROBOTS,'doorway-walkers');
   // Delivery robots: 0.8 m rovers with a lit lid, on the doorway forecourts.
@@ -582,6 +590,11 @@ export function mobility(scene:T.Scene) {
     part([1.5,.14,.08],[0,.95,2.3],headlight,.03),part([1.5,.14,.08],[0,.95,-2.3],taillight,.03)],carSlots,'street-cars');
   const carColors=['#f4f3ee','#e9eef0','#dfe4e2','#c9d3d0','#e8e0d0','#8fa8ad','#5f6f78','#2f3a40'];
   for(let i=0;i<carSlots;i++)cars.tint(i,carBody,carColors[Math.floor(hash(i,16)*carColors.length)]);
+  // Autonomous street pods take a car's slot as automation rises (podShare, as the aircraft): a rounded pale cabin under a wraparound
+  // glass canopy and a thin mint roof line, the cars' 4.6 m length so the drop-off lamps still fit; a van slot becomes a cargo pod.
+  const podBody=material('#ffffff'),streetPods=fleet(scene,[part([1.8,1.3,4.6],[0,.8,0],podBody,.6),part([1.84,.62,3.5],[0,1.28,-.1],glass,.3),
+    part([.24,.04,2.8],[0,1.6,-.1],mint,.02),part([1.3,.1,.08],[0,.82,2.29],headlight,.03),part([1.3,.1,.08],[0,.82,-2.29],taillight,.03)],carSlots,'street-pods');
+  for(let i=0;i<carSlots;i++)streetPods.tint(i,podBody,carColors[Math.floor(hash(i,16)*4)]);
   // Drop-off cues per bay car: an amber indicator pair (front and rear corner, set on the signalled side) and a bright brake lamp over
   // the tail light; hidden when off.
   const amber=new T.MeshBasicMaterial({color:'#ffae2e'}),brakeRed=new T.MeshBasicMaterial({color:'#ff3326'});
@@ -636,7 +649,23 @@ export function mobility(scene:T.Scene) {
   };
   /** Day-rhythm and crowd presence per actor: each is wholly on or off (a stable hash against the group's share, so the same people
    * come and go) and eases between the two, so nobody stays drawn shrunk when the hour or crowd is held. */
-  let lastTime=NaN,fade=1;
+  let lastTime=NaN,fade=1,dt=0;
+  /** Actual travel of a mover between frames from its solved lane and along offset (`passingLanes`), smoothed over ~.3 s: `pace` is
+   * the share of its own `speed` it really covers (a queued walker stops stepping) and `turn` the heading offset (rad) of a sidestep,
+   * so it turns rather than slides. A first frame, jump or snapshot starts still. */
+  const travel=(count:number)=>{
+    const lane=new Float32Array(count).fill(NaN),along=new Float32Array(count),aside=new Float32Array(count),ahead=new Float32Array(count);
+    return {
+      at(i:number,nowLane:number,nowAlong:number,speed:number){
+        if(dt>0&&Number.isFinite(lane[i])){const k=1-Math.exp(-dt/.3);aside[i]+=((nowLane-lane[i])/dt-aside[i])*k;ahead[i]+=((nowAlong-along[i])/dt-ahead[i])*k;}
+        else aside[i]=ahead[i]=0;
+        lane[i]=nowLane;along[i]=nowAlong;const forward=speed+ahead[i];
+        return {pace:T.MathUtils.clamp(forward/speed,0,1),turn:T.MathUtils.clamp(Math.atan2(-aside[i],Math.max(forward,.3)),-.6,.6)};
+      },
+      still(i:number){lane[i]=NaN;return {pace:1,turn:0};},
+    };
+  };
+  const walkerTravel=travel(MAX_WALKERS),doorTravel=travel(DOOR_WALKERS),robotTravel=travel(ROBOTS),partyTravel:{pace:number;turn:number}[]=[];
   const gate=(count:number)=>{
     const level=new Float32Array(count).fill(-1);
     return (i:number,on:boolean)=>{const target=on?1:0;level[i]=level[i]<0?target:level[i]+T.MathUtils.clamp(target-level[i],-fade,fade);return ease(level[i]);};
@@ -645,7 +674,7 @@ export function mobility(scene:T.Scene) {
   return (state:WorldState,time:number,automationShare?:number,night=0,hour?:number)=>{
     const activity=automationShare===undefined?null:automationActivity(automationShare),rhythm=streetRhythm(hour);
     // Presence eases over 1.5 s of animation time; a reset, snapshot or jump settles at once.
-    fade=Number.isFinite(lastTime)&&time>lastTime?(time-lastTime)/1.5:1;lastTime=time;
+    fade=Number.isFinite(lastTime)&&time>lastTime?(time-lastTime)/1.5:1;dt=time>lastTime&&time-lastTime<.5?time-lastTime:0;lastTime=time;
     const amount=(count:number,index:number)=>T.MathUtils.clamp(count-index,0,1);
     mint.emissiveIntensity=.65+state.neon*1.8;
     airShell.emissiveIntensity=activity?activity.level*.85:0;
@@ -687,6 +716,10 @@ export function mobility(scene:T.Scene) {
       // In formation (see walkerParty), drifting a little; `lane` is metres right of the centre line for this direction.
       const moved=moverOf[party.leader]===undefined||stop&&w.approach?null:passing[moverOf[party.leader]],lead=moved?moved.lane:base;
       const onDeck=route>1;
+      // Feet follow ground actually covered (trip distance plus the solver's along offset), so a queued party stops stepping; a stopper's
+      // legs settle within the first second of its stop (its trip distance freezes at once).
+      if(!party.slot)partyTravel[i]=moved?walkerTravel.at(i,lead,moved.along,w.speed):walkerTravel.still(i);
+      const {pace,turn}=partyTravel[party.leader],phase=((w.forward?w.u:1-w.u)*walkLength[route]+(moved?moved.along:0))*5.5+party.leader,feet=(1-Math.min(1,w.dwell*4))*pace,stride=Math.sin(phase)*feet;
       let lane=lead+(onDeck?0:party.side)+.04*Math.sin(time*.5+i*2.3)*(1-w.dwell),along=(onDeck?party.file:party.along)+(moved?moved.along:0),slope=0;
       // Promenade stoppers veer out of the lane to their stool's front or rail spot (a party lines up along the rail), a sitter settles
       // back onto the seat, and all veer back in after; `slope` turns the body along the diagonal.
@@ -694,12 +727,12 @@ export function mobility(scene:T.Scene) {
         const a=ease(w.approach),target=-sea*(stop.seat?T.MathUtils.lerp(stop.out,stop.seat,w.dwell):stop.out),lineup=party.lineup;
         lane=T.MathUtils.lerp(lane,target,a);along=T.MathUtils.lerp(along,lineup,a);slope=(target-lead)*6*w.approach*(1-w.approach)/5*(w.leaving?-1:1);
       }
-      pose.position.addScaledVector(side,-lane).addScaledVector(tangent,along);pose.position.y+=Math.abs(w.stride)*.025*w.speed-(stop&&stop.seat?.08*w.dwell:0);
-      if(slope)pose.rotation.y=Math.atan2(tangent.x-side.x*slope,tangent.z-side.z*slope);
+      pose.position.addScaledVector(side,-lane).addScaledVector(tangent,along);pose.position.y+=Math.abs(stride)*.025*w.speed-(stop&&stop.seat?.08*w.dwell:0);
+      if(slope)pose.rotation.y=Math.atan2(tangent.x-side.x*slope,tangent.z-side.z*slope);else pose.rotation.y+=turn*(1-w.dwell);
       // A stopped walker turns to face the bay (and sits, at a stool).
       if(w.dwell>0)pose.rotation.y+=w.dwell*((((stop?facing:seaYaw)-pose.rotation.y)%(Math.PI*2)+Math.PI*3)%(Math.PI*2)-Math.PI);
-      pose.rotation.z=w.stride*.03;pose.scale.setScalar(weight*w.visible*(party.child?.62:.93+.12*hash(i,8)));people.set(i,pose);
-      people.gait(i,w.phase+party.slot*2.1,(w.jog?.8:.45)*(1-w.dwell),stop&&stop.seat?w.dwell:0);
+      pose.rotation.z=stride*.03;pose.scale.setScalar(weight*w.visible*(party.child?.62:.93+.12*hash(i,8)));people.set(i,pose);
+      people.gait(i,phase+party.slot*2.1,(w.jog?.8:.45)*feet,stop&&stop.seat?w.dwell:0);
     }
     for(let k=0;k<TRANSFERS;k++){
       const tp=transferPose(time,k);
@@ -737,8 +770,9 @@ export function mobility(scene:T.Scene) {
       const trip=doorWalks[tripOf(k)];
       if(!trip){pose.scale.setScalar(0);doorPeople.set(k,pose);continue;}
       const w=doorPoses[k],m=doorMover[k]===undefined?null:doorPassing[doorMover[k]];
-      onTrip(trip,w.d,w.reverse,m?m.lane:.45,m?m.along:0);pose.rotation.z=Math.sin(w.phase)*.03;
-      pose.scale.setScalar(amount(doorShare*DOOR_WALKERS,k)*w.visible*doorGate(k,rhythm.people>hash(k,20))*(.93+.12*hash(k,8)));doorPeople.set(k,pose);doorPeople.gait(k,w.phase,.45);doorPeople.social(k,0,0);
+      const {pace,turn}=m?doorTravel.at(k,m.lane,m.along,w.speed):doorTravel.still(k),phase=T.MathUtils.clamp((w.reverse?trip.length-w.d:w.d)+(m?m.along:0),0,trip.length)*5.5+k;
+      onTrip(trip,w.d,w.reverse,m?m.lane:.45,m?m.along:0);pose.rotation.y+=turn;pose.rotation.z=Math.sin(phase)*.03*pace;
+      pose.scale.setScalar(amount(doorShare*DOOR_WALKERS,k)*w.visible*doorGate(k,rhythm.people>hash(k,20))*(.93+.12*hash(k,8)));doorPeople.set(k,pose);doorPeople.gait(k,phase,.45*pace);doorPeople.social(k,0,0);
     }
     for(let g=0;g<2;g++){
       const trip=entranceTrips[g];
@@ -757,7 +791,7 @@ export function mobility(scene:T.Scene) {
       const trip=doorWalks[robotTrip(k)],slot=COLLECTORS+k;
       if(!trip){pose.scale.setScalar(0);robots.set(k,pose);doorPeople.set(slot,pose);continue;}
       const w=robotPoses[k],present=robotGate(k,rhythm.robots>hash(k,24)),m=robotMover[k]===undefined?null:doorPassing[robotMover[k]];
-      onTrip(trip,w.d,w.reverse,m?m.lane:.45,m?m.along:0);pose.scale.setScalar(w.visible*present);robots.set(k,pose);
+      onTrip(trip,w.d,w.reverse,m?m.lane:.45,m?m.along:0);pose.rotation.y+=(m&&w.waited<0?robotTravel.at(k,m.lane,m.along,ROBOT_SPEED):robotTravel.still(k)).turn;pose.scale.setScalar(w.visible*present);robots.set(k,pose);
       const c=collectorPose(w.waited);
       onTrip(trip,w.reverse?c.e:trip.length-c.e,!w.reverse,-.45);pose.rotation.y+=Math.PI*(1-c.facing);
       pose.scale.setScalar(w.waited<0?0:present*T.MathUtils.clamp(c.e/.5,0,1)*(.93+.12*hash(slot,8)));doorPeople.set(slot,pose);
@@ -797,16 +831,19 @@ export function mobility(scene:T.Scene) {
       place(path.streets[r],car.d/streetLength[r],lane===1);side.crossVectors(up,tangent).normalize();
       pose.position.addScaledVector(side,(r?1.75:1.25)+car.bay*DROP_OFF.bay).y+=.1;pose.rotation.y+=car.steer;if(drop>=0)pose.rotation.x=(car as ReturnType<typeof dropOffPose>).pitch;
       // Every seventh car is a 7 m van; traffic density and the commute rhythm thin the fleet (drop-off cars always run).
+      // Human-driven cars give way to autonomous pods slot by slot as automation rises; standalone keeps the cars.
       const van=drop<0&&hash(slot,17)<.14,density=drop<0?carGate(slot,state.traffic*.6+.5>hash(slot,18)&&rhythm.cars>hash(slot,22)):1;
-      pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(car.visible*density);cars.set(slot,pose);
+      const shown=car.visible*density,pod=activity?podShare(activity.level,slot):0;
+      pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(shown*(1-pod));cars.set(slot,pose);
+      pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(shown*pod);streetPods.set(slot,pose);
       if(drop>=0){
-        const cue=car as ReturnType<typeof dropOffPose>,shown=pose.scale.x;passengers(drop,cue,pose.position.clone().addScaledVector(side,1.4).setY(0));
+        const cue=car as ReturnType<typeof dropOffPose>;passengers(drop,cue,pose.position.clone().addScaledVector(side,1.4).setY(0));
         pose.scale.setScalar(shown*cue.brake);brakeLamps.set(drop,pose);
         // Indicators blink at 1.5 Hz on the kerb (+x, Japan keeps left) or road side, just proud of the body.
         const kerbX=new T.Vector3(1,0,0).applyEuler(pose.rotation),on=cue.signal&&(time*1.5)%1<.5?1:0;
         pose.position.addScaledVector(kerbX,cue.signal*.95);pose.scale.setScalar(shown*on);indicators.set(drop,pose);
       }
-    }cars.flush();doorPeople.flush();indicators.flush();brakeLamps.flush();
+    }cars.flush();streetPods.flush();doorPeople.flush();indicators.flush();brakeLamps.flush();
     // Boats (boatPoses) bob and roll a little; loop taxis thin with traffic and the berthed interchange boat leaves no wake.
     boatPoses(time,path).forEach((b,i)=>{
       pose.position.set(b.x,b.y+Math.sin(time*(i<BOATS?1.3:1.1)+i)*.08,b.z);pose.rotation.set(0,b.yaw,i<BOATS?Math.sin(time*.9+i)*.02:0);

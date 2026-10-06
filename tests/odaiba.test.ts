@@ -454,6 +454,7 @@ const peopleFleets = ['promenade-walkers', 'doorway-walkers', 'resting-people', 
 const resting = peopleFleets[2], m = new Matrix4(), scale = new Vector3(), p = new Vector3();
 const seenVisits = new Set<string>();
 const previousEntrances=new Map<string,Vector3>();
+const strides = new Map<string, {time: number; at: Vector3; phase: number}>(), slow = [0, 0], inPlace = [0, 0];
 for (const share of [0, .5, 1]) for (const hour of [12, 21]) for (let time = 0; time < 240; time += .25) {
   updatePeople(presets.neutral, time, share, hour === 21 ? 1 : 0, hour);
   const drawn = peopleFleets.flatMap(mesh => {
@@ -461,6 +462,21 @@ for (const share of [0, .5, 1]) for (const hour of [12, 21]) for (let time = 0; 
     for (let slot = 0; slot < mesh.count; slot++) { mesh.getMatrixAt(slot, m); if (scale.setFromMatrixScale(m).x > .5) positions.push({mesh, slot, at: new Vector3().setFromMatrixPosition(m)}); }
     return positions;
   });
+  // Doorway people and robots keep their shoulders (robots .85 m) clear of each other, and nobody walks in place: a person drawn
+  // covering under .3 m/s must not also be striding (swing > .2 with the phase advancing), as queued walkers once did.
+  const door = drawn.filter(d => d.mesh === peopleFleets[1] || d.mesh === peopleFleets[3]);
+  for (let a = 0; a < door.length; a++) for (let b = a + 1; b < door.length; b++) if (Math.abs(door[a].at.y - door[b].at.y) < 1)
+    assert.ok(door[a].at.distanceTo(door[b].at) > (door[a].mesh === peopleFleets[3] || door[b].mesh === peopleFleets[3] ? .85 : .62), `${door[a].mesh.name}#${door[a].slot} grazes ${door[b].mesh.name}#${door[b].slot} at ${time}s`);
+  for (const [f, limit] of [[0, 400], [1, 116]] as const) {
+    const gait = peopleFleets[f].geometry.getAttribute('gait');
+    for (const d of drawn) if (d.mesh === peopleFleets[f] && d.slot < limit) {
+      const key = `${f}/${d.slot}`, prev = strides.get(key);
+      if (prev && prev.time === time - .25 && gait.getW(d.slot) < .5 && d.at.distanceTo(prev.at) < .075) {
+        slow[f]++; if (gait.getY(d.slot) > .2 && Math.abs(gait.getX(d.slot) - prev.phase) > .5) inPlace[f]++;
+      }
+      strides.set(key, {time, at: d.at.clone(), phase: gait.getX(d.slot)});
+    }
+  }
   for (const v of visits) {
     const slot = restStart + v.group * 3 + 2, pose = visitPose(time, v.group, v.length);
     resting.getMatrixAt(slot, m); p.setFromMatrixPosition(m);
@@ -490,10 +506,12 @@ for (const share of [0, .5, 1]) for (const hour of [12, 21]) for (let time = 0; 
     }
   }
 }
+// Only the inside of a tight forecourt corner (a body pivoting while its trip distance advances) may still read as a step.
+assert.ok(slow[0] > 1000 && inPlace[0] === 0 && slow[1] > 100 && inPlace[1] < slow[1] * .02, `walking in place: ${inPlace} of ${slow} slow frames`);
 assert.equal(seenVisits.size, 3 * 2 * visits.length, 'every journey is actually inhabited at low/mixed/high by day and night');
 // Conversation animation does not rotate/slide the seated body or change its folded leg pose.
 updatePeople(presets.neutral, 5, 0); const seat = new Matrix4(); resting.getMatrixAt(0, seat);
 updatePeople(presets.neutral, 9, 0); resting.getMatrixAt(0, m); assert.deepEqual(m.elements, seat.elements);
 assert.equal(resting.geometry.getAttribute('gait').getW(0), 1);
 ray.far = Infinity;
-console.log(`Odaiba: ${visits.length} forecourt visits and ${entrances.length} doorway meetings clear real paving, geometry and actual low/mixed/high day/night fleets; seated bodies remain fixed.`);
+console.log(`Odaiba: ${visits.length} forecourt visits and ${entrances.length} doorway meetings clear real paving, geometry and actual low/mixed/high day/night fleets; doorway people/robots keep clear, nobody walks in place (${inPlace} of ${slow}); seated bodies remain fixed.`);

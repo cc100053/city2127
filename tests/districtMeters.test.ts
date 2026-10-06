@@ -134,7 +134,7 @@ const visible = (name: string, slots = Infinity) => {
   return count;
 };
 updateActors(presets.neutral, 20);
-const names = ['guideway-pods', 'promenade-walkers', 'air-taxis', 'air-pods', 'water-taxis'];
+const names = ['guideway-pods', 'promenade-walkers', 'air-taxis', 'air-pods', 'water-taxis', 'street-cars', 'street-pods'];
 const legacyMatrices = names.map(name => [...fleet(name).instanceMatrix.array]);
 // Walker slots between trips are out of sight (inside a building), so count the slots whose current trip is in view.
 const walks = [...routes().promenades, ...routes().decks];
@@ -147,6 +147,12 @@ for (const [ports, aircraft, pods, walkers] of [[1, 3, 12, 400], [3, 17, 18, 260
     assert.deepEqual([visible('air-taxis') + visible('air-pods'), visible('guideway-pods'), visible('promenade-walkers', 400)], [aircraft, pods, walking(walkers)]);
   }
 }
+// Street traffic keeps every drawn slot while human-driven cars give way to autonomous pods: all cars at low, both at mixed, all pods at high.
+{
+  const street = [1, 3, 5].map(ports => { updateActors(presets.neutral, 20, ports / 6); return [visible('street-cars'), visible('street-pods')]; });
+  assert.ok(street[0][0] > 20 && street[0][1] === 0 && street[1][0] > 0 && street[1][1] > 0 && street[2][0] === 0, `street fleet by automation ${JSON.stringify(street)}`);
+  assert.ok(street.every(([cars, pods]) => cars + pods === street[0][0]), 'automation swaps vehicles, never the amount of traffic');
+}
 // Resting people (benches, rails, forecourts) are present or absent at any crowd level, never shrunk into their bench.
 updateActors(presets.neutral, 20, 5 / 6, 0, 15);
 {
@@ -155,6 +161,7 @@ updateActors(presets.neutral, 20, 5 / 6, 0, 15);
 }
 updateActors(presets.neutral, 20);
 names.forEach((name, i) => assert.deepEqual([...fleet(name).instanceMatrix.array], legacyMatrices[i], `${name} restores legacy matrices`));
+assert.equal(visible('street-pods'), 0, 'standalone streets keep human-driven cars');
 console.log('PASS: actual P2 actor matrices match low/mixed/high independently of day mood; original standalone/legacy poses restored.');
 
 const sharing = new SharingDistrict(new T.Scene());
