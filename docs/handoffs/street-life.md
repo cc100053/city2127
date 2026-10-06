@@ -4,8 +4,8 @@
 - Status: IN_PROGRESS
 - Branch: feat/pedestrian-traffic-life
 - Base commit: 9476fd8b82da523d6f7acee6f1893e5028fb35a0
-- Last verified commit: NONE (uncommitted working tree checked 2026-10-06)
-- Remote availability: NOT PUSHED
+- Last verified commit: 79d416531fe5198ea350a7e3139451cb66a5a9cc (tests/build/diff-check; browser checks on the same tree before commit)
+- Remote availability: origin/feat/pedestrian-traffic-life @ 79d416531fe5198ea350a7e3139451cb66a5a9cc
 
 ## Session Git state
 
