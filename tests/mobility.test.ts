@@ -160,6 +160,19 @@ path.streets.forEach((street, r) => {
       }
     }
     assert.ok(parkedSeen > 100, `drop-off car ${car} never parks`);
+    // Cues: kerb indicator ahead of easing in and through braking, brake lamp only while slowing, road indicator before pulling away
+    // and until back in lane; the nose dips under braking and lifts pulling away, never past 1°.
+    let kerbBeforeBay = 0, roadBeforeMove = 0;
+    for (let t = 0; t < 400; t += .25) {
+      const a = dropOffPose(t, car, cars, length, DROP_OFF.stops[k]), b = dropOffPose(t + .25, car, cars, length, DROP_OFF.stops[k]);
+      if (a.signal === 1 && a.bay === 0) kerbBeforeBay++;
+      if (a.signal === -1 && a.parked >= 0) roadBeforeMove++;
+      if (a.brake) assert.ok(a.signal === 1 && a.parked < 0 && a.pitch >= 0 && b.d !== a.d, 'brake lamp off the braking stretch');
+      if (a.bay === 0 && b.bay === 0) assert.ok(a.signal >= 0 && !a.brake && a.pitch === 0, 'cue in plain traffic');
+      if (a.parked >= 0 && a.leaving > 3) assert.equal(a.signal, 0, 'parked car signals early');
+      assert.ok(Math.abs(a.pitch) < .0175 && Math.abs(a.pitch - b.pitch) < .005);
+    }
+    assert.ok(kerbBeforeBay > 4 && roadBeforeMove >= 10, `drop-off car ${car} gives no warning`);
   });
 }
 

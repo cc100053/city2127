@@ -82,9 +82,19 @@ doorways per landmark), `src/main.ts` (DEV `?review=street`), `tests/mobility.te
   passengers) steps 1.5 m out, faces the robot, turns back and goes in; then the robot rolls in.
 - DEV `&cam=x,y,z` moves the `?review=street` camera (the default one now looks down on the canopy over the bench).
 
+### Round 6 (user request 2026-10-06: B8)
+
+- Drop-off cars cue their moves: `dropOffPose` returns `signal` (+1 kerb from 30 m before easing in until stopped, -1 road from 3 s
+  before pulling away until back in lane), `brake` and `pitch` (≤ .7° nose dip braking, .5° lift pulling away). Two small fleets
+  (`drop-off-indicators`, 1.5 Hz amber pair on the signalled side; `drop-off-brakes`, bright lamp over the tail light) hide when off.
+- Also fixed a round-5 type error in `main.ts` (`&cam` spread; `vite build` does not type-check, `tsc --noEmit` caught it).
+
 ## Actual validation results
 
 - Verification status: PARTIAL
+- Round 6 (2026-10-06, worktree before commit): root `npm test` PASS, `npm run build` PASS, `git diff --check` PASS, `tsc --noEmit`
+  PASS. Headless Chromium 1400×900 behind drop-off car 0 at `?hour=18&meters=nw:low&reviewTime=27.42/34.08/113.42`: kerb indicators
+  approaching, brake lamp stopping, road indicator pulling away. FPS NOT RUN.
 - Round 5 (2026-10-06, worktree before commit, base fabc3a6): root `npm test` PASS, `npm run build` PASS, `git diff --check` PASS.
   Vite DEV on :5174 (another session held :5173), built-in pane: no console errors. Headless Chromium 1400×900 with the camera set
   through the three.js devtools hook: walker slot 84 at `?hour=17&meters=nw:low&reviewTime=66/72` approaches and sits on the stool at

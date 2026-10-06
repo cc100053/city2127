@@ -287,22 +287,25 @@ export function streetCarPose(time:number,road:number,lane:number,car:number,car
 /** Kerbside drop-off on the paved forecourt south of Aqua City, beside the guideway avenue's westbound lane: two cars, each stopping at
  * its own bay `stops` m along the lane, `bay` m beyond the lane centre. On even laps the car eases over SHIFT m into the bay at speed,
  * brakes over 2·BRAKE m of its slot's travel to rest BRAKE m on, waits a whole lap, and rejoins exactly its own slot as it comes round,
- * so it never meets another car. */
+ * so it never meets another car. Cues: `signal` +1 indicates toward the kerb from SIGNAL m before easing in until it stops, -1 toward
+ * the road from 3 s before pulling away until back in lane; `brake` lights while braking; `pitch` (rad, + nose down) dips the nose
+ * under braking and lifts it pulling away. */
 export const DROP_OFF={road:1,lane:1,cars:[0,14],stops:[330,380],bay:3.5} as const;
-const BRAKE=12,SHIFT=35;
+const BRAKE=12,SHIFT=35,SIGNAL=30;
 export function dropOffPose(time:number,car:number,cars:number,length:number,stop:number) {
   const {x,lap,speed,span}=laneTravel(time,DROP_OFF.road,DROP_OFF.lane,car,cars,length),even=lap%2===0,rest=stop+BRAKE;
   // `steer`: heading offset (rad, toward the kerb) while easing in or out, so the car turns rather than slides.
-  let p=x,bay=0,parked=-1,leaving=-1,steer=0;
+  let p=x,bay=0,parked=-1,leaving=-1,steer=0,brake=0,pitch=0;
   const slope=(u:number)=>6*u*(1-u)*DROP_OFF.bay/SHIFT;
   if(even&&x>=stop-SHIFT&&x<stop){const u=(x-stop+SHIFT)/SHIFT;bay=ease(u);steer=Math.atan(slope(u));}
-  else if(even&&x>=stop){const u=Math.min((x-stop)/(2*BRAKE),1);p=stop+BRAKE*(1-(1-u)**2);bay=1;if(u===1)parked=(x-stop-2*BRAKE)/speed;}
+  else if(even&&x>=stop){const u=Math.min((x-stop)/(2*BRAKE),1);p=stop+BRAKE*(1-(1-u)**2);bay=1;if(u===1)parked=(x-stop-2*BRAKE)/speed;else{brake=1;pitch=.012*Math.sin(Math.PI*u);}}
   else if(!even&&x<stop){p=rest;bay=1;parked=(x+span-stop-2*BRAKE)/speed;}
-  else if(!even&&x<stop+2*BRAKE){const u=(x-stop)/(2*BRAKE);p=rest+BRAKE*u*u;bay=1;}
+  else if(!even&&x<stop+2*BRAKE){const u=(x-stop)/(2*BRAKE);p=rest+BRAKE*u*u;bay=1;pitch=-.008*Math.sin(Math.PI*u);}
   else if(!even&&x<stop+2*BRAKE+SHIFT){const u=(x-stop-2*BRAKE)/SHIFT;bay=1-ease(u);steer=-Math.atan(slope(u));}
   // While parked: seconds since stopping and until it pulls away (passengers time their walks to these).
   if(parked>=0)leaving=(((stop-x)%span+span)%span)/speed;
-  return {d:DROP_OFF.lane?length-p:p,bay,steer,visible:fadeEnds(p,length),parked,leaving};
+  const signal=even&&x>=stop-SHIFT-SIGNAL&&parked<0&&(x<stop||brake>0)?1:(parked>=0&&leaving<3)||(!even&&x>=stop&&x<stop+2*BRAKE+SHIFT)?-1:0;
+  return {d:DROP_OFF.lane?length-p:p,bay,steer,visible:fadeEnds(p,length),parked,leaving,signal,brake,pitch};
 }
 /** City day rhythm, 0..1 per group at `hour` (undefined: everything at full, as the standalone and Meter tests expect). Most people out
  * in the evening, joggers at dawn and dusk, strollers toward sunset, children by day, sitters from late morning, delivery robots
@@ -406,6 +409,11 @@ export function mobility(scene:T.Scene) {
     part([1.5,.14,.08],[0,.95,2.3],headlight,.03),part([1.5,.14,.08],[0,.95,-2.3],taillight,.03)],carSlots,'street-cars');
   const carColors=['#f4f3ee','#e9eef0','#dfe4e2','#c9d3d0','#e8e0d0','#8fa8ad','#5f6f78','#2f3a40'];
   for(let i=0;i<carSlots;i++)cars.tint(i,carBody,carColors[Math.floor(hash(i,16)*carColors.length)]);
+  // Drop-off cues per bay car: an amber indicator pair (front and rear corner, set on the signalled side) and a bright brake lamp over
+  // the tail light; hidden when off.
+  const amber=new T.MeshBasicMaterial({color:'#ffae2e'}),brakeRed=new T.MeshBasicMaterial({color:'#ff3326'});
+  const indicators=fleet(scene,[part([.06,.14,.3],[0,.95,2.05],amber,.02),part([.06,.14,.3],[0,.95,-2.05],amber,.02)],DROP_OFF.cars.length,'drop-off-indicators',false);
+  const brakeLamps=fleet(scene,[part([1.54,.16,.06],[0,.95,-2.33],brakeRed,.03)],DROP_OFF.cars.length,'drop-off-brakes',false);
   const berthLight=new T.PointLight('#b9e2cf',0,60,2);berthLight.position.set(SPHERE_DOCK[0],SPHERE_DOCK[1]+4,SPHERE_DOCK[2]);scene.add(berthLight);
   const ixLight=new T.PointLight('#b9e2cf',0,45,2);ixLight.position.set(INTERCHANGE.mast[0],INTERCHANGE.deck+4,INTERCHANGE.mast[2]);scene.add(ixLight);
   const guideMaterial=new T.MeshBasicMaterial({color:new T.Color('#88d6d3').multiplyScalar(1.6)});
@@ -547,12 +555,18 @@ export function mobility(scene:T.Scene) {
       const drop=r===DROP_OFF.road&&lane===DROP_OFF.lane?(DROP_OFF.cars as readonly number[]).indexOf(c):-1;
       const car=drop<0?{...streetCarPose(time,r,lane,c,streetCars[r],streetLength[r]),bay:0,steer:0}:dropOffPose(time,c,streetCars[r],streetLength[r],DROP_OFF.stops[drop]);
       place(path.streets[r],car.d/streetLength[r],lane===1);side.crossVectors(up,tangent).normalize();
-      pose.position.addScaledVector(side,(r?1.75:1.25)+car.bay*DROP_OFF.bay).y+=.1;pose.rotation.y+=car.steer;
+      pose.position.addScaledVector(side,(r?1.75:1.25)+car.bay*DROP_OFF.bay).y+=.1;pose.rotation.y+=car.steer;if(drop>=0)pose.rotation.x=(car as ReturnType<typeof dropOffPose>).pitch;
       // Every seventh car is a 7 m van; traffic density and the commute rhythm thin the fleet (drop-off cars always run).
       const van=drop<0&&hash(slot,17)<.14,density=drop<0?carGate(slot,state.traffic*.6+.5>hash(slot,18)&&rhythm.cars>hash(slot,22)):1;
       pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(car.visible*density);cars.set(slot,pose);
-      if(drop>=0)passengers(drop,car as ReturnType<typeof dropOffPose>,pose.position.clone().addScaledVector(side,1.4).setY(0));
-    }cars.flush();doorPeople.flush();
+      if(drop>=0){
+        const cue=car as ReturnType<typeof dropOffPose>,shown=pose.scale.x;passengers(drop,cue,pose.position.clone().addScaledVector(side,1.4).setY(0));
+        pose.scale.setScalar(shown*cue.brake);brakeLamps.set(drop,pose);
+        // Indicators blink at 1.5 Hz on the kerb (+x, Japan keeps left) or road side, just proud of the body.
+        const kerbX=new T.Vector3(1,0,0).applyEuler(pose.rotation),on=cue.signal&&(time*1.5)%1<.5?1:0;
+        pose.position.addScaledVector(kerbX,cue.signal*.95);pose.scale.setScalar(shown*on);indicators.set(drop,pose);
+      }
+    }cars.flush();doorPeople.flush();indicators.flush();brakeLamps.flush();
     for(let i=0;i<BOATS;i++){
       const u=(time*.009+i/BOATS)%1;place(path.water,u);pose.position.y+=Math.sin(time*1.3+i)*.08;pose.rotation.z=Math.sin(time*.9+i)*.02;
       pose.scale.setScalar(BOAT_SCALE*T.MathUtils.smoothstep(state.traffic*.6+.4-i/(BOATS+1),-.05,.05));boats.set(i,pose);pose.rotation.z=0;wakes.set(i,pose);

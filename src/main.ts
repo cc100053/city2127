@@ -41,7 +41,7 @@ try {
   const streetReview=import.meta.env.DEV && reviewParams.get('review')==='street';
   // `&cam=x,y,z` moves the street-review camera (still aimed at the bench, at least 30 m out) to see past canopies.
   const reviewCam=reviewParams.get('cam')?.split(',').map(Number);
-  if(streetReview){camera.position.set(...(reviewCam?.length===3&&reviewCam.every(Number.isFinite)?reviewCam as [number,number,number]:[-40,20,-245] as const));camera.lookAt(-24,0,-268);}
+  if(streetReview){const [x,y,z]=reviewCam?.length===3&&reviewCam.every(Number.isFinite)?reviewCam:[-40,20,-245];camera.position.set(x,y,z);camera.lookAt(-24,0,-268);}
   const reviewTime=import.meta.env.DEV && reviewParams.has('reviewTime') ? Number(reviewParams.get('reviewTime')) : NaN;
   const ambient=new T.HemisphereLight('#edf1e4','#8a8274',2.2);scene.add(ambient);
   const sun=new T.DirectionalLight('#ffe4b8',3.4);sun.position.set(-20,38,18);sun.castShadow=true;
