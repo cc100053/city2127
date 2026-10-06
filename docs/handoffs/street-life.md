@@ -134,3 +134,37 @@ doorways per landmark), `src/main.ts` (DEV `?review=street`), `tests/mobility.te
 - Validation: root `npm test` PASS (new boat-period and train-spacing checks; the boat check fails with the old loop phase), `npm run
   build` PASS, `git diff --check` PASS; headless Chromium hero `?hour=15&meters=nw:low&reviewTime=40` renders, no page errors.
   FPS NOT RUN (passingLanes adds a per-frame sort and pair pass over ~200 parties and the doorway movers).
+
+### Interaction proposal (2026-10-06; proposed, NOT IMPLEMENTED)
+
+- Inspection: Codex, for owner cc100053. Started on `feat/pedestrian-traffic-life` at
+  `f255a5118444b8fe36b7c9a25a293b5157c6ac9f`, clean. Fetch succeeded; branch/upstream divergence 0/0;
+  branch is 15 commits ahead of `origin/main` (`9476fd8b82da523d6f7acee6f1893e5028fb35a0`), 0 behind.
+  Round-7 verified implementation `50ac74a` is available remotely; subsequent `f255a51` changes only this handoff.
+- Scope: user requested proposals for improving pedestrian interaction. Source/caller inspection only; existing behavior and
+  implementation verification above remain unchanged. No new browser, runtime or FPS evidence.
+
+Recommended order:
+
+1. **Credible yielding.** Clear the remaining collector/doorway grazes first. Then make walking swing and body heading follow the
+   corrected movement from `passingLanes`: queued people should pause their feet, and a sidestep should turn smoothly rather than
+   slide sideways. Keep the existing shared lane solver and authored paths. Check actual drawn shoulder/robot clearance through
+   collector arrival, waiting and departure, plus low/mixed/high fleets; review continuous motion, not just held poses.
+2. **Companions acknowledge one another.** Pairs occasionally glance at each other; at existing rail stops, one adult points toward
+   the bay and the other follows the gesture. Family members react at staggered times rather than all turning together. Keep the
+   existing party leader, formation and stop allocation; gestures must stay within the tested clearance envelope. Use small,
+   deterministic per-party timing and extend the shared instanced person shader only for the required head/arm poses.
+3. **Complete the robot encounter.** Keep the current approach/wait/return sequence, adding a readable reach to the lid and a brief
+   acknowledgement before returning indoors. Preserve separation while arms extend. A parcel, if added, must visibly transfer once
+   between robot and collector rather than appear independently. Reuse `robotPose`/`collectorPose` timing and geometry.
+4. **Give resting groups conversational rhythm.** Bench pairs and forecourt groups alternate facing a companion and the view, with
+   occasional restrained gestures and pauses. Current whole-body sine rotation alone does not depict an exchange. Drive timing
+   from each group rather than independent actor oscillations; seated hips and folded legs must remain fixed to the seat.
+5. **Later: connected daily-life journeys.** Link a small number of validated doorway routes to a promenade destination or existing
+   forecourt group, so a resident emerges, visits and returns. Current doorway trips join doors on the same facade; passengers use
+   a straight kerb-to-door segment. Cross-route movement needs ground/building and actor clearance checks before expansion.
+
+Next expected step: select the implementation scope from this proposal, starting with item 1; implement and verify on this branch.
+Acceptance should include existing hero and street cameras, day/night, low/mixed/high automation, continuous interaction cycles,
+root tests/build/type check and a repeatable real-fleet clearance check. Exhibition-machine FPS remains open. No new dependency,
+pathfinding framework, guest controls or Meter-to-population inference is proposed.
