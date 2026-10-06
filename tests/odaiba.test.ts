@@ -14,6 +14,14 @@ import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from '../src/coast
 import { tidalEdge } from '../src/amphibiousShore.ts';
 import { AutomationDistrict, ConcentrationDistrict, SharingDistrict } from '../src/districtMeters.ts';
 import { bayContext } from '../src/bayContext.ts';
+import { acceleratedRaycast, MeshBVH } from 'three-mesh-bvh';
+
+// The checks below cast tens of thousands of rays at the full district. A BVH per geometry, built on first hit test, returns the same
+// intersections as three's brute-force raycast in a fraction of the time; `indirect` leaves each geometry's own index untouched.
+Mesh.prototype.raycast = function (this: Mesh, raycaster, intersects) {
+  this.geometry.boundsTree ??= new MeshBVH(this.geometry, { indirect: true });
+  return acceleratedRaycast.call(this, raycaster, intersects);
+};
 
 const layout = JSON.parse(readFileSync(new URL('../src/odaiba-layout.json', import.meta.url), 'utf8'));
 const hash = (bytes: Buffer) => createHash('sha256').update(bytes).digest('hex');

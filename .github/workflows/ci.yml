@@ -3,10 +3,18 @@ name: CI
 on:
   push:
     branches: ['**']
+    # Documentation-only pushes skip CI (VALIDATION.md: prose changes need link/fact checks, not package runs).
+    paths-ignore: ['docs/**', '**/*.md']
   pull_request:
+    paths-ignore: ['docs/**', '**/*.md']
 
 permissions:
   contents: read
+
+# A newer push to the same branch supersedes a run still in progress.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   check:

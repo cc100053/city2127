@@ -71,7 +71,7 @@ git push -u origin <task-branch>
 
 Use Conventional Commits: `<type>(<scope>): <subject>` with a concise English title and English bullet points in the body. Check the committed task diff too (`git diff --check origin/main...HEAD`); an empty working-tree diff alone does not check committed changes.
 
-Self-review is sufficient; no PR or mandatory external review. The [CI workflow](../.github/workflows/ci.yml) (Stage 2) runs on branch pushes and optional PRs: Node 24, install/test/build for the root and, since 2026-09-24, `survey/` and `module-swap/`, plus diff whitespace checks. Require successful checks on the current task-branch commit before merging, and verify main's checks after pushing. Do not describe a configured workflow as a passing run. No branch protection or deployment is configured.
+Self-review is sufficient; no PR or mandatory external review. The [CI workflow](../.github/workflows/ci.yml) (Stage 2) runs on branch pushes and optional PRs: Node 24, install/test/build for the root and, since 2026-09-24, `survey/` and `module-swap/`, plus diff whitespace checks. Since 2026-10-06 (user decision) the local checks above gate the merge; branch-push CI runs but integration need not wait for it. Main CI must pass after pushing — a failure on main is fixed forward immediately. Documentation-only pushes (`docs/**`, `*.md`) skip CI, and a newer push to the same branch cancels its in-progress run. Do not describe a configured workflow as a passing run. No branch protection or deployment is configured.
 
 ### Documentation sync
 
@@ -101,7 +101,7 @@ git merge --ff-only origin/main
 git merge --no-ff <task-branch>
 ```
 
-`--no-ff` preserves task-level integration history. If the fast-forward fails, inspect local-only commits and coordinate; do not reset main or conceal unexpected divergence. Resolve task conflicts on the task branch or merge result, review the resolutions and rerun the relevant checks. If CI is active and branch contents change, push the updated branch and wait for its successful checks before merging.
+`--no-ff` preserves task-level integration history. If the fast-forward fails, inspect local-only commits and coordinate; do not reset main or conceal unexpected divergence. Resolve task conflicts on the task branch or merge result, review the resolutions and rerun the relevant checks. If branch contents change, rerun the local checks on the merge result before pushing.
 
 Validate the integrated result with the same applicable checks above, inspect `git diff --check origin/main..HEAD` and the integration diff, and record the integrated commit/results in the task handoff. Commit a focused handoff update if necessary; check its links and diff. Before pushing, fetch again and confirm remote main is still an ancestor of the result:
 
