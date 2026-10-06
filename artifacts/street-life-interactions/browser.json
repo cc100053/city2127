@@ -1,0 +1,57 @@
+{
+  "browser": "151.0.7922.34",
+  "viewport": {
+    "width": 1400,
+    "height": 900
+  },
+  "deviceScaleFactor": 1,
+  "mode": "Headless Chromium; Metal requested; injected actor clock; FPS NOT MEASURED",
+  "visits": [
+    {
+      "group": 0,
+      "length": 13.694416999873384,
+      "at": [
+        161.8576364517307,
+        0,
+        203.31603395121329
+      ],
+      "start": [
+        168.4962343537688,
+        0,
+        192.49915773791847
+      ]
+    },
+    {
+      "group": 3,
+      "length": 15.397460241136374,
+      "at": [
+        -297.8157528585836,
+        0,
+        60.6403997842497
+      ],
+      "start": [
+        -283.6739879923988,
+        0,
+        64.59012302798693
+      ]
+    }
+  ],
+  "times": {
+    "outbound": 21.90000000000004,
+    "chat": 33.90000000000021,
+    "return": 78.89999999999979
+  },
+  "cycle": {
+    "maxStep": 0.28143162376395975,
+    "walk": 146,
+    "chat": 227,
+    "back": 48,
+    "hidden": 163,
+    "visibleSamples": 392,
+    "gestureSamples": 42,
+    "gazeSamples": 131
+  },
+  "nightVisible": 0.93486222483579,
+  "errors": [],
+  "network": []
+}

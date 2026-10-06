@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { routes, podPose, boatPoses, HULL, WATER_PERIOD, BOATS as BOAT_COUNT, trainPose, TRAIN_SPEED, walkerPose, walkerRoute, walkerParty, doorwayPose, robotPose, collectorPose, ROBOT_HALT, HANDOFF, promenadeStops, RAIL_OUT, STOOL_FRONT, streetCarPose, STREET_GAP, dropOffPose, DROP_OFF, streetRhythm, promenadeBenches, BENCH_OUT, transferPose, dockMotion, guideStrength, aircraftSlot, podShare, automationActivity, CARS, CAR_GAP, TRAINS, WALKERS, TRANSFERS, PLATOON } from '../src/mobility.ts';
 import { changeSites, SPHERE_DOCK, INTERCHANGE } from '../src/layout.ts';
 import { laneBeaconSites } from '../src/waterRooms.ts';
+import { conversationPose, visitPose } from '../src/mobility.ts';
 
 const path = routes(), guideLength = path.guideway.getLength();
 // Landmark boxes (Blender Z-up bounds → scene X, Y, -Z) and each survey site's tallest scaled envelope.
@@ -244,6 +245,32 @@ for (let k = 0; k < 14; k++) {
   assert.ok(waits > 0);
 }
 assert.ok([0, 7, HANDOFF].every(t => collectorPose(t).e === 0) && collectorPose(3).e + .25 < ROBOT_HALT - .4, 'collector meets the robot');
+
+// Group conversations include listening and silence, with at most one restrained gesture at any time.
+for (const members of [2, 3]) for (let group = 0; group < 5; group++) {
+  const speakers = new Set<number>(); let quiet = 0;
+  for (let time = -20; time < 80; time += .1) {
+    const turns = Array.from({ length: members }, (_, j) => conversationPose(time, group, j, members));
+    assert.ok(turns.filter(p => p.gesture > .001).length <= 1);
+    turns.forEach((p, j) => { assert.ok(p.attention >= 0 && p.attention <= 1 && p.gesture >= 0 && p.gesture <= .41);
+      if (p.attention > 0) { assert.ok(p.toward >= 0 && p.toward < members && p.toward !== j); if (p.gesture > .001) speakers.add(j); }
+    });
+    if (turns.every(p => p.attention === 0)) quiet++;
+  }
+  assert.equal(speakers.size, members); assert.ok(quiet > 0);
+}
+// Visits stay fully visible at the group, return to their own door, and never jump between visible positions.
+for (let group = 0; group < 5; group++) {
+  let outbound = 0, returning = 0, staying = 0, indoors = 0;
+  for (let time = 0; time < 240; time += .1) {
+    const a = visitPose(time, group, 20), b = visitPose(time + .1, group, 20);
+    assert.ok(a.u >= 0 && a.u <= 1 && Math.abs(a.u - b.u) * 20 <= .12 + 1e-8);
+    if (a.dwell > 0) { staying++; assert.equal(a.u, 1); assert.equal(a.visible, 1); assert.equal(a.walking, false); }
+    if (a.walking && a.visible === 1) { if (a.returning) returning++; else outbound++; }
+    if (!a.visible) { indoors++; assert.equal(a.u, 0); }
+  }
+  assert.ok(outbound && returning && staying && indoors);
+}
 
 // Interchange transfers: ≤ 2 m/s on the pier, appear/vanish only at the shore end or the boat, and board only while it is docked.
 for (let k = 0; k < TRANSFERS; k++) for (let t = 0; t < 120; t += .1) {

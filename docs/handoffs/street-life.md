@@ -168,3 +168,33 @@ Next expected step: select the implementation scope from this proposal, starting
 Acceptance should include existing hero and street cameras, day/night, low/mixed/high automation, continuous interaction cycles,
 root tests/build/type check and a repeatable real-fleet clearance check. Exhibition-machine FPS remains open. No new dependency,
 pathfinding framework, guest controls or Meter-to-population inference is proposed.
+
+### Round 8 — conversations and daily-life visits (2026-10-06)
+
+- User selected proposal items **4 and 5**. Implementation: Codex, for owner cc100053. Preflight:
+  `feat/pedestrian-traffic-life`, `dbf5d1533cf4fa340bf691ca3a8dc1356fa015a8`, clean; fetch succeeded;
+  branch/upstream 0/0, 16 ahead / 0 behind `origin/main` at `9476fd8`. No upstream merge was needed.
+- Bench/rail pairs and forecourt groups share deterministic speaking/listening/quiet turns. The existing instanced person shader
+  receives head-yaw/hand-gesture values; a small nose makes gaze visible without adding a draw. Seated hips/legs and body matrices
+  stay fixed; a lone sitter does not acknowledge an absent partner.
+- Selected forecourts reserve a validated curve from an existing door to the group's third slot. The resident walks out, chats
+  30–50 s, turns and walks back into the same doorway, then rests indoors. Ordinary walkers/robots use the other trips. Later
+  publication keeps clear of the visitor corridor too; failed candidates preserve ordinary traffic. Visiting groups use lower
+  presence thresholds to retain inhabited journeys at high automation. No extra fleet/dependency or road crossing is introduced.
+- Native checks: root `npm test` PASS, `npm run build` PASS (includes `tsc --noEmit`), `git diff --check` PASS, on the round-8
+  worktree based on `dbf5d15`. Actual GLBs publish two journeys in the sequential test load; curves clear paving/buildings/sites,
+  and actual visitors clear every drawn person/robot over 240 s at .25 s in automation 0/.5/1, hours 12/21. All six cases must
+  draw every journey. Conversation turns, timing continuity and stationary seated matrices/legs also pass.
+- Initial geometry-check height was corrected to test pavement below the body rather than an overhead canopy. A later sandboxed
+  full-suite attempt reached the HTTP test but failed to bind localhost (`EPERM`); rerunning with local-server access passed.
+  Early browser harness attempts used a duplicate HMR module or occluded cameras; the final check uses actual loaded modules,
+  requires drawn moving visitors, and replaces those captures.
+- Browser evidence: [captures/report](../../artifacts/street-life-interactions/) — Chromium 151.0.7922.34 headless,
+  1400×900, deviceScaleFactor 1, Metal requested; controlled actor clock, **FPS NOT MEASURED**. Existing hero day12/low,
+  dusk18.5/mixed and night22/high, bench exchange, visitor outbound/chat/return and hour21/high checks; no console/page errors or
+  unexpected failed resources. Journey count/location follows asynchronous landmark publication (native two, browser two/three).
+  Continuous drawn-visitor movement is checked over 140 s in .25 s steps, including stopped feet during conversation.
+- Scope limits: no promenade connector/pathfinding, no robot interaction upgrade, no general yielding/gait repair. Earlier
+  collector grazes and rest-pose shadows/GTAO remain recorded limitations. Exhibition-machine FPS/Safari/hardware NOT RUN.
+- Implementation complete; integration/remote SHA and main CI will be recorded after the Git workflow. Next: hardware FPS or a
+  separately assigned interaction round; the proposal's items 1–3 remain unimplemented.

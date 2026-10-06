@@ -232,13 +232,14 @@ function fleet(scene:T.Object3D,parts:Part[],count:number,name:string,shadow=tru
  * with its thighs level, the knee .31 m forward (clear of the seat edge) and the shin hanging straight. */
 function articulate(mat:T.Material,body:string) {
   mat.onBeforeCompile=shader=>{
-    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nattribute vec4 gait;\nvec3 swingX(vec3 p,float pivot,float a){p.y-=pivot;return vec3(p.x,p.y*cos(a)-p.z*sin(a),p.y*sin(a)+p.z*cos(a))+vec3(0.,pivot,0.);}')
+    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nattribute vec4 gait;\nattribute vec2 social;\nvec3 swingX(vec3 p,float pivot,float a){p.y-=pivot;return vec3(p.x,p.y*cos(a)-p.z*sin(a),p.y*sin(a)+p.z*cos(a))+vec3(0.,pivot,0.);}')
       .replace('#include <begin_vertex>','#include <begin_vertex>\n'+body);
   };
   mat.customProgramCacheKey=()=>'gait-'+body;
 }
 const LEGS='float side=sign(position.x);transformed=swingX(transformed,.26,(1.-smoothstep(.23,.29,position.y))*1.5*gait.w);transformed=swingX(transformed,.58,mix(sin(gait.x)*gait.y*side,-1.5,gait.w));';
-const ARMS='float side=sign(position.x);transformed=swingX(transformed,1.25,-sin(gait.x)*gait.y*.8*side*(1.-gait.w));';
+const ARMS='float side=sign(position.x);transformed=swingX(transformed,1.25,-sin(gait.x)*gait.y*.8*side*(1.-gait.w)-social.y*step(0.,position.x));';
+const HEAD='float c=cos(social.x),s=sin(social.x);transformed.xz=vec2(c*position.x+s*position.z,-s*position.x+c*position.z);';
 // Backpack behind the torso (z < -.12), bag at the right hip (x > .25): keep only the item this person carries; sitters set it down.
 const GEAR='transformed*=gait.w>.5||gait.z<.5?0.:gait.z<1.5?step(position.z,-.12):step(.25,position.x);';
 /** Shared capsule figures and palette, used by promenade, doorway, resting and plaza crowds. `gait(i, phase, swing, item, seated)`
@@ -246,10 +247,11 @@ const GEAR='transformed*=gait.w>.5||gait.z<.5?0.:gait.z<1.5?step(position.z,-.12
 export function pedestrians(scene:T.Object3D,count:number,name:string) {
   // People (several hundred, so modest segment counts): capsule torso and limbs, round head and hair; clothes, skin and hair vary per person from a muted palette (no saffron).
   const coats=material('#ffffff'),sleeves=material('#ffffff'),skin=material('#ffffff'),hair=material('#ffffff'),trousers=material('#ffffff'),gear=material('#ffffff');
-  articulate(trousers,LEGS);articulate(sleeves,ARMS);articulate(gear,GEAR);
+  articulate(trousers,LEGS);articulate(sleeves,ARMS);articulate(gear,GEAR);articulate(skin,HEAD);articulate(hair,HEAD);
   const capsule=(r:number,length:number,at:[number,number,number],mat:T.Material,depth=1):Part=>({geometry:new T.CapsuleGeometry(r,length,3,7).scale(1,1,depth).translate(...at),material:mat});
   const people=fleet(scene,[
     capsule(.22,.36,[0,.96,0],coats,.72),{geometry:new T.SphereGeometry(.15,10,7).translate(0,1.5,0),material:skin},
+    {geometry:new T.SphereGeometry(.035,6,4).scale(1,1,1.5).translate(0,1.49,.145),material:skin},
     {geometry:new T.SphereGeometry(.162,10,4,0,Math.PI*2,0,Math.PI*.55).translate(0,1.52,-.012),material:hair},
     capsule(.07,.42,[-.29,.98,0],sleeves),capsule(.07,.42,[.29,.98,0],sleeves),
     {geometry:new T.CapsuleGeometry(.08,.4,3,6).translate(-.13,.33,0),material:trousers},{geometry:new T.CapsuleGeometry(.08,.4,3,6).translate(.13,.33,0),material:trousers},
@@ -257,7 +259,8 @@ export function pedestrians(scene:T.Object3D,count:number,name:string) {
     part([.3,.38,.15],[0,1.02,-.25],gear,.05),part([.1,.3,.26],[.33,.78,0],gear,.04),
   ],count,name);
   const gait=new T.InstancedBufferAttribute(new Float32Array(count*4),4).setUsage(T.DynamicDrawUsage);
-  people.meshes.forEach(m=>m.geometry.setAttribute('gait',gait));
+  const social=new T.InstancedBufferAttribute(new Float32Array(count*2),2).setUsage(T.DynamicDrawUsage);
+  people.meshes.forEach(m=>{m.geometry.setAttribute('gait',gait);m.geometry.setAttribute('social',social);});
   const clothes=['#4f6f7c','#b5836f','#6d8a5f','#2f3e48','#c9b48a','#8c6f8f','#3f5a52','#e4e1d8'],skins=['#e8cdb0','#c99e7c','#8d6348','#f0d9c2'],hairs=['#2f2a27','#5a4033','#1d2226','#b9a58c','#d8d8d4'],bottoms=['#3d4a52','#2b3036','#6b6258','#c8c0b0','#45524a','#1f2a3a'],packs=['#2f3a40','#8c4a3a','#c9b48a','#4f6f7c','#e4e1d8'];
   for(let i=0;i<count;i++){
     const coat=clothes[(i*5)%clothes.length];people.tint(i,coats,coat);people.tint(i,sleeves,coat);people.tint(i,skin,skins[(i*3)%skins.length]);people.tint(i,hair,hairs[(i*7)%hairs.length]);
@@ -267,11 +270,16 @@ export function pedestrians(scene:T.Object3D,count:number,name:string) {
   }
   return {...people,
     gait(index:number,phase:number,swing:number,seated=0){gait.setX(index,phase);gait.setY(index,swing);gait.setW(index,seated);},
-    flush(){people.flush();gait.needsUpdate=true;}};
+    social(index:number,look:number,gesture:number){social.setXY(index,look,gesture);},
+    flush(){people.flush();gait.needsUpdate=true;social.needsUpdate=true;}};
 }
 
 /** Doorway trips in front of the landmarks: [door, forecourt, forecourt, door] at ground level, published once each landmark loads. */
-const doorTrips:{curve:T.CatmullRomCurve3;length:number;start:T.Vector3;end:T.Vector3;samples:T.Vector3[]}[]=[],doorSpots:T.Vector3[]=[],doorPoints:T.Vector3[]=[];
+type DoorTrip={curve:T.CatmullRomCurve3;length:number;start:T.Vector3;end:T.Vector3;samples:T.Vector3[]};
+const doorTrips:DoorTrip[]=[],doorWalks:DoorTrip[]=[],doorPoints:T.Vector3[]=[];
+const doorSpots:{at:T.Vector3;yaw:number;visit?:Pick<DoorTrip,'curve'|'length'>}[]=[];
+/** Published door-to-group journeys, for route/actor clearance checks. */
+export const forecourtVisits=()=>doorSpots.flatMap((spot,group)=>spot.visit?[{...spot.visit,group,at:spot.at,yaw:spot.yaw}]:[]);
 const PAVED=new Set(['sidewalk','plaza']);
 // Landmark pads overlap the avenues in places (Aqua City's north side), so forecourt walks also keep clear of every carriageway.
 let streetSamples:{p:T.Vector3;clear:number}[]|null=null;
@@ -313,11 +321,31 @@ export function publishDoorways(model:T.Object3D,ground:T.Object3D) {
       // Clear of every other trip by 3 m, so their people never share ground (passingLanes only separates people on one trip).
       const samples=curve.getSpacedPoints(60);
       if(doorTrips.some(trip=>trip.samples.some(p=>samples.some(q=>p.distanceTo(q)<3))))continue;
-      doorTrips.push({curve,length:curve.getLength(),start:a.at,end:b.at,samples});
+      const trip={curve,length:curve.getLength(),start:a.at,end:b.at,samples};doorTrips.push(trip);
       // Every other forecourt also holds a standing group 4 m beyond the walk, on paving, in sight of the doors and 2.6 m clear of the
       // rounded walk (group radius, a walker and the widest passing lane).
       const spot=fa.clone().lerp(fb,.5).addScaledVector(a.out.clone().add(b.out).normalize(),4);
-      if(doorTrips.length%2&&paved(spot)&&offStreet(spot)&&clear(spot.clone().add(lift),fa.clone().lerp(fb,.5).add(lift))&&samples.every(p=>p.distanceTo(spot)>2.6))doorSpots.push(spot);
+      let reserved=false;
+      if(doorTrips.length%2&&doorSpots.length<FORECOURT_GROUPS&&paved(spot)&&offStreet(spot)&&clear(spot.clone().add(lift),fa.clone().lerp(fb,.5).add(lift))&&samples.every(p=>p.distanceTo(spot)>2.6)){
+        const g=doorSpots.length,group:{at:T.Vector3;yaw:number;visit?:Pick<DoorTrip,'curve'|'length'>}={at:spot,yaw:hash(g,25)*6.28};
+        // Reserve a few forecourts for one resident's door → conversation → same door journey. Their ordinary walkers/robot use
+        // other trips; future doorway publication also keeps clear of the visitor's entire curve.
+        if(g%3===0){
+          const toward=fa.clone().sub(spot).normalize(),yaw=Math.atan2(toward.x,toward.z)-4*Math.PI/3,target=spot.clone().addScaledVector(toward,.65);
+          const visit=new T.CatmullRomCurve3([curve.points[0],a.at,fa,target],false,'centripetal'),length=visit.getLength(),points=visit.getSpacedPoints(Math.ceil(length/.4));
+          const hosts=[0,1].map(j=>spot.clone().add(new T.Vector3(Math.sin(yaw+j*2*Math.PI/3)*.65,0,Math.cos(yaw+j*2*Math.PI/3)*.65)));
+          const safe=points.every((p,i)=>{
+            if(i*length/(points.length-1)<1.1)return true; // first .6 m is intentionally inside the origin facade
+            const t=visit.getTangentAt(i/(points.length-1)),side=new T.Vector3(t.z,0,-t.x).normalize();
+            return [-.4,0,.4].every(offset=>{const q=p.clone().addScaledVector(side,offset);return paved(q)&&offStreet(q)&&clear(q.clone().add(lift),q.clone().add(new T.Vector3(0,.3,0)));})
+              &&hosts.every(h=>h.distanceTo(p)>.85)&&doorSpots.every(s=>s.at.distanceTo(p)>1.5)
+              &&doorTrips.slice(0,-1).every(other=>other.samples.every(q=>q.distanceTo(p)>3));
+          })&&points.slice(4).every((p,i)=>clear(points[i+3].clone().add(lift),p.clone().add(lift)));
+          if(safe){group.yaw=yaw;group.visit={curve:visit,length};trip.samples.push(...points);reserved=true;}
+        }
+        doorSpots.push(group);
+      }
+      if(!reserved)doorWalks.push(trip);
     }
   }
 }
@@ -403,6 +431,20 @@ export function streetRhythm(hour?:number) {
   };
   return Object.fromEntries(Object.entries(RHYTHM).map(([k,keys])=>[k,at(keys)])) as Record<keyof typeof RHYTHM,number>;
 }
+/** One speaker at a time, listeners turn toward them, then a shared quiet interval; group clocks are staggered. */
+export function conversationPose(time:number,group:number,member:number,members=2) {
+  const period=members*4+8+4*hash(group,32),clock=((time+hash(group,33)*period)%period+period)%period,speaker=Math.floor(clock/4);
+  const pulse=speaker<members?ease((clock%4)/.8)*(1-ease((clock%4-2.8)/1.2)):0;
+  return {speaker,toward:speaker===member?(member+1)%members:speaker,attention:pulse,gesture:speaker===member?pulse*(.35+.06*Math.sin(clock*4)):0};
+}
+/** A resident walks out, joins a forecourt group for 30–50 s, turns and returns to the same door, then stays indoors. */
+export function visitPose(time:number,group:number,length:number) {
+  const speed=1+.2*hash(group,34),walk=length/speed,stay=30+20*hash(group,35),cycle=2*walk+stay+15+30*hash(group,36);
+  const clock=((time+hash(group,37)*cycle)%cycle+cycle)%cycle,back=Math.max(0,clock-walk-stay),d=Math.max(0,Math.min(length,clock*speed)-back*speed);
+  return {u:d/length,visible:T.MathUtils.clamp(d/.5,0,1),dwell:ease((clock-walk)/2)*(1-ease((clock-walk-stay+2)/2)),
+    returning:clock>=walk+stay-2,walking:clock<walk||clock>=walk+stay&&clock<2*walk+stay,phase:d*5.5+group};
+}
+const yawTo=(from:number,to:number)=>((to-from)%(Math.PI*2)+Math.PI*3)%(Math.PI*2)-Math.PI;
 /** Promenade benches every 24 m facing the sea, 2.75 m out: the backrest (2.48 m) clears walker lanes (≤ 2.35 m) and sitters' feet
  * (3.15 m) stop short of the lit edge (3.3 m). Two seats each; between each pair of
  * benches a couple stands at the rail. Between them, 6 m from each, a one-seat stool and a free rail spot for passing walkers
@@ -623,16 +665,16 @@ export function mobility(scene:T.Scene) {
     };
     // Forecourt walkers and robots keep right on their trip and make way for each other (passingLanes); a halted robot and its
     // collector hold still. Movers' `path` is the trip.
-    const tripOf=(k:number)=>k%Math.max(doorTrips.length,1),robotTrip=(k:number)=>(k+3)%Math.max(doorTrips.length,1); // one robot per trip while trips ≥ ROBOTS
+    const tripOf=(k:number)=>k%Math.max(doorWalks.length,1),robotTrip=(k:number)=>(k+3)%Math.max(doorWalks.length,1); // one robot per trip while trips ≥ ROBOTS
     const doorMovers:Mover[]=[],doorMover:number[]=[],robotMover:number[]=[],doorPoses=[] as ReturnType<typeof doorwayPose>[],robotPoses=[] as ReturnType<typeof robotPose>[];
     const lane={inner:.15,outer:1.3};
     for(let k=0;k<DOOR_WALKERS;k++){
-      const trip=doorTrips[tripOf(k)];if(!trip)break;
+      const trip=doorWalks[tripOf(k)];if(!trip)break;
       const w=doorPoses[k]=doorwayPose(time,k,trip.length);
       if(w.visible>0&&amount(doorShare*DOOR_WALKERS,k)>0&&rhythm.people>hash(k,20)){doorMover[k]=doorMovers.length;doorMovers.push({path:tripOf(k),dir:w.reverse?-1:1,d:w.d,lane:.45,ext:0,...lane});}
     }
     for(let k=0;k<ROBOTS;k++){
-      const trip=doorTrips[robotTrip(k)];if(!trip)break;
+      const trip=doorWalks[robotTrip(k)];if(!trip)break;
       const w=robotPoses[k]=robotPose(time,500+k,trip.length),dir=w.reverse?-1:1;
       if(w.visible>0&&rhythm.robots>hash(k,24)){
         robotMover[k]=doorMovers.length;doorMovers.push({path:robotTrip(k),dir,d:w.d,lane:.45,ext:.3,front:.45,back:.45,...lane,fixed:w.waited>=0});
@@ -642,7 +684,7 @@ export function mobility(scene:T.Scene) {
     }
     const doorPassing=passingLanes(doorMovers);
     for(let k=0;k<DOOR_WALKERS;k++){
-      const trip=doorTrips[tripOf(k)];
+      const trip=doorWalks[tripOf(k)];
       if(!trip){pose.scale.setScalar(0);doorPeople.set(k,pose);continue;}
       const w=doorPoses[k],m=doorMover[k]===undefined?null:doorPassing[doorMover[k]];
       onTrip(trip,w.d,w.reverse,m?m.lane:.45,m?m.along:0);pose.rotation.z=Math.sin(w.phase)*.03;
@@ -650,7 +692,7 @@ export function mobility(scene:T.Scene) {
     }
     // Delivery robots roll to the next door and wait while a collector steps out to meet them, then both go in.
     for(let k=0;k<ROBOTS;k++){
-      const trip=doorTrips[robotTrip(k)],slot=COLLECTORS+k;
+      const trip=doorWalks[robotTrip(k)],slot=COLLECTORS+k;
       if(!trip){pose.scale.setScalar(0);robots.set(k,pose);doorPeople.set(slot,pose);continue;}
       const w=robotPoses[k],present=robotGate(k,rhythm.robots>hash(k,24)),m=robotMover[k]===undefined?null:doorPassing[robotMover[k]];
       onTrip(trip,w.d,w.reverse,m?m.lane:.45,m?m.along:0);pose.scale.setScalar(w.visible*present);robots.set(k,pose);
@@ -659,18 +701,33 @@ export function mobility(scene:T.Scene) {
       pose.scale.setScalar(w.waited<0?0:present*T.MathUtils.clamp(c.e/.5,0,1)*(.93+.12*hash(slot,8)));doorPeople.set(slot,pose);
       doorPeople.gait(slot,time*6+slot,c.walking?.45:0);
     }robots.flush();
-    // Resting people: bench sitters, rail couples, then forecourt groups of two or three facing each other; a slow sway of the head-turn.
+    // Resting groups share conversational turns; seated hips/legs stay on their authored seat while heads and a hand respond.
     // The crowd level decides how many spots are taken, never how big the people are.
     const occupied=(k:number,share:number,key:number)=>restGate(k,Math.min(1,doorShare*1.4)*share>key);
     spots.forEach((spot,k)=>{
-      pose.position.copy(spot.at);pose.rotation.set(0,spot.yaw+Math.sin(time*.3+k*1.7)*.12,0);
+      const share=spot.seated?rhythm.sitters:rhythm.strollers,c=conversationPose(time,Math.floor(k/2),k%2),partner=spots[k^1];
+      const together=Math.min(1,doorShare*1.4)*share>hash(k^1,21),look=yawTo(spot.yaw,Math.atan2(partner.at.x-spot.at.x,partner.at.z-spot.at.z));
+      pose.position.copy(spot.at);pose.rotation.set(0,spot.yaw,0);
       pose.scale.setScalar(occupied(k,spot.seated?rhythm.sitters:rhythm.strollers,hash(k,21))*(.93+.12*hash(k,8)));resting.set(k,pose);resting.gait(k,0,0,spot.seated);
+      resting.social(k,together?T.MathUtils.clamp(look,-.65,.65)*c.attention:0,together?c.gesture:0);
     });
-    for(let g=0;g<FORECOURT_GROUPS;g++)for(let j=0;j<3;j++){
-      const k=spots.length+g*3+j,spot=doorSpots[g],a=j*Math.PI*2/3+hash(g,25)*6.28;
-      if(!spot||(j===2&&hash(g,26)<.4)){pose.scale.setScalar(0);resting.set(k,pose);continue;}
-      pose.position.set(spot.x+Math.sin(a)*.65,0,spot.z+Math.cos(a)*.65);pose.rotation.set(0,a+Math.PI+Math.sin(time*.4+k)*.15,0);
-      pose.scale.setScalar(occupied(k,rhythm.people,hash(g,27))*(.93+.12*hash(k,8)));resting.set(k,pose);resting.gait(k,0,0);
+    for(let g=0;g<FORECOURT_GROUPS;g++){
+      const spot=doorSpots[g],v=spot?.visit?visitPose(time,g,spot.visit.length):null,members=v?3:hash(g,26)<.4?2:3;
+      for(let j=0;j<3;j++){
+        const k=spots.length+g*3+j;
+        if(!spot||(j===2&&!v&&members===2)){pose.scale.setScalar(0);resting.set(k,pose);resting.social(k,0,0);continue;}
+        const a=j*Math.PI*2/3+spot.yaw,c=conversationPose(time,1000+g,j,members);
+        pose.position.set(spot.at.x+Math.sin(a)*.65,0,spot.at.z+Math.cos(a)*.65);pose.rotation.set(0,a+Math.PI,0);
+        if(j===2&&v&&spot.visit){
+          place(spot.visit.curve,v.u,v.returning);pose.rotation.y+=yawTo(pose.rotation.y,a+Math.PI)*v.dwell;
+        }
+        const toward=spot.yaw+c.toward*2*Math.PI/3,look=yawTo(pose.rotation.y,Math.atan2(spot.at.x+Math.sin(toward)*.65-pose.position.x,spot.at.z+Math.cos(toward)*.65-pose.position.z));
+        const talking=v&&(j===2||c.toward===2||c.speaker===2)?v.dwell:1;
+        // Visiting groups keep a lower presence threshold so their journeys also exist in the mature high-automation city.
+        pose.scale.setScalar(occupied(k,rhythm.people,hash(g,27)*(v?.25:1))*(.93+.12*hash(k,8))*(j===2&&v?v.visible:1));resting.set(k,pose);
+        resting.gait(k,j===2&&v?v.phase:0,j===2&&v&&v.walking?.45:0);
+        resting.social(k,T.MathUtils.clamp(look,-.65,.65)*c.attention*talking,c.gesture*talking);
+      }
     }resting.flush();
     for(let r=0,slot=0;r<path.streets.length;r++)for(let lane=0;lane<2;lane++)for(let c=0;c<streetCars[r];c++,slot++){
       const drop=r===DROP_OFF.road&&lane===DROP_OFF.lane?(DROP_OFF.cars as readonly number[]).indexOf(c):-1;

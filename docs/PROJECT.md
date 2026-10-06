@@ -76,6 +76,17 @@ Automation changes walkers 400/260/120, pods 12/18/24 and circulating aircraft 2
 
 Live targets ease over 3 s; changed slots emit faint Meter-colour rings and each changed Meter's site emits bright rings plus a light shaft (two waves, about 4.2 s; site-only shafts since 2026-10-04). Snapshot/reset/Undo/reconnect/reduced motion settle immediately and clear pulses/queued displays. No-op events do not replay. Late roof/asset publication must adopt the latest target and seed.
 
+Street-life round 8 (2026-10-06): bench pairs, rail couples and forecourt groups share `conversationPose` turns: one restrained hand
+gesture, companions looking toward the speaker, then a quiet interval. A shared `social` instance attribute turns heads and raises
+one arm; a small nose makes gaze readable without another draw. Seated body matrices and folded legs stay fixed. Groups without a
+present companion do not gesture to an empty seat. `publishDoorways` reserves selected forecourts for `visitPose` journeys from
+inside a door to the group's third position, chatting for 30–50 s, then turning and returning through the same door. The reserved
+trip is excluded from ordinary walkers/robots; its full curve also reserves space against later doorway publication. Curves sample
+paving, street clearance, facade clearance, hosts and existing routes; failed candidates retain ordinary doorway traffic. Visiting
+groups have a lower presence threshold so journeys remain inhabited at high automation by day/night. The existing third group
+slot carries the visitor, without adding a fleet or dependency. `forecourtVisits` exposes published curves for actual-geometry and
+actor-clearance checks; this is a small authored network, not pathfinding or occupancy simulation.
+
 ## Survey ownership and persistence
 
 | Area | Responsibility |
