@@ -3,7 +3,7 @@ import * as T from 'three';
 import { hybridShare, AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, PRIVATE_RISE, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
 import { changeSites } from '../src/layout.ts';
 import { publicLight, trail } from '../src/cityRig.ts';
-import { mobility } from '../src/mobility.ts';
+import { mobility, promenadeStops, routes, walkerParty, walkerPose, walkerRoute } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
 
@@ -93,7 +93,7 @@ const low = automation.getDiagnostics();
 assert.ok(low.pavilions >= 6);
 assert.equal(low.visibleStaffedPavilions, low.pavilions);
 assert.equal(low.visibleDronePorts, 0, 'human-led bays carry no drone ports');
-assert.deepEqual([low.loopAircraft, low.guidewayPods, low.walkers], [2, 12, 160]);
+assert.deepEqual([low.loopAircraft, low.guidewayPods, low.walkers], [2, 12, 400]);
 automation.setTarget({ automatedPorts: 5 }, 1, false);
 automation.update(2.5);
 const midway = automation.level!;
@@ -106,7 +106,7 @@ assert.equal(high.visibleDronePorts, high.pavilions, 'P7: every bay becomes a dr
 const portMatrix = new T.Matrix4(), portScale = new T.Vector3();
 (automation.root.getObjectByName('automation-drone-ports') as T.InstancedMesh).getMatrixAt(automation.autonomousDesign.indexOf(0), portMatrix);
 assert.ok(Math.abs(portScale.setFromMatrixScale(portMatrix).y - 1) < 1e-6, 'drone port stands at full size');
-assert.deepEqual([high.loopAircraft, high.guidewayPods, high.walkers], [30, 24, 40]);
+assert.deepEqual([high.loopAircraft, high.guidewayPods, high.walkers], [30, 24, 120]);
 automation.setTarget({ automatedPorts: 1 }, 5, false);
 automation.update(6);
 const interrupted = automation.level!;
@@ -116,9 +116,9 @@ automation.update(9);
 const mixed = automation.getDiagnostics();
 assert.ok(mixed.visibleStaffedPavilions > 0 && mixed.visibleStaffedPavilions < mixed.pavilions);
 assert.equal(mixed.visibleStaffedPavilions + mixed.visibleDronePorts, mixed.pavilions, 'mixed bays are each staffed or autonomous');
-assert.deepEqual([mixed.loopAircraft, mixed.guidewayPods, mixed.walkers], [16, 18, 100]);
+assert.deepEqual([mixed.loopAircraft, mixed.guidewayPods, mixed.walkers], [16, 18, 260]);
 automation.setTarget({ automatedPorts: 1 }, 10, true);
-assert.equal(automation.getDiagnostics().walkers, 160, 'snapshot/reset is immediate');
+assert.equal(automation.getDiagnostics().walkers, 400, 'snapshot/reset is immediate');
 automation.hide(); automation.update(20);
 assert.equal(automation.level, undefined);
 assert.equal(automation.root.visible, false);
@@ -136,12 +136,22 @@ const visible = (name: string, slots = Infinity) => {
 updateActors(presets.neutral, 20);
 const names = ['guideway-pods', 'promenade-walkers', 'air-taxis', 'air-pods', 'water-taxis'];
 const legacyMatrices = names.map(name => [...fleet(name).instanceMatrix.array]);
-for (const [ports, aircraft, pods, walkers] of [[1, 3, 12, 160], [3, 17, 18, 100], [5, 31, 24, 40]]) {
+// Walker slots between trips are out of sight (inside a building), so count the slots whose current trip is in view.
+const walks = [...routes().promenades, ...routes().decks];
+const stops = promenadeStops(walks.slice(0, 2).map(c => c.getLength()));
+const walking = (count: number) => Array.from({ length: count }, (_, i) => walkerParty(i)).filter(p => walkerPose(20, p.leader, walks[walkerRoute(p.id)].getLength(), stops.get(p.leader)).visible > 0).length;
+for (const [ports, aircraft, pods, walkers] of [[1, 3, 12, 400], [3, 17, 18, 260], [5, 31, 24, 120]]) {
   for (const state of [presets.still, presets.pulse]) {
     updateActors(state, 20, ports / 6);
     // Each aircraft slot is drawn as either a winged craft or an autonomous pod at settled levels.
-    assert.deepEqual([visible('air-taxis') + visible('air-pods'), visible('guideway-pods'), visible('promenade-walkers', 160)], [aircraft, pods, walkers]);
+    assert.deepEqual([visible('air-taxis') + visible('air-pods'), visible('guideway-pods'), visible('promenade-walkers', 400)], [aircraft, pods, walking(walkers)]);
   }
+}
+// Resting people (benches, rails, forecourts) are present or absent at any crowd level, never shrunk into their bench.
+updateActors(presets.neutral, 20, 5 / 6, 0, 15);
+{
+  const mesh = fleet('resting-people'), matrix = new T.Matrix4(), scale = new T.Vector3();
+  for (let i = 0; i < mesh.count; i++) { mesh.getMatrixAt(i, matrix); const s = scale.setFromMatrixScale(matrix).x; assert.ok(s < .01 || s > .9, `resting person ${i} drawn at ${s.toFixed(2)} scale`); }
 }
 updateActors(presets.neutral, 20);
 names.forEach((name, i) => assert.deepEqual([...fleet(name).instanceMatrix.array], legacyMatrices[i], `${name} restores legacy matrices`));

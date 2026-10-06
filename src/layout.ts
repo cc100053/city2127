@@ -15,17 +15,32 @@ export const guideway: readonly P3[] = [
   [-292,14.2,127],[-312,14.2,141],[-330,14.2,159],[-343,14.2,180],[-350,14.2,204],[-350,14.2,229],[-344,14.2,254],[-333,14.2,276],
   [-319,14.2,297],[-306,14.2,318],
 ];
+// The two Yurikamome tracks, traced every 25 m along the environment's two guideway beams from the plate's north-east exit to about
+// 160 m past the district's south-west edge. Trains keep left: A (the centreline above, extended both ways) runs south-west, B (the
+// beam 4.6 m to its right) north-east.
+export const guidewayTracks: readonly (readonly P3[])[] = [
+  [[493,14.2,-408],[476,14.2,-390],[456,14.2,-375],[436,14.2,-360],[415,14.2,-347],[394,14.2,-332],[374,14.2,-318],[353,14.2,-305],[332,14.2,-291],[311,14.2,-277],[290,14.2,-263],[269,14.2,-250],[248,14.2,-236],[227,14.2,-222],...guideway,
+   [-292,14.2,339],[-278,14.2,360],[-264,14.2,380],[-251,14.2,401],[-236,14.2,422],[-221,14.2,442],[-205,14.2,461],[-188,14.2,479]],
+  [[-199,14.2,473],[-216,14.2,454],[-231,14.2,434],[-246,14.2,414],[-259,14.2,393],[-273,14.2,372],[-287,14.2,351],[-301,14.2,330],[-315,14.2,310],[-328,14.2,289],[-342,14.2,268],[-352,14.2,245],[-358,14.2,220],[-357,14.2,195],[-349,14.2,171],[-336,14.2,150],[-318,14.2,133],[-297,14.2,119],[-277,14.2,105],[-256,14.2,91],[-235,14.2,77],[-214,14.2,63],[-194,14.2,49],[-172,14.2,36],[-151,14.2,22],[-130,14.2,8],[-110,14.2,-5],[-89,14.2,-19],[-68,14.2,-33],[-47,14.2,-47],[-26,14.2,-61],[-6,14.2,-75],[15,14.2,-89],[36,14.2,-103],[57,14.2,-117],[78,14.2,-130],[98,14.2,-144],[119,14.2,-158],[140,14.2,-172],[161,14.2,-186],[181,14.2,-200],[202,14.2,-214],[222,14.2,-229],[243,14.2,-243],[264,14.2,-256],[284,14.2,-271],[305,14.2,-285],[326,14.2,-299],[347,14.2,-313],[368,14.2,-326],[388,14.2,-340],[409,14.2,-354],[430,14.2,-368],[451,14.2,-382],[470,14.2,-397],[481,14.2,-408]],
+];
 // Seaside promenades, traced on open ground 10–40 m inland of the north shore: east from DECKS to the park, west from the park to Hilton.
 // The park lot reaches the revetment, so walkers turn back at it instead of crossing.
 export const promenades: readonly (readonly P3[])[] = [
   [[1,0,-318],[3,0,-296],[-14,0,-269],[-43,0,-260],[-62,0,-250],[-86,0,-228],[-118,0,-207],[-148,0,-191],[-178,0,-173]],
   [[-259,0,-145],[-273,0,-123],[-288,0,-92],[-310,0,-76],[-347,0,-54],[-375,0,-33],[-411,0,-14],[-427,0,6]],
 ];
+// Street avenues, centrelines snapped to the environment's road surfaces (tests/mobility.test.ts): the 5 m seaside avenue north of Aqua
+// City and DECKS, and the 7 m avenue under the Yurikamome guideway. Neither crosses the other, so their street cars need no signals.
+export const streets: readonly (readonly P3[])[] = [
+  [[-207,0,-86.4],[-108.9,0,-151.5],[-10.8,0,-216.6],[87,0,-282.1],[168.4,0,-336.7],[217.5,0,-369.3]],
+  [[259.8,0,-256],[175.9,0,-199.5],[108.9,0,-154.3],[24.6,0,-98.4],[-59.9,0,-42.9],[-127.5,0,1.5],[-160.6,0,24],[-244,0,80.9],[-328.1,0,136.7],[-344.7,0,148.2]],
+];
 // Top of the Fuji TV sphere (centre about -18, 107, 23; radius 22): the air-taxi berth.
 export const SPHERE_DOCK: P3 = [-18,131,23];
 // Water taxis: a shuttle loop along the beach and a ferry lane out to the bay (the open sea continues past the plate).
+// The loop's return leg runs about 28 m seaward of the outbound leg, so taxis passing the other way never touch.
 export const waterLoop: readonly P3[] = [
-  [-90,-.6,-385],[-200,-.6,-300],[-330,-.6,-215],[-430,-.6,-120],[-395,-.6,-165],[-285,-.6,-255],[-160,-.6,-345],[-70,-.6,-420],
+  [-90,-.6,-385],[-200,-.6,-300],[-330,-.6,-215],[-430,-.6,-120],[-405,-.6,-181],[-295,-.6,-271],[-170,-.6,-361],[-70,-.6,-420],
 ];
 // The ferry heads west for the Shinagawa channel, clear of the Rainbow Bridge anchorage and Daiba approach piers.
 export const ferryLane: readonly P3[] = [[-230,-.6,-290],[-420,-.6,-470],[-760,-.6,-560],[-1250,-.6,-520]];
@@ -33,7 +48,7 @@ export const ferryLane: readonly P3[] = [[-230,-.6,-290],[-420,-.6,-470],[-760,-
 export const bayCruisers: readonly (readonly [number,number,number])[] = [
   [-300,-560,.9],[-120,-620,-2.2],[-560,-430,2.6],[40,-600,-.4],[-640,-300,.3],[-700,250,1.4],[-650,-40,-1.7],[-150,1420,1.2],[250,1480,-1.9],
   // Nearer the hero pose: the foreground bay reads busy with taxis, as in the 2127 target (runs checked clear of the north shore).
-  [100,-470,1.93],[-160,-470,.95],[-250,-380,-.9],[-330,-420,-.6],[-40,-560,2.3],[-500,-500,1.2],[260,-620,-1.6],
+  [100,-470,1.93],[-160,-470,.95],[-250,-380,-.9],[-330,-420,-.6],[-40,-560,2.3],[-478,-556,1.2],[260,-620,-1.6],
   // Open water south-west of the island, upper right of the hero frame.
   [133,1442,.4],[-333,908,2.1],[797,1695,-1],[-250,1180,1.1],
   // Far water beyond the island's south-west shore, top middle of the hero frame (target v2's distant boats).

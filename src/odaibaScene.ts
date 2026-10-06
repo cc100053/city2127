@@ -10,6 +10,7 @@ import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
 import { changeSites, DISTRICT, inDistrict, SEAWARD_GLSL } from './layout';
 import { bayContext, recedeBeyondDistrict } from './bayContext';
+import { publishDoorways } from './mobility';
 
 // Literal paths bundle the district-detailed environment (scripts/crop-odaiba-district.py) and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
 const environmentUrl = new URL('../asset/models/odaiba-masterplan/odaiba_district_v01_environment.glb', import.meta.url).href;
@@ -161,6 +162,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);
     model.name = placement.id;
     placeOdaibaModel(model, placement);
+    publishDoorways(model, environment);
     if(placement.id==='aqua-city-odaiba' || placement.id==='decks-tokyo-beach')publishRoofGardens(plantRoofCanopy(scene,model));
     else if(placement.id==='grand-nikko-tokyo-daiba' || placement.id==='divercity-office-tower')publishRoofGardens(plantRoofCanopy(scene,model,true));
     model.traverse(object => {

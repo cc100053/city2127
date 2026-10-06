@@ -9,6 +9,8 @@ type P3 = [number, number, number];
 const waterfall = new T.MeshStandardMaterial({ color: '#f3fbff', emissive: '#d8f0ff', emissiveIntensity: .6, roughness: .25, transparent: true, opacity: .85 });
 const foam = new T.MeshBasicMaterial({ color: '#f4fbff', transparent: true, opacity: .55, depthWrite: false });
 const cherry = paint('#efc2cf', .8);
+// Promenade boardwalk: the environment's sidewalk finish.
+const paving = paint('#ddd8cc', .78);
 const crown = leafyCrown(1), pole = new T.CylinderGeometry(1, 1, 1, 10);
 
 // Skyway network (metres, deck top): a ring around the 151 m tower east of DECKS, a link into the Fuji chassis ring floor (61 m),
@@ -177,8 +179,12 @@ export function skyways() {
   for (const points of [...LINKS, sweepway.map(p => [...p] as P3)]) skyway(root, new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'), false);
   for (const points of gardenDecks) { const curve = new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'); skyway(root, curve, false); garden(curve, false); }
   for (const s of SPHERES) sphere(root, s.centre, s.radius, s.deck);
-  // Lit blue lines at street level too (target v2): both edges of the seaside promenades.
-  for (const walk of routes().promenades) for (const side of [-3.6, 3.6]) root.add(new T.Mesh(offsetTube(walk, side, .25, .3, false), trail));
+  // Lit blue lines at street level too (target v2): both edges of the seaside promenades, over a 7.2 m paved boardwalk whose top is the
+  // walkers' level (the lawn lies 0.2–0.35 m below it, so it reads as a low raised walk rather than people on grass).
+  for (const walk of routes().promenades) {
+    root.add(new T.Mesh(deck(walk, 7.2, .6, 160), paving));
+    for (const side of [-3.6, 3.6]) root.add(new T.Mesh(offsetTube(walk, side, .25, .3, false), trail));
+  }
   shoreTerraces(root);
   const generated = new Set<T.BufferGeometry>();
   root.traverse(o => { if (o instanceof T.Mesh && o.geometry !== pole && o.geometry !== crown && o.geometry.type !== 'RoundedBoxGeometry') generated.add(o.geometry); });

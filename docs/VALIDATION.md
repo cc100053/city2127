@@ -53,9 +53,16 @@ Start the services and use their printed ports as described in [README](../READM
 | Undo | Latest completed proposal only, before next start; restore scores/counts/seeds; original event preserved; cancelled newer draft cannot reopen prior Undo |
 | Admin display | Day 12:00 / Night 22:00 / Auto saved across reset/restart; explicit City `?hour` wins; LAN access to Admin denied |
 | Persistence | Restart existing SQLite and reconnect pages; state/history/settings recover; do not delete DB to simulate recovery |
-| Routes/actors | Sample repeated guideway, promenade/deck walkers and viewpoint stops, boats, both aerial loops and berths, interchange boat/transfers, district crowd/drone cycles; no ground/landmark/site collisions, half-faded settled aircraft or stale visible batches. DEV `?meters=nw:high&reviewTime=<s>` (low/mixed/high) holds a review time |
+| Routes/actors | No actor passes through another: mobility tests check boat hulls over the whole water period, train spacing per track and walker lanes; for people, sample overlaps of the real fleets with doorways published. Sample repeated guideway, promenade/deck walker parties, joggers passing in the outer lane, promenade stool sitters and rail-spot parties veering out of the lane, doorway walkers emerging from the facade, bench sitters/rail couples/forecourt groups, delivery robots and their collector hand-offs, street cars on both avenues and the drop-off bays (indicators, brake lamp, nose dip), gait/items, day rhythm at `?hour=4/12/19/21`, boats, both aerial loops and berths, interchange boat/transfers, district crowd/drone cycles; no ground/landmark/site collisions, half-faded settled aircraft or stale visible batches. DEV `?meters=nw:high&reviewTime=<s>` (low/mixed/high) holds a review time; `?review=street` frames people and street cars up close (`&cam=x,y,z` moves that camera) |
 
 Optional runnable browser checks use installed Playwright and local services: [surveyAuto.browser.mjs](../tests/surveyAuto.browser.mjs), [adminUndo.browser.mjs](../tests/adminUndo.browser.mjs), [twoStations.browser.mjs](../tests/twoStations.browser.mjs), [residentP2.browser.mjs](../tests/residentP2.browser.mjs), [residentP3.browser.mjs](../tests/residentP3.browser.mjs), [residentP4.browser.mjs](../tests/residentP4.browser.mjs). Read each script's environment/ports before execution. These are focused regressions, not proof of exhibition-day hardware acceptance.
+
+Street-life interactions (2026-10-06): root `mobility.test.ts` checks conversational speaker/listener/quiet turns and continuous
+outbound/stay/return/indoor timing. `odaiba.test.ts` publishes real landmark doorways after creating the actor fleets, checks the
+visitor curves on actual paving and clear of buildings/sites, then samples each journey against actual people/robots for 240 s
+at .25 s in low/mixed/high, hours 12/21. Every journey must actually be drawn in all six cases; seated matrices and folded legs
+remain fixed. Repeat visual checks with companion gaze/hand gestures, visitor arrival/chat/turn/return, and held day/dusk/night.
+Dated results and any integration limits belong in the [street-life handoff](handoffs/street-life.md).
 
 ## Performance evidence
 

@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { routes, podPose, walkerPose, walkerRoute, transferPose, dockMotion, guideStrength, aircraftSlot, podShare, automationActivity, CARS, CAR_GAP, TRAINS, WALKERS, TRANSFERS, PLATOON } from '../src/mobility.ts';
+import { routes, podPose, boatPoses, HULL, WATER_PERIOD, BOATS as BOAT_COUNT, trainPose, TRAIN_SPEED, walkerPose, walkerRoute, walkerParty, doorwayPose, robotPose, collectorPose, ROBOT_HALT, HANDOFF, promenadeStops, RAIL_OUT, STOOL_FRONT, streetCarPose, STREET_GAP, dropOffPose, DROP_OFF, streetRhythm, promenadeBenches, BENCH_OUT, transferPose, dockMotion, guideStrength, aircraftSlot, podShare, automationActivity, CARS, CAR_GAP, TRAINS, WALKERS, TRANSFERS, PLATOON } from '../src/mobility.ts';
 import { changeSites, SPHERE_DOCK, INTERCHANGE } from '../src/layout.ts';
 import { laneBeaconSites } from '../src/waterRooms.ts';
+import { conversationPose, visitPose } from '../src/mobility.ts';
 
 const path = routes(), guideLength = path.guideway.getLength();
 // Landmark boxes (Blender Z-up bounds → scene X, Y, -Z) and each survey site's tallest scaled envelope.
@@ -69,18 +70,207 @@ for (let t = 0; t < 300; t += .25) for (let train = 0; train < TRAINS + 2; train
   assert.ok(Math.abs(next.u - cars[0].u) * guideLength < 1.5, 'pod jumps along the guideway');
 }
 
-// Walkers stroll continuously (≤ 2 m/s) and switch lanes only at the ends of their promenade or deck; viewpoint stops hold still.
+// Walkers: continuous while visible (≤ 3.5 m/s, joggers included), appear/vanish only at a route end, turn only out of sight, hold still
+// at a viewpoint; parties share their leader's route; paces vary.
 const walks = [...path.promenades, ...path.decks];
 let dwelling = 0;
-for (let i = 0; i < 160; i++) for (let t = 0; t < 1200; t += 1) {
-  const a = walkerPose(t, i, i < WALKERS ? WALKERS : 160), b = walkerPose(t + 1, i, i < WALKERS ? WALKERS : 160);
-  assert.ok(Math.abs(a.u - b.u) * walks[walkerRoute(i)].getLength() < 2, `walker ${i} jumps`);
-  if (a.forward !== b.forward) assert.ok(a.u < .01 || a.u > .99, `walker ${i} turns mid-promenade`);
-  if (a.dwell === 1 && b.dwell === 1) { dwelling++; assert.equal(a.u, b.u, `walker ${i} drifts while stopped`); }
-  assert.ok(Math.abs(a.dwell - b.dwell) <= .25 + 1e-9);
+const paces = new Set<number>();
+for (let i = 0; i < 400; i++) {
+  const length = walks[walkerRoute(walkerParty(i).id)].getLength();
+  paces.add(Math.round(walkerPose(0, i, length).speed * 10));
+  for (let t = 0; t < 1200; t += 1) {
+    const a = walkerPose(t, i, length), b = walkerPose(t + 1, i, length);
+    if (a.visible > 0 && b.visible > 0) assert.ok(Math.abs(a.u - b.u) * length < 3.5, `walker ${i} jumps`);
+    if (a.visible > 0 && a.visible < 1) assert.ok(a.u < 5 / length || a.u > 1 - 5 / length, `walker ${i} fades mid-route`);
+    if (a.forward !== b.forward) assert.ok(a.visible === 0 || b.visible === 0, `walker ${i} turns in view`);
+    if (a.dwell === 1 && b.dwell === 1) { dwelling++; assert.equal(a.u, b.u, `walker ${i} drifts while stopped`); }
+    assert.ok(Math.abs(a.dwell - b.dwell) <= .25 + 1e-9);
+  }
 }
 assert.ok(dwelling > 0, 'no walker stops at a viewpoint');
+assert.ok(paces.size > 10 && Math.max(...paces) >= 23, 'walkers share one pace or nobody jogs');
 assert.deepEqual([0, 1, 2, 3, 4, 9, 14, 19].map(walkerRoute), [0, 1, 0, 1, 2, 3, 4, 5]);
+for (let i = 0; i < 60; i++) { const p = walkerParty(i); assert.ok(walkerParty(p.leader).leader === p.leader && walkerParty(p.leader).id === p.id); }
+assert.deepEqual([0, 1, 2, 3, 4, 5].map(i => walkerParty(i).size), [1, 2, 2, 3, 3, 3]);
+
+// Doorway trips: continuous at walking pace while visible.
+for (let k = 0; k < 40; k++) for (let t = 0; t < 300; t += .5) {
+  const a = doorwayPose(t, k, 30), b = doorwayPose(t + .5, k, 30);
+  if (a.visible > 0 && b.visible > 0) assert.ok(Math.abs(a.d - b.d) < 1, `doorway walker ${k} jumps`);
+}
+
+// Street cars stay on the environment's road surface in both lanes, never close within 9 m in a lane, and move ≤ 15 m/s.
+const glb = readFileSync(new URL('../asset/models/odaiba-masterplan/odaiba_district_v01_environment.glb', import.meta.url));
+const gltf = JSON.parse(glb.subarray(20, 20 + glb.readUInt32LE(12)).toString()), bin = glb.subarray(28 + glb.readUInt32LE(12));
+const read = (i: number) => {
+  const a = gltf.accessors[i], v = gltf.bufferViews[a.bufferView], n = a.type === 'VEC3' ? 3 : 1, C = a.componentType === 5126 ? Float32Array : a.componentType === 5125 ? Uint32Array : Uint16Array;
+  const stride = v.byteStride ? v.byteStride / C.BYTES_PER_ELEMENT : n, arr = new C(bin.buffer, bin.byteOffset + (v.byteOffset ?? 0) + (a.byteOffset ?? 0), (a.count - 1) * stride + n);
+  return (k: number, c = 0) => arr[k * stride + c];
+};
+const roadTris: number[][] = [], pavedTris: number[][] = [];
+gltf.nodes.forEach((node: { mesh?: number; translation?: number[] }) => {
+  if (node.mesh === undefined) return;
+  const [tx, , tz] = node.translation ?? [0, 0, 0];
+  for (const prim of gltf.meshes[node.mesh].primitives) {
+    const name = gltf.materials[prim.material].name, list = ['road', 'road_marking'].includes(name) ? roadTris : ['sidewalk', 'plaza'].includes(name) ? pavedTris : null;
+    if (!list) continue;
+    const pos = read(prim.attributes.POSITION), idx = read(prim.indices), count = gltf.accessors[prim.indices].count;
+    for (let k = 0; k < count; k += 3) list.push([0, 1, 2].flatMap(j => [pos(idx(k + j), 0) + tx, pos(idx(k + j), 2) + tz]));
+  }
+});
+const inside = (tris: number[][], x: number, z: number) => tris.some(([ax, az, bx, bz, cx, cz]) => {
+  const s = (px: number, pz: number, qx: number, qz: number) => (x - qx) * (pz - qz) - (px - qx) * (z - qz);
+  const d1 = s(ax, az, bx, bz), d2 = s(bx, bz, cx, cz), d3 = s(cx, cz, ax, az);
+  return !((d1 < 0 || d2 < 0 || d3 < 0) && (d1 > 0 || d2 > 0 || d3 > 0));
+});
+const onRoad = (x: number, z: number) => inside(roadTris, x, z);
+path.streets.forEach((street, r) => {
+  const length = street.getLength(), offset = r ? 1.75 : 1.25, cars = Math.round((length + 40) / STREET_GAP);
+  let missing = 0, samples = 0;
+  for (let d = 0; d <= length; d += 2) for (const side of [-1, 1]) {
+    const p = street.getPointAt(d / length), t = street.getTangentAt(d / length);
+    // Both car edges (0.95 m either side of the lane centre). The junction mouth under the guideway (~10 m) has no road triangle.
+    for (const edge of [-.95, .95]) { samples++; if (!onRoad(p.x + t.z * side * (offset + edge), p.z - t.x * side * (offset + edge))) missing++; }
+  }
+  assert.ok(missing / samples < .02, `street ${r}: ${missing}/${samples} car-edge samples off the road`);
+  for (const lane of [0, 1]) for (let t = 0; t < 300; t += .5) {
+    const at = Array.from({ length: cars }, (_, c) => streetCarPose(t, r, lane, c, cars, length));
+    const shown = at.filter(c => c.visible > 0).map(c => c.d).sort((a, b) => a - b);
+    for (let k = 1; k < shown.length; k++) assert.ok(shown[k] - shown[k - 1] > 9, `street ${r} lane ${lane} cars close up at ${t}s`);
+    at.forEach((c, k) => { const next = streetCarPose(t + .5, r, lane, k, cars, length); if (c.visible > 0 && next.visible > 0) assert.ok(Math.abs(next.d - c.d) < 7.5, 'street car jumps'); });
+  }
+});
+// Drop-off: the bay car is continuous, rests on paving clear of the carriageway, and is back in its own lane slot whenever not in the bay.
+{
+  const street = path.streets[DROP_OFF.road], length = street.getLength(), cars = Math.round((length + 40) / STREET_GAP);
+  DROP_OFF.cars.forEach((car, k) => {
+    let parkedSeen = 0;
+    for (let t = 0; t < 400; t += .25) {
+      const a = dropOffPose(t, car, cars, length, DROP_OFF.stops[k]), b = dropOffPose(t + .25, car, cars, length, DROP_OFF.stops[k]);
+      const slot = streetCarPose(t, DROP_OFF.road, DROP_OFF.lane, car, cars, length);
+      if (a.visible > 0 && b.visible > 0) assert.ok(Math.abs(a.d - b.d) < 3.5 && Math.abs(a.bay - b.bay) < .15 && Math.abs(a.steer) < .2, `drop-off car ${car} jumps or swerves at ${t}s`);
+      if (a.bay === 0) assert.ok(Math.abs(a.d - slot.d) < 1e-6, `drop-off car ${car} leaves its slot outside the bay`);
+      if (a.parked >= 0) {
+        parkedSeen++;
+        assert.ok(a.leaving >= 0 && (b.parked < 0 || Math.abs(a.d - b.d) < 1e-6), 'parked car moves');
+        const p = street.getPointAt(a.d / length), tan = street.getTangentAt(a.d / length).negate(), off = 1.75 + DROP_OFF.bay;
+        for (const [along, across] of [[-2.3, -.95], [-2.3, .95], [2.3, -.95], [2.3, .95], [0, 0]]) {
+          const x = p.x + tan.z * (off + across) + tan.x * along, z = p.z - tan.x * (off + across) + tan.z * along;
+          assert.ok(inside(pavedTris, x, z) && !onRoad(x, z), `drop-off bay ${k} corner off the paving at ${x.toFixed(0)}, ${z.toFixed(0)}`);
+        }
+      }
+    }
+    assert.ok(parkedSeen > 100, `drop-off car ${car} never parks`);
+    // Cues: kerb indicator ahead of easing in and through braking, brake lamp only while slowing, road indicator before pulling away
+    // and until back in lane; the nose dips under braking and lifts pulling away, never past 1°.
+    let kerbBeforeBay = 0, roadBeforeMove = 0;
+    for (let t = 0; t < 400; t += .25) {
+      const a = dropOffPose(t, car, cars, length, DROP_OFF.stops[k]), b = dropOffPose(t + .25, car, cars, length, DROP_OFF.stops[k]);
+      if (a.signal === 1 && a.bay === 0) kerbBeforeBay++;
+      if (a.signal === -1 && a.parked >= 0) roadBeforeMove++;
+      if (a.brake) assert.ok(a.signal === 1 && a.parked < 0 && a.pitch >= 0 && b.d !== a.d, 'brake lamp off the braking stretch');
+      if (a.bay === 0 && b.bay === 0) assert.ok(a.signal >= 0 && !a.brake && a.pitch === 0, 'cue in plain traffic');
+      if (a.parked >= 0 && a.leaving > 3) assert.equal(a.signal, 0, 'parked car signals early');
+      assert.ok(Math.abs(a.pitch) < .0175 && Math.abs(a.pitch - b.pitch) < .005);
+    }
+    assert.ok(kerbBeforeBay > 4 && roadBeforeMove >= 10, `drop-off car ${car} gives no warning`);
+  });
+}
+
+// Boats: over the fleet's whole period every visible hull keeps 2 m of water to every other (loop taxis, ferry, interchange boat,
+// cruisers; a fading cruiser counts once it is a third grown).
+{
+  const hull = (b: ReturnType<typeof boatPoses>[number]) => { const c = Math.cos(b.yaw), s = Math.sin(b.yaw), k = b.scale, mid = (HULL.bow + HULL.stern) / 2 * k;
+    return { x: b.x + s * mid, z: b.z + c * mid, c, s, hx: HULL.x * k + 1, hz: (HULL.bow - HULL.stern) / 2 * k + 1 }; };
+  const meet = (a: ReturnType<typeof hull>, b: ReturnType<typeof hull>) => [[a.c, -a.s], [a.s, a.c], [b.c, -b.s], [b.s, b.c]].every(u => {
+    const ext = (o: typeof a) => o.hx * Math.abs(u[0] * o.c - u[1] * o.s) + o.hz * Math.abs(u[0] * o.s + u[1] * o.c);
+    return Math.abs((b.x - a.x) * u[0] + (b.z - a.z) * u[1]) < ext(a) + ext(b); });
+  for (let t = 0; t < WATER_PERIOD; t += .25) {
+    const boats = boatPoses(t, path).map((b, i) => ({ b, i, full: i <= BOAT_COUNT + 1 ? 1.7 : 1.35 })).filter(o => o.b.scale > .3 * o.full).map(o => ({ i: o.i, h: hull(o.b) }));
+    for (let a = 0; a < boats.length; a++) for (let b = a + 1; b < boats.length; b++) assert.ok(!meet(boats[a].h, boats[b].h), `boats ${boats[a].i} and ${boats[b].i} meet at ${t}s`);
+  }
+}
+// Trains: each track's trains keep a fixed gap (never closing up), and each runs one way on its own beam.
+{
+  const lengths = path.tracks.map(c => c.getLength());
+  for (let t = 0; t < 300; t += .5) for (const track of [0, 1]) {
+    const heads = [0, 1].map(k => trainPose(t, k, 2, 0, lengths[track]).u * lengths[track]), tails = [0, 1].map(k => trainPose(t, k, 2, 5, lengths[track]).u * lengths[track]);
+    const vis = [0, 1].map(k => trainPose(t, k, 2, 0, lengths[track]).visible > 0 || trainPose(t, k, 2, 5, lengths[track]).visible > 0);
+    if (vis[0] && vis[1]) assert.ok(Math.min(Math.abs(heads[0] - tails[1]), Math.abs(heads[1] - tails[0])) > 50, `trains close up on track ${track}`);
+    assert.ok(trainPose(t + .5, 0, 2, 0, lengths[track]).u * lengths[track] - heads[0] <= TRAIN_SPEED * .5 + 1e-6 || trainPose(t + .5, 0, 2, 0, lengths[track]).visible === 0);
+  }
+}
+
+// Day rhythm: every group in 0..1, continuous through midnight, full when no hour is given; evenings busier than 4 am.
+for (let h = 0; h < 24; h += .1) {
+  const a = streetRhythm(h), b = streetRhythm(h + .1);
+  for (const k of Object.keys(a) as (keyof typeof a)[]) { assert.ok(a[k] >= 0 && a[k] <= 1); assert.ok(Math.abs(a[k] - b[k]) < .06, `rhythm ${k} jumps at ${h.toFixed(1)}h`); }
+}
+assert.ok(Object.values(streetRhythm()).every(v => v === 1));
+assert.ok(streetRhythm(18).people > 3 * streetRhythm(4).people && streetRhythm(4).children === 0 && streetRhythm(23.99).robots > .9);
+
+// Benches: the backrest (.27 m behind the bench line) clears walker lanes (≤ 2.35 m incl. parties abreast and a .25 m body), and a
+// sitter's feet (knee .31 m forward plus the .08 m shin) stop short of the lit edge tube (3.6 m − .3 m).
+const benches = promenadeBenches(path.promenades.map(c => c.getLength()));
+assert.ok(benches.length >= 16 && benches.every(b => b.u > 0 && b.rail < 1) && BENCH_OUT - .27 > 2.35 && BENCH_OUT + .39 < 3.3);
+// Lanes clear the backrest (2.48 m) with a shoulder to spare and keep 0.25 m off the centre line; joggers run outside every party.
+assert.ok(Array.from({ length: 400 }, (_, i) => { const p = walkerParty(i), w = walkerPose(0, p.leader); return w.lane + p.side; }).every(v => v >= .25 && v <= 2.1));
+// Promenade stops: every spot used once, lone walkers sit at stools, parties stand at the rail; a walker holds exactly at its spot,
+// fully veered out, and is back in its lane 6 m on.
+const promenadeLengths = path.promenades.map(c => c.getLength()), stops = promenadeStops(promenadeLengths);
+const used = [...stops.values()].filter(s => s !== false);
+assert.ok(used.length >= 16 && new Set(used.map(s => `${s.route} ${s.at.toFixed(1)} ${s.out}`)).size === used.length, 'promenade spots shared');
+for (const [i, stop] of stops) {
+  if (stop === false) continue;
+  assert.equal(stop.seat > 0 ? stop.out : RAIL_OUT, stop.seat > 0 ? STOOL_FRONT : stop.out);
+  assert.equal(stop.seat > 0, walkerParty(i).size === 1);
+  const length = promenadeLengths[walkerRoute(walkerParty(i).id)];
+  let held = 0, far = 0;
+  for (let t = 0; t < 4000; t++) {
+    const w = walkerPose(t, i, length, stop);
+    if (w.dwell > 0) { held++; assert.ok(Math.abs((w.forward ? w.u : 1 - w.u) * length - (w.forward ? stop.at : length - stop.at)) < 1e-6 && w.approach === 1); }
+    if (w.visible > 0 && w.approach === 0) far++;
+  }
+  assert.ok(held > 0 && far > 0, `walker ${i} never stops at its spot`);
+}
+
+// Delivery robots: continuous at a steady pace, halting HANDOFF s just outside the far door while the collector comes out and back in.
+for (let k = 0; k < 14; k++) {
+  let waits = 0;
+  for (let t = 0; t < 400; t += .25) {
+    const a = robotPose(t, 500 + k, 30), b = robotPose(t + .25, 500 + k, 30);
+    if (a.visible > 0 && b.visible > 0) assert.ok(Math.abs(a.d - b.d) <= .7 * .25 + 1e-9, `robot ${k} jumps`);
+    if (a.waited >= 0) { waits++; assert.ok(Math.abs((a.reverse ? a.d : 30 - a.d) - ROBOT_HALT) < 1e-9); }
+  }
+  assert.ok(waits > 0);
+}
+assert.ok([0, 7, HANDOFF].every(t => collectorPose(t).e === 0) && collectorPose(3).e + .25 < ROBOT_HALT - .4, 'collector meets the robot');
+
+// Group conversations include listening and silence, with at most one restrained gesture at any time.
+for (const members of [2, 3]) for (let group = 0; group < 5; group++) {
+  const speakers = new Set<number>(); let quiet = 0;
+  for (let time = -20; time < 80; time += .1) {
+    const turns = Array.from({ length: members }, (_, j) => conversationPose(time, group, j, members));
+    assert.ok(turns.filter(p => p.gesture > .001).length <= 1);
+    turns.forEach((p, j) => { assert.ok(p.attention >= 0 && p.attention <= 1 && p.gesture >= 0 && p.gesture <= .41);
+      if (p.attention > 0) { assert.ok(p.toward >= 0 && p.toward < members && p.toward !== j); if (p.gesture > .001) speakers.add(j); }
+    });
+    if (turns.every(p => p.attention === 0)) quiet++;
+  }
+  assert.equal(speakers.size, members); assert.ok(quiet > 0);
+}
+// Visits stay fully visible at the group, return to their own door, and never jump between visible positions.
+for (let group = 0; group < 5; group++) {
+  let outbound = 0, returning = 0, staying = 0, indoors = 0;
+  for (let time = 0; time < 240; time += .1) {
+    const a = visitPose(time, group, 20), b = visitPose(time + .1, group, 20);
+    assert.ok(a.u >= 0 && a.u <= 1 && Math.abs(a.u - b.u) * 20 <= .12 + 1e-8);
+    if (a.dwell > 0) { staying++; assert.equal(a.u, 1); assert.equal(a.visible, 1); assert.equal(a.walking, false); }
+    if (a.walking && a.visible === 1) { if (a.returning) returning++; else outbound++; }
+    if (!a.visible) { indoors++; assert.equal(a.u, 0); }
+  }
+  assert.ok(outbound && returning && staying && indoors);
+}
 
 // Interchange transfers: ≤ 2 m/s on the pier, appear/vanish only at the shore end or the boat, and board only while it is docked.
 for (let k = 0; k < TRANSFERS; k++) for (let t = 0; t < 120; t += .1) {
@@ -106,4 +296,4 @@ for (let ports = 0; ports <= 6; ports++) {
 assert.ok(guideStrength(.01, .99, true) > .9);
 assert.equal(guideStrength(.01, .99, false), 0);
 assert.equal(guideStrength(.5, 0, true), 0);
-console.log(`PASS: Odaiba actors — air tiers clear landmarks, sites and beacons, sphere and interchange berths, pod spacing on ${guideLength.toFixed(0)} m of guideway, walker/deck/transfer continuity, ${beacons.length} lane beacons, aircraft slots, guide lights.`);
+console.log(`PASS: Odaiba actors — air tiers clear landmarks, sites and beacons, sphere and interchange berths, pod spacing on ${guideLength.toFixed(0)} m of guideway, walker/party/doorway/transfer continuity, street cars on the road and spaced, drop-off bays on paving, day rhythm, benches, ${beacons.length} lane beacons, aircraft slots, guide lights.`);
