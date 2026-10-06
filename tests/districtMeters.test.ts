@@ -146,6 +146,12 @@ for (const [ports, aircraft, pods, walkers] of [[1, 3, 12, 400], [3, 17, 18, 260
     assert.deepEqual([visible('air-taxis') + visible('air-pods'), visible('guideway-pods'), visible('promenade-walkers', 400)], [aircraft, pods, walking(walkers)]);
   }
 }
+// Resting people (benches, rails, forecourts) are present or absent at any crowd level, never shrunk into their bench.
+updateActors(presets.neutral, 20, 5 / 6, 0, 15);
+{
+  const mesh = fleet('resting-people'), matrix = new T.Matrix4(), scale = new T.Vector3();
+  for (let i = 0; i < mesh.count; i++) { mesh.getMatrixAt(i, matrix); const s = scale.setFromMatrixScale(matrix).x; assert.ok(s < .01 || s > .9, `resting person ${i} drawn at ${s.toFixed(2)} scale`); }
+}
 updateActors(presets.neutral, 20);
 names.forEach((name, i) => assert.deepEqual([...fleet(name).instanceMatrix.array], legacyMatrices[i], `${name} restores legacy matrices`));
 console.log('PASS: actual P2 actor matrices match low/mixed/high independently of day mood; original standalone/legacy poses restored.');

@@ -151,7 +151,8 @@ function fleet(scene:T.Object3D,parts:Part[],count:number,name:string,shadow=tru
 
 /** Gait per person (`gait` instance attribute, see `pedestrians`): x stride phase (rad), y swing (rad), z carried item (0 none,
  * 1 backpack, 2 shoulder bag), w seated 0..1. Legs swing about the hip and arms about the shoulder in the vertex shader, so a walk
- * costs no extra draws; seated legs fold forward. */
+ * costs no extra draws. Seated, the thigh folds forward at the hip (.58) and the shin back down at the knee (.33), so the figure sits
+ * with its thighs level and shins hanging. */
 function articulate(mat:T.Material,body:string) {
   mat.onBeforeCompile=shader=>{
     shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nattribute vec4 gait;\nvec3 swingX(vec3 p,float pivot,float a){p.y-=pivot;return vec3(p.x,p.y*cos(a)-p.z*sin(a),p.y*sin(a)+p.z*cos(a))+vec3(0.,pivot,0.);}')
@@ -159,10 +160,10 @@ function articulate(mat:T.Material,body:string) {
   };
   mat.customProgramCacheKey=()=>'gait-'+body;
 }
-const LEGS='float side=sign(position.x);transformed=swingX(transformed,.58,mix(sin(gait.x)*gait.y*side,-1.35,gait.w));';
+const LEGS='float side=sign(position.x);transformed=swingX(transformed,.33,smoothstep(.36,.3,position.y)*1.35*gait.w);transformed=swingX(transformed,.58,mix(sin(gait.x)*gait.y*side,-1.35,gait.w));';
 const ARMS='float side=sign(position.x);transformed=swingX(transformed,1.25,-sin(gait.x)*gait.y*.8*side*(1.-gait.w));';
-// Backpack behind the torso (z < -.12), bag at the right hip (x > .25): keep only the item this person carries.
-const GEAR='transformed*=gait.z<.5?0.:gait.z<1.5?step(position.z,-.12):step(.25,position.x);';
+// Backpack behind the torso (z < -.12), bag at the right hip (x > .25): keep only the item this person carries; sitters set it down.
+const GEAR='transformed*=gait.w>.5||gait.z<.5?0.:gait.z<1.5?step(position.z,-.12):step(.25,position.x);';
 /** Shared capsule figures and palette, used by promenade, doorway, resting and plaza crowds. `gait(i, phase, swing, item, seated)`
  * sets one person's walk; items are fixed per slot at build. */
 export function pedestrians(scene:T.Object3D,count:number,name:string) {
@@ -376,16 +377,17 @@ export function mobility(scene:T.Scene) {
   const [seaX,seaZ]=[INTERCHANGE.shore[0]-INTERCHANGE.head[0],INTERCHANGE.shore[2]-INTERCHANGE.head[2]].map(v=>-v/INTERCHANGE.pier),seaYaw=Math.atan2(seaX,seaZ);
   const alongX=seaZ,alongZ=-seaX; // Westward along the shore, as in layout.ts.
   // Promenade benches face the sea with their backs landward; per bench four resting slots: two seats, then a couple at the rail beyond.
-  const benches=promenadeBenches(walkLength.slice(0,2)),benchFleet=fleet(scene,[part([1.8,.08,.46],[0,.45,0],shell,.03),part([1.8,.4,.06],[0,.72,-.24],shell,.03),
-    part([.08,.45,.42],[-.8,.22,0],glass,.02),part([.08,.45,.42],[.8,.22,0],glass,.02)],benches.length,'promenade-benches');
+  const benches=promenadeBenches(walkLength.slice(0,2)),benchFleet=fleet(scene,[part([1.8,.08,.46],[0,.36,0],shell,.03),part([1.8,.4,.06],[0,.62,-.24],shell,.03),
+    part([.08,.32,.42],[-.8,.16,0],glass,.02),part([.08,.32,.42],[.8,.16,0],glass,.02)],benches.length,'promenade-benches');
   const spots:{at:T.Vector3;yaw:number;seated:number}[]=[];
   benches.forEach((b,k)=>{
     for(const [u,out,rail] of [[b.u,BENCH_OUT,0],[b.rail,2.95,1]] as const){
       place(walks[b.route],u);side.crossVectors(up,tangent).normalize();
       const sea=Math.sign(side.x*seaX+side.z*seaZ)||1,yaw=Math.atan2(side.x*sea,side.z*sea),at=pose.position.clone().addScaledVector(side,sea*out);
       if(!rail){pose.position.copy(at);pose.rotation.set(0,yaw,0);benchFleet.set(k,pose);}
-      // Seats sit .11 m lower (hips on the slab); the rail couple stand half a metre apart, turned a little toward each other.
-      for(const j of [-1,1])spots.push({at:at.clone().addScaledVector(tangent,j*(rail?.28:.45)).setY(rail?0:-.11),yaw:yaw-(rail?j*.35:0),seated:rail?0:1});
+      // Sitters drop .10 m so the folded thighs (.08 m radius under the .58 m hip) rest on the .40 m seat top; the rail couple stand half
+      // a metre apart, turned a little toward each other.
+      for(const j of [-1,1])spots.push({at:at.clone().addScaledVector(tangent,j*(rail?.28:.45)).setY(rail?0:-.1),yaw:yaw-(rail?j*.35:0),seated:rail?0:1});
     }
   });benchFleet.flush();
   const resting=pedestrians(scene,spots.length+FORECOURT_GROUPS*3,'resting-people');
@@ -401,10 +403,18 @@ export function mobility(scene:T.Scene) {
       pose.scale.setScalar(Math.min(1,f*walk*1.2,(1-f)*walk*1.2));doorPeople.set(slot,pose);doorPeople.gait(slot,t*6.6+slot,.45);
     }
   };
+  /** Day-rhythm and crowd presence per actor: each is wholly on or off (a stable hash against the group's share, so the same people
+   * come and go) and eases between the two, so nobody stays drawn shrunk when the hour or crowd is held. */
+  let lastTime=NaN,fade=1;
+  const gate=(count:number)=>{
+    const level=new Float32Array(count).fill(-1);
+    return (i:number,on:boolean)=>{const target=on?1:0;level[i]=level[i]<0?target:level[i]+T.MathUtils.clamp(target-level[i],-fade,fade);return ease(level[i]);};
+  };
+  const walkerGate=gate(MAX_WALKERS),doorGate=gate(DOOR_WALKERS),robotGate=gate(ROBOTS),restGate=gate(spots.length+FORECOURT_GROUPS*3),carGate=gate(carSlots);
   return (state:WorldState,time:number,automationShare?:number,night=0,hour?:number)=>{
     const activity=automationShare===undefined?null:automationActivity(automationShare),rhythm=streetRhythm(hour);
-    // Day rhythm hides a share of each group, keyed by a stable hash so the same people come and go; at full nobody is touched.
-    const present=(share:number,key:number)=>share>=1?1:T.MathUtils.smoothstep(share-key,-.06,.06);
+    // Presence eases over 1.5 s of animation time; a reset, snapshot or jump settles at once.
+    fade=Number.isFinite(lastTime)&&time>lastTime?(time-lastTime)/1.5:1;lastTime=time;
     const amount=(count:number,index:number)=>T.MathUtils.clamp(count-index,0,1);
     mint.emissiveIntensity=.65+state.neon*1.8;
     airShell.emissiveIntensity=activity?activity.level*.85:0;
@@ -421,8 +431,8 @@ export function mobility(scene:T.Scene) {
     }sweepPods.flush();
     for(let i=0;i<MAX_WALKERS;i++){
       const party=walkerParty(i),route=walkerRoute(party.id),onDeck=route>1,w=walkerPose(time,party.leader,walkLength[route]);
-      const weight=(activity?amount(activity.walkers,i):i<WALKERS?T.MathUtils.smoothstep(state.crowd*.8+.2-i/WALKERS,-.05,.05):0)
-        *present(party.size===3?rhythm.children:w.jog?rhythm.joggers:w.stops?rhythm.strollers:rhythm.people,hash(party.leader,20));
+      const share=party.size===3?rhythm.children:w.jog?rhythm.joggers:w.stops?rhythm.strollers:rhythm.people;
+      const weight=walkerGate(i,(activity?true:i<WALKERS&&state.crowd*.8+.2>i/WALKERS)&&share>hash(party.leader,20))*(activity?amount(activity.walkers,i):1);
       place(walks[route],w.u,!w.forward);side.crossVectors(up,tangent).normalize();
       // Parties walk abreast; deck walkers keep to the 9 m deck's outer lanes, clear of the planted middle bed.
       const abreast=(party.slot-(party.size-1)/2)*.65,lane=onDeck?(w.forward?1:-1)*(3.5+(party.size===1?(i%2-.5)*.6:abreast)):w.lane+(w.forward?abreast:-abreast);
@@ -446,7 +456,7 @@ export function mobility(scene:T.Scene) {
       let d=w.d,leg=0;while(leg<2&&d>legs[leg]){d-=legs[leg];leg++;}
       const a=trip[leg],b=trip[leg+1];pose.position.lerpVectors(a,b,Math.min(d/legs[leg],1));
       pose.rotation.set(0,Math.atan2(b.x-a.x,b.z-a.z)+(w.reverse?Math.PI:0),Math.sin(w.phase)*.03);
-      pose.scale.setScalar(amount(doorShare*DOOR_WALKERS,k)*w.visible*present(rhythm.people,hash(k,20))*(.93+.12*hash(k,8)));doorPeople.set(k,pose);doorPeople.gait(k,w.phase,.45);
+      pose.scale.setScalar(amount(doorShare*DOOR_WALKERS,k)*w.visible*doorGate(k,rhythm.people>hash(k,20))*(.93+.12*hash(k,8)));doorPeople.set(k,pose);doorPeople.gait(k,w.phase,.45);
     }
     for(let k=0;k<ROBOTS;k++){
       const trip=doorTrips[(k*5+3)%Math.max(doorTrips.length,1)];
@@ -454,19 +464,20 @@ export function mobility(scene:T.Scene) {
       const legs=[trip[0].distanceTo(trip[1]),trip[1].distanceTo(trip[2]),trip[2].distanceTo(trip[3])],w=doorwayPose(time,500+k,legs[0]+legs[1]+legs[2]);
       let d=w.d,leg=0;while(leg<2&&d>legs[leg]){d-=legs[leg];leg++;}
       const a=trip[leg],b=trip[leg+1];pose.position.lerpVectors(a,b,Math.min(d/legs[leg],1));
-      pose.rotation.set(0,Math.atan2(b.x-a.x,b.z-a.z)+(w.reverse?Math.PI:0),0);pose.scale.setScalar(w.visible*present(rhythm.robots,hash(k,24)));robots.set(k,pose);
+      pose.rotation.set(0,Math.atan2(b.x-a.x,b.z-a.z)+(w.reverse?Math.PI:0),0);pose.scale.setScalar(w.visible*robotGate(k,rhythm.robots>hash(k,24)));robots.set(k,pose);
     }robots.flush();
     // Resting people: bench sitters, rail couples, then forecourt groups of two or three facing each other; a slow sway of the head-turn.
-    const occupied=(share:number,key:number)=>Math.min(1,doorShare*1.4)*present(share,key);
+    // The crowd level decides how many spots are taken, never how big the people are.
+    const occupied=(k:number,share:number,key:number)=>restGate(k,Math.min(1,doorShare*1.4)*share>key);
     spots.forEach((spot,k)=>{
       pose.position.copy(spot.at);pose.rotation.set(0,spot.yaw+Math.sin(time*.3+k*1.7)*.12,0);
-      pose.scale.setScalar(occupied(spot.seated?rhythm.sitters:rhythm.strollers,hash(k,21))*(.93+.12*hash(k,8)));resting.set(k,pose);resting.gait(k,0,0,spot.seated);
+      pose.scale.setScalar(occupied(k,spot.seated?rhythm.sitters:rhythm.strollers,hash(k,21))*(.93+.12*hash(k,8)));resting.set(k,pose);resting.gait(k,0,0,spot.seated);
     });
     for(let g=0;g<FORECOURT_GROUPS;g++)for(let j=0;j<3;j++){
       const k=spots.length+g*3+j,spot=doorSpots[g],a=j*Math.PI*2/3+hash(g,25)*6.28;
       if(!spot||(j===2&&hash(g,26)<.4)){pose.scale.setScalar(0);resting.set(k,pose);continue;}
       pose.position.set(spot.x+Math.sin(a)*.65,0,spot.z+Math.cos(a)*.65);pose.rotation.set(0,a+Math.PI+Math.sin(time*.4+k)*.15,0);
-      pose.scale.setScalar(occupied(rhythm.people,hash(g,27))*(.93+.12*hash(k,8)));resting.set(k,pose);resting.gait(k,0,0);
+      pose.scale.setScalar(occupied(k,rhythm.people,hash(g,27))*(.93+.12*hash(k,8)));resting.set(k,pose);resting.gait(k,0,0);
     }resting.flush();
     for(let r=0,slot=0;r<path.streets.length;r++)for(let lane=0;lane<2;lane++)for(let c=0;c<streetCars[r];c++,slot++){
       const drop=r===DROP_OFF.road&&lane===DROP_OFF.lane?(DROP_OFF.cars as readonly number[]).indexOf(c):-1;
@@ -474,7 +485,7 @@ export function mobility(scene:T.Scene) {
       place(path.streets[r],car.d/streetLength[r],lane===1);side.crossVectors(up,tangent).normalize();
       pose.position.addScaledVector(side,(r?1.75:1.25)+car.bay*DROP_OFF.bay).y+=.1;pose.rotation.y+=car.steer;
       // Every seventh car is a 7 m van; traffic density and the commute rhythm thin the fleet (drop-off cars always run).
-      const van=drop<0&&hash(slot,17)<.14,density=drop<0?T.MathUtils.smoothstep(state.traffic*.6+.5-hash(slot,18),-.05,.05)*present(rhythm.cars,hash(slot,22)):1;
+      const van=drop<0&&hash(slot,17)<.14,density=drop<0?carGate(slot,state.traffic*.6+.5>hash(slot,18)&&rhythm.cars>hash(slot,22)):1;
       pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(car.visible*density);cars.set(slot,pose);
       if(drop>=0)passengers(drop,car as ReturnType<typeof dropOffPose>,pose.position.clone().addScaledVector(side,1.4).setY(0));
     }cars.flush();doorPeople.flush();

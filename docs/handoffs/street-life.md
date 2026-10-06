@@ -49,6 +49,15 @@ doorways per landmark), `src/main.ts` (DEV `?review=street`), `tests/mobility.te
   seaside avenue).
 - 7 Gait shader (leg/arm swing, seated legs), backpacks and shoulder bags.
 
+### Round 3 (user report 2026-10-06: sitters embedded in benches)
+
+- Cause: crowd share and day rhythm were multiplied into each person's scale, so at partial crowd (e.g. high automation) or a held
+  hour some people were drawn shrunk about their feet and sank into the bench. Presence is now on/off per actor, easing over 1.5 s
+  (also fixes the same latent shrink for walkers, doorway walkers, robots and street cars).
+- Seated pose: knee bend in the gait shader (thigh level, shin hanging), bench seat lowered to 0.40 m to suit the figure's 0.58 m hip,
+  sitters set at -0.10 m so thighs rest on the seat; items are hidden while seated (backpacks hit the backrest).
+- Test: `districtMeters.test.ts` asserts every resting person is drawn at ~0 or full scale (fails on the old code at 0.05).
+
 ## Actual validation results
 
 - Verification status: PARTIAL
