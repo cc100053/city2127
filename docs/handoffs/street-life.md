@@ -4,8 +4,8 @@
 - Status: COMPLETE (round 10 traffic/yielding items 1, 4, 6; exhibition-machine FPS and earlier limitations remain open)
 - Branch: feat/pedestrian-traffic-life
 - Base commit: 9476fd8b82da523d6f7acee6f1893e5028fb35a0
-- Last verified commit: 0c734bf25c8d3d359ecda83ce0a727275d126e43 (integrated main: root tests/build/diff-check PASS; tree identical to browser-verified round 9)
-- Remote availability: origin/feat/pedestrian-traffic-life contains 1267833; origin/main contains 0c734bf25c8d3d359ecda83ce0a727275d126e43
+- Last verified commit: cdea651d85b2e2573be5658cd583b1894e9caa65 (integrated main: root tests/build/diff-check PASS; tree identical to browser-verified round 10)
+- Remote availability: origin/feat/pedestrian-traffic-life contains 708b411; origin/main contains cdea651d85b2e2573be5658cd583b1894e9caa65
 
 ## Session Git state
 
@@ -318,3 +318,6 @@ Not proposed: signals, pathfinding, new dependencies, interiors, population infe
   [high night](../../artifacts/street-traffic-automation/avenue-high-night.png). The built-in pane was hidden, so it was not used.
 - Limits: exhibition-machine FPS, Safari/Windows unverified; proposal items 2, 3, 5 not implemented; rest-pose shadows remain.
 - Next: measure on the exhibition machine; then select from items 2 (crossings), 3 (car-following), 5 (junction mouth).
+- Integration: feature `708b411` pushed; merged `--no-ff` as `cdea651` (tree identical; root `npm test`, `npm run build`, committed
+  `git diff --check` PASS again); fetch before push showed main 2/0 ahead of origin. Exact main
+  [CI run 37497799060](https://github.com/cc100053/city2127/actions/runs/37497799060) PASS. New Markdown links checked.
