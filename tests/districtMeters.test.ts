@@ -3,7 +3,7 @@ import * as T from 'three';
 import { hybridShare, AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, PRIVATE_RISE, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
 import { changeSites } from '../src/layout.ts';
 import { publicLight, trail } from '../src/cityRig.ts';
-import { mobility, routes, walkerParty, walkerPose, walkerRoute } from '../src/mobility.ts';
+import { mobility, promenadeStops, routes, walkerParty, walkerPose, walkerRoute } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
 
@@ -138,7 +138,8 @@ const names = ['guideway-pods', 'promenade-walkers', 'air-taxis', 'air-pods', 'w
 const legacyMatrices = names.map(name => [...fleet(name).instanceMatrix.array]);
 // Walker slots between trips are out of sight (inside a building), so count the slots whose current trip is in view.
 const walks = [...routes().promenades, ...routes().decks];
-const walking = (count: number) => Array.from({ length: count }, (_, i) => walkerParty(i)).filter(p => walkerPose(20, p.leader, walks[walkerRoute(p.id)].getLength()).visible > 0).length;
+const stops = promenadeStops(walks.slice(0, 2).map(c => c.getLength()));
+const walking = (count: number) => Array.from({ length: count }, (_, i) => walkerParty(i)).filter(p => walkerPose(20, p.leader, walks[walkerRoute(p.id)].getLength(), walkerRoute(p.id) < 2 ? stops.get(p.leader) : undefined).visible > 0).length;
 for (const [ports, aircraft, pods, walkers] of [[1, 3, 12, 400], [3, 17, 18, 260], [5, 31, 24, 120]]) {
   for (const state of [presets.still, presets.pulse]) {
     updateActors(state, 20, ports / 6);

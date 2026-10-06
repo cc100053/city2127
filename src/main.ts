@@ -39,7 +39,9 @@ try {
   if(civicReview){camera.position.set(-180,105,-235);camera.lookAt(-10,78,20);}
   // DEV street review: a promenade bench, its walkers and the seaside avenue from 40 m (orbit may close to 30 m).
   const streetReview=import.meta.env.DEV && reviewParams.get('review')==='street';
-  if(streetReview){camera.position.set(-40,20,-245);camera.lookAt(-24,0,-268);}
+  // `&cam=x,y,z` moves the street-review camera (still aimed at the bench, at least 30 m out) to see past canopies.
+  const reviewCam=reviewParams.get('cam')?.split(',').map(Number);
+  if(streetReview){camera.position.set(...(reviewCam?.length===3&&reviewCam.every(Number.isFinite)?reviewCam as [number,number,number]:[-40,20,-245] as const));camera.lookAt(-24,0,-268);}
   const reviewTime=import.meta.env.DEV && reviewParams.has('reviewTime') ? Number(reviewParams.get('reviewTime')) : NaN;
   const ambient=new T.HemisphereLight('#edf1e4','#8a8274',2.2);scene.add(ambient);
   const sun=new T.DirectionalLight('#ffe4b8',3.4);sun.position.set(-20,38,18);sun.castShadow=true;

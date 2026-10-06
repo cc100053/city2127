@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { routes, podPose, walkerPose, walkerRoute, walkerParty, doorwayPose, streetCarPose, STREET_GAP, dropOffPose, DROP_OFF, streetRhythm, promenadeBenches, BENCH_OUT, transferPose, dockMotion, guideStrength, aircraftSlot, podShare, automationActivity, CARS, CAR_GAP, TRAINS, WALKERS, TRANSFERS, PLATOON } from '../src/mobility.ts';
+import { routes, podPose, walkerPose, walkerRoute, walkerParty, doorwayPose, robotPose, collectorPose, ROBOT_HALT, HANDOFF, promenadeStops, RAIL_OUT, STOOL_FRONT, streetCarPose, STREET_GAP, dropOffPose, DROP_OFF, streetRhythm, promenadeBenches, BENCH_OUT, transferPose, dockMotion, guideStrength, aircraftSlot, podShare, automationActivity, CARS, CAR_GAP, TRAINS, WALKERS, TRANSFERS, PLATOON } from '../src/mobility.ts';
 import { changeSites, SPHERE_DOCK, INTERCHANGE } from '../src/layout.ts';
 import { laneBeaconSites } from '../src/waterRooms.ts';
 
@@ -175,7 +175,43 @@ assert.ok(streetRhythm(18).people > 3 * streetRhythm(4).people && streetRhythm(4
 // sitter's feet (knee .31 m forward plus the .08 m shin) stop short of the lit edge tube (3.6 m − .3 m).
 const benches = promenadeBenches(path.promenades.map(c => c.getLength()));
 assert.ok(benches.length >= 16 && benches.every(b => b.u > 0 && b.rail < 1) && BENCH_OUT - .27 > 2.35 && BENCH_OUT + .39 < 3.3);
-assert.ok(Array.from({ length: 400 }, (_, i) => Math.abs(walkerPose(0, i).lane) + .6 + .25).every(v => v <= 2.35));
+// Lanes clear the backrest: parties span ±.6 m about their lane, lone joggers keep the outer lane, outside every party.
+assert.ok(Array.from({ length: 400 }, (_, i) => { const w = walkerPose(0, i); return Math.abs(w.lane) + (w.jog ? 0 : .6) + .25; }).every(v => v <= 2.35));
+// Party members (arms .38 m out, a child's .24 m) span ±.3 / ±.6 m about the leader's lane and sway .04 m: joggers pass outside them all.
+const partyEdge = (i: number) => { const p = walkerParty(i), w = walkerPose(0, p.leader); return Math.abs(w.lane) + (p.slot - (p.size - 1) / 2) * .6 + (p.child ? .24 : .38) + .04; };
+const joggerInner = Math.min(...Array.from({ length: 400 }, (_, i) => walkerPose(0, i)).filter(w => w.jog).map(w => Math.abs(w.lane) - .38 - .04));
+assert.ok(Array.from({ length: 400 }, (_, i) => i).filter(i => !walkerPose(0, walkerParty(i).leader).jog).every(i => partyEdge(i) < joggerInner), 'joggers overlap parties');
+
+// Promenade stops: every spot used once, lone walkers sit at stools, parties stand at the rail; a walker holds exactly at its spot,
+// fully veered out, and is back in its lane 6 m on.
+const promenadeLengths = path.promenades.map(c => c.getLength()), stops = promenadeStops(promenadeLengths);
+const used = [...stops.values()].filter(s => s !== false);
+assert.ok(used.length >= 16 && new Set(used.map(s => `${s.route} ${s.at.toFixed(1)} ${s.out}`)).size === used.length, 'promenade spots shared');
+for (const [i, stop] of stops) {
+  if (stop === false) continue;
+  assert.equal(stop.seat > 0 ? stop.out : RAIL_OUT, stop.seat > 0 ? STOOL_FRONT : stop.out);
+  assert.equal(stop.seat > 0, walkerParty(i).size === 1);
+  const length = promenadeLengths[walkerRoute(walkerParty(i).id)];
+  let held = 0, far = 0;
+  for (let t = 0; t < 1500; t++) {
+    const w = walkerPose(t, i, length, stop);
+    if (w.dwell > 0) { held++; assert.ok(Math.abs((w.forward ? w.u : 1 - w.u) * length - (w.forward ? stop.at : length - stop.at)) < 1e-6 && w.approach === 1); }
+    if (w.visible > 0 && w.approach === 0) far++;
+  }
+  assert.ok(held > 0 && far > 0, `walker ${i} never stops at its spot`);
+}
+
+// Delivery robots: continuous at a steady pace, halting HANDOFF s just outside the far door while the collector comes out and back in.
+for (let k = 0; k < 14; k++) {
+  let waits = 0;
+  for (let t = 0; t < 400; t += .25) {
+    const a = robotPose(t, 500 + k, 30), b = robotPose(t + .25, 500 + k, 30);
+    if (a.visible > 0 && b.visible > 0) assert.ok(Math.abs(a.d - b.d) <= .7 * .25 + 1e-9, `robot ${k} jumps`);
+    if (a.waited >= 0) { waits++; assert.ok(Math.abs((a.reverse ? a.d : 30 - a.d) - ROBOT_HALT) < 1e-9); }
+  }
+  assert.ok(waits > 0);
+}
+assert.ok([0, 7, HANDOFF].every(t => collectorPose(t).e === 0) && collectorPose(3).e + .25 < ROBOT_HALT - .4, 'collector meets the robot');
 
 // Interchange transfers: ≤ 2 m/s on the pier, appear/vanish only at the shore end or the boat, and board only while it is docked.
 for (let k = 0; k < TRANSFERS; k++) for (let t = 0; t < 120; t += .1) {

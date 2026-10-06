@@ -67,9 +67,29 @@ doorways per landmark), `src/main.ts` (DEV `?review=street`), `tests/mobility.te
   out; walker lanes narrowed to ≤ 2.35 m so the backrest still clears them. Test asserts both clearances.
 - Close-up captures must stay > 2 m from people: the hero camera's near plane is 2 m, which slices nearby figures.
 
+### Round 5 (user request 2026-10-06: polish A1–A5, B6, B7)
+
+- A1/B6 Promenade stops: `promenadeStops` gives each stopping promenade party its own spot between benches (bench 12, stool 18,
+  rail couple 24, free rail spot 30 m per 24 m step). Lone walkers veer out of the lane over 6–1 m to the front of a backless one-seat
+  stool, turn to the sea and sit 70 s (gait `w` = `dwell`), then stand and veer back; parties line up along a free rail spot for 40 s.
+  Leftover stoppers walk on; deck walkers keep the old in-lane stop. The body turns along the diagonal (`slope`).
+- A2 Joggers keep a fixed outer lane (2.1 m); other lanes .8–1.1 m, so joggers pass every party (test checks the arm clearance).
+- A3 Doorway trips run from .6 m inside one facade to .6 m inside the next, fading over .5 m inside the wall; drop-off passengers walk to
+  just inside the door.
+- A4 Doorway trips are centripetal Catmull-Rom curves (corners rounded, heading continuous); robots share them.
+- A5 Party followers keep a per-person ±.3 m offset ahead/behind, and everyone sways ±.04 m across the lane.
+- B7 Robots roll at .7 m/s, halt 2.4 m short of the far door end for 8 s while a collector (`doorway-walkers` slots after the
+  passengers) steps 1.5 m out, faces the robot, turns back and goes in; then the robot rolls in.
+- DEV `&cam=x,y,z` moves the `?review=street` camera (the default one now looks down on the canopy over the bench).
+
 ## Actual validation results
 
 - Verification status: PARTIAL
+- Round 5 (2026-10-06, worktree before commit, base fabc3a6): root `npm test` PASS, `npm run build` PASS, `git diff --check` PASS.
+  Vite DEV on :5174 (another session held :5173), built-in pane: no console errors. Headless Chromium 1400×900 with the camera set
+  through the three.js devtools hook: walker slot 84 at `?hour=17&meters=nw:low&reviewTime=66/72` approaches and sits on the stool at
+  (-25.0, -267.2) facing the sea, legs clear of the edge; live `?hour=13&meters=nw:low` robot 5 halts with its collector stepping out
+  and standing facing it. FPS NOT RUN.
 - Date and checked commit/worktree: 2026-10-06, 04c9333b6d2af95b1c89e224c05ea5e0a741d9b6
 - Round 2 (2026-10-06, worktree before commit): root `npm test` PASS, `npm run build` PASS, `git diff --check` PASS. Headless
   Chromium (installed Playwright, 1400×900): promenade at 17:00 with parties, items, gait, bench sitters; drop-off bay at reviewTime 39
