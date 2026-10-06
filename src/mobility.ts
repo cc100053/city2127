@@ -32,6 +32,27 @@ export function trainPose(time:number,train:number,trains:number,car:number,leng
   const span=length+300,head=((time*TRAIN_SPEED+span*train/trains)%span+span)%span,at=head-car*CAR_GAP;
   return {u:T.MathUtils.clamp(at/length,0,1),visible:T.MathUtils.clamp(at/20,0,1)*T.MathUtils.clamp((length-at)/20,0,1)};
 }
+/** Boat timing. Periods are commensurate — loop taxis BOAT_GAP s apart, bay cruisers 40 s per 300 m run, the interchange boat's 40 s
+ * dock cycle, the ferry's 320 s round trip — so the whole fleet repeats every WATER_PERIOD s, and WATER_PHASES (loop and ferry in s,
+ * cruisers in metres along their run, one per `bayCruisers` entry) were searched so that 2.5 m of water stays around every hull
+ * (tests/mobility.test.ts checks the whole period). */
+export const BOAT_GAP=20, CRUISER_SPEED=7.5, WATER_PERIOD=320;
+export const WATER_PHASES={loop:13.5,ferry:0,cruisers:[0,83,188,249,32,115,198,281,64,147,290,25,148,219,262,45,128,211,294,77,160,243,26,109,192]};
+/** Hull half-extents (m) in plan before scaling: x across, z from stern (-) to bow (+). */
+export const HULL={x:1.95,stern:-6.35,bow:5.65};
+/** Every boat at `time`: the loop taxis (BOATS), the ferry, the interchange boat, then the bay cruisers. `scale` is the drawn scale
+ * (0 hidden); `dock` is the interchange boat's `dockMotion`. */
+export function boatPoses(time:number,path:Pick<ReturnType<typeof routes>,'water'|'ferry'|'ixBoat'>,phases=WATER_PHASES) {
+  const p=new T.Vector3(),t=new T.Vector3(),wrap=(v:number)=>(v%1+1)%1;
+  const at=(route:T.Curve<T.Vector3>,u:number,reverse=false)=>{route.getPointAt(u,p);route.getTangentAt(u,t);return {x:p.x,y:p.y,z:p.z,yaw:reverse?Math.atan2(-t.x,-t.z):Math.atan2(t.x,t.z)};};
+  const loop=Array.from({length:BOATS},(_,i)=>({...at(path.water,wrap((time+phases.loop)/(BOAT_GAP*BOATS)+i/BOATS)),scale:BOAT_SCALE}));
+  const f=pingPong(time+phases.ferry,160),dock=dockMotion(time),ix=at(path.ixBoat,dock.u,dock.leaving);
+  const cruisers=bayCruisers.map(([x,z,heading],i)=>{
+    const d=((time*CRUISER_SPEED+phases.cruisers[i])%300+300)%300;
+    return {x:x+Math.sin(heading)*(d-150),y:-.6,z:z+Math.cos(heading)*(d-150),yaw:heading,scale:1.35*ease(d/25)*ease((300-d)/25)};
+  });
+  return [...loop,{...at(path.ferry,f.u,!f.forward),scale:BOAT_SCALE*(1-ease((f.u-.85)/.15))},{...ix,yaw:ix.yaw+dock.turn,scale:BOAT_SCALE*dock.visible,dock},...cruisers];
+}
 export const WALKERS=120, AIR_SCALE=5;
 const MAX_WALKERS=400, DOOR_WALKERS=120, ROBOTS=14, FORECOURT_GROUPS=20, MAX_TRAINS=4, LOOP_AIRCRAFT=30;
 /** Aircraft slot: groups 0..9 spread evenly, even groups on the regional district loop, odd on the city shore lane; slots 10+ join a
@@ -667,19 +688,11 @@ export function mobility(scene:T.Scene) {
         pose.position.addScaledVector(kerbX,cue.signal*.95);pose.scale.setScalar(shown*on);indicators.set(drop,pose);
       }
     }cars.flush();doorPeople.flush();indicators.flush();brakeLamps.flush();
-    for(let i=0;i<BOATS;i++){
-      const u=(time*.009+i/BOATS)%1;place(path.water,u);pose.position.y+=Math.sin(time*1.3+i)*.08;pose.rotation.z=Math.sin(time*.9+i)*.02;
-      pose.scale.setScalar(BOAT_SCALE*T.MathUtils.smoothstep(state.traffic*.6+.4-i/(BOATS+1),-.05,.05));boats.set(i,pose);pose.rotation.z=0;wakes.set(i,pose);
-    }
-    const ferry=pingPong(time,150);place(path.ferry,ferry.u,!ferry.forward);pose.scale.setScalar(BOAT_SCALE*(1-ease((ferry.u-.85)/.15)));boats.set(BOATS,pose);wakes.set(BOATS,pose);
-    // Interchange boat: in from the bay on the boat's 40 s dock cycle, pivoting at the pier head before it leaves; no wake while berthed.
-    const ixBoat=dockMotion(time);place(path.ixBoat,ixBoat.u,ixBoat.leaving);pose.rotation.y+=ixBoat.turn;pose.position.y+=Math.sin(time*1.3)*.05;
-    pose.scale.setScalar(BOAT_SCALE*ixBoat.visible);boats.set(BOATS+1,pose);pose.scale.multiplyScalar(Math.max(1-ixBoat.settle,1e-4));wakes.set(BOATS+1,pose);
-    // Bay cruisers: straight 300 m runs across the open bay, fading in and out at each end of the run.
-    bayCruisers.forEach(([x,z,heading],i)=>{
-      const d=((time*6+i*83)%300+300)%300,fade=ease(d/25)*ease((300-d)/25);
-      pose.position.set(x+Math.sin(heading)*(d-150),-.6+Math.sin(time*1.1+i)*.08,z+Math.cos(heading)*(d-150));pose.rotation.set(0,heading,0);
-      pose.scale.setScalar(1.35*fade);boats.set(BOATS+2+i,pose);wakes.set(BOATS+2+i,pose);
+    // Boats (boatPoses) bob and roll a little; loop taxis thin with traffic and the berthed interchange boat leaves no wake.
+    boatPoses(time,path).forEach((b,i)=>{
+      pose.position.set(b.x,b.y+Math.sin(time*(i<BOATS?1.3:1.1)+i)*.08,b.z);pose.rotation.set(0,b.yaw,i<BOATS?Math.sin(time*.9+i)*.02:0);
+      pose.scale.setScalar(b.scale*(i<BOATS?T.MathUtils.smoothstep(state.traffic*.6+.4-i/(BOATS+1),-.05,.05):1));boats.set(i,pose);
+      pose.rotation.z=0;if('dock' in b)pose.scale.multiplyScalar(Math.max(1-b.dock.settle,1e-4));wakes.set(i,pose);
     });
     boats.flush();wakes.flush();
     for(let i=0;i<LOOP_AIRCRAFT;i++){

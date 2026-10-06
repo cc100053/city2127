@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { routes, podPose, walkerPose, walkerRoute, walkerParty, doorwayPose, robotPose, collectorPose, ROBOT_HALT, HANDOFF, promenadeStops, RAIL_OUT, STOOL_FRONT, streetCarPose, STREET_GAP, dropOffPose, DROP_OFF, streetRhythm, promenadeBenches, BENCH_OUT, transferPose, dockMotion, guideStrength, aircraftSlot, podShare, automationActivity, CARS, CAR_GAP, TRAINS, WALKERS, TRANSFERS, PLATOON } from '../src/mobility.ts';
+import { routes, podPose, boatPoses, HULL, WATER_PERIOD, BOATS as BOAT_COUNT, trainPose, TRAIN_SPEED, walkerPose, walkerRoute, walkerParty, doorwayPose, robotPose, collectorPose, ROBOT_HALT, HANDOFF, promenadeStops, RAIL_OUT, STOOL_FRONT, streetCarPose, STREET_GAP, dropOffPose, DROP_OFF, streetRhythm, promenadeBenches, BENCH_OUT, transferPose, dockMotion, guideStrength, aircraftSlot, podShare, automationActivity, CARS, CAR_GAP, TRAINS, WALKERS, TRANSFERS, PLATOON } from '../src/mobility.ts';
 import { changeSites, SPHERE_DOCK, INTERCHANGE } from '../src/layout.ts';
 import { laneBeaconSites } from '../src/waterRooms.ts';
 
@@ -174,6 +174,30 @@ path.streets.forEach((street, r) => {
     }
     assert.ok(kerbBeforeBay > 4 && roadBeforeMove >= 10, `drop-off car ${car} gives no warning`);
   });
+}
+
+// Boats: over the fleet's whole period every visible hull keeps 2 m of water to every other (loop taxis, ferry, interchange boat,
+// cruisers; a fading cruiser counts once it is a third grown).
+{
+  const hull = (b: ReturnType<typeof boatPoses>[number]) => { const c = Math.cos(b.yaw), s = Math.sin(b.yaw), k = b.scale, mid = (HULL.bow + HULL.stern) / 2 * k;
+    return { x: b.x + s * mid, z: b.z + c * mid, c, s, hx: HULL.x * k + 1, hz: (HULL.bow - HULL.stern) / 2 * k + 1 }; };
+  const meet = (a: ReturnType<typeof hull>, b: ReturnType<typeof hull>) => [[a.c, -a.s], [a.s, a.c], [b.c, -b.s], [b.s, b.c]].every(u => {
+    const ext = (o: typeof a) => o.hx * Math.abs(u[0] * o.c - u[1] * o.s) + o.hz * Math.abs(u[0] * o.s + u[1] * o.c);
+    return Math.abs((b.x - a.x) * u[0] + (b.z - a.z) * u[1]) < ext(a) + ext(b); });
+  for (let t = 0; t < WATER_PERIOD; t += .25) {
+    const boats = boatPoses(t, path).map((b, i) => ({ b, i, full: i <= BOAT_COUNT + 1 ? 1.7 : 1.35 })).filter(o => o.b.scale > .3 * o.full).map(o => ({ i: o.i, h: hull(o.b) }));
+    for (let a = 0; a < boats.length; a++) for (let b = a + 1; b < boats.length; b++) assert.ok(!meet(boats[a].h, boats[b].h), `boats ${boats[a].i} and ${boats[b].i} meet at ${t}s`);
+  }
+}
+// Trains: each track's trains keep a fixed gap (never closing up), and each runs one way on its own beam.
+{
+  const lengths = path.tracks.map(c => c.getLength());
+  for (let t = 0; t < 300; t += .5) for (const track of [0, 1]) {
+    const heads = [0, 1].map(k => trainPose(t, k, 2, 0, lengths[track]).u * lengths[track]), tails = [0, 1].map(k => trainPose(t, k, 2, 5, lengths[track]).u * lengths[track]);
+    const vis = [0, 1].map(k => trainPose(t, k, 2, 0, lengths[track]).visible > 0 || trainPose(t, k, 2, 5, lengths[track]).visible > 0);
+    if (vis[0] && vis[1]) assert.ok(Math.min(Math.abs(heads[0] - tails[1]), Math.abs(heads[1] - tails[0])) > 50, `trains close up on track ${track}`);
+    assert.ok(trainPose(t + .5, 0, 2, 0, lengths[track]).u * lengths[track] - heads[0] <= TRAIN_SPEED * .5 + 1e-6 || trainPose(t + .5, 0, 2, 0, lengths[track]).visible === 0);
+  }
 }
 
 // Day rhythm: every group in 0..1, continuous through midnight, full when no hour is given; evenings busier than 4 am.

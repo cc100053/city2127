@@ -38,8 +38,9 @@ export const streets: readonly (readonly P3[])[] = [
 // Top of the Fuji TV sphere (centre about -18, 107, 23; radius 22): the air-taxi berth.
 export const SPHERE_DOCK: P3 = [-18,131,23];
 // Water taxis: a shuttle loop along the beach and a ferry lane out to the bay (the open sea continues past the plate).
+// The loop's return leg runs about 28 m seaward of the outbound leg, so taxis passing the other way never touch.
 export const waterLoop: readonly P3[] = [
-  [-90,-.6,-385],[-200,-.6,-300],[-330,-.6,-215],[-430,-.6,-120],[-395,-.6,-165],[-285,-.6,-255],[-160,-.6,-345],[-70,-.6,-420],
+  [-90,-.6,-385],[-200,-.6,-300],[-330,-.6,-215],[-430,-.6,-120],[-405,-.6,-181],[-295,-.6,-271],[-170,-.6,-361],[-70,-.6,-420],
 ];
 // The ferry heads west for the Shinagawa channel, clear of the Rainbow Bridge anchorage and Daiba approach piers.
 export const ferryLane: readonly P3[] = [[-230,-.6,-290],[-420,-.6,-470],[-760,-.6,-560],[-1250,-.6,-520]];
@@ -47,7 +48,7 @@ export const ferryLane: readonly P3[] = [[-230,-.6,-290],[-420,-.6,-470],[-760,-
 export const bayCruisers: readonly (readonly [number,number,number])[] = [
   [-300,-560,.9],[-120,-620,-2.2],[-560,-430,2.6],[40,-600,-.4],[-640,-300,.3],[-700,250,1.4],[-650,-40,-1.7],[-150,1420,1.2],[250,1480,-1.9],
   // Nearer the hero pose: the foreground bay reads busy with taxis, as in the 2127 target (runs checked clear of the north shore).
-  [100,-470,1.93],[-160,-470,.95],[-250,-380,-.9],[-330,-420,-.6],[-40,-560,2.3],[-500,-500,1.2],[260,-620,-1.6],
+  [100,-470,1.93],[-160,-470,.95],[-250,-380,-.9],[-330,-420,-.6],[-40,-560,2.3],[-478,-556,1.2],[260,-620,-1.6],
   // Open water south-west of the island, upper right of the hero frame.
   [133,1442,.4],[-333,908,2.1],[797,1695,-1],[-250,1180,1.1],
   // Far water beyond the island's south-west shore, top middle of the hero frame (target v2's distant boats).
