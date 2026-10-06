@@ -275,9 +275,12 @@ export function pedestrians(scene:T.Object3D,count:number,name:string) {
 }
 
 /** Doorway trips in front of the landmarks: [door, forecourt, forecourt, door] at ground level, published once each landmark loads. */
-type DoorTrip={curve:T.CatmullRomCurve3;length:number;start:T.Vector3;end:T.Vector3;samples:T.Vector3[]};
+type DoorTrip={curve:T.CatmullRomCurve3;length:number;start:T.Vector3;end:T.Vector3;samples:T.Vector3[];building:string};
 const doorTrips:DoorTrip[]=[],doorWalks:DoorTrip[]=[],doorPoints:T.Vector3[]=[];
 const doorSpots:{at:T.Vector3;yaw:number;visit?:Pick<DoorTrip,'curve'|'length'>}[]=[];
+const entranceTrips:DoorTrip[]=[];
+/** Two reserved meeting routes; their four people reuse the last ordinary doorway-walker slots. */
+export const entranceJourneys=()=>entranceTrips;
 /** Published door-to-group journeys, for route/actor clearance checks. */
 export const forecourtVisits=()=>doorSpots.flatMap((spot,group)=>spot.visit?[{...spot.visit,group,at:spot.at,yaw:spot.yaw}]:[]);
 const PAVED=new Set(['sidewalk','plaza']);
@@ -321,7 +324,7 @@ export function publishDoorways(model:T.Object3D,ground:T.Object3D) {
       // Clear of every other trip by 3 m, so their people never share ground (passingLanes only separates people on one trip).
       const samples=curve.getSpacedPoints(60);
       if(doorTrips.some(trip=>trip.samples.some(p=>samples.some(q=>p.distanceTo(q)<3))))continue;
-      const trip={curve,length:curve.getLength(),start:a.at,end:b.at,samples};doorTrips.push(trip);
+      const trip={curve,length:curve.getLength(),start:a.at,end:b.at,samples,building:model.name};doorTrips.push(trip);
       // Every other forecourt also holds a standing group 4 m beyond the walk, on paving, in sight of the doors and 2.6 m clear of the
       // rounded walk (group radius, a walker and the widest passing lane).
       const spot=fa.clone().lerp(fb,.5).addScaledVector(a.out.clone().add(b.out).normalize(),4);
@@ -347,6 +350,28 @@ export function publishDoorways(model:T.Object3D,ground:T.Object3D) {
       }
       if(!reserved)doorWalks.push(trip);
     }
+  }
+}
+/** Select meeting entrances only after all landmarks/landscape are present, so a later facade cannot obstruct a reserved lane. */
+export function publishEntrances(scene:T.Object3D,ground:T.Object3D) {
+  scene.updateMatrixWorld(true);const solids:{mesh:T.Mesh;bounds:T.Box3}[]=[],ray=new T.Raycaster(),down=new T.Vector3(0,-1,0);
+  scene.traverse(o=>{if(o instanceof T.Mesh&&!(o instanceof T.InstancedMesh))solids.push({mesh:o,bounds:new T.Box3().setFromObject(o)});});
+  for(const trip of [...doorWalks]){
+    if(entranceTrips.length===2)break;
+    if(entranceTrips.some(t=>t.building===trip.building))continue;
+    const points=trip.curve.getSpacedPoints(Math.ceil(trip.length/.25)),safe=points.every((p,i)=>{
+      if(Math.min(i,points.length-1-i)*trip.length/(points.length-1)<1.2)return true; // intentionally inside the two facades
+      const tangent=trip.curve.getTangentAt(i/(points.length-1)),side=new T.Vector3(tangent.z,0,-tangent.x);
+      return [-1.15,-.7,0,.7,1.15].every(offset=>{
+        const q=p.clone().addScaledVector(side,offset);if(!offStreet(q))return false;
+        ray.set(q.clone().setY(2),down);ray.far=3;const hit=ray.intersectObject(ground,true)[0],mat=hit&&(hit.object as T.Mesh).material;
+        if(!hit||hit.point.y>.6||!mat||Array.isArray(mat)||!PAVED.has(mat.name))return false;
+        // Cull distant/overhead meshes and the dense curved sea before native triangle tests.
+        const near=solids.filter(({bounds:b})=>q.x>=b.min.x&&q.x<=b.max.x&&q.z>=b.min.z&&q.z<=b.max.z&&b.max.y>=.3&&b.min.y<=1.2);
+        ray.set(q.clone().setY(1.2),down);ray.far=.9;return ray.intersectObjects(near.map(s=>s.mesh),false).length===0;
+      });
+    });
+    if(safe){entranceTrips.push(trip);doorWalks.splice(doorWalks.indexOf(trip),1);}
   }
 }
 /** Doorway walker `index` on a trip `length` m long: steps out of one door, crosses the forecourt and goes in at the next, then stays
@@ -444,6 +469,27 @@ export function visitPose(time:number,group:number,length:number) {
   return {u:d/length,visible:T.MathUtils.clamp(d/.5,0,1),dwell:ease((clock-walk)/2)*(1-ease((clock-walk-stay+2)/2)),
     returning:clock>=walk+stay-2,walking:clock<walk||clock>=walk+stay&&clock<2*walk+stay,phase:d*5.5+group};
 }
+/** Arrive and wait beside the entry; let a companion emerge, greet, then leave together through the far entry. */
+export function entrancePose(time:number,index:number,length:number,member:number) {
+  const wait=3.5,approach=(length-wait)/.6,exit=wait/.6,leave=(length-wait)/.6,cycle=approach+6+exit+4+leave+18;
+  const clock=((time+index*17)%cycle+cycle)%cycle,meet=approach+6,go=meet+exit+4;
+  let d=member?0:length,walking=false,reverse=false;
+  if(!member&&clock<approach){d=length-(length-wait)*ease(clock/approach);walking=true;reverse=true;}
+  else if(clock<go){d=member?wait*ease((clock-meet)/exit):wait;walking=!!member&&clock>meet&&clock<meet+exit;}
+  else {d=wait+(length-wait)*ease((clock-go)/leave);walking=clock<go+leave;}
+  const greeting=ease((clock-meet-exit)/.7)*(1-ease((clock-go+.7)/.7));
+  const yaw=member?-Math.PI/2*greeting:clock<go?Math.PI*(1-.5*ease((clock-meet-exit)/.7)-.5*ease((clock-go+.7)/.7)):0;
+  return {d,walking,reverse,yaw,lane:member?-.7:.7,greeting,phase:d*5.5+member,
+    visible:ease(d/.6)*ease((length-d)/.6),stage:clock<approach?'arrive':clock<meet?'wait':clock<meet+exit?'exit':clock<go?'greet':clock<go+leave?'leave':'inside'};
+}
+/** A service customer walks from a waiting place, uses the counter, returns and waits; distance drives stopped-foot gait. */
+export function servicePose(time:number,index:number,length:number) {
+  const walk=length/.8,cycle=2*walk+26,clock=((time+index*19)%cycle+cycle)%cycle;
+  const u=clock<walk?ease(clock/walk):clock<walk+12?1:1-ease((clock-walk-12)/walk);
+  const dwell=ease((clock-walk)/.6)*(1-ease((clock-walk-12+.6)/.6));
+  return {u,dwell,help:ease((clock-walk-5)/1)*dwell,turn:ease((clock-walk-11.4)/.6)*(1-ease((clock-cycle+2)/2)),
+    walking:clock<walk||clock>walk+12&&clock<2*walk+12,phase:u*length*5.5};
+}
 const yawTo=(from:number,to:number)=>((to-from)%(Math.PI*2)+Math.PI*3)%(Math.PI*2)-Math.PI;
 /** Promenade benches every 24 m facing the sea, 2.75 m out: the backrest (2.48 m) clears walker lanes (≤ 2.35 m) and sitters' feet
  * (3.15 m) stop short of the lit edge (3.3 m). Two seats each; between each pair of
@@ -505,6 +551,10 @@ export function mobility(scene:T.Scene) {
   for(let i=0;i<SWEEP_CARS;i++)sweepPods.tint(i,body,'#f6f5f1');
   // Walkers (promenades and mid-level decks) plus the interchange transfers after them.
   const people=pedestrians(scene,MAX_WALKERS+TRANSFERS,'promenade-walkers'),walks=[...path.promenades,...path.decks],walkLength=walks.map(c=>c.getLength());
+  // Facade overlays mark the inferred entries; the wall is not cut and there is no simulated interior.
+  const entries=fleet(scene,[part([.16,2.8,.2],[-1.9,1.4,0],shell,.03),part([.16,2.8,.2],[1.9,1.4,0],shell,.03),
+    part([4.2,.18,1.6],[0,2.9,.55],shell,.04),part([3.4,2.55,.06],[0,1.28,-.35],glass,.01),
+    part([3.6,.07,.12],[0,2.78,.08],mint,.02)],4,'building-entrances');
   // Water taxis: 11 m white yachts with a glass cabin and a mint waterline.
   // White yacht hull with a pointed bow (plan in x/-z), a raised aft deck, a dark glass cabin band under a white roof.
   const plan=new T.Shape([[-1.8,5.5],[1.8,5.5],[1.8,-2],[0,-6.2],[-1.8,-2]].map(([x,y])=>new T.Vector2(x,y)));
@@ -668,7 +718,7 @@ export function mobility(scene:T.Scene) {
     const tripOf=(k:number)=>k%Math.max(doorWalks.length,1),robotTrip=(k:number)=>(k+3)%Math.max(doorWalks.length,1); // one robot per trip while trips ≥ ROBOTS
     const doorMovers:Mover[]=[],doorMover:number[]=[],robotMover:number[]=[],doorPoses=[] as ReturnType<typeof doorwayPose>[],robotPoses=[] as ReturnType<typeof robotPose>[];
     const lane={inner:.15,outer:1.3};
-    for(let k=0;k<DOOR_WALKERS;k++){
+    for(let k=0;k<DOOR_WALKERS-4;k++){
       const trip=doorWalks[tripOf(k)];if(!trip)break;
       const w=doorPoses[k]=doorwayPose(time,k,trip.length);
       if(w.visible>0&&amount(doorShare*DOOR_WALKERS,k)>0&&rhythm.people>hash(k,20)){doorMover[k]=doorMovers.length;doorMovers.push({path:tripOf(k),dir:w.reverse?-1:1,d:w.d,lane:.45,ext:0,...lane});}
@@ -683,13 +733,25 @@ export function mobility(scene:T.Scene) {
       }
     }
     const doorPassing=passingLanes(doorMovers);
-    for(let k=0;k<DOOR_WALKERS;k++){
+    for(let k=0;k<DOOR_WALKERS-4;k++){
       const trip=doorWalks[tripOf(k)];
       if(!trip){pose.scale.setScalar(0);doorPeople.set(k,pose);continue;}
       const w=doorPoses[k],m=doorMover[k]===undefined?null:doorPassing[doorMover[k]];
       onTrip(trip,w.d,w.reverse,m?m.lane:.45,m?m.along:0);pose.rotation.z=Math.sin(w.phase)*.03;
-      pose.scale.setScalar(amount(doorShare*DOOR_WALKERS,k)*w.visible*doorGate(k,rhythm.people>hash(k,20))*(.93+.12*hash(k,8)));doorPeople.set(k,pose);doorPeople.gait(k,w.phase,.45);
+      pose.scale.setScalar(amount(doorShare*DOOR_WALKERS,k)*w.visible*doorGate(k,rhythm.people>hash(k,20))*(.93+.12*hash(k,8)));doorPeople.set(k,pose);doorPeople.gait(k,w.phase,.45);doorPeople.social(k,0,0);
     }
+    for(let g=0;g<2;g++){
+      const trip=entranceTrips[g];
+      for(let j=0;j<2;j++){
+        const slot=DOOR_WALKERS-4+g*2+j;
+        if(!trip){pose.scale.setScalar(0);doorPeople.set(slot,pose);entries.set(g*2+j,pose);continue;}
+        const w=entrancePose(time,g,trip.length,j);
+        onTrip(trip,w.d,false,w.lane);pose.rotation.y+=w.yaw;
+        pose.scale.setScalar(w.visible);doorPeople.set(slot,pose);doorPeople.gait(slot,w.phase,w.walking?.4:0);doorPeople.social(slot,0,w.greeting*(j?.32:.18));
+        const at=j?trip.end:trip.start,out=(j?trip.curve.points.at(-3)!:trip.curve.points[2]).clone().sub(at).normalize();
+        pose.position.copy(at);pose.rotation.set(0,Math.atan2(out.x,out.z),0);pose.scale.setScalar(1);entries.set(g*2+j,pose);
+      }
+    }entries.flush();
     // Delivery robots roll to the next door and wait while a collector steps out to meet them, then both go in.
     for(let k=0;k<ROBOTS;k++){
       const trip=doorWalks[robotTrip(k)],slot=COLLECTORS+k;

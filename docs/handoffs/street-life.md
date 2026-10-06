@@ -1,7 +1,7 @@
 # street-life — Pedestrian and street-traffic polish
 
 - Owner: cc100053
-- Status: COMPLETE (round 8 selected scope; earlier limitations and exhibition-machine FPS remain open)
+- Status: VERIFIED LOCALLY (round 9 building interaction items 1–3; integration/main CI pending; earlier limitations and exhibition-machine FPS remain open)
 - Branch: feat/pedestrian-traffic-life
 - Base commit: 9476fd8b82da523d6f7acee6f1893e5028fb35a0
 - Last verified commit: a055e4faed7a364601ee87455752b0bbe67cc1d8 (integrated main: root tests/build/diff-check PASS; tree identical to browser-verified round 8)
@@ -9,10 +9,10 @@
 
 ## Session Git state
 
-- Latest session starting branch and HEAD: feat/pedestrian-traffic-life, dbf5d1533cf4fa340bf691ca3a8dc1356fa015a8, clean
-- Last fetched origin/main before integration: 9476fd8b82da523d6f7acee6f1893e5028fb35a0 (fetched 2026-10-06)
+- Latest session starting branch and HEAD: feat/pedestrian-traffic-life, 52b6445478752496abea879f9ff8ed116a50892c, clean
+- Last fetched origin/main before integration: 52b6445478752496abea879f9ff8ed116a50892c (fetched 2026-10-06)
 - Local changes present at session start: NONE
-- Upstream integration status: COMPLETE; task merged with --no-ff as a055e4f and pushed to main; no conflicts
+- Upstream integration status: round 9 pending; round 8 merged as a055e4f, later proposal documentation integrated as 52b6445
 - Pending Git conflicts or synchronization blockers: NONE
 
 ## Goal and acceptance criteria
@@ -238,3 +238,33 @@ Recommended first slice: **1 + 2 + 3**, on a small number of visible frontages, 
 conversation timing and reserved curves. Next expected step: select the proposal scope. Acceptance should cover a continuous
 arrival/use/departure cycle, existing hero/street cameras, low/mixed/high day/night, doorway/actor/prop clearance, actual
 carrier changes and immediate reset/Undo/reconnect. No new dependency, interior simulation or guest controls are proposed.
+
+### Round 9 — building interaction items 1–3 (2026-10-06)
+
+- User selected recognizable entries, doorway meetings and actual service use. Codex implements for owner cc100053.
+  Preflight: `feat/pedestrian-traffic-life` at `52b6445478752496abea879f9ff8ed116a50892c`, clean; fetch succeeded;
+  branch/upstream and branch/main both 0/0. Prior implementation/verification and proposals are available remotely.
+- In scope: `src/mobility.ts`, `src/odaibaScene.ts`, focal `src/siteBuilders/automationHub.ts`, related native checks and current documentation.
+  No upstream merge needed at startup; no shared assets or other packages changed.
+- Implemented four facade entry overlays and two reserved meeting routes, reusing the last four doorway-person slots.
+  Selection happens after every landmark and landscape is present; paving and body-height solid checks reject unsafe lanes.
+  Bounding-box culling avoids ray-testing distant/overhead geometry and the dense curved sea. Friends wait, emerge,
+  acknowledge and leave together, with eased facing and stopped feet. Selection follows asynchronous landmark publication.
+- Added two service pilots on opposite AUTO HUB frontages using the existing person factory/runtime: approach, 12 s service,
+  return and wait. Staff serve human counters, assist at ports when a human counter remains, and disappear at six automated
+  ports. Actors cancel site scale and hide with invertible small matrices during slot handover; immediate recovery writes
+  the current configuration. Counters now sit on the existing podium, with flat pilot footing and a lower reachable panel.
+- Native verification PASS: `npm test`, `npm run build`, `git diff --check`. Actual entrance matrices sampled at .25 s for
+  240 s across low/mixed/high, hours 12/21, clear static geometry/paving and every existing person/robot fleet. Service matrices
+  cover 0/3/6 ports, full human size, podium support, counter/body clearance, live handover and immediate/hidden-layer recovery.
+- Browser evidence: [screenshots/report](../../artifacts/building-interactions/browser.json), Chromium 151.0.7922.34,
+  headless 1400×900, DPR 1, Metal requested, controlled actor clock. A 180 s actual entrance cycle covered all six stages:
+  maximum drawn displacement 0.307803 m per .25 s, minimum companion spacing 1.399983 m, waiting feet stopped and greetings
+  drawn. Explicit scores −12/0/+12 showed 4/4/2 service actors; live handover hides all four and settles to two customers.
+  Reviewed entrance wait/exit/greet/leave, night greeting, service low/day–mixed/dusk–high/night and the authored hero camera
+  at all three settings plus standalone/day. Earlier close-up captures labelled hero were replaced by explicit authored-pose views.
+  Console/network errors: none. Initial checks caught float/pose tolerances, a foreign facade on an early candidate, and
+  excess speed around a curved offset lane; complete-scene selection and slower entrance timing resolved those findings.
+- Limits: inferred door overlays, no wall cuts/interiors, queue or transaction simulation; proposal items 4–7 remain proposals.
+  Prior collector/body-shadow limitations remain. FPS, Safari/Windows and exhibition hardware are unverified.
+  Implementation is complete; integration, integrated checks and exact main CI are the next step.

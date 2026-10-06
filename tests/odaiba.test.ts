@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
 import { changeSites, skyBridges, inDistrict, DISTRICT } from '../src/layout.ts';
 import { heroCamera } from '../src/heroCamera.ts';
-import { pavilionFlight, plazaPose, routes, mobility, publishDoorways, forecourtVisits, promenadeBenches, visitPose } from '../src/mobility.ts';
+import { pavilionFlight, plazaPose, routes, mobility, publishDoorways, publishEntrances, forecourtVisits, promenadeBenches, visitPose, entranceJourneys, entrancePose } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { civicCore } from '../src/civicCore.ts';
 import { bake } from '../src/cityRig.ts';
@@ -39,6 +39,7 @@ for (const placement of layout.buildings) {
   const bytes = readFileSync(new URL(`../asset/models/${placement.id}/${placement.id}.glb`, import.meta.url));
   assert.equal(hash(bytes), placement.glbSha256, `${placement.id}: source GLB changed`);
   const { scene } = await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
+  scene.name=placement.id; // runtime loadOdaiba assigns the same landmark identity before publishing entrances
   placeOdaibaModel(scene, placement);
   // Compute precise vertex bounds, not rotated local AABBs. Independent expected
   // bounds were read from actual world-space geometry in the Blender masterplan.
@@ -427,7 +428,11 @@ console.log('Odaiba: P12 two-cycle continuity, separated plaza crowds, orchard/k
 // against every walking/resting person and robot over several complete cycles at all automation levels.
 const peopleScene = new Scene(), updatePeople = mobility(peopleScene);
 for (const landmark of landmarks.filter(m => m !== core)) publishDoorways(landmark, environment);
+assert.equal(entranceJourneys().length,0,'entrances must wait for complete static geometry');
+publishEntrances(city,environment);
 const visits = forecourtVisits();
+const entrances=entranceJourneys();
+assert.equal(entrances.length,2,'two real landmark frontages support complete entrance meetings');
 assert.ok(visits.length >= 2, 'actual landmarks publish at least two complete daily-life journeys');
 for (const v of visits) {
   const samples = v.curve.getSpacedPoints(Math.ceil(v.length / .25));
@@ -448,6 +453,7 @@ const restStart = promenadeBenches(actorPaths.promenades.map(p => p.getLength())
 const peopleFleets = ['promenade-walkers', 'doorway-walkers', 'resting-people', 'delivery-robots'].map(name => peopleScene.children.find(o => o.name === name) as InstancedMesh);
 const resting = peopleFleets[2], m = new Matrix4(), scale = new Vector3(), p = new Vector3();
 const seenVisits = new Set<string>();
+const previousEntrances=new Map<string,Vector3>();
 for (const share of [0, .5, 1]) for (const hour of [12, 21]) for (let time = 0; time < 240; time += .25) {
   updatePeople(presets.neutral, time, share, hour === 21 ? 1 : 0, hour);
   const drawn = peopleFleets.flatMap(mesh => {
@@ -465,6 +471,24 @@ for (const share of [0, .5, 1]) for (const hour of [12, 21]) for (let time = 0; 
     for (const other of drawn) if (!(other.mesh === resting && other.slot === slot) && Math.abs(other.at.y - p.y) < 1)
       assert.ok(p.distanceTo(other.at) > (other.mesh === peopleFleets[3] ? .85 : .65), `visitor ${v.group} overlaps ${other.mesh.name}#${other.slot} at ${time}s`);
   }
+  for(const [g,trip] of entrances.entries())for(let j=0;j<2;j++){
+    const mesh=peopleFleets[1],slot=116+g*2+j,w=entrancePose(time,g,trip.length,j);mesh.getMatrixAt(slot,m);p.setFromMatrixPosition(m);
+    const key=`${share}/${hour}/${g}/${j}`;
+    if(scale.setFromMatrixScale(m).x<.5){previousEntrances.delete(key);continue;}
+    const previous=previousEntrances.get(key);if(previous)assert.ok(p.distanceTo(previous)<.32,'drawn entrance person jumps or rushes through a curved lane');
+    previousEntrances.set(key,p.clone());
+    assert.equal(mesh.geometry.getAttribute('gait').getY(slot)>0,w.walking,'waiting person walks in place');
+    for(const other of drawn)if(!(other.mesh===mesh&&other.slot===slot)&&Math.abs(other.at.y-p.y)<1)
+      assert.ok(p.distanceTo(other.at)>(other.mesh===peopleFleets[3]?.85:.65),`entrance ${g}/${j} overlaps ${other.mesh.name}#${other.slot} at ${time}s`);
+    if(Math.min(w.d,trip.length-w.d)<1.2)continue;
+    ray.set(p.clone().setY(2),down);ray.far=3;const ground=ray.intersectObjects([environment,...landmarks],true)[0];
+    const finish=ground&&(ground.object as Mesh).material;
+    assert.ok(ground&&ground.point.y<.6&&finish&&!Array.isArray(finish)&&/^(sidewalk|plaza)$/.test(finish.name),`entrance ${g}/${j} at ${time}s leaves paving at ${p.toArray()}: ${ground?.object.name}/${!Array.isArray(finish)&&finish?.name}/${ground?.point.y}`);
+    for(const height of [.4,1.2])for(let k=0;k<8;k++){
+      ray.set(p.clone().setY(height),new Vector3(Math.cos(k*Math.PI/4),0,Math.sin(k*Math.PI/4)));ray.far=.4;
+      assert.equal(ray.intersectObjects([environment,...landmarks],true).length,0,'entrance actor clips city');
+    }
+  }
 }
 assert.equal(seenVisits.size, 3 * 2 * visits.length, 'every journey is actually inhabited at low/mixed/high by day and night');
 // Conversation animation does not rotate/slide the seated body or change its folded leg pose.
@@ -472,4 +496,4 @@ updatePeople(presets.neutral, 5, 0); const seat = new Matrix4(); resting.getMatr
 updatePeople(presets.neutral, 9, 0); resting.getMatrixAt(0, m); assert.deepEqual(m.elements, seat.elements);
 assert.equal(resting.geometry.getAttribute('gait').getW(0), 1);
 ray.far = Infinity;
-console.log(`Odaiba: ${visits.length} door → forecourt conversation → same-door journeys clear real paving, geometry, sites and actual low/mixed/high actor fleets; seated bodies remain fixed.`);
+console.log(`Odaiba: ${visits.length} forecourt visits and ${entrances.length} doorway meetings clear real paving, geometry and actual low/mixed/high day/night fleets; seated bodies remain fixed.`);

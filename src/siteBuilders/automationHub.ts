@@ -4,6 +4,7 @@ import { arc, bake, box, cream, faces, futureLight, glass, publicLight, sign, so
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import { remapCityMaterials, type SiteAssetLoaderCache } from '../siteAssets/assetLoader.ts';
 import type { Band } from '../surveyView.ts';
+import { conversationPose, pedestrians, servicePose } from '../mobility.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, SITE_TRANSITION_SECONDS, type BuiltSite } from './siteRuntime.ts';
 
 const SERVICE_SLOTS = 6;
@@ -40,11 +41,31 @@ type ServiceSlot = {
   to: number;
 };
 
-function createAutomationHubRuntime(slots: ServiceSlot[]): AutomationHubRuntime {
+function createAutomationHubRuntime(slots: ServiceSlot[], root:T.Group, base:T.Group, props:T.Group): AutomationHubRuntime {
   let target: AutomationHubTarget = { band: 'mixed', automatedPorts: 3 };
   let applied = false;
   let active = false;
   let start = 0;
+  // Two opposite frontage pilots, in site coordinates; people stay human-sized on the existing 1.2-unit podium.
+  const people=pedestrians(root,4,'hub-service-people'),pose=new T.Object3D(),pilots=[0,5];
+  const writePeople=(now:number)=>{
+    const shown=base.visible&&props.visible&&base.scale.y>.999&&props.scale.y>.999;
+    people.show(shown);
+    pilots.forEach((slotIndex,i)=>{
+      const slot=slots[slotIndex],sign=i?-1:1,x=(slotIndex-2.5)*1.02,from=i?3.8:-3.8,length=Math.abs(x-from)*root.scale.x;
+      const w=servicePose(now,i,length),automatic=slot.level>.999,ready=automatic||slot.level<.001;
+      const staffed=!automatic||slots.some(s=>s.level<.001),c=conversationPose(now,2000+i,0);
+      const walkingYaw=(i?-1:1)*Math.PI/2+Math.PI*w.turn,serviceYaw=automatic?i?0:Math.PI:(i?-1:1)*Math.PI/2;
+      const facing=automatic&&staffed?serviceYaw+Math.atan2(Math.sin((i?-1:1)*Math.PI/2-serviceYaw),Math.cos((i?-1:1)*Math.PI/2-serviceYaw))*w.help:serviceYaw;
+      pose.position.set(T.MathUtils.lerp(from,x,w.u),1.2,sign*3.6);
+      pose.rotation.set(0,walkingYaw+Math.atan2(Math.sin(facing-walkingYaw),Math.cos(facing-walkingYaw))*w.dwell,0);
+      pose.scale.setScalar((ready?1:HIDDEN)/root.scale.x);people.set(i*2,pose);people.gait(i*2,w.phase,w.walking?.4:0);
+      people.social(i*2,0,w.dwell*(automatic?.65*(1-w.help*Number(staffed)):c.gesture));
+      pose.position.set(x+(i?-.55:.55),1.2,sign*3.6);pose.rotation.set(0,(i?1:-1)*Math.PI/2,0);
+      pose.scale.setScalar((ready&&staffed?1:HIDDEN)/root.scale.x);people.set(i*2+1,pose);people.gait(i*2+1,0,0);
+      people.social(i*2+1,0,conversationPose(now,2000+i,1).gesture*w.dwell*(automatic?w.help:1));
+    });people.flush();
+  };
 
   const apply = () => {
     for (const slot of slots) {
@@ -61,6 +82,7 @@ function createAutomationHubRuntime(slots: ServiceSlot[]): AutomationHubRuntime 
     }
     active = false;
     apply();
+    writePeople(start);
   };
 
   settle(3);
@@ -81,12 +103,14 @@ function createAutomationHubRuntime(slots: ServiceSlot[]): AutomationHubRuntime 
       return changed;
     },
     update(now) {
-      if (!active) return;
-      const raw = Math.min(1, Math.max(0, (now - start) / SITE_TRANSITION_SECONDS));
-      const progress = smoothstep(raw);
-      for (const slot of slots) slot.level = slot.from + (slot.to - slot.from) * progress;
-      active = raw < 1;
-      apply();
+      if (active) {
+        const raw = Math.min(1, Math.max(0, (now - start) / SITE_TRANSITION_SECONDS));
+        const progress = smoothstep(raw);
+        for (const slot of slots) slot.level = slot.from + (slot.to - slot.from) * progress;
+        active = raw < 1;
+        apply();
+      }
+      writePeople(now);
     },
     restoreLegacy() {
       target = { band: 'mixed', automatedPorts: 3 };
@@ -112,7 +136,7 @@ export function buildAutomationHub(scene: T.Scene, kit: Kit, assets: SiteAssetLo
   const neutralPropsLayer = createSiteLayer(root, siteLayerDefinition('magnetEast', 'hubNeutralProps'));
   const hubBase = hubBaseLayer.group;
   const hubUpper = hubUpperLayer.group;
-  box(hubBase, [8.4, .8, 7.4], [0, .8, 0], cream, .25);
+  box(hubBase, [8.4, .8, 7.4], [0, .8, 0], cream, .05); // flat footing reaches the two service-frontage pilots
   box(hubBase, [7, 10, 6], [0, 6.2, 0], teal, .3);
   for (const y of [4, 7, 10]) faces(hubBase, 7, 6, (face, across, out) => {
     box(face, [across - .2, .9, .1], [0, y, out + .03], glass, .03);
@@ -133,7 +157,7 @@ export function buildAutomationHub(scene: T.Scene, kit: Kit, assets: SiteAssetLo
   for (let i = 0; i < SERVICE_SLOTS; i++) {
     const slot = new T.Group();
     slot.name = `hub-service-slot-${i}`;
-    slot.position.set((i - 2.5) * 1.02, 0, i % 2 === 0 ? 3.2 : -3.2);
+    slot.position.set((i - 2.5) * 1.02, 1.2, i % 2 === 0 ? 3.2 : -3.2);
     if (i % 2) slot.rotation.y = Math.PI;
     neutralPropsLayer.group.add(slot);
 
@@ -141,6 +165,7 @@ export function buildAutomationHub(scene: T.Scene, kit: Kit, assets: SiteAssetLo
     automated.name = `hub-automated-port-${i}`;
     box(automated, [.74, .94, .5], [0, .47, 0], cream, .06);
     box(automated, [.16, .16, .05], [0, .72, .27], futureLight, .02);
+    box(automated, [.18, .12, .05], [0, .42, .27], futureLight, .02); // reachable from the podium at the site's 3× scale
     automated.add(...bake(automated));
     slot.add(automated);
 
@@ -152,7 +177,7 @@ export function buildAutomationHub(scene: T.Scene, kit: Kit, assets: SiteAssetLo
     slot.add(human);
     slots.push({ automated, human, level: 0, from: 0, to: 0 });
   }
-  const automationHub = createAutomationHubRuntime(slots);
+  const automationHub = createAutomationHubRuntime(slots,root,hubBase,neutralPropsLayer.group);
   const automationDistrict = new AutomationDistrict(scene);
 
   const hubUpperFallback = new T.Group();

@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { routes, podPose, boatPoses, HULL, WATER_PERIOD, BOATS as BOAT_COUNT, trainPose, TRAIN_SPEED, walkerPose, walkerRoute, walkerParty, doorwayPose, robotPose, collectorPose, ROBOT_HALT, HANDOFF, promenadeStops, RAIL_OUT, STOOL_FRONT, streetCarPose, STREET_GAP, dropOffPose, DROP_OFF, streetRhythm, promenadeBenches, BENCH_OUT, transferPose, dockMotion, guideStrength, aircraftSlot, podShare, automationActivity, CARS, CAR_GAP, TRAINS, WALKERS, TRANSFERS, PLATOON } from '../src/mobility.ts';
 import { changeSites, SPHERE_DOCK, INTERCHANGE } from '../src/layout.ts';
 import { laneBeaconSites } from '../src/waterRooms.ts';
-import { conversationPose, visitPose } from '../src/mobility.ts';
+import { conversationPose, visitPose, entrancePose, servicePose } from '../src/mobility.ts';
 
 const path = routes(), guideLength = path.guideway.getLength();
 // Landmark boxes (Blender Z-up bounds → scene X, Y, -Z) and each survey site's tallest scaled envelope.
@@ -247,6 +247,21 @@ for (let k = 0; k < 14; k++) {
 assert.ok([0, 7, HANDOFF].every(t => collectorPose(t).e === 0) && collectorPose(3).e + .25 < ROBOT_HALT - .4, 'collector meets the robot');
 
 // Group conversations include listening and silence, with at most one restrained gesture at any time.
+const entranceStages=new Set<string>();let serviceUses=0,serviceWaits=0;
+for(let time=-10;time<200;time+=.1){
+  for(let j=0;j<2;j++){
+    const a=entrancePose(time,0,30,j),b=entrancePose(time+.1,0,30,j);entranceStages.add(a.stage);
+    if(a.visible>.5&&b.visible>.5)assert.ok(Math.abs(a.d-b.d)<.121,'entrance actor jumps or exceeds 1.2 m/s');
+    assert.ok(a.d>=0&&a.d<=30&&Math.abs(a.lane)===.7);
+    if(a.stage==='wait')assert.equal(a.walking,false);
+    if(a.greeting>.99)assert.ok(Math.abs(a.yaw-(j?-Math.PI/2:Math.PI/2))<.02,'companions face one another');
+  }
+  const a=servicePose(time,0,3.75),b=servicePose(time+.1,0,3.75);
+  assert.ok(Math.abs(a.u-b.u)*3.75<.121,'service customer jumps');
+  if(a.dwell===1){serviceUses++;assert.equal(a.walking,false);assert.equal(a.u,1);}
+  if(a.u===0&&!a.walking)serviceWaits++;
+}
+assert.equal(entranceStages.size,6);assert.ok(serviceUses&&serviceWaits);
 for (const members of [2, 3]) for (let group = 0; group < 5; group++) {
   const speakers = new Set<number>(); let quiet = 0;
   for (let time = -20; time < 80; time += .1) {
