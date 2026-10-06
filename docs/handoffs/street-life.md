@@ -4,8 +4,8 @@
 - Status: IN_PROGRESS
 - Branch: feat/pedestrian-traffic-life
 - Base commit: 9476fd8b82da523d6f7acee6f1893e5028fb35a0
-- Last verified commit: 04c9333b6d2af95b1c89e224c05ea5e0a741d9b6 (round 2: tests/build/diff-check; headless browser checks on the same tree before commit)
-- Remote availability: origin/feat/pedestrian-traffic-life @ 04c9333b6d2af95b1c89e224c05ea5e0a741d9b6
+- Last verified commit: d39a4f482582fe137b1df7da21628ba6f44146f4 (round 3: tests/build/diff-check; headless bench close-ups on the same tree before commit)
+- Remote availability: origin/feat/pedestrian-traffic-life @ d39a4f482582fe137b1df7da21628ba6f44146f4
 
 ## Session Git state
 
