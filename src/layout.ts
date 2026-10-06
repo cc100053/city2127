@@ -21,6 +21,12 @@ export const promenades: readonly (readonly P3[])[] = [
   [[1,0,-318],[3,0,-296],[-14,0,-269],[-43,0,-260],[-62,0,-250],[-86,0,-228],[-118,0,-207],[-148,0,-191],[-178,0,-173]],
   [[-259,0,-145],[-273,0,-123],[-288,0,-92],[-310,0,-76],[-347,0,-54],[-375,0,-33],[-411,0,-14],[-427,0,6]],
 ];
+// Street avenues, centrelines snapped to the environment's road surfaces (tests/mobility.test.ts): the 5 m seaside avenue north of Aqua
+// City and DECKS, and the 7 m avenue under the Yurikamome guideway. Neither crosses the other, so their street cars need no signals.
+export const streets: readonly (readonly P3[])[] = [
+  [[-207,0,-86.4],[-108.9,0,-151.5],[-10.8,0,-216.6],[87,0,-282.1],[168.4,0,-336.7],[217.5,0,-369.3]],
+  [[259.8,0,-256],[175.9,0,-199.5],[108.9,0,-154.3],[24.6,0,-98.4],[-59.9,0,-42.9],[-127.5,0,1.5],[-160.6,0,24],[-244,0,80.9],[-328.1,0,136.7],[-344.7,0,148.2]],
+];
 // Top of the Fuji TV sphere (centre about -18, 107, 23; radius 22): the air-taxi berth.
 export const SPHERE_DOCK: P3 = [-18,131,23];
 // Water taxis: a shuttle loop along the beach and a ferry lane out to the bay (the open sea continues past the plate).

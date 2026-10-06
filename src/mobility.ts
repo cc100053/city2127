@@ -2,14 +2,14 @@ import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets.ts';
-import { guideway, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers, sweepway, shoreLane, interchangeApproach, interchangeBoatLane, INTERCHANGE, midDecks, gardenDecks } from './layout.ts';
+import { guideway, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers, sweepway, streets, shoreLane, interchangeApproach, interchangeBoatLane, INTERCHANGE, midDecks, gardenDecks } from './layout.ts';
 
 const ease=(t:number)=>T.MathUtils.smoothstep(t,0,1);
 const curve=(points:readonly (readonly [number,number,number])[],closed=false)=>new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p)),closed,'centripetal');
 /** Every actor path in the Odaiba scene, in metres. */
 export function routes() {
   return {guideway:curve(guideway),promenades:promenades.map(p=>curve(p)),water:curve(waterLoop,true),ferry:curve(ferryLane),air:curve(airLoop,true),approach:curve(sphereApproach),sweep:curve(sweepway),
-    shore:curve(shoreLane,true),ixApproach:curve(interchangeApproach),ixBoat:curve(interchangeBoatLane),decks:[...midDecks,...gardenDecks].map(p=>curve(p))};
+    shore:curve(shoreLane,true),ixApproach:curve(interchangeApproach),ixBoat:curve(interchangeBoatLane),decks:[...midDecks,...gardenDecks].map(p=>curve(p)),streets:streets.map(p=>curve(p))};
 }
 /** 0→1→0 over `period` seconds: out-and-back routes reverse instead of jumping. */
 const pingPong=(time:number,period:number,offset=0)=>{const p=((time/period+offset)%2+2)%2;return {u:p<1?p:2-p,forward:p<1};};
@@ -23,8 +23,8 @@ export function podPose(time:number,train:number,car:number,length:number) {
   const head=margin+u*(1-2*margin);
   return {u:head+(forward?-1:1)*car*CAR_GAP/length,forward};
 }
-export const WALKERS=40, AIR_SCALE=5;
-const MAX_WALKERS=160, MAX_TRAINS=4, LOOP_AIRCRAFT=30;
+export const WALKERS=120, AIR_SCALE=5;
+const MAX_WALKERS=400, DOOR_WALKERS=120, MAX_TRAINS=4, LOOP_AIRCRAFT=30;
 /** Aircraft slot: groups 0..9 spread evenly, even groups on the regional district loop, odd on the city shore lane; slots 10+ join a
  * group as wingmen `k` × PLATOON m behind, so platoons form only as automation fills the fleet. */
 export const PLATOON=34;
@@ -49,20 +49,30 @@ export function automationActivity(share:number) {
   const level=T.MathUtils.smoothstep(share,1/6,5/6);
   // Drop Float32 endpoint noise so integer capacities do not expose a phantom extra actor.
   const count=(n:number)=>Math.round(n*1e6)/1e6;
-  return {level,aircraft:count(2+28*level),pods:count(CARS*(2+2*level)),walkers:count(40+120*(1-level))};
+  return {level,aircraft:count(2+28*level),pods:count(CARS*(2+2*level)),walkers:count(WALKERS+280*(1-level))};
 }
-/** Walkers (route: `walkerRoute`): slow out-and-back strolls, keeping right for their direction. Every third stops once each way at a
- * viewpoint for DWELL s (`dwell` eases 0→1→0 so the figure can turn to the sea); walking time is shifted, not sped up. */
+/** Stable 0..1 hash per actor `index` and salt `k`. */
+export const hash=(index:number,k=0)=>{const v=Math.sin(index*12.9898+k*78.233)*43758.5453;return v-Math.floor(v);};
+/** Walkers move in parties: per block of six slots, one alone, a pair and a trio whose third is a child. Members share the leader's pose;
+ * `id` numbers the parties for `walkerRoute`. */
+export function walkerParty(index:number) {
+  const k=index%6,[slot,size]=k===0?[0,1]:k<3?[k-1,2]:[k-3,3];
+  return {leader:index-slot,id:Math.floor(index/6)*3+size-1,slot,size,child:size===3&&slot===2};
+}
+/** Walkers (route: `walkerRoute`, `length` m): one-way trips at each person's own pace, keeping right for their direction, then a rest
+ * out of sight; trips begin and end at the route's ends (DECKS, the park, Hilton, deck landings), so people come from and go into
+ * buildings. A third of lone walkers jog; two in five others stop once at a viewpoint for DWELL s (`dwell` eases 0→1→0 so the figure
+ * can turn to the sea). `visible` fades over the first and last 4 m; each trip picks its direction afresh. */
 const DWELL=40;
-export function walkerPose(time:number,index:number,count=WALKERS) {
-  const period=420+(index%7)*23,lane=(forward:boolean)=>(forward?1:-1)*(1.2+(index%3)*.8);
-  if(index%3!==2){const {u,forward}=pingPong(time,period,index/count*2);return {u,forward,lane:lane(forward),stride:Math.sin(time*6+index),dwell:0};}
-  const half=period+DWELL,s=((time+index/count*2*period)%(2*half)+2*half)%(2*half),forward=s<half,local=forward?s:s-half;
-  // One viewpoint per walker (u = .3–.7), reached `start` s into each pass in either direction.
-  const stop=.3+(index%5)*.1,start=(forward?stop:1-stop)*period;
-  const walked=local<start?local:local<start+DWELL?start:local-DWELL,dwell=T.MathUtils.clamp(Math.min(local-start,start+DWELL-local)/4,0,1);
-  const u=forward?walked/period:1-walked/period;
-  return {u,forward,lane:lane(forward),stride:Math.sin(time*6+index)*(1-dwell),dwell};
+export function walkerPose(time:number,index:number,length=240) {
+  const jog=index%6===0&&hash(index,1)<.33,speed=jog?2.3+.5*hash(index,2):.9+.55*hash(index,2),stops=!jog&&hash(index,3)<.4;
+  const walk=length/speed,cycle=walk+(stops?DWELL:0)+8+40*hash(index,4),clock=time+hash(index,5)*cycle;
+  const trip=Math.floor(clock/cycle),s=clock-trip*cycle,forward=hash(index*31+trip,6)<.5;
+  // One viewpoint per walker (.3–.7 of the way), reached `start` s into the trip.
+  const start=stops?(.3+.4*hash(index,7))*walk:Infinity,walked=Math.min(walk,s<start?s:s<start+DWELL?start:s-DWELL);
+  const dwell=stops?T.MathUtils.clamp(Math.min(s-start,start+DWELL-s)/4,0,1):0,d=walked*speed;
+  const visible=s>=walk+(stops?DWELL:0)?0:T.MathUtils.clamp(d/4,0,1)*T.MathUtils.clamp((length-d)/4,0,1);
+  return {u:forward?d/length:1-d/length,forward,lane:(forward?1:-1)*(1.3+(index%3)*.55),stride:Math.sin(time*speed*5.5+index)*(1-dwell),dwell,visible,speed};
 }
 /** Interchange transfer `index` at `time`: `d` metres out along the pier (head at INTERCHANGE.pier), `side` across it, `visible` 0..1
  * (fading only at the shore end and at the boat), on the boat's 40 s `dockMotion` cycle. */
@@ -140,19 +150,71 @@ function fleet(scene:T.Object3D,parts:Part[],count:number,name:string,shadow=tru
 
 /** Shared capsule figures and palette, used by promenade and plaza crowds. */
 export function pedestrians(scene:T.Object3D,count:number,name:string) {
-  // People: capsule torso and limbs, round head and hair; clothes, skin and hair vary per person from a muted palette (no saffron).
-  const coats=material('#ffffff'),skin=material('#ffffff'),hair=material('#ffffff'),trousers=material('#3d4a52');
-  const capsule=(r:number,length:number,at:[number,number,number],mat:T.Material,depth=1):Part=>({geometry:new T.CapsuleGeometry(r,length,4,10).scale(1,1,depth).translate(...at),material:mat});
+  // People (several hundred, so modest segment counts): capsule torso and limbs, round head and hair; clothes, skin and hair vary per person from a muted palette (no saffron).
+  const coats=material('#ffffff'),skin=material('#ffffff'),hair=material('#ffffff'),trousers=material('#ffffff');
+  const capsule=(r:number,length:number,at:[number,number,number],mat:T.Material,depth=1):Part=>({geometry:new T.CapsuleGeometry(r,length,3,7).scale(1,1,depth).translate(...at),material:mat});
   const people=fleet(scene,[
-    capsule(.22,.36,[0,.96,0],coats,.72),{geometry:new T.SphereGeometry(.15,14,10).translate(0,1.5,0),material:skin},
-    {geometry:new T.SphereGeometry(.162,14,6,0,Math.PI*2,0,Math.PI*.55).translate(0,1.52,-.012),material:hair},
+    capsule(.22,.36,[0,.96,0],coats,.72),{geometry:new T.SphereGeometry(.15,10,7).translate(0,1.5,0),material:skin},
+    {geometry:new T.SphereGeometry(.162,10,4,0,Math.PI*2,0,Math.PI*.55).translate(0,1.52,-.012),material:hair},
     capsule(.07,.42,[-.29,.98,0],coats),capsule(.07,.42,[.29,.98,0],coats),
-    {geometry:new T.CapsuleGeometry(.08,.4,4,8).translate(-.13,.33,0),material:trousers},{geometry:new T.CapsuleGeometry(.08,.4,4,8).translate(.13,.33,0),material:trousers},
-    {geometry:new T.TorusGeometry(.2,.06,6,16).rotateX(Math.PI/2).translate(0,1.34,0),material:collar},
+    {geometry:new T.CapsuleGeometry(.08,.4,3,6).translate(-.13,.33,0),material:trousers},{geometry:new T.CapsuleGeometry(.08,.4,3,6).translate(.13,.33,0),material:trousers},
+    {geometry:new T.TorusGeometry(.2,.06,4,12).rotateX(Math.PI/2).translate(0,1.34,0),material:collar},
   ],count,name);
-  const clothes=['#4f6f7c','#b5836f','#6d8a5f','#2f3e48','#c9b48a','#8c6f8f','#3f5a52','#e4e1d8'],skins=['#e8cdb0','#c99e7c','#8d6348','#f0d9c2'],hairs=['#2f2a27','#5a4033','#1d2226','#b9a58c','#d8d8d4'];
-  for(let i=0;i<count;i++){people.tint(i,coats,clothes[(i*5)%clothes.length]);people.tint(i,skin,skins[(i*3)%skins.length]);people.tint(i,hair,hairs[(i*7)%hairs.length]);}
+  const clothes=['#4f6f7c','#b5836f','#6d8a5f','#2f3e48','#c9b48a','#8c6f8f','#3f5a52','#e4e1d8'],skins=['#e8cdb0','#c99e7c','#8d6348','#f0d9c2'],hairs=['#2f2a27','#5a4033','#1d2226','#b9a58c','#d8d8d4'],bottoms=['#3d4a52','#2b3036','#6b6258','#c8c0b0','#45524a','#1f2a3a'];
+  for(let i=0;i<count;i++){people.tint(i,coats,clothes[(i*5)%clothes.length]);people.tint(i,skin,skins[(i*3)%skins.length]);people.tint(i,hair,hairs[(i*7)%hairs.length]);people.tint(i,trousers,bottoms[(i*11)%bottoms.length]);}
   return people;
+}
+
+/** Doorway trips in front of the landmarks: [door, forecourt, forecourt, door] at ground level, published once each landmark loads. */
+const doorTrips:T.Vector3[][]=[];
+const PAVED=new Set(['sidewalk','plaza']);
+/** Finds ground-floor facade points by casting inward from all four sides of `model`'s bounds, and joins neighbouring doors on one face
+ * with a short walk 4–10 m out across the paved pad (`ground`: the environment). Each walk is raycast clear of the building. */
+export function publishDoorways(model:T.Object3D,ground:T.Object3D) {
+  model.updateMatrixWorld(true);ground.updateMatrixWorld(true);
+  const box=new T.Box3().setFromObject(model),ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),dir=new T.Vector3();
+  const paved=(p:T.Vector3)=>{
+    ray.set(new T.Vector3(p.x,30,p.z),down);ray.far=40;const hit=ray.intersectObject(ground,true)[0];
+    const mat=hit&&(hit.object as T.Mesh).material;return !!hit&&hit.point.y<.6&&!Array.isArray(mat)&&PAVED.has((mat as T.Material).name);
+  };
+  const clear=(a:T.Vector3,b:T.Vector3)=>{dir.subVectors(b,a);const far=dir.length();ray.set(a,dir.normalize());ray.far=far;return ray.intersectObject(model,true).length===0;};
+  const size=box.getSize(new T.Vector3());
+  for(const [axis,sign] of [['x',1],['x',-1],['z',1],['z',-1]] as const){
+    const across=axis==='x'?'z':'x',doors:{at:T.Vector3;out:T.Vector3}[]=[];
+    for(let t=box.min[across]+4;t<box.max[across]-4;t+=9){
+      const origin=new T.Vector3();origin[axis]=sign>0?box.max[axis]+3:box.min[axis]-3;origin[across]=t;origin.y=1.2;
+      ray.set(origin,new T.Vector3().setComponent(axis==='x'?0:2,-sign));ray.far=size[axis]+6;
+      const hit=ray.intersectObject(model,true)[0];if(!hit?.face)continue;
+      const out=hit.face.normal.clone().transformDirection(hit.object.matrixWorld).setY(0);
+      if(out.lengthSq()<.25||out.normalize()[axis]*sign<.4)continue;
+      doors.push({at:hit.point.clone().addScaledVector(out,.4).setY(0),out});
+    }
+    for(let k=1;k<doors.length;k++){
+      const a=doors[k-1],b=doors[k],gap=a.at.distanceTo(b.at),reach=4+6*hash(doorTrips.length,9);
+      // One face only (a corner's two normals diverge), and once: the x and z scans of a rotated landmark find the same doors.
+      if(gap<8||gap>40||a.out.dot(b.out)<.9||doorTrips.some(trip=>trip[0].distanceTo(a.at)<4))continue;
+      const fa=a.at.clone().addScaledVector(a.out,reach),fb=b.at.clone().addScaledVector(b.out,reach),lift=new T.Vector3(0,1.2,0);
+      if(![fa,fb,fa.clone().lerp(fb,.5)].every(paved)||!clear(fa.clone().add(lift),fb.clone().add(lift))||!clear(a.at.clone().add(lift),fa.clone().add(lift))||!clear(b.at.clone().add(lift),fb.clone().add(lift)))continue;
+      doorTrips.push([a.at,fa,fb,b.at]);
+    }
+  }
+}
+/** Doorway walker `index` on a trip `length` m long: steps out of one door, crosses the forecourt and goes in at the next, then stays
+ * inside 10–50 s. `d` metres along the trip (either way round), `visible` fading over the first and last 1.5 m. */
+export function doorwayPose(time:number,index:number,length:number) {
+  const speed=.9+.5*hash(index,10),walk=length/speed,cycle=walk+10+40*hash(index,11),clock=time+hash(index,12)*cycle;
+  const trip=Math.floor(clock/cycle),s=clock-trip*cycle,d=Math.min(s,walk)*speed,reverse=hash(index*17+trip,13)<.5;
+  return {d:reverse?length-d:d,reverse,visible:s>walk?0:T.MathUtils.clamp(d/1.5,0,1)*T.MathUtils.clamp((length-d)/1.5,0,1),stride:Math.sin(time*speed*5.5+index)};
+}
+/** Street cars per lane on each avenue: `cars` spread round the lane's loop (the avenue plus 40 m out of sight) at irregular gaps of
+ * 0.45–1.6× the mean, moving at one lane speed (8–11 m/s with a shared ±15 % surge), so they never close up. They fade in and out at the
+ * avenue ends. Lane 0 drives with the route, lane 1 against it; Japan keeps left. Returns `d` metres along the route. */
+export const STREET_GAP=27;
+export function streetCarPose(time:number,road:number,lane:number,car:number,cars:number,length:number) {
+  const id=road*2+lane,speed=8+3*hash(id,14),span=length+40,weight=(k:number)=>1+2.5*hash(id*97+k,15);
+  let before=0,total=0;for(let k=0;k<cars;k++){if(k<car)before+=weight(k);total+=weight(k);}
+  const travelled=speed*(time+3*Math.sin(time*.05+id*1.7)),d=((travelled-span*before/total)%span+span)%span-20;
+  return {d:lane?length-d:d,visible:T.MathUtils.clamp(d/12,0,1)*T.MathUtils.clamp((length-d)/12,0,1)};
 }
 
 /** Small service quadrotors match the parked district drones; four rotors share the trim batch. */
@@ -184,7 +246,7 @@ export function mobility(scene:T.Scene) {
   const SWEEP_CARS=4,SWEEP_SCALE=1.7,sweepLength=path.sweep.getLength(),sweepPods=fleet(scene,podParts(),SWEEP_CARS,'sweep-pods');
   for(let i=0;i<SWEEP_CARS;i++)sweepPods.tint(i,body,'#f6f5f1');
   // Walkers (promenades and mid-level decks) plus the interchange transfers after them.
-  const people=pedestrians(scene,MAX_WALKERS+TRANSFERS,'promenade-walkers');
+  const people=pedestrians(scene,MAX_WALKERS+TRANSFERS,'promenade-walkers'),walks=[...path.promenades,...path.decks],walkLength=walks.map(c=>c.getLength());
   // Water taxis: 11 m white yachts with a glass cabin and a mint waterline.
   // White yacht hull with a pointed bow (plan in x/-z), a raised aft deck, a dark glass cabin band under a white roof.
   const plan=new T.Shape([[-1.8,5.5],[1.8,5.5],[1.8,-2],[0,-6.2],[-1.8,-2]].map(([x,y])=>new T.Vector2(x,y)));
@@ -201,6 +263,14 @@ export function mobility(scene:T.Scene) {
   // Autonomous pods: a rounded cabin on four ducted rotors, 17 m across; they take a winged craft's slot as automation rises (podShare).
   const airPods=fleet(scene,[part([1.5,.8,2.4],[0,.1,0],airShell,.35),part([1.56,.3,1.5],[0,.32,.25],glass,.12),part([1.2,.08,2],[0,-.3,0],mint,.03),
     ...[[-1.15,-.95],[1.15,-.95],[-1.15,.95],[1.15,.95]].map(([x,z])=>({geometry:new T.TorusGeometry(.55,.08,6,20).rotateX(Math.PI/2).translate(x,.15,z),material:airShell}))],LOOP_AIRCRAFT+2,'air-pods');
+  // Doorway walkers step in and out of the landmarks (publishDoorways); street cars: 4.6 m autonomous cabs, every seventh a 7 m van.
+  const doorPeople=pedestrians(scene,DOOR_WALKERS,'doorway-walkers');
+  const carBody=material('#ffffff'),headlight=new T.MeshStandardMaterial({color:'#f4f6f2',emissive:'#fff6e0',emissiveIntensity:0,roughness:.3}),taillight=new T.MeshStandardMaterial({color:'#b85a50',emissive:'#ff4a3a',emissiveIntensity:0,roughness:.3});
+  const streetLength=path.streets.map(c=>c.getLength()),streetCars=streetLength.map(length=>Math.round((length+40)/STREET_GAP)),carSlots=streetCars.reduce((n,c)=>n+2*c,0);
+  const cars=fleet(scene,[part([1.85,1.1,4.6],[0,.75,0],carBody,.45),part([1.7,.6,2.6],[0,1.45,-.2],glass,.25),part([1.9,.1,4.3],[0,.45,0],mint,.04),
+    part([1.5,.14,.08],[0,.95,2.3],headlight,.03),part([1.5,.14,.08],[0,.95,-2.3],taillight,.03)],carSlots,'street-cars');
+  const carColors=['#f4f3ee','#e9eef0','#dfe4e2','#c9d3d0','#e8e0d0','#8fa8ad','#5f6f78','#2f3a40'];
+  for(let i=0;i<carSlots;i++)cars.tint(i,carBody,carColors[Math.floor(hash(i,16)*carColors.length)]);
   const berthLight=new T.PointLight('#b9e2cf',0,60,2);berthLight.position.set(SPHERE_DOCK[0],SPHERE_DOCK[1]+4,SPHERE_DOCK[2]);scene.add(berthLight);
   const ixLight=new T.PointLight('#b9e2cf',0,45,2);ixLight.position.set(INTERCHANGE.mast[0],INTERCHANGE.deck+4,INTERCHANGE.mast[2]);scene.add(ixLight);
   const guideMaterial=new T.MeshBasicMaterial({color:new T.Color('#88d6d3').multiplyScalar(1.6)});
@@ -221,6 +291,7 @@ export function mobility(scene:T.Scene) {
     mint.emissiveIntensity=.65+state.neon*1.8;
     airShell.emissiveIntensity=activity?activity.level*.85:0;
     collar.emissiveIntensity=night*4;
+    headlight.emissiveIntensity=.2+night*4;taillight.emissiveIntensity=.15+night*3;
     for(let train=0;train<MAX_TRAINS;train++)for(let car=0;car<CARS;car++){
       const {u,forward}=podPose(time,train<2?train:train-1.5,car,guideLength);
       place(path.guideway,u,!forward);pose.scale.setScalar(activity?amount(activity.pods,train*CARS+car):train<TRAINS?T.MathUtils.smoothstep(state.traffic*.5+.5-train*.3,0,.1):0);pods.set(train*CARS+car,pose);
@@ -231,20 +302,39 @@ export function mobility(scene:T.Scene) {
       place(path.sweep,u,!forward);pose.rotation.x=-Math.asin(T.MathUtils.clamp(tangent.y,-1,1));pose.scale.setScalar(SWEEP_SCALE*T.MathUtils.smoothstep(state.traffic*.5+.5,0,.1));sweepPods.set(car,pose);
     }sweepPods.flush();
     for(let i=0;i<MAX_WALKERS;i++){
-      const w=walkerPose(time,i,i<WALKERS?WALKERS:MAX_WALKERS),weight=activity?amount(activity.walkers,i):i<WALKERS?T.MathUtils.smoothstep(state.crowd*.8+.2-i/WALKERS,-.05,.05):0;
-      const route=walkerRoute(i),onDeck=route>1;
-      place(onDeck?path.decks[route-2]:path.promenades[route],w.u,!w.forward);side.crossVectors(up,tangent).normalize();
-      // Deck walkers keep to the 9 m deck's outer lanes, clear of the planted middle bed.
-      pose.position.addScaledVector(side,-(onDeck?(w.forward?1:-1)*(3.2+(i%2)*.6):w.lane));
+      const party=walkerParty(i),route=walkerRoute(party.id),onDeck=route>1,w=walkerPose(time,party.leader,walkLength[route]);
+      const weight=activity?amount(activity.walkers,i):i<WALKERS?T.MathUtils.smoothstep(state.crowd*.8+.2-i/WALKERS,-.05,.05):0;
+      place(walks[route],w.u,!w.forward);side.crossVectors(up,tangent).normalize();
+      // Parties walk abreast; deck walkers keep to the 9 m deck's outer lanes, clear of the planted middle bed.
+      const abreast=(party.slot-(party.size-1)/2)*.65,lane=onDeck?(w.forward?1:-1)*(3.5+(party.size===1?(i%2-.5)*.6:abreast)):w.lane+(w.forward?abreast:-abreast);
+      pose.position.addScaledVector(side,-lane);pose.position.y+=Math.abs(w.stride)*.025*w.speed;
       // A stopped walker turns to face the bay.
       if(w.dwell>0)pose.rotation.y+=w.dwell*(((seaYaw-pose.rotation.y)%(Math.PI*2)+Math.PI*3)%(Math.PI*2)-Math.PI);
-      pose.rotation.z=w.stride*.03;pose.scale.setScalar(weight);people.set(i,pose);
+      pose.rotation.z=w.stride*.03;pose.scale.setScalar(weight*w.visible*(party.child?.62:.93+.12*hash(i,8)));people.set(i,pose);
     }
     for(let k=0;k<TRANSFERS;k++){
       const tp=transferPose(time,k);
       pose.position.set(INTERCHANGE.shore[0]+seaX*tp.d+alongX*tp.side,.5,INTERCHANGE.shore[2]+seaZ*tp.d+alongZ*tp.side);
       pose.rotation.set(0,k%2?seaYaw:seaYaw+Math.PI,tp.moving?Math.sin(time*6+k)*.03:0);pose.scale.setScalar(tp.visible);people.set(MAX_WALKERS+k,pose);
     }people.flush();
+    const doorShare=activity?activity.walkers/MAX_WALKERS:T.MathUtils.clamp(state.crowd*.8+.2,0,1);
+    for(let k=0;k<DOOR_WALKERS;k++){
+      const trip=doorTrips[k%Math.max(doorTrips.length,1)];
+      if(!trip){pose.scale.setScalar(0);doorPeople.set(k,pose);continue;}
+      const legs=[trip[0].distanceTo(trip[1]),trip[1].distanceTo(trip[2]),trip[2].distanceTo(trip[3])],w=doorwayPose(time,k,legs[0]+legs[1]+legs[2]);
+      let d=w.d,leg=0;while(leg<2&&d>legs[leg]){d-=legs[leg];leg++;}
+      const a=trip[leg],b=trip[leg+1];pose.position.lerpVectors(a,b,Math.min(d/legs[leg],1));
+      pose.rotation.set(0,Math.atan2(b.x-a.x,b.z-a.z)+(w.reverse?Math.PI:0),w.stride*.03);
+      pose.scale.setScalar(amount(doorShare*DOOR_WALKERS,k)*w.visible*(.93+.12*hash(k,8)));doorPeople.set(k,pose);
+    }doorPeople.flush();
+    for(let r=0,slot=0;r<path.streets.length;r++)for(let lane=0;lane<2;lane++)for(let c=0;c<streetCars[r];c++,slot++){
+      const car=streetCarPose(time,r,lane,c,streetCars[r],streetLength[r]);
+      place(path.streets[r],car.d/streetLength[r],lane===1);side.crossVectors(up,tangent).normalize();
+      pose.position.addScaledVector(side,r?1.75:1.25).y+=.1;
+      // Every seventh car is a 7 m van; traffic density thins the fleet as on the water.
+      const van=hash(slot,17)<.14,density=T.MathUtils.smoothstep(state.traffic*.6+.5-hash(slot,18),-.05,.05);
+      pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(car.visible*density);cars.set(slot,pose);
+    }cars.flush();
     for(let i=0;i<BOATS;i++){
       const u=(time*.009+i/BOATS)%1;place(path.water,u);pose.position.y+=Math.sin(time*1.3+i)*.08;pose.rotation.z=Math.sin(time*.9+i)*.02;
       pose.scale.setScalar(BOAT_SCALE*T.MathUtils.smoothstep(state.traffic*.6+.4-i/(BOATS+1),-.05,.05));boats.set(i,pose);pose.rotation.z=0;wakes.set(i,pose);

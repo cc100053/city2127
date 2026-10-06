@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { routes, podPose, walkerPose, walkerRoute, transferPose, dockMotion, guideStrength, aircraftSlot, podShare, automationActivity, CARS, CAR_GAP, TRAINS, WALKERS, TRANSFERS, PLATOON } from '../src/mobility.ts';
+import { routes, podPose, walkerPose, walkerRoute, walkerParty, doorwayPose, streetCarPose, STREET_GAP, transferPose, dockMotion, guideStrength, aircraftSlot, podShare, automationActivity, CARS, CAR_GAP, TRAINS, WALKERS, TRANSFERS, PLATOON } from '../src/mobility.ts';
 import { changeSites, SPHERE_DOCK, INTERCHANGE } from '../src/layout.ts';
 import { laneBeaconSites } from '../src/waterRooms.ts';
 
@@ -69,19 +69,74 @@ for (let t = 0; t < 300; t += .25) for (let train = 0; train < TRAINS + 2; train
   assert.ok(Math.abs(next.u - cars[0].u) * guideLength < 1.5, 'pod jumps along the guideway');
 }
 
-// Walkers stroll continuously (≤ 2 m/s) and switch lanes only at the ends of their promenade or deck; viewpoint stops hold still.
+// Walkers: continuous while visible (≤ 3.5 m/s, joggers included), appear/vanish only at a route end, turn only out of sight, hold still
+// at a viewpoint; parties share their leader's route; paces vary.
 const walks = [...path.promenades, ...path.decks];
 let dwelling = 0;
-for (let i = 0; i < 160; i++) for (let t = 0; t < 1200; t += 1) {
-  const a = walkerPose(t, i, i < WALKERS ? WALKERS : 160), b = walkerPose(t + 1, i, i < WALKERS ? WALKERS : 160);
-  assert.ok(Math.abs(a.u - b.u) * walks[walkerRoute(i)].getLength() < 2, `walker ${i} jumps`);
-  if (a.forward !== b.forward) assert.ok(a.u < .01 || a.u > .99, `walker ${i} turns mid-promenade`);
-  if (a.dwell === 1 && b.dwell === 1) { dwelling++; assert.equal(a.u, b.u, `walker ${i} drifts while stopped`); }
-  assert.ok(Math.abs(a.dwell - b.dwell) <= .25 + 1e-9);
+const paces = new Set<number>();
+for (let i = 0; i < 400; i++) {
+  const length = walks[walkerRoute(walkerParty(i).id)].getLength();
+  paces.add(Math.round(walkerPose(0, i, length).speed * 10));
+  for (let t = 0; t < 1200; t += 1) {
+    const a = walkerPose(t, i, length), b = walkerPose(t + 1, i, length);
+    if (a.visible > 0 && b.visible > 0) assert.ok(Math.abs(a.u - b.u) * length < 3.5, `walker ${i} jumps`);
+    if (a.visible > 0 && a.visible < 1) assert.ok(a.u < 5 / length || a.u > 1 - 5 / length, `walker ${i} fades mid-route`);
+    if (a.forward !== b.forward) assert.ok(a.visible === 0 || b.visible === 0, `walker ${i} turns in view`);
+    if (a.dwell === 1 && b.dwell === 1) { dwelling++; assert.equal(a.u, b.u, `walker ${i} drifts while stopped`); }
+    assert.ok(Math.abs(a.dwell - b.dwell) <= .25 + 1e-9);
+  }
 }
 assert.ok(dwelling > 0, 'no walker stops at a viewpoint');
+assert.ok(paces.size > 10 && Math.max(...paces) >= 23, 'walkers share one pace or nobody jogs');
 assert.deepEqual([0, 1, 2, 3, 4, 9, 14, 19].map(walkerRoute), [0, 1, 0, 1, 2, 3, 4, 5]);
+for (let i = 0; i < 60; i++) { const p = walkerParty(i); assert.ok(walkerParty(p.leader).leader === p.leader && walkerParty(p.leader).id === p.id); }
+assert.deepEqual([0, 1, 2, 3, 4, 5].map(i => walkerParty(i).size), [1, 2, 2, 3, 3, 3]);
 
+// Doorway trips: continuous at walking pace while visible.
+for (let k = 0; k < 40; k++) for (let t = 0; t < 300; t += .5) {
+  const a = doorwayPose(t, k, 30), b = doorwayPose(t + .5, k, 30);
+  if (a.visible > 0 && b.visible > 0) assert.ok(Math.abs(a.d - b.d) < 1, `doorway walker ${k} jumps`);
+}
+
+// Street cars stay on the environment's road surface in both lanes, never close within 9 m in a lane, and move ≤ 15 m/s.
+const glb = readFileSync(new URL('../asset/models/odaiba-masterplan/odaiba_district_v01_environment.glb', import.meta.url));
+const gltf = JSON.parse(glb.subarray(20, 20 + glb.readUInt32LE(12)).toString()), bin = glb.subarray(28 + glb.readUInt32LE(12));
+const read = (i: number) => {
+  const a = gltf.accessors[i], v = gltf.bufferViews[a.bufferView], n = a.type === 'VEC3' ? 3 : 1, C = a.componentType === 5126 ? Float32Array : a.componentType === 5125 ? Uint32Array : Uint16Array;
+  const stride = v.byteStride ? v.byteStride / C.BYTES_PER_ELEMENT : n, arr = new C(bin.buffer, bin.byteOffset + (v.byteOffset ?? 0) + (a.byteOffset ?? 0), (a.count - 1) * stride + n);
+  return (k: number, c = 0) => arr[k * stride + c];
+};
+const roadTris: number[][] = [];
+gltf.nodes.forEach((node: { mesh?: number; translation?: number[] }) => {
+  if (node.mesh === undefined) return;
+  const [tx, , tz] = node.translation ?? [0, 0, 0];
+  for (const prim of gltf.meshes[node.mesh].primitives) {
+    if (!['road', 'road_marking'].includes(gltf.materials[prim.material].name)) continue;
+    const pos = read(prim.attributes.POSITION), idx = read(prim.indices), count = gltf.accessors[prim.indices].count;
+    for (let k = 0; k < count; k += 3) roadTris.push([0, 1, 2].flatMap(j => [pos(idx(k + j), 0) + tx, pos(idx(k + j), 2) + tz]));
+  }
+});
+const onRoad = (x: number, z: number) => roadTris.some(([ax, az, bx, bz, cx, cz]) => {
+  const s = (px: number, pz: number, qx: number, qz: number) => (x - qx) * (pz - qz) - (px - qx) * (z - qz);
+  const d1 = s(ax, az, bx, bz), d2 = s(bx, bz, cx, cz), d3 = s(cx, cz, ax, az);
+  return !((d1 < 0 || d2 < 0 || d3 < 0) && (d1 > 0 || d2 > 0 || d3 > 0));
+});
+path.streets.forEach((street, r) => {
+  const length = street.getLength(), offset = r ? 1.75 : 1.25, cars = Math.round((length + 40) / STREET_GAP);
+  let missing = 0, samples = 0;
+  for (let d = 0; d <= length; d += 2) for (const side of [-1, 1]) {
+    const p = street.getPointAt(d / length), t = street.getTangentAt(d / length);
+    // Both car edges (0.95 m either side of the lane centre). The junction mouth under the guideway (~10 m) has no road triangle.
+    for (const edge of [-.95, .95]) { samples++; if (!onRoad(p.x + t.z * side * (offset + edge), p.z - t.x * side * (offset + edge))) missing++; }
+  }
+  assert.ok(missing / samples < .02, `street ${r}: ${missing}/${samples} car-edge samples off the road`);
+  for (const lane of [0, 1]) for (let t = 0; t < 300; t += .5) {
+    const at = Array.from({ length: cars }, (_, c) => streetCarPose(t, r, lane, c, cars, length));
+    const shown = at.filter(c => c.visible > 0).map(c => c.d).sort((a, b) => a - b);
+    for (let k = 1; k < shown.length; k++) assert.ok(shown[k] - shown[k - 1] > 9, `street ${r} lane ${lane} cars close up at ${t}s`);
+    at.forEach((c, k) => { const next = streetCarPose(t + .5, r, lane, k, cars, length); if (c.visible > 0 && next.visible > 0) assert.ok(Math.abs(next.d - c.d) < 7.5, 'street car jumps'); });
+  }
+});
 // Interchange transfers: ≤ 2 m/s on the pier, appear/vanish only at the shore end or the boat, and board only while it is docked.
 for (let k = 0; k < TRANSFERS; k++) for (let t = 0; t < 120; t += .1) {
   const a = transferPose(t, k), b = transferPose(t + .1, k);
@@ -106,4 +161,4 @@ for (let ports = 0; ports <= 6; ports++) {
 assert.ok(guideStrength(.01, .99, true) > .9);
 assert.equal(guideStrength(.01, .99, false), 0);
 assert.equal(guideStrength(.5, 0, true), 0);
-console.log(`PASS: Odaiba actors — air tiers clear landmarks, sites and beacons, sphere and interchange berths, pod spacing on ${guideLength.toFixed(0)} m of guideway, walker/deck/transfer continuity, ${beacons.length} lane beacons, aircraft slots, guide lights.`);
+console.log(`PASS: Odaiba actors — air tiers clear landmarks, sites and beacons, sphere and interchange berths, pod spacing on ${guideLength.toFixed(0)} m of guideway, walker/party/doorway/transfer continuity, street cars on the road and spaced, ${beacons.length} lane beacons, aircraft slots, guide lights.`);

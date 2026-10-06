@@ -37,6 +37,9 @@ try {
   const reviewParams=new URLSearchParams(location.search);
   const civicReview=import.meta.env.DEV && reviewParams.get('review')==='civic';
   if(civicReview){camera.position.set(-180,105,-235);camera.lookAt(-10,78,20);}
+  // DEV street review: the seaside avenue, Aqua City forecourt and promenade at the closest orbit distance (people and street cars).
+  const streetReview=import.meta.env.DEV && reviewParams.get('review')==='street';
+  if(streetReview){camera.position.set(-170,70,-280);camera.lookAt(-80,0,-170);}
   const reviewTime=import.meta.env.DEV && reviewParams.has('reviewTime') ? Number(reviewParams.get('reviewTime')) : NaN;
   const ambient=new T.HemisphereLight('#edf1e4','#8a8274',2.2);scene.add(ambient);
   const sun=new T.DirectionalLight('#ffe4b8',3.4);sun.position.set(-20,38,18);sun.castShadow=true;
@@ -85,6 +88,7 @@ try {
   const controls=new OrbitControls(camera,renderer.domElement);
   controls.target.set(...HERO_TARGET);controls.enableDamping=true;controls.dampingFactor=.06;controls.rotateSpeed=.45;controls.zoomSpeed=.6;controls.panSpeed=.8;
   if(civicReview)controls.target.set(-10,78,20);
+  if(streetReview)controls.target.set(-80,0,-170);
   // Orbit and pan stay on the hero district; the hazed ground beyond is backdrop, not a destination.
   const districtMin=new T.Vector3(DISTRICT.minX,0,DISTRICT.minZ),districtMax=new T.Vector3(DISTRICT.maxX,160,DISTRICT.maxZ),panBack=new T.Vector3();
   controls.minDistance=150;controls.maxDistance=1000;controls.minPolarAngle=.35;controls.maxPolarAngle=1.42;controls.screenSpacePanning=false;controls.update();
