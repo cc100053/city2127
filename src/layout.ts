@@ -47,6 +47,34 @@ export const airLoop: readonly P3[] = Array.from({length:12},(_,i)=>{
   const a=i/12*Math.PI*2;return [-40+Math.cos(a)*330,170+Math.sin(a*2)*6,-40+Math.sin(a)*250] as const;
 });
 export const sphereApproach: readonly P3[] = [[-620,160,-640],[-380,160,-360],[-160,158,-120],[-60,150,-20],[SPHERE_DOCK[0],SPHERE_DOCK[1]+6,SPHERE_DOCK[2]]];
+// Air tiers (2127 mobility layers): regional 160–170 m (district loop, sphere approach), city 80–100 m (shore lane), service 30–45 m
+// (district quadrotors). The shore lane is one closed loop off the north shore: its inbound leg runs 45 m out at 80 m westward, its
+// outbound leg 120 m out at 100 m eastward, so the two directions read as separate lanes. Offsets of a smoothed shore, ending west of
+// the AUTO HUB site.
+export const shoreLaneInner: readonly P3[] = [[-65,80,-317],[-152,80,-258],[-220,80,-218],[-294,80,-186],[-367,80,-112],[-464,80,-53]];
+export const shoreLane: readonly P3[] = [...shoreLaneInner,
+  [-520,90,-80],[-503,100,-117],[-413,100,-171],[-339,100,-247],[-254,100,-285],[-193,100,-321],[-108,100,-379],[-50,90,-350]];
+// Multimodal interchange on the shore in front of Aqua City: a pier `PIER` m out to sea, a boat berth at its head and an arrival mast
+// beside it whose berth deck takes shore-lane air taxis (INTERCHANGE.deck: parked craft height, deck top 1.2 m lower). sea = unit vector out to sea, along = westward.
+const IX={x:-94,z:-243,sea:[-.56,-.828],along:[-.828,.56]} as const, at=(out:number,side=0,y=0):P3=>[IX.x+IX.sea[0]*out+IX.along[0]*side,y,IX.z+IX.sea[1]*out+IX.along[1]*side];
+export const INTERCHANGE = {shore:at(0),head:at(56),boat:at(68,0,-.6),mast:at(40,16),deck:38,pier:56,yaw:Math.atan2(IX.sea[0],IX.sea[1])} as const;
+export const interchangeApproach: readonly P3[] = [[-260,100,-420],[-190,84,-345],[-150,60,-295],[INTERCHANGE.mast[0],INTERCHANGE.deck+6,INTERCHANGE.mast[2]]];
+// The interchange boat runs in from the bay on the pier's axis, bow to the shore.
+export const interchangeBoatLane: readonly P3[] = [[-380,-.6,-560],[-260,-.6,-440],at(120,0,-.6),INTERCHANGE.boat];
+// Walkable mid-level skyways (deck top at the points, 9 m wide). Mid: Aqua City's east end to Hilton at 30 m, behind the PARK site from
+// the hero pose (r5 pass 3); Fuji chassis west face to Hilton at 40 m, south of the COMMONS PLAZA lot, so the gap reads layered (r6).
+export const midDecks: readonly (readonly P3[])[] = [
+  [[-183,30,-50],[-205,30.5,-30],[-228,30.5,-8],[-248,30,8]],
+  [[-86,40,18],[-130,40.5,26],[-180,41,34],[-220,40.5,40],[-250,40,44]],
+];
+// Planted mid-level decks (r6 pass 3, target v2's tree-lined middle layer; 5.2 m lawn bed down the middle). Raycast-checked against the
+// environment, landmarks and Fuji chassis: clear between their docked ends, and off every survey site's line of sight from the hero pose.
+export const gardenDecks: readonly (readonly P3[])[] = [
+  // DECKS south face over the open ground to a landing on Aqua City's planted roof (30 m).
+  [[150,40,-222],[150,39,-195],[125,37,-168],[85,35.5,-150],[40,34.5,-145],[20,34.5,-142]],
+  // The 151 m tower down to DECKS' east face at 42 m.
+  [[252,42,-346],[250,42,-315],[232,42,-290],[195,42,-281],[168,42,-280]],
+];
 
 // Survey change sites on Odaiba open ground the hero pose can see, clear of roads, landmarks and the guideway (tests/odaiba.test.ts).
 // x/z: metres in the Odaiba scene. w/d/h: the builders' own units (h = tallest variant); scale: metres per unit at the site root. place = the name guests read.

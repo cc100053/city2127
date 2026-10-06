@@ -127,7 +127,7 @@ export function cityRig(scene:T.Scene) {
       civicLights.forEach(light=>light.intensity=night*light.userData.peak);
       futureLight.emissiveIntensity=.25+state.neon*.5+night*.45;
       membrane.opacity=.6+state.greenery*.18;
-      updateMobility(state,time,automationShare);
+      updateMobility(state,time,automationShare,night);
     },
   };
 }

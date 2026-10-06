@@ -127,18 +127,20 @@ console.log(`PASS: automation district â€” ${low.pavilions} staffed pavilions â†
 // Check the actual actor matrices, not just the diagnostic counts, and preserve standalone/legacy poses.
 const actorScene = new T.Scene(), updateActors = mobility(actorScene);
 const fleet = (name: string) => actorScene.children.find(o => o.name === name) as T.InstancedMesh;
-const visible = (name: string) => {
+// `slots` limits the count to a fleet's first instances (walkers precede the interchange transfers in 'promenade-walkers').
+const visible = (name: string, slots = Infinity) => {
   const mesh = fleet(name), matrix = new T.Matrix4(), scale = new T.Vector3(); let count = 0;
-  for (let i = 0; i < mesh.count; i++) { mesh.getMatrixAt(i, matrix); scale.setFromMatrixScale(matrix); if (scale.length() > 1e-4) count++; }
+  for (let i = 0; i < Math.min(mesh.count, slots); i++) { mesh.getMatrixAt(i, matrix); scale.setFromMatrixScale(matrix); if (scale.length() > 1e-4) count++; }
   return count;
 };
 updateActors(presets.neutral, 20);
-const names = ['guideway-pods', 'promenade-walkers', 'air-taxis', 'water-taxis'];
+const names = ['guideway-pods', 'promenade-walkers', 'air-taxis', 'air-pods', 'water-taxis'];
 const legacyMatrices = names.map(name => [...fleet(name).instanceMatrix.array]);
 for (const [ports, aircraft, pods, walkers] of [[1, 3, 12, 160], [3, 17, 18, 100], [5, 31, 24, 40]]) {
   for (const state of [presets.still, presets.pulse]) {
     updateActors(state, 20, ports / 6);
-    assert.deepEqual([visible('air-taxis'), visible('guideway-pods'), visible('promenade-walkers')], [aircraft, pods, walkers]);
+    // Each aircraft slot is drawn as either a winged craft or an autonomous pod at settled levels.
+    assert.deepEqual([visible('air-taxis') + visible('air-pods'), visible('guideway-pods'), visible('promenade-walkers', 160)], [aircraft, pods, walkers]);
   }
 }
 updateActors(presets.neutral, 20);
