@@ -91,6 +91,10 @@ export function updateOdaiba(night: number) {
   curtainGlow.value = .45 + night * .8; curtainNight.value = night; towerGlow.value = .3 + night * .9;
 }
 
+// Ground finishes lie within centimetres of each other (building pads over the lawn terrain, plazas and service yards beside them), finer
+// than the depth precision at hero range, so they z-fight. A depth offset per finish fixes the stacking order at any distance; up close the
+// real geometry still decides. Same-finish pairs (pads/footpaths, planters/terrain) share a colour, so they need no order.
+const groundLayer: Record<string, number> = { road: 1, service_area: 1, plaza: 2, sidewalk: 3, road_marking: 4 };
 // Ground finishes that stop at the seaward cut; massing, guideway and revetment keep their geometry.
 const cutGround = new Set(['landscape', 'road', 'sidewalk', 'road_marking']);
 function openBay(material: T.Material) {
@@ -114,6 +118,8 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     if (!(object instanceof T.Mesh)) return;
     const material = object.material as T.MeshStandardMaterial, finish = environmentFinish[material.name];
     if (finish) { material.color.set(finish[0]); material.roughness = finish[1]; material.metalness = finish[2]; }
+    const layer = groundLayer[material.name];
+    if (layer) { material.polygonOffset = true; material.polygonOffsetFactor = -layer; material.polygonOffsetUnits = -4 * layer; }
     // Context massing (district and backdrop) carries the same storey-banded curtain wall and lit bays as Aqua City and DECKS.
     if (finish && material.name.startsWith('context_') && material.customProgramCacheKey() !== 'curtain-wall') curtainWall(material, finish[0]);
     if(material.name==='landscape'){
