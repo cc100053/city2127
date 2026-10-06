@@ -4,8 +4,8 @@
 - Status: IN_PROGRESS
 - Branch: feat/pedestrian-traffic-life
 - Base commit: 9476fd8b82da523d6f7acee6f1893e5028fb35a0
-- Last verified commit: 79d416531fe5198ea350a7e3139451cb66a5a9cc (tests/build/diff-check; browser checks on the same tree before commit)
-- Remote availability: origin/feat/pedestrian-traffic-life @ 79d416531fe5198ea350a7e3139451cb66a5a9cc
+- Last verified commit: 04c9333b6d2af95b1c89e224c05ea5e0a741d9b6 (round 2: tests/build/diff-check; headless browser checks on the same tree before commit)
+- Remote availability: origin/feat/pedestrian-traffic-life @ 04c9333b6d2af95b1c89e224c05ea5e0a741d9b6
 
 ## Session Git state
 
@@ -52,7 +52,7 @@ doorways per landmark), `src/main.ts` (DEV `?review=street`), `tests/mobility.te
 ## Actual validation results
 
 - Verification status: PARTIAL
-- Date and checked commit/worktree: 2026-10-06, uncommitted worktree on feat/pedestrian-traffic-life
+- Date and checked commit/worktree: 2026-10-06, 04c9333b6d2af95b1c89e224c05ea5e0a741d9b6
 - Round 2 (2026-10-06, worktree before commit): root `npm test` PASS, `npm run build` PASS, `git diff --check` PASS. Headless
   Chromium (installed Playwright, 1400×900): promenade at 17:00 with parties, items, gait, bench sitters; drop-off bay at reviewTime 39
   with a passenger stepping out; hero 12/19/4 h and bench view at 21 h. Headless FPS is not exhibition evidence; user reported FPS OK
