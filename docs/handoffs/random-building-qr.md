@@ -4,7 +4,7 @@
 - Status: IMPLEMENTED; QR checks PASS; broad integration browser check PARTIAL
 - Branch: `feat/random-building-qr`
 - Base commit: `4eda49ebae30e6215e6f67f17e8fef197832b34e`
-- Last verified commit: `f5106c8c575f75d040948d537a275f7b370e0fde` (tower-only code snapshot; final metadata update is documentation-only)
+- Last verified commit: `63287714788d656a5720cb9b71f5770a9f2a3df0` (original-landmark fallback code snapshot; final metadata update is documentation-only)
 - Remote availability: PUSHED to `origin/feat/random-building-qr`; not merged to main
 
 ## Session Git state
@@ -41,6 +41,7 @@ Current stage reads `/api/archives/:id` before constructing the QR. `futureBuild
 - Final `verify-building-qr.mjs` Chrome 750×620 PASS: three tower families and low-city Civic Core fallback, whole-building bounds, readable glass, stable reload, repeated exact canvas decoding and WebGL fallback. The final landmark screenshot was visually inspected from the bay-facing side, showing the original central sphere and frame together.
 - Read-only HTTP: existing 8787 serves loader `index-CCWhxj0Y.js`, imports new `main-ZNQU8Z8e.js`, and the bundle contains the Civic Core fallback. No server restart or production database writes.
 - Broad integration was NOT RERUN; its previous PARTIAL status and physical phone/Wi-Fi acceptance remain open. No live proposals or resets submitted.
+- Scoped source commit: `6328771`; affected Markdown links, staged/committed whitespace and complete scoped diff review PASS. Pushed on `origin/feat/random-building-qr`, not merged into main; branch CI not claimed verified. Temporary 5198 preview was stopped after verifying its process command; existing 8787 was left running.
 
 ### Tower-only refinement — previous stage, 2026-10-07
 
