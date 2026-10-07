@@ -43,6 +43,8 @@ Use an isolated SQLite and `qr-hud/scripts/verify-integration.mjs` for the destr
 
 CI uses Node 24, installs/tests/builds all three packages and checks committed whitespace. Local checks gate integration; main CI must pass after integration (branch CI need not be awaited, 2026-10-06). Documentation-only pushes skip CI; a newer push cancels an in-progress run on the same branch. The Odaiba route/clearance test raycasts through `three-mesh-bvh` (test-only devDependency) with the same hits as three's brute-force raycast. A configured workflow is not a passing run. [Git workflow](CONTRIBUTING.md) defines exact checks and race handling.
 
+2026-10-07 future-building QR evidence: root tests/build, QR 13 tests/build, integrated build and five-silhouette Chrome framing/actual QR decoding PASS against source commit `eb8de23`. The broader integration browser run remains PARTIAL due slow headless city initialization/selector/navigation timeouts; physical phone/venue acceptance is unverified. Exact steps, screenshots and limits are in [random-building-qr handoff](handoffs/random-building-qr.md); this is not main integration or S5 acceptance.
+
 Documentation-only changes require local Markdown file/anchor checks, tracked-target checks, renamed-path/plain-text-reference checks, source fact checks and self-review of the complete diff. Check both working/staged diffs and `git diff --check origin/main...HEAD`. Rendering/tests/builds are not required for prose-only changes, and CI skips pushes that touch only `docs/**` or `*.md`. No source/asset change can be disguised as documentation-only.
 
 ## Browser regression checks for the current prototype

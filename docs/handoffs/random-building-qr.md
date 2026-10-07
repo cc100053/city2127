@@ -1,11 +1,11 @@
 # Random building QR
 
 - Owner: User with Codex
-- Status: IMPLEMENTED; final integration browser check in progress
+- Status: IMPLEMENTED; QR checks PASS; broad integration browser check PARTIAL
 - Branch: `feat/random-building-qr`
 - Base commit: `4eda49ebae30e6215e6f67f17e8fef197832b34e`
-- Last verified commit: pending commit; current source verified against starting HEAD `f0df881bef504c5bb911abf3626187722eb91be6`
-- Remote availability: NOT PUSHED
+- Last verified commit: `eb8de23df534fb1d319f25246471c0b0f21e67fd` (code snapshot; final metadata update is documentation-only)
+- Remote availability: PUSHED to `origin/feat/random-building-qr`; not merged to main
 
 ## Session Git state
 
@@ -31,18 +31,19 @@ Current stage reads `/api/archives/:id` before constructing the QR. `futureBuild
 
 ## Actual validation results
 
-- Verification status: QR-specific checks PASS; full integration pending below
+- Verification status: QR-specific checks PASS; broad integration PARTIAL (headless city timeouts, not a QR decode failure)
 - Date and checked commit/worktree: 2026-10-07, task worktree based on `f0df881`
 - Root: full `npm test` PASS, including the new low/mixed/high + two-seed single-building checks; `npm run build` PASS. Initial sandbox run timed out at the existing WebSocket test; targeted rerun and full authorized rerun both passed.
 - QR: `npm test` 13/13 PASS; `npm run build` PASS. Final `verify-building-qr.mjs` Chrome PASS for all three tower/two pavilion silhouettes, complete projected bounds, non-overexposed blue glass, snapshot-only candidates, stable reload, repeated actual-canvas decoding, integrated 750×620 view and WebGL fallback. Evidence in ignored `qr-hud/test-results/building-qr-*-family-*.png` and scan/city captures, generated this session; no FPS claim.
 - Integrated build: `node scripts/exhibition.mjs build` PASS (root + survey + QR); no dependency/lockfile changes. Existing bundle-size warnings remain.
-- Integration browser: isolated scratch SQLite on localhost:8789; correct future-building source/revision and actual QR `/city/:id` decode PASS. With extended wait, shared-display canvas/screenshot PASS. The initial phone check exposed a harness race (loading-detached can pass before initialization); now explicitly waits for `canvas[data-archive-id]`. Final complete rerun is pending. No production proposals/resets were submitted.
+- Integration browser: isolated scratch SQLite on localhost:8789; correct future-building source/revision and actual QR `/city/:id` decode PASS; shared-display canvas/screenshot PASS with extended wait. One run also passed archived phone layout, zoom, touch rotation, zero live WebSockets, later-proposal isolation and reload, then timed out navigating to `/city/unknown`. The last rerun timed out at a default 30 s phone-canvas attribute query despite its longer initialization wait. The harness now waits for `canvas[data-archive-id]` before checking the loading label (which can otherwise be absent before initialization) and releases the already-checked display scene. Full end-to-end script is **not green** on this host; do not infer physical phone/performance acceptance. No production proposals/resets were submitted.
 - Documentation: affected local Markdown links PASS; diff whitespace PASS before final commit.
+- Scoped source commit: `eb8de23`; targeted root QR test and standalone QR build passed again after committing. Committed diff whitespace against origin/main PASS. Branch pushed successfully; remote main was not changed and branch CI is not claimed as verified.
 - Integrated commit and checks: NOT INTEGRATED
 
 ## Known issues and blockers
 
-Physical phone scanning and exhibition Wi-Fi require manual validation. Large shared-city startup is slow in this Windows headless environment; extended `INTEGRATION_CITY_TIMEOUT_MS` affects only the test harness, not the app, and does not establish performance acceptance. Remote civic/traffic commits are not integrated in this resumed checkout. Earlier audit note: `qr-hud` reported one high-severity advisory in the preserved standalone backend dependency tree; no new audit/fix was performed here and the integrated survey server does not start that backend.
+Physical phone scanning and exhibition Wi-Fi require manual validation. Large shared-city startup is slow in this Windows headless environment; extended `INTEGRATION_CITY_TIMEOUT_MS` affects only the test harness, not the app, and does not establish performance acceptance. Remote civic/traffic commits are not integrated in this resumed checkout. QR builds now require the complete repository (root source factory/local sky), not a copied `qr-hud`-only directory; its preserved standalone Docker context was not updated or tested (deployment is out of scope). Earlier audit note: `qr-hud` reported one high-severity advisory in the preserved standalone backend dependency tree; no new audit/fix was performed here and the integrated survey server does not start that backend.
 
 ## Important decisions
 
@@ -50,4 +51,4 @@ Choice is deterministic from proposal ID **within the authoritative saved city's
 
 ## Next expected step
 
-Record final integration browser result; save the scoped task commit. The local user can refresh `/guest` with Ctrl+F5 to use the rebuilt QR. Physical phone/venue acceptance and deliberate integration with the concurrent origin/main work remain separate follow-up steps; do not overwrite or auto-merge that work on resume.
+The local user can refresh `/guest` with Ctrl+F5 to use the rebuilt QR; existing 8787 service was read-only checked and serves the new QR bundle. Source is saved/pushed on the task branch. Recheck the broader city integration on a suitable browser host (or consistently extend its remaining default selector timeouts), then physical phone/venue acceptance. Deliberate integration with concurrent origin/main work is still separate; do not overwrite or auto-merge it on resume. Temporary 5198/8789 test services are stopped after validation; the user's 8787 server is left running.
