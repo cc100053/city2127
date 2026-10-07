@@ -28,7 +28,7 @@
 .integrated-qr .building-qr-controls{gap:8px}
 .integrated-qr .building-qr-controls button{min-height:40px;border-color:#9fb0a6;background:#fffefa;color:#25453c;font:700 12px/1.2 system-ui,"Yu Gothic",Meiryo,sans-serif}
 .integrated-qr .building-qr-controls button[aria-pressed=true]{border-color:#176653;background:#176653;color:#fff}
-.integrated-qr .building-qr-controls span{color:#52635c;font:11px/1.5 system-ui,"Yu Gothic",Meiryo,sans-serif}
+.integrated-qr .building-qr-controls span{order:-1;color:#25453c;font:700 14px/1.5 system-ui,"Yu Gothic",Meiryo,sans-serif}
 .integrated-qr .transfer{background:#edf2ec;color:#25453c}
 .integrated-qr .transfer-symbol,.integrated-qr .transfer-value{color:#176653}
 .integrated-qr .progress-track{background:#cbd5ce}

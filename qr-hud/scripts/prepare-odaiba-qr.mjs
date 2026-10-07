@@ -23,8 +23,8 @@ const cityColors = {
 };
 const models = [];
 for (const [id, label] of [
-  ['aqua-city-odaiba', 'アクアシティお台場'],
-  ['divercity-tokyo-plaza', 'ダイバーシティ東京プラザ'],
+  ['divercity-office-tower', 'ダイバーシティオフィスタワー'],
+  ['hilton-tokyo-odaiba', 'ヒルトン東京お台場'],
   ['grand-nikko-tokyo-daiba', 'グランドニッコー東京 台場'],
 ]) {
   const path = `asset/models/${id}/${id}.glb`;
@@ -48,7 +48,9 @@ for (const [id, label] of [
     for (let i = 0; i < p.count; i++) {
       point.fromBufferAttribute(p, i).applyMatrix4(mesh.matrixWorld);
       point.sub(new T.Vector3(center.x, bounds.min.y, center.z)).multiplyScalar(scale);
-      const v = point.toArray().map(n => Math.round(n / .035) * .035);
+      // Retain enough facade/roof silhouette to recognise the real building;
+      // .035 erased the low, wide malls into a handful of anonymous slabs.
+      const v = point.toArray().map(n => Math.round(n / .015) * .015);
       normal.fromBufferAttribute(geometry.attributes.normal, i).applyMatrix3(normalMatrix).normalize();
       const n = normal.toArray().map(value => +value.toFixed(5));
       const key = [...v, color.getHex()].join(',');

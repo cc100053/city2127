@@ -8,8 +8,8 @@ test('a proposal keeps the same QR landmark', () => {
 
 test('QR candidates are landmarks loaded in the visible city district', () => {
   assert.deepEqual(QR_LANDMARKS.map(landmark => landmark.id), [
-    'aqua-city-odaiba',
-    'divercity-tokyo-plaza',
+    'divercity-office-tower',
+    'hilton-tokyo-odaiba',
     'grand-nikko-tokyo-daiba',
   ]);
 });

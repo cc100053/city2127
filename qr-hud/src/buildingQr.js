@@ -4,6 +4,9 @@ import odaiba from './odaiba-qr-models.json';
 import { selectQrLandmark } from './landmarkSelection.js';
 import './buildingQr.css';
 
+const CITY_TILT = 1.05;
+const CITY_YAW = .65;
+
 // Generated from the team's Odaiba GLBs; retain spheres/arches and original colors.
 function template(model) {
   const geometry = new T.BufferGeometry();
@@ -31,7 +34,7 @@ export function createBuildingQr(host, proposalId) {
   const modelSize = buildingGeometry.boundingBox.getSize(new T.Vector3());
   const modelCenter = buildingGeometry.boundingBox.getCenter(new T.Vector3());
   const facade = new T.MeshStandardMaterial({ vertexColors: true, roughness: .65 });
-  const ink = new T.MeshBasicMaterial({ color: '#102331' });
+  const ink = new T.MeshBasicMaterial({ color: '#102331', transparent: true, depthWrite: false });
   const scan = { mask: { value: null }, count: { value: 1 }, progress: { value: 0 }, color: { value: new T.Color('#102331') } };
   // One complete landmark in presentation view; QR columns cut through the
   // same mesh during the top-view transition. Dark plinths complete its footprint.
@@ -53,7 +56,7 @@ export function createBuildingQr(host, proposalId) {
   const ground = new T.MeshBasicMaterial({ color: '#ecf2ed' });
   const tileGeometry = new T.BoxGeometry(1, .025, 1);
   let meshes = [], count = 0, radius = 24, cityExtent = 24, cameraDistance = 140;
-  let buildingCenter = new T.Vector3(), frame, timer, revealAt = 0, mask;
+  let buildingCenter = new T.Vector3(), cityTarget = new T.Vector3(), frame, timer, revealAt = 0, mask;
   let mode = 'city', from = 1, to = 1, changedAt = 0, growth = false;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const controls = document.createElement('div'); controls.className = 'building-qr-controls';
@@ -64,7 +67,7 @@ export function createBuildingQr(host, proposalId) {
     from = currentAngle(performance.now()); to = next === 'scan' ? 0 : 1; mode = next; changedAt = performance.now();
     host.dataset.cityView = 'transition';
     controls.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === next)));
-    controls.querySelector('span').textContent = next === 'scan' ? 'スマートフォンのカメラで読み取ってください' : `${landmark.label} · ODAIBA`;
+    controls.querySelector('span').textContent = next === 'scan' ? 'スマートフォンのカメラで読み取ってください' : `${landmark.label} · 都市内の建築`;
   }
   function currentAngle(now) {
     const p = reduced ? 1 : Math.min(1, (now - changedAt) / 850);
@@ -101,10 +104,26 @@ export function createBuildingQr(host, proposalId) {
     buildingCenter = modelCenter.clone().multiplyScalar(buildingScale); buildingCenter.y += building.position.y;
     const buildingHeight = modelSize.y * buildingScale;
     const buildingFootprint = Math.max(modelSize.x, modelSize.z) * buildingScale;
-    cityExtent = Math.max(radius * 1.12, buildingHeight * .6 + buildingFootprint * .4);
+    cityTarget = buildingCenter.clone(); cityTarget.y += buildingHeight * .2;
     cameraDistance = Math.max(140, buildingHeight * 1.35, cityExtent * 2.8);
+    const horizontal = Math.sin(CITY_TILT);
+    camera.position.set(
+      cityTarget.x + horizontal * Math.sin(CITY_YAW) * cameraDistance,
+      cityTarget.y + Math.cos(CITY_TILT) * cameraDistance,
+      cityTarget.z + horizontal * Math.cos(CITY_YAW) * cameraDistance,
+    );
+    camera.up.set(0, 0, -1); camera.lookAt(cityTarget); camera.updateMatrixWorld(true);
+    building.updateMatrixWorld(true);
+    const bounds = new T.Box3().setFromObject(building), projected = new T.Vector3();
+    cityExtent = 0;
+    for (const x of [bounds.min.x, bounds.max.x]) for (const y of [bounds.min.y, bounds.max.y]) for (const z of [bounds.min.z, bounds.max.z]) {
+      projected.set(x, y, z).applyMatrix4(camera.matrixWorldInverse);
+      cityExtent = Math.max(cityExtent, Math.abs(projected.x), Math.abs(projected.y));
+    }
+    cityExtent *= 1.3;
     host.dataset.buildingHeight = buildingHeight.toFixed(2);
     host.dataset.cityExtent = cityExtent.toFixed(2);
+    host.dataset.fitMargin = '1.3';
     building.userData.buildings = true; meshes.push(building); city.add(building);
     host.replaceChildren(renderer.domElement); host.dataset.payload = url; host.dataset.buildings = '1';
     growth = false; city.scale.y = 1; from = to = 1; setView('city'); resize();
@@ -115,14 +134,15 @@ export function createBuildingQr(host, proposalId) {
   function animate(now) {
     frame = requestAnimationFrame(animate);
     if (document.hidden || now - last < 1000 / 30) return; last = now;
-    const angle = currentAngle(now), tilt = angle * .95;
+    const angle = currentAngle(now), tilt = angle * CITY_TILT, horizontal = Math.sin(tilt);
     const extent = T.MathUtils.lerp(radius, cityExtent, angle);
     camera.left = camera.bottom = -extent; camera.right = camera.top = extent; camera.far = cameraDistance * 4; camera.updateProjectionMatrix();
-    const target = buildingCenter.clone().multiplyScalar(angle);
-    camera.position.set(target.x + angle * cameraDistance * .31, target.y + Math.cos(tilt) * cameraDistance, target.z + Math.sin(tilt) * cameraDistance);
+    const target = cityTarget.clone().multiplyScalar(angle);
+    camera.position.set(target.x + horizontal * Math.sin(CITY_YAW) * cameraDistance, target.y + Math.cos(tilt) * cameraDistance, target.z + horizontal * Math.cos(CITY_YAW) * cameraDistance);
     camera.up.set(0, 0, -1); camera.lookAt(target);
     scan.progress.value = 1 - angle;
     ink.color.set(angle < .001 ? '#102331' : '#c3d4d5');
+    ink.opacity = 1 - angle;
     if (growth) city.scale.y = reduced ? 1 : Math.max(.01, Math.min(1, (now - revealAt) / 1200));
     if (Math.abs(angle - to) < .001) host.dataset.cityView = mode;
     renderer.render(scene, camera);

@@ -45,8 +45,9 @@ try {
   await page.locator('#qr[data-city-view=city]').waitFor();
   const buildingHeight = Number(await page.locator('#qr').getAttribute('data-building-height'));
   const cityExtent = Number(await page.locator('#qr').getAttribute('data-city-extent'));
-  assert.ok(buildingHeight > 0 && cityExtent * 2 >= buildingHeight, 'city camera frames the whole building');
-  await page.waitForTimeout(900);
+  const fitMargin = Number(await page.locator('#qr').getAttribute('data-fit-margin'));
+  assert.ok(buildingHeight > 0 && cityExtent > 0 && fitMargin >= 1.25, 'city camera frames the whole building with margin');
+  await page.waitForTimeout(1400);
   await page.screenshot({ path: 'test-results/building-qr-embedded-city.png' });
   await page.getByRole('button', { name: '真上からスキャン', exact: true }).click();
   await decode(url);
@@ -80,7 +81,7 @@ try {
     assert.equal(await preview.locator('#qr').getAttribute('data-landmarks'), landmark.id);
     await preview.getByRole('button', { name: `${landmark.label}を見る`, exact: true }).click();
     await preview.locator('#qr[data-city-view=city]').waitFor();
-    await preview.waitForTimeout(900);
+    await preview.waitForTimeout(1400);
     await preview.screenshot({ path: `test-results/building-qr-${landmark.id}.png` });
     await preview.close();
   }

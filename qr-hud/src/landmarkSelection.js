@@ -1,6 +1,6 @@
 export const QR_LANDMARKS = [
-  { id: 'aqua-city-odaiba', label: 'アクアシティお台場' },
-  { id: 'divercity-tokyo-plaza', label: 'ダイバーシティ東京プラザ' },
+  { id: 'divercity-office-tower', label: 'ダイバーシティオフィスタワー' },
+  { id: 'hilton-tokyo-odaiba', label: 'ヒルトン東京お台場' },
   { id: 'grand-nikko-tokyo-daiba', label: 'グランドニッコー東京 台場' },
 ];
 
