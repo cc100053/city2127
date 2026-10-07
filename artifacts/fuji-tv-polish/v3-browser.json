@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-07",
+  "browser": "Codex in-app browser on development Mac",
+  "baseCommit": "782bac75973cfe5ce683fe9fa76940c7588051cf",
+  "civicSourceSHA256": "0d89991533d80c162b426e1472360b4af59e96ca3602c9f0f477d781ee39d99f",
+  "note": "DOM diagnostics are capture-time snapshots, not a sustained FPS benchmark; GPU and exhibition hardware not tested.",
+  "views": [
+    {
+      "view": "civic-day",
+      "url": "http://127.0.0.1:5174/?hour=16&review=civic&reviewTime=40",
+      "canvas": {
+        "dataset": {
+          "engine": "three.js r180"
+        },
+        "height": 720,
+        "width": 1280
+      },
+      "logs": []
+    },
+    {
+      "view": "civic-night",
+      "url": "http://127.0.0.1:5174/?hour=22&review=civic&reviewTime=40",
+      "canvas": {
+        "dataset": {
+          "engine": "three.js r180"
+        },
+        "height": 720,
+        "width": 1280
+      },
+      "logs": []
+    },
+    {
+      "view": "hero-day",
+      "url": "http://127.0.0.1:5174/?hour=16&reviewTime=40",
+      "canvas": {
+        "dataset": {
+          "engine": "three.js r180"
+        },
+        "height": 720,
+        "width": 1280
+      },
+      "logs": []
+    },
+    {
+      "view": "hero-low-day",
+      "url": "http://127.0.0.1:5174/?hour=12&reviewTime=40&meters=nw:-12,ne:-12,sw:-12,se:-12",
+      "canvas": {
+        "dataset": {
+          "engine": "three.js r180"
+        },
+        "height": 720,
+        "width": 1280
+      },
+      "logs": []
+    },
+    {
+      "view": "hero-mixed-dusk",
+      "url": "http://127.0.0.1:5174/?hour=18.5&reviewTime=40&meters=nw:0,ne:0,sw:0,se:0",
+      "canvas": {
+        "dataset": {
+          "engine": "three.js r180"
+        },
+        "height": 720,
+        "width": 1280
+      },
+      "logs": []
+    },
+    {
+      "view": "hero-high-night",
+      "url": "http://127.0.0.1:5174/?hour=22&reviewTime=40&meters=nw:12,ne:12,sw:12,se:12",
+      "canvas": {
+        "dataset": {
+          "engine": "three.js r180"
+        },
+        "height": 720,
+        "width": 1280
+      },
+      "logs": []
+    },
+    {
+      "view": "ordinary-desktop-resize",
+      "url": "http://127.0.0.1:5174/?hour=22&reviewTime=40&meters=nw:12,ne:12,sw:12,se:12",
+      "canvas": {
+        "backingHeight": 900,
+        "backingWidth": 1440,
+        "height": 900,
+        "width": 1440
+      },
+      "logs": []
+    }
+  ],
+  "implementationCommit": "f504484be71e306aa1fbd1b43286439fcb4cd038"
+}
