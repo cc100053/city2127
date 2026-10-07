@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS
 - Branch: codex/fuji-tv-polish
 - Base commit: 4eda49ebae30e6215e6f67f17e8fef197832b34e
-- Last verified commit: round-7 publication on origin/codex/fuji-tv-polish (source SHA-256 `b037643b…6de09f`); starting round 6 `1198b2f`
+- Last verified commit: round-8 publication on origin/codex/fuji-tv-polish (source SHA-256 `9dbae83b…c69109`); starting round 7 `7d263ce`
 - Remote availability: origin/codex/fuji-tv-polish; resolve this Git ref for latest implementation/evidence publication. Prior code 0076bad0 is integrated on main; v3 is a separate implementation.
 
 ## Session Git state
@@ -17,11 +17,11 @@ Polish the procedural Fuji TV civic core using [CITY MASTER TASTE](../ODAIBA_212
 
 ## Completed work
 
-Target v3 round 7's three implementation passes and source/browser checks complete; visual review remains pending on the feature branch. Prior runtime polish is integrated on main. Historical stage evidence is preserved below.
+Target v3 round 8's three implementation passes and source/browser checks complete; visual review remains pending on the feature branch. Prior runtime polish is integrated on main. Historical stage evidence is preserved below.
 
 ## Actual validation results
 
-V3 round-7 root tests/build/whitespace and specified browser checks PASS on starting `1198b2f` plus the source delta recorded below; target fidelity remains PARTIAL. Prior implementation is integrated through `f64af18`; v3 is not integrated.
+V3 round-8 root tests/build/whitespace and specified browser checks PASS on starting `7d263ce` plus the source delta recorded below; target fidelity remains PARTIAL. Prior implementation is integrated through `f64af18`; v3 is not integrated.
 
 ## Known issues and blockers
 
@@ -29,7 +29,7 @@ No failing source checks. Target fidelity remains partial; performance/hardware 
 
 ## Next expected step
 
-User reviews the v3 round-7 final screenshot ([v3r7-pass3](../../artifacts/fuji-tv-polish/v3r7-pass3.jpg)). Further passes or integration follow that review; keep this result on `codex/fuji-tv-polish` in the meantime.
+User reviews the v3 round-8 final screenshot ([v3r8-pass3](../../artifacts/fuji-tv-polish/v3r8-pass3.jpg)). Further passes or integration follow that review; keep this result on `codex/fuji-tv-polish` in the meantime.
 
 ## Target and pass 1 (2026-10-07)
 
@@ -188,3 +188,17 @@ Each pass: root `npm test`, `npm run build` (existing >500kB warning), `git diff
 Evidence: [pass1](../../artifacts/fuji-tv-polish/v3r7-pass1.jpg), [pass1 night](../../artifacts/fuji-tv-polish/v3r7-pass1-night.jpg), [pass2](../../artifacts/fuji-tv-polish/v3r7-pass2.jpg), [pass2 night](../../artifacts/fuji-tv-polish/v3r7-pass2-night.jpg), [final day](../../artifacts/fuji-tv-polish/v3r7-pass3.jpg), [final night](../../artifacts/fuji-tv-polish/v3r7-pass3-night.jpg), [hero](../../artifacts/fuji-tv-polish/v3r7-hero.jpg), [low day](../../artifacts/fuji-tv-polish/v3r7-hero-low-day.jpg), [mixed dusk](../../artifacts/fuji-tv-polish/v3r7-hero-mixed-dusk.jpg), [high night](../../artifacts/fuji-tv-polish/v3r7-hero-high-night.jpg), [browser/geometry record](../../artifacts/fuji-tv-polish/v3r7-browser.json).
 
 Target fidelity PARTIAL: changes are subtle at the review camera. The target still has fewer/taller lit floors, a larger warm theatre, visible stage beams (would need a new transparent finish beyond the nine-batch limit) and a busier ground lobby. Side galleries are open at their rear ends (z57.5–62.5), possibly visible at oblique angles. No new test added: changed geometry is covered by existing floor-support, route, actor and batch checks. Sustained FPS, exhibition hardware, Windows/Safari and live survey browser NOT RUN; survey/module-swap unchanged and not rerun. Stop after three passes for user visual review; no main integration.
+
+## Target v3 implementation round 8 (2026-10-07)
+
+Orchestrator: Claude (Opus 5.5). User requested “再做多三輪” after reviewing round 7. Startup: fetch succeeded; `codex/fuji-tv-polish` clean at `7d263ce`, local/remote 0/0. Target unchanged (SHA-256 `5cd1ea14…939737`). Baseline is the round-7 final civic16 capture. Three sequential Claude Opus workers with fresh contexts.
+
+- Pass1: near-clear face-on glazing (silver-glass Fresnel `mix(1.2,.12)`), warmer/brighter room light with wider per-room variation, violet theatre wall wash; blue screens reduced to every 2nd bay on studio levels and every 5th elsewhere; side-gallery blue backdrops only on studio levels; Y=102 becomes a third live-studio level.
+- Pass2: wing back walls become dark with a1m warm ceiling cove; building-local `solar` clone warmed to umber `#3b3430` (shared city finishes unchanged; also tints seats/treads/people); room light desaturated `#ffcf86`, lit floors dimmed less; escalator treads dark.
+- Pass3: the two inner dome shells merge into one inward `publicLight` shell (0.24π–0.70π) fading from violet to navy toward the crown; each diagonal gets a2.4m blue glass bay-side balustrade with lit rail and a2.5m blue glass fascia.
+
+Each pass: root `npm test`, `npm run build` (existing >500kB warning), `git diff --check` exit0; no orchestrator fix needed (raised balustrades pass the existing route-clearance checks). Day16/night22 civic captures every pass; final also hero16, all-low(−12)12, all-mixed(0)18.5, all-high(+12)22 and ordinary resize1440×900→1280×720 (canvas follows). All10 captures report0 console errors/warnings (headless Chrome154 via playwright-cli, DPR1). Screenshots visually reviewed. Final code SHA-256 `9dbae83b4e49a2fcad207bee8ef86fe8583b243cdc08986cd8d25f9ad7c69109`; 9 batches, 3,166,444 triangles, bounds unchanged. Geometry counts are not performance evidence.
+
+Evidence: [pass1](../../artifacts/fuji-tv-polish/v3r8-pass1.jpg), [pass1 night](../../artifacts/fuji-tv-polish/v3r8-pass1-night.jpg), [pass2](../../artifacts/fuji-tv-polish/v3r8-pass2.jpg), [pass2 night](../../artifacts/fuji-tv-polish/v3r8-pass2-night.jpg), [final day](../../artifacts/fuji-tv-polish/v3r8-pass3.jpg), [final night](../../artifacts/fuji-tv-polish/v3r8-pass3-night.jpg), [hero](../../artifacts/fuji-tv-polish/v3r8-hero.jpg), [low day](../../artifacts/fuji-tv-polish/v3r8-hero-low-day.jpg), [mixed dusk](../../artifacts/fuji-tv-polish/v3r8-hero-mixed-dusk.jpg), [high night](../../artifacts/fuji-tv-polish/v3r8-hero-high-night.jpg), [browser/geometry record](../../artifacts/fuji-tv-polish/v3r8-browser.json).
+
+Target fidelity PARTIAL: the target still has fewer/taller lit floors, a larger warm theatre visible past the right wing (moving the wing would break the kept footprint and berth checks), stage beams and a busier ground lobby. Brighter room light raises night bloom slightly. No new test: changed geometry/shaders are covered by existing support, route-clearance, actor and batch checks. Sustained FPS, exhibition hardware, Windows/Safari and live survey browser NOT RUN; survey/module-swap unchanged and not rerun. Stop after three passes for user visual review; no main integration.

@@ -1,0 +1,117 @@
+{
+ "date": "2026-10-07",
+ "baselineCommit": "7d263ce",
+ "branch": "codex/fuji-tv-polish",
+ "targetSha256": "5cd1ea14cf90bc5b39c1320b2cc340a81f8de181ac883aa6bb8f40b0de939737",
+ "platform": "Development Mac, headless Chrome via installed playwright-cli (UA Chrome/154)",
+ "viewport": [
+  1280,
+  720
+ ],
+ "devicePixelRatio": 1,
+ "geometry": {
+  "batches": 9,
+  "triangles": 3166444,
+  "bounds": {
+   "min": [
+    -77.49,
+    -4.64,
+    -46.99
+   ],
+   "max": [
+    73.49,
+    142.46,
+    79
+   ]
+  },
+  "sourceSha256": "9dbae83b4e49a2fcad207bee8ef86fe8583b243cdc08986cd8d25f9ad7c69109"
+ },
+ "captures": [
+  {
+   "name": "pass1",
+   "url": "http://127.0.0.1:5174/?hour=16&review=civic&reviewTime=40",
+   "consoleErrors": 0,
+   "consoleWarnings": 0
+  },
+  {
+   "name": "pass1-night",
+   "url": "http://127.0.0.1:5174/?hour=22&review=civic&reviewTime=40",
+   "consoleErrors": 0,
+   "consoleWarnings": 0
+  },
+  {
+   "name": "pass2",
+   "url": "http://127.0.0.1:5174/?hour=16&review=civic&reviewTime=40",
+   "consoleErrors": 0,
+   "consoleWarnings": 0
+  },
+  {
+   "name": "pass2-night",
+   "url": "http://127.0.0.1:5174/?hour=22&review=civic&reviewTime=40",
+   "consoleErrors": 0,
+   "consoleWarnings": 0
+  },
+  {
+   "name": "pass3",
+   "url": "http://127.0.0.1:5174/?hour=16&review=civic&reviewTime=40",
+   "consoleErrors": 0,
+   "consoleWarnings": 0
+  },
+  {
+   "name": "pass3-night",
+   "url": "http://127.0.0.1:5174/?hour=22&review=civic&reviewTime=40",
+   "consoleErrors": 0,
+   "consoleWarnings": 0
+  },
+  {
+   "name": "hero",
+   "url": "http://127.0.0.1:5174/?hour=16&reviewTime=40",
+   "consoleErrors": 0,
+   "consoleWarnings": 0
+  },
+  {
+   "name": "hero-low-day",
+   "url": "http://127.0.0.1:5174/?hour=12&reviewTime=40&meters=nw%3A-12%2Cne%3A-12%2Csw%3A-12%2Cse%3A-12",
+   "consoleErrors": 0,
+   "consoleWarnings": 0
+  },
+  {
+   "name": "hero-mixed-dusk",
+   "url": "http://127.0.0.1:5174/?hour=18.5&reviewTime=40&meters=nw%3A0%2Cne%3A0%2Csw%3A0%2Cse%3A0",
+   "consoleErrors": 0,
+   "consoleWarnings": 0
+  },
+  {
+   "name": "hero-high-night",
+   "url": "http://127.0.0.1:5174/?hour=22&reviewTime=40&meters=nw%3A12%2Cne%3A12%2Csw%3A12%2Cse%3A12",
+   "consoleErrors": 0,
+   "consoleWarnings": 0
+  }
+ ],
+ "resize": [
+  {
+   "viewport": [
+    1440,
+    900
+   ],
+   "canvas": [
+    1440,
+    900,
+    1440,
+    900
+   ]
+  },
+  {
+   "viewport": [
+    1280,
+    720
+   ],
+   "canvas": [
+    1280,
+    720,
+    1280,
+    720
+   ]
+  }
+ ]
+}

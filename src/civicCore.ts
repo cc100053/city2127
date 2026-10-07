@@ -8,11 +8,11 @@ export function civicCore() {
   // so occupied rooms read as silhouettes against warm light instead of blue-grey rows.
   const trim=cityTrim.clone();trim.color.set('#f6eee0');
   const stone=cityStone.clone();stone.color.set('#f2e9d8');
-  const solar=citySolar.clone();solar.color.set('#363a44');
+  const solar=citySolar.clone();solar.color.set('#3b3430'); // warm umber: unlit room depth reads brown-dark under the amber light
   // Warm occupied rooms follow the existing city clock, using one shared finish for this building.
-  const publicLight=cityLight.clone();publicLight.color.set('#f2dcb4');publicLight.emissive.set('#ffb04f');publicLight.emissiveIntensity=1;
+  const publicLight=cityLight.clone();publicLight.color.set('#f2dcb4');publicLight.emissive.set('#ffcf86');publicLight.emissiveIntensity=1;
   publicLight.onBeforeCompile=shader=>{
-    shader.uniforms.roomLight={get value(){return 1.2+cityLight.emissiveIntensity*.7;}};
+    shader.uniforms.roomLight={get value(){return 1.45+cityLight.emissiveIntensity*.7;}};
     // Each ~5×6 m room cell gets its own light level, and upward-facing floors glow less than ceilings and screens,
     // so stacked workrooms read as separate occupied rooms with depth instead of one flat lit slab.
     shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vRoomPos;\nvarying float vRoomUp;')
@@ -26,7 +26,11 @@ export function civicCore() {
         // The theatre's inner shell (r≈23.2 about the chamber centre) is a dim stage-wash wall, so rig, stage and audience glow against it.
         float theatreR=length(vRoomPos-vec3(-18.,100.,23.));
         float theatreWall=smoothstep(23.,23.12,theatreR)*(1.-smoothstep(23.28,23.4,theatreR));
-        totalEmissiveRadiance *= roomLight*(.65+.7*roomCell)*mix(1.,.25,roomFloor)*mix(1.,.3,theatreWall);
+        totalEmissiveRadiance *= roomLight*(.55+.9*roomCell)*mix(1.,.4,roomFloor)*mix(1.,.45,theatreWall);
+        // The theatre wall carries a violet stage wash, so the whole auditorium glows blue-violet around the warm rig.
+        totalEmissiveRadiance=mix(totalEmissiveRadiance,vec3(.34,.3,.95)*dot(totalEmissiveRadiance,vec3(.4)),theatreWall);
+        // The dome above the rig fades to a deep navy (not black), so the sphere reads as a lit glass theatre with its house lights.
+        totalEmissiveRadiance*=mix(1.,.2,smoothstep(104.,117.,vRoomPos.y)*theatreWall);
         // Blue-lit seat backs and step lights in the audience rake (below the chamber centre, ahead of the stage) read as violet house seating.
         float theatreSeat=(1.-smoothstep(22.,22.6,theatreR))*step(vRoomPos.y,101.)*step(vRoomPos.z,25.5)*step(totalEmissiveRadiance.r,totalEmissiveRadiance.b);
         totalEmissiveRadiance=mix(totalEmissiveRadiance,vec3(.3,.3,1.)*totalEmissiveRadiance.b,theatreSeat);`);
@@ -40,7 +44,7 @@ export function civicCore() {
   // Fresnel opacity: glass seen face-on is nearly clear (lit rooms and the theatre show through); grazing panes stay silvered.
   silverGlass.onBeforeCompile=shader=>{
     shader.fragmentShader=shader.fragmentShader.replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
-      diffuseColor.a*=mix(1.3,.35,abs(dot(normal,normalize(vViewPosition))));`);
+      diffuseColor.a*=mix(1.2,.12,abs(dot(normal,normalize(vViewPosition))));`);
   };
   silverGlass.customProgramCacheKey=()=>'fuji-silver-glass';
   const head=new T.SphereGeometry(.22,8,6);
@@ -112,7 +116,7 @@ export function civicCore() {
     box(street,[10,2.8,length],[0,0,0],stone);
     // A glazed mobility channel shares the inclined terrain with the planted pedestrian edge.
     box(street,[2.8,.16,length-4],[-1,1.5,0],solar);
-    for(let z=-length/2+3;z<length/2-3;z+=1.6)box(street,[2.6,.1,.12],[-1,1.6,z],trim);
+    for(let z=-length/2+3;z<length/2-3;z+=1.6)box(street,[2.6,.1,.12],[-1,1.6,z],solar);
     // An open escalator with glass balustrades and blue-lit handrails: riders stay visible against the void.
     for(const x of [-2.6,.6]) {
       box(street,[.1,1.7,length-4],[x,2.45,0],x<0 ? glass : silverGlass); // blue outer pane, clear inner pane over the riders
@@ -125,10 +129,15 @@ export function civicCore() {
       standing(rider.x,rider.y,rider.z);
     }
     for(const x of [-5,5]) {
-      box(street,[.25,1.5,length],[x,2,0],membrane);
-      box(street,[.22,.2,length],[x,2.85,0],trim);
+      // The bay-facing edge is a tall blue-glass escalator balustrade with a lit rail, so each diagonal reads as a glazed transfer bank.
+      const bay=x<0;
+      box(street,[.25,bay ? 2.4 : 1.5,length],[x,bay ? 2.4 : 2,0],bay ? glass : membrane);
+      box(street,[.22,.2,length],[x,bay ? 3.65 : 2.85,0],bay ? broadcastLight : trim);
       box(street,[.18,.18,length],[x,.9,0],publicLight);
     }
+    // Blue-glass fascia over the deck's bay face, with a lit lower edge: the incline reads as a dark glazed band against the ivory frame.
+    box(street,[.12,2.5,length-1],[-5.1,-.05,0],glass);
+    box(street,[.14,.16,length-1],[-5.12,-1.3,0],broadcastLight);
     // Continuous soil edge turns the structural incline into a climate street.
     for(let u=.12;u<.95;u+=.16) {
       const p=a.clone().lerp(b,u);
@@ -157,7 +166,7 @@ export function civicCore() {
         for(let dx=-width/2+5;dx<width/2-2;dx+=8)grove(x+dx,y+2.2,56,dx);
         continue;
       }
-      const h=y===43 ? 19.3 : 17.3,studio=y===43 || y===83;
+      const h=y===43 ? 19.3 : 17.3,studio=y===43 || y===83 || y===102;
       // The acoustic block is set back 5 m from each flank, leaving a glazed studio gallery where live production shows from outside.
       box(root,[width-10,h,23],[x,y+1.2+h/2,46],stone);
       // Deep ceramic reveals articulate the sealed acoustic rooms without glazing their sound enclosure.
@@ -209,14 +218,14 @@ export function civicCore() {
       }
       box(root,[width-3,.08,16],[x,y+9.54,9],publicLight);
       box(root,[width-3,1.2,.18],[x,y+10.1,.6],silverGlass);
-      // One continuous warm acoustic wall per floor (cream fins every bay) reads as lit room depth behind the desks,
-      // instead of a checker of separate panels; occasional wall screens hang in front of it.
+      // A dark umber rear wall washed by a warm ceiling cove: rooms keep deep shadow between their lights, so desks,
+      // staff and the hung screens read against it instead of a flat amber wall.
       for(const floor of [y+1.2,y+9.5]) {
         box(root,[width-3,6,.16],[x,floor+3.4,17.05],solar);
-        box(root,[width-4,4.2,.18],[x,floor+3.2,16.9],publicLight);
+        box(root,[width-4,1,.18],[x,floor+4.9,16.9],publicLight);
         box(root,[width-4,.5,.2],[x,floor+5.65,16.85],solar);
         for(let dx=-width/2+3,bay=0;dx<width/2-2;dx+=5,bay++) {
-          if((bay+y)%3===0 && !(studio && floor===y+1.2)) {
+          if((bay+y)%(studio ? 2 : 5)===0 && !(studio && floor===y+1.2)) {
             box(root,[3,1.9,.12],[x+dx,floor+3.5,16.72],solar);
             box(root,[2.7,1.6,.12],[x+dx,floor+3.5,16.64],broadcastLight);
           }
@@ -226,7 +235,7 @@ export function civicCore() {
       // Lit far-side partitions on the -X walls: the review view enters through the +X glazing and crosses the occupied room
       // (desks, staff, ceiling light) to warm, partly video-lit walls, rather than meeting lit panels right behind the glass.
       for(const [floor,zs] of [[y+1.2,[3.5,8.5,13.5,18.5,23.5,28.5]],[y+9.5,[3.5,8.5,13.5]]] as const)zs.forEach((z,i)=>{
-        const liveSet=studio && floor===y+1.2,video=liveSet || (i+y)%3===0;
+        const liveSet=studio && floor===y+1.2,video=liveSet || (i+y)%5===0;
         box(root,[.16,liveSet ? 4.8 : video ? 2.4 : 4.6,3.6],[x-width/2+1.1,floor+(video ? 3.6 : 3.2),z],video ? broadcastLight : publicLight);
         if(liveSet)box(root,[.2,.3,3.6],[x-width/2+1.25,floor+6.2,z],publicLight);
       });
@@ -238,7 +247,7 @@ export function civicCore() {
       for(const side of [-1,1]) {
         const wx=x+side*(width/2-4.95),edge=x+side*(width/2-.5);
         box(root,[.2,h-.4,22.6],[wx,y+1.2+h/2,46],solar);
-        box(root,[.26,6.4,16],[wx,y+6,46],broadcastLight);
+        box(root,[.26,6.4,16],[wx,y+6,46],studio ? broadcastLight : publicLight); // blue LED sets only on studio levels
         for(const z of [40,46,52])box(root,[.3,6.4,.18],[wx,y+6,z],solar);
         box(root,[.28,.35,17],[wx,y+9.5,46],publicLight);
         box(root,[.26,2.6,17],[wx,y+12.6,46],publicLight);
@@ -324,14 +333,12 @@ export function civicCore() {
   // The suspended sphere is a broadcast theatre: a clear upper auditorium over a solid acoustic bowl.
   const chamber=new T.Group();chamber.position.set(-18,100,23);root.add(chamber);
   const skin=new T.Mesh(new T.SphereGeometry(24,48,24,0,Math.PI*2,0,Math.PI*.7),silverGlass);chamber.add(skin);
-  // A dark inner shell closes the auditorium behind its glazing, so stage and rig light read against it, not the rear wing.
-  // A dark dome over a warm lower band: the lit rig, stage and audience glow against it like a live broadcast.
-  for(const [from,span,material] of [[.24,.18,solar],[.42,.28,publicLight]] as const) {
-    const shell=new T.SphereGeometry(23.2,40,8,0,Math.PI*2,Math.PI*from,Math.PI*span),shellIndex=shell.index!;
-    for(let i=0;i<shellIndex.count;i+=3){const t=shellIndex.getX(i+1);shellIndex.setX(i+1,shellIndex.getX(i+2));shellIndex.setX(i+2,t);}
-    (shell.attributes.normal.array as Float32Array).forEach((v,i,normals)=>normals[i]=-v); // inward-facing: only the far interior wall renders
-    chamber.add(new T.Mesh(shell,material));
-  }
+  // An inner stage-wash shell closes the auditorium behind its glazing, so stage and rig light read against it, not the rear wing;
+  // the room-light shader fades it from violet at the rig to navy in the dome.
+  const shell=new T.SphereGeometry(23.2,40,12,0,Math.PI*2,Math.PI*.24,Math.PI*.46),shellIndex=shell.index!;
+  for(let i=0;i<shellIndex.count;i+=3){const t=shellIndex.getX(i+1);shellIndex.setX(i+1,shellIndex.getX(i+2));shellIndex.setX(i+2,t);}
+  (shell.attributes.normal.array as Float32Array).forEach((v,i,normals)=>normals[i]=-v); // inward-facing: only the far interior wall renders
+  chamber.add(new T.Mesh(shell,publicLight));
   // Warm rig ring and spot fixtures under the dome give the theatre its lit crown.
   arc(chamber,16.2,18.2,.3,[0,13.2,0],publicLight);
   arc(chamber,16,18.4,.5,[0,13.5,0],solar);
