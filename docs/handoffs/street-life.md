@@ -1,10 +1,10 @@
 # street-life — Pedestrian and street-traffic polish
 
 - Owner: cc100053
-- Status: IN PROGRESS (rounds 11–12 on the feature branch, not merged by user request; exhibition-machine FPS open)
+- Status: COMPLETE (rounds 11–12 merged to main 2026-10-07; exhibition-machine FPS open)
 - Branch: feat/pedestrian-traffic-life
 - Base commit: 9476fd8b82da523d6f7acee6f1893e5028fb35a0
-- Last verified commit: cdea651d85b2e2573be5658cd583b1894e9caa65 (integrated main: root tests/build/diff-check PASS; tree identical to browser-verified round 10)
+- Last verified commit: 4b75ec0 (integrated main: root tests/build/diff-check PASS; feature tree a540480 browser-verified in round 12)
 - Remote availability: origin/feat/pedestrian-traffic-life contains 708b411; origin/main contains cdea651d85b2e2573be5658cd583b1894e9caa65
 
 ## Session Git state
@@ -379,3 +379,12 @@ Not proposed: signals, pathfinding, new dependencies, interiors, population infe
   (replacing round 11's captures). Console: the missing `/favicon.ico` 404, and once `TypeError: Failed to fetch` in the three.js
   loader chunk (also seen once in round 10; not traced). FPS NOT re-measured.
 - Next: user review, then merge with validation and FPS on the exhibition machine.
+
+### Integration — rounds 11–12 (2026-10-07)
+
+- User asked to merge. Fetch succeeded; `origin/main` `d53eb0e` was 19 ahead of the branch base `4eda49e`, branch 2 ahead
+  (`f06dc7b`, `a540480`). Merged `--no-ff` onto `origin/main` as `4b75ec0` with no conflicts (local `main` is checked out in
+  another worktree, so the merge was made on a detached HEAD and pushed as `HEAD:main`).
+- On the merge result: root `npm test` PASS, `npm run build` PASS, `git diff --check origin/main..HEAD` PASS. No browser re-check
+  (merge touched no file changed on main since the base). FPS NOT RUN.
+- Next: exhibition-machine FPS; optional trace of the intermittent loader `Failed to fetch`.
