@@ -12,7 +12,9 @@
     "server": "node --experimental-strip-types src/server/server.ts",
     "dev:auto": "npm run build && node --experimental-strip-types scripts/devAutoServer.ts",
     "test:meters": "node --experimental-strip-types tests/meterContract.test.ts",
-    "test:auto": "node --experimental-strip-types tests/autoAnswers.test.ts && node --experimental-strip-types tests/devSurvey.test.ts"
+    "test:auto": "node --experimental-strip-types tests/autoAnswers.test.ts && node --experimental-strip-types tests/devSurvey.test.ts",
+    "test:archive": "node --experimental-strip-types tests/archive.test.ts",
+    "posttest": "npm run test:archive"
   },
   "dependencies": {
     "ws": "^8.21.3"

@@ -6,6 +6,23 @@
 
 需要 Git、Node.js **24 或以上**（連 npm），以及支援 WebGL 2 嘅桌面瀏覽器。喺 repo 根目錄執行；每個 terminal tab 要保持開住。首次安裝或 lockfile 更新先跑 `npm ci`。目前係本機展覽流程，未設公開部署。
 
+### 問卷＋隨機建築 QR（整合啟動）
+
+QR 流程用單一 `8787` server 同時供應問卷、共享城市、建築 QR 同每份提案保存嘅 3D 城市。首次先喺 repo 根目錄執行：
+
+```powershell
+npm ci
+npm ci --prefix survey
+npm ci --prefix qr-hud
+node scripts/exhibition.mjs build
+$env:SURVEY_PUBLIC_URL='http://<展覽電腦 LAN IP>:8787'
+node scripts/exhibition.mjs start
+```
+
+主畫面開 `http://127.0.0.1:8787/display/?survey`，問卷開 `http://127.0.0.1:8787/guest`。提交後先保留原本城市閱讀時段，再顯示一棟由提案 ID 穩定隨機選出嘅台場建築；建築會轉成可掃描 QR，連去 `/city/<提案 ID>` 保存城市。現有池係富士電視台、Telecom Center、DiverCity Office Tower；同一提案重新整理唔會換建築。手機必須同展覽電腦喺同一可信 LAN，`SURVEY_PUBLIC_URL` 必須用實際 LAN IP，唔可以用手機自己嘅 `127.0.0.1`。
+
+以下雙 terminal 方式仍可用作一般開發，但唔會供應整合 `/qr/` 同 `/city/` 頁面。
+
 ### Mac：Terminal 開兩個 tab
 
 **Tab 1 — 問卷 server**（API、WebSocket、guest／monitor／admin 頁面，同 SQLite 資料）：

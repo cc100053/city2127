@@ -12,6 +12,19 @@ Guests collectively shape a futuristic Odaiba. Each guest answers four questions
 
 ## Start the exhibition locally
 
+For the integrated questionnaire + building QR flow, install all three packages and run one server from the repository root:
+
+```powershell
+npm ci
+npm ci --prefix survey
+npm ci --prefix qr-hud
+node scripts/exhibition.mjs build
+$env:SURVEY_PUBLIC_URL='http://<exhibition-PC-LAN-IP>:8787'
+node scripts/exhibition.mjs start
+```
+
+Open `http://127.0.0.1:8787/display/?survey` for the shared city and `http://127.0.0.1:8787/guest` for the questionnaire. Each submitted proposal deterministically selects Fuji TV, Telecom Center or DiverCity Office Tower, transforms it into a scannable QR and links to that proposal's archived `/city/:id` scene. Phones must share the trusted LAN; use the PC's real LAN address, not `127.0.0.1`, in `SURVEY_PUBLIC_URL`.
+
 Development auto-answer (DEV-ONLY): run `cd survey && npm run dev:auto`, open `http://127.0.0.1:8788/guest?dev-auto`, and connect root Vite at `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8788/ws`. Every launch creates a new retained scratch SQLite; it never uses the exhibition DB. The opt-in localhost panel drives the existing Guest flow and uses the same automatic next-session handoff as normal guests. Remove the development panel or move it to Admin before exhibition use. See the [survey guide](survey/README.md).
 
 Install Git and **Node.js 24+** (including npm). Use a desktop browser with WebGL 2. Keep both terminal tabs running. Run each command from the repository root unless a step changes directory. The project has no public deployment setup.

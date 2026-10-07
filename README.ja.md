@@ -12,6 +12,19 @@ A/B のリセットは新しい開始を停止し、両方の回答・結果・�
 
 ## 展示をローカルで起動する
 
+アンケート＋建物QRの統合フローは、repository root で次を実行します。
+
+```powershell
+npm ci
+npm ci --prefix survey
+npm ci --prefix qr-hud
+node scripts/exhibition.mjs build
+$env:SURVEY_PUBLIC_URL='http://<展示PCのLAN-IP>:8787'
+node scripts/exhibition.mjs start
+```
+
+共有城市は `http://127.0.0.1:8787/display/?survey`、アンケートは `http://127.0.0.1:8787/guest` で開きます。投稿ごとにフジテレビ、テレコムセンター、ダイバーシティオフィスタワーから1棟を安定して選び、読み取り可能な建物QRへ変化させ、その投稿の `/city/:id` 保存城市へ連結します。スマートフォンは同じ信頼できるLANに接続し、`SURVEY_PUBLIC_URL` に `127.0.0.1` ではなく展示PCのLANアドレスを使います。
+
 開発用自動回答（DEV-ONLY）：`cd survey && npm run dev:auto` で新しい独立テスト SQLite を起動し、`http://127.0.0.1:8788/guest?dev-auto` を開きます。街はルート Vite の `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8788/ws` に接続します。localhost 専用の任意起動パネルが既存 Guest フローを繰り返し、次の質問開始時に自動で交代します。展示前に開発パネルを削除、または Admin に移してください。詳細は[アンケートの説明](survey/README.md)を参照。
 
 Git と **Node.js 24 以上**（npm を含む）、WebGL 2 対応のデスクトップブラウザーが必要です。二つのターミナルタブを起動したままにします。特記がなければ、リポジトリのルートから実行してください。公開デプロイの設定はありません。

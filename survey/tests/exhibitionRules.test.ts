@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { fileURLToPath } from 'node:url';
 import { CITY_AXES, initialExhibitionState, zeroScores, type CityAxis, type ExhibitionState, type ExhibitionVotes, type Vote } from '../src/shared/citySurveyState.ts';
 import { deriveExhibitionLayout, exhibitionBand, type ExhibitionSocketId } from '../src/shared/cityView.ts';
 import { loadQuestionSetFile, QuestionSetError, validateExhibitionQuestionSet } from '../src/survey/questionLoader.ts';
@@ -87,7 +88,7 @@ assert.deepEqual({
 assert.throws(() => exhibitionBand(Number.POSITIVE_INFINITY), RangeError);
 assert.throws(() => deriveExhibitionLayout({ ...zeroScores(), automation: -13 }), RangeError);
 
-const questionPath = new URL('../src/survey/questions.exhibition.json', import.meta.url).pathname;
+const questionPath = fileURLToPath(new URL('../src/survey/questions.exhibition.json', import.meta.url));
 const questionSet = validateExhibitionQuestionSet(loadQuestionSetFile(questionPath));
 assert.equal(questionSet.version, 3);
 assert.equal(validateExhibitionQuestionSet({ ...questionSet, version: 2 }).version, 2);

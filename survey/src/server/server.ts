@@ -18,6 +18,7 @@ import { attachRealtime } from './realtime.ts';
 import { createProposalSession, getProposalSession, submitProposal, endStationSession } from './proposalService.ts';
 import { UnsupportedRunVersionError } from './runStore.ts';
 import { devSurveyConfig } from './devSurvey.ts';
+import { archiveRecord } from './archiveService.ts';
 
 const statusFor: Record<ErrorCode, number> = {
   bad_request: 400, not_found: 404, forbidden: 403, internal_error: 500,
@@ -68,11 +69,16 @@ export type SurveyServerOptions = {
   devAuto?: boolean;
   /** Directory with the Vite build (guest.html, monitor.html, admin.html, assets/). */
   staticDir?: string;
+  /** Optional integrated exhibition builds, served by the same LAN origin as the questionnaire. */
+  cityDir?: string;
+  qrDir?: string;
+  publicUrl?: string;
   /** Source address used for the loopback check; tests substitute a LAN address here. */
   remoteAddress?: (req: IncomingMessage) => string | undefined;
 };
 
-export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddress = req => req.socket.remoteAddress }: SurveyServerOptions) {
+export function createSurveyServer({ ctx, staticDir, cityDir, qrDir, publicUrl, devAuto = false, remoteAddress = req => req.socket.remoteAddress }: SurveyServerOptions) {
+  const publicOrigin = publicUrl ? new URL(publicUrl).origin : undefined;
   const server = createServer((req, res) => {
     handle(req, res).catch(error => {
       if (error instanceof UnsupportedRunVersionError) {
@@ -101,9 +107,9 @@ export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddr
     if (outcome.event) realtime.broadcast(outcome.event);
   };
 
-  async function serveFile(res: ServerResponse, relative: string) {
-    if (!staticDir) throw new HttpError(404, 'not_found', 'Not found.');
-    const root = resolve(staticDir), file = resolve(root, '.' + relative);
+  async function serveFile(res: ServerResponse, relative: string, directory = staticDir) {
+    if (!directory) throw new HttpError(404, 'not_found', 'Not found.');
+    const root = resolve(directory), file = resolve(root, '.' + relative);
     if (!file.startsWith(root + sep)) throw new HttpError(404, 'not_found', 'Not found.');
     let body: Buffer;
     try { body = await readFile(file); }
@@ -114,6 +120,20 @@ export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddr
 
   async function handle(req: IncomingMessage, res: ServerResponse) {
     const url = new URL(req.url ?? '/', 'http://localhost'), path = url.pathname, method = req.method ?? 'GET';
+    const archive = /^\/api\/(sessions|archives)\/([A-Za-z0-9_-]{1,128})$/.exec(path);
+    if (archive && method === 'GET') {
+      const record = archiveRecord(ctx, archive[2]);
+      if (!record) throw new HttpError(404, 'not_found', 'Archive not found.');
+      const origin = publicOrigin ?? `http://${req.headers.host}`;
+      res.writeHead(200, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' });
+      res.end(JSON.stringify({ ...record, city_url: `${origin}/city/${encodeURIComponent(archive[2])}` }));
+      return;
+    }
+    if ((method === 'GET' || method === 'HEAD') && path.startsWith('/display/'))
+      return serveFile(res, path === '/display/' ? '/index.html' : path.slice('/display'.length), cityDir);
+    if ((method === 'GET' || method === 'HEAD') && path.startsWith('/qr/'))
+      return serveFile(res, path === '/qr/' ? '/index.html' : path.slice('/qr'.length), qrDir);
+    if (method === 'GET' && /^\/city\/[A-Za-z0-9_-]{1,128}\/?$/.test(path)) return serveFile(res, '/index.html', cityDir);
     const isAdmin = path === '/admin' || path === '/admin.html' || path.startsWith('/api/admin/');
     if (isAdmin && !isLoopbackAddress(remoteAddress(req))) throw new HttpError(403, 'forbidden', 'Admin is available only from the exhibition PC (loopback).');
 
@@ -189,12 +209,19 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const port = Number(env.SURVEY_PORT ?? 8787), host = env.SURVEY_HOST ?? '127.0.0.1';
   const dbPath = resolve(env.SURVEY_DB_PATH ?? 'data/survey.sqlite');
   const ctx = createContext({ dbPath, questionsPath: resolve(env.SURVEY_QUESTIONS ?? 'src/survey/questions.exhibition.json') });
-  const { server, realtime } = createSurveyServer({ ctx, staticDir: resolve(env.SURVEY_STATIC_DIR ?? 'dist'), devAuto: env.SURVEY_DEV_AUTO === '1' });
+  const { server, realtime } = createSurveyServer({
+    ctx,
+    staticDir: resolve(env.SURVEY_STATIC_DIR ?? 'dist'),
+    cityDir: resolve(env.SURVEY_CITY_DIR ?? '../dist-exhibition'),
+    qrDir: resolve(env.SURVEY_QR_DIR ?? '../qr-hud/dist-exhibition'),
+    publicUrl: env.SURVEY_PUBLIC_URL,
+    devAuto: env.SURVEY_DEV_AUTO === '1',
+  });
   const state = currentState(ctx);
   server.listen(port, host, () => {
     console.log(`Survey server on http://${host === '0.0.0.0' ? '127.0.0.1' : host}:${port}  (db ${dbPath})`);
     console.log(`Run ${state.runId}, revision ${state.revision}, ${ctx.questions.questions.length} questions (version ${ctx.questions.version})`);
-    console.log('Pages: /guest  /monitor  /admin (loopback only)');
+    console.log('Pages: /guest  /monitor  /admin (loopback only)  /display/?survey  /qr/  /city/:proposalId');
     for (const url of lanGuestUrls(host, port)) console.log(`LAN Guest: ${url}`);
   });
   const stop = () => { realtime.close(); server.close(() => { ctx.db.close(); process.exit(0); }); };

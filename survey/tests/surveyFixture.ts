@@ -8,10 +8,11 @@ import { transaction } from '../src/server/database.ts';
 import { loadQuestionSetFile, validateExhibitionQuestionSet } from '../src/survey/questionLoader.ts';
 import { lifecycleCommand, readLifecycle } from '../src/server/adminService.ts';
 import type { AnswerData, ApiResponse, GuestQuestionData, LifecycleCommand, LifecycleData } from '../src/shared/protocol.ts';
+import { fileURLToPath } from 'node:url';
 
-export const QUESTIONS_PATH = new URL('../src/survey/questions.test.json', import.meta.url).pathname;
-export const MVP_QUESTIONS_PATH = new URL('../src/survey/questions.mvp.json', import.meta.url).pathname;
-export const EXHIBITION_QUESTIONS_PATH = new URL('../src/survey/questions.exhibition.json', import.meta.url).pathname;
+export const QUESTIONS_PATH = fileURLToPath(new URL('../src/survey/questions.test.json', import.meta.url));
+export const MVP_QUESTIONS_PATH = fileURLToPath(new URL('../src/survey/questions.mvp.json', import.meta.url));
+export const EXHIBITION_QUESTIONS_PATH = fileURLToPath(new URL('../src/survey/questions.exhibition.json', import.meta.url));
 
 /** In-memory (or given file) survey context with a controllable clock and readable sequential IDs. */
 export function fixture(dbPath = ':memory:', startMs = Date.parse('2026-09-23T10:00:00.000Z'), questionsPath = QUESTIONS_PATH) {

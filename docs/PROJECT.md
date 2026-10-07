@@ -10,6 +10,7 @@ The single exhibition venue is the **Odaiba waterfront in 2127**. Shibuya is a c
 | --- | --- |
 | Root `src/` | Vite / TypeScript / Three.js WebGL 2 exhibition city; standalone and `?survey` |
 | `survey/` | Four-question v2 proposal API, reducer, authoritative layout, SQLite schema 7, WebSocket, Guest / Monitor / loopback Admin |
+| `qr-hud/` | Integrated 3D building QR: deterministic per-proposal selection, scan view and standard-QR WebGL fallback |
 | `module-swap/` | Preserved standalone / legacy v1 four-lot demonstrator; rejects v2 and is not the exhibition city |
 
 Desktop-only presentation, with normal renderer resize. Do not add adaptive camera/mobile acceptance. Ambient people, vehicles, drones and aerial routes are allowed. Low/zero/high Meter values all depict mature 2127 alternatives. No deployment workflow is configured.
@@ -25,6 +26,7 @@ The [resident experience plan](RESIDENT_EXPERIENCE_PLAN.md) records P1–P3 impl
 | File / module | Responsibility |
 | --- | --- |
 | [main.ts](../src/main.ts) | Startup, WebGL renderer, lighting/sky/fog, composer, OrbitControls, loop/resize, survey hookup and diagnostics |
+| [personalCity.ts](../src/personalCity.ts) | Read-only `/city/:proposalId` archive loader and touch/zoom controls; never subscribes to live survey state |
 | [heroCamera.ts](../src/heroCamera.ts), [layout.ts](../src/layout.ts) | Authored Odaiba hero, district bounds, promenade/guideway/water/air routes, berth and four change-site footprints |
 | [odaibaPlacement.ts](../src/odaibaPlacement.ts), [odaiba-layout.json](../src/odaiba-layout.json) | Surveyed placement and Blender → Three transform, including Grand Nikko legacy adapter |
 | [odaibaScene.ts](../src/odaibaScene.ts) | District environment GLB, six landmark GLBs, material remap, context facades, roof publication and landmark night lighting |

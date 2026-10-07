@@ -30,6 +30,17 @@ npm test
 npm run build
 ```
 
+When the integrated building QR changes:
+
+```sh
+npm ci --prefix qr-hud
+npm --prefix qr-hud run build
+npm --prefix qr-hud test
+node scripts/exhibition.mjs build
+```
+
+Use an isolated SQLite and `qr-hud/scripts/verify-integration.mjs` for the destructive browser flow. It must decode the rendered QR to the submitted proposal's `/city/:id`, load the archived layout without a live WebSocket, and verify touch/zoom controls. `verify-building-qr.mjs` checks building/scan switching, real canvas decoding, embedded sizing and standard-QR fallback. Physical phone camera scanning and exhibition Wi-Fi remain manual acceptance.
+
 CI uses Node 24, installs/tests/builds all three packages and checks committed whitespace. Local checks gate integration; main CI must pass after integration (branch CI need not be awaited, 2026-10-06). Documentation-only pushes skip CI; a newer push cancels an in-progress run on the same branch. The Odaiba route/clearance test raycasts through `three-mesh-bvh` (test-only devDependency) with the same hits as three's brute-force raycast. A configured workflow is not a passing run. [Git workflow](CONTRIBUTING.md) defines exact checks and race handling.
 
 Documentation-only changes require local Markdown file/anchor checks, tracked-target checks, renamed-path/plain-text-reference checks, source fact checks and self-review of the complete diff. Check both working/staged diffs and `git diff --check origin/main...HEAD`. Rendering/tests/builds are not required for prose-only changes, and CI skips pushes that touch only `docs/**` or `*.md`. No source/asset change can be disguised as documentation-only.

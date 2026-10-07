@@ -22,18 +22,22 @@ import { bayWater } from './bayWater';
 import { scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
 import { createCityChangeManager } from './createCityChangeManager';
+import { loadPersonalCity, personalCityControls } from './personalCity';
 import './style.css';
 
-try {
+async function start() {
+  const archiveId=/^\/city\/([A-Za-z0-9_-]{1,128})\/?$/.exec(location.pathname)?.[1];
+  const personalView=archiveId?await loadPersonalCity(archiveId):null;
   const scene=new T.Scene();scene.background=new T.Color('#dfd6cd');scene.fog=new T.FogExp2('#dfd6cd',.0005);
   const renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio,personalView?1:1.5));renderer.setSize(innerWidth,innerHeight);
   renderer.toneMapping=T.NeutralToneMapping;renderer.toneMappingExposure=.84;renderer.outputColorSpace=T.SRGBColorSpace;
-  renderer.info.autoReset=false;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.VSMShadowMap;
+  renderer.info.autoReset=false;renderer.shadowMap.enabled=!personalView;renderer.shadowMap.type=T.VSMShadowMap;
   renderer.domElement.setAttribute('aria-label','The Odaiba waterfront around the Fuji TV sphere in 2127. Drag to orbit, scroll to zoom, right-drag to pan. One city day, dawn to night, passes every three minutes.');
   document.querySelector('#app')!.appendChild(renderer.domElement);
   scene.environmentIntensity=.6;
   const camera=heroCamera(innerWidth,innerHeight);
+  if(personalView)camera.position.sub(new T.Vector3(...HERO_TARGET)).multiplyScalar(Math.min(1.35,Math.max(1,Math.sqrt(innerHeight/innerWidth)))).add(new T.Vector3(...HERO_TARGET));
   const reviewParams=new URLSearchParams(location.search);
   const civicReview=import.meta.env.DEV && reviewParams.get('review')==='civic';
   if(civicReview){camera.position.set(-180,105,-235);camera.lookAt(-10,78,20);}
@@ -94,6 +98,9 @@ try {
   // Orbit and pan stay on the hero district; the hazed ground beyond is backdrop, not a destination.
   const districtMin=new T.Vector3(DISTRICT.minX,0,DISTRICT.minZ),districtMax=new T.Vector3(DISTRICT.maxX,160,DISTRICT.maxZ),panBack=new T.Vector3();
   controls.minDistance=streetReview?30:150;controls.maxDistance=1000;controls.minPolarAngle=.35;controls.maxPolarAngle=1.42;controls.screenSpacePanning=false;controls.update();
+  if(personalView){controls.minDistance=80;controls.maxDistance=1200;renderer.domElement.setAttribute('aria-label','あなたの3D都市。1本指で回転、2本指で拡大・縮小。');}
+  const personalReady=personalView?personalCityControls(personalView,camera,controls):null;
+  controls.addEventListener('change',()=>{renderer.domElement.dataset.camera=camera.position.toArray().map(value=>value.toFixed(2)).join(',');});
   // MSAA target: the composer's default target has no samples, so edges were aliased once post-processing ran.
   const composer=new EffectComposer(renderer,new T.WebGLRenderTarget(innerWidth,innerHeight,{type:T.HalfFloatType,samples:4}));composer.setSize(innerWidth,innerHeight);composer.addPass(new RenderPass(scene,camera));
   // Contact shadows where slabs, planters and cores meet: the cheapest step from blockout to built object.
@@ -114,14 +121,21 @@ try {
   const params=new URLSearchParams(location.search);
   // `?survey` or `?survey=ws://host:port/ws`: survey policy scores drive the city state; the day/night light still runs.
   const surveyParam=params.get('survey');
-  const surveyUrl=surveyParam===null?null:/^wss?:\/\//.test(surveyParam)?surveyParam:`ws://${location.hostname}:8787/ws`;
+  const integratedDisplay=location.pathname.startsWith('/display/');
+  const surveyUrl=personalView||surveyParam===null?null:/^wss?:\/\//.test(surveyParam)?surveyParam:integratedDisplay?`${location.protocol==='https:'?'wss':'ws'}://${location.host}/ws`:`ws://${location.hostname}:8787/ws`;
   // `?hour=21` holds the clock at one hour, for review captures.
-  const heldHour=Number(params.get('hour')??NaN),hold=heldHour>=0&&heldHour<24?heldHour:null;
+  const heldHour=Number(params.get('hour')??NaN),hold=personalView?12:heldHour>=0&&heldHour<24?heldHour:null;
   let displayMode: DisplayMode = 'auto';
-  const updateOverlay=overlay();
+  const updateOverlay=personalView?()=>{}:overlay();
   // DEV-only `?meters=nw:high,ne:low` (band or score −12..12 per site, unlisted = 0) applies a v2 layout without the survey server, for review captures; `window.cityMeters('ne:high')` then animates a live change.
   const metersParam=import.meta.env.DEV?params.get('meters'):null;
-  const cityChanges=surveyUrl||metersParam!==null?createCityChangeManager(scene):null;
+  const cityChanges=surveyUrl||personalView||metersParam!==null?createCityChangeManager(scene):null;
+  if(personalView){
+    cityChanges!.applyExhibitionLayout(personalView.layout,'city-state-snapshot',0,personalView.slotSeeds);
+    renderer.domElement.dataset.archiveId=archiveId;
+    renderer.domElement.dataset.revision=String(personalView.revision);
+    renderer.domElement.dataset.layout=JSON.stringify(personalView.layout);
+  }
   // Applied after the first frame, so `now` already holds the clock (or a held `reviewTime`) rather than its initial 0.
   if(import.meta.env.DEV && metersParam!==null)import('./devMeters').then(async({devLayout})=>{
     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
@@ -151,8 +165,8 @@ try {
   renderer.setAnimationLoop(()=>{
     now=Number.isFinite(reviewTime)&&reviewTime>=0 ? reviewTime : (performance.now()-start)/1000;
     const hour=hold??displayHour(displayMode,now),height=sunHeight(hour),day=daylight(hour),dark=1-day,glow=1-T.MathUtils.smoothstep(Math.abs(height),0,1),nightSky=T.MathUtils.smoothstep(dark,.35,1);
-    if(surveyUrl)world.update(now);
-    const s=withNight(surveyUrl?world.state:moodAt(hour),dark);
+    if(surveyUrl||personalView)world.update(now);
+    const s=withNight(surveyUrl||personalView?world.state:moodAt(hour),dark);
     const pulse=T.MathUtils.clamp((s.neon-.25)/.7,0,1)*day,still=T.MathUtils.clamp((s.warmth-.55)/.3,0,1);
     (scene.background as T.Color).copy(dayBase).lerp(dayPulse,pulse).lerp(dayStill,still).lerp(duskHorizon,glow*.85).lerp(nightHorizon,nightSky);
     // Clear bay air by day: the district stays crisp, the sea keeps its blue to the horizon and far shores fade to a cool haze.
@@ -171,13 +185,15 @@ try {
     ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientLate,glow*.6).lerp(ambientNight,dark);
     scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure*(1+.16*day);
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
-    controls.update();panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);cityChanges?.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
+    controls.update();panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);cityChanges?.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();personalReady?.();
     if(++frames===120){renderer.domElement.dataset.hour=hour.toFixed(2);renderer.domElement.dataset.displayMode=displayMode;renderer.domElement.dataset.time=now.toFixed(2);renderer.domElement.dataset.fps=(120000/(performance.now()-measureStart)).toFixed(1);renderer.domElement.dataset.drawCalls=String(renderer.info.render.calls);renderer.domElement.dataset.geometries=String(renderer.info.memory.geometries);if(cityChanges)renderer.domElement.dataset.siteAssets=JSON.stringify(cityChanges.getDiagnostics());frames=0;measureStart=performance.now();}
   });
   window.addEventListener('resize',()=>{
     camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight);
   });
   renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();renderer.setAnimationLoop(null);const message=document.createElement('p');message.className='error';message.textContent='The graphics context was lost. Reload to return to the city.';document.body.appendChild(message);});
-} catch(error) {
-  const message=document.createElement('p');message.className='error';message.textContent='The city could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);
 }
+start().catch(error=>{
+  document.querySelector('.personal-loading')?.remove();
+  const message=document.createElement('p');message.className='error';message.textContent='The city could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);
+});

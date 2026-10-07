@@ -1,5 +1,6 @@
 import { readDisplayMode, setDisplayMode } from '../src/server/adminService.ts';
 import assert from 'node:assert/strict';
+import { fileURLToPath } from 'node:url';
 import { mkdtempSync, rmSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -24,7 +25,7 @@ try {
     const upgradeDb = join(dir, `upgrade-${stationId ?? 'single'}.sqlite`);
     let nowMs = Date.parse('2026-10-02T00:00:00.000Z');
     const old = createContext({ dbPath: upgradeDb, questionsPath: oldPath,
-      legacyQuestionsPath: new URL('../src/survey/questions.mvp.json', import.meta.url).pathname, now: () => new Date(nowMs) });
+      legacyQuestionsPath: fileURLToPath(new URL('../src/survey/questions.mvp.json', import.meta.url)), now: () => new Date(nowMs) });
     const start = () => ok(createProposalSession(old, stationId ? { stationId } : {}).response);
     const first = start();
     const requestFor = (data: typeof first, id: string) => ({ submissionId: id,

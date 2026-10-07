@@ -9,7 +9,7 @@ const app = document.querySelector<HTMLElement>('#app')!;
 app.classList.add('guest');
 document.body.classList.add('guest-page');
 
-type Screen = 'welcome' | 'starting' | 'question' | 'review' | 'submitting' | 'waiting' | 'result' | 'handoff' | 'abandoned';
+type Screen = 'welcome' | 'starting' | 'question' | 'review' | 'submitting' | 'waiting' | 'result' | 'archive' | 'handoff' | 'abandoned';
 type GuestRecovery = {
   session: ProposalSessionData;
   choices: [string, string][];
@@ -497,15 +497,26 @@ function renderResult(focus = true) {
     if (focus) focusTitle();
     return;
   }
-  if (performance.now() >= resultEndsAt) return renderHandoff();
+  if (performance.now() >= resultEndsAt) return renderArchive();
   const { proposal } = saved;
   page('街の画面をご覧ください。', 'あなたの思いを記録しました',
     el('p', { class: 'guest-result-number' }, residentIdentity(proposal)),
-    el('p', { class: 'guest-copy', role: 'status' }, '回答を記録しました。'),
-    el('div', { class: 'guest-actions' }, action('次の方へ', renderHandoff, true)));
+    el('p', { class: 'guest-copy', role: 'status' }, '回答を記録しました。この後、あなたの街を持ち帰る建物QRを表示します。'),
+    el('div', { class: 'guest-actions' }, action('建物QRを表示', renderArchive, true)));
   if (focus) focusTitle();
   clearTimeout(flowTimer);
-  flowTimer = window.setTimeout(renderHandoff, Math.max(0, resultEndsAt - performance.now()));
+  flowTimer = window.setTimeout(renderArchive, Math.max(0, resultEndsAt - performance.now()));
+}
+
+function renderArchive() {
+  if (!saved) return renderWelcome();
+  clearTimeout(flowTimer); clearIdleTimers();
+  screen = 'archive';
+  page('建物QRで街を持ち帰る。', residentIdentity(saved.proposal),
+    el('p', { class: 'guest-copy' }, '提案ごとに選ばれたお台場の建物が、読み取り可能なQRコードに変化します。'),
+    el('iframe', { src: `/qr/?archive=${encodeURIComponent(saved.proposal.id)}`, title: 'あなたの都市の建物QRコード', class: 'guest-archive-frame' }),
+    el('div', { class: 'guest-actions' }, action('読み取りを終えて次へ', renderHandoff, true)));
+  focusTitle();
 }
 
 function renderHandoff() {
@@ -574,6 +585,7 @@ function renderCurrent(focus = true) {
   if (screen === 'question') return renderQuestion(focus);
   if (screen === 'review' || screen === 'submitting') return renderReview(focus);
   if (screen === 'result' || screen === 'waiting') return renderResult(focus);
+  if (screen === 'archive') return renderArchive();
   if (screen === 'handoff') return renderHandoff();
   renderAbandoned();
 }
@@ -611,7 +623,7 @@ if (new URLSearchParams(location.search).has('dev-auto')) {
   void import('./autoAnswerPanel.ts').then(({ mountAutoAnswerPanel }) => mountAutoAnswerPanel({
     async start(signal) {
       // Result/handoff use chained timers that a hidden tab may delay; never race them.
-      for (const deadline = Date.now() + 10_000; (screen === 'result' || screen === 'handoff') && Date.now() < deadline;) {
+      for (const deadline = Date.now() + 10_000; (screen === 'result' || screen === 'archive' || screen === 'handoff') && Date.now() < deadline;) {
         await new Promise(resolve => setTimeout(resolve, 100));
         signal.throwIfAborted();
       }
