@@ -326,6 +326,14 @@ for (const { road, d } of CROSSINGS) {
     assert.ok(Math.abs(a) < half ? drivable(...at(along, a)) : inside(pavedTris, ...at(along, a)), `crossing ${road}/${d} off its surface at ${a}`);
   for (let along = -8.7; along <= 8.7; along += .5) for (const a of [-half - .5, half + .5]) assert.ok(inside(pavedTris, ...at(along, a)), `crossing ${road}/${d} footway off the paving at ${along}`);
 }
+// Carriageway inlays: seams and mint lane guides face up, flush on the paving slab.
+{
+  const scene = new T.Scene(); mobility(scene);
+  for (const name of ['carriageway-seams', 'carriageway-guides']) {
+    const g = (scene.getObjectByName(name) as T.Mesh).geometry, n = g.attributes.normal, y = g.attributes.position;
+    for (let i = 0; i < n.count; i += 97) { assert.ok(n.getY(i) > .99, `${name} faces down at ${i}`); assert.equal(+y.getY(i).toFixed(3), .225); }
+  }
+}
 // Street traffic as simulated by the real actors over 15 min at 0.1 s (evening crowd and commute): cars never close within 1.5 m in a
 // lane or exceed 15 m/s, never stand between a crossing's stop line and its far side while residents cross, actually stop and queue
 // for crossings, catch up with their free slots afterwards, and every crosser drawn keeps clear of every car body drawn.
