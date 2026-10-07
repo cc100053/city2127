@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS
 - Branch: codex/fuji-tv-polish
 - Base commit: 4eda49ebae30e6215e6f67f17e8fef197832b34e
-- Last verified commit: f504484be71e306aa1fbd1b43286439fcb4cd038; committed source is byte-identical to the v3 pass3 worktree tested below
+- Last verified commit: the round-2 implementation commit recorded below (source SHA-256 `b3e28724…65ab`); previous round f504484
 - Remote availability: origin/codex/fuji-tv-polish; resolve this Git ref for latest implementation/evidence publication. Prior code 0076bad0 is integrated on main; v3 is a separate implementation.
 
 ## Session Git state
@@ -29,7 +29,7 @@ No failing source checks. Target fidelity remains partial; performance/hardware 
 
 ## Next expected step
 
-User reviews v3's final screenshot after the requested three passes. Further visual iteration or integration follows that review; keep this result on `codex/fuji-tv-polish` in the meantime.
+User reviews the v3 round-2 final screenshot ([v3r2-pass3](../../artifacts/fuji-tv-polish/v3r2-pass3.jpg)). Further passes or integration follow that review; keep this result on `codex/fuji-tv-polish` in the meantime.
 
 ## Target and pass 1 (2026-10-07)
 
@@ -104,3 +104,15 @@ Final browser: development Mac, Codex in-app browser1280×720, actor40; civic da
 Target fidelity PARTIAL: the selected target still has more prominent theatre/audience, richer indoor/public activity and finer facade/planting detail. Staff, presenters, audience and forum people are static geometry; entrances/cores express separate public/staff access but do not simulate interior circulation, acoustic performance or access control. Source GLB/Blender assets remain unchanged. Fal credentials were absent, and external asset packs were not authorized; no generated 3D asset requested. Worker FETCH_HEAD write was sandbox-blocked in pass3; orchestrator refreshed remote refs successfully and confirmed origin/main remainsf3b7d73. No main merge/deployment.
 
 Dream Loop Plus says “Initially, only perform this loop 3 times” and “stop after 3, ask the user to review the results.” Three passes are complete; feature publication preserves a reviewable result. Do not start a fourth pass or integrate this v3 stage automatically. Next step: user visual review, then requested refinement or integration. Final evidence check PASS:221 local Markdown targets exist, all8 tracked v3 screenshots are1280×720, all7 browser records have empty captured warning/error lists, and committed source bytes match the tested SHA-256. Complete source/test/docs and new-file diff self-reviewed; committed task whitespace check PASS before publication.
+
+## Target v3 implementation round 2 (2026-10-07)
+
+Owner: Claude (orchestrator) with Opus worker subagents. User requested “do 3 loops” on `codex/fuji-tv-polish`. Startup: clean at `f78d93c`, fetch succeeded, feature counterpart 0/0; origin/main still `f3b7d73`; no merge. Target unchanged: `.dream-loop/target.png` SHA-256 matches target v3. Fable workers were unavailable (usage credits), so all three passes used Opus. In-app browser pane was hidden, so captures used headless `playwright-cli` (Chromium) at 1280×720 against the same 127.0.0.1:5174 preview, `?hour=16|22&review=civic&reviewTime=40`; headless WebGL output may differ slightly from the earlier in-app captures.
+
+- Pass 1: brighter daytime room light (`.8+cityLight*.5`), warm floor skins and mezzanine ceilings, clearer silver glass, slimmer ivory mullions at wider spacing, sphere stage light towers/rig/step lights/balconies/ribs, ~46 forum and ~21 ring-floor standing visitors.
+- Pass 2: per-room light variation and dimmer up-facing floors in the shared room-light shader; saturated broadcast blue; planted front ledges with lit soffits on each work floor.
+- Pass 3: cream room-light tone, glass opacity .12; dark rear walls with warm panels and every third bay a blue video wall; standing staff along wing glazing; 9-row steeper theatre seating with risers and a warm stage back wall; lit lobby shopfront ring with visitors (skips wing interiors and the AQUA bridge gap).
+
+Validation after every pass: root `npm test` (fail 0, includes actual floor/route/site clearances and 81 real survey-pipeline combinations), `npm run build` (existing >500kB warning), `git diff --check` PASS; captured console has no warnings/errors besides a favicon 404. Final also checked standalone hero16 (canvas 1280×720). Batches remain ≤9 per the existing test; triangle count rises (not re-measured). All changes stay in `src/civicCore.ts`; no new dependencies, GLB/Blender assets or renderer/camera changes. Evidence: [pass1](../../artifacts/fuji-tv-polish/v3r2-pass1.jpg), [pass2](../../artifacts/fuji-tv-polish/v3r2-pass2.jpg), [final day](../../artifacts/fuji-tv-polish/v3r2-pass3.jpg), [final night](../../artifacts/fuji-tv-polish/v3r2-pass3-night.jpg), [hero](../../artifacts/fuji-tv-polish/v3r2-hero.jpg). Meter low/mixed/high states, FPS, GPU/exhibition hardware and live survey browser NOT RUN this round.
+
+Target fidelity PARTIAL: interior light now reads as warm rooms with blue screens and visible occupancy, but the target's glowing glass sphere theatre, denser crowds and glazed diagonal tubes remain stronger than the build. Static people are architectural occupancy, not simulation. Three passes done; stop for user review per Dream Loop Plus.
