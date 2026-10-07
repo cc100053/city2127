@@ -1,11 +1,11 @@
 # roof-interior-life — People on roofs and inside buildings
 
 - Owner: cc100053
-- Status: IN_PROGRESS (implemented, locally verified, pushed; awaiting user visual review before main integration)
+- Status: COMPLETE (merged to main 2026-10-08 as dc03930; exhibition-machine FPS open)
 - Branch: feat/roof-interior-life
 - Base commit: 051614fe6b5ea5d414b1208725061787a185962e
 - Last verified commit: 1ae894224a07987d4dc3e58c933aa610849c6135 (identical to the checked worktree)
-- Remote availability: origin/feat/roof-interior-life at 1ae8942
+- Remote availability: origin/main contains dc03930; feature branch deleted locally and on origin
 
 ## Session Git state
 
@@ -13,7 +13,7 @@
   that held it, fast-forwarded main 6 commits to 051614f, branched from there
 - Last fetched origin/main commit: 051614fe6b5ea5d414b1208725061787a185962e (fetched 2026-10-07/08)
 - Local changes present at session start: untracked `.playwright-cli/` only (preserved)
-- Upstream integration status: NOT INTEGRATED
+- Upstream integration status: merged --no-ff into main as dc03930 (origin/main unchanged since base, no conflicts)
 - Pending Git conflicts or synchronization blockers: NONE
 
 ## Goal and acceptance criteria
@@ -56,7 +56,7 @@ belong to the Fuji TV polish handoff, coordinate before further art edits), `src
   full size or absent, no jumps, strollers never step in place.
 - Evidence/environment: headless Chrome 154.0.8037.98, 1400×900, Metal requested, Vite DEV — `artifacts/roof-interior-life/`
   (Fuji wing dusk, theatre, forum day); Aqua City roof checked in the built-in pane. One 404 console message (resource not identified).
-- Integrated commit and checks: NOT INTEGRATED
+- Integrated commit and checks: dc03930 — root `npm test`, `npm run build`, `git diff --check` PASS; main CI run 37649905218 PASS
 - Changes since verification: NONE (full suite, build and diff check rerun after the aisle-length fix: PASS).
 
 ## Known issues and blockers
@@ -74,5 +74,4 @@ belong to the Fuji TV polish handoff, coordinate before further art edits), `src
 
 ## Next expected step
 
-User (cc100053) reviews the captures / live view; on approval integrate per CONTRIBUTING (fetch, ff main, --no-ff merge, rerun
-checks, push, confirm CI). Measure FPS on the exhibition machine.
+Measure FPS on the exhibition machine (owner cc100053). Archive this handoff when no longer active.
