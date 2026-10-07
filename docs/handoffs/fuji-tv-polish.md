@@ -29,7 +29,7 @@ No failing source checks. Target fidelity remains partial; performance/hardware 
 
 ## Next expected step
 
-Three passes complete; feature branch published for cc100053 to review the actual screenshots. Further passes/integration follow review per Dream Loop Plus.
+Implement the approved working-headquarters direction against target v2 when the user starts the next implementation round. Target regeneration is complete; the existing three-pass runtime still represents target v1. Keep the result on the feature branch until the new direction is implemented and verified.
 
 ## Target and pass 1 (2026-10-07)
 
@@ -58,3 +58,11 @@ Dream Loop Plus instructs: “Initially, only perform this loop 3 times” and �
 ## Feature-branch publication
 
 Implementation commit: `0076bad0def237c4bb455fa4934a6afbfd6ece9a`. Final fetch succeeded; origin/main remains4eda49e and is the task base (no divergence). Source byte comparison confirms committed code equals the pass3 checked worktree. Follow-up edits only record verification/publication; no code delta since checks. Published feature branch remains separate from main; main CI is not an integration claim. Feature-push CI is not part of the recorded local PASS results.
+
+## Working-headquarters target v2 (2026-10-07)
+
+User requested grilling and target regeneration, saying Fuji TV must retain working space. Six consecutive A answers confirmed: media-production headquarters (news editing, studios, program production, post-production and office); approximately 70% work / 30% public emphasis; two occupied work wings with a central void; sphere as media theatre/live-broadcast space with scheduled public admission; substantial opaque acoustic studio/editing volumes mixed with glazed office/collaboration floors; independent public circulation to ground entrance, selected platforms and theatre, with separate staff entrances and controlled production zones. The percentage is a design emphasis, not measured floor area. These decisions supersede target v1's primarily public chamber program.
+
+Resumed clean at `012b5afe9d95e3b602436c5d47916e7f60450fd1`; fetch succeeded, feature counterpart 0/0, branch 2 commits ahead of origin/main, no divergence. Built-in imagegen edited pass3.jpg using R01/R02 architectural references, followed by one refinement for opaque studio volumes and central openness. Selected [target v2](../../artifacts/fuji-tv-polish/target-v2.png), [full prompts](../../artifacts/fuji-tv-polish/target-v2-prompt.md); ignored `.dream-loop/target.png` now matches v2. Original committed target.png remains available.
+
+Visual review confirms two inhabited wings, substantial solid studio blocks, glazed office floors and the sphere's stage/audience. Independent access is an approved implementation requirement; an exterior generated image does not validate access control or circulation. Generated detail and diagonal connections are guidance; existing route clearances, berth, footprint and supported geometry still require source/browser checks during implementation. No TypeScript or runtime asset changed in this target-only stage. Local Markdown link/fact checks, target-file identity and git diff --check PASS; source tests/build/browser not rerun for this reference/documentation stage. Last verified runtime code remains 0076bad0.
