@@ -1,10 +1,10 @@
 # Fuji TV polish — Dream Loop
 
 - Owner: Codex
-- Status: IN_PROGRESS
+- Status: INTEGRATED; working-headquarters target v2 implementation remains a separate next round
 - Branch: codex/fuji-tv-polish
 - Base commit: 4eda49ebae30e6215e6f67f17e8fef197832b34e
-- Last verified commit: 0076bad0def237c4bb455fa4934a6afbfd6ece9a; committed core is byte-identical to the source tested in pass3
+- Last verified commit: f64af182c0001335da941144fa80fb84b492cbe0; integrated source is byte-identical to the feature branch
 - Remote availability: origin/codex/fuji-tv-polish; checked code 0076bad0def237c4bb455fa4934a6afbfd6ece9a. Resolve this Git ref for latest documentation commit.
 
 ## Session Git state
@@ -17,11 +17,11 @@ Polish the procedural Fuji TV civic core using [CITY MASTER TASTE](../ODAIBA_212
 
 ## Completed work
 
-Three implementation passes and source/browser checks complete. Core/public layers, references and evidence are documented below; visual review and integration remain pending.
+Three implementation passes and target v2 regeneration complete. The user requested integration; runtime polish is merged and verified locally. Target v2 workspace/theatre implementation remains pending.
 
 ## Actual validation results
 
-PASSED for local source and specified browser checks below. NOT INTEGRATED; generated-target fidelity remains PARTIAL.
+PASSED for local source and specified browser checks below. INTEGRATED; generated-target fidelity remains PARTIAL.
 
 ## Known issues and blockers
 
@@ -29,7 +29,7 @@ No failing source checks. Target fidelity remains partial; performance/hardware 
 
 ## Next expected step
 
-Implement the approved working-headquarters direction against target v2 when the user starts the next implementation round. Target regeneration is complete; the existing three-pass runtime still represents target v1. Keep the result on the feature branch until the new direction is implemented and verified.
+Implement the approved working-headquarters direction against target v2 when the user starts the next implementation round. Target regeneration is complete; the existing three-pass runtime still represents target v1. Existing runtime polish and target references are now integrated by explicit user request; do not claim target v2 has been implemented.
 
 ## Target and pass 1 (2026-10-07)
 
@@ -66,3 +66,11 @@ User requested grilling and target regeneration, saying Fuji TV must retain work
 Resumed clean at `012b5afe9d95e3b602436c5d47916e7f60450fd1`; fetch succeeded, feature counterpart 0/0, branch 2 commits ahead of origin/main, no divergence. Built-in imagegen edited pass3.jpg using R01/R02 architectural references, followed by one refinement for opaque studio volumes and central openness. Selected [target v2](../../artifacts/fuji-tv-polish/target-v2.png), [full prompts](../../artifacts/fuji-tv-polish/target-v2-prompt.md); ignored `.dream-loop/target.png` now matches v2. Original committed target.png remains available.
 
 Visual review confirms two inhabited wings, substantial solid studio blocks, glazed office floors and the sphere's stage/audience. Independent access is an approved implementation requirement; an exterior generated image does not validate access control or circulation. Generated detail and diagonal connections are guidance; existing route clearances, berth, footprint and supported geometry still require source/browser checks during implementation. No TypeScript or runtime asset changed in this target-only stage. Local Markdown link/fact checks, target-file identity and git diff --check PASS; source tests/build/browser not rerun for this reference/documentation stage. Last verified runtime code remains 0076bad0.
+
+## Main integration (2026-10-07)
+
+User explicitly requested merging the worktree to main. Preflight: clean ad8bc7552b181fbd583f8beb59bad5e7b41a6306; successful fetch; task counterpart0/0 and task/main3/0, main/origin/main0/0. Other checkout remains on feat/pedestrian-traffic-life and was untouched. Full task diff reviewed; no conflicts or upstream source changes. Merge commit `f64af182c0001335da941144fa80fb84b492cbe0` preserves task history.
+
+Root npm test/build PASS before and after merge; real 81-answer HTTP/WebSocket pipeline and actual scene/actor geometry checks PASS. Build retains the existing >500kB warning. Committed whitespace checks PASS and src/ byte comparison against the task branch is identical. Survey/module-swap source unchanged; their separate local suites not rerun. Post-merge development Mac in-app browser,1280×720, civic hour16/hour22, reviewTime40: visually checked, no console warnings/errors. Initial browser reload call timed out; rebinding recovered and checks completed. Temporary viewport override reset. Earlier hero/Meter captures remain evidence for identical code, not newly run cases. No FPS/hardware/live survey browser claim.
+
+Integration supersedes the earlier pending-review/main-unchanged publication notes. Only the implemented public-layer polish plus target v2 references are integrated; working wings and broadcast theatre remain pending implementation. Main push and CI confirmation follow this documentation update.
