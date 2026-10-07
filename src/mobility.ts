@@ -292,10 +292,14 @@ export const entranceJourneys=()=>entranceTrips;
 /** Published door-to-group journeys, for route/actor clearance checks. */
 export const forecourtVisits=()=>doorSpots.flatMap((spot,group)=>spot.visit?[{...spot.visit,group,at:spot.at,yaw:spot.yaw}]:[]);
 const PAVED=new Set(['sidewalk','plaza']);
-// Landmark pads overlap the avenues in places (Aqua City's north side), so forecourt walks also keep clear of every carriageway.
+// Landmark pads overlap the avenues in places (Aqua City's north side), so forecourt walks also keep 1.5 m clear of every carriageway
+// (`CARRIAGEWAY`) and of the surveyed road (the guideway avenue's pier strip included).
 let streetSamples:{p:T.Vector3;clear:number}[]|null=null;
-const offStreet=(p:T.Vector3)=>(streetSamples??=routes().streets.flatMap((c,r)=>c.getSpacedPoints(400).map(q=>({p:q,clear:r?5:4}))))
-  .every(s=>Math.hypot(s.p.x-p.x,s.p.z-p.z)>s.clear);
+const offStreet=(p:T.Vector3)=>(streetSamples??=routes().streets.flatMap((c,r)=>{
+  const {centre,half}=CARRIAGEWAY[r];
+  return [[0,ROAD_HALF[r]+1.5],[centre,half+1.5]].flatMap(([n,clear])=>c.getSpacedPoints(400).map((q,i,all)=>{
+    const t=all[Math.min(i+1,all.length-1)].clone().sub(all[Math.max(i-1,0)]).normalize();return {p:q.clone().add(new T.Vector3(t.z*n,0,-t.x*n)),clear};}));
+})).every(s=>Math.hypot(s.p.x-p.x,s.p.z-p.z)>s.clear);
 /** Finds ground-floor facade points by casting inward from all four sides of `model`'s bounds, and joins neighbouring doors on one face
  * with a short walk 4–10 m out across the paved pad (`ground`: the environment). Each walk is raycast clear of the building, and runs
  * from .6 m inside one door to .6 m inside the next, rounded at its corners, so people emerge from the facade rather than grow out of
@@ -429,7 +433,7 @@ export function streetCarPose(time:number,road:number,lane:number,car:number,car
  * `mobility` it also waits there until the lane beside the pull-out is clear). Cues: `signal` +1 indicates toward the kerb from SIGNAL m before easing in until it stops, -1 toward
  * the road from 3 s before pulling away until back in lane; `brake` lights while braking; `pitch` (rad, + nose down) dips the nose
  * under braking and lifts it pulling away. */
-export const DROP_OFF={road:1,lane:1,cars:[0,14],stops:[330,380],bay:3.5} as const;
+export const DROP_OFF={road:1,lane:1,cars:[0,14],stops:[223,273],bay:2.3} as const;
 const BRAKE=12,SHIFT=35,SIGNAL=30;
 export function dropOffPose(time:number,car:number,cars:number,length:number,stop:number) {
   return dropOffAt(laneTravel(time,DROP_OFF.road,DROP_OFF.lane,car,cars,length),length,stop);
@@ -455,17 +459,26 @@ function dropOffAt({x,lap,speed,span}:{x:number;lap:number;speed:number;span:num
  * behind each other (`mobility`). Both on the guideway avenue, where paving on each side is open 12 m out at body height (under the
  * guideway): south of Aqua City past the drop-off bays, and just before the junction mouth. The seaside avenue has no north footway (Aqua
  * City's wall stands 2.3 m from its centre line). */
-export const CROSSINGS=[{road:1,d:282,period:70},{road:1,d:480,period:83}] as const;
-/** Carriageway half-width per avenue (5 m and 7 m). */
+export const CROSSINGS=[{road:1,d:286,period:70},{road:1,d:480,period:83}] as const;
+/** Surveyed road half-width per avenue (5 m and 7 m). */
 export const ROAD_HALF=[2.5,3.5] as const;
+/** Where cars drive, in metres left of each avenue's route (`n`, up × tangent): the seaside avenue's lanes sit 0.25 m off centre in
+ * its 5 m road, away from Aqua City's wall (2.3 m right of the centre line); under the guideway the Yurikamome piers stand in the
+ * right half of the 7 m road about every 50 m, so its carriageway is widened 1.6 m to the left onto the paving slab and shifted
+ * clear of them (−5.1 … −0.5 m; piers reach 0.36 m left of the centre line where cars are drawn full size), the right half left to
+ * the piers. `lane`: each lane centre from the carriageway centre (Japan keeps
+ * left); car bodies keep ≥ 0.3 m from every solid (tests/odaiba.test.ts). */
+export const CARRIAGEWAY=[{centre:.25,half:2.25,lane:1.25},{centre:-2.8,half:2.3,lane:1.15}] as const;
+/** A lane's centre, metres along its own left (`up × travel direction`): lane 0 travels with the route, lane 1 against it. */
+export const laneOffset=(road:number,lane:number)=>{const {centre,lane:l}=CARRIAGEWAY[road];return lane?l-centre:centre+l;};
 /** The guideway avenue's junction mouth has no road surface in the environment (terrain shows between d 492 and 501): a strip of
  * the paving finish that covers the other avenues fills it (`loadOdaiba`). Left/right edge points (x, z) every metre, for the scene mesh and the road test. */
-export const ROAD_FILL={road:1,from:486,to:507,half:3.7} as const;
+export const ROAD_FILL={road:1,from:486,to:507,left:5.2,right:3.7} as const;
 export function roadFill() {
   const street=routes().streets[ROAD_FILL.road],length=street.getLength(),edges:[number,number][][]=[];
   for(let d=ROAD_FILL.from;d<=ROAD_FILL.to;d++){
     const p=street.getPointAt(d/length),t=street.getTangentAt(d/length);
-    edges.push([-1,1].map(s=>[p.x+t.z*s*ROAD_FILL.half,p.z-t.x*s*ROAD_FILL.half] as [number,number]));
+    edges.push([-ROAD_FILL.left,ROAD_FILL.right].map(n=>[p.x+t.z*n,p.z-t.x*n] as [number,number]));
   }
   return edges;
 }
@@ -664,9 +677,11 @@ export function mobility(scene:T.Scene) {
     }
   });benchFleet.flush();stools.flush();
   const crossAt=CROSSINGS.map(({road,d},k)=>{
-    place(path.streets[road],d/streetLength[road]);const half=ROAD_HALF[road];
+    place(path.streets[road],d/streetLength[road]);const {centre,half}=CARRIAGEWAY[road];
+    // `p`: the carriageway's centre at the crossing.
+    pose.position.add(new T.Vector3(tangent.z*centre,0,-tangent.x*centre));
     pose.scale.set(2*half+.6,1,1);crossBands.set(k,pose);pose.scale.set(1,1,1);
-    return {p:pose.position.clone(),t:tangent.clone(),half,kerb:half+.7,yaw:pose.rotation.y};
+    return {p:pose.position.clone(),t:tangent.clone(),half,kerb:half+.5,yaw:pose.rotation.y};
   });crossBands.flush();
   const stops=promenadeStops(walkLength.slice(0,2));
   const resting=pedestrians(scene,spots.length+FORECOURT_GROUPS*3,'resting-people');
@@ -944,7 +959,7 @@ export function mobility(scene:T.Scene) {
       const span=streetLength[r]+40,at={...laneAt(carT[slot],span),speed:8+3*hash(r*2+lane,14),span};
       const car=drop<0?{d:lane?streetLength[r]-at.x:at.x,visible:fadeEnds(at.x,streetLength[r]),bay:0,steer:0}:dropOffAt(at,streetLength[r],DROP_OFF.stops[drop]);
       place(path.streets[r],car.d/streetLength[r],lane===1);side.crossVectors(up,tangent).normalize();
-      pose.position.addScaledVector(side,(r?1.75:1.25)+car.bay*DROP_OFF.bay).y+=.1;pose.rotation.y+=car.steer;if(drop>=0)pose.rotation.x=(car as ReturnType<typeof dropOffPose>).pitch;
+      pose.position.addScaledVector(side,laneOffset(r,lane)+car.bay*DROP_OFF.bay).y+=.1;pose.rotation.y+=car.steer;if(drop>=0)pose.rotation.x=(car as ReturnType<typeof dropOffPose>).pitch;
       // Every seventh car is a 7 m van; traffic density and the commute rhythm thin the fleet (drop-off cars always run).
       // Human-driven cars give way to autonomous pods slot by slot as automation rises; standalone keeps the cars.
       const van=vanOf[slot]===1,density=drop<0?carGate(slot,state.traffic*.6+.5>hash(slot,18)&&rhythm.cars>hash(slot,22)):1;

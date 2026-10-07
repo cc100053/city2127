@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
 import { changeSites, skyBridges, inDistrict, DISTRICT } from '../src/layout.ts';
 import { heroCamera } from '../src/heroCamera.ts';
-import { pavilionFlight, plazaPose, routes, mobility, publishDoorways, publishEntrances, forecourtVisits, promenadeBenches, visitPose, entranceJourneys, entrancePose } from '../src/mobility.ts';
+import { pavilionFlight, plazaPose, routes, mobility, publishDoorways, publishEntrances, forecourtVisits, promenadeBenches, visitPose, entranceJourneys, entrancePose, laneOffset } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { civicCore } from '../src/civicCore.ts';
 import { bake } from '../src/cityRig.ts';
@@ -110,6 +110,29 @@ environment.traverse(object => {
   }
 });
 assert.ok(!environment.getObjectByName('ROADSIDE_TREE_INSTANCES'), 'Hidden roadside blockout is dropped');
+// Street cars pass through nothing: every lane's car body (±0.95 m, 0.5 and 1.2 m up, scaled as drawn by the 12 m fade at each
+// avenue end) along both avenues, probed 0.3 m in four directions against the landmarks, civic core and environment (guideway
+// piers, Hilton's chapel, Aqua City's walls). Faces are hit from either side for this check only.
+{
+  const solids = [environment, ...landmarks], sides = new Map<any, number>(), ground = /^(road|road_marking|sidewalk|plaza|landscape|water|service_area)$/;
+  for (const root of solids) root.traverse(o => { if (o instanceof Mesh && !Array.isArray(o.material)) { sides.set(o.material, o.material.side); o.material.side = 2; } });
+  environment.updateMatrixWorld(true);
+  const probe = new Raycaster(), dirs = [new Vector3(1, 0, 0), new Vector3(-1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 0, -1)], hits: string[] = [];
+  routes().streets.forEach((street, r) => {
+    const length = street.getLength();
+    for (let d = 0; d <= length; d += 1) for (const lane of [0, 1]) {
+      const p = street.getPointAt(d / length), t = street.getTangentAt(d / length), n = lane ? -laneOffset(r, 1) : laneOffset(r, 0);
+      const drawn = Math.min(1, d / 12, (length - d) / 12);
+      for (const across of [-.95, -.45, 0, .45, .95]) for (const y of [.5, 1.2]) for (const dir of dirs) {
+        probe.set(new Vector3(p.x + t.z * (n + across * drawn), y * drawn, p.z - t.x * (n + across * drawn)), dir); probe.far = .3;
+        const hit = probe.intersectObjects(solids, true).find(h => !ground.test(((h.object as Mesh).material as { name: string }).name));
+        if (hit) hits.push(`${r}|${lane}|${d}|${hit.object.name}|${hit.object.parent?.name}|${hit.point.y.toFixed(1)}|${hit.distance.toFixed(2)}`);
+      }
+    }
+  });
+  for (const [material, side] of sides) material.side = side;
+  assert.deepEqual([...new Set(hits.map(h => h.split('|').slice(0, 4).join('|')))].slice(0, 5), [], 'street cars pass through solid geometry');
+}
 const backdrop = new Box3().setFromObject(environment.getObjectByName('TERRAIN_LOW_DENSITY')!);
 assert.ok(environment.getObjectByName('CTX_south_east_unknown') && environment.getObjectByName('ROAD_MAJOR') && backdrop.max.z > 1300 && backdrop.max.x > 680, 'Odaiba backdrop ground, roads and massing continue past the district');
 const panels=contextFacades(environment);

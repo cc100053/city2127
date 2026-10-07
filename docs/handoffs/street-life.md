@@ -1,7 +1,7 @@
 # street-life — Pedestrian and street-traffic polish
 
 - Owner: cc100053
-- Status: IN PROGRESS (round 11 items 2, 3, 5 implemented on the feature branch, not merged by user request; exhibition-machine FPS open)
+- Status: IN PROGRESS (rounds 11–12 on the feature branch, not merged by user request; exhibition-machine FPS open)
 - Branch: feat/pedestrian-traffic-life
 - Base commit: 9476fd8b82da523d6f7acee6f1893e5028fb35a0
 - Last verified commit: cdea651d85b2e2573be5658cd583b1894e9caa65 (integrated main: root tests/build/diff-check PASS; tree identical to browser-verified round 10)
@@ -356,3 +356,26 @@ Not proposed: signals, pathfinding, new dependencies, interiors, population infe
   284–287, 358, 499, 559–628, 695–697) and solids sit in both lanes at d 639–670 (Hilton), so cars pass through them; Aqua City's
   wall is 0.1 m from seaside-avenue lane 1 car edges. Crossings are not in the hero view (geometry allows none there).
 - Next: user review, then merge with validation; re-measure FPS; consider re-routing lane offsets around the guideway piers.
+
+### Round 12 — lanes moved clear of piers and Hilton (2026-10-07; feature branch only, not merged)
+
+- User chose widening the guideway avenue's carriageway (asked "可唔可以擴闊車道？", then approved the plan). Start `f06dc7b`, clean,
+  0/0 with upstream, 1 ahead of `origin/main`.
+- Evidence (Node, real GLBs, BVH probes): the Yurikamome piers stand in the right half of the 7 m surveyed road about every 50 m,
+  reaching up to 0.5 m left of the centre line (0.36 m where cars are full size); Hilton's curved podium/chapel cross the whole road
+  at d 627–662; the strip left of the road is paving slab (except the junction mouth); beyond the piers is lawn.
+- `CARRIAGEWAY`/`laneOffset`: guideway avenue lanes at −1.65/−3.95 m (carriageway −5.1 … −0.5, widened 1.6 m onto paving), seaside
+  avenue lanes 0.25 m off centre (Aqua City's wall 2.3 m right of its centre line). Guideway avenue ends at d 620 (layout point
+  (−255.6, 88.6)); drop-off stops 223/273 (same road positions), bay 2.3 m beyond the lane; crossing d 282 → 286 so both
+  footways stay on paving; kerbs 0.5 m beyond the carriageway; junction fill −5.2 … +3.7 m; forecourt walks keep 1.5 m off both
+  the carriageway and the surveyed road.
+- Checks: new `odaiba.test.ts` sweep (every lane, car body ±0.95 m at 0.5/1.2 m scaled by the end fade, 0.3 m probes in four
+  directions, faces both sides) — 0 hits; fails on the old offsets. Mobility tests now require car edges on road or paving, the
+  crossing surfaces and the bays at the new offsets. Scratch 2 h traffic stress: min gap 2.00 m, 0 crossing conflicts, max lag
+  123 m, 147 crossings. Root `npm test` PASS, `npm run build` PASS, `git diff --check` PASS.
+- Browser (headed Chromium 151, 1400×900, Vite DEV :5174 started from `.claude/launch.json` `root-5174`, devtools-hook camera):
+  [pier clearance](../../artifacts/street-crossings/pier-clearance.png), [day crossing](../../artifacts/street-crossings/crossing-day.png),
+  [night crossing](../../artifacts/street-crossings/crossing-night.png), [junction](../../artifacts/street-crossings/junction-crossing.png)
+  (replacing round 11's captures). Console: the missing `/favicon.ico` 404, and once `TypeError: Failed to fetch` in the three.js
+  loader chunk (also seen once in round 10; not traced). FPS NOT re-measured.
+- Next: user review, then merge with validation and FPS on the exhibition machine.

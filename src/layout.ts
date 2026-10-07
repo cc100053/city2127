@@ -31,9 +31,10 @@ export const promenades: readonly (readonly P3[])[] = [
 ];
 // Street avenues, centrelines snapped to the environment's road surfaces (tests/mobility.test.ts): the 5 m seaside avenue north of Aqua
 // City and DECKS, and the 7 m avenue under the Yurikamome guideway. Neither crosses the other, so their street cars need no signals.
+// The guideway avenue ends at (-255.6, 88.6), short of Hilton's chapel and podium, which stand across its surveyed road beyond.
 export const streets: readonly (readonly P3[])[] = [
   [[-207,0,-86.4],[-108.9,0,-151.5],[-10.8,0,-216.6],[87,0,-282.1],[168.4,0,-336.7],[217.5,0,-369.3]],
-  [[259.8,0,-256],[175.9,0,-199.5],[108.9,0,-154.3],[24.6,0,-98.4],[-59.9,0,-42.9],[-127.5,0,1.5],[-160.6,0,24],[-244,0,80.9],[-328.1,0,136.7],[-344.7,0,148.2]],
+  [[259.8,0,-256],[175.9,0,-199.5],[108.9,0,-154.3],[24.6,0,-98.4],[-59.9,0,-42.9],[-127.5,0,1.5],[-160.6,0,24],[-244,0,80.9],[-255.6,0,88.6]],
 ];
 // Top of the Fuji TV sphere (centre about -18, 107, 23; radius 22): the air-taxi berth.
 export const SPHERE_DOCK: P3 = [-18,131,23];
