@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS
 - Branch: codex/fuji-tv-polish
 - Base commit: 4eda49ebae30e6215e6f67f17e8fef197832b34e
-- Last verified commit: the round-2 implementation commit recorded below (source SHA-256 `b3e28724…65ab`); previous round f504484
+- Last verified commit: the round-3 implementation commit recorded below (source SHA-256 `c80154ed…bc2b9`); round 2 `951bb27`
 - Remote availability: origin/codex/fuji-tv-polish; resolve this Git ref for latest implementation/evidence publication. Prior code 0076bad0 is integrated on main; v3 is a separate implementation.
 
 ## Session Git state
@@ -29,7 +29,7 @@ No failing source checks. Target fidelity remains partial; performance/hardware 
 
 ## Next expected step
 
-User reviews the v3 round-2 final screenshot ([v3r2-pass3](../../artifacts/fuji-tv-polish/v3r2-pass3.jpg)). Further passes or integration follow that review; keep this result on `codex/fuji-tv-polish` in the meantime.
+User reviews the v3 round-3 final screenshot ([v3r3-pass3](../../artifacts/fuji-tv-polish/v3r3-pass3.jpg)). Further passes or integration follow that review; keep this result on `codex/fuji-tv-polish` in the meantime.
 
 ## Target and pass 1 (2026-10-07)
 
@@ -116,3 +116,15 @@ Owner: Claude (orchestrator) with Opus worker subagents. User requested “do 3 
 Validation after every pass: root `npm test` (fail 0, includes actual floor/route/site clearances and 81 real survey-pipeline combinations), `npm run build` (existing >500kB warning), `git diff --check` PASS; captured console has no warnings/errors besides a favicon 404. Final also checked standalone hero16 (canvas 1280×720). Batches remain ≤9 per the existing test; triangle count rises (not re-measured). All changes stay in `src/civicCore.ts`; no new dependencies, GLB/Blender assets or renderer/camera changes. Evidence: [pass1](../../artifacts/fuji-tv-polish/v3r2-pass1.jpg), [pass2](../../artifacts/fuji-tv-polish/v3r2-pass2.jpg), [final day](../../artifacts/fuji-tv-polish/v3r2-pass3.jpg), [final night](../../artifacts/fuji-tv-polish/v3r2-pass3-night.jpg), [hero](../../artifacts/fuji-tv-polish/v3r2-hero.jpg). Meter low/mixed/high states, FPS, GPU/exhibition hardware and live survey browser NOT RUN this round.
 
 Target fidelity PARTIAL: interior light now reads as warm rooms with blue screens and visible occupancy, but the target's glowing glass sphere theatre, denser crowds and glazed diagonal tubes remain stronger than the build. Static people are architectural occupancy, not simulation. Three passes done; stop for user review per Dream Loop Plus.
+
+## Target v3 implementation round 3 (2026-10-07)
+
+Owner: Claude (orchestrator) with Opus worker subagents. User requested “do 3 more loops”. Startup: clean at `951bb27`, fetch succeeded, feature counterpart 0/0, origin/main `f3b7d73`; no merge. Same target, preview and headless `playwright-cli` 1280×720 capture method as round 2.
+
+- Pass 1: more amber room light with darker timber floors; dark desk tops; cleaner bay-facing mid band (y62/71 beam/diagonals removed on the front frame); diagonal streets now use a level basis (previously banked across their width) with ribbed glass escalator tubes, blue edge strips, steps and static riders; inward-facing sphere shell and lit crown rig.
+- Pass 2: sphere shell split into warm dome / blue lower band; glass opacity .2; softer room tone; pier slots blue, larger pier panels glass. Orchestrator fix: the worker used `silverGlass` before its declaration (TDZ crash; build/test/browser all failed), so the declaration moved up beside the light finishes.
+- Pass 3: fresnel `silverGlass` (clear face-on, silvered at grazing angles); saturated amber rooms; theatre wall dimmed to 0.3× so rig/stage/audience read; blue step lights; finer sphere grid (18 vertical, 6 horizontal ribs).
+
+Validation after each pass (pass 2 after the fix), recorded by exit code: root `npm test` 0, `npm run build` 0 (existing >500kB warning), `git diff --check` 0; civic day16/night22 captured console has no warnings/errors besides favicon 404. Standalone hero16 visually checked; its console log was not captured. Earlier round-2 notes grepped test output rather than exit codes; their builds succeeded and pages rendered, and round-3 pass 1 re-ran on top of that source with exit-code checks. Batches remain ≤9 per test; triangle count not re-measured. Evidence: [pass1](../../artifacts/fuji-tv-polish/v3r3-pass1.jpg), [pass2](../../artifacts/fuji-tv-polish/v3r3-pass2.jpg), [final day](../../artifacts/fuji-tv-polish/v3r3-pass3.jpg), [final night](../../artifacts/fuji-tv-polish/v3r3-pass3-night.jpg), [hero](../../artifacts/fuji-tv-polish/v3r3-hero.jpg). Meter low/mixed/high, FPS, GPU/exhibition hardware and live survey browser NOT RUN.
+
+Target fidelity PARTIAL: sphere now reads as a lit theatre and the wings as amber occupied rooms with blue screens; target still has a brighter golden stage/audience, denser visible crowds and warmer cream daytime facade. Stop for user review per Dream Loop Plus.
