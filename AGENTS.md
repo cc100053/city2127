@@ -74,7 +74,7 @@ cd module-swap && npm run install:app && npm test && npm run build  # viewer (te
 
 `survey/` and `module-swap/` are separate npm projects; root `npm test`/`build` does not cover them.
 
-Reuse a running preview if it belongs to this project. If the port is occupied, inspect it or use another port; leave unrelated processes running. Edit source, not `dist/` or `node_modules/`. There is no lint command or deployment workflow; [CI](.github/workflows/ci.yml) runs install/test/build for all three packages plus the whitespace check (details in [VALIDATION](docs/VALIDATION.md)).
+Reuse a running preview if it belongs to this project. If the port is occupied, inspect it or use another port; leave unrelated processes running. When the work is done, stop every dev/preview server you started (Vite, survey, headless browsers) so its port is free again. Edit source, not `dist/` or `node_modules/`. There is no lint command or deployment workflow; [CI](.github/workflows/ci.yml) runs install/test/build for all three packages plus the whitespace check (details in [VALIDATION](docs/VALIDATION.md)).
 
 ## CodeGraph
 
