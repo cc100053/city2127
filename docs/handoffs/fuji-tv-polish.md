@@ -5,7 +5,7 @@
 - Branch: codex/fuji-tv-polish
 - Base commit: 4eda49ebae30e6215e6f67f17e8fef197832b34e
 - Last verified commit: f64af182c0001335da941144fa80fb84b492cbe0; integrated source is byte-identical to the feature branch
-- Remote availability: origin/codex/fuji-tv-polish; checked code 0076bad0def237c4bb455fa4934a6afbfd6ece9a. Resolve this Git ref for latest documentation commit.
+- Remote availability: origin/main includes merge f64af182c0001335da941144fa80fb84b492cbe0; origin/codex/fuji-tv-polish retains ad8bc7552b181fbd583f8beb59bad5e7b41a6306. Main CI verified 15b82b4d3790b927b3dc74819e5f67f3a147134c; later handoff-only commits do not change code.
 
 ## Session Git state
 
@@ -73,4 +73,4 @@ User explicitly requested merging the worktree to main. Preflight: clean ad8bc75
 
 Root npm test/build PASS before and after merge; real 81-answer HTTP/WebSocket pipeline and actual scene/actor geometry checks PASS. Build retains the existing >500kB warning. Committed whitespace checks PASS and src/ byte comparison against the task branch is identical. Survey/module-swap source unchanged; their separate local suites not rerun. Post-merge development Mac in-app browser,1280×720, civic hour16/hour22, reviewTime40: visually checked, no console warnings/errors. Initial browser reload call timed out; rebinding recovered and checks completed. Temporary viewport override reset. Earlier hero/Meter captures remain evidence for identical code, not newly run cases. No FPS/hardware/live survey browser claim.
 
-Integration supersedes the earlier pending-review/main-unchanged publication notes. Only the implemented public-layer polish plus target v2 references are integrated; working wings and broadcast theatre remain pending implementation. Main push and CI confirmation follow this documentation update.
+Integration supersedes the earlier pending-review/main-unchanged publication notes. Only the implemented public-layer polish plus target v2 references are integrated; working wings and broadcast theatre remain pending implementation. Main pushed and fetched: HEAD/origin/main both `15b82b4d3790b927b3dc74819e5f67f3a147134c`, clean worktree. [Main CI 37560291965](https://github.com/cc100053/city2127/actions/runs/37560291965) SUCCESS on that exact commit: root tests/build, survey tests/build, module-swap tests/build and whitespace check PASS. This final handoff update is documentation-only; configured CI paths-ignore skips its push.
