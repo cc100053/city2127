@@ -7,7 +7,7 @@
   },
   "actorTime": 40,
   "base": "4eda49ebae30e6215e6f67f17e8fef197832b34e",
-  "checked": "Uncommitted final src/civicCore.ts delta",
+  "checked": "0076bad0def237c4bb455fa4934a6afbfd6ece9a",
   "cases": [
     {
       "view": "civic",
@@ -44,5 +44,6 @@
     }
   ],
   "fps": "NOT MEASURED",
-  "liveSurvey": "NOT RUN; real HTTP/WebSocket pipeline covered by root tests"
+  "liveSurvey": "NOT RUN; real HTTP/WebSocket pipeline covered by root tests",
+  "sourceIdentity": "Committed src/civicCore.ts byte-identical to browser-checked worktree"
 }

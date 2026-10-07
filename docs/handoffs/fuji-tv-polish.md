@@ -4,8 +4,8 @@
 - Status: IN_PROGRESS
 - Branch: codex/fuji-tv-polish
 - Base commit: 4eda49ebae30e6215e6f67f17e8fef197832b34e
-- Last verified commit: base 4eda49ebae30e6215e6f67f17e8fef197832b34e plus final uncommitted src/civicCore.ts delta; source checks PASS
-- Remote availability: NOT PUSHED
+- Last verified commit: 0076bad0def237c4bb455fa4934a6afbfd6ece9a; committed core is byte-identical to the source tested in pass3
+- Remote availability: origin/codex/fuji-tv-polish; checked code 0076bad0def237c4bb455fa4934a6afbfd6ece9a. Resolve this Git ref for latest documentation commit.
 
 ## Session Git state
 
@@ -29,7 +29,7 @@ No failing source checks. Target fidelity remains partial; performance/hardware 
 
 ## Next expected step
 
-Three passes complete. Publish the checked feature branch and ask cc100053 to review the actual screenshots; further passes/integration follow review per Dream Loop Plus.
+Three passes complete; feature branch published for cc100053 to review the actual screenshots. Further passes/integration follow review per Dream Loop Plus.
 
 ## Target and pass 1 (2026-10-07)
 
@@ -54,3 +54,7 @@ In-app browser on development Mac,1280×720, reviewTime40: final civic day16/nig
 Three-pass implementation/local validation complete; visual target PARTIAL. The generated target still has richer human activity, finer vegetation, fuller structural detail and layered interior light. Transfer capsules and internal rooms are static architectural details, not new simulated transport/services. FPS, exhibition GPU/hardware, long-run performance and live scratch-survey browser NOT RUN. No binary source changes or deployment. Main remains unchanged.
 
 Dream Loop Plus instructs: “Initially, only perform this loop 3 times” and “stop after 3, ask the user to review the results.” Result therefore stays on codex/fuji-tv-polish for cc100053 visual review; another three-pass group or integration follows that review. This task does not finish the separate asset study or previous district target. Working target/screenshots remain ignored under .dream-loop; committed target was generated with the built-in imagegen tool, not the CLI.
+
+## Feature-branch publication
+
+Implementation commit: `0076bad0def237c4bb455fa4934a6afbfd6ece9a`. Final fetch succeeded; origin/main remains4eda49e and is the task base (no divergence). Source byte comparison confirms committed code equals the pass3 checked worktree. Follow-up edits only record verification/publication; no code delta since checks. Published feature branch remains separate from main; main CI is not an integration claim. Feature-push CI is not part of the recorded local PASS results.
