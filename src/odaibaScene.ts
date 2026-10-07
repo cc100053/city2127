@@ -10,7 +10,7 @@ import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
 import { changeSites, DISTRICT, inDistrict, SEAWARD_GLSL } from './layout';
 import { bayContext, recedeBeyondDistrict } from './bayContext';
-import { publishDoorways, publishEntrances } from './mobility';
+import { publishDoorways, publishEntrances, roadFill } from './mobility';
 
 // Literal paths bundle the district-detailed environment (scripts/crop-odaiba-district.py) and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
 const environmentUrl = new URL('../asset/models/odaiba-masterplan/odaiba_district_v01_environment.glb', import.meta.url).href;
@@ -149,6 +149,17 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     // The sea lies under the whole plate; grazing shadows on it only produce acne.
     if (material.name === 'water') { object.castShadow = object.receiveShadow = false; if(water) object.material=water; }
   });
+  // The guideway avenue's junction mouth has neither road nor the paving slab laid over the avenues (terrain shows): fill it with the
+  // slab's finish, as part of the environment so doorway and paving checks see it.
+  let paving: T.Material | undefined;
+  environment.traverse(object => { if (!paving && object instanceof T.Mesh && (object.material as T.Material).name === 'sidewalk') paving = object.material; });
+  if (paving) {
+    const edges = roadFill(), fill = new T.BufferGeometry();
+    fill.setAttribute('position', new T.Float32BufferAttribute(edges.flatMap(pair => pair.flatMap(([x, z]) => [x, .15, z])), 3));
+    fill.setIndex(edges.slice(1).flatMap((_, i) => [2 * i, 2 * i + 2, 2 * i + 1, 2 * i + 1, 2 * i + 2, 2 * i + 3]));
+    fill.computeVertexNormals();
+    const strip = new T.Mesh(fill, paving); strip.name = 'ROAD_JUNCTION_FILL'; strip.receiveShadow = true; environment.add(strip);
+  }
   // After finishes: shared materials are re-tuned once per mesh above, which would drop an earlier wrap.
   environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) receded.add(object.material); });
   receded.forEach(material => { if (cutGround.has(material.name)) openBay(material); recedeBeyondDistrict(material); });

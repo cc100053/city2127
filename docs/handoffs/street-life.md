@@ -1,7 +1,7 @@
 # street-life — Pedestrian and street-traffic polish
 
 - Owner: cc100053
-- Status: COMPLETE (round 10 traffic/yielding items 1, 4, 6; exhibition-machine FPS and earlier limitations remain open)
+- Status: IN PROGRESS (round 11 items 2, 3, 5 implemented on the feature branch, not merged by user request; exhibition-machine FPS open)
 - Branch: feat/pedestrian-traffic-life
 - Base commit: 9476fd8b82da523d6f7acee6f1893e5028fb35a0
 - Last verified commit: cdea651d85b2e2573be5658cd583b1894e9caa65 (integrated main: root tests/build/diff-check PASS; tree identical to browser-verified round 10)
@@ -321,3 +321,38 @@ Not proposed: signals, pathfinding, new dependencies, interiors, population infe
 - Integration: feature `708b411` pushed; merged `--no-ff` as `cdea651` (tree identical; root `npm test`, `npm run build`, committed
   `git diff --check` PASS again); fetch before push showed main 2/0 ahead of origin. Exact main
   [CI run 37497799060](https://github.com/cc100053/city2127/actions/runs/37497799060) PASS. New Markdown links checked.
+
+### Round 11 — crossings, car-following, junction fill (2026-10-07; feature branch only, not merged)
+
+- User selected proposal items 2, 3, 5 and asked not to merge yet. Claude implements for owner cc100053 on
+  `feat/pedestrian-traffic-life` from `4eda49e` (branch/upstream and branch/main 0/0 after fetch).
+- 3 Car-following: every lane slot is simulated frame to frame (`carT`, never ahead of its free `laneTravel` slot): 2 m + 0.5 s
+  gap to the car ahead by loop position (measured modulo the loop, as a leader may wrap within the frame), ≤ 3 m/s² braking
+  profile for a requested crossing it can still stop for, +2.5 m/s² acceleration, catch-up ≤ +30 % and ≤ 14 m/s. Brake lamps
+  (now one per vehicle, `brake-lamps`) light while slowing or queued. A drop-off car wholly in its bay is no obstacle and its slot
+  keeps free pace (passenger timing); from 12 m before pulling out it keeps traffic pace and waits, indicating, until no car is
+  12 m behind to 20 m ahead and no slow car stands in the pull-out stretch. Reset/jump/snapshot puts cars back on their slots.
+  `mobility()` now returns the update function with `traffic()` diagnostics.
+- 2 Crossings (`CROSSINGS`): guideway avenue d 282 and d 480. Residents (1–2, every 70/83 s, gated by `rhythm.people`) walk 8 m
+  along the footway, wait at the kerb, cross at 1.4 m/s once no car is between stop line and far side and every approaching car
+  can stop at ≤ 4 m/s², then walk 8 m along the far footway. Pale band just above the paving slab, mint edge lines while
+  requested. Placement evidence: the seaside avenue has no north footway (Aqua City's "Warm Ivory Structure" stands 2.3 m from its
+  centre line, raycast); d 284–288 and d 640–670 have piers/overhangs; d 487 footways end at the mouth.
+- 5 Junction mouth: `roadFill()` strip (d 486–507, ±3.7 m) of the environment's paving finish, added to the environment in
+  `loadOdaiba`. The visible avenue surface everywhere is the sidewalk slab laid above the road layer, so the fill uses that finish.
+- Defects found and fixed while testing: drop-off slot overtaking a crossing queue (lane order now by loop position), merge into a
+  queue, merge beside a passing car, a car stopping every lap at the lane end (wrap within the frame), crosser pair meeting mid-turn,
+  catch-up above 15 m/s, unbounded queues with crossings every 37–43 s.
+- Checks: `mobility.test.ts` adds the traffic run (15 min evening with drawn crossers vs drawn car footprints; 30 min morning
+  lanes/crossings/lag), crossing surfaces, and zero off-road car-edge samples with the fill (fails without it: 24/1456). A scratch
+  2 h stress run (four start/hour/automation mixes) after the fixes: minimum bumper gap 2.00 m, 0 crossing conflicts, max lag 137 m.
+  Root `npm test` PASS, `npm run build` PASS, `git diff --check` PASS.
+- Browser (headed Chromium 151, 1400×900, Vite DEV :5174, camera set through the three.js devtools hook, live clock):
+  [day crossing](../../artifacts/street-crossings/crossing-day.png), [night crossing](../../artifacts/street-crossings/crossing-night.png),
+  [junction crossing](../../artifacts/street-crossings/junction-crossing.png); residents wait and cross while cars queue with brake
+  lamps; junction mouth reads as continuous paving. Console: only the missing `/favicon.ico` 404. FPS NOT re-measured this round
+  (the run was interrupted at the user's request); the simulation adds a per-frame sort of ≤ 28 cars per lane.
+- Pre-existing, not fixed (out of scope): guideway piers stand inside lane 0 about every 50 m (d 3–5, 64–67, 192–195, 237–240,
+  284–287, 358, 499, 559–628, 695–697) and solids sit in both lanes at d 639–670 (Hilton), so cars pass through them; Aqua City's
+  wall is 0.1 m from seaside-avenue lane 1 car edges. Crossings are not in the hero view (geometry allows none there).
+- Next: user review, then merge with validation; re-measure FPS; consider re-routing lane offsets around the guideway piers.

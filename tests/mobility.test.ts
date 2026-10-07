@@ -3,7 +3,9 @@ import { readFileSync } from 'node:fs';
 import { routes, podPose, boatPoses, HULL, WATER_PERIOD, BOATS as BOAT_COUNT, trainPose, TRAIN_SPEED, walkerPose, walkerRoute, walkerParty, doorwayPose, robotPose, collectorPose, ROBOT_HALT, HANDOFF, promenadeStops, RAIL_OUT, STOOL_FRONT, streetCarPose, STREET_GAP, dropOffPose, DROP_OFF, streetRhythm, promenadeBenches, BENCH_OUT, transferPose, dockMotion, guideStrength, aircraftSlot, podShare, automationActivity, CARS, CAR_GAP, TRAINS, WALKERS, TRANSFERS, PLATOON } from '../src/mobility.ts';
 import { changeSites, SPHERE_DOCK, INTERCHANGE } from '../src/layout.ts';
 import { laneBeaconSites } from '../src/waterRooms.ts';
-import { conversationPose, visitPose, entrancePose, servicePose } from '../src/mobility.ts';
+import { conversationPose, visitPose, entrancePose, servicePose, mobility, roadFill, CROSSINGS, ROAD_HALF } from '../src/mobility.ts';
+import * as T from 'three';
+import { presets } from '../src/presets.ts';
 
 const path = routes(), guideLength = path.guideway.getLength();
 // Landmark boxes (Blender Z-up bounds → scene X, Y, -Z) and each survey site's tallest scaled envelope.
@@ -123,16 +125,19 @@ const inside = (tris: number[][], x: number, z: number) => tris.some(([ax, az, b
   const d1 = s(ax, az, bx, bz), d2 = s(bx, bz, cx, cz), d3 = s(cx, cz, ax, az);
   return !((d1 < 0 || d2 < 0 || d3 < 0) && (d1 > 0 || d2 > 0 || d3 > 0));
 });
+// The junction-mouth fill (scene strip of road material) closes the guideway avenue's only gap.
+const fill = roadFill();
+for (let i = 1; i < fill.length; i++) { const [[ax, az], [bx, bz]] = fill[i - 1], [[cx, cz], [dx, dz]] = fill[i]; roadTris.push([ax, az, cx, cz, bx, bz], [bx, bz, cx, cz, dx, dz]); }
 const onRoad = (x: number, z: number) => inside(roadTris, x, z);
 path.streets.forEach((street, r) => {
   const length = street.getLength(), offset = r ? 1.75 : 1.25, cars = Math.round((length + 40) / STREET_GAP);
   let missing = 0, samples = 0;
   for (let d = 0; d <= length; d += 2) for (const side of [-1, 1]) {
     const p = street.getPointAt(d / length), t = street.getTangentAt(d / length);
-    // Both car edges (0.95 m either side of the lane centre). The junction mouth under the guideway (~10 m) has no road triangle.
+    // Both car edges (0.95 m either side of the lane centre).
     for (const edge of [-.95, .95]) { samples++; if (!onRoad(p.x + t.z * side * (offset + edge), p.z - t.x * side * (offset + edge))) missing++; }
   }
-  assert.ok(missing / samples < .02, `street ${r}: ${missing}/${samples} car-edge samples off the road`);
+  assert.equal(missing, 0, `street ${r}: ${missing}/${samples} car-edge samples off the road`);
   for (const lane of [0, 1]) for (let t = 0; t < 300; t += .5) {
     const at = Array.from({ length: cars }, (_, c) => streetCarPose(t, r, lane, c, cars, length));
     const shown = at.filter(c => c.visible > 0).map(c => c.d).sort((a, b) => a - b);
@@ -311,4 +316,67 @@ for (let ports = 0; ports <= 6; ports++) {
 assert.ok(guideStrength(.01, .99, true) > .9);
 assert.equal(guideStrength(.01, .99, false), 0);
 assert.equal(guideStrength(.5, 0, true), 0);
+// Crossings: the carriageway under the band is road; the kerbs and both footways walked 8 m up and down the avenue are paving.
+for (const { road, d } of CROSSINGS) {
+  const street = path.streets[road], length = street.getLength(), half = ROAD_HALF[road];
+  const at = (along: number, a: number) => { const p = street.getPointAt((d + along) / length), t = street.getTangentAt((d + along) / length); return [p.x + t.z * a, p.z - t.x * a] as const; };
+  for (const along of [-.7, 0, .7]) for (let a = -half - .7; a <= half + .7; a += .25)
+    assert.ok(Math.abs(a) < half - .3 ? onRoad(...at(along, a)) : Math.abs(a) > half + .3 ? inside(pavedTris, ...at(along, a)) : true, `crossing ${road}/${d} off its surface at ${a}`);
+  for (let along = -8.7; along <= 8.7; along += .5) for (const a of [-half - .7, half + .7]) assert.ok(inside(pavedTris, ...at(along, a)), `crossing ${road}/${d} footway off the paving at ${along}`);
+}
+// Street traffic as simulated by the real actors over 15 min at 0.1 s (evening crowd and commute): cars never close within 1.5 m in a
+// lane or exceed 15 m/s, never stand between a crossing's stop line and its far side while residents cross, actually stop and queue
+// for crossings, catch up with their free slots afterwards, and every crosser drawn keeps clear of every car body drawn.
+{
+  const scene = new T.Scene(), update = mobility(scene), mesh = (name: string) => scene.children.find(o => o.name === name) as T.InstancedMesh;
+  const people = mesh('doorway-walkers'), bodies = [mesh('street-cars'), mesh('street-pods')], m = new T.Matrix4(), q = new T.Matrix4(), v = new T.Vector3(), sc = new T.Vector3();
+  const crossers = people.count - 2 * CROSSINGS.length, crossed = CROSSINGS.map(() => 0), was = CROSSINGS.map(() => 'idle');
+  let stops = 0, queued = 0, brakes = 0, lag = 0, parked = 0, drawn = 0, prev: ReturnType<ReturnType<typeof mobility>['traffic']>['cars'] | null = null;
+  for (let t = 1000; t < 1900; t += .1) {
+    update(presets.neutral, t, .5, 0, 18);
+    const { cars, crossings } = update.traffic();
+    for (const road of [0, 1]) for (const lane of [0, 1]) {
+      const inLane = cars.filter(c => c.road === road && c.lane === lane && !c.bay).sort((a, b) => a.x - b.x);
+      for (let k = 1; k < inLane.length; k++) assert.ok(inLane[k].x - inLane[k].length / 2 - inLane[k - 1].x - inLane[k - 1].length / 2 > 1.5, `cars close up on ${road}/${lane} at ${t.toFixed(1)}s`);
+      queued += inLane.filter((c, k) => c.v < .1 && k + 1 < inLane.length && inLane[k + 1].v < .1 && inLane[k + 1].x - c.x < 12).length;
+    }
+    cars.forEach((c, k) => { assert.ok(c.v <= 15, 'street car too fast'); lag = Math.max(lag, c.lag); if (c.bay) parked++; if (prev && !c.bay && Math.abs(c.x - prev[k].x) < 100) assert.ok(Math.abs(c.x - prev[k].x) < 1.6, 'street car jumps'); if (c.brake) brakes++; });
+    crossings.forEach((c, k) => {
+      if (c.phase === 'cross' && was[k] !== 'cross') crossed[k]++; was[k] = c.phase;
+      for (const { lane, x } of c.lanes) for (const car of cars) if (car.road === c.road && car.lane === lane && !car.bay) {
+        const front = car.x + car.length / 2, rear = car.x - car.length / 2;
+        if (c.phase === 'cross') assert.ok(front < x - 3.5 || rear > x + 2.5, `car on crossing ${k} while residents cross at ${t.toFixed(1)}s`);
+        if (car.v < .1 && Math.abs(x - 4 - front) < 1) stops++;
+      }
+    });
+    prev = cars;
+    // Drawn bodies: each crosser outside every drawn car's footprint (+0.3 m), in that car's own frame.
+    for (let j = crossers; j < people.count; j++) {
+      people.getMatrixAt(j, m); if (sc.setFromMatrixScale(m).x < .5) continue; const at = new T.Vector3().setFromMatrixPosition(m); drawn++;
+      for (const body of bodies) for (let i = 0; i < body.count; i++) {
+        body.getMatrixAt(i, q); if (sc.setFromMatrixScale(q).x < .5) continue;
+        v.copy(at).applyMatrix4(q.clone().invert());
+        assert.ok(Math.abs(v.x) > .95 + .3 / sc.x || Math.abs(v.z) > 2.3 + .3 / sc.z, `crosser ${j} inside car ${i} at ${t.toFixed(1)}s`);
+      }
+    }
+  }
+  assert.ok(crossed.every(n => n >= 10) && stops > 50 && queued > 20 && brakes > 500 && drawn > 2000, `crossings ${crossed}, stops ${stops}, queued ${queued}, brakes ${brakes}, drawn crossers ${drawn}`);
+  // Delays recover: no slot falls more than 200 m behind its free slot, and the drop-off cars still spend long spells in their bays.
+  assert.ok(lag < 200 && parked > 4000, `lag ${lag.toFixed(0)} m, parked frames ${parked}`);
+  // A longer, cheaper run (morning, low automation, fresh actors): lanes, crossings and recovery only. Lane ends wrap round the loop
+  // and once stopped a car there every lap; drop-off pull-outs once merged into queues.
+  const morning = mobility(new T.Scene());
+  for (let t = 40000; t < 41800; t += .1) {
+    morning(presets.neutral, t, 0, 0, 8);
+    const { cars, crossings } = morning.traffic();
+    for (const road of [0, 1]) for (const lane of [0, 1]) {
+      const inLane = cars.filter(c => c.road === road && c.lane === lane && !c.bay).sort((a, b) => a.x - b.x);
+      for (let k = 1; k < inLane.length; k++) assert.ok(inLane[k].x - inLane[k].length / 2 - inLane[k - 1].x - inLane[k - 1].length / 2 > 1.5, `morning cars close up on ${road}/${lane} at ${t.toFixed(1)}s`);
+    }
+    assert.ok(cars.every(c => c.lag < 200), `morning lag at ${t.toFixed(1)}s`);
+    for (const c of crossings) if (c.phase === 'cross') for (const { lane, x } of c.lanes) for (const car of cars)
+      if (car.road === c.road && car.lane === lane && !car.bay) assert.ok(car.x + car.length / 2 < x - 3.5 || car.x - car.length / 2 > x + 2.5, `morning car on a crossing at ${t.toFixed(1)}s`);
+  }
+  console.log(`PASS: street traffic — crossings ${crossed.join('/')} in 15 min, ${stops} stop-line and ${queued} queue frames, max lag ${lag.toFixed(0)} m; cars clear of each other and of crossers.`);
+}
 console.log(`PASS: Odaiba actors — air tiers clear landmarks, sites and beacons, sphere and interchange berths, pod spacing on ${guideLength.toFixed(0)} m of guideway, walker/party/doorway/transfer continuity, street cars on the road and spaced, drop-off bays on paving, day rhythm, benches, ${beacons.length} lane beacons, aircraft slots, guide lights.`);

@@ -409,13 +409,15 @@ export function collectorPose(waited:number) {
  * 0.45–1.6× the mean, moving at one lane speed (8–11 m/s with a shared ±15 % surge), so they never close up. They fade in and out at the
  * avenue ends. Lane 0 drives with the route, lane 1 against it; Japan keeps left. Returns `d` metres along the route. */
 export const STREET_GAP=27;
-/** A lane car's travel `x` from its lane's start (-20 … length + 20, the ends out of sight) and its lap count. */
+/** A lane car's free slot: `travelled` metres round its lane's loop (`rate` m/s now), as travel `x` from the lane's start (-20 …
+ * length + 20, the ends out of sight) and its lap count. Car k-1 always leads car k. */
 function laneTravel(time:number,road:number,lane:number,car:number,cars:number,length:number) {
   const id=road*2+lane,speed=8+3*hash(id,14),span=length+40,weight=(k:number)=>1+2.5*hash(id*97+k,15);
   let before=0,total=0;for(let k=0;k<cars;k++){if(k<car)before+=weight(k);total+=weight(k);}
-  const travelled=speed*(time+3*Math.sin(time*.05+id*1.7))-span*before/total,lap=Math.floor(travelled/span);
-  return {x:travelled-lap*span-20,lap,speed,span};
+  const travelled=speed*(time+3*Math.sin(time*.05+id*1.7))-span*before/total;
+  return {...laneAt(travelled,span),speed,span,travelled,rate:speed*(1+.15*Math.cos(time*.05+id*1.7))};
 }
+const laneAt=(travelled:number,span:number)=>{const lap=Math.floor(travelled/span);return {x:travelled-lap*span-20,lap};};
 const fadeEnds=(x:number,length:number)=>T.MathUtils.clamp(x/12,0,1)*T.MathUtils.clamp((length-x)/12,0,1);
 export function streetCarPose(time:number,road:number,lane:number,car:number,cars:number,length:number) {
   const {x}=laneTravel(time,road,lane,car,cars,length);
@@ -423,14 +425,18 @@ export function streetCarPose(time:number,road:number,lane:number,car:number,car
 }
 /** Kerbside drop-off on the paved forecourt south of Aqua City, beside the guideway avenue's westbound lane: two cars, each stopping at
  * its own bay `stops` m along the lane, `bay` m beyond the lane centre. On even laps the car eases over SHIFT m into the bay at speed,
- * brakes over 2·BRAKE m of its slot's travel to rest BRAKE m on, waits a whole lap, and rejoins exactly its own slot as it comes round,
- * so it never meets another car. Cues: `signal` +1 indicates toward the kerb from SIGNAL m before easing in until it stops, -1 toward
+ * brakes over 2·BRAKE m of its slot's travel to rest BRAKE m on, waits a whole lap, and rejoins its own slot as it comes round (in
+ * `mobility` it also waits there until the lane beside the pull-out is clear). Cues: `signal` +1 indicates toward the kerb from SIGNAL m before easing in until it stops, -1 toward
  * the road from 3 s before pulling away until back in lane; `brake` lights while braking; `pitch` (rad, + nose down) dips the nose
  * under braking and lifts it pulling away. */
 export const DROP_OFF={road:1,lane:1,cars:[0,14],stops:[330,380],bay:3.5} as const;
 const BRAKE=12,SHIFT=35,SIGNAL=30;
 export function dropOffPose(time:number,car:number,cars:number,length:number,stop:number) {
-  const {x,lap,speed,span}=laneTravel(time,DROP_OFF.road,DROP_OFF.lane,car,cars,length),even=lap%2===0,rest=stop+BRAKE;
+  return dropOffAt(laneTravel(time,DROP_OFF.road,DROP_OFF.lane,car,cars,length),length,stop);
+}
+/** The drop-off manoeuvre for a slot at lane travel `x`, lap `lap` (`dropOffPose`, or the simulated slot in `mobility`). */
+function dropOffAt({x,lap,speed,span}:{x:number;lap:number;speed:number;span:number},length:number,stop:number) {
+  const even=lap%2===0,rest=stop+BRAKE;
   // `steer`: heading offset (rad, toward the kerb) while easing in or out, so the car turns rather than slides.
   let p=x,bay=0,parked=-1,leaving=-1,steer=0,brake=0,pitch=0;
   const slope=(u:number)=>6*u*(1-u)*DROP_OFF.bay/SHIFT;
@@ -443,6 +449,25 @@ export function dropOffPose(time:number,car:number,cars:number,length:number,sto
   if(parked>=0)leaving=(((stop-x)%span+span)%span)/speed;
   const signal=even&&x>=stop-SHIFT-SIGNAL&&parked<0&&(x<stop||brake>0)?1:(parked>=0&&leaving<3)||(!even&&x>=stop&&x<stop+2*BRAKE+SHIFT)?-1:0;
   return {d:DROP_OFF.lane?length-p:p,bay,steer,visible:fadeEnds(p,length),parked,leaving,signal,brake,pitch};
+}
+/** Shared-space crossings (no signals): `d` metres along `streets[road]`. Residents walk to the kerb, wait until every approaching car
+ * has stopped short of the stop line or passed, cross, and walk on; cars brake for a requested crossing when they still can and queue
+ * behind each other (`mobility`). Both on the guideway avenue, where paving on each side is open 12 m out at body height (under the
+ * guideway): south of Aqua City past the drop-off bays, and just before the junction mouth. The seaside avenue has no north footway (Aqua
+ * City's wall stands 2.3 m from its centre line). */
+export const CROSSINGS=[{road:1,d:282,period:70},{road:1,d:480,period:83}] as const;
+/** Carriageway half-width per avenue (5 m and 7 m). */
+export const ROAD_HALF=[2.5,3.5] as const;
+/** The guideway avenue's junction mouth has no road surface in the environment (terrain shows between d 492 and 501): a strip of
+ * the paving finish that covers the other avenues fills it (`loadOdaiba`). Left/right edge points (x, z) every metre, for the scene mesh and the road test. */
+export const ROAD_FILL={road:1,from:486,to:507,half:3.7} as const;
+export function roadFill() {
+  const street=routes().streets[ROAD_FILL.road],length=street.getLength(),edges:[number,number][][]=[];
+  for(let d=ROAD_FILL.from;d<=ROAD_FILL.to;d++){
+    const p=street.getPointAt(d/length),t=street.getTangentAt(d/length);
+    edges.push([-1,1].map(s=>[p.x+t.z*s*ROAD_FILL.half,p.z-t.x*s*ROAD_FILL.half] as [number,number]));
+  }
+  return edges;
 }
 /** City day rhythm, 0..1 per group at `hour` (undefined: everything at full, as the standalone and Meter tests expect). Most people out
  * in the evening, joggers at dawn and dusk, strollers toward sunset, children by day, sitters from late morning, delivery robots
@@ -580,8 +605,8 @@ export function mobility(scene:T.Scene) {
   const airPods=fleet(scene,[part([1.5,.8,2.4],[0,.1,0],airShell,.35),part([1.56,.3,1.5],[0,.32,.25],glass,.12),part([1.2,.08,2],[0,-.3,0],mint,.03),
     ...[[-1.15,-.95],[1.15,-.95],[-1.15,.95],[1.15,.95]].map(([x,z])=>({geometry:new T.TorusGeometry(.55,.08,6,20).rotateX(Math.PI/2).translate(x,.15,z),material:airShell}))],LOOP_AIRCRAFT+2,'air-pods');
   // Doorway walkers step in and out of the landmarks (publishDoorways); street cars: 4.6 m human-driven cars, every seventh a 7 m van.
-  // Slots: forecourt walkers, drop-off passengers, then one collector per delivery robot.
-  const COLLECTORS=DOOR_WALKERS+2*DROP_OFF.cars.length,doorPeople=pedestrians(scene,COLLECTORS+ROBOTS,'doorway-walkers');
+  // Slots: forecourt walkers, drop-off passengers, one collector per delivery robot, then two per crossing.
+  const COLLECTORS=DOOR_WALKERS+2*DROP_OFF.cars.length,CROSSERS=COLLECTORS+ROBOTS,doorPeople=pedestrians(scene,CROSSERS+2*CROSSINGS.length,'doorway-walkers');
   // Delivery robots: 0.8 m rovers with a lit lid, on the doorway forecourts.
   const robots=fleet(scene,[part([.62,.5,.8],[0,.42,0],shell,.12),part([.5,.05,.5],[0,.68,0],mint,.02),part([.66,.16,.7],[0,.12,0],glass,.05)],ROBOTS,'delivery-robots');
   const carBody=material('#ffffff'),headlight=new T.MeshStandardMaterial({color:'#f4f6f2',emissive:'#fff6e0',emissiveIntensity:0,roughness:.3}),taillight=new T.MeshStandardMaterial({color:'#b85a50',emissive:'#ff4a3a',emissiveIntensity:0,roughness:.3});
@@ -599,7 +624,13 @@ export function mobility(scene:T.Scene) {
   // the tail light; hidden when off.
   const amber=new T.MeshBasicMaterial({color:'#ffae2e'}),brakeRed=new T.MeshBasicMaterial({color:'#ff3326'});
   const indicators=fleet(scene,[part([.06,.14,.3],[0,.95,2.05],amber,.02),part([.06,.14,.3],[0,.95,-2.05],amber,.02)],DROP_OFF.cars.length,'drop-off-indicators',false);
-  const brakeLamps=fleet(scene,[part([1.54,.16,.06],[0,.95,-2.33],brakeRed,.03)],DROP_OFF.cars.length,'drop-off-brakes',false);
+  // Every street vehicle's brake lamp (slot as `cars`): lit while slowing, queued or stopped at a crossing, and for the drop-off stop.
+  const brakeLamps=fleet(scene,[part([1.54,.16,.06],[0,.95,-2.33],brakeRed,.03)],carSlots,'brake-lamps',false);
+  // Crossings: a pale band just above the paving slab that covers the avenues (x scaled to the carriageway width; car bodies clear
+  // it), with mint edge lines lit while a crossing is requested.
+  const crossBands=fleet(scene,[part([1,.02,3.6],[0,.23,0],shell,.01)],CROSSINGS.length,'crossing-bands',false),crossLights=fleet(scene,
+    [part([1,.02,.1],[0,.245,1.85],mint,.01),part([1,.02,.1],[0,.245,-1.85],mint,.01)],CROSSINGS.length,'crossing-lights',false);
+  crossBands.meshes.forEach(m=>m.receiveShadow=true);
   const berthLight=new T.PointLight('#b9e2cf',0,60,2);berthLight.position.set(SPHERE_DOCK[0],SPHERE_DOCK[1]+4,SPHERE_DOCK[2]);scene.add(berthLight);
   const ixLight=new T.PointLight('#b9e2cf',0,45,2);ixLight.position.set(INTERCHANGE.mast[0],INTERCHANGE.deck+4,INTERCHANGE.mast[2]);scene.add(ixLight);
   const guideMaterial=new T.MeshBasicMaterial({color:new T.Color('#88d6d3').multiplyScalar(1.6)});
@@ -632,6 +663,11 @@ export function mobility(scene:T.Scene) {
       for(const j of [-1,1])spots.push({at:at.clone().addScaledVector(tangent,j*(rail?.28:.45)).setY(rail?0:-.08),yaw:yaw-(rail?j*.35:0),seated:rail?0:1});
     }
   });benchFleet.flush();stools.flush();
+  const crossAt=CROSSINGS.map(({road,d},k)=>{
+    place(path.streets[road],d/streetLength[road]);const half=ROAD_HALF[road];
+    pose.scale.set(2*half+.6,1,1);crossBands.set(k,pose);pose.scale.set(1,1,1);
+    return {p:pose.position.clone(),t:tangent.clone(),half,kerb:half+.7,yaw:pose.rotation.y};
+  });crossBands.flush();
   const stops=promenadeStops(walkLength.slice(0,2));
   const resting=pedestrians(scene,spots.length+FORECOURT_GROUPS*3,'resting-people');
   /** Drop-off passengers: one steps out 2 s after the car parks and walks to the nearest landmark door; another walks out to arrive
@@ -671,11 +707,89 @@ export function mobility(scene:T.Scene) {
     return (i:number,on:boolean)=>{const target=on?1:0;level[i]=level[i]<0?target:level[i]+T.MathUtils.clamp(target-level[i],-fade,fade);return ease(level[i]);};
   };
   const walkerGate=gate(MAX_WALKERS),doorGate=gate(DOOR_WALKERS),robotGate=gate(ROBOTS),restGate=gate(spots.length+FORECOURT_GROUPS*3),carGate=gate(carSlots);
-  return (state:WorldState,time:number,automationShare?:number,night=0,hour?:number)=>{
+  // Street traffic: each lane slot drives its own `carT` metres round its lane loop, never ahead of its free slot (`laneTravel`). It
+  // eases toward the free pace (up to 30 % faster, ≤ 14 m/s, to catch up), keeps 2 m + 0.5 s behind the car ahead, and brakes on a ≤ 3 m/s²
+  // profile for a requested crossing it can still stop for (else it is committed and passes). A drop-off car wholly in its bay is no
+  // obstacle and its slot keeps the free pace (passengers time their walks to it), so leaders come from the actual order round the
+  // loop each frame; before pulling out it waits, indicating, until the lane behind and beside the bay is clear. A first frame, jump
+  // or snapshot puts every car on its slot.
+  const carLanes=path.streets.flatMap((_,road)=>[0,1].map(lane=>({road,lane,n:streetCars[road],length:streetLength[road],span:streetLength[road]+40}))),laneBase:number[]=[];
+  carLanes.reduce((b,l)=>{laneBase.push(b);return b+l.n;},0);
+  const dropOf=Int8Array.from({length:carSlots},(_,s)=>{const l=carLanes.findIndex((_,i)=>s>=laneBase[i]&&s<laneBase[i]+carLanes[i].n);
+    return carLanes[l].road===DROP_OFF.road&&carLanes[l].lane===DROP_OFF.lane?(DROP_OFF.cars as readonly number[]).indexOf(s-laneBase[l]):-1;});
+  const vanOf=Uint8Array.from({length:carSlots},(_,s)=>dropOf[s]<0&&hash(s,17)<.14?1:0),carLen=Float32Array.from(vanOf,v=>v?4.6*1.55:4.6);
+  const carT=new Float64Array(carSlots),carV=new Float32Array(carSlots),carBrake=new Uint8Array(carSlots),inBay=new Uint8Array(carSlots);
+  let simTime=NaN;
+  /** Crossing state: residents `arrive` along the footway (6 s, 8 m) to the kerb, `wait` until clear, `cross`, then `leave` along
+   * the far footway (6 s), each way up or down the avenue by `from`/`to`. */
+  type Phase='idle'|'arrive'|'wait'|'cross'|'leave';
+  const crossing=CROSSINGS.map(()=>({phase:'idle' as Phase,at:0,event:0,side:1,size:1,from:1,to:1}));
+  const requested=(k:number,time:number)=>{const c=crossing[k];return c.phase==='wait'||c.phase==='cross'||c.phase==='arrive'&&time-c.at>4.5;};
+  const laneX=(l:number,d:number)=>carLanes[l].lane?carLanes[l].length-d:d;
+  // Clear: no car between the stop line (4 m before the crossing centre) and 2.5 m past it, and every car still approaching can
+  // stop at ≤ 4 m/s².
+  const clearFor=(k:number)=>carLanes.every((l,i)=>{
+    if(l.road!==CROSSINGS[k].road)return true;
+    const xc=laneX(i,CROSSINGS[k].d),stop=xc-4;
+    for(let s=laneBase[i];s<laneBase[i]+l.n;s++){
+      if(inBay[s])continue;
+      const x=laneAt(carT[s],l.span).x,front=x+carLen[s]/2,rear=x-carLen[s]/2;
+      if(front>stop+.05&&rear<xc+2.5)return false;
+      if(front<=stop+.05&&carV[s]>.5&&stop-front<carV[s]**2/8)return false;
+    }
+    return true;
+  });
+  const stepTraffic=(time:number,people:number)=>{
+    const dt=time-simTime,reset=!(dt>0&&dt<.5);if(dt===0)return;simTime=time;
+    CROSSINGS.forEach((C,k)=>{
+      const c=crossing[k],event=Math.floor(time/C.period+hash(k,40));
+      if(reset){c.phase='idle';c.event=event;return;}
+      if(c.phase==='idle'&&event>c.event){c.event=event;if(people>hash(event*7+k,41))Object.assign(c,{phase:'arrive',at:time,side:hash(event,42)<.5?1:-1,size:hash(event,43)<.6?1:2,from:hash(event,44)<.5?1:-1,to:hash(event,45)<.5?1:-1});}
+      else if(c.phase==='arrive'&&time-c.at>=6)Object.assign(c,{phase:'wait',at:time});
+      else if(c.phase==='wait'&&clearFor(k))Object.assign(c,{phase:'cross',at:time});
+      else if(c.phase==='cross'&&time-c.at>=2*crossAt[k].kerb/1.4)Object.assign(c,{phase:'leave',at:time});
+      else if(c.phase==='leave'&&time-c.at>=6)c.phase='idle';
+    });
+    carLanes.forEach((l,i)=>{
+      const base=laneBase[i],slots=Array.from({length:l.n},(_,k)=>base+k);
+      for(const s of slots)inBay[s]=dropOf[s]>=0&&dropOffAt({...laneAt(carT[s],l.span),speed:0,span:l.span},l.length,DROP_OFF.stops[dropOf[s]]).bay===1?1:0;
+      // In-lane cars by position round the loop (lags differ, so travelled distance can be a lap apart); each follows the next one on.
+      const xOf=(s:number)=>laneAt(carT[s],l.span).x,order=slots.filter(s=>!inBay[s]).sort((a,b)=>xOf(a)-xOf(b));
+      for(const s of slots){
+        const k=s-base,free=laneTravel(time,l.road,l.lane,k,l.n,l.length);
+        if(reset){carT[s]=free.travelled;carV[s]=free.rate;carBrake[s]=0;continue;}
+        let v=Math.min(14,free.rate+T.MathUtils.clamp((free.travelled-carT[s])*.3,0,.3*free.rate));
+        if(inBay[s]){
+          // Due to pull out, the slot keeps traffic's free pace (no catch-up), so a car now 12 m behind to 20 m ahead of it would be
+          // beside or just ahead of it as it reaches the lane, and a slow or queued car in the pull-out stretch would be in its way;
+          // hold (indicating) until neither is there.
+          const stop=DROP_OFF.stops[dropOf[s]],x=laneAt(carT[s],l.span).x;
+          if(x>=stop-12&&x<stop+2*BRAKE)v=Math.min(v,free.rate);
+          if(x>=stop-1.5&&x<stop&&order.some(o=>{const ox=xOf(o);return ox>stop-12&&ox<stop+20||carV[o]<6&&ox>stop+2*BRAKE-8&&ox<stop+2*BRAKE+SHIFT+8;}))v=0;
+        }else{
+          v=Math.min(v,carV[s]+2.5*dt);
+          // The car ahead round the loop (the frontmost follows the rearmost, a lap on); measured round the loop, as it may already
+          // have wrapped this frame.
+          const at=order.indexOf(s),ls=order[(at+1)%order.length];
+          if(ls!==s){const gap=((xOf(ls)-xOf(s))%l.span+l.span)%l.span-carLen[ls]/2-carLen[s]/2;v=Math.min(v,Math.max(0,(gap-2)/.5));}
+          const front=laneAt(carT[s],l.span).x+carLen[s]/2;
+          CROSSINGS.forEach((C,c)=>{
+            if(C.road!==l.road||!requested(c,time))return;
+            const dist=laneX(i,C.d)-4-front;
+            if(dist>=-.05&&(dist>=carV[s]**2/12||carV[s]<.5))v=Math.min(v,Math.sqrt(6*Math.max(0,dist-.2)));
+          });
+        }
+        v=Math.max(0,v);carBrake[s]=!inBay[s]&&(v<.5||(carV[s]-v)/dt>1)?1:0;
+        carT[s]=Math.min(carT[s]+v*dt,free.travelled);carV[s]=v;
+      }
+    });
+  };
+  const update=(state:WorldState,time:number,automationShare?:number,night=0,hour?:number)=>{
     const activity=automationShare===undefined?null:automationActivity(automationShare),rhythm=streetRhythm(hour);
     // Presence eases over 1.5 s of animation time; a reset, snapshot or jump settles at once.
     fade=Number.isFinite(lastTime)&&time>lastTime?(time-lastTime)/1.5:1;dt=time>lastTime&&time-lastTime<.5?time-lastTime:0;lastTime=time;
     const amount=(count:number,index:number)=>T.MathUtils.clamp(count-index,0,1);
+    stepTraffic(time,rhythm.people);
     mint.emissiveIntensity=.65+state.neon*1.8;
     airShell.emissiveIntensity=activity?activity.level*.85:0;
     collar.emissiveIntensity=night*4;
@@ -827,23 +941,49 @@ export function mobility(scene:T.Scene) {
     }resting.flush();
     for(let r=0,slot=0;r<path.streets.length;r++)for(let lane=0;lane<2;lane++)for(let c=0;c<streetCars[r];c++,slot++){
       const drop=r===DROP_OFF.road&&lane===DROP_OFF.lane?(DROP_OFF.cars as readonly number[]).indexOf(c):-1;
-      const car=drop<0?{...streetCarPose(time,r,lane,c,streetCars[r],streetLength[r]),bay:0,steer:0}:dropOffPose(time,c,streetCars[r],streetLength[r],DROP_OFF.stops[drop]);
+      const span=streetLength[r]+40,at={...laneAt(carT[slot],span),speed:8+3*hash(r*2+lane,14),span};
+      const car=drop<0?{d:lane?streetLength[r]-at.x:at.x,visible:fadeEnds(at.x,streetLength[r]),bay:0,steer:0}:dropOffAt(at,streetLength[r],DROP_OFF.stops[drop]);
       place(path.streets[r],car.d/streetLength[r],lane===1);side.crossVectors(up,tangent).normalize();
       pose.position.addScaledVector(side,(r?1.75:1.25)+car.bay*DROP_OFF.bay).y+=.1;pose.rotation.y+=car.steer;if(drop>=0)pose.rotation.x=(car as ReturnType<typeof dropOffPose>).pitch;
       // Every seventh car is a 7 m van; traffic density and the commute rhythm thin the fleet (drop-off cars always run).
       // Human-driven cars give way to autonomous pods slot by slot as automation rises; standalone keeps the cars.
-      const van=drop<0&&hash(slot,17)<.14,density=drop<0?carGate(slot,state.traffic*.6+.5>hash(slot,18)&&rhythm.cars>hash(slot,22)):1;
+      const van=vanOf[slot]===1,density=drop<0?carGate(slot,state.traffic*.6+.5>hash(slot,18)&&rhythm.cars>hash(slot,22)):1;
       const shown=car.visible*density,pod=activity?podShare(activity.level,slot):0;
       pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(shown*(1-pod));cars.set(slot,pose);
       pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(shown*pod);streetPods.set(slot,pose);
+      // Brake lamp over the tail light (a pod's sits .13 m lower).
+      const lit=Math.max(carBrake[slot],drop>=0?(car as ReturnType<typeof dropOffPose>).brake:0);
+      pose.position.y-=pod>.5?.13*(van?1.3:1):0;pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(shown*lit);brakeLamps.set(slot,pose);pose.position.y+=pod>.5?.13*(van?1.3:1):0;
       if(drop>=0){
         const cue=car as ReturnType<typeof dropOffPose>;passengers(drop,cue,pose.position.clone().addScaledVector(side,1.4).setY(0));
-        pose.scale.setScalar(shown*cue.brake);brakeLamps.set(drop,pose);
         // Indicators blink at 1.5 Hz on the kerb (+x, Japan keeps left) or road side, just proud of the body.
         const kerbX=new T.Vector3(1,0,0).applyEuler(pose.rotation),on=cue.signal&&(time*1.5)%1<.5?1:0;
         pose.position.addScaledVector(kerbX,cue.signal*.95);pose.scale.setScalar(shown*on);indicators.set(drop,pose);
       }
-    }cars.flush();streetPods.flush();doorPeople.flush();indicators.flush();brakeLamps.flush();
+    }
+    // Crossing residents walk along the footway to the kerb, wait facing the road, cross once it is clear and walk on along the far
+    // footway; mint edge lines while requested.
+    crossing.forEach((c,k)=>{
+      const at=crossAt[k],{kerb}=at,u=(span:number)=>T.MathUtils.clamp((time-c.at)/span,0,1);
+      // `a`: metres across from the centre line toward the starting side; `along` metres along the avenue; `walked` metres since
+      // appearing (stride phase); `turn` 0 facing along the footway, 1 facing across.
+      let a=kerb,along=0,walked=8,turn=1;
+      if(c.phase==='arrive'){along=c.from*8*(1-u(6));walked=8*u(6);turn=T.MathUtils.clamp(1-Math.abs(along),0,1);}
+      else if(c.phase==='cross'){const f=u(2*kerb/1.4);a=kerb-2*kerb*f;walked=8+2*kerb*f;}
+      else if(c.phase==='leave'){a=-kerb;along=c.to*8*u(6);walked=8+2*kerb+8*u(6);turn=T.MathUtils.clamp(1-Math.abs(along),0,1);}
+      const shown=c.phase==='idle'?0:T.MathUtils.clamp((8-Math.abs(along))/1.5,0,1);
+      const across=Math.atan2(-at.t.z*c.side,at.t.x*c.side),alongYaw=Math.atan2(at.t.x,at.t.z)+((c.phase==='leave'?c.to:-c.from)>0?0:Math.PI);
+      for(let j=0;j<2;j++){
+        // A pair stays 0.7 m apart along the avenue: abreast crossing it, one behind the other on the footway.
+        const slot=CROSSERS+k*2+j,offset=c.size===2?(j?.35:-.35):0;
+        pose.position.set(at.p.x+at.t.z*c.side*a+at.t.x*(along+offset),0,at.p.z-at.t.x*c.side*a+at.t.z*(along+offset));
+        pose.rotation.set(0,alongYaw+yawTo(alongYaw,across)*turn,0);
+        pose.scale.setScalar(j<c.size?shown*(.93+.12*hash(slot,8)):0);doorPeople.set(slot,pose);
+        doorPeople.gait(slot,walked*5.5+slot,c.phase==='wait'?0:.45);doorPeople.social(slot,0,0);
+      }
+      pose.position.copy(at.p);pose.rotation.set(0,at.yaw,0);pose.scale.set(2*at.half+.6,1,1).multiplyScalar(requested(k,time)?1:0);crossLights.set(k,pose);
+    });
+    cars.flush();streetPods.flush();doorPeople.flush();indicators.flush();brakeLamps.flush();crossLights.flush();
     // Boats (boatPoses) bob and roll a little; loop taxis thin with traffic and the berthed interchange boat leaves no wake.
     boatPoses(time,path).forEach((b,i)=>{
       pose.position.set(b.x,b.y+Math.sin(time*(i<BOATS?1.3:1.1)+i)*.08,b.z);pose.rotation.set(0,b.yaw,i<BOATS?Math.sin(time*.9+i)*.02:0);
@@ -877,4 +1017,10 @@ export function mobility(scene:T.Scene) {
       pose.scale.setScalar(Math.max(strength*(closed[r]&&activity?3+activity.level*7:3),closed[r]?GUIDE_FLOOR:0));guides.set(r*96+j,pose);
     }guides.flush();
   };
+  /** Street traffic as simulated, for checks: every lane slot (lane travel `x`, metres behind its free slot, length, speed, in its bay)
+   * and every crossing. */
+  return Object.assign(update,{traffic:()=>({
+    cars:carLanes.flatMap((l,i)=>Array.from({length:l.n},(_,k)=>{const s=laneBase[i]+k;return {lag:laneTravel(simTime,l.road,l.lane,k,l.n,l.length).travelled-carT[s],road:l.road,lane:l.lane,x:laneAt(carT[s],l.span).x,length:carLen[s],v:carV[s],bay:inBay[s]===1,brake:carBrake[s]===1};})),
+    crossings:crossing.map((c,k)=>({...CROSSINGS[k],phase:c.phase,size:c.size,lanes:carLanes.flatMap((l,i)=>l.road===CROSSINGS[k].road?[{lane:l.lane,x:laneX(i,CROSSINGS[k].d)}]:[])})),
+  })});
 }
