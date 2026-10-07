@@ -81,7 +81,6 @@ export function civicCore() {
       for(const y of [16,49,87,116]) {
         box(root,[3.8,5.6,2.8],[x,y,z-5.6],glass);
         for(const dy of [-2.9,2.9])box(root,[4.1,.45,3],[x,y+dy,z-5.6],trim);
-        box(root,[2.6,2,.15],[x,y-.7,z-7.08],publicLight);
       }
       for(const y of [24,62,100,130]) {
         box(root,[17,5,13],[x,y,z],trim);
@@ -97,7 +96,6 @@ export function civicCore() {
   }
   for(const x of [-68,64]) {
     member([x,130,-12],[x,130,70],7,7);
-    member([x,62,-12],[x,130,70],3,4);
   }
   // The former podium is an open forum; the existing Aqua link lands here at Y=24.
   box(root,[100,3,36],[-8,22.5,-14],stone);
@@ -113,19 +111,15 @@ export function civicCore() {
     street.quaternion.setFromRotationMatrix(new T.Matrix4().makeBasis(across,dir.clone().cross(across),dir));street.updateMatrix();
     box(street,[10,2.8,length],[0,0,0],stone);
     // A glazed mobility channel shares the inclined terrain with the planted pedestrian edge.
-    box(street,[2.8,.16,length-4],[-1,1.5,0],glass);
-    for(let z=-length/2+3;z<length/2-3;z+=1.6)box(street,[2.6,.12,.18],[-1,1.62,z],trim);
-    // The channel is a ribbed glazed escalator tube with blue edge light, carrying riders through the void.
+    box(street,[2.8,.16,length-4],[-1,1.5,0],solar);
+    for(let z=-length/2+3;z<length/2-3;z+=1.6)box(street,[2.6,.1,.12],[-1,1.6,z],trim);
+    // An open escalator with glass balustrades and blue-lit handrails: riders stay visible against the void.
     for(const x of [-2.6,.6]) {
-      box(street,[.1,3.2,length-4],[x,3.2,0],x<0 ? glass : silverGlass); // outer pane reads blue; inner pane keeps riders visible
-      box(street,[.16,.16,length-4],[x,1.75,0],broadcastLight);
+      box(street,[.1,1.7,length-4],[x,2.45,0],x<0 ? glass : silverGlass); // blue outer pane, clear inner pane over the riders
+      box(street,[.16,.16,length-4],[x,1.65,0],broadcastLight);
+      box(street,[.2,.14,length-4],[x,3.35,0],broadcastLight);
     }
-    box(street,[3.4,.1,length-4],[-1,4.85,0],silverGlass);
-    for(const x of [-2.7,.7])box(street,[.14,.14,length-4],[x,4.95,0],broadcastLight);
-    for(let z=-length/2+3;z<length/2-2;z+=4) {
-      for(const x of [-2.6,.6])box(street,[.14,3.4,.14],[x,3.2,z],trim);
-      box(street,[3.4,.14,.14],[-1,4.85,z],trim);
-    }
+    for(let z=-length/2+3;z<length/2-2;z+=4)for(const x of [-2.6,.6])box(street,[.12,1.75,.12],[x,2.45,z],trim);
     for(let z=-length/2+5,i=0;z<length/2-5;z+=4.5,i++) {
       const rider=new T.Vector3(-1+(i%2)*.5-.25,1.62,z).applyMatrix4(street.matrix);
       standing(rider.x,rider.y,rider.z);
@@ -164,14 +158,15 @@ export function civicCore() {
         continue;
       }
       const h=y===43 ? 19.3 : 17.3,studio=y===43 || y===83;
-      box(root,[width-2,h,23],[x,y+1.2+h/2,46],stone);
+      // The acoustic block is set back 5 m from each flank, leaving a glazed studio gallery where live production shows from outside.
+      box(root,[width-10,h,23],[x,y+1.2+h/2,46],stone);
       // Deep ceramic reveals articulate the sealed acoustic rooms without glazing their sound enclosure.
       for(const side of [-1,1]) {
         box(root,[.22,.65,20],[x+side*(width/2-.85),y+9.2,46],solar);
         for(const z of [38,44,50,56])box(root,[.32,h-1,.3],[x+side*(width/2-.8),y+1.2+h/2,z],trim);
       }
       // Acoustic walls have recessed vertical service seams; the public edge remains transparent.
-      for(let dx=-width/2+3;dx<width/2;dx+=4)
+      for(let dx=-width/2+7;dx<width/2-5;dx+=4)
         box(root,[.16,h-1,.25],[x+dx,y+1.2+h/2,34.35],solar);
       box(root,[width-1,h,.18],[x,y+1.2+h/2,-2.6],silverGlass);
       // Ceramic floor edges break up the tall glass bays; shallow terraces remain inside the wing footprint.
@@ -214,12 +209,19 @@ export function civicCore() {
       }
       box(root,[width-3,.08,16],[x,y+9.54,9],publicLight);
       box(root,[width-3,1.2,.18],[x,y+10.1,.6],silverGlass);
-      // Lit acoustic baffles sit behind the desks, so furnishings silhouette against occupied depth.
-      for(const floor of [y+1.2,y+9.5])for(let dx=-width/2+3,bay=0;dx<width/2-2;dx+=5,bay++) {
-        const video=(bay+y)%3===0 || (studio && floor===y+1.2);
-        box(root,[3.7,6,.16],[x+dx,floor+3.4,17.05],solar);
-        box(root,video ? [3.3,2.2,.18] : [3.4,4.2,.18],[x+dx,floor+(video ? 3.6 : 3.2),16.9],video ? broadcastLight : publicLight);
-        box(root,[.18,6.5,.45],[x+dx+2.1,floor+3.5,16.65],trim);
+      // One continuous warm acoustic wall per floor (cream fins every bay) reads as lit room depth behind the desks,
+      // instead of a checker of separate panels; occasional wall screens hang in front of it.
+      for(const floor of [y+1.2,y+9.5]) {
+        box(root,[width-3,6,.16],[x,floor+3.4,17.05],solar);
+        box(root,[width-4,4.2,.18],[x,floor+3.2,16.9],publicLight);
+        box(root,[width-4,.5,.2],[x,floor+5.65,16.85],solar);
+        for(let dx=-width/2+3,bay=0;dx<width/2-2;dx+=5,bay++) {
+          if((bay+y)%3===0 && !(studio && floor===y+1.2)) {
+            box(root,[3,1.9,.12],[x+dx,floor+3.5,16.72],solar);
+            box(root,[2.7,1.6,.12],[x+dx,floor+3.5,16.64],broadcastLight);
+          }
+          box(root,[.18,6.5,.45],[x+dx+2.1,floor+3.5,16.65],trim);
+        }
       }
       // Lit far-side partitions on the -X walls: the review view enters through the +X glazing and crosses the occupied room
       // (desks, staff, ceiling light) to warm, partly video-lit walls, rather than meeting lit panels right behind the glass.
@@ -231,8 +233,27 @@ export function civicCore() {
       // Rear-zone ceiling light and flank-facing staff fill the deep half of each room seen through the side glazing.
       for(let dx=-width/2+3;dx<width/2-2;dx+=5)box(root,[2.6,.12,12],[x+dx,y+h+.85,25],publicLight);
       for(let z=3,i=0;z<31;z+=3.4,i++)if(z<15.5 || z>18.5)standing(x+width/2-1.9-(i%2)*.4,y+1.225,z);
-      // Narrow lit control-room bands on the sealed studio flanks; the fins act as their mullions.
-      for(const side of [-1,1])for(const dy of [5,13.5])for(const z of [41,47,53])box(root,[.2,2.4,4.6],[x+side*(width/2-.9),y+dy,z],publicLight);
+      // Flank studio galleries: a dark set wall with a large blue LED backdrop, warm control-room windows above,
+      // a spot rig, cameras and crew on the floor, all behind clear glazing between the ceramic fins.
+      for(const side of [-1,1]) {
+        const wx=x+side*(width/2-4.95),edge=x+side*(width/2-.5);
+        box(root,[.2,h-.4,22.6],[wx,y+1.2+h/2,46],solar);
+        box(root,[.26,6.4,16],[wx,y+6,46],broadcastLight);
+        for(const z of [40,46,52])box(root,[.3,6.4,.18],[wx,y+6,z],solar);
+        box(root,[.28,.35,17],[wx,y+9.5,46],publicLight);
+        box(root,[.26,2.6,17],[wx,y+12.6,46],publicLight);
+        for(let z=38.5;z<54;z+=2.5)box(root,[.32,2.6,.2],[wx,y+12.6,z],solar);
+        box(root,[.18,h,23],[edge,y+1.2+h/2,46],silverGlass);
+        box(root,[3.2,.3,21],[x+side*(width/2-3.2),y+1.25+h-.6,46],solar);
+        for(let z=36.5;z<56;z+=1.6)box(root,[.34,.16,.34],[x+side*(width/2-3.2),y+1.25+h-.85,z],publicLight);
+        for(let z=37,i=0;z<56;z+=2.1,i++) {
+          if(i%3!==1)standing(x+side*(width/2-3.4+(i%2)*.7),y+1.225,z);
+          if(i%4===2) {
+            box(root,[.25,1.3,.25],[x+side*(width/2-1.6),y+1.875,z],solar);
+            box(root,[.9,.5,.6],[x+side*(width/2-1.8),y+2.7,z],solar);
+          }
+        }
+      }
       // Standing staff gather at the glazed edge of each work and editing floor, clear of the desk rows.
       for(const [floor,z] of [[y+1.225,.6],[y+9.5,2.1]])for(let dx=-width/2+4.8,i=0;dx<width/2-5;dx+=3.1,i++)
         if((i+y)%3!==1)standing(x+dx+(i%2)*.6,floor,z+(i%3)*.5);
@@ -305,7 +326,7 @@ export function civicCore() {
   const skin=new T.Mesh(new T.SphereGeometry(24,48,24,0,Math.PI*2,0,Math.PI*.7),silverGlass);chamber.add(skin);
   // A dark inner shell closes the auditorium behind its glazing, so stage and rig light read against it, not the rear wing.
   // A dark dome over a warm lower band: the lit rig, stage and audience glow against it like a live broadcast.
-  for(const [from,span,material] of [[0,.42,solar],[.42,.28,publicLight]] as const) {
+  for(const [from,span,material] of [[.24,.18,solar],[.42,.28,publicLight]] as const) {
     const shell=new T.SphereGeometry(23.2,40,8,0,Math.PI*2,Math.PI*from,Math.PI*span),shellIndex=shell.index!;
     for(let i=0;i<shellIndex.count;i+=3){const t=shellIndex.getX(i+1);shellIndex.setX(i+1,shellIndex.getX(i+2));shellIndex.setX(i+2,t);}
     (shell.attributes.normal.array as Float32Array).forEach((v,i,normals)=>normals[i]=-v); // inward-facing: only the far interior wall renders
@@ -321,7 +342,7 @@ export function civicCore() {
     box(chamber,[.45,.35,.45],[x,height-.55,z],publicLight);
   }
   // Rows of house lights dot the far side of the dark dome.
-  for(const y of [5,10,15,19])for(let a=Math.PI+.2;a<Math.PI*2-.15;a+=.17) {
+  for(const y of [5,10,15])for(let a=Math.PI+.2;a<Math.PI*2-.15;a+=.17) {
     const r=Math.sqrt(23*23-y*y)-.3;
     box(chamber,[.3,.3,.3],[Math.cos(a)*r,y,-Math.sin(a)*r],publicLight);
   }
