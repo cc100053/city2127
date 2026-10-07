@@ -1,13 +1,18 @@
 import * as T from 'three';
-import { arc, bake, box, chrome, glass, mirrors, leaf, leafyCrown, membrane, publicLight as cityLight, solar, stone, trim } from './cityRig.ts';
+import { arc, bake, box, chrome, glass, mirrors, leaf, leafyCrown, membrane, publicLight as cityLight, solar as citySolar, stone as cityStone, trim as cityTrim } from './cityRig.ts';
 
 /** Occupied media headquarters within Fuji's civic chassis, retaining the sphere berth and site alignment. Metres. */
 export function civicCore() {
   const root=new T.Group();root.name='fuji-civic-chassis';
+  // Building-local finishes (still one batch each): warm cream frame and slabs, and dark charcoal furniture, people and hangers,
+  // so occupied rooms read as silhouettes against warm light instead of blue-grey rows.
+  const trim=cityTrim.clone();trim.color.set('#f1e6d1');
+  const stone=cityStone.clone();stone.color.set('#ede3d0');
+  const solar=citySolar.clone();solar.color.set('#363a44');
   // Warm occupied rooms follow the existing city clock, using one shared finish for this building.
-  const publicLight=cityLight.clone();publicLight.color.set('#e8c08a');publicLight.emissive.set('#ffa24e');publicLight.emissiveIntensity=1;
+  const publicLight=cityLight.clone();publicLight.color.set('#efd3a8');publicLight.emissive.set('#ffa04a');publicLight.emissiveIntensity=1;
   publicLight.onBeforeCompile=shader=>{
-    shader.uniforms.roomLight={get value(){return 1.05+cityLight.emissiveIntensity*.4;}};
+    shader.uniforms.roomLight={get value(){return 1.2+cityLight.emissiveIntensity*.7;}};
     // Each ~5×6 m room cell gets its own light level, and upward-facing floors glow less than ceilings and screens,
     // so stacked workrooms read as separate occupied rooms with depth instead of one flat lit slab.
     shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vRoomPos;\nvarying float vRoomUp;')
@@ -16,12 +21,15 @@ export function civicCore() {
       .replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>
         float roomCell=fract(sin(dot(floor(vRoomPos.xz/vec2(5.,6.))+floor(vRoomPos.y/9.)*vec2(7.,3.),vec2(12.9898,78.233)))*43758.5453);
         float roomFloor=smoothstep(.5,.9,vRoomUp);
-        // Floors read as warm timber under lit ceilings, giving the glazed rooms amber depth rather than a pale slab.
-        diffuseColor.rgb*=mix(vec3(1.),vec3(.6,.46,.34),roomFloor);
+        // Floors read as warm oak under lit ceilings: rooms gain golden depth instead of a pale slab seen from above.
+        diffuseColor.rgb*=mix(vec3(1.),vec3(.64,.5,.37),roomFloor);
         // The theatre's inner shell (r≈23.2 about the chamber centre) is a dim stage-wash wall, so rig, stage and audience glow against it.
         float theatreR=length(vRoomPos-vec3(-18.,100.,23.));
         float theatreWall=smoothstep(23.,23.12,theatreR)*(1.-smoothstep(23.28,23.4,theatreR));
-        totalEmissiveRadiance *= roomLight*(.65+.7*roomCell)*mix(1.,.25,roomFloor)*mix(1.,.3,theatreWall);`);
+        totalEmissiveRadiance *= roomLight*(.65+.7*roomCell)*mix(1.,.25,roomFloor)*mix(1.,.3,theatreWall);
+        // Blue-lit seat backs and step lights in the audience rake (below the chamber centre, ahead of the stage) read as violet house seating.
+        float theatreSeat=(1.-smoothstep(22.,22.6,theatreR))*step(vRoomPos.y,101.)*step(vRoomPos.z,25.5)*step(totalEmissiveRadiance.r,totalEmissiveRadiance.b);
+        totalEmissiveRadiance=mix(totalEmissiveRadiance,vec3(.55,.24,.9)*totalEmissiveRadiance.b,theatreSeat);`);
   };
   publicLight.customProgramCacheKey=()=>'fuji-room-light';
   // Broadcast light stays inside production rooms; public circulation retains its warm finish.
@@ -64,7 +72,7 @@ export function civicCore() {
       for(const dx of [-7,7])member([x,25,z],[x+dx,134,z],5,8);
       member([x-7,134,z],[x+7,134,z],6,9);
       // The split pier carries visible vertical transfer infrastructure and ceramic joints.
-      for(const dx of [-2,2])member([x+dx,5,z-5],[x+dx,130,z-5],.5,.7,solar);
+      for(const dx of [-2,2])member([x+dx,5,z-5],[x+dx,130,z-5],.5,.7,glass);
       box(root,[3.2,122,.35],[x,68,z-5.2],membrane);
       for(let y=12;y<126;y+=12) {
         box(root,[3.6,.35,1],[x,y,z-5.4],trim);
@@ -109,7 +117,7 @@ export function civicCore() {
     for(let z=-length/2+3;z<length/2-3;z+=1.6)box(street,[2.6,.12,.18],[-1,1.62,z],trim);
     // The channel is a ribbed glazed escalator tube with blue edge light, carrying riders through the void.
     for(const x of [-2.6,.6]) {
-      box(street,[.1,3.2,length-4],[x,3.2,0],silverGlass);
+      box(street,[.1,3.2,length-4],[x,3.2,0],x<0 ? glass : silverGlass); // outer pane reads blue; inner pane keeps riders visible
       box(street,[.16,.16,length-4],[x,1.75,0],broadcastLight);
     }
     box(street,[3.4,.1,length-4],[-1,4.85,0],silverGlass);
@@ -133,10 +141,11 @@ export function civicCore() {
       grove(p.x,p.y+2.1,p.z+3.7,Math.round(u*20));
       member([p.x,p.y+1,p.z-5],[p.x,p.y+3,p.z-5],.18,.18,trim);
     }
-    member([a.x,a.y-7,a.z],[b.x,b.y-7,b.z],1.5,2,solar);
+    // Ivory underside truss: the load path stays legible without drawing dark lines across the glazed wings.
+    member([a.x,a.y-7,a.z],[b.x,b.y-7,b.z],1.5,2);
     for(let u=0;u<1;u+=.2) {
       const p=a.clone().lerp(b,u),q=a.clone().lerp(b,Math.min(1,u+.2));
-      member([p.x,p.y-7,p.z],[q.x,q.y-1,q.z],1.2,1.5,solar);
+      member([p.x,p.y-7,p.z],[q.x,q.y-1,q.z],1,1.2);
     }
   }
   const transferA=new T.Vector3(14,100,-12),transferB=new T.Vector3(-18,100,-1);
@@ -173,7 +182,9 @@ export function civicCore() {
         for(let z=0;z<33;z+=10)box(root,[.22,h,.3],[x+side*(width/2-.4),y+1.2+h/2,z],trim);
       }
       for(let dx=-width/2+1;dx<width/2;dx+=4) {
+        // Cream mullions every 8 m, slim ones between: a finer glazed rhythm over the lit rooms.
         if((dx+width/2-1)%8===0)box(root,[.22,h,.3],[x+dx,y+1.2+h/2,-2.8],trim);
+        else box(root,[.1,h,.16],[x+dx,y+1.2+h/2,-2.75],trim);
         // Warm ceiling panels and inset workstation screens make the occupied depth legible.
         box(root,[2.8,.12,8],[x+dx+1.4,y+h+.85,8],publicLight);
       }
@@ -189,6 +200,13 @@ export function civicCore() {
         box(root,video ? [3.3,2.2,.18] : [3.4,4.2,.18],[x+dx,floor+(video ? 3.6 : 3.2),16.9],video ? broadcastLight : publicLight);
         box(root,[.18,6.5,.45],[x+dx+2.1,floor+3.5,16.65],trim);
       }
+      // Lit far-side partitions: a view through the near side glazing crosses the occupied room to warm, partly video-lit walls.
+      for(const [floor,zs] of [[y+1.2,[3.5,8.5,13.5,18.5,23.5,28.5]],[y+9.5,[3.5,8.5,13.5]]] as const)zs.forEach((z,i)=>{
+        const video=(i+y)%3===0;
+        box(root,[.16,video ? 2.4 : 4.6,3.6],[x+width/2-1.1,floor+(video ? 3.6 : 3.2),z],video ? broadcastLight : publicLight);
+      });
+      // Narrow lit control-room bands on the sealed studio flanks; the fins act as their mullions.
+      for(const side of [-1,1])for(const dy of [5,13.5])box(root,[.2,2.6,19],[x+side*(width/2-.9),y+dy,46],publicLight);
       // Standing staff gather at the glazed edge of each work and editing floor, clear of the desk rows.
       for(const [floor,z] of [[y+1.225,.6],[y+9.5,2.1]])for(let dx=-width/2+4.8,i=0;dx<width/2-5;dx+=3.1,i++)
         if((i+y)%3!==1)standing(x+dx+(i%2)*.6,floor,z+(i%3)*.5);
@@ -249,8 +267,8 @@ export function civicCore() {
   const chamber=new T.Group();chamber.position.set(-18,100,23);root.add(chamber);
   const skin=new T.Mesh(new T.SphereGeometry(24,48,24,0,Math.PI*2,0,Math.PI*.7),silverGlass);chamber.add(skin);
   // A dark inner shell closes the auditorium behind its glazing, so stage and rig light read against it, not the rear wing.
-  // The interior glows like a lantern: a warm lit dome over a blue stage-wash band, so the glass sphere reads as an occupied theatre.
-  for(const [from,span,material] of [[0,.32,publicLight],[.32,.38,broadcastLight]] as const) {
+  // A dim blue-washed dome over a warm lower band: the lit rig, stage and golden audience read against it like a live broadcast.
+  for(const [from,span,material] of [[0,.42,broadcastLight],[.42,.28,publicLight]] as const) {
     const shell=new T.SphereGeometry(23.2,40,8,0,Math.PI*2,Math.PI*from,Math.PI*span),shellIndex=shell.index!;
     for(let i=0;i<shellIndex.count;i+=3){const t=shellIndex.getX(i+1);shellIndex.setX(i+1,shellIndex.getX(i+2));shellIndex.setX(i+2,t);}
     (shell.attributes.normal.array as Float32Array).forEach((v,i,normals)=>normals[i]=-v); // inward-facing: only the far interior wall renders
@@ -268,7 +286,7 @@ export function civicCore() {
   arc(chamber,0,20.6,1.6,[0,-12,0],stone);
   arc(chamber,19.8,21.2,.7,[0,-10.4,0],trim);
   arc(chamber,20.7,21.1,.18,[0,-9.7,0],publicLight);
-  box(chamber,[22,1,9],[0,-9,7],solar);
+  box(chamber,[22,1,9],[0,-9,7],publicLight); // lit stage deck
   box(chamber,[22,12,.7],[0,-2.5,12],solar);
   box(chamber,[20,10,.18],[0,-2.5,11.55],broadcastLight);
   for(const x of [-8,-4,0,4,8]) {
@@ -305,22 +323,27 @@ export function civicCore() {
     box(chamber,[1.2,.18,1.2],[x,-8.4,4],solar);
   }
   // Tiered seating faces the rear stage; side aisles connect to the public entrance at Y=100.
-  arc(chamber,21.4,21.8,14,[0,-8,0],publicLight,Math.PI+.45,Math.PI-.9);
+  arc(chamber,21.4,21.8,14,[0,-8,0],solar,Math.PI+.45,Math.PI-.9); // dark stage surround: the blue screen and rig read against it
   for(let a=Math.PI+.5;a<Math.PI*2-.5;a+=.22)box(chamber,[.3,14,.5],[Math.cos(a)*21.3,-1,-Math.sin(a)*21.3],trim);
   for(let row=0;row<9;row++) {
     const z=1-row*2.2,y=-10.3+row*1.15,w=28-row*.6;
-    box(chamber,[w,.7+row*1.15,2.1],[0,y-row*.575,z],solar);
+    box(chamber,[w,.3,2.1],[0,y+.2,z],publicLight); // open lit treads: the warm house shows through, not a dark solid rake
     box(chamber,[w-.4,.12,.12],[0,y+.2,z+1.08],broadcastLight); // stage-wash step lights tint the audience blue
     for(let seat=0;seat<15;seat++) {
       if(seat===7)continue;
       const x=(seat-7)*1.55;
       box(chamber,[1.05,.25,1.1],[x,y+.8,z],solar);
-      box(chamber,[1.05,1.1,.2],[x,y+1.25,z-.5],solar);
+      box(chamber,[1.05,1.1,.2],[x,y+1.25,z-.5],broadcastLight); // violet seat backs (theatre tint in the room-light shader)
       if((seat+row)%4!==0) {
         box(chamber,[.52,.65,.32],[x,y+1.24,z],trim);
         const person=new T.Mesh(head,trim);person.position.set(x,y+1.8,z);chamber.add(person);
       }
     }
+  }
+  // Raked stringers and rear legs carry the open treads down to the acoustic bowl.
+  for(const x of [-11,-4,4,11]) {
+    member([x-18,89.5,24],[x-18,98.6,6.4],.5,.6,solar);
+    member([x-18,88.8,6.4],[x-18,98.6,6.4],.45,.45,solar);
   }
   for(const x of [-15,15]) {
     box(chamber,[2,1,18],[x,-6.5,-1],stone);
@@ -340,16 +363,16 @@ export function civicCore() {
   }
   const ring=new T.Mesh(new T.TorusGeometry(29,2.4,8,80),trim);
   ring.position.set(-18,94,23);ring.rotation.y=.58;root.add(ring);
-  const ringInset=new T.Mesh(new T.TorusGeometry(29,.45,5,80),solar);
+  const ringInset=new T.Mesh(new T.TorusGeometry(29,.45,5,80),broadcastLight); // blue edge light under the ring
   ringInset.position.copy(ring.position);ringInset.position.z-=2.2;ringInset.rotation.copy(ring.rotation);root.add(ringInset);
   // Suspension follows a visible load path from the top transfer beam to the chamber's lower cradle.
   for(const x of [-40,4]) {
     member([x,130,-12],[x,130,70],3,4);
-    for(const z of [6,40])member([x,130,z],[x,85,z],.65,.65,solar);
+    for(const z of [6,40])member([x,130,z],[x,85,z],.65,.65);
   }
-  for(const z of [6,40])member([-40,85,z],[4,85,z],2,3,solar);
-  member([-42.26,94,38.89],[-40,85,40],1.5,2,solar);
-  member([6.26,94,7.11],[4,85,6],1.5,2,solar);
+  for(const z of [6,40])member([-40,85,z],[4,85,z],2,3);
+  member([-42.26,94,38.89],[-40,85,40],1.5,2);
+  member([6.26,94,7.11],[4,85,6],1.5,2);
   member([-68,62,70],[-34,82,23],3,4);member([64,62,70],[-2,82,23],3,4);
   // Elevated public continuity through the chassis: one bay-facing ring floor and a rear transfer deck.
   arc(root,25,34,2,[-18,61,23],stone,Math.PI*.05,Math.PI*1.8);
