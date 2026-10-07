@@ -4,8 +4,8 @@
 - Status: IN_PROGRESS
 - Branch: codex/fuji-tv-polish
 - Base commit: 4eda49ebae30e6215e6f67f17e8fef197832b34e
-- Last verified commit: 0076bad0def237c4bb455fa4934a6afbfd6ece9a; committed core is byte-identical to the source tested in pass3
-- Remote availability: origin/codex/fuji-tv-polish; checked code 0076bad0def237c4bb455fa4934a6afbfd6ece9a. Resolve this Git ref for latest documentation commit.
+- Last verified commit: f504484be71e306aa1fbd1b43286439fcb4cd038; committed source is byte-identical to the v3 pass3 worktree tested below
+- Remote availability: origin/codex/fuji-tv-polish; resolve this Git ref for latest implementation/evidence publication. Prior code 0076bad0 is integrated on main; v3 is a separate implementation.
 
 ## Session Git state
 
@@ -17,11 +17,11 @@ Polish the procedural Fuji TV civic core using [CITY MASTER TASTE](../ODAIBA_212
 
 ## Completed work
 
-Three implementation passes and source/browser checks complete; prior runtime polish is integrated on main. The user-selected working-headquarters target v3 is saved; its implementation remains pending. Historical stage evidence is preserved below.
+Target v3's three implementation passes and source/browser checks complete; visual review remains pending on the feature branch. Prior runtime polish is integrated on main. Historical stage evidence is preserved below.
 
 ## Actual validation results
 
-PASSED for the prior implementation's local source and specified browser checks below, integrated through `f64af18`. Target v3 selection is reference/documentation only; the runtime does not yet match it.
+V3 root source/build/whitespace and specified browser checks PASS at implementation `f504484`; target fidelity remains PARTIAL. Prior implementation is integrated through `f64af18`; v3 is not integrated.
 
 ## Known issues and blockers
 
@@ -29,7 +29,7 @@ No failing source checks. Target fidelity remains partial; performance/hardware 
 
 ## Next expected step
 
-Implement the approved working-headquarters direction against the user-selected target v3 when the user starts the next implementation round. Target selection is complete; the existing three-pass runtime still represents target v1. Keep the new direction on the feature branch until implemented and verified.
+User reviews v3's final screenshot after the requested three passes. Further visual iteration or integration follows that review; keep this result on `codex/fuji-tv-polish` in the meantime.
 
 ## Target and pass 1 (2026-10-07)
 
@@ -76,3 +76,31 @@ Preflight: workspace `/Users/fatboy/city2127`, initially clean on `feat/pedestri
 Fresh baseline capture: development Mac, in-app browser, viewport1280×720, local feature preview `http://127.0.0.1:5174/?hour=16&review=civic&reviewTime=40`; no captured console warnings/errors. Baseline saved in ignored `.dream-loop/fuji-tv-v3-baseline.jpg`; it is a reference capture, not new runtime validation. A separate image-generation request was started before the attachment arrived, then terminated after the user selected their own image; it is not the target.
 
 Validation PASS: supplied attachment, tracked v3 and ignored active target are byte-identical, SHA-256 `5cd1ea14cf90bc5b39c1320b2cc340a81f8de181ac883aa6bb8f40b0de939737`; PNG1672×941. Local Markdown targets in all three changed documents exist; complete diff self-reviewed; `git diff --check` PASS. Source remains unchanged from resumed `ad8bc75` (last verified runtime `0076bad0`). Runtime tests/build, FPS, hardware and circulation validation are not rerun for target selection. Next step: implement v3 in a new Dream Loop implementation round when requested; do not claim target fidelity from the existing model. Publish this reference-only stage to `origin/codex/fuji-tv-polish`; keep the pending implementation separate from main.
+
+## Target v3 implementation loop (2026-10-07)
+
+Owner: Codex. User requested “do the loop”; Dream Loop Plus authorizes three sequential implementation worker passes, with orchestrator validation and screenshots between them. Target remains the exact supplied v3 image. Startup: clean `codex/fuji-tv-polish` at `782bac75973cfe5ce683fe9fa76940c7588051cf`; fetch succeeded, feature counterpart0/0. Versus `origin/main` (`f3b7d73`), one target-selection commit on the feature and three prior integration/documentation commits on main. No automatic main merge; no missing remote implementation. Reuse this checkout's preview on127.0.0.1:5174 and the same1280×720 civic/hour16/actor40 comparison. Implementation and validation results follow as completed.
+
+### V3 pass 1
+
+Worker implemented two occupied production wings with editing mezzanines, rear sealed studio rooms, workstation/technical fixtures and selective glazing. Sphere's former garden floors become stage, tiered seats and technical grid; forum gains glazed foyer and separate rear staff entrances. Source change stays in `src/civicCore.ts`, sharing the existing eight finishes. Initial build and test FAILED on an obsolete garden fragment left after the theatre replacement (undefined old floor variables/extra closing brace); orchestrator removed that stale fragment. Added a small actual-mesh floor-support/headroom check for both wings in existing `tests/odaiba.test.ts`.
+
+Corrected pass1 worktree: root `npm test`, `npm run build`, `git diff --check` PASS; build retains existing >500kB warning. Development Mac in-app browser1280×720, civic review actor40, day16/night22: no console warnings/errors. [Pass1](../../artifacts/fuji-tv-polish/v3-pass1.jpg); night comparison is ignored `.dream-loop/fuji-v3-pass1-night.jpg`. Workspace/interior light and activity remain visually below target; pass2 receives actual day/night screenshots. No committed implementation yet.
+
+### V3 pass 2
+
+First worker attempt stopped at a usage limit without a code change; after the usage tool reported available allowance, a fresh worker completed pass2. Lower-opacity glazing, ceramic mezzanine fascias, warm interior baffles, corner planting, seated editing staff/theatre audience and a brighter stage backdrop improve occupied depth. A single building light finish follows existing `cityLight.emissiveIntensity` through its shader uniform; total remains eight material batches. Upper-floor desks atz23 were outside the mezzanine and are now limited to supportedz4/12 rows. Static people are architectural occupancy, not new district actor simulation.
+
+Pass2 root `npm test`, `npm run build`, `git diff --check` PASS, including actual work-floor/route/site clearances and all81 real survey-pipeline combinations; existing build-size warning remains. Development Mac in-app browser1280×720, civic actor40, day16/night22: no console warnings/errors or shader errors. Existing preview had stopped; orchestrator restarted it on the same127.0.0.1:5174. App panel clipped preliminary viewport screenshots despite a1280px canvas; replaced these with full-page captures verified at1280×720. [Pass2](../../artifacts/fuji-tv-polish/v3-pass2.jpg); ignored night/source snapshots retained for pass3. No committed implementation yet; target fidelity remains partial.
+
+### V3 pass 3 and final verification
+
+Added a shared cool broadcast finish for workstation/studio/theatre screens, finer backdrop seams, presenter desk/two presenters/two cameras, ceramic studio flank reveals and seven bench/two-person forum groups. Static batching rises8→9 for the distinct screen finish; the existing draw-limit assertion now allows that one shared finish. Existing test also checks actual floor support beneath all14 forum visitors. Source changes stay in `src/civicCore.ts`; no new dependencies, binary production assets, actor simulation or renderer/camera changes.
+
+Final worktree against base782bac7: root `npm test`, `npm run build`, `git diff --check` PASS. Build retains the existing >500kB warning. Actual geometry:9 material batches,1,711,564 triangles; min(-77.49,-4.64,-46.99), max(73.49,142.46,79)m, unchanged from the prior frame. Triangle count is higher than the earlier473,092 and is not a performance measurement. Tested source SHA-256 `0d89991533d80c162b426e1472360b4af59e96ca3602c9f0f477d781ee39d99f`; committed implementation `f504484be71e306aa1fbd1b43286439fcb4cd038` is identical to the checked source.
+
+Final browser: development Mac, Codex in-app browser1280×720, actor40; civic day16/night22, standalone authored hero16, all-low(−12) day12, all-mixed(0) dusk18.5, all-high(+12) night22. All captured console warning/error lists empty; no shader error or failed load shown. Ordinary desktop resize1440×900 updates canvas/backing dimensions to1440×900, then returns to1280×720. [Final civic](../../artifacts/fuji-tv-polish/v3-pass3.jpg), [night](../../artifacts/fuji-tv-polish/v3-pass3-night.jpg), [hero](../../artifacts/fuji-tv-polish/v3-hero.jpg), [low](../../artifacts/fuji-tv-polish/v3-hero-low-day.jpg), [mixed](../../artifacts/fuji-tv-polish/v3-hero-mixed-dusk.jpg), [high](../../artifacts/fuji-tv-polish/v3-hero-high-night.jpg), [browser JSON](../../artifacts/fuji-tv-polish/v3-browser.json). JSON records capture-time canvas dimensions and engine, without a sustained FPS benchmark. GPU, exhibition hardware, sustained FPS, long-run and live survey browser NOT RUN; source pipeline tests exercised the real survey HTTP/WebSocket server. Unchanged survey/module-swap package suites not rerun.
+
+Target fidelity PARTIAL: the selected target still has more prominent theatre/audience, richer indoor/public activity and finer facade/planting detail. Staff, presenters, audience and forum people are static geometry; entrances/cores express separate public/staff access but do not simulate interior circulation, acoustic performance or access control. Source GLB/Blender assets remain unchanged. Fal credentials were absent, and external asset packs were not authorized; no generated 3D asset requested. Worker FETCH_HEAD write was sandbox-blocked in pass3; orchestrator refreshed remote refs successfully and confirmed origin/main remainsf3b7d73. No main merge/deployment.
+
+Dream Loop Plus says “Initially, only perform this loop 3 times” and “stop after 3, ask the user to review the results.” Three passes are complete; feature publication preserves a reviewable result. Do not start a fourth pass or integrate this v3 stage automatically. Next step: user visual review, then requested refinement or integration. Final evidence check PASS:221 local Markdown targets exist, all8 tracked v3 screenshots are1280×720, all7 browser records have empty captured warning/error lists, and committed source bytes match the tested SHA-256. Complete source/test/docs and new-file diff self-reviewed; committed task whitespace check PASS before publication.
