@@ -84,6 +84,8 @@ ANGLE Metal), Vite DEV, 1920×1080 viewport, deviceScaleFactor 1 (renderer pixel
 
 ## Current evidence and open acceptance
 
+Fuji TV polish (2026-10-07, `codex/fuji-tv-polish`, not integrated): three Dream Loop Plus passes; root `npm test`, `npm run build` and `git diff --check` PASS after each pass's fixes. Existing actual-mesh checks cover sphere aerial/wing clearance, Aqua City bridge approach, four site sightlines, route and person/robot geometry; no new test framework. Development Mac in-app browser, 1280×720, actor time40: civic day16/night22, standalone hero16, all-low day12, all-mixed dusk18.5 and all-high night22; no console warning/error in checked views. [Final civic](../artifacts/fuji-tv-polish/pass3.jpg), [night](../artifacts/fuji-tv-polish/pass3-night.jpg), [hero](../artifacts/fuji-tv-polish/hero.jpg), [browser record](../artifacts/fuji-tv-polish/browser.json), [handoff](handoffs/fuji-tv-polish.md). Generated target fidelity remains partial; FPS, exhibition hardware and live scratch-survey browser were not tested in this task. Root tests cover the real survey HTTP/WebSocket pipeline; survey/module-swap source unchanged and their separate suites not rerun.
+
 | Stage | Evidence / known limits |
 | --- | --- |
 | S1–S4 | [S1](handoffs/archive/exhibition-s1.md), [S2](handoffs/archive/exhibition-s2.md), [S3](handoffs/archive/exhibition-s3.md), [S4](handoffs/archive/exhibition-s4.md); dated server/root/Guest acceptance, some visuals captured before Odaiba |

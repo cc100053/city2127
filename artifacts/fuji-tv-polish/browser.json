@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-07",
+  "browser": "Codex In-app Browser on development Mac",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "actorTime": 40,
+  "base": "4eda49ebae30e6215e6f67f17e8fef197832b34e",
+  "checked": "0076bad0def237c4bb455fa4934a6afbfd6ece9a",
+  "cases": [
+    {
+      "view": "civic",
+      "hour": 16,
+      "logs": []
+    },
+    {
+      "view": "civic",
+      "hour": 22,
+      "logs": []
+    },
+    {
+      "view": "hero",
+      "hour": 16,
+      "logs": []
+    },
+    {
+      "view": "hero",
+      "band": "low",
+      "hour": 12,
+      "logs": []
+    },
+    {
+      "view": "hero",
+      "band": "mixed",
+      "hour": 18.5,
+      "logs": []
+    },
+    {
+      "view": "hero",
+      "band": "high",
+      "hour": 22,
+      "logs": []
+    }
+  ],
+  "fps": "NOT MEASURED",
+  "liveSurvey": "NOT RUN; real HTTP/WebSocket pipeline covered by root tests",
+  "sourceIdentity": "Committed src/civicCore.ts byte-identical to browser-checked worktree"
+}
