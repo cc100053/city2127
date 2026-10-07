@@ -3,7 +3,7 @@ import { PNG } from 'pngjs';
 import jsQR from 'jsqr';
 import assert from 'node:assert/strict';
 import { mkdir } from 'node:fs/promises';
-import { selectQrLandmark } from '../src/landmarkSelection.js';
+import { QR_LANDMARKS, selectQrLandmark } from '../src/landmarkSelection.js';
 
 const base = process.env.QR_TEST_URL || 'http://127.0.0.1:5198';
 await mkdir('test-results', { recursive: true });
@@ -65,5 +65,24 @@ try {
   await fallback.waitForTimeout(500);
   const backup = PNG.sync.read(await fallback.locator('#qr canvas').screenshot());
   assert.equal(jsQR(new Uint8ClampedArray(backup.data), backup.width, backup.height, { inversionAttempts: 'attemptBoth' })?.data, 'https://www.hal.ac.jp/tokyo');
+  await fallback.close();
+  const proposals = new Map();
+  for (let index = 0; proposals.size < QR_LANDMARKS.length; index++) {
+    const proposal = `proposal-${index}`, selected = selectQrLandmark(proposal);
+    if (!proposals.has(selected.id)) proposals.set(selected.id, proposal);
+  }
+  for (const landmark of QR_LANDMARKS) {
+    const preview = await browser.newPage({ viewport: { width: 750, height: 620 } });
+    await preview.route('**/api/config', route => route.fulfill({ json: { configured: false } }));
+    await preview.goto(`${base}/?archive=${proposals.get(landmark.id)}`);
+    await preview.locator('#terminal[data-state=ready]').waitFor();
+    await preview.evaluate(() => document.body.classList.add('integrated-qr'));
+    assert.equal(await preview.locator('#qr').getAttribute('data-landmarks'), landmark.id);
+    await preview.getByRole('button', { name: `${landmark.label}を見る`, exact: true }).click();
+    await preview.locator('#qr[data-city-view=city]').waitFor();
+    await preview.waitForTimeout(900);
+    await preview.screenshot({ path: `test-results/building-qr-${landmark.id}.png` });
+    await preview.close();
+  }
   console.log(`PASS: deterministic ${landmark.id} selection, building/scan controls, top-down QR decoding, changed personal URL, embedded layout, repeat scan and WebGL fallback.`);
 } finally { await browser.close(); }

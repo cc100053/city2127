@@ -1,7 +1,7 @@
 export const QR_LANDMARKS = [
-  { id: 'fuji-tv', label: 'フジテレビ本社ビル' },
-  { id: 'telecom-center', label: 'テレコムセンター' },
-  { id: 'divercity-office-tower', label: 'ダイバーシティオフィスタワー' },
+  { id: 'aqua-city-odaiba', label: 'アクアシティお台場' },
+  { id: 'divercity-tokyo-plaza', label: 'ダイバーシティ東京プラザ' },
+  { id: 'grand-nikko-tokyo-daiba', label: 'グランドニッコー東京 台場' },
 ];
 
 /** Stable per-proposal choice: random-looking, but unchanged after reload. */

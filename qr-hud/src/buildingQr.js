@@ -101,7 +101,7 @@ export function createBuildingQr(host, proposalId) {
     buildingCenter = modelCenter.clone().multiplyScalar(buildingScale); buildingCenter.y += building.position.y;
     const buildingHeight = modelSize.y * buildingScale;
     const buildingFootprint = Math.max(modelSize.x, modelSize.z) * buildingScale;
-    cityExtent = Math.max(radius * 1.12, buildingHeight * .54 + buildingFootprint * .34);
+    cityExtent = Math.max(radius * 1.12, buildingHeight * .6 + buildingFootprint * .4);
     cameraDistance = Math.max(140, buildingHeight * 1.35, cityExtent * 2.8);
     host.dataset.buildingHeight = buildingHeight.toFixed(2);
     host.dataset.cityExtent = cityExtent.toFixed(2);
