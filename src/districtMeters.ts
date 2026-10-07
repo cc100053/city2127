@@ -1230,6 +1230,50 @@ export class ConcentrationDistrict {
     });
   }
 
+  /** Read-only single-building views of the settled city, including pairing extras. */
+  getPreviewCandidates() {
+    const labels = ['ツイスト・スカイタワー', 'テラス・ガーデンタワー', 'ツイン・スカイタワー'];
+    return [
+      ...this.towers.flatMap((site, i) => this.height(i) > .02 ? [{ id: `future-tower-${i}`, label: labels[i % 3], x: site.x, z: site.z }] : []),
+      ...this.pods.flatMap((site, i) => this.podLevels.value[i] > .02 ? [{ id: `future-pavilion-${i}`, label: this.podDesign[i] === 1 ? 'ガーデン・リングパビリオン' : 'スカイ・ガーデンパビリオン', x: site.x, z: site.z }] : []),
+    ];
+  }
+
+  createBuildingPreview(id: string): T.Group {
+    const candidate = this.getPreviewCandidates().find(item => item.id === id);
+    if (!candidate) throw new Error('Building is not present in this city snapshot.');
+    const group = new T.Group(); group.name = id;
+    const copy = (meshes: readonly T.InstancedMesh[], index: number) => {
+      for (const source of meshes) {
+        if (!source.visible) continue;
+        const matrix = new T.Matrix4(); source.getMatrixAt(index, matrix);
+        if (Math.abs(matrix.determinant()) < 1e-8) continue;
+        const materials = [source.material].flat().map(original => {
+          const material = original.clone();
+          material.onBeforeCompile = original.onBeforeCompile;
+          material.customProgramCacheKey = original.customProgramCacheKey.bind(original);
+          return material;
+        });
+        const mesh = new T.InstancedMesh(source.geometry.clone(), Array.isArray(source.material) ? materials : materials[0], 1);
+        mesh.setMatrixAt(0, matrix); mesh.castShadow = mesh.receiveShadow = true;
+        if (source.instanceColor) { const color = new T.Color(); source.getColorAt(index, color); mesh.setColorAt(0, color); }
+        group.add(mesh);
+      }
+    };
+    const index = Number(id.split('-').at(-1));
+    if (id.startsWith('future-tower-')) {
+      copy(this.families[index % 3], Math.floor(index / 3));
+      for (let k = 0; k < 4; k++) copy([this.forestCrowns], index * 4 + k);
+      copy(this.dockMeshes, index);
+    } else {
+      copy(this.podDesign[index] === 1 ? this.ringMeshes : this.podMeshes, index);
+      copy([this.solarDiscs], index);
+    }
+    // Keep the city's instance matrix/shader intact, recentering only the preview group.
+    group.position.set(-candidate.x, 0, -candidate.z);
+    return group;
+  }
+
   /** Tower height share: full tower, or a 45 % mid-rise on hybrid sites. */
   private height(i: number): number { return Math.max(this.towerLevels.value[i], .45 * this.midRise.value[i]); }
 

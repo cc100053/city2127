@@ -1,162 +1,143 @@
 import * as T from 'three';
 import qrcode from 'qrcode-generator';
-import odaiba from './odaiba-qr-models.json';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { futureBuildingPool } from '../../src/qrFutureBuildings.ts';
 import { selectQrLandmark } from './landmarkSelection.js';
+import maritimeSky from '../../asset/textures/maritime-sky.png';
 import './buildingQr.css';
 
-const CITY_TILT = 1.05;
-const CITY_YAW = .65;
+const DEMO_LAYOUT = { version: 2, bands: { nw: 'high', ne: 'high', sw: 'high', se: 'high' }, automatedPorts: 6, sharedSeats: 8, treeCount: 12, plantedFraction: .8, coolingFins: 0, functionModules: 6 };
+const TILT = 1.12, YAW = .65;
 
-// Generated from the team's Odaiba GLBs; retain spheres/arches and original colors.
-function template(model) {
-  const geometry = new T.BufferGeometry();
-  geometry.setAttribute('position', new T.Float32BufferAttribute(model.positions, 3));
-  geometry.setAttribute('color', new T.Float32BufferAttribute(model.colors, 3));
-  geometry.setIndex(model.indices);
-  if (model.normals) geometry.setAttribute('normal', new T.Float32BufferAttribute(model.normals, 3));
-  else geometry.computeVertexNormals();
-  return geometry;
-}
-
-export function createBuildingQr(host, proposalId) {
-  const landmark = selectQrLandmark(proposalId);
-  const renderer = new T.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'low-power' });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.setClearColor('#ecf2ed');
-  renderer.domElement.setAttribute('aria-label', `${landmark.label}から変化するQRコード`);
-  host.dataset.landmarks = landmark.id;
-  const scene = new T.Scene(), city = new T.Group();
-  scene.add(city, new T.HemisphereLight('#ffffff', '#536a7c', 2.5));
-  const sun = new T.DirectionalLight('#fff2da', 2.4); sun.position.set(-20, 45, 30); scene.add(sun);
-  const camera = new T.OrthographicCamera(-25, 25, 25, -25, .1, 500);
-  const buildingGeometry = template(odaiba.models.find(model => model.id === landmark.id));
-  buildingGeometry.computeBoundingBox();
-  const modelSize = buildingGeometry.boundingBox.getSize(new T.Vector3());
-  const modelCenter = buildingGeometry.boundingBox.getCenter(new T.Vector3());
-  const facade = new T.MeshStandardMaterial({ vertexColors: true, roughness: .65 });
-  const ink = new T.MeshBasicMaterial({ color: '#102331', transparent: true, depthWrite: false });
-  const scan = { mask: { value: null }, count: { value: 1 }, progress: { value: 0 }, color: { value: new T.Color('#102331') } };
-  // One complete landmark in presentation view; QR columns cut through the
-  // same mesh during the top-view transition. Dark plinths complete its footprint.
-  facade.onBeforeCompile = shader => {
-    Object.assign(shader.uniforms, { qrMask: scan.mask, qrCount: scan.count, qrProgress: scan.progress, qrInk: scan.color });
-    shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 qrWorld;')
-      .replace('#include <project_vertex>', '#include <project_vertex>\nqrWorld = (modelMatrix * vec4(transformed, 1.0)).xz;');
-    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 qrWorld;\nuniform sampler2D qrMask;\nuniform float qrCount;\nuniform float qrProgress;\nuniform vec3 qrInk;')
-      .replace('#include <opaque_fragment>', `
-        vec2 qrCell = qrWorld + vec2(qrCount * 0.5);
-        vec2 qrUV = (floor(qrCell) + 0.5) / qrCount;
-        float dark = texture2D(qrMask, qrUV).r;
-        float cut = max(abs(fract(qrCell).x - 0.5), abs(fract(qrCell).y - 0.5));
-        if (qrProgress > 0.0 && dark < 0.5 && cut <= qrProgress * 0.501) discard;
-        outgoingLight = mix(outgoingLight, qrInk, qrProgress);
-        #include <opaque_fragment>
-      `);
-  };
-  const ground = new T.MeshBasicMaterial({ color: '#ecf2ed' });
-  const tileGeometry = new T.BoxGeometry(1, .025, 1);
-  let meshes = [], count = 0, radius = 24, cityExtent = 24, cameraDistance = 140;
-  let buildingCenter = new T.Vector3(), cityTarget = new T.Vector3(), frame, timer, revealAt = 0, mask;
-  let mode = 'city', from = 1, to = 1, changedAt = 0, growth = false;
+export function createBuildingQr(host, proposalId, archivedView) {
+  // Fail before allocating a city when WebGL is unavailable (standard QR fallback).
+  const renderer = new T.WebGLRenderer({ antialias: true, powerPreference: 'low-power' });
+  let pool, landmark, building;
+  try {
+    pool = futureBuildingPool(archivedView?.layout ?? DEMO_LAYOUT, archivedView?.slotSeeds);
+    landmark = selectQrLandmark(proposalId, pool.candidates);
+    building = pool.create(landmark.id);
+  } catch (error) { renderer.dispose(); throw error; }
+  finally { pool?.dispose(); }
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); renderer.setClearColor('#ecf2ed');
+  renderer.toneMapping = T.NeutralToneMapping; renderer.toneMappingExposure = .84;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
+  renderer.domElement.setAttribute('aria-label', landmark.label + 'から変化するQRコード');
+  Object.assign(host.dataset, { landmarks: landmark.id, source: 'city-district', sourcePosition: landmark.x + ',' + landmark.z, revision: String(archivedView?.revision ?? 'demo') });
+  const scene = new T.Scene(); scene.environmentIntensity = .6;
+  scene.add(new T.HemisphereLight('#e3ebee', '#8a8274', .6));
+  const sun = new T.DirectionalLight('#ffe7c4', 3.15); sun.position.set(-100, 200, 120);
+  sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024); sun.shadow.normalBias = .15;
+  Object.assign(sun.shadow.camera, { left: -160, right: 160, top: 160, bottom: -160, near: 1, far: 700 }); scene.add(sun);
+  const pmrem = new T.PMREMGenerator(renderer), room = new RoomEnvironment();
+  let environment = pmrem.fromScene(room, .04); scene.environment = environment.texture; room.dispose();
+  let disposed = false, skyTexture;
+  new T.TextureLoader().load(maritimeSky, texture => {
+    if (disposed) { texture.dispose(); return; }
+    skyTexture = texture;
+    const canvas = document.createElement('canvas'); canvas.width = texture.image.width; canvas.height = texture.image.height;
+    const context = canvas.getContext('2d'); context.filter = 'saturate(.55) sepia(.12) brightness(1.04)'; context.drawImage(texture.image, 0, 0);
+    const reflected = new T.CanvasTexture(canvas); reflected.colorSpace = T.SRGBColorSpace; reflected.mapping = T.EquirectangularReflectionMapping;
+    const capture = new RoomEnvironment(); capture.background = reflected;
+    // Match the city: remove room walls, retain the HDR light cards around the sky.
+    capture.traverse(object => { if (object.isMesh && object.material.isMeshStandardMaterial) object.visible = false; });
+    environment.dispose(); environment = pmrem.fromScene(capture, .04); scene.environment = environment.texture;
+    reflected.dispose(); capture.dispose();
+  });
+  const camera = new T.OrthographicCamera(-25, 25, 25, -25, .1, 2000);
+  const renderTarget = new T.WebGLRenderTarget(1, 1, { type: T.HalfFloatType, samples: 4 });
+  const composer = new EffectComposer(renderer, renderTarget); composer.addPass(new RenderPass(scene, camera));
+  const ao = new GTAOPass(scene, camera, 1, 1); ao.updateGtaoMaterial({ radius: 2, distanceFallOff: .8, thickness: 2, samples: 8 }); ao.blendIntensity = .8; composer.addPass(ao);
+  // A pale close-up backdrop fills the frame; city-wide bloom would wash out this small diorama.
+  composer.addPass(new OutputPass());
+  const presentation = new T.Group(), qrStage = new T.Group(); scene.add(presentation, qrStage);
+  const bounds = new T.Box3().setFromObject(building), size = bounds.getSize(new T.Vector3()), center = bounds.getCenter(new T.Vector3());
+  const wrapper = new T.Group(); wrapper.add(building); presentation.add(wrapper);
+  const groundMaterial = new T.MeshStandardMaterial({ color: '#ecf2ed', roughness: .9 });
+  const ground = new T.Mesh(new T.PlaneGeometry(1000, 1000), groundMaterial); ground.rotation.x = -Math.PI / 2; ground.position.y = -.15; ground.receiveShadow = true; presentation.add(ground);
+  const qrWhite = new T.MeshBasicMaterial({ color: '#ecf2ed', toneMapped: false });
+  const ink = new T.MeshBasicMaterial({ color: '#102331', toneMapped: false }), tileGeometry = new T.BoxGeometry(1, .025, 1);
+  let count = 0, radius = 24, cityExtent = 24, distance = 250, timer, frame;
+  const target = new T.Vector3();
+  let mode = 'city', from = 1, to = 1, changedAt = 0;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const controls = document.createElement('div'); controls.className = 'building-qr-controls';
-  controls.innerHTML = `<button type="button" data-view="city">${landmark.label}を見る</button><button type="button" data-view="scan">真上からスキャン</button><span role="status"></span>`;
+  controls.innerHTML = '<button type="button" data-view="city">' + landmark.label + 'を見る</button><button type="button" data-view="scan">真上からスキャン</button><span role="status"></span>';
   host.parentElement.parentElement.appendChild(controls);
   controls.querySelectorAll('button').forEach(button => button.addEventListener('click', () => { clearTimeout(timer); setView(button.dataset.view); }));
-  function setView(next) {
-    from = currentAngle(performance.now()); to = next === 'scan' ? 0 : 1; mode = next; changedAt = performance.now();
-    host.dataset.cityView = 'transition';
-    controls.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === next)));
-    controls.querySelector('span').textContent = next === 'scan' ? 'スマートフォンのカメラで読み取ってください' : `${landmark.label} · 都市内の建築`;
-  }
   function currentAngle(now) {
     const p = reduced ? 1 : Math.min(1, (now - changedAt) / 850);
     return T.MathUtils.lerp(from, to, p * p * (3 - 2 * p));
   }
-  function clear() {
-    clearTimeout(timer);
-    meshes.forEach(mesh => { city.remove(mesh); if (mesh.isInstancedMesh) mesh.dispose(); else if (mesh.geometry !== buildingGeometry) mesh.geometry.dispose(); }); meshes = [];
-    mask?.dispose(); mask = undefined;
+  function setView(next) {
+    from = currentAngle(performance.now()); to = next === 'scan' ? 0 : 1; mode = next; changedAt = performance.now(); host.dataset.cityView = 'transition';
+    controls.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.view === next)));
+    controls.querySelector('span').textContent = next === 'scan' ? 'スマートフォンのカメラで読み取ってください' : landmark.label + ' · 2127 ODAIBA';
+  }
+  function clearQr() {
+    for (const mesh of [...qrStage.children]) { qrStage.remove(mesh); if (mesh.isInstancedMesh) mesh.dispose(); if (mesh.geometry !== tileGeometry) mesh.geometry.dispose(); }
+  }
+  function pose(angle) {
+    const aim = target.clone().multiplyScalar(angle), tilt = angle * TILT;
+    camera.position.set(aim.x + Math.sin(tilt) * Math.sin(YAW) * distance, aim.y + Math.cos(tilt) * distance, aim.z + Math.sin(tilt) * Math.cos(YAW) * distance);
+    // Upright architecture in city view; north-up when scanning.
+    camera.up.set(0, angle, -(1 - angle)); camera.lookAt(aim); camera.updateMatrixWorld(true);
+    const extent = T.MathUtils.lerp(radius, cityExtent, angle);
+    camera.left = camera.bottom = -extent; camera.right = camera.top = extent; camera.updateProjectionMatrix();
   }
   function build(url) {
-    clear();
-    const qr = qrcode(0, 'H'); qr.addData(url, 'Byte'); qr.make(); count = qr.getModuleCount();
-    radius = (count + 10) / 2;
-    const lots = [], pixels = new Uint8Array(count * count * 4);
-    for (let row = 0; row < count; row++) for (let col = 0; col < count; col++) {
-      const dark = qr.isDark(row, col);
-      if (dark) lots.push({ row, col });
-      const offset = (row * count + col) * 4;
-      pixels.fill(dark ? 255 : 0, offset, offset + 3); pixels[offset + 3] = 255;
-    }
-    mask = new T.DataTexture(pixels, count, count, T.RGBAFormat);
-    mask.magFilter = mask.minFilter = T.NearestFilter; mask.needsUpdate = true;
-    scan.mask.value = mask; scan.count.value = count;
-    const plate = new T.Mesh(new T.BoxGeometry(count + 10, .15, count + 10), ground); plate.position.y = -.1; meshes.push(plate); city.add(plate);
+    clearTimeout(timer); clearQr();
+    const qr = qrcode(0, 'H'); qr.addData(url, 'Byte'); qr.make(); count = qr.getModuleCount(); radius = (count + 10) / 2;
+    const plate = new T.Mesh(new T.BoxGeometry(count + 10, .15, count + 10), qrWhite); plate.position.y = -.1; qrStage.add(plate);
+    const lots = []; for (let row = 0; row < count; row++) for (let col = 0; col < count; col++) if (qr.isDark(row, col)) lots.push([row, col]);
     const tiles = new T.InstancedMesh(tileGeometry, ink, lots.length), dummy = new T.Object3D();
-    lots.forEach(({ row, col }, index) => {
-      dummy.position.set(col - (count - 1) / 2, 0, row - (count - 1) / 2); dummy.scale.set(1, 1, 1); dummy.updateMatrix(); tiles.setMatrixAt(index, dummy.matrix);
-    });
-    meshes.push(tiles); city.add(tiles);
-    const building = new T.Mesh(buildingGeometry, facade);
-    const buildingScale = count * 1.08;
-    building.position.y = .025; building.scale.setScalar(buildingScale);
-    buildingCenter = modelCenter.clone().multiplyScalar(buildingScale); buildingCenter.y += building.position.y;
-    const buildingHeight = modelSize.y * buildingScale;
-    const buildingFootprint = Math.max(modelSize.x, modelSize.z) * buildingScale;
-    cityTarget = buildingCenter.clone(); cityTarget.y += buildingHeight * .2;
-    cameraDistance = Math.max(140, buildingHeight * 1.35, cityExtent * 2.8);
-    const horizontal = Math.sin(CITY_TILT);
-    camera.position.set(
-      cityTarget.x + horizontal * Math.sin(CITY_YAW) * cameraDistance,
-      cityTarget.y + Math.cos(CITY_TILT) * cameraDistance,
-      cityTarget.z + horizontal * Math.cos(CITY_YAW) * cameraDistance,
-    );
-    camera.up.set(0, 0, -1); camera.lookAt(cityTarget); camera.updateMatrixWorld(true);
-    building.updateMatrixWorld(true);
-    const bounds = new T.Box3().setFromObject(building), projected = new T.Vector3();
-    cityExtent = 0;
-    for (const x of [bounds.min.x, bounds.max.x]) for (const y of [bounds.min.y, bounds.max.y]) for (const z of [bounds.min.z, bounds.max.z]) {
-      projected.set(x, y, z).applyMatrix4(camera.matrixWorldInverse);
-      cityExtent = Math.max(cityExtent, Math.abs(projected.x), Math.abs(projected.y));
+    lots.forEach(([row, col], index) => { dummy.position.set(col - (count - 1) / 2, 0, row - (count - 1) / 2); dummy.updateMatrix(); tiles.setMatrixAt(index, dummy.matrix); }); qrStage.add(tiles);
+    const scale = count * .84 / Math.max(size.x, size.z); wrapper.scale.setScalar(scale);
+    wrapper.position.set(-center.x * scale, -bounds.min.y * scale, -center.z * scale);
+    const fitted = new T.Box3().setFromObject(wrapper); fitted.getCenter(target);
+    distance = Math.max(250, fitted.getSize(new T.Vector3()).length() * 3); camera.far = distance * 5;
+    cityExtent = 1; pose(1);
+    const projected = new T.Vector3();
+    for (const x of [fitted.min.x, fitted.max.x]) for (const y of [fitted.min.y, fitted.max.y]) for (const z of [fitted.min.z, fitted.max.z]) {
+      projected.set(x, y, z).applyMatrix4(camera.matrixWorldInverse); cityExtent = Math.max(cityExtent, Math.abs(projected.x), Math.abs(projected.y));
     }
-    cityExtent *= 1.3;
-    host.dataset.buildingHeight = buildingHeight.toFixed(2);
-    host.dataset.cityExtent = cityExtent.toFixed(2);
-    host.dataset.fitMargin = '1.3';
-    building.userData.buildings = true; meshes.push(building); city.add(building);
-    host.replaceChildren(renderer.domElement); host.dataset.payload = url; host.dataset.buildings = '1';
-    growth = false; city.scale.y = 1; from = to = 1; setView('city'); resize();
+    cityExtent *= 1.18;
+    pose(1);
+    const screenBounds = [Infinity, Infinity, -Infinity, -Infinity];
+    for (const x of [fitted.min.x, fitted.max.x]) for (const y of [fitted.min.y, fitted.max.y]) for (const z of [fitted.min.z, fitted.max.z]) {
+      projected.set(x, y, z).project(camera);
+      screenBounds[0] = Math.min(screenBounds[0], projected.x); screenBounds[1] = Math.min(screenBounds[1], projected.y);
+      screenBounds[2] = Math.max(screenBounds[2], projected.x); screenBounds[3] = Math.max(screenBounds[3], projected.y);
+    }
+    Object.assign(host.dataset, { buildingHeight: String(size.y * scale), cityExtent: String(cityExtent), fitMargin: '1.18', projectedBounds: JSON.stringify(screenBounds), payload: url, buildings: '1' });
+    host.replaceChildren(renderer.domElement); from = to = 1; setView('city'); resize();
   }
-  function resize() { const size = Math.max(1, host.clientWidth); renderer.setSize(size, size, false); }
+  function resize() { const side = Math.max(1, host.clientWidth); renderer.setSize(side, side, false); composer.setSize(side, side); }
   const observer = new ResizeObserver(resize); observer.observe(host);
   let last = 0;
   function animate(now) {
-    frame = requestAnimationFrame(animate);
-    if (document.hidden || now - last < 1000 / 30) return; last = now;
-    const angle = currentAngle(now), tilt = angle * CITY_TILT, horizontal = Math.sin(tilt);
-    const extent = T.MathUtils.lerp(radius, cityExtent, angle);
-    camera.left = camera.bottom = -extent; camera.right = camera.top = extent; camera.far = cameraDistance * 4; camera.updateProjectionMatrix();
-    const target = cityTarget.clone().multiplyScalar(angle);
-    camera.position.set(target.x + horizontal * Math.sin(CITY_YAW) * cameraDistance, target.y + Math.cos(tilt) * cameraDistance, target.z + horizontal * Math.cos(CITY_YAW) * cameraDistance);
-    camera.up.set(0, 0, -1); camera.lookAt(target);
-    scan.progress.value = 1 - angle;
-    ink.color.set(angle < .001 ? '#102331' : '#c3d4d5');
-    ink.opacity = 1 - angle;
-    if (growth) city.scale.y = reduced ? 1 : Math.max(.01, Math.min(1, (now - revealAt) / 1200));
+    frame = requestAnimationFrame(animate); if (document.hidden || now - last < 1000 / 30) return; last = now;
+    const angle = currentAngle(now); pose(angle);
+    presentation.visible = angle > .001; qrStage.visible = angle < .999;
+    wrapper.scale.y = wrapper.scale.x * Math.max(.001, angle);
     if (Math.abs(angle - to) < .001) host.dataset.cityView = mode;
-    renderer.render(scene, camera);
+    if (angle < .001) renderer.render(scene, camera); else composer.render();
   }
   frame = requestAnimationFrame(animate);
   return {
     build,
-    reveal() { growth = true; revealAt = performance.now(); setView('city'); timer = setTimeout(() => setView('scan'), reduced ? 0 : 3500); },
+    reveal() { setView('city'); timer = setTimeout(() => setView('scan'), 8000); },
     reset() { clearTimeout(timer); controls.hidden = true; },
     showControls() { controls.hidden = false; },
     dispose() {
-      clear(); cancelAnimationFrame(frame); observer.disconnect();
-      buildingGeometry.dispose(); tileGeometry.dispose(); facade.dispose(); ink.dispose(); ground.dispose();
-      renderer.dispose(); renderer.domElement.remove(); controls.remove();
+      disposed = true; clearTimeout(timer); cancelAnimationFrame(frame); observer.disconnect(); clearQr();
+      building.traverse(object => { if (object.isMesh) { object.geometry.dispose(); [object.material].flat().forEach(material => material.dispose()); } if (object.isInstancedMesh) object.dispose(); });
+      ground.geometry.dispose(); groundMaterial.dispose(); tileGeometry.dispose(); qrWhite.dispose(); ink.dispose();
+      composer.passes.forEach(pass => pass.dispose?.()); composer.dispose(); environment.dispose(); skyTexture?.dispose(); pmrem.dispose(); sun.shadow.dispose(); renderer.dispose(); renderer.domElement.remove(); controls.remove();
     },
   };
 }

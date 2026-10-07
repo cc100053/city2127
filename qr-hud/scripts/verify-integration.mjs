@@ -6,6 +6,7 @@ import { mkdir } from 'node:fs/promises';
 
 // Run ONLY against an isolated scratch survey database. Creates two proposals and resets it.
 const base = process.env.INTEGRATION_URL;
+const cityTimeout = Number(process.env.INTEGRATION_CITY_TIMEOUT_MS || 45000);
 if (!base || process.env.INTEGRATION_ALLOW_RESET !== 'yes') throw new Error('Set INTEGRATION_URL and INTEGRATION_ALLOW_RESET=yes for an isolated test server.');
 const api = async (path, body) => {
   const response = await fetch(base + path, body === undefined ? {} : { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
@@ -38,6 +39,9 @@ try {
   const id = saved.proposal.id;
   const qrFrame = guest.frameLocator('.guest-archive-frame');
   await qrFrame.locator('#terminal[data-state=ready]').waitFor({ timeout: 45000 });
+  assert.equal(await qrFrame.locator('#qr').getAttribute('data-source'), 'city-district');
+  assert.match(await qrFrame.locator('#qr').getAttribute('data-landmarks'), /^future-(tower|pavilion)-/);
+  assert.equal(Number(await qrFrame.locator('#qr').getAttribute('data-revision')), saved.proposal.revisionAfter);
   await qrFrame.locator('#qr[data-city-view=scan]').waitFor({ timeout: 20000 });
   await guest.waitForTimeout(600); // Let the existing 400 ms QR fade-in complete.
   const png = PNG.sync.read(await qrFrame.locator('#qr canvas').screenshot());
@@ -48,15 +52,18 @@ try {
   const first = await api(`/api/archives/${id}`);
   assert.deepEqual(first.view.layout, saved.proposal.afterLayout);
   // The shared display may be background-throttled while the guest tab is active; canvas presence is enough here.
-  await display.locator('canvas').waitFor({ timeout: 45000 });
+  await display.locator('canvas').waitFor({ timeout: cityTimeout });
   await display.screenshot({ path: 'test-results/integration-display.png' });
+  await display.close(); // Release its large GPU scene before the independent phone checks.
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
   const phone = await context.newPage();
   phone.on('pageerror', e => errors.push(e.message));
   let sockets = 0;
   phone.on('websocket', () => sockets++);
-  await phone.goto(`${decoded.data}?survey`); // Even an appended survey flag must not subscribe to live updates.
-  await phone.locator('.personal-loading').waitFor({ state: 'detached', timeout: 45000 });
+  await phone.goto(`${decoded.data}?survey`, { waitUntil: 'domcontentloaded', timeout: cityTimeout }); // Appended survey flag must not subscribe to live updates.
+  // Wait for archive initialization first; "loading detached" can pass before its script even starts.
+  await phone.locator('canvas[data-archive-id]').waitFor({ timeout: cityTimeout });
+  await phone.locator('.personal-loading').waitFor({ state: 'detached', timeout: cityTimeout });
   assert.equal(await phone.locator('canvas').getAttribute('data-archive-id'), id);
   assert.deepEqual(JSON.parse(await phone.locator('canvas').getAttribute('data-layout')), first.view.layout);
   assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
@@ -78,12 +85,13 @@ try {
     answers: session.questions.map(q => ({ questionId: q.id, optionId: q.options[2].id })) });
   assert.deepEqual((await api(`/api/archives/${id}`)).view, first.view);
   assert.notDeepEqual((await api('/api/city-view')).layout, first.view.layout);
-  await phone.reload();
-  await phone.locator('.personal-loading').waitFor({ state: 'detached', timeout: 45000 });
+  await phone.reload({ waitUntil: 'domcontentloaded', timeout: cityTimeout });
+  await phone.locator('canvas[data-archive-id]').waitFor({ timeout: cityTimeout });
+  await phone.locator('.personal-loading').waitFor({ state: 'detached', timeout: cityTimeout });
   assert.deepEqual(JSON.parse(await phone.locator('canvas').getAttribute('data-layout')), first.view.layout);
   assert.equal(sockets, 0);
-  await phone.goto(`${base}/city/unknown`);
-  await phone.locator('.error').waitFor();
+  await phone.goto(`${base}/city/unknown`, { waitUntil: 'domcontentloaded', timeout: cityTimeout });
+  await phone.locator('.error').waitFor({ timeout: cityTimeout });
   assert.equal(await phone.locator('canvas').count(), 0);
   assert.deepEqual(errors, []);
   console.log(`PASS: questionnaire -> actual QR decode -> interactive phone 3D; touch rotation, zoom, no live WebSocket, later guest/reset isolation. Archive: ${id}`);

@@ -13,11 +13,19 @@ const stageLabels = ['待機中', '暗号化中', '送信中', '完了'];
 const descriptions = ['アーカイブの作成待ち', '都市データを暗号化中', 'バックグラウンド送信のデモ', '提案のアーカイブが完成しました'];
 const terminal = $('#terminal');
 const archiveId = new URLSearchParams(location.search).get('archive');
+const integrated = !!archiveId && location.pathname.startsWith('/qr/');
+let archivedView;
+if (integrated) {
+  try {
+    const record = await api(`/api/archives/${encodeURIComponent(archiveId)}`);
+    if (record.view?.layout?.version !== 2) throw new Error('Invalid archived city');
+    archivedView = record.view;
+  } catch (error) { console.warn('City buildings unavailable; using a standard QR.', error); }
+}
 let buildingQr;
-try { buildingQr = createBuildingQr($('#qr'), archiveId); document.body.classList.add('building-qr'); }
+try { if (!integrated || archivedView) { buildingQr = createBuildingQr($('#qr'), archiveId, archivedView); document.body.classList.add('building-qr'); } }
 catch (error) { console.warn('3D QR unavailable; using the standard QR.', error); }
 const hologram = { reset() { buildingQr?.reset(); }, reveal() { buildingQr?.showControls(); buildingQr?.reveal(); }, dispose() { buildingQr?.dispose(); } };
-const integrated = !!archiveId && location.pathname.startsWith('/qr/');
 if (integrated) document.body.classList.add('integrated-qr');
 const config = integrated ? { configured: true, authenticated: true, publicBaseUrl: location.origin }
   : await api('/api/config').catch(() => ({ configured: false, authenticated: false, backendUnavailable: true }));
