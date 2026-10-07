@@ -1,9 +1,21 @@
 import * as T from 'three';
-import { arc, bake, box, chrome, glass, mirrors, leaf, leafyCrown, membrane, publicLight, solar, stone, trim } from './cityRig.ts';
+import { arc, bake, box, chrome, glass, mirrors, leaf, leafyCrown, membrane, publicLight as cityLight, solar, stone, trim } from './cityRig.ts';
 
-/** Fuji's office blocks become a load-bearing civic chassis, keeping the sphere berth and site alignment. Metres. */
+/** Occupied media headquarters within Fuji's civic chassis, retaining the sphere berth and site alignment. Metres. */
 export function civicCore() {
   const root=new T.Group();root.name='fuji-civic-chassis';
+  // Warm occupied rooms follow the existing city clock, using one shared finish for this building.
+  const publicLight=cityLight.clone();publicLight.color.set('#f5dfb9');publicLight.emissive.set('#ffd292');publicLight.emissiveIntensity=1;
+  publicLight.onBeforeCompile=shader=>{
+    shader.uniforms.roomLight={get value(){return .4+cityLight.emissiveIntensity*.65;}};
+    shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nuniform float roomLight;')
+      .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance *= roomLight;');
+  };
+  publicLight.customProgramCacheKey=()=>'fuji-room-light';
+  // Broadcast light stays inside production rooms; public circulation retains its warm finish.
+  const broadcastLight=publicLight.clone();broadcastLight.color.set('#8eabc8');broadcastLight.emissive.set('#9dbfea');
+  broadcastLight.onBeforeCompile=publicLight.onBeforeCompile;broadcastLight.customProgramCacheKey=publicLight.customProgramCacheKey;
+  const head=new T.SphereGeometry(.22,8,6);
   const member=(a:number[],b:number[],width:number,depth=width,material:T.Material=trim)=>{
     const from=new T.Vector3(...a),to=new T.Vector3(...b),delta=to.clone().sub(from);
     const mesh=box(root,[width,delta.length(),depth],from.clone().add(to).multiplyScalar(.5).toArray(),material,.05);
@@ -19,7 +31,7 @@ export function civicCore() {
       if(j<3)member([x,y+2,z],[tree.position.x,y+4,tree.position.z],.2,.2,solar);
     }
   };
-  // Four bifurcating foundations carry two deep transfer frames, rather than occupied office towers.
+  // Four bifurcating foundations carry the occupied wings and the two deep transfer frames.
   for(const z of [-12,70]) {
     for(const x of [-68,64]) {
       box(root,[18,3,18],[x,1.5,z],stone);
@@ -87,35 +99,142 @@ export function civicCore() {
   const transfer=box(root,[7,2.5,transferA.distanceTo(transferB)],transferA.clone().add(transferB).multiplyScalar(.5).toArray(),stone);
   transfer.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),transferB.sub(transferA).normalize());
   // A clear environmental envelope exposes the chamber floors while retaining a silver sky reflection.
-  const silverGlass=chrome.clone();silverGlass.color.set('#bfd6e2');silverGlass.transparent=true;silverGlass.opacity=.32;silverGlass.metalness=.55;silverGlass.depthWrite=false;mirrors.push(silverGlass);
-  // The titanium observation object becomes a suspended, inhabitable environmental chamber.
+  const silverGlass=chrome.clone();silverGlass.color.set('#d2dfe3');silverGlass.transparent=true;silverGlass.opacity=.2;silverGlass.metalness=.3;silverGlass.depthWrite=false;mirrors.push(silverGlass);
+  // Two production wings sit behind the independent public diagonal, leaving the sphere and central void open.
+  // Sealed studio boxes occupy the rear; glazed workrooms and collaboration galleries face the bay.
+  for(const [x,width] of [[-56,22],[40,38]]) {
+    for(const y of [3,24,43,64,83,102,121]) {
+      box(root,[width,1.7,65],[x,y,30],stone);
+      box(root,[width,.35,65],[x,y+1.05,30],trim);
+      if(y===121) {
+        box(root,[width-3,1,5],[x,y+1.7,56],leaf);
+        for(let dx=-width/2+5;dx<width/2-2;dx+=8)grove(x+dx,y+2.2,56,dx);
+        continue;
+      }
+      const h=y===43 ? 19.3 : 17.3;
+      box(root,[width-2,h,23],[x,y+1.2+h/2,46],stone);
+      // Deep ceramic reveals articulate the sealed acoustic rooms without glazing their sound enclosure.
+      for(const side of [-1,1]) {
+        box(root,[.22,.65,20],[x+side*(width/2-.85),y+9.2,46],solar);
+        for(const z of [38,44,50,56])box(root,[.32,h-1,.3],[x+side*(width/2-.8),y+1.2+h/2,z],trim);
+      }
+      // Acoustic walls have recessed vertical service seams; the public edge remains transparent.
+      for(let dx=-width/2+3;dx<width/2;dx+=4)
+        box(root,[.16,h-1,.25],[x+dx,y+1.2+h/2,34.35],solar);
+      box(root,[width-1,h,.18],[x,y+1.2+h/2,-2.6],silverGlass);
+      // Ceramic floor edges break up the tall glass bays; shallow terraces remain inside the wing footprint.
+      box(root,[width,1.05,3.2],[x,y+9.2,-1.2],trim);
+      box(root,[width-1,.25,.25],[x,y+8.55,-2.9],publicLight);
+      box(root,[width-2,1.3,.16],[x,y+10.1,-2.7],silverGlass);
+      for(const side of [-1,1]) {
+        box(root,[.18,h,36],[x+side*(width/2-.5),y+1.2+h/2,15],silverGlass);
+        for(let z=0;z<33;z+=5)box(root,[.3,h,.3],[x+side*(width/2-.4),y+1.2+h/2,z],solar);
+      }
+      for(let dx=-width/2+1;dx<width/2;dx+=4) {
+        box(root,[.3,h,.35],[x+dx,y+1.2+h/2,-2.8],solar);
+        // Warm ceiling panels and inset workstation screens make the occupied depth legible.
+        box(root,[2.8,.12,8],[x+dx+1.4,y+h+.85,8],publicLight);
+      }
+      // Each double-height production level has an editing mezzanine behind the glazing.
+      box(root,[width-2,.6,17],[x,y+9.2,9],stone);
+      box(root,[width-3,1.2,.18],[x,y+10.1,.6],silverGlass);
+      // Lit acoustic baffles sit behind the desks, so furnishings silhouette against occupied depth.
+      for(const floor of [y+1.2,y+9.5])for(let dx=-width/2+3;dx<width/2-2;dx+=5) {
+        box(root,[3.7,5.6,.18],[x+dx,floor+3.4,16.9],publicLight);
+        box(root,[.18,6.5,.45],[x+dx+2.1,floor+3.5,16.65],trim);
+      }
+      for(const floor of [y+1.2,y+9.5])for(let dx=-width/2+3;dx<width/2-2;dx+=5) {
+        for(const z of (floor===y+9.5 ? [4,12] : [4,12,23])) {
+          box(root,[3.6,.22,1.6],[x+dx,floor+1.05,z],trim);
+          box(root,[.22,1,1.2],[x+dx,floor+.5,z],solar);
+          box(root,[1.2,.8,.12],[x+dx,floor+1.55,z+.25],broadcastLight);
+          box(root,[.85,.1,.7],[x+dx,floor+.65,z-1.25],solar);
+          box(root,[.85,.85,.14],[x+dx,floor+1.1,z-1.55],solar);
+          // Seated editing staff are architectural occupancy, outside the district's moving actor routes.
+          if(z===4 || (dx+y)%3===0) {
+            box(root,[.5,.64,.3],[x+dx,floor+1.02,z-1.2],solar);
+            const person=new T.Mesh(head,trim);person.position.set(x+dx,floor+1.57,z-1.2);root.add(person);
+            for(const side of [-1,1]) {
+              box(root,[.14,.52,.16],[x+dx+side*.16,floor+.28,z-.88],solar);
+              member([x+dx+side*.3,floor+1.25,z-1.18],[x+dx+side*.3,floor+1.08,z-.55],.12,.12,trim);
+            }
+          }
+        }
+      }
+      // The planted outer corners shade the workrooms without covering the front glazing.
+      for(const side of [-1,1]) {
+        const px=x+side*(width/2-2.4);
+        box(root,[3.6,.8,3.8],[px,y+1.65,-.4],leaf);
+        grove(px,y+2.05,-.4,y+side);
+      }
+      if(y===43 || y===83) {
+        // Broadcast set at the glazed front of the acoustically enclosed production floor.
+        box(root,[width-5,8,.6],[x,y+5.5,29],solar);
+        box(root,[width-8,5.5,.2],[x,y+5.8,28.6],broadcastLight);
+        box(root,[width-10,.3,.2],[x,y+8.6,28.4],publicLight);
+        box(root,[width-7,.65,7],[x,y+1.6,25],trim);
+        for(let dx=-width/2+4;dx<width/2-2;dx+=4) {
+          box(root,[1,.7,1.4],[x+dx,y+15.8,22],solar);
+          box(root,[.7,.15,.9],[x+dx,y+15.35,22],broadcastLight);
+        }
+      }
+    }
+    // Dedicated staff entrance and internal lift/stair core, separate from the forum's public approach.
+    box(root,[7,118,8],[x,62,57],trim);
+    box(root,[4,5,.25],[x,5.6,62],glass);
+    box(root,[8,.7,4],[x,8.4,63],stone);
+    for(const dx of [-2,2])box(root,[.35,3,.7],[x+dx,4.5,60],solar);
+  }
+  // The suspended sphere is a broadcast theatre: a clear upper auditorium over a solid acoustic bowl.
   const chamber=new T.Group();chamber.position.set(-18,100,23);root.add(chamber);
   const skin=new T.Mesh(new T.SphereGeometry(24,48,24,0,Math.PI*2,0,Math.PI*.7),silverGlass);chamber.add(skin);
   const bowl=new T.Mesh(new T.SphereGeometry(24,48,12,0,Math.PI*2,Math.PI*.7,Math.PI*.3),trim);chamber.add(bowl);
-  for(const y of [-12,0,12]) {
-    const r=Math.sqrt(24*24-y*y);
-    arc(chamber,7,r,1.6,[0,y,0],stone);
-    arc(chamber,r-.6,r+.5,.7,[0,y+1.6,0],trim);
-    arc(chamber,r-.35,r+.15,.16,[0,y+2.15,0],publicLight);
-    for(let i=0;i<9;i++) {
-      const a=i*Math.PI*2/9;
-      grove(-18+Math.cos(a)*(r-5.5),100+y+1.6,23-Math.sin(a)*(r-5.5),i);
-      member([-18+Math.cos(a)*(r-1),102+y,23-Math.sin(a)*(r-1)],[-18+Math.cos(a)*(r-1),105+y,23-Math.sin(a)*(r-1)],.18,.18,trim);
-    }
-    // Continuous deep soil / water-retention beds, supported by the chamber floors.
-    arc(chamber,r-4,r-1.3,1.1,[0,y+1.6,0],leaf,.3,Math.PI*1.2);
-    for(let i=0;i<12;i++) {
-      const a=i*Math.PI/6,x=Math.cos(a)*(r-5),z=-Math.sin(a)*(r-5);
-      const seat=box(chamber,[3,.65,1],[x,y+2.2,z],trim);seat.rotation.y=a+Math.PI/2;
-    }
-    // Smaller civic rooms sit inside the public garden ring, leaving the outer promenade continuous.
-    for(const x of [-9,9]) {
-      box(chamber,[5,4.5,6],[x,y+3.85,0],glass);
-      box(chamber,[5.5,.4,6.5],[x,y+6.3,0],trim);
-      box(chamber,[4,.8,.16],[x,y+4,-3.1],publicLight);
-      for(const z of [-3,3])box(chamber,[5,.22,.25],[x,y+1.8,z],publicLight);
+  arc(chamber,0,20.6,1.6,[0,-12,0],stone);
+  arc(chamber,19.8,21.2,.7,[0,-10.4,0],trim);
+  arc(chamber,20.7,21.1,.18,[0,-9.7,0],publicLight);
+  box(chamber,[22,1,9],[0,-9,7],solar);
+  box(chamber,[22,12,.7],[0,-2.5,12],solar);
+  box(chamber,[20,10,.18],[0,-2.5,11.55],broadcastLight);
+  for(const x of [-8,-4,0,4,8]) {
+    box(chamber,[.15,10,.25],[x,-2.5,11.3],solar);
+    box(chamber,[1,.7,1.3],[x,9,5],solar);
+    box(chamber,[.75,.15,1],[x,8.55,5],broadcastLight);
+  }
+  // A presenter desk and camera pedestals distinguish the live studio from a vacant glazed chamber.
+  box(chamber,[8,1.1,2],[0,-7.95,6],trim);
+  box(chamber,[7,.5,.15],[0,-7.9,4.9],broadcastLight);
+  for(const x of [-5,5]) {
+    box(chamber,[.55,1.3,.4],[x,-7.85,7],solar);
+    const presenter=new T.Mesh(head,trim);presenter.position.set(x,-6.95,7);chamber.add(presenter);
+  }
+  for(const x of [-10,10]) {
+    box(chamber,[.3,1.4,.3],[x,-7.7,4],solar);
+    box(chamber,[.8,.55,1.1],[x,-6.85,4],solar);
+    box(chamber,[1.2,.18,1.2],[x,-8.4,4],solar);
+  }
+  // Tiered seating faces the rear stage; side aisles connect to the public entrance at Y=100.
+  for(let row=0;row<7;row++) {
+    const z=1-row*2.2,y=-10.3+row*.7,w=28-row*.6;
+    box(chamber,[w,.7,2.1],[0,y,z],stone);
+    for(let seat=0;seat<15;seat++) {
+      if(seat===7)continue;
+      const x=(seat-7)*1.55;
+      box(chamber,[1.05,.25,1.1],[x,y+.8,z],solar);
+      box(chamber,[1.05,1.1,.2],[x,y+1.25,z-.5],solar);
+      if((seat+row)%4!==0) {
+        box(chamber,[.52,.65,.32],[x,y+1.24,z],trim);
+        const person=new T.Mesh(head,trim);person.position.set(x,y+1.8,z);chamber.add(person);
+      }
     }
   }
+  for(const x of [-15,15]) {
+    box(chamber,[2,1,18],[x,-6.5,-1],stone);
+    box(chamber,[.2,1.4,17],[x,-5.3,-1],silverGlass);
+  }
+  // Overhead technical grid and a narrow planted crown replace the former three garden floors.
+  for(const z of [-4,5,10])box(chamber,[29,.45,.45],[0,10,z],solar);
+  arc(chamber,10,15,.8,[0,16,0],stone);
+  arc(chamber,11,14,.5,[0,16.8,0],leaf);
   for(let i=0;i<12;i++) {
     const rib=new T.Mesh(new T.TorusGeometry(24,.18,5,64),trim);
     rib.rotation.y=i*Math.PI/12;chamber.add(rib);
@@ -133,13 +252,6 @@ export function civicCore() {
   member([-42.26,94,38.89],[-40,85,40],1.5,2,solar);
   member([6.26,94,7.11],[4,85,6],1.5,2,solar);
   member([-68,62,70],[-34,82,23],3,4);member([64,62,70],[-2,82,23],3,4);
-  // A hung lateral civic volume shares the frame but keeps a different, open crescent silhouette.
-  const west=new T.Group();west.position.set(-49,88,52);root.add(west);
-  arc(west,7,18,3,[0,0,0],stone,0,Math.PI*1.5);
-  arc(west,16.5,18,8,[0,3,0],glass,0,Math.PI*1.5);
-  arc(west,7,18,2,[0,11,0],trim,0,Math.PI*1.5);
-  member([-68,130,52],[-38,130,52],3,4);
-  for(const x of [-61,-38])member([x,130,52],[x,101,52],.8,.8,solar);
   // Elevated public continuity through the chassis: one bay-facing ring floor and a rear transfer deck.
   arc(root,25,34,2,[-18,61,23],stone,Math.PI*.05,Math.PI*1.8);
   box(root,[132,2.5,12],[-2,61,64],stone);
@@ -149,6 +261,15 @@ export function civicCore() {
     [19,45,2,22,stone],[44.6,45,1.5,24,membrane],
     [44.5,45,.18,25.5,trim],[44.4,44.7,.18,23.9,publicLight],
   ] as const)arc(root,inner,outer,height,[-8,y,-2],material,2.2,Math.PI*2-.5);
+  // Public foyer below the forum has its own curved glazing and entry, distinct from rear staff doors.
+  arc(root,19,44,1,[-8,2,-2],stone,2.2,Math.PI*2-.5);
+  arc(root,42.8,43,18,[-8,3,-2],silverGlass,2.2,Math.PI*2-.5);
+  for(let a=2.25;a<7.95;a+=.16) {
+    const x=-8+Math.cos(a)*43,z=-2-Math.sin(a)*43;
+    member([x,3,z],[x,21,z],.35,.35,solar);
+    const light=box(root,[3,.15,1.4],[-8+Math.cos(a)*39,20.8,-2-Math.sin(a)*39],publicLight);
+    light.rotation.y=a+Math.PI/2;
+  }
   for(const a of [.15,2.25,3.15,4.7]) {
     arc(root,35,41,1.2,[-8,24,-2],leaf,a,.7);
     for(let i=0;i<4;i++) {
@@ -157,6 +278,18 @@ export function civicCore() {
     }
     const x=-8+Math.cos(a+.35)*39,z=-2-Math.sin(a+.35)*39;
     member([x,3,z],[x,22,z],2,3);
+  }
+  // Small public groups occupy the supported forum ring, clear of the Aqua bridge arrival sector.
+  for(const a of [.6,.85,1.1,1.35,2.4,2.65,2.9]) {
+    const x=-8+Math.cos(a)*30,z=-2-Math.sin(a)*30;
+    const bench=box(root,[3.4,.55,1.2],[x,24.3,z],trim);bench.rotation.y=a+Math.PI/2;
+    for(const dx of [-1.5,1.5]) {
+      box(root,[.5,.75,.32],[x+dx,25.05,z+2],solar);
+      for(const side of [-1,1])box(root,[.16,.65,.2],[x+dx+side*.15,24.35,z+2],solar);
+      const visitor=new T.Mesh(head,trim);visitor.position.set(x+dx,25.65,z+2);root.add(visitor);
+      member([x+dx-.32,25.3,z+2],[x+dx-.34,24.85,z+2.15],.13,.13,trim);
+      member([x+dx+.32,25.3,z+2],[x+dx+.36,25.05,z+1.8],.13,.13,trim);
+    }
   }
   for(const y of [63,134]) {
     box(root,[132,1.4,10],[-2,y,-12],stone);
