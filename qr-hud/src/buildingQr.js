@@ -23,11 +23,13 @@ export function createBuildingQr(host, proposalId, archivedView) {
     building = pool.create(landmark.id);
   } catch (error) { renderer.dispose(); throw error; }
   finally { pool?.dispose(); }
+  // The landmark's rear gallery hides its sphere; show its bay-facing side, like the city hero view.
+  const yaw = landmark.id === 'landmark-civic-core' ? YAW + Math.PI : YAW;
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); renderer.setClearColor('#ecf2ed');
   renderer.toneMapping = T.NeutralToneMapping; renderer.toneMappingExposure = .84;
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
   renderer.domElement.setAttribute('aria-label', landmark.label + 'から変化するQRコード');
-  Object.assign(host.dataset, { landmarks: landmark.id, source: 'city-district', sourcePosition: landmark.x + ',' + landmark.z, revision: String(archivedView?.revision ?? 'demo') });
+  Object.assign(host.dataset, { landmarks: landmark.id, source: landmark.id === 'landmark-civic-core' ? 'city-landmark' : 'city-district', sourcePosition: landmark.x + ',' + landmark.z, revision: String(archivedView?.revision ?? 'demo') });
   const scene = new T.Scene(); scene.environmentIntensity = .6;
   scene.add(new T.HemisphereLight('#e3ebee', '#8a8274', .6));
   const sun = new T.DirectionalLight('#ffe7c4', 3.15); sun.position.set(-100, 200, 120);
@@ -83,7 +85,7 @@ export function createBuildingQr(host, proposalId, archivedView) {
   }
   function pose(angle) {
     const aim = target.clone().multiplyScalar(angle), tilt = angle * TILT;
-    camera.position.set(aim.x + Math.sin(tilt) * Math.sin(YAW) * distance, aim.y + Math.cos(tilt) * distance, aim.z + Math.sin(tilt) * Math.cos(YAW) * distance);
+    camera.position.set(aim.x + Math.sin(tilt) * Math.sin(yaw) * distance, aim.y + Math.cos(tilt) * distance, aim.z + Math.sin(tilt) * Math.cos(yaw) * distance);
     // Upright architecture in city view; north-up when scanning.
     camera.up.set(0, angle, -(1 - angle)); camera.lookAt(aim); camera.updateMatrixWorld(true);
     const extent = T.MathUtils.lerp(radius, cityExtent, angle);

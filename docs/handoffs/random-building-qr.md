@@ -9,17 +9,17 @@
 
 ## Session Git state
 
-- Session starting branch and HEAD: tower-only refinement resumed `feat/random-building-qr` at `3b5b468586ad89e4e3e5033c8bde91a4b11237db`, 2026-10-07
+- Session starting branch and HEAD: landmark fallback resumed `feat/random-building-qr` at `bdc5c9271aa3f86db46bd3f800f242d0e83e1863`, 2026-10-07
 - Last fetched origin/main commit: `4ced0195c36b0c14fe488d5b223eebb04cbc13f7`, 2026-10-07
 - Local changes present at session start: NONE; prior QR integration/framing/landmark corrections are local task commits
-- Upstream integration status: at current preflight task branch was 6 commits ahead / 23 behind origin/main and matched `origin/feat/random-building-qr`. This is a resumed QR task; origin/main's independent civic/traffic updates are not automatically merged. Local exhibition build remains on the user's current checkout.
+- Upstream integration status: at current preflight task branch was 8 commits ahead / 23 behind origin/main and matched `origin/feat/random-building-qr`. This is a resumed QR task; origin/main's independent civic/traffic updates are not automatically merged. Local exhibition build remains on the user's current checkout.
 - Pending Git conflicts or synchronization blockers: NONE
 
 ## Goal and acceptance criteria
 
 Restore the questionnaire-to-building-QR flow on the current Odaiba city. Superseding user direction (2026-10-07): display one recognizable **2127 future building actually present in the saved island city**, not raw modern Odaiba landmarks or outer-district models. Preserve the building's settled shape/materials/height/pairings; show it upright and complete; deterministically choose within the saved city's visible slots and retain that choice on reload. The QR opens that proposal's archived city.
 
-Latest refinement: only recognizable mid/high-rise buildings and towers qualify. Exclude small garden pavilions entirely, even when present in the saved city. If that snapshot has no eligible tower, display a standard QR; do not fabricate a high-density building.
+Latest refinement: prioritize recognizable mid/high-rise buildings and towers, still excluding small garden pavilions entirely. User now requests an original city landmark or transport when no tower qualifies. The implementation uses the always-present central Civic Core as the landmark fallback; it does not add a new transport preview or fabricate a high-density building. A plain QR is reserved for archive/WebGL failure.
 
 ## In-scope files and dependencies
 
@@ -29,11 +29,20 @@ QR presentation package, root concentration district read-only extraction method
 
 Earlier task commits ported the integrated QR/archive flow: embedded result QR after the existing reading slot, read-only `/city/:proposalId`, single port 8787 and standard-QR WebGL fallback. Modern-landmark pools from those iterations are now superseded.
 
-Current stage reads `/api/archives/:id` before constructing the QR. `futureBuildingPool` uses the same `ConcentrationDistrict.setTarget(layout, ..., true, slotSeeds.urbanConcentration)` as the city, but now limits both selection and extraction to the actual visible tower slots. It extracts a single twisted/terraced/twin tower, cloning its actual instance matrices, materials, glass shader and crowns/dock; no duplicate building factory or GLB simplification. The source pool is released and cloned resources are owned by the QR. Upright camera framing fits all projected building corners with 18% margin. Sky reflections, sun/shadows, GTAO and Neutral tone mapping retain readable blue glass; whole-city bloom is intentionally omitted after actual screenshots showed a washed-out pale diorama. Eight seconds of presentation then collapse into a separately rendered high-contrast scan plate; both modes remain selectable. Standard QR is used if the archive cannot supply an eligible tower. Local integrated output has been rebuilt for the existing 8787 server.
+Current stage reads `/api/archives/:id` before constructing the QR. `futureBuildingPool` uses the same `ConcentrationDistrict.setTarget(layout, ..., true, slotSeeds.urbanConcentration)` as the city and prioritizes the actual visible tower slots. It extracts a single twisted/terraced/twin tower, cloning its actual instance matrices, materials, glass shader and crowns/dock. If none is visible, it builds the existing central landmark with `civicCore({ preview: true })`, the same factory used by `loadOdaiba`; this is not the old Fuji GLB. Preview mode owns baked geometry/materials and avoids the live city mirror registry, leaving default city rendering unchanged. The source pool is released and resources are owned by the QR. Upright camera framing fits all projected building corners with 18% margin. The Civic Core uses its bay-facing side so the rear gallery does not hide the sphere; tower angles are unchanged. Sky reflections, sun/shadows, GTAO and Neutral tone mapping retain readable glass; whole-city bloom remains omitted. Eight seconds of presentation then collapse into a separately rendered high-contrast scan plate; both modes remain selectable. Standard QR remains for archive/WebGL failure. Local integrated output is rebuilt for the existing 8787 server.
 
 ## Actual validation results
 
-### Tower-only refinement — current stage, 2026-10-07
+### Original landmark fallback — current stage, 2026-10-07
+
+- Starting source: `bdc5c92`; high-rise selection remains prioritized, and small garden pavilions remain excluded. No new transport preview is added because the original landmark satisfies the requested fallback.
+- Root full `npm test` and `npm run build` PASS. The focused test compares the fallback's exact baked vertex positions/material colours with `civicCore()` and checks independent geometry/material ownership and no live mirror registry additions. Default city factory behaviour is preserved.
+- QR `npm test` 13/13 and `npm run build` PASS; final integrated `node scripts/exhibition.mjs build` PASS. Existing bundle-size warnings remain.
+- Final `verify-building-qr.mjs` Chrome 750×620 PASS: three tower families and low-city Civic Core fallback, whole-building bounds, readable glass, stable reload, repeated exact canvas decoding and WebGL fallback. The final landmark screenshot was visually inspected from the bay-facing side, showing the original central sphere and frame together.
+- Read-only HTTP: existing 8787 serves loader `index-CCWhxj0Y.js`, imports new `main-ZNQU8Z8e.js`, and the bundle contains the Civic Core fallback. No server restart or production database writes.
+- Broad integration was NOT RERUN; its previous PARTIAL status and physical phone/Wi-Fi acceptance remain open. No live proposals or resets submitted.
+
+### Tower-only refinement — previous stage, 2026-10-07
 
 - Starting source: `3b5b468`; code and tests changed only for QR eligibility, not city geometry, scoring or saved data.
 - Root full `npm test` and `npm run build` PASS. Low cities produce an empty pool; visible pavilions cannot be extracted; mixed/high retain the exact existing mid/high-rise slots, heights, shaders and transforms.
@@ -63,7 +72,7 @@ Physical phone scanning and exhibition Wi-Fi require manual validation. Large sh
 
 ## Important decisions
 
-Choice is deterministic from proposal ID **within the authoritative saved city's visible mid/high-rise tower pool**. Low concentration with no eligible tower uses standard QR, never a pavilion; mixed includes actual visible mid-rise/full tower hybrids, high uses towers. Seeds, height and pairing extras come from the archive, never current live state. Source GLB/legacy QR assets remain untouched but are no longer imported by the QR presentation.
+Choice is deterministic from proposal ID **within the authoritative saved city's visible mid/high-rise tower pool**. Low concentration with no eligible tower uses the original central Civic Core, never a pavilion; mixed includes actual visible mid-rise/full tower hybrids, high uses towers. Seeds, height and pairing extras come from the archive, never current live state. The fixed Civic Core exists at every concentration level. Source GLB/legacy QR assets remain untouched but are no longer imported by the QR presentation.
 
 ## Next expected step
 

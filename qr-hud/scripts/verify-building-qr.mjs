@@ -31,7 +31,7 @@ async function city(page, filename) {
   await page.locator('[data-view=city]').click();
   await page.locator('#qr[data-city-view=city]').waitFor();
   const qr = page.locator('#qr');
-  assert.equal(await qr.getAttribute('data-source'), 'city-district');
+  assert.equal(await qr.getAttribute('data-source'), (await qr.getAttribute('data-landmarks')) === 'landmark-civic-core' ? 'city-landmark' : 'city-district');
   assert.equal(Number(await qr.getAttribute('data-buildings')), 1);
   const bounds = JSON.parse(await qr.getAttribute('data-projected-bounds'));
   assert.ok(bounds.every(value => Number.isFinite(value) && Math.abs(value) <= .85), 'the entire building fits with margin');
@@ -90,12 +90,13 @@ try {
     await preview.close();
   }
   const lowPreview = await open('/qr/?archive=low-proposal', low);
-  assert.equal(await lowPreview.locator('body.building-qr').count(), 0, 'no pavilion or invented tower in a low city');
-  assert.equal(await lowPreview.locator('.building-qr-controls').count(), 0);
-  const lowQr = PNG.sync.read(await lowPreview.locator('#qr canvas').screenshot());
-  assert.equal(jsQR(new Uint8ClampedArray(lowQr.data), lowQr.width, lowQr.height, { inversionAttempts: 'attemptBoth' })?.data, archiveUrl);
-  assert.equal(await lowPreview.evaluate(() => document.documentElement.scrollHeight <= innerHeight), true, 'standard QR fallback fits the embedded view');
-  await lowPreview.screenshot({ path: 'test-results/building-qr-no-tower-fallback.png' });
+  assert.equal(await city(lowPreview, 'building-qr-landmark-fallback'), 'landmark-civic-core', 'low city retains the existing central landmark, not small pavilions or invented towers');
+  assert.equal(await lowPreview.locator('#qr').getAttribute('data-revision'), '7');
+  await decode(lowPreview, archiveUrl);
+  await lowPreview.reload();
+  await lowPreview.locator('#terminal[data-state=ready]').waitFor();
+  assert.equal(await city(lowPreview), 'landmark-civic-core', 'the original landmark survives reload');
+  await decode(lowPreview, archiveUrl);
   await lowPreview.close();
   assert.deepEqual(errors, []);
 
@@ -112,5 +113,5 @@ try {
   const backup = PNG.sync.read(await fallback.locator('#qr canvas').screenshot());
   assert.equal(jsQR(new Uint8ClampedArray(backup.data), backup.width, backup.height, { inversionAttempts: 'attemptBoth' })?.data, demoUrl);
   await fallback.close();
-  console.log('PASS: all three archived tower silhouettes, whole-building framing, deterministic reload, repeat QR decoding, no-tower standard QR fallback, embedded layout and WebGL fallback.');
+  console.log('PASS: three archived tower families and original civic landmark fallback, whole-building framing, deterministic reload, repeat QR decoding, embedded layout and WebGL fallback.');
 } finally { await browser.close(); }

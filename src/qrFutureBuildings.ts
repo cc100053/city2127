@@ -1,5 +1,6 @@
 import * as T from 'three';
 import { ConcentrationDistrict } from './districtMeters.ts';
+import { civicCore } from './civicCore.ts';
 import type { ExhibitionLayout, Scores } from './surveyView.ts';
 
 /** Uses the same settled slot transforms and materials as the shared city. */
@@ -8,10 +9,13 @@ export function futureBuildingPool(layout: ExhibitionLayout, seeds?: Scores) {
   source.setTarget(layout, 0, true, seeds?.urbanConcentration ?? 0);
   // Only the snapshot's visible mid/high-rise slots qualify; small garden pavilions do not.
   const candidates = source.getPreviewCandidates().filter(candidate => candidate.id.startsWith('future-tower-'));
+  // This central landmark exists in every city, regardless of the concentration score.
+  if (!candidates.length) candidates.push({ id: 'landmark-civic-core', label: '台場シビック・コア', x: 0, z: 0 });
   return {
     candidates,
     create(id: string) {
-      if (!candidates.some(candidate => candidate.id === id)) throw new Error('Eligible tower is not present in this city snapshot.');
+      if (!candidates.some(candidate => candidate.id === id)) throw new Error('Eligible building is not present in this city snapshot.');
+      if (id === 'landmark-civic-core') return civicCore({ preview: true });
       return source.createBuildingPreview(id);
     },
     dispose() {

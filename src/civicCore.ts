@@ -2,7 +2,7 @@ import * as T from 'three';
 import { arc, bake, box, chrome, glass, mirrors, leaf, leafyCrown, membrane, solar, stone, trim } from './cityRig.ts';
 
 /** Fuji's office blocks become a load-bearing civic chassis, keeping the sphere berth and site alignment. Metres. */
-export function civicCore() {
+export function civicCore({ preview = false }: { preview?: boolean } = {}) {
   const root=new T.Group();root.name='fuji-civic-chassis';
   const member=(a:number[],b:number[],width:number,depth=width,material:T.Material=trim)=>{
     const from=new T.Vector3(...a),to=new T.Vector3(...b),delta=to.clone().sub(from);
@@ -47,7 +47,8 @@ export function civicCore() {
   const transfer=box(root,[7,2.5,transferA.distanceTo(transferB)],transferA.clone().add(transferB).multiplyScalar(.5).toArray(),stone);
   transfer.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),transferB.sub(transferA).normalize());
   // Silvered glass skin (target v2): the same warm mirror as the skyway spheres, faintly see-through to the planted floors.
-  const silverGlass=chrome.clone();silverGlass.transparent=true;silverGlass.opacity=.82;mirrors.push(silverGlass);
+  const silverGlass=chrome.clone();silverGlass.transparent=true;silverGlass.opacity=.82;
+  if(!preview)mirrors.push(silverGlass);
   // The titanium observation object becomes a suspended, inhabitable environmental chamber.
   const chamber=new T.Group();chamber.position.set(-18,100,23);root.add(chamber);
   const skin=new T.Mesh(new T.SphereGeometry(24,48,24,0,Math.PI*2,0,Math.PI*.7),silverGlass);chamber.add(skin);
@@ -121,7 +122,11 @@ export function civicCore() {
   }
   const generated=new Set<T.BufferGeometry>();
   root.traverse(object=>{if(object instanceof T.Mesh && object.geometry.type!=='RoundedBoxGeometry')generated.add(object.geometry);});
-  const batches=bake(root);root.clear();batches.forEach(mesh=>{mesh.name='fuji-civic-chassis';root.add(mesh);});
+  const batches=bake(root);root.clear();batches.forEach(mesh=>{
+    // Detached QR previews own their finishes and must not join the live city's night-light registry.
+    if(preview && mesh.material!==silverGlass)mesh.material=mesh.material.clone();
+    mesh.name='fuji-civic-chassis';root.add(mesh);
+  });
   generated.forEach(geometry=>geometry.dispose()); // Cached box geometry remains shared with the rest of the city.
   return root;
 }
