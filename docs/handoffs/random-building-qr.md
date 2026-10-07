@@ -4,7 +4,7 @@
 - Status: IMPLEMENTED; QR checks PASS; broad integration browser check PARTIAL
 - Branch: `feat/random-building-qr`
 - Base commit: `4eda49ebae30e6215e6f67f17e8fef197832b34e`
-- Last verified commit: `eb8de23df534fb1d319f25246471c0b0f21e67fd` (code snapshot; final metadata update is documentation-only)
+- Last verified commit: `f5106c8c575f75d040948d537a275f7b370e0fde` (tower-only code snapshot; final metadata update is documentation-only)
 - Remote availability: PUSHED to `origin/feat/random-building-qr`; not merged to main
 
 ## Session Git state
@@ -43,6 +43,7 @@ Current stage reads `/api/archives/:id` before constructing the QR. `futureBuild
 - Production database is untouched; no live proposals, resets or scoring changes. Existing 8787 service is left running.
 - Read-only HTTP check: `/qr/` serves loader `index-BZwTQtlU.js`, which imports new `main-3NPAc0ld.js`; that bundle contains the tower-only guard. The initial check mistakenly looked for the main chunk directly in HTML; tracing the dynamic loader confirmed the new bundle is served without restarting the server.
 - Affected local Markdown links and working diff whitespace PASS. Temporary 5198 QR preview was stopped after its process/command were verified; 8787 was not stopped.
+- Scoped source commit: `f5106c8`; committed task diff whitespace against origin/main PASS. Saved/pushed on `origin/feat/random-building-qr`; main is unchanged and branch CI is not claimed as verified.
 
 ### Previous future-building stage — historical evidence
 
