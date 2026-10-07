@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS
 - Branch: codex/fuji-tv-polish
 - Base commit: 4eda49ebae30e6215e6f67f17e8fef197832b34e
-- Last verified commit: the round-4 implementation commit recorded below (source SHA-256 `7a50266d…e2f1`); round 3 `d570f83`
+- Last verified commit: the round-5 implementation commit recorded below (source SHA-256 `f53fb31c…a969e1`); round 4 `ecdf66f`
 - Remote availability: origin/codex/fuji-tv-polish; resolve this Git ref for latest implementation/evidence publication. Prior code 0076bad0 is integrated on main; v3 is a separate implementation.
 
 ## Session Git state
@@ -29,7 +29,7 @@ No failing source checks. Target fidelity remains partial; performance/hardware 
 
 ## Next expected step
 
-User reviews the v3 round-4 final screenshot ([v3r4-pass3](../../artifacts/fuji-tv-polish/v3r4-pass3.jpg)). Further passes or integration follow that review; keep this result on `codex/fuji-tv-polish` in the meantime.
+User reviews the v3 round-5 final screenshot ([v3r5-pass3](../../artifacts/fuji-tv-polish/v3r5-pass3.jpg)). Further passes or integration follow that review; keep this result on `codex/fuji-tv-polish` in the meantime.
 
 ## Target and pass 1 (2026-10-07)
 
@@ -140,3 +140,15 @@ Owner: Claude (orchestrator) with Opus worker subagents. User requested “do 3 
 Validation after each pass by exit code: root `npm test` 0, `npm run build` 0 (existing >500kB warning), `git diff --check` 0; civic day16/night22 captured console has no warnings/errors besides favicon 404. Standalone hero16 visually checked (console query returned no entries). Batches remain ≤9 per test; triangle count not re-measured. The theatre violet region and the earlier theatre-wall dimming use world-space coordinates in the shader, so they assume the civic core stays at its current placement. Evidence: [pass1](../../artifacts/fuji-tv-polish/v3r4-pass1.jpg), [pass2](../../artifacts/fuji-tv-polish/v3r4-pass2.jpg), [final day](../../artifacts/fuji-tv-polish/v3r4-pass3.jpg), [final night](../../artifacts/fuji-tv-polish/v3r4-pass3-night.jpg), [hero](../../artifacts/fuji-tv-polish/v3r4-hero.jpg). Meter low/mixed/high, FPS, GPU/exhibition hardware and live survey browser NOT RUN.
 
 Target fidelity PARTIAL: theatre now shows violet tiered audience under a blue dome, wings read as lit occupied rooms with far walls; target still has denser crowds, a warmer golden daylight grade and spotlights in a darker dome. Stop for user review per Dream Loop Plus.
+
+## Target v3 implementation round 5 (2026-10-07)
+
+Owner: Claude (orchestrator) with Opus worker subagents. User requested “do 3 more loops”. Startup: clean at `ecdf66f`, fetch succeeded, feature counterpart 0/0, origin/main `f3b7d73`; no merge. Same target, preview and headless `playwright-cli` 1280×720 capture method.
+
+- Pass 1: whiter cream frame/slabs; golden-cream room light; violet-blue seat tint; smaller desk screens; live studio sets (video wall, lit stage, presenters, pedestal cameras, spot rigs) behind the glass on the y43/y83 wing levels; projecting cream mezzanine bands with lit undersides and planters on wing side faces; second forum visitor ring and denser foyer visitors.
+- Pass 2: flank light panels moved to each room's far wall with ceiling strips and standing staff; theatre can-light rings; ~6/7 seat occupancy; denser bay-side roof groves.
+- Pass 3: dark theatre dome with taller lit can-light lenses and four rows of house lights; dark mezzanine/upper soffits with lit strips and spot rigs behind the bay glazing; flank glass less silvered (fresnel `mix(1.3,.35)`); studio control-room bands split into windows; blue edge strips on escalator tubes.
+
+Validation after each pass by exit code: root `npm test` 0 (includes aerial-approach, route/site and wing floor-support checks), `npm run build` 0 (existing >500kB warning), `git diff --check` 0; civic day16/night22 captured console has no warnings/errors besides favicon 404. Standalone hero16 visually checked (console query returned no entries). Batches remain ≤9 per test; triangle count not re-measured. No orchestrator fixes needed. Evidence: [pass1](../../artifacts/fuji-tv-polish/v3r5-pass1.jpg), [pass2](../../artifacts/fuji-tv-polish/v3r5-pass2.jpg), [final day](../../artifacts/fuji-tv-polish/v3r5-pass3.jpg), [final night](../../artifacts/fuji-tv-polish/v3r5-pass3-night.jpg), [hero](../../artifacts/fuji-tv-polish/v3r5-hero.jpg). Meter low/mixed/high, FPS, GPU/exhibition hardware and live survey browser NOT RUN.
+
+Target fidelity PARTIAL: dark spotlit theatre dome, blue-violet audience and room-depth wings now approach the target; remaining gaps are stage light beams (would need a new transparent finish beyond the 9-batch limit), the warmer golden global daylight grade (out of civic-core scope) and denser crowds. Stop for user review per Dream Loop Plus.
