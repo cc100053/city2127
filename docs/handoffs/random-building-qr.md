@@ -4,8 +4,8 @@
 - Status: IMPLEMENTED; QR checks PASS; broad integration browser check PARTIAL
 - Branch: `feat/random-building-qr`
 - Base commit: `4eda49ebae30e6215e6f67f17e8fef197832b34e`
-- Last verified commit: `63287714788d656a5720cb9b71f5770a9f2a3df0` (original-landmark fallback code snapshot; final metadata update is documentation-only)
-- Remote availability: PUSHED to `origin/feat/random-building-qr`; not merged to main
+- Last verified commit: `35258f9d3caf4160807accd198fb3e9de48b40b1` (linked QR sculpture code snapshot; final metadata update is documentation-only)
+- Remote availability: latest linked sculpture `35258f9` is LOCAL ONLY; earlier `414cc63` is available on `origin/feat/random-building-qr`. This session's push was blocked by permission review pending explicit authorization/verified destination ownership; not merged to main.
 
 ## Session Git state
 
@@ -42,6 +42,8 @@ Current stage reads `/api/archives/:id` before constructing the QR. `futureBuild
 - Intermediate browser check failed the glass contrast threshold after restoring smooth-glass finishes; cube roughness now has a .35 floor. Final screenshot checks wait for local sky texture and the existing .4 s CSS opacity fade to finish before evaluating colour. Rerun PASS; do not attribute the earlier contrast failure solely to roughness. Half-open triangle coverage additionally prevents counting shared quad diagonals twice without removing real overlapping-solid crossings; overlapping-member native test and final browser rerun PASS.
 - Read-only HTTP: existing 8787 returns 200 for `/qr/`, serving `index-Dom_62bx.js` → `main-DuOz6kjT.js` containing `linked-building-qr`. No server restart or live proposals/resets.
 - Broad integration NOT RERUN; previous PARTIAL status and physical phone/Wi-Fi acceptance remain open. Feature branch only; no automatic merge with origin/main or verified branch CI claim.
+- Scoped source commit: `35258f9`; affected Markdown links, working/staged/committed whitespace and complete task diff review PASS. Temporary 5198 Vite preview was stopped after confirming its exact process command; the user's existing 8787 was left running. Source and this metadata are saved on the task branch, not merged to main.
+- Remote push NOT PERFORMED: permission review rejected the combined metadata-commit/push command because destination ownership and explicit user authorization to upload source were not established. Local metadata commit is completed separately as unaffected work; do not retry/bypass the upload without resolving that permission. Local 8787 output is already updated, so this does not block local use.
 
 ### Original landmark fallback — previous stage, 2026-10-07
 
@@ -87,4 +89,4 @@ Choice is deterministic from proposal ID **within the authoritative saved city's
 
 ## Next expected step
 
-The local user can refresh `/guest` with Ctrl+F5 to use the rebuilt QR; existing 8787 service was read-only checked and serves the new QR bundle. Source is saved/pushed on the task branch. Recheck the broader city integration on a suitable browser host (or consistently extend its remaining default selector timeouts), then physical phone/venue acceptance. Deliberate integration with concurrent origin/main work is still separate; do not overwrite or auto-merge it on resume. Temporary 5198/8789 test services are stopped after validation; the user's 8787 server is left running.
+The local user can refresh `/guest` with Ctrl+F5 to use the rebuilt linked QR; existing 8787 was read-only checked and serves the final bundle. Latest source is saved locally on the task branch; obtain explicit authorization/verified ownership before uploading it to origin (current permission-review block). Recheck broad city integration on a suitable browser host, then physical phone/venue acceptance. Deliberate origin/main integration is separate; do not overwrite or auto-merge it on resume. Temporary 5198/8789 test services are stopped; the user's 8787 is left running.
