@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { Box3, Group, InstancedMesh, Matrix4, Mesh, Raycaster, Scene, Vector3 } from 'three';
+import { Box3, Group, InstancedMesh, Matrix4, Mesh, Quaternion, Raycaster, Scene, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
 import { changeSites, skyBridges, inDistrict, DISTRICT } from '../src/layout.ts';
@@ -9,6 +9,7 @@ import { heroCamera } from '../src/heroCamera.ts';
 import { pavilionFlight, plazaPose, routes, mobility, publishDoorways, publishEntrances, forecourtVisits, promenadeBenches, visitPose, entranceJourneys, entrancePose, laneOffset } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { civicCore } from '../src/civicCore.ts';
+import { publishOccupants, publishRoofWalks, occupantFleet, occupants, rideShown, strollPose } from '../src/occupants.ts';
 import { bake } from '../src/cityRig.ts';
 import { contextFacades } from '../src/contextFacades.ts';
 import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from '../src/coastalCanopy.ts';
@@ -31,6 +32,7 @@ assert.equal(hash(readFileSync(new URL('../' + layout.source, import.meta.url)))
 assert.equal(layout.buildings.length, 8);
 assert.equal(new Set(layout.buildings.map((p: { id: string }) => p.id)).size, 8);
 let triangles = 0;
+const roofs:{model:Group;terraces:[number,number,number,number][];spots:{at:Vector3}[];walks:{curve:import('three').Curve<Vector3>;pair?:number}[]}[]=[];
 const city = new Group();
 const landmarks: Group[]=[];
 for (const placement of layout.buildings) {
@@ -70,7 +72,30 @@ for (const placement of layout.buildings) {
     assert.ok(mergedBounds.min.distanceTo(actual.min)<.01 && mergedBounds.max.distanceTo(actual.max)<.01,`${placement.id} merged bounds unchanged`);
     city.add(scene);landmarks.push(scene);
   }
-  if(placement.id==='aqua-city-odaiba' || placement.id==='decks-tokyo-beach')plantRoofCanopy(city,scene);
+  if(placement.id==='aqua-city-odaiba' || placement.id==='decks-tokyo-beach'){const terraces=plantRoofCanopy(city,scene);roofs.push({model:scene,terraces,...publishRoofWalks(scene,terraces)});}
+}
+// Roof residents stand on the landmark's own flat roof under open sky, outside the planted rims and trunks, the Meter's meadow mound
+// (radius 1.188 r) and its four sail posts, on both sides of each terrace's line.
+{
+  const sky=new Raycaster(),from=new Vector3(),points=roofs.flatMap(roof=>[...roof.spots.map(s=>({roof,p:s.at})),
+    ...roof.walks.flatMap(w=>w.curve.getSpacedPoints(Math.ceil(w.curve.getLength()/.5)).flatMap(p=>{
+      const t=w.curve.getTangentAt(.5),side=new Vector3(-t.z,0,t.x).normalize();return (w.pair?[-w.pair,w.pair]:[0]).map(o=>({roof,p:p.clone().addScaledVector(side,o)}));}))]);
+  const planted=city.children.filter(o=>o instanceof InstancedMesh&&/grove-terraces|surveyed-coastal/.test(o.name));
+  assert.ok(planted.length>0&&roofs.reduce((n,r)=>n+r.walks.length,0)>=4&&roofs.reduce((n,r)=>n+r.spots.length,0)>=4,'Aqua City and DECKS roofs take strolling and standing residents');
+  for(const {roof,p} of points){
+    sky.set(from.set(p.x,400,p.z),new Vector3(0,-1,0));sky.far=Infinity;const hit=sky.intersectObject(roof.model,true)[0];
+    assert.ok(hit&&Math.abs(hit.point.y-p.y)<.3,`roof resident at ${p.toArray().map(v=>v.toFixed(1))} stands on open roof`);
+    for(const [dx,dz] of [[0,0],[.3,0],[-.3,0],[0,.3],[0,-.3]]){
+      sky.set(from.set(p.x+dx,p.y+1.85,p.z+dz),new Vector3(0,-1,0));sky.far=1.8;
+      assert.equal(sky.intersectObjects(planted,false).length,0,`roof resident at ${p.toArray().map(v=>v.toFixed(1))} stands in planting`);
+    }
+    for(const [x,z,,r] of roof.terraces){
+      const yaw=Math.sin(x*.37+z*.11)*3,c=Math.cos(yaw),s=Math.sin(yaw);
+      assert.ok(Math.hypot(p.x-x,p.z-z)>1.188*r+.36,`roof resident at ${p.toArray().map(v=>v.toFixed(1))} stands in a meadow mound`);
+      for(const [a,b] of [[-1,-1],[1,-1],[-1,1],[1,1]])assert.ok(Math.hypot(p.x-(x+a*1.1*r*c+b*.7*r*s),p.z-(z-a*1.1*r*s+b*.7*r*c))>.66,'roof resident clears the sail posts');
+    }
+  }
+  console.log(`Odaiba: ${roofs.reduce((n,r)=>n+r.walks.length,0)} roof strolls and ${roofs.reduce((n,r)=>n+r.spots.length,0)} roof residents keep to open roof, clear of planting, meadows and sail posts.`);
 }
 assert.equal(triangles, 339919, 'All eight complete GLBs retain reviewed geometry');
 const core=civicCore();city.add(core);
@@ -87,28 +112,25 @@ for(const x of [-55,41])for(const y of [24,43,64,83,102]) {
   const hit=floorRay.intersectObject(core,true)[0];
   assert.ok(hit && Math.abs(hit.point.y-(y+1.225))<.3, `Fuji work floor ${x}/${y} needs support and clear headroom`);
 }
-for(const a of [.6,.85,1.1,1.35,2.4,2.65,2.9])for(const dx of [-1.5,1.5]) {
-  const footRay=new Raycaster(new Vector3(-8+Math.cos(a)*30+dx,24.02,-2-Math.sin(a)*30+2),new Vector3(0,-1,0),0,.2);
-  const hit=footRay.intersectObject(core,true)[0];
-  assert.ok(hit && Math.abs(hit.point.y-24)<.03, 'Fuji forum visitors stand on supported public floor');
-}
-for(let a=.4,i=0;a<1.6;a+=.085,i++) {
-  const r=24+(i%3)*1.2;
-  for(const [angle,radius] of [[a,r],...(i%3===0 ? [[a+.035,r+.8]] : [])]) {
-    const footRay=new Raycaster(new Vector3(-8+Math.cos(angle)*radius,24.02,-2-Math.sin(angle)*radius),new Vector3(0,-1,0),0,.2);
-    const hit=footRay.intersectObject(core,true)[0];
-    assert.ok(hit && Math.abs(hit.point.y-24)<.03, 'Fuji bay-facing groups stand on supported public floor');
-  }
-}
-for(let x=-42,i=0;x<=42;x+=7,i++)for(const [px,z] of [[x,-14.6],[x+.85,-14.1+(i%2)*.4]]) {
-  // Sample beside each figure so its own head is not mistaken for the supporting floor.
-  const floorRay=new Raycaster(new Vector3(px+.7,68,z),new Vector3(0,-1,0),0,4);
-  const hit=floorRay.intersectObject(core,true)[0];
-  assert.ok(hit && Math.abs(hit.point.y-65)<.03, 'Fuji promenade visitors need support and clear standing headroom');
-  const headRay=new Raycaster(new Vector3(px,67.2,z),new Vector3(0,-1,0),0,.3);
-  const headHit=headRay.intersectObject(core,true)[0];
-  assert.ok(headHit && Math.abs(headHit.point.y-67)<.03, 'Fuji promenade figures stand above the structural beam');
-}
+// Fuji's people (civicCore `occupants`) stand on real floor with clear headroom, or sit on a real seat; strollers and escalator riders
+// keep that along their whole lane and stay clear of everyone placed (seated knees reach further).
+const fuji=core.occupants,footing=new Raycaster(),downward=new Vector3(0,-1,0);
+const support=(p:Vector3,seated=false)=>{
+  footing.set(p.clone().setY(p.y+(seated?1.6:1.85)),downward);footing.far=2;const hit=footing.intersectObject(core,true)[0];
+  return !!hit&&Math.abs(hit.point.y-(p.y+(seated?.48:0)))<.1;
+};
+for(const s of fuji.spots)assert.ok(support(s.at,s.seated),`Fuji ${s.mode} at ${s.at.toArray().map(v=>v.toFixed(1))} needs a floor or seat and headroom`);
+const lanes=[...fuji.walks.map(w=>w.curve.getSpacedPoints(Math.ceil(w.curve.getLength()/.5))),
+  ...fuji.rides.map(r=>{const length=r.from.distanceTo(r.to),n=Math.ceil(length/.5);return Array.from({length:n+1},(_,i)=>i/n)
+    .filter(f=>rideShown(r,length,f*length)>0).map(f=>r.from.clone().lerp(r.to,f));})];
+lanes.forEach((points,l)=>points.forEach(p=>{
+  assert.ok(support(p),`Fuji lane ${l} at ${p.toArray().map(v=>v.toFixed(1))} needs a floor and headroom`);
+  for(const s of fuji.spots)if(Math.abs(s.at.y-p.y)<1.5)assert.ok(Math.hypot(s.at.x-p.x,s.at.z-p.z)>(s.seated?1:.8),`Fuji lane ${l} brushes a ${s.mode} person at ${s.at.toArray().map(v=>v.toFixed(1))}`);
+}));
+// Strollers keep to their own lanes: 1 m between any two, so passing people never touch.
+for(let a=0;a<lanes.length;a++)for(let b=a+1;b<lanes.length;b++)for(const p of lanes[a])for(const q of lanes[b])
+  if(Math.abs(p.y-q.y)<1.5)assert.ok(Math.hypot(p.x-q.x,p.z-q.z)>.95,`Fuji lanes ${a} and ${b} meet near ${p.toArray().map(v=>v.toFixed(1))}`);
+assert.ok(fuji.spots.filter(s=>s.mode==='audience').length>80&&fuji.walks.length>=50&&fuji.rides.length===2,'Fuji keeps its audience, strollers and both escalators');
 const approach=routes().approach,clearanceRay=new Raycaster();
 for(let i=0;i<=160;i++) {
   const p=approach.getPointAt(i/160);
@@ -566,3 +588,30 @@ updatePeople(presets.neutral, 9, 0); resting.getMatrixAt(0, m); assert.deepEqual
 assert.equal(resting.geometry.getAttribute('gait').getW(0), 1);
 ray.far = Infinity;
 console.log(`Odaiba: ${visits.length} forecourt visits and ${entrances.length} doorway meetings clear real paving, geometry and actual low/mixed/high day/night fleets; doorway people/robots keep clear, nobody walks in place (${inPlace} of ${slow}); seated bodies remain fixed.`);
+
+// Building occupants as drawn: one fleet sized to everything published, everyone wholly present or absent at a held hour, strollers and
+// riders moving continuously (no jumps), nobody stepping in place, seated people never moving.
+{
+  publishOccupants(core.occupants);
+  const published=occupants(),occScene=new Scene(),updateOccupants=occupantFleet(occScene);
+  const riders=published.rides.reduce((n,r)=>n+Math.ceil(r.from.distanceTo(r.to)/r.gap),0);
+  const walkers=published.walks.reduce((n,w)=>n+(w.pair?2:1),0),total=published.spots.length+walkers+riders;
+  let previous:Vector3[]=[],striding:boolean[]=[],moved=0;
+  for(const [hour,share] of [[12,0],[21,1]] as const)for(let time=0;time<=150;time+=.25){
+    updateOccupants(presets.neutral,time,share,hour);
+    const mesh=occScene.children.find(o=>o.name==='building-occupants') as InstancedMesh,gait=mesh.geometry.getAttribute('gait');
+    if(time===0){assert.equal(mesh.count,total,'occupant fleet holds every published person');previous=[];}
+    const now=Array.from({length:total},(_,k)=>{mesh.getMatrixAt(k,m);m.decompose(p,new Quaternion(),scale);return {at:p.clone(),size:scale.x};});
+    now.forEach(({at,size},k)=>{
+      // Riders alone fade, at the landings and through structure.
+      assert.ok(size===0||(size>.9&&size<1.06)||(k>=published.spots.length+walkers&&size<1.06),`occupant ${k} drawn part-shrunk (${size}) at a held hour`);
+      if(!previous.length||size===0)return;
+      const step=at.distanceTo(previous[k]);
+      assert.ok(step<(k<published.spots.length?1e-6:.32),`occupant ${k} jumps ${step.toFixed(2)} m at ${time}s`);
+      if(k>=published.spots.length&&k<published.spots.length+walkers&&gait.getY(k)>0&&striding[k]){assert.ok(step>.15,`stroller ${k} steps in place at ${time}s`);moved++;}
+    });
+    previous=now.map(n=>n.at);striding=now.map((_,k)=>gait.getY(k)>0);
+  }
+  assert.ok(moved>1000,'strollers walk');
+  console.log(`Odaiba: ${total} building occupants (${published.spots.length} placed, ${walkers} strolling, ${riders} riding) draw at full size or not at all, move continuously and never walk in place.`);
+}

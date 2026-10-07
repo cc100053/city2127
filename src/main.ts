@@ -39,9 +39,10 @@ try {
   if(civicReview){camera.position.set(-180,105,-235);camera.lookAt(-10,78,20);}
   // DEV street review: a promenade bench, its walkers and the seaside avenue from 40 m (orbit may close to 30 m).
   const streetReview=import.meta.env.DEV && reviewParams.get('review')==='street';
-  // `&cam=x,y,z` moves the street-review camera (still aimed at the bench, at least 30 m out) to see past canopies.
-  const reviewCam=reviewParams.get('cam')?.split(',').map(Number);
-  if(streetReview){const [x,y,z]=reviewCam?.length===3&&reviewCam.every(Number.isFinite)?reviewCam:[-40,20,-245];camera.position.set(x,y,z);camera.lookAt(-24,0,-268);}
+  // `&cam=x,y,z` moves the street-review camera (at least 30 m out) to see past canopies; `&at=x,y,z` aims it elsewhere than the bench.
+  const triple=(key:string,fallback:[number,number,number])=>{const v=reviewParams.get(key)?.split(',').map(Number);return v?.length===3&&v.every(Number.isFinite)?v as [number,number,number]:fallback;};
+  const reviewAim=triple('at',[-24,0,-268]);
+  if(streetReview){camera.position.set(...triple('cam',[-40,20,-245]));camera.lookAt(...reviewAim);}
   const reviewTime=import.meta.env.DEV && reviewParams.has('reviewTime') ? Number(reviewParams.get('reviewTime')) : NaN;
   const ambient=new T.HemisphereLight('#edf1e4','#8a8274',2.2);scene.add(ambient);
   const sun=new T.DirectionalLight('#ffe4b8',3.4);sun.position.set(-20,38,18);sun.castShadow=true;
@@ -90,7 +91,7 @@ try {
   const controls=new OrbitControls(camera,renderer.domElement);
   controls.target.set(...HERO_TARGET);controls.enableDamping=true;controls.dampingFactor=.06;controls.rotateSpeed=.45;controls.zoomSpeed=.6;controls.panSpeed=.8;
   if(civicReview)controls.target.set(-10,78,20);
-  if(streetReview)controls.target.set(-24,0,-268);
+  if(streetReview)controls.target.set(...reviewAim);
   // Orbit and pan stay on the hero district; the hazed ground beyond is backdrop, not a destination.
   const districtMin=new T.Vector3(DISTRICT.minX,0,DISTRICT.minZ),districtMax=new T.Vector3(DISTRICT.maxX,160,DISTRICT.maxZ),panBack=new T.Vector3();
   controls.minDistance=streetReview?30:150;controls.maxDistance=1000;controls.minPolarAngle=.35;controls.maxPolarAngle=1.42;controls.screenSpacePanning=false;controls.update();
