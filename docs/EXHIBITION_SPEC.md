@@ -10,6 +10,7 @@
 - Desktop presentation only；不加入 mobile／responsive 驗收。普通 renderer resize 保留。
 - 未來身份、可讀的選擇效果及城市延續性優先。行人、車、drones、空中航線已獲允許。交通分層（2026-10-06 user決定）：空中分區域160–170m／城市80–100m／服務30–45m三層，航道有地標及建築泊位；行人有停留、架空層、海邊轉乘及夜間光環，細節見 [PROJECT](PROJECT.md)。
 - 現行視覺方向是 [CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)；材質及動畫實作規則見 [ART](ART.md)。Shibuya／Pic 2 只作歷史來源。
+- Fuji TV 打磨（2026-10-07，新分支待視覺review）：程序 civic core 加入通透球室／公共樓層、柱內轉乘細節、植栽斜街、環台及屋頂遮蔭；[三輪交接](handoffs/fuji-tv-polish.md) 分開記錄實作與未達目標圖的細節，未合併不代表主線已更新。
 - 行人日常（2026-10-06）：長椅／前庭小組有輪流交流、轉頭與小手勢；少量居民從門口走到前庭探訪、停留後返回同一門口。沿用既有空間與人員槽位，low／mixed／high 日夜都保留可見探訪；坐姿及路線空間驗證見 [street-life 交接](handoffs/street-life.md)。
 - 建築互動（2026-10-06）：兩條預留前庭路線有入口門框／簷篷／燈、門旁等人、朋友出門與結伴離開。AUTO HUB 兩個櫃位有居民使用服務：按實際櫃位配置交流、操作端口或接受人員協助；全自律配置仍有使用者。人物維持正常大小，設施切換時暫隱、即時復原時配合最新配置；沒有室內或交易模擬。
 
