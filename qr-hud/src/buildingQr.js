@@ -7,6 +7,7 @@ import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { futureBuildingPool } from '../../src/qrFutureBuildings.ts';
 import { selectQrLandmark } from './landmarkSelection.js';
+import { createQrSculpture } from './qrSculpture.js';
 import maritimeSky from '../../asset/textures/maritime-sky.png';
 import './buildingQr.css';
 
@@ -24,11 +25,14 @@ export function createBuildingQr(host, proposalId, archivedView) {
   } catch (error) { renderer.dispose(); throw error; }
   finally { pool?.dispose(); }
   // The landmark's rear gallery hides its sphere; show its bay-facing side, like the city hero view.
-  const yaw = landmark.id === 'landmark-civic-core' ? YAW + Math.PI : YAW;
+  const orientation = new T.Matrix4();
+  building.children.find(object => object.isInstancedMesh)?.getMatrixAt(0, orientation);
+  // Each tower slot is rotated in the city: face its local front so twin shafts do not overlap.
+  const yaw = landmark.id === 'landmark-civic-core' ? YAW + Math.PI : YAW + Math.atan2(orientation.elements[8], orientation.elements[10]);
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); renderer.setClearColor('#ecf2ed');
   renderer.toneMapping = T.NeutralToneMapping; renderer.toneMappingExposure = .84;
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
-  renderer.domElement.setAttribute('aria-label', landmark.label + 'から変化するQRコード');
+  renderer.domElement.setAttribute('aria-label', landmark.label + 'の立体QRコード。真上から読み取れます');
   Object.assign(host.dataset, { landmarks: landmark.id, source: landmark.id === 'landmark-civic-core' ? 'city-landmark' : 'city-district', sourcePosition: landmark.x + ',' + landmark.z, revision: String(archivedView?.revision ?? 'demo') });
   const scene = new T.Scene(); scene.environmentIntensity = .6;
   scene.add(new T.HemisphereLight('#e3ebee', '#8a8274', .6));
@@ -48,6 +52,7 @@ export function createBuildingQr(host, proposalId, archivedView) {
     // Match the city: remove room walls, retain the HDR light cards around the sky.
     capture.traverse(object => { if (object.isMesh && object.material.isMeshStandardMaterial) object.visible = false; });
     environment.dispose(); environment = pmrem.fromScene(capture, .04); scene.environment = environment.texture;
+    host.dataset.skyReady = 'true';
     reflected.dispose(); capture.dispose();
   });
   const camera = new T.OrthographicCamera(-25, 25, 25, -25, .1, 2000);
@@ -56,35 +61,28 @@ export function createBuildingQr(host, proposalId, archivedView) {
   const ao = new GTAOPass(scene, camera, 1, 1); ao.updateGtaoMaterial({ radius: 2, distanceFallOff: .8, thickness: 2, samples: 8 }); ao.blendIntensity = .8; composer.addPass(ao);
   // A pale close-up backdrop fills the frame; city-wide bloom would wash out this small diorama.
   composer.addPass(new OutputPass());
-  const presentation = new T.Group(), qrStage = new T.Group(); scene.add(presentation, qrStage);
-  const bounds = new T.Box3().setFromObject(building), size = bounds.getSize(new T.Vector3()), center = bounds.getCenter(new T.Vector3());
-  const wrapper = new T.Group(); wrapper.add(building); presentation.add(wrapper);
-  const groundMaterial = new T.MeshStandardMaterial({ color: '#ecf2ed', roughness: .9 });
-  const ground = new T.Mesh(new T.PlaneGeometry(1000, 1000), groundMaterial); ground.rotation.x = -Math.PI / 2; ground.position.y = -.15; ground.receiveShadow = true; presentation.add(ground);
-  const qrWhite = new T.MeshBasicMaterial({ color: '#ecf2ed', toneMapped: false });
-  const ink = new T.MeshBasicMaterial({ color: '#102331', toneMapped: false }), tileGeometry = new T.BoxGeometry(1, .025, 1);
-  let count = 0, radius = 24, cityExtent = 24, distance = 250, timer, frame;
-  const target = new T.Vector3();
+  let sculpture, radius = 24, cityExtent = 24, distance = 250, timer, frame;
+  const target = new T.Vector3(), aim = new T.Vector3(), inspectedBounds = new T.Box3();
   let mode = 'city', from = 1, to = 1, changedAt = 0;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const controls = document.createElement('div'); controls.className = 'building-qr-controls';
-  controls.innerHTML = '<button type="button" data-view="city">' + landmark.label + 'を見る</button><button type="button" data-view="scan">真上からスキャン</button><span role="status"></span>';
+  controls.innerHTML = '<button type="button" data-view="city">建築のかたち</button><button type="button" data-view="scan">真上からスキャン</button><span role="status"></span>';
   host.parentElement.parentElement.appendChild(controls);
   controls.querySelectorAll('button').forEach(button => button.addEventListener('click', () => { clearTimeout(timer); setView(button.dataset.view); }));
   function currentAngle(now) {
-    const p = reduced ? 1 : Math.min(1, (now - changedAt) / 850);
+    const p = reduced ? 1 : Math.min(1, (now - changedAt) / 1400);
     return T.MathUtils.lerp(from, to, p * p * (3 - 2 * p));
   }
   function setView(next) {
     from = currentAngle(performance.now()); to = next === 'scan' ? 0 : 1; mode = next; changedAt = performance.now(); host.dataset.cityView = 'transition';
     controls.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.view === next)));
-    controls.querySelector('span').textContent = next === 'scan' ? 'スマートフォンのカメラで読み取ってください' : landmark.label + ' · 2127 ODAIBA';
+    controls.querySelector('span').textContent = next === 'scan' ? '同じ建築を真上から。カメラで読み取れます' : landmark.label + ' · 立体QR';
   }
   function clearQr() {
-    for (const mesh of [...qrStage.children]) { qrStage.remove(mesh); if (mesh.isInstancedMesh) mesh.dispose(); if (mesh.geometry !== tileGeometry) mesh.geometry.dispose(); }
+    if (sculpture) { scene.remove(sculpture.root); sculpture.dispose(); sculpture = undefined; }
   }
   function pose(angle) {
-    const aim = target.clone().multiplyScalar(angle), tilt = angle * TILT;
+    aim.copy(target).multiplyScalar(angle); const tilt = angle * TILT;
     camera.position.set(aim.x + Math.sin(tilt) * Math.sin(yaw) * distance, aim.y + Math.cos(tilt) * distance, aim.z + Math.sin(tilt) * Math.cos(yaw) * distance);
     // Upright architecture in city view; north-up when scanning.
     camera.up.set(0, angle, -(1 - angle)); camera.lookAt(aim); camera.updateMatrixWorld(true);
@@ -93,14 +91,9 @@ export function createBuildingQr(host, proposalId, archivedView) {
   }
   function build(url) {
     clearTimeout(timer); clearQr();
-    const qr = qrcode(0, 'H'); qr.addData(url, 'Byte'); qr.make(); count = qr.getModuleCount(); radius = (count + 10) / 2;
-    const plate = new T.Mesh(new T.BoxGeometry(count + 10, .15, count + 10), qrWhite); plate.position.y = -.1; qrStage.add(plate);
-    const lots = []; for (let row = 0; row < count; row++) for (let col = 0; col < count; col++) if (qr.isDark(row, col)) lots.push([row, col]);
-    const tiles = new T.InstancedMesh(tileGeometry, ink, lots.length), dummy = new T.Object3D();
-    lots.forEach(([row, col], index) => { dummy.position.set(col - (count - 1) / 2, 0, row - (count - 1) / 2); dummy.updateMatrix(); tiles.setMatrixAt(index, dummy.matrix); }); qrStage.add(tiles);
-    const scale = count * .84 / Math.max(size.x, size.z); wrapper.scale.setScalar(scale);
-    wrapper.position.set(-center.x * scale, -bounds.min.y * scale, -center.z * scale);
-    const fitted = new T.Box3().setFromObject(wrapper); fitted.getCenter(target);
+    const qr = qrcode(0, 'H'); qr.addData(url, 'Byte'); qr.make(); radius = (qr.getModuleCount() + 10) / 2;
+    sculpture = createQrSculpture(building, qr); scene.add(sculpture.root);
+    const fitted = new T.Box3().setFromObject(sculpture.root); fitted.getCenter(target);
     distance = Math.max(250, fitted.getSize(new T.Vector3()).length() * 3); camera.far = distance * 5;
     cityExtent = 1; pose(1);
     const projected = new T.Vector3();
@@ -115,7 +108,7 @@ export function createBuildingQr(host, proposalId, archivedView) {
       screenBounds[0] = Math.min(screenBounds[0], projected.x); screenBounds[1] = Math.min(screenBounds[1], projected.y);
       screenBounds[2] = Math.max(screenBounds[2], projected.x); screenBounds[3] = Math.max(screenBounds[3], projected.y);
     }
-    Object.assign(host.dataset, { buildingHeight: String(size.y * scale), cityExtent: String(cityExtent), fitMargin: '1.18', projectedBounds: JSON.stringify(screenBounds), payload: url, buildings: '1' });
+    Object.assign(host.dataset, { buildingHeight: String(sculpture.sourceHeight), cityExtent: String(cityExtent), fitMargin: '1.18', projectedBounds: JSON.stringify(screenBounds), payload: url, buildings: '1', qrGeometry: 'linked-voxels', voxelCount: String(sculpture.voxelCount) });
     host.replaceChildren(renderer.domElement); from = to = 1; setView('city'); resize();
   }
   function resize() { const side = Math.max(1, host.clientWidth); renderer.setSize(side, side, false); composer.setSize(side, side); }
@@ -124,9 +117,12 @@ export function createBuildingQr(host, proposalId, archivedView) {
   function animate(now) {
     frame = requestAnimationFrame(animate); if (document.hidden || now - last < 1000 / 30) return; last = now;
     const angle = currentAngle(now); pose(angle);
-    presentation.visible = angle > .001; qrStage.visible = angle < .999;
-    wrapper.scale.y = wrapper.scale.x * Math.max(.001, angle);
-    if (Math.abs(angle - to) < .001) host.dataset.cityView = mode;
+    sculpture?.setScanBlend(1 - T.MathUtils.smoothstep(angle, 0, .45));
+    // Diagnostic regression evidence is derived from the rendered object, not a second QR stage.
+    if (sculpture && Math.abs(angle - to) < .001 && host.dataset.cityView !== mode) {
+      inspectedBounds.setFromObject(sculpture.root);
+      Object.assign(host.dataset, { cityView: mode, sculptureHeight: String(inspectedBounds.max.y), sculptureVisible: String(sculpture.root.visible), geometryId: sculpture.root.uuid });
+    }
     if (angle < .001) renderer.render(scene, camera); else composer.render();
   }
   frame = requestAnimationFrame(animate);
@@ -138,7 +134,6 @@ export function createBuildingQr(host, proposalId, archivedView) {
     dispose() {
       disposed = true; clearTimeout(timer); cancelAnimationFrame(frame); observer.disconnect(); clearQr();
       building.traverse(object => { if (object.isMesh) { object.geometry.dispose(); [object.material].flat().forEach(material => material.dispose()); } if (object.isInstancedMesh) object.dispose(); });
-      ground.geometry.dispose(); groundMaterial.dispose(); tileGeometry.dispose(); qrWhite.dispose(); ink.dispose();
       composer.passes.forEach(pass => pass.dispose?.()); composer.dispose(); environment.dispose(); skyTexture?.dispose(); pmrem.dispose(); sun.shadow.dispose(); renderer.dispose(); renderer.domElement.remove(); controls.remove();
     },
   };

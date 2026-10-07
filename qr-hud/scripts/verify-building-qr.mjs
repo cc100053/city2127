@@ -14,8 +14,8 @@ const archiveUrl = 'http://10.192.129.43:8787/city/saved-proposal';
 const high = { version: 2, bands: { nw: 'high', ne: 'high', sw: 'high', se: 'high' }, automatedPorts: 6, sharedSeats: 8, treeCount: 12, plantedFraction: .8, coolingFins: 0, functionModules: 6 };
 const low = { ...high, bands: { nw: 'low', ne: 'low', sw: 'low', se: 'low' }, automatedPorts: 0, sharedSeats: 0, treeCount: 3, plantedFraction: .2, coolingFins: 6, functionModules: 2 };
 const seeds = { automation: 2127, publicSharing: 2127, environmentalPriority: 2127, urbanConcentration: 2127 };
-async function open(path = '/', layout) {
-  const page = await browser.newPage({ viewport: { width: 750, height: 620 } });
+async function open(path = '/', layout, reduced = false) {
+  const page = await browser.newPage({ viewport: { width: 750, height: 620 }, reducedMotion: reduced ? 'reduce' : 'no-preference' });
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (/THREE.WebGLProgram: Shader Error/.test(message.text())) errors.push(message.text()); });
   await page.route('**/api/config', route => route.fulfill({ json: { configured: false } }));
@@ -30,9 +30,15 @@ async function open(path = '/', layout) {
 async function city(page, filename) {
   await page.locator('[data-view=city]').click();
   await page.locator('#qr[data-city-view=city]').waitFor();
+  await page.locator('#qr[data-sky-ready=true]').waitFor();
+  await page.waitForFunction(() => getComputedStyle(document.querySelector('#qr')).opacity === '1');
   const qr = page.locator('#qr');
+  if (filename) await page.screenshot({ path: `test-results/${filename}.png` });
   assert.equal(await qr.getAttribute('data-source'), (await qr.getAttribute('data-landmarks')) === 'landmark-civic-core' ? 'city-landmark' : 'city-district');
   assert.equal(Number(await qr.getAttribute('data-buildings')), 1);
+  assert.equal(await qr.getAttribute('data-qr-geometry'), 'linked-voxels');
+  assert.ok(Number(await qr.getAttribute('data-voxel-count')) > 100);
+  assert.equal(await qr.getAttribute('data-sculpture-visible'), 'true');
   const bounds = JSON.parse(await qr.getAttribute('data-projected-bounds'));
   assert.ok(bounds.every(value => Number.isFinite(value) && Math.abs(value) <= .85), 'the entire building fits with margin');
   assert.ok(Math.max(bounds[2] - bounds[0], bounds[3] - bounds[1]) > 1.6, 'the building is large enough to identify');
@@ -45,12 +51,15 @@ async function city(page, filename) {
     }
     assert.ok(readableGlass > png.width * png.height * .01, 'blue glass is readable, not overexposed');
   }
-  if (filename) await page.screenshot({ path: `test-results/${filename}.png` });
   return qr.getAttribute('data-landmarks');
 }
 async function decode(page, url) {
+  const before = await page.locator('#qr').evaluate(element => ({ id: element.dataset.geometryId, height: element.dataset.sculptureHeight, voxels: element.dataset.voxelCount }));
   await page.locator('[data-view=scan]').click();
   await page.locator('#qr[data-city-view=scan]').waitFor({ timeout: 20000 });
+  const after = await page.locator('#qr').evaluate(element => ({ id: element.dataset.geometryId, height: element.dataset.sculptureHeight, voxels: element.dataset.voxelCount }));
+  assert.deepEqual(after, before, 'same geometry and full height, not a hidden/flattened model and another QR');
+  assert.equal(await page.locator('#qr').getAttribute('data-sculpture-visible'), 'true');
   const png = PNG.sync.read(await page.locator('#qr canvas').screenshot());
   assert.equal(jsQR(new Uint8ClampedArray(png.data), png.width, png.height)?.data, url);
 }
@@ -98,6 +107,10 @@ try {
   assert.equal(await city(lowPreview), 'landmark-civic-core', 'the original landmark survives reload');
   await decode(lowPreview, archiveUrl);
   await lowPreview.close();
+  const reduced = await open('/qr/?archive=reduced-proposal', high, true);
+  await city(reduced);
+  await decode(reduced, archiveUrl);
+  await reduced.close();
   assert.deepEqual(errors, []);
 
   const fallback = await browser.newPage();
@@ -113,5 +126,5 @@ try {
   const backup = PNG.sync.read(await fallback.locator('#qr canvas').screenshot());
   assert.equal(jsQR(new Uint8ClampedArray(backup.data), backup.width, backup.height, { inversionAttempts: 'attemptBoth' })?.data, demoUrl);
   await fallback.close();
-  console.log('PASS: three archived tower families and original civic landmark fallback, whole-building framing, deterministic reload, repeat QR decoding, embedded layout and WebGL fallback.');
+  console.log('PASS: three archived tower families and civic landmark, linked upright geometry in both views, whole-building framing, deterministic reload, repeat QR decoding, reduced motion, embedded layout and WebGL fallback.');
 } finally { await browser.close(); }

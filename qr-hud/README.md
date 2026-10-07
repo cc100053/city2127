@@ -1,6 +1,6 @@
 # 2127 Civic Archive Terminal
 
-建築 QR（2026-10-07）：整合問卷時從該份提案保存的台場 2127 城市中，穩定隨機抽取一棟實際可見的未來中高樓或高塔，排除小型花園館。保存城市沒有符合條件的樓塔時，展示原本城市中央的白色巨構／懸吊球體地標（台場 Civic Core），不會補出不存在的高樓。地標直接共用城市原本的 `civicCore`，不是舊富士電視台 GLB。直接共用根專案的 `ConcentrationDistrict`，保留該份城市的樓高、玻璃、綠化及配對設施，不再載入舊富士電視台／現代地標簡化模型。整棟直立展示 8 秒後轉為俯視 QR，按建築名稱／「真上からスキャン」可切換；QR 開啟提案保存的可操作 3D 台場城市。獨立 HUD 沒有問卷快照時使用高密度示範建築。舊 `prepare-odaiba-qr.mjs` 與 JSON 保留作歷史資產，不是目前建置來源。
+建築 QR（2026-10-07）：整合問卷時從該份提案保存的台場 2127 城市中，穩定隨機抽取一棟實際可見的扭轉塔、退台塔或雙塔，排除小型花園館。沒有符合條件的樓塔時，用原本中央白色巨構／懸吊球體地標（台場 Civic Core），不會補出不存在的高樓。造型來源共用城市的 `ConcentrationDistrict`／`civicCore`，不是舊富士電視台或現代地標 GLB。經使用者同意，QR 展示改為由原幾何取樣的方塊雕塑，保留主要輪廓、綠化、配對設施及材質色調，但不保證細小構件或原表面無損重現；城市原模型不變。方塊只放在 QR 深色欄位上；側面看建築，俯視同一批方塊與底板就是可掃描 QR。兩個視角的雕塑高度與可見狀態維持不變，不再壓扁／隱藏或切換另一張 QR。展示 8 秒後鏡頭用 1.4 秒轉至俯視，可按「建築のかたち」／「真上からスキャン」轉換。QR 開啟提案保存的可操作 3D 城市。參考 [QR-Bloom](https://github.com/rocknroll17/QR-Bloom) 的投影概念，沒有使用其 AI 權重或非商用樹生成器。獨立 HUD 使用高密度示範建築。舊 `prepare-odaiba-qr.mjs` 與 JSON 保留作歷史，不是目前建置來源。
 
 接 main 問卷、掃碼查看可操作 3D 城市時，請使用根目錄 [README 的整合版啟動方式](../README.md)。以下 `npm start` 是原本獨立 HUD／Supabase 圖片影片模式，不會自動接問卷。整合版重用 HUD，不需要 Supabase 金鑰。
 
@@ -40,7 +40,7 @@ npm run dev
 
 ## 掃描與版面
 
-- 建築 QR 使用 H 級錯誤修正、淺底深色方格及至少五個 module 的安靜區。掃描模式不用光影／後處理，避免影響對比；建築模式使用天空反射、陰影與接觸陰影。
+- 建築 QR 使用 H 級錯誤修正、淺底深色方格及五個 module 的安靜區。俯視時同一批方塊的顏色漸變為深色，直接渲染而不使用後處理；白色底板不接收陰影，避免污染白格。側面使用天空反射、陰影與接觸陰影；材質保留原色／金屬度，方塊粗糙度至少 .35，避免玻璃白色反光蓋過輪廓。
 - 標準備援 QR 保留圓點、青色至紫紅漸層、深底與小面積徽章；QR 本身沒有掃描線或半透明遮罩。
 - 桌面針對 16:9 全螢幕設計，小螢幕會重排，避免 QR 被擠壓。
 - 支援 reduced motion；WebGL 不可用時 QR 與互動仍可運作。
@@ -50,7 +50,8 @@ npm run dev
 
 - `index.html`：HUD 結構及開發控制面板。
 - `src/main.js`：Session、QR 產生、狀態與互動流程。
-- `src/buildingQr.js`：單棟未來建築、完整取景、光影、QR 切換與資源釋放。
+- `src/buildingQr.js`：單棟未來建築、完整取景、光影、鏡頭轉換與資源釋放。
+- `src/qrSculpture.js`：城市原幾何取樣、QR 約束方塊、原材質色調及同一物件的俯視掃描。
 - `src/landmarkSelection.js`：提案 ID 從保存城市的可見候選池選棟。
 - `../src/qrFutureBuildings.ts`：重用城市建築工廠及保存 layout／slotSeeds。
 - `src/style.css`：全螢幕 HUD、響應式版面與傳輸動畫。
@@ -68,4 +69,4 @@ npm run dev
 
 `npm run build` 後執行 `npm test` 驗證 API 與佇列。4173 預覽伺服器啟動後執行 `npm run test:e2e`，使用本機 Chrome 驗證 QR、操作流程、手機輪詢及媒體顯示。截圖輸出至 `test-results/`。測試使用隔離介面，尚需實際 Supabase 專案與實體手機驗收。
 
-建築展示另用 `node scripts/verify-building-qr.mjs`，預設測試 QR Vite 的 5198 port（可設 `QR_TEST_URL`）。涵蓋三種高塔、排除花園館、完整取景、低密度無高樓時的原有中央地標備援／高密度城市候選、重新整理與實際 canvas 解碼。整合問卷的隔離 SQLite 測試及現場驗收見根目錄 [VALIDATION](../docs/VALIDATION.md)。
+建築展示另用 `node scripts/verify-building-qr.mjs`，預設測試 QR Vite 的 5198 port（可設 `QR_TEST_URL`）。涵蓋三種高塔、排除花園館、完整取景、無高樓時的中央地標、重新整理、同一立體物件兩個視角都維持可見／相同高度與身份、reduced motion，以及實際 canvas 解碼。`tests/qrSculpture.test.js` 檢查原幾何變換、QR 白欄完全無建築方塊、懸空結構下的空洞及不壓扁／換幾何。整合問卷的隔離 SQLite 測試及現場驗收見根目錄 [VALIDATION](../docs/VALIDATION.md)。
