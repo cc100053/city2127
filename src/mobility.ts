@@ -81,6 +81,8 @@ export function automationActivity(share:number) {
   const count=(n:number)=>Math.round(n*1e6)/1e6;
   return {level,aircraft:count(2+28*level),pods:count(CARS*(2+2*level)),walkers:count(WALKERS+280*(1-level))};
 }
+/** Crowd level 0..1: the walker share at an automation level, or the standalone `crowd` setting. */
+export const crowdShare=(state:Pick<WorldState,'crowd'>,automationShare?:number)=>automationShare===undefined?T.MathUtils.clamp(state.crowd*.8+.2,0,1):automationActivity(automationShare).walkers/MAX_WALKERS;
 /** Stable 0..1 hash per actor `index` and salt `k`. */
 export const hash=(index:number,k=0)=>{const v=Math.sin(index*12.9898+k*78.233)*43758.5453;return v-Math.floor(v);};
 /** Walkers move in parties: per block of six slots, one alone, a pair and a trio whose third is a child. Members share the leader's pose;
@@ -536,7 +538,7 @@ export function servicePose(time:number,index:number,length:number) {
   return {u,dwell,help:ease((clock-walk-5)/1)*dwell,turn:ease((clock-walk-11.4)/.6)*(1-ease((clock-cycle+2)/2)),
     walking:clock<walk||clock>walk+12&&clock<2*walk+12,phase:u*length*5.5};
 }
-const yawTo=(from:number,to:number)=>((to-from)%(Math.PI*2)+Math.PI*3)%(Math.PI*2)-Math.PI;
+export const yawTo=(from:number,to:number)=>((to-from)%(Math.PI*2)+Math.PI*3)%(Math.PI*2)-Math.PI;
 /** Promenade benches every 24 m facing the sea, 2.75 m out: the backrest (2.48 m) clears walker lanes (≤ 2.35 m) and sitters' feet
  * (3.15 m) stop short of the lit edge (3.3 m). Two seats each; between each pair of
  * benches a couple stands at the rail. Between them, 6 m from each, a one-seat stool and a free rail spot for passing walkers
@@ -888,7 +890,7 @@ export function mobility(scene:T.Scene) {
       pose.rotation.set(0,k%2?seaYaw:seaYaw+Math.PI,tp.moving?Math.sin(time*6+k)*.03:0);pose.scale.setScalar(tp.visible);people.set(MAX_WALKERS+k,pose);
       people.gait(MAX_WALKERS+k,time*6+k,tp.moving?.45:0);
     }people.flush();
-    const doorShare=activity?activity.walkers/MAX_WALKERS:T.MathUtils.clamp(state.crowd*.8+.2,0,1);
+    const doorShare=crowdShare(state,automationShare);
     // Doorway trips follow their rounded curve; a reverse trip faces back along it. `lane` metres right of travel, `along` ahead.
     const onTrip=(trip:typeof doorTrips[number],d:number,reverse:boolean,lane=0,along=0)=>{
       const dir=reverse?-1:1,u=T.MathUtils.clamp((d+along*dir)/trip.length,0,1);trip.curve.getPointAt(u,pose.position);trip.curve.getTangentAt(u,tangent);

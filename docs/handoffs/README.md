@@ -10,6 +10,7 @@
 | [Fuji TV polish](fuji-tv-polish.md) | v3（第一至九組三輪打磨）已合併main及本機驗證 | Codex |
 | [LAN 雙站 iPad](lan-guest-stations.md) | IN_PROGRESS；軟件已整合，單機 station A 經 LAN PASS；雙機／瞓機待第二部裝置 | cc100053 |
 | [居民體驗 P5](resident-experience-p5.md) | IN_PROGRESS；文件準備已發布，D0–D10／理解程度／長跑實機NOT RUN。先提供輸出方案及可測硬件 | Codex；展覽決策cc100053，現場操作人待指定 |
+| [屋頂及室內人流](roof-interior-life.md) | IN_PROGRESS；P1–P3已實作、本機測試及push（1ae8942），待用家睇過再合併main；展覽機FPS未測 | cc100053 |
 
 已完成或不再適用的43份交接及Meter截圖見 [歸檔索引](archive/README.md)。歷史下一步不會自動變成backlog；Shibuya不再開發。人類美術review／實機未測等限制保留，不因歸檔而結案。
 

@@ -1,9 +1,12 @@
 import * as T from 'three';
 import { arc, bake, box, chrome, glass, mirrors, leaf, leafyCrown, membrane, publicLight as cityLight, solar as citySolar, stone as cityStone, trim as cityTrim } from './cityRig.ts';
+import type { Ride, Spot, Walk } from './occupants.ts';
 
-/** Occupied media headquarters within Fuji's civic chassis, retaining the sphere berth and site alignment. Metres. */
+/** Occupied media headquarters within Fuji's civic chassis, retaining the sphere berth and site alignment. Metres. Its people are not
+ * baked: `occupants` lists them (staff, audience, forum crowds, strollers and escalator riders) for `publishOccupants` to animate. */
 export function civicCore() {
   const root=new T.Group();root.name='fuji-civic-chassis';
+  const spots:Spot[]=[],walks:Walk[]=[],rides:Ride[]=[];
   // Building-local finishes (still one batch each): warm cream frame and slabs, and dark charcoal furniture, people and hangers,
   // so occupied rooms read as silhouettes against warm light instead of blue-grey rows.
   const trim=cityTrim.clone();trim.color.set('#f6eee0');
@@ -50,17 +53,18 @@ export function civicCore() {
       diffuseColor.a*=mix(1.2,.12,abs(dot(normal,normalize(vViewPosition))));`);
   };
   silverGlass.customProgramCacheKey=()=>'fuji-silver-glass';
-  const head=new T.SphereGeometry(.22,8,6);
   const member=(a:number[],b:number[],width:number,depth=width,material:T.Material=trim)=>{
     const from=new T.Vector3(...a),to=new T.Vector3(...b),delta=to.clone().sub(from);
     const mesh=box(root,[width,delta.length(),depth],from.clone().add(to).multiplyScalar(.5).toArray(),material,.05);
     mesh.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),delta.normalize());return mesh;
   };
-  const standing=(x:number,y:number,z:number)=>{
-    for(const side of [-1,1])box(root,[.17,.8,.2],[x+side*.13,y+.4,z],solar);
-    box(root,[.52,.75,.32],[x,y+1.17,z],solar);
-    const person=new T.Mesh(head,trim);person.position.set(x,y+1.78,z);root.add(person);
-  };
+  // A standing person on the floor at `y`, facing `yaw` (default -Z, the bay) unless they join a conversation.
+  const standing=(x:number,y:number,z:number,yaw=Math.PI,crowd:Spot['crowd']='staff')=>{spots.push({at:new T.Vector3(x,y,z),yaw,mode:'talk',crowd});};
+  // Strollers pace a public lane end to end; one person per lane, so lanes 1.2 m apart never meet.
+  const stroll=(points:T.Vector3[],crowd:Spot['crowd'])=>walks.push({curve:new T.CatmullRomCurve3(points,false,'centripetal'),crowd});
+  const lane=(cx:number,cz:number,r:number,from:number,to:number,y:number)=>stroll(Array.from({length:Math.ceil((to-from)/.15)+1},(_,i)=>{
+    const a=from+(to-from)*i/Math.ceil((to-from)/.15);return new T.Vector3(cx+Math.cos(a)*r,y,cz-Math.sin(a)*r);}),'public');
+  const outward=(a:number)=>Math.atan2(Math.cos(a),-Math.sin(a)),inward=(a:number)=>Math.atan2(-Math.cos(a),Math.sin(a));
   const crown=leafyCrown();
   const grove=(x:number,y:number,z:number,i:number)=>{
     box(root,[.55,3,.55],[x,y+1.5,z],solar);
@@ -127,10 +131,11 @@ export function civicCore() {
       box(street,[.2,.14,length-4],[x,3.35,0],broadcastLight);
     }
     for(let z=-length/2+3;z<length/2-2;z+=4)for(const x of [-2.6,.6])box(street,[.12,1.75,.12],[x,2.45,z],trim);
-    for(let z=-length/2+5,i=0;z<length/2-5;z+=4.5,i++) {
-      const rider=new T.Vector3(-1+(i%2)*.5-.25,1.62,z).applyMatrix4(street.matrix);
-      standing(rider.x,rider.y,rider.z);
-    }
+    // Riders stand on the treads and climb at .5 m/s (both diagonals run upward), out of sight where the incline passes through the
+    // forum podium (slab 21–24 m), under the upper incline's truss at the turn (from 59 m) and through the sphere's transfer beam
+    // (98.75–101.25 m), with standing headroom below each.
+    const ends=[-1,1].map(e=>new T.Vector3(-1,1.6,e*(length/2-3)).applyMatrix4(street.matrix)).sort((p,q)=>p.y-q.y);
+    rides.push({from:ends[0],to:ends[1],gap:4.5,speed:.5,through:i===1 ? [[19.1,24.1],[57.1,70]] : [[96.85,101.3]]});
     for(const x of [-5,5]) {
       // The bay-facing edge is a clear balustrade with a blue lit rail: the diagonal reads as a bright glazed escalator bank.
       const bay=x<0;
@@ -244,7 +249,7 @@ export function civicCore() {
       });
       // Rear-zone ceiling light and flank-facing staff fill the deep half of each room seen through the side glazing.
       for(let dx=-width/2+3;dx<width/2-2;dx+=5)box(root,[2.6,.12,12],[x+dx,y+h+.85,25],publicLight);
-      for(let z=3,i=0;z<31;z+=3.4,i++)if(z<15.5 || z>18.5)standing(x+width/2-1.9-(i%2)*.4,y+1.225,z);
+      for(let z=3,i=0;z<31;z+=3.4,i++)if(z<15.5 || z>18.5)standing(x+width/2-1.9-(i%2)*.4,y+1.225,z,Math.PI/2);
       // Flank studio galleries: a dark set wall with a large blue LED backdrop, warm control-room windows above,
       // a spot rig, cameras and crew on the floor, all behind clear glazing between the ceramic fins.
       for(const side of [-1,1]) {
@@ -259,7 +264,7 @@ export function civicCore() {
         box(root,[3.2,.3,21],[x+side*(width/2-3.2),y+1.25+h-.6,46],solar);
         for(let z=36.5;z<56;z+=1.6)box(root,[.34,.16,.34],[x+side*(width/2-3.2),y+1.25+h-.85,z],publicLight);
         for(let z=37,i=0;z<56;z+=2.1,i++) {
-          if(i%3!==1)standing(x+side*(width/2-3.4+(i%2)*.7),y+1.225,z);
+          if(i%3!==1)standing(x+side*(width/2-3.4+(i%2)*.7),y+1.225,z,-side*Math.PI/2); // crew face the set
           if(i%4===2) {
             box(root,[.25,1.3,.25],[x+side*(width/2-1.6),y+1.875,z],solar);
             box(root,[.9,.5,.6],[x+side*(width/2-1.8),y+2.7,z],solar);
@@ -276,16 +281,15 @@ export function civicCore() {
           box(root,[.95,.6,.12],[x+dx,floor+1.48,z+.25],(dx+z)&1 ? publicLight : broadcastLight); // mixed warm/blue monitors, not a blue speckle
           box(root,[.85,.1,.7],[x+dx,floor+.65,z-1.25],solar);
           box(root,[.85,.85,.14],[x+dx,floor+1.1,z-1.55],solar);
-          // Seated editing staff are architectural occupancy, outside the district's moving actor routes.
-          if(z===4 || (dx+y)%3===0) {
-            box(root,[.5,.64,.3],[x+dx,floor+1.02,z-1.2],solar);
-            const person=new T.Mesh(head,trim);person.position.set(x+dx,floor+1.57,z-1.2);root.add(person);
-            for(const side of [-1,1]) {
-              box(root,[.14,.52,.16],[x+dx+side*.16,floor+.28,z-.88],solar);
-              member([x+dx+side*.3,floor+1.25,z-1.18],[x+dx+side*.3,floor+1.08,z-.55],.12,.12,trim);
-            }
-          }
+          // Seated editing staff face their screens; thighs (.48 m under the hip) rest on the .70 m chair seat.
+          if(z===4 || (dx+y)%3===0)spots.push({at:new T.Vector3(x+dx,floor+.22,z-1.2),yaw:0,mode:'desk',crowd:'staff',seated:true});
         }
+      }
+      // Staff cross each floor along the aisle between the desk rows (studio floors: in front of the cameras), short of the flank staff.
+      // Level 24's main floor meets the forum's outer rail (r 45 about -8,-2), so its aisles stop 1 m short of it.
+      for(const [floor,zs] of [[y+1.225,studio ? [6] : [7.1,8.1]],[y+9.5,[7.1,8.1]]] as const)for(const z of zs) {
+        const cut=y===24 && floor===y+1.225,rail=-8+Math.sign(x+8)*Math.sqrt(46**2-(z+2)**2);
+        stroll([new T.Vector3(Math.max(x-width/2+2.6,cut && x>-8 ? rail : -Infinity),floor,z),new T.Vector3(Math.min(x+width/2-3.2,cut && x<-8 ? rail : Infinity),floor,z)],'staff');
       }
       // The planted outer corners shade the workrooms without covering the front glazing.
       for(const side of [-1,1]) {
@@ -405,10 +409,7 @@ export function civicCore() {
   // A presenter desk and camera pedestals distinguish the live studio from a vacant glazed chamber.
   box(chamber,[8,1.1,2],[0,-7.95,6],trim);
   box(chamber,[7,.5,.15],[0,-7.9,4.9],broadcastLight);
-  for(const x of [-5,5]) {
-    box(chamber,[.55,1.3,.4],[x,-7.85,7],solar);
-    const presenter=new T.Mesh(head,trim);presenter.position.set(x,-6.95,7);chamber.add(presenter);
-  }
+  for(const x of [-5,5])standing(chamber.position.x+x,chamber.position.y-8.5,chamber.position.z+7);
   for(const x of [-10,10]) {
     box(chamber,[.3,1.4,.3],[x,-7.7,4],solar);
     box(chamber,[.8,.55,1.1],[x,-6.85,4],solar);
@@ -426,10 +427,7 @@ export function civicCore() {
       const x=(seat-7)*1.55;
       box(chamber,[1.05,.25,1.1],[x,y+.8,z],solar);
       box(chamber,[1.05,1.1,.2],[x,y+1.25,z-.5],broadcastLight); // violet seat backs (theatre tint in the room-light shader)
-      if((seat*3+row)%7!==0) {
-        box(chamber,[.52,.65,.32],[x,y+1.24,z],trim);
-        const person=new T.Mesh(head,trim);person.position.set(x,y+1.8,z);chamber.add(person);
-      }
+      if((seat*3+row)%7!==0)spots.push({at:chamber.position.clone().add(new T.Vector3(x,y+.445,z)),yaw:0,mode:'audience',crowd:'public',seated:true});
     }
   }
   // Raked stringers and rear legs carry the open treads down to the acoustic bowl.
@@ -489,7 +487,7 @@ export function civicCore() {
     if(z>-3 && (outer>20 || outer<-44))continue; // Wing ground floors keep their own production rooms.
     box(root,[6,11,.3],[x,9.2,z],i%4===2 ? broadcastLight : publicLight).rotation.y=a+Math.PI/2;
     box(root,[.6,15,.8],[-8+Math.cos(a+.095)*37,10.5,-2-Math.sin(a+.095)*37],stone).rotation.y=a+Math.PI/2;
-    standing(-8+Math.cos(a)*(40.5-(i%2)*1.6),3,-2-Math.sin(a)*(40.5-(i%2)*1.6));
+    standing(-8+Math.cos(a)*(40.5-(i%2)*1.6),3,-2-Math.sin(a)*(40.5-(i%2)*1.6),outward(a),'public');
   }
   for(const a of [.15,2.25,3.15,4.7]) {
     arc(root,35,41,1.2,[-8,24,-2],leaf,a,.7);
@@ -504,33 +502,26 @@ export function civicCore() {
   for(const a of [.6,.85,1.1,1.35,2.4,2.65,2.9]) {
     const x=-8+Math.cos(a)*30,z=-2-Math.sin(a)*30;
     const bench=box(root,[3.4,.55,1.2],[x,24.3,z],trim);bench.rotation.y=a+Math.PI/2;
-    for(const dx of [-1.5,1.5]) {
-      box(root,[.5,.75,.32],[x+dx,25.05,z+2],solar);
-      for(const side of [-1,1])box(root,[.16,.65,.2],[x+dx+side*.15,24.35,z+2],solar);
-      const visitor=new T.Mesh(head,trim);visitor.position.set(x+dx,25.65,z+2);root.add(visitor);
-      member([x+dx-.32,25.3,z+2],[x+dx-.34,24.85,z+2.15],.13,.13,trim);
-      member([x+dx+.32,25.3,z+2],[x+dx+.36,25.05,z+1.8],.13,.13,trim);
-    }
+    // Two visitors sit facing outward, hips .18 m behind the seat's front edge (24.575 m), and talk.
+    for(const t of [-.75,.75])spots.push({at:new T.Vector3(x-Math.sin(a)*t+Math.cos(a)*.42,24.095,z-Math.cos(a)*t-Math.sin(a)*.42),yaw:outward(a),mode:'talk',crowd:'public',seated:true});
   }
-  // Standing crowds gather on the public forum and the elevated ring, away from benches, planting and the Aqua arrival.
-  for(let a=2.3,i=0;a<6.2;a+=.085,i++) {
-    const r=21.5+(i*7%5)*1.1;
-    standing(-8+Math.cos(a)*r,24,-2-Math.sin(a)*r);
-  }
+  // Standing crowds gather on the public forum and the elevated ring, away from benches, planting, the Aqua arrival and the incline
+  // rising through the forum (x 9–20, z < -6).
+  const forum=(a:number,r:number,yaw:number)=>{const x=-8+Math.cos(a)*r,z=-2-Math.sin(a)*r;if(z>-6 || x<9 || x>20)standing(x,24,z,yaw,'public');};
+  for(let a=2.3,i=0;a<6.2;a+=.085,i++)forum(a,21.5+(i*7%5)*1.1,inward(a));
   // A second, looser outer band thickens the forum into a gathering crowd, still inside the planted ring.
-  for(let a=2.36,i=0;a<6.15;a+=.115,i++) {
-    const r=25+(i*5%3)*.9;
-    standing(-8+Math.cos(a)*r,24,-2-Math.sin(a)*r);
-  }
+  for(let a=2.36,i=0;a<6.15;a+=.115,i++)forum(a,25+(i*5%3)*.9,inward(a));
   // Bay-facing forum groups occupy the supported inner walk, leaving the outer benches and arrival gap clear.
   for(let a=.4,i=0;a<1.6;a+=.085,i++) {
     const r=24+(i%3)*1.2;
-    standing(-8+Math.cos(a)*r,24,-2-Math.sin(a)*r);
-    if(i%3===0)standing(-8+Math.cos(a+.035)*(r+.8),24,-2-Math.sin(a+.035)*(r+.8));
+    forum(a,r,outward(a));
+    if(i%3===0)forum(a+.035,r+.8,outward(a));
   }
+  // Forum strollers pace five lanes between the crowd and the planting, clear of the wings and the bench sector.
+  for(const r of [28.2,29.4,30.6,31.8,33])lane(-8,-2,r,3.05,5.55,24);
   for(let a=.45,i=0;a<2.7;a+=.11,i++) {
     const r=26.2+(i*3%4)*.5;
-    standing(-18+Math.cos(a)*r,63,23-Math.sin(a)*r);
+    standing(-18+Math.cos(a)*r,63,23-Math.sin(a)*r,outward(a),'public');
   }
   for(const y of [63,134]) {
     box(root,[132,1.4,10],[-2,y,-12],stone);
@@ -547,9 +538,11 @@ export function civicCore() {
     }
     // Pairs stand on the transfer beam's top at Y=65, above the thinner promenade slab.
     if(y===63)for(let x=-42,i=0;x<=42;x+=7,i++) {
-      standing(x,65,-14.6);
-      standing(x+.85,65,-14.1+(i%2)*.4);
+      standing(x,65,-14.6,Math.PI,'public');
+      standing(x+.85,65,-14.1+(i%2)*.4,Math.PI,'public');
     }
+    // Strollers on the beam top, between the pairs and the planter, from the spine landing to the east pier.
+    if(y===63)for(const z of [-11.4,-10.2])stroll([new T.Vector3(-30,65,z),new T.Vector3(56,65,z)],'public');
   }
   // Roof fins span between the two transfer members: shade and energy collection over the climate walk.
   for(let x=-54;x<=54;x+=18) {
@@ -578,6 +571,8 @@ export function civicCore() {
     member([x,112,72],[x,132,72],.55,.65,solar);
   }
   for(const x of [-68,64])member([x,62,64],[x<0?-44:40,112,64],2.5,3);
+  // Ring strollers keep to the rear half, inside the soil ribbons and between the wings.
+  for(const r of [26.5,28.8])lane(-18,23,r,3.7,5.6,63);
   // Soil ribbons follow the occupied ring without closing its bay-facing public edge.
   for(const a of [.35,1.7,3.1,4.5]){
     arc(root,30,33,1.1,[-18,63,23],leaf,a,.65);
@@ -590,5 +585,5 @@ export function civicCore() {
   root.traverse(object=>{if(object instanceof T.Mesh && object.geometry.type!=='RoundedBoxGeometry')generated.add(object.geometry);});
   const batches=bake(root);root.clear();batches.forEach(mesh=>{mesh.name='fuji-civic-chassis';root.add(mesh);});
   generated.forEach(geometry=>geometry.dispose()); // Cached box geometry remains shared with the rest of the city.
-  return root;
+  return Object.assign(root,{occupants:{spots,walks,rides}});
 }

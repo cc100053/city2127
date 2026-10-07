@@ -4,6 +4,7 @@ import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometr
 import type { WorldState } from './presets';
 import { changeSites } from './layout.ts';
 import { mobility } from './mobility.ts';
+import { occupantFleet } from './occupants.ts';
 
 // Three finishes: matte ceramic composite, refined metal, and reflective glass. Same shader, different response to the one environment map.
 export const paint = (color: T.ColorRepresentation, roughness=.52, metalness=0) => new T.MeshStandardMaterial({ color, roughness, metalness });
@@ -119,7 +120,7 @@ export function cityRig(scene:T.Scene) {
     const light=new T.PointLight('#e0eee5',0,19*s,2);light.position.set(-.95,6.15,0);light.userData.peak=95*s*s;
     light.name='civic-night-light';mast.add(light);civicLights.push(light);
   }
-  const updateMobility=mobility(scene);
+  const updateMobility=mobility(scene),updateOccupants=occupantFleet(scene);
   return {
     update(state:WorldState,time:number,night:number,automationShare?:number,hour?:number) {
       publicLight.emissiveIntensity=.15+night*1.3;
@@ -128,6 +129,7 @@ export function cityRig(scene:T.Scene) {
       futureLight.emissiveIntensity=.25+state.neon*.5+night*.45;
       membrane.opacity=.6+state.greenery*.18;
       updateMobility(state,time,automationShare,night,hour);
+      updateOccupants(state,time,automationShare,hour);
     },
   };
 }

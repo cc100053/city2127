@@ -3,6 +3,7 @@ import { addCityModel } from './modelAssets';
 import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
 import { civicCore } from './civicCore';
+import { publishOccupants, publishRoofWalks } from './occupants';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
 import { facadeClimate, publishRoofGardens, towerGlow } from './districtMeters';
 import { CORRIDOR_GLSL, plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
@@ -167,15 +168,17 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   plantCanopy(scene,trees,true);
   plantBackdropGrove(scene,environment);
   // Sky gardens crown the tall context towers (the only CTX mesh above 30 m inside the district).
-  environment.traverse(object=>{if(object instanceof T.Mesh && object.name.startsWith('CTX_') && new T.Box3().setFromObject(object).max.y>30)publishRoofGardens(plantRoofCanopy(scene,object,true));});
+  // Each roof garden's terraces go to the district Meters (sails/forest) and take a few residents (stroll line, standing group).
+  const roofGarden=(model:T.Object3D,tower?:boolean)=>{const terraces=plantRoofCanopy(scene,model,tower);publishRoofGardens(terraces);publishRoofWalks(model,terraces);};
+  environment.traverse(object=>{if(object instanceof T.Mesh && object.name.startsWith('CTX_') && new T.Box3().setFromObject(object).max.y>30)roofGarden(object,true);});
   await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1])).map(async placement => {
-    if(placement.id==='fuji-tv'){scene.add(civicCore());return;}
+    if(placement.id==='fuji-tv'){const core=civicCore();scene.add(core);publishOccupants(core.occupants);return;}
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);
     model.name = placement.id;
     placeOdaibaModel(model, placement);
     publishDoorways(model, environment);
-    if(placement.id==='aqua-city-odaiba' || placement.id==='decks-tokyo-beach')publishRoofGardens(plantRoofCanopy(scene,model));
-    else if(placement.id==='grand-nikko-tokyo-daiba' || placement.id==='divercity-office-tower')publishRoofGardens(plantRoofCanopy(scene,model,true));
+    if(placement.id==='aqua-city-odaiba' || placement.id==='decks-tokyo-beach')roofGarden(model);
+    else if(placement.id==='grand-nikko-tokyo-daiba' || placement.id==='divercity-office-tower')roofGarden(model,true);
     model.traverse(object => {
       if (!(object instanceof T.Mesh)) return;
       for (const material of [object.material].flat() as T.MeshStandardMaterial[])
