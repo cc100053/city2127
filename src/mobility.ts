@@ -644,6 +644,25 @@ export function mobility(scene:T.Scene) {
   const crossBands=fleet(scene,[part([1,.02,3.6],[0,.23,0],shell,.01)],CROSSINGS.length,'crossing-bands',false),crossLights=fleet(scene,
     [part([1,.02,.1],[0,.245,1.85],mint,.01),part([1,.02,.1],[0,.245,-1.85],mint,.01)],CROSSINGS.length,'crossing-lights',false);
   crossBands.meshes.forEach(m=>m.receiveShadow=true);
+  // Shared-surface carriageways (2127: no asphalt, no painted lines): darker stone seams inlaid at each carriageway edge and a thin mint
+  // guide under each lane centre, flush on the paving slab (crossing bands lie over them). One merged mesh per finish.
+  const inlay=(offsets:(r:number)=>[number,number][])=>{
+    const position:number[]=[],index:number[]=[];
+    path.streets.forEach((street,r)=>{for(const [n,w] of offsets(r)){
+      const length=street.getLength(),base=position.length/3;
+      for(let d=0;d<=length;d+=2){const p=street.getPointAt(Math.min(d/length,1)),t=street.getTangentAt(Math.min(d/length,1));
+        for(const a of [n-w/2,n+w/2])position.push(p.x+t.z*a,.225,p.z-t.x*a);}
+      for(let i=base;i<position.length/3-2;i+=2)index.push(i,i+1,i+2,i+1,i+3,i+2);
+    }});
+    const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(position,3));g.setIndex(index);g.computeVertexNormals();
+    if(g.attributes.normal.getY(0)<0)g.index!.array.reverse(); // keep the strips facing up whatever the route's direction
+    g.computeVertexNormals();return g;
+  };
+  const seamStone=material('#bdb5a4');seamStone.polygonOffset=true;seamStone.polygonOffsetFactor=seamStone.polygonOffsetUnits=-2;
+  const guideMint=mint.clone();guideMint.polygonOffset=true;guideMint.polygonOffsetFactor=guideMint.polygonOffsetUnits=-2;
+  const seams=new T.Mesh(inlay(r=>[[CARRIAGEWAY[r].centre-CARRIAGEWAY[r].half,.3],[CARRIAGEWAY[r].centre+CARRIAGEWAY[r].half,.3]]),seamStone);
+  const laneGuides=new T.Mesh(inlay(r=>[[laneOffset(r,0),.1],[-laneOffset(r,1),.1]]),guideMint);
+  seams.name='carriageway-seams';laneGuides.name='carriageway-guides';seams.receiveShadow=laneGuides.receiveShadow=true;scene.add(seams,laneGuides);
   const berthLight=new T.PointLight('#b9e2cf',0,60,2);berthLight.position.set(SPHERE_DOCK[0],SPHERE_DOCK[1]+4,SPHERE_DOCK[2]);scene.add(berthLight);
   const ixLight=new T.PointLight('#b9e2cf',0,45,2);ixLight.position.set(INTERCHANGE.mast[0],INTERCHANGE.deck+4,INTERCHANGE.mast[2]);scene.add(ixLight);
   const guideMaterial=new T.MeshBasicMaterial({color:new T.Color('#88d6d3').multiplyScalar(1.6)});
@@ -805,7 +824,7 @@ export function mobility(scene:T.Scene) {
     fade=Number.isFinite(lastTime)&&time>lastTime?(time-lastTime)/1.5:1;dt=time>lastTime&&time-lastTime<.5?time-lastTime:0;lastTime=time;
     const amount=(count:number,index:number)=>T.MathUtils.clamp(count-index,0,1);
     stepTraffic(time,rhythm.people);
-    mint.emissiveIntensity=.65+state.neon*1.8;
+    guideMint.emissiveIntensity=mint.emissiveIntensity=.65+state.neon*1.8;
     airShell.emissiveIntensity=activity?activity.level*.85:0;
     collar.emissiveIntensity=night*4;
     headlight.emissiveIntensity=.2+night*4;taillight.emissiveIntensity=.15+night*3;
