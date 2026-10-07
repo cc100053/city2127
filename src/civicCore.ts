@@ -224,8 +224,9 @@ export function civicCore() {
       // Lit far-side partitions on the -X walls: the review view enters through the +X glazing and crosses the occupied room
       // (desks, staff, ceiling light) to warm, partly video-lit walls, rather than meeting lit panels right behind the glass.
       for(const [floor,zs] of [[y+1.2,[3.5,8.5,13.5,18.5,23.5,28.5]],[y+9.5,[3.5,8.5,13.5]]] as const)zs.forEach((z,i)=>{
-        const video=(i+y)%3===0;
-        box(root,[.16,video ? 2.4 : 4.6,3.6],[x-width/2+1.1,floor+(video ? 3.6 : 3.2),z],video ? broadcastLight : publicLight);
+        const liveSet=studio && floor===y+1.2,video=liveSet || (i+y)%3===0;
+        box(root,[.16,liveSet ? 4.8 : video ? 2.4 : 4.6,3.6],[x-width/2+1.1,floor+(video ? 3.6 : 3.2),z],video ? broadcastLight : publicLight);
+        if(liveSet)box(root,[.2,.3,3.6],[x-width/2+1.25,floor+6.2,z],publicLight);
       });
       // Rear-zone ceiling light and flank-facing staff fill the deep half of each room seen through the side glazing.
       for(let dx=-width/2+3;dx<width/2-2;dx+=5)box(root,[2.6,.12,12],[x+dx,y+h+.85,25],publicLight);
@@ -334,10 +335,25 @@ export function civicCore() {
   arc(chamber,19.8,21.2,.7,[0,-10.4,0],trim);
   arc(chamber,20.7,21.1,.18,[0,-9.7,0],publicLight);
   box(chamber,[22,1,9],[0,-9,7],publicLight); // lit stage deck
-  box(chamber,[22,12,.7],[0,-2.5,12],solar);
-  box(chamber,[20,10,.18],[0,-2.5,11.55],broadcastLight);
+  box(chamber,[25,17,.7],[0,0,12],solar);
+  box(chamber,[20,14,.18],[0,-.5,11.55],broadcastLight);
+  // Recessed screen bays and a warm centre set give the broadcast wall depth behind the presenters.
+  // Keep the bright blue to side panels, so the audience and live stage remain the focal point.
+  box(chamber,[6.8,13,.25],[0,-.5,11.3],solar);
+  for(const x of [-3.3,3.3])box(chamber,[.35,12,.3],[x,-.5,11.1],publicLight);
+  box(chamber,[6.8,.35,.3],[0,5.5,11.1],publicLight);
+  for(const x of [-7,7]) {
+    for(const y of [-3.8,.2,4.2])box(chamber,[5.7,.16,.3],[x,y,11.3],solar);
+    box(chamber,[.28,9,.3],[x,-.5,11.1],publicLight);
+  }
+  // Warm lower scenery separates the presenters' stage from the blue broadcast wall above it.
+  box(chamber,[19.5,2.4,.2],[0,-6.1,11.3],publicLight);
+  for(const x of [-7,-3.5,0,3.5,7])box(chamber,[.18,2.4,.25],[x,-6.1,11.15],solar);
+  // Warm proscenium frames the live screen above the audience, distinct from the dark technical dome.
+  for(const x of [-11.5,11.5])box(chamber,[1.1,15,.35],[x,-.5,11.4],publicLight);
+  box(chamber,[24,1,.4],[0,7.5,11.35],publicLight);
   for(const x of [-8,-4,0,4,8]) {
-    box(chamber,[.15,10,.25],[x,-2.5,11.3],solar);
+    box(chamber,[.12,14,.25],[x,-.5,11.3],solar);
     box(chamber,[1,.7,1.3],[x,9,5],solar);
     box(chamber,[.75,.15,1],[x,8.55,5],broadcastLight);
   }
@@ -349,7 +365,7 @@ export function civicCore() {
   }
   for(const z of [-4,10])for(let x=-12;x<=12;x+=3) {
     box(chamber,[.8,.9,.8],[x,9.3,z],solar);
-    box(chamber,[.55,.3,.55],[x,8.75,z],z<0 ? publicLight : broadcastLight);
+    box(chamber,[.75,.3,.75],[x,8.75,z],z<0 ? publicLight : broadcastLight);
   }
   // An inner glazed balcony and lit equator outline the full theatre volume behind the skin.
   for(const start of [-.6,Math.PI-.6]) {
@@ -374,7 +390,7 @@ export function civicCore() {
   for(let a=Math.PI+.5;a<Math.PI*2-.5;a+=.22)box(chamber,[.3,14,.5],[Math.cos(a)*21.3,-1,-Math.sin(a)*21.3],trim);
   for(let row=0;row<9;row++) {
     const z=1-row*2.2,y=-10.3+row*1.15,w=28-row*.6;
-    box(chamber,[w,.3,2.1],[0,y+.2,z],publicLight); // open lit treads: the warm house shows through, not a dark solid rake
+    box(chamber,[w,.3,2.1],[0,y+.2,z],solar); // dark acoustic treads keep the lit seats and audience distinct
     box(chamber,[w-.4,.12,.12],[0,y+.2,z+1.08],broadcastLight); // stage-wash step lights tint the audience blue
     for(let seat=0;seat<15;seat++) {
       if(seat===7)continue;
@@ -400,11 +416,11 @@ export function civicCore() {
   for(const z of [-4,5,10])box(chamber,[29,.45,.45],[0,10,z],solar);
   arc(chamber,10,15,.8,[0,16,0],stone);
   arc(chamber,11,14,.5,[0,16.8,0],leaf);
-  for(let i=0;i<18;i++) {
+  for(let i=0;i<12;i++) {
     const rib=new T.Mesh(new T.TorusGeometry(24,.16,5,64),trim);
-    rib.rotation.y=i*Math.PI/18;chamber.add(rib);
+    rib.rotation.y=i*Math.PI/12;chamber.add(rib);
   }
-  for(const y of [-8,-2,4,10,16,20]) {
+  for(const y of [-8,4,16,20]) {
     const rib=new T.Mesh(new T.TorusGeometry(Math.sqrt(576-y*y),.16,5,64),trim);
     rib.position.y=y;rib.rotation.x=Math.PI/2;chamber.add(rib);
   }
@@ -477,6 +493,12 @@ export function civicCore() {
     const r=25+(i*5%3)*.9;
     standing(-8+Math.cos(a)*r,24,-2-Math.sin(a)*r);
   }
+  // Bay-facing forum groups occupy the supported inner walk, leaving the outer benches and arrival gap clear.
+  for(let a=.4,i=0;a<1.6;a+=.085,i++) {
+    const r=24+(i%3)*1.2;
+    standing(-8+Math.cos(a)*r,24,-2-Math.sin(a)*r);
+    if(i%3===0)standing(-8+Math.cos(a+.035)*(r+.8),24,-2-Math.sin(a+.035)*(r+.8));
+  }
   for(let a=.45,i=0;a<2.7;a+=.11,i++) {
     const r=26.2+(i*3%4)*.5;
     standing(-18+Math.cos(a)*r,63,23-Math.sin(a)*r);
@@ -493,6 +515,11 @@ export function civicCore() {
     for(let x=-60;x<=60;x+=6) {
       member([x,y+.7,-16.8],[x,y+2.3,-16.8],.16,.18,solar);
       if(x%12===0)box(root,[4,.7,1.1],[x,y+1.15,-11],trim);
+    }
+    // Pairs stand on the transfer beam's top at Y=65, above the thinner promenade slab.
+    if(y===63)for(let x=-42,i=0;x<=42;x+=7,i++) {
+      standing(x,65,-14.6);
+      standing(x+.85,65,-14.1+(i%2)*.4);
     }
   }
   // Roof fins span between the two transfer members: shade and energy collection over the climate walk.

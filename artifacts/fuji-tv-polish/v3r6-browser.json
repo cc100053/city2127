@@ -1,0 +1,224 @@
+{
+  "date": "2026-10-07",
+  "baselineCommit": "8de6cf8f0d7ec8f17165f7a07e11b91f3da82da3",
+  "branch": "codex/fuji-tv-polish",
+  "targetSha256": "5cd1ea14cf90bc5b39c1320b2cc340a81f8de181ac883aa6bb8f40b0de939737",
+  "platform": "Development Mac, headless Chrome via installed playwright-cli",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+  "devicePixelRatio": 1,
+  "geometry": {
+    "batches": 9,
+    "triangles": 2853564,
+    "bounds": {
+      "min": [
+        -77.49165344238281,
+        -4.637270927429199,
+        -46.99067306518555
+      ],
+      "max": [
+        73.49165344238281,
+        142.45989990234375,
+        79
+      ]
+    },
+    "sourceSha256": "b8dd6961a3276493ca0d9883ba4128445415d8d09697711cc1ceb8f564049dc0"
+  },
+  "captures": [
+    {
+      "name": "pass1",
+      "url": "http://127.0.0.1:5174/?hour=16&review=civic&reviewTime=40",
+      "browser": "154.0.8037.98",
+      "canvas": {
+        "width": 1280,
+        "height": 720,
+        "data": {
+          "engine": "three.js r180"
+        }
+      },
+      "warnings": [],
+      "errors": [],
+      "failures": [],
+      "badResponses": []
+    },
+    {
+      "name": "pass1-night",
+      "url": "http://127.0.0.1:5174/?hour=22&review=civic&reviewTime=40",
+      "browser": "154.0.8037.98",
+      "canvas": {
+        "width": 1280,
+        "height": 720,
+        "data": {
+          "engine": "three.js r180"
+        }
+      },
+      "warnings": [],
+      "errors": [],
+      "failures": [],
+      "badResponses": []
+    },
+    {
+      "name": "pass2",
+      "url": "http://127.0.0.1:5174/?hour=16&review=civic&reviewTime=40",
+      "browser": "154.0.8037.98",
+      "canvas": {
+        "width": 1280,
+        "height": 720,
+        "data": {
+          "engine": "three.js r180"
+        }
+      },
+      "warnings": [],
+      "errors": [],
+      "failures": [],
+      "badResponses": []
+    },
+    {
+      "name": "pass2-night",
+      "url": "http://127.0.0.1:5174/?hour=22&review=civic&reviewTime=40",
+      "browser": "154.0.8037.98",
+      "canvas": {
+        "width": 1280,
+        "height": 720,
+        "data": {
+          "engine": "three.js r180"
+        }
+      },
+      "warnings": [],
+      "errors": [],
+      "failures": [],
+      "badResponses": []
+    },
+    {
+      "name": "pass3",
+      "url": "http://127.0.0.1:5174/?hour=16&review=civic&reviewTime=40",
+      "browser": "154.0.8037.98",
+      "canvas": {
+        "width": 1280,
+        "height": 720,
+        "data": {
+          "engine": "three.js r180"
+        }
+      },
+      "warnings": [],
+      "errors": [],
+      "failures": [],
+      "badResponses": []
+    },
+    {
+      "name": "pass3-night",
+      "url": "http://127.0.0.1:5174/?hour=22&review=civic&reviewTime=40",
+      "browser": "154.0.8037.98",
+      "canvas": {
+        "width": 1280,
+        "height": 720,
+        "data": {
+          "engine": "three.js r180"
+        }
+      },
+      "warnings": [],
+      "errors": [],
+      "failures": [],
+      "badResponses": []
+    },
+    {
+      "name": "hero",
+      "url": "http://127.0.0.1:5174/?hour=16&reviewTime=40",
+      "browser": "154.0.8037.98",
+      "canvas": {
+        "width": 1280,
+        "height": 720,
+        "data": {
+          "engine": "three.js r180"
+        }
+      },
+      "warnings": [],
+      "errors": [],
+      "failures": [],
+      "badResponses": []
+    },
+    {
+      "name": "hero-low-day",
+      "url": "http://127.0.0.1:5174/?hour=12&reviewTime=40&meters=nw%3A-12%2Cne%3A-12%2Csw%3A-12%2Cse%3A-12",
+      "browser": "154.0.8037.98",
+      "canvas": {
+        "width": 1280,
+        "height": 720,
+        "data": {
+          "engine": "three.js r180"
+        }
+      },
+      "warnings": [],
+      "errors": [],
+      "failures": [],
+      "badResponses": []
+    },
+    {
+      "name": "hero-mixed-dusk",
+      "url": "http://127.0.0.1:5174/?hour=18.5&reviewTime=40&meters=nw%3A0%2Cne%3A0%2Csw%3A0%2Cse%3A0",
+      "browser": "154.0.8037.98",
+      "canvas": {
+        "width": 1280,
+        "height": 720,
+        "data": {
+          "engine": "three.js r180"
+        }
+      },
+      "warnings": [],
+      "errors": [],
+      "failures": [],
+      "badResponses": []
+    },
+    {
+      "name": "hero-high-night",
+      "url": "http://127.0.0.1:5174/?hour=22&reviewTime=40&meters=nw%3A12%2Cne%3A12%2Csw%3A12%2Cse%3A12",
+      "browser": "154.0.8037.98",
+      "canvas": {
+        "width": 1280,
+        "height": 720,
+        "data": {
+          "engine": "three.js r180"
+        }
+      },
+      "warnings": [],
+      "errors": [],
+      "failures": [],
+      "badResponses": []
+    }
+  ],
+  "resize": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "canvas": {
+        "width": 1440,
+        "height": 900,
+        "clientWidth": 1440,
+        "clientHeight": 900
+      }
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "canvas": {
+        "width": 1280,
+        "height": 720,
+        "clientWidth": 1280,
+        "clientHeight": 720
+      }
+    }
+  ],
+  "initialSessionErrors": [
+    "Missing favicon.ico HTTP 404 before per-capture observers were attached"
+  ],
+  "limitations": [
+    "Target fidelity partial",
+    "Static architectural occupants, no interior circulation/access control simulation",
+    "No sustained FPS or exhibition hardware benchmark",
+    "No Windows/Safari or live survey browser test"
+  ],
+  "sourceChecks": "npm test, npm run build, git diff --check: all three corrected passes exit 0; root tests exercise real survey HTTP/WebSocket"
+}

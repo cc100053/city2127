@@ -92,6 +92,23 @@ for(const a of [.6,.85,1.1,1.35,2.4,2.65,2.9])for(const dx of [-1.5,1.5]) {
   const hit=footRay.intersectObject(core,true)[0];
   assert.ok(hit && Math.abs(hit.point.y-24)<.03, 'Fuji forum visitors stand on supported public floor');
 }
+for(let a=.4,i=0;a<1.6;a+=.085,i++) {
+  const r=24+(i%3)*1.2;
+  for(const [angle,radius] of [[a,r],...(i%3===0 ? [[a+.035,r+.8]] : [])]) {
+    const footRay=new Raycaster(new Vector3(-8+Math.cos(angle)*radius,24.02,-2-Math.sin(angle)*radius),new Vector3(0,-1,0),0,.2);
+    const hit=footRay.intersectObject(core,true)[0];
+    assert.ok(hit && Math.abs(hit.point.y-24)<.03, 'Fuji bay-facing groups stand on supported public floor');
+  }
+}
+for(let x=-42,i=0;x<=42;x+=7,i++)for(const [px,z] of [[x,-14.6],[x+.85,-14.1+(i%2)*.4]]) {
+  // Sample beside each figure so its own head is not mistaken for the supporting floor.
+  const floorRay=new Raycaster(new Vector3(px+.7,68,z),new Vector3(0,-1,0),0,4);
+  const hit=floorRay.intersectObject(core,true)[0];
+  assert.ok(hit && Math.abs(hit.point.y-65)<.03, 'Fuji promenade visitors need support and clear standing headroom');
+  const headRay=new Raycaster(new Vector3(px,67.2,z),new Vector3(0,-1,0),0,.3);
+  const headHit=headRay.intersectObject(core,true)[0];
+  assert.ok(headHit && Math.abs(headHit.point.y-67)<.03, 'Fuji promenade figures stand above the structural beam');
+}
 const approach=routes().approach,clearanceRay=new Raycaster();
 for(let i=0;i<=160;i++) {
   const p=approach.getPointAt(i/160);

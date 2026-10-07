@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS
 - Branch: codex/fuji-tv-polish
 - Base commit: 4eda49ebae30e6215e6f67f17e8fef197832b34e
-- Last verified commit: the round-5 implementation commit recorded below (source SHA-256 `f53fb31c…a969e1`); round 4 `ecdf66f`
+- Last verified commit: round-6 publication on origin/codex/fuji-tv-polish (recorded below) (source SHA-256 `b8dd6961…049dc0`); starting round 5 `8de6cf8`
 - Remote availability: origin/codex/fuji-tv-polish; resolve this Git ref for latest implementation/evidence publication. Prior code 0076bad0 is integrated on main; v3 is a separate implementation.
 
 ## Session Git state
@@ -17,11 +17,11 @@ Polish the procedural Fuji TV civic core using [CITY MASTER TASTE](../ODAIBA_212
 
 ## Completed work
 
-Target v3's three implementation passes and source/browser checks complete; visual review remains pending on the feature branch. Prior runtime polish is integrated on main. Historical stage evidence is preserved below.
+Target v3 round 6's three implementation passes and source/browser checks complete; visual review remains pending on the feature branch. Prior runtime polish is integrated on main. Historical stage evidence is preserved below.
 
 ## Actual validation results
 
-V3 root source/build/whitespace and specified browser checks PASS at implementation `f504484`; target fidelity remains PARTIAL. Prior implementation is integrated through `f64af18`; v3 is not integrated.
+V3 round-6 root tests/build/whitespace and specified browser checks PASS on starting `8de6cf8` plus the source delta recorded below; target fidelity remains PARTIAL. Prior implementation is integrated through `f64af18`; v3 is not integrated.
 
 ## Known issues and blockers
 
@@ -29,7 +29,7 @@ No failing source checks. Target fidelity remains partial; performance/hardware 
 
 ## Next expected step
 
-User reviews the v3 round-5 final screenshot ([v3r5-pass3](../../artifacts/fuji-tv-polish/v3r5-pass3.jpg)). Further passes or integration follow that review; keep this result on `codex/fuji-tv-polish` in the meantime.
+User reviews the v3 round-6 final screenshot ([v3r6-pass3](../../artifacts/fuji-tv-polish/v3r6-pass3.jpg)). Further passes or integration follow that review; keep this result on `codex/fuji-tv-polish` in the meantime.
 
 ## Target and pass 1 (2026-10-07)
 
@@ -152,3 +152,25 @@ Owner: Claude (orchestrator) with Opus worker subagents. User requested “do 3 
 Validation after each pass by exit code: root `npm test` 0 (includes aerial-approach, route/site and wing floor-support checks), `npm run build` 0 (existing >500kB warning), `git diff --check` 0; civic day16/night22 captured console has no warnings/errors besides favicon 404. Standalone hero16 visually checked (console query returned no entries). Batches remain ≤9 per test; triangle count not re-measured. No orchestrator fixes needed. Evidence: [pass1](../../artifacts/fuji-tv-polish/v3r5-pass1.jpg), [pass2](../../artifacts/fuji-tv-polish/v3r5-pass2.jpg), [final day](../../artifacts/fuji-tv-polish/v3r5-pass3.jpg), [final night](../../artifacts/fuji-tv-polish/v3r5-pass3-night.jpg), [hero](../../artifacts/fuji-tv-polish/v3r5-hero.jpg). Meter low/mixed/high, FPS, GPU/exhibition hardware and live survey browser NOT RUN.
 
 Target fidelity PARTIAL: dark spotlit theatre dome, blue-violet audience and room-depth wings now approach the target; remaining gaps are stage light beams (would need a new transparent finish beyond the 9-batch limit), the warmer golden global daylight grade (out of civic-core scope) and denser crowds. Stop for user review per Dream Loop Plus.
+
+## Target v3 implementation round 6 (2026-10-07)
+
+Owner: Codex (orchestrator), three sequential GPT-6 Astra workers at low reasoning with fresh contexts, as required by Dream Loop Plus. User requested “codex/fuji-tv-polish, do 3 loops”. Startup: workspace confirmed, clean at `8de6cf8f0d7ec8f17165f7a07e11b91f3da82da3`; fetch succeeded, feature counterpart0/0. Feature has7 commits not on `origin/main`, main has3 not on feature; main remains `f3b7d73669d7fa793e4b86e060d676f721259c0e`. Prior round-5 code/evidence is available remotely and matches the handoff. No automatic main merge. Active target remains byte-identical to target-v3.png, SHA-256 `5cd1ea14cf90bc5b39c1320b2cc340a81f8de181ac883aa6bb8f40b0de939737`. Reused this checkout's preview on127.0.0.1:5174 and captured a fresh1280×720 civic16/actor40 baseline before the workers.
+
+- Pass1: taller theatre screen, warm proscenium, dark acoustic audience treads, fewer sphere ribs and20 bay-facing forum visitors. Added actual floor-support checks for every new forum visitor. First root test attempt completed geometry checks but failed on sandbox loopback `listen EPERM`; rerun with loopback permission PASS. A first screenshot timeout was retried with a longer screenshot timeout; final day/night captures PASS.
+- Pass2: larger blue video bays with warm headers on live-studio side walls, warm lower theatre scenery and26 paired visitors on the mid-level promenade. New support/headroom check initially FAILED: visitor Y=63.7 followed the slab while the structural beam rises to65. Orchestrator fixed the shared placement to the actual Y=65 beam top; floor samples beside each figure avoid hitting its own head. Corrected full tests/build/whitespace and day/night captures PASS.
+- Pass3: recessed dark centre scenery and warm reveals break up the flat blue broadcast wall; side-screen seams/uprights and larger existing stage-can lenses improve stage detail. Full tests/build/whitespace and day/night captures PASS. No new finishes, dependencies or binary production assets.
+
+All three corrected passes: root `npm test`, `npm run build`, `git diff --check` exit0. Build retains the existing >500kB warning. Existing tests cover aerial/berth/bridge/site/route and actual people/robot geometry plus81 real answer combinations through HTTP/WebSocket. New checks cover all20 added forum visitors and26 promenade support/headroom samples. Unchanged survey/module-swap suites were not rerun. Final code SHA-256 `b8dd6961a3276493ca0d9883ba4128445415d8d09697711cc1ceb8f564049dc0`;9 batches,2,853,564 triangles; bounds min(-77.49,-4.64,-46.99), max(73.49,142.46,79)m. Geometry counts are not performance evidence.
+
+Development Mac, headless Chrome154.0.8037.98 via installed playwright-cli, ANGLE Metal Apple M6, devicePixelRatio1, viewport/canvas1280×720, actor40. All three passes captured civic16/22. Final also checked authored hero16, all-low(−12)12, all-mixed(0)18.5, all-high(+12)22 and ordinary resize1440×900→1280×720. All10 capture records have empty captured warning/error/page-error/request-failure/HTTP-error lists; browser session's initial missing favicon404 remains separate. Capture-time diagnostics are not sustained FPS. Screenshots visually reviewed.
+
+Evidence: [pass1](../../artifacts/fuji-tv-polish/v3r6-pass1.jpg), [pass1 night](../../artifacts/fuji-tv-polish/v3r6-pass1-night.jpg), [pass2](../../artifacts/fuji-tv-polish/v3r6-pass2.jpg), [pass2 night](../../artifacts/fuji-tv-polish/v3r6-pass2-night.jpg), [final day](../../artifacts/fuji-tv-polish/v3r6-pass3.jpg), [final night](../../artifacts/fuji-tv-polish/v3r6-pass3-night.jpg), [hero](../../artifacts/fuji-tv-polish/v3r6-hero.jpg), [low day](../../artifacts/fuji-tv-polish/v3r6-hero-low-day.jpg), [mixed dusk](../../artifacts/fuji-tv-polish/v3r6-hero-mixed-dusk.jpg), [high night](../../artifacts/fuji-tv-polish/v3r6-hero-high-night.jpg), [browser/geometry record](../../artifacts/fuji-tv-polish/v3r6-browser.json).
+
+Target fidelity PARTIAL: stage/crowds/production-room detail improve, but the target still has finer architectural/interior detail, a fuller theatre and richer daylight material response. No volumetric light beams or global grade changes. Occupants remain static architectural geometry; acoustic performance, internal circulation/access control, sustained FPS, exhibition hardware, Windows/Safari and live survey browser NOT RUN. Existing source tests exercised the real survey pipeline; they do not replace live exhibition acceptance.
+
+Dream Loop Plus says “stop after 3, ask the user to review the results.” Three passes are complete; publish the feature for visual review, without starting a fourth pass or integrating main. Current PROJECT/EXHIBITION_SPEC/VALIDATION and handoff index are synchronized; README startup/product flows are unaffected. Final link/artifact identity and complete source/test/docs/new-file self-review are recorded at publication below.
+
+### Round-6 publication
+
+2026-10-07 publication by Claude (on request “commit同push佢”): fetch succeeded; local/remote feature 0/0 before commit. Re-ran on the uncommitted round-6 worktree: root `npm test`, `npm run build`, `git diff --check` exit0. Source SHA-256 still `b8dd6961…049dc0`, equal to the checked pass3 code. All local Markdown links in the five changed documents exist; all10 v3r6 screenshots are1280×720. Complete source/test/docs diff self-reviewed. The round-6 commit on `origin/codex/fuji-tv-polish` holds this code and evidence; resolve that ref for its SHA. Untracked `.playwright-cli/` tool state is excluded. Main is not integrated; next step remains user visual review.
