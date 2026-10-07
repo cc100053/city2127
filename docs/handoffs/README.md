@@ -7,7 +7,7 @@
 | [台場素材](odaiba-assets.md) | IN_PROGRESS；素材研究／跨機接續仍開放。Runtime 已使用匯入素材；不要重做舊「未整合」步驟 | cc100053 |
 | [台場換場 P6/S5](odaiba-venue.md) | P0–P5已整合；P6/S5展覽驗收未完成，與P5實機表協調 | cc100053 |
 | [台場 Dream Loop r2](odaiba-dream-loop-2.md) | 已整合，target未達；視覺polish延後，待owner指定再開新任務分支 | cc100053 |
-| [Fuji TV polish](fuji-tv-polish.md) | 三輪實作／本機驗證完成；工作總部目標v2已生成，待下一輪實作，未合併 | Codex |
+| [Fuji TV polish](fuji-tv-polish.md) | 前三輪已整合main；使用者指定工作總部目標v3，待下一輪實作 | Codex |
 | [LAN 雙站 iPad](lan-guest-stations.md) | IN_PROGRESS；軟件已整合，單機 station A 經 LAN PASS；雙機／瞓機待第二部裝置 | cc100053 |
 | [居民體驗 P5](resident-experience-p5.md) | IN_PROGRESS；文件準備已發布，D0–D10／理解程度／長跑實機NOT RUN。先提供輸出方案及可測硬件 | Codex；展覽決策cc100053，現場操作人待指定 |
 

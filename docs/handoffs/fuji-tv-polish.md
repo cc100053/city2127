@@ -17,11 +17,11 @@ Polish the procedural Fuji TV civic core using [CITY MASTER TASTE](../ODAIBA_212
 
 ## Completed work
 
-Three implementation passes and source/browser checks complete. Core/public layers, references and evidence are documented below; visual review and integration remain pending.
+Three implementation passes and source/browser checks complete; prior runtime polish is integrated on main. The user-selected working-headquarters target v3 is saved; its implementation remains pending. Historical stage evidence is preserved below.
 
 ## Actual validation results
 
-PASSED for local source and specified browser checks below. NOT INTEGRATED; generated-target fidelity remains PARTIAL.
+PASSED for the prior implementation's local source and specified browser checks below, integrated through `f64af18`. Target v3 selection is reference/documentation only; the runtime does not yet match it.
 
 ## Known issues and blockers
 
@@ -29,7 +29,7 @@ No failing source checks. Target fidelity remains partial; performance/hardware 
 
 ## Next expected step
 
-Implement the approved working-headquarters direction against target v2 when the user starts the next implementation round. Target regeneration is complete; the existing three-pass runtime still represents target v1. Keep the result on the feature branch until the new direction is implemented and verified.
+Implement the approved working-headquarters direction against the user-selected target v3 when the user starts the next implementation round. Target selection is complete; the existing three-pass runtime still represents target v1. Keep the new direction on the feature branch until implemented and verified.
 
 ## Target and pass 1 (2026-10-07)
 
@@ -66,3 +66,13 @@ User requested grilling and target regeneration, saying Fuji TV must retain work
 Resumed clean at `012b5afe9d95e3b602436c5d47916e7f60450fd1`; fetch succeeded, feature counterpart 0/0, branch 2 commits ahead of origin/main, no divergence. Built-in imagegen edited pass3.jpg using R01/R02 architectural references, followed by one refinement for opaque studio volumes and central openness. Selected [target v2](../../artifacts/fuji-tv-polish/target-v2.png), [full prompts](../../artifacts/fuji-tv-polish/target-v2-prompt.md); ignored `.dream-loop/target.png` now matches v2. Original committed target.png remains available.
 
 Visual review confirms two inhabited wings, substantial solid studio blocks, glazed office floors and the sphere's stage/audience. Independent access is an approved implementation requirement; an exterior generated image does not validate access control or circulation. Generated detail and diagonal connections are guidance; existing route clearances, berth, footprint and supported geometry still require source/browser checks during implementation. No TypeScript or runtime asset changed in this target-only stage. Local Markdown link/fact checks, target-file identity and git diff --check PASS; source tests/build/browser not rerun for this reference/documentation stage. Last verified runtime code remains 0076bad0.
+
+## User-selected target v3 (2026-10-07)
+
+Owner: Codex. Scope: save the user's supplied Fuji TV target and update the active reference; no runtime implementation in this stage. User explicitly requested “use this as Fuji TV 目標圖”. [Target v3](../../artifacts/fuji-tv-polish/target-v3.png) is copied byte-for-byte from the attachment; no new generation or image editing was applied to the selected target. Original v1/v2 files and prompts remain preserved. Ignored `.dream-loop/target.png` now matches v3. The image's glazed occupied work/production wings, central broadcast theatre, open void and diagonal connections supersede v2's exterior reference. Existing headquarters program and independent public/staff circulation requirements remain; generated UI lettering is not a localization instruction.
+
+Preflight: workspace `/Users/fatboy/city2127`, initially clean on `feat/pedestrian-traffic-life` at `a540480e98b6fcb1b3cc1cd641292b160d4f2cc0`; fetch succeeded. Resumed the explicitly named `codex/fuji-tv-polish` at `ad8bc75`; local/remote feature refs match (0/0). `origin/main` is `f3b7d73`, three integration/documentation commits ahead of this branch with no branch-only commits. Prior runtime polish is already integrated through `f64af18`; this corrects the earlier “not integrated” stage status above. No automatic main merge. `src/civicCore.ts` matches the last verified implementation `0076bad0`; no unfinished implementation missing remotely.
+
+Fresh baseline capture: development Mac, in-app browser, viewport1280×720, local feature preview `http://127.0.0.1:5174/?hour=16&review=civic&reviewTime=40`; no captured console warnings/errors. Baseline saved in ignored `.dream-loop/fuji-tv-v3-baseline.jpg`; it is a reference capture, not new runtime validation. A separate image-generation request was started before the attachment arrived, then terminated after the user selected their own image; it is not the target.
+
+Validation PASS: supplied attachment, tracked v3 and ignored active target are byte-identical, SHA-256 `5cd1ea14cf90bc5b39c1320b2cc340a81f8de181ac883aa6bb8f40b0de939737`; PNG1672×941. Local Markdown targets in all three changed documents exist; complete diff self-reviewed; `git diff --check` PASS. Source remains unchanged from resumed `ad8bc75` (last verified runtime `0076bad0`). Runtime tests/build, FPS, hardware and circulation validation are not rerun for target selection. Next step: implement v3 in a new Dream Loop implementation round when requested; do not claim target fidelity from the existing model. Publish this reference-only stage to `origin/codex/fuji-tv-polish`; keep the pending implementation separate from main.
