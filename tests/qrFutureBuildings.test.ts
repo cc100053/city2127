@@ -9,13 +9,17 @@ for (const score of [-12, 0, 12]) for (const seed of [0, 2127]) {
   const district = new ConcentrationDistrict(new T.Group()); district.setTarget(layout, 0, true, seed);
   const pool = futureBuildingPool(layout, { automation: seed, publicSharing: seed, environmentalPriority: seed, urbanConcentration: seed });
   const configuration = district.getConfiguration();
-  assert.ok(pool.candidates.length > 0);
-  assert.equal(pool.candidates.filter(c => c.id.startsWith('future-tower')).length, configuration[0].filter(c => c[0] > .02).length);
-  assert.equal(pool.candidates.filter(c => c.id.startsWith('future-pavilion')).length, configuration[1].filter(c => c[0] > .02).length);
+  assert.equal(pool.candidates.length, configuration[0].filter(c => c[0] > .02).length);
+  assert.ok(pool.candidates.every(c => c.id.startsWith('future-tower-')));
+  if (score === -12) assert.equal(pool.candidates.length, 0, 'a low city must not invent towers or use garden pavilions');
+  else assert.ok(pool.candidates.length > 0, 'mixed/high cities retain their actual mid/high-rise towers');
+  for (const candidate of district.getPreviewCandidates().filter(c => c.id.startsWith('future-pavilion-'))) {
+    assert.throws(() => pool.create(candidate.id), /not present/, 'visible pavilions are excluded from QR selection and extraction');
+  }
   for (const candidate of pool.candidates) {
     const preview = pool.create(candidate.id);
     const bounds = new T.Box3().setFromObject(preview), size = bounds.getSize(new T.Vector3());
-    assert.ok(size.x > 1 && size.y > 1 && size.z > 1, candidate.id);
+    assert.ok(size.x > 1 && size.y > 40 && size.z > 1, candidate.id);
     assert.ok(Math.abs(bounds.getCenter(new T.Vector3()).x) < 35, 'one local building, not the whole district');
     preview.traverse(object => { if (object instanceof T.InstancedMesh) assert.equal(object.count, 1); });
     if (candidate.id.startsWith('future-tower')) {
@@ -29,4 +33,4 @@ for (const score of [-12, 0, 12]) for (const seed of [0, 2127]) {
   assert.throws(() => pool.create('fuji-tv'), /not present/);
   pool.dispose();
 }
-console.log('PASS: future QR buildings match low/mixed/high city slots, seeds, heights and single-building transforms.');
+console.log('PASS: future QR selects actual mid/high-rise towers only, excludes pavilions, and preserves city seeds, heights and transforms.');

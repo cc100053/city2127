@@ -6,9 +6,14 @@ import type { ExhibitionLayout, Scores } from './surveyView.ts';
 export function futureBuildingPool(layout: ExhibitionLayout, seeds?: Scores) {
   const source = new ConcentrationDistrict(new T.Group());
   source.setTarget(layout, 0, true, seeds?.urbanConcentration ?? 0);
+  // Only the snapshot's visible mid/high-rise slots qualify; small garden pavilions do not.
+  const candidates = source.getPreviewCandidates().filter(candidate => candidate.id.startsWith('future-tower-'));
   return {
-    candidates: source.getPreviewCandidates(),
-    create: (id: string) => source.createBuildingPreview(id),
+    candidates,
+    create(id: string) {
+      if (!candidates.some(candidate => candidate.id === id)) throw new Error('Eligible tower is not present in this city snapshot.');
+      return source.createBuildingPreview(id);
+    },
     dispose() {
       const geometries = new Set<T.BufferGeometry>();
       source.root.traverse(object => {

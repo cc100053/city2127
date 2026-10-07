@@ -1,6 +1,6 @@
 # 2127 Civic Archive Terminal
 
-建築 QR（2026-10-07）：整合問卷時從該份提案保存的台場 2127 城市中，穩定隨機抽取一棟實際可見的未來高塔或花園館。直接共用根專案的 `ConcentrationDistrict`，保留該份城市的樓高、玻璃、綠化及配對設施，不再載入舊富士電視台／現代地標簡化模型。整棟直立展示 8 秒後轉為俯視 QR，按建築名稱／「真上からスキャン」可切換；QR 開啟提案保存的可操作 3D 台場城市。獨立 HUD 沒有問卷快照時使用高密度示範建築。舊 `prepare-odaiba-qr.mjs` 與 JSON 保留作歷史資產，不是目前建置來源。
+建築 QR（2026-10-07）：整合問卷時從該份提案保存的台場 2127 城市中，穩定隨機抽取一棟實際可見的未來中高樓或高塔，排除小型花園館。保存城市沒有符合條件的樓塔時，直接顯示標準 QR，不會補出不存在的建築。直接共用根專案的 `ConcentrationDistrict`，保留該份城市的樓高、玻璃、綠化及配對設施，不再載入舊富士電視台／現代地標簡化模型。整棟直立展示 8 秒後轉為俯視 QR，按建築名稱／「真上からスキャン」可切換；QR 開啟提案保存的可操作 3D 台場城市。獨立 HUD 沒有問卷快照時使用高密度示範建築。舊 `prepare-odaiba-qr.mjs` 與 JSON 保留作歷史資產，不是目前建置來源。
 
 接 main 問卷、掃碼查看可操作 3D 城市時，請使用根目錄 [README 的整合版啟動方式](../README.md)。以下 `npm start` 是原本獨立 HUD／Supabase 圖片影片模式，不會自動接問卷。整合版重用 HUD，不需要 Supabase 金鑰。
 
@@ -68,4 +68,4 @@ npm run dev
 
 `npm run build` 後執行 `npm test` 驗證 API 與佇列。4173 預覽伺服器啟動後執行 `npm run test:e2e`，使用本機 Chrome 驗證 QR、操作流程、手機輪詢及媒體顯示。截圖輸出至 `test-results/`。測試使用隔離介面，尚需實際 Supabase 專案與實體手機驗收。
 
-建築展示另用 `node scripts/verify-building-qr.mjs`，預設測試 QR Vite 的 5198 port（可設 `QR_TEST_URL`）。涵蓋三種高塔、兩種館、完整取景、低／高城市候選、重新整理與實際 canvas 解碼。整合問卷的隔離 SQLite 測試及現場驗收見根目錄 [VALIDATION](../docs/VALIDATION.md)。
+建築展示另用 `node scripts/verify-building-qr.mjs`，預設測試 QR Vite 的 5198 port（可設 `QR_TEST_URL`）。涵蓋三種高塔、排除花園館、完整取景、低密度無高樓時的標準 QR 備援／高密度城市候選、重新整理與實際 canvas 解碼。整合問卷的隔離 SQLite 測試及現場驗收見根目錄 [VALIDATION](../docs/VALIDATION.md)。

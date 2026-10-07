@@ -30,7 +30,7 @@ try {
   await guest.goto(`${base}/guest`);
   await guest.getByRole('button', { name: 'はじめる', exact: true }).click();
   for (let i = 0; i < 4; i++) {
-    await guest.locator('input[type=radio]').first().check();
+    await guest.locator('input[type=radio]').last().check();
     await guest.getByRole('button', { name: i === 3 ? '回答を確認する' : '次へ', exact: true }).click();
   }
   const savedResponse = guest.waitForResponse(r => r.url() === `${base}/api/proposals` && r.request().method() === 'POST');
@@ -40,7 +40,7 @@ try {
   const qrFrame = guest.frameLocator('.guest-archive-frame');
   await qrFrame.locator('#terminal[data-state=ready]').waitFor({ timeout: 45000 });
   assert.equal(await qrFrame.locator('#qr').getAttribute('data-source'), 'city-district');
-  assert.match(await qrFrame.locator('#qr').getAttribute('data-landmarks'), /^future-(tower|pavilion)-/);
+  assert.match(await qrFrame.locator('#qr').getAttribute('data-landmarks'), /^future-tower-/);
   assert.equal(Number(await qrFrame.locator('#qr').getAttribute('data-revision')), saved.proposal.revisionAfter);
   await qrFrame.locator('#qr[data-city-view=scan]').waitFor({ timeout: 20000 });
   await guest.waitForTimeout(600); // Let the existing 400 ms QR fade-in complete.
@@ -82,7 +82,7 @@ try {
   assert.equal(sockets, 0);
   const session = await api('/api/proposal-sessions', {});
   await api('/api/proposals', { submissionId: crypto.randomUUID(), guestSessionId: session.session.id, expectedRevision: session.state.revision,
-    answers: session.questions.map(q => ({ questionId: q.id, optionId: q.options[2].id })) });
+    answers: session.questions.map(q => ({ questionId: q.id, optionId: q.options[0].id })) });
   assert.deepEqual((await api(`/api/archives/${id}`)).view, first.view);
   assert.notDeepEqual((await api('/api/city-view')).layout, first.view.layout);
   await phone.reload({ waitUntil: 'domcontentloaded', timeout: cityTimeout });

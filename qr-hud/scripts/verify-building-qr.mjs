@@ -89,19 +89,14 @@ try {
     assert.equal(await city(preview), selected.id, 'same archived proposal, same building');
     await preview.close();
   }
-  const pavilionLabels = new Set();
-  for (let index = 0; pavilionLabels.size < 2 && index < 12; index++) {
-    const preview = await open(`/qr/?archive=proposal-${index}`, low);
-    assert.match(await city(preview), /^future-pavilion-/, 'low snapshot never displays an absent tower');
-    const label = await preview.locator('[data-view=city]').textContent();
-    if (!pavilionLabels.has(label)) {
-      pavilionLabels.add(label);
-      await preview.screenshot({ path: `test-results/building-qr-pavilion-family-${pavilionLabels.size}.png` });
-    }
-    await decode(preview, archiveUrl);
-    await preview.close();
-  }
-  assert.equal(pavilionLabels.size, 2);
+  const lowPreview = await open('/qr/?archive=low-proposal', low);
+  assert.equal(await lowPreview.locator('body.building-qr').count(), 0, 'no pavilion or invented tower in a low city');
+  assert.equal(await lowPreview.locator('.building-qr-controls').count(), 0);
+  const lowQr = PNG.sync.read(await lowPreview.locator('#qr canvas').screenshot());
+  assert.equal(jsQR(new Uint8ClampedArray(lowQr.data), lowQr.width, lowQr.height, { inversionAttempts: 'attemptBoth' })?.data, archiveUrl);
+  assert.equal(await lowPreview.evaluate(() => document.documentElement.scrollHeight <= innerHeight), true, 'standard QR fallback fits the embedded view');
+  await lowPreview.screenshot({ path: 'test-results/building-qr-no-tower-fallback.png' });
+  await lowPreview.close();
   assert.deepEqual(errors, []);
 
   const fallback = await browser.newPage();
@@ -117,5 +112,5 @@ try {
   const backup = PNG.sync.read(await fallback.locator('#qr canvas').screenshot());
   assert.equal(jsQR(new Uint8ClampedArray(backup.data), backup.width, backup.height, { inversionAttempts: 'attemptBoth' })?.data, demoUrl);
   await fallback.close();
-  console.log('PASS: archived future towers/pavilions, all five silhouettes, whole-building framing, deterministic reload, repeat QR decoding, embedded layout and WebGL fallback.');
+  console.log('PASS: all three archived tower silhouettes, whole-building framing, deterministic reload, repeat QR decoding, no-tower standard QR fallback, embedded layout and WebGL fallback.');
 } finally { await browser.close(); }
