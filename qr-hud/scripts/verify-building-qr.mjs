@@ -43,6 +43,11 @@ try {
   assert.equal(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight), true, 'embedded view fits');
   await page.getByRole('button', { name: `${landmark.label}を見る`, exact: true }).click();
   await page.locator('#qr[data-city-view=city]').waitFor();
+  const buildingHeight = Number(await page.locator('#qr').getAttribute('data-building-height'));
+  const cityExtent = Number(await page.locator('#qr').getAttribute('data-city-extent'));
+  assert.ok(buildingHeight > 0 && cityExtent * 2 >= buildingHeight, 'city camera frames the whole building');
+  await page.waitForTimeout(900);
+  await page.screenshot({ path: 'test-results/building-qr-embedded-city.png' });
   await page.getByRole('button', { name: '真上からスキャン', exact: true }).click();
   await decode(url);
   assert.deepEqual(errors, []);

@@ -14,3 +14,22 @@
 .integrated-qr.building-qr .qr-shell{width:100%}
 .integrated-qr.building-qr .result{min-height:100px;padding:18px 0 4px}
 @media(max-width:760px){.building-qr .portal{max-width:90vw}.building-qr .qr-shell{width:100%}}
+
+/* The questionnaire embeds this view as a quiet exhibition card. */
+.integrated-qr{color:#1d2927;background:#f6f4ed}
+.integrated-qr .ambient{display:none}
+.integrated-qr .terminal{padding:16px 20px;background:#f6f4ed}
+.integrated-qr.building-qr .portal{width:min(510px,92vw,calc(100svh - 150px));padding-bottom:72px}
+.integrated-qr.building-qr .qr-shell{border:1px solid #d7ddd5;border-radius:14px;background:#edf2ec;box-shadow:0 14px 34px #334b411c}
+.integrated-qr.building-qr .result{min-height:58px;padding:8px 0 0}
+.integrated-qr .ready-label,.integrated-qr .target-link{display:none}
+.integrated-qr .result h2{margin:4px 0;color:#1d2927;letter-spacing:.04em;font:700 15px/1.5 system-ui,"Yu Gothic",Meiryo,sans-serif}
+.integrated-qr .scan-hint{margin:4px auto;color:#52635c;letter-spacing:0;font:12px/1.6 system-ui,"Yu Gothic",Meiryo,sans-serif}
+.integrated-qr .building-qr-controls{gap:8px}
+.integrated-qr .building-qr-controls button{min-height:40px;border-color:#9fb0a6;background:#fffefa;color:#25453c;font:700 12px/1.2 system-ui,"Yu Gothic",Meiryo,sans-serif}
+.integrated-qr .building-qr-controls button[aria-pressed=true]{border-color:#176653;background:#176653;color:#fff}
+.integrated-qr .building-qr-controls span{color:#52635c;font:11px/1.5 system-ui,"Yu Gothic",Meiryo,sans-serif}
+.integrated-qr .transfer{background:#edf2ec;color:#25453c}
+.integrated-qr .transfer-symbol,.integrated-qr .transfer-value{color:#176653}
+.integrated-qr .progress-track{background:#cbd5ce}
+.integrated-qr .progress-track>span{background:#176653;box-shadow:none}
