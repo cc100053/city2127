@@ -1,11 +1,11 @@
 # roof-interior-life — People on roofs and inside buildings
 
 - Owner: cc100053
-- Status: IN_PROGRESS (implemented and locally verified; not committed)
+- Status: IN_PROGRESS (implemented, locally verified, pushed; awaiting user visual review before main integration)
 - Branch: feat/roof-interior-life
 - Base commit: 051614fe6b5ea5d414b1208725061787a185962e
-- Last verified commit: NONE (uncommitted worktree on the base, checked 2026-10-08)
-- Remote availability: NOT PUSHED
+- Last verified commit: 1ae894224a07987d4dc3e58c933aa610849c6135 (identical to the checked worktree)
+- Remote availability: origin/feat/roof-interior-life at 1ae8942
 
 ## Session Git state
 
@@ -74,5 +74,5 @@ belong to the Fuji TV polish handoff, coordinate before further art edits), `src
 
 ## Next expected step
 
-Rerun full checks, commit on `feat/roof-interior-life`, user review of captures, then integrate per CONTRIBUTING; measure FPS on the
-exhibition machine.
+User (cc100053) reviews the captures / live view; on approval integrate per CONTRIBUTING (fetch, ff main, --no-ff merge, rerun
+checks, push, confirm CI). Measure FPS on the exhibition machine.
