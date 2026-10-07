@@ -5,7 +5,7 @@
 - Branch: `feat/random-building-qr`
 - Base commit: `4eda49ebae30e6215e6f67f17e8fef197832b34e`
 - Last verified commit: `35258f9d3caf4160807accd198fb3e9de48b40b1` (linked QR sculpture code snapshot; final metadata update is documentation-only)
-- Remote availability: latest linked sculpture `35258f9` is LOCAL ONLY; earlier `414cc63` is available on `origin/feat/random-building-qr`. This session's push was blocked by permission review pending explicit authorization/verified destination ownership; not merged to main.
+- Remote availability: linked sculpture `35258f9` and metadata `7bc4968` are PUSHED to `origin/feat/random-building-qr`, confirmed by remote ref. User explicitly authorized upload to `https://github.com/cc100053/city2127` after the earlier permission-review block; not merged to main.
 
 ## Session Git state
 
@@ -14,6 +14,7 @@
 - Local changes present at session start: NONE; prior QR integration/framing/landmark corrections are local task commits
 - Upstream integration status: at current preflight task branch was 10 commits ahead / 23 behind origin/main and matched `origin/feat/random-building-qr`. This is a resumed QR task; origin/main's independent civic/traffic updates are not automatically merged. Local exhibition build remains on the user's current checkout.
 - Pending Git conflicts or synchronization blockers: NONE
+- Upload follow-up (2026-10-07): resumed clean at `7bc496836f508b02c9f0087d436aa7128b31efde`, 2 commits ahead / 0 behind the fetched task remote; destination matched the user's explicit authorization. Normal fast-forward push succeeded; remote task ref matched `7bc4968`, and remote main remained `4ced0195c36b0c14fe488d5b223eebb04cbc13f7`. No source changes or new runtime checks in this upload-only follow-up; previous measured evidence remains applicable. Documentation link/whitespace checks are rerun for this status update; CI is not claimed verified.
 
 ## Goal and acceptance criteria
 
@@ -43,7 +44,7 @@ Current stage reads `/api/archives/:id` before constructing the QR. `futureBuild
 - Read-only HTTP: existing 8787 returns 200 for `/qr/`, serving `index-Dom_62bx.js` → `main-DuOz6kjT.js` containing `linked-building-qr`. No server restart or live proposals/resets.
 - Broad integration NOT RERUN; previous PARTIAL status and physical phone/Wi-Fi acceptance remain open. Feature branch only; no automatic merge with origin/main or verified branch CI claim.
 - Scoped source commit: `35258f9`; affected Markdown links, working/staged/committed whitespace and complete task diff review PASS. Temporary 5198 Vite preview was stopped after confirming its exact process command; the user's existing 8787 was left running. Source and this metadata are saved on the task branch, not merged to main.
-- Remote push NOT PERFORMED: permission review rejected the combined metadata-commit/push command because destination ownership and explicit user authorization to upload source were not established. Local metadata commit is completed separately as unaffected work; do not retry/bypass the upload without resolving that permission. Local 8787 output is already updated, so this does not block local use.
+- Earlier remote push was NOT PERFORMED: permission review rejected the combined metadata-commit/push command because destination ownership and explicit user authorization to upload source were not established. Local metadata commit was completed separately. This permission blocker is now resolved by the user's explicit approval; the normal task-branch push was completed and remotely verified in the upload follow-up above.
 
 ### Original landmark fallback — previous stage, 2026-10-07
 
@@ -89,4 +90,4 @@ Choice is deterministic from proposal ID **within the authoritative saved city's
 
 ## Next expected step
 
-The local user can refresh `/guest` with Ctrl+F5 to use the rebuilt linked QR; existing 8787 was read-only checked and serves the final bundle. Latest source is saved locally on the task branch; obtain explicit authorization/verified ownership before uploading it to origin (current permission-review block). Recheck broad city integration on a suitable browser host, then physical phone/venue acceptance. Deliberate origin/main integration is separate; do not overwrite or auto-merge it on resume. Temporary 5198/8789 test services are stopped; the user's 8787 is left running.
+The local user can refresh `/guest` with Ctrl+F5 to use the rebuilt linked QR; existing 8787 was read-only checked and serves the final bundle. Source is saved locally and remotely on the task branch. Recheck broad city integration on a suitable browser host, then physical phone/venue acceptance. Deliberate origin/main integration is separate; do not overwrite or auto-merge it on resume. Temporary 5198/8789 test services are stopped; the user's 8787 is left running.
