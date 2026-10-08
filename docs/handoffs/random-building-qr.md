@@ -1,10 +1,10 @@
 # Random building QR
 
 - Owner: User with Codex
-- Status: IMPLEMENTED; QR checks PASS; broad integration browser check PARTIAL
+- Status: IMPLEMENTED; QR and mobile-lite focused checks PASS; broad integration browser check PARTIAL; physical iOS stability unverified
 - Branch: `feat/random-building-qr`
 - Base commit: `4eda49ebae30e6215e6f67f17e8fef197832b34e`
-- Last verified commit: `35258f9d3caf4160807accd198fb3e9de48b40b1` (linked QR sculpture code snapshot; final metadata update is documentation-only)
+- Last verified commit: `894259b38a437b3bcb1ee042bbe1a344cfaee834` (mobile-lite source/evidence; full root tests/build, integrated build and focused browser PASS on identical final source; later metadata documentation-only). Previous linked QR snapshot: `35258f9d3caf4160807accd198fb3e9de48b40b1`.
 - Remote availability: linked sculpture `35258f9` and metadata `7bc4968` are PUSHED to `origin/feat/random-building-qr`, confirmed by remote ref. User explicitly authorized upload to `https://github.com/cc100053/city2127` after the earlier permission-review block; not merged to main.
 
 ## Session Git state
@@ -18,6 +18,7 @@
 - Existing8787 was NOT listening at this preflight; no live server stopped/restarted. Built `dist-exhibition` for the user's next normal start. Browser checks use isolated real SQLite/ephemeral server, preserved in OS temp for debugging.
 - Final Windows Chrome154.0.8037.98 browser rerun PASS: emulated iPhone390×844/DPR3 actually renders273×590 (CSS stays390×844, no antialiasing); idle3 frames/3.2s after interactions, no three large PNG requests, original archive layout/no live sockets, touch rotation/zoom/reset, landscape resize/reload, context-loss retry, desktop1280×720 full composer, forced lite and unknown archive. Phone-lite and desktop-full screenshots visually inspected in `artifacts/mobile-lite/`; `browser.json` records the evidence. This is desktop Chrome touch/UA emulation, not iPhone WebKit or measured device FPS/memory/thermal acceptance.
 - Root build, full root tests (repeated on final worktree), and final integrated build PASS after the damping correction; bundle-size warnings remain. Working/staged whitespace, affected local Markdown links and scoped source/new-test/documentation diff review PASS. No broad destructive integration rerun or physical phone/LAN test.
+- Source/evidence commit `894259b` saved and normal fast-forward pushed to `origin/feat/random-building-qr`; remote ref confirmed exact hash. Clean task branch, no main merge/push and no branch/main CI pass claim. This completion metadata is documentation-only.
 
 - Session starting branch and HEAD: linked QR sculpture resumed `feat/random-building-qr` at `414cc63b81d6a92d24557f0db2c3739cd4856dea`, 2026-10-07
 - Last fetched origin/main commit: `4ced0195c36b0c14fe488d5b223eebb04cbc13f7`, 2026-10-07
