@@ -1,13 +1,22 @@
 # Random building QR
 
 - Owner: User with Codex
-- Status: IMPLEMENTED; QR and mobile-lite focused checks PASS; broad integration browser check PARTIAL; physical iOS stability unverified
+- Status: IMPLEMENTED; QR and mobile-lite focused checks PASS; user-reported phone opening success; broad integration browser check PARTIAL; sustained physical iOS stability unverified
 - Branch: `feat/random-building-qr`
 - Base commit: `4eda49ebae30e6215e6f67f17e8fef197832b34e`
 - Last verified commit: `894259b38a437b3bcb1ee042bbe1a344cfaee834` (mobile-lite source/evidence; full root tests/build, integrated build and focused browser PASS on identical final source; later metadata documentation-only). Previous linked QR snapshot: `35258f9d3caf4160807accd198fb3e9de48b40b1`.
-- Remote availability: linked sculpture `35258f9` and metadata `7bc4968` are PUSHED to `origin/feat/random-building-qr`, confirmed by remote ref. User explicitly authorized upload to `https://github.com/cc100053/city2127` after the earlier permission-review block; not merged to main.
+- Remote availability: linked sculpture `35258f9`, mobile-lite source/evidence `894259b` and metadata `b914190` are PUSHED to `origin/feat/random-building-qr`, confirmed by remote ref. User explicitly authorized upload to `https://github.com/cc100053/city2127`; not merged to main.
 
 ## Session Git state
+
+### Phone scan diagnostics and progress upload — 2026-10-08
+
+- User-approved scope: upload completed progress and explicitly include the large plain black-and-white QR test image. Preflight: clean `feat/random-building-qr` at `b9141901dd582cafb1b38dd1002d9ebf956eee56`; fetch PASS, task remote divergence 0/0. Fresh `origin/main` is `a88808221d79e08de784d3b02669bff274cbddf2`; task is 15 ahead/30 behind. Preserve the existing branch; no automatic main integration.
+- Read-only diagnostics: decoded the user's phone QR image for proposal 14 and the actual full-resolution desktop QR screenshot for proposal 15. Both contained the expected LAN HTTP city URL including port 8787. After the user configured `SURVEY_PUBLIC_URL`, localhost, VPN and LAN archive API requests all returned the same LAN city URL. This does not establish an incorrect-URL cause for the reported scanning failure.
+- Actual phone evidence: the user's screenshot shows proposal 14 loaded with the `軽量表示` footer. After receiving the larger plain black-and-white proposal-15 test QR, the user reported “現在可以了”. The exact successful opening method, original scan-failure cause and sustained device stability are not established; do not claim a production QR fix or full hardware acceptance.
+- Windows Chrome mobile-emulation read-only check for proposal 15 PASS: archive identity/revision match, lite renderer, 273×590 drawing buffer and `data-scene-ready=true`, no page/request errors. A separate live QR-to-city diagnostic timed out waiting 45 s for the QR terminal ready state; do not describe the complete live QR flow as green. Earlier focused regression evidence remains separately dated.
+- Added [large plain QR test image](../../artifacts/qr-scan-check/city-15-qr.png) and [its scope/limitations](../../artifacts/qr-scan-check/README.md) per the user's upload request: 656×656, black on white, four-module quiet zone, exact payload round-trip decoded with jsQR and visually inspected. This is a fixed proposal-15 LAN diagnostic artifact, not a reusable guest QR or an app change. The website's QR renderer, survey data and server source are unchanged. Local diagnostic scripts and the exhibition SQLite are not included in this upload.
+- This follow-up changes documentation and adds the already-generated PNG only. Exact documentation/new-file diff review and 82 local Markdown targets PASS; the copied PNG's SHA-256 matches the inspected/decoded original. Existing runtime tests/builds are not rerun. Normal feature-branch upload only; no new CI or main integration claim.
 
 ### Mobile archive follow-up — 2026-10-08
 
@@ -93,13 +102,15 @@ Current stage reads `/api/archives/:id` before constructing the QR. `futureBuild
 
 ## Known issues and blockers
 
-Physical phone scanning and exhibition Wi-Fi require manual validation. Large shared-city startup is slow in this Windows headless environment; extended `INTEGRATION_CITY_TIMEOUT_MS` affects only the test harness, not the app, and does not establish performance acceptance. Remote civic/traffic commits are not integrated in this resumed checkout. QR builds now require the complete repository (root source factory/local sky), not a copied `qr-hud`-only directory; its preserved standalone Docker context was not updated or tested (deployment is out of scope). Earlier audit note: `qr-hud` reported one high-severity advisory in the preserved standalone backend dependency tree; no new audit/fix was performed here and the integrated survey server does not start that backend.
+Phone opening has basic user-reported success on 2026-10-08, but repeat scanning of the website's original QR, the cause of the earlier failure and sustained physical-device/venue Wi-Fi acceptance remain unverified. Large shared-city startup is slow in this Windows headless environment; extended `INTEGRATION_CITY_TIMEOUT_MS` affects only the test harness, not the app, and does not establish performance acceptance. Remote civic/traffic commits are not integrated in this resumed checkout. QR builds now require the complete repository (root source factory/local sky), not a copied `qr-hud`-only directory; its preserved standalone Docker context was not updated or tested (deployment is out of scope). Earlier audit note: `qr-hud` reported one high-severity advisory in the preserved standalone backend dependency tree; no new audit/fix was performed here and the integrated survey server does not start that backend.
 
 ## Important decisions
 
 Choice is deterministic from proposal ID **within the authoritative saved city's visible mid/high-rise tower pool**. Low concentration with no eligible tower uses the original central Civic Core, never a pavilion; mixed includes actual visible mid-rise/full tower hybrids, high uses towers. Seeds, height and pairing extras come from the archive, never current live state. The fixed Civic Core exists at every concentration level. Source GLB/legacy QR assets remain untouched but are no longer imported by the QR presentation.
 
 ## Next expected step
+
+Latest follow-up2026-10-08: basic phone opening succeeded; the larger black-and-white QR is saved as a diagnostic artifact only. Replacing the website's generated QR with a larger high-contrast scan presentation remains unimplemented. If requested, change the shared QR presentation, preserve per-proposal payload/linked-sculpture behavior and rerun package/build/browser checks. Repeat actual phone scans and sustained lite-view use before claiming device stability. Do not deploy the fixed proposal-15 image as the QR for other guests.
 
 Mobile follow-up2026-10-08: close the old phone city page, start the user's normal integrated8787 service if stopped, and rescan the same QR. Footer should say `軽量表示`; test rotation/zoom, background/return and sustained use on the actual iOS browser. If it still terminates, obtain phone model/browser and failure timing before another stage (model LOD/static fallback). No successful physical-phone stability claim yet.
 
