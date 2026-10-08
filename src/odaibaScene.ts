@@ -109,8 +109,10 @@ function openBay(material: T.Material) {
 }
 
 /** Phase 03D environment (detail inside the district only), the bay context, six surveyed landmarks and the Fuji civic core, in metres. */
-export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
-  const grass=new T.TextureLoader().load(new URL('../asset/textures/coastal-grass.png',import.meta.url).href);
+export async function loadOdaiba(scene: T.Scene, water?: T.Material, lite = false) {
+  // Keep the same lawn/pond/path shader and positions, without decoding a large grass image on phones.
+  const grass=lite ? new T.DataTexture(new Uint8Array([180,190,155,255]),1,1) : new T.TextureLoader().load(new URL('../asset/textures/coastal-grass.png',import.meta.url).href);
+  if (lite) grass.needsUpdate=true;
   grass.colorSpace=T.SRGBColorSpace;grass.wrapS=grass.wrapT=T.RepeatWrapping;grass.anisotropy=8;
   const environment = await addCityModel(scene, environmentUrl, [0, 0, 0]);
   environment.name = 'odaiba-environment';
@@ -154,7 +156,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   receded.forEach(material => { if (cutGround.has(material.name)) openBay(material); recedeBeyondDistrict(material); });
   scene.add(contextFacades(environment), bayContext());
   plantCanopy(scene,trees,true);
-  plantBackdropGrove(scene,environment);
+  if (!lite) plantBackdropGrove(scene,environment);
   // Sky gardens crown the tall context towers (the only CTX mesh above 30 m inside the district).
   environment.traverse(object=>{if(object instanceof T.Mesh && object.name.startsWith('CTX_') && new T.Box3().setFromObject(object).max.y>30)publishRoofGardens(plantRoofCanopy(scene,object,true));});
   await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1])).map(async placement => {
@@ -162,7 +164,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);
     model.name = placement.id;
     placeOdaibaModel(model, placement);
-    publishDoorways(model, environment);
+    if (!lite) publishDoorways(model, environment);
     if(placement.id==='aqua-city-odaiba' || placement.id==='decks-tokyo-beach')publishRoofGardens(plantRoofCanopy(scene,model));
     else if(placement.id==='grand-nikko-tokyo-daiba' || placement.id==='divercity-office-tower')publishRoofGardens(plantRoofCanopy(scene,model,true));
     model.traverse(object => {
@@ -178,5 +180,5 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     merged.forEach(mesh => { mesh.name = placement.id; model.add(mesh); });
   }));
   plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name)));
-  publishEntrances(scene,environment);
+  if (!lite) publishEntrances(scene,environment);
 }

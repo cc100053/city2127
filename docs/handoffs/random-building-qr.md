@@ -9,6 +9,16 @@
 
 ## Session Git state
 
+### Mobile archive follow-up — 2026-10-08
+
+- User-approved scope: after scanning QR the personal-city page crashes on the user's iOS device; implement archive-only mobile lite, leaving shared display/QR sculpting/server/data unchanged. Owner: User with Codex. This resumes the existing task, not a new main-based task.
+- Preflight: clean `feat/random-building-qr` at `3ae8a75cfba028acc2b7c23a2c2d484d97eaf73d`; fetched task remote matches (0/0). Fresh `origin/main` is `a88808221d79e08de784d3b02669bff274cbddf2`; task is13 ahead/30 behind. Handoff's `35258f9` code and later documentation/upload commits are available locally/remotely. No upstream merge, branch switching or user process/database changes.
+- Implemented: archive-only mobile/tablet detection plus lite/full reload override; bounded .7/720px/360k drawing buffer, no desktop composer/HDR/MSAA/GTAO/bloom allocations, no large sky/grass/water PNG requests, 64px reflection capture, simpler curved water and sea geometry. Keep actual landmarks/building carriers/layout/seeds; omit ambient mobility fleets/solver, backdrop groves and actor route publication; freeze remaining motions at time0. Damping off, at most30FPS while interacting/one refresh per second idle, hidden pages skip work. Footer identifies mode/switch, context loss offers same-archive lite retry. No model LOD/static screenshot fallback/new backend/dependencies.
+- First native test PASS. First sandbox build failed with OneDrive asset `realpath EPERM`; authorized root and integrated builds PASS. Root full `npm test` PASS. First browser run failed idle assertion (8 frames/3.2s): inherited damping left residual movement, now disabled only in lite. Final browser evidence is recorded below; do not treat this as actual phone verification.
+- Existing8787 was NOT listening at this preflight; no live server stopped/restarted. Built `dist-exhibition` for the user's next normal start. Browser checks use isolated real SQLite/ephemeral server, preserved in OS temp for debugging.
+- Final Windows Chrome154.0.8037.98 browser rerun PASS: emulated iPhone390×844/DPR3 actually renders273×590 (CSS stays390×844, no antialiasing); idle3 frames/3.2s after interactions, no three large PNG requests, original archive layout/no live sockets, touch rotation/zoom/reset, landscape resize/reload, context-loss retry, desktop1280×720 full composer, forced lite and unknown archive. Phone-lite and desktop-full screenshots visually inspected in `artifacts/mobile-lite/`; `browser.json` records the evidence. This is desktop Chrome touch/UA emulation, not iPhone WebKit or measured device FPS/memory/thermal acceptance.
+- Root build, full root tests (repeated on final worktree), and final integrated build PASS after the damping correction; bundle-size warnings remain. Working/staged whitespace, affected local Markdown links and scoped source/new-test/documentation diff review PASS. No broad destructive integration rerun or physical phone/LAN test.
+
 - Session starting branch and HEAD: linked QR sculpture resumed `feat/random-building-qr` at `414cc63b81d6a92d24557f0db2c3739cd4856dea`, 2026-10-07
 - Last fetched origin/main commit: `4ced0195c36b0c14fe488d5b223eebb04cbc13f7`, 2026-10-07
 - Local changes present at session start: NONE; prior QR integration/framing/landmark corrections are local task commits
@@ -90,4 +100,6 @@ Choice is deterministic from proposal ID **within the authoritative saved city's
 
 ## Next expected step
 
-The local user can refresh `/guest` with Ctrl+F5 to use the rebuilt linked QR; existing 8787 was read-only checked and serves the final bundle. Source is saved locally and remotely on the task branch. Recheck broad city integration on a suitable browser host, then physical phone/venue acceptance. Deliberate origin/main integration is separate; do not overwrite or auto-merge it on resume. Temporary 5198/8789 test services are stopped; the user's 8787 is left running.
+Mobile follow-up2026-10-08: close the old phone city page, start the user's normal integrated8787 service if stopped, and rescan the same QR. Footer should say `軽量表示`; test rotation/zoom, background/return and sustained use on the actual iOS browser. If it still terminates, obtain phone model/browser and failure timing before another stage (model LOD/static fallback). No successful physical-phone stability claim yet.
+
+Previous stage (2026-10-07): the local user could refresh `/guest` with Ctrl+F5 to use the rebuilt linked QR; existing8787 was read-only checked and served that stage's bundle. Source was saved locally and remotely on the task branch. Recheck broad city integration on a suitable browser host, then physical phone/venue acceptance. Deliberate origin/main integration is separate; do not overwrite or auto-merge it on resume. Temporary5198/8789 test services were stopped; the user's8787 was left running then (not listening at the2026-10-08 preflight).

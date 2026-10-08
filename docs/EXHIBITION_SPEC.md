@@ -7,7 +7,7 @@
 - 展覽唯一城市是 **2127 年 Odaiba／台場海濱**，根目錄 `src/` 是目標城市。
 - **Shibuya 已結束，未來不再做**（使用者確認，2026-10-02）。不保留場地切換，不將舊 Plan 01／02 的未完成項目列為後續工作。舊模型、內部識別碼與 Git／文件證據可保留；它們不代表場地或任務仍有效。
 - 2127 是固定時代。四個 Meter 的 low、mixed、high 都是成熟未來；低值不能代表舊時代、空城、缺乏技術或未開發。
-- Desktop presentation only；不加入 mobile／responsive 驗收。普通 renderer resize 保留。
+- 共同展覽畫面仍為 Desktop presentation，普通 renderer resize 保留。2026-10-08使用者明確要求手機輕量版，僅適用掃 QR 後的 `/city/:id` 保存城市，不降低共同展示屏畫質。
 - 未來身份、可讀的選擇效果及城市延續性優先。行人、車、drones、空中航線已獲允許。交通分層（2026-10-06 user決定）：空中分區域160–170m／城市80–100m／服務30–45m三層，航道有地標及建築泊位；行人有停留、架空層、海邊轉乘及夜間光環，細節見 [PROJECT](PROJECT.md)。
 - 現行視覺方向是 [CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)；材質及動畫實作規則見 [ART](ART.md)。Shibuya／Pic 2 只作歷史來源。
 - 行人日常（2026-10-06）：長椅／前庭小組有輪流交流、轉頭與小手勢；少量居民從門口走到前庭探訪、停留後返回同一門口。沿用既有空間與人員槽位，low／mixed／high 日夜都保留可見探訪；坐姿及路線空間驗證見 [street-life 交接](handoffs/street-life.md)。
@@ -73,6 +73,10 @@ Live 使用可重新定向的 **3 秒**過渡；pulse 只標示真的 live 變�
 | `/guest?station=A`／`B` | 獨立 session／草稿／結果；同一站一個體驗。不能混用活躍單站與 A/B | 停止新開始，等兩站問卷及結果／交接排出；Admin 中止必須指定一個未完成 session |
 
 A/B 按 server transaction 提交順序累積，容許舊 city revision、拒絕未來 revision；單站仍要求完全一致。單站／A-B City 顯示起點相隔至少 10 秒，城市動畫保持3秒；Guest 排隊顯示已保存／等待展示，再顯示自己的結果。提前Guest交接不截斷已排定展示；server拒絕在10秒閱讀結束前release／下一單站Start，reset遵守drain。問卷5分鐘期限、已提交result lease固定於展示開始後15秒釋放離線站；同ID retry／reload只接續剩餘時段，不延長lease；重連／斷線／過期late事件／reduced motion直接恢復最新完整城市並清掉舊字幕timer，不重播漏掉的過渡。`displayWaitMs`／`displayAt`只表示排程，不確認viewer在線或播放；不新增viewer-ack服務。
+
+## 手機保存城市（2026-10-08）
+
+使用者回報掃 QR 後 iOS 城市頁當掉；未取得型號、瀏覽器錯誤或記憶體紀錄，不能確認唯一原因。手機／觸控平板預設輕量模式，同一 QR／保存提案，不改計分、layout／slotSeeds、建築配置或 server。保留地標、塔樓、城市設施與旋轉／縮放；取消昂貴後製、大型天空／草地／水波貼圖及環境交通人群，城市時間固定、反射／海面／背景植栽簡化。操作時最多30FPS，靜止每秒刷新一次、隱藏時不繪圖；繪圖長邊最多720px。頁尾可切換輕量／原畫質，後者警告端末負荷大。這是可測試的首版，不承諾所有手機不當機；實際 iPhone／Safari／掃碼內建瀏覽器、Wi-Fi與長跑仍待驗收。需要時再依實機證據考慮模型LOD或靜態備援，不在此階段新增後端。
 
 ## Admin、資料與照明
 

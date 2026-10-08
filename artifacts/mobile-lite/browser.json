@@ -1,0 +1,43 @@
+{
+  "scratchDirectory": "C:\\Users\\User\\AppData\\Local\\Temp\\city-mobile-lite-oMvVT6",
+  "browser": "154.0.8037.98",
+  "platform": "win32",
+  "cases": [
+    {
+      "name": "iPhone emulated lite",
+      "dimensions": {
+        "width": 273,
+        "height": 590,
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "antialias": false
+      },
+      "idleFrames": 3,
+      "archive": "4ba6beaa-c202-407f-b31f-08c4984e8cd5",
+      "layout": {
+        "version": 2,
+        "bands": {
+          "nw": "high",
+          "ne": "high",
+          "sw": "high",
+          "se": "high"
+        },
+        "automatedPorts": 5,
+        "sharedSeats": 7,
+        "treeCount": 10,
+        "plantedFraction": 0.6875,
+        "coolingFins": 1,
+        "functionModules": 5
+      }
+    },
+    {
+      "name": "desktop archive full",
+      "size": [
+        1280,
+        720
+      ]
+    }
+  ],
+  "errors": [],
+  "status": "PASS"
+}

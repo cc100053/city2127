@@ -104,7 +104,7 @@ export function sign(group:T.Group, kit:Kit, text:string, x:number,y:number,z:nu
   const panel=new T.Mesh(new T.PlaneGeometry(w,h),material);panel.position.set(x,y,z+.09);group.add(panel);
 }
 /** Shared finishes, the civic lights at the survey sites and the ambient actors; the Odaiba ground and landmarks load in `odaibaScene`. */
-export function cityRig(scene:T.Scene) {
+export function cityRig(scene:T.Scene, options: { ambientMobility?: boolean } = {}) {
   const civicLights:T.PointLight[]=[];
   // ponytail: four shadowless site lights; use a baked lightmap if wall leakage becomes visible.
   for(const site of Object.values(changeSites)){
@@ -119,7 +119,8 @@ export function cityRig(scene:T.Scene) {
     const light=new T.PointLight('#e0eee5',0,19*s,2);light.position.set(-.95,6.15,0);light.userData.peak=95*s*s;
     light.name='civic-night-light';mast.add(light);civicLights.push(light);
   }
-  const updateMobility=mobility(scene);
+  // Archived phone cities retain infrastructure but omit the costly ambient actor fleets/solver.
+  const updateMobility=options.ambientMobility===false ? null : mobility(scene);
   return {
     update(state:WorldState,time:number,night:number,automationShare?:number,hour?:number) {
       publicLight.emissiveIntensity=.15+night*1.3;
@@ -127,7 +128,7 @@ export function cityRig(scene:T.Scene) {
       civicLights.forEach(light=>light.intensity=night*light.userData.peak);
       futureLight.emissiveIntensity=.25+state.neon*.5+night*.45;
       membrane.opacity=.6+state.greenery*.18;
-      updateMobility(state,time,automationShare,night,hour);
+      updateMobility?.(state,time,automationShare,night,hour);
     },
   };
 }

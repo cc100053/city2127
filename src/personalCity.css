@@ -10,5 +10,6 @@
 .personal-toolbar button:focus-visible{outline:3px solid #12837e;outline-offset:3px}
 .personal-toolbar small{display:block;max-width:340px;margin:13px auto 0;font-size:10px;line-height:1.7}
 .personal-loading{position:fixed;inset:0;display:grid;place-items:center;margin:0;padding:30px;background:#e4e7dc;z-index:5;font-size:14px}
+.personal-toolbar .personal-quality{font-size:10px;line-height:1.8;margin:8px 0 0}.personal-quality a{pointer-events:auto;display:inline-block;padding:6px;color:#17665b;text-underline-offset:3px}.personal-quality a:focus-visible{outline:3px solid #12837e}
 .personal-city .error{inset:30% 20px auto;max-width:520px;margin:0 auto;font-size:14px;line-height:1.8}
 @media(orientation:landscape) and (max-height:500px){.personal-heading{padding:15px 22px}.personal-heading h1{font-size:18px;margin:6px 0}.personal-toolbar{left:auto;width:300px;padding:16px}.personal-toolbar small{display:none}}

@@ -2,7 +2,12 @@ import * as T from 'three';
 import { curveBeyondPlate } from './bayContext.ts';
 
 /** One world-scaled ripple finish for both the surveyed bay plate and the open sea. */
-export function bayWater() {
+export function bayWater(lite = false) {
+  if (lite) {
+    const material = new T.MeshStandardMaterial({ color:'#2c6e98', roughness:.65, metalness:0 });
+    curveBeyondPlate(material);
+    return material;
+  }
   const normal = new T.TextureLoader().load(new URL('../asset/textures/bay-ripple-normal.png', import.meta.url).href);
   normal.wrapS = normal.wrapT = T.RepeatWrapping;
   normal.anisotropy = 8;
