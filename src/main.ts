@@ -122,7 +122,14 @@ try {
   const updateOverlay=overlay();
   // DEV-only `?meters=nw:high,ne:low` (band or score −12..12 per site, unlisted = 0) applies a v2 layout without the survey server, for review captures; `window.cityMeters('ne:high')` then animates a live change.
   const metersParam=import.meta.env.DEV?params.get('meters'):null;
-  const cityChanges=surveyUrl||metersParam!==null?createCityChangeManager(scene):null;
+  // DEV-only `?scaleLab` (`&profile=leaning&guests=120&seed=3&scale=a&journey`): a seeded guest sequence compares Meter scales and the vote-journey prototype; see docs/handoffs/meter-scale-journey.md.
+  const scaleLab=import.meta.env.DEV&&!surveyUrl&&params.has('scaleLab');
+  let devFrame:((now:number,darkness:number)=>void)|undefined;
+  const cityChanges=surveyUrl||metersParam!==null||scaleLab?createCityChangeManager(scene):null;
+  if(import.meta.env.DEV&&scaleLab)import('./devScaleLab').then(async({startScaleLab})=>{
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    devFrame=startScaleLab(scene,camera,cityChanges!,()=>now,params);
+  });
   // Applied after the first frame, so `now` already holds the clock (or a held `reviewTime`) rather than its initial 0.
   if(import.meta.env.DEV && metersParam!==null)import('./devMeters').then(async({devLayout})=>{
     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
@@ -172,7 +179,7 @@ try {
     ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientLate,glow*.6).lerp(ambientNight,dark);
     scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure*(1+.16*day);
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
-    controls.update();panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);cityChanges?.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
+    controls.update();panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);cityChanges?.update(now,dark);devFrame?.(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
     if(++frames===120){renderer.domElement.dataset.hour=hour.toFixed(2);renderer.domElement.dataset.displayMode=displayMode;renderer.domElement.dataset.time=now.toFixed(2);renderer.domElement.dataset.fps=(120000/(performance.now()-measureStart)).toFixed(1);renderer.domElement.dataset.drawCalls=String(renderer.info.render.calls);renderer.domElement.dataset.geometries=String(renderer.info.memory.geometries);if(cityChanges)renderer.domElement.dataset.siteAssets=JSON.stringify(cityChanges.getDiagnostics());frames=0;measureStart=performance.now();}
   });
   window.addEventListener('resize',()=>{

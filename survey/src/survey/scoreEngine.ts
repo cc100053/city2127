@@ -42,6 +42,12 @@ export function applyProposalVotes(before: ExhibitionState, votes: ExhibitionVot
   return next;
 }
 
+/** Folds one proposal into the per-axis slot seeds in place; neutral votes leave a seed unchanged. */
+export function foldSlotSeeds(seeds: CityScores, votes: ExhibitionVotes): CityScores {
+  for (const axis of CITY_AXES) if (votes[axis] !== 0) seeds[axis] = Math.imul(seeds[axis] ^ (votes[axis] + 2), 16777619) >>> 0;
+  return seeds;
+}
+
 /** Refuses corrupt replay/snapshot state instead of letting a clamp hide it. */
 export function validateExhibitionState(state: ExhibitionState): void {
   if (state.algorithmVersion !== 2 || typeof state.runId !== 'string' || typeof state.updatedAt !== 'string')

@@ -2,7 +2,7 @@ import type { DatabaseSync, SQLOutputValue } from 'node:sqlite';
 import { CITY_AXES, zeroScores, initialCitySurveyState, initialExhibitionState, isCityAxis, type CitySurveyState, type ExhibitionState, type ExhibitionVotes } from '../shared/citySurveyState.ts';
 import type { AnswerEvent, RunSummary } from '../shared/protocol.ts';
 import { deriveExhibitionLayout, exhibitionLayoutChanges, type ProposalAnswerRecord, type ProposalRecord } from '../shared/cityView.ts';
-import { applyEffects, applyProposalVotes, validateExhibitionState } from '../survey/scoreEngine.ts';
+import { applyEffects, applyProposalVotes, foldSlotSeeds, validateExhibitionState } from '../survey/scoreEngine.ts';
 import { transaction } from './database.ts';
 
 /** Raised when stored state is inconsistent. The server refuses to start instead of reinitializing. */
@@ -240,10 +240,8 @@ export function toProposalRecord(row: Row): ProposalRecord {
 export function runProposalSlotSeeds(db: DatabaseSync, runId: string) {
   const seeds = zeroScores();
   // ponytail: O(guests) per view, streaming only votes; persist incremental hashes if long runs make this measurable.
-  for (const row of db.prepare('SELECT votes_json FROM active_proposal_events WHERE run_id = ? ORDER BY sequence').iterate(runId)) {
-    const votes = parseVotes(str(row, 'votes_json'));
-    for (const axis of CITY_AXES) if (votes[axis] !== 0) seeds[axis] = Math.imul(seeds[axis] ^ (votes[axis] + 2), 16777619) >>> 0;
-  }
+  for (const row of db.prepare('SELECT votes_json FROM active_proposal_events WHERE run_id = ? ORDER BY sequence').iterate(runId))
+    foldSlotSeeds(seeds, parseVotes(str(row, 'votes_json')));
   return seeds;
 }
 

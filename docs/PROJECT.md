@@ -39,6 +39,7 @@ The [resident experience plan](RESIDENT_EXPERIENCE_PLAN.md) records P1–P3 impl
 | [changeCatalog.ts](../src/changeCatalog.ts), [cityChangeManager.ts](../src/cityChangeManager.ts), [createCityChangeManager.ts](../src/createCityChangeManager.ts) | Compatible internal site registry, layout targets, site/district lifecycle, 3 s retargeting and live markers |
 | [siteBuilders](../src/siteBuilders/index.ts), [siteRuntime.ts](../src/siteBuilders/siteRuntime.ts), [siteAssets](../src/siteAssets/assetCatalog.ts) | Four focal site builders, additive layers, GLB bounds/cache/fallback and late-load synchronization |
 | [districtMeters.ts](../src/districtMeters.ts), [devMeters.ts](../src/devMeters.ts) | District carriers, hybrid/pairing/seeded slot selection, pulse/motion; DEV-only Meter review controls |
+| [scaleLab.ts](../src/scaleLab.ts), [devScaleLab.ts](../src/devScaleLab.ts), [voteJourney.ts](../src/voteJourney.ts) | DEV-only `?scaleLab` prototype (2026-10-13, not product behavior): seeded guest sequences through the server reducer, current vs ×2.4 Meter scale comparison, and the vote-journey orbs/scan rings/lanterns; see [handoff](handoffs/meter-scale-journey.md) |
 | [dayCycle.ts](../src/dayCycle.ts), [presets.ts](../src/presets.ts), [worldState.ts](../src/worldState.ts) | Clock/light curves, numeric atmosphere presets, legacy 10 s WorldState blend |
 | [overlay.ts](../src/overlay.ts), [style.css](../src/style.css), [modelAssets.ts](../src/modelAssets.ts) | Desktop title/time UI, GLTFLoader and DEV-only local asset preview |
 
