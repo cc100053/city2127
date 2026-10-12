@@ -4,8 +4,8 @@
 - Status: IN_PROGRESS — DEV 原型完成，等待 owner 視覺評審；未改產品規格
 - Branch: `feat/meter-scale-journey`
 - Base commit: `a88808221d79e08de784d3b02669bff274cbddf2`
-- Last verified commit: 見下方「Actual validation results」（驗證時為未提交 worktree，內容即首個 task commit）
-- Remote availability: 見 Git log；push 後以 `origin/feat/meter-scale-journey` 為準
+- Last verified commit: `01c4fa53867800256f62be310ece513b3e3f2814`（驗證時係未提交 worktree，內容同呢個 commit 一樣；之後只改咗呢份 handoff）
+- Remote availability: `origin/feat/meter-scale-journey` @ `01c4fa53867800256f62be310ece513b3e3f2814`（之後有 handoff-only commit）
 - GitHub Issue (optional): NONE
 
 ## Session Git state
