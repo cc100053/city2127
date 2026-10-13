@@ -201,7 +201,8 @@ export class CityChangeManager {
       mesh.visible = shown > HIDDEN_SCALE;
       material.opacity = Math.min(1, shown * 3);
       const age = now - rose;
-      material.emissiveIntensity = .2 + (age < FRESH_MARKER_SECONDS
+      // A change scheduled after a vote journey has not started yet (negative age): no early blink.
+      material.emissiveIntensity = .2 + (age >= 0 && age < FRESH_MARKER_SECONDS
         ? (1 - age / FRESH_MARKER_SECONDS) * (1 - Math.cos(age * Math.PI * 2 / 1.25)) * .9
         : 0);
     }

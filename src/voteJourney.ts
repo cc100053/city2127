@@ -1,7 +1,10 @@
-// DEV prototype of "one vote's journey": a resident's four votes fly as light from the station side of the screen to the four focal
-// sites, scan rings rise where they land, and each vote stays as a small lantern that brightens at night. Additive and unlit.
+// "One vote's journey" (2026-10-13): a resident's four votes fly as light from the station side of the screen to the four focal sites,
+// scan rings rise where they land, and each vote stays as a small lantern that brightens at night. Additive and unlit.
 import * as T from 'three';
-import { CITY_AXES, type CityAxis, type ExhibitionVotes } from '../survey/src/shared/citySurveyState.ts';
+import { CITY_AXES, type CityAxis } from '../survey/src/shared/citySurveyState.ts';
+
+/** −1 / 0 / +1 per axis, as the server's proposal record and the root's parsed view both carry it. */
+type Votes = Readonly<Record<CityAxis, number>>;
 import { METER_COLORS } from './districtMeters.ts';
 import { changeSites } from './layout.ts';
 
@@ -10,7 +13,10 @@ const NEUTRAL = '#fff1d6';
 export const FLIGHT_SECONDS = 2.2, ORB_STAGGER = .14, SCAN_SECONDS = 1.4;
 /** The vote has landed at every site once the last staggered orb arrives. */
 export const ARRIVAL_SECONDS = FLIGHT_SECONDS + ORB_STAGGER * (CITY_AXES.length - 1);
-const TRAIL = 22, LANTERNS = 640;
+/** Lanterns keep the latest 64 guests, the same window the city view's recentProposals carries, so live and restored cities match. */
+export const LANTERN_GUESTS = 64;
+const TRAIL = 22, LANTERNS = LANTERN_GUESTS * CITY_AXES.length;
+const HIDDEN = new T.Matrix4().makeScale(0, 0, 0);
 
 const hash = (n: number) => { const s = Math.sin(n * 12.9898 + 78.233) * 43758.5453; return s - Math.floor(s); };
 const voteColor = (axis: CityAxis, vote: number) => new T.Color(vote === 0 ? NEUTRAL : METER_COLORS[axis]);
@@ -42,13 +48,13 @@ export class VoteJourney {
   private readonly lanternMaterial: T.MeshBasicMaterial;
   private readonly flights: Flight[] = [];
   private readonly scanList: Scan[] = [];
-  private readonly tag: HTMLElement;
   private readonly dummy = new T.Object3D();
   private readonly tint = new T.Color();
-  private lanternCount = 0;
-  private tagUntil = -1;
 
-  constructor(scene: T.Scene, private readonly camera: T.PerspectiveCamera) {
+  private readonly camera: T.PerspectiveCamera;
+
+  constructor(scene: T.Scene, camera: T.PerspectiveCamera) {
+    this.camera = camera;
     const capacity = CITY_AXES.length * 3 * (TRAIL + 1);
     this.positions = new Float32Array(capacity * 3); this.colors = new Float32Array(capacity * 3);
     const geometry = new T.BufferGeometry();
@@ -63,14 +69,13 @@ export class VoteJourney {
     this.scans.count = 0; this.scans.frustumCulled = false; this.scans.name = 'meter-pulse';
     this.lanternMaterial = new T.MeshBasicMaterial({ transparent: true, depthWrite: false, blending: T.AdditiveBlending });
     this.lanterns = new T.InstancedMesh(new T.SphereGeometry(1.1, 10, 6), this.lanternMaterial, LANTERNS);
-    this.lanterns.count = 0; this.lanterns.frustumCulled = false; this.lanterns.name = 'meter-pulse';
+    this.lanterns.frustumCulled = false; this.lanterns.name = 'meter-pulse';
+    this.lanterns.setColorAt(0, this.tint.setRGB(0, 0, 0)); this.clearLanterns();
     scene.add(this.points, this.scans, this.lanterns);
-    this.tag = document.createElement('div'); this.tag.className = 'journey-tag'; this.tag.hidden = true;
-    document.body.appendChild(this.tag);
   }
 
   /** Launches guest `ordinal`'s four votes from the lower-right (the stations' side of the screen). */
-  play(votes: ExhibitionVotes, ordinal: number, now: number): void {
+  play(votes: Votes, ordinal: number, now: number): void {
     this.cancel();
     const origin = new T.Vector3(.86, -.78, .5).unproject(this.camera).sub(this.camera.position).setLength(420).add(this.camera.position);
     CITY_AXES.forEach((axis, i) => {
@@ -79,26 +84,29 @@ export class VoteJourney {
       const curve = new T.CatmullRomCurve3([origin, origin.clone().lerp(apex, .5).setY(origin.y + 40), apex, site.clone().setY(70), site]);
       this.flights.push({ axis, vote: votes[axis], color: voteColor(axis, votes[axis]), curve, start: now + i * ORB_STAGGER, landed: false, ordinal });
     });
-    this.tag.innerHTML = `<span>送信</span>暮らしの声 #${ordinal}`;
-    this.tag.hidden = false; this.tag.classList.remove('journey-tag-out'); this.tagUntil = now + ARRIVAL_SECONDS + 1.2;
   }
 
-  /** Drops flights in progress (scrub, reset); landed lanterns stay. */
+  /** Drops flights in progress (snapshot, reset, scrub); landed lanterns stay. */
   cancel(): void {
-    this.flights.length = 0; this.scanList.length = 0; this.tag.hidden = true;
+    this.flights.length = 0; this.scanList.length = 0;
   }
 
-  /** Immediate state: one lantern per vote of guests 1..n, with no flight. */
-  setLanterns(history: ExhibitionVotes[]): void {
-    this.cancel(); this.lanternCount = 0;
-    history.forEach((votes, i) => { for (const axis of CITY_AXES) this.addLantern(i + 1, axis, votes[axis]); });
+  /** Immediate state (snapshot, reset, Undo, reduced motion): one lantern per vote of the latest guests, with no flight. */
+  setLanterns(history: readonly { ordinal: number; votes: Votes }[]): void {
+    this.cancel(); this.clearLanterns();
+    for (const { ordinal, votes } of history.slice(-LANTERN_GUESTS)) for (const axis of CITY_AXES) this.addLantern(ordinal, axis, votes[axis]);
+  }
+
+  private clearLanterns(): void {
+    for (let i = 0; i < LANTERNS; i++) this.lanterns.setMatrixAt(i, HIDDEN);
+    this.lanterns.instanceMatrix.needsUpdate = true;
   }
 
   private addLantern(ordinal: number, axis: CityAxis, vote: number): void {
-    const slot = this.lanternCount++ % LANTERNS;
+    // Guest #n always owns the same four slots, so the 65th guest replaces the 1st.
+    const slot = ((ordinal - 1) % LANTERN_GUESTS) * CITY_AXES.length + CITY_AXES.indexOf(axis);
     this.dummy.position.copy(lanternSpot(ordinal, axis)); this.dummy.scale.setScalar(vote === 0 ? .7 : 1); this.dummy.updateMatrix();
     this.lanterns.setMatrixAt(slot, this.dummy.matrix); this.lanterns.setColorAt(slot, voteColor(axis, vote));
-    this.lanterns.count = Math.min(this.lanternCount, LANTERNS);
     this.lanterns.instanceMatrix.needsUpdate = true; this.lanterns.instanceColor!.needsUpdate = true;
   }
 
@@ -141,8 +149,6 @@ export class VoteJourney {
     });
     this.scans.count = Math.min(this.scanList.length, 12);
     this.scans.instanceMatrix.needsUpdate = true; if (this.scans.instanceColor) this.scans.instanceColor.needsUpdate = true;
-    if (!this.tag.hidden && now > this.tagUntil - .6) this.tag.classList.add('journey-tag-out');
-    if (!this.tag.hidden && now > this.tagUntil) this.tag.hidden = true;
     if (!this.flights.some(f => !f.landed)) this.flights.length = 0;
   }
 }
