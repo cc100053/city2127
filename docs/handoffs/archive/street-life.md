@@ -189,7 +189,7 @@ pathfinding framework, guest controls or Meter-to-population inference is propos
   full-suite attempt reached the HTTP test but failed to bind localhost (`EPERM`); rerunning with local-server access passed.
   Early browser harness attempts used a duplicate HMR module or occluded cameras; the final check uses actual loaded modules,
   requires drawn moving visitors, and replaces those captures.
-- Browser evidence: [captures/report](../../artifacts/street-life-interactions/) — Chromium 151.0.7922.34 headless,
+- Browser evidence: [captures/report](../../../artifacts/street-life-interactions) — Chromium 151.0.7922.34 headless,
   1400×900, deviceScaleFactor 1, Metal requested; controlled actor clock, **FPS NOT MEASURED**. Existing hero day12/low,
   dusk18.5/mixed and night22/high, bench exchange, visitor outbound/chat/return and hour21/high checks; no console/page errors or
   unexpected failed resources. Journey count/location follows asynchronous landmark publication (native two, browser two/three).
@@ -257,7 +257,7 @@ carrier changes and immediate reset/Undo/reconnect. No new dependency, interior 
 - Native verification PASS: `npm test`, `npm run build`, `git diff --check`. Actual entrance matrices sampled at .25 s for
   240 s across low/mixed/high, hours 12/21, clear static geometry/paving and every existing person/robot fleet. Service matrices
   cover 0/3/6 ports, full human size, podium support, counter/body clearance, live handover and immediate/hidden-layer recovery.
-- Browser evidence: [screenshots/report](../../artifacts/building-interactions/browser.json), Chromium 151.0.7922.34,
+- Browser evidence: [screenshots/report](../../../artifacts/building-interactions/browser.json), Chromium 151.0.7922.34,
   headless 1400×900, DPR 1, Metal requested, controlled actor clock. A 180 s actual entrance cycle covered all six stages:
   maximum drawn displacement 0.307803 m per .25 s, minimum companion spacing 1.399983 m, waiting feet stopped and greetings
   drawn. Explicit scores −12/0/+12 showed 4/4/2 service actors; live handover hides all four and settles to two customers.
@@ -311,11 +311,11 @@ Not proposed: signals, pathfinding, new dependencies, interiors, population infe
   fleet at low/mixed/high and the standalone restore. Two same-direction doorway walkers on a curved bend still come within
   0.636 m (solver spacing 0.65 m on the path's straight-line metric).
 - 6 FPS (development Mac, Apple M6, headed Chromium 151, 1920×1080, DPR 1, hero, `data-fps`): standalone 56, low/mixed/high 53,
-  high night 52; see [VALIDATION](../VALIDATION.md#performance-evidence) and
-  [report](../../artifacts/street-traffic-automation/browser.json). Avenue captures behind the drop-off car (camera set through
-  the three.js devtools hook): [low](../../artifacts/street-traffic-automation/avenue-low.png),
-  [mixed](../../artifacts/street-traffic-automation/avenue-mixed.png), [high](../../artifacts/street-traffic-automation/avenue-high.png),
-  [high night](../../artifacts/street-traffic-automation/avenue-high-night.png). The built-in pane was hidden, so it was not used.
+  high night 52; see [VALIDATION](../../VALIDATION.md#performance-evidence) and
+  [report](../../../artifacts/street-traffic-automation/browser.json). Avenue captures behind the drop-off car (camera set through
+  the three.js devtools hook): [low](../../../artifacts/street-traffic-automation/avenue-low.png),
+  [mixed](../../../artifacts/street-traffic-automation/avenue-mixed.png), [high](../../../artifacts/street-traffic-automation/avenue-high.png),
+  [high night](../../../artifacts/street-traffic-automation/avenue-high-night.png). The built-in pane was hidden, so it was not used.
 - Limits: exhibition-machine FPS, Safari/Windows unverified; proposal items 2, 3, 5 not implemented; rest-pose shadows remain.
 - Next: measure on the exhibition machine; then select from items 2 (crossings), 3 (car-following), 5 (junction mouth).
 - Integration: feature `708b411` pushed; merged `--no-ff` as `cdea651` (tree identical; root `npm test`, `npm run build`, committed
@@ -348,8 +348,8 @@ Not proposed: signals, pathfinding, new dependencies, interiors, population infe
   2 h stress run (four start/hour/automation mixes) after the fixes: minimum bumper gap 2.00 m, 0 crossing conflicts, max lag 137 m.
   Root `npm test` PASS, `npm run build` PASS, `git diff --check` PASS.
 - Browser (headed Chromium 151, 1400×900, Vite DEV :5174, camera set through the three.js devtools hook, live clock):
-  [day crossing](../../artifacts/street-crossings/crossing-day.png), [night crossing](../../artifacts/street-crossings/crossing-night.png),
-  [junction crossing](../../artifacts/street-crossings/junction-crossing.png); residents wait and cross while cars queue with brake
+  [day crossing](../../../artifacts/street-crossings/crossing-day.png), [night crossing](../../../artifacts/street-crossings/crossing-night.png),
+  [junction crossing](../../../artifacts/street-crossings/junction-crossing.png); residents wait and cross while cars queue with brake
   lamps; junction mouth reads as continuous paving. Console: only the missing `/favicon.ico` 404. FPS NOT re-measured this round
   (the run was interrupted at the user's request); the simulation adds a per-frame sort of ≤ 28 cars per lane.
 - Pre-existing, not fixed (out of scope): guideway piers stand inside lane 0 about every 50 m (d 3–5, 64–67, 192–195, 237–240,
@@ -374,8 +374,8 @@ Not proposed: signals, pathfinding, new dependencies, interiors, population infe
   crossing surfaces and the bays at the new offsets. Scratch 2 h traffic stress: min gap 2.00 m, 0 crossing conflicts, max lag
   123 m, 147 crossings. Root `npm test` PASS, `npm run build` PASS, `git diff --check` PASS.
 - Browser (headed Chromium 151, 1400×900, Vite DEV :5174 started from `.claude/launch.json` `root-5174`, devtools-hook camera):
-  [pier clearance](../../artifacts/street-crossings/pier-clearance.png), [day crossing](../../artifacts/street-crossings/crossing-day.png),
-  [night crossing](../../artifacts/street-crossings/crossing-night.png), [junction](../../artifacts/street-crossings/junction-crossing.png)
+  [pier clearance](../../../artifacts/street-crossings/pier-clearance.png), [day crossing](../../../artifacts/street-crossings/crossing-day.png),
+  [night crossing](../../../artifacts/street-crossings/crossing-night.png), [junction](../../../artifacts/street-crossings/junction-crossing.png)
   (replacing round 11's captures). Console: the missing `/favicon.ico` 404, and once `TypeError: Failed to fetch` in the three.js
   loader chunk (also seen once in round 10; not traced). FPS NOT re-measured.
 - Next: user review, then merge with validation and FPS on the exhibition machine.

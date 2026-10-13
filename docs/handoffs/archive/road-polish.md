@@ -37,7 +37,7 @@ The user chose brainstorm options C + A (lite), day hero first: avenues should r
 - Verification status: PASSED (day only)
 - Date and checked commit/worktree: 2026-10-07, feat/road-polish implementation worktree
 - Commands/manual checks and results: root `npm test` PASS (incl. new inlay face-up/height check), `npm run build` PASS, `git diff --check` PASS
-- Evidence/environment: headless Chrome via playwright-cli, 1280×720, `?hour=12`; [artifacts/road-polish](../../artifacts/road-polish/)
+- Evidence/environment: headless Chrome via playwright-cli, 1280×720, `?hour=12`; [artifacts/road-polish](../../../artifacts/road-polish)
 - Integrated commit and checks: main merge; same root checks rerun on the merge
 - Changes since verification: NONE in source
 

@@ -1,13 +1,20 @@
 # 已歸檔 handoffs
 
-2026-10-03；整理 owner：Codex。返回 [現行交接](../README.md)／[文件索引](../../README.md)。
+2026-10-03 建立（Codex）；2026-10-13 加入7份已完成交接。返回 [現行交接](../README.md)／[文件索引](../../README.md)。
 
-以下43份交接已完成、已整合或被後續階段取代。保留原本日期、owner、commit、驗證限制與下一步歷史；舊分支／舊「待整合」或「下一步」不代表現行指示。Shibuya 已結束，不再開發。
+以下50份交接已完成、已整合或被後續階段取代。保留原本日期、owner、commit、驗證限制與下一步歷史；舊分支／舊「待整合」或「下一步」不代表現行指示。Shibuya 已結束，不再開發。
 
-歸檔不等於未達成的視覺目標、實機／Windows／各工作站 Blender 驗證已通過。仍待處理的台場素材、P6/S5、延後 polish 及 P5 實機驗收見現行交接；產品與驗證 authority 仍是 [SPEC](../../EXHIBITION_SPEC.md)／[VALIDATION](../../VALIDATION.md)。Meter截圖跟隨其交接歸檔，圖片內容不變。
+歸檔不等於未達成的視覺目標、實機／Windows／各工作站 Blender 驗證已通過。仍待處理的台場素材、P6/S5、延後 polish、LAN 雙站、P5 實機驗收及回顧章節見現行交接；展覽機 FPS、Fuji TV 目標細節、一票旅程光點大小等限制保留喺各自交接；產品與驗證 authority 仍是 [SPEC](../../EXHIBITION_SPEC.md)／[VALIDATION](../../VALIDATION.md)。Meter截圖跟隨其交接歸檔，圖片內容不變。
 
 | Task | 原標題 |
 | --- | --- |
+| [vote-journey](vote-journey.md) | vote-journey — 一票旅程接入 live 展示 |
+| [meter-scale-a](meter-scale-a.md) | meter-scale-a — 正式採用刻度 A（溫和開場、逐步加強） |
+| [meter-scale-journey](meter-scale-journey.md) | meter-scale-journey — Meter 刻度比較工具與「一票旅程」原型 |
+| [roof-interior-life](roof-interior-life.md) | roof-interior-life — People on roofs and inside buildings |
+| [road-polish](road-polish.md) | road-polish — 2127 shared-surface avenues |
+| [street-life](street-life.md) | street-life — Pedestrian and street-traffic polish |
+| [fuji-tv-polish](fuji-tv-polish.md) | Fuji TV polish — Dream Loop |
 | [ci-speed](ci-speed.md) | ci-speed — 縮短 CI 同整合等待時間 |
 | [ground-zfight](ground-zfight.md) | ground-zfight — 建築地底灰色同草地閃爍 |
 | [mobility-layers](mobility-layers.md) | mobility-layers — 2127 空中交通分層與行人生活 |
