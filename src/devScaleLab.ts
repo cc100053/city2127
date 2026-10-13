@@ -1,12 +1,12 @@
-// DEV-only `?scaleLab`: plays a seeded guest sequence through the real reducer into the city, toggling between the current Meter
-// scale and Scale A at the same guest, with an optional vote-journey prototype. No survey server; nothing is persisted.
+// DEV-only `?scaleLab`: plays a seeded guest sequence through the real reducer into the city, toggling between the old Meter
+// scale and the authoritative ramped Scale A at the same guest, with an optional vote-journey prototype. No survey server; nothing is persisted.
 import type * as T from 'three';
 import { CITY_AXES, type CityAxis } from '../survey/src/shared/citySurveyState.ts';
 import { exhibitionBand } from '../survey/src/shared/cityView.ts';
 import type { CityChangeManager } from './cityChangeManager.ts';
 import { METER_COLORS } from './districtMeters.ts';
 import { changeSites } from './layout.ts';
-import { labLayout, PROFILE_LABELS, replay, SCALE_A_GAIN, scaled, scaleStats, simulateVotes, type LabStep, type VoteProfile } from './scaleLab.ts';
+import { displayScore, labLayout, PROFILE_LABELS, replay, scaleStats, simulateVotes, type LabScale, type LabStep, type VoteProfile } from './scaleLab.ts';
 import { ARRIVAL_SECONDS, VoteJourney } from './voteJourney.ts';
 
 const SOCKET: Record<CityAxis, keyof typeof changeSites> = { automation: 'nw', publicSharing: 'sw', environmentalPriority: 'ne', urbanConcentration: 'se' };
@@ -18,7 +18,7 @@ export function startScaleLab(scene: T.Scene, camera: T.PerspectiveCamera, city:
   const journey = new VoteJourney(scene, camera);
   let profile = (params.get('profile') as VoteProfile) in PROFILE_LABELS ? params.get('profile') as VoteProfile : 'balanced';
   let guests = Number(params.get('guests')) || 60, seed = Number(params.get('seed')) || 1;
-  let gain = params.get('scale') === 'a' ? SCALE_A_GAIN : 1;
+  let scale: LabScale = params.get('scale') === 'old' ? 'old' : 'a';
   let steps: LabStep[] = [], step = 0, playing = false, nextAt = 0, interval = 2, journeyOn = params.has('journey');
   let pending: { step: number; at: number } | undefined;
 
@@ -27,7 +27,7 @@ export function startScaleLab(scene: T.Scene, camera: T.PerspectiveCamera, city:
   panel.innerHTML = `
     <h2 class="causal-title">Scale Lab · DEV</h2>
     <div class="lab-scale" role="group" aria-label="Meter scale">
-      <button data-gain="1">現行 ×1</button><button data-gain="${SCALE_A_GAIN}">刻度 A ×${SCALE_A_GAIN}</button>
+      <button data-scale="old">舊刻度 ×1</button><button data-scale="a">刻度 A（×0.85→2.4）</button>
     </div>
     <label>觀眾傾向 <select data-k="profile">${Object.entries(PROFILE_LABELS).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></label>
     <label>人數 <select data-k="guests">${[20, 60, 120, 200].map(n => `<option>${n}</option>`).join('')}</select></label>
@@ -52,7 +52,7 @@ export function startScaleLab(scene: T.Scene, camera: T.PerspectiveCamera, city:
 
   function apply(kind: 'city-state-snapshot' | 'city-state-updated') {
     const s = steps[step];
-    city.applyExhibitionLayout(labLayout(s.state.scores, gain), kind, clock(), s.slotSeeds);
+    city.applyExhibitionLayout(labLayout(s, scale), kind, clock(), s.slotSeeds);
     render();
   }
   /** Immediate jump: no flight, lanterns for every guest so far. */
@@ -75,13 +75,13 @@ export function startScaleLab(scene: T.Scene, camera: T.PerspectiveCamera, city:
   function render() {
     scrub.value = String(step);
     $('[data-act=play]').textContent = playing ? '❚❚ 暫停' : '▶ 播放';
-    panel.querySelectorAll<HTMLButtonElement>('[data-gain]').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.gain) === gain)));
+    panel.querySelectorAll<HTMLButtonElement>('[data-scale]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.scale === scale)));
     $('.lab-ordinal').textContent = step ? `暮らしの声 #${step} / ${guests}` : `開館（0 / ${guests}）`;
-    const scores = steps[step].state.scores;
-    $('.lab-readout').innerHTML = `<tr><th></th><th>M</th><th>現行</th><th>A</th></tr>` + CITY_AXES.map(axis => {
-      const now = exhibitionBand(scores[axis]), a = exhibitionBand(scaled(scores[axis], SCALE_A_GAIN));
+    const current = steps[step], scores = current.state.scores;
+    $('.lab-readout').innerHTML = `<tr><th></th><th>M</th><th>舊</th><th>A</th></tr>` + CITY_AXES.map(axis => {
+      const now = exhibitionBand(scores[axis]), a = exhibitionBand(displayScore(current, axis, 'a'));
       return `<tr><th style="color:${METER_COLORS[axis]}">${AXIS_NAME[axis]}<small>${changeSites[SOCKET[axis]].place}</small></th><td>${scores[axis].toFixed(1)}</td>`
-        + `<td class="${gain === 1 ? 'lab-on' : ''}">${BAND_NAME[now]}</td><td class="${gain !== 1 ? 'lab-on' : ''}">${BAND_NAME[a]}</td></tr>`;
+        + `<td class="${scale === 'old' ? 'lab-on' : ''}">${BAND_NAME[now]}</td><td class="${scale === 'a' ? 'lab-on' : ''}">${BAND_NAME[a]}</td></tr>`;
     }).join('');
     // The curves: each lane is −12..12 in the active scale; dashed lines are the ±3 band thresholds.
     const w = canvas.width, lane = canvas.height / 4;
@@ -92,25 +92,25 @@ export function startScaleLab(scene: T.Scene, camera: T.PerspectiveCamera, city:
       ctx.setLineDash([3, 3]); ctx.strokeStyle = '#35413955'; ctx.lineWidth = 1;
       for (const t of [3, -3]) { ctx.beginPath(); ctx.moveTo(0, y(t)); ctx.lineTo(w, y(t)); ctx.stroke(); }
       ctx.setLineDash([]); ctx.strokeStyle = METER_COLORS[axis]; ctx.lineWidth = 1.6; ctx.beginPath();
-      steps.forEach((s, k) => { const m = scaled(s.state.scores[axis], gain); if (k) ctx.lineTo(x(k), y(m)); else ctx.moveTo(x(k), y(m)); });
+      steps.forEach((s, k) => { const m = displayScore(s, axis, scale); if (k) ctx.lineTo(x(k), y(m)); else ctx.moveTo(x(k), y(m)); });
       ctx.stroke();
     });
     ctx.strokeStyle = '#354139'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(step / guests * w, 0); ctx.lineTo(step / guests * w, canvas.height); ctx.stroke();
   }
   function renderStats() {
-    const current = scaleStats(steps, 1), wide = scaleStats(steps, SCALE_A_GAIN);
+    const current = scaleStats(steps, 'old'), wide = scaleStats(steps, 'a');
     const cells = (s: ReturnType<typeof scaleStats>, axis: CityAxis) => `<td>${pct(s.bands[axis].low)}</td><td>${pct(s.bands[axis].mixed)}</td><td>${pct(s.bands[axis].high)}</td>`;
-    $('.lab-stats').innerHTML = `<caption>成段序列（#11 之後）形態佔比</caption><tr><th></th><th colspan="3">現行 L/M/H</th><th colspan="3">A L/M/H</th></tr>`
+    $('.lab-stats').innerHTML = `<caption>成段序列（#11 之後）形態佔比</caption><tr><th></th><th colspan="3">舊 L/M/H</th><th colspan="3">A L/M/H</th></tr>`
       + CITY_AXES.map(axis => `<tr><th>${AXIS_NAME[axis]}</th>${cells(current, axis)}${cells(wide, axis)}</tr>`).join('')
       + `<tr><th>切換</th><td colspan="3">${current.flips} 次</td><td colspan="3">${wide.flips} 次</td></tr>`
       + `<tr><th>端口級數</th><td colspan="3">${current.portValues} / 7</td><td colspan="3">${wide.portValues} / 7</td></tr>`;
   }
-  const setGain = (next: number) => { gain = next; apply('city-state-snapshot'); };
+  const setScale = (next: LabScale) => { scale = next; apply('city-state-snapshot'); };
 
   panel.addEventListener('click', event => {
     const target = (event.target as HTMLElement).closest('button');
     if (!target) return;
-    if (target.dataset.gain) setGain(Number(target.dataset.gain));
+    if (target.dataset.scale) setScale(target.dataset.scale as LabScale);
     if (target.dataset.act === 'play') { playing = !playing; nextAt = clock(); render(); }
     if (target.dataset.act === 'next') { playing = false; if (pending) jump(pending.step); else advance(); }
     if (target.dataset.act === 'back') { playing = false; jump(pending ? step : step - 1); }
@@ -126,14 +126,14 @@ export function startScaleLab(scene: T.Scene, camera: T.PerspectiveCamera, city:
   scrub.addEventListener('input', () => { playing = false; jump(Number(scrub.value)); });
   addEventListener('keydown', event => {
     if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) return;
-    if (event.key === 's' || event.key === 'S') setGain(gain === 1 ? SCALE_A_GAIN : 1);
+    if (event.key === 's' || event.key === 'S') setScale(scale === 'a' ? 'old' : 'a');
     else if (event.key === ' ') { event.preventDefault(); playing = !playing; nextAt = clock(); render(); }
     else if (event.key === 'ArrowRight') { playing = false; if (pending) jump(pending.step); else advance(); }
     else if (event.key === 'ArrowLeft') { playing = false; jump(step - 1); }
   });
 
   rebuild(); renderStats();
-  Object.assign(window, { scaleLab: { get step() { return step; }, get gain() { return gain; }, jump, setGain, journey } });
+  Object.assign(window, { scaleLab: { get step() { return step; }, get scale() { return scale; }, jump, setScale, journey } });
 
   return (now: number, darkness: number) => {
     if (pending && now >= pending.at) { step = pending.step; pending = undefined; apply('city-state-updated'); }

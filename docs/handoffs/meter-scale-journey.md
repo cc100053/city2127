@@ -1,7 +1,7 @@
 # meter-scale-journey — Meter 刻度比較工具與「一票旅程」原型
 
 - Owner: cc100053（實作：Claude Code）
-- Status: IN_PROGRESS — DEV 原型完成，等待 owner 視覺評審；未改產品規格
+- Status: IN_PROGRESS — DEV 原型已合併 main（`3c78210`）；owner 2026-10-13 決定採用刻度 A，正式實作見 [meter-scale-a](meter-scale-a.md)；旅程視覺及回顧章節待討論
 - Branch: `feat/meter-scale-journey`
 - Base commit: `a88808221d79e08de784d3b02669bff274cbddf2`
 - Last verified commit: `01c4fa53867800256f62be310ece513b3e3f2814`（驗證時係未提交 worktree，內容同呢個 commit 一樣；之後只改咗呢份 handoff）

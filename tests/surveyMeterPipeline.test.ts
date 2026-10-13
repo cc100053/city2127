@@ -120,7 +120,8 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
     applyEvent({ type: 'city-state-snapshot', view: currentView(ctx) }, 7000);
     for (let i = 0; i < 25; i++) {
       const session = ok(createProposalSession(ctx).response);
-      const votes = { automation: i === 24 ? -1 : i === 23 ? 0 : 1, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 } as const;
+      // One +1 in three keeps automation high but below the Scale A cap, so the opposing vote still moves real carriers.
+      const votes = { automation: i === 24 ? -1 : i === 23 ? 0 : i % 3 === 0 ? 1 : 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 } as const;
       const outcome = submitProposal(ctx, { submissionId: `resident-cause-${i}`, guestSessionId: session.session.id,
         expectedRevision: session.state.revision, answers: answersForVotes(METER_CONTRACTS, votes) });
       const saved = ok(outcome.response), causal = applyEvent(outcome.event, 7004 + i * 4)!;

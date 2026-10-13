@@ -131,7 +131,31 @@ export function exhibitionBand(score: number): Band {
   return score <= -3 ? 'low' : score >= 3 ? 'high' : 'mixed';
 }
 
-/** Server-authoritative layout mapping for the four mature 2127 sites. */
+/**
+ * Scale A (2026-10-13): real runs keep Meters within about ±5, so the layout reads a stretched display score. The stretch ramps
+ * from ×0.85 for the first guest (a mild opening, no instant extreme, yet a first ±1 still clears the .3/.7 pairing shares) to ×2.4 from guest #12 on, where bands switch at about ±1.25.
+ */
+export const SCALE_START_GAIN = 0.85, SCALE_FULL_GAIN = 2.4, SCALE_RAMP_GUESTS = 12;
+export function exhibitionScaleGain(guestCount: number): number {
+  return SCALE_START_GAIN + (SCALE_FULL_GAIN - SCALE_START_GAIN) * Math.min(1, Math.max(0, guestCount - 1) / (SCALE_RAMP_GUESTS - 1));
+}
+
+/** Meter scores after `guestCount` guests → the display scores the layout reads (clamped to ±12). */
+export function exhibitionDisplayScores(scores: CityScores, guestCount: number): CityScores {
+  const gain = exhibitionScaleGain(guestCount), display = { ...scores };
+  for (const axis of Object.keys(scores) as (keyof CityScores)[]) {
+    exhibitionBand(scores[axis]);
+    display[axis] = Math.max(-12, Math.min(12, scores[axis] * gain));
+  }
+  return display;
+}
+
+/** Server-authoritative layout of a run state: Scale A display scores through the site mapping below. */
+export function exhibitionStateLayout(scores: CityScores, guestCount: number): ExhibitionLayout {
+  return deriveExhibitionLayout(exhibitionDisplayScores(scores, guestCount));
+}
+
+/** Display score → layout for the four mature 2127 sites; dev `?meters` and carrier tests use it directly. */
 export function deriveExhibitionLayout(scores: CityScores): ExhibitionLayout {
   const t = (score: number) => {
     exhibitionBand(score);

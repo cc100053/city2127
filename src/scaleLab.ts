@@ -1,10 +1,10 @@
-// DEV Scale Lab logic: replays a seeded guest sequence through the server reducer and compares the current Meter scale with a gained one.
+// DEV Scale Lab logic: replays a seeded guest sequence through the server reducer and compares the pre-2026-10-13 Meter scale with Scale A.
 import { CITY_AXES, initialExhibitionState, type CityAxis, type CityScores, type ExhibitionState, type ExhibitionVotes, type Vote } from '../survey/src/shared/citySurveyState.ts';
-import { deriveExhibitionLayout, exhibitionBand, type Band, type ExhibitionLayout } from '../survey/src/shared/cityView.ts';
+import { deriveExhibitionLayout, exhibitionBand, exhibitionDisplayScores, type Band, type ExhibitionLayout } from '../survey/src/shared/cityView.ts';
 import { applyProposalVotes, foldSlotSeeds } from '../survey/src/survey/scoreEngine.ts';
 
-/** Scale A: ×2.4 spends the ±12 layout range over the ±5 that real runs reach, so bands switch at about ±1.25. */
-export const SCALE_A_GAIN = 2.4;
+/** `old`: the raw Meter score as the layout read it before Scale A; `a`: the authoritative ramped Scale A display score. */
+export type LabScale = 'old' | 'a';
 
 export type VoteProfile = 'balanced' | 'leaning' | 'strong' | 'groups';
 export const PROFILE_LABELS: Record<VoteProfile, string> = { balanced: '平均（三選項各⅓）', leaning: '有傾向（50% 一邊）', strong: '強傾向（60% 一邊）', groups: '團體（每 5 人同答）' };
@@ -43,25 +43,26 @@ export function replay(votes: ExhibitionVotes[]): LabStep[] {
   return steps;
 }
 
-export const scaled = (score: number, gain: number) => Math.max(-12, Math.min(12, score * gain));
-export const scaledScores = (scores: CityScores, gain: number) =>
-  Object.fromEntries(CITY_AXES.map(axis => [axis, scaled(scores[axis], gain)])) as CityScores;
-/** Gain 1 is exactly the server layout; other gains feed the same mapping a stretched score. */
-export const labLayout = (scores: CityScores, gain: number): ExhibitionLayout => deriveExhibitionLayout(scaledScores(scores, gain));
+/** The score the layout reads for one axis at one step. */
+export const displayScore = (step: LabStep, axis: CityAxis, scale: LabScale) =>
+  scale === 'old' ? step.state.scores[axis] : exhibitionDisplayScores(step.state.scores, step.state.guestCount)[axis];
+/** `a` is exactly the server layout; `old` feeds the raw scores to the same site mapping. */
+export const labLayout = (step: LabStep, scale: LabScale): ExhibitionLayout =>
+  deriveExhibitionLayout(scale === 'old' ? step.state.scores : exhibitionDisplayScores(step.state.scores, step.state.guestCount));
 
 export type ScaleStats = { bands: Record<CityAxis, Record<Band, number>>; flips: number; portValues: number };
 
 /** Band share per axis (after the first ten guests, as in the planning simulation), total band flips and distinct port counts. */
-export function scaleStats(steps: LabStep[], gain: number): ScaleStats {
+export function scaleStats(steps: LabStep[], scale: LabScale): ScaleStats {
   const bands = Object.fromEntries(CITY_AXES.map(axis => [axis, { low: 0, mixed: 0, high: 0 }])) as ScaleStats['bands'];
   const ports = new Set<number>();
   let flips = 0, counted = 0;
   steps.forEach((step, i) => {
-    ports.add(labLayout(step.state.scores, gain).automatedPorts);
+    ports.add(labLayout(step, scale).automatedPorts);
     if (i === 0) return;
     for (const axis of CITY_AXES) {
-      const band = exhibitionBand(scaled(step.state.scores[axis], gain));
-      if (band !== exhibitionBand(scaled(steps[i - 1].state.scores[axis], gain))) flips++;
+      const band = exhibitionBand(displayScore(step, axis, scale));
+      if (band !== exhibitionBand(displayScore(steps[i - 1], axis, scale))) flips++;
       if (i > 10) bands[axis][band]++;
     }
     if (i > 10) counted++;

@@ -47,9 +47,11 @@ Root 用固定360px右上卡片（2026-10-04由左移右，避免遮住focal sit
 
 每軸每份提案只有一票 `v ∈ {-1,0,+1}`。對第 n 份提案：`Sₙ=Sₙ₋₁+v`、`Rₙ=.75Rₙ₋₁+.25v`、`Mₙ=clamp(6(Sₙ/n+Rₙ),-12,12)`。新 run 的 S／R／M 全部零；中性票亦會更新近期記憶，不能略過。只在 server 計算；replay 與 live 使用同一 reducer：[scoreEngine](../survey/src/survey/scoreEngine.ts)。
 
-`low: M≤−3`，`mixed: −3<M<3`，`high: M≥3`；`t=(M+12)/24`。Server 的 [deriveExhibitionLayout](../survey/src/shared/cityView.ts) 是唯一權威映射：
+**刻度 A（2026-10-13 user決定，取代舊刻度）**：實際 run 嘅 M 多數只喺 ±5 之內，所以 layout 讀「展示分數」`D=clamp(M×g(n),-12,12)`，n 係目前累積觀眾數。`g(n)=0.85+1.55×min(1,(n−1)/11)`：第一位觀眾 ×0.85（溫和開場，第一票 ±1 只到 D=±6.375，唔會即刻去到極端，但仍然觸發 P10 配對設施），之後逐位加強，第 12 位起固定 ×2.4（形態門檻相當於 M≈±1.25）。計分 reducer 不變；提案紀錄嘅 before/after layout 讀取時由分數同觀眾數重新計算，所以舊歷史一齊轉用新刻度，冇資料遷移。新舊比較見 DEV `?scaleLab` 及 [handoff](handoffs/meter-scale-a.md)。
 
-| 參數 | 公式 | M=0 |
+`low: D≤−3`，`mixed: −3<D<3`，`high: D≥3`；`t=(D+12)/24`。Server 的 [exhibitionStateLayout](../survey/src/shared/cityView.ts)（D 經 `deriveExhibitionLayout`）是唯一權威映射：
+
+| 參數 | 公式 | D=0 |
 | --- | --- | --- |
 | automatedPorts | round(6t) | 3 |
 | sharedSeats | round(8t) | 4 |

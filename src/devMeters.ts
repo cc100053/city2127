@@ -1,4 +1,4 @@
-// DEV-only review helper for `?meters=`: reuses the server's authoritative layout mapping so captures match a real run.
+// DEV-only review helper for `?meters=`: values are Scale A display scores fed to the server site mapping (deriveExhibitionLayout), so captures match a real run.
 import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
 import type { ExhibitionLayout } from './surveyView.ts';
 
