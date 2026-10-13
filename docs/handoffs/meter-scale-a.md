@@ -1,7 +1,7 @@
 # meter-scale-a — 正式採用刻度 A（溫和開場、逐步加強）
 
 - Owner: cc100053（實作：Claude Code）
-- Status: IN_PROGRESS — 實作及本機驗證完成，等待合併
+- Status: DONE — 已合併 main `8340f46`，main CI PASS
 - Branch: `feat/meter-scale-a`
 - Base commit: `3c78210`（main，已包含 [刻度比較原型](meter-scale-journey.md)）
 - Last verified commit: 見 Git log；驗證時係未提交 worktree，內容即本分支第一個 commit
@@ -42,7 +42,7 @@
 - Date and checked commit/worktree: 2026-10-13，`feat/meter-scale-a` 基於 `3c78210` 加上本分支改動
 - Commands/manual checks and results: `survey/` `npm test`（exit 0，包括 81 種答案組合、HTTP/WebSocket、Undo、A/B）、`npm run build` PASS；root `npm test`（包括真實 server 嘅 Meter pipeline P4／P10／P11）、`npm run build` PASS；`git diff --check` PASS。
 - Evidence/environment: 開發 Mac headless Chrome（playwright-core，1280×720，DPR1，`?scaleLab&reviewTime=100&hour=16`，平均傾向、seed 1）：[#1 舊](../../artifacts/meter-scale-a/guest1-old.jpg)／[A](../../artifacts/meter-scale-a/guest1-a.jpg)、[#3 舊](../../artifacts/meter-scale-a/guest3-old.jpg)／[A](../../artifacts/meter-scale-a/guest3-a.jpg)、[#40 舊](../../artifacts/meter-scale-a/guest40-old.jpg)／[A](../../artifacts/meter-scale-a/guest40-a.jpg)。60 位觀眾：形態切換 42 對 98 次，端口級數 4/7 對 7/7。唯一 console error 係已知 favicon 404。
-- Integrated commit and checks: NOT INTEGRATED
+- Integrated commit and checks: main `8340f46`；merge result root／survey `npm test`、`npm run build`、`git diff --check` PASS；[main CI 38328541533](https://github.com/cc100053/city2127/actions/runs/38328541533) success
 - Changes since verification: 只有本 handoff
 
 ## Known issues and blockers
@@ -57,4 +57,4 @@
 
 ## Next expected step
 
-合併入 main 並確認 main CI。之後可以處理一票旅程（視覺方向／是否接入 live）同回顧章節（待討論）。
+已完成合併。下一步：一票旅程（視覺方向／是否接入 live）同回顧章節（待討論）。
