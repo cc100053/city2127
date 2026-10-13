@@ -49,7 +49,7 @@
   - `survey/` `npm test` PASS、`npm run build` PASS（因為改咗 `scoreEngine.ts`／`runStore.ts`）。
   - Production `dist/assets` 冇 `devScaleLab` chunk（改用 `import.meta.env.DEV&&scaleLab` 守住 import 之後）。
   - 開發 Mac 用 headless Chrome（playwright-core，1280×720，DPR1），`?scaleLab&reviewTime=100`，`hour=16`／`21`：旅程飛行 0.9 秒／1.8 秒、掃描 2.8 秒、#40 現行對 A、120 位觀眾夜景光點。唯一 console error 係已知 favicon 404。
-- Evidence/environment: [飛行](../../artifacts/meter-scale-journey/journey-1-flight.jpg)、[接近](../../artifacts/meter-scale-journey/journey-2-approach.jpg)、[掃描](../../artifacts/meter-scale-journey/journey-3-scan.jpg)、[#40 現行](../../artifacts/meter-scale-journey/scale-current-40.jpg)、[#40 刻度 A](../../artifacts/meter-scale-journey/scale-a-40.jpg)、[夜景光點](../../artifacts/meter-scale-journey/lanterns-night-120.jpg)。平均傾向、seed 1、60 位觀眾：形態切換次數現行 42 對 A 94，端口級數 4/7 對 7/7（面板統計）。
+- Evidence/environment: [飛行](../../../artifacts/meter-scale-journey/journey-1-flight.jpg)、[接近](../../../artifacts/meter-scale-journey/journey-2-approach.jpg)、[掃描](../../../artifacts/meter-scale-journey/journey-3-scan.jpg)、[#40 現行](../../../artifacts/meter-scale-journey/scale-current-40.jpg)、[#40 刻度 A](../../../artifacts/meter-scale-journey/scale-a-40.jpg)、[夜景光點](../../../artifacts/meter-scale-journey/lanterns-night-120.jpg)。平均傾向、seed 1、60 位觀眾：形態切換次數現行 42 對 A 94，端口級數 4/7 對 7/7（面板統計）。
 - Integrated commit and checks: NOT INTEGRATED（原型等待評審，未合併 main）
 - Changes since verification: 只有本 handoff 及文件更新
 

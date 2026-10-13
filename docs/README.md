@@ -32,7 +32,7 @@
 
 ## 任務 handoffs
 
-2026-10-03：交接目錄已分開 [現行任務](handoffs/README.md) 與 [已完成／已取代的歸檔](handoffs/archive/README.md)。現行保留台場素材、P6/S5、延後視覺polish及居民P5實機驗收；其餘39份交接保留原日期／commit／證據，舊下一步不重新建立任務。新任務用 [TEMPLATE](handoffs/TEMPLATE.md)。
+2026-10-13：交接目錄分開 [現行任務](handoffs/README.md) 與 [已完成／已取代的歸檔](handoffs/archive/README.md)。現行保留台場素材、P6/S5、延後視覺polish、LAN 雙站、居民P5實機驗收及 [回顧章節](handoffs/day-replay.md)；其餘50份交接保留原日期／commit／證據，舊下一步不重新建立任務。新任務用 [TEMPLATE](handoffs/TEMPLATE.md)。
 
 ## Repository skill
 

@@ -42,7 +42,7 @@
 - Date and checked commit/worktree: 2026-10-13，`feat/vote-journey` 基於 `8566c10` 加本分支改動
 - Commands/manual checks and results: root `npm test`（包括新嘅 `voteJourney.test.ts`、`scaleLab.test.ts` 同真實 Meter pipeline）PASS；`npm run build` PASS，production bundle 冇 lab chunk；`survey/` `npm test`、`npm run build` PASS；`git diff --check` PASS。
 - Live 檢查：`survey` `npm run dev:auto`（scratch SQLite，port 8788）加 Vite 5173，headless Chrome 1280×720 DPR1，`?survey=ws://127.0.0.1:8788/ws&hour=16`；經 HTTP 提交一份真實提案（autonomous／private-pods／canopy-cooling／mixed-functions）。0.9 秒：光點由右下飛出，結果卡顯示「暮らしの声 #1」；2.0 秒：接近 site；3.6 秒：pulse 光柱及掃描環出現，城市開始過渡，結果句「…自律サービスの端口が増えました。」（carrier 證據正確）；之後 reload 去 `hour=21`，snapshot 重建咗光點。唯一 console error 係已知 favicon 404。
-- Evidence/environment: [飛行](../../artifacts/vote-journey/live-1-flight.jpg)、[著陸](../../artifacts/vote-journey/live-2-landing.jpg)、[過渡](../../artifacts/vote-journey/live-3-transition.jpg)、[理由](../../artifacts/vote-journey/live-4-reason.jpg)、[reload 夜景](../../artifacts/vote-journey/reload-night-lanterns.jpg)。
+- Evidence/environment: [飛行](../../../artifacts/vote-journey/live-1-flight.jpg)、[著陸](../../../artifacts/vote-journey/live-2-landing.jpg)、[過渡](../../../artifacts/vote-journey/live-3-transition.jpg)、[理由](../../../artifacts/vote-journey/live-4-reason.jpg)、[reload 夜景](../../../artifacts/vote-journey/reload-night-lanterns.jpg)。
 - Integrated commit and checks: main `e83deaf`；merge result root／survey test、root build、`git diff --check` PASS；[main CI 38332403031](https://github.com/cc100053/city2127/actions/runs/38332403031) success
 - Changes since verification: 只有本 handoff
 

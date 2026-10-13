@@ -41,7 +41,7 @@
 - Verification status: PASSED（軟件及 DEV 截圖）
 - Date and checked commit/worktree: 2026-10-13，`feat/meter-scale-a` 基於 `3c78210` 加上本分支改動
 - Commands/manual checks and results: `survey/` `npm test`（exit 0，包括 81 種答案組合、HTTP/WebSocket、Undo、A/B）、`npm run build` PASS；root `npm test`（包括真實 server 嘅 Meter pipeline P4／P10／P11）、`npm run build` PASS；`git diff --check` PASS。
-- Evidence/environment: 開發 Mac headless Chrome（playwright-core，1280×720，DPR1，`?scaleLab&reviewTime=100&hour=16`，平均傾向、seed 1）：[#1 舊](../../artifacts/meter-scale-a/guest1-old.jpg)／[A](../../artifacts/meter-scale-a/guest1-a.jpg)、[#3 舊](../../artifacts/meter-scale-a/guest3-old.jpg)／[A](../../artifacts/meter-scale-a/guest3-a.jpg)、[#40 舊](../../artifacts/meter-scale-a/guest40-old.jpg)／[A](../../artifacts/meter-scale-a/guest40-a.jpg)。60 位觀眾：形態切換 42 對 98 次，端口級數 4/7 對 7/7。唯一 console error 係已知 favicon 404。
+- Evidence/environment: 開發 Mac headless Chrome（playwright-core，1280×720，DPR1，`?scaleLab&reviewTime=100&hour=16`，平均傾向、seed 1）：[#1 舊](../../../artifacts/meter-scale-a/guest1-old.jpg)／[A](../../../artifacts/meter-scale-a/guest1-a.jpg)、[#3 舊](../../../artifacts/meter-scale-a/guest3-old.jpg)／[A](../../../artifacts/meter-scale-a/guest3-a.jpg)、[#40 舊](../../../artifacts/meter-scale-a/guest40-old.jpg)／[A](../../../artifacts/meter-scale-a/guest40-a.jpg)。60 位觀眾：形態切換 42 對 98 次，端口級數 4/7 對 7/7。唯一 console error 係已知 favicon 404。
 - Integrated commit and checks: main `8340f46`；merge result root／survey `npm test`、`npm run build`、`git diff --check` PASS；[main CI 38328541533](https://github.com/cc100053/city2127/actions/runs/38328541533) success
 - Changes since verification: 只有本 handoff
 
