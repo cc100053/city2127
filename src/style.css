@@ -24,9 +24,8 @@ body[data-time=night] footer,body[data-time=night] .intro{text-shadow:0 0 10px r
 .resident-card-title{font-size:21px;line-height:1.5;margin-bottom:10px!important}
 .resident-card-copy{font-size:17px;line-height:1.85}
 .resident-place{font-size:13px;color:#46676e;margin-top:14px!important}
-/* DEV Scale Lab and vote-journey prototype (`?scaleLab`). */
+/* DEV Scale Lab (`?scaleLab`). */
 .scale-lab{left:20px;right:auto;top:20px;width:330px;max-height:calc(100vh - 40px);z-index:20;display:grid;gap:6px}.scale-lab label{display:flex;justify-content:space-between;align-items:center;gap:8px}.scale-lab select,.scale-lab input[type=number]{width:170px;font:inherit}.scale-lab .lab-check{justify-content:flex-start}
-.lab-scale,.lab-transport{display:flex;gap:4px}.lab-scale button,.lab-transport button{flex:1;font:inherit;padding:5px;border:1px solid #35413930;border-radius:5px;background:#fff9;cursor:pointer}.lab-scale button[aria-pressed=true]{background:#354139;color:#fff}
+.lab-transport{display:flex;gap:4px}.lab-transport button{flex:1;font:inherit;padding:5px;border:1px solid #35413930;border-radius:5px;background:#fff9;cursor:pointer}
 .scale-lab input[type=range]{width:100%}.lab-ordinal{font-weight:600;margin:0}.scale-lab canvas{position:static;width:100%;height:auto;border-radius:4px}
 .scale-lab table{border-collapse:collapse;font-size:11px;width:100%}.scale-lab td,.scale-lab th{padding:2px 3px;text-align:right;font-weight:400}.scale-lab th small{display:block;font-size:8px;opacity:.6}.scale-lab tr>th:first-child{text-align:left;font-weight:600}.lab-readout .lab-on{font-weight:700;background:#35413914}.lab-stats caption{font-size:9px;opacity:.6;text-align:left}
-.journey-tag{position:fixed;right:48px;bottom:56px;z-index:15;padding:10px 16px;border-radius:8px;background:#0b1424cc;color:#eaf3ff;font-size:18px;letter-spacing:1px;box-shadow:0 0 24px #3fa9ff55;transition:opacity .6s}.journey-tag span{display:block;font-size:10px;letter-spacing:3px;opacity:.7}.journey-tag-out{opacity:0}

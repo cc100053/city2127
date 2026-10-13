@@ -22,6 +22,7 @@ import { bayWater } from './bayWater';
 import { scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
 import { createCityChangeManager } from './createCityChangeManager';
+import { ARRIVAL_SECONDS, VoteJourney } from './voteJourney';
 import './style.css';
 
 try {
@@ -122,7 +123,7 @@ try {
   const updateOverlay=overlay();
   // DEV-only `?meters=nw:high,ne:low` (band or score −12..12 per site, unlisted = 0) applies a v2 layout without the survey server, for review captures; `window.cityMeters('ne:high')` then animates a live change.
   const metersParam=import.meta.env.DEV?params.get('meters'):null;
-  // DEV-only `?scaleLab` (`&profile=leaning&guests=120&seed=3&scale=a&journey`): a seeded guest sequence compares Meter scales and the vote-journey prototype; see docs/handoffs/meter-scale-journey.md.
+  // DEV-only `?scaleLab` (`&profile=leaning&guests=120&seed=3&journey`): a seeded guest sequence through Scale A and the vote journey, without the survey server.
   const scaleLab=import.meta.env.DEV&&!surveyUrl&&params.has('scaleLab');
   let devFrame:((now:number,darkness:number)=>void)|undefined;
   const cityChanges=surveyUrl||metersParam!==null||scaleLab?createCityChangeManager(scene):null;
@@ -139,10 +140,19 @@ try {
     const to=params.get('metersTo');
     if(to!==null)cityChanges!.applyExhibitionLayout(devLayout(to),'city-state-updated',now-Number(params.get('metersAge')??1));
   });
+  const journey=surveyUrl?new VoteJourney(scene,camera):null;
   if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view)=>{
     if(isExhibitionView(view)){
       // Cancel any legacy score blend while preserving its current rendered atmosphere.
       world.blendTo(world.state,now);
+      const latest=view.latestProposal;
+      // Vote journey: a live result's four votes fly to the sites first; the city transition and pulses start as they land,
+      // while the carrier evidence for the resident card is computed now. Snapshots, resets, Undo and reduced motion stay immediate.
+      if(kind==='city-state-updated'&&latest&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
+        journey!.play(latest.votes,latest.ordinal,now);
+        return cityChanges!.applyExhibitionLayout(view.layout,kind,now+ARRIVAL_SECONDS,view.slotSeeds);
+      }
+      journey!.setLanterns(view.recentProposals);
       return cityChanges!.applyExhibitionLayout(view.layout,kind,now,view.slotSeeds);
     }
     world.blendTo(scoresToWorldState(view.scores),now);
@@ -179,7 +189,7 @@ try {
     ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientLate,glow*.6).lerp(ambientNight,dark);
     scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure*(1+.16*day);
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
-    controls.update();panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);cityChanges?.update(now,dark);devFrame?.(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
+    controls.update();panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();composer.render();
     if(++frames===120){renderer.domElement.dataset.hour=hour.toFixed(2);renderer.domElement.dataset.displayMode=displayMode;renderer.domElement.dataset.time=now.toFixed(2);renderer.domElement.dataset.fps=(120000/(performance.now()-measureStart)).toFixed(1);renderer.domElement.dataset.drawCalls=String(renderer.info.render.calls);renderer.domElement.dataset.geometries=String(renderer.info.memory.geometries);if(cityChanges)renderer.domElement.dataset.siteAssets=JSON.stringify(cityChanges.getDiagnostics());frames=0;measureStart=performance.now();}
   });
   window.addEventListener('resize',()=>{
