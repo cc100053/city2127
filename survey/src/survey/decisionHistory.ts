@@ -1,5 +1,5 @@
 import { zeroScores, type CitySurveyState, type ExhibitionState } from '../shared/citySurveyState.ts';
-import { deriveCityLayout, deriveExhibitionLayout, layoutChanges, type Decision, type ExhibitionCityView, type LegacyCityView, type ProposalRecord } from '../shared/cityView.ts';
+import { deriveCityLayout, exhibitionStateLayout, layoutChanges, type Decision, type ExhibitionCityView, type LegacyCityView, type ProposalRecord } from '../shared/cityView.ts';
 import type { AnswerEvent } from '../shared/protocol.ts';
 import type { QuestionSet } from '../shared/question.ts';
 import { applyEffects, scoreChange } from './scoreEngine.ts';
@@ -32,7 +32,7 @@ export function buildExhibitionCityView(state: ExhibitionState, proposals: Propo
   return {
     version: 2, runId: state.runId, revision: state.revision, guestCount: state.guestCount, algorithmVersion: 2,
     voteSums: state.voteSums, recentVotes: state.recentVotes, scores: state.scores, slotSeeds,
-    layout: deriveExhibitionLayout(state.scores), recentProposals,
+    layout: exhibitionStateLayout(state.scores, state.guestCount), recentProposals,
     latestProposal: recentProposals.at(-1),
   };
 }

@@ -1,7 +1,7 @@
 import type { DatabaseSync, SQLOutputValue } from 'node:sqlite';
 import { CITY_AXES, zeroScores, initialCitySurveyState, initialExhibitionState, isCityAxis, type CitySurveyState, type ExhibitionState, type ExhibitionVotes } from '../shared/citySurveyState.ts';
 import type { AnswerEvent, RunSummary } from '../shared/protocol.ts';
-import { deriveExhibitionLayout, exhibitionLayoutChanges, type ProposalAnswerRecord, type ProposalRecord } from '../shared/cityView.ts';
+import { exhibitionLayoutChanges, exhibitionStateLayout, type ProposalAnswerRecord, type ProposalRecord } from '../shared/cityView.ts';
 import { applyEffects, applyProposalVotes, foldSlotSeeds, validateExhibitionState } from '../survey/scoreEngine.ts';
 import { transaction } from './database.ts';
 
@@ -225,7 +225,7 @@ export function toProposalRecord(row: Row): ProposalRecord {
     throw new CorruptStateError(`proposal ${str(row, 'id')} has inconsistent revisions`);
   const expected = applyProposalVotes(before, votes, submittedAt);
   if (JSON.stringify(expected) !== JSON.stringify(after)) throw new CorruptStateError(`proposal ${str(row, 'id')} does not match its stored vote result`);
-  const beforeLayout = deriveExhibitionLayout(before.scores), afterLayout = deriveExhibitionLayout(after.scores);
+  const beforeLayout = exhibitionStateLayout(before.scores, before.guestCount), afterLayout = exhibitionStateLayout(after.scores, after.guestCount);
   return {
     id: str(row, 'id'), runId, guestSessionId: str(row, 'guest_session_id'), ordinal: after.guestCount,
     ...(row.station_id ? { stationId: str(row, 'station_id') as 'A' | 'B' } : {}),

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { CITY_AXES, initialExhibitionState, zeroScores, type CityAxis, type ExhibitionState, type ExhibitionVotes, type Vote } from '../src/shared/citySurveyState.ts';
-import { deriveExhibitionLayout, exhibitionBand, type ExhibitionSocketId } from '../src/shared/cityView.ts';
+import { deriveExhibitionLayout, exhibitionBand, exhibitionDisplayScores, exhibitionScaleGain, exhibitionStateLayout, type ExhibitionSocketId } from '../src/shared/cityView.ts';
 import { loadQuestionSetFile, QuestionSetError, validateExhibitionQuestionSet } from '../src/survey/questionLoader.ts';
 import { applyProposalVotes, validateExhibitionState } from '../src/survey/scoreEngine.ts';
 
@@ -86,6 +86,22 @@ assert.deepEqual({
 }, { automatedPorts: 3, sharedSeats: 4, treeCount: 8, plantedFraction: 0.5, coolingFins: 3, functionModules: 4 });
 assert.throws(() => exhibitionBand(Number.POSITIVE_INFINITY), RangeError);
 assert.throws(() => deriveExhibitionLayout({ ...zeroScores(), automation: -13 }), RangeError);
+
+// Scale A: ×0.85 opening, linear to ×2.4 at guest #12, then constant; display scores clamp to ±12.
+assert.equal(exhibitionScaleGain(0), 0.85);
+assert.equal(exhibitionScaleGain(1), 0.85);
+assert.ok(Math.abs(exhibitionScaleGain(6.5) - 1.625) < 1e-12);
+assert.equal(exhibitionScaleGain(12), 2.4);
+assert.equal(exhibitionScaleGain(500), 2.4);
+for (let n = 1; n < 20; n++) assert.ok(exhibitionScaleGain(n + 1) >= exhibitionScaleGain(n), 'gain never weakens');
+assert.equal(exhibitionDisplayScores({ ...zeroScores(), automation: 7.5 }, 1).automation, 6.375);
+assert.equal(exhibitionDisplayScores({ ...zeroScores(), automation: 7.5 }, 12).automation, 12);
+assert.equal(exhibitionDisplayScores({ ...zeroScores(), automation: -1.5 }, 40).automation, -3.5999999999999996);
+assert.deepEqual(exhibitionStateLayout(zeroScores(), 40), baseline, 'neutral city is unchanged by the scale');
+// A late Meter of 1.5 is mixed in raw terms but high on Scale A; the opening guest cannot reach the extreme.
+assert.equal(exhibitionStateLayout({ ...zeroScores(), automation: 1.5 }, 40).bands.nw, 'high');
+assert.equal(exhibitionStateLayout({ ...zeroScores(), automation: 7.5 }, 1).automatedPorts, 5);
+assert.throws(() => exhibitionStateLayout({ ...zeroScores(), automation: 13 }, 5), RangeError);
 
 const questionPath = new URL('../src/survey/questions.exhibition.json', import.meta.url).pathname;
 const questionSet = validateExhibitionQuestionSet(loadQuestionSetFile(questionPath));

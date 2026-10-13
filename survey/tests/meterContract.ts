@@ -4,7 +4,7 @@ import type { Vote } from '../src/shared/citySurveyState.ts';
 
 export type MeterContract = {
   axis: string; questionId: string; options: Record<Vote, string>; socket: string;
-  /** Independent golden values for the first -1/0/+1 vote, not computed by production mapping. */
+  /** Independent golden values for the first -1/0/+1 vote (Meter ±7.5 × Scale A opening gain 0.85 = display ±6.375), not computed by production mapping. */
   parameters: Record<string, readonly [number, number, number]>;
 };
 
@@ -13,10 +13,10 @@ export const METER_CONTRACTS: readonly MeterContract[] = [
   { axis: 'automation', questionId: 'service-2127', socket: 'nw',
     options: { [-1]: 'human-led', 0: 'human-machine', 1: 'autonomous' }, parameters: { automatedPorts: [1, 3, 5] } },
   { axis: 'publicSharing', questionId: 'commons-2127', socket: 'sw',
-    options: { [-1]: 'private-pods', 0: 'mixed-seating', 1: 'open-commons' }, parameters: { sharedSeats: [2, 4, 7] } },
+    options: { [-1]: 'private-pods', 0: 'mixed-seating', 1: 'open-commons' }, parameters: { sharedSeats: [2, 4, 6] } },
   { axis: 'environmentalPriority', questionId: 'cooling-2127', socket: 'ne',
     options: { [-1]: 'active-cooling', 0: 'hybrid-cooling', 1: 'canopy-cooling' },
-    parameters: { treeCount: [5, 8, 10], plantedFraction: [.3125, .5, .6875], coolingFins: [5, 3, 1] } },
+    parameters: { treeCount: [5, 8, 10], plantedFraction: [.340625, .5, .659375], coolingFins: [5, 3, 1] } },
   { axis: 'urbanConcentration', questionId: 'functions-2127', socket: 'se',
     options: { [-1]: 'distributed-pavilions', 0: 'mixed-functions', 1: 'vertical-functions' }, parameters: { functionModules: [3, 4, 5] } },
 ];
