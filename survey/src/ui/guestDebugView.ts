@@ -523,7 +523,11 @@ function renderHandoff() {
 }
 
 async function nextGuest() {
-  if (saved && performance.now() < resultEndsAt) { renderHandoff(); return; }
+  if (saved && performance.now() < resultEndsAt) {
+    // The reading slot is protected; say why the button waits instead of silently re-rendering.
+    notice = { role: 'status', text: '街の画面で、あなたの回答をご案内しています。表示が終わると、はじめる画面に戻ります。' };
+    renderHandoff(); return;
+  }
   if (stationId && session) {
     if (busy) return;
     busy = true;
