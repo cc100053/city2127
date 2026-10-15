@@ -88,7 +88,7 @@ AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/P
 
 Root `src/` 以 Three.js / WebGL 2 載入 Odaiba district 地形、六棟地標 GLB、程序 civic core，以及連接周邊的安靜 backdrop。2127 skyways、潮汐邊緣及六座 waterfront islands 已在現行城市；不再使用早期 150 m 淡出成孤島的版本。四個 Meter 同時改變 focal site 及 district，保留成熟未來的 low／mixed／high，並支援 hybrid、跨軸設施與歷史種子布局。
 
-城市自動日夜循環一日 180 秒；`?hour=22` 可固定時間。鏡頭、共享材質／InstancedMesh、3 秒變化與立即 reset/reconnect 的實作見 [PROJECT](docs/PROJECT.md)。後製包括 MSAA、GTAO、bloom、vignette、output 及 colour grade。
+城市自動日夜循環一日 180 秒；`?hour=22` 可固定時間。鏡頭、共享材質／InstancedMesh、3 秒變化與立即 reset/reconnect 的實作見 [PROJECT](docs/PROJECT.md)。後製包括 MSAA、GTAO、bloom、vignette、output 及 colour grade。GPU 較弱嘅電腦（例如 M1 接 4K 螢幕）可以喺城市網址加 `&quality=low`：關閉 MSAA、GTAO 同陰影，pixel ratio 上限 1；預設畫面不變（2026-10-15）。
 
 開發時可用 `?meters=nw:high,ne:low`（band 或 −12..12）直接 review v2 layout，console `cityMeters('ne:high')` 睇 live 過渡；`&metersTo=ne:high&metersAge=0.7` 配合 `reviewTime` 截圖。這些工具不提交提案、不改展覽資料。`?asset-preview` 可載入本機 GLB 於原點，重新整理後換另一件；production 沒有 picker。素材標準見 [BLENDER](docs/BLENDER.md)。
 
