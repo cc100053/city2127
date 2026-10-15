@@ -8,6 +8,7 @@
 
 | Task | 原標題 |
 | --- | --- |
+| [guest-handoff-wait-notice](guest-handoff-wait-notice.md) | guest-handoff-wait-notice — 交接畫面等待提示（2026-10-15） |
 | [vote-journey](vote-journey.md) | vote-journey — 一票旅程接入 live 展示 |
 | [meter-scale-a](meter-scale-a.md) | meter-scale-a — 正式採用刻度 A（溫和開場、逐步加強） |
 | [meter-scale-journey](meter-scale-journey.md) | meter-scale-journey — Meter 刻度比較工具與「一票旅程」原型 |
