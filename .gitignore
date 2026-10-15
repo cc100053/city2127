@@ -11,3 +11,6 @@ dist/
 asset/models/**/*.blend1
 asset/models/**/*.blend2
 asset/models/**/*.blend@
+
+# Planning-team proposal drafts (shared outside the repo, not committed).
+docs/PROPOSAL_JA.md
