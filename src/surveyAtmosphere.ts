@@ -96,6 +96,7 @@ export const exhibitionScoresText = (scores: ExhibitionView['scores']) =>
 type ResidentCard = { id: string; title: string; text: string; place: string };
 // P1 copy; facility selection follows rendered focal quantities, not the resident's vote.
 const RESIDENT_CARDS: Record<string, readonly [string, string]> = {
+  "intro.origin": ["街は、誰が決めるのか。", "これまで街のかたちは、行政や大企業が決めてきました。住民の思いで街が決まるとしたら、どうなるでしょう。"],
   "intro.identity": ["あなたも、この街の住民です。", "ここは2127年のお台場。あなたは、この街で暮らす一人です。"],
   "intro.inherited": ["街には、これまでの思いが重なっています。", "あなたの前にも、住民たちが暮らしへの思いを残しました。目の前の街は、その積み重ねを受け継いでいます。"],
   "intro.lineage": ["台場の記憶が、街の骨組みに。", "骨組み、球体、大きな空洞。かつてのフジテレビの形は、2127年の街をつなぐ構造へと受け継がれています。"],
@@ -116,8 +117,8 @@ const RESIDENT_CARDS: Record<string, readonly [string, string]> = {
 
 export function residentCards(view: ExhibitionView): ResidentCard[] {
   const l = view.layout;
-  const ids = ['intro.identity', 'intro.lineage', 'intro.participation'];
-  if (view.recentProposals.length) ids.splice(1, 0, 'intro.inherited');
+  const ids = ['intro.origin', 'intro.identity', 'intro.lineage', 'intro.participation'];
+  if (view.recentProposals.length) ids.splice(2, 0, 'intro.inherited');
   const facilityIds = [
     l.automatedPorts === 0 ? 'service.human' : l.automatedPorts === 6 ? 'service.autonomous' : 'service.hybrid',
     l.sharedSeats === 0 ? 'commons.private' : l.sharedSeats === 8 ? 'commons.open' : 'commons.hybrid',
