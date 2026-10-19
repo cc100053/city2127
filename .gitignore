@@ -15,3 +15,6 @@ asset/models/**/*.blend@
 # Planning-team proposal drafts (shared outside the repo, not committed).
 docs/PROPOSAL_JA.md
 docs/PROPOSAL_JA.pdf
+
+# Planning-team question candidates (kept outside the repo).
+question_candidates.md
