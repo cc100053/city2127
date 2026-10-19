@@ -159,6 +159,8 @@ assert.equal(unchangedFeedback?.cityChanged, false);
 assert.equal(unchangedFeedback?.note, 'Meter値と街区構成は維持されました。提案 #1 を記録しました。');
 
 const baseCards = residentCards(parsedInitialV2.view);
+assert.deepEqual(baseCards.slice(0, 4).map(card => card.id), ['intro.origin', 'intro.identity', 'intro.lineage', 'intro.participation']);
+assert.deepEqual(residentCards(parsedV2.view).slice(0, 3).map(card => card.id), ['intro.origin', 'intro.identity', 'intro.inherited']);
 assert.equal(baseCards.some(card => card.id === 'intro.inherited'), false);
 assert.equal(residentCards({ ...parsedInitialV2.view, guestCount: 100 }).some(card => card.id === 'intro.inherited'), false,
   'city-reset lifetime participation never implies answers in this run');

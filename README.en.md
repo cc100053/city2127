@@ -1,5 +1,9 @@
 # 2127 — Frozen Intersection
 
+## About the work
+
+"Who will decide what a city looks like in 100 years?" Cities have usually been shaped by governments and large corporations rather than by the people who live in them. What if the residents decided the future 100 years from now? This exhibition explores that possibility. Each visitor answers questions about daily life as one resident of Odaiba in 2127; their voice accumulates with other residents' voices into the city the next visitor inherits. No single answer decides the city alone. The opening city card `intro.origin` introduces the world with the same question (see [RESIDENT_COPY](docs/RESIDENT_COPY.md)).
+
 ## Two concurrent Guest devices — 2026-10-02
 
 Use one survey server on the trusted LAN. Open `http://<exhibition-PC LAN IP>:8787/guest?station=A` on one device and `http://<exhibition-PC LAN IP>:8787/guest?station=B` on the other. Use only one page per station; each station admits one active experience. With `SURVEY_HOST=0.0.0.0` the server prints the full A/B `LAN Guest:` URLs to type on the iPads; router/iPad setup is in the [LAN station handoff](docs/handoffs/lan-guest-stations.md). Bind the survey server with `SURVEY_HOST=0.0.0.0` (PowerShell: `$env:SURVEY_HOST='0.0.0.0'`). Each station has its own four-question draft/result/handoff; submissions accumulate in server arrival order and retries count once. Live City results reserve ten-second reading slots with three-second transitions and proposal/station labels. City reconnect restores the latest snapshot immediately. The existing `/guest` single-station flow remains; do not mix it with active A/B experiences.

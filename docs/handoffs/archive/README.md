@@ -8,6 +8,7 @@
 
 | Task | 原標題 |
 | --- | --- |
+| [intro-origin-card](intro-origin-card.md) | intro-origin-card — 開場「街は、誰が決めるのか。」卡同 README 作品概念（2026-10-19） |
 | [guest-handoff-wait-notice](guest-handoff-wait-notice.md) | guest-handoff-wait-notice — 交接畫面等待提示（2026-10-15） |
 | [vote-journey](vote-journey.md) | vote-journey — 一票旅程接入 live 展示 |
 | [meter-scale-a](meter-scale-a.md) | meter-scale-a — 正式採用刻度 A（溫和開場、逐步加強） |
