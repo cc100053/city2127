@@ -1,6 +1,10 @@
 # Validation procedures and evidence index — Odaiba
 
-Current procedures, 2026-10-02. Product acceptance comes from [EXHIBITION_SPEC](EXHIBITION_SPEC.md); implementation from [PROJECT](PROJECT.md). Shibuya is closed history, with no future work or acceptance backlog. Earlier screenshots/FPS do not establish current Odaiba results.
+- Current procedures, 2026-10-02.
+- Product acceptance comes from [EXHIBITION_SPEC](EXHIBITION_SPEC.md); implementation from [PROJECT](PROJECT.md); terms from [GLOSSARY](GLOSSARY.md).
+- Shibuya is closed history, with no future work or acceptance backlog.
+- Earlier screenshots/FPS do not establish current Odaiba results.
+- Evidence entries below use `### <title> (<date>)`; list them with `rg -n "^### " docs/VALIDATION.md`.
 
 ## Automated checks for the current prototype
 
@@ -14,7 +18,10 @@ npm run build
 git diff --check
 ```
 
-Root pipeline tests start the real survey HTTP/WebSocket server, so survey dependencies are required. Root does not run the separate package suites. When survey changes:
+- Root pipeline tests start the real survey HTTP/WebSocket server, so survey dependencies are required.
+- Root does not run the separate package suites.
+
+When survey changes:
 
 ```sh
 cd survey
@@ -30,89 +37,301 @@ npm test
 npm run build
 ```
 
-CI uses Node 24, installs/tests/builds all three packages and checks committed whitespace. Local checks gate integration; main CI must pass after integration (branch CI need not be awaited, 2026-10-06). Documentation-only pushes skip CI; a newer push cancels an in-progress run on the same branch. The Odaiba route/clearance test raycasts through `three-mesh-bvh` (test-only devDependency) with the same hits as three's brute-force raycast. A configured workflow is not a passing run. [Git workflow](CONTRIBUTING.md) defines exact checks and race handling.
+### CI
 
-Documentation-only changes require local Markdown file/anchor checks, tracked-target checks, renamed-path/plain-text-reference checks, source fact checks and self-review of the complete diff. Check both working/staged diffs and `git diff --check origin/main...HEAD`. Rendering/tests/builds are not required for prose-only changes, and CI skips pushes that touch only `docs/**` or `*.md`. No source/asset change can be disguised as documentation-only.
+- CI uses Node 24, installs/tests/builds all three packages and checks committed whitespace.
+- Local checks gate integration; main CI must pass after integration (branch CI need not be awaited, 2026-10-06).
+- Documentation-only pushes skip CI (pushes touching only `docs/**` or `*.md`); a newer push cancels an in-progress run on the same branch.
+- The Odaiba route/clearance test raycasts through `three-mesh-bvh` (test-only devDependency), with the same hits as three's brute-force raycast.
+- A configured workflow is not a passing run.
+- [Git workflow](CONTRIBUTING.md) defines exact checks and race handling.
+
+### Documentation-only changes
+
+- Required: local Markdown file/anchor checks, tracked-target checks, renamed-path/plain-text-reference checks, source fact checks and self-review of the complete diff.
+- Check both working/staged diffs and `git diff --check origin/main...HEAD`.
+- Rendering/tests/builds are not required for prose-only changes.
+- No source/asset change can be disguised as documentation-only.
 
 ## Browser regression checks for the current prototype
 
-Start the services and use their printed ports as described in [README](../README.md). Use scratch SQLite for destructive reset/Undo checks; preserve the exhibition DB. Desktop only. Record actual viewport, browser/GPU/device, commit, hour/actor time and console/network results. Reuse project previews; do not kill unrelated processes.
+- Start the services and use their printed ports as described in [README](../README.md).
+- Use scratch SQLite for destructive reset/Undo checks; preserve the exhibition DB.
+- Desktop only.
+- Record actual viewport, browser/GPU/device, commit, hour/actor time and console/network results.
+- Reuse project previews; do not kill unrelated processes.
 
 | Check | Expected result |
 | --- | --- |
 | Standalone `/` | Odaiba landmarks/civic core, connected backdrop, bay, six waterfront islands and base mobility load without errors; no survey-dependent district layer |
 | Day/dusk/night | Review `?hour=12`, `18.5`, `22`; structure, public paths, windows and four sites remain readable; automatic clock wraps in 180 s |
 | Camera/resize | Initial authored desktop hero; orbit/zoom/pan limits and ordinary renderer resize work; no adaptive camera or mobile requirement |
-| Four-question Guest | One complete proposal after review; partial answers do not change city; scheduled result10s / handoff5s; reload resumes remaining time without renewing leases; IDs survive unknown-result retry without a duplicate vote |
+| Four-question Guest | One complete proposal after review; partial answers do not change city; scheduled result 10 s / handoff 5 s; reload resumes remaining time without renewing leases; IDs survive unknown-result retry without a duplicate vote |
 | Low/mixed/high | All four focal sites and district carriers are complete future alternatives; continuous quantities, hybrids, pairings and seed layout agree with authoritative view |
 | Live transition | Changed targets retarget over 3 s with local pulses; duplicate/no-op events do not replay; late assets/roof publication use latest target |
 | Immediate recovery | Snapshot/reset/Undo/reconnect/reduced motion settle immediately, clear pulses/queued display, restore latest state; lighting-only snapshots do not skip live queue |
 | Single station | Next Start automatically ends completed experience; queued reset applies before new answers; no Admin exit confirmation; Admin can end unfinished questionnaire |
-| A/B | Independent draft/result/recovery; both accumulate in commit order; displays ≥10 s apart with separate3s city motion; each Guest sees its own queued result; newer starts close old Undo |
+| A/B | Independent draft/result/recovery; both accumulate in commit order; displays ≥ 10 s apart with separate 3 s city motion; each Guest sees its own queued result; newer starts close old Undo |
 | A/B reset/cancel/expiry | New starts stop during reset; both sessions drain; named unfinished cancellation affects one; questionnaire/result leases release abandoned stations |
 | Undo | Latest completed proposal only, before next start; restore scores/counts/seeds; original event preserved; cancelled newer draft cannot reopen prior Undo |
 | Admin display | Day 12:00 / Night 22:00 / Auto saved across reset/restart; explicit City `?hour` wins; LAN access to Admin denied |
 | Persistence | Restart existing SQLite and reconnect pages; state/history/settings recover; do not delete DB to simulate recovery |
-| Routes/actors | No actor passes through another: mobility tests check boat hulls over the whole water period, train spacing per track and walker lanes; for people, sample overlaps of the real fleets with doorways published. Sample repeated guideway, promenade/deck walker parties, joggers passing in the outer lane, promenade stool sitters and rail-spot parties veering out of the lane, doorway walkers emerging from the facade, bench sitters/rail couples/forecourt groups, delivery robots and their collector hand-offs, street cars on both avenues and the drop-off bays (indicators, brake lamp, nose dip), gait/items, day rhythm at `?hour=4/12/19/21`, boats, both aerial loops and berths, interchange boat/transfers, district crowd/drone cycles; no ground/landmark/site collisions, half-faded settled aircraft or stale visible batches. DEV `?meters=nw:high&reviewTime=<s>` (low/mixed/high) holds a review time; `?review=street` frames people and street cars up close (`&cam=x,y,z` moves that camera, `&at=x,y,z` aims it) |
+| Routes/actors | No actor passes through another; no ground/landmark/site collisions, half-faded settled aircraft or stale visible batches. Details in "Routes/actors sampling" below |
 
-Optional runnable browser checks use installed Playwright and local services: [surveyAuto.browser.mjs](../tests/surveyAuto.browser.mjs), [adminUndo.browser.mjs](../tests/adminUndo.browser.mjs), [twoStations.browser.mjs](../tests/twoStations.browser.mjs), [residentP2.browser.mjs](../tests/residentP2.browser.mjs), [residentP3.browser.mjs](../tests/residentP3.browser.mjs), [residentP4.browser.mjs](../tests/residentP4.browser.mjs). Read each script's environment/ports before execution. These are focused regressions, not proof of exhibition-day hardware acceptance.
+### Routes/actors sampling
 
-Street-life interactions (2026-10-06): root `mobility.test.ts` checks conversational speaker/listener/quiet turns and continuous
-outbound/stay/return/indoor timing. `odaiba.test.ts` publishes real landmark doorways after creating the actor fleets, checks the
-visitor curves on actual paving and clear of buildings/sites, then samples each journey against actual people/robots for 240 s
-at .25 s in low/mixed/high, hours 12/21. Every journey must actually be drawn in all six cases; seated matrices and folded legs
-remain fixed. Repeat visual checks with companion gaze/hand gestures, visitor arrival/chat/turn/return, and held day/dusk/night.
-The same loop asserts doorway people (0.62 m) and robots (0.85 m) never overlap and that no promenade walker, and at most 2 % of slow doorway frames (tight forecourt corners), strides in place; `districtMeters.test.ts` checks street cars → pods at low/mixed/high with unchanged traffic. `mobility.test.ts` runs the real traffic simulation 15 min (evening) with drawn bodies and 30 min (morning): lane bumper gaps > 1.5 m, ≤ 15 m/s, no car between stop line and far side while residents cross, crossers outside every drawn car footprint, real stops/queues/brake lamps, lag < 200 m, drop-off cars still parking; crossing bands on road and footways on paving, and both avenues' car edges on road or paving with the junction fill. `odaiba.test.ts` sweeps every lane's car body (as drawn, ends faded) along both avenues against the real landmarks, civic core and environment and requires 0.3 m clearance (fails with the old lane positions).
-Dated results and any integration limits belong in the [street-life handoff](handoffs/archive/street-life.md).
+- Mobility tests check boat hulls over the whole water period, train spacing per track and walker lanes.
+- For people, sample overlaps of the real fleets with doorways published.
+- Sample repeatedly:
+  - guideway; promenade/deck walker parties; joggers passing in the outer lane;
+  - promenade stool sitters and rail-spot parties veering out of the lane;
+  - doorway walkers emerging from the facade; bench sitters/rail couples/forecourt groups;
+  - delivery robots and their collector hand-offs;
+  - street cars on both avenues and the drop-off bays (indicators, brake lamp, nose dip);
+  - gait/items; day rhythm at `?hour=4/12/19/21`;
+  - boats, both aerial loops and berths, interchange boat/transfers, district crowd/drone cycles.
+- DEV `?meters=nw:high&reviewTime=<s>` (low/mixed/high) holds a review time.
+- `?review=street` frames people and street cars up close (`&cam=x,y,z` moves that camera, `&at=x,y,z` aims it).
 
-Building interactions (round 9, 2026-10-06): `mobility.test.ts` checks arrival/wait/exit/greeting/departure/indoor stages,
-bounded continuous movement and stopped service feet. `odaiba.test.ts` samples the actual four entrance people against paving,
-static city geometry and all existing person/robot fleets at low/mixed/high, hours 12/21. `automationHub.test.ts` checks actual
-service actor size, platform support and counter/facade clearance, human/assisted/autonomous use, live handover, immediate
-recovery and hidden frontage. Review entrance stages and service scenes in the browser, keeping the original hero day/dusk/night;
-use explicit `nw:-12/0/12` for 0/3/6 automated ports (band shorthand `low/high` maps to scores −7.5/+7.5, not the endpoints).
+### Optional browser scripts
+
+- Installed Playwright and local services: [surveyAuto.browser.mjs](../tests/surveyAuto.browser.mjs), [adminUndo.browser.mjs](../tests/adminUndo.browser.mjs), [twoStations.browser.mjs](../tests/twoStations.browser.mjs), [residentP2.browser.mjs](../tests/residentP2.browser.mjs), [residentP3.browser.mjs](../tests/residentP3.browser.mjs), [residentP4.browser.mjs](../tests/residentP4.browser.mjs).
+- Read each script's environment/ports before execution.
+- These are focused regressions, not proof of exhibition-day hardware acceptance.
+
+### Street-life interaction tests (2026-10-06)
+
+- `mobility.test.ts` checks conversational speaker/listener/quiet turns and continuous outbound/stay/return/indoor timing.
+- `odaiba.test.ts` publishes real landmark doorways after creating the actor fleets, checks the visitor curves on actual paving and clear of buildings/sites, then samples each journey against actual people/robots for 240 s at .25 s in low/mixed/high, hours 12/21.
+  - Every journey must actually be drawn in all six cases; seated matrices and folded legs remain fixed.
+  - The same loop asserts doorway people (0.62 m) and robots (0.85 m) never overlap, and that no promenade walker (and at most 2 % of slow doorway frames, at tight forecourt corners) strides in place.
+- `districtMeters.test.ts` checks street cars → pods at low/mixed/high with unchanged traffic.
+- `mobility.test.ts` runs the real traffic simulation 15 min (evening, with drawn bodies) and 30 min (morning):
+  - lane bumper gaps > 1.5 m, ≤ 15 m/s;
+  - no car between stop line and far side while residents cross; crossers outside every drawn car footprint;
+  - real stops/queues/brake lamps; lag < 200 m; drop-off cars still parking;
+  - crossing bands on road and footways on paving; both avenues' car edges on road or paving with the junction fill.
+- `odaiba.test.ts` sweeps every lane's car body (as drawn, ends faded) along both avenues against the real landmarks, civic core and environment, and requires 0.3 m clearance (fails with the old lane positions).
+- Repeat visual checks: companion gaze/hand gestures, visitor arrival/chat/turn/return, held day/dusk/night.
+- Dated results and integration limits belong in the [street-life handoff](handoffs/archive/street-life.md).
+
+### Building interaction tests (round 9, 2026-10-06)
+
+- `mobility.test.ts` checks arrival/wait/exit/greeting/departure/indoor stages, bounded continuous movement and stopped service feet.
+- `odaiba.test.ts` samples the actual four entrance people against paving, static city geometry and all existing person/robot fleets at low/mixed/high, hours 12/21.
+- `automationHub.test.ts` checks actual service actor size, platform support and counter/facade clearance, human/assisted/autonomous use, live handover, immediate recovery and hidden frontage.
+- Browser review: entrance stages and service scenes, keeping the original hero day/dusk/night.
+- Use explicit `nw:-12/0/12` for 0/3/6 automated ports; band shorthand `low/high` maps to scores −7.5/+7.5, not the endpoints.
 
 ## Performance evidence
 
-Measure current Odaiba on the stated real GPU, ideally the exhibition machine at 1920×1080. State pixel ratio, actual viewport, camera/hour/mode, frame sampling interval, draw calls/triangles and console/network results. Mesh counts, source file size, headless/software FPS and old Shibuya 60 FPS are not equivalent to a current measurement. Do not claim Windows or another workstation was tested from Mac evidence.
+- Measure current Odaiba on the stated real GPU, ideally the exhibition machine at 1920×1080.
+- State pixel ratio, actual viewport, camera/hour/mode, frame sampling interval, draw calls/triangles and console/network results.
+- Not equivalent to a current measurement: mesh counts, source file size, headless/software FPS, old Shibuya 60 FPS.
+- Do not claim Windows or another workstation was tested from Mac evidence.
 
-Opening origin card (2026-10-19, `feat/intro-origin-card` from `5e2fc3a`): ambient resident cards now open with `intro.origin` 「街は、誰が決めるのか。」 before `intro.identity`; READMEs gain an about-the-work section. Root `npm test`/`npm run build`, `git diff --check` PASS; scratch-DB headless Google Chrome 1280×720 `?survey=…&hour=16`: rotation origin → identity → lineage → participation → four facility cards → origin at 12 s each, both sentences fit the card ([screenshot](../artifacts/intro-origin/intro-origin.png), second cycle). The first card is in the DOM at ~8 s but is not painted while the scene is still loading (pre-existing, also true of identity before). Physical display NOT RUN; [handoff](handoffs/archive/intro-origin-card.md).
+### Render quality low (2026-10-15)
 
-Guest handoff wait notice (2026-10-15, `feat/guest-handoff-wait-notice` from `db561a1`): pressing 「はじめる画面へ」 inside the protected reading slot now shows the `control.handoffWait` status notice instead of silently re-rendering. `survey/` `npm test`/`npm run build`, `git diff --check` PASS; scratch-DB headless Google Chrome 1280×720, single and station A: notice shown, still on handoff, auto welcome after ~9.7 s with notice cleared, no page errors ([screenshot](../artifacts/guest-handoff/handoff-wait-notice.png)). iPad NOT RUN; [handoff](handoffs/archive/guest-handoff-wait-notice.md).
+- Branch `feat/render-quality-low` from `29d12db`; [handoff](handoffs/render-quality.md).
+- User-run measurement: Brave on the owner's M1 16 GB, external 4K monitor, canvas 2131×1334 (DPR 1), Vite DEV `?survey&hour=15`, rAF frames counted over 3×4 s after load.
+- Temporary uncommitted pass switches (FPS): base 9.4; no MSAA 12.9; no GTAO 14.6; GTAO 8 samples 9.6; no bloom 10.0; 2048 shadow 10.3; no shadows 13.1; no MSAA+GTAO+shadows 33.3.
+- `?quality=low` ships that last set.
+- `tests/renderQuality.test.ts`, root `npm test`/`npm run build`, `git diff --check` PASS.
+- Development Mac headless Chromium (Playwright, ANGLE Metal) 1280×720/DPR 1, same URL: default 15.5 FPS, low 52.5 FPS, no console errors ([default](../artifacts/render-quality/quality-default.png), [low](../artifacts/render-quality/quality-low.png)).
+- NOT RUN: exhibition machine, phones, automatic quality stepping.
 
-Render quality low (2026-10-15, `feat/render-quality-low` from `29d12db`): user-run Brave on the owner's M1 16 GB, external 4K monitor, canvas 2131×1334 (DPR 1), Vite DEV `?survey&hour=15`, rAF frames counted over 3×4 s after load. Temporary uncommitted pass switches gave base 9.4 FPS; no MSAA 12.9, no GTAO 14.6, GTAO 8 samples 9.6, no bloom 10.0, 2048 shadow 10.3, no shadows 13.1, no MSAA+GTAO+shadows 33.3. `?quality=low` ships that last set. `tests/renderQuality.test.ts`, root `npm test`/`npm run build`, `git diff --check` PASS. Development Mac headless Chromium (Playwright, ANGLE Metal) 1280×720/DPR1, same URL: default 15.5 FPS, low 52.5 FPS, no console errors ([default](../artifacts/render-quality/quality-default.png), [low](../artifacts/render-quality/quality-low.png)). Exhibition machine, phones and automatic quality stepping NOT RUN; [handoff](handoffs/render-quality.md).
+### Street traffic round 10 (2026-10-07)
 
-Street traffic round 10 (2026-10-07, development Mac, not the exhibition machine): Apple M6, headed Chromium 151.0.7922.34 (Playwright,
-ANGLE Metal), Vite DEV, 1920×1080 viewport, deviceScaleFactor 1 (renderer pixel ratio 1), authored hero camera, canvas `data-fps`
-(mean over 120 frames) sampled 5× at 2.5 s after 8 s warm-up: standalone `?hour=16` 56 FPS / 946 draws; `meters=nw:low` 53 / 1585;
-`nw:0` 53 / 1585; `nw:high` 53 / 1601; `nw:high` at hour 21 52 / 1607. Triangles not recorded; console shows only the missing `/favicon.ico` 404, no page errors.
-[report](../artifacts/street-traffic-automation/browser.json). Exhibition-machine FPS remains unmeasured.
+- Development Mac, not the exhibition machine: Apple M6, headed Chromium 151.0.7922.34 (Playwright, ANGLE Metal), Vite DEV, 1920×1080 viewport, deviceScaleFactor 1 (renderer pixel ratio 1), authored hero camera.
+- Sampling: canvas `data-fps` (mean over 120 frames) sampled 5× at 2.5 s after 8 s warm-up.
+- Results (FPS / draws): standalone `?hour=16` 56 / 946; `meters=nw:low` 53 / 1585; `nw:0` 53 / 1585; `nw:high` 53 / 1601; `nw:high` at hour 21 52 / 1607.
+- Triangles not recorded. Console shows only the missing `/favicon.ico` 404, no page errors.
+- [report](../artifacts/street-traffic-automation/browser.json). Exhibition-machine FPS remains unmeasured.
 
 ## Current evidence and open acceptance
 
-Road polish (2026-10-07, `feat/road-polish` from `4ced019`): a colour probe (road magenta, paving cyan, markings red) shows the hero frame already has no visible asphalt or painted markings — the avenues read as the pale paving slab — so the change adds only shared-surface inlays: stone seams at both carriageway edges and a mint guide per lane (two merged meshes, +2 draws). Root `npm test` (new inlay face-up/height check in [mobility tests](../tests/mobility.test.ts)), `npm run build`, `git diff --check` PASS. Development Mac headless Chrome via playwright-cli, 1280×720, `?hour=12`: [hero before](../artifacts/road-polish/before-hero.jpg)/[after](../artifacts/road-polish/after-hero.jpg) (inlays below hero resolution, as intended), [seaside avenue before](../artifacts/road-polish/before-sea.jpg)/[after](../artifacts/road-polish/after-sea.jpg) (`review=street&cam=40,22,-195`), [probe](../artifacts/road-polish/probe-hero.jpg); no console errors. Night, Meter states, FPS and the guideway avenue close-up (hidden under the guideway) NOT RUN; [handoff](handoffs/archive/road-polish.md).
+### Opening origin card (2026-10-19)
 
-Roof and interior life (2026-10-08, `feat/roof-interior-life` from `051614f`, uncommitted worktree): `odaiba.test.ts` checks every Fuji TV occupant on real floor or seat with headroom, every stroll/ride sample (shown part) supported, ≥ 0.8 m from standing and 1 m from seated people, lanes ≥ 0.95 m apart; Aqua City/DECKS roof residents on open roof, out of planting, meadow mounds and sail posts; and the drawn `building-occupants` fleet (1084 people) at hours 12/21, automation 0/1, over 150 s: full size or absent, no jumps, no stepping in place. Root `npm test`, `npm run build`, `git diff --check` PASS. Headless Chrome 154, 1400×900: [Fuji wing at dusk](../artifacts/roof-interior-life/fuji-wing-dusk.png), [theatre](../artifacts/roof-interior-life/fuji-theatre.png), [forum by day](../artifacts/roof-interior-life/fuji-forum-day.png); exhibition FPS NOT RUN; [handoff](handoffs/archive/roof-interior-life.md).
+- Branch `feat/intro-origin-card` from `5e2fc3a`; [handoff](handoffs/archive/intro-origin-card.md).
+- Change: ambient resident cards open with `intro.origin` 「街は、誰が決めるのか。」 before `intro.identity`; READMEs gain an about-the-work section.
+- Root `npm test`/`npm run build`, `git diff --check` PASS.
+- Scratch-DB headless Google Chrome 1280×720 `?survey=…&hour=16`: rotation origin → identity → lineage → participation → four facility cards → origin, at 12 s each; both sentences fit the card ([screenshot](../artifacts/intro-origin/intro-origin.png), second cycle).
+- Known (pre-existing, also true of identity before): the first card is in the DOM at ~8 s but is not painted while the scene is still loading.
+- NOT RUN: physical display.
 
-Meter scale lab and vote journey (2026-10-13, `feat/meter-scale-journey` from `a888082`, DEV-only prototype, not integrated): `tests/scaleLab.test.ts` checks seeded replay, the server reducer (#1 +1 → 7.5), seed folding, ×1 = server layout and Scale A band spread. Root and `survey/` `npm test`/`npm run build`, `git diff --check` PASS; production bundle has no lab chunk. Development Mac headless Chrome via playwright-core, 1280×720/DPR1, frozen `reviewTime`: [flight](../artifacts/meter-scale-journey/journey-1-flight.jpg), [scan](../artifacts/meter-scale-journey/journey-3-scan.jpg), [#40 current](../artifacts/meter-scale-journey/scale-current-40.jpg)/[Scale A](../artifacts/meter-scale-journey/scale-a-40.jpg), [night lanterns](../artifacts/meter-scale-journey/lanterns-night-120.jpg); only the known favicon 404. FPS, live survey and owner visual review NOT RUN; [handoff](handoffs/archive/meter-scale-journey.md).
+### Guest handoff wait notice (2026-10-15)
 
-Scale A adopted (2026-10-13, `feat/meter-scale-a` from `3c78210`): authoritative layout reads `clamp(M × g(n))`, g = 0.85 → 2.4 by guest #12 ([spec](EXHIBITION_SPEC.md)). New ramp/clamp tests in `exhibitionRules`, first-vote goldens in `meterContract`, P4 pipeline history kept below the cap. `survey/` and root `npm test`/`npm run build`, `git diff --check` PASS. Headless Chrome 1280×720 lab captures old vs Scale A at guests #1/#3/#40 ([#40 Scale A](../artifacts/meter-scale-a/guest40-a.jpg)); only the known favicon 404. Resident browser regressions and FPS NOT RUN; [handoff](handoffs/archive/meter-scale-a.md).
+- Branch `feat/guest-handoff-wait-notice` from `db561a1`; [handoff](handoffs/archive/guest-handoff-wait-notice.md).
+- Change: pressing 「はじめる画面へ」 inside the protected reading slot shows the `control.handoffWait` status notice instead of silently re-rendering.
+- `survey/` `npm test`/`npm run build`, `git diff --check` PASS.
+- Scratch-DB headless Google Chrome 1280×720, single and station A: notice shown, still on handoff, auto welcome after ~9.7 s with notice cleared, no page errors ([screenshot](../artifacts/guest-handoff/handoff-wait-notice.png)).
+- NOT RUN: iPad.
 
-Vote journey live (2026-10-13, `feat/vote-journey` from `8566c10`): `tests/voteJourney.test.ts` checks journey + transition fit the reading slot with 4 s to spare and lantern placement; root/`survey/` tests and builds, `git diff --check` PASS. Scratch `dev:auto` server + headless Chrome 1280×720/DPR1: one real HTTP proposal shows orbs (0.9 s), pulses/scan and transition (3.6 s) with correct carrier evidence in the result card, then a `hour=21` reload rebuilds lanterns ([transition](../artifacts/vote-journey/live-3-transition.jpg)); only the known favicon 404. A/B and resident browser regressions, FPS and exhibition hardware NOT RUN; [handoff](handoffs/archive/vote-journey.md).
+### Vote journey live (2026-10-13)
 
-Fuji TV target v3 round6 (2026-10-07, `codex/fuji-tv-polish`, starting `8de6cf8` plus checked source SHA-256 `b8dd6961…049dc0`, not integrated): three Dream Loop Plus passes improve theatre screen/scenery, glazing ribs, live-studio sets and46 static forum/promenade visitors. Root `npm test`, `npm run build`, `git diff --check` PASS after each corrected pass; new actual-mesh support/headroom check caught and fixed promenade visitors below the Y=65 structural beam. Existing route/site/actor and81-answer real HTTP/WebSocket checks PASS. Development Mac headless Chrome154.0.8037.98, Apple M6 ANGLE Metal,1280×720/DPR1, actor40: all three civic16/22 comparisons, final hero16, all-low(−12)12, mixed(0)18.5, high(+12)22 and resize1440×900→1280×720 PASS. All10 capture records have no captured console/page/network errors; initial session favicon404 is recorded separately. [Final day](../artifacts/fuji-tv-polish/v3r6-pass3.jpg), [night](../artifacts/fuji-tv-polish/v3r6-pass3-night.jpg), [hero](../artifacts/fuji-tv-polish/v3r6-hero.jpg), [browser/geometry record](../artifacts/fuji-tv-polish/v3r6-browser.json), [handoff](handoffs/archive/fuji-tv-polish.md). Nine batches/2,853,564 triangles with unchanged bounds; no sustained FPS or exhibition-hardware claim. Target fidelity remains PARTIAL; interior simulation/access control and live survey browser NOT RUN. Unchanged survey/module-swap package suites not rerun.
+- Branch `feat/vote-journey` from `8566c10`; [handoff](handoffs/archive/vote-journey.md).
+- `tests/voteJourney.test.ts` checks journey + transition fit the reading slot with 4 s to spare, and lantern placement.
+- Root/`survey/` tests and builds, `git diff --check` PASS.
+- Scratch `dev:auto` server + headless Chrome 1280×720/DPR 1: one real HTTP proposal shows orbs (0.9 s), pulses/scan and transition (3.6 s) with correct carrier evidence in the result card; then a `hour=21` reload rebuilds lanterns ([transition](../artifacts/vote-journey/live-3-transition.jpg)). Only the known favicon 404.
+- NOT RUN: A/B and resident browser regressions, FPS, exhibition hardware.
 
-Fuji TV target v3 round7 (2026-10-07, `codex/fuji-tv-polish`, starting `1198b2f` plus checked source SHA-256 `b037643b…6de09f`, not integrated): three Dream Loop Plus passes (Claude Opus workers; Fable unavailable without usage credits) open the escalators and sphere crown, remove flank braces/pier light squares, add glazed side studio galleries and a continuous warm wing back wall. Root `npm test`, `npm run build`, `git diff --check` PASS after each pass with no source fix needed. Development Mac headless Chrome154 via playwright-cli,1280×720/DPR1, actor40: civic16/22 for all three passes, final hero16, all-low(−12)12, mixed(0)18.5, high(+12)22 and resize1440×900→1280×720 PASS; all10 captures report0 console errors/warnings. [Final day](../artifacts/fuji-tv-polish/v3r7-pass3.jpg), [night](../artifacts/fuji-tv-polish/v3r7-pass3-night.jpg), [browser/geometry record](../artifacts/fuji-tv-polish/v3r7-browser.json), [handoff](handoffs/archive/fuji-tv-polish.md). Nine batches/3,143,944 triangles with unchanged bounds; no sustained FPS or exhibition-hardware claim. Target fidelity PARTIAL; survey/module-swap suites not rerun.
+### Scale A adopted (2026-10-13)
 
-Fuji TV target v3 round8 (2026-10-07, `codex/fuji-tv-polish`, starting `7d263ce` plus checked source SHA-256 `9dbae83b…c69109`, not integrated): three Dream Loop Plus passes (Claude Opus workers) clear the glazing, rebalance warm/blue room light and dark umber depth, add a third studio level, a violet-to-navy theatre shell and blue glass escalator balustrades/fascias. Root `npm test`, `npm run build`, `git diff --check` PASS after each pass with no source fix needed. Development Mac headless Chrome154 via playwright-cli,1280×720/DPR1, actor40: civic16/22 for all three passes, final hero16, all-low(−12)12, mixed(0)18.5, high(+12)22 and resize1440×900→1280×720 PASS; all10 captures report0 console errors/warnings. [Final day](../artifacts/fuji-tv-polish/v3r8-pass3.jpg), [night](../artifacts/fuji-tv-polish/v3r8-pass3-night.jpg), [browser/geometry record](../artifacts/fuji-tv-polish/v3r8-browser.json), [handoff](handoffs/archive/fuji-tv-polish.md). Nine batches/3,166,444 triangles with unchanged bounds; no sustained FPS or exhibition-hardware claim. Target fidelity PARTIAL; survey/module-swap suites not rerun.
+- Branch `feat/meter-scale-a` from `3c78210`; [handoff](handoffs/archive/meter-scale-a.md).
+- Authoritative layout reads `clamp(M × g(n))`, g = 0.85 → 2.4 by guest #12 ([spec](EXHIBITION_SPEC.md)).
+- New ramp/clamp tests in `exhibitionRules`; first-vote goldens in `meterContract`; P4 pipeline history kept below the cap.
+- `survey/` and root `npm test`/`npm run build`, `git diff --check` PASS.
+- Headless Chrome 1280×720 lab captures old vs Scale A at guests #1/#3/#40 ([#40 Scale A](../artifacts/meter-scale-a/guest40-a.jpg)); only the known favicon 404.
+- NOT RUN: resident browser regressions, FPS.
 
-Fuji TV target v3 round9 (2026-10-07, `codex/fuji-tv-polish`, starting `7b37d43` plus checked source SHA-256 `9857573a…1f09a5`, not integrated): three Dream Loop Plus passes (Claude Opus workers) return the escalators to silver with navy trim, give the sphere navy ribs, a darker navy dome, extra can lights, violet seats and a full blue screen, and lower/desaturate room light with dark floors and deeper blue screens. Root `npm test`, `npm run build`, `git diff --check` PASS after each pass with no source fix needed. Development Mac headless Chrome154 via playwright-cli,1280×720/DPR1, actor40: civic16/22 for all three passes, final hero16, all-low(−12)12, mixed(0)18.5, high(+12)22 and resize1440×900→1280×720 PASS; all10 captures report0 console errors/warnings (final night retaken after a stale file). [Final day](../artifacts/fuji-tv-polish/v3r9-pass3.jpg), [night](../artifacts/fuji-tv-polish/v3r9-pass3-night.jpg), [browser/geometry record](../artifacts/fuji-tv-polish/v3r9-browser.json), [handoff](handoffs/archive/fuji-tv-polish.md). Nine batches/3,182,944 triangles with unchanged bounds; no sustained FPS or exhibition-hardware claim. Target fidelity PARTIAL; survey/module-swap suites not rerun.
+### Meter scale lab and vote journey prototype (2026-10-13)
 
-Fuji TV target v3 (2026-10-07, feature `codex/fuji-tv-polish`, implementation `f504484`, not integrated): three new Dream Loop Plus passes against the user's selected image. Final root `npm test`, `npm run build`, `git diff --check` PASS after removing pass1's obsolete garden fragment. Actual-mesh checks now also sample standing headroom/support on both work wings and support beneath all14 forum visitors; batch limit is9 for the added shared broadcast finish. Existing route/berth/bridge/site/person/robot and81-answer HTTP/WebSocket checks PASS. Development Mac in-app browser,1280×720, actor40: civic16/22, authored hero16, all-low(−12)12, all-mixed(0)18.5 and all-high(+12)22; no captured console warnings/errors, including shader compile. Ordinary desktop resize1440×900 updates canvas/backing dimensions. [Final civic](../artifacts/fuji-tv-polish/v3-pass3.jpg), [night](../artifacts/fuji-tv-polish/v3-pass3-night.jpg), [hero](../artifacts/fuji-tv-polish/v3-hero.jpg), [browser JSON](../artifacts/fuji-tv-polish/v3-browser.json), [handoff](handoffs/archive/fuji-tv-polish.md). Geometry grows to1,711,564 triangles in9 batches with unchanged bounds; capture-time canvas diagnostics do not measure sustained FPS. Target fidelity remains partial; exhibition GPU/hardware, sustained performance, interior circulation/access control and live survey browser were not tested. Separate survey/module-swap suites not rerun because those packages are unchanged.
+- Branch `feat/meter-scale-journey` from `a888082`; DEV-only prototype, not integrated at the time; [handoff](handoffs/archive/meter-scale-journey.md).
+- `tests/scaleLab.test.ts` checks seeded replay, the server reducer (#1 +1 → 7.5), seed folding, ×1 = server layout and Scale A band spread.
+- Root and `survey/` `npm test`/`npm run build`, `git diff --check` PASS; production bundle has no lab chunk.
+- Development Mac headless Chrome via playwright-core, 1280×720/DPR 1, frozen `reviewTime`: [flight](../artifacts/meter-scale-journey/journey-1-flight.jpg), [scan](../artifacts/meter-scale-journey/journey-3-scan.jpg), [#40 current](../artifacts/meter-scale-journey/scale-current-40.jpg)/[Scale A](../artifacts/meter-scale-journey/scale-a-40.jpg), [night lanterns](../artifacts/meter-scale-journey/lanterns-night-120.jpg); only the known favicon 404.
+- NOT RUN: FPS, live survey, owner visual review.
 
-Fuji TV target v1 historical evidence (2026-10-07, integrated through `f64af18`): three Dream Loop Plus passes; root `npm test`, `npm run build` and `git diff --check` PASS after each pass's fixes. Existing actual-mesh checks cover sphere aerial/wing clearance, Aqua City bridge approach, four site sightlines, route and person/robot geometry; no new test framework. Development Mac in-app browser, 1280×720, actor time40: civic day16/night22, standalone hero16, all-low day12, all-mixed dusk18.5 and all-high night22; no console warning/error in checked views. [Final civic](../artifacts/fuji-tv-polish/pass3.jpg), [night](../artifacts/fuji-tv-polish/pass3-night.jpg), [hero](../artifacts/fuji-tv-polish/hero.jpg), [browser record](../artifacts/fuji-tv-polish/browser.json), [handoff](handoffs/archive/fuji-tv-polish.md). Generated target fidelity remains partial; FPS, exhibition hardware and live scratch-survey browser were not tested in this task. Root tests cover the real survey HTTP/WebSocket pipeline; survey/module-swap source unchanged and their separate suites not rerun.
+### Roof and interior life (2026-10-08)
 
-Fuji TV integration (2026-10-07): merge `f64af182c0001335da941144fa80fb84b492cbe0` has identical source to the feature branch. Root tests/build and committed whitespace checks rerun PASS; build retains the existing >500kB warning. In-app browser on development Mac,1280×720, civic reviewTime40, day16/night22: visually checked, no console warnings/errors. A reload-control timeout was recovered by rebinding the tab. Working-headquarters target v2 remains a reference awaiting implementation; main publication/CI status is recorded in the [handoff](handoffs/archive/fuji-tv-polish.md).
+- Branch `feat/roof-interior-life` from `051614f`, uncommitted worktree; [handoff](handoffs/archive/roof-interior-life.md).
+- `odaiba.test.ts` checks:
+  - every Fuji TV occupant on real floor or seat with headroom;
+  - every stroll/ride sample (shown part) supported, ≥ 0.8 m from standing and 1 m from seated people, lanes ≥ 0.95 m apart;
+  - Aqua City/DECKS roof residents on open roof, out of planting, meadow mounds and sail posts;
+  - the drawn `building-occupants` fleet (1084 people) at hours 12/21, automation 0/1, over 150 s: full size or absent, no jumps, no stepping in place.
+- Root `npm test`, `npm run build`, `git diff --check` PASS.
+- Headless Chrome 154, 1400×900: [Fuji wing at dusk](../artifacts/roof-interior-life/fuji-wing-dusk.png), [theatre](../artifacts/roof-interior-life/fuji-theatre.png), [forum by day](../artifacts/roof-interior-life/fuji-forum-day.png).
+- NOT RUN: exhibition FPS.
+
+### Road polish (2026-10-07)
+
+- Branch `feat/road-polish` from `4ced019`; [handoff](handoffs/archive/road-polish.md).
+- A colour probe (road magenta, paving cyan, markings red) shows the hero frame already has no visible asphalt or painted markings; the avenues read as the pale paving slab.
+- So the change adds only shared-surface inlays: stone seams at both carriageway edges and a mint guide per lane (two merged meshes, +2 draws).
+- Root `npm test` (new inlay face-up/height check in [mobility tests](../tests/mobility.test.ts)), `npm run build`, `git diff --check` PASS.
+- Development Mac headless Chrome via playwright-cli, 1280×720, `?hour=12`; no console errors:
+  - [hero before](../artifacts/road-polish/before-hero.jpg)/[after](../artifacts/road-polish/after-hero.jpg) (inlays below hero resolution, as intended);
+  - [seaside avenue before](../artifacts/road-polish/before-sea.jpg)/[after](../artifacts/road-polish/after-sea.jpg) (`review=street&cam=40,22,-195`);
+  - [probe](../artifacts/road-polish/probe-hero.jpg).
+- NOT RUN: night, Meter states, FPS, guideway avenue close-up (hidden under the guideway).
+
+### Fuji TV target v3 — integration (2026-10-07)
+
+- Merge `f64af182c0001335da941144fa80fb84b492cbe0` has identical source to the feature branch.
+- Root tests/build and committed whitespace checks rerun PASS; build retains the existing >500kB warning.
+- In-app browser on development Mac, 1280×720, civic reviewTime 40, day 16/night 22: visually checked, no console warnings/errors. A reload-control timeout was recovered by rebinding the tab.
+- At that time, working-headquarters target v2 remained a reference awaiting implementation; main publication/CI status is recorded in the [handoff](handoffs/archive/fuji-tv-polish.md).
+
+### Fuji TV target v3 rounds 6–9 (2026-10-07)
+
+All on `codex/fuji-tv-polish`, not integrated at the time; each was three Dream Loop Plus passes; [handoff](handoffs/archive/fuji-tv-polish.md).
+
+- Common checks (each round):
+  - Root `npm test`, `npm run build`, `git diff --check` PASS after each pass.
+  - Development Mac headless Chrome 154, 1280×720/DPR 1, actor 40: civic 16/22 for all three passes, final hero 16, all-low (−12) 12, mixed (0) 18.5, high (+12) 22, and resize 1440×900 → 1280×720 PASS.
+  - Nine batches with unchanged bounds; no sustained FPS or exhibition-hardware claim; target fidelity PARTIAL; survey/module-swap suites not rerun.
+- Round 6 (starting `8de6cf8` plus checked source SHA-256 `b8dd6961…049dc0`):
+  - Theatre screen/scenery, glazing ribs, live-studio sets and 46 static forum/promenade visitors.
+  - New actual-mesh support/headroom check caught and fixed promenade visitors below the Y=65 structural beam.
+  - Existing route/site/actor and 81-answer real HTTP/WebSocket checks PASS.
+  - Chrome 154.0.8037.98, Apple M6 ANGLE Metal. All 10 capture records have no captured console/page/network errors; initial session favicon 404 recorded separately.
+  - 2,853,564 triangles. [Final day](../artifacts/fuji-tv-polish/v3r6-pass3.jpg), [night](../artifacts/fuji-tv-polish/v3r6-pass3-night.jpg), [hero](../artifacts/fuji-tv-polish/v3r6-hero.jpg), [browser/geometry record](../artifacts/fuji-tv-polish/v3r6-browser.json).
+  - NOT RUN: interior simulation/access control, live survey browser.
+- Round 7 (starting `1198b2f` plus checked source SHA-256 `b037643b…6de09f`; Claude Opus workers, Fable unavailable without usage credits):
+  - Open escalators and sphere crown; remove flank braces/pier light squares; glazed side studio galleries; continuous warm wing back wall.
+  - No source fix needed; via playwright-cli; all 10 captures report 0 console errors/warnings.
+  - 3,143,944 triangles. [Final day](../artifacts/fuji-tv-polish/v3r7-pass3.jpg), [night](../artifacts/fuji-tv-polish/v3r7-pass3-night.jpg), [browser/geometry record](../artifacts/fuji-tv-polish/v3r7-browser.json).
+- Round 8 (starting `7d263ce` plus checked source SHA-256 `9dbae83b…c69109`; Claude Opus workers):
+  - Clearer glazing; rebalanced warm/blue room light and dark umber depth; third studio level; violet-to-navy theatre shell; blue glass escalator balustrades/fascias.
+  - No source fix needed; via playwright-cli; all 10 captures report 0 console errors/warnings.
+  - 3,166,444 triangles. [Final day](../artifacts/fuji-tv-polish/v3r8-pass3.jpg), [night](../artifacts/fuji-tv-polish/v3r8-pass3-night.jpg), [browser/geometry record](../artifacts/fuji-tv-polish/v3r8-browser.json).
+- Round 9 (starting `7b37d43` plus checked source SHA-256 `9857573a…1f09a5`; Claude Opus workers):
+  - Silver escalators with navy trim; navy sphere ribs, darker navy dome, extra can lights, violet seats, full blue screen; lower/desaturated room light with dark floors and deeper blue screens.
+  - No source fix needed; via playwright-cli; all 10 captures report 0 console errors/warnings (final night retaken after a stale file).
+  - 3,182,944 triangles. [Final day](../artifacts/fuji-tv-polish/v3r9-pass3.jpg), [night](../artifacts/fuji-tv-polish/v3r9-pass3-night.jpg), [browser/geometry record](../artifacts/fuji-tv-polish/v3r9-browser.json).
+
+### Fuji TV target v3 — first rounds (2026-10-07)
+
+- Feature `codex/fuji-tv-polish`, implementation `f504484`, not integrated at the time; three Dream Loop Plus passes against the user's selected image; [handoff](handoffs/archive/fuji-tv-polish.md).
+- Final root `npm test`, `npm run build`, `git diff --check` PASS after removing pass 1's obsolete garden fragment.
+- Actual-mesh checks also sample standing headroom/support on both work wings and support beneath all 14 forum visitors; batch limit is 9 for the added shared broadcast finish.
+- Existing route/berth/bridge/site/person/robot and 81-answer HTTP/WebSocket checks PASS.
+- Development Mac in-app browser, 1280×720, actor 40: civic 16/22, authored hero 16, all-low (−12) 12, all-mixed (0) 18.5, all-high (+12) 22; no captured console warnings/errors, including shader compile.
+- Ordinary desktop resize 1440×900 updates canvas/backing dimensions.
+- Geometry grows to 1,711,564 triangles in 9 batches with unchanged bounds; capture-time canvas diagnostics do not measure sustained FPS.
+- [Final civic](../artifacts/fuji-tv-polish/v3-pass3.jpg), [night](../artifacts/fuji-tv-polish/v3-pass3-night.jpg), [hero](../artifacts/fuji-tv-polish/v3-hero.jpg), [browser JSON](../artifacts/fuji-tv-polish/v3-browser.json).
+- Target fidelity remains partial.
+- NOT RUN: exhibition GPU/hardware, sustained performance, interior circulation/access control, live survey browser. Separate survey/module-swap suites not rerun (packages unchanged).
+
+### Fuji TV target v1 — historical (2026-10-07)
+
+- Integrated through `f64af18`; three Dream Loop Plus passes; [handoff](handoffs/archive/fuji-tv-polish.md).
+- Root `npm test`, `npm run build` and `git diff --check` PASS after each pass's fixes.
+- Existing actual-mesh checks cover sphere aerial/wing clearance, Aqua City bridge approach, four site sightlines, route and person/robot geometry; no new test framework.
+- Development Mac in-app browser, 1280×720, actor time 40: civic day 16/night 22, standalone hero 16, all-low day 12, all-mixed dusk 18.5, all-high night 22; no console warning/error in checked views.
+- [Final civic](../artifacts/fuji-tv-polish/pass3.jpg), [night](../artifacts/fuji-tv-polish/pass3-night.jpg), [hero](../artifacts/fuji-tv-polish/hero.jpg), [browser record](../artifacts/fuji-tv-polish/browser.json).
+- Generated target fidelity remains partial.
+- NOT RUN: FPS, exhibition hardware, live scratch-survey browser. Root tests cover the real survey HTTP/WebSocket pipeline; survey/module-swap unchanged and their suites not rerun.
+
+### City readability (2026-10-04)
+
+- Branch `fix/city-readability`.
+- Change: resident card moved top-right, site-only pulse shafts, night intro halo.
+- Root `npm test`／`npm run build`／`git diff --check` PASS.
+- P3 browser PASS (Chrome 1280×720, hour 16, ordered reading 10,017 ms); evidence in [artifacts/readability](../artifacts/readability):
+  - [A reason](../artifacts/readability/resident-p3-city-A-reason.png);
+  - [pulse before](../artifacts/readability/pulse-before-1920.png)／[after](../artifacts/readability/pulse-site-focus-1920.png) (Chrome 1920×1080 `?meters`, 0→5 all axes, 0.7s);
+  - [night intro](../artifacts/readability/night-intro-1920.png).
+- Focal-site screen positions computed from `heroCamera` at 1280×720／1920×1080／3840×2160 all fall left of x = viewport − 404.
+- No FPS／hardware claim.
+
+### Resident P5 (2026-10-02)
+
+- [實機驗收表／交接](handoffs/resident-experience-p5.md)：預計 65 吋 HDMI／約 4 米／兩部 iPad／Mac mini M6 配置。
+- 使用者指定兩部 iPad 接收主機輸出；D0 先驗雙路獨立畫面／觸控，再驗睡眠／復原、閱讀／理解、長跑及政策。
+- 全部實機項目仍為 NOT RUN；P4 模擬觸控、clock jumps 或 CI 不替代實機證據。
+
+### Resident P4 (2026-10-02)
+
+- [handoff](handoffs/archive/resident-experience-p4.md) maps every resident-plan case to new native/browser evidence; exact final checked commits, CI and repeated timing are there.
+- Root/survey tests/build plus P2/P3/A-B/Admin Undo/P4 scratch-browser checks PASS.
+- Timing: P3 ordered reading 10,007 ms; A/B 10,011 ms initial, 10,004 ms A-first and 10,011 ms explicit B-first.
+- The real Meter pipeline connects 81 answers, maintained/new-run baselines, accumulated direction-only, mixed/opposing preference/high collective city and equal-score/different-distribution to resident reasons and actual carrier targets.
+- A/B checks follow whichever station commits first.
+- New P4 browser covers: keyboard/desktop-emulated touch/review; failed save/same-ID retry; next-guest inheritance; real City TCP disconnect/reconnect; offline B result expiry retaining A draft; then A questionnaire expiry/reset/admission.
+- Lease jumps 16,000/300,000 ms test server recovery; they do not measure visitor time.
+- Evidence (Chrome 154.0.8037.93, viewport 1280×720, deviceScaleFactor 1, fixed hero/hour 16): [A/B city](../artifacts/resident-p4-two-stations-city.png), [B waiting](../artifacts/resident-p4-guest-B-waiting.png), [review](../artifacts/resident-p4-single-review.png), [save/retry](../artifacts/resident-p4-save-retry.png), [maintained result](../artifacts/resident-p4-maintained-city.png), [reconnected city](../artifacts/resident-p4-reconnected-city.png), [expiry/reset city](../artifacts/resident-p4-expired-reset-city.png), [console/network JSON](../artifacts/resident-p4-browser.json).
+  - Save/retry is a full-page capture; viewport remains 1280×720.
+  - No page exceptions or unexpected resource/API errors; existing missing `/favicon.ico` 404 and deliberately aborted POST/offline WebSocket are explicitly recorded.
+- How to run: P4 browser starts its own temporary real SQLite/server and uses the existing project City preview.
+  - Set `CITY2127_PLAYWRIGHT_PATH` to an already installed Playwright `index.mjs`.
+  - Optional: `CITY2127_CITY_URL` selects the preview; `CITY2127_EVIDENCE_DIR` preserves previous screenshots; `CITY2127_CHECKED_COMMIT` records the checked baseline/commit.
+  - Run `node tests/residentP4.browser.mjs` after building survey. Do not use the exhibition database for destructive checks.
+- NOT RUN: hardware/Safari/LAN/visitor understanding/long-run/FPS/Windows.
+
+### Resident P3 (2026-10-02)
+
+- [handoff](handoffs/archive/resident-experience-p3.md) records coordinated single/A-B reading 10 s, separate city motion 3 s, result lease fixed 15 s, remaining-time retry/reload and early-handoff protection. Exact final verification/integration/CI and later changes are there; initial failures are recorded separately, not claimed as passes.
+- Renderer evidence compares effective visible carrier configurations, not scores/seed alone; same-score distribution, direction-only and maintained results are checked.
+- Root/survey native tests/build and scratch Chrome 1280×720 checks cover: A/B lost reply/reload; ordered reading (10,024 ms initial / 10,006 ms repeat; existing A/B regression 10,001 ms); reset drain; lighting; immediate reduced-motion/reload/Undo; P2 old-copy/keyboard and single Admin Undo regressions.
+- Screenshots (Chrome 1280×720, deviceScaleFactor 1, root `?hour=16`, visually reviewed; no geometry/camera changes): [A reason](../artifacts/resident-p3-city-A-reason.png), [B waiting](../artifacts/resident-p3-guest-B-waiting.png), [B reason](../artifacts/resident-p3-city-B-reason.png), [B look up](../artifacts/resident-p3-guest-B-look-up.png).
+- The browser check uses its own temporary real SQLite/server, installed Playwright via `CITY2127_PLAYWRIGHT_PATH` and the running root preview; use `CITY2127_EVIDENCE_DIR` to preserve previous evidence.
+- NOT RUN: P4's comprehensive matrix, P5 hardware/reading/understanding; no FPS/Safari/iPad/Windows claim.
+
+### Resident P2 (2026-10-02)
+
+- Question-set version 3 keeps ids/effects and original history.
+- Guest result has no viewing table and shares `ステーション A/B · 暮らしの声 #n` with City.
+- Native radio selection/focus/review edit and pre/post-commit network loss retain the request ID.
+- City background/focal facility cards use actual quantities; lifetime count alone never enables inherited-run copy; reload/reset/Undo replaces an old result.
+- That P2 local-card timeout did not reserve 10 s between results; the P3 record above supersedes its scheduling/lease/causal limits.
+- Desktop evidence (Chrome 1280×720, root `?hour=16`, scratch SQLite; exact checked commit in P2 handoff): [question](../artifacts/resident-p2-question-A.png), [review](../artifacts/resident-p2-review.png), [look up](../artifacts/resident-p2-look-up.png), [ambient city](../artifacts/resident-p2-city-ambient.png), [facility](../artifacts/resident-p2-city-facility.png), [result](../artifacts/resident-p2-city-result.png).
+- Panel coverage checked below 16% at 1280×720; screenshots visually reviewed.
+- Browser scripts report page exceptions; deliberate aborted submission requests are test inputs.
+- NOT RUN: real viewing distance, FPS, touch hardware, Safari, reading comprehension.
+
+### Stage index
 
 | Stage | Evidence / known limits |
 | --- | --- |
@@ -128,32 +347,26 @@ Fuji TV integration (2026-10-07): merge `f64af182c0001335da941144fa80fb84b492cbe
 | Documentation consolidation | [this task](handoffs/archive/odaiba-docs-consolidation.md); prose/link verification, not new runtime acceptance |
 | Resident narrative P1 (2026-10-02) | [copy](RESIDENT_COPY.md), [handoff](handoffs/archive/resident-copy-p1.md); documentation only, new screen/copy wiring and reading-time/iPad acceptance remain untested |
 | Resident experience plan (2026-10-02) | [P1–P5 plan](RESIDENT_EXPERIENCE_PLAN.md), [handoff](handoffs/archive/resident-experience-plan.md); documentation evidence only; proposed P2–P5 acceptance is not a passing runtime/device check |
-| Resident P2 (2026-10-02) | [P2 handoff](handoffs/archive/resident-experience-p2.md); root/survey tests/build, real SQLite question2→3 history/retry, Chrome1280×720 old A/B draft/keyboard/review, single Undo and A/B reset/cancel/lost-response regressions; new screen evidence below. P3/P4/P5 remain open |
+| Resident P2 (2026-10-02) | [P2 handoff](handoffs/archive/resident-experience-p2.md); root/survey tests/build, real SQLite question 2→3 history/retry, Chrome 1280×720 old A/B draft/keyboard/review, single Undo and A/B reset/cancel/lost-response regressions; P3/P4/P5 remain open |
 
-P2 current checks: question-set version3 keeps ids/effects and original history; Guest result has no viewing table and shares `ステーション A/B · 暮らしの声 #n` with City. Native radio selection/focus/review edit and pre/post-commit network loss retain the request ID. City background/focal facility cards use actual quantities, lifetime count alone never enables inherited-run copy, and reload/reset/Undo replaces an old result. That P2 local-card timeout did not reserve10s between results; the P3 record below supersedes its scheduling/lease/causal limits.
+### Still open
 
-New 2026-10-02 desktop evidence (Chrome1280×720, root `?hour=16`, scratch SQLite; exact checked commit in P2 handoff): [question](../artifacts/resident-p2-question-A.png), [review](../artifacts/resident-p2-review.png), [look up](../artifacts/resident-p2-look-up.png), [ambient city](../artifacts/resident-p2-city-ambient.png), [facility](../artifacts/resident-p2-city-facility.png), [result](../artifacts/resident-p2-city-result.png). Panel coverage checked below16% at1280×720; screenshots visually reviewed. This does not measure real viewing distance, FPS, touch hardware, Safari or reading comprehension. Browser scripts report page exceptions; deliberate aborted submission requests are test inputs.
-
-P3 (2026-10-02): [handoff](handoffs/archive/resident-experience-p3.md) records coordinated single/A-B reading10s, separate city motion3s, result lease fixed15s, remaining-time retry/reload and early-handoff protection. Renderer evidence compares effective visible carrier configurations, not scores/seed alone; same-score distribution, direction-only and maintained results are checked. Root/survey native tests/build and scratch Chrome1280×720 checks cover A/B lost reply/reload, ordered reading (10,024ms initial /10,006ms repeat; existing A/B regression10,001ms), reset drain, lighting, immediate reduced-motion/reload/Undo, plus P2 old-copy/keyboard and single Admin Undo regressions. Exact final verification/integration/CI and any later changes are in the handoff; initial failures are recorded separately, not claimed as passes.
-
-New P3 screenshots: [A reason](../artifacts/resident-p3-city-A-reason.png), [B waiting](../artifacts/resident-p3-guest-B-waiting.png), [B reason](../artifacts/resident-p3-city-B-reason.png), [B look up](../artifacts/resident-p3-guest-B-look-up.png). Visually reviewed at Chrome1280×720, deviceScaleFactor1, root `?hour=16`; no geometry/camera changes. The browser check uses its own temporary real SQLite/server, installed Playwright via `CITY2127_PLAYWRIGHT_PATH` and the running root preview; use `CITY2127_EVIDENCE_DIR` to preserve previous evidence. These checks do not complete P4's comprehensive matrix or P5 hardware/reading/understanding; no FPS/Safari/iPad/Windows claim.
-
-P4 (2026-10-02): [handoff](handoffs/archive/resident-experience-p4.md) maps every resident-plan case to new native/browser evidence. Root/survey tests/build plus P2/P3/A-B/Admin Undo/P4 scratch-browser checks PASS; P3 ordered reading10,007ms, A/B10,011ms initial,10,004ms A-first and10,011ms explicit B-first. The real Meter pipeline now connects 81 answers, maintained/new-run baselines, accumulated direction-only, mixed/opposing preference/high collective city and equal-score/different-distribution to resident reasons and actual carrier targets. A/B checks follow whichever station commits first. New P4 browser covers keyboard/desktop-emulated touch/review, failed save/same-ID retry, next-guest inheritance, real City TCP disconnect/reconnect, offline B result expiry retaining A draft, then A questionnaire expiry/reset/admission. Lease jumps16,000/300,000ms test server recovery; they do not measure visitor time. Exact final checked commits, CI and repeated timing belong in the handoff.
-
-New P4 evidence (Chrome154.0.8037.93, viewport1280×720, deviceScaleFactor1, fixed hero/hour16): [A/B city](../artifacts/resident-p4-two-stations-city.png), [B waiting](../artifacts/resident-p4-guest-B-waiting.png), [review](../artifacts/resident-p4-single-review.png), [save/retry](../artifacts/resident-p4-save-retry.png), [maintained result](../artifacts/resident-p4-maintained-city.png), [reconnected city](../artifacts/resident-p4-reconnected-city.png), [expiry/reset city](../artifacts/resident-p4-expired-reset-city.png), [console/network JSON](../artifacts/resident-p4-browser.json). Save/retry is a full-page capture; viewport remains1280×720. No page exceptions or unexpected resource/API errors; existing missing `/favicon.ico`404 and deliberately aborted POST/offline WebSocket are explicitly recorded. Hardware/Safari/LAN/visitor understanding/long-run/FPS/Windows remain unverified.
-
-P4 browser starts its own temporary real SQLite/server and uses the existing project City preview. Set `CITY2127_PLAYWRIGHT_PATH` to an already installed Playwright `index.mjs`; optional `CITY2127_CITY_URL` selects the preview, `CITY2127_EVIDENCE_DIR` preserves previous screenshots and `CITY2127_CHECKED_COMMIT` records the checked baseline/commit. Run `node tests/residentP4.browser.mjs` after building survey. Do not use the exhibition database for destructive checks.
-
-P5（2026-10-02）：[實機驗收表／交接](handoffs/resident-experience-p5.md) 記錄預計65吋HDMI／約4米／兩部iPad／Mac mini M6配置；使用者指定兩部iPad接收主機輸出，D0先驗雙路獨立畫面／觸控，再驗睡眠／復原、閱讀／理解、長跑及政策。全部實機項目仍為 NOT RUN；P4模擬觸控、clock jumps或CI不替代實機證據。
-
-City readability (2026-10-04, branch `fix/city-readability`): resident card moved top-right, site-only pulse shafts, night intro halo. Root `npm test`／`npm run build`／`git diff --check` PASS; P3 browser PASS (Chrome1280×720, hour16, ordered reading 10,017ms) with new evidence in [artifacts/readability](../artifacts/readability) — [A reason](../artifacts/readability/resident-p3-city-A-reason.png), [pulse before](../artifacts/readability/pulse-before-1920.png)／[after](../artifacts/readability/pulse-site-focus-1920.png) (Chrome1920×1080 `?meters`, 0→5 all axes, 0.7s), [night intro](../artifacts/readability/night-intro-1920.png). Focal-site screen positions computed from `heroCamera` at 1280×720／1920×1080／3840×2160 all fall left of x = viewport − 404. No FPS／hardware claim.
-
-**Still open:** S5 full exhibition acceptance, actual input hardware, exhibition-day reset/recovery policy, sustained runtime/device testing. Use current browser procedures and the P5 handoff above; do not reopen old Shibuya tasks.
+- S5 full exhibition acceptance.
+- Actual input hardware.
+- Exhibition-day reset/recovery policy.
+- Sustained runtime/device testing.
+- Use current browser procedures and the P5 handoff above; do not reopen old Shibuya tasks.
 
 ## Historical evidence (not exhibition acceptance)
 
-All pre-consolidation dated entries and screenshots are retained in [validation snapshot through 2026-10-02](history/VALIDATION_2026-10-02.md), with original headings for old deep links. Its “current prototype” procedures and next steps describe historical stages and must not be executed as today's acceptance plan. The old [implementation snapshot](history/PROJECT_2026-10-02.md), [MVP plan](history/EXHIBITION_MVP.md), [Shibuya Plan 02](history/SHIBUYA_PLAN02.md) and [Plan 01](SHIBUYA.md) preserve decisions/evidence without creating future Shibuya work.
+- All pre-consolidation dated entries and screenshots are retained in [validation snapshot through 2026-10-02](history/VALIDATION_2026-10-02.md), with original headings for old deep links.
+- Its "current prototype" procedures and next steps describe historical stages and must not be executed as today's acceptance plan.
+- The old [implementation snapshot](history/PROJECT_2026-10-02.md), [MVP plan](history/EXHIBITION_MVP.md), [Shibuya Plan 02](history/SHIBUYA_PLAN02.md) and [Plan 01](SHIBUYA.md) preserve decisions/evidence without creating future Shibuya work.
 
 ## Task handoff verification
 
-Use one named owner and [handoff template](handoffs/TEMPLATE.md). Record preflight branch/HEAD, fresh remote refs/divergence, scope, checked commit/worktree, actual commands/evidence, unrun checks, integrated commit/CI and next step. Preserve each task separately; document integration completion independently from visual/hardware acceptance. Full handoff navigation: [open tasks](handoffs/README.md) / [archived task evidence](handoffs/archive/README.md). Archiving completed/superseded handoffs preserves their dates, commits and unverified limits; it does not complete visual or hardware acceptance.
+- Use one named owner and the [handoff template](handoffs/TEMPLATE.md).
+- Record: preflight branch/HEAD, fresh remote refs/divergence, scope, checked commit/worktree, actual commands/evidence, unrun checks, integrated commit/CI and next step.
+- Preserve each task separately; document integration completion independently from visual/hardware acceptance.
+- Navigation: [open tasks](handoffs/README.md) / [archived task evidence](handoffs/archive/README.md).
+- Archiving completed/superseded handoffs preserves their dates, commits and unverified limits; it does not complete visual or hardware acceptance.

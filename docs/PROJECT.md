@@ -1,10 +1,14 @@
 # Project contract and implementation map — Odaiba 2127
 
-Current source map, updated for resident P3 against base `e82b8f57ccfb36d6106f6cdf7954d76a5efba4d5` on 2026-10-02; exact verified/integrated commits are in the [P3 handoff](handoffs/archive/resident-experience-p3.md). Product decisions belong in [EXHIBITION_SPEC](EXHIBITION_SPEC.md), startup in [README](../README.md), art implementation in [ART](ART.md), and dated checks in [VALIDATION](VALIDATION.md). Owner: cc100053; documentation consolidation: Codex.
+- Current source map, updated for resident P3 against base `e82b8f57ccfb36d6106f6cdf7954d76a5efba4d5` on 2026-10-02; exact verified/integrated commits are in the [P3 handoff](handoffs/archive/resident-experience-p3.md).
+- Where other facts live: product decisions in [EXHIBITION_SPEC](EXHIBITION_SPEC.md), startup in [README](../README.md), art implementation in [ART](ART.md), dated checks in [VALIDATION](VALIDATION.md), terms in [GLOSSARY](GLOSSARY.md).
+- Owner: cc100053; documentation consolidation: Codex.
 
 ## Product and package boundaries
 
-The single exhibition venue is the **Odaiba waterfront in 2127**. Shibuya is a closed historical direction and will not be developed again (user decision, 2026-10-02). Historical unfinished tasks are not the current backlog. Legacy internal site IDs are compatibility identifiers, not a second venue.
+- The single exhibition venue is the **Odaiba waterfront in 2127**.
+- Shibuya is a closed historical direction and will not be developed again (user decision, 2026-10-02). Historical unfinished tasks are not the current backlog.
+- Legacy internal site IDs are compatibility identifiers, not a second venue.
 
 | Package | Current responsibility |
 | --- | --- |
@@ -12,13 +16,47 @@ The single exhibition venue is the **Odaiba waterfront in 2127**. Shibuya is a c
 | `survey/` | Four-question v2 proposal API, reducer, authoritative layout, SQLite schema 7, WebSocket, Guest / Monitor / loopback Admin |
 | `module-swap/` | Preserved standalone / legacy v1 four-lot demonstrator; rejects v2 and is not the exhibition city |
 
-Desktop-only presentation, with normal renderer resize. Do not add adaptive camera/mobile acceptance. Ambient people, vehicles, drones and aerial routes are allowed. Low/zero/high Meter values all depict mature 2127 alternatives. No deployment workflow is configured.
+- Desktop-only presentation, with normal renderer resize. Do not add adaptive camera/mobile acceptance.
+- Ambient people, vehicles, drones and aerial routes are allowed.
+- Low/zero/high Meter values all depict mature 2127 alternatives.
+- No deployment workflow is configured.
 
-Resident [P1 copy](RESIDENT_COPY.md) is wired by [P2](handoffs/archive/resident-experience-p2.md). Guest handles questions/background, choices, review, save/wait/retry, shared station/ordinal identity and the look-up prompt; results have no answer/score/facility tables. The existing single-revision conflict review still displays scores for recovery. Question-set version **3** is independent of algorithm/CityView v2 and SQLite schema7. Older reserved drafts are rejected by the existing version guard, then valid choices can be carried into a fresh reservation; A/B ends its own obsolete reservation through the existing endpoint first. Stored version2 proposals retain their original question/option copy and remain idempotently recoverable after upgrade.
+### Guest (iPad) copy and question set
 
-Root reuses `surveyAtmosphere`'s panel for one fixed desktop reading card at the top right (moved from the left 2026-10-04: at 1280–3840 px wide all four focal sites project left of it): title, at most two sentences and named location. Ambient background/facility cards rotate locally every12s; current-run proposals, never lifetime participation alone, allow the inherited-city card. Service/shared-seat counts, Park tree/cooling quantities and the tower's rendered band select focal facility descriptions. Even low Park retains trees, so trees+cooling uses the combined card; these are descriptions of current facilities, not district change inference. The rotation opens with `intro.origin` (who has decided cities so far; added 2026-10-19), then the identity card, whose body is shortened to its first two P1 sentences. P3 live results reserve10s: identity/location during the existing3s transition, then one selected preference plus one collective effect until the slot ends. `CityChangeManager.applyExhibitionLayout` returns focal/district evidence by comparing effective `getConfiguration()` targets, including slot distribution, rendered hybrids, visible pairing products, published roofs/facades and actual fleet counts. Hidden tower extras and seed changes alone are not visual evidence. Focal quantities name only their own site; district-only changes use district locations and conservative configuration wording. No evidence after a missed predecessor uses the recorded fallback; unchanged targets distinguish score-direction changes from maintained configuration. Snapshot/reset/Undo replaces the card immediately; reload does not replay an old result. Lighting-only snapshots do not restart cards or skip queued changes.
+- Resident [P1 copy](RESIDENT_COPY.md) is wired by [P2](handoffs/archive/resident-experience-p2.md).
+- Guest handles questions/background, choices, review, save/wait/retry, shared station/ordinal identity and the look-up prompt.
+- Results have no answer/score/facility tables. The existing single-revision conflict review still displays scores for recovery.
+- Question-set version **3** is independent of algorithm/CityView v2 and SQLite schema 7.
+- Older reserved drafts are rejected by the existing version guard; valid choices can then be carried into a fresh reservation. A/B first ends its own obsolete reservation through the existing endpoint.
+- Stored version 2 proposals retain their original question/option copy and remain idempotently recoverable after upgrade.
 
-The [resident experience plan](RESIDENT_EXPERIENCE_PLAN.md) records P1–P3 implementation and [P4 software acceptance](handoffs/archive/resident-experience-p4.md); P5 device/visitor acceptance remains. `survey/src/shared/displayTiming.ts` supplies server/root/Guest reading10s, handoff5s and result lease15s separately from the renderer transition3s. Provisional iPad hardware/Safari/visitor understanding and whether ten seconds is sufficient remain unverified; no generic responsive requirement. Geometry/camera/resources remain unchanged.
+### City reading card (top right)
+
+- Root reuses `surveyAtmosphere`'s panel for one fixed desktop reading card at the top right: title, at most two sentences and named location.
+- It moved from the left on 2026-10-04: at 1280–3840 px wide, all four focal sites project left of it.
+- Ambient background/facility cards rotate locally every 12 s.
+- The rotation opens with `intro.origin` (who has decided cities so far; added 2026-10-19), then the identity card, whose body is shortened to its first two P1 sentences.
+- Only current-run proposals allow the inherited-city card; lifetime participation alone never does.
+- Focal facility descriptions are selected by service/shared-seat counts, Park tree/cooling quantities and the tower's rendered band.
+- Even low Park retains trees, so trees + cooling uses the combined card. These describe current facilities; they do not infer district change.
+- P3 live results reserve 10 s: identity/location during the existing 3 s transition, then one selected preference plus one collective effect until the slot ends.
+
+### Change evidence for result text
+
+- `CityChangeManager.applyExhibitionLayout` returns focal/district evidence by comparing effective `getConfiguration()` targets: slot distribution, rendered hybrids, visible pairing products, published roofs/facades and actual fleet counts.
+- Hidden tower extras and seed changes alone are not visual evidence.
+- Focal quantities name only their own site. District-only changes use district locations and conservative configuration wording.
+- No evidence after a missed predecessor → the recorded fallback.
+- Unchanged targets distinguish score-direction changes from maintained configuration.
+- Snapshot/reset/Undo replaces the card immediately; reload does not replay an old result.
+- Lighting-only snapshots do not restart cards or skip queued changes.
+
+### Resident experience status and timing
+
+- The [resident experience plan](RESIDENT_EXPERIENCE_PLAN.md) records P1–P3 implementation and [P4 software acceptance](handoffs/archive/resident-experience-p4.md); P5 device/visitor acceptance remains.
+- `survey/src/shared/displayTiming.ts` supplies server/root/Guest timings: reading 10 s, handoff 5 s, result lease 15 s. These are separate from the renderer transition (3 s).
+- Unverified: provisional iPad hardware/Safari, visitor understanding, and whether ten seconds is sufficient. No generic responsive requirement.
+- Geometry/camera/resources remain unchanged.
 
 ## Root source ownership
 
@@ -46,25 +84,78 @@ The [resident experience plan](RESIDENT_EXPERIENCE_PLAN.md) records P1–P3 impl
 
 ## Scene, geometry and rendering
 
-Coordinates are **metres, Y-up**. `DISTRICT` covers the 720 × 680 m hero area. The derived `odaiba_district_v01_environment.glb` retains connected ground/roads and quieter background context outside the hero; the former 150 m dissolve-to-island is superseded. Telecom Center is not loaded as a separate landmark. [crop script](../scripts/crop-odaiba-district.py) produces the environment from the preserved masterplan source.
+### District and landmarks
 
-Six named models remain: Aqua City, DECKS, DiverCity Plaza, DiverCity Office Tower, Hilton and Grand Nikko. Fuji TV's runtime form is `civicCore`. Generated maritime sky/coastal grass textures are local assets. The future-tree GLB is used by the Park site; it is no longer placed at Hachiko.
+- Coordinates are **metres, Y-up**. `DISTRICT` covers the 720 × 680 m hero area.
+- The derived `odaiba_district_v01_environment.glb` retains connected ground/roads and quieter background context outside the hero; the former 150 m dissolve-to-island is superseded.
+- The [crop script](../scripts/crop-odaiba-district.py) produces the environment from the preserved masterplan source.
+- Telecom Center is not loaded as a separate landmark.
+- Six named models remain: Aqua City, DECKS, DiverCity Plaza, DiverCity Office Tower, Hilton and Grand Nikko.
+- Fuji TV's runtime form is `civicCore`.
+- Generated maritime sky/coastal grass textures are local assets.
+- The future-tree GLB is used by the Park site; it is no longer placed at Hachiko.
 
-Fuji TV target v3 (2026-10-07, integrated from `codex/fuji-tv-polish` after round 9 by user request): two occupied work wings contain editing mezzanines, workstation/staff details on dark oak floors against dark umber back walls under softer warm ceiling coves, sparse deep-blue hung screens, dark front glazing mullions, narrower rear sealed studio volumes flanked by glazed side studio galleries, selective near-clear glazing and blue live-studio sets on three studio levels (Y=43/83/102); other gallery levels stay warm. The sphere has a taller broadcast wall with recessed centre scenery, warm proscenium, presenter desk/cameras, dark acoustic seating treads, tiered audience and technical grid behind reduced glazing ribs; a darkened inward stage-wash shell glows violet around the rig and fades to navy below the clear crown, with navy glass ribs, an outer ring of dome can lights, violet audience seats and a fully lit blue broadcast wall. Diagonal transfers are silver escalators with light treads, clear balustrades, a slim navy fascia and blue-lit rails; the flank diagonal braces and pier light squares are removed. Warm room lighting and cool production screens follow the existing city clock through a shared shader uniform reading `cityRig.publicLight.emissiveIntensity`; building-local ceramic/furniture finishes leave shared city materials unchanged. Glazed public foyer, forum visitors/benches, bay-facing groups, mid-level promenade pairs and separate rear staff entrances express the approved program; people/equipment/access details are static geometry, without interior-service or access-control simulation. Promenade pairs stand at Y=65 on the transfer beam above the thinner slab. Split piers, planted diagonals, forum bridge opening, sphere berth, district routes, original Blender/GLB and authored hero remain. Static geometry merges into nine shared material batches. [Target, checks and limits](handoffs/archive/fuji-tv-polish.md).
+### Fuji TV target v3 (2026-10-07)
 
-Hero camera: position `(-520,300,-620)`, target `(-40,25,-60)`, FOV 42°, near 2, far 9000. Orbit distance 150–1000, polar angle .35–1.42; pan is bounded to the district. Comparisons use the untouched hero pose, stated viewport/hour and actor time. No automatic camera reframing.
+Integrated from `codex/fuji-tv-polish` after round 9 by user request. [Target, checks and limits](handoffs/archive/fuji-tv-polish.md).
 
-Renderer: WebGL 2, Neutral tone mapping (.84 base exposure), sRGB output, pixel ratio capped at 1.5, VSM directional shadows. [renderQuality](../src/renderQuality.ts) reads `?quality=low` (2026-10-15, manual fallback for weaker GPUs, production too): pixel ratio cap 1, no MSAA, GTAO disabled and the shadow map off; the default keeps the full look and automatic quality stepping is not implemented. The sky dome follows the camera. A softened generated sky plus RoomEnvironment light cards feeds PMREM reflections. Composer: 4× MSAA HalfFloat target → RenderPass → GTAO → bloom → vignette → OutputPass → display-space colour grade. Curved sea/bay context, wakes and Meter pulses are excluded where required from GTAO's flat override prepass. Do not add another tone-map/output conversion. Environment ground finishes lie within 0–3 cm of each other (building pads over lawn terrain, plazas, service yards), below hero-range depth precision; `odaibaScene` gives road/service, plaza, sidewalk and road-marking finishes increasing polygon offsets so they stack in that order over the lawn instead of z-fighting (2026-10-06).
+- Work wings: two occupied wings with editing mezzanines and workstation/staff details on dark oak floors, against dark umber back walls under softer warm ceiling coves; sparse deep-blue hung screens; dark front glazing mullions.
+- Studios: narrower rear sealed studio volumes, flanked by glazed side studio galleries; selective near-clear glazing and blue live-studio sets on three studio levels (Y=43/83/102); other gallery levels stay warm.
+- Sphere: a taller broadcast wall with recessed centre scenery, warm proscenium, presenter desk/cameras, dark acoustic seating treads, tiered audience and technical grid behind reduced glazing ribs.
+- Sphere lighting: a darkened inward stage-wash shell glows violet around the rig and fades to navy below the clear crown; navy glass ribs, an outer ring of dome can lights, violet audience seats and a fully lit blue broadcast wall.
+- Diagonal transfers: silver escalators with light treads, clear balustrades, a slim navy fascia and blue-lit rails. The flank diagonal braces and pier light squares are removed.
+- Lighting: warm room lighting and cool production screens follow the existing city clock through a shared shader uniform reading `cityRig.publicLight.emissiveIntensity`. Building-local ceramic/furniture finishes leave shared city materials unchanged.
+- Program: glazed public foyer, forum visitors/benches, bay-facing groups, mid-level promenade pairs and separate rear staff entrances.
+- People/equipment/access details are static geometry, without interior-service or access-control simulation.
+- Promenade pairs stand at Y=65 on the transfer beam above the thinner slab.
+- Unchanged: split piers, planted diagonals, forum bridge opening, sphere berth, district routes, original Blender/GLB and authored hero.
+- Static geometry merges into nine shared material batches.
 
-Static groups are merged by material, windows/actors/carriers use InstancedMesh, and inactive district batches issue no draws. Shared resources are not disposed by a clone. Hidden transition transforms remain invertible. No geometry/material allocation per frame. Full teardown for repeated in-page scene recreation is not implemented; initialization is once per page.
+### Camera
+
+- Hero camera: position `(-520,300,-620)`, target `(-40,25,-60)`, FOV 42°, near 2, far 9000.
+- Orbit distance 150–1000, polar angle .35–1.42; pan is bounded to the district.
+- Comparisons use the untouched hero pose, stated viewport/hour and actor time.
+- No automatic camera reframing.
+
+### Renderer
+
+- WebGL 2, Neutral tone mapping (.84 base exposure), sRGB output, pixel ratio capped at 1.5, VSM directional shadows.
+- [renderQuality](../src/renderQuality.ts) reads `?quality=low` (2026-10-15; manual fallback for weaker GPUs, production too): pixel ratio cap 1, no MSAA, GTAO disabled and the shadow map off.
+- The default keeps the full look; automatic quality stepping is not implemented.
+- The sky dome follows the camera. A softened generated sky plus RoomEnvironment light cards feeds PMREM reflections.
+- Composer: 4× MSAA HalfFloat target → RenderPass → GTAO → bloom → vignette → OutputPass → display-space colour grade.
+- Curved sea/bay context, wakes and Meter pulses are excluded where required from GTAO's flat override prepass.
+- Do not add another tone-map/output conversion.
+- Ground finishes (2026-10-06): environment ground finishes lie within 0–3 cm of each other (building pads over lawn terrain, plazas, service yards), below hero-range depth precision. `odaibaScene` gives road/service, plaza, sidewalk and road-marking finishes increasing polygon offsets, so they stack in that order over the lawn instead of z-fighting.
+
+### Resources
+
+- Static groups are merged by material; windows/actors/carriers use InstancedMesh; inactive district batches issue no draws.
+- Shared resources are not disposed by a clone.
+- Hidden transition transforms remain invertible.
+- No geometry/material allocation per frame.
+- Full teardown for repeated in-page scene recreation is not implemented; initialization is once per page.
 
 ## Frame and data flow
 
-`main` determines clock/display hour → standalone `moodAt` or survey `world.state`, followed by `withNight`, supplies base atmosphere → lights/sky/fog update → `CityChangeManager.update(time,darkness)` advances focal sites, district carriers, pulses and local motion → `cityRig.update` forwards eased automation activity to mobility → `updateOdaiba` updates glazing → overlay and composer render. Time uses `performance.now()`; hidden tabs may advance motion on return.
+- Per frame: `main` determines clock/display hour → standalone `moodAt` or survey `world.state`, followed by `withNight`, supplies base atmosphere → lights/sky/fog update → `CityChangeManager.update(time,darkness)` advances focal sites, district carriers, pulses and local motion → `cityRig.update` forwards eased automation activity to mobility → `updateOdaiba` updates glazing → overlay and composer render.
+- Time uses `performance.now()`; hidden tabs may advance motion on return.
 
-A city day is 180 s from 12:00. Mood labels are Still / Daylight / Pulse; the old preset buttons and `0/1/2` controls were removed. `?hour=0..23.999` holds review time and overrides Admin Day/Night/Auto. Admin display setting persists independently of city reset. Separate Auto viewers have local clocks.
+### Clock
 
-Standalone uses day-cycle activity and does not create the v2 district layer. `?survey` connects to `ws://<current-host>:8787/ws`, or the explicit ws/wss URL supplied as its value. Legacy v1 retains the 10 s atmosphere path. V2 uses the server layout and seeds directly, without blending scores into global atmosphere.
+- A city day is 180 s, starting from 12:00.
+- Mood labels are Still / Daylight / Pulse; the old preset buttons and `0/1/2` controls were removed.
+- `?hour=0..23.999` holds review time and overrides Admin Day/Night/Auto.
+- The Admin display setting persists independently of city reset.
+- Separate Auto viewers have local clocks.
+
+### Standalone and survey modes
+
+- Standalone uses day-cycle activity and does not create the v2 district layer.
+- `?survey` connects to `ws://<current-host>:8787/ws`, or to the explicit ws/wss URL supplied as its value.
+- Legacy v1 retains the 10 s atmosphere path.
+- V2 uses the server layout and seeds directly, without blending scores into global atmosphere.
 
 ## Four sites and district behavior
 
@@ -75,72 +166,218 @@ Standalone uses day-cycle activity and does not create the v2 district layer. `?
 | sw / sharing | (−105,60), ×4, アクアシティ南 | Commons plaza + SharingDistrict |
 | se / concentration | (175,−45), ×3, フジテレビ東 | Concentration tower + ConcentrationDistrict |
 
-The district layer uses bounded preallocated slots: 17 climate bays, 11 service bays, six water rooms, ten courts, ten towers and 26 low pods, plus published roof carriers. Complementary covers preserve complete future identities; mixed composes hybrids. Cross-Meter agreement enables extra facilities. Four uint32 `slotSeeds` hash the full ordered active run history; neutral votes do not shuffle direction, and Undo excludes revoked proposals. Full-history hashing is O(guests) per view; optimize only if measured cost warrants it. Site/design footprints stay fixed while selected slot distribution can differ by history.
+### District slots and seeds
 
-Automation changes walkers 400/260/120, pods 12/18/24 and circulating aircraft 2/16/30 at low/mixed/high, and turns street cars into autonomous street pods (all cars / about half / all pods, with the same amount of traffic); capacities exceed visible counts. Air tiers ([layout](../src/layout.ts)): the regional district loop/sphere approach at 160–170 m, the city shore lane (closed loop offshore, inbound leg 80 m, outbound 100 m) and the service quadrotors at 30–45 m. Aircraft slots 0–9 alternate loops evenly; slots 10+ fly as wingmen 34 m behind, so platoons appear only as automation rises. Each slot is a human-led winged craft or an autonomous pod; craft switch midway between settled levels (pods about 0/15/50/85/100 % for ports 0–1/2/3/4/5–6), berth shuttles become pods above mixed. Corridors keep a faint fixed guide line; four shore-lane beacon masts (58 m) stand clear of rooms and boat routes. The shore interchange in front of Aqua City has a 56 m pier, boat head and a 38 m arrival mast with glass lift; its boat and air shuttle reuse the 40 s `dockMotion` cycle (offset 20 s) and pivot over 4 s when leaving, as does the sphere shuttle. Walkers move in parties (per six slots: one alone, a pair, a trio with a child); four of five parties walk the promenades, every fifth a mid-level/garden skyway deck. Each makes one-way trips at their own pace (0.9–1.45 m/s; a third of lone walkers jog, in the outer lane so they pass parties), followers loosely ahead or behind, fading in and out at the route ends as if entering a building, rests out of sight, and picks a fresh direction. Lanes are right of travel, so the two directions keep to their own sides; parties walk at most 0.6 m wide (a pair abreast; a trio's child beside the leader, the other adult behind; single file on decks), and `passingLanes` makes everyone sharing a path sidestep to pass or meet with 0.65 m between shoulders, queueing up to 2.5 m where a crowd leaves no room; whoever passes a fixed mover (a halted robot, its collector, a stopper) goes round the side with room. Feet follow ground actually covered (trip distance plus the solver's along offset), so queued people stop stepping, and a sidestep turns the body toward its actual path. Two in five non-joggers stop at a viewpoint facing the bay. On the promenades each such party has its own spot (`promenadeStops`): lone walkers veer out of the lane to a backless one-seat stool between benches and sit 70 s, parties line up at a free rail spot for 40 s, then rejoin their lane; they stop only on trips with the sea on their right, so they never cross the oncoming lane; leftover stoppers and deck walkers walk on. Up to 120 doorway walkers (scaled like the promenade walkers) step out from 0.6 m inside one ground-floor door (so they emerge from the facade rather than grow out of the paving), cross the paved forecourt 4–10 m out on a corner-rounded curve (keeping right and making way like promenade walkers; each door on one trip, trips 3 m apart, one robot per trip) and go in at the next: `publishDoorways` raycasts each loaded landmark's facades and forecourt (sidewalk/plaza only). Street cars (4.6 m human-driven cars, every seventh a 7 m van; head/tail lights at night; each slot becomes a rounded autonomous street pod or cargo pod by the aircraft's `podShare` thresholds as automation rises, standalone keeps cars) drive on the left on two avenues snapped to the environment's road surface ([layout](../src/layout.ts) `streets`: seaside avenue north of Aqua City/DECKS, avenue under the guideway, which ends at d 620 short of Hilton's chapel and podium); `CARRIAGEWAY` places the lanes: the seaside lanes 0.25 m off centre away from Aqua City's wall, and under the guideway a carriageway widened 1.6 m left onto the paving slab (−5.1 … −0.5 m) so the Yurikamome piers, which stand in the right half of the surveyed road, stay ≥ 0.34 m clear of full-size cars, each never ahead of its slot on one speed per lane with irregular gaps, fading at the avenue ends; density follows `traffic`. Each slot is simulated frame to frame: it keeps 2 m + 0.5 s behind the car ahead round the loop, brakes for a requested crossing it can still stop for (≤ 3 m/s² profile, brake lamps lit while slowing or queued), then catches up (≤ +30 %, ≤ 14 m/s); first frame, jumps and snapshots put every car back on its slot. Two signal-free shared-space crossings on the guideway avenue (`CROSSINGS`, d 286 and 480; pale band, mint edge lines while requested): residents walk 8 m along the footway to the kerb, wait until every approaching car has stopped or passed, cross, and walk on along the far footway. The seaside avenue has none: Aqua City's wall stands 2.3 m from its centre line. Both carriageways are shared surface, not asphalt: inlaid darker stone seams (0.3 m) at the `CARRIAGEWAY` edges and a 0.1 m mint guide under each lane centre (`carriageway-seams`/`carriageway-guides`, one merged mesh each, flush on the paving slab under the crossing bands). `roadFill` lays a strip of the paving finish over the guideway avenue's junction mouth (d 486–507), which had only terrain. The two avenues do not cross each other, so there are no signals (2127 cars need none). Two cars on the guideway avenue's westbound lane make kerbside drop-offs at paved bays south of Aqua City: each eases into its bay, parks about one lane lap, and waits indicating until the lane behind and beside the pull-out is clear (kerb-side amber indicators from 30 m before easing in, a brake lamp and slight nose dip while stopping, road-side indicators from 3 s before pulling away with a slight lift); a passenger walks between car and the nearest landmark door. The promenades are a 7.2 m paved boardwalk (top at walker level, lawn 0.2–0.35 m below). Benches every 24 m, 2.75 m out facing the sea (walker centres stay ≤ 2.1 m out, so shoulders clear the backrest; feet clear the lit edge), seat two people, with a couple standing at the rail between benches; up to 20 forecourts hold standing groups of two or three, and 14 delivery robots (0.7 m/s) run the doorway forecourts, halting 8 s just outside the next door while a collector steps out to meet them, then both go in. People swing legs and arms in a vertex shader (`gait` instance attribute, no extra draws; shadows and GTAO use the rest pose) and a quarter carry a backpack, a fifth a shoulder bag. `streetRhythm(hour)` thins each group through the day by a stable per-person hash: evening crowds, joggers at dawn/dusk, strollers toward sunset, children by day, sitters from late morning, robots at night, cars at the commutes; without an hour (tests, standalone callers) everyone stays. DEV `?review=street` frames a promenade bench and the seaside avenue from 40 m (orbit may close to 30 m in that mode only; `&cam=x,y,z` moves that camera, `&at=x,y,z` aims it). Sixteen transfers (independent of Meters) disembark/queue/board on the boat cycle. Every person wears a collar light lit at night. Guideway trains run one way on each of the two Yurikamome beams (`guidewayTracks`, traced from the environment: south-west on the centreline beam, north-east on the beam 4.6 m beside it, keeping left), evenly spaced at 12 m/s and fading beyond the district, so they never meet or reverse. Boats (`boatPoses`) have commensurate periods (loop taxis 20 s apart on a loop whose return leg runs 28 m seaward of the outbound, cruisers 40 s per run, interchange boat 40 s, ferry 320 s), and their phases were searched so 2.5 m of water stays around every hull over the 320 s period. Base water fleets, sweep cars and berth shuttle are independent. P12 adds up to 120 crowd slots for eligible courts (seed-zero 0/24/96), 11 service quadrotors with staggered 48 s docking cycles, and slow night accent rhythms. These are authored motion, not physics/pathfinding/occupancy simulation. Route/bounds checks are in [mobility tests](../tests/mobility.test.ts) and [Odaiba tests](../tests/odaiba.test.ts); detailed accepted limits in [Meter handoff](handoffs/archive/meter-variety.md).
+- The district layer uses bounded preallocated slots: 17 climate bays, 11 service bays, six water rooms, ten courts, ten towers and 26 low pods, plus published roof carriers.
+- Complementary covers preserve complete future identities; mixed composes hybrids.
+- Cross-Meter agreement enables extra facilities.
+- Four uint32 `slotSeeds` hash the full ordered active run history. Neutral votes do not shuffle direction; Undo excludes revoked proposals.
+- Full-history hashing is O(guests) per view; optimize only if measured cost warrants it.
+- Site/design footprints stay fixed, while the selected slot distribution can differ by history.
 
-A live v2 result first plays the vote journey ([voteJourney.ts](../src/voteJourney.ts), `ARRIVAL_SECONDS` ≈ 2.6 s): `main` applies the layout immediately for carrier evidence but with start time `now + ARRIVAL_SECONDS`, so motions, pulses and the site marker wait for the orbs to land; lanterns keep the latest 64 guests (ordinal-owned slots) and rebuild from `recentProposals` on snapshots. Live targets then ease over 3 s; changed slots emit faint Meter-colour rings and each changed Meter's site emits bright rings plus a light shaft (two waves, about 4.2 s; site-only shafts since 2026-10-04). Snapshot/reset/Undo/reconnect/reduced motion settle immediately and clear pulses/queued displays. No-op events do not replay. Late roof/asset publication must adopt the latest target and seed.
+### Automation and mobility counts
 
-Street-life round 8 (2026-10-06): bench pairs, rail couples and forecourt groups share `conversationPose` turns: one restrained hand
-gesture, companions looking toward the speaker, then a quiet interval. A shared `social` instance attribute turns heads and raises
-one arm; a small nose makes gaze readable without another draw. Seated body matrices and folded legs stay fixed. Groups without a
-present companion do not gesture to an empty seat. `publishDoorways` reserves selected forecourts for `visitPose` journeys from
-inside a door to the group's third position, chatting for 30–50 s, then turning and returning through the same door. The reserved
-trip is excluded from ordinary walkers/robots; its full curve also reserves space against later doorway publication. Curves sample
-paving, street clearance, facade clearance, hosts and existing routes; failed candidates retain ordinary doorway traffic. Visiting
-groups have a lower presence threshold so journeys remain inhabited at high automation by day/night. The existing third group
-slot carries the visitor, without adding a fleet or dependency. `forecourtVisits` exposes published curves for actual-geometry and
-actor-clearance checks; this is a small authored network, not pathfinding or occupancy simulation.
+- Automation changes these at low/mixed/high: walkers 400/260/120, pods 12/18/24, circulating aircraft 2/16/30.
+- It also turns street cars into autonomous street pods (all cars / about half / all pods), with the same amount of traffic.
+- Capacities exceed visible counts.
 
-Street-life round 9 (2026-10-06): after all landmarks and landscape load, `odaibaScene` calls `publishEntrances` to reserve two
-additional routes, one per selected landmark, checking the lane envelope on paving against complete static geometry.
-`entranceJourneys` exposes them for verification. Four
-door frames/canopies and threshold lights mark the inferred entries as facade overlays. The last four ordinary doorway-person
-slots run `entrancePose`: arrival slows to a door-side wait, a companion emerges on the other side, both turn/gesture, then leave
-together through the far entry. Ordinary walkers/robots do not use those routes; the four pilots stay active at every automation
-level and hour. Walls/interiors are not remodelled. Route selection still follows asynchronous landmark publication.
-The focal Automation Hub uses two opposite service slots (0/5): customers walk from podium waiting places, stop for 12 s,
-use the actual settled counter/port, return and wait. Staff serve human counters, assist at ports when another full human counter
-exists, and disappear in the fully autonomous configuration. `servicePose` drives stopped feet and eased turns; actor scale
-cancels the site's 3× scale. Existing counters now sit on the 1.2-unit podium rather than inside it; a lower port panel is reachable,
-and the podium bevel keeps the pilots' footing flat without changing its bounds. Service actors hide during their counter's
-handover or while the base/props layer is folded; immediate snapshots restore the matching pose through the existing Hub runtime.
-These are small ambient scenes, not a queue, transaction or interior simulation; district raised-hall staff are unchanged.
+### Air tiers and aircraft
 
-Roof and interior life (2026-10-08): [occupants.ts](../src/occupants.ts) draws people inside and on top of buildings with one
-`building-occupants` pedestrian fleet (same figures, gait/social shader and collar light as the street crowds), updated from `cityRig`
-after `mobility` and rebuilt as buildings publish. `civicCore` no longer bakes people: its `occupants` list (placed `Spot`s, strolling
-`Walk`s, escalator `Ride`s) is published by `odaibaScene`. Fuji TV: seated editing staff glance and type; standing staff, studio crew,
-presenters, foyer/forum/ring/beam crowds and the forum bench sitters (now seated on the benches) join conversations of up to three
-within 1.9 m (`talkGroups`, `conversationPose`), facing the group; the theatre audience follows the stage and applauds together for
-5 s in every 50; one staff member per aisle lane crosses each wing work floor and mezzanine, strollers pace five forum lanes, two
-ring lanes and two beam-top lanes (`strollPose`: end to end, a 3–8 s turn-about rest, back), and riders climb both escalator
-diagonals at 0.5 m/s, hidden where the incline passes through the forum slab, under the upper incline's truss and through the
-transfer beam. Roofs: `publishRoofWalks` gives each roof-garden terrace (Aqua City, DECKS, Grand Nikko, DiverCity Office Tower and
-the context towers) a stroll line for one resident or an abreast pair (resting 6–16 s facing the view, or each other) and a standing
-group of two or three on the other side, outside the planter, the Meter's meadow mound and sail posts, on raycast flat roof with
-1.5 m of roof beyond; terraces without room stay empty. Presence follows `streetRhythm(hour)` (staff .4–1 × people, public and
-residents × strollers, residents also × crowd share), wholly on or off per person. Landmark GLB facades are opaque shader glass with
-no interior, so interior life is shown only where real glazing and rooms exist (Fuji TV). Authored motion, not pathfinding or
-occupancy simulation.
+Routes are in [layout](../src/layout.ts).
+
+- Regional tier: district loop/sphere approach at 160–170 m.
+- City tier: shore lane, a closed loop offshore; inbound leg 80 m, outbound 100 m.
+- Service tier: quadrotors at 30–45 m.
+- Aircraft slots 0–9 alternate loops evenly. Slots 10+ fly as wingmen 34 m behind, so platoons appear only as automation rises.
+- Each slot is a human-led winged craft or an autonomous pod. Craft switch midway between settled levels: pods about 0/15/50/85/100 % for ports 0–1/2/3/4/5–6.
+- Berth shuttles become pods above mixed.
+- Corridors keep a faint fixed guide line. Four shore-lane beacon masts (58 m) stand clear of rooms and boat routes.
+
+### Shore interchange
+
+- In front of Aqua City: a 56 m pier, boat head and a 38 m arrival mast with glass lift.
+- Its boat and air shuttle reuse the 40 s `dockMotion` cycle (offset 20 s) and pivot over 4 s when leaving; so does the sphere shuttle.
+- Sixteen transfers (independent of Meters) disembark/queue/board on the boat cycle.
+
+### Promenade walkers
+
+- Walkers move in parties: per six slots, one alone, a pair, and a trio with a child.
+- Four of five parties walk the promenades; every fifth walks a mid-level/garden skyway deck.
+- Each makes one-way trips at their own pace (0.9–1.45 m/s). A third of lone walkers jog, in the outer lane, so they pass parties.
+- Followers walk loosely ahead or behind. Walkers fade in and out at the route ends as if entering a building, rest out of sight, and pick a fresh direction.
+- Lanes are right of travel, so the two directions keep to their own sides.
+- Parties walk at most 0.6 m wide: a pair abreast; a trio's child beside the leader with the other adult behind; single file on decks.
+- `passingLanes` makes everyone sharing a path sidestep to pass or meet with 0.65 m between shoulders, queueing up to 2.5 m where a crowd leaves no room.
+- Whoever passes a fixed mover (a halted robot, its collector, a stopper) goes round the side with room.
+- Feet follow ground actually covered (trip distance plus the solver's along offset), so queued people stop stepping; a sidestep turns the body toward its actual path.
+
+### Promenade stops, benches and forecourts
+
+- Two in five non-joggers stop at a viewpoint facing the bay.
+- On the promenades each such party has its own spot (`promenadeStops`): lone walkers veer out of the lane to a backless one-seat stool between benches and sit 70 s; parties line up at a free rail spot for 40 s; then they rejoin their lane.
+- They stop only on trips with the sea on their right, so they never cross the oncoming lane. Leftover stoppers and deck walkers walk on.
+- The promenades are a 7.2 m paved boardwalk (top at walker level, lawn 0.2–0.35 m below).
+- Benches every 24 m, 2.75 m out, face the sea and seat two people. Walker centres stay ≤ 2.1 m out, so shoulders clear the backrest and feet clear the lit edge.
+- A couple stands at the rail between benches.
+- Up to 20 forecourts hold standing groups of two or three.
+
+### Doorway walkers and delivery robots
+
+- Up to 120 doorway walkers (scaled like the promenade walkers) step out from 0.6 m inside one ground-floor door, so they emerge from the facade rather than grow out of the paving.
+- They cross the paved forecourt 4–10 m out on a corner-rounded curve (keeping right and making way like promenade walkers) and go in at the next door.
+- Each door is on one trip; trips are 3 m apart; one robot per trip.
+- `publishDoorways` raycasts each loaded landmark's facades and forecourt (sidewalk/plaza only).
+- 14 delivery robots (0.7 m/s) run the doorway forecourts, halting 8 s just outside the next door while a collector steps out to meet them; then both go in.
+
+### Street cars
+
+- Cars: 4.6 m human-driven cars, every seventh a 7 m van; head/tail lights at night.
+- As automation rises, each slot becomes a rounded autonomous street pod or cargo pod by the aircraft's `podShare` thresholds. Standalone keeps cars.
+- They drive on the left on two avenues snapped to the environment's road surface ([layout](../src/layout.ts) `streets`):
+  - the seaside avenue, north of Aqua City/DECKS;
+  - the avenue under the guideway, which ends at d 620, short of Hilton's chapel and podium.
+- `CARRIAGEWAY` places the lanes:
+  - seaside lanes sit 0.25 m off centre, away from Aqua City's wall;
+  - under the guideway, the carriageway is widened 1.6 m left onto the paving slab (−5.1 … −0.5 m), so the Yurikamome piers (in the right half of the surveyed road) stay ≥ 0.34 m clear of full-size cars.
+- Each car is never ahead of its slot, at one speed per lane with irregular gaps, fading at the avenue ends. Density follows `traffic`.
+- Each slot is simulated frame to frame: it keeps 2 m + 0.5 s behind the car ahead round the loop, brakes for a requested crossing it can still stop for (≤ 3 m/s² profile; brake lamps lit while slowing or queued), then catches up (≤ +30 %, ≤ 14 m/s).
+- The first frame, jumps and snapshots put every car back on its slot.
+
+### Crossings and road surface
+
+- Two signal-free shared-space crossings on the guideway avenue (`CROSSINGS`, d 286 and 480): a pale band, with mint edge lines while requested.
+- Residents walk 8 m along the footway to the kerb, wait until every approaching car has stopped or passed, cross, and walk on along the far footway.
+- The seaside avenue has no crossing: Aqua City's wall stands 2.3 m from its centre line.
+- Both carriageways are shared surface, not asphalt: inlaid darker stone seams (0.3 m) at the `CARRIAGEWAY` edges and a 0.1 m mint guide under each lane centre (`carriageway-seams`/`carriageway-guides`, one merged mesh each, flush on the paving slab under the crossing bands).
+- `roadFill` lays a strip of the paving finish over the guideway avenue's junction mouth (d 486–507), which had only terrain.
+- The two avenues do not cross each other, so there are no signals (2127 cars need none).
+
+### Kerbside drop-offs
+
+- Two cars on the guideway avenue's westbound lane make kerbside drop-offs at paved bays south of Aqua City.
+- Each eases into its bay, parks about one lane lap, and waits indicating until the lane behind and beside the pull-out is clear.
+- Signals: kerb-side amber indicators from 30 m before easing in; a brake lamp and slight nose dip while stopping; road-side indicators from 3 s before pulling away, with a slight lift.
+- A passenger walks between the car and the nearest landmark door.
+
+### People rendering and daily rhythm
+
+- People swing legs and arms in a vertex shader (`gait` instance attribute, no extra draws; shadows and GTAO use the rest pose).
+- A quarter carry a backpack, a fifth a shoulder bag.
+- Every person wears a collar light, lit at night.
+- `streetRhythm(hour)` thins each group through the day by a stable per-person hash: evening crowds, joggers at dawn/dusk, strollers toward sunset, children by day, sitters from late morning, robots at night, cars at the commutes.
+- Without an hour (tests, standalone callers) everyone stays.
+- DEV `?review=street` frames a promenade bench and the seaside avenue from 40 m. Orbit may close to 30 m in that mode only; `&cam=x,y,z` moves that camera and `&at=x,y,z` aims it.
+
+### Trains, boats and other fleets
+
+- Guideway trains run one way on each of the two Yurikamome beams (`guidewayTracks`, traced from the environment): south-west on the centreline beam, north-east on the beam 4.6 m beside it, keeping left.
+- Trains are evenly spaced at 12 m/s and fade beyond the district, so they never meet or reverse.
+- Boats (`boatPoses`) have commensurate periods: loop taxis 20 s apart on a loop whose return leg runs 28 m seaward of the outbound; cruisers 40 s per run; interchange boat 40 s; ferry 320 s.
+- Boat phases were searched so 2.5 m of water stays around every hull over the 320 s period.
+- Base water fleets, sweep cars and berth shuttle are independent.
+- P12 adds up to 120 crowd slots for eligible courts (seed-zero 0/24/96), 11 service quadrotors with staggered 48 s docking cycles, and slow night accent rhythms.
+- These are authored motion, not physics/pathfinding/occupancy simulation.
+- Route/bounds checks are in [mobility tests](../tests/mobility.test.ts) and [Odaiba tests](../tests/odaiba.test.ts); detailed accepted limits are in the [Meter handoff](handoffs/archive/meter-variety.md).
+
+### Live result motion (vote journey)
+
+- A live v2 result first plays the vote journey ([voteJourney.ts](../src/voteJourney.ts), `ARRIVAL_SECONDS` ≈ 2.6 s).
+- `main` applies the layout immediately for carrier evidence, but with start time `now + ARRIVAL_SECONDS`, so motions, pulses and the site marker wait for the orbs to land.
+- Lanterns keep the latest 64 guests (ordinal-owned slots) and rebuild from `recentProposals` on snapshots.
+- Live targets then ease over 3 s.
+- Changed slots emit faint Meter-colour rings; each changed Meter's site emits bright rings plus a light shaft (two waves, about 4.2 s; site-only shafts since 2026-10-04).
+- Snapshot/reset/Undo/reconnect/reduced motion settle immediately and clear pulses/queued displays.
+- No-op events do not replay.
+- Late roof/asset publication must adopt the latest target and seed.
+
+### Street-life round 8 (2026-10-06): conversations and forecourt visits
+
+- Bench pairs, rail couples and forecourt groups share `conversationPose` turns: one restrained hand gesture, companions looking toward the speaker, then a quiet interval.
+- A shared `social` instance attribute turns heads and raises one arm; a small nose makes gaze readable without another draw.
+- Seated body matrices and folded legs stay fixed.
+- Groups without a present companion do not gesture to an empty seat.
+- `publishDoorways` reserves selected forecourts for `visitPose` journeys: from inside a door to the group's third position, chatting for 30–50 s, then turning and returning through the same door.
+- The reserved trip is excluded from ordinary walkers/robots; its full curve also reserves space against later doorway publication.
+- Curves sample paving, street clearance, facade clearance, hosts and existing routes; failed candidates retain ordinary doorway traffic.
+- Visiting groups have a lower presence threshold, so journeys remain inhabited at high automation by day/night.
+- The existing third group slot carries the visitor, without adding a fleet or dependency.
+- `forecourtVisits` exposes published curves for actual-geometry and actor-clearance checks.
+- This is a small authored network, not pathfinding or occupancy simulation.
+
+### Street-life round 9 (2026-10-06): entrances and the Automation Hub
+
+- After all landmarks and landscape load, `odaibaScene` calls `publishEntrances` to reserve two additional routes, one per selected landmark, checking the lane envelope on paving against complete static geometry.
+- `entranceJourneys` exposes them for verification.
+- Four door frames/canopies and threshold lights mark the inferred entries as facade overlays.
+- The last four ordinary doorway-person slots run `entrancePose`: arrival slows to a door-side wait, a companion emerges on the other side, both turn/gesture, then leave together through the far entry.
+- Ordinary walkers/robots do not use those routes; the four pilots stay active at every automation level and hour.
+- Walls/interiors are not remodelled. Route selection still follows asynchronous landmark publication.
+- The focal Automation Hub uses two opposite service slots (0/5): customers walk from podium waiting places, stop for 12 s, use the actual settled counter/port, return and wait.
+- Staff serve human counters, assist at ports when another full human counter exists, and disappear in the fully autonomous configuration.
+- `servicePose` drives stopped feet and eased turns; actor scale cancels the site's 3× scale.
+- Existing counters now sit on the 1.2-unit podium rather than inside it; a lower port panel is reachable; the podium bevel keeps the pilots' footing flat without changing its bounds.
+- Service actors hide during their counter's handover or while the base/props layer is folded; immediate snapshots restore the matching pose through the existing Hub runtime.
+- These are small ambient scenes, not a queue, transaction or interior simulation; district raised-hall staff are unchanged.
+
+### Roof and interior life (2026-10-08)
+
+- [occupants.ts](../src/occupants.ts) draws people inside and on top of buildings with one `building-occupants` pedestrian fleet (same figures, gait/social shader and collar light as the street crowds).
+- It is updated from `cityRig` after `mobility` and rebuilt as buildings publish.
+- `civicCore` no longer bakes people: its `occupants` list (placed `Spot`s, strolling `Walk`s, escalator `Ride`s) is published by `odaibaScene`.
+- Fuji TV:
+  - seated editing staff glance and type;
+  - standing staff, studio crew, presenters, foyer/forum/ring/beam crowds and the forum bench sitters (now seated on the benches) join conversations of up to three within 1.9 m (`talkGroups`, `conversationPose`), facing the group;
+  - the theatre audience follows the stage and applauds together for 5 s in every 50;
+  - one staff member per aisle lane crosses each wing work floor and mezzanine;
+  - strollers pace five forum lanes, two ring lanes and two beam-top lanes (`strollPose`: end to end, a 3–8 s turn-about rest, back);
+  - riders climb both escalator diagonals at 0.5 m/s, hidden where the incline passes through the forum slab, under the upper incline's truss and through the transfer beam.
+- Roofs: `publishRoofWalks` gives each roof-garden terrace (Aqua City, DECKS, Grand Nikko, DiverCity Office Tower and the context towers):
+  - a stroll line for one resident or an abreast pair (resting 6–16 s facing the view, or each other);
+  - a standing group of two or three on the other side.
+- Roof people stay outside the planter, the Meter's meadow mound and sail posts, on raycast flat roof with 1.5 m of roof beyond; terraces without room stay empty.
+- Presence follows `streetRhythm(hour)` (staff .4–1 × people; public and residents × strollers; residents also × crowd share), wholly on or off per person.
+- Landmark GLB facades are opaque shader glass with no interior, so interior life is shown only where real glazing and rooms exist (Fuji TV).
+- Authored motion, not pathfinding or occupancy simulation.
 
 ## Survey ownership and persistence
 
 | Area | Responsibility |
 | --- | --- |
 | [shared](../survey/src/shared/cityView.ts) | v1/v2 state/view/protocol contracts; authoritative policy → layout (v2 through Scale A display scores, `exhibitionStateLayout(scores, guestCount)`, since 2026-10-13) |
-| [questionLoader](../survey/src/survey/questionLoader.ts), [scoreEngine](../survey/src/survey/scoreEngine.ts), [decisionHistory](../survey/src/survey/decisionHistory.ts) | Versioned four-axis question copy (currently3), shared reducer/replay, immutable view history |
+| [questionLoader](../survey/src/survey/questionLoader.ts), [scoreEngine](../survey/src/survey/scoreEngine.ts), [decisionHistory](../survey/src/survey/decisionHistory.ts) | Versioned four-axis question copy (currently 3), shared reducer/replay, immutable view history |
 | [server](../survey/src/server/server.ts), [realtime](../survey/src/server/realtime.ts) | HTTP/static pages, loopback/same-origin Admin guard, snapshots/updates/reset broadcasts |
 | [database](../survey/src/server/database.ts), [migrations](../survey/src/server/migrations.ts), [runStore](../survey/src/server/runStore.ts) | SQLite schema 7, transaction/restoration, active proposal replay, seeds/counts |
 | [proposalService](../survey/src/server/proposalService.ts), [adminService](../survey/src/server/adminService.ts) | Atomic submission/idempotency, single/A/B sessions, leases/reset drain, Undo, display mode |
 | [Guest](../survey/src/ui/guestDebugView.ts), [guestFlow](../survey/src/ui/guestFlow.ts), [Admin](../survey/src/ui/adminView.ts), [Monitor](../survey/src/ui/monitorDebugView.ts) | Presentation/API adapters, recovery and local draft; no independent score calculation |
 
-Start → four answers → review → one proposal → result 10 s / handoff 5 s. Canonical request IDs and session uniqueness prevent double counting; transactions accumulate against latest state. A/B permits stale but not future city revision; single mode requires exact revision. Server schedules single/A-B displays ≥10 s apart and root preserves ordering/deadlines. `displayWaitMs`/`displayAt` are scheduling metadata, not viewer playback acknowledgement; `displayRemainingMs` resumes the original slot after retry/reload without extending it. Late expired events, disconnect/reconnect and reduced motion restore the latest snapshot and clear queued text/motion; lighting-only snapshots preserve valid queues/cards.
+### Submission and display scheduling
 
-Single mode automatically hands off at next Start and applies a queued reset after the protected10s slot. A/B end also rejects release before its slot ends; early Guest handoff keeps recovery and defers station release. Explicit authoritative Undo/reset recovery remains immediate. A/B stops new admissions during reset and drains both; questionnaire expiry is 5 min, result lease fixed at display start +15 s (retry never renews it), server sweep every 1 s. Admin cancellation must identify one reserved session. Undo is available only for the latest completed proposal before a newer start; cancelling that newer draft does not reopen Undo. City/full reset and Undo retain original audit history; full reset changes the total-count watermark. Actual API/defaults are in [survey README](../survey/README.md).
+- Flow: Start → four answers → review → one proposal → result 10 s / handoff 5 s.
+- Canonical request IDs and session uniqueness prevent double counting; transactions accumulate against latest state.
+- A/B permits a stale but not a future city revision; single mode requires the exact revision.
+- The server schedules single/A-B displays ≥ 10 s apart, and root preserves ordering/deadlines.
+- `displayWaitMs`/`displayAt` are scheduling metadata, not viewer playback acknowledgement.
+- `displayRemainingMs` resumes the original slot after retry/reload without extending it.
+- Late expired events, disconnect/reconnect and reduced motion restore the latest snapshot and clear queued text/motion.
+- Lighting-only snapshots preserve valid queues/cards.
+
+### Sessions, reset and Undo
+
+- Single mode automatically hands off at next Start and applies a queued reset after the protected 10 s slot.
+- A/B end also rejects release before its slot ends; early Guest handoff keeps recovery and defers station release.
+- Explicit authoritative Undo/reset recovery remains immediate.
+- A/B stops new admissions during reset and drains both stations.
+- Questionnaire expiry is 5 min; the result lease is fixed at display start + 15 s (retry never renews it); the server sweeps every 1 s.
+- Admin cancellation must identify one reserved session.
+- Undo is available only for the latest completed proposal before a newer start; cancelling that newer draft does not reopen Undo.
+- City/full reset and Undo retain original audit history; full reset changes the total-count watermark.
+- Actual API/defaults are in the [survey README](../survey/README.md).
 
 ## Verification and historical references
 
-Root tests/build cover root only; install survey dependencies for the real HTTP/WebSocket pipeline tests. Survey and module-swap have separate checks. Browser/performance evidence is tied to the captured commit/device, never inferred from geometry counts or earlier Shibuya FPS. S5, input hardware and exhibition-day recovery policy remain unresolved. See [current validation](VALIDATION.md) and [document index](README.md).
-
-The [previous implementation map](history/PROJECT_2026-10-02.md) is an archived mixed-stage snapshot for old deep links. It is not an architecture authority or a list of future work.
+- Root tests/build cover root only; install survey dependencies for the real HTTP/WebSocket pipeline tests.
+- Survey and module-swap have separate checks.
+- Browser/performance evidence is tied to the captured commit/device, never inferred from geometry counts or earlier Shibuya FPS.
+- S5, input hardware and exhibition-day recovery policy remain unresolved.
+- See [current validation](VALIDATION.md) and the [document index](README.md).
+- The [previous implementation map](history/PROJECT_2026-10-02.md) is an archived mixed-stage snapshot for old deep links. It is not an architecture authority or a list of future work.
