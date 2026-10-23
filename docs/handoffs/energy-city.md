@@ -1,58 +1,50 @@
-# energy-city — 能源城市規劃與E1
+# energy-city — 能源城市 E1／E2
 
 - Owner: Codex；產品決策cc100053
-- Status: IN_PROGRESS — 本輪規劃／E1文件完成；E2–E5未開始
-- Branch: `codex/energy-sector-plan`
-- Base commit: `1bbffeababd32f8ecc5642c1082a05ac558b6a2c`
-- Last verified commit: 內容commit `0dd1675a666da5134afd0d2ad9f4e421f3dc6fb6`；整合commit `754a05c5beb51c7dd6e7880ff8faed6d13db4443`重驗通過
-- Remote availability: `origin/codex/energy-sector-plan` @ `0dd1675a666da5134afd0d2ad9f4e421f3dc6fb6`；`origin/main` @ `754a05c5beb51c7dd6e7880ff8faed6d13db4443`已推送並fetch確認
+- Status: IN_PROGRESS — E1、E2實作與本機檢查完成；E3–E5未開始；Git整合待本輪記錄
+- Branch: `codex/energy-space-prototype`
+- Base commit: `1966ebe4b57567b838ce2613a1a3182d4a5d9daf`
+- Last verified commit: E2工作樹（內容commit／整合commit待下方補記）
+- Remote availability: E1已在`origin/main` @ `1966ebe`；E2待推送
 - GitHub Issue (optional): NONE
 
 ## Session Git state
 
-- Session starting branch and HEAD: 原checkout `main` @ `29d12db7629b8ffabdb75b53b2cec70d8c15ee9a`
-- Last fetched origin/main commit: `1bbffeababd32f8ecc5642c1082a05ac558b6a2c`；2026-10-24 fetch成功
-- Local changes present at session start: 未追蹤`.playwright-cli/`；保留，沒有stash／刪除／提交
-- Upstream integration status: 原checkout為0 ahead／11 behind；未同步或切換原checkout。新任務於`/private/tmp/city2127-energy-plan-20261024`獨立checkout，在clean main fast-forward至最新origin/main後開分支
-- Pending Git conflicts or synchronization blockers: NONE；本輪文件變更不需要動原checkout
+- 原checkout `/Users/fatboy/city2127`為`main` @ `29d12db7629b8ffabdb75b53b2cec70d8c15ee9a`，保留未追蹤`.playwright-cli/`與所有截圖，沒有stash／reset／同步原checkout。
+- 2026-10-24 fetch成功，origin/main為`1966ebe`；原checkout 0 ahead／14 behind。
+- 重用獨立checkout `/private/tmp/city2127-energy-plan-20261024`：main乾淨，fetch後與origin/main 0／0；先核對E1文件／source，再開E2分支。此checkout沒有`.codegraph/`，依AGENTS直接讀source／callers；原checkout index沒有用來假定新checkout內容。
+- 無並行模組／binary改動；Owner為本任務Codex；沒有改共享二進位資產。
 
-## Goal and acceptance criteria
+## Goal and scope
 
-使用者要求「write a planning about this then do step one」。本輪將能源篇分成E1系統／形態定義、E2空間原型、E3組合動態、E4居民提案、E5驗收；完成E1的四構想角色、能源流程、三種成熟方向及混合範例、生活選擇草案、現況／模組／驗證範圍。
-
-## In-scope files and dependencies
-
-- 新增[ENERGY_CITY_PLAN](../ENERGY_CITY_PLAN.md)，連入[SPEC](../EXHIBITION_SPEC.md)、[文件索引](../README.md)及[handoff索引](README.md)。
-- 讀過README、PROJECT、CONTRIBUTING、VALIDATION、ART、CITY MASTER TASTE、handoff template及現有Dream Loop／變化說明卡交接。
-- CodeGraph檢查富士核心、載入、`shoreRoomBays()`與呼叫者；相關source在原checkout與最新main無差異，沒有修改程式、二進位素材或他人handoff。
-- 與[變化說明卡](change-explanation.md)共享未來「實際配置→結果說明」依賴；與既有富士媒體用途、六座water rooms及環境Meter存在設計接口，先記錄候選而非覆寫產品契約。
+本輪使用者要求直接完成E2靜態空間比較及驗證。原hero能比較基準、A「海と暮らす」、B「空とつながる」、C「陸地を増やす」及M1混合；各一組海上接收翼、上下水庭／渦輪回路、球體外置儲能環、填海能源島。保留富士媒體／劇場、六座water rooms、公共／海空通道、四站視線；不改四題／Meter／歷史資料，不部署。
 
 ## Completed work
 
-- 完成能源篇分階段計劃與E1交付；①②④整合，③作獨立／可混合來源。
-- 三種方向並非low/mixed/high；問卷候選與現有四題／計分保持清楚區別。
-- 保留原始奇想與工程推演界線；記錄水循環／旋轉不是淨能源來源、JAXA正文讀取逾時及其他未驗證事項。
+- [energyPrototype.ts](../../src/energyPrototype.ts)：四組靜態幾何，一次建立，共19個共享材質batch；配置只切visibility／翼scale，rotor獨立於固定支承。無新dependency，沒有逐幀工作。
+- [devEnergy.ts](../../src/devEnergy.ts)及main的DEV dynamic import：`?energy=baseline|a|b|c|mixed`原生選單，URL保存；survey／meters／scaleLab優先，production移除整個工具。
+- 上下水庭含落水管、渦輪室／轉子、獨立抽水回管、下庭公共看台／4 m緩坡；能源島有分段岸界、檢修橋及兩端升降井。都是量體示意，未模擬服務或工程。
+- 水平環在hero太弱、貼近立環碰到斜街；最後採海側前置環，中心`(-18,100,-24)`，半徑31 m，固定支承接既有transfer frame。實際rotor與劇場／工作翼／斜街不相交；沒有轉動劇場本體。
+- [幾何測試](../../tests/energyPrototype.test.ts)接root npm test；[計劃](../ENERGY_CITY_PLAN.md)、PROJECT／SPEC／VALIDATION、README與文件索引同步。
+- [實際截圖](../../artifacts/energy-city-e2/README.md)：五張同hero日景、M1黃昏／夜景及水庭近景。
 
 ## Actual validation results
 
-- Verification status: PASSED（文件範圍）
-- Date and checked commit/worktree: 2026-10-24；內容commit及整合commit如上，獨立checkout
-- Commands/manual checks and results: PASS — 五份文件共120個本機連結／anchor／tracked或本輪新增targets；相關source與最新main的diff為空；完整staged diff自審；`git diff --check`通過。JAXA正文工具讀取逾時，只核對搜尋摘要。
-- Evidence/environment: documentation-only；沒有browser截圖或FPS
-- Integrated commit and checks: `754a05c5beb51c7dd6e7880ff8faed6d13db4443`；與內容commit tree無差異、120個本機連結／tracked targets及`git diff --check origin/main..HEAD`重驗PASS。推送後HEAD與origin/main為0/0；`gh run list`查該SHA為空，與CI的docs-only paths-ignore相符，並非runtime CI通過。
-- Changes since verification: 本次只補交接的commit／remote／實際驗證記錄；無程式或設計內容變更。
-- Runtime tests/build/browser: NOT RUN；純文件，按CONTRIBUTING不要求
+- Date/environment: 2026-10-24；Node26.0.0；macOS本機Codex in-app Chromium／WebGL2，1920×1080，預設quality；未量GPU型號與展覽硬件FPS。
+- PASS — root `npm test`（真實survey HTTP／WebSocket pipeline，81組答案與既有城市／路徑檢查）。首次sandbox跑到pipeline時因listen EPERM中止；允許localhost重跑後整套通過。沒有改survey程式。
+- PASS — root `npm run build`；既有>500 kB chunk warning保留；產物搜尋無`energy-prototype`／`海と暮らす`／Energy工具，DEV import已剔除。
+- PASS — focused E2 test（補真實tidal-edge新步道檢查後再跑）：五配置／mesh UUID重用、19 batches、rotor vs實際core網格、21,595個可見船體保守包圍盒（完整320秒週期、0.5秒步距）、公共／deck／rooms連岸路、beacons、航空走廊／泊位、四站視線及原hero畫框。
+- PASS — 五種day（hour12／reviewTime20）選單切換、URL、五張1920×1080截圖；M1 hour18.5／22及水庭近景；各頁console error／warn為空。資產與城市可見載入，沒有資產失敗console訊息；沒有另錄完整HTTP network trace。
+- PASS — standalone與`?meters=nw:high,ne:low&energy=mixed`：城市／既有Meter層正常，能源控制數量0，console error／warn為空；因此不能將能源配置疊到Meter當正式答案。
+- PASS — 工作樹whitespace與完整diff／new files自審；9份Markdown的366個本機links／anchors／tracked或本輪新targets通過。Staged／committed檢查及整合後重驗待下方補記。
+- survey／module-swap package tests未另跑：兩個package沒有改動；root真實pipeline已跑，main CI會跑三個package。
 
-## Known issues and blockers
+## Known limits and next expected step
 
-沒有本輪文件交付阻礙。E2–E5未實作，未驗證真實佔地、球體泊位／外環淨空、航路、接收面積、工程容量或視覺品質。四領域是企劃分類，未成為正式問卷。現有媒體劇場用途仍有效。
+E2是可隔離的靜態量體比較，並非最終美術／工程驗收。Hero有四類輪廓，但水管與渦輪需近景；前置環離開球殼，並非同心貼殼機械；核能設施／長橋仍是概念形體。夜間可辨輪廓，細節照明未設計。
 
-## Important decisions
+離散幾何樣本不等於連續碰撞、完整旋轉掃掠／實際飛行、結構／水質／噪音／電力或海岸工程驗證。沒有測容量、可靠度、GPU性能、Safari、iPad或展覽硬件。E3才設計全城少量擴展與緩慢動態；E4才協調正式四題／權威配置及歷史相容性；不可將A/B/C直接當環境Meter bands。
 
-- 2026-10-24使用者：先研究能源篇，將四個構想合併／形成城市變化；本輪要求寫計劃並完成第一步。
-- E1屬設計文件；不能宣稱畫面或新問卷已完成，也不預先把能源種類線性映射到現有環境Meter。
-- PROJECT／ART／VALIDATION沒有行為或流程變更，因此不複製新的模組架構或runtime證據；SPEC只加入待實作計劃入口。
+## Preserved E1 record
 
-## Next expected step
-
-Codex／接手實作者於最新main開E2實作分支，依計劃做可隔離的靜態量體比較；先追蹤當時source與callers、確認共享模組／素材owner，再驗證hero日景、通行／航路與球體淨空。此次任務的規劃與E1已完成及發布main；E2–E5仍待接續。
+E1規劃及四構想系統定義於`0dd1675`，整合`754a05c`，最後交接`1966ebe`。當時為純文件，120個本機links／targets及whitespace通過；沒有runtime測試／截圖，docs-only CI跳過。JAXA正文讀取逾時、僅核對搜尋摘要的限制保留在能源計劃，不用E2幾何推論工程效能。

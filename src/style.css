@@ -29,3 +29,5 @@ body[data-time=night] footer,body[data-time=night] .intro{text-shadow:0 0 10px r
 .lab-transport{display:flex;gap:4px}.lab-transport button{flex:1;font:inherit;padding:5px;border:1px solid #35413930;border-radius:5px;background:#fff9;cursor:pointer}
 .scale-lab input[type=range]{width:100%}.lab-ordinal{font-weight:600;margin:0}.scale-lab canvas{position:static;width:100%;height:auto;border-radius:4px}
 .scale-lab table{border-collapse:collapse;font-size:11px;width:100%}.scale-lab td,.scale-lab th{padding:2px 3px;text-align:right;font-weight:400}.scale-lab th small{display:block;font-size:8px;opacity:.6}.scale-lab tr>th:first-child{text-align:left;font-weight:600}.lab-readout .lab-on{font-weight:700;background:#35413914}.lab-stats caption{font-size:9px;opacity:.6;text-align:left}
+
+.energy-review{z-index:20}.energy-review label{display:flex;align-items:center;gap:10px;margin-bottom:8px}.energy-review select{font:inherit;max-width:240px}

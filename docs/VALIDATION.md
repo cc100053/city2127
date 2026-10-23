@@ -157,3 +157,11 @@ All pre-consolidation dated entries and screenshots are retained in [validation 
 ## Task handoff verification
 
 Use one named owner and [handoff template](handoffs/TEMPLATE.md). Record preflight branch/HEAD, fresh remote refs/divergence, scope, checked commit/worktree, actual commands/evidence, unrun checks, integrated commit/CI and next step. Preserve each task separately; document integration completion independently from visual/hardware acceptance. Full handoff navigation: [open tasks](handoffs/README.md) / [archived task evidence](handoffs/archive/README.md). Archiving completed/superseded handoffs preserves their dates, commits and unverified limits; it does not complete visual or hardware acceptance.
+
+## Energy E2 static study — 2026-10-24
+
+DEV `?energy=baseline|a|b|c|mixed&hour=12&reviewTime=20`：在原hero固定五配置，與survey／meters／scaleLab隔離；production build移除工具。實作／實際commit及整合結果見[energy-city交接](handoffs/energy-city.md)，[截圖與環境](../artifacts/energy-city-e2/README.md)。
+
+- Root `npm test`包含[energyPrototype.test.ts](../tests/energyPrototype.test.ts)：五配置／物件重用、19個共享材質batch、rotor獨立且不碰實際civicCore、320秒每0.5秒全部可見船體保守包圍盒（21,595個）、22 m飛行走廊／sphere及水面泊位、公共路／deck、六座water rooms與連岸路、beacons、新水庭步道對真實tidal-edge淨空、四站hero視線及原畫框。
+- Desktop 1920×1080：五種日景、混合18.5／22及水庭近景；選單切換及URL保存正常，console沒有error／warn。日景輪廓可分辨；管線／渦輪需近景，夜間細節仍為量體階段。一般standalone／Meter優先隔離檢查依交接記錄。
+- 不聲稱連續碰撞、完整旋轉掃掠、工程容量／可行性、硬件FPS、Safari／iPad或E3／E4完成。E2沒有新動態；原城市actor保持原有路線。測試／瀏覽器結果只證明本輪靜態幾何及所列桌面情境。
