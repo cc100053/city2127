@@ -1,11 +1,11 @@
 # energy-city — 能源城市 E1／E2
 
 - Owner: Codex；產品決策cc100053
-- Status: IN_PROGRESS — E1、E2實作與本機檢查完成；E3–E5未開始；Git整合待本輪記錄
+- Status: IN_PROGRESS — E1、E2完成並發布main，main CI PASS；E3–E5未開始
 - Branch: `codex/energy-space-prototype`
 - Base commit: `1966ebe4b57567b838ce2613a1a3182d4a5d9daf`
-- Last verified commit: E2工作樹（內容commit／整合commit待下方補記）
-- Remote availability: E1已在`origin/main` @ `1966ebe`；E2待推送
+- Last verified commit: 內容commit `afd4c0a1b4416c2c430a9ad2d86fa9e05cf6e7e6`；整合commit `7fa5c9f6d8cd207acf9a7c89e0cbb25b88040e69`重驗PASS
+- Remote availability: `origin/codex/energy-space-prototype` @ `afd4c0a`；`origin/main`包含`7fa5c9f`（推送後fetch確認0／0），本次僅補驗證交接
 - GitHub Issue (optional): NONE
 
 ## Session Git state
@@ -36,8 +36,11 @@
 - PASS — focused E2 test（補真實tidal-edge新步道檢查後再跑）：五配置／mesh UUID重用、19 batches、rotor vs實際core網格、21,595個可見船體保守包圍盒（完整320秒週期、0.5秒步距）、公共／deck／rooms連岸路、beacons、航空走廊／泊位、四站視線及原hero畫框。
 - PASS — 五種day（hour12／reviewTime20）選單切換、URL、五張1920×1080截圖；M1 hour18.5／22及水庭近景；各頁console error／warn為空。資產與城市可見載入，沒有資產失敗console訊息；沒有另錄完整HTTP network trace。
 - PASS — standalone與`?meters=nw:high,ne:low&energy=mixed`：城市／既有Meter層正常，能源控制數量0，console error／warn為空；因此不能將能源配置疊到Meter當正式答案。
-- PASS — 工作樹whitespace與完整diff／new files自審；9份Markdown的366個本機links／anchors／tracked或本輪新targets通過。Staged／committed檢查及整合後重驗待下方補記。
-- survey／module-swap package tests未另跑：兩個package沒有改動；root真實pipeline已跑，main CI會跑三個package。
+- PASS — 工作樹whitespace與完整diff／new files自審；9份Markdown的366個本機links／anchors／tracked或本輪新targets通過。Staged／committed `git diff --check`通過。
+- PASS — `7fa5c9f`整合tree與`afd4c0a`完全一致；整合後root npm test（含最後E2／tidal-edge檢查）及build、366個links／targets與`git diff --check origin/main..HEAD`重跑通過。原瀏覽器證據對應同一程式／素材tree。
+- Main CI：[run 39990353370](https://github.com/cc100053/city2127/actions/runs/39990353370)，2026-10-24完成success：root npm test／build、survey test／build、module-swap test／build、committed whitespace全部PASS（Node24／Ubuntu）。本次後續只補Markdown驗證紀錄，runtime／截圖tree不變。
+- 本機survey／module-swap package tests未另跑：兩個package沒有改動；root真實pipeline已跑，main CI三個package的test／build已全部通過。
+- 清理：本輪Vite已停止（localhost:5173 curl回應000／connection refused）、測試分頁已關閉、viewport override已reset；未啟動持久survey server。原checkout及既有`.playwright-cli/`保持原狀。
 
 ## Known limits and next expected step
 
