@@ -12,7 +12,7 @@
 | [描畫品質](render-quality.md) | `?quality=low` 已實作；TODO：自動品質調整（按實測 FPS 逐級降低） | cc100053 |
 | [回顧章節](day-replay.md) | PLANNED；方向已討論（轉向章節、空檔播、觀眾互動），開工前待owner答6項決定 | cc100053 |
 | [變化說明卡](change-explanation.md) | PLANNED（TODO）；右上卡片直接說明「乜嘢變成乜嘢」，未定案前先用參數前後變動 | cc100053 |
-| [能源城市](energy-city.md) | E1規劃／系統定義完成；E2靜態空間比較未開始，四題／Meter及正式模型未改 | Codex；產品決策cc100053 |
+| [能源城市](energy-city.md) | E1與DEV E2靜態五配置／淨空比較完成；E3動態及E4問卷未做，正式四題／Meter未改 | Codex；產品決策cc100053 |
 
 已完成或不再適用的50份交接及Meter截圖見 [歸檔索引](archive/README.md)。歷史下一步不會自動變成backlog；Shibuya不再開發。人類美術review／實機未測等限制保留，不因歸檔而結案。
 
