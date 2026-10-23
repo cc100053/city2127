@@ -4,8 +4,8 @@
 - Status: IN_PROGRESS — 本輪規劃／E1文件完成；E2–E5未開始
 - Branch: `codex/energy-sector-plan`
 - Base commit: `1bbffeababd32f8ecc5642c1082a05ac558b6a2c`
-- Last verified commit: `1bbffeababd32f8ecc5642c1082a05ac558b6a2c`加本輪五份文件delta；提交後補內容commit
-- Remote availability: NOT PUSHED
+- Last verified commit: 內容commit `0dd1675a666da5134afd0d2ad9f4e421f3dc6fb6`；整合commit `754a05c5beb51c7dd6e7880ff8faed6d13db4443`重驗通過
+- Remote availability: `origin/codex/energy-sector-plan` @ `0dd1675a666da5134afd0d2ad9f4e421f3dc6fb6`；`origin/main` @ `754a05c5beb51c7dd6e7880ff8faed6d13db4443`已推送並fetch確認
 - GitHub Issue (optional): NONE
 
 ## Session Git state
@@ -36,11 +36,11 @@
 ## Actual validation results
 
 - Verification status: PASSED（文件範圍）
-- Date and checked commit/worktree: 2026-10-24；上述base加本輪文件delta
+- Date and checked commit/worktree: 2026-10-24；內容commit及整合commit如上，獨立checkout
 - Commands/manual checks and results: PASS — 五份文件共120個本機連結／anchor／tracked或本輪新增targets；相關source與最新main的diff為空；完整staged diff自審；`git diff --check`通過。JAXA正文工具讀取逾時，只核對搜尋摘要。
 - Evidence/environment: documentation-only；沒有browser截圖或FPS
-- Integrated commit and checks: NOT INTEGRATED
-- Changes since verification: NONE
+- Integrated commit and checks: `754a05c5beb51c7dd6e7880ff8faed6d13db4443`；與內容commit tree無差異、120個本機連結／tracked targets及`git diff --check origin/main..HEAD`重驗PASS。推送後HEAD與origin/main為0/0；`gh run list`查該SHA為空，與CI的docs-only paths-ignore相符，並非runtime CI通過。
+- Changes since verification: 本次只補交接的commit／remote／實際驗證記錄；無程式或設計內容變更。
 - Runtime tests/build/browser: NOT RUN；純文件，按CONTRIBUTING不要求
 
 ## Known issues and blockers
@@ -55,4 +55,4 @@
 
 ## Next expected step
 
-Codex／接手實作者於最新main開E2實作分支，依計劃做可隔離的靜態量體比較；先追蹤當時source與callers、確認共享模組／素材owner，再驗證hero日景、通行／航路與球體淨空。此次任務只完成規劃與E1；整合結果於下方更新。
+Codex／接手實作者於最新main開E2實作分支，依計劃做可隔離的靜態量體比較；先追蹤當時source與callers、確認共享模組／素材owner，再驗證hero日景、通行／航路與球體淨空。此次任務的規劃與E1已完成及發布main；E2–E5仍待接續。
