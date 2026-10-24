@@ -16,7 +16,7 @@ node tests/energyE5.browser.mjs
 
 預設City `http://127.0.0.1:5173`；可用`CITY2127_CITY_URL`改成實際Vite URL。預設比較每種60秒、長跑30分鐘；可用`CITY2127_COMPARE_SECONDS`（≥5）及`CITY2127_SOAK_MINUTES`（≥1）改時長，報告記實際值。證據必須用新目錄，不覆寫本輪。script自建scratch SQLite／loopback server及headed Chrome，finally關閉並清理scratch；外部Vite由啟動人停止。
 
-量測順序：空白權威城市default／low，各排除15秒warm-up；以真實HTTP提交16份四類各4能源提案，各保留真實10秒閱讀；混合權威城市default／low（三個現行Meter均選中間答案）；low畫質自動日夜長跑，兩個桌面Guest A/B每40秒各完成一份原生四題／核對／提交；最後City實際browser offline三秒、重連及reload。沒有clock jump、DEV energy預設或展覽DB。
+量測順序：零提案基準城市default／low，各排除15秒warm-up；以真實HTTP提交16份四類各4能源提案，各保留真實10秒閱讀；混合權威城市default／low（三個現行Meter均選中間答案）；low畫質自動日夜長跑，兩個桌面Guest A/B每40秒各完成一份原生四題／核對／提交；最後City實際browser offline三秒、重連及reload。沒有clock jump、DEV energy預設或展覽DB。
 
 每5秒保存rAF interval統計、既有120-frame FPS、draw calls、triangles、geometry／texture counts、canvas CSS／buffer、actor time、時刻、能源target、JS heap、DOM nodes及測試server RSS。rAF interval是browser cadence，並非GPU timer／scanout；draw／triangle包含composer各passes，並非唯一mesh面數。JS heap不是整個Chrome／GPU記憶體；RSS屬同程序survey server及測試runner。未強制GC，不能單憑heap波動判定洩漏。沒有涵蓋所有Meter／能源極值、4K或整個展日；`pmset -g therm`首次sandbox查詢失敗；允許host讀取後回報沒有已記錄的thermal／performance warning或CPU power status（[原文](mac-mini/thermal.txt)），仍沒有溫度／頻率追蹤或未降頻證據。截圖在每phase量測後才拍；保存每5秒統計與整段彙總，沒有保存逐幀interval清單。
 
@@ -28,8 +28,8 @@ node tests/energyE5.browser.mjs
 
 | 場景／quality | 量測秒數 | 全段FPS | p95／p99間隔 ms | 最長間隔 ms | 量測後截圖 |
 | --- | ---: | ---: | --- | ---: | --- |
-| 空白權威城市／default | 60.13 | 31.10 | 34.1／34.4 | 50.1 | [圖](mac-mini/baseline-default.png) |
-| 空白權威城市／low | 60.09 | 59.94 | 17.6／17.7 | 17.8 | [圖](mac-mini/baseline-low.png) |
+| 零提案基準城市／default | 60.13 | 31.10 | 34.1／34.4 | 50.1 | [圖](mac-mini/baseline-default.png) |
+| 零提案基準城市／low | 60.09 | 59.94 | 17.6／17.7 | 17.8 | [圖](mac-mini/baseline-low.png) |
 | 四類共存／default | 60.13 | 32.36 | 34.5／35.3 | 50.7 | [圖](mac-mini/mixed-default.png) |
 | 四類共存／low | 60.08 | 59.94 | 17.6／17.7 | 17.8 | [圖](mac-mini/mixed-low.png) |
 | low、自動日夜＋A/B UI長跑 | 1801.94 | 59.94 | 17.9／18.6 | 66.7 | [圖](mac-mini/soak-low-auto.png) |
