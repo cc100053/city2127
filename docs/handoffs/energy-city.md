@@ -4,7 +4,7 @@
 ## E4正式接入／本輪續作（2026-10-24）
 
 - Owner: Codex；產品決策cc100053。
-- Status: LOCAL_VERIFIED — 使用者閱讀Q3詳情後回覆「Ok」，確認只替換Q3的方案；正式接入及本機驗證完成，Git整合／main CI待以下最終記錄。E5硬件／性能／訪客驗收不在本次。
+- Status: COMPLETE（E4）— 使用者閱讀Q3詳情後回覆「Ok」，確認只替換Q3的方案；正式接入、本機／browser驗證、main整合及CI全部完成。E5硬件／性能／訪客驗收不在本次。
 - Branch: `codex/energy-city-authority`；獨立checkout `/private/tmp/city2127-energy-plan-20261024`；續作HEAD `a617f55e220060aeb65c5dd4fe4d6e76676bdb24`，origin任務分支0／0，對origin/main b8bccad 2 ahead／0 behind。乾淨後開始，沒有自動pull／merge main。
 - Mandatory preflight續作：首先確認原city2127 main29d12db、只有既有未追蹤`.playwright-cli/`；fetch成功，原checkout落後23 commits，保留原狀。獨立checkoutfetch成功，遠端main仍b8bccad，E3及準備commit可取得；無`.codegraph/`，不索引。沿用已讀本任務所有必讀文件並核對上輪交接／actualsource及callers。沒有並行binary／模組編輯；同一Owner。
 - 實作：question-set4，只改Q3；三軸原ids／effects／文字維持。`shared/energy.ts`定義四類累計／精確整數門檻／配置驗證；votes.energy與environmentalPriority零佔位明確表示氣候缺席。state.energy持久counts與climateGuestCount；舊氣候EMA／sum／score及刻度不受能源人數稀釋，舊事件無energy仍完全沿用原reducer結果。SQLite8只新增nullable energy_json，舊event／原文不重寫；新before／after JSON及votes記錄可重播／Undo。
@@ -20,7 +20,9 @@
 - 清理PASS：本輪唯一Vite session已停止exit130，lsof確認5173無LISTEN；全部Chrome scripts在finally關閉browser／realtime／HTTP／scratch DB。本輪沒有持久survey server或留下測試分頁。原checkout／舊截圖保持。
 - Last verified commit: **`361eff7aa9f04ebd0c51ac7771fd4faa0d813592`**（no-ff integration）；實作 **`fdf0981`** 已推送`origin/codex/energy-city-authority`。整合前fresh fetch確認main仍b8bccad，沒有衝突，`git diff --quiet fdf0981 HEAD`證明tree完全一致。
 - Integrated validation PASS：root完整npm test（包含最終324情境／164,088 mesh checks）／npm run build／git diff --check；survey完整npm test／build／git diff --check。正式browser與P2／P3／P4對應相同runtime tree；38個source SHA-256重核PASS。429個本機Markdown links／anchors／targets及committed `git diff --check origin/main..HEAD` PASS；最終文件指標變更後再核對。沒有另外跑未改的module-swap本機suite，main CI仍須驗三package。
-- Publication: 本次僅補整合紀錄，接下來fresh fetch／ancestor檢查後推送main並確認main CI；沒有部署。E5硬件／性能／訪客驗收仍獨立未完成。
+- Publication PASS：`90dbc5b9f6595817d70fb042cebd14cf68e7c857`已推送`origin/main`，fresh fetch確認0／0。[main CI 40051102120](https://github.com/cc100053/city2127/actions/runs/40051102120)完成success（job120743753228，Node24／Ubuntu）：root test／build、survey test／build、module-swap test／build及committed whitespace全部PASS。本次後續僅補Markdown完成紀錄，依paths-ignore不另觸發CI；runtime／素材仍與已通過的361eff7／90dbc5b一致。
+- 下一步：E5實際展覽硬件／長跑性能／訪客理解驗收，尚未開始。使用新版須重新build／restart survey並刷新City／Guest；沒有部署，原checkout及既有截圖繼續保留。
+- 最終文件收尾：四份更新文件的87個本機Markdown links／anchors及完整diff／whitespace檢查PASS；僅補完成狀態與上述已核對的CI事實，不重跑runtime suite。
 
 ---
 
