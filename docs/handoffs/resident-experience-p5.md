@@ -10,6 +10,10 @@
 - Last verified commit: `8399a2601de3824b8fa58d50fc2b3e26328e5e79`（文件檢查PASS）；另有本交接的publication metadata更新，實機 NOT RUN
 - Remote availability: 準備source `8399a2601de3824b8fa58d50fc2b3e26328e5e79` 及publication closure `92a97c117b06cd76adb1e293374a39c1ef3f45a5` 均在 `origin/main`；原P5分支已退休，實機工作仍待接續。
 
+## 2026-10-24能源E5本機續作
+
+使用者限定「test this mac mini only」。目前Mac mini M6／24GB已做1080p、DPR1、low真實30分鐘A/B長跑，數據與相機限制見[能源E5紀錄](../../artifacts/energy-city-e5/README.md)及[交接](energy-city.md)。這是目前主機的本機證據，不填成D0–D10的65吋HDMI／iPad／專用router或真人結果；展覽日完整時長／門檻及P5／S5仍待owner安排。
+
 ## Session Git state
 
 2026-10-02（Asia/Tokyo）：確認 `/Users/fatboy/city2127`；起始為乾淨 `main`／上述HEAD，沒有未提交截圖。Fetch成功；`origin/main`同為base，divergence 0/0，無需整合upstream。P4 source `7b36dd65da03289e224c31bc825b9cbef4fed19b` 和 verified integration `9f7741921805551724d2608c9ac249e0e194dc21` 均在remote main；本次base是P4文件closure。沒有既有P5分支／交接。Codex負責文件，沒有本地重疊修改；未改模組或binary assets。建立分支的sandbox Git lock寫入失敗，已授權escalation後成功。

@@ -1,0 +1,8 @@
+2026-10-24 Asia/Tokyo, approximately 12 minutes into the soak.
+pmset -g therm (read-only, with host access):
+Note: No thermal warning level has been recorded
+Note: No performance warning level has been recorded
+Note: No CPU power status has been recorded
+
+The first sandboxed query returned 0xe00002bc. The host query above succeeded.
+No temperature, frequency trace or proof of absence of throttling was obtained.

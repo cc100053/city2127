@@ -1,5 +1,28 @@
-# energy-city — 能源城市 E1–E4
+# energy-city — 能源城市 E1–E5
 
+
+## E5本機驗收續作（2026-10-24）
+
+- Owner：Codex；產品決策cc100053。
+- Status：PARTIAL（E5整體）；本輪Mac限定量測與TCP復原已完成，Git收尾進行中。使用者將範圍明確限定「test this mac mini only」。只完成可用Mac的性能／操作；E5整體、HDMI／iPad／專用LAN及真人理解不推論完成。
+- Branch：`codex/energy-city-e5`；獨立clone `/private/tmp/city2127-energy-plan-20261024`。
+- Base：`66c6adf5b76c071e338b37620bedf42b134cb33f`；本輪開始乾淨main，fresh fetch後與origin/main 0／0。E4 runtime `90dbc5b`及docs closure `66c6adf`都在remote。
+- Last verified commit：本輪base加E5工作樹（local gate及source hashes通過）；整合後補確切SHA。
+- Remote availability：NOT PUSHED（待本輪Git收尾）。
+- 原checkout `/Users/fatboy/city2127` main `29d12db`，保留既有未追蹤`.playwright-cli/`／截圖，沒有reset／stash／同步。fetch首次受sandbox限制，允許後兩clone fetch成功；原checkout對最新main為0 ahead／29 behind。獨立clone沒有`.codegraph/`，不借用舊index或自行索引。
+- 已讀README、PROJECT、VALIDATION、ENERGY_CITY_PLAN、本交接、CONTRIBUTING、P5實機驗收表及LAN交接。沿用E4已完成產品方向／四題／獨立counts／歷史；無新素材、部署、基建或其他chat／agent。
+- 觸及範圍：main既有120-frame diagnostics加triangles／textures；root test chain加入統計self-check；新`tests/energyE5.browser.mjs`讀正式API／原生Guest／canvas及CDP，獨立scratch DB；統計自檢及本機證據。main animation loop／renderer.info.reset／composer callers已核對，沒有改畫質或動畫行為。PROJECT／VALIDATION／SPEC／能源計劃／索引同步。
+- 方法與下一輪實機可執行步驟：[E5證據](../../artifacts/energy-city-e5/README.md)。測量中不並行跑CPU密集tests／build，避免污染性能比較。
+- 主要run：本機Mac mini Mac18,5／Apple M6、24GB、macOS27.0.1；headed Chrome156.0.8078.47／ANGLE Metal／WebGL2；City1920×1080／DPR1、Guest A/B1280×900、Vite DEV。2026-10-24 14:18:08–14:58:19 JST，真正長跑1801.94秒，無clock jumps／展覽DB。主Meter選中間答案，四類能源共存。
+- 量測PASS：low平均59.94FPS、p95／p99 17.9／18.6ms、max66.7ms；108,008frames，每5秒讀取的120幀renderer FPS樣本59.8–60.1，首／末12個renderer FPS樣本均值59.908／59.933。16 HTTP seed＋90份原生UI A/B＝106，權威count106，每對server displayAt相距10,000ms；renderer425 geometry／24 textures全段不變，JS heap19.2–51.8MiB（末35.5MiB）。page crash／exception／context loss均0，只有3個favicon404 console訊息。
+- 60秒場景樣本：空白／混合default31.10／32.36FPS，low均59.94。**相機限制**：從hero起始，但OrbitControls未鎖定／未記錄軌跡，實際截圖有視角／距離偏移，來源未確定；不可稱完全固定hero benchmark或推算能源GPU增量。低畫質長跑數字仍是實際互動／日夜負載證據，非4K／所有配置／整日保證。
+- 完整5秒原始資料、GPU／source hashes、5張已檢視截圖及當時runner原文在artifact。主要run的offline／reload只驗count，不能單憑它證明TCP斷線；獨立補驗PASS：真實City TCP切斷＋offline3秒，新connection5→6，count20及能源target／reload恢復；只有2個favicon404及2個刻意offline錯誤。首次pmset受sandbox限制，host查詢沒有已記錄thermal／performance warning／CPU power status，沒有溫度／頻率trace。
+- 最終runner修正seed紀錄API欄位、既有證據目錄guard及row.rendererFps／rAF row.fps命名；舊兩輪raw row.fps是每120幀renderer均值，phase.fps／p95／p99由全部rAF計算。原始紀錄未改寫，兩輪當時runner原文已存並與hash核對。新增canvas pointer-events:none只限測試context，已以最終runner init做實際Chrome drag／wheel／render clock檢查PASS，正式城市控制不變；沒有第三輪30分鐘重跑。
+- Local validation：root完整npm test（含最後E5統計self-check、舊81／新108答案及324幾何情境）／build PASS，既有>500kB chunk warning；最後欄位命名修正後完整gate再次PASS。Survey build為browser準備PASS，survey／module-swap source沒改，本機沒有另跑兩套package tests；main CI仍需核對。文件／diff／所有新source及6張保留截圖已自審；392個本機links／anchors／targets、兩輪runtime／archived runner及最終pointer probe hash全部PASS；Git紀錄待收尾。
+- Cleanup PASS：兩輪runner的scratch DB／HTTP／WebSocket及Chrome均在finally關閉；兩個Vite session已停止exit130，最後短probe亦關閉Chrome。原checkout及既有`.playwright-cli/`／截圖未改。
+- Next：本機範圍已實作／驗證，待Git整合與main CI紀錄；之後由owner另行安排展覽硬件／真人與整日門檻，本輪不等待或宣稱已通過。
+
+---
 
 ## E4正式接入／本輪續作（2026-10-24）
 
