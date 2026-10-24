@@ -174,3 +174,7 @@ DEV `?energy=baseline|a|b|c|mixed&hour=12&reviewTime=20`：在原hero固定五�
 - 富士環用內半徑29／外33 m、厚3 m保守全周掃掠檢查真實civicCore及固定軸承；兩庭渦輪用半徑2.3 m／厚0.9 m圓盤檢查固定室／支承。掃掠同樣檢查既有船體／公共／航空通道與泊位；兩條新步道對真實tidal-edge檢查，全部mesh頂點留在原hero畫框。保持六座rooms與連岸路、beacons及四站hero視線。
 - 本機Codex in-app Chromium／WebGL2、1920×1080、預設quality：五日景、M1 18.5／22、近景充能10／暫存30／釋能50與靜態閱讀；console error／warn、實時階段、模式隔離及一般desktop resize記錄在artifact／handoff。OS全域reduced-motion設定未改，瀏覽器用原生核取框測相同靜態更新分支。
 - 流向是標記、水位是視覺位移；未模擬完整電網／流體、連續全城碰撞、容量／損耗／可靠度或海岸工程。沒有測展覽硬件、FPS、Safari／iPad；小機械需近景。正式問卷／Meter與後端維持現況，E4／E5不在本輪交付。
+
+## Energy E4 model preparation — 2026-10-24（未完成E4）
+
+Root `npm test`／`npm run build`／`git diff --check` PASS。新增36種獨立配置的實際visibility、翼比例、配電條件、目標副本隔離及mesh UUID重用檢查；沿用完整E3幾何／動態檢查。macOS Codex in-app Chromium／WebGL2、1280×720、原hero、hour12／reviewTime50：五DEV預設與靜態閱讀回歸通過，captured console warn／error為空。[證據](../artifacts/energy-city-e4/README.md)只證明模型接口準備；正式問題／權威資料鏈、scratch歷史／migration與正式瀏覽器驗收尚未接入，E5硬件／FPS未測。產品取捨及分支狀態見[能源交接](handoffs/energy-city.md)。

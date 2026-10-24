@@ -147,3 +147,7 @@ Single mode automatically hands off at next Start and applies a queued reset aft
 Root tests/build cover root only; install survey dependencies for the real HTTP/WebSocket pipeline tests. Survey and module-swap have separate checks. Browser/performance evidence is tied to the captured commit/device, never inferred from geometry counts or earlier Shibuya FPS. S5, input hardware and exhibition-day recovery policy remain unresolved. See [current validation](VALIDATION.md) and [document index](README.md).
 
 The [previous implementation map](history/PROJECT_2026-10-02.md) is an archived mixed-stage snapshot for old deep links. It is not an architecture authority or a list of future work.
+
+### E4配置接口準備（2026-10-24，非正式接入）
+
+`energyPrototype.configure(EnergyConfiguration)`可獨立設定0／1／2處水庭、無／小／大接收翼、儲能環及能源島；`getConfiguration()`回傳目標的副本。原DEV `select()`五預設沿用此接口，幾何／材質不重建。無儲能的組合沿用外部供電／持續配電，有儲能時沿用60秒節拍。新增36種組合的模型檢查；[E4準備證據](../artifacts/energy-city-e4/README.md)。正式survey、CityView、四軸及schema未變；Q3取捨待[能源方案](ENERGY_CITY_PLAN.md#e4評審草案四題與能源權威配置2026-10-24待產品決定)確認，不能把此接口當作正式權威鏈已接通。

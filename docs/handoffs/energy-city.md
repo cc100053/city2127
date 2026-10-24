@@ -1,4 +1,25 @@
-# energy-city — 能源城市 E1–E3
+# energy-city — 能源城市 E1–E4
+
+
+## E4本輪狀態（2026-10-24）
+
+- Owner: Codex；產品決策cc100053
+- Status: **WAITING_FOR_PRODUCT_DECISION** — 已準備配置接口及具體Q3／累積／歷史方案；E4正式接入未完成，E5不在本輪。
+- Branch: `codex/energy-city-authority`；checkout `/private/tmp/city2127-energy-plan-20261024`。
+- Base: `b8bccad9275283fd5aa3a19a1c0d37602345cc95`；E3內容8d6cb93／223cc09與整合3333e4c均可從remote取得，交接與實際code一致。
+- Preflight：先確認原`/Users/fatboy/city2127`為main29d12db，只保留既有未追蹤`.playwright-cli/`；fetch成功後0 ahead／23 behind。獨立checkout開工乾淨main b8bccad，初次fetch sandbox DNS失敗，允許網絡重跑成功，0／0。未stash／reset／改原checkout。獨立checkout沒有.codegraph，不自行索引；不拿舊checkout的index當新source。
+- 已讀使用者指定README、PROJECT、CONTRIBUTING、VALIDATION、SPEC、RESIDENT_COPY、ART、CITY MASTER TASTE、ENERGY_CITY_PLAN及本交接。追蹤questionLoader→proposalService→scoreEngine→SQLite snapshot／replay／toProposalRecord→CityView／viewOf→root parser／main→cityChangeManager→residentResult；現行question-set3／CityView2／SQLite7。唯一Owner，無並行binary／module編輯。
+- 完成：energyPrototype增加configure／getConfiguration接口，水庭0／1／2、接收翼無／小／大、環與島獨立共存；原select預設保留，沒有新geometry／materials。配電由實際儲能有無決定節拍。36組模型測試；[評審方案](../ENERGY_CITY_PLAN.md#e4評審草案四題與能源權威配置2026-10-24待產品決定)含四題協調、完整日文選項、累積門檻例、共存／互斥、氣候缺席與歷史保存、實際證據及無改變文案。
+- PASS：root完整npm test（含真實loopback HTTP／WebSocket／81組原題），npm run build（既有>500kB warning），git diff --check。Focused能源幾何／動態test亦PASS。Survey／module-swap source未改，沒有另跑本機suite；不把原四題pipeline當新能源pipeline。
+- PASS：[準備階段browser證據](../../artifacts/energy-city-e4/README.md)：macOS in-app Chromium／WebGL2、1280×720、原hero、hour12／reviewTime50，五DEV配置及靜態閱讀；console warn／error空。未做新正式flow、migration、硬件／FPS驗收。
+- 文件核對：262個本機Markdown links／anchors／targets PASS；新增source hashes與實際code一致；完整diff／new files自審，沒有改README／SPEC／RESIDENT_COPY，因正式產品行為與文案仍維持version3，候選明確只寫ENERGY_CITY_PLAN。
+- 清理：本輪Vite session正常停止exit130，5173無LISTEN；本輪in-app測試分頁已關閉，沒有新持久survey服務；原checkout與既有截圖保留。
+- 待決：使用者本次明確要求「會改變產品方向的關鍵決定先準備可review方案再問」。**是否接受只將Q3由夏日涼感改成能源四類生活取捨，另外三題不變、舊氣候保持原義且不收新票、能源獨立累積？** 已透過本chat選項詢問；沒有答案前，不自行改正式題、軸、資料／migration或合併未完成E4至main。
+- 下一步：收到產品決定後，依確認方案完成server累積／缺席與schema migration、嚴格wire驗證、正式能源runtime及3秒retarget、前後實際證據／結果卡，再做新舊scratch歷史、retry／reconnect／Undo／reset、single／A-B與reduced-motion正式桌面證據，跑root／survey適用test/build，按Git流程整合及確認main CI。下方E3原交接作歷史保留。
+
+---
+
+## E3發布紀錄
 
 - Owner: Codex；產品決策cc100053
 - Status: IN_PROGRESS — E1–E3完成並發布main，最終main CI PASS；E4／E5未開始
