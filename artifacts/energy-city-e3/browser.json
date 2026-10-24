@@ -119,11 +119,18 @@
       "view": "standalone",
       "energyControls": 0,
       "logs": []
+    },
+    {
+      "view": "configuration-specific-copy",
+      "aPhase": "60 秒示意循環 · 釋能／分配 → 落水經渦輪 → 街區用電",
+      "bPhase": "60 秒示意循環 · 釋能／分配 → 旋轉環減速 → 街區用電",
+      "bStatic": "靜態閱讀：接收 → 儲能 → 街區；接收翼、旋轉環與配電門架保持固定。",
+      "logs": []
     }
   ],
   "sourceSha256": {
     "src/energyPrototype.ts": "cba52b0efd94e75099a27a313fad88c5a357287456ae3442893eb58a42d95409",
-    "src/devEnergy.ts": "dd14ad2352ac6ffdaf11c5013cfba2d85e6278b54b903234d9874f622adf1632",
+    "src/devEnergy.ts": "0bd5bac65c30334005f0534180d177ae424e853c0c7587047d70e0d58cd20321",
     "src/main.ts": "103a2bd6dc1d654e9371bda74be56467b7c851df9ad7443c7df9f08858aa4c92"
   }
 }
