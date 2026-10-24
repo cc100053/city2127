@@ -1,3 +1,4 @@
+import { isEnergyChoice, isEnergyConfiguration, isEnergyState, sameEnergyConfiguration, energyConfiguration, emptyEnergyConfiguration, type EnergyConfiguration, type EnergyState, type EnergyChoice } from '../survey/src/shared/energy.ts';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 import { isDisplayMode, type DisplayMode } from './dayCycle.ts';
 export const AXES = ['automation', 'publicSharing', 'environmentalPriority', 'urbanConcentration'] as const;
@@ -22,6 +23,7 @@ export type SurveyView = { version: 1; runId: string; revision: number; scores: 
 export type Band = 'low' | 'mixed' | 'high';
 export type ExhibitionLayout = {
   version: 2;
+  energy?: EnergyConfiguration;
   bands: Record<LotSocketId, Band>;
   automatedPorts: number;
   sharedSeats: number;
@@ -47,7 +49,7 @@ export type ExhibitionProposal = {
   questionSetVersion: number;
   algorithmVersion: 2;
   answers: ProposalAnswer[];
-  votes: Scores;
+  votes: Scores & { energy?: EnergyChoice };
   revisionBefore: number;
   revisionAfter: number;
   submittedAt: string;
@@ -62,6 +64,7 @@ export type ExhibitionView = {
   runId: string;
   revision: number;
   guestCount: number;
+  energy?: EnergyState;
   algorithmVersion: 2;
   voteSums: Scores;
   recentVotes: Scores;
@@ -101,7 +104,8 @@ function isIntegerScores(value: unknown, min: number, max: number): value is Sco
 }
 
 function isExhibitionLayout(value: unknown): value is ExhibitionLayout {
-  if (!isRecord(value) || !hasExactKeys(value, ['version', 'bands', 'automatedPorts', 'sharedSeats', 'treeCount', 'plantedFraction', 'coolingFins', 'functionModules'])
+  if (!isRecord(value) || !hasExactKeys(value, ['version', 'bands', 'automatedPorts', 'sharedSeats', 'treeCount', 'plantedFraction', 'coolingFins', 'functionModules', ...(Object.hasOwn(value, 'energy') ? ['energy'] : [])])
+    || (Object.hasOwn(value, 'energy') && !isEnergyConfiguration(value.energy))
     || value.version !== 2 || !isRecord(value.bands) || !hasExactKeys(value.bands, LOT_SOCKET_IDS)) return false;
   const bands = value.bands;
   return LOT_SOCKET_IDS.every(id => isOneOf(bands[id], ['low', 'mixed', 'high']))
@@ -127,7 +131,8 @@ function isProposalAnswer(value: unknown): value is ProposalAnswer {
 }
 
 function isVotes(value: unknown): value is Scores {
-  return isRecord(value) && hasExactKeys(value, AXES) && AXES.every(axis => value[axis] === -1 || value[axis] === 0 || value[axis] === 1);
+  return isRecord(value) && hasExactKeys(value, [...AXES, ...(Object.hasOwn(value, 'energy') ? ['energy'] : [])])
+    && (!Object.hasOwn(value, 'energy') || (isEnergyChoice(value.energy) && value.environmentalPriority === 0)) && AXES.every(axis => value[axis] === -1 || value[axis] === 0 || value[axis] === 1);
 }
 
 function isChangeValues(value: unknown, layout: ExhibitionLayout, socketId: LotSocketId): value is Record<string, number | string> {
@@ -164,14 +169,16 @@ function isExhibitionProposal(value: unknown, runId: string, revision: number): 
   const changedSites = new Set(value.cityChanges.map(change => (change as ExhibitionCityChange).socketId));
   const expectedChanges = LOT_SOCKET_IDS.filter(id => exhibitionSiteChanged(value.beforeLayout as ExhibitionLayout, value.afterLayout as ExhibitionLayout, id));
   return new Set(answers.map(answer => answer.questionId)).size === answers.length
-    && answers.some(answer => answer.questionId === 'cooling-2127')
+    && (Object.hasOwn(value.votes, 'energy')
+      ? value.questionSetVersion >= 4 && answers.some(answer => answer.questionId === 'energy-2127' && answer.optionId === (value.votes as ExhibitionProposal['votes']).energy) && !!value.afterLayout.energy
+      : answers.some(answer => answer.questionId === 'cooling-2127'))
     && changedSites.size === value.cityChanges.length
     && expectedChanges.length === changedSites.size
     && expectedChanges.every(id => changedSites.has(id));
 }
 
 function parseExhibitionView(value: unknown): ExhibitionView | null {
-  if (!isRecord(value) || !hasExactKeys(value, ['version', 'runId', 'revision', 'guestCount', 'algorithmVersion', 'voteSums', 'recentVotes', 'scores', 'layout', 'recentProposals', ...(Object.hasOwn(value, 'slotSeeds') ? ['slotSeeds'] : []), ...(Object.hasOwn(value, 'latestProposal') ? ['latestProposal'] : [])])
+  if (!isRecord(value) || !hasExactKeys(value, ['version', 'runId', 'revision', 'guestCount', 'algorithmVersion', 'voteSums', 'recentVotes', 'scores', 'layout', 'recentProposals', ...(Object.hasOwn(value, 'energy') ? ['energy'] : []), ...(Object.hasOwn(value, 'slotSeeds') ? ['slotSeeds'] : []), ...(Object.hasOwn(value, 'latestProposal') ? ['latestProposal'] : [])])
     || value.version !== 2 || !isBoundedText(value.runId, 128)
     || !isSafeCount(value.revision) || !isSafeCount(value.guestCount) || value.revision !== value.guestCount
     || value.algorithmVersion !== 2 || !isIntegerScores(value.voteSums, -value.guestCount, value.guestCount)
@@ -179,6 +186,9 @@ function parseExhibitionView(value: unknown): ExhibitionView | null {
     || (Object.hasOwn(value, 'slotSeeds') && !isIntegerScores(value.slotSeeds, 0, 0xffffffff))
     || !Array.isArray(value.recentProposals) || value.recentProposals.length > 64
     || !value.recentProposals.every(proposal => isExhibitionProposal(proposal, value.runId as string, value.revision as number))) return null;
+  if (Object.hasOwn(value, 'energy')) {
+    if (!isEnergyState(value.energy, value.guestCount) || (!value.layout.energy || !sameEnergyConfiguration(value.layout.energy, energyConfiguration(value.energy.counts)))) return null;
+  } else if (value.layout.energy !== undefined) return null;
   const recent = value.recentProposals as ExhibitionProposal[];
   if (value.guestCount === 0 && value.slotSeeds && AXES.some(axis => (value.slotSeeds as Scores)[axis] !== 0)) return null;
   if (recent.some((proposal, i) => i > 0 && proposal.ordinal <= recent[i - 1].ordinal)) return null;
@@ -197,7 +207,8 @@ function sameScores(a: Scores, b: Scores): boolean {
 }
 
 function sameLayout(a: ExhibitionLayout, b: ExhibitionLayout): boolean {
-  return a.version === b.version && LOT_SOCKET_IDS.every(id => a.bands[id] === b.bands[id])
+  return sameEnergyConfiguration(a.energy ?? emptyEnergyConfiguration(), b.energy ?? emptyEnergyConfiguration())
+    && a.version === b.version && LOT_SOCKET_IDS.every(id => a.bands[id] === b.bands[id])
     && ['automatedPorts', 'sharedSeats', 'treeCount', 'plantedFraction', 'coolingFins', 'functionModules']
       .every(key => a[key as keyof ExhibitionLayout] === b[key as keyof ExhibitionLayout]);
 }

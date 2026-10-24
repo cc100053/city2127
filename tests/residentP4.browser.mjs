@@ -60,7 +60,8 @@ try {
   await guest.goto(survey + '/guest'); await admin.goto(survey + '/admin');
   await city.goto(`${process.env.CITY2127_CITY_URL ?? 'http://127.0.0.1:5173'}/?survey=${encodeURIComponent(survey.replace('http', 'ws') + '/ws')}&hour=16`);
   await settled();
-  assert.equal(await city.locator('.resident-card-title').textContent(), 'あなたも、この街の住民です。');
+  assert.equal(await city.locator('.causal-panel').getAttribute('data-presentation'), 'ambient');
+  assert.ok((await city.locator('.resident-card-title').textContent()).length > 0, 'ambient cards rotate while the model loads');
   // Desktop touch events, native keyboard radio, return and review edit without a partial vote.
   await guest.locator('[data-auto-action=start]').tap();
   await screen(guest, 'question');
@@ -96,7 +97,7 @@ try {
   await city.waitForFunction(() => document.querySelector('.causal-panel')?.dataset.presentation === 'result');
   assert.equal(await city.locator('.causal-panel').getAttribute('data-result-kind'), 'maintained');
   assert.equal(await city.locator('section .causal-context').textContent(), await guest.locator('.guest-result-number').textContent());
-  await city.waitForFunction(() => document.querySelector('.resident-card-copy')?.textContent.includes('構成は維持'));
+  await city.waitForFunction(() => document.querySelector('.resident-card-copy')?.textContent.includes('街のエネルギー設備は今の配置を受け継いでいます'));
   await city.screenshot({ path: join(evidence, 'resident-p4-maintained-city.png') });
   const inherited = await read('/api/city-view');
   assert.equal(inherited.guestCount, 1);

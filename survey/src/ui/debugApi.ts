@@ -51,7 +51,10 @@ export function renderView(view: CityView): HTMLElement {
           : id === 'sw' ? `共有席 ${view.layout.sharedSeats}/8` : `機能ユニット ${view.layout.functionModules}`)));
     const history = view.recentProposals.map(proposal => el('li', {},
       `#${proposal.ordinal}: ${proposal.answers.map(answer => answer.optionLabel).join(' · ')}`));
-    return el('div', {}, el('table', { class: 'scores' }, ...slots), el('ol', { class: 'log' }, ...history));
+    const energy = view.layout.energy;
+    return el('div', {}, el('table', { class: 'scores' }, ...slots),
+      ...(energy ? [el('p', {}, `エネルギー配置: 水庭 ${energy.waterGardens} · 受電翼 ${energy.receiver} · 蓄電環 ${energy.flywheel ? 'あり' : 'なし'} · 原子力島 ${energy.island ? 'あり' : 'なし'}`)] : []),
+      el('ol', { class: 'log' }, ...history));
   }
   const slots = LOT_SOCKET_IDS.map(id => {
     const lot = view.layout.lots[id];

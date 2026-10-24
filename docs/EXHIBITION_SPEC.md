@@ -26,7 +26,7 @@
 
 ### 能源篇研究（2026-10-24，E1–E3 DEV城市組合完成）
 
-使用者提出按「建築・居住／交通・物流／環境・エネルギー／社会・生活」研究更多城市形態，先做能源子題。[能源城市計劃](ENERGY_CITY_PLAN.md) 已完成E1：水庭儲能、富士旋轉環、填海核能島、軌道能源四構想的角色與整合，以及三種城市方向、混合範例與現況對照。E2已加入隔離的DEV `?energy`基準／A／B／C／M1靜態比較、四類量體與桌面幾何／瀏覽器檢查；[截圖](../artifacts/energy-city-e2/README.md)。E3已擴展兩處沿岸水庭／翼形遮棚及環／翼配電門架，加入可重播60秒充能／暫存／釋能流程與完整靜態閱讀；[E3實際比較](../artifacts/energy-city-e3/README.md)。E4正式問卷／權威配置、E5硬件／整體驗收仍未開始。上述分類及設施均屬企劃候選，未取代現有四題／Meter、富士媒體總部／劇場用途或六座water rooms；E2／E3只驗證目前DEV組合、動態及所列桌面畫面，最終美術、工程及硬件效果未驗證。[交接](handoffs/energy-city.md) 記錄本輪實際檢查及下一步。
+使用者提出按「建築・居住／交通・物流／環境・エネルギー／社会・生活」研究更多城市形態，先做能源子題。[能源城市計劃](ENERGY_CITY_PLAN.md) 已完成E1：水庭儲能、富士旋轉環、填海核能島、軌道能源四構想的角色與整合，以及三種城市方向、混合範例與現況對照。E2已加入隔離的DEV `?energy`基準／A／B／C／M1靜態比較、四類量體與桌面幾何／瀏覽器檢查；[截圖](../artifacts/energy-city-e2/README.md)。E3已擴展兩處沿岸水庭／翼形遮棚及環／翼配電門架，加入可重播60秒充能／暫存／釋能流程與完整靜態閱讀；[E3實際比較](../artifacts/energy-city-e3/README.md)。E4已由使用者確認只替換Q3並接入獨立權威能源配置（見下節）；E5硬件／整體驗收仍待後續。上述E1–E3研究當時未取代四題／Meter；正式Q3取捨由下節E4記錄。富士媒體總部／劇場用途及六座water rooms保持；E2／E3只驗證目前DEV組合、動態及所列桌面畫面，最終美術、工程及硬件效果未驗證。[交接](handoffs/energy-city.md) 記錄本輪實際檢查及下一步。
 
 ### 居民敘事與畫面分工（2026-10-02）
 
@@ -44,12 +44,20 @@ Root 用固定360px右上卡片（2026-10-04由左移右，避免遮住focal sit
 | --- | --- | --- | --- |
 | `service-2127` | automation | デックス西（nw） | 人員主導 → 人機協作 → 自律服務 |
 | `commons-2127` | publicSharing | アクアシティ南（sw） | 私密空間 → 混合庭院 → 開放共享 |
-| `cooling-2127` | environmentalPriority | お台場海浜公園（ne） | 主動冷卻 → 協同氣候庭院 → 樹冠／植栽 |
+| `energy-2127` | 獨立能源累計（不作Meter） | 沿岸能源接點；設備分佈於水庭／富士／外海 | 水庭儲能／儲能環／軌道接收翼／核能島可共存 |
 | `functions-2127` | urbanConcentration | フジテレビ東（se） | 分散機能艙 → 混合館 → 垂直集中 |
+
+### E4 Q3能源生活取捨（2026-10-24使用者確認）
+
+Q3採[能源計劃正式四選項](ENERGY_CITY_PLAN.md#e4正式接入2026-10-24)，另外三題原文／effects不變。每位居民仍一份四題提案；能源不按low/mixed/high排列。四類票獨立累計；每類至少2票且`票數×5≥能源回答總數+4`才出現；水庭／翼在`票數×5≥2×(能源回答總數+4)`時兩庭／大翼，否則一庭／小翼。環／島各最多一組；設備可共存，翼尺寸及同一庭有無互斥。這是展示門檻，並非容量或供電佔比；前四個基準席位不代表未記錄居民。第一票可沒有可見設備差異。
+
+舊cooling問題、原文及效應保留原意；新能源答案對氣候是缺席，氣候EMA／分數／刻度以有效舊氣候回答人數維持，不按能源回答數稀釋。新run維持D=0成熟混合氣候；其餘三軸如常變化與配對。外部電網為設定前提，水庭／環只儲能，軌道／核能為供電路線推演；沒有容量／可靠度／工程認證，不設災難獎勵特效。
+
+Server產出`layout.energy`，root套用模型並比較實際前後target。新第四票的旅程及lantern在沿岸能源接點，舊氣候票仍在公園；既有時間及立即恢復契約延續。結果卡只描述真實設備變化，不由本人選項推論共同結果；沒有可見差異就說能源配置延續。SQLite8新增nullable能源snapshot欄，保留schema7全部原始歷史；新舊server／City須一起更新，舊草稿重新預約、Q3重選，已保存舊ID仍可回原紀錄。
 
 ## 累積與權威 layout
 
-每軸每份提案只有一票 `v ∈ {-1,0,+1}`。對第 n 份提案：`Sₙ=Sₙ₋₁+v`、`Rₙ=.75Rₙ₋₁+.25v`、`Mₙ=clamp(6(Sₙ/n+Rₙ),-12,12)`。新 run 的 S／R／M 全部零；中性票亦會更新近期記憶，不能略過。只在 server 計算；replay 與 live 使用同一 reducer：[scoreEngine](../survey/src/survey/scoreEngine.ts)。
+E4後automation／publicSharing／urbanConcentration每軸每份提案只有一票 `v ∈ {-1,0,+1}`。對第 n 份提案：`Sₙ=Sₙ₋₁+v`、`Rₙ=.75Rₙ₋₁+.25v`、`Mₙ=clamp(6(Sₙ/n+Rₙ),-12,12)`。新 run 的 S／R／M 全部零；中性票亦會更新近期記憶，不能略過。只在 server 計算；replay 與 live 使用同一 reducer：[scoreEngine](../survey/src/survey/scoreEngine.ts)。
 
 **刻度 A（2026-10-13 user決定，取代舊刻度）**：實際 run 嘅 M 多數只喺 ±5 之內，所以 layout 讀「展示分數」`D=clamp(M×g(n),-12,12)`，n 係目前累積觀眾數。`g(n)=0.85+1.55×min(1,(n−1)/11)`：第一位觀眾 ×0.85（溫和開場，第一票 ±1 只到 D=±6.375，唔會即刻去到極端，但仍然觸發 P10 配對設施），之後逐位加強，第 12 位起固定 ×2.4（形態門檻相當於 M≈±1.25）。計分 reducer 不變；提案紀錄嘅 before/after layout 讀取時由分數同觀眾數重新計算，所以舊歷史一齊轉用新刻度，冇資料遷移。新舊比較見 DEV `?scaleLab` 及 [handoff](handoffs/archive/meter-scale-a.md)。
 
@@ -68,7 +76,7 @@ Root 用固定360px右上卡片（2026-10-04由左移右，避免遮住focal sit
 
 ## 城市可見變化
 
-四個 site 是視覺焦點，**Meter 已可影響整個 district**（2026-10-01 決策，P0–P12 已整合）；不再受原 MVP「只改四地塊」限制。
+四個 site 是視覺焦點，**三個現行Meter與繼承氣候配置可影響整個 district**（2026-10-01 決策，P0–P12 已整合）；不再受原 MVP「只改四地塊」限制。
 
 - Automation：服務亭／自律端口、步道人數、guideway pods、空中 fleet、服務 quadrotors。
 - Sharing：六座 water rooms、十個內陸庭院的私密／混合／共享形態，以及符合條件的廣場人群。
@@ -76,7 +84,7 @@ Root 用固定360px右上卡片（2026-10-04由左移右，避免遮住focal sit
 - Concentration：低層 pods／中間高度／十座塔、sky lobbies 與連橋。
 - Mixed 有自己的 hybrid 組合；跨 Meter 條件產生配對設施；完整 active run 的投票次序推導四軸 `slotSeeds`，相同分數可保留不同槽位分布。最新 64 份顯示 history 不截斷 seed 來源。
 
-**一票旅程（2026-10-13 user要求）**：live 結果先播約 2.6 秒旅程——觀眾四票化成 Meter 色光點（中性票暖白），由畫面右下（站台方向）飛去四個 focal site，著陸時掃描環升起；每票留低一粒浮喺 site 上空嘅光點（日間淡、夜間亮），保留最近 64 位觀眾，snapshot／reload 由 `recentProposals` 重建。著陸後先開始 3 秒過渡及 pulse，總共大約 5.6 秒，喺 10 秒閱讀時段之內；結果卡證據喺收到事件時已經計好，理由句照舊喺第 3 秒出現。Snapshot、reset、Undo、reconnect、reduced motion 唔播旅程，即時恢復。
+**一票旅程（2026-10-13 user要求）**：live 結果先播約 2.6 秒旅程——觀眾四票化成 Meter 色光點（中性票暖白），由畫面右下（站台方向）飛去四個 focal site（E4後新Q3改到沿岸能源接點，舊氣候票仍到公園），著陸時掃描環升起；每票留低一粒浮喺 site 上空嘅光點（日間淡、夜間亮），保留最近 64 位觀眾，snapshot／reload 由 `recentProposals` 重建。著陸後先開始 3 秒過渡及 pulse，總共大約 5.6 秒，喺 10 秒閱讀時段之內；結果卡證據喺收到事件時已經計好，理由句照舊喺第 3 秒出現。Snapshot、reset、Undo、reconnect、reduced motion 唔播旅程，即時恢復。
 
 Live 使用可重新定向的 **3 秒**過渡；pulse 只標示真的 live 變化；每個改變嘅 Meter 只喺其 site 出光柱，district slots 只有淡色光圈（2026-10-04）。Snapshot、reset、Undo、reconnect、reduced motion 直接恢復權威狀態，清除排隊及 pulse。重複事件不重播。配對、counts、固定 footprint 及限制見 [Meter handoff](handoffs/archive/meter-variety.md)。
 
@@ -95,7 +103,7 @@ A/B 按 server transaction 提交順序累積，容許舊 city revision、拒絕
 
 Admin 只限 server 電腦 loopback，POST 另檢查 same-origin。City reset 開新城市、保留總人數；full reset 清零展示計數但保留 append-only 歷史。保留中的 reset 可取消。Undo 只可撤銷最後一份已完成提案、且下一位開始前；新草稿即使稍後取消亦不重開舊 Undo。保存不可變撤銷標記，還原提交前狀態／counts／seeds。
 
-目前 question-set **version3**、SQLite **schema 7**、algorithm／CityView **v2**；schema 3 轉換曾結束 v1 run 並保留歷史，schema 7 保留現有 v2 城市及歷史。重啟使用原 SQLite，不刪資料。Root／survey 配合更新，尤其 slotSeeds。`module-swap` 只接受 legacy v1，不是展覽城市。
+目前 question-set **version4**、SQLite **schema 8**、algorithm／CityView **v2**；schema 3 轉換曾結束 v1 run 並保留歷史，schema 7 保留現有 v2 城市及歷史。重啟使用原 SQLite，不刪資料。Root／survey 配合更新，尤其 slotSeeds。`module-swap` 只接受 legacy v1，不是展覽城市。
 
 Admin Day／Night／Auto 保存為獨立 display setting：12:00／22:00／180 秒日循環。Reset 不改照明；City `?hour` 優先。多 viewer 的 Auto 時鐘不作跨裝置同步。
 

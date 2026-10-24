@@ -178,3 +178,14 @@ DEV `?energy=baseline|a|b|c|mixed&hour=12&reviewTime=20`：在原hero固定五�
 ## Energy E4 model preparation — 2026-10-24（未完成E4）
 
 Root `npm test`／`npm run build`／`git diff --check` PASS。新增36種獨立配置的實際visibility、翼比例、配電條件、目標副本隔離及mesh UUID重用檢查；沿用完整E3幾何／動態檢查。macOS Codex in-app Chromium／WebGL2、1280×720、原hero、hour12／reviewTime50：五DEV預設與靜態閱讀回歸通過，captured console warn／error為空。[證據](../artifacts/energy-city-e4/README.md)只證明模型接口準備；正式問題／權威資料鏈、scratch歷史／migration與正式瀏覽器驗收尚未接入，E5硬件／FPS未測。產品取捨及分支狀態見[能源交接](handoffs/energy-city.md)。
+
+
+## Energy E4 formal authority — 2026-10-24
+
+正式question-set4只替換Q3，CityView／algorithm2及SQLite8；能源獨立累計，保留舊氣候分數／EMA與刻度人數。Root舊81組加新108組、survey完整native tests與兩package build需要在最終及整合tree通過；實際verified commit／命令結果見[交接](handoffs/energy-city.md)。新增energy.test驗真實schema7→8／原文／舊ID／replay／氣候凍結／超過64筆counts／Undo／reset；energyPipeline用實際模型驗四題→權威→parser→模型→前後證據，並驗資源重用、固定橋高、延遲／淡入及reduced motion。
+
+正式[瀏覽器矩陣與圖像](../artifacts/energy-city-e4/formal/README.md)：macOS已安裝Chrome156.0.8078.47 headless／WebGL2，City1920×1080預設quality／原hero、Guest1280×900，hour12／18.5／22，實時actor clock（未固定或另記每張actor秒數）。真實scratch schema7→8舊草稿／原文／已保存ID，新Q3四個native radios／核對、pre/post-commit同ID重試、首票無設備差異／第二票一庭及結果、能源Undo、16份有效能源提案四類各4的混合snapshot、TCP重連、browser reduced-motion、普通resize1440×900、reset及舊ID恢復全部PASS。Exceptions為0；預期obsolete-session409、favicon404及兩次注入abort明列，沒有未預期console／network失敗。不用DEV圖證明正式接入。
+
+P3在現行v4回歸PASS：Chrome1280×720、hour16，實測A/B閱讀間隔10,002ms；排序、lost reply／reload、提前交接、reset drain、照明與立即恢復。P4／P2亦在目前v4回歸PASS，涵蓋舊A/B草稿、native鍵盤／桌面模擬觸控、核對、未知提交重試、離線站結果／問卷到期及reset；新證據分別保存於energy-city-e4/p4及p2，未覆寫歷史截圖。新增energyDistrict檢查兩種翼尺寸、seed0／4242、四軸三band共324情境，164,088次實際幾何檢查，能源最大組合與完整轉子掃掠對程序district／fallback focal無交集；不宣稱所有late roofs／GLB、任意seed或全城連續碰撞。最終commit及source hashes見handoff。GPU／FPS、實際展覽硬件、Safari／iPad／Windows、OS全域motion偏好及訪客理解未驗；E5維持開放。
+
+重跑：先build survey，開root本機預覽，使用既有Playwright安裝；設定`CITY2127_PLAYWRIGHT_PATH`指向其index.mjs，可用`CITY2127_CITY_URL`選預覽、`CITY2127_EVIDENCE_DIR`選新證據資料夾、`CITY2127_CHECKED_COMMIT`記基準，然後`node tests/energyE4.browser.mjs`。該script建立並清理自己的scratch DB／server／browser，不使用展覽SQLite；本機需允許localhost listen及已安裝Chrome。P2亦支援證據資料夾，避免覆寫舊截圖。

@@ -11,7 +11,7 @@
 | [PROJECT](PROJECT.md) | 現行模組、source/data/render flow、資源 lifecycle |
 | [RESIDENT_COPY](RESIDENT_COPY.md) | P1 日文居民文案與接入條件；P2文案／P3結果接入；設施增加仍須符合實際證據 |
 | [RESIDENT_EXPERIENCE_PLAN](RESIDENT_EXPERIENCE_PLAN.md) | 居民雙屏體驗 P1–P5 計劃、交付及驗收；P1–P3已實作，P4軟件驗證通過，P5驗收表已準備、實機未測 |
-| [ENERGY_CITY_PLAN](ENERGY_CITY_PLAN.md) | 能源篇E1–E5計劃；E1–E3 DEV五配置／街區動態與靜態閱讀完成，E4問卷映射未實作，未取代現行四題／Meter |
+| [ENERGY_CITY_PLAN](ENERGY_CITY_PLAN.md) | 能源篇E1–E5計劃；E1–E4實作／本機驗證完成，Q3能源獨立累積及權威模型接入，保留舊氣候／歷史；整合CI見交接，E5實機待驗 |
 | [ART](ART.md)／[CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) | 實作美術規則／視覺與世界觀 authority |
 | [VALIDATION](VALIDATION.md) | 今日可執行 checks、dated evidence 入口；不複製全部 handoff |
 | [BLENDER](BLENDER.md) | 素材 source/export/placement 及每台工作站的 MCP 設定契約 |

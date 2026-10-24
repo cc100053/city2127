@@ -21,7 +21,7 @@ export function simulateVotes(profile: VoteProfile, guests: number, seed: number
   const odds = profile === 'leaning' ? [.2, .3] : profile === 'strong' ? [.15, .25] : [1 / 3, 1 / 3];
   for (let i = 0; i < guests; i++) {
     if (profile === 'groups' && i % 5) { votes.push({ ...votes[i - 1] }); continue; }
-    votes.push(Object.fromEntries(CITY_AXES.map(axis => [axis, pick(next(), odds[0], odds[1], profile === 'leaning' || profile === 'strong' ? LEAN[axis] : 1)])) as ExhibitionVotes);
+    votes.push(Object.fromEntries(CITY_AXES.map(axis => [axis, pick(next(), odds[0], odds[1], profile === 'leaning' || profile === 'strong' ? LEAN[axis] : 1)])) as Record<CityAxis, Vote>);
   }
   return votes;
 }

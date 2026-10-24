@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "questions": [
     {
       "id": "service-2127",
@@ -22,14 +22,35 @@
       "background": "水辺の空間には限りがあります。静かに過ごす場所と、誰でも集まれる場所が、同じ海辺を分け合っています。"
     },
     {
-      "id": "cooling-2127",
-      "text": "厳しい夏の日、海辺を歩くなら。あなたは、どんな涼しさが心地よいですか？",
+      "id": "energy-2127",
+      "text": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+      "background": "電気を受け取り、蓄え、街へ届ける設備は、海辺の景色や使い方も変えます。どの方法にも、場所の使い方の違いがあります。",
       "options": [
-        { "id": "active-cooling", "label": "木陰より、日差しを調整する屋根と冷却設備のある道", "effects": { "environmentalPriority": -1 } },
-        { "id": "hybrid-cooling", "label": "冷却設備と、木陰・植栽が半分ずつある道", "effects": { "environmentalPriority": 0 } },
-        { "id": "canopy-cooling", "label": "設備より、海風が通る木陰と植栽のある道", "effects": { "environmentalPriority": 1 } }
-      ],
-      "background": "同じ費用でも、屋根や冷却設備を中心にするか、木陰や植栽を中心にするかで、海辺の過ごし方は変わります。"
+        {
+          "id": "water-storage",
+          "label": "水の音や機械が身近でも、海辺の庭で電気を蓄える暮らし",
+          "effects": {},
+          "energy": "water-storage"
+        },
+        {
+          "id": "rotor-storage",
+          "label": "大きな機械が景色に加わっても、街の中心で電気を蓄える暮らし",
+          "effects": {},
+          "energy": "rotor-storage"
+        },
+        {
+          "id": "orbital-supply",
+          "label": "海の上に受け取る面が広がっても、空から届く電気を使う暮らし",
+          "effects": {},
+          "energy": "orbital-supply"
+        },
+        {
+          "id": "island-supply",
+          "label": "海の一部が設備の陸地に変わっても、沖の原子力施設から電気を届ける暮らし",
+          "effects": {},
+          "energy": "island-supply"
+        }
+      ]
     },
     {
       "id": "functions-2127",

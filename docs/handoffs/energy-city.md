@@ -1,7 +1,28 @@
 # energy-city — 能源城市 E1–E4
 
 
-## E4本輪狀態（2026-10-24）
+## E4正式接入／本輪續作（2026-10-24）
+
+- Owner: Codex；產品決策cc100053。
+- Status: LOCAL_VERIFIED — 使用者閱讀Q3詳情後回覆「Ok」，確認只替換Q3的方案；正式接入及本機驗證完成，Git整合／main CI待以下最終記錄。E5硬件／性能／訪客驗收不在本次。
+- Branch: `codex/energy-city-authority`；獨立checkout `/private/tmp/city2127-energy-plan-20261024`；續作HEAD `a617f55e220060aeb65c5dd4fe4d6e76676bdb24`，origin任務分支0／0，對origin/main b8bccad 2 ahead／0 behind。乾淨後開始，沒有自動pull／merge main。
+- Mandatory preflight續作：首先確認原city2127 main29d12db、只有既有未追蹤`.playwright-cli/`；fetch成功，原checkout落後23 commits，保留原狀。獨立checkoutfetch成功，遠端main仍b8bccad，E3及準備commit可取得；無`.codegraph/`，不索引。沿用已讀本任務所有必讀文件並核對上輪交接／actualsource及callers。沒有並行binary／模組編輯；同一Owner。
+- 實作：question-set4，只改Q3；三軸原ids／effects／文字維持。`shared/energy.ts`定義四類累計／精確整數門檻／配置驗證；votes.energy與environmentalPriority零佔位明確表示氣候缺席。state.energy持久counts與climateGuestCount；舊氣候EMA／sum／score及刻度不受能源人數稀釋，舊事件無energy仍完全沿用原reducer結果。SQLite8只新增nullable energy_json，舊event／原文不重寫；新before／after JSON及votes記錄可重播／Undo。
+- Renderer：CityView2 optional energy及嚴格parser → EnergyRuntime沿用E3固定幾何／60秒節拍 → CityChangeManager實際前後target → residentResult／當前設施卡。能源局部淡入／淡出3秒，保持能源橋與公共路高度，翼尺寸平滑變化；材質副本按獨立組一次建立，跟隨原發光／反射日夜更新，不改共用城市材質。第四票與lantern去沿岸能源接點；舊氣候歷史仍在公園。約2.6秒journey、三秒retarget、10秒閱讀及立即恢復保留。
+- Caller同步：Monitor顯示能源配置與實際變更，focal cityChanges保持原契約，能源前後在layout.energy；DEV auto獨立選能源／四類輪替，不把四類當Meter數值。凍結v3 JSON回歸fixture保留原81組；新v4另驗108組。現行README／survey README／PROJECT／SPEC／RESIDENT_COPY／能源計劃同步，歷史段落保留；P2證據改可指定資料夾，P4改驗ambient狀態而不猜載入時輪換到哪張卡。
+- PASS（開發工作樹）：focused energy.test驗真實schema7→8、原文／舊ID／舊草稿版本guard、70份新能源與超過64筆完整counts、氣候分數／EMA／刻度、重啟replay、corrupt tally拒絕、Undo與reset。focused energyPipeline驗108組正式答案→HTTP／WebSocket／嚴格parser→實際模型、精確門檻、共存、無可見變化／缺前後證據、延遲／重定向／snapshot／reduced motion，以及局部材質／geometry重用與橋高。
+- PASS（開發工作樹）：root完整npm test含舊81組與新108組；survey完整npm test；兩package build（root既有>500kB warning）；git diff --check。最後變更後與整合後仍需依下方最終紀錄重跑；不能以早期工作樹結果宣稱整合通過。
+- PASS（正式browser）：Chrome156.0.8078.47／macOS，City1920×1080預設quality／原hero、Guest1280×900，scratch真實SQLite7→8；[正式證據](../../artifacts/energy-city-e4/formal/README.md)／browser.json。驗舊草稿保留Q1／Q2／Q4且Q3重選、pre/post-commit同ID重試、第一能源票無設備差異、第二票實際一庭及結果、Undo消除模型、實際已記錄的16票混合配置、hour12／18.5／22、TCP重連、browser prefers-reduced-motion、1440×900普通resize及reset／舊ID重試。全部page exception為0；預期舊session409、favicon404及兩次刻意abort明列，另核對沒有未預期console／network失敗。11s／16s fixture clock jumps只跳過舊閱讀／seed／Undo等待，不代表訪客時間；actor為實時本機clock，未固定reviewTime。GPU／FPS／實機／OS全域motion偏好未量。
+- PASS：既有resident P3在目前v4上回歸，Chrome1280×720／hour16，A/B閱讀間隔**10,002ms**；排隊、lost reply／reload同ID、提前交接與reset drain、照明、reduced motion／snapshot／Undo全通過。新截圖在`artifacts/energy-city-e4/p3/`，未覆寫舊證據。P4／P2亦PASS：1280×720／hour16，P4含桌面鍵盤／模擬觸控、同ID重試、繼承、真實TCP離線重連、B結果到期保留A草稿及A問卷到期／reset；P2含舊A/B草稿重新預約、有效選項／焦點／核對及結果。新證據在相鄰p4／p2資料夾，沒有覆寫原截圖。
+- 開發中曾遇sandbox loopback listen EPERM，允許localhost後重跑；browser斷言補正狀態完整文字、預期舊session409及等待resize完成。這些與最終通過結果分開，未將失敗當通過。
+- 最終本機檢查PASS：root完整npm test／build／git diff --check、survey完整npm test／build／git diff --check；Node26.0.0，允許loopback。Root仍只有既有>500kB warning。最後新增energyDistrict檢查大小翼、seed0／4242、四軸low／mixed／high共324個情境，164,088次actual mesh intersections，含完整環／渦輪掃掠及兩處水庭；使用真實程序district／fallback focal幾何，沒有另claim所有late roof／GLB、所有uint32 seeds或全城連續碰撞。324最後focused重跑PASS，整合全套亦須包含它。
+- 自審：exact diff與所有新source／tests／artifact已讀；source hashes在正式證據內。沒有外部依賴／部署／素材包或歷史Shibuya改動。Markdown local links／anchors／targets在最後文件變更後重驗，數目見下方完成紀錄。
+- 清理PASS：本輪唯一Vite session已停止exit130，lsof確認5173無LISTEN；全部Chrome scripts在finally關閉browser／realtime／HTTP／scratch DB。本輪沒有持久survey server或留下測試分頁。原checkout／舊截圖保持。
+- 下一步：commit／push任務分支；fresh fetch，no-ff整合main、完整重驗、push並確認main CI。E5硬件／性能／訪客驗收仍獨立未完成。
+
+---
+
+## E4前輪準備checkpoint（歷史；以下待決狀態已由上方使用者確認取代）（2026-10-24）
 
 - Owner: Codex；產品決策cc100053
 - Status: **WAITING_FOR_PRODUCT_DECISION** — 已準備配置接口及具體Q3／累積／歷史方案；E4正式接入未完成，E5不在本輪。

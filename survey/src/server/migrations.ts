@@ -201,6 +201,8 @@ export const migrations: (string | ((db: DatabaseSync) => void))[] = [
      WHERE station_id IS NOT NULL AND ended_at IS NULL AND status IN ('reserved', 'submitted');
    ALTER TABLE proposal_events ADD COLUMN station_id TEXT CHECK (station_id IN ('A', 'B'));
    ALTER TABLE proposal_events ADD COLUMN display_at TEXT;`,
+  // 8: optional independent energy tallies; NULL retains byte-for-byte legacy state/event replay.
+  `ALTER TABLE exhibition_snapshots ADD COLUMN energy_json TEXT;`,
 ];
 
 export const SCHEMA_VERSION = migrations.length;

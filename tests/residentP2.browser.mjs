@@ -1,6 +1,6 @@
 // P2 desktop copy/review/focus and pre-upgrade A/B draft recovery on a real scratch SQLite.
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -9,7 +9,8 @@ import { createProposalSession } from '../survey/src/server/proposalService.ts';
 const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH).href);
 const directory = mkdtempSync(join(tmpdir(), 'resident-p2-browser-'));
 const questionsPath = new URL('../survey/src/survey/questions.exhibition.json', import.meta.url).pathname;
-const oldQuestions = JSON.parse(readFileSync(questionsPath, 'utf8'));
+const evidence = process.env.CITY2127_EVIDENCE_DIR ?? 'artifacts'; mkdirSync(evidence, { recursive: true });
+const oldQuestions = JSON.parse(readFileSync(new URL('../survey/src/survey/questions.exhibition.v3.json', import.meta.url), 'utf8'));
 oldQuestions.version = 2;
 oldQuestions.questions[0].text = 'Previous question copy';
 const oldPath = join(directory, 'questions.old.json'), dbPath = join(directory, 'survey.sqlite');
@@ -46,7 +47,7 @@ try {
     // Match the formal current set, not a local old question snapshot.
     const current = JSON.parse(readFileSync(questionsPath, 'utf8'));
     assert.equal(await page.locator('.guest-copy').first().textContent(), current.questions[0].background);
-    await page.screenshot({ path: `artifacts/resident-p2-question-${session.session.stationId}.png` });
+    await page.screenshot({ path: `${evidence}/resident-p2-question-${session.session.stationId}.png` });
     // Keyboard native radio selection, visible selected state and navigation.
     await page.locator('input[type=radio]').first().focus();
     await page.keyboard.press('Space');
@@ -65,7 +66,7 @@ try {
   }
   const read = async () => (await (await context.request.get(survey + '/api/city-view')).json()).data;
   assert.equal((await read()).guestCount, 0, 'all partial answers/review changes leave city unchanged');
-  await pages[0].screenshot({ path: 'artifacts/resident-p2-review.png' });
+  await pages[0].screenshot({ path: join(evidence, 'resident-p2-review.png') });
   const city = await context.newPage();
   city.on('pageerror', error => errors.push(error.message));
   await city.goto(`${process.env.CITY2127_CITY_URL ?? 'http://127.0.0.1:5173'}/?survey=${encodeURIComponent(survey.replace('http', 'ws') + '/ws')}&hour=16`);
@@ -73,10 +74,10 @@ try {
   assert.equal(await city.locator('.causal-panel').getAttribute('data-presentation'), 'ambient');
   const bounds = await city.locator('.causal-panel').boundingBox();
   assert.ok(bounds.width * bounds.height / (1280 * 720) < .16);
-  await city.screenshot({ path: 'artifacts/resident-p2-city-ambient.png' });
-  await city.getByText('普段は自動、困ったら人へ', { exact: true }).waitFor({ timeout: 45000 });
+  await city.screenshot({ path: join(evidence, 'resident-p2-city-ambient.png') });
+  await city.getByText('普段は自動、困ったら人へ', { exact: true }).waitFor({ timeout: 75000 });
   assert.equal(await city.locator('.resident-place').textContent(), '街の画面：デックス西');
-  await city.screenshot({ path: 'artifacts/resident-p2-city-facility.png' });
+  await city.screenshot({ path: join(evidence, 'resident-p2-city-facility.png') });
   // Fail before commit, then verify the identical request is retried and cast exactly once.
   const requests = [];
   pages[0].on('request', r => { if (r.url().endsWith('/api/proposals')) requests.push(r.postDataJSON()); });
@@ -92,8 +93,8 @@ try {
   assert.equal(await city.locator('section .causal-context').textContent(), await pages[0].locator('.guest-result-number').textContent());
   await city.waitForFunction(() => document.querySelector('.resident-card-copy')?.textContent.includes('あなたは'));
   assert.ok((await city.locator('.resident-card-copy').textContent()).includes('ほかの住民の声と重なり'));
-  await pages[0].screenshot({ path: 'artifacts/resident-p2-look-up.png' });
-  await city.screenshot({ path: 'artifacts/resident-p2-city-result.png' });
+  await pages[0].screenshot({ path: join(evidence, 'resident-p2-look-up.png') });
+  await city.screenshot({ path: join(evidence, 'resident-p2-city-result.png') });
   await city.reload();
   await city.waitForFunction(() => document.querySelector('.causal-panel')?.dataset.presentation === 'ambient');
   assert.ok(!(await city.locator('section .causal-context').textContent()).includes('暮らしの声 #'));

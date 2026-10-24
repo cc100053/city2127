@@ -1,3 +1,4 @@
+import { isEnergyChoice, type EnergyChoice } from '../shared/energy.ts';
 import { readFileSync } from 'node:fs';
 import { CITY_AXES, isCityAxis } from '../shared/citySurveyState.ts';
 import type { CityEffects, Question, QuestionOption, QuestionSet, QuestionTrigger } from '../shared/question.ts';
@@ -68,7 +69,8 @@ export function parseQuestionSet(input: unknown): QuestionSet {
       const optionId = text(option.id, `${where}.id`);
       if (optionIds.has(optionId)) throw new QuestionSetError(`duplicate option id "${optionId}" in question "${id}"`);
       optionIds.add(optionId);
-      return { id: optionId, label: text(option.label, `${where}.label`), effects: effects(option.effects, `${where}.effects`) };
+      if (option.energy !== undefined && !isEnergyChoice(option.energy)) throw new QuestionSetError(`${where} has invalid energy choice`);
+      return { ...(option.energy ? { energy: option.energy as EnergyChoice } : {}), id: optionId, label: text(option.label, `${where}.label`), effects: effects(option.effects, `${where}.effects`) };
     });
     const year = raw.year;
     if (year !== undefined && (typeof year !== 'number' || !Number.isInteger(year))) throw new QuestionSetError(`question "${id}".year must be an integer`);
@@ -98,6 +100,14 @@ export function validateExhibitionQuestionSet(set: QuestionSet): QuestionSet {
     throw new QuestionSetError('exhibition question set must have a question-set version >= 2 with exactly four questions');
   const axes = new Set<string>();
   for (const question of set.questions) {
+    if (question.options.some(option => option.energy !== undefined)) {
+      if (set.version < 4 || question.id !== 'energy-2127' || axes.has('environmentalPriority')
+          || question.options.length !== 4 || new Set(question.options.map(o => o.energy)).size !== 4
+          || question.options.some(o => !isEnergyChoice(o.energy) || o.id !== o.energy || Object.keys(o.effects).length))
+        throw new QuestionSetError('energy question must have four distinct independent preferences and no climate vote');
+      axes.add('environmentalPriority');
+      continue;
+    }
     if (question.options.length !== 3) throw new QuestionSetError(`exhibition question "${question.id}" must have exactly three options`);
     let axisForQuestion: string | undefined;
     const votes = new Set<number>();

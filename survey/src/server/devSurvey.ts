@@ -8,7 +8,8 @@ export function devSurveyConfig(set: QuestionSet): DevSurveyConfig {
   validateExhibitionQuestionSet(set);
   return {
     questionSetVersion: set.version,
-    meters: set.questions.map(question => ({
+    ...(set.questions.some(q => q.id === 'energy-2127') ? { energy: { questionId: 'energy-2127', options: set.questions.find(q => q.id === 'energy-2127')!.options.map(o => ({ id: o.energy!, label: o.label })) } } : {}),
+    meters: set.questions.filter(q => !q.options[0].energy).map(question => ({
       axis: Object.keys(question.options[0].effects)[0], questionId: question.id,
       options: question.options.map(option => ({ id: option.id, label: option.label, vote: voteForEffects(option.effects) })),
     })),

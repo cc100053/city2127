@@ -11,7 +11,8 @@ import type { AnswerData, ApiResponse, GuestQuestionData, LifecycleCommand, Life
 
 export const QUESTIONS_PATH = new URL('../src/survey/questions.test.json', import.meta.url).pathname;
 export const MVP_QUESTIONS_PATH = new URL('../src/survey/questions.mvp.json', import.meta.url).pathname;
-export const EXHIBITION_QUESTIONS_PATH = new URL('../src/survey/questions.exhibition.json', import.meta.url).pathname;
+export const CURRENT_EXHIBITION_QUESTIONS_PATH = new URL('../src/survey/questions.exhibition.json', import.meta.url).pathname;
+export const EXHIBITION_QUESTIONS_PATH = new URL('../src/survey/questions.exhibition.v3.json', import.meta.url).pathname;
 
 /** In-memory (or given file) survey context with a controllable clock and readable sequential IDs. */
 export function fixture(dbPath = ':memory:', startMs = Date.parse('2026-09-23T10:00:00.000Z'), questionsPath = QUESTIONS_PATH) {
@@ -33,13 +34,13 @@ export function fixture(dbPath = ':memory:', startMs = Date.parse('2026-09-23T10
   return { ctx, clock };
 }
 
-/** V2 context for proposal transaction and persistence tests. */
-export function exhibitionFixture(dbPath = ':memory:', startMs = Date.parse('2026-09-28T10:00:00.000Z')) {
+/** Frozen v3 context for legacy proposal transaction and persistence regressions. */
+export function exhibitionFixture(dbPath = ':memory:', startMs = Date.parse('2026-09-28T10:00:00.000Z'), questionsPath = EXHIBITION_QUESTIONS_PATH) {
   const clock = { ms: startMs };
   let counter = 0;
   const db = openDatabase(dbPath);
   const ctx: SurveyContext = {
-    db, questions: validateExhibitionQuestionSet(loadQuestionSetFile(EXHIBITION_QUESTIONS_PATH)),
+    db, questions: validateExhibitionQuestionSet(loadQuestionSetFile(questionsPath)),
     legacyQuestions: loadQuestionSetFile(MVP_QUESTIONS_PATH), now: () => new Date(clock.ms),
     newId: () => `ex-${++counter}-${Math.random().toString(16).slice(2, 8)}`, reservationMs: RESERVATION_MS,
   };

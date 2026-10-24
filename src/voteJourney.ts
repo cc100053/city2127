@@ -1,15 +1,19 @@
 // "One vote's journey" (2026-10-13): a resident's four votes fly as light from the station side of the screen to the four focal sites,
 // scan rings rise where they land, and each vote stays as a small lantern that brightens at night. Additive and unlit.
 import * as T from 'three';
+import type { EnergyChoice } from '../survey/src/shared/energy.ts';
 import { CITY_AXES, type CityAxis } from '../survey/src/shared/citySurveyState.ts';
 
 /** −1 / 0 / +1 per axis, as the server's proposal record and the root's parsed view both carry it. */
-type Votes = Readonly<Record<CityAxis, number>>;
+type Votes = Readonly<Record<CityAxis, number> & { energy?: EnergyChoice }>;
 import { METER_COLORS } from './districtMeters.ts';
 import { changeSites } from './layout.ts';
 
 const SOCKET: Record<CityAxis, keyof typeof changeSites> = { automation: 'nw', publicSharing: 'sw', environmentalPriority: 'ne', urbanConcentration: 'se' };
 const NEUTRAL = '#fff1d6';
+// The fourth new vote visits the energy shore node, not the inherited climate park.
+export const ENERGY_VOTE_SITE = { x: -310, z: -105, w: 14, d: 14, scale: 1 };
+const voteSite = (axis: CityAxis, energy: boolean) => axis === 'environmentalPriority' && energy ? ENERGY_VOTE_SITE : changeSites[SOCKET[axis]];
 export const FLIGHT_SECONDS = 2.2, ORB_STAGGER = .14, SCAN_SECONDS = 1.4;
 /** The vote has landed at every site once the last staggered orb arrives. */
 export const ARRIVAL_SECONDS = FLIGHT_SECONDS + ORB_STAGGER * (CITY_AXES.length - 1);
@@ -19,11 +23,11 @@ const TRAIL = 22, LANTERNS = LANTERN_GUESTS * CITY_AXES.length;
 const HIDDEN = new T.Matrix4().makeScale(0, 0, 0);
 
 const hash = (n: number) => { const s = Math.sin(n * 12.9898 + 78.233) * 43758.5453; return s - Math.floor(s); };
-const voteColor = (axis: CityAxis, vote: number) => new T.Color(vote === 0 ? NEUTRAL : METER_COLORS[axis]);
+const voteColor = (axis: CityAxis, vote: number, energy = false) => new T.Color(energy ? '#75e2c2' : vote === 0 ? NEUTRAL : METER_COLORS[axis]);
 
 /** Fixed lantern spot for guest `ordinal` on `axis`: a loose halo floating above the focal site's roofs (clear of trees and podiums), so a rebuild lands in the same place. */
-export function lanternSpot(ordinal: number, axis: CityAxis): T.Vector3 {
-  const s = changeSites[SOCKET[axis]], i = ordinal * 4 + CITY_AXES.indexOf(axis);
+export function lanternSpot(ordinal: number, axis: CityAxis, energy = false): T.Vector3 {
+  const s = voteSite(axis, energy), i = ordinal * 4 + CITY_AXES.indexOf(axis);
   const angle = hash(i) * Math.PI * 2, radius = Math.max(s.w, s.d) * s.scale * (.4 + .7 * Math.sqrt(hash(i + .5)));
   return new T.Vector3(s.x + Math.cos(angle) * radius, 42 + 22 * hash(i + .25), s.z + Math.sin(angle) * radius);
 }
@@ -36,7 +40,7 @@ function glowTexture(): T.Texture {
   return new T.CanvasTexture(c);
 }
 
-type Flight = { axis: CityAxis; vote: number; color: T.Color; curve: T.CatmullRomCurve3; start: number; landed: boolean; ordinal: number };
+type Flight = { axis: CityAxis; vote: number; color: T.Color; curve: T.CatmullRomCurve3; start: number; landed: boolean; ordinal: number; energy: boolean };
 type Scan = { x: number; z: number; r: number; color: T.Color; start: number };
 
 export class VoteJourney {
@@ -79,10 +83,11 @@ export class VoteJourney {
     this.cancel();
     const origin = new T.Vector3(.86, -.78, .5).unproject(this.camera).sub(this.camera.position).setLength(420).add(this.camera.position);
     CITY_AXES.forEach((axis, i) => {
-      const s = changeSites[SOCKET[axis]], site = new T.Vector3(s.x, 6, s.z);
+      const energy = axis === 'environmentalPriority' && !!votes.energy;
+      const s = voteSite(axis, energy), site = new T.Vector3(s.x, 6, s.z);
       const apex = origin.clone().lerp(site, .55).setY(120 + i * 8);
       const curve = new T.CatmullRomCurve3([origin, origin.clone().lerp(apex, .5).setY(origin.y + 40), apex, site.clone().setY(70), site]);
-      this.flights.push({ axis, vote: votes[axis], color: voteColor(axis, votes[axis]), curve, start: now + i * ORB_STAGGER, landed: false, ordinal });
+      this.flights.push({ axis, vote: votes[axis], color: voteColor(axis, votes[axis], energy), curve, start: now + i * ORB_STAGGER, landed: false, ordinal, energy });
     });
   }
 
@@ -94,7 +99,7 @@ export class VoteJourney {
   /** Immediate state (snapshot, reset, Undo, reduced motion): one lantern per vote of the latest guests, with no flight. */
   setLanterns(history: readonly { ordinal: number; votes: Votes }[]): void {
     this.cancel(); this.clearLanterns();
-    for (const { ordinal, votes } of history.slice(-LANTERN_GUESTS)) for (const axis of CITY_AXES) this.addLantern(ordinal, axis, votes[axis]);
+    for (const { ordinal, votes } of history.slice(-LANTERN_GUESTS)) for (const axis of CITY_AXES) this.addLantern(ordinal, axis, votes[axis], axis === 'environmentalPriority' && !!votes.energy);
   }
 
   private clearLanterns(): void {
@@ -102,11 +107,11 @@ export class VoteJourney {
     this.lanterns.instanceMatrix.needsUpdate = true;
   }
 
-  private addLantern(ordinal: number, axis: CityAxis, vote: number): void {
+  private addLantern(ordinal: number, axis: CityAxis, vote: number, energy = false): void {
     // Guest #n always owns the same four slots, so the 65th guest replaces the 1st.
     const slot = ((ordinal - 1) % LANTERN_GUESTS) * CITY_AXES.length + CITY_AXES.indexOf(axis);
-    this.dummy.position.copy(lanternSpot(ordinal, axis)); this.dummy.scale.setScalar(vote === 0 ? .7 : 1); this.dummy.updateMatrix();
-    this.lanterns.setMatrixAt(slot, this.dummy.matrix); this.lanterns.setColorAt(slot, voteColor(axis, vote));
+    this.dummy.position.copy(lanternSpot(ordinal, axis, energy)); this.dummy.scale.setScalar(vote === 0 && !energy ? .7 : 1); this.dummy.updateMatrix();
+    this.lanterns.setMatrixAt(slot, this.dummy.matrix); this.lanterns.setColorAt(slot, voteColor(axis, vote, energy));
     this.lanterns.instanceMatrix.needsUpdate = true; this.lanterns.instanceColor!.needsUpdate = true;
   }
 
@@ -120,9 +125,9 @@ export class VoteJourney {
       if (raw >= 1) {
         if (!f.landed) {
           f.landed = true;
-          const s = changeSites[SOCKET[f.axis]];
+          const s = voteSite(f.axis, f.energy);
           this.scanList.push({ x: s.x, z: s.z, r: Math.max(s.w, s.d) * s.scale * 1.15, color: f.color, start: f.start + FLIGHT_SECONDS });
-          this.addLantern(f.ordinal, f.axis, f.vote);
+          this.addLantern(f.ordinal, f.axis, f.vote, f.energy);
         }
         continue;
       }

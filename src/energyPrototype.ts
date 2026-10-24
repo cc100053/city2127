@@ -9,12 +9,8 @@ export const ENERGY_OPTIONS = {
   mixed: 'M1 · 混合配置',
 } as const;
 export type EnergyOption = keyof typeof ENERGY_OPTIONS;
-export type EnergyConfiguration = {
-  waterGardens: 0 | 1 | 2;
-  receiver: 'none' | 'small' | 'large';
-  flywheel: boolean;
-  island: boolean;
-};
+import type { EnergyConfiguration } from '../survey/src/shared/energy.ts';
+export type { EnergyConfiguration } from '../survey/src/shared/energy.ts';
 
 // A narrated storage cycle, not a power / fluid simulation. Time is absolute for reproducible captures.
 export function energyCycle(seconds: number, reducedMotion = false) {
@@ -26,7 +22,7 @@ export function energyCycle(seconds: number, reducedMotion = false) {
   return { t, phase, level, angle: reducedMotion ? .7 : Math.floor(seconds / 60) * 3.6 + angle };
 }
 
-/** DEV city composition only; independent of Meter scores and engineering capacity. */
+/** Shared authored geometry for DEV comparisons and the authoritative energy runtime. */
 export function energyPrototype() {
   const root = new T.Group(); root.name = 'energy-prototype';
   const wing = new T.Group(), garden = new T.Group(), ring = new T.Group(), island = new T.Group();

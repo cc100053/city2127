@@ -48,7 +48,7 @@ try {
     assert.equal(resumed.session.questionSetVersion, 3);
     assert.deepEqual(resumed.questions.map(q => q.options.map(o => o.id)), draft.questions.map(q => q.options.map(o => o.id)));
     assert.deepEqual(currentView(upgraded), beforeUpgrade, 'reserving again does not cast a vote');
-    assert.equal(schemaVersion(upgraded.db), 7);
+    assert.equal(schemaVersion(upgraded.db), SCHEMA_VERSION);
     upgraded.db.close();
   }
   const dbPath = join(dir, 'schema2.sqlite');

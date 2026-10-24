@@ -234,11 +234,16 @@ export function submitProposal(ctx: SurveyContext, body: unknown): ServiceOutcom
         const elsewhere = questionSet.questions.some(candidate => candidate.options.some(item => item.id === optionId));
         return { response: fail(elsewhere ? 'option_question_mismatch' : 'unknown_option', 'An option does not belong to its question.', current.state) };
       }
+      if (option.energy) {
+        votes.energy = option.energy; votes.environmentalPriority = 0;
+        answers.push({ questionId: question.id, optionId: option.id, questionText: question.text, optionLabel: option.label });
+        continue;
+      }
       const entries = Object.entries(option.effects);
       const [axis, amount] = entries[0] ?? [];
       if (!axis || Object.hasOwn(votes, axis))
         return { response: fail('bad_request', 'Each question must vote on a distinct city axis.', current.state) };
-      votes[axis as keyof ExhibitionVotes] = voteForEffects(option.effects);
+      votes[axis as typeof CITY_AXES[number]] = voteForEffects(option.effects);
       answers.push({ questionId: question.id, optionId: option.id, questionText: question.text, optionLabel: option.label });
     }
     if (CITY_AXES.some(axis => !Object.hasOwn(votes, axis)))
