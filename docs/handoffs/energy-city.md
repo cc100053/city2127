@@ -7,6 +7,7 @@
 - Status: **WAITING_FOR_PRODUCT_DECISION** — 已準備配置接口及具體Q3／累積／歷史方案；E4正式接入未完成，E5不在本輪。
 - Branch: `codex/energy-city-authority`；checkout `/private/tmp/city2127-energy-plan-20261024`。
 - Base: `b8bccad9275283fd5aa3a19a1c0d37602345cc95`；E3內容8d6cb93／223cc09與整合3333e4c均可從remote取得，交接與實際code一致。
+- Last verified commit: `4658c9243222e84f67d917580d596bed8005e45c`（上述root test／build與browser對應同一source tree）；已推送`origin/codex/energy-city-authority`，0／0、working tree乾淨。`origin/main`仍為b8bccad，E4未整合，沒有新的main CI結果可宣稱。後續僅補本Markdown驗證指標。
 - Preflight：先確認原`/Users/fatboy/city2127`為main29d12db，只保留既有未追蹤`.playwright-cli/`；fetch成功後0 ahead／23 behind。獨立checkout開工乾淨main b8bccad，初次fetch sandbox DNS失敗，允許網絡重跑成功，0／0。未stash／reset／改原checkout。獨立checkout沒有.codegraph，不自行索引；不拿舊checkout的index當新source。
 - 已讀使用者指定README、PROJECT、CONTRIBUTING、VALIDATION、SPEC、RESIDENT_COPY、ART、CITY MASTER TASTE、ENERGY_CITY_PLAN及本交接。追蹤questionLoader→proposalService→scoreEngine→SQLite snapshot／replay／toProposalRecord→CityView／viewOf→root parser／main→cityChangeManager→residentResult；現行question-set3／CityView2／SQLite7。唯一Owner，無並行binary／module編輯。
 - 完成：energyPrototype增加configure／getConfiguration接口，水庭0／1／2、接收翼無／小／大、環與島獨立共存；原select預設保留，沒有新geometry／materials。配電由實際儲能有無決定節拍。36組模型測試；[評審方案](../ENERGY_CITY_PLAN.md#e4評審草案四題與能源權威配置2026-10-24待產品決定)含四題協調、完整日文選項、累積門檻例、共存／互斥、氣候缺席與歷史保存、實際證據及無改變文案。
