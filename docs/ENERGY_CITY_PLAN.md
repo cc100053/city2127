@@ -1,6 +1,6 @@
 # 台場2127 — 能源城市計劃
 
-2026-10-24。Owner：Codex；產品決策：cc100053。狀態：**E1–E4完成，E4已發布main並通過CI，證據見交接；E5硬件驗收未開始**。
+2026-10-24。Owner：Codex；產品決策：cc100053。狀態：**E1–E4完成，E4已發布main並通過CI，證據見交接；E5本機Mac限定30分鐘性能／操作量測已完成，實際展覽硬件與訪客理解仍未驗**。
 
 本文件記錄使用者要求的能源篇規劃、E1概念、E2靜態空間比較、E3城市組合／動態及E4居民提案接入。候選方案不等於已核准的模型、問卷或計分變更；現行行為以 [EXHIBITION_SPEC](EXHIBITION_SPEC.md) 為準，實際驗證見 [任務交接](handoffs/energy-city.md)。
 
@@ -27,7 +27,7 @@
 | E2：同鏡頭空間原型 | 在root現有DEV review機制旁建立可隔離的靜態比較原型；先做一組接收翼、一組水庭、一組外置旋轉環、一組能源島量體 | 原始hero鏡頭可比較基準及三種方向；日景可辨識；有實際佔地／淨空檢查；不覆寫正式問卷 | **已完成，含M1靜態混合；見下文** |
 | E3：城市組合與動態 | 擴展環／翼／水層到少量街區；做至少一個混合配置；加入有因果的緩慢機械／水流動作 | 差異來自輪廓與空間分布；不是只換色或加光；混合狀態完整；reduced motion可靜態閱讀 | **已完成DEV實作與桌面驗證，見下文** |
 | E4：居民提案與權威配置 | 與其他三領域協調四題方向，定義答案→累積狀態→實際配置→結果卡；決定是否沿用或修訂現有軸 | 明確定義可共存／互斥項、歷史相容性、無可見改變文案；不能直接把A/B/C塞成現有環境軸low/mixed/high | **正式接入／本機與browser驗證／main整合／CI完成，見交接** |
-| E5：硬件／性能／訪客驗收 | 實際展覽裝置、長跑性能、閱讀與訪客理解；各實作階段的本機test／build／browser及Git整合仍當輪完成 | 實機結果與未測項獨立列出，不用DEV圖或CI代替 | 未開始（本次使用者明確留後續） |
+| E5：硬件／性能／訪客驗收 | 實際展覽裝置、長跑性能、閱讀與訪客理解；各實作階段的本機test／build／browser及Git整合仍當輪完成 | 實機結果與未測項獨立列出，不用DEV圖或CI代替 | 部分完成；2026-10-24目前Mac mini 30分鐘量測與TCP復原已驗，展覽實機／真人另留後續 |
 
 各實作階段都要先跑適用檢查及更新交接，不能延至E5才驗證。E2完成靜態比較，E3完成少量街區擴展／動態及本輪驗證；E4才處理問卷串接。
 
@@ -234,3 +234,10 @@ Q1服務（交通／物流的日常服務接口）、Q2共享（社会・生活�
 - SQLite8只新增nullable `exhibition_snapshots.energy_json`；schema7資料原地升級，不刪DB，不改immutable事件。舊已保存ID重試仍回原紀錄；未提交舊草稿須重新預約，Q1／Q2／Q4有效選項保留，舊cooling不自動選能源。
 - Native checks覆蓋舊81組與新108組答案、完整歷史超過64筆、精確門檻、氣候凍結、真實7→8升級／重啟／Undo／reset／idempotency、實際模型與結果證據。實際命令／browser結果與整合commit只以[handoff](handoffs/energy-city.md)及[VALIDATION](VALIDATION.md)完成紀錄為準，不以本段推論全部通過。
 - E5實際硬件／性能／訪客理解仍另留後續；沒有新增部署、依賴或外部資產。能源仍為2127形態／流程示意，不提供容量／可靠度／海岸工程認證。
+
+
+## E5本機部分完成（2026-10-24）
+
+使用者本輪限定先測目前Mac mini。M6／24GB／macOS27.0.1、headed Chrome156／ANGLE Metal、City1920×1080／DPR1、Vite DEV：low自動日夜真實1801.94秒平均59.94FPS，p95／p99 17.9／18.6ms、max66.7ms；90份原生Guest A/B＋16份HTTP種子，最終count106，沒有page crash／exception／context loss。60秒default兩種場景31.10／32.36FPS，low均59.94；鏡頭曾偏離初始hero，不能當完全固定鏡頭或能源GPU增量benchmark。
+
+獨立真實TCP斷線／新連線與count／能源target復原通過；renderer geometry／texture counts全段425／24。最終runner另驗canvas輸入保護及拒絕覆寫舊證據，統計self-check接root npm test。[完整方法／結果／限制](../artifacts/energy-city-e5/README.md)及[Git／CI交接](handoffs/energy-city.md)。本輪Mac限定工作完成與E5整體完成分開；4K、所有配置、整日穩定性、65吋HDMI、iPad Safari／專用LAN及真人閱讀理解仍未驗，依P5表另行安排。

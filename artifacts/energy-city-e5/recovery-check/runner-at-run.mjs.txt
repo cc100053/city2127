@@ -1,0 +1,186 @@
+// Local Mac stability evidence; physical display and visitor acceptance stay separate.
+import assert from 'node:assert/strict';
+import { mkdtempSync, mkdirSync, writeFileSync, appendFileSync, readFileSync, rmSync, existsSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { setTimeout as delay } from 'node:timers/promises';
+import { createContext, createSurveyServer } from '../survey/src/server/server.ts';
+import { ENERGY_CHOICES } from '../survey/src/shared/energy.ts';
+
+function frameStats(values) {
+  assert.ok(values.length > 0 && values.every(n => Number.isFinite(n) && n > 0));
+  const sorted = [...values].sort((a, b) => a - b);
+  return { frames: values.length, fps: 1000 * values.length / values.reduce((a, b) => a + b, 0),
+    p50Ms: sorted[Math.ceil(sorted.length * .5) - 1], p95Ms: sorted[Math.ceil(sorted.length * .95) - 1],
+    p99Ms: sorted[Math.ceil(sorted.length * .99) - 1], maxMs: sorted.at(-1),
+    over50Ms: values.filter(n => n > 50).length, over100Ms: values.filter(n => n > 100).length,
+    over1000Ms: values.filter(n => n > 1000).length };
+}
+if (process.argv.includes('--self-test')) {
+  assert.deepEqual(frameStats([10, 20, 30, 40, 100]), { frames: 5, fps: 25, p50Ms: 30, p95Ms: 100,
+    p99Ms: 100, maxMs: 100, over50Ms: 1, over100Ms: 0, over1000Ms: 0 });
+  assert.throws(() => frameStats([])); assert.throws(() => frameStats([NaN]));
+  console.log('PASS E5 frame statistics self-check.'); process.exit(0);
+}
+const minutes = Number(process.env.CITY2127_SOAK_MINUTES ?? 30);
+const compareSeconds = Number(process.env.CITY2127_COMPARE_SECONDS ?? 60);
+assert.ok(Number.isFinite(minutes) && minutes >= 1);
+assert.ok(Number.isFinite(compareSeconds) && compareSeconds >= 5);
+const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH).href);
+const evidence = process.env.CITY2127_EVIDENCE_DIR ?? 'artifacts/energy-city-e5/mac-mini';
+assert.ok(!existsSync(join(evidence, 'browser.json')) && !existsSync(join(evidence, 'samples.ndjson')), 'Use a fresh evidence directory.');
+mkdirSync(evidence, { recursive: true });
+const scratch = mkdtempSync(join(tmpdir(), 'energy-e5-'));
+const ctx = createContext({ dbPath: join(scratch, 'scratch.sqlite'),
+  questionsPath: new URL('../survey/src/survey/questions.exhibition.json', import.meta.url).pathname });
+const { server, realtime } = createSurveyServer({ ctx, staticDir: new URL('../survey/dist', import.meta.url).pathname });
+let browser;
+const report = { startedAt: new Date().toISOString(), checkedCommit: process.env.CITY2127_CHECKED_COMMIT ?? 'working tree',
+  runtimeSourceHashes: Object.fromEntries(['src/main.ts', 'src/energyRuntime.ts', 'src/energyPrototype.ts', 'tests/energyE5.browser.mjs'].map(p =>
+    [p, createHash('sha256').update(readFileSync(p)).digest('hex')])),
+  mode: 'Vite DEV; authored hero; headed Chrome; real clock; scratch SQLite; loopback only',
+  viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1, phases: [], proposals: [], errors: [], warnings: [],
+  badResponses: [], failedRequests: [], recovery: [], limits: ['No physical HDMI/iPad/LAN or visitors',
+    'rAF intervals are browser presentation cadence, not GPU timer queries', 'CDP JS heap and renderer object counts are not total process/GPU memory'] };
+const save = () => writeFileSync(join(evidence, 'browser.json'), JSON.stringify(report, null, 2) + '\n');
+try {
+  await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
+  const survey = `http://127.0.0.1:${server.address().port}`;
+  const cityOrigin = process.env.CITY2127_CITY_URL ?? 'http://127.0.0.1:5173';
+  const citySockets = new Set(); let cityConnections = 0;
+  server.on('upgrade', (request, socket) => {
+    if (request.headers.origin !== new URL(cityOrigin).origin) return;
+    cityConnections++; citySockets.add(socket); socket.on('close', () => citySockets.delete(socket));
+  });
+  browser = await chromium.launch({ channel: 'chrome', headless: false });
+  report.browser = browser.version();
+  const browserCDP = await browser.newBrowserCDPSession();
+  const gpu = (await browserCDP.send('SystemInfo.getInfo')).gpu;
+  report.gpu = { devices: gpu.devices, renderer: gpu.auxAttributes.glRenderer, features: gpu.featureStatus };
+  report.host = execFileSync('system_profiler', ['SPHardwareDataType', 'SPSoftwareDataType'], { encoding: 'utf8' })
+    .split('\n').filter(line => !/Serial Number|UUID|UDID|User Name|Boot Volume/.test(line)).join('\n');
+  report.node = process.version;
+  const display = await browser.newContext({ viewport: report.viewport, deviceScaleFactor: 1 });
+  await display.addInitScript(() => {
+    let last, frames = [], losses = 0;
+    document.addEventListener('webglcontextlost', () => losses++, true);
+    const tick = t => { if (last !== undefined) frames.push(t - last); last = t; requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+    window.e5Frames = () => { const result = { frames, losses, visibility: document.visibilityState }; frames = []; return result; };
+  });
+  const city = await display.newPage();
+  const a = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  const b = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  for (const [name, page] of [['city', city], ['A', a], ['B', b]]) {
+    page.on('pageerror', error => report.errors.push({ name, error: error.message }));
+    page.on('crash', () => report.errors.push({ name, error: 'page crashed' }));
+    page.on('console', m => { if (['error', 'warning'].includes(m.type())) report.warnings.push({ name, text: m.text(), url: m.location().url }); });
+    page.on('response', r => { if (r.status() >= 400) report.badResponses.push({ name, url: r.url(), status: r.status() }); });
+    page.on('requestfailed', r => report.failedRequests.push({ name, url: r.url(), error: r.failure()?.errorText }));
+  }
+  const cdp = await display.newCDPSession(city); await cdp.send('Performance.enable');
+  const post = async (path, data) => { const r = await display.request.post(survey + path, { data }); const body = await r.json(); assert.ok(r.ok() && body.ok, JSON.stringify(body)); return body.data; };
+  const view = async () => (await (await display.request.get(survey + '/api/city-view')).json()).data;
+  const url = (quality, hour) => `${cityOrigin}/?survey=${encodeURIComponent(survey.replace('http', 'ws') + '/ws')}&quality=${quality}${hour === undefined ? '' : `&hour=${hour}`}`;
+  async function load(quality, hour) {
+    await city.goto(url(quality, hour)); await city.bringToFront();
+    await city.waitForFunction(() => Number(document.querySelector('canvas')?.dataset.triangles) > 0, null, { timeout: 120_000 });
+    await delay(15_000); // Asset/shader warm-up is excluded from each comparison.
+    await city.evaluate(() => window.e5Frames());
+  }
+  async function sample(phase, start) {
+    const frames = await city.evaluate(() => window.e5Frames());
+    assert.equal(frames.visibility, 'visible'); assert.equal(frames.losses, 0); assert.ok(frames.frames.length);
+    const canvas = await city.locator('canvas').evaluate(c => ({ css: [c.clientWidth, c.clientHeight], buffer: [c.width, c.height],
+      fps: Number(c.dataset.fps), calls: Number(c.dataset.drawCalls), triangles: Number(c.dataset.triangles),
+      geometries: Number(c.dataset.geometries), textures: Number(c.dataset.textures), hour: Number(c.dataset.hour),
+      actorTime: Number(c.dataset.time), energy: JSON.parse(c.dataset.energy), presentation: document.querySelector('.causal-panel')?.dataset.presentation }));
+    assert.deepEqual(canvas.css, [1920, 1080]); assert.deepEqual(canvas.buffer, [1920, 1080]);
+    assert.ok(canvas.triangles > 0 && canvas.calls > 0);
+    const metrics = Object.fromEntries((await cdp.send('Performance.getMetrics')).metrics.map(m => [m.name, m.value]));
+    const row = { phase, elapsedSeconds: (performance.now() - start) / 1000, at: new Date().toISOString(),
+      ...frameStats(frames.frames), ...canvas, jsHeapUsed: metrics.JSHeapUsedSize, jsHeapTotal: metrics.JSHeapTotalSize,
+      nodes: metrics.Nodes, serverRss: process.memoryUsage().rss, contextLosses: frames.losses, visibility: frames.visibility };
+    appendFileSync(join(evidence, 'samples.ndjson'), JSON.stringify(row) + '\n');
+    return { row, intervals: frames.frames };
+  }
+  async function phase(name, seconds, work) {
+    const start = performance.now(), intervals = [], rows = []; let nextWork = 0, nextProgress = 0;
+    await city.evaluate(() => window.e5Frames());
+    while (performance.now() - start < seconds * 1000) {
+      if (work && performance.now() - start >= nextWork) { await work(); nextWork += 40_000; await city.bringToFront(); }
+      await delay(5_000);
+      const result = await sample(name, start); rows.push(result.row); intervals.push(...result.intervals);
+      if (performance.now() - start >= nextProgress) { console.log(`${name}: ${result.row.elapsedSeconds.toFixed(0)}s, ${result.row.fps.toFixed(1)} FPS, heap ${(result.row.jsHeapUsed / 1048576).toFixed(0)} MiB`); nextProgress += 60_000; }
+    }
+    const result = { name, seconds: (performance.now() - start) / 1000, ...frameStats(intervals), samples: rows.length,
+      first: rows[0], last: rows.at(-1), minFps: Math.min(...rows.map(r => r.fps)), maxFps: Math.max(...rows.map(r => r.fps)) };
+    report.phases.push(result); save(); await city.screenshot({ path: join(evidence, `${name}.png`) });
+  }
+  await a.goto(survey + '/guest?station=A'); await b.goto(survey + '/guest?station=B');
+  for (const quality of ['default', 'low']) { await load(quality, 12); await phase(`baseline-${quality}`, compareSeconds); }
+  // Establish a real recorded mixed portfolio, preserving real ten-second reading slots.
+  for (let n = 0; n < 16; n++) {
+    const session = await post('/api/proposal-sessions', {});
+    const saved = await post('/api/proposals', { submissionId: `e5-seed-${n}`, guestSessionId: session.session.id,
+      expectedRevision: session.state.revision, answers: session.questions.map(q => ({ questionId: q.id,
+        optionId: q.id === 'energy-2127' ? ENERGY_CHOICES[n % 4] : q.options[1].id })) });
+    report.proposals.push({ seed: true, id: saved.proposal.id, displayAt: saved.proposal.displayAt });
+    if (n % 4 === 3) console.log(`Recorded ${n + 1}/16 seed proposals (real clock).`);
+    await delay(10_200);
+  }
+  report.mixedView = await view();
+  assert.deepEqual(report.mixedView.layout.energy, { waterGardens: 1, receiver: 'small', flywheel: true, island: true });
+  for (const quality of ['default', 'low']) { await load(quality, 12); await phase(`mixed-${quality}`, compareSeconds); }
+  await load('low');
+  let count = 0;
+  async function answer(page, choice) {
+    await page.waitForFunction(() => document.querySelector('#app')?.dataset.screen === 'welcome', null, { timeout: 45_000 });
+    await page.locator('[data-auto-action=start]').click();
+    for (let i = 0; i < 4; i++) {
+      if (i === 2) await page.locator(`input[value="${choice}"]`).check();
+      else await page.locator('input[type=radio]').nth(1).check();
+      await page.locator('[data-auto-action=next]').click();
+    }
+    const response = page.waitForResponse(r => r.url().endsWith('/api/proposals') && r.request().method() === 'POST');
+    await page.locator('[data-auto-action=submit]').click();
+    const saved = (await (await response).json()).data;
+    assert.ok(saved?.proposal); report.proposals.push({ stationId: saved.proposal.stationId, ordinal: saved.proposal.ordinal, displayAt: saved.proposal.displayAt });
+  }
+  await phase('soak-low-auto', minutes * 60, async () => {
+    await Promise.all([answer(a, ENERGY_CHOICES[count++ % 4]), answer(b, ENERGY_CHOICES[count++ % 4])]);
+    const latest = report.proposals.slice(-2).sort((x, y) => Date.parse(x.displayAt) - Date.parse(y.displayAt));
+    assert.equal(Date.parse(latest[1].displayAt) - Date.parse(latest[0].displayAt), 10_000);
+  });
+  const expected = await view();
+  assert.equal(expected.guestCount, 16 + count); report.finalView = expected;
+  const before = cityConnections; assert.ok(citySockets.size > 0);
+  await display.setOffline(true); for (const socket of citySockets) socket.destroy();
+  await delay(3_000); await display.setOffline(false);
+  for (const deadline = Date.now() + 30_000; cityConnections === before && Date.now() < deadline;) await delay(100);
+  assert.ok(cityConnections > before, 'City opens a new TCP/WebSocket connection');
+  const restored = () => city.waitForFunction(v => {
+    const canvas = document.querySelector('canvas');
+    return document.querySelector('.causal-panel')?.dataset.guestCount === String(v.guestCount)
+      && JSON.stringify(JSON.parse(canvas?.dataset.energy ?? 'null')?.target) === JSON.stringify(v.layout.energy);
+  }, expected, { timeout: 45_000 });
+  await city.getByText('サーバー: 接続済み', { exact: true }).waitFor({ timeout: 30_000 });
+  await restored();
+  report.recovery.push({ check: 'City TCP disconnect + offline 3s → new connection and authoritative count/energy target',
+    connectionsBefore: before, connectionsAfter: cityConnections, guestCount: expected.guestCount, energy: expected.layout.energy });
+  await city.reload(); await restored();
+  report.recovery.push('City reload restores authoritative count and energy target');
+  assert.deepEqual(report.errors, []);
+  assert.ok(report.badResponses.every(r => r.url.endsWith('/favicon.ico')));
+  assert.ok(report.warnings.every(r => r.url.endsWith('/favicon.ico') || r.text.includes('ERR_INTERNET_DISCONNECTED')));
+  report.status = 'PASS_LOCAL_CHECKS'; console.log(`PASS local Mac run: ${count} UI proposals plus 16 seeds, no page crashes/exceptions/context losses.`);
+} catch (error) { report.status = 'FAILED'; report.failure = String(error.stack); throw error; }
+finally {
+  report.finishedAt = new Date().toISOString(); save();
+  if (browser) await browser.close(); realtime.close(); server.closeAllConnections();
+  if (server.listening) await new Promise(resolve => server.close(resolve));
+  ctx.db.close(); rmSync(scratch, { recursive: true, force: true });
+}

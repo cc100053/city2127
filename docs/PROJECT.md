@@ -143,6 +143,10 @@ Start → four answers → review → one proposal → result 10 s / handoff 5 s
 
 Single mode automatically hands off at next Start and applies a queued reset after the protected10s slot. A/B end also rejects release before its slot ends; early Guest handoff keeps recovery and defers station release. Explicit authoritative Undo/reset recovery remains immediate. A/B stops new admissions during reset and drains both; questionnaire expiry is 5 min, result lease fixed at display start +15 s (retry never renews it), server sweep every 1 s. Admin cancellation must identify one reserved session. Undo is available only for the latest completed proposal before a newer start; cancelling that newer draft does not reopen Undo. City/full reset and Undo retain original audit history; full reset changes the total-count watermark. Actual API/defaults are in [survey README](../survey/README.md).
 
+## Performance diagnostics
+
+City canvas diagnostics update every120 rendered frames: `data-fps` is the mean cadence over those120 frames; `data-draw-calls` and `data-triangles` are the last completed composer render (all passes), `data-geometries` / `data-textures` are renderer resource counts. They do not measure GPU allocation or per-frame latency. The optional [E5 browser runner](../tests/energyE5.browser.mjs) records separate rAF interval distributions, CDP JS heap and scratch-server RSS, using headed Chrome and real A/B Guest submissions; it adds no runtime dependency. Results and platform limits belong in [VALIDATION](VALIDATION.md) and the [energy handoff](handoffs/energy-city.md).
+
 ## Verification and historical references
 
 Root tests/build cover root only; install survey dependencies for the real HTTP/WebSocket pipeline tests. Survey and module-swap have separate checks. Browser/performance evidence is tied to the captured commit/device, never inferred from geometry counts or earlier Shibuya FPS. S5, input hardware and exhibition-day recovery policy remain unresolved. See [current validation](VALIDATION.md) and [document index](README.md).
