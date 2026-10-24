@@ -26,13 +26,15 @@
 ## E3 validation
 
 - PASS — root `npm test`（Node26.0.0，真實loopback survey HTTP／WebSocket、81組答案與既有城市／路徑檢查）；最終任務內容完整重跑通過；整合後結果於下方補記。未改兩個子package，未另跑其本機suite。
-- PASS — root `npm run build`；沿用既有>500kB chunk warning；產物無energy-prototype／E3工具。`git diff --check`通過；379個本機Markdown links／anchors／targets檢查PASS。
+- PASS — root `npm run build`；沿用既有>500kB chunk warning；產物無energy-prototype／E3工具。`git diff --check`通過；380個本機Markdown links／anchors／targets檢查PASS。
 - PASS — 五配置／geometry重用；環角度、水位跨phase連續；水位方向／界限、配電流向、C獨立配電、全部能源world transforms及instance矩陣的reduced-motion時間不變性。
 - PASS — 富士環保守全周annulus（內29／外33 m，厚3 m），對真實civicCore及固定支承；兩渦輪圓盤（r2.3／厚0.9 m）對固定室／支承，並檢查真正轉子都包含在掃掠內。沿用21,595個完整320秒／0.5秒船體樣本、公共／deck／22m航空走廊、泊位、六rooms／連岸路、beacons、四站hero視線；所有mesh頂點在原hero畫框。兩庭公共步道對tidalEdge及能源機械／門架的headroom檢查通過。
 - Desktop browser evidence: macOS本機Codex in-app Chromium／WebGL2，1920×1080，預設quality，hero／近景與hour／reviewTime列在artifact README。五日景、混合暮／夜、近景三階段／靜態閱讀已檢查；實時畫面從暫存推進至下一輪充能，1440×900 canvas CSS尺寸跟隨resize後回1920×1080；standalone／Meter優先隔離控制數量0，console error／warn為空。瀏覽器啟動時兩次locator遇到載入期間CDP timeout，待頁面完成後恢復；不是程式console例外。
 - OS全域reduced-motion偏好未改；瀏覽器用原生核取框測相同靜態分支，Node檢查所有新增動態固定。完整HTTP network trace、實際GPU／FPS、Safari／iPad、Windows／展覽硬件、訪客理解未測。
 - PASS — 內容`8d6cb93`推送`origin/codex/energy-city-motion`；fresh fetch確認origin/main仍為`cf5ea94`。`d2fb447`以no-ff整合，tree與任務分支完全一致；整合root `npm test`／`npm run build`、379 links／anchors／targets、committed whitespace及browser source hashes重驗PASS。主分支發布／CI結果於後續紀錄。
 - 清理PASS — Vite已透過原session停止（exit130），`lsof`確認5173沒有LISTEN；本輪in-app分頁已關閉、viewport override已reset。沒有啟動持久survey／headless服務；測試自建的loopback server隨suite正常結束。原checkout與舊截圖保留原狀。
+
+- 最後文案自審修正：A／B階段分別只描述水庭／旋轉環，避免沿用M1而提到隱藏設備；B靜態閱讀亦不提水管。瀏覽器原生選單＋checkbox斷言通過，更新A／B日景及B靜態圖，console error／warn仍為空；混合／C、幾何與時序沒有更改。補充root test／build、整合及main CI結果於完成後記錄。
 
 ## E3 limits and next step
 
