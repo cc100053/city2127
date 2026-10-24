@@ -18,7 +18,9 @@
 - 最終本機檢查PASS：root完整npm test／build／git diff --check、survey完整npm test／build／git diff --check；Node26.0.0，允許loopback。Root仍只有既有>500kB warning。最後新增energyDistrict檢查大小翼、seed0／4242、四軸low／mixed／high共324個情境，164,088次actual mesh intersections，含完整環／渦輪掃掠及兩處水庭；使用真實程序district／fallback focal幾何，沒有另claim所有late roof／GLB、所有uint32 seeds或全城連續碰撞。324最後focused重跑PASS，整合全套亦須包含它。
 - 自審：exact diff與所有新source／tests／artifact已讀；source hashes在正式證據內。沒有外部依賴／部署／素材包或歷史Shibuya改動。Markdown local links／anchors／targets在最後文件變更後重驗，數目見下方完成紀錄。
 - 清理PASS：本輪唯一Vite session已停止exit130，lsof確認5173無LISTEN；全部Chrome scripts在finally關閉browser／realtime／HTTP／scratch DB。本輪沒有持久survey server或留下測試分頁。原checkout／舊截圖保持。
-- 下一步：commit／push任務分支；fresh fetch，no-ff整合main、完整重驗、push並確認main CI。E5硬件／性能／訪客驗收仍獨立未完成。
+- Last verified commit: **`361eff7aa9f04ebd0c51ac7771fd4faa0d813592`**（no-ff integration）；實作 **`fdf0981`** 已推送`origin/codex/energy-city-authority`。整合前fresh fetch確認main仍b8bccad，沒有衝突，`git diff --quiet fdf0981 HEAD`證明tree完全一致。
+- Integrated validation PASS：root完整npm test（包含最終324情境／164,088 mesh checks）／npm run build／git diff --check；survey完整npm test／build／git diff --check。正式browser與P2／P3／P4對應相同runtime tree；38個source SHA-256重核PASS。429個本機Markdown links／anchors／targets及committed `git diff --check origin/main..HEAD` PASS；最終文件指標變更後再核對。沒有另外跑未改的module-swap本機suite，main CI仍須驗三package。
+- Publication: 本次僅補整合紀錄，接下來fresh fetch／ancestor檢查後推送main並確認main CI；沒有部署。E5硬件／性能／訪客驗收仍獨立未完成。
 
 ---
 
