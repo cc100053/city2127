@@ -1,10 +1,11 @@
 # energy-city — 能源城市 E1–E3
 
 - Owner: Codex；產品決策cc100053
-- Status: IN_PROGRESS — E1–E3 DEV實作、本機／整合驗證完成；待發布main／CI確認；E4／E5未開始
+- Status: IN_PROGRESS — E1–E3完成並發布main，最終main CI PASS；E4／E5未開始
 - Branch: `codex/energy-city-motion`
 - Base commit: `cf5ea94ac3cd3e8c9415cbe3dda9d55f5654b8c9`
-- Last verified commit: 內容`8d6cb93299410fee462bb7ceffd65ceda1376511`；整合`d2fb447382856dfea348342e442b65dfbe02ae5d`完整root test／build重驗PASS
+- Last verified commit: E3內容`8d6cb93299410fee462bb7ceffd65ceda1376511`＋文案修正`223cc09f5c80e686c52cfc01a757dba3ebc21fd2`；最終整合`3333e4c612277a2f88531a8d1f582e3e4bf54341`完整root test／build重驗PASS
+- Remote availability: `origin/codex/energy-city-motion` @ `223cc09`；`origin/main`已含最終整合`3333e4c`，本次僅補CI交接。
 - Scope: 只完成E3城市組合與動態；不接E4正式問卷、權威配置或後端／部署
 
 ## E3 preflight and scope
@@ -34,7 +35,8 @@
 - PASS — 內容`8d6cb93`推送`origin/codex/energy-city-motion`；fresh fetch確認origin/main仍為`cf5ea94`。`d2fb447`以no-ff整合，tree與任務分支完全一致；整合root `npm test`／`npm run build`、379 links／anchors／targets、committed whitespace及browser source hashes重驗PASS。主分支發布／CI結果於後續紀錄。
 - 清理PASS — Vite已透過原session停止（exit130），`lsof`確認5173沒有LISTEN；本輪in-app分頁已關閉、viewport override已reset。沒有啟動持久survey／headless服務；測試自建的loopback server隨suite正常結束。原checkout與舊截圖保留原狀。
 
-- 最後文案自審修正：A／B階段分別只描述水庭／旋轉環，避免沿用M1而提到隱藏設備；B靜態閱讀亦不提水管。瀏覽器原生選單＋checkbox斷言通過，更新A／B日景及B靜態圖，console error／warn仍為空；混合／C、幾何與時序沒有更改。補充root test／build、整合及main CI結果於完成後記錄。
+- 最後文案自審修正：A／B階段分別只描述水庭／旋轉環，避免沿用M1而提到隱藏設備；B靜態閱讀亦不提水管。瀏覽器原生選單＋checkbox斷言通過，更新A／B日景及B靜態圖，console error／warn仍為空；混合／C、幾何與時序沒有更改。文案修正`223cc09`推送任務分支，最終`3333e4c` no-ff整合；root test（含實際HTTP／WebSocket）／build、380 links／anchors／targets、committed whitespace及browser hashes在整合後重跑PASS。`origin/main`已發布`3333e4c`，fetch確認0／0；[最終main CI](https://github.com/cc100053/city2127/actions/runs/40045993266)已完成success：Node24／Ubuntu的root test／build、survey test／build、module-swap test／build及committed whitespace全部PASS（job 120727731401）。本次後續僅更新Markdown交接，依paths-ignore不另觸發CI；runtime／素材與已通過的`3333e4c`一致。
+- 第二輪短暫Vite亦已停止（exit130）、新測試分頁關閉／viewport reset；5173無LISTEN，沒有本輪服務留在背景。
 
 ## E3 limits and next step
 
