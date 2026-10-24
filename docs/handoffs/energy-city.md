@@ -1,4 +1,47 @@
-# energy-city — 能源城市 E1／E2
+# energy-city — 能源城市 E1–E3
+
+- Owner: Codex；產品決策cc100053
+- Status: IN_PROGRESS — E1–E3 DEV實作與本機驗證完成；E3 Git整合／main CI待下方紀錄；E4／E5未開始
+- Branch: `codex/energy-city-motion`
+- Base commit: `cf5ea94ac3cd3e8c9415cbe3dda9d55f5654b8c9`
+- Last verified: 本輪最終工作樹；commit／整合結果於完成後補記
+- Scope: 只完成E3城市組合與動態；不接E4正式問卷、權威配置或後端／部署
+
+## E3 preflight and scope
+
+- 2026-10-24先確認原`/Users/fatboy/city2127`。main @ `29d12db`，未追蹤`.playwright-cli/`及既有截圖保留；沒有stash／reset／discard／提交無關工作。
+- 首次原checkout fetch因`.git/FETCH_HEAD`寫入權限、獨立checkout因sandbox DNS失敗；允許網絡的fetch重跑均成功，沒有自動merge原checkout。最新origin/main為`cf5ea94`；原checkout 0 ahead／17 behind。
+- 重用`/private/tmp/city2127-energy-plan-20261024`，開工main乾淨，fetch後與origin/main 0／0；從該main開`codex/energy-city-motion`。無`.codegraph/`，不自行索引；直接追蹤energyPrototype → devEnergy → main的DEV import／devFrame，及bake／arc／mobility／tidalEdge／幾何tests。E2內容`afd4c0a`、整合`7fa5c9f`、交接`cf5ea94`均可在遠端取得。
+- 已讀README、PROJECT、CONTRIBUTING、VALIDATION、ART、CITY MASTER TASTE、能源計劃及本交接。唯一Owner為本任務Codex，沒有並行binary／模組編輯。只改root程式／測試、相關文件及新截圖；不改survey／module-swap／外部素材。
+
+## E3 implementation
+
+- `energyPrototype.ts`延伸既有工廠：原水庭＋DECKS外側`(30,0,-395)`比例0.72第二庭，共享geometry／materials；兩庭翼形檢修遮棚、可見框管／箭頭、獨立抽水回管及連岸路。兩處環／翼配電門架以服務軌接向岸邊，所有非基準方向可讀。
+- M1完整共存；A分散水層、B集中接收翼／前置環、C外擴岸界／橋與低矮配電接點。沒有把A/B/C變成環境Meter bands。
+- 60秒充能20／暫存20／釋能20；絕對時間計算水位、流向、環加／減速、渦輪與向岸分配。C配電不依賴不存在的儲能。36個合併／水面mesh、4個flow InstancedMesh，一次建立；沒有逐幀geometry／material分配。
+- `devEnergy`回傳現有`devFrame` callback；`reviewTime=10|30|50`可重播。系統reduced-motion或原生「靜態閱讀」固定全部新增能源動態，保留箭頭／設備／流程文字。Production guard移除工具；survey／Meter／scaleLab隔離仍保留。
+- 自審／幾何修正：第二庭最初碰轉乘泊位，移到現址；固定軸承退至旋轉平面後方；外露渦輪提高0.5 m以清下庭邊緣；新看台／步道起點移出槽緣，維持連岸端點及平順坡度。
+- 計劃／PROJECT／SPEC／VALIDATION、README及文件索引同步；[E3實際比較圖](../../artifacts/energy-city-e3/README.md)。E2歷史實測保留於下方。
+
+## E3 validation
+
+- PASS — root `npm test`（Node26.0.0，真實loopback survey HTTP／WebSocket、81組答案與既有城市／路徑檢查）；最終任務內容完整重跑通過；整合後結果於下方補記。未改兩個子package，未另跑其本機suite。
+- PASS — root `npm run build`；沿用既有>500kB chunk warning；產物無energy-prototype／E3工具。`git diff --check`通過；379個本機Markdown links／anchors／targets檢查PASS。
+- PASS — 五配置／geometry重用；環角度、水位跨phase連續；水位方向／界限、配電流向、C獨立配電、全部能源world transforms及instance矩陣的reduced-motion時間不變性。
+- PASS — 富士環保守全周annulus（內29／外33 m，厚3 m），對真實civicCore及固定支承；兩渦輪圓盤（r2.3／厚0.9 m）對固定室／支承，並檢查真正轉子都包含在掃掠內。沿用21,595個完整320秒／0.5秒船體樣本、公共／deck／22m航空走廊、泊位、六rooms／連岸路、beacons、四站hero視線；所有mesh頂點在原hero畫框。兩庭公共步道對tidalEdge及能源機械／門架的headroom檢查通過。
+- Desktop browser evidence: macOS本機Codex in-app Chromium／WebGL2，1920×1080，預設quality，hero／近景與hour／reviewTime列在artifact README。五日景、混合暮／夜、近景三階段／靜態閱讀已檢查；實時畫面從暫存推進至下一輪充能，1440×900 canvas CSS尺寸跟隨resize後回1920×1080；standalone／Meter優先隔離控制數量0，console error／warn為空。瀏覽器啟動時兩次locator遇到載入期間CDP timeout，待頁面完成後恢復；不是程式console例外。
+- OS全域reduced-motion偏好未改；瀏覽器用原生核取框測相同靜態分支，Node檢查所有新增動態固定。完整HTTP network trace、實際GPU／FPS、Safari／iPad、Windows／展覽硬件、訪客理解未測。
+- Git整合、main CI、最終清理：待本輪完成後補記。
+
+## E3 limits and next step
+
+E3是DEV視覺與因果節拍，不是電力／流體／容量／可靠度模擬。沒有完整地下電網或水量守恆／損耗計算，流向標記僅示意。Hero可讀組合；小機械／水位需近景。前置環非貼殼同心機械，島／橋仍為候選量體。全周轉子包絡＋離散船體／路徑檢查不等於全城連續碰撞或工程認證。
+
+下一步為E4正式問題／權威配置／歷史相容性及實際變化證據，另開明確任務；E5做硬件／性能／訪客理解。不要以E3完成推論這些已通過。
+
+---
+
+## E1／E2歷史交接（本段為E3前紀錄）
 
 - Owner: Codex；產品決策cc100053
 - Status: IN_PROGRESS — E1、E2完成並發布main，main CI PASS；E3–E5未開始

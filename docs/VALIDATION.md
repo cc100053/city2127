@@ -165,3 +165,12 @@ DEV `?energy=baseline|a|b|c|mixed&hour=12&reviewTime=20`：在原hero固定五�
 - Root `npm test`包含[energyPrototype.test.ts](../tests/energyPrototype.test.ts)：五配置／物件重用、19個共享材質batch、rotor獨立且不碰實際civicCore、320秒每0.5秒全部可見船體保守包圍盒（21,595個）、22 m飛行走廊／sphere及水面泊位、公共路／deck、六座water rooms與連岸路、beacons、新水庭步道對真實tidal-edge淨空、四站hero視線及原畫框。
 - Desktop 1920×1080：五種日景、混合18.5／22及水庭近景；選單切換及URL保存正常，console沒有error／warn。日景輪廓可分辨；管線／渦輪需近景，夜間細節仍為量體階段。一般standalone／Meter優先隔離檢查依交接記錄。
 - 不聲稱連續碰撞、完整旋轉掃掠、工程容量／可行性、硬件FPS、Safari／iPad或E3／E4完成。E2沒有新動態；原城市actor保持原有路線。測試／瀏覽器結果只證明本輪靜態幾何及所列桌面情境。
+
+## Energy E3 composition and motion — 2026-10-24
+
+沿用隔離DEV五配置與原hero，`reviewTime=10|30|50`固定充能／暫存／釋能；面板「靜態閱讀」與系統reduced motion使用同一固定分支。新證據見[截圖／情境紀錄](../artifacts/energy-city-e3/README.md)，實際驗證commit、整合／CI見[交接](handoffs/energy-city.md)。
+
+- Root test涵蓋五配置／共享mesh、絕對時間重播、水位方向／範圍、環角度跨20／40／60秒連續、釋能向岸配電／C獨立供電、全部能源transform及flow instances靜止不變。
+- 富士環用內半徑29／外33 m、厚3 m保守全周掃掠檢查真實civicCore及固定軸承；兩庭渦輪用半徑2.3 m／厚0.9 m圓盤檢查固定室／支承。掃掠同樣檢查既有船體／公共／航空通道與泊位；兩條新步道對真實tidal-edge檢查，全部mesh頂點留在原hero畫框。保持六座rooms與連岸路、beacons及四站hero視線。
+- 本機Codex in-app Chromium／WebGL2、1920×1080、預設quality：五日景、M1 18.5／22、近景充能10／暫存30／釋能50與靜態閱讀；console error／warn、實時階段、模式隔離及一般desktop resize記錄在artifact／handoff。OS全域reduced-motion設定未改，瀏覽器用原生核取框測相同靜態更新分支。
+- 流向是標記、水位是視覺位移；未模擬完整電網／流體、連續全城碰撞、容量／損耗／可靠度或海岸工程。沒有測展覽硬件、FPS、Safari／iPad；小機械需近景。正式問卷／Meter與後端維持現況，E4／E5不在本輪交付。
