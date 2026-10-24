@@ -40,7 +40,7 @@ The [resident experience plan](RESIDENT_EXPERIENCE_PLAN.md) records P1–P3 impl
 | [siteBuilders](../src/siteBuilders/index.ts), [siteRuntime.ts](../src/siteBuilders/siteRuntime.ts), [siteAssets](../src/siteAssets/assetCatalog.ts) | Four focal site builders, additive layers, GLB bounds/cache/fallback and late-load synchronization |
 | [districtMeters.ts](../src/districtMeters.ts), [devMeters.ts](../src/devMeters.ts) | District carriers, hybrid/pairing/seeded slot selection, pulse/motion; DEV-only Meter review controls |
 | [voteJourney.ts](../src/voteJourney.ts) | Live vote journey (2026-10-13): Meter-colour orbs, scan rings and per-guest lanterns (latest 64), additive and unlit, named `meter-pulse` so GTAO skips them |
-| [energyPrototype.ts](../src/energyPrototype.ts), [devEnergy.ts](../src/devEnergy.ts) | DEV-only E2靜態能源量體／五配置比較；不讀Meter、不接survey；見[能源計劃](ENERGY_CITY_PLAN.md) |
+| [energyPrototype.ts](../src/energyPrototype.ts), [devEnergy.ts](../src/devEnergy.ts) | DEV-only E3能源城市組合／五配置及慢速儲能流程；不讀Meter、不接survey；見[能源計劃](ENERGY_CITY_PLAN.md) |
 | [scaleLab.ts](../src/scaleLab.ts), [devScaleLab.ts](../src/devScaleLab.ts) | DEV-only `?scaleLab`: seeded guest sequences through the server reducer and Scale A with live journey timing; see [handoff](handoffs/archive/vote-journey.md) |
 | [dayCycle.ts](../src/dayCycle.ts), [presets.ts](../src/presets.ts), [worldState.ts](../src/worldState.ts) | Clock/light curves, numeric atmosphere presets, legacy 10 s WorldState blend |
 | [overlay.ts](../src/overlay.ts), [style.css](../src/style.css), [modelAssets.ts](../src/modelAssets.ts) | Desktop title/time UI, GLTFLoader and DEV-only local asset preview |
@@ -65,7 +65,7 @@ Static groups are merged by material, windows/actors/carriers use InstancedMesh,
 
 A city day is 180 s from 12:00. Mood labels are Still / Daylight / Pulse; the old preset buttons and `0/1/2` controls were removed. `?hour=0..23.999` holds review time and overrides Admin Day/Night/Auto. Admin display setting persists independently of city reset. Separate Auto viewers have local clocks.
 
-DEV-only `?energy=baseline|a|b|c|mixed`（配合`hour`／`reviewTime`）在原hero旁提供靜態能源比較；只在沒有`survey`／`meters`／`scaleLab`時啟動。接收翼、水庭、前置儲能環、能源島共19個共享材質batch，建立一次後只切visibility／翼scale；rotor獨立保留但E2不動。Production的DEV guard移除import／選單，正式展覽資料與現行四題不變。量體座標、通道檢查及限制見[能源計劃E2](ENERGY_CITY_PLAN.md#e2成果隔離的靜態空間比較2026-10-24)。
+DEV-only `?energy=baseline|a|b|c|mixed`（配合`hour`／`reviewTime`）提供E3城市組合；只在沒有`survey`／`meters`／`scaleLab`時啟動。`startEnergyReview`回傳frame callback給現有`devFrame`，`energyPrototype.update(absoluteSeconds,reducedMotion)`同步兩水庭水位／管內流向、渦輪、富士前置環與兩處岸邊配電服務軌。60秒充能20／暫存20／釋能20；C配電獨立運作。36個合併／水面mesh與4個flow InstancedMesh一次建立，第二庭共用geometry／materials；只改可見性與transform／instance矩陣。系統reduced motion或原生「靜態閱讀」核取框固定本輪全部能源動態並保留箭頭／流程。Production移除DEV import／工具，正式四題及資料不變。[組合、座標、敘事／工程限制](ENERGY_CITY_PLAN.md#e3成果城市組合與慢速因果動態2026-10-24)，[實際桌面證據](../artifacts/energy-city-e3/README.md)。
 
 Standalone uses day-cycle activity and does not create the v2 district layer. `?survey` connects to `ws://<current-host>:8787/ws`, or the explicit ws/wss URL supplied as its value. Legacy v1 retains the 10 s atmosphere path. V2 uses the server layout and seeds directly, without blending scores into global atmosphere.
 

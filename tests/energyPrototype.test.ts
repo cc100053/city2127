@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
-import { Box3, Matrix4, Mesh, Raycaster, Vector3 } from 'three';
+import { Box3, Group, InstancedMesh, Matrix4, Mesh, Raycaster, Vector3 } from 'three';
 import { MeshBVH, acceleratedRaycast } from 'three-mesh-bvh';
-import { ENERGY_OPTIONS, energyPrototype } from '../src/energyPrototype.ts';
+import { arc, trim } from '../src/cityRig.ts';
+import { ENERGY_OPTIONS, energyCycle, energyPrototype } from '../src/energyPrototype.ts';
 import { tidalEdge } from '../src/amphibiousShore.ts';
 import { civicCore } from '../src/civicCore.ts';
 import { heroCamera } from '../src/heroCamera.ts';
@@ -12,21 +13,28 @@ import { laneBeaconSites, shoreRoomBays } from '../src/waterRooms.ts';
 const study = energyPrototype(), path = routes(), camera = heroCamera(1920, 1080);
 camera.updateMatrixWorld(true);
 const meshes: Mesh[] = [];
-study.root.traverse(o => { if (o instanceof Mesh) { o.geometry.boundsTree = new MeshBVH(o.geometry, { indirect: true }); o.raycast = acceleratedRaycast; meshes.push(o); } });
+study.root.traverse(o => { if (o instanceof Mesh && !(o instanceof InstancedMesh)) { o.geometry.boundsTree = new MeshBVH(o.geometry, { indirect: true }); o.raycast = acceleratedRaycast; meshes.push(o); } });
 const count = meshes.length, originalMeshes = meshes.map(m => m.uuid);
-const expected = { baseline: [], a: ['wing', 'garden'], b: ['wing', 'ring'], c: ['island'], mixed: ['wing', 'garden', 'ring', 'island'] };
+const expected = { baseline: [], a: ['wing', 'garden', 'distribution'], b: ['wing', 'ring', 'distribution'], c: ['island', 'distribution'], mixed: ['wing', 'garden', 'ring', 'island', 'distribution'] };
 for (const option of Object.keys(ENERGY_OPTIONS) as (keyof typeof ENERGY_OPTIONS)[]) {
   study.select(option);
   assert.equal(study.option, option);
   assert.deepEqual(Object.entries(study.parts).filter(([, g]) => g.visible).map(([key]) => key), expected[option]);
 }
-const after: string[] = []; study.root.traverse(o => { if (o instanceof Mesh) after.push(o.uuid); });
-assert.deepEqual(after, originalMeshes, 'switching configurations reuses the same geometry'); assert.ok(count < 25, 'static study batches by shared finish');
+const after: string[] = []; study.root.traverse(o => { if (o instanceof Mesh && !(o instanceof InstancedMesh)) after.push(o.uuid); });
+assert.deepEqual(after, originalMeshes, 'switching configurations reuses the same geometry'); assert.ok(count < 50, 'static study batches by shared finish');
 const core = civicCore(); core.updateMatrixWorld(true);
 core.traverse(o => { if (o instanceof Mesh) o.geometry.boundsTree = new MeshBVH(o.geometry, { indirect: true }); });
 study.root.updateMatrixWorld(true);
 const rotor = study.root.getObjectByName('energy-rotor')!;
 assert.ok(rotor.children.length > 0, 'rotor remains separate from the stationary bearings');
+for (const rotorMesh of rotor.children as Mesh[]) {
+  const positions = rotorMesh.geometry.attributes.position;
+  for (let i = 0; i < positions.count; i++) {
+    const p = new Vector3().fromBufferAttribute(positions, i).applyMatrix4(rotorMesh.matrix);
+    assert.ok(Math.hypot(p.x, p.y) >= 29 && Math.hypot(p.x, p.y) <= 33 && Math.abs(p.z) <= 1.5, 'rotor escapes its sweep envelope');
+  }
+}
 for (const rotorMesh of rotor.children as Mesh[]) for (const chassis of core.children as Mesh[]) {
   const relative = new Matrix4().copy(rotorMesh.matrixWorld).invert().multiply(chassis.matrixWorld);
   assert.equal(rotorMesh.geometry.boundsTree!.intersectsGeometry(chassis.geometry, relative), false, 'rotating band intersects theatre / work wings');
@@ -38,6 +46,39 @@ rotor.traverse(o => { if (o instanceof Mesh) {
 } });
 assert.ok(sphereGap > 3, `rotor only ${sphereGap} m from theatre shell`);
 
+// The entire rotor sweep (all angles), including the blocks, fits this conservative annular volume.
+const sweptRoot = new Group();
+const sweep = arc(sweptRoot, 29, 33, 3, [0, -1.5, 0], trim);
+sweep.updateMatrix(); sweep.geometry.applyMatrix4(sweep.matrix); sweep.position.set(0, 0, 0); sweep.rotation.x = Math.PI / 2;
+sweptRoot.position.copy(study.parts.ring.position); sweptRoot.updateMatrixWorld(true);
+sweep.geometry.boundsTree = new MeshBVH(sweep.geometry, { indirect: true }); sweep.raycast = acceleratedRaycast;
+for (const chassis of core.children as Mesh[]) {
+  const relative = sweep.matrixWorld.clone().invert().multiply(chassis.matrixWorld);
+  assert.equal(sweep.geometry.boundsTree.intersectsGeometry(chassis.geometry, relative), false, 'full rotor sweep meets occupied core');
+}
+for (const fixed of study.parts.ring.children) if (fixed instanceof Mesh) {
+  assert.equal(sweep.geometry.boundsTree.intersectsGeometry(fixed.geometry, sweep.matrixWorld.clone().invert().multiply(fixed.matrixWorld)), false, 'full rotor sweep meets a fixed bearing');
+}
+for (const g of study.gardens) {
+  const turbine = g.getObjectByName('energy-turbine')!;
+  for (const mesh of turbine.children as Mesh[]) {
+    const positions = mesh.geometry.attributes.position;
+    for (let i = 0; i < positions.count; i++) {
+      const p = new Vector3().fromBufferAttribute(positions, i).applyMatrix4(mesh.matrix);
+      assert.ok(Math.hypot(p.x, p.y) <= 2.3 && Math.abs(p.z) <= .45, 'turbine escapes its sweep envelope');
+    }
+  }
+  const envelope = new Group();
+  const disc = arc(envelope, 0, 2.3, .9, [0, -.45, 0], trim);
+  disc.updateMatrix(); disc.geometry.applyMatrix4(disc.matrix); disc.position.set(0, 0, 0); disc.rotation.x = Math.PI / 2;
+  envelope.position.copy(turbine.position); g.add(envelope); study.root.updateMatrixWorld(true);
+  disc.geometry.boundsTree = new MeshBVH(disc.geometry, { indirect: true });
+  for (const fixed of g.children) if (fixed instanceof Mesh && !(fixed instanceof InstancedMesh)) {
+    assert.equal(disc.geometry.boundsTree.intersectsGeometry(fixed.geometry, disc.matrixWorld.clone().invert().multiply(fixed.matrixWorld)), false, 'turbine sweep meets fixed room / support');
+  }
+  envelope.removeFromParent(); disc.geometry.dispose();
+}
+meshes.push(sweep);
 const inverse = new Map(meshes.map(m => [m, m.matrixWorld.clone().invert()]));
 function clear(box: Box3, label: string) {
   for (const mesh of meshes) assert.equal(mesh.geometry.boundsTree!.intersectsBox(box, inverse.get(mesh)!), false, `${label} meets ${mesh.parent?.name}`);
@@ -70,9 +111,11 @@ for (const [x, z] of laneBeaconSites()) clear(new Box3(new Vector3(x - 1, 0, z -
 const tide = tidalEdge(); tide.updateMatrixWorld(true);
 tide.traverse(o => { if (o instanceof Mesh) { o.geometry.boundsTree = new MeshBVH(o.geometry, { indirect: true }); o.raycast = acceleratedRaycast; } });
 const ray = new Raycaster();
-for (let t = 0; t <= 1; t += .025) for (const x of [-1.6, 0, 1.6]) {
-  ray.set(new Vector3(-310 + x, .6 * (1 - t) + .1, -137 + 38 * t), new Vector3(0, 1, 0)); ray.far = 2.3;
-  assert.equal(ray.intersectObject(tide, true).length, 0, 'new water-garden public spur meets tidal-edge pavilion / planting');
+for (const g of study.gardens) for (let t = 0; t <= 1; t += .025) for (const x of [-1.6, 0, 1.6]) {
+  const p = new Vector3(x, .6 * (1 - t) + .1, 17.5 + 34.5 * t).applyMatrix4(g.matrixWorld);
+  ray.set(p, new Vector3(0, 1, 0)); ray.far = 2.3;
+  assert.equal(ray.intersectObject(tide, true).length, 0, 'water-garden public spur meets tidal-edge pavilion / planting');
+  assert.equal(ray.intersectObjects(meshes).length, 0, 'water-garden public spur meets energy machinery / service gate');
 }
 for (const site of Object.values(changeSites)) for (const height of [1, site.h * site.scale / 4]) {
   const look = new Vector3(site.x, height, site.z);
@@ -80,11 +123,45 @@ for (const site of Object.values(changeSites)) for (const height of [1, site.h *
   assert.equal(ray.intersectObjects(meshes).length, 0, `${site.name} hero sightline obstructed`);
 }
 // Every studied part remains in the original hero frame; original camera values are never changed by select().
-for (const group of Object.values(study.parts)) {
-  const box = new Box3().setFromObject(group, true);
-  for (const x of [box.min.x, box.max.x]) for (const y of [box.min.y, box.max.y]) for (const z of [box.min.z, box.max.z]) {
-    const ndc = new Vector3(x, y, z).project(camera);
-    assert.ok(Math.abs(ndc.x) < 1 && Math.abs(ndc.y) < 1, `${group.name} leaves hero frame: ${ndc.toArray()}`);
+for (const mesh of meshes) {
+  const positions = mesh.geometry.attributes.position;
+  for (let i = 0; i < positions.count; i++) {
+    const ndc = new Vector3().fromBufferAttribute(positions, i).applyMatrix4(mesh.matrixWorld).project(camera);
+    assert.ok(Math.abs(ndc.x) < 1 && Math.abs(ndc.y) < 1, `${mesh.parent?.name} leaves hero frame: ${ndc.toArray()}`);
   }
 }
-console.log(`Energy E2: five configurations, ${count} batches, rotor shell gap ${sphereGap.toFixed(2)} m; ${hulls} hulls, public / room paths, air / water berths and hero sightlines clear.`);
+// Check absolute-time replay, bounded water travel, phase direction and full static reduced-motion reading.
+for (const t of [0, 10, 20, 30, 40, 50, 59.999, 60, 80, 120]) {
+  const cycle = study.update(t);
+  assert.ok(cycle.level >= 0 && cycle.level <= 1);
+  assert.deepEqual(study.update(t), cycle, 'absolute-time replay must not integrate frame deltas');
+}
+const delivery = study.root.getObjectByName('energy-distribution-flow') as InstancedMesh;
+study.update(10); assert.equal(delivery.visible, false);
+study.update(30); assert.equal(delivery.visible, false);
+study.update(50); assert.equal(delivery.visible, true);
+const first = new Matrix4(), second = new Matrix4(); delivery.getMatrixAt(0, first);
+study.update(51); delivery.getMatrixAt(0, second);
+assert.ok(second.elements[14] > first.elements[14], 'release markers travel along the service rail toward shore');
+study.select('c'); study.update(10); assert.equal(delivery.visible, true, 'island supplies distribution without the storage loop');
+study.update(59.999); delivery.getMatrixAt(0, first); study.update(60); delivery.getMatrixAt(0, second);
+assert.ok(Math.abs(second.elements[14] - first.elements[14]) < .01, 'continuous island supply jumps at storage cycle wrap'); study.select('mixed');
+assert.equal(energyCycle(10).phase, 'charge'); assert.equal(energyCycle(30).phase, 'hold'); assert.equal(energyCycle(50).phase, 'release');
+for (const t of [20, 40, 60, 120]) {
+  assert.ok(Math.abs(energyCycle(t).angle - energyCycle(t - .00001).angle) < .00001, 'rotor jumps at a phase boundary');
+  assert.ok(Math.abs(energyCycle(t).level - energyCycle(t - .00001).level) < .00001, 'water jumps at a phase boundary');
+}
+study.update(0, true); study.root.updateMatrixWorld(true);
+const staticPose = () => { const state: number[][] = []; study.root.traverse(o => { state.push(o.matrixWorld.toArray()); if (o instanceof InstancedMesh) state.push(Array.from(o.instanceMatrix.array)); }); return state; };
+const stillPose = staticPose();
+assert.deepEqual(study.update(0, true), study.update(987, true), 'reduced motion is independent of time');
+study.root.updateMatrixWorld(true); assert.deepEqual(staticPose(), stillPose, 'all energy transforms and marker instances stay fixed');
+assert.ok(energyCycle(15).level > energyCycle(5).level, 'external charging fills the upper reservoir');
+assert.ok(energyCycle(55).level < energyCycle(45).level, 'release drains the upper reservoir');
+for (const g of study.gardens) {
+  assert.ok(Math.abs(g.getObjectByName('energy-upper-water')!.position.y - 22.6) < 1e-10);
+  assert.ok(Math.abs(g.getObjectByName('energy-lower-water')!.position.y + .3) < 1e-10);
+}
+const meshesAfterMotion: string[] = []; study.root.traverse(o => { if (o instanceof Mesh && !(o instanceof InstancedMesh)) meshesAfterMotion.push(o.uuid); });
+assert.deepEqual(meshesAfterMotion, originalMeshes, 'motion reuses every mesh');
+console.log(`Energy E3: five configurations, ${count} batches, rotor shell gap ${sphereGap.toFixed(2)} m; ${hulls} hulls, public / room paths, air / water berths and hero sightlines clear.`);
