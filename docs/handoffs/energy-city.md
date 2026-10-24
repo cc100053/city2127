@@ -1,10 +1,10 @@
 # energy-city — 能源城市 E1–E3
 
 - Owner: Codex；產品決策cc100053
-- Status: IN_PROGRESS — E1–E3 DEV實作與本機驗證完成；E3 Git整合／main CI待下方紀錄；E4／E5未開始
+- Status: IN_PROGRESS — E1–E3 DEV實作、本機／整合驗證完成；待發布main／CI確認；E4／E5未開始
 - Branch: `codex/energy-city-motion`
 - Base commit: `cf5ea94ac3cd3e8c9415cbe3dda9d55f5654b8c9`
-- Last verified: 本輪最終工作樹；commit／整合結果於完成後補記
+- Last verified commit: 內容`8d6cb93299410fee462bb7ceffd65ceda1376511`；整合`d2fb447382856dfea348342e442b65dfbe02ae5d`完整root test／build重驗PASS
 - Scope: 只完成E3城市組合與動態；不接E4正式問卷、權威配置或後端／部署
 
 ## E3 preflight and scope
@@ -31,7 +31,8 @@
 - PASS — 富士環保守全周annulus（內29／外33 m，厚3 m），對真實civicCore及固定支承；兩渦輪圓盤（r2.3／厚0.9 m）對固定室／支承，並檢查真正轉子都包含在掃掠內。沿用21,595個完整320秒／0.5秒船體樣本、公共／deck／22m航空走廊、泊位、六rooms／連岸路、beacons、四站hero視線；所有mesh頂點在原hero畫框。兩庭公共步道對tidalEdge及能源機械／門架的headroom檢查通過。
 - Desktop browser evidence: macOS本機Codex in-app Chromium／WebGL2，1920×1080，預設quality，hero／近景與hour／reviewTime列在artifact README。五日景、混合暮／夜、近景三階段／靜態閱讀已檢查；實時畫面從暫存推進至下一輪充能，1440×900 canvas CSS尺寸跟隨resize後回1920×1080；standalone／Meter優先隔離控制數量0，console error／warn為空。瀏覽器啟動時兩次locator遇到載入期間CDP timeout，待頁面完成後恢復；不是程式console例外。
 - OS全域reduced-motion偏好未改；瀏覽器用原生核取框測相同靜態分支，Node檢查所有新增動態固定。完整HTTP network trace、實際GPU／FPS、Safari／iPad、Windows／展覽硬件、訪客理解未測。
-- Git整合、main CI、最終清理：待本輪完成後補記。
+- PASS — 內容`8d6cb93`推送`origin/codex/energy-city-motion`；fresh fetch確認origin/main仍為`cf5ea94`。`d2fb447`以no-ff整合，tree與任務分支完全一致；整合root `npm test`／`npm run build`、379 links／anchors／targets、committed whitespace及browser source hashes重驗PASS。主分支發布／CI結果於後續紀錄。
+- 清理PASS — Vite已透過原session停止（exit130），`lsof`確認5173沒有LISTEN；本輪in-app分頁已關閉、viewport override已reset。沒有啟動持久survey／headless服務；測試自建的loopback server隨suite正常結束。原checkout與舊截圖保留原狀。
 
 ## E3 limits and next step
 
