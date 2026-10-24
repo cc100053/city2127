@@ -48,7 +48,7 @@ function exhibitionValue(key: string, value: number | string) {
 }
 export const voteSymbol = (vote: number) => vote > 0 ? '＋' : vote < 0 ? '−' : '·';
 export const exhibitionVoteMarks = (votes: ExhibitionProposal['votes']) => AXES.map(axis => ({
-  label: EXHIBITION_LABELS[axis], vote: votes[axis], symbol: voteSymbol(votes[axis]),
+  label: axis === 'environmentalPriority' && votes.energy ? 'エネルギー' : EXHIBITION_LABELS[axis], vote: votes[axis], symbol: axis === 'environmentalPriority' && votes.energy ? '◆' : voteSymbol(votes[axis]),
 }));
 
 /** Causal panel text: policy deltas, and city changes named by the Odaiba place where they appear. */
@@ -96,6 +96,10 @@ export const exhibitionScoresText = (scores: ExhibitionView['scores']) =>
 type ResidentCard = { id: string; title: string; text: string; place: string };
 // P1 copy; facility selection follows rendered focal quantities, not the resident's vote.
 const RESIDENT_CARDS: Record<string, readonly [string, string]> = {
+  'energy.water': ['海辺の庭に、電気を蓄える', '外から届く電力で水をくみ上げ、落水を通して取り出す蓄電庭園です。水辺の居場所と、エネルギー設備が隣り合っています。'],
+  'energy.rotor': ['街の中心で、電気を蓄える', 'フジテレビの劇場とは別の環が、外部の電力で回転して蓄えます。劇場と公共の動線は、そのまま残っています。'],
+  'energy.orbital': ['海の上で、空からの電気を受け取る', '海上に広がる翼は、軌道から届く電力を受け取る設備です。海の景色と空間を使う、2127年の構想です。'],
+  'energy.island': ['電気のために、海の境界が変わる', '沖の原子力施設を置く島と、検修の橋が街につながっています。電気を届ける場所を確保するために、海の一部を陸地として使っています。'],
   "intro.origin": ["街は、誰が決めるのか。", "これまで街のかたちは、行政や大企業が決めてきました。住民の思いで街が決まるとしたら、どうなるでしょう。"],
   "intro.identity": ["あなたも、この街の住民です。", "ここは2127年のお台場。あなたは、この街で暮らす一人です。"],
   "intro.inherited": ["街には、これまでの思いが重なっています。", "あなたの前にも、住民たちが暮らしへの思いを残しました。目の前の街は、その積み重ねを受け継いでいます。"],
@@ -126,16 +130,22 @@ export function residentCards(view: ExhibitionView): ResidentCard[] {
     l.bands.se === 'low' ? 'functions.distributed' : l.bands.se === 'high' ? 'functions.vertical' : 'functions.hybrid',
   ];
   const places = ['nw', 'sw', 'ne', 'se'] as const;
+  const energy = l.energy;
+  const energyCards = energy ? [energy.waterGardens ? 'energy.water' : '', energy.flywheel ? 'energy.rotor' : '', energy.receiver !== 'none' ? 'energy.orbital' : '', energy.island ? 'energy.island' : ''].filter(Boolean) : [];
   return [...ids, ...facilityIds].map((id, index) => ({
     id, title: RESIDENT_CARDS[id][0], text: RESIDENT_CARDS[id][1],
     place: index < ids.length ? 'お台場全景' : changeSites[places[index - ids.length]].place,
-  }));
+  })).concat(energyCards.map(id => ({ id, title: RESIDENT_CARDS[id][0], text: RESIDENT_CARDS[id][1], place: id === 'energy.rotor' ? 'フジテレビ前・蓄電環' : id === 'energy.water' ? '海辺の蓄電庭園' : id === 'energy.orbital' ? '沖の受電翼' : '沖のエネルギー島' })));
 }
 
 export const residentIdentity = (proposal: ExhibitionProposal) =>
   `${proposal.stationId ? `ステーション ${proposal.stationId} · ` : ''}暮らしの声 #${proposal.ordinal}`;
 
 const RESIDENT_PREFERENCES: Record<string, string> = {
+  'water-storage': 'あなたは、蓄電の仕組みが身近にある海辺の庭を選びました。',
+  'rotor-storage': 'あなたは、街の中心で電気を蓄える暮らしを選びました。',
+  'orbital-supply': 'あなたは、海上の設備で空から電気を受け取る暮らしを選びました。',
+  'island-supply': 'あなたは、海の一部を使い、沖の原子力施設から電気を届ける暮らしを選びました。',
   'human-led': 'あなたは、人に相談できる日常を大切にしました。',
   'human-machine': 'あなたは、自動の便利さと、人に相談できる安心を選びました。',
   autonomous: 'あなたは、自分の都合でいつでも使えるサービスを大切にしました。',
@@ -160,7 +170,7 @@ const DISTRICT_RESULTS = {
 /** Evidence is the renderer's before/after targets, including visible pairings and shuffled slots. */
 export function residentResult(proposal: ExhibitionProposal, changes?: readonly CarrierChange[]) {
   const change = changes?.[0];
-  const questionId = change ? RESULT_AXES[change.socketId]
+  const questionId = change?.energy || (!change && proposal.votes.energy) ? 'energy-2127' : change ? RESULT_AXES[change.socketId]
     : Object.values(RESULT_AXES)[AXES.findIndex(axis => proposal.votes[axis] !== 0)];
   const answer = proposal.answers.find(answer => answer.questionId === questionId) ?? proposal.answers[0];
   const preference = RESIDENT_PREFERENCES[answer?.optionId] ?? 'あなたの思いが、住民の声に加わりました。';
@@ -184,11 +194,25 @@ export function residentResult(proposal: ExhibitionProposal, changes?: readonly 
         ? 'この拠点では、歩いて用事を済ませる低い建物が暮らしを支える構成になりました。'
         : after.bands.se === 'high' ? 'この拠点では、上下に用事をつなぐタワーが暮らしを支える構成になりました。' : 'この拠点では、高さの違う建物が用事を分け合う構成になりました。';
     }
+    if (change.energy) {
+      const { before, after } = change.energy;
+      if (before.waterGardens !== after.waterGardens) {
+        place = '海辺の蓄電庭園'; effect = `海辺の蓄電庭園は${after.waterGardens === 0 ? '配置から外れました' : `${after.waterGardens}か所の配置になりました`}。`;
+      } else if (before.receiver !== after.receiver) {
+        place = '沖の受電翼'; effect = after.receiver === 'none' ? '海上の受電翼は配置から外れました。' : `海上の受電翼は${after.receiver === 'small' ? '小さな' : '大きな'}配置になりました。`;
+      } else if (before.flywheel !== after.flywheel) {
+        place = 'フジテレビ前・蓄電環'; effect = after.flywheel ? '劇場の前に、独立した蓄電環が加わりました。' : '劇場の前の蓄電環は配置から外れました。';
+      } else {
+        place = '沖のエネルギー島'; effect = after.island ? '沖に、原子力施設を置く島と検修橋が加わりました。' : '沖のエネルギー島と検修橋は配置から外れました。';
+      }
+    }
     effect = `ほかの住民の声と重なり、${effect}`;
   } else if (changes) {
     const direction = AXES.some(axis => proposal.beforeScores[axis] !== proposal.afterScores[axis]);
     kind = direction ? 'direction' : 'maintained';
-    effect = direction ? '街の方向は少し動きましたが、見えている施設の構成は維持されました。' : '思いは記録され、見えている施設の構成は維持されました。';
+    if (proposal.votes.energy) {
+      effect = '思いは住民の声に加わり、街のエネルギー設備は今の配置を受け継いでいます。';
+    } else effect = direction ? '街の方向は少し動きましたが、見えている施設の構成は維持されました。' : '思いは記録され、見えている施設の構成は維持されました。';
   }
   return { preference, effect, place, kind };
 }

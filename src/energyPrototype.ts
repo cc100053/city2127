@@ -9,6 +9,8 @@ export const ENERGY_OPTIONS = {
   mixed: 'M1 · 混合配置',
 } as const;
 export type EnergyOption = keyof typeof ENERGY_OPTIONS;
+import type { EnergyConfiguration } from '../survey/src/shared/energy.ts';
+export type { EnergyConfiguration } from '../survey/src/shared/energy.ts';
 
 // A narrated storage cycle, not a power / fluid simulation. Time is absolute for reproducible captures.
 export function energyCycle(seconds: number, reducedMotion = false) {
@@ -20,7 +22,7 @@ export function energyCycle(seconds: number, reducedMotion = false) {
   return { t, phase, level, angle: reducedMotion ? .7 : Math.floor(seconds / 60) * 3.6 + angle };
 }
 
-/** DEV city composition only; independent of Meter scores and engineering capacity. */
+/** Shared authored geometry for DEV comparisons and the authoritative energy runtime. */
 export function energyPrototype() {
   const root = new T.Group(); root.name = 'energy-prototype';
   const wing = new T.Group(), garden = new T.Group(), ring = new T.Group(), island = new T.Group();
@@ -168,14 +170,25 @@ export function energyPrototype() {
   });
   const pose = new T.Object3D(), from = new T.Vector3(), to = new T.Vector3();
   let option: EnergyOption = 'baseline';
+  let configuration: EnergyConfiguration;
+  function configure(next: EnergyConfiguration) {
+    configuration = { ...next };
+    wing.visible = next.receiver !== 'none';
+    wing.scale.setScalar(next.receiver === 'small' ? .65 : 1);
+    garden.visible = next.waterGardens > 0;
+    garden2.visible = next.waterGardens === 2;
+    ring.visible = next.flywheel;
+    island.visible = next.island;
+    distribution.visible = garden.visible || wing.visible || ring.visible || island.visible;
+  }
   function select(next: EnergyOption) {
     option = next;
-    wing.visible = next === 'a' || next === 'b' || next === 'mixed';
-    wing.scale.setScalar(next === 'a' ? .65 : 1);
-    garden.visible = garden2.visible = next === 'a' || next === 'mixed';
-    ring.visible = next === 'b' || next === 'mixed';
-    island.visible = next === 'c' || next === 'mixed';
-    distribution.visible = next !== 'baseline';
+    configure({
+      waterGardens: next === 'a' || next === 'mixed' ? 2 : 0,
+      receiver: next === 'a' ? 'small' : next === 'b' || next === 'mixed' ? 'large' : 'none',
+      flywheel: next === 'b' || next === 'mixed',
+      island: next === 'c' || next === 'mixed',
+    });
   }
   for (const flow of flows) flow.boundingSphere = new T.Sphere(new T.Vector3(5, 12, 0), 20);
   function update(seconds: number, reducedMotion = false) {
@@ -196,7 +209,7 @@ export function energyPrototype() {
       flows[i].instanceMatrix.needsUpdate = true;
     }
     for (const markers of deliveries) {
-      markers.visible = reducedMotion || option === 'c' || cycle.phase === 'release';
+      markers.visible = reducedMotion || (configuration.waterGardens === 0 && !configuration.flywheel) || cycle.phase === 'release';
       for (let j = 0; j < 3; j++) {
         pose.position.set(3.4, 2.6, 35 + 15 * ((j / 3 + (reducedMotion ? 0 : seconds * .06)) % 1));
         pose.updateMatrix(); markers.setMatrixAt(j, pose.matrix);
@@ -206,5 +219,5 @@ export function energyPrototype() {
     return cycle;
   }
   select(option); update(0);
-  return { root, parts, gardens, rotor, select, update, get option() { return option; } };
+  return { root, parts, gardens, rotor, select, configure, update, getConfiguration: () => ({ ...configuration }), get option() { return option; } };
 }

@@ -103,7 +103,7 @@ assert.equal(exhibitionStateLayout({ ...zeroScores(), automation: 1.5 }, 40).ban
 assert.equal(exhibitionStateLayout({ ...zeroScores(), automation: 7.5 }, 1).automatedPorts, 5);
 assert.throws(() => exhibitionStateLayout({ ...zeroScores(), automation: 13 }, 5), RangeError);
 
-const questionPath = new URL('../src/survey/questions.exhibition.json', import.meta.url).pathname;
+const questionPath = new URL('../src/survey/questions.exhibition.v3.json', import.meta.url).pathname;
 const questionSet = validateExhibitionQuestionSet(loadQuestionSetFile(questionPath));
 assert.equal(questionSet.version, 3);
 assert.equal(validateExhibitionQuestionSet({ ...questionSet, version: 2 }).version, 2);

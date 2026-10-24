@@ -23,13 +23,13 @@ Guest／Monitor／Admin は同じ HTTP server の `dist` から配信します�
 | SURVEY_STATIC_DIR | dist | build 済み Guest／Monitor／Admin |
 | SURVEY_DEV_AUTO | 未設定 | `1` の場合だけ localhost DEV-auto endpoint を有効化 |
 
-SQLite は現在 **schema 7**（`PRAGMA user_version`）、proposal algorithm / CityView は **version 2**です。Schema 番号と API version は別です。Schema 3 は旧 v1 run を終了して v2 run を開始し履歴を残しました。Schema 7 は既存 v2 状態／履歴を保ち A/B station を追加します。`migrations.ts` は append-only；適用済み migration を書き換えません。
+SQLite は現在 **schema 8**（`PRAGMA user_version`）、proposal algorithm / CityView は **version 2**です。Schema 番号と API version は別です。Schema 3 は旧 v1 run を終了して v2 run を開始し履歴を残しました。Schema 7 は既存 v2 状態／履歴を保ち A/B station を追加します。`migrations.ts` は append-only；適用済み migration を書き換えません。
 
 ## 四問、一つの提案
 
 [questions.exhibition.json](src/survey/questions.exhibition.json) に automation / publicSharing / environmentalPriority / urbanConcentration の四問と各 −1／0／+1 option を定義します。Draft と review は街を変えず、全四問を一つの transaction で提出します。Effects は server の JSON から取得し、クライアントからの偽の値は採用しません。
 
-v2 state は `voteSums`、`recentVotes`、`guestCount`、`revision` と四軸 scores を保持します。毎軸 `sum += vote`、`recent=.75*recent+.25*vote`、`score=6*(sum/guestCount+recent)`（±12）。最新票も共同履歴も反映し、中性票は recent を衰減させます。旧 v1 の加算 clamp／条件付き一人一問 trigger は展示会の仕様ではありません。
+v2 state は `voteSums`、`recentVotes`、`guestCount`、`revision` と四軸 scores を保持します。E4の三つの現行Meterは `sum += vote`、`recent=.75*recent+.25*vote`、`score=6*(sum/guestCount+recent)`（±12）。最新票も共同履歴も反映し、中性票は recent を衰減させます。Q3のenergyは独立累計、旧気候には投票せず、気候の計算と展示刻度は旧気候回答数を保持します。旧 v1 の加算 clamp／条件付き一人一問 trigger は展示会の仕様ではありません。
 
 [cityView.ts](src/shared/cityView.ts) が layout の唯一の authority。v2 view は layout、最新提案／最大64件の履歴、完全な active run 履歴から得た四軸 `slotSeeds` を含みます。Undo の revoked proposal は replay／counts／seeds から除外します。Root v2 は site と district を描画し、module-swap は v2 を拒否します。
 
@@ -78,7 +78,7 @@ Admin は loopback、POST は同一 origin も検査します。各 command は 
 | src/survey | JSON validation、reducer、replay/history |
 | src/server/proposalService.ts | session、canonical proposal、atomic accumulation／idempotency、station lease |
 | src/server/adminService.ts | lifecycle/reset/Undo/display setting |
-| src/server/runStore.ts / migrations.ts | schema 7、restoration、active history／slotSeeds |
+| src/server/runStore.ts / migrations.ts | schema 8、restoration、active history／slotSeeds |
 | src/server/server.ts / realtime.ts | API／static／loopback guard／WS |
 | src/ui | Guest flow/recovery、Admin、Monitor；独立スコア計算なし |
 
@@ -110,3 +110,7 @@ v1 の質問予約／trigger／加算 clamp／一人一問コードと tests は
 2026-10-02 P2：正式question-setはversion3です（algorithm／CityView v2、schema7とは別）。住民の問い／背景、送信前確認、保存／待機／街を見る案内をGuestに接続し、結果の回答／Meter／施設表はCity側の短い解説に置き換えました。旧草稿は新しい予約へ有効な選択を引き継ぎ、A/Bは自分の旧予約を既存end endpointで終了します。保存済みversion2提案は原文のまま同IDで回復でき、SQLiteを削除しません。時刻／lease／resetは変更していません。[P2 handoff](../docs/handoffs/archive/resident-experience-p2.md)。
 
 2026-10-02 P3は上記P2の時刻条件を更新します：server/root/Guestは共通10秒閲覧枠を予約し、3秒の都市転換を保持。早い交代はreleaseを枠の終わりまで待ち、resetは両stationをdrainします。retry/reloadは残り時間のみ、result leaseは開始+15秒で固定。rootはeffective carrier配置／可視pairing／seed後の実分布を比較し、個人の声と共同結果を区別。切断／再接続／Undo／reduced motion／期限切れイベントは即復元、照明のみのsnapshotは有効queueを保持。[P3 handoff](../docs/handoffs/archive/resident-experience-p3.md)。
+
+## E4 energy question (2026-10-24)
+
+Question-set4 replaces only Q3 with four independent energy preferences. Algorithm/CityView remain2; SQLite8 adds nullable snapshot energy state without rewriting old events or copy. Rebuild/restart survey and refresh City/Guest together; keep the existing database. Obsolete drafts require a fresh reservation and a new Q3 answer; valid Q1/Q2/Q4 choices and committed same-ID retries remain recoverable. Climate is absent from new proposals, retaining its historical score/EMA and original display count. Energy tallies are cumulative, independent of the three active Meters; see the [formal energy contract](../docs/ENERGY_CITY_PLAN.md#e4正式接入2026-10-24). DEV auto profiles cover three Meters; energy is selected separately or rotates over its four choices.

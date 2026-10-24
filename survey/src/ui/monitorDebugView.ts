@@ -1,4 +1,5 @@
 import './debug.css';
+import { emptyEnergyConfiguration, sameEnergyConfiguration } from '../shared/energy.ts';
 import type { CityView } from '../shared/cityView.ts';
 import { isExhibitionCityView } from '../shared/cityView.ts';
 import type { ServerEvent } from '../shared/protocol.ts';
@@ -40,10 +41,12 @@ function onEvent(event: ServerEvent) {
   if ('proposal' in event) {
     const proposal = event.proposal;
     const choices = proposal.answers.map(answer => answer.optionLabel).join(' · ');
+    const changes = proposal.cityChanges.map(change => change.label);
+    if (!sameEnergyConfiguration(proposal.beforeLayout.energy ?? emptyEnergyConfiguration(), proposal.afterLayout.energy ?? emptyEnergyConfiguration())) changes.push('エネルギー配置');
     last.replaceChildren(
       el('p', {}, choices),
       el('p', {}, `提案 #${proposal.ordinal} · revision ${proposal.revisionBefore} → ${proposal.revisionAfter}`),
-      el('p', { class: 'meta' }, `提案ID ${proposal.id} · ${proposal.cityChanges.map(change => change.label).join('、') || '構成を維持'}`));
+      el('p', { class: 'meta' }, `提案ID ${proposal.id} · ${changes.join('、') || '構成を維持'}`));
     log.prepend(el('li', {}, `rev ${proposal.revisionAfter}: ${choices}`));
     while (log.children.length > 30) log.lastElementChild?.remove();
     return;

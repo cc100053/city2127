@@ -1,15 +1,16 @@
+import type { EnergyChoice } from '../shared/energy.ts';
 import type { DevSurveyConfig } from '../shared/devSurvey.ts';
 import type { Vote } from '../shared/citySurveyState.ts';
 import type { ProposalData, ProposalSessionData, AdminCurrentRun } from '../shared/protocol.ts';
 
 export type AutoProfile = 'low' | 'zero' | 'high' | 'mixed' | 'custom' | 'random';
-export type AutoSettings = { profile: AutoProfile; count: number; seed: number; extraWaitMs: number; custom: Record<string, Vote> };
+export type AutoSettings = { profile: AutoProfile; count: number; seed: number; extraWaitMs: number; custom: Record<string, Vote>; energy?: EnergyChoice };
 
 /** Data-driven across any number of Meter descriptors; never depends on option order. */
 export function selectAutoAnswers(config: DevSurveyConfig, settings: AutoSettings, ordinal: number) {
   let seed = (settings.seed + Math.imul(ordinal + 1, 0x9e3779b9)) >>> 0;
   const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
-  return config.meters.map((meter, index) => {
+  const answers = config.meters.map((meter, index) => {
     const vote = settings.profile === 'low' ? -1 : settings.profile === 'high' ? 1 : settings.profile === 'zero' ? 0
       : settings.profile === 'mixed' ? ([-1, 0, 1] as const)[(index + ordinal) % 3]
         : settings.profile === 'random' ? ([-1, 0, 1] as const)[Math.floor(random() * 3)] : settings.custom[meter.axis];
@@ -17,6 +18,12 @@ export function selectAutoAnswers(config: DevSurveyConfig, settings: AutoSetting
     if (!option) throw new Error(`No option for ${meter.axis}: ${vote}`);
     return { questionId: meter.questionId, optionId: option.id };
   });
+  if (config.energy) {
+    const choice = settings.energy ?? config.energy.options[ordinal % config.energy.options.length].id;
+    if (!config.energy.options.some(o => o.id === choice)) throw new Error('Invalid energy choice');
+    answers.push({ questionId: config.energy.questionId, optionId: choice });
+  }
+  return answers;
 }
 
 export type AutoDriver = {
@@ -46,7 +53,7 @@ export async function runAutoAnswers(config: DevSurveyConfig, settings: AutoSett
     const session = await driver.start(signal);
     active();
     if (session.session.questionSetVersion !== config.questionSetVersion
-        || session.questions.length !== config.meters.length) throw new Error('Question configuration changed');
+        || session.questions.length !== config.meters.length + (config.energy ? 1 : 0)) throw new Error('Question configuration changed');
     const assertOwnDraft = async () => {
       const current = await driver.readAdmin();
       active();

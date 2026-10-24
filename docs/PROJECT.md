@@ -9,12 +9,12 @@ The single exhibition venue is the **Odaiba waterfront in 2127**. Shibuya is a c
 | Package | Current responsibility |
 | --- | --- |
 | Root `src/` | Vite / TypeScript / Three.js WebGL 2 exhibition city; standalone and `?survey` |
-| `survey/` | Four-question v2 proposal API, reducer, authoritative layout, SQLite schema 7, WebSocket, Guest / Monitor / loopback Admin |
+| `survey/` | Four-question v2 proposal API, reducer, authoritative layout, SQLite schema 8, WebSocket, Guest / Monitor / loopback Admin |
 | `module-swap/` | Preserved standalone / legacy v1 four-lot demonstrator; rejects v2 and is not the exhibition city |
 
 Desktop-only presentation, with normal renderer resize. Do not add adaptive camera/mobile acceptance. Ambient people, vehicles, drones and aerial routes are allowed. Low/zero/high Meter values all depict mature 2127 alternatives. No deployment workflow is configured.
 
-Resident [P1 copy](RESIDENT_COPY.md) is wired by [P2](handoffs/archive/resident-experience-p2.md). Guest handles questions/background, choices, review, save/wait/retry, shared station/ordinal identity and the look-up prompt; results have no answer/score/facility tables. The existing single-revision conflict review still displays scores for recovery. Question-set version **3** is independent of algorithm/CityView v2 and SQLite schema7. Older reserved drafts are rejected by the existing version guard, then valid choices can be carried into a fresh reservation; A/B ends its own obsolete reservation through the existing endpoint first. Stored version2 proposals retain their original question/option copy and remain idempotently recoverable after upgrade.
+Resident [P1 copy](RESIDENT_COPY.md) is wired by [P2](handoffs/archive/resident-experience-p2.md). Guest handles questions/background, choices, review, save/wait/retry, shared station/ordinal identity and the look-up prompt; results have no answer/score/facility tables. The existing single-revision conflict review still displays scores for recovery. Question-set version **4** (energy E4, 2026-10-24) is independent of algorithm/CityView v2 and SQLite schema8; P2 introduced version3 copy. Older reserved drafts are rejected by the existing version guard, then valid choices can be carried into a fresh reservation; A/B ends its own obsolete reservation through the existing endpoint first. Stored version2 proposals retain their original question/option copy and remain idempotently recoverable after upgrade.
 
 Root reuses `surveyAtmosphere`'s panel for one fixed desktop reading card at the top right (moved from the left 2026-10-04: at 1280–3840 px wide all four focal sites project left of it): title, at most two sentences and named location. Ambient background/facility cards rotate locally every12s; current-run proposals, never lifetime participation alone, allow the inherited-city card. Service/shared-seat counts, Park tree/cooling quantities and the tower's rendered band select focal facility descriptions. Even low Park retains trees, so trees+cooling uses the combined card; these are descriptions of current facilities, not district change inference. The rotation opens with `intro.origin` (who has decided cities so far; added 2026-10-19), then the identity card, whose body is shortened to its first two P1 sentences. P3 live results reserve10s: identity/location during the existing3s transition, then one selected preference plus one collective effect until the slot ends. `CityChangeManager.applyExhibitionLayout` returns focal/district evidence by comparing effective `getConfiguration()` targets, including slot distribution, rendered hybrids, visible pairing products, published roofs/facades and actual fleet counts. Hidden tower extras and seed changes alone are not visual evidence. Focal quantities name only their own site; district-only changes use district locations and conservative configuration wording. No evidence after a missed predecessor uses the recorded fallback; unchanged targets distinguish score-direction changes from maintained configuration. Snapshot/reset/Undo replaces the card immediately; reload does not replay an old result. Lighting-only snapshots do not restart cards or skip queued changes.
 
@@ -38,6 +38,7 @@ The [resident experience plan](RESIDENT_EXPERIENCE_PLAN.md) records P1–P3 impl
 | [surveyAtmosphere.ts](../src/surveyAtmosphere.ts) | Legacy v1 atmosphere/feedback and v2 resident ambient/result panel; forwards authoritative views |
 | [changeCatalog.ts](../src/changeCatalog.ts), [cityChangeManager.ts](../src/cityChangeManager.ts), [createCityChangeManager.ts](../src/createCityChangeManager.ts) | Compatible internal site registry, layout targets, site/district lifecycle, 3 s retargeting and live markers |
 | [siteBuilders](../src/siteBuilders/index.ts), [siteRuntime.ts](../src/siteBuilders/siteRuntime.ts), [siteAssets](../src/siteAssets/assetCatalog.ts) | Four focal site builders, additive layers, GLB bounds/cache/fallback and late-load synchronization |
+| [energyRuntime.ts](../src/energyRuntime.ts), [energyPrototype.ts](../src/energyPrototype.ts) | Server能源配置的實際模型／局部淡入與60秒動態；DEV比較重用同一幾何 |
 | [districtMeters.ts](../src/districtMeters.ts), [devMeters.ts](../src/devMeters.ts) | District carriers, hybrid/pairing/seeded slot selection, pulse/motion; DEV-only Meter review controls |
 | [voteJourney.ts](../src/voteJourney.ts) | Live vote journey (2026-10-13): Meter-colour orbs, scan rings and per-guest lanterns (latest 64), additive and unlit, named `meter-pulse` so GTAO skips them |
 | [energyPrototype.ts](../src/energyPrototype.ts), [devEnergy.ts](../src/devEnergy.ts) | DEV-only E3能源城市組合／五配置及慢速儲能流程；不讀Meter、不接survey；見[能源計劃](ENERGY_CITY_PLAN.md) |
@@ -131,10 +132,10 @@ occupancy simulation.
 
 | Area | Responsibility |
 | --- | --- |
-| [shared](../survey/src/shared/cityView.ts) | v1/v2 state/view/protocol contracts; authoritative policy → layout (v2 through Scale A display scores, `exhibitionStateLayout(scores, guestCount)`, since 2026-10-13) |
+| [shared](../survey/src/shared/cityView.ts) | v1/v2 state/view/protocol contracts; authoritative policy → layout (v2 through Scale A display scores, `exhibitionStateLayout(scores, guestCount, energy?)`, since 2026-10-13) |
 | [questionLoader](../survey/src/survey/questionLoader.ts), [scoreEngine](../survey/src/survey/scoreEngine.ts), [decisionHistory](../survey/src/survey/decisionHistory.ts) | Versioned four-axis question copy (currently3), shared reducer/replay, immutable view history |
 | [server](../survey/src/server/server.ts), [realtime](../survey/src/server/realtime.ts) | HTTP/static pages, loopback/same-origin Admin guard, snapshots/updates/reset broadcasts |
-| [database](../survey/src/server/database.ts), [migrations](../survey/src/server/migrations.ts), [runStore](../survey/src/server/runStore.ts) | SQLite schema 7, transaction/restoration, active proposal replay, seeds/counts |
+| [database](../survey/src/server/database.ts), [migrations](../survey/src/server/migrations.ts), [runStore](../survey/src/server/runStore.ts) | SQLite schema 8, transaction/restoration, active proposal replay, seeds/counts |
 | [proposalService](../survey/src/server/proposalService.ts), [adminService](../survey/src/server/adminService.ts) | Atomic submission/idempotency, single/A/B sessions, leases/reset drain, Undo, display mode |
 | [Guest](../survey/src/ui/guestDebugView.ts), [guestFlow](../survey/src/ui/guestFlow.ts), [Admin](../survey/src/ui/adminView.ts), [Monitor](../survey/src/ui/monitorDebugView.ts) | Presentation/API adapters, recovery and local draft; no independent score calculation |
 
@@ -147,3 +148,17 @@ Single mode automatically hands off at next Start and applies a queued reset aft
 Root tests/build cover root only; install survey dependencies for the real HTTP/WebSocket pipeline tests. Survey and module-swap have separate checks. Browser/performance evidence is tied to the captured commit/device, never inferred from geometry counts or earlier Shibuya FPS. S5, input hardware and exhibition-day recovery policy remain unresolved. See [current validation](VALIDATION.md) and [document index](README.md).
 
 The [previous implementation map](history/PROJECT_2026-10-02.md) is an archived mixed-stage snapshot for old deep links. It is not an architecture authority or a list of future work.
+
+### E4配置接口準備（2026-10-24，非正式接入）
+
+`energyPrototype.configure(EnergyConfiguration)`可獨立設定0／1／2處水庭、無／小／大接收翼、儲能環及能源島；`getConfiguration()`回傳目標的副本。原DEV `select()`五預設沿用此接口，幾何／材質不重建。無儲能的組合沿用外部供電／持續配電，有儲能時沿用60秒節拍。新增36種組合的模型檢查；[E4準備證據](../artifacts/energy-city-e4/README.md)。正式survey、CityView、四軸及schema未變；Q3取捨待[能源方案](ENERGY_CITY_PLAN.md#e4評審草案四題與能源權威配置2026-10-24待產品決定)確認，不能把此接口當作正式權威鏈已接通。
+
+### E4正式能源資料流（2026-10-24，取代上方準備狀態）
+
+使用者已確認只替換Q3，三題及其Meter語義保持。正式Q3 `energy-2127`有四個獨立能源取捨；question-set4，CityView／algorithm2，SQLite8。`shared/energy.ts`定義嚴格配置／counts與門檻，proposalService只接收四對question／option ids；`applyProposalVotes`將energy作獨立累計，跳過其environmentalPriority零佔位，保存climateGuestCount。舊氣候EMA／sum／score維持，Scale A亦用舊氣候回答數；其餘三軸沿用目前guestCount。原四軸key保留為歷史契約，不能把第四個新答案當氣候中性票。
+
+`exhibition_snapshots.energy_json`為nullable；舊事件及snapshot重播沒有energy，保留原JSON／原文與idempotency。新事件在votes_json記類別、before／after_state_json保存完整新狀態；replay／Undo用同一reducer。資料一致性包括counts總和、氣候回答數與原score公式。`runStore.toProposalRecord`及viewOf讀權威layout，近期64筆不截斷持久counts。新問卷不接受舊session，Guest既有重新預約復原保留仍有效的Q1／Q2／Q4；Q3須重新選擇。開新run時沒有繼承氣候票，維持D=0的成熟混合氣候。
+
+`layout.energy`列水庭數、接收翼尺寸、環與島；root parser接受舊v2（無energy），嚴格驗證新欄位／counts／answer類別與view一致。`createCityChangeManager`建立一次EnergyRuntime，沿用energyPrototype幾何及60秒動態；standalone不建立，DEV Meter沒有energy時隱藏。Main既有約2.6秒journey＋3秒過渡保留，能源光點及lantern轉到沿岸能源接點；舊氣候歷史仍落原公園。Snapshot／Undo／reset／reconnect／reduced motion立即套用，能源設備以局部材質淡入／淡出3秒，橋面、支承與公共路高度保持，接收翼尺寸另平滑變化；材質副本按組一次建立，沿用原材質日夜發光／反射更新，沒有逐幀新資源。
+
+CityChangeManager將能源實際前後target加入CarrierChange，residentResult只以這項證據描述一個真的設備差異；無設備差異明確延續目前能源配置，缺少前後證據只確認保存。能源ambient卡只依存在設備加入。`proposal.cityChanges`仍列四個focal差異，能源前後在beforeLayout／afterLayout.energy；Monitor另外顯示能源配置，不將focal清單為空當作整座城市沒變。DEV自動答題保留三軸數值profile，能源另選／四類輪替，不把其選項塞成數值Meter。

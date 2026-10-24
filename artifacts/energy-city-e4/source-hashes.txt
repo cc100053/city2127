@@ -1,0 +1,2 @@
+a12194e234cb89446b8ca7f32c23577b36826cb0914cf5c55239fa0a5642ff7c  src/energyPrototype.ts
+a1235a30b84093378f7f52963cb7ec461e6171d5bb6e47d33f6fcc0d39f36453  tests/energyPrototype.test.ts

@@ -1,7 +1,8 @@
+import type { EnergyChoice } from './energy.ts';
 import type { CityAxis, CityScores } from './citySurveyState.ts';
 
 export type CityEffects = Partial<CityScores>;
-export type QuestionOption = { id: string; label: string; effects: CityEffects };
+export type QuestionOption = { id: string; label: string; effects: CityEffects; energy?: EnergyChoice };
 /** Every listed axis must satisfy its bounds (inclusive). No trigger: always eligible. */
 export type QuestionTrigger = Partial<Record<CityAxis, { gte?: number; lte?: number }>>;
 /**

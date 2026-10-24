@@ -1,3 +1,4 @@
+import { isEnergyChoice } from '../shared/energy.ts';
 import type { DatabaseSync, SQLOutputValue } from 'node:sqlite';
 import { CITY_AXES, zeroScores, initialCitySurveyState, initialExhibitionState, isCityAxis, type CitySurveyState, type ExhibitionState, type ExhibitionVotes } from '../shared/citySurveyState.ts';
 import type { AnswerEvent, RunSummary } from '../shared/protocol.ts';
@@ -116,6 +117,7 @@ export function readExhibitionSnapshot(db: DatabaseSync, runId: string): Exhibit
       environmentalPriority: real(row, 'environmental_priority'), urbanConcentration: real(row, 'urban_concentration'),
     },
     updatedAt: str(row, 'updated_at'),
+    ...(row.energy_json !== null ? { energy: parseJson(str(row, 'energy_json'), 'snapshot energy') as ExhibitionState['energy'] } : {}),
   };
   if (num(row, 'algorithm_version') !== 2) throw new CorruptStateError(`exhibition snapshot of run ${runId} has an unsupported algorithm`);
   try { validateExhibitionState(state); }
@@ -129,8 +131,8 @@ export function writeExhibitionSnapshot(db: DatabaseSync, state: ExhibitionState
   db.prepare(`INSERT INTO exhibition_snapshots (run_id, revision, guest_count, algorithm_version,
       vote_sum_automation, vote_sum_public_sharing, vote_sum_environmental_priority, vote_sum_urban_concentration,
       recent_automation, recent_public_sharing, recent_environmental_priority, recent_urban_concentration,
-      automation, public_sharing, environmental_priority, urban_concentration, updated_at)
-    VALUES (?, ?, ?, 2, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      automation, public_sharing, environmental_priority, urban_concentration, updated_at, energy_json)
+    VALUES (?, ?, ?, 2, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(run_id) DO UPDATE SET revision = excluded.revision, guest_count = excluded.guest_count,
       algorithm_version = excluded.algorithm_version, vote_sum_automation = excluded.vote_sum_automation,
       vote_sum_public_sharing = excluded.vote_sum_public_sharing,
@@ -141,10 +143,10 @@ export function writeExhibitionSnapshot(db: DatabaseSync, state: ExhibitionState
       recent_urban_concentration = excluded.recent_urban_concentration,
       automation = excluded.automation, public_sharing = excluded.public_sharing,
       environmental_priority = excluded.environmental_priority, urban_concentration = excluded.urban_concentration,
-      updated_at = excluded.updated_at`)
+      updated_at = excluded.updated_at, energy_json = excluded.energy_json`)
     .run(state.runId, state.revision, state.guestCount, sums.automation, sums.publicSharing, sums.environmentalPriority, sums.urbanConcentration,
       recent.automation, recent.publicSharing, recent.environmentalPriority, recent.urbanConcentration,
-      s.automation, s.publicSharing, s.environmentalPriority, s.urbanConcentration, state.updatedAt);
+      s.automation, s.publicSharing, s.environmentalPriority, s.urbanConcentration, state.updatedAt, state.energy ? JSON.stringify(state.energy) : null);
 }
 
 export function createExhibitionRun(db: DatabaseSync, runId: string, at: string): ExhibitionState {
@@ -191,7 +193,8 @@ function parseVotes(json: string): ExhibitionVotes {
   const raw = parseJson<unknown>(json, 'proposal votes');
   if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) throw new CorruptStateError('proposal votes are malformed');
   const votes = raw as Record<string, unknown>;
-  if (Object.keys(votes).length !== CITY_AXES.length || CITY_AXES.some(axis => votes[axis] !== -1 && votes[axis] !== 0 && votes[axis] !== 1))
+  if (Object.keys(votes).length !== CITY_AXES.length + (Object.hasOwn(votes, 'energy') ? 1 : 0)
+      || (Object.hasOwn(votes, 'energy') && (!isEnergyChoice(votes.energy) || votes.environmentalPriority !== 0)) || CITY_AXES.some(axis => votes[axis] !== -1 && votes[axis] !== 0 && votes[axis] !== 1))
     throw new CorruptStateError('proposal votes are malformed');
   return votes as ExhibitionVotes;
 }
@@ -219,13 +222,15 @@ export function toProposalRecord(row: Row): ProposalRecord {
   const after = parseExhibitionState(str(row, 'after_state_json'), 'proposal after state');
   const votes = parseVotes(str(row, 'votes_json'));
   const answers = parseAnswers(str(row, 'answers_json'));
+  if (votes.energy && (num(row, 'question_set_version') < 4 || !answers.some(a => a.questionId === 'energy-2127' && a.optionId === votes.energy)))
+    throw new CorruptStateError('stored energy preference does not match its answer');
   const revisionBefore = num(row, 'revision_before'), revisionAfter = num(row, 'revision_after');
   if (before.runId !== runId || after.runId !== runId || before.revision !== revisionBefore || after.revision !== revisionAfter
       || revisionAfter !== revisionBefore + 1 || after.guestCount !== revisionAfter)
     throw new CorruptStateError(`proposal ${str(row, 'id')} has inconsistent revisions`);
   const expected = applyProposalVotes(before, votes, submittedAt);
   if (JSON.stringify(expected) !== JSON.stringify(after)) throw new CorruptStateError(`proposal ${str(row, 'id')} does not match its stored vote result`);
-  const beforeLayout = exhibitionStateLayout(before.scores, before.guestCount), afterLayout = exhibitionStateLayout(after.scores, after.guestCount);
+  const beforeLayout = exhibitionStateLayout(before.scores, before.guestCount, before.energy), afterLayout = exhibitionStateLayout(after.scores, after.guestCount, after.energy);
   return {
     id: str(row, 'id'), runId, guestSessionId: str(row, 'guest_session_id'), ordinal: after.guestCount,
     ...(row.station_id ? { stationId: str(row, 'station_id') as 'A' | 'B' } : {}),

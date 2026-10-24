@@ -1,3 +1,5 @@
+import type { EnergyChoice, EnergyState } from './energy.ts';
+
 // Shared by the survey server, debug views and tests. Keep this module free of Node and DOM APIs.
 /**
  * Policy axes: the urban strategies guests' choices push. They drive question triggers and the derived
@@ -19,11 +21,13 @@ export type CitySurveyState = {
 };
 
 export type Vote = -1 | 0 | 1;
-export type ExhibitionVotes = Record<CityAxis, Vote>;
+/** energy present: environmentalPriority is an unused zero placeholder, not a neutral climate vote. */
+export type ExhibitionVotes = Record<CityAxis, Vote> & { energy?: EnergyChoice };
 export type ExhibitionState = {
   runId: string;
   revision: number;
   guestCount: number;
+  energy?: EnergyState;
   algorithmVersion: 2;
   voteSums: CityScores;
   recentVotes: CityScores;

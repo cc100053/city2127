@@ -1,3 +1,5 @@
+import { emptyEnergyConfiguration, type EnergyConfiguration } from '../survey/src/shared/energy.ts';
+import type { EnergyRuntime } from './energyRuntime.ts';
 import type * as T from 'three';
 import { CHANGE_CATALOG, SITE_IDS, environmentParkTarget, selectExhibitionSiteVariants, selectSiteVariants, variantLayers, type SiteId, type SiteLayerDefinition, type SiteLayerId, type SiteVariantId } from './changeCatalog.ts';
 import type { BuiltSite, BuiltSiteMap, SiteLayerRuntime } from './siteBuilders/index.ts';
@@ -42,7 +44,7 @@ export interface SiteDiagnostic {
   readonly concentrationTower?: ReturnType<NonNullable<BuiltSite['concentrationTower']>['getDiagnostics']>;
 }
 
-export type CarrierChange = { socketId: LotSocketId; focal: boolean; district: boolean };
+export type CarrierChange = { socketId: LotSocketId; focal: boolean; district: boolean; energy?: { before: EnergyConfiguration; after: EnergyConfiguration } };
 
 export type CityChangeDiagnostics = Readonly<Record<SiteId, SiteDiagnostic>>;
 
@@ -65,8 +67,10 @@ export class CityChangeManager {
   private darkness = 0;
   private exhibitionInitialized = false;
 
-  constructor(sites: BuiltSiteMap) {
-    this.sites = sites;
+  readonly energy?: EnergyRuntime;
+
+  constructor(sites: BuiltSiteMap, energy?: EnergyRuntime) {
+    this.sites = sites; this.energy = energy;
     for (const siteId of SITE_IDS) {
       const built = sites[siteId];
       if (!built || built.id !== siteId) throw new Error(`Missing runtime for change site ${siteId}.`);
@@ -143,9 +147,10 @@ export class CityChangeManager {
       ].some(Boolean)],
     ] as const;
     for (const [siteId, siteChanged] of changed) if (siteChanged && fresh) this.markFresh(siteId, now);
-    return (Object.keys(districts) as LotSocketId[]).map(socketId => ({ socketId, focal: focal[socketId],
+    const energy = this.energy?.setTarget(layout.energy ?? emptyEnergyConfiguration(), now, immediate);
+    return [...(energy ? [{ socketId: 'ne' as const, focal: false, district: true, energy }] : []), ...(Object.keys(districts) as LotSocketId[]).map(socketId => ({ socketId, focal: focal[socketId],
       district: before[socketId] !== JSON.stringify(districts[socketId]?.getConfiguration()),
-    })).filter(change => change.focal || change.district);
+    })).filter(change => change.focal || change.district)];
   }
 
   get automationLevel(): number | undefined { return this.sites.magnetEast.automationDistrict?.level; }
@@ -176,6 +181,7 @@ export class CityChangeManager {
 
   update(now: number, darkness = this.darkness): void {
     this.lastUpdateNow = now; this.darkness = darkness;
+    this.energy?.update(now, prefersReducedMotion());
     this.sites.stationEastPark.environmentPark?.update(now);
     this.sites.stationEastPark.environmentDistrict?.update(now, darkness);
     this.sites.magnetEast.automationHub?.update(now);
@@ -263,6 +269,7 @@ export class CityChangeManager {
   }
 
   private restoreLegacyMode(now: number): void {
+    this.energy?.setTarget(emptyEnergyConfiguration(), now, true);
     if (!this.exhibitionInitialized) return;
     this.sites.stationEastPark.environmentPark?.restoreLegacy();
     this.sites.stationEastPark.environmentDistrict?.hide();

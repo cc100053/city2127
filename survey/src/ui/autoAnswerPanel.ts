@@ -1,3 +1,4 @@
+import type { EnergyChoice } from '../shared/energy.ts';
 import type { DevSurveyConfig } from '../shared/devSurvey.ts';
 import type { ApiResponse, AdminCurrentRun } from '../shared/protocol.ts';
 import type { Vote } from '../shared/citySurveyState.ts';
@@ -20,7 +21,7 @@ export async function mountAutoAnswerPanel(guest: Pick<AutoDriver, 'start' | 'an
   const config = configResponse.data;
   document.body.classList.add('dev-auto-page');
   const profile = el('select', { 'data-dev-profile': '', 'aria-label': '回答パターン' },
-    ...Object.entries({ low: '全て −1', zero: '全て 0', high: '全て +1', mixed: '混合・輪替', custom: '軸ごとに指定', random: 'シード付きランダム' })
+    ...Object.entries({ low: '全Meter −1', zero: '全Meter 0', high: '全Meter +1', mixed: '混合・輪替', custom: '軸ごとに指定', random: 'シード付きランダム' })
       .map(([value, label]) => el('option', { value }, label)));
   profile.value = 'high';
   const count = el('input', { type: 'number', min: '1', max: '1000', value: '10', 'data-dev-count': '', 'aria-label': '提案数' });
@@ -30,6 +31,7 @@ export async function mountAutoAnswerPanel(guest: Pick<AutoDriver, 'start' | 'an
     ...meter.options.map(option => el('option', { value: String(option.vote) }, `${option.vote > 0 ? '+' : ''}${option.vote}: ${option.label}`)))]));
   const customRows = el('details', {}, el('summary', {}, '軸ごとの指定'), ...config.meters.map(meter =>
     el('label', {}, meter.axis, custom.get(meter.axis)!)));
+  const energy = el('select', { 'aria-label': 'エネルギーの回答' }, el('option', { value: '' }, '四つの選択を輪替'), ...(config.energy?.options ?? []).map(o => el('option', { value: o.id }, o.label)));
   const status = el('p', { role: 'status', 'aria-live': 'polite', 'data-dev-status': '' }, '待機中');
   const output = el('pre', { 'data-dev-output': '' });
   const start = el('button', { type: 'button', 'data-dev-start': '' }, '自動回答を開始');
@@ -41,10 +43,10 @@ export async function mountAutoAnswerPanel(guest: Pick<AutoDriver, 'start' | 'an
     start.disabled = true;
     stop.disabled = false;
     status.textContent = '実行中…';
-    const controls = [profile, count, seed, wait, ...custom.values()];
+    const controls = [profile, count, seed, wait, energy, ...custom.values()];
     controls.forEach(control => { control.disabled = true; });
     const settings = { profile: profile.value as AutoProfile, count: Number(count.value), seed: Number(seed.value),
-      extraWaitMs: Number(wait.value) * 1000,
+      energy: energy.value ? energy.value as EnergyChoice : undefined, extraWaitMs: Number(wait.value) * 1000,
       custom: Object.fromEntries([...custom].map(([axis, select]) => [axis, Number(select.value) as Vote])) };
     try {
       await runAutoAnswers(config, settings, {
@@ -70,6 +72,6 @@ export async function mountAutoAnswerPanel(guest: Pick<AutoDriver, 'start' | 'an
     el('p', {}, 'このサーバーのDBに記録します。npm run dev:auto の独立テストDBを使ってください。次の質問開始時に自動で交代します。展示前に削除、または管理画面へ移動してください。'),
     el('p', {}, '未完了の体験の終了・都市のリセットは ', el('a', { href: '/admin', target: '_blank' }, '管理画面（/admin）'), ' で操作してください。'),
     el('label', {}, '回答パターン', profile), el('label', {}, '提案数', count), el('label', {}, 'シード', seed),
-    el('label', {}, '追加待ち時間（秒）', wait), customRows,
+    el('label', {}, '追加待ち時間（秒）', wait), customRows, ...(config.energy ? [el('label', {}, 'エネルギー（Meterとは独立）', energy)] : []),
     el('p', {}, '各問 0.3 秒 · 結果 10 秒 · 引継ぎ 5 秒'), start, stop, status, output));
 }

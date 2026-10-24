@@ -21,6 +21,26 @@ for (const option of Object.keys(ENERGY_OPTIONS) as (keyof typeof ENERGY_OPTIONS
   assert.equal(study.option, option);
   assert.deepEqual(Object.entries(study.parts).filter(([, g]) => g.visible).map(([key]) => key), expected[option]);
 }
+// Every independent composition uses the authored geometry, including combinations absent from DEV presets.
+for (const waterGardens of [0, 1, 2] as const) for (const receiver of ['none', 'small', 'large'] as const)
+  for (const flywheel of [false, true]) for (const island of [false, true]) {
+    const configuration = { waterGardens, receiver, flywheel, island };
+    study.configure(configuration);
+    assert.deepEqual(study.getConfiguration(), configuration);
+    assert.equal(study.gardens[0].visible, waterGardens > 0);
+    assert.equal(study.gardens[1].visible, waterGardens === 2);
+    assert.equal(study.parts.wing.visible, receiver !== 'none');
+    assert.equal(study.parts.wing.scale.x, receiver === 'small' ? .65 : 1);
+    assert.equal(study.parts.ring.visible, flywheel);
+    assert.equal(study.parts.island.visible, island);
+    assert.equal(study.parts.distribution.visible, waterGardens > 0 || receiver !== 'none' || flywheel || island);
+    study.update(10);
+    const delivery = study.root.getObjectByName('energy-distribution-flow')!;
+    assert.equal(delivery.visible, waterGardens === 0 && !flywheel, 'external supply runs without a storage cycle');
+    const copy = study.getConfiguration(); copy.island = !island;
+    assert.deepEqual(study.getConfiguration(), configuration, 'configuration evidence cannot mutate the model target');
+  }
+study.select('mixed');
 const after: string[] = []; study.root.traverse(o => { if (o instanceof Mesh && !(o instanceof InstancedMesh)) after.push(o.uuid); });
 assert.deepEqual(after, originalMeshes, 'switching configurations reuses the same geometry'); assert.ok(count < 50, 'static study batches by shared finish');
 const core = civicCore(); core.updateMatrixWorld(true);

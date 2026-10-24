@@ -1,3 +1,4 @@
+import { energyConfiguration, type EnergyState, type EnergyConfiguration } from './energy.ts';
 import type { CityScores, ExhibitionVotes } from './citySurveyState.ts';
 
 /**
@@ -32,6 +33,7 @@ export type ExhibitionSocketId = typeof EXHIBITION_SOCKET_IDS[number];
 export type Band = 'low' | 'mixed' | 'high';
 export type ExhibitionLayout = {
   version: 2;
+  energy?: EnergyConfiguration;
   bands: Record<ExhibitionSocketId, Band>;
   automatedPorts: number;
   sharedSeats: number;
@@ -72,6 +74,7 @@ export type ExhibitionCityView = {
   runId: string;
   revision: number;
   guestCount: number;
+  energy?: EnergyState;
   algorithmVersion: 2;
   voteSums: CityScores;
   recentVotes: CityScores;
@@ -151,8 +154,10 @@ export function exhibitionDisplayScores(scores: CityScores, guestCount: number):
 }
 
 /** Server-authoritative layout of a run state: Scale A display scores through the site mapping below. */
-export function exhibitionStateLayout(scores: CityScores, guestCount: number): ExhibitionLayout {
-  return deriveExhibitionLayout(exhibitionDisplayScores(scores, guestCount));
+export function exhibitionStateLayout(scores: CityScores, guestCount: number, energy?: EnergyState): ExhibitionLayout {
+  const display = exhibitionDisplayScores(scores, guestCount);
+  if (energy) display.environmentalPriority = exhibitionDisplayScores(scores, energy.climateGuestCount).environmentalPriority;
+  return { ...deriveExhibitionLayout(display), ...(energy ? { energy: energyConfiguration(energy.counts) } : {}) };
 }
 
 /** Display score → layout for the four mature 2127 sites; dev `?meters` and carrier tests use it directly. */
