@@ -1,7 +1,7 @@
 # Energy polish publication and integration — 2026-10-25
 
 - Owner：Codex（本次整合 chat）。使用者明確要求 push energy-polish、merge main、再安全刪除相關分支；這項新授權取代先前批次的本機-only／禁止push限制。
-- Status：INTEGRATED_LOCALLY_AND_VALIDATED；main已合併並重跑驗證PASS，main push／CI／刪分支待完成，完成後在本檔追加實際結果。
+- Status：COMPLETE；main已發布、整合後驗證及main CI全部PASS，相關本機／遠端分支已安全刪除。
 - Task clone：`/Users/fatboy/city2127-energy-polish`；branch `codex/energy-city-polish`。
 - Starting HEAD／feature browser checked commit：`852561348e2c6a61ba64325067386ff951135da7`；runtime source commit `333e984f1a4bb315238aa6d8baeded797c659fc6`，SHA256 `01987a48101b59559709dc2ce5461ec51617f0a73a06803e45c50354612556f3`。
 - Fresh origin/main：`db772bb2248aed345468d6b07fc011d518f7c7b2`；feature ahead14／behind0，最初無remote counterpart，乾淨working tree。提權fetch成功；一次非提權網絡查詢DNS失敗未作為remote freshness證據。feature已成功首次push，遠端同8525613。
@@ -25,7 +25,7 @@ Node26.0.0，root `npm test`、`npm run build`、`git diff --check origin/main..
 
 保留已拒絕的夜間材質trial，runtime維持accepted baseline。水庭／島最新近景review支持收尾；生成target逐pixel、工程可行性、新FPS／長跑、展覽硬件／Safari／iPad／Windows／真人理解不屬本次驗證。
 
-下一步：fresh fetch，乾淨main fast-forward到origin/main，`--no-ff`合併；重跑整合root test/build／formal browser及whitespace，記錄merge commit；確認main祖先與push、main CI通過後，僅刪除已整合`codex/energy-city-polish`本機／遠端ref。保留clone及其ignored備份，更新原checkout main時保留未追蹤檔。自己的Vite5194完成後停止；scratch/browser由runner finally清理。
+原定整合步驟（已按下節完成）：fresh fetch，乾淨main fast-forward到origin/main，`--no-ff`合併；重跑整合root test/build／formal browser及whitespace，記錄merge commit；確認main祖先與push、main CI通過後，僅刪除已整合`codex/energy-city-polish`本機／遠端ref。保留clone及其ignored備份，更新原checkout main時保留未追蹤檔。自己的Vite5194完成後停止；scratch/browser由runner finally清理。
 
 ## Integrated result
 
@@ -33,4 +33,15 @@ Merge commit `8ad644d63444558a4abfdc4f0d102343d842b3cd`，parents為fresh main `
 
 [Integrated test log](../../artifacts/energy-city-polish/main-integration-20261025/integrated-test.log)、[build log](../../artifacts/energy-city-polish/main-integration-20261025/integrated-build.log)、[formal browser log](../../artifacts/energy-city-polish/main-integration-20261025/integrated-browser.log)及[exact-commit browser metadata](../../artifacts/energy-city-polish/main-integration-20261025/integrated-browser.json)。兩次完整formal原圖及hash另保存在本chat持久visualizations目錄的`energy-polish-integration/`；沒有覆寫舊證據。第二次browser的scratch DB／HTTP／WebSocket／Chrome由原finally全部關閉，沒有使用展覽DB。
 
-這次新增的整合證據／文件不改runtime。Main publication／CI及branch deletion實際結果待下節追加；之前各批次的審美、工程及硬件限制保留。
+這次新增的整合證據／文件不改runtime。Main publication／CI及branch deletion實際結果見下節；之前各批次的審美、工程及硬件限制保留。
+
+## Publication, CI and safe cleanup — complete
+
+- 已push main `9a1009e908c3c93c92517da38d7f85aef9b98ae3`；fresh fetch確認remote包含merge `8ad644d`。
+- [Main CI 40200646383](https://github.com/cc100053/city2127/actions/runs/40200646383)在9a1009e完成SUCCESS；root install/test/build、survey install/test/build、module-swap install/test/build及committed whitespace全部通過。這是本次實際run，沒有沿用舊CI。
+- 刪除前再次fresh fetch，確認remote feature仍為`44585bd0b5c9e7f5ce142b5aeb2771dd38d0554f`，本機及遠端feature均為origin/main祖先。Remote delete附exact expected-SHA lease，防止檢查後有新提交被刪；本機使用`git branch -d`，沒有force-delete／重寫main。刪後fresh fetch／branch listing確認兩個ref均不存在。只清理`codex/energy-city-polish`；其他分支未動。
+- 原checkout main已fast-forward到9a1009e；13個未追蹤Playwright YAML逐byte SHA256核對一致，tracked diff為空。收尾文件push後再作最後fast-forward；保留同一checksum核對。
+- Task clone保持main、乾淨；整個clone及ignored source／checkpoints／bundles／tar archives保留，沒有刪重要共享資產或備份。本次Vite5194／PID53881已SIGTERM、session exit143，lsof無LISTEN；兩次formal runner均exit0並按finally關閉browser／scratch server／SQLite。
+- CI原始JSON／watch log、兩組完整13檔formal evidence及其SHA256、原checkout前後checksum manifest保存在本chat持久visualizations目錄`energy-polish-integration/`。Git內feature與integrated logs／metadata保留上方連結。
+
+最後此交接／索引收尾只改Markdown，依現行CI paths-ignore不觸發新run；runtime/tests/config與已PASS的9a1009e完全相同。下一步：無待辦Git整合；既有夜間環可讀性／target／展覽硬件等限制保留，沒有部署或新視覺實作。
