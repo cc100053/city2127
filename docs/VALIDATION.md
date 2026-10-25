@@ -216,3 +216,8 @@ P3在現行v4回歸PASS：Chrome1280×720、hour16，實測A/B閱讀間隔10,002
 接收翼第二輪（sourcede556764）：相同完整root／包絡／scope hash／DEV33／原正式gate PASS，49 batches／108／324／170775；static PNG一致、live21.39→28.88秒，僅預期browser錯誤，原assertions／quality／timeout不變。逐輪原圖、限制、清理及本機backup見接收翼handoff。
 
 接收翼第三輪（source01987a48）：完整root test/build/diff／原大小版AABB／protected hashes、DEV33原圖及原正式scratch gate全部PASS，49 batches／108／324／170775；static PNG一致、live21.45→26.50秒。三輪合共99張DEV新原圖，原tests／quality／timeout不變，沒有新增global光源或用途。三輪後停止等coordinator review，逐輪source commit／final metadata commit／bundle／archive與未驗限制見接收翼handoff。
+
+
+## 儲能環夜間可讀性一次試驗 — 2026-10-25（未採用）
+
+Trial source29168309的root test/build/diff、exact環外source／全energy幾何／環外與shared材質保護、原DEV27圖及原正式scratch gate PASS；49 batches、108／324／170775。Before／trial各27張1920×1080 DPR1 default原圖、21組固定URL／time配對及全部54個PNG hash核實，兩輪固定static均一致；Chrome156.0.8078.47 headless／ANGLE Metal Apple M6／WebGL2，沒有未預期DEV錯誤，formal exceptions0，只有既有favicon404／obsolete409／注入abort。Owner原尺寸hero/day/night review判定夜間改善不足、日景銀邊減弱，因此不採用候選並逐byte還原01987a48 baseline。初版artifact checker的JSON undefined比對失敗及修正完整保留，原runtime tests未改；還原狀態的額外實測、所有raw logs／原圖／diff／target及備份verify見[handoff](handoffs/ring-night-readability.md)與[證據入口](../artifacts/energy-city-polish/ring-night-readability-20261025/README.md)。軟件gate不等於視覺接受，夜間缺口仍開放；沒有新FPS／工程／硬件／Safari／iPad／Windows／真人理解或main CI宣稱。

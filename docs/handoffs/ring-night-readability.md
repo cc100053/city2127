@@ -4,6 +4,7 @@
 - Status：WAITING_FOR_REVIEW；只此一次Plus trial，完成後交coordinator驗收，不自開新輪。
 - Clone `/Users/fatboy/city2127-energy-polish`；branch `codex/energy-city-polish`；clean starting HEAD `b24cf3d8b569780324e4bf0f491bdf8af3c30169`。
 - Runtime baseline `333e984f1a4bb315238aa6d8baeded797c659fc6`、SHA256 `01987a48101b59559709dc2ce5461ec51617f0a73a06803e45c50354612556f3`；trial SHA256 `29168309084f683cf6c57e82ca45ee2c3fa2e3ba22e86cb4fc92c2103b60cf02`。
+- Evidence checkpoint：`f25b2a3e136a6346e40f3c51bae10808ea14a9ed`；runtime source仍為原accepted333e984，候選只保存在artifact，沒有candidate runtime commit。文件checkpoint與完整backup最終HEAD由`checkpoints/final.json`標明。
 - Remote availability：NOT PUSHED；無upstream／remote counterpart；禁止push／deploy／main整合，沒有main CI宣稱。
 
 ## Preflight與scope

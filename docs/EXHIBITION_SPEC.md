@@ -133,3 +133,8 @@ Admin Day／Night／Auto 保存為獨立 display setting：12:00／22:00／180 �
 ### 接收翼局部打磨 — 2026-10-25（本機續作）
 
 沿用能源Q3及既有接收翼，僅細化雙葉表面、承托接點／服務頸，保留原位置／包絡／大小配置語義與已接受水庭／環／島；沒有新用途、容量或工程宣稱。三輪Plus實作及owner實際驗收分開記在[接收翼交接](handoffs/receiver-wing-polish.md)，沒有push或main整合。生成target只作工藝reference，不依賴強光或背景／UI漂移證明軌道身份。
+
+
+### 儲能環夜間可讀性一次跟進 — 2026-10-25（候選不採用）
+
+已批准的一次局部材質試驗未達原hour22 hero「完整環周與兩組固定承托連續可讀」要求；owner保留原已接受baseline及完整trial證據，夜間可讀性缺口仍在。沒有新產品方向、source變更、工程／target達成或發布宣稱；只交coordinator review，[實測與checkpoint](handoffs/ring-night-readability.md)。

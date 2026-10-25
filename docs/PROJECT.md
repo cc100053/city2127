@@ -175,3 +175,8 @@ CityChangeManager將能源實際前後target加入CarrierChange，residentResult
 ### Receiver local polish — 2026-10-25（本機分支，未整合）
 
 `energyPrototype`既有offshore wing保留位置／雙葉輪廓及small0.65／large1；細分接收面、板底承托、服務頸及接點以既有共享材質bake。DEV與正式EnergyRuntime重用，3秒retarget／立即recovery／60秒流程維持，水庭／環／島及global light／hero／core源碼保護。逐輪實際source／gate／備份見[接收翼handoff](handoffs/receiver-wing-polish.md)；target工藝reference不代表軌道工程身份已解決。
+
+
+### 儲能環夜間材質跟進試驗 — 2026-10-25（未採用）
+
+只針對既有環邊／固定軸承作一次non-emissive局部finish試驗，owner完整尺寸night hero review未見足夠改善，日景銀邊反光亦減弱；候選不採用，runtime已逐byte保留接收翼後的已接受baseline，沒有新增材質／幾何／動畫留在source。原圖、target漂移界線、trial diff、正式scratch及還原檢查見[本輪handoff](handoffs/ring-night-readability.md)，不自行再開輪。
