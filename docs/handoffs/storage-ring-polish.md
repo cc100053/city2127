@@ -15,3 +15,15 @@
 - 未測：新FPS、展覽硬件／iPad／Safari／Windows／工程可行性；survey／module-swap source未改，不另跑其suite。survey build只作 scratch browser fixture。
 
 - 封存修正：首個本機commit3d21e11含原patch context空白，未過artifact whitespace；下一個修正commit將verbatim patch收入raw-patches.tar.gz（原工作檔保留），再跑完整base diff check。沒有改source／target／test門檻。
+
+## 第一輪本次checkpoint
+
+- 完整gate及新browser PASS，source5255520；checkpoint `093acddfc03a9b5e390a902e55f34bcf96f208f1`（含artifact格式修正）。
+- `checkpoints/pass1.bundle` verify PASS，`pass1-evidence.tar.gz`全部首輪checksum／source解讀PASS；完整SHA見`checkpoints/pass1.json`。不是base-only bundle。
+- Vite5187已關閉，兩組browser／scratch服務已清理。第二輪現在套用原候選47cf4d5，只改環／原固定承托；未驗前不沿用首輪結論。
+
+## 第二輪候選驗收
+
+- Source47cf4d5原候選已完成新root test/build/diff、DEV27原圖及正式scratch browser PASS；47 batches，108權威及324／170424幾何檢查，環外source逐byte不變。
+- 原runner新增reduced頁30秒timeout再次出現。只修正tests/energyE4.browser.mjs renderer生命週期：舊City暫時about:blank、reduced結束恢復原hour22並model(view)。原assertions／品質／timeout全部保留，修改後完整root gate及browser PASS；失敗原版另存。
+- 新證據pass2/；native static PNG一致，live22.75→28.61秒；服務／scratch已清理。現在封存本機checkpoint／verify bundle，之後才開第三輪fresh strongest/lowest worker；沒有其他worker。

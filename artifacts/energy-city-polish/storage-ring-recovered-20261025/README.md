@@ -5,7 +5,7 @@
 | 輪次 | 狀態 | 實測 |
 | --- | --- | --- |
 | 1 | 恢復版驗收完成 | [review](pass1/review.md)、[DEV JSON](pass1/dev/browser.json)、[formal JSON](pass1/formal/browser.json)、原PNG／test/build logs／SHA256SUMS |
-| 2 | 已保存候選，尚未套用 | 原source SHA47cf4d5；需完整gate |
+| 2 | 原候選驗收完成 | [review](pass2/review.md)、[DEV JSON](pass2/dev/browser.json)、[formal JSON](pass2/formal/browser.json)、原PNG／raw logs／SHA256SUMS |
 | 3 | 未開始 | 第二輪通過且備份清理後才開fresh worker |
 
 每輪source及當時runner均另存。DEV矩陣runner：`node artifacts/energy-city-polish/storage-ring-recovered-20261025/review.browser.mjs <新evidence目錄>`；正式runner沿用tests/energyE4.browser.mjs及VALIDATION的scratch設定。新舊失敗attempt分開保存。

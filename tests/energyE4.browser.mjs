@@ -124,6 +124,8 @@ try {
   for (const socket of citySockets) socket.destroy();
   await city.getByText('サーバー: 接続済み', { exact: true }).waitFor(); await model(view);
   assert.equal(await city.locator('.causal-panel').getAttribute('data-presentation'), 'ambient');
+  // Release the previous full city while the reduced-motion context cold-loads its own renderer.
+  await city.goto('about:blank');
   const reduced = await browser.newContext({ viewport, reducedMotion: 'reduce' });
   const still = await reduced.newPage(); still.on('pageerror', e => exceptions.push(e.message));
   await still.goto(url(12));
@@ -132,6 +134,7 @@ try {
   await still.waitForFunction(t => Number(document.querySelector('canvas')?.dataset.time) >= t + 2, first.time, { timeout: 45_000 });
   assert.equal(await still.locator('canvas').evaluate(c => JSON.parse(c.dataset.energy).rotorAngle), first.angle);
   await still.screenshot({ path: join(evidence, 'mixed-reduced-motion.png') }); await reduced.close();
+  await city.goto(url(22)); await model(view);
   await city.setViewportSize({ width: 1440, height: 900 });
   await city.waitForFunction(() => document.querySelector('canvas')?.clientWidth === 1440 && document.querySelector('canvas')?.clientHeight === 900);
   assert.deepEqual(await city.locator('canvas').evaluate(c => [c.clientWidth, c.clientHeight]), [1440, 900]);

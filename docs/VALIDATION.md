@@ -202,3 +202,5 @@ P3在現行v4回歸PASS：Chrome1280×720、hour16，實測A/B閱讀間隔10,002
 首輪恢復source5255520已在獨立clone重跑root test/build/diff PASS；108正式權威模型及324 district／170424 exact checks、r29–33／depth±1.5全周與固定承托、船／航空／泊位／公共／四站視線均未放寬。Chrome156 headless／WebGL2、1920×1080 DPR1 default：新DEV27原圖及正式scratch runner PASS，包含native static、live兩時點、固定三phase、日暮夜及正式歷史／retry／Undo／reconnect／reduced-motion／reset。首次並行formal reduced-page30秒timeout及DEV未完成static讀取均保留；未修改原正式runner門檻，單獨重跑通過。固定時間static兩張PNG hash一致；其他live城市actor仍會動。
 
 逐輪source hash、完整PNG／raw log／JSON、實際checkpoint／清理與總指揮review狀態見 [儲能環交接](handoffs/storage-ring-polish.md) 及 [新證據](../artifacts/energy-city-polish/storage-ring-recovered-20261025/README.md)。沒有新FPS／展覽硬件／Safari／iPad／Windows／工程或target達成宣稱；survey build僅作scratch fixture，source未改。
+
+第二輪原候選47cf4d5亦完成同一完整root／DEV27圖／正式gate PASS（47 batches，108／324／170424）；環外source未變。原正式runner的reduced新頁30秒timeout可再次出現：現只在該段先釋放舊City renderer，再恢復hour22及額外核對同一model(view)。原assertions／quality／30與45秒門檻保留，沒有放寬tests；失敗原runner、圖及新排程成功證據同存pass2。詳細限制沿用上段與handoff。
