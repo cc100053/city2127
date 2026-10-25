@@ -1,0 +1,15 @@
+{
+  "format": "verbatim original patch files; extract into this directory before rerunning extract.py",
+  "sha256": {
+    "owner-1179.patch": "3c388d31d8fbdca180713992e795d0a1bc0665e0826216127980f1ac42d56d20",
+    "owner-1287.patch": "930a90104fe3d4ee0009fc1c5a453a988b262029973b4868437ee5031366eed5",
+    "owner-1434.patch": "3c99d7f30c99364b8999d68905a89a63f3b484f9d10ae34783a6240365198113",
+    "owner-1749.patch": "f834e65049a52ac52c653d75f11cb215a4e133ee34232eab4c701589999a89ab",
+    "owner-1895.patch": "f0f6c7bcee30d8006f8f99c470991747ec7c296d5dd3a48d2793f8e7dd822abf",
+    "owner-2079.patch": "cee9c819476150f05955aa688a71947a5dd3b6c21f248e44ed18d3b771066376",
+    "owner-2305.patch": "9037221d5e75a92be4a70c1983d70b0af9890309e9be9ade0b7e6059e4d584c9",
+    "owner-965.patch": "d26a2920737a82d6ae6dde0d06be26da7735693d84d5d915a6178138183839ea",
+    "recovered-runtime.patch": "2e3c81def65d31d10dd4c5e3f1340abcbb951a3ed9257bff5c30dcf3450e9feb",
+    "ring-pass2-recorded.patch": "390b0b4a527f2f9c86932831cb0196de355ec25a3d2e3520c99992035f4f42f0"
+  }
+}

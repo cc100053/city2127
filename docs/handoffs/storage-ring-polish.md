@@ -13,3 +13,5 @@
 - Remote availability：NOT PUSHED。只本機 Conventional Commits／bundle；禁止 push／main整合／deploy／外部設定。
 - Next：首輪新browser／root gate已過且服務清理；封存本機checkpoint及verify bundle後驗第二輪候選，通過完整gate及備份後才按Plus流程開第三輪fresh-context worker。三輪後等待總指揮review。
 - 未測：新FPS、展覽硬件／iPad／Safari／Windows／工程可行性；survey／module-swap source未改，不另跑其suite。survey build只作 scratch browser fixture。
+
+- 封存修正：首個本機commit3d21e11含原patch context空白，未過artifact whitespace；下一個修正commit將verbatim patch收入raw-patches.tar.gz（原工作檔保留），再跑完整base diff check。沒有改source／target／test門檻。
