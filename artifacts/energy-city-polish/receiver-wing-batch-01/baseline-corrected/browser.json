@@ -1,0 +1,54 @@
+{
+  "sourceSha256": "27c1e4f36835267eccc64c9d0c2947203d65dd95b7f37dda90c06dfb6576d9fa",
+  "browser": "156.0.8078.47",
+  "platform": "darwin",
+  "quality": "default",
+  "dpr": 1,
+  "gpu": {
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+  },
+  "errors": [],
+  "warnings": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:5187/favicon.ico"
+    }
+  ],
+  "failures": [],
+  "responses": [],
+  "shots": [
+    {
+      "name": "detail-day-large",
+      "url": "http://127.0.0.1:5187/?energy=b&hour=12&reviewTime=50&review=street&cam=125%2C85%2C-290&at=125%2C60%2C-360",
+      "capturedAt": "2026-10-25T01:41:16.675Z",
+      "width": 1920,
+      "height": 1080,
+      "time": "50.00",
+      "hour": "12.00",
+      "sha256": "f006f82bb8dd1a66853d3a26f0a6aaa6136f70a0538a5542d9968cd871885052"
+    },
+    {
+      "name": "detail-day-small",
+      "url": "http://127.0.0.1:5187/?energy=a&hour=12&reviewTime=50&review=street&cam=125%2C85%2C-290&at=125%2C60%2C-360",
+      "capturedAt": "2026-10-25T01:41:38.363Z",
+      "width": 1920,
+      "height": 1080,
+      "time": "50.00",
+      "hour": "12.00",
+      "sha256": "25532a264c12ee21163341dc6027ee758fbe8774bc3788aff109e882f99118fb"
+    },
+    {
+      "name": "detail-night-large",
+      "url": "http://127.0.0.1:5187/?energy=b&hour=22&reviewTime=50&review=street&cam=125%2C85%2C-290&at=125%2C60%2C-360",
+      "capturedAt": "2026-10-25T01:41:59.865Z",
+      "width": 1920,
+      "height": 1080,
+      "time": "50.00",
+      "hour": "22.00",
+      "sha256": "82b9cd1c3ca63ea2d19634eddc1afe79d1e1613e0f229204c88e983f76c64935"
+    }
+  ],
+  "scope": "Preparation baseline only; no implementation or full regression/FPS claim"
+}

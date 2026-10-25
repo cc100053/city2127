@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-25 JST",
+  "owner": "Codex current water/island reviewer (01a171ff-5460-78d3-bd96-2242789f12a7)",
+  "checkout": "/Users/fatboy/city2127-energy-polish",
+  "branch": "codex/energy-city-polish",
+  "head": "abf838156880e6dc8686e9610fc644756e7b9e3b",
+  "originMain": "db772bb2248aed345468d6b07fc011d518f7c7b2",
+  "fetch": "PASS git fetch --prune origin",
+  "branchDivergence": "12 ahead / 0 behind origin/main; no remote counterpart",
+  "startingWorktree": "clean",
+  "codegraph": false,
+  "sourceCommit": "333e984f1a4bb315238aa6d8baeded797c659fc6",
+  "sourceSHA256": "01987a48101b59559709dc2ce5461ec51617f0a73a06803e45c50354612556f3",
+  "previousOwnerRelease": "dispatch and docs/handoffs/ring-night-readability.md confirm prior owner released; own services cleaned",
+  "quotaStartRemainingPercent": 31,
+  "quotaAfterCaptureRemainingPercent": 23,
+  "deadline": "2026-10-26 00:00 JST; no new pass after 2026-10-25 23:45 JST",
+  "dispatch": "/Users/fatboy/city2127/.dream-loop/orchestration/water-island-review-dispatch.md"
+}

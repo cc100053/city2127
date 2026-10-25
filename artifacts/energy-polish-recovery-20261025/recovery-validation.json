@@ -1,0 +1,14 @@
+{
+  "dateJST": "2026-10-25",
+  "branch": "codex/energy-city-polish",
+  "head": "db772bb2248aed345468d6b07fc011d518f7c7b2",
+  "sourceSha256": "5255520888c0810717e7aee60917c4703ba255721b67d6a7e9d6960aca4e9627",
+  "rootTest": "PASS exit 0",
+  "rootBuild": "PASS exit 0; existing chunk-size warning",
+  "diffCheck": "PASS exit 0",
+  "browser": "NOT RUN",
+  "pass2": "NOT APPLIED; UNVERIFIED",
+  "originalFeatureCommits": "NOT RECOVERED",
+  "newCommits": false,
+  "push": false
+}

@@ -1,0 +1,16 @@
+{
+  "owner": "01a171dc-80a0-7e63-a14d-b7dbca7159b6",
+  "clone": "/Users/fatboy/city2127-energy-polish",
+  "branch": "codex/energy-city-polish",
+  "startingHead": "b24cf3d8b569780324e4bf0f491bdf8af3c30169",
+  "originMain": "db772bb2248aed345468d6b07fc011d518f7c7b2",
+  "mainBehindAhead": "0\t10",
+  "remoteCounterpart": null,
+  "fetch": "PASS",
+  "startingWorkingTree": "clean",
+  "verifiedRuntimeCommit": "333e984f1a4bb315238aa6d8baeded797c659fc6",
+  "sourceSha256": "01987a48101b59559709dc2ce5461ec51617f0a73a06803e45c50354612556f3",
+  "scope": "Exactly one approved Plus trial: ring outer-edge and fixed bearing/support tonal/material hierarchy only; no geometry, animation, camera, global/shared material mutation, lights, halo or new emission. No push/deploy/main integration.",
+  "deadline": "2026-10-26T00:00:00+09:00; no new pass after 2026-10-25T23:45:00+09:00",
+  "codegraph": false
+}

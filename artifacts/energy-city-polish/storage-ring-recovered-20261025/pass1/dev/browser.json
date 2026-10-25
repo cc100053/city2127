@@ -1,0 +1,325 @@
+{
+  "sourceHash": "5255520888c0810717e7aee60917c4703ba255721b67d6a7e9d6960aca4e9627",
+  "browser": "156.0.8078.47",
+  "platform": "darwin",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "dpr": 1,
+  "quality": "default",
+  "gpu": {
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+  },
+  "exceptions": [],
+  "consoleMessages": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:5187/favicon.ico"
+    }
+  ],
+  "responses": [],
+  "failures": [],
+  "shots": [
+    {
+      "name": "hero-day-mixed",
+      "url": "http://127.0.0.1:5187/?energy=mixed&hour=12&reviewTime=50",
+      "capturedAt": "2026-10-25T00:48:30.184Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "12.00",
+      "sha256": "5e074e064993752d22e9283efafda04b9738e323b4799d0173272a6474e1e84f",
+      "cycle": "60 秒示意循環 · 釋能／分配 → 落水經渦輪、旋轉環減速 → 街區用電"
+    },
+    {
+      "name": "hero-day-b",
+      "url": "http://127.0.0.1:5187/?energy=b&hour=12&reviewTime=50",
+      "capturedAt": "2026-10-25T00:48:30.524Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "12.00",
+      "sha256": "ea37e13df7fd74aad673a3dac366b9c2d7c60ad5a7f4e36a9a9987714b885379",
+      "cycle": "60 秒示意循環 · 釋能／分配 → 旋轉環減速 → 街區用電"
+    },
+    {
+      "name": "hero-day-baseline",
+      "url": "http://127.0.0.1:5187/?energy=baseline&hour=12&reviewTime=50",
+      "capturedAt": "2026-10-25T00:48:30.856Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "12.00",
+      "sha256": "3ab6ab177ee216df1191ede6bad500836ffdc31e465633a51ae3f8df070f5a6f",
+      "cycle": ""
+    },
+    {
+      "name": "detail-day-mixed",
+      "url": "http://127.0.0.1:5187/?energy=mixed&hour=12&reviewTime=50&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:48:54.405Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "12.00",
+      "sha256": "ef744dae4eaa30339ebabd6f1008e530c0bd29876e494ea44707d387bb16ad21",
+      "cycle": "60 秒示意循環 · 釋能／分配 → 落水經渦輪、旋轉環減速 → 街區用電"
+    },
+    {
+      "name": "detail-day-b",
+      "url": "http://127.0.0.1:5187/?energy=b&hour=12&reviewTime=50&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:48:54.699Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "12.00",
+      "sha256": "dcb76d9d9a15f376272599118f37ec148369c34dd2252cf803513d931dbc6eb4",
+      "cycle": "60 秒示意循環 · 釋能／分配 → 旋轉環減速 → 街區用電"
+    },
+    {
+      "name": "detail-day-baseline",
+      "url": "http://127.0.0.1:5187/?energy=baseline&hour=12&reviewTime=50&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:48:55.005Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "12.00",
+      "sha256": "3e0ecdad68b32e02c7c82d15bcc992c9de72278505e1b96ca95f89eb26e08878",
+      "cycle": ""
+    },
+    {
+      "name": "hero-dusk-mixed",
+      "url": "http://127.0.0.1:5187/?energy=mixed&hour=18.5&reviewTime=50",
+      "capturedAt": "2026-10-25T00:49:18.772Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "18.50",
+      "sha256": "f7081d19620ed9c15fac430fa0e91f51ce7709be52f0dd7ce5746a428e658cd4",
+      "cycle": "60 秒示意循環 · 釋能／分配 → 落水經渦輪、旋轉環減速 → 街區用電"
+    },
+    {
+      "name": "hero-dusk-b",
+      "url": "http://127.0.0.1:5187/?energy=b&hour=18.5&reviewTime=50",
+      "capturedAt": "2026-10-25T00:49:19.139Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "18.50",
+      "sha256": "c185dc2e0aa90d894eb83495e0d377975f2d6a51cb5e084c5770e4ceed7337de",
+      "cycle": "60 秒示意循環 · 釋能／分配 → 旋轉環減速 → 街區用電"
+    },
+    {
+      "name": "hero-dusk-baseline",
+      "url": "http://127.0.0.1:5187/?energy=baseline&hour=18.5&reviewTime=50",
+      "capturedAt": "2026-10-25T00:49:19.498Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "18.50",
+      "sha256": "b9c3c8b439db1f1f25a289d887ce7f4e2d5f091b529511d3c1a168d034445f6b",
+      "cycle": ""
+    },
+    {
+      "name": "detail-dusk-mixed",
+      "url": "http://127.0.0.1:5187/?energy=mixed&hour=18.5&reviewTime=50&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:49:42.915Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "18.50",
+      "sha256": "2d2790561710163c2f4b83e3b4540dfd1ea838842c7ff525cf030b921d764ef3",
+      "cycle": "60 秒示意循環 · 釋能／分配 → 落水經渦輪、旋轉環減速 → 街區用電"
+    },
+    {
+      "name": "detail-dusk-b",
+      "url": "http://127.0.0.1:5187/?energy=b&hour=18.5&reviewTime=50&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:49:43.208Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "18.50",
+      "sha256": "19710fe7d5a54fc77664c7a1fa05a1daa26b3174196153f784e9edaf24440fbd",
+      "cycle": "60 秒示意循環 · 釋能／分配 → 旋轉環減速 → 街區用電"
+    },
+    {
+      "name": "detail-dusk-baseline",
+      "url": "http://127.0.0.1:5187/?energy=baseline&hour=18.5&reviewTime=50&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:49:43.506Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "18.50",
+      "sha256": "509074579e4a9829057c40465759174c26cd7d6120a0a7158a7c02f9e32b4c79",
+      "cycle": ""
+    },
+    {
+      "name": "hero-night-mixed",
+      "url": "http://127.0.0.1:5187/?energy=mixed&hour=22&reviewTime=50",
+      "capturedAt": "2026-10-25T00:50:06.999Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "22.00",
+      "sha256": "bafe4019f3d5449d1a398cd57e8671876e87f4c17db4add82e24418b124d16df",
+      "cycle": "60 秒示意循環 · 釋能／分配 → 落水經渦輪、旋轉環減速 → 街區用電"
+    },
+    {
+      "name": "hero-night-b",
+      "url": "http://127.0.0.1:5187/?energy=b&hour=22&reviewTime=50",
+      "capturedAt": "2026-10-25T00:50:07.339Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "22.00",
+      "sha256": "897fbed48e3601b37b839b7dff48d8f97745fcd3eb896546b870a55e4209e5d1",
+      "cycle": "60 秒示意循環 · 釋能／分配 → 旋轉環減速 → 街區用電"
+    },
+    {
+      "name": "hero-night-baseline",
+      "url": "http://127.0.0.1:5187/?energy=baseline&hour=22&reviewTime=50",
+      "capturedAt": "2026-10-25T00:50:07.690Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "22.00",
+      "sha256": "1772488fdd4fa4b396797121c72645c491e2c3e3a8ea6e10c4fb9f8ec71f1d8c",
+      "cycle": ""
+    },
+    {
+      "name": "detail-night-mixed",
+      "url": "http://127.0.0.1:5187/?energy=mixed&hour=22&reviewTime=50&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:50:31.447Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "22.00",
+      "sha256": "b7fee857133483c374bc82f68055f847045be659ed90d5fa2c39c7e83836bb4d",
+      "cycle": "60 秒示意循環 · 釋能／分配 → 落水經渦輪、旋轉環減速 → 街區用電"
+    },
+    {
+      "name": "detail-night-b",
+      "url": "http://127.0.0.1:5187/?energy=b&hour=22&reviewTime=50&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:50:31.772Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "22.00",
+      "sha256": "d7dca42c48c57947f144b5f564590fef50f7838ab48aa1385fdc717cf845675d",
+      "cycle": "60 秒示意循環 · 釋能／分配 → 旋轉環減速 → 街區用電"
+    },
+    {
+      "name": "detail-night-baseline",
+      "url": "http://127.0.0.1:5187/?energy=baseline&hour=22&reviewTime=50&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:50:32.064Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "22.00",
+      "sha256": "ae64052d05bc210102f8ac0cc691d177418c96ed29888d6145c2b943f437d331",
+      "cycle": ""
+    },
+    {
+      "name": "detail-charge",
+      "url": "http://127.0.0.1:5187/?energy=mixed&hour=12&reviewTime=10&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:50:55.615Z",
+      "time": "10.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "12.00",
+      "sha256": "d4fad66c48e7e0ca420bd15e963d14850b78d3a81b83d17fa35eb57ab27ec1ac",
+      "cycle": "60 秒示意循環 · 接收／外部供電 → 抽水上行、旋轉環充能"
+    },
+    {
+      "name": "detail-hold",
+      "url": "http://127.0.0.1:5187/?energy=mixed&hour=12&reviewTime=30&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:51:18.928Z",
+      "time": "30.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "12.00",
+      "sha256": "868d02c733b6168b514950a66ec7e8390b809893ddf7da253be9d47587883f47",
+      "cycle": "60 秒示意循環 · 暫存 → 上水庭保水、旋轉環續轉"
+    },
+    {
+      "name": "detail-release",
+      "url": "http://127.0.0.1:5187/?energy=mixed&hour=12&reviewTime=50&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:51:42.816Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "12.00",
+      "sha256": "6fefaaf11d39af1964e3ac08d367328543a1bcfc325aedcb3c9b3c75e5e7566c",
+      "cycle": "60 秒示意循環 · 釋能／分配 → 落水經渦輪、旋轉環減速 → 街區用電"
+    },
+    {
+      "name": "static-a",
+      "url": "http://127.0.0.1:5187/?energy=mixed&hour=12&reviewTime=50&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:51:43.202Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "12.00",
+      "sha256": "6f50d7cd0a958f8a737b4edcae1c7773120b96e9dd1f5bca454e819729a9b9cb",
+      "cycle": "靜態閱讀：接收 → 儲能 → 街區；箭頭標示落水／抽水回管，水位與機械保持固定。"
+    },
+    {
+      "name": "static-b",
+      "url": "http://127.0.0.1:5187/?energy=mixed&hour=12&reviewTime=50&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:51:44.842Z",
+      "time": "50.00",
+      "width": 1920,
+      "height": 1080,
+      "hour": "12.00",
+      "sha256": "6f50d7cd0a958f8a737b4edcae1c7773120b96e9dd1f5bca454e819729a9b9cb",
+      "cycle": "靜態閱讀：接收 → 儲能 → 街區；箭頭標示落水／抽水回管，水位與機械保持固定。"
+    },
+    {
+      "name": "live-a",
+      "url": "http://127.0.0.1:5187/?energy=mixed&hour=12&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:52:08.715Z",
+      "time": "23.21",
+      "width": 1920,
+      "height": 1080,
+      "hour": "12.00",
+      "sha256": "e34b2eea714313fa53af2ff9f96eedbba599418a667e3ad3553d1f49b88f4123",
+      "cycle": "60 秒示意循環 · 暫存 → 上水庭保水、旋轉環續轉"
+    },
+    {
+      "name": "live-b",
+      "url": "http://127.0.0.1:5187/?energy=mixed&hour=12&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:52:14.635Z",
+      "time": "29.18",
+      "width": 1920,
+      "height": 1080,
+      "hour": "12.00",
+      "sha256": "70ff92e04ab647a2b4bc790ba17ffbda461ba9d1c54adda5df403e1f08e65c83",
+      "cycle": "60 秒示意循環 · 暫存 → 上水庭保水、旋轉環續轉"
+    },
+    {
+      "name": "live-static-a",
+      "url": "http://127.0.0.1:5187/?energy=mixed&hour=12&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:52:15.003Z",
+      "time": "29.18",
+      "width": 1920,
+      "height": 1080,
+      "hour": "12.00",
+      "sha256": "0b2c87beba9026d70c60068c17bc6b243089ae82a91cc412262529c461fa0525",
+      "cycle": "靜態閱讀：接收 → 儲能 → 街區；箭頭標示落水／抽水回管，水位與機械保持固定。"
+    },
+    {
+      "name": "live-static-b",
+      "url": "http://127.0.0.1:5187/?energy=mixed&hour=12&review=street&cam=-105%2C132%2C-180&at=-18%2C100%2C-7",
+      "capturedAt": "2026-10-25T00:52:16.921Z",
+      "time": "29.18",
+      "width": 1920,
+      "height": 1080,
+      "hour": "12.00",
+      "sha256": "d61c9450c43c3cf596cda83745f4220e6fdce587ddb4df64dd15a879fd856e6a",
+      "cycle": "靜態閱讀：接收 → 儲能 → 街區；箭頭標示落水／抽水回管，水位與機械保持固定。"
+    }
+  ],
+  "limitation": "Static geometry/transforms are asserted by native tests; live/static screenshots retain other city actors. No FPS claim."
+}

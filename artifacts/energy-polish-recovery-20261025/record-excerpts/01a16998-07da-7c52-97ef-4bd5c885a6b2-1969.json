@@ -1,0 +1,9 @@
+{
+  "session": "01a16998-07da-7c52-97ef-4bd5c885a6b2",
+  "line": 1969,
+  "call": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\nfrom pathlib import Path\\nimport subprocess,hashlib,json\\nold=subprocess.check_output(['git','show','5bb341b:src/energyPrototype.ts'],text=True);new=Path('src/energyPrototype.ts').read_text();a='  // Three reclaimed caissons';b='  // Two shore service gates';assert old.split(a)[0]==new.split(a)[0] and old.split(b)[1]==new.split(b)[1]\\nfor n,commit in [(1,'5def69f'),(2,'7c2b31d')]:\\n p=Path(f'artifacts/energy-city-polish/energy-island-batch-01/pass{n}-source.json');d=json.loads(p.read_text());assert d['sourceSha256']==hashlib.sha256(subprocess.check_output(['git','show',f'{commit}:src/energyPrototype.ts'])).hexdigest()\\nprint('PASS island-only source diff, both source hashes, accepted water unchanged')\\nPY\\ngit diff --check\",\"workdir\":\"/private/tmp/city2127-energy-polish-20261024\",\"max_output_tokens\":200}));\n",
+  "outputs": [
+    "Script completed\nWall time 0.1 seconds\nOutput:\n",
+    "{\"chunk_id\":\"dd019d\",\"wall_time_seconds\":0.000005125,\"exit_code\":0,\"original_token_count\":19,\"output\":\"PASS island-only source diff, both source hashes, accepted water unchanged\\n\"}"
+  ]
+}

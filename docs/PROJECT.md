@@ -166,3 +166,20 @@ The [previous implementation map](history/PROJECT_2026-10-02.md) is an archived 
 `layout.energy`列水庭數、接收翼尺寸、環與島；root parser接受舊v2（無energy），嚴格驗證新欄位／counts／answer類別與view一致。`createCityChangeManager`建立一次EnergyRuntime，沿用energyPrototype幾何及60秒動態；standalone不建立，DEV Meter沒有energy時隱藏。Main既有約2.6秒journey＋3秒過渡保留，能源光點及lantern轉到沿岸能源接點；舊氣候歷史仍落原公園。Snapshot／Undo／reset／reconnect／reduced motion立即套用，能源設備以局部材質淡入／淡出3秒，橋面、支承與公共路高度保持，接收翼尺寸另平滑變化；材質副本按組一次建立，沿用原材質日夜發光／反射更新，沒有逐幀新資源。
 
 CityChangeManager將能源實際前後target加入CarrierChange，residentResult只以這項證據描述一個真的設備差異；無設備差異明確延續目前能源配置，缺少前後證據只確認保存。能源ambient卡只依存在設備加入。`proposal.cityChanges`仍列四個focal差異，能源前後在beforeLayout／afterLayout.energy；Monitor另外顯示能源配置，不將focal清單為空當作整座城市沒變。DEV自動答題保留三軸數值profile，能源另選／四類輪替，不把其選項塞成數值Meter。
+
+### 能源模型 polish 恢復續作（2026-10-25）
+
+獨立本機 branch 恢復已接受水庭／能源島及富士前置儲能環第一輪 source；原 commit chain 未找回。環以獨立 rotor 保持 r29–33／depth±1.5 m，分層環帶、分段殼與金屬接縫沿用共享材質／bake；兩組固定軸承由原 transfer frame 承托。`devEnergy` 與正式 `EnergyRuntime` 沿用同一工廠，原60秒、3秒retarget及立即恢復不變。這是模型細化，未驗證儲能工程。三輪本機gate已完成，最後環帶使用分段金屬肩環／緊固件與凹入軸承端面，仍沿用同一工廠與共享材質。最新逐輪 source／實測與未完成項目見 [儲能環交接](handoffs/storage-ring-polish.md)。
+
+
+### Receiver local polish — 2026-10-25（本機分支，未整合）
+
+`energyPrototype`既有offshore wing保留位置／雙葉輪廓及small0.65／large1；細分接收面、板底承托、服務頸及接點以既有共享材質bake。DEV與正式EnergyRuntime重用，3秒retarget／立即recovery／60秒流程維持，水庭／環／島及global light／hero／core源碼保護。逐輪實際source／gate／備份見[接收翼handoff](handoffs/receiver-wing-polish.md)；target工藝reference不代表軌道工程身份已解決。
+
+
+### 儲能環夜間材質跟進試驗 — 2026-10-25（未採用）
+
+只針對既有環邊／固定軸承作一次non-emissive局部finish試驗，owner完整尺寸night hero review未見足夠改善，日景銀邊反光亦減弱；候選不採用，runtime已逐byte保留接收翼後的已接受baseline，沒有新增材質／幾何／動畫留在source。原圖、target漂移界線、trial diff、正式scratch及還原檢查見[本輪handoff](handoffs/ring-night-readability.md)，不自行再開輪。
+
+
+2026-10-25 發布更新：使用者已明確要求推送能源polish及整合main，先前本機-only狀態由[本次整合交接](handoffs/energy-polish-integration.md)取代。既有runtime未再修改；root test/build／正式scratch browser已重跑PASS，整合後驗證、main CI與安全刪分支的實際結果統一記在該交接，原target／夜間可讀性／硬件限制保留。

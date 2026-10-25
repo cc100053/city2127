@@ -1,0 +1,35 @@
+{
+  "checkedAt": "2026-10-25T08:02:43.060989+00:00",
+  "sourceHash": "01987a48101b59559709dc2ce5461ec51617f0a73a06803e45c50354612556f3",
+  "sourceUnchanged": "PASS protected tracked diff empty since abf8381",
+  "pngCount": {
+    "total": 12,
+    "original": 10,
+    "supplemental": 2
+  },
+  "pngHashAndDimension": "PASS all12; original PNGs also matched first checkpoint manifest",
+  "framingBeforeCapture": "PASS full model AABB all8 corners inside viewport, target within original bounds",
+  "actualVisualSelfReview": "PASS both new PNGs independently viewed; full island footprint/twin shells/service volumes/bridge/endpoints in frame; no UI overlap. Old island-detail two remain INVALID.",
+  "visualRecommendation": "Stop both water-garden and energy-island polish; zero source fix candidates",
+  "browser": "No exceptions or unexpected console/network errors; favicon404 only",
+  "localLinks": {
+    "result": "PASS",
+    "count": 31
+  },
+  "scriptSyntax": "PASS",
+  "whitespace": "PASS; staged/committed checks follow",
+  "cleanup": {
+    "viteSession17456": "exit130",
+    "captureSession25895": "exit0",
+    "ports5193and64668": "lsof no LISTEN",
+    "runnerCheck": "ps only checker processes, no own runner",
+    "browserClosed": true,
+    "surveyClosed": true,
+    "surveyPort": 64668,
+    "scratchRemoved": true
+  },
+  "notRun": "Root test/build, full formal matrix, motion rerun, FPS/hardware/engineering",
+  "authorization": "Coordinator explicitly allowed +2 PNGs after original10; no new polish pass",
+  "quotaStartRemainingPercent": 18,
+  "remote": "No push/deploy/main integration"
+}

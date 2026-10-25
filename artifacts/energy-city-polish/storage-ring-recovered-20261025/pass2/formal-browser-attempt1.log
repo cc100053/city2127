@@ -1,0 +1,10 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.waitForFunction: Timeout 30000ms exceeded.
+    at /Users/fatboy/city2127-energy-polish/tests/energyE4.browser.mjs:130:15 {
+  name: 'TimeoutError'
+}
+
+Node.js v26.0.0

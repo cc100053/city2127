@@ -1,0 +1,16 @@
+{
+  "sourceSha256": "29168309084f683cf6c57e82ca45ee2c3fa2e3ba22e86cb4fc92c2103b60cf02",
+  "rootTest": "PASS",
+  "rootBuild": "PASS; existing >500 kB chunk warning",
+  "workingDiffCheck": "PASS",
+  "protectedCheck": "PASS; initial checker serialization failure preserved and repaired",
+  "batches": 49,
+  "theatreGapMetres": 30.5,
+  "hullChecks": 21595,
+  "formalCombinations": 108,
+  "districtCases": 324,
+  "exactGeometryChecks": 170775,
+  "surveyBuild": "PASS, scratch fixture only; source unchanged",
+  "surveySuite": "not rerun; no survey source changed",
+  "moduleSwapSuite": "not rerun; source unchanged"
+}

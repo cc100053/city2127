@@ -1,0 +1,10 @@
+{
+  "observedAt": "2026-10-25T01:43:45.171171+00:00",
+  "fiveHourUsedPercent": 93,
+  "fiveHourRemainingPercent": 7,
+  "fiveHourResetJST": "2026-10-25 14:24:04 +09:00",
+  "weeklyUsedPercent": 79,
+  "weeklyResetJST": "2026-10-31 09:05:37 +09:00",
+  "availableBankedResets": 2,
+  "resetsUsed": 0
+}

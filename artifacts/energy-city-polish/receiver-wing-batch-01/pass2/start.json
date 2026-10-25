@@ -1,0 +1,10 @@
+{
+  "startedAt": "2026-10-25T05:50:03.862720+00:00",
+  "base": "8ec1cd186044bc613b308067e9605d9328a7e56c",
+  "worker": "true same-chat fresh empty-context gpt-6-astra/low",
+  "priorCheckpoint": "checkpoints/pass1.json",
+  "fiveHourUsedPercent": 25,
+  "weeklyUsedPercent": 84,
+  "bankedResetsUsed": 0,
+  "scope": "receiver block only; owner validates"
+}

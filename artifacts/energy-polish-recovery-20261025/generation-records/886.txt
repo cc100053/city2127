@@ -1,0 +1,4 @@
+// @exec: {"yield_time_ms": 120000, "max_output_tokens": 1500}
+const result = await tools.image_gen__imagegen({prompt:load("waterPolishTargetPrompt"),referenced_image_paths:["/private/tmp/city2127-energy-polish-20261024/artifacts/energy-city-polish/water-garden-batch-01/baseline-detail-day.jpg","/private/tmp/city2127-energy-polish-20261024/artifacts/fuji-tv-polish/v3r9-pass3.jpg"],transparent_background:false});
+store("waterPolishTargetResult",result);
+generatedImage(result);

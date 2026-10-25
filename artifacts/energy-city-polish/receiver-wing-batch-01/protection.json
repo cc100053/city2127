@@ -1,0 +1,12 @@
+{
+  "base": "5db4e6e7f69d06ddc666fee95546807ec92b2256",
+  "runtimeSha256": "27c1e4f36835267eccc64c9d0c2947203d65dd95b7f37dda90c06dfb6576d9fa",
+  "receiverSourceLines": [
+    38,
+    50
+  ],
+  "receiverSha256": "89c9ee1bb9fe64bf1dce9e5132d9671c3e585d43375bc1de3ccaee554d39ca72",
+  "outsideReceiverSha256": "0e223a7b3c94fb1a165506725e32f83f078b760eaf3041b853ddc043da816cd6",
+  "runtimeTestsChanged": false,
+  "scope": "Only receiver source block may change after separate implementation authorization. Original location, envelope, scale semantics and submerged service trunk remain constraints."
+}

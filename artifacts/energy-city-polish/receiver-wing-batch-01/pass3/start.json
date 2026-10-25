@@ -1,0 +1,11 @@
+{
+  "startedAt": "2026-10-25T06:02:16.948596+00:00",
+  "base": "d71c01c3d7b4de8a8e9fededaaf7b8a66ea32695",
+  "workerTask": "/root/receiver_pass3",
+  "worker": "true same-chat fresh empty-context gpt-6-astra/low",
+  "priorCheckpoint": "checkpoints/pass2.json",
+  "fiveHourUsedPercent": 48,
+  "weeklyUsedPercent": 87,
+  "bankedResetsUsed": 0,
+  "scope": "receiver block only; final authorized pass"
+}

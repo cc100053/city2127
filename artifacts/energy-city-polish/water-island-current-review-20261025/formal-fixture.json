@@ -1,0 +1,2131 @@
+{
+  "proposals": [
+    {
+      "submissionId": "current-review-water-storage-0",
+      "guestSessionId": "d519cac0-5bcf-43a4-8396-42ad193e5ceb",
+      "expectedRevision": 0,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "water-storage"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions"
+        }
+      ]
+    },
+    {
+      "submissionId": "current-review-water-storage-1",
+      "guestSessionId": "7a5b1335-0e1a-476a-90d8-d00cccb1b826",
+      "expectedRevision": 1,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "water-storage"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions"
+        }
+      ]
+    },
+    {
+      "submissionId": "current-review-water-storage-2",
+      "guestSessionId": "787c215b-fb41-4a6a-805e-0b4926b47e6e",
+      "expectedRevision": 2,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "water-storage"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions"
+        }
+      ]
+    },
+    {
+      "submissionId": "current-review-water-storage-3",
+      "guestSessionId": "af6311a3-9627-4cc9-b0e5-b15d12fa33dc",
+      "expectedRevision": 3,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "water-storage"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions"
+        }
+      ]
+    },
+    {
+      "submissionId": "current-review-rotor-storage-0",
+      "guestSessionId": "72adf6e8-a21a-434a-a0d3-3eef35cdb99e",
+      "expectedRevision": 4,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "rotor-storage"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions"
+        }
+      ]
+    },
+    {
+      "submissionId": "current-review-rotor-storage-1",
+      "guestSessionId": "d976b2ff-b0da-4e7a-81d4-0a58bd8dbb34",
+      "expectedRevision": 5,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "rotor-storage"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions"
+        }
+      ]
+    },
+    {
+      "submissionId": "current-review-rotor-storage-2",
+      "guestSessionId": "6b4c995e-5c71-46bc-8873-a3e59fbec887",
+      "expectedRevision": 6,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "rotor-storage"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions"
+        }
+      ]
+    },
+    {
+      "submissionId": "current-review-rotor-storage-3",
+      "guestSessionId": "958100c5-baf3-4035-8581-a82e4ba197f4",
+      "expectedRevision": 7,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "rotor-storage"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions"
+        }
+      ]
+    },
+    {
+      "submissionId": "current-review-orbital-supply-0",
+      "guestSessionId": "ae7570f2-b7e3-475e-bd82-c3d27cc9c5a9",
+      "expectedRevision": 8,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "orbital-supply"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions"
+        }
+      ]
+    },
+    {
+      "submissionId": "current-review-orbital-supply-1",
+      "guestSessionId": "9769cdd1-6678-441e-aaed-8d9160bb862e",
+      "expectedRevision": 9,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "orbital-supply"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions"
+        }
+      ]
+    },
+    {
+      "submissionId": "current-review-orbital-supply-2",
+      "guestSessionId": "b1523575-1e73-4bc9-ad2c-49e222245633",
+      "expectedRevision": 10,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "orbital-supply"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions"
+        }
+      ]
+    },
+    {
+      "submissionId": "current-review-orbital-supply-3",
+      "guestSessionId": "2cca50b2-6ee1-405e-b831-38d839caf988",
+      "expectedRevision": 11,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "orbital-supply"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions"
+        }
+      ]
+    },
+    {
+      "submissionId": "current-review-island-supply-0",
+      "guestSessionId": "98e71a3b-81a7-4962-b162-798509d4a173",
+      "expectedRevision": 12,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "island-supply"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions"
+        }
+      ]
+    },
+    {
+      "submissionId": "current-review-island-supply-1",
+      "guestSessionId": "21269c9a-ff8a-4a4d-9cad-63d266829f1d",
+      "expectedRevision": 13,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "island-supply"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions"
+        }
+      ]
+    },
+    {
+      "submissionId": "current-review-island-supply-2",
+      "guestSessionId": "79bacdca-4e9c-49aa-a4f7-ea3fe664536e",
+      "expectedRevision": 14,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "island-supply"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions"
+        }
+      ]
+    },
+    {
+      "submissionId": "current-review-island-supply-3",
+      "guestSessionId": "b044b5ce-2d84-41c5-9381-b44bf651bc95",
+      "expectedRevision": 15,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "island-supply"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions"
+        }
+      ]
+    }
+  ],
+  "view": {
+    "version": 2,
+    "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+    "revision": 16,
+    "guestCount": 16,
+    "algorithmVersion": 2,
+    "voteSums": {
+      "automation": 0,
+      "publicSharing": 0,
+      "environmentalPriority": 0,
+      "urbanConcentration": 0
+    },
+    "recentVotes": {
+      "automation": 0,
+      "publicSharing": 0,
+      "environmentalPriority": 0,
+      "urbanConcentration": 0
+    },
+    "scores": {
+      "automation": 0,
+      "publicSharing": 0,
+      "environmentalPriority": 0,
+      "urbanConcentration": 0
+    },
+    "slotSeeds": {
+      "automation": 0,
+      "publicSharing": 0,
+      "environmentalPriority": 0,
+      "urbanConcentration": 0
+    },
+    "layout": {
+      "version": 2,
+      "bands": {
+        "nw": "mixed",
+        "ne": "mixed",
+        "sw": "mixed",
+        "se": "mixed"
+      },
+      "automatedPorts": 3,
+      "sharedSeats": 4,
+      "treeCount": 8,
+      "plantedFraction": 0.5,
+      "coolingFins": 3,
+      "functionModules": 4,
+      "energy": {
+        "waterGardens": 1,
+        "receiver": "small",
+        "flywheel": true,
+        "island": true
+      }
+    },
+    "energy": {
+      "climateGuestCount": 0,
+      "counts": {
+        "water-storage": 4,
+        "rotor-storage": 4,
+        "orbital-supply": 4,
+        "island-supply": 4
+      }
+    },
+    "recentProposals": [
+      {
+        "id": "current-review-water-storage-0",
+        "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+        "guestSessionId": "d519cac0-5bcf-43a4-8396-42ad193e5ceb",
+        "ordinal": 1,
+        "displayAt": "2026-10-25T07:41:27.610Z",
+        "questionSetVersion": 4,
+        "algorithmVersion": 2,
+        "answers": [
+          {
+            "questionId": "service-2127",
+            "optionId": "human-machine",
+            "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+            "optionLabel": "普段は自動で、困ったときは人に相談したい"
+          },
+          {
+            "questionId": "commons-2127",
+            "optionId": "mixed-seating",
+            "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+            "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+          },
+          {
+            "questionId": "energy-2127",
+            "optionId": "water-storage",
+            "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+            "optionLabel": "水の音や機械が身近でも、海辺の庭で電気を蓄える暮らし"
+          },
+          {
+            "questionId": "functions-2127",
+            "optionId": "mixed-functions",
+            "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+            "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+          }
+        ],
+        "votes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "energy": "water-storage",
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "revisionBefore": 0,
+        "revisionAfter": 1,
+        "submittedAt": "2026-10-25T07:41:27.610Z",
+        "beforeScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "afterScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "beforeLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4
+        },
+        "afterLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 0,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          }
+        },
+        "cityChanges": []
+      },
+      {
+        "id": "current-review-water-storage-1",
+        "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+        "guestSessionId": "7a5b1335-0e1a-476a-90d8-d00cccb1b826",
+        "ordinal": 2,
+        "displayAt": "2026-10-25T07:41:43.611Z",
+        "questionSetVersion": 4,
+        "algorithmVersion": 2,
+        "answers": [
+          {
+            "questionId": "service-2127",
+            "optionId": "human-machine",
+            "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+            "optionLabel": "普段は自動で、困ったときは人に相談したい"
+          },
+          {
+            "questionId": "commons-2127",
+            "optionId": "mixed-seating",
+            "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+            "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+          },
+          {
+            "questionId": "energy-2127",
+            "optionId": "water-storage",
+            "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+            "optionLabel": "水の音や機械が身近でも、海辺の庭で電気を蓄える暮らし"
+          },
+          {
+            "questionId": "functions-2127",
+            "optionId": "mixed-functions",
+            "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+            "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+          }
+        ],
+        "votes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "energy": "water-storage",
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "revisionBefore": 1,
+        "revisionAfter": 2,
+        "submittedAt": "2026-10-25T07:41:43.611Z",
+        "beforeScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "afterScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "beforeLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 0,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          }
+        },
+        "afterLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          }
+        },
+        "cityChanges": []
+      },
+      {
+        "id": "current-review-water-storage-2",
+        "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+        "guestSessionId": "787c215b-fb41-4a6a-805e-0b4926b47e6e",
+        "ordinal": 3,
+        "displayAt": "2026-10-25T07:41:59.611Z",
+        "questionSetVersion": 4,
+        "algorithmVersion": 2,
+        "answers": [
+          {
+            "questionId": "service-2127",
+            "optionId": "human-machine",
+            "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+            "optionLabel": "普段は自動で、困ったときは人に相談したい"
+          },
+          {
+            "questionId": "commons-2127",
+            "optionId": "mixed-seating",
+            "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+            "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+          },
+          {
+            "questionId": "energy-2127",
+            "optionId": "water-storage",
+            "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+            "optionLabel": "水の音や機械が身近でも、海辺の庭で電気を蓄える暮らし"
+          },
+          {
+            "questionId": "functions-2127",
+            "optionId": "mixed-functions",
+            "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+            "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+          }
+        ],
+        "votes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "energy": "water-storage",
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "revisionBefore": 2,
+        "revisionAfter": 3,
+        "submittedAt": "2026-10-25T07:41:59.611Z",
+        "beforeScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "afterScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "beforeLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          }
+        },
+        "afterLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 2,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          }
+        },
+        "cityChanges": []
+      },
+      {
+        "id": "current-review-water-storage-3",
+        "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+        "guestSessionId": "af6311a3-9627-4cc9-b0e5-b15d12fa33dc",
+        "ordinal": 4,
+        "displayAt": "2026-10-25T07:42:15.612Z",
+        "questionSetVersion": 4,
+        "algorithmVersion": 2,
+        "answers": [
+          {
+            "questionId": "service-2127",
+            "optionId": "human-machine",
+            "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+            "optionLabel": "普段は自動で、困ったときは人に相談したい"
+          },
+          {
+            "questionId": "commons-2127",
+            "optionId": "mixed-seating",
+            "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+            "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+          },
+          {
+            "questionId": "energy-2127",
+            "optionId": "water-storage",
+            "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+            "optionLabel": "水の音や機械が身近でも、海辺の庭で電気を蓄える暮らし"
+          },
+          {
+            "questionId": "functions-2127",
+            "optionId": "mixed-functions",
+            "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+            "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+          }
+        ],
+        "votes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "energy": "water-storage",
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "revisionBefore": 3,
+        "revisionAfter": 4,
+        "submittedAt": "2026-10-25T07:42:15.612Z",
+        "beforeScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "afterScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "beforeLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 2,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          }
+        },
+        "afterLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 2,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          }
+        },
+        "cityChanges": []
+      },
+      {
+        "id": "current-review-rotor-storage-0",
+        "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+        "guestSessionId": "72adf6e8-a21a-434a-a0d3-3eef35cdb99e",
+        "ordinal": 5,
+        "displayAt": "2026-10-25T07:42:31.612Z",
+        "questionSetVersion": 4,
+        "algorithmVersion": 2,
+        "answers": [
+          {
+            "questionId": "service-2127",
+            "optionId": "human-machine",
+            "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+            "optionLabel": "普段は自動で、困ったときは人に相談したい"
+          },
+          {
+            "questionId": "commons-2127",
+            "optionId": "mixed-seating",
+            "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+            "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+          },
+          {
+            "questionId": "energy-2127",
+            "optionId": "rotor-storage",
+            "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+            "optionLabel": "大きな機械が景色に加わっても、街の中心で電気を蓄える暮らし"
+          },
+          {
+            "questionId": "functions-2127",
+            "optionId": "mixed-functions",
+            "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+            "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+          }
+        ],
+        "votes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "energy": "rotor-storage",
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "revisionBefore": 4,
+        "revisionAfter": 5,
+        "submittedAt": "2026-10-25T07:42:31.612Z",
+        "beforeScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "afterScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "beforeLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 2,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          }
+        },
+        "afterLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 2,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          }
+        },
+        "cityChanges": []
+      },
+      {
+        "id": "current-review-rotor-storage-1",
+        "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+        "guestSessionId": "d976b2ff-b0da-4e7a-81d4-0a58bd8dbb34",
+        "ordinal": 6,
+        "displayAt": "2026-10-25T07:42:47.613Z",
+        "questionSetVersion": 4,
+        "algorithmVersion": 2,
+        "answers": [
+          {
+            "questionId": "service-2127",
+            "optionId": "human-machine",
+            "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+            "optionLabel": "普段は自動で、困ったときは人に相談したい"
+          },
+          {
+            "questionId": "commons-2127",
+            "optionId": "mixed-seating",
+            "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+            "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+          },
+          {
+            "questionId": "energy-2127",
+            "optionId": "rotor-storage",
+            "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+            "optionLabel": "大きな機械が景色に加わっても、街の中心で電気を蓄える暮らし"
+          },
+          {
+            "questionId": "functions-2127",
+            "optionId": "mixed-functions",
+            "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+            "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+          }
+        ],
+        "votes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "energy": "rotor-storage",
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "revisionBefore": 5,
+        "revisionAfter": 6,
+        "submittedAt": "2026-10-25T07:42:47.613Z",
+        "beforeScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "afterScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "beforeLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 2,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          }
+        },
+        "afterLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 2,
+            "receiver": "none",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "cityChanges": []
+      },
+      {
+        "id": "current-review-rotor-storage-2",
+        "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+        "guestSessionId": "6b4c995e-5c71-46bc-8873-a3e59fbec887",
+        "ordinal": 7,
+        "displayAt": "2026-10-25T07:43:03.614Z",
+        "questionSetVersion": 4,
+        "algorithmVersion": 2,
+        "answers": [
+          {
+            "questionId": "service-2127",
+            "optionId": "human-machine",
+            "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+            "optionLabel": "普段は自動で、困ったときは人に相談したい"
+          },
+          {
+            "questionId": "commons-2127",
+            "optionId": "mixed-seating",
+            "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+            "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+          },
+          {
+            "questionId": "energy-2127",
+            "optionId": "rotor-storage",
+            "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+            "optionLabel": "大きな機械が景色に加わっても、街の中心で電気を蓄える暮らし"
+          },
+          {
+            "questionId": "functions-2127",
+            "optionId": "mixed-functions",
+            "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+            "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+          }
+        ],
+        "votes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "energy": "rotor-storage",
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "revisionBefore": 6,
+        "revisionAfter": 7,
+        "submittedAt": "2026-10-25T07:43:03.614Z",
+        "beforeScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "afterScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "beforeLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 2,
+            "receiver": "none",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "afterLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "none",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "cityChanges": []
+      },
+      {
+        "id": "current-review-rotor-storage-3",
+        "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+        "guestSessionId": "958100c5-baf3-4035-8581-a82e4ba197f4",
+        "ordinal": 8,
+        "displayAt": "2026-10-25T07:43:19.614Z",
+        "questionSetVersion": 4,
+        "algorithmVersion": 2,
+        "answers": [
+          {
+            "questionId": "service-2127",
+            "optionId": "human-machine",
+            "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+            "optionLabel": "普段は自動で、困ったときは人に相談したい"
+          },
+          {
+            "questionId": "commons-2127",
+            "optionId": "mixed-seating",
+            "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+            "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+          },
+          {
+            "questionId": "energy-2127",
+            "optionId": "rotor-storage",
+            "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+            "optionLabel": "大きな機械が景色に加わっても、街の中心で電気を蓄える暮らし"
+          },
+          {
+            "questionId": "functions-2127",
+            "optionId": "mixed-functions",
+            "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+            "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+          }
+        ],
+        "votes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "energy": "rotor-storage",
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "revisionBefore": 7,
+        "revisionAfter": 8,
+        "submittedAt": "2026-10-25T07:43:19.614Z",
+        "beforeScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "afterScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "beforeLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "none",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "afterLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "none",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "cityChanges": []
+      },
+      {
+        "id": "current-review-orbital-supply-0",
+        "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+        "guestSessionId": "ae7570f2-b7e3-475e-bd82-c3d27cc9c5a9",
+        "ordinal": 9,
+        "displayAt": "2026-10-25T07:43:35.615Z",
+        "questionSetVersion": 4,
+        "algorithmVersion": 2,
+        "answers": [
+          {
+            "questionId": "service-2127",
+            "optionId": "human-machine",
+            "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+            "optionLabel": "普段は自動で、困ったときは人に相談したい"
+          },
+          {
+            "questionId": "commons-2127",
+            "optionId": "mixed-seating",
+            "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+            "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+          },
+          {
+            "questionId": "energy-2127",
+            "optionId": "orbital-supply",
+            "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+            "optionLabel": "海の上に受け取る面が広がっても、空から届く電気を使う暮らし"
+          },
+          {
+            "questionId": "functions-2127",
+            "optionId": "mixed-functions",
+            "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+            "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+          }
+        ],
+        "votes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "energy": "orbital-supply",
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "revisionBefore": 8,
+        "revisionAfter": 9,
+        "submittedAt": "2026-10-25T07:43:35.615Z",
+        "beforeScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "afterScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "beforeLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "none",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "afterLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "none",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "cityChanges": []
+      },
+      {
+        "id": "current-review-orbital-supply-1",
+        "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+        "guestSessionId": "9769cdd1-6678-441e-aaed-8d9160bb862e",
+        "ordinal": 10,
+        "displayAt": "2026-10-25T07:43:51.616Z",
+        "questionSetVersion": 4,
+        "algorithmVersion": 2,
+        "answers": [
+          {
+            "questionId": "service-2127",
+            "optionId": "human-machine",
+            "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+            "optionLabel": "普段は自動で、困ったときは人に相談したい"
+          },
+          {
+            "questionId": "commons-2127",
+            "optionId": "mixed-seating",
+            "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+            "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+          },
+          {
+            "questionId": "energy-2127",
+            "optionId": "orbital-supply",
+            "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+            "optionLabel": "海の上に受け取る面が広がっても、空から届く電気を使う暮らし"
+          },
+          {
+            "questionId": "functions-2127",
+            "optionId": "mixed-functions",
+            "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+            "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+          }
+        ],
+        "votes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "energy": "orbital-supply",
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "revisionBefore": 9,
+        "revisionAfter": 10,
+        "submittedAt": "2026-10-25T07:43:51.616Z",
+        "beforeScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "afterScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "beforeLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "none",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "afterLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "none",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "cityChanges": []
+      },
+      {
+        "id": "current-review-orbital-supply-2",
+        "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+        "guestSessionId": "b1523575-1e73-4bc9-ad2c-49e222245633",
+        "ordinal": 11,
+        "displayAt": "2026-10-25T07:44:07.616Z",
+        "questionSetVersion": 4,
+        "algorithmVersion": 2,
+        "answers": [
+          {
+            "questionId": "service-2127",
+            "optionId": "human-machine",
+            "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+            "optionLabel": "普段は自動で、困ったときは人に相談したい"
+          },
+          {
+            "questionId": "commons-2127",
+            "optionId": "mixed-seating",
+            "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+            "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+          },
+          {
+            "questionId": "energy-2127",
+            "optionId": "orbital-supply",
+            "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+            "optionLabel": "海の上に受け取る面が広がっても、空から届く電気を使う暮らし"
+          },
+          {
+            "questionId": "functions-2127",
+            "optionId": "mixed-functions",
+            "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+            "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+          }
+        ],
+        "votes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "energy": "orbital-supply",
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "revisionBefore": 10,
+        "revisionAfter": 11,
+        "submittedAt": "2026-10-25T07:44:07.616Z",
+        "beforeScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "afterScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "beforeLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "none",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "afterLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "small",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "cityChanges": []
+      },
+      {
+        "id": "current-review-orbital-supply-3",
+        "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+        "guestSessionId": "2cca50b2-6ee1-405e-b831-38d839caf988",
+        "ordinal": 12,
+        "displayAt": "2026-10-25T07:44:23.617Z",
+        "questionSetVersion": 4,
+        "algorithmVersion": 2,
+        "answers": [
+          {
+            "questionId": "service-2127",
+            "optionId": "human-machine",
+            "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+            "optionLabel": "普段は自動で、困ったときは人に相談したい"
+          },
+          {
+            "questionId": "commons-2127",
+            "optionId": "mixed-seating",
+            "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+            "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+          },
+          {
+            "questionId": "energy-2127",
+            "optionId": "orbital-supply",
+            "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+            "optionLabel": "海の上に受け取る面が広がっても、空から届く電気を使う暮らし"
+          },
+          {
+            "questionId": "functions-2127",
+            "optionId": "mixed-functions",
+            "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+            "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+          }
+        ],
+        "votes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "energy": "orbital-supply",
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "revisionBefore": 11,
+        "revisionAfter": 12,
+        "submittedAt": "2026-10-25T07:44:23.617Z",
+        "beforeScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "afterScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "beforeLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "small",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "afterLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "small",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "cityChanges": []
+      },
+      {
+        "id": "current-review-island-supply-0",
+        "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+        "guestSessionId": "98e71a3b-81a7-4962-b162-798509d4a173",
+        "ordinal": 13,
+        "displayAt": "2026-10-25T07:44:39.617Z",
+        "questionSetVersion": 4,
+        "algorithmVersion": 2,
+        "answers": [
+          {
+            "questionId": "service-2127",
+            "optionId": "human-machine",
+            "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+            "optionLabel": "普段は自動で、困ったときは人に相談したい"
+          },
+          {
+            "questionId": "commons-2127",
+            "optionId": "mixed-seating",
+            "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+            "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+          },
+          {
+            "questionId": "energy-2127",
+            "optionId": "island-supply",
+            "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+            "optionLabel": "海の一部が設備の陸地に変わっても、沖の原子力施設から電気を届ける暮らし"
+          },
+          {
+            "questionId": "functions-2127",
+            "optionId": "mixed-functions",
+            "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+            "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+          }
+        ],
+        "votes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "energy": "island-supply",
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "revisionBefore": 12,
+        "revisionAfter": 13,
+        "submittedAt": "2026-10-25T07:44:39.617Z",
+        "beforeScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "afterScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "beforeLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "small",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "afterLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "small",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "cityChanges": []
+      },
+      {
+        "id": "current-review-island-supply-1",
+        "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+        "guestSessionId": "21269c9a-ff8a-4a4d-9cad-63d266829f1d",
+        "ordinal": 14,
+        "displayAt": "2026-10-25T07:44:55.618Z",
+        "questionSetVersion": 4,
+        "algorithmVersion": 2,
+        "answers": [
+          {
+            "questionId": "service-2127",
+            "optionId": "human-machine",
+            "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+            "optionLabel": "普段は自動で、困ったときは人に相談したい"
+          },
+          {
+            "questionId": "commons-2127",
+            "optionId": "mixed-seating",
+            "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+            "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+          },
+          {
+            "questionId": "energy-2127",
+            "optionId": "island-supply",
+            "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+            "optionLabel": "海の一部が設備の陸地に変わっても、沖の原子力施設から電気を届ける暮らし"
+          },
+          {
+            "questionId": "functions-2127",
+            "optionId": "mixed-functions",
+            "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+            "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+          }
+        ],
+        "votes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "energy": "island-supply",
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "revisionBefore": 13,
+        "revisionAfter": 14,
+        "submittedAt": "2026-10-25T07:44:55.618Z",
+        "beforeScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "afterScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "beforeLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "small",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "afterLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "small",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "cityChanges": []
+      },
+      {
+        "id": "current-review-island-supply-2",
+        "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+        "guestSessionId": "79bacdca-4e9c-49aa-a4f7-ea3fe664536e",
+        "ordinal": 15,
+        "displayAt": "2026-10-25T07:45:11.619Z",
+        "questionSetVersion": 4,
+        "algorithmVersion": 2,
+        "answers": [
+          {
+            "questionId": "service-2127",
+            "optionId": "human-machine",
+            "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+            "optionLabel": "普段は自動で、困ったときは人に相談したい"
+          },
+          {
+            "questionId": "commons-2127",
+            "optionId": "mixed-seating",
+            "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+            "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+          },
+          {
+            "questionId": "energy-2127",
+            "optionId": "island-supply",
+            "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+            "optionLabel": "海の一部が設備の陸地に変わっても、沖の原子力施設から電気を届ける暮らし"
+          },
+          {
+            "questionId": "functions-2127",
+            "optionId": "mixed-functions",
+            "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+            "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+          }
+        ],
+        "votes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "energy": "island-supply",
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "revisionBefore": 14,
+        "revisionAfter": 15,
+        "submittedAt": "2026-10-25T07:45:11.619Z",
+        "beforeScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "afterScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "beforeLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "small",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "afterLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "small",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "cityChanges": []
+      },
+      {
+        "id": "current-review-island-supply-3",
+        "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+        "guestSessionId": "b044b5ce-2d84-41c5-9381-b44bf651bc95",
+        "ordinal": 16,
+        "displayAt": "2026-10-25T07:45:27.620Z",
+        "questionSetVersion": 4,
+        "algorithmVersion": 2,
+        "answers": [
+          {
+            "questionId": "service-2127",
+            "optionId": "human-machine",
+            "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+            "optionLabel": "普段は自動で、困ったときは人に相談したい"
+          },
+          {
+            "questionId": "commons-2127",
+            "optionId": "mixed-seating",
+            "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+            "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+          },
+          {
+            "questionId": "energy-2127",
+            "optionId": "island-supply",
+            "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+            "optionLabel": "海の一部が設備の陸地に変わっても、沖の原子力施設から電気を届ける暮らし"
+          },
+          {
+            "questionId": "functions-2127",
+            "optionId": "mixed-functions",
+            "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+            "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+          }
+        ],
+        "votes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "energy": "island-supply",
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "revisionBefore": 15,
+        "revisionAfter": 16,
+        "submittedAt": "2026-10-25T07:45:27.620Z",
+        "beforeScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "afterScores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "beforeLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "small",
+            "flywheel": true,
+            "island": false
+          }
+        },
+        "afterLayout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4,
+          "energy": {
+            "waterGardens": 1,
+            "receiver": "small",
+            "flywheel": true,
+            "island": true
+          }
+        },
+        "cityChanges": []
+      }
+    ],
+    "latestProposal": {
+      "id": "current-review-island-supply-3",
+      "runId": "49cc7c7a-8568-4251-8d7d-17a6cd201077",
+      "guestSessionId": "b044b5ce-2d84-41c5-9381-b44bf651bc95",
+      "ordinal": 16,
+      "displayAt": "2026-10-25T07:45:27.620Z",
+      "questionSetVersion": 4,
+      "algorithmVersion": 2,
+      "answers": [
+        {
+          "questionId": "service-2127",
+          "optionId": "human-machine",
+          "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+          "optionLabel": "普段は自動で、困ったときは人に相談したい"
+        },
+        {
+          "questionId": "commons-2127",
+          "optionId": "mixed-seating",
+          "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+          "optionLabel": "静かな席と、自由に集まれる場所が半分ずつある海辺"
+        },
+        {
+          "questionId": "energy-2127",
+          "optionId": "island-supply",
+          "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+          "optionLabel": "海の一部が設備の陸地に変わっても、沖の原子力施設から電気を届ける暮らし"
+        },
+        {
+          "questionId": "functions-2127",
+          "optionId": "mixed-functions",
+          "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+          "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+        }
+      ],
+      "votes": {
+        "automation": 0,
+        "publicSharing": 0,
+        "energy": "island-supply",
+        "environmentalPriority": 0,
+        "urbanConcentration": 0
+      },
+      "revisionBefore": 15,
+      "revisionAfter": 16,
+      "submittedAt": "2026-10-25T07:45:27.620Z",
+      "beforeScores": {
+        "automation": 0,
+        "publicSharing": 0,
+        "environmentalPriority": 0,
+        "urbanConcentration": 0
+      },
+      "afterScores": {
+        "automation": 0,
+        "publicSharing": 0,
+        "environmentalPriority": 0,
+        "urbanConcentration": 0
+      },
+      "beforeLayout": {
+        "version": 2,
+        "bands": {
+          "nw": "mixed",
+          "ne": "mixed",
+          "sw": "mixed",
+          "se": "mixed"
+        },
+        "automatedPorts": 3,
+        "sharedSeats": 4,
+        "treeCount": 8,
+        "plantedFraction": 0.5,
+        "coolingFins": 3,
+        "functionModules": 4,
+        "energy": {
+          "waterGardens": 1,
+          "receiver": "small",
+          "flywheel": true,
+          "island": false
+        }
+      },
+      "afterLayout": {
+        "version": 2,
+        "bands": {
+          "nw": "mixed",
+          "ne": "mixed",
+          "sw": "mixed",
+          "se": "mixed"
+        },
+        "automatedPorts": 3,
+        "sharedSeats": 4,
+        "treeCount": 8,
+        "plantedFraction": 0.5,
+        "coolingFins": 3,
+        "functionModules": 4,
+        "energy": {
+          "waterGardens": 1,
+          "receiver": "small",
+          "flywheel": true,
+          "island": true
+        }
+      },
+      "cityChanges": []
+    }
+  },
+  "offset": 256000,
+  "note": "16 valid proposals, four per energy choice; Q1/Q2/Q4 option index1. Scratch clock advances skip reading waits, not visitor timing."
+}

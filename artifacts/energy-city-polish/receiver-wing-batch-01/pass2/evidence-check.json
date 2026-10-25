@@ -1,0 +1,18 @@
+{
+  "sourceSha256": "de5567640acb4b3b8bc15dcd3a6cbcd2779f59c960dca3e0c3be009aa970a896",
+  "browser": "156.0.8078.47",
+  "gpu": {
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+  },
+  "screenshots": 33,
+  "staticPngIdentical": true,
+  "liveTimes": [
+    "21.39",
+    "28.88"
+  ],
+  "formal": "PASS original E4 runner; only expected favicon404, obsolete409, two injected aborts",
+  "platform": "darwin",
+  "quality": "default",
+  "fps": "NOT MEASURED"
+}

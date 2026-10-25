@@ -1,0 +1,10 @@
+{
+  "status": "LOCKED_PREPARATION_REFERENCE",
+  "generator": "built-in image_gen",
+  "input": "baseline-corrected/detail-day-large.png",
+  "output": "target.png",
+  "sha256": "02bbde1032c230d51199d1d9cc219ca39fb9935f0af44b456fd843895ef51a40",
+  "workflowTarget": ".dream-loop/receiver-wing-batch-01/target.png",
+  "acceptedRingTargetUnchanged": "70c988bbfaa5f85698a1a8b45382c8d4ca06cf63362777ee90402369b2e61b3b",
+  "limitations": "Output 1672x941 differs from input 1920x1080; retain original framing/runtime camera, ignore UI/text and non-receiver generative drift. Still retains panel-array character; no claim that future identity or implementation is accepted."
+}

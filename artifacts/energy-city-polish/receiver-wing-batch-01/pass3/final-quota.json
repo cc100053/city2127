@@ -1,0 +1,18 @@
+{
+  "observedAt": "2026-10-25T06:12:50.126Z",
+  "fiveHour": {
+    "usedPercent": 1,
+    "windowDurationMins": 300,
+    "resetsAt": 1792926692
+  },
+  "weekly": {
+    "usedPercent": 0,
+    "windowDurationMins": 10080,
+    "resetsAt": 1793513492
+  },
+  "planType": "plus",
+  "ordinaryUsageAllowed": true,
+  "availableBankedResets": 2,
+  "resetsTriggeredByThisBatch": 0,
+  "note": "Previous observed values 60% five-hour / 89% weekly; current tool values changed externally/unknown reason. No reset mutation invoked by this batch, no extra passes authorized."
+}

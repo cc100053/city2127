@@ -196,3 +196,31 @@ P3在現行v4回歸PASS：Chrome1280×720、hour16，實測A/B閱讀間隔10,002
 使用者限定先測目前Mac。Mac mini Mac18,5／Apple M6（12 GPU cores）／24GB／macOS27.0.1、Chrome156.0.8078.47 **headed**、ANGLE Metal／WebGL2，Vite DEV、City1920×1080／DPR1／Guest A/B1280×900。原hero起始但OrbitControls未鎖定，截圖顯示視角有變，故不是完全固定鏡頭benchmark；不推算能源額外成本或其他視角效能。三個Meter中間答案，四類能源正式共存。60秒零提案／混合default31.10／32.36 FPS，low均59.94 FPS。low自動日夜1801.94秒／108,008frames，平均59.94，p95／p99 17.9／18.6ms，max66.7ms，每5秒讀取的120幀renderer FPS樣本59.8–60.1；90份原生UI A/B＋16份真實HTTP種子，count106，server各對展示排程差10,000ms。每5秒renderer counts425 geometries／24 textures不變，JS heap19.2–51.8MiB，沒有page crash／exception／context loss；只有3個favicon404 console訊息。[方法、完整資料及鏡頭／記憶體限制](../artifacts/energy-city-e5/README.md)，[交接](handoffs/energy-city.md)。獨立1分鐘runner補驗：真實City TCP切斷＋offline3秒後新connection5→6，count20與能源target／reload恢復，只有預期favicon404及offline錯誤。最終runner另驗pointer input保護／繼續render及拒絕覆寫舊證據；raw舊row.fps為每120幀renderer均值，新runner將rendererFps與rAF fps分開。Root完整npm test（含E5統計self-check）／build通過，僅既有>500kB chunk warning；Git整合紀錄見交接。
 
 可重跑`node tests/energyE5.browser.mjs --self-test`；完整headed browser runner的Playwright path、scratch／Vite及證據目錄設定見artifact README。30分鐘不代表整日穩定性，4K／所有Meter與能源極值、65吋HDMI／iPad Safari／專用LAN／真人閱讀理解仍未驗。E5／P5／S5不因此完成。
+
+## 儲能環 polish 恢復續作 — 2026-10-25
+
+首輪恢復source5255520已在獨立clone重跑root test/build/diff PASS；108正式權威模型及324 district／170424 exact checks、r29–33／depth±1.5全周與固定承托、船／航空／泊位／公共／四站視線均未放寬。Chrome156 headless／WebGL2、1920×1080 DPR1 default：新DEV27原圖及正式scratch runner PASS，包含native static、live兩時點、固定三phase、日暮夜及正式歷史／retry／Undo／reconnect／reduced-motion／reset。首次並行formal reduced-page30秒timeout及DEV未完成static讀取均保留；未修改原正式runner門檻，單獨重跑通過。固定時間static兩張PNG hash一致；其他live城市actor仍會動。
+
+逐輪source hash、完整PNG／raw log／JSON、實際checkpoint／清理與總指揮review狀態見 [儲能環交接](handoffs/storage-ring-polish.md) 及 [新證據](../artifacts/energy-city-polish/storage-ring-recovered-20261025/README.md)。沒有新FPS／展覽硬件／Safari／iPad／Windows／工程或target達成宣稱；survey build僅作scratch fixture，source未改。
+
+第二輪原候選47cf4d5亦完成同一完整root／DEV27圖／正式gate PASS（47 batches，108／324／170424）；環外source未變。原正式runner的reduced新頁30秒timeout可再次出現：現只在該段先釋放舊City renderer，再恢復hour22及額外核對同一model(view)。原assertions／quality／30與45秒門檻保留，沒有放寬tests；失敗原runner、圖及新排程成功證據同存pass2。詳細限制沿用上段與handoff。
+
+第三輪source27c1e4f（真正same-chat fresh gpt-6-astra/low worker、owner驗收）完整root test/build/base-diff、DEV27原PNG及正式scratch gate PASS；48 batches、theatre gap30.50m、108／324／170424。環外source與原target逐byte保持；static兩圖相同，live29.15→35.10秒。延續上段renderer排程，原assertions／quality／timeout未改；所測平台／原圖、source commit／bundle／hash／服務清理與未驗項目均在儲能環handoff。三輪後停止，target審美review／硬件／工程／新FPS未完成，沒有push／main整合。
+
+## 軌道接收翼準備 — 2026-10-25（未實作）
+
+只新增[baseline／imagegen target及保存紀錄](../artifacts/energy-city-polish/receiver-wing-batch-01/README.md)，[owner交接](handoffs/receiver-wing-polish.md)。source維持5db4e6e／SHA27c1e4f，runtime/tests未變；Chrome156 headless／ANGLE Metal Apple M6／WebGL2、1920×1080 DPR1 default，原hero mixed日景及接收翼大小版日景／大型夜景。第一組detail觸發既有相機district clamp，保留失效構圖後以合法aim重拍；沒有改相機source。無page exception／failed request／非預期console，僅favicon404。這是準備baseline，不是新實作回歸或目標達成；本輪未重跑test/build／正式pipeline／FPS／硬件。等待另授權重型Plus三輪。
+
+接收翼第一輪（source0f1941bd）：root test/build/diff、原大小版AABB／翼外hash、33 DEV原圖與原正式scratch gate PASS；49 batches、108／324／170775，固定static PNG一致，live21.20→26.22秒。原tests／timeouts未改，只有預期404／obsolete409／注入abort。實測平台／清理／未驗限制及逐輪commit／備份見接收翼handoff，並非新FPS或工程驗收。
+
+接收翼第二輪（sourcede556764）：相同完整root／包絡／scope hash／DEV33／原正式gate PASS，49 batches／108／324／170775；static PNG一致、live21.39→28.88秒，僅預期browser錯誤，原assertions／quality／timeout不變。逐輪原圖、限制、清理及本機backup見接收翼handoff。
+
+接收翼第三輪（source01987a48）：完整root test/build/diff／原大小版AABB／protected hashes、DEV33原圖及原正式scratch gate全部PASS，49 batches／108／324／170775；static PNG一致、live21.45→26.50秒。三輪合共99張DEV新原圖，原tests／quality／timeout不變，沒有新增global光源或用途。三輪後停止等coordinator review，逐輪source commit／final metadata commit／bundle／archive與未驗限制見接收翼handoff。
+
+
+## 儲能環夜間可讀性一次試驗 — 2026-10-25（未採用）
+
+Trial source29168309的root test/build/diff、exact環外source／全energy幾何／環外與shared材質保護、原DEV27圖及原正式scratch gate PASS；49 batches、108／324／170775。Before／trial各27張1920×1080 DPR1 default原圖、21組固定URL／time配對及全部54個PNG hash核實，兩輪固定static均一致；Chrome156.0.8078.47 headless／ANGLE Metal Apple M6／WebGL2，沒有未預期DEV錯誤，formal exceptions0，只有既有favicon404／obsolete409／注入abort。Owner原尺寸hero/day/night review判定夜間改善不足、日景銀邊減弱，因此不採用候選並逐byte還原01987a48 baseline。初版artifact checker的JSON undefined比對失敗及修正完整保留，原runtime tests未改；還原狀態的額外實測、所有raw logs／原圖／diff／target及備份verify見[handoff](handoffs/ring-night-readability.md)與[證據入口](../artifacts/energy-city-polish/ring-night-readability-20261025/README.md)。軟件gate不等於視覺接受，夜間缺口仍開放；沒有新FPS／工程／硬件／Safari／iPad／Windows／真人理解或main CI宣稱。
+
+
+2026-10-25 發布更新：使用者已明確要求推送能源polish及整合main，先前本機-only狀態由[本次整合交接](handoffs/energy-polish-integration.md)取代。既有runtime未再修改；root test/build／正式scratch browser已重跑PASS，整合後驗證、main CI與安全刪分支的實際結果統一記在該交接，原target／夜間可讀性／硬件限制保留。

@@ -1,0 +1,14 @@
+{
+  "decision": "REJECT_TRIAL_RETAIN_BASELINE",
+  "baselineSourceCommit": "333e984f1a4bb315238aa6d8baeded797c659fc6",
+  "startingHead": "b24cf3d8b569780324e4bf0f491bdf8af3c30169",
+  "finalRuntimeSha256": "01987a48101b59559709dc2ce5461ec51617f0a73a06803e45c50354612556f3",
+  "trialRuntimeSha256": "29168309084f683cf6c57e82ca45ee2c3fa2e3ba22e86cb4fc92c2103b60cf02",
+  "trialPatchSha256": "67735ff50716474114464671f951b1f29fd9ccb9e6ca894743daf069ce4cf556",
+  "trialSourceCommit": null,
+  "sourceCommitNote": "Trial was rejected and only archived as source/patch/evidence; no candidate runtime commit. Final runtime source remains accepted333e984 and byte-identical to starting HEAD.",
+  "protectedCodeDiff": "",
+  "originalFormalRunnerSha256": "b36aad574bf308773469943de50c0ff22dfbf721cda3b90d011ebcd3d6a5c3fe",
+  "formalTrial": "PASS; no original runner assertions/quality/timeouts changed",
+  "sourceRestore": "byte-identical cmp PASS"
+}

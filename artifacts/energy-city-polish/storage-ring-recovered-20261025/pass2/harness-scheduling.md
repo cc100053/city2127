@@ -1,0 +1,5 @@
+# 正式browser載入排程
+
+第二輪原runner單獨執行仍在reduced context的首個canvas diagnostics等待30秒timeout；失敗原runner/log/PNG保留formal-attempt1。原City仍保留完整renderer，新增reduced City亦cold-load另一renderer。
+
+只在這段測試前將原City導航about:blank釋放場景；reduced context關閉後重新載入原hour22，並額外model(view)核對相同權威snapshot。原assertions、全部30／45秒門檻及測試情境逐byte保留；不是改quality或放寬timeout。產品source沒變。新排程需要實際重跑通過才算修正。
