@@ -38,12 +38,46 @@ export function energyPrototype() {
   // Offshore receiver: a bifurcating mast carries two folded collection surfaces, leaving open sea beneath.
   wing.position.set(125, 0, -424);
   arc(wing, 0, 5, 2, [0, -2, 0], stone);
-  member(wing, [0, 0, 0], [0, 25, 0], 2.4);
+  arc(wing, 0, 1.2, 25, [0, 0, 0], trim);
+  // The service neck and seated joints make the existing fork read as one supported assembly.
+  arc(wing, 0, .96, 4.2, [0, 25, 0], dark);
+  arc(wing, 0, 1.14, 3.7, [0, 25.25, 0], trim);
+  for (const y of [1, 15.6, 17, 24.6, 28.8]) {
+    arc(wing, 1.16, 1.34, .18, [0, y, 0], chrome);
+    arc(wing, 1.16, 1.28, .12, [0, y + .22, 0], dark);
+  }
+  box(wing, [.72, 7.2, .08], [0, 8, 1.18], dark);
+  box(wing, [.58, 6.95, .08], [0, 8, 1.22], trim);
   for (const side of [-1, 1]) {
-    member(wing, [0, 16, 0], [side * 20, 34, 0], 1.4);
+    member(wing, [0, 16, 0], [side * 20, 31.8, 0], 1.4);
+    for (const z of [-.71, .71]) {
+      member(wing, [side * 1.3, 17.03, z], [side * 18.8, 30.85, z], .16, chrome);
+      const joint = arc(wing, 0, .78, .12, [side * 1.35, 17.07, z], trim);
+      joint.rotation.x = Math.PI / 2;
+      const pin = arc(wing, 0, .3, .16, [side * 1.35, 17.07, z], chrome);
+      pin.rotation.x = Math.PI / 2;
+    }
     const leaf = new T.Group(); leaf.position.set(side * 13, 31, 0); leaf.rotation.z = side * .22; wing.add(leaf);
     box(leaf, [25, 1.1, 20], [0, 0, 0], trim);
-    for (let x = -10; x <= 10; x += 5) box(leaf, [4.4, .22, 18], [x, .7, 0], solar);
+    for (const z of [-9.7, 9.7]) {
+      box(leaf, [24.7, .12, .18], [0, .67, z], chrome);
+      box(leaf, [24.5, .14, .08], [0, -.18, z + Math.sign(z) * .25], dark);
+    }
+    for (let x = -10; x <= 10; x += 5) {
+      box(leaf, [4.5, .12, 18.3], [x, .59, 0], dark);
+      for (let row = 0; row < 12; row++) {
+        const z = -8.25 + row * 1.5;
+        for (const dx of [-1.1, 1.1]) box(leaf, [2.16, .12, 1.44], [x + dx, .71, z], solar, .015);
+      }
+      for (const dx of [-2.32, 2.32]) {
+        box(leaf, [.12, .2, 18.4], [x + dx, .68, 0], chrome);
+        for (const z of [-8.4, 0, 8.4]) box(leaf, [.22, .08, .38], [x + dx, .76, z], trim);
+      }
+    }
+    // Underside spars receive the fork below the surface instead of protruding through it.
+    for (const z of [-6.8, 6.8]) member(leaf, [-11.6, -.8, z], [11.6, -.8, z], .45, dark);
+    box(leaf, [3.1, .6, 4], [side * 7, -.8, 0], trim);
+    for (const z of [-1.85, 1.85]) box(leaf, [2.8, .16, .18], [side * 7, -1.12, z], chrome);
     member(leaf, [-12, -.8, -8], [12, -.8, 8], .6, dark);
   }
   // Submerged service trunk, rather than a visible fictional energy beam.

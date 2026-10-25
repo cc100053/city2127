@@ -1,7 +1,7 @@
-# 軌道接收翼 — 準備批次 01
+# 軌道接收翼 — Dream Loop Plus 三輪
 
 - Owner：Codex receiver-wing batch owner（本 chat；唯一 writer）。Coordinator：`01a16c95-84d1-7fe2-a365-42e343514498`。
-- Status：PREPARATION_ONLY / WAITING_FOR_IMPLEMENTATION_AUTHORIZATION。未啟動 worker／Dream Loop 實作輪。
+- Status：IN_PROGRESS；2026-10-25 14:35 JST總指揮在自然reset後授權原三輪。沿用既有target，不重做準備。
 - Clone：`/Users/fatboy/city2127-energy-polish`；branch `codex/energy-city-polish`。
 - Base／本次實際截圖 source HEAD：`5db4e6e7f69d06ddc666fee95546807ec92b2256`；runtime SHA256 `27c1e4f36835267eccc64c9d0c2947203d65dd95b7f37dda90c06dfb6576d9fa`。
 - 上輪完整 runtime test/build verified source：`cd6c6e65466df8c4cee070b25c475018f92162a8`，見[儲能環交接](storage-ring-polish.md)。本輪沒有改 runtime/tests，沒有把上輪結果當作新一輪驗收。
@@ -42,3 +42,14 @@ Built-in imagegen以修正後真實large日景編輯，prompt／輸入／輸出�
 下一步：idle等總指揮另授權重型實作。授權後才按Plus做3輪：同chat strongest-model／lowest-effort、fresh empty-context true worker只實作，owner跑完整root test/build/diff與day/dusk/night hero/detail、A/B/mixed/baseline、small/large/static/live／正式scratch pipeline，再逐輪checkpoint／backup／cleanup。23:45後不開新輪，截止2026-10-26 00:00 JST；不足時間或quota就保存停止。
 
 Target locked locally after visual inspection: generated output is 1672×941 versus actual1920×1080. Existing panel-array character remains; no target-achieved or design-acceptance claim. Ignore UI/text/background drift and preserve runtime camera/envelope. The accepted ring `.dream-loop/target.png` stays byte-identical; receiver workflow target is `.dream-loop/receiver-wing-batch-01/target.png`.
+
+
+## 實作授權後續作 — 2026-10-25
+
+重型起點62d000f乾淨；fresh fetch成功，origin/main仍db772bb，ahead6／behind0，無upstream，不merge。實查開始5h3%／weekly80%；本次自然reset後5h重置時間為2026-10-25 19:36:07 JST，banked reset未用。每輪開始前查quota，5h剩餘少於20%不開下一重型輪。
+
+第一輪 true same-chat fresh empty-context gpt-6-astra／low worker只實作receiver block，owner驗收。source0f1941bd，翼外SHA0e223a7b及target02bbde10維持；細分接收板／金屬壓條、板底承托／圓截面服務頸及接點，支架端部收回板底。root tests/build、原大小版overall AABB及protection通過；桌面／正式gate紀錄逐輪另存，完成狀態以各pass review為準。
+
+準備prompt檔誤存literal undefined：保留原錯誤檔及準備commit／bundle，已從本chat實際imagegen呼叫逐字恢復，沒有生成新target，詳見artifact prompt-recovery.md。原SHA256SUMS是當時檔案，更新後manifest不冒充原準備內容。
+
+第一輪owner完整gate PASS，見artifact pass1/review.md／evidence-check.json。source0f1941bd，33 DEV＋原正式scratch、static byte-identical、live21.20→26.22，49 batches／108／324／170775；已清理，完成本機commit與完整backup後才開第二輪。exact commit／backup以checkpoints/pass1.json為準。

@@ -128,3 +128,8 @@ Admin Day／Night／Auto 保存為獨立 display setting：12:00／22:00／180 �
 ### 能源模型 polish 恢復（2026-10-25）
 
 獨立本機 clone 已恢復水庭／能源島與富士前置儲能環首輪 source，沿用原生成 target；僅續作儲能環／原固定承托三輪批次，三輪本機實作gate已完成，等待總指揮視覺review。保留劇場、工作翼、斜街與原權威配置／歷史。恢復 provenance、逐輪驗收及總指揮視覺review狀態見 [儲能環交接](handoffs/storage-ring-polish.md)；沒有發布／整合，不能據此宣稱 target、工程或展覽驗收完成。
+
+
+### 接收翼局部打磨 — 2026-10-25（本機續作）
+
+沿用能源Q3及既有接收翼，僅細化雙葉表面、承托接點／服務頸，保留原位置／包絡／大小配置語義與已接受水庭／環／島；沒有新用途、容量或工程宣稱。三輪Plus實作及owner實際驗收分開記在[接收翼交接](handoffs/receiver-wing-polish.md)，沒有push或main整合。生成target只作工藝reference，不依賴強光或背景／UI漂移證明軌道身份。
