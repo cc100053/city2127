@@ -1,0 +1,160 @@
+{
+  "cameras": [
+    {
+      "name": "hero",
+      "requested": {
+        "name": "hero",
+        "position": [
+          -520,
+          300,
+          -620
+        ],
+        "target": [
+          -40,
+          25,
+          -60
+        ]
+      },
+      "requestedDistanceMetres": 787.1626261453221,
+      "inferredAfterPanClamp": {
+        "position": [
+          -520,
+          300,
+          -620
+        ],
+        "target": [
+          -40,
+          25,
+          -60
+        ]
+      },
+      "inference": "From main.ts target clamp and layout.ts DISTRICT; not runtime camera telemetry",
+      "eligibility": "VALID"
+    },
+    {
+      "name": "water-orbit",
+      "requested": {
+        "name": "water-orbit",
+        "position": [
+          -415,
+          85,
+          -260
+        ],
+        "target": [
+          -310,
+          10,
+          -151
+        ]
+      },
+      "requestedDistanceMetres": 168.9112192839777,
+      "inferredAfterPanClamp": {
+        "position": [
+          -415,
+          85,
+          -260
+        ],
+        "target": [
+          -310,
+          10,
+          -151
+        ]
+      },
+      "inference": "From main.ts target clamp and layout.ts DISTRICT; not runtime camera telemetry",
+      "eligibility": "VALID"
+    },
+    {
+      "name": "water-detail",
+      "requested": {
+        "name": "water-detail",
+        "position": [
+          -357,
+          35,
+          -205
+        ],
+        "target": [
+          -308,
+          10,
+          -151
+        ]
+      },
+      "requestedDistanceMetres": 77.08436936240706,
+      "inferredAfterPanClamp": {
+        "position": [
+          -357,
+          35,
+          -205
+        ],
+        "target": [
+          -308,
+          10,
+          -151
+        ]
+      },
+      "inference": "From main.ts target clamp and layout.ts DISTRICT; not runtime camera telemetry",
+      "eligibility": "VALID"
+    },
+    {
+      "name": "island-orbit",
+      "requested": {
+        "name": "island-orbit",
+        "position": [
+          -165,
+          94,
+          -580
+        ],
+        "target": [
+          -40,
+          8,
+          -427
+        ]
+      },
+      "requestedDistanceMetres": 215.47621678505496,
+      "inferredAfterPanClamp": {
+        "position": [
+          -165,
+          94,
+          -513
+        ],
+        "target": [
+          -40,
+          8,
+          -360
+        ]
+      },
+      "inference": "From main.ts target clamp and layout.ts DISTRICT; not runtime camera telemetry",
+      "eligibility": "PARTIAL island orbit: island apron clipped at bottom, bridge visible"
+    },
+    {
+      "name": "island-detail",
+      "requested": {
+        "name": "island-detail",
+        "position": [
+          -112,
+          44,
+          -536
+        ],
+        "target": [
+          -60,
+          9,
+          -470
+        ]
+      },
+      "requestedDistanceMetres": 91.02197536858887,
+      "inferredAfterPanClamp": {
+        "position": [
+          -112,
+          44,
+          -426
+        ],
+        "target": [
+          -60,
+          9,
+          -360
+        ]
+      },
+      "inference": "From main.ts target clamp and layout.ts DISTRICT; not runtime camera telemetry",
+      "eligibility": "INVALID island detail: actual view is water room"
+    }
+  ],
+  "correction": "browser.json note water-detail75.7m is inaccurate; computed requested distance77.084m. Screenshot URLs and coordinates unchanged. No screenshots retaken."
+}

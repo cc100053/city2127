@@ -1,0 +1,32 @@
+[
+  {
+    "path": "artifacts/energy-polish-recovery-20261025/targets/water-garden.png",
+    "sha256": "f38177c2b7de25e2943d157ca4cc8d1920a26c48f2ab382eac6b91692ea08a19",
+    "role": "locked target/prompt or historical Fuji craft reference; never current-runtime evidence"
+  },
+  {
+    "path": "artifacts/energy-polish-recovery-20261025/targets/water-garden-prompt.txt",
+    "sha256": "62a19b795d45a5dacdcbcddd1242aabffa8ae9a9d27249e9bc84fa7fb1251892",
+    "role": "locked target/prompt or historical Fuji craft reference; never current-runtime evidence"
+  },
+  {
+    "path": "artifacts/energy-polish-recovery-20261025/targets/energy-island.png",
+    "sha256": "b2c2d8e2a8143fec2233569793bf80d8c3b9a413c5d377956b2347bbfe844301",
+    "role": "locked target/prompt or historical Fuji craft reference; never current-runtime evidence"
+  },
+  {
+    "path": "artifacts/energy-polish-recovery-20261025/targets/energy-island-prompt.txt",
+    "sha256": "be27ea84a167e6ffb1c8f58423f525f9f8f3b6d31c7b16e2738f6dae02a06b98",
+    "role": "locked target/prompt or historical Fuji craft reference; never current-runtime evidence"
+  },
+  {
+    "path": "artifacts/fuji-tv-polish/v3r9-pass3.jpg",
+    "sha256": "bbbfbff32fce57532bcfcf102cb39a522bf6fe8cd46073535adc89e3487769eb",
+    "role": "locked target/prompt or historical Fuji craft reference; never current-runtime evidence"
+  },
+  {
+    "path": "artifacts/fuji-tv-polish/v3r9-pass3-night.jpg",
+    "sha256": "71f5a7fb8df1e70c6c5f4bf00d8e8f08c5cd80a76cbcc58edf125ecf1a2c6b31",
+    "role": "locked target/prompt or historical Fuji craft reference; never current-runtime evidence"
+  }
+]

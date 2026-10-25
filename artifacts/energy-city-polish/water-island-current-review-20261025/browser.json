@@ -1,0 +1,704 @@
+{
+  "head": "abf838156880e6dc8686e9610fc644756e7b9e3b",
+  "sourceHash": "01987a48101b59559709dc2ce5461ec51617f0a73a06803e45c50354612556f3",
+  "browser": "156.0.8078.47",
+  "platform": "darwin",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "dpr": 1,
+  "quality": "default",
+  "gpu": {
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+  },
+  "shots": [
+    {
+      "name": "hero-day",
+      "url": "http://127.0.0.1:5193/?survey=ws%3A%2F%2F127.0.0.1%3A64102%2Fws&hour=12&reviewTime=50",
+      "capturedAt": "2026-10-25T07:41:34.679Z",
+      "camera": {
+        "name": "hero",
+        "position": [
+          -520,
+          300,
+          -620
+        ],
+        "target": [
+          -40,
+          25,
+          -60
+        ]
+      },
+      "fov": 42,
+      "time": "50.00",
+      "hour": "12.00",
+      "width": 1920,
+      "height": 1080,
+      "energy": {
+        "target": {
+          "waterGardens": 1,
+          "receiver": "small",
+          "flywheel": true,
+          "island": true
+        },
+        "rotorAngle": 3.2500000000000004,
+        "parts": [
+          {
+            "visible": true,
+            "scaleY": 0.65,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": false,
+            "scaleY": 0.72,
+            "opacity": 0
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          }
+        ]
+      },
+      "sha256": "7a413df08a97123bc47a865a2aa722d62b3a32373dea2793caef9f1de3b412d1"
+    },
+    {
+      "name": "hero-night",
+      "url": "http://127.0.0.1:5193/?survey=ws%3A%2F%2F127.0.0.1%3A64102%2Fws&hour=22&reviewTime=50",
+      "capturedAt": "2026-10-25T07:41:57.261Z",
+      "camera": {
+        "name": "hero",
+        "position": [
+          -520,
+          300,
+          -620
+        ],
+        "target": [
+          -40,
+          25,
+          -60
+        ]
+      },
+      "fov": 42,
+      "time": "50.00",
+      "hour": "22.00",
+      "width": 1920,
+      "height": 1080,
+      "energy": {
+        "target": {
+          "waterGardens": 1,
+          "receiver": "small",
+          "flywheel": true,
+          "island": true
+        },
+        "rotorAngle": 3.2500000000000004,
+        "parts": [
+          {
+            "visible": true,
+            "scaleY": 0.65,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": false,
+            "scaleY": 0.72,
+            "opacity": 0
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          }
+        ]
+      },
+      "sha256": "8b7056c45a0e6a3fb419b03ca997b2222c81449e25b52a92ba2d978a531de30d"
+    },
+    {
+      "name": "water-orbit-day",
+      "url": "http://127.0.0.1:5193/?survey=ws%3A%2F%2F127.0.0.1%3A64102%2Fws&hour=12&reviewTime=50&review=street&cam=-415%2C85%2C-260&at=-310%2C10%2C-151",
+      "capturedAt": "2026-10-25T07:42:19.215Z",
+      "camera": {
+        "name": "water-orbit",
+        "position": [
+          -415,
+          85,
+          -260
+        ],
+        "target": [
+          -310,
+          10,
+          -151
+        ]
+      },
+      "fov": 42,
+      "time": "50.00",
+      "hour": "12.00",
+      "width": 1920,
+      "height": 1080,
+      "energy": {
+        "target": {
+          "waterGardens": 1,
+          "receiver": "small",
+          "flywheel": true,
+          "island": true
+        },
+        "rotorAngle": 3.2500000000000004,
+        "parts": [
+          {
+            "visible": true,
+            "scaleY": 0.65,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": false,
+            "scaleY": 0.72,
+            "opacity": 0
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          }
+        ]
+      },
+      "sha256": "f320ede31c0dd80a9ddc40454ff3e829625bc01ce9279d14c5be285391c3a2d4"
+    },
+    {
+      "name": "water-orbit-night",
+      "url": "http://127.0.0.1:5193/?survey=ws%3A%2F%2F127.0.0.1%3A64102%2Fws&hour=22&reviewTime=50&review=street&cam=-415%2C85%2C-260&at=-310%2C10%2C-151",
+      "capturedAt": "2026-10-25T07:42:41.675Z",
+      "camera": {
+        "name": "water-orbit",
+        "position": [
+          -415,
+          85,
+          -260
+        ],
+        "target": [
+          -310,
+          10,
+          -151
+        ]
+      },
+      "fov": 42,
+      "time": "50.00",
+      "hour": "22.00",
+      "width": 1920,
+      "height": 1080,
+      "energy": {
+        "target": {
+          "waterGardens": 1,
+          "receiver": "small",
+          "flywheel": true,
+          "island": true
+        },
+        "rotorAngle": 3.2500000000000004,
+        "parts": [
+          {
+            "visible": true,
+            "scaleY": 0.65,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": false,
+            "scaleY": 0.72,
+            "opacity": 0
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          }
+        ]
+      },
+      "sha256": "fda95e700b147459d6c1526de051b5189431606372854d8a3278058ed15b1159"
+    },
+    {
+      "name": "water-detail-day",
+      "url": "http://127.0.0.1:5193/?survey=ws%3A%2F%2F127.0.0.1%3A64102%2Fws&hour=12&reviewTime=50&review=street&cam=-357%2C35%2C-205&at=-308%2C10%2C-151",
+      "capturedAt": "2026-10-25T07:43:04.200Z",
+      "camera": {
+        "name": "water-detail",
+        "position": [
+          -357,
+          35,
+          -205
+        ],
+        "target": [
+          -308,
+          10,
+          -151
+        ]
+      },
+      "fov": 42,
+      "time": "50.00",
+      "hour": "12.00",
+      "width": 1920,
+      "height": 1080,
+      "energy": {
+        "target": {
+          "waterGardens": 1,
+          "receiver": "small",
+          "flywheel": true,
+          "island": true
+        },
+        "rotorAngle": 3.2500000000000004,
+        "parts": [
+          {
+            "visible": true,
+            "scaleY": 0.65,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": false,
+            "scaleY": 0.72,
+            "opacity": 0
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          }
+        ]
+      },
+      "sha256": "bfe8eb94b6bed8d418abfbfbf95158fe1db47fc65b06420a0ff05fe671f30d33"
+    },
+    {
+      "name": "water-detail-night",
+      "url": "http://127.0.0.1:5193/?survey=ws%3A%2F%2F127.0.0.1%3A64102%2Fws&hour=22&reviewTime=50&review=street&cam=-357%2C35%2C-205&at=-308%2C10%2C-151",
+      "capturedAt": "2026-10-25T07:43:26.783Z",
+      "camera": {
+        "name": "water-detail",
+        "position": [
+          -357,
+          35,
+          -205
+        ],
+        "target": [
+          -308,
+          10,
+          -151
+        ]
+      },
+      "fov": 42,
+      "time": "50.00",
+      "hour": "22.00",
+      "width": 1920,
+      "height": 1080,
+      "energy": {
+        "target": {
+          "waterGardens": 1,
+          "receiver": "small",
+          "flywheel": true,
+          "island": true
+        },
+        "rotorAngle": 3.2500000000000004,
+        "parts": [
+          {
+            "visible": true,
+            "scaleY": 0.65,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": false,
+            "scaleY": 0.72,
+            "opacity": 0
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          }
+        ]
+      },
+      "sha256": "e1bb0a3d1d3f9c245354a33c3dcc2d84c492af47bc8503da96bbe00a5ac77f0f"
+    },
+    {
+      "name": "island-orbit-day",
+      "url": "http://127.0.0.1:5193/?survey=ws%3A%2F%2F127.0.0.1%3A64102%2Fws&hour=12&reviewTime=50&review=street&cam=-165%2C94%2C-580&at=-40%2C8%2C-427",
+      "capturedAt": "2026-10-25T07:43:49.523Z",
+      "camera": {
+        "name": "island-orbit",
+        "position": [
+          -165,
+          94,
+          -580
+        ],
+        "target": [
+          -40,
+          8,
+          -427
+        ]
+      },
+      "fov": 42,
+      "time": "50.00",
+      "hour": "12.00",
+      "width": 1920,
+      "height": 1080,
+      "energy": {
+        "target": {
+          "waterGardens": 1,
+          "receiver": "small",
+          "flywheel": true,
+          "island": true
+        },
+        "rotorAngle": 3.2500000000000004,
+        "parts": [
+          {
+            "visible": true,
+            "scaleY": 0.65,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": false,
+            "scaleY": 0.72,
+            "opacity": 0
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          }
+        ]
+      },
+      "sha256": "e274485d9f0249cbe20a75b7389581dc2fa58977000cca20573539210f797727"
+    },
+    {
+      "name": "island-orbit-night",
+      "url": "http://127.0.0.1:5193/?survey=ws%3A%2F%2F127.0.0.1%3A64102%2Fws&hour=22&reviewTime=50&review=street&cam=-165%2C94%2C-580&at=-40%2C8%2C-427",
+      "capturedAt": "2026-10-25T07:44:12.265Z",
+      "camera": {
+        "name": "island-orbit",
+        "position": [
+          -165,
+          94,
+          -580
+        ],
+        "target": [
+          -40,
+          8,
+          -427
+        ]
+      },
+      "fov": 42,
+      "time": "50.00",
+      "hour": "22.00",
+      "width": 1920,
+      "height": 1080,
+      "energy": {
+        "target": {
+          "waterGardens": 1,
+          "receiver": "small",
+          "flywheel": true,
+          "island": true
+        },
+        "rotorAngle": 3.2500000000000004,
+        "parts": [
+          {
+            "visible": true,
+            "scaleY": 0.65,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": false,
+            "scaleY": 0.72,
+            "opacity": 0
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          }
+        ]
+      },
+      "sha256": "f469f1ea47dbf343b34688c5c415ebad3aae421b3d6880d8947541503bac0ff8"
+    },
+    {
+      "name": "island-detail-day",
+      "url": "http://127.0.0.1:5193/?survey=ws%3A%2F%2F127.0.0.1%3A64102%2Fws&hour=12&reviewTime=50&review=street&cam=-112%2C44%2C-536&at=-60%2C9%2C-470",
+      "capturedAt": "2026-10-25T07:44:34.891Z",
+      "camera": {
+        "name": "island-detail",
+        "position": [
+          -112,
+          44,
+          -536
+        ],
+        "target": [
+          -60,
+          9,
+          -470
+        ]
+      },
+      "fov": 42,
+      "time": "50.00",
+      "hour": "12.00",
+      "width": 1920,
+      "height": 1080,
+      "energy": {
+        "target": {
+          "waterGardens": 1,
+          "receiver": "small",
+          "flywheel": true,
+          "island": true
+        },
+        "rotorAngle": 3.2500000000000004,
+        "parts": [
+          {
+            "visible": true,
+            "scaleY": 0.65,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": false,
+            "scaleY": 0.72,
+            "opacity": 0
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          }
+        ]
+      },
+      "sha256": "5ffde557b6f382a72ab17ba2a139cf56017b4d4cf742ae1d173ffd6e065324c8"
+    },
+    {
+      "name": "island-detail-night",
+      "url": "http://127.0.0.1:5193/?survey=ws%3A%2F%2F127.0.0.1%3A64102%2Fws&hour=22&reviewTime=50&review=street&cam=-112%2C44%2C-536&at=-60%2C9%2C-470",
+      "capturedAt": "2026-10-25T07:44:57.471Z",
+      "camera": {
+        "name": "island-detail",
+        "position": [
+          -112,
+          44,
+          -536
+        ],
+        "target": [
+          -60,
+          9,
+          -470
+        ]
+      },
+      "fov": 42,
+      "time": "50.00",
+      "hour": "22.00",
+      "width": 1920,
+      "height": 1080,
+      "energy": {
+        "target": {
+          "waterGardens": 1,
+          "receiver": "small",
+          "flywheel": true,
+          "island": true
+        },
+        "rotorAngle": 3.2500000000000004,
+        "parts": [
+          {
+            "visible": true,
+            "scaleY": 0.65,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": false,
+            "scaleY": 0.72,
+            "opacity": 0
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          }
+        ]
+      },
+      "sha256": "ef2ad5f3f352bb442d5532696e6597643575246d4e0d5e2bbf79c8fd0a1588ff"
+    }
+  ],
+  "motion": {
+    "liveA": {
+      "time": 21.67,
+      "angle": 1.1334560000002387
+    },
+    "liveB": {
+      "time": 24.8,
+      "angle": 1.3839520000001788
+    },
+    "staticA": {
+      "time": 28.14,
+      "angle": 0.7
+    },
+    "staticB": {
+      "time": 31.16,
+      "angle": 0.7
+    },
+    "scope": "Formal global energy rotor diagnostic only. No water level/turbine transform hook; no dynamics engineering or continuous collision claim."
+  },
+  "exceptions": [],
+  "consoleMessages": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:5193/favicon.ico"
+    }
+  ],
+  "responses": [],
+  "failures": [],
+  "cleanup": {
+    "browserClosed": true,
+    "surveyClosed": true,
+    "surveyPort": 64102,
+    "scratchRemoved": true
+  },
+  "note": "All 10 images newly captured in formal survey configuration. Existing camera/reviewTime hooks only; source unchanged. Water/detail distance75.7m, island/detail91.0m; orbit cameras >=150m. Not a full product regression or FPS measurement."
+}

@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-10-25T07:50:00.782608+00:00",
+  "sourceVerifiedHEAD": "abf838156880e6dc8686e9610fc644756e7b9e3b",
+  "sourceSHA256": "01987a48101b59559709dc2ce5461ec51617f0a73a06803e45c50354612556f3",
+  "protectedTrackedDiff": "empty",
+  "scopeWhitelist": "PASS including untracked files",
+  "pngCount": 10,
+  "pngDimensionsAndHashes": "PASS all10 1920x1080 original PNG",
+  "referenceHashes": "PASS all6",
+  "markdownLocalLinks": {
+    "result": "PASS",
+    "count": 24
+  },
+  "captureSyntax": "PASS node --check",
+  "captureRuntimeAssertions": "PASS; framing audit PARTIAL, not visual acceptance",
+  "visualReview": "6 fully usable;2 partial island orbit;2 invalid island detail. Every image inspected.",
+  "whitespace": "PASS git diff --check and staged check",
+  "checkRepair": "First link check failed because checks.json was a forward reference before creation. Created this result file, reran full check; no product change.",
+  "cleanup": {
+    "viteSession59539": "exit130",
+    "captureSession99880": "exit0",
+    "ports5193and64102": "no LISTEN via lsof",
+    "runnerProcessCheck": "no capture/vite5193 runner; ps output only checker itself",
+    "browserAndScratch": {
+      "browserClosed": true,
+      "surveyClosed": true,
+      "surveyPort": 64102,
+      "scratchRemoved": true
+    }
+  },
+  "productTestsBuild": "NOT RUN unchanged-source review",
+  "mainIntegration": "PROHIBITED / NOT RUN"
+}

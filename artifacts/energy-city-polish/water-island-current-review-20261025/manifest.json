@@ -1,0 +1,138 @@
+{
+  "sourceHead": "abf838156880e6dc8686e9610fc644756e7b9e3b",
+  "sourceSHA256": "01987a48101b59559709dc2ce5461ec51617f0a73a06803e45c50354612556f3",
+  "captureCount": 10,
+  "selfExcluded": "manifest excludes itself; external archive SHA covers it",
+  "files": [
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/README.md",
+      "bytes": 6231,
+      "sha256": "3aac65a8a300054e3b8000564f3e643d434dc9f59cb11811a9b74427e5bb2ad1"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/browser.json",
+      "bytes": 16655,
+      "sha256": "6cb945d251a3b157cd1c8ba7a8fe2e478b655e92d32cb0f8cdd77c722fb92a38"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/camera-audit.json",
+      "bytes": 3451,
+      "sha256": "cd70cebba418b23dd9e17fd06f6443faf6b36a616d959ccdad977bba2f569670"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/capture.log",
+      "bytes": 359,
+      "sha256": "6e97ffcda9176dc7f6b78025286911278c553fad57e8fa03a834315cf6d93acb"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/capture.mjs",
+      "bytes": 8575,
+      "sha256": "55e3496a9c77cac7bdd304fb25f846a799922edda100103586843ba4981fce25"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/checks.json",
+      "bytes": 1414,
+      "sha256": "ea7bbb568a05104c7ba1965d796138148326b4fef6500ae7c943e422ef5afaac"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/formal-fixture.json",
+      "bytes": 69292,
+      "sha256": "2dfc1d8eb70b2e29f39a29f7978c684919e38571de82ae879704849b4b7b044c"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/hero-day.png",
+      "bytes": 2832127,
+      "sha256": "7a413df08a97123bc47a865a2aa722d62b3a32373dea2793caef9f1de3b412d1"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/hero-night.png",
+      "bytes": 2635150,
+      "sha256": "8b7056c45a0e6a3fb419b03ca997b2222c81449e25b52a92ba2d978a531de30d"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/island-detail-day.png",
+      "bytes": 2414617,
+      "sha256": "5ffde557b6f382a72ab17ba2a139cf56017b4d4cf742ae1d173ffd6e065324c8"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/island-detail-night.png",
+      "bytes": 2390873,
+      "sha256": "ef2ad5f3f352bb442d5532696e6597643575246d4e0d5e2bbf79c8fd0a1588ff"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/island-orbit-day.png",
+      "bytes": 2892621,
+      "sha256": "e274485d9f0249cbe20a75b7389581dc2fa58977000cca20573539210f797727"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/island-orbit-night.png",
+      "bytes": 2896244,
+      "sha256": "f469f1ea47dbf343b34688c5c415ebad3aae421b3d6880d8947541503bac0ff8"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/preflight.json",
+      "bytes": 1041,
+      "sha256": "a43d5fac468d77b3ac64c96b46a2b9089c97b2dc5e3a65471a78be4c5978ebf9"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/references.json",
+      "bytes": 1621,
+      "sha256": "a16b9453f12f18a8914398a4c7261a0c825856ef5b1affb9b2da2deb2c05f15d"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/water-detail-day.png",
+      "bytes": 2390945,
+      "sha256": "bfe8eb94b6bed8d418abfbfbf95158fe1db47fc65b06420a0ff05fe671f30d33"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/water-detail-night.png",
+      "bytes": 2307215,
+      "sha256": "e1bb0a3d1d3f9c245354a33c3dcc2d84c492af47bc8503da96bbe00a5ac77f0f"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/water-orbit-day.png",
+      "bytes": 2758663,
+      "sha256": "f320ede31c0dd80a9ddc40454ff3e829625bc01ce9279d14c5be285391c3a2d4"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/water-orbit-night.png",
+      "bytes": 2667198,
+      "sha256": "fda95e700b147459d6c1526de051b5189431606372854d8a3278058ed15b1159"
+    },
+    {
+      "path": "docs/handoffs/water-island-current-review.md",
+      "bytes": 4103,
+      "sha256": "75e15e91133f5c6a1a033155ae3adc4cb00da2edbff53817ec0b1c789d169e07"
+    },
+    {
+      "path": "artifacts/energy-polish-recovery-20261025/targets/water-garden.png",
+      "bytes": 2418852,
+      "sha256": "f38177c2b7de25e2943d157ca4cc8d1920a26c48f2ab382eac6b91692ea08a19"
+    },
+    {
+      "path": "artifacts/energy-polish-recovery-20261025/targets/water-garden-prompt.txt",
+      "bytes": 3123,
+      "sha256": "62a19b795d45a5dacdcbcddd1242aabffa8ae9a9d27249e9bc84fa7fb1251892"
+    },
+    {
+      "path": "artifacts/energy-polish-recovery-20261025/targets/energy-island.png",
+      "bytes": 2849922,
+      "sha256": "b2c2d8e2a8143fec2233569793bf80d8c3b9a413c5d377956b2347bbfe844301"
+    },
+    {
+      "path": "artifacts/energy-polish-recovery-20261025/targets/energy-island-prompt.txt",
+      "bytes": 2086,
+      "sha256": "be27ea84a167e6ffb1c8f58423f525f9f8f3b6d31c7b16e2738f6dae02a06b98"
+    },
+    {
+      "path": "artifacts/fuji-tv-polish/v3r9-pass3.jpg",
+      "bytes": 246445,
+      "sha256": "bbbfbff32fce57532bcfcf102cb39a522bf6fe8cd46073535adc89e3487769eb"
+    },
+    {
+      "path": "artifacts/fuji-tv-polish/v3r9-pass3-night.jpg",
+      "bytes": 206697,
+      "sha256": "71f5a7fb8df1e70c6c5f4bf00d8e8f08c5cd80a76cbcc58edf125ecf1a2c6b31"
+    }
+  ]
+}

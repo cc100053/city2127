@@ -1,0 +1,11 @@
+captured hero-day
+captured hero-night
+captured water-orbit-day
+captured water-orbit-night
+captured water-detail-day
+captured water-detail-night
+captured island-orbit-day
+captured island-orbit-night
+captured island-detail-day
+captured island-detail-night
+PASS bounded formal review: 10 original PNGs, exact config, live/static diagnostic, no unexpected errors
