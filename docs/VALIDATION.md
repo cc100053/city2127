@@ -212,3 +212,5 @@ P3在現行v4回歸PASS：Chrome1280×720、hour16，實測A/B閱讀間隔10,002
 只新增[baseline／imagegen target及保存紀錄](../artifacts/energy-city-polish/receiver-wing-batch-01/README.md)，[owner交接](handoffs/receiver-wing-polish.md)。source維持5db4e6e／SHA27c1e4f，runtime/tests未變；Chrome156 headless／ANGLE Metal Apple M6／WebGL2、1920×1080 DPR1 default，原hero mixed日景及接收翼大小版日景／大型夜景。第一組detail觸發既有相機district clamp，保留失效構圖後以合法aim重拍；沒有改相機source。無page exception／failed request／非預期console，僅favicon404。這是準備baseline，不是新實作回歸或目標達成；本輪未重跑test/build／正式pipeline／FPS／硬件。等待另授權重型Plus三輪。
 
 接收翼第一輪（source0f1941bd）：root test/build/diff、原大小版AABB／翼外hash、33 DEV原圖與原正式scratch gate PASS；49 batches、108／324／170775，固定static PNG一致，live21.20→26.22秒。原tests／timeouts未改，只有預期404／obsolete409／注入abort。實測平台／清理／未驗限制及逐輪commit／備份見接收翼handoff，並非新FPS或工程驗收。
+
+接收翼第二輪（sourcede556764）：相同完整root／包絡／scope hash／DEV33／原正式gate PASS，49 batches／108／324／170775；static PNG一致、live21.39→28.88秒，僅預期browser錯誤，原assertions／quality／timeout不變。逐輪原圖、限制、清理及本機backup見接收翼handoff。

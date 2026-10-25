@@ -48,26 +48,38 @@ export function energyPrototype() {
   }
   box(wing, [.72, 7.2, .08], [0, 8, 1.18], dark);
   box(wing, [.58, 6.95, .08], [0, 8, 1.22], trim);
+  for (const z of [-1.16, 1.16]) {
+    box(wing, [.44, 2.5, .1], [0, 26.95, z], dark);
+    box(wing, [.3, 2.25, .12], [0, 26.95, z], trim);
+    for (const y of [25.95, 27.95]) box(wing, [.12, .12, .14], [0, y, z], chrome);
+  }
   for (const side of [-1, 1]) {
     member(wing, [0, 16, 0], [side * 20, 31.8, 0], 1.4);
     for (const z of [-.71, .71]) {
       member(wing, [side * 1.3, 17.03, z], [side * 18.8, 30.85, z], .16, chrome);
       const joint = arc(wing, 0, .78, .12, [side * 1.35, 17.07, z], trim);
-      joint.rotation.x = Math.PI / 2;
+      joint.rotation.x = Math.sign(z) * Math.PI / 2;
       const pin = arc(wing, 0, .3, .16, [side * 1.35, 17.07, z], chrome);
-      pin.rotation.x = Math.PI / 2;
+      pin.rotation.x = Math.sign(z) * Math.PI / 2;
+      for (const dx of [-.43, .43]) for (const dy of [-.43, .43])
+        box(wing, [.13, .13, .12], [side * 1.35 + dx, 17.07 + dy, z + Math.sign(z) * .13], chrome);
     }
     const leaf = new T.Group(); leaf.position.set(side * 13, 31, 0); leaf.rotation.z = side * .22; wing.add(leaf);
     box(leaf, [25, 1.1, 20], [0, 0, 0], trim);
     for (const z of [-9.7, 9.7]) {
       box(leaf, [24.7, .12, .18], [0, .67, z], chrome);
       box(leaf, [24.5, .14, .08], [0, -.18, z + Math.sign(z) * .25], dark);
+      for (let x = -10; x <= 10; x += 5) {
+        box(leaf, [4.6, .2, .08], [x, .17, z + Math.sign(z) * .25], dark);
+        box(leaf, [4.25, .08, .09], [x, .19, z + Math.sign(z) * .25], chrome);
+      }
     }
     for (let x = -10; x <= 10; x += 5) {
       box(leaf, [4.5, .12, 18.3], [x, .59, 0], dark);
       for (let row = 0; row < 12; row++) {
         const z = -8.25 + row * 1.5;
-        for (const dx of [-1.1, 1.1]) box(leaf, [2.16, .12, 1.44], [x + dx, .71, z], solar, .015);
+        for (const dx of [-1.1, 1.1]) box(leaf, [2.1, .12, 1.34], [x + dx, .71, z], solar, .015);
+        if (row % 3 === 2 && row < 11) box(leaf, [4.4, .06, .08], [x, .74, z + .75], chrome, .01);
       }
       for (const dx of [-2.32, 2.32]) {
         box(leaf, [.12, .2, 18.4], [x + dx, .68, 0], chrome);
@@ -77,7 +89,15 @@ export function energyPrototype() {
     // Underside spars receive the fork below the surface instead of protruding through it.
     for (const z of [-6.8, 6.8]) member(leaf, [-11.6, -.8, z], [11.6, -.8, z], .45, dark);
     box(leaf, [3.1, .6, 4], [side * 7, -.8, 0], trim);
-    for (const z of [-1.85, 1.85]) box(leaf, [2.8, .16, .18], [side * 7, -1.12, z], chrome);
+    for (const z of [-1.85, 1.85]) {
+      box(leaf, [2.8, .16, .18], [side * 7, -1.12, z], chrome);
+      const seat = arc(leaf, 0, .75, .15, [side * 7, -.65, z], trim);
+      seat.rotation.x = Math.sign(z) * Math.PI / 2;
+      const bearing = arc(leaf, .28, .56, .18, [side * 7, -.65, z], dark);
+      bearing.rotation.x = Math.sign(z) * Math.PI / 2;
+      const pin = arc(leaf, 0, .25, .21, [side * 7, -.65, z], chrome);
+      pin.rotation.x = Math.sign(z) * Math.PI / 2;
+    }
     member(leaf, [-12, -.8, -8], [12, -.8, 8], .6, dark);
   }
   // Submerged service trunk, rather than a visible fictional energy beam.

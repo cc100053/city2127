@@ -1,55 +1,54 @@
 # 軌道接收翼 — Dream Loop Plus 三輪
 
-- Owner：Codex receiver-wing batch owner（本 chat；唯一 writer）。Coordinator：`01a16c95-84d1-7fe2-a365-42e343514498`。
-- Status：IN_PROGRESS；2026-10-25 14:35 JST總指揮在自然reset後授權原三輪。沿用既有target，不重做準備。
-- Clone：`/Users/fatboy/city2127-energy-polish`；branch `codex/energy-city-polish`。
-- Base／本次實際截圖 source HEAD：`5db4e6e7f69d06ddc666fee95546807ec92b2256`；runtime SHA256 `27c1e4f36835267eccc64c9d0c2947203d65dd95b7f37dda90c06dfb6576d9fa`。
-- 上輪完整 runtime test/build verified source：`cd6c6e65466df8c4cee070b25c475018f92162a8`，見[儲能環交接](storage-ring-polish.md)。本輪沒有改 runtime/tests，沒有把上輪結果當作新一輪驗收。
-- Remote availability：NOT PUSHED。只本機 Conventional Commit；禁止 push／main整合／deploy／外部設定。
+- Owner：本chat的Codex receiver-wing batch owner，唯一writer；coordinator `01a16c95-84d1-7fe2-a365-42e343514498`。
+- Status：IN_PROGRESS；14:35 JST總指揮自然reset後授權原三輪，取代preparation-only gate。前兩輪完整owner gate PASS；第二輪保存後待quota開第三輪。
+- Clone `/Users/fatboy/city2127-energy-polish`；branch `codex/energy-city-polish`。
+- Receiver source baseline `5db4e6e7f69d06ddc666fee95546807ec92b2256`；implementation base／preparation commit `62d000f5918a21d75088abf6973ee46bbc400acd`。
+- Last verified runtime commit：第一輪 `8ec1cd186044bc613b308067e9605d9328a7e56c`；source SHA0f1941bd。第二輪de556764所有gate已驗證，exact commit以checkpoints/pass2.json為準。
+- Remote availability：NOT PUSHED；無upstream／remote counterpart。只本機Conventional Commits；禁止push／main整合／deploy／外部設定／其他批次。
 
-## Preflight
+## Session與授權
 
-2026-10-25 JST：先確認原repo `city2127`；原main `29d12db7629b8ffabdb75b53b2cec70d8c15ee9a`，原 `.playwright-cli/` 保留，沒有切換／拉取／改原source。原repo fetch成功。
+2026-10-25準備時先確認原city2127，main29d12db及`.playwright-cli/`保留；原repo fetch成功，沒有切branch／pull／改原source。指定持久clone乾淨5db4e6e，fetch後origin/main `db772bb2248aed345468d6b07fc011d518f7c7b2`，ahead5／behind0。14:35後續作62d000f乾淨，fresh fetch仍同一main，ahead6／behind0，不merge；第二worker fetch同main、ahead7／behind0。持久clone無.codegraph，依規則用rg，不索引。
 
-持久clone起始乾淨，HEAD與派工一致；fetch成功，最新origin/main `db772bb2248aed345468d6b07fc011d518f7c7b2`，本地ahead5／behind0，無upstream／remote counterpart，5個未push task commits仍只在本機及既有bundle。續作既有分支，沒有merge。持久clone無.codegraph，依工具明示改用rg，不新建索引。
+已讀repo產品／PROJECT／CONTRIBUTING／VALIDATION／ART／CITY MASTER TASTE、相關callers/tests、接收翼與儲能環handoff及Dream Loop Plus／ponytail／imagegen技能。前owner水庭／島／環已獲coordinator接受，不重做。[原準備派工](../../artifacts/energy-city-polish/receiver-wing-batch-01/dispatch.md)及[實作授權後派工](../../artifacts/energy-city-polish/receiver-wing-batch-01/implementation-dispatch.md)並存。
 
-已讀 README、PROJECT、CONTRIBUTING、VALIDATION、EXHIBITION_SPEC、ART、CITY MASTER TASTE、儲能環handoff／pass3 metadata，以及Dream Loop Plus／ponytail／imagegen技能。前owner的儲能環已由coordinator接受，水庭／島／環不重開。
+## Scope與不變量
 
-## Scope與callers
+只改`src/energyPrototype.ts`在`Offshore receiver:`與`All water-garden metalwork`註解之間的receiver雙葉／支承冠／服務頸。其餘同檔字節SHA256 `0e223a7b3c94fb1a165506725e32f83f078b760eaf3041b853ddc043da816cd6`不變；所有其他src／既有tests／survey／module-swap不變。原source及保護metadata在artifact。
 
-只準備既有接收翼／支承冠／服務頸細節。`src/energyPrototype.ts:38–50`為目前receiver block，位置`[125,0,-424]`、原輪廓／包絡／通道及水下service trunk保留。其餘source protected hash在artifact `protection.json`；整份原source亦逐byte保存。
+Callers：main → devEnergy.startEnergyReview → energyPrototype；正式createCityChangeManager → EnergyRuntime → 同模型。無interface／fixture／config／export變更。保留位置`[125,0,-424]`、原overall AABB與雙葉輪廓、none／small0.65／large1、水下service trunk、共享材質／bake、四題權威／歷史、3秒retarget／立即recovery及60秒流程。
 
-Call chain：`main.ts` → DEV `devEnergy.startEnergyReview` → `energyPrototype`；正式 `createCityChangeManager`／`EnergyRuntime` → 同一模型。`configure`及runtime保持none／small0.65／large1、共享資源、3秒retarget與立即recovery。現有 `energyPrototype.test.ts`、`energyPipeline.test.ts`、`energyDistrict.test.ts`及正式 `energyE4.browser.mjs`均是後續重驗範圍，本次未改。
+水庭／島／環、global lighting／hero／civic core、routes／berths／公共路／四站視線／完整sweep保護；不得放寬tests、新增用途／強光／dependency／infra／packs。Target只作工藝reference，不以生成背景／UI漂移或新用途宣稱軌道身份解決。
 
-保留四題權威／歷史、60秒流程、所有routes／berths／公共路／四站視線／完整sweep；不得以target要求越過原包絡或改global lighting／hero／civic core。只用既有factories／materials／bake；不加dependency／infra／外部pack。
+## Target與準備provenance
 
-## 準備證據與限制
+[Artifact入口](../../artifacts/energy-city-polish/receiver-wing-batch-01/README.md)。鎖定target SHA256 `02bbde1032c230d51199d1d9cc219ca39fb9935f0af44b456fd843895ef51a40`；workflow `.dream-loop/receiver-wing-batch-01/target.png`。原接受環target `.dream-loop/target.png`仍SHA70c988bb，不覆寫。沒有重生成圖。
 
-[批次artifact與鎖定target](../../artifacts/energy-city-polish/receiver-wing-batch-01/README.md)。Chrome156.0.8078.47 headless／ANGLE Metal Apple M6／WebGL2、1920×1080 DPR1、default quality、reviewTime50。原hero mixed日12；修正近景含large日12、small日12及large夜22。例外／失敗request／非預期console為0，僅既有favicon404。
+生成target1672×941，actual1920×1080；保留runtime framing／包絡，忽略生成UI／背景漂移。仍帶板列特徵，沒有target精準達成／設計／工程驗收宣稱。準備prompt誤存literal undefined，第一輪已從本chat實際imagegen呼叫逐字恢復；原錯誤檔及準備commit／bundle保存，見prompt-recovery.md。
 
-第一組detail把aim設於district外，OrbitControls按原邊界clamp，畫面偏離receiver；原PNG／script／JSON完整保留，不作有效detail。修正為`cam=125,85,-290&at=125,60,-360`，未改runtime相機。Hero及修正large日景已目視核對；small／night亦已目視核對，留待下一輪比較，非完整審美或回歸驗收。
+原hero mixed日景；合法近景`cam=125,85,-290&at=125,60,-360`的large／small日景及large夜景。初次detail超出district而被既有OrbitControls clamp，失效構圖原圖／script／JSON完整保留，不作有效receiver detail；未改相機source。
 
-Built-in imagegen以修正後真實large日景編輯，prompt／輸入／輸出／hash存artifact；目標只細化原雙葉receiver、承托接點及服務頸，周邊與UI保留要求不授權改其他區塊。生成圖並非工程驗證，未開始追圖實作。
+## 逐輪實作與owner驗收
 
-本次只artifact／handoff／準備驗證紀錄；root test/build未重跑，survey／module-swap未改未跑，沒有FPS／展覽硬件／Safari／iPad／Windows／工程容量宣稱。已驗`git diff --exit-code BASE -- src tests survey module-swap`無差異；root source SHA仍一致。實際artifact checks、最終commit／bundle／完整archive驗證見批次checkpoint JSON。
+每輪同chat true fresh empty-context `gpt-6-astra`／low worker只實作；owner自驗test/build/browser、文件／本機commit、完整branch bundle及source/target/evidence archive逐檔verify、清理後才下一輪。逐輪exact commit／bundle／archive hashes及verify count在本機ignored `artifacts/energy-city-polish/receiver-wing-batch-01/checkpoints/passN.json`。
 
-## Quota與續作
+| 輪 | Source SHA256前綴 | 狀態／紀錄 |
+| --- | --- | --- |
+| 1 | 0f1941bd | 完整PASS並備份；8ec1cd1；pass1/review.md；379個archive檔逐byte一致 |
+| 2 | de556764 | 完整PASS；pass2/review.md；exact commit／backup見checkpoints/pass2.json |
+| 3 | 未開始 | 待第二輪完整保存與quota gate |
 
-已讀實際usage：開始5h84%／weekly77%；準備中5h91%／weekly78%。5h reset `2026-10-25 14:24:04 JST`；weekly reset `2026-10-31 09:05:37 JST`。兩個banked reset未使用；最終讀數存artifact `quota.json`，以該檔及回報為準。
+第一輪細分接收板／金屬壓條、板底承托、圓截面服務頸／接點，支架端部收回板底。第二輪加橫向分段、分層板邊、軸座／緊固件／檢修面並校正端蓋朝向；沒有新材質或global光改動。
 
-清理：本輪Vite5187已停止，無LISTEN；兩次擷取browser由finally關閉，沒有survey／scratch服務或worker。
+Gate：root `npm test`／`npm run build`／branch diff whitespace；原small/large overall AABB／位置／scale及protected hash；DEV33張原PNG（hero/detail日12／暮18.5／夜22的A/B/mixed/baseline、三phase、native static、live兩時點／live→static）；原`tests/energyE4.browser.mjs`正式scratch，assertions／quality／timeouts不變。Root包含21595船體、完整轉子／固定承托、航空泊位／公共／四站視線、108權威組合與324 district／大小版；前兩輪49 batches／gap30.50m／170775 exact checks。
 
-下一步：idle等總指揮另授權重型實作。授權後才按Plus做3輪：同chat strongest-model／lowest-effort、fresh empty-context true worker只實作，owner跑完整root test/build/diff與day/dusk/night hero/detail、A/B/mixed/baseline、small/large/static/live／正式scratch pipeline，再逐輪checkpoint／backup／cleanup。23:45後不開新輪，截止2026-10-26 00:00 JST；不足時間或quota就保存停止。
+正式gate包含舊歷史／草稿／原文／ID、Q3/review、pre/post-commit同ID retry、維持／一庭結果、Undo、記錄混合snapshot、日暮夜、TCP重連、reduced motion、普通desktop resize、reset與舊ID恢復。前兩輪PASS；exceptions0，僅預期favicon404／obsolete409／兩次注入abort。
 
-Target locked locally after visual inspection: generated output is 1672×941 versus actual1920×1080. Existing panel-array character remains; no target-achieved or design-acceptance claim. Ignore UI/text/background drift and preserve runtime camera/envelope. The accepted ring `.dream-loop/target.png` stays byte-identical; receiver workflow target is `.dream-loop/receiver-wing-batch-01/target.png`.
+平台：Node26.0.0，macOS Chrome156.0.8078.47 headless／ANGLE Metal Apple M6／WebGL2；City1920×1080 DPR1 default、Guest1280×900。第一輪固定static PNG一致、live21.20→26.22；第二輪static亦一致、live21.39→28.88。owner目視各輪日暮夜／大小版／hero；細部較清楚，hero仍細小，夜間克制。沒有新FPS／連續細節閃爍量化／硬件／Safari／iPad／Windows／真人理解／工程容量／全城連續碰撞／所有late GLB/seed驗收；survey build僅作scratch fixture，survey/module-swap未改未另跑其suite。
 
+## Quota、清理與下一步
 
-## 實作授權後續作 — 2026-10-25
+開始實作實查5h3%／weekly80%；第一輪保存後5h25%／weekly84%；第二輪驗收中5h39%／weekly86%。5h reset2026-10-25 19:36:07 JST；weekly2026-10-31 09:05:37 JST；兩個banked reset未用。每輪前重查，5h剩餘<20%不開下一重型輪。準備期quota.json只作歷史；最新以checkpoint與最後回報為準。
 
-重型起點62d000f乾淨；fresh fetch成功，origin/main仍db772bb，ahead6／behind0，無upstream，不merge。實查開始5h3%／weekly80%；本次自然reset後5h重置時間為2026-10-25 19:36:07 JST，banked reset未用。每輪開始前查quota，5h剩餘少於20%不開下一重型輪。
-
-第一輪 true same-chat fresh empty-context gpt-6-astra／low worker只實作receiver block，owner驗收。source0f1941bd，翼外SHA0e223a7b及target02bbde10維持；細分接收板／金屬壓條、板底承托／圓截面服務頸及接點，支架端部收回板底。root tests/build、原大小版overall AABB及protection通過；桌面／正式gate紀錄逐輪另存，完成狀態以各pass review為準。
-
-準備prompt檔誤存literal undefined：保留原錯誤檔及準備commit／bundle，已從本chat實際imagegen呼叫逐字恢復，沒有生成新target，詳見artifact prompt-recovery.md。原SHA256SUMS是當時檔案，更新後manifest不冒充原準備內容。
-
-第一輪owner完整gate PASS，見artifact pass1/review.md／evidence-check.json。source0f1941bd，33 DEV＋原正式scratch、static byte-identical、live21.20→26.22，49 batches／108／324／170775；已清理，完成本機commit與完整backup後才開第二輪。exact commit／backup以checkpoints/pass1.json為準。
+第一輪Vite5187及browser／scratch服務已清理；第二輪同樣已清理。下一步完成第二輪本機commit／verified backup，再依quota開始第三輪。三輪後idle等總指揮review，不開第四輪或其他批次。今日23:45不開新輪，截止2026-10-26 00:00 JST。
