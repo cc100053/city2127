@@ -1,5 +1,7 @@
 # 富士前置儲能環／固定承托 — 三輪恢復續作
 
+> 2026-10-25 最新發布／整合狀態見 [energy polish integration](energy-polish-integration.md)；以下本機-only／NOT PUSHED及review限制是先前批次的歷史狀態，今次使用者另已明確授權發布。
+
 - Owner：batch chat `01a1707d-71bd-7b13-b8d7-1cae4bc24037`；總指揮 `01a16c95-84d1-7fe2-a365-42e343514498`。
 - Status：WAITING_FOR_REVIEW；三輪實作與本機驗收完成，不開第4輪／其他設備。
 - Clone `/Users/fatboy/city2127-energy-polish`；branch `codex/energy-city-polish`；base `db772bb2248aed345468d6b07fc011d518f7c7b2`。

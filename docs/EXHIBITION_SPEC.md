@@ -138,3 +138,6 @@ Admin Day／Night／Auto 保存為獨立 display setting：12:00／22:00／180 �
 ### 儲能環夜間可讀性一次跟進 — 2026-10-25（候選不採用）
 
 已批准的一次局部材質試驗未達原hour22 hero「完整環周與兩組固定承托連續可讀」要求；owner保留原已接受baseline及完整trial證據，夜間可讀性缺口仍在。沒有新產品方向、source變更、工程／target達成或發布宣稱；只交coordinator review，[實測與checkpoint](handoffs/ring-night-readability.md)。
+
+
+2026-10-25 發布更新：使用者已明確要求推送能源polish及整合main，先前本機-only狀態由[本次整合交接](handoffs/energy-polish-integration.md)取代。既有runtime未再修改；root test/build／正式scratch browser已重跑PASS，整合後驗證、main CI與安全刪分支的實際結果統一記在該交接，原target／夜間可讀性／硬件限制保留。

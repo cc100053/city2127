@@ -180,3 +180,6 @@ CityChangeManager將能源實際前後target加入CarrierChange，residentResult
 ### 儲能環夜間材質跟進試驗 — 2026-10-25（未採用）
 
 只針對既有環邊／固定軸承作一次non-emissive局部finish試驗，owner完整尺寸night hero review未見足夠改善，日景銀邊反光亦減弱；候選不採用，runtime已逐byte保留接收翼後的已接受baseline，沒有新增材質／幾何／動畫留在source。原圖、target漂移界線、trial diff、正式scratch及還原檢查見[本輪handoff](handoffs/ring-night-readability.md)，不自行再開輪。
+
+
+2026-10-25 發布更新：使用者已明確要求推送能源polish及整合main，先前本機-only狀態由[本次整合交接](handoffs/energy-polish-integration.md)取代。既有runtime未再修改；root test/build／正式scratch browser已重跑PASS，整合後驗證、main CI與安全刪分支的實際結果統一記在該交接，原target／夜間可讀性／硬件限制保留。

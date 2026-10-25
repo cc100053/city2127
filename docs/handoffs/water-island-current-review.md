@@ -1,5 +1,7 @@
 # 水庭／能源島現行核對 — 2026-10-25
 
+> 2026-10-25 最新發布／整合狀態見 [energy polish integration](energy-polish-integration.md)；以下本機-only／NOT PUSHED及review限制是先前批次的歷史狀態，今次使用者另已明確授權發布。
+
 - Owner：Codex water/island reviewer `01a171ff-5460-78d3-bd96-2242789f12a7`；coordinator `01a16c95-84d1-7fe2-a365-42e343514498`。
 - Status：REVIEW_COMPLETE / WAITING_FOR_COORDINATOR。追加兩張有效島日夜證據後，建議水庭及島本輪polish都收尾，0個source修正候選；原10圖及失效記錄保留。
 - Clone：`/Users/fatboy/city2127-energy-polish`；branch `codex/energy-city-polish`。

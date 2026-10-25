@@ -221,3 +221,6 @@ P3在現行v4回歸PASS：Chrome1280×720、hour16，實測A/B閱讀間隔10,002
 ## 儲能環夜間可讀性一次試驗 — 2026-10-25（未採用）
 
 Trial source29168309的root test/build/diff、exact環外source／全energy幾何／環外與shared材質保護、原DEV27圖及原正式scratch gate PASS；49 batches、108／324／170775。Before／trial各27張1920×1080 DPR1 default原圖、21組固定URL／time配對及全部54個PNG hash核實，兩輪固定static均一致；Chrome156.0.8078.47 headless／ANGLE Metal Apple M6／WebGL2，沒有未預期DEV錯誤，formal exceptions0，只有既有favicon404／obsolete409／注入abort。Owner原尺寸hero/day/night review判定夜間改善不足、日景銀邊減弱，因此不採用候選並逐byte還原01987a48 baseline。初版artifact checker的JSON undefined比對失敗及修正完整保留，原runtime tests未改；還原狀態的額外實測、所有raw logs／原圖／diff／target及備份verify見[handoff](handoffs/ring-night-readability.md)與[證據入口](../artifacts/energy-city-polish/ring-night-readability-20261025/README.md)。軟件gate不等於視覺接受，夜間缺口仍開放；沒有新FPS／工程／硬件／Safari／iPad／Windows／真人理解或main CI宣稱。
+
+
+2026-10-25 發布更新：使用者已明確要求推送能源polish及整合main，先前本機-only狀態由[本次整合交接](handoffs/energy-polish-integration.md)取代。既有runtime未再修改；root test/build／正式scratch browser已重跑PASS，整合後驗證、main CI與安全刪分支的實際結果統一記在該交接，原target／夜間可讀性／硬件限制保留。

@@ -13,7 +13,7 @@
 | [回顧章節](day-replay.md) | PLANNED；方向已討論（轉向章節、空檔播、觀眾互動），開工前待owner答6項決定 | cc100053 |
 | [變化說明卡](change-explanation.md) | PLANNED（TODO）；右上卡片直接說明「乜嘢變成乜嘢」，未定案前先用參數前後變動 | cc100053 |
 | [能源城市](energy-city.md) | E1–E4完成並發布main，CI通過；Q3獨立能源權威配置、舊氣候／歷史與正式browser通過；E5本機Mac mini 30分鐘量測與TCP復原已驗；展覽硬件／訪客待驗 | Codex；產品決策cc100053 |
-| [儲能環 polish](storage-ring-polish.md) | 三輪本機gate完成；等待總指揮視覺review，本機checkpoint／bundle保存；不push／整合 | Codex batch owner |
+| [儲能環 polish](storage-ring-polish.md) | 三輪gate及後續取證完成；今次已獲發布授權，最新Git／CI見 [整合交接](energy-polish-integration.md)，原審美／硬件限制保留 | Codex batch owner |
 
 已完成或不再適用的50份交接及Meter截圖見 [歸檔索引](archive/README.md)。歷史下一步不會自動變成backlog；Shibuya不再開發。人類美術review／實機未測等限制保留，不因歸檔而結案。
 

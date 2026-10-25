@@ -1,5 +1,7 @@
 # 能源 polish 恢復檢查 — 2026-10-25 JST
 
+> 2026-10-25 最新發布／整合狀態見 [energy polish integration](energy-polish-integration.md)；以下本機-only／NOT PUSHED及review限制是先前批次的歷史狀態，今次使用者另已明確授權發布。
+
 - Owner：恢復 chat `01a17072-1ca4-74e2-bab4-8426b4257c57`；總指揮 `01a16c95-84d1-7fe2-a365-42e343514498`。
 - Status：PARTIAL RECOVERY；沒有開始新美術輪。只從已記錄的 diff、literal source、原圖片及 session media 抽出資料；沒有執行歷史紀錄內的指令。
 - 安全副本：`/Users/fatboy/city2127-energy-polish`。新建獨立 clone，branch `codex/energy-city-polish`，HEAD／base `db772bb2248aed345468d6b07fc011d518f7c7b2`。source／tests 為刻意保留的 dirty 恢復資料，沒有新 commit。

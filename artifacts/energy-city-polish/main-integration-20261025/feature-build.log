@@ -1,0 +1,30 @@
+
+> city2127@1.0.0 build
+> tsc --noEmit && vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 70 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                               0.42 kB │ gzip:   0.30 kB
+dist/assets/automation-hub-upper-DmtyRzQA.glb                75.43 kB
+dist/assets/future-tree-2127-BWMhZqIP.glb                    79.70 kB
+dist/assets/aqua-city-odaiba-D_U2ZqC5.glb                   701.31 kB
+dist/assets/decks-tokyo-beach-DCBXUSei.glb                  835.24 kB
+dist/assets/divercity-office-tower-DbsufCcJ.glb           1,261.22 kB
+dist/assets/odaiba_district_v01_environment-C9muNiMG.glb  1,437.92 kB
+dist/assets/maritime-sky-DbN1EmYm.png                     1,540.93 kB
+dist/assets/hilton-tokyo-odaiba-BjtUULW7.glb              2,021.70 kB
+dist/assets/grand-nikko-tokyo-daiba-CiMQTPp8.glb          2,121.58 kB
+dist/assets/divercity-tokyo-plaza-C5HBTVlr.glb            2,142.02 kB
+dist/assets/bay-ripple-normal-Dne0F-H8.png                2,402.61 kB
+dist/assets/coastal-grass-DwLkEMjx.png                    4,017.54 kB
+dist/assets/index-BHI5H7GM.css                                6.77 kB │ gzip:   2.19 kB
+dist/assets/index-DndKTxlI.js                             1,003.46 kB │ gzip: 282.89 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 621ms
