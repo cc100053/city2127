@@ -1,0 +1,91 @@
+{
+  "outsideRingSource": "a53845db4aace12a427d0b55fefcccfbb00237a959d42dde0a023cf84f9b21eb",
+  "geometry": {
+    "wing": {
+      "triangles": 181552,
+      "sha256": "08fb2a10cd8a667d05c0541141e759cdd97bcefa293f9d6c96b628a1c8b1ce43"
+    },
+    "garden": {
+      "triangles": 85160,
+      "sha256": "f556eb5b2f1e666527d7ddbb2dd41fb247f13fc884bf8fce7a96cacccdb3b678"
+    },
+    "ring": {
+      "triangles": 80708,
+      "sha256": "545f8be5898c777e4d629926586f51c24b8fb8315d0ab95cf7d410e0979bc42c"
+    },
+    "island": {
+      "triangles": 255688,
+      "sha256": "e64acc1e34d6801c85551d631f0278f164d8dd2676bec5baf8ae3d3f31410794"
+    },
+    "distribution": {
+      "triangles": 5568,
+      "sha256": "7eb5ab61b132bd64e52a2ad428e19e2093b50e4e369d6378796e7e3d9afe16ef"
+    }
+  },
+  "nonRingMaterials": {
+    "wing": {
+      "triangles": 181552,
+      "sha256": "c4abbd586369d68b4b2c39832d9cfef9cf4bdb67bda46294a6c5251171d066a0"
+    },
+    "garden": {
+      "triangles": 85160,
+      "sha256": "d4106cc31cfd52dff049738bcfa3911b16ed576c6073c5bc2a3224cfa338094a"
+    },
+    "island": {
+      "triangles": 255688,
+      "sha256": "e63631817bb8b84f0b7ecd4901d117fc017193324baf3f2a7a3b7bdd66356695"
+    },
+    "distribution": {
+      "triangles": 5568,
+      "sha256": "0b9f5efa4f12a89f8c0c946591fba0db2836b49e68f3c6950c31382dd7825cfb"
+    }
+  },
+  "sharedMaterials": [
+    {
+      "type": "MeshPhysicalMaterial",
+      "color": "f1f4f6",
+      "emissive": "000000",
+      "emissiveIntensity": 1,
+      "roughness": 0.05,
+      "metalness": 0.92,
+      "envMapIntensity": 1,
+      "clearcoat": 1,
+      "clearcoatRoughness": 0.02,
+      "opacity": 1,
+      "transparent": false
+    },
+    {
+      "type": "MeshStandardMaterial",
+      "color": "eee9df",
+      "emissive": "000000",
+      "emissiveIntensity": 1,
+      "roughness": 0.48,
+      "metalness": 0,
+      "envMapIntensity": 1,
+      "opacity": 1,
+      "transparent": false
+    },
+    {
+      "type": "MeshStandardMaterial",
+      "color": "27414f",
+      "emissive": "000000",
+      "emissiveIntensity": 1,
+      "roughness": 0.16,
+      "metalness": 0.7,
+      "envMapIntensity": 1,
+      "opacity": 1,
+      "transparent": false
+    },
+    {
+      "type": "MeshStandardMaterial",
+      "color": "486b83",
+      "emissive": "000000",
+      "emissiveIntensity": 1,
+      "roughness": 0.3,
+      "metalness": 0.85,
+      "envMapIntensity": 1,
+      "opacity": 1,
+      "transparent": false
+    }
+  ]
+}

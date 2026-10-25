@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "pngHashesVerified": 81,
+  "sameFixedURLsTimesConfigs": 42,
+  "matrixSizes": {
+    "before": 27,
+    "after": 27,
+    "restored": 27
+  },
+  "allFixedStaticPairsEqual": true
+}

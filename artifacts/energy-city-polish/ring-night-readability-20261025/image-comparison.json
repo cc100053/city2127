@@ -1,0 +1,114 @@
+[
+  {
+    "name": "hero-day-mixed",
+    "size": [
+      1920,
+      1080
+    ],
+    "changedPixels": 413078,
+    "diffBoundingBox": [
+      0,
+      53,
+      1920,
+      1080
+    ],
+    "meanAbsoluteRGBDifference": [
+      0.45607831790123454,
+      0.45557484567901235,
+      0.36954475308641976
+    ],
+    "contextRegion": [
+      915,
+      325,
+      1030,
+      455
+    ],
+    "regionMeanLuminanceBefore": 146.60001364548495,
+    "regionMeanLuminanceTrial": 140.74179505016724,
+    "note": "Pixel statistics include antialiasing/late actors and do not establish perceptual acceptance; original full-size screenshots govern."
+  },
+  {
+    "name": "hero-night-mixed",
+    "size": [
+      1920,
+      1080
+    ],
+    "changedPixels": 399673,
+    "diffBoundingBox": [
+      0,
+      0,
+      1920,
+      1080
+    ],
+    "meanAbsoluteRGBDifference": [
+      0.2723172260802469,
+      0.2737398726851852,
+      0.2515398341049383
+    ],
+    "contextRegion": [
+      915,
+      325,
+      1030,
+      455
+    ],
+    "regionMeanLuminanceBefore": 81.54350199331103,
+    "regionMeanLuminanceTrial": 81.88887634782608,
+    "note": "Pixel statistics include antialiasing/late actors and do not establish perceptual acceptance; original full-size screenshots govern."
+  },
+  {
+    "name": "detail-day-mixed",
+    "size": [
+      1920,
+      1080
+    ],
+    "changedPixels": 483175,
+    "diffBoundingBox": [
+      0,
+      13,
+      1920,
+      1080
+    ],
+    "meanAbsoluteRGBDifference": [
+      1.4404012345679011,
+      1.3918036265432099,
+      1.2238020833333334
+    ],
+    "contextRegion": [
+      680,
+      300,
+      1145,
+      810
+    ],
+    "regionMeanLuminanceBefore": 138.5453280101202,
+    "regionMeanLuminanceTrial": 130.49324541260805,
+    "note": "Pixel statistics include antialiasing/late actors and do not establish perceptual acceptance; original full-size screenshots govern."
+  },
+  {
+    "name": "detail-night-mixed",
+    "size": [
+      1920,
+      1080
+    ],
+    "changedPixels": 488325,
+    "diffBoundingBox": [
+      0,
+      0,
+      1920,
+      1080
+    ],
+    "meanAbsoluteRGBDifference": [
+      0.37332224151234567,
+      0.368467399691358,
+      0.35663966049382717
+    ],
+    "contextRegion": [
+      680,
+      300,
+      1145,
+      810
+    ],
+    "regionMeanLuminanceBefore": 76.44356579717478,
+    "regionMeanLuminanceTrial": 76.57916369049124,
+    "note": "Pixel statistics include antialiasing/late actors and do not establish perceptual acceptance; original full-size screenshots govern."
+  }
+]

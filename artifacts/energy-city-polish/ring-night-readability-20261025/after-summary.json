@@ -1,0 +1,31 @@
+{
+  "sourceHash": "29168309084f683cf6c57e82ca45ee2c3fa2e3ba22e86cb4fc92c2103b60cf02",
+  "browser": "156.0.8078.47",
+  "platform": "darwin",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "dpr": 1,
+  "quality": "default",
+  "gpu": {
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+  },
+  "exceptions": [],
+  "consoleMessages": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:5187/favicon.ico"
+    }
+  ],
+  "responses": [],
+  "failures": [],
+  "screenshots": 27,
+  "fixedStaticEqual": true,
+  "liveTimes": [
+    "21.88",
+    "27.93"
+  ]
+}

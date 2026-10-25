@@ -1,0 +1,16 @@
+{
+  "checkedAt": "2026-10-25T16:24:37+09:00",
+  "viteSession": 52348,
+  "vitePid": 35752,
+  "viteExit": 130,
+  "viteListener5187": false,
+  "formalScratchPortsNoListener": [
+    "62767"
+  ],
+  "allBrowserHarnessSessionsExited": true,
+  "formalRunnerFinallyCleanup": "PASS: browser/realtime/server/SQLite scratch cleanup returned exit0",
+  "ownedHarnessProcessCheck": "ps exact-name filter found none; Vite PID absent",
+  "worker": "/root/ring_finish_trial completed; no active implementation worker",
+  "owner": "source ownership released; checkpoint-only closure, no new pass",
+  "pushDeployMainIntegration": false
+}

@@ -1,0 +1,17 @@
+{
+  "lockedAt": "2026-10-25T16:05:29+09:00",
+  "targetSha256": "062aed68c2ad36de52bc2c153a20e540918fe2a45d4e7b67bc559a4d09ecee02",
+  "targetSize": [
+    1672,
+    941
+  ],
+  "baselineSize": [
+    1920,
+    1080
+  ],
+  "baseline": "/Users/fatboy/city2127-energy-polish/artifacts/energy-city-polish/ring-night-readability-20261025/before/hero-night-mixed.png",
+  "baselineSha256": "56b24fc1d970fb9ae466e2f00b70cad2dfa52c53f0278b7d578d3e37abe7b900",
+  "tool": "built-in image_gen.imagegen",
+  "generatedOriginal": "/Users/fatboy/.codex/generated_images/01a171dc-80a0-7e63-a14d-b7dbca7159b6/exec-79b20cd2-f5cd-4cd9-b4a9-8589730273c8.png",
+  "scopeDecision": "Only ring/support non-emissive finish reference is accepted. Generated resizing, smoothing, UI/text/background drift are explicitly rejected. Exact runtime framing, geometry, all other objects and lighting remain immutable. No claim of pixel-exact target attainment."
+}
