@@ -204,3 +204,5 @@ P3在現行v4回歸PASS：Chrome1280×720、hour16，實測A/B閱讀間隔10,002
 逐輪source hash、完整PNG／raw log／JSON、實際checkpoint／清理與總指揮review狀態見 [儲能環交接](handoffs/storage-ring-polish.md) 及 [新證據](../artifacts/energy-city-polish/storage-ring-recovered-20261025/README.md)。沒有新FPS／展覽硬件／Safari／iPad／Windows／工程或target達成宣稱；survey build僅作scratch fixture，source未改。
 
 第二輪原候選47cf4d5亦完成同一完整root／DEV27圖／正式gate PASS（47 batches，108／324／170424）；環外source未變。原正式runner的reduced新頁30秒timeout可再次出現：現只在該段先釋放舊City renderer，再恢復hour22及額外核對同一model(view)。原assertions／quality／30與45秒門檻保留，沒有放寬tests；失敗原runner、圖及新排程成功證據同存pass2。詳細限制沿用上段與handoff。
+
+第三輪source27c1e4f（真正same-chat fresh gpt-6-astra/low worker、owner驗收）完整root test/build/base-diff、DEV27原PNG及正式scratch gate PASS；48 batches、theatre gap30.50m、108／324／170424。環外source與原target逐byte保持；static兩圖相同，live29.15→35.10秒。延續上段renderer排程，原assertions／quality／timeout未改；所測平台／原圖、source commit／bundle／hash／服務清理與未驗項目均在儲能環handoff。三輪後停止，target審美review／硬件／工程／新FPS未完成，沒有push／main整合。

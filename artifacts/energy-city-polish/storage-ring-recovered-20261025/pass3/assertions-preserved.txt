@@ -1,0 +1,1 @@
+PASS current formal runner minus the two renderer lifecycle steps is byte-identical to the original pass1 runner. All assertions, quality and timeout values retained.

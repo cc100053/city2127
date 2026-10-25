@@ -127,4 +127,4 @@ Admin Day／Night／Auto 保存為獨立 display setting：12:00／22:00／180 �
 
 ### 能源模型 polish 恢復（2026-10-25）
 
-獨立本機 clone 已恢復水庭／能源島與富士前置儲能環首輪 source，沿用原生成 target；僅續作儲能環／原固定承托三輪批次。保留劇場、工作翼、斜街與原權威配置／歷史。恢復 provenance、逐輪驗收及總指揮視覺review狀態見 [儲能環交接](handoffs/storage-ring-polish.md)；沒有發布／整合，不能據此宣稱 target、工程或展覽驗收完成。
+獨立本機 clone 已恢復水庭／能源島與富士前置儲能環首輪 source，沿用原生成 target；僅續作儲能環／原固定承托三輪批次，三輪本機實作gate已完成，等待總指揮視覺review。保留劇場、工作翼、斜街與原權威配置／歷史。恢復 provenance、逐輪驗收及總指揮視覺review狀態見 [儲能環交接](handoffs/storage-ring-polish.md)；沒有發布／整合，不能據此宣稱 target、工程或展覽驗收完成。

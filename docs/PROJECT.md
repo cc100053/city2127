@@ -169,4 +169,4 @@ CityChangeManager將能源實際前後target加入CarrierChange，residentResult
 
 ### 能源模型 polish 恢復續作（2026-10-25）
 
-獨立本機 branch 恢復已接受水庭／能源島及富士前置儲能環第一輪 source；原 commit chain 未找回。環以獨立 rotor 保持 r29–33／depth±1.5 m，分層環帶、分段殼與金屬接縫沿用共享材質／bake；兩組固定軸承由原 transfer frame 承托。`devEnergy` 與正式 `EnergyRuntime` 沿用同一工廠，原60秒、3秒retarget及立即恢復不變。這是模型細化，未驗證儲能工程。最新逐輪 source／實測與未完成項目見 [儲能環交接](handoffs/storage-ring-polish.md)。
+獨立本機 branch 恢復已接受水庭／能源島及富士前置儲能環第一輪 source；原 commit chain 未找回。環以獨立 rotor 保持 r29–33／depth±1.5 m，分層環帶、分段殼與金屬接縫沿用共享材質／bake；兩組固定軸承由原 transfer frame 承托。`devEnergy` 與正式 `EnergyRuntime` 沿用同一工廠，原60秒、3秒retarget及立即恢復不變。這是模型細化，未驗證儲能工程。三輪本機gate已完成，最後環帶使用分段金屬肩環／緊固件與凹入軸承端面，仍沿用同一工廠與共享材質。最新逐輪 source／實測與未完成項目見 [儲能環交接](handoffs/storage-ring-polish.md)。

@@ -1,3 +1,4 @@
+a6b1130c24e0098f579bb760f75a4c48d226ffdee5ebeed6620742633c6bcb91  artifacts/energy-city-polish/storage-ring-recovered-20261025/pass3/assertions-preserved.txt
 184743372cd9dc0648fdcb38c8e5fb6390316a2f75da942b688a53126c3c630e  artifacts/energy-city-polish/storage-ring-recovered-20261025/pass3/build.log
 1e52daf39a6cb3c3125d0a7d360d0367a4f1d55294761a90f01ebdbceb5a16a2  artifacts/energy-city-polish/storage-ring-recovered-20261025/pass3/cleanup.txt
 f49dd6d499dc264b7517a793e08db7af40da4f9e13e3753d42eace3d5222e66e  artifacts/energy-city-polish/storage-ring-recovered-20261025/pass3/dev/browser.json
@@ -47,6 +48,7 @@ e7ecf539df6a68983c1a0fec5bdf2fb6888715724fa4ff3a373e437e80bf56d3  artifacts/ener
 b36aad574bf308773469943de50c0ff22dfbf721cda3b90d011ebcd3d6a5c3fe  artifacts/energy-city-polish/storage-ring-recovered-20261025/pass3/formal.browser.mjs
 b5aae62f59c292bf311b309f8f5085a0a88fe8b0d1bbd9d88210208d366b9a9a  artifacts/energy-city-polish/storage-ring-recovered-20261025/pass3/review.browser.mjs
 37c33698bd10928ceea0bba26c2e4109279117d3ddc7188b177ab407f3c542df  artifacts/energy-city-polish/storage-ring-recovered-20261025/pass3/review.md
+b5a32290b6111bc85bbad4bcce6fdc89c985cbee4708ad7a447010d8ff87e954  artifacts/energy-city-polish/storage-ring-recovered-20261025/pass3/source-checkpoint.json
 36d8c8761aec5ea3f6b8da3632f4f7abcd90692b027963f476bed7640780b415  artifacts/energy-city-polish/storage-ring-recovered-20261025/pass3/source.patch.gz
 27c1e4f36835267eccc64c9d0c2947203d65dd95b7f37dda90c06dfb6576d9fa  artifacts/energy-city-polish/storage-ring-recovered-20261025/pass3/source.ts
 27a0407be7b285b6e8097b933318041031d083a42a9ba1ba85105cb568b062e3  artifacts/energy-city-polish/storage-ring-recovered-20261025/pass3/test.log
