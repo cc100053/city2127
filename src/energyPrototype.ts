@@ -48,6 +48,12 @@ export function energyPrototype() {
   }
   box(wing, [.72, 7.2, .08], [0, 8, 1.18], dark);
   box(wing, [.58, 6.95, .08], [0, 8, 1.22], trim);
+  box(wing, [.2, .65, .08], [.15, 8, 1.28], chrome);
+  arc(wing, 1.18, 1.3, .35, [0, 23.95, 0], trim);
+  for (const side of [-1, 1]) {
+    box(wing, [.08, 6.5, .32], [side * 1.18, 20.6, 0], dark);
+    box(wing, [.08, 6.3, .16], [side * 1.22, 20.6, 0], chrome);
+  }
   for (const z of [-1.16, 1.16]) {
     box(wing, [.44, 2.5, .1], [0, 26.95, z], dark);
     box(wing, [.3, 2.25, .12], [0, 26.95, z], trim);
@@ -56,10 +62,13 @@ export function energyPrototype() {
   for (const side of [-1, 1]) {
     member(wing, [0, 16, 0], [side * 20, 31.8, 0], 1.4);
     for (const z of [-.71, .71]) {
-      member(wing, [side * 1.3, 17.03, z], [side * 18.8, 30.85, z], .16, chrome);
+      member(wing, [side * 2.3, 17.82, z], [side * 18, 30.22, z], .4, dark);
+      member(wing, [side * 2.3, 17.82, z + Math.sign(z) * .18], [side * 18, 30.22, z + Math.sign(z) * .18], .18, trim);
       const joint = arc(wing, 0, .78, .12, [side * 1.35, 17.07, z], trim);
       joint.rotation.x = Math.sign(z) * Math.PI / 2;
-      const pin = arc(wing, 0, .3, .16, [side * 1.35, 17.07, z], chrome);
+      const gasket = arc(wing, .3, .59, .14, [side * 1.35, 17.07, z], dark);
+      gasket.rotation.x = Math.sign(z) * Math.PI / 2;
+      const pin = arc(wing, 0, .3, .18, [side * 1.35, 17.07, z], chrome);
       pin.rotation.x = Math.sign(z) * Math.PI / 2;
       for (const dx of [-.43, .43]) for (const dy of [-.43, .43])
         box(wing, [.13, .13, .12], [side * 1.35 + dx, 17.07 + dy, z + Math.sign(z) * .13], chrome);
@@ -76,6 +85,10 @@ export function energyPrototype() {
     }
     for (let x = -10; x <= 10; x += 5) {
       box(leaf, [4.5, .12, 18.3], [x, .59, 0], dark);
+      for (const z of [-9.05, 9.05]) {
+        box(leaf, [4.4, .18, .26], [x, .68, z], chrome);
+        box(leaf, [3.85, .08, .14], [x, .78, z], trim);
+      }
       for (let row = 0; row < 12; row++) {
         const z = -8.25 + row * 1.5;
         for (const dx of [-1.1, 1.1]) box(leaf, [2.1, .12, 1.34], [x + dx, .71, z], solar, .015);
@@ -88,6 +101,7 @@ export function energyPrototype() {
     }
     // Underside spars receive the fork below the surface instead of protruding through it.
     for (const z of [-6.8, 6.8]) member(leaf, [-11.6, -.8, z], [11.6, -.8, z], .45, dark);
+    for (const x of [-7.5, 7.5]) member(leaf, [x, -.8, -6.8], [x, -.8, 6.8], .35, trim);
     box(leaf, [3.1, .6, 4], [side * 7, -.8, 0], trim);
     for (const z of [-1.85, 1.85]) {
       box(leaf, [2.8, .16, .18], [side * 7, -1.12, z], chrome);

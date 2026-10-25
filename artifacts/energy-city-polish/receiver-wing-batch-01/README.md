@@ -28,3 +28,5 @@ Use existing installed Playwright/Chrome and a loopback Vite on5187. `node artif
 After source/diff/document review, local Conventional Commit and cleanup, `python3 artifacts/energy-city-polish/receiver-wing-batch-01/checkpoint.py passN` saves a full branch bundle and archive of all receiver evidence plus complete current src/tests/docs and both workflow targets. It verifies bundle and every archived file and refuses to overwrite a prior checkpoint. Local `checkpoints/` is ignored to avoid recursive backups; preparation also retains a full tracked-tree archive.
 
 [Pass2 owner review](pass2/review.md)：sourcede556764，同一完整root／DEV33／正式gate PASS，固定static PNG一致、live21.39→28.88；checkpoints/pass2.json保存exact commit與完整branch bundle／evidence archive驗證。
+
+[Pass3 owner review](pass3/review.md)：source01987a48，相同完整gate PASS，static PNG一致、live21.45→26.50。三輪後停止等coordinator review，不再實作；最後source commit與文件收尾commit由checkpoints/pass3.json分列。

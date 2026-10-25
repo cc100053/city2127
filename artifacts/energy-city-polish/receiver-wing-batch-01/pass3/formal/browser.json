@@ -1,0 +1,70 @@
+{
+  "browser": "156.0.8078.47",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "quality": "default",
+  "hour": [
+    12,
+    18.5,
+    22
+  ],
+  "checkedCommit": "d71c01c-plus-source-01987a48",
+  "exceptions": [],
+  "warnings": [
+    {
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:60413/favicon.ico"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 409 (Conflict)",
+      "url": "http://127.0.0.1:60413/api/proposal-sessions/67e40b5e-ae5f-4719-8612-0eec763b95c0"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:5187/favicon.ico"
+    },
+    {
+      "text": "Failed to load resource: net::ERR_FAILED",
+      "url": "http://127.0.0.1:60413/api/proposals"
+    },
+    {
+      "text": "Failed to load resource: net::ERR_FAILED",
+      "url": "http://127.0.0.1:60413/api/proposals"
+    }
+  ],
+  "badResponses": [
+    {
+      "url": "http://127.0.0.1:60413/api/proposal-sessions/67e40b5e-ae5f-4719-8612-0eec763b95c0",
+      "status": 409
+    }
+  ],
+  "failures": [
+    {
+      "url": "http://127.0.0.1:60413/api/proposals",
+      "error": "net::ERR_FAILED"
+    },
+    {
+      "url": "http://127.0.0.1:60413/api/proposals",
+      "error": "net::ERR_FAILED"
+    }
+  ],
+  "tests": [
+    "schema7→8 with original proposal and obsolete draft",
+    "old climate unchanged",
+    "Q3 four native radios and review",
+    "pre/post commit same-ID retry",
+    "first preference no visible change",
+    "second preference actual model/result",
+    "Undo removes energy model",
+    "recorded mixed portfolio snapshot",
+    "day/dusk/night",
+    "TCP reconnect",
+    "browser prefers-reduced-motion",
+    "normal desktop resize",
+    "reset removes all equipment",
+    "old retry after reset"
+  ],
+  "fixtureClockJumps": "11s old reading, then 16s skips for Undo and mixed seeding; not visitor timing"
+}

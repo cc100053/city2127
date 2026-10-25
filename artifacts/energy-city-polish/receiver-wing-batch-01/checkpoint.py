@@ -28,7 +28,7 @@ with tarfile.open(archive, 'r:gz') as tar:
     for member in members:
         assert hashlib.sha256(tar.extractfile(member).read()).digest() == hashlib.sha256(Path(member.name).read_bytes()).digest(), member.name
 assert not subprocess.check_output(['git', 'status', '--porcelain'], text=True), 'Backup must leave tree clean'
-meta = {'round': round_name, 'commit': head, 'sourceSha256': hashlib.sha256(Path('src/energyPrototype.ts').read_bytes()).hexdigest(),
+meta = {'round': round_name, 'commit': head, 'sourceCommit': subprocess.check_output(['git', 'log', '-1', '--format=%H', '--', 'src/energyPrototype.ts'], text=True).strip(), 'sourceSha256': hashlib.sha256(Path('src/energyPrototype.ts').read_bytes()).hexdigest(),
         'targetSha256': hashlib.sha256((root / 'target.png').read_bytes()).hexdigest(), 'bundleVerify': 'PASS',
         'archiveContentsVerify': 'PASS', 'archiveScope': 'all receiver evidence, complete current src/tests/docs and both workflow targets; checkpoints excluded',
         'verifiedEvidenceFiles': len(files), 'workingTree': 'clean; checkpoint files ignored locally', 'services': 'Vite stopped; browser and scratch server closed',

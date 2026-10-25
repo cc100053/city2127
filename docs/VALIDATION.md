@@ -214,3 +214,5 @@ P3在現行v4回歸PASS：Chrome1280×720、hour16，實測A/B閱讀間隔10,002
 接收翼第一輪（source0f1941bd）：root test/build/diff、原大小版AABB／翼外hash、33 DEV原圖與原正式scratch gate PASS；49 batches、108／324／170775，固定static PNG一致，live21.20→26.22秒。原tests／timeouts未改，只有預期404／obsolete409／注入abort。實測平台／清理／未驗限制及逐輪commit／備份見接收翼handoff，並非新FPS或工程驗收。
 
 接收翼第二輪（sourcede556764）：相同完整root／包絡／scope hash／DEV33／原正式gate PASS，49 batches／108／324／170775；static PNG一致、live21.39→28.88秒，僅預期browser錯誤，原assertions／quality／timeout不變。逐輪原圖、限制、清理及本機backup見接收翼handoff。
+
+接收翼第三輪（source01987a48）：完整root test/build/diff／原大小版AABB／protected hashes、DEV33原圖及原正式scratch gate全部PASS，49 batches／108／324／170775；static PNG一致、live21.45→26.50秒。三輪合共99張DEV新原圖，原tests／quality／timeout不變，沒有新增global光源或用途。三輪後停止等coordinator review，逐輪source commit／final metadata commit／bundle／archive與未驗限制見接收翼handoff。
