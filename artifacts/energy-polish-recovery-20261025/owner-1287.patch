@@ -1,0 +1,109 @@
+diff --git a/src/energyPrototype.ts b/src/energyPrototype.ts
+index 44b72ea..90bbad8 100644
+--- a/src/energyPrototype.ts
++++ b/src/energyPrototype.ts
+@@ -77,12 +77,15 @@ export function energyPrototype() {
+   arc(garden, 0, 4.8, .25, [8, 18.6, 0], dark);
+   for (let i = 0; i < 24; i++) {
+     const a = i * Math.PI / 12, c = Math.cos(a), z = Math.sin(a);
+-    member(garden, [8 + 4.8 * c, 18.7, 4.8 * z], [8 + 10.9 * c, 21.25, 10.9 * z], .13, chrome);
++    member(garden, [8 + 4.8 * c, 18.7, 4.8 * z], [8 + 10.9 * c, 21.25, 10.9 * z], .23, trim);
+     member(garden, [8 + 12.015 * c, 21.85, 12.015 * z], [8 + 12.015 * c, 23.23, 12.015 * z], .035, dark);
+     member(garden, [14.015 * c, -1.05, 14.015 * z], [14.015 * c, .95, 14.015 * z], .035, dark);
+   }
+   for (const [inner, outer, y] of [[11.05, 11.22, 23.28], [11.8, 12, 23.28], [11.9, 12, 21.75]])
+     arc(garden, inner, outer, .12, [8, y, 0], chrome);
++  // Recessed pool-edge light and coping retain the existing wall and maintenance width.
++  arc(garden, 10.96, 11.04, .08, [8, 23.12, 0], publicLight);
++  arc(garden, 12.48, 12.56, .08, [0, .78, 0], publicLight);
+   arc(garden, 12.55, 13.95, .12, [0, 1, 0], stone);
+   arc(garden, 13.85, 14, .12, [0, .85, 0], chrome);
+   // The maintenance walk stays on the existing wall; the reservoir remains visibly full of water.
+@@ -110,6 +113,12 @@ export function energyPrototype() {
+   for (const y of [.55, 5.45]) box(garden, [9.3, .2, 6.25], [-5, y, -7], trim);
+   for (const x of [-9.45, -7.6, -2.4, -.55]) box(garden, [.14, 4.8, .18], [x, 3, -10.08], trim);
+   box(garden, [8.7, .18, 5.7], [-5, 5.65, -7], dark);
++  for (const x of [-8.6, -1.4]) {
++    box(garden, [1.2, .12, .14], [x, 5.18, -10.2], publicLight);
++    box(garden, [.72, 1.3, .12], [x, 3.1, -10.17], dark);
++    for (const y of [2.75, 3.1, 3.45]) box(garden, [.45, .06, .04], [x, y, -10.25], chrome);
++  }
++  for (const x of [-9.7, -.3]) box(garden, [.08, .1, 4.45], [x, 4.8, -7], publicLight);
+   const casing = new T.Mesh(new T.TorusGeometry(2.48, .16, 8, 48), trim);
+   casing.position.set(-5, 3.5, -10.6); garden.add(casing);
+   for (let i = 0; i < 12; i++) {
+@@ -117,21 +126,33 @@ export function energyPrototype() {
+     box(garden, [.13, .13, .13], [-5 + 2.48 * Math.cos(a), 3.5 + 2.48 * Math.sin(a), -10.79], dark);
+   }
+   const turbineRotor = new T.Group(); turbineRotor.name = 'energy-turbine'; turbineRotor.position.set(-5, 3.5, -10.6); garden.add(turbineRotor);
+-  const turbine = new T.Mesh(new T.TorusGeometry(1.8, .4, 6, 20), chrome);
++  const turbine = new T.Mesh(new T.TorusGeometry(2.03, .14, 10, 64), chrome);
+   turbineRotor.add(turbine);
+-  for (const angle of [0, Math.PI / 3, Math.PI * 2 / 3]) {
+-    const blade = box(turbineRotor, [.4, 3.6, .3], [0, 0, 0], dark); blade.rotation.z = angle;
++  // Swept impeller vanes share one profile and stay inside the original 2.3 m rotor envelope.
++  const vane = new T.Shape();
++  vane.moveTo(.38, -.12); vane.bezierCurveTo(.95, -.35, 1.75, -.15, 2.03, .25);
++  vane.lineTo(1.9, .64); vane.bezierCurveTo(1.36, .24, .86, .12, .38, .24); vane.closePath();
++  const vaneGeometry = new T.ExtrudeGeometry(vane, { depth: .18, bevelEnabled: true, bevelSize: .035, bevelThickness: .035, bevelSegments: 2, steps: 1, curveSegments: 10 });
++  vaneGeometry.translate(0, 0, -.09);
++  for (let i = 0; i < 7; i++) {
++    const blade = new T.Mesh(vaneGeometry, dark); blade.rotation.z = i * Math.PI * 2 / 7; turbineRotor.add(blade);
++  }
++  pipe(turbineRotor, [0, 0, -.25], [0, 0, .25], .52, chrome);
++  pipe(turbineRotor, [0, 0, -.34], [0, 0, -.26], .28, dark);
++  for (let i = 0; i < 6; i++) {
++    const a = i * Math.PI / 3;
++    box(turbineRotor, [.08, .08, .06], [.39 * Math.cos(a), .39 * Math.sin(a), -.29], trim);
+   }
+   for (const z of [-7.8, -6.2]) {
+     const a = [2, 23, z], b = [-5, 5.5, z];
+-    pipe(garden, a, b, .25, glass);
++    pipe(garden, a, b, .31, glass);
+     for (const t of [.1, .35, .7, .94]) collar(a, b, t, .36);
+   }
+   member(garden, [-5, .5, -7], [-5, 2, -7], 1.6, solar);
+   // Return line closes the loop visibly; it is storage charged by an external supply.
+   for (const z of [7.5, 8.5]) {
+     const a = [5, .5, z], b = [15, 23, z];
+-    pipe(garden, a, b, .2, dark);
++    pipe(garden, a, b, .25, dark);
+     for (const t of [.06, .3, .65, .95]) collar(a, b, t, .3);
+   }
+   member(garden, [15, 23, 8], [12, 23, 0], .9, dark);
+@@ -152,6 +173,8 @@ export function energyPrototype() {
+   box(canopy, [16, .5, 10], [0, 0, 0], dark);
+   for (let x = -6; x <= 6; x += 4) for (const z of [-2.5, 2.5])
+     box(canopy, [3.82, .09, 4.78], [x, .3, z], solar);
++  for (let x = -7.4; x <= 7.4; x += .8) for (const z of [-2.5, 2.5])
++    box(canopy, [.018, .015, 4.55], [x, .352, z], chrome);
+   for (const z of [-4.9, 4.9]) box(canopy, [15.9, .12, .12], [0, .35, z], chrome);
+   for (const x of [-7.9, 7.9]) box(canopy, [.12, .12, 9.8], [x, .35, 0], chrome);
+   for (const x of [-6, 0, 6]) box(canopy, [.18, .5, 9.5], [x, -.45, 0], trim);
+@@ -225,12 +248,13 @@ export function energyPrototype() {
+   rotor.removeFromParent(); turbineRotor.removeFromParent();
+   for (const group of [...Object.values(parts), rotor, turbineRotor]) group.add(...bake(group));
+   ring.add(rotor); garden.add(turbineRotor);
+-  const water = new T.MeshPhysicalMaterial({ color: '#6897ad', roughness: .18, metalness: .12, clearcoat: .6, clearcoatRoughness: .15 });
++  const water = new T.MeshPhysicalMaterial({ color: '#608fa5', roughness: .12, metalness: .28, clearcoat: .8, clearcoatRoughness: .12, envMap: chrome.envMap, envMapIntensity: .7 });
+   // Reuse the generated bay normal, with metre-scaled UVs; Node geometry checks need no image loader.
+   if (typeof document !== 'undefined' && typeof document.createElementNS === 'function') {
+     const normal = new T.TextureLoader().load(new URL('../asset/textures/bay-ripple-normal.png', import.meta.url).href);
+-    normal.wrapS = normal.wrapT = T.RepeatWrapping; normal.repeat.set(.16, .16);
+-    water.normalMap = normal; water.normalScale.set(.3, .3);
++    normal.wrapS = normal.wrapT = T.RepeatWrapping; normal.repeat.set(.34, .34);
++    water.normalMap = normal; water.normalScale.set(.65, .65);
++    water.clearcoatNormalMap = normal; water.clearcoatNormalScale.set(.4, .4);
+   }
+   const lowerWater = arc(garden, 0, 12.4, .2, [0, .1, 0], water);
+   const upperWater = arc(garden, 0, 10.7, .2, [8, 23, 0], water);
+@@ -275,6 +299,9 @@ export function energyPrototype() {
+   for (const flow of flows) flow.boundingSphere = new T.Sphere(new T.Vector3(5, 12, 0), 20);
+   function update(seconds: number, reducedMotion = false) {
+     const cycle = energyCycle(seconds, reducedMotion);
++    water.envMapIntensity = chrome.envMapIntensity * .7;
++    // Absolute-time UV drift keeps snapshots reproducible and reduced-motion surfaces still.
++    water.normalMap?.offset.set(reducedMotion ? .1 : seconds * .007, reducedMotion ? .05 : seconds * .004);
+     rotor.rotation.z = cycle.angle;
+     for (const [i, g] of gardens.entries()) {
+       g.getObjectByName('energy-upper-water')!.position.y = 22.2 + cycle.level * .8;

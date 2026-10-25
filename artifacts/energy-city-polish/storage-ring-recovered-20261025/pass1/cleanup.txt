@@ -1,0 +1,1 @@
+PASS Vite exited; port5187 has no LISTEN. Both completed browser runners exited0 and close scratch/browser in finally. DEV attempt1 Node was explicitly stopped after Chrome closed.

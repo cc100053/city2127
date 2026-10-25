@@ -196,3 +196,9 @@ P3在現行v4回歸PASS：Chrome1280×720、hour16，實測A/B閱讀間隔10,002
 使用者限定先測目前Mac。Mac mini Mac18,5／Apple M6（12 GPU cores）／24GB／macOS27.0.1、Chrome156.0.8078.47 **headed**、ANGLE Metal／WebGL2，Vite DEV、City1920×1080／DPR1／Guest A/B1280×900。原hero起始但OrbitControls未鎖定，截圖顯示視角有變，故不是完全固定鏡頭benchmark；不推算能源額外成本或其他視角效能。三個Meter中間答案，四類能源正式共存。60秒零提案／混合default31.10／32.36 FPS，low均59.94 FPS。low自動日夜1801.94秒／108,008frames，平均59.94，p95／p99 17.9／18.6ms，max66.7ms，每5秒讀取的120幀renderer FPS樣本59.8–60.1；90份原生UI A/B＋16份真實HTTP種子，count106，server各對展示排程差10,000ms。每5秒renderer counts425 geometries／24 textures不變，JS heap19.2–51.8MiB，沒有page crash／exception／context loss；只有3個favicon404 console訊息。[方法、完整資料及鏡頭／記憶體限制](../artifacts/energy-city-e5/README.md)，[交接](handoffs/energy-city.md)。獨立1分鐘runner補驗：真實City TCP切斷＋offline3秒後新connection5→6，count20與能源target／reload恢復，只有預期favicon404及offline錯誤。最終runner另驗pointer input保護／繼續render及拒絕覆寫舊證據；raw舊row.fps為每120幀renderer均值，新runner將rendererFps與rAF fps分開。Root完整npm test（含E5統計self-check）／build通過，僅既有>500kB chunk warning；Git整合紀錄見交接。
 
 可重跑`node tests/energyE5.browser.mjs --self-test`；完整headed browser runner的Playwright path、scratch／Vite及證據目錄設定見artifact README。30分鐘不代表整日穩定性，4K／所有Meter與能源極值、65吋HDMI／iPad Safari／專用LAN／真人閱讀理解仍未驗。E5／P5／S5不因此完成。
+
+## 儲能環 polish 恢復續作 — 2026-10-25
+
+首輪恢復source5255520已在獨立clone重跑root test/build/diff PASS；108正式權威模型及324 district／170424 exact checks、r29–33／depth±1.5全周與固定承托、船／航空／泊位／公共／四站視線均未放寬。Chrome156 headless／WebGL2、1920×1080 DPR1 default：新DEV27原圖及正式scratch runner PASS，包含native static、live兩時點、固定三phase、日暮夜及正式歷史／retry／Undo／reconnect／reduced-motion／reset。首次並行formal reduced-page30秒timeout及DEV未完成static讀取均保留；未修改原正式runner門檻，單獨重跑通過。固定時間static兩張PNG hash一致；其他live城市actor仍會動。
+
+逐輪source hash、完整PNG／raw log／JSON、實際checkpoint／清理與總指揮review狀態見 [儲能環交接](handoffs/storage-ring-polish.md) 及 [新證據](../artifacts/energy-city-polish/storage-ring-recovered-20261025/README.md)。沒有新FPS／展覽硬件／Safari／iPad／Windows／工程或target達成宣稱；survey build僅作scratch fixture，source未改。

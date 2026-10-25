@@ -1,0 +1,13 @@
+diff --git a/src/energyPrototype.ts b/src/energyPrototype.ts
+index 4c5afef..44b72ea 100644
+--- a/src/energyPrototype.ts
++++ b/src/energyPrototype.ts
+@@ -227,7 +227,7 @@ export function energyPrototype() {
+   ring.add(rotor); garden.add(turbineRotor);
+   const water = new T.MeshPhysicalMaterial({ color: '#6897ad', roughness: .18, metalness: .12, clearcoat: .6, clearcoatRoughness: .15 });
+   // Reuse the generated bay normal, with metre-scaled UVs; Node geometry checks need no image loader.
+-  if (typeof document !== 'undefined') {
++  if (typeof document !== 'undefined' && typeof document.createElementNS === 'function') {
+     const normal = new T.TextureLoader().load(new URL('../asset/textures/bay-ripple-normal.png', import.meta.url).href);
+     normal.wrapS = normal.wrapT = T.RepeatWrapping; normal.repeat.set(.16, .16);
+     water.normalMap = normal; water.normalScale.set(.3, .3);

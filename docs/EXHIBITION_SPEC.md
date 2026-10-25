@@ -124,3 +124,7 @@ Admin Day／Night／Auto 保存為獨立 display setting：12:00／22:00／180 �
 | Meter variety | [P0–P12](handoffs/archive/meter-variety.md)，整合 `e7afbee`，published main `68b669a` |
 
 原 MVP 規劃存於 [歷史快照](history/EXHIBITION_MVP.md)；其中 Shibuya、single-only、site-only 與待實作文字已被以上決策取代。後續任務只從本規格及現行 handoff 建立。
+
+### 能源模型 polish 恢復（2026-10-25）
+
+獨立本機 clone 已恢復水庭／能源島與富士前置儲能環首輪 source，沿用原生成 target；僅續作儲能環／原固定承托三輪批次。保留劇場、工作翼、斜街與原權威配置／歷史。恢復 provenance、逐輪驗收及總指揮視覺review狀態見 [儲能環交接](handoffs/storage-ring-polish.md)；沒有發布／整合，不能據此宣稱 target、工程或展覽驗收完成。

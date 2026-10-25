@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import { Box3, Group, InstancedMesh, Matrix4, Mesh, Raycaster, Vector3 } from 'three';
+import { Box3, Group, InstancedMesh, Matrix4, Mesh, MeshPhysicalMaterial, Raycaster, Texture, Vector3 } from 'three';
 import { MeshBVH, acceleratedRaycast } from 'three-mesh-bvh';
-import { arc, trim } from '../src/cityRig.ts';
+import { arc, chrome, trim } from '../src/cityRig.ts';
 import { ENERGY_OPTIONS, energyCycle, energyPrototype } from '../src/energyPrototype.ts';
 import { tidalEdge } from '../src/amphibiousShore.ts';
 import { civicCore } from '../src/civicCore.ts';
@@ -43,6 +43,24 @@ for (const waterGardens of [0, 1, 2] as const) for (const receiver of ['none', '
 study.select('mixed');
 const after: string[] = []; study.root.traverse(o => { if (o instanceof Mesh && !(o instanceof InstancedMesh)) after.push(o.uuid); });
 assert.deepEqual(after, originalMeshes, 'switching configurations reuses the same geometry'); assert.ok(count < 50, 'static study batches by shared finish');
+// Both reservoirs and their district clone reuse one physical water finish through every cycle.
+const waters = study.gardens.flatMap(g => ['energy-lower-water', 'energy-upper-water'].map(name => g.getObjectByName(name) as Mesh));
+assert.ok(waters.every(w => w.material === waters[0].material), 'reservoir clones allocate separate water finishes');
+const waterResources = waters.map(w => [w.geometry.uuid, w.material]);
+for (const t of [0, 10, 20, 30, 40, 50, 60]) study.update(t);
+assert.deepEqual(waters.map(w => [w.geometry.uuid, w.material]), waterResources, 'water cycling reallocates resources');
+const waterFinish = waters[0].material;
+assert.ok(waterFinish instanceof MeshPhysicalMaterial);
+assert.equal(waterFinish.envMap, chrome.envMap, 'water reuses the existing city reflection texture');
+// Exercise texture motion without requiring a browser image decoder in geometry tests.
+const normal = new Texture(); waterFinish.normalMap = normal;
+study.update(5); const earlyUV = normal.offset.toArray();
+study.update(25); assert.notDeepEqual(normal.offset.toArray(), earlyUV, 'water normal never moves');
+study.update(5); assert.deepEqual(normal.offset.toArray(), earlyUV, 'water normal drifts by frame delta');
+study.update(0, true); const staticUV = normal.offset.toArray();
+study.update(987, true); assert.deepEqual(normal.offset.toArray(), staticUV, 'static water normal keeps moving');
+waterFinish.normalMap = null; normal.dispose();
+
 const core = civicCore(); core.updateMatrixWorld(true);
 core.traverse(o => { if (o instanceof Mesh) o.geometry.boundsTree = new MeshBVH(o.geometry, { indirect: true }); });
 study.root.updateMatrixWorld(true);

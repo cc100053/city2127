@@ -1,0 +1,5 @@
+# 首輪首次 browser attempts
+
+DEV attempt1：21張固定情境PNG已完成；之後native static步驟未完成（沒有成功log），finally已寫browser.json並關閉Chrome，但Node留在cleanup，owner停止PID12247。未將這次算PASS。新runner等待下一幀static文字並先輸出錯誤；不改產品source。
+
+Formal attempt1：原runner在tests/energyE4.browser.mjs:130等待新增reduced-motion頁面的canvas diagnostics達30秒timeout。原log及已拍PNG完整保留；與DEV重型browser並行，尚未證明因果。全部關閉後以未修改的原runner單獨重跑；未放寬tests或逾時。
