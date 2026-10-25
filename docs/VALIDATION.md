@@ -206,3 +206,7 @@ P3在現行v4回歸PASS：Chrome1280×720、hour16，實測A/B閱讀間隔10,002
 第二輪原候選47cf4d5亦完成同一完整root／DEV27圖／正式gate PASS（47 batches，108／324／170424）；環外source未變。原正式runner的reduced新頁30秒timeout可再次出現：現只在該段先釋放舊City renderer，再恢復hour22及額外核對同一model(view)。原assertions／quality／30與45秒門檻保留，沒有放寬tests；失敗原runner、圖及新排程成功證據同存pass2。詳細限制沿用上段與handoff。
 
 第三輪source27c1e4f（真正same-chat fresh gpt-6-astra/low worker、owner驗收）完整root test/build/base-diff、DEV27原PNG及正式scratch gate PASS；48 batches、theatre gap30.50m、108／324／170424。環外source與原target逐byte保持；static兩圖相同，live29.15→35.10秒。延續上段renderer排程，原assertions／quality／timeout未改；所測平台／原圖、source commit／bundle／hash／服務清理與未驗項目均在儲能環handoff。三輪後停止，target審美review／硬件／工程／新FPS未完成，沒有push／main整合。
+
+## 軌道接收翼準備 — 2026-10-25（未實作）
+
+只新增[baseline／imagegen target及保存紀錄](../artifacts/energy-city-polish/receiver-wing-batch-01/README.md)，[owner交接](handoffs/receiver-wing-polish.md)。source維持5db4e6e／SHA27c1e4f，runtime/tests未變；Chrome156 headless／ANGLE Metal Apple M6／WebGL2、1920×1080 DPR1 default，原hero mixed日景及接收翼大小版日景／大型夜景。第一組detail觸發既有相機district clamp，保留失效構圖後以合法aim重拍；沒有改相機source。無page exception／failed request／非預期console，僅favicon404。這是準備baseline，不是新實作回歸或目標達成；本輪未重跑test/build／正式pipeline／FPS／硬件。等待另授權重型Plus三輪。
