@@ -1,13 +1,15 @@
 {
-  "sourceHead": "abf838156880e6dc8686e9610fc644756e7b9e3b",
+  "sourceHead": "1838a827df3a241659148b2b0c52c5b7050fb93a",
   "sourceSHA256": "01987a48101b59559709dc2ce5461ec51617f0a73a06803e45c50354612556f3",
-  "captureCount": 10,
+  "captureCount": 12,
+  "originalCaptureCount": 10,
+  "supplementCaptureCount": 2,
   "selfExcluded": "manifest excludes itself; external archive SHA covers it",
   "files": [
     {
       "path": "artifacts/energy-city-polish/water-island-current-review-20261025/README.md",
-      "bytes": 6231,
-      "sha256": "3aac65a8a300054e3b8000564f3e643d434dc9f59cb11811a9b74427e5bb2ad1"
+      "bytes": 9582,
+      "sha256": "abe84e3bae80ffaed8a7f3cdd7f9538d9ddcb33be2d8696910b76c9bf601e085"
     },
     {
       "path": "artifacts/energy-city-polish/water-island-current-review-20261025/browser.json",
@@ -80,6 +82,46 @@
       "sha256": "a16b9453f12f18a8914398a4c7261a0c825856ef5b1affb9b2da2deb2c05f15d"
     },
     {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/supplement/browser.json",
+      "bytes": 4133,
+      "sha256": "13ce711a57eaa44565c7ca406757966266513bd070bccef5e963ff6991222efd"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/supplement/capture.log",
+      "bytes": 174,
+      "sha256": "d3aff506ed0583f7ebd0250ce3145883f2bb3cfee65b7e7b69c63a459a43ec4e"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/supplement/capture.mjs",
+      "bytes": 8677,
+      "sha256": "565f0717a5c1e719836349d2c2eda87f857b842100f93c4eb1e082f6087ff2a7"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/supplement/checks.json",
+      "bytes": 1601,
+      "sha256": "33b5f76ad67784630c5b0b6c6121d8adddd534342ee5d435e41129d4d8cec383"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/supplement/formal-fixture.json",
+      "bytes": 69292,
+      "sha256": "d02a63e2182b7f4e20cca4ddc8f81632b2d4d5788e71ed962ad96cfd379bad38"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/supplement/framing.json",
+      "bytes": 1333,
+      "sha256": "4dd7d14095e66a628102a10848625861df016b9f85c191e70a1cd070c63e3e21"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/supplement/island-complete-day.png",
+      "bytes": 2562782,
+      "sha256": "ea8407f371aca5c7ce3b524c892cc5650d8312d4c382d1d6107407708bfc525e"
+    },
+    {
+      "path": "artifacts/energy-city-polish/water-island-current-review-20261025/supplement/island-complete-night.png",
+      "bytes": 2531092,
+      "sha256": "0ee133e732f8bcb094c4c8598caa2cbf725e1662488e9fe1152ad91071c91ab2"
+    },
+    {
       "path": "artifacts/energy-city-polish/water-island-current-review-20261025/water-detail-day.png",
       "bytes": 2390945,
       "sha256": "bfe8eb94b6bed8d418abfbfbf95158fe1db47fc65b06420a0ff05fe671f30d33"
@@ -101,8 +143,8 @@
     },
     {
       "path": "docs/handoffs/water-island-current-review.md",
-      "bytes": 4103,
-      "sha256": "75e15e91133f5c6a1a033155ae3adc4cb00da2edbff53817ec0b1c789d169e07"
+      "bytes": 6015,
+      "sha256": "6a2d4dc16a4e05a5641dbfa74272f23d7970af7d04b91d186bad60bec2da93f9"
     },
     {
       "path": "artifacts/energy-polish-recovery-20261025/targets/water-garden.png",

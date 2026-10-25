@@ -1,0 +1,165 @@
+{
+  "head": "1838a827df3a241659148b2b0c52c5b7050fb93a",
+  "sourceHash": "01987a48101b59559709dc2ce5461ec51617f0a73a06803e45c50354612556f3",
+  "browser": "156.0.8078.47",
+  "platform": "darwin",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "dpr": 1,
+  "quality": "default",
+  "gpu": {
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+  },
+  "shots": [
+    {
+      "name": "island-complete-day",
+      "url": "http://127.0.0.1:5193/?survey=ws%3A%2F%2F127.0.0.1%3A64668%2Fws&hour=12&reviewTime=50&review=street&cam=-150%2C65%2C-625&at=-35%2C0%2C-355",
+      "capturedAt": "2026-10-25T07:59:49.435Z",
+      "camera": {
+        "name": "island-complete",
+        "position": [
+          -150,
+          65,
+          -625
+        ],
+        "target": [
+          -35,
+          0,
+          -355
+        ]
+      },
+      "fov": 42,
+      "time": "50.00",
+      "hour": "12.00",
+      "width": 1920,
+      "height": 1080,
+      "energy": {
+        "target": {
+          "waterGardens": 1,
+          "receiver": "small",
+          "flywheel": true,
+          "island": true
+        },
+        "rotorAngle": 3.2500000000000004,
+        "parts": [
+          {
+            "visible": true,
+            "scaleY": 0.65,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": false,
+            "scaleY": 0.72,
+            "opacity": 0
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          }
+        ]
+      },
+      "sha256": "ea8407f371aca5c7ce3b524c892cc5650d8312d4c382d1d6107407708bfc525e"
+    },
+    {
+      "name": "island-complete-night",
+      "url": "http://127.0.0.1:5193/?survey=ws%3A%2F%2F127.0.0.1%3A64668%2Fws&hour=22&reviewTime=50&review=street&cam=-150%2C65%2C-625&at=-35%2C0%2C-355",
+      "capturedAt": "2026-10-25T08:00:11.945Z",
+      "camera": {
+        "name": "island-complete",
+        "position": [
+          -150,
+          65,
+          -625
+        ],
+        "target": [
+          -35,
+          0,
+          -355
+        ]
+      },
+      "fov": 42,
+      "time": "50.00",
+      "hour": "22.00",
+      "width": 1920,
+      "height": 1080,
+      "energy": {
+        "target": {
+          "waterGardens": 1,
+          "receiver": "small",
+          "flywheel": true,
+          "island": true
+        },
+        "rotorAngle": 3.2500000000000004,
+        "parts": [
+          {
+            "visible": true,
+            "scaleY": 0.65,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": false,
+            "scaleY": 0.72,
+            "opacity": 0
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          },
+          {
+            "visible": true,
+            "scaleY": 1,
+            "opacity": 1
+          }
+        ]
+      },
+      "sha256": "0ee133e732f8bcb094c4c8598caa2cbf725e1662488e9fe1152ad91071c91ab2"
+    }
+  ],
+  "exceptions": [],
+  "consoleMessages": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:5193/favicon.ico"
+    }
+  ],
+  "responses": [],
+  "failures": [],
+  "cleanup": {
+    "browserClosed": true,
+    "surveyClosed": true,
+    "surveyPort": 64668,
+    "scratchRemoved": true
+  },
+  "note": "Two supplemental images only; original ten retained. Formal fixture reused. Bounds-compatible camera precomputed; source unchanged. No full product matrix or motion rerun. See framing.json and visual self-review."
+}

@@ -1,12 +1,12 @@
 # 水庭／能源島現行視覺核對 — 2026-10-25 JST
 
-**結論：水庭建議收尾；能源島只完成 hero／部分 orbit 核對，近景驗收未完成。沒有足夠證據提出一個值得續做的 source 視覺修改，也不能據此宣布兩者全部達標。** 保留現版，交回 coordinator 決定是否另授權補島取證；本 chat 停止，不自行開 pass。
+**補證後結論：水庭與能源島均建議停止本輪polish，保留現版，0個值得續做的source視覺修改候選。** 總指揮另授權修正取證，新增2張有效日夜原圖，合共12張；原10張及無效標記全部保留。這是有限正常桌面視覺review，並非生成target逐pixel匹配、工程或全產品驗收。下方原10張的限制記錄保留，最新結論以「兩張補證」為準。
 
 ## 當前證據與範圍
 
 唯一 source 為 `333e984f1a4bb315238aa6d8baeded797c659fc6`，`energyPrototype.ts` SHA256 `01987a48101b59559709dc2ce5461ec51617f0a73a06803e45c50354612556f3`；capture HEAD `abf838156880e6dc8686e9610fc644756e7b9e3b`。本輪 source、tests、assets、config、lockfiles 全部未改。既有 ring-night rejected trial 未套回；沒有新 target／imagegen／worker／實作輪。
 
-macOS／已安裝 Chrome156.0.8078.47 headless，ANGLE Metal Apple M6／WebGL2，1920×1080、DPR1、default quality。正式 `?survey` 經真實 scratch SQLite／server／WebSocket，以 question-set4 四類各4份有效提案產生 `waterGardens:1, receiver:small, flywheel:true, island:true`；Q1／Q2／Q4均用 index1。`reviewTime=50`，hour12／22。這是單一正式代表配置，不覆蓋兩庭／所有seed或極值。全新原PNG恰好10張；沒有使用縮圖替代原圖，也沒有重拍或覆寫。
+macOS／已安裝 Chrome156.0.8078.47 headless，ANGLE Metal Apple M6／WebGL2，1920×1080、DPR1、default quality。正式 `?survey` 經真實 scratch SQLite／server／WebSocket，以 question-set4 四類各4份有效提案產生 `waterGardens:1, receiver:small, flywheel:true, island:true`；Q1／Q2／Q4均用 index1。`reviewTime=50`，hour12／22。這是單一正式代表配置，不覆蓋兩庭／所有seed或極值。首批全新原PNG恰好10張（追加2張見末節）；沒有使用縮圖替代原圖，也沒有重拍或覆寫。
 
 [原圖／URL／時間／hash及browser記錄](browser.json)、[正式提案與完整snapshot](formal-fixture.json)、[取證腳本](capture.mjs)、[執行log](capture.log)、[相機取證審核](camera-audit.json)。只用現成 `review=street&cam&at`／reviewTime hook，未改產品source。
 
@@ -37,3 +37,18 @@ Fuji craft對照已存在的 [v3r9日](../../fuji-tv-polish/v3r9-pass3.jpg)／[�
 有限live/static觀察：正式rotor diagnostic live21.67→24.80秒、角1.133456→1.383952；browser reduced-motion時28.14→31.16秒仍0.7。只證明該diagnostic，沒有水位／渦輪transform instrumentation或新motion完整驗收。10原圖均固定actor50秒。Page exceptions0；無未預期console/network錯誤，只有既有favicon404。未重跑完整產品矩陣／root tests／build（source不變）；沒有新FPS、實際展覽硬件／Safari／iPad／Windows／長時間／工程驗證。
 
 [Preflight](preflight.json) 記錄fetch／branch／owner release／quota；[reference hashes](references.json)鎖定比較來源。自己的Vite5193已exit130，scratch64102及browser由finally關閉，scratch檔案移除；清理與whitespace／hash／link結果見 [checks.json](checks.json)。獨立小archive／checksum／local commit見 handoff 指定backup checkpoint；沒有push／deploy／main整合，沒有複製1.5GB source bundle。
+
+## 兩張補證 — coordinator追加授權，2026-10-25 17:00 JST
+
+追加只允許能源島日／夜各1張原1920×1080 PNG，非新polish輪。原10張的每個PNG SHA256不變，舊島detail兩圖仍無效；**12 total / 2 supplemental**。沒有試拍、覆寫原圖或新增target。源HEAD1838a827（evidence-only），runtime source仍01987a48；fresh fetch成功、origin/main仍db772bb，ahead13／behind0，無remote counterpart。開始實讀配額剩18%，只做已批准的兩張micro取證／checkpoint，沒有重型矩陣。
+
+- 有效新原圖：[島完整日景](supplement/island-complete-day.png)／[夜景](supplement/island-complete-night.png)。
+- [實際URL／hash／console／cleanup](supplement/browser.json)、[capture script](supplement/capture.mjs)、[log](supplement/capture.log)、[預先畫框計算](supplement/framing.json)、[補證核對](supplement/checks.json)。
+- 重用同一正式16份scratch配置；hour12／22，actor50，Chrome156／1920×1080 DPR1 default，沒有DEV energy selector，source／quality／pan bounds／產品camera均未改。額外完整product matrix／motion／test／build未跑。
+- 既有review hook camera(-150,65,-625)，target(-35,0,-355)；距target300.58m、polar1.353rad，全部在原OrbitControls限制內。target不被clamp。拍前以現行island全部mesh的world AABB投影8角，包含完整島與跨水橋，得到x176.97–1176.46、y421.77–840.42，安全地落在1920×1080畫框；非只估島中心。這是保守AABB預算，圖像仍另作人工自審。
+
+**實際構圖自審：兩張均有效。** 完整基座四角／前沿及右側分段邊緣、雙殼頂與腳、服務屋屋頂／深色側面、整條橋和岸端均在畫框，沒有被UI卡遮住。島身實際約x555–1000／y572–825（人工像素估計，非新的量測），不是極端zoom；同張背景可見現行Fuji，尺度／銀白淡殼與深色機械關係可直接比較。較高舊orbit保留的屋頂百葉／端框／橋桁架視角與這組補圖互補；舊orbit下緣裁切不再被用作完整基座證明。
+
+**島craft判斷：建議收尾。** Day殼面縱橫接縫、穹頂環箍／肩環、底座coping／分段caisson側縫及兩服務屋的深淺材料分層都能讀到；不是未完成的光滑膠囊加黑盒。Night殼面暗於Fuji亮室內，但雙殼／基座邊及接橋仍分離可辨，沒有輪廓消失或明顯組裝斷口。這符合locked target「既有輪廓內成熟組裝」的方向；沒有證據支持加微細件、改燈或追生成圖材質平滑度會改善正常訪客視角。保留原功能、封閉殼體、公共／船／air敘事。只作本次視覺判斷，不宣稱工程可行或達到生成target全部細節。
+
+補圖Page exceptions0，只有既有favicon404，無未預期console/network失敗。自己的Vite session17456 exit130、capture25895 exit0；scratch64668／browser由finally關閉、scratch移除。source及原10PNG hash再核對，補圖PNG尺寸／hash、links／whitespace／scope及清理見supplement/checks.json。追加獨立archive／本機commit／hash見backup的checkpoint-supplement.json。Ownership已釋放，等待coordinator；不push／deploy／main整合。
