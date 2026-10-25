@@ -30,3 +30,5 @@ After source/diff/document review, local Conventional Commit and cleanup, `pytho
 [Pass2 owner review](pass2/review.md)：sourcede556764，同一完整root／DEV33／正式gate PASS，固定static PNG一致、live21.39→28.88；checkpoints/pass2.json保存exact commit與完整branch bundle／evidence archive驗證。
 
 [Pass3 owner review](pass3/review.md)：source01987a48，相同完整gate PASS，static PNG一致、live21.45→26.50。三輪後停止等coordinator review，不再實作；最後source commit與文件收尾commit由checkpoints/pass3.json分列。
+
+Final verified runtime source commit: `333e984f1a4bb315238aa6d8baeded797c659fc6`, SHA256 `01987a48101b59559709dc2ce5461ec51617f0a73a06803e45c50354612556f3`. Later closeout changes metadata only. Status WAITING_FOR_REVIEW / IDLE; exact final HEAD and backup verification in checkpoints/pass3.json. Final quota service readout changed to1%/0% with two banked resets still available; this batch invoked no reset and starts no further pass.
