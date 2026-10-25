@@ -199,21 +199,23 @@ export function energyPrototype() {
   const belt = arc(rotor, 29.55, 32.45, 1.8, [0, 0, -.9], dark);
   belt.rotation.x = Math.PI / 2;
   for (const z of [-1.12, 1.12]) for (const radius of [29.65, 32.35]) {
-    const race = new T.Mesh(new T.TorusGeometry(radius, .19, 8, 128), chrome);
+    const race = new T.Mesh(new T.TorusGeometry(radius, .13, 8, 128), chrome);
     race.position.z = z; race.castShadow = race.receiveShadow = true; rotor.add(race);
   }
-  for (const z of [-1.2, 1.05]) for (const [inner, outer] of [[29.9, 30.18], [31.82, 32.1]]) {
-    const shoulder = arc(rotor, inner, outer, .15, [0, 0, z], chrome);
-    shoulder.rotation.x = Math.PI / 2;
+  for (let i = 0; i < 24; i++) for (const z of [-1.2, 1.05]) {
+    for (const [inner, outer] of [[29.85, 30.25], [31.75, 32.15]]) {
+      const shoulder = arc(rotor, inner, outer, .15, [0, 0, z], chrome, i * Math.PI / 12 + .012, Math.PI / 12 - .024);
+      shoulder.rotation.x = Math.PI / 2;
+    }
   }
   for (let i = 0; i < 48; i++) {
     const angle = i * Math.PI / 24, span = Math.PI / 24;
     for (const z of [-1.04, .94]) {
-      const cassette = arc(rotor, 30.23, 31.77, .1, [0, 0, z], dark, angle + .004, span - .008);
+      const cassette = arc(rotor, 30.33, 31.67, .16, [0, 0, z], solar, angle + .009, span - .018);
       cassette.rotation.x = Math.PI / 2;
     }
     const c = Math.cos(angle), s = Math.sin(angle);
-    const joint = box(rotor, [1.54, .07, 2.12], [31 * c, 31 * s, 0], chrome);
+    const joint = box(rotor, [1.54, .12, 2.12], [31 * c, 31 * s, 0], dark);
     joint.rotation.z = angle;
     if (i % 4 === 0) {
       for (const radius of [29.85, 32.15]) {
@@ -222,7 +224,7 @@ export function energyPrototype() {
       }
     }
     for (const radius of [30.35, 31.65]) {
-      pipe(rotor, [radius * c, radius * s, -1.18], [radius * c, radius * s, -1.32], .105, dark);
+      pipe(rotor, [radius * c, radius * s, -1.18], [radius * c, radius * s, -1.32], .105, chrome);
     }
   }
   box(rotor, [1.2, .42, .12], [31, 0, -1.2], publicLight);
@@ -244,7 +246,13 @@ export function energyPrototype() {
     const lip = arc(ring, 1.68, 2.22, .28, [x, y, -1.45], chrome);
     lip.rotation.x = Math.PI / 2;
     pipe(ring, [x, y, -1.05], [x, y, -1.3], 1.65, dark);
-    pipe(ring, [x, y, -1.31], [x, y, -1.48], .8, chrome);
+    const bearingLip = arc(ring, .66, .88, .14, [x, y, -1.48], chrome);
+    bearingLip.rotation.x = Math.PI / 2;
+    pipe(ring, [x, y, -1.31], [x, y, -1.38], .55, dark);
+    for (const anchor of [22, 26]) {
+      box(ring, [1.7, 1.1, .4], [side * anchor, 29.8, 10.65], chrome);
+      pipe(ring, [side * anchor, 29.8, 10.42], [side * anchor, 29.8, 10.2], .27, dark);
+    }
     for (const dx of [-1.5, 1.5]) {
       member(ring, [x + dx, y, 2.8], [x + dx, y + 1.7, 4.2], .42, chrome);
       pipe(ring, [x + dx - .25, y + 1.7, 4.2], [x + dx + .25, y + 1.7, 4.2], .38, dark);
