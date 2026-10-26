@@ -48,7 +48,8 @@
     "sourceAndImageHashes": "PASS verified-evidence.json; 6 sources / 25 originals",
     "productionExclusion": "PASS bundle does not contain housing DEV markers",
     "documentationLinks": "PASS",
-    "diffCheck": "PASS"
+    "diffCheck": "PASS",
+    "committedDiffCheck": "PASS git diff --check origin/main...HEAD"
   },
   "sourceHashes": {
     "src/main.ts": "c9be3a5cb36d48bfcdbe2e9d95eba20f535ab4eed40d0718f979ddbfa769453f",
@@ -70,9 +71,15 @@
   "allWritersReleased": true,
   "allOwnedServicesStopped": true,
   "callback": {
-    "status": "pending"
+    "status": "sent",
+    "targetThreadId": "01a17822-914e-7a52-a897-a34d47a68d70",
+    "authorizationVerified": "Direct human execution turn re-read immediately before callback; standing preference human turn read earlier in worker",
+    "confirmed": true,
+    "deliveredAtUTC": "2026-10-26T12:47:49.586336+00:00",
+    "tool": "send_message_to_thread",
+    "responseThreadId": "01a17822-914e-7a52-a897-a34d47a68d70"
   },
-  "updatedAtUTC": "2026-10-26T12:46:36.550587+00:00",
+  "updatedAtUTC": "2026-10-26T12:47:49.586336+00:00",
   "checkout": "/Users/fatboy/city2127",
   "branch": "codex/housing-city",
   "outcome": "H1 closure pushed; H1b secondary static designs implemented and software verified; visual review pending; H2 not started",
@@ -124,5 +131,7 @@
     "humanMessage": "01a17822-ead1-7172-b6da-d82035164927",
     "standingPreferenceChat": "01a17818-0759-7ae2-b1fc-1add8051846e",
     "standingPreferenceMessage": "01a1781f-336b-7f22-9eef-dfbb1ee35a04"
-  }
+  },
+  "resultCommit": "1145ffeeef522d1f821fee1815199b951a0a0f3d",
+  "remoteCheckpoint": "origin/codex/housing-city"
 }
