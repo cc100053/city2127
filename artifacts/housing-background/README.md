@@ -4,7 +4,7 @@
 
 人類先選方案A，收到原M與低automation服務館相交報告後，再選「保留服務館，重新選 M 住宅位置並提供對照圖」。M由`(-135,-175)`平移至`(-165,-165)`，距離31.62m；P/U、三類主／次設計、複合外皮、數量／輪廓及所有既有服務館保持。
 
-`main`初始化一次mixed住宅並固定U停泊A；不進入投票／Meter／能源權威、CarrierChange或結果文案。正式frame不呼叫住宅update，snapshot／live／Undo／reset／reconnect均不重建住宅。Standalone與正式survey均顯示；隔離DEV housing／energy比較保留舊有基準，90秒循環只在DEV播放。沒有改問卷、DB、survey／module-swap source或新增依賴／部署。
+`main`初始化一次mixed住宅並固定U停泊A；不進入投票／Meter／能源權威、CarrierChange或結果文案。正式frame不呼叫住宅update，snapshot／live／Undo／reset／reconnect均不重建住宅。Standalone與正式survey均顯示；隔離DEV housing／energy比較保留舊有基準，90秒循環只在DEV播放。沒有改問卷、DB、survey／module-swap source或新增依賴或執行部署命令。
 
 ## 搬位對照
 
@@ -38,4 +38,4 @@ PASS：live四段觀察、結果沒有住宅變化聲稱、Undo、真TCP離線�
 
 ## 整合
 
-Feature `d83ee62d2198c27fc3bdef2edd265dccd457e0a3`已push；merge `ba54961ed7cc6c5f137d4609f95ba77b76dad3e6`無衝突，tree與feature完全一致。整合後root test/build/committed whitespace PASS：[test](integrated-test.log)／[build](integrated-build.log)。Browser及FPS沿用同runtime/source hashes的最終release證據，沒有重拍或宣稱新FPS。Main push／CI尚待下方最終紀錄。所有本輪Vite／preview／browser／scratch survey服務已停止；既有`.playwright-cli/`及舊feature保留。
+Feature `d83ee62d2198c27fc3bdef2edd265dccd457e0a3`已push；merge `ba54961ed7cc6c5f137d4609f95ba77b76dad3e6`無衝突，tree與feature完全一致。整合後root test/build/committed whitespace PASS：[test](integrated-test.log)／[build](integrated-build.log)。Browser及FPS沿用同runtime/source hashes的最終release證據，沒有重拍或宣稱新FPS。Main已push並fetch核對 `7ea9ec0100bebd24a1e9144dde1b9006bc23995a`；[main CI 40421964460](https://github.com/cc100053/city2127/actions/runs/40421964460)實際completed／success，root／survey／module-swap test/build及whitespace全部成功。Feature的[CI 40421635474](https://github.com/cc100053/city2127/actions/runs/40421635474)亦成功。後續本輪只提交Markdown交接紀錄，按CI規則skip，runtime沒有再變。所有本輪Vite／preview／browser／scratch survey服務已停止；既有`.playwright-cli/`及舊feature保留。

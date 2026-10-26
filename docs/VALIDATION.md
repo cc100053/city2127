@@ -283,3 +283,5 @@ Root `npm test`／`npm run build`／production有固定住宅且DEV控制排除�
 [本批原圖／logs／方法](../artifacts/housing-background/README.md)及[最終browser結果](../artifacts/housing-background/release/browser.json)：production preview＋獨立scratch真實survey，live／Undo／city reset／full reset／TCP斷線重連／reload／reduced motion／普通resize保持固定住宅及資源；結果沒有住宅變化聲稱。DEV另驗24秒搬運及靜態／重播／重設／reduced motion，沒有重複背景。查看新hero日12／暮17／夜21及同鏡頭M搬前／搬後近景，服務館／P/U保留。Chrome156 headless／ANGLE Metal Apple M6、1920×1080 DPR1，各30秒短測low60.0197 FPS、default35.7305 FPS；low達H0≥50，default未達50，長時間展覽硬件性能仍未驗。非預期console/page/network errors0；既有favicon404及人為離線WebSocket診斷分別記錄。
 
 Survey／module-swap source未改，未另跑本機獨立suite；整合與main CI結果見本批報告／交接。沒有部署；未測HDMI、Safari／iPad／Windows、訪客理解、結構／生態／消防／無障礙工程及新增居民實際路徑。
+
+2026-10-27 A整合完成：feature `d83ee62`、無衝突merge `ba54961` tree相同；整合後root test/build/committed whitespace PASS。Main `7ea9ec0100bebd24a1e9144dde1b9006bc23995a`的[CI 40421964460](https://github.com/cc100053/city2127/actions/runs/40421964460)實際completed／success，root／survey／module-swap及whitespace全部通過。後續僅Markdown紀錄，依paths規則skip；runtime及最終browser source hashes不變。所有owned services停止。

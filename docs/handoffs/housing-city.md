@@ -1,11 +1,11 @@
 # housing-city — Current relay checkpoint
 
 - Task / stable specification: housing-city，H0–H3；[HOUSING_CITY_PLAN](../HOUSING_CITY_PLAN.md)，無deadline。
-- Revision / status: 22 / LOCAL INTEGRATION VERIFIED A。2026-10-27本chat人類直接回覆「A」，批准現有M/P/U固定背景、U停泊A、90秒循環留DEV；相交報告後選「保留服務館，重新選 M 住宅位置並提供對照圖」。正式接入、本機共存與production回歸通過，整合後root test/build通過；待main push／CI。
-- Active owner: Codex，本chat `01a17a83-db63-74d1-bc2a-755edb0102e9`，host local；本輪直接實作，沒有派新worker。前輪所有writers已release，chat狀態idle。
+- Revision / status: 23 / SOFTWARE COMPLETE A。2026-10-27本chat人類直接回覆「A」，批准現有M/P/U固定背景、U停泊A、90秒循環留DEV；相交報告後選「保留服務館，重新選 M 住宅位置並提供對照圖」。正式固定背景及M搬位已完成，整合後本機檢查及main三package CI通過；只餘展覽硬件／訪客／工程驗收。
+- Active owner: none；本輪owner Codex，本chat `01a17a83-db63-74d1-bc2a-755edb0102e9`，host local，直接實作完成，無新worker／排程，所有writers／owned services釋放。
 - Prior worker: none active。Integration `01a17935-7d58-79b1-a8d8-600ccf889ee8`明確release所有writers／services，final idle cursor `0aad33eb-3832-4da7-9540-d3bfded1bd90:55`。
 - Checkout: `/Users/fatboy/city2127`，目前main（feature `codex/housing-background`保留），base `d3152b4b4b9d0385b4fe77194ca10062e4777e5b`。Fetch重試（sandbox權限）成功，main/origin/main 0 ahead / 0 behind；保留既有untracked `.playwright-cli/`及舊feature。
-- Last progress: 2026-10-27 JST；A固定背景及M搬位已實作，root test/build與352配置共存檢查通過，production恢復流程通過；八張對照／正式原圖與DEV回歸已通過，merge `ba54961` tree與feature相同；整合後root checks PASS。
+- Last progress: 2026-10-27 JST；A固定背景及M搬位已實作，root test/build與352配置共存檢查通過，production恢復流程通過；八張對照／正式原圖與DEV回歸已通過，merge `ba54961` tree與feature相同；整合後root checks PASS，main `7ea9ec0100bebd24a1e9144dde1b9006bc23995a`的CI完成success。
 
 ## Direct human authorization and boundaries
 
@@ -33,7 +33,8 @@
 - Relocation: low automation staffed pavilion與原M重疊；初次擴展幾何檢查正確攔下。人類指定保留服務館，M移至`(-165,-165)`（31.62m），數量／輪廓不變；新位置已通過352配置與原城／路線／視線檢查。
 - Software PASS: root npm test/build；352 authority band/seed/hybrid/transition states；原城／交通／20 focal視線／DEV掃掠。正式production有固定住宅，DEV控制排除。完整結果與對照見[本批報告](../../artifacts/housing-background/README.md)；release browser PASS：low60.0197／default35.7305 FPS（各30秒），實際查看八張原圖。
 - Integrated: feature `d83ee62d2198c27fc3bdef2edd265dccd457e0a3`已push；merge／last verified code `ba54961ed7cc6c5f137d4609f95ba77b76dad3e6`。無衝突／tree相同；整合後root npm test/build／committed whitespace PASS，browser source／8PNG hashes一致。
-- Next action: 推送已驗證main並確認main CI；之後只記錄CI與釋放owner，無需新實作。沒有部署。
+- Main verified: `7ea9ec0100bebd24a1e9144dde1b9006bc23995a`已push/fetch核對；[CI 40421964460](https://github.com/cc100053/city2127/actions/runs/40421964460)completed／success，root／survey／module-swap test/build及whitespace成功。此後只作Markdown紀錄提交，CI按paths規則skip。
+- Next action: 本輪無剩餘軟件實作；展覽HDMI／實機長測、訪客理解及工程驗收另安排。所有Vite／preview／browser／scratch服務停止，5188／5189無listener；既有`.playwright-cli/`及兩個feature branch保留。未執行部署命令。
 
 ## Prior relay delivery / quota / wakeup（歷史）
 
@@ -44,4 +45,4 @@
 
 ## Remaining limits
 
-未測default sustainedFPS、展覽硬件、Safari／iPad／Windows、訪客理解、結構／生態／消防／無障礙工程及新住宅居民實際使用路徑。H2中值／全能源證據不能證明所有正式配置／轉場。A本機軟件驗證完成；default短測35.7305FPS，長時間／實機仍待驗；沒有部署。
+未測default sustainedFPS、展覽硬件、Safari／iPad／Windows、訪客理解、結構／生態／消防／無障礙工程及新住宅居民實際使用路徑。H2中值／全能源證據不能證明所有正式配置／轉場。A已整合main並通過CI；default短測35.7305FPS，長時間／實機仍待驗；未執行部署命令。
