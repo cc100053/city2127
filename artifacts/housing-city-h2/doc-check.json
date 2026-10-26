@@ -1,0 +1,6 @@
+{
+  "localLinksPassed": true,
+  "checkedLinks": 402,
+  "factChecks": "phase timings match housingCycle; renderer/FPS match original reports; implementation and acceptance separated",
+  "unrelatedHandoffExcluded": true
+}

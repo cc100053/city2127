@@ -247,3 +247,13 @@ H1b完整小屋／藻類／橫向骨架及H2全掃掠尚未驗；靜態actor位�
 Chrome156 headless／ANGLE Metal Apple M6／WebGL2、1920×1080 DPR1 default：五配置hour12／17／21、六處近景及藻類夜景、locked原hero／drag、普通resize、reduced-motion、互斥模式及資源重用PASS。實際runtime含skyways／已發布入口及reviewTime20靜態actor：7086項精確比較、475項本體通道近測，hits0；25原圖／6份source hash一致，無exception／warning／failed request。全新low baseline對mixed各30秒，60.0143／60.0163 FPS；全住宅renderer增量36 geometries／0 textures／38 calls／133416 triangles，在H0整體上限內，geometry額度已滿。Node幾何133344 triangles與renderer因透光面重畫相差72；default FPS未量。
 
 Coordinator已核對diff、source hashes與mixed日夜及三個次設計近景，接受軟件批次；未冒稱人類視覺簽收。部分近景保留原樹／高架遮擋。H2動畫／全掃掠、展覽硬件／Safari／iPad／Windows、工程及訪客理解未驗，沒有正式接入或main CI宣稱。
+
+### Housing H2（2026-10-27，DEV動態；批次待coordinator review）
+
+[本批方法／原圖／logs](../artifacts/housing-city-h2/README.md)：90秒明示「多年更新壓縮示意」，U生活艙透過前側吊運門架／下承叉架在兩socket之間實際交換，完整小屋沿專用更新軌搬遷；水電先斷開後移動，停泊後接通。原主體、公共廊、M／P與靜態植物／藻類保留。靜態閱讀／reduced motion／重設都回A停泊，重播重置相對時間；固定`reviewTime`沿用既有慣例。
+
+Root `npm test`／`npm run build`與diff check PASS（只有既有chunk warning）；Node全住宅50 meshes／30 geometries／128580 triangles，資源identity全程不變。兩移動組件之間以分段線性相對時間不等式連續檢查，只容許量化的吊索端點固定接觸。對原城／固定住宅完整680個掃掠盒涵蓋底鞋、叉架、吊車、吊索與plug，不再只驗上半部；Node真實GLB／civic／district／全能源／四站／完整skyways做7544項精確檢查、10923項掃掠近測、20條hero focal視線PASS。全部交通曲線≤0.5m弧長採樣＋保守包絡涵蓋中間位置；實際fleet另按90秒每0.5秒、日12／夜21取5204836個mesh／instance邊界，沒有隱藏actor。後者屬離散補充檢查，不宣稱所有actor的任意時間連續幾何證明。
+
+Chrome156 headless／ANGLE Metal Apple M6／WebGL2，1920×1080 DPR1：default原hero日12／暮17／夜21、交換艙及小屋A／途中／B近景；low實城7964項精確檢查及11265項掃掠近測、hits0。靜態／reduced motion／重設重播／一般resize及模式優先序另驗；survey入口互斥用隔離mock WebSocket，不代表重跑正式survey流程。production bundle沒有住宅DEV source markers。全新low baseline 30.0013秒平均60.0307 FPS，動態91.0013秒平均60.0101 FPS、覆蓋全部11狀態；[原始intervals](../artifacts/housing-city-h2/final/performance.json)。全新baseline同幀配對在8個停泊／搬運時間均為住宅增量30 geometries／0 textures／51 calls／128652 rendered triangles，符合H0上限；Node與renderer差72為透光面額外繪製。完整renderer配對量測、source hashes及錯誤記錄由[獨立結果](../artifacts/housing-city-h2/result.json)連入。
+
+未測default sustained FPS、展覽硬件、Safari／iPad／Windows、訪客理解或工程／生態／無障礙法規；survey／module-swap source未改，未另跑其獨立suite。H2實作／軟件檢查不代替人類視覺簽收，H3正式背景／偏好／累積歸屬仍待人類決定；本批不整合main或部署。

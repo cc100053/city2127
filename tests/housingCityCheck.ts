@@ -1,8 +1,11 @@
 import assert from 'node:assert/strict';
 import { Box3, Group, InstancedMesh, Line3, Matrix4, Mesh, Object3D, Ray, Scene, Sphere, Vector3 } from 'three';
 import { MeshBVH } from 'three-mesh-bvh';
-import { HOUSING_HOME_ROUTE, housingPrototype } from '../src/housingPrototype.ts';
-import { routes } from '../src/mobility.ts';
+import { HOUSING_KEYFRAMES, housingPrototype } from '../src/housingPrototype.ts';
+import { build2127 } from '../src/odaiba2127.ts';
+import { mobility, routes } from '../src/mobility.ts';
+import { occupantFleet } from '../src/occupants.ts';
+import { presets } from '../src/presets.ts';
 import { changeSites } from '../src/layout.ts';
 import { heroCamera } from '../src/heroCamera.ts';
 import { CityChangeManager } from '../src/cityChangeManager.ts';
@@ -22,6 +25,7 @@ export function checkHousingCity(city: Object3D) {
   }
   manager.applyExhibitionLayout({ ...deriveExhibitionLayout({ automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 }),
     energy: { waterGardens: 2, receiver: 'large', flywheel: true, island: true } }, 'city-state-snapshot', 0);
+  build2127(district);
   district.updateMatrixWorld(true);
   const housing = housingPrototype(); housing.select('mixed'); housing.root.updateMatrixWorld(true); city.updateMatrixWorld(true);
   const instance = new Matrix4(), world = new Matrix4(), relative = new Matrix4();
@@ -55,27 +59,41 @@ export function checkHousingCity(city: Object3D) {
       `housing ${h.mesh.parent?.name} intersects ${other.mesh.name} / ${other.mesh.parent?.name}`);
   }
   const path = routes(), sphere = new Sphere(), camera = heroCamera(1920, 1080);
-  // Static reserved body corridor above the rail/dock interface; H2 must still verify each articulated moving part.
-  const body = new Box3().setFromObject(housing.wholeHome); body.min.y = 3.35;
-  const shift = new Vector3().subVectors(new Vector3(...HOUSING_HOME_ROUTE.end), new Vector3(...HOUSING_HOME_ROUTE.start));
-  const fixed = [...obstacles, ...houses.filter(h => h.mesh.parent !== housing.wholeHome)];
-  let homeRouteChecks = 0;
-  for (let i = 0; i <= 24; i++) {
-    const corridor = body.clone().translate(shift.clone().multiplyScalar(i / 24));
-    for (const other of fixed) if (corridor.intersectsBox(other.box)) {
-      other.mesh.geometry.boundsTree ??= new MeshBVH(other.mesh.geometry, { indirect: true });
-      homeRouteChecks++;
-      assert.equal(other.mesh.geometry.boundsTree.intersectsBox(corridor, other.matrix.clone().invert()), false,
-        `Whole-home body corridor enters ${other.mesh.parent?.name} / ${other.mesh.name}`);
+  // Every moving mesh/instance, including shoes, fork, ropes and plugs. Each interval moves/scales along one axis;
+  // its endpoint union is the exact swept box for the unit boxes (no sampled-time holes).
+  const owned = new Set<Object3D>(); housing.moving.forEach(root => root.traverse(o => owned.add(o)));
+  const fixed = [...obstacles, ...houses.filter(h => !owned.has(h.mesh))];
+  const sweeps: Box3[] = [];
+  let sweepChecks = 0;
+  for (let k = 0; k < HOUSING_KEYFRAMES.length - 1; k++) {
+    housing.update(HOUSING_KEYFRAMES[k]); housing.root.updateMatrixWorld(true);
+    const from = housing.moving.flatMap(shapes);
+    housing.update(HOUSING_KEYFRAMES[k + 1]); housing.root.updateMatrixWorld(true);
+    const to = housing.moving.flatMap(shapes);
+    assert.equal(from.length, to.length);
+    for (let i = 0; i < from.length; i++) {
+      const corridor = from[i].box.clone().union(to[i].box);
+      sweeps.push(corridor);
+      for (const other of fixed) if (corridor.intersectsBox(other.box)) {
+        other.mesh.geometry.boundsTree ??= new MeshBVH(other.mesh.geometry, { indirect: true });
+        sweepChecks++;
+        // 1 mm removes exact support-face contact only, not a whole named object or the underbody.
+        assert.equal(other.mesh.geometry.boundsTree.intersectsBox(corridor.clone().expandByScalar(-.001), other.matrix.clone().invert()), false,
+          `H2 sweep ${HOUSING_KEYFRAMES[k]}-${HOUSING_KEYFRAMES[k + 1]} ${from[i].mesh.parent?.name} enters ${other.mesh.parent?.name}/${other.mesh.name} at ${corridor.min.toArray()}..${corridor.max.toArray()}`);
+      }
     }
   }
+  housing.update(0); housing.root.updateMatrixWorld(true);
   camera.updateMatrixWorld(true);
   let routeChecks = 0;
   for (const [key, value] of Object.entries(path)) for (const curve of Array.isArray(value) ? value : [value]) {
     const radius = /air|approach|shore|ixApproach/.test(key) ? 22 : /street|guideway|tracks|water|ferry|ixBoat|sweep/.test(key) ? 8 : 4;
-    for (const p of curve.getSpacedPoints(Math.ceil(curve.getLength() / .5))) for (const h of houses) if (h.box.distanceToPoint(p) < radius + .5) {
-      routeChecks++; sphere.set(p, radius + .5).applyMatrix4(h.matrix.clone().invert());
-      assert.equal(trees.get(h.mesh.geometry)!.intersectsSphere(sphere), false, `housing enters ${key} route envelope`);
+    for (const p of curve.getSpacedPoints(Math.ceil(curve.getLength() / .5))) {
+      for (const sweep of sweeps) assert.ok(sweep.distanceToPoint(p) >= radius + .5, `Full H2 sweep enters ${key} actor/path envelope`);
+      for (const h of houses) if (h.box.distanceToPoint(p) < radius + .5) {
+        routeChecks++; sphere.set(p, radius + .5).applyMatrix4(h.matrix.clone().invert());
+        assert.equal(trees.get(h.mesh.geometry)!.intersectsSphere(sphere), false, `housing enters ${key} route envelope`);
+      }
     }
   }
   // Multiple points per focal site: no housing triangle may block these existing hero sightlines.
@@ -88,5 +106,20 @@ export function checkHousingCity(city: Object3D) {
       assert.ok(!hit || hit.point.clone().applyMatrix4(h.matrix).distanceTo(camera.position) > delta.length(), 'Housing blocks focal hero sightline');
     }
   }
-  console.log(`PASS housing H1b city: actual landmark/environment/planting fixture, ${exact} exact mesh checks, route envelopes (${routeChecks} near tests), home body corridor (${homeRouteChecks} near tests) and 20 focal sightlines.`);
+  // Supplement continuous route envelopes with every actual fleet mesh/instance over a complete cycle,
+  // including published facade/forecourt/roof occupants which are not routes() curves. No actor is hidden.
+  const actors = new Scene(), updateActors = mobility(actors), updateOccupants = occupantFleet(actors);
+  let actorBoxes = 0;
+  const sweepBounds = sweeps.reduce((box, sweep) => box.union(sweep), new Box3()).expandByScalar(1);
+  for (const hour of [12, 21]) for (let time = 0; time <= 90; time += .5) {
+    updateActors(presets.neutral, time, .5, hour === 21 ? 1 : 0, hour);
+    updateOccupants(presets.neutral, time, .5, hour);
+    actors.updateMatrixWorld(true);
+    for (const actor of shapes(actors)) {
+      actorBoxes++;
+      if (!actor.box.intersectsBox(sweepBounds)) continue;
+      for (const sweep of sweeps) assert.equal(sweep.intersectsBox(actor.box), false, `H2 swept equipment meets actual ${actor.mesh.name} at ${time}/${hour}`);
+    }
+  }
+  console.log(`PASS housing H2 city: actual landmark/environment/planting fixture, ${exact} exact mesh checks, route envelopes (${routeChecks} near tests), whole articulated sweep (${sweeps.length} interval boxes / ${sweepChecks} near tests), including skyways, ${actorBoxes} actual fleet boxes across 90s day/night and 20 focal sightlines.`);
 }

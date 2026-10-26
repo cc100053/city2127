@@ -28,7 +28,7 @@
 
 使用者提出按「建築・居住／交通・物流／環境・エネルギー／社会・生活」研究更多城市形態，先做能源子題。[能源城市計劃](ENERGY_CITY_PLAN.md) 已完成E1：水庭儲能、富士旋轉環、填海核能島、軌道能源四構想的角色與整合，以及三種城市方向、混合範例與現況對照。E2已加入隔離的DEV `?energy`基準／A／B／C／M1靜態比較、四類量體與桌面幾何／瀏覽器檢查；[截圖](../artifacts/energy-city-e2/README.md)。E3已擴展兩處沿岸水庭／翼形遮棚及環／翼配電門架，加入可重播60秒充能／暫存／釋能流程與完整靜態閱讀；[E3實際比較](../artifacts/energy-city-e3/README.md)。E4已由使用者確認只替換Q3並接入獨立權威能源配置（見下節）；E5已完成目前Mac mini限定30分鐘性能／操作量測，展覽硬件／訪客理解仍待後續。上述E1–E3研究當時未取代四題／Meter；正式Q3取捨由下節E4記錄。富士媒體總部／劇場用途及六座water rooms保持；E2／E3只驗證目前DEV組合、動態及所列桌面畫面，最終美術、工程及硬件效果未驗證。[交接](handoffs/energy-city.md) 記錄本輪實際檢查及下一步。
 
-2026-10-26：「建築・居住」[計劃](HOUSING_CITY_PLAN.md)已開始H0位置／基準／預算研究，[具體提案與原圖](../artifacts/housing-city-h0/README.md)已由cc100053確認；H1隔離DEV五配置靜態住宅已實作、軟件驗證並獲人類簽收，見[H1原圖](../artifacts/housing-city-h1/README.md)。H1b已實作橫向共享骨架／藻類循環面板／完整小屋及更新軌的靜態次設計，見[H1b證據](../artifacts/housing-city-h1b/README.md)，已通過軟件及coordinator review（未冒稱人類簽收）；H2動態及H3正式接入仍待完成。仮説1–3（新材料、植物膜、可移動建築）先做隔離DEV視覺／動態比較，與現有建築共存；仮説4（身體自立）只保留概念。使用者已選定90秒多年更新壓縮循環；H0原圖只有預留線框，未新增正式城市住宅。本輪不改四題、Meter或累積規則；[交接](handoffs/housing-city.md)。
+2026-10-26：「建築・居住」[計劃](HOUSING_CITY_PLAN.md)已開始H0位置／基準／預算研究，[具體提案與原圖](../artifacts/housing-city-h0/README.md)已由cc100053確認；H1隔離DEV五配置靜態住宅已實作、軟件驗證並獲人類簽收，見[H1原圖](../artifacts/housing-city-h1/README.md)。H1b已實作橫向共享骨架／藻類循環面板／完整小屋及更新軌的靜態次設計，見[H1b證據](../artifacts/housing-city-h1b/README.md)，已通過軟件及coordinator review（未冒稱人類簽收）；H2已加入90秒DEV多年更新壓縮循環，生活艙／完整小屋實際搬運及接駁，靜態／reduced motion回停泊A；[H2實測與限制](../artifacts/housing-city-h2/README.md)另列，批次仍待coordinator review。H3正式接入仍待完成，固定背景／既有偏好／獨立累積歸屬須另由cc100053選定。仮説1–3（新材料、植物膜、可移動建築）先做隔離DEV視覺／動態比較，與現有建築共存；仮説4（身體自立）只保留概念。使用者已選定90秒多年更新壓縮循環；H0原圖只有預留線框，未新增正式城市住宅。本輪不改四題、Meter或累積規則；[交接](handoffs/housing-city.md)。
 
 ### 居民敘事與畫面分工（2026-10-02）
 

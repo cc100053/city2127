@@ -1,0 +1,42 @@
+{
+  "checkedAtUTC": "2026-10-26T16:52:24.325103+00:00",
+  "sourceHashes": {
+    "src/main.ts": "36cb56939a7fdd353c36008d5e836a33aa1bdca99879374f20a53a4a22db0653",
+    "src/devHousing.ts": "a1b01d4d86dea76c37a779b7e369f16897f2ca1652ffa6ddbc09efc09844b708",
+    "src/housingPrototype.ts": "5330475f2583bc6e0491068c2c61bb2134b46790558abda834bf53e1f9cc576f",
+    "src/odaiba2127.ts": "979e9c92fb0dbf70d457f9bed016da21e41ebfbea6146567073bf655352fe830",
+    "src/skyways.ts": "28d6ce50f2b07cb5ff67ec52f3aaa73326c3ec819a3e3609e92cc517c12db83d",
+    "tests/housingCityCheck.ts": "1c37eb1823cacc36dde30b371edb3d104b126b5175ea350bc85cbe1b19060e67",
+    "tests/housingPrototype.test.ts": "b01c18f26db13ab87c6fa1ca2153e1b5bcd21f414d59d0d0a14d6edebf53c80f",
+    "tests/odaiba.test.ts": "fc2146671044f6b4d4f23b22bce77574ce92221acb2e2ba99b41d83fd4da7831",
+    "tests/housingH2.browser.mjs": "36f760e7a1b87fd1feecf6a155b0528b9a3fba3ef8284df6871f0f1e68c2dd7f"
+  },
+  "finalOriginalPNGs": {
+    "artifacts/housing-city-h2/final/geometry-mixed.png": "3363da73762e1c31378bd30fdea5cd99480a439ca51fa81e2a49374c88373f9e",
+    "artifacts/housing-city-h2/final/hero-transport-12.png": "e0a7790f0f55390819dfbefb77a0f34b29804d22dc112e8bad5a747df3afa371",
+    "artifacts/housing-city-h2/final/hero-transport-17.png": "8a9b0fa1a830ee695b59b16fa980e4f0b35bbd6c8579259cdbdeb0568b5f78c0",
+    "artifacts/housing-city-h2/final/hero-transport-21.png": "632dfff97a968812198eaa2c3881f28b1fa561faab78bce81581414e28e67113",
+    "artifacts/housing-city-h2/final/home-0.png": "657e8d2069e0dc6757a08f29f57396cec291739432cc16b862e0bae5ae43c7f1",
+    "artifacts/housing-city-h2/final/home-24.png": "4fec8c856baaf8010b6735408fba5c827734ece030b23e342eef7ce0eb180547",
+    "artifacts/housing-city-h2/final/home-40.png": "8e3067ffd7f9db01b258584bf8142f24e3c91fe1739a4656cf831f1347ac1ea7",
+    "artifacts/housing-city-h2/final/mobile-0.png": "4e4bfd5921365ec337a75a950a823715e9bc060f209d451eac72564386c200a9",
+    "artifacts/housing-city-h2/final/mobile-16.png": "7bf81599afaed7d5627c70016d04760aa2ea74aab97249856ffd0a3d421f19d2",
+    "artifacts/housing-city-h2/final/mobile-24.png": "d86c6325ffbc22cda9fd5c48fe52743ff11f81dfbf768cc6c8989ca7380bd796",
+    "artifacts/housing-city-h2/final/mobile-30.png": "47c3a544ebabe4b746ce6188d35cfbb0a3bd443c3645626af57cad8d52c49e1c",
+    "artifacts/housing-city-h2/final/mobile-40.png": "a501bd1ce8b93d4e83d0c3f70f1a9535cf9466d230ae2d675d095df7ac939605",
+    "artifacts/housing-city-h2/final/mobile-56.png": "c35f4e2a6db247a1ef9e063eb4460a93b69d28415ab60f5c65fc1ffe66f647f6",
+    "artifacts/housing-city-h2/final/mobile-64.png": "56c9e27298df0e891c17a6ec8448b72892b161b337f5e8434042d5215ba9d365",
+    "artifacts/housing-city-h2/final/mobile-7.png": "5757611c2146fc535a0c17399b78ffa37f6817b5bf88c280640fdf864918242e",
+    "artifacts/housing-city-h2/final/mobile-76.png": "3d7fce60d4b6e73c4e40590641247a47fc2c3d894b4783bb45e426e3aacca476",
+    "artifacts/housing-city-h2/final/reduced-docked.png": "f8bae2a7c698537f1eba30b3faedfc5ccb28439b28997428e4e3074a70c75d6a",
+    "artifacts/housing-city-h2/final/static-docked.png": "57e45fa9ab9d20e4b5c318453e13723f8884940bc7093e3b2d94581a91064b88"
+  },
+  "browserChecksPassed": true,
+  "budgetChecksPassed": true,
+  "allSourceAndImageHashesMatch": true,
+  "testBuildCompletedBeforePerformance": true,
+  "rootTests": "PASS",
+  "rootBuild": "PASS; existing chunk warning",
+  "whitespace": "PASS",
+  "owner": "01a1790d-a993-76d3-bf14-fc024a8ed3c8"
+}

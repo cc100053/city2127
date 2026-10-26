@@ -135,7 +135,7 @@ try {
   const cityChanges=surveyUrl||metersParam!==null||scaleLab||housing?createCityChangeManager(scene):null;
   if(import.meta.env.DEV&&housing)import('./devHousing').then(async({startHousingReview})=>{
     if(!await odaibaReady)return;
-    startHousingReview(scene,camera,controls,cityChanges!,params);
+    devFrame=startHousingReview(scene,camera,controls,cityChanges!,params);
   });
   if(import.meta.env.DEV&&scaleLab)import('./devScaleLab').then(async({startScaleLab})=>{
     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));

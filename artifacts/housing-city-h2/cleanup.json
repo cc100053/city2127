@@ -1,0 +1,10 @@
+{
+  "allOwnedServicesStopped": true,
+  "allBrowsersClosed": true,
+  "vitePID": 21190,
+  "port": 5188,
+  "listenerAfterStop": false,
+  "previousExplorationNodePID": 21537,
+  "previousExplorationChromePID": 21541,
+  "notes": "Only this batch owned services were stopped; unrelated processes preserved."
+}

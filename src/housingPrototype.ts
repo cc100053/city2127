@@ -9,9 +9,23 @@ export const HOUSING_OPTIONS = {
 export type HousingOption = keyof typeof HOUSING_OPTIONS;
 export const HOUSING_SITES = { material: [-135, -175], membrane: [45, -215], mobile: [-265, -60] } as const;
 
-export const HOUSING_HOME_ROUTE = { start: [-5.2, 5, -4.4], end: [5.2, 5, -4.4] } as const;
+export const HOUSING_HOME_ROUTE = { start: [-5.2, 5.14, -4.4], end: [5.2, 5.14, -4.4] } as const;
 
-/** H1/H1b: fixed parked configurations, independent of votes; every part is built once. */
+export const HOUSING_CYCLE_SECONDS = 90;
+// Axis-aligned, piecewise-linear translation makes each interval's swept AABB conservative, including between samples.
+export const HOUSING_KEYFRAMES = [0, 5, 8, 12, 20, 28, 32, 35, 38, 45, 48, 52, 60, 68, 72, 75, 78, 90] as const;
+export function housingCycle(seconds: number, still = false) {
+  const time = still || !Number.isFinite(seconds) ? 0 : ((seconds % HOUSING_CYCLE_SECONDS) + HOUSING_CYCLE_SECONDS) % HOUSING_CYCLE_SECONDS;
+  const ramp = (a: number, b: number) => Math.max(0, Math.min(1, (time - a) / (b - a)));
+  const travel = ramp(20, 28) - ramp(60, 68);
+  const out = ramp(12, 20) - ramp(28, 32) + ramp(52, 60) - ramp(68, 72);
+  const lift = ramp(8, 12) - ramp(32, 35) + ramp(48, 52) - ramp(72, 75);
+  const plugA = 1 - ramp(5, 8) + ramp(75, 78), plugB = ramp(35, 38) - ramp(45, 48);
+  const phase = time < 5 || time >= 78 ? 'docked' : time < 8 ? 'disconnect' : time < 20 ? 'departure' : time < 28 ? 'transport' : time < 35 ? 'docking' : time < 45 ? 'connected' : time < 48 ? 'return-disconnect' : time < 60 ? 'return-departure' : time < 68 ? 'return-transport' : time < 75 ? 'return-docking' : 'reconnect';
+  return { time, phase, travel, out, lift, plugA, plugB };
+}
+
+/** DEV compressed-years study, independent of votes; every part is built once. */
 export function housingPrototype() {
   const root = new T.Group(); root.name = 'housing-prototype';
   const parts = { material: new T.Group(), membrane: new T.Group(), mobile: new T.Group() };
@@ -29,6 +43,27 @@ export function housingPrototype() {
     box(parent, [length, .08, .08], [x, y + 1.1, z], trim);
   };
   const treadGeometry = new T.BoxGeometry(1, 1, 1);
+  const block = (parent: T.Group, size: [number, number, number], at: [number, number, number], finish: T.Material = trim) => {
+    const mesh = new T.Mesh(treadGeometry, finish); mesh.scale.set(...size); mesh.position.set(...at);
+    mesh.castShadow = mesh.receiveShadow = true; parent.add(mesh); return mesh;
+  };
+  // Moving rectangular equipment shares one unit box across all material instances; fixed H1 rounded parts stay baked.
+  const instanceBlocks = (group: T.Group) => {
+    const finishes = new Map<T.Material, T.Matrix4[]>();
+    group.updateMatrixWorld(true);
+    const inverse = group.matrixWorld.clone().invert();
+    group.traverse(o => {
+      if (!(o instanceof T.Mesh) || Array.isArray(o.material)) return;
+      const list = finishes.get(o.material) ?? [];
+      list.push(inverse.clone().multiply(o.matrixWorld)); finishes.set(o.material, list);
+    });
+    group.clear();
+    for (const [finish, matrices] of finishes) {
+      const batch = new T.InstancedMesh(treadGeometry, finish, matrices.length);
+      matrices.forEach((matrix, i) => batch.setMatrixAt(i, matrix));
+      batch.castShadow = batch.receiveShadow = true; group.add(batch);
+    }
+  };
   const access = (parent: T.Group, x: number, floor: number, z: number) => {
     // Switchback stairs use ordinary <=18 cm risers beside a fixed accessible lift / utility core.
     box(parent, [2.5, floor, 2.4], [x - 4, floor / 2 + .15, z], trim);
@@ -48,17 +83,19 @@ export function housingPrototype() {
       box(parent, [1.3, .22, 3.1], [x + direction * 2.75, .15 + rise * (f + 1), z], stone);
     }
   };
-  const cabin = (parent: T.Group, x: number, y: number, z: number) => {
+  const cabin = (parent: T.Group, x: number, y: number, z: number, moving = false) => {
+    const make = moving ? block : box;
     const room = new T.Group(); room.name = 'housing-living-cabin'; room.position.set(x, y, z); parent.add(room);
-    for (const h of [-2.15, 2.15]) box(room, [7.6, .28, 5.4], [0, h, 0], trim);
-    box(room, [7.2, 3.95, .18], [0, 0, 2.5], trim);
-    for (const dx of [-3.65, 3.65]) box(room, [.22, 4.1, 5.2], [dx, 0, 0], trim);
+    for (const h of [-2.15, 2.15]) make(room, [7.6, .28, 5.4], [0, h, 0], trim);
+    make(room, [7.2, 3.95, .18], [0, 0, 2.5], trim);
+    for (const dx of [-3.65, 3.65]) make(room, [.22, 4.1, 5.2], [dx, 0, 0], trim);
     // Recessed glazing, removable service shoes and a visible door make this a dwelling rather than a solid pod.
-    box(room, [6.9, 3.6, .14], [0, 0, -2.42], glass);
-    for (const dx of [-3.45, -1.2, 1.2, 3.45]) box(room, [.09, 3.9, .15], [dx, 0, -2.55], trim);
-    box(room, [1.1, 2.6, .18], [2.5, -.55, -2.58], dark);
-    box(room, [.45, .05, .05], [2.6, -.2, -2.7], publicLight);
-    for (const dx of [-2.8, 2.8]) for (const dz of [-2, 2]) box(room, [.65, .28, .65], [dx, -2.4, dz], dark);
+    make(room, [6.9, 3.6, .14], [0, 0, -2.42], glass);
+    for (const dx of [-3.45, -1.2, 1.2, 3.45]) make(room, [.09, 3.9, .15], [dx, 0, -2.55], trim);
+    make(room, [1.1, 2.6, .18], [2.5, -.55, -2.58], dark);
+    make(room, [.45, .05, .05], [2.6, -.2, -2.7], publicLight);
+    for (const dx of [-2.8, 2.8]) for (const dz of [-2, 2]) make(room, [.65, .28, .65], [dx, -2.4, dz], dark);
+    if (moving) instanceBlocks(room);
     return room;
   };
   const plantGeometry = leafyCrown(1), pose = new T.Object3D();
@@ -154,17 +191,19 @@ export function housingPrototype() {
   }
   for (const y of [8, 15.2, 22.6]) for (const z of [0, 5.6]) {
     member(u, [-9.5, y, z], [9.5, y, z], .38);
-    for (const x of [-4.5, 4.5]) for (const dx of [-3.2, 3.2]) box(u, [.14, .14, 8], [x + dx, y + .3, 1.8], dark);
+    for (const x of [-4.5, 4.5]) for (const side of [-1, 1]) box(u, [.14, .14, 8], [x + side * (y === 8 ? 2.8 : 3.2), y + (y === 8 ? .18 : .3), 1.8], dark);
   }
   for (const x of [-9, 9]) member(u, [x, 8, 5.6], [x, 22.6, 0], .2, dark);
-  cabin(u, -4.5, 10.8, 2.8); cabin(u, 4.5, 18, 2.8);
-  // One empty socket, a receiving cradle and an overhead travelling hoist show the route without H2 motion.
-  box(u, [7.6, .28, 6.2], [4.5, 8.3, 2.8], trim);
-  for (const x of [-7.7, -1.3]) member(u, [x, 23, -4], [x, 25.5, -4], .22);
-  member(u, [-8.3, 25.5, -4], [8.3, 25.5, -4], .32);
-  box(u, [3.4, .6, 2], [-4.5, 25.1, -4], dark);
-  for (const x of [-6.8, -2.2]) member(u, [x, 24.8, -4], [x, 22.7, -4], .06, dark);
-  box(u, [7.4, .25, 5.4], [-4.5, 22.6, -3.8], trim);
+  const exchangeCabin = cabin(u, -4.5, 10.8, 2.8, true);
+  exchangeCabin.removeFromParent();
+  cabin(u, 4.5, 18, 2.8);
+  // Front hoist avoids the occupied upper socket; its fork enters below the lower cabin's side sills.
+  for (const x of [-10.5, 10.5]) member(u, [x, 2.7, -7.8], [x, 25.5, -7.8], .4);
+  member(u, [-10.7, 25.5, -7.8], [10.7, 25.5, -7.8], .32);
+  for (const x of [-4.5, 4.5]) {
+    member(u, [x, 8.2, 6.1], [x, 10.8, 6.1], .18, dark);
+    box(u, [.8, .5, .24], [x, 10.8, 6.1], dark);
+  }
   box(u, [1.6, 2.2, 1], [9.4, 3.8, 5.6], dark);
   for (const y of [8.5, 15.7]) {
     box(u, [1.4, .8, .3], [8.8, y, 5.7], trim);
@@ -175,13 +214,9 @@ export function housingPrototype() {
   // Continuous public gallery stays behind the exchange lane, linked by the fixed lift core.
   access(u, -4.8, 15.5, 7.1);
   for (const y of [8, 15.2]) { box(u, [20.5, .3, 1.5], [0, y, 6.5], trim); rail(u, 0, y + .15, 7.3, 20.5); }
-  u.add(...bake(u));
 
-  // Secondary equipment uses the existing unit stair box: bevels on these small sections would consume the shared H0 budget.
-  const block = (parent: T.Group, size: [number, number, number], at: [number, number, number], finish: T.Material = trim) => {
-    const mesh = new T.Mesh(treadGeometry, finish); mesh.scale.set(...size); mesh.position.set(...at);
-    mesh.castShadow = mesh.receiveShadow = true; parent.add(mesh); return mesh;
-  };
+
+  // Secondary equipment shares the unit stair box.
   const collective = new T.Group(); collective.name = 'housing-collective-frame'; m.add(collective);
   collective.rotation.y = Math.PI / 2; collective.position.set(8.2, 0, 5.9); collective.scale.z = .7;
   // One horizontal communal room spans the existing outdoor deck, distinct from the separate Q4 tower.
@@ -224,7 +259,7 @@ export function housingPrototype() {
   const relocation = new T.Group(); relocation.name = 'housing-home-infrastructure'; u.add(relocation);
   // Dedicated update rails stay on the water-side half of the pile deck, separate from the public gallery and module hoist.
   for (const z of [-5.6, -3.2]) {
-    block(relocation, [16, .18, .22], [0, 2.95, z], dark);
+    block(relocation, [16, .18, .22], [0, 3.04, z], dark);
   }
   for (const x of [-7.5, -5, -2.5, 0, 2.5, 5, 7.5]) block(relocation, [.5, .18, 3.2], [x, 2.8, -4.4]);
   for (const x of [-5.2, 5.2]) {
@@ -236,7 +271,7 @@ export function housingPrototype() {
     block(relocation, [1.4, .12, 3], [x, 2.96, .3]).rotation.x = Math.atan2(.48, 3);
   }
   block(relocation, [1.5, 1.8, 1.2], [9.3, 3.7, -4.4], dark);
-  relocation.add(...bake(relocation));
+  u.add(...bake(u)); u.add(exchangeCabin);
   const wholeHome = new T.Group(); wholeHome.name = 'housing-whole-home'; wholeHome.position.set(...HOUSING_HOME_ROUTE.start); u.add(wholeHome);
   for (const y of [-1.7, 1.7]) block(wholeHome, [3.6, .2, 3.6], [0, y, 0]);
   for (const x of [-1.7, 1.7]) block(wholeHome, [.2, 3.2, 3.6], [x, 0, 0]);
@@ -247,7 +282,33 @@ export function housingPrototype() {
   block(wholeHome, [.08, 3.1, .15], [-.3, 0, -1.8]);
   for (const x of [-1.25, 1.25]) for (const z of [-1.2, 1.2]) block(wholeHome, [.5, .22, .5], [x, -1.9, z], dark);
   block(wholeHome, [1.2, .4, .7], [0, -1.4, 1], stone);
-  wholeHome.add(...bake(wholeHome));
+  instanceBlocks(wholeHome);
+  const rig = new T.Group(); rig.name = 'housing-transfer-rig'; u.add(rig);
+  const trolley = block(rig, [7.2, .6, 1], [-4.5, 25.02, -7.8], dark);
+  const fork = new T.Group(); fork.name = 'housing-transfer-fork'; rig.add(fork);
+  block(fork, [7.2, .2, .3], [0, 0, -7.8], dark);
+  const fingers = [-3.4, 3.4].map(x => block(fork, [.18, .14, 12.9], [x, 0, -1.35], trim));
+  const cables = [-3.4, 3.4].map(x => block(rig, [.07, 16.3, .07], [x - 4.5, 16.6, -7.8], dark));
+  const utilities = new T.Group(); utilities.name = 'housing-utility-connectors'; u.add(utilities);
+  const cabinPlugs = [-4.5, 4.5].map(x => block(utilities, [.18, .18, .57], [x, 10.8, 5.685], dark));
+  const homePlugs = [-5.2, 5.2].map(x => block(utilities, [.18, .18, .69], [x + .3, 4.3, -2.245], dark));
+  // Fixed service elbows lead from each original column to the retracting whole-home plug.
+  for (const x of [-5.2, 5.2]) block(utilities, [1.8, .18, .18], [x + 1.05, 4.3, -1.8], dark);
+  const moving = [exchangeCabin, wholeHome, trolley, fork, ...cables, ...cabinPlugs, ...homePlugs];
+  const update = (seconds: number, still = false) => {
+    const cycle = housingCycle(seconds, still), x = -4.5 + 9 * cycle.travel, y = 8.43 + .6 * cycle.lift;
+    exchangeCabin.position.set(x, 10.8 + .6 * cycle.lift, 2.8 - 6.8 * cycle.out);
+    wholeHome.position.set(-5.2 + 10.4 * cycle.travel, 5.14, -4.4);
+    trolley.position.x = x; fork.position.set(x, y, 0);
+    fingers.forEach(finger => { const length = 12.9 - 6.8 * cycle.out; finger.scale.z = length; finger.position.z = -7.8 + length / 2; });
+    cables.forEach((cable, i) => { cable.position.set(x + (i ? 3.4 : -3.4), (24.75 + y) / 2, -7.8); cable.scale.y = 24.75 - y; });
+    for (const [i, amount] of [cycle.plugA, cycle.plugB].entries()) {
+      cabinPlugs[i].scale.z = .04 + .53 * amount; cabinPlugs[i].position.z = 5.97 - cabinPlugs[i].scale.z / 2;
+      homePlugs[i].scale.z = .04 + .65 * amount; homePlugs[i].position.z = -1.9 - homePlugs[i].scale.z / 2;
+    }
+    return cycle;
+  };
+  update(0);
 
   let option: HousingOption = 'baseline';
   const select = (next: HousingOption) => {
@@ -256,5 +317,5 @@ export function housingPrototype() {
     composite.visible = next === 'mixed';
   };
   select(option);
-  return { root, parts, composite, collective, algae, wholeHome, select, get option() { return option; } };
+  return { root, parts, composite, collective, algae, wholeHome, exchangeCabin, rig, utilities, moving, update, select, get option() { return option; } };
 }

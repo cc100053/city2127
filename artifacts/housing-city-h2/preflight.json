@@ -1,0 +1,35 @@
+{
+  "workspace": "/Users/fatboy/city2127",
+  "branch": "codex/housing-city",
+  "startingHEAD": "6a27106365e1cf7b6b0d38677baf4f971cf102b1",
+  "fetch": "PASS after approved escalation",
+  "originMain": "c94e92f",
+  "featureUpstreamAheadBehind": [
+    0,
+    0
+  ],
+  "originMainAheadBehind": [
+    10,
+    0
+  ],
+  "preserved": [
+    ".playwright-cli/",
+    "coordinator-owned docs/handoffs/housing-city.md",
+    "all H0/H1/H1b evidence"
+  ],
+  "humanCallbackAuthorizationVerified": {
+    "execution": {
+      "threadId": "01a17822-914e-7a52-a897-a34d47a68d70",
+      "messageId": "01a17822-ead1-7172-b6da-d82035164927"
+    },
+    "standingContract": {
+      "threadId": "01a17818-0759-7ae2-b1fc-1add8051846e",
+      "messageId": "01a1781f-336b-7f22-9eef-dfbb1ee35a04"
+    }
+  },
+  "quota": {
+    "primaryRemainingPercent": 67,
+    "weeklyRemainingPercent": 66,
+    "pauseStrictlyBelowPercent": 15
+  }
+}

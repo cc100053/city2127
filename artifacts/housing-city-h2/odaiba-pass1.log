@@ -1,0 +1,20 @@
+Odaiba: 32 roof strolls and 69 roof residents keep to open roof, clear of planting, meadows and sail posts.
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: H2 sweep 0-5 housing-transfer-rig enters housing-mobile/fixed-kit at -273.1,24.75,-68.3..-265.9,25.35,-67.3
+
+true !== false
+
+    at checkHousingCity (file:///Users/fatboy/city2127/tests/housingCityCheck.ts:79:16)
+    at file:///Users/fatboy/city2127/tests/odaiba.test.ts:206:1 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: true,
+  expected: false,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v26.0.0
