@@ -17,6 +17,7 @@ import { tidalEdge } from '../src/amphibiousShore.ts';
 import { AutomationDistrict, ConcentrationDistrict, SharingDistrict } from '../src/districtMeters.ts';
 import { bayContext } from '../src/bayContext.ts';
 import { acceleratedRaycast, MeshBVH } from 'three-mesh-bvh';
+import { checkHousingCity } from './housingCityCheck.ts';
 
 // The checks below cast tens of thousands of rays at the full district. A BVH per geometry, built on first hit test, returns the same
 // intersections as three's brute-force raycast in a fraction of the time; `indirect` leaves each geometry's own index untouched.
@@ -202,6 +203,7 @@ for (const grove of city.children.filter(o => o instanceof InstancedMesh && o.na
   for (let i = 0; i < grove.count; i++) { grove.getMatrixAt(i, m); c.setFromMatrixPosition(m); assert.ok(inDistrict(c.x, c.z), `tree outside the district at ${c.x.toFixed(0)},${c.z.toFixed(0)}`); }
 }
 city.updateMatrixWorld(true);
+checkHousingCity(city);
 const openGround = /^(TERRAIN|PHASE03C_LANDSCAPE|PHASE03C_PLAZA|PRIMARY_PLAZA|PHASE03C_SERVICE|SERVICE_BAY|SIDEWALK|WATERFRONT_PROMENADE)/;
 const ray = new Raycaster(), down = new Vector3(0, -1, 0);
 const camera = heroCamera(1920, 1080);

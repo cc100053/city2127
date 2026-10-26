@@ -231,3 +231,10 @@ Trial source29168309的root test/build/diff、exact環外source／全energy幾�
 住宅runtime未改。[H0原圖與詳細方法](../artifacts/housing-city-h0/README.md)以615ad98既有城市、四軸0／seed0、四類能源共存、鎖定原hero、hour12／reviewTime20，檢查三處24×18m／最高28m候選框。最終Chrome156 headless／ANGLE Metal Apple M6／WebGL2、1920×1080 DPR1 low：10秒rAF平均60.08 FPS、431 geometries／24 textures／486 calls／8,699,769 triangles；page errors／console warnings均0。12項四站中心視線及候選表面、九點承托／上方淨空、離散mobility走廊篩選PASS。這不是連續全掃掠、整個focal輪廓、live soak或H1模型驗收。
 
 H0設計矩陣、Q4區隔、夜間方案與新增資源／最低50 FPS預算已由cc100053於2026-10-26簽收；H1–H3尚未實作。使用者已選90秒多年更新壓縮循環。Node runner語法檢查PASS；root build PASS（既有>500kB chunk warning）。首次root test在sandbox localhost listen遇EPERM；獲准重跑完整root npm test PASS；diff／本地連結／原圖manifest PASS，Vite5188與browser均已清理。checkpoint及恢復狀態由[交接](handoffs/housing-city.md)記錄。survey／module-swap source未改。未測default FPS、展覽硬件、Safari／iPad／Windows或結構工程。
+
+
+## 住宅城市 H1 靜態比較 — 2026-10-26（已簽收）
+
+[H1原圖／環境／完整logs](../artifacts/housing-city-h1/README.md)：root npm test／build PASS，final source hashes closure核對一致；五配置、三處24×18m／28m實際頂點、共享資源、實際Odaiba／district／全能源BVH碰撞、mobility曲線≤0.5m採樣包絡及20項focal視線PASS。Chrome156 headless／ANGLE Metal Apple M6／WebGL2、1920×1080 DPR1 default日12／暮17／夜21及三類近景，原hero鎖定；模式隔離、普通resize、reduced-motion及切換資源重用PASS。全新low baseline對mixed各30秒，住宅增量20 geometries／0 textures／21 calls／131940 triangles，mixed約60.03 FPS，無未預期browser錯誤。cc100053已明確簽收H1並指示繼續H1b／H2。
+
+H1b完整小屋／藻類／橫向骨架及H2全掃掠尚未驗；靜態actor位姿不代表全部時間。正式問卷及其他package未改，未重跑其獨立suite；展覽硬件／Safari／iPad／Windows、工程及訪客理解未測。

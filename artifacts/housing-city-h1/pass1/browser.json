@@ -1,0 +1,631 @@
+{
+  "startedAt": "2026-10-26T11:36:18.929Z",
+  "browser": "156.0.8078.47",
+  "platform": "darwin",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "sourceHashes": {
+    "src/main.ts": "c9be3a5cb36d48bfcdbe2e9d95eba20f535ab4eed40d0718f979ddbfa769453f",
+    "src/devHousing.ts": "b0b29d896a3b0f09d130129c7eb77313a6626fb3d743d5d4a264bb36c9827738",
+    "src/housingPrototype.ts": "f5fb9057c9ea057afa7bbc5c01bdfa4ed6ac4cd408e891d6afe146567d8b8546",
+    "tests/housingH1.browser.mjs": "aee670c54ddb610e61bed2a84b113b4a0114a5c30d7d3ffe41eb9b11639ebe0a"
+  },
+  "errors": [],
+  "warnings": [],
+  "failures": [],
+  "badResponses": [],
+  "shots": [
+    {
+      "name": "baseline-12",
+      "url": "http://127.0.0.1:5188/?housing=baseline&hour=12&reviewTime=20",
+      "capturedAt": "2026-10-26T11:36:42.831Z",
+      "sha256": "8f62fe0d17b563483c87ca9f548c41e09c6059555898ed81d7823839e04edef2",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "5.4",
+        "drawCalls": "1839",
+        "triangles": "34420790",
+        "geometries": "432",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "material-12",
+      "url": "http://127.0.0.1:5188/?housing=material&hour=12&reviewTime=20",
+      "capturedAt": "2026-10-26T11:36:43.765Z",
+      "sha256": "a0124ce1b7fe1a51ac29df510a2d824773989f6158c0019b21017ee33a245343",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "5.4",
+        "drawCalls": "1839",
+        "triangles": "34420790",
+        "geometries": "432",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "membrane-12",
+      "url": "http://127.0.0.1:5188/?housing=membrane&hour=12&reviewTime=20",
+      "capturedAt": "2026-10-26T11:36:44.704Z",
+      "sha256": "4707d7411a8a77cff65b131247e0434bd28e95c09bb544249a6bf2269bf68cc0",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "5.4",
+        "drawCalls": "1839",
+        "triangles": "34420790",
+        "geometries": "432",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "mobile-12",
+      "url": "http://127.0.0.1:5188/?housing=mobile&hour=12&reviewTime=20",
+      "capturedAt": "2026-10-26T11:36:45.635Z",
+      "sha256": "d0302d6d925245be974126f03ee7e82b90518227967d31f35a0dfe87e4ac0588",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "33.8",
+        "drawCalls": "1859",
+        "triangles": "34610726",
+        "geometries": "449",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "mixed-12",
+      "url": "http://127.0.0.1:5188/?housing=mixed&hour=12&reviewTime=20",
+      "capturedAt": "2026-10-26T11:36:46.571Z",
+      "sha256": "427e3a12d4e7d3f26d56a2043736f33c2cad1c4a78e82dca31703f648d3907b3",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "33.8",
+        "drawCalls": "1859",
+        "triangles": "34610726",
+        "geometries": "449",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "baseline-17",
+      "url": "http://127.0.0.1:5188/?housing=baseline&hour=17&reviewTime=20",
+      "capturedAt": "2026-10-26T11:37:10.280Z",
+      "sha256": "a2231298461e52d268b32c54cfa9525fbeadecabdc605d948f2118f45e5bf022",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "17.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "5.4",
+        "drawCalls": "1835",
+        "triangles": "34419506",
+        "geometries": "432",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "material-17",
+      "url": "http://127.0.0.1:5188/?housing=material&hour=17&reviewTime=20",
+      "capturedAt": "2026-10-26T11:37:11.189Z",
+      "sha256": "9c562199b0253f95c1fdbf9c84f28843c28e26f9954c7bcac80d99e7f94da21f",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "17.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "5.4",
+        "drawCalls": "1835",
+        "triangles": "34419506",
+        "geometries": "432",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "membrane-17",
+      "url": "http://127.0.0.1:5188/?housing=membrane&hour=17&reviewTime=20",
+      "capturedAt": "2026-10-26T11:37:12.107Z",
+      "sha256": "fcd7ffcfbd415981254a9487f3f90a5abf00abf8547afdbbf230912b51c6ea11",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "17.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "5.4",
+        "drawCalls": "1835",
+        "triangles": "34419506",
+        "geometries": "432",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "mobile-17",
+      "url": "http://127.0.0.1:5188/?housing=mobile&hour=17&reviewTime=20",
+      "capturedAt": "2026-10-26T11:37:13.047Z",
+      "sha256": "92a8a8c5de6001c4ea27cf6c4cabcb209f71ad129f1670916a926361532c7b51",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "17.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "34.6",
+        "drawCalls": "1855",
+        "triangles": "34609442",
+        "geometries": "449",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "mixed-17",
+      "url": "http://127.0.0.1:5188/?housing=mixed&hour=17&reviewTime=20",
+      "capturedAt": "2026-10-26T11:37:13.995Z",
+      "sha256": "71b6b93f7afb03c451553e77c62c6b09ecd13a20e7fd4f86a08cd5a8a2c7aad3",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "17.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "34.6",
+        "drawCalls": "1855",
+        "triangles": "34609442",
+        "geometries": "449",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "baseline-21",
+      "url": "http://127.0.0.1:5188/?housing=baseline&hour=21&reviewTime=20",
+      "capturedAt": "2026-10-26T11:37:38.131Z",
+      "sha256": "e7c6a1ba76676aa92026e61bda64ddb4c69755b3684cd38da0573dd5a61cb09b",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "21.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "5.3",
+        "drawCalls": "1841",
+        "triangles": "34420758",
+        "geometries": "432",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "material-21",
+      "url": "http://127.0.0.1:5188/?housing=material&hour=21&reviewTime=20",
+      "capturedAt": "2026-10-26T11:37:39.049Z",
+      "sha256": "1e0bdd31160d8a4ff3a8becc33c92800b894ffe111115b204d9e8a0166b3e0e0",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "21.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "5.3",
+        "drawCalls": "1841",
+        "triangles": "34420758",
+        "geometries": "432",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "membrane-21",
+      "url": "http://127.0.0.1:5188/?housing=membrane&hour=21&reviewTime=20",
+      "capturedAt": "2026-10-26T11:37:40.008Z",
+      "sha256": "e8b7615b2f033745876f4e1714e68e40dafbf9b669f4fe34a455bb2575f31013",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "21.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "5.3",
+        "drawCalls": "1841",
+        "triangles": "34420758",
+        "geometries": "432",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "mobile-21",
+      "url": "http://127.0.0.1:5188/?housing=mobile&hour=21&reviewTime=20",
+      "capturedAt": "2026-10-26T11:37:40.983Z",
+      "sha256": "4937e0794e70b78997c98e243871207a576118c8a59e55eeacac768f6e2f8c1a",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "21.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "33.7",
+        "drawCalls": "1861",
+        "triangles": "34610694",
+        "geometries": "449",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "mixed-21",
+      "url": "http://127.0.0.1:5188/?housing=mixed&hour=21&reviewTime=20",
+      "capturedAt": "2026-10-26T11:37:41.913Z",
+      "sha256": "11ba0faef8ebe85e1493addeba36bac62b3fb46448fb582687e6da278015923c",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "21.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "33.7",
+        "drawCalls": "1861",
+        "triangles": "34610694",
+        "geometries": "449",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "detail-material",
+      "url": "http://127.0.0.1:5188/?housing=mixed&hour=12&reviewTime=20&housingView=material",
+      "capturedAt": "2026-10-26T11:37:59.435Z",
+      "sha256": "559dc9060f09b3d21a04c5314e81ebbeddc4ec4b766ec67b0bae8ab17bc60f5a",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "7.4",
+        "drawCalls": "1923",
+        "triangles": "34869750",
+        "geometries": "452",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -177,
+          35.999999999999986,
+          -229.00000000000006
+        ],
+        "target": [
+          -135,
+          11.000000000000002,
+          -175.00000000000003
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "detail-membrane",
+      "url": "http://127.0.0.1:5188/?housing=mixed&hour=12&reviewTime=20&housingView=membrane",
+      "capturedAt": "2026-10-26T11:38:00.249Z",
+      "sha256": "f021e67fc777c152efdfeee010e3ec1a4ce3d2610215928d0395634ff936bc99",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "7.4",
+        "drawCalls": "1923",
+        "triangles": "34869750",
+        "geometries": "452",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          3,
+          36,
+          -269
+        ],
+        "target": [
+          45,
+          11,
+          -215
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "detail-mobile",
+      "url": "http://127.0.0.1:5188/?housing=mixed&hour=12&reviewTime=20&housingView=mobile",
+      "capturedAt": "2026-10-26T11:38:01.086Z",
+      "sha256": "56d7a0e718a6b92ed34aa8b2134215c642600b3bee8a8dd9e169426ec761a08d",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "7.4",
+        "drawCalls": "1923",
+        "triangles": "34869750",
+        "geometries": "452",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -307,
+          35.999999999999986,
+          -114.00000000000003
+        ],
+        "target": [
+          -265,
+          11,
+          -60
+        ],
+        "locked": true
+      }
+    },
+    {
+      "name": "hero-after-drag",
+      "url": "http://127.0.0.1:5188/?housing=mixed&hour=12&reviewTime=20",
+      "capturedAt": "2026-10-26T11:38:02.299Z",
+      "sha256": "9413d0c1fa9e0cdd80b6b1ff5d2ea6e14c108869f68f999353757eada37fa77e",
+      "canvas": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "35.4",
+        "drawCalls": "1923",
+        "triangles": "34869750",
+        "geometries": "452",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"large\",\"flywheel\":true,\"island\":true},\"rotorAngle\":1,\"parts\":[{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ],
+        "locked": true
+      }
+    }
+  ],
+  "performance": []
+}

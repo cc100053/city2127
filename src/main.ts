@@ -79,7 +79,7 @@ try {
   const floor=new T.Mesh(new T.PlaneGeometry(18000,18000,180,180),water);floor.rotation.x=-Math.PI/2;floor.position.y=-1.2;floor.receiveShadow=true;scene.add(floor);
   const rig=cityRig(scene);
   build2127(scene);
-  loadOdaiba(scene,water).catch(error=>{const message=document.createElement('p');message.className='error';message.textContent='Odaiba could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);});
+  const odaibaReady=loadOdaiba(scene,water).then(()=>true).catch(error=>{const message=document.createElement('p');message.className='error';message.textContent='Odaiba could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);return false;});
   if(import.meta.env.DEV && new URLSearchParams(location.search).has('asset-preview')){
     const input=document.createElement('input');input.type='file';input.accept='.glb,model/gltf-binary';input.className='asset-preview';input.title='Preview a Blender GLB in the city scene';input.setAttribute('aria-label','Preview a Blender GLB');
     document.body.appendChild(input);
@@ -127,11 +127,16 @@ try {
   const metersParam=import.meta.env.DEV?params.get('meters'):null;
   // DEV-only `?scaleLab` (`&profile=leaning&guests=120&seed=3&journey`): a seeded guest sequence through Scale A and the vote journey, without the survey server.
   const scaleLab=import.meta.env.DEV&&!surveyUrl&&params.has('scaleLab');
+  const housing=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&!params.has('energy')&&params.has('housing');
   // DEV E3 city composition: a separate design comparison, never derived from environment Meter bands.
   let devFrame:((now:number,darkness:number)=>void)|undefined;
   if(import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&params.has('energy'))
     import('./devEnergy').then(({startEnergyReview})=>{devFrame=startEnergyReview(scene,params);});
-  const cityChanges=surveyUrl||metersParam!==null||scaleLab?createCityChangeManager(scene):null;
+  const cityChanges=surveyUrl||metersParam!==null||scaleLab||housing?createCityChangeManager(scene):null;
+  if(import.meta.env.DEV&&housing)import('./devHousing').then(async({startHousingReview})=>{
+    if(!await odaibaReady)return;
+    startHousingReview(scene,camera,controls,cityChanges!,params);
+  });
   if(import.meta.env.DEV&&scaleLab)import('./devScaleLab').then(async({startScaleLab})=>{
     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     devFrame=startScaleLab(scene,camera,cityChanges!,()=>now,params);
