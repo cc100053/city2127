@@ -240,10 +240,10 @@ H0設計矩陣、Q4區隔、夜間方案與新增資源／最低50 FPS預算已�
 H1b完整小屋／藻類／橫向骨架及H2全掃掠尚未驗；靜態actor位姿不代表全部時間。正式問卷及其他package未改，未重跑其獨立suite；展覽硬件／Safari／iPad／Windows、工程及訪客理解未測。
 
 
-## 住宅城市 H1b 次設計 — 2026-10-26（待視覺review）
+## 住宅城市 H1b 次設計 — 2026-10-26（coordinator review通過）
 
 [H1b原圖／方法／完整logs](../artifacts/housing-city-h1b/README.md)：保留已簽收H1主設計，加一組橫向共享骨架、藻類循環設備、完整小屋／雙底座及專用更新軌。Root npm test／build PASS；三區所有頂點與兩停泊端點、資源重用、非自發光、實際Odaiba／district／全能源BVH碰撞、既有交通包絡及20條focal視線通過。另驗y≥3.35m的小屋本體預留通道25個位姿；軌／底鞋／接駁接口及H2完整動作掃掠未驗。
 
 Chrome156 headless／ANGLE Metal Apple M6／WebGL2、1920×1080 DPR1 default：五配置hour12／17／21、六處近景及藻類夜景、locked原hero／drag、普通resize、reduced-motion、互斥模式及資源重用PASS。實際runtime含skyways／已發布入口及reviewTime20靜態actor：7086項精確比較、475項本體通道近測，hits0；25原圖／6份source hash一致，無exception／warning／failed request。全新low baseline對mixed各30秒，60.0143／60.0163 FPS；全住宅renderer增量36 geometries／0 textures／38 calls／133416 triangles，在H0整體上限內，geometry額度已滿。Node幾何133344 triangles與renderer因透光面重畫相差72；default FPS未量。
 
-H1b尚待coordinator／人類視覺review；部分近景保留原樹／高架遮擋。H2動畫／全掃掠、展覽硬件／Safari／iPad／Windows、工程及訪客理解未驗，沒有正式接入或main CI宣稱。
+Coordinator已核對diff、source hashes與mixed日夜及三個次設計近景，接受軟件批次；未冒稱人類視覺簽收。部分近景保留原樹／高架遮擋。H2動畫／全掃掠、展覽硬件／Safari／iPad／Windows、工程及訪客理解未驗，沒有正式接入或main CI宣稱。

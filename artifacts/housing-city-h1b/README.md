@@ -1,6 +1,6 @@
 # H1b — 次設計靜態比較
 
-2026-10-26，worker owner `01a17828-38f5-73f1-8ec9-480ecc60db07`。Dispatch `housing-h1b-r1-rev5`；本批只做 H1 closure＋H1b，未做 H2 動畫或 main 整合。H1 的直接人類簽收已記在 [H1 README](../housing-city-h1/README.md)；**H1b 待 coordinator／人類視覺 review，不自稱已接受。**
+2026-10-26，worker owner `01a17828-38f5-73f1-8ec9-480ecc60db07`。Dispatch `housing-h1b-r1-rev5`；本批只做 H1 closure＋H1b，未做 H2 動畫或 main 整合。H1 的直接人類簽收已記在 [H1 README](../housing-city-h1/README.md)；**H1b 已通過 coordinator 原圖／diff／source hash review；未冒稱人類視覺簽收。H2 待配額恢復。**
 
 [穩定計劃](../../docs/HOUSING_CITY_PLAN.md)／[current coordinator 交接](../../docs/handoffs/housing-city.md)／[獨立結果](result.json)。
 
