@@ -3,12 +3,12 @@
 ## Current relay checkpoint
 
 - Task / stable specification: housing-city；[HOUSING_CITY_PLAN](../HOUSING_CITY_PLAN.md)，H0–H3，無deadline。
-- State revision / current batch: 9 / housing-h1b-r1（已review）；下一批housing-h2-r1尚未派發。
+- State revision / current batch: 10 / housing-h1b-r1（已review）；下一批housing-h2-r1尚未派發。
 - Status: WAITING_QUOTA，primary已用80–81%，到20 points保留線；不開始新的實作批次。
 - Active coordinator: chat `01a17822-914e-7a52-a897-a34d47a68d70`，host local。
 - Worker owner: none；worker `01a17828-38f5-73f1-8ec9-480ecc60db07`已完成、明確釋放所有source writers／services；metadata callback記錄已commit後idle。
 - Checkout / branch: `/Users/fatboy/city2127` / `codex/housing-city`，upstream `origin/codex/housing-city`。
-- Actual source checkpoint: H1 `c05f4b3`＋closure `1eca33a`；H1b `1145ffeeef522d1f821fee1815199b951a0a0f3d`，result/callback metadata `3e6e745`，全部已push。
+- Actual source checkpoint: H1 `c05f4b3`＋closure `1eca33a`；H1b `1145ffeeef522d1f821fee1815199b951a0a0f3d`，result/callback metadata `3e6e745`、coordinator review `6dcfed3`，全部已push。
 - Last actual progress: 2026-10-26T12:50:10.249912+00:00；coordinator已review H1b原圖／diff／source hashes並接受軟件批次，H2仍未開始。
 - Product acceptance: cc100053；H0／H1已人類簽收，H1b未冒稱人類簽收；H3正式歸屬另決定。
 
@@ -27,6 +27,7 @@
 - 本輪cwd／Git root為city2127；fetch --prune origin成功，origin/main c94e92f，本地main相等。起始HEAD45a015e對origin/main ahead4／behind0；既有H1 dirty source／tests／artifacts全部保留並closure，未自動merge／pull main。
 - 前owner release：舊chat turn `01a17823-e85c-7e10-b49b-8435b785f249`，final `msg_0ae1fc723a744b09016adf452372e88191b47f26805f6207a2`。前唯讀subagent完成、Vite5188／browser已停、單次automation h1已刪除。
 - 本批worker release：[result](../../artifacts/housing-city-h1b/result.json) allWritersReleased／allOwnedServicesStopped均true；callback送達、metadata commit/push後final，cursor67確認idle。
+- 最終closure前fetch（獲准寫FETCH_HEAD）成功；origin/main仍c94e92f，worker及coordinator checkpoint對feature upstream0／0，沒有main整合。
 - Worker曾遇一次模型capacity systemError，同owner續作後完成，沒有另派writer或改model。
 - 既有`.playwright-cli/`保留未stage；沒有外部assets／部署／DB更改。本coordinator未啟動服務，lsof5188確認無listener。
 - H1 logs已保存於[H1 artifacts](../../artifacts/housing-city-h1/README.md)，不依賴/tmp。舊handoff歷史snapshot：[pre-relay-handoff](../../artifacts/housing-city-h1/pre-relay-handoff.md)，其中舊owner／排程不再有效。
@@ -54,8 +55,8 @@
 
 - Dispatch housing-h1b-r1-rev5已完成；pending dispatch none；worker final cursor `f72fe43b-0030-4e16-8b10-599ce45459ae:67`；callback sent且已review，last processed result上述final01。
 - Quota latest：primary80% used（worker最後81%）、weekly27% used；primary reset1793031925（2026-10-26T16:25:25Z / 10月27日01:25:25 JST），weekly reset1793600524；reserve20 points。H1 closure＋H1b實際約27 points（含其他account使用，不當精確單批成本），H2預估20，現容量不足。
-- Earliest recovery check: `2026-10-26T16:28:25Z`（10月27日01:28 JST），必須重讀limits，reset時間不是配額已恢復證明。
-- Wakeup: NOT ARMED，已透過async問題請使用者另授權本chat10月27日01:28單次續作，尚未收到回覆；不因等待時間當作同意。若無授權則手動「$task-relay 繼續 housing-city」；不可自行轉成週期排程。
+- Earliest recovery check: `2026-10-26T16:28:30Z`（10月27日01:28:30 JST），必須重讀limits，reset時間不是配額已恢復證明。
+- Wakeup: ARMED；automation ID `h2`，heartbeat ACTIVE，target chat `01a17822-914e-7a52-a897-a34d47a68d70`。使用者本chat直接回覆async問題 `call_9764b6c8d76a4cf8b2bfe235d732aae7`：「授權 01:28 單次續作」。automation_update create成功，view及本機automation.toml確認目標、單次COUNT=1及01:28:30規則；對應2026-10-27 01:28:30 Asia/Tokyo（2026-10-26T16:28:30Z）。工具未額外提供next_run欄位；尚未執行。只授權這一次，恢復後記錄結果並刪除／停用h2，不得自行改成週期重試。需要電腦及Codex App可用。
 
 ## Remaining limits
 
