@@ -38,4 +38,4 @@ PASS：live四段觀察、結果沒有住宅變化聲稱、Undo、真TCP離線�
 
 ## 整合
 
-Feature本機驗證完成；main整合及其CI待下一步，尚未宣稱已發布。所有本輪Vite／preview／browser／scratch survey服務已停止；既有`.playwright-cli/`及舊feature保留。
+Feature `d83ee62d2198c27fc3bdef2edd265dccd457e0a3`已push；merge `ba54961ed7cc6c5f137d4609f95ba77b76dad3e6`無衝突，tree與feature完全一致。整合後root test/build/committed whitespace PASS：[test](integrated-test.log)／[build](integrated-build.log)。Browser及FPS沿用同runtime/source hashes的最終release證據，沒有重拍或宣稱新FPS。Main push／CI尚待下方最終紀錄。所有本輪Vite／preview／browser／scratch survey服務已停止；既有`.playwright-cli/`及舊feature保留。

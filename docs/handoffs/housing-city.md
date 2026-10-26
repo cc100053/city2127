@@ -1,11 +1,11 @@
 # housing-city — Current relay checkpoint
 
 - Task / stable specification: housing-city，H0–H3；[HOUSING_CITY_PLAN](../HOUSING_CITY_PLAN.md)，無deadline。
-- Revision / status: 21 / SOFTWARE VERIFIED A。2026-10-27本chat人類直接回覆「A」，批准現有M/P/U固定背景、U停泊A、90秒循環留DEV；相交報告後選「保留服務館，重新選 M 住宅位置並提供對照圖」。正式接入、本機共存與production回歸通過，準備整合。
+- Revision / status: 22 / LOCAL INTEGRATION VERIFIED A。2026-10-27本chat人類直接回覆「A」，批准現有M/P/U固定背景、U停泊A、90秒循環留DEV；相交報告後選「保留服務館，重新選 M 住宅位置並提供對照圖」。正式接入、本機共存與production回歸通過，整合後root test/build通過；待main push／CI。
 - Active owner: Codex，本chat `01a17a83-db63-74d1-bc2a-755edb0102e9`，host local；本輪直接實作，沒有派新worker。前輪所有writers已release，chat狀態idle。
 - Prior worker: none active。Integration `01a17935-7d58-79b1-a8d8-600ccf889ee8`明確release所有writers／services，final idle cursor `0aad33eb-3832-4da7-9540-d3bfded1bd90:55`。
-- Checkout: `/Users/fatboy/city2127`，branch `codex/housing-background`，base `d3152b4b4b9d0385b4fe77194ca10062e4777e5b`。Fetch重試（sandbox權限）成功，main/origin/main 0 ahead / 0 behind；保留既有untracked `.playwright-cli/`及舊feature。
-- Last progress: 2026-10-27 JST；A固定背景及M搬位已實作，root test/build與352配置共存檢查通過，production恢復流程通過；八張對照／正式原圖與DEV回歸已通過；準備整合。
+- Checkout: `/Users/fatboy/city2127`，目前main（feature `codex/housing-background`保留），base `d3152b4b4b9d0385b4fe77194ca10062e4777e5b`。Fetch重試（sandbox權限）成功，main/origin/main 0 ahead / 0 behind；保留既有untracked `.playwright-cli/`及舊feature。
+- Last progress: 2026-10-27 JST；A固定背景及M搬位已實作，root test/build與352配置共存檢查通過，production恢復流程通過；八張對照／正式原圖與DEV回歸已通過，merge `ba54961` tree與feature相同；整合後root checks PASS。
 
 ## Direct human authorization and boundaries
 
@@ -15,7 +15,7 @@
 - AGENTS授權範圍內feature commit／push、自review、驗證後main merge／push及main CI；未授權部署、基礎設施、外部素材包。四題／survey／DB／Meter／live時序未改。身體自立僅概念。
 - 最新task-relay unattended defaults：routine可逆選擇自行處理，只有重大決策阻擋其dependent工作；quota相關已知window剩餘≥15%繼續小批，嚴格<15%停止新substantial工作。沒有舊20pointreserve／40%startgate；不買credit／用reset／改model規避。
 
-## Accepted evidence and integration
+## H0–H3 accepted evidence and integration（歷史）
 
 - H1b／H2 SOFTWARE＋COORDINATOR ACCEPTED；H3 assessment ACCEPTED，result `housing-h3-r1-rev16-20261027-final01`已處理一次。[H3 report](../../artifacts/housing-city-h3/README.md)／[result](../../artifacts/housing-city-h3/result.json)。保留三區／數量／輪廓，無必需模型修正；hero定位與近景機理／訪客理解分開。
 - H2 source `5ae56e34e7f439bdaad37d4b99186b298b5b4223`，9source＋18原PNG hashes在H3及整合前後一致；[H2原圖／方法](../../artifacts/housing-city-h2/README.md)。固定四軸0／seed0及全能源，不推論所有正式配置通過。
@@ -32,7 +32,8 @@
 - Implementation: main初始化一次共享housingPrototype，選mixed及初始A停泊；不納入CityChangeManager或投票回傳證據。隔離DEV housing／energy比較保留原基準。
 - Relocation: low automation staffed pavilion與原M重疊；初次擴展幾何檢查正確攔下。人類指定保留服務館，M移至`(-165,-165)`（31.62m），數量／輪廓不變；新位置已通過352配置與原城／路線／視線檢查。
 - Software PASS: root npm test/build；352 authority band/seed/hybrid/transition states；原城／交通／20 focal視線／DEV掃掠。正式production有固定住宅，DEV控制排除。完整結果與對照見[本批報告](../../artifacts/housing-background/README.md)；release browser PASS：low60.0197／default35.7305 FPS（各30秒），實際查看八張原圖。
-- Next action: 完成驗證及文件同步，自review後按CONTRIBUTING提交／整合main，確認main CI。沒有部署。
+- Integrated: feature `d83ee62d2198c27fc3bdef2edd265dccd457e0a3`已push；merge／last verified code `ba54961ed7cc6c5f137d4609f95ba77b76dad3e6`。無衝突／tree相同；整合後root npm test/build／committed whitespace PASS，browser source／8PNG hashes一致。
+- Next action: 推送已驗證main並確認main CI；之後只記錄CI與釋放owner，無需新實作。沒有部署。
 
 ## Prior relay delivery / quota / wakeup（歷史）
 
