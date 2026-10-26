@@ -70,12 +70,15 @@
   "allWritersReleased": true,
   "allOwnedServicesStopped": true,
   "delivery": {
-    "status": "pending",
+    "status": "sent",
     "authorizationVerified": true,
     "executionMessageId": "01a17822-ead1-7172-b6da-d82035164927",
-    "standingContractMessageId": "01a1781f-336b-7f22-9eef-dfbb1ee35a04"
+    "standingContractMessageId": "01a1781f-336b-7f22-9eef-dfbb1ee35a04",
+    "confirmedAtUTC": "2026-10-26T16:55:27.311577+00:00",
+    "coordinatorId": "01a17822-914e-7a52-a897-a34d47a68d70",
+    "confirmation": "send_message_to_thread returned the target threadId with isError=false"
   },
-  "updatedAtUTC": "2026-10-26T16:54:33.227677+00:00",
+  "updatedAtUTC": "2026-10-26T16:55:27.311577+00:00",
   "lastVerifiedCommit": "5ae56e34e7f439bdaad37d4b99186b298b5b4223",
   "nextAction": "Coordinator reviews this unique result; no source work or H3 integration starts here."
 }
