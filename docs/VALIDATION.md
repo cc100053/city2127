@@ -272,3 +272,14 @@ Chrome156 headless／ANGLE Metal Apple M6／WebGL2，1920×1080 DPR1：default�
 [整合紀錄](../artifacts/housing-city-integration/README.md)記錄feature／整合root checks及main CI實際結果。Feature root `npm test`／`npm run build` PASS；首次sandbox因localhost listen EPERM中斷，取得權限後完整重跑成功。Production住宅source markers仍排除。H2後runtime／tests／package完全相同，9份source與18原PNG hashes核對一致，保留H2有效browser／性能證據，未作新FPS量測或重拍；固定中值／seed0及平台限制不變。H3已coordinator接受；正式A／B／C仍待人類選定，沒有正式render／資料鏈／問卷或部署變更。
 
 整合結果 `1aa3d7f` 已push並fetch核對；[main CI 40368091018](https://github.com/cc100053/city2127/actions/runs/40368091018)實際completed／success，root／survey／module-swap及whitespace全部通過。後續交付紀錄不改runtime；詳細SHA、logs及release見整合result。
+
+
+## Housing A 正式固定背景 — 2026-10-27
+
+人類選A後，新增共存檢查發現原M `(-135,-175)`穿過低automation服務館樓板；依人類後續指示保留服務館，把同一M構造移至`(-165,-165)`。正式mixed三區、U停泊A；問卷／權威／投票結果不讀或改住宅，90秒循環留DEV。
+
+Root `npm test`／`npm run build`／production有固定住宅且DEV控制排除／`git diff --check` PASS。新增324個四軸band × 4 seeds snapshot及28個hybrid過渡樣本，共352狀態；7482精確幾何檢查、交通包絡12近測、20條focal視線及原H2全掃掠／日夜actor補驗通過。原H0–H3證據不冒充新位置驗證；有限seed／過渡樣本不是所有任意狀態證明。
+
+[本批原圖／logs／方法](../artifacts/housing-background/README.md)及[最終browser結果](../artifacts/housing-background/release/browser.json)：production preview＋獨立scratch真實survey，live／Undo／city reset／full reset／TCP斷線重連／reload／reduced motion／普通resize保持固定住宅及資源；結果沒有住宅變化聲稱。DEV另驗24秒搬運及靜態／重播／重設／reduced motion，沒有重複背景。查看新hero日12／暮17／夜21及同鏡頭M搬前／搬後近景，服務館／P/U保留。Chrome156 headless／ANGLE Metal Apple M6、1920×1080 DPR1，各30秒短測low60.0197 FPS、default35.7305 FPS；low達H0≥50，default未達50，長時間展覽硬件性能仍未驗。非預期console/page/network errors0；既有favicon404及人為離線WebSocket診斷分別記錄。
+
+Survey／module-swap source未改，未另跑本機獨立suite；整合與main CI結果見本批報告／交接。沒有部署；未測HDMI、Safari／iPad／Windows、訪客理解、結構／生態／消防／無障礙工程及新增居民實際路徑。

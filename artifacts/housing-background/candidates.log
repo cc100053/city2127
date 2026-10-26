@@ -1,0 +1,27 @@
+Odaiba: 32 roof strolls and 69 roof residents keep to open roof, clear of planting, meadows and sail posts.
+Odaiba: hero district keeps six landmarks and four sites; street detail, trees and facades stay inside it; the Odaiba backdrop and bay bridges stay clear of every route.
+Odaiba: sky bridges span clear air above the trains.
+Odaiba: pods ride the guideway deck, walkers keep to open ground outside site lots, water taxis stay afloat.
+Odaiba: survey sites sit on open ground, clear of roads, landmarks and guideway, and are visible from the hero pose.
+Odaiba: eight GLBs match Phase 03D world bounds within 2 mm, grounded, unit scale, legacy axis verified.
+Odaiba: 11 raised staffed pavilions clear context and actor routes; piers land on open ground.
+Odaiba: 6 private / open water rooms preserve boat beams, walker lanes and landward access.
+Odaiba: 10 vertical towers, 6 sky bridges and 26 pods stand on open ground, clear of landmarks, context and routes; sites stay visible.
+Odaiba: 10 sharing courts stand on open ground clear of context, routes and other Meter sites; sites stay visible.
+Odaiba: sharing courts show 2826 / 2016 / 966 / 2545 / 1938 / 825 / 892 / 1434 / 709 / 694 px of ground in the hero frame.
+Odaiba: P12 two-cycle continuity, separated plaza crowds, orchard/kiosk clearance and full service-drone columns pass actual geometry checks.
+Odaiba: 2 forecourt visits and 2 doorway meetings clear real paving, geometry and actual low/mixed/high day/night fleets; doorway people/robots keep clear, nobody walks in place (0,14 of 10011,999); seated bodies remain fixed.
+Odaiba: 1084 building occupants (934 placed, 98 strolling, 52 riding) draw at full size or not at all, move continuously and never walk in place.
+CANDIDATE {"x":-165,"z":-165,"distance":31.622776601683796}
+CANDIDATE {"x":-165,"z":-155,"distance":36.05551275463989}
+CANDIDATE {"x":-175,"z":-205,"distance":50}
+CANDIDATE {"x":-165,"z":-215,"distance":50}
+CANDIDATE {"x":-185,"z":-205,"distance":58.309518948453}
+CANDIDATE {"x":-135,"z":-235,"distance":60}
+CANDIDATE {"x":-125,"z":-235,"distance":60.82762530298219}
+CANDIDATE {"x":-195,"z":-195,"distance":63.24555320336759}
+CANDIDATE {"x":-185,"z":-215,"distance":64.03124237432849}
+CANDIDATE {"x":-195,"z":-205,"distance":67.0820393249937}
+CANDIDATE {"x":-135,"z":-245,"distance":70}
+CANDIDATE {"x":-125,"z":-245,"distance":70.71067811865476}
+CANDIDATES COMPLETE [{"x":-165,"z":-165,"distance":31.622776601683796},{"x":-165,"z":-155,"distance":36.05551275463989},{"x":-175,"z":-205,"distance":50},{"x":-165,"z":-215,"distance":50},{"x":-185,"z":-205,"distance":58.309518948453},{"x":-135,"z":-235,"distance":60},{"x":-125,"z":-235,"distance":60.82762530298219},{"x":-195,"z":-195,"distance":63.24555320336759},{"x":-185,"z":-215,"distance":64.03124237432849},{"x":-195,"z":-205,"distance":67.0820393249937},{"x":-135,"z":-245,"distance":70},{"x":-125,"z":-245,"distance":70.71067811865476}]
