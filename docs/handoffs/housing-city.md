@@ -1,11 +1,11 @@
 # housing-city — Current relay checkpoint
 
 - Task / stable specification: housing-city，H0–H3；[HOUSING_CITY_PLAN](../HOUSING_CITY_PLAN.md)，無deadline。
-- Revision / status: 20 / NEEDS_INPUT。H3評估及獨立DEV-only整合已完成並coordinator接受；沒有剩餘獨立實作，正式A/B/C選擇待人類。
-- Active coordinator: `01a17927-a815-7041-b4d3-aff62d7bd182`，host local。前任 `01a17822-914e-7a52-a897-a34d47a68d70`已release dispatch；succession housing-h3-coordinator-rev14完成。
-- Worker owner: none。Integration `01a17935-7d58-79b1-a8d8-600ccf889ee8`明確release所有writers／services，final idle cursor `0aad33eb-3832-4da7-9540-d3bfded1bd90:55`。
-- Checkout: `/Users/fatboy/city2127`，目前main／origin/main `6ed506993cdd33fa713c53ad64215041e7fd7776`；只保留既有untracked `.playwright-cli/`，feature `codex/housing-city`保留。
-- Last progress: 2026-10-27 JST；coordinator已讀整合result／report／checks及closure diff，獨立核實最後main CI成功；本revision只保存交接。
+- Revision / status: 21 / SOFTWARE VERIFIED A。2026-10-27本chat人類直接回覆「A」，批准現有M/P/U固定背景、U停泊A、90秒循環留DEV；相交報告後選「保留服務館，重新選 M 住宅位置並提供對照圖」。正式接入、本機共存與production回歸通過，準備整合。
+- Active owner: Codex，本chat `01a17a83-db63-74d1-bc2a-755edb0102e9`，host local；本輪直接實作，沒有派新worker。前輪所有writers已release，chat狀態idle。
+- Prior worker: none active。Integration `01a17935-7d58-79b1-a8d8-600ccf889ee8`明確release所有writers／services，final idle cursor `0aad33eb-3832-4da7-9540-d3bfded1bd90:55`。
+- Checkout: `/Users/fatboy/city2127`，branch `codex/housing-background`，base `d3152b4b4b9d0385b4fe77194ca10062e4777e5b`。Fetch重試（sandbox權限）成功，main/origin/main 0 ahead / 0 behind；保留既有untracked `.playwright-cli/`及舊feature。
+- Last progress: 2026-10-27 JST；A固定背景及M搬位已實作，root test/build與352配置共存檢查通過，production恢復流程通過；八張對照／正式原圖與DEV回歸已通過；準備整合。
 
 ## Direct human authorization and boundaries
 
@@ -25,16 +25,16 @@
 - [main CI 40368091018](https://github.com/cc100053/city2127/actions/runs/40368091018)成功；最後record commit `6ed506993cdd33fa713c53ad64215041e7fd7776`的[CI 40369145127](https://github.com/cc100053/city2127/actions/runs/40369145127)亦completed／success，coordinator用完整SHA獨立核實。後續本handoff-only提交按CI規則skip，不改runtime。
 - Coordinator核對closure完整diff／結果／測試log結尾／production.json及doc-review；source／tests／packages自H2無新增差異，committed diff check PASS。原證據及feature保留。所有服務停止，沒有部署。
 
-## Pending major decision — notified once, unanswered
+## A approved — 2026-10-27
 
-精確問題已於本coordinator的async問題通知：是否採A，把原M/P/U含複合外皮及次設計按原位置／數量作正式固定背景、U停泊A、90秒循環留DEV、不宣稱住宅是投票結果；還是B保留DEV先設計獨立居住偏好與輸入來源；或C另規劃四題替換／權威累積？
+本chat人類於進度報告列明三方案後直接選「A」。現有M/P/U含複合外皮及次設計，以原數量作正式固定背景；P/U原位置、M按本chat另批搬位避讓服務館，U停泊A；90秒循環留DEV。四題／Meter／DB／live timing不改，不將住宅形態或搬運當作提案結果。
 
-- Recommendation：A，僅提案，未批准。現有問題不授權把M掛Q4、植物膜掛能源Q3或交換艙掛Q1；Q2共享亦不等於整棟居住方式同意。
-- Dependent work：正式render／production納入、資料權威鏈及其新配置／轉場共存、恢復／資源／性能驗證。B/C須先選輸入及相容性計劃，不能默認第五題。
-- Independent work：H3評估／DEV原型收尾／整合／mainCI已全部完成；目前沒有其他獨立batch。沉默不批准，production住宅仍排除。
-- Next action：等待人類選A/B/C；收到後先核實quota／checkout，按選定scope建立fresh worker。不得自派正式接入。
+- Implementation: main初始化一次共享housingPrototype，選mixed及初始A停泊；不納入CityChangeManager或投票回傳證據。隔離DEV housing／energy比較保留原基準。
+- Relocation: low automation staffed pavilion與原M重疊；初次擴展幾何檢查正確攔下。人類指定保留服務館，M移至`(-165,-165)`（31.62m），數量／輪廓不變；新位置已通過352配置與原城／路線／視線檢查。
+- Software PASS: root npm test/build；352 authority band/seed/hybrid/transition states；原城／交通／20 focal視線／DEV掃掠。正式production有固定住宅，DEV控制排除。完整結果與對照見[本批報告](../../artifacts/housing-background/README.md)；release browser PASS：low60.0197／default35.7305 FPS（各30秒），實際查看八張原圖。
+- Next action: 完成驗證及文件同步，自review後按CONTRIBUTING提交／整合main，確認main CI。沒有部署。
 
-## Delivery / quota / wakeup
+## Prior relay delivery / quota / wakeup（歷史）
 
 - Assessment owner final idle cursor `5caa831e-c167-45bd-bd0f-af8b43665a4b:28`；integration final cursor55見上，兩結果已review一次。無pending dispatch／result。
 - Assessment callback曾被自動審核拒絕（未採信歷史直接授權）；coordinator安全主動retrieved並發receipt。Integration不嘗試callback，使用wait_threads final retrieval。沒有需人類解鎖的delivery blocker。
@@ -43,4 +43,4 @@
 
 ## Remaining limits
 
-未測default sustainedFPS、展覽硬件、Safari／iPad／Windows、訪客理解、結構／生態／消防／無障礙工程及新住宅居民實際使用路徑。H2中值／全能源證據不能證明所有正式配置／轉場。正式住宅未接入；沒有部署。
+未測default sustainedFPS、展覽硬件、Safari／iPad／Windows、訪客理解、結構／生態／消防／無障礙工程及新住宅居民實際使用路徑。H2中值／全能源證據不能證明所有正式配置／轉場。A本機軟件驗證完成；default短測35.7305FPS，長時間／實機仍待驗；沒有部署。

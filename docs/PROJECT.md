@@ -43,6 +43,7 @@ The [resident experience plan](RESIDENT_EXPERIENCE_PLAN.md) records P1–P3 impl
 | [voteJourney.ts](../src/voteJourney.ts) | Live vote journey (2026-10-13): Meter-colour orbs, scan rings and per-guest lanterns (latest 64), additive and unlit, named `meter-pulse` so GTAO skips them |
 | [energyPrototype.ts](../src/energyPrototype.ts), [devEnergy.ts](../src/devEnergy.ts) | DEV-only E3能源城市組合／五配置及慢速儲能流程；不讀Meter、不接survey；見[能源計劃](ENERGY_CITY_PLAN.md) |
 | [scaleLab.ts](../src/scaleLab.ts), [devScaleLab.ts](../src/devScaleLab.ts) | DEV-only `?scaleLab`: seeded guest sequences through the server reducer and Scale A with live journey timing; see [handoff](handoffs/archive/vote-journey.md) |
+| [housingPrototype.ts](../src/housingPrototype.ts), [devHousing.ts](../src/devHousing.ts) | 正式城市固定mixed住宅／U停泊A；DEV五配置與90秒循環重用同一工廠，獨立於投票權威 |
 | [dayCycle.ts](../src/dayCycle.ts), [presets.ts](../src/presets.ts), [worldState.ts](../src/worldState.ts) | Clock/light curves, numeric atmosphere presets, legacy 10 s WorldState blend |
 | [overlay.ts](../src/overlay.ts), [style.css](../src/style.css), [modelAssets.ts](../src/modelAssets.ts) | Desktop title/time UI, GLTFLoader and DEV-only local asset preview |
 
@@ -187,3 +188,10 @@ CityChangeManager將能源實際前後target加入CarrierChange，residentResult
 
 
 2026-10-25 發布更新：使用者已明確要求推送能源polish及整合main，先前本機-only狀態由[本次整合交接](handoffs/energy-polish-integration.md)取代。既有runtime未再修改；root test/build／正式scratch browser已重跑PASS，整合後驗證、main CI與安全刪分支的實際結果統一記在該交接，原target／夜間可讀性／硬件限制保留。
+
+
+### Housing A — 正式固定背景（2026-10-27）
+
+人類本chat選A，後續明確保留服務館並重新選M位置。`main`初始化一次共享`housingPrototype`，選mixed、命名`housing-background`並加入scene；初始化的`update(0)`已停泊A，正式frame不呼叫住宅update，無投票參數、CarrierChange、結果卡或DB接線。Standalone／survey／DEV Meter與scaleLab均有固定背景；隔離DEV housing及energy比較保留各自基準，不重複建立住宅。Production保留固定構造，移除DEV控制import；頁面重建才重建幾何，沿用本專案一次初始化生命週期。
+
+原M `(-135,-175)`在低automation時穿過既有staffed pavilion的20m樓板；按人類決定將同一M構造平移至`(-165,-165)`（31.62m），服務館、P/U、數量、輪廓與材質保持。原M庭院留孔保留。U90秒循環只由`devHousing`推進；所有正式snapshot／live／Undo／reset／reconnect與reduced motion都不碰住宅。新證據與實測限制見[本批報告](../artifacts/housing-background/README.md)，舊H0–H3原圖／性能只作當時紀錄。

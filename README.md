@@ -100,7 +100,9 @@ Root `src/` 以 Three.js / WebGL 2 載入 Odaiba district 地形、六棟地標 
 
 開發時可用 `?meters=nw:high,ne:low`（band 或 −12..12）直接 review v2 layout，console `cityMeters('ne:high')` 睇 live 過渡；`&metersTo=ne:high&metersAge=0.7` 配合 `reviewTime` 截圖。這些工具不提交提案、不改展覽資料。 DEV能源研究可用`?energy=baseline&hour=12&reviewTime=20`切換基準／A／B／C／混合城市組合，E3加入兩處沿岸水庭／配電門架及60秒儲能流程；`reviewTime=10|30|50`固定階段，面板「靜態閱讀」或系統reduced motion固定能源動態；須與`survey`、`meters`、`scaleLab`分開使用。[E3比較與限制](artifacts/energy-city-e3/README.md)。
 
-住宅DEV比較另開 `?housing=mixed&hour=12&reviewTime=24`（原hero鎖定），配置可選baseline／material／membrane／mobile／mixed，`housingView=mobile|home`看搬運特寫。移除`reviewTime`會播放90秒「多年更新壓縮示意」：生活艙與完整小屋在兩處專用接駁位置之間移動，代表數年至數十年更新。面板可重播或重設／停泊，靜態閱讀／reduced motion固定停泊A；植物與藻類不動。須與survey／meters／scaleLab／energy分開使用，production排除。[H2證據與限制](artifacts/housing-city-h2/README.md)。
+住宅已按方案A加入正式城市作固定背景：輕材住宅M、植物膜P及交換骨架U共存，U固定停泊A；不隨回答或Meter改變，亦不列為提案結果。M移至`(-165,-165)`避讓低自動化服務館，保留服務館及住宅數量／輪廓。[接入驗證與搬位對照](artifacts/housing-background/README.md)。
+
+住宅DEV比較另開 `?housing=mixed&hour=12&reviewTime=24`（原hero鎖定），配置可選baseline／material／membrane／mobile／mixed，`housingView=mobile|home`看搬運特寫。移除`reviewTime`會播放90秒「多年更新壓縮示意」：生活艙與完整小屋在兩處專用接駁位置之間移動，代表數年至數十年更新。面板可重播或重設／停泊，靜態閱讀／reduced motion固定停泊A；植物與藻類不動。須與survey／meters／scaleLab／energy分開使用；production只排除比較控制與90秒播放，保留正式固定住宅。[H2證據與限制](artifacts/housing-city-h2/README.md)。
 
 `?asset-preview` 可載入本機 GLB 於原點，重新整理後換另一件；production 沒有 picker。素材標準見 [BLENDER](docs/BLENDER.md)。
 

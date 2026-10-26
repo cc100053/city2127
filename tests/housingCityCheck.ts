@@ -32,7 +32,7 @@ export function checkHousingCity(city: Object3D) {
   const shapes = (root: Object3D) => {
     const result: { mesh: Mesh; matrix: Matrix4; box: Box3 }[] = [];
     root.traverse(o => {
-      if (!(o instanceof Mesh)) return;
+      if (!(o instanceof Mesh) || o.name === 'meter-pulse') return;
       for (let parent: Object3D | null = o; parent; parent = parent.parent) if (!parent.visible) return;
       o.geometry.computeBoundingBox();
       for (let i = 0; i < (o instanceof InstancedMesh ? o.count : 1); i++) {
@@ -45,19 +45,53 @@ export function checkHousingCity(city: Object3D) {
   const houses = shapes(housing.root), obstacles = [...shapes(city), ...shapes(district)], trees = new Map();
   for (const h of houses) if (!trees.has(h.mesh.geometry)) trees.set(h.mesh.geometry, new MeshBVH(h.mesh.geometry, { indirect: true }));
   let exact = 0;
-  for (const h of houses) for (const other of obstacles) if (h.box.intersectsBox(other.box)) {
-    exact++; relative.copy(h.matrix).invert().multiply(other.matrix);
-    other.mesh.geometry.boundsTree ??= new MeshBVH(other.mesh.geometry, { indirect: true });
-    let intersects = trees.get(h.mesh.geometry)!.intersectsGeometry(other.mesh.geometry, relative);
-    if (intersects && !Array.isArray(other.mesh.material) && /^(landscape|sidewalk|plaza|service_area|road)$/.test(other.mesh.material.name)) {
-      // Existing paving is one district-wide mesh: permit only actual ground contacts below 35 cm, not the whole mesh.
-      const line = new Line3();
-      intersects = trees.get(h.mesh.geometry)!.bvhcast(other.mesh.geometry.boundsTree, relative, { intersectsTriangles: (a, b) =>
-        a.intersectsTriangle(b, line) && Math.max(line.start.clone().applyMatrix4(h.matrix).y, line.end.clone().applyMatrix4(h.matrix).y) > .35 });
+  const checked = new Map<Mesh['geometry'], Set<string>>();
+  const check = (candidates: ReturnType<typeof shapes>) => {
+    for (const other of candidates) {
+      // A fixed dwelling needs each identical geometry/transform tested only once across authority states.
+      const seen = checked.get(other.mesh.geometry) ?? new Set<string>(), key = other.matrix.elements.join(',');
+      if (seen.has(key)) continue;
+      seen.add(key); checked.set(other.mesh.geometry, seen);
+      for (const h of houses) if (h.box.intersectsBox(other.box)) {
+        exact++; relative.copy(h.matrix).invert().multiply(other.matrix);
+        other.mesh.geometry.boundsTree ??= new MeshBVH(other.mesh.geometry, { indirect: true });
+        let intersects = trees.get(h.mesh.geometry)!.intersectsGeometry(other.mesh.geometry, relative);
+        if (intersects && !Array.isArray(other.mesh.material) && /^(landscape|sidewalk|plaza|service_area|road)$/.test(other.mesh.material.name)) {
+          // Existing paving is one district-wide mesh: permit only actual ground contacts below 35 cm, not the whole mesh.
+          const line = new Line3();
+          intersects = trees.get(h.mesh.geometry)!.bvhcast(other.mesh.geometry.boundsTree, relative, { intersectsTriangles: (a, b) =>
+            a.intersectsTriangle(b, line) && Math.max(line.start.clone().applyMatrix4(h.matrix).y, line.end.clone().applyMatrix4(h.matrix).y) > .35 });
+        }
+        assert.equal(intersects, false,
+          `housing ${h.mesh.parent?.name} intersects ${other.mesh.name} / ${other.mesh.parent?.name}, overlap ${h.box.clone().intersect(other.box).min.toArray()}..${h.box.clone().intersect(other.box).max.toArray()}`);
+      }
     }
-    assert.equal(intersects, false,
-      `housing ${h.mesh.parent?.name} intersects ${other.mesh.name} / ${other.mesh.parent?.name}`);
+  };
+  check(obstacles);
+  // Formal fixed background must coexist with authoritative bands, hybrids, seeded slots and live transitions.
+  const backgroundPose = housing.root.toJSON();
+  let configurations = 0, clock = 0;
+  const scores = [-12, 0, 12];
+  for (const seed of [0, 1, 2127, 0xffffffff]) for (const a of scores) for (const b of scores) for (const c of scores) for (const d of scores) {
+    const axes = { automation: a, publicSharing: b, environmentalPriority: c, urbanConcentration: d };
+    const layout = { ...deriveExhibitionLayout(axes), energy: { waterGardens: 2, receiver: 'large' as const, flywheel: true, island: true } };
+    manager.applyExhibitionLayout(layout, 'city-state-snapshot', clock, Object.fromEntries(Object.keys(axes).map(k => [k, seed])) as typeof axes);
+    district.updateMatrixWorld(true); check(shapes(district)); configurations++;
   }
+  for (const value of [-5, -2.5, 2.5, 5]) {
+    const layout = { ...deriveExhibitionLayout({ automation: value, publicSharing: -value, environmentalPriority: value, urbanConcentration: -value }),
+      energy: { waterGardens: 1, receiver: 'small' as const, flywheel: false, island: false } };
+    clock += 4;
+    manager.applyExhibitionLayout(layout, 'city-state-updated', clock, { automation: 13, publicSharing: 27, environmentalPriority: 39, urbanConcentration: 51 });
+    for (const age of [0, .5, 1, 1.5, 2, 2.5, 3]) {
+      manager.update(clock + age); district.updateMatrixWorld(true); check(shapes(district)); configurations++;
+    }
+  }
+  assert.deepEqual(housing.root.toJSON(), backgroundPose, 'Authority changes must not mutate the fixed housing resources or dock');
+  manager.applyExhibitionLayout({ ...deriveExhibitionLayout({ automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 }),
+    energy: { waterGardens: 2, receiver: 'large', flywheel: true, island: true } }, 'city-state-snapshot', clock + 4);
+  district.updateMatrixWorld(true);
+  console.log(`PASS housing fixed background: ${configurations} band/seed/hybrid/transition configurations, unchanged dock and resources.`);
   const path = routes(), sphere = new Sphere(), camera = heroCamera(1920, 1080);
   // Every moving mesh/instance, including shoes, fork, ropes and plugs. Each interval moves/scales along one axis;
   // its endpoint union is the exact swept box for the unit boxes (no sampled-time holes).

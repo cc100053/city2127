@@ -1,0 +1,3 @@
+Measuring low
+Measuring default
+PASS housing A production: fixed mixed background, live evidence, Undo/reset/reconnect/reload/reduced motion/resize and resources. [ [ 'low', 60.01972886144615 ], [ 'default', 35.73047489533461 ] ]

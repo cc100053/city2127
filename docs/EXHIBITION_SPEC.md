@@ -145,3 +145,8 @@ Admin Day／Night／Auto 保存為獨立 display setting：12:00／22:00／180 �
 
 
 2026-10-25 發布更新：使用者已明確要求推送能源polish及整合main，先前本機-only狀態由[本次整合交接](handoffs/energy-polish-integration.md)取代。既有runtime未再修改；root test/build／正式scratch browser已重跑PASS，整合後驗證、main CI與安全刪分支的實際結果統一記在該交接，原target／夜間可讀性／硬件限制保留。
+
+
+### 住宅方案A — 2026-10-27 決定
+
+人類已採固定背景A：M輕材架空／共享住宅、P植物膜／藻類設備、U交換骨架／完整小屋及複合外皮共同存在於正式城市，U固定停泊A。90秒多年更新壓縮循環只留DEV。住宅不是任何回答或Meter造成的變化，不加入提案結果，四題與權威資料契約保持。依後續人類決定保留既有服務館，將M原構造由`(-135,-175)`平移到`(-165,-165)`，其餘住宅位置、數量與輪廓保持。驗證／搬位原圖見[本批報告](../artifacts/housing-background/README.md)；H3中的「待選A/B/C」已由本決定取代。實機／訪客及工程驗收仍另列。

@@ -7,7 +7,7 @@ export const HOUSING_OPTIONS = {
   baseline: '基準城市', material: 'M · 輕材架空住宅', membrane: 'P · 植物膜住宅', mobile: 'U · 可換生活艙', mixed: '三類共存 · 複合住宅',
 } as const;
 export type HousingOption = keyof typeof HOUSING_OPTIONS;
-export const HOUSING_SITES = { material: [-135, -175], membrane: [45, -215], mobile: [-265, -60] } as const;
+export const HOUSING_SITES = { material: [-165, -165], membrane: [45, -215], mobile: [-265, -60] } as const;
 
 export const HOUSING_HOME_ROUTE = { start: [-5.2, 5.14, -4.4], end: [5.2, 5.14, -4.4] } as const;
 
@@ -25,7 +25,7 @@ export function housingCycle(seconds: number, still = false) {
   return { time, phase, travel, out, lift, plugA, plugB };
 }
 
-/** DEV compressed-years study, independent of votes; every part is built once. */
+/** Shared dwellings, initially docked A; only the DEV study calls the compressed-years update. */
 export function housingPrototype() {
   const root = new T.Group(); root.name = 'housing-prototype';
   const parts = { material: new T.Group(), membrane: new T.Group(), mobile: new T.Group() };
@@ -117,7 +117,7 @@ export function housingPrototype() {
     for (const y of [7.1, 16.5]) box(m, [.7, .45, .7], [y < 8 ? x * .68 : x, y, z], dark);
   }
   for (const y of [7, 16.2]) {
-    // The existing skyway mast passes through an open courtyard, never through a new floor or home.
+    // The open central courtyard preserves ground-level breathing room between the two deck halves.
     box(m, [9.9, .4, 9.8], [-5.55, y, 0], trim);
     box(m, [4.5, .4, 9.8], [8.25, y, 0], trim);
     for (const z of [-4.1, 4.1]) box(m, [6.6, .4, 1.6], [2.7, y, z], trim);

@@ -24,6 +24,7 @@ import { isExhibitionView } from './surveyView';
 import { createCityChangeManager } from './createCityChangeManager';
 import { renderQuality } from './renderQuality';
 import { ARRIVAL_SECONDS, VoteJourney } from './voteJourney';
+import { housingPrototype } from './housingPrototype';
 import './style.css';
 
 try {
@@ -128,9 +129,14 @@ try {
   // DEV-only `?scaleLab` (`&profile=leaning&guests=120&seed=3&journey`): a seeded guest sequence through Scale A and the vote journey, without the survey server.
   const scaleLab=import.meta.env.DEV&&!surveyUrl&&params.has('scaleLab');
   const housing=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&!params.has('energy')&&params.has('housing');
+  const energyReview=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&params.has('energy');
+  if(!housing&&!energyReview){
+    // Fixed city background: votes and recovery never retarget the dwellings; the update cycle stays in DEV.
+    const background=housingPrototype();background.select('mixed');background.root.name='housing-background';scene.add(background.root);
+  }
   // DEV E3 city composition: a separate design comparison, never derived from environment Meter bands.
   let devFrame:((now:number,darkness:number)=>void)|undefined;
-  if(import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&params.has('energy'))
+  if(import.meta.env.DEV&&energyReview)
     import('./devEnergy').then(({startEnergyReview})=>{devFrame=startEnergyReview(scene,params);});
   const cityChanges=surveyUrl||metersParam!==null||scaleLab||housing?createCityChangeManager(scene):null;
   if(import.meta.env.DEV&&housing)import('./devHousing').then(async({startHousingReview})=>{
