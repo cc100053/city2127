@@ -1,0 +1,179 @@
+{
+  "browser": "156.0.8078.47",
+  "errors": [],
+  "warnings": [],
+  "failedRequests": [],
+  "sourceHashes": {
+    "src/housingPrototype.ts": "5330475f2583bc6e0491068c2c61bb2134b46790558abda834bf53e1f9cc576f",
+    "src/main.ts": "36cb56939a7fdd353c36008d5e836a33aa1bdca99879374f20a53a4a22db0653",
+    "src/devHousing.ts": "a1b01d4d86dea76c37a779b7e369f16897f2ca1652ffa6ddbc09efc09844b708",
+    "artifacts/housing-city-h2/renderer-budget.mjs": "cd8a91e2ffc50aa62a052881992bbd2d22dfff4650ed3f4df4f74cc55b45eff0"
+  },
+  "freshBaseline": {
+    "geometries": 431,
+    "textures": 24,
+    "drawCalls": 486,
+    "triangles": 8699769
+  },
+  "phases": [
+    {
+      "time": 0,
+      "baseline": {
+        "geometries": 461,
+        "textures": 24,
+        "drawCalls": 486,
+        "triangles": 8699769
+      },
+      "mixed": {
+        "geometries": 461,
+        "textures": 24,
+        "drawCalls": 537,
+        "triangles": 8828421
+      },
+      "delta": {
+        "drawCalls": 51,
+        "triangles": 128652
+      }
+    },
+    {
+      "time": 12,
+      "baseline": {
+        "geometries": 461,
+        "textures": 24,
+        "drawCalls": 486,
+        "triangles": 8699769
+      },
+      "mixed": {
+        "geometries": 461,
+        "textures": 24,
+        "drawCalls": 537,
+        "triangles": 8828421
+      },
+      "delta": {
+        "drawCalls": 51,
+        "triangles": 128652
+      }
+    },
+    {
+      "time": 20,
+      "baseline": {
+        "geometries": 461,
+        "textures": 24,
+        "drawCalls": 486,
+        "triangles": 8699769
+      },
+      "mixed": {
+        "geometries": 461,
+        "textures": 24,
+        "drawCalls": 537,
+        "triangles": 8828421
+      },
+      "delta": {
+        "drawCalls": 51,
+        "triangles": 128652
+      }
+    },
+    {
+      "time": 24,
+      "baseline": {
+        "geometries": 461,
+        "textures": 24,
+        "drawCalls": 486,
+        "triangles": 8699769
+      },
+      "mixed": {
+        "geometries": 461,
+        "textures": 24,
+        "drawCalls": 537,
+        "triangles": 8828421
+      },
+      "delta": {
+        "drawCalls": 51,
+        "triangles": 128652
+      }
+    },
+    {
+      "time": 28,
+      "baseline": {
+        "geometries": 461,
+        "textures": 24,
+        "drawCalls": 486,
+        "triangles": 8699769
+      },
+      "mixed": {
+        "geometries": 461,
+        "textures": 24,
+        "drawCalls": 537,
+        "triangles": 8828421
+      },
+      "delta": {
+        "drawCalls": 51,
+        "triangles": 128652
+      }
+    },
+    {
+      "time": 40,
+      "baseline": {
+        "geometries": 461,
+        "textures": 24,
+        "drawCalls": 486,
+        "triangles": 8699769
+      },
+      "mixed": {
+        "geometries": 461,
+        "textures": 24,
+        "drawCalls": 537,
+        "triangles": 8828421
+      },
+      "delta": {
+        "drawCalls": 51,
+        "triangles": 128652
+      }
+    },
+    {
+      "time": 64,
+      "baseline": {
+        "geometries": 461,
+        "textures": 24,
+        "drawCalls": 486,
+        "triangles": 8699769
+      },
+      "mixed": {
+        "geometries": 461,
+        "textures": 24,
+        "drawCalls": 537,
+        "triangles": 8828421
+      },
+      "delta": {
+        "drawCalls": 51,
+        "triangles": 128652
+      }
+    },
+    {
+      "time": 76,
+      "baseline": {
+        "geometries": 461,
+        "textures": 24,
+        "drawCalls": 486,
+        "triangles": 8699769
+      },
+      "mixed": {
+        "geometries": 461,
+        "textures": 24,
+        "drawCalls": 537,
+        "triangles": 8828421
+      },
+      "delta": {
+        "drawCalls": 51,
+        "triangles": 128652
+      }
+    }
+  ],
+  "delta": {
+    "geometries": 30,
+    "textures": 0,
+    "drawCalls": 51,
+    "triangles": 128652
+  },
+  "passed": true
+}

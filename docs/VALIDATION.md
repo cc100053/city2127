@@ -224,3 +224,49 @@ Trial source29168309的root test/build/diff、exact環外source／全energy幾�
 
 
 2026-10-25 發布更新：使用者已明確要求推送能源polish及整合main，先前本機-only狀態由[本次整合交接](handoffs/energy-polish-integration.md)取代。既有runtime未再修改；root test/build／正式scratch browser已重跑PASS，整合後驗證、main CI與安全刪分支的實際結果統一記在該交接，原target／夜間可讀性／硬件限制保留。
+
+
+## 住宅城市 H0 候選與基準 — 2026-10-26（已簽收）
+
+住宅runtime未改。[H0原圖與詳細方法](../artifacts/housing-city-h0/README.md)以615ad98既有城市、四軸0／seed0、四類能源共存、鎖定原hero、hour12／reviewTime20，檢查三處24×18m／最高28m候選框。最終Chrome156 headless／ANGLE Metal Apple M6／WebGL2、1920×1080 DPR1 low：10秒rAF平均60.08 FPS、431 geometries／24 textures／486 calls／8,699,769 triangles；page errors／console warnings均0。12項四站中心視線及候選表面、九點承托／上方淨空、離散mobility走廊篩選PASS。這不是連續全掃掠、整個focal輪廓、live soak或H1模型驗收。
+
+H0設計矩陣、Q4區隔、夜間方案與新增資源／最低50 FPS預算已由cc100053於2026-10-26簽收；H1–H3尚未實作。使用者已選90秒多年更新壓縮循環。Node runner語法檢查PASS；root build PASS（既有>500kB chunk warning）。首次root test在sandbox localhost listen遇EPERM；獲准重跑完整root npm test PASS；diff／本地連結／原圖manifest PASS，Vite5188與browser均已清理。checkpoint及恢復狀態由[交接](handoffs/housing-city.md)記錄。survey／module-swap source未改。未測default FPS、展覽硬件、Safari／iPad／Windows或結構工程。
+
+
+## 住宅城市 H1 靜態比較 — 2026-10-26（已簽收）
+
+[H1原圖／環境／完整logs](../artifacts/housing-city-h1/README.md)：root npm test／build PASS，final source hashes closure核對一致；五配置、三處24×18m／28m實際頂點、共享資源、實際Odaiba／district／全能源BVH碰撞、mobility曲線≤0.5m採樣包絡及20項focal視線PASS。Chrome156 headless／ANGLE Metal Apple M6／WebGL2、1920×1080 DPR1 default日12／暮17／夜21及三類近景，原hero鎖定；模式隔離、普通resize、reduced-motion及切換資源重用PASS。全新low baseline對mixed各30秒，住宅增量20 geometries／0 textures／21 calls／131940 triangles，mixed約60.03 FPS，無未預期browser錯誤。cc100053已明確簽收H1並指示繼續H1b／H2。
+
+H1b完整小屋／藻類／橫向骨架及H2全掃掠尚未驗；靜態actor位姿不代表全部時間。正式問卷及其他package未改，未重跑其獨立suite；展覽硬件／Safari／iPad／Windows、工程及訪客理解未測。
+
+
+## 住宅城市 H1b 次設計 — 2026-10-26（coordinator review通過）
+
+[H1b原圖／方法／完整logs](../artifacts/housing-city-h1b/README.md)：保留已簽收H1主設計，加一組橫向共享骨架、藻類循環設備、完整小屋／雙底座及專用更新軌。Root npm test／build PASS；三區所有頂點與兩停泊端點、資源重用、非自發光、實際Odaiba／district／全能源BVH碰撞、既有交通包絡及20條focal視線通過。另驗y≥3.35m的小屋本體預留通道25個位姿；軌／底鞋／接駁接口及H2完整動作掃掠未驗。
+
+Chrome156 headless／ANGLE Metal Apple M6／WebGL2、1920×1080 DPR1 default：五配置hour12／17／21、六處近景及藻類夜景、locked原hero／drag、普通resize、reduced-motion、互斥模式及資源重用PASS。實際runtime含skyways／已發布入口及reviewTime20靜態actor：7086項精確比較、475項本體通道近測，hits0；25原圖／6份source hash一致，無exception／warning／failed request。全新low baseline對mixed各30秒，60.0143／60.0163 FPS；全住宅renderer增量36 geometries／0 textures／38 calls／133416 triangles，在H0整體上限內，geometry額度已滿。Node幾何133344 triangles與renderer因透光面重畫相差72；default FPS未量。
+
+Coordinator已核對diff、source hashes與mixed日夜及三個次設計近景，接受軟件批次；未冒稱人類視覺簽收。部分近景保留原樹／高架遮擋。H2動畫／全掃掠、展覽硬件／Safari／iPad／Windows、工程及訪客理解未驗，沒有正式接入或main CI宣稱。
+
+### Housing H2（2026-10-27，DEV動態；coordinator review通過）
+
+[本批方法／原圖／logs](../artifacts/housing-city-h2/README.md)：90秒明示「多年更新壓縮示意」，U生活艙透過前側吊運門架／下承叉架在兩socket之間實際交換，完整小屋沿專用更新軌搬遷；水電先斷開後移動，停泊後接通。原主體、公共廊、M／P與靜態植物／藻類保留。靜態閱讀／reduced motion／重設都回A停泊，重播重置相對時間；固定`reviewTime`沿用既有慣例。
+
+Root `npm test`／`npm run build`與diff check PASS（只有既有chunk warning）；Node全住宅50 meshes／30 geometries／128580 triangles，資源identity全程不變。兩移動組件之間以分段線性相對時間不等式連續檢查，只容許量化的吊索端點固定接觸。對原城／固定住宅完整680個掃掠盒涵蓋底鞋、叉架、吊車、吊索與plug，不再只驗上半部；Node真實GLB／civic／district／全能源／四站／完整skyways做7544項精確檢查、10923項掃掠近測、20條hero focal視線PASS。全部交通曲線≤0.5m弧長採樣＋保守包絡涵蓋中間位置；實際fleet另按90秒每0.5秒、日12／夜21取5204836個mesh／instance邊界，沒有隱藏actor。後者屬離散補充檢查，不宣稱所有actor的任意時間連續幾何證明。
+
+Chrome156 headless／ANGLE Metal Apple M6／WebGL2，1920×1080 DPR1：default原hero日12／暮17／夜21、交換艙及小屋A／途中／B近景；low實城7964項精確檢查及11265項掃掠近測、hits0。靜態／reduced motion／重設重播／一般resize及模式優先序另驗；survey入口互斥用隔離mock WebSocket，不代表重跑正式survey流程。production bundle沒有住宅DEV source markers。全新low baseline 30.0013秒平均60.0307 FPS，動態91.0013秒平均60.0101 FPS、覆蓋全部11狀態；[原始intervals](../artifacts/housing-city-h2/final/performance.json)。全新baseline同幀配對在8個停泊／搬運時間均為住宅增量30 geometries／0 textures／51 calls／128652 rendered triangles，符合H0上限；Node與renderer差72為透光面額外繪製。完整renderer配對量測、source hashes及錯誤記錄由[獨立結果](../artifacts/housing-city-h2/result.json)連入。
+
+未測default sustained FPS、展覽硬件、Safari／iPad／Windows、訪客理解或工程／生態／無障礙法規；survey／module-swap source未改，未另跑其獨立suite。H2實作／軟件檢查不代替人類視覺簽收，H3正式背景／偏好／累積歸屬仍待人類決定；本批不整合main或部署。
+
+2026-10-27 coordinator核對H2原碼／測試diff、18原PNG及source hashes、mobile搬運／停泊、小屋途中與hero夜景，接受此軟件批次；所有writer／services已釋放，H3交由fresh coordinator評估。未冒稱人類視覺或展覽實機簽收。
+
+## 住宅城市 H3 收斂評估 — 2026-10-27（coordinator已接受）
+
+[H3報告／正式選項](../artifacts/housing-city-h3/README.md)：直接查看H1／H1b／H2各8張原PNG及R01／R06，分別評估三類與mixed的數量、位置、輪廓、日暮夜及原城共存；沒有驗收必需的小修，source／asset未改。主鏡頭可定位低層新增量體，藻類循環、水電接駁及多年更新機理仍依賴近景／說明，藻類近景原樹局部遮擋亦保留；未作訪客理解測試。建議A固定背景／U停泊A、循環留DEV，另列B保留DEV待居住偏好設計及C四題替換／權威累積；正式方案未選定，production住宅仍排除。
+
+[本批證據核對](../artifacts/housing-city-h3/evidence-check.json)確認H2現檔9份source及18原PNG hashes一致；H1／H1b所有原圖與各自browser記錄相符、source hashes與歷史commit相符，M／P及共享骨架／藻類構造區段自H1b未改。舊圖只作設計沿革比較，U現況與資源／性能以上方H2為準；本批未重跑tests／build／browser、未重拍／覆寫原圖。文件本地targets／anchors／tracked targets、來源事實及diff檢查由[獨立結果](../artifacts/housing-city-h3/result.json)記錄。固定中值／seed0與全能源的H2通過結果，不證明正式所有狀態／轉場共存；default sustained FPS、展覽硬件、其他平台、訪客理解及工程限制保持。
+
+
+## 住宅 DEV-only 整合 — 2026-10-27
+
+[整合紀錄](../artifacts/housing-city-integration/README.md)記錄feature／整合root checks及main CI實際結果。Feature root `npm test`／`npm run build` PASS；首次sandbox因localhost listen EPERM中斷，取得權限後完整重跑成功。Production住宅source markers仍排除。H2後runtime／tests／package完全相同，9份source與18原PNG hashes核對一致，保留H2有效browser／性能證據，未作新FPS量測或重拍；固定中值／seed0及平台限制不變。H3已coordinator接受；正式A／B／C仍待人類選定，沒有正式render／資料鏈／問卷或部署變更。

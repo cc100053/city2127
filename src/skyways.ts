@@ -2,7 +2,7 @@ import * as T from 'three';
 import { arc, bake, box, chrome, leaf, leafyCrown, paint, stone, trail, trim } from './cityRig.ts';
 import { changeSites, gardenDecks, midDecks, sweepway } from './layout.ts';
 import { routes } from './mobility.ts';
-import layout from './odaiba-layout.json';
+import layout from './odaiba-layout.json' with { type: 'json' };
 import { shoreRoomBays } from './waterRooms.ts';
 
 type P3 = [number, number, number];

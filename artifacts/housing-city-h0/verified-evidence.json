@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-10-26T10:15:01.739Z",
+  "runtimeCommit": "615ad9872aeab2cf021a62affc26e34c2b7e7e28",
+  "files": {
+    "capture.mjs": "bfe0218fdad71d4e4daf3342e1bbd8485fb12a1086a6c30b715f0c062232af4a",
+    "review/baseline-day.png": "2844734993d6363b742b347503c210a8570aca3e5b55ee6337da83ca296095aa",
+    "review/candidates-day.png": "ba2711cb9e25806f262350f35668e5eb1513dd2196cc216c8a7165189af3f2af",
+    "review/browser.json": "a3b611f1a1880f992579f159045d8e5a3e562243f650e0f537cbc78a4f18a8dd",
+    "review/candidates.json": "168b5cdef34999b69a4b773d6a019f90331972f558ae8519ee5f90622c5b0085"
+  }
+}

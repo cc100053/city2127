@@ -1,0 +1,84 @@
+{
+  "taskId": "housing-city",
+  "batchId": "housing-h2-r1",
+  "dispatchId": "housing-h2-r1-rev11",
+  "resultId": "housing-h2-r1-rev11-20261027-final01",
+  "status": "REVIEW_READY",
+  "workerId": "01a1790d-a993-76d3-bf14-fc024a8ed3c8",
+  "coordinatorId": "01a17822-914e-7a52-a897-a34d47a68d70",
+  "checkout": "/Users/fatboy/city2127",
+  "branch": "codex/housing-city",
+  "baselineCommit": "6a27106365e1cf7b6b0d38677baf4f971cf102b1",
+  "checkpointCommit": "5ae56e34e7f439bdaad37d4b99186b298b5b4223",
+  "reportPath": "/Users/fatboy/city2127/artifacts/housing-city-h2/README.md",
+  "evidencePath": "/Users/fatboy/city2127/artifacts/housing-city-h2/final",
+  "validation": {
+    "rootTest": "PASS",
+    "rootBuild": "PASS; existing chunk warning",
+    "whitespace": "PASS after compressing raw diff context",
+    "browser": "PASS",
+    "productionExclusion": "PASS",
+    "geometry": {
+      "nodeExact": 7544,
+      "nodeSweepBoxes": 680,
+      "nodeSweepNearTests": 10923,
+      "nodeActualActorBoxes": 5204836,
+      "browserExact": 7964,
+      "browserSweepNearTests": 11265,
+      "browserHits": 0
+    },
+    "baselineFps": 60.03073200157748,
+    "baselineSeconds": 30.00130000001788,
+    "motionFps": 60.0101317233851,
+    "motionSeconds": 91.00130000001192,
+    "motionPhases": 11,
+    "rendererHousingDelta": {
+      "geometries": 30,
+      "textures": 0,
+      "drawCalls": 51,
+      "triangles": 128652
+    },
+    "nodeHousing": {
+      "meshes": 50,
+      "geometries": 30,
+      "triangles": 128580
+    },
+    "platform": "macOS / Chrome 156.0.8078.47 headless / ANGLE Metal Apple M6 / WebGL2",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "dpr": 1,
+    "fpsQuality": "low",
+    "visualQuality": "default",
+    "exceptions": 0,
+    "warnings": 0,
+    "failedRequests": 0,
+    "originalFinalPngs": 18,
+    "manifestPath": "/Users/fatboy/city2127/artifacts/housing-city-h2/verified-evidence.json",
+    "budgetPath": "/Users/fatboy/city2127/artifacts/housing-city-h2/renderer-budget.json"
+  },
+  "limitations": [
+    "Actual non-route actor matrices sampled at 0.5s; route envelopes and moving/fixed sweeps continuous conservatively.",
+    "Default sustained FPS, exhibition hardware, Safari/iPad/Windows and visitor understanding untested.",
+    "Structural/ecological/accessibility engineering not verified.",
+    "survey and module-swap source unchanged; independent suites not rerun.",
+    "H2 software completion does not claim human visual acceptance; coordinator review pending.",
+    "No main integration or deployment."
+  ],
+  "pendingMajorDecision": "H3 formal background / existing preference / independent accumulated state ownership remains a human product decision.",
+  "allWritersReleased": true,
+  "allOwnedServicesStopped": true,
+  "delivery": {
+    "status": "sent",
+    "authorizationVerified": true,
+    "executionMessageId": "01a17822-ead1-7172-b6da-d82035164927",
+    "standingContractMessageId": "01a1781f-336b-7f22-9eef-dfbb1ee35a04",
+    "confirmedAtUTC": "2026-10-26T16:55:27.311577+00:00",
+    "coordinatorId": "01a17822-914e-7a52-a897-a34d47a68d70",
+    "confirmation": "send_message_to_thread returned the target threadId with isError=false"
+  },
+  "updatedAtUTC": "2026-10-26T16:55:27.311577+00:00",
+  "lastVerifiedCommit": "5ae56e34e7f439bdaad37d4b99186b298b5b4223",
+  "nextAction": "Coordinator reviews this unique result; no source work or H3 integration starts here."
+}

@@ -1,0 +1,48 @@
+{
+  "exact": 7103,
+  "houses": 444,
+  "obstacles": 25529,
+  "homeCorridorChecks": 475,
+  "hits": [
+    {
+      "homeCorridor": 1,
+      "other": "fixed-kit",
+      "parent": "housing-home-infrastructure"
+    },
+    {
+      "homeCorridor": 2,
+      "other": "fixed-kit",
+      "parent": "housing-home-infrastructure"
+    },
+    {
+      "homeCorridor": 3,
+      "other": "fixed-kit",
+      "parent": "housing-home-infrastructure"
+    },
+    {
+      "homeCorridor": 4,
+      "other": "fixed-kit",
+      "parent": "housing-home-infrastructure"
+    },
+    {
+      "homeCorridor": 5,
+      "other": "fixed-kit",
+      "parent": "housing-home-infrastructure"
+    },
+    {
+      "homeCorridor": 6,
+      "other": "fixed-kit",
+      "parent": "housing-home-infrastructure"
+    },
+    {
+      "homeCorridor": 7,
+      "other": "fixed-kit",
+      "parent": "housing-home-infrastructure"
+    },
+    {
+      "homeCorridor": 8,
+      "other": "fixed-kit",
+      "parent": "housing-home-infrastructure"
+    }
+  ]
+}

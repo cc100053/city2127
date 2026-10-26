@@ -1,0 +1,143 @@
+{
+  "taskId": "housing-city",
+  "batchId": "housing-h3-r1",
+  "dispatchId": "housing-h3-r1-rev16",
+  "resultId": "housing-h3-r1-rev16-20261027-final01",
+  "status": "REVIEW_READY",
+  "workerId": "01a1792a-0965-73b3-bd12-e44fd9bf60ff",
+  "coordinatorId": "01a17927-a815-7041-b4d3-aff62d7bd182",
+  "checkout": "/Users/fatboy/city2127",
+  "branch": "codex/housing-city",
+  "baselineCommit": "b27105a02ebecf66d19b4ea546b2fa8523758499",
+  "checkpointCommit": "8f9f8f9b21448aaf26e23f873c179e93f01d0f75",
+  "currentSourceVerifiedCommit": "5ae56e34e7f439bdaad37d4b99186b298b5b4223",
+  "changedFiles": [
+    "docs/HOUSING_CITY_PLAN.md",
+    "docs/PROJECT.md",
+    "docs/EXHIBITION_SPEC.md",
+    "docs/VALIDATION.md",
+    "artifacts/housing-city-h3/README.md",
+    "artifacts/housing-city-h3/evidence-check.json",
+    "artifacts/housing-city-h3/result.json"
+  ],
+  "reportPath": "/Users/fatboy/city2127/artifacts/housing-city-h3/README.md",
+  "evidenceCheckPath": "/Users/fatboy/city2127/artifacts/housing-city-h3/evidence-check.json",
+  "scope": "Documentation-only H3 assessment; no runtime/source/model changes; no main merge.",
+  "assessment": {
+    "retained": "M/P/U original positions, quantities, silhouettes, compound building and secondary designs; no acceptance-critical source fix found.",
+    "legibility": "Hero locates small added forms; systems, algae circulation, utilities and compressed renewal need details/explanation. Tree occlusion preserved. Visitor comprehension untested.",
+    "viewedOriginalPngs": 24,
+    "viewedReferencePngs": 2,
+    "h0h1HumanAccepted": true,
+    "h1bH2SoftwareCoordinatorAccepted": true,
+    "h1bH2HumanVisualAcceptanceClaimed": false
+  },
+  "validation": {
+    "documentation": {
+      "localMarkdownTargets": "PASS",
+      "trackedTargetsIncludingIntendedNewFiles": "PASS",
+      "anchors": "PASS",
+      "targetCount": 350,
+      "anchorCount": 5,
+      "renamedPaths": "NONE; no files renamed",
+      "plainTextPaths": "PASS: source/DEV/evidence paths retained, no stale new path references",
+      "sourceFacts": "PASS: quantities, mode guard, fixed baseline, H2 result metrics and source history reviewed",
+      "fullDiffReview": "PASS exact seven-file staged diff including all new files; coordinator handoff excluded",
+      "whitespace": "PASS working, staged and committed task diff against origin/main"
+    },
+    "runtimeTestsBuildBrowser": "NOT RERUN: docs only, existing H2 hashes remain valid",
+    "h2SourceHashes": 9,
+    "h2OriginalPngHashes": 18,
+    "h1h1bHistoricalSourceAndAllOriginalPngHashes": "PASS",
+    "unchangedH1bMaterialMembraneCollectiveAlgaeSections": "PASS",
+    "originalEvidencePaths": [
+      "/Users/fatboy/city2127/artifacts/housing-city-h1/final",
+      "/Users/fatboy/city2127/artifacts/housing-city-h1b/final",
+      "/Users/fatboy/city2127/artifacts/housing-city-h2/final"
+    ],
+    "retainedH2Measurement": {
+      "sourceResultId": "housing-h2-r1-rev11-20261027-final01",
+      "motionFps": 60.0101317233851,
+      "motionSeconds": 91.00130000001192,
+      "rendererHousingDelta": {
+        "geometries": 30,
+        "textures": 0,
+        "drawCalls": 51,
+        "triangles": 128652
+      },
+      "remeasuredByH3": false
+    }
+  },
+  "pendingDecision": {
+    "status": "NOT_SELECTED",
+    "decisionOwner": "cc100053",
+    "question": "是否採A：原M/P/U（含複合外皮及次設計）原位置／數量作固定背景、U停泊A，90秒循環留DEV，不稱投票結果；或選B保留DEV待獨立居住偏好設計，或C另開四題替換／權威累積方案？",
+    "options": {
+      "A": "Fixed formal background, U docked A; DEV motion retained; no voting causality.",
+      "B": "Keep DEV while independent housing preference and its input source are designed.",
+      "C": "Separate explicitly authorized four-question replacement/authority plan."
+    },
+    "recommendation": "A; proposal only, not authorization",
+    "dependentWork": [
+      "Formal render/lifecycle wiring and production housing inclusion",
+      "All relevant authoritative configurations/transitions coexistence and runtime/recovery/performance validation",
+      "Any independent state/question/schema/history/result-card wiring under B/C only after approved plan"
+    ],
+    "independentNextAction": "Coordinator reviews H3; may assign validated DEV-only Git integration under AGENTS. No worker starts a new batch."
+  },
+  "limitations": [
+    "Fixed middle-score/seed0/all-energy H2 evidence does not validate every formal configuration or transition.",
+    "Default sustained FPS, exhibition hardware, Safari/iPad/Windows and visitor understanding untested.",
+    "Actual actor matrices sampled at 0.5s supplement continuous route envelopes; not universal continuous actor collision proof.",
+    "Structural, ecological, fire/accessibility engineering and new housing resident use/routes unverified.",
+    "Production housing excluded; no survey/database/four-question/Meter/live-timing change, no deployment, no main integration."
+  ],
+  "gitPreflight": {
+    "fetch": "PASS on scoped escalation after initial FETCH_HEAD permission error",
+    "baselineFeatureDivergence": [
+      0,
+      0
+    ],
+    "baselineVersusOriginMain": {
+      "ahead": 14,
+      "behind": 0
+    },
+    "preserved": [
+      "coordinator-owned docs/handoffs/housing-city.md",
+      ".playwright-cli/"
+    ],
+    "unfinishedCommitsAvailableRemotely": true
+  },
+  "allWritersReleased": true,
+  "allOwnedServicesStopped": true,
+  "ownedServicesStarted": [],
+  "delivery": {
+    "status": "coordinator_retrieved",
+    "authorizationVerified": true,
+    "executionMessageId": "01a17822-ead1-7172-b6da-d82035164927",
+    "standingContractMessageId": "01a1781f-336b-7f22-9eef-dfbb1ee35a04",
+    "coordinatorId": "01a17927-a815-7041-b4d3-aff62d7bd182",
+    "callbackSent": false,
+    "callbackAttempts": 2,
+    "callbackOutcome": "AUTO_REVIEW_REJECTED; no further retry or workaround",
+    "autoReviewReason": "Historical authorization retrieved through tools was not accepted by auto-review as trusted direct authorization for messaging this thread.",
+    "receipt": {
+      "sourceThreadId": "01a17927-a815-7041-b4d3-aff62d7bd182",
+      "receivedAtUTC": "2026-10-26T17:13:27.166096+00:00",
+      "channel": "Coordinator message received in this worker conversation",
+      "text": "我已主動讀取並收到H3 result housing-h3-r1-rev16-20261027-final01（report8f9f8f9／metadata7b23bf6），開始review。不要再重試callback；可在delivery記錄coordinator retrieved，以此訊息作receipt（不要冒稱callback sent）。"
+    },
+    "retrievedCheckpointCommit": "7b23bf6",
+    "furtherCallbackRequired": false
+  },
+  "updatedAtUTC": "2026-10-26T17:13:27.166096+00:00",
+  "nextAction": "Coordinator has retrieved H3 and begun review; worker completes delivery metadata only, releases all writers/services and stays idle. Integration requires a new coordinator assignment.",
+  "lastVerifiedCommit": "8f9f8f9b21448aaf26e23f873c179e93f01d0f75",
+  "coordinatorReview": {
+    "status": "ACCEPTED",
+    "checkpointCommit": "78d2720eea606349e69ee98a0584a706233b6577",
+    "assessmentResultId": "housing-h3-r1-rev16-20261027-final01",
+    "formalDecision": "NOT_SELECTED",
+    "note": "Historical worker status/delivery retained; DEV-only integration assigned separately."
+  }
+}

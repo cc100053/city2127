@@ -1,10 +1,10 @@
 import * as T from 'three';
-import { arc, bake, box, futureLight, glass, leaf, membrane, publicLight, solar, stone, trail, trim } from './cityRig';
-import { INTERCHANGE, skyBridges, SPHERE_DOCK } from './layout';
-import { routes } from './mobility';
-import { tidalEdge } from './amphibiousShore';
-import { laneBeaconSites } from './waterRooms';
-import { skyways } from './skyways';
+import { arc, bake, box, futureLight, glass, leaf, membrane, publicLight, solar, stone, trail, trim } from './cityRig.ts';
+import { INTERCHANGE, skyBridges, SPHERE_DOCK } from './layout.ts';
+import { routes } from './mobility.ts';
+import { tidalEdge } from './amphibiousShore.ts';
+import { laneBeaconSites } from './waterRooms.ts';
+import { skyways } from './skyways.ts';
 
 /** What 2127 added around the existing landmarks: sky bridges, the sphere berth, the shore interchange, lane beacons and guideway light lines. */
 export function build2127(scene: T.Scene) {

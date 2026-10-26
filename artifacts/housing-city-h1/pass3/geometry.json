@@ -1,0 +1,137 @@
+{
+  "exact": 3658,
+  "houses": 207,
+  "obstacles": 25529,
+  "hits": [
+    {
+      "housing": "housing-material",
+      "other": "automation-drone-ports",
+      "parent": "automation-district",
+      "box": [
+        -132.32972717285156,
+        32,
+        -174.4949188232422
+      ]
+    },
+    {
+      "housing": "housing-material",
+      "other": "automation-drone-ports",
+      "parent": "automation-district",
+      "box": [
+        -132.32972717285156,
+        32,
+        -174.4949188232422
+      ]
+    },
+    {
+      "housing": "housing-material",
+      "other": "automation-drone-ports",
+      "parent": "automation-district",
+      "box": [
+        -132.32972717285156,
+        32,
+        -174.4949188232422
+      ]
+    },
+    {
+      "housing": "housing-composite-skin",
+      "other": "automation-drone-ports",
+      "parent": "automation-district",
+      "box": [
+        -132.32972717285156,
+        32,
+        -174.4949188232422
+      ]
+    },
+    {
+      "housing": "housing-composite-skin",
+      "other": "automation-drone-ports",
+      "parent": "automation-district",
+      "box": [
+        -132.32972717285156,
+        32,
+        -174.4949188232422
+      ]
+    },
+    {
+      "housing": "housing-composite-skin",
+      "other": "automation-drone-ports",
+      "parent": "automation-district",
+      "box": [
+        -132.32972717285156,
+        32,
+        -174.4949188232422
+      ]
+    },
+    {
+      "housing": "housing-composite-skin",
+      "other": "automation-drone-ports",
+      "parent": "automation-district",
+      "box": [
+        -132.32972717285156,
+        32,
+        -174.4949188232422
+      ]
+    },
+    {
+      "housing": "housing-composite-skin",
+      "other": "automation-drone-ports",
+      "parent": "automation-district",
+      "box": [
+        -132.32972717285156,
+        32,
+        -174.4949188232422
+      ]
+    },
+    {
+      "housing": "housing-composite-skin",
+      "other": "automation-drone-ports",
+      "parent": "automation-district",
+      "box": [
+        -132.32972717285156,
+        32,
+        -174.4949188232422
+      ]
+    },
+    {
+      "housing": "housing-composite-skin",
+      "other": "automation-drone-ports",
+      "parent": "automation-district",
+      "box": [
+        -132.32972717285156,
+        32,
+        -174.4949188232422
+      ]
+    },
+    {
+      "housing": "housing-composite-skin",
+      "other": "automation-drone-ports",
+      "parent": "automation-district",
+      "box": [
+        -132.32972717285156,
+        32,
+        -174.4949188232422
+      ]
+    },
+    {
+      "housing": "housing-composite-skin",
+      "other": "automation-drone-ports",
+      "parent": "automation-district",
+      "box": [
+        -132.32972717285156,
+        32,
+        -174.4949188232422
+      ]
+    },
+    {
+      "housing": "housing-composite-skin",
+      "other": "automation-drone-ports",
+      "parent": "automation-district",
+      "box": [
+        -132.32972717285156,
+        32,
+        -174.4949188232422
+      ]
+    }
+  ]
+}

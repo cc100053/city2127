@@ -1,0 +1,137 @@
+{
+  "taskId": "housing-city",
+  "batchId": "housing-h1b-r1",
+  "dispatchId": "housing-h1b-r1-rev5",
+  "resultId": "housing-h1b-r1-rev5-20261026-final01",
+  "status": "REVIEW_READY",
+  "workerId": "01a17828-38f5-73f1-8ec9-480ecc60db07",
+  "coordinatorId": "01a17822-914e-7a52-a897-a34d47a68d70",
+  "baselineCommit": "45a015e92a037a706123381e17eb7214006e75b0",
+  "implementationBaseline": "1eca33aeeedfa695976ec1658bc0082351744345",
+  "h1ClosureCommits": [
+    "c05f4b3",
+    "1eca33a"
+  ],
+  "durablePatch": "artifacts/housing-city-h1b/checkpoint.patch.gz",
+  "reportPath": "/Users/fatboy/city2127/artifacts/housing-city-h1b/README.md",
+  "validation": {
+    "rootTest": {
+      "status": "PASS",
+      "path": "artifacts/housing-city-h1b/root-test-final.log"
+    },
+    "rootBuild": {
+      "status": "PASS",
+      "path": "artifacts/housing-city-h1b/root-build-final.log",
+      "warning": "existing >500kB chunk"
+    },
+    "browser": {
+      "status": "PASS",
+      "path": "artifacts/housing-city-h1b/final/browser.json",
+      "geometry": {
+        "exact": 7086,
+        "houses": 443,
+        "obstacles": 25529,
+        "homeCorridorChecks": 475,
+        "hits": []
+      },
+      "delta": {
+        "geometries": 36,
+        "textures": 0,
+        "drawCalls": 38,
+        "triangles": 133416
+      },
+      "fps": {
+        "baseline": 60.01432879589322,
+        "mixed": 60.01632870687832
+      }
+    },
+    "sourceAndImageHashes": "PASS verified-evidence.json; 6 sources / 25 originals",
+    "productionExclusion": "PASS bundle does not contain housing DEV markers",
+    "documentationLinks": "PASS",
+    "diffCheck": "PASS",
+    "committedDiffCheck": "PASS git diff --check origin/main...HEAD"
+  },
+  "sourceHashes": {
+    "src/main.ts": "c9be3a5cb36d48bfcdbe2e9d95eba20f535ab4eed40d0718f979ddbfa769453f",
+    "src/devHousing.ts": "a100e8f34001516bb0817c3427e4610f7cdb3ad2f45000ea78b293c01b93a314",
+    "src/housingPrototype.ts": "aa0c5641d14f762d899e0573e292230cbffcd4063c0eb88e2cc8b3ff16b6d30e",
+    "tests/housingH1.browser.mjs": "013de624c1af7eb76f53edeb41b5a9b27e00636e6a96a5d7af9c2a10eaa1289e",
+    "tests/housingCityCheck.ts": "2a14f0953b5043782f09bee22d0bc9b3f2aaa57cac3af22cf7f7d38eb9e7a679",
+    "tests/housingPrototype.test.ts": "a72b5b9eae7b057c07514cac70168d8e4cfc78bfaa41a3b2bd6fa61eeafc9e43"
+  },
+  "limitations": [
+    "No H2 animation or full articulated motion sweep",
+    "Geometry total budget 36 is fully used; H2 must reuse or optimize",
+    "No main integration, hardware, Safari/iPad/Windows, visitor or engineering acceptance",
+    "Some detail views retain existing tree/skyway occlusion; no assets removed for framing",
+    "Static home body corridor checks y>=3.35m only; underbody/rail/dock contacts and articulated H2 sweep unverified",
+    "No default-quality FPS measurement; no survey/module-swap source change or standalone suites",
+    "Coordinator owns current shared handoff; remaining dirty handoff preserved; .playwright-cli excluded"
+  ],
+  "allWritersReleased": true,
+  "allOwnedServicesStopped": true,
+  "callback": {
+    "status": "sent",
+    "targetThreadId": "01a17822-914e-7a52-a897-a34d47a68d70",
+    "authorizationVerified": "Direct human execution turn re-read immediately before callback; standing preference human turn read earlier in worker",
+    "confirmed": true,
+    "deliveredAtUTC": "2026-10-26T12:47:49.586336+00:00",
+    "tool": "send_message_to_thread",
+    "responseThreadId": "01a17822-914e-7a52-a897-a34d47a68d70"
+  },
+  "updatedAtUTC": "2026-10-26T12:47:49.586336+00:00",
+  "checkout": "/Users/fatboy/city2127",
+  "branch": "codex/housing-city",
+  "outcome": "H1 closure pushed; H1b secondary static designs implemented and software verified; visual review pending; H2 not started",
+  "originalImagePaths": [
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/geometry-mixed.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/baseline-12.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/material-12.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/membrane-12.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/mobile-12.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/mixed-12.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/baseline-17.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/material-17.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/membrane-17.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/mobile-17.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/mixed-17.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/baseline-21.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/material-21.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/membrane-21.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/mobile-21.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/mixed-21.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/detail-material.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/detail-membrane.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/detail-mobile.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/detail-collective.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/detail-algae.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/detail-home.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/detail-algae-21.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/hero-after-drag.png",
+    "/Users/fatboy/city2127/artifacts/housing-city-h1b/final/mixed-reduced.png"
+  ],
+  "services": {
+    "vite5188": "stopped; session42630 exit130; lsof no listener",
+    "browserRunners": "completed; finally closed Chrome; process check none"
+  },
+  "review": {
+    "software": "PASS",
+    "h1Human": "accepted in message01a17815-5263-7ae2-9f44-5c8f55732aa6",
+    "h1bVisual": "PENDING coordinator/human",
+    "next": "Review H1b images and exact diff; H2 must reuse/optimize geometry before adding motion"
+  },
+  "quota": {
+    "primaryUsedPercent": 74,
+    "weeklyUsedPercent": 26,
+    "reservePoints": 20,
+    "lastRead": "2026-10-26; before closure"
+  },
+  "authorization": {
+    "executionChat": "01a17822-914e-7a52-a897-a34d47a68d70",
+    "humanMessage": "01a17822-ead1-7172-b6da-d82035164927",
+    "standingPreferenceChat": "01a17818-0759-7ae2-b1fc-1add8051846e",
+    "standingPreferenceMessage": "01a1781f-336b-7f22-9eef-dfbb1ee35a04"
+  },
+  "resultCommit": "1145ffeeef522d1f821fee1815199b951a0a0f3d",
+  "remoteCheckpoint": "origin/codex/housing-city"
+}

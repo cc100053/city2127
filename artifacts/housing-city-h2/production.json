@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "checkedFiles": 1,
+  "excludedHousingMarkers": [
+    "housing-prototype",
+    "housing-review",
+    "\u591a\u5e74\u66f4\u65b0\u58d3\u7e2e\u793a\u610f",
+    "housing-transfer-rig"
+  ],
+  "bundleHashes": {
+    "dist/assets/index-CoRywZWo.js": "e1f98257aa55758da4c6e7aa2a053c0718e4cd821d4347c6fc300abec1db8f43"
+  }
+}

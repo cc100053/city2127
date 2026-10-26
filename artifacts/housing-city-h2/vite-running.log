@@ -1,0 +1,12 @@
+
+> city2127@1.0.0 dev
+> vite --host 127.0.0.1 --port 5188
+
+
+  VITE v7.3.6  ready in 72 ms
+
+  ➜  Local:   http://127.0.0.1:5188/
+1:40:55 AM [vite] (client) page reload src/housingPrototype.ts
+1:40:55 AM [vite] (client) page reload src/devHousing.ts
+1:41:23 AM [vite] (client) page reload src/housingPrototype.ts
+1:41:40 AM [vite] (client) page reload src/housingPrototype.ts

@@ -17,6 +17,7 @@ import { tidalEdge } from '../src/amphibiousShore.ts';
 import { AutomationDistrict, ConcentrationDistrict, SharingDistrict } from '../src/districtMeters.ts';
 import { bayContext } from '../src/bayContext.ts';
 import { acceleratedRaycast, MeshBVH } from 'three-mesh-bvh';
+import { checkHousingCity } from './housingCityCheck.ts';
 
 // The checks below cast tens of thousands of rays at the full district. A BVH per geometry, built on first hit test, returns the same
 // intersections as three's brute-force raycast in a fraction of the time; `indirect` leaves each geometry's own index untouched.
@@ -615,3 +616,5 @@ console.log(`Odaiba: ${visits.length} forecourt visits and ${entrances.length} d
   assert.ok(moved>1000,'strollers walk');
   console.log(`Odaiba: ${total} building occupants (${published.spots.length} placed, ${walkers} strolling, ${riders} riding) draw at full size or not at all, move continuously and never walk in place.`);
 }
+
+checkHousingCity(city);
