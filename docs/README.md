@@ -12,7 +12,7 @@
 | [RESIDENT_COPY](RESIDENT_COPY.md) | P1 日文居民文案與接入條件；P2文案／P3結果接入；設施增加仍須符合實際證據 |
 | [RESIDENT_EXPERIENCE_PLAN](RESIDENT_EXPERIENCE_PLAN.md) | 居民雙屏體驗 P1–P5 計劃、交付及驗收；P1–P3已實作，P4軟件驗證通過，P5驗收表已準備、實機未測 |
 | [ENERGY_CITY_PLAN](ENERGY_CITY_PLAN.md) | 能源篇E1–E5計劃；E1–E4完成並發布main，CI通過；Q3能源獨立累積及權威模型接入，保留舊氣候／歷史；E5目前Mac mini 30分鐘性能／操作量測已完成，實機／訪客另待驗 |
-| [HOUSING_CITY_PLAN](HOUSING_CITY_PLAN.md) | 建築・居住篇H0–H3計劃；PLANNED，仮説1–3視覺比較先行，仮説4只保留概念，本輪不改問卷 |
+| [HOUSING_CITY_PLAN](HOUSING_CITY_PLAN.md) | 建築・居住篇H0–H3；H0具體提案／本機證據待確認，H1–H3未實作；仮説4只保留概念，本輪不改問卷 |
 | [ART](ART.md)／[CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) | 實作美術規則／視覺與世界觀 authority |
 | [VALIDATION](VALIDATION.md) | 今日可執行 checks、dated evidence 入口；不複製全部 handoff |
 | [BLENDER](BLENDER.md) | 素材 source/export/placement 及每台工作站的 MCP 設定契約 |

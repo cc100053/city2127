@@ -13,7 +13,7 @@
 | [回顧章節](day-replay.md) | PLANNED；方向已討論（轉向章節、空檔播、觀眾互動），開工前待owner答6項決定 | cc100053 |
 | [變化說明卡](change-explanation.md) | PLANNED（TODO）；右上卡片直接說明「乜嘢變成乜嘢」，未定案前先用參數前後變動 | cc100053 |
 | [能源城市](energy-city.md) | E1–E4完成並發布main，CI通過；Q3獨立能源權威配置、舊氣候／歷史與正式browser通過；E5本機Mac mini 30分鐘量測與TCP復原已驗；展覽硬件／訪客待驗 | Codex；產品決策cc100053 |
-| [建築・居住](housing-city.md) | PLANNED；[計劃](../HOUSING_CITY_PLAN.md)已寫入，未實作；下一步H0基準配置／設計矩陣／性能上限 | cc100053；實作owner待指定 |
+| [建築・居住](housing-city.md) | H0提案／基準與候選原圖待產品確認；H1–H3未實作；[證據](../../artifacts/housing-city-h0/README.md) | Codex；產品決策cc100053 |
 | [儲能環 polish](storage-ring-polish.md) | 已整合main，實際main CI通過，本機／遠端task分支已安全刪除；[整合交接](energy-polish-integration.md)，原審美／硬件限制保留 | Codex batch owner |
 
 已完成或不再適用的50份交接及Meter截圖見 [歸檔索引](archive/README.md)。歷史下一步不會自動變成backlog；Shibuya不再開發。人類美術review／實機未測等限制保留，不因歸檔而結案。
