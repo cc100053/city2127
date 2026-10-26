@@ -155,6 +155,8 @@ Root tests/build cover root only; install survey dependencies for the real HTTP/
 
 The [previous implementation map](history/PROJECT_2026-10-02.md) is an archived mixed-stage snapshot for old deep links. It is not an architecture authority or a list of future work.
 
+Housing H3（2026-10-27）：[三類／mixed原圖評估及正式接入選項](../artifacts/housing-city-h3/README.md)已交付待coordinator review。本批只更新文件，保留現有三區／數量／輪廓、DEV入口與production排除。Hero定位與近景系統機理分開評價，未作訪客理解測試；建議A以原M／P／U作固定背景、U停泊A，90秒循環留DEV，不宣稱投票因果；B保留DEV待獨立居住偏好設計、C另規劃四題替換／權威累積為替代方案。三者皆未由人類選定，正式render／資料鏈不變。H2有效證據只涵蓋固定中值／seed0及全能源基準，正式接入仍須驗不同權威配置、轉場及資源／恢復生命週期，不能直接沿用DEV通過結果。
+
 ### E4配置接口準備（2026-10-24，非正式接入）
 
 `energyPrototype.configure(EnergyConfiguration)`可獨立設定0／1／2處水庭、無／小／大接收翼、儲能環及能源島；`getConfiguration()`回傳目標的副本。原DEV `select()`五預設沿用此接口，幾何／材質不重建。無儲能的組合沿用外部供電／持續配電，有儲能時沿用60秒節拍。新增36種組合的模型檢查；[E4準備證據](../artifacts/energy-city-e4/README.md)。正式survey、CityView、四軸及schema未變；Q3取捨待[能源方案](ENERGY_CITY_PLAN.md#e4評審草案四題與能源權威配置2026-10-24待產品決定)確認，不能把此接口當作正式權威鏈已接通。

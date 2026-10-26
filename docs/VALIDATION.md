@@ -259,3 +259,9 @@ Chrome156 headless／ANGLE Metal Apple M6／WebGL2，1920×1080 DPR1：default�
 未測default sustained FPS、展覽硬件、Safari／iPad／Windows、訪客理解或工程／生態／無障礙法規；survey／module-swap source未改，未另跑其獨立suite。H2實作／軟件檢查不代替人類視覺簽收，H3正式背景／偏好／累積歸屬仍待人類決定；本批不整合main或部署。
 
 2026-10-27 coordinator核對H2原碼／測試diff、18原PNG及source hashes、mobile搬運／停泊、小屋途中與hero夜景，接受此軟件批次；所有writer／services已釋放，H3交由fresh coordinator評估。未冒稱人類視覺或展覽實機簽收。
+
+## 住宅城市 H3 收斂評估 — 2026-10-27（待coordinator review）
+
+[H3報告／正式選項](../artifacts/housing-city-h3/README.md)：直接查看H1／H1b／H2各8張原PNG及R01／R06，分別評估三類與mixed的數量、位置、輪廓、日暮夜及原城共存；沒有驗收必需的小修，source／asset未改。主鏡頭可定位低層新增量體，藻類循環、水電接駁及多年更新機理仍依賴近景／說明，藻類近景原樹局部遮擋亦保留；未作訪客理解測試。建議A固定背景／U停泊A、循環留DEV，另列B保留DEV待居住偏好設計及C四題替換／權威累積；正式方案未選定，production住宅仍排除。
+
+[本批證據核對](../artifacts/housing-city-h3/evidence-check.json)確認H2現檔9份source及18原PNG hashes一致；H1／H1b所有原圖與各自browser記錄相符、source hashes與歷史commit相符，M／P及共享骨架／藻類構造區段自H1b未改。舊圖只作設計沿革比較，U現況與資源／性能以上方H2為準；本批未重跑tests／build／browser、未重拍／覆寫原圖。文件本地targets／anchors／tracked targets、來源事實及diff檢查由[獨立結果](../artifacts/housing-city-h3/result.json)記錄。固定中值／seed0與全能源的H2通過結果，不證明正式所有狀態／轉場共存；default sustained FPS、展覽硬件、其他平台、訪客理解及工程限制保持。
