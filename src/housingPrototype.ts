@@ -1,5 +1,7 @@
 import * as T from 'three';
-import { bake, box, dark, glass, leaf, leafyCrown, publicLight, stone, trim } from './cityRig.ts';
+import { bake, box, dark, glass, leaf, leafyCrown, membrane, paint, publicLight, stone, trim } from './cityRig.ts';
+
+const algaeCulture = paint('#365b42', .35, .15);
 
 export const HOUSING_OPTIONS = {
   baseline: '基準城市', material: 'M · 輕材架空住宅', membrane: 'P · 植物膜住宅', mobile: 'U · 可換生活艙', mixed: '三類共存 · 複合住宅',
@@ -7,7 +9,9 @@ export const HOUSING_OPTIONS = {
 export type HousingOption = keyof typeof HOUSING_OPTIONS;
 export const HOUSING_SITES = { material: [-135, -175], membrane: [45, -215], mobile: [-265, -60] } as const;
 
-/** H1: fixed parked configurations, independent of votes; every part is built once. */
+export const HOUSING_HOME_ROUTE = { start: [-5.2, 5, -4.4], end: [5.2, 5, -4.4] } as const;
+
+/** H1/H1b: fixed parked configurations, independent of votes; every part is built once. */
 export function housingPrototype() {
   const root = new T.Group(); root.name = 'housing-prototype';
   const parts = { material: new T.Group(), membrane: new T.Group(), mobile: new T.Group() };
@@ -173,6 +177,78 @@ export function housingPrototype() {
   for (const y of [8, 15.2]) { box(u, [20.5, .3, 1.5], [0, y, 6.5], trim); rail(u, 0, y + .15, 7.3, 20.5); }
   u.add(...bake(u));
 
+  // Secondary equipment uses the existing unit stair box: bevels on these small sections would consume the shared H0 budget.
+  const block = (parent: T.Group, size: [number, number, number], at: [number, number, number], finish: T.Material = trim) => {
+    const mesh = new T.Mesh(treadGeometry, finish); mesh.scale.set(...size); mesh.position.set(...at);
+    mesh.castShadow = mesh.receiveShadow = true; parent.add(mesh); return mesh;
+  };
+  const collective = new T.Group(); collective.name = 'housing-collective-frame'; m.add(collective);
+  collective.rotation.y = Math.PI / 2; collective.position.set(8.2, 0, 5.9); collective.scale.z = .7;
+  // One horizontal communal room spans the existing outdoor deck, distinct from the separate Q4 tower.
+  for (const z of [-3, 3]) {
+    block(collective, [8.8, .3, .3], [6.4, 21.3, z]);
+    for (const x of [2, 6.4, 10.8]) {
+      block(collective, [.25, 5, .25], [x, 18.8, z]);
+      block(collective, [.65, .35, .65], [x, 21.3, z], dark);
+    }
+  }
+  for (const x of [2, 10.8]) block(collective, [.3, .3, 6.3], [x, 21.3, 0]);
+  block(collective, [8.5, .2, 5.7], [6.4, 21.55, 0]);
+  for (const x of [4.1, 8.4]) {
+    block(collective, [3.6, .18, 3.5], [x, 16.4, .8]);
+    block(collective, [3.5, 2.8, .14], [x, 17.9, 2.5], glass);
+    block(collective, [3.5, 2.8, .14], [x, 17.9, -.9], glass);
+    for (const dx of [-1.8, 1.8]) block(collective, [.14, 3, 3.5], [x + dx, 17.9, .8]);
+    block(collective, [2.4, .5, .7], [x, 16.8, 2], stone);
+    block(collective, [3.6, .12, .12], [x, 20.6, -.9], dark);
+  }
+  block(collective, [8.5, .2, 1.6], [6.4, 16.4, -2]);
+  collective.add(...bake(collective));
+
+  const algae = new T.Group(); algae.name = 'housing-algae-equipment'; p.add(algae);
+  // Non-emissive green culture behind reflective glass; manifolds, return pipes and filter tank make the loop legible.
+  for (const x of [-8, -4, 0, 4, 8]) {
+    block(algae, [.22, 13, .22], [x, 6.5, 8.1]);
+    block(algae, [3.5, 7, .32], [x, 8.8, 7.6], algaeCulture);
+    block(algae, [3.5, 7, .08], [x, 8.8, 7.82], membrane);
+    for (const dx of [-1.85, 1.85]) block(algae, [.12, 7.4, .4], [x + dx, 8.8, 7.6]);
+    for (const y of [5.1, 12.5]) block(algae, [3.8, .18, .5], [x, y, 7.6]);
+    block(algae, [.12, 9.1, .12], [x, 7.05, 8.35], dark);
+    block(algae, [1.2, .3, 1.2], [x, .25, 8.1], stone);
+  }
+  for (const y of [2.5, 12.9]) block(algae, [18.5, .18, .18], [0, y, 8.35], dark);
+  block(algae, [2.4, 2, 1], [9, 1.2, 7.6], dark);
+  block(algae, [1.8, 1.5, .12], [9, 1.3, 7.02], membrane);
+  algae.add(...bake(algae));
+
+  const relocation = new T.Group(); relocation.name = 'housing-home-infrastructure'; u.add(relocation);
+  // Dedicated update rails stay on the water-side half of the pile deck, separate from the public gallery and module hoist.
+  for (const z of [-5.6, -3.2]) {
+    block(relocation, [16, .18, .22], [0, 2.95, z], dark);
+  }
+  for (const x of [-7.5, -5, -2.5, 0, 2.5, 5, 7.5]) block(relocation, [.5, .18, 3.2], [x, 2.8, -4.4]);
+  for (const x of [-5.2, 5.2]) {
+    block(relocation, [4.2, .14, 4.6], [x, 3.05, -4.4]);
+    block(relocation, [.5, 1.5, .6], [x + 1.9, 3.7, -1.8], dark);
+    block(relocation, [.35, .1, .1], [x + 1.9, 4.3, -2.15], publicLight);
+    block(relocation, [.15, .15, 1], [x + 1.9, 3.1, -2.3], dark);
+    block(relocation, [3.8, .12, 1.4], [x, 3.2, -1.9]);
+    block(relocation, [1.4, .12, 3], [x, 2.96, .3]).rotation.x = Math.atan2(.48, 3);
+  }
+  block(relocation, [1.5, 1.8, 1.2], [9.3, 3.7, -4.4], dark);
+  relocation.add(...bake(relocation));
+  const wholeHome = new T.Group(); wholeHome.name = 'housing-whole-home'; wholeHome.position.set(...HOUSING_HOME_ROUTE.start); u.add(wholeHome);
+  for (const y of [-1.7, 1.7]) block(wholeHome, [3.6, .2, 3.6], [0, y, 0]);
+  for (const x of [-1.7, 1.7]) block(wholeHome, [.2, 3.2, 3.6], [x, 0, 0]);
+  block(wholeHome, [3.2, 3.2, .18], [0, 0, 1.7]);
+  block(wholeHome, [3.1, 2.8, .12], [0, 0, -1.7], glass);
+  block(wholeHome, [.85, 2.3, .14], [.95, -.35, -1.8], dark);
+  block(wholeHome, [.85, 2.3, .14], [.95, -.35, 1.82], dark);
+  block(wholeHome, [.08, 3.1, .15], [-.3, 0, -1.8]);
+  for (const x of [-1.25, 1.25]) for (const z of [-1.2, 1.2]) block(wholeHome, [.5, .22, .5], [x, -1.9, z], dark);
+  block(wholeHome, [1.2, .4, .7], [0, -1.4, 1], stone);
+  wholeHome.add(...bake(wholeHome));
+
   let option: HousingOption = 'baseline';
   const select = (next: HousingOption) => {
     option = next;
@@ -180,5 +256,5 @@ export function housingPrototype() {
     composite.visible = next === 'mixed';
   };
   select(option);
-  return { root, parts, composite, select, get option() { return option; } };
+  return { root, parts, composite, collective, algae, wholeHome, select, get option() { return option; } };
 }

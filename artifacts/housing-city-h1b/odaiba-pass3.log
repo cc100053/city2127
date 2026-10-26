@@ -1,0 +1,20 @@
+Odaiba: 32 roof strolls and 69 roof residents keep to open roof, clear of planting, meadows and sail posts.
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Whole-home body corridor enters housing-home-infrastructure / fixed-kit
+
+true !== false
+
+    at checkHousingCity (file:///Users/fatboy/city2127/tests/housingCityCheck.ts:68:14)
+    at file:///Users/fatboy/city2127/tests/odaiba.test.ts:206:1 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: true,
+  expected: false,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v26.0.0

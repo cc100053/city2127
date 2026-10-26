@@ -4,14 +4,14 @@ import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 
 const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH ?? '/opt/homebrew/lib/node_modules/@playwright/cli/node_modules/playwright/index.mjs').href);
-const out = process.env.CITY2127_EVIDENCE_DIR ?? 'artifacts/housing-city-h1/pass1';
+const out = process.env.CITY2127_EVIDENCE_DIR ?? 'artifacts/housing-city-h1b/new-run';
 assert.ok(!existsSync(`${out}/browser.json`), 'Preserve previous evidence'); mkdirSync(out, { recursive: true });
 const base = process.env.CITY2127_CITY_URL ?? 'http://127.0.0.1:5188';
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const context = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
 const page = await context.newPage(); page.setDefaultTimeout(60000);
 const report = { startedAt: new Date().toISOString(), browser: browser.version(), platform: process.platform, viewport: [1920, 1080], dpr: 1,
-  sourceHashes: Object.fromEntries(['src/main.ts', 'src/devHousing.ts', 'src/housingPrototype.ts', 'tests/housingH1.browser.mjs'].map(f => [f, createHash('sha256').update(readFileSync(f)).digest('hex')])),
+  sourceHashes: Object.fromEntries(['src/main.ts', 'src/devHousing.ts', 'src/housingPrototype.ts', 'tests/housingH1.browser.mjs', 'tests/housingCityCheck.ts', 'tests/housingPrototype.test.ts'].map(f => [f, createHash('sha256').update(readFileSync(f)).digest('hex')])),
   errors: [], warnings: [], failures: [], badResponses: [], shots: [], performance: [] };
 page.on('pageerror', e => report.errors.push(e.message));
 page.on('console', m => { if (['error', 'warning'].includes(m.type())) report.warnings.push({ text: m.text(), url: m.location().url }); });
@@ -71,7 +71,20 @@ try {
       if (intersects)
         hits.push({ housing: h.o.parent?.name, other: other.o.name, parent: other.o.parent?.name, box: other.box.getCenter(new T.Vector3()).toArray() });
     }
-    return { exact, houses: houses.length, obstacles: obstacles.length, hits };
+    const { HOUSING_HOME_ROUTE } = await import('/src/housingPrototype.ts');
+    const home = study.getObjectByName('housing-whole-home'), body = new T.Box3().setFromObject(home); body.min.y = 3.35;
+    const delta = new T.Vector3(...HOUSING_HOME_ROUTE.end).sub(new T.Vector3(...HOUSING_HOME_ROUTE.start));
+    const fixed = [...obstacles, ...houses.filter(h => h.o.parent !== home)];
+    let homeCorridorChecks = 0;
+    for (let i = 0; i <= 24; i++) {
+      const corridor = body.clone().translate(delta.clone().multiplyScalar(i / 24));
+      for (const other of fixed) if (corridor.intersectsBox(other.box)) {
+        homeCorridorChecks++;
+        other.o.geometry.boundsTree ??= new MeshBVH(other.o.geometry, { indirect: true });
+        if (other.o.geometry.boundsTree.intersectsBox(corridor, other.matrix.clone().invert())) hits.push({ homeCorridor: i, other: other.o.name, parent: other.o.parent?.name });
+      }
+    }
+    return { exact, houses: houses.length, obstacles: obstacles.length, homeCorridorChecks, hits };
   });
   writeFileSync(`${out}/geometry.json`, JSON.stringify(report.geometry, null, 2) + '\n');
   assert.deepEqual(report.geometry.hits, [], 'Housing collides with the actual rendered city');
@@ -88,9 +101,10 @@ try {
     }
   }
   await open({ housing: 'mixed', hour: 12, reviewTime: 20 });
-  for (const detail of ['material', 'membrane', 'mobile']) {
+  for (const detail of ['material', 'membrane', 'mobile', 'collective', 'algae', 'home']) {
     await page.getByLabel('住宅比較鏡頭').selectOption(detail); await shot(`detail-${detail}`);
   }
+  await open({ housing: 'mixed', hour: 21, reviewTime: 20, housingView: 'algae' }); await shot('detail-algae-21');
   await page.getByLabel('住宅比較鏡頭').selectOption('hero');
   await page.mouse.move(800, 500); await page.mouse.down(); await page.mouse.move(1200, 600, { steps: 8 }); await page.mouse.up();
   await shot('hero-after-drag');

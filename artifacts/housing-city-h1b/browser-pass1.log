@@ -1,0 +1,102 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Housing collides with the actual rendered city
++ actual - expected
+
++ [
++   {
++     homeCorridor: 1,
++     other: 'fixed-kit',
++     parent: 'housing-home-infrastructure'
++   },
++   {
++     homeCorridor: 2,
++     other: 'fixed-kit',
++     parent: 'housing-home-infrastructure'
++   },
++   {
++     homeCorridor: 3,
++     other: 'fixed-kit',
++     parent: 'housing-home-infrastructure'
++   },
++   {
++     homeCorridor: 4,
++     other: 'fixed-kit',
++     parent: 'housing-home-infrastructure'
++   },
++   {
++     homeCorridor: 5,
++     other: 'fixed-kit',
++     parent: 'housing-home-infrastructure'
++   },
++   {
++     homeCorridor: 6,
++     other: 'fixed-kit',
++     parent: 'housing-home-infrastructure'
++   },
++   {
++     homeCorridor: 7,
++     other: 'fixed-kit',
++     parent: 'housing-home-infrastructure'
++   },
++   {
++     homeCorridor: 8,
++     other: 'fixed-kit',
++     parent: 'housing-home-infrastructure'
++   }
++ ]
+- []
+
+    at file:///Users/fatboy/city2127/tests/housingH1.browser.mjs:90:10 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [
+    {
+      homeCorridor: 1,
+      other: 'fixed-kit',
+      parent: 'housing-home-infrastructure'
+    },
+    {
+      homeCorridor: 2,
+      other: 'fixed-kit',
+      parent: 'housing-home-infrastructure'
+    },
+    {
+      homeCorridor: 3,
+      other: 'fixed-kit',
+      parent: 'housing-home-infrastructure'
+    },
+    {
+      homeCorridor: 4,
+      other: 'fixed-kit',
+      parent: 'housing-home-infrastructure'
+    },
+    {
+      homeCorridor: 5,
+      other: 'fixed-kit',
+      parent: 'housing-home-infrastructure'
+    },
+    {
+      homeCorridor: 6,
+      other: 'fixed-kit',
+      parent: 'housing-home-infrastructure'
+    },
+    {
+      homeCorridor: 7,
+      other: 'fixed-kit',
+      parent: 'housing-home-infrastructure'
+    },
+    {
+      homeCorridor: 8,
+      other: 'fixed-kit',
+      parent: 'housing-home-infrastructure'
+    }
+  ],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v26.0.0

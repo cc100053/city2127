@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { Box3, InstancedMesh, Matrix4, Mesh, Vector3 } from 'three';
 import { leaf } from '../src/cityRig.ts';
-import { HOUSING_OPTIONS, HOUSING_SITES, housingPrototype } from '../src/housingPrototype.ts';
+import { HOUSING_HOME_ROUTE, HOUSING_OPTIONS, HOUSING_SITES, housingPrototype } from '../src/housingPrototype.ts';
 
 const study = housingPrototype(), resources: unknown[] = [];
 study.root.traverse(o => { if (o instanceof Mesh) resources.push(o.uuid, o.geometry, o.material); });
@@ -34,7 +34,16 @@ for (const [name, part] of Object.entries(study.parts)) {
   });
 }
 assert.ok(triangles <= 150_000, `Housing triangles ${triangles} exceed H0 budget`);
-assert.ok(geometries.size <= 36 && meshes <= 36);
+assert.ok(geometries.size <= 36, `${geometries.size} geometries exceed the total housing budget`);
+assert.ok(meshes <= 80, `${meshes} batches exceed the total housing draw budget`);
+const collectiveSize = new Box3().setFromObject(study.collective).getSize(new Vector3());
+assert.ok(Math.max(collectiveSize.x, collectiveSize.z) > collectiveSize.y * 1.5, 'The secondary collective frame stays horizontal');
+study.algae.traverse(o => { if (o instanceof Mesh && !Array.isArray(o.material) && 'emissive' in o.material) assert.equal((o.material.emissive as { getHex(): number }).getHex(), 0, 'Algae equipment is not self-lit'); });
+assert.equal(study.wholeHome.parent, study.parts.mobile);
+assert.deepEqual(study.wholeHome.position.toArray(), HOUSING_HOME_ROUTE.start);
+const destination = new Box3().setFromObject(study.wholeHome).translate(new Vector3(...HOUSING_HOME_ROUTE.end).sub(new Vector3(...HOUSING_HOME_ROUTE.start)));
+const [ux, uz] = HOUSING_SITES.mobile;
+assert.ok(new Box3(new Vector3(ux - 12, 0, uz - 9), new Vector3(ux + 12, 28, uz + 9)).containsBox(destination), 'The second dock remains in the agreed U reservation');
 assert.equal(leaf.emissive.getHex(), 0, 'Living membrane is not self-lit');
 const after: unknown[] = [];
 for (let i = 0; i < 20; i++) { study.select('baseline'); study.select('mixed'); }

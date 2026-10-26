@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "sourceHashesVerified": true,
+  "imageHashesVerified": 25,
+  "delta": {
+    "geometries": 36,
+    "textures": 0,
+    "drawCalls": 38,
+    "triangles": 133416
+  },
+  "fps": {
+    "baseline": 60.01432879589322,
+    "mixed": 60.01632870687832
+  },
+  "geometry": {
+    "exact": 7086,
+    "houses": 443,
+    "obstacles": 25529,
+    "homeCorridorChecks": 475,
+    "hits": []
+  },
+  "errors": [],
+  "warnings": [],
+  "failures": [],
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)"
+}

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { Box3, Group, InstancedMesh, Line3, Matrix4, Mesh, Object3D, Ray, Scene, Sphere, Vector3 } from 'three';
 import { MeshBVH } from 'three-mesh-bvh';
-import { housingPrototype } from '../src/housingPrototype.ts';
+import { HOUSING_HOME_ROUTE, housingPrototype } from '../src/housingPrototype.ts';
 import { routes } from '../src/mobility.ts';
 import { changeSites } from '../src/layout.ts';
 import { heroCamera } from '../src/heroCamera.ts';
@@ -55,6 +55,20 @@ export function checkHousingCity(city: Object3D) {
       `housing ${h.mesh.parent?.name} intersects ${other.mesh.name} / ${other.mesh.parent?.name}`);
   }
   const path = routes(), sphere = new Sphere(), camera = heroCamera(1920, 1080);
+  // Static reserved body corridor above the rail/dock interface; H2 must still verify each articulated moving part.
+  const body = new Box3().setFromObject(housing.wholeHome); body.min.y = 3.35;
+  const shift = new Vector3().subVectors(new Vector3(...HOUSING_HOME_ROUTE.end), new Vector3(...HOUSING_HOME_ROUTE.start));
+  const fixed = [...obstacles, ...houses.filter(h => h.mesh.parent !== housing.wholeHome)];
+  let homeRouteChecks = 0;
+  for (let i = 0; i <= 24; i++) {
+    const corridor = body.clone().translate(shift.clone().multiplyScalar(i / 24));
+    for (const other of fixed) if (corridor.intersectsBox(other.box)) {
+      other.mesh.geometry.boundsTree ??= new MeshBVH(other.mesh.geometry, { indirect: true });
+      homeRouteChecks++;
+      assert.equal(other.mesh.geometry.boundsTree.intersectsBox(corridor, other.matrix.clone().invert()), false,
+        `Whole-home body corridor enters ${other.mesh.parent?.name} / ${other.mesh.name}`);
+    }
+  }
   camera.updateMatrixWorld(true);
   let routeChecks = 0;
   for (const [key, value] of Object.entries(path)) for (const curve of Array.isArray(value) ? value : [value]) {
@@ -74,5 +88,5 @@ export function checkHousingCity(city: Object3D) {
       assert.ok(!hit || hit.point.clone().applyMatrix4(h.matrix).distanceTo(camera.position) > delta.length(), 'Housing blocks focal hero sightline');
     }
   }
-  console.log(`PASS housing H1 city: actual landmark/environment/planting fixture, ${exact} exact mesh checks, route envelopes (${routeChecks} near tests) and 20 focal sightlines.`);
+  console.log(`PASS housing H1b city: actual landmark/environment/planting fixture, ${exact} exact mesh checks, route envelopes (${routeChecks} near tests), home body corridor (${homeRouteChecks} near tests) and 20 focal sightlines.`);
 }
