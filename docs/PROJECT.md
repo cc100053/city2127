@@ -149,7 +149,7 @@ City canvas diagnostics update every120 rendered frames: `data-fps` is the mean 
 
 ## Verification and historical references
 
-Housing H0（2026-10-26）：[檢查runner與提案](../artifacts/housing-city-h0/README.md)以既有DEV Meter入口、立即套用四類能源共存及鎖定hero，透過單次browser response instrumentation檢查候選預留體積，沒有修改runtime／公開新query入口。位置、性能預算及夜間方案待產品確認；H1–H3尚未實作，正式survey資料流不變。最新owner／quota／簽收狀態見[住宅交接](handoffs/housing-city.md)。
+Housing H0（2026-10-26）：[檢查runner與提案](../artifacts/housing-city-h0/README.md)以既有DEV Meter入口、立即套用四類能源共存及鎖定hero，透過單次browser response instrumentation檢查候選預留體積，沒有修改runtime／公開新query入口。位置、性能預算及夜間方案已由cc100053確認；H1–H3尚未實作，正式survey資料流不變。最新owner／quota／簽收狀態見[住宅交接](handoffs/housing-city.md)。
 
 Root tests/build cover root only; install survey dependencies for the real HTTP/WebSocket pipeline tests. Survey and module-swap have separate checks. Browser/performance evidence is tied to the captured commit/device, never inferred from geometry counts or earlier Shibuya FPS. S5, input hardware and exhibition-day recovery policy remain unresolved. See [current validation](VALIDATION.md) and [document index](README.md).
 

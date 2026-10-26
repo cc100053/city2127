@@ -4,9 +4,9 @@
 - Owner / active coordinator: Codex，chat `01a177a5-78d8-7c20-8d07-5daa1f099905`，host `local`；產品決策／簽收：cc100053
 - Checkout: `/Users/fatboy/city2127`
 - Branch: `docs/housing-city-plan`（恢復同一住宅任務；尚未建立H1分支）
-- State revision / batch: 2 / housing-h0-r1
-- Status: NEEDS_INPUT（H0已可審閱，未獲簽收）；另有WAITING_QUOTA限制，不可開始H1實作
-- Last actual progress: 2026-10-26 10:16 UTC（19:16 JST）；H0完整檢查PASS，checkpoint 80ecf72已推送任務分支
+- State revision / batch: 3 / housing-h0-r1（accepted）；下一批housing-h1-r1
+- Status: WAITING_QUOTA（H0已由cc100053簽收；等待已授權的20:25 JST續作）
+- Last actual progress: 2026-10-26 10:21 UTC（19:21 JST）；收到H0簽收及單次續作授權，automation h1已建立
 - Base / starting commit: `615ad9872aeab2cf021a62affc26e34c2b7e7e28`（計劃文件提交，父commit `c94e92f5d1b1dd5518e24019a8d0b67b692d4fce`）
 - Last verified runtime commit: `615ad9872aeab2cf021a62affc26e34c2b7e7e28`；H0 runner／證據已驗證於checkpoint `80ecf72`，驗證見下方
 - Evidence / durable checkpoint: [H0 README](../../artifacts/housing-city-h0/README.md)、`artifacts/housing-city-h0/review/`原PNG／JSON、本文；checkpoint `80ecf72`，本機及origin/docs/housing-city-plan均可取回
@@ -17,7 +17,7 @@
 直接使用者指示來源：上述chat，2026-10-26「[$task-relay] … do the whole implementation of [HOUSING_CITY_PLAN.md]」。允許同一任務的實作、檢查、文件及AGENTS規定的feature branch commit／push／驗證後整合。
 計劃是穩定spec，本交接是唯一current-state checkpoint；沒有另建競爭的.task-relay state。
 未授權新user-visible worker／successor chats或向其他chat傳訊；task-relay可用bounded subagents，但本批未派發、沒有其他writer。
-沒有deadline。90秒壓縮循環已由同chat的使用者選項回覆確認；H0具體提案仍等待另一個已發出的async問題。
+沒有deadline。90秒壓縮循環已由同chat的使用者選項回覆確認。2026-10-26 19:19 JST使用者直接回覆H0問題「確認，按提案繼續（建議）」；同一則回覆選「20:25 自動續作（建議）」，授權2026-10-26 20:25 Asia/Tokyo在本chat單次續作。這不授權無限週期或另開worker／successor chat。
 排除survey、資料庫、四題、Meter、live時序、外部素材包、部署；H3正式接入仍須產品另選定歸屬，不可自行加入題目或假稱投票因果。
 
 ## Session Git state
@@ -40,7 +40,7 @@
 - 預算：相對本機low基準新增≤36 geometries／0 textures／80 calls／150k triangles；50 FPS最低，H1／H2動態各須30秒rAF實測。
 - H1五配置同輪比較；主設計簽收後H1b次設計；H2按已選90秒多年更新壓縮循環；H3先收斂評估，正式接入不能自行決定。
 
-H0不標COMPLETE：計劃要求cc100053確認；H1／H1b截圖簽收亦不能由agent自稱完成。
+H0：COMPLETE／ACCEPTED（2026-10-26，本chat直接人類回覆確認以上提案）。H1／H1b截圖簽收及H3正式接入評估仍按計劃，不可由agent自稱human accepted。
 
 ## Actual validation
 
@@ -56,13 +56,15 @@ H0不標COMPLETE：計劃要求cc100053確認；H1／H1b截圖簽收亦不能由
 
 ## Relay / quota / delivery
 
-- No worker, pending dispatch, cursor, callback or accepted result. Current review result ID: housing-h0-r1（只代表可審閱，非human accepted）。
+- No worker, pending dispatch, cursor or callback. Accepted result ID: housing-h0-r1；H0直接人類簽收已記錄，未派發H1。
 - Quota last read: primary 82% used，18% remaining，300min window resets `2026-10-26T11:22:04Z`；weekly13% used。task-relay預設保留20 percentage points，因此停止新substantial批次，剩餘用於驗證與closure。
-- Earliest recovery check: `2026-10-26T11:25:00Z`（2026-10-26 20:25 JST）；必須重讀使用量及H0回覆再決定，不因重設時間到便假定可派發。
-- Wakeup: NOT ARMED；已發async問題詢問使用者是否授權20:25在本chat續作。未有confirmed tool result前不可聲稱自動續作。
+- Earliest recovery check: `2026-10-26T11:25:00Z`（2026-10-26 20:25 JST）；必須重讀實際使用量、checkout及owner狀態再決定，不因重設時間到便假定可派發；H0人類確認已完成。
+- Wakeup: ARMED，automation ID `h1`，kind heartbeat／ACTIVE，target_thread_id為本chat。automation_update create成功並view確認；保存的單次COUNT=1規則指定20:25:00，下一次為2026-10-26 20:25 JST（11:25 UTC）。本機automation.toml已核實目標與規則；tool未另回傳next_run欄位，不代表已執行。只授權此一次；若未恢復足夠配額，保存狀態後告知，不自行轉成無限重試。
 - Services: 本批Vite5188、全部Playwright browsers由本owner啟動；已停止Vite（session3274 exit130），lsof確認5188無listener；browser runner均finally close，沒有本批服務留待續作。
 
 ## Next action
 
-先讀取／記錄本chat的H0簽收及20:25續作問題回覆。H0未獲確認時不開始H1；配額回到batch＋reserve可容納後，才按已接受H0建立隔離DEV五配置及模型／Node檢查。
+於2026-10-26 20:25 JST單次wakeup讀本checkpoint、核實active coordinator／checkout／branch／remote及實際配額。配額回到batch＋reserve可容納後，按已接受H0開始H1隔離DEV五配置及模型／Node檢查；不重做H0、不再詢問已確認的H0選擇。記錄automation執行結果，完成或離開該單次恢復後移除／停用本automation（不影響其他排程）。
 如手動恢復：在本chat輸入「$task-relay 繼續 housing-city」，讀本交接、核實checkout／HEAD／owner及fetch，再續下一步，不重做已保存H0原圖。
+
+2026-10-26 acceptance-turn preflight：HEAD461a2d0，初始只有既有.playwright-cli/；sandbox fetch因FETCH_HEAD權限失敗後獲准重跑成功，origin/main仍c94e92f；HEAD對main ahead3／behind0，對同名upstream0／0。本輪只記錄產品簽收與排程，沒有重跑npm test/build（runtime未改）；本地文件連結／diff另驗。
