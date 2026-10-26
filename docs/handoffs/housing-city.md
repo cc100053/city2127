@@ -4,13 +4,13 @@
 - Owner / active coordinator: Codex，chat `01a177a5-78d8-7c20-8d07-5daa1f099905`，host `local`；產品決策／簽收：cc100053
 - Checkout: `/Users/fatboy/city2127`
 - Branch: `docs/housing-city-plan`（恢復同一住宅任務；尚未建立H1分支）
-- State revision / batch: 1 / housing-h0-r1
+- State revision / batch: 2 / housing-h0-r1
 - Status: NEEDS_INPUT（H0已可審閱，未獲簽收）；另有WAITING_QUOTA限制，不可開始H1實作
-- Last actual progress: 2026-10-26 10:10 UTC（19:10 JST）；H0候選／原圖／量測／預算保存
+- Last actual progress: 2026-10-26 10:16 UTC（19:16 JST）；H0完整檢查PASS，checkpoint 80ecf72已推送任務分支
 - Base / starting commit: `615ad9872aeab2cf021a62affc26e34c2b7e7e28`（計劃文件提交，父commit `c94e92f5d1b1dd5518e24019a8d0b67b692d4fce`）
-- Last verified runtime commit: `615ad9872aeab2cf021a62affc26e34c2b7e7e28`；H0 runner／文件為本批工作樹，驗證見下方
-- Evidence / durable checkpoint: [H0 README](../../artifacts/housing-city-h0/README.md)、`artifacts/housing-city-h0/review/`原PNG／JSON、本文；提交hash待closure回填
-- Remote / integration: 原計劃提交未在origin/main；本批尚未push／整合，沒有main CI完成宣稱
+- Last verified runtime commit: `615ad9872aeab2cf021a62affc26e34c2b7e7e28`；H0 runner／證據已驗證於checkpoint `80ecf72`，驗證見下方
+- Evidence / durable checkpoint: [H0 README](../../artifacts/housing-city-h0/README.md)、`artifacts/housing-city-h0/review/`原PNG／JSON、本文；checkpoint `80ecf72`，本機及origin/docs/housing-city-plan均可取回
+- Remote / integration: 原計劃提交未在origin/main；checkpoint `80ecf72`已push至origin/docs/housing-city-plan，對remote counterpart ahead0／behind0；未整合main，沒有main CI完成宣稱
 
 ## Authorization and scope
 
@@ -25,7 +25,7 @@
 - 啟動確認cwd為city2127；branch `docs/housing-city-plan` @ `615ad98`。
 - 初始僅有未追蹤 `.playwright-cli/`，保留不動，沒有已追蹤檔案差異。
 - 初始 `git fetch --prune origin` 成功；origin/main = `c94e92f`；HEAD對origin/main ahead1／behind0，本地main等於origin/main。
-- 本task branch沒有remote counterpart／upstream，沒有divergence需要整合；未自動merge或pull main。
+- 啟動時本task branch沒有remote counterpart／upstream；本批closure push後已建立同名upstream，ahead0／behind0。未自動merge或pull main。
 - 稍後額外 `git ls-remote` 在sandbox內因DNS失敗；發布前已獲准重新fetch成功，遠端origin/main仍為c94e92f。
 - 同repo上一個規劃chat為idle，本輪沒有派發或交接其他writer；沒有修改既有binary assets；本批只新增檢查PNG。
 
