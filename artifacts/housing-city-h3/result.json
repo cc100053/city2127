@@ -9,7 +9,7 @@
   "checkout": "/Users/fatboy/city2127",
   "branch": "codex/housing-city",
   "baselineCommit": "b27105a02ebecf66d19b4ea546b2fa8523758499",
-  "checkpointCommit": null,
+  "checkpointCommit": "8f9f8f9b21448aaf26e23f873c179e93f01d0f75",
   "currentSourceVerifiedCommit": "5ae56e34e7f439bdaad37d4b99186b298b5b4223",
   "changedFiles": [
     "docs/HOUSING_CITY_PLAN.md",
@@ -42,8 +42,8 @@
       "renamedPaths": "NONE; no files renamed",
       "plainTextPaths": "PASS: source/DEV/evidence paths retained, no stale new path references",
       "sourceFacts": "PASS: quantities, mode guard, fixed baseline, H2 result metrics and source history reviewed",
-      "fullDiffReview": "PASS; task-owned docs and all new files reviewed; shared handoff excluded",
-      "whitespace": "PASS working diff; staged/committed checks required before push"
+      "fullDiffReview": "PASS exact seven-file staged diff including all new files; coordinator handoff excluded",
+      "whitespace": "PASS working, staged and committed task diff against origin/main"
     },
     "runtimeTestsBuildBrowser": "NOT RERUN: docs only, existing H2 hashes remain valid",
     "h2SourceHashes": 9,
@@ -118,6 +118,7 @@
     "standingContractMessageId": "01a1781f-336b-7f22-9eef-dfbb1ee35a04",
     "coordinatorId": "01a17927-a815-7041-b4d3-aff62d7bd182"
   },
-  "updatedAtUTC": "2026-10-26T17:10:51.082774+00:00",
-  "nextAction": "Coordinator reviews unique H3 result and original evidence; formal decision stays pending; worker stops after callback."
+  "updatedAtUTC": "2026-10-26T17:11:47.733589+00:00",
+  "nextAction": "Coordinator reviews unique H3 result and original evidence; formal decision stays pending; worker stops after callback.",
+  "lastVerifiedCommit": "8f9f8f9b21448aaf26e23f873c179e93f01d0f75"
 }
