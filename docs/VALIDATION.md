@@ -270,3 +270,5 @@ Chrome156 headless／ANGLE Metal Apple M6／WebGL2，1920×1080 DPR1：default�
 ## 住宅 DEV-only 整合 — 2026-10-27
 
 [整合紀錄](../artifacts/housing-city-integration/README.md)記錄feature／整合root checks及main CI實際結果。Feature root `npm test`／`npm run build` PASS；首次sandbox因localhost listen EPERM中斷，取得權限後完整重跑成功。Production住宅source markers仍排除。H2後runtime／tests／package完全相同，9份source與18原PNG hashes核對一致，保留H2有效browser／性能證據，未作新FPS量測或重拍；固定中值／seed0及平台限制不變。H3已coordinator接受；正式A／B／C仍待人類選定，沒有正式render／資料鏈／問卷或部署變更。
+
+整合結果 `1aa3d7f` 已push並fetch核對；[main CI 40368091018](https://github.com/cc100053/city2127/actions/runs/40368091018)實際completed／success，root／survey／module-swap及whitespace全部通過。後續交付紀錄不改runtime；詳細SHA、logs及release見整合result。

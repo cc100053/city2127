@@ -2,7 +2,7 @@
   "taskId": "housing-city",
   "dispatchId": "housing-h3-integration-rev18",
   "resultId": "housing-h3-integration-rev18-20261027-final01",
-  "status": "LOCAL_VERIFIED_MAIN_CI_PENDING",
+  "status": "REVIEW_READY",
   "workerId": "01a17935-7d58-79b1-a8d8-600ccf889ee8",
   "coordinatorId": "01a17927-a815-7041-b4d3-aff62d7bd182",
   "baselineCommit": "78d2720eea606349e69ee98a0584a706233b6577",
@@ -33,14 +33,15 @@
     }
   },
   "delivery": {
-    "status": "PENDING",
+    "status": "COORDINATOR_RETRIEVAL_PENDING",
     "callbackSent": false,
     "callbackAttempts": 0,
     "authorizationVerified": true,
     "executionMessageId": "01a17822-ead1-7172-b6da-d82035164927",
-    "standingContractMessageId": "01a1781f-336b-7f22-9eef-dfbb1ee35a04"
+    "standingContractMessageId": "01a1781f-336b-7f22-9eef-dfbb1ee35a04",
+    "note": "Coordinator wait_threads retrieval is sufficient; no callback attempted during low-quota checkpoint closure."
   },
-  "allWritersReleased": false,
+  "allWritersReleased": true,
   "allOwnedServicesStopped": true,
   "ownedServicesStarted": [],
   "preflight": {
@@ -65,12 +66,148 @@
   "integratedTreeEqualsFeature": true,
   "integratedRuntimeEvidenceHashes": "PASS: 9 source and 18 PNG remain identical after merge",
   "mainCI": {
-    "status": "PENDING",
-    "actualRunRequired": true
+    "conclusion": "success",
+    "databaseId": 40368091018,
+    "headSha": "1aa3d7ff3b4c42772026c6b20a0c95602ed5d5e9",
+    "jobs": [
+      {
+        "completedAt": "2026-10-26T17:27:59Z",
+        "conclusion": "success",
+        "databaseId": 121731141383,
+        "name": "check",
+        "startedAt": "2026-10-26T17:23:05Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-26T17:23:06Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-26T17:23:06Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T17:23:28Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v5",
+            "number": 2,
+            "startedAt": "2026-10-26T17:23:06Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T17:23:30Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-node@v5",
+            "number": 3,
+            "startedAt": "2026-10-26T17:23:28Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T17:23:32Z",
+            "conclusion": "success",
+            "name": "Run npm ci",
+            "number": 4,
+            "startedAt": "2026-10-26T17:23:30Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T17:23:33Z",
+            "conclusion": "success",
+            "name": "Run npm ci --prefix survey",
+            "number": 5,
+            "startedAt": "2026-10-26T17:23:32Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T17:27:37Z",
+            "conclusion": "success",
+            "name": "Run npm test",
+            "number": 6,
+            "startedAt": "2026-10-26T17:23:33Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T17:27:42Z",
+            "conclusion": "success",
+            "name": "Run npm run build",
+            "number": 7,
+            "startedAt": "2026-10-26T17:27:37Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T17:27:50Z",
+            "conclusion": "success",
+            "name": "survey",
+            "number": 8,
+            "startedAt": "2026-10-26T17:27:42Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T17:27:56Z",
+            "conclusion": "success",
+            "name": "module-swap",
+            "number": 9,
+            "startedAt": "2026-10-26T17:27:50Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T17:27:56Z",
+            "conclusion": "success",
+            "name": "Check diff whitespace",
+            "number": 10,
+            "startedAt": "2026-10-26T17:27:56Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T17:27:56Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-node@v5",
+            "number": 19,
+            "startedAt": "2026-10-26T17:27:56Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T17:27:56Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v5",
+            "number": 20,
+            "startedAt": "2026-10-26T17:27:56Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T17:27:56Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 21,
+            "startedAt": "2026-10-26T17:27:56Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/cc100053/city2127/actions/runs/40368091018/job/121731141383"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/cc100053/city2127/actions/runs/40368091018",
+    "packages": [
+      "root",
+      "survey",
+      "module-swap"
+    ]
   },
   "quotaAtIntegrationCheckpoint": {
     "primaryRemainingPercent": 16,
     "weeklyRemainingPercent": 58,
     "pauseStrictlyBelowPercent": 15
-  }
+  },
+  "checkpointCommit": "1aa3d7ff3b4c42772026c6b20a0c95602ed5d5e9",
+  "pushedMainSHA": "1aa3d7ff3b4c42772026c6b20a0c95602ed5d5e9",
+  "pendingFormalDecision": "A/B/C NOT_SELECTED; no formal production housing or authority changes",
+  "completedAtUTC": "2026-10-26T17:29:27.606730+00:00",
+  "nextAction": "Coordinator retrieves/reviews this DEV-only integration result, updates the coordinator-owned handoff, and holds formal render/data work for human A/B/C decision.",
+  "limitations": [
+    "No repeated image/FPS suite: unchanged H2 identity verified before/after merge.",
+    "No default sustained FPS, exhibition hardware, Safari/iPad/Windows or visitor/engineering acceptance.",
+    "Fixed middle-score/seed0/all-energy evidence does not cover every formal configuration/transition.",
+    "No deployment; preserved original evidence, feature branch and .playwright-cli."
+  ]
 }

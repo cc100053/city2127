@@ -17,3 +17,9 @@ feature與整合root checks、production排除、Git／main CI實際結果及log
 未測default sustained FPS、展覽硬件、Safari／iPad／Windows、訪客理解或結構／生態／無障礙工程。正式render／資料鏈及所有權威配置／轉場共存須等人類選定方案後另做。保留原圖、既有.playwright-cli及feature branch，沒有部署。
 
 整合merge `5699d83ae06a5ee900951fddca6fa8e3e60f7504` 無衝突，tree與feature `b244209` 完全一致；feature及整合root test／build／production排除／committed whitespace全部PASS。Logs：feature-test.log、feature-build.log、integrated-test.log、integrated-build.log。整合後重核9source／18PNG一致。Main push／CI待下方最終紀錄。
+
+## 最終交付
+
+已推送並fetch確認main `1aa3d7ff3b4c42772026c6b20a0c95602ed5d5e9`；實際[main CI 40368091018](https://github.com/cc100053/city2127/actions/runs/40368091018) completed／success，root、survey、module-swap與whitespace全部通過。Result ID `housing-h3-integration-rev18-20261027-final01`；merge／feature／檢查SHA與完整steps在result.json。此後只作交付紀錄提交，runtime仍為H2已驗證原碼。
+
+本worker沒有啟動DEV／preview／browser服務，root測試內的HTTP／WebSocket已隨suite退出；所有writer／owned services釋放。Quota通知primary剩12%後只完成既有CI／安全checkpoint，無新增實作、無reset credit／model切換／排程。Callback未嘗試，以coordinator既有wait_threads讀取最終結果；共享handoff未被本worker改動或stage。
