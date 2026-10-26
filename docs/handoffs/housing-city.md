@@ -1,16 +1,13 @@
-# housing-city — 建築・居住多樣性
-
-## Current relay checkpoint
+# housing-city — Current relay checkpoint
 
 - Task / stable specification: housing-city；[HOUSING_CITY_PLAN](../HOUSING_CITY_PLAN.md)，H0–H3，無deadline。
-- State revision / current batch: 10 / housing-h1b-r1（已review）；下一批housing-h2-r1尚未派發。
-- Status: WAITING_QUOTA，primary已用80–81%，到20 points保留線；不開始新的實作批次。
-- Active coordinator: chat `01a17822-914e-7a52-a897-a34d47a68d70`，host local。
-- Worker owner: none；worker `01a17828-38f5-73f1-8ec9-480ecc60db07`已完成、明確釋放所有source writers／services；metadata callback記錄已commit後idle。
+- Revision / status: 15 / HANDOFF_PENDING。H2已coordinator接受，successor已建立且active身份已原子轉移；待activation。Succession ID housing-h3-coordinator-rev14。
+- Active coordinator: `01a17927-a815-7041-b4d3-aff62d7bd182`，host local；只有本文active coordinator可派發或修改current state。前coordinator `01a17822-914e-7a52-a897-a34d47a68d70`已release dispatch，僅完成本transfer文件commit／push與activation，不再另派implementation。
+- Worker owner: none；H2 worker `01a1790d-a993-76d3-bf14-fc024a8ed3c8`所有source writer／owned services已release，callback metadata已push，wait cursor67確認idle。
 - Checkout / branch: `/Users/fatboy/city2127` / `codex/housing-city`，upstream `origin/codex/housing-city`。
-- Actual source checkpoint: H1 `c05f4b3`＋closure `1eca33a`；H1b `1145ffeeef522d1f821fee1815199b951a0a0f3d`，result/callback metadata `3e6e745`、coordinator review `6dcfed3`，全部已push。
-- Last actual progress: 2026-10-26T12:50:10.249912+00:00；coordinator已review H1b原圖／diff／source hashes並接受軟件批次，H2仍未開始。
-- Product acceptance: cc100053；H0／H1已人類簽收，H1b未冒稱人類簽收；H3正式歸屬另決定。
+- Actual checkpoint: H2 source `5ae56e34e7f439bdaad37d4b99186b298b5b4223`、result `480037c`、confirmed callback `245f03c`，全部已push；source hashes與現檔一致。
+- Last progress: 2026-10-26T16:58:51.197515+00:00，H2 source／tests／原圖／hash／結果review完成，接受此批軟件；未冒稱人類H2視覺簽收。
+- Succession reason: 本coordinator累積H0–H2多輪實作／除錯歷史；H2是已釋放writer的安全milestone，H3改由fresh coordinator從本compact state做產品收斂，避免繼續攜帶機械細節。
 
 ## Direct human authorization
 
@@ -21,43 +18,44 @@
 - 允許相關實作／測試／文件、feature commit／push，按AGENTS和CONTRIBUTING驗證後整合main及確認CI。未授權部署、基礎設施、外部素材包或無限排程。
 - 排除survey／DB／四題／Meter／live時序；身體自立只保留概念。H3只作收斂與正式接入評估，正式歸屬必須另由cc100053選定，不可自行增加題目或投票因果。
 
+- 人類本次提供的task-relay新版SKILL採unattended defaults：routine可逆選擇自行處理，只在重大產品／架構／破壞或授權擴張需問；有獨立工作時不因pending decision停全任務。
+- Quota新版規則：相關已知window剩餘≥15%繼續縮小batch，嚴格低於15%才停新實作；沒有舊20 points reserve門檻。Scoped quota recovery wakeups已由人類standing preference授權，可自動建立／更新／移除，無需再問；不買credit／用reset／改model規避。
 
-## Preflight and ownership evidence
+## Verified progress and evidence
 
-- 本輪cwd／Git root為city2127；fetch --prune origin成功，origin/main c94e92f，本地main相等。起始HEAD45a015e對origin/main ahead4／behind0；既有H1 dirty source／tests／artifacts全部保留並closure，未自動merge／pull main。
-- 前owner release：舊chat turn `01a17823-e85c-7e10-b49b-8435b785f249`，final `msg_0ae1fc723a744b09016adf452372e88191b47f26805f6207a2`。前唯讀subagent完成、Vite5188／browser已停、單次automation h1已刪除。
-- 本批worker release：[result](../../artifacts/housing-city-h1b/result.json) allWritersReleased／allOwnedServicesStopped均true；callback送達、metadata commit/push後final，cursor67確認idle。
-- 最終closure前fetch（獲准寫FETCH_HEAD）成功；origin/main仍c94e92f，worker及coordinator checkpoint對feature upstream0／0，沒有main整合。
-- Worker曾遇一次模型capacity systemError，同owner續作後完成，沒有另派writer或改model。
-- 既有`.playwright-cli/`保留未stage；沒有外部assets／部署／DB更改。本coordinator未啟動服務，lsof5188確認無listener。
-- H1 logs已保存於[H1 artifacts](../../artifacts/housing-city-h1/README.md)，不依賴/tmp。舊handoff歷史snapshot：[pre-relay-handoff](../../artifacts/housing-city-h1/pre-relay-handoff.md)，其中舊owner／排程不再有效。
+- H0／H1 HUMAN ACCEPTED，H1b SOFTWARE／COORDINATOR ACCEPTED；原始[H0](../../artifacts/housing-city-h0/README.md)／[H1](../../artifacts/housing-city-h1/README.md)／[H1b](../../artifacts/housing-city-h1b/README.md)保留。
+- H2 IMPLEMENTED／SOFTWARE VERIFIED／COORDINATOR ACCEPTED，result ID `housing-h2-r1-rev11-20261027-final01`已處理一次，勿重做／重問H1 gate。[compact result](../../artifacts/housing-city-h2/result.json)／[report](../../artifacts/housing-city-h2/README.md)／[hash manifest](../../artifacts/housing-city-h2/verified-evidence.json)。
+- 固定四軸0／seed0全能源基準及原hero；M/P／複合／藻類維持。U下層生活艙A→抽出／吊索下承叉架→橫移／B停泊／接通；完整小屋沿專用軌A→B。後半返回，90秒「多年更新壓縮示意」，非通勤；斷接先於移動，靜態／reduced motion／reset回A，replay deterministic，資源identity不變。
+- H2有必要機械小修：前側門架／下承叉架避開上層固定艙，lower rails對齊底鞋；全小屋抬14cm與軌抬9cm，接口避開門。固定H1保留；移動艙小倒角改共享unit-box instancing，geometry減少。詳report，不是工程可行性證明。
+- Root npm test／build、production住宅DEV排除、互斥、桌面resize、recovery／replay、完整幾何及browser PASS；僅既有chunk warning。
+- 全構件（底鞋／索／叉架／plug）17線性區間680保守swept boxes；Node近測10923／browser11265，實城hits0；移動組件互相碰撞用線性時間不等式覆蓋全區間，只有量化rope端部接點。原交通保守曲線包絡，另5204836實際actor boxes日夜90秒每0.5秒補驗，離散actor不冒稱全部時間連續證明。
+- Chrome156 headless／ANGLE Metal Apple M6／WebGL2、1920×1080 DPR1；default日暮夜＋18原PNG；low fresh baseline30秒60.0307 FPS、動態mixed91秒60.0101 FPS，11phase全出現。
+- 同幀8phase對比總住宅delta30 geometries／0 textures／51 calls／128652 rendered triangles，符合≤36／0／80／150000及≥50FPS。Node128580與renderer差72透光重畫，不混用。H1b「geometry已滿」已被H2優化取代，現在有6餘量，勿誤讀舊預算。
+- Coordinator已CodeGraph追housingCycle／startHousingReview、review實作與test diff、查看mobile24／40、小屋24與hero夜景；重核9source＋18PNG hashes、browser PASS／無errors、committed whitespace及root final log。沒有重跑有效完整suite。
 
-## Accepted batch and actual evidence
+## Git / ownership / service state
 
-- H0 ACCEPTED：M(-135,-175)、P(45,-215)、U(-265,-60)，各24×18m、最高28m；四軸0／seed0，全能源。原圖／矩陣見[H0](../../artifacts/housing-city-h0/README.md)。
-- H1 SOFTWARE VERIFIED / HUMAN ACCEPTED：五配置主設計／混合複合住宅，保留M drone-port庭院及U shader水庭；[H1](../../artifacts/housing-city-h1/README.md)，原final證據未覆寫。
-- H1b IMPLEMENTED / SOFTWARE VERIFIED / COORDINATOR ACCEPTED：M橫向共享骨架／P非發光藻類循環設備／U完整小屋、雙底座及專用更新軌，保留H1主設計；[README](../../artifacts/housing-city-h1b/README.md)／[獨立result](../../artifacts/housing-city-h1b/result.json)。Result ID `housing-h1b-r1-rev5-20261026-final01`已處理一次；沒有重複dispatch。
-- Root npm test／build、diff check、production DEV排除、模式互斥、resize、reduced motion靜態及資源重用PASS；25原PNG／6source hashes一致。Browser exceptions／warnings／failed requests0。
-- 實際runtime7086項精確比較、443住宅mesh／instances對25529原城物件、475小屋上方本體通道近測，hits0；Node實城fixture、交通包絡及20條focal視線PASS。
-- Chrome156 headless／ANGLE Metal Apple M6／WebGL2，1920×1080 DPR1；default日12／暮17／夜21原圖，low新baseline／mixed各30秒60.0143／60.0163 FPS。
-- 全住宅renderer增量36 geometries／0 textures／38 calls／133416 triangles；符合H0 ≤36／0／80／150000及≥50 FPS。Node133344與renderer差72為透光面額外繪製，不混用。
-- Coordinator實際查看mixed日／夜、M共享室、P藻類日／夜、U小屋原圖，review src/tests diff並重核全部source hashes、browser PASS及committed whitespace；未重跑已有效的完整suite。
-- P特寫仍有原樹局部遮擋；原城市、天空／海灣及四focal保留。人類視覺簽收狀態另列，不當H2已完成。
+- 本heartbeat先確認repo、HEAD6a27106，fetch成功，feature counterpart0／0、對origin/main ahead10／behind0；原tracked tree clean，只保留既有`.playwright-cli/`。
+- 現只有coordinator-owned handoff／review文件更新可dirty，H2 source已commit/push；不stage／移除`.playwright-cli/`、不reset／stash／自動pull main。
+- H2 source5ae56e3僅root變更；odaiba2127補.ts、skyways JSON type attribute使Node載入原factory以驗skyways，無改原城市形狀。survey／module-swap沒改，未跑其獨立suite。
+- H2服務清理[record](../../artifacts/housing-city-h2/cleanup.json)；lsof5188無listener。沒有active writer、browser、dev server或quota automation。
+- 先前h1單次排程已刪，h2於2026-10-27 01:28 JST實際觸發，配額恢復後automation_update delete成功；本heartbeat結束時須說明h2已移除。未設新排程。
 
-## Next authorized action
+## Next action for successor
 
-1. 於恢復時先讀本checkpoint，確認本chat是active coordinator、無writer、Git/fetch及實際quota。
-2. 配額可容納批次＋20 points reserve後，建立fresh H2 worker，唯一writer，從H1b來源checkpoint開始。H1b軟件review已接受，H1人類簽收不重問。
-3. H2實作已選90秒「多年更新壓縮示意」：生活艙交換、完整小屋遷移／停泊／接駁；植物膜保持靜態。復用／減少現有geometry（36已滿），不能逐幀建立資源。靜態／reduced motion、replay／reset、全掃掠、道路／mobility／skyways、實測動態FPS及總預算，全部按plan驗證。
-4. H2後做H3收斂／正式接入評估；正式固定背景／偏好／獨立累積歸屬必須由cc100053另選，不能自改四題／DB／Meter／live時序或假稱投票因果。
+1. 先只核實身份／checkpoint／quota／owner；未在本文成為active coordinator且收到activation前，不派發或寫source。Reconcile pending successor，禁止重複建立。
+2. 成為active後建立fresh H3 worker，完成已授權「收斂與正式接入評估」：按H1b／H2原圖與實測評估三類各自／mixed輪廓、數量、可讀性及原城共存，保存具體正式接入選項與推薦；只修驗收必需的小問題，不擴大美術／系統。
+3. Pending major decision：哪些作正式固定背景、哪些跟既有偏好、哪些另建獨立累積。可提交選項：A先把已驗證住宅作固定背景、不稱投票結果（建議用以討論，未獲同意不實作）；B保留DEV原型，待獨立居住偏好設計；C另行規劃既有四題替換／權威累積（擴產品，需明確確認）。問題依賴：正式render／權威資料接入，不能自行取代題目／DB／Meter或製造因果。
+4. 在等major decision時，完成獨立H3評估文件、現有DEV原型收尾及驗證／Git整合。AGENTS授權把已驗證DEV-only code經CONTRIBUTING整合main＋push並確認main CI，這不代表正式展示住宅已獲批准；production housing仍排除。先review準備好的batch再派整合；branch/main無force、無部署。若沒有獨立工作才NEEDS_INPUT。
+5. 原人類H1b／H2續作授權及新unattended規則持續有效，勿重問例行選擇；重大決策保存question／options／recommendation／dependent scope，通知一次。
 
-## Delivery, quota and wakeup
+## Delivery / quota / succession
 
-- Dispatch housing-h1b-r1-rev5已完成；pending dispatch none；worker final cursor `f72fe43b-0030-4e16-8b10-599ce45459ae:67`；callback sent且已review，last processed result上述final01。
-- Quota latest：primary80% used（worker最後81%）、weekly27% used；primary reset1793031925（2026-10-26T16:25:25Z / 10月27日01:25:25 JST），weekly reset1793600524；reserve20 points。H1 closure＋H1b實際約27 points（含其他account使用，不當精確單批成本），H2預估20，現容量不足。
-- Earliest recovery check: `2026-10-26T16:28:30Z`（10月27日01:28:30 JST），必須重讀limits，reset時間不是配額已恢復證明。
-- Wakeup: ARMED；automation ID `h2`，heartbeat ACTIVE，target chat `01a17822-914e-7a52-a897-a34d47a68d70`。使用者本chat直接回覆async問題 `call_9764b6c8d76a4cf8b2bfe235d732aae7`：「授權 01:28 單次續作」。automation_update create成功，view及本機automation.toml確認目標、單次COUNT=1及01:28:30規則；對應2026-10-27 01:28:30 Asia/Tokyo（2026-10-26T16:28:30Z）。工具未額外提供next_run欄位；尚未執行。只授權這一次，恢復後記錄結果並刪除／停用h2，不得自行改成週期重試。需要電腦及Codex App可用。
+- H2 dispatch housing-h2-r1-rev11完成，cursor `dd347910-9fe0-45da-a453-ec7b3847b5ea:67`（idle），callback sent，result final01已coordinator accepted。不要再派H2或誤當未讀result。
+- Succession ID housing-h3-coordinator-rev14；successor `01a17927-a815-7041-b4d3-aff62d7bd182`，host local，create_thread成功。Revision15已轉active coordinator，等待前coordinator明確activation；接班者收到後自行更新RUNNING／delivery狀態。不要重建successor。
+- Quota last actual read primary42% used／58%remaining、weekly35%used／65%remaining；reset1793050170／1793600524，pause<15%，H3小批評估預估8points，整合按實際scope另估。接班前重讀。
+- Wakeup none；不聲稱有scheduled continuation。新coordinator激活用明確send_message_to_thread，確認送達後前coordinator退出dispatch。
 
-## Remaining limits
+## Limits still open
 
-H2動畫／底鞋及接駁全掃掠未實作；H1b通道只驗y≥3.35m上方本體、25位姿，不能當完整動作證明。未測default FPS、展覽硬件、Safari／iPad／Windows、訪客理解或結構／生態工程；survey／module-swap未改，未重跑其獨立suite。未整合main，未宣稱main CI或正式接入完成。
+未測default sustained FPS、展覽硬件、Safari／iPad／Windows、訪客理解、結構／生態／無障礙工程。H3正式歸屬未決定；目前無main整合／main CI完成宣稱；沒有部署或正式問卷更改。

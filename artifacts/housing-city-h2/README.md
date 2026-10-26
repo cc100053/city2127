@@ -1,6 +1,6 @@
 # H2 — 生活艙交換／完整小屋更新循環
 
-2026-10-27，唯一 worker `01a1790d-a993-76d3-bf14-fc024a8ed3c8`，batch `housing-h2-r1`，dispatch `housing-h2-r1-rev11`。起點 `6a27106365e1cf7b6b0d38677baf4f971cf102b1`；續做 `codex/housing-city`，不整合main。H0／H1已人類簽收，H1b已coordinator接受；本批完成與驗證另列，不代替H2人類視覺簽收。
+2026-10-27，唯一 worker `01a1790d-a993-76d3-bf14-fc024a8ed3c8`，batch `housing-h2-r1`，dispatch `housing-h2-r1-rev11`。起點 `6a27106365e1cf7b6b0d38677baf4f971cf102b1`；續做 `codex/housing-city`，不整合main。H0／H1已人類簽收，H1b已coordinator接受；本批完成與驗證另列，已通過coordinator原圖／diff／hash review，不代替H2人類視覺簽收。
 
 [穩定計劃](../../docs/HOUSING_CITY_PLAN.md)／[coordinator交接](../../docs/handoffs/housing-city.md)／[獨立結果](result.json)。本worker不修改共享handoff。
 
