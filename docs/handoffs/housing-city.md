@@ -1,70 +1,53 @@
 # housing-city — 建築・居住多樣性
 
-- Task / specification: housing-city；[HOUSING_CITY_PLAN](../HOUSING_CITY_PLAN.md)，H0–H3全份實作
-- Owner / active coordinator: Codex，chat `01a177a5-78d8-7c20-8d07-5daa1f099905`，host `local`；產品決策／簽收：cc100053
-- Checkout: `/Users/fatboy/city2127`
-- Branch: `docs/housing-city-plan`（恢復同一住宅任務；尚未建立H1分支）
-- State revision / batch: 3 / housing-h0-r1（accepted）；下一批housing-h1-r1
-- Status: WAITING_QUOTA（H0已由cc100053簽收；等待已授權的20:25 JST續作）
-- Last actual progress: 2026-10-26 10:21 UTC（19:21 JST）；收到H0簽收及單次續作授權，automation h1已建立
-- Base / starting commit: `615ad9872aeab2cf021a62affc26e34c2b7e7e28`（計劃文件提交，父commit `c94e92f5d1b1dd5518e24019a8d0b67b692d4fce`）
-- Last verified runtime commit: `615ad9872aeab2cf021a62affc26e34c2b7e7e28`；H0 runner／證據已驗證於checkpoint `80ecf72`，驗證見下方
-- Evidence / durable checkpoint: [H0 README](../../artifacts/housing-city-h0/README.md)、`artifacts/housing-city-h0/review/`原PNG／JSON、本文；checkpoint `80ecf72`，本機及origin/docs/housing-city-plan均可取回
-- Remote / integration: 原計劃提交未在origin/main；checkpoint `80ecf72`已push至origin/docs/housing-city-plan，對remote counterpart ahead0／behind0；未整合main，沒有main CI完成宣稱
+## Current relay checkpoint
 
-## Authorization and scope
+- Task / stable specification: housing-city；[HOUSING_CITY_PLAN](../HOUSING_CITY_PLAN.md)，H0–H3範圍，無deadline。
+- State revision / batch: 6 / housing-h1b-r1。
+- Status: RUNNING，dispatch housing-h1b-r1-rev5 已成功建立worker。
+- Active coordinator: chat `01a17822-914e-7a52-a897-a34d47a68d70`，host local。
+- Worker owner: chat `01a17828-38f5-73f1-8ec9-480ecc60db07`，host local，唯一checkout writer；前owner已明確release。
+- Checkout / branch / HEAD: `/Users/fatboy/city2127` / `codex/housing-city` / `45a015e92a037a706123381e17eb7214006e75b0`，既有H1尚未commit。
+- Last actual progress: 2026-10-26T12:20:03.013018+00:00；確認H1人類簽收、前owner及服務釋放，準備H1 closure＋H1b。
+- Product acceptance: cc100053。
 
-直接使用者指示來源：上述chat，2026-10-26「[$task-relay] … do the whole implementation of [HOUSING_CITY_PLAN.md]」。允許同一任務的實作、檢查、文件及AGENTS規定的feature branch commit／push／驗證後整合。
-計劃是穩定spec，本交接是唯一current-state checkpoint；沒有另建競爭的.task-relay state。
-未授權新user-visible worker／successor chats或向其他chat傳訊；task-relay可用bounded subagents，但本批未派發、沒有其他writer。
-沒有deadline。90秒壓縮循環已由同chat的使用者選項回覆確認。2026-10-26 19:19 JST使用者直接回覆H0問題「確認，按提案繼續（建議）」；同一則回覆選「20:25 自動續作（建議）」，授權2026-10-26 20:25 Asia/Tokyo在本chat單次續作。這不授權無限週期或另開worker／successor chat。
-排除survey、資料庫、四題、Meter、live時序、外部素材包、部署；H3正式接入仍須產品另選定歸屬，不可自行加入題目或假稱投票因果。
+## Direct human authorization
 
-## Session Git state
+- 本coordinator chat `01a17822-914e-7a52-a897-a34d47a68d70`，2026-10-26直接人類請求：「[$task-relay] … continue the implementation of /Users/fatboy/city2127/docs/HOUSING_CITY_PLAN.md」。message ID工具未提供；可讀本chat原始人類turn核實。
+- Standing execution contract: [改善 task-relay 主機交接](codex://threads/01a17818-0759-7ae2-b1fc-1add8051846e)，human message `01a1781f-336b-7f22-9eef-dfbb1ee35a04`，2026-10-26。依本次直接請求綁定housing-city，授權本relay的worker chats、dispatch、callback及必要coordinator succession；舊handoff「未授權worker chat」已被本次明確task-relay合約取代。
+- H0已由cc100053於舊實作chat確認位置、預算、夜間方案；90秒多年更新壓縮循環、植物膜靜態已選定。
+- H1直接人類簽收：chat `01a177a5-78d8-7c20-8d07-5daa1f099905`，message `01a17815-5263-7ae2-9f44-5c8f55732aa6`：「簽收，繼續 H1b／H2（建議）」。可用read_thread最後turn核實，勿重問。
+- 允許相關實作／測試／文件、feature commit／push，按AGENTS和CONTRIBUTING驗證後整合main及確認CI。未授權部署、基礎設施、外部素材包或無限排程。
+- 排除survey／DB／四題／Meter／live時序；身體自立只保留概念。H3只作收斂與正式接入評估，正式歸屬必須另由cc100053選定，不可自行增加題目或投票因果。
 
-- 啟動確認cwd為city2127；branch `docs/housing-city-plan` @ `615ad98`。
-- 初始僅有未追蹤 `.playwright-cli/`，保留不動，沒有已追蹤檔案差異。
-- 初始 `git fetch --prune origin` 成功；origin/main = `c94e92f`；HEAD對origin/main ahead1／behind0，本地main等於origin/main。
-- 啟動時本task branch沒有remote counterpart／upstream；本批closure push後已建立同名upstream，ahead0／behind0。未自動merge或pull main。
-- 稍後額外 `git ls-remote` 在sandbox內因DNS失敗；發布前已獲准重新fetch成功，遠端origin/main仍為c94e92f。
-- 同repo上一個規劃chat為idle，本輪沒有派發或交接其他writer；沒有修改既有binary assets；本批只新增檢查PNG。
+## Ownership and preflight
 
-## H0 outcome / acceptance
+- 本輪先確認cwd與Git root均為city2127。fetch --prune origin成功；origin/main仍c94e92f，本地main與其相等；本branch對origin/main ahead4／behind0，無同名remote counterpart／upstream；不自動merge或pull main。
+- 既有H1 dirty source、tests、artifacts完整保留；`.playwright-cli/`為既有未追蹤內容，不得納入或移除。
+- 前owner release：舊chat turn `01a17823-e85c-7e10-b49b-8435b785f249`，final message `msg_0ae1fc723a744b09016adf452372e88191b47f26805f6207a2`，確認停止寫入及dispatch、唯一唯讀subagent已完成、H1全寫入磁碟。
+- 前owner已關閉Vite5188／browser runner，已刪除單次automation h1；本coordinator沒有啟動服務或新排程。
+- H1 test/build原log在 `/tmp/housing-h1-test-final.log`、`/tmp/housing-h1-build-final.log`；worker須複製到持久artifacts後再完成H1 closure。
 
-[完整位置、矩陣及預算](../../artifacts/housing-city-h0/README.md)。提議：
+## Accepted progress and evidence
 
-- 基準：四軸0／seed0，水庭2＋large receiver＋flywheel＋island，原hero鎖定，hour12／reviewTime20。
-- M(-135,-175)、P(45,-215)、U(-265,-60)，各24×18m、最高28m，分別容納輕材＋複合住宅、植物斜面住宅、交換骨架及專用更新軌。
-- Q4區隔：低矮橫向可拆接架構、固定DEV背景，遠離(175,-45)的Meter集約塔；不更改原塔或宣稱答案造成。
-- 夜間：植物暗面、藻類反射設備面，兩者不自發光；既有入口／接駁標記，無新global light。植物膜保持靜態。
-- 預算：相對本機low基準新增≤36 geometries／0 textures／80 calls／150k triangles；50 FPS最低，H1／H2動態各須30秒rAF實測。
-- H1五配置同輪比較；主設計簽收後H1b次設計；H2按已選90秒多年更新壓縮循環；H3先收斂評估，正式接入不能自行決定。
+- H0 COMPLETE / ACCEPTED：M(-135,-175)、P(45,-215)、U(-265,-60)，各24×18m、最高28m；四軸0／seed0，全四類能源。原圖／數字見[H0 README](../../artifacts/housing-city-h0/README.md)。
+- H1 IMPLEMENTED / SOFTWARE VERIFIED / HUMAN ACCEPTED（上述message）；[五配置、日暮夜與近景](../../artifacts/housing-city-h1/README.md)，原始final PNG／browser.json／geometry.json／performance.json。
+- H1最終reported delta：20 geometries、0 textures、21 calls、131940 triangles；low 30秒約60.03 FPS；root test/build、精確實城碰撞、路徑／視線及browser PASS。前owner確認final source hashes與現檔一致；coordinator已查看mixed日景及U近景，尚未重新跑完整suite。
+- H1保留M既有drone-port柱並開庭院，U用樁柱架高保留shader水庭；H0框不是完整淨空證明。
+- H1文件同步及commit尚未完成；H1b／H2未實作，H3正式接入未決定。
+- H1原handoff保存為歷史snapshot：[pre-relay-handoff](../../artifacts/housing-city-h1/pre-relay-handoff.md)，其中舊owner／授權／排程欄位不再有效。
 
-H0：COMPLETE／ACCEPTED（2026-10-26，本chat直接人類回覆確認以上提案）。H1／H1b截圖簽收及H3正式接入評估仍按計劃，不可由agent自稱human accepted。
+## Dispatch and next action
 
-## Actual validation
+- Dispatch ID: housing-h1b-r1-rev5；worker `01a17828-38f5-73f1-8ec9-480ecc60db07` 已建立並收到完整batch，唯一writer；不重複派發。
+- Batch: 保存H1 log／同步文件及commit作恢復點，再做H1b三個次設計（少量橫向集約骨架、藻類設備及完整小屋＋專用路徑）。完成靜態實城／geometry／budget／日暮夜／近景驗證，保存獨立result後release。
+- 本批不做H2動畫；H1b結果review後按配額派下一批H2 90秒循環。已有人類授權，不需重問H1 gate。
+- H1b原圖及report：`artifacts/housing-city-h1b/`；worker result `artifacts/housing-city-h1b/result.json`；完整log由worker保存，不修改本current handoff（只active coordinator可更新）。
+- Acceptance budget相對全新low baseline：≤36 geometries、0 textures、≤80 calls、≤150000 triangles；≥50 FPS。需復用現有工廠與材質，不加dependencies。H1b須保留H1全部主設計與基準一致。
+- Delivery cursor: `f72fe43b-0030-4e16-8b10-599ce45459ae:2`；last processed result ID housing-h1-r1（human accepted，尚待closure commit）；callback未收。
+- Quota last read: primary53% used / 47% remaining，weekly23% used / 77% remaining；reset1793031925 / 1793600524；保留20 points，H1 closure＋H1b估≤20 points，可派。下批前重新讀limits。
+- Wakeup: none / NOT ARMED；不聲稱自動續作。active wait／授權callback用於本批。
 
-- 原碼不變；本機Chrome156.0.8078.47 headless／ANGLE Metal Apple M6／WebGL2、1920×1080 DPR1、low。
-- 最終 `review/`：431 geometries／24 textures／486 calls／8,699,769 triangles，10秒rAF平均60.0754 FPS；固定reviewTime20，不是live soak。
-- 7,506個static mesh／instance作初步篩選；三候選完整預留框BVH表面相交、九點地面／上方淨空、401點／路徑的保守半徑及候選hero視線PASS；三框對四focal中心視線共12項PASS。
-- 最終page errors0／console warnings0；初輪duplicate-Three warning、探索中較弱篩選原圖與JSON全部保留，README說明哪些不能當最終證據。
-- runner首次sandbox Chrome SIGABRT，獲准在本機browser執行後成功；沒有approval auto-review拒絕。
-- `node --check artifacts/housing-city-h0/capture.mjs` PASS。
-- Root `npm test`重跑PASS（原sandbox listen EPERM完整log保留）；`npm run build` PASS（既有>500kB chunk warning）、`git diff --check`及8份文件本地連結檢查PASS。原始root-test.log／root-build.log與evidence SHA256 manifest已保存；survey／module-swap source未改，沒有另跑其package suite。
-- 四條中心視線不代表整個focal輪廓驗收，401點／路徑不是連續掃掠；H1／H2仍須Node實際幾何、published actor／skyway及動畫檢查。
-- 未測default FPS、live動態、新住宅模型、展覽硬件、Safari／iPad／Windows或結構工程；H1–H3沒有完成宣稱。
+## Remaining limits
 
-## Relay / quota / delivery
-
-- No worker, pending dispatch, cursor or callback. Accepted result ID: housing-h0-r1；H0直接人類簽收已記錄，未派發H1。
-- Quota last read: primary 82% used，18% remaining，300min window resets `2026-10-26T11:22:04Z`；weekly13% used。task-relay預設保留20 percentage points，因此停止新substantial批次，剩餘用於驗證與closure。
-- Earliest recovery check: `2026-10-26T11:25:00Z`（2026-10-26 20:25 JST）；必須重讀實際使用量、checkout及owner狀態再決定，不因重設時間到便假定可派發；H0人類確認已完成。
-- Wakeup: ARMED，automation ID `h1`，kind heartbeat／ACTIVE，target_thread_id為本chat。automation_update create成功並view確認；保存的單次COUNT=1規則指定20:25:00，下一次為2026-10-26 20:25 JST（11:25 UTC）。本機automation.toml已核實目標與規則；tool未另回傳next_run欄位，不代表已執行。只授權此一次；若未恢復足夠配額，保存狀態後告知，不自行轉成無限重試。
-- Services: 本批Vite5188、全部Playwright browsers由本owner啟動；已停止Vite（session3274 exit130），lsof確認5188無listener；browser runner均finally close，沒有本批服務留待續作。
-
-## Next action
-
-於2026-10-26 20:25 JST單次wakeup讀本checkpoint、核實active coordinator／checkout／branch／remote及實際配額。配額回到batch＋reserve可容納後，按已接受H0開始H1隔離DEV五配置及模型／Node檢查；不重做H0、不再詢問已確認的H0選擇。記錄automation執行結果，完成或離開該單次恢復後移除／停用本automation（不影響其他排程）。
-如手動恢復：在本chat輸入「$task-relay 繼續 housing-city」，讀本交接、核實checkout／HEAD／owner及fetch，再續下一步，不重做已保存H0原圖。
-
-2026-10-26 acceptance-turn preflight：HEAD461a2d0，初始只有既有.playwright-cli/；sandbox fetch因FETCH_HEAD權限失敗後獲准重跑成功，origin/main仍c94e92f；HEAD對main ahead3／behind0，對同名upstream0／0。本輪只記錄產品簽收與排程，沒有重跑npm test/build（runtime未改）；本地文件連結／diff另驗。
+未測展覽硬件、Safari／iPad／Windows、訪客理解、結構或生態工程。H1靜態證據不等於H2全掃掠或動態性能驗證；正式survey保持原狀。

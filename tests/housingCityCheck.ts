@@ -76,4 +76,3 @@ export function checkHousingCity(city: Object3D) {
   }
   console.log(`PASS housing H1 city: actual landmark/environment/planting fixture, ${exact} exact mesh checks, route envelopes (${routeChecks} near tests) and 20 focal sightlines.`);
 }
-

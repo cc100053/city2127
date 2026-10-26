@@ -1,6 +1,6 @@
 # housing-city — 建築・居住多樣性
 
-- Task / specification: housing-city；[HOUSING_CITY_PLAN](../HOUSING_CITY_PLAN.md)，H0–H3全份實作
+- Task / specification: housing-city；[HOUSING_CITY_PLAN](../../docs/HOUSING_CITY_PLAN.md)，H0–H3全份實作
 - Owner / active coordinator: Codex，chat `01a177a5-78d8-7c20-8d07-5daa1f099905`，host `local`；產品決策／簽收：cc100053
 - Checkout: `/Users/fatboy/city2127`
 - Branch: `codex/housing-city`（由已簽收checkpoint45a015e續作H1）
