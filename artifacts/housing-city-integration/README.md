@@ -15,3 +15,5 @@ feature與整合root checks、production排除、Git／main CI實際結果及log
 ## 限制及交接
 
 未測default sustained FPS、展覽硬件、Safari／iPad／Windows、訪客理解或結構／生態／無障礙工程。正式render／資料鏈及所有權威配置／轉場共存須等人類選定方案後另做。保留原圖、既有.playwright-cli及feature branch，沒有部署。
+
+整合merge `5699d83ae06a5ee900951fddca6fa8e3e60f7504` 無衝突，tree與feature `b244209` 完全一致；feature及整合root test／build／production排除／committed whitespace全部PASS。Logs：feature-test.log、feature-build.log、integrated-test.log、integrated-build.log。整合後重核9source／18PNG一致。Main push／CI待下方最終紀錄。

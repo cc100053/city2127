@@ -2,7 +2,7 @@
   "taskId": "housing-city",
   "dispatchId": "housing-h3-integration-rev18",
   "resultId": "housing-h3-integration-rev18-20261027-final01",
-  "status": "RUNNING",
+  "status": "LOCAL_VERIFIED_MAIN_CI_PENDING",
   "workerId": "01a17935-7d58-79b1-a8d8-600ccf889ee8",
   "coordinatorId": "01a17927-a815-7041-b4d3-aff62d7bd182",
   "baselineCommit": "78d2720eea606349e69ee98a0584a706233b6577",
@@ -21,7 +21,16 @@
     },
     "production": "production.json",
     "documentation": "doc-review.json",
-    "review": "Complete source/callers/tests/config/current docs diff inspected, historical evidence retained; original evidence identity verified. No source change in integration closure."
+    "review": "Complete source/callers/tests/config/current docs diff inspected, historical evidence retained; original evidence identity verified. No source change in integration closure.",
+    "integrated": {
+      "commit": "5699d83ae06a5ee900951fddca6fa8e3e60f7504",
+      "npmTest": "PASS",
+      "npmTestLog": "integrated-test.log",
+      "npmBuild": "PASS; existing chunk warning",
+      "npmBuildLog": "integrated-build.log",
+      "whitespace": "PASS origin/main..HEAD",
+      "productionHousingExclusion": "PASS"
+    }
   },
   "delivery": {
     "status": "PENDING",
@@ -32,7 +41,7 @@
     "standingContractMessageId": "01a1781f-336b-7f22-9eef-dfbb1ee35a04"
   },
   "allWritersReleased": false,
-  "allOwnedServicesStopped": false,
+  "allOwnedServicesStopped": true,
   "ownedServicesStarted": [],
   "preflight": {
     "fetch": "PASS; later sandbox FETCH_HEAD denial retried with scoped escalation successfully",
@@ -49,5 +58,19 @@
       "coordinator-owned docs/handoffs/housing-city.md"
     ],
     "unfinishedCommitsAvailableRemotely": true
+  },
+  "featureCheckpoint": "b244209",
+  "mergeCommit": "5699d83ae06a5ee900951fddca6fa8e3e60f7504",
+  "mergeConflicts": false,
+  "integratedTreeEqualsFeature": true,
+  "integratedRuntimeEvidenceHashes": "PASS: 9 source and 18 PNG remain identical after merge",
+  "mainCI": {
+    "status": "PENDING",
+    "actualRunRequired": true
+  },
+  "quotaAtIntegrationCheckpoint": {
+    "primaryRemainingPercent": 16,
+    "weeklyRemainingPercent": 58,
+    "pauseStrictlyBelowPercent": 15
   }
 }

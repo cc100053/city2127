@@ -7,5 +7,6 @@
     "housing-transfer-rig",
     "\u4f4f\u5b85\u6bd4\u8f03\u914d\u7f6e"
   ],
-  "housingChunks": []
+  "housingChunks": [],
+  "integratedBuildPassed": true
 }
