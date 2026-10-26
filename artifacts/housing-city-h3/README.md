@@ -61,3 +61,5 @@ H2 root test／build／production 排除／browser／恢復及資源 identity �
 Repo／branch／HEAD已核對；fetch成功（第一次因 `.git/FETCH_HEAD` 權限失敗，取得所需權限後重試成功），feature與remote0／0、對 `origin/main` ahead14／behind0。保留 coordinator 的 dirty handoff 及既有 `.playwright-cli/`。人類執行請求 `01a17822-ead1-7172-b6da-d82035164927` 及 standing contract `01a1781f-336b-7f22-9eef-dfbb1ee35a04` 已各讀取核實，callback只限本 relay 的現任 coordinator。
 
 本批只改此報告、證據核對／結果紀錄及 HOUSING_CITY_PLAN／PROJECT／EXHIBITION_SPEC／VALIDATION 的現況與評估入口；本地 Markdown targets／anchors／tracked targets、來源事實與完整 diff／whitespace 檢查結果由 result.json 記錄。未改 source／package／asset，未重跑有效 H2 tests／build／browser，未重拍或覆寫原圖，沒有啟動服務。所有本 worker 寫入者／服務在交付時釋放，等待 coordinator review；共享 current state 由 coordinator 更新。
+
+2026-10-27 接受狀態更新：coordinator已在 `78d2720` 接受本評估（原report `8f9f8f9`、metadata `773a8fd`）。上文「待review」保留為worker交付當時的歷史；正式A／B／C仍未選定。獨立DEV-only整合紀錄見[整合報告](../housing-city-integration/README.md)。

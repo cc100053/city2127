@@ -155,7 +155,7 @@ Root tests/build cover root only; install survey dependencies for the real HTTP/
 
 The [previous implementation map](history/PROJECT_2026-10-02.md) is an archived mixed-stage snapshot for old deep links. It is not an architecture authority or a list of future work.
 
-Housing H3（2026-10-27）：[三類／mixed原圖評估及正式接入選項](../artifacts/housing-city-h3/README.md)已交付待coordinator review。本批只更新文件，保留現有三區／數量／輪廓、DEV入口與production排除。Hero定位與近景系統機理分開評價，未作訪客理解測試；建議A以原M／P／U作固定背景、U停泊A，90秒循環留DEV，不宣稱投票因果；B保留DEV待獨立居住偏好設計、C另規劃四題替換／權威累積為替代方案。三者皆未由人類選定，正式render／資料鏈不變。H2有效證據只涵蓋固定中值／seed0及全能源基準，正式接入仍須驗不同權威配置、轉場及資源／恢復生命週期，不能直接沿用DEV通過結果。
+Housing H3（2026-10-27）：[三類／mixed原圖評估及正式接入選項](../artifacts/housing-city-h3/README.md)已通過coordinator review（2026-10-27）。本批只更新文件，保留現有三區／數量／輪廓、DEV入口與production排除。Hero定位與近景系統機理分開評價，未作訪客理解測試；建議A以原M／P／U作固定背景、U停泊A，90秒循環留DEV，不宣稱投票因果；B保留DEV待獨立居住偏好設計、C另規劃四題替換／權威累積為替代方案。三者皆未由人類選定，正式render／資料鏈不變。H2有效證據只涵蓋固定中值／seed0及全能源基準，正式接入仍須驗不同權威配置、轉場及資源／恢復生命週期，不能直接沿用DEV通過結果。
 
 ### E4配置接口準備（2026-10-24，非正式接入）
 

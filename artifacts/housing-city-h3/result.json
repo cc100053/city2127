@@ -132,5 +132,12 @@
   },
   "updatedAtUTC": "2026-10-26T17:13:27.166096+00:00",
   "nextAction": "Coordinator has retrieved H3 and begun review; worker completes delivery metadata only, releases all writers/services and stays idle. Integration requires a new coordinator assignment.",
-  "lastVerifiedCommit": "8f9f8f9b21448aaf26e23f873c179e93f01d0f75"
+  "lastVerifiedCommit": "8f9f8f9b21448aaf26e23f873c179e93f01d0f75",
+  "coordinatorReview": {
+    "status": "ACCEPTED",
+    "checkpointCommit": "78d2720eea606349e69ee98a0584a706233b6577",
+    "assessmentResultId": "housing-h3-r1-rev16-20261027-final01",
+    "formalDecision": "NOT_SELECTED",
+    "note": "Historical worker status/delivery retained; DEV-only integration assigned separately."
+  }
 }

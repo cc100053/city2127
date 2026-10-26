@@ -1,0 +1,36 @@
+{
+  "sourceHashes": {
+    "src/main.ts": true,
+    "src/devHousing.ts": true,
+    "src/housingPrototype.ts": true,
+    "src/odaiba2127.ts": true,
+    "src/skyways.ts": true,
+    "tests/housingCityCheck.ts": true,
+    "tests/housingPrototype.test.ts": true,
+    "tests/odaiba.test.ts": true,
+    "tests/housingH2.browser.mjs": true
+  },
+  "finalOriginalPNGs": {
+    "artifacts/housing-city-h2/final/geometry-mixed.png": true,
+    "artifacts/housing-city-h2/final/hero-transport-12.png": true,
+    "artifacts/housing-city-h2/final/hero-transport-17.png": true,
+    "artifacts/housing-city-h2/final/hero-transport-21.png": true,
+    "artifacts/housing-city-h2/final/home-0.png": true,
+    "artifacts/housing-city-h2/final/home-24.png": true,
+    "artifacts/housing-city-h2/final/home-40.png": true,
+    "artifacts/housing-city-h2/final/mobile-0.png": true,
+    "artifacts/housing-city-h2/final/mobile-16.png": true,
+    "artifacts/housing-city-h2/final/mobile-24.png": true,
+    "artifacts/housing-city-h2/final/mobile-30.png": true,
+    "artifacts/housing-city-h2/final/mobile-40.png": true,
+    "artifacts/housing-city-h2/final/mobile-56.png": true,
+    "artifacts/housing-city-h2/final/mobile-64.png": true,
+    "artifacts/housing-city-h2/final/mobile-7.png": true,
+    "artifacts/housing-city-h2/final/mobile-76.png": true,
+    "artifacts/housing-city-h2/final/reduced-docked.png": true,
+    "artifacts/housing-city-h2/final/static-docked.png": true
+  },
+  "runtimeAndTestsUnchangedSince": "5ae56e34e7f439bdaad37d4b99186b298b5b4223",
+  "checkedAtCommit": "65455ea5ce9f4e89bdb2ce7e3d55774d250686e5",
+  "passed": true
+}

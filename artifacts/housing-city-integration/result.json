@@ -1,0 +1,53 @@
+{
+  "taskId": "housing-city",
+  "dispatchId": "housing-h3-integration-rev18",
+  "resultId": "housing-h3-integration-rev18-20261027-final01",
+  "status": "RUNNING",
+  "workerId": "01a17935-7d58-79b1-a8d8-600ccf889ee8",
+  "coordinatorId": "01a17927-a815-7041-b4d3-aff62d7bd182",
+  "baselineCommit": "78d2720eea606349e69ee98a0584a706233b6577",
+  "startCommit": "65455ea5ce9f4e89bdb2ce7e3d55774d250686e5",
+  "mainBase": "c94e92f5d1b1dd5518e24019a8d0b67b692d4fce",
+  "scope": "DEV-only integration; production housing excluded; no formal A/B/C choice, survey/DB/question/Meter/timing/deployment changes",
+  "runtimeIdentity": "runtime-identity.json",
+  "validation": {
+    "feature": {
+      "npmTest": "PASS",
+      "npmTestLog": "feature-test.log",
+      "npmBuild": "PASS; existing chunk warning",
+      "npmBuildLog": "feature-build.log",
+      "whitespace": "PASS working and committed task diff",
+      "firstTestAttempt": "Sandbox listen EPERM; full suite rerun with required localhost permission passed"
+    },
+    "production": "production.json",
+    "documentation": "doc-review.json",
+    "review": "Complete source/callers/tests/config/current docs diff inspected, historical evidence retained; original evidence identity verified. No source change in integration closure."
+  },
+  "delivery": {
+    "status": "PENDING",
+    "callbackSent": false,
+    "callbackAttempts": 0,
+    "authorizationVerified": true,
+    "executionMessageId": "01a17822-ead1-7172-b6da-d82035164927",
+    "standingContractMessageId": "01a1781f-336b-7f22-9eef-dfbb1ee35a04"
+  },
+  "allWritersReleased": false,
+  "allOwnedServicesStopped": false,
+  "ownedServicesStarted": [],
+  "preflight": {
+    "fetch": "PASS; later sandbox FETCH_HEAD denial retried with scoped escalation successfully",
+    "featureRemoteDivergence": [
+      0,
+      0
+    ],
+    "featureVersusMain": {
+      "ahead": 19,
+      "behind": 0
+    },
+    "preserved": [
+      ".playwright-cli/",
+      "coordinator-owned docs/handoffs/housing-city.md"
+    ],
+    "unfinishedCommitsAvailableRemotely": true
+  }
+}

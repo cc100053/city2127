@@ -30,7 +30,7 @@
 
 2026-10-26：「建築・居住」[計劃](HOUSING_CITY_PLAN.md)已開始H0位置／基準／預算研究，[具體提案與原圖](../artifacts/housing-city-h0/README.md)已由cc100053確認；H1隔離DEV五配置靜態住宅已實作、軟件驗證並獲人類簽收，見[H1原圖](../artifacts/housing-city-h1/README.md)。H1b已實作橫向共享骨架／藻類循環面板／完整小屋及更新軌的靜態次設計，見[H1b證據](../artifacts/housing-city-h1b/README.md)，已通過軟件及coordinator review（未冒稱人類簽收）；H2已加入90秒DEV多年更新壓縮循環，生活艙／完整小屋實際搬運及接駁，靜態／reduced motion回停泊A；[H2實測與限制](../artifacts/housing-city-h2/README.md)另列，2026-10-27已通過coordinator review。仮説1–3（新材料、植物膜、可移動建築）先做隔離DEV視覺／動態比較，與現有建築共存；仮説4（身體自立）只保留概念。使用者已選定90秒多年更新壓縮循環；H0原圖只有預留線框，未新增正式城市住宅。本輪不改四題、Meter或累積規則；[交接](handoffs/housing-city.md)。
 
-2026-10-27：[H3原圖評估與正式選項](../artifacts/housing-city-h3/README.md)已交付待coordinator review，建議保留現有三區／數量／輪廓。Hero可定位新增體量，系統機理仍需近景／說明，未作訪客理解測試。正式歸屬尚未選定：A固定背景（建議原三區、U停泊A，90秒循環留DEV，不宣稱投票因果）；B保留DEV待獨立居住偏好與輸入來源設計；C另規劃四題替換／權威累積。問題及依賴工作已保存，須由cc100053選定；沉默不視為批准。正式render／資料接線未改，production住宅仍排除。現有固定中值／全能源測試不證明所有正式配置與轉場共存。
+2026-10-27：[H3原圖評估與正式選項](../artifacts/housing-city-h3/README.md)已通過coordinator review（2026-10-27），建議保留現有三區／數量／輪廓。Hero可定位新增體量，系統機理仍需近景／說明，未作訪客理解測試。正式歸屬尚未選定：A固定背景（建議原三區、U停泊A，90秒循環留DEV，不宣稱投票因果）；B保留DEV待獨立居住偏好與輸入來源設計；C另規劃四題替換／權威累積。問題及依賴工作已保存，須由cc100053選定；沉默不視為批准。正式render／資料接線未改，production住宅仍排除。現有固定中值／全能源測試不證明所有正式配置與轉場共存。
 
 ### 居民敘事與畫面分工（2026-10-02）
 

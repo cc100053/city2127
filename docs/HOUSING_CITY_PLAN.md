@@ -1,6 +1,6 @@
 # 台場2127 — 建築・居住多樣性計劃
 
-2026-10-26（H3評估更新2026-10-27）。產品決策：cc100053；規劃整理／實作 owner：Codex。狀態：**H0／H1 已簽收，H1b 靜態次設計及 H2 動態已通過軟件及 coordinator review；H3評估已交付待review，正式歸屬待人類決定**。本計劃按Claude review修訂；H0的基準／候選位置／設計矩陣／預算提案及本機檢查已由cc100053於2026-10-26在實作chat確認，見 [H0證據](../artifacts/housing-city-h0/README.md)。H1／H1b 已新增隔離 DEV 住宅比較，H2 已加入90秒多年更新壓縮循環；正式問卷及展覽資料未修改。現行行為以 [EXHIBITION_SPEC](EXHIBITION_SPEC.md) 為準，實際驗證與下一步見 [任務交接](handoffs/housing-city.md)。
+2026-10-26（H3評估更新2026-10-27）。產品決策：cc100053；規劃整理／實作 owner：Codex。狀態：**H0／H1 已簽收，H1b 靜態次設計及 H2 動態已通過軟件及 coordinator review；H3評估已通過coordinator review，正式歸屬待人類決定**。本計劃按Claude review修訂；H0的基準／候選位置／設計矩陣／預算提案及本機檢查已由cc100053於2026-10-26在實作chat確認，見 [H0證據](../artifacts/housing-city-h0/README.md)。H1／H1b 已新增隔離 DEV 住宅比較，H2 已加入90秒多年更新壓縮循環；正式問卷及展覽資料未修改。現行行為以 [EXHIBITION_SPEC](EXHIBITION_SPEC.md) 為準，實際驗證與下一步見 [任務交接](handoffs/housing-city.md)。
 
 ## 目標與範圍
 
@@ -60,7 +60,7 @@
 | H1：隔離靜態比較 | DEV入口五配置、截圖證據 | 見下文H1；[H1原圖](../artifacts/housing-city-h1/README.md)，2026-10-26人類簽收 | ACCEPTED |
 | H1b：次設計靜態比較 | 橫向共享骨架、藻類設備、完整小屋及更新軌；[本批證據](../artifacts/housing-city-h1b/README.md) | 靜態實城／預算／日暮夜及近景檢查；獨立於H2掃掠 | IMPLEMENTED / COORDINATOR VERIFIED |
 | H2：局部動態與恢復 | 生活艙交換、小屋搬遷、停泊／接駁 | 見下文H2及[本批證據](../artifacts/housing-city-h2/README.md) | IMPLEMENTED / COORDINATOR VERIFIED |
-| H3：收斂與正式接入評估 | [原圖評估與正式選項](../artifacts/housing-city-h3/README.md)；建議保留數量／位置／輪廓 | 評估待coordinator review；正式接入由人類選定 | ASSESSMENT DELIVERED / DECISION PENDING |
+| H3：收斂與正式接入評估 | [原圖評估與正式選項](../artifacts/housing-city-h3/README.md)；建議保留數量／位置／輪廓 | 評估已coordinator接受；正式接入由人類選定 | ASSESSMENT ACCEPTED / DECISION PENDING |
 
 各實作階段都要當輪跑適用檢查並更新交接，不能延至最後才驗證。
 
