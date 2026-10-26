@@ -1,12 +1,12 @@
 # housing-city — Current relay checkpoint
 
 - Task / stable specification: housing-city；[HOUSING_CITY_PLAN](../HOUSING_CITY_PLAN.md)，H0–H3，無deadline。
-- Revision / status: 18 / RUNNING。H3 result `housing-h3-r1-rev16-20261027-final01`已coordinator接受；worker完成delivery metadata後release，下一步獨立DEV-only整合。
+- Revision / status: 19 / RUNNING。H3 assessment已接受；DEV-only integration `housing-h3-integration-rev18`已建立，記錄owner後發START。
 - Active coordinator: `01a17927-a815-7041-b4d3-aff62d7bd182`，host local；只有本文active coordinator可派發或修改current state。前coordinator `01a17822-914e-7a52-a897-a34d47a68d70`已release dispatch，僅完成本transfer文件commit／push與activation，不再另派implementation。
-- Worker owner: none；H3 `01a1792a-0965-73b3-bd12-e44fd9bf60ff`已明確release所有writers／services，metadata `773a8fd`已push，final cursor28確認idle。
+- Worker owner: integration `01a17935-7d58-79b1-a8d8-600ccf889ee8`，host local，唯一writer／Git整合owner，START後執行。H3 assessment owner已release／idle，metadata `773a8fd`已push，final cursor28。
 - Checkout / branch: `/Users/fatboy/city2127` / `codex/housing-city`，upstream `origin/codex/housing-city`。
 - Actual checkpoint: H2 source `5ae56e34e7f439bdaad37d4b99186b298b5b4223`、result `480037c`、confirmed callback `245f03c`，全部已push；source hashes與現檔一致。
-- Previous progress: 2026-10-26T17:02:36.495620+00:00；successor完成activation／唯讀preflight，H2接受狀態保留。
+- Last activation progress: 2026-10-26T17:02:36.495620+00:00；successor完成activation／唯讀preflight，H2接受狀態保留。
 - Succession reason: 本coordinator累積H0–H2多輪實作／除錯歷史；H2是已釋放writer的安全milestone，H3改由fresh coordinator從本compact state做產品收斂，避免繼續攜帶機械細節。
 
 ## Direct human authorization
@@ -49,16 +49,16 @@
 - H2服務清理[record](../../artifacts/housing-city-h2/cleanup.json)；lsof5188無listener。沒有active writer、browser、dev server或quota automation。
 - 先前h1單次排程已刪，h2於2026-10-27 01:28 JST實際觸發，配額恢復後automation_update delete成功；本heartbeat結束時須說明h2已移除。未設新排程。
 
-## Next action for successor
+## Next action
 
-1. H3 assessment已接受且owner已release；保存本coordinator checkpoint後建立fresh DEV-only integration worker。Pending dispatch `housing-h3-integration-rev18`，尚未建立；勿重審同result或重試callback。
-2. 成為active後建立fresh H3 worker，完成已授權「收斂與正式接入評估」：按H1b／H2原圖與實測評估三類各自／mixed輪廓、數量、可讀性及原城共存，保存具體正式接入選項與推薦；只修驗收必需的小問題，不擴大美術／系統。
-3. Pending major decision：哪些作正式固定背景、哪些跟既有偏好、哪些另建獨立累積。可提交選項：A先把已驗證住宅作固定背景、不稱投票結果（建議用以討論，未獲同意不實作）；B保留DEV原型，待獨立居住偏好設計；C另行規劃既有四題替換／權威累積（擴產品，需明確確認）。問題依賴：正式render／權威資料接入，不能自行取代題目／DB／Meter或製造因果。
-4. 在等major decision時，完成獨立H3評估文件、現有DEV原型收尾及驗證／Git整合。AGENTS授權把已驗證DEV-only code經CONTRIBUTING整合main＋push並確認main CI，這不代表正式展示住宅已獲批准；production housing仍排除。先review準備好的batch再派整合；branch/main無force、無部署。若沒有獨立工作才NEEDS_INPUT。
-5. 原人類H1b／H2續作授權及新unattended規則持續有效，勿重問例行選擇；重大決策保存question／options／recommendation／dependent scope，通知一次。
+1. 本revision19 commit完成後，對integration worker發START，保存cursor，等待其compact result；不重派／不由coordinator實作。
+2. Batch範圍：H3 accepted狀態文件收尾、root feature／integrated tests+build+whitespace、按CONTRIBUTING main race checks／merge／push／確認mainCI，保留branch／原證據；production住宅繼續排除，不部署。
+3. H3正式A/B/C選擇仍待答，已通知一次，見上節；僅dependent正式render／資料接線等待，沉默不是批准。
+4. Review integration結果後保存實際main／CI／release狀態。若仍未收到產品選擇且沒有獨立工作才NEEDS_INPUT；如quota<15%，按最新版skill安全checkpoint並安排scoped recovery。
 
 ## Delivery / quota / succession
 
+- Integration dispatch `housing-h3-integration-rev18` CREATE confirmed；worker `01a17935-7d58-79b1-a8d8-600ccf889ee8`，host local；START pending本revision19 commit，cursor pending。
 - H2 dispatch housing-h2-r1-rev11完成，cursor `dd347910-9fe0-45da-a453-ec7b3847b5ea:67`（idle），callback sent，result final01已coordinator accepted。不要再派H2或誤當未讀result。
 - Succession `housing-h3-coordinator-rev14` COMPLETE；active coordinator `01a17927-a815-7041-b4d3-aff62d7bd182`已收到前任ACTIVATE，前任release dispatch。Direct human execution及standing message已由read_thread核實一次。Dispatch `housing-h3-r1-rev16` CREATE／DELIVERED confirmed；worker `01a1792a-0965-73b3-bd12-e44fd9bf60ff`，host local，final status cursor `5caa831e-c167-45bd-bd0f-af8b43665a4b:28`（idle），result accepted。
 - Quota last actual read primary66% used／34%remaining、weekly39%used／61%remaining；reset1793050170／1793600524，pause<15%。H3 assessment+coordinator實際約18points（account共用，不當精確單批成本），整合以約8points小批開始，安全milestone重查。
