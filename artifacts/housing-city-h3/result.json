@@ -112,13 +112,25 @@
   "allOwnedServicesStopped": true,
   "ownedServicesStarted": [],
   "delivery": {
-    "status": "pending",
+    "status": "coordinator_retrieved",
     "authorizationVerified": true,
     "executionMessageId": "01a17822-ead1-7172-b6da-d82035164927",
     "standingContractMessageId": "01a1781f-336b-7f22-9eef-dfbb1ee35a04",
-    "coordinatorId": "01a17927-a815-7041-b4d3-aff62d7bd182"
+    "coordinatorId": "01a17927-a815-7041-b4d3-aff62d7bd182",
+    "callbackSent": false,
+    "callbackAttempts": 2,
+    "callbackOutcome": "AUTO_REVIEW_REJECTED; no further retry or workaround",
+    "autoReviewReason": "Historical authorization retrieved through tools was not accepted by auto-review as trusted direct authorization for messaging this thread.",
+    "receipt": {
+      "sourceThreadId": "01a17927-a815-7041-b4d3-aff62d7bd182",
+      "receivedAtUTC": "2026-10-26T17:13:27.166096+00:00",
+      "channel": "Coordinator message received in this worker conversation",
+      "text": "我已主動讀取並收到H3 result housing-h3-r1-rev16-20261027-final01（report8f9f8f9／metadata7b23bf6），開始review。不要再重試callback；可在delivery記錄coordinator retrieved，以此訊息作receipt（不要冒稱callback sent）。"
+    },
+    "retrievedCheckpointCommit": "7b23bf6",
+    "furtherCallbackRequired": false
   },
-  "updatedAtUTC": "2026-10-26T17:11:47.733589+00:00",
-  "nextAction": "Coordinator reviews unique H3 result and original evidence; formal decision stays pending; worker stops after callback.",
+  "updatedAtUTC": "2026-10-26T17:13:27.166096+00:00",
+  "nextAction": "Coordinator has retrieved H3 and begun review; worker completes delivery metadata only, releases all writers/services and stays idle. Integration requires a new coordinator assignment.",
   "lastVerifiedCommit": "8f9f8f9b21448aaf26e23f873c179e93f01d0f75"
 }
