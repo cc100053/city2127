@@ -67,6 +67,7 @@ try {
     const images=[],takes=[];
     for(let take=1;take<=2;take++) {
       const data=await load(row,6000),path=`${out}/${key(row)}${take===1?'__repeat1':''}.jpg`;
+      assert.ok(!existsSync(path),`Preserve existing image: ${path}; use a new evidence directory or archive the interrupted take.`);
       await page.screenshot({path,type:'jpeg',quality:90});images.push(path);takes.push({...data,errors:[...errors]});
     }
     const reproducibility=await difference(...images.map(imageData)),data=takes[1],auto=framing(data.frame,row.id);
@@ -87,6 +88,7 @@ try {
   }
   if(mode==='compare') {
     const captureReport=JSON.parse(readFileSync(`${out}/capture.json`,'utf8')),captures=captureReport.rows;
+    assert.ok(selected.every(row=>captures.some(c=>key(c)===key(row)&&c.complete)),'Complete the selected matrix before A4 comparisons.');
     report.rows=[];
     for(const id of new Set(captures.map(r=>r.id))) for(const hour of [12,22]) {
       const rows=captures.filter(r=>r.id===id&&r.hour===hour); if(rows.length<2)continue;

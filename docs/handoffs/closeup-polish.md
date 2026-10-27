@@ -1,11 +1,11 @@
 # closeup-polish — Headline 近鏡逐個打磨
 
 - Owner: cc100053（產品／審美最終批准）；實作由一個 long session 負責，開工時喺下面「進度」記低 session 名。
-- Status: S0 IN PROGRESS（worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2`；只做量測，未改美術）
+- Status: S0 PARTIAL / WAITING QUOTA（worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2`；43/98，未改美術）
 - Branch: `feat/closeup-polish`（一條長分支，每個 sector 一個 checkpoint）
 - Base commit: `fdc4a0cbbbc352b41c15850f2a846845d7975de1`（fetch verified main，包含完整 S0 標準）
-- Last verified commit: `fdc4a0c` baseline；S0 working source root test/build、runner self-check及production DEV排除PASS，完整矩陣仍在跑。
-- Remote availability: main baseline已fetch核對；獨立clone `feat/closeup-polish` 已開，S0 checkpoint尚未合併。
+- Last verified commit: runtime `59c6ea9`；最終source root test/build、runner self-check及production DEV排除PASS，完整S0矩陣及效能未完成。
+- Remote availability: source checkpoint `59c6ea9` 已push `origin/feat/closeup-polish`；部分原圖／logs另作evidence checkpoint，result record記錄最終SHA。未合併main。
 
 ## Session Git state
 
@@ -164,7 +164,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 
 | Sector | 狀態 | Checkpoint | Owner review | Main merge |
 | --- | --- | --- | --- | --- |
-| S0 基準 | IN PROGRESS；worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2` | — | 唔需要（冇美術改動）；本批留 coordinator review，不 merge | — |
+| S0 基準 | PARTIAL / WAITING QUOTA；43/98，worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2` | runtime `59c6ea9`；[部分報告](../../artifacts/closeup-polish/S0/README.md) | 唔需要（冇美術改動）；本批留 coordinator review，不 merge | — |
 | A 海浜公園 | PLANNED | — | — | — |
 | B アクアシティ南 | PLANNED | — | — | — |
 | C フジテレビ東 | PLANNED | — | — | — |
@@ -173,7 +173,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 
 ## Actual validation results
 
-- Verification status: NOT RUN（只有計劃）
+- Verification status: PARTIAL（43/98；不是S0完成）。[原圖／完整logs／量測報告](../../artifacts/closeup-polish/S0/README.md)及[JSON](../../artifacts/closeup-polish/S0/partial-report.json)。Root最終source npm test/build PASS，runner self-check、production排除及diff PASS；首次sandbox listen EPERM已獲准重跑。A1 32/43、A2 18/43、A3 0/43、A6 42/43；首次Vite optimizer504/abort保留待獨立重測。Repro7/43通過；其餘保留雙圖／採第二張，未調門檻。Vsync59.8–60.1不代表uncapped性能；A4／28組兩輪uncapped／其餘55狀態未跑。沒有新live／硬件驗收。
 - 呢份計劃只做咗文件連結同事實核對。以下各項都對照過 `6a20346` 嘅 source：檔案路徑、shot pose、`?meters`／`?shot`／`?energy`／`hour`／`reviewTime` 參數、ladder 邊界（`LADDER_EDGES` 1.5／4／7）、`ENERGY_OPTIONS`，同 `data-fps` 嘅 120 frame 平均。
 
 ## Known issues and blockers
@@ -192,4 +192,4 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 
 ## Next expected step
 
-Long session：開 `feat/closeup-polish`，做 S0（tier 對應 check → capture runner → `cityShotFrame` 同 test → 完整 baseline 矩陣同效能量度）。
+配額低於15%已安全停止。Coordinator依watchdog復原後先重查實際limits，再在同一獨立clone續跑capture（已完成43行會跳過，不覆寫原圖）；完成餘下55狀態、在新目錄重測首組NW focal optimizer失敗、28組兩輪uncapped、compare A4/A5及完整review。最早報告weekly reset+3min為2026-11-02T06:25:04Z；不能把目前部分證據視為S0完成。Chrome／runner／Vite5194均已停止，未啟動survey服務；worker交接後不再寫入。

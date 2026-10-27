@@ -1,0 +1,11 @@
+{
+  "checked": [
+    "docs/PROJECT.md",
+    "docs/VALIDATION.md",
+    "docs/handoffs/README.md",
+    "docs/handoffs/closeup-polish.md",
+    "artifacts/closeup-polish/S0/README.md"
+  ],
+  "missingLocalTargets": [],
+  "anchors": "No new anchors introduced; existing anchors unchanged."
+}

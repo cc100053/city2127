@@ -1,0 +1,7 @@
+Vite launch: npm run dev -- --port 5194 --strictPort (loopback 127.0.0.1)
+VITE v7.3.6 ready in 79 ms; http://127.0.0.1:5194/
+Remaining process output on cleanup:
+10:08:14 PM [vite] (client) page reload src/devShotFrame.ts
+10:08:20 PM [vite] (client) ✨ new dependencies optimized: three-mesh-bvh
+10:08:20 PM [vite] (client) ✨ optimized dependencies changed. reloading
+Cleanup exit code: 130 (requested SIGINT); port 5194 has no listener.

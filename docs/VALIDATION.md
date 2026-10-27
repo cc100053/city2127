@@ -345,6 +345,8 @@ Owner明確批准後，accepted `cf0fe82`以no-ff merge成 `51002890371ef3aa7bc7
 
 Main `ad60a8912a62c5ad24bdbf965c5dc31527771562`推送及fetch核對成功、HEAD=origin/main，實際[main CI40490237501](https://github.com/cc100053/city2127/actions/runs/40490237501) SUCCESS：root／survey／module-swap測試與build、committed whitespace全部通過；[run及各步驟原始證據](handoffs/evidence/headline-camera-main-ci.json)。本段取代上方feature階段待批准／main CI未驗狀態。最後CI紀錄提交只有Markdown及docs內證據，按workflow跳過CI，程式碼與成功run一致；連結／fact／diff檢查通過。既有硬件／長測／模型打磨限制保留。
 
-## Closeup polish S0 — 2026-10-27（進行中）
+## Closeup polish S0 — 2026-10-27（部分／配額暫停）
 
 [方法／原圖／完整logs](../artifacts/closeup-polish/S0/README.md)：新增DEV `cityShotFrame`及四站tier對應、投影／九點／可見性／InstancedMesh／raycast還原測試，runner self-check定義98個日夜狀態；完整矩陣與兩輪uncapped效能仍在執行，不能視為S0完成。主體／原門檻不變，初步NW A1/A2通過但A3及重載reproducibility失敗，所有原圖與失敗保留。首次sandbox root test的localhost EPERM已獲准重跑完整PASS；最終source結果及精確checkpoint見本批handoff。Build PASS，僅既有兩項warning；production排除DEV helper。沒有美術／相機pose／survey／梯級／時間線改動，未合併main；其他平台／展示硬件／新live／真人辨識未驗。
+
+S0安全checkpoint：weekly剩14%時停止；final flush共43/98狀態／86張baseline JPEG，另保留native試跑。A1通過32/43、A2 18/43、A3 0/43、A6 42/43；repro7/43通過，所有雙圖及失敗保留。data-fps59.8–60.1僅vsync參考；A4、完整矩陣及兩輪uncapped仍未驗。Runtime59c6ea9已push feature，未merge；所有owned Chrome／runner／Vite5194已釋放。最終source root checks及來源hash見上方報告，沒有新live或其他平台宣稱。
