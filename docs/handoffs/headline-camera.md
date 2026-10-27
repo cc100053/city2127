@@ -4,8 +4,8 @@
 - Status: REVIEW_READY — implementation and local software checks complete; main merge requires owner approval
 - Branch: `feat/headline-camera`
 - Base commit: `00c0273`（main：ladder 整合同 main CI 記錄之後）
-- Last verified commit: validated working tree; exact code commit recorded after commit below
-- Remote availability: `origin/feat/headline-camera`（只有呢份計劃）
+- Last verified commit: `9335b6d627cd5d6175a13936cb45c0e34708ab33` (exact validated source / tests / original evidence)
+- Remote availability: `origin/feat/headline-camera` @ `9335b6d627cd5d6175a13936cb45c0e34708ab33`; implementation pushed successfully, metadata follow-up carries this verification record
 
 ## Session Git state
 
@@ -59,7 +59,7 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 - [x] 鏡頭到嘅地方同結果卡「街の画面：…」講嘅地點一致。
 - [x] Root `npm test`、`npm run build`、`git diff --check` 通過；survey 冇改就唔使跑。
 - [x] 用 scratch `survey dev:auto` 做 browser check，每個 shot 至少一張截圖，並記錄 hero 同近鏡嘅 `data-fps`。
-- [ ] 文件同步完成；feature push 記錄待下方補充，**merge main 之前問 owner**。
+- [x] 文件同步及 feature push 完成；**merge main 之前問 owner**。
 
 ## 預設設計（owner 未另外講就照做）
 
@@ -217,7 +217,7 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 - 14 static images (hero +13 shots), 14 settled live hold images (13 shots +water garden after Undo), original hashes verified. Development Mac macOS27.0.1 arm64, Chrome156.0.8078.48 headless/ANGLE Metal Apple M6, 1920×1080 DPR1 default/hour12. Hero60.1FPS/998 calls; static59.9–60.1FPS/455–950 calls; actual live59.9–60.1FPS/599–1186 calls. Short canvas cadence only, no sustained/hardware claim.
 - Live no-change/reload/Undo/reduced motion/A-B PASS; submissions1006ms apart, ordered display, second own headline. Eight extra real TCP/reset/DEV/legacy/standalone/catch-up checks PASS; shortened-slot uses real-view wire fixture, clearly separated from real server checks.
 - Page errors/console errors0. System font fallback explicit. All owned browsers/services closed; Vite5184 and dev:auto8798 confirmed free.
-- Main unchanged; feature push/checkpoint will be recorded below. No main CI claim.
+- Main unchanged at `00c02737650008a450bd8f08e1a491ad023c77d2`; feature `9335b6d627cd5d6175a13936cb45c0e34708ab33` pushed successfully. Committed task whitespace and source/image manifest PASS. No main CI claim.
 - Integrated commit and checks: NOT INTEGRATED
 
 ## Known issues and blockers
@@ -256,3 +256,9 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 - First live images were taken at 4.9 s (early hold, before the 5.62 s geometry completion). They are retained locally in `artifacts/headline-camera/drafts/early-hold/`; final live captures move to 8.3 s so geometry is settled and the latest 120-frame FPS window lies fully inside hold.
 
 - Bare `?shot=nw:focal` now initializes neutral exhibition carriers through the existing DEV Meter snapshot helper; explicit energy/housing/scale/street/civic review priority is preserved. `?energy=mixed&shot=energy:ring` remains the explicit energy-composition preview. The final added recovery check covers the bare shot query.
+
+## Delivery checkpoint
+
+- Implementation / validated code commit: `9335b6d627cd5d6175a13936cb45c0e34708ab33` (`feat(camera): follow live headlines with authored close-ups`).
+- Feature push succeeded; this documentation follow-up changes no runtime, tests or original evidence.
+- Worker report: `.task-relay/headline-camera/result-implementation-1.json` in the source project (outside this independent clone). Writers and owned services released for coordinator review. Main merge remains blocked on explicit owner approval by the agreed plan.
