@@ -217,6 +217,7 @@ const realTreeBytes = await readFile(new URL('../asset/models/future-tree-2127/f
 const realTreeBuffer = realTreeBytes.buffer.slice(realTreeBytes.byteOffset, realTreeBytes.byteOffset + realTreeBytes.byteLength);
 const realTreeGltf: Pick<GLTF, 'scene' | 'animations'> = await new Promise((resolve, reject) =>
   new GLTFLoader().parse(realTreeBuffer, '', resolve, reject));
+const cachedCrownPositions = Array.from((realTreeGltf.scene.getObjectByName('Photovoltaic_crown') as T.Mesh).geometry.attributes.position.array);
 const fittedScene = new T.Scene();
 const fittedAssets = new SiteAssetLoaderCache({ async loadAsync() { return realTreeGltf; } });
 const fittedPark = buildEnvironmentPark(fittedScene, { windows: [], signs: [], random: () => 0 }, fittedAssets);
@@ -274,6 +275,9 @@ fittedTreeLayer.group.traverseVisible(object => {
   if (object instanceof T.InstancedMesh && object.name === 'park-tree-glb-instances') glbMeshes.push(object);
 });
 assert.ok(glbMeshes.length > 0);
+assert.ok(glbMeshes.some(mesh => !Array.isArray(mesh.material) && mesh.material.name === 'park-photovoltaic-foliage'), 'actual imported foliage uses the Park finish');
+assert.deepEqual(Array.from((realTreeGltf.scene.getObjectByName('Photovoltaic_crown') as T.Mesh).geometry.attributes.position.array), cachedCrownPositions,
+  'Park refinement must not mutate the cached GLB geometry');
 const legacyGlbMatrices = glbMeshes.map(mesh => Array.from({ length: 5 }, (_, index) => {
   const matrix = new T.Matrix4(); mesh.getMatrixAt(index, matrix); return matrix.toArray();
 }));

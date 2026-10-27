@@ -2,9 +2,9 @@
 
 Owner: worker `01a17e2a-4c38-7422-8d68-33782c0367f5`, dispatch `closeup-polish-A-1-r8`. Base: verified clean main `3d0f40ebd5d7350ecdcc05ab3420cacf926dfd9a`, 2026-10-28 fetch0/0. Explicitly switched the retained feature branch and fast-forwarded it to this main; remote feature then ahead2/behind0. Root legacy checkout untouched. No `.codegraph/` in this clone.
 
-Status: r1 pose measurement in progress; no art acceptance or main merge. [Round state](round-state.json), [scope and gates](../../../docs/handoffs/closeup-polish.md), [immutable S0](../S0/README.md), [baseline references](baseline/reference.json).
+Status: r1 complete24/24 states +8×2 performance windows; r2 applied, root verification in progress. No art acceptance or main merge. [Round state](round-state.json), [scope and gates](../../../docs/handoffs/closeup-polish.md), [immutable S0](../S0/README.md), [baseline references](baseline/reference.json).
 
-順序：`ne:focal` → `ne:district` → `energy:garden`。沿用ART與CITY MASTER TASTE，原圖已能定位本次問題，無需額外dream-loop目標。第一輪只調SHOTS數值；第二輪預備patch保存於 [planned-r2.patch](planned-r2.patch)，在r1完成前不套用。每shot最多三輪。
+順序：`ne:focal` → `ne:district` → `energy:garden`。沿用ART與CITY MASTER TASTE，原圖已能定位本次問題，無需額外dream-loop目標。第一輪只調SHOTS數值；第二輪在r1完成後套用，patch保存於 [planned-r2.patch](planned-r2.patch)（zero-context，重現用`git apply --unidiff-zero`）。每shot最多三輪。
 
 每輪24狀態（focal6、district10、garden6、hero2），每狀態兩次fresh navigation，保存JPEG90原圖，採第二take。1920×1080／DPR1／default／Chrome156 headless／hour12,22／reviewTime20；Google Fonts明確改空CSS，系統字體。8組效能各兩輪，至少16秒後取5秒rAF，雙flag解除vsync與frame cap。S0原始檔不覆寫，A1–A6門檻不改。
 

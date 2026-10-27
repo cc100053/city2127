@@ -1,0 +1,34 @@
+{
+  "phase": "r2 source verified; visual and live checks pending",
+  "rootNpmTest": {
+    "status": "PASS",
+    "exitCode": 0,
+    "log": "npm-test.log"
+  },
+  "rootNpmBuild": {
+    "status": "PASS",
+    "exitCode": 0,
+    "log": "npm-build.log",
+    "warnings": [
+      "existing chunk-size warning"
+    ]
+  },
+  "initialTestFailure": {
+    "status": "FAIL preserved",
+    "log": "npm-test-initial-failure.log",
+    "source": "initial-source.patch",
+    "cause": "Added public-light batch met the existing fewer-than50 study batch limit",
+    "fix": "After garden2 clone, rebake new edges with the first garden existing public-light mesh;49 batches, second garden untouched"
+  },
+  "targetedEnergy": {
+    "status": "PASS",
+    "log": "energy-check.log"
+  },
+  "gitDiffCheck": "PASS working tree; committed check follows checkpoint",
+  "notRun": [
+    "r2 full capture/performance",
+    "sector A live",
+    "owner visual acceptance",
+    "exhibition hardware"
+  ]
+}

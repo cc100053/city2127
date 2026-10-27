@@ -167,3 +167,5 @@ Admin Day／Night／Auto 保存為獨立 display setting：12:00／22:00／180 �
 ### 住宅方案A — 2026-10-27 決定
 
 人類已採固定背景A：M輕材架空／共享住宅、P植物膜／藻類設備、U交換骨架／完整小屋及複合外皮共同存在於正式城市，U固定停泊A。90秒多年更新壓縮循環只留DEV。住宅不是任何回答或Meter造成的變化，不加入提案結果，四題與權威資料契約保持。依後續人類決定保留既有服務館，將M原構造由`(-135,-175)`平移到`(-165,-165)`，其餘住宅位置、數量與輪廓保持。驗證／搬位原圖見[本批報告](../artifacts/housing-background/README.md)；H3中的「待選A/B/C」已由本決定取代。實機／訪客及工程驗收仍另列。
+
+2026-10-28 closeup sector A feature進行中：海浜公園、同區climate carriers與第一西岸水庭在原數量／footprint內打磨，三個SHOTS重新構圖，hero／FOV42／headline時間線保持。r1全24日夜狀態已保存，r2驗證中；[本批證據](../artifacts/closeup-polish/A/README.md)。此為feature實作，owner美術review及main整合未完成，A3／A4等差距仍須逐項報告。

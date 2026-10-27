@@ -1,0 +1,131 @@
+diff --git a/src/districtMeters.ts b/src/districtMeters.ts
+index 65120c3..a073d10 100644
+--- a/src/districtMeters.ts
++++ b/src/districtMeters.ts
+@@ -562 +562 @@ export class EnvironmentDistrict {
+-  private readonly postGeometry = new T.CylinderGeometry(.22, .3, ROOF, 8);
++  private readonly postGeometry = new T.CylinderGeometry(.22, .3, ROOF, 16);
+@@ -606,0 +607 @@ export class EnvironmentDistrict {
++    const screenFoliage = leafyCrown(2);
+@@ -608,2 +609,3 @@ export class EnvironmentDistrict {
+-      new T.BoxGeometry(SPAN - 2, ROOF - .6, .9).translate(0, (ROOF - .6) / 2, WIDTH / 2 - .5),
+-      new T.BoxGeometry(SPAN, .5, WIDTH / 2).translate(0, ROOF + .2, WIDTH / 4),
++      ...Array.from({ length: 15 }, (_, k) => screenFoliage.clone().scale(1.75, 1.05, .5)
++        .translate((k % 5 - 2) * 3.5, 1.4 + Math.floor(k / 5) * 2.25, WIDTH / 2 - .5)),
++      new T.BoxGeometry(SPAN, .5, WIDTH / 2).deleteAttribute('uv').translate(0, ROOF + .2, WIDTH / 4),
+@@ -610,0 +613 @@ export class EnvironmentDistrict {
++    screenFoliage.dispose();
+@@ -613,0 +617 @@ export class EnvironmentDistrict {
++      ...[-7, -3.5, 0, 3.5, 7].map(x => new T.BoxGeometry(.12, ROOF - .6, .12).translate(x, (ROOF - .6) / 2, WIDTH / 2 - .5)),
+@@ -616 +620 @@ export class EnvironmentDistrict {
+-    this.crowns = new T.InstancedMesh(leafyCrown(1), this.crownMaterial, n * 3);
++    this.crowns = new T.InstancedMesh(leafyCrown(3), this.crownMaterial, n * 3);
+@@ -768 +772 @@ export class EnvironmentDistrict {
+-        this.dummy.scale.set(4.6 * pergola, 1.5 * pergola, 6.4 * pergola);
++        this.dummy.scale.set(4.6 * pergola, 2.1 * pergola, 6.4 * pergola);
+diff --git a/src/energyPrototype.ts b/src/energyPrototype.ts
+index bae943a..e19aeaf 100644
+--- a/src/energyPrototype.ts
++++ b/src/energyPrototype.ts
+@@ -504,0 +505,9 @@ export function energyPrototype() {
++  const westGardenLights = new T.Group(); westGardenLights.name = 'energy-west-garden-edge-lights';
++  arc(westGardenLights, 11.96, 12.025, .08, [8, 21.84, 0], publicLight);
++  for (const z of [-8, 8]) {
++    member(westGardenLights, [-7.55, 1, z - .57], [.55, 20.8, z - .57], .08, publicLight);
++    member(westGardenLights, [11.22, 1, z - .57], [15.78, 20.8, z - .57], .08, publicLight);
++  }
++  // Rebatch this garden's edge finish after cloning; the second garden keeps its original geometry.
++  westGardenLights.add(...garden.children.filter(child => child instanceof T.Mesh && child.material === publicLight));
++  westGardenLights.add(...bake(westGardenLights)); garden.add(westGardenLights);
+diff --git a/src/headlineCamera.ts b/src/headlineCamera.ts
+index c552b22..a6e1407 100644
+--- a/src/headlineCamera.ts
++++ b/src/headlineCamera.ts
+@@ -17 +17 @@ export const SHOTS: Record<ShotId, Pose> = {
+-  'ne:district': { position: [-390, 270, -310], target: [-100, 65, -60] },
++  'ne:district': { position: [-390, 270, -310], target: [-250, 0, -170] },
+@@ -20 +20 @@ export const SHOTS: Record<ShotId, Pose> = {
+-  'energy:garden': { position: [-350, 56, -245], target: [-302, 12, -135] },
++  'energy:garden': { position: [-390, 65, -160], target: [-304, 12, -130] },
+diff --git a/src/siteBuilders/environmentPark.ts b/src/siteBuilders/environmentPark.ts
+index 6a2d0a9..ab920ee 100644
+--- a/src/siteBuilders/environmentPark.ts
++++ b/src/siteBuilders/environmentPark.ts
+@@ -2 +2 @@ import * as T from 'three';
+-import { arc, bake, futureLight, leaf, membrane, paint, pink, shrubs, stone, trim, type Kit } from '../cityRig.ts';
++import { arc, bake, box, futureLight, leaf, leafyCrown, membrane, paint, pink, publicLight, shrubs, stone, trim, type Kit } from '../cityRig.ts';
+@@ -11,0 +12,2 @@ const treeTrunk = paint('#62756b', .88);
++const photovoltaicFoliage = paint('#728c61', .82, .08);
++photovoltaicFoliage.name = 'park-photovoltaic-foliage';
+@@ -159,0 +162,3 @@ class ParkRuntime implements EnvironmentParkRuntime {
++    const crown = leafyCrown(3);
++    crown.computeBoundingBox();
++    const crownSize = crown.boundingBox!.getSize(new T.Vector3()), crownCenter = crown.boundingBox!.getCenter(new T.Vector3());
+@@ -161 +166,12 @@ class ParkRuntime implements EnvironmentParkRuntime {
+-      if (object instanceof T.Mesh && Array.isArray(object.material)) hasMaterialArray = true;
++      if (!(object instanceof T.Mesh)) return;
++      if (Array.isArray(object.material)) { hasMaterialArray = true; return; }
++      if (object.name.startsWith('Photovoltaic_crown')) {
++        // Keep each imported frond's envelope and branch attachment; only soften its faceted foliage.
++        object.geometry.computeBoundingBox();
++        const bounds = object.geometry.boundingBox!, size = bounds.getSize(new T.Vector3()), center = bounds.getCenter(new T.Vector3());
++        object.geometry = crown.clone().translate(-crownCenter.x, -crownCenter.y, -crownCenter.z)
++          .scale(size.x / crownSize.x, size.y / crownSize.y, size.z / crownSize.z).translate(center.x, center.y, center.z);
++        object.material = photovoltaicFoliage;
++      } else if (object.material.name === 'Cyan bioluminescent veins') object.material = publicLight;
++      else if (object.material.name === 'Ceramic bark') object.material = treeTrunk;
++      else if (object.material.name === 'Brushed titanium') object.material = trim;
+@@ -162,0 +179 @@ class ParkRuntime implements EnvironmentParkRuntime {
++    crown.dispose();
+@@ -281 +298 @@ export function buildEnvironmentPark(scene: T.Scene, _kit: Kit, assets: SiteAsse
+-  const crownGeometry = new T.IcosahedronGeometry(1, 1);
++  const crownGeometry = leafyCrown(3);
+@@ -293 +310,3 @@ export function buildEnvironmentPark(scene: T.Scene, _kit: Kit, assets: SiteAsse
+-  const canopy = new T.Mesh(new T.RingGeometry(2.7, 4.2, 48), membrane);
++  const climateFrame = new T.Group();
++  const veil = membrane.clone(); veil.opacity = .3;
++  const canopy = new T.Mesh(new T.RingGeometry(3.45, 4.2, 64), veil);
+@@ -295,2 +314,8 @@ export function buildEnvironmentPark(scene: T.Scene, _kit: Kit, assets: SiteAsse
+-  finLayer.group.add(canopy);
+-  finLayer.group.add(fins);
++  climateFrame.add(canopy);
++  for (let i = 0; i < 6; i++) {
++    const angle = i * Math.PI / 3, x = Math.cos(angle) * 4.05, z = -Math.sin(angle) * 4.05;
++    arc(climateFrame, 0, .065, 4.4, [x, .75, z], trim);
++    box(climateFrame, [.18, .08, .5], [x, 5.1, z], trim).rotation.y = angle;
++  }
++  climateFrame.add(...bake(climateFrame));
++  finLayer.group.add(climateFrame, fins);
+@@ -303,0 +329,2 @@ export function buildEnvironmentPark(scene: T.Scene, _kit: Kit, assets: SiteAsse
++  const marker = createGuestMarker(root, 'ne');
++  marker.material.color.set('#b7a17b');
+@@ -307 +334 @@ export function buildEnvironmentPark(scene: T.Scene, _kit: Kit, assets: SiteAsse
+-    marker: createGuestMarker(root, 'ne'), environmentPark,
++    marker, environmentPark,
+diff --git a/tests/districtMeters.test.ts b/tests/districtMeters.test.ts
+index 295b2b5..a1ca962 100644
+--- a/tests/districtMeters.test.ts
++++ b/tests/districtMeters.test.ts
+@@ -40,0 +41,5 @@ let d = district.getDiagnostics();
++const livingScreen = district.root.getObjectByName('environment-district-canopy') as T.InstancedMesh;
++livingScreen.geometry.computeBoundingBox();
++const screenBounds = livingScreen.geometry.boundingBox!;
++assert.ok(screenBounds.min.x >= -9 && screenBounds.max.x <= 9 && screenBounds.min.z >= -6 && screenBounds.max.z <= 6,
++  'layered screen foliage must stay inside its original promenade bay');
+diff --git a/tests/energyPrototype.test.ts b/tests/energyPrototype.test.ts
+index ae468c3..a8cc4a4 100644
+--- a/tests/energyPrototype.test.ts
++++ b/tests/energyPrototype.test.ts
+@@ -43,0 +44,2 @@ study.select('mixed');
++assert.ok(study.gardens[0].getObjectByName('energy-west-garden-edge-lights'), 'west water garden keeps its own supported edge lighting');
++assert.equal(study.gardens[1].getObjectByName('energy-west-garden-edge-lights'), undefined, 'sector A must leave the second garden geometry unchanged');
+diff --git a/tests/siteAssets.test.ts b/tests/siteAssets.test.ts
+index 16e1142..e2b5737 100644
+--- a/tests/siteAssets.test.ts
++++ b/tests/siteAssets.test.ts
+@@ -219,0 +220 @@ const realTreeGltf: Pick<GLTF, 'scene' | 'animations'> = await new Promise((reso
++const cachedCrownPositions = Array.from((realTreeGltf.scene.getObjectByName('Photovoltaic_crown') as T.Mesh).geometry.attributes.position.array);
+@@ -276,0 +278,3 @@ assert.ok(glbMeshes.length > 0);
++assert.ok(glbMeshes.some(mesh => !Array.isArray(mesh.material) && mesh.material.name === 'park-photovoltaic-foliage'), 'actual imported foliage uses the Park finish');
++assert.deepEqual(Array.from((realTreeGltf.scene.getObjectByName('Photovoltaic_crown') as T.Mesh).geometry.attributes.position.array), cachedCrownPositions,
++  'Park refinement must not mutate the cached GLB geometry');

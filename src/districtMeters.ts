@@ -559,7 +559,7 @@ export class EnvironmentDistrict {
   private readonly sailMaterial = new T.MeshStandardMaterial({ color: '#fbf8f1', roughness: .55, side: T.DoubleSide, emissive: '#fff4e0', emissiveIntensity: .08 });
   private readonly crownMaterial = new T.MeshStandardMaterial({ color: '#ffffff', roughness: .92 });
   private sailGeometry!: T.BufferGeometry;
-  private readonly postGeometry = new T.CylinderGeometry(.22, .3, ROOF, 8);
+  private readonly postGeometry = new T.CylinderGeometry(.22, .3, ROOF, 16);
   private targetCanopy = .5;
   private targetHybrid = .6;
   private orderSeed = 0;
@@ -604,16 +604,20 @@ export class EnvironmentDistrict {
     this.louvres = new T.InstancedMesh(mergeGeometries(Array.from({ length: 6 }, (_, k) =>
       new T.BoxGeometry(SPAN, .14, 1.6).rotateX(-.55).translate(0, 0, (k - 2.5) * 1.95))), solar, n);
     // Green screen: a planted wall along one edge (clear of the walker lanes) carrying a half-width planted canopy.
+    const screenFoliage = leafyCrown(2);
     this.screens = new T.InstancedMesh(mergeGeometries([
-      new T.BoxGeometry(SPAN - 2, ROOF - .6, .9).translate(0, (ROOF - .6) / 2, WIDTH / 2 - .5),
-      new T.BoxGeometry(SPAN, .5, WIDTH / 2).translate(0, ROOF + .2, WIDTH / 4),
+      ...Array.from({ length: 15 }, (_, k) => screenFoliage.clone().scale(1.75, 1.05, .5)
+        .translate((k % 5 - 2) * 3.5, 1.4 + Math.floor(k / 5) * 2.25, WIDTH / 2 - .5)),
+      new T.BoxGeometry(SPAN, .5, WIDTH / 2).deleteAttribute('uv').translate(0, ROOF + .2, WIDTH / 4),
     ]), leaf, n);
+    screenFoliage.dispose();
     this.screenCaps = new T.InstancedMesh(mergeGeometries([
       new T.BoxGeometry(SPAN + .4, .35, 1.3).translate(0, ROOF - .4, WIDTH / 2 - .5),
       new T.BoxGeometry(SPAN + .4, .25, .4).translate(0, ROOF + .55, 0),
+      ...[-7, -3.5, 0, 3.5, 7].map(x => new T.BoxGeometry(.12, ROOF - .6, .12).translate(x, (ROOF - .6) / 2, WIDTH / 2 - .5)),
     ]), trim, n);
     this.slabs = new T.InstancedMesh(new T.BoxGeometry(SPAN, .5, WIDTH), leaf, n);
-    this.crowns = new T.InstancedMesh(leafyCrown(1), this.crownMaterial, n * 3);
+    this.crowns = new T.InstancedMesh(leafyCrown(3), this.crownMaterial, n * 3);
     const color = new T.Color();
     for (let i = 0; i < n * 3; i++) this.crowns.setColorAt(i, color.setHSL(.24 + (i % 5) * .009, .36 + (i % 3) * .05, .22 + (i % 7) * .015));
     const towerGeometry = new T.CylinderGeometry(.7, 1.5, TOWER, 12).translate(0, TOWER / 2, 0);
@@ -765,7 +769,7 @@ export class EnvironmentDistrict {
       this.place(bay, 0, ROOF + .2, 0, pergola); this.slabs.setMatrixAt(i, this.dummy.matrix);
       for (let k = 0; k < 3; k++) {
         this.place(bay, (k - 1) * 6, ROOF + .9, (k - 1) * .8, pergola);
-        this.dummy.scale.set(4.6 * pergola, 1.5 * pergola, 6.4 * pergola);
+        this.dummy.scale.set(4.6 * pergola, 2.1 * pergola, 6.4 * pergola);
         this.dummy.updateMatrix();
         this.crowns.setMatrixAt(i * 3 + k, this.dummy.matrix);
       }

@@ -41,6 +41,8 @@ for (const waterGardens of [0, 1, 2] as const) for (const receiver of ['none', '
     assert.deepEqual(study.getConfiguration(), configuration, 'configuration evidence cannot mutate the model target');
   }
 study.select('mixed');
+assert.ok(study.gardens[0].getObjectByName('energy-west-garden-edge-lights'), 'west water garden keeps its own supported edge lighting');
+assert.equal(study.gardens[1].getObjectByName('energy-west-garden-edge-lights'), undefined, 'sector A must leave the second garden geometry unchanged');
 const after: string[] = []; study.root.traverse(o => { if (o instanceof Mesh && !(o instanceof InstancedMesh)) after.push(o.uuid); });
 assert.deepEqual(after, originalMeshes, 'switching configurations reuses the same geometry'); assert.ok(count < 50, 'static study batches by shared finish');
 // Both reservoirs and their district clone reuse one physical water finish through every cycle.

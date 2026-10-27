@@ -1,7 +1,7 @@
 # closeup-polish — Headline 近鏡逐個打磨
 
 - Owner: cc100053（產品／審美最終批准）；實作由一個 long session 負責，開工時喺下面「進度」記低 session 名。
-- Status: S0 INTEGRATED（coordinator已接受量度基準；worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2`；98/98，未接受美術；A–D未開始）
+- Status: S0 INTEGRATED（coordinator已接受量度基準；worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2`；98/98，未接受美術；A進行中，B–D未開始）
 - Branch: `feat/closeup-polish`（一條長分支，每個 sector 一個 checkpoint）
 - Base commit: `fdc4a0cbbbc352b41c15850f2a846845d7975de1`（fetch verified main，包含完整 S0 標準）
 - Last verified commit: 整合merge `c802bbab329fb3835f4c5d5b09a5bc0d18e51703`，root npm test/build/diff PASS；runtime/tests/package與接受的`19e9ae2`完全一致。
@@ -165,7 +165,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 | Sector | 狀態 | Checkpoint | Owner review | Main merge |
 | --- | --- | --- | --- | --- |
 | S0 基準 | INTEGRATED；量度基準接受，非美術接受 | `19e9ae2`；[完整基準](../../artifacts/closeup-polish/S0/README.md) | coordinator已審查；冇美術改動 | `c802bba` |
-| A 海浜公園 | IN PROGRESS：sector A worker，dispatch `closeup-polish-A-1-r8` | base `3d0f40e`；r1 pose matrix | pending | — |
+| A 海浜公園 | IN PROGRESS：worker `01a17e2a`，dispatch `closeup-polish-A-1-r8` | r1 `2c39678`：24/24；r2 source applied | pending | — |
 | B アクアシティ南 | PLANNED | — | — | — |
 | C フジテレビ東 | PLANNED | — | — | — |
 | D デックス西＋沖 | PLANNED | — | — | — |
@@ -215,3 +215,7 @@ Coordinator revision7接受19e9ae2作完整量度基準，明確保留A1–A4/V 
 ## Sector A preflight — 2026-10-28
 
 指定唯一clone `.task-relay/closeup-polish/checkout` 開始於clean main `3d0f40e`；fetch成功、main/upstream0/0，無.codegraph。原S0 owner明確release；切回既有`feat/closeup-polish`並按dispatch明確ff-only至驗證main，feature對remote ahead2/behind0（S0整合與文件）。主checkout未改。只做ne:focal → ne:district → energy:garden，ART／既有原圖足以定義本次目標，未需dream-loop。r1只改SHOTS數值；保留全主體量度及所有原門檻，進度／source patch見`artifacts/closeup-polish/A/round-state.json`。
+
+### A r1 checkpoint／r2 implementation
+
+r1 `2c39678` 保存24狀態48原圖、22比較及8組×2效能；A6 24/24 PASS，A3全部20可用主體仍FAIL，district A2 FAIL。r1是pose試驗，hero runtime未變而FPS上升，因此不把升幅當優化成果。r2才打磨Park原GLB五片葉簇（保持原frond envelope／cached GLB不變）、fallback樹冠、較窄透明環與支承；EnvironmentDistrict細化既有植栽screen／pergola，第一水庭加支承邊光（在garden2 clone之後，第二庭未改）。SHOTS修正district瞄準點及第一庭側視角；target映射、數量、footprint、hero/FOV42、三秒與時間線保持。實作／完整矩陣／效能／live／最終限制集中在[本批證據](../../artifacts/closeup-polish/A/README.md)，未接受美術。

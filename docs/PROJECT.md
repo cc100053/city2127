@@ -200,3 +200,7 @@ CityChangeManager將能源實際前後target加入CarrierChange，residentResult
 人類本chat選A，後續明確保留服務館並重新選M位置。`main`初始化一次共享`housingPrototype`，選mixed、命名`housing-background`並加入scene；初始化的`update(0)`已停泊A，正式frame不呼叫住宅update，無投票參數、CarrierChange、結果卡或DB接線。Standalone／survey／DEV Meter與scaleLab均有固定背景；隔離DEV housing及energy比較保留各自基準，不重複建立住宅。Production保留固定構造，移除DEV控制import；頁面重建才重建幾何，沿用本專案一次初始化生命週期。
 
 原M `(-135,-175)`在低automation時穿過既有staffed pavilion的20m樓板；按人類決定將同一M構造平移至`(-165,-165)`（31.62m），服務館、P/U、數量、輪廓與材質保持。原M庭院留孔保留。U90秒循環只由`devHousing`推進；所有正式snapshot／live／Undo／reset／reconnect與reduced motion都不碰住宅。新證據與實測限制見[本批報告](../artifacts/housing-background/README.md)，舊H0–H3原圖／性能只作當時紀錄。
+
+### Closeup sector A — 2026-10-28（feature，待owner美術review）
+
+`feat/closeup-polish`以已整合S0為基準：Park在載入clone上以既有`leafyCrown`平滑五片光伏葉簇，保持每片原bounding envelope、支架、treeCount與cache不變；本地green／ceramic／public-light finishes和較窄的有支承膜環降低cyan／marker搶焦。EnvironmentDistrict沿用原batch與slot，只細化screen植栽、支承、冠層曲面／厚度；原target／hybrid／seed／roof publication不改。第一西岸水庭在第二庭clone之後將支承邊光併入原本public-light batch，批次數與第二庭幾何保持。三個A shot只改`SHOTS`數值，hero、42°與headline邏輯／時長不變。[交接與完整驗證](handoffs/closeup-polish.md)。

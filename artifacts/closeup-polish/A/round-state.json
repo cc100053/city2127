@@ -2,18 +2,18 @@
   "dispatchId": "closeup-polish-A-1-r8",
   "base": "3d0f40ebd5d7350ecdcc05ab3420cacf926dfd9a",
   "owner": "01a17e2a-4c38-7422-8d68-33782c0367f5",
-  "status": "r1 complete24 captures/8x2 performance; applying r2",
+  "status": "r2 root test/build PASS; full24-state matrix starting",
   "rounds": {
-    "ne:focal": 1,
-    "ne:district": 1,
-    "energy:garden": 1
+    "ne:focal": 2,
+    "ne:district": 2,
+    "energy:garden": 2
   },
   "services": [
     "Vite 5194 session72451"
   ],
   "notes": "S0 immutable originals referenced; branch explicitly ff-only to validated main, ahead origin feature2/0; no .codegraph directory. Dream-loop not needed: ART and observed failures give concrete scoped target.",
   "pendingSourcePatch": "planned-r2.patch",
-  "r1Checkpoint": "8ee93da",
+  "r1Checkpoint": "2c39678",
   "r1Note": "focal complete6/6; uncapped101.56/102.41; district pose currentlyFAIL A2, intended correction stored for r2 after all r1 measurements.",
   "r1Results": {
     "A6": "24/24 PASS",
@@ -21,5 +21,8 @@
     "perf": "8x2 complete; all >=95% S0",
     "A4": "comparison.json",
     "noArtChanges": true
-  }
+  },
+  "r2Source": "r2/source.patch",
+  "patchFormat": "zero-context unified diff; git apply --unidiff-zero only when reproducing from r1 source",
+  "r2InitialFailure": "preserved in r2/npm-test-initial-failure.log; rebatch fix keeps49 batches"
 }

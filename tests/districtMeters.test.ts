@@ -38,6 +38,11 @@ assert.notDeepEqual([...seeded.value], originalOrder);
 
 const district = new EnvironmentDistrict(new T.Scene());
 let d = district.getDiagnostics();
+const livingScreen = district.root.getObjectByName('environment-district-canopy') as T.InstancedMesh;
+livingScreen.geometry.computeBoundingBox();
+const screenBounds = livingScreen.geometry.boundingBox!;
+assert.ok(screenBounds.min.x >= -9 && screenBounds.max.x <= 9 && screenBounds.min.z >= -6 && screenBounds.max.z <= 6,
+  'layered screen foliage must stay inside its original promenade bay');
 assert.ok(d.slots >= 12, `promenade bays: ${d.slots}`);
 
 // Low: mostly sails, mist towers, white louvres. High: mostly planted pergolas, no towers, planted facades.

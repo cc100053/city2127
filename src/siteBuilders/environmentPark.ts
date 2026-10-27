@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { arc, bake, futureLight, leaf, membrane, paint, pink, shrubs, stone, trim, type Kit } from '../cityRig.ts';
+import { arc, bake, box, futureLight, leaf, leafyCrown, membrane, paint, pink, publicLight, shrubs, stone, trim, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition, type EnvironmentParkTarget } from '../changeCatalog.ts';
 import { EnvironmentDistrict } from '../districtMeters.ts';
 import { changeSites } from '../layout.ts';
@@ -9,6 +9,8 @@ import { SITE_TRANSITION_SECONDS, createGuestMarker, createSiteLayer, createSite
 const lawn = paint('#9fbf8a', .9);
 const water = new T.MeshStandardMaterial({ color: '#7fb4c4', roughness: .05, metalness: .3 });
 const treeTrunk = paint('#62756b', .88);
+const photovoltaicFoliage = paint('#728c61', .82, .08);
+photovoltaicFoliage.name = 'park-photovoltaic-foliage';
 const TREE_SLOTS = [
   { x: -2.9, z: -1.9, height: 7 }, { x: 2.4, z: -2.9, height: 5.5 }, { x: -2, z: 3.1, height: 5 },
   { x: 3.3, z: 1.2, height: 6.5 }, { x: .4, z: 3.6, height: 4 }, { x: -1.4, z: -.5, height: 4.2 },
@@ -157,9 +159,24 @@ class ParkRuntime implements EnvironmentParkRuntime {
     this.assetHalfWidth = Math.max(Math.abs(assetBounds.min.x), Math.abs(assetBounds.max.x));
     this.assetHalfDepth = Math.max(Math.abs(assetBounds.min.z), Math.abs(assetBounds.max.z));
     let hasMaterialArray = false;
+    const crown = leafyCrown(3);
+    crown.computeBoundingBox();
+    const crownSize = crown.boundingBox!.getSize(new T.Vector3()), crownCenter = crown.boundingBox!.getCenter(new T.Vector3());
     root.traverse(object => {
-      if (object instanceof T.Mesh && Array.isArray(object.material)) hasMaterialArray = true;
+      if (!(object instanceof T.Mesh)) return;
+      if (Array.isArray(object.material)) { hasMaterialArray = true; return; }
+      if (object.name.startsWith('Photovoltaic_crown')) {
+        // Keep each imported frond's envelope and branch attachment; only soften its faceted foliage.
+        object.geometry.computeBoundingBox();
+        const bounds = object.geometry.boundingBox!, size = bounds.getSize(new T.Vector3()), center = bounds.getCenter(new T.Vector3());
+        object.geometry = crown.clone().translate(-crownCenter.x, -crownCenter.y, -crownCenter.z)
+          .scale(size.x / crownSize.x, size.y / crownSize.y, size.z / crownSize.z).translate(center.x, center.y, center.z);
+        object.material = photovoltaicFoliage;
+      } else if (object.material.name === 'Cyan bioluminescent veins') object.material = publicLight;
+      else if (object.material.name === 'Ceramic bark') object.material = treeTrunk;
+      else if (object.material.name === 'Brushed titanium') object.material = trim;
     });
+    crown.dispose();
     if (!hasMaterialArray) root.add(...bake(root));
     root.updateWorldMatrix(true, true);
     const inverseRoot = new T.Matrix4().copy(root.matrixWorld).invert();
@@ -278,7 +295,7 @@ export function buildEnvironmentPark(scene: T.Scene, _kit: Kit, assets: SiteAsse
   const fallback = new T.Group();
   fallback.name = 'park-trees-procedural-fallback';
   const trunkGeometry = new T.CylinderGeometry(.18, .28, 1, 8);
-  const crownGeometry = new T.IcosahedronGeometry(1, 1);
+  const crownGeometry = leafyCrown(3);
   const trunks = new T.InstancedMesh(trunkGeometry, treeTrunk, TREE_SLOTS.length);
   trunks.name = 'park-tree-fallback-trunks'; trunks.castShadow = true; trunks.receiveShadow = true; trunks.frustumCulled = false;
   const crowns = new T.InstancedMesh(crownGeometry, leaf, TREE_SLOTS.length);
@@ -290,10 +307,18 @@ export function buildEnvironmentPark(scene: T.Scene, _kit: Kit, assets: SiteAsse
   const finGeometry = new T.BoxGeometry(.18, 2.2, .85);
   const fins = new T.InstancedMesh(finGeometry, trim, 6);
   fins.name = 'park-cooling-fin-instances'; fins.castShadow = true; fins.receiveShadow = true; fins.frustumCulled = false;
-  const canopy = new T.Mesh(new T.RingGeometry(2.7, 4.2, 48), membrane);
+  const climateFrame = new T.Group();
+  const veil = membrane.clone(); veil.opacity = .3;
+  const canopy = new T.Mesh(new T.RingGeometry(3.45, 4.2, 64), veil);
   canopy.name = 'park-climate-membrane'; canopy.rotation.x = -Math.PI / 2; canopy.position.y = 5.15; canopy.castShadow = true;
-  finLayer.group.add(canopy);
-  finLayer.group.add(fins);
+  climateFrame.add(canopy);
+  for (let i = 0; i < 6; i++) {
+    const angle = i * Math.PI / 3, x = Math.cos(angle) * 4.05, z = -Math.sin(angle) * 4.05;
+    arc(climateFrame, 0, .065, 4.4, [x, .75, z], trim);
+    box(climateFrame, [.18, .08, .5], [x, 5.1, z], trim).rotation.y = angle;
+  }
+  climateFrame.add(...bake(climateFrame));
+  finLayer.group.add(climateFrame, fins);
 
   const environmentPark = new ParkRuntime(plantedArea, fallback, trunks, crowns, glb, fins);
   treeLayer.setPreparation(async () => {
@@ -301,10 +326,12 @@ export function buildEnvironmentPark(scene: T.Scene, _kit: Kit, assets: SiteAsse
     environmentPark.attachGlb(tree);
   });
 
+  const marker = createGuestMarker(root, 'ne');
+  marker.material.color.set('#b7a17b');
   return {
     id: 'stationEastPark', root,
     layers: { parkSurface: surfaceLayer, parkTrees: treeLayer, parkCoolingFins: finLayer },
-    marker: createGuestMarker(root, 'ne'), environmentPark,
+    marker, environmentPark,
     // The same Q3 choice also shades every promenade bay across the district (P1 meter variety).
     environmentDistrict: new EnvironmentDistrict(scene),
   };
