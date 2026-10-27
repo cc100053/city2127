@@ -1,0 +1,15 @@
+{
+  "dispatchId": "closeup-polish-A-1-r8",
+  "base": "3d0f40ebd5d7350ecdcc05ab3420cacf926dfd9a",
+  "owner": "current sector A worker",
+  "status": "r1 pose matrix",
+  "rounds": {
+    "ne:focal": 1,
+    "ne:district": 1,
+    "energy:garden": 1
+  },
+  "services": [
+    "Vite 5194 session72451"
+  ],
+  "notes": "S0 immutable originals referenced; branch explicitly ff-only to validated main, ahead origin feature2/0; no .codegraph directory. Dream-loop not needed: ART and observed failures give concrete scoped target."
+}

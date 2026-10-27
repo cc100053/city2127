@@ -165,7 +165,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 | Sector | 狀態 | Checkpoint | Owner review | Main merge |
 | --- | --- | --- | --- | --- |
 | S0 基準 | INTEGRATED；量度基準接受，非美術接受 | `19e9ae2`；[完整基準](../../artifacts/closeup-polish/S0/README.md) | coordinator已審查；冇美術改動 | `c802bba` |
-| A 海浜公園 | PLANNED | — | — | — |
+| A 海浜公園 | IN PROGRESS：sector A worker，dispatch `closeup-polish-A-1-r8` | base `3d0f40e`；r1 pose matrix | pending | — |
 | B アクアシティ南 | PLANNED | — | — | — |
 | C フジテレビ東 | PLANNED | — | — | — |
 | D デックス西＋沖 | PLANNED | — | — | — |
@@ -211,3 +211,7 @@ Coordinator核對本批S0整合result及實際main CI，再dispatch A NE；此wo
 ## S0 main integration — 2026-10-28
 
 Coordinator revision7接受19e9ae2作完整量度基準，明確保留A1–A4/V failures並授權整合。Preflight clean，fresh mainfdc4a0c／feature5:0，no-ff merge成c802bba，無衝突；整合後root npm test、npm run build及git diff --check全部PASS。Source/tests/package/lock與接受checkpoint完全一致，既有browser evidence適用，沒有虛報新browser/FPS。詳細[整合紀錄](../../artifacts/closeup-polish/S0/integration.json)及logs；此後文件／evidence更新不改runtime。Push前再fetch並確認ancestor；最終main SHA、實際main CI、cleanup及writer release由本批result-S0-integration.json記錄。原root舊feature checkout與所有原圖不動；長feature分支保留，未部署或開A–D。
+
+## Sector A preflight — 2026-10-28
+
+指定唯一clone `.task-relay/closeup-polish/checkout` 開始於clean main `3d0f40e`；fetch成功、main/upstream0/0，無.codegraph。原S0 owner明確release；切回既有`feat/closeup-polish`並按dispatch明確ff-only至驗證main，feature對remote ahead2/behind0（S0整合與文件）。主checkout未改。只做ne:focal → ne:district → energy:garden，ART／既有原圖足以定義本次目標，未需dream-loop。r1只改SHOTS數值；保留全主體量度及所有原門檻，進度／source patch見`artifacts/closeup-polish/A/round-state.json`。
