@@ -1,0 +1,11 @@
+{
+  "result": "PASS",
+  "acceptedFeature": "cf0fe82d6d781d4841b82f45bc64a4cc7fc69b46",
+  "mergeCommit": "51002890371ef3aa7bc7d16791cc34b23d98cffc",
+  "acceptedTree": "152663b7fcf81e960a26539e8a1bd912377c6666",
+  "mergeTree": "152663b7fcf81e960a26539e8a1bd912377c6666",
+  "entireTreeIdenticalBeforeDeliveryRecords": true,
+  "originalManifestSHA256": "8117ad21a7e3523d2db11e4ff2cd1fe3ee329aca20a0617f171b2fb1b1393904",
+  "surveyAndModuleSwapChanged": false,
+  "visualEvidence": "Accepted original images and prior browser evidence remain valid for identical runtime; supplemental production smoke recorded separately."
+}

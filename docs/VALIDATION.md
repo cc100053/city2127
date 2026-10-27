@@ -335,3 +335,10 @@ macOS 27.0.1 arm64、Chrome 156.0.8078.48 headless／WebGL2／ANGLE Metal Apple 
 Headline correction1（2026-10-27）：[獨立結果與原圖](../artifacts/headline-camera/README.md#coordinator-correction-1--2026-10-27)。補齊任意新 live 結果（包括無 headline）由當前近鏡平滑回 hero；hold／fly-out 第一幀、2秒返回／操作恢復及無新fly-in unit tests PASS。真實v4 A/B第二份 layout不變，提交1018ms相隔、邊界0.1001m／最大逐幀6.1096m、返回後65個hero樣本及操作恢復PASS。SW district改看實際共享岸邊三房間2/3/4，重拍靜態／live兩圖並實測60.0FPS、958／936 calls；其餘原圖以保存的舊hash逐一核對。Root test/build/whitespace再次PASS；build保留既有chunk-size及JSON import-attributes兩項warning。Manifest預設只比對、不重建；刻意錯hash拒絕／原檔還原／獨立verify PASS。沒有模型／材質／server／協議改動；仍未測展示硬件／長測或main CI。
 
 Correction1 verified code `4c52d681a3715630e5eba52889831729355775fb` 已推送；後續僅交付文件，runtime及原圖 hashes不變。
+
+
+## Headline camera main integration — 2026-10-27
+
+Owner明確批准後，accepted `cf0fe82`以no-ff merge成 `51002890371ef3aa7bc7d16791cc34b23d98cffc`，無衝突且整個tree相同。整合後root npm test／build、committed及working whitespace、保存manifest比對PASS；保留chunk-size及JSON import-attributes兩項既有warning。Survey／module-swap source未改，未另跑本地suite。
+
+[本次整合logs／原圖](../artifacts/headline-camera/integration-1/README.md)：production preview＋真實scratch v4，live nw結果近鏡／原因及reload snapshot ambient hero，DEV `cityShot`排除，Chrome156.0.8078.48 headless、1920×1080 DPR1 default/hour12，原圖已查看、page／console errors0，系統字體fallback明確。Runtime及原圖hash不變支持保留先前完整鏡頭／中斷證據；沒有新FPS／硬件／全矩陣重跑宣稱。Owned服務已停止。Main push及實際CI結果待下一段記錄；無部署。

@@ -1,6 +1,6 @@
 # Headline camera — 2026-10-27
 
-Implementation worker: Codex `01a17b81-4af3-7bf3-9512-a451a5198d53`, independent clone on `feat/headline-camera`, base `bdb22465d34eb1aa7ebc0175ce067d581c7b7495`. Validated code checkpoint: `4c52d681a3715630e5eba52889831729355775fb` (correction1; original implementation `9335b6d627cd5d6175a13936cb45c0e34708ab33`). Implementation and software verification are separate from coordinator review / human merge approval. No main merge or deployment.
+Implementation worker: Codex `01a17b81-4af3-7bf3-9512-a451a5198d53`, independent clone on `feat/headline-camera`, base `bdb22465d34eb1aa7ebc0175ce067d581c7b7495`. Validated code checkpoint: `4c52d681a3715630e5eba52889831729355775fb` (correction1; original implementation `9335b6d627cd5d6175a13936cb45c0e34708ab33`). Implementation and software verification are separate from coordinator review / human merge approval. Main merge approved and locally integrated on2026-10-27; [integration checks](integration-1/README.md) track push/main CI. No deployment.
 
 The thirteen authored poses and the pure timeline are in [headlineCamera.ts](../../src/headlineCamera.ts). Focal/district priority matches the result card; energy selection/removal order is shared. Live transitions retain 2.62 s journey + 3 s city transition, 1.5 s overlapping fly-in and return at the actual display deadline (normally 10–12 s). No protocol, server, ladder, model, material or dependency change.
 

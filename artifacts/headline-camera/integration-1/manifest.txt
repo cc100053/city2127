@@ -1,0 +1,2 @@
+VERIFIED saved manifest.
+PASS: all 13 static/live shots, hero, recovery, camera-table agreement and original image/source hashes.

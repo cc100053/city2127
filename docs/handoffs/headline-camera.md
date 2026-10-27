@@ -1,11 +1,11 @@
 # headline-camera — 近鏡跟住 headline 變化
 
 - Owner: cc100053（產品決策）；實作 Codex worker `01a17b81-4af3-7bf3-9512-a451a5198d53`
-- Status: REVIEW_READY — implementation and local software checks complete; main merge requires owner approval
-- Branch: `feat/headline-camera`
+- Status: INTEGRATED_LOCAL — owner approved merge; integrated root checks / production smoke PASS; push and main CI pending
+- Branch: `main` (feature `feat/headline-camera` retained)
 - Base commit: `00c0273`（main：ladder 整合同 main CI 記錄之後）
-- Last verified commit: `4c52d681a3715630e5eba52889831729355775fb` (correction1; root checks, targeted A/B/SW and retained-evidence verification PASS)
-- Remote availability: `origin/feat/headline-camera` @ `4c52d681a3715630e5eba52889831729355775fb`; correction1 pushed successfully; metadata follow-up changes no runtime
+- Last verified commit: `51002890371ef3aa7bc7d16791cc34b23d98cffc` (merge tree identical to accepted `cf0fe82`; integrated root checks / production smoke PASS)
+- Remote availability: accepted feature `origin/feat/headline-camera` @ `cf0fe82d6d781d4841b82f45bc64a4cc7fc69b46`; local main integration awaits validated push / main CI
 
 ## Session Git state
 
@@ -209,7 +209,7 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
   - 回顧章節、變化說明卡。
   - module-swap。
 
-## Actual validation results
+## Feature validation results (before integration)
 
 - Verification status: PASS (local software); coordinator review / owner merge approval pending.
 - Root `npm test`, `npm run build`, production DEV exclusion, `git diff --check`: PASS. Source/new-file exact-diff self-review complete; no survey/module-swap source change.
@@ -218,7 +218,7 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 - Live no-change/reload/Undo/reduced motion/A-B PASS; submissions1006ms apart, ordered display, second own headline. Eight extra real TCP/reset/DEV/legacy/standalone/catch-up checks PASS; shortened-slot uses real-view wire fixture, clearly separated from real server checks.
 - Page errors/console errors0. System font fallback explicit. All owned browsers/services closed; Vite5184 and dev:auto8798 confirmed free.
 - Main unchanged at `00c02737650008a450bd8f08e1a491ad023c77d2`; feature `9335b6d627cd5d6175a13936cb45c0e34708ab33` pushed successfully. Committed task whitespace and source/image manifest PASS. No main CI claim.
-- Integrated commit and checks: NOT INTEGRATED
+- Integrated commit and checks: `51002890371ef3aa7bc7d16791cc34b23d98cffc`; root test/build/whitespace/manifest and production smoke PASS; remote push / main CI pending
 
 ## Known issues and blockers
 
@@ -234,7 +234,7 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 
 ## Next expected step
 
-1. Coordinator 檢查 pushed branch、exact diff 與原圖／manifest；通過後向 owner 取得 merge main 批准。Worker 已釋放 source ownership，等待具體修正要求。
+1. Owner merge approval已取得；完成validated main push、確認main CI並保存最終結果。
 2. 之後另開打磨任務，以 shot list 做基準，按出現頻率排次序：
    - 先打磨各 site 第一格嘅 focal 近鏡（ne → sw → se → nw）。
    - 再打磨 district（±2）。
@@ -271,3 +271,11 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 - SW pose corrected to `[-365,135,-420] → [-180,8,-235]`: changed sharing rooms2/3/4 are central/readable; park is in the right background. Static/live60.0FPS,958/936 calls. New SW original pair plus B-at-hero proof; unchanged original hashes preserved. Full inland court occlusion sweep is not claimed.
 - Root tests/build/whitespace PASS again. Build includes existing chunk-size AND odaiba-layout JSON import-attributes warnings (prior report wording corrected). New manifest verifier compares saved hashes; explicit update followed by independent verify PASS, deliberate mismatched hash rejected.
 - [Correction evidence/report](../../artifacts/headline-camera/README.md#coordinator-correction-1--2026-10-27), [actual results](../../artifacts/headline-camera/correction-1/browser.json). Corrective code checkpoint `4c52d681a3715630e5eba52889831729355775fb` pushed successfully; main still requires human approval. All owned services/writers released for review.
+
+## Main integration — 2026-10-27
+
+- Human批准：coordinator chat `01a17b7e-975a-7721-b636-9c24b65f8551`，message `01a17cea-06c6-7cc3-bc81-f190ee70dd13`，原文 "merge"；此前ask-before-main關卡已滿足。
+- Accepted feature `cf0fe82d6d781d4841b82f45bc64a4cc7fc69b46`；base/remote main `00c02737650008a450bd8f08e1a491ad023c77d2`。Clean feature upstream0/0；本clone新建tracking main、ff-only確認，再no-ff merge，無衝突。
+- Merge `51002890371ef3aa7bc7d16791cc34b23d98cffc`整個tree等同accepted feature。Integrated root test/build、committed/working whitespace、保存manifest比對PASS；兩項既有build warnings保留。Survey/module-swap未改，未另跑本地suite。
+- Production smoke：真實scratch v4 live nw近鏡／原因，reload立即ambient hero、DEV入口排除PASS；Chrome156.0.8078.48 headless、1920×1080 DPR1 default/hour12，新兩圖已查看、errors0。沒有新FPS或全13鏡頭重拍宣稱；原視覺證據由相同runtime／hash支援。
+- [整合原始logs／原圖／tree證據](../../artifacts/headline-camera/integration-1/README.md)。Owned servers/browser停止；5184已釋放。Main push/CI實際結果稍後補記；無部署、無刪分支。
