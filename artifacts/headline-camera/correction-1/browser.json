@@ -1,0 +1,339 @@
+{
+  "browser": "156.0.8078.48",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "checks": [
+    {
+      "check": "real v4 A/B headline to no-headline smooth return",
+      "gapMs": 1018,
+      "bFirstFrameJumpMetres": 0.10008589957753279,
+      "maxFrameStepMetres": 6.109628808470666,
+      "heroFramesAfterReturn": 65,
+      "controlsReenabled": true,
+      "pass": true
+    },
+    {
+      "check": "SW actual sharing district hold",
+      "pose": {
+        "position": [
+          -365,
+          135,
+          -420
+        ],
+        "target": [
+          -180,
+          8,
+          -235
+        ]
+      },
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "35.47",
+        "fps": "60.0",
+        "drawCalls": "936",
+        "triangles": "16048646",
+        "geometries": "428",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-high\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":72,\"targetSharing\":0.75,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":0,\"hybridCourts\":1,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":7,\"visibleOpenRooms\":5,\"visiblePrivateRooms\":1},\"commonsPlaza\":{\"band\":\"high\",\"targetSharedSeats\":8,\"visibleSharedSeats\":8,\"targetScreenedSeats\":0,\"visibleScreenedSeats\":0}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":2.2377199999999995,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "tiers": {
+        "nw": 0,
+        "ne": 0,
+        "sw": 2,
+        "se": 0
+      },
+      "seed": 1929867470,
+      "carriers": [
+        {
+          "kind": "room",
+          "index": 0,
+          "p": {
+            "x": 214.13556469657925,
+            "z": -474.6825595347019,
+            "yaw": -1.2047398109474783,
+            "r": 14,
+            "y": 2.8,
+            "sx": 1,
+            "sz": 1
+          },
+          "changed": true,
+          "ndc": [
+            -1.67816003673548,
+            0.28633890177013466,
+            0.9902211485354467
+          ],
+          "inFrame": false
+        },
+        {
+          "kind": "room",
+          "index": 1,
+          "p": {
+            "x": 77.09975516092783,
+            "z": -422.74405147475596,
+            "yaw": -1.209592571301215,
+            "r": 14,
+            "y": 2.8,
+            "sx": 1,
+            "sz": 1
+          },
+          "changed": false,
+          "ndc": [
+            -1.3668845742419988,
+            0.12930709531947052,
+            0.988580008799792
+          ],
+          "inFrame": false
+        },
+        {
+          "kind": "room",
+          "index": 2,
+          "p": {
+            "x": -53.880522660512206,
+            "z": -332.6574839128131,
+            "yaw": -0.3805063771123649,
+            "r": 14,
+            "y": 2.8,
+            "sx": 1,
+            "sz": 1
+          },
+          "changed": true,
+          "ndc": [
+            -0.7450832613906211,
+            0.03441084159840157,
+            0.9875882478548822
+          ],
+          "inFrame": true
+        },
+        {
+          "kind": "room",
+          "index": 3,
+          "p": {
+            "x": -172.6036894091833,
+            "z": -244.70851859357634,
+            "yaw": -0.9519815600572117,
+            "r": 16,
+            "y": 2.8,
+            "sx": 1,
+            "sz": 1
+          },
+          "changed": true,
+          "ndc": [
+            -0.06077495561542517,
+            -0.048166511729012595,
+            0.9867252317635952
+          ],
+          "inFrame": true
+        },
+        {
+          "kind": "room",
+          "index": 4,
+          "p": {
+            "x": -248.99117377698246,
+            "z": -217.71077096554214,
+            "yaw": -1.6563016204731014,
+            "r": 16,
+            "y": 2.8,
+            "sx": 1,
+            "sz": 1
+          },
+          "changed": true,
+          "ndc": [
+            0.3435767370410863,
+            -0.20666788542996414,
+            0.9850687335775528
+          ],
+          "inFrame": true
+        },
+        {
+          "kind": "room",
+          "index": 5,
+          "p": {
+            "x": -379.7051892568065,
+            "z": -107.70973082864074,
+            "yaw": -1.092443895416239,
+            "r": 16,
+            "y": 2.8,
+            "sx": 1,
+            "sz": 1
+          },
+          "changed": true,
+          "ndc": [
+            1.3715789683526491,
+            -0.285139392741418,
+            0.9842486276915133
+          ],
+          "inFrame": false
+        },
+        {
+          "kind": "court",
+          "index": 0,
+          "p": {
+            "x": -220,
+            "z": -140,
+            "yaw": 0.4
+          },
+          "changed": true,
+          "ndc": [
+            0.42636468206056843,
+            0.09770797029522936,
+            0.9882497662784753
+          ],
+          "inFrame": true
+        },
+        {
+          "kind": "court",
+          "index": 1,
+          "p": {
+            "x": -410,
+            "z": 120,
+            "yaw": 1.1
+          },
+          "changed": false,
+          "ndc": [
+            1.6267867004292895,
+            0.23715172394568598,
+            0.9897070932377529
+          ],
+          "inFrame": false
+        },
+        {
+          "kind": "court",
+          "index": 2,
+          "p": {
+            "x": -100,
+            "z": 60,
+            "yaw": 2.3
+          },
+          "changed": true,
+          "ndc": [
+            0.4190346133635954,
+            0.5444817676892123,
+            0.992919000163796
+          ],
+          "inFrame": true
+        },
+        {
+          "kind": "court",
+          "index": 3,
+          "p": {
+            "x": 50,
+            "z": -340,
+            "yaw": 0.9
+          },
+          "changed": true,
+          "ndc": [
+            -0.9315787087928418,
+            0.23715172394568612,
+            0.9897070932377529
+          ],
+          "inFrame": false
+        },
+        {
+          "kind": "court",
+          "index": 4,
+          "p": {
+            "x": 170,
+            "z": -360,
+            "yaw": 3.6
+          },
+          "changed": false,
+          "ndc": [
+            -1.1282756556519302,
+            0.386973581977976,
+            0.9912728817874988
+          ],
+          "inFrame": false
+        },
+        {
+          "kind": "court",
+          "index": 5,
+          "p": {
+            "x": -70,
+            "z": 180,
+            "yaw": 1.7
+          },
+          "changed": false,
+          "ndc": [
+            0.5039891130310754,
+            0.6540545871394152,
+            0.9940641459276507
+          ],
+          "inFrame": true
+        },
+        {
+          "kind": "court",
+          "index": 6,
+          "p": {
+            "x": -290,
+            "z": 290,
+            "yaw": 5.1
+          },
+          "changed": true,
+          "ndc": [
+            1.1810859040787576,
+            0.5773713239679045,
+            0.9932627289848357
+          ],
+          "inFrame": false
+        },
+        {
+          "kind": "court",
+          "index": 7,
+          "p": {
+            "x": -460,
+            "z": 290,
+            "yaw": 0.2
+          },
+          "changed": true,
+          "ndc": [
+            1.857943405570139,
+            0.4118430804822453,
+            0.991532792968066
+          ],
+          "inFrame": false
+        },
+        {
+          "kind": "court",
+          "index": 8,
+          "p": {
+            "x": 220,
+            "z": 0,
+            "yaw": 2.8
+          },
+          "changed": false,
+          "ndc": [
+            -0.24527920042516307,
+            0.7153417619665338,
+            0.9947046583191733
+          ],
+          "inFrame": true
+        },
+        {
+          "kind": "court",
+          "index": 9,
+          "p": {
+            "x": -20,
+            "z": 210,
+            "yaw": 4.4
+          },
+          "changed": true,
+          "ndc": [
+            0.43558983494653786,
+            0.6998817533299352,
+            0.994543085736774
+          ],
+          "inFrame": true
+        }
+      ],
+      "pass": true
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,66 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: B is a genuine proposal with no headline layout/energy change
++ actual - expected
+... Skipped lines
+
+  {
+    automatedPorts: 6,
+    bands: {
+      ne: 'mixed',
+      nw: 'high',
+...
+      ne: 0,
++     nw: 1,
+-     nw: 2,
+      se: 0,
+      sw: 0
+    },
+    treeCount: 8,
+    version: 2
+
+    at file:///Users/fatboy/city2127/.task-relay/headline-camera/checkout/artifacts/headline-camera/correction-1/browser.mjs:34:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: {
+    version: 2,
+    energy: {
+      waterGardens: 0,
+      receiver: 'none',
+      flywheel: false,
+      island: false
+    },
+    bands: { nw: 'high', ne: 'mixed', sw: 'mixed', se: 'mixed' },
+    tiers: { nw: 1, ne: 0, sw: 0, se: 0 },
+    automatedPorts: 6,
+    sharedSeats: 4,
+    treeCount: 8,
+    plantedFraction: 0.5,
+    coolingFins: 3,
+    functionModules: 4
+  },
+  expected: {
+    version: 2,
+    energy: {
+      waterGardens: 0,
+      receiver: 'none',
+      flywheel: false,
+      island: false
+    },
+    bands: { nw: 'high', ne: 'mixed', sw: 'mixed', se: 'mixed' },
+    tiers: { nw: 2, ne: 0, sw: 0, se: 0 },
+    automatedPorts: 6,
+    sharedSeats: 4,
+    treeCount: 8,
+    plantedFraction: 0.5,
+    coolingFins: 3,
+    functionModules: 4
+  },
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v26.0.0

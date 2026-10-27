@@ -15,7 +15,7 @@ export const SHOTS: Record<ShotId, Pose> = {
   'se:focal': { position: [-20, 245, -240], target: [175, 65, -45] },
   'nw:district': { position: [-180, 180, -470], target: [10, 28, -210] },
   'ne:district': { position: [-440, 200, -355], target: [-210, 25, -120] },
-  'sw:district': { position: [-430, 215, -260], target: [-145, 20, -50] },
+  'sw:district': { position: [-365, 135, -420], target: [-180, 8, -235] },
   'se:district': { position: [-105, 235, -295], target: [140, 40, -30] },
   'energy:garden': { position: [-372, 62, -232], target: [-306, 12, -150] },
   'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },
@@ -46,6 +46,7 @@ const heroPosition = new Vector3(...HERO_POSITION), heroTarget = new Vector3(...
 
 export class HeadlineCamera {
   private shot: ShotId | null = null;
+  private returning = false;
   private started = 0;
   private displayMs = DISPLAY_MS;
   private readonly fromPosition = new Vector3();
@@ -55,27 +56,28 @@ export class HeadlineCamera {
   private readonly position = new Vector3();
   private readonly target = new Vector3();
   constructor(camera: PerspectiveCamera, controls: Controls) { this.camera = camera; this.controls = controls; }
-  get active() { return this.shot !== null; }
+  get active() { return this.shot !== null || this.returning; }
   play(changes: readonly CarrierChange[], now: number, displayMs = DISPLAY_MS) {
     const shot = headlineShot(changes[0]);
-    if (displayMs < DISPLAY_MS - 100 || !shot) { this.cancel(); return; }
+    if (displayMs < DISPLAY_MS - 100 || (!shot && !this.active)) { this.cancel(); return; }
     this.fromPosition.copy(this.camera.position); this.fromTarget.copy(this.controls.target);
-    this.position.set(...SHOTS[shot].position); this.target.set(...SHOTS[shot].target);
+    if (shot) { this.position.set(...SHOTS[shot].position); this.target.set(...SHOTS[shot].target); }
+    this.returning = shot === null;
     this.shot = shot; this.started = now; this.displayMs = displayMs; this.controls.enabled = false;
   }
   cancel() {
-    this.shot = null;
+    this.shot = null; this.returning = false;
     this.camera.position.copy(heroPosition); this.controls.target.copy(heroTarget);
     this.controls.update();
     this.camera.position.copy(heroPosition); this.controls.target.copy(heroTarget); this.camera.lookAt(heroTarget);
     this.controls.enabled = true;
   }
   update(now: number) {
-    if (!this.shot) return;
+    if (!this.active) return;
     const elapsed = Math.max(0, now - this.started), t = shotTimeline(this.displayMs);
     const stage = shotStage(elapsed, this.displayMs);
-    if (stage === 'done') { this.cancel(); return; }
-    if (stage === 'journey') {
+    if (stage === 'done' || (this.returning && elapsed >= FLY_OUT)) { this.cancel(); return; }
+    if (this.returning || stage === 'journey') {
       const blend = MathUtils.smoothstep(elapsed, 0, FLY_OUT);
       this.camera.position.lerpVectors(this.fromPosition, heroPosition, blend);
       this.controls.target.lerpVectors(this.fromTarget, heroTarget, blend);

@@ -50,7 +50,7 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 3. 閱讀時段內停喺近鏡；
 4. 之後返去 hero pose。
 
-冇 headline 嘅結果（冇格變、冇能源變化）全程留喺 hero。
+冇 headline 嘅結果（冇格變、冇能源變化）唔推近；如果接續仍 active 嘅近鏡，先用2秒平滑返回，再留喺 hero。
 
 完成條件：
 - [x] 一張鏡頭清單（shot list）。每個 site 有 focal 同 district 兩個 pose，每個能源部件一個 pose。清單係常數表，DEV 可以逐個跳去睇。
@@ -214,7 +214,7 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 - Verification status: PASS (local software); coordinator review / owner merge approval pending.
 - Root `npm test`, `npm run build`, production DEV exclusion, `git diff --check`: PASS. Source/new-file exact-diff self-review complete; no survey/module-swap source change.
 - [Evidence / reproducible commands / FPS table](../../artifacts/headline-camera/README.md), [manifest](../../artifacts/headline-camera/final/manifest.json), [live](../../artifacts/headline-camera/final/live.json), [recovery](../../artifacts/headline-camera/final/recovery.json).
-- 14 static images (hero +13 shots), 14 settled live hold images (13 shots +water garden after Undo), original hashes verified. Development Mac macOS27.0.1 arm64, Chrome156.0.8078.48 headless/ANGLE Metal Apple M6, 1920×1080 DPR1 default/hour12. Hero60.1FPS/998 calls; static59.9–60.1FPS/455–950 calls; actual live59.9–60.1FPS/599–1186 calls. Short canvas cadence only, no sustained/hardware claim.
+- 14 static images (hero +13 shots), 14 settled live hold images (13 shots +water garden after Undo), original hashes verified. Development Mac macOS27.0.1 arm64, Chrome156.0.8078.48 headless/ANGLE Metal Apple M6, 1920×1080 DPR1 default/hour12. Hero60.1FPS/998 calls; static59.9–60.1FPS/455–958 calls; actual live59.9–60.1FPS/599–1186 calls. Short canvas cadence only, no sustained/hardware claim.
 - Live no-change/reload/Undo/reduced motion/A-B PASS; submissions1006ms apart, ordered display, second own headline. Eight extra real TCP/reset/DEV/legacy/standalone/catch-up checks PASS; shortened-slot uses real-view wire fixture, clearly separated from real server checks.
 - Page errors/console errors0. System font fallback explicit. All owned browsers/services closed; Vite5184 and dev:auto8798 confirmed free.
 - Main unchanged at `00c02737650008a450bd8f08e1a491ad023c77d2`; feature `9335b6d627cd5d6175a13936cb45c0e34708ab33` pushed successfully. Committed task whitespace and source/image manifest PASS. No main CI claim.
@@ -262,3 +262,12 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 - Implementation / validated code commit: `9335b6d627cd5d6175a13936cb45c0e34708ab33` (`feat(camera): follow live headlines with authored close-ups`).
 - Feature push succeeded; this documentation follow-up changes no runtime, tests or original evidence.
 - Worker report: `.task-relay/headline-camera/result-implementation-1.json` in the source project (outside this independent clone). Writers and owned services released for coordinator review. Main merge remains blocked on explicit owner approval by the agreed plan.
+
+## Coordinator correction 1 — 2026-10-27
+
+- Baseline `5e896846de712a615fff1120e5f8c74a37848d2f`; clean / branch upstream0/0; fresh fetch confirms origin/main still `00c02737650008a450bd8f08e1a491ad023c77d2`. Same owner/clone, no replacement writer.
+- `play([])` interrupted hold/fly-out formerly cut to hero. It now uses the shared current-pose return for2s, then stays hero with controls enabled. Fresh no-headline stays hero; nonlive/reduced/catch-up retain immediate cut. Tests cover first-frame continuity, halfway interpolation, final target/position, controls and no new fly-in.
+- Real A/B second proposal has identical before/after layout:1018ms commit gap,0.1001m boundary step,6.1096m maximum sampled frame step,65 hero frames after return and controls work. No server/protocol/clock changes.
+- SW pose corrected to `[-365,135,-420] → [-180,8,-235]`: changed sharing rooms2/3/4 are central/readable; park is in the right background. Static/live60.0FPS,958/936 calls. New SW original pair plus B-at-hero proof; unchanged original hashes preserved. Full inland court occlusion sweep is not claimed.
+- Root tests/build/whitespace PASS again. Build includes existing chunk-size AND odaiba-layout JSON import-attributes warnings (prior report wording corrected). New manifest verifier compares saved hashes; explicit update followed by independent verify PASS, deliberate mismatched hash rejected.
+- [Correction evidence/report](../../artifacts/headline-camera/README.md#coordinator-correction-1--2026-10-27), [actual results](../../artifacts/headline-camera/correction-1/browser.json). Final corrective code checkpoint is recorded in the delivery follow-up; main still requires human approval.

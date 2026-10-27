@@ -1,0 +1,2 @@
+PASS: altered saved source hash was rejected by default verification (exit 1).
+PASS: original manifest restored byte-for-byte and independently verified (exit 0).

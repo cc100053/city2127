@@ -68,3 +68,19 @@ assert.equal(shotTimeline(9950).flyOut,9.95);
 controller.play([first],35,9950);controller.update(35+9.96);assert.notDeepEqual(camera.position.toArray(),SHOTS['ne:focal'].position,'fly-out follows the actual remaining card slot');
 controller.play([first],40);controller.update(40+t.done);assert.equal(controller.active,false);assert.deepEqual(camera.position.toArray(),HERO_POSITION);
 console.log('PASS: 13 headline shots, card location priority, timing, interruption, catch-up and immediate cancel.');
+
+// Any next live result returns smoothly, even when its proposal has no headline.
+for (const interruptedAt of [t.hold, t.flyOut + .5]) {
+  controller.play([first],0);controller.update(interruptedAt);
+  const before=camera.position.clone(),target=controls.target.clone();
+  controller.play([],20);controller.update(20);
+  assert.ok(camera.position.equals(before));assert.ok(controls.target.equals(target));
+  assert.equal(controller.active,true);assert.equal(controls.enabled,false);
+  controller.update(21);assert.ok(camera.position.distanceTo(before.clone().lerp(new Vector3(...HERO_POSITION),.5))<1e-8);
+  controller.update(22);assert.deepEqual(camera.position.toArray(),HERO_POSITION);assert.deepEqual(controls.target.toArray(),HERO_TARGET);
+  assert.equal(controller.active,false);assert.equal(controls.enabled,true);
+  controller.update(20+t.hold);assert.deepEqual(camera.position.toArray(),HERO_POSITION,'no fly-in after a no-headline return');
+}
+controller.play([],30);assert.equal(controller.active,false);assert.deepEqual(camera.position.toArray(),HERO_POSITION);
+controller.play([first],40);controller.update(40+t.hold);controller.play([],50,5000);assert.deepEqual(camera.position.toArray(),HERO_POSITION,'catch-up still cuts immediately');
+console.log('PASS: no-headline interruptions preserve the first frame in hold/fly-out and return without another fly-in.');
