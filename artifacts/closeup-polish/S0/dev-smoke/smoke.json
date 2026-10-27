@@ -1,0 +1,116 @@
+{
+  "browser": "156.0.8078.48",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "mode": "DEV",
+  "checks": [
+    {
+      "check": "DEV measurement leaves active headline pose and GPU resource counts unchanged",
+      "frame": {
+        "id": "nw:focal",
+        "subject": "survey-site-nw",
+        "box": {
+          "left": 0.43256575306197376,
+          "right": 0.566950317299624,
+          "top": 0.22100877459264862,
+          "bottom": 0.7676218295136148
+        },
+        "reason": null,
+        "worldBounds": {
+          "min": [
+            24.40000057220459,
+            1.2000000178813934,
+            -314.0999994277954
+          ],
+          "max": [
+            55.59999942779541,
+            96.89999771118164,
+            -285.9000005722046
+          ]
+        },
+        "hits": 3,
+        "samples": [
+          {
+            "x": 0.49975803518079887,
+            "y": 0.49431530205313173,
+            "hit": true,
+            "first": "fixed-kit",
+            "distance": 241.09455939054
+          },
+          {
+            "x": 0.44600420948573877,
+            "y": 0.27567008008474525,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 464.2813871363109
+          },
+          {
+            "x": 0.5535118608758589,
+            "y": 0.27567008008474525,
+            "hit": false,
+            "first": "sharing-private-courts",
+            "distance": 588.2320819183367
+          },
+          {
+            "x": 0.44600420948573877,
+            "y": 0.7129605240215182,
+            "hit": false,
+            "first": "sharing-private-courts",
+            "distance": 271.40468044704124
+          },
+          {
+            "x": 0.5535118608758589,
+            "y": 0.7129605240215182,
+            "hit": false,
+            "first": "TERRAIN_LOW_DENSITY",
+            "distance": 273.4239335591262
+          },
+          {
+            "x": 0.49975803518079887,
+            "y": 0.27567008008474525,
+            "hit": true,
+            "first": "fixed-kit",
+            "distance": 227.40285730748525
+          },
+          {
+            "x": 0.49975803518079887,
+            "y": 0.7129605240215182,
+            "hit": true,
+            "first": "fixed-kit",
+            "distance": 258.4768776332206
+          },
+          {
+            "x": 0.44600420948573877,
+            "y": 0.49431530205313173,
+            "hit": false,
+            "first": "concentration-vertical-towers",
+            "distance": 263.9488099997157
+          },
+          {
+            "x": 0.5535118608758589,
+            "y": 0.49431530205313173,
+            "hit": false,
+            "first": "TERRAIN_LOW_DENSITY",
+            "distance": 370.78130969107383
+          }
+        ]
+      },
+      "pass": true
+    },
+    {
+      "check": "real v4 live headline and reason",
+      "place": "街の画面：デックス西",
+      "pass": true
+    },
+    {
+      "check": "reload snapshot ambient hero",
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "performanceClaim": "none; diagnostics only used for load readiness"
+}

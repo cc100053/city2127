@@ -1,0 +1,137 @@
+{
+  "checkedAtUTC": "2026-10-27T15:58:52.220388+00:00",
+  "runtimeCommit": "59c6ea998463c3c969ef2bc91f9b8608c64a4113",
+  "runtimeUnchangedAtRecoveryHEAD": "0ddd039b627bf76795859377bf74e7b5ee39e046",
+  "rootNpmTest": {
+    "status": "PASS",
+    "exitCode": 0,
+    "log": "resume-npm-test.log",
+    "basis": "Full resume suite; final runtime diff against59c6ea9 empty."
+  },
+  "rootNpmBuild": {
+    "status": "PASS",
+    "exitCode": 0,
+    "log": "resume-npm-build.log",
+    "warnings": [
+      "existing chunk-size",
+      "existing JSON import attributes"
+    ]
+  },
+  "surveyFixtureBuild": {
+    "status": "PASS",
+    "exitCode": 0,
+    "log": "survey-fixture-build.log",
+    "packageTestClaim": false,
+    "reason": "No survey source changes; build only supplies scratch guest/admin fixture."
+  },
+  "runnerSelfTest": {
+    "status": "PASS",
+    "exitCode": 0,
+    "log": "runner-self-test.log"
+  },
+  "occlusionSelfChecks": {
+    "status": "PASS",
+    "exitCode": 0,
+    "log": "occlusion-analysis.log"
+  },
+  "fullMatrix": {
+    "states": 98,
+    "takes": 196,
+    "urlPoseIntegrity": "PASS exact same URL and pose across both fresh takes"
+  },
+  "visualOriginalReview": {
+    "originalSecondTakes": 98,
+    "source": "visual-review.json",
+    "visitorRecognitionAndTemporalFlicker": "NOT TESTED"
+  },
+  "A4": {
+    "pairs": 96,
+    "pass": 7,
+    "unmeasurableFail": 20,
+    "unchangedThresholds": true
+  },
+  "A5": {
+    "status": "REFERENCE ESTABLISHED",
+    "cases": 28,
+    "rounds": 56,
+    "launchArgs": [
+      "--disable-gpu-vsync",
+      "--disable-frame-rate-limit"
+    ],
+    "meanFpsRange": [
+      79.51269340386263,
+      133.59841657634274
+    ],
+    "unexpectedRoundErrors": 0,
+    "relativeGate": "N/A until later round;95%FPS/+10%draw unchanged",
+    "preservedFlagOnly": "baseline/performance-vsync-flag-only.json"
+  },
+  "original93Hashes": "PASS against pushed7fbfbfa manifest",
+  "allImageHashes": {
+    "count": 234,
+    "manifest": "original-images.json"
+  },
+  "devSmoke": {
+    "status": "PASS",
+    "exitCode": 0,
+    "log": "dev-smoke.log",
+    "evidence": "dev-smoke/smoke.json",
+    "assertions": "Real live/reload; helper leaves active headline pose and GPU resource counts unchanged."
+  },
+  "productionSmoke": {
+    "status": "PASS",
+    "exitCode": 0,
+    "log": "production-smoke.log",
+    "evidence": "production-smoke/smoke.json",
+    "assertions": "Both DEV globals undefined; real live/reload; zero errors."
+  },
+  "staticProductionExclusion": {
+    "status": "PASS",
+    "evidence": "production-check.json"
+  },
+  "originalE4": {
+    "status": "FAIL",
+    "exitCode": 1,
+    "log": "formal.log",
+    "cause": "Fixed energy-copy wait contradicts current priority of a ladder site headline; original source and partial images retained."
+  },
+  "headlineAwareE4": {
+    "status": "PASS",
+    "exitCode": 0,
+    "log": "formal-headline.log",
+    "evidence": "formal-headline/browser.json",
+    "source": "../formal.mjs",
+    "adaptation": "Two result waits now follow current headline preference/kind; all energy/model/history/retry/Undo/reconnect/reduced-motion/resize/reset checks retained.",
+    "timingLimit": "Fixture skips visitor waits; root tests cover3s retarget; no exact3.000s browser timing claim."
+  },
+  "localMarkdownTargetsAndNewAnchor": "PASS",
+  "gitDiffCheck": "PASS working; staged/committed checked at checkpoint",
+  "cleanup": {
+    "ports": {
+      "5194": {
+        "free": true,
+        "output": ""
+      },
+      "5195": {
+        "free": true,
+        "output": ""
+      }
+    },
+    "remainingOwnedRunnersOrChrome": [],
+    "stoppedPids": [
+      79943,
+      93067
+    ],
+    "scratchServices": "Both smoke finally blocks and formal finally close browser/realtime/server/SQLite; formal scratch directory removed. Original failed E4 also exited finally.",
+    "scope": "Only this worker services; unrelated Chrome/processes untouched."
+  },
+  "notRun": [
+    "exhibition hardware",
+    "Safari/iPad/Windows",
+    "DPR2",
+    "visitor recognition",
+    "whole-scene temporal flicker",
+    "main integration"
+  ],
+  "branchCI": "Checked after push in external worker result."
+}

@@ -36,7 +36,7 @@ const mode=process.argv[2]??'capture',out=resolve(process.env.CITY2127_EVIDENCE_
 assert.ok(['capture','perf','compare'].includes(mode),'mode: capture | perf | compare');
 mkdirSync(out,{recursive:true});
 const {chromium}=await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH??'/opt/homebrew/lib/node_modules/@playwright/cli/node_modules/playwright/index.mjs').href);
-const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true,args:mode==='perf'?['--disable-gpu-vsync']:[]});
+const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true,args:mode==='perf'?['--disable-gpu-vsync','--disable-frame-rate-limit']:[]});
 const page=await browser.newPage({viewport:{width:1920,height:1080},deviceScaleFactor:1});
 await page.route('https://fonts.googleapis.com/**',route=>route.fulfill({contentType:'text/css',body:''}));
 const errors=[];page.on('pageerror',e=>errors.push({type:'page',message:e.message}));
@@ -44,7 +44,7 @@ page.on('console',m=>{if(m.type()==='error')errors.push({type:'console',message:
 page.on('requestfailed',r=>errors.push({type:'network',message:r.failure()?.errorText,url:r.url()}));
 const file=`${out}/${mode==='perf'?'performance':mode==='compare'?'comparison':'capture'}.json`;
 const report=existsSync(file)?JSON.parse(readFileSync(file,'utf8')):{mode,commit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),
-  sourceDiff:execFileSync('git',['diff','--','src','tests','package.json'],{encoding:'utf8'}),browser:browser.version(),viewport:[1920,1080],dpr:1,quality:'default',rows:[],errors:[]};
+  sourceDiff:execFileSync('git',['diff','--','src','tests','package.json'],{encoding:'utf8'}),browser:browser.version(),viewport:[1920,1080],dpr:1,quality:'default',launchArgs:mode==='perf'?['--disable-gpu-vsync','--disable-frame-rate-limit']:[],rows:[],errors:[]};
 const save=()=>writeFileSync(file,JSON.stringify(report,null,2)+'\n');
 const key=row=>`${row.id.replaceAll(':','-')}__${row.state}__h${row.hour}`;
 const selected=matrix.filter(row=>!process.env.CITY_SHOT_ONLY||row.id===process.env.CITY_SHOT_ONLY);
@@ -113,7 +113,7 @@ try {
       row.A4=report.rows.filter(pair=>pair.id===row.id&&pair.hour===row.hour&&(pair.from===row.state||pair.to===row.state));
       const reference=performance.find(p=>p.id===row.id&&p.hour===row.hour);
       row.A5={vsync:{fps:Number(row.diagnostics.fps),pass:Number(row.diagnostics.fps)>=58},
-        uncappedReference:reference?{state:reference.state,meanFps:reference.meanFps}:null,relative:'S0 establishes reference; 95% / +10% comparisons apply to later rounds'};
+        uncappedReference:reference?{state:reference.state,meanFps:reference.meanFps,drawCalls:reference.rounds.map(r=>Number(r.diagnostics.drawCalls)),meanDrawCalls:reference.rounds.reduce((n,r)=>n+Number(r.diagnostics.drawCalls),0)/reference.rounds.length}:null,relative:'S0 establishes reference; 95% / +10% comparisons apply to later rounds'};
     }
     writeFileSync(`${out}/capture.json`,JSON.stringify(captureReport,null,2)+'\n');save();
   }

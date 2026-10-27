@@ -32,8 +32,8 @@
           "high新增柱體在夜間比鄰樓暗；端口差異難讀。"
         ],
         "V6": [
-          "FAIL",
-          "近鏡可見簡化方盒／圓柱、重複外皮及樹冠多邊形輪廓。"
+          "STATIC PASS",
+          "原圖未見可確認的穿模／浮空／破面；造型及材質簡單由V1/V3/V4另評，不因簡單而虛報幾何缺陷。靜圖未驗閃爍。"
         ]
       },
       "notes": "橙色地界可以定位hub，但周邊兩棟塔同樣搶眼；high加柱體的差異可見，服務機理未表達。"
@@ -73,8 +73,8 @@
           "夜間暖窗與航線搶眼，low服務亭和high端口本體差異較暗。"
         ],
         "V6": [
-          "FAIL",
-          "近景背景樹冠和服務頂棚過度簡化，細節層次不足；靜圖未證明無閃爍。"
+          "STATIC PASS",
+          "原圖未見可確認的穿模／浮空／破面；造型及材質簡單由V1/V3/V4另評，不因簡單而虛報幾何缺陷。靜圖未驗閃爍。"
         ]
       },
       "notes": "高tier亮青航線與大型飛行器橫跨畫面，是額外遮擋來源；不能把bbox內空白ray miss都叫作前景遮擋。"
@@ -151,8 +151,8 @@
           "夜間白帆／深綠樹冠以及立面綠帶比例仍可分辨；只是其他窗光更搶眼。"
         ],
         "V6": [
-          "FAIL",
-          "前方冠蓋的大平面／條板及規則球狀屋頂樹冠仍顯粗糙；靜圖不證明無閃爍。"
+          "STATIC PASS",
+          "原圖未見可確認的穿模／浮空／破面；造型及材質簡單由V1/V3/V4另評，不因簡單而虛報幾何缺陷。靜圖未驗閃爍。"
         ]
       },
       "notes": "相鄰tier的立面綠帶、遮陽帆與樹冠數有變；對方大範圍carrier的world AABB不等於畫面內單一公園範圍。"
@@ -266,11 +266,400 @@
           "night主體比左右鄰樓暗，low高杆及功能模組細節難讀；high高度差仍可見。"
         ],
         "V6": [
-          "FAIL",
-          "簡單方盒／細柱及環形疊層明顯，精細接點與功能模組不足。"
+          "STATIC PASS",
+          "原圖未見可確認的穿模／浮空／破面；造型及材質簡單由V1/V3/V4另評，不因簡單而虛報幾何缺陷。靜圖未驗閃爍。"
         ]
       },
-      "notes": "A1包含長服務杆，因此low投影高度大於neutral不代表低層功能主體足夠醒目；不要靠量度PASS掩蓋此問題。"
+      "notes": "A1包含長服務杆，因此low投影高度大於neutral不代表低層功能主體足夠醒目；不要靠量度PASS掩蓋此問題。",
+      "perStateOverrides": {
+        "2": {
+          "V4": [
+            "PASS",
+            "high為完整多層塔體與平台配置；功能辨識不足仍列V1失敗。"
+          ]
+        }
+      }
+    },
+    "se:district": {
+      "reviewedOriginals": [
+        "baseline/se-district__-8__h12.jpg",
+        "baseline/se-district__-8__h22.jpg",
+        "baseline/se-district__-5__h12.jpg",
+        "baseline/se-district__-5__h22.jpg",
+        "baseline/se-district__0__h12.jpg",
+        "baseline/se-district__0__h22.jpg",
+        "baseline/se-district__5__h12.jpg",
+        "baseline/se-district__5__h22.jpg",
+        "baseline/se-district__8__h12.jpg",
+        "baseline/se-district__8__h22.jpg"
+      ],
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "看得到新增塔及低層圓亭，但無法只看圖迅速讀出集中／分散的生活功能。"
+        ],
+        "V2": [
+          "PASS",
+          "上方海面明確入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "屋頂及前景綠化多為規則樹團、球冠與平綠頂。"
+        ],
+        "V4": [
+          "PASS",
+          "low有完整分散圓亭，high有多層垂直配置，district整體沒有退化成空地／舊城。"
+        ],
+        "V5": [
+          "FAIL",
+          "low相鄰tier在此鏡頭幾乎相同，夜間暖窗搶眼，功能配置差異未能完整讀出。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "靜圖未見確證的破面／浮空／穿模；高架與塔的投影重疊不等於幾何穿越。未用靜圖證明無閃爍。"
+        ]
+      },
+      "notes": "整個concentration carrier bounds跨near plane，framing與A4不可測應明確FAIL；不能只取鏡頭內好看的一座塔替代原主體定義。"
+    },
+    "energy:garden": {
+      "reviewedOriginals": [
+        "baseline/energy-garden__baseline__h12.jpg",
+        "baseline/energy-garden__baseline__h22.jpg",
+        "baseline/energy-garden__a__h12.jpg",
+        "baseline/energy-garden__a__h22.jpg",
+        "baseline/energy-garden__mixed__h12.jpg",
+        "baseline/energy-garden__mixed__h22.jpg"
+      ],
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "上下水池、立管及渦輪房可讀成蓄水設備；儲能用途仍需文案，未作真人兩秒測試。"
+        ],
+        "V2": [
+          "PASS",
+          "前景海面明確。"
+        ],
+        "V3": [
+          "FAIL",
+          "部件本身偏機械，周邊仍是球冠細幹樹，未達整體綠化門檻。"
+        ],
+        "V4": [
+          "PASS",
+          "上下水池、支承、管線及岸上接橋形成完整運作方案。"
+        ],
+        "V5": [
+          "PASS",
+          "夜間上／下槽和支承輪廓仍可分，內部機械較暗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "靜圖未見破面或確證穿模／浮空；前景白杆造成遮擋，不能據投影重疊宣稱穿模。"
+        ]
+      },
+      "perStateOverrides": {
+        "baseline": {
+          "V1": [
+            "N/A",
+            "此基準按定義沒有水庭；只驗證原城仍完整，不能把不存在主體當PASS。"
+          ],
+          "V3": [
+            "N/A",
+            "此基準按定義沒有水庭；只驗證原城仍完整，不能把不存在主體當PASS。"
+          ],
+          "V4": [
+            "N/A",
+            "此基準按定義沒有水庭；只驗證原城仍完整，不能把不存在主體當PASS。"
+          ],
+          "V5": [
+            "N/A",
+            "此基準按定義沒有水庭；只驗證原城仍完整，不能把不存在主體當PASS。"
+          ],
+          "V6": [
+            "N/A",
+            "此基準按定義沒有水庭；只驗證原城仍完整，不能把不存在主體當PASS。"
+          ]
+        }
+      },
+      "notes": "a與mixed的水庭部件相同，A4近零屬預期同部件比較，仍保留原門檻FAIL；一條白色前景杆穿過視線，pose需後續sector處理。"
+    },
+    "energy:garden2": {
+      "reviewedOriginals": [
+        "baseline/energy-garden2__baseline__h12.jpg",
+        "baseline/energy-garden2__baseline__h22.jpg",
+        "baseline/energy-garden2__a__h12.jpg",
+        "baseline/energy-garden2__a__h22.jpg",
+        "baseline/energy-garden2__mixed__h12.jpg",
+        "baseline/energy-garden2__mixed__h22.jpg"
+      ],
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "雙層水盤、連接管及渦輪可讀為水能設施；未做訪客兩秒辨認測試。"
+        ],
+        "V2": [
+          "PASS",
+          "大幅海面與水岸連接清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "機械構件為主；周邊植栽仍是規則球樹／棒幹，未達多層生態質感。"
+        ],
+        "V4": [
+          "PASS",
+          "水盤、支柱、機械底座及接岸橋完整。"
+        ],
+        "V5": [
+          "FAIL",
+          "夜間渦輪／管線及下水盤很暗，儲能機理弱於背景窗光。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "靜圖未見可確認的破面／穿模；不能以靜圖排除閃爍。"
+        ]
+      },
+      "perStateOverrides": {
+        "baseline": {
+          "V1": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ],
+          "V3": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ],
+          "V4": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ],
+          "V5": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ],
+          "V6": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ]
+        }
+      },
+      "notes": "a與mixed同一水庭構件；mixed右側另有接收翼，但不能算作此subject的改善。"
+    },
+    "energy:ring": {
+      "reviewedOriginals": [
+        "baseline/energy-ring__baseline__h12.jpg",
+        "baseline/energy-ring__baseline__h22.jpg",
+        "baseline/energy-ring__b__h12.jpg",
+        "baseline/energy-ring__b__h22.jpg",
+        "baseline/energy-ring__mixed__h12.jpg",
+        "baseline/energy-ring__mixed__h22.jpg"
+      ],
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "能讀成大型機械環，但看不出儲能或旋轉帶功能；環後富士球體與斜橋很搶眼。"
+        ],
+        "V2": [
+          "PASS",
+          "富士球體、海面和彩虹橋入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "背景植栽仍是規則球樹。"
+        ],
+        "V4": [
+          "PASS",
+          "環、雙軸承及支架形成完整設施。"
+        ],
+        "V5": [
+          "FAIL",
+          "夜間環體暗於背景窗光；旋轉帶分段及軸承機理難讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "未見可確認的破面／浮空；靜圖不能驗證閃爍。"
+        ]
+      },
+      "perStateOverrides": {
+        "baseline": {
+          "V1": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ],
+          "V3": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ],
+          "V4": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ],
+          "V5": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ],
+          "V6": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ]
+        }
+      },
+      "notes": "b與mixed的環相同，低A4差異保留。環內射線多穿過空隙，不等於環本體被遮擋。"
+    },
+    "energy:wing": {
+      "reviewedOriginals": [
+        "baseline/energy-wing__baseline__h12.jpg",
+        "baseline/energy-wing__baseline__h22.jpg",
+        "baseline/energy-wing__a__h12.jpg",
+        "baseline/energy-wing__a__h22.jpg",
+        "baseline/energy-wing__b__h12.jpg",
+        "baseline/energy-wing__b__h22.jpg",
+        "baseline/energy-wing__mixed__h12.jpg",
+        "baseline/energy-wing__mixed__h22.jpg"
+      ],
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "雙片帶網格面板和支柱，能讀為收集能源的翼。未做真人辨識測試。"
+        ],
+        "V2": [
+          "PASS",
+          "前景海面清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "周邊規則圓球樹缺少多層綠化。"
+        ],
+        "V4": [
+          "PASS",
+          "a小型及b/mixed大型均有完整面板、轉軸、支柱及底座。"
+        ],
+        "V5": [
+          "FAIL",
+          "夜間輪廓可讀，但深色面板與轉軸細節被背景窗光壓過。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "未見可確認的破面／穿模；靜圖未驗閃爍。"
+        ]
+      },
+      "perStateOverrides": {
+        "baseline": {
+          "V1": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ],
+          "V3": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ],
+          "V4": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ],
+          "V5": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ],
+          "V6": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ]
+        }
+      },
+      "notes": "a到b面板尺度差異清楚；b與mixed共用大翼，A4低差異保留。"
+    },
+    "energy:island": {
+      "reviewedOriginals": [
+        "baseline/energy-island__baseline__h12.jpg",
+        "baseline/energy-island__baseline__h22.jpg",
+        "baseline/energy-island__c__h12.jpg",
+        "baseline/energy-island__c__h22.jpg",
+        "baseline/energy-island__mixed__h12.jpg",
+        "baseline/energy-island__mixed__h22.jpg"
+      ],
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "成對儲能罐、設備間與維修橋可讀為海上能源設施；未測真人兩秒辨認。"
+        ],
+        "V2": [
+          "PASS",
+          "海面與水岸明確定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "島體缺少生態層次，岸邊仍是規則球樹。"
+        ],
+        "V4": [
+          "PASS",
+          "罐體、設備間、圍欄、底板及接岸橋構成完整海上設施。"
+        ],
+        "V5": [
+          "FAIL",
+          "夜間罐體與底板輪廓可讀，但設備／能源分區偏暗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見罐體面板接縫；未見可確認的破面或穿模，靜圖不排除閃爍。"
+        ]
+      },
+      "perStateOverrides": {
+        "baseline": {
+          "V1": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ],
+          "V3": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ],
+          "V4": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ],
+          "V5": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ],
+          "V6": [
+            "N/A",
+            "此配置沒有該能源設施。"
+          ]
+        }
+      },
+      "notes": "c與mixed島體相同；mixed背景另有翼及水庭，不算此subject的改善。"
+    },
+    "hero": {
+      "reviewedOriginals": [
+        "baseline/hero__neutral__h12.jpg",
+        "baseline/hero__neutral__h22.jpg"
+      ],
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "整體可讀為有居住、交通與水岸公共設施的未來城市；hero不是單一結果設施。"
+        ],
+        "V2": [
+          "PASS",
+          "海、富士球體及彩虹橋均入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "全城仍有大量規則圓球樹及平坦草頂。"
+        ],
+        "V4": [
+          "PASS",
+          "中性城市為完整聚落與交通系統。"
+        ],
+        "V5": [
+          "PASS",
+          "夜間全城輪廓與主要航線清楚；單一設施變化由各shot另評。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "hero尺度未見可確認的破面；未作全場閃爍驗收。"
+        ]
+      },
+      "notes": "A1–A4對hero無指定subject，記N/A；A5/A6仍量度。"
     }
   }
 }

@@ -1,0 +1,19 @@
+{
+  "ports": {
+    "5194": {
+      "free": true,
+      "output": ""
+    },
+    "5195": {
+      "free": true,
+      "output": ""
+    }
+  },
+  "remainingOwnedRunnersOrChrome": [],
+  "stoppedPids": [
+    79943,
+    93067
+  ],
+  "scratchServices": "Both smoke finally blocks and formal finally close browser/realtime/server/SQLite; formal scratch directory removed. Original failed E4 also exited finally.",
+  "scope": "Only this worker services; unrelated Chrome/processes untouched."
+}

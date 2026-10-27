@@ -14,11 +14,29 @@
     "src/main.ts": "ef7f9c82e6efa5363924f1f952a09378bfb60b59c462fadf5459ee0a6e1718e6",
     "tests/devShotFrame.test.ts": "755978f63f4a9e6ff4b88318bf8a8e93548458b480043e9512243959ea994ef8",
     "package.json": "2e0e74b1d4765a104f7160f174a3f287ab632e2536d13db85fd66532e904f9d1",
-    "artifacts/closeup-polish/capture.mjs": "7318e29f3663149a22003ce0a1f0df59d780fa981910e84365060beaa34ff4bc"
+    "artifacts/closeup-polish/capture.mjs": "e0d0d2b8cb8cc8f0b25b48d11d83b6b2c4c3736dfbed18b83765b1a048a28c78",
+    "artifacts/closeup-polish/report.mjs": "920ccde7492917d2389974ac1cd184f70b51543d662c73690b632aff6f018007",
+    "artifacts/closeup-polish/occlusion.mjs": "b158145336042c822e9cfa21d98dbc9e515ba8542a8a73864efab5db54b38a24",
+    "artifacts/closeup-polish/smoke.mjs": "c6a0b93c23fc9594fed4914776771acc3d012a3dd7d0b07aa31c5a0ff2444471",
+    "artifacts/closeup-polish/formal.mjs": "68c5cc8acfdcf18a9cc3d03730eea0af44319277a89751b939c6dcfb5d6f7b49"
   },
   "browser": "Google Chrome 156.0.8078.48 headless",
   "capture": "fresh navigation per take; fps dataset then six seconds; JPEG90; reviewTime20 / hour12,22",
-  "performance": "NOT RUN \u2014 quota checkpoint at 14% weekly remaining",
+  "performance": "Corrected28 cases /56 windows use --disable-gpu-vsync plus --disable-frame-rate-limit. Original flag-only60FPS series preserved separately; raw intervals retained.",
   "sourceRuntimeCommit": "59c6ea9",
-  "installedLockfileMatchesSourceCheckout": true
+  "installedLockfileMatchesSourceCheckout": true,
+  "captureSegments": {
+    "original43": "runtime59c6ea9; original JPEG bytes verified after recovery",
+    "remaining55": "runtime unchanged; runner comparison fixes only; checkpoint0ddd039"
+  },
+  "recovery": "2026-10-28 JST; resumed after actual five-hour limit. No percentage pre-pause.",
+  "performanceCorrection": {
+    "original": "baseline/performance-vsync-flag-only.json",
+    "diagnostic": "perf-cap-trial/performance.json",
+    "reason": "CurrentChrome still caps rAF near60 with disable-gpu-vsync alone; isolated same-scene two-flag trial exceeded86FPS."
+  },
+  "correctedPerformanceRange": [
+    79.51269340386263,
+    133.59841657634274
+  ]
 }

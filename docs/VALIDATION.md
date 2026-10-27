@@ -350,3 +350,12 @@ Main `ad60a8912a62c5ad24bdbf965c5dc31527771562`推送及fetch核對成功、HEAD
 [方法／原圖／完整logs](../artifacts/closeup-polish/S0/README.md)：新增DEV `cityShotFrame`及四站tier對應、投影／九點／可見性／InstancedMesh／raycast還原測試，runner self-check定義98個日夜狀態；完整矩陣與兩輪uncapped效能仍在執行，不能視為S0完成。主體／原門檻不變，初步NW A1/A2通過但A3及重載reproducibility失敗，所有原圖與失敗保留。首次sandbox root test的localhost EPERM已獲准重跑完整PASS；最終source結果及精確checkpoint見本批handoff。Build PASS，僅既有兩項warning；production排除DEV helper。沒有美術／相機pose／survey／梯級／時間線改動，未合併main；其他平台／展示硬件／新live／真人辨識未驗。
 
 S0安全checkpoint：weekly剩14%時停止；final flush共43/98狀態／86張baseline JPEG，另保留native試跑。A1通過32/43、A2 18/43、A3 0/43、A6 42/43；repro7/43通過，所有雙圖及失敗保留。data-fps59.8–60.1僅vsync參考；A4、完整矩陣及兩輪uncapped仍未驗。Runtime59c6ea9已push feature，未merge；所有owned Chrome／runner／Vite5194已釋放。最終source root checks及來源hash見上方報告，沒有新live或其他平台宣稱。
+
+
+## Closeup polish S0 recovery — 2026-10-28
+
+本節取代上方43/98暫停狀態；[完整方法／證據](../artifacts/closeup-polish/S0/README.md)、[逐狀態review](../artifacts/closeup-polish/S0/REVIEW.md)、[測試與cleanup](../artifacts/closeup-polish/S0/checks.json)。98狀態／196原圖、96 A4比較；98張正式第二take已逐張檢視。A1 60 PASS／6 FAIL／20無法量測FAIL／12 N/A，A2 42／24／20／12，A3 0／66／20／12；A4 7/96，A6原始97/98（獨立NW6/6重測無錯），repro41/98。12 N/A僅hero與absent-energy，不以null投影虛報通過。Vsync58.5–60.1。A3 misses分類與幾何／shader限制保留。當前Chrome156用`--disable-gpu-vsync`仍cap60，原28組完整保留；加入`--disable-frame-rate-limit`後補量28組×2有效reference，raw FPS、draw calls及5秒intervals見report／performance.json。相對95%FPS／+10%draw門檻留待後續輪次，不放寬。
+
+DEV／production smoke及S0的headline-aware E4副本驗證結果見checks.json；scratch SQLite／HTTP／WebSocket採現有fixture，沒有部署或survey source變更。Root suite/build PASS的實際logs保留，production bundle排除cityShotFrame；helper在live headline不改pose或GPU資源數。原始43狀態與93張原圖hash驗證一致，過往quota與optimizer失敗仍留歷史。僅開發Mac Chrome1920×1080/DPR1；真人辨識、展示硬件、其他平台、完整時序閃爍驗收未做。無美術／pose／timeline／ladder變動，未merge main，本批後釋放服務及writer交coordinator review。
+
+S0終版：有效uncapped平均79.51–133.60FPS。原E4在現行ladder headline顯示其他site時仍等固定能源句，故保留失敗；S0測試副本僅更新兩個結果等待斷言後完成全流程，page exception0，runtime及原E4不改。234張原圖hash核對、98組雙take URL/pose一致、DEV／production smoke PASS。所有owned Vite／Chrome／scratch server已停止，5194／5195 free。

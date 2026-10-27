@@ -1,0 +1,1531 @@
+{
+  "mode": "compare",
+  "commit": "0ddd039b627bf76795859377bf74e7b5ee39e046",
+  "sourceDiff": "",
+  "browser": "156.0.8078.48",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "rows": [
+    {
+      "id": "nw:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.007016099559146789,
+      "rect": {
+        "x": 842,
+        "y": 545,
+        "width": 235,
+        "height": 285
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:focal",
+      "hour": 12,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.05004057259621648,
+      "rect": {
+        "x": 830,
+        "y": 238,
+        "width": 259,
+        "height": 592
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.04961497382006126,
+      "rect": {
+        "x": 830,
+        "y": 238,
+        "width": 259,
+        "height": 592
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.005954402066911124,
+      "rect": {
+        "x": 842,
+        "y": 545,
+        "width": 235,
+        "height": 285
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:focal",
+      "hour": 22,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.051631497497952185,
+      "rect": {
+        "x": 830,
+        "y": 238,
+        "width": 259,
+        "height": 592
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.05251760675051613,
+      "rect": {
+        "x": 830,
+        "y": 238,
+        "width": 259,
+        "height": 592
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.017680051866839255,
+      "rect": {
+        "x": 684,
+        "y": 122,
+        "width": 1236,
+        "height": 958
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 12,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.024763095023453256,
+      "rect": {
+        "x": 684,
+        "y": 122,
+        "width": 1236,
+        "height": 958
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 12,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.010342056678989053,
+      "rect": {
+        "x": 684,
+        "y": 125,
+        "width": 1236,
+        "height": 955
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 12,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.03180524720034446,
+      "rect": {
+        "x": 692,
+        "y": 126,
+        "width": 1228,
+        "height": 954
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.05424858218850152,
+      "rect": {
+        "x": 684,
+        "y": 126,
+        "width": 1236,
+        "height": 954
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.01685414942000204,
+      "rect": {
+        "x": 684,
+        "y": 122,
+        "width": 1236,
+        "height": 958
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 22,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.019986512440362255,
+      "rect": {
+        "x": 684,
+        "y": 122,
+        "width": 1236,
+        "height": 958
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 22,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.014271283192617598,
+      "rect": {
+        "x": 684,
+        "y": 125,
+        "width": 1236,
+        "height": 955
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 22,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.03399187339241881,
+      "rect": {
+        "x": 692,
+        "y": 126,
+        "width": 1228,
+        "height": 954
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.05805505236567091,
+      "rect": {
+        "x": 684,
+        "y": 126,
+        "width": 1236,
+        "height": 954
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.030811385414633474,
+      "rect": {
+        "x": 599,
+        "y": 282,
+        "width": 689,
+        "height": 566
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:focal",
+      "hour": 12,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.02484272539570344,
+      "rect": {
+        "x": 599,
+        "y": 282,
+        "width": 689,
+        "height": 566
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.04093807695106605,
+      "rect": {
+        "x": 599,
+        "y": 282,
+        "width": 689,
+        "height": 566
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.02990909298427839,
+      "rect": {
+        "x": 599,
+        "y": 282,
+        "width": 689,
+        "height": 566
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:focal",
+      "hour": 22,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.018566784961799532,
+      "rect": {
+        "x": 599,
+        "y": 282,
+        "width": 689,
+        "height": 566
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.03582642730899673,
+      "rect": {
+        "x": 599,
+        "y": 282,
+        "width": 689,
+        "height": 566
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.009679195160574517,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 12,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.01476872717965787,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 12,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.01716763243363189,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 12,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.010454751422173808,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.030184319651214396,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.010692606209150328,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 22,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.01868079573650448,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 22,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.019934066231945453,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 22,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.00977535327402566,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.03341521549463407,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.017070074141629088,
+      "rect": {
+        "x": 298,
+        "y": 306,
+        "width": 1250,
+        "height": 774
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:focal",
+      "hour": 12,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.012559650065021702,
+      "rect": {
+        "x": 298,
+        "y": 306,
+        "width": 1250,
+        "height": 774
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.023785402036783705,
+      "rect": {
+        "x": 298,
+        "y": 306,
+        "width": 1250,
+        "height": 774
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.01105980983263245,
+      "rect": {
+        "x": 298,
+        "y": 306,
+        "width": 1250,
+        "height": 774
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:focal",
+      "hour": 22,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.008495183665197345,
+      "rect": {
+        "x": 298,
+        "y": 306,
+        "width": 1250,
+        "height": 774
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.01564288527469558,
+      "rect": {
+        "x": 298,
+        "y": 306,
+        "width": 1250,
+        "height": 774
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "sw:district",
+      "hour": 12,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "sw:district",
+      "hour": 12,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "sw:district",
+      "hour": 12,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "sw:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "sw:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "sw:district",
+      "hour": 22,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "sw:district",
+      "hour": 22,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "sw:district",
+      "hour": 22,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "sw:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.09734332018873743,
+      "rect": {
+        "x": 849,
+        "y": 343,
+        "width": 222,
+        "height": 473
+      },
+      "pass": true
+    },
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.07154813246513435,
+      "rect": {
+        "x": 842,
+        "y": 206,
+        "width": 236,
+        "height": 607
+      },
+      "pass": true
+    },
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.12577558762691887,
+      "rect": {
+        "x": 842,
+        "y": 206,
+        "width": 236,
+        "height": 610
+      },
+      "pass": true
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.07810537810537811,
+      "rect": {
+        "x": 849,
+        "y": 343,
+        "width": 222,
+        "height": 473
+      },
+      "pass": true
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.044881144594771424,
+      "rect": {
+        "x": 842,
+        "y": 206,
+        "width": 236,
+        "height": 607
+      },
+      "pass": false
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.09182287381934343,
+      "rect": {
+        "x": 842,
+        "y": 206,
+        "width": 236,
+        "height": 610
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": null,
+      "pass": false,
+      "reason": "No valid projected subject box in either state",
+      "frameReasons": [
+        "bounds cross camera near plane",
+        "bounds cross camera near plane"
+      ]
+    },
+    {
+      "id": "energy:garden",
+      "hour": 12,
+      "from": "baseline",
+      "to": "a",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.058445453304253395,
+      "rect": {
+        "x": 679,
+        "y": 254,
+        "width": 753,
+        "height": 592
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden",
+      "hour": 12,
+      "from": "a",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.0043193679970103685,
+      "rect": {
+        "x": 679,
+        "y": 254,
+        "width": 753,
+        "height": 592
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden",
+      "hour": 12,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.05848537780808697,
+      "rect": {
+        "x": 679,
+        "y": 254,
+        "width": 753,
+        "height": 592
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden",
+      "hour": 22,
+      "from": "baseline",
+      "to": "a",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.041404912646417213,
+      "rect": {
+        "x": 679,
+        "y": 254,
+        "width": 753,
+        "height": 592
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden",
+      "hour": 22,
+      "from": "a",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.0035564800797985704,
+      "rect": {
+        "x": 679,
+        "y": 254,
+        "width": 753,
+        "height": 592
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden",
+      "hour": 22,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.04140555190766112,
+      "rect": {
+        "x": 679,
+        "y": 254,
+        "width": 753,
+        "height": 592
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 12,
+      "from": "baseline",
+      "to": "a",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.07145494540637165,
+      "rect": {
+        "x": 646,
+        "y": 242,
+        "width": 752,
+        "height": 604
+      },
+      "pass": true
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 12,
+      "from": "a",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.006934892516491826,
+      "rect": {
+        "x": 646,
+        "y": 242,
+        "width": 752,
+        "height": 604
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 12,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.0747734762732297,
+      "rect": {
+        "x": 646,
+        "y": 242,
+        "width": 752,
+        "height": 604
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 22,
+      "from": "baseline",
+      "to": "a",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.044419967449193756,
+      "rect": {
+        "x": 646,
+        "y": 242,
+        "width": 752,
+        "height": 604
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 22,
+      "from": "a",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.003548056299218762,
+      "rect": {
+        "x": 646,
+        "y": 242,
+        "width": 752,
+        "height": 604
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 22,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.045472976130943664,
+      "rect": {
+        "x": 646,
+        "y": 242,
+        "width": 752,
+        "height": 604
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:ring",
+      "hour": 12,
+      "from": "baseline",
+      "to": "b",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.034714675818700934,
+      "rect": {
+        "x": 673,
+        "y": 83,
+        "width": 759,
+        "height": 932
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:ring",
+      "hour": 12,
+      "from": "b",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.0063417803898358875,
+      "rect": {
+        "x": 673,
+        "y": 83,
+        "width": 759,
+        "height": 932
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:ring",
+      "hour": 12,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.03473824776196817,
+      "rect": {
+        "x": 673,
+        "y": 83,
+        "width": 759,
+        "height": 932
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:ring",
+      "hour": 22,
+      "from": "baseline",
+      "to": "b",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.026649129628724153,
+      "rect": {
+        "x": 673,
+        "y": 83,
+        "width": 759,
+        "height": 932
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:ring",
+      "hour": 22,
+      "from": "b",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.005001893923224724,
+      "rect": {
+        "x": 673,
+        "y": 83,
+        "width": 759,
+        "height": 932
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:ring",
+      "hour": 22,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.026657877635891534,
+      "rect": {
+        "x": 673,
+        "y": 83,
+        "width": 759,
+        "height": 932
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 12,
+      "from": "baseline",
+      "to": "a",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.05038828354119489,
+      "rect": {
+        "x": 758,
+        "y": 429,
+        "width": 526,
+        "height": 495
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 12,
+      "from": "a",
+      "to": "b",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.06713767290906246,
+      "rect": {
+        "x": 645,
+        "y": 270,
+        "width": 829,
+        "height": 746
+      },
+      "pass": true
+    },
+    {
+      "id": "energy:wing",
+      "hour": 12,
+      "from": "b",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.0032734272255575494,
+      "rect": {
+        "x": 645,
+        "y": 270,
+        "width": 829,
+        "height": 746
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 12,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.0567168230800795,
+      "rect": {
+        "x": 645,
+        "y": 270,
+        "width": 829,
+        "height": 746
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 22,
+      "from": "baseline",
+      "to": "a",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.02501862984827273,
+      "rect": {
+        "x": 758,
+        "y": 429,
+        "width": 526,
+        "height": 495
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 22,
+      "from": "a",
+      "to": "b",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.031860314861059245,
+      "rect": {
+        "x": 645,
+        "y": 270,
+        "width": 829,
+        "height": 746
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 22,
+      "from": "b",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.0025015767741084,
+      "rect": {
+        "x": 645,
+        "y": 270,
+        "width": 829,
+        "height": 746
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 22,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.027802974246505525,
+      "rect": {
+        "x": 645,
+        "y": 270,
+        "width": 829,
+        "height": 746
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:island",
+      "hour": 12,
+      "from": "baseline",
+      "to": "c",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.06507821090748966,
+      "rect": {
+        "x": 291,
+        "y": 83,
+        "width": 1389,
+        "height": 719
+      },
+      "pass": true
+    },
+    {
+      "id": "energy:island",
+      "hour": 12,
+      "from": "c",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.009280573106798105,
+      "rect": {
+        "x": 291,
+        "y": 83,
+        "width": 1389,
+        "height": 719
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:island",
+      "hour": 12,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.06800031437229766,
+      "rect": {
+        "x": 291,
+        "y": 83,
+        "width": 1389,
+        "height": 719
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:island",
+      "hour": 22,
+      "from": "baseline",
+      "to": "c",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.035032613246294954,
+      "rect": {
+        "x": 291,
+        "y": 83,
+        "width": 1389,
+        "height": 719
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:island",
+      "hour": 22,
+      "from": "c",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.007706489101423306,
+      "rect": {
+        "x": 291,
+        "y": 83,
+        "width": 1389,
+        "height": 719
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:island",
+      "hour": 22,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.036199038135690864,
+      "rect": {
+        "x": 291,
+        "y": 83,
+        "width": 1389,
+        "height": 719
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}
