@@ -235,7 +235,7 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 ## Next expected step
 
 1. 此任務已完成：owner批准、main merge/push及實際CI通過，技術交付毋須下一個實作步驟；以下打磨另作任務。
-2. 之後另開打磨任務，以 shot list 做基準，按出現頻率排次序：
+2. 之後另開打磨任務（2026-10-27 已寫成 [closeup-polish](closeup-polish.md)），以 shot list 做基準，按出現頻率排次序：
    - 先打磨各 site 第一格嘅 focal 近鏡（ne → sw → se → nw）。
    - 再打磨 district（±2）。
    - 然後係 ±3 加配對設施。
