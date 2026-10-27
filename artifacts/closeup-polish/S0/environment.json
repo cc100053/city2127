@@ -1,0 +1,22 @@
+{
+  "baseline": "fdc4a0cbbbc352b41c15850f2a846845d7975de1",
+  "platform": "Mac mini Mac18,5 / Apple M6 / 12 GPU cores / 24GB / macOS 27.0.1 (26A434)",
+  "node": "v26.0.0",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "fonts": "Google Fonts CSS explicitly replaced by empty CSS, system fallback",
+  "sourceHashes": {
+    "src/devShotFrame.ts": "61558ef4610b26248ca69f4aa554bf4777cedff008e020e122ed41a77f0ff28c",
+    "src/main.ts": "ef7f9c82e6efa5363924f1f952a09378bfb60b59c462fadf5459ee0a6e1718e6",
+    "tests/devShotFrame.test.ts": "755978f63f4a9e6ff4b88318bf8a8e93548458b480043e9512243959ea994ef8",
+    "package.json": "2e0e74b1d4765a104f7160f174a3f287ab632e2536d13db85fd66532e904f9d1",
+    "artifacts/closeup-polish/capture.mjs": "dc730196960714247860dcb5011ddd42244ed8311d72543397174a5c5e91f206"
+  },
+  "browser": "Google Chrome 156.0.8078.48 headless",
+  "capture": "fresh navigation per take; fps dataset then six seconds; JPEG90; reviewTime20 / hour12,22",
+  "performance": "separate run after tests/capture; disable-gpu-vsync; >=16 seconds after navigation; 5 second rAF; two rounds; pending"
+}

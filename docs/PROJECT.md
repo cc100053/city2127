@@ -22,6 +22,8 @@ The [resident experience plan](RESIDENT_EXPERIENCE_PLAN.md) records P1–P3 impl
 
 ## Root source ownership
 
+DEV 近鏡量度（closeup-polish S0）：`main.ts` 只在 `import.meta.env.DEV` 動態載入 [devShotFrame.ts](../src/devShotFrame.ts)，提供 `window.cityShotFrame(id)`。主體依現有名稱取 socket site root、district carrier 或能源 group；回傳可見 mesh／instance 的 world AABB 投影、九個內縮取樣點及第一個可見 mesh 命中。沒有主體或 bounds 跨 near plane 時明確回傳 null，不能當 framing PASS。沿用現有 test dependency `three-mesh-bvh` 的 indirect 精確 raycast，僅同步量度期間暫換並還原 Mesh raycast；不改 render loop 或 production。CPU raycast 不模擬 shader displacement／貼圖 alpha，因此是計劃的幾何取樣條件，並非逐像素可見性證明。
+
 | File / module | Responsibility |
 | --- | --- |
 | [main.ts](../src/main.ts) | Startup, WebGL renderer, lighting/sky/fog, composer, OrbitControls, loop/resize, survey hookup and diagnostics |

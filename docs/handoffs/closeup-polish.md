@@ -1,17 +1,17 @@
 # closeup-polish — Headline 近鏡逐個打磨
 
 - Owner: cc100053（產品／審美最終批准）；實作由一個 long session 負責，開工時喺下面「進度」記低 session 名。
-- Status: PLANNED
+- Status: S0 IN PROGRESS（worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2`；只做量測，未改美術）
 - Branch: `feat/closeup-polish`（一條長分支，每個 sector 一個 checkpoint）
-- Base commit: `6a20346`（main，已包含 headline camera、review-mode 修正同本計劃初版）
-- Last verified commit: NONE（只有計劃）
-- Remote availability: 計劃隨 main 發布；實作分支未開。
+- Base commit: `fdc4a0cbbbc352b41c15850f2a846845d7975de1`（fetch verified main，包含完整 S0 標準）
+- Last verified commit: `fdc4a0c` baseline；S0 working source root test/build、runner self-check及production DEV排除PASS，完整矩陣仍在跑。
+- Remote availability: main baseline已fetch核對；獨立clone `feat/closeup-polish` 已開，S0 checkpoint尚未合併。
 
 ## Session Git state
 
-- Session starting branch and HEAD: `main` @ `6a20346`（clone `.task-relay/headline-camera/checkout`）
-- Last fetched origin/main commit: `6a20346`，2026-10-27 fetch 成功
-- Local changes present at session start: NONE
+- Session starting branch and HEAD: 主 checkout `feat/energy-demo-camera` @ `016f6d1`，原 upstream 0/0、對 main 2/18；全部保留。獨立 clone `.task-relay/closeup-polish/checkout` 由 verified `origin/main` 開 `feat/closeup-polish`，clean start。
+- Last fetched origin/main commit: `fdc4a0c`，2026-10-27 fetch 成功（clone 初次 sandbox DNS 失敗，獲准重跑成功）。計劃舊 base `6a20346` 至本基準僅完整標準文件及其 merge，runtime 未變。
+- Local changes present at session start: 主 checkout 未追蹤 `.playwright-cli/`、`.task-relay/` 保留；獨立 clone NONE。
 - Upstream integration status: NOT NEEDED
 - Pending Git conflicts or synchronization blockers: NONE
 
@@ -164,7 +164,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 
 | Sector | 狀態 | Checkpoint | Owner review | Main merge |
 | --- | --- | --- | --- | --- |
-| S0 基準 | PLANNED | — | 唔需要（冇美術改動） | — |
+| S0 基準 | IN PROGRESS；worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2` | — | 唔需要（冇美術改動）；本批留 coordinator review，不 merge | — |
 | A 海浜公園 | PLANNED | — | — | — |
 | B アクアシティ南 | PLANNED | — | — | — |
 | C フジテレビ東 | PLANNED | — | — | — |

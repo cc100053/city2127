@@ -1,0 +1,26 @@
+{
+  "rows": [
+    {
+      "id": "nw:focal",
+      "state": "-2",
+      "hour": 12,
+      "boxExact": true,
+      "hitsExact": true
+    },
+    {
+      "id": "nw:focal",
+      "state": "-2",
+      "hour": 22,
+      "boxExact": true,
+      "hitsExact": true
+    },
+    {
+      "id": "nw:focal",
+      "state": "0",
+      "hour": 12,
+      "boxExact": true,
+      "hitsExact": true
+    }
+  ],
+  "note": "same-source trial comparison; original geometry and accelerated raycast, no visual/frame change"
+}

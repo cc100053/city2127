@@ -344,3 +344,7 @@ Owner明確批准後，accepted `cf0fe82`以no-ff merge成 `51002890371ef3aa7bc7
 [本次整合logs／原圖](../artifacts/headline-camera/integration-1/README.md)：production preview＋真實scratch v4，live nw結果近鏡／原因及reload snapshot ambient hero，DEV `cityShot`排除，Chrome156.0.8078.48 headless、1920×1080 DPR1 default/hour12，原圖已查看、page／console errors0，系統字體fallback明確。Runtime及原圖hash不變支持保留先前完整鏡頭／中斷證據；沒有新FPS／硬件／全矩陣重跑宣稱。Owned服務已停止；無部署。
 
 Main `ad60a8912a62c5ad24bdbf965c5dc31527771562`推送及fetch核對成功、HEAD=origin/main，實際[main CI40490237501](https://github.com/cc100053/city2127/actions/runs/40490237501) SUCCESS：root／survey／module-swap測試與build、committed whitespace全部通過；[run及各步驟原始證據](handoffs/evidence/headline-camera-main-ci.json)。本段取代上方feature階段待批准／main CI未驗狀態。最後CI紀錄提交只有Markdown及docs內證據，按workflow跳過CI，程式碼與成功run一致；連結／fact／diff檢查通過。既有硬件／長測／模型打磨限制保留。
+
+## Closeup polish S0 — 2026-10-27（進行中）
+
+[方法／原圖／完整logs](../artifacts/closeup-polish/S0/README.md)：新增DEV `cityShotFrame`及四站tier對應、投影／九點／可見性／InstancedMesh／raycast還原測試，runner self-check定義98個日夜狀態；完整矩陣與兩輪uncapped效能仍在執行，不能視為S0完成。主體／原門檻不變，初步NW A1/A2通過但A3及重載reproducibility失敗，所有原圖與失敗保留。首次sandbox root test的localhost EPERM已獲准重跑完整PASS；最終source結果及精確checkpoint見本批handoff。Build PASS，僅既有兩項warning；production排除DEV helper。沒有美術／相機pose／survey／梯級／時間線改動，未合併main；其他平台／展示硬件／新live／真人辨識未驗。

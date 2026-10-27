@@ -156,6 +156,7 @@ try {
   let devShot:ShotId|null=null;
   const cameraMotion=matchMedia('(prefers-reduced-motion: reduce)');
   if(import.meta.env.DEV){
+    import('./devShotFrame').then(({cityShotFrame})=>Object.assign(window,{cityShotFrame:(id:string)=>cityShotFrame(scene,camera,id)}));
     Object.assign(window,{cityShot:(id?:string)=>{
       if(id===undefined){const pose={position:camera.position.toArray(),target:controls.target.toArray()};console.log(pose);return pose;}
       if(!Object.hasOwn(SHOTS,id))throw new Error(`Unknown shot: ${id}`);
