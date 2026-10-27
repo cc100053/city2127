@@ -1,7 +1,7 @@
 # closeup-polish — Headline 近鏡逐個打磨
 
 - Owner: cc100053（產品／審美最終批准）；實作由一個 long session 負責，開工時喺下面「進度」記低 session 名。
-- Status: S0 INTEGRATED（coordinator已接受量度基準；worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2`；98/98，未接受美術；A REVIEW_READY，三輪完成但gate仍FAIL，B–D未開始）
+- Status: S0 INTEGRATED（98/98，量度基準已接受）；A REVIEW_READY（三輪完成但gate仍FAIL）；B IN_PROGRESS（worker `01a17e8c-3c8c-77f3-afbb-6f7d62abad14`）；C/D/Z未開始。
 - Branch: `feat/closeup-polish`（一條長分支，每個 sector 一個 checkpoint）
 - Base commit: `fdc4a0cbbbc352b41c15850f2a846845d7975de1`（fetch verified main，包含完整 S0 標準）
 - Last verified commit: A runtime `b7d5861bebeef1bbe4a17e526c07410cde4f616d`，root npm test/build及A browser/live PASS；最終證據checkpoint見本批result。S0接受main `3d0f40e`保持不動。
@@ -166,7 +166,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 | --- | --- | --- | --- | --- |
 | S0 基準 | INTEGRATED；量度基準接受，非美術接受 | `19e9ae2`；[完整基準](../../artifacts/closeup-polish/S0/README.md) | coordinator已審查；冇美術改動 | `c802bba` |
 | A 海浜公園 | REVIEW_READY：worker `01a17e2a-4c38-7422-8d68-33782c0367f5`，dispatch `closeup-polish-A-1-r8`；三輪各24狀態完成 | runtime `b7d5861`；[完整review](../../artifacts/closeup-polish/A/REVIEW.md)，最終SHA見result-A-1.json | pending；A3/A4/V失敗保留 | — |
-| B アクアシティ南 | PLANNED | — | — | — |
+| B アクアシティ南 | IN_PROGRESS：sectorB worker，dispatch `closeup-polish-B-1-r9`；18狀態／輪，先pose | base `def2f28`；[工作記錄](../../artifacts/closeup-polish/B/NOTES.md) | pending | — |
 | C フジテレビ東 | PLANNED | — | — | — |
 | D デックス西＋沖 | PLANNED | — | — | — |
 | Z 全城回歸 | PLANNED | — | — | — |
@@ -194,7 +194,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 
 ## Next expected step
 
-Coordinator核對唯一result-A-1.json、feature checkpoint、[逐圖review](../../artifacts/closeup-polish/A/REVIEW.md)及所有FAIL差距，決定接受本批證據／修正或記錄owner審閱待辦，再獨立dispatch B。A三輪已用完，不宣稱art PASS；owner批准之前不能merge A art。此worker完成push／callback後釋放writer，不開始B–D／Z，不動main。取消百分比預停的人類指示仍有效，僅真正provider limit觸發recovery。
+B worker已由clean `def2f28`續作；fresh fetch成功，upstream0/0，對origin/main `3d0f40e`為6/0。A三輪證據已由coordinator審查，owner美術決定仍pending，只阻A merge。B按focal→district、最多三輪，完整18狀態／16比較／6組兩窗效能；不改main、A幾何及原圖。B收尾交result-B-1.json及逐圖report；C/D/Z由coordinator之後分派。取消百分比預停的人類指示仍有效，僅真正provider limit觸發recovery。
 
 ## S0 resume — 2026-10-27
 

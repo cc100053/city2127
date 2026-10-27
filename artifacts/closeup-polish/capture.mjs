@@ -25,6 +25,10 @@ function comparisonBox(a,b) {
 }
 if (process.argv.includes('--self-test')) {
   assert.equal(selectedShots('ne:focal,ne:district,energy:garden,hero').length,24);
+  const sectorB=selectedShots('sw:focal,sw:district,hero');
+  assert.equal(sectorB.length,18);
+  assert.equal(sectorB.filter(r=>r.id==='hero'||r.state===(r.id.endsWith('district')?'8':'2')).length,6);
+  assert.equal(['focal','district'].reduce((n,kind)=>n+2*(selectedShots(`sw:${kind}`).length/2),0),16,'B adjacent plus extreme comparisons');
   assert.equal(selectedShots('ne:focal').length,6); assert.equal(selectedShots(undefined).length,98);
   assert.equal(matrix.length,98); assert.equal(new Set(matrix.map(r=>`${r.id}/${r.state}/${r.hour}`)).size,98);
   assert.deepEqual(framing({box:{left:.2,right:.6,top:.2,bottom:.6},hits:7},'ne:focal').A1,true);

@@ -1,0 +1,17 @@
+{
+  "matrixStates": 18,
+  "A4Pairs": 16,
+  "A4Pass": 0,
+  "uncappedCases": 6,
+  "uncappedRounds": 2,
+  "uncappedGatePass": 6,
+  "vsyncMin": 59.8,
+  "vsyncMax": 60.1,
+  "A6Pass": 18,
+  "rootTest": "PASS npm-test-retry.log; initial sandbox listen denied, original log preserved",
+  "rootBuild": "PASS npm-build.log; existing import-attributes/chunk warnings",
+  "diffCheck": "PASS",
+  "S0AOriginalHashes": "PASS",
+  "sourceHashes": "PASS",
+  "status": "FAILED_POSE_TRIAL_PRESERVED"
+}
