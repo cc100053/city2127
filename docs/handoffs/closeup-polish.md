@@ -1,17 +1,17 @@
 # closeup-polish — Headline 近鏡逐個打磨
 
 - Owner: cc100053（產品／審美最終批准）；實作由一個 long session 負責，開工時喺下面「進度」記低 session 名。
-- Status: PLANNED
+- Status: S0 REVIEW CHECKPOINT（worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2`；98/98 原圖，未改美術；最終檢查見下文）
 - Branch: `feat/closeup-polish`（一條長分支，每個 sector 一個 checkpoint）
-- Base commit: `6a20346`（main，已包含 headline camera、review-mode 修正同本計劃初版）
-- Last verified commit: NONE（只有計劃）
-- Remote availability: 計劃隨 main 發布；實作分支未開。
+- Base commit: `fdc4a0cbbbc352b41c15850f2a846845d7975de1`（fetch verified main，包含完整 S0 標準）
+- Last verified commit: runtime `59c6ea9`（至本S0 checkpoint source不變）；runner／evidence 完整SHA見本批result record及Git checkpoint。Root suite/build與最終browser結果見下文。
+- Remote availability: `origin/feat/closeup-polish`；完整S0 checkpoint push後由result record記錄SHA。依本批assignment留 coordinator review，不合併main、不開A–D。
 
 ## Session Git state
 
-- Session starting branch and HEAD: `main` @ `6a20346`（clone `.task-relay/headline-camera/checkout`）
-- Last fetched origin/main commit: `6a20346`，2026-10-27 fetch 成功
-- Local changes present at session start: NONE
+- Session starting branch and HEAD: 主 checkout `feat/energy-demo-camera` @ `016f6d1`，原 upstream 0/0、對 main 2/18；全部保留。獨立 clone `.task-relay/closeup-polish/checkout` 由 verified `origin/main` 開 `feat/closeup-polish`，clean start。
+- Last fetched origin/main commit: `fdc4a0c`，2026-10-27 fetch 成功（clone 初次 sandbox DNS 失敗，獲准重跑成功）。計劃舊 base `6a20346` 至本基準僅完整標準文件及其 merge，runtime 未變。
+- Local changes present at session start: 主 checkout 未追蹤 `.playwright-cli/`、`.task-relay/` 保留；獨立 clone NONE。
 - Upstream integration status: NOT NEEDED
 - Pending Git conflicts or synchronization blockers: NONE
 
@@ -34,11 +34,11 @@
 | **D デックス西＋沖（NW）** | DECKS 西同北面海上 | `nw:focal`、`nw:district`、`energy:garden2`、`energy:wing`、`energy:island` | [automationHub.ts](../../src/siteBuilders/automationHub.ts)、districtMeters.ts、energyPrototype.ts |
 | **Z 全城回歸** | 全城 | 全部重截，同 S0 比較，加 live 檢查 | 只做驗收，唔改美術（發現回歸就返去對應 sector 修） |
 
-Baseline 觀察（2026-10-27，每個 shot 只睇咗一張 [live hold 原圖](../../artifacts/headline-camera/README.md#settled-live-hold-samples)，未經 owner review；S0 會用完整矩陣取代）：
+S0 觀察（2026-10-28，98張完整原始第二take已逐張檢視；[逐狀態報告](../../artifacts/closeup-polish/S0/REVIEW.md)，屬session判斷，未經owner美術批准）：
 
-- `ne:focal`：樹冠平台只佔畫面大約六分一；樹似棒棒糖；方形小屋好簡陋；橙色 marker 環比主體更搶眼。
+- `ne:focal`：AABB包含桿件／marker，不等於植物本體填滿畫面；冷卻環／橙框比公園植栽搶眼，樹冠仍有棒幹／稜角。
 - `sw:focal`：一條淺藍高架通道橫過畫面頂同底，所以要先修 pose。白色圓環頂好平；有一嚿粉紅色植物；共享座位睇唔出。
-- `se:focal`：主塔太幼，俾左邊斑駁灰色大樓搶咗焦點；function modules 睇唔出。
+- `se:focal`：low箱體／桿件與neutral office box未表達完整集中功能；high塔較完整但鄰樓搶眼。桿件令low box高度43.7%大於neutral26.7%，不能把A1通過當作功能可讀。
 - `nw:focal`：幾棟相似嘅藍塔企埋一齊，分唔到邊棟係 hub；自動服務端口認唔出。
 
 ## Capture 標準
@@ -72,7 +72,7 @@ Meters 分數同 tier 嘅對應：ladder 邊界係 1.5、4、7，所以分數 �
 - 每個 sector 一個 `REVIEW.md`，內容係 baseline 同最後一輪逐狀態並排嘅對比。
 
 **效能量度（同截圖分開跑）**
-- Chrome 加 `--disable-gpu-vsync`，載入後等 16 秒，用 5 秒 rAF 窗口量，量兩輪，取平均。方法同 [VALIDATION](../VALIDATION.md) 嘅 render-perf 段一樣。
+- Chrome 加 `--disable-gpu-vsync` **及 `--disable-frame-rate-limit`**，載入後至少等16秒，用5秒rAF窗口量兩輪取平均。2026-10-28 S0查證目前Chrome156單靠前者仍被鎖60；雙flag的hero86.33/89.42才解除上限。原始28組flag-only數據完整保留，修正只關乎量測，不改scene／quality或門檻；[證據](../../artifacts/closeup-polish/S0/README.md#chrome-frame-cap-correction)。
 - 量 hero，同每個 shot 嘅 tier +1（district 量 +3）。兩樣都要量 hour 12 同 hour 22。
 - 另外喺開 vsync 嘅情況下讀 `data-fps`（120 frame 平均），作為可以頂到 60 FPS 嘅檢查。
 
@@ -164,7 +164,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 
 | Sector | 狀態 | Checkpoint | Owner review | Main merge |
 | --- | --- | --- | --- | --- |
-| S0 基準 | PLANNED | — | 唔需要（冇美術改動） | — |
+| S0 基準 | REVIEW CHECKPOINT；98狀態／96比較，worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2` | runtime `59c6ea9`；[完整基準](../../artifacts/closeup-polish/S0/README.md) | 冇美術改動；本批留 coordinator review，不 merge | — |
 | A 海浜公園 | PLANNED | — | — | — |
 | B アクアシティ南 | PLANNED | — | — | — |
 | C フジテレビ東 | PLANNED | — | — | — |
@@ -173,7 +173,9 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 
 ## Actual validation results
 
-- Verification status: NOT RUN（只有計劃）
+- S0 measurement status: 98/98、196張baseline JPEG，所有98張正式第二take原圖逐張檢視；[原圖／logs／方法](../../artifacts/closeup-polish/S0/README.md)、[逐狀態review](../../artifacts/closeup-polish/S0/REVIEW.md)、[JSON](../../artifacts/closeup-polish/S0/report.json)。不是全shot美術驗收PASS。A1 60 PASS／6 FAIL／20無法量測FAIL／12 N/A；A2 42／24／20／12；A3 0／66／20／12。A4 7/96通過，20組無有效投影仍FAIL。A6原始97/98，首次optimizer504原圖保留；獨立NW retry6/6無錯。Repro41/98，57失敗採第二take，不改門檻。Vsync58.5–60.1，全部>=58。效能reference28組兩輪，以雙flag解除Chrome60fps cap；精確數字見report。
+- A3原因：66個可投影狀態的594條射線，66命中subject、266不穿過world AABB、182穿完整bounds空隙、80命中bounds內其他geometry（原因不明）；不能把所有miss當成前景遮擋。SW／SE district整個carrier跨near plane，20狀態未能量測；下一輪先調pose，不能偷換成較小主體。
+- Root suite/build、runner自檢、production靜態排除及live/recovery結果以[checks.json](../../artifacts/closeup-polish/S0/checks.json)為準。Runtime source自59c6ea9未變；既有chunk-size／JSON import warning保留。只測開發Mac Chrome1920×1080/DPR1；無展示硬件／其他平台／真人辨識驗收。
 - 呢份計劃只做咗文件連結同事實核對。以下各項都對照過 `6a20346` 嘅 source：檔案路徑、shot pose、`?meters`／`?shot`／`?energy`／`hour`／`reviewTime` 參數、ladder 邊界（`LADDER_EDGES` 1.5／4／7）、`ENERGY_OPTIONS`，同 `data-fps` 嘅 120 frame 平均。
 
 ## Known issues and blockers
@@ -192,4 +194,16 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 
 ## Next expected step
 
-Long session：開 `feat/closeup-polish`，做 S0（tier 對應 check → capture runner → `cityShotFrame` 同 test → 完整 baseline 矩陣同效能量度）。
+Coordinator審查本批S0完整checkpoint、原圖及方法，決定整合與後續A NE；此worker不merge main、不開始A–D。所有失敗留作後續pose／builder修改基準，不能把measurement完成說成shot驗收通過。服務與writer釋放以本批result record／checks.json為準。取消百分比預停的人類指示仍有效；僅真正provider limit觸發recovery。
+
+## S0 resume — 2026-10-27
+
+人類message01a17d9e-e127-7d03-9bed-65a8eb3fdba1已取消百分比預停；上方15%暫停／未來復原時間只作歷史，現由實際provider limit決定quota recovery。相同worker由clean7fbfbfa／upstream0/0續作，fetch origin/main仍fdc4a0c（feature ahead3，無須整合）。43 rows及93原圖hash核對一致。剩餘矩陣、NW新目錄retry、28組兩輪uncapped及A4依序執行；root test/build再次PASS，survey只build作scratch fixture。A4無有效box的組合改為明確FAIL／原因，沒有跳過或放寬門檻；pixel runtime未改。完整原圖review逐組寫入visual-review.json；尚未宣稱S0完成或source接受。
+
+## S0 recovery — 2026-10-28
+
+實際五小時limit中斷後，背景runner完成98 capture／28 flag-only perf／96比較；recovery-r6續用同一owner、0ddd039及所有dirty原圖。Fetch main仍fdc4a0c，upstream0/0，未pull或merge。全98原圖檢視完成，報告腳本核對舊hash、展開每狀態V理由，保留43狀態partial歷史與所有失敗。查明Chrome只用disable-gpu-vsync被60fps cap，額外disable-frame-rate-limit後補齊有效效能reference；舊數據及診斷runner均保留。終版驗證／cleanup／checkpoint由checks.json和本批result記錄；不改美術／pose／時間線／梯級／survey協定。
+
+## S0 final verification — 2026-10-28
+
+已完成98狀態、96比較、28組×2有效uncapped reference；平均79.51–133.60FPS，vsync58.5–60.1。Root npm test/build PASS且runtime對59c6ea9 diff為空，runner／report／ray原因自檢、原93張hash及所有98雙take URL/pose核對PASS。DEV／production smoke PASS；原E4因固定能源句斷言不合現行ladder headline優先次序而失敗，保留formal.log及3張partial原圖。S0副本只調整兩個結果等待斷言，其餘能源數量／實際模型／legacy／同ID retry／Undo／mixed／TCP reconnect／reduced motion／resize／reset均PASS、page exception0；tests/energyE4.browser.mjs與runtime不改。完整234張原圖hash在manifest。Vite5194／preview5195已停止、ports free，owned Chrome／runner無剩餘；scratch server／SQLite均finally關閉。最終evidence SHA、push／CI狀態由本批唯一result record供coordinator review。

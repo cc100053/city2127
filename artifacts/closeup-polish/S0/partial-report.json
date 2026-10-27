@@ -1,0 +1,65 @@
+{
+  "status": "PARTIAL_WAITING_QUOTA",
+  "completeStates": 43,
+  "requiredStates": 98,
+  "A1": {
+    "pass": 32,
+    "measured": 43
+  },
+  "A2": {
+    "pass": 18,
+    "measured": 43
+  },
+  "A3": {
+    "pass": 0,
+    "measured": 43
+  },
+  "A4": "NOT RUN \u2014 full selected matrix incomplete",
+  "A5": {
+    "uncapped": "NOT RUN",
+    "vsyncDataFpsRange": [
+      59.8,
+      60.1
+    ],
+    "vsyncPassed": 43,
+    "relative": "S0 reference incomplete; no performance acceptance claim"
+  },
+  "A6": {
+    "pass": 42,
+    "measured": 43,
+    "failure": "First NW low/day take: Vite optimizer504 and aborted asset fetches; preserve and retry separately"
+  },
+  "reproducibility": {
+    "pass": 7,
+    "threshold": 0.00392156862745098,
+    "madRange": [
+      0.0020201846556523843,
+      0.009056674508795288
+    ]
+  },
+  "checks": {
+    "rootTestFinalSource": "PASS exit0",
+    "rootBuild": "PASS exit0; existing chunk-size/import-attributes warnings",
+    "runnerSelfTest": "PASS",
+    "productionDevExclusion": "PASS",
+    "whitespace": "PASS",
+    "sourceLockfileMatchesCopiedDependencies": true
+  },
+  "latest": {
+    "id": "sw:district",
+    "state": "0",
+    "hour": 12
+  },
+  "quota": {
+    "primaryRemaining": 35,
+    "weeklyRemaining": 14,
+    "weeklyReset": 1793600524,
+    "resumeAfterUTC": "2026-11-02T06:25:04+00:00"
+  },
+  "services": {
+    "vite5194": "stopped; no listener",
+    "captureChrome": "stopped; unique profiles no longer present",
+    "writer": "release after checkpoint push"
+  },
+  "next": "Resume capture from first missing row using unchanged runtime; preserve originals. Complete98, rerun first NW focal in new directory after warm optimizer, collect28 two-round uncapped cases, run compare and full review. S0 is not complete."
+}

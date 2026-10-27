@@ -1,0 +1,43 @@
+// Summarize preserved measurements; never turn missing or invalid geometry into PASS.
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,readdirSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {basename,join} from 'node:path';
+const root='artifacts/closeup-polish/S0',read=p=>JSON.parse(readFileSync(`${root}/${p}`,'utf8'));
+const checks=read('checks.json');
+assert.ok(['rootNpmTest','rootNpmBuild','devSmoke','productionSmoke','headlineAwareE4'].every(k=>checks[k].status==='PASS'),'Complete shared S0 behavior checks');
+const capture=read('baseline/capture.json'),comparison=read('baseline/comparison.json'),perf=read('baseline/performance.json'),visual=read('visual-review.json');
+assert.ok(perf.launchArgs?.includes('--disable-frame-rate-limit'),'Chrome frame cap must be removed for the reference');
+assert.equal(capture.rows.length,98);assert.equal(perf.rows.length,28);assert.equal(comparison.rows.length,96);
+assert.equal(new Set(capture.rows.map(r=>`${r.id}/${r.state}/${r.hour}`)).size,98);
+assert.equal(new Set(perf.rows.map(r=>`${r.id}/${r.hour}`)).size,28);
+assert.ok(perf.rows.every(r=>r.complete&&r.rounds.length===2&&r.rounds.every(t=>t.sample.elapsedMs>=5000)));
+const mark=(r,k)=>r.auto[k]===true?'PASS':r.auto[k]===false?'FAIL':r.id==='hero'||r.auto.reason==='subject absent in this state'?'N/A':'FAIL (unmeasurable)';
+assert.equal(mark({auto:{A1:null,reason:'invalid'},id:'sw:district'},'A1'),'FAIL (unmeasurable)');
+assert.equal(mark({auto:{A1:null,reason:'subject absent in this state'},id:'energy:ring'},'A1'),'N/A');
+const rows=capture.rows.map(r=>{
+ const group=visual.groups[r.id];assert.ok(group,`Missing visual review ${r.id}`);
+ assert.ok(r.complete&&r.takes.length===2&&r.images.length===2);
+ assert.ok(Array.isArray(r.A4)&&r.A5?.uncappedReference,'Run compare after performance');
+ const judgments={...group.V1_V6,...group.perStateOverrides?.[r.state]};
+ assert.ok(['V1','V2','V3','V4','V5','V6'].every(k=>judgments[k]?.length===2),`Incomplete visual criteria ${r.id}`);
+ const image=`baseline/${basename(r.images[1])}`;assert.ok(group.reviewedOriginals.includes(image),`Original not reviewed ${image}`);
+ return {id:r.id,state:r.state,hour:r.hour,image,A1:mark(r,'A1'),A2:mark(r,'A2'),A3:mark(r,'A3'),A4:r.A4,A5:r.A5,A6:r.A6?'PASS':'FAIL',reproducibility:r.reproducibility,
+ V1_V6:judgments,notes:group.notes};
+});
+const counts=values=>Object.fromEntries([...new Set(values)].map(k=>[k,values.filter(v=>v===k).length]));
+const summary={states:rows.length,visualOriginalsReviewed:rows.length,automatic:Object.fromEntries(['A1','A2','A3','A6'].map(k=>[k,counts(rows.map(r=>r[k]))])),A4:{pairs:comparison.rows.length,pass:comparison.rows.filter(r=>r.pass).length,unmeasurable:comparison.rows.filter(r=>r.mad===null).length},reproducibility:counts(rows.map(r=>r.reproducibility.pass?'PASS':'FAIL')),performance:{cases:perf.rows.length,rounds:perf.rows.length*2,minMeanFps:Math.min(...perf.rows.map(r=>r.meanFps)),maxMeanFps:Math.max(...perf.rows.map(r=>r.meanFps)),minVsyncFps:Math.min(...capture.rows.map(r=>Number(r.diagnostics.fps))),maxVsyncFps:Math.max(...capture.rows.map(r=>Number(r.diagnostics.fps))),relativeGate:'N/A: S0 establishes the reference; later changes require >=95% FPS and <=110% draw calls.'},visual: Object.fromEntries(['V1','V2','V3','V4','V5','V6'].map(k=>[k,counts(rows.map(r=>r.V1_V6[k][0]))]))};
+const hashes=read('original-images.json'),hash=p=>createHash('sha256').update(readFileSync(p)).digest('hex');
+for(const [p,expected] of Object.entries(hashes))assert.equal(hash(p),expected,`Changed original ${p}`);
+function walk(dir){for(const entry of readdirSync(dir,{withFileTypes:true})){const p=join(dir,entry.name);if(entry.isDirectory())walk(p);else if(/\.(jpg|png)$/.test(p))hashes[p]=hash(p);}}walk(root);
+writeFileSync(`${root}/original-images.json`,JSON.stringify(hashes,null,2)+'\n');
+writeFileSync(`${root}/report.json`,JSON.stringify({summary,A7:{status:'PASS: shared S0 runtime checks',evidence:'checks.json',scope:'Root tests/build, DEV and production smoke, headline-aware E4 recovery. No exact3.000s browser timing or per-shot live-art acceptance claim.'},limitations:['Session visual judgments are not visitor recognition tests.','V6 STATIC PASS cannot exclude temporal flicker.','A3 measures first geometric hit, including gaps in projected world AABBs; shaders and alpha masks are not modeled.','Original optimizer startup error remains FAIL; independent NW retry is separate.','Only the recorded development Mac/Chrome platform was measured.'],rows},null,2)+'\n');
+const cell=r=>r.A4.length?`${r.A4.filter(p=>p.pass).length}/${r.A4.length}`:'N/A';
+let md='# S0 measured baseline review\n\nFull matrix measured; this is a baseline, not visual acceptance. No art, camera pose or timeline changed. [Structured evidence](report.json), [raw captures](baseline/capture.json), [96 A4 comparisons](baseline/comparison.json), [56 performance windows](baseline/performance.json), [A3 causes](occlusion-causes.json).\n\n';
+md+='| Shot | State | Hour | Original | A1 | A2 | A3 | A4 passing pairs | A6 | Repro | V1–V6 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n';
+for(const r of rows)md+=`| ${r.id} | ${r.state} | ${r.hour} | [JPEG](${r.image}) | ${r.A1} | ${r.A2} | ${r.A3} | ${cell(r)} | ${r.A6} | ${r.reproducibility.pass?'PASS':'FAIL'} | ${Object.values(r.V1_V6).map(v=>v[0]).join(' / ')} |\n`;
+md+='\nEach image above is the original second take, opened directly at full resolution in this session. First takes are preserved for reproducibility measurement. Per-state V1–V6 reasons are in report.json, expanded from the reviewed shot notes and explicit state overrides in visual-review.json. Day V5 entries refer to the corresponding reviewed night state. V6 static judgments do not certify absence of flicker.\n\n';
+md+='## Performance reference\n\n| Shot | Hour | State | Mean uncapped FPS | Round draw calls |\n| --- | --- | --- | --- | --- |\n';
+for(const r of perf.rows)md+=`| ${r.id} | ${r.hour} | ${r.state} | ${r.meanFps.toFixed(2)} | ${r.rounds.map(t=>t.diagnostics.drawCalls).join(' / ')} |\n`;
+md+='\nChrome headless, --disable-gpu-vsync plus --disable-frame-rate-limit, two independent navigations per case, at least16 seconds after navigation and a five-second rAF sample per round. Frames wait for DEV diagnostics before measurement. Relative A5 limits apply to later rounds against this reference. Raw intervals, GPU strings, URLs, poses and errors are retained.\n';
+writeFileSync(`${root}/REVIEW.md`,md);console.log(JSON.stringify(summary,null,2));

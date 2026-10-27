@@ -1,0 +1,75 @@
+{
+  "states": 98,
+  "visualOriginalsReviewed": 98,
+  "automatic": {
+    "A1": {
+      "PASS": 60,
+      "FAIL": 6,
+      "FAIL (unmeasurable)": 20,
+      "N/A": 12
+    },
+    "A2": {
+      "PASS": 42,
+      "FAIL": 24,
+      "FAIL (unmeasurable)": 20,
+      "N/A": 12
+    },
+    "A3": {
+      "FAIL": 66,
+      "FAIL (unmeasurable)": 20,
+      "N/A": 12
+    },
+    "A6": {
+      "FAIL": 1,
+      "PASS": 97
+    }
+  },
+  "A4": {
+    "pairs": 96,
+    "pass": 7,
+    "unmeasurable": 20
+  },
+  "reproducibility": {
+    "FAIL": 57,
+    "PASS": 41
+  },
+  "performance": {
+    "cases": 28,
+    "rounds": 56,
+    "minMeanFps": 79.51269340386263,
+    "maxMeanFps": 133.59841657634274,
+    "minVsyncFps": 58.5,
+    "maxVsyncFps": 60.1,
+    "relativeGate": "N/A: S0 establishes the reference; later changes require >=95% FPS and <=110% draw calls."
+  },
+  "visual": {
+    "V1": {
+      "FAIL": 58,
+      "PASS": 30,
+      "N/A": 10
+    },
+    "V2": {
+      "PASS": 92,
+      "FAIL": 6
+    },
+    "V3": {
+      "FAIL": 88,
+      "N/A": 10
+    },
+    "V4": {
+      "PASS": 84,
+      "FAIL": 4,
+      "N/A": 10
+    },
+    "V5": {
+      "FAIL": 50,
+      "PASS": 38,
+      "N/A": 10
+    },
+    "V6": {
+      "STATIC PASS": 76,
+      "FAIL": 12,
+      "N/A": 10
+    }
+  }
+}

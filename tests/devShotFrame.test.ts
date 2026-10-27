@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import { Box3, BoxGeometry, Group, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, Vector3 } from 'three';
+import { projectShotBox, shotSamples, cityShotFrame } from '../src/devShotFrame.ts';
+import { devLayout } from '../src/devMeters.ts';
+for (const site of ['nw','ne','sw','se'] as const) {
+  assert.deepEqual([-8,-5,-2,0,2,5,8].map(score => devLayout(`${site}:${score}`).tiers[site]), [-3,-2,-1,0,1,2,3]);
+}
+const camera = new PerspectiveCamera(90, 1, .1, 100); camera.updateMatrixWorld(true);
+const box = projectShotBox(new Box3(new Vector3(-1,-1,-3),new Vector3(1,1,-2)),camera)!;
+assert.ok(Math.abs(box.left - .25) < 1e-10); assert.ok(Math.abs(box.bottom - .75) < 1e-10);
+assert.equal(projectShotBox(new Box3(),camera),null);
+assert.equal(projectShotBox(new Box3(new Vector3(-1,-1,-1),new Vector3(1,1,1)),camera),null);
+assert.equal(shotSamples(box).length,9); assert.ok(Math.abs(shotSamples(box)[0].x - .5) < 1e-10); assert.ok(Math.abs(shotSamples(box)[0].y - .5) < 1e-10);
+assert.ok(Math.abs(shotSamples(box)[1].x - .3) < 1e-10);
+const scene = new Scene(), root = new Group(); root.name = 'survey-site-ne'; scene.add(root);
+root.add(new Mesh(new BoxGeometry(2,2,1),new MeshBasicMaterial())); root.position.z = -3;
+const nativeRaycast = Mesh.prototype.raycast;
+assert.equal(cityShotFrame(scene,camera,'ne:focal').hits,9); assert.equal(Mesh.prototype.raycast,nativeRaycast);
+const blocker = new Mesh(new BoxGeometry(5,5,.2),new MeshBasicMaterial()); blocker.position.z=-1; scene.add(blocker);
+assert.equal(cityShotFrame(scene,camera,'ne:focal').hits,0);
+blocker.visible=false; assert.equal(cityShotFrame(scene,camera,'ne:focal').hits,9);
+root.visible=false; assert.equal(cityShotFrame(scene,camera,'ne:focal').box,null);
+const instances = new InstancedMesh(new BoxGeometry(2,2,1),new MeshBasicMaterial(),1);
+instances.setMatrixAt(0,new Matrix4().makeTranslation(0,0,-3));
+const energy = new Group(); energy.name='energy-wing';energy.add(instances);scene.add(energy);
+assert.equal(cityShotFrame(scene,camera,'energy:wing').hits,9);
+const outOfFrame=projectShotBox(new Box3(new Vector3(10,0,-3),new Vector3(12,1,-2)),camera)!;
+assert.ok(outOfFrame.left>1,'projection preserves off-screen bounds');
+assert.throws(()=>cityShotFrame(scene,camera,'invalid'));
+console.log('PASS: four-site tier mapping, projection, nine samples, visible subjects and first-hit occlusion.');
