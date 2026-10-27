@@ -151,7 +151,8 @@ try {
     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     devFrame=startScaleLab(scene,camera,cityChanges!,()=>now,params);
   });
-  const headlineCamera=surveyUrl||metersParam!==null||shotPreview?new HeadlineCamera(camera,controls):null;
+  // Civic/street reviews keep their own authored camera.
+  const headlineCamera=(surveyUrl||metersParam!==null||shotPreview)&&!civicReview&&!streetReview?new HeadlineCamera(camera,controls):null;
   let devShot:ShotId|null=null;
   const cameraMotion=matchMedia('(prefers-reduced-motion: reduce)');
   if(import.meta.env.DEV){
@@ -171,7 +172,7 @@ try {
       devShot=null;
       const reduced=cameraMotion.matches;
       const changes=cityChanges!.applyExhibitionLayout(devLayout(meters),reduced?'city-state-snapshot':'city-state-updated',reduced?at:at+ARRIVAL_SECONDS);
-      if(reduced)headlineCamera!.cancel();else if(!civicReview&&!streetReview)headlineCamera!.play(changes,at);
+      if(reduced)headlineCamera?.cancel();else headlineCamera?.play(changes,at);
       return changes;
     };
     Object.assign(window,{cityMeters:(meters:string)=>playMeters(meters,now)});
@@ -191,14 +192,14 @@ try {
       if(kind==='city-state-updated'&&latest&&!cameraMotion.matches){
         journey!.play(latest.votes,latest.ordinal,now);
         const changes=cityChanges!.applyExhibitionLayout(view.layout,kind,now+ARRIVAL_SECONDS,view.slotSeeds);
-        if(civicReview||streetReview)headlineCamera!.cancel();else headlineCamera!.play(changes,now,displayMs);
+        headlineCamera?.play(changes,now,displayMs);
         return changes;
       }
-      headlineCamera!.cancel();
+      headlineCamera?.cancel();
       journey!.setLanterns(view.recentProposals);
       return cityChanges!.applyExhibitionLayout(view.layout,kind,now,view.slotSeeds);
     }
-    headlineCamera!.cancel();journey!.cancel();
+    headlineCamera?.cancel();journey!.cancel();
     world.blendTo(scoresToWorldState(view.scores),now);
     if(kind==='city-state-updated')cityChanges!.applyIncrementalUpdate(view,now);
     else cityChanges!.restoreFromSnapshot(view,now);
