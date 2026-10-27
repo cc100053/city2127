@@ -1,0 +1,30 @@
+{
+  "A7": {
+    "status": "PASS",
+    "sourceCommit": "74d6c2b",
+    "npmTest": "r3/npm-test.log PASS",
+    "npmBuild": "r3/npm-build.log PASS",
+    "diffCheck": "PASS",
+    "localPhysicalTests": "Paving clearance at .25s intervals, positive hidden transforms, oculus/annular canopy and court entrance approach PASS",
+    "runnerSelfCheck": "18 captures /16 pairs /6 perf cases; full98 matrix unchanged",
+    "reportSelfCheck": "95%FPS/110%calls exact boundaries PASS",
+    "live": "8 checks PASS; live/browser.json",
+    "duration": "Exact3s retarget/snapshot/reduced motion checked by node suite; browser120-frame diagnostics only show intermediate easing. No3.000s browser precision claim."
+  },
+  "scope": "A park/energy and non-sharing district source identical to def2f28; only twoSW shot values changed in camera module.",
+  "warnings": [
+    "Existing JSON import-attribute warning",
+    "Existing chunk-size warning"
+  ],
+  "limits": [
+    "No production smoke or whole-city Z rerun in B",
+    "No exhibition hardware, Safari/iPad, Windows or visitor2s test",
+    "Static V6 does not establish all-state flicker absence",
+    "Live initial diagnostic includes7.6FPS loading window; no steady-state liveFPS claim. A5 uses separate warmed measurements.",
+    "Installed Chrome patch differs from S0: versions recorded per round; original numerical thresholds retained, no baseline replacement or same-version controlled-comparison claim."
+  ],
+  "cleanup": "PASS cleanup.json; Vite5194 and scratch52505 bind-verified free",
+  "selfReview": "PASS exact runtime/test diff and all new fixtures/report/manifest reviewed; 18 final originals and two live originals inspected",
+  "links": "PASS link-check.json:496 local targets; no new anchor links",
+  "originals": "PASS S0:234, A:147, B:110 hashes; originals preserved"
+}

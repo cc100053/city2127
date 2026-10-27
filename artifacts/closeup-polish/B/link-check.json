@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "files": [
+    "docs/PROJECT.md",
+    "docs/EXHIBITION_SPEC.md",
+    "docs/VALIDATION.md",
+    "docs/handoffs/closeup-polish.md",
+    "docs/handoffs/README.md",
+    "artifacts/closeup-polish/B/REVIEW.md",
+    "artifacts/closeup-polish/B/NOTES.md"
+  ],
+  "localFileTargetsChecked": 496,
+  "errors": [],
+  "anchors": "No new anchor links; existing anchor text unchanged.",
+  "sourceFacts": "SW only camera values; same target/count/seed/timing interfaces; report counts and physical tests checked against raw JSON/source."
+}

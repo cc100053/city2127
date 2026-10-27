@@ -84,7 +84,7 @@ Headline 近鏡（2026-10-27）：live 結果先在 hero 播完 2.62 秒 vote jo
 
 近鏡打磨A（2026-10-28，feature REVIEW_READY，未經owner接受／未merge main）：海浜公園、同區climate carriers及第一西岸水庭在原數量／footprint內完成三輪；最終focal恢復S0 pose，district／第一庭重新構圖，hero／FOV42／headline時間線保持。[24狀態S0／final原圖與逐項理由](../artifacts/closeup-polish/A/REVIEW.md)及[檢查](../artifacts/closeup-polish/A/checks.json)：A1/A2各20 PASS、4 N/A；A3全部20可用狀態FAIL、A4 1/22；A5/A6 24/24與九項live PASS。綠化、低focal辨識、district夜間仍有失敗，門檻不放寬；三輪後留owner決定。展示硬件／真人辨識／其他平台與全城Z仍未驗。
 
-近鏡打磨B（2026-10-28，feature候選，驗證中）：在原共享／私人席位、六水室及十庭院內，調整SW構圖、環頂採光口、摺屏／長椅及局部冠層，所有成熟low/mixed/high、權威數量／footprint／三秒retarget保持。[逐輪記錄](../artifacts/closeup-polish/B/NOTES.md)；r1/r2完整18狀態與失敗原值保存，r3及owner美術接受仍待完成，未merge main。
+近鏡打磨B（2026-10-28，feature REVIEW_READY，未經owner接受／未merge main）：原數量／footprint內調整SW構圖、曲面環頂／採光口、摺屏／長椅及局部冠層，target／seed／三秒retarget保持。[三輪各18狀態原圖及理由](../artifacts/closeup-polish/B/REVIEW.md)：A1/A2各16 PASS、2 N/A；A3全部16可用狀態FAIL，A4 0/16；A5 12 PASS／6 focal FAIL，A6 18 PASS。Root test/build及八項live PASS；r3 focal構圖比r2退步且calls135.3%S0，綠化仍FAIL。三輪後停止，建議暫不接受B美術。Chrome patch差異／硬件及真人限制見報告，原門檻不放寬。
 
 `ladderLayout(tiers, energy)` 是唯一權威映射；focal 數值由 tier 符號決定（`t`= 1／.5／0 對應 >0／0／<0）：
 

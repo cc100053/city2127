@@ -375,3 +375,14 @@ Final平均90.95–104.47FPS，兩個uncapping flags、每組至少16秒後各�
 Root npm test／npm run build PASS，runner／report self-check、source hashes與committed diff check PASS；保留既有chunk-size warning。R2首次49-batch上限測試失敗的log與修正前patch保留，修正以既有public-light batch合批，沒有放寬測試或更改第二庭。實際scratch HTTP／WebSocket／SQLite九項live PASS、page error0：v3歷史氣候題涵蓋NE的focal／district、現行v4能源題涵蓋第一庭；hold位置與文案、中間easing、reload、Undo、reduced motion核對。Browser資料每120frame更新，不宣稱3.000秒精度；精確三秒retarget由root測試覆蓋。
 
 Survey／module-swap source未改，獨立package tests/build不另跑；A未重做production browser smoke或全13shot的Z回歸。展示硬件、其他平台、真人兩秒辨識未驗。自己啟動的Vite5194／runner／Chrome／scratch server與SQLite全部結束，埠bind驗證free，見[cleanup](../artifacts/closeup-polish/A/cleanup.json)。美術仍待owner接受，未merge main，未部署。
+
+
+## Closeup sector B — 2026-10-28（max3輪，feature REVIEW_READY）
+
+Runtime `74d6c2b`；[逐狀態S0/final對照](../artifacts/closeup-polish/B/REVIEW.md)、[完整JSON](../artifacts/closeup-polish/B/report.json)、[checks](../artifacts/closeup-polish/B/checks.json)。三輪各18狀態／36原始JPEG、16 A4比較、6組×2效能窗；合計54狀態／108靜態原圖，18張final第二take及兩張live原圖已逐張檢視。S0/A原圖hash及非SharingDistrict／energy／park source核對保持。
+
+Final A1/A2各16 PASS、hero2 N/A；A3 16 FAIL（全0/9、每狀態差7條），[144射線診斷](../artifacts/closeup-polish/B/a3-diagnostics.json)有80取樣點在視窗外，不把其餘miss全稱遮擋。A4 0/16，精確MAD與pp差距見report。A5 12 PASS／6 focal FAIL；focal uncapped day/night103.12/102.39FPS，為S0的89.7%/90.7%，分別差6.08/4.83FPS到95%門檻；calls820/606（135.3%，上限666.6）。District106.87/106.81、hero91.41/91.14FPS；vsync59.7–60.1。雙uncapping flags、載入≥16s後兩個5s rAF窗維持，沒有重設baseline。R1/S0 Chrome156.0.8078.48、recovery後r2/r3為156.0.8078.73，版本變化及比較限制保留；不將升幅當性能優化成果。
+
+A6 18/18、root npm test/build/diff、runner／report自檢及[八項scratch v4 live](../artifacts/closeup-polish/B/live/browser.json) PASS：兩鏡hold／結果卡地點、座位及district中間easing、reload、Undo及reduced motion；page/console errors0。精確3s／retarget由node tests驗證，browser診斷120frames刷新不能證明3.000s精度；loading首個診斷含7.6FPS，不作穩態效能宣稱。早期sandbox localhost拒絕及成功retry logs保留，既有build兩項warning保持。
+
+V1/V2/V5 focal各6 FAIL、district及hero各12 PASS；V3全部18 FAIL，V4全部18 PASS；V6僅STATIC PASS，不證明全狀態動態無閃爍。r3 focal中央前景柱遮擋，構圖比r2退步，不能因A1/A2通過而接受。三輪已用完，建議owner暫不接受B美術，不做第四輪，不merge main。Survey／module-swap source未改、未另跑其獨立suite；無production smoke／全城Z／展示硬件、Safari/iPad、Windows或真人辨識驗收。自己的Vite／Chrome／scratch HTTP/WebSocket/SQLite已清理，[cleanup](../artifacts/closeup-polish/B/cleanup.json)實際bind5194/52505成功，無部署。

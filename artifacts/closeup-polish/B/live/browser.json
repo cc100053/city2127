@@ -1,0 +1,986 @@
+{
+  "browser": "156.0.8078.73",
+  "apiOrigin": "http://127.0.0.1:52505",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "checks": [
+    {
+      "check": "live hold",
+      "id": "sw:focal",
+      "before": {
+        "time": 15.85,
+        "fps": 7.6,
+        "commons": {
+          "band": "mixed",
+          "targetSharedSeats": 4,
+          "visibleSharedSeats": 4,
+          "targetScreenedSeats": 4,
+          "visibleScreenedSeats": 4
+        },
+        "district": {
+          "enabled": true,
+          "nightRhythm": 1,
+          "plazaPeople": 24,
+          "targetSharing": 0.5,
+          "rooms": 6,
+          "activePulses": 0,
+          "vaults": 3,
+          "courts": 10,
+          "hybridRooms": 3,
+          "hybridCourts": 5,
+          "droneKiosks": 0,
+          "orchardCourts": 0,
+          "visibleOpenCourts": 4,
+          "visibleOpenRooms": 3,
+          "visiblePrivateRooms": 3
+        },
+        "energy": {
+          "target": {
+            "waterGardens": 0,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "rotorAngle": 0.6936378676145978,
+          "parts": [
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 0.72,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            }
+          ]
+        }
+      },
+      "samples": [
+        {
+          "elapsedMs": 28,
+          "time": 15.85,
+          "fps": 7.6,
+          "commons": {
+            "band": "mixed",
+            "targetSharedSeats": 4,
+            "visibleSharedSeats": 4,
+            "targetScreenedSeats": 4,
+            "visibleScreenedSeats": 4
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "plazaPeople": 24,
+            "targetSharing": 0.5,
+            "rooms": 6,
+            "activePulses": 0,
+            "vaults": 3,
+            "courts": 10,
+            "hybridRooms": 3,
+            "hybridCourts": 5,
+            "droneKiosks": 0,
+            "orchardCourts": 0,
+            "visibleOpenCourts": 4,
+            "visibleOpenRooms": 3,
+            "visiblePrivateRooms": 3
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 0.6936378676145978,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 2047,
+          "time": 17.85,
+          "fps": 59.9,
+          "commons": {
+            "band": "high",
+            "targetSharedSeats": 8,
+            "visibleSharedSeats": 4,
+            "targetScreenedSeats": 0,
+            "visibleScreenedSeats": 4
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "plazaPeople": 24,
+            "targetSharing": 0.5,
+            "rooms": 6,
+            "activePulses": 0,
+            "vaults": 3,
+            "courts": 10,
+            "hybridRooms": 3,
+            "hybridCourts": 5,
+            "droneKiosks": 0,
+            "orchardCourts": 0,
+            "visibleOpenCourts": 4,
+            "visibleOpenRooms": 3,
+            "visiblePrivateRooms": 3
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 0.834757238639561,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 4049,
+          "time": 19.85,
+          "fps": 60.1,
+          "commons": {
+            "band": "high",
+            "targetSharedSeats": 8,
+            "visibleSharedSeats": 8,
+            "targetScreenedSeats": 0,
+            "visibleScreenedSeats": 4
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "plazaPeople": 24,
+            "targetSharing": 0.5,
+            "rooms": 6,
+            "activePulses": 0,
+            "vaults": 3,
+            "courts": 10,
+            "hybridRooms": 3,
+            "hybridCourts": 5,
+            "droneKiosks": 0,
+            "orchardCourts": 0,
+            "visibleOpenCourts": 4,
+            "visibleOpenRooms": 3,
+            "visiblePrivateRooms": 3
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 0.9878348843749998,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 6067,
+          "time": 21.85,
+          "fps": 60,
+          "commons": {
+            "band": "high",
+            "targetSharedSeats": 8,
+            "visibleSharedSeats": 8,
+            "targetScreenedSeats": 0,
+            "visibleScreenedSeats": 0
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "plazaPeople": 24,
+            "targetSharing": 0.5,
+            "rooms": 6,
+            "activePulses": 0,
+            "vaults": 3,
+            "courts": 10,
+            "hybridRooms": 3,
+            "hybridCourts": 5,
+            "droneKiosks": 0,
+            "orchardCourts": 0,
+            "visibleOpenCourts": 4,
+            "visibleOpenRooms": 3,
+            "visiblePrivateRooms": 3
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.147791999998093,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 8066,
+          "time": 23.85,
+          "fps": 59.8,
+          "commons": {
+            "band": "high",
+            "targetSharedSeats": 8,
+            "visibleSharedSeats": 8,
+            "targetScreenedSeats": 0,
+            "visibleScreenedSeats": 0
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "plazaPeople": 24,
+            "targetSharing": 0.5,
+            "rooms": 6,
+            "activePulses": 0,
+            "vaults": 3,
+            "courts": 10,
+            "hybridRooms": 3,
+            "hybridCourts": 5,
+            "droneKiosks": 0,
+            "orchardCourts": 0,
+            "visibleOpenCourts": 4,
+            "visibleOpenRooms": 3,
+            "visiblePrivateRooms": 3
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.3078079999995225,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        }
+      ],
+      "place": "街の画面：アクアシティ南",
+      "pose": {
+        "position": [
+          -165,
+          45,
+          210
+        ],
+        "target": [
+          -105,
+          28,
+          60
+        ]
+      },
+      "pass": true
+    },
+    {
+      "check": "live seats show intermediate easing",
+      "pass": true
+    },
+    {
+      "check": "reload snapshot immediately restores settled commons, district and hero",
+      "pass": true
+    },
+    {
+      "check": "live hold",
+      "id": "sw:district",
+      "before": {
+        "time": 21.67,
+        "fps": 5.5,
+        "commons": {
+          "band": "high",
+          "targetSharedSeats": 8,
+          "visibleSharedSeats": 8,
+          "targetScreenedSeats": 0,
+          "visibleScreenedSeats": 0
+        },
+        "district": {
+          "enabled": true,
+          "nightRhythm": 1,
+          "plazaPeople": 24,
+          "targetSharing": 0.5,
+          "rooms": 6,
+          "activePulses": 0,
+          "vaults": 3,
+          "courts": 10,
+          "hybridRooms": 3,
+          "hybridCourts": 5,
+          "droneKiosks": 0,
+          "orchardCourts": 0,
+          "visibleOpenCourts": 4,
+          "visibleOpenRooms": 3,
+          "visiblePrivateRooms": 3
+        },
+        "energy": {
+          "target": {
+            "waterGardens": 0,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "rotorAngle": 1.133367999999523,
+          "parts": [
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 0.72,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            }
+          ]
+        }
+      },
+      "samples": [
+        {
+          "elapsedMs": 11,
+          "time": 21.67,
+          "fps": 5.5,
+          "commons": {
+            "band": "high",
+            "targetSharedSeats": 8,
+            "visibleSharedSeats": 8,
+            "targetScreenedSeats": 0,
+            "visibleScreenedSeats": 0
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "plazaPeople": 24,
+            "targetSharing": 0.5,
+            "rooms": 6,
+            "activePulses": 0,
+            "vaults": 3,
+            "courts": 10,
+            "hybridRooms": 3,
+            "hybridCourts": 5,
+            "droneKiosks": 0,
+            "orchardCourts": 0,
+            "visibleOpenCourts": 4,
+            "visibleOpenRooms": 3,
+            "visiblePrivateRooms": 3
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.133367999999523,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 2026,
+          "time": 23.67,
+          "fps": 60.1,
+          "commons": {
+            "band": "high",
+            "targetSharedSeats": 8,
+            "visibleSharedSeats": 8,
+            "targetScreenedSeats": 0,
+            "visibleScreenedSeats": 0
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "plazaPeople": 24,
+            "targetSharing": 0.75,
+            "rooms": 6,
+            "activePulses": 0,
+            "vaults": 3,
+            "courts": 10,
+            "hybridRooms": 3,
+            "hybridCourts": 5,
+            "droneKiosks": 0,
+            "orchardCourts": 0,
+            "visibleOpenCourts": 4,
+            "visibleOpenRooms": 3,
+            "visiblePrivateRooms": 3
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 1,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.2932959999990463,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 4034,
+          "time": 25.68,
+          "fps": 59.4,
+          "commons": {
+            "band": "high",
+            "targetSharedSeats": 8,
+            "visibleSharedSeats": 8,
+            "targetScreenedSeats": 0,
+            "visibleScreenedSeats": 0
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "plazaPeople": 24,
+            "targetSharing": 0.75,
+            "rooms": 6,
+            "activePulses": 24,
+            "vaults": 3,
+            "courts": 10,
+            "hybridRooms": 3,
+            "hybridCourts": 5,
+            "droneKiosks": 0,
+            "orchardCourts": 0,
+            "visibleOpenCourts": 8,
+            "visibleOpenRooms": 6,
+            "visiblePrivateRooms": 4
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 1,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.4547279999995226,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 0.43997896241088275
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 0.43997896241088275
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 6057,
+          "time": 27.68,
+          "fps": 60,
+          "commons": {
+            "band": "high",
+            "targetSharedSeats": 8,
+            "visibleSharedSeats": 8,
+            "targetScreenedSeats": 0,
+            "visibleScreenedSeats": 0
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "plazaPeople": 72,
+            "targetSharing": 0.75,
+            "rooms": 6,
+            "activePulses": 12,
+            "vaults": 3,
+            "courts": 10,
+            "hybridRooms": 0,
+            "hybridCourts": 1,
+            "droneKiosks": 0,
+            "orchardCourts": 0,
+            "visibleOpenCourts": 7,
+            "visibleOpenRooms": 5,
+            "visiblePrivateRooms": 1
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 1,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.61466399999857,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 8066,
+          "time": 29.68,
+          "fps": 60,
+          "commons": {
+            "band": "high",
+            "targetSharedSeats": 8,
+            "visibleSharedSeats": 8,
+            "targetScreenedSeats": 0,
+            "visibleScreenedSeats": 0
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "plazaPeople": 72,
+            "targetSharing": 0.75,
+            "rooms": 6,
+            "activePulses": 0,
+            "vaults": 3,
+            "courts": 10,
+            "hybridRooms": 0,
+            "hybridCourts": 1,
+            "droneKiosks": 0,
+            "orchardCourts": 0,
+            "visibleOpenCourts": 7,
+            "visibleOpenRooms": 5,
+            "visiblePrivateRooms": 1
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 1,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.774655999999046,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              }
+            ]
+          }
+        }
+      ],
+      "place": "街の画面：水辺の居場所・庭の広場",
+      "pose": {
+        "position": [
+          -160,
+          420,
+          -400
+        ],
+        "target": [
+          -120,
+          5,
+          -260
+        ]
+      },
+      "pass": true
+    },
+    {
+      "check": "district shows intermediate easing",
+      "pass": true
+    },
+    {
+      "check": "Undo immediately restores hero",
+      "pass": true
+    },
+    {
+      "check": "Undo restores previous seat and district counts on next diagnostic refresh",
+      "pass": true
+    },
+    {
+      "check": "reduced-motion SW stays at hero and next diagnostics show settled geometry without pulses",
+      "diagnostics": {
+        "time": 33.7,
+        "fps": 60,
+        "commons": {
+          "band": "high",
+          "targetSharedSeats": 8,
+          "visibleSharedSeats": 8,
+          "targetScreenedSeats": 0,
+          "visibleScreenedSeats": 0
+        },
+        "district": {
+          "enabled": true,
+          "nightRhythm": 1,
+          "plazaPeople": 72,
+          "targetSharing": 0.75,
+          "rooms": 6,
+          "activePulses": 0,
+          "vaults": 3,
+          "courts": 10,
+          "hybridRooms": 0,
+          "hybridCourts": 1,
+          "droneKiosks": 0,
+          "orchardCourts": 0,
+          "visibleOpenCourts": 7,
+          "visibleOpenRooms": 5,
+          "visiblePrivateRooms": 1
+        },
+        "energy": {
+          "target": {
+            "waterGardens": 1,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "rotorAngle": 0.7,
+          "parts": [
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": true,
+              "scaleY": 1,
+              "opacity": 1
+            },
+            {
+              "visible": false,
+              "scaleY": 0.72,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": true,
+              "scaleY": 1,
+              "opacity": 1
+            }
+          ]
+        }
+      },
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "timing": "Browser diagnostics refresh each120 frames (~2s); intermediate states prove easing. Exact3s duration/retarget remains covered by root tests; no3.000s browser precision claim.",
+  "fixtures": "Real current v4 sharing proposals; isolated scratch SQLite."
+}

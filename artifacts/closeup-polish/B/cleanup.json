@@ -1,0 +1,11 @@
+{
+  "ownedVite": "stopped by original session1537 Ctrl-C",
+  "ownedChrome": "capture/perf/compare browser finally closed; live script exit0 and browser closed in finally",
+  "scratch": "live script closed realtime/HTTP/SQLite and removed its temporary directory in finally; script exit0",
+  "portsBindVerifiedFree": [
+    5194,
+    52505
+  ],
+  "allWritersAndServicesReleased": true,
+  "processCheck": "PASS no matching capture.mjs, B/live.mjs or Playwright temporary-profile processes remain"
+}

@@ -1,0 +1,295 @@
+{
+  "method": "Classify only normalized sample coordinates and recorded first hits; no new geometric ray/AABB cause audit. Do not call every miss an occlusion.",
+  "summary": {
+    "rows": 16,
+    "rays": 144,
+    "hits": 0,
+    "offViewport": 80
+  },
+  "rows": [
+    {
+      "id": "sw:focal",
+      "state": "-2",
+      "hour": 12,
+      "hits": 0,
+      "required": 7,
+      "gap": 7,
+      "offViewport": 0,
+      "firstHits": {
+        "skyways": 3,
+        "YURIKAMOME_GUIDEWAY": 1,
+        "fuji-civic-chassis": 2,
+        "TERRAIN_LOW_DENSITY": 2,
+        "SIDEWALK_NETWORK": 1
+      }
+    },
+    {
+      "id": "sw:focal",
+      "state": "-2",
+      "hour": 22,
+      "hits": 0,
+      "required": 7,
+      "gap": 7,
+      "offViewport": 0,
+      "firstHits": {
+        "skyways": 3,
+        "YURIKAMOME_GUIDEWAY": 1,
+        "fuji-civic-chassis": 2,
+        "TERRAIN_LOW_DENSITY": 2,
+        "SIDEWALK_NETWORK": 1
+      }
+    },
+    {
+      "id": "sw:focal",
+      "state": "0",
+      "hour": 12,
+      "hits": 0,
+      "required": 7,
+      "gap": 7,
+      "offViewport": 0,
+      "firstHits": {
+        "skyways": 3,
+        "YURIKAMOME_GUIDEWAY": 1,
+        "fuji-civic-chassis": 2,
+        "TERRAIN_LOW_DENSITY": 2,
+        "SIDEWALK_NETWORK": 1
+      }
+    },
+    {
+      "id": "sw:focal",
+      "state": "0",
+      "hour": 22,
+      "hits": 0,
+      "required": 7,
+      "gap": 7,
+      "offViewport": 0,
+      "firstHits": {
+        "skyways": 3,
+        "YURIKAMOME_GUIDEWAY": 1,
+        "fuji-civic-chassis": 2,
+        "TERRAIN_LOW_DENSITY": 2,
+        "SIDEWALK_NETWORK": 1
+      }
+    },
+    {
+      "id": "sw:focal",
+      "state": "2",
+      "hour": 12,
+      "hits": 0,
+      "required": 7,
+      "gap": 7,
+      "offViewport": 0,
+      "firstHits": {
+        "skyways": 3,
+        "YURIKAMOME_GUIDEWAY": 1,
+        "fuji-civic-chassis": 2,
+        "TERRAIN_LOW_DENSITY": 2,
+        "SIDEWALK_NETWORK": 1
+      }
+    },
+    {
+      "id": "sw:focal",
+      "state": "2",
+      "hour": 22,
+      "hits": 0,
+      "required": 7,
+      "gap": 7,
+      "offViewport": 0,
+      "firstHits": {
+        "skyways": 3,
+        "YURIKAMOME_GUIDEWAY": 1,
+        "fuji-civic-chassis": 2,
+        "TERRAIN_LOW_DENSITY": 2,
+        "SIDEWALK_NETWORK": 1
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "-8",
+      "hour": 12,
+      "hits": 0,
+      "required": 7,
+      "gap": 7,
+      "offViewport": 8,
+      "firstHits": {
+        "tidal-edge": 1,
+        "TERRAIN_LOW_DENSITY": 1,
+        "skyways": 1,
+        "(unnamed/no hit)": 2,
+        "WATER_MAIN": 2,
+        "fuji-civic-chassis": 1,
+        "CTX_north_east_unknown": 1
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "-8",
+      "hour": 22,
+      "hits": 0,
+      "required": 7,
+      "gap": 7,
+      "offViewport": 8,
+      "firstHits": {
+        "tidal-edge": 1,
+        "TERRAIN_LOW_DENSITY": 1,
+        "skyways": 1,
+        "(unnamed/no hit)": 2,
+        "WATER_MAIN": 2,
+        "fuji-civic-chassis": 1,
+        "CTX_north_east_unknown": 1
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "-5",
+      "hour": 12,
+      "hits": 0,
+      "required": 7,
+      "gap": 7,
+      "offViewport": 8,
+      "firstHits": {
+        "tidal-edge": 1,
+        "TERRAIN_LOW_DENSITY": 1,
+        "skyways": 1,
+        "(unnamed/no hit)": 2,
+        "WATER_MAIN": 2,
+        "fuji-civic-chassis": 1,
+        "CTX_north_east_unknown": 1
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "-5",
+      "hour": 22,
+      "hits": 0,
+      "required": 7,
+      "gap": 7,
+      "offViewport": 8,
+      "firstHits": {
+        "tidal-edge": 1,
+        "TERRAIN_LOW_DENSITY": 1,
+        "skyways": 1,
+        "(unnamed/no hit)": 2,
+        "WATER_MAIN": 2,
+        "fuji-civic-chassis": 1,
+        "CTX_north_east_unknown": 1
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "0",
+      "hour": 12,
+      "hits": 0,
+      "required": 7,
+      "gap": 7,
+      "offViewport": 8,
+      "firstHits": {
+        "tidal-edge": 1,
+        "TERRAIN_LOW_DENSITY": 1,
+        "skyways": 1,
+        "(unnamed/no hit)": 2,
+        "WATER_MAIN": 2,
+        "fuji-civic-chassis": 1,
+        "CTX_north_east_unknown": 1
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "0",
+      "hour": 22,
+      "hits": 0,
+      "required": 7,
+      "gap": 7,
+      "offViewport": 8,
+      "firstHits": {
+        "tidal-edge": 1,
+        "TERRAIN_LOW_DENSITY": 1,
+        "skyways": 1,
+        "(unnamed/no hit)": 2,
+        "WATER_MAIN": 2,
+        "fuji-civic-chassis": 1,
+        "CTX_north_east_unknown": 1
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "5",
+      "hour": 12,
+      "hits": 0,
+      "required": 7,
+      "gap": 7,
+      "offViewport": 8,
+      "firstHits": {
+        "air-corridor-guides": 1,
+        "backdrop-grove": 1,
+        "skyways": 1,
+        "bay-context-static": 1,
+        "WATER_MAIN": 1,
+        "divercity-tokyo-plaza": 1,
+        "(unnamed/no hit)": 1,
+        "CTX_north_east_unknown": 1,
+        "water-taxis": 1
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "5",
+      "hour": 22,
+      "hits": 0,
+      "required": 7,
+      "gap": 7,
+      "offViewport": 8,
+      "firstHits": {
+        "air-corridor-guides": 1,
+        "backdrop-grove": 1,
+        "skyways": 1,
+        "bay-context-static": 1,
+        "WATER_MAIN": 1,
+        "divercity-tokyo-plaza": 1,
+        "(unnamed/no hit)": 1,
+        "CTX_north_east_unknown": 1,
+        "water-taxis": 1
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "8",
+      "hour": 12,
+      "hits": 0,
+      "required": 7,
+      "gap": 7,
+      "offViewport": 8,
+      "firstHits": {
+        "air-corridor-guides": 1,
+        "backdrop-grove": 1,
+        "skyways": 1,
+        "bay-context-static": 1,
+        "WATER_MAIN": 1,
+        "divercity-tokyo-plaza": 1,
+        "(unnamed/no hit)": 1,
+        "CTX_north_east_unknown": 1,
+        "water-taxis": 1
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "8",
+      "hour": 22,
+      "hits": 0,
+      "required": 7,
+      "gap": 7,
+      "offViewport": 8,
+      "firstHits": {
+        "air-corridor-guides": 1,
+        "backdrop-grove": 1,
+        "skyways": 1,
+        "bay-context-static": 1,
+        "WATER_MAIN": 1,
+        "divercity-tokyo-plaza": 1,
+        "(unnamed/no hit)": 1,
+        "CTX_north_east_unknown": 1,
+        "water-taxis": 1
+      }
+    }
+  ]
+}

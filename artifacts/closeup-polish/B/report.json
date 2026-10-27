@@ -1,0 +1,1847 @@
+{
+  "summary": {
+    "finalStates": 18,
+    "allMeasuredStates": 54,
+    "rawStaticImages": 108,
+    "roundsUsed": 3,
+    "A1": {
+      "PASS": 16,
+      "N/A": 2
+    },
+    "A2": {
+      "PASS": 16,
+      "N/A": 2
+    },
+    "A3": {
+      "FAIL": 16,
+      "N/A": 2
+    },
+    "A4": {
+      "pass": 0,
+      "pairs": 16
+    },
+    "A5": {
+      "FAIL": 6,
+      "PASS": 12
+    },
+    "A6": {
+      "PASS": 18
+    },
+    "reproducibility": {
+      "PASS": 10,
+      "FAIL": 8
+    },
+    "V": {
+      "V1": {
+        "FAIL": 6,
+        "PASS": 12
+      },
+      "V2": {
+        "FAIL": 6,
+        "PASS": 12
+      },
+      "V3": {
+        "FAIL": 18
+      },
+      "V4": {
+        "PASS": 18
+      },
+      "V5": {
+        "FAIL": 6,
+        "PASS": 12
+      },
+      "V6": {
+        "STATIC PASS": 18
+      }
+    }
+  },
+  "sourceCommit": "74d6c2b5f632c37bd9bf58bd7d7d6af11589d3b0",
+  "browser": "156.0.8078.73",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+  "checks": {
+    "A7": {
+      "status": "PASS",
+      "sourceCommit": "74d6c2b",
+      "npmTest": "r3/npm-test.log PASS",
+      "npmBuild": "r3/npm-build.log PASS",
+      "diffCheck": "PASS",
+      "localPhysicalTests": "Paving clearance at .25s intervals, positive hidden transforms, oculus/annular canopy and court entrance approach PASS",
+      "runnerSelfCheck": "18 captures /16 pairs /6 perf cases; full98 matrix unchanged",
+      "reportSelfCheck": "95%FPS/110%calls exact boundaries PASS",
+      "live": "8 checks PASS; live/browser.json",
+      "duration": "Exact3s retarget/snapshot/reduced motion checked by node suite; browser120-frame diagnostics only show intermediate easing. No3.000s browser precision claim."
+    },
+    "scope": "A park/energy and non-sharing district source identical to def2f28; only twoSW shot values changed in camera module.",
+    "warnings": [
+      "Existing JSON import-attribute warning",
+      "Existing chunk-size warning"
+    ],
+    "limits": [
+      "No production smoke or whole-city Z rerun in B",
+      "No exhibition hardware, Safari/iPad, Windows or visitor2s test",
+      "Static V6 does not establish all-state flicker absence",
+      "Live initial diagnostic includes7.6FPS loading window; no steady-state liveFPS claim. A5 uses separate warmed measurements.",
+      "Installed Chrome patch differs from S0: versions recorded per round; original numerical thresholds retained, no baseline replacement or same-version controlled-comparison claim."
+    ],
+    "cleanup": "PASS cleanup.json; Vite5194 and scratch52505 bind-verified free",
+    "selfReview": "PASS exact runtime/test diff and all new fixtures/report/manifest reviewed; 18 final originals and two live originals inspected",
+    "links": "PASS link-check.json:496 local targets; no new anchor links",
+    "originals": "PASS S0:234, A:147, B:110 hashes; originals preserved"
+  },
+  "performance": [
+    {
+      "id": "sw:focal",
+      "hour": 12,
+      "fps": 103.11548239559448,
+      "baselineFps": 114.94264034813332,
+      "fpsRatio": 0.8971038257280566,
+      "calls": 820,
+      "baselineCalls": 606,
+      "callsRatio": 1.353135313531353,
+      "minimumFps": 109.19550833072665,
+      "fpsGap": 6.08002593513217,
+      "maximumCalls": 666.6,
+      "callsGap": 153.39999999999998,
+      "pass": false
+    },
+    {
+      "id": "sw:focal",
+      "hour": 22,
+      "fps": 102.38935346719575,
+      "baselineFps": 112.858242039066,
+      "fpsRatio": 0.9072385996563155,
+      "calls": 820,
+      "baselineCalls": 606,
+      "callsRatio": 1.353135313531353,
+      "minimumFps": 107.2153299371127,
+      "fpsGap": 4.825976469916952,
+      "maximumCalls": 666.6,
+      "callsGap": 153.39999999999998,
+      "pass": false
+    },
+    {
+      "id": "sw:district",
+      "hour": 12,
+      "fps": 106.8748924163749,
+      "baselineFps": 86.97058404595231,
+      "fpsRatio": 1.2288625354051415,
+      "calls": 760,
+      "baselineCalls": 934,
+      "callsRatio": 0.8137044967880086,
+      "minimumFps": 82.6220548436547,
+      "fpsGap": 0,
+      "maximumCalls": 1027.4,
+      "callsGap": 0,
+      "pass": true
+    },
+    {
+      "id": "sw:district",
+      "hour": 22,
+      "fps": 106.80509994980241,
+      "baselineFps": 86.1487466593799,
+      "fpsRatio": 1.239775435992062,
+      "calls": 760,
+      "baselineCalls": 1118.5,
+      "callsRatio": 0.6794814483683504,
+      "minimumFps": 81.8413093264109,
+      "fpsGap": 0,
+      "maximumCalls": 1230.3500000000001,
+      "callsGap": 0,
+      "pass": true
+    },
+    {
+      "id": "hero",
+      "hour": 12,
+      "fps": 91.4058330521786,
+      "baselineFps": 86.33431099192002,
+      "fpsRatio": 1.0587428335500728,
+      "calls": 950,
+      "baselineCalls": 948,
+      "callsRatio": 1.0021097046413503,
+      "minimumFps": 82.01759544232401,
+      "fpsGap": 0,
+      "maximumCalls": 1042.8000000000002,
+      "callsGap": 0,
+      "pass": true
+    },
+    {
+      "id": "hero",
+      "hour": 22,
+      "fps": 91.13607936753733,
+      "baselineFps": 89.42044526679217,
+      "fpsRatio": 1.0191861502772264,
+      "calls": 950,
+      "baselineCalls": 948,
+      "callsRatio": 1.0021097046413503,
+      "minimumFps": 84.94942300345257,
+      "fpsGap": 0,
+      "maximumCalls": 1042.8000000000002,
+      "callsGap": 0,
+      "pass": true
+    }
+  ],
+  "rows": [
+    {
+      "id": "sw:focal",
+      "state": "-2",
+      "hour": 12,
+      "image": "r3/sw-focal__-2__h12.jpg",
+      "baselineImage": "../S0/baseline/sw-focal__-2__h12.jpg",
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0,
+        "gap": 7
+      },
+      "A4": [
+        {
+          "id": "sw:focal",
+          "hour": 12,
+          "from": "-2",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.013702003760408274,
+          "rect": {
+            "x": 671,
+            "y": 566,
+            "width": 625,
+            "height": 292
+          },
+          "pass": false
+        },
+        {
+          "id": "sw:focal",
+          "hour": 12,
+          "from": "-2",
+          "to": "2",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.03250721819321336,
+          "rect": {
+            "x": 671,
+            "y": 566,
+            "width": 625,
+            "height": 292
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "sw:focal",
+          "hour": 12,
+          "fps": 103.11548239559448,
+          "baselineFps": 114.94264034813332,
+          "fpsRatio": 0.8971038257280566,
+          "calls": 820,
+          "baselineCalls": 606,
+          "callsRatio": 1.353135313531353,
+          "minimumFps": 109.19550833072665,
+          "fpsGap": 6.08002593513217,
+          "maximumCalls": 666.6,
+          "callsGap": 153.39999999999998,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 820,
+        "baselineCalls": 606,
+        "pass": false
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "前景淺色支柱穿過廣場中心，右側深色停泊桿及左樓搶焦；兩秒內不能清楚辨認私人休息設施。"
+        ],
+        "V2": [
+          "FAIL",
+          "富士球體和彩虹橋未清楚入鏡；可見藍面不足以辨認為東京灣。"
+        ],
+        "V3": [
+          "FAIL",
+          "廣場綠邊較細，但背景仍有圓球式冠層；遮擋令院落層次難判讀。"
+        ],
+        "V4": [
+          "PASS",
+          "八個私人屏風、完整曲面環頂與平台仍屬成熟未來方案，沒有以low表示空地。"
+        ],
+        "V5": [
+          "FAIL",
+          "已檢視配對hour22：環頂可見，但深色屏風與被遮住的座位差異不易辨認；無法達到夜間功能可讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見環頂曲線及屏風沒有明顯閃線或浮空；被支柱擋住的部分無法判讀，未證實動態無閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "sw:focal",
+      "state": "-2",
+      "hour": 22,
+      "image": "r3/sw-focal__-2__h22.jpg",
+      "baselineImage": "../S0/baseline/sw-focal__-2__h22.jpg",
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0,
+        "gap": 7
+      },
+      "A4": [
+        {
+          "id": "sw:focal",
+          "hour": 22,
+          "from": "-2",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.010423106813501656,
+          "rect": {
+            "x": 671,
+            "y": 566,
+            "width": 625,
+            "height": 292
+          },
+          "pass": false
+        },
+        {
+          "id": "sw:focal",
+          "hour": 22,
+          "from": "-2",
+          "to": "2",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.023236887814486525,
+          "rect": {
+            "x": 671,
+            "y": 566,
+            "width": 625,
+            "height": 292
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "sw:focal",
+          "hour": 22,
+          "fps": 102.38935346719575,
+          "baselineFps": 112.858242039066,
+          "fpsRatio": 0.9072385996563155,
+          "calls": 820,
+          "baselineCalls": 606,
+          "callsRatio": 1.353135313531353,
+          "minimumFps": 107.2153299371127,
+          "fpsGap": 4.825976469916952,
+          "maximumCalls": 666.6,
+          "callsGap": 153.39999999999998,
+          "pass": false
+        },
+        "vsync": 59.7,
+        "calls": 820,
+        "baselineCalls": 606,
+        "pass": false
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "夜景窗口及前景桿件比小型私人休息設施搶眼，中心支柱持續遮住廣場。"
+        ],
+        "V2": [
+          "FAIL",
+          "富士球體和彩虹橋未清楚入鏡；可見藍面不足以辨認為東京灣。"
+        ],
+        "V3": [
+          "FAIL",
+          "廣場綠邊較細，但背景仍有圓球式冠層；遮擋令院落層次難判讀。"
+        ],
+        "V4": [
+          "PASS",
+          "八個私人屏風、完整曲面環頂與平台仍屬成熟未來方案，沒有以low表示空地。"
+        ],
+        "V5": [
+          "FAIL",
+          "環頂可見，但深色屏風與被遮住的座位差異不易辨認；無法達到夜間功能可讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見環頂曲線及屏風沒有明顯閃線或浮空；被支柱擋住的部分無法判讀，未證實動態無閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "sw:focal",
+      "state": "0",
+      "hour": 12,
+      "image": "r3/sw-focal__0__h12.jpg",
+      "baselineImage": "../S0/baseline/sw-focal__0__h12.jpg",
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0,
+        "gap": 7
+      },
+      "A4": [
+        {
+          "id": "sw:focal",
+          "hour": 12,
+          "from": "-2",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.013702003760408274,
+          "rect": {
+            "x": 671,
+            "y": 566,
+            "width": 625,
+            "height": 292
+          },
+          "pass": false
+        },
+        {
+          "id": "sw:focal",
+          "hour": 12,
+          "from": "0",
+          "to": "2",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.02355523323484645,
+          "rect": {
+            "x": 671,
+            "y": 566,
+            "width": 625,
+            "height": 292
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "sw:focal",
+          "hour": 12,
+          "fps": 103.11548239559448,
+          "baselineFps": 114.94264034813332,
+          "fpsRatio": 0.8971038257280566,
+          "calls": 820,
+          "baselineCalls": 606,
+          "callsRatio": 1.353135313531353,
+          "minimumFps": 109.19550833072665,
+          "fpsGap": 6.08002593513217,
+          "maximumCalls": 666.6,
+          "callsGap": 153.39999999999998,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 820,
+        "baselineCalls": 606,
+        "pass": false
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "中性配置只見部分屏風及長椅邊緣，中央前景支柱遮住共享／私人混合設施；牌面可讀但不足以兩秒辨識。"
+        ],
+        "V2": [
+          "FAIL",
+          "富士球體和彩虹橋未清楚入鏡；可見藍面不足以辨認為東京灣。"
+        ],
+        "V3": [
+          "FAIL",
+          "廣場綠邊較細，但背景仍有圓球式冠層；遮擋令院落層次難判讀。"
+        ],
+        "V4": [
+          "PASS",
+          "共享及私人席位的混合方案、環頂與平台均保留完整構造；不是過渡中的空地。"
+        ],
+        "V5": [
+          "FAIL",
+          "已檢視配對hour22：亮窗及停泊燈搶焦，混合席位變化難辨；環頂可見不代表功能可讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見環頂曲線及屏風沒有明顯閃線或浮空；被支柱擋住的部分無法判讀，未證實動態無閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "sw:focal",
+      "state": "0",
+      "hour": 22,
+      "image": "r3/sw-focal__0__h22.jpg",
+      "baselineImage": "../S0/baseline/sw-focal__0__h22.jpg",
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0,
+        "gap": 7
+      },
+      "A4": [
+        {
+          "id": "sw:focal",
+          "hour": 22,
+          "from": "-2",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.010423106813501656,
+          "rect": {
+            "x": 671,
+            "y": 566,
+            "width": 625,
+            "height": 292
+          },
+          "pass": false
+        },
+        {
+          "id": "sw:focal",
+          "hour": 22,
+          "from": "0",
+          "to": "2",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.01667925149968663,
+          "rect": {
+            "x": 671,
+            "y": 566,
+            "width": 625,
+            "height": 292
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "sw:focal",
+          "hour": 22,
+          "fps": 102.38935346719575,
+          "baselineFps": 112.858242039066,
+          "fpsRatio": 0.9072385996563155,
+          "calls": 820,
+          "baselineCalls": 606,
+          "callsRatio": 1.353135313531353,
+          "minimumFps": 107.2153299371127,
+          "fpsGap": 4.825976469916952,
+          "maximumCalls": 666.6,
+          "callsGap": 153.39999999999998,
+          "pass": false
+        },
+        "vsync": 60.1,
+        "calls": 820,
+        "baselineCalls": 606,
+        "pass": false
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "夜景混合席位只露出部分屏風及背板，前景中央支柱與明亮鄰樓令設施不易辨識。"
+        ],
+        "V2": [
+          "FAIL",
+          "富士球體和彩虹橋未清楚入鏡；可見藍面不足以辨認為東京灣。"
+        ],
+        "V3": [
+          "FAIL",
+          "廣場綠邊較細，但背景仍有圓球式冠層；遮擋令院落層次難判讀。"
+        ],
+        "V4": [
+          "PASS",
+          "私人及共享混合配置保持完整平台、曲面環頂與植栽邊界，沒有未建成空地。"
+        ],
+        "V5": [
+          "FAIL",
+          "亮窗及停泊燈搶焦，混合席位變化難辨；環頂可見不代表功能可讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見環頂曲線及屏風沒有明顯閃線或浮空；被支柱擋住的部分無法判讀，未證實動態無閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "sw:focal",
+      "state": "2",
+      "hour": 12,
+      "image": "r3/sw-focal__2__h12.jpg",
+      "baselineImage": "../S0/baseline/sw-focal__2__h12.jpg",
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0,
+        "gap": 7
+      },
+      "A4": [
+        {
+          "id": "sw:focal",
+          "hour": 12,
+          "from": "0",
+          "to": "2",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.02355523323484645,
+          "rect": {
+            "x": 671,
+            "y": 566,
+            "width": 625,
+            "height": 292
+          },
+          "pass": false
+        },
+        {
+          "id": "sw:focal",
+          "hour": 12,
+          "from": "-2",
+          "to": "2",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.03250721819321336,
+          "rect": {
+            "x": 671,
+            "y": 566,
+            "width": 625,
+            "height": 292
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "sw:focal",
+          "hour": 12,
+          "fps": 103.11548239559448,
+          "baselineFps": 114.94264034813332,
+          "fpsRatio": 0.8971038257280566,
+          "calls": 820,
+          "baselineCalls": 606,
+          "callsRatio": 1.353135313531353,
+          "minimumFps": 109.19550833072665,
+          "fpsGap": 6.08002593513217,
+          "maximumCalls": 666.6,
+          "callsGap": 153.39999999999998,
+          "pass": false
+        },
+        "vsync": 60.1,
+        "calls": 820,
+        "baselineCalls": 606,
+        "pass": false
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "可見部分共享長椅，但中央支柱遮擋仍令公共休息設施退到背景；兩秒辨識未過。"
+        ],
+        "V2": [
+          "FAIL",
+          "富士球體和彩虹橋未清楚入鏡；可見藍面不足以辨認為東京灣。"
+        ],
+        "V3": [
+          "FAIL",
+          "廣場綠邊較細，但背景仍有圓球式冠層；遮擋令院落層次難判讀。"
+        ],
+        "V4": [
+          "PASS",
+          "完整共享長椅、公共平台及採光環頂保留成熟2127方案，並非刪走私人設施後留空。"
+        ],
+        "V5": [
+          "FAIL",
+          "已檢視配對hour22：雖可見環頂與部分淺色椅背，但遮擋及深色背景令全共享配置差異仍難讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見環頂曲線及屏風沒有明顯閃線或浮空；被支柱擋住的部分無法判讀，未證實動態無閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "sw:focal",
+      "state": "2",
+      "hour": 22,
+      "image": "r3/sw-focal__2__h22.jpg",
+      "baselineImage": "../S0/baseline/sw-focal__2__h22.jpg",
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0,
+        "gap": 7
+      },
+      "A4": [
+        {
+          "id": "sw:focal",
+          "hour": 22,
+          "from": "0",
+          "to": "2",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.01667925149968663,
+          "rect": {
+            "x": 671,
+            "y": 566,
+            "width": 625,
+            "height": 292
+          },
+          "pass": false
+        },
+        {
+          "id": "sw:focal",
+          "hour": 22,
+          "from": "-2",
+          "to": "2",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.023236887814486525,
+          "rect": {
+            "x": 671,
+            "y": 566,
+            "width": 625,
+            "height": 292
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "sw:focal",
+          "hour": 22,
+          "fps": 102.38935346719575,
+          "baselineFps": 112.858242039066,
+          "fpsRatio": 0.9072385996563155,
+          "calls": 820,
+          "baselineCalls": 606,
+          "callsRatio": 1.353135313531353,
+          "minimumFps": 107.2153299371127,
+          "fpsGap": 4.825976469916952,
+          "maximumCalls": 666.6,
+          "callsGap": 153.39999999999998,
+          "pass": false
+        },
+        "vsync": 59.7,
+        "calls": 820,
+        "baselineCalls": 606,
+        "pass": false
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "夜間共享長椅輪廓在支柱後只露出一部分，牌面及鄰樓光線較搶眼，難以兩秒辨識。"
+        ],
+        "V2": [
+          "FAIL",
+          "富士球體和彩虹橋未清楚入鏡；可見藍面不足以辨認為東京灣。"
+        ],
+        "V3": [
+          "FAIL",
+          "廣場綠邊較細，但背景仍有圓球式冠層；遮擋令院落層次難判讀。"
+        ],
+        "V4": [
+          "PASS",
+          "完整共享長椅、公共平台及採光環頂保留成熟2127方案，並非刪走私人設施後留空。"
+        ],
+        "V5": [
+          "FAIL",
+          "雖可見環頂與部分淺色椅背，但遮擋及深色背景令全共享配置差異仍難讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見環頂曲線及屏風沒有明顯閃線或浮空；被支柱擋住的部分無法判讀，未證實動態無閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "-8",
+      "hour": 12,
+      "image": "r3/sw-district__-8__h12.jpg",
+      "baselineImage": "../S0/baseline/sw-district__-8__h12.jpg",
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0,
+        "gap": 7
+      },
+      "A4": [
+        {
+          "id": "sw:district",
+          "hour": 12,
+          "from": "-8",
+          "to": "-5",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.011728042039861213,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "sw:district",
+          "hour": 12,
+          "from": "-8",
+          "to": "8",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.017632824477527637,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "sw:district",
+          "hour": 12,
+          "fps": 106.8748924163749,
+          "baselineFps": 86.97058404595231,
+          "fpsRatio": 1.2288625354051415,
+          "calls": 760,
+          "baselineCalls": 934,
+          "callsRatio": 0.8137044967880086,
+          "minimumFps": 82.6220548436547,
+          "fpsGap": 0,
+          "maximumCalls": 1027.4,
+          "callsGap": 0,
+          "pass": true
+        },
+        "vsync": 59.9,
+        "calls": 746,
+        "baselineCalls": 920,
+        "pass": true
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "海邊連橋、水上圓頂及環形花園清楚，能快速辨認為水邊休憩設施，對應水辺の居場所。"
+        ],
+        "V2": [
+          "PASS",
+          "東京灣海面及船隻佔畫面下半，位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "水上島嶼仍有平圓冠層及棒狀樹幹；新增院落／halo細節未消除全景的玩具式樹形。"
+        ],
+        "V4": [
+          "PASS",
+          "私人水庭、完整透光圓頂、接橋及岸上花園是完整成熟方案。"
+        ],
+        "V5": [
+          "PASS",
+          "已檢視配對hour22：圓頂格殼、粉色環邊與無罩水庭仍可區分；局部綠植偏暗但主要輪廓可讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "圓頂格殼、環邊與接橋的可見部分沒有明顯穿模或浮空；沒有宣稱靜態圖可證明動態無閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "-8",
+      "hour": 22,
+      "image": "r3/sw-district__-8__h22.jpg",
+      "baselineImage": "../S0/baseline/sw-district__-8__h22.jpg",
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0,
+        "gap": 7
+      },
+      "A4": [
+        {
+          "id": "sw:district",
+          "hour": 22,
+          "from": "-8",
+          "to": "-5",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.013490890144638102,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "sw:district",
+          "hour": 22,
+          "from": "-8",
+          "to": "8",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.019639239389171306,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "sw:district",
+          "hour": 22,
+          "fps": 106.80509994980241,
+          "baselineFps": 86.1487466593799,
+          "fpsRatio": 1.239775435992062,
+          "calls": 760,
+          "baselineCalls": 1118.5,
+          "callsRatio": 0.6794814483683504,
+          "minimumFps": 81.8413093264109,
+          "fpsGap": 0,
+          "maximumCalls": 1230.3500000000001,
+          "callsGap": 0,
+          "pass": true
+        },
+        "vsync": 60.1,
+        "calls": 746,
+        "baselineCalls": 920,
+        "pass": true
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "夜景透光圓頂、環形岸線及接橋仍容易辨認為水邊休憩設施。"
+        ],
+        "V2": [
+          "PASS",
+          "東京灣海面及船隻佔畫面下半，位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "水上島嶼仍有平圓冠層及棒狀樹幹；新增院落／halo細節未消除全景的玩具式樹形。"
+        ],
+        "V4": [
+          "PASS",
+          "私人水庭、完整透光圓頂、接橋及岸上花園是完整成熟方案。"
+        ],
+        "V5": [
+          "PASS",
+          "圓頂格殼、粉色環邊與無罩水庭仍可區分；局部綠植偏暗但主要輪廓可讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "圓頂格殼、環邊與接橋的可見部分沒有明顯穿模或浮空；沒有宣稱靜態圖可證明動態無閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "-5",
+      "hour": 12,
+      "image": "r3/sw-district__-5__h12.jpg",
+      "baselineImage": "../S0/baseline/sw-district__-5__h12.jpg",
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0,
+        "gap": 7
+      },
+      "A4": [
+        {
+          "id": "sw:district",
+          "hour": 12,
+          "from": "-8",
+          "to": "-5",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.011728042039861213,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "sw:district",
+          "hour": 12,
+          "from": "-5",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.010599198514282256,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "sw:district",
+          "hour": 12,
+          "fps": 106.8748924163749,
+          "baselineFps": 86.97058404595231,
+          "fpsRatio": 1.2288625354051415,
+          "calls": 760,
+          "baselineCalls": 934,
+          "callsRatio": 0.8137044967880086,
+          "minimumFps": 82.6220548436547,
+          "fpsGap": 0,
+          "maximumCalls": 1027.4,
+          "callsGap": 0,
+          "pass": true
+        },
+        "vsync": 60,
+        "calls": 760,
+        "baselineCalls": 934,
+        "pass": true
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "圓頂水庭與部分植栽halo並置、接橋清楚，可辨認水邊花園／休憩設施。"
+        ],
+        "V2": [
+          "PASS",
+          "東京灣海面及船隻佔畫面下半，位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "halo冠層雖有起伏，仍像均勻小球；島內平圓樹冠及棒幹未改善到要求。"
+        ],
+        "V4": [
+          "PASS",
+          "私人水庭、部分開放halo及岸上庭院都有完整構造；中間rung仍是成熟配置。"
+        ],
+        "V5": [
+          "PASS",
+          "已檢視配對hour22：發光環邊、圓頂與無罩水庭有可辨輪廓差異；植栽內部仍較暗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "圓頂格殼、環邊與接橋的可見部分沒有明顯穿模或浮空；沒有宣稱靜態圖可證明動態無閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "-5",
+      "hour": 22,
+      "image": "r3/sw-district__-5__h22.jpg",
+      "baselineImage": "../S0/baseline/sw-district__-5__h22.jpg",
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0,
+        "gap": 7
+      },
+      "A4": [
+        {
+          "id": "sw:district",
+          "hour": 22,
+          "from": "-8",
+          "to": "-5",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.013490890144638102,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "sw:district",
+          "hour": 22,
+          "from": "-5",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.009160036159525538,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "sw:district",
+          "hour": 22,
+          "fps": 106.80509994980241,
+          "baselineFps": 86.1487466593799,
+          "fpsRatio": 1.239775435992062,
+          "calls": 760,
+          "baselineCalls": 1118.5,
+          "callsRatio": 0.6794814483683504,
+          "minimumFps": 81.8413093264109,
+          "fpsGap": 0,
+          "maximumCalls": 1230.3500000000001,
+          "callsGap": 0,
+          "pass": true
+        },
+        "vsync": 59.9,
+        "calls": 760,
+        "baselineCalls": 934,
+        "pass": true
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "夜景中暖邊halo與透光水庭並置，接橋連到岸上休憩空間，設施身份可辨。"
+        ],
+        "V2": [
+          "PASS",
+          "東京灣海面及船隻佔畫面下半，位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "水上島嶼仍有平圓冠層及棒狀樹幹；新增院落／halo細節未消除全景的玩具式樹形。"
+        ],
+        "V4": [
+          "PASS",
+          "私人水庭及部分開放halo保持成熟、完整且有接橋的配置。"
+        ],
+        "V5": [
+          "PASS",
+          "發光環邊、圓頂與無罩水庭有可辨輪廓差異；植栽內部仍較暗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "圓頂格殼、環邊與接橋的可見部分沒有明顯穿模或浮空；沒有宣稱靜態圖可證明動態無閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "0",
+      "hour": 12,
+      "image": "r3/sw-district__0__h12.jpg",
+      "baselineImage": "../S0/baseline/sw-district__0__h12.jpg",
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0,
+        "gap": 7
+      },
+      "A4": [
+        {
+          "id": "sw:district",
+          "hour": 12,
+          "from": "-5",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.010599198514282256,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "sw:district",
+          "hour": 12,
+          "from": "0",
+          "to": "5",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.013206102361211974,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "sw:district",
+          "hour": 12,
+          "fps": 106.8748924163749,
+          "baselineFps": 86.97058404595231,
+          "fpsRatio": 1.2288625354051415,
+          "calls": 760,
+          "baselineCalls": 934,
+          "callsRatio": 0.8137044967880086,
+          "minimumFps": 82.6220548436547,
+          "fpsGap": 0,
+          "maximumCalls": 1027.4,
+          "callsGap": 0,
+          "pass": true
+        },
+        "vsync": 60.1,
+        "calls": 760,
+        "baselineCalls": 934,
+        "pass": true
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "完整圓頂、半開格殼與階梯式水庭同時可見，能辨認水邊休憩群。"
+        ],
+        "V2": [
+          "PASS",
+          "東京灣海面及船隻佔畫面下半，位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "階梯／halo內仍是平圓樹冠與簡化棒幹，岸上冠層也有均勻球形。"
+        ],
+        "V4": [
+          "PASS",
+          "中性以半開水庭與共享階梯組合成成熟混合方案，並非未完成工地。"
+        ],
+        "V5": [
+          "PASS",
+          "已檢視配對hour22：完整／半開圓頂及無罩階梯的主要輪廓可分辨；暖邊halo提供位置提示，綠植細部偏暗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "圓頂格殼、環邊與接橋的可見部分沒有明顯穿模或浮空；沒有宣稱靜態圖可證明動態無閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "0",
+      "hour": 22,
+      "image": "r3/sw-district__0__h22.jpg",
+      "baselineImage": "../S0/baseline/sw-district__0__h22.jpg",
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0,
+        "gap": 7
+      },
+      "A4": [
+        {
+          "id": "sw:district",
+          "hour": 22,
+          "from": "-5",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.009160036159525538,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "sw:district",
+          "hour": 22,
+          "from": "0",
+          "to": "5",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.010742921911562979,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "sw:district",
+          "hour": 22,
+          "fps": 106.80509994980241,
+          "baselineFps": 86.1487466593799,
+          "fpsRatio": 1.239775435992062,
+          "calls": 760,
+          "baselineCalls": 1118.5,
+          "callsRatio": 0.6794814483683504,
+          "minimumFps": 81.8413093264109,
+          "fpsGap": 0,
+          "maximumCalls": 1230.3500000000001,
+          "callsGap": 0,
+          "pass": true
+        },
+        "vsync": 60,
+        "calls": 760,
+        "baselineCalls": 934,
+        "pass": true
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "夜景完整圓頂、半開格殼、階梯水庭與接橋都有可讀輪廓，仍是水邊休憩群。"
+        ],
+        "V2": [
+          "PASS",
+          "東京灣海面及船隻佔畫面下半，位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "水上島嶼仍有平圓冠層及棒狀樹幹；新增院落／halo細節未消除全景的玩具式樹形。"
+        ],
+        "V4": [
+          "PASS",
+          "中性混合配置各水庭都保持完整構造，沒有空置／未建成的過渡感。"
+        ],
+        "V5": [
+          "PASS",
+          "完整／半開圓頂及無罩階梯的主要輪廓可分辨；暖邊halo提供位置提示，綠植細部偏暗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "圓頂格殼、環邊與接橋的可見部分沒有明顯穿模或浮空；沒有宣稱靜態圖可證明動態無閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "5",
+      "hour": 12,
+      "image": "r3/sw-district__5__h12.jpg",
+      "baselineImage": "../S0/baseline/sw-district__5__h12.jpg",
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0,
+        "gap": 7
+      },
+      "A4": [
+        {
+          "id": "sw:district",
+          "hour": 12,
+          "from": "0",
+          "to": "5",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.013206102361211974,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "sw:district",
+          "hour": 12,
+          "from": "5",
+          "to": "8",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.006868693516501251,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "sw:district",
+          "hour": 12,
+          "fps": 106.8748924163749,
+          "baselineFps": 86.97058404595231,
+          "fpsRatio": 1.2288625354051415,
+          "calls": 760,
+          "baselineCalls": 934,
+          "callsRatio": 0.8137044967880086,
+          "minimumFps": 82.6220548436547,
+          "fpsGap": 0,
+          "maximumCalls": 1027.4,
+          "callsGap": 0,
+          "pass": true
+        },
+        "vsync": 60,
+        "calls": 760,
+        "baselineCalls": 934,
+        "pass": true
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "共享階梯水庭及植栽halo成為主要水上設施，接橋與岸上共用庭院清楚。"
+        ],
+        "V2": [
+          "PASS",
+          "東京灣海面及船隻佔畫面下半，位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "水庭內仍是平圓冠層，halo屋面則像一圈均勻綠珠，未達自然層次要求。"
+        ],
+        "V4": [
+          "PASS",
+          "共享水庭與仍保留的庭院設備構成完整成熟配置，沒有以更開放代表未開發。"
+        ],
+        "V5": [
+          "PASS",
+          "已檢視配對hour22：階梯環、halo輪廓及岸上庭院仍可分辨，主要開放形式可讀；植栽內部細節偏暗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "圓頂格殼、環邊與接橋的可見部分沒有明顯穿模或浮空；沒有宣稱靜態圖可證明動態無閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "5",
+      "hour": 22,
+      "image": "r3/sw-district__5__h22.jpg",
+      "baselineImage": "../S0/baseline/sw-district__5__h22.jpg",
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0,
+        "gap": 7
+      },
+      "A4": [
+        {
+          "id": "sw:district",
+          "hour": 22,
+          "from": "0",
+          "to": "5",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.010742921911562979,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "sw:district",
+          "hour": 22,
+          "from": "5",
+          "to": "8",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.005737508699467441,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "sw:district",
+          "hour": 22,
+          "fps": 106.80509994980241,
+          "baselineFps": 86.1487466593799,
+          "fpsRatio": 1.239775435992062,
+          "calls": 760,
+          "baselineCalls": 1118.5,
+          "callsRatio": 0.6794814483683504,
+          "minimumFps": 81.8413093264109,
+          "fpsGap": 0,
+          "maximumCalls": 1230.3500000000001,
+          "callsGap": 0,
+          "pass": true
+        },
+        "vsync": 60,
+        "calls": 760,
+        "baselineCalls": 934,
+        "pass": true
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "夜景共享階梯水庭、暖邊halo及接橋仍清楚，水邊設施身份容易辨認。"
+        ],
+        "V2": [
+          "PASS",
+          "東京灣海面及船隻佔畫面下半，位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "水上島嶼仍有平圓冠層及棒狀樹幹；新增院落／halo細節未消除全景的玩具式樹形。"
+        ],
+        "V4": [
+          "PASS",
+          "完整開放水庭及庭院保留成熟公共空間，不以高值代表從空地增建。"
+        ],
+        "V5": [
+          "PASS",
+          "階梯環、halo輪廓及岸上庭院仍可分辨，主要開放形式可讀；植栽內部細節偏暗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "圓頂格殼、環邊與接橋的可見部分沒有明顯穿模或浮空；沒有宣稱靜態圖可證明動態無閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "8",
+      "hour": 12,
+      "image": "r3/sw-district__8__h12.jpg",
+      "baselineImage": "../S0/baseline/sw-district__8__h12.jpg",
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0,
+        "gap": 7
+      },
+      "A4": [
+        {
+          "id": "sw:district",
+          "hour": 12,
+          "from": "5",
+          "to": "8",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.006868693516501251,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "sw:district",
+          "hour": 12,
+          "from": "-8",
+          "to": "8",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.017632824477527637,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "sw:district",
+          "hour": 12,
+          "fps": 106.8748924163749,
+          "baselineFps": 86.97058404595231,
+          "fpsRatio": 1.2288625354051415,
+          "calls": 760,
+          "baselineCalls": 934,
+          "callsRatio": 0.8137044967880086,
+          "minimumFps": 82.6220548436547,
+          "fpsGap": 0,
+          "maximumCalls": 1027.4,
+          "callsGap": 0,
+          "pass": true
+        },
+        "vsync": 60,
+        "calls": 760,
+        "baselineCalls": 934,
+        "pass": true
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "多個開放階梯水庭及植栽halo連到海岸，能快速辨認公共水邊休憩群。"
+        ],
+        "V2": [
+          "PASS",
+          "東京灣海面及船隻佔畫面下半，位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "島內平圓樹冠／棒幹及halo均勻綠珠仍像簡化原件，未達自然層次要求。"
+        ],
+        "V4": [
+          "PASS",
+          "全共享配置仍有完整接橋、座階、遮蔭halo及岸上庭院，具完整未來系統。"
+        ],
+        "V5": [
+          "PASS",
+          "已檢視配對hour22：全共享的座階環邊、halo與橋接輪廓仍可讀；綠植內部偏暗，另列V3。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "圓頂格殼、環邊與接橋的可見部分沒有明顯穿模或浮空；沒有宣稱靜態圖可證明動態無閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "sw:district",
+      "state": "8",
+      "hour": 22,
+      "image": "r3/sw-district__8__h22.jpg",
+      "baselineImage": "../S0/baseline/sw-district__8__h22.jpg",
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0,
+        "gap": 7
+      },
+      "A4": [
+        {
+          "id": "sw:district",
+          "hour": 22,
+          "from": "5",
+          "to": "8",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.005737508699467441,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "sw:district",
+          "hour": 22,
+          "from": "-8",
+          "to": "8",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.019639239389171306,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "sw:district",
+          "hour": 22,
+          "fps": 106.80509994980241,
+          "baselineFps": 86.1487466593799,
+          "fpsRatio": 1.239775435992062,
+          "calls": 760,
+          "baselineCalls": 1118.5,
+          "callsRatio": 0.6794814483683504,
+          "minimumFps": 81.8413093264109,
+          "fpsGap": 0,
+          "maximumCalls": 1230.3500000000001,
+          "callsGap": 0,
+          "pass": true
+        },
+        "vsync": 60.1,
+        "calls": 760,
+        "baselineCalls": 934,
+        "pass": true
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "夜景多個階梯水庭與暖邊halo清楚，接橋及岸上庭院仍可辨認為共享海濱設施。"
+        ],
+        "V2": [
+          "PASS",
+          "東京灣海面及船隻佔畫面下半，位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "島內平圓樹冠／棒幹及halo均勻綠珠仍像簡化原件，未達自然層次要求。"
+        ],
+        "V4": [
+          "PASS",
+          "全共享配置仍有完整接橋、座階、遮蔭halo及岸上庭院，具完整未來系統。"
+        ],
+        "V5": [
+          "PASS",
+          "全共享的座階環邊、halo與橋接輪廓仍可讀；綠植內部偏暗，另列V3。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "圓頂格殼、環邊與接橋的可見部分沒有明顯穿模或浮空；沒有宣稱靜態圖可證明動態無閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "hero",
+      "state": "neutral",
+      "hour": 12,
+      "image": "r3/hero__neutral__h12.jpg",
+      "baselineImage": "../S0/baseline/hero__neutral__h12.jpg",
+      "A1": "N/A",
+      "A2": "N/A",
+      "A3": {
+        "status": "N/A",
+        "hits": null,
+        "gap": null
+      },
+      "A4": [],
+      "A5": {
+        "reference": {
+          "id": "hero",
+          "hour": 12,
+          "fps": 91.4058330521786,
+          "baselineFps": 86.33431099192002,
+          "fpsRatio": 1.0587428335500728,
+          "calls": 950,
+          "baselineCalls": 948,
+          "callsRatio": 1.0021097046413503,
+          "minimumFps": 82.01759544232401,
+          "fpsGap": 0,
+          "maximumCalls": 1042.8000000000002,
+          "callsGap": 0,
+          "pass": true
+        },
+        "vsync": 60,
+        "calls": 950,
+        "baselineCalls": 948,
+        "pass": true
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "總覽的完整城市、海濱及未來交通可辨認；這是session總覽判斷，沒有真人兩秒測試。"
+        ],
+        "V2": [
+          "PASS",
+          "廣闊東京灣及岸線清楚，日圖亦可見遠方彩虹橋。"
+        ],
+        "V3": [
+          "FAIL",
+          "總覽仍有單球、平圓及柱狀冠層；B局部細化未解決全城綠化層次。"
+        ],
+        "V4": [
+          "PASS",
+          "中性城市已有完整建築、海濱設施與交通系統，並非等待升級的空白。"
+        ],
+        "V5": [
+          "PASS",
+          "已檢視日夜配對，建築、航道及水上設施輪廓可讀；遠景及綠植細部偏暗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "總覽未見明顯浮空或穿模主體，但遠處解析度及靜態取樣不足以排除所有閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "hero",
+      "state": "neutral",
+      "hour": 22,
+      "image": "r3/hero__neutral__h22.jpg",
+      "baselineImage": "../S0/baseline/hero__neutral__h22.jpg",
+      "A1": "N/A",
+      "A2": "N/A",
+      "A3": {
+        "status": "N/A",
+        "hits": null,
+        "gap": null
+      },
+      "A4": [],
+      "A5": {
+        "reference": {
+          "id": "hero",
+          "hour": 22,
+          "fps": 91.13607936753733,
+          "baselineFps": 89.42044526679217,
+          "fpsRatio": 1.0191861502772264,
+          "calls": 950,
+          "baselineCalls": 948,
+          "callsRatio": 1.0021097046413503,
+          "minimumFps": 84.94942300345257,
+          "fpsGap": 0,
+          "maximumCalls": 1042.8000000000002,
+          "callsGap": 0,
+          "pass": true
+        },
+        "vsync": 60,
+        "calls": 950,
+        "baselineCalls": 948,
+        "pass": true
+      },
+      "A6": "PASS",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "總覽的完整城市、海濱及未來交通可辨認；這是session總覽判斷，沒有真人兩秒測試。"
+        ],
+        "V2": [
+          "PASS",
+          "廣闊東京灣及岸線清楚，日圖亦可見遠方彩虹橋。"
+        ],
+        "V3": [
+          "FAIL",
+          "總覽仍有單球、平圓及柱狀冠層；B局部細化未解決全城綠化層次。"
+        ],
+        "V4": [
+          "PASS",
+          "中性城市已有完整建築、海濱設施與交通系統，並非等待升級的空白。"
+        ],
+        "V5": [
+          "PASS",
+          "已檢視日夜配對，建築、航道及水上設施輪廓可讀；遠景及綠植細部偏暗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "總覽未見明顯浮空或穿模主體，但遠處解析度及靜態取樣不足以排除所有閃爍。"
+        ]
+      }
+    }
+  ]
+}
