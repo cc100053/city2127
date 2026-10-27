@@ -1,3 +1,4 @@
+import type { EnergyConfiguration } from '../survey/src/shared/energy.ts';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 import type { CarrierChange } from './cityChangeManager.ts';
@@ -167,6 +168,11 @@ const DISTRICT_RESULTS = {
   se: ['街に点在する建物', '建物の構成が変わり、暮らしの用事を分け合う場所の配置が調整されました。'],
 } as const;
 
+/** The result card and camera follow the same first changed energy location. */
+export function energyChangedPart(before: EnergyConfiguration, after: EnergyConfiguration) {
+  return (['waterGardens', 'receiver', 'flywheel', 'island'] as const).find(part => before[part] !== after[part]) ?? null;
+}
+
 /** Evidence is the renderer's before/after targets, including visible pairings and shuffled slots. */
 export function residentResult(proposal: ExhibitionProposal, changes?: readonly CarrierChange[]) {
   const change = changes?.[0];
@@ -177,9 +183,9 @@ export function residentResult(proposal: ExhibitionProposal, changes?: readonly 
   let effect = '回答を記録しました。', place = 'お台場全景', kind = 'recorded';
   if (change) {
     kind = 'configuration';
-    place = change.focal ? changeSites[change.socketId].place : DISTRICT_RESULTS[change.socketId][0];
+    place = change.focal && !change.district ? changeSites[change.socketId].place : DISTRICT_RESULTS[change.socketId][0];
     effect = DISTRICT_RESULTS[change.socketId][1];
-    if (change.focal) {
+    if (change.focal && !change.district) {
       const before = proposal.beforeLayout, after = proposal.afterLayout;
       if (change.socketId === 'nw') effect = after.automatedPorts > before.automatedPorts
         ? 'この拠点では、自分の都合で使える自律サービスの端口が増えました。'
@@ -196,11 +202,12 @@ export function residentResult(proposal: ExhibitionProposal, changes?: readonly 
     }
     if (change.energy) {
       const { before, after } = change.energy;
-      if (before.waterGardens !== after.waterGardens) {
+      const part = energyChangedPart(before, after);
+      if (part === 'waterGardens') {
         place = '海辺の蓄電庭園'; effect = `海辺の蓄電庭園は${after.waterGardens === 0 ? '配置から外れました' : `${after.waterGardens}か所の配置になりました`}。`;
-      } else if (before.receiver !== after.receiver) {
+      } else if (part === 'receiver') {
         place = '沖の受電翼'; effect = after.receiver === 'none' ? '海上の受電翼は配置から外れました。' : `海上の受電翼は${after.receiver === 'small' ? '小さな' : '大きな'}配置になりました。`;
-      } else if (before.flywheel !== after.flywheel) {
+      } else if (part === 'flywheel') {
         place = 'フジテレビ前・蓄電環'; effect = after.flywheel ? '劇場の前に、独立した蓄電環が加わりました。' : '劇場の前の蓄電環は配置から外れました。';
       } else {
         place = '沖のエネルギー島'; effect = after.island ? '沖に、原子力施設を置く島と検修橋が加わりました。' : '沖のエネルギー島と検修橋は配置から外れました。';
@@ -224,7 +231,7 @@ const row = (term: string, value: string) => { const r = el('div', 'causal-row')
 /** `?survey` mode: the survey server is the only source of the atmosphere, the change sites and the causal panel. */
 export function startSurveyAtmosphere(
   url: string,
-  apply: (kind: SurveyEventKind, view: CityView) => CarrierChange[] | void,
+  apply: (kind: SurveyEventKind, view: CityView, displayMs: number) => CarrierChange[] | void,
   onDisplayMode?: (mode: DisplayMode) => void,
 ) {
   document.body.dataset.mode = 'survey';
@@ -258,7 +265,7 @@ export function startSurveyAtmosphere(
     if (kind !== 'city-state-snapshot' && !supersedes(current, view, kind)) return;
     const previous = current;
     current = view;
-    const changes = apply(kind, view);
+    const changes = apply(kind, view, displayMs);
     clearTimeout(reasonTimer);
     if (isExhibitionView(view)) {
       panel.classList.add('resident-panel');

@@ -184,7 +184,7 @@ assert.equal(residentIdentity({ ...parsedV2.view.latestProposal!, stationId: 'B'
 // P3: personal preference and collective effect are independent, and require actual renderer evidence.
 const opposed = { ...v2Proposal, answers: [{ questionId: 'service-2127', optionId: 'human-machine', questionText: 'q', optionLabel: 'mixed' }],
   beforeLayout: { ...v2BeforeLayout, automatedPorts: 4 }, afterLayout: { ...v2AfterLayout, automatedPorts: 3 } };
-const causal = residentResult(opposed, [{ socketId: 'nw', focal: true, district: true }]);
+const causal = residentResult(opposed, [{ socketId: 'nw', focal: true, district: false }]);
 assert.ok(causal.preference.includes('自動の便利さ'));
 assert.ok(causal.effect.includes('人に相談できる窓口が増え'));
 assert.equal(causal.place, 'デックス西');

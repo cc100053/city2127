@@ -1,0 +1,38 @@
+{
+  "checks": [
+    {
+      "check": "actual TCP disconnect + reconnect cut hero",
+      "pass": true
+    },
+    {
+      "check": "actual reset cuts active hold",
+      "pass": true
+    },
+    {
+      "check": "5000ms catch-up stays hero, reason immediate (real-view wire fixture)",
+      "pass": true
+    },
+    {
+      "check": "DEV meters age preview and no first-frame interruption jump",
+      "pass": true
+    },
+    {
+      "check": "DEV reduced-motion toggle cancels immediately",
+      "pass": true
+    },
+    {
+      "check": "legacy v1 snapshot hero",
+      "pass": true
+    },
+    {
+      "check": "standalone shot query loads neutral exhibition carriers",
+      "pass": true
+    },
+    {
+      "check": "standalone hero",
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "browser": "156.0.8078.48"
+}

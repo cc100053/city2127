@@ -1,21 +1,21 @@
 # headline-camera — 近鏡跟住 headline 變化
 
-- Owner: cc100053（產品決策）；實作由 owner 指派嘅第二個 agent
-- Status: PLANNED（執行計劃已寫好，未開始實作）
+- Owner: cc100053（產品決策）；實作 Codex worker `01a17b81-4af3-7bf3-9512-a451a5198d53`
+- Status: REVIEW_READY — implementation and local software checks complete; main merge requires owner approval
 - Branch: `feat/headline-camera`
 - Base commit: `00c0273`（main：ladder 整合同 main CI 記錄之後）
-- Last verified commit: NONE
+- Last verified commit: validated working tree; exact code commit recorded after commit below
 - Remote availability: `origin/feat/headline-camera`（只有呢份計劃）
 
 ## Session Git state
 
 接手 agent 開工時自己填，唔好沿用寫計劃時嘅狀態。
 
-- Session starting branch and HEAD:
-- Last fetched origin/main commit:
-- Local changes present at session start:
-- Upstream integration status:
-- Pending Git conflicts or synchronization blockers:
+- Session starting branch and HEAD: `feat/headline-camera` / `bdb22465d34eb1aa7ebc0175ce067d581c7b7495` (independent clone `.task-relay/headline-camera/checkout`)
+- Last fetched origin/main commit: `00c02737650008a450bd8f08e1a491ad023c77d2`; fetch succeeded (initial sandbox DNS failure recovered with approved network access)
+- Local changes present at session start: none; source checkout and its unrelated untracked files untouched
+- Upstream integration status: branch matches `origin/feat/headline-camera` (0/0), main baseline is its parent; no pull/merge/rebase needed
+- Pending Git conflicts or synchronization blockers: none
 
 ## 背景（冇睇過之前對話都要讀）
 
@@ -53,13 +53,13 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 冇 headline 嘅結果（冇格變、冇能源變化）全程留喺 hero。
 
 完成條件：
-- [ ] 一張鏡頭清單（shot list）。每個 site 有 focal 同 district 兩個 pose，每個能源部件一個 pose。清單係常數表，DEV 可以逐個跳去睇。
-- [ ] 揀 shot、計時間線嘅都係純函數，並有測試（見「測試」）。
-- [ ] 以下情況全部即時 cut 返 hero，唔播近鏡：snapshot、reset、Undo、reconnect、`prefers-reduced-motion`、legacy v1、standalone 同各 DEV review 模式。
-- [ ] 鏡頭到嘅地方同結果卡「街の画面：…」講嘅地點一致。
-- [ ] Root `npm test`、`npm run build`、`git diff --check` 通過；survey 冇改就唔使跑。
-- [ ] 用 scratch `survey dev:auto` 做 browser check，每個 shot 至少一張截圖，並記錄 hero 同近鏡嘅 `data-fps`。
-- [ ] 文件同步（見「文件」），push 分支；**merge main 之前問 owner**。
+- [x] 一張鏡頭清單（shot list）。每個 site 有 focal 同 district 兩個 pose，每個能源部件一個 pose。清單係常數表，DEV 可以逐個跳去睇。
+- [x] 揀 shot、計時間線嘅都係純函數，並有測試（見「測試」）。
+- [x] 以下情況全部即時 cut 返 hero，唔播近鏡：snapshot、reset、Undo、reconnect、`prefers-reduced-motion`、legacy v1、standalone 同各 DEV review 模式。
+- [x] 鏡頭到嘅地方同結果卡「街の画面：…」講嘅地點一致。
+- [x] Root `npm test`、`npm run build`、`git diff --check` 通過；survey 冇改就唔使跑。
+- [x] 用 scratch `survey dev:auto` 做 browser check，每個 shot 至少一張截圖，並記錄 hero 同近鏡嘅 `data-fps`。
+- [ ] 文件同步完成；feature push 記錄待下方補充，**merge main 之前問 owner**。
 
 ## 預設設計（owner 未另外講就照做）
 
@@ -211,7 +211,13 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 
 ## Actual validation results
 
-- Verification status: NOT RUN
+- Verification status: PASS (local software); coordinator review / owner merge approval pending.
+- Root `npm test`, `npm run build`, production DEV exclusion, `git diff --check`: PASS. Source/new-file exact-diff self-review complete; no survey/module-swap source change.
+- [Evidence / reproducible commands / FPS table](../../artifacts/headline-camera/README.md), [manifest](../../artifacts/headline-camera/final/manifest.json), [live](../../artifacts/headline-camera/final/live.json), [recovery](../../artifacts/headline-camera/final/recovery.json).
+- 14 static images (hero +13 shots), 14 settled live hold images (13 shots +water garden after Undo), original hashes verified. Development Mac macOS27.0.1 arm64, Chrome156.0.8078.48 headless/ANGLE Metal Apple M6, 1920×1080 DPR1 default/hour12. Hero60.1FPS/998 calls; static59.9–60.1FPS/455–950 calls; actual live59.9–60.1FPS/599–1186 calls. Short canvas cadence only, no sustained/hardware claim.
+- Live no-change/reload/Undo/reduced motion/A-B PASS; submissions1006ms apart, ordered display, second own headline. Eight extra real TCP/reset/DEV/legacy/standalone/catch-up checks PASS; shortened-slot uses real-view wire fixture, clearly separated from real server checks.
+- Page errors/console errors0. System font fallback explicit. All owned browsers/services closed; Vite5184 and dev:auto8798 confirmed free.
+- Main unchanged; feature push/checkpoint will be recorded below. No main CI claim.
 - Integrated commit and checks: NOT INTEGRATED
 
 ## Known issues and blockers
@@ -228,10 +234,25 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 
 ## Next expected step
 
-1. 第二個 agent 按「實作步驟」1–9 完成，然後問 owner 批准 merge。
+1. Coordinator 檢查 pushed branch、exact diff 與原圖／manifest；通過後向 owner 取得 merge main 批准。Worker 已釋放 source ownership，等待具體修正要求。
 2. 之後另開打磨任務，以 shot list 做基準，按出現頻率排次序：
    - 先打磨各 site 第一格嘅 focal 近鏡（ne → sw → se → nw）。
    - 再打磨 district（±2）。
    - 然後係 ±3 加配對設施。
    - 最後係能源部件。
    - 每個近鏡一個細任務；每個都要用 `?shot=` 截圖做前後比較，並量 FPS。
+
+## Implementation decisions — 2026-10-27
+
+- Pure helper `energyChangedPart` remains root-side in surveyAtmosphere, avoiding shared protocol/server changes. Result card now uses district place/effect when both flags change, matching the specified shot priority.
+- Exact authored timing wins over contradictory prose: reason at 3 s occurs during fly-in; hold starts at 4.12 s and covers transition completion at 5.62 s.
+- Current E4 freezes the climate axis. Four site live checks use the preserved v3 question set in a separate fresh scratch server; current v4 scratch checks cover energy and recovery. This does not change exhibition questions.
+- New class tests cover selection/removal/location agreement, stage boundaries, controls, current-pose interruption, cancellation and catch-up. No new dependencies/model/material changes.
+
+- Tall focal sites are actually scaled to about 96 m (nw) / 138 m (se), so the initial 80–160 m distance / 40–90 m height hints cropped their upper bodies. Authored focal poses retreat/raise to retain the full tower; the 40–450 m invariant remains. SW uses a lower view beneath the existing sky bridge. District SW aims at the shore rather than the obstructed inland focal. No geometry moved.
+- Fly-out uses the actual callback `displayMs` (including the allowed <100 ms delivery jitter), so ambient-card switch and return start share the same deadline. The default pure timeline remains 10–12 s.
+
+- Browser recovery found that the initial DEV media-change listener did not reliably clear a held review camera. The final render loop reads one retained MediaQueryList before camera update and cancels an active shot in the next frame; actual reduced-motion toggle now passes. Live survey also retains its existing queue/model recovery handling.
+- First live images were taken at 4.9 s (early hold, before the 5.62 s geometry completion). They are retained locally in `artifacts/headline-camera/drafts/early-hold/`; final live captures move to 8.3 s so geometry is settled and the latest 120-frame FPS window lies fully inside hold.
+
+- Bare `?shot=nw:focal` now initializes neutral exhibition carriers through the existing DEV Meter snapshot helper; explicit energy/housing/scale/street/civic review priority is preserved. `?energy=mixed&shot=energy:ring` remains the explicit energy-composition preview. The final added recovery check covers the bare shot query.

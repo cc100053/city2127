@@ -1,0 +1,300 @@
+{
+  "browser": "156.0.8078.48",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "quality": "default",
+  "observations": [
+    {
+      "check": "live hold",
+      "id": "nw:focal",
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "23.74",
+        "fps": "60.0",
+        "drawCalls": "777",
+        "triangles": "15724550",
+        "geometries": "438",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-high\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"ready\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"high\",\"targetAutomatedPorts\":6,\"visibleAutomatedPorts\":6,\"targetHumanCounters\":0,\"visibleHumanCounters\":0}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1.298807999999524,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "place": "街の画面：デックス西"
+    },
+    {
+      "check": "live hold",
+      "id": "nw:district",
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "35.73",
+        "fps": "60.0",
+        "drawCalls": "871",
+        "triangles": "15925158",
+        "geometries": "438",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-high\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"ready\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":1,\"visibleDronePorts\":10,\"hybridBays\":5,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"high\",\"targetAutomatedPorts\":6,\"visibleAutomatedPorts\":6,\"targetHumanCounters\":0,\"visibleHumanCounters\":0}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":2.2587599999999997,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "place": "街の画面：水辺のサービス拠点・移動ルート"
+    },
+    {
+      "check": "live hold",
+      "id": "ne:focal",
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "30.83",
+        "fps": "60.0",
+        "drawCalls": "1186",
+        "triangles": "20346078",
+        "geometries": "428",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"high\",\"targetTreeCount\":12,\"visibleTreeCount\":12,\"targetPlantedFraction\":0.8,\"plantedFraction\":0.8,\"targetCoolingFins\":0,\"visibleCoolingFins\":0,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1.8661199999999996,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "place": "街の画面：お台場海浜公園"
+    },
+    {
+      "check": "live hold",
+      "id": "ne:district",
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "42.83",
+        "fps": "60.0",
+        "drawCalls": "910",
+        "triangles": "16134918",
+        "geometries": "428",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"high\",\"targetTreeCount\":12,\"visibleTreeCount\":12,\"targetPlantedFraction\":0.8,\"plantedFraction\":0.8,\"targetCoolingFins\":0,\"visibleCoolingFins\":0,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.75,\"visibleCanopies\":12,\"visibleSails\":5,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":18,\"visibleRoofCrowns\":35,\"hybridBays\":6,\"hybridRoofs\":12,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":2.8140433674412786,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "place": "街の画面：海辺の歩道・屋根・建物の外壁"
+    },
+    {
+      "check": "live hold",
+      "id": "sw:focal",
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "30.14",
+        "fps": "60.0",
+        "drawCalls": "608",
+        "triangles": "14998274",
+        "geometries": "428",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-high\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"high\",\"targetSharedSeats\":8,\"visibleSharedSeats\":8,\"targetScreenedSeats\":0,\"visibleScreenedSeats\":0}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1.8110720000004767,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "place": "街の画面：アクアシティ南"
+    },
+    {
+      "check": "live hold",
+      "id": "sw:district",
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "42.14",
+        "fps": "60.0",
+        "drawCalls": "898",
+        "triangles": "16123602",
+        "geometries": "428",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-high\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":72,\"targetSharing\":0.75,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":0,\"hybridCourts\":1,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":7,\"visibleOpenRooms\":5,\"visiblePrivateRooms\":1},\"commonsPlaza\":{\"band\":\"high\",\"targetSharedSeats\":8,\"visibleSharedSeats\":8,\"targetScreenedSeats\":0,\"visibleScreenedSeats\":0}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":2.7642128681604383,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "place": "街の画面：水辺の居場所・庭の広場"
+    },
+    {
+      "check": "live hold",
+      "id": "se:focal",
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "25.11",
+        "fps": "60.1",
+        "drawCalls": "708",
+        "triangles": "15650418",
+        "geometries": "458",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-high\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"high\",\"targetFunctionModules\":6,\"activeFunctionModules\":6,\"transitioning\":false,\"representation\":\"vertical-tower\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1.4085039999985702,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "place": "街の画面：フジテレビ東"
+    },
+    {
+      "check": "live hold",
+      "id": "se:district",
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "37.11",
+        "fps": "60.0",
+        "drawCalls": "745",
+        "triangles": "15680810",
+        "geometries": "458",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-high\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.75,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":7,\"visiblePods\":8,\"midRises\":0,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"high\",\"targetFunctionModules\":6,\"activeFunctionModules\":6,\"transitioning\":false,\"representation\":\"vertical-tower\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":2.3685920000004765,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "place": "街の画面：街に点在する建物"
+    },
+    {
+      "check": "reload snapshot hero",
+      "pass": true
+    },
+    {
+      "check": "reduced motion hero",
+      "pass": true
+    },
+    {
+      "check": "no headline hero",
+      "pass": true
+    },
+    {
+      "check": "live hold",
+      "id": "energy:garden",
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "36.19",
+        "fps": "60.1",
+        "drawCalls": "859",
+        "triangles": "15801898",
+        "geometries": "445",
+        "textures": "33",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":1,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":2.2955679999995233,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "place": "街の画面：海辺の蓄電庭園"
+    },
+    {
+      "check": "Undo cuts hero",
+      "pass": true
+    },
+    {
+      "check": "live hold",
+      "id": "energy:garden",
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "44.19",
+        "fps": "60.0",
+        "drawCalls": "863",
+        "triangles": "15803658",
+        "geometries": "446",
+        "textures": "33",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":1,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":2.9091355460000003,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "place": "街の画面：海辺の蓄電庭園"
+    },
+    {
+      "check": "live hold",
+      "id": "energy:garden2",
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "58.19",
+        "fps": "60.0",
+        "drawCalls": "711",
+        "triangles": "15647208",
+        "geometries": "446",
+        "textures": "33",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":2,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":3.5590002546250004,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":0.72,\"opacity\":1},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "place": "街の画面：海辺の蓄電庭園"
+    },
+    {
+      "check": "live hold",
+      "id": "energy:ring",
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "40.98",
+        "fps": "60.0",
+        "drawCalls": "709",
+        "triangles": "15488876",
+        "geometries": "441",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":true,\"island\":false},\"rotorAngle\":2.6770903976640814,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "place": "街の画面：フジテレビ前・蓄電環"
+    },
+    {
+      "check": "live hold",
+      "id": "energy:wing",
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "33.73",
+        "fps": "59.9",
+        "drawCalls": "599",
+        "triangles": "10850506",
+        "geometries": "439",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"small\",\"flywheel\":false,\"island\":false},\"rotorAngle\":2.098263999998569,\"parts\":[{\"visible\":true,\"scaleY\":0.65,\"opacity\":1},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "place": "街の画面：沖の受電翼"
+    },
+    {
+      "check": "live hold",
+      "id": "energy:island",
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "36.48",
+        "fps": "60.1",
+        "drawCalls": "701",
+        "triangles": "15987032",
+        "geometries": "441",
+        "textures": "32",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":true},\"rotorAngle\":2.3187360000014303,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":true,\"scaleY\":1,\"opacity\":1},{\"visible\":true,\"scaleY\":1,\"opacity\":1}]}"
+      },
+      "place": "街の画面：沖のエネルギー島"
+    },
+    {
+      "check": "A/B queue and second headline",
+      "commitGapMs": 1006,
+      "boundaryPose": {
+        "position": [
+          -118.59632836828682,
+          154.91433555480248,
+          -479.7505243696424
+        ],
+        "target": [
+          37.37902103743869,
+          47.246468548263614,
+          -292.137063112316
+        ]
+      },
+      "pass": true
+    },
+    {
+      "check": "motion toggled during hold",
+      "pass": true
+    }
+  ],
+  "errors": []
+}

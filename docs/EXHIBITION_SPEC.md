@@ -78,6 +78,8 @@ P10 配對要兩個 site 同一邊都到 ±3。環境軸 E4 後凍結喺 mixed�
 
 Live headline（[pickHeadline](../survey/src/shared/cityView.ts)）：新到達最高格嘅 site，否則載體變化最多嘅 site，否則能源；只有 headline site 有亮 pulse／marker 同結果卡，其他變化（例如同時嘅能源門檻）靜靜過渡。
 
+Headline 近鏡（2026-10-27）：live 結果先在 hero 播完 2.62 秒 vote journey，再用 1.5 秒推近 headline，與原本 3 秒場景過渡重疊，沒有延遲過渡。4.12–10 秒停留，10 秒與 ambient 卡同步開始用 2 秒返回 hero；原因文字仍在第 3 秒出現。八個 site shot（四站各 focal／district）及五個能源 shot 用常數表，保留 hero 方向及海／地標定位；focal 與 district 同時改以 district 為準。能源鏡頭與結果卡共用部件優先次序，移除設備亦看原位置。新結果從現有位置先平滑回 hero；snapshot／reset／Undo／reconnect／reduced motion／legacy／無 headline／追趕中的結果立即 hero。普通 standalone 及其他 DEV review 不自動播放；DEV 可用 `?shot=` 逐鏡檢查。近鏡的模型／材質打磨及真人閱讀／展示硬件驗收另作任務。
+
 `ladderLayout(tiers, energy)` 是唯一權威映射；focal 數值由 tier 符號決定（`t`= 1／.5／0 對應 >0／0／<0）：
 
 | 參數 | 公式 | tier 0 |
