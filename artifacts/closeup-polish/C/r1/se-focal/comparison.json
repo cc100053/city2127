@@ -1,0 +1,112 @@
+{
+  "mode": "compare",
+  "commit": "ca22a92769e596b3c168ae0579aadef4b5420d9d",
+  "sourceDiff": "diff --git a/src/headlineCamera.ts b/src/headlineCamera.ts\nindex 343d734..0a511a8 100644\n--- a/src/headlineCamera.ts\n+++ b/src/headlineCamera.ts\n@@ -12,7 +12,7 @@ export const SHOTS: Record<ShotId, Pose> = {\n   'nw:focal': { position: [-105, 150, -475], target: [40, 48, -300] },\n   'ne:focal': { position: [-280, 85, -245], target: [-210, 14, -135] },\n   'sw:focal': { position: [-165, 45, 210], target: [-105, 28, 60] },\n-  'se:focal': { position: [-20, 245, -240], target: [175, 65, -45] },\n+  'se:focal': { position: [160, 210, -335], target: [175, 60, -45] },\n   'nw:district': { position: [-180, 180, -470], target: [10, 28, -210] },\n   'ne:district': { position: [-390, 270, -310], target: [-250, 0, -170] },\n   'sw:district': { position: [-160, 420, -400], target: [-120, 5, -260] },\n",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.005574289705299834,
+      "rect": {
+        "x": 873,
+        "y": 333,
+        "width": 166,
+        "height": 463
+      },
+      "pass": false
+    },
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.040059236961783054,
+      "rect": {
+        "x": 868,
+        "y": 189,
+        "width": 175,
+        "height": 603
+      },
+      "pass": false
+    },
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.04102547158347139,
+      "rect": {
+        "x": 868,
+        "y": 189,
+        "width": 175,
+        "height": 607
+      },
+      "pass": false
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.004279311801051663,
+      "rect": {
+        "x": 873,
+        "y": 333,
+        "width": 166,
+        "height": 463
+      },
+      "pass": false
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.034630755342490785,
+      "rect": {
+        "x": 868,
+        "y": 189,
+        "width": 175,
+        "height": 603
+      },
+      "pass": false
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.035304036166910475,
+      "rect": {
+        "x": 868,
+        "y": 189,
+        "width": 175,
+        "height": 607
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}

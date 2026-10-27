@@ -1,0 +1,10 @@
+{
+  "sha256": {
+    "src/headlineCamera.ts": "4373dc349c1556a55c1f66f03e84aa057a787cc07517f75a5418dcdf37cb9db3",
+    "src/siteBuilders/concentrationTower.ts": "12028c1fb86e5a9de9d5df8b6840c94e88c82cbbbfe93762a8ce747972936e20",
+    "src/districtMeters.ts": "aa2f5ec9d0e00651fd7d8a7d810fbf8d9743f07734eea2e9bc2915cae5824a59",
+    "src/energyPrototype.ts": "66ff93259e78daade46d1081bf33fc34bb5fb1c355ec94a2ca76a630a8743642",
+    "src/devShotFrame.ts": "61558ef4610b26248ca69f4aa554bf4777cedff008e020e122ed41a77f0ff28c",
+    "artifacts/closeup-polish/capture.mjs": "a968b4e1b8d9713232d05ea6c5ec9229a989fc18ce22a46039ea89c744d434ff"
+  }
+}

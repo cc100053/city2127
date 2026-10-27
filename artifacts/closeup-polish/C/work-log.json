@@ -1,0 +1,29 @@
+{
+  "task": "closeup-polish",
+  "batch": "C-1",
+  "dispatch": "closeup-polish-C-1-r13",
+  "owner": "01a17f7d-839f-74d0-8660-22e9c1ec1435",
+  "baseline": "ca22a92769e596b3c168ae0579aadef4b5420d9d",
+  "checkout": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout",
+  "fetch": "PASS",
+  "upstream": "0/0",
+  "vsOriginMain": "10/0",
+  "main": "3d0f40e",
+  "codegraph": false,
+  "scope": [
+    "concentrationTower.ts",
+    "ConcentrationDistrict in districtMeters.ts",
+    "ring in energyPrototype.ts",
+    "three C SHOTS poses",
+    "affected tests/capture support/docs/evidence"
+  ],
+  "preserve": [
+    "S0/A/B evidence and pending art decisions",
+    "A/B/D source outside C",
+    "main",
+    "survey protocol/counts/ladder/timing"
+  ],
+  "dreamLoop": "Not used; local targets from ART/master taste and original screenshots.",
+  "status": "r1 se:focal pose-only complete matrix capture running",
+  "startedUTC": "2026-10-27T22:34:03.606381+00:00"
+}

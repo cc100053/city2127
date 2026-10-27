@@ -1,7 +1,7 @@
 # closeup-polish — Headline 近鏡逐個打磨
 
 - Owner: cc100053（產品／審美最終批准）；實作由一個 long session 負責，開工時喺下面「進度」記低 session 名。
-- Status: S0 INTEGRATED（98/98，量度基準已接受）；A REVIEW_READY（三輪完成但gate仍FAIL）；B REVIEW_READY（worker `01a17e8c-3c8c-77f3-afbb-6f7d62abad14`；三輪完成，FAIL保留）；C/D/Z未開始。
+- Status: S0 INTEGRATED（98/98，量度基準已接受）；A REVIEW_READY（三輪完成但gate仍FAIL）；B REVIEW_READY（worker `01a17e8c-3c8c-77f3-afbb-6f7d62abad14`；三輪完成，FAIL保留）；C RUNNING（worker `01a17f7d-839f-74d0-8660-22e9c1ec1435`，dispatch `closeup-polish-C-1-r13`）；D/Z未開始。
 - Branch: `feat/closeup-polish`（一條長分支，每個 sector 一個 checkpoint）
 - Base commit: `fdc4a0cbbbc352b41c15850f2a846845d7975de1`（fetch verified main，包含完整 S0 標準）
 - Last verified commit: B runtime `74d6c2b`，root npm test/build及八項B live PASS；視覺／效能gate仍FAIL。最終完整證據checkpoint見`result-B-1.json`；S0接受main `3d0f40e`保持不動。
@@ -167,7 +167,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 | S0 基準 | INTEGRATED；量度基準接受，非美術接受 | `19e9ae2`；[完整基準](../../artifacts/closeup-polish/S0/README.md) | coordinator已審查；冇美術改動 | `c802bba` |
 | A 海浜公園 | REVIEW_READY：worker `01a17e2a-4c38-7422-8d68-33782c0367f5`，dispatch `closeup-polish-A-1-r8`；三輪各24狀態完成 | runtime `b7d5861`；[完整review](../../artifacts/closeup-polish/A/REVIEW.md)，最終SHA見result-A-1.json | pending；A3/A4/V失敗保留 | — |
 | B アクアシティ南 | REVIEW_READY：worker `01a17e8c`，三輪各18狀態；A3/A4、focal A5/V及V3仍FAIL | runtime `74d6c2b`；[完整review](../../artifacts/closeup-polish/B/REVIEW.md)，final SHA見result-B-1.json | pending；建議暫不接受r3 focal退步候選 | — |
-| C フジテレビ東 | PLANNED | — | — | — |
+| C フジテレビ東 | RUNNING：指定persistent clone唯一writer，focal→district含配對→ring；每shot最多三輪 | baseline `ca22a92`；[本批紀錄](../../artifacts/closeup-polish/C/work-log.json) | pending | — |
 | D デックス西＋沖 | PLANNED | — | — | — |
 | Z 全城回歸 | PLANNED | — | — | — |
 
@@ -235,3 +235,7 @@ Final平均90.95–104.47FPS，vsync59.9–60.2，各shot達S0的95%及mean／in
 B由clean `def2f28`續同一長branch；fresh fetch upstream0/0，未pull/merge main。r1完整量度後實際provider limit中斷checkpoint，r10同owner復原，r1 source／原圖hash核對一致，沒有重跑或覆寫。Sandbox DNS/listen拒絕的原log及成功retry保存；r1/r2/runtime三個checkpoint均push。
 
 r3完整18狀態、16 A4、6組×2效能窗，三輪合計54狀態／108 JPEG，18 final及2 live原圖已檢視。[報告](../../artifacts/closeup-polish/B/REVIEW.md)：A1/A2 16 PASS＋2 N/A；A3 16 FAIL（0/9）；A4 0/16；A5 focal6 FAIL、其餘12 PASS；A6 18 PASS。V3全部FAIL，focal V1/V2/V5各6 FAIL且較r2退步。Root test/build/diff、物理／入口／oculus checks及八項scratch live PASS；精確3s是node證據，browser只證實中間easing及恢復。全部實際FPS、版本差異、原圖及limits見report；所有owned服務結束、5194/52505 free。未改A park/energy及非SharingDistrict source；無新依賴／素材／部署。README啟動及AGENTS產品／工作流沒有改變，按sync表不改其文案。
+
+## C preflight / focal r1 — 2026-10-28
+
+Worker `01a17f7d-839f-74d0-8660-22e9c1ec1435`在指定clone接手；HEAD ca22a92769e596b3c168ae0579aadef4b5420d9d，clean、fetch PASS、upstream0/0、vs origin/main10/0；沒有.codegraph。A/B writer已釋放，pending art及全部S0/A/B source/evidence保留，不merge main。以ART/mastertaste和實際原圖作局部目標，沒有使用dream-loop。r1只調SE focal pose，完整6狀態加hero雙take；前景大樓遮住主體，比S0退步，A1/A2不作美術接受依據。原圖與raw量度保存於C/r1/se-focal；未完成C最終驗證。

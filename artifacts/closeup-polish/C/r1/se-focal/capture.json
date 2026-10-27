@@ -1,0 +1,2938 @@
+{
+  "mode": "capture",
+  "commit": "ca22a92769e596b3c168ae0579aadef4b5420d9d",
+  "sourceDiff": "diff --git a/src/headlineCamera.ts b/src/headlineCamera.ts\nindex 343d734..0a511a8 100644\n--- a/src/headlineCamera.ts\n+++ b/src/headlineCamera.ts\n@@ -12,7 +12,7 @@ export const SHOTS: Record<ShotId, Pose> = {\n   'nw:focal': { position: [-105, 150, -475], target: [40, 48, -300] },\n   'ne:focal': { position: [-280, 85, -245], target: [-210, 14, -135] },\n   'sw:focal': { position: [-165, 45, 210], target: [-105, 28, 60] },\n-  'se:focal': { position: [-20, 245, -240], target: [175, 65, -45] },\n+  'se:focal': { position: [160, 210, -335], target: [175, 60, -45] },\n   'nw:district': { position: [-180, 180, -470], target: [10, 28, -210] },\n   'ne:district': { position: [-390, 270, -310], target: [-250, 0, -170] },\n   'sw:district': { position: [-160, 420, -400], target: [-120, 5, -260] },\n",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "se:focal",
+      "state": "-2",
+      "meters": "se:-2",
+      "hour": 12,
+      "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&meters=se%3A-2&shot=se%3Afocal",
+      "pose": {
+        "position": [
+          160,
+          210,
+          -335
+        ],
+        "target": [
+          175,
+          60,
+          -45
+        ]
+      },
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "60.0",
+        "drawCalls": "725",
+        "triangles": "15970034",
+        "geometries": "424",
+        "textures": "29",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-low\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"low\",\"targetFunctionModules\":2,\"activeFunctionModules\":2,\"transitioning\":false,\"representation\":\"pavilion-pair\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "frame": {
+        "id": "se:focal",
+        "subject": "survey-site-se",
+        "box": {
+          "left": 0.4549711435651579,
+          "right": 0.5409925399335722,
+          "top": 0.30872519053364,
+          "bottom": 0.7366705757439604
+        },
+        "reason": null,
+        "worldBounds": {
+          "min": [
+            157.9000005722046,
+            0.07500001788139343,
+            -62.09999942779541
+          ],
+          "max": [
+            192.0999994277954,
+            104.04000091552734,
+            -27.90000057220459
+          ]
+        },
+        "hits": 0,
+        "samples": [
+          {
+            "x": 0.49798184174936505,
+            "y": 0.5226978831388003,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 235.77957742805432
+          },
+          {
+            "x": 0.4635732832019993,
+            "y": 0.35151972905467205,
+            "hit": false,
+            "first": "surveyed-coastal-canopy",
+            "distance": 236.369375306077
+          },
+          {
+            "x": 0.5323904002967308,
+            "y": 0.35151972905467205,
+            "hit": false,
+            "first": "skyways",
+            "distance": 400.27393892997776
+          },
+          {
+            "x": 0.4635732832019993,
+            "y": 0.6938760372229285,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 247.8676594131567
+          },
+          {
+            "x": 0.5323904002967308,
+            "y": 0.6938760372229285,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 264.9207269679535
+          },
+          {
+            "x": 0.49798184174936505,
+            "y": 0.35151972905467205,
+            "hit": false,
+            "first": "skyways",
+            "distance": 375.95942643539297
+          },
+          {
+            "x": 0.49798184174936505,
+            "y": 0.6938760372229285,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 255.89783651826107
+          },
+          {
+            "x": 0.4635732832019993,
+            "y": 0.5226978831388003,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 228.94965788991502
+          },
+          {
+            "x": 0.5323904002967308,
+            "y": 0.5226978831388003,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 243.6452243399391
+          }
+        ]
+      },
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+      "errors": [],
+      "images": [
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/se-focal/se-focal__-2__h12__repeat1.jpg",
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/se-focal/se-focal__-2__h12.jpg"
+      ],
+      "takes": [
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&meters=se%3A-2&shot=se%3Afocal",
+          "pose": {
+            "position": [
+              160,
+              210,
+              -335
+            ],
+            "target": [
+              175,
+              60,
+              -45
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "12.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.2",
+            "drawCalls": "725",
+            "triangles": "15970034",
+            "geometries": "424",
+            "textures": "29",
+            "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-low\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"low\",\"targetFunctionModules\":2,\"activeFunctionModules\":2,\"transitioning\":false,\"representation\":\"pavilion-pair\"}}}",
+            "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+          },
+          "frame": {
+            "id": "se:focal",
+            "subject": "survey-site-se",
+            "box": {
+              "left": 0.4549711435651579,
+              "right": 0.5409925399335722,
+              "top": 0.30872519053364,
+              "bottom": 0.7366705757439604
+            },
+            "reason": null,
+            "worldBounds": {
+              "min": [
+                157.9000005722046,
+                0.07500001788139343,
+                -62.09999942779541
+              ],
+              "max": [
+                192.0999994277954,
+                104.04000091552734,
+                -27.90000057220459
+              ]
+            },
+            "hits": 0,
+            "samples": [
+              {
+                "x": 0.49798184174936505,
+                "y": 0.5226978831388003,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 235.77957742805432
+              },
+              {
+                "x": 0.4635732832019993,
+                "y": 0.35151972905467205,
+                "hit": false,
+                "first": "surveyed-coastal-canopy",
+                "distance": 236.369375306077
+              },
+              {
+                "x": 0.5323904002967308,
+                "y": 0.35151972905467205,
+                "hit": false,
+                "first": "skyways",
+                "distance": 400.27393892997776
+              },
+              {
+                "x": 0.4635732832019993,
+                "y": 0.6938760372229285,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 247.8676594131567
+              },
+              {
+                "x": 0.5323904002967308,
+                "y": 0.6938760372229285,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 264.9207269679535
+              },
+              {
+                "x": 0.49798184174936505,
+                "y": 0.35151972905467205,
+                "hit": false,
+                "first": "skyways",
+                "distance": 375.95942643539297
+              },
+              {
+                "x": 0.49798184174936505,
+                "y": 0.6938760372229285,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 255.89783651826107
+              },
+              {
+                "x": 0.4635732832019993,
+                "y": 0.5226978831388003,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 228.94965788991502
+              },
+              {
+                "x": 0.5323904002967308,
+                "y": 0.5226978831388003,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 243.6452243399391
+              }
+            ]
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        },
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&meters=se%3A-2&shot=se%3Afocal",
+          "pose": {
+            "position": [
+              160,
+              210,
+              -335
+            ],
+            "target": [
+              175,
+              60,
+              -45
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "12.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "725",
+            "triangles": "15970034",
+            "geometries": "424",
+            "textures": "29",
+            "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-low\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"low\",\"targetFunctionModules\":2,\"activeFunctionModules\":2,\"transitioning\":false,\"representation\":\"pavilion-pair\"}}}",
+            "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+          },
+          "frame": {
+            "id": "se:focal",
+            "subject": "survey-site-se",
+            "box": {
+              "left": 0.4549711435651579,
+              "right": 0.5409925399335722,
+              "top": 0.30872519053364,
+              "bottom": 0.7366705757439604
+            },
+            "reason": null,
+            "worldBounds": {
+              "min": [
+                157.9000005722046,
+                0.07500001788139343,
+                -62.09999942779541
+              ],
+              "max": [
+                192.0999994277954,
+                104.04000091552734,
+                -27.90000057220459
+              ]
+            },
+            "hits": 0,
+            "samples": [
+              {
+                "x": 0.49798184174936505,
+                "y": 0.5226978831388003,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 235.77957742805432
+              },
+              {
+                "x": 0.4635732832019993,
+                "y": 0.35151972905467205,
+                "hit": false,
+                "first": "surveyed-coastal-canopy",
+                "distance": 236.369375306077
+              },
+              {
+                "x": 0.5323904002967308,
+                "y": 0.35151972905467205,
+                "hit": false,
+                "first": "skyways",
+                "distance": 400.27393892997776
+              },
+              {
+                "x": 0.4635732832019993,
+                "y": 0.6938760372229285,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 247.8676594131567
+              },
+              {
+                "x": 0.5323904002967308,
+                "y": 0.6938760372229285,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 264.9207269679535
+              },
+              {
+                "x": 0.49798184174936505,
+                "y": 0.35151972905467205,
+                "hit": false,
+                "first": "skyways",
+                "distance": 375.95942643539297
+              },
+              {
+                "x": 0.49798184174936505,
+                "y": 0.6938760372229285,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 255.89783651826107
+              },
+              {
+                "x": 0.4635732832019993,
+                "y": 0.5226978831388003,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 228.94965788991502
+              },
+              {
+                "x": 0.5323904002967308,
+                "y": 0.5226978831388003,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 243.6452243399391
+              }
+            ]
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        }
+      ],
+      "reproducibility": {
+        "mad": 0.004072675855321553,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.08602139636841433,
+        "height": 0.42794538521032044,
+        "center": {
+          "x": 0.49798184174936505,
+          "y": 0.5226978831388003
+        },
+        "cardOverlap": 0
+      },
+      "A6": true,
+      "complete": true,
+      "A4": [
+        {
+          "id": "se:focal",
+          "hour": 12,
+          "from": "-2",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.005574289705299834,
+          "rect": {
+            "x": 873,
+            "y": 333,
+            "width": 166,
+            "height": 463
+          },
+          "pass": false
+        },
+        {
+          "id": "se:focal",
+          "hour": 12,
+          "from": "-2",
+          "to": "2",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.04102547158347139,
+          "rect": {
+            "x": 868,
+            "y": 189,
+            "width": 175,
+            "height": 607
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "vsync": {
+          "fps": 60,
+          "pass": true
+        },
+        "uncappedReference": {
+          "state": "2",
+          "meanFps": 96.15670511870869,
+          "drawCalls": [
+            751,
+            751
+          ],
+          "meanDrawCalls": 751
+        },
+        "relative": "S0 establishes reference; 95% / +10% comparisons apply to later rounds"
+      }
+    },
+    {
+      "id": "se:focal",
+      "state": "-2",
+      "meters": "se:-2",
+      "hour": 22,
+      "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&meters=se%3A-2&shot=se%3Afocal",
+      "pose": {
+        "position": [
+          160,
+          210,
+          -335
+        ],
+        "target": [
+          175,
+          60,
+          -45
+        ]
+      },
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "22.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "60.0",
+        "drawCalls": "725",
+        "triangles": "15970034",
+        "geometries": "425",
+        "textures": "29",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-low\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"low\",\"targetFunctionModules\":2,\"activeFunctionModules\":2,\"transitioning\":false,\"representation\":\"pavilion-pair\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "frame": {
+        "id": "se:focal",
+        "subject": "survey-site-se",
+        "box": {
+          "left": 0.4549711435651579,
+          "right": 0.5409925399335722,
+          "top": 0.30872519053364,
+          "bottom": 0.7366705757439604
+        },
+        "reason": null,
+        "worldBounds": {
+          "min": [
+            157.9000005722046,
+            0.07500001788139343,
+            -62.09999942779541
+          ],
+          "max": [
+            192.0999994277954,
+            104.04000091552734,
+            -27.90000057220459
+          ]
+        },
+        "hits": 0,
+        "samples": [
+          {
+            "x": 0.49798184174936505,
+            "y": 0.5226978831388003,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 235.77957742805432
+          },
+          {
+            "x": 0.4635732832019993,
+            "y": 0.35151972905467205,
+            "hit": false,
+            "first": "surveyed-coastal-canopy",
+            "distance": 236.369375306077
+          },
+          {
+            "x": 0.5323904002967308,
+            "y": 0.35151972905467205,
+            "hit": false,
+            "first": "skyways",
+            "distance": 400.27393892997776
+          },
+          {
+            "x": 0.4635732832019993,
+            "y": 0.6938760372229285,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 247.8676594131567
+          },
+          {
+            "x": 0.5323904002967308,
+            "y": 0.6938760372229285,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 264.9207269679535
+          },
+          {
+            "x": 0.49798184174936505,
+            "y": 0.35151972905467205,
+            "hit": false,
+            "first": "skyways",
+            "distance": 375.95942643539297
+          },
+          {
+            "x": 0.49798184174936505,
+            "y": 0.6938760372229285,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 255.89783651826107
+          },
+          {
+            "x": 0.4635732832019993,
+            "y": 0.5226978831388003,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 228.94965788991502
+          },
+          {
+            "x": 0.5323904002967308,
+            "y": 0.5226978831388003,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 243.6452243399391
+          }
+        ]
+      },
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+      "errors": [],
+      "images": [
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/se-focal/se-focal__-2__h22__repeat1.jpg",
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/se-focal/se-focal__-2__h22.jpg"
+      ],
+      "takes": [
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&meters=se%3A-2&shot=se%3Afocal",
+          "pose": {
+            "position": [
+              160,
+              210,
+              -335
+            ],
+            "target": [
+              175,
+              60,
+              -45
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "22.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "725",
+            "triangles": "15970034",
+            "geometries": "425",
+            "textures": "29",
+            "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-low\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"low\",\"targetFunctionModules\":2,\"activeFunctionModules\":2,\"transitioning\":false,\"representation\":\"pavilion-pair\"}}}",
+            "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+          },
+          "frame": {
+            "id": "se:focal",
+            "subject": "survey-site-se",
+            "box": {
+              "left": 0.4549711435651579,
+              "right": 0.5409925399335722,
+              "top": 0.30872519053364,
+              "bottom": 0.7366705757439604
+            },
+            "reason": null,
+            "worldBounds": {
+              "min": [
+                157.9000005722046,
+                0.07500001788139343,
+                -62.09999942779541
+              ],
+              "max": [
+                192.0999994277954,
+                104.04000091552734,
+                -27.90000057220459
+              ]
+            },
+            "hits": 0,
+            "samples": [
+              {
+                "x": 0.49798184174936505,
+                "y": 0.5226978831388003,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 235.77957742805432
+              },
+              {
+                "x": 0.4635732832019993,
+                "y": 0.35151972905467205,
+                "hit": false,
+                "first": "surveyed-coastal-canopy",
+                "distance": 236.369375306077
+              },
+              {
+                "x": 0.5323904002967308,
+                "y": 0.35151972905467205,
+                "hit": false,
+                "first": "skyways",
+                "distance": 400.27393892997776
+              },
+              {
+                "x": 0.4635732832019993,
+                "y": 0.6938760372229285,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 247.8676594131567
+              },
+              {
+                "x": 0.5323904002967308,
+                "y": 0.6938760372229285,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 264.9207269679535
+              },
+              {
+                "x": 0.49798184174936505,
+                "y": 0.35151972905467205,
+                "hit": false,
+                "first": "skyways",
+                "distance": 375.95942643539297
+              },
+              {
+                "x": 0.49798184174936505,
+                "y": 0.6938760372229285,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 255.89783651826107
+              },
+              {
+                "x": 0.4635732832019993,
+                "y": 0.5226978831388003,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 228.94965788991502
+              },
+              {
+                "x": 0.5323904002967308,
+                "y": 0.5226978831388003,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 243.6452243399391
+              }
+            ]
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        },
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&meters=se%3A-2&shot=se%3Afocal",
+          "pose": {
+            "position": [
+              160,
+              210,
+              -335
+            ],
+            "target": [
+              175,
+              60,
+              -45
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "22.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "725",
+            "triangles": "15970034",
+            "geometries": "425",
+            "textures": "29",
+            "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-low\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"low\",\"targetFunctionModules\":2,\"activeFunctionModules\":2,\"transitioning\":false,\"representation\":\"pavilion-pair\"}}}",
+            "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+          },
+          "frame": {
+            "id": "se:focal",
+            "subject": "survey-site-se",
+            "box": {
+              "left": 0.4549711435651579,
+              "right": 0.5409925399335722,
+              "top": 0.30872519053364,
+              "bottom": 0.7366705757439604
+            },
+            "reason": null,
+            "worldBounds": {
+              "min": [
+                157.9000005722046,
+                0.07500001788139343,
+                -62.09999942779541
+              ],
+              "max": [
+                192.0999994277954,
+                104.04000091552734,
+                -27.90000057220459
+              ]
+            },
+            "hits": 0,
+            "samples": [
+              {
+                "x": 0.49798184174936505,
+                "y": 0.5226978831388003,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 235.77957742805432
+              },
+              {
+                "x": 0.4635732832019993,
+                "y": 0.35151972905467205,
+                "hit": false,
+                "first": "surveyed-coastal-canopy",
+                "distance": 236.369375306077
+              },
+              {
+                "x": 0.5323904002967308,
+                "y": 0.35151972905467205,
+                "hit": false,
+                "first": "skyways",
+                "distance": 400.27393892997776
+              },
+              {
+                "x": 0.4635732832019993,
+                "y": 0.6938760372229285,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 247.8676594131567
+              },
+              {
+                "x": 0.5323904002967308,
+                "y": 0.6938760372229285,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 264.9207269679535
+              },
+              {
+                "x": 0.49798184174936505,
+                "y": 0.35151972905467205,
+                "hit": false,
+                "first": "skyways",
+                "distance": 375.95942643539297
+              },
+              {
+                "x": 0.49798184174936505,
+                "y": 0.6938760372229285,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 255.89783651826107
+              },
+              {
+                "x": 0.4635732832019993,
+                "y": 0.5226978831388003,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 228.94965788991502
+              },
+              {
+                "x": 0.5323904002967308,
+                "y": 0.5226978831388003,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 243.6452243399391
+              }
+            ]
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        }
+      ],
+      "reproducibility": {
+        "mad": 0.003625349869886226,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": true
+      },
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.08602139636841433,
+        "height": 0.42794538521032044,
+        "center": {
+          "x": 0.49798184174936505,
+          "y": 0.5226978831388003
+        },
+        "cardOverlap": 0
+      },
+      "A6": true,
+      "complete": true,
+      "A4": [
+        {
+          "id": "se:focal",
+          "hour": 22,
+          "from": "-2",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.004279311801051663,
+          "rect": {
+            "x": 873,
+            "y": 333,
+            "width": 166,
+            "height": 463
+          },
+          "pass": false
+        },
+        {
+          "id": "se:focal",
+          "hour": 22,
+          "from": "-2",
+          "to": "2",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.035304036166910475,
+          "rect": {
+            "x": 868,
+            "y": 189,
+            "width": 175,
+            "height": 607
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "vsync": {
+          "fps": 60,
+          "pass": true
+        },
+        "uncappedReference": {
+          "state": "2",
+          "meanFps": 95.03169740740938,
+          "drawCalls": [
+            751,
+            751
+          ],
+          "meanDrawCalls": 751
+        },
+        "relative": "S0 establishes reference; 95% / +10% comparisons apply to later rounds"
+      }
+    },
+    {
+      "id": "se:focal",
+      "state": "0",
+      "meters": "se:0",
+      "hour": 12,
+      "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&meters=se%3A0&shot=se%3Afocal",
+      "pose": {
+        "position": [
+          160,
+          210,
+          -335
+        ],
+        "target": [
+          175,
+          60,
+          -45
+        ]
+      },
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "60.0",
+        "drawCalls": "723",
+        "triangles": "15988038",
+        "geometries": "423",
+        "textures": "30",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "frame": {
+        "id": "se:focal",
+        "subject": "survey-site-se",
+        "box": {
+          "left": 0.45824273062472415,
+          "right": 0.5382634114091427,
+          "top": 0.4885188754177401,
+          "bottom": 0.7331788903397368
+        },
+        "reason": null,
+        "worldBounds": {
+          "min": [
+            157.9000005722046,
+            1.2000000178813934,
+            -62.09999942779541
+          ],
+          "max": [
+            192.0999994277954,
+            54.14999771118164,
+            -27.90000057220459
+          ]
+        },
+        "hits": 0,
+        "samples": [
+          {
+            "x": 0.4982530710169334,
+            "y": 0.6108488828787384,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 245.3543703444169
+          },
+          {
+            "x": 0.466244798703166,
+            "y": 0.5129848769099398,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 228.56166640289297
+          },
+          {
+            "x": 0.5302613433307009,
+            "y": 0.5129848769099398,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 242.07901384745583
+          },
+          {
+            "x": 0.466244798703166,
+            "y": 0.7087128888475371,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 250.4206014403682
+          },
+          {
+            "x": 0.5302613433307009,
+            "y": 0.7087128888475371,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 266.59494592449636
+          },
+          {
+            "x": 0.4982530710169334,
+            "y": 0.5129848769099398,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 234.96036804703903
+          },
+          {
+            "x": 0.4982530710169334,
+            "y": 0.7087128888475371,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 257.9827065073367
+          },
+          {
+            "x": 0.466244798703166,
+            "y": 0.6108488828787384,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 238.40011909141703
+          },
+          {
+            "x": 0.5302613433307009,
+            "y": 0.6108488828787384,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 253.15427046268064
+          }
+        ]
+      },
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+      "errors": [],
+      "images": [
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/se-focal/se-focal__0__h12__repeat1.jpg",
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/se-focal/se-focal__0__h12.jpg"
+      ],
+      "takes": [
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&meters=se%3A0&shot=se%3Afocal",
+          "pose": {
+            "position": [
+              160,
+              210,
+              -335
+            ],
+            "target": [
+              175,
+              60,
+              -45
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "12.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "723",
+            "triangles": "15988038",
+            "geometries": "423",
+            "textures": "30",
+            "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+            "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+          },
+          "frame": {
+            "id": "se:focal",
+            "subject": "survey-site-se",
+            "box": {
+              "left": 0.45824273062472415,
+              "right": 0.5382634114091427,
+              "top": 0.4885188754177401,
+              "bottom": 0.7331788903397368
+            },
+            "reason": null,
+            "worldBounds": {
+              "min": [
+                157.9000005722046,
+                1.2000000178813934,
+                -62.09999942779541
+              ],
+              "max": [
+                192.0999994277954,
+                54.14999771118164,
+                -27.90000057220459
+              ]
+            },
+            "hits": 0,
+            "samples": [
+              {
+                "x": 0.4982530710169334,
+                "y": 0.6108488828787384,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 245.3543703444169
+              },
+              {
+                "x": 0.466244798703166,
+                "y": 0.5129848769099398,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 228.56166640289297
+              },
+              {
+                "x": 0.5302613433307009,
+                "y": 0.5129848769099398,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 242.07901384745583
+              },
+              {
+                "x": 0.466244798703166,
+                "y": 0.7087128888475371,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 250.4206014403682
+              },
+              {
+                "x": 0.5302613433307009,
+                "y": 0.7087128888475371,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 266.59494592449636
+              },
+              {
+                "x": 0.4982530710169334,
+                "y": 0.5129848769099398,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 234.96036804703903
+              },
+              {
+                "x": 0.4982530710169334,
+                "y": 0.7087128888475371,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 257.9827065073367
+              },
+              {
+                "x": 0.466244798703166,
+                "y": 0.6108488828787384,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 238.40011909141703
+              },
+              {
+                "x": 0.5302613433307009,
+                "y": 0.6108488828787384,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 253.15427046268064
+              }
+            ]
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        },
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&meters=se%3A0&shot=se%3Afocal",
+          "pose": {
+            "position": [
+              160,
+              210,
+              -335
+            ],
+            "target": [
+              175,
+              60,
+              -45
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "12.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "723",
+            "triangles": "15988038",
+            "geometries": "423",
+            "textures": "30",
+            "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+            "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+          },
+          "frame": {
+            "id": "se:focal",
+            "subject": "survey-site-se",
+            "box": {
+              "left": 0.45824273062472415,
+              "right": 0.5382634114091427,
+              "top": 0.4885188754177401,
+              "bottom": 0.7331788903397368
+            },
+            "reason": null,
+            "worldBounds": {
+              "min": [
+                157.9000005722046,
+                1.2000000178813934,
+                -62.09999942779541
+              ],
+              "max": [
+                192.0999994277954,
+                54.14999771118164,
+                -27.90000057220459
+              ]
+            },
+            "hits": 0,
+            "samples": [
+              {
+                "x": 0.4982530710169334,
+                "y": 0.6108488828787384,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 245.3543703444169
+              },
+              {
+                "x": 0.466244798703166,
+                "y": 0.5129848769099398,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 228.56166640289297
+              },
+              {
+                "x": 0.5302613433307009,
+                "y": 0.5129848769099398,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 242.07901384745583
+              },
+              {
+                "x": 0.466244798703166,
+                "y": 0.7087128888475371,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 250.4206014403682
+              },
+              {
+                "x": 0.5302613433307009,
+                "y": 0.7087128888475371,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 266.59494592449636
+              },
+              {
+                "x": 0.4982530710169334,
+                "y": 0.5129848769099398,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 234.96036804703903
+              },
+              {
+                "x": 0.4982530710169334,
+                "y": 0.7087128888475371,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 257.9827065073367
+              },
+              {
+                "x": 0.466244798703166,
+                "y": 0.6108488828787384,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 238.40011909141703
+              },
+              {
+                "x": 0.5302613433307009,
+                "y": 0.6108488828787384,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 253.15427046268064
+              }
+            ]
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        }
+      ],
+      "reproducibility": {
+        "mad": 0.006254295519648188,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "auto": {
+        "A1": false,
+        "A2": true,
+        "A3": false,
+        "width": 0.08002068078441854,
+        "height": 0.24466001492199674,
+        "center": {
+          "x": 0.4982530710169334,
+          "y": 0.6108488828787384
+        },
+        "cardOverlap": 0
+      },
+      "A6": true,
+      "complete": true,
+      "A4": [
+        {
+          "id": "se:focal",
+          "hour": 12,
+          "from": "-2",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.005574289705299834,
+          "rect": {
+            "x": 873,
+            "y": 333,
+            "width": 166,
+            "height": 463
+          },
+          "pass": false
+        },
+        {
+          "id": "se:focal",
+          "hour": 12,
+          "from": "0",
+          "to": "2",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.040059236961783054,
+          "rect": {
+            "x": 868,
+            "y": 189,
+            "width": 175,
+            "height": 603
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "vsync": {
+          "fps": 60,
+          "pass": true
+        },
+        "uncappedReference": {
+          "state": "2",
+          "meanFps": 96.15670511870869,
+          "drawCalls": [
+            751,
+            751
+          ],
+          "meanDrawCalls": 751
+        },
+        "relative": "S0 establishes reference; 95% / +10% comparisons apply to later rounds"
+      }
+    },
+    {
+      "id": "se:focal",
+      "state": "0",
+      "meters": "se:0",
+      "hour": 22,
+      "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&meters=se%3A0&shot=se%3Afocal",
+      "pose": {
+        "position": [
+          160,
+          210,
+          -335
+        ],
+        "target": [
+          175,
+          60,
+          -45
+        ]
+      },
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "22.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "60.0",
+        "drawCalls": "723",
+        "triangles": "15988038",
+        "geometries": "424",
+        "textures": "30",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "frame": {
+        "id": "se:focal",
+        "subject": "survey-site-se",
+        "box": {
+          "left": 0.45824273062472415,
+          "right": 0.5382634114091427,
+          "top": 0.4885188754177401,
+          "bottom": 0.7331788903397368
+        },
+        "reason": null,
+        "worldBounds": {
+          "min": [
+            157.9000005722046,
+            1.2000000178813934,
+            -62.09999942779541
+          ],
+          "max": [
+            192.0999994277954,
+            54.14999771118164,
+            -27.90000057220459
+          ]
+        },
+        "hits": 0,
+        "samples": [
+          {
+            "x": 0.4982530710169334,
+            "y": 0.6108488828787384,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 245.3543703444169
+          },
+          {
+            "x": 0.466244798703166,
+            "y": 0.5129848769099398,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 228.56166640289297
+          },
+          {
+            "x": 0.5302613433307009,
+            "y": 0.5129848769099398,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 242.07901384745583
+          },
+          {
+            "x": 0.466244798703166,
+            "y": 0.7087128888475371,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 250.4206014403682
+          },
+          {
+            "x": 0.5302613433307009,
+            "y": 0.7087128888475371,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 266.59494592449636
+          },
+          {
+            "x": 0.4982530710169334,
+            "y": 0.5129848769099398,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 234.96036804703903
+          },
+          {
+            "x": 0.4982530710169334,
+            "y": 0.7087128888475371,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 257.9827065073367
+          },
+          {
+            "x": 0.466244798703166,
+            "y": 0.6108488828787384,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 238.40011909141703
+          },
+          {
+            "x": 0.5302613433307009,
+            "y": 0.6108488828787384,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 253.15427046268064
+          }
+        ]
+      },
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+      "errors": [],
+      "images": [
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/se-focal/se-focal__0__h22__repeat1.jpg",
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/se-focal/se-focal__0__h22.jpg"
+      ],
+      "takes": [
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&meters=se%3A0&shot=se%3Afocal",
+          "pose": {
+            "position": [
+              160,
+              210,
+              -335
+            ],
+            "target": [
+              175,
+              60,
+              -45
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "22.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "723",
+            "triangles": "15988038",
+            "geometries": "424",
+            "textures": "30",
+            "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+            "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+          },
+          "frame": {
+            "id": "se:focal",
+            "subject": "survey-site-se",
+            "box": {
+              "left": 0.45824273062472415,
+              "right": 0.5382634114091427,
+              "top": 0.4885188754177401,
+              "bottom": 0.7331788903397368
+            },
+            "reason": null,
+            "worldBounds": {
+              "min": [
+                157.9000005722046,
+                1.2000000178813934,
+                -62.09999942779541
+              ],
+              "max": [
+                192.0999994277954,
+                54.14999771118164,
+                -27.90000057220459
+              ]
+            },
+            "hits": 0,
+            "samples": [
+              {
+                "x": 0.4982530710169334,
+                "y": 0.6108488828787384,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 245.3543703444169
+              },
+              {
+                "x": 0.466244798703166,
+                "y": 0.5129848769099398,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 228.56166640289297
+              },
+              {
+                "x": 0.5302613433307009,
+                "y": 0.5129848769099398,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 242.07901384745583
+              },
+              {
+                "x": 0.466244798703166,
+                "y": 0.7087128888475371,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 250.4206014403682
+              },
+              {
+                "x": 0.5302613433307009,
+                "y": 0.7087128888475371,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 266.59494592449636
+              },
+              {
+                "x": 0.4982530710169334,
+                "y": 0.5129848769099398,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 234.96036804703903
+              },
+              {
+                "x": 0.4982530710169334,
+                "y": 0.7087128888475371,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 257.9827065073367
+              },
+              {
+                "x": 0.466244798703166,
+                "y": 0.6108488828787384,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 238.40011909141703
+              },
+              {
+                "x": 0.5302613433307009,
+                "y": 0.6108488828787384,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 253.15427046268064
+              }
+            ]
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        },
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&meters=se%3A0&shot=se%3Afocal",
+          "pose": {
+            "position": [
+              160,
+              210,
+              -335
+            ],
+            "target": [
+              175,
+              60,
+              -45
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "22.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "723",
+            "triangles": "15988038",
+            "geometries": "424",
+            "textures": "30",
+            "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+            "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+          },
+          "frame": {
+            "id": "se:focal",
+            "subject": "survey-site-se",
+            "box": {
+              "left": 0.45824273062472415,
+              "right": 0.5382634114091427,
+              "top": 0.4885188754177401,
+              "bottom": 0.7331788903397368
+            },
+            "reason": null,
+            "worldBounds": {
+              "min": [
+                157.9000005722046,
+                1.2000000178813934,
+                -62.09999942779541
+              ],
+              "max": [
+                192.0999994277954,
+                54.14999771118164,
+                -27.90000057220459
+              ]
+            },
+            "hits": 0,
+            "samples": [
+              {
+                "x": 0.4982530710169334,
+                "y": 0.6108488828787384,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 245.3543703444169
+              },
+              {
+                "x": 0.466244798703166,
+                "y": 0.5129848769099398,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 228.56166640289297
+              },
+              {
+                "x": 0.5302613433307009,
+                "y": 0.5129848769099398,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 242.07901384745583
+              },
+              {
+                "x": 0.466244798703166,
+                "y": 0.7087128888475371,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 250.4206014403682
+              },
+              {
+                "x": 0.5302613433307009,
+                "y": 0.7087128888475371,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 266.59494592449636
+              },
+              {
+                "x": 0.4982530710169334,
+                "y": 0.5129848769099398,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 234.96036804703903
+              },
+              {
+                "x": 0.4982530710169334,
+                "y": 0.7087128888475371,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 257.9827065073367
+              },
+              {
+                "x": 0.466244798703166,
+                "y": 0.6108488828787384,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 238.40011909141703
+              },
+              {
+                "x": 0.5302613433307009,
+                "y": 0.6108488828787384,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 253.15427046268064
+              }
+            ]
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        }
+      ],
+      "reproducibility": {
+        "mad": 0.005227519441418543,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "auto": {
+        "A1": false,
+        "A2": true,
+        "A3": false,
+        "width": 0.08002068078441854,
+        "height": 0.24466001492199674,
+        "center": {
+          "x": 0.4982530710169334,
+          "y": 0.6108488828787384
+        },
+        "cardOverlap": 0
+      },
+      "A6": true,
+      "complete": true,
+      "A4": [
+        {
+          "id": "se:focal",
+          "hour": 22,
+          "from": "-2",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.004279311801051663,
+          "rect": {
+            "x": 873,
+            "y": 333,
+            "width": 166,
+            "height": 463
+          },
+          "pass": false
+        },
+        {
+          "id": "se:focal",
+          "hour": 22,
+          "from": "0",
+          "to": "2",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.034630755342490785,
+          "rect": {
+            "x": 868,
+            "y": 189,
+            "width": 175,
+            "height": 603
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "vsync": {
+          "fps": 60,
+          "pass": true
+        },
+        "uncappedReference": {
+          "state": "2",
+          "meanFps": 95.03169740740938,
+          "drawCalls": [
+            751,
+            751
+          ],
+          "meanDrawCalls": 751
+        },
+        "relative": "S0 establishes reference; 95% / +10% comparisons apply to later rounds"
+      }
+    },
+    {
+      "id": "se:focal",
+      "state": "2",
+      "meters": "se:2",
+      "hour": 12,
+      "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&meters=se%3A2&shot=se%3Afocal",
+      "pose": {
+        "position": [
+          160,
+          210,
+          -335
+        ],
+        "target": [
+          175,
+          60,
+          -45
+        ]
+      },
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "60.0",
+        "drawCalls": "751",
+        "triangles": "16056342",
+        "geometries": "437",
+        "textures": "30",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-high\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"high\",\"targetFunctionModules\":6,\"activeFunctionModules\":6,\"transitioning\":false,\"representation\":\"vertical-tower\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "frame": {
+        "id": "se:focal",
+        "subject": "survey-site-se",
+        "box": {
+          "left": 0.4525171257348455,
+          "right": 0.5430562769121773,
+          "top": 0.17546681471814235,
+          "bottom": 0.7331788903397368
+        },
+        "reason": null,
+        "worldBounds": {
+          "min": [
+            157.9000005722046,
+            1.2000000178813934,
+            -62.09999942779541
+          ],
+          "max": [
+            192.0999994277954,
+            136.94999885559082,
+            -27.90000057220459
+          ]
+        },
+        "hits": 1,
+        "samples": [
+          {
+            "x": 0.4977867013235114,
+            "y": 0.4543228525289396,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 229.63570648210123
+          },
+          {
+            "x": 0.46157104085257866,
+            "y": 0.2312380222803018,
+            "hit": false,
+            "first": "divercity-office-tower",
+            "distance": 507.888147668658
+          },
+          {
+            "x": 0.534002361794444,
+            "y": 0.2312380222803018,
+            "hit": false,
+            "first": "skyways",
+            "distance": 377.458509480356
+          },
+          {
+            "x": 0.46157104085257866,
+            "y": 0.6774076827775775,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 245.32774903036656
+          },
+          {
+            "x": 0.534002361794444,
+            "y": 0.6774076827775775,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 262.98443369318016
+          },
+          {
+            "x": 0.4977867013235114,
+            "y": 0.2312380222803018,
+            "hit": true,
+            "first": "fixed-kit",
+            "distance": 292.3035817858006
+          },
+          {
+            "x": 0.4977867013235114,
+            "y": 0.6774076827775775,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 253.60778782408616
+          },
+          {
+            "x": 0.46157104085257866,
+            "y": 0.4543228525289396,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 227.20167769838145
+          },
+          {
+            "x": 0.534002361794444,
+            "y": 0.4543228525289396,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 237.44577402858752
+          }
+        ]
+      },
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+      "errors": [],
+      "images": [
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/se-focal/se-focal__2__h12__repeat1.jpg",
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/se-focal/se-focal__2__h12.jpg"
+      ],
+      "takes": [
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&meters=se%3A2&shot=se%3Afocal",
+          "pose": {
+            "position": [
+              160,
+              210,
+              -335
+            ],
+            "target": [
+              175,
+              60,
+              -45
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "12.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "751",
+            "triangles": "16056342",
+            "geometries": "437",
+            "textures": "30",
+            "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-high\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"high\",\"targetFunctionModules\":6,\"activeFunctionModules\":6,\"transitioning\":false,\"representation\":\"vertical-tower\"}}}",
+            "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+          },
+          "frame": {
+            "id": "se:focal",
+            "subject": "survey-site-se",
+            "box": {
+              "left": 0.4525171257348455,
+              "right": 0.5430562769121773,
+              "top": 0.17546681471814235,
+              "bottom": 0.7331788903397368
+            },
+            "reason": null,
+            "worldBounds": {
+              "min": [
+                157.9000005722046,
+                1.2000000178813934,
+                -62.09999942779541
+              ],
+              "max": [
+                192.0999994277954,
+                136.94999885559082,
+                -27.90000057220459
+              ]
+            },
+            "hits": 1,
+            "samples": [
+              {
+                "x": 0.4977867013235114,
+                "y": 0.4543228525289396,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 229.63570648210123
+              },
+              {
+                "x": 0.46157104085257866,
+                "y": 0.2312380222803018,
+                "hit": false,
+                "first": "divercity-office-tower",
+                "distance": 507.888147668658
+              },
+              {
+                "x": 0.534002361794444,
+                "y": 0.2312380222803018,
+                "hit": false,
+                "first": "skyways",
+                "distance": 377.458509480356
+              },
+              {
+                "x": 0.46157104085257866,
+                "y": 0.6774076827775775,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 245.32774903036656
+              },
+              {
+                "x": 0.534002361794444,
+                "y": 0.6774076827775775,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 262.98443369318016
+              },
+              {
+                "x": 0.4977867013235114,
+                "y": 0.2312380222803018,
+                "hit": true,
+                "first": "fixed-kit",
+                "distance": 292.3035817858006
+              },
+              {
+                "x": 0.4977867013235114,
+                "y": 0.6774076827775775,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 253.60778782408616
+              },
+              {
+                "x": 0.46157104085257866,
+                "y": 0.4543228525289396,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 227.20167769838145
+              },
+              {
+                "x": 0.534002361794444,
+                "y": 0.4543228525289396,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 237.44577402858752
+              }
+            ]
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        },
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&meters=se%3A2&shot=se%3Afocal",
+          "pose": {
+            "position": [
+              160,
+              210,
+              -335
+            ],
+            "target": [
+              175,
+              60,
+              -45
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "12.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "751",
+            "triangles": "16056342",
+            "geometries": "437",
+            "textures": "30",
+            "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-high\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"high\",\"targetFunctionModules\":6,\"activeFunctionModules\":6,\"transitioning\":false,\"representation\":\"vertical-tower\"}}}",
+            "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+          },
+          "frame": {
+            "id": "se:focal",
+            "subject": "survey-site-se",
+            "box": {
+              "left": 0.4525171257348455,
+              "right": 0.5430562769121773,
+              "top": 0.17546681471814235,
+              "bottom": 0.7331788903397368
+            },
+            "reason": null,
+            "worldBounds": {
+              "min": [
+                157.9000005722046,
+                1.2000000178813934,
+                -62.09999942779541
+              ],
+              "max": [
+                192.0999994277954,
+                136.94999885559082,
+                -27.90000057220459
+              ]
+            },
+            "hits": 1,
+            "samples": [
+              {
+                "x": 0.4977867013235114,
+                "y": 0.4543228525289396,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 229.63570648210123
+              },
+              {
+                "x": 0.46157104085257866,
+                "y": 0.2312380222803018,
+                "hit": false,
+                "first": "divercity-office-tower",
+                "distance": 507.888147668658
+              },
+              {
+                "x": 0.534002361794444,
+                "y": 0.2312380222803018,
+                "hit": false,
+                "first": "skyways",
+                "distance": 377.458509480356
+              },
+              {
+                "x": 0.46157104085257866,
+                "y": 0.6774076827775775,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 245.32774903036656
+              },
+              {
+                "x": 0.534002361794444,
+                "y": 0.6774076827775775,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 262.98443369318016
+              },
+              {
+                "x": 0.4977867013235114,
+                "y": 0.2312380222803018,
+                "hit": true,
+                "first": "fixed-kit",
+                "distance": 292.3035817858006
+              },
+              {
+                "x": 0.4977867013235114,
+                "y": 0.6774076827775775,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 253.60778782408616
+              },
+              {
+                "x": 0.46157104085257866,
+                "y": 0.4543228525289396,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 227.20167769838145
+              },
+              {
+                "x": 0.534002361794444,
+                "y": 0.4543228525289396,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 237.44577402858752
+              }
+            ]
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        }
+      ],
+      "reproducibility": {
+        "mad": 0.004183193133220366,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.0905391511773318,
+        "height": 0.5577120756215945,
+        "center": {
+          "x": 0.4977867013235114,
+          "y": 0.45432285252893956
+        },
+        "cardOverlap": 0
+      },
+      "A6": true,
+      "complete": true,
+      "A4": [
+        {
+          "id": "se:focal",
+          "hour": 12,
+          "from": "0",
+          "to": "2",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.040059236961783054,
+          "rect": {
+            "x": 868,
+            "y": 189,
+            "width": 175,
+            "height": 603
+          },
+          "pass": false
+        },
+        {
+          "id": "se:focal",
+          "hour": 12,
+          "from": "-2",
+          "to": "2",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.04102547158347139,
+          "rect": {
+            "x": 868,
+            "y": 189,
+            "width": 175,
+            "height": 607
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "vsync": {
+          "fps": 60,
+          "pass": true
+        },
+        "uncappedReference": {
+          "state": "2",
+          "meanFps": 96.15670511870869,
+          "drawCalls": [
+            751,
+            751
+          ],
+          "meanDrawCalls": 751
+        },
+        "relative": "S0 establishes reference; 95% / +10% comparisons apply to later rounds"
+      }
+    },
+    {
+      "id": "se:focal",
+      "state": "2",
+      "meters": "se:2",
+      "hour": 22,
+      "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&meters=se%3A2&shot=se%3Afocal",
+      "pose": {
+        "position": [
+          160,
+          210,
+          -335
+        ],
+        "target": [
+          175,
+          60,
+          -45
+        ]
+      },
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "22.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "60.0",
+        "drawCalls": "751",
+        "triangles": "16056342",
+        "geometries": "438",
+        "textures": "30",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-high\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"high\",\"targetFunctionModules\":6,\"activeFunctionModules\":6,\"transitioning\":false,\"representation\":\"vertical-tower\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "frame": {
+        "id": "se:focal",
+        "subject": "survey-site-se",
+        "box": {
+          "left": 0.4525171257348455,
+          "right": 0.5430562769121773,
+          "top": 0.17546681471814235,
+          "bottom": 0.7331788903397368
+        },
+        "reason": null,
+        "worldBounds": {
+          "min": [
+            157.9000005722046,
+            1.2000000178813934,
+            -62.09999942779541
+          ],
+          "max": [
+            192.0999994277954,
+            136.94999885559082,
+            -27.90000057220459
+          ]
+        },
+        "hits": 1,
+        "samples": [
+          {
+            "x": 0.4977867013235114,
+            "y": 0.4543228525289396,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 229.63570648210123
+          },
+          {
+            "x": 0.46157104085257866,
+            "y": 0.2312380222803018,
+            "hit": false,
+            "first": "divercity-office-tower",
+            "distance": 507.888147668658
+          },
+          {
+            "x": 0.534002361794444,
+            "y": 0.2312380222803018,
+            "hit": false,
+            "first": "skyways",
+            "distance": 377.458509480356
+          },
+          {
+            "x": 0.46157104085257866,
+            "y": 0.6774076827775775,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 245.32774903036656
+          },
+          {
+            "x": 0.534002361794444,
+            "y": 0.6774076827775775,
+            "hit": false,
+            "first": "context-recessed-facades",
+            "distance": 262.98443369318016
+          },
+          {
+            "x": 0.4977867013235114,
+            "y": 0.2312380222803018,
+            "hit": true,
+            "first": "fixed-kit",
+            "distance": 292.3035817858006
+          },
+          {
+            "x": 0.4977867013235114,
+            "y": 0.6774076827775775,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 253.60778782408616
+          },
+          {
+            "x": 0.46157104085257866,
+            "y": 0.4543228525289396,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 227.20167769838145
+          },
+          {
+            "x": 0.534002361794444,
+            "y": 0.4543228525289396,
+            "hit": false,
+            "first": "CTX_north_east_unknown",
+            "distance": 237.44577402858752
+          }
+        ]
+      },
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+      "errors": [],
+      "images": [
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/se-focal/se-focal__2__h22__repeat1.jpg",
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/se-focal/se-focal__2__h22.jpg"
+      ],
+      "takes": [
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&meters=se%3A2&shot=se%3Afocal",
+          "pose": {
+            "position": [
+              160,
+              210,
+              -335
+            ],
+            "target": [
+              175,
+              60,
+              -45
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "22.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "751",
+            "triangles": "16056342",
+            "geometries": "438",
+            "textures": "30",
+            "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-high\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"high\",\"targetFunctionModules\":6,\"activeFunctionModules\":6,\"transitioning\":false,\"representation\":\"vertical-tower\"}}}",
+            "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+          },
+          "frame": {
+            "id": "se:focal",
+            "subject": "survey-site-se",
+            "box": {
+              "left": 0.4525171257348455,
+              "right": 0.5430562769121773,
+              "top": 0.17546681471814235,
+              "bottom": 0.7331788903397368
+            },
+            "reason": null,
+            "worldBounds": {
+              "min": [
+                157.9000005722046,
+                1.2000000178813934,
+                -62.09999942779541
+              ],
+              "max": [
+                192.0999994277954,
+                136.94999885559082,
+                -27.90000057220459
+              ]
+            },
+            "hits": 1,
+            "samples": [
+              {
+                "x": 0.4977867013235114,
+                "y": 0.4543228525289396,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 229.63570648210123
+              },
+              {
+                "x": 0.46157104085257866,
+                "y": 0.2312380222803018,
+                "hit": false,
+                "first": "divercity-office-tower",
+                "distance": 507.888147668658
+              },
+              {
+                "x": 0.534002361794444,
+                "y": 0.2312380222803018,
+                "hit": false,
+                "first": "skyways",
+                "distance": 377.458509480356
+              },
+              {
+                "x": 0.46157104085257866,
+                "y": 0.6774076827775775,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 245.32774903036656
+              },
+              {
+                "x": 0.534002361794444,
+                "y": 0.6774076827775775,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 262.98443369318016
+              },
+              {
+                "x": 0.4977867013235114,
+                "y": 0.2312380222803018,
+                "hit": true,
+                "first": "fixed-kit",
+                "distance": 292.3035817858006
+              },
+              {
+                "x": 0.4977867013235114,
+                "y": 0.6774076827775775,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 253.60778782408616
+              },
+              {
+                "x": 0.46157104085257866,
+                "y": 0.4543228525289396,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 227.20167769838145
+              },
+              {
+                "x": 0.534002361794444,
+                "y": 0.4543228525289396,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 237.44577402858752
+              }
+            ]
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        },
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&meters=se%3A2&shot=se%3Afocal",
+          "pose": {
+            "position": [
+              160,
+              210,
+              -335
+            ],
+            "target": [
+              175,
+              60,
+              -45
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "22.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "751",
+            "triangles": "16056342",
+            "geometries": "438",
+            "textures": "30",
+            "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-high\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"high\",\"targetFunctionModules\":6,\"activeFunctionModules\":6,\"transitioning\":false,\"representation\":\"vertical-tower\"}}}",
+            "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+          },
+          "frame": {
+            "id": "se:focal",
+            "subject": "survey-site-se",
+            "box": {
+              "left": 0.4525171257348455,
+              "right": 0.5430562769121773,
+              "top": 0.17546681471814235,
+              "bottom": 0.7331788903397368
+            },
+            "reason": null,
+            "worldBounds": {
+              "min": [
+                157.9000005722046,
+                1.2000000178813934,
+                -62.09999942779541
+              ],
+              "max": [
+                192.0999994277954,
+                136.94999885559082,
+                -27.90000057220459
+              ]
+            },
+            "hits": 1,
+            "samples": [
+              {
+                "x": 0.4977867013235114,
+                "y": 0.4543228525289396,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 229.63570648210123
+              },
+              {
+                "x": 0.46157104085257866,
+                "y": 0.2312380222803018,
+                "hit": false,
+                "first": "divercity-office-tower",
+                "distance": 507.888147668658
+              },
+              {
+                "x": 0.534002361794444,
+                "y": 0.2312380222803018,
+                "hit": false,
+                "first": "skyways",
+                "distance": 377.458509480356
+              },
+              {
+                "x": 0.46157104085257866,
+                "y": 0.6774076827775775,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 245.32774903036656
+              },
+              {
+                "x": 0.534002361794444,
+                "y": 0.6774076827775775,
+                "hit": false,
+                "first": "context-recessed-facades",
+                "distance": 262.98443369318016
+              },
+              {
+                "x": 0.4977867013235114,
+                "y": 0.2312380222803018,
+                "hit": true,
+                "first": "fixed-kit",
+                "distance": 292.3035817858006
+              },
+              {
+                "x": 0.4977867013235114,
+                "y": 0.6774076827775775,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 253.60778782408616
+              },
+              {
+                "x": 0.46157104085257866,
+                "y": 0.4543228525289396,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 227.20167769838145
+              },
+              {
+                "x": 0.534002361794444,
+                "y": 0.4543228525289396,
+                "hit": false,
+                "first": "CTX_north_east_unknown",
+                "distance": 237.44577402858752
+              }
+            ]
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        }
+      ],
+      "reproducibility": {
+        "mad": 0.0035714686466150245,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": true
+      },
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.0905391511773318,
+        "height": 0.5577120756215945,
+        "center": {
+          "x": 0.4977867013235114,
+          "y": 0.45432285252893956
+        },
+        "cardOverlap": 0
+      },
+      "A6": true,
+      "complete": true,
+      "A4": [
+        {
+          "id": "se:focal",
+          "hour": 22,
+          "from": "0",
+          "to": "2",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.034630755342490785,
+          "rect": {
+            "x": 868,
+            "y": 189,
+            "width": 175,
+            "height": 603
+          },
+          "pass": false
+        },
+        {
+          "id": "se:focal",
+          "hour": 22,
+          "from": "-2",
+          "to": "2",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.035304036166910475,
+          "rect": {
+            "x": 868,
+            "y": 189,
+            "width": 175,
+            "height": 607
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "vsync": {
+          "fps": 60,
+          "pass": true
+        },
+        "uncappedReference": {
+          "state": "2",
+          "meanFps": 95.03169740740938,
+          "drawCalls": [
+            751,
+            751
+          ],
+          "meanDrawCalls": 751
+        },
+        "relative": "S0 establishes reference; 95% / +10% comparisons apply to later rounds"
+      }
+    },
+    {
+      "id": "hero",
+      "state": "neutral",
+      "meters": "nw:0,ne:0,sw:0,se:0",
+      "hour": 12,
+      "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&meters=nw%3A0%2Cne%3A0%2Csw%3A0%2Cse%3A0",
+      "pose": {
+        "position": [
+          -520.0000000000002,
+          300,
+          -619.9999999999999
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ]
+      },
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "60.0",
+        "drawCalls": "950",
+        "triangles": "16471250",
+        "geometries": "426",
+        "textures": "31",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "frame": null,
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+      "errors": [],
+      "images": [
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/se-focal/hero__neutral__h12__repeat1.jpg",
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/se-focal/hero__neutral__h12.jpg"
+      ],
+      "takes": [
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&meters=nw%3A0%2Cne%3A0%2Csw%3A0%2Cse%3A0",
+          "pose": {
+            "position": [
+              -520.0000000000002,
+              300,
+              -619.9999999999999
+            ],
+            "target": [
+              -40,
+              25,
+              -59.999999999999986
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "12.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "950",
+            "triangles": "16471250",
+            "geometries": "426",
+            "textures": "31",
+            "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+            "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+          },
+          "frame": null,
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        },
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&meters=nw%3A0%2Cne%3A0%2Csw%3A0%2Cse%3A0",
+          "pose": {
+            "position": [
+              -520.0000000000002,
+              300,
+              -619.9999999999999
+            ],
+            "target": [
+              -40,
+              25,
+              -59.999999999999986
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "12.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "950",
+            "triangles": "16471250",
+            "geometries": "426",
+            "textures": "31",
+            "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+            "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+          },
+          "frame": null,
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        }
+      ],
+      "reproducibility": {
+        "mad": 0.004997289926773178,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "auto": {
+        "A1": null,
+        "A2": null,
+        "A3": null,
+        "reason": "hero has no subject"
+      },
+      "A6": true,
+      "complete": true,
+      "A4": [],
+      "A5": {
+        "vsync": {
+          "fps": 60,
+          "pass": true
+        },
+        "uncappedReference": {
+          "state": "neutral",
+          "meanFps": 91.83756377004417,
+          "drawCalls": [
+            950,
+            950
+          ],
+          "meanDrawCalls": 950
+        },
+        "relative": "S0 establishes reference; 95% / +10% comparisons apply to later rounds"
+      }
+    },
+    {
+      "id": "hero",
+      "state": "neutral",
+      "meters": "nw:0,ne:0,sw:0,se:0",
+      "hour": 22,
+      "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&meters=nw%3A0%2Cne%3A0%2Csw%3A0%2Cse%3A0",
+      "pose": {
+        "position": [
+          -520.0000000000002,
+          300,
+          -619.9999999999999
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ]
+      },
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "22.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "60.0",
+        "drawCalls": "950",
+        "triangles": "16471250",
+        "geometries": "426",
+        "textures": "31",
+        "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+        "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+      },
+      "frame": null,
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+      "errors": [],
+      "images": [
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/se-focal/hero__neutral__h22__repeat1.jpg",
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/se-focal/hero__neutral__h22.jpg"
+      ],
+      "takes": [
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&meters=nw%3A0%2Cne%3A0%2Csw%3A0%2Cse%3A0",
+          "pose": {
+            "position": [
+              -520.0000000000002,
+              300,
+              -619.9999999999999
+            ],
+            "target": [
+              -40,
+              25,
+              -59.999999999999986
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "22.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "950",
+            "triangles": "16471250",
+            "geometries": "426",
+            "textures": "31",
+            "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+            "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+          },
+          "frame": null,
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        },
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&meters=nw%3A0%2Cne%3A0%2Csw%3A0%2Cse%3A0",
+          "pose": {
+            "position": [
+              -520.0000000000002,
+              300,
+              -619.9999999999999
+            ],
+            "target": [
+              -40,
+              25,
+              -59.999999999999986
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "22.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "950",
+            "triangles": "16471250",
+            "geometries": "426",
+            "textures": "31",
+            "siteAssets": "{\"magnetEast\":{\"variant\":\"automation-mixed\",\"layers\":{\"hubBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"hubUpper\":{\"kind\":\"glb\",\"assetId\":\"automation-hub-upper\",\"assetStatus\":\"idle\"},\"hubNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"automationDistrict\":{\"enabled\":true,\"serviceDrones\":11,\"nightRhythm\":1.25,\"targetAutomation\":0.5,\"automation\":0.5,\"activePulses\":0,\"pavilions\":11,\"visibleStaffedPavilions\":3,\"visibleDronePorts\":8,\"hybridBays\":6,\"loopAircraft\":16,\"guidewayPods\":18,\"walkers\":260},\"automationHub\":{\"band\":\"mixed\",\"targetAutomatedPorts\":3,\"visibleAutomatedPorts\":3,\"targetHumanCounters\":3,\"visibleHumanCounters\":3}},\"stationEastPark\":{\"variant\":\"exhibition-neutral\",\"layers\":{\"parkSurface\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"parkTrees\":{\"kind\":\"glb\",\"assetId\":\"future-tree-2127\",\"assetStatus\":\"ready\"},\"parkCoolingFins\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"environmentPark\":{\"band\":\"mixed\",\"targetTreeCount\":8,\"visibleTreeCount\":8,\"targetPlantedFraction\":0.5,\"plantedFraction\":0.5,\"targetCoolingFins\":3,\"visibleCoolingFins\":3,\"representation\":\"glb\"},\"environmentDistrict\":{\"nightRhythm\":1.210992754619342,\"slots\":17,\"targetCanopy\":0.5,\"visibleCanopies\":9,\"visibleSails\":8,\"visibleCoolingTowers\":0,\"roofs\":53,\"visibleRoofSails\":31,\"visibleRoofCrowns\":22,\"hybridBays\":12,\"hybridRoofs\":29,\"activePulses\":0}},\"dogenzakaSouth\":{\"variant\":\"commons-mixed\",\"layers\":{\"plaza\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"commonsNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"sharingDistrict\":{\"enabled\":true,\"nightRhythm\":1.1719291405139338,\"plazaPeople\":24,\"targetSharing\":0.5,\"rooms\":6,\"activePulses\":0,\"vaults\":3,\"courts\":10,\"hybridRooms\":3,\"hybridCourts\":5,\"droneKiosks\":0,\"orchardCourts\":0,\"visibleOpenCourts\":4,\"visibleOpenRooms\":3,\"visiblePrivateRooms\":3},\"commonsPlaza\":{\"band\":\"mixed\",\"targetSharedSeats\":4,\"visibleSharedSeats\":4,\"targetScreenedSeats\":4,\"visibleScreenedSeats\":4}},\"centerGaiRear\":{\"variant\":\"tower-mixed\",\"layers\":{\"towerBase\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerUpper\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"},\"towerNeutralProps\":{\"kind\":\"procedural\",\"assetStatus\":\"not-applicable\"}},\"concentrationDistrict\":{\"enabled\":true,\"nightRhythm\":1.2334422904482347,\"targetConcentration\":0.5,\"towers\":10,\"pods\":26,\"activePulses\":0,\"visibleTowers\":5,\"visiblePods\":15,\"midRises\":2,\"forestTowers\":0,\"droneDocks\":0,\"solarPods\":0},\"concentrationTower\":{\"band\":\"mixed\",\"targetFunctionModules\":4,\"activeFunctionModules\":4,\"transitioning\":false,\"representation\":\"mid-rise-hall\"}}}",
+            "energy": "{\"target\":{\"waterGardens\":0,\"receiver\":\"none\",\"flywheel\":false,\"island\":false},\"rotorAngle\":1,\"parts\":[{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":0.72,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0},{\"visible\":false,\"scaleY\":1,\"opacity\":0}]}"
+          },
+          "frame": null,
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        }
+      ],
+      "reproducibility": {
+        "mad": 0.004270499223351892,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "auto": {
+        "A1": null,
+        "A2": null,
+        "A3": null,
+        "reason": "hero has no subject"
+      },
+      "A6": true,
+      "complete": true,
+      "A4": [],
+      "A5": {
+        "vsync": {
+          "fps": 60,
+          "pass": true
+        },
+        "uncappedReference": {
+          "state": "neutral",
+          "meanFps": 91.2690006986129,
+          "drawCalls": [
+            950,
+            950
+          ],
+          "meanDrawCalls": 950
+        },
+        "relative": "S0 establishes reference; 95% / +10% comparisons apply to later rounds"
+      }
+    }
+  ],
+  "errors": []
+}
