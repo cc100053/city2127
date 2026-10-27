@@ -1,11 +1,11 @@
 # headline-camera — 近鏡跟住 headline 變化
 
 - Owner: cc100053（產品決策）；實作 Codex worker `01a17b81-4af3-7bf3-9512-a451a5198d53`
-- Status: INTEGRATED_LOCAL — owner approved merge; integrated root checks / production smoke PASS; push and main CI pending
+- Status: DONE — owner approved merge; integrated root checks / production smoke and actual main CI PASS; main pushed
 - Branch: `main` (feature `feat/headline-camera` retained)
 - Base commit: `00c0273`（main：ladder 整合同 main CI 記錄之後）
-- Last verified commit: `51002890371ef3aa7bc7d16791cc34b23d98cffc` (merge tree identical to accepted `cf0fe82`; integrated root checks / production smoke PASS)
-- Remote availability: accepted feature `origin/feat/headline-camera` @ `cf0fe82d6d781d4841b82f45bc64a4cc7fc69b46`; local main integration awaits validated push / main CI
+- Last verified commit: `ad60a8912a62c5ad24bdbf965c5dc31527771562` (main CI PASS; merge `5100289` tree identical to accepted `cf0fe82`; integrated root checks / production smoke PASS)
+- Remote availability: main published at `ad60a8912a62c5ad24bdbf965c5dc31527771562`, fetch confirmed HEAD=origin/main and0/0; feature `origin/feat/headline-camera` retained at `cf0fe82d6d781d4841b82f45bc64a4cc7fc69b46`. Final follow-up records are documentation only.
 
 ## Session Git state
 
@@ -218,7 +218,7 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 - Live no-change/reload/Undo/reduced motion/A-B PASS; submissions1006ms apart, ordered display, second own headline. Eight extra real TCP/reset/DEV/legacy/standalone/catch-up checks PASS; shortened-slot uses real-view wire fixture, clearly separated from real server checks.
 - Page errors/console errors0. System font fallback explicit. All owned browsers/services closed; Vite5184 and dev:auto8798 confirmed free.
 - Main unchanged at `00c02737650008a450bd8f08e1a491ad023c77d2`; feature `9335b6d627cd5d6175a13936cb45c0e34708ab33` pushed successfully. Committed task whitespace and source/image manifest PASS. No main CI claim.
-- Integrated commit and checks: `51002890371ef3aa7bc7d16791cc34b23d98cffc`; root test/build/whitespace/manifest and production smoke PASS; remote push / main CI pending
+- Integrated commit and checks (superseding feature-stage approval/CI status above): merge `51002890371ef3aa7bc7d16791cc34b23d98cffc`, published `ad60a8912a62c5ad24bdbf965c5dc31527771562`; root test/build/whitespace/manifest and production smoke PASS; actual [main CI40490237501](https://github.com/cc100053/city2127/actions/runs/40490237501) PASS.
 
 ## Known issues and blockers
 
@@ -234,7 +234,7 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 
 ## Next expected step
 
-1. Owner merge approval已取得；完成validated main push、確認main CI並保存最終結果。
+1. 此任務已完成：owner批准、main merge/push及實際CI通過，技術交付毋須下一個實作步驟；以下打磨另作任務。
 2. 之後另開打磨任務，以 shot list 做基準，按出現頻率排次序：
    - 先打磨各 site 第一格嘅 focal 近鏡（ne → sw → se → nw）。
    - 再打磨 district（±2）。
@@ -278,4 +278,6 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 - Accepted feature `cf0fe82d6d781d4841b82f45bc64a4cc7fc69b46`；base/remote main `00c02737650008a450bd8f08e1a491ad023c77d2`。Clean feature upstream0/0；本clone新建tracking main、ff-only確認，再no-ff merge，無衝突。
 - Merge `51002890371ef3aa7bc7d16791cc34b23d98cffc`整個tree等同accepted feature。Integrated root test/build、committed/working whitespace、保存manifest比對PASS；兩項既有build warnings保留。Survey/module-swap未改，未另跑本地suite。
 - Production smoke：真實scratch v4 live nw近鏡／原因，reload立即ambient hero、DEV入口排除PASS；Chrome156.0.8078.48 headless、1920×1080 DPR1 default/hour12，新兩圖已查看、errors0。沒有新FPS或全13鏡頭重拍宣稱；原視覺證據由相同runtime／hash支援。
-- [整合原始logs／原圖／tree證據](../../artifacts/headline-camera/integration-1/README.md)。Owned servers/browser停止；5184已釋放。Main push/CI實際結果稍後補記；無部署、無刪分支。
+- [整合原始logs／原圖／tree證據](../../artifacts/headline-camera/integration-1/README.md)。Owned servers/browser停止；5184已釋放。無部署、無刪分支。
+- Main `ad60a8912a62c5ad24bdbf965c5dc31527771562`已推送，fetch確認HEAD=origin/main、divergence0/0，包含merge `5100289`。實際push/main [CI40490237501](https://github.com/cc100053/city2127/actions/runs/40490237501) SUCCESS，root test/build、survey test/build、module-swap install/test/build及whitespace步驟全部成功；[原始run／steps證據](evidence/headline-camera-main-ci.json)。本紀錄取代上方各feature階段嘅main待批准／CI未驗狀態。
+- 最後跟進只改Markdown及docs內CI證據，按workflow跳過CI；runtime／tests／packages與上述成功run相同。文件連結／fact checks及diff自查另行通過，無需重跑相同browser／FPS矩陣。展示硬件／Safari／iPad／Windows／長測／觀眾理解及模型材質打磨限制保留。

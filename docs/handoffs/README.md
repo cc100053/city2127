@@ -14,7 +14,7 @@
 | [變化說明卡](change-explanation.md) | PLANNED（TODO）；右上卡片直接說明「乜嘢變成乜嘢」，未定案前先用參數前後變動 | cc100053 |
 | [能源城市](energy-city.md) | E1–E4完成並發布main，CI通過；Q3獨立能源權威配置、舊氣候／歷史與正式browser通過；E5本機Mac mini 30分鐘量測與TCP復原已驗；展覽硬件／訪客待驗 | Codex；產品決策cc100053 |
 | [建築・居住](housing-city.md) | H0提案／基準與候選原圖已簽收；H1隔離靜態比較已簽收；H1b靜態次設計、H2動態及H3評估已通過coordinator review；DEV-only已整合main且CI通過，正式歸屬待人類決定；[證據](../../artifacts/housing-city-h0/README.md) | Codex；產品決策cc100053 |
-| [Headline 近鏡](headline-camera.md) | INTEGRATED_LOCAL；owner已批准，無衝突merge及root／production smoke通過；main push／CI待確認 | cc100053；Codex worker |
+| [Headline 近鏡](headline-camera.md) | DONE；owner已批准並merge/push main；整合root／production smoke及實際main CI通過；feature分支保留 | cc100053；Codex worker |
 | [分級階梯＋headline](meter-ladder.md) | DONE；±3格、每份提案最多一格、headline已merge入main `0b84a29`，main CI通過；headline camera另開任務 | cc100053；實作Claude |
 | [儲能環 polish](storage-ring-polish.md) | 已整合main，實際main CI通過，本機／遠端task分支已安全刪除；[整合交接](energy-polish-integration.md)，原審美／硬件限制保留 | Codex batch owner |
 

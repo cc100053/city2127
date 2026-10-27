@@ -341,4 +341,6 @@ Correction1 verified code `4c52d681a3715630e5eba52889831729355775fb` 已推送�
 
 Owner明確批准後，accepted `cf0fe82`以no-ff merge成 `51002890371ef3aa7bc7d16791cc34b23d98cffc`，無衝突且整個tree相同。整合後root npm test／build、committed及working whitespace、保存manifest比對PASS；保留chunk-size及JSON import-attributes兩項既有warning。Survey／module-swap source未改，未另跑本地suite。
 
-[本次整合logs／原圖](../artifacts/headline-camera/integration-1/README.md)：production preview＋真實scratch v4，live nw結果近鏡／原因及reload snapshot ambient hero，DEV `cityShot`排除，Chrome156.0.8078.48 headless、1920×1080 DPR1 default/hour12，原圖已查看、page／console errors0，系統字體fallback明確。Runtime及原圖hash不變支持保留先前完整鏡頭／中斷證據；沒有新FPS／硬件／全矩陣重跑宣稱。Owned服務已停止。Main push及實際CI結果待下一段記錄；無部署。
+[本次整合logs／原圖](../artifacts/headline-camera/integration-1/README.md)：production preview＋真實scratch v4，live nw結果近鏡／原因及reload snapshot ambient hero，DEV `cityShot`排除，Chrome156.0.8078.48 headless、1920×1080 DPR1 default/hour12，原圖已查看、page／console errors0，系統字體fallback明確。Runtime及原圖hash不變支持保留先前完整鏡頭／中斷證據；沒有新FPS／硬件／全矩陣重跑宣稱。Owned服務已停止；無部署。
+
+Main `ad60a8912a62c5ad24bdbf965c5dc31527771562`推送及fetch核對成功、HEAD=origin/main，實際[main CI40490237501](https://github.com/cc100053/city2127/actions/runs/40490237501) SUCCESS：root／survey／module-swap測試與build、committed whitespace全部通過；[run及各步驟原始證據](handoffs/evidence/headline-camera-main-ci.json)。本段取代上方feature階段待批准／main CI未驗狀態。最後CI紀錄提交只有Markdown及docs內證據，按workflow跳過CI，程式碼與成功run一致；連結／fact／diff檢查通過。既有硬件／長測／模型打磨限制保留。
