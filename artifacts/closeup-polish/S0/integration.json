@@ -1,0 +1,36 @@
+{
+  "dateJST": "2026-10-28",
+  "checkedAtUTC": "2026-10-27T16:13:44.869634+00:00",
+  "acceptedCheckpoint": "19e9ae2c055fd60ab897bfa0fe1cb1aa3df1fdf1",
+  "preMergeMain": "fdc4a0cbbbc352b41c15850f2a846845d7975de1",
+  "mergeCommit": "c802bbab329fb3835f4c5d5b09a5bc0d18e51703",
+  "strategy": "--no-ff",
+  "conflicts": false,
+  "validation": {
+    "rootNpmTest": {
+      "status": "PASS",
+      "exitCode": 0,
+      "log": "integration-npm-test.log"
+    },
+    "rootNpmBuild": {
+      "status": "PASS",
+      "exitCode": 0,
+      "log": "integration-npm-build.log",
+      "warnings": [
+        "existing chunk-size warning",
+        "existing JSON import-attributes warning"
+      ]
+    },
+    "gitDiffCheck": {
+      "status": "PASS",
+      "log": "integration-diff-check.log"
+    },
+    "runtimeAndTestsMatchAcceptedCheckpoint": true,
+    "browserEvidence": "Existing S0 live/DEV/production/recovery evidence remains valid: integrated src/tests/package/lock exactly match accepted19e9ae2. No new browser or FPS measurement claimed.",
+    "otherPackages": "No survey/module-swap source changes; no separate local rerun."
+  },
+  "acceptance": "Measured S0 baseline only; all art/framing failures retained. A-D not started.",
+  "featureBranch": "feat/closeup-polish retained at19e9ae2; no history rewritten.",
+  "services": "No preview/browser launched for integration; root scratch test services finish in test cleanup. Prior5194/5195 free check remains recorded.",
+  "publication": "Final pushed main SHA and actual main CI are recorded by result-S0-integration.json outside this Git tree to avoid self-referential commit metadata."
+}

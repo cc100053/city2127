@@ -359,3 +359,8 @@ S0安全checkpoint：weekly剩14%時停止；final flush共43/98狀態／86張ba
 DEV／production smoke及S0的headline-aware E4副本驗證結果見checks.json；scratch SQLite／HTTP／WebSocket採現有fixture，沒有部署或survey source變更。Root suite/build PASS的實際logs保留，production bundle排除cityShotFrame；helper在live headline不改pose或GPU資源數。原始43狀態與93張原圖hash驗證一致，過往quota與optimizer失敗仍留歷史。僅開發Mac Chrome1920×1080/DPR1；真人辨識、展示硬件、其他平台、完整時序閃爍驗收未做。無美術／pose／timeline／ladder變動，未merge main，本批後釋放服務及writer交coordinator review。
 
 S0終版：有效uncapped平均79.51–133.60FPS。原E4在現行ladder headline顯示其他site時仍等固定能源句，故保留失敗；S0測試副本僅更新兩個結果等待斷言後完成全流程，page exception0，runtime及原E4不改。234張原圖hash核對、98組雙take URL/pose一致、DEV／production smoke PASS。所有owned Vite／Chrome／scratch server已停止，5194／5195 free。
+
+
+## Closeup S0 main integration — 2026-10-28
+
+Coordinator接受19e9ae2為完整量度基準，保留全部視覺失敗。Fresh mainfdc4a0c以no-ff整合為c802bba，無衝突；在整合結果重新跑root npm test、npm run build及git diff --check全部PASS，僅既有build warnings。[整合JSON／logs](../artifacts/closeup-polish/S0/integration.json)。Runtime/tests/package/lock與接受checkpoint完全相同，因此原DEV／production／headline-aware recovery evidence仍適用，沒有重複宣稱新browser或FPS量度。Survey／module-swap未改，local不另跑。Main最終SHA／實際CI與服務、writer釋放由result-S0-integration.json記錄；長feature保留，原root舊feature checkout不動。A–D未開始、未部署；S0整合不代表art gates獲通過。

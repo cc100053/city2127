@@ -1,18 +1,18 @@
 # closeup-polish — Headline 近鏡逐個打磨
 
 - Owner: cc100053（產品／審美最終批准）；實作由一個 long session 負責，開工時喺下面「進度」記低 session 名。
-- Status: S0 REVIEW CHECKPOINT（worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2`；98/98 原圖，未改美術；最終檢查見下文）
+- Status: S0 INTEGRATED（coordinator已接受量度基準；worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2`；98/98，未接受美術；A–D未開始）
 - Branch: `feat/closeup-polish`（一條長分支，每個 sector 一個 checkpoint）
 - Base commit: `fdc4a0cbbbc352b41c15850f2a846845d7975de1`（fetch verified main，包含完整 S0 標準）
-- Last verified commit: runtime `59c6ea9`（至本S0 checkpoint source不變）；runner／evidence 完整SHA見本批result record及Git checkpoint。Root suite/build與最終browser結果見下文。
-- Remote availability: `origin/feat/closeup-polish`；完整S0 checkpoint push後由result record記錄SHA。依本批assignment留 coordinator review，不合併main、不開A–D。
+- Last verified commit: 整合merge `c802bbab329fb3835f4c5d5b09a5bc0d18e51703`，root npm test/build/diff PASS；runtime/tests/package與接受的`19e9ae2`完全一致。
+- Remote availability: S0 checkpoint `19e9ae2`保留於`origin/feat/closeup-polish`；S0整合main，最終published SHA／實際main CI見`result-S0-integration.json`與GitHub CI。無A–D／部署。
 
 ## Session Git state
 
 - Session starting branch and HEAD: 主 checkout `feat/energy-demo-camera` @ `016f6d1`，原 upstream 0/0、對 main 2/18；全部保留。獨立 clone `.task-relay/closeup-polish/checkout` 由 verified `origin/main` 開 `feat/closeup-polish`，clean start。
 - Last fetched origin/main commit: `fdc4a0c`，2026-10-27 fetch 成功（clone 初次 sandbox DNS 失敗，獲准重跑成功）。計劃舊 base `6a20346` 至本基準僅完整標準文件及其 merge，runtime 未變。
 - Local changes present at session start: 主 checkout 未追蹤 `.playwright-cli/`、`.task-relay/` 保留；獨立 clone NONE。
-- Upstream integration status: NOT NEEDED
+- Upstream integration status: S0按revision7授權整合；fresh origin/main `fdc4a0c`，feature5/0，clean start；main新建追蹤origin/main，no-ff merge無衝突。
 - Pending Git conflicts or synchronization blockers: NONE
 
 ## 點解係下一步
@@ -164,7 +164,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 
 | Sector | 狀態 | Checkpoint | Owner review | Main merge |
 | --- | --- | --- | --- | --- |
-| S0 基準 | REVIEW CHECKPOINT；98狀態／96比較，worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2` | runtime `59c6ea9`；[完整基準](../../artifacts/closeup-polish/S0/README.md) | 冇美術改動；本批留 coordinator review，不 merge | — |
+| S0 基準 | INTEGRATED；量度基準接受，非美術接受 | `19e9ae2`；[完整基準](../../artifacts/closeup-polish/S0/README.md) | coordinator已審查；冇美術改動 | `c802bba` |
 | A 海浜公園 | PLANNED | — | — | — |
 | B アクアシティ南 | PLANNED | — | — | — |
 | C フジテレビ東 | PLANNED | — | — | — |
@@ -194,7 +194,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 
 ## Next expected step
 
-Coordinator審查本批S0完整checkpoint、原圖及方法，決定整合與後續A NE；此worker不merge main、不開始A–D。所有失敗留作後續pose／builder修改基準，不能把measurement完成說成shot驗收通過。服務與writer釋放以本批result record／checks.json為準。取消百分比預停的人類指示仍有效；僅真正provider limit觸發recovery。
+Coordinator核對本批S0整合result及實際main CI，再dispatch A NE；此worker完成整合後釋放writer，不開始A–D。`feat/closeup-polish`保留於接受的19e9ae2，獨立clone留在main；後續owner如沿用長分支，應明確快進至已驗證main再開工。取消百分比預停的人類指示仍有效，僅真正provider limit觸發recovery。
 
 ## S0 resume — 2026-10-27
 
@@ -207,3 +207,7 @@ Coordinator審查本批S0完整checkpoint、原圖及方法，決定整合與後
 ## S0 final verification — 2026-10-28
 
 已完成98狀態、96比較、28組×2有效uncapped reference；平均79.51–133.60FPS，vsync58.5–60.1。Root npm test/build PASS且runtime對59c6ea9 diff為空，runner／report／ray原因自檢、原93張hash及所有98雙take URL/pose核對PASS。DEV／production smoke PASS；原E4因固定能源句斷言不合現行ladder headline優先次序而失敗，保留formal.log及3張partial原圖。S0副本只調整兩個結果等待斷言，其餘能源數量／實際模型／legacy／同ID retry／Undo／mixed／TCP reconnect／reduced motion／resize／reset均PASS、page exception0；tests/energyE4.browser.mjs與runtime不改。完整234張原圖hash在manifest。Vite5194／preview5195已停止、ports free，owned Chrome／runner無剩餘；scratch server／SQLite均finally關閉。最終evidence SHA、push／CI狀態由本批唯一result record供coordinator review。
+
+## S0 main integration — 2026-10-28
+
+Coordinator revision7接受19e9ae2作完整量度基準，明確保留A1–A4/V failures並授權整合。Preflight clean，fresh mainfdc4a0c／feature5:0，no-ff merge成c802bba，無衝突；整合後root npm test、npm run build及git diff --check全部PASS。Source/tests/package/lock與接受checkpoint完全一致，既有browser evidence適用，沒有虛報新browser/FPS。詳細[整合紀錄](../../artifacts/closeup-polish/S0/integration.json)及logs；此後文件／evidence更新不改runtime。Push前再fetch並確認ancestor；最終main SHA、實際main CI、cleanup及writer release由本批result-S0-integration.json記錄。原root舊feature checkout與所有原圖不動；長feature分支保留，未部署或開A–D。

@@ -80,7 +80,7 @@ Live headline（[pickHeadline](../survey/src/shared/cityView.ts)）：新到達�
 
 Headline 近鏡（2026-10-27）：live 結果先在 hero 播完 2.62 秒 vote journey，再用 1.5 秒推近 headline，與原本 3 秒場景過渡重疊，沒有延遲過渡。4.12–10 秒停留，10 秒與 ambient 卡同步開始用 2 秒返回 hero；原因文字仍在第 3 秒出現。八個 site shot（四站各 focal／district）及五個能源 shot 用常數表，保留 hero 方向及海／地標定位；focal 與 district 同時改以 district 為準。能源鏡頭與結果卡共用部件優先次序，移除設備亦看原位置。新結果從現有位置先平滑回 hero；snapshot／reset／Undo／reconnect／reduced motion／legacy／追趕中的結果立即 hero。無 headline 不推近；如接續仍在播放的近鏡，先從當前位置用 2 秒平滑返回，再保持 hero 並恢復操作。普通 standalone 及其他 DEV review 不自動播放；DEV 可用 `?shot=` 逐鏡檢查。近鏡的模型／材質打磨及真人閱讀／展示硬件驗收另作任務。
 
-近鏡打磨S0（2026-10-28，feature checkpoint／待coordinator review）：[完整基準](../artifacts/closeup-polish/S0/README.md)記錄98個日夜狀態、96組像素比較及28組兩輪效能；沒有美術、pose、時間線或梯級改動。A1/A2/A3與夜間／綠化仍有明確失敗，20個district狀態跨near plane不可量測；這是後續A–D的起點，並非視覺完成或owner接受。所有正式第二take原圖已逐張檢視，展示硬件及真人辨認未驗；尚未合併main。
+近鏡打磨S0（2026-10-28，coordinator接受量度基準並整合main `c802bba`）：[完整基準](../artifacts/closeup-polish/S0/README.md)記錄98個日夜狀態、96組像素比較及28組兩輪效能；沒有美術、pose、時間線或梯級改動。A1/A2/A3與夜間／綠化仍有明確失敗，20個district狀態跨near plane不可量測；這是後續A–D的起點，並非視覺完成或owner接受。所有正式第二take原圖已逐張檢視，展示硬件及真人辨認未驗；[整合驗證](../artifacts/closeup-polish/S0/integration.json)root test/build/diff PASS，實際published SHA及main CI由本批integration result記錄。
 
 `ladderLayout(tiers, energy)` 是唯一權威映射；focal 數值由 tier 符號決定（`t`= 1／.5／0 對應 >0／0／<0）：
 

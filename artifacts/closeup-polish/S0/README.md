@@ -46,3 +46,7 @@ Final check outcomes and cleanup are recorded in [checks.json](checks.json) and 
 ## Preserved checkpoint history
 
 The first checkpoint stopped at43/98 under the then-active15% reserve, with86 baseline JPEGs and7 native trial images; [partial-report.json](partial-report.json) is historical. Commit7fbfbfa normalized filenames to hyphens without changing any of those93 image bytes. Human message01a17d9e-e127-7d03-9bed-65a8eb3fdba1 removed the percentage reserve; that earlier resume date is superseded. Work resumed, later hit an actual provider limit, and the background runner finished98/28/96 while sampling was unavailable. Recovery dispatch closeup-polish-S0-recover-r6 reconciled those results and completed the remaining review/checks. Original93 hashes were verified before and after continuation. Shared coordinator state remains the authority for relay ownership; only this worker's result record is written here.
+
+## Integration status — 2026-10-28
+
+Coordinator accepted19e9ae2 as the measured baseline. No-ff main mergec802bba passed fresh root test/build/diff checks; [integration evidence](integration.json) records the actual merge and logs. Runtime/tests/package/lock exactly match the accepted checkpoint, so existing browser evidence remains applicable; no new FPS or browser claim. Final published SHA and actual main CI live in this batch's external result-S0-integration.json. All original failures remain; sectors A–D have not started.
