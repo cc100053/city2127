@@ -1,5 +1,5 @@
 import { zeroScores, type CitySurveyState, type ExhibitionState } from '../shared/citySurveyState.ts';
-import { deriveCityLayout, exhibitionStateLayout, layoutChanges, type Decision, type ExhibitionCityView, type LegacyCityView, type ProposalRecord } from '../shared/cityView.ts';
+import { deriveCityLayout, ladderLayout, layoutChanges, type Decision, type ExhibitionLadder, type ExhibitionCityView, type LegacyCityView, type ProposalRecord } from '../shared/cityView.ts';
 import type { AnswerEvent } from '../shared/protocol.ts';
 import type { QuestionSet } from '../shared/question.ts';
 import { applyEffects, scoreChange } from './scoreEngine.ts';
@@ -27,12 +27,13 @@ export function buildCityView(state: CitySurveyState, events: AnswerEvent[], que
   return { runId: state.runId, revision: state.revision, scores: state.scores, layout: deriveCityLayout(state.scores), history };
 }
 
-export function buildExhibitionCityView(state: ExhibitionState, proposals: ProposalRecord[], slotSeeds: ExhibitionCityView['slotSeeds']): ExhibitionCityView {
+/** `ladder` is the run's fold of its active proposals; its frozen seeds are the view's slot seeds. */
+export function buildExhibitionCityView(state: ExhibitionState, proposals: ProposalRecord[], ladder: ExhibitionLadder): ExhibitionCityView {
   const recentProposals = proposals.slice(-64);
   return {
     version: 2, runId: state.runId, revision: state.revision, guestCount: state.guestCount, algorithmVersion: 2,
-    voteSums: state.voteSums, recentVotes: state.recentVotes, scores: state.scores, slotSeeds,
-    layout: exhibitionStateLayout(state.scores, state.guestCount, state.energy), ...(state.energy ? { energy: state.energy } : {}), recentProposals,
+    voteSums: state.voteSums, recentVotes: state.recentVotes, scores: state.scores, slotSeeds: ladder.seeds,
+    layout: ladderLayout(ladder.tiers, state.energy), ...(state.energy ? { energy: state.energy } : {}), recentProposals,
     latestProposal: recentProposals.at(-1),
   };
 }

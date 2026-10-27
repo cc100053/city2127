@@ -95,7 +95,7 @@ export function startScaleLab(scene: T.Scene, camera: T.PerspectiveCamera, city:
     const stats = scaleStats(steps);
     $('.lab-stats').innerHTML = `<caption>成段序列（#11 之後）形態佔比</caption><tr><th></th><th>low</th><th>mix</th><th>high</th></tr>`
       + CITY_AXES.map(axis => `<tr><th>${AXIS_NAME[axis]}</th><td>${pct(stats.bands[axis].low)}</td><td>${pct(stats.bands[axis].mixed)}</td><td>${pct(stats.bands[axis].high)}</td></tr>`).join('')
-      + `<tr><th>切換</th><td colspan="3">${stats.flips} 次</td></tr><tr><th>端口級數</th><td colspan="3">${stats.portValues} / 7</td></tr>`;
+      + `<tr><th>切換</th><td colspan="3">${stats.flips} 次</td></tr><tr><th>自動化段階</th><td colspan="3">${stats.tierValues} / 7</td></tr>`;
   }
 
   const togglePlay = () => { playing = !playing; nextAt = clock(); render(); };

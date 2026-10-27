@@ -44,8 +44,8 @@ assert.equal(supersedes(parsed.view, parsed.view), false);
 assert.equal(supersedes(parsed.view, { ...parsed.view, revision: 2 }), true);
 assert.equal(supersedes(parsed.view, { ...parsed.view, runId: 'reset', revision: 0 }), true);
 
-const v2BeforeLayout = { version: 2, bands: { nw: 'mixed', ne: 'mixed', sw: 'mixed', se: 'mixed' }, automatedPorts: 3, sharedSeats: 4, treeCount: 8, plantedFraction: .5, coolingFins: 3, functionModules: 4 } as const;
-const v2AfterLayout = { ...v2BeforeLayout, bands: { ...v2BeforeLayout.bands, ne: 'low' }, treeCount: 5, plantedFraction: .3125, coolingFins: 5 } as const;
+const v2BeforeLayout = { version: 2, bands: { nw: 'mixed', ne: 'mixed', sw: 'mixed', se: 'mixed' }, tiers: { nw: 0, ne: 0, sw: 0, se: 0 }, automatedPorts: 3, sharedSeats: 4, treeCount: 8, plantedFraction: .5, coolingFins: 3, functionModules: 4 } as const;
+const v2AfterLayout = { ...v2BeforeLayout, bands: { ...v2BeforeLayout.bands, ne: 'low' }, tiers: { ...v2BeforeLayout.tiers, ne: -1 }, treeCount: 3, plantedFraction: .2, coolingFins: 6 } as const;
 const v2BeforeScores = { ...zero };
 const v2Scores = { ...zero, environmentalPriority: -7.5 };
 const v2Proposal = {
@@ -58,7 +58,7 @@ const v2Proposal = {
   ],
   votes: { ...zero, environmentalPriority: -1 }, revisionBefore: 0, revisionAfter: 1, submittedAt: '2026-09-28T00:00:00.000Z',
   beforeScores: v2BeforeScores, afterScores: v2Scores, beforeLayout: v2BeforeLayout, afterLayout: v2AfterLayout,
-  cityChanges: [{ socketId: 'ne', label: '樹冠・冷却設備', before: { band: 'mixed', treeCount: 8, plantedFraction: .5, coolingFins: 3 }, after: { band: 'low', treeCount: 5, plantedFraction: .3125, coolingFins: 5 } }],
+  cityChanges: [{ socketId: 'ne', label: '樹冠・冷却設備', before: { band: 'mixed', tier: 0, treeCount: 8, plantedFraction: .5, coolingFins: 3 }, after: { band: 'low', tier: -1, treeCount: 3, plantedFraction: .2, coolingFins: 6 } }],
 };
 const v2View = {
   version: 2, runId: 'r2', revision: 1, guestCount: 1, algorithmVersion: 2, voteSums: { ...v2Proposal.votes },
@@ -93,6 +93,9 @@ assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2Vie
 assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, layout: { ...v2AfterLayout, bands: { ...v2AfterLayout.bands, ne: 'wild' } } } }), null);
 assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, recentProposals: Array(65).fill(v2Proposal) } }), null);
 assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, latestProposal: { ...v2Proposal, afterLayout: { ...v2AfterLayout, treeCount: 6 } } } }), null);
+assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, layout: { ...v2AfterLayout, tiers: { ...v2AfterLayout.tiers, ne: -2 } } } }), null, 'view layout must match its latest proposal');
+assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, layout: { ...v2AfterLayout, tiers: { ...v2AfterLayout.tiers, ne: 1 } } } }), null, 'tier sign must match its band');
+assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, layout: { ...v2AfterLayout, tiers: { ...v2AfterLayout.tiers, ne: -4 } } } }), null, 'tiers stay within ±3');
 assert.deepEqual(parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, latestProposal: { ...v2Proposal, answers: [v2Proposal.answers[0], { ...v2Proposal.answers[1], questionId: v2Proposal.answers[0].questionId }, ...v2Proposal.answers.slice(2)] } } }), null);
 const reorderedProposal = { ...v2Proposal, answers: [v2Proposal.answers[2], v2Proposal.answers[1], v2Proposal.answers[0], v2Proposal.answers[3]] };
 const reorderedV2 = parseSurveyEvent({ type: 'city-state-updated', view: { ...v2View, latestProposal: reorderedProposal, recentProposals: [reorderedProposal] } });
@@ -109,7 +112,7 @@ assert.deepEqual(feedback?.scores.map(score => [score.label, score.before, score
   ['機能の配置', '0.0', '0.0'],
 ]);
 assert.equal(feedback?.cityChanges.length, 1);
-assert.equal(feedback?.cityChanges[0]?.effect, '樹冠 8 → 5 · 植栽面 50.0% → 31.3% · 冷却設備 3 → 5');
+assert.equal(feedback?.cityChanges[0]?.effect, '段階 0 → -1 · 樹冠 8 → 3 · 植栽面 50.0% → 20.0% · 冷却設備 3 → 6');
 assert.equal(feedback?.changed, true);
 assert.equal(feedback?.cityChanged, true);
 assert.equal(feedback?.note, '提案 #1 の街区構成変更を記録しました。');

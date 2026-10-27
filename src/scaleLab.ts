@@ -1,6 +1,6 @@
-// DEV Scale Lab logic: replays a seeded guest sequence through the server reducer and the authoritative Scale A layout.
+// DEV Scale Lab logic: replays a seeded guest sequence through the server reducer, Scale A and the authoritative ladder layout.
 import { CITY_AXES, initialExhibitionState, type CityAxis, type CityScores, type ExhibitionState, type ExhibitionVotes, type Vote } from '../survey/src/shared/citySurveyState.ts';
-import { exhibitionBand, exhibitionDisplayScores, exhibitionStateLayout, type Band, type ExhibitionLayout } from '../survey/src/shared/cityView.ts';
+import { exhibitionBand, exhibitionDisplayScores, initialLadder, ladderLayout, ladderStep, type Band, type ExhibitionLadder, type ExhibitionLayout } from '../survey/src/shared/cityView.ts';
 import { applyProposalVotes, foldSlotSeeds } from '../survey/src/survey/scoreEngine.ts';
 
 export type VoteProfile = 'balanced' | 'leaning' | 'strong' | 'groups';
@@ -26,16 +26,18 @@ export function simulateVotes(profile: VoteProfile, guests: number, seed: number
   return votes;
 }
 
-export type LabStep = { state: ExhibitionState; slotSeeds: CityScores; votes?: ExhibitionVotes };
+/** `slotSeeds` are the ladder's frozen seeds, as the server view sends them. */
+export type LabStep = { state: ExhibitionState; slotSeeds: CityScores; ladder: ExhibitionLadder; votes?: ExhibitionVotes };
 
-/** Step 0 is the fresh run; step n is the city after guest #n, through the same reducer and seed fold as the server. */
+/** Step 0 is the fresh run; step n is the city after guest #n, through the same reducer, seed fold and ladder as the server. */
 export function replay(votes: ExhibitionVotes[]): LabStep[] {
-  let state = initialExhibitionState('scale-lab', new Date(0).toISOString());
+  let state = initialExhibitionState('scale-lab', new Date(0).toISOString()), ladder = initialLadder();
   const seeds = { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 };
-  const steps: LabStep[] = [{ state, slotSeeds: { ...seeds } }];
+  const steps: LabStep[] = [{ state, slotSeeds: ladder.seeds, ladder }];
   for (const vote of votes) {
     state = applyProposalVotes(state, vote, state.updatedAt);
-    steps.push({ state, slotSeeds: { ...foldSlotSeeds(seeds, vote) }, votes: vote });
+    ladder = ladderStep(ladder, state, vote, foldSlotSeeds(seeds, vote));
+    steps.push({ state, slotSeeds: ladder.seeds, ladder, votes: vote });
   }
   return steps;
 }
@@ -43,17 +45,17 @@ export function replay(votes: ExhibitionVotes[]): LabStep[] {
 /** The Scale A display score the layout reads for one axis at one step. */
 export const displayScore = (step: LabStep, axis: CityAxis) => exhibitionDisplayScores(step.state.scores, step.state.guestCount)[axis];
 /** Exactly the server layout for the step. */
-export const labLayout = (step: LabStep): ExhibitionLayout => exhibitionStateLayout(step.state.scores, step.state.guestCount);
+export const labLayout = (step: LabStep): ExhibitionLayout => ladderLayout(step.ladder.tiers);
 
-export type ScaleStats = { bands: Record<CityAxis, Record<Band, number>>; flips: number; portValues: number };
+export type ScaleStats = { bands: Record<CityAxis, Record<Band, number>>; flips: number; tierValues: number };
 
-/** Band share per axis (after the first ten guests, as in the planning simulation), total band flips and distinct port counts. */
+/** Band share per axis (after the first ten guests, as in the planning simulation), total band flips and distinct automation rungs. */
 export function scaleStats(steps: LabStep[]): ScaleStats {
   const bands = Object.fromEntries(CITY_AXES.map(axis => [axis, { low: 0, mixed: 0, high: 0 }])) as ScaleStats['bands'];
-  const ports = new Set<number>();
+  const rungs = new Set<number>();
   let flips = 0, counted = 0;
   steps.forEach((step, i) => {
-    ports.add(labLayout(step).automatedPorts);
+    rungs.add(labLayout(step).tiers.nw);
     if (i === 0) return;
     for (const axis of CITY_AXES) {
       const band = exhibitionBand(displayScore(step, axis));
@@ -63,5 +65,5 @@ export function scaleStats(steps: LabStep[]): ScaleStats {
     if (i > 10) counted++;
   });
   for (const axis of CITY_AXES) for (const band of ['low', 'mixed', 'high'] as const) bands[axis][band] = counted ? bands[axis][band] / counted : 0;
-  return { bands, flips, portValues: ports.size };
+  return { bands, flips, tierValues: rungs.size };
 }

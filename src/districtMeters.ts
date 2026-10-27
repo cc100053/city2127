@@ -149,16 +149,25 @@ const sitePulse = (socket: keyof typeof changeSites): PulsePoint => {
 const rank = (i: number) => { const s = Math.sin(i * 12.9898 + 4.1) * 43758.5453; return s - Math.floor(s); };
 /** P8: fixed design family (0..n − 1) per slot; the 7.31 stride breaks the long runs neighbouring slots give `rank`, the salt decorrelates carriers. */
 export const designOf = (i: number, salt: number, n: number) => Math.floor(rank(i * 7.31 + salt) * n);
-/** P9: share of slots showing a hybrid design, peaking at 60 % at mixed (axis position .5) and zero at every low / high band (≤ .25, ≥ .75). */
-export const hybridShare = (t: number) => .6 * Math.max(0, 1 - Math.abs(t - .5) / .25);
-/** P10: the other axes a district reads for its cross-Meter extras (the manager passes the whole layout; absent axes read as mixed). */
-export type PairingAxes = Partial<Pick<ExhibitionLayout, 'automatedPorts' | 'sharedSeats' | 'plantedFraction' | 'functionModules'>>;
-const axes = (l: PairingAxes) => ({
-  automation: l.automatedPorts === undefined ? .5 : l.automatedPorts / 6, sharing: l.sharedSeats === undefined ? .5 : l.sharedSeats / 8,
-  environment: l.plantedFraction === undefined ? .5 : (l.plantedFraction - .2) / .6, concentration: l.functionModules === undefined ? .5 : (l.functionModules - 2) / 4,
-});
-/** A pairing shows only when both axes agree: both high (≥ .7) or both low (≤ .3); every first low / high proposal clears these. */
-export const agree = (a: number, b: number, side: 'high' | 'low') => side === 'high' ? Math.min(a, b) >= .7 : Math.max(a, b) <= .3;
+/** Ladder rung → progress of a district from its mixed toward its complete form: rungs 0–1 (focal only) keep mixed, 2 is halfway, 3 complete. */
+export const rungStep = (tier: number) => [0, 0, .5, 1][Math.min(3, Math.abs(tier))];
+/** A district's switched share at `tier`, from its mixed share toward 1 (high) or 0 (low); a fixed seed keeps the switched slots nested. */
+export const ladderShare = (tier: number, mixed: number) => mixed + ((tier > 0 ? 1 : 0) - mixed) * rungStep(tier);
+/** Threshold for `rank < cut` slots at `tier`: mixed and complete as `ladderShare`, while rung 2 switches half the slots between them
+ * counted in rank order, since hashed ranks bunch (the 11 service bays already show 8 drone ports at mixed). */
+export function ladderCut(ranks: readonly number[], tier: number, mixed: number): number {
+  if (rungStep(tier) !== .5) return ladderShare(tier, mixed);
+  const sorted = [...ranks].sort((a, b) => a - b), n = sorted.length;
+  const k = Math.round((sorted.filter(r => r < mixed).length + (tier > 0 ? n : 0)) / 2);
+  return k >= n ? 1 : k <= 0 ? 0 : (sorted[k - 1] + sorted[k]) / 2;
+}
+const ranks = (n: number, key: (i: number) => number) => Array.from({ length: n }, (_, i) => key(i));
+/** P9: share of slots showing a hybrid design: 60 % at mixed, 30 % at rung 2, none in the complete form. */
+export const ladderHybrid = (tier: number) => .6 * (1 - rungStep(tier));
+/** P10: a pairing shows only when both its sites complete the same side (rung 3, or −3 for the low pairing). */
+export const agree = (tiers: ExhibitionLayout['tiers'], a: keyof ExhibitionLayout['tiers'], b: keyof ExhibitionLayout['tiers'], side: 'high' | 'low') =>
+  (side === 'high' ? Math.min(tiers[a], tiers[b]) : -Math.max(tiers[a], tiers[b])) >= 3;
+type LadderTarget = Pick<ExhibitionLayout, 'tiers'>;
 
 /** Private shell height as a share of its radius: a hemispherical vault rather than the former 28 m egg. */
 export const PRIVATE_RISE = 1.15;
@@ -325,25 +334,27 @@ export class SharingDistrict {
     this.root.visible = false; parent.add(this.root); this.write();
   }
 
-  setTarget(layout: Pick<ExhibitionLayout, 'sharedSeats'> & PairingAxes, now: number, immediate: boolean, seed = 0): boolean {
+  /** `quiet` settles a live change without pulses (another site carries the result's headline). */
+  setTarget({ tiers }: LadderTarget, now: number, immediate: boolean, seed = 0, quiet = false): boolean {
     if (immediate) this.pulses.clear();
-    this.target = layout.sharedSeats / 8;
-    const axis = axes(layout);
-    const kiosks = this.kiosk.setTargets(() => agree(axis.sharing, axis.automation, 'high') ? 1 : 0, now, immediate);
-    const orchards = this.orchard.setTargets(() => agree(axis.sharing, axis.environment, 'high') ? 1 : 0, now, immediate);
-    // The first low / high proposals (2 / 7 seats) already read as distinct mature alternatives.
-    const share = T.MathUtils.smoothstep(this.target, .25, .875);
+    const tier = tiers.sw;
+    this.target = ladderShare(tier, .5);
+    const kiosks = this.kiosk.setTargets(() => agree(tiers, 'sw', 'nw', 'high') ? 1 : 0, now, immediate);
+    const orchards = this.orchard.setTargets(() => agree(tiers, 'sw', 'ne', 'high') ? 1 : 0, now, immediate);
+    // Mixed keeps about a third of rooms and courts open (the former mixed curve); rung 2 goes halfway to all open / all private.
+    const mixed = T.MathUtils.smoothstep(.5, .25, .875);
+    const roomCut = ladderCut(ranks(this.bays.length, i => rank(i + 401)), tier, mixed), courtCut = ladderCut(ranks(COURT_SITES.length, i => rank(i + 977)), tier, mixed);
     this.root.visible = true;
-    const rooms = this.levels.setTargets(i => rank(i + 401) < share ? 1 : 0, now, immediate, seed);
-    const courts = this.court.setTargets(i => rank(i + 977) < share ? 1 : 0, now, immediate, seed);
-    const hybrid = hybridShare(this.target);
+    const rooms = this.levels.setTargets(i => rank(i + 401) < roomCut ? 1 : 0, now, immediate, seed);
+    const courts = this.court.setTargets(i => rank(i + 977) < courtCut ? 1 : 0, now, immediate, seed);
+    const hybrid = ladderHybrid(tier);
     const hr = this.hybridRooms.setTargets(i => rank(i + 433) < hybrid ? 1 : 0, now, immediate, seed);
     const hc = this.hybridCourts.setTargets(i => rank(i + 1019) < hybrid ? 1 : 0, now, immediate, seed);
     const changed = rooms || courts || hr || hc || kiosks || orchards;
     const roomSlots = new Set([...(rooms ? this.levels.changed : []), ...(hr ? this.hybridRooms.changed : [])]);
     const courtSlots = new Set([...(courts ? this.court.changed : []), ...(hc ? this.hybridCourts.changed : []), ...(kiosks ? this.kiosk.changed : []),
       ...(orchards ? this.orchard.changed : [])]);
-    if (changed && !immediate) this.pulses.emit([sitePulse('sw'), ...[...roomSlots].map(i => {
+    if (changed && !immediate && !quiet) this.pulses.emit([sitePulse('sw'), ...[...roomSlots].map(i => {
       const b = this.bays[i]; return { x: b.x, y: b.y, z: b.z, r: b.r * b.sx * 1.3 };
     }), ...[...courtSlots].map(i => ({ x: this.courts[i].x, y: 0, z: this.courts[i].z, r: COURT * .75 }))], now);
     this.write(); return changed;
@@ -550,6 +561,7 @@ export class EnvironmentDistrict {
   private sailGeometry!: T.BufferGeometry;
   private readonly postGeometry = new T.CylinderGeometry(.22, .3, ROOF, 8);
   private targetCanopy = .5;
+  private targetHybrid = .6;
   private orderSeed = 0;
   private now = 0;
   private applied = false;
@@ -656,15 +668,16 @@ export class EnvironmentDistrict {
     const green = (i: number) => rank(i + 37) < this.targetCanopy ? 1 : 0;
     const a = this.roofSail.setTargets(i => 1 - green(i), now, immediate, this.orderSeed);
     const b = this.roofCrown.setTargets(green, now, immediate, this.orderSeed);
-    const c = this.roofHybrid.setTargets(i => rank(i + 887) < hybridShare(this.targetCanopy) ? 1 : 0, now, immediate, this.orderSeed);
+    const c = this.roofHybrid.setTargets(i => rank(i + 887) < this.targetHybrid ? 1 : 0, now, immediate, this.orderSeed);
     return a || b || c;
   }
 
-  /** `plantedFraction` runs .2–.8 over the environment axis; its 0..1 position is the share of canopy-shaded bays. */
-  setTarget(layout: Pick<ExhibitionLayout, 'plantedFraction'>, now: number, immediate: boolean, seed = 0): boolean {
+  /** The share of canopy-shaded bays is .5 at mixed, .25 / .75 at rung ∓2 and 0 / 1 in the complete form. */
+  setTarget({ tiers }: LadderTarget, now: number, immediate: boolean, seed = 0, quiet = false): boolean {
     if (immediate) this.pulses.clear();
-    const share = Math.min(1, Math.max(0, (layout.plantedFraction - .2) / .6));
+    const share = ladderShare(tiers.ne, .5);
     this.targetCanopy = share;
+    this.targetHybrid = ladderHybrid(tiers.ne);
     this.orderSeed = seed;
     this.now = now;
     this.applied = true;
@@ -674,10 +687,10 @@ export class EnvironmentDistrict {
     const b = this.sail.setTargets(i => 1 - green(i), now, immediate, seed);
     // Mist towers only below the midpoint: most at the low end, none from mixed upward.
     const c = this.tower.setTargets(i => rank(i + 101) >= share * 2 ? 1 : 0, now, immediate, seed);
-    const h = this.hybrid.setTargets(i => rank(i + 577) < hybridShare(share) ? 1 : 0, now, immediate, seed);
+    const h = this.hybrid.setTargets(i => rank(i + 577) < this.targetHybrid ? 1 : 0, now, immediate, seed);
     const d = this.setRoofTargets(now, immediate) || h;
     this.facade.setTargets(i => facadeShare(i ? 1 - share : share), now, immediate);
-    if ((a || b || c || d) && !immediate) {
+    if ((a || b || c || d) && !immediate && !quiet) {
       const bays = new Set([...this.canopy.changed, ...this.sail.changed, ...this.hybrid.changed, ...this.tower.changed.map(j => this.towerBays[j])]);
       const roofs = new Set([...this.roofSail.changed, ...this.roofCrown.changed, ...this.roofHybrid.changed]);
       this.pulses.emit([
@@ -931,17 +944,19 @@ export class AutomationDistrict {
 
   get level(): number | undefined { return this.root.visible ? this.automation.value[0] : undefined; }
 
-  setTarget(layout: Pick<ExhibitionLayout, 'automatedPorts'>, now: number, immediate: boolean, seed = 0): boolean {
+  setTarget({ tiers }: LadderTarget, now: number, immediate: boolean, seed = 0, quiet = false): boolean {
     if (immediate) this.pulses.clear();
-    this.target = layout.automatedPorts / 6;
-    const activity = automationActivity(this.target);
+    const tier = tiers.nw;
+    // Fleets, aircraft and street pods stay mixed until rung 3 completes the district; the bays switch from rung 2.
+    this.target = rungStep(tier) === 1 ? tier > 0 ? 1 : 0 : .5;
     this.root.visible = true;
     const a = this.automation.setTargets(() => this.target, now, immediate);
-    const b = this.staffed.setTargets(i => rank(i + 203) >= activity.level ? 1 : 0, now, immediate, seed);
-    const h = this.hybrid.setTargets(i => rank(i + 307) < hybridShare(this.target) ? 1 : 0, now, immediate, seed);
+    const cut = ladderCut(ranks(this.bays.length, i => rank(i + 203)), tier, .5);
+    const b = this.staffed.setTargets(i => rank(i + 203) >= cut ? 1 : 0, now, immediate, seed);
+    const h = this.hybrid.setTargets(i => rank(i + 307) < ladderHybrid(tier) ? 1 : 0, now, immediate, seed);
     // The fleets change everywhere at once, so the hub anchors the pulse; changed bays (pavilion ↔ drone port ↔ hybrid) mark their terraces.
     const bays = new Set([...(b ? this.staffed.changed : []), ...(h ? this.hybrid.changed : [])]);
-    if ((a || b || h) && !immediate) this.pulses.emit([sitePulse('nw'), ...[...bays].map(i => ({ x: this.bays[i].x, y: this.bays[i].y + 20, z: this.bays[i].z, r: 26 }))], now);
+    if ((a || b || h) && !immediate && !quiet) this.pulses.emit([sitePulse('nw'), ...[...bays].map(i => ({ x: this.bays[i].x, y: this.bays[i].y + 20, z: this.bays[i].z, r: 26 }))], now);
     this.write(); return a || b || h;
   }
 
@@ -1171,22 +1186,22 @@ export class ConcentrationDistrict {
     this.root.visible = false; parent.add(this.root); this.write();
   }
 
-  setTarget(layout: Pick<ExhibitionLayout, 'functionModules'> & PairingAxes, now: number, immediate: boolean, seed = 0): boolean {
+  setTarget({ tiers }: LadderTarget, now: number, immediate: boolean, seed = 0, quiet = false): boolean {
     if (immediate) this.pulses.clear();
-    this.target = (layout.functionModules - 2) / 4;
-    const axis = axes(layout);
-    const f = this.forest.setTargets(() => agree(axis.concentration, axis.environment, 'high') ? 1 : 0, now, immediate);
-    const d = this.docks.setTargets(() => agree(axis.concentration, axis.automation, 'high') ? 1 : 0, now, immediate);
-    const sp = this.solarPods.setTargets(() => agree(axis.concentration, axis.environment, 'low') ? 1 : 0, now, immediate);
-    // First low / high proposals (3 / 5 modules) read as the two complete forms; mixed (4) keeps about half of each.
-    const share = T.MathUtils.smoothstep(this.target, .3, .75);
+    const tier = tiers.se;
+    this.target = ladderShare(tier, .5);
+    const f = this.forest.setTargets(() => agree(tiers, 'se', 'ne', 'high') ? 1 : 0, now, immediate);
+    const d = this.docks.setTargets(() => agree(tiers, 'se', 'nw', 'high') ? 1 : 0, now, immediate);
+    const sp = this.solarPods.setTargets(() => agree(tiers, 'se', 'ne', 'low') ? 1 : 0, now, immediate);
+    // Mixed keeps about half of towers and pods (the former mixed curve); rung 2 goes halfway to the complete form.
+    const share = ladderShare(tier, T.MathUtils.smoothstep(.5, .3, .75));
     this.root.visible = true;
     // Golden-ratio order: with only ten towers a hash rank clusters, this keeps any share evenly spread across both groups.
     const order = (i: number, offset: number) => (i * .6180339887 + offset) % 1;
     const a = this.towerLevels.setTargets(i => order(i, .31) < share ? 1 : 0, now, immediate, seed);
     const b = this.podLevels.setTargets(i => order(i, .77) >= share ? 1 : 0, now, immediate, seed);
-    const m = this.midRise.setTargets(i => rank(i + 1301) < hybridShare(this.target) ? 1 : 0, now, immediate, seed);
-    if ((a || b || m || f || d || sp) && !immediate) this.pulses.emit([
+    const m = this.midRise.setTargets(i => rank(i + 1301) < ladderHybrid(tier) ? 1 : 0, now, immediate, seed);
+    if ((a || b || m || f || d || sp) && !immediate && !quiet) this.pulses.emit([
       sitePulse('se'),
       ...[...new Set([...(a ? this.towerLevels.changed : []), ...(m ? this.midRise.changed : []), ...(f ? this.forest.changed : []), ...(d ? this.docks.changed : [])])]
         .map(i => ({ x: this.towers[i].x, y: 1, z: this.towers[i].z, r: 30 })),

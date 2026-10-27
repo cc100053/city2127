@@ -9,7 +9,7 @@ import { viewOf } from './answerService.ts';
 import { transaction } from './database.ts';
 import { fail, type ServiceOutcome, type SurveyContext } from './context.ts';
 import { finishGuest, readLifecycle, setLifecycle, isStationMode, stationSessions, syncStations } from './adminService.ts';
-import { activeRun, CorruptStateError, num, readExhibitionSnapshot, str, toProposalRecord, writeExhibitionSnapshot } from './runStore.ts';
+import { activeRun, CorruptStateError, num, readExhibitionSnapshot, str, proposalRecordOf, writeExhibitionSnapshot } from './runStore.ts';
 
 import { DISPLAY_MS, RESULT_LEASE_MS } from '../shared/displayTiming.ts';
 
@@ -178,7 +178,7 @@ function duplicateResult(ctx: SurveyContext, row: Row, request: ProposalRequest)
   }
   if (ctx.db.prepare('SELECT proposal_id FROM proposal_undos WHERE proposal_id = ?').get(request.submissionId))
     return { response: fail('proposal_undone', 'This proposal was undone by an administrator. Start a new questionnaire.', currentExhibition(ctx)?.state) };
-  const proposal = toProposalRecord(row);
+  const proposal = proposalRecordOf(ctx.db, row);
   const wait = displayWait(ctx, proposal);
   const session = ctx.db.prepare('SELECT ended_at FROM proposal_sessions WHERE id = ?').get(proposal.guestSessionId);
   return { response: { ok: true, data: { proposal, state: savedState(row), replayed: true, ...wait,
@@ -269,7 +269,7 @@ export function submitProposal(ctx: SurveyContext, body: unknown): ServiceOutcom
 
     const row = ctx.db.prepare('SELECT * FROM proposal_events WHERE id = ?').get(request.submissionId);
     if (!row) throw new CorruptStateError('proposal insert did not produce a row');
-    const proposal = toProposalRecord(row);
+    const proposal = proposalRecordOf(ctx.db, row);
     return {
       response: { ok: true, data: { proposal, state: next, replayed: false, ...displayWait(ctx, proposal) } },
       event: { type: 'city-state-updated', submissionId: proposal.id, state: next, proposal, view: viewOf(ctx, next), ...displayWait(ctx, proposal) },
