@@ -1,0 +1,1587 @@
+{
+  "complete": false,
+  "measuredStates": 24,
+  "method": "Reconstruct the authored42deg/16:9 camera rays. Compare saved first-hit distance with world-AABB entry/exit; 1cm margin. Interior non-subject geometry remains ambiguous. This does not change A3 and does not model shaders/alpha.",
+  "rows": [
+    {
+      "id": "ne:focal",
+      "state": "-2",
+      "hour": 12,
+      "samples": [
+        {
+          "x": 0.5081580761600211,
+          "y": 0.5244856438849251,
+          "hit": true,
+          "first": "park-cooling-fin-instances",
+          "distance": 164.2204490254812,
+          "cause": "subject"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "aqua-city-odaiba",
+          "distance": 178.4611015628756,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "concentration-vertical-towers",
+          "distance": 178.96195648310658,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.7222188508414855,
+          "hit": false,
+          "first": "WATERFRONT_PROMENADE",
+          "distance": 137.05761653616761,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.7222188508414855,
+          "hit": false,
+          "first": "sharing-open-plazas",
+          "distance": 136.73499723358557,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.5081580761600211,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "surveyed-coastal-canopy",
+          "distance": 214.5177677134779,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.5081580761600211,
+          "y": 0.7222188508414855,
+          "hit": true,
+          "first": "guest-marker-ne",
+          "distance": 131.71872187249178,
+          "cause": "subject"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.5244856438849251,
+          "hit": false,
+          "first": "concentration-distributed-pods",
+          "distance": 162.02670113916926,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.5244856438849251,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 175.47412904023366,
+          "cause": "gap through entire world AABB"
+        }
+      ]
+    },
+    {
+      "id": "ne:focal",
+      "state": "-2",
+      "hour": 22,
+      "samples": [
+        {
+          "x": 0.5081580761600211,
+          "y": 0.5244856438849251,
+          "hit": true,
+          "first": "park-cooling-fin-instances",
+          "distance": 164.2204490254812,
+          "cause": "subject"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "aqua-city-odaiba",
+          "distance": 178.4611015628756,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "concentration-vertical-towers",
+          "distance": 178.96195648310658,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.7222188508414855,
+          "hit": false,
+          "first": "WATERFRONT_PROMENADE",
+          "distance": 137.05761653616761,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.7222188508414855,
+          "hit": false,
+          "first": "sharing-open-plazas",
+          "distance": 136.73499723358557,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.5081580761600211,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "surveyed-coastal-canopy",
+          "distance": 214.5177677134779,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.5081580761600211,
+          "y": 0.7222188508414855,
+          "hit": true,
+          "first": "guest-marker-ne",
+          "distance": 131.71872187249178,
+          "cause": "subject"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.5244856438849251,
+          "hit": false,
+          "first": "concentration-distributed-pods",
+          "distance": 162.02670113916926,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.5244856438849251,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 175.47412904023366,
+          "cause": "gap through entire world AABB"
+        }
+      ]
+    },
+    {
+      "id": "ne:focal",
+      "state": "0",
+      "hour": 12,
+      "samples": [
+        {
+          "x": 0.5081580761600211,
+          "y": 0.5244856438849251,
+          "hit": true,
+          "first": "park-tree-glb-instances",
+          "distance": 150.4682707866201,
+          "cause": "subject"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "aqua-city-odaiba",
+          "distance": 178.4611015628756,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "concentration-vertical-towers",
+          "distance": 178.96195648310658,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.7222188508414855,
+          "hit": false,
+          "first": "WATERFRONT_PROMENADE",
+          "distance": 137.05761653616761,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.7222188508414855,
+          "hit": false,
+          "first": "sharing-open-plazas",
+          "distance": 136.73499723358557,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.5081580761600211,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "surveyed-coastal-canopy",
+          "distance": 214.5177677134779,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.5081580761600211,
+          "y": 0.7222188508414855,
+          "hit": true,
+          "first": "guest-marker-ne",
+          "distance": 131.71872187249178,
+          "cause": "subject"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.5244856438849251,
+          "hit": false,
+          "first": "concentration-distributed-pods",
+          "distance": 162.02670113916926,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.5244856438849251,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 175.47412904023366,
+          "cause": "gap through entire world AABB"
+        }
+      ]
+    },
+    {
+      "id": "ne:focal",
+      "state": "0",
+      "hour": 22,
+      "samples": [
+        {
+          "x": 0.5081580761600211,
+          "y": 0.5244856438849251,
+          "hit": true,
+          "first": "park-tree-glb-instances",
+          "distance": 150.4682707866201,
+          "cause": "subject"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "aqua-city-odaiba",
+          "distance": 178.4611015628756,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "concentration-vertical-towers",
+          "distance": 178.96195648310658,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.7222188508414855,
+          "hit": false,
+          "first": "WATERFRONT_PROMENADE",
+          "distance": 137.05761653616761,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.7222188508414855,
+          "hit": false,
+          "first": "sharing-open-plazas",
+          "distance": 136.73499723358557,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.5081580761600211,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "surveyed-coastal-canopy",
+          "distance": 214.5177677134779,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.5081580761600211,
+          "y": 0.7222188508414855,
+          "hit": true,
+          "first": "guest-marker-ne",
+          "distance": 131.71872187249178,
+          "cause": "subject"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.5244856438849251,
+          "hit": false,
+          "first": "concentration-distributed-pods",
+          "distance": 162.02670113916926,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.5244856438849251,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 175.47412904023366,
+          "cause": "gap through entire world AABB"
+        }
+      ]
+    },
+    {
+      "id": "ne:focal",
+      "state": "2",
+      "hour": 12,
+      "samples": [
+        {
+          "x": 0.5081580761600211,
+          "y": 0.5244856438849251,
+          "hit": true,
+          "first": "park-tree-glb-instances",
+          "distance": 133.87401047190323,
+          "cause": "subject"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "aqua-city-odaiba",
+          "distance": 178.4611015628756,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "concentration-vertical-towers",
+          "distance": 178.96195648310658,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.7222188508414855,
+          "hit": false,
+          "first": "WATERFRONT_PROMENADE",
+          "distance": 137.05761653616761,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.7222188508414855,
+          "hit": false,
+          "first": "sharing-open-plazas",
+          "distance": 136.73499723358557,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.5081580761600211,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "surveyed-coastal-canopy",
+          "distance": 214.5177677134779,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.5081580761600211,
+          "y": 0.7222188508414855,
+          "hit": true,
+          "first": "guest-marker-ne",
+          "distance": 131.71872187249178,
+          "cause": "subject"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.5244856438849251,
+          "hit": false,
+          "first": "concentration-distributed-pods",
+          "distance": 162.02670113916926,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.5244856438849251,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 175.47412904023366,
+          "cause": "gap through entire world AABB"
+        }
+      ]
+    },
+    {
+      "id": "ne:focal",
+      "state": "2",
+      "hour": 22,
+      "samples": [
+        {
+          "x": 0.5081580761600211,
+          "y": 0.5244856438849251,
+          "hit": true,
+          "first": "park-tree-glb-instances",
+          "distance": 133.87401047190323,
+          "cause": "subject"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "aqua-city-odaiba",
+          "distance": 178.4611015628756,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "concentration-vertical-towers",
+          "distance": 178.96195648310658,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.7222188508414855,
+          "hit": false,
+          "first": "WATERFRONT_PROMENADE",
+          "distance": 137.05761653616761,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.7222188508414855,
+          "hit": false,
+          "first": "sharing-open-plazas",
+          "distance": 136.73499723358557,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.5081580761600211,
+          "y": 0.32675243692836475,
+          "hit": false,
+          "first": "surveyed-coastal-canopy",
+          "distance": 214.5177677134779,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.5081580761600211,
+          "y": 0.7222188508414855,
+          "hit": true,
+          "first": "guest-marker-ne",
+          "distance": 131.71872187249178,
+          "cause": "subject"
+        },
+        {
+          "x": 0.3763943026158062,
+          "y": 0.5244856438849251,
+          "hit": false,
+          "first": "concentration-distributed-pods",
+          "distance": 162.02670113916926,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.6399218497042359,
+          "y": 0.5244856438849251,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 175.47412904023366,
+          "cause": "gap through entire world AABB"
+        }
+      ]
+    },
+    {
+      "id": "ne:district",
+      "state": "-8",
+      "hour": 12,
+      "samples": [
+        {
+          "x": 0.6237637491948684,
+          "y": 2.5206433769865058,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 272.82649577672595,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.017735649035785755,
+          "y": 0.5602710831083131,
+          "hit": false,
+          "first": "decks-tokyo-beach",
+          "distance": 551.5897795614092,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 1.2297918493539512,
+          "y": 0.5602710831083131,
+          "hit": false,
+          "first": "backdrop-grove",
+          "distance": 719.3351453075128,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.017735649035785755,
+          "y": 4.481015670864699,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 280.7197754623027,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2297918493539512,
+          "y": 4.481015670864699,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 287.9082808933731,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6237637491948684,
+          "y": 0.5602710831083131,
+          "hit": false,
+          "first": "fixed-kit",
+          "distance": 529.6193684342813,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 0.6237637491948684,
+          "y": 4.481015670864699,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 275.3970100491165,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.017735649035785755,
+          "y": 2.5206433769865058,
+          "hit": false,
+          "first": "water-taxi-wakes",
+          "distance": 288.38522456436385,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2297918493539512,
+          "y": 2.5206433769865058,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 308.7301468835294,
+          "cause": "projected-box gap (ray misses world AABB)"
+        }
+      ]
+    },
+    {
+      "id": "ne:district",
+      "state": "-8",
+      "hour": 22,
+      "samples": [
+        {
+          "x": 0.6237637491948684,
+          "y": 2.5206433769865058,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 272.82649577672595,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.017735649035785755,
+          "y": 0.5602710831083131,
+          "hit": false,
+          "first": "decks-tokyo-beach",
+          "distance": 551.5897795614092,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 1.2297918493539512,
+          "y": 0.5602710831083131,
+          "hit": false,
+          "first": "backdrop-grove",
+          "distance": 719.3351453075128,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.017735649035785755,
+          "y": 4.481015670864699,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 280.7197754623027,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2297918493539512,
+          "y": 4.481015670864699,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 287.9082808933731,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6237637491948684,
+          "y": 0.5602710831083131,
+          "hit": false,
+          "first": "fixed-kit",
+          "distance": 529.6193684342813,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 0.6237637491948684,
+          "y": 4.481015670864699,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 275.3970100491165,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.017735649035785755,
+          "y": 2.5206433769865058,
+          "hit": false,
+          "first": "water-taxi-wakes",
+          "distance": 288.38522456436385,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2297918493539512,
+          "y": 2.5206433769865058,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 308.7301468835294,
+          "cause": "projected-box gap (ray misses world AABB)"
+        }
+      ]
+    },
+    {
+      "id": "ne:district",
+      "state": "-5",
+      "hour": 12,
+      "samples": [
+        {
+          "x": 0.6206802403780173,
+          "y": 2.639515326517216,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 272.20753778181097,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.012185333165453588,
+          "y": 0.5837132218904789,
+          "hit": false,
+          "first": "concentration-vertical-towers",
+          "distance": 515.9765914941445,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 1.2291751475905812,
+          "y": 0.5837132218904789,
+          "hit": false,
+          "first": "skyways",
+          "distance": 564.6741398521972,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.012185333165453588,
+          "y": 4.6953174311439545,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 281.1137710133921,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2291751475905812,
+          "y": 4.6953174311439545,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 287.54830102807114,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6206802403780173,
+          "y": 0.5837132218904789,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 518.6552333591815,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.6206802403780173,
+          "y": 4.6953174311439545,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 276.1196055688094,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.012185333165453588,
+          "y": 2.639515326517216,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 287.0097788081823,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2291751475905812,
+          "y": 2.639515326517216,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 305.3823463852768,
+          "cause": "projected-box gap (ray misses world AABB)"
+        }
+      ]
+    },
+    {
+      "id": "ne:district",
+      "state": "-5",
+      "hour": 22,
+      "samples": [
+        {
+          "x": 0.6206802403780173,
+          "y": 2.639515326517216,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 272.20753778181097,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.012185333165453588,
+          "y": 0.5837132218904789,
+          "hit": false,
+          "first": "concentration-vertical-towers",
+          "distance": 515.9765914941445,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 1.2291751475905812,
+          "y": 0.5837132218904789,
+          "hit": false,
+          "first": "skyways",
+          "distance": 564.6741398521972,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.012185333165453588,
+          "y": 4.6953174311439545,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 281.1137710133921,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2291751475905812,
+          "y": 4.6953174311439545,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 287.54830102807114,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6206802403780173,
+          "y": 0.5837132218904789,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 518.6552333591815,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.6206802403780173,
+          "y": 4.6953174311439545,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 276.1196055688094,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.012185333165453588,
+          "y": 2.639515326517216,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 287.0097788081823,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2291751475905812,
+          "y": 2.639515326517216,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 305.3823463852768,
+          "cause": "projected-box gap (ray misses world AABB)"
+        }
+      ]
+    },
+    {
+      "id": "ne:district",
+      "state": "0",
+      "hour": 12,
+      "samples": [
+        {
+          "x": 0.6214858492165408,
+          "y": 2.6639107970263782,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 272.1320603337557,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.012346454933158307,
+          "y": 0.5885923159923113,
+          "hit": false,
+          "first": "concentration-vertical-towers",
+          "distance": 514.2208353828629,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 1.2306252434999232,
+          "y": 0.5885923159923113,
+          "hit": false,
+          "first": "skyways",
+          "distance": 563.0665019248303,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.012346454933158307,
+          "y": 4.739229278060446,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 281.17147517786566,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2306252434999232,
+          "y": 4.739229278060446,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 287.5404170464921,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6214858492165408,
+          "y": 0.5885923159923113,
+          "hit": false,
+          "first": "YURIKAMOME_PHASE03C_REFINEMENT_Mesh",
+          "distance": 487.6518400279334,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 0.6214858492165408,
+          "y": 4.739229278060446,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 276.2753730015714,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.012346454933158307,
+          "y": 2.6639107970263782,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 286.67080090634573,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2306252434999232,
+          "y": 2.6639107970263782,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 304.89661034078495,
+          "cause": "projected-box gap (ray misses world AABB)"
+        }
+      ]
+    },
+    {
+      "id": "ne:district",
+      "state": "0",
+      "hour": 22,
+      "samples": [
+        {
+          "x": 0.6215126436473851,
+          "y": 2.6638721272828234,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 272.13263011893827,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.012351813819327151,
+          "y": 0.5885227104539128,
+          "hit": false,
+          "first": "concentration-vertical-towers",
+          "distance": 514.263357711606,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 1.2306734734754432,
+          "y": 0.5885227104539128,
+          "hit": false,
+          "first": "skyways",
+          "distance": 563.114498497241,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.012351813819327151,
+          "y": 4.739221544111735,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 281.1713504854564,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2306734734754432,
+          "y": 4.739221544111735,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 287.54192569227325,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6215126436473851,
+          "y": 0.5885227104539128,
+          "hit": false,
+          "first": "YURIKAMOME_PHASE03C_REFINEMENT_Mesh",
+          "distance": 487.69617812095913,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 0.6215126436473851,
+          "y": 4.739221544111735,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 276.2754905566757,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.012351813819327151,
+          "y": 2.6638721272828234,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 286.67097911185414,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2306734734754432,
+          "y": 2.6638721272828234,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 304.9017778880969,
+          "cause": "projected-box gap (ray misses world AABB)"
+        }
+      ]
+    },
+    {
+      "id": "ne:district",
+      "state": "5",
+      "hour": 12,
+      "samples": [
+        {
+          "x": 0.6206332925264914,
+          "y": 2.637408754273499,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 272.21481130892215,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.012257839728562064,
+          "y": 0.5835156941049301,
+          "hit": false,
+          "first": "concentration-vertical-towers",
+          "distance": 516.0801415397078,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 1.2290087453244207,
+          "y": 0.5835156941049301,
+          "hit": false,
+          "first": "skyways",
+          "distance": 564.7001864164528,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.012257839728562064,
+          "y": 4.691301814442068,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 281.1067202886106,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2290087453244207,
+          "y": 4.691301814442068,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 287.54813506898023,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6206332925264914,
+          "y": 0.5835156941049301,
+          "hit": false,
+          "first": "guest-marker-sw",
+          "distance": 515.1432932721826,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 0.6206332925264914,
+          "y": 4.691301814442068,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 276.10548718488775,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.012257839728562064,
+          "y": 2.637408754273499,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 287.0342759847085,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2290087453244207,
+          "y": 2.637408754273499,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 305.42141755777,
+          "cause": "projected-box gap (ray misses world AABB)"
+        }
+      ]
+    },
+    {
+      "id": "ne:district",
+      "state": "5",
+      "hour": 22,
+      "samples": [
+        {
+          "x": 0.620528603307419,
+          "y": 2.637556608151856,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 272.212523901791,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.012236901884747575,
+          "y": 0.5837818310859728,
+          "hit": false,
+          "first": "concentration-vertical-towers",
+          "distance": 515.9157785600197,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 1.2288203047300903,
+          "y": 0.5837818310859728,
+          "hit": false,
+          "first": "skyways",
+          "distance": 564.513481263942,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.012236901884747575,
+          "y": 4.691331385217739,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 281.10721390053067,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2288203047300903,
+          "y": 4.691331385217739,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 287.54213708627964,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.620528603307419,
+          "y": 0.5837818310859728,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 518.5940217668291,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.620528603307419,
+          "y": 4.691331385217739,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 276.1050188085269,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.012236901884747575,
+          "y": 2.637556608151856,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 287.03355281454554,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2288203047300903,
+          "y": 2.637556608151856,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 305.4009494504563,
+          "cause": "projected-box gap (ray misses world AABB)"
+        }
+      ]
+    },
+    {
+      "id": "ne:district",
+      "state": "8",
+      "hour": 12,
+      "samples": [
+        {
+          "x": 0.6208356278889419,
+          "y": 2.633390463776604,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 272.23367584533594,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.013393966608447827,
+          "y": 0.5856459671938402,
+          "hit": false,
+          "first": "concentration-vertical-towers",
+          "distance": 515.4740794722065,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 1.2282772891694358,
+          "y": 0.5856459671938402,
+          "hit": false,
+          "first": "skyways",
+          "distance": 563.49334342351,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.013393966608447827,
+          "y": 4.681134960359368,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 281.0682481134897,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2282772891694358,
+          "y": 4.681134960359368,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 287.5379960587824,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6208356278889419,
+          "y": 0.5856459671938402,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 517.4437681418871,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.6208356278889419,
+          "y": 4.681134960359368,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 276.07148891755406,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.013393966608447827,
+          "y": 2.633390463776604,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 287.0182551974916,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2282772891694358,
+          "y": 2.633390463776604,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 305.45952525749294,
+          "cause": "projected-box gap (ray misses world AABB)"
+        }
+      ]
+    },
+    {
+      "id": "ne:district",
+      "state": "8",
+      "hour": 22,
+      "samples": [
+        {
+          "x": 0.6208356278889419,
+          "y": 2.633390463776604,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 272.23367584533594,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.013393966608447827,
+          "y": 0.5856459671938402,
+          "hit": false,
+          "first": "concentration-vertical-towers",
+          "distance": 515.4740794722065,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 1.2282772891694358,
+          "y": 0.5856459671938402,
+          "hit": false,
+          "first": "skyways",
+          "distance": 563.49334342351,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.013393966608447827,
+          "y": 4.681134960359368,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 281.0682481134897,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2282772891694358,
+          "y": 4.681134960359368,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 287.5379960587824,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6208356278889419,
+          "y": 0.5856459671938402,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 517.4437681418871,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.6208356278889419,
+          "y": 4.681134960359368,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 276.07148891755406,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.013393966608447827,
+          "y": 2.633390463776604,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 287.0182551974916,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 1.2282772891694358,
+          "y": 2.633390463776604,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 305.45952525749294,
+          "cause": "projected-box gap (ray misses world AABB)"
+        }
+      ]
+    },
+    {
+      "id": "energy:garden",
+      "state": "a",
+      "hour": 12,
+      "samples": [
+        {
+          "x": 0.5041521790850225,
+          "y": 0.5691690472172901,
+          "hit": false,
+          "first": "tidal-edge",
+          "distance": 142.31108607553023,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 0.36910726871986227,
+          "y": 0.357707331268587,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 236.28425794504884,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6391970894501826,
+          "y": 0.357707331268587,
+          "hit": false,
+          "first": "SIDEWALK_NETWORK",
+          "distance": 236.60611538655274,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.36910726871986227,
+          "y": 0.7806307631659934,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 107.92913116234062,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6391970894501826,
+          "y": 0.7806307631659934,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 108.13802212796166,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.5041521790850225,
+          "y": 0.357707331268587,
+          "hit": false,
+          "first": "SIDEWALK_NETWORK",
+          "distance": 232.34645270509913,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.5041521790850225,
+          "y": 0.7806307631659934,
+          "hit": true,
+          "first": "fixed-kit",
+          "distance": 104.2918311119898,
+          "cause": "subject"
+        },
+        {
+          "x": 0.36910726871986227,
+          "y": 0.5691690472172901,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 145.45700655954607,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.6391970894501826,
+          "y": 0.5691690472172901,
+          "hit": false,
+          "first": "tidal-edge",
+          "distance": 146.75912329290858,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        }
+      ]
+    },
+    {
+      "id": "energy:garden",
+      "state": "a",
+      "hour": 22,
+      "samples": [
+        {
+          "x": 0.5041521790850225,
+          "y": 0.5691690472172901,
+          "hit": false,
+          "first": "tidal-edge",
+          "distance": 142.31108607553023,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 0.36910726871986227,
+          "y": 0.357707331268587,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 236.28425794504884,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6391970894501826,
+          "y": 0.357707331268587,
+          "hit": false,
+          "first": "SIDEWALK_NETWORK",
+          "distance": 236.60611538655274,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.36910726871986227,
+          "y": 0.7806307631659934,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 107.92913116234062,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6391970894501826,
+          "y": 0.7806307631659934,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 108.13802212796166,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.5041521790850225,
+          "y": 0.357707331268587,
+          "hit": false,
+          "first": "SIDEWALK_NETWORK",
+          "distance": 232.34645270509913,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.5041521790850225,
+          "y": 0.7806307631659934,
+          "hit": true,
+          "first": "fixed-kit",
+          "distance": 104.2918311119898,
+          "cause": "subject"
+        },
+        {
+          "x": 0.36910726871986227,
+          "y": 0.5691690472172901,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 145.45700655954607,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.6391970894501826,
+          "y": 0.5691690472172901,
+          "hit": false,
+          "first": "tidal-edge",
+          "distance": 146.75912329290858,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        }
+      ]
+    },
+    {
+      "id": "energy:garden",
+      "state": "mixed",
+      "hour": 12,
+      "samples": [
+        {
+          "x": 0.5041521790850225,
+          "y": 0.5691690472172901,
+          "hit": false,
+          "first": "tidal-edge",
+          "distance": 142.31108607553023,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 0.36910726871986227,
+          "y": 0.357707331268587,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 236.28425794504884,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6391970894501826,
+          "y": 0.357707331268587,
+          "hit": false,
+          "first": "SIDEWALK_NETWORK",
+          "distance": 236.60611538655274,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.36910726871986227,
+          "y": 0.7806307631659934,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 107.92913116234062,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6391970894501826,
+          "y": 0.7806307631659934,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 108.13802212796166,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.5041521790850225,
+          "y": 0.357707331268587,
+          "hit": false,
+          "first": "SIDEWALK_NETWORK",
+          "distance": 232.34645270509913,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.5041521790850225,
+          "y": 0.7806307631659934,
+          "hit": true,
+          "first": "fixed-kit",
+          "distance": 104.2918311119898,
+          "cause": "subject"
+        },
+        {
+          "x": 0.36910726871986227,
+          "y": 0.5691690472172901,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 145.45700655954607,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.6391970894501826,
+          "y": 0.5691690472172901,
+          "hit": false,
+          "first": "tidal-edge",
+          "distance": 146.75912329290858,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        }
+      ]
+    },
+    {
+      "id": "energy:garden",
+      "state": "mixed",
+      "hour": 22,
+      "samples": [
+        {
+          "x": 0.5041521790850225,
+          "y": 0.5691690472172901,
+          "hit": false,
+          "first": "tidal-edge",
+          "distance": 142.31108607553023,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        },
+        {
+          "x": 0.36910726871986227,
+          "y": 0.357707331268587,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 236.28425794504884,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6391970894501826,
+          "y": 0.357707331268587,
+          "hit": false,
+          "first": "SIDEWALK_NETWORK",
+          "distance": 236.60611538655274,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.36910726871986227,
+          "y": 0.7806307631659934,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 107.92913116234062,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.6391970894501826,
+          "y": 0.7806307631659934,
+          "hit": false,
+          "first": "WATER_MAIN",
+          "distance": 108.13802212796166,
+          "cause": "projected-box gap (ray misses world AABB)"
+        },
+        {
+          "x": 0.5041521790850225,
+          "y": 0.357707331268587,
+          "hit": false,
+          "first": "SIDEWALK_NETWORK",
+          "distance": 232.34645270509913,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.5041521790850225,
+          "y": 0.7806307631659934,
+          "hit": true,
+          "first": "fixed-kit",
+          "distance": 104.2918311119898,
+          "cause": "subject"
+        },
+        {
+          "x": 0.36910726871986227,
+          "y": 0.5691690472172901,
+          "hit": false,
+          "first": "TERRAIN_LOW_DENSITY",
+          "distance": 145.45700655954607,
+          "cause": "gap through entire world AABB"
+        },
+        {
+          "x": 0.6391970894501826,
+          "y": 0.5691690472172901,
+          "hit": false,
+          "first": "tidal-edge",
+          "distance": 146.75912329290858,
+          "cause": "other geometry inside world AABB (ambiguous)"
+        }
+      ]
+    }
+  ]
+}

@@ -11,6 +11,7 @@ export const matrix = [
   ...Object.entries(energyStates).flatMap(([part,states]) => states.map(energy => ({id:`energy:${part}`,state:energy,energy}))),
   {id:'hero',state:'neutral',meters:'nw:0,ne:0,sw:0,se:0'},
 ].flatMap(row => [12,22].map(hour => ({...row,hour})));
+export const selectedShots = (ids) => matrix.filter(row => !ids || ids.split(',').includes(row.id));
 export function framing(frame, id) {
   if (!frame?.box) return {A1:null,A2:null,A3:null,reason:frame?.reason ?? 'hero has no subject'};
   const b=frame.box,w=b.right-b.left,h=b.bottom-b.top,x=(b.left+b.right)/2,y=(b.top+b.bottom)/2;
@@ -23,6 +24,8 @@ function comparisonBox(a,b) {
   return boxes.length ? {left:Math.min(...boxes.map(b=>b.left)),right:Math.max(...boxes.map(b=>b.right)),top:Math.min(...boxes.map(b=>b.top)),bottom:Math.max(...boxes.map(b=>b.bottom))} : null;
 }
 if (process.argv.includes('--self-test')) {
+  assert.equal(selectedShots('ne:focal,ne:district,energy:garden,hero').length,24);
+  assert.equal(selectedShots('ne:focal').length,6); assert.equal(selectedShots(undefined).length,98);
   assert.equal(matrix.length,98); assert.equal(new Set(matrix.map(r=>`${r.id}/${r.state}/${r.hour}`)).size,98);
   assert.deepEqual(framing({box:{left:.2,right:.6,top:.2,bottom:.6},hits:7},'ne:focal').A1,true);
   assert.equal(framing({box:{left:.8,right:1,top:0,bottom:.4},hits:6},'ne:focal').A2,false);
@@ -47,7 +50,7 @@ const report=existsSync(file)?JSON.parse(readFileSync(file,'utf8')):{mode,commit
   sourceDiff:execFileSync('git',['diff','--','src','tests','package.json'],{encoding:'utf8'}),browser:browser.version(),viewport:[1920,1080],dpr:1,quality:'default',launchArgs:mode==='perf'?['--disable-gpu-vsync','--disable-frame-rate-limit']:[],rows:[],errors:[]};
 const save=()=>writeFileSync(file,JSON.stringify(report,null,2)+'\n');
 const key=row=>`${row.id.replaceAll(':','-')}__${row.state}__h${row.hour}`;
-const selected=matrix.filter(row=>!process.env.CITY_SHOT_ONLY||row.id===process.env.CITY_SHOT_ONLY);
+const selected=selectedShots(process.env.CITY_SHOTS??process.env.CITY_SHOT_ONLY);
 async function load(row,wait) {
   const url=new URL(process.env.CITY2127_CITY_URL??'http://127.0.0.1:5194/');
   url.search=new URLSearchParams({reviewTime:'20',hour:String(row.hour),...(row.energy?{energy:row.energy}:{meters:row.meters}),...(row.id==='hero'?{}:{shot:row.id})});

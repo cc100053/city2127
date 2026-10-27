@@ -1,8 +1,8 @@
 {
   "dispatchId": "closeup-polish-A-1-r8",
   "base": "3d0f40ebd5d7350ecdcc05ab3420cacf926dfd9a",
-  "owner": "current sector A worker",
-  "status": "r1 pose matrix",
+  "owner": "01a17e2a-4c38-7422-8d68-33782c0367f5",
+  "status": "r1 complete24 captures/8x2 performance; applying r2",
   "rounds": {
     "ne:focal": 1,
     "ne:district": 1,
@@ -11,5 +11,15 @@
   "services": [
     "Vite 5194 session72451"
   ],
-  "notes": "S0 immutable originals referenced; branch explicitly ff-only to validated main, ahead origin feature2/0; no .codegraph directory. Dream-loop not needed: ART and observed failures give concrete scoped target."
+  "notes": "S0 immutable originals referenced; branch explicitly ff-only to validated main, ahead origin feature2/0; no .codegraph directory. Dream-loop not needed: ART and observed failures give concrete scoped target.",
+  "pendingSourcePatch": "planned-r2.patch",
+  "r1Checkpoint": "8ee93da",
+  "r1Note": "focal complete6/6; uncapped101.56/102.41; district pose currentlyFAIL A2, intended correction stored for r2 after all r1 measurements.",
+  "r1Results": {
+    "A6": "24/24 PASS",
+    "A3": "all20 applicable FAIL; exact hits saved",
+    "perf": "8x2 complete; all >=95% S0",
+    "A4": "comparison.json",
+    "noArtChanges": true
+  }
 }
