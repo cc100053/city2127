@@ -36,6 +36,8 @@
 ## Actual validation results
 
 - Verification status: PASSED（手動模式；2026-10-27 預設調整喺開發 Mac M6 1080p uncapped 40 → 80 FPS，vsync 下全部 view 60）；展覽機 NOT RUN
+- 2026-10-27 整合：feature `a08d3dd`，`--no-ff` merge `3591af7` 推上 `origin/main`；merge 結果 root `npm test`/`npm run build`、`git diff --check origin/main..HEAD` PASS；main CI run 40427511885 success。
+- 2026-10-27 owner 喺自己 Chrome（開發 Mac，Vite DEV `?meters=nw:0,ne:0,sw:0,se:0`，即時時鐘）目視檢查後接受；嗰次冇記錄 FPS。
 - 詳情：[VALIDATION](../VALIDATION.md#performance-evidence)
 
 ## Known issues and blockers
