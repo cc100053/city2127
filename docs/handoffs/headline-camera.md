@@ -55,7 +55,7 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 完成條件：
 - [x] 一張鏡頭清單（shot list）。每個 site 有 focal 同 district 兩個 pose，每個能源部件一個 pose。清單係常數表，DEV 可以逐個跳去睇。
 - [x] 揀 shot、計時間線嘅都係純函數，並有測試（見「測試」）。
-- [x] 以下情況全部即時 cut 返 hero，唔播近鏡：snapshot、reset、Undo、reconnect、`prefers-reduced-motion`、legacy v1、standalone 同各 DEV review 模式。
+- [x] 以下情況全部即時 cut 返 hero，唔播近鏡：snapshot、reset、Undo、reconnect、`prefers-reduced-motion`、legacy v1。Standalone 唔建 headline camera；civic／street DEV review 亦唔建，保持佢哋自己嘅鏡頭（2026-10-27 修正）。
 - [x] 鏡頭到嘅地方同結果卡「街の画面：…」講嘅地點一致。
 - [x] Root `npm test`、`npm run build`、`git diff --check` 通過；survey 冇改就唔使跑。
 - [x] 用 scratch `survey dev:auto` 做 browser check，每個 shot 至少一張截圖，並記錄 hero 同近鏡嘅 `data-fps`。
@@ -281,3 +281,9 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 - [整合原始logs／原圖／tree證據](../../artifacts/headline-camera/integration-1/README.md)。Owned servers/browser停止；5184已釋放。無部署、無刪分支。
 - Main `ad60a8912a62c5ad24bdbf965c5dc31527771562`已推送，fetch確認HEAD=origin/main、divergence0/0，包含merge `5100289`。實際push/main [CI40490237501](https://github.com/cc100053/city2127/actions/runs/40490237501) SUCCESS，root test/build、survey test/build、module-swap install/test/build及whitespace步驟全部成功；[原始run／steps證據](evidence/headline-camera-main-ci.json)。本紀錄取代上方各feature階段嘅main待批准／CI未驗狀態。
 - 最後跟進只改Markdown及docs內CI證據，按workflow跳過CI；runtime／tests／packages與上述成功run相同。文件連結／fact checks及diff自查另行通過，無需重跑相同browser／FPS矩陣。展示硬件／Safari／iPad／Windows／長測／觀眾理解及模型材質打磨限制保留。
+
+## Review-mode fix — 2026-10-27
+
+- 問題：`review=civic|street` 配合 `?meters`／`?survey` 時，每次結果、snapshot 都 `cancel()`，將 review 鏡頭扯返 hero。
+- 修正：review 模式唔建 `HeadlineCamera`（[main.ts](../../src/main.ts)），所有 call 改 `?.`；其他模式行為不變。
+- 驗證：root `npm test`、`npm run build`、`git diff --check` PASS（只有既有 build warnings）。DEV browser（Browser pane，port 5191）用 `cityShot()` 讀 pose：civic `[-178.7,124.2,-233.1]`、street `[-40,20,-245]` 喺 `cityMeters` 後 1–8 秒不變；普通 `?meters=` 由 hero 推到 `se:district` `[-105,235,-295]`。Survey＋review 組合未實測（同一個 null guard）。
