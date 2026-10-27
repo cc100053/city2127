@@ -1,0 +1,15 @@
+{
+  "verifiedAtUTC": "2026-10-27T18:00:23.992026+00:00",
+  "stoppedViteSession": 72451,
+  "completedR3RunnerSession": 51873,
+  "completedLiveSession": 71783,
+  "ports": {
+    "5194": "free: loopback bind succeeded"
+  },
+  "ownedProcessPidsRemaining": [],
+  "scratchSQLiteDirectoriesRemaining": [],
+  "browserAndSurvey": "live finally closed browser,realtime,HTTP,SQLite; script exited0; recorded owned PIDs absent",
+  "unrelatedServices": "preserved",
+  "writersReleasedAfterFinalCheckpoint": true,
+  "allRunnerAndHeadlessChromeScan": "PASS: no capture/perf/live node, headless Chrome main, or Vite5194 process remained; shell/rg self-matches excluded"
+}

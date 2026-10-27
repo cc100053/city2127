@@ -364,3 +364,14 @@ S0終版：有效uncapped平均79.51–133.60FPS。原E4在現行ladder headline
 ## Closeup S0 main integration — 2026-10-28
 
 Coordinator接受19e9ae2為完整量度基準，保留全部視覺失敗。Fresh mainfdc4a0c以no-ff整合為c802bba，無衝突；在整合結果重新跑root npm test、npm run build及git diff --check全部PASS，僅既有build warnings。[整合JSON／logs](../artifacts/closeup-polish/S0/integration.json)。Runtime/tests/package/lock與接受checkpoint完全相同，因此原DEV／production／headline-aware recovery evidence仍適用，沒有重複宣稱新browser或FPS量度。Survey／module-swap未改，local不另跑。Main最終SHA／實際CI與服務、writer釋放由result-S0-integration.json記錄；長feature保留，原root舊feature checkout不動。A–D未開始、未部署；S0整合不代表art gates獲通過。
+
+
+## Closeup sector A — 2026-10-28（feature REVIEW_READY）
+
+Runtime `b7d5861`，三輪各24日夜狀態／48原圖、22像素比較及8組兩輪uncapped；144張靜態＋3張live全部保留，[S0／final逐圖並排](../artifacts/closeup-polish/A/REVIEW.md)、[JSON](../artifacts/closeup-polish/A/report.json)、[checks](../artifacts/closeup-polish/A/checks.json)。Final24張正式第二take原圖逐張以original detail檢視，S0原234張hash一致。A1/A2各20 PASS、4 N/A；A3 20 FAIL、4 N/A，focal2/9、district0/9、第一庭0/9，原7/9門檻不改；A4 1/22、6%/12%不改。A5/A6各24/24 PASS；repro14/24，10失敗保留雙take並採第二張。V1有12 FAIL、V3有22 FAIL、V5有8 FAIL，N/A及逐項原因分列；靜態V6不代表完整時序閃爍驗收。
+
+Final平均90.95–104.47FPS，兩個uncapping flags、每組至少16秒後各取兩次5秒；各shot≥S0的95%，mean及每狀態instant draw calls≤S0的110%，vsync59.9–60.2FPS。只測開發Mac／Chrome156／1920×1080／DPR1／default，字體採明確空Google Fonts CSS後system fallback；不能把hero source未變時的FPS升幅視為優化。District完整carrier超出viewport，A2通過並非完整可見；[A3原因](../artifacts/closeup-polish/A/r3/occlusion-causes.json)不把空隙一律算前景。
+
+Root npm test／npm run build PASS，runner／report self-check、source hashes與committed diff check PASS；保留既有chunk-size warning。R2首次49-batch上限測試失敗的log與修正前patch保留，修正以既有public-light batch合批，沒有放寬測試或更改第二庭。實際scratch HTTP／WebSocket／SQLite九項live PASS、page error0：v3歷史氣候題涵蓋NE的focal／district、現行v4能源題涵蓋第一庭；hold位置與文案、中間easing、reload、Undo、reduced motion核對。Browser資料每120frame更新，不宣稱3.000秒精度；精確三秒retarget由root測試覆蓋。
+
+Survey／module-swap source未改，獨立package tests/build不另跑；A未重做production browser smoke或全13shot的Z回歸。展示硬件、其他平台、真人兩秒辨識未驗。自己啟動的Vite5194／runner／Chrome／scratch server與SQLite全部結束，埠bind驗證free，見[cleanup](../artifacts/closeup-polish/A/cleanup.json)。美術仍待owner接受，未merge main，未部署。

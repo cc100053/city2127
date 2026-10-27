@@ -1,11 +1,11 @@
 # closeup-polish — Headline 近鏡逐個打磨
 
 - Owner: cc100053（產品／審美最終批准）；實作由一個 long session 負責，開工時喺下面「進度」記低 session 名。
-- Status: S0 INTEGRATED（coordinator已接受量度基準；worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2`；98/98，未接受美術；A進行中，B–D未開始）
+- Status: S0 INTEGRATED（coordinator已接受量度基準；worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2`；98/98，未接受美術；A REVIEW_READY，三輪完成但gate仍FAIL，B–D未開始）
 - Branch: `feat/closeup-polish`（一條長分支，每個 sector 一個 checkpoint）
 - Base commit: `fdc4a0cbbbc352b41c15850f2a846845d7975de1`（fetch verified main，包含完整 S0 標準）
-- Last verified commit: 整合merge `c802bbab329fb3835f4c5d5b09a5bc0d18e51703`，root npm test/build/diff PASS；runtime/tests/package與接受的`19e9ae2`完全一致。
-- Remote availability: S0 checkpoint `19e9ae2`保留於`origin/feat/closeup-polish`；S0整合main，最終published SHA／實際main CI見`result-S0-integration.json`與GitHub CI。無A–D／部署。
+- Last verified commit: A runtime `b7d5861bebeef1bbe4a17e526c07410cde4f616d`，root npm test/build及A browser/live PASS；最終證據checkpoint見本批result。S0接受main `3d0f40e`保持不動。
+- Remote availability: A完整feature checkpoint的push／remote SHA由本批`result-A-1.json`記錄；S0 main `3d0f40e`與其成功CI保持歷史。A未整合main／未部署。
 
 ## Session Git state
 
@@ -165,7 +165,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 | Sector | 狀態 | Checkpoint | Owner review | Main merge |
 | --- | --- | --- | --- | --- |
 | S0 基準 | INTEGRATED；量度基準接受，非美術接受 | `19e9ae2`；[完整基準](../../artifacts/closeup-polish/S0/README.md) | coordinator已審查；冇美術改動 | `c802bba` |
-| A 海浜公園 | IN PROGRESS：worker `01a17e2a`，dispatch `closeup-polish-A-1-r8` | r1 `2c39678`：24/24；r2 source applied | pending | — |
+| A 海浜公園 | REVIEW_READY：worker `01a17e2a-4c38-7422-8d68-33782c0367f5`，dispatch `closeup-polish-A-1-r8`；三輪各24狀態完成 | runtime `b7d5861`；[完整review](../../artifacts/closeup-polish/A/REVIEW.md)，最終SHA見result-A-1.json | pending；A3/A4/V失敗保留 | — |
 | B アクアシティ南 | PLANNED | — | — | — |
 | C フジテレビ東 | PLANNED | — | — | — |
 | D デックス西＋沖 | PLANNED | — | — | — |
@@ -194,7 +194,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 
 ## Next expected step
 
-Coordinator核對本批S0整合result及實際main CI，再dispatch A NE；此worker完成整合後釋放writer，不開始A–D。`feat/closeup-polish`保留於接受的19e9ae2，獨立clone留在main；後續owner如沿用長分支，應明確快進至已驗證main再開工。取消百分比預停的人類指示仍有效，僅真正provider limit觸發recovery。
+Coordinator核對唯一result-A-1.json、feature checkpoint、[逐圖review](../../artifacts/closeup-polish/A/REVIEW.md)及所有FAIL差距，決定接受本批證據／修正或記錄owner審閱待辦，再獨立dispatch B。A三輪已用完，不宣稱art PASS；owner批准之前不能merge A art。此worker完成push／callback後釋放writer，不開始B–D／Z，不動main。取消百分比預停的人類指示仍有效，僅真正provider limit觸發recovery。
 
 ## S0 resume — 2026-10-27
 
@@ -219,3 +219,12 @@ Coordinator revision7接受19e9ae2作完整量度基準，明確保留A1–A4/V 
 ### A r1 checkpoint／r2 implementation
 
 r1 `2c39678` 保存24狀態48原圖、22比較及8組×2效能；A6 24/24 PASS，A3全部20可用主體仍FAIL，district A2 FAIL。r1是pose試驗，hero runtime未變而FPS上升，因此不把升幅當優化成果。r2才打磨Park原GLB五片葉簇（保持原frond envelope／cached GLB不變）、fallback樹冠、較窄透明環與支承；EnvironmentDistrict細化既有植栽screen／pergola，第一水庭加支承邊光（在garden2 clone之後，第二庭未改）。SHOTS修正district瞄準點及第一庭側視角；target映射、數量、footprint、hero/FOV42、三秒與時間線保持。實作／完整矩陣／效能／live／最終限制集中在[本批證據](../../artifacts/closeup-polish/A/README.md)，未接受美術。
+
+
+### A final verification — 2026-10-28
+
+Owner worker `01a17e2a-4c38-7422-8d68-33782c0367f5`，runtime `b7d5861`；三輪各24/24、48原圖、22比較、8組×2有效uncapped完成。Final24張原圖逐張review，144靜態＋3 live hash保存，S0原234張hash不變。A1/A2各20 PASS、4 N/A；A3 20 FAIL（focal2/9、district0/9、第一庭0/9）、4 N/A；A4僅1/22。A5/A6各24/24 PASS，repro14/24、失敗10保留。V1 FAIL12、V3 FAIL22、V5 FAIL8；未經owner美術或真人辨識接受，三輪後停止本批美術迭代。
+
+Final平均90.95–104.47FPS，vsync59.9–60.2，各shot達S0的95%及mean／instant draw≤110%。Root test/build PASS，實際scratch live九項PASS、error0（v3 NE＋v4第一庭）；精確三秒靠root測試，不把每120frame browser診斷當精密計時。R2首次batch測試失敗及合批修正保存；最終49 batches、第二庭原幾何、所有權威target/counts／hero/FOV42／timeline不改。Final focal恢復S0 pose，district／第一庭採新pose。
+
+詳細[checks](../../artifacts/closeup-polish/A/checks.json)、[source hashes](../../artifacts/closeup-polish/A/r3/source-hashes.json)、[review](../../artifacts/closeup-polish/A/REVIEW.md)與[cleanup](../../artifacts/closeup-polish/A/cleanup.json)。僅開發Mac Chrome1920×1080/DPR1/default；未測展示硬件／其他平台／Z／真人，A未重跑production smoke。Vite5194／Chrome／runner／scratch全停、port free。最後文件／證據checkpoint、remote可取性、writer release和callback delivery記於checkout外`.task-relay/closeup-polish/result-A-1.json`；shared state只由coordinator更新。

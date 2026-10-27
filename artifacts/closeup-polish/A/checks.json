@@ -1,0 +1,66 @@
+{
+  "sourceCommit": "b7d5861bebeef1bbe4a17e526c07410cde4f616d",
+  "base": "3d0f40ebd5d7350ecdcc05ab3420cacf926dfd9a",
+  "root": {
+    "npmTest": {
+      "status": "PASS",
+      "log": "r3/npm-test.log"
+    },
+    "npmBuild": {
+      "status": "PASS",
+      "log": "r3/npm-build.log",
+      "warning": "Existing Vite chunk-size warning; no new dependency"
+    },
+    "sourceHashes": "r3/source-hashes.json",
+    "runnerSelfTest": {
+      "status": "PASS",
+      "log": "r3/runner-self-test.log"
+    },
+    "reportSelfTest": {
+      "status": "PASS",
+      "log": "r3/report-self-test.log"
+    },
+    "gitDiffCheck": {
+      "status": "PASS",
+      "scope": "working tree and origin/main...b7d5861",
+      "log": "r3/committed-diff-check.log"
+    }
+  },
+  "A7": {
+    "status": "PASS",
+    "evidence": "live/browser.json",
+    "assertedChecks": 9,
+    "errors": [],
+    "originalLiveImagesInspected": [
+      "live/ne-focal.jpg",
+      "live/ne-district.jpg",
+      "live/energy-garden.jpg"
+    ],
+    "fixtures": "Real scratch HTTP/WebSocket/SQLite: historical v3 climate for NE Meter, current v4 energy for garden",
+    "timingLimit": "Browser diagnostics refresh each120 frames (~2s); intermediate states prove easing. Exact3s duration/retarget remains covered by root tests; no3.000s browser precision claim."
+  },
+  "scope": {
+    "unchanged": "authoritative target/counts, hero/FOV42/timeline, energyRuntime, siteRuntime, cached GLB, second garden, other sectors and assets",
+    "sourceEvidence": "r3/source-hashes.json",
+    "surveyAndModuleSwap": "source unchanged; their separate test/build not rerun",
+    "productionSmoke": "root build passed; no fresh production browser smoke in A (S0 evidence is historical)"
+  },
+  "preservedFailures": {
+    "r2InitialBatchLimit": "r2/npm-test-initial-failure.log; fixed by rebatching existing finish, not threshold relaxation",
+    "A3": "20 applicable FAIL;7/9 unchanged",
+    "A4": "1/22 PASS;6% adjacent and12% extremes unchanged",
+    "visual": "visual-review.json; session judgments, not owner/visitor acceptance",
+    "reproducibility": "retain both fresh takes; failures use original second take"
+  },
+  "cleanup": {
+    "status": "PASS",
+    "evidence": "cleanup.json"
+  },
+  "documentationLinks": {
+    "status": "PASS",
+    "evidence": "link-check.json",
+    "targetsChecked": 526
+  },
+  "selfReview": "PASS: exact runtime/test diff, every new evidence file structure, final source hashes and 24 final +3 live original images inspected; docs matched raw JSON and retained failures",
+  "acceptance": "REVIEW_READY after checkpoint; pending coordinator and owner art review; no main merge"
+}

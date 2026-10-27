@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "files": [
+    "docs/PROJECT.md",
+    "docs/EXHIBITION_SPEC.md",
+    "docs/VALIDATION.md",
+    "docs/handoffs/README.md",
+    "docs/handoffs/closeup-polish.md",
+    "artifacts/closeup-polish/A/README.md",
+    "artifacts/closeup-polish/A/REVIEW.md",
+    "artifacts/closeup-polish/A/r2/review-notes.md"
+  ],
+  "targetsChecked": 526,
+  "failures": [],
+  "method": "Strip fenced code, resolve local Markdown links/images against each file; external links not fetched",
+  "facts": "Counts and source SHA cross-checked with report/raw JSON; planned vs implemented states separated"
+}

@@ -1,0 +1,1493 @@
+{
+  "browser": "156.0.8078.48",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "checks": [
+    {
+      "check": "live hold",
+      "id": "ne:focal",
+      "before": {
+        "time": 14.21,
+        "fps": 8.4,
+        "park": {
+          "band": "mixed",
+          "targetTreeCount": 8,
+          "visibleTreeCount": 8,
+          "targetPlantedFraction": 0.5,
+          "plantedFraction": 0.5,
+          "targetCoolingFins": 3,
+          "visibleCoolingFins": 3,
+          "representation": "glb"
+        },
+        "district": {
+          "nightRhythm": 1,
+          "slots": 17,
+          "targetCanopy": 0.5,
+          "visibleCanopies": 9,
+          "visibleSails": 8,
+          "visibleCoolingTowers": 0,
+          "roofs": 53,
+          "visibleRoofSails": 31,
+          "visibleRoofCrowns": 22,
+          "hybridBays": 12,
+          "hybridRoofs": 29,
+          "activePulses": 0
+        },
+        "energy": {
+          "target": {
+            "waterGardens": 0,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "rotorAngle": 0.5868607014403731,
+          "parts": [
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 0.72,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            }
+          ]
+        }
+      },
+      "samples": [
+        {
+          "elapsedMs": 20,
+          "time": 14.21,
+          "fps": 8.4,
+          "park": {
+            "band": "mixed",
+            "targetTreeCount": 8,
+            "visibleTreeCount": 8,
+            "targetPlantedFraction": 0.5,
+            "plantedFraction": 0.5,
+            "targetCoolingFins": 3,
+            "visibleCoolingFins": 3,
+            "representation": "glb"
+          },
+          "district": {
+            "nightRhythm": 1,
+            "slots": 17,
+            "targetCanopy": 0.5,
+            "visibleCanopies": 9,
+            "visibleSails": 8,
+            "visibleCoolingTowers": 0,
+            "roofs": 53,
+            "visibleRoofSails": 31,
+            "visibleRoofCrowns": 22,
+            "hybridBays": 12,
+            "hybridRoofs": 29,
+            "activePulses": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 0.5868607014403731,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 2027,
+          "time": 16.21,
+          "fps": 60.1,
+          "park": {
+            "band": "high",
+            "targetTreeCount": 12,
+            "visibleTreeCount": 8,
+            "targetPlantedFraction": 0.8,
+            "plantedFraction": 0.5,
+            "targetCoolingFins": 0,
+            "visibleCoolingFins": 3,
+            "representation": "glb"
+          },
+          "district": {
+            "nightRhythm": 1,
+            "slots": 17,
+            "targetCanopy": 0.5,
+            "visibleCanopies": 9,
+            "visibleSails": 8,
+            "visibleCoolingTowers": 0,
+            "roofs": 53,
+            "visibleRoofSails": 31,
+            "visibleRoofCrowns": 22,
+            "hybridBays": 12,
+            "hybridRoofs": 29,
+            "activePulses": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 0.7180991014404088,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 4034,
+          "time": 18.21,
+          "fps": 60,
+          "park": {
+            "band": "high",
+            "targetTreeCount": 12,
+            "visibleTreeCount": 12,
+            "targetPlantedFraction": 0.8,
+            "plantedFraction": 0.6270702164725372,
+            "targetCoolingFins": 0,
+            "visibleCoolingFins": 3,
+            "representation": "glb"
+          },
+          "district": {
+            "nightRhythm": 1,
+            "slots": 17,
+            "targetCanopy": 0.5,
+            "visibleCanopies": 9,
+            "visibleSails": 8,
+            "visibleCoolingTowers": 0,
+            "roofs": 53,
+            "visibleRoofSails": 31,
+            "visibleRoofCrowns": 22,
+            "hybridBays": 12,
+            "hybridRoofs": 29,
+            "activePulses": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 0.8613375014404445,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 6038,
+          "time": 20.21,
+          "fps": 60,
+          "park": {
+            "band": "high",
+            "targetTreeCount": 12,
+            "visibleTreeCount": 12,
+            "targetPlantedFraction": 0.8,
+            "plantedFraction": 0.8,
+            "targetCoolingFins": 0,
+            "visibleCoolingFins": 0,
+            "representation": "glb"
+          },
+          "district": {
+            "nightRhythm": 1,
+            "slots": 17,
+            "targetCanopy": 0.5,
+            "visibleCanopies": 9,
+            "visibleSails": 8,
+            "visibleCoolingTowers": 0,
+            "roofs": 53,
+            "visibleRoofSails": 31,
+            "visibleRoofCrowns": 22,
+            "hybridBays": 12,
+            "hybridRoofs": 29,
+            "activePulses": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.0165200000000005,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 8045,
+          "time": 22.21,
+          "fps": 60,
+          "park": {
+            "band": "high",
+            "targetTreeCount": 12,
+            "visibleTreeCount": 12,
+            "targetPlantedFraction": 0.8,
+            "plantedFraction": 0.8,
+            "targetCoolingFins": 0,
+            "visibleCoolingFins": 0,
+            "representation": "glb"
+          },
+          "district": {
+            "nightRhythm": 1,
+            "slots": 17,
+            "targetCanopy": 0.5,
+            "visibleCanopies": 9,
+            "visibleSails": 8,
+            "visibleCoolingTowers": 0,
+            "roofs": 53,
+            "visibleRoofSails": 31,
+            "visibleRoofCrowns": 22,
+            "hybridBays": 12,
+            "hybridRoofs": 29,
+            "activePulses": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.1765120000004765,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        }
+      ],
+      "place": "街の画面：お台場海浜公園",
+      "pose": {
+        "position": [
+          -280,
+          85,
+          -245
+        ],
+        "target": [
+          -210,
+          14,
+          -135
+        ]
+      },
+      "pass": true
+    },
+    {
+      "check": "reload snapshot immediately restores settled Park and hero",
+      "pass": true
+    },
+    {
+      "check": "live hold",
+      "id": "ne:district",
+      "before": {
+        "time": 16.53,
+        "fps": 7.3,
+        "park": {
+          "band": "high",
+          "targetTreeCount": 12,
+          "visibleTreeCount": 12,
+          "targetPlantedFraction": 0.8,
+          "plantedFraction": 0.8,
+          "targetCoolingFins": 0,
+          "visibleCoolingFins": 0,
+          "representation": "glb"
+        },
+        "district": {
+          "nightRhythm": 1,
+          "slots": 17,
+          "targetCanopy": 0.5,
+          "visibleCanopies": 9,
+          "visibleSails": 8,
+          "visibleCoolingTowers": 0,
+          "roofs": 53,
+          "visibleRoofSails": 31,
+          "visibleRoofCrowns": 22,
+          "hybridBays": 12,
+          "hybridRoofs": 29,
+          "activePulses": 0
+        },
+        "energy": {
+          "target": {
+            "waterGardens": 0,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "rotorAngle": 0.740802377015415,
+          "parts": [
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 0.72,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            }
+          ]
+        }
+      },
+      "samples": [
+        {
+          "elapsedMs": 8,
+          "time": 16.53,
+          "fps": 7.3,
+          "park": {
+            "band": "high",
+            "targetTreeCount": 12,
+            "visibleTreeCount": 12,
+            "targetPlantedFraction": 0.8,
+            "plantedFraction": 0.8,
+            "targetCoolingFins": 0,
+            "visibleCoolingFins": 0,
+            "representation": "glb"
+          },
+          "district": {
+            "nightRhythm": 1,
+            "slots": 17,
+            "targetCanopy": 0.5,
+            "visibleCanopies": 9,
+            "visibleSails": 8,
+            "visibleCoolingTowers": 0,
+            "roofs": 53,
+            "visibleRoofSails": 31,
+            "visibleRoofCrowns": 22,
+            "hybridBays": 12,
+            "hybridRoofs": 29,
+            "activePulses": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 0.740802377015415,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 2000,
+          "time": 18.53,
+          "fps": 60,
+          "park": {
+            "band": "high",
+            "targetTreeCount": 12,
+            "visibleTreeCount": 12,
+            "targetPlantedFraction": 0.8,
+            "plantedFraction": 0.8,
+            "targetCoolingFins": 0,
+            "visibleCoolingFins": 0,
+            "representation": "glb"
+          },
+          "district": {
+            "nightRhythm": 1,
+            "slots": 17,
+            "targetCanopy": 0.75,
+            "visibleCanopies": 9,
+            "visibleSails": 8,
+            "visibleCoolingTowers": 0,
+            "roofs": 53,
+            "visibleRoofSails": 31,
+            "visibleRoofCrowns": 22,
+            "hybridBays": 12,
+            "hybridRoofs": 29,
+            "activePulses": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 0.8859588544613515,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 4016,
+          "time": 20.53,
+          "fps": 60,
+          "park": {
+            "band": "high",
+            "targetTreeCount": 12,
+            "visibleTreeCount": 12,
+            "targetPlantedFraction": 0.8,
+            "plantedFraction": 0.8,
+            "targetCoolingFins": 0,
+            "visibleCoolingFins": 0,
+            "representation": "glb"
+          },
+          "district": {
+            "nightRhythm": 1,
+            "slots": 17,
+            "targetCanopy": 0.75,
+            "visibleCanopies": 16,
+            "visibleSails": 12,
+            "visibleCoolingTowers": 0,
+            "roofs": 53,
+            "visibleRoofSails": 36,
+            "visibleRoofCrowns": 40,
+            "hybridBays": 14,
+            "hybridRoofs": 38,
+            "activePulses": 116
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.0426720000004774,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 6034,
+          "time": 22.53,
+          "fps": 59.9,
+          "park": {
+            "band": "high",
+            "targetTreeCount": 12,
+            "visibleTreeCount": 12,
+            "targetPlantedFraction": 0.8,
+            "plantedFraction": 0.8,
+            "targetCoolingFins": 0,
+            "visibleCoolingFins": 0,
+            "representation": "glb"
+          },
+          "district": {
+            "nightRhythm": 1,
+            "slots": 17,
+            "targetCanopy": 0.75,
+            "visibleCanopies": 12,
+            "visibleSails": 5,
+            "visibleCoolingTowers": 0,
+            "roofs": 53,
+            "visibleRoofSails": 18,
+            "visibleRoofCrowns": 35,
+            "hybridBays": 6,
+            "hybridRoofs": 12,
+            "activePulses": 58
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.2027760000014303,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 8041,
+          "time": 24.53,
+          "fps": 60.1,
+          "park": {
+            "band": "high",
+            "targetTreeCount": 12,
+            "visibleTreeCount": 12,
+            "targetPlantedFraction": 0.8,
+            "plantedFraction": 0.8,
+            "targetCoolingFins": 0,
+            "visibleCoolingFins": 0,
+            "representation": "glb"
+          },
+          "district": {
+            "nightRhythm": 1,
+            "slots": 17,
+            "targetCanopy": 0.75,
+            "visibleCanopies": 12,
+            "visibleSails": 5,
+            "visibleCoolingTowers": 0,
+            "roofs": 53,
+            "visibleRoofSails": 18,
+            "visibleRoofCrowns": 35,
+            "hybridBays": 6,
+            "hybridRoofs": 12,
+            "activePulses": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.3627520000004767,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        }
+      ],
+      "place": "街の画面：海辺の歩道・屋根・建物の外壁",
+      "pose": {
+        "position": [
+          -390,
+          270,
+          -310
+        ],
+        "target": [
+          -250,
+          0,
+          -170
+        ]
+      },
+      "pass": true
+    },
+    {
+      "check": "Undo immediately restores hero",
+      "pass": true
+    },
+    {
+      "check": "reduced-motion NE result stays at hero",
+      "diagnostics": {
+        "time": 26.53,
+        "fps": 60,
+        "park": {
+          "band": "high",
+          "targetTreeCount": 12,
+          "visibleTreeCount": 12,
+          "targetPlantedFraction": 0.8,
+          "plantedFraction": 0.8,
+          "targetCoolingFins": 0,
+          "visibleCoolingFins": 0,
+          "representation": "glb"
+        },
+        "district": {
+          "nightRhythm": 1,
+          "slots": 17,
+          "targetCanopy": 0.75,
+          "visibleCanopies": 12,
+          "visibleSails": 5,
+          "visibleCoolingTowers": 0,
+          "roofs": 53,
+          "visibleRoofSails": 18,
+          "visibleRoofCrowns": 35,
+          "hybridBays": 6,
+          "hybridRoofs": 12,
+          "activePulses": 0
+        },
+        "energy": {
+          "target": {
+            "waterGardens": 0,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "rotorAngle": 0.7,
+          "parts": [
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 0.72,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            }
+          ]
+        }
+      },
+      "pass": true
+    },
+    {
+      "check": "live hold",
+      "id": "energy:garden",
+      "before": {
+        "time": 26.44,
+        "fps": 60.1,
+        "park": {
+          "band": "mixed",
+          "targetTreeCount": 8,
+          "visibleTreeCount": 8,
+          "targetPlantedFraction": 0.5,
+          "plantedFraction": 0.5,
+          "targetCoolingFins": 3,
+          "visibleCoolingFins": 3,
+          "representation": "glb"
+        },
+        "district": {
+          "nightRhythm": 1,
+          "slots": 17,
+          "targetCanopy": 0.5,
+          "visibleCanopies": 9,
+          "visibleSails": 8,
+          "visibleCoolingTowers": 0,
+          "roofs": 53,
+          "visibleRoofSails": 31,
+          "visibleRoofCrowns": 22,
+          "hybridBays": 12,
+          "hybridRoofs": 29,
+          "activePulses": 0
+        },
+        "energy": {
+          "target": {
+            "waterGardens": 0,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "rotorAngle": 1.514952000000477,
+          "parts": [
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 0.72,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            }
+          ]
+        }
+      },
+      "samples": [
+        {
+          "elapsedMs": 8,
+          "time": 26.44,
+          "fps": 60.1,
+          "park": {
+            "band": "mixed",
+            "targetTreeCount": 8,
+            "visibleTreeCount": 8,
+            "targetPlantedFraction": 0.5,
+            "plantedFraction": 0.5,
+            "targetCoolingFins": 3,
+            "visibleCoolingFins": 3,
+            "representation": "glb"
+          },
+          "district": {
+            "nightRhythm": 1,
+            "slots": 17,
+            "targetCanopy": 0.5,
+            "visibleCanopies": 9,
+            "visibleSails": 8,
+            "visibleCoolingTowers": 0,
+            "roofs": 53,
+            "visibleRoofSails": 31,
+            "visibleRoofCrowns": 22,
+            "hybridBays": 12,
+            "hybridRoofs": 29,
+            "activePulses": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.514952000000477,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 1701,
+          "time": 28.44,
+          "fps": 60,
+          "park": {
+            "band": "mixed",
+            "targetTreeCount": 8,
+            "visibleTreeCount": 8,
+            "targetPlantedFraction": 0.5,
+            "plantedFraction": 0.5,
+            "targetCoolingFins": 3,
+            "visibleCoolingFins": 3,
+            "representation": "glb"
+          },
+          "district": {
+            "nightRhythm": 1,
+            "slots": 17,
+            "targetCanopy": 0.5,
+            "visibleCanopies": 9,
+            "visibleSails": 8,
+            "visibleCoolingTowers": 0,
+            "roofs": 53,
+            "visibleRoofSails": 31,
+            "visibleRoofCrowns": 22,
+            "hybridBays": 12,
+            "hybridRoofs": 29,
+            "activePulses": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 1,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.675104000000954,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 3806,
+          "time": 30.47,
+          "fps": 59,
+          "park": {
+            "band": "mixed",
+            "targetTreeCount": 8,
+            "visibleTreeCount": 8,
+            "targetPlantedFraction": 0.5,
+            "plantedFraction": 0.5,
+            "targetCoolingFins": 3,
+            "visibleCoolingFins": 3,
+            "representation": "glb"
+          },
+          "district": {
+            "nightRhythm": 1,
+            "slots": 17,
+            "targetCanopy": 0.5,
+            "visibleCanopies": 9,
+            "visibleSails": 8,
+            "visibleCoolingTowers": 0,
+            "roofs": 53,
+            "visibleRoofSails": 31,
+            "visibleRoofCrowns": 22,
+            "hybridBays": 12,
+            "hybridRoofs": 29,
+            "activePulses": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 1,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.837696000001431,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 0.30274527908288223
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 0.30274527908288223
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 5718,
+          "time": 32.47,
+          "fps": 59.9,
+          "park": {
+            "band": "mixed",
+            "targetTreeCount": 8,
+            "visibleTreeCount": 8,
+            "targetPlantedFraction": 0.5,
+            "plantedFraction": 0.5,
+            "targetCoolingFins": 3,
+            "visibleCoolingFins": 3,
+            "representation": "glb"
+          },
+          "district": {
+            "nightRhythm": 1,
+            "slots": 17,
+            "targetCanopy": 0.5,
+            "visibleCanopies": 9,
+            "visibleSails": 8,
+            "visibleCoolingTowers": 0,
+            "roofs": 53,
+            "visibleRoofSails": 31,
+            "visibleRoofCrowns": 22,
+            "hybridBays": 12,
+            "hybridRoofs": 29,
+            "activePulses": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 1,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.9977520000004767,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 7730,
+          "time": 34.47,
+          "fps": 60.2,
+          "park": {
+            "band": "mixed",
+            "targetTreeCount": 8,
+            "visibleTreeCount": 8,
+            "targetPlantedFraction": 0.5,
+            "plantedFraction": 0.5,
+            "targetCoolingFins": 3,
+            "visibleCoolingFins": 3,
+            "representation": "glb"
+          },
+          "district": {
+            "nightRhythm": 1,
+            "slots": 17,
+            "targetCanopy": 0.5,
+            "visibleCanopies": 9,
+            "visibleSails": 8,
+            "visibleCoolingTowers": 0,
+            "roofs": 53,
+            "visibleRoofSails": 31,
+            "visibleRoofCrowns": 22,
+            "hybridBays": 12,
+            "hybridRoofs": 29,
+            "activePulses": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 1,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 2.1576720000004777,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              }
+            ]
+          }
+        }
+      ],
+      "place": "街の画面：海辺の蓄電庭園",
+      "pose": {
+        "position": [
+          -420,
+          65,
+          -210
+        ],
+        "target": [
+          -304,
+          12,
+          -135
+        ]
+      },
+      "pass": true
+    },
+    {
+      "check": "Undo immediately restores hero",
+      "pass": true
+    },
+    {
+      "check": "energy Undo removes first water garden",
+      "pass": true
+    },
+    {
+      "check": "reduced-motion garden immediately settles without camera playback",
+      "diagnostics": {
+        "time": 38.47,
+        "fps": 60,
+        "park": {
+          "band": "mixed",
+          "targetTreeCount": 8,
+          "visibleTreeCount": 8,
+          "targetPlantedFraction": 0.5,
+          "plantedFraction": 0.5,
+          "targetCoolingFins": 3,
+          "visibleCoolingFins": 3,
+          "representation": "glb"
+        },
+        "district": {
+          "nightRhythm": 1,
+          "slots": 17,
+          "targetCanopy": 0.5,
+          "visibleCanopies": 9,
+          "visibleSails": 8,
+          "visibleCoolingTowers": 0,
+          "roofs": 53,
+          "visibleRoofSails": 31,
+          "visibleRoofCrowns": 22,
+          "hybridBays": 12,
+          "hybridRoofs": 29,
+          "activePulses": 0
+        },
+        "energy": {
+          "target": {
+            "waterGardens": 1,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "rotorAngle": 0.7,
+          "parts": [
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": true,
+              "scaleY": 1,
+              "opacity": 1
+            },
+            {
+              "visible": false,
+              "scaleY": 0.72,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": true,
+              "scaleY": 1,
+              "opacity": 1
+            }
+          ]
+        }
+      },
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "timing": "Browser diagnostics refresh each120 frames (~2s); intermediate states prove easing. Exact3s duration/retarget remains covered by root tests; no3.000s browser precision claim.",
+  "fixtures": "v3 historical climate for NE Meter; real current v4 energy proposals for garden; isolated scratch SQLite."
+}

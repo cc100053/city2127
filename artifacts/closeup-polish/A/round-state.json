@@ -2,15 +2,13 @@
   "dispatchId": "closeup-polish-A-1-r8",
   "base": "3d0f40ebd5d7350ecdcc05ab3420cacf926dfd9a",
   "owner": "01a17e2a-4c38-7422-8d68-33782c0367f5",
-  "status": "r3 final source applied, root test/build PASS; full24 matrix starting",
+  "status": "REVIEW_READY: all3 rounds complete;24 final originals reviewed; failures retained",
   "rounds": {
     "ne:focal": 3,
     "ne:district": 3,
     "energy:garden": 3
   },
-  "services": [
-    "Vite5194 session72451"
-  ],
+  "services": [],
   "notes": "S0 immutable originals referenced; branch explicitly ff-only to validated main, ahead origin feature2/0; no .codegraph directory. Dream-loop not needed: ART and observed failures give concrete scoped target.",
   "pendingSourcePatch": null,
   "r1Checkpoint": "2c39678",
@@ -36,5 +34,70 @@
     "root": "test/build PASS after documented49-batch fix"
   },
   "r2Checkpoint": "79bece4",
-  "r3SourceApplied": true
+  "r3SourceApplied": true,
+  "r3SourceCheckpoint": "b7d5861",
+  "r3Results": {
+    "finalStates": 24,
+    "allMeasuredStates": 72,
+    "rawStaticImages": 144,
+    "originalFinalImagesReviewed": 24,
+    "roundsUsed": 3,
+    "A1": {
+      "PASS": 20,
+      "N/A": 4
+    },
+    "A2": {
+      "PASS": 20,
+      "N/A": 4
+    },
+    "A3": {
+      "FAIL": 20,
+      "N/A": 4
+    },
+    "A4": {
+      "pairs": 22,
+      "pass": 1
+    },
+    "A5": {
+      "PASS": 24
+    },
+    "A6": {
+      "PASS": 24
+    },
+    "reproducibility": {
+      "FAIL": 10,
+      "PASS": 14
+    },
+    "V": {
+      "V1": {
+        "FAIL": 12,
+        "PASS": 10,
+        "N/A": 2
+      },
+      "V2": {
+        "PASS": 24
+      },
+      "V3": {
+        "FAIL": 22,
+        "N/A": 2
+      },
+      "V4": {
+        "PASS": 22,
+        "N/A": 2
+      },
+      "V5": {
+        "PASS": 14,
+        "FAIL": 8,
+        "N/A": 2
+      },
+      "V6": {
+        "STATIC PASS": 22,
+        "N/A": 2
+      }
+    }
+  },
+  "checks": "checks.json",
+  "report": "REVIEW.md",
+  "cleanup": "cleanup.json",
+  "next": "Checkpoint,push,result record and one authorized coordinator callback; no next sector or main merge."
 }

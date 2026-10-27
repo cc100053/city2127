@@ -1,0 +1,60 @@
+{
+  "finalStates": 24,
+  "allMeasuredStates": 72,
+  "rawStaticImages": 144,
+  "originalFinalImagesReviewed": 24,
+  "roundsUsed": 3,
+  "A1": {
+    "PASS": 20,
+    "N/A": 4
+  },
+  "A2": {
+    "PASS": 20,
+    "N/A": 4
+  },
+  "A3": {
+    "FAIL": 20,
+    "N/A": 4
+  },
+  "A4": {
+    "pairs": 22,
+    "pass": 1
+  },
+  "A5": {
+    "PASS": 24
+  },
+  "A6": {
+    "PASS": 24
+  },
+  "reproducibility": {
+    "FAIL": 10,
+    "PASS": 14
+  },
+  "V": {
+    "V1": {
+      "FAIL": 12,
+      "PASS": 10,
+      "N/A": 2
+    },
+    "V2": {
+      "PASS": 24
+    },
+    "V3": {
+      "FAIL": 22,
+      "N/A": 2
+    },
+    "V4": {
+      "PASS": 22,
+      "N/A": 2
+    },
+    "V5": {
+      "PASS": 14,
+      "FAIL": 8,
+      "N/A": 2
+    },
+    "V6": {
+      "STATIC PASS": 22,
+      "N/A": 2
+    }
+  }
+}
