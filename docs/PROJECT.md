@@ -203,4 +203,4 @@ CityChangeManager將能源實際前後target加入CarrierChange，residentResult
 
 ### Closeup sector A — 2026-10-28（feature，待owner美術review）
 
-`feat/closeup-polish`以已整合S0為基準：Park在載入clone上以既有`leafyCrown`平滑五片光伏葉簇，保持每片原bounding envelope、支架、treeCount與cache不變；本地green／ceramic／public-light finishes和較窄的有支承膜環降低cyan／marker搶焦。EnvironmentDistrict沿用原batch與slot，只細化screen植栽、支承、冠層曲面／厚度；原target／hybrid／seed／roof publication不改。第一西岸水庭在第二庭clone之後將支承邊光併入原本public-light batch，批次數與第二庭幾何保持。三個A shot只改`SHOTS`數值，hero、42°與headline邏輯／時長不變。[交接與完整驗證](handoffs/closeup-polish.md)。
+`feat/closeup-polish`以已整合S0為基準：Park在載入clone上以既有`leafyCrown`以疊葉細化五片光伏葉簇，保持每片原bounding envelope、支架、treeCount與cache不變；原冷卻片加入格柵輪廓，本地green／ceramic／public-light finishes和較窄的有支承膜環降低cyan／marker搶焦。EnvironmentDistrict沿用原batch與slot，只細化screen疊葉、底部集水槽、支承、冠層曲面／厚度；原target／hybrid／seed／roof publication不改。第一西岸水庭在第二庭clone之後將支承邊光併入原本public-light batch，批次數與第二庭幾何保持。三個A shot只改`SHOTS`數值，hero、42°與headline邏輯／時長不變。[交接與完整驗證](handoffs/closeup-polish.md)。

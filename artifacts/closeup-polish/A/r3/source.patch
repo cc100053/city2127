@@ -1,0 +1,42 @@
+diff --git a/src/districtMeters.ts b/src/districtMeters.ts
+index a073d10..92ed868 100644
+--- a/src/districtMeters.ts
++++ b/src/districtMeters.ts
+@@ -609,2 +609,2 @@ export class EnvironmentDistrict {
+-      ...Array.from({ length: 15 }, (_, k) => screenFoliage.clone().scale(1.75, 1.05, .5)
+-        .translate((k % 5 - 2) * 3.5, 1.4 + Math.floor(k / 5) * 2.25, WIDTH / 2 - .5)),
++      ...Array.from({ length: 15 }, (_, k) => screenFoliage.clone().scale(3.05, 1.5, .5).rotateZ((k % 3 - 1) * .1)
++        .translate((k % 5 - 2) * 2.9, 1.8 + Math.floor(k / 5) * 2.1, WIDTH / 2 - .5)),
+@@ -614,0 +615 @@ export class EnvironmentDistrict {
++      new T.BoxGeometry(SPAN - 2, .55, .9).translate(0, .275, WIDTH / 2 - .5),
+diff --git a/src/headlineCamera.ts b/src/headlineCamera.ts
+index a6e1407..24641ad 100644
+--- a/src/headlineCamera.ts
++++ b/src/headlineCamera.ts
+@@ -13 +13 @@ export const SHOTS: Record<ShotId, Pose> = {
+-  'ne:focal': { position: [-245, 80, -260], target: [-205, 14, -135] },
++  'ne:focal': { position: [-280, 85, -245], target: [-210, 14, -135] },
+@@ -20 +20 @@ export const SHOTS: Record<ShotId, Pose> = {
+-  'energy:garden': { position: [-390, 65, -160], target: [-304, 12, -130] },
++  'energy:garden': { position: [-420, 65, -210], target: [-304, 12, -135] },
+diff --git a/src/siteBuilders/environmentPark.ts b/src/siteBuilders/environmentPark.ts
+index ab920ee..d860f04 100644
+--- a/src/siteBuilders/environmentPark.ts
++++ b/src/siteBuilders/environmentPark.ts
+@@ -1,0 +2 @@ import * as T from 'three';
++import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+@@ -162 +163,7 @@ class ParkRuntime implements EnvironmentParkRuntime {
+-    const crown = leafyCrown(3);
++    const clusters = [
++      leafyCrown(3).scale(.75, .8, .85).translate(-.22, .12, 0),
++      leafyCrown(3).scale(.65, .7, .7).translate(.35, -.2, .12),
++      leafyCrown(3).scale(.6, .65, .75).translate(.05, .45, -.2),
++    ];
++    const crown = mergeGeometries(clusters);
++    clusters.forEach(geometry => geometry.dispose());
+@@ -307 +314,4 @@ export function buildEnvironmentPark(scene: T.Scene, _kit: Kit, assets: SiteAsse
+-  const finGeometry = new T.BoxGeometry(.18, 2.2, .85);
++  const finGeometry = mergeGeometries([
++    ...[-.365, .365].map(z => new T.BoxGeometry(.22, 2.2, .12).translate(0, 0, z)),
++    ...Array.from({ length: 5 }, (_, k) => new T.BoxGeometry(.3, .16, .65).rotateZ(.28).translate(0, (k - 2) * .42, 0)),
++  ]);

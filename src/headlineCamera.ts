@@ -10,14 +10,14 @@ export type ShotId = `${Site}:${'focal' | 'district'}` | `energy:${'garden' | 'g
 type Pose = { position: [number, number, number]; target: [number, number, number] };
 export const SHOTS: Record<ShotId, Pose> = {
   'nw:focal': { position: [-105, 150, -475], target: [40, 48, -300] },
-  'ne:focal': { position: [-245, 80, -260], target: [-205, 14, -135] },
+  'ne:focal': { position: [-280, 85, -245], target: [-210, 14, -135] },
   'sw:focal': { position: [-150, 40, -10], target: [-105, 12, 60] },
   'se:focal': { position: [-20, 245, -240], target: [175, 65, -45] },
   'nw:district': { position: [-180, 180, -470], target: [10, 28, -210] },
   'ne:district': { position: [-390, 270, -310], target: [-250, 0, -170] },
   'sw:district': { position: [-365, 135, -420], target: [-180, 8, -235] },
   'se:district': { position: [-105, 235, -295], target: [140, 40, -30] },
-  'energy:garden': { position: [-390, 65, -160], target: [-304, 12, -130] },
+  'energy:garden': { position: [-420, 65, -210], target: [-304, 12, -135] },
   'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },
   'energy:ring': { position: [-118, 148, -138], target: [-18, 96, -24] },
   'energy:wing': { position: [56, 64, -496], target: [125, 22, -424] },

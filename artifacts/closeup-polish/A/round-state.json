@@ -2,18 +2,17 @@
   "dispatchId": "closeup-polish-A-1-r8",
   "base": "3d0f40ebd5d7350ecdcc05ab3420cacf926dfd9a",
   "owner": "01a17e2a-4c38-7422-8d68-33782c0367f5",
-  "status": "r2 complete24/24 +8x2 performance; applying final r3",
+  "status": "r3 final source applied, root test/build PASS; full24 matrix starting",
   "rounds": {
     "ne:focal": 3,
     "ne:district": 3,
     "energy:garden": 3
   },
   "services": [
-    "Vite5194 session72451",
-    "r2 runner session22294"
+    "Vite5194 session72451"
   ],
   "notes": "S0 immutable originals referenced; branch explicitly ff-only to validated main, ahead origin feature2/0; no .codegraph directory. Dream-loop not needed: ART and observed failures give concrete scoped target.",
-  "pendingSourcePatch": "planned-r3.patch",
+  "pendingSourcePatch": null,
   "r1Checkpoint": "2c39678",
   "r1Note": "focal complete6/6; uncapped101.56/102.41; district pose currentlyFAIL A2, intended correction stored for r2 after all r1 measurements.",
   "r1Results": {
@@ -27,7 +26,7 @@
   "patchFormat": "zero-context unified diff; git apply --unidiff-zero only when reproducing from r1 source",
   "r2InitialFailure": "preserved in r2/npm-test-initial-failure.log; rebatch fix keeps49 batches",
   "r2SourceCheckpoint": "2039292",
-  "pendingPatchInstruction": "After r2 completes, git apply --unidiff-zero planned-r3.patch, tests/build then final full24 states +8x2 performance. R2 garden side angle hides rotor; r3 pose returns towards the inspection face, no energy geometry changes.",
+  "pendingPatchInstruction": null,
   "r3Intent": "Restore sea-context focal pose, layer foliage inside unchanged frond envelopes, make cooling fin intake slats readable, replace r2 sparse screen grid with overlapping vegetation inside original bay. No A3/A4 threshold changes. Final water-garden view also retargeted toward turbine inspection face after reviewing r2 garden inspection-face evidence; remeasure entire24-state matrix.",
   "r2Results": {
     "A1": "20 PASS/4 N/A",
@@ -35,5 +34,7 @@
     "A3": "20 FAIL/4 N/A",
     "A6": "24/24 PASS",
     "root": "test/build PASS after documented49-batch fix"
-  }
+  },
+  "r2Checkpoint": "79bece4",
+  "r3SourceApplied": true
 }

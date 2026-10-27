@@ -1,0 +1,22 @@
+{
+  "phase": "final source verified; full matrix/live pending",
+  "rootNpmTest": {
+    "status": "PASS",
+    "exitCode": 0,
+    "log": "npm-test.log"
+  },
+  "rootNpmBuild": {
+    "status": "PASS",
+    "exitCode": 0,
+    "log": "npm-build.log",
+    "warnings": [
+      "existing chunk-size warning"
+    ]
+  },
+  "runnerSelfTest": {
+    "status": "PASS",
+    "log": "runner-self-test.log"
+  },
+  "sourceContracts": "PASS source-hashes.json",
+  "packageScope": "root only; survey/module-swap unchanged"
+}

@@ -1,0 +1,11 @@
+{
+  "scope": "Final r3 original second takes; no visitor recognition claim",
+  "expectedFinalStates": 24,
+  "reviewedOriginals": [],
+  "rows": {},
+  "limits": [
+    "Session visual assessment is not owner or visitor acceptance",
+    "Static images cannot certify temporal flicker across every state"
+  ],
+  "intermediateInspection": "R1/R2 sampled originals identified pole/inspection-face, sparse crown and screen-grid issues; no complete per-state V acceptance claimed for intermediate rounds."
+}

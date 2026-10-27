@@ -1,4 +1,5 @@
 import * as T from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { arc, bake, box, futureLight, leaf, leafyCrown, membrane, paint, pink, publicLight, shrubs, stone, trim, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition, type EnvironmentParkTarget } from '../changeCatalog.ts';
 import { EnvironmentDistrict } from '../districtMeters.ts';
@@ -159,7 +160,13 @@ class ParkRuntime implements EnvironmentParkRuntime {
     this.assetHalfWidth = Math.max(Math.abs(assetBounds.min.x), Math.abs(assetBounds.max.x));
     this.assetHalfDepth = Math.max(Math.abs(assetBounds.min.z), Math.abs(assetBounds.max.z));
     let hasMaterialArray = false;
-    const crown = leafyCrown(3);
+    const clusters = [
+      leafyCrown(3).scale(.75, .8, .85).translate(-.22, .12, 0),
+      leafyCrown(3).scale(.65, .7, .7).translate(.35, -.2, .12),
+      leafyCrown(3).scale(.6, .65, .75).translate(.05, .45, -.2),
+    ];
+    const crown = mergeGeometries(clusters);
+    clusters.forEach(geometry => geometry.dispose());
     crown.computeBoundingBox();
     const crownSize = crown.boundingBox!.getSize(new T.Vector3()), crownCenter = crown.boundingBox!.getCenter(new T.Vector3());
     root.traverse(object => {
@@ -304,7 +311,10 @@ export function buildEnvironmentPark(scene: T.Scene, _kit: Kit, assets: SiteAsse
   treeLayer.group.add(fallback);
   const glb = new T.Group(); glb.name = 'park-trees-glb'; glb.visible = false; treeLayer.group.add(glb);
 
-  const finGeometry = new T.BoxGeometry(.18, 2.2, .85);
+  const finGeometry = mergeGeometries([
+    ...[-.365, .365].map(z => new T.BoxGeometry(.22, 2.2, .12).translate(0, 0, z)),
+    ...Array.from({ length: 5 }, (_, k) => new T.BoxGeometry(.3, .16, .65).rotateZ(.28).translate(0, (k - 2) * .42, 0)),
+  ]);
   const fins = new T.InstancedMesh(finGeometry, trim, 6);
   fins.name = 'park-cooling-fin-instances'; fins.castShadow = true; fins.receiveShadow = true; fins.frustumCulled = false;
   const climateFrame = new T.Group();

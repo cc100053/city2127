@@ -606,12 +606,13 @@ export class EnvironmentDistrict {
     // Green screen: a planted wall along one edge (clear of the walker lanes) carrying a half-width planted canopy.
     const screenFoliage = leafyCrown(2);
     this.screens = new T.InstancedMesh(mergeGeometries([
-      ...Array.from({ length: 15 }, (_, k) => screenFoliage.clone().scale(1.75, 1.05, .5)
-        .translate((k % 5 - 2) * 3.5, 1.4 + Math.floor(k / 5) * 2.25, WIDTH / 2 - .5)),
+      ...Array.from({ length: 15 }, (_, k) => screenFoliage.clone().scale(3.05, 1.5, .5).rotateZ((k % 3 - 1) * .1)
+        .translate((k % 5 - 2) * 2.9, 1.8 + Math.floor(k / 5) * 2.1, WIDTH / 2 - .5)),
       new T.BoxGeometry(SPAN, .5, WIDTH / 2).deleteAttribute('uv').translate(0, ROOF + .2, WIDTH / 4),
     ]), leaf, n);
     screenFoliage.dispose();
     this.screenCaps = new T.InstancedMesh(mergeGeometries([
+      new T.BoxGeometry(SPAN - 2, .55, .9).translate(0, .275, WIDTH / 2 - .5),
       new T.BoxGeometry(SPAN + .4, .35, 1.3).translate(0, ROOF - .4, WIDTH / 2 - .5),
       new T.BoxGeometry(SPAN + .4, .25, .4).translate(0, ROOF + .55, 0),
       ...[-7, -3.5, 0, 3.5, 7].map(x => new T.BoxGeometry(.12, ROOF - .6, .12).translate(x, (ROOF - .6) / 2, WIDTH / 2 - .5)),

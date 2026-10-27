@@ -1,0 +1,28 @@
+{
+  "base": "3d0f40ebd5d7350ecdcc05ab3420cacf926dfd9a",
+  "assertions": [
+    "hero/FOV and main unchanged",
+    "headline code outside SHOTS unchanged",
+    "energy source changes only first-garden batch after clone",
+    "district source changes only EnvironmentDistrict",
+    "no asset/survey/module-swap diff"
+  ],
+  "sha256": {
+    "src/main.ts": "ef7f9c82e6efa5363924f1f952a09378bfb60b59c462fadf5459ee0a6e1718e6",
+    "src/heroCamera.ts": "c6e061b7cd9f532aa66b1f76ff7caeae813f3ec08ec37c00c9edd2590006ad34",
+    "src/changeCatalog.ts": "c204eae779b72afd644122bbab9a6f6c6982e8d15fb532e135ab9e52f73b36f1",
+    "src/energyRuntime.ts": "f2f6abcf7820ef9072133bcd2483463afaccaf2a5314469661f2025c19e29c1c",
+    "src/siteBuilders/siteRuntime.ts": "c472724ed77f6f196026ee306c85eae9d28052f533a08cdc56d9289f47899907",
+    "src/devShotFrame.ts": "61558ef4610b26248ca69f4aa554bf4777cedff008e020e122ed41a77f0ff28c",
+    "package.json": "2e0e74b1d4765a104f7160f174a3f287ab632e2536d13db85fd66532e904f9d1",
+    "package-lock.json": "92533d9f3e39ee7f1ec9d45d3cac0d8b63fd04280ba54ea6e4ad147c8cacff02",
+    "src/headlineCamera.ts": "b6894e056f9bb69d1db23002bb86fe2f12054502106ca8aad9efbf746e044b2f",
+    "src/energyPrototype.ts": "66ff93259e78daade46d1081bf33fc34bb5fb1c355ec94a2ca76a630a8743642",
+    "src/districtMeters.ts": "dad298a5f9c56270645a1be41174df02d6ccf269e8b559c9f92ca36cf3426651",
+    "src/siteBuilders/environmentPark.ts": "d9e52425991d7e60bf8ff3100d9a73f93acde892b5069db9649a07e0c0207eba",
+    "tests/siteAssets.test.ts": "1b42366e66f5cd17e352ee207c6b57bc3f22a68d5b8dd233eb9a636fb1423a56",
+    "tests/energyPrototype.test.ts": "90ad430a11a91f1e4dde41c39e5291cf8454952d687f55b136e4d18d70064005",
+    "tests/districtMeters.test.ts": "a80e7c358ea9ae7af31fbcfc4e021e7f38daaa97698428d4d4ed14431f23d4a4",
+    "artifacts/closeup-polish/capture.mjs": "73bcae4d707c54fc7b63ed91d4db689e49bd93b65cb27a65b0df4f287a634d6e"
+  }
+}
