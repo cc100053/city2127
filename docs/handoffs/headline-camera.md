@@ -4,8 +4,8 @@
 - Status: REVIEW_READY — implementation and local software checks complete; main merge requires owner approval
 - Branch: `feat/headline-camera`
 - Base commit: `00c0273`（main：ladder 整合同 main CI 記錄之後）
-- Last verified commit: `9335b6d627cd5d6175a13936cb45c0e34708ab33` (exact validated source / tests / original evidence)
-- Remote availability: `origin/feat/headline-camera` @ `9335b6d627cd5d6175a13936cb45c0e34708ab33`; implementation pushed successfully, metadata follow-up carries this verification record
+- Last verified commit: `4c52d681a3715630e5eba52889831729355775fb` (correction1; root checks, targeted A/B/SW and retained-evidence verification PASS)
+- Remote availability: `origin/feat/headline-camera` @ `4c52d681a3715630e5eba52889831729355775fb`; correction1 pushed successfully; metadata follow-up changes no runtime
 
 ## Session Git state
 
@@ -270,4 +270,4 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 - Real A/B second proposal has identical before/after layout:1018ms commit gap,0.1001m boundary step,6.1096m maximum sampled frame step,65 hero frames after return and controls work. No server/protocol/clock changes.
 - SW pose corrected to `[-365,135,-420] → [-180,8,-235]`: changed sharing rooms2/3/4 are central/readable; park is in the right background. Static/live60.0FPS,958/936 calls. New SW original pair plus B-at-hero proof; unchanged original hashes preserved. Full inland court occlusion sweep is not claimed.
 - Root tests/build/whitespace PASS again. Build includes existing chunk-size AND odaiba-layout JSON import-attributes warnings (prior report wording corrected). New manifest verifier compares saved hashes; explicit update followed by independent verify PASS, deliberate mismatched hash rejected.
-- [Correction evidence/report](../../artifacts/headline-camera/README.md#coordinator-correction-1--2026-10-27), [actual results](../../artifacts/headline-camera/correction-1/browser.json). Final corrective code checkpoint is recorded in the delivery follow-up; main still requires human approval.
+- [Correction evidence/report](../../artifacts/headline-camera/README.md#coordinator-correction-1--2026-10-27), [actual results](../../artifacts/headline-camera/correction-1/browser.json). Corrective code checkpoint `4c52d681a3715630e5eba52889831729355775fb` pushed successfully; main still requires human approval. All owned services/writers released for review.
