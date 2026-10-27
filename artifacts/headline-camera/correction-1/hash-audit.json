@@ -1,0 +1,12 @@
+{
+  "result": "PASS",
+  "priorFiles": 34,
+  "changedAsExpected": [
+    "src/headlineCamera.ts",
+    "tests/headlineCamera.test.ts",
+    "artifacts/headline-camera/final/live-sw-district.jpg",
+    "artifacts/headline-camera/final/sw-district.jpg"
+  ],
+  "unchangedOriginalImages": 26,
+  "savedCurrentHashesVerified": 42
+}

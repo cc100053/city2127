@@ -320,3 +320,18 @@ Survey／module-swap source未改，未另跑本機獨立suite；整合與main C
 - 九份 guest HTTP 提案，每份只有一個 site 移一格。結果卡每次講一個地點；有能源同時變化嘅一次，卡片照講 tier 嘅 site。Console 冇 error。
 - 截圖：[focal 第 1 格](../artifacts/meter-ladder/guest2-se-focal.jpg)、[district 第 3 格](../artifacts/meter-ladder/guest9-se-rung3.jpg)。
 - 未測：FPS、A/B station、iPad 實機、訪客理解程度、整合後嘅 main CI。
+
+
+## Headline 近鏡 — 2026-10-27
+
+[原圖、方法及逐鏡數據](../artifacts/headline-camera/README.md)／[manifest](../artifacts/headline-camera/final/manifest.json)。Root `npm test`、`npm run build`、`git diff --check` PASS；build 有既有 >500kB chunk warning 及 `odaiba-layout.json` import attributes 不一致 warning。新增純函數／controller 測試涵蓋 13 shots、focal/district 及能源優先次序／移除／結果卡位置、2.62 s journey／1.5 s fly-in／10–12 s fly-out、實際 displayMs 同步、current-pose 中斷、cancel、catch-up。Production bundle 沒有 `cityShot`；survey／module-swap source 未改，未另跑其 suite（survey build 只供 scratch UI）。
+
+macOS 27.0.1 arm64、Chrome 156.0.8078.48 headless／WebGL2／ANGLE Metal Apple M6，1920×1080 DPR1 default、hour12；DEV actor time20，live 使用實時 actor clock。Hero 與每個 authored shot 均有新原圖和 canvas 診斷：hero 60.1 FPS／998 calls；13 靜態近鏡 59.9–60.1 FPS／455–958 calls。另以真實 scratch HTTP/WebSocket 提案在第 8.3 s hold 拍齊 13 個 live shot（另有 Undo 後水庭），59.9–60.1 FPS／599–1186 calls；這些狀態與靜態比較配置不同，不能把 calls 差異當回歸。120-frame cadence 是短段取樣，不是 sustained／isolated benchmark。原圖已逐鏡查看；沒有改模型／材質，既有柱／路線及 commons 自身屋頂仍可見，不宣稱全場遮擋或飛行碰撞掃掠。
+
+初次使用指定 Vite5184／dev:auto8798 與獨立暫存 SQLite；最終可重跑 runner 另建 fresh v3（舊氣候四站）／v4（現行能源）真實 server，不改展覽 DB／協議／時鐘。無 headline、reload、Undo、A/B（提交相隔 1006 ms；維持原10秒展示次序、第二份停在自己的 headline）與 reduced motion PASS。另驗真實 TCP 斷線重連、reset、縮短 displayMs 的 real-view wire fixture、DEV meters／中斷／reduced-motion、裸 `?shot=` 的中性載體、legacy v1 snapshot 及 standalone，八項 PASS。Page exception／console error 為0；外部 Google Fonts CSS 以空 CSS 明確使用系統 fallback。全部 owned servers／browsers 已停止，5184／8798 已釋放。
+
+初版 DEV 僅靠 media change 事件的中斷未通過，已改成 render loop 在 camera update 前讀取保留的 MediaQueryList；早期4.9秒半透明過渡圖由最終8.3秒原圖取代。Sandbox listen／Chrome 初次失敗後以範圍授權重跑成功。完整 logs／限制與 checkpoint 見 [handoff](handoffs/headline-camera.md)；展示機／4K HDMI、Safari／iPad／Windows、長時間效能、真人閱讀理解／工程及 main CI 未驗，模型近鏡打磨另作任務；merge main 仍待 owner 批准。
+
+Headline correction1（2026-10-27）：[獨立結果與原圖](../artifacts/headline-camera/README.md#coordinator-correction-1--2026-10-27)。補齊任意新 live 結果（包括無 headline）由當前近鏡平滑回 hero；hold／fly-out 第一幀、2秒返回／操作恢復及無新fly-in unit tests PASS。真實v4 A/B第二份 layout不變，提交1018ms相隔、邊界0.1001m／最大逐幀6.1096m、返回後65個hero樣本及操作恢復PASS。SW district改看實際共享岸邊三房間2/3/4，重拍靜態／live兩圖並實測60.0FPS、958／936 calls；其餘原圖以保存的舊hash逐一核對。Root test/build/whitespace再次PASS；build保留既有chunk-size及JSON import-attributes兩項warning。Manifest預設只比對、不重建；刻意錯hash拒絕／原檔還原／獨立verify PASS。沒有模型／材質／server／協議改動；仍未測展示硬件／長測或main CI。
+
+Correction1 verified code `4c52d681a3715630e5eba52889831729355775fb` 已推送；後續僅交付文件，runtime及原圖 hashes不變。

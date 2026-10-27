@@ -1,0 +1,15 @@
+hero 60.1 998
+nw:focal 60.0 815
+ne:focal 60.0 799
+sw:focal 60.0 620
+se:focal 60.1 720
+nw:district 60.0 911
+ne:district 60.0 950
+sw:district 60.0 778
+se:district 60.1 757
+energy:garden 60.1 496
+energy:garden2 60.0 455
+energy:ring 59.9 669
+energy:wing 59.9 604
+energy:island 59.9 461
+sw:district 60.0 938

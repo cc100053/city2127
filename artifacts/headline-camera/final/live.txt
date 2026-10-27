@@ -1,0 +1,14 @@
+site nw
+hold nw:district
+site ne
+hold ne:district
+site sw
+hold sw:district
+site se
+hold se:district
+hold energy:garden
+hold energy:garden
+hold energy:garden2
+hold energy:ring
+hold energy:wing
+hold energy:island

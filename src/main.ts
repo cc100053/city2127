@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+import { HeadlineCamera, SHOTS, type ShotId } from './headlineCamera';
 import * as T from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -132,6 +133,7 @@ try {
   const scaleLab=import.meta.env.DEV&&!surveyUrl&&params.has('scaleLab');
   const housing=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&!params.has('energy')&&params.has('housing');
   const energyReview=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&params.has('energy');
+  const shotPreview=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&!housing&&!energyReview&&!civicReview&&!streetReview&&params.has('shot');
   if(!housing&&!energyReview){
     // Fixed city background: votes and recovery never retarget the dwellings; the update cycle stays in DEV.
     const background=housingPrototype();background.select('mixed');background.root.name='housing-background';scene.add(background.root);
@@ -140,7 +142,7 @@ try {
   let devFrame:((now:number,darkness:number)=>void)|undefined;
   if(import.meta.env.DEV&&energyReview)
     import('./devEnergy').then(({startEnergyReview})=>{devFrame=startEnergyReview(scene,params);});
-  const cityChanges=surveyUrl||metersParam!==null||scaleLab||housing?createCityChangeManager(scene):null;
+  const cityChanges=surveyUrl||metersParam!==null||scaleLab||housing||shotPreview?createCityChangeManager(scene):null;
   if(import.meta.env.DEV&&housing)import('./devHousing').then(async({startHousingReview})=>{
     if(!await odaibaReady)return;
     devFrame=startHousingReview(scene,camera,controls,cityChanges!,params);
@@ -149,30 +151,54 @@ try {
     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     devFrame=startScaleLab(scene,camera,cityChanges!,()=>now,params);
   });
+  const headlineCamera=surveyUrl||metersParam!==null||shotPreview?new HeadlineCamera(camera,controls):null;
+  let devShot:ShotId|null=null;
+  const cameraMotion=matchMedia('(prefers-reduced-motion: reduce)');
+  if(import.meta.env.DEV){
+    Object.assign(window,{cityShot:(id?:string)=>{
+      if(id===undefined){const pose={position:camera.position.toArray(),target:controls.target.toArray()};console.log(pose);return pose;}
+      if(!Object.hasOwn(SHOTS,id))throw new Error(`Unknown shot: ${id}`);
+      headlineCamera?.cancel();devShot=id as ShotId;controls.enabled=false;
+    }});
+    const shot=params.get('shot');
+    if(shot!==null)(window as unknown as {cityShot:(id:string)=>void}).cityShot(shot);
+  }
   // Applied after the first frame, so `now` already holds the clock (or a held `reviewTime`) rather than its initial 0.
-  if(import.meta.env.DEV && metersParam!==null)import('./devMeters').then(async({devLayout})=>{
+  if(import.meta.env.DEV && (metersParam!==null||shotPreview))import('./devMeters').then(async({devLayout})=>{
     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-    cityChanges!.applyExhibitionLayout(devLayout(metersParam),'city-state-snapshot',now);
-    Object.assign(window,{cityMeters:(meters:string)=>cityChanges!.applyExhibitionLayout(devLayout(meters),'city-state-updated',now)});
-    // `&metersTo=se:high&metersAge=1.2`: a live change that started 1.2 s ago, so a held `reviewTime` capture shows the transition and pulse.
+    cityChanges!.applyExhibitionLayout(devLayout(metersParam??''),'city-state-snapshot',now);
+    const playMeters=(meters:string,at:number)=>{
+      devShot=null;
+      const reduced=cameraMotion.matches;
+      const changes=cityChanges!.applyExhibitionLayout(devLayout(meters),reduced?'city-state-snapshot':'city-state-updated',reduced?at:at+ARRIVAL_SECONDS);
+      if(reduced)headlineCamera!.cancel();else if(!civicReview&&!streetReview)headlineCamera!.play(changes,at);
+      return changes;
+    };
+    Object.assign(window,{cityMeters:(meters:string)=>playMeters(meters,now)});
+    // `&metersTo=se:high&metersAge=8.3`: seconds since the live result; held `reviewTime` previews the settled headline shot.
     const to=params.get('metersTo');
-    if(to!==null)cityChanges!.applyExhibitionLayout(devLayout(to),'city-state-updated',now-Number(params.get('metersAge')??1));
+    if(to!==null)playMeters(to,now-Number(params.get('metersAge')??1));
   });
   const journey=surveyUrl?new VoteJourney(scene,camera):null;
-  if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view)=>{
+  if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view,displayMs)=>{
+    devShot=null;
     if(isExhibitionView(view)){
       // Cancel any legacy score blend while preserving its current rendered atmosphere.
       world.blendTo(world.state,now);
       const latest=view.latestProposal;
       // Vote journey: a live result's four votes fly to the sites first; the city transition and pulses start as they land,
       // while the carrier evidence for the resident card is computed now. Snapshots, resets, Undo and reduced motion stay immediate.
-      if(kind==='city-state-updated'&&latest&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
+      if(kind==='city-state-updated'&&latest&&!cameraMotion.matches){
         journey!.play(latest.votes,latest.ordinal,now);
-        return cityChanges!.applyExhibitionLayout(view.layout,kind,now+ARRIVAL_SECONDS,view.slotSeeds);
+        const changes=cityChanges!.applyExhibitionLayout(view.layout,kind,now+ARRIVAL_SECONDS,view.slotSeeds);
+        if(civicReview||streetReview)headlineCamera!.cancel();else headlineCamera!.play(changes,now,displayMs);
+        return changes;
       }
+      headlineCamera!.cancel();
       journey!.setLanterns(view.recentProposals);
       return cityChanges!.applyExhibitionLayout(view.layout,kind,now,view.slotSeeds);
     }
+    headlineCamera!.cancel();journey!.cancel();
     world.blendTo(scoresToWorldState(view.scores),now);
     if(kind==='city-state-updated')cityChanges!.applyIncrementalUpdate(view,now);
     else cityChanges!.restoreFromSnapshot(view,now);
@@ -207,7 +233,10 @@ try {
     ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientLate,glow*.6).lerp(ambientNight,dark);
     scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure*(1+.16*day);
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
-    controls.update();panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();
+    controls.update();panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);
+    if(headlineCamera?.active&&cameraMotion.matches)headlineCamera.cancel();else headlineCamera?.update(now);
+    if(import.meta.env.DEV&&devShot){const pose=SHOTS[devShot];camera.position.set(...pose.position);controls.target.set(...pose.target);camera.lookAt(controls.target);}
+    cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.
     if(performance.now()-shadowDrawn>=1000/quality.shadowHz){renderer.shadowMap.needsUpdate=true;shadowDrawn=performance.now();}
     composer.render();
