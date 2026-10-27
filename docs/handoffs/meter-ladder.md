@@ -4,8 +4,8 @@
 - Status: IN_PROGRESS（實作／驗證完成並 push；等 owner 批准先 merge main）
 - Branch: `feat/meter-ladder`
 - Base commit: `047cb2c62c5224e1628a418659685d489695a3b9`
-- Last verified commit: 見下面「Actual validation results」；驗證對象係 push 前嘅 working tree，之後只改咗文件
-- Remote availability: `origin/feat/meter-ladder`
+- Last verified commit: `df730c0dae6f2d703721a4add8a1bbf515288534`（code 同驗證過嘅 working tree 一樣；之後只改咗呢份 handoff）
+- Remote availability: `origin/feat/meter-ladder` @ `df730c0` 再加呢個 handoff commit
 
 ## Session Git state
 
@@ -55,7 +55,7 @@
 ## Actual validation results
 
 - Verification status: PASSED（以下列出嘅範圍）
-- Date and checked commit/worktree: 2026-10-27，`feat/meter-ladder` working tree（base `047cb2c`）。
+- Date and checked commit/worktree: 2026-10-27，`feat/meter-ladder` working tree，commit 做 `df730c0`（base `047cb2c`）。
 - Commands/manual checks and results:
   - Root `npm test` PASS、`npm run build` PASS。
   - `survey/` `npm test` PASS、`npm run build` PASS。
