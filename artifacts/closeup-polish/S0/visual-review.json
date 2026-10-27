@@ -1,0 +1,276 @@
+{
+  "method": "Every listed full original second-take JPEG opened directly with view_image; session judgment, not visitor testing. V6 static frames cannot establish absence of flicker.",
+  "groups": {
+    "nw:focal": {
+      "reviewedOriginals": [
+        "baseline/nw-focal__-2__h12.jpg",
+        "baseline/nw-focal__-2__h22.jpg",
+        "baseline/nw-focal__0__h12.jpg",
+        "baseline/nw-focal__0__h22.jpg",
+        "baseline/nw-focal__2__h12.jpg",
+        "baseline/nw-focal__2__h22.jpg"
+      ],
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "Hub與鄰近藍塔相似；低／中服務端口太小，無法只看圖迅速辨認自動服務。"
+        ],
+        "V2": [
+          "PASS",
+          "海面與富士球體入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "周邊圓球樹與棒狀樹幹仍明顯。"
+        ],
+        "V4": [
+          "PASS",
+          "三種配置均有完整量體及服務底層，low沒有退化成空地。"
+        ],
+        "V5": [
+          "FAIL",
+          "high新增柱體在夜間比鄰樓暗；端口差異難讀。"
+        ],
+        "V6": [
+          "FAIL",
+          "近鏡可見簡化方盒／圓柱、重複外皮及樹冠多邊形輪廓。"
+        ]
+      },
+      "notes": "橙色地界可以定位hub，但周邊兩棟塔同樣搶眼；high加柱體的差異可見，服務機理未表達。"
+    },
+    "nw:district": {
+      "reviewedOriginals": [
+        "baseline/nw-district__-8__h12.jpg",
+        "baseline/nw-district__-8__h22.jpg",
+        "baseline/nw-district__-5__h12.jpg",
+        "baseline/nw-district__-5__h22.jpg",
+        "baseline/nw-district__0__h12.jpg",
+        "baseline/nw-district__0__h22.jpg",
+        "baseline/nw-district__5__h12.jpg",
+        "baseline/nw-district__5__h22.jpg",
+        "baseline/nw-district__8__h12.jpg",
+        "baseline/nw-district__8__h22.jpg"
+      ],
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "大部分畫面是Fuji與其他carrier；自動化服務館／平台分散且部分在邊緣。"
+        ],
+        "V2": [
+          "PASS",
+          "海與富士球體清楚入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "綠化仍是圓球樹與稀疏綠頂格點。"
+        ],
+        "V4": [
+          "PASS",
+          "low保留完整有頂服務亭，high有泊位／無人機系統，都是成熟替代配置。"
+        ],
+        "V5": [
+          "FAIL",
+          "夜間暖窗與航線搶眼，low服務亭和high端口本體差異較暗。"
+        ],
+        "V6": [
+          "FAIL",
+          "近景背景樹冠和服務頂棚過度簡化，細節層次不足；靜圖未證明無閃爍。"
+        ]
+      },
+      "notes": "高tier亮青航線與大型飛行器橫跨畫面，是額外遮擋來源；不能把bbox內空白ray miss都叫作前景遮擋。"
+    },
+    "ne:focal": {
+      "reviewedOriginals": [
+        "baseline/ne-focal__-2__h12.jpg",
+        "baseline/ne-focal__-2__h22.jpg",
+        "baseline/ne-focal__0__h12.jpg",
+        "baseline/ne-focal__0__h22.jpg",
+        "baseline/ne-focal__2__h12.jpg",
+        "baseline/ne-focal__2__h22.jpg"
+      ],
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "能辨認為環形冷卻／綠化裝置，未能在兩秒內讀成海濱公園；橙框比樹冠搶眼。"
+        ],
+        "V2": [
+          "PASS",
+          "下方有明確海面。"
+        ],
+        "V3": [
+          "FAIL",
+          "青色樹冠為稜角團塊、細長裸幹，缺少飽滿自然層次。"
+        ],
+        "V4": [
+          "PASS",
+          "low有冷卻柱與三棵樹、high為完整密植平台，不是空白／舊式方案。"
+        ],
+        "V5": [
+          "PASS",
+          "夜間環形輪廓及由疏到密的樹數可辨，雖主體較背景暗。"
+        ],
+        "V6": [
+          "FAIL",
+          "樹冠稜角、簡單箱體及半透明罩交界在近鏡明顯。"
+        ]
+      },
+      "notes": "三狀態可看到樹數及冷卻柱變化，但主體本體約中間小區域；root大box不等於樹冠佔畫面一半。"
+    },
+    "ne:district": {
+      "reviewedOriginals": [
+        "baseline/ne-district__-8__h12.jpg",
+        "baseline/ne-district__-8__h22.jpg",
+        "baseline/ne-district__-5__h12.jpg",
+        "baseline/ne-district__-5__h22.jpg",
+        "baseline/ne-district__0__h12.jpg",
+        "baseline/ne-district__0__h22.jpg",
+        "baseline/ne-district__5__h12.jpg",
+        "baseline/ne-district__5__h22.jpg",
+        "baseline/ne-district__8__h12.jpg",
+        "baseline/ne-district__8__h22.jpg"
+      ],
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "氣候設施分散於長岸邊與屋頂；畫面先讀到其他塔與富士框架，難即刻認出環境district主題。"
+        ],
+        "V2": [
+          "PASS",
+          "廣闊海面與富士球體入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "屋頂仍是規則小樹團與平綠頂，前方冠蓋是大塊平面；欠自然層次。"
+        ],
+        "V4": [
+          "PASS",
+          "low完整遮陽／冷卻設施與high綠化立面皆持續運作，並非荒地或退回舊城。"
+        ],
+        "V5": [
+          "PASS",
+          "夜間白帆／深綠樹冠以及立面綠帶比例仍可分辨；只是其他窗光更搶眼。"
+        ],
+        "V6": [
+          "FAIL",
+          "前方冠蓋的大平面／條板及規則球狀屋頂樹冠仍顯粗糙；靜圖不證明無閃爍。"
+        ]
+      },
+      "notes": "相鄰tier的立面綠帶、遮陽帆與樹冠數有變；對方大範圍carrier的world AABB不等於畫面內單一公園範圍。"
+    },
+    "sw:focal": {
+      "reviewedOriginals": [
+        "baseline/sw-focal__-2__h12.jpg",
+        "baseline/sw-focal__-2__h22.jpg",
+        "baseline/sw-focal__0__h12.jpg",
+        "baseline/sw-focal__0__h22.jpg",
+        "baseline/sw-focal__2__h12.jpg",
+        "baseline/sw-focal__2__h22.jpg"
+      ],
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "圓亭可見，但共享座位與私密屏風用途不夠清楚，前景柱遮住重點。"
+        ],
+        "V2": [
+          "FAIL",
+          "只見建築間一小塊藍水面，沒有清楚海岸／富士球／彩虹橋定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "規則球狀矮樹與大粉紅團塊近鏡粗糙。"
+        ],
+        "V4": [
+          "PASS",
+          "low完整私密屏風、high完整開放座位，low不是空／舊。"
+        ],
+        "V5": [
+          "PASS",
+          "夜間屏風數與開放背椅差異仍可讀，亭頂和背景光較搶眼。"
+        ],
+        "V6": [
+          "FAIL",
+          "扁平圓環屋頂、粉紅冠團稜面與簡化接縫顯露；上下高架近鏡切過畫面。"
+        ]
+      },
+      "notes": "先修pose：左前白柱與上／下青色高架直接擋住視線；勿只增加細節。"
+    },
+    "sw:district": {
+      "reviewedOriginals": [
+        "baseline/sw-district__-8__h12.jpg",
+        "baseline/sw-district__-8__h22.jpg",
+        "baseline/sw-district__-5__h12.jpg",
+        "baseline/sw-district__-5__h22.jpg",
+        "baseline/sw-district__0__h12.jpg",
+        "baseline/sw-district__0__h22.jpg",
+        "baseline/sw-district__5__h12.jpg",
+        "baseline/sw-district__5__h22.jpg",
+        "baseline/sw-district__8__h12.jpg",
+        "baseline/sw-district__8__h22.jpg"
+      ],
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "前景三座海上房間／水庭一眼可辨，罩頂與開放層的替代關係清楚。"
+        ],
+        "V2": [
+          "PASS",
+          "海面佔畫面大部分。"
+        ],
+        "V3": [
+          "FAIL",
+          "平台樹冠仍是平橢圓／球形、細幹的規則排列。"
+        ],
+        "V4": [
+          "PASS",
+          "low完整封閉水房與high開放環形水庭皆為成熟海濱方案。"
+        ],
+        "V5": [
+          "PASS",
+          "夜間透明罩、開放環及發光封閉層仍可區分。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "本組靜圖未見明顯浮空／穿模或破面，穹頂肋線可讀；未用靜圖宣稱無閃爍。"
+        ]
+      },
+      "notes": "畫面可讀，但整個sharing carrier world AABB跨near plane，A1–A3不可算，A4應保留失敗原因而不能跳過。"
+    },
+    "se:focal": {
+      "reviewedOriginals": [
+        "baseline/se-focal__-2__h12.jpg",
+        "baseline/se-focal__-2__h22.jpg",
+        "baseline/se-focal__0__h12.jpg",
+        "baseline/se-focal__0__h22.jpg",
+        "baseline/se-focal__2__h12.jpg",
+        "baseline/se-focal__2__h22.jpg"
+      ],
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "主體夾在左大樓與右藍塔之間；low只見兩個小盒與高杆，function modules無法迅速辨認。"
+        ],
+        "V2": [
+          "PASS",
+          "左上海面清楚提供定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "周邊屋頂仍為規則樹團與細幹球冠。"
+        ],
+        "V4": [
+          "FAIL",
+          "low的兩小盒與長杆讀成未充分成形的設施，neutral偏一般辦公盒；high雖完整增高，功能整合未清楚表達。"
+        ],
+        "V5": [
+          "FAIL",
+          "night主體比左右鄰樓暗，low高杆及功能模組細節難讀；high高度差仍可見。"
+        ],
+        "V6": [
+          "FAIL",
+          "簡單方盒／細柱及環形疊層明顯，精細接點與功能模組不足。"
+        ]
+      },
+      "notes": "A1包含長服務杆，因此low投影高度大於neutral不代表低層功能主體足夠醒目；不要靠量度PASS掩蓋此問題。"
+    }
+  }
+}

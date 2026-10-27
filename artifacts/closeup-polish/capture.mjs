@@ -18,10 +18,18 @@ export function framing(frame, id) {
   return {A1:id.endsWith('focal') ? h>=.25&&h<=.60 : id.endsWith('district') ? w>=.35 : Math.max(w,h)>=.20,
     A2:x>=.08&&x<=.72&&y>=.15&&y<=.85&&cardOverlap<=.05,A3:frame.hits>=7,width:w,height:h,center:{x,y},cardOverlap};
 }
+function comparisonBox(a,b) {
+  const boxes=[a?.box,b?.box].filter(Boolean);
+  return boxes.length ? {left:Math.min(...boxes.map(b=>b.left)),right:Math.max(...boxes.map(b=>b.right)),top:Math.min(...boxes.map(b=>b.top)),bottom:Math.max(...boxes.map(b=>b.bottom))} : null;
+}
 if (process.argv.includes('--self-test')) {
   assert.equal(matrix.length,98); assert.equal(new Set(matrix.map(r=>`${r.id}/${r.state}/${r.hour}`)).size,98);
   assert.deepEqual(framing({box:{left:.2,right:.6,top:.2,bottom:.6},hits:7},'ne:focal').A1,true);
   assert.equal(framing({box:{left:.8,right:1,top:0,bottom:.4},hits:6},'ne:focal').A2,false);
+  assert.equal(comparisonBox({box:null},{box:null}),null,'invalid projections cannot silently disappear from A4');
+  const a={left:-.1,right:.4,top:.2,bottom:.6},b={left:.2,right:.7,top:.1,bottom:.8};
+  assert.deepEqual(comparisonBox({box:a},{box:b}),{left:-.1,right:.7,top:.1,bottom:.8});
+  assert.deepEqual(comparisonBox(null,{box:a}),a,'absent energy uses its present counterpart');
   console.log('PASS: 98 captures, energy membership, framing thresholds.'); process.exit(0);
 }
 const mode=process.argv[2]??'capture',out=resolve(process.env.CITY2127_EVIDENCE_DIR??'artifacts/closeup-polish/S0/baseline');
@@ -90,14 +98,14 @@ try {
     const captureReport=JSON.parse(readFileSync(`${out}/capture.json`,'utf8')),captures=captureReport.rows;
     assert.ok(selected.every(row=>captures.some(c=>key(c)===key(row)&&c.complete)),'Complete the selected matrix before A4 comparisons.');
     report.rows=[];
-    for(const id of new Set(captures.map(r=>r.id))) for(const hour of [12,22]) {
+    for(const id of new Set(selected.map(r=>r.id))) for(const hour of [12,22]) {
       const rows=captures.filter(r=>r.id===id&&r.hour===hour); if(rows.length<2)continue;
       const pairs=rows.slice(1).map((r,i)=>[rows[i],r,'adjacent']);pairs.push([rows[0],rows.at(-1),'extremes']);
       for(const [a,b,kind] of pairs) {
-        const boxes=[a.frame?.box,b.frame?.box].filter(Boolean);if(!boxes.length)continue;
-        const box={left:Math.min(...boxes.map(b=>b.left)),right:Math.max(...boxes.map(b=>b.right)),top:Math.min(...boxes.map(b=>b.top)),bottom:Math.max(...boxes.map(b=>b.bottom))};
+        const box=comparisonBox(a.frame,b.frame);
+        if(!box){report.rows.push({id,hour,from:a.state,to:b.state,kind,threshold:kind==='extremes'?.12:.06,mad:null,pass:false,reason:'No valid projected subject box in either state',frameReasons:[a.frame?.reason,b.frame?.reason]});continue;}
         const delta=await difference(imageData(a.images[1]),imageData(b.images[1]),box),threshold=kind==='extremes'?.12:.06;
-        report.rows.push({id,hour,from:a.state,to:b.state,kind,threshold,...delta,pass:delta!==null&&delta.mad>=threshold});
+        report.rows.push({id,hour,from:a.state,to:b.state,kind,threshold,...(delta??{mad:null,reason:'Subject box does not overlap viewport'}),pass:delta!==null&&delta.mad>=threshold});
       }
     }
     const performance=existsSync(`${out}/performance.json`)?JSON.parse(readFileSync(`${out}/performance.json`,'utf8')).rows:[];

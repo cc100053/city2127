@@ -1,7 +1,7 @@
 # closeup-polish — Headline 近鏡逐個打磨
 
 - Owner: cc100053（產品／審美最終批准）；實作由一個 long session 負責，開工時喺下面「進度」記低 session 名。
-- Status: S0 PARTIAL / WAITING QUOTA（worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2`；43/98，未改美術）
+- Status: S0 RESUMED / IN PROGRESS（worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2`；43/98，未改美術）
 - Branch: `feat/closeup-polish`（一條長分支，每個 sector 一個 checkpoint）
 - Base commit: `fdc4a0cbbbc352b41c15850f2a846845d7975de1`（fetch verified main，包含完整 S0 標準）
 - Last verified commit: runtime `59c6ea9`；最終source root test/build、runner self-check及production DEV排除PASS，完整S0矩陣及效能未完成。
@@ -164,7 +164,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 
 | Sector | 狀態 | Checkpoint | Owner review | Main merge |
 | --- | --- | --- | --- | --- |
-| S0 基準 | PARTIAL / WAITING QUOTA；43/98，worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2` | runtime `59c6ea9`；[部分報告](../../artifacts/closeup-polish/S0/README.md) | 唔需要（冇美術改動）；本批留 coordinator review，不 merge | — |
+| S0 基準 | RESUMED；保留43/98基準，補全矩陣中，worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2` | runtime `59c6ea9`；[部分報告](../../artifacts/closeup-polish/S0/README.md) | 唔需要（冇美術改動）；本批留 coordinator review，不 merge | — |
 | A 海浜公園 | PLANNED | — | — | — |
 | B アクアシティ南 | PLANNED | — | — | — |
 | C フジテレビ東 | PLANNED | — | — | — |
@@ -193,3 +193,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 ## Next expected step
 
 配額低於15%已安全停止。Coordinator依watchdog復原後先重查實際limits，再在同一獨立clone續跑capture（已完成43行會跳過，不覆寫原圖）；完成餘下55狀態、在新目錄重測首組NW focal optimizer失敗、28組兩輪uncapped、compare A4/A5及完整review。最早報告weekly reset+3min為2026-11-02T06:25:04Z；不能把目前部分證據視為S0完成。Chrome／runner／Vite5194均已停止，未啟動survey服務；worker交接後不再寫入。
+
+## S0 resume — 2026-10-27
+
+人類message01a17d9e-e127-7d03-9bed-65a8eb3fdba1已取消百分比預停；上方15%暫停／未來復原時間只作歷史，現由實際provider limit決定quota recovery。相同worker由clean7fbfbfa／upstream0/0續作，fetch origin/main仍fdc4a0c（feature ahead3，無須整合）。43 rows及93原圖hash核對一致。剩餘矩陣、NW新目錄retry、28組兩輪uncapped及A4依序執行；root test/build再次PASS，survey只build作scratch fixture。A4無有效box的組合改為明確FAIL／原因，沒有跳過或放寬門檻；pixel runtime未改。完整原圖review逐組寫入visual-review.json；尚未宣稱S0完成或source接受。

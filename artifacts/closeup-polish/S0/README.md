@@ -1,4 +1,4 @@
-# S0 baseline — PARTIAL / WAITING QUOTA
+# S0 baseline — RESUMED / IN PROGRESS
 
 Owner: Codex worker `01a17d74-5b40-7a30-a6eb-88447b33d6b2`; baseline `fdc4a0cbbbc352b41c15850f2a846845d7975de1`, 2026-10-27. Only DEV measurement and tests changed; art, camera poses, ladder, timeline, survey and production behavior unchanged. S0 is **not complete** until all 98 states, A4 comparisons and 28 two-round uncapped performance cases are recorded.
 
@@ -43,3 +43,9 @@ Final-source root suite exited0; build exited0; runner self-test, production exc
 Resume from this checkout with the same Vite port (or set CITY2127_CITY_URL). Capture skips43 completed rows; do not replace their images. Runner now refuses to overwrite any pre-existing incomplete image; archive interrupted takes explicitly if any appear. After all states and performance are collected, run compare to add A4/A5 to capture.json. No acceptance threshold was changed.
 
 Packaging uses hyphens for shot IDs in filenames, matching the headline runner, so Git filenames are portable across desktop filesystems. All93 original JPEG bytes/hashes are unchanged; only paths were normalized before release.
+
+## Resume under updated human policy
+
+Human message01a17d9e-e127-7d03-9bed-65a8eb3fdba1 in coordinator chat01a17d6e-4ae4-7c22-8afd-103b9bd841af removed the percentage pause threshold and requested continuation. The historical14% checkpoint above remains evidence, but its future resume date/15% requirement is superseded. Dispatch closeup-polish-S0-1-resume-r5 reuses clean7fbfbfa, fetched mainfdc4a0c, upstream0/0. The original43 rows and93 original image hashes were verified before resuming. Work continues while provider ordinaryUsageAllowed is true; actual limits alone trigger recovery.
+
+Runner audit: A4 now reports unmeasurable pairs as FAIL with near-plane/viewport reasons instead of silently skipping them, and respects selected-shot filtering. Projection-union/absent-subject checks pass. No pixel-producing runtime source changed, so preserved captures remain applicable. Additional smoke reuses the accepted headline integration check, with fresh evidence and a DEV call checking unchanged headline pose/resource counts. Full image review notes accumulate in visual-review.json.
