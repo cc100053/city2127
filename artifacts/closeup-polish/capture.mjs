@@ -38,7 +38,7 @@ const file=`${out}/${mode==='perf'?'performance':mode==='compare'?'comparison':'
 const report=existsSync(file)?JSON.parse(readFileSync(file,'utf8')):{mode,commit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),
   sourceDiff:execFileSync('git',['diff','--','src','tests','package.json'],{encoding:'utf8'}),browser:browser.version(),viewport:[1920,1080],dpr:1,quality:'default',rows:[],errors:[]};
 const save=()=>writeFileSync(file,JSON.stringify(report,null,2)+'\n');
-const key=row=>`${row.id}__${row.state}__h${row.hour}`;
+const key=row=>`${row.id.replaceAll(':','-')}__${row.state}__h${row.hour}`;
 const selected=matrix.filter(row=>!process.env.CITY_SHOT_ONLY||row.id===process.env.CITY_SHOT_ONLY);
 async function load(row,wait) {
   const url=new URL(process.env.CITY2127_CITY_URL??'http://127.0.0.1:5194/');

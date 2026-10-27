@@ -133,8 +133,8 @@
       "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
       "errors": [],
       "images": [
-        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/S0/baseline/nw:focal__-2__h12__repeat1.jpg",
-        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/S0/baseline/nw:focal__-2__h12.jpg"
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/S0/baseline/nw-focal__-2__h12__repeat1.jpg",
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/S0/baseline/nw-focal__-2__h12.jpg"
       ],
       "takes": [
         {
@@ -524,8 +524,8 @@
       "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
       "errors": [],
       "images": [
-        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/S0/baseline/nw:focal__-2__h22__repeat1.jpg",
-        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/S0/baseline/nw:focal__-2__h22.jpg"
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/S0/baseline/nw-focal__-2__h22__repeat1.jpg",
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/S0/baseline/nw-focal__-2__h22.jpg"
       ],
       "takes": [
         {
@@ -915,8 +915,8 @@
       "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
       "errors": [],
       "images": [
-        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/S0/baseline/nw:focal__0__h12__repeat1.jpg",
-        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/S0/baseline/nw:focal__0__h12.jpg"
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/S0/baseline/nw-focal__0__h12__repeat1.jpg",
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/S0/baseline/nw-focal__0__h12.jpg"
       ],
       "takes": [
         {
