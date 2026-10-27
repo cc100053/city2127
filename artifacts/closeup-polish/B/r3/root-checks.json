@@ -1,0 +1,8 @@
+{
+  "npmTest": "PASS",
+  "npmBuild": "PASS",
+  "diffCheck": "PASS",
+  "scopeCheck": "PASS: only SharingDistrict and SW shot values; A park/energy and all non-sharing district classes identical to def2f28",
+  "warnings": "Existing JSON import-attribute and chunk-size warnings",
+  "status": "ROOT_VERIFIED_CAPTURE_PENDING"
+}

@@ -206,3 +206,7 @@ CityChangeManager將能源實際前後target加入CarrierChange，residentResult
 `feat/closeup-polish`以已整合S0為基準：Park在載入clone上以既有`leafyCrown`疊葉細化五片光伏葉簇，保持每片原bounding envelope、支架、treeCount與cache不變；原冷卻片加入格柵輪廓，本地green／ceramic／public-light finishes和較窄的有支承膜環降低cyan／marker搶焦。EnvironmentDistrict沿用原batch與slot，只細化screen疊葉、底部集水槽、支承、冠層曲面／厚度；原target／hybrid／seed／roof publication不改。第一西岸水庭在第二庭clone之後將支承邊光併入原本public-light batch，批次數與第二庭幾何保持。本批相機調整只涉及`SHOTS`數值；最終focal恢復S0原pose，保留district／第一水庭新構圖，hero、42°與headline邏輯／時長不變。[交接與完整驗證](handoffs/closeup-polish.md)。
 
 2026-10-28 A REVIEW_READY：runtime `b7d5861`；[S0／final並排](../artifacts/closeup-polish/A/REVIEW.md)保留三輪原始量度及未過門檻。Root test/build、A5/A6與九項scratch live PASS；A3全20可用狀態FAIL、A4僅1/22，district夜間辨識及背景綠化仍有差距。此為待owner審閱feature，未merge main。
+
+### Closeup sector B — 2026-10-28（feature候選，驗證中）
+
+Commons沿用四組八席InstancedMesh：共享長椅向中央內收，私人弧屏向外壓摺成低層擱架，按旋轉後下緣補償高度，保持全程在鋪面以上及原SW footprint內。原平環頂換成同內外徑的native曲面環，中央膜片只留窄邊，保持採光口；外圈植栽沿用`shrubs`分布並換成既有`leafyCrown`，靜態部分仍按原材質bake。SharingDistrict每院六株移向邊緣，庭院／orchard冠層細化，halo既有planting batch加入冠層層次；六水室、十court、family／hybrid／pairing／seed／target及動畫不變。相機只改兩個SW `SHOTS`數值；hero、42°及headline邏輯不變。[逐輪記錄](../artifacts/closeup-polish/B/NOTES.md)保留r1/r2失敗，r3量測及owner接受仍待完成；未merge main。

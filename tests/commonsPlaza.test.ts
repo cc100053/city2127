@@ -79,3 +79,41 @@ test('commons seats are preallocated, retarget smoothly, fold screens and stay i
   runtime.restoreLegacy();
   assert.ok(instances.every(mesh => !mesh.visible));
 });
+
+test('commons shells stay on paving throughout folding and stow outside the shared benches', () => {
+  const site = buildSite(), runtime = site.commonsPlaza, plaza = site.layers.plaza!.group;
+  const screens = plaza.getObjectByName('commons-curved-screens') as T.InstancedMesh;
+  const seats = plaza.getObjectByName('commons-shared-seats') as T.InstancedMesh;
+  screens.geometry.computeBoundingBox();
+  const matrix = new T.Matrix4();
+  runtime.setTarget({ band: 'low', sharedSeats: 0 }, 0, true);
+  runtime.setTarget({ band: 'high', sharedSeats: 8 }, 10, false);
+  for (let age = 0; age <= 3; age += .25) {
+    runtime.update(10 + age);
+    for (let i = 0; i < 8; i++) {
+      screens.getMatrixAt(i, matrix);
+      const bounds = screens.geometry.boundingBox!.clone().applyMatrix4(matrix);
+      assert.ok(bounds.min.y >= .62 - 1e-6, `screen ${i} cuts through paving at ${age}s`);
+      assert.ok(bounds.min.x >= -6 && bounds.max.x <= 6 && bounds.min.z >= -5 && bounds.max.z <= 5);
+      assert.ok(matrix.determinant() > 0, 'folded normals retain an invertible transform');
+    }
+  }
+  for (let i = 0; i < 8; i++) {
+    seats.getMatrixAt(i, matrix);
+    const p = new T.Vector3().setFromMatrixPosition(matrix);
+    assert.ok(Math.abs(Math.hypot(p.x, p.z) - 2.55) < 1e-5, 'shared benches draw into the open central court');
+  }
+});
+
+test('commons canopy keeps a clear oculus and the original annular footprint', () => {
+  const plaza = buildSite().layers.plaza!.group;
+  plaza.visible = true; plaza.scale.setScalar(1); plaza.updateWorldMatrix(true, true);
+  const ray = new T.Raycaster(), down = new T.Vector3(0, -1, 0);
+  const height = (x: number) => {
+    ray.set(plaza.localToWorld(new T.Vector3(x, 10, 0)), down);
+    const hit = ray.intersectObject(plaza, true)[0];
+    assert.ok(hit); return plaza.worldToLocal(hit.point.clone()).y;
+  };
+  assert.ok(height(0) < 1, 'central court remains open to the sky');
+  assert.ok(height(3.8) > 4.9, 'curved canopy still covers the outer seating ring');
+});

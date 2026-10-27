@@ -181,8 +181,8 @@ const COURT_SITES: readonly (readonly [number, number, number])[] = [
   [-220, -140, .4], [-410, 120, 1.1], [-100, 60, 2.3], [50, -340, .9], [170, -360, 3.6], [-70, 180, 1.7], [-290, 290, 5.1], [-460, 290, .2], [220, 0, 2.8], [-20, 210, 4.4],
 ];
 const COURT = 40;
-/** Garden crowns inside a private court [x, z, size], clear of the glass room and the entrance. */
-const COURT_TREES: readonly (readonly [number, number, number])[] = [[-10, 8, 4.2], [0, -3, 3.4], [8, 9, 3.8], [10, -9, 3.2], [-2, 13, 2.8], [-14, -14, 2.6]];
+/** Edge planting inside a private court [x, z, size], leaving central seating and the +X entrance clear. */
+const COURT_TREES: readonly (readonly [number, number, number])[] = [[-14, 13, 4.2], [13, 13, 3.4], [14, -13, 3.8], [-16, -16, 3.2], [0, 15, 2.8], [-16, 3, 2.6]];
 /** Blossom orchard crowns around a shared court's edge [x, z], clear of parasols, pergola and the kiosk corner (13, 12). */
 const ORCHARD: readonly (readonly [number, number])[] = [[-15, -15], [0, -16], [15, -15], [-17, 9], [17, -8], [-12, 16]];
 /** Parasol centres in a shared plaza. */
@@ -277,7 +277,12 @@ export class SharingDistrict {
       return new T.CylinderGeometry(.022, .028, HALO, 8).translate(Math.cos(a) * .9, HALO / 2, -Math.sin(a) * .9).toNonIndexed();
     });
     this.halos = instance(mergeGeometries([ringGeometry(.5, 1.38, .035, HALO), ...columns]), trim, 'sharing-open-halos');
-    this.haloGardens = instance(ringGeometry(.58, 1.3, .03, HALO + .035), leaf, 'sharing-open-halos');
+    const haloFoliage = leafyCrown(2).toNonIndexed(), haloBed = ringGeometry(.58, 1.3, .03, HALO + .035);
+    haloBed.deleteAttribute('uv');
+    this.haloGardens = instance(mergeGeometries([haloBed, ...Array.from({ length: 14 }, (_, k) => {
+      const a = .3 + LENGTH * (k + .5) / 14;
+      return haloFoliage.clone().scale(.15, .09 + (k % 3) * .015, .15).translate(Math.cos(a) * .95, HALO + .1, -Math.sin(a) * .95);
+    })]), leaf, 'sharing-open-halos');
     this.haloLights = instance(ringGeometry(1.31, 1.38, .05, HALO + .035), warm, 'sharing-open-halos');
     // Lit boardwalk ring under the canopy: brightens with the city's night glow so the commons read after dark.
     this.haloDecks = instance(ringGeometry(.92, 1.3, .04), this.deckGlow, 'sharing-open-halos');
@@ -298,7 +303,7 @@ export class SharingDistrict {
       new T.BoxGeometry(.6, 2.4, H - 5).translate(H, 1.2, -(H + 5) / 2), new T.BoxGeometry(.6, 2.4, H - 5).translate(H, 1.2, (H + 5) / 2),
     ]), trim, 'sharing-private-courts');
     this.courtPavilions = batch(new T.BoxGeometry(12, 4.2, 9).translate(-8, 2.1, -7), privacy, 'sharing-private-courts');
-    this.courtCrowns = batch(leafyCrown(1), new T.MeshStandardMaterial({ color: '#ffffff', roughness: .92 }), 'sharing-private-courts', n * COURT_TREES.length);
+    this.courtCrowns = batch(leafyCrown(2), new T.MeshStandardMaterial({ color: '#ffffff', roughness: .92 }), 'sharing-private-courts', n * COURT_TREES.length);
     const color = new T.Color();
     for (let i = 0; i < n * COURT_TREES.length; i++) this.courtCrowns.setColorAt(i, i % 4 === 2 ? color.set('#efc2cf') : color.setHSL(.26 + (i % 5) * .01, .4, .22 + (i % 3) * .02));
     // Shared plaza: a pale paved disc with three white parasols on slim masts (9 m canopies about 9 m up).
@@ -327,7 +332,7 @@ export class SharingDistrict {
       batch(new T.TorusGeometry(3.2, .22, 6, 24).rotateX(Math.PI / 2).translate(0, 12.4, 0), trail, 'sharing-drone-kiosks'),
       batch(new T.SphereGeometry(1, 12, 8).scale(1.3, .55, 1).translate(0, 13, 0), glass, 'sharing-drone-kiosks'),
     ];
-    this.orchardCrowns = batch(leafyCrown(1), new T.MeshStandardMaterial({ color: '#ffffff', roughness: .9 }), 'sharing-orchards', n * ORCHARD.length);
+    this.orchardCrowns = batch(leafyCrown(2), new T.MeshStandardMaterial({ color: '#ffffff', roughness: .9 }), 'sharing-orchards', n * ORCHARD.length);
     for (let i = 0; i < n * ORCHARD.length; i++) this.orchardCrowns.setColorAt(i, color.set(i % 3 === 0 ? '#f6f1e8' : i % 3 === 1 ? '#f2bfd0' : '#7fa35e'));
     this.crowd = pedestrians(this.root, this.courts.length * 12, 'plaza-crowds');
     this.pulses = new PulseRings(this.root, METER_COLORS.publicSharing, (this.bays.length + n + 1) * PULSE_WAVES);

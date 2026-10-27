@@ -172,10 +172,28 @@ assert.equal(visible('street-pods'), 0, 'standalone streets keep human-driven ca
 console.log('PASS: actual P2 actor matrices match low/mixed/high independently of day mood; original standalone/legacy poses restored.');
 
 const sharing = new SharingDistrict(new T.Scene());
+{
+  const garden = sharing.root.getObjectsByProperty('name', 'sharing-open-halos')[1] as T.InstancedMesh;
+  garden.geometry.computeBoundingBox();
+  const b = garden.geometry.boundingBox!;
+  assert.ok(b.max.y > .6, 'halo garden has layered foliage above its bed');
+  assert.ok(b.min.x >= -1.301 && b.max.x <= 1.301 && b.min.z >= -1.301 && b.max.z <= 1.301,
+    'halo foliage stays inside the original planted annulus');
+}
 sharing.setTarget(at({ sw: -3 }), 0, true);
 assert.equal(sharing.getDiagnostics().visiblePrivateRooms, sharing.bays.length);
 assert.equal(sharing.getDiagnostics().visibleOpenRooms, 0);
 assert.equal(sharing.getDiagnostics().vaults, Math.ceil(sharing.bays.length / 2), 'every other room carries a vault');
+{
+  const crowns = sharing.root.children.find(o => o.name === 'sharing-private-courts' && (o as T.InstancedMesh).count === 60)!;
+  sharing.root.updateMatrixWorld(true);
+  const ray = new T.Raycaster(); ray.far = 10;
+  for (const { x, z, yaw } of sharing.courts) for (const lane of [-2, 0, 2]) {
+    const c = Math.cos(yaw), s = Math.sin(yaw);
+    ray.set(new T.Vector3(x + 20 * c + lane * s, 1, z - 20 * s + lane * c), new T.Vector3(-c, 0, s));
+    assert.equal(ray.intersectObject(crowns).length, 0, 'court foliage keeps the entrance approach clear');
+  }
+}
 {
   const vaultScale = (i: number) => { const m = new T.Matrix4(), v = new T.Vector3();
     (sharing.root.getObjectByName('sharing-private-gardens') as T.InstancedMesh).getMatrixAt(i, m); return v.setFromMatrixScale(m).x; };

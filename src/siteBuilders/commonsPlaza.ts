@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { arc, bake, box, dark, futureLight, leaf, membrane, pink, publicLight, shrubs, sign, stone, trim, type Kit } from '../cityRig.ts';
+import { arc, bake, box, dark, futureLight, leaf, leafyCrown, membrane, pink, publicLight, shrubs, sign, stone, trim, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, SITE_TRANSITION_SECONDS, type BuiltSite } from './siteRuntime.ts';
 import { SharingDistrict } from '../districtMeters.ts';
@@ -48,10 +48,10 @@ function sharedSlotLevels(sharedSeats: number): Float32Array {
 }
 
 function createCommonsPlazaRuntime(plaza: T.Group): CommonsPlazaRuntime {
-  const sharedSeats = createInstancedBox(plaza, 'commons-shared-seats', [1.35, .34, .48], leaf);
-  const sharedBacks = createInstancedBox(plaza, 'commons-shared-backs', [1.35, .4, .12], trim);
+  const sharedSeats = createInstancedBox(plaza, 'commons-shared-seats', [1.5, .34, .6], leaf);
+  const sharedBacks = createInstancedBox(plaza, 'commons-shared-backs', [1.5, .4, .12], trim);
   const screenedSeats = createInstancedBox(plaza, 'commons-screened-seats', [.82, .34, .48], leaf);
-  const screenGeometry = new T.CylinderGeometry(.62, .62, 2.4, 24, 1, true, Math.PI / 4, Math.PI * 1.5).translate(0, 1.25, 0);
+  const screenGeometry = new T.CylinderGeometry(.62, .62, 2.4, 24, 1, true, Math.PI / 4, Math.PI * 1.5).translate(0, 1.2, 0);
   const curvedScreens = new T.InstancedMesh(screenGeometry, dark, SEAT_COUNT);
   curvedScreens.name = 'commons-curved-screens';
   curvedScreens.castShadow = curvedScreens.receiveShadow = true;
@@ -76,15 +76,16 @@ function createCommonsPlazaRuntime(plaza: T.Group): CommonsPlazaRuntime {
       const x = Math.cos(angle) * 3.1, z = -Math.sin(angle) * 3.1;
       const yaw = angle - Math.PI / 2;
       const shared = levels[i], screened = 1 - shared;
+      const seatRadius = 3.1 - .55 * shared;
 
-      transform.position.set(x, .78, z);
+      transform.position.set(Math.cos(angle) * seatRadius, .78, -Math.sin(angle) * seatRadius);
       transform.rotation.set(0, yaw, 0);
       transform.scale.set(1, Math.max(HIDDEN, shared), 1);
       transform.updateMatrix();
       sharedSeats.setMatrixAt(i, transform.matrix);
       transform.position.y = 1.12;
-      transform.position.x = x - Math.sin(yaw) * .17;
-      transform.position.z = z - Math.cos(yaw) * .17;
+      transform.position.x -= Math.sin(yaw) * .17;
+      transform.position.z -= Math.cos(yaw) * .17;
       transform.scale.y = Math.max(HIDDEN, shared);
       transform.updateMatrix();
       sharedBacks.setMatrixAt(i, transform.matrix);
@@ -95,10 +96,10 @@ function createCommonsPlazaRuntime(plaza: T.Group): CommonsPlazaRuntime {
       transform.updateMatrix();
       screenedSeats.setMatrixAt(i, transform.matrix);
 
-      // The open side faces the plaza; its rear arc folds flat as the unit becomes shared.
-      transform.position.set(x, .12, z);
-      transform.rotation.set(shared * Math.PI / 2, yaw, 0, 'YXZ');
-      transform.scale.set(1, 1, 1);
+      // Stow outward behind the bench; compensate the rotating shell's lower edge so it never cuts through paving.
+      transform.position.set(x, .62 + .62 * (1 - .85 * shared) * Math.sin(shared * Math.PI / 2), z);
+      transform.rotation.set(-shared * Math.PI / 2, yaw, 0, 'YXZ');
+      transform.scale.set(1, 1 - .8 * shared, 1 - .85 * shared);
       transform.updateMatrix();
       curvedScreens.setMatrixAt(i, transform.matrix);
     }
@@ -184,15 +185,19 @@ export function buildCommonsPlaza(scene: T.Scene, kit: Kit): CommonsPlazaSite {
   arc(plaza, 2.05, 2.15, .02, [0, .62, 0], futureLight);
   arc(plaza, 4.3, 5, .5, [0, .62, 0], trim, 1.2, 3.6);
   arc(plaza, 4.4, 4.9, .08, [0, 1.12, 0], leaf, 1.2, 3.6);
+  const firstShrub = plaza.children.length;
   shrubs(plaza, 4.65, 1.15, 1.2, 3.6, 23);
+  const crown = leafyCrown(2);
+  for (const shrub of plaza.children.slice(firstShrub)) (shrub as T.Mesh).geometry = crown;
   for (const [start, length] of [[.35, 1.2], [2.45, 1.2], [4.55, 1.2]]) arc(plaza, 2.6, 3, .42, [0, .62, 0], pink, start, length);
   for (let i = 0; i < 6; i++) {
     const angle = i / 6 * Math.PI * 2 + .26;
     box(plaza, [.2, 4.3, .2], [Math.cos(angle) * 3.8, 2.8, -Math.sin(angle) * 3.8], trim, .05);
   }
-  arc(plaza, 3.1, 4.5, .22, [0, 4.95, 0], trim);
-  arc(plaza, 3.35, 3.48, .04, [0, 4.91, 0], publicLight);
-  arc(plaza, 0, 3.1, .06, [0, 5.03, 0], membrane);
+  const canopy = new T.Mesh(new T.TorusGeometry(3.8, .7, 12, 96).rotateX(-Math.PI / 2).scale(1, .32, 1).translate(0, 4.95, 0), trim);
+  plaza.add(canopy);
+  arc(plaza, 3.35, 3.48, .04, [0, 4.73, 0], publicLight);
+  arc(plaza, 2.7, 3.1, .06, [0, 4.95, 0], membrane);
   sign(plaza, kit, '公共広場 / COMMONS', 2.2, 2.1, 4, 4, .55, '#536f66');
   plaza.add(...bake(plaza));
 

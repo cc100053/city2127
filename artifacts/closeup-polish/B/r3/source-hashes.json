@@ -1,0 +1,13 @@
+{
+  "sha256": {
+    "src/headlineCamera.ts": "6170190bbd49e8d3e99dd9bb364ae2c6c3ebab1840b9eea1e4ba2096cb5e11ac",
+    "src/siteBuilders/commonsPlaza.ts": "b0e2df43014f7c10c2c94849e7acab936b46954d4bdf4fa57c7f908a80e27932",
+    "src/districtMeters.ts": "aa2f5ec9d0e00651fd7d8a7d810fbf8d9743f07734eea2e9bc2915cae5824a59",
+    "src/energyPrototype.ts": "66ff93259e78daade46d1081bf33fc34bb5fb1c355ec94a2ca76a630a8743642",
+    "src/siteBuilders/environmentPark.ts": "d9e52425991d7e60bf8ff3100d9a73f93acde892b5069db9649a07e0c0207eba",
+    "tests/commonsPlaza.test.ts": "d450370e8e3b9d343bbfd91a81dbba67140d076f0f29bffe45a8ab1eba8c3bc3",
+    "tests/districtMeters.test.ts": "d6b54892ddfcc8b9dc0f19d11a4d5ee533114444dc07a7238e29aa57d2378a32",
+    "tests/headlineCamera.test.ts": "daec8e555310f5f3cd2889356a599e18af8317bd7a46adfc1990a6e1100e586a",
+    "artifacts/closeup-polish/capture.mjs": "a968b4e1b8d9713232d05ea6c5ec9229a989fc18ce22a46039ea89c744d434ff"
+  }
+}
