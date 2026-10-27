@@ -1,0 +1,368 @@
+{
+  "mode": "compare",
+  "commit": "203929228f576144ae97ce6d2ef131464e9a3985",
+  "sourceDiff": "",
+  "browser": "156.0.8078.48",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "ne:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.046394484602343196,
+      "rect": {
+        "x": 659,
+        "y": 299,
+        "width": 633,
+        "height": 535
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:focal",
+      "hour": 12,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.03151354507638492,
+      "rect": {
+        "x": 659,
+        "y": 299,
+        "width": 633,
+        "height": 535
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.06098010362600302,
+      "rect": {
+        "x": 659,
+        "y": 299,
+        "width": 633,
+        "height": 535
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.039415048553760774,
+      "rect": {
+        "x": 659,
+        "y": 299,
+        "width": 633,
+        "height": 535
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:focal",
+      "hour": 22,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.023317643623472824,
+      "rect": {
+        "x": 659,
+        "y": 299,
+        "width": 633,
+        "height": 535
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.049242610353162734,
+      "rect": {
+        "x": 659,
+        "y": 299,
+        "width": 633,
+        "height": 535
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.008805300875494231,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 12,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.012221108312152021,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 12,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.013019005184378278,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 12,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.009226429486403615,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.02554374634370209,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.008808573892519971,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 22,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.013412142313201,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 22,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.013807621363874768,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 22,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.008674887033002501,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "ne:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.027305565641894618,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden",
+      "hour": 12,
+      "from": "baseline",
+      "to": "a",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.07004366265829405,
+      "rect": {
+        "x": 435,
+        "y": 284,
+        "width": 1074,
+        "height": 699
+      },
+      "pass": true
+    },
+    {
+      "id": "energy:garden",
+      "hour": 12,
+      "from": "a",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.0040133943371139175,
+      "rect": {
+        "x": 435,
+        "y": 284,
+        "width": 1074,
+        "height": 699
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden",
+      "hour": 12,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.0700595427112394,
+      "rect": {
+        "x": 435,
+        "y": 284,
+        "width": 1074,
+        "height": 699
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden",
+      "hour": 22,
+      "from": "baseline",
+      "to": "a",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.04520269607777841,
+      "rect": {
+        "x": 435,
+        "y": 284,
+        "width": 1074,
+        "height": 699
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden",
+      "hour": 22,
+      "from": "a",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.003161434720297506,
+      "rect": {
+        "x": 435,
+        "y": 284,
+        "width": 1074,
+        "height": 699
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden",
+      "hour": 22,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.04516988252539298,
+      "rect": {
+        "x": 435,
+        "y": 284,
+        "width": 1074,
+        "height": 699
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}

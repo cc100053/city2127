@@ -1,13 +1,13 @@
 // Scoped real-server sector A regression; scratch data and all services are closed in finally.
 import assert from 'node:assert/strict';
 import {chromium} from '/opt/homebrew/lib/node_modules/@playwright/cli/node_modules/playwright/index.mjs';
-import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,writeFileSync,rmSync,existsSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {createContext,createSurveyServer} from '../../../survey/src/server/server.ts';
 import {SHOTS} from '../../../src/headlineCamera.ts';
 import {HERO_POSITION} from '../../../src/heroCamera.ts';
-const out=process.env.CITY2127_EVIDENCE_DIR??'artifacts/closeup-polish/A/live';mkdirSync(out,{recursive:true});
+const out=process.env.CITY2127_EVIDENCE_DIR??'artifacts/closeup-polish/A/live';assert.ok(!existsSync(out),'Preserve existing live evidence; choose a fresh directory.');mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
 const page=await browser.newPage({viewport:{width:1920,height:1080},deviceScaleFactor:1});
 await page.route('https://fonts.googleapis.com/**',r=>r.fulfill({contentType:'text/css',body:''}));

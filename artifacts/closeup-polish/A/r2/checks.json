@@ -1,5 +1,5 @@
 {
-  "phase": "r2 source verified; visual and live checks pending",
+  "phase": "r2 full matrix complete; art still fails gates, r3 needed",
   "rootNpmTest": {
     "status": "PASS",
     "exitCode": 0,
@@ -24,11 +24,26 @@
     "status": "PASS",
     "log": "energy-check.log"
   },
-  "gitDiffCheck": "PASS working tree; committed check follows checkpoint",
+  "gitDiffCheck": "PASS working tree and2039292 committed diff against origin/main",
   "notRun": [
-    "r2 full capture/performance",
-    "sector A live",
+    "sector A final live",
     "owner visual acceptance",
     "exhibition hardware"
-  ]
+  ],
+  "capture": {
+    "states": 24,
+    "takes": 48,
+    "A1": "20 PASS /4 N/A",
+    "A2": "20 PASS /4 N/A",
+    "A3": "20 FAIL /4 N/A",
+    "A6": "24 PASS"
+  },
+  "performance": {
+    "cases": 8,
+    "rounds": 16,
+    "flags": [
+      "--disable-gpu-vsync",
+      "--disable-frame-rate-limit"
+    ]
+  }
 }
