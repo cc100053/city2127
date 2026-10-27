@@ -218,12 +218,13 @@ function wing(mat:T.Material=shell):Part {
   const shape=new T.Shape();shape.moveTo(-2.2,-.8);shape.lineTo(-.5,.8);shape.lineTo(.5,.8);shape.lineTo(2.2,-.8);shape.lineTo(.55,-.4);shape.lineTo(-.55,-.4);shape.closePath();
   const geometry=new T.ExtrudeGeometry(shape,{depth:.1,bevelEnabled:false});geometry.rotateX(-Math.PI/2);return {geometry,material:mat};
 }
-function fleet(scene:T.Object3D,parts:Part[],count:number,name:string,shadow=true) {
+// Actors (people, vehicles, benches) cast no shadow: invisible from the hero frame, yet each fleet redrew in the shadow map.
+function fleet(scene:T.Object3D,parts:Part[],count:number,name:string) {
   const batches=new Map<T.Material,T.BufferGeometry[]>();
   parts.forEach(p=>{const list=batches.get(p.material)??[];list.push(p.geometry.index?p.geometry.toNonIndexed():p.geometry);batches.set(p.material,list);});
   const meshes=[...batches].map(([mat,geometries])=>{
     const mesh=new T.InstancedMesh(mergeGeometries(geometries),mat,count);
-    mesh.name=name;mesh.castShadow=shadow;mesh.frustumCulled=false;
+    mesh.name=name;mesh.frustumCulled=false;
     mesh.instanceMatrix.setUsage(T.DynamicDrawUsage);scene.add(mesh);return mesh;
   });
   return {
@@ -611,7 +612,7 @@ export function mobility(scene:T.Scene) {
   const BOAT_SLOTS=BOATS+2+bayCruisers.length;
   const boats=fleet(scene,[{geometry:hull,material:shell},part([2.9,1.1,5.4],[0,1.55,-1],glass,.4),part([3,.3,5.8],[0,2.2,-1.1],shell,.15),part([3.7,.12,11.1],[0,.25,-.2],mint,.05),part([2.4,.12,.12],[0,1,5.5],coral,.05)],BOAT_SLOTS,'water-taxis');
   // Wakes: a fading V and prop wash trailing each taxi on the water (no shadow).
-  const wakes=fleet(scene,[{geometry:wake(),material:new T.MeshBasicMaterial({vertexColors:true,transparent:true,depthWrite:false})}],BOAT_SLOTS,'water-taxi-wakes',false);
+  const wakes=fleet(scene,[{geometry:wake(),material:new T.MeshBasicMaterial({vertexColors:true,transparent:true,depthWrite:false})}],BOAT_SLOTS,'water-taxi-wakes');
   // Human-led air taxis: 22 m winged craft. Slots: loop craft, then the sphere and interchange berth shuttles.
   const airShell=shell.clone(); airShell.emissive.set('#c1e9e4');
   const drones=fleet(scene,[wing(airShell),part([.8,.35,2.5],[0,.1,0],airShell,.15),part([.55,.2,1],[0,.34,.45],glass,.08),
@@ -638,13 +639,13 @@ export function mobility(scene:T.Scene) {
   // Drop-off cues per bay car: an amber indicator pair (front and rear corner, set on the signalled side) and a bright brake lamp over
   // the tail light; hidden when off.
   const amber=new T.MeshBasicMaterial({color:'#ffae2e'}),brakeRed=new T.MeshBasicMaterial({color:'#ff3326'});
-  const indicators=fleet(scene,[part([.06,.14,.3],[0,.95,2.05],amber,.02),part([.06,.14,.3],[0,.95,-2.05],amber,.02)],DROP_OFF.cars.length,'drop-off-indicators',false);
+  const indicators=fleet(scene,[part([.06,.14,.3],[0,.95,2.05],amber,.02),part([.06,.14,.3],[0,.95,-2.05],amber,.02)],DROP_OFF.cars.length,'drop-off-indicators');
   // Every street vehicle's brake lamp (slot as `cars`): lit while slowing, queued or stopped at a crossing, and for the drop-off stop.
-  const brakeLamps=fleet(scene,[part([1.54,.16,.06],[0,.95,-2.33],brakeRed,.03)],carSlots,'brake-lamps',false);
+  const brakeLamps=fleet(scene,[part([1.54,.16,.06],[0,.95,-2.33],brakeRed,.03)],carSlots,'brake-lamps');
   // Crossings: a pale band just above the paving slab that covers the avenues (x scaled to the carriageway width; car bodies clear
   // it), with mint edge lines lit while a crossing is requested.
-  const crossBands=fleet(scene,[part([1,.02,3.6],[0,.23,0],shell,.01)],CROSSINGS.length,'crossing-bands',false),crossLights=fleet(scene,
-    [part([1,.02,.1],[0,.245,1.85],mint,.01),part([1,.02,.1],[0,.245,-1.85],mint,.01)],CROSSINGS.length,'crossing-lights',false);
+  const crossBands=fleet(scene,[part([1,.02,3.6],[0,.23,0],shell,.01)],CROSSINGS.length,'crossing-bands'),crossLights=fleet(scene,
+    [part([1,.02,.1],[0,.245,1.85],mint,.01),part([1,.02,.1],[0,.245,-1.85],mint,.01)],CROSSINGS.length,'crossing-lights');
   crossBands.meshes.forEach(m=>m.receiveShadow=true);
   // Shared-surface carriageways (2127: no asphalt, no painted lines): darker stone seams inlaid at each carriageway edge and a thin mint
   // guide under each lane centre, flush on the paving slab (crossing bands lie over them). One merged mesh per finish.

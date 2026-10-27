@@ -96,7 +96,7 @@ AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/P
 
 Root `src/` 以 Three.js / WebGL 2 載入 Odaiba district 地形、六棟地標 GLB、程序 civic core，以及連接周邊的安靜 backdrop。2127 skyways、潮汐邊緣及六座 waterfront islands 已在現行城市；不再使用早期 150 m 淡出成孤島的版本。三個現行 Meter 與繼承的氣候配置改變 focal site 及 district，能源以獨立配置接入；Meter保留成熟未來的 low／mixed／high，並支援 hybrid、跨軸設施與歷史種子布局。
 
-城市自動日夜循環一日 180 秒；`?hour=22` 可固定時間。鏡頭、共享材質／InstancedMesh、3 秒變化與立即 reset/reconnect 的實作見 [PROJECT](docs/PROJECT.md)。後製包括 MSAA、GTAO、bloom、vignette、output 及 colour grade。GPU 較弱嘅電腦（例如 M1 接 4K 螢幕）可以喺城市網址加 `&quality=low`：關閉 MSAA、GTAO 同陰影，pixel ratio 上限 1；預設畫面不變（2026-10-15）。
+城市自動日夜循環一日 180 秒；`?hour=22` 可固定時間。鏡頭、共享材質／InstancedMesh、3 秒變化與立即 reset/reconnect 的實作見 [PROJECT](docs/PROJECT.md)。後製包括 MSAA、GTAO、bloom、vignette、output 及 colour grade。GPU 較弱嘅電腦（例如 M1 接 4K 螢幕）可以喺城市網址加 `&quality=low`：關閉 MSAA、GTAO 同陰影，pixel ratio 上限 1；預設畫面不變（2026-10-15）。2026-10-27 起預設用半解像度 GTAO、2× MSAA，陰影每秒更新 4 次，行人同車輛唔投影（hero 距離幾乎睇唔出分別）。
 
 開發時可用 `?meters=nw:high,ne:low`（band 或 −12..12）直接 review v2 layout，console `cityMeters('ne:high')` 睇 live 過渡；`&metersTo=ne:high&metersAge=0.7` 配合 `reviewTime` 截圖。這些工具不提交提案、不改展覽資料。 DEV能源研究可用`?energy=baseline&hour=12&reviewTime=20`切換基準／A／B／C／混合城市組合，E3加入兩處沿岸水庭／配電門架及60秒儲能流程；`reviewTime=10|30|50`固定階段，面板「靜態閱讀」或系統reduced motion固定能源動態；須與`survey`、`meters`、`scaleLab`分開使用。[E3比較與限制](artifacts/energy-city-e3/README.md)。
 
