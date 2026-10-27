@@ -1,18 +1,18 @@
 # meter-ladder — 分級階梯＋headline（每份提案最多一格）
 
 - Owner: cc100053（產品決策）；實作 Claude（side session）
-- Status: IN_PROGRESS（實作／驗證完成並 push；等 owner 批准先 merge main）
+- Status: DONE（owner 2026-10-27 批准；已 merge 入 main，main CI 通過）
 - Branch: `feat/meter-ladder`
 - Base commit: `047cb2c62c5224e1628a418659685d489695a3b9`
 - Last verified commit: `df730c0dae6f2d703721a4add8a1bbf515288534`（code 同驗證過嘅 working tree 一樣；之後只改咗呢份 handoff）
-- Remote availability: `origin/feat/meter-ladder` @ `df730c0` 再加呢個 handoff commit
+- Remote availability: `origin/feat/meter-ladder` @ `44f4bf7`；`origin/main` @ merge `0b84a29b`（之後只加呢份 handoff 更新）
 
 ## Session Git state
 
 - Session starting branch and HEAD: `claude/meter-ladder-114216` @ `047cb2c62c5224e1628a418659685d489695a3b9`（乾淨）
 - Last fetched origin/main commit: `047cb2c62c5224e1628a418659685d489695a3b9`（2026-10-27 fetch）
 - Local changes present at session start: NONE
-- Upstream integration status: NOT INTEGRATED
+- Upstream integration status: 2026-10-27 merge 入 main（`0b84a29`，`--no-ff`；origin/main 當時仍係 base `047cb2c`，冇衝突）
 - Pending Git conflicts or synchronization blockers: NONE
 
 ## Goal and acceptance criteria
@@ -70,7 +70,7 @@
   - 結果卡每次只講一個地點。#2 同時有能源門檻，卡片照講フジテレビ東。
   - Console 冇 error。
   - 截圖：[#2 focal](../../artifacts/meter-ladder/guest2-se-focal.jpg)、[#9 district](../../artifacts/meter-ladder/guest9-se-rung3.jpg)。
-- Integrated commit and checks: NOT INTEGRATED
+- Integrated commit and checks: `0b84a29`（Merge branch 'feat/meter-ladder'）。Merge 結果上 root `npm test`／`npm run build` PASS、`survey/` `npm test`／`npm run build` PASS、`git diff --check origin/main..HEAD` PASS；push 前 ancestor check 通過；main CI run 40445156371 `check` success。
 - Changes since verification: 只有呢份 handoff、VALIDATION、SPEC、PROJECT 同 handoffs index 嘅文件改動。
 
 ## Known issues and blockers
@@ -90,5 +90,5 @@
 
 ## Next expected step
 
-1. Owner（cc100053）批准先 merge `feat/meter-ladder` 入 main，然後跟 [CONTRIBUTING](../CONTRIBUTING.md) 做整合驗證同睇 main CI。
-2. 之後另開任務：camera zoom 去 headline。
+1. 已完成：owner 批准後 merge 入 main（`0b84a29`），main CI 通過。
+2. 下一個任務（另開）：camera zoom 去 headline；仍未測 FPS、A/B station、iPad 實機同訪客理解程度。
