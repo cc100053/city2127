@@ -13,3 +13,9 @@ Pose only. Focal moves farther west/up from S0; district looks down from400m, ke
 Dream-loop is conditional and unused: clear pose/geometry defects can be handled with existing native geometry and materials; no new generated target or product direction required.
 
 Recovery r10: actual provider limit interrupted checkpoint checks after r1 capture/perf/compare had finished. Same worker resumed; source and S0/A original hashes verified, fresh fetch upstream0/0. Sandbox DNS/listen failures preserved; authorized root retry and build PASS. r1 complete18/16/6, A4 0/16, uncapped six/six relative gates PASS. No round repeated.
+
+## r2
+
+Pose only after complete r1: focal looks north from the south of the plaza, candidate124.23m from target; district nearly vertical at436.49m, preserving the full carrier. Pure projection predicts focal height53.9% and district centre(47.1%,68.2%); browser/raycast gates remain the authority. Camera constraints test PASS. No builder changes during r2.
+
+R2 sampled original day/night focal: skyway no longer crosses the plaza; A1/A2 pass, central membrane and overlapping courtyard crowns still mask seats. District low/day-night A1/A2 now pass while full bounds exceed viewport. R3 scope is existing native geometry: curved annular canopy/open oculus, screened shells stowed outside shared benches above paving, shared benches moved inward, same six courtyard crowns moved to edges and smoother local foliage. No carrier/count/footprint/seed/timing changes.

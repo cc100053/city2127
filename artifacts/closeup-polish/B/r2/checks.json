@@ -1,0 +1,12 @@
+{
+  "matrixStates": 18,
+  "A4Pairs": 16,
+  "A4Pass": 0,
+  "A1Pass": 16,
+  "A2Pass": 16,
+  "A3Pass": 0,
+  "A6Pass": 18,
+  "cameraTest": "PASS",
+  "sourceHashes": "PASS",
+  "status": "POSE_ONLY_CANDIDATE; full root suite passed r1; final integrated suite follows r3"
+}

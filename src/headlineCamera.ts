@@ -11,11 +11,11 @@ type Pose = { position: [number, number, number]; target: [number, number, numbe
 export const SHOTS: Record<ShotId, Pose> = {
   'nw:focal': { position: [-105, 150, -475], target: [40, 48, -300] },
   'ne:focal': { position: [-280, 85, -245], target: [-210, 14, -135] },
-  'sw:focal': { position: [-180, 65, 10], target: [-105, 9, 60] },
+  'sw:focal': { position: [-165, 62, 155], target: [-105, 9, 60] },
   'se:focal': { position: [-20, 245, -240], target: [175, 65, -45] },
   'nw:district': { position: [-180, 180, -470], target: [10, 28, -210] },
   'ne:district': { position: [-390, 270, -310], target: [-250, 0, -170] },
-  'sw:district': { position: [-160, 400, -260], target: [-120, 5, -90] },
+  'sw:district': { position: [-140, 440, -120], target: [-120, 5, -90] },
   'se:district': { position: [-105, 235, -295], target: [140, 40, -30] },
   'energy:garden': { position: [-420, 65, -210], target: [-304, 12, -135] },
   'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },

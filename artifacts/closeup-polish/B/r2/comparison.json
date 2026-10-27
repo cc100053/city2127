@@ -1,0 +1,272 @@
+{
+  "mode": "compare",
+  "commit": "8d3b86f462877f3320eec544ed3d0c6755200cef",
+  "sourceDiff": "diff --git a/src/headlineCamera.ts b/src/headlineCamera.ts\nindex b9ce2aa..4da2782 100644\n--- a/src/headlineCamera.ts\n+++ b/src/headlineCamera.ts\n@@ -11,11 +11,11 @@ type Pose = { position: [number, number, number]; target: [number, number, numbe\n export const SHOTS: Record<ShotId, Pose> = {\n   'nw:focal': { position: [-105, 150, -475], target: [40, 48, -300] },\n   'ne:focal': { position: [-280, 85, -245], target: [-210, 14, -135] },\n-  'sw:focal': { position: [-180, 65, 10], target: [-105, 9, 60] },\n+  'sw:focal': { position: [-165, 62, 155], target: [-105, 9, 60] },\n   'se:focal': { position: [-20, 245, -240], target: [175, 65, -45] },\n   'nw:district': { position: [-180, 180, -470], target: [10, 28, -210] },\n   'ne:district': { position: [-390, 270, -310], target: [-250, 0, -170] },\n-  'sw:district': { position: [-160, 400, -260], target: [-120, 5, -90] },\n+  'sw:district': { position: [-140, 440, -120], target: [-120, 5, -90] },\n   'se:district': { position: [-105, 235, -295], target: [140, 40, -30] },\n   'energy:garden': { position: [-420, 65, -210], target: [-304, 12, -135] },\n   'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },\n",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "sw:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.016400559964837053,
+      "rect": {
+        "x": 534,
+        "y": 298,
+        "width": 890,
+        "height": 607
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:focal",
+      "hour": 12,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.013208973326417857,
+      "rect": {
+        "x": 534,
+        "y": 298,
+        "width": 890,
+        "height": 607
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.02516911521224499,
+      "rect": {
+        "x": 534,
+        "y": 298,
+        "width": 890,
+        "height": 607
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.011042967779760715,
+      "rect": {
+        "x": 534,
+        "y": 298,
+        "width": 890,
+        "height": 607
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:focal",
+      "hour": 22,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.008994595499689735,
+      "rect": {
+        "x": 534,
+        "y": 298,
+        "width": 890,
+        "height": 607
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.01665386771236023,
+      "rect": {
+        "x": 534,
+        "y": 298,
+        "width": 890,
+        "height": 607
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.007654078915516824,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:district",
+      "hour": 12,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.009557350923908659,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:district",
+      "hour": 12,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.018445165617687404,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:district",
+      "hour": 12,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.015609288005325588,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.01155141007020092,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.006324841266239006,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:district",
+      "hour": 22,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.007734968833212297,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:district",
+      "hour": 22,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.00800473805777455,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:district",
+      "hour": 22,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.006214984643548777,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "sw:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.010179139685709675,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}
