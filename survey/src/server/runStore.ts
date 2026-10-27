@@ -2,7 +2,7 @@ import { isEnergyChoice } from '../shared/energy.ts';
 import type { DatabaseSync, SQLOutputValue } from 'node:sqlite';
 import { CITY_AXES, zeroScores, initialCitySurveyState, initialExhibitionState, isCityAxis, type CitySurveyState, type ExhibitionState, type ExhibitionVotes } from '../shared/citySurveyState.ts';
 import type { AnswerEvent, RunSummary } from '../shared/protocol.ts';
-import { exhibitionLayoutChanges, exhibitionStateLayout, type ProposalAnswerRecord, type ProposalRecord } from '../shared/cityView.ts';
+import { exhibitionLayoutChanges, initialLadder, ladderLayout, ladderStep, type ExhibitionLadder, type ProposalAnswerRecord, type ProposalRecord } from '../shared/cityView.ts';
 import { applyEffects, applyProposalVotes, foldSlotSeeds, validateExhibitionState } from '../survey/scoreEngine.ts';
 import { transaction } from './database.ts';
 
@@ -215,7 +215,10 @@ function parseAnswers(json: string): ProposalAnswerRecord[] {
   });
 }
 
-export function toProposalRecord(row: Row): ProposalRecord {
+/** The run's ladder before and after one proposal. */
+export type ProposalLadder = { before: ExhibitionLadder; after: ExhibitionLadder };
+
+export function toProposalRecord(row: Row, ladder: ProposalLadder): ProposalRecord {
   if (num(row, 'algorithm_version') !== 2) throw new CorruptStateError('proposal uses an unsupported algorithm version');
   const runId = str(row, 'run_id'), submittedAt = str(row, 'submitted_at');
   const before = parseExhibitionState(str(row, 'before_state_json'), 'proposal before state');
@@ -230,7 +233,7 @@ export function toProposalRecord(row: Row): ProposalRecord {
     throw new CorruptStateError(`proposal ${str(row, 'id')} has inconsistent revisions`);
   const expected = applyProposalVotes(before, votes, submittedAt);
   if (JSON.stringify(expected) !== JSON.stringify(after)) throw new CorruptStateError(`proposal ${str(row, 'id')} does not match its stored vote result`);
-  const beforeLayout = exhibitionStateLayout(before.scores, before.guestCount, before.energy), afterLayout = exhibitionStateLayout(after.scores, after.guestCount, after.energy);
+  const beforeLayout = ladderLayout(ladder.before.tiers, before.energy), afterLayout = ladderLayout(ladder.after.tiers, after.energy);
   return {
     id: str(row, 'id'), runId, guestSessionId: str(row, 'guest_session_id'), ordinal: after.guestCount,
     ...(row.station_id ? { stationId: str(row, 'station_id') as 'A' | 'B' } : {}),
@@ -241,34 +244,52 @@ export function toProposalRecord(row: Row): ProposalRecord {
   };
 }
 
-/** Ordered integer hash; IDs, timestamps and neutral votes never shuffle a district. */
-export function runProposalSlotSeeds(db: DatabaseSync, runId: string) {
-  const seeds = zeroScores();
-  // ponytail: O(guests) per view, streaming only votes; persist incremental hashes if long runs make this measurable.
-  for (const row of db.prepare('SELECT votes_json FROM active_proposal_events WHERE run_id = ? ORDER BY sequence').iterate(runId))
-    foldSlotSeeds(seeds, parseVotes(str(row, 'votes_json')));
-  return seeds;
+/** A run's ladder fold: the shown ladder, the full-history slot seeds and each active proposal's ladder step. */
+export type RunLadder = { ladder: ExhibitionLadder; slotSeeds: ReturnType<typeof zeroScores>; steps: Map<string, ProposalLadder> };
+
+function stepLadder(fold: RunLadder, row: Row): ProposalLadder {
+  const votes = parseVotes(str(row, 'votes_json'));
+  // Ordered integer hash; IDs, timestamps and neutral votes never shuffle a district.
+  foldSlotSeeds(fold.slotSeeds, votes);
+  const step = { before: fold.ladder, after: ladderStep(fold.ladder, parseExhibitionState(str(row, 'after_state_json'), 'proposal after state'), votes, fold.slotSeeds) };
+  fold.ladder = step.after;
+  return step;
 }
 
-export function runProposalRecords(db: DatabaseSync, runId: string, requestedLimit = 64): ProposalRecord[] {
+/** Folds the run's active proposals (those before `beforeSequence`) through the one-rung-per-proposal ladder. */
+export function runProposalLadder(db: DatabaseSync, runId: string, beforeSequence = Number.MAX_SAFE_INTEGER): RunLadder {
+  const fold: RunLadder = { ladder: initialLadder(), slotSeeds: zeroScores(), steps: new Map() };
+  // ponytail: O(guests) per view, streaming votes and states; persist incremental ladders if long runs make this measurable.
+  for (const row of db.prepare('SELECT id, votes_json, after_state_json FROM active_proposal_events WHERE run_id = ? AND sequence < ? ORDER BY sequence').iterate(runId, beforeSequence))
+    fold.steps.set(str(row, 'id'), stepLadder(fold, row));
+  return fold;
+}
+
+/** One stored proposal with its ladder layouts; an undone proposal steps from the active history before it. */
+export function proposalRecordOf(db: DatabaseSync, row: Row): ProposalRecord {
+  return toProposalRecord(row, stepLadder(runProposalLadder(db, str(row, 'run_id'), num(row, 'sequence')), row));
+}
+
+export function runProposalRecords(db: DatabaseSync, runId: string, requestedLimit = 64, fold = runProposalLadder(db, runId)): ProposalRecord[] {
   const limit = Math.max(0, Math.min(64, Math.trunc(requestedLimit)));
   if (limit === 0) return [];
   return db.prepare('SELECT * FROM active_proposal_events WHERE run_id = ? ORDER BY sequence DESC LIMIT ?')
-    .all(runId, limit).reverse().map(toProposalRecord);
+    .all(runId, limit).reverse().map(row => toProposalRecord(row, fold.steps.get(str(row, 'id'))!));
 }
 
 export function recentProposalEvents(db: DatabaseSync, requestedLimit = 50): (ProposalRecord & { undoneAt: string | null })[] {
   const limit = Math.max(0, Math.min(200, Math.trunc(requestedLimit)));
   if (limit === 0) return [];
   return db.prepare('SELECT p.*, u.created_at AS undone_at FROM proposal_events p LEFT JOIN proposal_undos u ON u.proposal_id = p.id ORDER BY p.sequence DESC LIMIT ?')
-    .all(limit).map(row => ({ ...toProposalRecord(row), undoneAt: optStr(row, 'undone_at') }));
+    .all(limit).map(row => ({ ...proposalRecordOf(db, row), undoneAt: optStr(row, 'undone_at') }));
 }
 
 export function replayExhibitionRun(db: DatabaseSync, runId: string, startedAt: string): ExhibitionState {
   let state = initialExhibitionState(runId, startedAt);
+  const fold: RunLadder = { ladder: initialLadder(), slotSeeds: zeroScores(), steps: new Map() };
   const rows = db.prepare('SELECT * FROM active_proposal_events WHERE run_id = ? ORDER BY sequence').all(runId);
   for (const row of rows) {
-    const record = toProposalRecord(row);
+    const record = toProposalRecord(row, stepLadder(fold, row));
     const savedBefore = parseExhibitionState(str(row, 'before_state_json'), 'proposal before state');
     if (record.revisionBefore !== state.revision || JSON.stringify(savedBefore) !== JSON.stringify(state))
       throw new CorruptStateError(`proposal ${record.id} does not continue run ${runId}`);

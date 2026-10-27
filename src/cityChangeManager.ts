@@ -7,6 +7,7 @@ import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 import type { EnvironmentParkDiagnostics } from './siteBuilders/siteRuntime.ts';
 import type { EnvironmentDistrictDiagnostics } from './districtMeters.ts';
 import type { Scores, SurveyView } from './surveyView.ts';
+import { pickHeadline } from '../survey/src/shared/cityView.ts';
 import type { ExhibitionLayout, LotSocketId, SurveyEventKind } from './surveyView.ts';
 
 export { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
@@ -44,7 +45,8 @@ export interface SiteDiagnostic {
   readonly concentrationTower?: ReturnType<NonNullable<BuiltSite['concentrationTower']>['getDiagnostics']>;
 }
 
-export type CarrierChange = { socketId: LotSocketId; focal: boolean; district: boolean; energy?: { before: EnergyConfiguration; after: EnergyConfiguration } };
+/** `headline`: the one change a live result presents with pulses, marker and resident card; it comes first in the returned list. */
+export type CarrierChange = { socketId: LotSocketId; focal: boolean; district: boolean; headline?: boolean; energy?: { before: EnergyConfiguration; after: EnergyConfiguration } };
 
 export type CityChangeDiagnostics = Readonly<Record<SiteId, SiteDiagnostic>>;
 
@@ -52,6 +54,8 @@ const EXHIBITION_BASE_VARIANTS: Record<SiteId, SiteVariantId> = {
   magnetEast: 'automation-mixed', stationEastPark: 'exhibition-neutral',
   dogenzakaSouth: 'commons-mixed', centerGaiRear: 'tower-mixed',
 };
+
+const SITE_SOCKETS: Record<SiteId, LotSocketId> = { magnetEast: 'nw', stationEastPark: 'ne', dogenzakaSouth: 'sw', centerGaiRear: 'se' };
 
 const prefersReducedMotion = () => typeof globalThis.matchMedia === 'function'
   && globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -66,6 +70,7 @@ export class CityChangeManager {
   private lastUpdateNow = 0;
   private darkness = 0;
   private exhibitionInitialized = false;
+  private exhibitionLayout?: ExhibitionLayout;
 
   readonly energy?: EnergyRuntime;
 
@@ -116,7 +121,14 @@ export class CityChangeManager {
     if (!this.exhibitionInitialized) this.restoreExhibitionBaseline(now);
     const fresh = kind === 'city-state-updated' && !prefersReducedMotion();
     const immediate = !fresh;
+    // Only the headline site pulses and blinks its marker; other live changes settle quietly.
+    const headline = fresh && this.exhibitionLayout ? pickHeadline(this.exhibitionLayout, layout) : undefined;
+    const quiet = (socketId: LotSocketId) => !headline || !('socketId' in headline) || headline.socketId !== socketId;
+    this.exhibitionLayout = layout;
+    // Quiet sites keep whatever marker blink an earlier result left; this result adds none.
+    const earlier = SITE_IDS.filter(id => quiet(SITE_SOCKETS[id])).map(id => [...this.motions.get(id)!.values()].map(m => [m, m.fresh] as const)).flat();
     this.transitionToVariants(selectExhibitionSiteVariants(layout), now, fresh, immediate);
+    if (fresh) for (const [motion, at] of earlier) motion.fresh = at;
     const districts = {
       nw: this.sites.magnetEast.automationDistrict, sw: this.sites.dogenzakaSouth.sharingDistrict,
       ne: this.sites.stationEastPark.environmentDistrict, se: this.sites.centerGaiRear.concentrationDistrict,
@@ -131,26 +143,28 @@ export class CityChangeManager {
     const changed = [
       ['magnetEast', [
         focal.nw,
-        this.sites.magnetEast.automationDistrict?.setTarget(layout, now, immediate, slotSeeds?.automation) ?? false,
+        this.sites.magnetEast.automationDistrict?.setTarget(layout, now, immediate, slotSeeds?.automation, quiet('nw')) ?? false,
       ].some(Boolean)],
       ['dogenzakaSouth', [
         focal.sw,
-        this.sites.dogenzakaSouth.sharingDistrict?.setTarget(layout, now, immediate, slotSeeds?.publicSharing) ?? false,
+        this.sites.dogenzakaSouth.sharingDistrict?.setTarget(layout, now, immediate, slotSeeds?.publicSharing, quiet('sw')) ?? false,
       ].some(Boolean)],
       ['centerGaiRear', [
         focal.se,
-        this.sites.centerGaiRear.concentrationDistrict?.setTarget(layout, now, immediate, slotSeeds?.urbanConcentration) ?? false,
+        this.sites.centerGaiRear.concentrationDistrict?.setTarget(layout, now, immediate, slotSeeds?.urbanConcentration, quiet('se')) ?? false,
       ].some(Boolean)],
       ['stationEastPark', [
         focal.ne,
-        this.sites.stationEastPark.environmentDistrict?.setTarget(layout, now, immediate, slotSeeds?.environmentalPriority) ?? false,
+        this.sites.stationEastPark.environmentDistrict?.setTarget(layout, now, immediate, slotSeeds?.environmentalPriority, quiet('ne')) ?? false,
       ].some(Boolean)],
     ] as const;
-    for (const [siteId, siteChanged] of changed) if (siteChanged && fresh) this.markFresh(siteId, now);
+    for (const [siteId, siteChanged] of changed) if (siteChanged && fresh && !quiet(SITE_SOCKETS[siteId])) this.markFresh(siteId, now);
     const energy = this.energy?.setTarget(layout.energy ?? emptyEnergyConfiguration(), now, immediate);
-    return [...(energy ? [{ socketId: 'ne' as const, focal: false, district: true, energy }] : []), ...(Object.keys(districts) as LotSocketId[]).map(socketId => ({ socketId, focal: focal[socketId],
-      district: before[socketId] !== JSON.stringify(districts[socketId]?.getConfiguration()),
-    })).filter(change => change.focal || change.district)];
+    const changes: CarrierChange[] = [...(energy ? [{ socketId: 'ne' as const, focal: false, district: true, energy, ...(headline && 'energy' in headline ? { headline: true } : {}) }] : []),
+      ...(Object.keys(districts) as LotSocketId[]).map(socketId => ({ socketId, focal: focal[socketId],
+        district: before[socketId] !== JSON.stringify(districts[socketId]?.getConfiguration()), ...(quiet(socketId) ? {} : { headline: true }),
+      })).filter(change => change.focal || change.district)];
+    return changes.sort((a, b) => Number(!!b.headline) - Number(!!a.headline));
   }
 
   get automationLevel(): number | undefined { return this.sites.magnetEast.automationDistrict?.level; }
@@ -281,6 +295,7 @@ export class CityChangeManager {
     this.sites.centerGaiRear.concentrationTower?.restoreLegacy();
     for (const siteId of SITE_IDS) for (const motion of this.motions.get(siteId)!.values()) motion.fresh = -Infinity;
     this.exhibitionInitialized = false;
+    this.exhibitionLayout = undefined;
   }
 
   private prepareAsset(motion: LayerMotion, now: number): void {

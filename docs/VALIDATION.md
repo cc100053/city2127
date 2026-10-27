@@ -287,3 +287,36 @@ Root `npm test`／`npm run build`／production有固定住宅且DEV控制排除�
 Survey／module-swap source未改，未另跑本機獨立suite；整合與main CI結果見本批報告／交接。沒有部署；未測HDMI、Safari／iPad／Windows、訪客理解、結構／生態／消防／無障礙工程及新增居民實際路徑。
 
 2026-10-27 A整合完成：feature `d83ee62`、無衝突merge `ba54961` tree相同；整合後root test/build/committed whitespace PASS。Main `7ea9ec0100bebd24a1e9144dde1b9006bc23995a`的[CI 40421964460](https://github.com/cc100053/city2127/actions/runs/40421964460)實際completed／success，root／survey／module-swap及whitespace全部通過。後續僅Markdown紀錄，依paths規則skip；runtime及最終browser source hashes不變。所有owned services停止。
+
+## 分級階梯＋headline — 2026-10-27
+
+`feat/meter-ladder`（base `047cb2c`），[handoff](handoffs/meter-ladder.md)。User 批准咗：±3 格、|D| 1.5／4／7、遲滯 2、每份提案最多一格。
+
+**分佈模擬：** 用 [ladderSim](../survey/scripts/ladderSim.ts) 跑真 reducer、seed fold、`ladderStep` 同 `ladderLayout`，200 輪 × 40 位有偏向嘅訪客（E4 能源題組）。
+
+| | 改之前 main（`047cb2c`，band＋連續數值） | 階梯 |
+| --- | --- | --- |
+| 一次改 ≥2 個載體（連能源） | 53.3% | 10.8%（只係 site：0%） |
+| 啱啱一個 site 移一格 | — | 73.0%（26.9% 冇格變） |
+| 第 1／2／3 位訪客平均變幾多項 | 2.38 / 2.38 / 2.81 | 0.99 / 1.41 / 1.46 |
+
+- 格變分佈：focal（±1）佔 39%，district（±2／±3）佔 61%。
+- 38.7% 格變係將同一 site 上一步拉返轉頭，主要出現喺意見平分嘅人群。
+- 「改之前」嗰欄係 base 上嘅模擬，用同一個訪客模型。腳本入面嘅 old 行係唔限速嘅新格，唔係舊 band。
+
+**自動測試（全部 PASS）：** root `npm test`／`npm run build`、`survey/` `npm test`／`npm run build`、`git diff --check`。新增或改咗嘅覆蓋範圍：
+- `ladderGap` 門檻同遲滯。
+- `ladderStep`：每份最多一格、第一位訪客只郁一個 focal、seed 喺 ±2 固定、tie-break。
+- `pickHeadline`。
+- 81 組首份提案嘅 golden，每組只郁一個 site。
+- District 各格：rung 1 唔郁 district、rung 2 槽位互相包含、fleets 只喺 rung 3 郁、quiet 唔出 pulse。
+- Manager headline 排第一，非 headline site 嘅 marker 唔閃。
+- 低邊人群跑完整個 ladder，觸發 solar pods。
+- P4 反對票：自動化由第 3 格退到第 2 格，卡片講 district。
+- P11 seed 由早期次序決定。
+
+**Browser：**
+- 環境：scratch `SURVEY_PORT=8798 npm run dev:auto --prefix survey`，root Vite 5184，City 分頁保持喺前面。
+- 九份 guest HTTP 提案，每份只有一個 site 移一格。結果卡每次講一個地點；有能源同時變化嘅一次，卡片照講 tier 嘅 site。Console 冇 error。
+- 截圖：[focal 第 1 格](../artifacts/meter-ladder/guest2-se-focal.jpg)、[district 第 3 格](../artifacts/meter-ladder/guest9-se-rung3.jpg)。
+- 未測：FPS、A/B station、iPad 實機、訪客理解程度、整合後嘅 main CI。

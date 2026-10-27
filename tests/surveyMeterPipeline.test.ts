@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { CityChangeManager } from '../src/cityChangeManager.ts';
+import { ladderShare, rungStep } from '../src/districtMeters.ts';
 import { buildSurveySites } from '../src/siteBuilders/index.ts';
 import { AXES, parseSurveyEvent } from '../src/surveyView.ts';
 import { residentResult } from '../src/surveyAtmosphere.ts';
@@ -44,29 +45,30 @@ function assertModels(view: ExhibitionCityView) {
       assert.ok(Math.abs(actual.parameters[key] - Number(view.layout[key as keyof typeof view.layout])) < 1e-9, `${meter.axis}/${key}: actual model must use server parameter`);
     }
   }
-  // District layer (P1 meter variety): every promenade bay is covered by exactly one shade type, sized by the server's planted fraction.
+  // District layer (P1 meter variety, ladder 2026-10-27): districts read the server's rung; rung 3 is the complete form.
+  const tiers = view.layout.tiers;
   const district = diagnostics.stationEastPark.environmentDistrict!;
   assert.equal(district.visibleCanopies + district.visibleSails, district.slots);
-  assert.ok(Math.abs(district.targetCanopy - (view.layout.plantedFraction - .2) / .6) < 1e-9);
+  assert.ok(Math.abs(district.targetCanopy - ladderShare(tiers.ne, .5)) < 1e-9);
   const automation = diagnostics.magnetEast.automationDistrict!;
   assert.equal(automation.enabled, true);
-  assert.equal(automation.targetAutomation, view.layout.automatedPorts / 6);
-  assert.ok(Math.abs(manager.automationLevel! - view.layout.automatedPorts / 6) < 1e-7);
+  const fleets = rungStep(tiers.nw) === 1 ? Number(tiers.nw > 0) : .5;
+  assert.equal(automation.targetAutomation, fleets);
+  assert.ok(Math.abs(manager.automationLevel! - fleets) < 1e-7);
   const sharing = diagnostics.dogenzakaSouth.sharingDistrict!;
   assert.equal(sharing.enabled, true);
-  assert.equal(sharing.targetSharing, view.layout.sharedSeats / 8);
+  assert.equal(sharing.targetSharing, ladderShare(tiers.sw, .5));
   assert.equal(sharing.visibleOpenRooms + sharing.visiblePrivateRooms, sharing.rooms);
-  if (view.layout.sharedSeats <= 2) assert.equal(sharing.visiblePrivateRooms, sharing.rooms);
-  if (view.layout.sharedSeats >= 7) assert.equal(sharing.visibleOpenRooms, sharing.rooms);
+  if (tiers.sw <= -3) assert.equal(sharing.visiblePrivateRooms, sharing.rooms);
+  if (tiers.sw >= 3) assert.equal(sharing.visibleOpenRooms, sharing.rooms);
   const concentration = diagnostics.centerGaiRear.concentrationDistrict!;
   assert.equal(concentration.enabled, true);
-  assert.equal(concentration.targetConcentration, (view.layout.functionModules - 2) / 4);
-  if (view.layout.functionModules <= 3) assert.deepEqual([concentration.visibleTowers, concentration.visiblePods], [0, concentration.pods]);
-  if (view.layout.functionModules >= 5) assert.deepEqual([concentration.visibleTowers, concentration.visiblePods], [concentration.towers, 0]);
-  // P10: each cross-Meter extra appears exactly when its two axes agree (both high, or both low for solar pods), never otherwise.
+  assert.equal(concentration.targetConcentration, ladderShare(tiers.se, .5));
+  if (tiers.se <= -3) assert.deepEqual([concentration.visibleTowers, concentration.visiblePods], [0, concentration.pods]);
+  if (tiers.se >= 3) assert.deepEqual([concentration.visibleTowers, concentration.visiblePods], [concentration.towers, 0]);
+  // P10: each cross-Meter extra appears exactly when its two sites complete the same side (both rung 3, or −3 for solar pods), never otherwise.
   const band = view.layout.bands;
-  const positions = { nw: view.layout.automatedPorts / 6, sw: view.layout.sharedSeats / 8, ne: (view.layout.plantedFraction - .2) / .6, se: (view.layout.functionModules - 2) / 4 };
-  const both = (a: 'nw' | 'sw' | 'ne' | 'se', b: 'nw' | 'sw' | 'ne' | 'se', side: string) => side === 'high' ? Math.min(positions[a], positions[b]) >= .7 : Math.max(positions[a], positions[b]) <= .3;
+  const both = (a: 'nw' | 'sw' | 'ne' | 'se', b: 'nw' | 'sw' | 'ne' | 'se', side: string) => side === 'high' ? Math.min(tiers[a], tiers[b]) >= 3 : Math.max(tiers[a], tiers[b]) <= -3;
   const pairings: [string, number, boolean, number][] = [
     ['drone kiosks (sharing + automation high)', sharing.droneKiosks, both('sw', 'nw', 'high'), sharing.visibleOpenCourts],
     ['orchards (sharing + environment high)', sharing.orchardCourts, both('sw', 'ne', 'high'), sharing.visibleOpenCourts],
@@ -120,7 +122,7 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
     applyEvent({ type: 'city-state-snapshot', view: currentView(ctx) }, 7000);
     for (let i = 0; i < 25; i++) {
       const session = ok(createProposalSession(ctx).response);
-      // One +1 in three keeps automation high but below the Scale A cap, so the opposing vote still moves real carriers.
+      // One +1 in three keeps automation high but below the Scale A cap, so the opposing vote still moves a real rung.
       const votes = { automation: i === 24 ? -1 : i === 23 ? 0 : i % 3 === 0 ? 1 : 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 } as const;
       const outcome = submitProposal(ctx, { submissionId: `resident-cause-${i}`, guestSessionId: session.session.id,
         expectedRevision: session.state.revision, answers: answersForVotes(METER_CONTRACTS, votes) });
@@ -136,7 +138,10 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
         assert.equal(saved.proposal.votes.automation, -1);
         assert.equal(saved.proposal.afterLayout.bands.nw, 'high', 'opposing personal vote leaves the accumulated city high');
         assert.ok(causal.result.preference.includes('人に相談'));
-        assert.ok(causal.result.effect.includes('この拠点では、人に相談できる窓口が増え'));
+        // The ladder steps the completed district back to rung 2 while the focal hub stays high.
+        assert.deepEqual([saved.proposal.beforeLayout.tiers.nw, saved.proposal.afterLayout.tiers.nw], [3, 2]);
+        assert.ok(causal.result.effect.includes('サービス拠点と移動の構成が変わり'));
+        assert.equal(causal.result.place, '水辺のサービス拠点・移動ルート');
       }
       ok(staff(ctx, 'guest-left'));
     }
@@ -145,9 +150,11 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
   } finally { ctx.db.close(); }
 }
 
-// P11: early order survives the latest-64 window even after the EMA converges to exactly equal scores.
+// P11: early order survives the latest-64 window even after the EMA converges to exactly equal scores. Twenty agreeing guests
+// complete every ladder (so both runs reach the same tiers) after the districts froze their rung-2 seeds from differently ordered
+// histories; alternating guests then bring every site back to mixed, where those seeds decide the slot distribution.
 {
-  const histories = [[1, -1], [-1, 1]].map(prefix => [...prefix, ...Array.from({ length: 140 }, (_, i) => i % 2 ? -1 : 1)]);
+  const histories = [[1, -1], [-1, 1]].map(prefix => [...prefix, ...Array<1>(20).fill(1), ...Array.from({ length: 140 }, (_, i) => i % 2 ? -1 : 1)]);
   const districtRoots = [sites.magnetEast.automationDistrict!.root, sites.dogenzakaSouth.sharingDistrict!.root,
     sites.stationEastPark.environmentDistrict!.root, sites.centerGaiRear.concentrationDistrict!.root];
   const matrices = () => districtRoots.map(root => root.children.filter(o => o instanceof T.InstancedMesh && !['meter-pulse', 'plaza-crowds', 'service-drones'].includes(o.name))
@@ -229,6 +236,25 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
   console.log('PASS: P11 full-history order, equal-score/different-city in all four districts, >64 guests, retry, reload, reset and interrupted snapshot.');
 }
 
+// P10 pairings need both sites at rung ±3, which a single first proposal no longer reaches: an agreeing low crowd completes every
+// ladder for solar pods (P11's agreeing high crowd covers the four high pairings).
+{
+  const { ctx } = exhibitionFixture();
+  try {
+    applyEvent({ type: 'city-state-snapshot', view: currentView(ctx) }, 8000);
+    for (let i = 0; i < 20; i++) {
+      const session = ok(createProposalSession(ctx).response);
+      const outcome = submitProposal(ctx, { submissionId: `low-crowd-${i}`, guestSessionId: session.session.id, expectedRevision: i,
+        answers: answersForVotes(METER_CONTRACTS, Object.fromEntries(METER_CONTRACTS.map(m => [m.axis, -1])) as Record<string, -1>) });
+      const saved = ok(outcome.response); applyEvent(outcome.event, 8004 + i * 4);
+      const moved = (['nw', 'ne', 'sw', 'se'] as const).filter(id => saved.proposal.beforeLayout.tiers[id] !== saved.proposal.afterLayout.tiers[id]);
+      assert.ok(moved.length <= 1, `guest ${i + 1} moved one rung at most (${moved})`);
+      ok(staff(ctx, 'guest-left'));
+    }
+    assert.deepEqual((currentView(ctx) as ExhibitionCityView).layout.tiers, { nw: -3, ne: -3, sw: -3, se: -3 });
+  } finally { ctx.db.close(); }
+}
+
 // Also cross the real HTTP/WebSocket serialization boundary, then restore/reload/reset.
 const { ctx } = exhibitionFixture();
 const server = await startServer(ctx);
@@ -272,6 +298,6 @@ try {
   assert.equal(manager.getDiagnostics().dogenzakaSouth.sharingDistrict!.enabled, false, 'manager hides sharing in legacy v1');
   assert.equal(manager.getDiagnostics().centerGaiRear.concentrationDistrict!.enabled, false, 'manager hides concentration in legacy v1');
   applyEvent(resetEvent, 432);
-  assert.equal(pairingHits.size, 5, 'every P10 pairing occurs in the 81 combinations');
+  assert.equal(pairingHits.size, 5, 'every P10 pairing occurs across the real histories');
   console.log(`PASS: ${count} actual answer combinations → client parser → real four-site models; HTTP/WebSocket, retry, snapshot and reset.`);
 } finally { socket.close(); await server.close(); ctx.db.close(); }

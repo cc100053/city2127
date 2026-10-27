@@ -45,7 +45,7 @@ export function renderState(state: CitySurveyState | ExhibitionState): HTMLEleme
 export function renderView(view: CityView): HTMLElement {
   if (isExhibitionCityView(view)) {
     const slots = LOT_SOCKET_IDS.map(id => el('tr', {},
-      el('th', {}, id.toUpperCase()), el('td', {}, view.layout.bands[id]),
+      el('th', {}, id.toUpperCase()), el('td', {}, `${view.layout.bands[id]} · 段階 ${view.layout.tiers[id]}`),
       el('td', {}, id === 'nw' ? `自動端口 ${view.layout.automatedPorts}/6`
         : id === 'ne' ? `樹木 ${view.layout.treeCount} · 鰭片 ${view.layout.coolingFins} · 種植 ${Math.round(view.layout.plantedFraction * 100)}%`
           : id === 'sw' ? `共有席 ${view.layout.sharedSeats}/8` : `機能ユニット ${view.layout.functionModules}`)));

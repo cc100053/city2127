@@ -32,8 +32,7 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
     assert.deepEqual(view.layout, golden.layout);
     assert.deepEqual(view.latestProposal, result.proposal);
     assert.deepEqual(outcome.event?.view, view);
-    assert.deepEqual(result.proposal.cityChanges.map(change => change.socketId).sort(),
-      METER_CONTRACTS.filter(meter => votes[meter.axis] !== 0).map(meter => meter.socket).sort());
+    assert.deepEqual(result.proposal.cityChanges.map(change => change.socketId), golden.moved ? [golden.moved] : [], 'one proposal moves one site one rung');
     const row = ctx.db.prepare('SELECT votes_json, after_state_json FROM proposal_events WHERE id = ?').get(request.submissionId)!;
     assert.deepEqual(JSON.parse(String(row.votes_json)), votes);
     assert.deepEqual(JSON.parse(String(row.after_state_json)), result.state);

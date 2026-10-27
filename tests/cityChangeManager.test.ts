@@ -17,11 +17,15 @@ const view = (value: Layout, revision: number, runId = 'run'): SurveyView => ({
   version: 1, runId, revision, layout: value, history: [],
   scores: { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 },
 });
-const exhibitionLayout = (overrides: Partial<ExhibitionLayout> = {}): ExhibitionLayout => ({
-  version: 2, bands: { nw: 'mixed', ne: 'mixed', sw: 'mixed', se: 'mixed' },
-  automatedPorts: 3, sharedSeats: 4, treeCount: 8, plantedFraction: .5, coolingFins: 3, functionModules: 4,
-  ...overrides,
-});
+const exhibitionLayout = (overrides: Partial<ExhibitionLayout> = {}): ExhibitionLayout => {
+  const bands = overrides.bands ?? { nw: 'mixed', ne: 'mixed', sw: 'mixed', se: 'mixed' };
+  const rung = (band: string) => band === 'high' ? 1 : band === 'low' ? -1 : 0;
+  return {
+    version: 2, bands, tiers: { nw: rung(bands.nw), ne: rung(bands.ne), sw: rung(bands.sw), se: rung(bands.se) },
+    automatedPorts: 3, sharedSeats: 4, treeCount: 8, plantedFraction: .5, coolingFins: 3, functionModules: 4,
+    ...overrides,
+  };
+};
 
 function createController<Target extends object, Diagnostics>(initial: Target, diagnostics: (target: Target) => Diagnostics) {
   let target = initial, applied = false, transitionStart = -Infinity, transitioning = false, restores = 0, updates = 0;
@@ -371,6 +375,18 @@ for (const siteId of SITE_IDS) close(sites[siteId].marker.material.emissiveInten
 manager.applyExhibitionLayout(neutral, 'run-reset', 32);
 assert.equal(parkTarget.treeCount, 8);
 assert.equal(manager.getDiagnostics().stationEastPark.environmentPark?.visibleTreeCount, 8);
+
+// Headline: when two sites change at once (only outside the ladder's one-rung rule, e.g. dev `?meters`), the higher rung leads
+// the returned changes and alone blinks its marker; the other settles quietly.
+{
+  const two = exhibitionLayout({ bands: { nw: 'high', ne: 'mixed', sw: 'mixed', se: 'high' }, automatedPorts: 6, functionModules: 6 });
+  const changes = manager.applyExhibitionLayout({ ...two, tiers: { ...two.tiers, se: 2 } }, 'city-state-updated', 32.5);
+  assert.deepEqual(changes.map(change => [change.socketId, !!change.headline]), [['se', true], ['nw', false]]);
+  manager.update(33);
+  assert.ok(sites.centerGaiRear.marker.material.emissiveIntensity > .2);
+  close(sites.magnetEast.marker.material.emissiveIntensity, .2);
+  manager.applyExhibitionLayout(neutral, 'run-reset', 33);
+}
 
 manager.applyIncrementalUpdate(view(layout({ ne: lot('park') }), 8), 33);
 assert.equal(parkLegacyRestores, 1);

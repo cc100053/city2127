@@ -63,11 +63,24 @@ Server產出`layout.energy`，root套用模型並比較實際前後target。新�
 
 E4後automation／publicSharing／urbanConcentration每軸每份提案只有一票 `v ∈ {-1,0,+1}`。對第 n 份提案：`Sₙ=Sₙ₋₁+v`、`Rₙ=.75Rₙ₋₁+.25v`、`Mₙ=clamp(6(Sₙ/n+Rₙ),-12,12)`。新 run 的 S／R／M 全部零；中性票亦會更新近期記憶，不能略過。只在 server 計算；replay 與 live 使用同一 reducer：[scoreEngine](../survey/src/survey/scoreEngine.ts)。
 
-**刻度 A（2026-10-13 user決定，取代舊刻度）**：實際 run 嘅 M 多數只喺 ±5 之內，所以 layout 讀「展示分數」`D=clamp(M×g(n),-12,12)`，n 係目前累積觀眾數。`g(n)=0.85+1.55×min(1,(n−1)/11)`：第一位觀眾 ×0.85（溫和開場，第一票 ±1 只到 D=±6.375，唔會即刻去到極端，但仍然觸發 P10 配對設施），之後逐位加強，第 12 位起固定 ×2.4（形態門檻相當於 M≈±1.25）。計分 reducer 不變；提案紀錄嘅 before/after layout 讀取時由分數同觀眾數重新計算，所以舊歷史一齊轉用新刻度，冇資料遷移。新舊比較見 DEV `?scaleLab` 及 [handoff](handoffs/archive/meter-scale-a.md)。
+**刻度 A（2026-10-13 user決定，取代舊刻度）**：實際 run 嘅 M 多數只喺 ±5 之內，所以 layout 讀「展示分數」`D=clamp(M×g(n),-12,12)`，n 係目前累積觀眾數。`g(n)=0.85+1.55×min(1,(n−1)/11)`：第一位觀眾 ×0.85（溫和開場，第一票 ±1 只到 D=±6.375；2026-10-27 起再受每份一格限制，第一位只令一個 focal site 轉），之後逐位加強，第 12 位起固定 ×2.4（第一格門檻 |D|≥1.5 相當於 M≈±0.63）。計分 reducer 不變；提案紀錄嘅 before/after layout 讀取時由分數同觀眾數重新計算，所以舊歷史一齊轉用新刻度，冇資料遷移。新舊比較見 DEV `?scaleLab` 及 [handoff](handoffs/archive/meter-scale-a.md)。
 
-`low: D≤−3`，`mixed: −3<D<3`，`high: D≥3`；`t=(D+12)/24`。Server 的 [exhibitionStateLayout](../survey/src/shared/cityView.ts)（D 經 `deriveExhibitionLayout`）是唯一權威映射：
+**分級階梯＋headline（2026-10-27 user決定，取代 `D≤−3／D≥3` 一次翻轉整個 band）**：每個 site 有 −3…+3 格（`layout.tiers`）。目標格由 D 決定：`|D|≥1.5／4／7` 分別到 ±1／±2／±3；退返 mixed 要 D 再過門檻 2（遲滯，例如由 +1 退到 0 要 `D≤−0.5`）。**每份提案最多令一個 site 移一格**：先揀差距最大嘅 site，打和揀今位訪客投向嗰個方向嘅 site，再打和按觀眾數輪替（[ladderStep](../survey/src/shared/cityView.ts)）。所以格係歷史 fold 出嚟（同 slotSeeds 一樣 O(guests)，由 active proposals 重算；Undo、舊歷史、snapshot 無資料遷移），唔係單一分數嘅純函數。
 
-| 參數 | 公式 | D=0 |
+| 格 | 自動化 nw | 共有 sw | 集約 se |
+| --- | --- | --- | --- |
+| 0 | 全部 mixed（60% hybrid） | 同左 | 同左 |
+| ±1 | 只換 focal：デックス西轉 high／low（端口 6／0） | 只換 focal：アクアシティ南（座位 8／0） | 只換 focal：フジテレビ東（模組 6／2） |
+| ±2 | 11 個服務灣按 rank 次序轉一半（mixed 同完整之間），hybrid 30% | 6 water rooms＋10 庭院轉一半，hybrid 30% | 10 塔／26 pods 轉一半，mid-rise 30% |
+| ±3 | 其餘服務灣＋fleets／飛行器／街道 pods（即舊完整 low／high） | 完整形態 | 完整形態 |
+
+P10 配對要兩個 site 同一邊都到 ±3。環境軸 E4 後凍結喺 mixed，所以 sails／冷卻塔／屋頂／外牆唔做格（舊氣候 run 照用同一 ladder）。每個 district 第一次到 ±2 時固定該軸 `slotSeeds`（之前為 0），之後各格 slot 互相包含，唔會每票重排。
+
+Live headline（[pickHeadline](../survey/src/shared/cityView.ts)）：新到達最高格嘅 site，否則載體變化最多嘅 site，否則能源；只有 headline site 有亮 pulse／marker 同結果卡，其他變化（例如同時嘅能源門檻）靜靜過渡。
+
+`ladderLayout(tiers, energy)` 是唯一權威映射；focal 數值由 tier 符號決定（`t`= 1／.5／0 對應 >0／0／<0）：
+
+| 參數 | 公式 | tier 0 |
 | --- | --- | --- |
 | automatedPorts | round(6t) | 3 |
 | sharedSeats | round(8t) | 4 |
@@ -76,7 +89,7 @@ E4後automation／publicSharing／urbanConcentration每軸每份提案只有一�
 | coolingFins | round(6(1−t)) | 3 |
 | functionModules | 2+round(4t) | 4 |
 
-全部 round 用 JavaScript `Math.round`。機能單元不是人口或等容量承諾；不能在實作中暗改算法。Root v2 不將 Meter 混入全城天空／氣氛。
+District 直接讀 tier；DEV `?meters`／carrier 測試用 `deriveExhibitionLayout(D)`（同一門檻、唔限速）。全部 round 用 JavaScript `Math.round`。機能單元不是人口或等容量承諾；不能在實作中暗改算法。Root v2 不將 Meter 混入全城天空／氣氛。
 
 ## 城市可見變化
 
@@ -86,7 +99,7 @@ E4後automation／publicSharing／urbanConcentration每軸每份提案只有一�
 - Sharing：六座 water rooms、十個內陸庭院的私密／混合／共享形態，以及符合條件的廣場人群。
 - Environment：promenade sails／pergolas、冷卻塔、屋頂 cover、立面氣候層。
 - Concentration：低層 pods／中間高度／十座塔、sky lobbies 與連橋。
-- Mixed 有自己的 hybrid 組合；跨 Meter 條件產生配對設施；完整 active run 的投票次序推導四軸 `slotSeeds`，相同分數可保留不同槽位分布。最新 64 份顯示 history 不截斷 seed 來源。
+- Mixed 有自己的 hybrid 組合；跨 Meter 條件（兩 site 同邊 ±3）產生配對設施；完整 active run 的投票次序推導四軸 `slotSeeds`，各 district 第一次到 ±2 時固定（2026-10-27），相同分數可保留不同槽位分布。最新 64 份顯示 history 不截斷 seed 來源。
 
 **一票旅程（2026-10-13 user要求）**：live 結果先播約 2.6 秒旅程——觀眾四票化成 Meter 色光點（中性票暖白），由畫面右下（站台方向）飛去四個 focal site（E4後新Q3改到沿岸能源接點，舊氣候票仍到公園），著陸時掃描環升起；每票留低一粒浮喺 site 上空嘅光點（日間淡、夜間亮），保留最近 64 位觀眾，snapshot／reload 由 `recentProposals` 重建。著陸後先開始 3 秒過渡及 pulse，總共大約 5.6 秒，喺 10 秒閱讀時段之內；結果卡證據喺收到事件時已經計好，理由句照舊喺第 3 秒出現。Snapshot、reset、Undo、reconnect、reduced motion 唔播旅程，即時恢復。
 

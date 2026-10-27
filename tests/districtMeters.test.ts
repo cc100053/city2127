@@ -1,12 +1,14 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { hybridShare, AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, PRIVATE_RISE, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
+import { ladderHybrid, ladderShare, rungStep, AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, PRIVATE_RISE, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
 import { changeSites } from '../src/layout.ts';
 import { publicLight, trail } from '../src/cityRig.ts';
 import { mobility, promenadeStops, routes, walkerParty, walkerPose, walkerRoute } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
 
+/** A ladder target with the given rungs; the rest mixed. */
+const at = (t: Partial<Record<'nw' | 'ne' | 'sw' | 'se', number>> = {}) => ({ tiers: { nw: 0, ne: 0, sw: 0, se: 0, ...t } });
 const env = (score: number) => deriveExhibitionLayout({ automation: 0, publicSharing: 0, environmentalPriority: score, urbanConcentration: 0 });
 
 // SlotLevels eases over the shared 3 s transition and reports target changes.
@@ -88,17 +90,17 @@ assert.ok(Math.abs(repeated.value[0] - 1 / 12) < 1e-7);
 // Automation uses authoritative ports; same-target events, interrupted live changes and reset/legacy remain deterministic.
 const automation = new AutomationDistrict(new T.Scene());
 assert.equal(automation.level, undefined);
-automation.setTarget({ automatedPorts: 1 }, 0, true);
+automation.setTarget(at({ nw: -3 }), 0, true);
 const low = automation.getDiagnostics();
 assert.ok(low.pavilions >= 6);
 assert.equal(low.visibleStaffedPavilions, low.pavilions);
 assert.equal(low.visibleDronePorts, 0, 'human-led bays carry no drone ports');
 assert.deepEqual([low.loopAircraft, low.guidewayPods, low.walkers], [2, 12, 400]);
-automation.setTarget({ automatedPorts: 5 }, 1, false);
+automation.setTarget(at({ nw: 3 }), 1, false);
 automation.update(2.5);
 const midway = automation.level!;
 assert.ok(Math.abs(midway - .5) < 1e-7);
-assert.equal(automation.setTarget({ automatedPorts: 5 }, 2.5, false), false);
+assert.equal(automation.setTarget(at({ nw: 3 }), 2.5, false), false);
 automation.update(4);
 const high = automation.getDiagnostics();
 assert.equal(high.visibleStaffedPavilions, 0);
@@ -107,17 +109,17 @@ const portMatrix = new T.Matrix4(), portScale = new T.Vector3();
 (automation.root.getObjectByName('automation-drone-ports') as T.InstancedMesh).getMatrixAt(automation.autonomousDesign.indexOf(0), portMatrix);
 assert.ok(Math.abs(portScale.setFromMatrixScale(portMatrix).y - 1) < 1e-6, 'drone port stands at full size');
 assert.deepEqual([high.loopAircraft, high.guidewayPods, high.walkers], [30, 24, 120]);
-automation.setTarget({ automatedPorts: 1 }, 5, false);
+automation.setTarget(at({ nw: -3 }), 5, false);
 automation.update(6);
 const interrupted = automation.level!;
-automation.setTarget({ automatedPorts: 3 }, 6, false);
+automation.setTarget(at(), 6, false);
 assert.equal(automation.level, interrupted, 'retarget preserves current level');
 automation.update(9);
 const mixed = automation.getDiagnostics();
 assert.ok(mixed.visibleStaffedPavilions > 0 && mixed.visibleStaffedPavilions < mixed.pavilions);
 assert.equal(mixed.visibleStaffedPavilions + mixed.visibleDronePorts, mixed.pavilions, 'mixed bays are each staffed or autonomous');
 assert.deepEqual([mixed.loopAircraft, mixed.guidewayPods, mixed.walkers], [16, 18, 260]);
-automation.setTarget({ automatedPorts: 1 }, 10, true);
+automation.setTarget(at({ nw: -3 }), 10, true);
 assert.equal(automation.getDiagnostics().walkers, 400, 'snapshot/reset is immediate');
 automation.hide(); automation.update(20);
 assert.equal(automation.level, undefined);
@@ -165,7 +167,7 @@ assert.equal(visible('street-pods'), 0, 'standalone streets keep human-driven ca
 console.log('PASS: actual P2 actor matrices match low/mixed/high independently of day mood; original standalone/legacy poses restored.');
 
 const sharing = new SharingDistrict(new T.Scene());
-sharing.setTarget({ sharedSeats: 2 }, 0, true);
+sharing.setTarget(at({ sw: -3 }), 0, true);
 assert.equal(sharing.getDiagnostics().visiblePrivateRooms, sharing.bays.length);
 assert.equal(sharing.getDiagnostics().visibleOpenRooms, 0);
 assert.equal(sharing.getDiagnostics().vaults, Math.ceil(sharing.bays.length / 2), 'every other room carries a vault');
@@ -174,13 +176,13 @@ assert.equal(sharing.getDiagnostics().vaults, Math.ceil(sharing.bays.length / 2)
     (sharing.root.getObjectByName('sharing-private-gardens') as T.InstancedMesh).getMatrixAt(i, m); return v.setFromMatrixScale(m).x; };
   assert.ok(vaultScale(0) > 10 && vaultScale(1) < 1e-2, 'only vaulted rooms show glass when private');
 }
-sharing.setTarget({ sharedSeats: 7 }, 1, false);
+sharing.setTarget(at({ sw: 3 }), 1, false);
 sharing.update(2.5);
 const screens = sharing.root.getObjectByName('sharing-private-gardens') as T.InstancedMesh;
 const matrix = new T.Matrix4(), scale = new T.Vector3();
 screens.getMatrixAt(0, matrix); scale.setFromMatrixScale(matrix);
 assert.ok(Math.abs(scale.y - PRIVATE_RISE * sharing.bays[0].r / 2) < 1e-4, 'private wall lowers halfway through the 3-second transition');
-assert.equal(sharing.setTarget({ sharedSeats: 7 }, 2.5, false), false);
+assert.equal(sharing.setTarget(at({ sw: 3 }), 2.5, false), false);
 sharing.update(4);
 assert.equal(sharing.getDiagnostics().visibleOpenRooms, sharing.bays.length);
 assert.equal(sharing.getDiagnostics().visiblePrivateRooms, 0);
@@ -197,16 +199,16 @@ for (const object of sharing.root.children) {
     assert.ok(matrix.determinant() > 0, 'hidden parts keep invertible matrices for G-buffer normals');
   }
 }
-sharing.setTarget({ sharedSeats: 0 }, 5, false); sharing.update(6);
+sharing.setTarget(at({ sw: -3 }), 5, false); sharing.update(6);
 screens.getMatrixAt(0, matrix); scale.setFromMatrixScale(matrix); const interruptedHeight = scale.y;
-sharing.setTarget({ sharedSeats: 4 }, 6, false);
+sharing.setTarget(at(), 6, false);
 screens.getMatrixAt(0, matrix); scale.setFromMatrixScale(matrix);
 assert.equal(scale.y, interruptedHeight, 'retarget does not jump');
 sharing.update(9);
 const hybrid = sharing.getDiagnostics();
 assert.ok(hybrid.visibleOpenRooms > 0 && hybrid.visiblePrivateRooms > 0);
 assert.equal(hybrid.visibleOpenRooms + hybrid.visiblePrivateRooms, hybrid.rooms);
-sharing.setTarget({ sharedSeats: 8 }, 10, true);
+sharing.setTarget(at({ sw: 3 }), 10, true);
 assert.equal(sharing.getDiagnostics().visibleOpenRooms, hybrid.rooms, 'snapshot/reset is immediate');
 sharing.hide(); sharing.update(20);
 assert.equal(sharing.root.visible, false);
@@ -216,9 +218,9 @@ console.log(`PASS: sharing — ${hybrid.rooms} water gardens, actual screen matr
 // P4: low scatters every pod with no towers; high raises every tower with no pods; mixed keeps about half of each.
 const concentration = new ConcentrationDistrict(new T.Scene());
 const counts = () => { const d = concentration.getDiagnostics(); return [d.visibleTowers, d.visiblePods]; };
-concentration.setTarget({ functionModules: 3 }, 0, true);
+concentration.setTarget(at({ se: -3 }), 0, true);
 assert.deepEqual(counts(), [0, concentration.pods.length]);
-concentration.setTarget({ functionModules: 5 }, 1, false);
+concentration.setTarget(at({ se: 3 }), 1, false);
 concentration.update(2.5);
 const towerMesh = concentration.root.getObjectByName('concentration-vertical-towers') as T.InstancedMesh;
 // P7: three silhouette families (twisted / terraced / twin) split the slots; their batches hold exactly the ten towers.
@@ -227,14 +229,14 @@ assert.deepEqual([...new Set(towerBatches.map(m => m.count))].sort(), [3, 4], 't
 const rising = new T.Vector3();
 towerMesh.getMatrixAt(0, matrix); rising.setFromMatrixScale(matrix);
 assert.ok(rising.y > concentration.towers[0].h * .3 && rising.y < concentration.towers[0].h * .7, 'towers rise over the 3-second transition');
-assert.equal(concentration.setTarget({ functionModules: 5 }, 2.5, false), false);
+assert.equal(concentration.setTarget(at({ se: 3 }), 2.5, false), false);
 concentration.update(4);
 assert.deepEqual(counts(), [concentration.towers.length, 0]);
 for (const object of concentration.root.children) {
   const mesh = object as T.InstancedMesh;
   for (let i = 0; i < mesh.count; i++) { mesh.getMatrixAt(i, matrix); assert.ok(matrix.determinant() > 0, `${mesh.name} keeps invertible matrices`); }
 }
-concentration.setTarget({ functionModules: 4 }, 5, true);
+concentration.setTarget(at(), 5, true);
 const [mixedTowers, mixedPods] = counts();
 assert.ok(mixedTowers > 0 && mixedTowers < concentration.towers.length && mixedPods > 0 && mixedPods < concentration.pods.length, 'mixed is a hybrid');
 concentration.hide();
@@ -255,7 +257,7 @@ console.log(`PASS: concentration district — ${concentration.towers.length} tow
     'private courts': sharingDesigns.privateDesign, 'open courts': sharingDesigns.openDesign, pods: podDesigns.podDesign,
   })) assert.ok(families(designs) >= 2, `${name} use ≥ 2 design families`);
   // Actual matrices at high automation: a mast bay draws the mast, never the port, and vice versa.
-  automationDesigns.setTarget({ automatedPorts: 6 }, 0, true);
+  automationDesigns.setTarget(at({ nw: 3 }), 0, true);
   // First batch belongs to the port group, last to the mast group (both share the name).
   const autonomous = automationDesigns.root.children.filter(o => o.name === 'automation-drone-ports') as T.InstancedMesh[];
   const ports = autonomous[0], masts = autonomous.at(-1)!;
@@ -268,7 +270,9 @@ console.log(`PASS: concentration district — ${concentration.towers.length} tow
 
 // P9: hybrids appear only around mixed (never at a low / high band) and compose both designs on the same slot.
 {
-  assert.deepEqual([hybridShare(.25), hybridShare(.5), hybridShare(.75), hybridShare(.1875), hybridShare(.8125)], [0, .6, 0, 0, 0]);
+  assert.deepEqual([-3, -2, -1, 0, 1, 2, 3].map(ladderHybrid), [0, .3, .6, .6, .6, .3, 0]);
+  assert.deepEqual([-3, -2, -1, 0, 1, 2, 3].map(rungStep), [1, .5, 0, 0, 0, .5, 1]);
+  assert.deepEqual([-3, -2, 0, 2, 3].map(tier => ladderShare(tier, .4)), [0, .2, .4, .7, 1]);
   const a = new AutomationDistrict(new T.Scene()), sh = new SharingDistrict(new T.Scene()), c = new ConcentrationDistrict(new T.Scene()), e = new EnvironmentDistrict(new T.Scene());
   const counts = () => [a.getDiagnostics().hybridBays, sh.getDiagnostics().hybridRooms + sh.getDiagnostics().hybridCourts, c.getDiagnostics().midRises, e.getDiagnostics().hybridBays];
   const band = (name: string) => { const l = deriveExhibitionLayout({ automation: { low: -7.5, mixed: 0, high: 7.5 }[name]!, publicSharing: { low: -7.5, mixed: 0, high: 7.5 }[name]!,
@@ -295,9 +299,9 @@ console.log(`PASS: concentration district — ${concentration.towers.length} tow
 // snapshots / resets / reduced motion (immediate) never pulse, and a legacy hide clears pulses.
 const pulseCases: [string, { setTarget(l: never, now: number, immediate: boolean): boolean; update(now: number): void; hide(): void; getDiagnostics(): { activePulses: number }; root: T.Group }, object, object][] = [
   ['environment', new EnvironmentDistrict(new T.Scene()) as never, env(-7.5), env(7.5)],
-  ['automation', new AutomationDistrict(new T.Scene()) as never, { automatedPorts: 1 }, { automatedPorts: 5 }],
-  ['sharing', new SharingDistrict(new T.Scene()) as never, { sharedSeats: 2 }, { sharedSeats: 7 }],
-  ['concentration', new ConcentrationDistrict(new T.Scene()) as never, { functionModules: 3 }, { functionModules: 5 }],
+  ['automation', new AutomationDistrict(new T.Scene()) as never, at({ nw: -3 }), at({ nw: 3 })],
+  ['sharing', new SharingDistrict(new T.Scene()) as never, at({ sw: -3 }), at({ sw: 3 })],
+  ['concentration', new ConcentrationDistrict(new T.Scene()) as never, at({ se: -3 }), at({ se: 3 })],
 ];
 for (const [name, district, low, high] of pulseCases) {
   district.setTarget(low as never, 0, true); district.update(.5);
@@ -353,7 +357,7 @@ for (const score of [-7.5, 0, 7.5]) {
 assert.ok(trail.color.equals(civicTrail)); assert.equal(publicLight.emissiveIntensity, civicEmission);
 const highLife = deriveExhibitionLayout({ automation: 7.5, publicSharing: 7.5, environmentalPriority: 7.5, urbanConcentration: 7.5 });
 life.setTarget(highLife, 30, true);
-life.setTarget({ ...highLife, sharedSeats: 0 }, 30, false); life.update(31.5, 1);
+life.setTarget({ ...highLife, tiers: { ...highLife.tiers, sw: -3 } }, 30, false); life.update(31.5, 1);
 assert.equal(life.getDiagnostics().plazaPeople, 0, 'crowds clear before private gardens grow');
 life.setTarget(highLife, 31.5, true); life.update(31.5, 1);
 assert.equal(life.getDiagnostics().plazaPeople, 96, 'snapshot immediately restores settled crowd');
@@ -379,6 +383,32 @@ for (const controller of [district, automation, sharing, concentration]) {
 const lowFunctions = deriveExhibitionLayout({ automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: -12 });
 concentration.setTarget(lowFunctions, 220, true);
 const lowConfig = concentration.getConfiguration();
-concentration.setTarget({ ...lowFunctions, automatedPorts: 6, plantedFraction: .8 }, 221, true);
+concentration.setTarget({ ...lowFunctions, tiers: { ...lowFunctions.tiers, nw: 3, ne: 3 } }, 221, true);
 assert.deepEqual(concentration.getConfiguration(), lowConfig, 'forest/dock flags on absent towers never claim visible change');
 console.log('PASS: P3 carrier evidence covers uniform seed no-op, same-score redistribution, animation-independent targets and hidden pairings.');
+
+// Ladder: rung 1 is the focal site only (the district stays mixed); rung 2 switches about half; rung 3 completes it, and with the
+// district's frozen seed each rung's switched slots nest inside the next, so climbing never reshuffles.
+{
+  const a = new AutomationDistrict(new T.Scene()), staffed = (a as unknown as { staffed: SlotLevels }).staffed;
+  const ports = (tier: number) => { a.setTarget(at({ nw: tier }), 0, true, 1234); return [...staffed.targets].map(v => v === 0); };
+  const config = (tier: number) => { a.setTarget(at({ nw: tier }), 0, true, 1234); return JSON.stringify(a.getConfiguration()); };
+  assert.equal(config(1), config(0), 'rung 1 leaves the district mixed');
+  assert.equal(config(-1), config(0));
+  const counts = [0, 2, 3].map(tier => ports(tier).filter(Boolean).length);
+  assert.ok(counts[0] < counts[1] && counts[1] < counts[2] && counts[2] === staffed.targets.length, `drone ports climb ${counts}`);
+  const [p0, p2] = [ports(0), ports(2)];
+  assert.ok(p0.every((port, i) => !port || p2[i]), 'rung 2 keeps every mixed drone port');
+  a.setTarget(at({ nw: 2 }), 0, true, 1234);
+  assert.equal(a.getDiagnostics().loopAircraft, 16, 'fleets stay mixed until rung 3');
+  a.setTarget(at({ nw: 3 }), 0, true, 1234);
+  assert.equal(a.getDiagnostics().loopAircraft, 30);
+  const sh = new SharingDistrict(new T.Scene()), open = (tier: number) => { sh.setTarget(at({ sw: tier }), 0, true, 99); return sh.getDiagnostics().visibleOpenRooms; };
+  assert.ok(open(-3) <= open(-2) && open(-2) <= open(0) && open(0) <= open(2) && open(2) <= open(3) && open(-3) < open(3));
+  // A quiet live change animates without pulses (another site carries the headline).
+  a.setTarget(at({ nw: 2 }), 10, false, 1234, true); a.update(10.5);
+  assert.equal(a.getDiagnostics().activePulses, 0);
+  a.setTarget(at({ nw: 3 }), 11, false, 1234); a.update(11.5);
+  assert.ok(a.getDiagnostics().activePulses > 0);
+  console.log(`PASS: ladder rungs — focal-only rung 1, drone ports ${counts} at rungs 0/2/3 nested, fleets at rung 3, quiet live changes.`);
+}

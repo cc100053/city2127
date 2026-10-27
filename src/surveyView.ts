@@ -25,6 +25,8 @@ export type ExhibitionLayout = {
   version: 2;
   energy?: EnergyConfiguration;
   bands: Record<LotSocketId, Band>;
+  /** Ladder rung per site, −3..3 (survey cityView `ladderLayout`). */
+  tiers: Record<LotSocketId, number>;
   automatedPorts: number;
   sharedSeats: number;
   treeCount: number;
@@ -104,11 +106,13 @@ function isIntegerScores(value: unknown, min: number, max: number): value is Sco
 }
 
 function isExhibitionLayout(value: unknown): value is ExhibitionLayout {
-  if (!isRecord(value) || !hasExactKeys(value, ['version', 'bands', 'automatedPorts', 'sharedSeats', 'treeCount', 'plantedFraction', 'coolingFins', 'functionModules', ...(Object.hasOwn(value, 'energy') ? ['energy'] : [])])
+  if (!isRecord(value) || !hasExactKeys(value, ['version', 'bands', 'tiers', 'automatedPorts', 'sharedSeats', 'treeCount', 'plantedFraction', 'coolingFins', 'functionModules', ...(Object.hasOwn(value, 'energy') ? ['energy'] : [])])
     || (Object.hasOwn(value, 'energy') && !isEnergyConfiguration(value.energy))
-    || value.version !== 2 || !isRecord(value.bands) || !hasExactKeys(value.bands, LOT_SOCKET_IDS)) return false;
-  const bands = value.bands;
-  return LOT_SOCKET_IDS.every(id => isOneOf(bands[id], ['low', 'mixed', 'high']))
+    || value.version !== 2 || !isRecord(value.bands) || !hasExactKeys(value.bands, LOT_SOCKET_IDS)
+    || !isRecord(value.tiers) || !hasExactKeys(value.tiers, LOT_SOCKET_IDS)) return false;
+  const bands = value.bands, tiers = value.tiers;
+  return LOT_SOCKET_IDS.every(id => isOneOf(bands[id], ['low', 'mixed', 'high']) && Number.isInteger(tiers[id]) && isFiniteBetween(tiers[id], -3, 3)
+      && bands[id] === (tiers[id] as number > 0 ? 'high' : tiers[id] as number < 0 ? 'low' : 'mixed'))
     && Number.isInteger(value.automatedPorts) && isFiniteBetween(value.automatedPorts, 0, 6)
     && Number.isInteger(value.sharedSeats) && isFiniteBetween(value.sharedSeats, 0, 8)
     && Number.isInteger(value.treeCount) && isFiniteBetween(value.treeCount, 3, 12)
@@ -122,7 +126,7 @@ const EXHIBITION_SITE_FIELDS: Record<LotSocketId, readonly (keyof ExhibitionLayo
   sw: ['sharedSeats'], se: ['functionModules'],
 };
 const exhibitionSiteChanged = (before: ExhibitionLayout, after: ExhibitionLayout, id: LotSocketId) =>
-  before.bands[id] !== after.bands[id] || EXHIBITION_SITE_FIELDS[id].some(key => before[key] !== after[key]);
+  before.bands[id] !== after.bands[id] || before.tiers[id] !== after.tiers[id] || EXHIBITION_SITE_FIELDS[id].some(key => before[key] !== after[key]);
 
 function isProposalAnswer(value: unknown): value is ProposalAnswer {
   return isRecord(value) && hasExactKeys(value, ['questionId', 'optionId', 'questionText', 'optionLabel'])
@@ -136,8 +140,8 @@ function isVotes(value: unknown): value is Scores {
 }
 
 function isChangeValues(value: unknown, layout: ExhibitionLayout, socketId: LotSocketId): value is Record<string, number | string> {
-  if (!isRecord(value) || !isOneOf(value.band, ['low', 'mixed', 'high']) || value.band !== layout.bands[socketId]) return false;
-  return hasExactKeys(value, ['band', ...EXHIBITION_SITE_FIELDS[socketId]])
+  if (!isRecord(value) || !isOneOf(value.band, ['low', 'mixed', 'high']) || value.band !== layout.bands[socketId] || value.tier !== layout.tiers[socketId]) return false;
+  return hasExactKeys(value, ['band', 'tier', ...EXHIBITION_SITE_FIELDS[socketId]])
     && EXHIBITION_SITE_FIELDS[socketId].every(key => value[key] === layout[key]);
 }
 
@@ -208,7 +212,7 @@ function sameScores(a: Scores, b: Scores): boolean {
 
 function sameLayout(a: ExhibitionLayout, b: ExhibitionLayout): boolean {
   return sameEnergyConfiguration(a.energy ?? emptyEnergyConfiguration(), b.energy ?? emptyEnergyConfiguration())
-    && a.version === b.version && LOT_SOCKET_IDS.every(id => a.bands[id] === b.bands[id])
+    && a.version === b.version && LOT_SOCKET_IDS.every(id => a.bands[id] === b.bands[id] && a.tiers[id] === b.tiers[id])
     && ['automatedPorts', 'sharedSeats', 'treeCount', 'plantedFraction', 'coolingFins', 'functionModules']
       .every(key => a[key as keyof ExhibitionLayout] === b[key as keyof ExhibitionLayout]);
 }

@@ -37,7 +37,7 @@ const EXHIBITION_LABELS: Record<string, string> = {
   environmentalPriority: '暑さへの備え', urbanConcentration: '機能の配置',
 };
 const EXHIBITION_FIELD_LABELS: Record<string, string> = {
-  band: 'Meter帯', automatedPorts: '自律サービス端口', sharedSeats: '共有席',
+  band: 'Meter帯', tier: '段階', automatedPorts: '自律サービス端口', sharedSeats: '共有席',
   treeCount: '樹冠', plantedFraction: '植栽面', coolingFins: '冷却設備', functionModules: '機能モジュール',
 };
 const signed = (n: number) => (n > 0 ? `+${n}` : String(n));

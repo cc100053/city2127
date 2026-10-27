@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { CITY_AXES, initialExhibitionState, zeroScores, type CityAxis, type ExhibitionState, type ExhibitionVotes, type Vote } from '../src/shared/citySurveyState.ts';
-import { deriveExhibitionLayout, exhibitionBand, exhibitionDisplayScores, exhibitionScaleGain, exhibitionStateLayout, type ExhibitionSocketId } from '../src/shared/cityView.ts';
+import { deriveExhibitionLayout, exhibitionBand, exhibitionDisplayScores, exhibitionScaleGain, initialLadder, ladderGap, ladderLayout, ladderStep, pickHeadline, type ExhibitionLadder, type ExhibitionSocketId } from '../src/shared/cityView.ts';
 import { loadQuestionSetFile, QuestionSetError, validateExhibitionQuestionSet } from '../src/survey/questionLoader.ts';
 import { applyProposalVotes, validateExhibitionState } from '../src/survey/scoreEngine.ts';
 
@@ -97,11 +97,57 @@ for (let n = 1; n < 20; n++) assert.ok(exhibitionScaleGain(n + 1) >= exhibitionS
 assert.equal(exhibitionDisplayScores({ ...zeroScores(), automation: 7.5 }, 1).automation, 6.375);
 assert.equal(exhibitionDisplayScores({ ...zeroScores(), automation: 7.5 }, 12).automation, 12);
 assert.equal(exhibitionDisplayScores({ ...zeroScores(), automation: -1.5 }, 40).automation, -3.5999999999999996);
-assert.deepEqual(exhibitionStateLayout(zeroScores(), 40), baseline, 'neutral city is unchanged by the scale');
-// A late Meter of 1.5 is mixed in raw terms but high on Scale A; the opening guest cannot reach the extreme.
-assert.equal(exhibitionStateLayout({ ...zeroScores(), automation: 1.5 }, 40).bands.nw, 'high');
-assert.equal(exhibitionStateLayout({ ...zeroScores(), automation: 7.5 }, 1).automatedPorts, 5);
-assert.throws(() => exhibitionStateLayout({ ...zeroScores(), automation: 13 }, 5), RangeError);
+assert.deepEqual(ladderLayout(initialLadder().tiers), baseline, 'the neutral ladder is the mixed city');
+
+// Ladder: rungs at |D| 1.5 / 4 / 7; returning toward mixed needs D a further 2 past the edge.
+for (const [tier, d, gap] of [[0, 1.4, 0], [0, 1.5, 1], [0, 4, 2], [0, 12, 3], [0, -7, -3], [1, 0, 0], [1, -.4, 0], [1, -.5, -1], [2, 2.1, 0], [2, 2, -1],
+  [3, 5.1, 0], [3, 5, -1], [-1, .5, 1], [-1, .4, 0], [-3, -12, 0], [1, -12, -4]] as const) assert.equal(ladderGap(tier, d), gap, `gap(${tier}, ${d})`);
+assert.deepEqual(deriveExhibitionLayout({ ...zeroScores(), automation: 4, publicSharing: -1.5, urbanConcentration: 7 }).tiers, { nw: 2, ne: 0, sw: -1, se: 3 });
+// Focal values switch completely at rung 1; districts read the tier itself.
+assert.deepEqual([1, 2, 3].map(tier => ladderLayout({ nw: tier, ne: 0, sw: -tier, se: 0 })).map(l => [l.automatedPorts, l.sharedSeats, l.bands.nw, l.bands.sw]),
+  [[6, 0, 'high', 'low'], [6, 0, 'high', 'low'], [6, 0, 'high', 'low']]);
+
+// A leaning crowd: every proposal moves at most one site one rung, the first guest exactly one, and slot seeds freeze at rung 2.
+{
+  let state = initialExhibitionState('ladder', 't0'), ladder: ExhibitionLadder = initialLadder();
+  const seeds = { ...zeroScores(), automation: 11, publicSharing: 22, environmentalPriority: 33, urbanConcentration: 44 };
+  for (let i = 0; i < 30; i++) {
+    const v: ExhibitionVotes = { automation: 1, publicSharing: i % 3 ? -1 : 0, environmentalPriority: 0, urbanConcentration: i % 2 ? 1 : -1 };
+    state = add(state, v);
+    seeds.automation += i;
+    const next = ladderStep(ladder, state, v, seeds);
+    const moved = (Object.keys(next.tiers) as ExhibitionSocketId[]).filter(id => next.tiers[id] !== ladder.tiers[id]);
+    assert.ok(moved.length <= 1 && moved.every(id => Math.abs(next.tiers[id] - ladder.tiers[id]) === 1), `proposal ${i + 1} moved ${moved}`);
+    if (i === 0) assert.deepEqual(next.tiers, { nw: 0, ne: 0, sw: 0, se: -1 }, 'guest #1 (rotation ne, sw, se, nw): only the concentration focal site');
+    if (Math.abs(next.tiers.nw) === 2 && ladder.seeds.automation === 0) assert.equal(next.seeds.automation, seeds.automation, 'seed adopted at rung 2');
+    else if (ladder.seeds.automation) assert.equal(next.seeds.automation, ladder.seeds.automation, 'seed stays frozen');
+    ladder = next;
+  }
+  assert.equal(ladder.tiers.nw, 3, 'a steady automation crowd climbs the whole ladder');
+  assert.notEqual(ladder.seeds.automation, 0);
+}
+// Ties prefer a site the guest voted toward over the rotation's first site.
+{
+  const after = { scores: { ...zeroScores(), automation: 5, publicSharing: 5 }, guestCount: 20 };
+  const step = (v: Partial<ExhibitionVotes>) => ladderStep(initialLadder(), after, { ...votes(0), ...v }, zeroScores()).tiers;
+  assert.deepEqual(step({ publicSharing: 1 }), { nw: 0, ne: 0, sw: 1, se: 0 });
+  assert.deepEqual(step({ automation: 1 }), { nw: 1, ne: 0, sw: 0, se: 0 });
+  assert.deepEqual(step({}), { nw: 1, ne: 0, sw: 0, se: 0 }, 'guest #20 rotation starts at nw');
+}
+
+// Headline: highest tier newly reached, else the largest carrier change, else energy.
+{
+  const at = (nw: number, sw: number, se = 0, ne = 0) => ladderLayout({ nw, ne, sw, se });
+  assert.deepEqual(pickHeadline(at(0, 0), at(1, 0)), { socketId: 'nw' });
+  assert.deepEqual(pickHeadline(at(1, 2), at(2, 3)), { socketId: 'sw' }, 'the higher rung wins');
+  assert.deepEqual(pickHeadline(at(0, -2), at(1, -3)), { socketId: 'sw' }, 'rung height is symmetric');
+  assert.deepEqual(pickHeadline(at(0, 0), { ...at(0, 0), automatedPorts: 5, sharedSeats: 5, bands: { ...at(0, 0).bands, sw: 'high' } }), { socketId: 'sw' }, 'largest carrier change');
+  const water = (n: 0 | 1 | 2) => ({ ...at(1, 0), energy: { waterGardens: n, receiver: 'none' as const, flywheel: false, island: false } });
+  assert.deepEqual(pickHeadline(water(0), water(1)), { energy: true });
+  assert.deepEqual(pickHeadline({ ...water(0), tiers: { ...water(0).tiers, nw: 0 } }, water(1)), { socketId: 'nw' }, 'a tier beats energy');
+  assert.equal(pickHeadline(water(1), water(1)), undefined);
+  assert.equal(pickHeadline(at(1, 0), water(0)), undefined, 'absent energy equals the empty configuration');
+}
 
 const questionPath = new URL('../src/survey/questions.exhibition.v3.json', import.meta.url).pathname;
 const questionSet = validateExhibitionQuestionSet(loadQuestionSetFile(questionPath));
