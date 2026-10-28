@@ -16,7 +16,7 @@ export const SHOTS: Record<ShotId, Pose> = {
   'nw:district': { position: [-180, 180, -470], target: [10, 28, -210] },
   'ne:district': { position: [-390, 270, -310], target: [-250, 0, -170] },
   'sw:district': { position: [-160, 420, -400], target: [-120, 5, -260] },
-  'se:district': { position: [-250, 320, -420], target: [-100, 20, -180] },
+  'se:district': { position: [-200, 300, -365], target: [15, 35, -80] },
   'energy:garden': { position: [-420, 65, -210], target: [-304, 12, -135] },
   'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },
   'energy:ring': { position: [-118, 148, -138], target: [-18, 96, -24] },

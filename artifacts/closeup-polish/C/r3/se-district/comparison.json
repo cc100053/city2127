@@ -1,0 +1,272 @@
+{
+  "mode": "compare",
+  "commit": "6a82b1cbd154566e6527923bf1097ee9ff3a9ac4",
+  "sourceDiff": "diff --git a/src/headlineCamera.ts b/src/headlineCamera.ts\nindex 2e85d2d..ee1f70b 100644\n--- a/src/headlineCamera.ts\n+++ b/src/headlineCamera.ts\n@@ -16,7 +16,7 @@ export const SHOTS: Record<ShotId, Pose> = {\n   'nw:district': { position: [-180, 180, -470], target: [10, 28, -210] },\n   'ne:district': { position: [-390, 270, -310], target: [-250, 0, -170] },\n   'sw:district': { position: [-160, 420, -400], target: [-120, 5, -260] },\n-  'se:district': { position: [-250, 320, -420], target: [-100, 20, -180] },\n+  'se:district': { position: [-200, 300, -365], target: [15, 35, -80] },\n   'energy:garden': { position: [-420, 65, -210], target: [-304, 12, -135] },\n   'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },\n   'energy:ring': { position: [-118, 148, -138], target: [-18, 96, -24] },\n",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.02996618933067054,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.02577523223795691,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.024287050905753248,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.0231915969448479,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.06847630277676914,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "low-solar",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.028099962833494054,
+      "rect": {
+        "x": 0,
+        "y": 104,
+        "width": 1920,
+        "height": 976
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "8",
+      "to": "high-forest",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.021792791923868314,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "8",
+      "to": "high-docks",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.0336113538136448,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.02764144136306786,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.02179813327079803,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.01850267792302106,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.028129480856128458,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.05800485342027758,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "low-solar",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.023970990035358405,
+      "rect": {
+        "x": 0,
+        "y": 104,
+        "width": 1920,
+        "height": 976
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "8",
+      "to": "high-forest",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.023542694212458647,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "8",
+      "to": "high-docks",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.04084579689643347,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}

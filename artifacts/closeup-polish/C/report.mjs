@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync,readdirSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {basename,join} from 'node:path';
+import {SHOTS} from '../../../src/headlineCamera.ts';
+import {HERO_POSITION,HERO_TARGET} from '../../../src/heroCamera.ts';
 const read=p=>JSON.parse(readFileSync(p,'utf8')),mean=a=>a.reduce((n,x)=>n+x,0)/a.length;
 const gate=(fps,calls,oldFps,oldCalls)=>fps>=oldFps*.95&&calls<=oldCalls*1.1;
 if(process.argv.includes('--self-test')){
@@ -28,8 +30,13 @@ for(const [id,rounds]of Object.entries(plan)){
   const perf=p.rows.map(r=>{const old=s0p.rows.find(b=>b.id===r.id&&b.hour===r.hour),calls=mean(r.rounds.map(t=>Number(t.diagnostics.drawCalls))),oldCalls=mean(old.rounds.map(t=>Number(t.diagnostics.drawCalls)));return {id:r.id,hour:r.hour,round:index+1,directory:dir,fps:r.meanFps,baselineFps:old.meanFps,fpsRatio:r.meanFps/old.meanFps,calls,baselineCalls:oldCalls,minimumFps:old.meanFps*.95,maximumCalls:oldCalls*1.1,pass:gate(r.meanFps,calls,old.meanFps,oldCalls)};});
   all.push({id,directory:dir,states:c.rows.length,A4:a4.rows.filter(r=>r.pass).length,A4pairs:a4.rows.length,browser:c.browser});performance.push(...perf);
   if(index!==rounds.length-1)continue;
+  const source=read(`${root}/${dir}/source-hashes.json`).sha256;
+  const primary=id==='se:focal'?'src/siteBuilders/concentrationTower.ts':id==='se:district'?'src/districtMeters.ts':'src/energyPrototype.ts';
+  assert.equal(source[primary],hash(primary),'Final primary builder must match its measured source');
   comparisons.push(...a4.rows.map(r=>({...r,directory:dir})));
   for(const r of c.rows){
+   const pose=r.id==='hero'?{position:HERO_POSITION,target:HERO_TARGET}:SHOTS[r.id];for(const field of ['position','target'])assert.ok(r.pose[field].every((n,i)=>Math.abs(n-pose[field][i])<1e-5),'Final measured pose must match the final table');
+   if(id==='se:district')assert.equal(JSON.parse(r.diagnostics.energy).target.flywheel,false,'Later ring polish must remain hidden in the measured Meter matrix');
    const k=`${id}/${key(r)}`,v=visual.rows[k],old=s0.rows.find(b=>key(b)===key(r)),ref=perf.find(p=>p.id===r.id&&p.hour===r.hour),absent=r.id.startsWith('energy:')&&r.frame?.reason==='subject absent in this state';
    assert.equal(v.image,`${dir}/${basename(r.images[1])}`);assert.ok(visual.reviewedOriginals.includes(v.image));assert.ok(['V1','V2','V3','V4','V5','V6'].every(k=>v.V1_V6[k]?.length===2&&v.V1_V6[k][0]!=='PENDING'));
    const mark=k=>r.id==='hero'||absent?'N/A':r.auto[k]===true?'PASS':r.auto[k]===false?'FAIL':'FAIL (unmeasurable)';
