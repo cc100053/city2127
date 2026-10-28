@@ -4,7 +4,7 @@
 ## E5本機驗收續作（2026-10-24）
 
 - Owner：Codex；產品決策cc100053。
-- Status：PARTIAL（E5整體）；本輪Mac限定量測、TCP復原及整合local gate已完成，main發布／CI待核對。使用者將範圍明確限定「test this mac mini only」。只完成可用Mac的性能／操作；E5整體、HDMI／iPad／專用LAN及真人理解不推論完成。
+- Status：PARTIAL（E5整體）；本輪Mac限定量測、TCP復原及整合local gate已完成，main發布及CI已核實（見下方Next）。使用者將範圍明確限定「test this mac mini only」。只完成可用Mac的性能／操作；E5整體、HDMI／iPad／專用LAN及真人理解不推論完成。
 - Branch：`codex/energy-city-e5`；獨立clone `/private/tmp/city2127-energy-plan-20261024`。
 - Base：`66c6adf5b76c071e338b37620bedf42b134cb33f`；本輪開始乾淨main，fresh fetch後與origin/main 0／0。E4 runtime `90dbc5b`及docs closure `66c6adf`都在remote。
 - Last verified commit：`64b0887492dff1334913a9e043c0eb71b63de4a4`（no-ff整合，root npm test／build及392 links／whitespace全通過）；source `96d35f416ad0e32c727c68ca5a1c811114592e19`。
@@ -21,7 +21,7 @@
 - Local validation：root完整npm test（含最後E5統計self-check、舊81／新108答案及324幾何情境）／build PASS，既有>500kB chunk warning；最後欄位命名修正後完整gate再次PASS。Survey build為browser準備PASS，survey／module-swap source沒改，本機沒有另跑兩套package tests；main CI仍需核對。文件／diff／所有新source及6張保留截圖已自審；392個本機links／anchors／targets、兩輪runtime／archived runner及最終pointer probe hash全部PASS；Git紀錄待收尾。
 - Integrated validation PASS：整合前fresh fetch確認main仍`66c6adf`；`64b0887` tree與`96d35f4`完全一致。整合後root完整npm test（含E5 self-check）／npm run build、392個links／anchors／targets、committed `git diff --check origin/main..HEAD`全部PASS；之後只有本段及零提案用語等Markdown metadata，沒有runtime／runner／artifact數據差異。
 - Cleanup PASS：兩輪runner的scratch DB／HTTP／WebSocket及Chrome均在finally關閉；兩個Vite session已停止exit130，最後短probe亦關閉Chrome。原checkout及既有`.playwright-cli/`／截圖未改。
-- Next：本機範圍與整合gate已完成，待main發布與CI紀錄；之後由owner另行安排展覽硬件／真人與整日門檻，本輪不等待或宣稱已通過。
+- Next：本機範圍與整合gate已完成；2026-10-29核實紀錄commit `db772bb`（含整合`64b0887`）已在main，[main CI 40069808324](https://github.com/cc100053/city2127/actions/runs/40069808324) success。之後由owner另行安排展覽硬件／真人與整日門檻，本輪不等待或宣稱已通過；固定hero鎖鏡重量見[closeup-next](closeup-next.md) F3。
 
 ---
 

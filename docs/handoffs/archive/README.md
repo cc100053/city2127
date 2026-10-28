@@ -2,12 +2,13 @@
 
 2026-10-03 建立（Codex）；2026-10-13 加入7份已完成交接。返回 [現行交接](../README.md)／[文件索引](../../README.md)。
 
-以下50份交接已完成、已整合或被後續階段取代。保留原本日期、owner、commit、驗證限制與下一步歷史；舊分支／舊「待整合」或「下一步」不代表現行指示。Shibuya 已結束，不再開發。
+以下53份交接已完成、已整合或被後續階段取代。保留原本日期、owner、commit、驗證限制與下一步歷史；舊分支／舊「待整合」或「下一步」不代表現行指示。Shibuya 已結束，不再開發。
 
 歸檔不等於未達成的視覺目標、實機／Windows／各工作站 Blender 驗證已通過。仍待處理的台場素材、P6/S5、延後 polish、LAN 雙站、P5 實機驗收及回顧章節見現行交接；展覽機 FPS、Fuji TV 目標細節、一票旅程光點大小等限制保留喺各自交接；產品與驗證 authority 仍是 [SPEC](../../EXHIBITION_SPEC.md)／[VALIDATION](../../VALIDATION.md)。Meter截圖跟隨其交接歸檔，圖片內容不變。
 
 | Task | 原標題 |
 | --- | --- |
+| [energy-demo-camera](energy-demo-camera.md) | energy-demo-camera — DEV能源近鏡講解時間原型（2026-10-27；2026-10-29歸檔，被headline近鏡取代） |
 | [intro-origin-card](intro-origin-card.md) | intro-origin-card — 開場「街は、誰が決めるのか。」卡同 README 作品概念（2026-10-19） |
 | [guest-handoff-wait-notice](guest-handoff-wait-notice.md) | guest-handoff-wait-notice — 交接畫面等待提示（2026-10-15） |
 | [vote-journey](vote-journey.md) | vote-journey — 一票旅程接入 live 展示 |
