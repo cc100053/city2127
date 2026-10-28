@@ -1,6 +1,6 @@
 {
-  "checkedUTC": "2026-10-28T23:25:23.578046+00:00",
-  "localMarkdownLinks": 1223,
+  "checkedUTC": "2026-10-28T23:29:32.270486+00:00",
+  "localMarkdownLinks": 1225,
   "brokenLinks": [],
   "originals": {
     "S0": 234,
@@ -17,5 +17,6 @@
   "snapshotPairs": 202,
   "threeColumnRows": 98,
   "sqliteArtifacts": [],
-  "selfReview": "Exact Z-only diff, scripts and source callers reviewed; generated measurements checked by report assertions and original manifests. All failed gates retained."
+  "selfReview": "Exact Z-only diff, scripts and source callers reviewed; generated measurements checked by report assertions and original manifests. All failed gates retained.",
+  "generatedMarkdownWhitespace": "PASS after fix-forward; original failed output preserved in final-checks/generated-markdown-diff-failure.json"
 }

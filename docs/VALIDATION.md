@@ -429,3 +429,5 @@ Owner `01a183af-1ca0-7190-a25c-b31a6db4fd98`，base `4a3ad9f`／runtime `44521a0
 [Z紀錄](../artifacts/closeup-polish/Z/README.md)保留實際quota恢復、首個sandbox DNS／listen EPERM及成功retry；同一background程序完成perf/A4後重驗，未替換樣本。Z共222 originals，另20張行為圖以original detail檢視。[Cleanup](../artifacts/closeup-polish/Z/cleanup.json)核對cwd後關閉Vite5194／preview5195，9個已記錄ports bind free、owned Chrome／runner／scratch SQLite清場；smoke未記ephemeral port，僅記exit/finally及temp清場，沒有虛報bind。
 
 只測開發Mac Chrome156.0.8078.73（S0 .48），累積source／未控制機器背景及熱狀態，不能當同版本隔離優化。展示硬件、Safari/iPad／Windows、實體HDMI、長跑、真人理解及完整動態閃爍未驗。A–D美術pending，未merge main／部署；實際feature checkpoint、remote0/0及release統一記在result-Z-1.json。
+
+Z報告generator的行尾空白首次staged/branch diff檢查FAIL亦保存為[原始輸出JSON](../artifacts/closeup-polish/Z/final-checks/generated-markdown-diff-failure.json)；80f3adc已push後以fix-forward修正separator與輸出assert，未改數值／原圖／runtime，stage所有產生檔再檢查整條feature結果。

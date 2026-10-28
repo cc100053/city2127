@@ -87,7 +87,7 @@ S0→Z：鏡位由側向轉正面，服務入口三個深框較S0可見；主體
 
 Sector-last→Z：與D r3同pose／本體；本圖屋頂植栽盤面的動態外觀有差異，沒有新增主體改善，仍保留身份缺口。
 
-[D last original eebff28](../D/r3/nw-focal/nw-focal__-2__h12.jpg) · 
+[D last original eebff28](../D/r3/nw-focal/nw-focal__-2__h12.jpg)
 
 S0→Z full MAD 25.654%、subject-union 24.646%、pose changed；D-last→Z full MAD 1.106%、subject-union 0.538%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -116,7 +116,7 @@ S0→Z：正面服務框較S0側面能看見，但夜間仍與普通深藍辦公
 
 Sector-last→Z：與D r3同構圖及入口；背景盤面微差，主體與夜間可讀性缺口保持。
 
-[D last original eebff28](../D/r3/nw-focal/nw-focal__-2__h22.jpg) · 
+[D last original eebff28](../D/r3/nw-focal/nw-focal__-2__h22.jpg)
 
 S0→Z full MAD 23.108%、subject-union 20.479%、pose changed；D-last→Z full MAD 1.100%、subject-union 0.434%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -145,7 +145,7 @@ S0→Z：正面三槽及淺色終端比S0側面可見，但服務混合功能仍
 
 Sector-last→Z：與D r3相同主體／pose，未見新的主體退步或改善；背景植栽盤／AO重載微差另以像素量度記錄。
 
-[D last original eebff28](../D/r3/nw-focal/nw-focal__0__h12.jpg) · 
+[D last original eebff28](../D/r3/nw-focal/nw-focal__0__h12.jpg)
 
 S0→Z full MAD 25.698%、subject-union 24.651%、pose changed；D-last→Z full MAD 0.602%、subject-union 0.531%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -174,7 +174,7 @@ S0→Z：混合態正面終端比S0側視可見，但夜景仍欠人機共用服
 
 Sector-last→Z：與D r3同主體及pose，夜間可讀性沒有新增改善，背景微差不作局部優化。
 
-[D last original eebff28](../D/r3/nw-focal/nw-focal__0__h22.jpg) · 
+[D last original eebff28](../D/r3/nw-focal/nw-focal__0__h22.jpg)
 
 S0→Z full MAD 23.120%、subject-union 20.498%、pose changed；D-last→Z full MAD 1.204%、subject-union 0.449%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -203,7 +203,7 @@ S0→Z：正面取向及底層服務框比S0側面改善，但高態與旁邊普
 
 Sector-last→Z：主體及pose與D r3一致，當前累積source未提供新的主體改善；背景盤面差異另存像素證據。
 
-[D last original eebff28](../D/r3/nw-focal/nw-focal__2__h12.jpg) · 
+[D last original eebff28](../D/r3/nw-focal/nw-focal__2__h12.jpg)
 
 S0→Z full MAD 25.538%、subject-union 23.488%、pose changed；D-last→Z full MAD 0.602%、subject-union 0.702%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -232,7 +232,7 @@ S0→Z：高態正面下層服務框較S0側面可見，上部環帶輪廓清楚
 
 Sector-last→Z：與D r3同樓體／pose及亮環，沒有新的主體改善或明顯退步。
 
-[D last original eebff28](../D/r3/nw-focal/nw-focal__2__h22.jpg) · 
+[D last original eebff28](../D/r3/nw-focal/nw-focal__2__h22.jpg)
 
 S0→Z full MAD 22.903%、subject-union 20.320%、pose changed；D-last→Z full MAD 1.175%、subject-union 1.237%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -261,7 +261,7 @@ S0→Z：由S0側視改為較廣的俯視海岸服務列，欄邊與支承略清
 
 Sector-last→Z：與D district r3同構圖／亭與欄邊；屋頂小盤面與AO差異可見但沒有新的服務形態改善。
 
-[D last original fbae624](../D/r3/nw-district/nw-district__-8__h12.jpg) · 
+[D last original fbae624](../D/r3/nw-district/nw-district__-8__h12.jpg)
 
 S0→Z full MAD 26.095%、subject-union 26.095%、pose changed；D-last→Z full MAD 0.774%、subject-union 0.774%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -290,7 +290,7 @@ S0→Z：由S0側視改為較廣的俯視海岸服務列，欄邊與支承略清
 
 Sector-last→Z：與D district r3同構圖／亭與欄邊；屋頂小盤面與AO差異可見但沒有新的服務形態改善。
 
-[D last original fbae624](../D/r3/nw-district/nw-district__-8__h22.jpg) · 
+[D last original fbae624](../D/r3/nw-district/nw-district__-8__h22.jpg)
 
 S0→Z full MAD 22.099%、subject-union 22.099%、pose changed；D-last→Z full MAD 0.432%、subject-union 0.432%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -319,7 +319,7 @@ S0→Z：俯視服務列與藍色drone盤較S0能一起看見；仍欠人手服�
 
 Sector-last→Z：與D r3相同盤／亭配置與鏡位；本圖延續hybrid懸空感，非新功能，背景盤面差異另量。
 
-[D last original fbae624](../D/r3/nw-district/nw-district__-5__h12.jpg) · 
+[D last original fbae624](../D/r3/nw-district/nw-district__-5__h12.jpg)
 
 S0→Z full MAD 26.225%、subject-union 26.225%、pose changed；D-last→Z full MAD 0.816%、subject-union 0.816%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -348,7 +348,7 @@ S0→Z：俯視服務列與藍色drone盤較S0能一起看見；仍欠人手服�
 
 Sector-last→Z：與D r3相同盤／亭配置與鏡位；本圖延續hybrid懸空感，非新功能，背景盤面差異另量。
 
-[D last original fbae624](../D/r3/nw-district/nw-district__-5__h22.jpg) · 
+[D last original fbae624](../D/r3/nw-district/nw-district__-5__h22.jpg)
 
 S0→Z full MAD 22.783%、subject-union 22.783%、pose changed；D-last→Z full MAD 0.447%、subject-union 0.447%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -377,7 +377,7 @@ S0→Z：較S0完整看見藍盤／白亭交替，但構圖仍俯視且載荷路
 
 Sector-last→Z：與D r3同neutral配置及pose；懸空接合感及背景盆景缺口保持，無新增主體改善。
 
-[D last original fbae624](../D/r3/nw-district/nw-district__0__h12.jpg) · 
+[D last original fbae624](../D/r3/nw-district/nw-district__0__h12.jpg)
 
 S0→Z full MAD 26.064%、subject-union 26.064%、pose changed；D-last→Z full MAD 0.826%、subject-union 0.826%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -406,7 +406,7 @@ S0→Z：較S0完整看見藍盤／白亭交替，但構圖仍俯視且載荷路
 
 Sector-last→Z：與D r3同neutral配置及pose；懸空接合感及背景盆景缺口保持，無新增主體改善。
 
-[D last original fbae624](../D/r3/nw-district/nw-district__0__h22.jpg) · 
+[D last original fbae624](../D/r3/nw-district/nw-district__0__h22.jpg)
 
 S0→Z full MAD 22.357%、subject-union 22.357%、pose changed；D-last→Z full MAD 0.450%、subject-union 0.450%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -435,7 +435,7 @@ S0→Z：比S0更集中見到多個柱盤與無人機服務列，藍色環邊較
 
 Sector-last→Z：與D r3同盤／hybrid配置與pose，沒有新增主體改善；屋頂盤面方向等像素差仍記錄。
 
-[D last original fbae624](../D/r3/nw-district/nw-district__5__h12.jpg) · 
+[D last original fbae624](../D/r3/nw-district/nw-district__5__h12.jpg)
 
 S0→Z full MAD 25.935%、subject-union 25.935%、pose changed；D-last→Z full MAD 0.709%、subject-union 0.709%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -464,7 +464,7 @@ S0→Z：比S0更集中見到多個柱盤與無人機服務列，藍色環邊較
 
 Sector-last→Z：與D r3同盤／hybrid配置與pose，沒有新增主體改善；屋頂盤面方向等像素差仍記錄。
 
-[D last original fbae624](../D/r3/nw-district/nw-district__5__h22.jpg) · 
+[D last original fbae624](../D/r3/nw-district/nw-district__5__h22.jpg)
 
 S0→Z full MAD 22.409%、subject-union 22.409%、pose changed；D-last→Z full MAD 0.733%、subject-union 0.733%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -493,7 +493,7 @@ S0→Z：新俯視較S0集中展開完整drone服務列與欄邊，但近處大�
 
 Sector-last→Z：與D r3同完整高態及pose，主體未見新增改善／退步；不同屋頂盤面方向及AO差異照量。
 
-[D last original fbae624](../D/r3/nw-district/nw-district__8__h12.jpg) · 
+[D last original fbae624](../D/r3/nw-district/nw-district__8__h12.jpg)
 
 S0→Z full MAD 26.160%、subject-union 26.160%、pose changed；D-last→Z full MAD 0.710%、subject-union 0.710%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -522,7 +522,7 @@ S0→Z：新俯視較S0集中展開完整drone服務列與欄邊，但近處大�
 
 Sector-last→Z：與D r3同完整高態及pose，主體未見新增改善／退步；不同屋頂盤面方向及AO差異照量。
 
-[D last original fbae624](../D/r3/nw-district/nw-district__8__h22.jpg) · 
+[D last original fbae624](../D/r3/nw-district/nw-district__8__h22.jpg)
 
 S0→Z full MAD 23.377%、subject-union 23.377%、pose changed；D-last→Z full MAD 0.971%、subject-union 0.971%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -551,7 +551,7 @@ S0→Z：與S0同focal pose；GLB葉簇變綠且有分片、立柱細節較明�
 
 Sector-last→Z：與A r3同park body／pose；累積D後右側白亭／盤的背景細節有差異，未見park本體新增改善。
 
-[A last original b7d5861](../A/r3/ne-focal__-2__h12.jpg) · 
+[A last original b7d5861](../A/r3/ne-focal__-2__h12.jpg)
 
 S0→Z full MAD 1.246%、subject-union 2.843%、pose same；A-last→Z full MAD 0.879%、subject-union 0.598%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -580,7 +580,7 @@ S0→Z：與S0同focal pose；GLB葉簇變綠且有分片、立柱細節較明�
 
 Sector-last→Z：與A r3同park body／pose；累積D後右側白亭／盤的背景細節有差異，未見park本體新增改善。
 
-[A last original b7d5861](../A/r3/ne-focal__-2__h22.jpg) · 
+[A last original b7d5861](../A/r3/ne-focal__-2__h22.jpg)
 
 S0→Z full MAD 1.403%、subject-union 2.394%、pose same；A-last→Z full MAD 0.917%、subject-union 0.496%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -609,7 +609,7 @@ S0→Z：與S0同focal pose；GLB葉簇變綠且有分片、立柱細節較明�
 
 Sector-last→Z：與A r3同park body／pose；累積D後右側白亭／盤的背景細節有差異，未見park本體新增改善。
 
-[A last original b7d5861](../A/r3/ne-focal__0__h12.jpg) · 
+[A last original b7d5861](../A/r3/ne-focal__0__h12.jpg)
 
 S0→Z full MAD 1.369%、subject-union 3.473%、pose same；A-last→Z full MAD 0.874%、subject-union 0.612%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -638,7 +638,7 @@ S0→Z：與S0同focal pose；GLB葉簇變綠且有分片、立柱細節較明�
 
 Sector-last→Z：與A r3同park body／pose；累積D後右側白亭／盤的背景細節有差異，未見park本體新增改善。
 
-[A last original b7d5861](../A/r3/ne-focal__0__h22.jpg) · 
+[A last original b7d5861](../A/r3/ne-focal__0__h22.jpg)
 
 S0→Z full MAD 1.481%、subject-union 2.851%、pose same；A-last→Z full MAD 1.092%、subject-union 0.513%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -667,7 +667,7 @@ S0→Z：與S0同pose／權威樹數；綠色分片葉簇減少青色塑膠感�
 
 Sector-last→Z：與A r3同主體及pose，新增D背景細節未改park；沒有新的本體改善。
 
-[A last original b7d5861](../A/r3/ne-focal__2__h12.jpg) · 
+[A last original b7d5861](../A/r3/ne-focal__2__h12.jpg)
 
 S0→Z full MAD 1.610%、subject-union 3.683%、pose same；A-last→Z full MAD 0.669%、subject-union 0.604%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -696,7 +696,7 @@ S0→Z：與S0同pose／權威樹數；綠色分片葉簇減少青色塑膠感�
 
 Sector-last→Z：與A r3同主體及pose，新增D背景細節未改park；沒有新的本體改善。
 
-[A last original b7d5861](../A/r3/ne-focal__2__h22.jpg) · 
+[A last original b7d5861](../A/r3/ne-focal__2__h22.jpg)
 
 S0→Z full MAD 1.668%、subject-union 2.967%、pose same；A-last→Z full MAD 0.914%、subject-union 0.498%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -725,7 +725,7 @@ S0→Z：構圖由S0看較多樓體改為更多海面與岸線，細化遮陽屏
 
 Sector-last→Z：與A r3同環境carrier及pose；累積D的NW白亭／盤／欄邊在背景有細節差異，環境本體未有新增改善。
 
-[A last original b7d5861](../A/r3/ne-district__-8__h12.jpg) · 
+[A last original b7d5861](../A/r3/ne-district__-8__h12.jpg)
 
 S0→Z full MAD 24.509%、subject-union 24.509%、pose changed；A-last→Z full MAD 0.758%、subject-union 0.758%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -754,7 +754,7 @@ S0→Z：構圖由S0看較多樓體改為更多海面與岸線，細化遮陽屏
 
 Sector-last→Z：與A r3同環境carrier及pose；累積D的NW白亭／盤／欄邊在背景有細節差異，環境本體未有新增改善。
 
-[A last original b7d5861](../A/r3/ne-district__-8__h22.jpg) · 
+[A last original b7d5861](../A/r3/ne-district__-8__h22.jpg)
 
 S0→Z full MAD 21.411%、subject-union 21.411%、pose changed；A-last→Z full MAD 1.245%、subject-union 1.245%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -783,7 +783,7 @@ S0→Z：改以更多海面和岸邊全列為中心，綠屏有葉層細節；�
 
 Sector-last→Z：與A r3同環境本體／pose；背景NW改動與盤面方向差異保留，未新增環境本體改善。
 
-[A last original b7d5861](../A/r3/ne-district__-5__h12.jpg) · 
+[A last original b7d5861](../A/r3/ne-district__-5__h12.jpg)
 
 S0→Z full MAD 24.487%、subject-union 24.487%、pose changed；A-last→Z full MAD 0.664%、subject-union 0.664%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -812,7 +812,7 @@ S0→Z：改以更多海面和岸邊全列為中心，綠屏有葉層細節；�
 
 Sector-last→Z：與A r3同環境本體／pose；背景NW改動與盤面方向差異保留，未新增環境本體改善。
 
-[A last original b7d5861](../A/r3/ne-district__-5__h22.jpg) · 
+[A last original b7d5861](../A/r3/ne-district__-5__h22.jpg)
 
 S0→Z full MAD 21.260%、subject-union 21.260%、pose changed；A-last→Z full MAD 1.247%、subject-union 1.247%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -841,7 +841,7 @@ S0→Z：與S0不同pose令岸線更完整，綠屏有葉層與pergola層次；�
 
 Sector-last→Z：與A r3同neutral環境主體／pose；累積NW背景操作邊與屋頂盤面差異照存，無新增主體改善。
 
-[A last original b7d5861](../A/r3/ne-district__0__h12.jpg) · 
+[A last original b7d5861](../A/r3/ne-district__0__h12.jpg)
 
 S0→Z full MAD 24.666%、subject-union 24.666%、pose changed；A-last→Z full MAD 0.667%、subject-union 0.667%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -870,7 +870,7 @@ S0→Z：與S0不同pose令岸線更完整，綠屏有葉層與pergola層次；�
 
 Sector-last→Z：與A r3同neutral環境主體／pose；累積NW背景操作邊與屋頂盤面差異照存，無新增主體改善。
 
-[A last original b7d5861](../A/r3/ne-district__0__h22.jpg) · 
+[A last original b7d5861](../A/r3/ne-district__0__h22.jpg)
 
 S0→Z full MAD 21.499%、subject-union 21.499%、pose changed；A-last→Z full MAD 1.235%、subject-union 1.235%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -899,7 +899,7 @@ S0→Z：新構圖較集中岸線綠層，屏葉細節有改善；但海面比�
 
 Sector-last→Z：與A r3同環境本體／pose，較後NW操作邊只影響背景，未新增主體改善。
 
-[A last original b7d5861](../A/r3/ne-district__5__h12.jpg) · 
+[A last original b7d5861](../A/r3/ne-district__5__h12.jpg)
 
 S0→Z full MAD 25.212%、subject-union 25.212%、pose changed；A-last→Z full MAD 0.816%、subject-union 0.816%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -928,7 +928,7 @@ S0→Z：新構圖較集中岸線綠層，屏葉細節有改善；但海面比�
 
 Sector-last→Z：與A r3同環境本體／pose，較後NW操作邊只影響背景，未新增主體改善。
 
-[A last original b7d5861](../A/r3/ne-district__5__h22.jpg) · 
+[A last original b7d5861](../A/r3/ne-district__5__h22.jpg)
 
 S0→Z full MAD 21.219%、subject-union 21.219%、pose changed；A-last→Z full MAD 1.233%、subject-union 1.233%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -957,7 +957,7 @@ S0→Z：新構圖較集中岸線綠層，屏葉細節有改善；但海面比�
 
 Sector-last→Z：與A r3同環境本體／pose，較後NW操作邊只影響背景，未新增主體改善。
 
-[A last original b7d5861](../A/r3/ne-district__8__h12.jpg) · 
+[A last original b7d5861](../A/r3/ne-district__8__h12.jpg)
 
 S0→Z full MAD 25.081%、subject-union 25.081%、pose changed；A-last→Z full MAD 0.669%、subject-union 0.669%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -986,7 +986,7 @@ S0→Z：新構圖較集中岸線綠層，屏葉細節有改善；但海面比�
 
 Sector-last→Z：與A r3同環境本體／pose，較後NW操作邊只影響背景，未新增主體改善。
 
-[A last original b7d5861](../A/r3/ne-district__8__h22.jpg) · 
+[A last original b7d5861](../A/r3/ne-district__8__h22.jpg)
 
 S0→Z full MAD 20.840%、subject-union 20.840%、pose changed；A-last→Z full MAD 1.242%、subject-union 1.242%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1015,7 +1015,7 @@ S0→Z：比S0明顯退步：主體移到遠處且中央白柱遮住座位／屋
 
 Sector-last→Z：與B r3同pose／commons body，中央柱遮擋完全保持；累積C/D背景細節不構成主體修正。
 
-[B last original 74d6c2b](../B/r3/sw-focal__-2__h12.jpg) · 
+[B last original 74d6c2b](../B/r3/sw-focal__-2__h12.jpg)
 
 S0→Z full MAD 29.913%、subject-union 31.964%、pose changed；B-last→Z full MAD 0.549%、subject-union 0.714%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1044,7 +1044,7 @@ S0→Z：比S0明顯退步：主體移到遠處且中央白柱遮住座位／屋
 
 Sector-last→Z：與B r3同pose／commons body，中央柱遮擋完全保持；累積C/D背景細節不構成主體修正。
 
-[B last original 74d6c2b](../B/r3/sw-focal__-2__h22.jpg) · 
+[B last original 74d6c2b](../B/r3/sw-focal__-2__h22.jpg)
 
 S0→Z full MAD 27.034%、subject-union 26.312%、pose changed；B-last→Z full MAD 1.771%、subject-union 0.475%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1073,7 +1073,7 @@ S0→Z：比S0主體更小且中央柱遮住座位／環頂，明顯構圖退步
 
 Sector-last→Z：與B r3同pose／commons body，中央柱遮擋完全保持；累積C/D背景細節不構成主體修正。
 
-[B last original 74d6c2b](../B/r3/sw-focal__0__h12.jpg) · 
+[B last original 74d6c2b](../B/r3/sw-focal__0__h12.jpg)
 
 S0→Z full MAD 29.653%、subject-union 31.403%、pose changed；B-last→Z full MAD 0.550%、subject-union 0.709%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1102,7 +1102,7 @@ S0→Z：比S0主體更小且中央柱遮住座位／環頂，明顯構圖退步
 
 Sector-last→Z：與B r3同pose／commons body，中央柱遮擋完全保持；累積C/D背景細節不構成主體修正。
 
-[B last original 74d6c2b](../B/r3/sw-focal__0__h22.jpg) · 
+[B last original 74d6c2b](../B/r3/sw-focal__0__h22.jpg)
 
 S0→Z full MAD 26.903%、subject-union 26.034%、pose changed；B-last→Z full MAD 1.791%、subject-union 0.476%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1131,7 +1131,7 @@ S0→Z：比S0主體更小且中央柱遮住座位／環頂，明顯構圖退步
 
 Sector-last→Z：與B r3同pose／commons body，中央柱遮擋完全保持；累積C/D背景細節不構成主體修正。
 
-[B last original 74d6c2b](../B/r3/sw-focal__2__h12.jpg) · 
+[B last original 74d6c2b](../B/r3/sw-focal__2__h12.jpg)
 
 S0→Z full MAD 29.551%、subject-union 31.186%、pose changed；B-last→Z full MAD 0.550%、subject-union 0.729%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1160,7 +1160,7 @@ S0→Z：比S0主體更小且中央柱遮住座位／環頂，明顯構圖退步
 
 Sector-last→Z：與B r3同pose／commons body，中央柱遮擋完全保持；累積C/D背景細節不構成主體修正。
 
-[B last original 74d6c2b](../B/r3/sw-focal__2__h22.jpg) · 
+[B last original 74d6c2b](../B/r3/sw-focal__2__h22.jpg)
 
 S0→Z full MAD 26.848%、subject-union 25.915%、pose changed；B-last→Z full MAD 1.791%、subject-union 0.487%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1189,7 +1189,7 @@ S0→Z：改為更高俯視，完整carrier可投影而S0跨near plane；私密�
 
 Sector-last→Z：與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。
 
-[B last original 74d6c2b](../B/r3/sw-district__-8__h12.jpg) · 
+[B last original 74d6c2b](../B/r3/sw-district__-8__h12.jpg)
 
 S0→Z full MAD 24.633%、subject-union 24.633%、pose changed；B-last→Z full MAD 0.607%、subject-union 0.607%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1218,7 +1218,7 @@ S0→Z：改為更高俯視，完整carrier可投影而S0跨near plane；私密�
 
 Sector-last→Z：與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。
 
-[B last original 74d6c2b](../B/r3/sw-district__-8__h22.jpg) · 
+[B last original 74d6c2b](../B/r3/sw-district__-8__h22.jpg)
 
 S0→Z full MAD 19.238%、subject-union 19.238%、pose changed；B-last→Z full MAD 0.942%、subject-union 0.942%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1247,7 +1247,7 @@ S0→Z：高俯視使carrier完整可投影，半球曲頂肋與開放盤更能�
 
 Sector-last→Z：與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。
 
-[B last original 74d6c2b](../B/r3/sw-district__-5__h12.jpg) · 
+[B last original 74d6c2b](../B/r3/sw-district__-5__h12.jpg)
 
 S0→Z full MAD 24.767%、subject-union 24.767%、pose changed；B-last→Z full MAD 0.610%、subject-union 0.610%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1276,7 +1276,7 @@ S0→Z：高俯視使carrier完整可投影，半球曲頂肋與開放盤更能�
 
 Sector-last→Z：與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。
 
-[B last original 74d6c2b](../B/r3/sw-district__-5__h22.jpg) · 
+[B last original 74d6c2b](../B/r3/sw-district__-5__h22.jpg)
 
 S0→Z full MAD 19.605%、subject-union 19.605%、pose changed；B-last→Z full MAD 0.948%、subject-union 0.948%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1305,7 +1305,7 @@ S0→Z：高俯視使carrier完整可投影，半球曲頂肋與開放盤更能�
 
 Sector-last→Z：與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。
 
-[B last original 74d6c2b](../B/r3/sw-district__0__h12.jpg) · 
+[B last original 74d6c2b](../B/r3/sw-district__0__h12.jpg)
 
 S0→Z full MAD 24.902%、subject-union 24.902%、pose changed；B-last→Z full MAD 0.610%、subject-union 0.610%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1334,7 +1334,7 @@ S0→Z：高俯視使carrier完整可投影，半球曲頂肋與開放盤更能�
 
 Sector-last→Z：與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。
 
-[B last original 74d6c2b](../B/r3/sw-district__0__h22.jpg) · 
+[B last original 74d6c2b](../B/r3/sw-district__0__h22.jpg)
 
 S0→Z full MAD 19.427%、subject-union 19.427%、pose changed；B-last→Z full MAD 1.412%、subject-union 1.412%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1363,7 +1363,7 @@ S0→Z：新俯視讓完整carrier可投影，開放盤與座位環可辨；較�
 
 Sector-last→Z：與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。
 
-[B last original 74d6c2b](../B/r3/sw-district__5__h12.jpg) · 
+[B last original 74d6c2b](../B/r3/sw-district__5__h12.jpg)
 
 S0→Z full MAD 24.788%、subject-union 24.788%、pose changed；B-last→Z full MAD 0.743%、subject-union 0.743%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1392,7 +1392,7 @@ S0→Z：新俯視讓完整carrier可投影，開放盤與座位環可辨；較�
 
 Sector-last→Z：與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。
 
-[B last original 74d6c2b](../B/r3/sw-district__5__h22.jpg) · 
+[B last original 74d6c2b](../B/r3/sw-district__5__h22.jpg)
 
 S0→Z full MAD 19.429%、subject-union 19.429%、pose changed；B-last→Z full MAD 0.949%、subject-union 0.949%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1421,7 +1421,7 @@ S0→Z：完整carrier由S0 near-plane不可投影改為可量度，開放環台
 
 Sector-last→Z：與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。
 
-[B last original 74d6c2b](../B/r3/sw-district__8__h12.jpg) · 
+[B last original 74d6c2b](../B/r3/sw-district__8__h12.jpg)
 
 S0→Z full MAD 24.807%、subject-union 24.807%、pose changed；B-last→Z full MAD 0.615%、subject-union 0.615%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1450,7 +1450,7 @@ S0→Z：完整carrier由S0 near-plane不可投影改為可量度，開放環台
 
 Sector-last→Z：與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。
 
-[B last original 74d6c2b](../B/r3/sw-district__8__h22.jpg) · 
+[B last original 74d6c2b](../B/r3/sw-district__8__h22.jpg)
 
 S0→Z full MAD 19.277%、subject-union 19.277%、pose changed；B-last→Z full MAD 1.363%、subject-union 1.363%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1479,7 +1479,7 @@ S0→Z：S0高桿低態改為有支承的小型服務廊／核心，避免空高
 
 Sector-last→Z：與C r3同低態服務廊／pose；累積D局部改動在此背景沒有明顯主體影響，未新增改善。
 
-[C last original 67386a4](../C/r3/se-focal/se-focal__-2__h12.jpg) · 
+[C last original 67386a4](../C/r3/se-focal/se-focal__-2__h12.jpg)
 
 S0→Z full MAD 23.178%、subject-union 24.808%、pose changed；C-last→Z full MAD 0.492%、subject-union 0.654%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1508,7 +1508,7 @@ S0→Z：S0高桿低態改為有支承的小型服務廊／核心，避免空高
 
 Sector-last→Z：與C r3同低態服務廊／pose；累積D局部改動在此背景沒有明顯主體影響，未新增改善。
 
-[C last original 67386a4](../C/r3/se-focal/se-focal__-2__h22.jpg) · 
+[C last original 67386a4](../C/r3/se-focal/se-focal__-2__h22.jpg)
 
 S0→Z full MAD 18.082%、subject-union 16.728%、pose changed；C-last→Z full MAD 0.681%、subject-union 0.516%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1537,7 +1537,7 @@ S0→Z：中態中央空隙／欄邊及核心接合有局部改善，構圖仍�
 
 Sector-last→Z：與C r3同本體／pose，未見累積D造成新的主體退步或改善。
 
-[C last original 67386a4](../C/r3/se-focal/se-focal__0__h12.jpg) · 
+[C last original 67386a4](../C/r3/se-focal/se-focal__0__h12.jpg)
 
 S0→Z full MAD 23.093%、subject-union 21.689%、pose changed；C-last→Z full MAD 0.500%、subject-union 0.583%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1566,7 +1566,7 @@ S0→Z：中態中央空隙／欄邊及核心接合有局部改善，構圖仍�
 
 Sector-last→Z：與C r3同本體／pose，未見累積D造成新的主體退步或改善。
 
-[C last original 67386a4](../C/r3/se-focal/se-focal__0__h22.jpg) · 
+[C last original 67386a4](../C/r3/se-focal/se-focal__0__h22.jpg)
 
 S0→Z full MAD 18.031%、subject-union 15.043%、pose changed；C-last→Z full MAD 0.684%、subject-union 0.439%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1595,7 +1595,7 @@ S0→Z：高塔基座轉接肋／操作接點更明確，垂直堆疊可讀；�
 
 Sector-last→Z：與C r3同本體／pose，未見累積D造成新的主體退步或改善。
 
-[C last original 67386a4](../C/r3/se-focal/se-focal__2__h12.jpg) · 
+[C last original 67386a4](../C/r3/se-focal/se-focal__2__h12.jpg)
 
 S0→Z full MAD 23.077%、subject-union 22.879%、pose changed；C-last→Z full MAD 0.509%、subject-union 0.571%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1624,7 +1624,7 @@ S0→Z：高塔基座轉接肋／操作接點更明確，垂直堆疊可讀；�
 
 Sector-last→Z：與C r3同本體／pose，未見累積D造成新的主體退步或改善。
 
-[C last original 67386a4](../C/r3/se-focal/se-focal__2__h22.jpg) · 
+[C last original 67386a4](../C/r3/se-focal/se-focal__2__h22.jpg)
 
 S0→Z full MAD 17.998%、subject-union 16.531%、pose changed；C-last→Z full MAD 0.681%、subject-union 0.448%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1653,7 +1653,7 @@ S0→Z：新pose避開S0 carrier跨near plane，可投影但全範圍仍裁切�
 
 Sector-last→Z：與C district r3同SE本體／pose；累積D的前景NW服務亭局部emission／操作邊有差異，不能當SE自身改善。
 
-[C last original 6a82b1c](../C/r3/se-district/se-district__-8__h12.jpg) · 
+[C last original 6a82b1c](../C/r3/se-district/se-district__-8__h12.jpg)
 
 S0→Z full MAD 26.047%、subject-union 26.675%、pose changed；C-last→Z full MAD 1.359%、subject-union 1.463%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1682,7 +1682,7 @@ S0→Z：新pose避開S0 carrier跨near plane，可投影但全範圍仍裁切�
 
 Sector-last→Z：與C district r3同SE本體／pose；累積D的前景NW服務亭局部emission／操作邊有差異，不能當SE自身改善。
 
-[C last original 6a82b1c](../C/r3/se-district/se-district__-8__h22.jpg) · 
+[C last original 6a82b1c](../C/r3/se-district/se-district__-8__h22.jpg)
 
 S0→Z full MAD 20.616%、subject-union 21.046%、pose changed；C-last→Z full MAD 1.086%、subject-union 1.166%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1711,7 +1711,7 @@ S0→Z：新pose避免S0 carrier跨near plane，局部連廊通道／冠層細�
 
 Sector-last→Z：與C district r3同SE本體／pose；累積D的前景NW服務亭局部emission／操作邊有差異，不能當SE自身改善。
 
-[C last original 6a82b1c](../C/r3/se-district/se-district__-5__h12.jpg) · 
+[C last original 6a82b1c](../C/r3/se-district/se-district__-5__h12.jpg)
 
 S0→Z full MAD 25.857%、subject-union 25.857%、pose changed；C-last→Z full MAD 0.831%、subject-union 0.831%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1740,7 +1740,7 @@ S0→Z：新pose避免S0 carrier跨near plane，局部連廊通道／冠層細�
 
 Sector-last→Z：與C district r3同SE本體／pose；累積D的前景NW服務亭局部emission／操作邊有差異，不能當SE自身改善。
 
-[C last original 6a82b1c](../C/r3/se-district/se-district__-5__h22.jpg) · 
+[C last original 6a82b1c](../C/r3/se-district/se-district__-5__h22.jpg)
 
 S0→Z full MAD 20.805%、subject-union 20.805%、pose changed；C-last→Z full MAD 1.424%、subject-union 1.424%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1769,7 +1769,7 @@ S0→Z：新pose避免S0 carrier跨near plane，局部連廊通道／冠層細�
 
 Sector-last→Z：與C district r3同SE本體／pose；累積D的前景NW服務亭局部emission／操作邊有差異，不能當SE自身改善。
 
-[C last original 6a82b1c](../C/r3/se-district/se-district__0__h12.jpg) · 
+[C last original 6a82b1c](../C/r3/se-district/se-district__0__h12.jpg)
 
 S0→Z full MAD 25.912%、subject-union 25.912%、pose changed；C-last→Z full MAD 1.366%、subject-union 1.366%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1798,7 +1798,7 @@ S0→Z：新pose避免S0 carrier跨near plane，局部連廊通道／冠層細�
 
 Sector-last→Z：與C district r3同SE本體／pose；累積D的前景NW服務亭局部emission／操作邊有差異，不能當SE自身改善。
 
-[C last original 6a82b1c](../C/r3/se-district/se-district__0__h22.jpg) · 
+[C last original 6a82b1c](../C/r3/se-district/se-district__0__h22.jpg)
 
 S0→Z full MAD 21.351%、subject-union 21.351%、pose changed；C-last→Z full MAD 1.759%、subject-union 1.759%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1827,7 +1827,7 @@ S0→Z：新pose避開near plane，通道與塔身轉接有局部改善；完整
 
 Sector-last→Z：與C district r3同SE本體／pose；累積D的前景NW服務亭局部emission／操作邊有差異，不能當SE自身改善。
 
-[C last original 6a82b1c](../C/r3/se-district/se-district__5__h12.jpg) · 
+[C last original 6a82b1c](../C/r3/se-district/se-district__5__h12.jpg)
 
 S0→Z full MAD 25.758%、subject-union 25.758%、pose changed；C-last→Z full MAD 1.485%、subject-union 1.485%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1856,7 +1856,7 @@ S0→Z：新pose避開near plane，通道與塔身轉接有局部改善；完整
 
 Sector-last→Z：與C district r3同SE本體／pose；累積D的前景NW服務亭局部emission／操作邊有差異，不能當SE自身改善。
 
-[C last original 6a82b1c](../C/r3/se-district/se-district__5__h22.jpg) · 
+[C last original 6a82b1c](../C/r3/se-district/se-district__5__h22.jpg)
 
 S0→Z full MAD 21.652%、subject-union 21.652%、pose changed；C-last→Z full MAD 1.712%、subject-union 1.712%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1885,7 +1885,7 @@ S0→Z：新pose避開near plane，通道與塔身轉接有局部改善；完整
 
 Sector-last→Z：與C district r3同SE本體／pose；累積D的前景NW服務亭局部emission／操作邊有差異，不能當SE自身改善。
 
-[C last original 6a82b1c](../C/r3/se-district/se-district__8__h12.jpg) · 
+[C last original 6a82b1c](../C/r3/se-district/se-district__8__h12.jpg)
 
 S0→Z full MAD 25.522%、subject-union 25.522%、pose changed；C-last→Z full MAD 1.591%、subject-union 1.591%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1914,7 +1914,7 @@ S0→Z：新pose避開near plane，通道與塔身轉接有局部改善；完整
 
 Sector-last→Z：與C district r3同SE本體／pose；累積D的前景NW服務亭局部emission／操作邊有差異，不能當SE自身改善。
 
-[C last original 6a82b1c](../C/r3/se-district/se-district__8__h22.jpg) · 
+[C last original 6a82b1c](../C/r3/se-district/se-district__8__h22.jpg)
 
 S0→Z full MAD 22.271%、subject-union 22.271%、pose changed；C-last→Z full MAD 1.059%、subject-union 1.059%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1943,7 +1943,7 @@ S0→Z：同為沒有第一水庭的baseline；新側向pose改變岸線構圖�
 
 Sector-last→Z：與A r3同第一水庭body／pose；此獨立energy fixture的主體沒有新增改動，當前原圖另量，不能沿用舊圖當Z。
 
-[A last original b7d5861](../A/r3/energy-garden__baseline__h12.jpg) · 
+[A last original b7d5861](../A/r3/energy-garden__baseline__h12.jpg)
 
 S0→Z full MAD 20.888%、subject-union 不可量測、pose changed；A-last→Z full MAD 0.325%、subject-union 不可量測、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -1972,7 +1972,7 @@ S0→Z：同為沒有第一水庭的baseline；新側向pose改變岸線構圖�
 
 Sector-last→Z：與A r3同第一水庭body／pose；此獨立energy fixture的主體沒有新增改動，當前原圖另量，不能沿用舊圖當Z。
 
-[A last original b7d5861](../A/r3/energy-garden__baseline__h22.jpg) · 
+[A last original b7d5861](../A/r3/energy-garden__baseline__h22.jpg)
 
 S0→Z full MAD 18.316%、subject-union 不可量測、pose changed；A-last→Z full MAD 0.286%、subject-union 不可量測、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2001,7 +2001,7 @@ S0→Z：新側向pose減少S0前景柱跨過水庭，支架操作邊較明確�
 
 Sector-last→Z：與A r3同第一水庭body／pose；此獨立energy fixture的主體沒有新增改動，當前原圖另量，不能沿用舊圖當Z。
 
-[A last original b7d5861](../A/r3/energy-garden__a__h12.jpg) · 
+[A last original b7d5861](../A/r3/energy-garden__a__h12.jpg)
 
 S0→Z full MAD 21.375%、subject-union 24.333%、pose changed；A-last→Z full MAD 0.353%、subject-union 0.480%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2030,7 +2030,7 @@ S0→Z：新側向pose減少S0前景柱跨過水庭，支架操作邊較明確�
 
 Sector-last→Z：與A r3同第一水庭body／pose；此獨立energy fixture的主體沒有新增改動，當前原圖另量，不能沿用舊圖當Z。
 
-[A last original b7d5861](../A/r3/energy-garden__a__h22.jpg) · 
+[A last original b7d5861](../A/r3/energy-garden__a__h22.jpg)
 
 S0→Z full MAD 18.352%、subject-union 17.348%、pose changed；A-last→Z full MAD 0.298%、subject-union 0.366%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2059,7 +2059,7 @@ S0→Z：混合配置沿同一雙盤水庭body；新側向pose減少S0前景柱�
 
 Sector-last→Z：與A r3同第一水庭body／pose；mixed同a外觀一致，當前另截，不能捏造選項差異。
 
-[A last original b7d5861](../A/r3/energy-garden__mixed__h12.jpg) · 
+[A last original b7d5861](../A/r3/energy-garden__mixed__h12.jpg)
 
 S0→Z full MAD 21.324%、subject-union 24.335%、pose changed；A-last→Z full MAD 0.345%、subject-union 0.476%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2088,7 +2088,7 @@ S0→Z：混合配置沿同一雙盤水庭body；新側向pose減少S0前景柱�
 
 Sector-last→Z：與A r3同第一水庭body／pose；mixed同a外觀一致，當前另截，不能捏造選項差異。
 
-[A last original b7d5861](../A/r3/energy-garden__mixed__h22.jpg) · 
+[A last original b7d5861](../A/r3/energy-garden__mixed__h22.jpg)
 
 S0→Z full MAD 18.284%、subject-union 17.349%、pose changed；A-last→Z full MAD 0.299%、subject-union 0.360%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2117,7 +2117,7 @@ S0→Z：S0→Z降低俯視角，海面與水岸仍完整；第二水庭在basel
 
 Sector-last→Z：與D r2同第二水庭pose；背景有累積source變化，baseline仍只有海面公共水岸。
 
-[D last original 0066eed](../D/r2/energy-garden2/energy-garden2__baseline__h12.jpg) · 
+[D last original 0066eed](../D/r2/energy-garden2/energy-garden2__baseline__h12.jpg)
 
 S0→Z full MAD 13.976%、subject-union 不可量測、pose changed；D-last→Z full MAD 0.268%、subject-union 不可量測、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2146,7 +2146,7 @@ S0→Z：S0→Z降低俯視角，海面與水岸仍完整；第二水庭在basel
 
 Sector-last→Z：與D r2同第二水庭pose；背景有累積source變化，baseline仍只有海面公共水岸。
 
-[D last original 0066eed](../D/r2/energy-garden2/energy-garden2__baseline__h22.jpg) · 
+[D last original 0066eed](../D/r2/energy-garden2/energy-garden2__baseline__h22.jpg)
 
 S0→Z full MAD 14.433%、subject-union 不可量測、pose changed；D-last→Z full MAD 0.233%、subject-union 不可量測、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2175,7 +2175,7 @@ S0→Z：S0→Z較低側角讓渦輪正面與上水盤支架分離；完整主�
 
 Sector-last→Z：與D r2同第二水庭body／pose；Z原圖的支架、棚與接岸橋與最後量測一致。
 
-[D last original 0066eed](../D/r2/energy-garden2/energy-garden2__a__h12.jpg) · 
+[D last original 0066eed](../D/r2/energy-garden2/energy-garden2__a__h12.jpg)
 
 S0→Z full MAD 14.259%、subject-union 17.793%、pose changed；D-last→Z full MAD 0.307%、subject-union 0.383%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2204,7 +2204,7 @@ S0→Z：S0→Z較低側角讓渦輪正面與上水盤支架分離；完整主�
 
 Sector-last→Z：與D r2同第二水庭body／pose；Z原圖的支架、棚與接岸橋與最後量測一致。
 
-[D last original 0066eed](../D/r2/energy-garden2/energy-garden2__a__h22.jpg) · 
+[D last original 0066eed](../D/r2/energy-garden2/energy-garden2__a__h22.jpg)
 
 S0→Z full MAD 14.234%、subject-union 14.681%、pose changed；D-last→Z full MAD 0.263%、subject-union 0.314%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2233,7 +2233,7 @@ S0→Z：較低側角讓渦輪、雙盤與接岸橋分離；mixed沿a同水庭bo
 
 Sector-last→Z：與D r2同第二庭body／pose；mixed右方配電橋仍存在，水庭本身沒有新增選項差異。
 
-[D last original 0066eed](../D/r2/energy-garden2/energy-garden2__mixed__h12.jpg) · 
+[D last original 0066eed](../D/r2/energy-garden2/energy-garden2__mixed__h12.jpg)
 
 S0→Z full MAD 14.569%、subject-union 17.831%、pose changed；D-last→Z full MAD 0.316%、subject-union 0.390%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2262,7 +2262,7 @@ S0→Z：較低側角讓渦輪、雙盤與接岸橋分離；mixed沿a同水庭bo
 
 Sector-last→Z：與D r2同第二庭body／pose；mixed右方配電橋仍存在，水庭本身沒有新增選項差異。
 
-[D last original 0066eed](../D/r2/energy-garden2/energy-garden2__mixed__h22.jpg) · 
+[D last original 0066eed](../D/r2/energy-garden2/energy-garden2__mixed__h22.jpg)
 
 S0→Z full MAD 14.433%、subject-union 14.659%、pose changed；D-last→Z full MAD 0.281%、subject-union 0.333%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2291,7 +2291,7 @@ S0→Z：較S0偏側俯視改為接近正面，富士球體與梯橋關係更清
 
 Sector-last→Z：與C r2同ring pose，baseline同為沒有環的成熟富士街區；當前累積source另截。
 
-[C last original 67386a4](../C/r2/energy-ring/energy-ring__baseline__h12.jpg) · 
+[C last original 67386a4](../C/r2/energy-ring/energy-ring__baseline__h12.jpg)
 
 S0→Z full MAD 22.150%、subject-union 不可量測、pose changed；C-last→Z full MAD 0.401%、subject-union 不可量測、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2320,7 +2320,7 @@ S0→Z：較S0偏側俯視改為接近正面，富士球體與梯橋關係更清
 
 Sector-last→Z：與C r2同ring pose，baseline同為沒有環的成熟富士街區；當前累積source另截。
 
-[C last original 67386a4](../C/r2/energy-ring/energy-ring__baseline__h22.jpg) · 
+[C last original 67386a4](../C/r2/energy-ring/energy-ring__baseline__h22.jpg)
 
 S0→Z full MAD 15.729%、subject-union 不可量測、pose changed；C-last→Z full MAD 0.331%、subject-union 不可量測、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2349,7 +2349,7 @@ S0→Z：較S0偏側俯視改接近正面，轉子、兩個軸承與後方富士
 
 Sector-last→Z：與C r2同儲能環body／pose；操作標記與輪帶仍在，當前累積source另截，不沿用sector圖。
 
-[C last original 67386a4](../C/r2/energy-ring/energy-ring__b__h12.jpg) · 
+[C last original 67386a4](../C/r2/energy-ring/energy-ring__b__h12.jpg)
 
 S0→Z full MAD 22.526%、subject-union 23.422%、pose changed；C-last→Z full MAD 0.397%、subject-union 0.590%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2378,7 +2378,7 @@ S0→Z：較S0偏側俯視改接近正面，轉子、兩個軸承與後方富士
 
 Sector-last→Z：與C r2同儲能環body／pose；操作標記與輪帶仍在，當前累積source另截，不沿用sector圖。
 
-[C last original 67386a4](../C/r2/energy-ring/energy-ring__b__h22.jpg) · 
+[C last original 67386a4](../C/r2/energy-ring/energy-ring__b__h22.jpg)
 
 S0→Z full MAD 15.804%、subject-union 18.334%、pose changed；C-last→Z full MAD 0.338%、subject-union 0.478%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2407,7 +2407,7 @@ S0→Z：較S0接近正面構圖，環與富士球體分離；mixed沿b同一個
 
 Sector-last→Z：與C r2同ring body／pose，mixed同b的環部件一致；另截Z作累積source比對。
 
-[C last original 67386a4](../C/r2/energy-ring/energy-ring__mixed__h12.jpg) · 
+[C last original 67386a4](../C/r2/energy-ring/energy-ring__mixed__h12.jpg)
 
 S0→Z full MAD 22.526%、subject-union 23.423%、pose changed；C-last→Z full MAD 0.395%、subject-union 0.585%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2436,7 +2436,7 @@ S0→Z：較S0接近正面構圖，環與富士球體分離；mixed沿b同一個
 
 Sector-last→Z：與C r2同ring body／pose，mixed同b的環部件一致；另截Z作累積source比對。
 
-[C last original 67386a4](../C/r2/energy-ring/energy-ring__mixed__h22.jpg) · 
+[C last original 67386a4](../C/r2/energy-ring/energy-ring__mixed__h22.jpg)
 
 S0→Z full MAD 15.802%、subject-union 18.332%、pose changed；C-last→Z full MAD 0.332%、subject-union 0.473%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2465,7 +2465,7 @@ S0→Z：最後wing恢復S0同pose；baseline海面水岸與住宅／球冠背�
 
 Sector-last→Z：與D r3同pose；baseline維持沒有接收翼的成熟公共水岸，背景累積source另截比對。
 
-[D last original c6b5607](../D/r3/energy-wing/energy-wing__baseline__h12.jpg) · 
+[D last original c6b5607](../D/r3/energy-wing/energy-wing__baseline__h12.jpg)
 
 S0→Z full MAD 0.300%、subject-union 不可量測、pose same；D-last→Z full MAD 0.305%、subject-union 不可量測、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2494,7 +2494,7 @@ S0→Z：最後wing恢復S0同pose；baseline海面水岸與住宅／球冠背�
 
 Sector-last→Z：與D r3同pose；baseline維持沒有接收翼的成熟公共水岸，背景累積source另截比對。
 
-[D last original c6b5607](../D/r3/energy-wing/energy-wing__baseline__h22.jpg) · 
+[D last original c6b5607](../D/r3/energy-wing/energy-wing__baseline__h22.jpg)
 
 S0→Z full MAD 0.253%、subject-union 不可量測、pose same；D-last→Z full MAD 0.249%、subject-union 不可量測、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2523,7 +2523,7 @@ S0→Z：同S0 pose，雙葉表面反光收斂、板框與服務頸細節較清�
 
 Sector-last→Z：與D r3同wing body／S0 pose，當前另截；小型a翼沒有額外部件或新用途，背景綠化缺口保持。
 
-[D last original c6b5607](../D/r3/energy-wing/energy-wing__a__h12.jpg) · 
+[D last original c6b5607](../D/r3/energy-wing/energy-wing__a__h12.jpg)
 
 S0→Z full MAD 0.462%、subject-union 1.453%、pose same；D-last→Z full MAD 0.324%、subject-union 0.294%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2552,7 +2552,7 @@ S0→Z：同S0 pose，雙葉表面反光收斂、板框與服務頸細節較清�
 
 Sector-last→Z：與D r3同wing body／S0 pose，當前另截；小型a翼沒有額外部件或新用途，背景綠化缺口保持。
 
-[D last original c6b5607](../D/r3/energy-wing/energy-wing__a__h22.jpg) · 
+[D last original c6b5607](../D/r3/energy-wing/energy-wing__a__h22.jpg)
 
 S0→Z full MAD 0.295%、subject-union 0.532%、pose same；D-last→Z full MAD 0.259%、subject-union 0.209%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2581,7 +2581,7 @@ S0→Z：同S0 pose的大型雙葉，表面反光收斂、細板框仍可見；�
 
 Sector-last→Z：與D r3同body／pose；b按原權威比例比a大，兩葉數量與用途保持，不假稱新增設備。
 
-[D last original c6b5607](../D/r3/energy-wing/energy-wing__b__h12.jpg) · 
+[D last original c6b5607](../D/r3/energy-wing/energy-wing__b__h12.jpg)
 
 S0→Z full MAD 0.594%、subject-union 1.245%、pose same；D-last→Z full MAD 0.321%、subject-union 0.342%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2610,7 +2610,7 @@ S0→Z：同S0 pose的大型雙葉，表面反光收斂、細板框仍可見；�
 
 Sector-last→Z：與D r3同body／pose；b按原權威比例比a大，兩葉數量與用途保持，不假稱新增設備。
 
-[D last original c6b5607](../D/r3/energy-wing/energy-wing__b__h22.jpg) · 
+[D last original c6b5607](../D/r3/energy-wing/energy-wing__b__h22.jpg)
 
 S0→Z full MAD 0.386%、subject-union 0.641%、pose same；D-last→Z full MAD 0.262%、subject-union 0.253%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2639,7 +2639,7 @@ S0→Z：同S0 pose，mixed沿b大型雙葉body；反光收斂與板框細節改
 
 Sector-last→Z：與D r3同body／pose；mixed同b的翼大小一致，不捏造同body選項差異。
 
-[D last original c6b5607](../D/r3/energy-wing/energy-wing__mixed__h12.jpg) · 
+[D last original c6b5607](../D/r3/energy-wing/energy-wing__mixed__h12.jpg)
 
 S0→Z full MAD 0.595%、subject-union 1.249%、pose same；D-last→Z full MAD 0.319%、subject-union 0.339%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2668,7 +2668,7 @@ S0→Z：同S0 pose，mixed沿b大型雙葉body；反光收斂與板框細節改
 
 Sector-last→Z：與D r3同body／pose；mixed同b的翼大小一致，不捏造同body選項差異。
 
-[D last original c6b5607](../D/r3/energy-wing/energy-wing__mixed__h22.jpg) · 
+[D last original c6b5607](../D/r3/energy-wing/energy-wing__mixed__h22.jpg)
 
 S0→Z full MAD 0.384%、subject-union 0.642%、pose same；D-last→Z full MAD 0.264%、subject-union 0.260%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2697,7 +2697,7 @@ S0→Z：S0→Z略降島視角與重新置中，baseline仍為沒有島體的完
 
 Sector-last→Z：與D r2同island pose；baseline同樣無島，當前累積source背景另截，不假稱設備變化。
 
-[D last original 44521a0](../D/r2/energy-island/energy-island__baseline__h12.jpg) · 
+[D last original 44521a0](../D/r2/energy-island/energy-island__baseline__h12.jpg)
 
 S0→Z full MAD 9.986%、subject-union 不可量測、pose changed；D-last→Z full MAD 0.143%、subject-union 不可量測、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2726,7 +2726,7 @@ S0→Z：S0→Z略降島視角與重新置中，baseline仍為沒有島體的完
 
 Sector-last→Z：與D r2同island pose；baseline同樣無島，當前累積source背景另截，不假稱設備變化。
 
-[D last original 44521a0](../D/r2/energy-island/energy-island__baseline__h22.jpg) · 
+[D last original 44521a0](../D/r2/energy-island/energy-island__baseline__h22.jpg)
 
 S0→Z full MAD 10.600%、subject-union 不可量測、pose changed；D-last→Z full MAD 0.125%、subject-union 不可量測、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2755,7 +2755,7 @@ S0→Z：較S0稍低及置中，雙罩、服務房、甲板與連岸橋更成組
 
 Sector-last→Z：與D r2同island body／pose；c島體、甲板操作邊及服務橋維持，累積source另截。
 
-[D last original 44521a0](../D/r2/energy-island/energy-island__c__h12.jpg) · 
+[D last original 44521a0](../D/r2/energy-island/energy-island__c__h12.jpg)
 
 S0→Z full MAD 12.263%、subject-union 14.296%、pose changed；D-last→Z full MAD 0.199%、subject-union 0.300%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2784,7 +2784,7 @@ S0→Z：較S0稍低及置中，雙罩、服務房、甲板與連岸橋更成組
 
 Sector-last→Z：與D r2同island body／pose；c島體、甲板操作邊及服務橋維持，累積source另截。
 
-[D last original 44521a0](../D/r2/energy-island/energy-island__c__h22.jpg) · 
+[D last original 44521a0](../D/r2/energy-island/energy-island__c__h22.jpg)
 
 S0→Z full MAD 11.372%、subject-union 11.494%、pose changed；D-last→Z full MAD 0.167%、subject-union 0.241%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2813,7 +2813,7 @@ S0→Z：較S0置中與稍低，mixed同c的島體維持，背景有水庭／接
 
 Sector-last→Z：與D r2同島體／pose；mixed與c共用同一成熟body，操作邊及橋維持，當前另截。
 
-[D last original 44521a0](../D/r2/energy-island/energy-island__mixed__h12.jpg) · 
+[D last original 44521a0](../D/r2/energy-island/energy-island__mixed__h12.jpg)
 
 S0→Z full MAD 12.414%、subject-union 14.463%、pose changed；D-last→Z full MAD 0.205%、subject-union 0.311%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2842,7 +2842,7 @@ S0→Z：較S0置中與稍低，mixed同c的島體維持，背景有水庭／接
 
 Sector-last→Z：與D r2同島體／pose；mixed與c共用同一成熟body，操作邊及橋維持，當前另截。
 
-[D last original 44521a0](../D/r2/energy-island/energy-island__mixed__h22.jpg) · 
+[D last original 44521a0](../D/r2/energy-island/energy-island__mixed__h22.jpg)
 
 S0→Z full MAD 11.414%、subject-union 11.561%、pose changed；D-last→Z full MAD 0.170%、subject-union 0.247%、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2871,7 +2871,7 @@ S0→Z：Hero同S0 pose、FOV與全城構圖；累積A–D有局部冠層／服�
 
 Sector-last→Z：與A/B/C/D各自最後hero保持同pose；A/B/C背景包含其後sector累積改動，D最後source與Z相同。逐sector像素差另列，不混用不同source當本次圖。
 
-[A last original b7d5861](../A/r3/hero__neutral__h12.jpg) · [B last original 74d6c2b](../B/r3/hero__neutral__h12.jpg) · [C last original 67386a4](../C/r2/energy-ring/hero__neutral__h12.jpg) · [D last original 44521a0](../D/r2/energy-island/hero__neutral__h12.jpg) · 
+[A last original b7d5861](../A/r3/hero__neutral__h12.jpg) · [B last original 74d6c2b](../B/r3/hero__neutral__h12.jpg) · [C last original 67386a4](../C/r2/energy-ring/hero__neutral__h12.jpg) · [D last original 44521a0](../D/r2/energy-island/hero__neutral__h12.jpg)
 
 S0→Z full MAD 0.695%、subject-union 不可量測、pose same；A-last→Z full MAD 0.688%、subject-union 不可量測、pose same；B-last→Z full MAD 0.513%、subject-union 不可量測、pose same；C-last→Z full MAD 0.480%、subject-union 不可量測、pose same；D-last→Z full MAD 0.402%、subject-union 不可量測、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 
@@ -2906,7 +2906,7 @@ S0→Z：Hero同S0 pose、FOV與全城構圖；累積A–D有局部冠層／服�
 
 Sector-last→Z：與A/B/C/D各自最後hero保持同pose；A/B/C背景包含其後sector累積改動，D最後source與Z相同。逐sector像素差另列，不混用不同source當本次圖。
 
-[A last original b7d5861](../A/r3/hero__neutral__h22.jpg) · [B last original 74d6c2b](../B/r3/hero__neutral__h22.jpg) · [C last original 67386a4](../C/r2/energy-ring/hero__neutral__h22.jpg) · [D last original 44521a0](../D/r2/energy-island/hero__neutral__h22.jpg) · 
+[A last original b7d5861](../A/r3/hero__neutral__h22.jpg) · [B last original 74d6c2b](../B/r3/hero__neutral__h22.jpg) · [C last original 67386a4](../C/r2/energy-ring/hero__neutral__h22.jpg) · [D last original 44521a0](../D/r2/energy-island/hero__neutral__h22.jpg)
 
 S0→Z full MAD 0.789%、subject-union 不可量測、pose same；A-last→Z full MAD 0.660%、subject-union 不可量測、pose same；B-last→Z full MAD 0.700%、subject-union 不可量測、pose same；C-last→Z full MAD 0.670%、subject-union 不可量測、pose same；D-last→Z full MAD 0.330%、subject-union 不可量測、pose same。MAD 只描述跨 source／pose 像素差，不替代 A4 或美術判斷。
 

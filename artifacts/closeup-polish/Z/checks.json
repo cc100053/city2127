@@ -83,7 +83,10 @@
   },
   "diffCheck": {
     "status": "PASS",
-    "log": "final-checks/diff-check.log"
+    "log": "final-checks/diff-check.log",
+    "scope": "All generated files staged; index and working result versus origin/main checked",
+    "priorGeneratedFailure": "final-checks/generated-markdown-diff-failure.json",
+    "correction": "Reference links joined without trailing separator; generator asserts no trailing whitespace; fix-forward after80f3adc"
   },
   "selfChecks": {
     "status": "PASS",
@@ -114,7 +117,7 @@
   "verification": {
     "status": "PASS",
     "record": "verification.json",
-    "links": 1223,
+    "links": 1225,
     "priorOriginals": 957,
     "zOriginals": 222
   }

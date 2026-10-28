@@ -49,3 +49,5 @@ Uncapped mean 89.232–135.208 FPS，capped診斷59.8–60.3。六個canonical F
 [Cleanup](cleanup.json)核對cwd/命令後關閉Vite43568／preview70383；5194/5195及記錄到的7個scratch ports均bind free，owned Chrome／runner／SQLite清場。所有owned temp roots已移除；unchanged smoke runner未記錄其ephemeral port，依exit/finally及temp清場驗證，不虛報該port bind。
 
 只驗開發Mac Chrome、桌面1920×1080/DPR1/default；展示機、Safari/iPad／Windows、實體HDMI、長跑、真人兩秒辨識及完整動態閃爍未驗。下一步由coordinator獨立review本批證據，再交owner決定A/B/C/D接受／部分接受／棄用及A3/A4政策；本批不追加美術輪次、不merge main、不部署。
+
+最終產生報告時的[whitespace失敗](final-checks/generated-markdown-diff-failure.json)亦保留：generator在reference links後加尾空白，且提交shell未在失敗時停止，80f3adc已push；後續fix-forward改成join並加入輸出assert，stage產生檔後重驗working/index及整條feature diff。數值／原圖／runtime不變，沒有重寫共享歷史。
