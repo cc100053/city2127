@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/D/run-round.py", line 10, in <module>
+    assert not out.exists(),f'Preserve existing round: {out}'
+           ^^^^^^^^^^^^^^^^
+AssertionError: Preserve existing round: artifacts/closeup-polish/D/r1/nw-focal

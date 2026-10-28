@@ -1,0 +1,19 @@
+PASS: six bounded MAGNET service slots retarget smoothly and restore to the mixed 3/3 baseline.
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: slot 0 has no recessed service face: 0.23999930819019255 / MeshStandardMaterial / eee9df
+    at file:///Users/fatboy/city2127/.task-relay/closeup-polish/checkout/tests/automationHub.test.ts:105:10
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:642:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v26.0.0

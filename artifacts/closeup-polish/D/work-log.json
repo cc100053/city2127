@@ -58,6 +58,81 @@
       "result": "FAIL sandbox listen EPERM after geometry tests; no implementation failure shown",
       "log": "r1/nw-focal/npm-test.log.txt",
       "retry": "authorized escalation runs whole suite; first log preserved"
+    },
+    {
+      "round": "r2",
+      "shot": "nw:focal",
+      "runtime": "six recessed service faces/mullions plus six partial upper operating joints; pose small pull-in; controller untouched",
+      "testFailure": "new ray started exactly at old sign backing upper boundary2.7local and correctly hit trim; moved sample to exposed face y3.0, runtime unchanged during capture",
+      "originalFailure": "r2/nw-focal/service-face-check-attempt.txt",
+      "checkpointR1": "7c05b4a pushed after root npm test/build/diff PASS"
+    },
+    {
+      "diagnostic": "Offline pose probe accidentally imported executable capture.mjs; sandbox rejected Chrome before report/image I/O. No S0 bytes changed. Subsequent pure projection imports devShotFrame only.",
+      "projectionOnly": "pose-prediction.json; not visual/A3/perf evidence"
+    },
+    {
+      "round": "r2",
+      "shot": "nw:focal",
+      "status": "matrix/perf/compare complete",
+      "A4": "2/6",
+      "checks": "hub/late-GLB/pose tests, build, diff PASS; whole root suite required again at final D",
+      "next": "r3 pose to direct frontage; no controller or art semantic change"
     }
+  ],
+  "nextExpected": "Complete focal r2 capture/perf/compare, review original final images, checkpoint/push; then nw:district pose-only r1. Never edit measured runtime while runner active.",
+  "plannedPoses": {
+    "nw:district": {
+      "position": [
+        -100,
+        440,
+        -150
+      ],
+      "target": [
+        -100,
+        30,
+        -10
+      ]
+    },
+    "energy:garden2": {
+      "position": [
+        -15,
+        36,
+        -455
+      ],
+      "target": [
+        32,
+        8,
+        -392
+      ]
+    },
+    "energy:wing": {
+      "position": [
+        110,
+        64,
+        -530
+      ],
+      "target": [
+        125,
+        17,
+        -424
+      ]
+    },
+    "energy:island": {
+      "position": [
+        -150,
+        65,
+        -590
+      ],
+      "target": [
+        -40,
+        8,
+        -425
+      ]
+    }
+  },
+  "preparedDrafts": [
+    "/private/tmp/d-district-r2.py",
+    "/private/tmp/d-energy-detail.py"
   ]
 }

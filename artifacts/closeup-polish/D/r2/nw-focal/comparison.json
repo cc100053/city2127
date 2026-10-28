@@ -1,0 +1,112 @@
+{
+  "mode": "compare",
+  "commit": "7c05b4a7e7601c1f1890a58d9fe033f8a4316f6f",
+  "sourceDiff": "diff --git a/src/headlineCamera.ts b/src/headlineCamera.ts\nindex d1dd12e..9b50e8c 100644\n--- a/src/headlineCamera.ts\n+++ b/src/headlineCamera.ts\n@@ -9,7 +9,7 @@ type Site = CarrierChange['socketId'];\n export type ShotId = `${Site}:${'focal' | 'district'}` | `energy:${'garden' | 'garden2' | 'ring' | 'wing' | 'island'}`;\n type Pose = { position: [number, number, number]; target: [number, number, number] };\n export const SHOTS: Record<ShotId, Pose> = {\n-  'nw:focal': { position: [0, 135, -520], target: [40, 43, -300] },\n+  'nw:focal': { position: [0, 130, -510], target: [40, 43, -300] },\n   'ne:focal': { position: [-280, 85, -245], target: [-210, 14, -135] },\n   'sw:focal': { position: [-165, 45, 210], target: [-105, 28, 60] },\n   'se:focal': { position: [-90, 200, -170], target: [175, 50, -45] },\ndiff --git a/src/siteBuilders/automationHub.ts b/src/siteBuilders/automationHub.ts\nindex ff4ac0f..1f511bf 100644\n--- a/src/siteBuilders/automationHub.ts\n+++ b/src/siteBuilders/automationHub.ts\n@@ -1,6 +1,6 @@\n import * as T from 'three';\n import { AutomationDistrict } from '../districtMeters.ts';\n-import { arc, bake, box, cream, faces, futureLight, glass, publicLight, sign, solar, teal, trim, type Kit } from '../cityRig.ts';\n+import { arc, bake, box, cream, dark, faces, futureLight, glass, publicLight, sign, solar, teal, trim, type Kit } from '../cityRig.ts';\n import { siteLayerDefinition } from '../changeCatalog.ts';\n import { remapCityMaterials, type SiteAssetLoaderCache } from '../siteAssets/assetLoader.ts';\n import type { Band } from '../surveyView.ts';\n@@ -151,6 +151,19 @@ export function buildAutomationHub(scene: T.Scene, kit: Kit, assets: SiteAssetLo\n     const angle = i * Math.PI / 2 + Math.PI / 4;\n     box(hubBase, [.12, .7, .12], [Math.cos(angle) * 3.7, 12.15, -Math.sin(angle) * 3.7], solar, .02);\n   }\n+  // Recessed service faces align with the six existing counters, above the public approach.\n+  for (let i = 0; i < SERVICE_SLOTS; i++) {\n+    const x = (i - 2.5) * 1.02, z = i % 2 ? -1 : 1;\n+    box(hubBase, [.78, 1.5, .08], [x, 2.7, z * 3.04], dark, .02);\n+    for (const dx of [-.44, .44]) box(hubBase, [.06, 1.9, .14], [x + dx, 2.7, z * 3.06], trim, .01);\n+    box(hubBase, [.84, .08, .14], [x, 3.65, z * 3.06], trim, .01);\n+    box(hubBase, [.38, .035, .03], [x, 3.48, z * 3.12], publicLight, .01);\n+  }\n+  // Floor-height joints subdivide the existing envelope without changing the upper GLB or its cache.\n+  for (const y of [4, 7, 10]) faces(hubBase, 7, 6, (face, across, out) => {\n+    for (let x = -across / 2 + .7; x < across / 2; x += 1.1)\n+      box(face, [.045, .9, .12], [x, y, out + .04], trim, .01);\n+  });\n   sign(hubBase, kit, '自動サービス / AUTO HUB', 0, 2.2, 3.2, 6.2, .8, '#46676e');\n \n   const slots: ServiceSlot[] = [];\n@@ -180,6 +193,12 @@ export function buildAutomationHub(scene: T.Scene, kit: Kit, assets: SiteAssetLo\n   const automationHub = createAutomationHubRuntime(slots,root,hubBase,neutralPropsLayer.group);\n   const automationDistrict = new AutomationDistrict(scene);\n \n+  const upperJoints = new T.Group(); upperJoints.name = 'automation-hub-service-joints';\n+  for (const y of [2.7, 5.7, 8.7, 11.7, 14.7, 17.7]) {\n+    arc(upperJoints, 2.29, 2.35, .045, [0, y, 0], publicLight, .8, 1.6);\n+  }\n+  upperJoints.add(...bake(upperJoints)); hubUpper.add(upperJoints);\n+\n   const hubUpperFallback = new T.Group();\n   hubUpperFallback.name = 'automation-hub-upper-procedural-fallback';\n   hubUpper.add(hubUpperFallback);\ndiff --git a/tests/automationHub.test.ts b/tests/automationHub.test.ts\nindex 5c333a6..1a05184 100644\n--- a/tests/automationHub.test.ts\n+++ b/tests/automationHub.test.ts\n@@ -1,5 +1,6 @@\n import assert from 'node:assert/strict';\n import * as T from 'three';\n+import { dark } from '../src/cityRig.ts';\n import { buildAutomationHub } from '../src/siteBuilders/automationHub.ts';\n \n const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'document');\n@@ -94,3 +95,19 @@ assert.ok(Math.abs(size.setFromMatrixScale(m).x-1/3)<1e-6,'immediate recovery le\n props.visible=false;runtime.update(62);assert.equal(people.visible,false,'actors outlive a hidden frontage');\n \n console.log('PASS: six bounded MAGNET service slots retarget smoothly and restore to the mixed 3/3 baseline.');\n+\n+// Every existing service slot has a recessed face; approach/body-clearance tests above still apply.\n+site.root.updateMatrixWorld(true);\n+for(let i=0;i<6;i++){\n+  const side=i%2?-1:1,origin=new T.Vector3((i-2.5)*1.02,3,side*3.3).applyMatrix4(site.root.matrixWorld);\n+  ray.set(origin,new T.Vector3(0,0,-side).transformDirection(site.root.matrixWorld));ray.far=1;\n+  const first=ray.intersectObject(site.layers.hubBase!.group,true)[0];\n+  assert.ok(first&&first.object instanceof T.Mesh&&first.object.material===dark,'slot has no recessed service face above its existing sign');\n+}\n+console.log('PASS: six recessed service faces stay behind the existing accessible approach.');\n+\n+const joints=site.layers.hubUpper!.group.getObjectByName('automation-hub-service-joints')!;\n+assert.ok(joints&&joints.children.length===1,'upper operating joints do not share one static batch');\n+await site.layers.hubUpper!.prepare();\n+assert.equal(site.layers.hubUpper!.group.getObjectByName('automation-hub-service-joints'),joints,'late GLB replacement removed the operating joints');\n+console.log('PASS: upper operating joints survive late GLB loading without rebuilding their batch.');\n",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "nw:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.00719702720483513,
+      "rect": {
+        "x": 846,
+        "y": 533,
+        "width": 218,
+        "height": 282
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:focal",
+      "hour": 12,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.07843118271609156,
+      "rect": {
+        "x": 833,
+        "y": 189,
+        "width": 242,
+        "height": 626
+      },
+      "pass": true
+    },
+    {
+      "id": "nw:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.07882205734369545,
+      "rect": {
+        "x": 833,
+        "y": 189,
+        "width": 242,
+        "height": 626
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.006091329758528436,
+      "rect": {
+        "x": 846,
+        "y": 533,
+        "width": 218,
+        "height": 282
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:focal",
+      "hour": 22,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.07070121177260984,
+      "rect": {
+        "x": 833,
+        "y": 189,
+        "width": 242,
+        "height": 626
+      },
+      "pass": true
+    },
+    {
+      "id": "nw:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.07099232056775923,
+      "rect": {
+        "x": 833,
+        "y": 189,
+        "width": 242,
+        "height": 626
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}

@@ -10,6 +10,8 @@ root=pathlib.Path('artifacts/closeup-polish/D');out=root/round_/shot.replace(':'
 assert not out.exists(),f'Preserve existing round: {out}'
 out.mkdir(parents=True)
 paths=['src/headlineCamera.ts','src/siteBuilders/automationHub.ts','src/districtMeters.ts','src/energyPrototype.ts','src/devShotFrame.ts','artifacts/closeup-polish/capture.mjs']
+(out/'source').mkdir()
+for p in paths:(out/'source'/pathlib.Path(p).name).write_bytes(pathlib.Path(p).read_bytes())
 (out/'source-hashes.json').write_text(json.dumps({'commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'sha256':{p:hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest() for p in paths}},indent=2)+'\n')
 env={**os.environ,'CITY_SHOTS':shot+',hero','CITY2127_EVIDENCE_DIR':str(out),'CITY_NW_PAIRINGS':'1' if shot=='nw:district' else '0'}
 for mode in ['capture','perf','compare']:

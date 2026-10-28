@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
+import { dark } from '../src/cityRig.ts';
 import { buildAutomationHub } from '../src/siteBuilders/automationHub.ts';
 
 const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'document');
@@ -94,3 +95,19 @@ assert.ok(Math.abs(size.setFromMatrixScale(m).x-1/3)<1e-6,'immediate recovery le
 props.visible=false;runtime.update(62);assert.equal(people.visible,false,'actors outlive a hidden frontage');
 
 console.log('PASS: six bounded MAGNET service slots retarget smoothly and restore to the mixed 3/3 baseline.');
+
+// Every existing service slot has a recessed face; approach/body-clearance tests above still apply.
+site.root.updateMatrixWorld(true);
+for(let i=0;i<6;i++){
+  const side=i%2?-1:1,origin=new T.Vector3((i-2.5)*1.02,3,side*3.3).applyMatrix4(site.root.matrixWorld);
+  ray.set(origin,new T.Vector3(0,0,-side).transformDirection(site.root.matrixWorld));ray.far=1;
+  const first=ray.intersectObject(site.layers.hubBase!.group,true)[0];
+  assert.ok(first&&first.object instanceof T.Mesh&&first.object.material===dark,'slot has no recessed service face above its existing sign');
+}
+console.log('PASS: six recessed service faces stay behind the existing accessible approach.');
+
+const joints=site.layers.hubUpper!.group.getObjectByName('automation-hub-service-joints')!;
+assert.ok(joints&&joints.children.length===1,'upper operating joints do not share one static batch');
+await site.layers.hubUpper!.prepare();
+assert.equal(site.layers.hubUpper!.group.getObjectByName('automation-hub-service-joints'),joints,'late GLB replacement removed the operating joints');
+console.log('PASS: upper operating joints survive late GLB loading without rebuilding their batch.');

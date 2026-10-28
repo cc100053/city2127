@@ -10,6 +10,8 @@
     "energy configuration/60s cycle"
   ],
   "changed": [
-    "src/headlineCamera.ts"
+    "src/headlineCamera.ts",
+    "src/siteBuilders/automationHub.ts",
+    "tests/automationHub.test.ts"
   ]
 }
