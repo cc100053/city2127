@@ -135,9 +135,79 @@
         }
       ],
       "next": "nw:district pose-only r1; preserve final focal source/pose"
+    },
+    {
+      "focalR3": "863f7d9; A3 3/9 versus r2 4/9; day79.776 vs83.838FPS, calls959 versus883; night outlier1335 preserved. Not recommended; do not mix unmeasured r2 pose with later source."
+    },
+    {
+      "round": "r1",
+      "shot": "nw:district",
+      "capture": "16/16 complete,14 subject A1/A2 PASS; A3 all FAIL; first subject view reviewed top-down and considered weak facility identity",
+      "performancePartial": "96.31865/99.85009FPS; hero12 85.66567; remaining reference/comparisons still running",
+      "nextR2Pose": {
+        "position": [
+          -390,
+          300,
+          -330
+        ],
+        "target": [
+          -200,
+          0,
+          -80
+        ]
+      },
+      "r2Builder": "Supported edge guards at existing staffed terraces, four disc operating joints; same batches/footprints/targets. Run full root tests before r2 capture.",
+      "pairingLimit": "se:8,nw\u00b18 images include whole partner changes; existing C dock load-path issue remains outside D."
+    },
+    {
+      "round": "r1",
+      "shot": "nw:district",
+      "states": 16,
+      "A4": [
+        0,
+        14
+      ],
+      "perf": [
+        {
+          "id": "nw:district",
+          "hour": 12,
+          "fps": 96.31864781581635,
+          "calls": [
+            "749",
+            "749"
+          ]
+        },
+        {
+          "id": "nw:district",
+          "hour": 22,
+          "fps": 99.85008703326612,
+          "calls": [
+            "749",
+            "1125"
+          ]
+        },
+        {
+          "id": "hero",
+          "hour": 12,
+          "fps": 85.66566573508422,
+          "calls": [
+            "952",
+            "952"
+          ]
+        },
+        {
+          "id": "hero",
+          "hour": 22,
+          "fps": 84.51019429723385,
+          "calls": [
+            "952",
+            "952"
+          ]
+        }
+      ]
     }
   ],
-  "nextExpected": "Focal max3 complete; push checkpoint then nw:district r1 pose-only. Four extra paired rows included. Never change runtime while runner active.",
+  "nextExpected": "NW district r2: low oblique pose + supported guards/landing markers; full root/target checks before complete capture.",
   "plannedPoses": {
     "nw:district": {
       "position": [

@@ -30,7 +30,13 @@ async function submit(axis='service-2127'){
 let energyChoice;
 async function live(id){
  const before=await data(),started=Date.now();await submit(id.startsWith('energy:')?energyChoice:'service-2127');const samples=[];
- while(Date.now()-started<8300){const d=await data();if(samples.at(-1)?.time!==d.time)samples.push({elapsedMs:Date.now()-started,...d});await page.waitForTimeout(100);}
+ let hold;
+ while(Date.now()-started<30000){
+  const d=await data();if(samples.at(-1)?.time!==d.time)samples.push({elapsedMs:Date.now()-started,...d});
+  const current=await pose();if(Math.hypot(...current.position.map((x,i)=>x-SHOTS[id].position[i]))<.02)hold??=Date.now();
+  if(hold&&Date.now()-hold>=2500)break;await page.waitForTimeout(100);
+ }
+ assert.ok(hold,'queued live result never reached its authored hold');
  await at(SHOTS[id].position);const place=await page.locator('.resident-place').textContent();assert.match(place,/デックス|サービス|街を巡る|海辺の蓄電庭園|沖の受電翼|沖のエネルギー島/);
  await page.screenshot({path:`${out}/${id.replace(':','-')}.jpg`,type:'jpeg',quality:90});checks.push({check:'live hold',id,before,samples,place,pose:await pose(),pass:true});return samples;
 }
@@ -53,5 +59,5 @@ try{
  assert.deepEqual(errors,[]);
 
 }finally{
- writeFileSync(`${out}/browser.json`,JSON.stringify({browser:browser.version(),apiOrigin:base,viewport:[1920,1080],dpr:1,quality:'default',checks,errors,timing:'Browser diagnostics refresh each120 frames (~2s); intermediate states prove easing. Exact3s duration/retarget remains covered by root tests; no3.000s browser precision claim.',fixtures:'Real current v4 service, water, receiver and island proposals; isolated scratch SQLite.'},null,2)+'\n');await browser.close();await closeServer();for(const dir of scratch)rmSync(dir,{recursive:true,force:true});
+ writeFileSync(`${out}/browser.json`,JSON.stringify({browser:browser.version(),apiOrigin:base,viewport:[1920,1080],dpr:1,quality:'default',checks,errors,timing:'Wait for the actual authored hold plus2.5s (queued submissions may wait behind earlier slots). Browser diagnostics refresh each120 frames (~2s); intermediate states prove easing. Exact3s duration/retarget remains covered by root tests; no3.000s browser precision claim.',fixtures:'Real current v4 service, water, receiver and island proposals; isolated scratch SQLite.'},null,2)+'\n');await browser.close();await closeServer();for(const dir of scratch)rmSync(dir,{recursive:true,force:true});
 }

@@ -3,5 +3,8 @@
     "r1/nw-focal",
     "r2/nw-focal",
     "r3/nw-focal"
+  ],
+  "nw:district": [
+    "r1/nw-district"
   ]
 }

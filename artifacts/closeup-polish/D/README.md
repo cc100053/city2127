@@ -9,3 +9,7 @@ The original 98-state matrix remains unchanged. NW's own carrier reads only tier
 Local target from ART/mastertaste and original screenshots: recessed service interfaces and frame joints, supported district service halls/docks, restrained operating lights on second garden/receiver/island, with the existing footprints and empty spaces. Dream-loop is not used. Background greenery/global lighting are outside scope; V3 gaps must remain explicit.
 
 First Chrome launch failed under sandbox, before any original image or capture row existed. Its log/source hashes are preserved in `r1/nw-focal-launch-failure`; the authorized outside-sandbox retry uses a fresh directory. This is not an all-attempts-error-free claim.
+
+Focal closed at max3 rounds: checkpoint `863f7d9` (pushed0/0), [summary](focal-summary.json), all eight final second-take originals individually reviewed in [visual-review](visual-review.json). r3 is not recommended: A3 fell from r2 4/9 to3/9, day FPS79.776 versus83.838, normal calls959 versus883, and the r3 night raw1335-call sample is retained. No unmeasured r2-pose/later-builder mix is presented as final. District is now in its own first round; all D remains RUNNING.
+
+Per-shot final images mean the final local round at its captured source snapshot. Later shots may alter background geometry. Every snapshot and source hash remains available; the full current all-sector image comparison belongs to Z. These local matrices do not establish an isolated D performance improvement or owner art acceptance.
