@@ -262,3 +262,10 @@ Low服務廊保持occupied、<10local units且在原lot；mixed rails／高塔�
 Root test/build/diff、capture/report邊界自檢、[scope assertions](../../artifacts/closeup-polish/C/scope-check.json)、324能源清場cases／177219 exact checks PASS；既有JSON import／chunk-size warnings保留。[Scratch current-v4 live](../../artifacts/closeup-polish/C/live/browser.json)11項PASS、error0，證實中間easing、reload／Undo即時hero及counts、reduced motion無pulse、ring局部fade；精確三秒靠node suite而非120frame browser診斷。S0 234／A147／B110張原圖hash重驗不變；C191張manifest保存。Ring r1意外Chrome關閉、auto-review初次拒絕combined retry與最後安全capture-only續拍的原log／partial／hash證據均保留。
 
 [Cleanup](../../artifacts/closeup-polish/C/cleanup.json)：本輪Vite PID46877核對clone後SIGINT關閉，5194／50033 bind確認free；所有owned Chrome／runner／scratch服務關閉。僅開發Mac Chrome1920×1080/DPR1/default，未測production／展示機／Safari/iPad／Windows／真人／Z。README啟動／AGENTS產品或工作流未改，按sync表不改其文案。完成文件／diff review及feature push後以唯一result-C-1.json回調現任coordinator；worker不自行開D/Z或merge main。A/B pending只阻其art merge，coordinator可繼續獨立D，然後Z全城比較。
+
+
+## D preflight — 2026-10-28
+
+Worker `01a18154-a9bd-7ca2-a776-9a2834a519da`，dispatch `closeup-polish-D-1-r18`在唯一clone接手：clean `3bb99ce2485aeb4b816e2ef21f8b74fb42328b08`、fetch成功、upstream0/0、vs origin/main18/0；main `3d0f40e`，無.codegraph。C writer/services已明確release；A/B/C source、原圖及pending美術全部保留，不merge main。已核人類原execution message及取消百分比門檻，沿task-relay／ponytail；ART/mastertaste與原圖足以定局部目標，未使用dream-loop。NW→第二水庭→機翼→島逐shot；四個NW／SE dock跨軸額外rows獨立標記，原98矩陣不變，欠同狀態S0的A5維持UNVERIFIED。首個sandbox Chrome launch失敗（無圖/row）與原log保留，fresh目錄retry獲准。進度與原證據見[D工作目錄](../../artifacts/closeup-polish/D/README.md)。
+
+D focal r1：8狀態／16原圖、4組雙窗效能及6比較完成，A4 2/6。Low/mixed A1高度24.8199%未過25%，high55.1096%通過；A2六個subject PASS、A3全FAIL。Shot82.3214/84.9667、hero82.3630/82.2273FPS，累積A/B/C/D與Chrome patch差異保留，raw calls/outliers不剔除。Root checks及checkpoint保存後才改r2，無美術接受。

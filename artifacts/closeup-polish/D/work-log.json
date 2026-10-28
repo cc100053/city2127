@@ -1,0 +1,63 @@
+{
+  "owner": "01a18154-a9bd-7ca2-a776-9a2834a519da",
+  "dispatch": "closeup-polish-D-1-r18",
+  "baseline": "3bb99ce2485aeb4b816e2ef21f8b74fb42328b08",
+  "preflight": {
+    "fetch": "PASS",
+    "clean": true,
+    "upstream": [
+      0,
+      0
+    ],
+    "vsMain": [
+      18,
+      0
+    ],
+    "codegraph": false
+  },
+  "scope": "Only D poses/builders, tests, DEV capture support and evidence/docs; no main merge.",
+  "dreamLoop": "Not used; ART/mastertaste and original screenshots define local target.",
+  "inventory": {
+    "garden2": [
+      "baseline",
+      "a",
+      "mixed"
+    ],
+    "wing": [
+      "baseline",
+      "a",
+      "b",
+      "mixed"
+    ],
+    "island": [
+      "baseline",
+      "c",
+      "mixed"
+    ],
+    "NWpairings": "AutomationDistrict only reads tiers.nw; cross-product dock is on existing SE carrier at se:8 with nw\u00b18, separately marked 4 extra rows, no same-state S0 baseline."
+  },
+  "services": {
+    "viteSession": 18787,
+    "port": 5194
+  },
+  "steps": [
+    "focal r1 pose-only authored",
+    {
+      "round": "r1",
+      "shot": "nw:focal",
+      "states": 8,
+      "A4": "2/6",
+      "A1": "low/mixed 24.8199% FAIL; high 55.1096% PASS",
+      "A2": "all six PASS",
+      "A3": "all six FAIL",
+      "perf": "shot82.3214/84.9667, hero82.3630/82.2273FPS; raw calls/outliers preserved",
+      "next": "r2 small pull-in, six recessed faces and upper operating joints; source unchanged until r1 tests/checkpoint finish"
+    },
+    {
+      "check": "r1 root npm test first attempt",
+      "result": "FAIL sandbox listen EPERM after geometry tests; no implementation failure shown",
+      "log": "r1/nw-focal/npm-test.log.txt",
+      "retry": "authorized escalation runs whole suite; first log preserved"
+    }
+  ]
+}

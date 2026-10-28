@@ -16,6 +16,10 @@ export const sePairings = [
   {state:'high-forest',meters:'se:8,ne:8',baseState:'8'},
   {state:'high-docks',meters:'se:8,nw:8',baseState:'8'},
 ].flatMap(row=>[12,22].map(hour=>({...row,id:'se:district',hour,pairing:true})));
+export const nwPairings = [
+  {state:'low-no-docks',meters:'nw:-8,se:8',baseState:'-8'},
+  {state:'high-docks',meters:'nw:8,se:8',baseState:'8'},
+].flatMap(row=>[12,22].map(hour=>({...row,id:'nw:district',hour,pairing:true})));
 export const selectedShots = (ids, pairings = false) => [...matrix,...(pairings?sePairings:[])].filter(row => !ids || ids.split(',').includes(row.id));
 export function framing(frame, id) {
   if (!frame?.box) return {A1:null,A2:null,A3:null,reason:frame?.reason ?? 'hero has no subject'};
@@ -35,6 +39,7 @@ if (process.argv.includes('--self-test')) {
   assert.equal(sectorB.filter(r=>r.id==='hero'||r.state===(r.id.endsWith('district')?'8':'2')).length,6);
   assert.equal(['focal','district'].reduce((n,kind)=>n+2*(selectedShots(`sw:${kind}`).length/2),0),16,'B adjacent plus extreme comparisons');
   assert.equal(selectedShots('ne:focal').length,6); assert.equal(selectedShots(undefined).length,98);
+  assert.equal(nwPairings.length,4);assert.ok(nwPairings.every(r=>r.pairing&&r.id==='nw:district'));
   assert.equal(matrix.length,98); assert.equal(new Set(matrix.map(r=>`${r.id}/${r.state}/${r.hour}`)).size,98);
   assert.equal(selectedShots('se:district,hero',true).length,18,'C includes all three cross-Meter pairings at both hours');
   assert.equal(selectedShots('se:focal,hero',true).length,8,'pairing support leaves other shots unchanged');
@@ -61,7 +66,7 @@ const report=existsSync(file)?JSON.parse(readFileSync(file,'utf8')):{mode,commit
   sourceDiff:execFileSync('git',['diff','--','src','tests','package.json'],{encoding:'utf8'}),browser:browser.version(),viewport:[1920,1080],dpr:1,quality:'default',launchArgs:mode==='perf'?['--disable-gpu-vsync','--disable-frame-rate-limit']:[],rows:[],errors:[]};
 const save=()=>writeFileSync(file,JSON.stringify(report,null,2)+'\n');
 const key=row=>`${row.id.replaceAll(':','-')}__${row.state}__h${row.hour}`;
-const selected=selectedShots(process.env.CITY_SHOTS??process.env.CITY_SHOT_ONLY,process.env.CITY_SE_PAIRINGS==='1');
+const selected=[...selectedShots(process.env.CITY_SHOTS??process.env.CITY_SHOT_ONLY,process.env.CITY_SE_PAIRINGS==='1'),...(process.env.CITY_NW_PAIRINGS==='1'?nwPairings:[])];
 async function load(row,wait) {
   const url=new URL(process.env.CITY2127_CITY_URL??'http://127.0.0.1:5194/');
   url.search=new URLSearchParams({reviewTime:'20',hour:String(row.hour),...(row.energy?{energy:row.energy}:{meters:row.meters}),...(row.id==='hero'?{}:{shot:row.id})});
