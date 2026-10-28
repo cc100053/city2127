@@ -1,5 +1,5 @@
 {
-  "updatedUTC": "2026-10-28T18:23:24.699583+00:00",
+  "updatedUTC": "2026-10-28T18:52:48.046361+00:00",
   "status": "RUNNING",
   "owner": "01a183af-1ca0-7190-a25c-b31a6db4fd98",
   "dispatch": "closeup-polish-Z-1-r21",
@@ -10,6 +10,7 @@
   "vite": "exec session57693 / 5194",
   "next": "Finish98 dual-take captures and original-detail review; standalone28perf then96A4; snapshot diffs/live/formal/production/docs/cleanup/push",
   "ownedServicesReleased": false,
-  "captures": 17,
-  "reviewedOriginals": 16
+  "captures": 52,
+  "reviewedOriginals": 50,
+  "protectedCurrentImages": 69
 }

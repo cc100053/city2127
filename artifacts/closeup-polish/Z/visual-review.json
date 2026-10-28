@@ -16,7 +16,41 @@
     "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__5__h12.jpg",
     "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__5__h22.jpg",
     "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__8__h12.jpg",
-    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__8__h22.jpg"
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__8__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-focal__-2__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-focal__-2__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-focal__0__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-focal__0__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-focal__2__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-focal__2__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__-8__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__-8__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__-5__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__-5__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__0__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__0__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__5__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__5__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__8__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__8__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-focal__-2__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-focal__-2__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-focal__0__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-focal__0__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-focal__2__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-focal__2__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__-8__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__-8__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__-5__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__-5__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__0__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__0__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__5__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__5__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__8__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__8__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/se-focal__-2__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/se-focal__-2__h22.jpg"
   ],
   "rows": {
     "nw:focal/-2/12": {
@@ -528,6 +562,1094 @@
         "V6": [
           "STATIC PASS",
           "此完整高態沒有混合小露台接合缺口，柱盤／基座沒有明顯穿模；動態閃爍仍未完整驗證。"
+        ]
+      }
+    },
+    "ne:focal/-2/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-focal__-2__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "與S0同focal pose；GLB葉簇變綠且有分片、立柱細節較明確，減少青色塑膠感，但高幹稀疏冠層及機械環仍搶眼。",
+      "lastToZ": "與A r3同park body／pose；累積D後右側白亭／盤的背景細節有差異，未見park本體新增改善。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "環形盆地與高桿／梯形機件主導，小公園容易讀成設備試驗盤而非海浜公園。"
+        ],
+        "V2": [
+          "PASS",
+          "前景海面與岸邊步道清楚入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "主體少數高幹上葉簇分片仍稀疏，背景孤立球冠／盆景網格保留。"
+        ],
+        "V4": [
+          "PASS",
+          "低及中態均有完整植栽、水盆與冷卻構造，低態非空方案。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜景植栽本體暗，冷光環與鄰樓亮窗比冠層突出。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "主體支架／池邊貼合未見明顯浮件或穿模；分片葉輪廓品質缺口列V3，動態閃爍未驗。"
+        ]
+      }
+    },
+    "ne:focal/-2/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-focal__-2__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "與S0同focal pose；GLB葉簇變綠且有分片、立柱細節較明確，減少青色塑膠感，但高幹稀疏冠層及機械環仍搶眼。",
+      "lastToZ": "與A r3同park body／pose；累積D後右側白亭／盤的背景細節有差異，未見park本體新增改善。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "環形盆地與高桿／梯形機件主導，小公園容易讀成設備試驗盤而非海浜公園。"
+        ],
+        "V2": [
+          "PASS",
+          "前景海面與岸邊步道清楚入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "主體少數高幹上葉簇分片仍稀疏，背景孤立球冠／盆景網格保留。"
+        ],
+        "V4": [
+          "PASS",
+          "低及中態均有完整植栽、水盆與冷卻構造，低態非空方案。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜景植栽本體暗，冷光環與鄰樓亮窗比冠層突出。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "主體支架／池邊貼合未見明顯浮件或穿模；分片葉輪廓品質缺口列V3，動態閃爍未驗。"
+        ]
+      }
+    },
+    "ne:focal/0/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-focal__0__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "與S0同focal pose；GLB葉簇變綠且有分片、立柱細節較明確，減少青色塑膠感，但高幹稀疏冠層及機械環仍搶眼。",
+      "lastToZ": "與A r3同park body／pose；累積D後右側白亭／盤的背景細節有差異，未見park本體新增改善。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "環形盆地與高桿／梯形機件主導，小公園容易讀成設備試驗盤而非海浜公園。"
+        ],
+        "V2": [
+          "PASS",
+          "前景海面與岸邊步道清楚入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "主體少數高幹上葉簇分片仍稀疏，背景孤立球冠／盆景網格保留。"
+        ],
+        "V4": [
+          "PASS",
+          "低及中態均有完整植栽、水盆與冷卻構造，低態非空方案。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜景植栽本體暗，冷光環與鄰樓亮窗比冠層突出。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "主體支架／池邊貼合未見明顯浮件或穿模；分片葉輪廓品質缺口列V3，動態閃爍未驗。"
+        ]
+      }
+    },
+    "ne:focal/0/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-focal__0__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "與S0同focal pose；GLB葉簇變綠且有分片、立柱細節較明確，減少青色塑膠感，但高幹稀疏冠層及機械環仍搶眼。",
+      "lastToZ": "與A r3同park body／pose；累積D後右側白亭／盤的背景細節有差異，未見park本體新增改善。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "中態夜景樹簇被冷光環與鄰樓亮窗壓過，像機械展台，公園身份不足。"
+        ],
+        "V2": [
+          "PASS",
+          "前景海面與岸邊步道清楚入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "主體少數高幹上葉簇分片仍稀疏，背景孤立球冠／盆景網格保留。"
+        ],
+        "V4": [
+          "PASS",
+          "低及中態均有完整植栽、水盆與冷卻構造，低態非空方案。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜景植栽本體暗，冷光環與鄰樓亮窗比冠層突出。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "主體支架／池邊貼合未見明顯浮件或穿模；分片葉輪廓品質缺口列V3，動態閃爍未驗。"
+        ]
+      }
+    },
+    "ne:focal/2/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-focal__2__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "與S0同pose／權威樹數；綠色分片葉簇減少青色塑膠感，較像植栽公園，但自然冠層品質未達標。",
+      "lastToZ": "與A r3同主體及pose，新增D背景細節未改park；沒有新的本體改善。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "高態較密的多層樹簇與環形公共綠台可直接讀成海邊植栽公園；夜間差異另列V5。"
+        ],
+        "V2": [
+          "PASS",
+          "前景海面與岸邊步道清楚入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "數量足但葉簇仍呈分片硬輪廓、粗幹露白，未成飽滿自然冠層；背景盆景亦稀疏。"
+        ],
+        "V4": [
+          "PASS",
+          "完整多層綠台／水盆與支架形成成熟高植栽替代方案。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜景植栽本體暗，冷光環與鄰樓亮窗比冠層突出。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "主體支架／池邊貼合未見明顯浮件或穿模；分片葉輪廓品質缺口列V3，動態閃爍未驗。"
+        ]
+      }
+    },
+    "ne:focal/2/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-focal__2__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "與S0同pose／權威樹數；綠色分片葉簇減少青色塑膠感，較像植栽公園，但自然冠層品質未達標。",
+      "lastToZ": "與A r3同主體及pose，新增D背景細節未改park；沒有新的本體改善。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "高態較密的多層樹簇與環形公共綠台可直接讀成海邊植栽公園；夜間差異另列V5。"
+        ],
+        "V2": [
+          "PASS",
+          "前景海面與岸邊步道清楚入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "數量足但葉簇仍呈分片硬輪廓、粗幹露白，未成飽滿自然冠層；背景盆景亦稀疏。"
+        ],
+        "V4": [
+          "PASS",
+          "完整多層綠台／水盆與支架形成成熟高植栽替代方案。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜景植栽本體暗，冷光環與鄰樓亮窗比冠層突出。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "主體支架／池邊貼合未見明顯浮件或穿模；分片葉輪廓品質缺口列V3，動態閃爍未驗。"
+        ]
+      }
+    },
+    "ne:district/-8/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__-8__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "構圖由S0看較多樓體改為更多海面與岸線，細化遮陽屏／pergola但實際氣候載體更小，低態功能辨識仍不足。",
+      "lastToZ": "與A r3同環境carrier及pose；累積D的NW白亭／盤／欄邊在背景有細節差異，環境本體未有新增改善。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "大幅海面與飛行路線主導，岸邊細小遮陽屏不足以兩秒讀成環境氣候配置。"
+        ],
+        "V2": [
+          "PASS",
+          "海面佔大部分下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "頂部格仔屋頂盆景及孤立球冠仍明顯，岸邊植栽稀疏。"
+        ],
+        "V4": [
+          "PASS",
+          "低態仍保留完整路徑、遮陽與機械冷卻替代方案。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖岸線亮邊可見，但暗色遮陽屏與背景亮窗難分層次。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "環境主體屏／pergola未見明顯浮件／穿模；鄰區hybrid接合缺口見NW判斷，未證全時間無閃爍。"
+        ]
+      }
+    },
+    "ne:district/-8/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__-8__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "構圖由S0看較多樓體改為更多海面與岸線，細化遮陽屏／pergola但實際氣候載體更小，低態功能辨識仍不足。",
+      "lastToZ": "與A r3同環境carrier及pose；累積D的NW白亭／盤／欄邊在背景有細節差異，環境本體未有新增改善。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "大幅海面與飛行路線主導，岸邊細小遮陽屏不足以兩秒讀成環境氣候配置。"
+        ],
+        "V2": [
+          "PASS",
+          "海面佔大部分下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "頂部格仔屋頂盆景及孤立球冠仍明顯，岸邊植栽稀疏。"
+        ],
+        "V4": [
+          "PASS",
+          "低態仍保留完整路徑、遮陽與機械冷卻替代方案。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖岸線亮邊可見，但暗色遮陽屏與背景亮窗難分層次。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "環境主體屏／pergola未見明顯浮件／穿模；鄰區hybrid接合缺口見NW判斷，未證全時間無閃爍。"
+        ]
+      }
+    },
+    "ne:district/-5/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__-5__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "改以更多海面和岸邊全列為中心，綠屏有葉層細節；本階段混合配置差異仍小，功能辨識未過。",
+      "lastToZ": "與A r3同環境本體／pose；背景NW改動與盤面方向差異保留，未新增環境本體改善。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "局部綠冠屏與機械冷卻配置交替，但岸線載體細小，仍被飛行路線及大片海面壓過。"
+        ],
+        "V2": [
+          "PASS",
+          "海面佔大部分下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "頂部格仔屋頂盆景及孤立球冠仍明顯，岸邊植栽稀疏。"
+        ],
+        "V4": [
+          "PASS",
+          "低態仍保留完整路徑、遮陽與機械冷卻替代方案。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖岸線亮邊可見，但暗色遮陽屏與背景亮窗難分層次。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "環境主體屏／pergola未見明顯浮件／穿模；鄰區hybrid接合缺口見NW判斷，未證全時間無閃爍。"
+        ]
+      }
+    },
+    "ne:district/-5/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__-5__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "改以更多海面和岸邊全列為中心，綠屏有葉層細節；本階段混合配置差異仍小，功能辨識未過。",
+      "lastToZ": "與A r3同環境本體／pose；背景NW改動與盤面方向差異保留，未新增環境本體改善。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "局部綠冠屏與機械冷卻配置交替，但岸線載體細小，仍被飛行路線及大片海面壓過。"
+        ],
+        "V2": [
+          "PASS",
+          "海面佔大部分下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "頂部格仔屋頂盆景及孤立球冠仍明顯，岸邊植栽稀疏。"
+        ],
+        "V4": [
+          "PASS",
+          "低態仍保留完整路徑、遮陽與機械冷卻替代方案。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖岸線亮邊可見，但暗色遮陽屏與背景亮窗難分層次。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "環境主體屏／pergola未見明顯浮件／穿模；鄰區hybrid接合缺口見NW判斷，未證全時間無閃爍。"
+        ]
+      }
+    },
+    "ne:district/0/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__0__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "與S0不同pose令岸線更完整，綠屏有葉層與pergola層次；整個氣候carrier仍難讀，海面及飛行器主導。",
+      "lastToZ": "與A r3同neutral環境主體／pose；累積NW背景操作邊與屋頂盤面差異照存，無新增主體改善。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "中態綠屏／遮陽組合完整，但範圍過廣、局部太小，難在兩秒指出氣候配置的主體。"
+        ],
+        "V2": [
+          "PASS",
+          "海面佔大部分下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "頂部格仔屋頂盆景及孤立球冠仍明顯，岸邊植栽稀疏。"
+        ],
+        "V4": [
+          "PASS",
+          "中態保留連續步道與遮陽／綠屏混合方案，完整成熟。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖岸線亮邊可見，但暗色遮陽屏與背景亮窗難分層次。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "環境主體屏／pergola未見明顯浮件／穿模；鄰區hybrid接合缺口見NW判斷，未證全時間無閃爍。"
+        ]
+      }
+    },
+    "ne:district/0/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__0__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "與S0不同pose令岸線更完整，綠屏有葉層與pergola層次；整個氣候carrier仍難讀，海面及飛行器主導。",
+      "lastToZ": "與A r3同neutral環境主體／pose；累積NW背景操作邊與屋頂盤面差異照存，無新增主體改善。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "中態綠屏／遮陽組合完整，但範圍過廣、局部太小，難在兩秒指出氣候配置的主體。"
+        ],
+        "V2": [
+          "PASS",
+          "海面佔大部分下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "頂部格仔屋頂盆景及孤立球冠仍明顯，岸邊植栽稀疏。"
+        ],
+        "V4": [
+          "PASS",
+          "中態保留連續步道與遮陽／綠屏混合方案，完整成熟。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖岸線亮邊可見，但暗色遮陽屏與背景亮窗難分層次。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "環境主體屏／pergola未見明顯浮件／穿模；鄰區hybrid接合缺口見NW判斷，未證全時間無閃爍。"
+        ]
+      }
+    },
+    "ne:district/5/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__5__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "新構圖較集中岸線綠層，屏葉細節有改善；但海面比例更大，夜間綠化輪廓及格仔植栽缺口保持。",
+      "lastToZ": "與A r3同環境本體／pose，較後NW操作邊只影響背景，未新增主體改善。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "較連續的岸線綠冠屏與立面綠層可讀成環境調節水岸，雖然局部功能細節偏小。"
+        ],
+        "V2": [
+          "PASS",
+          "海面佔大部分下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "綠層較多但仍像格仔薄片與盆景，沒有飽滿的連續冠層。"
+        ],
+        "V4": [
+          "PASS",
+          "完整綠屏／pergola與岸線公共路徑構成成熟偏環境方案。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖岸線亮邊可見，但暗色遮陽屏與背景亮窗難分層次。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "環境主體屏／pergola未見明顯浮件／穿模；鄰區hybrid接合缺口見NW判斷，未證全時間無閃爍。"
+        ]
+      }
+    },
+    "ne:district/5/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__5__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "新構圖較集中岸線綠層，屏葉細節有改善；但海面比例更大，夜間綠化輪廓及格仔植栽缺口保持。",
+      "lastToZ": "與A r3同環境本體／pose，較後NW操作邊只影響背景，未新增主體改善。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "較連續的岸線綠冠屏與立面綠層可讀成環境調節水岸，雖然局部功能細節偏小。"
+        ],
+        "V2": [
+          "PASS",
+          "海面佔大部分下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "綠層較多但仍像格仔薄片與盆景，沒有飽滿的連續冠層。"
+        ],
+        "V4": [
+          "PASS",
+          "完整綠屏／pergola與岸線公共路徑構成成熟偏環境方案。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖岸線亮邊可見，但暗色遮陽屏與背景亮窗難分層次。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "環境主體屏／pergola未見明顯浮件／穿模；鄰區hybrid接合缺口見NW判斷，未證全時間無閃爍。"
+        ]
+      }
+    },
+    "ne:district/8/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__8__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "新構圖較集中岸線綠層，屏葉細節有改善；但海面比例更大，夜間綠化輪廓及格仔植栽缺口保持。",
+      "lastToZ": "與A r3同環境本體／pose，較後NW操作邊只影響背景，未新增主體改善。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "較連續的岸線綠冠屏與立面綠層可讀成環境調節水岸，雖然局部功能細節偏小。"
+        ],
+        "V2": [
+          "PASS",
+          "海面佔大部分下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "綠層較多但仍像格仔薄片與盆景，沒有飽滿的連續冠層。"
+        ],
+        "V4": [
+          "PASS",
+          "完整綠屏／pergola與岸線公共路徑構成成熟偏環境方案。"
+        ],
+        "V5": [
+          "FAIL",
+          "完整高態的綠冠屏在夜間仍暗，鄰樓亮窗與飛行路線比環境配置更突出。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "環境主體屏／pergola未見明顯浮件／穿模；鄰區hybrid接合缺口見NW判斷，未證全時間無閃爍。"
+        ]
+      }
+    },
+    "ne:district/8/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/ne-district__8__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "新構圖較集中岸線綠層，屏葉細節有改善；但海面比例更大，夜間綠化輪廓及格仔植栽缺口保持。",
+      "lastToZ": "與A r3同環境本體／pose，較後NW操作邊只影響背景，未新增主體改善。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "較連續的岸線綠冠屏與立面綠層可讀成環境調節水岸，雖然局部功能細節偏小。"
+        ],
+        "V2": [
+          "PASS",
+          "海面佔大部分下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "綠層較多但仍像格仔薄片與盆景，沒有飽滿的連續冠層。"
+        ],
+        "V4": [
+          "PASS",
+          "完整綠屏／pergola與岸線公共路徑構成成熟偏環境方案。"
+        ],
+        "V5": [
+          "FAIL",
+          "完整高態的綠冠屏在夜間仍暗，鄰樓亮窗與飛行路線比環境配置更突出。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "環境主體屏／pergola未見明顯浮件／穿模；鄰區hybrid接合缺口見NW判斷，未證全時間無閃爍。"
+        ]
+      }
+    },
+    "sw:focal/-2/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-focal__-2__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "比S0明顯退步：主體移到遠處且中央白柱遮住座位／屋頂，左藍樓與右drone柱更搶眼；曲面環頂及摺屏細節無法補救構圖。",
+      "lastToZ": "與B r3同pose／commons body，中央柱遮擋完全保持；累積C/D背景細節不構成主體修正。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "遠處小圓亭被中央白柱擋住，不能兩秒讀出安靜私密座位廣場。"
+        ],
+        "V2": [
+          "FAIL",
+          "海面、富士球體及彩虹橋均未在這幅構圖清楚出現。"
+        ],
+        "V3": [
+          "FAIL",
+          "少數球冠／低poly植栽保留，大片草地及背景盆景沒有生態層次。"
+        ],
+        "V4": [
+          "PASS",
+          "私密屏／座位與有蓋公共空間仍是完整替代方案，遮擋不代表低態未建成。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖commons暗且被白柱遮擋，鄰樓亮窗與drone柱主導。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見環頂／基座邊緣未見浮件或穿模；被遮住的座位細節及動態閃爍未驗。"
+        ]
+      }
+    },
+    "sw:focal/-2/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-focal__-2__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "比S0明顯退步：主體移到遠處且中央白柱遮住座位／屋頂，左藍樓與右drone柱更搶眼；曲面環頂及摺屏細節無法補救構圖。",
+      "lastToZ": "與B r3同pose／commons body，中央柱遮擋完全保持；累積C/D背景細節不構成主體修正。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "遠處小圓亭被中央白柱擋住，不能兩秒讀出安靜私密座位廣場。"
+        ],
+        "V2": [
+          "FAIL",
+          "海面、富士球體及彩虹橋均未在這幅構圖清楚出現。"
+        ],
+        "V3": [
+          "FAIL",
+          "少數球冠／低poly植栽保留，大片草地及背景盆景沒有生態層次。"
+        ],
+        "V4": [
+          "PASS",
+          "私密屏／座位與有蓋公共空間仍是完整替代方案，遮擋不代表低態未建成。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖commons暗且被白柱遮擋，鄰樓亮窗與drone柱主導。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見環頂／基座邊緣未見浮件或穿模；被遮住的座位細節及動態閃爍未驗。"
+        ]
+      }
+    },
+    "sw:focal/0/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-focal__0__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "比S0主體更小且中央柱遮住座位／環頂，明顯構圖退步；本態長椅／屏細節難以辨認。",
+      "lastToZ": "與B r3同pose／commons body，中央柱遮擋完全保持；累積C/D背景細節不構成主體修正。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "混合屏／長椅藏在中央白柱後，只見細小圓亭，無法兩秒辨認座位方案。"
+        ],
+        "V2": [
+          "FAIL",
+          "海面、富士球體及彩虹橋均未在這幅構圖清楚出現。"
+        ],
+        "V3": [
+          "FAIL",
+          "少數球冠／低poly植栽保留，大片草地及背景盆景沒有生態層次。"
+        ],
+        "V4": [
+          "PASS",
+          "完整有蓋廣場與屏／長椅替代方案仍保留；構圖遮擋與成熟度分開判斷。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖commons暗且被白柱遮擋，鄰樓亮窗與drone柱主導。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見環頂／基座邊緣未見浮件或穿模；被遮住的座位細節及動態閃爍未驗。"
+        ]
+      }
+    },
+    "sw:focal/0/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-focal__0__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "比S0主體更小且中央柱遮住座位／環頂，明顯構圖退步；本態長椅／屏細節難以辨認。",
+      "lastToZ": "與B r3同pose／commons body，中央柱遮擋完全保持；累積C/D背景細節不構成主體修正。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "混合屏／長椅藏在中央白柱後，只見細小圓亭，無法兩秒辨認座位方案。"
+        ],
+        "V2": [
+          "FAIL",
+          "海面、富士球體及彩虹橋均未在這幅構圖清楚出現。"
+        ],
+        "V3": [
+          "FAIL",
+          "少數球冠／低poly植栽保留，大片草地及背景盆景沒有生態層次。"
+        ],
+        "V4": [
+          "PASS",
+          "完整有蓋廣場與屏／長椅替代方案仍保留；構圖遮擋與成熟度分開判斷。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖commons暗且被白柱遮擋，鄰樓亮窗與drone柱主導。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見環頂／基座邊緣未見浮件或穿模；被遮住的座位細節及動態閃爍未驗。"
+        ]
+      }
+    },
+    "sw:focal/2/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-focal__2__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "比S0主體更小且中央柱遮住座位／環頂，明顯構圖退步；本態長椅／屏細節難以辨認。",
+      "lastToZ": "與B r3同pose／commons body，中央柱遮擋完全保持；累積C/D背景細節不構成主體修正。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "開放共享長椅藏在中央白柱後，只見細小圓亭，無法兩秒辨認座位方案。"
+        ],
+        "V2": [
+          "FAIL",
+          "海面、富士球體及彩虹橋均未在這幅構圖清楚出現。"
+        ],
+        "V3": [
+          "FAIL",
+          "少數球冠／低poly植栽保留，大片草地及背景盆景沒有生態層次。"
+        ],
+        "V4": [
+          "PASS",
+          "完整有蓋廣場與屏／長椅替代方案仍保留；構圖遮擋與成熟度分開判斷。"
+        ],
+        "V5": [
+          "FAIL",
+          "夜景共享長椅／環頂仍被中央柱遮住，主體細小偏暗；鄰樓亮窗更搶眼。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見環頂／基座邊緣未見浮件或穿模；被遮住的座位細節及動態閃爍未驗。"
+        ]
+      }
+    },
+    "sw:focal/2/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-focal__2__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "比S0主體更小且中央柱遮住座位／環頂，明顯構圖退步；本態長椅／屏細節難以辨認。",
+      "lastToZ": "與B r3同pose／commons body，中央柱遮擋完全保持；累積C/D背景細節不構成主體修正。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "開放共享長椅藏在中央白柱後，只見細小圓亭，無法兩秒辨認座位方案。"
+        ],
+        "V2": [
+          "FAIL",
+          "海面、富士球體及彩虹橋均未在這幅構圖清楚出現。"
+        ],
+        "V3": [
+          "FAIL",
+          "少數球冠／低poly植栽保留，大片草地及背景盆景沒有生態層次。"
+        ],
+        "V4": [
+          "PASS",
+          "完整有蓋廣場與屏／長椅替代方案仍保留；構圖遮擋與成熟度分開判斷。"
+        ],
+        "V5": [
+          "FAIL",
+          "夜景共享長椅／環頂仍被中央柱遮住，主體細小偏暗；鄰樓亮窗更搶眼。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見環頂／基座邊緣未見浮件或穿模；被遮住的座位細節及動態閃爍未驗。"
+        ]
+      }
+    },
+    "sw:district/-8/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__-8__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "改為更高俯視，完整carrier可投影而S0跨near plane；私密半球水房仍可辨，主體較遠，曲頂肋／縫細節只屬局部改善。",
+      "lastToZ": "與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "兩個透明有蓋半球水房與獨立植栽台可讀成私密水岸休憩空間。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣佔下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "頂部屋頂盆景仍棋盤式零散，球冠與孤立樹盆缺層次。"
+        ],
+        "V4": [
+          "PASS",
+          "私密低態有完整可用水房／公共岸線與接岸路徑，不是空白或落後方案。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖半球肋與淡粉邊光保留輪廓，水房與開放盤仍可分。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見穹頂肋、接岸小橋及基座未見明顯浮件／穿模；未驗證完整動態閃爍。"
+        ]
+      }
+    },
+    "sw:district/-8/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__-8__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "改為更高俯視，完整carrier可投影而S0跨near plane；私密半球水房仍可辨，主體較遠，曲頂肋／縫細節只屬局部改善。",
+      "lastToZ": "與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "兩個透明有蓋半球水房與獨立植栽台可讀成私密水岸休憩空間。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣佔下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "頂部屋頂盆景仍棋盤式零散，球冠與孤立樹盆缺層次。"
+        ],
+        "V4": [
+          "PASS",
+          "私密低態有完整可用水房／公共岸線與接岸路徑，不是空白或落後方案。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖半球肋與淡粉邊光保留輪廓，水房與開放盤仍可分。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見穹頂肋、接岸小橋及基座未見明顯浮件／穿模；未驗證完整動態閃爍。"
+        ]
+      }
+    },
+    "sw:district/-5/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__-5__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "高俯視使carrier完整可投影，半球曲頂肋與開放盤更能比較；主體較遠且屋頂盆景仍稀疏，未達全部gate。",
+      "lastToZ": "與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "有蓋半球水房與開放綠盤並存，可讀成混合安靜／共用的水岸空間。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣佔下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "頂部屋頂盆景仍棋盤式零散，球冠與孤立樹盆缺層次。"
+        ],
+        "V4": [
+          "PASS",
+          "混合水房／露台與完整接岸通道均在，成熟方案並非過渡空白。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖半球肋與淡粉邊光保留輪廓，水房與開放盤仍可分。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見穹頂肋、接岸小橋及基座未見明顯浮件／穿模；未驗證完整動態閃爍。"
+        ]
+      }
+    },
+    "sw:district/-5/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__-5__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "高俯視使carrier完整可投影，半球曲頂肋與開放盤更能比較；主體較遠且屋頂盆景仍稀疏，未達全部gate。",
+      "lastToZ": "與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "有蓋半球水房與開放綠盤並存，可讀成混合安靜／共用的水岸空間。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣佔下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "頂部屋頂盆景仍棋盤式零散，球冠與孤立樹盆缺層次。"
+        ],
+        "V4": [
+          "PASS",
+          "混合水房／露台與完整接岸通道均在，成熟方案並非過渡空白。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖半球肋與淡粉邊光保留輪廓，水房與開放盤仍可分。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見穹頂肋、接岸小橋及基座未見明顯浮件／穿模；未驗證完整動態閃爍。"
+        ]
+      }
+    },
+    "sw:district/0/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__0__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "高俯視使carrier完整可投影，半球曲頂肋與開放盤更能比較；主體較遠且屋頂盆景仍稀疏，未達全部gate。",
+      "lastToZ": "與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "有蓋半球水房與開放綠盤並存，可讀成混合安靜／共用的水岸空間。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣佔下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "頂部屋頂盆景仍棋盤式零散，球冠與孤立樹盆缺層次。"
+        ],
+        "V4": [
+          "PASS",
+          "混合水房／露台與完整接岸通道均在，成熟方案並非過渡空白。"
+        ],
+        "V5": [
+          "PASS",
+          "夜間半球肋、開放台及接岸邊光仍能辨認混合水岸方案。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見穹頂肋、接岸小橋及基座未見明顯浮件／穿模；未驗證完整動態閃爍。"
+        ]
+      }
+    },
+    "sw:district/0/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__0__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "高俯視使carrier完整可投影，半球曲頂肋與開放盤更能比較；主體較遠且屋頂盆景仍稀疏，未達全部gate。",
+      "lastToZ": "與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "有蓋半球水房與開放綠盤並存，可讀成混合安靜／共用的水岸空間。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣佔下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "頂部屋頂盆景仍棋盤式零散，球冠與孤立樹盆缺層次。"
+        ],
+        "V4": [
+          "PASS",
+          "混合水房／露台與完整接岸通道均在，成熟方案並非過渡空白。"
+        ],
+        "V5": [
+          "PASS",
+          "夜間半球肋、開放台及接岸邊光仍能辨認混合水岸方案。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見穹頂肋、接岸小橋及基座未見明顯浮件／穿模；未驗證完整動態閃爍。"
+        ]
+      }
+    },
+    "sw:district/5/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__5__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "新俯視讓完整carrier可投影，開放盤與座位環可辨；較遠的構圖與格仔綠化缺口仍在，未成全gate通過。",
+      "lastToZ": "與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "開放綠盤、環形座位及公共岸線可直接讀成較共享的水岸休憩空間。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣佔下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "頂部屋頂盆景仍棋盤式零散，球冠與孤立樹盆缺層次。"
+        ],
+        "V4": [
+          "PASS",
+          "開放台及混合內陸庭院完整有接岸通道，成熟公共共享方案。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖盤邊暖光及座位環保留輪廓，可與有蓋私密水房區分。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見穹頂肋、接岸小橋及基座未見明顯浮件／穿模；未驗證完整動態閃爍。"
+        ]
+      }
+    },
+    "sw:district/5/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__5__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "新俯視讓完整carrier可投影，開放盤與座位環可辨；較遠的構圖與格仔綠化缺口仍在，未成全gate通過。",
+      "lastToZ": "與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "開放綠盤、環形座位及公共岸線可直接讀成較共享的水岸休憩空間。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣佔下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "頂部屋頂盆景仍棋盤式零散，球冠與孤立樹盆缺層次。"
+        ],
+        "V4": [
+          "PASS",
+          "開放台及混合內陸庭院完整有接岸通道，成熟公共共享方案。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖盤邊暖光及座位環保留輪廓，可與有蓋私密水房區分。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見穹頂肋、接岸小橋及基座未見明顯浮件／穿模；未驗證完整動態閃爍。"
+        ]
+      }
+    },
+    "sw:district/8/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__8__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "完整carrier由S0 near-plane不可投影改為可量度，開放環台仍可辨；俯視較遠，格仔綠化與A3缺口沒有解決。",
+      "lastToZ": "與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "完整開放植栽盤／環形座位與公共步道可讀成共用水岸空間。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣佔下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "頂部屋頂盆景仍棋盤式零散，球冠與孤立樹盆缺層次。"
+        ],
+        "V4": [
+          "PASS",
+          "高共享態完整保留接岸路徑與公共綠台，屬成熟替代方案。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖盤邊暖光及座位環保留輪廓，可與有蓋私密水房區分。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見穹頂肋、接岸小橋及基座未見明顯浮件／穿模；未驗證完整動態閃爍。"
+        ]
+      }
+    },
+    "sw:district/8/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/sw-district__8__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "完整carrier由S0 near-plane不可投影改為可量度，開放環台仍可辨；俯視較遠，格仔綠化與A3缺口沒有解決。",
+      "lastToZ": "與B r3同sharing body／pose；累積C/D的背景局部細節有差異，但私密水房及共享區沒有新增改善或明顯退步。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "完整開放植栽盤／環形座位與公共步道可讀成共用水岸空間。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣佔下半畫面，水岸定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "頂部屋頂盆景仍棋盤式零散，球冠與孤立樹盆缺層次。"
+        ],
+        "V4": [
+          "PASS",
+          "高共享態完整保留接岸路徑與公共綠台，屬成熟替代方案。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖盤邊暖光及座位環保留輪廓，可與有蓋私密水房區分。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見穹頂肋、接岸小橋及基座未見明顯浮件／穿模；未驗證完整動態閃爍。"
+        ]
+      }
+    },
+    "se:focal/-2/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/se-focal__-2__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "S0高桿低態改為有支承的小型服務廊／核心，避免空高桿；新pose讓本體仍夾在兩大樓間，低態辨識沒有達標。",
+      "lastToZ": "與C r3同低態服務廊／pose；累積D局部改動在此背景沒有明顯主體影響，未新增改善。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "中央小型藍色服務廊／核心比兩側大樓小得多，兩秒難認出分散日常機能。"
+        ],
+        "V2": [
+          "PASS",
+          "後方海灣與富士球體入鏡，定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "屋頂孤立球冠／盆景與前景格仔綠地保留，冠層欠連續層次。"
+        ],
+        "V4": [
+          "PASS",
+          "低態保留完整有支承的佔用空間與連接核心，不是空桿或舊式空白地。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖小藍廊暗且被鄰樓亮窗壓過，低態輪廓難讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見小廊／核心支承未見明顯浮件／穿模，像素較小限制細節判斷；動態閃爍未驗。"
+        ]
+      }
+    },
+    "se:focal/-2/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/se-focal__-2__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "S0高桿低態改為有支承的小型服務廊／核心，避免空高桿；新pose讓本體仍夾在兩大樓間，低態辨識沒有達標。",
+      "lastToZ": "與C r3同低態服務廊／pose；累積D局部改動在此背景沒有明顯主體影響，未新增改善。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "中央小型藍色服務廊／核心比兩側大樓小得多，兩秒難認出分散日常機能。"
+        ],
+        "V2": [
+          "PASS",
+          "後方海灣與富士球體入鏡，定位清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "屋頂孤立球冠／盆景與前景格仔綠地保留，冠層欠連續層次。"
+        ],
+        "V4": [
+          "PASS",
+          "低態保留完整有支承的佔用空間與連接核心，不是空桿或舊式空白地。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖小藍廊暗且被鄰樓亮窗壓過，低態輪廓難讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見小廊／核心支承未見明顯浮件／穿模，像素較小限制細節判斷；動態閃爍未驗。"
         ]
       }
     }

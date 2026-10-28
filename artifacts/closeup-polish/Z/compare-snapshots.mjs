@@ -4,6 +4,11 @@ import {readFileSync,writeFileSync,existsSync} from 'node:fs';
 import {chromium} from '/opt/homebrew/lib/node_modules/@playwright/cli/node_modules/playwright/index.mjs';
 import {key,lastSnapshots,sectorFor} from './snapshots.mjs';
 const root='artifacts/closeup-polish/Z',read=p=>JSON.parse(readFileSync(p,'utf8'));
+const metric=(from,to)=>({from:from??null,to:to??null,delta:Number.isFinite(from)&&Number.isFinite(to)?to-from:null});
+if(process.argv.includes('--self-test')){
+ assert.deepEqual(metric(.25,.3),{from:.25,to:.3,delta:.3-.25});assert.deepEqual(metric(undefined,.3),{from:null,to:.3,delta:null});
+ console.log('PASS: numeric deltas preserve missing projection instead of inventing zero.');process.exit(0);
+}
 const file=`${root}/snapshot-comparisons.json`;assert.ok(!existsSync(file),'Preserve earlier measurements');
 const current=read(`${root}/current/capture.json`),s0=read('artifacts/closeup-polish/S0/baseline/capture.json'),last=lastSnapshots();
 assert.equal(current.rows.length,98);
@@ -28,7 +33,9 @@ try{
     }
     return {full:mad({left:0,right:1,top:0,bottom:1}),subjectUnion:mad(box)};
    },{a:'data:image/jpeg;base64,'+readFileSync(old.row.images[1]).toString('base64'),b:'data:image/jpeg;base64,'+readFileSync(r.images[1]).toString('base64'),box});
-   rows.push({id:r.id,state:r.state,hour:r.hour,from:old.label,priorCommit:old.commit??s0.commit,priorImage:old.row.images[1],currentImage:r.images[1],poseChanged:JSON.stringify(old.row.pose)!==JSON.stringify(r.pose),...data});
+   const numeric=Object.fromEntries(['width','height','cardOverlap'].map(k=>[k,metric(old.row.auto[k],r.auto[k])]));
+   numeric.hits=metric(old.row.frame?.hits,r.frame?.hits);for(const k of ['fps','drawCalls'])numeric[k]=metric(Number(old.row.diagnostics[k]),Number(r.diagnostics[k]));
+   rows.push({id:r.id,state:r.state,hour:r.hour,from:old.label,priorCommit:old.commit??s0.commit,priorImage:old.row.images[1],currentImage:r.images[1],poseChanged:JSON.stringify(old.row.pose)!==JSON.stringify(r.pose),numeric,...data});
   }
  }
  assert.equal(rows.length,202,'98 S0 + 96 local shot + eight sector hero comparisons');

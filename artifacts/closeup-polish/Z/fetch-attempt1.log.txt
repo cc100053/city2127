@@ -1,0 +1,3 @@
+Preserved initial tool output (no retry output substituted):
+fatal: unable to access 'https://github.com/cc100053/city2127.git/': Could not resolve host: github.com
+Escalated git fetch --prune origin retry succeeded; upstream0/0 and main34/2 verified.
