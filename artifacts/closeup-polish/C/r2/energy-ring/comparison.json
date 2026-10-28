@@ -1,0 +1,112 @@
+{
+  "mode": "compare",
+  "commit": "67386a4ba643fdde5e16759d96e5439aafb5b5b7",
+  "sourceDiff": "diff --git a/src/energyPrototype.ts b/src/energyPrototype.ts\nindex e19aeaf..7b57561 100644\n--- a/src/energyPrototype.ts\n+++ b/src/energyPrototype.ts\n@@ -295,7 +295,12 @@ export function energyPrototype() {\n       pipe(rotor, [radius * c, radius * s, -1.18], [radius * c, radius * s, -1.32], .105, chrome);\n     }\n   }\n-  box(rotor, [1.2, .42, .12], [31, 0, -1.2], publicLight);\n+  // Sparse operating marks keep the rotor readable at night without turning its belt into a light ring.\n+  for (let i = 0; i < 4; i++) {\n+    const a = i * Math.PI / 2;\n+    const marker = box(rotor, [1.2, .42, .12], [31 * Math.cos(a), 31 * Math.sin(a), -1.2], publicLight);\n+    marker.rotation.z = a;\n+  }\n   for (const side of [-1, 1]) {\n     const x = side * 25.7, y = 25.7;\n     // Fixed bearing housings clear r33 even while the complete belt sweeps past.\n",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "energy:ring",
+      "hour": 12,
+      "from": "baseline",
+      "to": "b",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.03437954195517016,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:ring",
+      "hour": 12,
+      "from": "b",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.00581021309317674,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:ring",
+      "hour": 12,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.034379070795727655,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:ring",
+      "hour": 22,
+      "from": "baseline",
+      "to": "b",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.026698321587429658,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:ring",
+      "hour": 22,
+      "from": "b",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.0046866450601412485,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:ring",
+      "hour": 22,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.02671300114881003,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}

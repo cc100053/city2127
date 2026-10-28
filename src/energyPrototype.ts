@@ -295,7 +295,12 @@ export function energyPrototype() {
       pipe(rotor, [radius * c, radius * s, -1.18], [radius * c, radius * s, -1.32], .105, chrome);
     }
   }
-  box(rotor, [1.2, .42, .12], [31, 0, -1.2], publicLight);
+  // Sparse operating marks keep the rotor readable at night without turning its belt into a light ring.
+  for (let i = 0; i < 4; i++) {
+    const a = i * Math.PI / 2;
+    const marker = box(rotor, [1.2, .42, .12], [31 * Math.cos(a), 31 * Math.sin(a), -1.2], publicLight);
+    marker.rotation.z = a;
+  }
   for (const side of [-1, 1]) {
     const x = side * 25.7, y = 25.7;
     // Fixed bearing housings clear r33 even while the complete belt sweeps past.

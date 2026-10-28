@@ -18,7 +18,15 @@
     "r3/se-district/se-district__high-forest__h12.jpg",
     "r3/se-district/se-district__high-forest__h22.jpg",
     "r3/se-district/se-district__high-docks__h12.jpg",
-    "r3/se-district/se-district__high-docks__h22.jpg"
+    "r3/se-district/se-district__high-docks__h22.jpg",
+    "r2/energy-ring/energy-ring__baseline__h12.jpg",
+    "r2/energy-ring/energy-ring__baseline__h22.jpg",
+    "r2/energy-ring/energy-ring__b__h12.jpg",
+    "r2/energy-ring/energy-ring__b__h22.jpg",
+    "r2/energy-ring/energy-ring__mixed__h12.jpg",
+    "r2/energy-ring/hero__neutral__h12.jpg",
+    "r2/energy-ring/energy-ring__mixed__h22.jpg",
+    "r2/energy-ring/hero__neutral__h22.jpg"
   ],
   "rows": {
     "se:district/se:district/-8/12": {
@@ -540,6 +548,238 @@
         "V6": [
           "FAIL",
           "藍色dock環及小停泊機看似直接懸在塔外，原圖未能讀到支承／連接與載荷路徑；三輪後保留此缺口，不用光效冒充實體完成。"
+        ]
+      }
+    },
+    "energy:ring/energy:ring/baseline/12": {
+      "image": "r2/energy-ring/energy-ring__baseline__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "N/A",
+          "Baseline按設計移除蓄電環，沒有該設施可做辨認；保留原地點背景供比較。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體在中央且清楚，左右海灣／遠處橋線提供場地定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "CivicCore露台及左側景觀仍有細幹團狀樹冠；本輪只改環的操作標記，綠化未達整圖門檻。"
+        ],
+        "V4": [
+          "PASS",
+          "沒有環仍是完整成熟的Fuji公共框架與劇場，baseline不代表舊城市。"
+        ],
+        "V5": [
+          "N/A",
+          "此狀態環按設計不存在，無環體夜間輪廓可驗；背景劇場仍可讀。"
+        ],
+        "V6": [
+          "N/A",
+          "環體按baseline移除，沒有該部件可作近距離零件檢查；背景未見新增缺陷。"
+        ]
+      }
+    },
+    "energy:ring/energy:ring/baseline/22": {
+      "image": "r2/energy-ring/energy-ring__baseline__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "N/A",
+          "Baseline按設計移除蓄電環，沒有該設施可做辨認；保留原地點背景供比較。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體在中央且清楚，左右海灣／遠處橋線提供場地定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "CivicCore露台及左側景觀仍有細幹團狀樹冠；本輪只改環的操作標記，綠化未達整圖門檻。"
+        ],
+        "V4": [
+          "PASS",
+          "沒有環仍是完整成熟的Fuji公共框架與劇場，baseline不代表舊城市。"
+        ],
+        "V5": [
+          "N/A",
+          "此狀態環按設計不存在，無環體夜間輪廓可驗；背景劇場仍可讀。"
+        ],
+        "V6": [
+          "N/A",
+          "環體按baseline移除，沒有該部件可作近距離零件檢查；背景未見新增缺陷。"
+        ]
+      }
+    },
+    "energy:ring/energy:ring/b/12": {
+      "image": "r2/energy-ring/energy-ring__b__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "獨立中空轉子、兩個上方固定軸承及重複cassette可辨，與後方劇場球體分開；可讀成工程化蓄電環。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體在中央且清楚，左右海灣／遠處橋線提供場地定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "CivicCore露台及左側景觀仍有細幹團狀樹冠；本輪只改環的操作標記，綠化未達整圖門檻。"
+        ],
+        "V4": [
+          "PASS",
+          "轉子與固定軸承／transfer frame關係清楚，保留大中空與公共路徑，成熟機械系統不依賴霓虹。"
+        ],
+        "V5": [
+          "N/A",
+          "日景，h22另驗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原圖輪帶／軸承接點無明顯表面打架或浮空；full-sweep／包絡測試保留原清場，完整動態閃爍未全驗。"
+        ]
+      }
+    },
+    "energy:ring/energy:ring/b/22": {
+      "image": "r2/energy-ring/energy-ring__b__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "獨立中空轉子、兩個上方固定軸承及重複cassette可辨，與後方劇場球體分開；可讀成工程化蓄電環。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體在中央且清楚，左右海灣／遠處橋線提供場地定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "CivicCore露台及左側景觀仍有細幹團狀樹冠；本輪只改環的操作標記，綠化未達整圖門檻。"
+        ],
+        "V4": [
+          "PASS",
+          "轉子與固定軸承／transfer frame關係清楚，保留大中空與公共路徑，成熟機械系統不依賴霓虹。"
+        ],
+        "V5": [
+          "PASS",
+          "四個稀疏操作標記配合金屬邊緣令環的輪廓可讀，與亮劇場分開；cassette細節仍偏暗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原圖輪帶／軸承接點無明顯表面打架或浮空；full-sweep／包絡測試保留原清場，完整動態閃爍未全驗。"
+        ]
+      }
+    },
+    "energy:ring/energy:ring/mixed/12": {
+      "image": "r2/energy-ring/energy-ring__mixed__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "獨立中空轉子、兩個上方固定軸承及重複cassette可辨，與後方劇場球體分開；可讀成工程化蓄電環。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體在中央且清楚，左右海灣／遠處橋線提供場地定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "CivicCore露台及左側景觀仍有細幹團狀樹冠；本輪只改環的操作標記，綠化未達整圖門檻。"
+        ],
+        "V4": [
+          "PASS",
+          "轉子與固定軸承／transfer frame關係清楚，保留大中空與公共路徑，成熟機械系統不依賴霓虹。"
+        ],
+        "V5": [
+          "N/A",
+          "日景，h22另驗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原圖輪帶／軸承接點無明顯表面打架或浮空；full-sweep／包絡測試保留原清場，完整動態閃爍未全驗。"
+        ]
+      }
+    },
+    "energy:ring/hero/neutral/12": {
+      "image": "r2/energy-ring/hero__neutral__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "N/A",
+          "Hero全城對照，不以單一C主體兩秒辨識門檻判定。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣及Rainbow Bridge保留在背景，Fuji主框架與劇場球體清楚定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景方格屋頂與細幹球冠仍明顯，局部冠層改善未令整圖達標。"
+        ],
+        "V4": [
+          "PASS",
+          "低中高建物與公共地面、立體路徑保持成熟2127配置。"
+        ],
+        "V5": [
+          "N/A",
+          "日景，夜間另驗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此張原圖未見新增浮空或明顯表面打架；未完整驗證動態閃爍。"
+        ]
+      }
+    },
+    "energy:ring/energy:ring/mixed/22": {
+      "image": "r2/energy-ring/energy-ring__mixed__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "獨立中空轉子、兩個上方固定軸承及重複cassette可辨，與後方劇場球體分開；可讀成工程化蓄電環。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體在中央且清楚，左右海灣／遠處橋線提供場地定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "CivicCore露台及左側景觀仍有細幹團狀樹冠；本輪只改環的操作標記，綠化未達整圖門檻。"
+        ],
+        "V4": [
+          "PASS",
+          "轉子與固定軸承／transfer frame關係清楚，保留大中空與公共路徑，成熟機械系統不依賴霓虹。"
+        ],
+        "V5": [
+          "PASS",
+          "四個稀疏操作標記配合金屬邊緣令環的輪廓可讀，與亮劇場分開；cassette細節仍偏暗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原圖輪帶／軸承接點無明顯表面打架或浮空；full-sweep／包絡測試保留原清場，完整動態閃爍未全驗。"
+        ]
+      }
+    },
+    "energy:ring/hero/neutral/22": {
+      "image": "r2/energy-ring/hero__neutral__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "N/A",
+          "Hero全城對照，不以單一C主體兩秒辨識門檻判定。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣及Rainbow Bridge保留在背景，Fuji主框架與劇場球體清楚定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景方格屋頂與細幹球冠仍明顯，局部冠層改善未令整圖達標。"
+        ],
+        "V4": [
+          "PASS",
+          "低中高建物與公共地面、立體路徑保持成熟2127配置。"
+        ],
+        "V5": [
+          "PASS",
+          "暖窗與路徑輪廓可讀，未靠整面霓虹；遠處細節仍有限。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此張原圖未見新增浮空或明顯表面打架；未完整驗證動態閃爍。"
         ]
       }
     }
