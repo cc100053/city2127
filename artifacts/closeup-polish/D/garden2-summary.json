@@ -1,0 +1,138 @@
+{
+  "shot": "energy:garden2",
+  "rounds": 2,
+  "A4": [
+    1,
+    6
+  ],
+  "subject": [
+    {
+      "state": "baseline",
+      "hour": 12,
+      "auto": {
+        "A1": null,
+        "A2": null,
+        "A3": null,
+        "reason": "subject absent in this state"
+      },
+      "hits": 0
+    },
+    {
+      "state": "baseline",
+      "hour": 22,
+      "auto": {
+        "A1": null,
+        "A2": null,
+        "A3": null,
+        "reason": "subject absent in this state"
+      },
+      "hits": 0
+    },
+    {
+      "state": "a",
+      "hour": 12,
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.39100172266088423,
+        "height": 0.5028131143495398,
+        "center": {
+          "x": 0.5273610722586324,
+          "y": 0.5194028178342834
+        },
+        "cardOverlap": 0
+      },
+      "hits": 0
+    },
+    {
+      "state": "a",
+      "hour": 22,
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.39100172266088423,
+        "height": 0.5028131143495398,
+        "center": {
+          "x": 0.5273610722586324,
+          "y": 0.5194028178342834
+        },
+        "cardOverlap": 0
+      },
+      "hits": 0
+    },
+    {
+      "state": "mixed",
+      "hour": 12,
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.39100172266088423,
+        "height": 0.5028131143495398,
+        "center": {
+          "x": 0.5273610722586324,
+          "y": 0.5194028178342834
+        },
+        "cardOverlap": 0
+      },
+      "hits": 0
+    },
+    {
+      "state": "mixed",
+      "hour": 22,
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.39100172266088423,
+        "height": 0.5028131143495398,
+        "center": {
+          "x": 0.5273610722586324,
+          "y": 0.5194028178342834
+        },
+        "cardOverlap": 0
+      },
+      "hits": 0
+    }
+  ],
+  "performance": [
+    {
+      "id": "energy:garden2",
+      "hour": 12,
+      "fps": 103.24835274422972,
+      "calls": [
+        "483",
+        "483"
+      ]
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 22,
+      "fps": 102.5312714801326,
+      "calls": [
+        "483",
+        "483"
+      ]
+    },
+    {
+      "id": "hero",
+      "hour": 12,
+      "fps": 89.1671379777799,
+      "calls": [
+        "952",
+        "952"
+      ]
+    },
+    {
+      "id": "hero",
+      "hour": 22,
+      "fps": 89.22949721425076,
+      "calls": [
+        "952",
+        "952"
+      ]
+    }
+  ]
+}

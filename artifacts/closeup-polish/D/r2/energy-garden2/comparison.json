@@ -1,0 +1,112 @@
+{
+  "mode": "compare",
+  "commit": "549fbdcf7fbe553af194063ab96145ffd39be33b",
+  "sourceDiff": "",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "energy:garden2",
+      "hour": 12,
+      "from": "baseline",
+      "to": "a",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.07390921101737476,
+      "rect": {
+        "x": 637,
+        "y": 289,
+        "width": 751,
+        "height": 544
+      },
+      "pass": true
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 12,
+      "from": "a",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.007329894243277322,
+      "rect": {
+        "x": 637,
+        "y": 289,
+        "width": 751,
+        "height": 544
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 12,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.0769011176178782,
+      "rect": {
+        "x": 637,
+        "y": 289,
+        "width": 751,
+        "height": 544
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 22,
+      "from": "baseline",
+      "to": "a",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.05266012099207976,
+      "rect": {
+        "x": 637,
+        "y": 289,
+        "width": 751,
+        "height": 544
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 22,
+      "from": "a",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.004361399333760292,
+      "rect": {
+        "x": 637,
+        "y": 289,
+        "width": 751,
+        "height": 544
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 22,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.05374717920639967,
+      "rect": {
+        "x": 637,
+        "y": 289,
+        "width": 751,
+        "height": 544
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}

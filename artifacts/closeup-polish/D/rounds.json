@@ -10,6 +10,7 @@
     "r3/nw-district"
   ],
   "energy:garden2": [
-    "r1/energy-garden2"
+    "r1/energy-garden2",
+    "r2/energy-garden2"
   ]
 }
