@@ -1,0 +1,4 @@
+perf energy-island__mixed__h12 89.48798664689477
+perf energy-island__mixed__h22 91.40679430502027
+perf hero__neutral__h12 87.48672417570808
+perf hero__neutral__h22 87.8341669080598

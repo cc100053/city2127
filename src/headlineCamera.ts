@@ -20,8 +20,8 @@ export const SHOTS: Record<ShotId, Pose> = {
   'energy:garden': { position: [-420, 65, -210], target: [-304, 12, -135] },
   'energy:garden2': { position: [-15, 36, -455], target: [32, 8, -392] },
   'energy:ring': { position: [-70, 135, -170], target: [-18, 99, -24] },
-  'energy:wing': { position: [110, 64, -530], target: [125, 17, -424] },
-  'energy:island': { position: [-142, 66, -556], target: [-60, 4, -470] },
+  'energy:wing': { position: [56, 64, -496], target: [125, 22, -424] },
+  'energy:island': { position: [-150, 65, -590], target: [-40, 8, -425] },
 };
 export function headlineShot(change: CarrierChange | undefined): ShotId | null {
   if (!change) return null;

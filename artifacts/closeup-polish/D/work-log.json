@@ -684,9 +684,22 @@
         ]
       },
       "stopAt2": "Measured local glare/operating-edge refinement complete; V1 still ordinary-solar ambiguity, V3 still FAIL, A3/A4 retain full hollow and same b/mixed body. No unchanged third run to replace a failure."
+    },
+    {
+      "selfReview": "Exact D diff against3bb99ce reviewed: hub faces/joints with late GLB, NW supported guards/disc joints/local ceramic, capture opt-in4 rows/default98 unchanged, affected tests. Controllers/targets/slots/selection preserved by scope assertions. Energy garden/receiver reviewed separately; island pending."
+    },
+    {
+      "islandR1Review": "c day/night originals inspected: island smaller thanS0 but full bridge/shore/Fuji landmark now visible; A1/A2 PASS on full group. Low deck edges dim atnight, r2 two seated publicLight strips within existing caisson top, same existing materialbatch. No edits until r1 measurement completes."
+    },
+    {
+      "measurementContext": "Garden2 r2 first capture states overlapped the approved root npm test (~2.5min); full suite ended before its independent uncapped performance phase. Raw capped FPS/repro rows remain unchanged; no isolated idle-machine claim. Remaining final root suite will precede island r2 browser work, final live runs after all performance."
+    },
+    {
+      "wingStopAt2Superseded": "Direct S0 review shows r2 FPS98.14/99.70 vs132.05/133.60 and calls505 vs378, severe framing regression despite local material improvement. Use final allowed r3 to restore exact S0 wing pose with same measured D builder. Full matrix required; not an unmeasured hybrid. r2 visual review archived, originals remain.",
+      "islandR1": "Complete8states/16originals/6pairs/4performance refs. New pose A1/A2 PASS but city-heavy composition costs performance. Offline original camera with target y23 projects full group cardOverlap3.4036%, versusS0 7.3586%; plan this measured r2 pose plus seated edge lights after wing r3. Offline projections are not A3/performance evidence."
     }
   ],
-  "nextExpected": "island pose-only r1; wing source/pose frozen.",
+  "nextExpected": "wing r3 restore S0 pose, full10state matrix; then island r2 source/pose, final root suite before browser.",
   "plannedPoses": {
     "nw:district": {
       "position": [

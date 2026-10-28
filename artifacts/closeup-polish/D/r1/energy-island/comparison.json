@@ -1,0 +1,112 @@
+{
+  "mode": "compare",
+  "commit": "91564dc68cbe136b79ab8ae1db8ff21db6d6a441",
+  "sourceDiff": "diff --git a/src/headlineCamera.ts b/src/headlineCamera.ts\nindex db3770e..1b99ab6 100644\n--- a/src/headlineCamera.ts\n+++ b/src/headlineCamera.ts\n@@ -21,7 +21,7 @@ export const SHOTS: Record<ShotId, Pose> = {\n   'energy:garden2': { position: [-15, 36, -455], target: [32, 8, -392] },\n   'energy:ring': { position: [-70, 135, -170], target: [-18, 99, -24] },\n   'energy:wing': { position: [110, 64, -530], target: [125, 17, -424] },\n-  'energy:island': { position: [-142, 66, -556], target: [-60, 4, -470] },\n+  'energy:island': { position: [-150, 65, -590], target: [-40, 8, -425] },\n };\n export function headlineShot(change: CarrierChange | undefined): ShotId | null {\n   if (!change) return null;\n",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "energy:island",
+      "hour": 12,
+      "from": "baseline",
+      "to": "c",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.06095782574821766,
+      "rect": {
+        "x": 256,
+        "y": 349,
+        "width": 1143,
+        "height": 532
+      },
+      "pass": true
+    },
+    {
+      "id": "energy:island",
+      "hour": 12,
+      "from": "c",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.008518033543020744,
+      "rect": {
+        "x": 256,
+        "y": 349,
+        "width": 1143,
+        "height": 532
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:island",
+      "hour": 12,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.06577362599196944,
+      "rect": {
+        "x": 256,
+        "y": 349,
+        "width": 1143,
+        "height": 532
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:island",
+      "hour": 22,
+      "from": "baseline",
+      "to": "c",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.035554865067391174,
+      "rect": {
+        "x": 256,
+        "y": 349,
+        "width": 1143,
+        "height": 532
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:island",
+      "hour": 22,
+      "from": "c",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.00620659861617745,
+      "rect": {
+        "x": 256,
+        "y": 349,
+        "width": 1143,
+        "height": 532
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:island",
+      "hour": 22,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.03872533219209312,
+      "rect": {
+        "x": 256,
+        "y": 349,
+        "width": 1143,
+        "height": 532
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}
