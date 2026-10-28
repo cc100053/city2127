@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import * as T from 'three';
 import { ladderHybrid, ladderShare, rungStep, AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, PRIVATE_RISE, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
 import { changeSites } from '../src/layout.ts';
-import { publicLight, trail } from '../src/cityRig.ts';
+import { publicLight, trail, trim } from '../src/cityRig.ts';
 import { mobility, promenadeStops, routes, walkerParty, walkerPose, walkerRoute } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
@@ -443,3 +443,19 @@ console.log('PASS: P3 carrier evidence covers uniform seed no-op, same-score red
   assert.ok(a.getDiagnostics().activePulses > 0);
   console.log(`PASS: ladder rungs — focal-only rung 1, drone ports ${counts} at rungs 0/2/3 nested, fleets at rung 3, quiet live changes.`);
 }
+
+// Guardrails stay over each authored service terrace and retain every bay/selection/actor mapping above.
+const guarded = new AutomationDistrict(new T.Scene());
+guarded.setTarget(at({nw:-3}),0,true);guarded.root.updateMatrixWorld(true);
+const local = guarded as unknown as {meshes:T.InstancedMesh[];decks:T.InstancedMesh[]};
+for(const family of [local.meshes,local.decks]){
+  const railing = family.find(m=>m.material===trim)!;
+  assert.ok(railing,'staffed hall loses its shared structural guardrail batch');
+  const bounds=railing.geometry.boundingBox??(railing.geometry.computeBoundingBox(),railing.geometry.boundingBox!);
+  assert.ok(bounds.min.x>=-19.01&&bounds.max.x<=19.01,'railing leaves original staffed footprint');
+  assert.ok(bounds.min.z>=-17.01&&bounds.max.z<=17.01,'railing leaves original terrace depth');
+  const guardRay=new T.Raycaster(new T.Vector3(20,21.6,0),new T.Vector3(-1,0,0),0,4);
+  const guardHit=guardRay.intersectObject(new T.Mesh(railing.geometry,trim),false)[0];
+  assert.ok(guardHit&&guardHit.point.x>17.8&&guardHit.point.x<18.1,'service terrace has no supported edge guard');
+}
+console.log('PASS: staffed service guards reuse batches within the original terrace footprints.');

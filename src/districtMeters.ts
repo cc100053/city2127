@@ -891,6 +891,11 @@ export class AutomationDistrict {
       const deck = new T.Mesh(new T.CylinderGeometry(3.5, 3.5, .4, 24), trim); deck.position.set(10, 44, 0); group.add(deck);
       const rim = new T.Mesh(new T.TorusGeometry(3.5, .2, 6, 24).rotateX(Math.PI / 2), this.light); rim.position.set(10, 44.3, 0); group.add(rim);
     };
+    // Short guardrails leave the public arrival open and expose the terrace thickness.
+    for (const x of [-18, 18]) {
+      for (const y of [20.9, 21.6]) box(pavilion, [.12, .12, 30], [x, y, 0], trim);
+      for (const z of [-14, 0, 14]) box(pavilion, [.14, 1.3, .14], [x, 21.05, z], trim);
+    }
     pad(pavilion);
     this.meshes = instances(pavilion, 'automation-staffed-pavilions');
     // Autonomous counterpart on the same bay: a slate mast lifts a round landing deck with a lit blue apron ring, a charging spire
@@ -911,6 +916,10 @@ export class AutomationDistrict {
       at(new T.SphereGeometry(1.4, 12, 8).scale(1.4, .6, 1), glass, x, PORT_DECK + 1.3, z);
       for (const [dx, dz] of [[-1.8, -1.8], [1.8, -1.8], [-1.8, 1.8], [1.8, 1.8]]) at(new T.CylinderGeometry(1, 1, .12, 12), trim, x + dx, PORT_DECK + 1.6, z + dz);
     }
+    for (const a of [0, Math.PI / 2, Math.PI, Math.PI * 1.5]) {
+      const x = Math.cos(a) * 13.7, z = Math.sin(a) * 13.7;
+      at(new T.BoxGeometry(.5, .18, 1.2).rotateY(-a), trim, x, PORT_DECK + .58, z);
+    }
     this.ports = instances(port, 'automation-drone-ports');
     // Stacked-deck staffed hall: two open terraces on the same four piers, a planted upper edge and a flat lit roof, staff at both bars.
     const deck = new T.Group();
@@ -927,6 +936,10 @@ export class AutomationDistrict {
       const y = i < 3 ? 21.5 : 30, x = (i % 3 - 1) * 6;
       const torso = new T.Mesh(new T.CapsuleGeometry(.35, .65, 4, 8), glass); torso.position.set(x, y, 4); deck.add(torso);
       const head = new T.Mesh(new T.SphereGeometry(.25, 10, 8), trim); head.position.set(x, y + .85, 4); deck.add(head);
+    }
+    for (const [y, x, depth] of [[20.4, 18, 30], [28.9, 14, 22]]) for (const side of [-1, 1]) {
+      for (const lift of [.5, 1.2]) box(deck, [.12, .12, depth], [side * x, y + lift, 0], trim);
+      for (const z of [-depth / 2 + 1, 0, depth / 2 - 1]) box(deck, [.14, 1.3, .14], [side * x, y + .65, z], trim);
     }
     pad(deck);
     this.decks = instances(deck, 'automation-staffed-pavilions');

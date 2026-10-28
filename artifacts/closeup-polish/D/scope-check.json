@@ -10,8 +10,10 @@
     "energy configuration/60s cycle"
   ],
   "changed": [
+    "src/districtMeters.ts",
     "src/headlineCamera.ts",
     "src/siteBuilders/automationHub.ts",
-    "tests/automationHub.test.ts"
+    "tests/automationHub.test.ts",
+    "tests/districtMeters.test.ts"
   ]
 }

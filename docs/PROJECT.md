@@ -220,4 +220,4 @@ Focal／district各三輪，ring兩輪後停止；94狀態／188靜態原圖，3
 
 ### Closeup sector D — 2026-10-28（進行中，未接受）
 
-NW hub在原六個服務槽後方加入凹入服務面、既有玻璃帶的細分窗框，以及獨立於GLB fallback／replacement的六段窄操作層線；同用Kit材質／bake，不改counter數量、controller、資產cache或原footprint。`SHOTS`只調NW focal數值，hero／FOV42／timeline維持。Focal r1/r2完整原圖與量度已push `7c05b4a`／`eebff28`，r3正面構圖仍在量度；[D進度](../artifacts/closeup-polish/D/README.md)。全D、live及final checks未完成，A/B/C pending與FAIL不變。
+NW hub在原六個服務槽後方加入凹入服務面、既有玻璃帶的細分窗框，以及獨立於GLB fallback／replacement的六段窄操作層線；同用Kit材質／bake，不改counter數量、controller、資產cache或原footprint。`SHOTS`只調NW focal數值，hero／FOV42／timeline維持。Focal r1/r2完整原圖與量度已push `7c05b4a`／`eebff28`，r3正面構圖仍在量度；[D進度](../artifacts/closeup-polish/D/README.md)。AutomationDistrict另在原有人服務露台內加有支承欄邊，在原停機盤加四個接點；沿用既有instanced材質batch、bay選位／footprint／target與motion。此runtime root test/build/diff已通過，324能源清場cases／177867 exactchecks通過；district r2完整圖正在量度。全D、live及final checks未完成，A/B/C pending與FAIL不變。

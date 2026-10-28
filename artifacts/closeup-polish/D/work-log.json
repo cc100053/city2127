@@ -205,9 +205,29 @@
           ]
         }
       ]
+    },
+    {
+      "shot": "nw:district",
+      "round": "r2",
+      "preflight": "root npm test/build/diff PASS incl324cases/177867 exactchecks; still49 energybatches",
+      "pose": {
+        "position": [
+          -390,
+          300,
+          -330
+        ],
+        "target": [
+          -200,
+          0,
+          -80
+        ]
+      },
+      "runtime": "original staffed terraces get supported edge guards; four landing-disc joints, same instanced material batches; controller/slots untouched",
+      "source": "r2/preflight-nw-district/source.patch",
+      "capture": "r2/nw-district; runtime frozen until all stages finish"
     }
   ],
-  "nextExpected": "NW district r2: low oblique pose + supported guards/landing markers; full root/target checks before complete capture.",
+  "nextExpected": "District r2 active session79352; root tested source is frozen. Early runtime checkpoint before full round evidence, then push completed matrix after runner finishes; do not start other shots yet.",
   "plannedPoses": {
     "nw:district": {
       "position": [
