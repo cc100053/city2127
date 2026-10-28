@@ -284,9 +284,69 @@
           ]
         }
       ]
+    },
+    {
+      "round": "r3",
+      "shot": "nw:district",
+      "change": "local ceramic clone emissiveIntensity1\u21920.2 only; keep measured r2 pose",
+      "checks": "district target/guard/pose/scope/build/diff PASS; final whole root suite still required after allD",
+      "capture": "r3/nw-district; runtime frozen"
+    },
+    {
+      "round": "r3",
+      "shot": "nw:district",
+      "states": 16,
+      "A1pass": 14,
+      "A2pass": 4,
+      "A3pass": 0,
+      "A4": [
+        0,
+        14
+      ],
+      "perf": [
+        {
+          "id": "nw:district",
+          "hour": 12,
+          "fps": 90.6802039169516,
+          "calls": [
+            "875",
+            "875"
+          ]
+        },
+        {
+          "id": "nw:district",
+          "hour": 22,
+          "fps": 90.37074226313808,
+          "calls": [
+            "875",
+            "875"
+          ]
+        },
+        {
+          "id": "hero",
+          "hour": 12,
+          "fps": 89.1403287241636,
+          "calls": [
+            "952",
+            "952"
+          ]
+        },
+        {
+          "id": "hero",
+          "hour": 22,
+          "fps": 88.95053517003089,
+          "calls": [
+            "952",
+            "952"
+          ]
+        }
+      ]
+    },
+    {
+      "resumeFetch": "PASS approved retry; upstream0/0, ahead main24/0; prior Vite no longer listening, restart owned5194."
     }
   ],
-  "nextExpected": "Push complete district r2 evidence, then r3 only local ceramic clone emissive1\u21920.2; keep r2 pose, full final matrix/perf and original reviews; no fourth round.",
+  "nextExpected": "NW max3 complete; energy:garden2 pose r1 then image-driven supported edge-light detail r2. Existing V3/V6 and A2/A3/A4 failures remain.",
   "plannedPoses": {
     "nw:district": {
       "position": [

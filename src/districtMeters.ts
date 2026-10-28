@@ -860,7 +860,7 @@ export class AutomationDistrict {
     this.staffed = new SlotLevels(this.bays.length);
     this.hybrid = new SlotLevels(this.bays.length);
     const pavilion = new T.Group();
-    const ceramic = trim.clone(); ceramic.emissive.set('#e5cab0'); ceramic.emissiveIntensity = 1;
+    const ceramic = trim.clone(); ceramic.emissive.set('#e5cab0'); ceramic.emissiveIntensity = .2;
     // Open service hall: ivory canopy, glass service bar and warm-lit fascia, with people behind the counter.
     box(pavilion, [38, .8, 34], [0, 20, 0], ceramic);
     for (const x of [-16, 16]) for (const z of [-12, 12]) box(pavilion, [.8, 20, .8], [x, 10, z], trim);

@@ -55,6 +55,10 @@ try{
   energyChoice=choice;await open();
   for(let i=0;i<preload;i++){await submit('energy-'+choice);await page.waitForTimeout(16000);}
   const samples=await live(id);assert.ok(samples.some(s=>s.energy.parts[index].opacity>0&&s.energy.parts[index].opacity<1),'energy local transition has no intermediate fade');checks.push({check:'local energy fade',id,pass:true});await undo();
+  await page.emulateMedia({reducedMotion:'reduce'});await submit('energy-'+choice);await page.waitForTimeout(250);await at(HERO_POSITION);await page.waitForTimeout(2500);await at(HERO_POSITION);
+  const immediate=await data();assert.equal(immediate.energy.parts[index].opacity,1);assert.equal(immediate.energy.parts[index].visible,true);checks.push({check:'reduced-motion energy settles immediately at hero',id,diagnostics:immediate.energy,pass:true});
+  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.querySelector('canvas')?.dataset.fps);await at(HERO_POSITION);const reloaded=await data();assert.deepEqual(reloaded.energy.target,immediate.energy.target);assert.equal(reloaded.energy.parts[index].opacity,1);checks.push({check:'energy reload snapshot restores target and full part at hero',id,pass:true});
+  await page.emulateMedia({reducedMotion:'no-preference'});
  }
  assert.deepEqual(errors,[]);
 

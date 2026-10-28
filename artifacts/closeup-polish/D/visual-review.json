@@ -8,7 +8,23 @@
     "r3/nw-focal/nw-focal__2__h12.jpg",
     "r3/nw-focal/nw-focal__2__h22.jpg",
     "r3/nw-focal/hero__neutral__h12.jpg",
-    "r3/nw-focal/hero__neutral__h22.jpg"
+    "r3/nw-focal/hero__neutral__h22.jpg",
+    "r3/nw-district/nw-district__-8__h12.jpg",
+    "r3/nw-district/nw-district__-8__h22.jpg",
+    "r3/nw-district/nw-district__-5__h12.jpg",
+    "r3/nw-district/nw-district__-5__h22.jpg",
+    "r3/nw-district/nw-district__0__h12.jpg",
+    "r3/nw-district/nw-district__0__h22.jpg",
+    "r3/nw-district/nw-district__5__h12.jpg",
+    "r3/nw-district/nw-district__5__h22.jpg",
+    "r3/nw-district/nw-district__8__h12.jpg",
+    "r3/nw-district/nw-district__8__h22.jpg",
+    "r3/nw-district/hero__neutral__h12.jpg",
+    "r3/nw-district/hero__neutral__h22.jpg",
+    "r3/nw-district/nw-district__low-no-docks__h12.jpg",
+    "r3/nw-district/nw-district__low-no-docks__h22.jpg",
+    "r3/nw-district/nw-district__high-docks__h12.jpg",
+    "r3/nw-district/nw-district__high-docks__h22.jpg"
   ],
   "rows": {
     "nw:focal/nw:focal/-2/12": {
@@ -240,6 +256,470 @@
         "V6": [
           "STATIC PASS",
           "全尺寸靜態原圖未見新增穿模／浮件；不宣稱所有motion state皆無閃爍。"
+        ]
+      }
+    },
+    "nw:district/nw:district/-8/12": {
+      "image": "r3/nw-district/nw-district__-8__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "低自動化的大服務屋頂與支承已可讀，但屋頂仍遮住多數人員／服務bar，兩秒不足以辨認人本服務機能。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣與civic球體／巨框仍提供台場定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "左側屋頂棋盤植栽、扁冠及前景球簇仍明顯，沒有擴出D去改全城綠化。"
+        ],
+        "V4": [
+          "PASS",
+          "低方案保留完整有人服務露台、升降支承與輔助停機點，非空或舊時代的過渡形態。"
+        ],
+        "V5": [
+          "N/A",
+          "日景；同狀態h22另評。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "屋面與露台支承未見明顯浮件／穿模，新增欄邊在原平台內；完整動態無閃爍未驗。"
+        ]
+      }
+    },
+    "nw:district/nw:district/-8/22": {
+      "image": "r3/nw-district/nw-district__-8__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "低自動化的大服務屋頂與支承已可讀，但屋頂仍遮住多數人員／服務bar，兩秒不足以辨認人本服務機能。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣與civic球體／巨框仍提供台場定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "左側屋頂棋盤植栽、扁冠及前景球簇仍明顯，沒有擴出D去改全城綠化。"
+        ],
+        "V4": [
+          "PASS",
+          "低方案保留完整有人服務露台、升降支承與輔助停機點，非空或舊時代的過渡形態。"
+        ],
+        "V5": [
+          "FAIL",
+          "屋面曲率較r2可讀，但被遮的服務bar夜間仍不清楚。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "屋面與露台支承未見明顯浮件／穿模，新增欄邊在原平台內；完整動態無閃爍未驗。"
+        ]
+      }
+    },
+    "nw:district/nw:district/-5/12": {
+      "image": "r3/nw-district/nw-district__-5__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "自主端盤與有人服務樓並存，但服務bar多被大屋面遮住，兩秒難讀完整的混合服務機能。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣與富士系civic球體／框架可見。"
+        ],
+        "V3": [
+          "FAIL",
+          "屋頂棋盤植栽及海濱球簇／扁冠仍明顯，不作全城綠化來追gate。"
+        ],
+        "V4": [
+          "PASS",
+          "完整有人服務露台和自主端盤共存，保留原hybrid方案與公共前場。"
+        ],
+        "V5": [
+          "N/A",
+          "日景；夜景另列。"
+        ],
+        "V6": [
+          "FAIL",
+          "局部mast與縮小有人樓屋面看似穿頂，缺少明確轉接接頭；這是原hybrid的靜態視覺缺口，未冒充已量的碰撞斷言。"
+        ]
+      }
+    },
+    "nw:district/nw:district/-5/22": {
+      "image": "r3/nw-district/nw-district__-5__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "自主端盤與有人服務樓並存，但服務bar多被大屋面遮住，兩秒難讀完整的混合服務機能。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣與富士系civic球體／框架可見。"
+        ],
+        "V3": [
+          "FAIL",
+          "屋頂棋盤植栽及海濱球簇／扁冠仍明顯，不作全城綠化來追gate。"
+        ],
+        "V4": [
+          "PASS",
+          "完整有人服務露台和自主端盤共存，保留原hybrid方案與公共前場。"
+        ],
+        "V5": [
+          "PASS",
+          "藍色端盤、暗桿與淡色有人樓夜間可分辨；服務身份仍屬V1缺口。"
+        ],
+        "V6": [
+          "FAIL",
+          "局部mast與縮小有人樓屋面看似穿頂，缺少明確轉接接頭；這是原hybrid的靜態視覺缺口，未冒充已量的碰撞斷言。"
+        ]
+      }
+    },
+    "nw:district/nw:district/0/12": {
+      "image": "r3/nw-district/nw-district__0__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "自主端盤與有人服務樓並存，但服務bar多被大屋面遮住，兩秒難讀完整的混合服務機能。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣與富士系civic球體／框架可見。"
+        ],
+        "V3": [
+          "FAIL",
+          "屋頂棋盤植栽及海濱球簇／扁冠仍明顯，不作全城綠化來追gate。"
+        ],
+        "V4": [
+          "PASS",
+          "完整有人服務露台和自主端盤共存，保留原hybrid方案與公共前場。"
+        ],
+        "V5": [
+          "N/A",
+          "日景；夜景另列。"
+        ],
+        "V6": [
+          "FAIL",
+          "局部mast與縮小有人樓屋面看似穿頂，缺少明確轉接接頭；這是原hybrid的靜態視覺缺口，未冒充已量的碰撞斷言。"
+        ]
+      }
+    },
+    "nw:district/nw:district/0/22": {
+      "image": "r3/nw-district/nw-district__0__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "自主端盤與有人服務樓並存，但服務bar多被大屋面遮住，兩秒難讀完整的混合服務機能。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣與富士系civic球體／框架可見。"
+        ],
+        "V3": [
+          "FAIL",
+          "屋頂棋盤植栽及海濱球簇／扁冠仍明顯，不作全城綠化來追gate。"
+        ],
+        "V4": [
+          "PASS",
+          "完整有人服務露台和自主端盤共存，保留原hybrid方案與公共前場。"
+        ],
+        "V5": [
+          "PASS",
+          "藍色端盤、暗桿與淡色有人樓夜間可分辨；服務身份仍屬V1缺口。"
+        ],
+        "V6": [
+          "FAIL",
+          "局部mast與縮小有人樓屋面看似穿頂，缺少明確轉接接頭；這是原hybrid的靜態視覺缺口，未冒充已量的碰撞斷言。"
+        ]
+      }
+    },
+    "nw:district/nw:district/5/12": {
+      "image": "r3/nw-district/nw-district__5__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "無人端盤可讀，但剩餘有人樓的服務bar仍被遮，混合機能不夠直接。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣、球體與civic框架可定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "屋頂棋盤與海濱球簇／扁冠仍不達mastertaste，未以範圍外綠化補足。"
+        ],
+        "V4": [
+          "PASS",
+          "完整自主網絡或原有人／無人混合並存，沒有以空地代表low或未完成方案。"
+        ],
+        "V5": [
+          "N/A",
+          "日景；夜景另列。"
+        ],
+        "V6": [
+          "FAIL",
+          "局部hybrid mast看似穿過縮小有人屋面，缺少明確轉接節點；靜態視覺缺口保留，未冒充碰撞量測。"
+        ]
+      }
+    },
+    "nw:district/nw:district/5/22": {
+      "image": "r3/nw-district/nw-district__5__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "無人端盤可讀，但剩餘有人樓的服務bar仍被遮，混合機能不夠直接。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣、球體與civic框架可定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "屋頂棋盤與海濱球簇／扁冠仍不達mastertaste，未以範圍外綠化補足。"
+        ],
+        "V4": [
+          "PASS",
+          "完整自主網絡或原有人／無人混合並存，沒有以空地代表low或未完成方案。"
+        ],
+        "V5": [
+          "PASS",
+          "夜間端盤、充電桿和淡色樓體的輪廓與替換差異可讀。"
+        ],
+        "V6": [
+          "FAIL",
+          "局部hybrid mast看似穿過縮小有人屋面，缺少明確轉接節點；靜態視覺缺口保留，未冒充碰撞量測。"
+        ]
+      }
+    },
+    "nw:district/nw:district/8/12": {
+      "image": "r3/nw-district/nw-district__8__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "多座自主端盤、充電桿與機隊可直接辨認為無人空中服務網絡。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣、球體與civic框架可定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "屋頂棋盤與海濱球簇／扁冠仍不達mastertaste，未以範圍外綠化補足。"
+        ],
+        "V4": [
+          "PASS",
+          "完整自主網絡或原有人／無人混合並存，沒有以空地代表low或未完成方案。"
+        ],
+        "V5": [
+          "N/A",
+          "日景；夜景另列。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "高方案支桿／盤面落點未見明顯新浮件或穿模；不是全動態閃爍證明。"
+        ]
+      }
+    },
+    "nw:district/nw:district/8/22": {
+      "image": "r3/nw-district/nw-district__8__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "多座自主端盤、充電桿與機隊可直接辨認為無人空中服務網絡。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣、球體與civic框架可定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "屋頂棋盤與海濱球簇／扁冠仍不達mastertaste，未以範圍外綠化補足。"
+        ],
+        "V4": [
+          "PASS",
+          "完整自主網絡或原有人／無人混合並存，沒有以空地代表low或未完成方案。"
+        ],
+        "V5": [
+          "PASS",
+          "夜間端盤、充電桿和淡色樓體的輪廓與替換差異可讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "高方案支桿／盤面落點未見明顯新浮件或穿模；不是全動態閃爍證明。"
+        ]
+      }
+    },
+    "nw:district/hero/neutral/12": {
+      "image": "r3/nw-district/hero__neutral__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "整座civic巨框、球體與多層海濱系統可直接讀成台場未來城市；hero不是服務單體辨識證明。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣、富士球體及彩虹橋的地理關係保留。"
+        ],
+        "V3": [
+          "FAIL",
+          "近岸球簇及棋盤屋頂綠地在全城仍明顯，未達mastertaste層次。"
+        ],
+        "V4": [
+          "PASS",
+          "多層交通、公民空間與水邊皆完整，維持成熟混合配置。"
+        ],
+        "V5": [
+          "N/A",
+          "日景；夜景另列。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此hero距離未見新增明顯穿模／浮件；近鏡hybrid轉接缺口已另列FAIL，不以hero遮小它作通過證明。"
+        ]
+      }
+    },
+    "nw:district/hero/neutral/22": {
+      "image": "r3/nw-district/hero__neutral__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "整座civic巨框、球體與多層海濱系統可直接讀成台場未來城市；hero不是服務單體辨識證明。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣、富士球體及彩虹橋的地理關係保留。"
+        ],
+        "V3": [
+          "FAIL",
+          "近岸球簇及棋盤屋頂綠地在全城仍明顯，未達mastertaste層次。"
+        ],
+        "V4": [
+          "PASS",
+          "多層交通、公民空間與水邊皆完整，維持成熟混合配置。"
+        ],
+        "V5": [
+          "PASS",
+          "岸線、框架、交通與樓體夜間可分辨，非每個遠處小服務槽可讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此hero距離未見新增明顯穿模／浮件；近鏡hybrid轉接缺口已另列FAIL，不以hero遮小它作通過證明。"
+        ]
+      }
+    },
+    "nw:district/nw:district/low-no-docks/12": {
+      "image": "r3/nw-district/nw-district__low-no-docks__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "人工服務亭仍主要見到大片屋頂，服務開口被遮，類別不夠直接。"
+        ],
+        "V2": [
+          "PASS",
+          "海岸、富士球體與後方civic巨框同時提供台場定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "既有球簇、棒棒糖樹與平綠屋面依然明顯；本輪不擴大全城植栽。"
+        ],
+        "V4": [
+          "PASS",
+          "兩種成熟的人工／自主服務設施完整存在；配對dock依既有跨軸資料顯示。"
+        ],
+        "V5": [
+          "N/A",
+          "日景，夜間另列h22。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原尺寸可見亭台與支腳未見明顯浮件；靜態圖不能證明完整動態無閃爍。"
+        ]
+      }
+    },
+    "nw:district/nw:district/low-no-docks/22": {
+      "image": "r3/nw-district/nw-district__low-no-docks__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "人工服務亭仍主要見到大片屋頂，服務開口被遮，類別不夠直接。"
+        ],
+        "V2": [
+          "PASS",
+          "海岸、富士球體與後方civic巨框同時提供台場定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "既有球簇、棒棒糖樹與平綠屋面依然明顯；本輪不擴大全城植栽。"
+        ],
+        "V4": [
+          "PASS",
+          "兩種成熟的人工／自主服務設施完整存在；配對dock依既有跨軸資料顯示。"
+        ],
+        "V5": [
+          "FAIL",
+          "亭體輪廓存在，但暗色服務面難讀，夜間機能仍不清楚。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原尺寸可見亭台與支腳未見明顯浮件；靜態圖不能證明完整動態無閃爍。"
+        ]
+      }
+    },
+    "nw:district/nw:district/high-docks/12": {
+      "image": "r3/nw-district/nw-district__high-docks__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "自主平台／操作桅杆清晰成網。"
+        ],
+        "V2": [
+          "PASS",
+          "海岸、富士球體與後方civic巨框同時提供台場定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "既有球簇、棒棒糖樹與平綠屋面依然明顯；本輪不擴大全城植栽。"
+        ],
+        "V4": [
+          "PASS",
+          "兩種成熟的人工／自主服務設施完整存在；配對dock依既有跨軸資料顯示。"
+        ],
+        "V5": [
+          "N/A",
+          "日景，夜間另列h22。"
+        ],
+        "V6": [
+          "FAIL",
+          "配對既有C dock仍有視覺承重／接合疑慮；保留C未接受項，不將其當成D新增碰撞。"
+        ]
+      }
+    },
+    "nw:district/nw:district/high-docks/22": {
+      "image": "r3/nw-district/nw-district__high-docks__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "自主平台／操作桅杆清晰成網。"
+        ],
+        "V2": [
+          "PASS",
+          "海岸、富士球體與後方civic巨框同時提供台場定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "既有球簇、棒棒糖樹與平綠屋面依然明顯；本輪不擴大全城植栽。"
+        ],
+        "V4": [
+          "PASS",
+          "兩種成熟的人工／自主服務設施完整存在；配對dock依既有跨軸資料顯示。"
+        ],
+        "V5": [
+          "PASS",
+          "平台輪廓與操作桅杆燈可辨認，dock及航路亮度另屬既有C。"
+        ],
+        "V6": [
+          "FAIL",
+          "配對既有C dock仍有視覺承重／接合疑慮；保留C未接受項，不將其當成D新增碰撞。"
         ]
       }
     }

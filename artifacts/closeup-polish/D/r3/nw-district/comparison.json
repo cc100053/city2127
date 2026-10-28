@@ -1,0 +1,240 @@
+{
+  "mode": "compare",
+  "commit": "fbae62452fe0d829e15d7f2502be305f96fbb4d5",
+  "sourceDiff": "diff --git a/src/districtMeters.ts b/src/districtMeters.ts\nindex 0268a4f..8a8f18a 100644\n--- a/src/districtMeters.ts\n+++ b/src/districtMeters.ts\n@@ -860,7 +860,7 @@ export class AutomationDistrict {\n     this.staffed = new SlotLevels(this.bays.length);\n     this.hybrid = new SlotLevels(this.bays.length);\n     const pavilion = new T.Group();\n-    const ceramic = trim.clone(); ceramic.emissive.set('#e5cab0'); ceramic.emissiveIntensity = 1;\n+    const ceramic = trim.clone(); ceramic.emissive.set('#e5cab0'); ceramic.emissiveIntensity = .2;\n     // Open service hall: ivory canopy, glass service bar and warm-lit fascia, with people behind the counter.\n     box(pavilion, [38, .8, 34], [0, 20, 0], ceramic);\n     for (const x of [-16, 16]) for (const z of [-12, 12]) box(pavilion, [.8, 20, .8], [x, 10, z], trim);\n",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "nw:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.02793756240922295,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 12,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.014766633003510046,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 12,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.018966129443032356,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 12,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.030777877380376018,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.0668927286320907,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "low-no-docks",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.023295267489711936,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 12,
+      "from": "8",
+      "to": "high-docks",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.022327406348341804,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.022276515094206407,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 22,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.012627815979786976,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 22,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.015635798056362463,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 22,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.03284993103465666,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.06094099995965464,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "low-no-docks",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.019028389262083435,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "nw:district",
+      "hour": 22,
+      "from": "8",
+      "to": "high-docks",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.021006472277697086,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}
