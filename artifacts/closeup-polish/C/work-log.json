@@ -24,10 +24,136 @@
     "survey protocol/counts/ladder/timing"
   ],
   "dreamLoop": "Not used; local targets from ART/master taste and original screenshots.",
-  "status": "Ring r2 complete and all8 originals individually reviewed; stop ring at2<=3. Deferred focal r3 full final-source matrix/perf begins.",
+  "status": "REVIEW_READY bounded C experiment;94 measured states/191 original images; final root/build/diff, scope and11 live PASS. Art NOT recommended; final documentation/remote/result callback pending.",
   "startedUTC": "2026-10-27T22:34:03.606381+00:00",
   "verificationOrder": "Author focal r3 final pose after r2, then district and ring. Defer focal r3 complete matrix/perf until all C geometry is final, so its last evidence includes cumulative district changes; no r4 or extra art iteration.",
   "districtR2VisualFinding": "Oblique r2 passes A1/A2 but original low/day view focuses on NE shoreline/park and clips Fuji at top; V1 location clarity still fails. R3 will aim central/SE from a farther SW pose, preserve full carrier measurement and accept honest remaining failures.",
   "ringR1Retry": "Chrome unexpectedly closed during mixed load after4 complete rows. Cause unknown; original capture.log/partial JSON and8 image hashes preserved. Combined retry/perf/compare was auto-review rejected for possible overwrites; read-only checks proved skip-complete keys and refuse-existing-image assertions, missing mixed/hero files and absent perf/compare. Capture-only same-source continuation attempted after that proof; no new art round.",
-  "ringStopDecision": "R2 retains successful frontal pose and four sparse operating marks, actual b day/night originals inspected. If remaining matrix is consistent, finish ring at2<=3: filling the hollow forA3 or inventing b/mixed rotor differences forA4 would change semantics; background lollipop greenery is outside ring-only scope. No third art change merely to chase those gates."
+  "ringStopDecision": "Stopped after2<=3: frontal rotor and four sparse quarter marks complete this local polish. HollowA3 and identical-partA4 remain, as do measured nightFPS/hero A5 failures. Do not change semantics or rerun unchanged art merely to replace a failing sample. Background greenery lies outside the ring block.",
+  "finalSummary": {
+    "finalStates": 34,
+    "measuredStates": 94,
+    "rounds": [
+      {
+        "id": "se:focal",
+        "directory": "r1/se-focal",
+        "states": 8,
+        "A4": 0,
+        "A4pairs": 6,
+        "browser": "156.0.8078.73"
+      },
+      {
+        "id": "se:focal",
+        "directory": "r2/se-focal",
+        "states": 8,
+        "A4": 3,
+        "A4pairs": 6,
+        "browser": "156.0.8078.73"
+      },
+      {
+        "id": "se:focal",
+        "directory": "r3/se-focal",
+        "states": 8,
+        "A4": 4,
+        "A4pairs": 6,
+        "browser": "156.0.8078.73"
+      },
+      {
+        "id": "se:district",
+        "directory": "r1/se-district",
+        "states": 18,
+        "A4": 0,
+        "A4pairs": 16,
+        "browser": "156.0.8078.73"
+      },
+      {
+        "id": "se:district",
+        "directory": "r2/se-district",
+        "states": 18,
+        "A4": 0,
+        "A4pairs": 16,
+        "browser": "156.0.8078.73"
+      },
+      {
+        "id": "se:district",
+        "directory": "r3/se-district",
+        "states": 18,
+        "A4": 0,
+        "A4pairs": 16,
+        "browser": "156.0.8078.73"
+      },
+      {
+        "id": "energy:ring",
+        "directory": "r1/energy-ring",
+        "states": 8,
+        "A4": 0,
+        "A4pairs": 6,
+        "browser": "156.0.8078.73"
+      },
+      {
+        "id": "energy:ring",
+        "directory": "r2/energy-ring",
+        "states": 8,
+        "A4": 0,
+        "A4pairs": 6,
+        "browser": "156.0.8078.73"
+      }
+    ],
+    "A1": {
+      "FAIL": 2,
+      "PASS": 24,
+      "N/A": 8
+    },
+    "A2": {
+      "PASS": 10,
+      "N/A": 8,
+      "FAIL": 16
+    },
+    "A3": {
+      "FAIL": 26,
+      "N/A": 8
+    },
+    "A4": {
+      "pass": 4,
+      "pairs": 28
+    },
+    "A5": {
+      "FAIL": 18,
+      "PASS": 10,
+      "UNVERIFIED": 6
+    },
+    "A6": {
+      "PASS": 34
+    },
+    "reproducibility": {
+      "FAIL": 24,
+      "PASS": 10
+    },
+    "V": {
+      "V1": {
+        "FAIL": 9,
+        "PASS": 17,
+        "N/A": 8
+      },
+      "V2": {
+        "PASS": 34
+      },
+      "V3": {
+        "FAIL": 34
+      },
+      "V4": {
+        "PASS": 34
+      },
+      "V5": {
+        "N/A": 18,
+        "FAIL": 5,
+        "PASS": 11
+      },
+      "V6": {
+        "STATIC PASS": 30,
+        "FAIL": 2,
+        "N/A": 2
+      }
+    }
+  }
 }

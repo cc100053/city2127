@@ -1,0 +1,126 @@
+{
+  "finalStates": 34,
+  "measuredStates": 94,
+  "rounds": [
+    {
+      "id": "se:focal",
+      "directory": "r1/se-focal",
+      "states": 8,
+      "A4": 0,
+      "A4pairs": 6,
+      "browser": "156.0.8078.73"
+    },
+    {
+      "id": "se:focal",
+      "directory": "r2/se-focal",
+      "states": 8,
+      "A4": 3,
+      "A4pairs": 6,
+      "browser": "156.0.8078.73"
+    },
+    {
+      "id": "se:focal",
+      "directory": "r3/se-focal",
+      "states": 8,
+      "A4": 4,
+      "A4pairs": 6,
+      "browser": "156.0.8078.73"
+    },
+    {
+      "id": "se:district",
+      "directory": "r1/se-district",
+      "states": 18,
+      "A4": 0,
+      "A4pairs": 16,
+      "browser": "156.0.8078.73"
+    },
+    {
+      "id": "se:district",
+      "directory": "r2/se-district",
+      "states": 18,
+      "A4": 0,
+      "A4pairs": 16,
+      "browser": "156.0.8078.73"
+    },
+    {
+      "id": "se:district",
+      "directory": "r3/se-district",
+      "states": 18,
+      "A4": 0,
+      "A4pairs": 16,
+      "browser": "156.0.8078.73"
+    },
+    {
+      "id": "energy:ring",
+      "directory": "r1/energy-ring",
+      "states": 8,
+      "A4": 0,
+      "A4pairs": 6,
+      "browser": "156.0.8078.73"
+    },
+    {
+      "id": "energy:ring",
+      "directory": "r2/energy-ring",
+      "states": 8,
+      "A4": 0,
+      "A4pairs": 6,
+      "browser": "156.0.8078.73"
+    }
+  ],
+  "A1": {
+    "FAIL": 2,
+    "PASS": 24,
+    "N/A": 8
+  },
+  "A2": {
+    "PASS": 10,
+    "N/A": 8,
+    "FAIL": 16
+  },
+  "A3": {
+    "FAIL": 26,
+    "N/A": 8
+  },
+  "A4": {
+    "pass": 4,
+    "pairs": 28
+  },
+  "A5": {
+    "FAIL": 18,
+    "PASS": 10,
+    "UNVERIFIED": 6
+  },
+  "A6": {
+    "PASS": 34
+  },
+  "reproducibility": {
+    "FAIL": 24,
+    "PASS": 10
+  },
+  "V": {
+    "V1": {
+      "FAIL": 9,
+      "PASS": 17,
+      "N/A": 8
+    },
+    "V2": {
+      "PASS": 34
+    },
+    "V3": {
+      "FAIL": 34
+    },
+    "V4": {
+      "PASS": 34
+    },
+    "V5": {
+      "N/A": 18,
+      "FAIL": 5,
+      "PASS": 11
+    },
+    "V6": {
+      "STATIC PASS": 30,
+      "FAIL": 2,
+      "N/A": 2
+    }
+  }
+}

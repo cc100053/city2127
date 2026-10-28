@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "baseline": "ca22a92769e596b3c168ae0579aadef4b5420d9d",
+  "checks": [
+    "Only three C pose values; hero/FOV/timeline unchanged",
+    "Non-ConcentrationDistrict carriers and all slot positions unchanged",
+    "Concentration targets/counts/controllers/module wiring unchanged",
+    "Only the C flywheel block changes in energy; A/D and other energy parts preserved",
+    "No protocol, dependency, survey or module-swap changes"
+  ],
+  "changedRuntimeAndTests": [
+    "src/districtMeters.ts",
+    "src/energyPrototype.ts",
+    "src/headlineCamera.ts",
+    "src/siteBuilders/concentrationTower.ts",
+    "tests/concentrationTower.test.ts",
+    "tests/districtMeters.test.ts"
+  ]
+}

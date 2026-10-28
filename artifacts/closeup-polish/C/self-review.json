@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "reviewedUTC": "2026-10-28T06:59:04.765456+00:00",
+  "runtimeBase": "ca22a92769e596b3c168ae0579aadef4b5420d9d",
+  "runtimeFinal": "b5ce8fe64ccb7e41c06cbfd6ffcdc48acd4a37da",
+  "scope": "83 insertions/38 deletions across four C runtime files, two affected tests and optional pairing capture support. Exact diff and connected existing controllers/factories reviewed. Non-C source byte boundaries verified in scope-check.py.",
+  "newFiles": "Live/report/scope scripts, README, final checks and all generated state/metric/provenance matrices reviewed; parsed all C JSON files. Report asserts94 complete measurements, original thresholds, raw rAF windows/poses,34 final state mappings and preserved S0/A/B hashes.",
+  "parsedJSONFiles": 57,
+  "visual": "34 final second-take originals and3 live originals individually viewed at original detail; not a claim that191 images were all individually reviewed. All191 hashes saved.",
+  "quality": "No correctness blocker found in scoped code. Art NOT recommended: low/mixed readability, full district composition, A3/A4/A5/V3 and paired dock V6 failures retained. No baseline replacement/filtering/threshold change.",
+  "docs": "PROJECT, EXHIBITION_SPEC, VALIDATION, handoff/index synchronized. No setup or user-facing startup instruction changes; README/AGENTS unchanged.577 local link targets checked.",
+  "checks": "Final root test/build/diff and runner/report/scope/live checks PASS. Later changes only evidence/docs; no runtime changes after final tests."
+}

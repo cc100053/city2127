@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "S0": 234,
+  "A": 147,
+  "B": 110,
+  "earlierCommittedCImagesByteIdentical": 172,
+  "CReferenceCommit": "b5ce8fe64ccb7e41c06cbfd6ffcdc48acd4a37da",
+  "finalCOriginalImages": 191,
+  "note": "S0/A/B checked by their SHA256 manifests in report.mjs. All already committed C images compared byte-for-byte with HEAD; final focal and live add19 new originals."
+}

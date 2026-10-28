@@ -1,0 +1,32 @@
+{
+  "A7": {
+    "status": "PASS",
+    "sourceCommit": "b5ce8fe64ccb7e41c06cbfd6ffcdc48acd4a37da",
+    "npmTest": "final-checks/npm-test.log PASS, exit0",
+    "npmBuild": "final-checks/npm-build.log PASS, exit0",
+    "diffCheck": "final-checks/diff-check.log PASS",
+    "localPhysicalTests": "Low gallery within occupied <10 local-unit height and original footprint; open sky-bridge central ray passage; solar support roof landing and preallocated count PASS. Full rotor envelope + 324 district/history/receiver cases /177219 exact checks PASS.",
+    "runnerSelfCheck": "Full98 default matrix unchanged; optional six SE pairing states PASS",
+    "reportSelfCheck": "95% FPS /110% calls boundaries PASS",
+    "live": "11 checks PASS, errors0; live/browser.json",
+    "duration": "Exact3s duration/retarget/snapshot/reduced motion covered by root tests. Browser120-frame diagnostic refresh proves intermediate easing, no3.000s browser precision claim."
+  },
+  "scope": "PASS scope-check.json: only C geometry/three poses and affected tests; non-C runtime, hero/FOV/timeline, targets/counts/slots and survey/module-swap/dependencies unchanged from ca22a92.",
+  "warnings": [
+    "Existing JSON import-attribute warning",
+    "Existing chunk-size warning"
+  ],
+  "limits": [
+    "Art gates retain FAIL; owner acceptance pending, no main merge",
+    "A5 pairings UNVERIFIED: no same-state S0 draw baseline",
+    "C vs S0 includes cumulative A/B/C source; Chrome .73 differs from S0 .48; no isolated-C or same-version controlled performance claim",
+    "Raw shadow-call samples retained, no filtering or extra run to replace a failure",
+    "Static V6 does not establish full temporal flicker absence",
+    "No production, exhibition hardware, Safari/iPad, Windows, visitor2s or Z test in C"
+  ],
+  "attemptHistory": "Ring r1 Chrome closed unexpectedly after4 states, unknown cause; failed log/partial rows/original8 hashes preserved. Initial combined retry auto-review rejection resolved with read-only no-overwrite proof, approved capture-only continuation. Old hashes/rows/source/environment unchanged, retry-preservation.json PASS.",
+  "cleanup": "PASS cleanup.json; Vite5194 and final scratch50033 bind-verified free, all owned browsers/runners closed",
+  "selfReview": "PASS exact C runtime/test/capture diff, new live/report/scope scripts, generated state/metric matrices and final documents reviewed;34 final and3 live originals inspected individually.",
+  "links": "PASS link-check.json:577 local filesystem targets, no new fragment links",
+  "originals": "PASS original manifests S0:234/A:147/B:110 revalidated;172 earlier committed C image bytes revalidated;191 C originals in final manifest"
+}

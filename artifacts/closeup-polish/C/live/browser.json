@@ -1,0 +1,1376 @@
+{
+  "browser": "156.0.8078.73",
+  "apiOrigin": "http://127.0.0.1:50033",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "checks": [
+    {
+      "check": "live hold",
+      "id": "se:focal",
+      "before": {
+        "time": 20.15,
+        "fps": 6,
+        "tower": {
+          "band": "mixed",
+          "targetFunctionModules": 4,
+          "activeFunctionModules": 4,
+          "transitioning": false,
+          "representation": "mid-rise-hall"
+        },
+        "district": {
+          "enabled": true,
+          "nightRhythm": 1,
+          "targetConcentration": 0.5,
+          "towers": 10,
+          "pods": 26,
+          "activePulses": 0,
+          "visibleTowers": 5,
+          "visiblePods": 15,
+          "midRises": 2,
+          "forestTowers": 0,
+          "droneDocks": 0,
+          "solarPods": 0
+        },
+        "energy": {
+          "target": {
+            "waterGardens": 0,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "rotorAngle": 1.012351999998093,
+          "parts": [
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 0.72,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            }
+          ]
+        }
+      },
+      "samples": [
+        {
+          "elapsedMs": 19,
+          "time": 20.15,
+          "fps": 6,
+          "tower": {
+            "band": "mixed",
+            "targetFunctionModules": 4,
+            "activeFunctionModules": 4,
+            "transitioning": false,
+            "representation": "mid-rise-hall"
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "targetConcentration": 0.5,
+            "towers": 10,
+            "pods": 26,
+            "activePulses": 0,
+            "visibleTowers": 5,
+            "visiblePods": 15,
+            "midRises": 2,
+            "forestTowers": 0,
+            "droneDocks": 0,
+            "solarPods": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.012351999998093,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 2015,
+          "time": 22.15,
+          "fps": 60,
+          "tower": {
+            "band": "high",
+            "targetFunctionModules": 6,
+            "activeFunctionModules": 4,
+            "transitioning": true,
+            "representation": "vertical-tower"
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "targetConcentration": 0.5,
+            "towers": 10,
+            "pods": 26,
+            "activePulses": 0,
+            "visibleTowers": 5,
+            "visiblePods": 15,
+            "midRises": 2,
+            "forestTowers": 0,
+            "droneDocks": 0,
+            "solarPods": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.1723679999971386,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 4000,
+          "time": 24.16,
+          "fps": 60,
+          "tower": {
+            "band": "high",
+            "targetFunctionModules": 6,
+            "activeFunctionModules": 10,
+            "transitioning": true,
+            "representation": "vertical-tower"
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "targetConcentration": 0.5,
+            "towers": 10,
+            "pods": 26,
+            "activePulses": 0,
+            "visibleTowers": 5,
+            "visiblePods": 15,
+            "midRises": 2,
+            "forestTowers": 0,
+            "droneDocks": 0,
+            "solarPods": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.3324,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 6090,
+          "time": 26.17,
+          "fps": 59.5,
+          "tower": {
+            "band": "high",
+            "targetFunctionModules": 6,
+            "activeFunctionModules": 6,
+            "transitioning": false,
+            "representation": "vertical-tower"
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "targetConcentration": 0.5,
+            "towers": 10,
+            "pods": 26,
+            "activePulses": 0,
+            "visibleTowers": 5,
+            "visiblePods": 15,
+            "midRises": 2,
+            "forestTowers": 0,
+            "droneDocks": 0,
+            "solarPods": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.493695999999046,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 8000,
+          "time": 28.17,
+          "fps": 60,
+          "tower": {
+            "band": "high",
+            "targetFunctionModules": 6,
+            "activeFunctionModules": 6,
+            "transitioning": false,
+            "representation": "vertical-tower"
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "targetConcentration": 0.5,
+            "towers": 10,
+            "pods": 26,
+            "activePulses": 0,
+            "visibleTowers": 5,
+            "visiblePods": 15,
+            "midRises": 2,
+            "forestTowers": 0,
+            "droneDocks": 0,
+            "solarPods": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.6536959999990462,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        }
+      ],
+      "place": "街の画面：フジテレビ東",
+      "pose": {
+        "position": [
+          -90,
+          200,
+          -170
+        ],
+        "target": [
+          175,
+          50,
+          -45
+        ]
+      },
+      "pass": true
+    },
+    {
+      "check": "live tower shows intermediate easing",
+      "pass": true
+    },
+    {
+      "check": "reload snapshot immediately restores settled tower, district and hero",
+      "pass": true
+    },
+    {
+      "check": "live hold",
+      "id": "se:district",
+      "before": {
+        "time": 15.66,
+        "fps": 7.7,
+        "tower": {
+          "band": "high",
+          "targetFunctionModules": 6,
+          "activeFunctionModules": 6,
+          "transitioning": false,
+          "representation": "vertical-tower"
+        },
+        "district": {
+          "enabled": true,
+          "nightRhythm": 1,
+          "targetConcentration": 0.5,
+          "towers": 10,
+          "pods": 26,
+          "activePulses": 0,
+          "visibleTowers": 5,
+          "visiblePods": 15,
+          "midRises": 2,
+          "forestTowers": 0,
+          "droneDocks": 0,
+          "solarPods": 0
+        },
+        "energy": {
+          "target": {
+            "waterGardens": 0,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "rotorAngle": 0.6807252340126051,
+          "parts": [
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 0.72,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            }
+          ]
+        }
+      },
+      "samples": [
+        {
+          "elapsedMs": 9,
+          "time": 15.66,
+          "fps": 7.7,
+          "tower": {
+            "band": "high",
+            "targetFunctionModules": 6,
+            "activeFunctionModules": 6,
+            "transitioning": false,
+            "representation": "vertical-tower"
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "targetConcentration": 0.5,
+            "towers": 10,
+            "pods": 26,
+            "activePulses": 0,
+            "visibleTowers": 5,
+            "visiblePods": 15,
+            "midRises": 2,
+            "forestTowers": 0,
+            "droneDocks": 0,
+            "solarPods": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 0.6807252340126051,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 1990,
+          "time": 17.66,
+          "fps": 60,
+          "tower": {
+            "band": "high",
+            "targetFunctionModules": 6,
+            "activeFunctionModules": 6,
+            "transitioning": false,
+            "representation": "vertical-tower"
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "targetConcentration": 0.75,
+            "towers": 10,
+            "pods": 26,
+            "activePulses": 0,
+            "visibleTowers": 5,
+            "visiblePods": 15,
+            "midRises": 2,
+            "forestTowers": 0,
+            "droneDocks": 0,
+            "solarPods": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 1,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 0.8206777237382601,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 4111,
+          "time": 19.69,
+          "fps": 59,
+          "tower": {
+            "band": "high",
+            "targetFunctionModules": 6,
+            "activeFunctionModules": 6,
+            "transitioning": false,
+            "representation": "vertical-tower"
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "targetConcentration": 0.75,
+            "towers": 10,
+            "pods": 26,
+            "activePulses": 50,
+            "visibleTowers": 9,
+            "visiblePods": 19,
+            "midRises": 0,
+            "forestTowers": 0,
+            "droneDocks": 0,
+            "solarPods": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 1,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 0.9752413615340572,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 0.44818284346606724
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 0.44818284346606724
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 6092,
+          "time": 21.69,
+          "fps": 60,
+          "tower": {
+            "band": "high",
+            "targetFunctionModules": 6,
+            "activeFunctionModules": 6,
+            "transitioning": false,
+            "representation": "vertical-tower"
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "targetConcentration": 0.75,
+            "towers": 10,
+            "pods": 26,
+            "activePulses": 25,
+            "visibleTowers": 7,
+            "visiblePods": 8,
+            "midRises": 0,
+            "forestTowers": 0,
+            "droneDocks": 0,
+            "solarPods": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 1,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.1351199999999995,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 8068,
+          "time": 23.69,
+          "fps": 60.1,
+          "tower": {
+            "band": "high",
+            "targetFunctionModules": 6,
+            "activeFunctionModules": 6,
+            "transitioning": false,
+            "representation": "vertical-tower"
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "targetConcentration": 0.75,
+            "towers": 10,
+            "pods": 26,
+            "activePulses": 0,
+            "visibleTowers": 7,
+            "visiblePods": 8,
+            "midRises": 0,
+            "forestTowers": 0,
+            "droneDocks": 0,
+            "solarPods": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 1,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.2951119999980927,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              }
+            ]
+          }
+        }
+      ],
+      "place": "街の画面：街に点在する建物",
+      "pose": {
+        "position": [
+          -200,
+          300,
+          -365
+        ],
+        "target": [
+          15,
+          35,
+          -80
+        ]
+      },
+      "pass": true
+    },
+    {
+      "check": "district shows intermediate easing",
+      "pass": true
+    },
+    {
+      "check": "Undo immediately restores hero",
+      "pass": true
+    },
+    {
+      "check": "Undo restores previous tower and district counts on next diagnostic refresh",
+      "pass": true
+    },
+    {
+      "check": "reduced-motion SE stays at hero and settles geometry without pulses",
+      "diagnostics": {
+        "time": 27.69,
+        "fps": 60,
+        "tower": {
+          "band": "high",
+          "targetFunctionModules": 6,
+          "activeFunctionModules": 6,
+          "transitioning": false,
+          "representation": "vertical-tower"
+        },
+        "district": {
+          "enabled": true,
+          "nightRhythm": 1,
+          "targetConcentration": 0.75,
+          "towers": 10,
+          "pods": 26,
+          "activePulses": 0,
+          "visibleTowers": 7,
+          "visiblePods": 8,
+          "midRises": 0,
+          "forestTowers": 0,
+          "droneDocks": 0,
+          "solarPods": 0
+        },
+        "energy": {
+          "target": {
+            "waterGardens": 1,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "rotorAngle": 0.7,
+          "parts": [
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": true,
+              "scaleY": 1,
+              "opacity": 1
+            },
+            {
+              "visible": false,
+              "scaleY": 0.72,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": true,
+              "scaleY": 1,
+              "opacity": 1
+            }
+          ]
+        }
+      },
+      "pass": true
+    },
+    {
+      "check": "live hold",
+      "id": "energy:ring",
+      "before": {
+        "time": 36.59,
+        "fps": 60,
+        "tower": {
+          "band": "mixed",
+          "targetFunctionModules": 4,
+          "activeFunctionModules": 4,
+          "transitioning": false,
+          "representation": "mid-rise-hall"
+        },
+        "district": {
+          "enabled": true,
+          "nightRhythm": 1,
+          "targetConcentration": 0.5,
+          "towers": 10,
+          "pods": 26,
+          "activePulses": 0,
+          "visibleTowers": 5,
+          "visiblePods": 15,
+          "midRises": 2,
+          "forestTowers": 0,
+          "droneDocks": 0,
+          "solarPods": 0
+        },
+        "energy": {
+          "target": {
+            "waterGardens": 0,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "rotorAngle": 2.3271359999990464,
+          "parts": [
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 0.72,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            }
+          ]
+        }
+      },
+      "samples": [
+        {
+          "elapsedMs": 6,
+          "time": 36.59,
+          "fps": 60,
+          "tower": {
+            "band": "mixed",
+            "targetFunctionModules": 4,
+            "activeFunctionModules": 4,
+            "transitioning": false,
+            "representation": "mid-rise-hall"
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "targetConcentration": 0.5,
+            "towers": 10,
+            "pods": 26,
+            "activePulses": 0,
+            "visibleTowers": 5,
+            "visiblePods": 15,
+            "midRises": 2,
+            "forestTowers": 0,
+            "droneDocks": 0,
+            "solarPods": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 2.3271359999990464,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 1982,
+          "time": 38.59,
+          "fps": 60,
+          "tower": {
+            "band": "mixed",
+            "targetFunctionModules": 4,
+            "activeFunctionModules": 4,
+            "transitioning": false,
+            "representation": "mid-rise-hall"
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "targetConcentration": 0.5,
+            "towers": 10,
+            "pods": 26,
+            "activePulses": 0,
+            "visibleTowers": 5,
+            "visiblePods": 15,
+            "midRises": 2,
+            "forestTowers": 0,
+            "droneDocks": 0,
+            "solarPods": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": true,
+              "island": false
+            },
+            "rotorAngle": 2.487055999999046,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 4085,
+          "time": 40.59,
+          "fps": 59.9,
+          "tower": {
+            "band": "mixed",
+            "targetFunctionModules": 4,
+            "activeFunctionModules": 4,
+            "transitioning": false,
+            "representation": "mid-rise-hall"
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "targetConcentration": 0.5,
+            "towers": 10,
+            "pods": 26,
+            "activePulses": 0,
+            "visibleTowers": 5,
+            "visiblePods": 15,
+            "midRises": 2,
+            "forestTowers": 0,
+            "droneDocks": 0,
+            "solarPods": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": true,
+              "island": false
+            },
+            "rotorAngle": 2.6465370311390672,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 0.43134340516391
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 0.43134340516391
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 5982,
+          "time": 42.59,
+          "fps": 60.1,
+          "tower": {
+            "band": "mixed",
+            "targetFunctionModules": 4,
+            "activeFunctionModules": 4,
+            "transitioning": false,
+            "representation": "mid-rise-hall"
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "targetConcentration": 0.5,
+            "towers": 10,
+            "pods": 26,
+            "activePulses": 0,
+            "visibleTowers": 5,
+            "visiblePods": 15,
+            "midRises": 2,
+            "forestTowers": 0,
+            "droneDocks": 0,
+            "solarPods": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": true,
+              "island": false
+            },
+            "rotorAngle": 2.797007831139139,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 8085,
+          "time": 44.59,
+          "fps": 60,
+          "tower": {
+            "band": "mixed",
+            "targetFunctionModules": 4,
+            "activeFunctionModules": 4,
+            "transitioning": false,
+            "representation": "mid-rise-hall"
+          },
+          "district": {
+            "enabled": true,
+            "nightRhythm": 1,
+            "targetConcentration": 0.5,
+            "towers": 10,
+            "pods": 26,
+            "activePulses": 0,
+            "visibleTowers": 5,
+            "visiblePods": 15,
+            "midRises": 2,
+            "forestTowers": 0,
+            "droneDocks": 0,
+            "solarPods": 0
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": true,
+              "island": false
+            },
+            "rotorAngle": 2.9354786311392105,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              }
+            ]
+          }
+        }
+      ],
+      "place": "街の画面：フジテレビ前・蓄電環",
+      "pose": {
+        "position": [
+          -70,
+          135,
+          -170
+        ],
+        "target": [
+          -18,
+          99,
+          -24
+        ]
+      },
+      "pass": true
+    },
+    {
+      "check": "energy ring fades over the shared transition",
+      "pass": true
+    },
+    {
+      "check": "Undo immediately restores hero",
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "timing": "Browser diagnostics refresh each120 frames (~2s); intermediate states prove easing. Exact3s duration/retarget remains covered by root tests; no3.000s browser precision claim.",
+  "fixtures": "Real current v4 concentration and rotor proposals; isolated scratch SQLite."
+}

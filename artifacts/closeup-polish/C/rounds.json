@@ -1,0 +1,16 @@
+{
+  "se:focal": [
+    "r1/se-focal",
+    "r2/se-focal",
+    "r3/se-focal"
+  ],
+  "se:district": [
+    "r1/se-district",
+    "r2/se-district",
+    "r3/se-district"
+  ],
+  "energy:ring": [
+    "r1/energy-ring",
+    "r2/energy-ring"
+  ]
+}

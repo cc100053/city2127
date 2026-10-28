@@ -1,0 +1,112 @@
+{
+  "mode": "compare",
+  "commit": "b5ce8fe64ccb7e41c06cbfd6ffcdc48acd4a37da",
+  "sourceDiff": "",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.15239482478328867,
+      "rect": {
+        "x": 864,
+        "y": 483,
+        "width": 197,
+        "height": 290
+      },
+      "pass": true
+    },
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.071736086029829,
+      "rect": {
+        "x": 852,
+        "y": 141,
+        "width": 222,
+        "height": 628
+      },
+      "pass": true
+    },
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.12902576813596917,
+      "rect": {
+        "x": 852,
+        "y": 141,
+        "width": 222,
+        "height": 632
+      },
+      "pass": true
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.11112040078298663,
+      "rect": {
+        "x": 864,
+        "y": 483,
+        "width": 197,
+        "height": 290
+      },
+      "pass": true
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.04887565534811694,
+      "rect": {
+        "x": 852,
+        "y": 141,
+        "width": 222,
+        "height": 628
+      },
+      "pass": false
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.09067858811901999,
+      "rect": {
+        "x": 852,
+        "y": 141,
+        "width": 222,
+        "height": 632
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}

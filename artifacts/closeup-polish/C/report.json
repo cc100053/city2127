@@ -1,0 +1,5139 @@
+{
+  "summary": {
+    "finalStates": 34,
+    "measuredStates": 94,
+    "rounds": [
+      {
+        "id": "se:focal",
+        "directory": "r1/se-focal",
+        "states": 8,
+        "A4": 0,
+        "A4pairs": 6,
+        "browser": "156.0.8078.73"
+      },
+      {
+        "id": "se:focal",
+        "directory": "r2/se-focal",
+        "states": 8,
+        "A4": 3,
+        "A4pairs": 6,
+        "browser": "156.0.8078.73"
+      },
+      {
+        "id": "se:focal",
+        "directory": "r3/se-focal",
+        "states": 8,
+        "A4": 4,
+        "A4pairs": 6,
+        "browser": "156.0.8078.73"
+      },
+      {
+        "id": "se:district",
+        "directory": "r1/se-district",
+        "states": 18,
+        "A4": 0,
+        "A4pairs": 16,
+        "browser": "156.0.8078.73"
+      },
+      {
+        "id": "se:district",
+        "directory": "r2/se-district",
+        "states": 18,
+        "A4": 0,
+        "A4pairs": 16,
+        "browser": "156.0.8078.73"
+      },
+      {
+        "id": "se:district",
+        "directory": "r3/se-district",
+        "states": 18,
+        "A4": 0,
+        "A4pairs": 16,
+        "browser": "156.0.8078.73"
+      },
+      {
+        "id": "energy:ring",
+        "directory": "r1/energy-ring",
+        "states": 8,
+        "A4": 0,
+        "A4pairs": 6,
+        "browser": "156.0.8078.73"
+      },
+      {
+        "id": "energy:ring",
+        "directory": "r2/energy-ring",
+        "states": 8,
+        "A4": 0,
+        "A4pairs": 6,
+        "browser": "156.0.8078.73"
+      }
+    ],
+    "A1": {
+      "FAIL": 2,
+      "PASS": 24,
+      "N/A": 8
+    },
+    "A2": {
+      "PASS": 10,
+      "N/A": 8,
+      "FAIL": 16
+    },
+    "A3": {
+      "FAIL": 26,
+      "N/A": 8
+    },
+    "A4": {
+      "pass": 4,
+      "pairs": 28
+    },
+    "A5": {
+      "FAIL": 18,
+      "PASS": 10,
+      "UNVERIFIED": 6
+    },
+    "A6": {
+      "PASS": 34
+    },
+    "reproducibility": {
+      "FAIL": 24,
+      "PASS": 10
+    },
+    "V": {
+      "V1": {
+        "FAIL": 9,
+        "PASS": 17,
+        "N/A": 8
+      },
+      "V2": {
+        "PASS": 34
+      },
+      "V3": {
+        "FAIL": 34
+      },
+      "V4": {
+        "PASS": 34
+      },
+      "V5": {
+        "N/A": 18,
+        "FAIL": 5,
+        "PASS": 11
+      },
+      "V6": {
+        "STATIC PASS": 30,
+        "FAIL": 2,
+        "N/A": 2
+      }
+    }
+  },
+  "source": {
+    "commit": "b5ce8fe64ccb7e41c06cbfd6ffcdc48acd4a37da",
+    "sha256": {
+      "src/headlineCamera.ts": "7a7bd9926ed1e142ec5f461d3cb57f51eb2a6585a642e8ebc266ab5b64a21d5b",
+      "src/siteBuilders/concentrationTower.ts": "0e50b3666522af659369d160f24e0dfcbb832a96a87f18e3abdb7550dd45d289",
+      "src/districtMeters.ts": "037296e5a307584ef3772e9f77c3824599554ffeee90d85af8ffa125704b277a",
+      "src/energyPrototype.ts": "0f952c94f4ae3b97d00a94bc4862987ec901a1379cf9288473b000d6c16a1890",
+      "src/devShotFrame.ts": "61558ef4610b26248ca69f4aa554bf4777cedff008e020e122ed41a77f0ff28c",
+      "artifacts/closeup-polish/capture.mjs": "8bc537e18033743e1badd023b0f2e250e4e381fb079d441465966198861358ae",
+      "tests/concentrationTower.test.ts": "10219b21d6e1a0eed8b4384fba9b3c6d9414a212e1bf65c2b0ffced3c9909432",
+      "tests/districtMeters.test.ts": "8b8dd6b346c4d0e77ec53abe28cec30031ceacb66573b122a3a8927eeb996084",
+      "artifacts/closeup-polish/C/live.mjs": "088a2b6d8f08c919183f5a00ab9e2fa5047181b320086b5aaac1fc1cbc4e6618",
+      "artifacts/closeup-polish/C/report.mjs": "dffce571f139d36945fb53cb18236c0fff139300b329cd829ea488d1a20c6c0b",
+      "artifacts/closeup-polish/C/scope-check.py": "a098a96677c478b905ccde12ef12098048bc11a0ad569b1a75071a0b6ce895e6"
+    },
+    "note": "Final runtime is committed b5ce8fe; later evidence/docs commits must not change these sources. Focal r3 uses final cumulative source. District/ring final primary builders match measured source; later ring marks are hidden in all Meter/hero captures."
+  },
+  "checks": {
+    "A7": {
+      "status": "PASS",
+      "sourceCommit": "b5ce8fe64ccb7e41c06cbfd6ffcdc48acd4a37da",
+      "npmTest": "final-checks/npm-test.log PASS, exit0",
+      "npmBuild": "final-checks/npm-build.log PASS, exit0",
+      "diffCheck": "final-checks/diff-check.log PASS",
+      "localPhysicalTests": "Low gallery within occupied <10 local-unit height and original footprint; open sky-bridge central ray passage; solar support roof landing and preallocated count PASS. Full rotor envelope + 324 district/history/receiver cases /177219 exact checks PASS.",
+      "runnerSelfCheck": "Full98 default matrix unchanged; optional six SE pairing states PASS",
+      "reportSelfCheck": "95% FPS /110% calls boundaries PASS",
+      "live": "11 checks PASS, errors0; live/browser.json",
+      "duration": "Exact3s duration/retarget/snapshot/reduced motion covered by root tests. Browser120-frame diagnostic refresh proves intermediate easing, no3.000s browser precision claim."
+    },
+    "scope": "PASS scope-check.json: only C geometry/three poses and affected tests; non-C runtime, hero/FOV/timeline, targets/counts/slots and survey/module-swap/dependencies unchanged from ca22a92.",
+    "warnings": [
+      "Existing JSON import-attribute warning",
+      "Existing chunk-size warning"
+    ],
+    "limits": [
+      "Art gates retain FAIL; owner acceptance pending, no main merge",
+      "A5 pairings UNVERIFIED: no same-state S0 draw baseline",
+      "C vs S0 includes cumulative A/B/C source; Chrome .73 differs from S0 .48; no isolated-C or same-version controlled performance claim",
+      "Raw shadow-call samples retained, no filtering or extra run to replace a failure",
+      "Static V6 does not establish full temporal flicker absence",
+      "No production, exhibition hardware, Safari/iPad, Windows, visitor2s or Z test in C"
+    ],
+    "attemptHistory": "Ring r1 Chrome closed unexpectedly after4 states, unknown cause; failed log/partial rows/original8 hashes preserved. Initial combined retry auto-review rejection resolved with read-only no-overwrite proof, approved capture-only continuation. Old hashes/rows/source/environment unchanged, retry-preservation.json PASS.",
+    "cleanup": "PASS cleanup.json; Vite5194 and final scratch50033 bind-verified free, all owned browsers/runners closed",
+    "selfReview": "PASS exact C runtime/test/capture diff, new live/report/scope scripts, generated state/metric matrices and final documents reviewed;34 final and3 live originals inspected individually.",
+    "links": "PASS link-check.json:577 local filesystem targets, no new fragment links",
+    "originals": "PASS original manifests S0:234/A:147/B:110 revalidated;172 earlier committed C image bytes revalidated;191 C originals in final manifest"
+  },
+  "performance": [
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "round": 1,
+      "directory": "r1/se-focal",
+      "fps": 96.15670511870869,
+      "baselineFps": 98.77824882915922,
+      "fpsRatio": 0.9734603139706941,
+      "calls": 751,
+      "baselineCalls": 706,
+      "minimumFps": 93.83933638770125,
+      "maximumCalls": 776.6,
+      "pass": true
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "round": 1,
+      "directory": "r1/se-focal",
+      "fps": 95.03169740740938,
+      "baselineFps": 99.89858531000374,
+      "fpsRatio": 0.9512817134748054,
+      "calls": 751,
+      "baselineCalls": 897.5,
+      "minimumFps": 94.90365604450355,
+      "maximumCalls": 987.2500000000001,
+      "pass": true
+    },
+    {
+      "id": "hero",
+      "hour": 12,
+      "round": 1,
+      "directory": "r1/se-focal",
+      "fps": 91.83756377004417,
+      "baselineFps": 86.33431099192002,
+      "fpsRatio": 1.0637435188269377,
+      "calls": 950,
+      "baselineCalls": 948,
+      "minimumFps": 82.01759544232401,
+      "maximumCalls": 1042.8000000000002,
+      "pass": true
+    },
+    {
+      "id": "hero",
+      "hour": 22,
+      "round": 1,
+      "directory": "r1/se-focal",
+      "fps": 91.2690006986129,
+      "baselineFps": 89.42044526679217,
+      "fpsRatio": 1.020672626112579,
+      "calls": 950,
+      "baselineCalls": 948,
+      "minimumFps": 84.94942300345257,
+      "maximumCalls": 1042.8000000000002,
+      "pass": true
+    },
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "round": 2,
+      "directory": "r2/se-focal",
+      "fps": 91.79764487500697,
+      "baselineFps": 98.77824882915922,
+      "fpsRatio": 0.9293305556952576,
+      "calls": 919,
+      "baselineCalls": 706,
+      "minimumFps": 93.83933638770125,
+      "maximumCalls": 776.6,
+      "pass": false
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "round": 2,
+      "directory": "r2/se-focal",
+      "fps": 92.13143018479147,
+      "baselineFps": 99.89858531000374,
+      "fpsRatio": 0.9222495984191432,
+      "calls": 919,
+      "baselineCalls": 897.5,
+      "minimumFps": 94.90365604450355,
+      "maximumCalls": 987.2500000000001,
+      "pass": false
+    },
+    {
+      "id": "hero",
+      "hour": 12,
+      "round": 2,
+      "directory": "r2/se-focal",
+      "fps": 91.82753895671185,
+      "baselineFps": 86.33431099192002,
+      "fpsRatio": 1.0636274026129187,
+      "calls": 950,
+      "baselineCalls": 948,
+      "minimumFps": 82.01759544232401,
+      "maximumCalls": 1042.8000000000002,
+      "pass": true
+    },
+    {
+      "id": "hero",
+      "hour": 22,
+      "round": 2,
+      "directory": "r2/se-focal",
+      "fps": 91.14614139688763,
+      "baselineFps": 89.42044526679217,
+      "fpsRatio": 1.0192986752072943,
+      "calls": 950,
+      "baselineCalls": 948,
+      "minimumFps": 84.94942300345257,
+      "maximumCalls": 1042.8000000000002,
+      "pass": true
+    },
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "round": 3,
+      "directory": "r3/se-focal",
+      "fps": 91.85576559221857,
+      "baselineFps": 98.77824882915922,
+      "fpsRatio": 0.9299189516012442,
+      "calls": 706,
+      "baselineCalls": 706,
+      "minimumFps": 93.83933638770125,
+      "maximumCalls": 776.6,
+      "pass": false
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "round": 3,
+      "directory": "r3/se-focal",
+      "fps": 97.70071633197331,
+      "baselineFps": 99.89858531000374,
+      "fpsRatio": 0.9779989979716927,
+      "calls": 898,
+      "baselineCalls": 897.5,
+      "minimumFps": 94.90365604450355,
+      "maximumCalls": 987.2500000000001,
+      "pass": true
+    },
+    {
+      "id": "hero",
+      "hour": 12,
+      "round": 3,
+      "directory": "r3/se-focal",
+      "fps": 87.89523834010815,
+      "baselineFps": 86.33431099192002,
+      "fpsRatio": 1.0180800348118169,
+      "calls": 950,
+      "baselineCalls": 948,
+      "minimumFps": 82.01759544232401,
+      "maximumCalls": 1042.8000000000002,
+      "pass": true
+    },
+    {
+      "id": "hero",
+      "hour": 22,
+      "round": 3,
+      "directory": "r3/se-focal",
+      "fps": 87.7738839578551,
+      "baselineFps": 89.42044526679217,
+      "fpsRatio": 0.9815862993745509,
+      "calls": 950,
+      "baselineCalls": 948,
+      "minimumFps": 84.94942300345257,
+      "maximumCalls": 1042.8000000000002,
+      "pass": true
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "round": 1,
+      "directory": "r1/se-district",
+      "fps": 96.12661356154737,
+      "baselineFps": 94.16639810989645,
+      "fpsRatio": 1.0208165066413952,
+      "calls": 855,
+      "baselineCalls": 743,
+      "minimumFps": 89.45807820440162,
+      "maximumCalls": 817.3000000000001,
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "round": 1,
+      "directory": "r1/se-district",
+      "fps": 96.90890949778813,
+      "baselineFps": 93.16341831331326,
+      "fpsRatio": 1.0402034538049967,
+      "calls": 855,
+      "baselineCalls": 743,
+      "minimumFps": 88.5052473976476,
+      "maximumCalls": 817.3000000000001,
+      "pass": false
+    },
+    {
+      "id": "hero",
+      "hour": 12,
+      "round": 1,
+      "directory": "r1/se-district",
+      "fps": 91.03351901214182,
+      "baselineFps": 86.33431099192002,
+      "fpsRatio": 1.054430364547203,
+      "calls": 950,
+      "baselineCalls": 948,
+      "minimumFps": 82.01759544232401,
+      "maximumCalls": 1042.8000000000002,
+      "pass": true
+    },
+    {
+      "id": "hero",
+      "hour": 22,
+      "round": 1,
+      "directory": "r1/se-district",
+      "fps": 88.92796192198767,
+      "baselineFps": 89.42044526679217,
+      "fpsRatio": 0.9944924972881186,
+      "calls": 950,
+      "baselineCalls": 948,
+      "minimumFps": 84.94942300345257,
+      "maximumCalls": 1042.8000000000002,
+      "pass": true
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "round": 2,
+      "directory": "r2/se-district",
+      "fps": 91.28941748176419,
+      "baselineFps": 94.16639810989645,
+      "fpsRatio": 0.9694479061971268,
+      "calls": 885,
+      "baselineCalls": 743,
+      "minimumFps": 89.45807820440162,
+      "maximumCalls": 817.3000000000001,
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "round": 2,
+      "directory": "r2/se-district",
+      "fps": 91.54324318922268,
+      "baselineFps": 93.16341831331326,
+      "fpsRatio": 0.9826093207674943,
+      "calls": 885,
+      "baselineCalls": 743,
+      "minimumFps": 88.5052473976476,
+      "maximumCalls": 817.3000000000001,
+      "pass": false
+    },
+    {
+      "id": "hero",
+      "hour": 12,
+      "round": 2,
+      "directory": "r2/se-district",
+      "fps": 85.72159043941004,
+      "baselineFps": 86.33431099192002,
+      "fpsRatio": 0.9929029311119733,
+      "calls": 950,
+      "baselineCalls": 948,
+      "minimumFps": 82.01759544232401,
+      "maximumCalls": 1042.8000000000002,
+      "pass": true
+    },
+    {
+      "id": "hero",
+      "hour": 22,
+      "round": 2,
+      "directory": "r2/se-district",
+      "fps": 84.43499946626225,
+      "baselineFps": 89.42044526679217,
+      "fpsRatio": 0.9442471373783089,
+      "calls": 950,
+      "baselineCalls": 948,
+      "minimumFps": 84.94942300345257,
+      "maximumCalls": 1042.8000000000002,
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "round": 3,
+      "directory": "r3/se-district",
+      "fps": 89.49792343969341,
+      "baselineFps": 94.16639810989645,
+      "fpsRatio": 0.9504231364487923,
+      "calls": 925,
+      "baselineCalls": 743,
+      "minimumFps": 89.45807820440162,
+      "maximumCalls": 817.3000000000001,
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "round": 3,
+      "directory": "r3/se-district",
+      "fps": 88.614259931941,
+      "baselineFps": 93.16341831331326,
+      "fpsRatio": 0.9511701216664978,
+      "calls": 925,
+      "baselineCalls": 743,
+      "minimumFps": 88.5052473976476,
+      "maximumCalls": 817.3000000000001,
+      "pass": false
+    },
+    {
+      "id": "hero",
+      "hour": 12,
+      "round": 3,
+      "directory": "r3/se-district",
+      "fps": 89.15195902269707,
+      "baselineFps": 86.33431099192002,
+      "fpsRatio": 1.0326364801943082,
+      "calls": 1134,
+      "baselineCalls": 948,
+      "minimumFps": 82.01759544232401,
+      "maximumCalls": 1042.8000000000002,
+      "pass": false
+    },
+    {
+      "id": "hero",
+      "hour": 22,
+      "round": 3,
+      "directory": "r3/se-district",
+      "fps": 88.95409017826493,
+      "baselineFps": 89.42044526679217,
+      "fpsRatio": 0.9947846928391395,
+      "calls": 950,
+      "baselineCalls": 948,
+      "minimumFps": 84.94942300345257,
+      "maximumCalls": 1042.8000000000002,
+      "pass": true
+    },
+    {
+      "id": "energy:ring",
+      "hour": 12,
+      "round": 1,
+      "directory": "r1/energy-ring",
+      "fps": 97.52017873859108,
+      "baselineFps": 98.14939562408861,
+      "fpsRatio": 0.9935891924601612,
+      "calls": 447,
+      "baselineCalls": 443,
+      "minimumFps": 93.24192584288417,
+      "maximumCalls": 487.3,
+      "pass": true
+    },
+    {
+      "id": "energy:ring",
+      "hour": 22,
+      "round": 1,
+      "directory": "r1/energy-ring",
+      "fps": 97.9363971425455,
+      "baselineFps": 99.83115076003116,
+      "fpsRatio": 0.981020416943403,
+      "calls": 447,
+      "baselineCalls": 443,
+      "minimumFps": 94.8395932220296,
+      "maximumCalls": 487.3,
+      "pass": true
+    },
+    {
+      "id": "hero",
+      "hour": 12,
+      "round": 1,
+      "directory": "r1/energy-ring",
+      "fps": 86.07343390407715,
+      "baselineFps": 86.33431099192002,
+      "fpsRatio": 0.9969782918882936,
+      "calls": 950,
+      "baselineCalls": 948,
+      "minimumFps": 82.01759544232401,
+      "maximumCalls": 1042.8000000000002,
+      "pass": true
+    },
+    {
+      "id": "hero",
+      "hour": 22,
+      "round": 1,
+      "directory": "r1/energy-ring",
+      "fps": 85.57674541394036,
+      "baselineFps": 89.42044526679217,
+      "fpsRatio": 0.9570154248127052,
+      "calls": 950,
+      "baselineCalls": 948,
+      "minimumFps": 84.94942300345257,
+      "maximumCalls": 1042.8000000000002,
+      "pass": true
+    },
+    {
+      "id": "energy:ring",
+      "hour": 12,
+      "round": 2,
+      "directory": "r2/energy-ring",
+      "fps": 98.98869166371739,
+      "baselineFps": 98.14939562408861,
+      "fpsRatio": 1.0085512094526112,
+      "calls": 447,
+      "baselineCalls": 443,
+      "minimumFps": 93.24192584288417,
+      "maximumCalls": 487.3,
+      "pass": true
+    },
+    {
+      "id": "energy:ring",
+      "hour": 22,
+      "round": 2,
+      "directory": "r2/energy-ring",
+      "fps": 93.68276876374722,
+      "baselineFps": 99.83115076003116,
+      "fpsRatio": 0.9384121894871963,
+      "calls": 447,
+      "baselineCalls": 443,
+      "minimumFps": 94.8395932220296,
+      "maximumCalls": 487.3,
+      "pass": false
+    },
+    {
+      "id": "hero",
+      "hour": 12,
+      "round": 2,
+      "directory": "r2/energy-ring",
+      "fps": 86.90215559437897,
+      "baselineFps": 86.33431099192002,
+      "fpsRatio": 1.0065772761250402,
+      "calls": 950,
+      "baselineCalls": 948,
+      "minimumFps": 82.01759544232401,
+      "maximumCalls": 1042.8000000000002,
+      "pass": true
+    },
+    {
+      "id": "hero",
+      "hour": 22,
+      "round": 2,
+      "directory": "r2/energy-ring",
+      "fps": 84.76807981535909,
+      "baselineFps": 89.42044526679217,
+      "fpsRatio": 0.9479720164940756,
+      "calls": 1135,
+      "baselineCalls": 948,
+      "minimumFps": 84.94942300345257,
+      "maximumCalls": 1042.8000000000002,
+      "pass": false
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.15239482478328867,
+      "rect": {
+        "x": 864,
+        "y": 483,
+        "width": 197,
+        "height": 290
+      },
+      "pass": true,
+      "directory": "r3/se-focal"
+    },
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.071736086029829,
+      "rect": {
+        "x": 852,
+        "y": 141,
+        "width": 222,
+        "height": 628
+      },
+      "pass": true,
+      "directory": "r3/se-focal"
+    },
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.12902576813596917,
+      "rect": {
+        "x": 852,
+        "y": 141,
+        "width": 222,
+        "height": 632
+      },
+      "pass": true,
+      "directory": "r3/se-focal"
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.11112040078298663,
+      "rect": {
+        "x": 864,
+        "y": 483,
+        "width": 197,
+        "height": 290
+      },
+      "pass": true,
+      "directory": "r3/se-focal"
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.04887565534811694,
+      "rect": {
+        "x": 852,
+        "y": 141,
+        "width": 222,
+        "height": 628
+      },
+      "pass": false,
+      "directory": "r3/se-focal"
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.09067858811901999,
+      "rect": {
+        "x": 852,
+        "y": 141,
+        "width": 222,
+        "height": 632
+      },
+      "pass": false,
+      "directory": "r3/se-focal"
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.02996618933067054,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false,
+      "directory": "r3/se-district"
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.02577523223795691,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false,
+      "directory": "r3/se-district"
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.024287050905753248,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false,
+      "directory": "r3/se-district"
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.0231915969448479,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false,
+      "directory": "r3/se-district"
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.06847630277676914,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false,
+      "directory": "r3/se-district"
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "low-solar",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.028099962833494054,
+      "rect": {
+        "x": 0,
+        "y": 104,
+        "width": 1920,
+        "height": 976
+      },
+      "pass": false,
+      "directory": "r3/se-district"
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "8",
+      "to": "high-forest",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.021792791923868314,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false,
+      "directory": "r3/se-district"
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "8",
+      "to": "high-docks",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.0336113538136448,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false,
+      "directory": "r3/se-district"
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.02764144136306786,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false,
+      "directory": "r3/se-district"
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.02179813327079803,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false,
+      "directory": "r3/se-district"
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.01850267792302106,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false,
+      "directory": "r3/se-district"
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.028129480856128458,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false,
+      "directory": "r3/se-district"
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.05800485342027758,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false,
+      "directory": "r3/se-district"
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "low-solar",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.023970990035358405,
+      "rect": {
+        "x": 0,
+        "y": 104,
+        "width": 1920,
+        "height": 976
+      },
+      "pass": false,
+      "directory": "r3/se-district"
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "8",
+      "to": "high-forest",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.023542694212458647,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false,
+      "directory": "r3/se-district"
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "8",
+      "to": "high-docks",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.04084579689643347,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false,
+      "directory": "r3/se-district"
+    },
+    {
+      "id": "energy:ring",
+      "hour": 12,
+      "from": "baseline",
+      "to": "b",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.03437954195517016,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false,
+      "directory": "r2/energy-ring"
+    },
+    {
+      "id": "energy:ring",
+      "hour": 12,
+      "from": "b",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.00581021309317674,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false,
+      "directory": "r2/energy-ring"
+    },
+    {
+      "id": "energy:ring",
+      "hour": 12,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.034379070795727655,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false,
+      "directory": "r2/energy-ring"
+    },
+    {
+      "id": "energy:ring",
+      "hour": 22,
+      "from": "baseline",
+      "to": "b",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.026698321587429658,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false,
+      "directory": "r2/energy-ring"
+    },
+    {
+      "id": "energy:ring",
+      "hour": 22,
+      "from": "b",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.0046866450601412485,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false,
+      "directory": "r2/energy-ring"
+    },
+    {
+      "id": "energy:ring",
+      "hour": 22,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.02671300114881003,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false,
+      "directory": "r2/energy-ring"
+    }
+  ],
+  "rows": [
+    {
+      "id": "se:focal",
+      "state": "-2",
+      "hour": 12,
+      "finalShot": "se:focal",
+      "image": "r3/se-focal/se-focal__-2__h12.jpg",
+      "baselineImage": "../S0/baseline/se-focal__-2__h12.jpg",
+      "measurement": {
+        "box": {
+          "left": 0.45194863549135905,
+          "right": 0.5501534003515248,
+          "top": 0.5375088101552701,
+          "bottom": 0.7152687834345224
+        },
+        "reason": null,
+        "framing": {
+          "A1": false,
+          "A2": true,
+          "A3": false,
+          "width": 0.09820476486016577,
+          "height": 0.1777599732792523,
+          "center": {
+            "x": 0.5010510179214419,
+            "y": 0.6263887967948962
+          },
+          "cardOverlap": 0
+        }
+      },
+      "A1": "FAIL",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 1
+      },
+      "A4": [
+        {
+          "id": "se:focal",
+          "hour": 12,
+          "from": "-2",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.15239482478328867,
+          "rect": {
+            "x": 864,
+            "y": 483,
+            "width": 197,
+            "height": 290
+          },
+          "pass": true
+        },
+        {
+          "id": "se:focal",
+          "hour": 12,
+          "from": "-2",
+          "to": "2",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.12902576813596917,
+          "rect": {
+            "x": 852,
+            "y": 141,
+            "width": 222,
+            "height": 632
+          },
+          "pass": true
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:focal",
+          "hour": 12,
+          "round": 3,
+          "directory": "r3/se-focal",
+          "fps": 91.85576559221857,
+          "baselineFps": 98.77824882915922,
+          "fpsRatio": 0.9299189516012442,
+          "calls": 706,
+          "baselineCalls": 706,
+          "minimumFps": 93.83933638770125,
+          "maximumCalls": 776.6,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 670,
+        "sameStateDrawBaseline": 680,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.004058950869442427,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "低層服務廊在中央橙框內可見，但被兩側高樓的尺度與亮度壓過；兩個地面小館較遠，不能兩秒辨認分散日常機能方案。"
+        ],
+        "V2": [
+          "PASS",
+          "右側Fuji主框架、劇場球體及後方水岸提供清楚位置關係。"
+        ],
+        "V3": [
+          "FAIL",
+          "左側屋頂仍有細幹球冠及前景空方格植栽；綠化未達整圖飽滿要求。"
+        ],
+        "V4": [
+          "PASS",
+          "低層館有完整玻璃、升降支承及連廊，配合成熟交通和公共地面，沒有以空高桿或荒地代表low。"
+        ],
+        "V5": [
+          "N/A",
+          "日景；同狀態h22另列。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此原圖的gallery支承及屋面未見明顯浮空／穿模；不代表完整動態閃爍驗收。"
+        ]
+      }
+    },
+    {
+      "id": "se:focal",
+      "state": "-2",
+      "hour": 22,
+      "finalShot": "se:focal",
+      "image": "r3/se-focal/se-focal__-2__h22.jpg",
+      "baselineImage": "../S0/baseline/se-focal__-2__h22.jpg",
+      "measurement": {
+        "box": {
+          "left": 0.45194863549135905,
+          "right": 0.5501534003515248,
+          "top": 0.5375088101552701,
+          "bottom": 0.7152687834345224
+        },
+        "reason": null,
+        "framing": {
+          "A1": false,
+          "A2": true,
+          "A3": false,
+          "width": 0.09820476486016577,
+          "height": 0.1777599732792523,
+          "center": {
+            "x": 0.5010510179214419,
+            "y": 0.6263887967948962
+          },
+          "cardOverlap": 0
+        }
+      },
+      "A1": "FAIL",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 1
+      },
+      "A4": [
+        {
+          "id": "se:focal",
+          "hour": 22,
+          "from": "-2",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.11112040078298663,
+          "rect": {
+            "x": 864,
+            "y": 483,
+            "width": 197,
+            "height": 290
+          },
+          "pass": true
+        },
+        {
+          "id": "se:focal",
+          "hour": 22,
+          "from": "-2",
+          "to": "2",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.09067858811901999,
+          "rect": {
+            "x": 852,
+            "y": 141,
+            "width": 222,
+            "height": 632
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:focal",
+          "hour": 22,
+          "round": 3,
+          "directory": "r3/se-focal",
+          "fps": 97.70071633197331,
+          "baselineFps": 99.89858531000374,
+          "fpsRatio": 0.9779989979716927,
+          "calls": 898,
+          "baselineCalls": 897.5,
+          "minimumFps": 94.90365604450355,
+          "maximumCalls": 987.2500000000001,
+          "pass": true
+        },
+        "vsync": 60.1,
+        "calls": 670,
+        "sameStateDrawBaseline": 680,
+        "reason": null,
+        "pass": true
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.0034688880567659165,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": true
+      },
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "低層服務廊在中央橙框內可見，但被兩側高樓的尺度與亮度壓過；兩個地面小館較遠，不能兩秒辨認分散日常機能方案。"
+        ],
+        "V2": [
+          "PASS",
+          "右側Fuji主框架、劇場球體及後方水岸提供清楚位置關係。"
+        ],
+        "V3": [
+          "FAIL",
+          "左側屋頂仍有細幹球冠及前景空方格植栽；綠化未達整圖飽滿要求。"
+        ],
+        "V4": [
+          "PASS",
+          "低層館有完整玻璃、升降支承及連廊，配合成熟交通和公共地面，沒有以空高桿或荒地代表low。"
+        ],
+        "V5": [
+          "FAIL",
+          "小館及服務廊在夜景太暗，橙框比occupied gallery更搶眼；兩側暖窗壓過主體。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此原圖的gallery支承及屋面未見明顯浮空／穿模；不代表完整動態閃爍驗收。"
+        ]
+      }
+    },
+    {
+      "id": "se:focal",
+      "state": "0",
+      "hour": 12,
+      "finalShot": "se:focal",
+      "image": "r3/se-focal/se-focal__0__h12.jpg",
+      "baselineImage": "../S0/baseline/se-focal__0__h12.jpg",
+      "measurement": {
+        "box": {
+          "left": 0.45015197012952823,
+          "right": 0.5521139031023863,
+          "top": 0.4472806271258263,
+          "bottom": 0.7116630629907946
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": true,
+          "A3": false,
+          "width": 0.10196193297285805,
+          "height": 0.26438243586496835,
+          "center": {
+            "x": 0.5011329366159573,
+            "y": 0.5794718450583105
+          },
+          "cardOverlap": 0
+        }
+      },
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 3
+      },
+      "A4": [
+        {
+          "id": "se:focal",
+          "hour": 12,
+          "from": "-2",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.15239482478328867,
+          "rect": {
+            "x": 864,
+            "y": 483,
+            "width": 197,
+            "height": 290
+          },
+          "pass": true
+        },
+        {
+          "id": "se:focal",
+          "hour": 12,
+          "from": "0",
+          "to": "2",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.071736086029829,
+          "rect": {
+            "x": 852,
+            "y": 141,
+            "width": 222,
+            "height": 628
+          },
+          "pass": true
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:focal",
+          "hour": 12,
+          "round": 3,
+          "directory": "r3/se-focal",
+          "fps": 91.85576559221857,
+          "baselineFps": 98.77824882915922,
+          "fpsRatio": 0.9299189516012442,
+          "calls": 706,
+          "baselineCalls": 706,
+          "minimumFps": 93.83933638770125,
+          "maximumCalls": 776.6,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 678,
+        "sameStateDrawBaseline": 678,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.004200713734567901,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "中層hall位置清楚且達畫面高度門檻，但中央void與function modules在此角度被樓板／玻璃遮住，仍似普通細長玻璃樓，兩秒內未讀出混合機能。"
+        ],
+        "V2": [
+          "PASS",
+          "右側Fuji frame及劇場球體、後方水岸保留，可清楚對照場地。"
+        ],
+        "V3": [
+          "FAIL",
+          "鄰樓屋頂細幹球冠及前景稀疏方格植栽仍明顯，未達整圖綠化要求。"
+        ],
+        "V4": [
+          "PASS",
+          "完整中層hall連同多層移動、公共地面與成熟周邊配置，沒有以破舊或未完成代表mixed。"
+        ],
+        "V5": [
+          "N/A",
+          "日景，夜間另列。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原圖樓板、玻璃及地面接點未見新增浮空或明顯表面打架；完整動態閃爍未驗。"
+        ]
+      }
+    },
+    {
+      "id": "se:focal",
+      "state": "0",
+      "hour": 22,
+      "finalShot": "se:focal",
+      "image": "r3/se-focal/se-focal__0__h22.jpg",
+      "baselineImage": "../S0/baseline/se-focal__0__h22.jpg",
+      "measurement": {
+        "box": {
+          "left": 0.45015197012952823,
+          "right": 0.5521139031023863,
+          "top": 0.4472806271258263,
+          "bottom": 0.7116630629907946
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": true,
+          "A3": false,
+          "width": 0.10196193297285805,
+          "height": 0.26438243586496835,
+          "center": {
+            "x": 0.5011329366159573,
+            "y": 0.5794718450583105
+          },
+          "cardOverlap": 0
+        }
+      },
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 3
+      },
+      "A4": [
+        {
+          "id": "se:focal",
+          "hour": 22,
+          "from": "-2",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.11112040078298663,
+          "rect": {
+            "x": 864,
+            "y": 483,
+            "width": 197,
+            "height": 290
+          },
+          "pass": true
+        },
+        {
+          "id": "se:focal",
+          "hour": 22,
+          "from": "0",
+          "to": "2",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.04887565534811694,
+          "rect": {
+            "x": 852,
+            "y": 141,
+            "width": 222,
+            "height": 628
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:focal",
+          "hour": 22,
+          "round": 3,
+          "directory": "r3/se-focal",
+          "fps": 97.70071633197331,
+          "baselineFps": 99.89858531000374,
+          "fpsRatio": 0.9779989979716927,
+          "calls": 898,
+          "baselineCalls": 897.5,
+          "minimumFps": 94.90365604450355,
+          "maximumCalls": 987.2500000000001,
+          "pass": true
+        },
+        "vsync": 59.9,
+        "calls": 678,
+        "sameStateDrawBaseline": 678,
+        "reason": null,
+        "pass": true
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.0035204708555232793,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": true
+      },
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "中層hall位置清楚且達畫面高度門檻，但中央void與function modules在此角度被樓板／玻璃遮住，仍似普通細長玻璃樓，兩秒內未讀出混合機能。"
+        ],
+        "V2": [
+          "PASS",
+          "右側Fuji frame及劇場球體、後方水岸保留，可清楚對照場地。"
+        ],
+        "V3": [
+          "FAIL",
+          "鄰樓屋頂細幹球冠及前景稀疏方格植栽仍明顯，未達整圖綠化要求。"
+        ],
+        "V4": [
+          "PASS",
+          "完整中層hall連同多層移動、公共地面與成熟周邊配置，沒有以破舊或未完成代表mixed。"
+        ],
+        "V5": [
+          "FAIL",
+          "hall只有細白樓板帶，玻璃和內部機能較暗；兩側暖亮高樓仍搶走主體，混合功能不清楚。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原圖樓板、玻璃及地面接點未見新增浮空或明顯表面打架；完整動態閃爍未驗。"
+        ]
+      }
+    },
+    {
+      "id": "se:focal",
+      "state": "2",
+      "hour": 12,
+      "finalShot": "se:focal",
+      "image": "r3/se-focal/se-focal__2__h12.jpg",
+      "baselineImage": "../S0/baseline/se-focal__2__h12.jpg",
+      "measurement": {
+        "box": {
+          "left": 0.44381519393911045,
+          "right": 0.5590801102060224,
+          "top": 0.1309802001573429,
+          "bottom": 0.7116630629907946
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": true,
+          "A3": false,
+          "width": 0.11526491626691199,
+          "height": 0.5806828628334517,
+          "center": {
+            "x": 0.5014476520725665,
+            "y": 0.42132163157406877
+          },
+          "cardOverlap": 0
+        }
+      },
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 3
+      },
+      "A4": [
+        {
+          "id": "se:focal",
+          "hour": 12,
+          "from": "0",
+          "to": "2",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.071736086029829,
+          "rect": {
+            "x": 852,
+            "y": 141,
+            "width": 222,
+            "height": 628
+          },
+          "pass": true
+        },
+        {
+          "id": "se:focal",
+          "hour": 12,
+          "from": "-2",
+          "to": "2",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.12902576813596917,
+          "rect": {
+            "x": 852,
+            "y": 141,
+            "width": 222,
+            "height": 632
+          },
+          "pass": true
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:focal",
+          "hour": 12,
+          "round": 3,
+          "directory": "r3/se-focal",
+          "fps": 91.85576559221857,
+          "baselineFps": 98.77824882915922,
+          "fpsRatio": 0.9299189516012442,
+          "calls": 706,
+          "baselineCalls": 706,
+          "minimumFps": 93.83933638770125,
+          "maximumCalls": 776.6,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 706,
+        "sameStateDrawBaseline": 706,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.0041661314603001695,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "中央細長環層塔完整可見，與中層base形成明確的集中立體機能塔；橙色基地框及右側Fuji令位置可對照，這是session判斷而非真人兩秒實測。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji主框架和劇場球體清楚，後方海灣保留地理定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "左樓屋頂仍有細桿球冠，前景稀疏屋頂方格保持；塔環綠帶不能令整張圖通過。"
+        ],
+        "V4": [
+          "PASS",
+          "完整高塔、轉接肋、occupied base及環層綠帶形成成熟高集中方案，權威模組保留。"
+        ],
+        "V5": [
+          "N/A",
+          "日景；同狀態h22另列。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原圖環層、轉接肋與base連接未見明顯浮空、穿模或表面打架；完整動態閃爍未驗。"
+        ]
+      }
+    },
+    {
+      "id": "se:focal",
+      "state": "2",
+      "hour": 22,
+      "finalShot": "se:focal",
+      "image": "r3/se-focal/se-focal__2__h22.jpg",
+      "baselineImage": "../S0/baseline/se-focal__2__h22.jpg",
+      "measurement": {
+        "box": {
+          "left": 0.44381519393911045,
+          "right": 0.5590801102060224,
+          "top": 0.1309802001573429,
+          "bottom": 0.7116630629907946
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": true,
+          "A3": false,
+          "width": 0.11526491626691199,
+          "height": 0.5806828628334517,
+          "center": {
+            "x": 0.5014476520725665,
+            "y": 0.42132163157406877
+          },
+          "cardOverlap": 0
+        }
+      },
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 3
+      },
+      "A4": [
+        {
+          "id": "se:focal",
+          "hour": 22,
+          "from": "0",
+          "to": "2",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.04887565534811694,
+          "rect": {
+            "x": 852,
+            "y": 141,
+            "width": 222,
+            "height": 628
+          },
+          "pass": false
+        },
+        {
+          "id": "se:focal",
+          "hour": 22,
+          "from": "-2",
+          "to": "2",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.09067858811901999,
+          "rect": {
+            "x": 852,
+            "y": 141,
+            "width": 222,
+            "height": 632
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:focal",
+          "hour": 22,
+          "round": 3,
+          "directory": "r3/se-focal",
+          "fps": 97.70071633197331,
+          "baselineFps": 99.89858531000374,
+          "fpsRatio": 0.9779989979716927,
+          "calls": 898,
+          "baselineCalls": 897.5,
+          "minimumFps": 94.90365604450355,
+          "maximumCalls": 987.2500000000001,
+          "pass": true
+        },
+        "vsync": 60,
+        "calls": 706,
+        "sameStateDrawBaseline": 706,
+        "reason": null,
+        "pass": true
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.003560466341886549,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": true
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "中央細長環層塔完整可見，與中層base形成明確的集中立體機能塔；橙色基地框及右側Fuji令位置可對照，這是session判斷而非真人兩秒實測。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji主框架和劇場球體清楚，後方海灣保留地理定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "左樓屋頂仍有細桿球冠，前景稀疏屋頂方格保持；塔環綠帶不能令整張圖通過。"
+        ],
+        "V4": [
+          "PASS",
+          "完整高塔、轉接肋、occupied base及環層綠帶形成成熟高集中方案，權威模組保留。"
+        ],
+        "V5": [
+          "PASS",
+          "高塔完整輪廓與水平白邊可辨，明確區分mixed中層hall；小型機能模組及玻璃細節仍暗，鄰樓較亮。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原圖環層、轉接肋與base連接未見明顯浮空、穿模或表面打架；完整動態閃爍未驗。"
+        ]
+      }
+    },
+    {
+      "id": "hero",
+      "state": "neutral",
+      "hour": 12,
+      "finalShot": "se:focal",
+      "image": "r3/se-focal/hero__neutral__h12.jpg",
+      "baselineImage": "../S0/baseline/hero__neutral__h12.jpg",
+      "measurement": {
+        "box": null,
+        "reason": null,
+        "framing": {
+          "A1": null,
+          "A2": null,
+          "A3": null,
+          "reason": "hero has no subject"
+        }
+      },
+      "A1": "N/A",
+      "A2": "N/A",
+      "A3": {
+        "status": "N/A",
+        "hits": null
+      },
+      "A4": [],
+      "A5": {
+        "reference": {
+          "id": "hero",
+          "hour": 12,
+          "round": 3,
+          "directory": "r3/se-focal",
+          "fps": 87.89523834010815,
+          "baselineFps": 86.33431099192002,
+          "fpsRatio": 1.0180800348118169,
+          "calls": 950,
+          "baselineCalls": 948,
+          "minimumFps": 82.01759544232401,
+          "maximumCalls": 1042.8000000000002,
+          "pass": true
+        },
+        "vsync": 60,
+        "calls": 950,
+        "sameStateDrawBaseline": 948,
+        "reason": null,
+        "pass": true
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.00475051377289599,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "N/A",
+          "Hero全城對照，不以單一C主體兩秒辨識門檻判定。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣及Rainbow Bridge保留在背景，Fuji主框架與劇場球體清楚定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景方格屋頂與細幹球冠仍明顯，局部冠層改善未令整圖達標。"
+        ],
+        "V4": [
+          "PASS",
+          "低中高建物與公共地面、立體路徑保持成熟2127配置。"
+        ],
+        "V5": [
+          "N/A",
+          "日景，夜間另驗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此張原圖未見新增浮空或明顯表面打架；未完整驗證動態閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "hero",
+      "state": "neutral",
+      "hour": 22,
+      "finalShot": "se:focal",
+      "image": "r3/se-focal/hero__neutral__h22.jpg",
+      "baselineImage": "../S0/baseline/hero__neutral__h22.jpg",
+      "measurement": {
+        "box": null,
+        "reason": null,
+        "framing": {
+          "A1": null,
+          "A2": null,
+          "A3": null,
+          "reason": "hero has no subject"
+        }
+      },
+      "A1": "N/A",
+      "A2": "N/A",
+      "A3": {
+        "status": "N/A",
+        "hits": null
+      },
+      "A4": [],
+      "A5": {
+        "reference": {
+          "id": "hero",
+          "hour": 22,
+          "round": 3,
+          "directory": "r3/se-focal",
+          "fps": 87.7738839578551,
+          "baselineFps": 89.42044526679217,
+          "fpsRatio": 0.9815862993745509,
+          "calls": 950,
+          "baselineCalls": 948,
+          "minimumFps": 84.94942300345257,
+          "maximumCalls": 1042.8000000000002,
+          "pass": true
+        },
+        "vsync": 60,
+        "calls": 950,
+        "sameStateDrawBaseline": 948,
+        "reason": null,
+        "pass": true
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.0033857419511014284,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": true
+      },
+      "V1_V6": {
+        "V1": [
+          "N/A",
+          "Hero全城對照，不以單一C主體兩秒辨識門檻判定。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣及Rainbow Bridge保留在背景，Fuji主框架與劇場球體清楚定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景方格屋頂與細幹球冠仍明顯，局部冠層改善未令整圖達標。"
+        ],
+        "V4": [
+          "PASS",
+          "低中高建物與公共地面、立體路徑保持成熟2127配置。"
+        ],
+        "V5": [
+          "PASS",
+          "暖窗與路徑輪廓可讀，未靠整面霓虹；遠處細節仍有限。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此張原圖未見新增浮空或明顯表面打架；未完整驗證動態閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "se:district",
+      "state": "-8",
+      "hour": 12,
+      "finalShot": "se:district",
+      "image": "r3/se-district/se-district__-8__h12.jpg",
+      "baselineImage": "../S0/baseline/se-district__-8__h12.jpg",
+      "measurement": {
+        "box": {
+          "left": -0.06926152636494187,
+          "right": 1.1473438915589582,
+          "top": 0.10119078745473409,
+          "bottom": 2.453829507718287
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": false,
+          "A3": false,
+          "width": 1.2166054179239,
+          "height": 2.3526387202635526,
+          "center": {
+            "x": 0.5390411825970082,
+            "y": 1.2775101475865105
+          },
+          "cardOverlap": 0.02681054491310777
+        }
+      },
+      "A1": "PASS",
+      "A2": "FAIL",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "se:district",
+          "hour": 12,
+          "from": "-8",
+          "to": "-5",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.02996618933067054,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "se:district",
+          "hour": 12,
+          "from": "-8",
+          "to": "8",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.06847630277676914,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "se:district",
+          "hour": 12,
+          "from": "-8",
+          "to": "low-solar",
+          "kind": "pairing",
+          "threshold": 0.06,
+          "mad": 0.028099962833494054,
+          "rect": {
+            "x": 0,
+            "y": 104,
+            "width": 1920,
+            "height": 976
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:district",
+          "hour": 12,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 89.49792343969341,
+          "baselineFps": 94.16639810989645,
+          "fpsRatio": 0.9504231364487923,
+          "calls": 925,
+          "baselineCalls": 743,
+          "minimumFps": 89.45807820440162,
+          "maximumCalls": 817.3000000000001,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 889,
+        "sameStateDrawBaseline": 717,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.011639136004195917,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "分散的低層環亭可見於中央草地及右側，但仍似綠頂圓盤；Fuji和前景屋頂更搶眼，兩秒內未能清楚讀成分散機能館。"
+        ],
+        "V2": [
+          "PASS",
+          "中央Fuji劇場球體與整個civic frame同時可辨；左上亦保留水岸。"
+        ],
+        "V3": [
+          "FAIL",
+          "左側背景屋頂仍有細桿球冠，前景屋頂仍是稀疏格仔種植；SE新增冠層不足以令整張圖通過。"
+        ],
+        "V4": [
+          "PASS",
+          "低狀態保留完整環亭、公共地面及多層移動系統，沒有以空地或老舊建築代表low。"
+        ],
+        "V5": [
+          "N/A",
+          "hour12日景，夜間可讀性另看同狀態h22。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此張原圖未見新增零件浮空、明顯穿模或z-fighting；不代表完整動態閃爍驗收。"
+        ]
+      }
+    },
+    {
+      "id": "se:district",
+      "state": "-8",
+      "hour": 22,
+      "finalShot": "se:district",
+      "image": "r3/se-district/se-district__-8__h22.jpg",
+      "baselineImage": "../S0/baseline/se-district__-8__h22.jpg",
+      "measurement": {
+        "box": {
+          "left": -0.06926152636494187,
+          "right": 1.1473438915589582,
+          "top": 0.10119078745473409,
+          "bottom": 2.453829507718287
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": false,
+          "A3": false,
+          "width": 1.2166054179239,
+          "height": 2.3526387202635526,
+          "center": {
+            "x": 0.5390411825970082,
+            "y": 1.2775101475865105
+          },
+          "cardOverlap": 0.02681054491310777
+        }
+      },
+      "A1": "PASS",
+      "A2": "FAIL",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "se:district",
+          "hour": 22,
+          "from": "-8",
+          "to": "-5",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.02764144136306786,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "se:district",
+          "hour": 22,
+          "from": "-8",
+          "to": "8",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.05800485342027758,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "se:district",
+          "hour": 22,
+          "from": "-8",
+          "to": "low-solar",
+          "kind": "pairing",
+          "threshold": 0.06,
+          "mad": 0.023970990035358405,
+          "rect": {
+            "x": 0,
+            "y": 104,
+            "width": 1920,
+            "height": 976
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:district",
+          "hour": 22,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 88.614259931941,
+          "baselineFps": 93.16341831331326,
+          "fpsRatio": 0.9511701216664978,
+          "calls": 925,
+          "baselineCalls": 743,
+          "minimumFps": 88.5052473976476,
+          "maximumCalls": 817.3000000000001,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 889,
+        "sameStateDrawBaseline": 717,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.004401046709836198,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "夜景只見分散暖白圓邊，機能館身暗；視線首先落在Fuji及航線，不能兩秒辨認分散機能方案。"
+        ],
+        "V2": [
+          "PASS",
+          "中央Fuji劇場球體與整個civic frame同時可辨；左上亦保留水岸。"
+        ],
+        "V3": [
+          "FAIL",
+          "左側背景屋頂仍有細桿球冠，前景屋頂仍是稀疏格仔種植；SE新增冠層不足以令整張圖通過。"
+        ],
+        "V4": [
+          "PASS",
+          "低狀態保留完整環亭、公共地面及多層移動系統，沒有以空地或老舊建築代表low。"
+        ],
+        "V5": [
+          "FAIL",
+          "環亭暖白邊可見，但小館及分布仍被Fuji亮室、背景窗帶與前景航線壓過，夜間變化主體不清楚。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此張原圖未見新增零件浮空、明顯穿模或z-fighting；不代表完整動態閃爍驗收。"
+        ]
+      }
+    },
+    {
+      "id": "se:district",
+      "state": "-5",
+      "hour": 12,
+      "finalShot": "se:district",
+      "image": "r3/se-district/se-district__-5__h12.jpg",
+      "baselineImage": "../S0/baseline/se-district__-5__h12.jpg",
+      "measurement": {
+        "box": {
+          "left": -0.2384926258798562,
+          "right": 1.549636338960315,
+          "top": -0.10224808489607184,
+          "bottom": 3.255687420611512
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": false,
+          "A3": false,
+          "width": 1.7881289648401713,
+          "height": 3.3579355055075837,
+          "center": {
+            "x": 0.6555718565402293,
+            "y": 1.57671966785772
+          },
+          "cardOverlap": 0.0164878491711091
+        }
+      },
+      "A1": "PASS",
+      "A2": "FAIL",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "se:district",
+          "hour": 12,
+          "from": "-8",
+          "to": "-5",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.02996618933067054,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "se:district",
+          "hour": 12,
+          "from": "-5",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.02577523223795691,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:district",
+          "hour": 12,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 89.49792343969341,
+          "baselineFps": 94.16639810989645,
+          "fpsRatio": 0.9504231364487923,
+          "calls": 925,
+          "baselineCalls": 743,
+          "minimumFps": 89.45807820440162,
+          "maximumCalls": 817.3000000000001,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 889,
+        "sameStateDrawBaseline": 717,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.006843750630396191,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "左下雙塔／扭轉塔與右側立體塔已可辨，保留低環亭；可讀成分散低館與部分立體街區並存，惟邊緣塔群被裁切。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體與完整主框架仍在中央，左上保留水岸，位置可對照。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景稀疏方格植栽與背景細幹球冠保持；新SE環亭冠層不能抵消全圖的格仔感。"
+        ],
+        "V4": [
+          "PASS",
+          "低環亭與完整立體塔／連廊共存，混合狀態是成熟配置而非尚未建完的工地。"
+        ],
+        "V5": [
+          "N/A",
+          "日景；夜間輪廓看同狀態h22。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此原圖連廊接至塔身、冠層落於屋面，未見新增z-fighting或浮空；邊緣裁切屬構圖缺口，完整動態閃爍未驗。"
+        ]
+      }
+    },
+    {
+      "id": "se:district",
+      "state": "-5",
+      "hour": 22,
+      "finalShot": "se:district",
+      "image": "r3/se-district/se-district__-5__h22.jpg",
+      "baselineImage": "../S0/baseline/se-district__-5__h22.jpg",
+      "measurement": {
+        "box": {
+          "left": -0.2384926258798562,
+          "right": 1.549636338960315,
+          "top": -0.10224808489607184,
+          "bottom": 3.255687420611512
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": false,
+          "A3": false,
+          "width": 1.7881289648401713,
+          "height": 3.3579355055075837,
+          "center": {
+            "x": 0.6555718565402293,
+            "y": 1.57671966785772
+          },
+          "cardOverlap": 0.0164878491711091
+        }
+      },
+      "A1": "PASS",
+      "A2": "FAIL",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "se:district",
+          "hour": 22,
+          "from": "-8",
+          "to": "-5",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.02764144136306786,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "se:district",
+          "hour": 22,
+          "from": "-5",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.02179813327079803,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:district",
+          "hour": 22,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 88.614259931941,
+          "baselineFps": 93.16341831331326,
+          "fpsRatio": 0.9511701216664978,
+          "calls": 925,
+          "baselineCalls": 743,
+          "minimumFps": 88.5052473976476,
+          "maximumCalls": 817.3000000000001,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 889,
+        "sameStateDrawBaseline": 717,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.010264229933228435,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "暖亮的左下雙塔和右側塔令部分立體街區可辨；小環亭較弱，但混合配置相對全low仍可讀。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體與完整主框架仍在中央，左上保留水岸，位置可對照。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景稀疏方格植栽與背景細幹球冠保持；新SE環亭冠層不能抵消全圖的格仔感。"
+        ],
+        "V4": [
+          "PASS",
+          "低環亭與完整立體塔／連廊共存，混合狀態是成熟配置而非尚未建完的工地。"
+        ],
+        "V5": [
+          "PASS",
+          "雙塔與右側塔的暖窗／水平環緣清楚，能和全low的暗小館區分；不表示所有離鏡小館都清楚。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此原圖連廊接至塔身、冠層落於屋面，未見新增z-fighting或浮空；邊緣裁切屬構圖缺口，完整動態閃爍未驗。"
+        ]
+      }
+    },
+    {
+      "id": "se:district",
+      "state": "0",
+      "hour": 12,
+      "finalShot": "se:district",
+      "image": "r3/se-district/se-district__0__h12.jpg",
+      "baselineImage": "../S0/baseline/se-district__0__h12.jpg",
+      "measurement": {
+        "box": {
+          "left": -0.2373199504450585,
+          "right": 1.5876916008015016,
+          "top": -0.1147330660175424,
+          "bottom": 3.2919768694231224
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": false,
+          "A3": false,
+          "width": 1.8250115512465601,
+          "height": 3.4067099354406647,
+          "center": {
+            "x": 0.6751858251782216,
+            "y": 1.58862190170279
+          },
+          "cardOverlap": 0.01592334922011098
+        }
+      },
+      "A1": "PASS",
+      "A2": "FAIL",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "se:district",
+          "hour": 12,
+          "from": "-5",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.02577523223795691,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "se:district",
+          "hour": 12,
+          "from": "0",
+          "to": "5",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.024287050905753248,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:district",
+          "hour": 12,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 89.49792343969341,
+          "baselineFps": 94.16639810989645,
+          "fpsRatio": 0.9504231364487923,
+          "calls": 925,
+          "baselineCalls": 743,
+          "minimumFps": 89.45807820440162,
+          "maximumCalls": 817.3000000000001,
+          "pass": false
+        },
+        "vsync": 59.9,
+        "calls": 897,
+        "sameStateDrawBaseline": 715,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.0055704442528040025,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "Fuji左側新增扭轉塔、左下雙塔與右側塔群同低環亭並存；可辨是混合高度的機能街區，外圍仍有裁切。"
+        ],
+        "V2": [
+          "PASS",
+          "中央Fuji劇場球體及周圍frame完整入鏡，左上水岸提供第二個定位線索。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景大屋頂保持大片空方格與分散小植栽，左後方球冠細幹明顯；全圖未達飽滿層次要求。"
+        ],
+        "V4": [
+          "PASS",
+          "中層hall、環亭及數種完整高塔同時存在，低／中／高配置都延續成熟的公共地面和立體系統。"
+        ],
+        "V5": [
+          "N/A",
+          "hour12日景，夜間另列。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此張原圖未見新增橋段與塔身脫離或明顯表面打架；邊緣高塔裁切保持構圖限制，動態未作完整閃爍掃描。"
+        ]
+      }
+    },
+    {
+      "id": "se:district",
+      "state": "0",
+      "hour": 22,
+      "finalShot": "se:district",
+      "image": "r3/se-district/se-district__0__h22.jpg",
+      "baselineImage": "../S0/baseline/se-district__0__h22.jpg",
+      "measurement": {
+        "box": {
+          "left": -0.2373199504450585,
+          "right": 1.5876916008015016,
+          "top": -0.1147330660175424,
+          "bottom": 3.2919768694231224
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": false,
+          "A3": false,
+          "width": 1.8250115512465601,
+          "height": 3.4067099354406647,
+          "center": {
+            "x": 0.6751858251782216,
+            "y": 1.58862190170279
+          },
+          "cardOverlap": 0.01592334922011098
+        }
+      },
+      "A1": "PASS",
+      "A2": "FAIL",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "se:district",
+          "hour": 22,
+          "from": "-5",
+          "to": "0",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.02179813327079803,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "se:district",
+          "hour": 22,
+          "from": "0",
+          "to": "5",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.01850267792302106,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:district",
+          "hour": 22,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 88.614259931941,
+          "baselineFps": 93.16341831331326,
+          "fpsRatio": 0.9511701216664978,
+          "calls": 925,
+          "baselineCalls": 743,
+          "minimumFps": 88.5052473976476,
+          "maximumCalls": 817.3000000000001,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 897,
+        "sameStateDrawBaseline": 715,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.012006769194303235,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "中央左側扭轉塔與右側塔群暖窗突出，混合機能配置可辨；較低的中層hall依然弱。"
+        ],
+        "V2": [
+          "PASS",
+          "中央Fuji劇場球體及周圍frame完整入鏡，左上水岸提供第二個定位線索。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景大屋頂保持大片空方格與分散小植栽，左後方球冠細幹明顯；全圖未達飽滿層次要求。"
+        ],
+        "V4": [
+          "PASS",
+          "中層hall、環亭及數種完整高塔同時存在，低／中／高配置都延續成熟的公共地面和立體系統。"
+        ],
+        "V5": [
+          "PASS",
+          "扭轉／雙塔窗帶與連廊的水平關係可見，整體高度混合在夜間可讀；小館細節仍有限。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此張原圖未見新增橋段與塔身脫離或明顯表面打架；邊緣高塔裁切保持構圖限制，動態未作完整閃爍掃描。"
+        ]
+      }
+    },
+    {
+      "id": "se:district",
+      "state": "5",
+      "hour": 12,
+      "finalShot": "se:district",
+      "image": "r3/se-district/se-district__5__h12.jpg",
+      "baselineImage": "../S0/baseline/se-district__5__h12.jpg",
+      "measurement": {
+        "box": {
+          "left": -0.23273151127406244,
+          "right": 1.5876916008015016,
+          "top": -0.1131820083963363,
+          "bottom": 3.2919768694231224
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": false,
+          "A3": false,
+          "width": 1.820423112075564,
+          "height": 3.4051588778194586,
+          "center": {
+            "x": 0.6774800447637196,
+            "y": 1.589397430513393
+          },
+          "cardOverlap": 0.015970755973974793
+        }
+      },
+      "A1": "PASS",
+      "A2": "FAIL",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "se:district",
+          "hour": 12,
+          "from": "0",
+          "to": "5",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.024287050905753248,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "se:district",
+          "hour": 12,
+          "from": "5",
+          "to": "8",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.0231915969448479,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:district",
+          "hour": 12,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 89.49792343969341,
+          "baselineFps": 94.16639810989645,
+          "fpsRatio": 0.9504231364487923,
+          "calls": 925,
+          "baselineCalls": 743,
+          "minimumFps": 89.45807820440162,
+          "maximumCalls": 817.3000000000001,
+          "pass": false
+        },
+        "vsync": 60.1,
+        "calls": 925,
+        "sameStateDrawBaseline": 743,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.014515496399176955,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "左下雙塔和水平連廊、中央左側高環塔及右側塔群可讀成更集中的立體機能街區；前景仍有混合低館。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體及完整主框架仍提供清楚定位，左上亦留水岸。"
+        ],
+        "V3": [
+          "FAIL",
+          "大片前景格仔屋頂與後方球冠細幹依然明顯，局部SE綠冠改善未令整體達標。"
+        ],
+        "V4": [
+          "PASS",
+          "高低設施、連廊與多層交通都保留完整運作形態，+2不是半建築或荒地。"
+        ],
+        "V5": [
+          "N/A",
+          "日景；同狀態h22另驗夜景。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原圖橋段連接與屋面落點未見新增穿模／浮空；靜態沒有明顯表面打架，未驗完整動態閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "se:district",
+      "state": "5",
+      "hour": 22,
+      "finalShot": "se:district",
+      "image": "r3/se-district/se-district__5__h22.jpg",
+      "baselineImage": "../S0/baseline/se-district__5__h22.jpg",
+      "measurement": {
+        "box": {
+          "left": -0.23273151127406244,
+          "right": 1.5876916008015016,
+          "top": -0.1131820083963363,
+          "bottom": 3.2919768694231224
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": false,
+          "A3": false,
+          "width": 1.820423112075564,
+          "height": 3.4051588778194586,
+          "center": {
+            "x": 0.6774800447637196,
+            "y": 1.589397430513393
+          },
+          "cardOverlap": 0.015970755973974793
+        }
+      },
+      "A1": "PASS",
+      "A2": "FAIL",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "se:district",
+          "hour": 22,
+          "from": "0",
+          "to": "5",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.01850267792302106,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "se:district",
+          "hour": 22,
+          "from": "5",
+          "to": "8",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.028129480856128458,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:district",
+          "hour": 22,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 88.614259931941,
+          "baselineFps": 93.16341831331326,
+          "fpsRatio": 0.9511701216664978,
+          "calls": 925,
+          "baselineCalls": 743,
+          "minimumFps": 88.5052473976476,
+          "maximumCalls": 817.3000000000001,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 925,
+        "sameStateDrawBaseline": 743,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.011606747508674251,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "左下雙塔連廊及右側暖亮塔群突出，集中配置可辨；中央左側高環塔比其他塔暗。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體及完整主框架仍提供清楚定位，左上亦留水岸。"
+        ],
+        "V3": [
+          "FAIL",
+          "大片前景格仔屋頂與後方球冠細幹依然明顯，局部SE綠冠改善未令整體達標。"
+        ],
+        "V4": [
+          "PASS",
+          "高低設施、連廊與多層交通都保留完整運作形態，+2不是半建築或荒地。"
+        ],
+        "V5": [
+          "PASS",
+          "暖亮雙塔／扭轉塔的高度和連廊關係可讀，暗的高環塔輪廓亦有背景對比；不宣稱小館細節同樣清楚。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原圖橋段連接與屋面落點未見新增穿模／浮空；靜態沒有明顯表面打架，未驗完整動態閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "se:district",
+      "state": "8",
+      "hour": 12,
+      "finalShot": "se:district",
+      "image": "r3/se-district/se-district__8__h12.jpg",
+      "baselineImage": "../S0/baseline/se-district__8__h12.jpg",
+      "measurement": {
+        "box": {
+          "left": -0.25728457580305897,
+          "right": 1.592216595229894,
+          "top": -0.1485052514532751,
+          "bottom": 3.1727564829360806
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": false,
+          "A3": false,
+          "width": 1.8495011710329528,
+          "height": 3.321261734389356,
+          "center": {
+            "x": 0.6674660097134175,
+            "y": 1.5121256157414027
+          },
+          "cardOverlap": 0.016116750477440003
+        }
+      },
+      "A1": "PASS",
+      "A2": "FAIL",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "se:district",
+          "hour": 12,
+          "from": "5",
+          "to": "8",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.0231915969448479,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "se:district",
+          "hour": 12,
+          "from": "-8",
+          "to": "8",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.06847630277676914,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "se:district",
+          "hour": 12,
+          "from": "8",
+          "to": "high-forest",
+          "kind": "pairing",
+          "threshold": 0.06,
+          "mad": 0.021792791923868314,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "se:district",
+          "hour": 12,
+          "from": "8",
+          "to": "high-docks",
+          "kind": "pairing",
+          "threshold": 0.06,
+          "mad": 0.0336113538136448,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:district",
+          "hour": 12,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 89.49792343969341,
+          "baselineFps": 94.16639810989645,
+          "fpsRatio": 0.9504231364487923,
+          "calls": 925,
+          "baselineCalls": 743,
+          "minimumFps": 89.45807820440162,
+          "maximumCalls": 817.3000000000001,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 925,
+        "sameStateDrawBaseline": 743,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.0067752215212216575,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "新增退台塔與完整雙塔／扭轉塔分布清楚，水平空中連廊可見，可辨為集中式立體機能街區；部分外圍仍被裁。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體與主frame保持在畫面中央，定位清楚；左上亦有水岸。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景方格屋頂和後方細桿球冠仍是主要綠化語彙，SE細化冠層未達整張圖的要求。"
+        ],
+        "V4": [
+          "PASS",
+          "多種完整塔型與公共層、連廊和移動系統共同構成成熟的高集中方案，low替代沒有被解讀為舊時代。"
+        ],
+        "V5": [
+          "N/A",
+          "日景，夜間另列h22。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "退台、連廊與屋面接點此張未見新增浮空或打架；外圍裁切是構圖缺口，沒有宣稱動態閃爍全驗。"
+        ]
+      }
+    },
+    {
+      "id": "se:district",
+      "state": "8",
+      "hour": 22,
+      "finalShot": "se:district",
+      "image": "r3/se-district/se-district__8__h22.jpg",
+      "baselineImage": "../S0/baseline/se-district__8__h22.jpg",
+      "measurement": {
+        "box": {
+          "left": -0.25728457580305897,
+          "right": 1.592216595229894,
+          "top": -0.1485052514532751,
+          "bottom": 3.1727564829360806
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": false,
+          "A3": false,
+          "width": 1.8495011710329528,
+          "height": 3.321261734389356,
+          "center": {
+            "x": 0.6674660097134175,
+            "y": 1.5121256157414027
+          },
+          "cardOverlap": 0.016116750477440003
+        }
+      },
+      "A1": "PASS",
+      "A2": "FAIL",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "se:district",
+          "hour": 22,
+          "from": "5",
+          "to": "8",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.028129480856128458,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "se:district",
+          "hour": 22,
+          "from": "-8",
+          "to": "8",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.05800485342027758,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "se:district",
+          "hour": 22,
+          "from": "8",
+          "to": "high-forest",
+          "kind": "pairing",
+          "threshold": 0.06,
+          "mad": 0.023542694212458647,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        },
+        {
+          "id": "se:district",
+          "hour": 22,
+          "from": "8",
+          "to": "high-docks",
+          "kind": "pairing",
+          "threshold": 0.06,
+          "mad": 0.04084579689643347,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:district",
+          "hour": 22,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 88.614259931941,
+          "baselineFps": 93.16341831331326,
+          "fpsRatio": 0.9511701216664978,
+          "calls": 925,
+          "baselineCalls": 743,
+          "minimumFps": 88.5052473976476,
+          "maximumCalls": 817.3000000000001,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 925,
+        "sameStateDrawBaseline": 743,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.010168789210643105,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "新增退台塔與完整雙塔／扭轉塔分布清楚，水平空中連廊可見，可辨為集中式立體機能街區；部分外圍仍被裁。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體與主frame保持在畫面中央，定位清楚；左上亦有水岸。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景方格屋頂和後方細桿球冠仍是主要綠化語彙，SE細化冠層未達整張圖的要求。"
+        ],
+        "V4": [
+          "PASS",
+          "多種完整塔型與公共層、連廊和移動系統共同構成成熟的高集中方案，low替代沒有被解讀為舊時代。"
+        ],
+        "V5": [
+          "PASS",
+          "新退台塔與雙塔的暖窗／水平連廊足夠明顯，高集中輪廓比中性更密集；高環塔仍偏暗但外形可辨。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "退台、連廊與屋面接點此張未見新增浮空或打架；外圍裁切是構圖缺口，沒有宣稱動態閃爍全驗。"
+        ]
+      }
+    },
+    {
+      "id": "hero",
+      "state": "neutral",
+      "hour": 12,
+      "finalShot": "se:district",
+      "image": "r3/se-district/hero__neutral__h12.jpg",
+      "baselineImage": "../S0/baseline/hero__neutral__h12.jpg",
+      "measurement": {
+        "box": null,
+        "reason": null,
+        "framing": {
+          "A1": null,
+          "A2": null,
+          "A3": null,
+          "reason": "hero has no subject"
+        }
+      },
+      "A1": "N/A",
+      "A2": "N/A",
+      "A3": {
+        "status": "N/A",
+        "hits": null
+      },
+      "A4": [],
+      "A5": {
+        "reference": {
+          "id": "hero",
+          "hour": 12,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 89.15195902269707,
+          "baselineFps": 86.33431099192002,
+          "fpsRatio": 1.0326364801943082,
+          "calls": 1134,
+          "baselineCalls": 948,
+          "minimumFps": 82.01759544232401,
+          "maximumCalls": 1042.8000000000002,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 950,
+        "sameStateDrawBaseline": 948,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.004660614863229242,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "N/A",
+          "原hero全城總覽，沒有單一近鏡設施作兩秒辨認主體。"
+        ],
+        "V2": [
+          "PASS",
+          "東京灣與彩虹橋清楚，Fuji主框架位於城市中央。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景屋頂仍有稀疏格仔植栽，背景樹冠多為球團／細桿，整體未達綠化門檻。"
+        ],
+        "V4": [
+          "PASS",
+          "大型公共框架、立體移動與完整水岸層次維持成熟2127城市。"
+        ],
+        "V5": [
+          "N/A",
+          "hour12日景，夜間另列。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此張總覽未見新增浮空零件或明顯表面打架；不是完整動態閃爍驗收。"
+        ]
+      }
+    },
+    {
+      "id": "hero",
+      "state": "neutral",
+      "hour": 22,
+      "finalShot": "se:district",
+      "image": "r3/se-district/hero__neutral__h22.jpg",
+      "baselineImage": "../S0/baseline/hero__neutral__h22.jpg",
+      "measurement": {
+        "box": null,
+        "reason": null,
+        "framing": {
+          "A1": null,
+          "A2": null,
+          "A3": null,
+          "reason": "hero has no subject"
+        }
+      },
+      "A1": "N/A",
+      "A2": "N/A",
+      "A3": {
+        "status": "N/A",
+        "hits": null
+      },
+      "A4": [],
+      "A5": {
+        "reference": {
+          "id": "hero",
+          "hour": 22,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 88.95409017826493,
+          "baselineFps": 89.42044526679217,
+          "fpsRatio": 0.9947846928391395,
+          "calls": 950,
+          "baselineCalls": 948,
+          "minimumFps": 84.94942300345257,
+          "maximumCalls": 1042.8000000000002,
+          "pass": true
+        },
+        "vsync": 60,
+        "calls": 950,
+        "sameStateDrawBaseline": 948,
+        "reason": null,
+        "pass": true
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.0032420557471959975,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": true
+      },
+      "V1_V6": {
+        "V1": [
+          "N/A",
+          "Hero全城總覽沒有單一近鏡設施作主體。"
+        ],
+        "V2": [
+          "PASS",
+          "廣闊東京灣、遠處彩虹橋輪廓與中央Fuji框架仍可定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "屋頂種植格、球團細桿樹依然存在，夜暗不當作綠化通過。"
+        ],
+        "V4": [
+          "PASS",
+          "公共框架、立體路網與成熟水岸層次在夜景保持完整。"
+        ],
+        "V5": [
+          "PASS",
+          "主要建物、公共層及海岸輪廓可讀；不代表遠處每個機能小館細節可讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此張原圖未見新增浮空或z-fighting，未完成全時序閃爍驗證。"
+        ]
+      }
+    },
+    {
+      "id": "se:district",
+      "state": "low-solar",
+      "hour": 12,
+      "finalShot": "se:district",
+      "image": "r3/se-district/se-district__low-solar__h12.jpg",
+      "baselineImage": null,
+      "measurement": {
+        "box": {
+          "left": -0.07162203707813919,
+          "right": 1.1502601255394085,
+          "top": 0.09642947348400788,
+          "bottom": 2.4601324618176363
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": false,
+          "A3": false,
+          "width": 1.2218821626175478,
+          "height": 2.3637029883336282,
+          "center": {
+            "x": 0.5393190442306346,
+            "y": 1.2782809676508222
+          },
+          "cardOverlap": 0.026932489978401454
+        }
+      },
+      "A1": "PASS",
+      "A2": "FAIL",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "se:district",
+          "hour": 12,
+          "from": "-8",
+          "to": "low-solar",
+          "kind": "pairing",
+          "threshold": 0.06,
+          "mad": 0.028099962833494054,
+          "rect": {
+            "x": 0,
+            "y": 104,
+            "width": 1920,
+            "height": 976
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:district",
+          "hour": 12,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 89.49792343969341,
+          "baselineFps": 94.16639810989645,
+          "fpsRatio": 0.9504231364487923,
+          "calls": 925,
+          "baselineCalls": 743,
+          "minimumFps": 89.45807820440162,
+          "maximumCalls": 817.3000000000001,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 893,
+        "sameStateDrawBaseline": null,
+        "reason": "No same-state S0 pairing draw baseline; canonical shot performance is listed separately",
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.0065139607540547085,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "分散館上方的深藍圓盤雖清楚，但缺少可讀的光伏分格／機能細節，兩秒內未能認出solar配對；Fuji仍更搶眼。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體及civic frame清楚入鏡，左上水岸仍在。"
+        ],
+        "V3": [
+          "FAIL",
+          "配對的低環境狀態保留大片疏格屋頂；背景細桿球冠仍多，SE屋面冠層不足以通過全圖綠化。"
+        ],
+        "V4": [
+          "PASS",
+          "低分散館及其受支承的能源頂蓋是完整替代，公共層／路網沒有被移除或退回舊時代。"
+        ],
+        "V5": [
+          "N/A",
+          "日景，h22另驗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見頂蓋與既有館面的位置關係，新增支架的屋面接點亦由幾何測試覆蓋；此原圖未見明顯穿模／表面打架，動態閃爍未全驗。"
+        ]
+      }
+    },
+    {
+      "id": "se:district",
+      "state": "low-solar",
+      "hour": 22,
+      "finalShot": "se:district",
+      "image": "r3/se-district/se-district__low-solar__h22.jpg",
+      "baselineImage": null,
+      "measurement": {
+        "box": {
+          "left": -0.07162203707813919,
+          "right": 1.1502601255394085,
+          "top": 0.09642947348400788,
+          "bottom": 2.4601324618176363
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": false,
+          "A3": false,
+          "width": 1.2218821626175478,
+          "height": 2.3637029883336282,
+          "center": {
+            "x": 0.5393190442306346,
+            "y": 1.2782809676508222
+          },
+          "cardOverlap": 0.026932489978401454
+        }
+      },
+      "A1": "PASS",
+      "A2": "FAIL",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "se:district",
+          "hour": 22,
+          "from": "-8",
+          "to": "low-solar",
+          "kind": "pairing",
+          "threshold": 0.06,
+          "mad": 0.023970990035358405,
+          "rect": {
+            "x": 0,
+            "y": 104,
+            "width": 1920,
+            "height": 976
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:district",
+          "hour": 22,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 88.614259931941,
+          "baselineFps": 93.16341831331326,
+          "fpsRatio": 0.9511701216664978,
+          "calls": 925,
+          "baselineCalls": 743,
+          "minimumFps": 88.5052473976476,
+          "maximumCalls": 817.3000000000001,
+          "pass": false
+        },
+        "vsync": 59.8,
+        "calls": 893,
+        "sameStateDrawBaseline": null,
+        "reason": "No same-state S0 pairing draw baseline; canonical shot performance is listed separately",
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.00992559875030259,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "分散館上方的深藍圓盤雖清楚，但缺少可讀的光伏分格／機能細節，兩秒內未能認出solar配對；Fuji仍更搶眼。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體及civic frame清楚入鏡，左上水岸仍在。"
+        ],
+        "V3": [
+          "FAIL",
+          "配對的低環境狀態保留大片疏格屋頂；背景細桿球冠仍多，SE屋面冠層不足以通過全圖綠化。"
+        ],
+        "V4": [
+          "PASS",
+          "低分散館及其受支承的能源頂蓋是完整替代，公共層／路網沒有被移除或退回舊時代。"
+        ],
+        "V5": [
+          "FAIL",
+          "暗藍頂蓋夜間接近黑色圓盤，館身與屋頂配對機能仍不清楚；背景窗帶比主體突出。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見頂蓋與既有館面的位置關係，新增支架的屋面接點亦由幾何測試覆蓋；此原圖未見明顯穿模／表面打架，動態閃爍未全驗。"
+        ]
+      }
+    },
+    {
+      "id": "se:district",
+      "state": "high-forest",
+      "hour": 12,
+      "finalShot": "se:district",
+      "image": "r3/se-district/se-district__high-forest__h12.jpg",
+      "baselineImage": null,
+      "measurement": {
+        "box": {
+          "left": -0.25728457580305897,
+          "right": 1.592216595229894,
+          "top": -0.1485052514532751,
+          "bottom": 3.1727564829360806
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": false,
+          "A3": false,
+          "width": 1.8495011710329528,
+          "height": 3.321261734389356,
+          "center": {
+            "x": 0.6674660097134175,
+            "y": 1.5121256157414027
+          },
+          "cardOverlap": 0.016116750477440003
+        }
+      },
+      "A1": "PASS",
+      "A2": "FAIL",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "se:district",
+          "hour": 12,
+          "from": "8",
+          "to": "high-forest",
+          "kind": "pairing",
+          "threshold": 0.06,
+          "mad": 0.021792791923868314,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:district",
+          "hour": 12,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 89.49792343969341,
+          "baselineFps": 94.16639810989645,
+          "fpsRatio": 0.9504231364487923,
+          "calls": 925,
+          "baselineCalls": 743,
+          "minimumFps": 89.45807820440162,
+          "maximumCalls": 817.3000000000001,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 1310,
+        "sameStateDrawBaseline": null,
+        "reason": "No same-state S0 pairing draw baseline; canonical shot performance is listed separately",
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.005536106572258533,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "完整立體塔與連廊清楚，塔頂及sky-lobby綠冠亦可見；可讀為有綠化的集中街區，尚不像完整vertical-forest系統。"
+        ],
+        "V2": [
+          "PASS",
+          "中央Fuji劇場球體及主框架保持定位，左上水岸仍可見。"
+        ],
+        "V3": [
+          "FAIL",
+          "塔頂新增冠層仍像綠色團塊，背景仍有細桿球冠及前景格仔空面，層次與生態連續性未達標。"
+        ],
+        "V4": [
+          "PASS",
+          "高集中機能館、公共層及partner環境配置都完整保留；仍是成熟方案，綠化品質缺口另列V3。"
+        ],
+        "V5": [
+          "N/A",
+          "日景；夜間另列。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原圖新增冠層落在既有屋頂／sky-lobby上，未見明顯浮空或表面打架；不含完整動態閃爍驗證。"
+        ]
+      }
+    },
+    {
+      "id": "se:district",
+      "state": "high-forest",
+      "hour": 22,
+      "finalShot": "se:district",
+      "image": "r3/se-district/se-district__high-forest__h22.jpg",
+      "baselineImage": null,
+      "measurement": {
+        "box": {
+          "left": -0.25728457580305897,
+          "right": 1.592216595229894,
+          "top": -0.1485052514532751,
+          "bottom": 3.1727564829360806
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": false,
+          "A3": false,
+          "width": 1.8495011710329528,
+          "height": 3.321261734389356,
+          "center": {
+            "x": 0.6674660097134175,
+            "y": 1.5121256157414027
+          },
+          "cardOverlap": 0.016116750477440003
+        }
+      },
+      "A1": "PASS",
+      "A2": "FAIL",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "se:district",
+          "hour": 22,
+          "from": "8",
+          "to": "high-forest",
+          "kind": "pairing",
+          "threshold": 0.06,
+          "mad": 0.023542694212458647,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:district",
+          "hour": 22,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 88.614259931941,
+          "baselineFps": 93.16341831331326,
+          "fpsRatio": 0.9511701216664978,
+          "calls": 925,
+          "baselineCalls": 743,
+          "minimumFps": 88.5052473976476,
+          "maximumCalls": 817.3000000000001,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 927,
+        "sameStateDrawBaseline": null,
+        "reason": "No same-state S0 pairing draw baseline; canonical shot performance is listed separately",
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.00549013619079319,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "暖窗塔群可辨，但新增綠冠很暗，容易只讀成原有高集中塔群，森林配對不夠清楚。"
+        ],
+        "V2": [
+          "PASS",
+          "中央Fuji劇場球體及主框架保持定位，左上水岸仍可見。"
+        ],
+        "V3": [
+          "FAIL",
+          "塔頂新增冠層仍像綠色團塊，背景仍有細桿球冠及前景格仔空面，層次與生態連續性未達標。"
+        ],
+        "V4": [
+          "PASS",
+          "高集中機能館、公共層及partner環境配置都完整保留；仍是成熟方案，綠化品質缺口另列V3。"
+        ],
+        "V5": [
+          "FAIL",
+          "塔的基本暖窗輪廓清楚，但forest新增綠冠和樓層邊植栽在夜景偏暗，配對變化不清楚。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原圖新增冠層落在既有屋頂／sky-lobby上，未見明顯浮空或表面打架；不含完整動態閃爍驗證。"
+        ]
+      }
+    },
+    {
+      "id": "se:district",
+      "state": "high-docks",
+      "hour": 12,
+      "finalShot": "se:district",
+      "image": "r3/se-district/se-district__high-docks__h12.jpg",
+      "baselineImage": null,
+      "measurement": {
+        "box": {
+          "left": -0.27573251244890573,
+          "right": 1.6198893024293386,
+          "top": -0.15079763916719835,
+          "bottom": 3.422146898515313
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": false,
+          "A3": false,
+          "width": 1.8956218148782442,
+          "height": 3.5729445376825115,
+          "center": {
+            "x": 0.6720783949902165,
+            "y": 1.6356746296740572
+          },
+          "cardOverlap": 0.014616965499757087
+        }
+      },
+      "A1": "PASS",
+      "A2": "FAIL",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "se:district",
+          "hour": 12,
+          "from": "8",
+          "to": "high-docks",
+          "kind": "pairing",
+          "threshold": 0.06,
+          "mad": 0.0336113538136448,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:district",
+          "hour": 12,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 89.49792343969341,
+          "baselineFps": 94.16639810989645,
+          "fpsRatio": 0.9504231364487923,
+          "calls": 925,
+          "baselineCalls": 743,
+          "minimumFps": 89.45807820440162,
+          "maximumCalls": 817.3000000000001,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 937,
+        "sameStateDrawBaseline": null,
+        "reason": "No same-state S0 pairing draw baseline; canonical shot performance is listed separately",
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.00547520084422658,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "塔身外的藍色空中環、小停泊機與固定航線可辨，能讀成高集中街區的空中接駁配對；實體連接不足另列V6。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體與主框架在中央，水岸在左上；地點仍可定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "背景細幹球冠與前景疏格種植仍多，藍色環與航線沒有解決綠化品質。"
+        ],
+        "V4": [
+          "PASS",
+          "高集中塔街區及自動化移動是完整替代，既有公共層仍在；dock載荷路徑的視覺缺口另列V6。"
+        ],
+        "V5": [
+          "N/A",
+          "日景，夜間另看h22。"
+        ],
+        "V6": [
+          "FAIL",
+          "藍色dock環及小停泊機看似直接懸在塔外，原圖未能讀到支承／連接與載荷路徑；三輪後保留此缺口，不用光效冒充實體完成。"
+        ]
+      }
+    },
+    {
+      "id": "se:district",
+      "state": "high-docks",
+      "hour": 22,
+      "finalShot": "se:district",
+      "image": "r3/se-district/se-district__high-docks__h22.jpg",
+      "baselineImage": null,
+      "measurement": {
+        "box": {
+          "left": -0.27573251244890573,
+          "right": 1.6198893024293386,
+          "top": -0.15079763916719835,
+          "bottom": 3.422146898515313
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": false,
+          "A3": false,
+          "width": 1.8956218148782442,
+          "height": 3.5729445376825115,
+          "center": {
+            "x": 0.6720783949902165,
+            "y": 1.6356746296740572
+          },
+          "cardOverlap": 0.014616965499757087
+        }
+      },
+      "A1": "PASS",
+      "A2": "FAIL",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "se:district",
+          "hour": 22,
+          "from": "8",
+          "to": "high-docks",
+          "kind": "pairing",
+          "threshold": 0.06,
+          "mad": 0.04084579689643347,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "se:district",
+          "hour": 22,
+          "round": 3,
+          "directory": "r3/se-district",
+          "fps": 88.614259931941,
+          "baselineFps": 93.16341831331326,
+          "fpsRatio": 0.9511701216664978,
+          "calls": 925,
+          "baselineCalls": 743,
+          "minimumFps": 88.5052473976476,
+          "maximumCalls": 817.3000000000001,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 1327,
+        "sameStateDrawBaseline": null,
+        "reason": "No same-state S0 pairing draw baseline; canonical shot performance is listed separately",
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.005620605508149762,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "塔身外的藍色空中環、小停泊機與固定航線可辨，能讀成高集中街區的空中接駁配對；實體連接不足另列V6。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體與主框架在中央，水岸在左上；地點仍可定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "背景細幹球冠與前景疏格種植仍多，藍色環與航線沒有解決綠化品質。"
+        ],
+        "V4": [
+          "PASS",
+          "高集中塔街區及自動化移動是完整替代，既有公共層仍在；dock載荷路徑的視覺缺口另列V6。"
+        ],
+        "V5": [
+          "PASS",
+          "藍環與暖亮塔身在夜間明顯，空中接駁配對可讀；前景高亮航線亦會分走注意。"
+        ],
+        "V6": [
+          "FAIL",
+          "藍色dock環及小停泊機看似直接懸在塔外，原圖未能讀到支承／連接與載荷路徑；三輪後保留此缺口，不用光效冒充實體完成。"
+        ]
+      }
+    },
+    {
+      "id": "energy:ring",
+      "state": "baseline",
+      "hour": 12,
+      "finalShot": "energy:ring",
+      "image": "r2/energy-ring/energy-ring__baseline__h12.jpg",
+      "baselineImage": "../S0/baseline/energy-ring__baseline__h12.jpg",
+      "measurement": {
+        "box": null,
+        "reason": "subject absent in this state",
+        "framing": {
+          "A1": null,
+          "A2": null,
+          "A3": null,
+          "reason": "subject absent in this state"
+        }
+      },
+      "A1": "N/A",
+      "A2": "N/A",
+      "A3": {
+        "status": "N/A",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "energy:ring",
+          "hour": 12,
+          "from": "baseline",
+          "to": "b",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.03437954195517016,
+          "rect": {
+            "x": 587,
+            "y": 105,
+            "width": 823,
+            "height": 863
+          },
+          "pass": false
+        },
+        {
+          "id": "energy:ring",
+          "hour": 12,
+          "from": "baseline",
+          "to": "mixed",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.034379070795727655,
+          "rect": {
+            "x": 587,
+            "y": 105,
+            "width": 823,
+            "height": 863
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "energy:ring",
+          "hour": 12,
+          "round": 2,
+          "directory": "r2/energy-ring",
+          "fps": 98.98869166371739,
+          "baselineFps": 98.14939562408861,
+          "fpsRatio": 1.0085512094526112,
+          "calls": 447,
+          "baselineCalls": 443,
+          "minimumFps": 93.24192584288417,
+          "maximumCalls": 487.3,
+          "pass": true
+        },
+        "vsync": 60,
+        "calls": 421,
+        "sameStateDrawBaseline": 594,
+        "reason": null,
+        "pass": true
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.003980951318284516,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "N/A",
+          "Baseline按設計移除蓄電環，沒有該設施可做辨認；保留原地點背景供比較。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體在中央且清楚，左右海灣／遠處橋線提供場地定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "CivicCore露台及左側景觀仍有細幹團狀樹冠；本輪只改環的操作標記，綠化未達整圖門檻。"
+        ],
+        "V4": [
+          "PASS",
+          "沒有環仍是完整成熟的Fuji公共框架與劇場，baseline不代表舊城市。"
+        ],
+        "V5": [
+          "N/A",
+          "此狀態環按設計不存在，無環體夜間輪廓可驗；背景劇場仍可讀。"
+        ],
+        "V6": [
+          "N/A",
+          "環體按baseline移除，沒有該部件可作近距離零件檢查；背景未見新增缺陷。"
+        ]
+      }
+    },
+    {
+      "id": "energy:ring",
+      "state": "baseline",
+      "hour": 22,
+      "finalShot": "energy:ring",
+      "image": "r2/energy-ring/energy-ring__baseline__h22.jpg",
+      "baselineImage": "../S0/baseline/energy-ring__baseline__h22.jpg",
+      "measurement": {
+        "box": null,
+        "reason": "subject absent in this state",
+        "framing": {
+          "A1": null,
+          "A2": null,
+          "A3": null,
+          "reason": "subject absent in this state"
+        }
+      },
+      "A1": "N/A",
+      "A2": "N/A",
+      "A3": {
+        "status": "N/A",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "energy:ring",
+          "hour": 22,
+          "from": "baseline",
+          "to": "b",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.026698321587429658,
+          "rect": {
+            "x": 587,
+            "y": 105,
+            "width": 823,
+            "height": 863
+          },
+          "pass": false
+        },
+        {
+          "id": "energy:ring",
+          "hour": 22,
+          "from": "baseline",
+          "to": "mixed",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.02671300114881003,
+          "rect": {
+            "x": 587,
+            "y": 105,
+            "width": 823,
+            "height": 863
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "energy:ring",
+          "hour": 22,
+          "round": 2,
+          "directory": "r2/energy-ring",
+          "fps": 93.68276876374722,
+          "baselineFps": 99.83115076003116,
+          "fpsRatio": 0.9384121894871963,
+          "calls": 447,
+          "baselineCalls": 443,
+          "minimumFps": 94.8395932220296,
+          "maximumCalls": 487.3,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 421,
+        "sameStateDrawBaseline": 417,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.0032908515643911888,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": true
+      },
+      "V1_V6": {
+        "V1": [
+          "N/A",
+          "Baseline按設計移除蓄電環，沒有該設施可做辨認；保留原地點背景供比較。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體在中央且清楚，左右海灣／遠處橋線提供場地定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "CivicCore露台及左側景觀仍有細幹團狀樹冠；本輪只改環的操作標記，綠化未達整圖門檻。"
+        ],
+        "V4": [
+          "PASS",
+          "沒有環仍是完整成熟的Fuji公共框架與劇場，baseline不代表舊城市。"
+        ],
+        "V5": [
+          "N/A",
+          "此狀態環按設計不存在，無環體夜間輪廓可驗；背景劇場仍可讀。"
+        ],
+        "V6": [
+          "N/A",
+          "環體按baseline移除，沒有該部件可作近距離零件檢查；背景未見新增缺陷。"
+        ]
+      }
+    },
+    {
+      "id": "energy:ring",
+      "state": "b",
+      "hour": 12,
+      "finalShot": "energy:ring",
+      "image": "r2/energy-ring/energy-ring__b__h12.jpg",
+      "baselineImage": "../S0/baseline/energy-ring__b__h12.jpg",
+      "measurement": {
+        "box": {
+          "left": 0.30614216236934355,
+          "right": 0.7339660688481342,
+          "top": 0.09776656125388394,
+          "bottom": 0.8962493105650402
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": true,
+          "A3": false,
+          "width": 0.42782390647879065,
+          "height": 0.7984827493111563,
+          "center": {
+            "x": 0.5200541156087388,
+            "y": 0.4970079359094621
+          },
+          "cardOverlap": 0
+        }
+      },
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "energy:ring",
+          "hour": 12,
+          "from": "baseline",
+          "to": "b",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.03437954195517016,
+          "rect": {
+            "x": 587,
+            "y": 105,
+            "width": 823,
+            "height": 863
+          },
+          "pass": false
+        },
+        {
+          "id": "energy:ring",
+          "hour": 12,
+          "from": "b",
+          "to": "mixed",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.00581021309317674,
+          "rect": {
+            "x": 587,
+            "y": 105,
+            "width": 823,
+            "height": 863
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "energy:ring",
+          "hour": 12,
+          "round": 2,
+          "directory": "r2/energy-ring",
+          "fps": 98.98869166371739,
+          "baselineFps": 98.14939562408861,
+          "fpsRatio": 1.0085512094526112,
+          "calls": 447,
+          "baselineCalls": 443,
+          "minimumFps": 93.24192584288417,
+          "maximumCalls": 487.3,
+          "pass": true
+        },
+        "vsync": 60,
+        "calls": 447,
+        "sameStateDrawBaseline": 443,
+        "reason": null,
+        "pass": true
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.003934585048010974,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "獨立中空轉子、兩個上方固定軸承及重複cassette可辨，與後方劇場球體分開；可讀成工程化蓄電環。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體在中央且清楚，左右海灣／遠處橋線提供場地定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "CivicCore露台及左側景觀仍有細幹團狀樹冠；本輪只改環的操作標記，綠化未達整圖門檻。"
+        ],
+        "V4": [
+          "PASS",
+          "轉子與固定軸承／transfer frame關係清楚，保留大中空與公共路徑，成熟機械系統不依賴霓虹。"
+        ],
+        "V5": [
+          "N/A",
+          "日景，h22另驗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原圖輪帶／軸承接點無明顯表面打架或浮空；full-sweep／包絡測試保留原清場，完整動態閃爍未全驗。"
+        ]
+      }
+    },
+    {
+      "id": "energy:ring",
+      "state": "b",
+      "hour": 22,
+      "finalShot": "energy:ring",
+      "image": "r2/energy-ring/energy-ring__b__h22.jpg",
+      "baselineImage": "../S0/baseline/energy-ring__b__h22.jpg",
+      "measurement": {
+        "box": {
+          "left": 0.30614216236934355,
+          "right": 0.7339660688481342,
+          "top": 0.09776656125388394,
+          "bottom": 0.8962493105650402
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": true,
+          "A3": false,
+          "width": 0.42782390647879065,
+          "height": 0.7984827493111563,
+          "center": {
+            "x": 0.5200541156087388,
+            "y": 0.4970079359094621
+          },
+          "cardOverlap": 0
+        }
+      },
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "energy:ring",
+          "hour": 22,
+          "from": "baseline",
+          "to": "b",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.026698321587429658,
+          "rect": {
+            "x": 587,
+            "y": 105,
+            "width": 823,
+            "height": 863
+          },
+          "pass": false
+        },
+        {
+          "id": "energy:ring",
+          "hour": 22,
+          "from": "b",
+          "to": "mixed",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.0046866450601412485,
+          "rect": {
+            "x": 587,
+            "y": 105,
+            "width": 823,
+            "height": 863
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "energy:ring",
+          "hour": 22,
+          "round": 2,
+          "directory": "r2/energy-ring",
+          "fps": 93.68276876374722,
+          "baselineFps": 99.83115076003116,
+          "fpsRatio": 0.9384121894871963,
+          "calls": 447,
+          "baselineCalls": 443,
+          "minimumFps": 94.8395932220296,
+          "maximumCalls": 487.3,
+          "pass": false
+        },
+        "vsync": 60.2,
+        "calls": 447,
+        "sameStateDrawBaseline": 443,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.0033410966624304044,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": true
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "獨立中空轉子、兩個上方固定軸承及重複cassette可辨，與後方劇場球體分開；可讀成工程化蓄電環。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體在中央且清楚，左右海灣／遠處橋線提供場地定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "CivicCore露台及左側景觀仍有細幹團狀樹冠；本輪只改環的操作標記，綠化未達整圖門檻。"
+        ],
+        "V4": [
+          "PASS",
+          "轉子與固定軸承／transfer frame關係清楚，保留大中空與公共路徑，成熟機械系統不依賴霓虹。"
+        ],
+        "V5": [
+          "PASS",
+          "四個稀疏操作標記配合金屬邊緣令環的輪廓可讀，與亮劇場分開；cassette細節仍偏暗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原圖輪帶／軸承接點無明顯表面打架或浮空；full-sweep／包絡測試保留原清場，完整動態閃爍未全驗。"
+        ]
+      }
+    },
+    {
+      "id": "energy:ring",
+      "state": "mixed",
+      "hour": 12,
+      "finalShot": "energy:ring",
+      "image": "r2/energy-ring/energy-ring__mixed__h12.jpg",
+      "baselineImage": "../S0/baseline/energy-ring__mixed__h12.jpg",
+      "measurement": {
+        "box": {
+          "left": 0.30614216236934355,
+          "right": 0.7339660688481342,
+          "top": 0.09776656125388394,
+          "bottom": 0.8962493105650402
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": true,
+          "A3": false,
+          "width": 0.42782390647879065,
+          "height": 0.7984827493111563,
+          "center": {
+            "x": 0.5200541156087388,
+            "y": 0.4970079359094621
+          },
+          "cardOverlap": 0
+        }
+      },
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "energy:ring",
+          "hour": 12,
+          "from": "b",
+          "to": "mixed",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.00581021309317674,
+          "rect": {
+            "x": 587,
+            "y": 105,
+            "width": 823,
+            "height": 863
+          },
+          "pass": false
+        },
+        {
+          "id": "energy:ring",
+          "hour": 12,
+          "from": "baseline",
+          "to": "mixed",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.034379070795727655,
+          "rect": {
+            "x": 587,
+            "y": 105,
+            "width": 823,
+            "height": 863
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "energy:ring",
+          "hour": 12,
+          "round": 2,
+          "directory": "r2/energy-ring",
+          "fps": 98.98869166371739,
+          "baselineFps": 98.14939562408861,
+          "fpsRatio": 1.0085512094526112,
+          "calls": 447,
+          "baselineCalls": 443,
+          "minimumFps": 93.24192584288417,
+          "maximumCalls": 487.3,
+          "pass": true
+        },
+        "vsync": 60,
+        "calls": 447,
+        "sameStateDrawBaseline": 443,
+        "reason": null,
+        "pass": true
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.003963460345557977,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "獨立中空轉子、兩個上方固定軸承及重複cassette可辨，與後方劇場球體分開；可讀成工程化蓄電環。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體在中央且清楚，左右海灣／遠處橋線提供場地定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "CivicCore露台及左側景觀仍有細幹團狀樹冠；本輪只改環的操作標記，綠化未達整圖門檻。"
+        ],
+        "V4": [
+          "PASS",
+          "轉子與固定軸承／transfer frame關係清楚，保留大中空與公共路徑，成熟機械系統不依賴霓虹。"
+        ],
+        "V5": [
+          "N/A",
+          "日景，h22另驗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原圖輪帶／軸承接點無明顯表面打架或浮空；full-sweep／包絡測試保留原清場，完整動態閃爍未全驗。"
+        ]
+      }
+    },
+    {
+      "id": "energy:ring",
+      "state": "mixed",
+      "hour": 22,
+      "finalShot": "energy:ring",
+      "image": "r2/energy-ring/energy-ring__mixed__h22.jpg",
+      "baselineImage": "../S0/baseline/energy-ring__mixed__h22.jpg",
+      "measurement": {
+        "box": {
+          "left": 0.30614216236934355,
+          "right": 0.7339660688481342,
+          "top": 0.09776656125388394,
+          "bottom": 0.8962493105650402
+        },
+        "reason": null,
+        "framing": {
+          "A1": true,
+          "A2": true,
+          "A3": false,
+          "width": 0.42782390647879065,
+          "height": 0.7984827493111563,
+          "center": {
+            "x": 0.5200541156087388,
+            "y": 0.4970079359094621
+          },
+          "cardOverlap": 0
+        }
+      },
+      "A1": "PASS",
+      "A2": "PASS",
+      "A3": {
+        "status": "FAIL",
+        "hits": 0
+      },
+      "A4": [
+        {
+          "id": "energy:ring",
+          "hour": 22,
+          "from": "b",
+          "to": "mixed",
+          "kind": "adjacent",
+          "threshold": 0.06,
+          "mad": 0.0046866450601412485,
+          "rect": {
+            "x": 587,
+            "y": 105,
+            "width": 823,
+            "height": 863
+          },
+          "pass": false
+        },
+        {
+          "id": "energy:ring",
+          "hour": 22,
+          "from": "baseline",
+          "to": "mixed",
+          "kind": "extremes",
+          "threshold": 0.12,
+          "mad": 0.02671300114881003,
+          "rect": {
+            "x": 587,
+            "y": 105,
+            "width": 823,
+            "height": 863
+          },
+          "pass": false
+        }
+      ],
+      "A5": {
+        "reference": {
+          "id": "energy:ring",
+          "hour": 22,
+          "round": 2,
+          "directory": "r2/energy-ring",
+          "fps": 93.68276876374722,
+          "baselineFps": 99.83115076003116,
+          "fpsRatio": 0.9384121894871963,
+          "calls": 447,
+          "baselineCalls": 443,
+          "minimumFps": 94.8395932220296,
+          "maximumCalls": 487.3,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 447,
+        "sameStateDrawBaseline": 443,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.003284105064350843,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": true
+      },
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "獨立中空轉子、兩個上方固定軸承及重複cassette可辨，與後方劇場球體分開；可讀成工程化蓄電環。"
+        ],
+        "V2": [
+          "PASS",
+          "Fuji劇場球體在中央且清楚，左右海灣／遠處橋線提供場地定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "CivicCore露台及左側景觀仍有細幹團狀樹冠；本輪只改環的操作標記，綠化未達整圖門檻。"
+        ],
+        "V4": [
+          "PASS",
+          "轉子與固定軸承／transfer frame關係清楚，保留大中空與公共路徑，成熟機械系統不依賴霓虹。"
+        ],
+        "V5": [
+          "PASS",
+          "四個稀疏操作標記配合金屬邊緣令環的輪廓可讀，與亮劇場分開；cassette細節仍偏暗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原圖輪帶／軸承接點無明顯表面打架或浮空；full-sweep／包絡測試保留原清場，完整動態閃爍未全驗。"
+        ]
+      }
+    },
+    {
+      "id": "hero",
+      "state": "neutral",
+      "hour": 12,
+      "finalShot": "energy:ring",
+      "image": "r2/energy-ring/hero__neutral__h12.jpg",
+      "baselineImage": "../S0/baseline/hero__neutral__h12.jpg",
+      "measurement": {
+        "box": null,
+        "reason": null,
+        "framing": {
+          "A1": null,
+          "A2": null,
+          "A3": null,
+          "reason": "hero has no subject"
+        }
+      },
+      "A1": "N/A",
+      "A2": "N/A",
+      "A3": {
+        "status": "N/A",
+        "hits": null
+      },
+      "A4": [],
+      "A5": {
+        "reference": {
+          "id": "hero",
+          "hour": 12,
+          "round": 2,
+          "directory": "r2/energy-ring",
+          "fps": 86.90215559437897,
+          "baselineFps": 86.33431099192002,
+          "fpsRatio": 1.0065772761250402,
+          "calls": 950,
+          "baselineCalls": 948,
+          "minimumFps": 82.01759544232401,
+          "maximumCalls": 1042.8000000000002,
+          "pass": true
+        },
+        "vsync": 60,
+        "calls": 950,
+        "sameStateDrawBaseline": 948,
+        "reason": null,
+        "pass": true
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.0037580923959089807,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": true
+      },
+      "V1_V6": {
+        "V1": [
+          "N/A",
+          "Hero全城對照，不以單一C主體兩秒辨識門檻判定。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣及Rainbow Bridge保留在背景，Fuji主框架與劇場球體清楚定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景方格屋頂與細幹球冠仍明顯，局部冠層改善未令整圖達標。"
+        ],
+        "V4": [
+          "PASS",
+          "低中高建物與公共地面、立體路徑保持成熟2127配置。"
+        ],
+        "V5": [
+          "N/A",
+          "日景，夜間另驗。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此張原圖未見新增浮空或明顯表面打架；未完整驗證動態閃爍。"
+        ]
+      }
+    },
+    {
+      "id": "hero",
+      "state": "neutral",
+      "hour": 22,
+      "finalShot": "energy:ring",
+      "image": "r2/energy-ring/hero__neutral__h22.jpg",
+      "baselineImage": "../S0/baseline/hero__neutral__h22.jpg",
+      "measurement": {
+        "box": null,
+        "reason": null,
+        "framing": {
+          "A1": null,
+          "A2": null,
+          "A3": null,
+          "reason": "hero has no subject"
+        }
+      },
+      "A1": "N/A",
+      "A2": "N/A",
+      "A3": {
+        "status": "N/A",
+        "hits": null
+      },
+      "A4": [],
+      "A5": {
+        "reference": {
+          "id": "hero",
+          "hour": 22,
+          "round": 2,
+          "directory": "r2/energy-ring",
+          "fps": 84.76807981535909,
+          "baselineFps": 89.42044526679217,
+          "fpsRatio": 0.9479720164940756,
+          "calls": 1135,
+          "baselineCalls": 948,
+          "minimumFps": 84.94942300345257,
+          "maximumCalls": 1042.8000000000002,
+          "pass": false
+        },
+        "vsync": 60,
+        "calls": 950,
+        "sameStateDrawBaseline": 948,
+        "reason": null,
+        "pass": false
+      },
+      "A6": "PASS",
+      "reproducibility": {
+        "mad": 0.0032519491850238036,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": true
+      },
+      "V1_V6": {
+        "V1": [
+          "N/A",
+          "Hero全城對照，不以單一C主體兩秒辨識門檻判定。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣及Rainbow Bridge保留在背景，Fuji主框架與劇場球體清楚定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景方格屋頂與細幹球冠仍明顯，局部冠層改善未令整圖達標。"
+        ],
+        "V4": [
+          "PASS",
+          "低中高建物與公共地面、立體路徑保持成熟2127配置。"
+        ],
+        "V5": [
+          "PASS",
+          "暖窗與路徑輪廓可讀，未靠整面霓虹；遠處細節仍有限。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此張原圖未見新增浮空或明顯表面打架；未完整驗證動態閃爍。"
+        ]
+      }
+    }
+  ]
+}

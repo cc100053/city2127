@@ -86,7 +86,7 @@ Headline 近鏡（2026-10-27）：live 結果先在 hero 播完 2.62 秒 vote jo
 
 近鏡打磨B（2026-10-28，feature REVIEW_READY，未經owner接受／未merge main）：原數量／footprint內調整SW構圖、曲面環頂／採光口、摺屏／長椅及局部冠層，target／seed／三秒retarget保持。[三輪各18狀態原圖及理由](../artifacts/closeup-polish/B/REVIEW.md)：A1/A2各16 PASS、2 N/A；A3全部16可用狀態FAIL，A4 0/16；A5 12 PASS／6 focal FAIL，A6 18 PASS。Root test/build及八項live PASS；r3 focal構圖比r2退步且calls135.3%S0，綠化仍FAIL。三輪後停止，建議暫不接受B美術。Chrome patch差異／硬件及真人限制見報告，原門檻不放寬。
 
-近鏡打磨C（2026-10-28，RUNNING，未經owner接受／未merge main）：SE集中功能候選改用有支承的low服務廊、mixed中央空隙及高塔轉接肋，原functionModules／footprint／三秒過渡保持。Focal前兩輪已保存，第三輪完整量度待C累積source完成；district含±3與三種配對，之後處理儲能環。未宣稱C最終gates通過；[進度與原圖](../artifacts/closeup-polish/C/work-log.json)／[交接](handoffs/closeup-polish.md)。
+近鏡打磨C（2026-10-28，REVIEW_READY，未經owner接受／未merge main）：SE候選改用有支承的low服務廊、mixed中央空隙及高塔轉接肋；district連廊打開通道、細化冠層並支承solar roof，儲能環加四個稀疏操作標記。原counts／slot／footprint／三秒過渡與hero/FOV/timeline保持。Focal／district三輪、ring兩輪，94狀態／191張含live原圖保存；root test/build/diff及11項live PASS，但A3全部適用項FAIL、A4僅4/28、A5有18 FAIL及6配對UNVERIFIED、V3全部FAIL。完整[原圖／理由／效能](../artifacts/closeup-polish/C/REVIEW.md)與[交接](handoffs/closeup-polish.md)保留所有缺口；C未作美術接受，A/B pending不變，D/Z由coordinator另行分派。
 
 `ladderLayout(tiers, energy)` 是唯一權威映射；focal 數值由 tier 符號決定（`t`= 1／.5／0 對應 >0／0／<0）：
 

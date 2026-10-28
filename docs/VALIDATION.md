@@ -390,3 +390,12 @@ V1/V2/V5 focal各6 FAIL、district及hero各12 PASS；V3全部18 FAIL，V4全部
 ## Closeup sector C r2 checkpoint — 2026-10-28（RUNNING）
 
 Checkpoint `4cb97c8`：[focal r2原始量度](../artifacts/closeup-polish/C/r2/se-focal/capture.json)、[效能](../artifacts/closeup-polish/C/r2/se-focal/performance.json)與[A4](../artifacts/closeup-polish/C/r2/se-focal/comparison.json)。8狀態／16原始JPEG、4組×2雙flag uncapped、6比較完整；A4 3/6，focal low A1 FAIL，全部focal A3 FAIL，前景context樓仍遮住主體。r2 root [npm test](../artifacts/closeup-polish/C/r2/se-focal/npm-test.log)／[build](../artifacts/closeup-polish/C/r2/se-focal/npm-build.log)與diff PASS，保留JSON import／chunk-size warnings。相機／footprint／low非空高桿的target小測試PASS。Chrome156.0.8078.73，1920×1080／DPR1／default；這是中途checkpoint，不代表最終C視覺／live或其他平台已驗證。
+
+
+## Closeup sector C final — 2026-10-28（REVIEW_READY，art未接受）
+
+最終runtime `b5ce8fe`，Focal／district各三輪、ring兩輪。共94狀態／188靜態JPEG＋3 live，34張final與3張live原圖逐張檢視；[report](../artifacts/closeup-polish/C/REVIEW.md)、[checks](../artifacts/closeup-polish/C/checks.json)、[原圖hash](../artifacts/closeup-polish/C/original-images.json)。A1 24 PASS／2 FAIL／8 N/A；A2 10／16／8；A3 26 FAIL／8 N/A；A4 4/28；A5 10 PASS／18 FAIL／6配對UNVERIFIED；A6 34 PASS；repro10 PASS／24 FAIL，失敗照用第二take並保存。V3全部34 FAIL，dock V6兩項FAIL，靜態PASS不等同完整動態無閃爍。未改門檻或縮細full root/carrier/group去追數字。
+
+Root [npm test](../artifacts/closeup-polish/C/final-checks/npm-test.log)／[build](../artifacts/closeup-polish/C/final-checks/npm-build.log)／diff、runner/report self-check與[scope](../artifacts/closeup-polish/C/scope-check.json) PASS；low occupied gallery footprint、bridge passage、solar roof支架及324能源清場cases／177219 exact checks通過。[真實scratch survey live](../artifacts/closeup-polish/C/live/browser.json)11項PASS、errors0：tower/district中間easing、reload snapshot、Undo即時hero和counts、reduced motion、ring局部fade。三秒精確時長靠node tests，browser每120frames診斷只證實中間態。Survey/module-swap未改，local不另跑其suite。保留既有JSON import／chunk-size warnings。
+
+Final uncapped reference平均84.77–98.99FPS；focal日景只達S0的93.0%，ring夜景93.8%及其hero94.8%仍FAIL；district925/743calls超110%，hero原始陰影call樣本亦保留不剔除。配對缺同狀態S0 draw基準，A5保持UNVERIFIED。開發Mac Chrome156.0.8078.73（S0 .48），1920×1080／DPR1／default；對S0量度含累積A/B/C，不將跨版本／硬件噪聲當C優化。Ring r1 Chrome意外關閉與安全續拍證據保存，所有原八張／四row不變；不宣稱全部attempt無錯。[Cleanup](../artifacts/closeup-polish/C/cleanup.json)：Vite5194、scratch50033 bind確認free，Chrome／runner全關。未測production、展示機／Safari/iPad／Windows／真人兩秒／Z；未merge main或接受C美術，A/B pending保持。

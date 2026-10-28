@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "files": [
+    "docs/PROJECT.md",
+    "docs/EXHIBITION_SPEC.md",
+    "docs/VALIDATION.md",
+    "docs/handoffs/README.md",
+    "docs/handoffs/closeup-polish.md",
+    "artifacts/closeup-polish/C/README.md",
+    "artifacts/closeup-polish/C/REVIEW.md"
+  ],
+  "localTargets": 577,
+  "broken": [],
+  "note": "Code fences excluded; filesystem targets checked. No new fragment links introduced."
+}

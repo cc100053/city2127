@@ -1,16 +1,16 @@
 # closeup-polish — Headline 近鏡逐個打磨
 
 - Owner: cc100053（產品／審美最終批准）；實作由一個 long session 負責，開工時喺下面「進度」記低 session 名。
-- Status: S0 INTEGRATED（98/98，量度基準已接受）；A REVIEW_READY（三輪完成但gate仍FAIL）；B REVIEW_READY（worker `01a17e8c-3c8c-77f3-afbb-6f7d62abad14`；三輪完成，FAIL保留）；C RUNNING（worker `01a17f7d-839f-74d0-8660-22e9c1ec1435`，dispatch `closeup-polish-C-1-r13`）；D/Z未開始。
+- Status: S0 INTEGRATED（98/98，量度基準已接受）；A REVIEW_READY（三輪完成但gate仍FAIL）；B REVIEW_READY（worker `01a17e8c-3c8c-77f3-afbb-6f7d62abad14`；三輪完成，FAIL保留）；C REVIEW_READY（worker `01a17f7d-839f-74d0-8660-22e9c1ec1435`，dispatch `closeup-polish-C-1-r13`／recovery r16；focal/district三輪、ring兩輪，FAIL保留）；D/Z未開始。
 - Branch: `feat/closeup-polish`（一條長分支，每個 sector 一個 checkpoint）
 - Base commit: `fdc4a0cbbbc352b41c15850f2a846845d7975de1`（fetch verified main，包含完整 S0 標準）
-- Last verified commit: B runtime `74d6c2b`，root npm test/build及八項B live PASS；視覺／效能gate仍FAIL。最終完整證據checkpoint見`result-B-1.json`；S0接受main `3d0f40e`保持不動。
-- Remote availability: A checkpoint `def2f28`及B r1 `8d3b86f`／r2 `35e8323`／runtime `74d6c2b`已push長feature；B final SHA見`result-B-1.json`。S0 main `3d0f40e`與其成功CI保持歷史；A/B未整合main／未部署。
+- Last verified commit: C runtime `b5ce8fe64ccb7e41c06cbfd6ffcdc48acd4a37da`，root npm test/build/diff及11項C live PASS；視覺／效能gate仍FAIL。最終完整證據checkpoint見`result-C-1.json`；A/B pending和S0接受main `3d0f40e`保持。
+- Remote availability: A `def2f28`、B `ca22a92`、C各輪至runtime `b5ce8fe`已push長feature；C最終證據SHA／remote確認／writer release／callback delivery見checkout外`.task-relay/closeup-polish/result-C-1.json`。A/B/C未整合main／未部署。
 
 ## Session Git state
 
 - Session starting branch and HEAD: 主 checkout `feat/energy-demo-camera` @ `016f6d1`，原 upstream 0/0、對 main 2/18；全部保留。獨立 clone `.task-relay/closeup-polish/checkout` 由 verified `origin/main` 開 `feat/closeup-polish`，clean start。
-- Last fetched origin/main commit: `fdc4a0c`，2026-10-27 fetch 成功（clone 初次 sandbox DNS 失敗，獲准重跑成功）。計劃舊 base `6a20346` 至本基準僅完整標準文件及其 merge，runtime 未變。
+- Last fetched origin/main commit: `3d0f40ebd5d7350ecdcc05ab3420cacf926dfd9a`，2026-10-28 C final fetch成功；runtime `b5ce8fe` upstream0/0、vs main17/0，未pull/merge。最終evidence commit divergence見result-C-1.json。起始S0基準為`fdc4a0c`，原sandbox DNS retry及整合歷史保留。
 - Local changes present at session start: 主 checkout 未追蹤 `.playwright-cli/`、`.task-relay/` 保留；獨立 clone NONE。
 - Upstream integration status: S0按revision7授權整合；fresh origin/main `fdc4a0c`，feature5/0，clean start；main新建追蹤origin/main，no-ff merge無衝突。
 - Pending Git conflicts or synchronization blockers: NONE
@@ -167,7 +167,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 | S0 基準 | INTEGRATED；量度基準接受，非美術接受 | `19e9ae2`；[完整基準](../../artifacts/closeup-polish/S0/README.md) | coordinator已審查；冇美術改動 | `c802bba` |
 | A 海浜公園 | REVIEW_READY：worker `01a17e2a-4c38-7422-8d68-33782c0367f5`，dispatch `closeup-polish-A-1-r8`；三輪各24狀態完成 | runtime `b7d5861`；[完整review](../../artifacts/closeup-polish/A/REVIEW.md)，最終SHA見result-A-1.json | pending；A3/A4/V失敗保留 | — |
 | B アクアシティ南 | REVIEW_READY：worker `01a17e8c`，三輪各18狀態；A3/A4、focal A5/V及V3仍FAIL | runtime `74d6c2b`；[完整review](../../artifacts/closeup-polish/B/REVIEW.md)，final SHA見result-B-1.json | pending；建議暫不接受r3 focal退步候選 | — |
-| C フジテレビ東 | RUNNING：指定persistent clone唯一writer，focal→district含配對→ring；每shot最多三輪 | baseline `ca22a92`；[本批紀錄](../../artifacts/closeup-polish/C/work-log.json) | pending | — |
+| C フジテレビ東 | REVIEW_READY：focal/district各三輪、ring兩輪完成；A3全FAIL、A4 4/28，A5 18FAIL＋6UNVERIFIED；root/live11項PASS；未接受art | baseline `ca22a92` → runtime `b5ce8fe`；[逐圖／完整量度](../../artifacts/closeup-polish/C/REVIEW.md) | owner pending，建議暫不接受C美術 | — |
 | D デックス西＋沖 | PLANNED | — | — | — |
 | Z 全城回歸 | PLANNED | — | — | — |
 
@@ -249,3 +249,16 @@ C district r2：18狀態／36原圖、4組雙窗口效能、16比較完成；A4 
 C district r3：三輪用完，完整18狀態／36原圖、4組雙窗口效能、16比較完成；最後18張原始第二take逐張以original detail檢視並記V1–V6。A1全部16主體狀態PASS，A2/A3全部FAIL，A4 0/16。+3 uncapped89.4979/88.6143FPS、925calls，S0 94.1664/93.1634FPS、743calls；FPS平均剛達95%而calls約124.5%明確超110%。Low／solar夜間辨識、forest夜間配對、綠化及dock看似懸空的載荷路徑缺口均保留；不做第四輪。Hero raw有一次1318calls影格，保留不挑走。下一步ring，focal r3完整矩陣仍按C累積source策略待拍；全C最終root/live驗證尚未完成。
 
 C ring r1：pose-only完整8狀態／16原圖、4組雙flag效能與6比較完成；A4 0/6，present ring A1/A2 PASS、A3 FAIL，absent baseline如實N/A。Mixed uncapped97.5202/97.9364FPS、447calls，S0 98.1494/99.8312FPS、443calls。Chrome於首個mixed載入意外關閉，原因未知，四個完整row／八張原圖及failure log保存；auto-review先拒絕combined retry的潛在覆寫，經skip-complete、防覆寫assert、缺失狀態及原圖hash核對後，capture-only續拍獲准並完成。原八張hash及原四row不變、source/helper/Chrome156.0.8078.73一致；效能／比較分開建立新檔。下一輪只以既有batch補轉子季度操作標記。
+
+
+## C final verification — 2026-10-28
+
+Runtime `b5ce8fe`，focal／district各三輪、ring兩輪後停止；final focal r3延後至全部C runtime完成才拍，沒有混用未量測pose/builder。共94狀態、188靜態＋3live原圖，34張final及3張live以original detail逐張檢視。[完整比較](../../artifacts/closeup-polish/C/REVIEW.md)／[checks](../../artifacts/closeup-polish/C/checks.json)／[source hashes](../../artifacts/closeup-polish/C/final-source-hashes.json)。A1 24 PASS／2 FAIL／8 N/A；A2 10／16／8；A3 26 FAIL／8 N/A；A4 4/28；A5 10 PASS／18 FAIL／6配對UNVERIFIED；A6 34 PASS，repro10 PASS／24 FAIL全部保留。V1九項FAIL、V3全34 FAIL、V5五項FAIL、dock V6兩項FAIL；其餘靜態V6不證明完整動態無閃爍。
+
+Final平均84.77–98.99FPS、vsync59.8–60.2；focal日景91.86FPS＝S0 93.0% FAIL，ring夜景93.68FPS＝93.8%、其hero84.77FPS＝94.8% FAIL，district925/743calls＝124.5%超限。Raw陰影call樣本1090／1318／1320保持，不過濾或用重跑取代失敗；六個pairings無同狀態S0 draw基準，A5保持UNVERIFIED。版本Chrome156.0.8078.73與S0 .48不同，數字含累積A/B/C source，不能當隔離C優化。
+
+Low服務廊保持occupied、<10local units且在原lot；mixed rails／高塔轉接肋、可通行district連廊、既有leafyCrown細化、落屋面solar支架及四個稀疏ring操作標記均使用既有材料／instancing。未改權威counts／target／slot／footprint／hero／FOV42／timeline，未新增依賴／素材／protocol。Ring停於2≤3係局部視覺修正完成；不填中空或捏造b/mixed差異去追A3/A4，也不靠無實作變更的重測換走A5失敗。背景球冠與整圖綠化、C低／中狀態辨識、district裁切／配對載荷路徑缺口照報，建議owner暫不接受C美術；如需超出round上限另授權。
+
+Root test/build/diff、capture/report邊界自檢、[scope assertions](../../artifacts/closeup-polish/C/scope-check.json)、324能源清場cases／177219 exact checks PASS；既有JSON import／chunk-size warnings保留。[Scratch current-v4 live](../../artifacts/closeup-polish/C/live/browser.json)11項PASS、error0，證實中間easing、reload／Undo即時hero及counts、reduced motion無pulse、ring局部fade；精確三秒靠node suite而非120frame browser診斷。S0 234／A147／B110張原圖hash重驗不變；C191張manifest保存。Ring r1意外Chrome關閉、auto-review初次拒絕combined retry與最後安全capture-only續拍的原log／partial／hash證據均保留。
+
+[Cleanup](../../artifacts/closeup-polish/C/cleanup.json)：本輪Vite PID46877核對clone後SIGINT關閉，5194／50033 bind確認free；所有owned Chrome／runner／scratch服務關閉。僅開發Mac Chrome1920×1080/DPR1/default，未測production／展示機／Safari/iPad／Windows／真人／Z。README啟動／AGENTS產品或工作流未改，按sync表不改其文案。完成文件／diff review及feature push後以唯一result-C-1.json回調現任coordinator；worker不自行開D/Z或merge main。A/B pending只阻其art merge，coordinator可繼續獨立D，然後Z全城比較。

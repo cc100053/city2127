@@ -1,0 +1,17 @@
+{
+  "commit": "b5ce8fe64ccb7e41c06cbfd6ffcdc48acd4a37da",
+  "sha256": {
+    "src/headlineCamera.ts": "7a7bd9926ed1e142ec5f461d3cb57f51eb2a6585a642e8ebc266ab5b64a21d5b",
+    "src/siteBuilders/concentrationTower.ts": "0e50b3666522af659369d160f24e0dfcbb832a96a87f18e3abdb7550dd45d289",
+    "src/districtMeters.ts": "037296e5a307584ef3772e9f77c3824599554ffeee90d85af8ffa125704b277a",
+    "src/energyPrototype.ts": "0f952c94f4ae3b97d00a94bc4862987ec901a1379cf9288473b000d6c16a1890",
+    "src/devShotFrame.ts": "61558ef4610b26248ca69f4aa554bf4777cedff008e020e122ed41a77f0ff28c",
+    "artifacts/closeup-polish/capture.mjs": "8bc537e18033743e1badd023b0f2e250e4e381fb079d441465966198861358ae",
+    "tests/concentrationTower.test.ts": "10219b21d6e1a0eed8b4384fba9b3c6d9414a212e1bf65c2b0ffced3c9909432",
+    "tests/districtMeters.test.ts": "8b8dd6b346c4d0e77ec53abe28cec30031ceacb66573b122a3a8927eeb996084",
+    "artifacts/closeup-polish/C/live.mjs": "088a2b6d8f08c919183f5a00ab9e2fa5047181b320086b5aaac1fc1cbc4e6618",
+    "artifacts/closeup-polish/C/report.mjs": "dffce571f139d36945fb53cb18236c0fff139300b329cd829ea488d1a20c6c0b",
+    "artifacts/closeup-polish/C/scope-check.py": "a098a96677c478b905ccde12ef12098048bc11a0ad569b1a75071a0b6ce895e6"
+  },
+  "note": "Final runtime is committed b5ce8fe; later evidence/docs commits must not change these sources. Focal r3 uses final cumulative source. District/ring final primary builders match measured source; later ring marks are hidden in all Meter/hero captures."
+}

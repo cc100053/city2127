@@ -1,0 +1,11 @@
+{
+  "ownedVite": "PID46877 command and cwd verified as the assigned clone, stopped by SIGINT",
+  "ownedChrome": "All capture/perf/compare/live browser finally blocks completed; no matching temporary-profile process remains",
+  "scratch": "Live exit0; both scratch realtime/HTTP/SQLite servers closed before replacement/in finally and temporary directories removed",
+  "portsBindVerifiedFree": [
+    5194,
+    50033
+  ],
+  "processCheck": "PASS no remaining capture.mjs, C/live.mjs or Playwright temporary-profile processes before Vite shutdown",
+  "ownedServicesReleased": true
+}
