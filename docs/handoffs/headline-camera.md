@@ -32,7 +32,7 @@
   - Live 結果先播 ≈2.62 s vote journey（`ARRIVAL_SECONDS`，`src/voteJourney.ts`），然後係 3 s site transition（`SITE_TRANSITION_SECONDS`）。
   - 閱讀時段 `DISPLAY_MS` 係 10 s，之後 `HANDOFF_MS` 5 s；result lease 由 display start 起計 15 s（`survey/src/shared/displayTiming.ts`）。
   - 結果卡喺 result 後 3 s 換成原因文字，10 s 後轉返 ambient 卡（`src/surveyAtmosphere.ts`）。
-- 參考做法（**唔好 merge，亦唔好依賴**）：`feat/energy-demo-camera` 嘅 `016f6d1:src/devEnergyDemo.ts`。
+- 參考做法（**唔好 merge，亦唔好依賴**）：`016f6d1:src/devEnergyDemo.ts`（分支2026-10-29已刪，副本喺 [artifacts/energy-demo-camera/reference](../../artifacts/energy-demo-camera/reference/devEnergyDemo.ts)）。
   - 佢有純函數 `demoTimeline`／`demoStage`、smoothstep 飛入飛出、`controls.enabled = false`、snapshot 即時 cut 返 hero。
   - 五個能源近鏡 pose：garden、garden2、ring、wing、island。可以用 `git show 016f6d1:src/devEnergyDemo.ts` 抄數值做起點。
   - 佢為咗飛入將 transition 延遲咗 3 s。**今次唔可以咁做。**

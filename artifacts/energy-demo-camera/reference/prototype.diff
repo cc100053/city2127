@@ -1,0 +1,215 @@
+diff --git a/package.json b/package.json
+index 1045b20..a900e47 100644
+--- a/package.json
++++ b/package.json
+@@ -1 +1 @@
+-{"name":"city2127","version":"1.0.0","private":true,"type":"module","scripts":{"test:survey-browser":"node tests/surveyAuto.browser.mjs","dev":"vite --host 127.0.0.1","build":"tsc --noEmit && vite build","test":"node --experimental-strip-types tests/worldState.test.ts && node --experimental-strip-types tests/mobility.test.ts && node --experimental-strip-types tests/surveyAtmosphere.test.ts && node --experimental-strip-types tests/changeCatalog.test.ts && node --experimental-strip-types tests/cityChangeManager.test.ts && node --experimental-strip-types tests/siteAssets.test.ts && node --experimental-strip-types tests/automationHub.test.ts && node --experimental-strip-types tests/commonsPlaza.test.ts && node --experimental-strip-types tests/concentrationTower.test.ts && node --experimental-strip-types tests/districtMeters.test.ts && node --experimental-strip-types tests/housingPrototype.test.ts && node --experimental-strip-types tests/odaiba.test.ts && node --experimental-strip-types tests/surveyMeterPipeline.test.ts && node --experimental-strip-types tests/scaleLab.test.ts && node --experimental-strip-types tests/voteJourney.test.ts && node --experimental-strip-types tests/renderQuality.test.ts && node --experimental-strip-types tests/energyPrototype.test.ts && node --experimental-strip-types tests/energyPipeline.test.ts && node --experimental-strip-types tests/energyDistrict.test.ts && node tests/energyE5.browser.mjs --self-test"},"dependencies":{"three":"^0.180.0"},"devDependencies":{"@types/three":"^0.180.0","three-mesh-bvh":"^0.9.15","typescript":"^5.9.3","vite":"^7.1.7"}}
+\ No newline at end of file
++{"name":"city2127","version":"1.0.0","private":true,"type":"module","scripts":{"test:survey-browser":"node tests/surveyAuto.browser.mjs","dev":"vite --host 127.0.0.1","build":"tsc --noEmit && vite build","test":"node --experimental-strip-types tests/worldState.test.ts && node --experimental-strip-types tests/mobility.test.ts && node --experimental-strip-types tests/surveyAtmosphere.test.ts && node --experimental-strip-types tests/changeCatalog.test.ts && node --experimental-strip-types tests/cityChangeManager.test.ts && node --experimental-strip-types tests/siteAssets.test.ts && node --experimental-strip-types tests/automationHub.test.ts && node --experimental-strip-types tests/commonsPlaza.test.ts && node --experimental-strip-types tests/concentrationTower.test.ts && node --experimental-strip-types tests/districtMeters.test.ts && node --experimental-strip-types tests/housingPrototype.test.ts && node --experimental-strip-types tests/odaiba.test.ts && node --experimental-strip-types tests/surveyMeterPipeline.test.ts && node --experimental-strip-types tests/scaleLab.test.ts && node --experimental-strip-types tests/voteJourney.test.ts && node --experimental-strip-types tests/energyDemo.test.ts && node --experimental-strip-types tests/renderQuality.test.ts && node --experimental-strip-types tests/energyPrototype.test.ts && node --experimental-strip-types tests/energyPipeline.test.ts && node --experimental-strip-types tests/energyDistrict.test.ts && node tests/energyE5.browser.mjs --self-test"},"dependencies":{"three":"^0.180.0"},"devDependencies":{"@types/three":"^0.180.0","three-mesh-bvh":"^0.9.15","typescript":"^5.9.3","vite":"^7.1.7"}}
+\ No newline at end of file
+diff --git a/src/devEnergy.ts b/src/devEnergy.ts
+index 603c79d..4a2bef8 100644
+--- a/src/devEnergy.ts
++++ b/src/devEnergy.ts
+@@ -1,6 +1,13 @@
+ import type { Scene } from 'three';
+ import { ENERGY_OPTIONS, energyPrototype, type EnergyOption } from './energyPrototype.ts';
+
++/** Narrated storage-cycle phases, shared with the DEV close-up demo. */
++export const ENERGY_PHASES = {
++  a: { charge: '接收／外部供電 → 抽水上行、上水庭蓄水', hold: '暫存 → 上水庭保水、渦輪停定', release: '釋能／分配 → 落水經渦輪 → 街區用電' },
++  b: { charge: '接收／外部供電 → 旋轉環充能', hold: '暫存 → 旋轉環續轉', release: '釋能／分配 → 旋轉環減速 → 街區用電' },
++  mixed: { charge: '接收／外部供電 → 抽水上行、旋轉環充能', hold: '暫存 → 上水庭保水、旋轉環續轉', release: '釋能／分配 → 落水經渦輪、旋轉環減速 → 街區用電' },
++};
++
+ /** Reload-free comparison in the unchanged hero camera, isolated from survey and Meter review. */
+ export function startEnergyReview(scene: Scene, params: URLSearchParams) {
+   const study = energyPrototype(); scene.add(study.root);
+@@ -29,16 +36,11 @@ export function startEnergyReview(scene: Scene, params: URLSearchParams) {
+   const still = panel.querySelector<HTMLInputElement>('input')!;
+   still.checked = motion.matches;
+   motion.addEventListener('change', () => { still.checked = motion.matches; });
+-  const phases = {
+-    a: { charge: '接收／外部供電 → 抽水上行、上水庭蓄水', hold: '暫存 → 上水庭保水、渦輪停定', release: '釋能／分配 → 落水經渦輪 → 街區用電' },
+-    b: { charge: '接收／外部供電 → 旋轉環充能', hold: '暫存 → 旋轉環續轉', release: '釋能／分配 → 旋轉環減速 → 街區用電' },
+-    mixed: { charge: '接收／外部供電 → 抽水上行、旋轉環充能', hold: '暫存 → 上水庭保水、旋轉環續轉', release: '釋能／分配 → 落水經渦輪、旋轉環減速 → 街區用電' },
+-  };
+   let previous = '';
+   return (seconds: number) => {
+     const cycle = study.update(seconds, motion.matches || still.checked);
+     const staticText = study.option === 'b' ? '靜態閱讀：接收 → 儲能 → 街區；接收翼、旋轉環與配電門架保持固定。' : '靜態閱讀：接收 → 儲能 → 街區；箭頭標示落水／抽水回管，水位與機械保持固定。';
+-    const text = study.option === 'baseline' ? '' : study.option === 'c' ? '能源島 → 檢修橋服務線 → 街區配電節點（供電路線示意）' : motion.matches || still.checked ? staticText : `60 秒示意循環 · ${phases[study.option][cycle.phase]}`;
++    const text = study.option === 'baseline' ? '' : study.option === 'c' ? '能源島 → 檢修橋服務線 → 街區配電節點（供電路線示意）' : motion.matches || still.checked ? staticText : `60 秒示意循環 · ${ENERGY_PHASES[study.option][cycle.phase]}`;
+     if (text !== previous) { status.textContent = text; previous = text; }
+   };
+ }
+diff --git a/src/devEnergyDemo.ts b/src/devEnergyDemo.ts
+new file mode 100644
+index 0000000..cc712a3
+--- /dev/null
++++ b/src/devEnergyDemo.ts
+@@ -0,0 +1,122 @@
++import { MathUtils, Vector3, type PerspectiveCamera } from 'three';
++import type { OrbitControls } from 'three/addons/controls/OrbitControls.js';
++import type { CityChangeManager } from './cityChangeManager.ts';
++import { ENERGY_PHASES } from './devEnergy.ts';
++import { energyCycle } from './energyPrototype.ts';
++import { HERO_POSITION, HERO_TARGET } from './heroCamera.ts';
++import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
++import { ARRIVAL_SECONDS } from './voteJourney.ts';
++import { emptyEnergyConfiguration, type EnergyConfiguration } from '../survey/src/shared/energy.ts';
++
++export type EnergyFocus = 'island' | 'wing' | 'ring' | 'garden' | 'garden2';
++export const FLY_SECONDS = 3;
++const CYCLE_SECONDS = 60;
++/** Seconds of narrated cycle in close-up; the whole 60 s storage cycle is compressed into it (close-up ≈ fade-in + hold). */
++export const DEFAULT_HOLD = 9;
++
++const RECEIVER_RANK = { none: 0, small: 1, large: 2 } as const;
++/** The newly added energy part a close-up should show; removals and unchanged layouts return null. */
++export function energyFocus(before: EnergyConfiguration, after: EnergyConfiguration): EnergyFocus | null {
++  if (after.island && !before.island) return 'island';
++  if (RECEIVER_RANK[after.receiver] > RECEIVER_RANK[before.receiver]) return 'wing';
++  if (after.flywheel && !before.flywheel) return 'ring';
++  if (after.waterGardens > before.waterGardens) return after.waterGardens === 2 && before.waterGardens === 1 ? 'garden2' : 'garden';
++  return null;
++}
++
++export type DemoStage = 'arrive' | 'fly-in' | 'appear' | 'cycle' | 'fly-out' | 'done';
++/** Seconds after the live result at which each stage starts: hero vote journey, fly in, the part fades in, narrated cycle, fly back. */
++export function demoTimeline(hold: number) {
++  const flyIn = ARRIVAL_SECONDS, appear = flyIn + FLY_SECONDS, cycle = appear + SITE_TRANSITION_SECONDS, flyOut = cycle + hold;
++  return { arrive: 0, flyIn, appear, cycle, flyOut, done: flyOut + FLY_SECONDS };
++}
++export function demoStage(elapsed: number, hold: number): DemoStage {
++  const t = demoTimeline(hold);
++  return elapsed < t.flyIn ? 'arrive' : elapsed < t.appear ? 'fly-in' : elapsed < t.cycle ? 'appear' : elapsed < t.flyOut ? 'cycle' : elapsed < t.done ? 'fly-out' : 'done';
++}
++
++// Close-up poses from the hero side (camera, target), authored against energyPrototype part positions.
++const POSES: Record<EnergyFocus, [[number, number, number], [number, number, number]]> = {
++  garden: [[-372, 62, -232], [-306, 12, -150]],
++  garden2: [[-16, 48, -452], [32, 8, -392]],
++  ring: [[-118, 148, -138], [-18, 96, -24]],
++  wing: [[56, 64, -496], [125, 22, -424]],
++  island: [[-142, 66, -556], [-60, 4, -470]],
++};
++const COPY: Record<EnergyFocus, { title: string; steps: [string, string, string] }> = {
++  garden: { title: '上下水庭 · 水力儲能', steps: [ENERGY_PHASES.a.charge, ENERGY_PHASES.a.hold, ENERGY_PHASES.a.release] },
++  garden2: { title: '第二處水庭 · 水力儲能', steps: [ENERGY_PHASES.a.charge, ENERGY_PHASES.a.hold, ENERGY_PHASES.a.release] },
++  ring: { title: '富士儲能環 · 旋轉儲能', steps: [ENERGY_PHASES.b.charge, ENERGY_PHASES.b.hold, ENERGY_PHASES.b.release] },
++  wing: { title: '接收翼 · 外部供電', steps: ['接收翼 → 接收外部供電', '岸邊配電門架 → 承接供電', '街區配電節點 → 街區用電'] },
++  island: { title: '能源島 · 島嶼供電', steps: ['能源島 → 供電', '跨水檢修橋 → 服務線', '街區配電節點 → 街區用電'] },
++};
++
++/**
++ * DEV-only `?survey&energyDemo` (`&demoHold=12`): after a live result adds an energy part, the camera flies to it and a
++ * caption narrates one storage cycle compressed into a quick close-up, then returns to the hero pose. A timing prototype, not exhibition copy.
++ */
++export type EnergyDemo = ReturnType<typeof startEnergyDemo>;
++export function startEnergyDemo(camera: PerspectiveCamera, controls: OrbitControls, manager: CityChangeManager, params: URLSearchParams) {
++  const hold = Math.max(3, Number(params.get('demoHold') ?? DEFAULT_HOLD) || DEFAULT_HOLD), rate = CYCLE_SECONDS / hold;
++  const panel = document.createElement('aside'); panel.className = 'causal-panel energy-demo'; panel.hidden = true;
++  panel.innerHTML = '<h2 class="causal-title"></h2><ol></ol><p class="causal-status">原型示意 · 非正式文案<br>未驗證容量或工程可行性。</p>';
++  document.body.appendChild(panel);
++  const title = panel.querySelector('h2')!, list = panel.querySelector('ol')!;
++  const fromPos = new Vector3(), fromAim = new Vector3(), toPos = new Vector3(), toAim = new Vector3(), aim = new Vector3();
++  const hero = [new Vector3(...HERO_POSITION), new Vector3(...HERO_TARGET)] as const;
++  let demo: { focus: EnergyFocus; start: number; stage: DemoStage; marks: Partial<Record<DemoStage, number>> } | null = null;
++  // Energy motion runs on its own clock so the narrated cycle starts at charge and fits the close-up hold.
++  // shortcut: other energy parts jump to the cycle start (and drift from wall time); replace with a per-part phase if this ships.
++  let clock = 0, last: number | null = null;
++  const status = (data: object) => { document.body.dataset.energyDemo = JSON.stringify(data); };
++  function finish(snap: boolean) {
++    if (!demo) return;
++    if (snap) { camera.position.copy(hero[0]); controls.target.copy(hero[1]); camera.lookAt(controls.target); }
++    controls.enabled = true; controls.update(); panel.hidden = true;
++    status({ focus: demo.focus, stage: snap ? 'cancelled' : 'done', marks: demo.marks, planned: demoTimeline(hold), rate, hold });
++    console.info('[energyDemo]', demo.focus, snap ? 'cancelled' : 'done', JSON.stringify(demo.marks));
++    demo = null;
++  }
++  function flyFrom(target: readonly [Vector3, Vector3]) { fromPos.copy(camera.position); fromAim.copy(controls.target); toPos.copy(target[0]); toAim.copy(target[1]); }
++  return {
++    /** Starts a demo for a live layout and returns the extra seconds the city transition should wait (0 without a new part). */
++    play(next: EnergyConfiguration | undefined, now: number) {
++      const focus = energyFocus(manager.energy?.getConfiguration() ?? emptyEnergyConfiguration(), next ?? emptyEnergyConfiguration());
++      finish(true);
++      if (!focus) return 0;
++      demo = { focus, start: now, stage: 'arrive', marks: { arrive: 0 } };
++      title.textContent = COPY[focus].title;
++      list.replaceChildren(...COPY[focus].steps.map(step => Object.assign(document.createElement('li'), { textContent: step })));
++      console.info('[energyDemo]', focus, 'planned', JSON.stringify(demoTimeline(hold)), { rate, hold });
++      return FLY_SECONDS;
++    },
++    /** Snapshots, resets, Undo and reconnects settle immediately: cut back to the hero pose. */
++    cancel() { finish(true); },
++    update(now: number) {
++      const dt = last === null ? 0 : Math.max(0, now - last); last = now;
++      const stage = demo ? demoStage(now - demo.start, hold) : 'done';
++      if (demo && stage !== demo.stage) {
++        demo.marks[stage] = +(now - demo.start).toFixed(2);
++        if (stage === 'fly-in') { flyFrom([new Vector3(...POSES[demo.focus][0]), new Vector3(...POSES[demo.focus][1])]); controls.enabled = false; }
++        if (stage === 'appear') panel.hidden = false;
++        if (stage === 'cycle') clock = Math.ceil(clock / CYCLE_SECONDS) * CYCLE_SECONDS;
++        if (stage === 'fly-out') { flyFrom(hero); panel.hidden = true; }
++        demo.stage = stage;
++      }
++      clock += dt * (stage === 'cycle' ? rate : 1);
++      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) manager.energy?.model.update(clock);
++      if (!demo) return;
++      if (stage === 'done') return finish(false);
++      const t = demoTimeline(hold);
++      if (stage === 'fly-in' || stage === 'fly-out') {
++        const k = MathUtils.smoothstep(now - demo.start, stage === 'fly-in' ? t.flyIn : t.flyOut, (stage === 'fly-in' ? t.flyIn : t.flyOut) + FLY_SECONDS);
++        camera.position.lerpVectors(fromPos, toPos, k); controls.target.copy(aim.lerpVectors(fromAim, toAim, k));
++      } else if (stage !== 'arrive') { camera.position.copy(toPos); controls.target.copy(toAim); }
++      // OrbitControls' distance/pan limits run before this each frame; the authored pose overrides them while the demo holds the camera.
++      if (stage !== 'arrive') camera.lookAt(controls.target);
++      const active = stage === 'cycle' ? Math.min(2, Math.floor(energyCycle(clock).t / 20)) : -1;
++      Array.from(list.children).forEach((li, i) => li.classList.toggle('active', i === active));
++      status({ focus: demo.focus, stage, elapsed: +(now - demo.start).toFixed(2), phase: stage === 'cycle' ? energyCycle(clock).phase : null, marks: demo.marks, planned: t, rate, hold });
++    },
++  };
++}
+diff --git a/src/main.ts b/src/main.ts
+index b3d57c2..0cae842 100644
+--- a/src/main.ts
++++ b/src/main.ts
+@@ -159,6 +159,12 @@ try {
+     if(to!==null)cityChanges!.applyExhibitionLayout(devLayout(to),'city-state-updated',now-Number(params.get('metersAge')??1));
+   });
+   const journey=surveyUrl?new VoteJourney(scene,camera):null;
++  // DEV-only `?survey&energyDemo` (`&demoHold=12`): a live energy change flies the camera to the new part for a quick narrated cycle, to time a close-up demo.
++  let energyDemo:import('./devEnergyDemo').EnergyDemo|undefined;
++  if(import.meta.env.DEV&&surveyUrl&&params.has('energyDemo'))import('./devEnergyDemo').then(async({startEnergyDemo})=>{
++    if(!await odaibaReady)return;
++    energyDemo=startEnergyDemo(camera,controls,cityChanges!,params);devFrame=energyDemo.update;
++  });
+   if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view)=>{
+     if(isExhibitionView(view)){
+       // Cancel any legacy score blend while preserving its current rendered atmosphere.
+@@ -168,8 +174,10 @@ try {
+       // while the carrier evidence for the resident card is computed now. Snapshots, resets, Undo and reduced motion stay immediate.
+       if(kind==='city-state-updated'&&latest&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
+         journey!.play(latest.votes,latest.ordinal,now);
+-        return cityChanges!.applyExhibitionLayout(view.layout,kind,now+ARRIVAL_SECONDS,view.slotSeeds);
++        const lead=energyDemo?.play(view.layout.energy,now)??0;
++        return cityChanges!.applyExhibitionLayout(view.layout,kind,now+ARRIVAL_SECONDS+lead,view.slotSeeds);
+       }
++      energyDemo?.cancel();
+       journey!.setLanterns(view.recentProposals);
+       return cityChanges!.applyExhibitionLayout(view.layout,kind,now,view.slotSeeds);
+     }
+diff --git a/src/style.css b/src/style.css
+index 2db2ea2..c47a236 100644
+--- a/src/style.css
++++ b/src/style.css
+@@ -24,6 +24,8 @@ body[data-time=night] footer,body[data-time=night] .intro{text-shadow:0 0 10px r
+ .resident-card-title{font-size:21px;line-height:1.5;margin-bottom:10px!important}
+ .resident-card-copy{font-size:17px;line-height:1.85}
+ .resident-place{font-size:13px;color:#46676e;margin-top:14px!important}
++/* DEV energy close-up demo (`?survey&energyDemo`). */
++.causal-panel.energy-demo{top:auto;bottom:44px;left:44px;right:auto;width:440px;max-height:none;padding:18px 20px;font-size:17px;line-height:1.7}.energy-demo .causal-title{font-size:21px}.energy-demo ol{font-size:17px}.energy-demo li{opacity:.4}.energy-demo li.active{opacity:1;font-weight:600}.energy-demo .causal-status{font-size:12px}
+ /* DEV Scale Lab (`?scaleLab`). */
+ .scale-lab{left:20px;right:auto;top:20px;width:330px;max-height:calc(100vh - 40px);z-index:20;display:grid;gap:6px}.scale-lab label{display:flex;justify-content:space-between;align-items:center;gap:8px}.scale-lab select,.scale-lab input[type=number]{width:170px;font:inherit}.scale-lab .lab-check{justify-content:flex-start}
+ .lab-transport{display:flex;gap:4px}.lab-transport button{flex:1;font:inherit;padding:5px;border:1px solid #35413930;border-radius:5px;background:#fff9;cursor:pointer}
