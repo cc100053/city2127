@@ -169,7 +169,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 | B アクアシティ南 | REVIEW_READY：worker `01a17e8c`，三輪各18狀態；A3/A4、focal A5/V及V3仍FAIL | runtime `74d6c2b`；[完整review](../../artifacts/closeup-polish/B/REVIEW.md)，final SHA見result-B-1.json | pending；建議暫不接受r3 focal退步候選 | — |
 | C フジテレビ東 | REVIEW_READY：focal/district各三輪、ring兩輪完成；A3全FAIL、A4 4/28，A5 18FAIL＋6UNVERIFIED；root/live11項PASS；未接受art | baseline `ca22a92` → runtime `b5ce8fe`；[逐圖／完整量度](../../artifacts/closeup-polish/C/REVIEW.md) | owner pending，建議暫不接受C美術 | — |
 | D デックス西＋沖 | REVIEW_READY：134狀態／275原圖、final50；root/live23PASS，A3/A4/A5及V失敗保留 | runtime `44521a0`；[完整report](../../artifacts/closeup-polish/D/REVIEW.md)，final SHA見result-D-1.json | pending，建議暫不接受D美術 | — |
-| Z 全城回歸 | REVIEW_READY：98態／28效能／96A4／202比較；root/live16項/E4/DEV+production PASS，FAIL保留 | base `4a3ad9f`／runtime `44521a0`；[完整報告](../../artifacts/closeup-polish/Z/REVIEW.md) | A–D與A3/A4政策仍待owner；未merge main | 222 originals／98 final逐圖 |
+| Z 全城回歸 | REVIEW_READY：98態／28效能／96A4／202比較；root/live16項/E4/DEV+production PASS，FAIL保留；222 originals／98 final逐圖 | base `4a3ad9f`／runtime `44521a0`；[完整報告](../../artifacts/closeup-polish/Z/REVIEW.md) | A–D與A3/A4政策仍待owner；未merge main | —（未合併） |
 
 ## Actual validation results
 
