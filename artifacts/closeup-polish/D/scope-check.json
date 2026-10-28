@@ -11,9 +11,11 @@
   ],
   "changed": [
     "src/districtMeters.ts",
+    "src/energyPrototype.ts",
     "src/headlineCamera.ts",
     "src/siteBuilders/automationHub.ts",
     "tests/automationHub.test.ts",
-    "tests/districtMeters.test.ts"
+    "tests/districtMeters.test.ts",
+    "tests/energyPrototype.test.ts"
   ]
 }

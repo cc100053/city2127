@@ -1,0 +1,112 @@
+{
+  "mode": "compare",
+  "commit": "0066eedc335869bc8cc90bd4eefeffbd8ecf407e",
+  "sourceDiff": "diff --git a/src/headlineCamera.ts b/src/headlineCamera.ts\nindex 70260a1..34084c5 100644\n--- a/src/headlineCamera.ts\n+++ b/src/headlineCamera.ts\n@@ -18,7 +18,7 @@ export const SHOTS: Record<ShotId, Pose> = {\n   'sw:district': { position: [-160, 420, -400], target: [-120, 5, -260] },\n   'se:district': { position: [-200, 300, -365], target: [15, 35, -80] },\n   'energy:garden': { position: [-420, 65, -210], target: [-304, 12, -135] },\n-  'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },\n+  'energy:garden2': { position: [-15, 36, -455], target: [32, 8, -392] },\n   'energy:ring': { position: [-70, 135, -170], target: [-18, 99, -24] },\n   'energy:wing': { position: [56, 64, -496], target: [125, 22, -424] },\n   'energy:island': { position: [-142, 66, -556], target: [-60, 4, -470] },\n",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "energy:garden2",
+      "hour": 12,
+      "from": "baseline",
+      "to": "a",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.07360833383247557,
+      "rect": {
+        "x": 637,
+        "y": 289,
+        "width": 751,
+        "height": 544
+      },
+      "pass": true
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 12,
+      "from": "a",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.007214752366574159,
+      "rect": {
+        "x": 637,
+        "y": 289,
+        "width": 751,
+        "height": 544
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 12,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.07660324168569807,
+      "rect": {
+        "x": 637,
+        "y": 289,
+        "width": 751,
+        "height": 544
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 22,
+      "from": "baseline",
+      "to": "a",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.050815716811776275,
+      "rect": {
+        "x": 637,
+        "y": 289,
+        "width": 751,
+        "height": 544
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 22,
+      "from": "a",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.004219732526309915,
+      "rect": {
+        "x": 637,
+        "y": 289,
+        "width": 751,
+        "height": 544
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:garden2",
+      "hour": 22,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.05183550600992858,
+      "rect": {
+        "x": 637,
+        "y": 289,
+        "width": 751,
+        "height": 544
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}

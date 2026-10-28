@@ -43,6 +43,10 @@ for (const waterGardens of [0, 1, 2] as const) for (const receiver of ['none', '
 study.select('mixed');
 assert.ok(study.gardens[0].getObjectByName('energy-west-garden-edge-lights'), 'west water garden keeps its own supported edge lighting');
 assert.equal(study.gardens[1].getObjectByName('energy-west-garden-edge-lights'), undefined, 'sector A must leave the second garden geometry unchanged');
+const secondLight = study.gardens[1].getObjectByName('energy-second-garden-edge-lights')!;
+assert.ok(secondLight&&secondLight.children.length===1,'second-garden detail must reuse one existing public-light batch');
+const firstLight = study.gardens[0].getObjectByName('energy-west-garden-edge-lights')!;
+assert.deepEqual(Array.from((secondLight.children[0] as Mesh).geometry.attributes.position.array),Array.from((firstLight.children[0] as Mesh).geometry.attributes.position.array),'local clone edge detail differs from the existing supported west-garden envelope');
 const after: string[] = []; study.root.traverse(o => { if (o instanceof Mesh && !(o instanceof InstancedMesh)) after.push(o.uuid); });
 assert.deepEqual(after, originalMeshes, 'switching configurations reuses the same geometry'); assert.ok(count < 50, 'static study batches by shared finish');
 // Both reservoirs and their district clone reuse one physical water finish through every cycle.

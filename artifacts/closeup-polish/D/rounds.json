@@ -8,5 +8,8 @@
     "r1/nw-district",
     "r2/nw-district",
     "r3/nw-district"
+  ],
+  "energy:garden2": [
+    "r1/energy-garden2"
   ]
 }

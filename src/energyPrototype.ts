@@ -507,13 +507,22 @@ export function energyPrototype() {
   const garden2 = garden.clone(); garden2.name = 'energy-district-garden';
   garden2.position.set(30, 0, -395); garden2.scale.setScalar(.72); root.add(garden2);
   const gardens = [garden, garden2];
+  const secondGardenLights = new T.Group(); secondGardenLights.name = 'energy-second-garden-edge-lights';
+  arc(secondGardenLights, 11.96, 12.025, .08, [8, 21.84, 0], publicLight);
+  for (const z of [-8, 8]) {
+    member(secondGardenLights, [-7.55, 1, z - .57], [.55, 20.8, z - .57], .08, publicLight);
+    member(secondGardenLights, [11.22, 1, z - .57], [15.78, 20.8, z - .57], .08, publicLight);
+  }
+  // Rebuild only this clone's light batch; shared geometry and the west garden stay untouched.
+  secondGardenLights.add(...garden2.children.filter(child => child instanceof T.Mesh && child.material === publicLight));
+  secondGardenLights.add(...bake(secondGardenLights)); garden2.add(secondGardenLights);
   const westGardenLights = new T.Group(); westGardenLights.name = 'energy-west-garden-edge-lights';
   arc(westGardenLights, 11.96, 12.025, .08, [8, 21.84, 0], publicLight);
   for (const z of [-8, 8]) {
     member(westGardenLights, [-7.55, 1, z - .57], [.55, 20.8, z - .57], .08, publicLight);
     member(westGardenLights, [11.22, 1, z - .57], [15.78, 20.8, z - .57], .08, publicLight);
   }
-  // Rebatch this garden's edge finish after cloning; the second garden keeps its original geometry.
+  // Rebatch the west garden separately so both gardens retain independent local light geometry.
   westGardenLights.add(...garden.children.filter(child => child instanceof T.Mesh && child.material === publicLight));
   westGardenLights.add(...bake(westGardenLights)); garden.add(westGardenLights);
   // Short markers stay inside the two pipe frames; they illustrate direction, never a visible energy beam.

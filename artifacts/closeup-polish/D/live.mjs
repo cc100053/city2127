@@ -29,7 +29,7 @@ async function submit(axis='service-2127'){
 }
 let energyChoice;
 async function live(id){
- const before=await data(),started=Date.now();await submit(id.startsWith('energy:')?energyChoice:'service-2127');const samples=[];
+ const before=await data(),started=Date.now();await submit(id.startsWith('energy:')?'energy-'+energyChoice:'service-2127');const samples=[];
  let hold;
  while(Date.now()-started<30000){
   const d=await data();if(samples.at(-1)?.time!==d.time)samples.push({elapsedMs:Date.now()-started,...d});

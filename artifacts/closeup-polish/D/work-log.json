@@ -344,9 +344,16 @@
     },
     {
       "resumeFetch": "PASS approved retry; upstream0/0, ahead main24/0; prior Vite no longer listening, restart owned5194."
+    },
+    {
+      "shot": "energy:garden2",
+      "round": "r1",
+      "status": "complete",
+      "review": "a day/night original inspected: whole reservoir and bridge clear, night upper rim/supports dim. r2 duplicates existing supported west edge lights after clone, same batch count; no motion/config changes.",
+      "liveScriptReview": "Corrected energy-choice prefix before first run so wing/island submits their actual Q3 categories."
     }
   ],
-  "nextExpected": "NW max3 complete; energy:garden2 pose r1 then image-driven supported edge-light detail r2. Existing V3/V6 and A2/A3/A4 failures remain.",
+  "nextExpected": "garden2 r2 full matrix and original review, then wing pose r1.",
   "plannedPoses": {
     "nw:district": {
       "position": [
