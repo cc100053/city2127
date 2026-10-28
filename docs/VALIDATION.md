@@ -412,3 +412,12 @@ Root [npm test](../artifacts/closeup-polish/D/final-checks/npm-test.log)／[buil
 [真實current-v4 scratch live](../artifacts/closeup-polish/D/live-retry1/browser.json) complete、23項PASS、errors0，五shot hold與結果卡相符，中間geometry/fade、reload／Undo counts及hero、reduced motion已驗。精確3秒由node suite保證，120frame browser診斷只證實中間態。[首輪失敗](../artifacts/closeup-polish/D/live/browser.json)是在Undo後等待前後皆為.5的targetAutomation而讀到舊counts；原2圖/log/hash保存，只修fixture去等原counts／zero pulses並保留完整deep equality，fresh目錄重跑。首個sandbox Chrome launch、root listen EPERM、service-face test邊界首測log亦保留，不宣稱所有attempt無失敗。
 
 S0 234／A147／B110／C191原圖hash重驗不變，268張早期tracked D圖與c63f2f2核對不變；D275張manifest完整。[Cleanup](../artifacts/closeup-polish/D/cleanup.json)：核對owned Vite PID2325/cwd後SIGINT，5194、52149、52371、52592、52689、52760 bind確認free；Chrome／runner／scratch SQLite清場。僅開發Mac Chrome156.0.8078.73（S0 .48）、1920×1080/DPR1/default；包含累積A/B/C/D source，每shot為當時source snapshot，不能當隔離D或全D當前畫面。Garden2 r2初段capped capture與root suite重疊，uncapped phase開始前suite已結束；原rows保留。四個NW-view配對無同狀態S0 draw基準，A5保持UNVERIFIED。未測production、展示機、Safari/iPad、Windows、真人兩秒或Z；建議暫不接受D美術，A/B/C pending不變，未merge main／部署。
+
+
+### Closeup Z — 2026-10-29（全當前source）
+
+Owner `01a183af-1ca0-7190-a25c-b31a6db4fd98`，base `4a3ad9f`／runtime `44521a0`；src/tests/package hashes保持，沒有改美術或門檻。沿原S0方法：1920×1080／DPR1／default，hour12/22、reviewTime20，98態各兩次fresh navigation，JPEG90，永遠採第二take且保留失敗；完整root/carrier/group及world-AABB取樣不縮細。S0原234／A147／B110／C191／D275張共957 originals hash核對保持。
+
+靜態A1 84PASS／2FAIL／12N/A；A2 68／18／12；A3 86FAIL／12N/A；A6 98PASS；重現性47PASS／51FAIL。全部98張final原圖逐張original detail檢視，V1是session判斷而非真人兩秒測試，V6 STATIC PASS不證明完整動態無閃爍。[原始capture](../artifacts/closeup-polish/Z/current/capture.json)、[逐圖理由](../artifacts/closeup-polish/Z/visual-review.json)、[A3原因](../artifacts/closeup-polish/Z/occlusion-causes.json)：86可投影rows共774點，主體56、world-AABB穿空276、projected-box未入AABB310、前景70、AABB內其他幾何62（有歧義）；不把全部miss當前景遮擋，不改A3。
+
+效能／A4與live等其餘驗證仍在執行；最終狀態見[Z工作紀錄](../artifacts/closeup-polish/Z/README.md)。只測開發Mac Chrome156.0.8078.73（S0 .48），不是同版本隔離優化；展示硬件、其他平台、實體HDMI、長跑及真人理解未驗。A–D美術pending，未merge main／部署。

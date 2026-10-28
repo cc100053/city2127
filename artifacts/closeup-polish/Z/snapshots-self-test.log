@@ -1,0 +1,1 @@
+PASS: numeric deltas preserve missing projection instead of inventing zero.

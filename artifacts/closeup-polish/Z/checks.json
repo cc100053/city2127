@@ -1,0 +1,52 @@
+{
+  "rootNpmTest": {
+    "status": "PASS",
+    "log": "npm-test-retry1.log",
+    "note": "Initial sandbox loopback EPERM retained in npm-test.log"
+  },
+  "rootNpmBuild": {
+    "status": "PASS",
+    "log": "npm-build.log",
+    "note": "Existing JSON import/chunk warnings retained"
+  },
+  "live": {
+    "status": "PENDING"
+  },
+  "headlineAwareE4": {
+    "status": "PENDING"
+  },
+  "devSmoke": {
+    "status": "PENDING"
+  },
+  "productionSmoke": {
+    "status": "PENDING"
+  },
+  "runtime": "44521a0d63aae904c306a19c4baac52a44b62a87",
+  "capture": {
+    "states": 98,
+    "reviewed": 98,
+    "gates": {
+      "A1": {
+        "PASS": 84,
+        "FAIL": 2,
+        "N/A": 12
+      },
+      "A2": {
+        "PASS": 68,
+        "FAIL": 18,
+        "N/A": 12
+      },
+      "A3": {
+        "FAIL": 86,
+        "N/A": 12
+      }
+    },
+    "A6": {
+      "PASS": 98
+    },
+    "reproducibility": {
+      "FAIL": 51,
+      "PASS": 47
+    }
+  }
+}

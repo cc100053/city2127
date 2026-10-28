@@ -1,0 +1,13 @@
+{
+  "recoveredUTC": "2026-10-28T23:05:50.733462+00:00",
+  "sourceHashes": "PASS",
+  "priorOriginals": 957,
+  "earlierZOriginals": 69,
+  "allZOriginals": 196,
+  "canonicalCaptureURLPose": "PASS",
+  "counts": {
+    "capture": 98,
+    "performance": 28,
+    "comparison": 96
+  }
+}

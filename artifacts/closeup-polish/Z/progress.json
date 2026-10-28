@@ -1,16 +1,47 @@
 {
-  "updatedUTC": "2026-10-28T18:52:48.046361+00:00",
+  "updatedUTC": "2026-10-28T23:06:12.055695+00:00",
   "status": "RUNNING",
   "owner": "01a183af-1ca0-7190-a25c-b31a6db4fd98",
-  "dispatch": "closeup-polish-Z-1-r21",
+  "dispatch": "closeup-polish-Z-recover-r23",
   "runtime": "44521a0d63aae904c306a19c4baac52a44b62a87",
   "rootNpmTest": "PASS npm-test-retry1.log; original sandbox EPERM preserved",
   "rootNpmBuild": "PASS npm-build.log; existing JSON-import/chunk warnings",
-  "runner": "capture\u2192perf\u2192compare in exec session15734",
+  "runner": "capture→perf→compare in exec session15734",
   "vite": "exec session57693 / 5194",
-  "next": "Finish98 dual-take captures and original-detail review; standalone28perf then96A4; snapshot diffs/live/formal/production/docs/cleanup/push",
+  "next": "Run202 snapshot comparisons, current-v4 live/formal/dev+production smoke; final report/docs/cleanup/push",
   "ownedServicesReleased": false,
-  "captures": 52,
-  "reviewedOriginals": 50,
-  "protectedCurrentImages": 69
+  "captures": 98,
+  "reviewedOriginals": 98,
+  "protectedCurrentImages": 196,
+  "phase": "98 captures /28perf /96A4 complete; snapshot/live/formal/smokes/report pending",
+  "performanceRows": 28,
+  "occlusionAnalysis": "PASS known-ray checks; full98 captures analyzed,86projectable rows; gates unchanged",
+  "visualSummary": {
+    "V1": {
+      "FAIL": 42,
+      "PASS": 46,
+      "N/A": 10
+    },
+    "V2": {
+      "PASS": 92,
+      "FAIL": 6
+    },
+    "V3": {
+      "FAIL": 98
+    },
+    "V4": {
+      "PASS": 98
+    },
+    "V5": {
+      "N/A": 54,
+      "FAIL": 16,
+      "PASS": 28
+    },
+    "V6": {
+      "STATIC PASS": 82,
+      "FAIL": 6,
+      "N/A": 10
+    }
+  },
+  "A4Rows": 96
 }

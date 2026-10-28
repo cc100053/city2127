@@ -8,6 +8,7 @@ const read=p=>JSON.parse(readFileSync(p,'utf8')),mean=a=>a.reduce((n,x)=>n+x,0)/
 const gate=(fps,calls,baselineFps,baselineCalls)=>fps>=baselineFps*.95&&calls<=baselineCalls*1.1;
 const mark=(r,k)=>r.id==='hero'||r.frame?.reason==='subject absent in this state'?'N/A':r.auto[k]===true?'PASS':r.auto[k]===false?'FAIL':'FAIL (unmeasurable)';
 if(process.argv.includes('--self-test')){
+ assert.ok(/\.(jpg|png)$/.test('current/example.jpg'));assert.ok(!/\.(jpg|png)$/.test('capture.json'));
  assert.ok(gate(95,110,100,100));assert.ok(!gate(94.99,110,100,100));assert.ok(!gate(100,110.01,100,100));
  assert.equal(mark({id:'sw:district',frame:{reason:'near plane'},auto:{A1:null}},'A1'),'FAIL (unmeasurable)');
  assert.equal(mark({id:'energy:ring',frame:{reason:'subject absent in this state'},auto:{A1:null}},'A1'),'N/A');

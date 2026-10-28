@@ -223,3 +223,8 @@ Focal／district各三輪，ring兩輪後停止；94狀態／188靜態原圖，3
 Runtime `44521a0`：NW hub六槽後方增加服務面、窗框及上層稀疏操作接點，保留controller、原GLB及cache；AutomationDistrict只在原露台／停機盤加支承欄邊／接點及降低局部陶瓷emission。第二水庭在clone後獨立rebatch既有西庭邊燈，接收翼用局部solar clone減反光並把操作邊嵌入板框，島甲板增加貼地操作邊；能源保持49 batches。第一水庭／C環／distribution、權威target／counts／slots／footprint及3秒／60秒節拍皆保持。NW兩鏡、第二庭及島只調SHOTS數值，wing最後恢復S0 pose；hero/FOV42/timeline無改。
 
 NW／wing各三輪、garden2／island各兩輪後停止；[50狀態S0／final及逐項理由](../artifacts/closeup-polish/D/REVIEW.md)、[檢查](../artifacts/closeup-polish/D/checks.json)。Root及真實scratch live23項PASS，A3/A4/A5與綠化／身份／接合視覺缺口照報，未接受D美術，A/B/C pending保留。每shot final對應其當時source snapshot，後續shot可改背景；全當前累積矩陣由Z驗證。無新依賴、GLB、protocol、部署或main merge。
+
+
+### Closeup Z — 2026-10-29（全當前source量測）
+
+Z只新增證據／報告工具及文件；`src/`、tests、package與接手`4a3ad9f`保持byte-identical，runtime仍為`44521a0`，沒有改美術、SHOTS、hero/FOV42或資料／時間線。沿用S0 capture runner完成98態雙take，逐張檢視98張第二take原圖；S0與sector-last是各自當時source的比較，不能當同版本隔離優化。完整差異／實際驗證集中於[Z工作紀錄](../artifacts/closeup-polish/Z/README.md)與[handoff](handoffs/closeup-polish.md)。A–D美術仍待owner接受，未merge main。

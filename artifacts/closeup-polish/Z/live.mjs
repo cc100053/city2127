@@ -9,8 +9,8 @@ import {HERO_POSITION} from '../../../src/heroCamera.ts';
 
 function authoritative(d,v){
  const l=v.layout,h=d.sites.magnetEast.automationHub,c=d.sites.dogenzakaSouth.commonsPlaza,p=d.sites.stationEastPark.environmentPark,t=d.sites.centerGaiRear.concentrationTower;
- assert.equal(h.targetAutomatedPorts,l.automatedPorts);assert.equal(h.visibleAutomatedPorts,l.automatedPorts);assert.equal(h.visibleHumanCounters,6-l.automatedPorts);
- assert.equal(c.targetSharedSeats,l.sharedSeats);assert.equal(c.visibleSharedSeats,l.sharedSeats);assert.equal(c.visibleScreenedSeats,8-l.sharedSeats);
+ assert.equal(h.targetAutomatedPorts,l.automatedPorts);assert.equal(h.targetHumanCounters,6-l.automatedPorts);assert.equal(h.visibleAutomatedPorts,l.automatedPorts);assert.equal(h.visibleHumanCounters,6-l.automatedPorts);
+ assert.equal(c.targetSharedSeats,l.sharedSeats);assert.equal(c.targetScreenedSeats,8-l.sharedSeats);assert.equal(c.visibleSharedSeats,l.sharedSeats);assert.equal(c.visibleScreenedSeats,8-l.sharedSeats);
  assert.equal(p.targetTreeCount,l.treeCount);assert.equal(p.visibleTreeCount,l.treeCount);assert.equal(p.targetCoolingFins,l.coolingFins);assert.equal(p.visibleCoolingFins,l.coolingFins);assert.equal(p.plantedFraction,l.plantedFraction);
  assert.equal(t.targetFunctionModules,l.functionModules);assert.equal(t.activeFunctionModules,l.functionModules);assert.equal(t.transitioning,false);
  assert.deepEqual(d.energy.target,l.energy);assert.equal(d.guestCount,v.guestCount);
@@ -19,7 +19,7 @@ function authoritative(d,v){
 }
 if(process.argv.includes('--self-test')){
  const l={automatedPorts:3,sharedSeats:4,treeCount:8,coolingFins:3,plantedFraction:.5,functionModules:5,energy:{receiver:'none',waterGardens:0,flywheel:false,island:false}};
- const d={guestCount:0,sites:{magnetEast:{automationHub:{targetAutomatedPorts:3,visibleAutomatedPorts:3,visibleHumanCounters:3}},dogenzakaSouth:{commonsPlaza:{targetSharedSeats:4,visibleSharedSeats:4,visibleScreenedSeats:4}},stationEastPark:{environmentPark:{targetTreeCount:8,visibleTreeCount:8,targetCoolingFins:3,visibleCoolingFins:3,plantedFraction:.5}},centerGaiRear:{concentrationTower:{targetFunctionModules:5,activeFunctionModules:5,transitioning:false}}},energy:{target:l.energy,parts:Array.from({length:6},()=>({visible:false,opacity:0,scaleY:1}))}};
+ const d={guestCount:0,sites:{magnetEast:{automationHub:{targetAutomatedPorts:3,targetHumanCounters:3,visibleAutomatedPorts:3,visibleHumanCounters:3}},dogenzakaSouth:{commonsPlaza:{targetSharedSeats:4,targetScreenedSeats:4,visibleSharedSeats:4,visibleScreenedSeats:4}},stationEastPark:{environmentPark:{targetTreeCount:8,visibleTreeCount:8,targetCoolingFins:3,visibleCoolingFins:3,plantedFraction:.5}},centerGaiRear:{concentrationTower:{targetFunctionModules:5,activeFunctionModules:5,transitioning:false}}},energy:{target:l.energy,parts:Array.from({length:6},()=>({visible:false,opacity:0,scaleY:1}))}};
  authoritative(d,{layout:l,guestCount:0});d.sites.magnetEast.automationHub.visibleAutomatedPorts=4;assert.throws(()=>authoritative(d,{layout:l,guestCount:0}));
  console.log('PASS: full four-site and energy assertions accept settled authority and reject stale counts.');process.exit(0);
 }
