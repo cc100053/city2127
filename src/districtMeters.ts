@@ -1071,6 +1071,7 @@ export class ConcentrationDistrict {
   private readonly forestCrowns: T.InstancedMesh;
   private readonly dockMeshes: T.InstancedMesh[];
   private readonly solarDiscs: T.InstancedMesh;
+  private readonly solarSupports: T.InstancedMesh;
   readonly bridges: { i: number; j: number; y: number }[] = [];
   private readonly bridgeMeshes: T.InstancedMesh[];
   private readonly pulses: PulseRings;
@@ -1155,8 +1156,14 @@ export class ConcentrationDistrict {
       if (j > i && Math.hypot(a.x - b.x, a.z - b.z) < 80) for (const level of [.4, .72]) this.bridges.push({ i, j, y: level * Math.min(a.h, b.h) });
     }));
     const bridge = new T.Group();
-    box(bridge, [1, 4.5, 10], [0, 0, 0], trim);
-    box(bridge, [1, 2, 10.4], [0, .8, 0], lobby);
+    // Keep the vertical street open between a deep floor, roof and side trusses.
+    box(bridge, [1, .65, 10], [0, -1.9, 0], trim);
+    box(bridge, [1, .45, 10], [0, 2, 0], trim);
+    for (const z of [-5, 5]) {
+      box(bridge, [1, 2, .15], [0, .3, z], lobby);
+      const diagonal = box(bridge, [.03, Math.hypot(.9, 3.1), .18], [0, 0, z], trim, .01);
+      diagonal.rotation.z = -Math.atan2(.9, 3.1);
+    }
     this.bridgeMeshes = this.instances(bake(bridge), this.bridges.length, 'concentration-sky-bridges');
     // Pod: two stacked rings of warm-lit glass under floating ivory discs (the upper one planted) on a slim stem, about 15 m tall and
     // 24 m across, so the scattered alternative reads at hero distance.
@@ -1169,6 +1176,12 @@ export class ConcentrationDistrict {
     piece(new T.CylinderGeometry(9, 7.5, 1.2, 32), trim, 13.7);
     piece(new T.CylinderGeometry(8, 8, .4, 28), leaf, 14.5);
     piece(new T.CylinderGeometry(11.6, 11.6, .3, 36), leaf, 9.6);
+    for (let i = 0; i < 6; i++) {
+      const a = i * Math.PI / 3;
+      const crown = new T.Mesh(leafyCrown(2), leaf);
+      crown.position.set(Math.cos(a) * 9.4, 10.5, Math.sin(a) * 9.4);
+      crown.scale.set(1.2, 1.1, 1.2); pod.add(crown);
+    }
     this.podMeshes = this.instances(bake(pod), this.pods.length, 'concentration-distributed-pods');
     // Garden ring pavilion: a low lit glass ring under an ivory roof with a planted top, around a courtyard tree (21 m across).
     const ring = new T.Group();
@@ -1176,14 +1189,14 @@ export class ConcentrationDistrict {
     arc(ring, 5.6, 10.5, .8, [0, 4.4, 0], trim);
     arc(ring, 6, 10.1, .35, [0, 5.2, 0], leaf);
     box(ring, [1, 5, 1], [0, 2.5, 0], trim);
-    const tree = new T.Mesh(new T.IcosahedronGeometry(1, 1), leaf); tree.position.y = 7.5; tree.scale.set(4.6, 3.6, 4.6); ring.add(tree);
+    const tree = new T.Mesh(leafyCrown(2), leaf); tree.position.y = 7.5; tree.scale.set(4.6, 3.6, 4.6); ring.add(tree);
     this.ringMeshes = this.instances(bake(ring), this.pods.length, 'concentration-distributed-pods');
     const extra = (geometry: T.BufferGeometry, material: T.Material, count: number, name: string) => {
       const mesh = new T.InstancedMesh(geometry, material, count);
       mesh.name = name; mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;
       mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); this.root.add(mesh); return mesh;
     };
-    this.forestCrowns = extra(leafyCrown(1), new T.MeshStandardMaterial({ color: '#ffffff', roughness: .92 }), this.towers.length * 4, 'concentration-vertical-forest');
+    this.forestCrowns = extra(leafyCrown(2), new T.MeshStandardMaterial({ color: '#ffffff', roughness: .92 }), this.towers.length * 4, 'concentration-vertical-forest');
     const green = new T.Color();
     for (let i = 0; i < this.towers.length * 4; i++) this.forestCrowns.setColorAt(i, green.setHSL(.25 + (i % 5) * .01, .42, .24 + (i % 3) * .03));
     this.dockMeshes = [
@@ -1192,6 +1205,12 @@ export class ConcentrationDistrict {
         this.towers.length, 'concentration-drone-docks'),
     ];
     this.solarDiscs = extra(new T.CylinderGeometry(11, 11, .4, 32).rotateZ(.12), solar, this.pods.length, 'concentration-solar-pods');
+    // Both pod families have an occupied roof 7.1 m below their canopy; struts meet the tilted underside.
+    this.solarSupports = extra(mergeGeometries(Array.from({ length: 3 }, (_, i) => {
+      const a = i * Math.PI * 2 / 3, x = Math.cos(a) * 8.5, z = Math.sin(a) * 8.5;
+      const h = 7.1 + Math.tan(.12) * x - .2 / Math.cos(.12);
+      return new T.CylinderGeometry(.17, .27, h, 10).translate(x, -7.1 + h / 2, z);
+    })), trim, this.pods.length, 'concentration-solar-supports');
     this.pulses = new PulseRings(this.root, METER_COLORS.urbanConcentration, (this.towers.length + this.pods.length + 1) * PULSE_WAVES);
     this.root.visible = false; parent.add(this.root); this.write();
   }
@@ -1292,6 +1311,7 @@ export class ConcentrationDistrict {
       const solarLevel = this.solarPods.value[i] * level;
       this.dummy.position.y = ring ? 12.6 : 16.2; this.dummy.scale.setScalar(Math.max(HIDDEN, solarLevel)); this.dummy.updateMatrix();
       this.solarDiscs.setMatrixAt(i, this.dummy.matrix);
+      this.solarSupports.setMatrixAt(i, this.dummy.matrix);
     });
     this.bridges.forEach(({ i, j, y }, k) => {
       // A bridge spans only once both towers stand; it grows out from the midpoint.
@@ -1303,10 +1323,11 @@ export class ConcentrationDistrict {
       this.dummy.scale.set(length * s, s, s); this.dummy.updateMatrix();
       for (const mesh of this.bridgeMeshes) mesh.setMatrixAt(k, this.dummy.matrix);
     });
-    for (const mesh of [...this.families.flat(), ...this.podMeshes, ...this.ringMeshes, ...this.bridgeMeshes, this.forestCrowns, ...this.dockMeshes, this.solarDiscs]) mesh.instanceMatrix.needsUpdate = true;
+    for (const mesh of [...this.families.flat(), ...this.podMeshes, ...this.ringMeshes, ...this.bridgeMeshes, this.forestCrowns, ...this.dockMeshes, this.solarDiscs, this.solarSupports]) mesh.instanceMatrix.needsUpdate = true;
     // Inactive pairings submit no draws.
     this.forestCrowns.visible = this.forest.visible() > 0;
     for (const mesh of this.dockMeshes) mesh.visible = this.docks.visible() > 0;
     this.solarDiscs.visible = this.solarPods.visible() > 0;
+    this.solarSupports.visible = this.solarDiscs.visible;
   }
 }

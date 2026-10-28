@@ -24,7 +24,8 @@
     "survey protocol/counts/ladder/timing"
   ],
   "dreamLoop": "Not used; local targets from ART/master taste and original screenshots.",
-  "status": "Focal r2 complete:8states,4x2perf,6A4pairs; root npm test/build/diff PASS. Resumed same owner after provider-limit recovery r16.",
+  "status": "district r2 complete matrix/perf/compare running; district r1 durable eac653f pushed; focal r3 full matrix deferred",
   "startedUTC": "2026-10-27T22:34:03.606381+00:00",
-  "verificationOrder": "Author focal r3 final pose after r2, then district and ring. Defer focal r3 complete matrix/perf until all C geometry is final, so its last evidence includes cumulative district changes; no r4 or extra art iteration."
+  "verificationOrder": "Author focal r3 final pose after r2, then district and ring. Defer focal r3 complete matrix/perf until all C geometry is final, so its last evidence includes cumulative district changes; no r4 or extra art iteration.",
+  "districtR2VisualFinding": "Oblique r2 passes A1/A2 but original low/day view focuses on NE shoreline/park and clips Fuji at top; V1 location clarity still fails. R3 will aim central/SE from a farther SW pose, preserve full carrier measurement and accept honest remaining failures."
 }

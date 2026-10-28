@@ -30,13 +30,13 @@ async function submit(axis='functions-2127'){
 async function live(id){
  const before=await data(),started=Date.now();await submit(id==='energy:ring'?'energy-only':'functions-2127');const samples=[];
  while(Date.now()-started<8300){const d=await data();if(samples.at(-1)?.time!==d.time)samples.push({elapsedMs:Date.now()-started,...d});await page.waitForTimeout(100);}
- await at(SHOTS[id].position);const place=await page.locator('.resident-place').textContent();assert.match(place,/フジテレビ東|フジテレビ前・蓄電環|フジテレビ周辺・街なか/);
+ await at(SHOTS[id].position);const place=await page.locator('.resident-place').textContent();assert.match(place,/フジテレビ東|フジテレビ前・蓄電環|街に点在する建物/);
  await page.screenshot({path:`${out}/${id.replace(':','-')}.jpg`,type:'jpeg',quality:90});checks.push({check:'live hold',id,before,samples,place,pose:await pose(),pass:true});return samples;
 }
 async function undo(){const a=await api('/api/admin/current-run'),v=await api('/api/city-view');await api('/api/admin/lifecycle',{command:'undo-proposal',expectedRevision:a.lifecycle.revision,proposalId:v.latestProposal.id});await page.waitForTimeout(250);await at(HERO_POSITION);checks.push({check:'Undo immediately restores hero',pass:true});}
 try{
  await open();const tower=await live('se:focal');
- assert.ok(tower.some(s=>s.tower.transitioning),'live tower exposes intermediate easing');
+ assert.ok(tower.some(s=>s.tower.transitioning&&s.tower.activeFunctionModules>s.tower.targetFunctionModules),'live tower exposes complementary intermediate modules');
  checks.push({check:'live tower shows intermediate easing',pass:true});
  const settled=await data();await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.querySelector('canvas')?.dataset.fps);await at(HERO_POSITION);assert.deepEqual((await data()).tower,settled.tower);assert.deepEqual((await data()).district,settled.district);checks.push({check:'reload snapshot immediately restores settled tower, district and hero',pass:true});
  const district=await live('se:district');const end=district.at(-1).district;assert.ok(district.some(s=>s.district.visibleTowers+s.district.visiblePods>end.visibleTowers+end.visiblePods),'district exposes complementary intermediate geometry');checks.push({check:'district shows intermediate easing',pass:true});await undo();

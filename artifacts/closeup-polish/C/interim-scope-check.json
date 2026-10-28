@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "baseline": "ca22a92769e596b3c168ae0579aadef4b5420d9d",
+  "checks": [
+    "All non-C SHOTS and HeadlineCamera logic unchanged",
+    "All non-ConcentrationDistrict carriers and C slot positions unchanged",
+    "ConcentrationTower target controller unchanged",
+    "Energy source unchanged at district r2 stage"
+  ],
+  "note": "Refresh at final C source after ring polish."
+}

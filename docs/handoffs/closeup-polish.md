@@ -243,3 +243,5 @@ Worker `01a17f7d-839f-74d0-8660-22e9c1ec1435`在指定clone接手；HEAD ca22a92
 C r2：完整8狀態／16原圖、4組雙窗口效能與6比較完成，A4 3/6；root npm test/build/diff PASS，只有既有JSON import及chunk-size warnings。Provider-limit recovery r16以同owner／dirty source恢復，fresh fetch upstream0/0；r2證據未覆寫。Low以<10 local units的服務廊取代空高桿、mixed中央void、高塔轉接肋，權威counts及footprint不變；r3 pose／最終驗證仍待做。
 
 C district r1：完整18狀態（10普通tier、2hero、6配對）／36原圖，4組雙flag效能、16像素比較保存；A1/A2全部16主體狀態PASS、A3全部FAIL、A4 0/16。完整carrier已避開near plane，box仍超出viewport；原圖偏俯視，不作美術接受。Focal r3 pose及低層升降核心已authored且target tests PASS，最終matrix按C累積source策略延後。
+
+C district r2：18狀態／36原圖、4組雙窗口效能、16比較完成；A4 0/16、low-solar A2因卡區重疊6.2%FAIL，其餘普通tier A1/A2通過而A3仍FAIL。連廊改為有地板／頂蓋／側框的可通行空間，solar canopy支架落在既有pod-family屋面內，綠冠沿用leafyCrown、權威counts/slot/footprint不變。Central-passage ray及屋面落點測試PASS，root test/build/diff PASS；完整能源清場324 cases PASS。R2圖仍偏岸邊，r3只重新對準central/SE，保留full carrier量度與未過gates。

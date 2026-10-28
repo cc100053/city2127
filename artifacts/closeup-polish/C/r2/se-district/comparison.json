@@ -1,0 +1,272 @@
+{
+  "mode": "compare",
+  "commit": "eac653f9f033df8c1473587fc73cb6fbf386372e",
+  "sourceDiff": "diff --git a/src/districtMeters.ts b/src/districtMeters.ts\nindex 61bbceb..c7fcd12 100644\n--- a/src/districtMeters.ts\n+++ b/src/districtMeters.ts\n@@ -1071,6 +1071,7 @@ export class ConcentrationDistrict {\n   private readonly forestCrowns: T.InstancedMesh;\n   private readonly dockMeshes: T.InstancedMesh[];\n   private readonly solarDiscs: T.InstancedMesh;\n+  private readonly solarSupports: T.InstancedMesh;\n   readonly bridges: { i: number; j: number; y: number }[] = [];\n   private readonly bridgeMeshes: T.InstancedMesh[];\n   private readonly pulses: PulseRings;\n@@ -1155,8 +1156,14 @@ export class ConcentrationDistrict {\n       if (j > i && Math.hypot(a.x - b.x, a.z - b.z) < 80) for (const level of [.4, .72]) this.bridges.push({ i, j, y: level * Math.min(a.h, b.h) });\n     }));\n     const bridge = new T.Group();\n-    box(bridge, [1, 4.5, 10], [0, 0, 0], trim);\n-    box(bridge, [1, 2, 10.4], [0, .8, 0], lobby);\n+    // Keep the vertical street open between a deep floor, roof and side trusses.\n+    box(bridge, [1, .65, 10], [0, -1.9, 0], trim);\n+    box(bridge, [1, .45, 10], [0, 2, 0], trim);\n+    for (const z of [-5, 5]) {\n+      box(bridge, [1, 2, .15], [0, .3, z], lobby);\n+      const diagonal = box(bridge, [.03, Math.hypot(.9, 3.1), .18], [0, 0, z], trim, .01);\n+      diagonal.rotation.z = -Math.atan2(.9, 3.1);\n+    }\n     this.bridgeMeshes = this.instances(bake(bridge), this.bridges.length, 'concentration-sky-bridges');\n     // Pod: two stacked rings of warm-lit glass under floating ivory discs (the upper one planted) on a slim stem, about 15 m tall and\n     // 24 m across, so the scattered alternative reads at hero distance.\n@@ -1169,6 +1176,12 @@ export class ConcentrationDistrict {\n     piece(new T.CylinderGeometry(9, 7.5, 1.2, 32), trim, 13.7);\n     piece(new T.CylinderGeometry(8, 8, .4, 28), leaf, 14.5);\n     piece(new T.CylinderGeometry(11.6, 11.6, .3, 36), leaf, 9.6);\n+    for (let i = 0; i < 6; i++) {\n+      const a = i * Math.PI / 3;\n+      const crown = new T.Mesh(leafyCrown(2), leaf);\n+      crown.position.set(Math.cos(a) * 9.4, 10.5, Math.sin(a) * 9.4);\n+      crown.scale.set(1.2, 1.1, 1.2); pod.add(crown);\n+    }\n     this.podMeshes = this.instances(bake(pod), this.pods.length, 'concentration-distributed-pods');\n     // Garden ring pavilion: a low lit glass ring under an ivory roof with a planted top, around a courtyard tree (21 m across).\n     const ring = new T.Group();\n@@ -1176,14 +1189,14 @@ export class ConcentrationDistrict {\n     arc(ring, 5.6, 10.5, .8, [0, 4.4, 0], trim);\n     arc(ring, 6, 10.1, .35, [0, 5.2, 0], leaf);\n     box(ring, [1, 5, 1], [0, 2.5, 0], trim);\n-    const tree = new T.Mesh(new T.IcosahedronGeometry(1, 1), leaf); tree.position.y = 7.5; tree.scale.set(4.6, 3.6, 4.6); ring.add(tree);\n+    const tree = new T.Mesh(leafyCrown(2), leaf); tree.position.y = 7.5; tree.scale.set(4.6, 3.6, 4.6); ring.add(tree);\n     this.ringMeshes = this.instances(bake(ring), this.pods.length, 'concentration-distributed-pods');\n     const extra = (geometry: T.BufferGeometry, material: T.Material, count: number, name: string) => {\n       const mesh = new T.InstancedMesh(geometry, material, count);\n       mesh.name = name; mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;\n       mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); this.root.add(mesh); return mesh;\n     };\n-    this.forestCrowns = extra(leafyCrown(1), new T.MeshStandardMaterial({ color: '#ffffff', roughness: .92 }), this.towers.length * 4, 'concentration-vertical-forest');\n+    this.forestCrowns = extra(leafyCrown(2), new T.MeshStandardMaterial({ color: '#ffffff', roughness: .92 }), this.towers.length * 4, 'concentration-vertical-forest');\n     const green = new T.Color();\n     for (let i = 0; i < this.towers.length * 4; i++) this.forestCrowns.setColorAt(i, green.setHSL(.25 + (i % 5) * .01, .42, .24 + (i % 3) * .03));\n     this.dockMeshes = [\n@@ -1192,6 +1205,12 @@ export class ConcentrationDistrict {\n         this.towers.length, 'concentration-drone-docks'),\n     ];\n     this.solarDiscs = extra(new T.CylinderGeometry(11, 11, .4, 32).rotateZ(.12), solar, this.pods.length, 'concentration-solar-pods');\n+    // Both pod families have an occupied roof 7.1 m below their canopy; struts meet the tilted underside.\n+    this.solarSupports = extra(mergeGeometries(Array.from({ length: 3 }, (_, i) => {\n+      const a = i * Math.PI * 2 / 3, x = Math.cos(a) * 8.5, z = Math.sin(a) * 8.5;\n+      const h = 7.1 + Math.tan(.12) * x - .2 / Math.cos(.12);\n+      return new T.CylinderGeometry(.17, .27, h, 10).translate(x, -7.1 + h / 2, z);\n+    })), trim, this.pods.length, 'concentration-solar-supports');\n     this.pulses = new PulseRings(this.root, METER_COLORS.urbanConcentration, (this.towers.length + this.pods.length + 1) * PULSE_WAVES);\n     this.root.visible = false; parent.add(this.root); this.write();\n   }\n@@ -1292,6 +1311,7 @@ export class ConcentrationDistrict {\n       const solarLevel = this.solarPods.value[i] * level;\n       this.dummy.position.y = ring ? 12.6 : 16.2; this.dummy.scale.setScalar(Math.max(HIDDEN, solarLevel)); this.dummy.updateMatrix();\n       this.solarDiscs.setMatrixAt(i, this.dummy.matrix);\n+      this.solarSupports.setMatrixAt(i, this.dummy.matrix);\n     });\n     this.bridges.forEach(({ i, j, y }, k) => {\n       // A bridge spans only once both towers stand; it grows out from the midpoint.\n@@ -1303,10 +1323,11 @@ export class ConcentrationDistrict {\n       this.dummy.scale.set(length * s, s, s); this.dummy.updateMatrix();\n       for (const mesh of this.bridgeMeshes) mesh.setMatrixAt(k, this.dummy.matrix);\n     });\n-    for (const mesh of [...this.families.flat(), ...this.podMeshes, ...this.ringMeshes, ...this.bridgeMeshes, this.forestCrowns, ...this.dockMeshes, this.solarDiscs]) mesh.instanceMatrix.needsUpdate = true;\n+    for (const mesh of [...this.families.flat(), ...this.podMeshes, ...this.ringMeshes, ...this.bridgeMeshes, this.forestCrowns, ...this.dockMeshes, this.solarDiscs, this.solarSupports]) mesh.instanceMatrix.needsUpdate = true;\n     // Inactive pairings submit no draws.\n     this.forestCrowns.visible = this.forest.visible() > 0;\n     for (const mesh of this.dockMeshes) mesh.visible = this.docks.visible() > 0;\n     this.solarDiscs.visible = this.solarPods.visible() > 0;\n+    this.solarSupports.visible = this.solarDiscs.visible;\n   }\n }\ndiff --git a/src/headlineCamera.ts b/src/headlineCamera.ts\nindex 44b5ded..2e85d2d 100644\n--- a/src/headlineCamera.ts\n+++ b/src/headlineCamera.ts\n@@ -16,7 +16,7 @@ export const SHOTS: Record<ShotId, Pose> = {\n   'nw:district': { position: [-180, 180, -470], target: [10, 28, -210] },\n   'ne:district': { position: [-390, 270, -310], target: [-250, 0, -170] },\n   'sw:district': { position: [-160, 420, -400], target: [-120, 5, -260] },\n-  'se:district': { position: [-160, 440, -260], target: [-60, 20, -140] },\n+  'se:district': { position: [-250, 320, -420], target: [-100, 20, -180] },\n   'energy:garden': { position: [-420, 65, -210], target: [-304, 12, -135] },\n   'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },\n   'energy:ring': { position: [-118, 148, -138], target: [-18, 96, -24] },\ndiff --git a/tests/districtMeters.test.ts b/tests/districtMeters.test.ts\nindex aa5c53f..544aaba 100644\n--- a/tests/districtMeters.test.ts\n+++ b/tests/districtMeters.test.ts\n@@ -248,6 +248,14 @@ concentration.update(2.5);\n const towerMesh = concentration.root.getObjectByName('concentration-vertical-towers') as T.InstancedMesh;\n // P7: three silhouette families (twisted / terraced / twin) split the slots; their batches hold exactly the ten towers.\n const towerBatches = concentration.root.children.filter(o => o.name === 'concentration-vertical-towers') as T.InstancedMesh[];\n+const passage = new T.Raycaster(new T.Vector3(-1, 0, 0), new T.Vector3(1, 0, 0), 0, 2);\n+for (const object of concentration.root.children.filter(o => o.name === 'concentration-sky-bridges') as T.InstancedMesh[]) {\n+  assert.equal(passage.intersectObject(new T.Mesh(object.geometry, object.material)).length, 0, 'sky-bridge central passage stays open');\n+}\n+const solarSupports = concentration.root.getObjectByName('concentration-solar-supports') as T.InstancedMesh;\n+solarSupports.geometry.computeBoundingBox();\n+assert.ok(Math.abs(solarSupports.geometry.boundingBox!.min.y + 7.1) < 1e-5, 'solar struts land on the existing pod-family roof');\n+assert.equal(solarSupports.count, concentration.pods.length, 'one preallocated solar support frame per pod');\n assert.deepEqual([...new Set(towerBatches.map(m => m.count))].sort(), [3, 4], 'towers split into three families of 4 / 3 / 3');\n const rising = new T.Vector3();\n towerMesh.getMatrixAt(0, matrix); rising.setFromMatrixScale(matrix);\n",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.021885705388122328,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.015502512128822723,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.014114027954288712,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.016320616350964254,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.04664608864379085,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "-8",
+      "to": "low-solar",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.026130723997417896,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "8",
+      "to": "high-forest",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.021409770132332768,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 12,
+      "from": "8",
+      "to": "high-docks",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.03576274535019769,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "-5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.02003806269164044,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "-5",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.01666205657931897,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "0",
+      "to": "5",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.012074944020818204,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "5",
+      "to": "8",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.017942036330993304,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "8",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.03970814421447592,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "-8",
+      "to": "low-solar",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.02357422473876382,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "8",
+      "to": "high-forest",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.02187175093802953,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    },
+    {
+      "id": "se:district",
+      "hour": 22,
+      "from": "8",
+      "to": "high-docks",
+      "kind": "pairing",
+      "threshold": 0.06,
+      "mad": 0.045901573721052205,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}

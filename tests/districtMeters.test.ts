@@ -248,6 +248,14 @@ concentration.update(2.5);
 const towerMesh = concentration.root.getObjectByName('concentration-vertical-towers') as T.InstancedMesh;
 // P7: three silhouette families (twisted / terraced / twin) split the slots; their batches hold exactly the ten towers.
 const towerBatches = concentration.root.children.filter(o => o.name === 'concentration-vertical-towers') as T.InstancedMesh[];
+const passage = new T.Raycaster(new T.Vector3(-1, 0, 0), new T.Vector3(1, 0, 0), 0, 2);
+for (const object of concentration.root.children.filter(o => o.name === 'concentration-sky-bridges') as T.InstancedMesh[]) {
+  assert.equal(passage.intersectObject(new T.Mesh(object.geometry, object.material)).length, 0, 'sky-bridge central passage stays open');
+}
+const solarSupports = concentration.root.getObjectByName('concentration-solar-supports') as T.InstancedMesh;
+solarSupports.geometry.computeBoundingBox();
+assert.ok(Math.abs(solarSupports.geometry.boundingBox!.min.y + 7.1) < 1e-5, 'solar struts land on the existing pod-family roof');
+assert.equal(solarSupports.count, concentration.pods.length, 'one preallocated solar support frame per pod');
 assert.deepEqual([...new Set(towerBatches.map(m => m.count))].sort(), [3, 4], 'towers split into three families of 4 / 3 / 3');
 const rising = new T.Vector3();
 towerMesh.getMatrixAt(0, matrix); rising.setFromMatrixScale(matrix);

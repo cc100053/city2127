@@ -1,0 +1,13 @@
+PASS: environment district — 17 promenade bays, sails/pergolas/mist towers, roof sails/forest, facade shares, late roofs, legacy hide.
+PASS: automation district — 11 staffed pavilions ↔ drone ports, aircraft/pods/walker mapping, same targets, live retarget, reset and legacy hide.
+PASS: actual P2 actor matrices match low/mixed/high independently of day mood; original standalone/legacy poses restored.
+PASS: sharing — 6 water gardens, actual screen matrices, mixed, same target, interruption, snapshot and legacy hide.
+PASS: concentration district — 10 towers in 3 silhouette families / 6 sky bridges vs 26 pods, rise, same target, mixed hybrid, invertible hidden matrices, legacy hide.
+PASS: P8 design families — every carrier mixes ≥ 2 families per band; each slot draws only its own design.
+PASS: P9 hybrids — none at low / high, 6 / 8 / 2 / 12 (automation / sharing / mid-rise / environment) at mixed; hybrid bay composes both designs.
+PASS: P5 pulses — live changes only, two waves, fade, no pulse on snapshot / unchanged target, cleared on legacy hide, GTAO-excluded.
+PASS: P12 current-slot crowds, live/snapshot/legacy, moving service drones, four night rhythms and civic material isolation.
+PASS: P3 carrier evidence covers uniform seed no-op, same-score redistribution, animation-independent targets and hidden pairings.
+PASS: ladder rungs — focal-only rung 1, drone ports 8,10,11 at rungs 0/2/3 nested, fleets at rung 3, quiet live changes.
+PASS: 13 headline shots, card location priority, timing, interruption, catch-up and immediate cancel.
+PASS: no-headline interruptions preserve the first frame in hold/fly-out and return without another fly-in.
