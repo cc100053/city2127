@@ -872,9 +872,12 @@
         ]
       },
       "islandR2": "Original S0 camera with target y23 plus two seated edge lights; fixed whole group and bridge bounds. Complete final root checks precede browser."
+    },
+    {
+      "islandAimBeforeR2": "46b7b1f full root/build/scope PASS saved as final-checks/aim-y23-* logs. Before any r2 browser capture, choose smaller S0 horizontal aim x-60\u2192-70, y4 unchanged, rather than upwardy23: full-group projection A2 overlap3.3429%, preserves original downward framing. Re-run required root checks on this exact source before capture. Failed x-45 prediction11.3879% and prior y95/y23 options remain in prediction JSON; no offline A3 or performance claims."
     }
   ],
-  "nextExpected": "Target/scope checks, commit runtime, full root suite/build/diff; then island r2 full matrix and real current-v4 live.",
+  "nextExpected": "Run final root tests/build on new committed island aim; then island r2 matrix/performance and current-v4 live.",
   "plannedPoses": {
     "nw:district": {
       "position": [

@@ -1,0 +1,3 @@
+Energy E3: five configurations, 49 batches, rotor shell gap 30.50 m; 21595 hulls, public / room paths, air / water berths and hero sightlines clear.
+PASS: 13 headline shots, card location priority, timing, interruption, catch-up and immediate cancel.
+PASS: no-headline interruptions preserve the first frame in hold/fly-out and return without another fly-in.
