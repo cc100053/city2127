@@ -218,6 +218,8 @@ ConcentrationTower將low空高服務桿改成有支承的低層服務廊／升�
 Focal／district各三輪，ring兩輪後停止；94狀態／188靜態原圖，34張final及3張live逐張檢視。[逐圖比較及量度](../artifacts/closeup-polish/C/REVIEW.md)：focal low A1、district A2、全部適用A3仍FAIL；A4只有4/28，A5 18 FAIL／10 PASS／6配對UNVERIFIED，V3全部FAIL，dock載荷路徑等V6缺口保留。Root test/build/diff、324能源清場cases及11項scratch live PASS；這是功能與有界實驗完成，未接受美術，沒有merge main。A/B pending及FAIL保持；全城Z、實機／其他平台仍待做，完整版本與累積A/B/C效能限制見report及[交接](handoffs/closeup-polish.md)。
 
 
-### Closeup sector D — 2026-10-28（進行中，未接受）
+### Closeup sector D — 2026-10-28（REVIEW_READY，art未接受）
 
-NW hub在原六個服務槽後方加入凹入服務面、既有玻璃帶的細分窗框，以及獨立於GLB fallback／replacement的六段窄操作層線；同用Kit材質／bake，不改counter數量、controller、資產cache或原footprint。`SHOTS`只調NW focal數值，hero／FOV42／timeline維持。Focal r1/r2完整原圖與量度已push `7c05b4a`／`eebff28`，r3正面構圖仍在量度；[D進度](../artifacts/closeup-polish/D/README.md)。AutomationDistrict另在原有人服務露台內加有支承欄邊，在原停機盤加四個接點；沿用既有instanced材質batch、bay選位／footprint／target與motion。此runtime root test/build/diff已通過，324能源清場cases／177867 exactchecks通過；district r2完整圖正在量度。全D、live及final checks未完成，A/B/C pending與FAIL不變。
+Runtime `44521a0`：NW hub六槽後方增加服務面、窗框及上層稀疏操作接點，保留controller、原GLB及cache；AutomationDistrict只在原露台／停機盤加支承欄邊／接點及降低局部陶瓷emission。第二水庭在clone後獨立rebatch既有西庭邊燈，接收翼用局部solar clone減反光並把操作邊嵌入板框，島甲板增加貼地操作邊；能源保持49 batches。第一水庭／C環／distribution、權威target／counts／slots／footprint及3秒／60秒節拍皆保持。NW兩鏡、第二庭及島只調SHOTS數值，wing最後恢復S0 pose；hero/FOV42/timeline無改。
+
+NW／wing各三輪、garden2／island各兩輪後停止；[50狀態S0／final及逐項理由](../artifacts/closeup-polish/D/REVIEW.md)、[檢查](../artifacts/closeup-polish/D/checks.json)。Root及真實scratch live23項PASS，A3/A4/A5與綠化／身份／接合視覺缺口照報，未接受D美術，A/B/C pending保留。每shot final對應其當時source snapshot，後續shot可改背景；全當前累積矩陣由Z驗證。無新依賴、GLB、protocol、部署或main merge。

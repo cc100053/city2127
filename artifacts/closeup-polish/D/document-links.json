@@ -1,6 +1,15 @@
 {
   "status": "PASS",
-  "checkedLocalLinks": 453,
+  "checkedLocalLinks": 673,
   "missing": [],
-  "note": "Existing targets and current D links; new links contain no anchors."
+  "files": [
+    "docs/PROJECT.md",
+    "docs/EXHIBITION_SPEC.md",
+    "docs/VALIDATION.md",
+    "docs/handoffs/README.md",
+    "docs/handoffs/closeup-polish.md",
+    "artifacts/closeup-polish/D/README.md",
+    "artifacts/closeup-polish/D/REVIEW.md"
+  ],
+  "note": "Filesystem link targets checked, fenced code excluded; no new fragment links."
 }

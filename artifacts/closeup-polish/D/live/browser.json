@@ -1,0 +1,753 @@
+{
+  "complete": false,
+  "browser": "156.0.8078.73",
+  "apiOrigin": "http://127.0.0.1:52149",
+  "apiOrigins": [
+    "http://127.0.0.1:52149"
+  ],
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "checks": [
+    {
+      "check": "live hold",
+      "id": "nw:focal",
+      "before": {
+        "time": 20.25,
+        "fps": 5.9,
+        "hub": {
+          "band": "mixed",
+          "targetAutomatedPorts": 3,
+          "visibleAutomatedPorts": 3,
+          "targetHumanCounters": 3,
+          "visibleHumanCounters": 3
+        },
+        "district": {
+          "enabled": true,
+          "serviceDrones": 11,
+          "nightRhythm": 1,
+          "targetAutomation": 0.5,
+          "automation": 0.5,
+          "activePulses": 0,
+          "pavilions": 11,
+          "visibleStaffedPavilions": 3,
+          "visibleDronePorts": 8,
+          "hybridBays": 6,
+          "loopAircraft": 16,
+          "guidewayPods": 18,
+          "walkers": 260
+        },
+        "energy": {
+          "target": {
+            "waterGardens": 0,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "rotorAngle": 1.02,
+          "parts": [
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 0.72,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            }
+          ]
+        }
+      },
+      "samples": [
+        {
+          "elapsedMs": 29,
+          "time": 20.25,
+          "fps": 5.9,
+          "hub": {
+            "band": "mixed",
+            "targetAutomatedPorts": 3,
+            "visibleAutomatedPorts": 3,
+            "targetHumanCounters": 3,
+            "visibleHumanCounters": 3
+          },
+          "district": {
+            "enabled": true,
+            "serviceDrones": 11,
+            "nightRhythm": 1,
+            "targetAutomation": 0.5,
+            "automation": 0.5,
+            "activePulses": 0,
+            "pavilions": 11,
+            "visibleStaffedPavilions": 3,
+            "visibleDronePorts": 8,
+            "hybridBays": 6,
+            "loopAircraft": 16,
+            "guidewayPods": 18,
+            "walkers": 260
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.02,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 2034,
+          "time": 22.25,
+          "fps": 60.1,
+          "hub": {
+            "band": "high",
+            "targetAutomatedPorts": 6,
+            "visibleAutomatedPorts": 3,
+            "targetHumanCounters": 0,
+            "visibleHumanCounters": 3
+          },
+          "district": {
+            "enabled": true,
+            "serviceDrones": 11,
+            "nightRhythm": 1,
+            "targetAutomation": 0.5,
+            "automation": 0.5,
+            "activePulses": 0,
+            "pavilions": 11,
+            "visibleStaffedPavilions": 3,
+            "visibleDronePorts": 8,
+            "hybridBays": 6,
+            "loopAircraft": 16,
+            "guidewayPods": 18,
+            "walkers": 260
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.17996,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 4028,
+          "time": 24.25,
+          "fps": 60,
+          "hub": {
+            "band": "high",
+            "targetAutomatedPorts": 6,
+            "visibleAutomatedPorts": 6,
+            "targetHumanCounters": 0,
+            "visibleHumanCounters": 3
+          },
+          "district": {
+            "enabled": true,
+            "serviceDrones": 11,
+            "nightRhythm": 1,
+            "targetAutomation": 0.5,
+            "automation": 0.5,
+            "activePulses": 0,
+            "pavilions": 11,
+            "visibleStaffedPavilions": 3,
+            "visibleDronePorts": 8,
+            "hybridBays": 6,
+            "loopAircraft": 16,
+            "guidewayPods": 18,
+            "walkers": 260
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.3399840000009533,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 6026,
+          "time": 26.25,
+          "fps": 60.1,
+          "hub": {
+            "band": "high",
+            "targetAutomatedPorts": 6,
+            "visibleAutomatedPorts": 6,
+            "targetHumanCounters": 0,
+            "visibleHumanCounters": 0
+          },
+          "district": {
+            "enabled": true,
+            "serviceDrones": 11,
+            "nightRhythm": 1,
+            "targetAutomation": 0.5,
+            "automation": 0.5,
+            "activePulses": 0,
+            "pavilions": 11,
+            "visibleStaffedPavilions": 3,
+            "visibleDronePorts": 8,
+            "hybridBays": 6,
+            "loopAircraft": 16,
+            "guidewayPods": 18,
+            "walkers": 260
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.4999599999999997,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        }
+      ],
+      "place": "街の画面：デックス西",
+      "pose": {
+        "position": [
+          40,
+          130,
+          -508
+        ],
+        "target": [
+          40,
+          43,
+          -300
+        ]
+      },
+      "pass": true
+    },
+    {
+      "check": "six service slots show intermediate easing",
+      "pass": true
+    },
+    {
+      "check": "reload snapshot immediately restores settled hub, district and hero",
+      "pass": true
+    },
+    {
+      "check": "live hold",
+      "id": "nw:district",
+      "before": {
+        "time": 20.9,
+        "fps": 5.7,
+        "hub": {
+          "band": "high",
+          "targetAutomatedPorts": 6,
+          "visibleAutomatedPorts": 6,
+          "targetHumanCounters": 0,
+          "visibleHumanCounters": 0
+        },
+        "district": {
+          "enabled": true,
+          "serviceDrones": 11,
+          "nightRhythm": 1,
+          "targetAutomation": 0.5,
+          "automation": 0.5,
+          "activePulses": 0,
+          "pavilions": 11,
+          "visibleStaffedPavilions": 3,
+          "visibleDronePorts": 8,
+          "hybridBays": 6,
+          "loopAircraft": 16,
+          "guidewayPods": 18,
+          "walkers": 260
+        },
+        "energy": {
+          "target": {
+            "waterGardens": 0,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "rotorAngle": 1.072312000002861,
+          "parts": [
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 0.72,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            }
+          ]
+        }
+      },
+      "samples": [
+        {
+          "elapsedMs": 12,
+          "time": 20.9,
+          "fps": 5.7,
+          "hub": {
+            "band": "high",
+            "targetAutomatedPorts": 6,
+            "visibleAutomatedPorts": 6,
+            "targetHumanCounters": 0,
+            "visibleHumanCounters": 0
+          },
+          "district": {
+            "enabled": true,
+            "serviceDrones": 11,
+            "nightRhythm": 1,
+            "targetAutomation": 0.5,
+            "automation": 0.5,
+            "activePulses": 0,
+            "pavilions": 11,
+            "visibleStaffedPavilions": 3,
+            "visibleDronePorts": 8,
+            "hybridBays": 6,
+            "loopAircraft": 16,
+            "guidewayPods": 18,
+            "walkers": 260
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.072312000002861,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 2007,
+          "time": 22.9,
+          "fps": 60,
+          "hub": {
+            "band": "high",
+            "targetAutomatedPorts": 6,
+            "visibleAutomatedPorts": 6,
+            "targetHumanCounters": 0,
+            "visibleHumanCounters": 0
+          },
+          "district": {
+            "enabled": true,
+            "serviceDrones": 11,
+            "nightRhythm": 1,
+            "targetAutomation": 0.5,
+            "automation": 0.5,
+            "activePulses": 0,
+            "pavilions": 11,
+            "visibleStaffedPavilions": 3,
+            "visibleDronePorts": 8,
+            "hybridBays": 6,
+            "loopAircraft": 16,
+            "guidewayPods": 18,
+            "walkers": 260
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 1,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.2322720000028609,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 4108,
+          "time": 24.92,
+          "fps": 59.5,
+          "hub": {
+            "band": "high",
+            "targetAutomatedPorts": 6,
+            "visibleAutomatedPorts": 6,
+            "targetHumanCounters": 0,
+            "visibleHumanCounters": 0
+          },
+          "district": {
+            "enabled": true,
+            "serviceDrones": 11,
+            "nightRhythm": 1,
+            "targetAutomation": 0.5,
+            "automation": 0.5,
+            "activePulses": 18,
+            "pavilions": 11,
+            "visibleStaffedPavilions": 4,
+            "visibleDronePorts": 11,
+            "hybridBays": 8,
+            "loopAircraft": 16,
+            "guidewayPods": 18,
+            "walkers": 260
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 1,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.3936320000028604,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 0.4400286410731804
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 0.4400286410731804
+              }
+            ]
+          }
+        },
+        {
+          "elapsedMs": 6086,
+          "time": 26.92,
+          "fps": 60,
+          "hub": {
+            "band": "high",
+            "targetAutomatedPorts": 6,
+            "visibleAutomatedPorts": 6,
+            "targetHumanCounters": 0,
+            "visibleHumanCounters": 0
+          },
+          "district": {
+            "enabled": true,
+            "serviceDrones": 11,
+            "nightRhythm": 1,
+            "targetAutomation": 0.5,
+            "automation": 0.5,
+            "activePulses": 9,
+            "pavilions": 11,
+            "visibleStaffedPavilions": 1,
+            "visibleDronePorts": 10,
+            "hybridBays": 5,
+            "loopAircraft": 16,
+            "guidewayPods": 18,
+            "walkers": 260
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 1,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.5536159999990469,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": true,
+                "scaleY": 1,
+                "opacity": 1
+              }
+            ]
+          }
+        }
+      ],
+      "place": "街の画面：水辺のサービス拠点・移動ルート",
+      "pose": {
+        "position": [
+          -390,
+          300,
+          -330
+        ],
+        "target": [
+          -200,
+          0,
+          -80
+        ]
+      },
+      "pass": true
+    },
+    {
+      "check": "district shows intermediate easing",
+      "pass": true
+    },
+    {
+      "check": "Undo immediately restores hero",
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "timing": "Wait for the actual authored hold plus2.5s (queued submissions may wait behind earlier slots). Browser diagnostics refresh each120 frames (~2s); intermediate states prove easing. Exact3s duration/retarget remains covered by root tests; no3.000s browser precision claim.",
+  "fixtures": "Real current v4 service, water, receiver and island proposals; isolated scratch SQLite."
+}

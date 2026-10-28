@@ -1,0 +1,14 @@
+{
+  "method": "All seven live originals individually inspected at original detail, including two from the failed fixture attempt.",
+  "images": [
+    "live/nw-focal.jpg",
+    "live/nw-district.jpg",
+    "live-retry1/nw-focal.jpg",
+    "live-retry1/nw-district.jpg",
+    "live-retry1/energy-garden2.jpg",
+    "live-retry1/energy-wing.jpg",
+    "live-retry1/energy-island.jpg"
+  ],
+  "finding": "Five final live holds match authored poses and Japanese place cards; intermediate geometry/fade and exact restoration are checked in browser.json. Earlier art V1/V3/V6 concerns remain; live A7 PASS does not accept art. Single frames do not certify full temporal flicker absence.",
+  "result": "live-retry1 complete,23 PASS,errors0; failed first Undo-wait assertion preserved."
+}

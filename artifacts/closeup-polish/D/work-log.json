@@ -37,8 +37,17 @@
     "NWpairings": "AutomationDistrict only reads tiers.nw; cross-product dock is on existing SE carrier at se:8 with nw\u00b18, separately marked 4 extra rows, no same-state S0 baseline."
   },
   "services": {
-    "viteSession": 18787,
-    "port": 5194
+    "vite": "closed",
+    "portsBindFree": [
+      5194,
+      52149,
+      52371,
+      52592,
+      52689,
+      52760
+    ],
+    "runners": "closed",
+    "scratch": "removed"
   },
   "steps": [
     "focal r1 pose-only authored",
@@ -1022,9 +1031,19 @@
       },
       "stopAt2": "Local operating-edge and original-camera aim repair complete; full bridge/group retained, c/mixed same body, A3/A4 gaps remain. No unchanged rerun to replace a failed gate.",
       "live": "First real current-v4 fixture run started only after all performance phases closed."
+    },
+    {
+      "liveAttempt1": "FAIL after6 passed checks at Undo counts comparison; camera immediately hero, dataset still showed pre-Undo counts and9 pulses. targetAutomation .5 was identical before/after so original wait returned early. Source main.ts confirms120-frame caching; cityChangeManager snapshot immediate unchanged. Preserved failed fixture source in c63f2f2, log/browser/2images hashes in live-failed-originals.json; scratch52149 bind-free after approved verification retry (sandbox initial EPERM was not an occupied-port result).",
+      "liveRetry1": "Fresh live-retry1 directory, only fixture wait corrected to restored staffed/drone/hybrid/pulse fields, full equality retained. Runtime/source hashes unchanged."
+    },
+    {
+      "finalVerification": "Runtime44521a0 root test/build/diff/scope PASS; all13rounds134states268static,50final/7live originals reviewed; live-retry1 complete23PASS/errors0; failed-first diagnostics-wait attempt preserved/hash checked.",
+      "finalReport": "A1 34PASS/16NA; A2 24PASS/10FAIL/16NA; A3 34FAIL/16NA; A4 4of40; A5 36PASS/10FAIL/4UNVERIFIED; A6 50PASS; repro21PASS/29FAIL; V1 22FAIL,V3 50FAIL,V5 4FAIL,V6 8FAIL. Art NOT recommended.",
+      "preservationAndCleanup": "682 S0/A/B/C originals revalidated,268 tracked D originals unchanged,cumulative D275 hashes. Vite2325SIGINT,5194 and5scratch ports bind-free; runners/browsers/SQLite closed.",
+      "documentation": "PROJECT/EXHIBITION_SPEC/VALIDATION/handoffs index and task handoff synchronized;673 links PASS. No startup/AGENTS workflow change. Exact source/scripts/docs diff reviewed."
     }
   ],
-  "nextExpected": "Finish live/browser original review, cleanup, full report and manifests, sync docs, exact diff/link review, final feature push and coordinator callback.",
+  "nextExpected": "Commit/push final evidence/docs, fetch and verify clean/upstream0/0; save unique complete own result with writer/services release, then authorized callback to current coordinator. Do not perform Z or merge main.",
   "plannedPoses": {
     "nw:district": {
       "position": [
@@ -1078,5 +1097,6 @@
   "preparedDrafts": [
     "/private/tmp/d-district-r2.py",
     "/private/tmp/d-energy-detail.py"
-  ]
+  ],
+  "status": "LOCAL_WORK_COMPLETE_REVIEW_READY"
 }

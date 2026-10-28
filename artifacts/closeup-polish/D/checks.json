@@ -1,6 +1,6 @@
 {
   "A7": {
-    "status": "PENDING",
+    "status": "PASS",
     "sourceCommit": "44521a0d63aae904c306a19c4baac52a44b62a87",
     "npmTest": "final-checks/npm-test.log PASS, exit0",
     "npmBuild": "final-checks/npm-build.log PASS, exit0",
@@ -8,7 +8,7 @@
     "localPhysicalTests": "Six service faces, late-GLB joints and supported terrace guards PASS; first garden/C ring/distribution protected;49 static energy batches,108 authority/wire/model combinations,324 district/history/receiver cases and177867 exact geometry checks PASS.",
     "runnerSelfCheck": "Default98 unchanged, optional NW4 pairing rows PASS",
     "reportSelfCheck": "95% FPS /110% calls boundaries PASS; complete five-shot/50-final-row assertions",
-    "live": "NOT RUN YET",
+    "live": "live-retry1/browser.json:complete true,23 checks PASS,errors0; first failed attempt preserved",
     "duration": "Exact3s retarget/duration/snapshot/reduced motion remains covered by root suite; browser diagnostics refresh each120 frames, no3.000s browser precision claim."
   },
   "scope": "PASS scope-check.json against3bb99ce; only D local builders/poses/tests and opt-in capture support; first garden light source also explicitly protected.",
@@ -26,9 +26,9 @@
     "Static V6 does not establish full temporal flicker absence",
     "No production, exhibition hardware, Safari/iPad, Windows, visitor2s or Z test in D"
   ],
-  "attemptHistory": "First sandbox Chrome launch failed before images/rows, fresh authorized retry preserved original log. First root test sandbox listen EPERM preserved, approved full retry passed. Service-face ray initially sampled old sign boundary, corrected test sample with unchanged runtime. Rejected offline pose predictions remain. Wing r2 framing regression kept; r3 is a newly measured S0-pose candidate, not an unmeasured hybrid.",
-  "cleanup": "PENDING",
-  "selfReview": "Exact NW/energy runtime/test/capture/report/live/scope diffs reviewed; all50 final original images individually reviewed. Final report/docs/cleanup pending.",
-  "links": "PENDING",
-  "originals": "Final report will revalidate S0/A/B/C manifests and create full D original manifest."
+  "attemptHistory": "First sandbox Chrome launch failed before images/rows, fresh authorized retry preserved original log. First root test sandbox listen EPERM preserved, approved full retry passed. Service-face ray initially sampled old sign boundary, corrected test sample with unchanged runtime. Rejected offline pose predictions remain. Wing r2 framing regression kept; r3 is a newly measured S0-pose candidate, not an unmeasured hybrid. First live attempt failed after6 checks because unchanged targetAutomation did not await the120-frame Undo diagnostic; corrected only fixture count wait, complete fresh retry23 PASS. Original2images/log/browser hashes remain in live-failed-originals.json.",
+  "cleanup": "PASS cleanup.json; task Vite and five scratch ports bind-free, owned runners/browsers/scratch closed",
+  "selfReview": "PASS exact D runtime/tests, capture/live/report/scope scripts, generated state/metric tables and final docs reviewed;50 final plus7 live originals individually inspected.",
+  "links": "PASS document-links.json:673 filesystem targets, no new fragment links",
+  "originals": "PASS original-preservation.json: S0 234/A147/B110/C191 hashes unchanged,268 tracked D images unchanged againstc63f2f2,275 D originals in final manifest; failed-live originals revalidated."
 }

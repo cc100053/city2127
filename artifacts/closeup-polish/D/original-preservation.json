@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "priorManifestsRevalidatedByReport": {
+    "S0": 234,
+    "A": 147,
+    "B": 110,
+    "C": 191
+  },
+  "trackedDImagesUnchangedAgainstCommit": "c63f2f26997eb716cd873ba8d3d75c16e6ad62b6",
+  "trackedDImageCount": 268,
+  "failedLiveOriginals": "live-failed-originals.json hashes verified by cleanup",
+  "finalDManifestImageCount": 275
+}

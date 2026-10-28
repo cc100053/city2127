@@ -1,0 +1,13 @@
+{
+  "status": "FAIL preserved",
+  "failedAssertion": "Undo expected district counts after a targetAutomation wait that was already true at both rungs; cached120-frame diagnostic was stale. Retry waits for all restored counts and zero pulses, then keeps full deep equality.",
+  "scratchPortsConfirmedFree": [
+    52149
+  ],
+  "sha256": {
+    "artifacts/closeup-polish/D/live/browser.json": "949ab71d642377ead124c5d680a8e23454ce91b37af589bff4d172bee250288d",
+    "artifacts/closeup-polish/D/live/nw-focal.jpg": "5d59d404f36884834a5d5eaa8adac50f09999caf1d233667c5b8509777f9d58e",
+    "artifacts/closeup-polish/D/live/nw-district.jpg": "71f67ce7e2fd59ff7ebcac934a8f74748ad9c40dcdb916a8c8535c97e3e91442",
+    "artifacts/closeup-polish/D/live-attempt1.log.txt": "03ba26483ab4fc5efbec695b65d3bd41a9fa90504ad9d39b766a9833601e496a"
+  }
+}

@@ -101,7 +101,7 @@ Headline 近鏡（2026-10-27）：live 結果先在 hero 播完 2.62 秒 vote jo
 
 District 直接讀 tier；DEV `?meters`／carrier 測試用 `deriveExhibitionLayout(D)`（同一門檻、唔限速）。全部 round 用 JavaScript `Math.round`。機能單元不是人口或等容量承諾；不能在實作中暗改算法。Root v2 不將 Meter 混入全城天空／氣氛。
 
-近鏡打磨D（2026-10-28，RUNNING，未接受）：NW focal在原服務槽與量體內細化服務面、窗框及層間操作標記，r1/r2的8狀態矩陣／效能各完成，r3量度中。低／中服務辨認、A3／A4及效能缺口保留；其餘D鏡頭與最終live尚未完成。[D進度](../artifacts/closeup-polish/D/README.md)，不合併main，A/B/C pending不變。
+近鏡打磨D（2026-10-28，REVIEW_READY，未經owner接受／未merge main）：NW服務面／操作接點與支承欄邊、第二水庭／受電翼／能源島局部操作邊及鏡位完成；原counts／slots／footprints／三秒過渡／60秒cycle、hero/FOV/timeline保持，能源49 batches。NW／wing三輪、garden2／island兩輪，134 measured states／275原圖保存；root及scratch live23項PASS。Final50狀態A3全部適用項FAIL、A4 4/40、A5 10FAIL／4配對UNVERIFIED，V3全部FAIL；[完整原圖／理由／量度](../artifacts/closeup-polish/D/REVIEW.md)保留缺口，建議暫不接受D美術。A/B/C pending不變，全當前累積Z另驗。
 
 ## 城市可見變化
 

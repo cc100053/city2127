@@ -1,0 +1,65 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
+  {
++   activePulses: 9,
+-   activePulses: 0,
+    automation: 0.5,
+    enabled: true,
+    guidewayPods: 18,
++   hybridBays: 5,
+-   hybridBays: 6,
+    loopAircraft: 16,
+    nightRhythm: 1,
+    pavilions: 11,
+    serviceDrones: 11,
+    targetAutomation: 0.5,
++   visibleDronePorts: 10,
++   visibleStaffedPavilions: 1,
+-   visibleDronePorts: 8,
+-   visibleStaffedPavilions: 3,
+    walkers: 260
+  }
+
+    at file:///Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/D/live.mjs:51:58 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: {
+    enabled: true,
+    serviceDrones: 11,
+    nightRhythm: 1,
+    targetAutomation: 0.5,
+    automation: 0.5,
+    activePulses: 9,
+    pavilions: 11,
+    visibleStaffedPavilions: 1,
+    visibleDronePorts: 10,
+    hybridBays: 5,
+    loopAircraft: 16,
+    guidewayPods: 18,
+    walkers: 260
+  },
+  expected: {
+    enabled: true,
+    serviceDrones: 11,
+    nightRhythm: 1,
+    targetAutomation: 0.5,
+    automation: 0.5,
+    activePulses: 0,
+    pavilions: 11,
+    visibleStaffedPavilions: 3,
+    visibleDronePorts: 8,
+    hybridBays: 6,
+    loopAircraft: 16,
+    guidewayPods: 18,
+    walkers: 260
+  },
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v26.0.0

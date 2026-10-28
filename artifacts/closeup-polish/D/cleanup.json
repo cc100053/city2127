@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "ownedVitePID": 2325,
+  "ownedViteCwd": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout",
+  "stop": "SIGINT via owned exec session79521,exit130",
+  "portsBindConfirmedFree": [
+    5194,
+    52149,
+    52371,
+    52592,
+    52689,
+    52760
+  ],
+  "ownedNodeRunners": "none",
+  "scratchSqliteDirectories": [],
+  "ownedBrowsers": "All capture/performance/compare/live launches closed by finally; every runner exited. No unrelated Chrome processes killed.",
+  "failedAttemptOriginalHashes": "unchanged"
+}
