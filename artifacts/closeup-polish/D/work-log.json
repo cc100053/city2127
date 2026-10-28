@@ -875,9 +875,156 @@
     },
     {
       "islandAimBeforeR2": "46b7b1f full root/build/scope PASS saved as final-checks/aim-y23-* logs. Before any r2 browser capture, choose smaller S0 horizontal aim x-60\u2192-70, y4 unchanged, rather than upwardy23: full-group projection A2 overlap3.3429%, preserves original downward framing. Re-run required root checks on this exact source before capture. Failed x-45 prediction11.3879% and prior y95/y23 options remain in prediction JSON; no offline A3 or performance claims."
+    },
+    {
+      "finalRuntime": "44521a0d63aae904c306a19c4baac52a44b62a87",
+      "rootValidation": "npm test/build/diff and scope PASS on exact committed final source before island r2;108 authority/wire/model combinations,324 clearance cases,177867 exact checks,49batches. final-source-hashes.json created. No other CPU-heavy tests while capture/perf runs.",
+      "islandR2": "Full8state matrix active at frozen final source."
+    },
+    {
+      "islandFinal": {
+        "shot": "energy:island",
+        "rounds": 2,
+        "A4": [
+          1,
+          6
+        ],
+        "subject": [
+          {
+            "state": "baseline",
+            "hour": 12,
+            "auto": {
+              "A1": null,
+              "A2": null,
+              "A3": null,
+              "reason": "subject absent in this state"
+            },
+            "hits": 0
+          },
+          {
+            "state": "baseline",
+            "hour": 22,
+            "auto": {
+              "A1": null,
+              "A2": null,
+              "A3": null,
+              "reason": "subject absent in this state"
+            },
+            "hits": 0
+          },
+          {
+            "state": "c",
+            "hour": 12,
+            "auto": {
+              "A1": true,
+              "A2": true,
+              "A3": false,
+              "width": 0.7277206937609442,
+              "height": 0.6707032020680577,
+              "center": {
+                "x": 0.45606946103248125,
+                "y": 0.37673421606183033
+              },
+              "cardOverlap": 0.03342865910539034
+            },
+            "hits": 2
+          },
+          {
+            "state": "c",
+            "hour": 22,
+            "auto": {
+              "A1": true,
+              "A2": true,
+              "A3": false,
+              "width": 0.7277206937609442,
+              "height": 0.6707032020680577,
+              "center": {
+                "x": 0.45606946103248125,
+                "y": 0.37673421606183033
+              },
+              "cardOverlap": 0.03342865910539034
+            },
+            "hits": 2
+          },
+          {
+            "state": "mixed",
+            "hour": 12,
+            "auto": {
+              "A1": true,
+              "A2": true,
+              "A3": false,
+              "width": 0.7277206937609442,
+              "height": 0.6707032020680577,
+              "center": {
+                "x": 0.45606946103248125,
+                "y": 0.37673421606183033
+              },
+              "cardOverlap": 0.03342865910539034
+            },
+            "hits": 2
+          },
+          {
+            "state": "mixed",
+            "hour": 22,
+            "auto": {
+              "A1": true,
+              "A2": true,
+              "A3": false,
+              "width": 0.7277206937609442,
+              "height": 0.6707032020680577,
+              "center": {
+                "x": 0.45606946103248125,
+                "y": 0.37673421606183033
+              },
+              "cardOverlap": 0.03342865910539034
+            },
+            "hits": 2
+          }
+        ],
+        "performance": [
+          {
+            "id": "energy:island",
+            "hour": 12,
+            "fps": 104.98465760398541,
+            "calls": [
+              "465",
+              "465"
+            ]
+          },
+          {
+            "id": "energy:island",
+            "hour": 22,
+            "fps": 103.7470515980069,
+            "calls": [
+              "465",
+              "465"
+            ]
+          },
+          {
+            "id": "hero",
+            "hour": 12,
+            "fps": 90.24052954913459,
+            "calls": [
+              "952",
+              "952"
+            ]
+          },
+          {
+            "id": "hero",
+            "hour": 22,
+            "fps": 89.63588000315526,
+            "calls": [
+              "952",
+              "952"
+            ]
+          }
+        ]
+      },
+      "stopAt2": "Local operating-edge and original-camera aim repair complete; full bridge/group retained, c/mixed same body, A3/A4 gaps remain. No unchanged rerun to replace a failed gate.",
+      "live": "First real current-v4 fixture run started only after all performance phases closed."
     }
   ],
-  "nextExpected": "Run final root tests/build on new committed island aim; then island r2 matrix/performance and current-v4 live.",
+  "nextExpected": "Finish live/browser original review, cleanup, full report and manifests, sync docs, exact diff/link review, final feature push and coordinator callback.",
   "plannedPoses": {
     "nw:district": {
       "position": [

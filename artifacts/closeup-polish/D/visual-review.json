@@ -42,7 +42,15 @@
     "r3/energy-wing/energy-wing__mixed__h12.jpg",
     "r3/energy-wing/energy-wing__mixed__h22.jpg",
     "r3/energy-wing/hero__neutral__h12.jpg",
-    "r3/energy-wing/hero__neutral__h22.jpg"
+    "r3/energy-wing/hero__neutral__h22.jpg",
+    "r2/energy-island/energy-island__baseline__h12.jpg",
+    "r2/energy-island/energy-island__baseline__h22.jpg",
+    "r2/energy-island/energy-island__c__h12.jpg",
+    "r2/energy-island/energy-island__c__h22.jpg",
+    "r2/energy-island/energy-island__mixed__h12.jpg",
+    "r2/energy-island/energy-island__mixed__h22.jpg",
+    "r2/energy-island/hero__neutral__h12.jpg",
+    "r2/energy-island/hero__neutral__h22.jpg"
   ],
   "rows": {
     "nw:focal/nw:focal/-2/12": {
@@ -1236,6 +1244,238 @@
     },
     "energy:wing/hero/neutral/22": {
       "image": "r3/energy-wing/hero__neutral__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "整座civic巨框、球體與多層海濱系統可直接讀成台場未來城市；hero不是服務單體辨識證明。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣、富士球體及彩虹橋的地理關係保留。"
+        ],
+        "V3": [
+          "FAIL",
+          "近岸球簇及棋盤屋頂綠地在全城仍明顯，未達mastertaste層次。"
+        ],
+        "V4": [
+          "PASS",
+          "多層交通、公民空間與水邊皆完整，維持成熟混合配置。"
+        ],
+        "V5": [
+          "PASS",
+          "岸線、框架、交通與樓體夜間可分辨，非每個遠處小服務槽可讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "全尺寸靜態原圖未見新增穿模／浮件；不宣稱所有motion state皆無閃爍。"
+        ]
+      }
+    },
+    "energy:island/energy:island/baseline/12": {
+      "image": "r2/energy-island/energy-island__baseline__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "N/A",
+          "基準無能源島，不要求識別缺席的部件。"
+        ],
+        "V2": [
+          "PASS",
+          "開闊海面與對岸步道共同標示台場海岸位置。"
+        ],
+        "V3": [
+          "FAIL",
+          "岸邊仍有球簇、棒棒糖冠層與柱形綠塊，未達有層次植栽要求。"
+        ],
+        "V4": [
+          "PASS",
+          "基準保持完整海灣、航道與沿岸公共空間；缺席能源島不代表落後。"
+        ],
+        "V5": [
+          "N/A",
+          "日景另以h22判斷夜間。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原尺寸可見罩體、甲板、欄杆與橋支承未見明顯浮件或穿模；單張不證明完整動態無閃爍。"
+        ]
+      }
+    },
+    "energy:island/energy:island/baseline/22": {
+      "image": "r2/energy-island/energy-island__baseline__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "N/A",
+          "基準無能源島，不要求識別缺席的部件。"
+        ],
+        "V2": [
+          "PASS",
+          "開闊海面與對岸步道共同標示台場海岸位置。"
+        ],
+        "V3": [
+          "FAIL",
+          "岸邊仍有球簇、棒棒糖冠層與柱形綠塊，未達有層次植栽要求。"
+        ],
+        "V4": [
+          "PASS",
+          "基準保持完整海灣、航道與沿岸公共空間；缺席能源島不代表落後。"
+        ],
+        "V5": [
+          "N/A",
+          "基準無能源島，部件夜景不適用。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原尺寸可見罩體、甲板、欄杆與橋支承未見明顯浮件或穿模；單張不證明完整動態無閃爍。"
+        ]
+      }
+    },
+    "energy:island/energy:island/c/12": {
+      "image": "r2/energy-island/energy-island__c__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "雙罩能源量體、分段海上平台、服務房與專用橋構成可辨認的海上能源島；屬靜態review判斷，未作真人兩秒測試。"
+        ],
+        "V2": [
+          "PASS",
+          "開闊海面與對岸步道共同標示台場海岸位置。"
+        ],
+        "V3": [
+          "FAIL",
+          "岸邊仍有球簇、棒棒糖冠層與柱形綠塊，未達有層次植栽要求。"
+        ],
+        "V4": [
+          "PASS",
+          "罩體、維修設備、平台護欄、服務房與連岸橋完整；c和mixed共用同一成熟本體，不捏造新差異。"
+        ],
+        "V5": [
+          "N/A",
+          "日景另以h22判斷夜間。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原尺寸可見罩體、甲板、欄杆與橋支承未見明顯浮件或穿模；單張不證明完整動態無閃爍。"
+        ]
+      }
+    },
+    "energy:island/energy:island/c/22": {
+      "image": "r2/energy-island/energy-island__c__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "雙罩能源量體、分段海上平台、服務房與專用橋構成可辨認的海上能源島；屬靜態review判斷，未作真人兩秒測試。"
+        ],
+        "V2": [
+          "PASS",
+          "開闊海面與對岸步道共同標示台場海岸位置。"
+        ],
+        "V3": [
+          "FAIL",
+          "岸邊仍有球簇、棒棒糖冠層與柱形綠塊，未達有層次植栽要求。"
+        ],
+        "V4": [
+          "PASS",
+          "罩體、維修設備、平台護欄、服務房與連岸橋完整；c和mixed共用同一成熟本體，不捏造新差異。"
+        ],
+        "V5": [
+          "PASS",
+          "雙罩及橋仍可讀，貼地操作邊讓既有甲板邊界可追蹤；維持原海灣光照。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原尺寸可見罩體、甲板、欄杆與橋支承未見明顯浮件或穿模；單張不證明完整動態無閃爍。"
+        ]
+      }
+    },
+    "energy:island/energy:island/mixed/12": {
+      "image": "r2/energy-island/energy-island__mixed__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "雙罩能源量體、分段海上平台、服務房與專用橋構成可辨認的海上能源島；屬靜態review判斷，未作真人兩秒測試。"
+        ],
+        "V2": [
+          "PASS",
+          "開闊海面與對岸步道共同標示台場海岸位置。"
+        ],
+        "V3": [
+          "FAIL",
+          "岸邊仍有球簇、棒棒糖冠層與柱形綠塊，未達有層次植栽要求。"
+        ],
+        "V4": [
+          "PASS",
+          "罩體、維修設備、平台護欄、服務房與連岸橋完整；c和mixed共用同一成熟本體，不捏造新差異。"
+        ],
+        "V5": [
+          "N/A",
+          "日景另以h22判斷夜間。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原尺寸可見罩體、甲板、欄杆與橋支承未見明顯浮件或穿模；單張不證明完整動態無閃爍。"
+        ]
+      }
+    },
+    "energy:island/energy:island/mixed/22": {
+      "image": "r2/energy-island/energy-island__mixed__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "雙罩能源量體、分段海上平台、服務房與專用橋構成可辨認的海上能源島；屬靜態review判斷，未作真人兩秒測試。"
+        ],
+        "V2": [
+          "PASS",
+          "開闊海面與對岸步道共同標示台場海岸位置。"
+        ],
+        "V3": [
+          "FAIL",
+          "岸邊仍有球簇、棒棒糖冠層與柱形綠塊，未達有層次植栽要求。"
+        ],
+        "V4": [
+          "PASS",
+          "罩體、維修設備、平台護欄、服務房與連岸橋完整；c和mixed共用同一成熟本體，不捏造新差異。"
+        ],
+        "V5": [
+          "PASS",
+          "雙罩及橋仍可讀，貼地操作邊讓既有甲板邊界可追蹤；維持原海灣光照。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "原尺寸可見罩體、甲板、欄杆與橋支承未見明顯浮件或穿模；單張不證明完整動態無閃爍。"
+        ]
+      }
+    },
+    "energy:island/hero/neutral/12": {
+      "image": "r2/energy-island/hero__neutral__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "整座civic巨框、球體與多層海濱系統可直接讀成台場未來城市；hero不是服務單體辨識證明。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣、富士球體及彩虹橋的地理關係保留。"
+        ],
+        "V3": [
+          "FAIL",
+          "近岸球簇及棋盤屋頂綠地在全城仍明顯，未達mastertaste層次。"
+        ],
+        "V4": [
+          "PASS",
+          "多層交通、公民空間與水邊皆完整，維持成熟混合配置。"
+        ],
+        "V5": [
+          "N/A",
+          "日景；夜景另列。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "全尺寸靜態原圖未見新增穿模／浮件；不宣稱所有motion state皆無閃爍。"
+        ]
+      }
+    },
+    "energy:island/hero/neutral/22": {
+      "image": "r2/energy-island/hero__neutral__h22.jpg",
       "V1_V6": {
         "V1": [
           "PASS",

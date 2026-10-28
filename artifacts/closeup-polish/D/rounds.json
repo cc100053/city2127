@@ -19,6 +19,7 @@
     "r3/energy-wing"
   ],
   "energy:island": [
-    "r1/energy-island"
+    "r1/energy-island",
+    "r2/energy-island"
   ]
 }

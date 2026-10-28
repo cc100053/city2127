@@ -1,0 +1,138 @@
+{
+  "shot": "energy:island",
+  "rounds": 2,
+  "A4": [
+    1,
+    6
+  ],
+  "subject": [
+    {
+      "state": "baseline",
+      "hour": 12,
+      "auto": {
+        "A1": null,
+        "A2": null,
+        "A3": null,
+        "reason": "subject absent in this state"
+      },
+      "hits": 0
+    },
+    {
+      "state": "baseline",
+      "hour": 22,
+      "auto": {
+        "A1": null,
+        "A2": null,
+        "A3": null,
+        "reason": "subject absent in this state"
+      },
+      "hits": 0
+    },
+    {
+      "state": "c",
+      "hour": 12,
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.7277206937609442,
+        "height": 0.6707032020680577,
+        "center": {
+          "x": 0.45606946103248125,
+          "y": 0.37673421606183033
+        },
+        "cardOverlap": 0.03342865910539034
+      },
+      "hits": 2
+    },
+    {
+      "state": "c",
+      "hour": 22,
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.7277206937609442,
+        "height": 0.6707032020680577,
+        "center": {
+          "x": 0.45606946103248125,
+          "y": 0.37673421606183033
+        },
+        "cardOverlap": 0.03342865910539034
+      },
+      "hits": 2
+    },
+    {
+      "state": "mixed",
+      "hour": 12,
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.7277206937609442,
+        "height": 0.6707032020680577,
+        "center": {
+          "x": 0.45606946103248125,
+          "y": 0.37673421606183033
+        },
+        "cardOverlap": 0.03342865910539034
+      },
+      "hits": 2
+    },
+    {
+      "state": "mixed",
+      "hour": 22,
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.7277206937609442,
+        "height": 0.6707032020680577,
+        "center": {
+          "x": 0.45606946103248125,
+          "y": 0.37673421606183033
+        },
+        "cardOverlap": 0.03342865910539034
+      },
+      "hits": 2
+    }
+  ],
+  "performance": [
+    {
+      "id": "energy:island",
+      "hour": 12,
+      "fps": 104.98465760398541,
+      "calls": [
+        "465",
+        "465"
+      ]
+    },
+    {
+      "id": "energy:island",
+      "hour": 22,
+      "fps": 103.7470515980069,
+      "calls": [
+        "465",
+        "465"
+      ]
+    },
+    {
+      "id": "hero",
+      "hour": 12,
+      "fps": 90.24052954913459,
+      "calls": [
+        "952",
+        "952"
+      ]
+    },
+    {
+      "id": "hero",
+      "hour": 22,
+      "fps": 89.63588000315526,
+      "calls": [
+        "952",
+        "952"
+      ]
+    }
+  ]
+}
