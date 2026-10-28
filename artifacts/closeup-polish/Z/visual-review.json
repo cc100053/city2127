@@ -1,0 +1,535 @@
+{
+  "method": "Each listed final second-take original opened with view_image detail=original. Session judgment, no visitor timing. V6 STATIC PASS cannot exclude temporal flicker.",
+  "reviewedOriginals": [
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-focal__-2__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-focal__-2__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-focal__0__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-focal__0__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-focal__2__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-focal__2__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__-8__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__-8__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__-5__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__-5__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__0__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__0__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__5__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__5__h22.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__8__h12.jpg",
+    "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__8__h22.jpg"
+  ],
+  "rows": {
+    "nw:focal/-2/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-focal__-2__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "鏡位由側向轉正面，服務入口三個深框較S0可見；主體仍遠小於左側藍塔，未能直讀人手服務。",
+      "lastToZ": "與D r3同pose／本體；本圖屋頂植栽盤面的動態外觀有差異，沒有新增主體改善，仍保留身份缺口。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "小型藍色樓與周邊同語彙高樓競爭，正面深框不足以在兩秒讀出人手服務中心。"
+        ],
+        "V2": [
+          "PASS",
+          "右下海面及後方富士civic core入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景粉色球冠與孤立圓盆樹仍像裝飾，樹冠及草坪欠連續層次。"
+        ],
+        "V4": [
+          "PASS",
+          "低態仍是完整有入口和人尺度的樓館，並非空地。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖樓身深藍，周圍大樓亮窗更搶眼，服務端口仍難讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "正面框與基座貼合，未見主體浮件／穿模；靜態不能排除閃爍。"
+        ]
+      }
+    },
+    "nw:focal/-2/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-focal__-2__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "正面服務框較S0側面能看見，但夜間仍與普通深藍辦公樓相似，身份未改善到通過。",
+      "lastToZ": "與D r3同構圖及入口；背景盤面微差，主體與夜間可讀性缺口保持。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "小型藍色樓與周邊同語彙高樓競爭，正面深框不足以在兩秒讀出人手服務中心。"
+        ],
+        "V2": [
+          "PASS",
+          "右下海面及後方富士civic core入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景粉色球冠與孤立圓盆樹仍像裝飾，樹冠及草坪欠連續層次。"
+        ],
+        "V4": [
+          "PASS",
+          "低態仍是完整有入口和人尺度的樓館，並非空地。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖樓身深藍，周圍大樓亮窗更搶眼，服務端口仍難讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "主體入口框及樓腳無明顯浮空／穿模，夜圖不能排除時間閃爍。"
+        ]
+      }
+    },
+    "nw:focal/0/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-focal__0__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "正面三槽及淺色終端比S0側面可見，但服務混合功能仍未能清楚辨認。",
+      "lastToZ": "與D r3相同主體／pose，未見新的主體退步或改善；背景植栽盤／AO重載微差另以像素量度記錄。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "混合態門口出現一個淺色終端，但遠距離只讀成一般藍樓，與人手態差異細小。"
+        ],
+        "V2": [
+          "PASS",
+          "右下海面及後方富士civic core入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景粉色球冠與孤立圓盆樹仍像裝飾，樹冠及草坪欠連續層次。"
+        ],
+        "V4": [
+          "PASS",
+          "低態仍是完整有入口和人尺度的樓館，並非空地。"
+        ],
+        "V5": [
+          "FAIL",
+          "同態夜圖樓身深藍，周圍大樓亮窗更搶眼，服務端口仍難讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "正面框與基座貼合，未見主體浮件／穿模；靜態不能排除閃爍。"
+        ]
+      }
+    },
+    "nw:focal/0/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-focal__0__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "混合態正面終端比S0側視可見，但夜景仍欠人機共用服務身份。",
+      "lastToZ": "與D r3同主體及pose，夜間可讀性沒有新增改善，背景微差不作局部優化。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "混合態門口出現一個淺色終端，但遠距離只讀成一般藍樓，與人手態差異細小。"
+        ],
+        "V2": [
+          "PASS",
+          "右下海面及後方富士civic core入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景粉色球冠與孤立圓盆樹仍像裝飾，樹冠及草坪欠連續層次。"
+        ],
+        "V4": [
+          "PASS",
+          "低態仍是完整有入口和人尺度的樓館，並非空地。"
+        ],
+        "V5": [
+          "FAIL",
+          "終端淺面可見，但暗藍樓身和人手低態近似，周邊亮窗更主導畫面。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "正面框與基座貼合，未見主體浮件／穿模；靜態不能排除閃爍。"
+        ]
+      }
+    },
+    "nw:focal/2/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-focal__2__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "正面取向及底層服務框比S0側面改善，但高態與旁邊普通藍塔同質，身份缺口仍FAIL。",
+      "lastToZ": "主體及pose與D r3一致，當前累積source未提供新的主體改善；背景盤面差異另存像素證據。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "高態樓體較大但仍似藍色一般高樓；底層六槽只見細小亮面，未能直讀自動服務。"
+        ],
+        "V2": [
+          "PASS",
+          "右下海面及後方富士civic core入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景粉色球冠與孤立圓盆樹仍像裝飾，樹冠及草坪欠連續層次。"
+        ],
+        "V4": [
+          "PASS",
+          "高態是完整分層樓與底座，維持成熟方案。"
+        ],
+        "V5": [
+          "PASS",
+          "新增圓柱上層的亮環分層明顯，與低／中態輪廓可分；服務身份缺口另列V1。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "正面框與基座貼合，未見主體浮件／穿模；靜態不能排除閃爍。"
+        ]
+      }
+    },
+    "nw:focal/2/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-focal__2__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "高態正面下層服務框較S0側面可見，上部環帶輪廓清楚；功能身份仍未通過。",
+      "lastToZ": "與D r3同樓體／pose及亮環，沒有新的主體改善或明顯退步。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "高態樓體較大但仍似藍色一般高樓；底層六槽只見細小亮面，未能直讀自動服務。"
+        ],
+        "V2": [
+          "PASS",
+          "右下海面及後方富士civic core入鏡。"
+        ],
+        "V3": [
+          "FAIL",
+          "前景粉色球冠與孤立圓盆樹仍像裝飾，樹冠及草坪欠連續層次。"
+        ],
+        "V4": [
+          "PASS",
+          "高態是完整分層樓與底座，維持成熟方案。"
+        ],
+        "V5": [
+          "PASS",
+          "新增圓柱上層的亮環分層明顯，與低／中態輪廓可分；服務身份缺口另列V1。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "正面框與基座貼合，未見主體浮件／穿模；靜態不能排除閃爍。"
+        ]
+      }
+    },
+    "nw:district/-8/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__-8__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "由S0側視改為較廣的俯視海岸服務列，欄邊與支承略清楚；人手服務面仍被大面積白屋頂遮住，未解決功能辨識。",
+      "lastToZ": "與D district r3同構圖／亭與欄邊；屋頂小盤面與AO差異可見但沒有新的服務形態改善。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "俯視主要讀到白屋頂及圓盤，無法兩秒辨認人手服務列。"
+        ],
+        "V2": [
+          "PASS",
+          "下半海面及右上球體提供明確水岸定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "左側屋頂多個孤立格仔盆景及前方球冠保留，未形成飽滿連續生態層。"
+        ],
+        "V4": [
+          "PASS",
+          "完整服務亭／露台與輔助停機點保留，低自動化並非空地。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖屋頂、柱與停機環輪廓可見；功能辨識不足另列V1。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "本圖服務屋面、露台欄邊與支承未見明顯浮件／穿模；不代表時間閃爍已驗。"
+        ]
+      }
+    },
+    "nw:district/-8/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__-8__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "由S0側視改為較廣的俯視海岸服務列，欄邊與支承略清楚；人手服務面仍被大面積白屋頂遮住，未解決功能辨識。",
+      "lastToZ": "與D district r3同構圖／亭與欄邊；屋頂小盤面與AO差異可見但沒有新的服務形態改善。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "俯視主要讀到白屋頂及圓盤，無法兩秒辨認人手服務列。"
+        ],
+        "V2": [
+          "PASS",
+          "下半海面及右上球體提供明確水岸定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "左側屋頂多個孤立格仔盆景及前方球冠保留，未形成飽滿連續生態層。"
+        ],
+        "V4": [
+          "PASS",
+          "完整服務亭／露台與輔助停機點保留，低自動化並非空地。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖屋頂、柱與停機環輪廓可見；功能辨識不足另列V1。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "本圖服務屋面、露台欄邊與支承未見明顯浮件／穿模；不代表時間閃爍已驗。"
+        ]
+      }
+    },
+    "nw:district/-5/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__-5__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "俯視服務列與藍色drone盤較S0能一起看見；仍欠人手服務可讀性，混合小露台接合不清。",
+      "lastToZ": "與D r3相同盤／亭配置與鏡位；本圖延續hybrid懸空感，非新功能，背景盤面差異另量。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "服務亭與藍色drone盤有可見替換，但白屋頂遮住人手服務面，混合服務含義不清。"
+        ],
+        "V2": [
+          "PASS",
+          "下半海面及右上球體提供明確水岸定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "左側屋頂多個孤立格仔盆景及前方球冠保留，未形成飽滿連續生態層。"
+        ],
+        "V4": [
+          "PASS",
+          "完整服務亭／露台與輔助停機點保留，低自動化並非空地。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖屋頂、柱與停機環輪廓可見；功能辨識不足另列V1。"
+        ],
+        "V6": [
+          "FAIL",
+          "右側小型白色hybrid露台與藍色停機柱的接合載荷路徑不清，視覺上像懸在柱旁。"
+        ]
+      }
+    },
+    "nw:district/-5/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__-5__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "俯視服務列與藍色drone盤較S0能一起看見；仍欠人手服務可讀性，混合小露台接合不清。",
+      "lastToZ": "與D r3相同盤／亭配置與鏡位；本圖延續hybrid懸空感，非新功能，背景盤面差異另量。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "服務亭與藍色drone盤有可見替換，但白屋頂遮住人手服務面，混合服務含義不清。"
+        ],
+        "V2": [
+          "PASS",
+          "下半海面及右上球體提供明確水岸定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "左側屋頂多個孤立格仔盆景及前方球冠保留，未形成飽滿連續生態層。"
+        ],
+        "V4": [
+          "PASS",
+          "完整服務亭／露台與輔助停機點保留，低自動化並非空地。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖屋頂、柱與停機環輪廓可見；功能辨識不足另列V1。"
+        ],
+        "V6": [
+          "FAIL",
+          "右側小型白色hybrid露台與藍色停機柱的接合載荷路徑不清，視覺上像懸在柱旁。"
+        ]
+      }
+    },
+    "nw:district/0/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__0__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "較S0完整看見藍盤／白亭交替，但構圖仍俯視且載荷路徑缺口保持。",
+      "lastToZ": "與D r3同neutral配置及pose；懸空接合感及背景盆景缺口保持，無新增主體改善。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "中態藍盤與白亭雖能分出類型，卻無清楚人機協作介面；周邊球體與高塔搶走主體焦點。"
+        ],
+        "V2": [
+          "PASS",
+          "下半海面及右上球體提供明確水岸定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "左側屋頂多個孤立格仔盆景及前方球冠保留，未形成飽滿連續生態層。"
+        ],
+        "V4": [
+          "PASS",
+          "完整服務亭／露台與輔助停機點保留，低自動化並非空地。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖屋頂、柱與停機環輪廓可見；功能辨識不足另列V1。"
+        ],
+        "V6": [
+          "FAIL",
+          "中央及右側白色小露台與drone柱旁的支承關係欠清楚，像懸在水面／柱旁。"
+        ]
+      }
+    },
+    "nw:district/0/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__0__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "較S0完整看見藍盤／白亭交替，但構圖仍俯視且載荷路徑缺口保持。",
+      "lastToZ": "與D r3同neutral配置及pose；懸空接合感及背景盆景缺口保持，無新增主體改善。",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "中態藍盤與白亭雖能分出類型，卻無清楚人機協作介面；周邊球體與高塔搶走主體焦點。"
+        ],
+        "V2": [
+          "PASS",
+          "下半海面及右上球體提供明確水岸定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "左側屋頂多個孤立格仔盆景及前方球冠保留，未形成飽滿連續生態層。"
+        ],
+        "V4": [
+          "PASS",
+          "完整服務亭／露台與輔助停機點保留，低自動化並非空地。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖屋頂、柱與停機環輪廓可見；功能辨識不足另列V1。"
+        ],
+        "V6": [
+          "FAIL",
+          "中央及右側白色小露台與drone柱旁的支承關係欠清楚，像懸在水面／柱旁。"
+        ]
+      }
+    },
+    "nw:district/5/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__5__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "比S0更集中見到多個柱盤與無人機服務列，藍色環邊較有層次；混合小露台接合及格仔綠化缺口保持。",
+      "lastToZ": "與D r3同盤／hybrid配置與pose，沒有新增主體改善；屋頂盤面方向等像素差仍記錄。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "多個藍色柱式停機盤與四旋翼及分層環能直接讀成自動服務網絡。"
+        ],
+        "V2": [
+          "PASS",
+          "下半海面及右上球體提供明確水岸定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "左側屋頂多個孤立格仔盆景及前方球冠保留，未形成飽滿連續生態層。"
+        ],
+        "V4": [
+          "PASS",
+          "完整服務亭／露台與輔助停機點保留，低自動化並非空地。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖屋頂、柱與停機環輪廓可見；功能辨識不足另列V1。"
+        ],
+        "V6": [
+          "FAIL",
+          "右側保留的小白色hybrid露台仍與藍色柱盤載荷路徑脫節，局部懸空感沒有解決。"
+        ]
+      }
+    },
+    "nw:district/5/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__5__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "比S0更集中見到多個柱盤與無人機服務列，藍色環邊較有層次；混合小露台接合及格仔綠化缺口保持。",
+      "lastToZ": "與D r3同盤／hybrid配置與pose，沒有新增主體改善；屋頂盤面方向等像素差仍記錄。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "多個藍色柱式停機盤與四旋翼及分層環能直接讀成自動服務網絡。"
+        ],
+        "V2": [
+          "PASS",
+          "下半海面及右上球體提供明確水岸定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "左側屋頂多個孤立格仔盆景及前方球冠保留，未形成飽滿連續生態層。"
+        ],
+        "V4": [
+          "PASS",
+          "完整服務亭／露台與輔助停機點保留，低自動化並非空地。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖屋頂、柱與停機環輪廓可見；功能辨識不足另列V1。"
+        ],
+        "V6": [
+          "FAIL",
+          "右側保留的小白色hybrid露台仍與藍色柱盤載荷路徑脫節，局部懸空感沒有解決。"
+        ]
+      }
+    },
+    "nw:district/8/12": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__8__h12.jpg",
+      "detail": "original",
+      "s0ToZ": "新俯視較S0集中展開完整drone服務列與欄邊，但近處大四旋翼及背景仍競爭注意，綠化缺口保持。",
+      "lastToZ": "與D r3同完整高態及pose，主體未見新增改善／退步；不同屋頂盤面方向及AO差異照量。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "完整藍色drone盤／多支柱與四旋翼路線清楚表達自動服務網絡。"
+        ],
+        "V2": [
+          "PASS",
+          "下半海面及右上球體提供明確水岸定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "左側屋頂多個孤立格仔盆景及前方球冠保留，未形成飽滿連續生態層。"
+        ],
+        "V4": [
+          "PASS",
+          "完整服務亭／露台與輔助停機點保留，低自動化並非空地。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖屋頂、柱與停機環輪廓可見；功能辨識不足另列V1。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此完整高態沒有混合小露台接合缺口，柱盤／基座沒有明顯穿模；動態閃爍仍未完整驗證。"
+        ]
+      }
+    },
+    "nw:district/8/22": {
+      "image": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/Z/current/nw-district__8__h22.jpg",
+      "detail": "original",
+      "s0ToZ": "新俯視較S0集中展開完整drone服務列與欄邊，但近處大四旋翼及背景仍競爭注意，綠化缺口保持。",
+      "lastToZ": "與D r3同完整高態及pose，主體未見新增改善／退步；不同屋頂盤面方向及AO差異照量。",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "完整藍色drone盤／多支柱與四旋翼路線清楚表達自動服務網絡。"
+        ],
+        "V2": [
+          "PASS",
+          "下半海面及右上球體提供明確水岸定位。"
+        ],
+        "V3": [
+          "FAIL",
+          "左側屋頂多個孤立格仔盆景及前方球冠保留，未形成飽滿連續生態層。"
+        ],
+        "V4": [
+          "PASS",
+          "完整服務亭／露台與輔助停機點保留，低自動化並非空地。"
+        ],
+        "V5": [
+          "PASS",
+          "同態夜圖屋頂、柱與停機環輪廓可見；功能辨識不足另列V1。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "此完整高態沒有混合小露台接合缺口，柱盤／基座沒有明顯穿模；動態閃爍仍未完整驗證。"
+        ]
+      }
+    }
+  }
+}

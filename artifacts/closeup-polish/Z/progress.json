@@ -1,0 +1,15 @@
+{
+  "updatedUTC": "2026-10-28T18:23:24.699583+00:00",
+  "status": "RUNNING",
+  "owner": "01a183af-1ca0-7190-a25c-b31a6db4fd98",
+  "dispatch": "closeup-polish-Z-1-r21",
+  "runtime": "44521a0d63aae904c306a19c4baac52a44b62a87",
+  "rootNpmTest": "PASS npm-test-retry1.log; original sandbox EPERM preserved",
+  "rootNpmBuild": "PASS npm-build.log; existing JSON-import/chunk warnings",
+  "runner": "capture\u2192perf\u2192compare in exec session15734",
+  "vite": "exec session57693 / 5194",
+  "next": "Finish98 dual-take captures and original-detail review; standalone28perf then96A4; snapshot diffs/live/formal/production/docs/cleanup/push",
+  "ownedServicesReleased": false,
+  "captures": 17,
+  "reviewedOriginals": 16
+}

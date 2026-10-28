@@ -1,0 +1,21 @@
+{
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "architecture": "arm64",
+  "macOS": "27.0.1",
+  "node": "v26.0.0",
+  "browser": "156.0.8078.73",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "fonts": "https://fonts.googleapis.com/** fulfilled with empty text/css; system fallback",
+  "captureRunnerSha256": "bf1f9006b8e52f9284b3f5dfaed45664914c3b156d05d75f2fdd916d78598567",
+  "limitations": [
+    "S0 Chrome156.0.8078.48 vs Z156.0.8078.73",
+    "Cumulative A/B/C/D source; not controlled same-version isolated optimization",
+    "Survey fixture build during NW focal high capture; finished before any uncapped perf; no idle-machine capture claim"
+  ]
+}

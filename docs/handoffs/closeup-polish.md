@@ -1,7 +1,7 @@
 # closeup-polish — Headline 近鏡逐個打磨
 
 - Owner: cc100053（產品／審美最終批准）；實作由一個 long session 負責，開工時喺下面「進度」記低 session 名。
-- Status: S0 INTEGRATED（98/98，量度基準已接受）；A REVIEW_READY（三輪完成但gate仍FAIL）；B REVIEW_READY（worker `01a17e8c-3c8c-77f3-afbb-6f7d62abad14`；三輪完成，FAIL保留）；C REVIEW_READY（worker `01a17f7d-839f-74d0-8660-22e9c1ec1435`，dispatch `closeup-polish-C-1-r13`／recovery r16；focal/district三輪、ring兩輪，FAIL保留）；D REVIEW_READY（worker `01a18154-a9bd-7ca2-a776-9a2834a519da`，NW/wing三輪、garden2/island兩輪，FAIL保留）；Z未開始。
+- Status: S0 INTEGRATED（98/98，量度基準已接受）；A REVIEW_READY（三輪完成但gate仍FAIL）；B REVIEW_READY（worker `01a17e8c-3c8c-77f3-afbb-6f7d62abad14`；三輪完成，FAIL保留）；C REVIEW_READY（worker `01a17f7d-839f-74d0-8660-22e9c1ec1435`，dispatch `closeup-polish-C-1-r13`／recovery r16；focal/district三輪、ring兩輪，FAIL保留）；D REVIEW_READY（worker `01a18154-a9bd-7ca2-a776-9a2834a519da`，NW/wing三輪、garden2/island兩輪，FAIL保留）；Z RUNNING（worker `01a183af-1ca0-7190-a25c-b31a6db4fd98`，dispatch `closeup-polish-Z-1-r21`；全當前累積source驗證中）。
 - Branch: `feat/closeup-polish`（一條長分支，每個 sector 一個 checkpoint）
 - Base commit: `fdc4a0cbbbc352b41c15850f2a846845d7975de1`（fetch verified main，包含完整 S0 標準）
 - Last verified commit: D runtime `44521a0d63aae904c306a19c4baac52a44b62a87`，root npm test/build/diff及23項D live PASS；art gate FAIL保留。最終feature evidence SHA／remote／release見`result-D-1.json`；A/B/C pending和S0接受main `3d0f40e`保持。
@@ -169,7 +169,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 | B アクアシティ南 | REVIEW_READY：worker `01a17e8c`，三輪各18狀態；A3/A4、focal A5/V及V3仍FAIL | runtime `74d6c2b`；[完整review](../../artifacts/closeup-polish/B/REVIEW.md)，final SHA見result-B-1.json | pending；建議暫不接受r3 focal退步候選 | — |
 | C フジテレビ東 | REVIEW_READY：focal/district各三輪、ring兩輪完成；A3全FAIL、A4 4/28，A5 18FAIL＋6UNVERIFIED；root/live11項PASS；未接受art | baseline `ca22a92` → runtime `b5ce8fe`；[逐圖／完整量度](../../artifacts/closeup-polish/C/REVIEW.md) | owner pending，建議暫不接受C美術 | — |
 | D デックス西＋沖 | REVIEW_READY：134狀態／275原圖、final50；root/live23PASS，A3/A4/A5及V失敗保留 | runtime `44521a0`；[完整report](../../artifacts/closeup-polish/D/REVIEW.md)，final SHA見result-D-1.json | pending，建議暫不接受D美術 | — |
-| Z 全城回歸 | PLANNED | — | — | — |
+| Z 全城回歸 | RUNNING：原98態／28效能／四區scratch live，僅量度文件 | base `4a3ad9f`／runtime `44521a0`；[工作紀錄](../../artifacts/closeup-polish/Z/README.md) | A–D與A3/A4政策仍待owner | — |
 
 ## Actual validation results
 
@@ -290,3 +290,12 @@ Root npm test/build/diff、capture/report/round self-check與scope PASS：108權
 [原圖保留核對](../../artifacts/closeup-polish/D/original-preservation.json)：S0 234／A147／B110／C191 hash不變，268張tracked D圖對c63f2f2不變，D275張manifest完整。每shot final為其最後local-round source snapshot，後續細節可改背景，Z另驗全當前累積source；四個NW-view配對缺S0同狀態image/draw，A5 UNVERIFIED。Chrome156.0.8078.73對S0 .48，不能當隔離D提速。Garden2 r2初段capped capture與root test重疊，uncapped前suite已結束，原rows不修改。
 
 [Cleanup](../../artifacts/closeup-polish/D/cleanup.json)：owned Vite PID2325/cwd核對後SIGINT；5194／52149／52371／52592／52689／52760 bind確認free，owned Chrome／runner／scratch SQLite全關。只驗開發Mac Chrome1920×1080/DPR1/default；未測展示硬件、production、Safari/iPad、Windows、真人兩秒或Z。README啟動及AGENTS產品／工作流無改，依sync表不改其文案。最終docs/link/diff review及feature push結果見result-D-1.json；writer/services release後由coordinator接D review，再分派Z，A/B/C pending不變。
+
+
+## Z preflight — 2026-10-29
+
+唯一writer `01a183af-1ca0-7190-a25c-b31a6db4fd98`，dispatch `closeup-polish-Z-1-r21`。指定clone clean `feat/closeup-polish` @ `4a3ad9fab51cd471a0cfa08a81a6b9ab4a722aca`，runtime `44521a0`；sandbox DNS fetch失敗後授權retry成功，upstream0/0、vs origin/main34/2，main `545bff2`。主root與原圖保留，clone無.codegraph；D writer/services明確release後接手。已核原人類execution／standing契約與取消百分比門檻，sharedstate只coordinator寫。
+
+`origin/main:docs/handoffs/closeup-next.md` C1已核：續D review→Z→owner review；F1/F2/N1獨立，本批不實作或自動merge main新文件。S0/A/B/C/D共957原圖hash全部一致，完整src/tests/package起始hash保存於[preflight](../../artifacts/closeup-polish/Z/preflight.json)。Z不改runtime／pose／美術或門檻，重用capture.mjs完整98雙take、獨立28組雙窗效能及96A4；Chrome實際仍156.0.8078.73，S0 .48差異明列。
+
+Root test首次sandbox listen EPERM log保留，授權重跑完整suite及build PASS；survey只build供scratch Guest/Admin fixture，不宣稱獨立package suite。新report/live量度腳本自檢PASS。當前仍RUNNING，進度與服務ownership見[progress](../../artifacts/closeup-polish/Z/progress.json)；未完成98原圖審閱／live／final report前不宣稱Z完成，A–D及A3/A4政策pending保持。

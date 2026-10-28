@@ -1,0 +1,22 @@
+{
+  "S0": {
+    "count": 234,
+    "manifestSha256": "9c122def81eea85fd5111bfd168bbf470d9f8435b2a47c2f10d0681a605e0190"
+  },
+  "A": {
+    "count": 147,
+    "manifestSha256": "5cee5a1a421a53b70e8956cf8374dde279712a52d7c98c7a8ef60dce0800e7b2"
+  },
+  "B": {
+    "count": 110,
+    "manifestSha256": "983d47eed49cbc94f937942d5d51543daeda0011ff2b964df5f02489c8f0688d"
+  },
+  "C": {
+    "count": 191,
+    "manifestSha256": "5a2b32d2d6d316f9d14fff058b367d33081a12ada7976e8fa4f6921387d09861"
+  },
+  "D": {
+    "count": 275,
+    "manifestSha256": "4fb4fff123d1145a742e4a2f1a195a52340794f76e9b8b3822d169cf942fb4af"
+  }
+}
