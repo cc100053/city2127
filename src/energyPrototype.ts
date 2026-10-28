@@ -37,7 +37,10 @@ export function energyPrototype() {
 
   // Offshore receiver: a bifurcating mast carries two folded collection surfaces, leaving open sea beneath.
   wing.position.set(125, 0, -424);
-  arc(wing, 0, 5, 2, [0, -2, 0], stone);
+  const receiverSurface = solar.clone(); receiverSurface.name = 'energy-receiver-surface';
+  receiverSurface.roughness = .55; // Soften the measured frontal highlight without changing the city solar finish.
+  // The ceramic footing shares its chassis finish to keep the operating-light addition within the batch budget.
+  arc(wing, 0, 5, 2, [0, -2, 0], trim);
   arc(wing, 0, 1.2, 25, [0, 0, 0], trim);
   // The service neck and seated joints make the existing fork read as one supported assembly.
   arc(wing, 0, .96, 4.2, [0, 25, 0], dark);
@@ -91,7 +94,7 @@ export function energyPrototype() {
       }
       for (let row = 0; row < 12; row++) {
         const z = -8.25 + row * 1.5;
-        for (const dx of [-1.1, 1.1]) box(leaf, [2.1, .12, 1.34], [x + dx, .71, z], solar, .015);
+        for (const dx of [-1.1, 1.1]) box(leaf, [2.1, .12, 1.34], [x + dx, .71, z], receiverSurface, .015);
         if (row % 3 === 2 && row < 11) box(leaf, [4.4, .06, .08], [x, .74, z + .75], chrome, .01);
       }
       for (const dx of [-2.32, 2.32]) {
@@ -99,6 +102,8 @@ export function energyPrototype() {
         for (const z of [-8.4, 0, 8.4]) box(leaf, [.22, .08, .38], [x + dx, .76, z], trim);
       }
     }
+    // Operating strips sit in the existing receiver rim, against its load-bearing surface.
+    for (const z of [-9.35, 9.35]) box(leaf, [21.8, .035, .06], [0, .56, z], publicLight, .01);
     // Underside spars receive the fork below the surface instead of protruding through it.
     for (const z of [-6.8, 6.8]) member(leaf, [-11.6, -.8, z], [11.6, -.8, z], .45, dark);
     for (const x of [-7.5, 7.5]) member(leaf, [x, -.8, -6.8], [x, -.8, 6.8], .35, trim);

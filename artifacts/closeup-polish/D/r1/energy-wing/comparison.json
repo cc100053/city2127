@@ -1,0 +1,144 @@
+{
+  "mode": "compare",
+  "commit": "a1d430f3c295e930fa2699445504652bbe672231",
+  "sourceDiff": "diff --git a/src/headlineCamera.ts b/src/headlineCamera.ts\nindex 34084c5..db3770e 100644\n--- a/src/headlineCamera.ts\n+++ b/src/headlineCamera.ts\n@@ -20,7 +20,7 @@ export const SHOTS: Record<ShotId, Pose> = {\n   'energy:garden': { position: [-420, 65, -210], target: [-304, 12, -135] },\n   'energy:garden2': { position: [-15, 36, -455], target: [32, 8, -392] },\n   'energy:ring': { position: [-70, 135, -170], target: [-18, 99, -24] },\n-  'energy:wing': { position: [56, 64, -496], target: [125, 22, -424] },\n+  'energy:wing': { position: [110, 64, -530], target: [125, 17, -424] },\n   'energy:island': { position: [-142, 66, -556], target: [-60, 4, -470] },\n };\n export function headlineShot(change: CarrierChange | undefined): ShotId | null {\n",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "energy:wing",
+      "hour": 12,
+      "from": "baseline",
+      "to": "a",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.08831665176977968,
+      "rect": {
+        "x": 741,
+        "y": 397,
+        "width": 425,
+        "height": 391
+      },
+      "pass": true
+    },
+    {
+      "id": "energy:wing",
+      "hour": 12,
+      "from": "a",
+      "to": "b",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.09100286496364927,
+      "rect": {
+        "x": 602,
+        "y": 245,
+        "width": 700,
+        "height": 585
+      },
+      "pass": true
+    },
+    {
+      "id": "energy:wing",
+      "hour": 12,
+      "from": "b",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.004058659133168937,
+      "rect": {
+        "x": 602,
+        "y": 245,
+        "width": 700,
+        "height": 585
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 12,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.07292397711221241,
+      "rect": {
+        "x": 602,
+        "y": 245,
+        "width": 700,
+        "height": 585
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 22,
+      "from": "baseline",
+      "to": "a",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.06479804049396701,
+      "rect": {
+        "x": 741,
+        "y": 397,
+        "width": 425,
+        "height": 391
+      },
+      "pass": true
+    },
+    {
+      "id": "energy:wing",
+      "hour": 22,
+      "from": "a",
+      "to": "b",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.06660317779533466,
+      "rect": {
+        "x": 602,
+        "y": 245,
+        "width": 700,
+        "height": 585
+      },
+      "pass": true
+    },
+    {
+      "id": "energy:wing",
+      "hour": 22,
+      "from": "b",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.0034297493356316884,
+      "rect": {
+        "x": 602,
+        "y": 245,
+        "width": 700,
+        "height": 585
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 22,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.05079798893916541,
+      "rect": {
+        "x": 602,
+        "y": 245,
+        "width": 700,
+        "height": 585
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}

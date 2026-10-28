@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import { Box3, Group, InstancedMesh, Matrix4, Mesh, MeshPhysicalMaterial, Raycaster, Texture, Vector3 } from 'three';
+import { Box3, Group, InstancedMesh, Matrix4, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, Raycaster, Texture, Vector3 } from 'three';
 import { MeshBVH, acceleratedRaycast } from 'three-mesh-bvh';
-import { arc, chrome, trim } from '../src/cityRig.ts';
+import { arc, chrome, solar, trim } from '../src/cityRig.ts';
 import { ENERGY_OPTIONS, energyCycle, energyPrototype } from '../src/energyPrototype.ts';
 import { tidalEdge } from '../src/amphibiousShore.ts';
 import { civicCore } from '../src/civicCore.ts';
@@ -47,6 +47,10 @@ const secondLight = study.gardens[1].getObjectByName('energy-second-garden-edge-
 assert.ok(secondLight&&secondLight.children.length===1,'second-garden detail must reuse one existing public-light batch');
 const firstLight = study.gardens[0].getObjectByName('energy-west-garden-edge-lights')!;
 assert.deepEqual(Array.from((secondLight.children[0] as Mesh).geometry.attributes.position.array),Array.from((firstLight.children[0] as Mesh).geometry.attributes.position.array),'local clone edge detail differs from the existing supported west-garden envelope');
+const receiverSurface = meshes.find(mesh => (mesh.material as MeshStandardMaterial).name === 'energy-receiver-surface')?.material as MeshStandardMaterial;
+assert.ok(receiverSurface && receiverSurface !== solar, 'receiver surface must keep the city solar finish independent');
+assert.equal(receiverSurface.color.getHex(), solar.color.getHex());
+assert.equal(solar.roughness, .3, 'receiver detail changed the global solar response');
 const after: string[] = []; study.root.traverse(o => { if (o instanceof Mesh && !(o instanceof InstancedMesh)) after.push(o.uuid); });
 assert.deepEqual(after, originalMeshes, 'switching configurations reuses the same geometry'); assert.ok(count < 50, 'static study batches by shared finish');
 // Both reservoirs and their district clone reuse one physical water finish through every cycle.

@@ -492,6 +492,23 @@
         ]
       },
       "stopAt2": "Local supported light refinement complete; keep full group hollow and a/mixed identity. No unchanged third run to replace A3/A4/performance failures."
+    },
+    {
+      "wingR1Review": "a day/night originals inspected. New frontal pose has strong left-panel specular washout; r2 will clone only wing solar finish roughness.3\u2192.55 (global solar not animated by cityRig), add supported rim lights, and combine ceramic footing with existing trim batch to keep49. No runtime edit until full r1 finishes."
+    },
+    {
+      "wingR1": "10states20originals8pairs4performance references complete",
+      "A4": [
+        4,
+        8
+      ],
+      "FPS": [
+        96.3396804038637,
+        97.64918567918775,
+        89.54072285568682,
+        89.04829558320867
+      ],
+      "wingR2": "local cloned solar roughness.55 and seated rim lights; ceramic footing uses existing trim batch,49 retained; prototype/pose/scope/build/diff PASS; full matrix active"
     }
   ],
   "nextExpected": "energy:wing pose-only r1; garden2 source/pose frozen.",

@@ -1,0 +1,4 @@
+perf energy-wing__mixed__h12 96.3396804038637
+perf energy-wing__mixed__h22 97.64918567918775
+perf hero__neutral__h12 89.54072285568682
+perf hero__neutral__h22 89.04829558320867
