@@ -216,3 +216,8 @@ Commons沿用四組八席InstancedMesh：共享長椅向中央內收，私人弧
 ConcentrationTower將low空高服務桿改成有支承的低層服務廊／升降核心，mixed改為兩側occupied rails及中央空隙，高層加轉接肋。ConcentrationDistrict連廊保留地板／頂蓋／側框而打開通道，細化既有冠層，solar canopy沿用矩陣並加一個預配InstancedMesh支架。儲能環沿用publicLight batch，單點操作標記改成四個稀疏quarter marks；三個C SHOTS只改數值。Controller／權威module與district counts／slot／footprint／hero／FOV42／時間線與三秒retarget不變，[scope assertions](../artifacts/closeup-polish/C/scope-check.json)核對非C source。
 
 Focal／district各三輪，ring兩輪後停止；94狀態／188靜態原圖，34張final及3張live逐張檢視。[逐圖比較及量度](../artifacts/closeup-polish/C/REVIEW.md)：focal low A1、district A2、全部適用A3仍FAIL；A4只有4/28，A5 18 FAIL／10 PASS／6配對UNVERIFIED，V3全部FAIL，dock載荷路徑等V6缺口保留。Root test/build/diff、324能源清場cases及11項scratch live PASS；這是功能與有界實驗完成，未接受美術，沒有merge main。A/B pending及FAIL保持；全城Z、實機／其他平台仍待做，完整版本與累積A/B/C效能限制見report及[交接](handoffs/closeup-polish.md)。
+
+
+### Closeup sector D — 2026-10-28（進行中，未接受）
+
+NW hub在原六個服務槽後方加入凹入服務面、既有玻璃帶的細分窗框，以及獨立於GLB fallback／replacement的六段窄操作層線；同用Kit材質／bake，不改counter數量、controller、資產cache或原footprint。`SHOTS`只調NW focal數值，hero／FOV42／timeline維持。Focal r1/r2完整原圖與量度已push `7c05b4a`／`eebff28`，r3正面構圖仍在量度；[D進度](../artifacts/closeup-polish/D/README.md)。全D、live及final checks未完成，A/B/C pending與FAIL不變。

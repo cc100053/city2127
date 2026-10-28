@@ -78,9 +78,66 @@
       "A4": "2/6",
       "checks": "hub/late-GLB/pose tests, build, diff PASS; whole root suite required again at final D",
       "next": "r3 pose to direct frontage; no controller or art semantic change"
+    },
+    {
+      "status": "FOCAL_MAX3_COMPLETE_NOT_ACCEPTED",
+      "states": 8,
+      "A1": 6,
+      "A2": 6,
+      "A3hits": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "A4": {
+        "pass": 2,
+        "pairs": 6
+      },
+      "perf": [
+        {
+          "id": "nw:focal",
+          "hour": 12,
+          "fps": 79.77613846325927,
+          "calls": [
+            "959",
+            "959"
+          ]
+        },
+        {
+          "id": "nw:focal",
+          "hour": 22,
+          "fps": 85.6507221856073,
+          "calls": [
+            "959",
+            "1335"
+          ]
+        },
+        {
+          "id": "hero",
+          "hour": 12,
+          "fps": 87.15636404241988,
+          "calls": [
+            "952",
+            "952"
+          ]
+        },
+        {
+          "id": "hero",
+          "hour": 22,
+          "fps": 88.47689518700201,
+          "calls": [
+            "952",
+            "952"
+          ]
+        }
+      ],
+      "next": "nw:district pose-only r1; preserve final focal source/pose"
     }
   ],
-  "nextExpected": "Complete focal r2 capture/perf/compare, review original final images, checkpoint/push; then nw:district pose-only r1. Never edit measured runtime while runner active.",
+  "nextExpected": "Focal max3 complete; push checkpoint then nw:district r1 pose-only. Four extra paired rows included. Never change runtime while runner active.",
   "plannedPoses": {
     "nw:district": {
       "position": [

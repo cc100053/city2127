@@ -9,7 +9,7 @@ type Site = CarrierChange['socketId'];
 export type ShotId = `${Site}:${'focal' | 'district'}` | `energy:${'garden' | 'garden2' | 'ring' | 'wing' | 'island'}`;
 type Pose = { position: [number, number, number]; target: [number, number, number] };
 export const SHOTS: Record<ShotId, Pose> = {
-  'nw:focal': { position: [0, 130, -510], target: [40, 43, -300] },
+  'nw:focal': { position: [40, 130, -508], target: [40, 43, -300] },
   'ne:focal': { position: [-280, 85, -245], target: [-210, 14, -135] },
   'sw:focal': { position: [-165, 45, 210], target: [-105, 28, 60] },
   'se:focal': { position: [-90, 200, -170], target: [175, 50, -45] },

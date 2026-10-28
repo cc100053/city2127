@@ -1,7 +1,7 @@
 # closeup-polish — Headline 近鏡逐個打磨
 
 - Owner: cc100053（產品／審美最終批准）；實作由一個 long session 負責，開工時喺下面「進度」記低 session 名。
-- Status: S0 INTEGRATED（98/98，量度基準已接受）；A REVIEW_READY（三輪完成但gate仍FAIL）；B REVIEW_READY（worker `01a17e8c-3c8c-77f3-afbb-6f7d62abad14`；三輪完成，FAIL保留）；C REVIEW_READY（worker `01a17f7d-839f-74d0-8660-22e9c1ec1435`，dispatch `closeup-polish-C-1-r13`／recovery r16；focal/district三輪、ring兩輪，FAIL保留）；D/Z未開始。
+- Status: S0 INTEGRATED（98/98，量度基準已接受）；A REVIEW_READY（三輪完成但gate仍FAIL）；B REVIEW_READY（worker `01a17e8c-3c8c-77f3-afbb-6f7d62abad14`；三輪完成，FAIL保留）；C REVIEW_READY（worker `01a17f7d-839f-74d0-8660-22e9c1ec1435`，dispatch `closeup-polish-C-1-r13`／recovery r16；focal/district三輪、ring兩輪，FAIL保留）；D RUNNING（worker `01a18154-a9bd-7ca2-a776-9a2834a519da`，focal r3）；Z未開始。
 - Branch: `feat/closeup-polish`（一條長分支，每個 sector 一個 checkpoint）
 - Base commit: `fdc4a0cbbbc352b41c15850f2a846845d7975de1`（fetch verified main，包含完整 S0 標準）
 - Last verified commit: C runtime `b5ce8fe64ccb7e41c06cbfd6ffcdc48acd4a37da`，root npm test/build/diff及11項C live PASS；視覺／效能gate仍FAIL。最終完整證據checkpoint見`result-C-1.json`；A/B pending和S0接受main `3d0f40e`保持。
@@ -168,7 +168,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 | A 海浜公園 | REVIEW_READY：worker `01a17e2a-4c38-7422-8d68-33782c0367f5`，dispatch `closeup-polish-A-1-r8`；三輪各24狀態完成 | runtime `b7d5861`；[完整review](../../artifacts/closeup-polish/A/REVIEW.md)，最終SHA見result-A-1.json | pending；A3/A4/V失敗保留 | — |
 | B アクアシティ南 | REVIEW_READY：worker `01a17e8c`，三輪各18狀態；A3/A4、focal A5/V及V3仍FAIL | runtime `74d6c2b`；[完整review](../../artifacts/closeup-polish/B/REVIEW.md)，final SHA見result-B-1.json | pending；建議暫不接受r3 focal退步候選 | — |
 | C フジテレビ東 | REVIEW_READY：focal/district各三輪、ring兩輪完成；A3全FAIL、A4 4/28，A5 18FAIL＋6UNVERIFIED；root/live11項PASS；未接受art | baseline `ca22a92` → runtime `b5ce8fe`；[逐圖／完整量度](../../artifacts/closeup-polish/C/REVIEW.md) | owner pending，建議暫不接受C美術 | — |
-| D デックス西＋沖 | PLANNED | — | — | — |
+| D デックス西＋沖 | RUNNING：focal第三輪，其他D shots待做 | r1 `7c05b4a`／r2 `eebff28`已push | 未接受 | — |
 | Z 全城回歸 | PLANNED | — | — | — |
 
 ## Actual validation results
@@ -269,3 +269,5 @@ Root test/build/diff、capture/report邊界自檢、[scope assertions](../../art
 Worker `01a18154-a9bd-7ca2-a776-9a2834a519da`，dispatch `closeup-polish-D-1-r18`在唯一clone接手：clean `3bb99ce2485aeb4b816e2ef21f8b74fb42328b08`、fetch成功、upstream0/0、vs origin/main18/0；main `3d0f40e`，無.codegraph。C writer/services已明確release；A/B/C source、原圖及pending美術全部保留，不merge main。已核人類原execution message及取消百分比門檻，沿task-relay／ponytail；ART/mastertaste與原圖足以定局部目標，未使用dream-loop。NW→第二水庭→機翼→島逐shot；四個NW／SE dock跨軸額外rows獨立標記，原98矩陣不變，欠同狀態S0的A5維持UNVERIFIED。首個sandbox Chrome launch失敗（無圖/row）與原log保留，fresh目錄retry獲准。進度與原證據見[D工作目錄](../../artifacts/closeup-polish/D/README.md)。
 
 D focal r1：8狀態／16原圖、4組雙窗效能及6比較完成，A4 2/6。Low/mixed A1高度24.8199%未過25%，high55.1096%通過；A2六個subject PASS、A3全FAIL。Shot82.3214/84.9667、hero82.3630/82.2273FPS，累積A/B/C/D與Chrome patch差異保留，raw calls/outliers不剔除。Root checks及checkpoint保存後才改r2，無美術接受。
+
+D focal r3：三輪已用完，8狀態／16原圖、6比較及4組雙窗口完整，8張final第二take均以original detail檢視。A1/A2六個subject皆PASS、A3 hits [3, 3, 3, 3, 3, 3]仍全FAIL；A4 2/6。確切FPS／calls及原窗口見[D focal summary](../../artifacts/closeup-polish/D/focal-summary.json)。服務身份、low/mixed夜間差異及背景綠化FAIL保留；未接受美術、不開第四輪，下一步NW district。

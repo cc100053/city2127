@@ -101,6 +101,8 @@ Headline 近鏡（2026-10-27）：live 結果先在 hero 播完 2.62 秒 vote jo
 
 District 直接讀 tier；DEV `?meters`／carrier 測試用 `deriveExhibitionLayout(D)`（同一門檻、唔限速）。全部 round 用 JavaScript `Math.round`。機能單元不是人口或等容量承諾；不能在實作中暗改算法。Root v2 不將 Meter 混入全城天空／氣氛。
 
+近鏡打磨D（2026-10-28，RUNNING，未接受）：NW focal在原服務槽與量體內細化服務面、窗框及層間操作標記，r1/r2的8狀態矩陣／效能各完成，r3量度中。低／中服務辨認、A3／A4及效能缺口保留；其餘D鏡頭與最終live尚未完成。[D進度](../artifacts/closeup-polish/D/README.md)，不合併main，A/B/C pending不變。
+
 ## 城市可見變化
 
 四個 site 是視覺焦點，**三個現行Meter與繼承氣候配置可影響整個 district**（2026-10-01 決策，P0–P12 已整合）；不再受原 MVP「只改四地塊」限制。
