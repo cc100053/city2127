@@ -5,6 +5,7 @@
     "r3/nw-focal"
   ],
   "nw:district": [
-    "r1/nw-district"
+    "r1/nw-district",
+    "r2/nw-district"
   ]
 }

@@ -273,3 +273,5 @@ D focal r1：8狀態／16原圖、4組雙窗效能及6比較完成，A4 2/6。Lo
 D focal r3：三輪已用完，8狀態／16原圖、6比較及4組雙窗口完整，8張final第二take均以original detail檢視。A1/A2六個subject皆PASS、A3 hits [3, 3, 3, 3, 3, 3]仍全FAIL；A4 2/6。確切FPS／calls及原窗口見[D focal summary](../../artifacts/closeup-polish/D/focal-summary.json)。服務身份、low/mixed夜間差異及背景綠化FAIL保留；未接受美術、不開第四輪，下一步NW district。
 
 D district r1：完整16狀態（含4獨立dock配對）、32原圖、14比較及4組雙窗量度保存，A4 0/14；14個subject A1/A2 PASS，A3全FAIL。完整box仍超出viewport，構圖太俯視令low服務館只讀成白屋頂，不因數字通過當美術接受。下一輪降低視角及細化原露台欄邊；NW選位／targets／配對語義保持。
+
+D district r2：16狀態／32原圖、14比較及4組雙窗完成，A4 0/14；A2只4個subject通過，其他卡區重疊5.12–5.33%FAIL，A3全部FAIL。Root完整suite/build/diff及324清場cases已在此source PASS；正常calls／raw陰影樣本保留。R3保持已量斜角，只降低本AutomationDistrict材質clone自發光，修正實際圖中白屋面缺層次問題，不改global light或body。

@@ -225,9 +225,68 @@
       "runtime": "original staffed terraces get supported edge guards; four landing-disc joints, same instanced material batches; controller/slots untouched",
       "source": "r2/preflight-nw-district/source.patch",
       "capture": "r2/nw-district; runtime frozen until all stages finish"
+    },
+    {
+      "districtR2FirstOriginal": "r2/nw-district/nw-district__-8__h12.jpg reviewed at original detail; support fronts are clearer than r1 but ceramic roofs are visibly overbright/flat. Consider local clone intensity only for r3, never global light.",
+      "runtimeCheckpoint": "ba75658 pushed and verified0/0 while capture continued; no source changed during capture."
+    },
+    {
+      "r3OfflineAimChecks": [
+        "district-r3-prediction.json",
+        "district-r3-west-prediction.json"
+      ],
+      "decision": "Neither passes all A2; do not substitute an unmeasured pose. Keep r2 pose and leave card FAIL explicit; local matte/curvature readability is the remaining concrete r3 goal."
+    },
+    {
+      "round": "r2",
+      "shot": "nw:district",
+      "states": 16,
+      "A2pass": 4,
+      "A4": [
+        0,
+        14
+      ],
+      "performance": [
+        {
+          "id": "nw:district",
+          "hour": 12,
+          "fps": 91.66617181931844,
+          "calls": [
+            "875",
+            "875"
+          ]
+        },
+        {
+          "id": "nw:district",
+          "hour": 22,
+          "fps": 92.07938859012341,
+          "calls": [
+            "875",
+            "875"
+          ]
+        },
+        {
+          "id": "hero",
+          "hour": 12,
+          "fps": 89.84477596283472,
+          "calls": [
+            "952",
+            "952"
+          ]
+        },
+        {
+          "id": "hero",
+          "hour": 22,
+          "fps": 89.96053422205387,
+          "calls": [
+            "952",
+            "952"
+          ]
+        }
+      ]
     }
   ],
-  "nextExpected": "District r2 active session79352; root tested source is frozen. Early runtime checkpoint before full round evidence, then push completed matrix after runner finishes; do not start other shots yet.",
+  "nextExpected": "Push complete district r2 evidence, then r3 only local ceramic clone emissive1\u21920.2; keep r2 pose, full final matrix/perf and original reviews; no fourth round.",
   "plannedPoses": {
     "nw:district": {
       "position": [
