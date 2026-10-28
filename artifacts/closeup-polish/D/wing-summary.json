@@ -1,0 +1,172 @@
+{
+  "shot": "energy:wing",
+  "rounds": 2,
+  "A4": [
+    2,
+    8
+  ],
+  "subject": [
+    {
+      "state": "baseline",
+      "hour": 12,
+      "auto": {
+        "A1": null,
+        "A2": null,
+        "A3": null,
+        "reason": "subject absent in this state"
+      },
+      "hits": 0
+    },
+    {
+      "state": "baseline",
+      "hour": 22,
+      "auto": {
+        "A1": null,
+        "A2": null,
+        "A3": null,
+        "reason": "subject absent in this state"
+      },
+      "hits": 0
+    },
+    {
+      "state": "a",
+      "hour": 12,
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.22050161873427931,
+        "height": 0.36192145726648056,
+        "center": {
+          "x": 0.49669083541587883,
+          "y": 0.5485664057583893
+        },
+        "cardOverlap": 0
+      },
+      "hits": 1
+    },
+    {
+      "state": "a",
+      "hour": 22,
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.22050161873427931,
+        "height": 0.36192145726648056,
+        "center": {
+          "x": 0.49669083541587883,
+          "y": 0.5485664057583893
+        },
+        "cardOverlap": 0
+      },
+      "hits": 1
+    },
+    {
+      "state": "b",
+      "hour": 12,
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.363897995408009,
+        "height": 0.5413971491410617,
+        "center": {
+          "x": 0.4956771208005999,
+          "y": 0.4977708976942538
+        },
+        "cardOverlap": 0
+      },
+      "hits": 1
+    },
+    {
+      "state": "b",
+      "hour": 22,
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.363897995408009,
+        "height": 0.5413971491410617,
+        "center": {
+          "x": 0.4956771208005999,
+          "y": 0.4977708976942538
+        },
+        "cardOverlap": 0
+      },
+      "hits": 1
+    },
+    {
+      "state": "mixed",
+      "hour": 12,
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.363897995408009,
+        "height": 0.5413971491410617,
+        "center": {
+          "x": 0.4956771208005999,
+          "y": 0.4977708976942538
+        },
+        "cardOverlap": 0
+      },
+      "hits": 1
+    },
+    {
+      "state": "mixed",
+      "hour": 22,
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.363897995408009,
+        "height": 0.5413971491410617,
+        "center": {
+          "x": 0.4956771208005999,
+          "y": 0.4977708976942538
+        },
+        "cardOverlap": 0
+      },
+      "hits": 1
+    }
+  ],
+  "performance": [
+    {
+      "id": "energy:wing",
+      "hour": 12,
+      "fps": 98.14011418540699,
+      "calls": [
+        "505",
+        "505"
+      ]
+    },
+    {
+      "id": "energy:wing",
+      "hour": 22,
+      "fps": 99.6992613151094,
+      "calls": [
+        "505",
+        "505"
+      ]
+    },
+    {
+      "id": "hero",
+      "hour": 12,
+      "fps": 91.54705754942137,
+      "calls": [
+        "952",
+        "952"
+      ]
+    },
+    {
+      "id": "hero",
+      "hour": 22,
+      "fps": 91.36110651708518,
+      "calls": [
+        "952",
+        "952"
+      ]
+    }
+  ]
+}

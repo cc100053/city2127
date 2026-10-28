@@ -1,0 +1,11 @@
+{
+  "commit": "a1d430f3c295e930fa2699445504652bbe672231",
+  "sha256": {
+    "src/headlineCamera.ts": "1f27b81430a3976170cdd1643a4817e245c53e2738429046db477816243ef489",
+    "src/siteBuilders/automationHub.ts": "705fd3d9f770afab156e15057294a42700ddd14acff22986924521f478de3483",
+    "src/districtMeters.ts": "c3363d2dfe19c9dc88f659cbfac06f5af58eac8c7efb7b95555dbbb5859bd910",
+    "src/energyPrototype.ts": "bf00b6611b20e0a1df6146e6e1ced3b647054ff68cf0cb55712f4fed1c228bca",
+    "src/devShotFrame.ts": "61558ef4610b26248ca69f4aa554bf4777cedff008e020e122ed41a77f0ff28c",
+    "artifacts/closeup-polish/capture.mjs": "bf1f9006b8e52f9284b3f5dfaed45664914c3b156d05d75f2fdd916d78598567"
+  }
+}

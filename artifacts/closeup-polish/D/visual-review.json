@@ -32,7 +32,17 @@
     "r2/energy-garden2/energy-garden2__mixed__h12.jpg",
     "r2/energy-garden2/energy-garden2__mixed__h22.jpg",
     "r2/energy-garden2/hero__neutral__h12.jpg",
-    "r2/energy-garden2/hero__neutral__h22.jpg"
+    "r2/energy-garden2/hero__neutral__h22.jpg",
+    "r2/energy-wing/energy-wing__baseline__h12.jpg",
+    "r2/energy-wing/energy-wing__baseline__h22.jpg",
+    "r2/energy-wing/energy-wing__a__h12.jpg",
+    "r2/energy-wing/energy-wing__a__h22.jpg",
+    "r2/energy-wing/energy-wing__b__h12.jpg",
+    "r2/energy-wing/energy-wing__b__h22.jpg",
+    "r2/energy-wing/energy-wing__mixed__h12.jpg",
+    "r2/energy-wing/energy-wing__mixed__h22.jpg",
+    "r2/energy-wing/hero__neutral__h12.jpg",
+    "r2/energy-wing/hero__neutral__h22.jpg"
   ],
   "rows": {
     "nw:focal/nw:focal/-2/12": {
@@ -936,6 +946,296 @@
     },
     "energy:garden2/hero/neutral/22": {
       "image": "r2/energy-garden2/hero__neutral__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "整座civic巨框、球體與多層海濱系統可直接讀成台場未來城市；hero不是服務單體辨識證明。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣、富士球體及彩虹橋的地理關係保留。"
+        ],
+        "V3": [
+          "FAIL",
+          "近岸球簇及棋盤屋頂綠地在全城仍明顯，未達mastertaste層次。"
+        ],
+        "V4": [
+          "PASS",
+          "多層交通、公民空間與水邊皆完整，維持成熟混合配置。"
+        ],
+        "V5": [
+          "PASS",
+          "岸線、框架、交通與樓體夜間可分辨，非每個遠處小服務槽可讀。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "全尺寸靜態原圖未見新增穿模／浮件；不宣稱所有motion state皆無閃爍。"
+        ]
+      }
+    },
+    "energy:wing/energy:wing/baseline/12": {
+      "image": "r2/energy-wing/energy-wing__baseline__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "N/A",
+          "基準沒有接收翼，不要求辨認缺席部件。"
+        ],
+        "V2": [
+          "PASS",
+          "海面與沿岸步道同時入鏡，海上基座位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "背景仍有圓球簇、棒棒糖冠層、柱形綠塊與大片平綠地，D未擴大改樹。"
+        ],
+        "V4": [
+          "PASS",
+          "基準海岸與公共空間完整，不把部件缺席當落後。"
+        ],
+        "V5": [
+          "N/A",
+          "日景以h22另核夜間。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見板框、分叉軸承、桅杆與基座未見明顯浮件或穿模；未用靜態圖證明完整動態無閃爍。"
+        ]
+      }
+    },
+    "energy:wing/energy:wing/baseline/22": {
+      "image": "r2/energy-wing/energy-wing__baseline__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "N/A",
+          "基準沒有接收翼，不要求辨認缺席部件。"
+        ],
+        "V2": [
+          "PASS",
+          "海面與沿岸步道同時入鏡，海上基座位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "背景仍有圓球簇、棒棒糖冠層、柱形綠塊與大片平綠地，D未擴大改樹。"
+        ],
+        "V4": [
+          "PASS",
+          "基準海岸與公共空間完整，不把部件缺席當落後。"
+        ],
+        "V5": [
+          "N/A",
+          "基準無接收翼，部件夜間辨識不適用。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見板框、分叉軸承、桅杆與基座未見明顯浮件或穿模；未用靜態圖證明完整動態無閃爍。"
+        ]
+      }
+    },
+    "energy:wing/energy:wing/a/12": {
+      "image": "r2/energy-wing/energy-wing__a__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "分叉桅杆與兩葉收集板可辨認，但單看仍像普通太陽能裝置，未直接表達軌道受電；未作真人兩秒測試。"
+        ],
+        "V2": [
+          "PASS",
+          "海面與沿岸步道同時入鏡，海上基座位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "背景仍有圓球簇、棒棒糖冠層、柱形綠塊與大片平綠地，D未擴大改樹。"
+        ],
+        "V4": [
+          "PASS",
+          "收集面、分叉承架、桅杆及海上基座完整；A的小翼與B/mixed的大翼沿原權威比例，均為完整方案。"
+        ],
+        "V5": [
+          "N/A",
+          "日景以h22另核夜間。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見板框、分叉軸承、桅杆與基座未見明顯浮件或穿模；未用靜態圖證明完整動態無閃爍。"
+        ]
+      }
+    },
+    "energy:wing/energy:wing/a/22": {
+      "image": "r2/energy-wing/energy-wing__a__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "分叉桅杆與兩葉收集板可辨認，但單看仍像普通太陽能裝置，未直接表達軌道受電；未作真人兩秒測試。"
+        ],
+        "V2": [
+          "PASS",
+          "海面與沿岸步道同時入鏡，海上基座位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "背景仍有圓球簇、棒棒糖冠層、柱形綠塊與大片平綠地，D未擴大改樹。"
+        ],
+        "V4": [
+          "PASS",
+          "收集面、分叉承架、桅杆及海上基座完整；A的小翼與B/mixed的大翼沿原權威比例，均為完整方案。"
+        ],
+        "V5": [
+          "PASS",
+          "兩葉板面分格、分叉支承與海上基座仍可讀，小/大輪廓差異保留；受電身份的歧義另列V1。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見板框、分叉軸承、桅杆與基座未見明顯浮件或穿模；未用靜態圖證明完整動態無閃爍。"
+        ]
+      }
+    },
+    "energy:wing/energy:wing/b/12": {
+      "image": "r2/energy-wing/energy-wing__b__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "分叉桅杆與兩葉收集板可辨認，但單看仍像普通太陽能裝置，未直接表達軌道受電；未作真人兩秒測試。"
+        ],
+        "V2": [
+          "PASS",
+          "海面與沿岸步道同時入鏡，海上基座位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "背景仍有圓球簇、棒棒糖冠層、柱形綠塊與大片平綠地，D未擴大改樹。"
+        ],
+        "V4": [
+          "PASS",
+          "收集面、分叉承架、桅杆及海上基座完整；A的小翼與B/mixed的大翼沿原權威比例，均為完整方案。"
+        ],
+        "V5": [
+          "N/A",
+          "日景以h22另核夜間。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見板框、分叉軸承、桅杆與基座未見明顯浮件或穿模；未用靜態圖證明完整動態無閃爍。"
+        ]
+      }
+    },
+    "energy:wing/energy:wing/b/22": {
+      "image": "r2/energy-wing/energy-wing__b__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "分叉桅杆與兩葉收集板可辨認，但單看仍像普通太陽能裝置，未直接表達軌道受電；未作真人兩秒測試。"
+        ],
+        "V2": [
+          "PASS",
+          "海面與沿岸步道同時入鏡，海上基座位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "背景仍有圓球簇、棒棒糖冠層、柱形綠塊與大片平綠地，D未擴大改樹。"
+        ],
+        "V4": [
+          "PASS",
+          "收集面、分叉承架、桅杆及海上基座完整；A的小翼與B/mixed的大翼沿原權威比例，均為完整方案。"
+        ],
+        "V5": [
+          "PASS",
+          "兩葉板面分格、分叉支承與海上基座仍可讀，小/大輪廓差異保留；受電身份的歧義另列V1。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見板框、分叉軸承、桅杆與基座未見明顯浮件或穿模；未用靜態圖證明完整動態無閃爍。"
+        ]
+      }
+    },
+    "energy:wing/energy:wing/mixed/12": {
+      "image": "r2/energy-wing/energy-wing__mixed__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "分叉桅杆與兩葉收集板可辨認，但單看仍像普通太陽能裝置，未直接表達軌道受電；未作真人兩秒測試。"
+        ],
+        "V2": [
+          "PASS",
+          "海面與沿岸步道同時入鏡，海上基座位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "背景仍有圓球簇、棒棒糖冠層、柱形綠塊與大片平綠地，D未擴大改樹。"
+        ],
+        "V4": [
+          "PASS",
+          "收集面、分叉承架、桅杆及海上基座完整；A的小翼與B/mixed的大翼沿原權威比例，均為完整方案。"
+        ],
+        "V5": [
+          "N/A",
+          "日景以h22另核夜間。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見板框、分叉軸承、桅杆與基座未見明顯浮件或穿模；未用靜態圖證明完整動態無閃爍。"
+        ]
+      }
+    },
+    "energy:wing/energy:wing/mixed/22": {
+      "image": "r2/energy-wing/energy-wing__mixed__h22.jpg",
+      "V1_V6": {
+        "V1": [
+          "FAIL",
+          "分叉桅杆與兩葉收集板可辨認，但單看仍像普通太陽能裝置，未直接表達軌道受電；未作真人兩秒測試。"
+        ],
+        "V2": [
+          "PASS",
+          "海面與沿岸步道同時入鏡，海上基座位置清楚。"
+        ],
+        "V3": [
+          "FAIL",
+          "背景仍有圓球簇、棒棒糖冠層、柱形綠塊與大片平綠地，D未擴大改樹。"
+        ],
+        "V4": [
+          "PASS",
+          "收集面、分叉承架、桅杆及海上基座完整；A的小翼與B/mixed的大翼沿原權威比例，均為完整方案。"
+        ],
+        "V5": [
+          "PASS",
+          "兩葉板面分格、分叉支承與海上基座仍可讀，小/大輪廓差異保留；受電身份的歧義另列V1。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "可見板框、分叉軸承、桅杆與基座未見明顯浮件或穿模；未用靜態圖證明完整動態無閃爍。"
+        ]
+      }
+    },
+    "energy:wing/hero/neutral/12": {
+      "image": "r2/energy-wing/hero__neutral__h12.jpg",
+      "V1_V6": {
+        "V1": [
+          "PASS",
+          "整座civic巨框、球體與多層海濱系統可直接讀成台場未來城市；hero不是服務單體辨識證明。"
+        ],
+        "V2": [
+          "PASS",
+          "海灣、富士球體及彩虹橋的地理關係保留。"
+        ],
+        "V3": [
+          "FAIL",
+          "近岸球簇及棋盤屋頂綠地在全城仍明顯，未達mastertaste層次。"
+        ],
+        "V4": [
+          "PASS",
+          "多層交通、公民空間與水邊皆完整，維持成熟混合配置。"
+        ],
+        "V5": [
+          "N/A",
+          "日景；夜景另列。"
+        ],
+        "V6": [
+          "STATIC PASS",
+          "全尺寸靜態原圖未見新增穿模／浮件；不宣稱所有motion state皆無閃爍。"
+        ]
+      }
+    },
+    "energy:wing/hero/neutral/22": {
+      "image": "r2/energy-wing/hero__neutral__h22.jpg",
       "V1_V6": {
         "V1": [
           "PASS",

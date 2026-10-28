@@ -14,6 +14,7 @@ if(process.argv.includes('--self-test')){
 const root='artifacts/closeup-polish/D',key=r=>`${r.id}/${r.state}/${r.hour}`,hash=p=>createHash('sha256').update(readFileSync(p)).digest('hex');
 const s0=read('artifacts/closeup-polish/S0/baseline/capture.json'),s0p=read('artifacts/closeup-polish/S0/baseline/performance.json');
 const plan=read(`${root}/rounds.json`),visual=read(`${root}/visual-review.json`),checks=read(`${root}/checks.json`),all=[],rows=[],performance=[],comparisons=[];
+assert.deepEqual(Object.keys(plan).sort(),['nw:focal','nw:district','energy:garden2','energy:wing','energy:island'].sort(),'All five D shots must be complete');
 for(const [id,rounds]of Object.entries(plan)){
  assert.ok(rounds.length>0&&rounds.length<=3,'Maximum three rounds per shot');
  for(const [index,dir]of rounds.entries()){
@@ -49,7 +50,7 @@ for(const [id,rounds]of Object.entries(plan)){
   }
  }
 }
-assert.equal(new Set(visual.reviewedOriginals).size,rows.length);assert.equal(rows.filter(r=>r.A5.reason).length,4);assert.ok(rows.filter(r=>r.A5.reason).every(r=>!r.A5.pass));assert.equal(checks.A7.status,'PASS');
+assert.equal(rows.length,50,'Complete D final state matrix including paired rows and per-shot heroes');assert.equal(new Set(visual.reviewedOriginals).size,rows.length);assert.equal(rows.filter(r=>r.A5.reason).length,4);assert.ok(rows.filter(r=>r.A5.reason).every(r=>!r.A5.pass));assert.equal(checks.A7.status,'PASS');
 for(const sector of ['S0','A','B','C'])for(const [p,h]of Object.entries(read(`artifacts/closeup-polish/${sector}/original-images.json`)))assert.equal(hash(p),h,`Changed ${sector} original ${p}`);
 for(const [p,h]of Object.entries(read(`${root}/final-source-hashes.json`).sha256))assert.equal(hash(p),h,`Changed final source ${p}`);
 const count=a=>Object.fromEntries([...new Set(a)].map(k=>[k,a.filter(x=>x===k).length]));

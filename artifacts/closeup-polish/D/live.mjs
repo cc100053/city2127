@@ -11,14 +11,14 @@ const out=process.env.CITY2127_EVIDENCE_DIR??'artifacts/closeup-polish/D/live';a
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
 const page=await browser.newPage({viewport:{width:1920,height:1080},deviceScaleFactor:1});
 await page.route('https://fonts.googleapis.com/**',r=>r.fulfill({contentType:'text/css',body:''}));
-const errors=[],checks=[],scratch=[];let owned,base;
+const errors=[],checks=[],scratch=[],origins=[];let owned,base,complete=false;
 page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error'&&!m.text().includes('favicon'))errors.push(m.text());});
 const api=async(path,body)=>{const r=await fetch(base+path,body===undefined?{}:{method:'POST',headers:{'content-type':'application/json',origin:base},body:JSON.stringify(body)});const j=await r.json();assert.equal(j.ok,true,JSON.stringify(j));return j.data;};
 async function closeServer(){if(!owned)return;owned.realtime.close();owned.server.closeAllConnections();await new Promise(r=>owned.server.close(r));owned.ctx.db.close();owned=null;}
 async function open(){
  await page.goto('about:blank');await closeServer();const dir=mkdtempSync(join(tmpdir(),'closeup-d-'));scratch.push(dir);
  const ctx=createContext({dbPath:join(dir,'survey.sqlite'),questionsPath:new URL('../../../survey/src/survey/questions.exhibition.json',import.meta.url).pathname});
- const services=createSurveyServer({ctx});await new Promise(r=>services.server.listen(0,'127.0.0.1',r));owned={...services,ctx};base=`http://127.0.0.1:${services.server.address().port}`;
+ const services=createSurveyServer({ctx});await new Promise(r=>services.server.listen(0,'127.0.0.1',r));owned={...services,ctx};base=`http://127.0.0.1:${services.server.address().port}`;origins.push(base);
  await page.goto((process.env.CITY2127_CITY_URL??'http://127.0.0.1:5194')+'/?survey='+encodeURIComponent(base.replace('http','ws')+'/ws')+'&hour=12',{waitUntil:'domcontentloaded'});await page.bringToFront();await page.waitForFunction(()=>document.querySelector('canvas')?.dataset.fps);
 }
 const pose=()=>page.evaluate(()=>window.cityShot());
@@ -60,8 +60,8 @@ try{
   await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.querySelector('canvas')?.dataset.fps);await at(HERO_POSITION);const reloaded=await data();assert.deepEqual(reloaded.energy.target,immediate.energy.target);assert.equal(reloaded.energy.parts[index].opacity,1);checks.push({check:'energy reload snapshot restores target and full part at hero',id,pass:true});
   await page.emulateMedia({reducedMotion:'no-preference'});
  }
- assert.deepEqual(errors,[]);
+ assert.deepEqual(errors,[]);complete=true;
 
 }finally{
- writeFileSync(`${out}/browser.json`,JSON.stringify({browser:browser.version(),apiOrigin:base,viewport:[1920,1080],dpr:1,quality:'default',checks,errors,timing:'Wait for the actual authored hold plus2.5s (queued submissions may wait behind earlier slots). Browser diagnostics refresh each120 frames (~2s); intermediate states prove easing. Exact3s duration/retarget remains covered by root tests; no3.000s browser precision claim.',fixtures:'Real current v4 service, water, receiver and island proposals; isolated scratch SQLite.'},null,2)+'\n');await browser.close();await closeServer();for(const dir of scratch)rmSync(dir,{recursive:true,force:true});
+ writeFileSync(`${out}/browser.json`,JSON.stringify({complete,browser:browser.version(),apiOrigin:base,apiOrigins:origins,viewport:[1920,1080],dpr:1,quality:'default',checks,errors,timing:'Wait for the actual authored hold plus2.5s (queued submissions may wait behind earlier slots). Browser diagnostics refresh each120 frames (~2s); intermediate states prove easing. Exact3s duration/retarget remains covered by root tests; no3.000s browser precision claim.',fixtures:'Real current v4 service, water, receiver and island proposals; isolated scratch SQLite.'},null,2)+'\n');await browser.close();await closeServer();for(const dir of scratch)rmSync(dir,{recursive:true,force:true});
 }
