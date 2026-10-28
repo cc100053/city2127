@@ -227,4 +227,4 @@ NW／wing各三輪、garden2／island各兩輪後停止；[50狀態S0／final及
 
 ### Closeup Z — 2026-10-29（全當前source量測）
 
-Z只新增證據／報告工具及文件；`src/`、tests、package與接手`4a3ad9f`保持byte-identical，runtime仍為`44521a0`，沒有改美術、SHOTS、hero/FOV42或資料／時間線。沿用S0 capture runner完成98態雙take，逐張檢視98張第二take原圖；S0與sector-last是各自當時source的比較，不能當同版本隔離優化。完整差異／實際驗證集中於[Z工作紀錄](../artifacts/closeup-polish/Z/README.md)與[handoff](handoffs/closeup-polish.md)。A–D美術仍待owner接受，未merge main。
+Z只新增證據／報告工具及文件；`src/`、tests、package與接手`4a3ad9f`保持byte-identical，runtime仍為`44521a0`，沒有改美術、SHOTS、hero/FOV42或資料／時間線。沿用S0 capture runner完成98態雙take，逐張檢視98張第二take原圖；S0與sector-last是各自當時source的比較，不能當同版本隔離優化。Z REVIEW_READY：98態／196靜態原圖、28組效能、96 A4與202 snapshot比較完整；root、四區scratch live16項、headline-aware E4與DEV/production smoke通過。A3全86適用項FAIL、A4 9/96、每態A5 71PASS／27FAIL，FAIL與原樣本保留。完整差異／實際驗證集中於[Z工作紀錄](../artifacts/closeup-polish/Z/README.md)與[handoff](handoffs/closeup-polish.md)。A–D美術仍待owner接受，未merge main。

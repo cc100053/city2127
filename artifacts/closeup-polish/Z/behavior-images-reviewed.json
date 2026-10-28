@@ -1,0 +1,26 @@
+{
+  "method": "Each listed original opened with view_image detail=original; functional evidence, not additional art acceptance.",
+  "reviewed": [
+    "live/A-hold.jpg",
+    "live/A-return.jpg",
+    "formal/one-garden-settled.png",
+    "formal/q3-current.png",
+    "formal/review-current.png",
+    "formal/mixed-22.png",
+    "formal/mixed-reduced-motion.png",
+    "formal/reset-baseline.png",
+    "dev-smoke/production-live.jpg",
+    "dev-smoke/production-reload-hero.jpg",
+    "production-smoke/production-live.jpg",
+    "production-smoke/production-reload-hero.jpg",
+    "live-retry1/A-hold.jpg",
+    "live-retry1/A-return.jpg",
+    "live-retry1/B-hold.jpg",
+    "live-retry1/B-return.jpg",
+    "live-retry1/C-hold.jpg",
+    "live-retry1/C-return.jpg",
+    "live-retry1/D-hold.jpg",
+    "live-retry1/D-return.jpg"
+  ],
+  "notes": "Current v4 four-sector card/shot matches visible; B focal foreground obstruction persists; formal Q3/review and mixed night/reduced/reset plus DEV/production live/reload inspected."
+}

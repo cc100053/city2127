@@ -16,6 +16,7 @@
   "limitations": [
     "S0 Chrome156.0.8078.48 vs Z156.0.8078.73",
     "Cumulative A/B/C/D source; not controlled same-version isolated optimization",
-    "Survey fixture build during NW focal high capture; finished before any uncapped perf; no idle-machine capture claim"
+    "Survey fixture build during NW focal high capture; finished before any uncapped perf; no idle-machine capture claim",
+    "Uncapped sequence continued in the same owned background process during actual agent quota failure; machine background/thermal state not controlled, no isolated optimization claim."
   ]
 }

@@ -9,5 +9,18 @@
     "capture": 98,
     "performance": 28,
     "comparison": 96
-  }
+  },
+  "dispatchId": "closeup-polish-Z-recover-r23",
+  "checkpoint": "f2572e808fed6741ba9f84f112d6dc0136df6b01",
+  "remoteVerified": true,
+  "upstream": [
+    0,
+    0
+  ],
+  "vsMain": [
+    36,
+    2
+  ],
+  "fetch": "success",
+  "note": "Actual provider limit interrupted the agent; same-owner background measurement completed28perf/96A4. No rerun/replacement samples. Existing Vite43568/cwd verified and reused; no capture/Chrome process remained."
 }

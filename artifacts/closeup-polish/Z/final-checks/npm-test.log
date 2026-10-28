@@ -1,0 +1,77 @@
+
+> city2127@1.0.0 test
+> node --experimental-strip-types tests/worldState.test.ts && node --experimental-strip-types tests/mobility.test.ts && node --experimental-strip-types tests/surveyAtmosphere.test.ts && node --experimental-strip-types tests/changeCatalog.test.ts && node --experimental-strip-types tests/cityChangeManager.test.ts && node --experimental-strip-types tests/siteAssets.test.ts && node --experimental-strip-types tests/automationHub.test.ts && node --experimental-strip-types tests/commonsPlaza.test.ts && node --experimental-strip-types tests/concentrationTower.test.ts && node --experimental-strip-types tests/districtMeters.test.ts && node --experimental-strip-types tests/housingPrototype.test.ts && node --experimental-strip-types tests/odaiba.test.ts && node --experimental-strip-types tests/surveyMeterPipeline.test.ts && node --experimental-strip-types tests/scaleLab.test.ts && node --experimental-strip-types tests/headlineCamera.test.ts && node --experimental-strip-types tests/devShotFrame.test.ts && node --experimental-strip-types tests/voteJourney.test.ts && node --experimental-strip-types tests/renderQuality.test.ts && node --experimental-strip-types tests/energyPrototype.test.ts && node --experimental-strip-types tests/energyPipeline.test.ts && node --experimental-strip-types tests/energyDistrict.test.ts && node tests/energyE5.browser.mjs --self-test
+
+PASS: survey blend, day clock wrap, daylight curve, mood keyframes and midnight continuity, night lights.
+PASS: daylight lighting preserved, night readability floors and continuous dusk lighting.
+PASS: admin clock holds day/night and Auto preserves the running cycle.
+PASS: street traffic — crossings 13/11 in 15 min, 934 stop-line and 175 queue frames, max lag 100 m; cars clear of each other and of crossers.
+PASS: Odaiba actors — air tiers clear landmarks, sites and beacons, sphere and interchange berths, pod spacing on 826 m of guideway, walker/party/doorway/transfer continuity, street cars on the road and spaced, drop-off bays on paving, day rhythm, benches, 4 lane beacons, aircraft slots, guide lights.
+Ignored malformed survey message {"type":"city-state-updated","state":{"runId":"r","revision":1,"scores":{"automation":2,"publicSharing":0,"environmentalPriority":0,"urbanConcentration":0},"layout":{"version":1,"lots":{"nw":{"lot":"empty","building":"medium"},"ne":{"lot":"empty","building":"none"},"sw":{"lot":"empty","building":"none"},"se":{"lot":"empty","building":"none"}}},"history":[{"revision":1,"questionText":"q","optionLabel":"x","policyChange":{"automation":2},"cityChanges":[{"socketId":"nw","label":"hub"}]}]},"view":{"runId":"r","revision":1,"scores":{"automation":2,"publicSharing":0,"environmentalPriority":0,"urbanConcentration":0},"layout":{"version":2,"bands":{}},"history":[{"revision":1,"questionText":"q","optionLabel":"x","policyChange":{"automation":2},"cityChanges":[{"socketId":"nw","label":"hub"}]}],"version":2}}
+PASS: survey scores → atmosphere mapping, causal panel text, typed event parsing, revision order, blendTo.
+PASS: layout selects explicit site variants and additive layers.
+PASS: four-site v2 targets, isolated axes, same-band retargets, snapshots/resets, and preserved v1 paths.
+PASS: asset cache/retry, Park animation, actual 12-tree GLB/fallback bounds, legacy transforms, and late attach.
+PASS: six bounded MAGNET service slots retarget smoothly and restore to the mixed 3/3 baseline.
+PASS: six recessed service faces stay behind the existing accessible approach.
+THREE.Object3D.add: object not an instance of THREE.Object3D. undefined
+PASS: upper operating joints survive late GLB loading without rebuilding their batch.
+✔ commons seats are preallocated, retarget smoothly, fold screens and stay in the SW lot (29.419ms)
+✔ commons shells stay on paving throughout folding and stow outside the shared benches (15.2695ms)
+✔ commons canopy keeps a clear oculus and the original annular footprint (14.760083ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 62.309125
+concentrationTower low bounds x=-4.00..4.00 y=0.03..8.90 z=-2.17..2.17; modules z=-1.35..1.47
+concentrationTower mixed bounds x=-4.50..4.50 y=0.40..18.05 z=-4.50..4.50; modules z=3.41..4.45
+concentrationTower high bounds x=-4.50..4.50 y=0.40..45.65 z=-4.50..4.50; modules z=-3.62..3.62
+concentrationTower: PASS
+PASS: environment district — 17 promenade bays, sails/pergolas/mist towers, roof sails/forest, facade shares, late roofs, legacy hide.
+PASS: automation district — 11 staffed pavilions ↔ drone ports, aircraft/pods/walker mapping, same targets, live retarget, reset and legacy hide.
+PASS: actual P2 actor matrices match low/mixed/high independently of day mood; original standalone/legacy poses restored.
+PASS: sharing — 6 water gardens, actual screen matrices, mixed, same target, interruption, snapshot and legacy hide.
+PASS: concentration district — 10 towers in 3 silhouette families / 6 sky bridges vs 26 pods, rise, same target, mixed hybrid, invertible hidden matrices, legacy hide.
+PASS: P8 design families — every carrier mixes ≥ 2 families per band; each slot draws only its own design.
+PASS: P9 hybrids — none at low / high, 6 / 8 / 2 / 12 (automation / sharing / mid-rise / environment) at mixed; hybrid bay composes both designs.
+PASS: P5 pulses — live changes only, two waves, fade, no pulse on snapshot / unchanged target, cleared on legacy hide, GTAO-excluded.
+PASS: P12 current-slot crowds, live/snapshot/legacy, moving service drones, four night rhythms and civic material isolation.
+PASS: P3 carrier evidence covers uniform seed no-op, same-score redistribution, animation-independent targets and hidden pairings.
+PASS: ladder rungs — focal-only rung 1, drone ports 8,10,11 at rungs 0/2/3 nested, fleets at rung 3, quiet live changes.
+PASS: staffed service guards reuse batches within the original terrace footprints.
+PASS housing H1: five parked configurations, three agreed reservations, composite skin and shared resources; 50 meshes, 30 geometries, 128580 triangles.
+PASS H2: all 11 phases, disconnect-before-motion, full equipment bounds, random access/replay/90s wrap/static dock and resource identity.
+PASS H2 moving assemblies: cabin, home, fork, ropes, trolley and utilities; only measured rope-end mounting contacts.
+Odaiba: 32 roof strolls and 69 roof residents keep to open roof, clear of planting, meadows and sail posts.
+Odaiba: hero district keeps six landmarks and four sites; street detail, trees and facades stay inside it; the Odaiba backdrop and bay bridges stay clear of every route.
+Odaiba: sky bridges span clear air above the trains.
+Odaiba: pods ride the guideway deck, walkers keep to open ground outside site lots, water taxis stay afloat.
+Odaiba: survey sites sit on open ground, clear of roads, landmarks and guideway, and are visible from the hero pose.
+Odaiba: eight GLBs match Phase 03D world bounds within 2 mm, grounded, unit scale, legacy axis verified.
+Odaiba: 11 raised staffed pavilions clear context and actor routes; piers land on open ground.
+Odaiba: 6 private / open water rooms preserve boat beams, walker lanes and landward access.
+Odaiba: 10 vertical towers, 6 sky bridges and 26 pods stand on open ground, clear of landmarks, context and routes; sites stay visible.
+Odaiba: 10 sharing courts stand on open ground clear of context, routes and other Meter sites; sites stay visible.
+Odaiba: sharing courts show 2826 / 2016 / 966 / 2545 / 1938 / 825 / 892 / 1434 / 709 / 694 px of ground in the hero frame.
+Odaiba: P12 two-cycle continuity, separated plaza crowds, orchard/kiosk clearance and full service-drone columns pass actual geometry checks.
+Odaiba: 2 forecourt visits and 2 doorway meetings clear real paving, geometry and actual low/mixed/high day/night fleets; doorway people/robots keep clear, nobody walks in place (0,14 of 10011,999); seated bodies remain fixed.
+Odaiba: 1084 building occupants (934 placed, 98 strolling, 52 riding) draw at full size or not at all, move continuously and never walk in place.
+PASS housing fixed background: 352 band/seed/hybrid/transition configurations, unchanged dock and resources.
+PASS housing H2 city: actual landmark/environment/planting fixture, 7489 exact mesh checks, route envelopes (12 near tests), whole articulated sweep (680 interval boxes / 10923 near tests), including skyways, 5204836 actual fleet boxes across 90s day/night and 20 focal sightlines.
+PASS: P4 real accumulated history → carrier evidence → resident reason; direction-only, mixed and opposing preference/high collective city.
+PASS: P11 full-history order, equal-score/different-city in all four districts, >64 guests, retry, reload, reset and interrupted snapshot.
+PASS: 81 actual answer combinations → client parser → real four-site models; HTTP/WebSocket, retry, snapshot and reset.
+scaleLab tests passed
+PASS: 13 headline shots, card location priority, timing, interruption, catch-up and immediate cancel.
+PASS: no-headline interruptions preserve the first frame in hold/fly-out and return without another fly-in.
+PASS: four-site tier mapping, projection, nine samples, visible subjects and first-hit occlusion.
+voteJourney tests passed
+renderQuality ok
+Energy E3: five configurations, 49 batches, rotor shell gap 30.50 m; 21595 hulls, public / room paths, air / water berths and hero sightlines clear.
+PASS: 108 current four-question combinations → authority → strict wire → actual models; HTTP/WebSocket, evidence, no-change, journey node, retarget/snapshot/reduced motion.
+PASS: energy maximal envelope and full rotor sweeps clear actual district meshes across 324 low/mixed/high + history-seed + receiver-size cases (177867 exact geometry checks).
+PASS E5 frame statistics self-check.

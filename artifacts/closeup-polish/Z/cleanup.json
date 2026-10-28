@@ -1,0 +1,36 @@
+{
+  "atUTC": "2026-10-28T23:21:01.437441+00:00",
+  "stoppedVite": [
+    {
+      "pid": 43568,
+      "port": 5194,
+      "cwd": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout",
+      "command": "node /Users/fatboy/city2127/.task-relay/closeup-polish/checkout/node_modules/.bin/vite --host 127.0.0.1 --port 5194 --strictPort"
+    },
+    {
+      "pid": 70383,
+      "port": 5195,
+      "cwd": "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout",
+      "command": "node ./node_modules/.bin/vite preview --host 127.0.0.1 --port 5195 --strictPort"
+    }
+  ],
+  "bindConfirmedFree": [
+    5194,
+    5195,
+    50322,
+    50436,
+    50461,
+    50821,
+    50897,
+    51081,
+    51145
+  ],
+  "scratchRootsRemoved": [
+    "/private/tmp/closeup-z-browser-qtrf9226",
+    "/private/tmp/closeup-z-live-retry-cvsk4hzm"
+  ],
+  "ownedChromeRemaining": [],
+  "browserRunners": "All exited; each runner finally closes browser/realtime/HTTP/SQLite. Smoke ephemeral ports are not recorded by unchanged accepted runner; exit/finally and owned-temp cleanup verified.",
+  "originalMeasurement": "same-owner capture/perf/compare completed; no matching process at recovery",
+  "released": true
+}

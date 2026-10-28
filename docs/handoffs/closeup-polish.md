@@ -1,16 +1,16 @@
 # closeup-polish — Headline 近鏡逐個打磨
 
 - Owner: cc100053（產品／審美最終批准）；實作由一個 long session 負責，開工時喺下面「進度」記低 session 名。
-- Status: S0 INTEGRATED（98/98，量度基準已接受）；A REVIEW_READY（三輪完成但gate仍FAIL）；B REVIEW_READY（worker `01a17e8c-3c8c-77f3-afbb-6f7d62abad14`；三輪完成，FAIL保留）；C REVIEW_READY（worker `01a17f7d-839f-74d0-8660-22e9c1ec1435`，dispatch `closeup-polish-C-1-r13`／recovery r16；focal/district三輪、ring兩輪，FAIL保留）；D REVIEW_READY（worker `01a18154-a9bd-7ca2-a776-9a2834a519da`，NW/wing三輪、garden2/island兩輪，FAIL保留）；Z RUNNING（worker `01a183af-1ca0-7190-a25c-b31a6db4fd98`，dispatch `closeup-polish-Z-1-r21`；全當前累積source驗證中）。
+- Status: S0 INTEGRATED（98/98，量度基準已接受）；A REVIEW_READY（三輪完成但gate仍FAIL）；B REVIEW_READY（worker `01a17e8c-3c8c-77f3-afbb-6f7d62abad14`；三輪完成，FAIL保留）；C REVIEW_READY（worker `01a17f7d-839f-74d0-8660-22e9c1ec1435`，dispatch `closeup-polish-C-1-r13`／recovery r16；focal/district三輪、ring兩輪，FAIL保留）；D REVIEW_READY（worker `01a18154-a9bd-7ca2-a776-9a2834a519da`，NW/wing三輪、garden2/island兩輪，FAIL保留）；Z REVIEW_READY（worker `01a183af-1ca0-7190-a25c-b31a6db4fd98`，dispatch `closeup-polish-Z-1-r21`／recovery r23；98態及完整回歸，art FAIL保留）。
 - Branch: `feat/closeup-polish`（一條長分支，每個 sector 一個 checkpoint）
 - Base commit: `fdc4a0cbbbc352b41c15850f2a846845d7975de1`（fetch verified main，包含完整 S0 標準）
-- Last verified commit: D runtime `44521a0d63aae904c306a19c4baac52a44b62a87`，root npm test/build/diff及23項D live PASS；art gate FAIL保留。最終feature evidence SHA／remote／release見`result-D-1.json`；A/B/C pending和S0接受main `3d0f40e`保持。
-- Remote availability: A `def2f28`、B `ca22a92`、C各輪至runtime `b5ce8fe`已push長feature；C最終證據SHA／remote確認／writer release／callback delivery見checkout外`.task-relay/closeup-polish/result-C-1.json`。A/B/C未整合main／未部署。
+- Last verified commit: Z重驗runtime `44521a0d63aae904c306a19c4baac52a44b62a87`，src/tests/package與base4a3ad9f相同；最終root/live16項/E4/DEV+production PASS、art FAIL保留。完整量測checkpoint `f2572e8`已push；最終evidence SHA／remote／release見checkout外`result-Z-1.json`。A/B/C/D pending及S0接受main `3d0f40e`保持。
+- Remote availability: A `def2f28`、B `ca22a92`、C `3bb99ce`、D `4a3ad9f`及Z完整量測 `f2572e8`已push長feature；Z最終SHA／remote確認／writer release／callback delivery見checkout外`.task-relay/closeup-polish/result-Z-1.json`。A–D未整合main／未部署。
 
 ## Session Git state
 
 - Session starting branch and HEAD: 主 checkout `feat/energy-demo-camera` @ `016f6d1`，原 upstream 0/0、對 main 2/18；全部保留。獨立 clone `.task-relay/closeup-polish/checkout` 由 verified `origin/main` 開 `feat/closeup-polish`，clean start。
-- Last fetched origin/main commit: `3d0f40ebd5d7350ecdcc05ab3420cacf926dfd9a`，2026-10-28 C final fetch成功；runtime `b5ce8fe` upstream0/0、vs main17/0，未pull/merge。最終evidence commit divergence見result-C-1.json。起始S0基準為`fdc4a0c`，原sandbox DNS retry及整合歷史保留。
+- Last fetched origin/main commit: `545bff234745c037caa963acf70c661efa801bb7`，2026-10-29 Z恢復fetch成功，起始16d3f70/upstream0/0、vs main36/2；main兩個文件commit未自動merge。此前C final fetch main3d0f40e；runtime `b5ce8fe` upstream0/0、vs main17/0，未pull/merge。最終evidence commit divergence見result-C-1.json。起始S0基準為`fdc4a0c`，原sandbox DNS retry及整合歷史保留。
 - Local changes present at session start: 主 checkout 未追蹤 `.playwright-cli/`、`.task-relay/` 保留；獨立 clone NONE。
 - Upstream integration status: S0按revision7授權整合；fresh origin/main `fdc4a0c`，feature5/0，clean start；main新建追蹤origin/main，no-ff merge無衝突。
 - Pending Git conflicts or synchronization blockers: NONE
@@ -169,7 +169,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 | B アクアシティ南 | REVIEW_READY：worker `01a17e8c`，三輪各18狀態；A3/A4、focal A5/V及V3仍FAIL | runtime `74d6c2b`；[完整review](../../artifacts/closeup-polish/B/REVIEW.md)，final SHA見result-B-1.json | pending；建議暫不接受r3 focal退步候選 | — |
 | C フジテレビ東 | REVIEW_READY：focal/district各三輪、ring兩輪完成；A3全FAIL、A4 4/28，A5 18FAIL＋6UNVERIFIED；root/live11項PASS；未接受art | baseline `ca22a92` → runtime `b5ce8fe`；[逐圖／完整量度](../../artifacts/closeup-polish/C/REVIEW.md) | owner pending，建議暫不接受C美術 | — |
 | D デックス西＋沖 | REVIEW_READY：134狀態／275原圖、final50；root/live23PASS，A3/A4/A5及V失敗保留 | runtime `44521a0`；[完整report](../../artifacts/closeup-polish/D/REVIEW.md)，final SHA見result-D-1.json | pending，建議暫不接受D美術 | — |
-| Z 全城回歸 | RUNNING：原98態／28效能／四區scratch live，僅量度文件 | base `4a3ad9f`／runtime `44521a0`；[工作紀錄](../../artifacts/closeup-polish/Z/README.md) | A–D與A3/A4政策仍待owner | — |
+| Z 全城回歸 | REVIEW_READY：98態／28效能／96A4／202比較；root/live16項/E4/DEV+production PASS，FAIL保留 | base `4a3ad9f`／runtime `44521a0`；[完整報告](../../artifacts/closeup-polish/Z/REVIEW.md) | A–D與A3/A4政策仍待owner；未merge main | 222 originals／98 final逐圖 |
 
 ## Actual validation results
 
@@ -194,7 +194,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 
 ## Next expected step
 
-Coordinator核對唯一result-D-1.json、feature final SHA、[D逐圖review](../../artifacts/closeup-polish/D/REVIEW.md)、原始樣本及writer/services release後接手。D是有界實驗完成，未作美術接受；A/B/C/D owner pending只阻相應art merge，下一步Z全城當前source矩陣與scratch live由coordinator另派。D worker不做Z、第四輪或main merge。百分比預停已取消，只在真正provider limit時recovery。
+Coordinator從唯一result-Z-1.json、最終feature SHA及[Z三欄原圖／全部gates](../../artifacts/closeup-polish/Z/REVIEW.md)核對完整結果及writer/services release，獨立review後交owner決定A/B/C/D接受／部分接受／棄用及A3/A4政策。Z完成係量測與功能驗證，不代表美術接受；不自動merge main、追加第四輪或實作獨立F1/N1。百分比預停已取消，只在真正provider limit時recovery。
 
 ## S0 resume — 2026-10-27
 
@@ -299,3 +299,14 @@ Root npm test/build/diff、capture/report/round self-check與scope PASS：108權
 `origin/main:docs/handoffs/closeup-next.md` C1已核：續D review→Z→owner review；F1/F2/N1獨立，本批不實作或自動merge main新文件。S0/A/B/C/D共957原圖hash全部一致，完整src/tests/package起始hash保存於[preflight](../../artifacts/closeup-polish/Z/preflight.json)。Z不改runtime／pose／美術或門檻，重用capture.mjs完整98雙take、獨立28組雙窗效能及96A4；Chrome實際仍156.0.8078.73，S0 .48差異明列。
 
 Root test首次sandbox listen EPERM log保留，授權重跑完整suite及build PASS；survey只build供scratch Guest/Admin fixture，不宣稱獨立package suite。新report/live量度腳本自檢PASS。當前仍RUNNING，進度與服務ownership見[progress](../../artifacts/closeup-polish/Z/progress.json)；未完成98原圖審閱／live／final report前不宣稱Z完成，A–D及A3/A4政策pending保持。
+
+
+## Z final verification — 2026-10-29
+
+唯一owner `01a183af-1ca0-7190-a25c-b31a6db4fd98`，base `4a3ad9f`／runtime `44521a0`；[完整紀錄](../../artifacts/closeup-polish/Z/README.md)、[三欄逐圖報告](../../artifacts/closeup-polish/Z/REVIEW.md)、[checks](../../artifacts/closeup-polish/Z/checks.json)。沒有runtime/art/pose/gate變更，957張舊originals hash不變；原98矩陣兩take完整196 JPEG，另10 live／12 formal／4 smoke，共222 originals。98 final及20行為原圖逐張original detail檢視；28組uncapped雙窗、96 A4、202 S0/sector-last比較完整。
+
+A1 84PASS／2FAIL／12N/A；A2 68／18／12；A3 86FAIL／12N/A；A4 9/96；每態A5 71PASS／27FAIL，canonical效能22PASS／6FAIL；A6 98PASS，repro47PASS／51FAIL均固定用第二take、不換失敗樣本。Uncapped89.232–135.208FPS、vsync59.8–60.3；raw shadow calls不過濾，Chrome/S0版本及累積source限制保持。V1 42FAIL、V2 6FAIL、V3全98FAIL、V4全98PASS；V5只計h22為28PASS／16FAIL，日景／缺席54N/A；V6 82STATIC PASS／6FAIL／10N/A。B focal退步、NW hybrid接合與綠化等缺口保留，不因功能PASS接受美術。
+
+最終root test/build/diff與report/live/capture/snapshot/known-ray自檢PASS，108權威/wire/model組合及324能源清場cases／177867 checks通過。Current-v4 devAuto fresh scratch live16項、headline-aware E4 14情境、DEV3／production2項smoke PASS，page errors0；精確三秒靠node，browser只證實中間態。Live首輪初始能源欄位假設錯誤的2原圖/log保留，fixture沿用shared空配置並新增自檢，fresh retry完整PASS；runtime未改。A因v4 Q3不再改環境Meter而用第一水庭驗live，未操作auto-answer panel；E4實際Guest UI／retry／mixed／reconnect／reset另驗且clock jumps限制保留。F1/N1未做，survey/module-swap獨立suite未另跑。
+
+實際provider quota limit後，同一background程序完成28perf/96A4；recovery r23核對已完成原始結果、source/URL/pose/hashes與程序，沒有第二writer或重跑樣本。恢復fetch成功，main545bff2未merge；完整量測checkpoint f2572e8遠端0/0。[Cleanup](../../artifacts/closeup-polish/Z/cleanup.json)核對cwd/命令後關閉Vite43568／preview70383，5194/5195及7個已記錄scratch ports bind free，所有owned Chrome/runner/SQLite/temp清場。最後evidence SHA／remote／release／callback由checkout外result-Z-1.json記錄，共享state只由coordinator寫。只測開發Mac Chrome，未驗展示機、其他平台、實體HDMI、長跑、真人兩秒或完整動態閃爍；owner美術決策仍pending，未merge main／部署。README啟動／AGENTS工作流未變，按sync表不改其文案。

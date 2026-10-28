@@ -4,16 +4,26 @@ import {readFileSync,writeFileSync,readdirSync,existsSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {relative,join} from 'node:path';
 import {key,lastSnapshots,sectorFor} from './snapshots.mjs';
+import {SHOTS} from '../../../src/headlineCamera.ts';
+import {HERO_POSITION,HERO_TARGET} from '../../../src/heroCamera.ts';
 const read=p=>JSON.parse(readFileSync(p,'utf8')),mean=a=>a.reduce((n,x)=>n+x,0)/a.length;
 const gate=(fps,calls,baselineFps,baselineCalls)=>fps>=baselineFps*.95&&calls<=baselineCalls*1.1;
 const mark=(r,k)=>r.id==='hero'||r.frame?.reason==='subject absent in this state'?'N/A':r.auto[k]===true?'PASS':r.auto[k]===false?'FAIL':'FAIL (unmeasurable)';
+const canonical=r=>{
+ const u=new URL(r.url),pose=r.id==='hero'?{position:HERO_POSITION,target:HERO_TARGET}:SHOTS[r.id];assert.ok(pose);
+ assert.equal(u.origin,'http://127.0.0.1:5194');assert.equal(u.searchParams.get('reviewTime'),'20');assert.equal(u.searchParams.get('hour'),String(r.hour));assert.equal(u.searchParams.get('shot'),r.id==='hero'?null:r.id);
+ if(r.id.startsWith('energy:')){assert.equal(u.searchParams.get('energy'),r.state);assert.equal(u.searchParams.get('meters'),null);}
+ else{assert.equal(u.searchParams.get('meters'),r.id==='hero'?'nw:0,ne:0,sw:0,se:0':r.id.split(':')[0]+':'+r.state);assert.equal(u.searchParams.get('energy'),null);}
+ for(const k of ['position','target'])assert.ok(Math.hypot(...pose[k].map((n,i)=>n-r.pose[k][i]))<.02,'Current authored '+k+' must match measured pose');
+};
 if(process.argv.includes('--self-test')){
+ const r={id:'nw:focal',state:'2',hour:12,url:'http://127.0.0.1:5194/?reviewTime=20&hour=12&meters=nw:2&shot=nw:focal',pose:SHOTS['nw:focal']};canonical(r);assert.throws(()=>canonical({...r,url:r.url.replace('shot=nw:focal','shot=ne:focal')}));assert.throws(()=>canonical({...r,pose:{...r.pose,position:[0,0,0]}}));
  assert.ok(/\.(jpg|png)$/.test('current/example.jpg'));assert.ok(!/\.(jpg|png)$/.test('capture.json'));
  assert.ok(gate(95,110,100,100));assert.ok(!gate(94.99,110,100,100));assert.ok(!gate(100,110.01,100,100));
  assert.equal(mark({id:'sw:district',frame:{reason:'near plane'},auto:{A1:null}},'A1'),'FAIL (unmeasurable)');
  assert.equal(mark({id:'energy:ring',frame:{reason:'subject absent in this state'},auto:{A1:null}},'A1'),'N/A');
  const last=lastSnapshots();for(const id of ['ne:focal','sw:focal','se:focal','nw:focal'])assert.ok(last.has(`${sectorFor(id)}/${id}/2/12`));
- console.log('PASS: A5 boundaries, invalid projection FAIL, absent N/A, all four final snapshot selections.');process.exit(0);
+ console.log('PASS: current URL/pose and wrong-shot rejection, A5 boundaries, invalid projection FAIL, absent N/A, final snapshot selections.');process.exit(0);
 }
 const root='artifacts/closeup-polish/Z',capture=read(`${root}/current/capture.json`),perf=read(`${root}/current/performance.json`),pairs=read(`${root}/current/comparison.json`);
 const s0=read('artifacts/closeup-polish/S0/baseline/capture.json'),s0p=read('artifacts/closeup-polish/S0/baseline/performance.json'),last=lastSnapshots(),visual=read(`${root}/visual-review.json`),delta=read(`${root}/snapshot-comparisons.json`),checks=read(`${root}/checks.json`);
@@ -24,10 +34,10 @@ for(const sector of ['S0','A','B','C','D'])for(const [p,h]of Object.entries(read
 assert.deepEqual(capture.rows.map(key).sort(),s0.rows.map(key).sort());assert.equal(capture.rows.length,98);assert.equal(perf.rows.length,28);assert.equal(pairs.rows.length,96);assert.equal(delta.rows.length,202);
 assert.equal(new Set(capture.rows.map(key)).size,98);assert.equal(new Set(perf.rows.map(r=>`${r.id}/${r.hour}`)).size,28);
 assert.deepEqual(capture.viewport,[1920,1080]);assert.equal(capture.dpr,1);assert.equal(capture.quality,'default');assert.deepEqual(perf.launchArgs,['--disable-gpu-vsync','--disable-frame-rate-limit']);
-for(const r of capture.rows){assert.ok(r.complete&&r.takes.length===2);assert.equal(r.takes[0].url,r.takes[1].url);assert.deepEqual(r.takes[0].pose,r.takes[1].pose);const u=new URL(r.url);assert.equal(u.searchParams.get('reviewTime'),'20');assert.equal(u.searchParams.get('hour'),String(r.hour));assert.equal(r.reproducibility.pass,r.reproducibility.mad<1/255);}
+for(const r of capture.rows){canonical(r);for(const t of r.takes)canonical({...r,...t});assert.ok(r.complete&&r.takes.length===2);assert.equal(r.takes[0].url,r.takes[1].url);assert.deepEqual(r.takes[0].pose,r.takes[1].pose);const u=new URL(r.url);assert.equal(u.searchParams.get('reviewTime'),'20');assert.equal(u.searchParams.get('hour'),String(r.hour));assert.equal(r.reproducibility.pass,r.reproducibility.mad<1/255);}
 const performance=perf.rows.map(r=>{
  const baseline=s0p.rows.find(b=>b.id===r.id&&b.hour===r.hour);assert.ok(baseline);assert.equal(r.state,baseline.state);
- assert.ok(r.complete&&r.rounds.length===2);for(const t of r.rounds){assert.ok(t.sample.elapsedMs>=5000);assert.ok(Math.abs(t.sample.fps-t.sample.intervals.length*1000/t.sample.elapsedMs)<1e-8);}
+ assert.ok(r.complete&&r.rounds.length===2);for(const t of r.rounds){canonical({...r,...t});assert.ok(t.sample.elapsedMs>=5000);assert.ok(Math.abs(t.sample.fps-t.sample.intervals.length*1000/t.sample.elapsedMs)<1e-8);}
  assert.ok(Math.abs(r.meanFps-mean(r.rounds.map(t=>t.sample.fps)))<1e-8);
  const calls=mean(r.rounds.map(t=>Number(t.diagnostics.drawCalls))),baselineCalls=mean(baseline.rounds.map(t=>Number(t.diagnostics.drawCalls)));
  return {id:r.id,hour:r.hour,state:r.state,fps:r.meanFps,baselineFps:baseline.meanFps,fpsRatio:r.meanFps/baseline.meanFps,calls,baselineCalls,rawCalls:r.rounds.map(t=>Number(t.diagnostics.drawCalls)),minimumFps:baseline.meanFps*.95,maximumCalls:baselineCalls*1.1,pass:gate(r.meanFps,calls,baseline.meanFps,baselineCalls)};

@@ -179,4 +179,4 @@ Admin Day／Night／Auto 保存為獨立 display setting：12:00／22:00／180 �
 
 ### 近鏡 Z 累積比較 — 2026-10-29（量測，未接受美術）
 
-全當前累積A/B/C/D runtime `44521a0`的98態雙take原圖已齊，原A1/A2/A3定義保持：84/68/0項PASS，另有12項N/A；A6全部98 PASS。綠化、部分設施身份／夜間及SW focal構圖缺口仍在，不能因功能檢查或完整證據交付而稱美術完成。Z不改runtime或原acceptance gate；接受／部分接受／棄用各sector及A3/A4政策仍由owner決定。實際效能／live與完整限制見[Z紀錄](../artifacts/closeup-polish/Z/README.md)及[驗證](VALIDATION.md)。
+全當前累積A/B/C/D runtime `44521a0`的98態雙take原圖已齊，原A1/A2/A3定義保持：84/68/0項PASS，另有12項N/A；A6全部98 PASS。綠化、部分設施身份／夜間及SW focal構圖缺口仍在，不能因功能檢查或完整證據交付而稱美術完成。Z的root／四區live16項／headline-aware E4及DEV/production smoke均通過，完整A4 9/96、每態A5 71PASS／27FAIL（28組canonical效能22PASS／6FAIL），所有原FAIL保留。Z不改runtime或原acceptance gate；接受／部分接受／棄用各sector及A3/A4政策仍由owner決定。實際效能／live與完整限制見[Z紀錄](../artifacts/closeup-polish/Z/README.md)及[驗證](VALIDATION.md)。

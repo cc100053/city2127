@@ -1,0 +1,70 @@
+{
+  "states": 98,
+  "originalFinalImagesReviewed": 98,
+  "A1": {
+    "PASS": 84,
+    "FAIL": 2,
+    "N/A": 12
+  },
+  "A2": {
+    "PASS": 68,
+    "FAIL": 18,
+    "N/A": 12
+  },
+  "A3": {
+    "FAIL": 86,
+    "N/A": 12
+  },
+  "A4": {
+    "pass": 9,
+    "pairs": 96
+  },
+  "A5": {
+    "FAIL": 27,
+    "PASS": 71
+  },
+  "canonicalPerformance": {
+    "FAIL": 6,
+    "PASS": 22
+  },
+  "A6": {
+    "PASS": 98
+  },
+  "reproducibility": {
+    "FAIL": 51,
+    "PASS": 47
+  },
+  "V": {
+    "V1": {
+      "FAIL": 42,
+      "PASS": 46,
+      "N/A": 10
+    },
+    "V2": {
+      "PASS": 92,
+      "FAIL": 6
+    },
+    "V3": {
+      "FAIL": 98
+    },
+    "V4": {
+      "PASS": 98
+    },
+    "V5": {
+      "N/A": 54,
+      "FAIL": 16,
+      "PASS": 28
+    },
+    "V6": {
+      "STATIC PASS": 82,
+      "FAIL": 6,
+      "N/A": 10
+    }
+  },
+  "performance": {
+    "minFps": 89.23207797815746,
+    "maxFps": 135.20820623676929,
+    "minVsync": 59.8,
+    "maxVsync": 60.3
+  }
+}

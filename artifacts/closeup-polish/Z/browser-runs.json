@@ -1,0 +1,42 @@
+{
+  "scratchRoot": "/private/tmp/closeup-z-browser-qtrf9226",
+  "removed": true,
+  "runs": [
+    {
+      "name": "live",
+      "status": "FAIL",
+      "exitCode": 1,
+      "log": "live.log",
+      "directory": "live",
+      "startedUTC": "2026-10-28T23:07:50.664946+00:00",
+      "finishedUTC": "2026-10-28T23:09:35.102823+00:00"
+    },
+    {
+      "name": "headlineAwareE4",
+      "status": "PASS",
+      "exitCode": 0,
+      "log": "formal.log",
+      "directory": "formal",
+      "startedUTC": "2026-10-28T23:09:35.103511+00:00",
+      "finishedUTC": "2026-10-28T23:12:07.176181+00:00"
+    },
+    {
+      "name": "devSmoke",
+      "status": "PASS",
+      "exitCode": 0,
+      "log": "dev-smoke.log",
+      "directory": "dev-smoke",
+      "startedUTC": "2026-10-28T23:12:07.176839+00:00",
+      "finishedUTC": "2026-10-28T23:12:53.257242+00:00"
+    },
+    {
+      "name": "productionSmoke",
+      "status": "PASS",
+      "exitCode": 0,
+      "log": "production-smoke.log",
+      "directory": "production-smoke",
+      "startedUTC": "2026-10-28T23:12:53.258183+00:00",
+      "finishedUTC": "2026-10-28T23:13:39.969985+00:00"
+    }
+  ]
+}

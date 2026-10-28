@@ -1,25 +1,57 @@
 {
   "rootNpmTest": {
     "status": "PASS",
-    "log": "npm-test-retry1.log",
-    "note": "Initial sandbox loopback EPERM retained in npm-test.log"
+    "log": "final-checks/npm-test.log",
+    "priorLog": "npm-test-retry1.log",
+    "initialFailure": "npm-test.log: sandbox loopback EPERM"
   },
   "rootNpmBuild": {
     "status": "PASS",
-    "log": "npm-build.log",
-    "note": "Existing JSON import/chunk warnings retained"
+    "log": "final-checks/npm-build.log",
+    "note": "Existing JSON import and chunk-size warnings retained"
   },
   "live": {
-    "status": "PENDING"
+    "status": "PASS",
+    "exitCode": 0,
+    "log": "live-retry1.log",
+    "directory": "live-retry1",
+    "startedUTC": "2026-10-28T23:14:09.410471+00:00",
+    "finishedUTC": "2026-10-28T23:18:08.501477+00:00",
+    "priorAttempt": {
+      "status": "FAIL",
+      "exitCode": 1,
+      "log": "live.log",
+      "directory": "live",
+      "startedUTC": "2026-10-28T23:07:50.664946+00:00",
+      "finishedUTC": "2026-10-28T23:09:35.102823+00:00"
+    },
+    "fixtureCorrection": "Use shared emptyEnergyConfiguration for an absent initial energy history; full authority/count assertions retained; self-test covers absent energy and stale counts.",
+    "scratchRoot": "/private/tmp/closeup-z-live-retry-cvsk4hzm",
+    "scratchRemoved": true
   },
   "headlineAwareE4": {
-    "status": "PENDING"
+    "status": "PASS",
+    "exitCode": 0,
+    "log": "formal.log",
+    "directory": "formal",
+    "startedUTC": "2026-10-28T23:09:35.103511+00:00",
+    "finishedUTC": "2026-10-28T23:12:07.176181+00:00"
   },
   "devSmoke": {
-    "status": "PENDING"
+    "status": "PASS",
+    "exitCode": 0,
+    "log": "dev-smoke.log",
+    "directory": "dev-smoke",
+    "startedUTC": "2026-10-28T23:12:07.176839+00:00",
+    "finishedUTC": "2026-10-28T23:12:53.257242+00:00"
   },
   "productionSmoke": {
-    "status": "PENDING"
+    "status": "PASS",
+    "exitCode": 0,
+    "log": "production-smoke.log",
+    "directory": "production-smoke",
+    "startedUTC": "2026-10-28T23:12:53.258183+00:00",
+    "finishedUTC": "2026-10-28T23:13:39.969985+00:00"
   },
   "runtime": "44521a0d63aae904c306a19c4baac52a44b62a87",
   "capture": {
@@ -48,5 +80,42 @@
       "FAIL": 51,
       "PASS": 47
     }
+  },
+  "diffCheck": {
+    "status": "PASS",
+    "log": "final-checks/diff-check.log"
+  },
+  "selfChecks": {
+    "status": "PASS",
+    "logs": [
+      "capture-self-test.log",
+      "live-self-test.log",
+      "report-self-test.log",
+      "snapshots-self-test.log",
+      "occlusion.log"
+    ]
+  },
+  "sourceScope": {
+    "status": "PASS",
+    "baseline": "4a3ad9fab51cd471a0cfa08a81a6b9ab4a722aca",
+    "runtime": "44521a0d63aae904c306a19c4baac52a44b62a87",
+    "sourceDiff": ""
+  },
+  "productionGlobals": {
+    "status": "PASS",
+    "staticScan": "production-check.json",
+    "browser": "production-smoke/smoke.json"
+  },
+  "cleanup": {
+    "status": "PASS",
+    "record": "cleanup.json"
+  },
+  "checkedUTC": "2026-10-28T23:21:40.064261+00:00",
+  "verification": {
+    "status": "PASS",
+    "record": "verification.json",
+    "links": 1223,
+    "priorOriginals": 957,
+    "zOriginals": 222
   }
 }

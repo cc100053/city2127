@@ -6,6 +6,7 @@ import {join} from 'node:path';
 import {createContext,createSurveyServer} from '../../../survey/src/server/server.ts';
 import {SHOTS} from '../../../src/headlineCamera.ts';
 import {HERO_POSITION} from '../../../src/heroCamera.ts';
+import {emptyEnergyConfiguration} from '../../../survey/src/shared/energy.ts';
 
 function authoritative(d,v){
  const l=v.layout,h=d.sites.magnetEast.automationHub,c=d.sites.dogenzakaSouth.commonsPlaza,p=d.sites.stationEastPark.environmentPark,t=d.sites.centerGaiRear.concentrationTower;
@@ -13,14 +14,14 @@ function authoritative(d,v){
  assert.equal(c.targetSharedSeats,l.sharedSeats);assert.equal(c.targetScreenedSeats,8-l.sharedSeats);assert.equal(c.visibleSharedSeats,l.sharedSeats);assert.equal(c.visibleScreenedSeats,8-l.sharedSeats);
  assert.equal(p.targetTreeCount,l.treeCount);assert.equal(p.visibleTreeCount,l.treeCount);assert.equal(p.targetCoolingFins,l.coolingFins);assert.equal(p.visibleCoolingFins,l.coolingFins);assert.equal(p.plantedFraction,l.plantedFraction);
  assert.equal(t.targetFunctionModules,l.functionModules);assert.equal(t.activeFunctionModules,l.functionModules);assert.equal(t.transitioning,false);
- assert.deepEqual(d.energy.target,l.energy);assert.equal(d.guestCount,v.guestCount);
- const e=l.energy,scales=[e.receiver==='none'?0:e.receiver==='small'?.65:1,e.waterGardens>0?1:0,e.waterGardens===2?.72:0,e.flywheel?1:0,e.island?1:0,e.waterGardens||e.flywheel||e.island||e.receiver!=='none'?1:0];
+ const e=l.energy??emptyEnergyConfiguration();assert.deepEqual(d.energy.target,e);assert.equal(d.guestCount,v.guestCount);
+ const scales=[e.receiver==='none'?0:e.receiver==='small'?.65:1,e.waterGardens>0?1:0,e.waterGardens===2?.72:0,e.flywheel?1:0,e.island?1:0,e.waterGardens||e.flywheel||e.island||e.receiver!=='none'?1:0];
  d.energy.parts.forEach((p,i)=>{assert.equal(p.visible,scales[i]>0);assert.equal(p.opacity,scales[i]>0?1:0);if(scales[i])assert.ok(Math.abs(p.scaleY-scales[i])<1e-6);});
 }
 if(process.argv.includes('--self-test')){
  const l={automatedPorts:3,sharedSeats:4,treeCount:8,coolingFins:3,plantedFraction:.5,functionModules:5,energy:{receiver:'none',waterGardens:0,flywheel:false,island:false}};
  const d={guestCount:0,sites:{magnetEast:{automationHub:{targetAutomatedPorts:3,targetHumanCounters:3,visibleAutomatedPorts:3,visibleHumanCounters:3}},dogenzakaSouth:{commonsPlaza:{targetSharedSeats:4,targetScreenedSeats:4,visibleSharedSeats:4,visibleScreenedSeats:4}},stationEastPark:{environmentPark:{targetTreeCount:8,visibleTreeCount:8,targetCoolingFins:3,visibleCoolingFins:3,plantedFraction:.5}},centerGaiRear:{concentrationTower:{targetFunctionModules:5,activeFunctionModules:5,transitioning:false}}},energy:{target:l.energy,parts:Array.from({length:6},()=>({visible:false,opacity:0,scaleY:1}))}};
- authoritative(d,{layout:l,guestCount:0});d.sites.magnetEast.automationHub.visibleAutomatedPorts=4;assert.throws(()=>authoritative(d,{layout:l,guestCount:0}));
+ authoritative(d,{layout:l,guestCount:0});delete l.energy;authoritative(d,{layout:l,guestCount:0});d.sites.magnetEast.automationHub.visibleAutomatedPorts=4;assert.throws(()=>authoritative(d,{layout:l,guestCount:0}));
  console.log('PASS: full four-site and energy assertions accept settled authority and reject stale counts.');process.exit(0);
 }
 const {chromium}=await import('/opt/homebrew/lib/node_modules/@playwright/cli/node_modules/playwright/index.mjs');
