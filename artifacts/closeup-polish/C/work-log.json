@@ -27,5 +27,6 @@
   "status": "district r3 complete / max rounds:18 originals individually reviewed, A2/A3 and A4 FAIL, draw925/743 S0 FAIL, dock V6 gaps retained. Next ring; focal r3 final cumulative capture pending.",
   "startedUTC": "2026-10-27T22:34:03.606381+00:00",
   "verificationOrder": "Author focal r3 final pose after r2, then district and ring. Defer focal r3 complete matrix/perf until all C geometry is final, so its last evidence includes cumulative district changes; no r4 or extra art iteration.",
-  "districtR2VisualFinding": "Oblique r2 passes A1/A2 but original low/day view focuses on NE shoreline/park and clips Fuji at top; V1 location clarity still fails. R3 will aim central/SE from a farther SW pose, preserve full carrier measurement and accept honest remaining failures."
+  "districtR2VisualFinding": "Oblique r2 passes A1/A2 but original low/day view focuses on NE shoreline/park and clips Fuji at top; V1 location clarity still fails. R3 will aim central/SE from a farther SW pose, preserve full carrier measurement and accept honest remaining failures.",
+  "ringR1Retry": "Chrome unexpectedly closed during mixed load after4 complete rows. Cause unknown; original capture.log/partial JSON and8 image hashes preserved. Combined retry/perf/compare was auto-review rejected for possible overwrites; read-only checks proved skip-complete keys and refuse-existing-image assertions, missing mixed/hero files and absent perf/compare. Capture-only same-source continuation attempted after that proof; no new art round."
 }

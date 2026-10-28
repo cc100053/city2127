@@ -1,0 +1,112 @@
+{
+  "mode": "compare",
+  "commit": "00424ca09f27ce25893155b7e185da911a2ef345",
+  "sourceDiff": "diff --git a/src/headlineCamera.ts b/src/headlineCamera.ts\nindex ee1f70b..1987757 100644\n--- a/src/headlineCamera.ts\n+++ b/src/headlineCamera.ts\n@@ -19,7 +19,7 @@ export const SHOTS: Record<ShotId, Pose> = {\n   'se:district': { position: [-200, 300, -365], target: [15, 35, -80] },\n   'energy:garden': { position: [-420, 65, -210], target: [-304, 12, -135] },\n   'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },\n-  'energy:ring': { position: [-118, 148, -138], target: [-18, 96, -24] },\n+  'energy:ring': { position: [-70, 135, -170], target: [-18, 99, -24] },\n   'energy:wing': { position: [56, 64, -496], target: [125, 22, -424] },\n   'energy:island': { position: [-142, 66, -556], target: [-60, 4, -470] },\n };\n",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "energy:ring",
+      "hour": 12,
+      "from": "baseline",
+      "to": "b",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.03448372524642628,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:ring",
+      "hour": 12,
+      "from": "b",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.005905944961933032,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:ring",
+      "hour": 12,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.03448270746841182,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:ring",
+      "hour": 22,
+      "from": "baseline",
+      "to": "b",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.02674681420067566,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:ring",
+      "hour": 22,
+      "from": "b",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.004727223667126516,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:ring",
+      "hour": 22,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.02672278875004133,
+      "rect": {
+        "x": 587,
+        "y": 105,
+        "width": 823,
+        "height": 863
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}

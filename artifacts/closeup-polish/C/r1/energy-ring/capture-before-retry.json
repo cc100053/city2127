@@ -1,0 +1,1064 @@
+{
+  "mode": "capture",
+  "commit": "00424ca09f27ce25893155b7e185da911a2ef345",
+  "sourceDiff": "diff --git a/src/headlineCamera.ts b/src/headlineCamera.ts\nindex ee1f70b..1987757 100644\n--- a/src/headlineCamera.ts\n+++ b/src/headlineCamera.ts\n@@ -19,7 +19,7 @@ export const SHOTS: Record<ShotId, Pose> = {\n   'se:district': { position: [-200, 300, -365], target: [15, 35, -80] },\n   'energy:garden': { position: [-420, 65, -210], target: [-304, 12, -135] },\n   'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },\n-  'energy:ring': { position: [-118, 148, -138], target: [-18, 96, -24] },\n+  'energy:ring': { position: [-70, 135, -170], target: [-18, 99, -24] },\n   'energy:wing': { position: [56, 64, -496], target: [125, 22, -424] },\n   'energy:island': { position: [-142, 66, -556], target: [-60, 4, -470] },\n };\n",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "energy:ring",
+      "state": "baseline",
+      "energy": "baseline",
+      "hour": 12,
+      "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&energy=baseline&shot=energy%3Aring",
+      "pose": {
+        "position": [
+          -70,
+          135,
+          -170
+        ],
+        "target": [
+          -18,
+          99,
+          -24
+        ]
+      },
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "60.0",
+        "drawCalls": "421",
+        "triangles": "13764922",
+        "geometries": "228",
+        "textures": "28"
+      },
+      "frame": {
+        "id": "energy:ring",
+        "subject": "energy-ring",
+        "box": null,
+        "reason": "subject absent in this state",
+        "worldBounds": null,
+        "hits": 0,
+        "samples": []
+      },
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+      "errors": [],
+      "images": [
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/energy-ring/energy-ring__baseline__h12__repeat1.jpg",
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/energy-ring/energy-ring__baseline__h12.jpg"
+      ],
+      "takes": [
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&energy=baseline&shot=energy%3Aring",
+          "pose": {
+            "position": [
+              -70,
+              135,
+              -170
+            ],
+            "target": [
+              -18,
+              99,
+              -24
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "12.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "598",
+            "triangles": "17734322",
+            "geometries": "228",
+            "textures": "28"
+          },
+          "frame": {
+            "id": "energy:ring",
+            "subject": "energy-ring",
+            "box": null,
+            "reason": "subject absent in this state",
+            "worldBounds": null,
+            "hits": 0,
+            "samples": []
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        },
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&energy=baseline&shot=energy%3Aring",
+          "pose": {
+            "position": [
+              -70,
+              135,
+              -170
+            ],
+            "target": [
+              -18,
+              99,
+              -24
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "12.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "421",
+            "triangles": "13764922",
+            "geometries": "228",
+            "textures": "28"
+          },
+          "frame": {
+            "id": "energy:ring",
+            "subject": "energy-ring",
+            "box": null,
+            "reason": "subject absent in this state",
+            "worldBounds": null,
+            "hits": 0,
+            "samples": []
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        }
+      ],
+      "reproducibility": {
+        "mad": 0.003929428407165335,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "auto": {
+        "A1": null,
+        "A2": null,
+        "A3": null,
+        "reason": "subject absent in this state"
+      },
+      "A6": true,
+      "complete": true
+    },
+    {
+      "id": "energy:ring",
+      "state": "baseline",
+      "energy": "baseline",
+      "hour": 22,
+      "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&energy=baseline&shot=energy%3Aring",
+      "pose": {
+        "position": [
+          -70,
+          135,
+          -170
+        ],
+        "target": [
+          -18,
+          99,
+          -24
+        ]
+      },
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "22.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "59.9",
+        "drawCalls": "421",
+        "triangles": "13764922",
+        "geometries": "229",
+        "textures": "28"
+      },
+      "frame": {
+        "id": "energy:ring",
+        "subject": "energy-ring",
+        "box": null,
+        "reason": "subject absent in this state",
+        "worldBounds": null,
+        "hits": 0,
+        "samples": []
+      },
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+      "errors": [],
+      "images": [
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/energy-ring/energy-ring__baseline__h22__repeat1.jpg",
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/energy-ring/energy-ring__baseline__h22.jpg"
+      ],
+      "takes": [
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&energy=baseline&shot=energy%3Aring",
+          "pose": {
+            "position": [
+              -70,
+              135,
+              -170
+            ],
+            "target": [
+              -18,
+              99,
+              -24
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "22.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "421",
+            "triangles": "13764922",
+            "geometries": "229",
+            "textures": "28"
+          },
+          "frame": {
+            "id": "energy:ring",
+            "subject": "energy-ring",
+            "box": null,
+            "reason": "subject absent in this state",
+            "worldBounds": null,
+            "hits": 0,
+            "samples": []
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        },
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&energy=baseline&shot=energy%3Aring",
+          "pose": {
+            "position": [
+              -70,
+              135,
+              -170
+            ],
+            "target": [
+              -18,
+              99,
+              -24
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "22.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "59.9",
+            "drawCalls": "421",
+            "triangles": "13764922",
+            "geometries": "229",
+            "textures": "28"
+          },
+          "frame": {
+            "id": "energy:ring",
+            "subject": "energy-ring",
+            "box": null,
+            "reason": "subject absent in this state",
+            "worldBounds": null,
+            "hits": 0,
+            "samples": []
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        }
+      ],
+      "reproducibility": {
+        "mad": 0.0032960624193092876,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": true
+      },
+      "auto": {
+        "A1": null,
+        "A2": null,
+        "A3": null,
+        "reason": "subject absent in this state"
+      },
+      "A6": true,
+      "complete": true
+    },
+    {
+      "id": "energy:ring",
+      "state": "b",
+      "energy": "b",
+      "hour": 12,
+      "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&energy=b&shot=energy%3Aring",
+      "pose": {
+        "position": [
+          -70,
+          135,
+          -170
+        ],
+        "target": [
+          -18,
+          99,
+          -24
+        ]
+      },
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "12.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "60.0",
+        "drawCalls": "447",
+        "triangles": "13937474",
+        "geometries": "246",
+        "textures": "28"
+      },
+      "frame": {
+        "id": "energy:ring",
+        "subject": "energy-ring",
+        "box": {
+          "left": 0.30614216236934355,
+          "right": 0.7339660688481342,
+          "top": 0.09776656125388394,
+          "bottom": 0.8962493105650402
+        },
+        "reason": null,
+        "worldBounds": {
+          "min": [
+            -62.87999584863204,
+            55.12000415136796,
+            -25.649999976158142
+          ],
+          "max": [
+            26.879995848632042,
+            144.87999584863203,
+            -11.5
+          ]
+        },
+        "hits": 0,
+        "samples": [
+          {
+            "x": 0.5200541156087388,
+            "y": 0.4970079359094621,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 183.4302695460763
+          },
+          {
+            "x": 0.34892455301722264,
+            "y": 0.17761483618499957,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 181.28475636975193
+          },
+          {
+            "x": 0.6911836782002552,
+            "y": 0.17761483618499957,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 157.71235222788647
+          },
+          {
+            "x": 0.34892455301722264,
+            "y": 0.8164010356339246,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 220.4207564054608
+          },
+          {
+            "x": 0.6911836782002552,
+            "y": 0.8164010356339246,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 168.70467925330806
+          },
+          {
+            "x": 0.5200541156087388,
+            "y": 0.17761483618499957,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 249.8645588819101
+          },
+          {
+            "x": 0.5200541156087388,
+            "y": 0.8164010356339246,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 244.20058411507324
+          },
+          {
+            "x": 0.34892455301722264,
+            "y": 0.4970079359094621,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 201.2343819978871
+          },
+          {
+            "x": 0.6911836782002552,
+            "y": 0.4970079359094621,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 171.942294884104
+          }
+        ]
+      },
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+      "errors": [],
+      "images": [
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/energy-ring/energy-ring__b__h12__repeat1.jpg",
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/energy-ring/energy-ring__b__h12.jpg"
+      ],
+      "takes": [
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&energy=b&shot=energy%3Aring",
+          "pose": {
+            "position": [
+              -70,
+              135,
+              -170
+            ],
+            "target": [
+              -18,
+              99,
+              -24
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "12.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "59.9",
+            "drawCalls": "447",
+            "triangles": "13937474",
+            "geometries": "246",
+            "textures": "28"
+          },
+          "frame": {
+            "id": "energy:ring",
+            "subject": "energy-ring",
+            "box": {
+              "left": 0.30614216236934355,
+              "right": 0.7339660688481342,
+              "top": 0.09776656125388394,
+              "bottom": 0.8962493105650402
+            },
+            "reason": null,
+            "worldBounds": {
+              "min": [
+                -62.87999584863204,
+                55.12000415136796,
+                -25.649999976158142
+              ],
+              "max": [
+                26.879995848632042,
+                144.87999584863203,
+                -11.5
+              ]
+            },
+            "hits": 0,
+            "samples": [
+              {
+                "x": 0.5200541156087388,
+                "y": 0.4970079359094621,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 183.4302695460763
+              },
+              {
+                "x": 0.34892455301722264,
+                "y": 0.17761483618499957,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 181.28475636975193
+              },
+              {
+                "x": 0.6911836782002552,
+                "y": 0.17761483618499957,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 157.71235222788647
+              },
+              {
+                "x": 0.34892455301722264,
+                "y": 0.8164010356339246,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 220.4207564054608
+              },
+              {
+                "x": 0.6911836782002552,
+                "y": 0.8164010356339246,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 168.70467925330806
+              },
+              {
+                "x": 0.5200541156087388,
+                "y": 0.17761483618499957,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 249.8645588819101
+              },
+              {
+                "x": 0.5200541156087388,
+                "y": 0.8164010356339246,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 244.20058411507324
+              },
+              {
+                "x": 0.34892455301722264,
+                "y": 0.4970079359094621,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 201.2343819978871
+              },
+              {
+                "x": 0.6911836782002552,
+                "y": 0.4970079359094621,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 171.942294884104
+              }
+            ]
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        },
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=12&energy=b&shot=energy%3Aring",
+          "pose": {
+            "position": [
+              -70,
+              135,
+              -170
+            ],
+            "target": [
+              -18,
+              99,
+              -24
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "12.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "447",
+            "triangles": "13937474",
+            "geometries": "246",
+            "textures": "28"
+          },
+          "frame": {
+            "id": "energy:ring",
+            "subject": "energy-ring",
+            "box": {
+              "left": 0.30614216236934355,
+              "right": 0.7339660688481342,
+              "top": 0.09776656125388394,
+              "bottom": 0.8962493105650402
+            },
+            "reason": null,
+            "worldBounds": {
+              "min": [
+                -62.87999584863204,
+                55.12000415136796,
+                -25.649999976158142
+              ],
+              "max": [
+                26.879995848632042,
+                144.87999584863203,
+                -11.5
+              ]
+            },
+            "hits": 0,
+            "samples": [
+              {
+                "x": 0.5200541156087388,
+                "y": 0.4970079359094621,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 183.4302695460763
+              },
+              {
+                "x": 0.34892455301722264,
+                "y": 0.17761483618499957,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 181.28475636975193
+              },
+              {
+                "x": 0.6911836782002552,
+                "y": 0.17761483618499957,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 157.71235222788647
+              },
+              {
+                "x": 0.34892455301722264,
+                "y": 0.8164010356339246,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 220.4207564054608
+              },
+              {
+                "x": 0.6911836782002552,
+                "y": 0.8164010356339246,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 168.70467925330806
+              },
+              {
+                "x": 0.5200541156087388,
+                "y": 0.17761483618499957,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 249.8645588819101
+              },
+              {
+                "x": 0.5200541156087388,
+                "y": 0.8164010356339246,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 244.20058411507324
+              },
+              {
+                "x": 0.34892455301722264,
+                "y": 0.4970079359094621,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 201.2343819978871
+              },
+              {
+                "x": 0.6911836782002552,
+                "y": 0.4970079359094621,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 171.942294884104
+              }
+            ]
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        }
+      ],
+      "reproducibility": {
+        "mad": 0.003952712090494634,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": false
+      },
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.42782390647879065,
+        "height": 0.7984827493111563,
+        "center": {
+          "x": 0.5200541156087388,
+          "y": 0.4970079359094621
+        },
+        "cardOverlap": 0
+      },
+      "A6": true,
+      "complete": true
+    },
+    {
+      "id": "energy:ring",
+      "state": "b",
+      "energy": "b",
+      "hour": 22,
+      "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&energy=b&shot=energy%3Aring",
+      "pose": {
+        "position": [
+          -70,
+          135,
+          -170
+        ],
+        "target": [
+          -18,
+          99,
+          -24
+        ]
+      },
+      "diagnostics": {
+        "engine": "three.js r180",
+        "hour": "22.00",
+        "displayMode": "auto",
+        "time": "20.00",
+        "fps": "60.0",
+        "drawCalls": "447",
+        "triangles": "13937474",
+        "geometries": "247",
+        "textures": "28"
+      },
+      "frame": {
+        "id": "energy:ring",
+        "subject": "energy-ring",
+        "box": {
+          "left": 0.30614216236934355,
+          "right": 0.7339660688481342,
+          "top": 0.09776656125388394,
+          "bottom": 0.8962493105650402
+        },
+        "reason": null,
+        "worldBounds": {
+          "min": [
+            -62.87999584863204,
+            55.12000415136796,
+            -25.649999976158142
+          ],
+          "max": [
+            26.879995848632042,
+            144.87999584863203,
+            -11.5
+          ]
+        },
+        "hits": 0,
+        "samples": [
+          {
+            "x": 0.5200541156087388,
+            "y": 0.4970079359094621,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 183.4302695460763
+          },
+          {
+            "x": 0.34892455301722264,
+            "y": 0.17761483618499957,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 181.28475636975193
+          },
+          {
+            "x": 0.6911836782002552,
+            "y": 0.17761483618499957,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 157.71235222788647
+          },
+          {
+            "x": 0.34892455301722264,
+            "y": 0.8164010356339246,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 220.4207564054608
+          },
+          {
+            "x": 0.6911836782002552,
+            "y": 0.8164010356339246,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 168.70467925330806
+          },
+          {
+            "x": 0.5200541156087388,
+            "y": 0.17761483618499957,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 249.8645588819101
+          },
+          {
+            "x": 0.5200541156087388,
+            "y": 0.8164010356339246,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 244.20058411507324
+          },
+          {
+            "x": 0.34892455301722264,
+            "y": 0.4970079359094621,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 201.2343819978871
+          },
+          {
+            "x": 0.6911836782002552,
+            "y": 0.4970079359094621,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 171.942294884104
+          }
+        ]
+      },
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+      "errors": [],
+      "images": [
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/energy-ring/energy-ring__b__h22__repeat1.jpg",
+        "/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/C/r1/energy-ring/energy-ring__b__h22.jpg"
+      ],
+      "takes": [
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&energy=b&shot=energy%3Aring",
+          "pose": {
+            "position": [
+              -70,
+              135,
+              -170
+            ],
+            "target": [
+              -18,
+              99,
+              -24
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "22.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "447",
+            "triangles": "13937474",
+            "geometries": "247",
+            "textures": "28"
+          },
+          "frame": {
+            "id": "energy:ring",
+            "subject": "energy-ring",
+            "box": {
+              "left": 0.30614216236934355,
+              "right": 0.7339660688481342,
+              "top": 0.09776656125388394,
+              "bottom": 0.8962493105650402
+            },
+            "reason": null,
+            "worldBounds": {
+              "min": [
+                -62.87999584863204,
+                55.12000415136796,
+                -25.649999976158142
+              ],
+              "max": [
+                26.879995848632042,
+                144.87999584863203,
+                -11.5
+              ]
+            },
+            "hits": 0,
+            "samples": [
+              {
+                "x": 0.5200541156087388,
+                "y": 0.4970079359094621,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 183.4302695460763
+              },
+              {
+                "x": 0.34892455301722264,
+                "y": 0.17761483618499957,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 181.28475636975193
+              },
+              {
+                "x": 0.6911836782002552,
+                "y": 0.17761483618499957,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 157.71235222788647
+              },
+              {
+                "x": 0.34892455301722264,
+                "y": 0.8164010356339246,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 220.4207564054608
+              },
+              {
+                "x": 0.6911836782002552,
+                "y": 0.8164010356339246,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 168.70467925330806
+              },
+              {
+                "x": 0.5200541156087388,
+                "y": 0.17761483618499957,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 249.8645588819101
+              },
+              {
+                "x": 0.5200541156087388,
+                "y": 0.8164010356339246,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 244.20058411507324
+              },
+              {
+                "x": 0.34892455301722264,
+                "y": 0.4970079359094621,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 201.2343819978871
+              },
+              {
+                "x": 0.6911836782002552,
+                "y": 0.4970079359094621,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 171.942294884104
+              }
+            ]
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        },
+        {
+          "url": "http://127.0.0.1:5194/?reviewTime=20&hour=22&energy=b&shot=energy%3Aring",
+          "pose": {
+            "position": [
+              -70,
+              135,
+              -170
+            ],
+            "target": [
+              -18,
+              99,
+              -24
+            ]
+          },
+          "diagnostics": {
+            "engine": "three.js r180",
+            "hour": "22.00",
+            "displayMode": "auto",
+            "time": "20.00",
+            "fps": "60.0",
+            "drawCalls": "447",
+            "triangles": "13937474",
+            "geometries": "247",
+            "textures": "28"
+          },
+          "frame": {
+            "id": "energy:ring",
+            "subject": "energy-ring",
+            "box": {
+              "left": 0.30614216236934355,
+              "right": 0.7339660688481342,
+              "top": 0.09776656125388394,
+              "bottom": 0.8962493105650402
+            },
+            "reason": null,
+            "worldBounds": {
+              "min": [
+                -62.87999584863204,
+                55.12000415136796,
+                -25.649999976158142
+              ],
+              "max": [
+                26.879995848632042,
+                144.87999584863203,
+                -11.5
+              ]
+            },
+            "hits": 0,
+            "samples": [
+              {
+                "x": 0.5200541156087388,
+                "y": 0.4970079359094621,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 183.4302695460763
+              },
+              {
+                "x": 0.34892455301722264,
+                "y": 0.17761483618499957,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 181.28475636975193
+              },
+              {
+                "x": 0.6911836782002552,
+                "y": 0.17761483618499957,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 157.71235222788647
+              },
+              {
+                "x": 0.34892455301722264,
+                "y": 0.8164010356339246,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 220.4207564054608
+              },
+              {
+                "x": 0.6911836782002552,
+                "y": 0.8164010356339246,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 168.70467925330806
+              },
+              {
+                "x": 0.5200541156087388,
+                "y": 0.17761483618499957,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 249.8645588819101
+              },
+              {
+                "x": 0.5200541156087388,
+                "y": 0.8164010356339246,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 244.20058411507324
+              },
+              {
+                "x": 0.34892455301722264,
+                "y": 0.4970079359094621,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 201.2343819978871
+              },
+              {
+                "x": 0.6911836782002552,
+                "y": 0.4970079359094621,
+                "hit": false,
+                "first": "fuji-civic-chassis",
+                "distance": 171.942294884104
+              }
+            ]
+          },
+          "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M6, Unspecified Version)",
+          "errors": []
+        }
+      ],
+      "reproducibility": {
+        "mad": 0.0032967432471959976,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "pass": true
+      },
+      "auto": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "width": 0.42782390647879065,
+        "height": 0.7984827493111563,
+        "center": {
+          "x": 0.5200541156087388,
+          "y": 0.4970079359094621
+        },
+        "cardOverlap": 0
+      },
+      "A6": true,
+      "complete": true
+    }
+  ],
+  "errors": []
+}

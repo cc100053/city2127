@@ -19,7 +19,7 @@ export const SHOTS: Record<ShotId, Pose> = {
   'se:district': { position: [-200, 300, -365], target: [15, 35, -80] },
   'energy:garden': { position: [-420, 65, -210], target: [-304, 12, -135] },
   'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },
-  'energy:ring': { position: [-118, 148, -138], target: [-18, 96, -24] },
+  'energy:ring': { position: [-70, 135, -170], target: [-18, 99, -24] },
   'energy:wing': { position: [56, 64, -496], target: [125, 22, -424] },
   'energy:island': { position: [-142, 66, -556], target: [-60, 4, -470] },
 };

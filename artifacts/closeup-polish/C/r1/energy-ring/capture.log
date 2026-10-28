@@ -1,0 +1,13 @@
+energy-ring__baseline__h12 {"auto":{"A1":null,"A2":null,"A3":null,"reason":"subject absent in this state"},"reproducibility":{"mad":0.003929428407165335,"rect":{"x":0,"y":0,"width":1920,"height":1080},"pass":false},"A6":true}
+energy-ring__baseline__h22 {"auto":{"A1":null,"A2":null,"A3":null,"reason":"subject absent in this state"},"reproducibility":{"mad":0.0032960624193092876,"rect":{"x":0,"y":0,"width":1920,"height":1080},"pass":true},"A6":true}
+energy-ring__b__h12 {"auto":{"A1":true,"A2":true,"A3":false,"width":0.42782390647879065,"height":0.7984827493111563,"center":{"x":0.5200541156087388,"y":0.4970079359094621},"cardOverlap":0},"reproducibility":{"mad":0.003952712090494634,"rect":{"x":0,"y":0,"width":1920,"height":1080},"pass":false},"A6":true}
+energy-ring__b__h22 {"auto":{"A1":true,"A2":true,"A3":false,"width":0.42782390647879065,"height":0.7984827493111563,"center":{"x":0.5200541156087388,"y":0.4970079359094621},"cardOverlap":0},"reproducibility":{"mad":0.0032967432471959976,"rect":{"x":0,"y":0,"width":1920,"height":1080},"pass":true},"A6":true}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.waitForFunction: Target page, context or browser has been closed
+    at load (/Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/capture.mjs:69:14)
+    at async file:///Users/fatboy/city2127/.task-relay/closeup-polish/checkout/artifacts/closeup-polish/capture.mjs:91:18
+
+Node.js v26.0.0

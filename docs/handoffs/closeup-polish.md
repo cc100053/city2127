@@ -247,3 +247,5 @@ C district r1：完整18狀態（10普通tier、2hero、6配對）／36原圖，
 C district r2：18狀態／36原圖、4組雙窗口效能、16比較完成；A4 0/16、low-solar A2因卡區重疊6.2%FAIL，其餘普通tier A1/A2通過而A3仍FAIL。連廊改為有地板／頂蓋／側框的可通行空間，solar canopy支架落在既有pod-family屋面內，綠冠沿用leafyCrown、權威counts/slot/footprint不變。Central-passage ray及屋面落點測試PASS，root test/build/diff PASS；完整能源清場324 cases PASS。R2圖仍偏岸邊，r3只重新對準central/SE，保留full carrier量度與未過gates。
 
 C district r3：三輪用完，完整18狀態／36原圖、4組雙窗口效能、16比較完成；最後18張原始第二take逐張以original detail檢視並記V1–V6。A1全部16主體狀態PASS，A2/A3全部FAIL，A4 0/16。+3 uncapped89.4979/88.6143FPS、925calls，S0 94.1664/93.1634FPS、743calls；FPS平均剛達95%而calls約124.5%明確超110%。Low／solar夜間辨識、forest夜間配對、綠化及dock看似懸空的載荷路徑缺口均保留；不做第四輪。Hero raw有一次1318calls影格，保留不挑走。下一步ring，focal r3完整矩陣仍按C累積source策略待拍；全C最終root/live驗證尚未完成。
+
+C ring r1：pose-only完整8狀態／16原圖、4組雙flag效能與6比較完成；A4 0/6，present ring A1/A2 PASS、A3 FAIL，absent baseline如實N/A。Mixed uncapped97.5202/97.9364FPS、447calls，S0 98.1494/99.8312FPS、443calls。Chrome於首個mixed載入意外關閉，原因未知，四個完整row／八張原圖及failure log保存；auto-review先拒絕combined retry的潛在覆寫，經skip-complete、防覆寫assert、缺失狀態及原圖hash核對後，capture-only續拍獲准並完成。原八張hash及原四row不變、source/helper/Chrome156.0.8078.73一致；效能／比較分開建立新檔。下一輪只以既有batch補轉子季度操作標記。

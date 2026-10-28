@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "originalImagesVerified": 8,
+  "originalRowsUnchanged": 4,
+  "finalRows": 8,
+  "runtimeAndCaptureHelperUnchanged": true,
+  "newFilesNotYetExisting": [
+    "performance.json",
+    "comparison.json"
+  ]
+}
