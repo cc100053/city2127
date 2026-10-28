@@ -33,16 +33,16 @@
     "r2/energy-garden2/energy-garden2__mixed__h22.jpg",
     "r2/energy-garden2/hero__neutral__h12.jpg",
     "r2/energy-garden2/hero__neutral__h22.jpg",
-    "r2/energy-wing/energy-wing__baseline__h12.jpg",
-    "r2/energy-wing/energy-wing__baseline__h22.jpg",
-    "r2/energy-wing/energy-wing__a__h12.jpg",
-    "r2/energy-wing/energy-wing__a__h22.jpg",
-    "r2/energy-wing/energy-wing__b__h12.jpg",
-    "r2/energy-wing/energy-wing__b__h22.jpg",
-    "r2/energy-wing/energy-wing__mixed__h12.jpg",
-    "r2/energy-wing/energy-wing__mixed__h22.jpg",
-    "r2/energy-wing/hero__neutral__h12.jpg",
-    "r2/energy-wing/hero__neutral__h22.jpg"
+    "r3/energy-wing/energy-wing__baseline__h12.jpg",
+    "r3/energy-wing/energy-wing__baseline__h22.jpg",
+    "r3/energy-wing/energy-wing__a__h12.jpg",
+    "r3/energy-wing/energy-wing__a__h22.jpg",
+    "r3/energy-wing/energy-wing__b__h12.jpg",
+    "r3/energy-wing/energy-wing__b__h22.jpg",
+    "r3/energy-wing/energy-wing__mixed__h12.jpg",
+    "r3/energy-wing/energy-wing__mixed__h22.jpg",
+    "r3/energy-wing/hero__neutral__h12.jpg",
+    "r3/energy-wing/hero__neutral__h22.jpg"
   ],
   "rows": {
     "nw:focal/nw:focal/-2/12": {
@@ -974,7 +974,7 @@
       }
     },
     "energy:wing/energy:wing/baseline/12": {
-      "image": "r2/energy-wing/energy-wing__baseline__h12.jpg",
+      "image": "r3/energy-wing/energy-wing__baseline__h12.jpg",
       "V1_V6": {
         "V1": [
           "N/A",
@@ -1003,7 +1003,7 @@
       }
     },
     "energy:wing/energy:wing/baseline/22": {
-      "image": "r2/energy-wing/energy-wing__baseline__h22.jpg",
+      "image": "r3/energy-wing/energy-wing__baseline__h22.jpg",
       "V1_V6": {
         "V1": [
           "N/A",
@@ -1032,7 +1032,7 @@
       }
     },
     "energy:wing/energy:wing/a/12": {
-      "image": "r2/energy-wing/energy-wing__a__h12.jpg",
+      "image": "r3/energy-wing/energy-wing__a__h12.jpg",
       "V1_V6": {
         "V1": [
           "FAIL",
@@ -1061,7 +1061,7 @@
       }
     },
     "energy:wing/energy:wing/a/22": {
-      "image": "r2/energy-wing/energy-wing__a__h22.jpg",
+      "image": "r3/energy-wing/energy-wing__a__h22.jpg",
       "V1_V6": {
         "V1": [
           "FAIL",
@@ -1090,7 +1090,7 @@
       }
     },
     "energy:wing/energy:wing/b/12": {
-      "image": "r2/energy-wing/energy-wing__b__h12.jpg",
+      "image": "r3/energy-wing/energy-wing__b__h12.jpg",
       "V1_V6": {
         "V1": [
           "FAIL",
@@ -1119,7 +1119,7 @@
       }
     },
     "energy:wing/energy:wing/b/22": {
-      "image": "r2/energy-wing/energy-wing__b__h22.jpg",
+      "image": "r3/energy-wing/energy-wing__b__h22.jpg",
       "V1_V6": {
         "V1": [
           "FAIL",
@@ -1148,7 +1148,7 @@
       }
     },
     "energy:wing/energy:wing/mixed/12": {
-      "image": "r2/energy-wing/energy-wing__mixed__h12.jpg",
+      "image": "r3/energy-wing/energy-wing__mixed__h12.jpg",
       "V1_V6": {
         "V1": [
           "FAIL",
@@ -1177,7 +1177,7 @@
       }
     },
     "energy:wing/energy:wing/mixed/22": {
-      "image": "r2/energy-wing/energy-wing__mixed__h22.jpg",
+      "image": "r3/energy-wing/energy-wing__mixed__h22.jpg",
       "V1_V6": {
         "V1": [
           "FAIL",
@@ -1206,7 +1206,7 @@
       }
     },
     "energy:wing/hero/neutral/12": {
-      "image": "r2/energy-wing/hero__neutral__h12.jpg",
+      "image": "r3/energy-wing/hero__neutral__h12.jpg",
       "V1_V6": {
         "V1": [
           "PASS",
@@ -1235,7 +1235,7 @@
       }
     },
     "energy:wing/hero/neutral/22": {
-      "image": "r2/energy-wing/hero__neutral__h22.jpg",
+      "image": "r3/energy-wing/hero__neutral__h22.jpg",
       "V1_V6": {
         "V1": [
           "PASS",

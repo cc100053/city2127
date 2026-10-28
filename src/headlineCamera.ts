@@ -21,7 +21,7 @@ export const SHOTS: Record<ShotId, Pose> = {
   'energy:garden2': { position: [-15, 36, -455], target: [32, 8, -392] },
   'energy:ring': { position: [-70, 135, -170], target: [-18, 99, -24] },
   'energy:wing': { position: [56, 64, -496], target: [125, 22, -424] },
-  'energy:island': { position: [-150, 65, -590], target: [-40, 8, -425] },
+  'energy:island': { position: [-142, 66, -556], target: [-60, 23, -470] },
 };
 export function headlineShot(change: CarrierChange | undefined): ShotId | null {
   if (!change) return null;

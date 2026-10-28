@@ -1,0 +1,144 @@
+{
+  "mode": "compare",
+  "commit": "c6b56076926b8e0efda89271c5f2291ee42a0cbb",
+  "sourceDiff": "",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "energy:wing",
+      "hour": 12,
+      "from": "baseline",
+      "to": "a",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.0456739014690256,
+      "rect": {
+        "x": 758,
+        "y": 429,
+        "width": 526,
+        "height": 495
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 12,
+      "from": "a",
+      "to": "b",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.058206123453163935,
+      "rect": {
+        "x": 645,
+        "y": 270,
+        "width": 829,
+        "height": 746
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 12,
+      "from": "b",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.0033670814461346297,
+      "rect": {
+        "x": 645,
+        "y": 270,
+        "width": 829,
+        "height": 746
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 12,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.050702306253148234,
+      "rect": {
+        "x": 645,
+        "y": 270,
+        "width": 829,
+        "height": 746
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 22,
+      "from": "baseline",
+      "to": "a",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.02495468364401489,
+      "rect": {
+        "x": 758,
+        "y": 429,
+        "width": 526,
+        "height": 495
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 22,
+      "from": "a",
+      "to": "b",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.030699626492814942,
+      "rect": {
+        "x": 645,
+        "y": 270,
+        "width": 829,
+        "height": 746
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 22,
+      "from": "b",
+      "to": "mixed",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.0025433267552593996,
+      "rect": {
+        "x": 645,
+        "y": 270,
+        "width": 829,
+        "height": 746
+      },
+      "pass": false
+    },
+    {
+      "id": "energy:wing",
+      "hour": 22,
+      "from": "baseline",
+      "to": "mixed",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.026685659187962445,
+      "rect": {
+        "x": 645,
+        "y": 270,
+        "width": 829,
+        "height": 746
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}

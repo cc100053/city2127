@@ -21,6 +21,8 @@ suffix=lambda s:s.split('  // Two shore service gates')[1].split('  const garden
 garden_ring=lambda s:s.split('  // All water-garden metalwork')[1].split('  // Three reclaimed caissons')[0]
 assert garden_ring(old(p))==garden_ring(now(p)),'A garden or C ring changed'
 assert suffix(old(p))==suffix(now(p)),'Distribution or clone changed'
+west=lambda s:'\n'.join(line for line in s.split('  const westGardenLights')[1].split('  // Short markers')[0].splitlines() if not line.lstrip().startswith('//'))
+assert west(old(p))==west(now(p)),'First west-garden light geometry changed'
 assert old(p).split('  let option: EnergyOption')[1]==now(p).split('  let option: EnergyOption')[1],'Energy mapping/motion changed'
 changed=subprocess.check_output(['git','diff','--name-only',BASE,'--','src','tests','survey','module-swap','package.json','package-lock.json'],text=True).splitlines()
 allowed={'src/headlineCamera.ts','src/siteBuilders/automationHub.ts','src/districtMeters.ts','src/energyPrototype.ts','tests/automationHub.test.ts','tests/districtMeters.test.ts','tests/energyPrototype.test.ts'}

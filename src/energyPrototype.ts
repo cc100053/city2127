@@ -439,6 +439,8 @@ export function energyPrototype() {
     box(island, [1.6, 2.7, .16], [x, 2.95, 9.97], trim);
     box(island, [1.2, .08, .12], [x, 4.45, 9.85], publicLight);
   }
+  // Low operating edges identify the sealed service platform without lighting the open bay.
+  for (const x of [-18.6, 18.6]) box(island, [.08, .06, 42], [x, 1.62, 0], publicLight, .01);
   box(island, [32, 1, 8], [0, 2.1, -19], teal);
   for (let x = -12; x <= 12; x += 8) box(island, [.1, .025, 7.7], [x, 2.615, -19], trim);
   for (const z of [-22.8, -15.2]) box(island, [31.5, .025, .12], [0, 2.615, z], chrome);

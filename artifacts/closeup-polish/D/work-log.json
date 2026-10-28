@@ -697,9 +697,184 @@
     {
       "wingStopAt2Superseded": "Direct S0 review shows r2 FPS98.14/99.70 vs132.05/133.60 and calls505 vs378, severe framing regression despite local material improvement. Use final allowed r3 to restore exact S0 wing pose with same measured D builder. Full matrix required; not an unmeasured hybrid. r2 visual review archived, originals remain.",
       "islandR1": "Complete8states/16originals/6pairs/4performance refs. New pose A1/A2 PASS but city-heavy composition costs performance. Offline original camera with target y23 projects full group cardOverlap3.4036%, versusS0 7.3586%; plan this measured r2 pose plus seated edge lights after wing r3. Offline projections are not A3/performance evidence."
+    },
+    {
+      "wingMax3Final": {
+        "shot": "energy:wing",
+        "rounds": 3,
+        "A4": [
+          0,
+          8
+        ],
+        "subject": [
+          {
+            "state": "baseline",
+            "hour": 12,
+            "auto": {
+              "A1": null,
+              "A2": null,
+              "A3": null,
+              "reason": "subject absent in this state"
+            },
+            "hits": 0
+          },
+          {
+            "state": "baseline",
+            "hour": 22,
+            "auto": {
+              "A1": null,
+              "A2": null,
+              "A3": null,
+              "reason": "subject absent in this state"
+            },
+            "hits": 0
+          },
+          {
+            "state": "a",
+            "hour": 12,
+            "auto": {
+              "A1": true,
+              "A2": true,
+              "A3": false,
+              "width": 0.2735240108731002,
+              "height": 0.4569351570160407,
+              "center": {
+                "x": 0.5317226947753457,
+                "y": 0.6265957011835035
+              },
+              "cardOverlap": 0
+            },
+            "hits": 0
+          },
+          {
+            "state": "a",
+            "hour": 22,
+            "auto": {
+              "A1": true,
+              "A2": true,
+              "A3": false,
+              "width": 0.2735240108731002,
+              "height": 0.4569351570160407,
+              "center": {
+                "x": 0.5317226947753457,
+                "y": 0.6265957011835035
+              },
+              "cardOverlap": 0
+            },
+            "hits": 0
+          },
+          {
+            "state": "b",
+            "hour": 12,
+            "auto": {
+              "A1": true,
+              "A2": true,
+              "A3": false,
+              "width": 0.4307673195590215,
+              "height": 0.6900899695506155,
+              "center": {
+                "x": 0.5518291779088358,
+                "y": 0.5953852967863343
+              },
+              "cardOverlap": 0
+            },
+            "hits": 1
+          },
+          {
+            "state": "b",
+            "hour": 22,
+            "auto": {
+              "A1": true,
+              "A2": true,
+              "A3": false,
+              "width": 0.4307673195590215,
+              "height": 0.6900899695506155,
+              "center": {
+                "x": 0.5518291779088358,
+                "y": 0.5953852967863343
+              },
+              "cardOverlap": 0
+            },
+            "hits": 1
+          },
+          {
+            "state": "mixed",
+            "hour": 12,
+            "auto": {
+              "A1": true,
+              "A2": true,
+              "A3": false,
+              "width": 0.4307673195590215,
+              "height": 0.6900899695506155,
+              "center": {
+                "x": 0.5518291779088358,
+                "y": 0.5953852967863343
+              },
+              "cardOverlap": 0
+            },
+            "hits": 1
+          },
+          {
+            "state": "mixed",
+            "hour": 22,
+            "auto": {
+              "A1": true,
+              "A2": true,
+              "A3": false,
+              "width": 0.4307673195590215,
+              "height": 0.6900899695506155,
+              "center": {
+                "x": 0.5518291779088358,
+                "y": 0.5953852967863343
+              },
+              "cardOverlap": 0
+            },
+            "hits": 1
+          }
+        ],
+        "performance": [
+          {
+            "id": "energy:wing",
+            "hour": 12,
+            "fps": 131.55151455804503,
+            "calls": [
+              "378",
+              "604"
+            ]
+          },
+          {
+            "id": "energy:wing",
+            "hour": 22,
+            "fps": 130.39338239210193,
+            "calls": [
+              "378",
+              "378"
+            ]
+          },
+          {
+            "id": "hero",
+            "hour": 12,
+            "fps": 88.69674862856763,
+            "calls": [
+              "952",
+              "952"
+            ]
+          },
+          {
+            "id": "hero",
+            "hour": 22,
+            "fps": 86.09656741469581,
+            "calls": [
+              "952",
+              "952"
+            ]
+          }
+        ]
+      },
+      "islandR2": "Original S0 camera with target y23 plus two seated edge lights; fixed whole group and bridge bounds. Complete final root checks precede browser."
     }
   ],
-  "nextExpected": "wing r3 restore S0 pose, full10state matrix; then island r2 source/pose, final root suite before browser.",
+  "nextExpected": "Target/scope checks, commit runtime, full root suite/build/diff; then island r2 full matrix and real current-v4 live.",
   "plannedPoses": {
     "nw:district": {
       "position": [
