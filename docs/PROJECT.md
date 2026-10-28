@@ -210,3 +210,7 @@ CityChangeManager將能源實際前後target加入CarrierChange，residentResult
 ### Closeup sector B — 2026-10-28（feature REVIEW_READY，未接受）
 
 Commons沿用四組八席InstancedMesh：共享長椅向中央內收，私人弧屏向外壓摺成低層擱架，按旋轉後下緣補償高度，保持全程在鋪面以上及原SW footprint內。原平環頂換成同內外徑的native曲面環，中央膜片只留窄邊，保持採光口；外圈植栽沿用`shrubs`分布並換成既有`leafyCrown`，靜態部分仍按原材質bake。SharingDistrict每院六株移向邊緣，庭院／orchard冠層細化，halo既有planting batch加入冠層層次；六水室、十court、family／hybrid／pairing／seed／target及動畫不變。相機只改兩個SW `SHOTS`數值；hero、42°及headline邏輯不變。[逐圖報告](../artifacts/closeup-polish/B/REVIEW.md)保存三輪各18狀態及失敗原值。Runtime `74d6c2b` root test/build、八項scratch live PASS；A1/A2各16 PASS，A3全部16 FAIL，A4 0/16，A5 focal六狀態FAIL。r3 focal新支柱遮擋比r2退步；district定位／夜間較清楚，但V3仍FAIL。三輪用完，建議owner暫不接受B美術；未merge main。
+
+### Closeup sector C — 2026-10-28（RUNNING，未接受）
+
+ConcentrationTower候選將low的空高服務桿改成有支承的低層服務廊／升降核心，mixed保留兩側occupied rails及中央civic void，高層加入轉接肋；使用既有材質與bake，controller／六個function module slots／footprint及三秒retarget不變。SE focal最後pose沿113m高既有context樓西側望入，district先以完整carrier修正near-plane投影，FOV42、hero與timeline不改。[C紀錄](../artifacts/closeup-polish/C/work-log.json)及[交接](handoffs/closeup-polish.md)區分實作、量度與owner接受；final focal r3矩陣延後至C累積source完成，沒有第四輪。A/B pending及FAIL保持，未merge main。

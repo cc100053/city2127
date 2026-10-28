@@ -1,0 +1,6 @@
+concentrationTower low bounds x=-4.00..4.00 y=0.03..8.90 z=-2.17..2.17; modules z=-1.35..1.47
+concentrationTower mixed bounds x=-4.50..4.50 y=0.40..18.05 z=-4.50..4.50; modules z=3.41..4.45
+concentrationTower high bounds x=-4.50..4.50 y=0.40..45.65 z=-4.50..4.50; modules z=-3.62..3.62
+concentrationTower: PASS
+PASS: 13 headline shots, card location priority, timing, interruption, catch-up and immediate cancel.
+PASS: no-headline interruptions preserve the first frame in hold/fly-out and return without another fly-in.

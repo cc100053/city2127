@@ -386,3 +386,7 @@ Final A1/A2各16 PASS、hero2 N/A；A3 16 FAIL（全0/9、每狀態差7條），
 A6 18/18、root npm test/build/diff、runner／report自檢及[八項scratch v4 live](../artifacts/closeup-polish/B/live/browser.json) PASS：兩鏡hold／結果卡地點、座位及district中間easing、reload、Undo及reduced motion；page/console errors0。精確3s／retarget由node tests驗證，browser診斷120frames刷新不能證明3.000s精度；loading首個診斷含7.6FPS，不作穩態效能宣稱。早期sandbox localhost拒絕及成功retry logs保留，既有build兩項warning保持。
 
 V1/V2/V5 focal各6 FAIL、district及hero各12 PASS；V3全部18 FAIL，V4全部18 PASS；V6僅STATIC PASS，不證明全狀態動態無閃爍。r3 focal中央前景柱遮擋，構圖比r2退步，不能因A1/A2通過而接受。三輪已用完，建議owner暫不接受B美術，不做第四輪，不merge main。Survey／module-swap source未改、未另跑其獨立suite；無production smoke／全城Z／展示硬件、Safari/iPad、Windows或真人辨識驗收。自己的Vite／Chrome／scratch HTTP/WebSocket/SQLite已清理，[cleanup](../artifacts/closeup-polish/B/cleanup.json)實際bind5194/52505成功，無部署。
+
+## Closeup sector C r2 checkpoint — 2026-10-28（RUNNING）
+
+Checkpoint `4cb97c8`：[focal r2原始量度](../artifacts/closeup-polish/C/r2/se-focal/capture.json)、[效能](../artifacts/closeup-polish/C/r2/se-focal/performance.json)與[A4](../artifacts/closeup-polish/C/r2/se-focal/comparison.json)。8狀態／16原始JPEG、4組×2雙flag uncapped、6比較完整；A4 3/6，focal low A1 FAIL，全部focal A3 FAIL，前景context樓仍遮住主體。r2 root [npm test](../artifacts/closeup-polish/C/r2/se-focal/npm-test.log)／[build](../artifacts/closeup-polish/C/r2/se-focal/npm-build.log)與diff PASS，保留JSON import／chunk-size warnings。相機／footprint／low非空高桿的target小測試PASS。Chrome156.0.8078.73，1920×1080／DPR1／default；這是中途checkpoint，不代表最終C視覺／live或其他平台已驗證。

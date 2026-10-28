@@ -241,3 +241,5 @@ r3完整18狀態、16 A4、6組×2效能窗，三輪合計54狀態／108 JPEG，
 Worker `01a17f7d-839f-74d0-8660-22e9c1ec1435`在指定clone接手；HEAD ca22a92769e596b3c168ae0579aadef4b5420d9d，clean、fetch PASS、upstream0/0、vs origin/main10/0；沒有.codegraph。A/B writer已釋放，pending art及全部S0/A/B source/evidence保留，不merge main。以ART/mastertaste和實際原圖作局部目標，沒有使用dream-loop。r1只調SE focal pose，完整6狀態加hero雙take；前景大樓遮住主體，比S0退步，A1/A2不作美術接受依據。原圖與raw量度保存於C/r1/se-focal；未完成C最終驗證。
 
 C r2：完整8狀態／16原圖、4組雙窗口效能與6比較完成，A4 3/6；root npm test/build/diff PASS，只有既有JSON import及chunk-size warnings。Provider-limit recovery r16以同owner／dirty source恢復，fresh fetch upstream0/0；r2證據未覆寫。Low以<10 local units的服務廊取代空高桿、mixed中央void、高塔轉接肋，權威counts及footprint不變；r3 pose／最終驗證仍待做。
+
+C district r1：完整18狀態（10普通tier、2hero、6配對）／36原圖，4組雙flag效能、16像素比較保存；A1/A2全部16主體狀態PASS、A3全部FAIL、A4 0/16。完整carrier已避開near plane，box仍超出viewport；原圖偏俯視，不作美術接受。Focal r3 pose及低層升降核心已authored且target tests PASS，最終matrix按C累積source策略延後。

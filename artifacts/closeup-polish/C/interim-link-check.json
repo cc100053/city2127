@@ -1,0 +1,46 @@
+{
+  "status": "PASS",
+  "links": [
+    [
+      "docs/PROJECT.md",
+      "../artifacts/closeup-polish/C/work-log.json"
+    ],
+    [
+      "docs/PROJECT.md",
+      "handoffs/closeup-polish.md"
+    ],
+    [
+      "docs/EXHIBITION_SPEC.md",
+      "../artifacts/closeup-polish/C/work-log.json"
+    ],
+    [
+      "docs/EXHIBITION_SPEC.md",
+      "handoffs/closeup-polish.md"
+    ],
+    [
+      "docs/VALIDATION.md",
+      "../artifacts/closeup-polish/C/r2/se-focal/capture.json"
+    ],
+    [
+      "docs/VALIDATION.md",
+      "../artifacts/closeup-polish/C/r2/se-focal/performance.json"
+    ],
+    [
+      "docs/VALIDATION.md",
+      "../artifacts/closeup-polish/C/r2/se-focal/comparison.json"
+    ],
+    [
+      "docs/VALIDATION.md",
+      "../artifacts/closeup-polish/C/r2/se-focal/npm-test.log"
+    ],
+    [
+      "docs/VALIDATION.md",
+      "../artifacts/closeup-polish/C/r2/se-focal/npm-build.log"
+    ],
+    [
+      "docs/handoffs/closeup-polish.md",
+      "../../artifacts/closeup-polish/C/work-log.json"
+    ]
+  ],
+  "stage": "r2 checkpoint / C running"
+}

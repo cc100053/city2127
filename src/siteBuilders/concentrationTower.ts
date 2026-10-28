@@ -196,6 +196,8 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
   pavilions.add(serviceGallery);
   // Low services occupy a supported transfer gallery instead of two empty 100 m marker masts.
   for (const x of [-2.55, 2.55]) {
+    box(serviceGallery, [.9, 6.2, .9], [x, 3.2, 0], cream, .05);
+    box(serviceGallery, [.65, 5.5, .08], [x, 3.3, -.48], glass, .03);
     box(serviceGallery, [2.8, .45, 3.8], [x, 6.3, 0], trim, .08);
     box(serviceGallery, [2.5, 2.1, 3.5], [x, 7.55, 0], sage, .08);
     for (const z of [-1.8, 1.8]) {

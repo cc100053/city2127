@@ -1,0 +1,14 @@
+{
+  "check": "Straight central passage through the unit bridge, before corridor repair",
+  "rows": [
+    {
+      "material": "f734d74e-1b8f-4910-a86a-d82d96712532",
+      "passageHits": 2
+    },
+    {
+      "material": "4c9b2e97-5e13-4460-a9b7-b2939a17ee46",
+      "passageHits": 1
+    }
+  ],
+  "pass": false
+}
