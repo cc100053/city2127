@@ -1,0 +1,112 @@
+{
+  "mode": "compare",
+  "commit": "0e015d476c32b35e14b6d344f910576f9663505d",
+  "sourceDiff": "diff --git a/src/headlineCamera.ts b/src/headlineCamera.ts\nindex 0a511a8..35b7f4c 100644\n--- a/src/headlineCamera.ts\n+++ b/src/headlineCamera.ts\n@@ -12,7 +12,7 @@ export const SHOTS: Record<ShotId, Pose> = {\n   'nw:focal': { position: [-105, 150, -475], target: [40, 48, -300] },\n   'ne:focal': { position: [-280, 85, -245], target: [-210, 14, -135] },\n   'sw:focal': { position: [-165, 45, 210], target: [-105, 28, 60] },\n-  'se:focal': { position: [160, 210, -335], target: [175, 60, -45] },\n+  'se:focal': { position: [390, 185, -255], target: [175, 55, -45] },\n   'nw:district': { position: [-180, 180, -470], target: [10, 28, -210] },\n   'ne:district': { position: [-390, 270, -310], target: [-250, 0, -170] },\n   'sw:district': { position: [-160, 420, -400], target: [-120, 5, -260] },\ndiff --git a/src/siteBuilders/concentrationTower.ts b/src/siteBuilders/concentrationTower.ts\nindex 03e524e..7769743 100644\n--- a/src/siteBuilders/concentrationTower.ts\n+++ b/src/siteBuilders/concentrationTower.ts\n@@ -161,7 +161,8 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration\n   base.name = 'tower-mid-rise-hall';\n   towerBase.add(base);\n   box(base, [9, 1, 9], [0, .9, 0], cream, .25);\n-  box(base, [8, 16.6, 8], [0, 9.6, 0], sage, .35);\n+  // Paired occupied rails leave a central civic void; the floor bands connect their services.\n+  for (const x of [-2.55, 2.55]) box(base, [2.9, 16.6, 8], [x, 9.6, 0], sage, .35);\n   for (let y = 4; y < 17; y += 3) {\n     box(base, [8.2, .3, 8.2], [0, y, 0], trim, .05);\n     faces(base, 8.2, 8.2, (face, across, out) => box(face, [across - .4, .07, .08], [0, y - .12, out + .04], publicLight, .02));\n@@ -190,36 +191,33 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration\n   }\n   pavilions.add(...bake(pavilions));\n \n-  const serviceSpines = new T.Group();\n-  serviceSpines.name = 'tower-low-service-spines';\n-  pavilions.add(serviceSpines);\n-  // Twin glazed service heads clear the foreground roofline; the occupied pavilion bodies remain at ground height.\n-  for (const [i, x] of [-3.1, 3.1].entries()) {\n-    const spine = new T.Group();\n-    spine.name = `tower-low-service-spine-${i + 1}`;\n-    spine.position.x = x;\n-    serviceSpines.add(spine);\n-    const mast = new T.Group();\n-    mast.name = `tower-low-service-mast-${i + 1}`;\n-    spine.add(mast);\n-    box(mast, [.18, 32.45, .18], [0, 18.225, 0], solar, .03);\n-    mast.add(...bake(mast));\n-\n-    const cap = new T.Group();\n-    cap.name = `tower-low-service-cap-${i + 1}`;\n-    spine.add(cap);\n-    box(cap, [2.5, 1.2, .08], [0, 33.84, 1.04], glass, .03);\n-    box(cap, [.08, 1.2, 2], [1.21, 33.84, 0], glass, .03);\n-    box(cap, [2.6, .18, 2.2], [0, 34.52, 0], cream, .1);\n-    box(cap, [1.5, .06, 1.35], [0, 34.65, 0], solar, .04);\n-    box(cap, [2, .06, .1], [0, 34.65, 1.02], futureLight, .02);\n-    box(cap, [.1, .06, 1.7], [1.17, 34.65, 0], futureLight, .02);\n-    cap.add(...bake(cap));\n+  const serviceGallery = new T.Group();\n+  serviceGallery.name = 'tower-low-service-gallery';\n+  pavilions.add(serviceGallery);\n+  // Low services occupy a supported transfer gallery instead of two empty 100 m marker masts.\n+  for (const x of [-2.55, 2.55]) {\n+    box(serviceGallery, [2.8, .45, 3.8], [x, 6.3, 0], trim, .08);\n+    box(serviceGallery, [2.5, 2.1, 3.5], [x, 7.55, 0], sage, .08);\n+    for (const z of [-1.8, 1.8]) {\n+      box(serviceGallery, [2.35, 1.4, .08], [x, 7.55, z], glass, .03);\n+      const brace = box(serviceGallery, [.22, 6.6, .28], [x, 3.35, z], cream, .04);\n+      brace.rotation.z = Math.sign(x) * .12;\n+      box(serviceGallery, [2.5, .08, .1], [x, 6.62, z], publicLight, .02);\n+    }\n+    box(serviceGallery, [2.9, .3, 3.9], [x, 8.75, 0], cream, .08);\n   }\n+  box(serviceGallery, [3, .4, 1.4], [0, 6.3, 0], trim, .06);\n+  box(serviceGallery, [3, .8, .08], [0, 6.9, -.65], glass, .03);\n+  serviceGallery.add(...bake(serviceGallery));\n \n   const core = new T.Mesh(new T.CylinderGeometry(3, 3, 26, 40), glass);\n   core.position.y = 13;\n   towerUpper.add(core);\n+  // Alternating transfer ribs tie the occupied stack into its base without enlarging the lot.\n+  for (let floor = 0; floor < 5; floor++) for (const side of [-1, 1]) {\n+    const rib = box(towerUpper, [.18, 5.4, .22], [side * 2.15, 2.6 + floor * 5.2, -2.4], cream, .03);\n+    rib.rotation.z = side * (floor % 2 ? -.27 : .27);\n+  }\n   for (let y = 0, floor = 0; y < 25; y += 2.6, floor++) {\n     arc(towerUpper, 0, 3.2, 1, [0, y, 0], cream);\n     arc(towerUpper, 0, 3.45, .14, [0, y + 1, 0], trim);\ndiff --git a/tests/concentrationTower.test.ts b/tests/concentrationTower.test.ts\nindex ccd957a..5c442d4 100644\n--- a/tests/concentrationTower.test.ts\n+++ b/tests/concentrationTower.test.ts\n@@ -97,6 +97,7 @@ try {\n     assert.ok(local.min.z >= -siteBounds.d / 2 - 1e-6, `${band} extends north of its lot: ${local.min.z}`);\n     assert.ok(local.max.z <= siteBounds.d / 2 + 1e-6, `${band} extends south of its lot: ${local.max.z}`);\n     assert.ok(local.min.y >= -1e-6 && local.max.y <= siteBounds.h + 1e-6, `${band} exceeds site height: ${local.min.y}..${local.max.y}`);\n+    if (band === 'low') assert.ok(local.max.y < 10, 'low services remain occupied low galleries, not empty marker masts');\n     assert.ok(localModules.min.x >= -siteBounds.w / 2 - 1e-6 && localModules.max.x <= siteBounds.w / 2 + 1e-6, `${band} function modules exceed lot width: ${localModules.min.x}..${localModules.max.x}`);\n     assert.ok(localModules.min.z >= -siteBounds.d / 2 - 1e-6 && localModules.max.z <= siteBounds.d / 2 + 1e-6, `${band} function modules exceed lot depth: ${localModules.min.z}..${localModules.max.z}`);\n \n",
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "launchArgs": [],
+  "rows": [
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.12348951010217211,
+      "rect": {
+        "x": 856,
+        "y": 504,
+        "width": 208,
+        "height": 295
+      },
+      "pass": true
+    },
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.06112919123709429,
+      "rect": {
+        "x": 844,
+        "y": 163,
+        "width": 232,
+        "height": 632
+      },
+      "pass": true
+    },
+    {
+      "id": "se:focal",
+      "hour": 12,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.10833729338623325,
+      "rect": {
+        "x": 844,
+        "y": 163,
+        "width": 232,
+        "height": 636
+      },
+      "pass": false
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "0",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.07954320798288894,
+      "rect": {
+        "x": 856,
+        "y": 504,
+        "width": 208,
+        "height": 295
+      },
+      "pass": true
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "from": "0",
+      "to": "2",
+      "kind": "adjacent",
+      "threshold": 0.06,
+      "mad": 0.04260115420386109,
+      "rect": {
+        "x": 844,
+        "y": 163,
+        "width": 232,
+        "height": 632
+      },
+      "pass": false
+    },
+    {
+      "id": "se:focal",
+      "hour": 22,
+      "from": "-2",
+      "to": "2",
+      "kind": "extremes",
+      "threshold": 0.12,
+      "mad": 0.07259410396848684,
+      "rect": {
+        "x": 844,
+        "y": 163,
+        "width": 232,
+        "height": 636
+      },
+      "pass": false
+    }
+  ],
+  "errors": []
+}

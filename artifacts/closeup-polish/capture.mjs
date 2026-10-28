@@ -11,7 +11,12 @@ export const matrix = [
   ...Object.entries(energyStates).flatMap(([part,states]) => states.map(energy => ({id:`energy:${part}`,state:energy,energy}))),
   {id:'hero',state:'neutral',meters:'nw:0,ne:0,sw:0,se:0'},
 ].flatMap(row => [12,22].map(hour => ({...row,hour})));
-export const selectedShots = (ids) => matrix.filter(row => !ids || ids.split(',').includes(row.id));
+export const sePairings = [
+  {state:'low-solar',meters:'se:-8,ne:-8',baseState:'-8'},
+  {state:'high-forest',meters:'se:8,ne:8',baseState:'8'},
+  {state:'high-docks',meters:'se:8,nw:8',baseState:'8'},
+].flatMap(row=>[12,22].map(hour=>({...row,id:'se:district',hour,pairing:true})));
+export const selectedShots = (ids, pairings = false) => [...matrix,...(pairings?sePairings:[])].filter(row => !ids || ids.split(',').includes(row.id));
 export function framing(frame, id) {
   if (!frame?.box) return {A1:null,A2:null,A3:null,reason:frame?.reason ?? 'hero has no subject'};
   const b=frame.box,w=b.right-b.left,h=b.bottom-b.top,x=(b.left+b.right)/2,y=(b.top+b.bottom)/2;
@@ -31,6 +36,8 @@ if (process.argv.includes('--self-test')) {
   assert.equal(['focal','district'].reduce((n,kind)=>n+2*(selectedShots(`sw:${kind}`).length/2),0),16,'B adjacent plus extreme comparisons');
   assert.equal(selectedShots('ne:focal').length,6); assert.equal(selectedShots(undefined).length,98);
   assert.equal(matrix.length,98); assert.equal(new Set(matrix.map(r=>`${r.id}/${r.state}/${r.hour}`)).size,98);
+  assert.equal(selectedShots('se:district,hero',true).length,18,'C includes all three cross-Meter pairings at both hours');
+  assert.equal(selectedShots('se:focal,hero',true).length,8,'pairing support leaves other shots unchanged');
   assert.deepEqual(framing({box:{left:.2,right:.6,top:.2,bottom:.6},hits:7},'ne:focal').A1,true);
   assert.equal(framing({box:{left:.8,right:1,top:0,bottom:.4},hits:6},'ne:focal').A2,false);
   assert.equal(comparisonBox({box:null},{box:null}),null,'invalid projections cannot silently disappear from A4');
@@ -54,7 +61,7 @@ const report=existsSync(file)?JSON.parse(readFileSync(file,'utf8')):{mode,commit
   sourceDiff:execFileSync('git',['diff','--','src','tests','package.json'],{encoding:'utf8'}),browser:browser.version(),viewport:[1920,1080],dpr:1,quality:'default',launchArgs:mode==='perf'?['--disable-gpu-vsync','--disable-frame-rate-limit']:[],rows:[],errors:[]};
 const save=()=>writeFileSync(file,JSON.stringify(report,null,2)+'\n');
 const key=row=>`${row.id.replaceAll(':','-')}__${row.state}__h${row.hour}`;
-const selected=selectedShots(process.env.CITY_SHOTS??process.env.CITY_SHOT_ONLY);
+const selected=selectedShots(process.env.CITY_SHOTS??process.env.CITY_SHOT_ONLY,process.env.CITY_SE_PAIRINGS==='1');
 async function load(row,wait) {
   const url=new URL(process.env.CITY2127_CITY_URL??'http://127.0.0.1:5194/');
   url.search=new URLSearchParams({reviewTime:'20',hour:String(row.hour),...(row.energy?{energy:row.energy}:{meters:row.meters}),...(row.id==='hero'?{}:{shot:row.id})});
@@ -106,8 +113,11 @@ try {
     assert.ok(selected.every(row=>captures.some(c=>key(c)===key(row)&&c.complete)),'Complete the selected matrix before A4 comparisons.');
     report.rows=[];
     for(const id of new Set(selected.map(r=>r.id))) for(const hour of [12,22]) {
-      const rows=captures.filter(r=>r.id===id&&r.hour===hour); if(rows.length<2)continue;
+      const rows=captures.filter(r=>r.id===id&&r.hour===hour&&!r.pairing); if(rows.length<2)continue;
       const pairs=rows.slice(1).map((r,i)=>[rows[i],r,'adjacent']);pairs.push([rows[0],rows.at(-1),'extremes']);
+      for(const paired of captures.filter(r=>r.id===id&&r.hour===hour&&r.pairing)) {
+        const base=rows.find(r=>r.state===paired.baseState);assert.ok(base,'Pairing requires its unpaired same-tier counterpart');pairs.push([base,paired,'pairing']);
+      }
       for(const [a,b,kind] of pairs) {
         const box=comparisonBox(a.frame,b.frame);
         if(!box){report.rows.push({id,hour,from:a.state,to:b.state,kind,threshold:kind==='extremes'?.12:.06,mad:null,pass:false,reason:'No valid projected subject box in either state',frameReasons:[a.frame?.reason,b.frame?.reason]});continue;}

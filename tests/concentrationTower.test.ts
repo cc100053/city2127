@@ -97,6 +97,7 @@ try {
     assert.ok(local.min.z >= -siteBounds.d / 2 - 1e-6, `${band} extends north of its lot: ${local.min.z}`);
     assert.ok(local.max.z <= siteBounds.d / 2 + 1e-6, `${band} extends south of its lot: ${local.max.z}`);
     assert.ok(local.min.y >= -1e-6 && local.max.y <= siteBounds.h + 1e-6, `${band} exceeds site height: ${local.min.y}..${local.max.y}`);
+    if (band === 'low') assert.ok(local.max.y < 10, 'low services remain occupied low galleries, not empty marker masts');
     assert.ok(localModules.min.x >= -siteBounds.w / 2 - 1e-6 && localModules.max.x <= siteBounds.w / 2 + 1e-6, `${band} function modules exceed lot width: ${localModules.min.x}..${localModules.max.x}`);
     assert.ok(localModules.min.z >= -siteBounds.d / 2 - 1e-6 && localModules.max.z <= siteBounds.d / 2 + 1e-6, `${band} function modules exceed lot depth: ${localModules.min.z}..${localModules.max.z}`);
 

@@ -1,0 +1,5 @@
+{
+  "capture": "a968b4e1b8d9713232d05ea6c5ec9229a989fc18ce22a46039ea89c744d434ff",
+  "perfAndCompare": "8bc537e18033743e1badd023b0f2e250e4e381fb079d441465966198861358ae",
+  "note": "C pairing support added while r2 focal capture was running; old module already loaded. Extra states opt-in and unset; focal matrix, load, FPS and comparison algorithms unchanged."
+}

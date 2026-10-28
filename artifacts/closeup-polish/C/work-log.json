@@ -24,6 +24,7 @@
     "survey protocol/counts/ladder/timing"
   ],
   "dreamLoop": "Not used; local targets from ART/master taste and original screenshots.",
-  "status": "r1 se:focal pose-only complete matrix capture running",
-  "startedUTC": "2026-10-27T22:34:03.606381+00:00"
+  "status": "Focal r2 complete:8states,4x2perf,6A4pairs; root npm test/build/diff PASS. Resumed same owner after provider-limit recovery r16.",
+  "startedUTC": "2026-10-27T22:34:03.606381+00:00",
+  "verificationOrder": "Author focal r3 final pose after r2, then district and ring. Defer focal r3 complete matrix/perf until all C geometry is final, so its last evidence includes cumulative district changes; no r4 or extra art iteration."
 }

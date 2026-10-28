@@ -18,6 +18,9 @@ for(const [id,rounds]of Object.entries(plan)){
   const c=read(`${root}/${dir}/capture.json`),p=read(`${root}/${dir}/performance.json`),a4=read(`${root}/${dir}/comparison.json`);
   const expected=s0.rows.filter(r=>r.id===id||r.id==='hero').map(key).sort();
   assert.deepEqual(c.rows.filter(r=>!r.pairing).map(key).sort(),expected);assert.equal(p.rows.length,4);
+  if(id==='se:district')assert.deepEqual(c.rows.filter(r=>r.pairing).map(key).sort(),['low-solar','high-forest','high-docks'].flatMap(state=>[12,22].map(hour=>`${id}/${state}/${hour}`)).sort());
+  assert.deepEqual(p.rows.map(r=>`${r.id}/${r.hour}`).sort(),[id,'hero'].flatMap(shot=>[12,22].map(hour=>`${shot}/${hour}`)).sort());
+  assert.equal(a4.rows.length,id==='se:district'?16:6);for(const pair of a4.rows)assert.equal(pair.threshold,pair.kind==='extremes'?.12:.06);
   assert.deepEqual(c.viewport,[1920,1080]);assert.equal(c.dpr,1);assert.equal(c.quality,'default');
   assert.ok(p.launchArgs.includes('--disable-gpu-vsync')&&p.launchArgs.includes('--disable-frame-rate-limit'));
   for(const r of c.rows){assert.ok(r.complete&&r.takes.length===2);const u=new URL(r.url);assert.equal(u.searchParams.get('reviewTime'),'20');assert.equal(u.searchParams.get('hour'),String(r.hour));assert.equal(r.takes[0].url,r.takes[1].url);assert.deepEqual(r.takes[0].pose,r.takes[1].pose);for(const image of r.images)assert.ok(readFileSync(image).length>0);}

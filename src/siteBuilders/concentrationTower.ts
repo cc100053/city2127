@@ -161,7 +161,8 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
   base.name = 'tower-mid-rise-hall';
   towerBase.add(base);
   box(base, [9, 1, 9], [0, .9, 0], cream, .25);
-  box(base, [8, 16.6, 8], [0, 9.6, 0], sage, .35);
+  // Paired occupied rails leave a central civic void; the floor bands connect their services.
+  for (const x of [-2.55, 2.55]) box(base, [2.9, 16.6, 8], [x, 9.6, 0], sage, .35);
   for (let y = 4; y < 17; y += 3) {
     box(base, [8.2, .3, 8.2], [0, y, 0], trim, .05);
     faces(base, 8.2, 8.2, (face, across, out) => box(face, [across - .4, .07, .08], [0, y - .12, out + .04], publicLight, .02));
@@ -190,36 +191,33 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
   }
   pavilions.add(...bake(pavilions));
 
-  const serviceSpines = new T.Group();
-  serviceSpines.name = 'tower-low-service-spines';
-  pavilions.add(serviceSpines);
-  // Twin glazed service heads clear the foreground roofline; the occupied pavilion bodies remain at ground height.
-  for (const [i, x] of [-3.1, 3.1].entries()) {
-    const spine = new T.Group();
-    spine.name = `tower-low-service-spine-${i + 1}`;
-    spine.position.x = x;
-    serviceSpines.add(spine);
-    const mast = new T.Group();
-    mast.name = `tower-low-service-mast-${i + 1}`;
-    spine.add(mast);
-    box(mast, [.18, 32.45, .18], [0, 18.225, 0], solar, .03);
-    mast.add(...bake(mast));
-
-    const cap = new T.Group();
-    cap.name = `tower-low-service-cap-${i + 1}`;
-    spine.add(cap);
-    box(cap, [2.5, 1.2, .08], [0, 33.84, 1.04], glass, .03);
-    box(cap, [.08, 1.2, 2], [1.21, 33.84, 0], glass, .03);
-    box(cap, [2.6, .18, 2.2], [0, 34.52, 0], cream, .1);
-    box(cap, [1.5, .06, 1.35], [0, 34.65, 0], solar, .04);
-    box(cap, [2, .06, .1], [0, 34.65, 1.02], futureLight, .02);
-    box(cap, [.1, .06, 1.7], [1.17, 34.65, 0], futureLight, .02);
-    cap.add(...bake(cap));
+  const serviceGallery = new T.Group();
+  serviceGallery.name = 'tower-low-service-gallery';
+  pavilions.add(serviceGallery);
+  // Low services occupy a supported transfer gallery instead of two empty 100 m marker masts.
+  for (const x of [-2.55, 2.55]) {
+    box(serviceGallery, [2.8, .45, 3.8], [x, 6.3, 0], trim, .08);
+    box(serviceGallery, [2.5, 2.1, 3.5], [x, 7.55, 0], sage, .08);
+    for (const z of [-1.8, 1.8]) {
+      box(serviceGallery, [2.35, 1.4, .08], [x, 7.55, z], glass, .03);
+      const brace = box(serviceGallery, [.22, 6.6, .28], [x, 3.35, z], cream, .04);
+      brace.rotation.z = Math.sign(x) * .12;
+      box(serviceGallery, [2.5, .08, .1], [x, 6.62, z], publicLight, .02);
+    }
+    box(serviceGallery, [2.9, .3, 3.9], [x, 8.75, 0], cream, .08);
   }
+  box(serviceGallery, [3, .4, 1.4], [0, 6.3, 0], trim, .06);
+  box(serviceGallery, [3, .8, .08], [0, 6.9, -.65], glass, .03);
+  serviceGallery.add(...bake(serviceGallery));
 
   const core = new T.Mesh(new T.CylinderGeometry(3, 3, 26, 40), glass);
   core.position.y = 13;
   towerUpper.add(core);
+  // Alternating transfer ribs tie the occupied stack into its base without enlarging the lot.
+  for (let floor = 0; floor < 5; floor++) for (const side of [-1, 1]) {
+    const rib = box(towerUpper, [.18, 5.4, .22], [side * 2.15, 2.6 + floor * 5.2, -2.4], cream, .03);
+    rib.rotation.z = side * (floor % 2 ? -.27 : .27);
+  }
   for (let y = 0, floor = 0; y < 25; y += 2.6, floor++) {
     arc(towerUpper, 0, 3.2, 1, [0, y, 0], cream);
     arc(towerUpper, 0, 3.45, .14, [0, y + 1, 0], trim);
