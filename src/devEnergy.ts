@@ -1,6 +1,19 @@
 import type { Scene } from 'three';
 import { ENERGY_OPTIONS, energyPrototype, type EnergyOption } from './energyPrototype.ts';
 
+/** Storage-cycle phases, shared with the live energy close-up narration. */
+export const ENERGY_PHASES = {
+  a: { charge: '接收／外部供電 → 抽水上行、上水庭蓄水', hold: '暫存 → 上水庭保水、渦輪停定', release: '釋能／分配 → 落水經渦輪 → 街區用電' },
+  b: { charge: '接收／外部供電 → 旋轉環充能', hold: '暫存 → 旋轉環續轉', release: '釋能／分配 → 旋轉環減速 → 街區用電' },
+  mixed: { charge: '接收／外部供電 → 抽水上行、旋轉環充能', hold: '暫存 → 上水庭保水、旋轉環續轉', release: '釋能／分配 → 落水經渦輪、旋轉環減速 → 街區用電' },
+};
+/** Reduced-motion readings: the cycle is described, never played. */
+export const ENERGY_STATIC = {
+  a: '靜態閱讀：接收 → 儲能 → 街區；箭頭標示落水／抽水回管，水位與機械保持固定。',
+  b: '靜態閱讀：接收 → 儲能 → 街區；接收翼、旋轉環與配電門架保持固定。',
+  c: '能源島 → 檢修橋服務線 → 街區配電節點（供電路線示意）',
+};
+
 /** Reload-free comparison in the unchanged hero camera, isolated from survey and Meter review. */
 export function startEnergyReview(scene: Scene, params: URLSearchParams) {
   const study = energyPrototype(); scene.add(study.root);
@@ -29,16 +42,11 @@ export function startEnergyReview(scene: Scene, params: URLSearchParams) {
   const still = panel.querySelector<HTMLInputElement>('input')!;
   still.checked = motion.matches;
   motion.addEventListener('change', () => { still.checked = motion.matches; });
-  const phases = {
-    a: { charge: '接收／外部供電 → 抽水上行、上水庭蓄水', hold: '暫存 → 上水庭保水、渦輪停定', release: '釋能／分配 → 落水經渦輪 → 街區用電' },
-    b: { charge: '接收／外部供電 → 旋轉環充能', hold: '暫存 → 旋轉環續轉', release: '釋能／分配 → 旋轉環減速 → 街區用電' },
-    mixed: { charge: '接收／外部供電 → 抽水上行、旋轉環充能', hold: '暫存 → 上水庭保水、旋轉環續轉', release: '釋能／分配 → 落水經渦輪、旋轉環減速 → 街區用電' },
-  };
   let previous = '';
   return (seconds: number) => {
     const cycle = study.update(seconds, motion.matches || still.checked);
-    const staticText = study.option === 'b' ? '靜態閱讀：接收 → 儲能 → 街區；接收翼、旋轉環與配電門架保持固定。' : '靜態閱讀：接收 → 儲能 → 街區；箭頭標示落水／抽水回管，水位與機械保持固定。';
-    const text = study.option === 'baseline' ? '' : study.option === 'c' ? '能源島 → 檢修橋服務線 → 街區配電節點（供電路線示意）' : motion.matches || still.checked ? staticText : `60 秒示意循環 · ${phases[study.option][cycle.phase]}`;
+    const staticText = study.option === 'b' ? ENERGY_STATIC.b : ENERGY_STATIC.a;
+    const text = study.option === 'baseline' ? '' : study.option === 'c' ? ENERGY_STATIC.c : motion.matches || still.checked ? staticText : `60 秒示意循環 · ${ENERGY_PHASES[study.option][cycle.phase]}`;
     if (text !== previous) { status.textContent = text; previous = text; }
   };
 }

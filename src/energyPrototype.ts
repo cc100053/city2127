@@ -11,6 +11,7 @@ export const ENERGY_OPTIONS = {
 export type EnergyOption = keyof typeof ENERGY_OPTIONS;
 import type { EnergyConfiguration } from '../survey/src/shared/energy.ts';
 export type { EnergyConfiguration } from '../survey/src/shared/energy.ts';
+export type EnergyClock = Partial<Record<'garden' | 'garden2' | 'ring' | 'distribution', number>>;
 
 // A narrated storage cycle, not a power / fluid simulation. Time is absolute for reproducible captures.
 export function energyCycle(seconds: number, reducedMotion = false) {
@@ -537,28 +538,35 @@ export function energyPrototype() {
     });
   }
   for (const flow of flows) flow.boundingSphere = new T.Sphere(new T.Vector3(5, 12, 0), 20);
-  function update(seconds: number, reducedMotion = false) {
+  /** `clock` gives a narrated part (and its distribution) its own seconds; every other part follows `seconds`. */
+  function update(seconds: number, reducedMotion = false, clock: EnergyClock = {}) {
     const cycle = energyCycle(seconds, reducedMotion);
     water.envMapIntensity = chrome.envMapIntensity * .7;
     // Absolute-time UV drift keeps snapshots reproducible and reduced-motion surfaces still.
     water.normalMap?.offset.set(reducedMotion ? .1 : seconds * .007, reducedMotion ? .05 : seconds * .004);
-    rotor.rotation.z = cycle.angle;
+    rotor.rotation.z = energyCycle(clock.ring ?? seconds, reducedMotion).angle;
     for (const [i, g] of gardens.entries()) {
-      g.getObjectByName('energy-upper-water')!.position.y = 22.2 + cycle.level * .8;
-      g.getObjectByName('energy-lower-water')!.position.y = .1 - cycle.level * .8;
-      g.getObjectByName('energy-turbine')!.rotation.z = reducedMotion ? .4 : cycle.phase === 'release' ? Math.PI * 2 * ((cycle.t - 40) / 20) - Math.sin(Math.PI * 2 * (cycle.t - 40) / 20) : 0;
-      const pumping = cycle.phase === 'charge';
+      const c = energyCycle(clock[i ? 'garden2' : 'garden'] ?? seconds, reducedMotion);
+      // The pools also widen / recede over their stone floors, so the stored water reads at close-up distance, not only its 0.8 m rise.
+      const upper = g.getObjectByName('energy-upper-water')!, lower = g.getObjectByName('energy-lower-water')!;
+      upper.position.y = 22.2 + c.level * .8; upper.scale.set(.55 + .45 * c.level, 1, .55 + .45 * c.level);
+      lower.position.y = .1 - c.level * .8; lower.scale.set(1 - .32 * c.level, 1, 1 - .32 * c.level);
+      g.getObjectByName('energy-turbine')!.rotation.z = reducedMotion ? .4 : c.phase === 'release' ? Math.PI * 2 * ((c.t - 40) / 20) - Math.sin(Math.PI * 2 * (c.t - 40) / 20) : 0;
+      const pumping = c.phase === 'charge';
       from.set(pumping ? 5 : 2, pumping ? .5 : 23, pumping ? 8 : -7);
       to.set(pumping ? 15 : -5, pumping ? 23 : 5.5, pumping ? 8 : -7);
-      flows[i].visible = reducedMotion || cycle.phase !== 'hold';
+      flows[i].visible = reducedMotion || c.phase !== 'hold';
+      pose.scale.setScalar(reducedMotion ? 1 : 1.8);
       for (let j = 0; j < 8; j++) {
-        pose.position.lerpVectors(from, to, (j / 8 + (reducedMotion ? 0 : cycle.t * .06)) % 1);
+        pose.position.lerpVectors(from, to, (j / 8 + (reducedMotion ? 0 : c.t * .06)) % 1);
         pose.updateMatrix(); flows[i].setMatrixAt(j, pose.matrix);
       }
       flows[i].instanceMatrix.needsUpdate = true;
     }
+    pose.scale.setScalar(1);
+    const supply = energyCycle(clock.distribution ?? seconds, reducedMotion);
     for (const markers of deliveries) {
-      markers.visible = reducedMotion || (configuration.waterGardens === 0 && !configuration.flywheel) || cycle.phase === 'release';
+      markers.visible = reducedMotion || (configuration.waterGardens === 0 && !configuration.flywheel) || supply.phase === 'release';
       for (let j = 0; j < 3; j++) {
         pose.position.set(3.4, 2.6, 35 + 15 * ((j / 3 + (reducedMotion ? 0 : seconds * .06)) % 1));
         pose.updateMatrix(); markers.setMatrixAt(j, pose.matrix);

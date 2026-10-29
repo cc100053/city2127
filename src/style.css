@@ -24,6 +24,9 @@ body[data-time=night] footer,body[data-time=night] .intro{text-shadow:0 0 10px r
 .resident-card-title{font-size:21px;line-height:1.5;margin-bottom:10px!important}
 .resident-card-copy{font-size:17px;line-height:1.85}
 .resident-place{font-size:13px;color:#46676e;margin-top:14px!important}
+/* Live energy close-up narration: bottom-left, clear of the result card. */
+.causal-panel.energy-narration{top:auto;bottom:44px;left:44px;right:auto;width:440px;max-height:none;padding:18px 20px;font-size:17px;line-height:1.7}.energy-narration .causal-title{font-size:21px}.energy-narration ol{font-size:17px;padding-left:1.4em;margin:6px 0}.energy-narration li{opacity:.4;transition:opacity .25s}.energy-narration li.active{opacity:1;font-weight:600}.energy-narration .causal-status{font-size:12px}
+@media(prefers-reduced-motion:reduce){.energy-narration li{opacity:1;transition:none}}
 /* DEV Scale Lab (`?scaleLab`). */
 .scale-lab{left:20px;right:auto;top:20px;width:330px;max-height:calc(100vh - 40px);z-index:20;display:grid;gap:6px}.scale-lab label{display:flex;justify-content:space-between;align-items:center;gap:8px}.scale-lab select,.scale-lab input[type=number]{width:170px;font:inherit}.scale-lab .lab-check{justify-content:flex-start}
 .lab-transport{display:flex;gap:4px}.lab-transport button{flex:1;font:inherit;padding:5px;border:1px solid #35413930;border-radius:5px;background:#fff9;cursor:pointer}
