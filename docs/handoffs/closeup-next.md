@@ -3,10 +3,10 @@
 下一個 agent 嘅入口文件（2026-10-29 寫）。冇 chat 歷史都可以由呢度開始。佢唔取代 [closeup-polish](closeup-polish.md)：A–D／Z 嘅標準同進度仍然以嗰份為準（最新版喺 `origin/feat/closeup-polish`，唔係 main）。
 
 - Owner: cc100053（產品／審美決定）；F1/F2 worker：Codex `01a1857c-e75a-7571-b8af-59b218b9b0aa`；coordinator：`01a1856f-6e56-73b2-b8f9-a8378a64fb71`。
-- Status: F1/F2 LOCAL VERIFIED，待整合／main CI；C1／N1 PENDING（美術 owner gate 保留）；F3 等展覽硬件。
+- Status: F1/F2 INTEGRATED LOCAL VERIFIED，待push main／CI；C1／N1 PENDING（美術 owner gate 保留）；F3 等展覽硬件。
 - Branch: F1/F2 `fix/energy-e4-headline`；C1 由 verified main 開 `feat/closeup-accepted`，舊 `feat/closeup-polish` 只留證據。
 - Base commit: F1/F2 `e69874dbca243674590ee87d60b03cffcd37379d`（2026-10-29 fetch，main／origin/main 0/0）；本文件最初 base `3d0f40e`。
-- Last verified commit: F1/F2 驗證紀錄見下方；初版只核對文件，唔作 runtime 證據。
+- Last verified commit: F1/F2 feature `61ec1bbfaf128691aaba97693b86365826a24c2a`，integrated `00303e133f797a40392dd81e7540f35d3cdd9ea0`；初版只核對文件，唔作 runtime 證據。
 - Remote availability: 初版／F2 修正已經喺 main；本批發布紀錄見下方。
 
 ## Session Git state（寫呢份文件嗰個 session）
@@ -128,9 +128,14 @@ Z 已經由 Codex relay 完成（`origin/feat/closeup-polish` @ `f66cc3a`，量�
 - Local checks PASS：root `npm test`／`npm run build`、survey `npm run build --prefix survey`、`git diff --check`。首次 npm ci 因 sandbox DNS／cache 權限失敗，權限重試 root／survey 皆成功；原失敗 log 保留。Root build 保留 JSON import attributes 及 >500kB 警告；安裝 audit 回報既有 1 high，未改依賴。
 - Formal E4 PASS：macOS 27.0.1、已安裝 headless Chrome 156.0.8078.73、既有 Playwright、City 1920×1080／DPR1／default、Guest 1280×900、hour12／18.5／22，scratch 真實 SQLite7→8。保留全部原驗收：舊草稿／原文／ID、Q3／review、pre/post-commit retry、首能源票0庭但 Meter headline、第二票1庭及能源結果、Undo、16票混合配置、TCP重連、browser reduced motion、普通resize、reset／舊ID。Page exceptions0；只有預期 favicon404／obsolete409／兩次注入abort，另逐項核對 browser.json。12張新原圖，已目視Q3／兩張結果／mixed夜景／reduced motion／reset；[完整證據與重跑](../../artifacts/closeup-next/F1/README.md)。
 - F2 四項現行事實全部吻合，冇改四份文件：[facts](../../artifacts/closeup-next/F1/f2-facts.json)。住宅A／production、handoffs SOFTWARE COMPLETE A／closeup-next／53份archive、E5 `db772bb` 已在 main且 CI40069808324 success、headline-camera source指向已追蹤artifact副本。
-- 文件檢查：改動文件加F2四份文件共345個local links／anchors／tracked targets PASS，見[link-check](../../artifacts/closeup-next/F1/link-check.json)；exact diff、新文字檔及上述6張原圖已自審，無需PROJECT／SPEC同步（runtime／產品規則未改）。
+- 文件檢查：改動文件加F2四份文件共350個local links／anchors／tracked targets PASS，見[link-check](../../artifacts/closeup-next/F1/link-check.json)；exact diff、新文字檔及上述6張原圖已自審，無需PROJECT／SPEC同步（runtime／產品規則未改）。
 - 驗證tree：baseline `e69874dbca243674590ee87d60b03cffcd37379d` 加 fixture SHA256 `77b835afe0f5ad70f7af8f72a4c01c1df4eb65289a4b1b00520f78f881adb78a`；實際 feature／integrated SHA 與 main CI 待下方發布紀錄。Owned Vite5191／scratch57086／browser已停止，ports已核對無listener。
 - 限制：冇改 runtime／survey／module-swap／E5 runner；分開package suites冇重跑。未量FPS、未測展覽硬件／Safari／iPad／Windows／訪客理解。11s／16s fixture clock jumps唔係訪客時間；actor clock係實時，原runner冇鎖hero，不將圖當canonical performance或C1美術驗收。
+
+## F1/F2 integration — 2026-10-29
+
+- Feature `61ec1bbfaf128691aaba97693b86365826a24c2a` 已push到 `origin/fix/energy-e4-headline`。整合前重新fetch確認 `origin/main=e69874d`，clean main fast-forward後no-ff merge為 `00303e133f797a40392dd81e7540f35d3cdd9ea0`，完整tree與feature逐byte一致，無conflict。
+- Integrated root `npm test`／`npm run build`、helper self-check、`git diff --check origin/main..HEAD`全部PASS；[integration record](../../artifacts/closeup-next/F1/integration.json)及新logs留在本批證據。Formal browser所驗fixture hash與integrated完全相同；未為純metadata再重截圖。Main push／CI待核實；本段後只有整合metadata／logs，runtime與fixture未變。
 
 ## Next expected step
 

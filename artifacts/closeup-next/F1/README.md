@@ -6,6 +6,8 @@ Owner：Codex worker `01a1857c-e75a-7571-b8af-59b218b9b0aa`。Baseline：`e69874
 
 Local checks：root [test](root-test.log)／[build](root-build.log)、[survey build](survey-build.log)、helper self-check及whitespace全部PASS。首次npmci的sandbox DNS／cache失敗logs保留；root／survey權限重試成功。Build保留既有JSON import attributes／>500kB警告；npm audit既有1 high，無依賴變更。
 
+Feature `61ec1bbfaf128691aaba97693b86365826a24c2a`已push；no-ff merge `00303e133f797a40392dd81e7540f35d3cdd9ea0` tree完全相同，整合後root checks再PASS，見[integration.json](integration.json)、[test](integrated-root-test.log)／[build](integrated-root-build.log)。Main發布／CI見handoff。
+
 Formal [browser.json](browser.json)／[browser.log](browser.log)：macOS27.0.1、headless installed Google Chrome156.0.8078.73、City1920×1080／DPR1／default、Guest1280×900、hour12／18.5／22。原scratch schema7→8／Q3／same-ID retry／實際能源／Undo／混合snapshot／TCP重連／reduced motion／resize／reset矩陣全PASS，exceptions0，只有預期favicon404／obsolete409／兩次注入abort。12張原圖，未覆寫舊證據；已目視Q3、兩張結果、mixed22、reduced motion、reset。
 
 | Evidence | Original |

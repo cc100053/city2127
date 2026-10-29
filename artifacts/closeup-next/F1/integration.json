@@ -1,0 +1,17 @@
+{
+  "baseline": "e69874dbca243674590ee87d60b03cffcd37379d",
+  "featureCommit": "61ec1bbfaf128691aaba97693b86365826a24c2a",
+  "integratedSHA": "00303e133f797a40392dd81e7540f35d3cdd9ea0",
+  "identicalFeatureMergeTree": true,
+  "rootTest": "PASS",
+  "rootBuild": "PASS, existing JSON import attributes and chunk-size warnings",
+  "helperSelfcheck": "PASS",
+  "committedWhitespace": "PASS",
+  "browserFixtureSha256": "77b835afe0f5ad70f7af8f72a4c01c1df4eb65289a4b1b00520f78f881adb78a",
+  "browserReused": "same exact fixture/runtime, no repeat needed for metadata",
+  "testLog": "integrated-root-test.log",
+  "buildLog": "integrated-root-build.log",
+  "mainPush": "pending",
+  "mainCI": "pending",
+  "servicesReleased": true
+}
