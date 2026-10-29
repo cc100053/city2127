@@ -18,7 +18,7 @@
 | [近鏡打磨](closeup-polish.md) | S0 INTEGRATED，98/98；coordinator接受量度基準，失敗保留；worker 01a17d74；分 S0 基準 → A NE → B SW → C SE → D NW → Z 回歸；驗收同 capture 標準已定，每個 sector 要 owner 睇圖批准先 merge | cc100053 |
 | [分級階梯＋headline](meter-ladder.md) | DONE；±3格、每份提案最多一格、headline已merge入main `0b84a29`，main CI通過；headline camera另開任務 | cc100053；實作Claude |
 | [儲能環 polish](storage-ring-polish.md) | 已整合main，實際main CI通過，本機／遠端task分支已安全刪除；[整合交接](energy-polish-integration.md)，原審美／硬件限制保留 | Codex batch owner |
-| [近鏡後續／能源講解](closeup-next.md) | F1/F2、C1 INTEGRATED（C1 owner批准，24組兩秒辨認未做）；N1 能源講解 REVIEW_READY（`feat/energy-narration`，13s／日文版等owner睇圖），F3等硬件（2026-10-29） | cc100053 |
+| [近鏡後續／能源講解](closeup-next.md) | F1/F2、C1 INTEGRATED（C1 owner批准，24組兩秒辨認未做）；N1 能源講解 INTEGRATED（13s／日文），F3等硬件（2026-10-29） | cc100053 |
 
 已完成或不再適用的53份交接及Meter截圖見 [歸檔索引](archive/README.md)。歷史下一步不會自動變成backlog；Shibuya不再開發。人類美術review／實機未測等限制保留，不因歸檔而結案。
 
