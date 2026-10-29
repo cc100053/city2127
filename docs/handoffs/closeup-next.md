@@ -2,12 +2,12 @@
 
 下一個 agent 嘅入口文件（2026-10-29 寫）。冇 chat 歷史都可以由呢度開始。佢唔取代 [closeup-polish](closeup-polish.md)：A–D／Z 嘅標準同進度仍然以嗰份為準（最新版喺 `origin/feat/closeup-polish`，唔係 main）。
 
-- Owner: cc100053（產品／審美決定）；實作：下一個 agent，開工時喺「進度」記低 session。
-- Status: PLANNED（C1 嘅 owner 決定 2026-10-29 已記低，見下面）
-- Branch: 每個工作包一條，見下面；C1 用現有 `feat/closeup-polish`。
-- Base commit: `3d0f40ebd5d7350ecdcc05ab3420cacf926dfd9a`（origin/main，2026-10-29 fetch）
-- Last verified commit: NONE（本文件只做文件／連結核對）
-- Remote availability: 本文件連同 F2 文件修正同 energy-demo 歸檔經 `docs/closeup-next` merge 入 main。
+- Owner: cc100053（產品／審美決定）；F1/F2 worker：Codex `01a1857c-e75a-7571-b8af-59b218b9b0aa`；coordinator：`01a1856f-6e56-73b2-b8f9-a8378a64fb71`。
+- Status: F1/F2 LOCAL VERIFIED，待整合／main CI；C1／N1 PENDING（美術 owner gate 保留）；F3 等展覽硬件。
+- Branch: F1/F2 `fix/energy-e4-headline`；C1 由 verified main 開 `feat/closeup-accepted`，舊 `feat/closeup-polish` 只留證據。
+- Base commit: F1/F2 `e69874dbca243674590ee87d60b03cffcd37379d`（2026-10-29 fetch，main／origin/main 0/0）；本文件最初 base `3d0f40e`。
+- Last verified commit: F1/F2 驗證紀錄見下方；初版只核對文件，唔作 runtime 證據。
+- Remote availability: 初版／F2 修正已經喺 main；本批發布紀錄見下方。
 
 ## Session Git state（寫呢份文件嗰個 session）
 
@@ -51,7 +51,7 @@ Z 已經由 Codex relay 完成（`origin/feat/closeup-polish` @ `f66cc3a`，量�
 
 ### F1 — 修 E4 正式 browser runner（細，可以即刻做）
 
-- 問題：[tests/energyE4.browser.mjs:91](../../tests/energyE4.browser.mjs) 等 `街のエネルギー設備は今の配置`，[:100](../../tests/energyE4.browser.mjs) 等 `蓄電庭園は1か所`。meter-ladder（`0b84a29`）之後，結果卡會先講 headline 嘅 Meter 偏好，所以兩句都可能唔出，runner 會 timeout（[失敗 log](../../artifacts/closeup-polish/S0/formal.log)）。呢個 runner 唔喺 `npm test`，CI 捉唔到。
+- 問題：[tests/energyE4.browser.mjs](../../tests/energyE4.browser.mjs) 原 line 91 等 `街のエネルギー設備は今の配置`，原 line 100 等 `蓄電庭園は1か所`。meter-ladder（`0b84a29`）之後，結果卡會先講 headline 嘅 Meter 偏好，所以兩句都可能唔出，runner 會 timeout（[失敗 log](../../artifacts/closeup-polish/S0/formal.log)）。呢個 runner 唔喺 `npm test`，CI 捉唔到。
 - 修法：搬 S0 副本 [artifacts/closeup-polish/formal.mjs](../../artifacts/closeup-polish/formal.mjs) 嘅 `headlineResult(view)`（line 66–76，用 `pickHeadline` + `residentResult` 揀預期文字），連埋佢需要嘅 import，替換上面兩個 wait。其他斷言、quality 同 timeout 一律唔改；S0 嘅 coordinator review 已經接受咗呢個改法。
 - Branch：`fix/energy-e4-headline`，由 main 開。
 - 驗證：`npm ci --prefix survey`，然後 `npm run build --prefix survey`（runner 用嚟做 scratch fixture），再跑 `node tests/energyE4.browser.mjs`，要 PASS，page exception 0，只容許預期嘅 favicon 404／obsolete 409／注入嘅 abort。另外跑 root `npm test && npm run build && git diff --check`。
@@ -122,10 +122,16 @@ Z 已經由 Codex relay 完成（`origin/feat/closeup-polish` @ `f66cc3a`，量�
 
 ## Actual validation results
 
-- Verification status: PARTIAL（只做文件）
-- 2026-10-29 `docs/closeup-next`：只檢查咗 Markdown 連結同引用嘅事實（SHA、CI run、行號）。冇跑 runtime test，因為冇改過 code。
-- F1 失敗係根據 S0 log，今次冇重跑。
+- 初版 `docs/closeup-next` 只核對文件；F1 原失敗保留於 S0 log。以下係 2026-10-29 F1/F2 新驗證，唔沿用舊圖／log。
+- Preflight：原 checkout `main@e69874d`，fetch 成功、0/0，原有 `.playwright-cli/`／`.task-relay/` 保留；worker 用 `.task-relay/closeup-next/checkout` clean independent clone，設回 GitHub origin 再 fetch，0/0 後開 `fix/energy-e4-headline`。冇改原 checkout source，冇借共享 index，舊 feature 冇 merge。
+- F1：逐字搬 S0 `headlineResult(view)` 加兩個 imports，只替換兩處 wait；[exact-scope](../../artifacts/closeup-next/F1/exact-scope.json) 還原後逐 byte 等於 baseline runner，其他斷言／quality／timeout 不變。`headline-selfcheck.mjs` 驗 Meter／能源 fallback 及錯配拒絕。
+- Local checks PASS：root `npm test`／`npm run build`、survey `npm run build --prefix survey`、`git diff --check`。首次 npm ci 因 sandbox DNS／cache 權限失敗，權限重試 root／survey 皆成功；原失敗 log 保留。Root build 保留 JSON import attributes 及 >500kB 警告；安裝 audit 回報既有 1 high，未改依賴。
+- Formal E4 PASS：macOS 27.0.1、已安裝 headless Chrome 156.0.8078.73、既有 Playwright、City 1920×1080／DPR1／default、Guest 1280×900、hour12／18.5／22，scratch 真實 SQLite7→8。保留全部原驗收：舊草稿／原文／ID、Q3／review、pre/post-commit retry、首能源票0庭但 Meter headline、第二票1庭及能源結果、Undo、16票混合配置、TCP重連、browser reduced motion、普通resize、reset／舊ID。Page exceptions0；只有預期 favicon404／obsolete409／兩次注入abort，另逐項核對 browser.json。12張新原圖，已目視Q3／兩張結果／mixed夜景／reduced motion／reset；[完整證據與重跑](../../artifacts/closeup-next/F1/README.md)。
+- F2 四項現行事實全部吻合，冇改四份文件：[facts](../../artifacts/closeup-next/F1/f2-facts.json)。住宅A／production、handoffs SOFTWARE COMPLETE A／closeup-next／53份archive、E5 `db772bb` 已在 main且 CI40069808324 success、headline-camera source指向已追蹤artifact副本。
+- 文件檢查：改動文件加F2四份文件共345個local links／anchors／tracked targets PASS，見[link-check](../../artifacts/closeup-next/F1/link-check.json)；exact diff、新文字檔及上述6張原圖已自審，無需PROJECT／SPEC同步（runtime／產品規則未改）。
+- 驗證tree：baseline `e69874dbca243674590ee87d60b03cffcd37379d` 加 fixture SHA256 `77b835afe0f5ad70f7af8f72a4c01c1df4eb65289a4b1b00520f78f881adb78a`；實際 feature／integrated SHA 與 main CI 待下方發布紀錄。Owned Vite5191／scratch57086／browser已停止，ports已核對無listener。
+- 限制：冇改 runtime／survey／module-swap／E5 runner；分開package suites冇重跑。未量FPS、未測展覽硬件／Safari／iPad／Windows／訪客理解。11s／16s fixture clock jumps唔係訪客時間；actor clock係實時，原runner冇鎖hero，不將圖當canonical performance或C1美術驗收。
 
 ## Next expected step
 
-下一個 agent 先做 F1，再核對 F2。之後由 main 開 `feat/closeup-accepted`，做「2026-10-29 近鏡 A–D 決定」入面收嘅 4 個 pose 加 `eebff28` 服務面，同埋 `sw:focal` 嗰一輪 pose；做完同 S0 並排，交 owner 睇圖先 merge。合併之後先開 N1。
+F1/F2 整合及 main CI 完成後，由 coordinator review 本批，再派 C1：由 verified main 開 `feat/closeup-accepted`，做「2026-10-29 近鏡 A–D 決定」入面收嘅4個 pose 加 `eebff28` 服務面，同埋 `sw:focal` 一輪 pose；同 S0 並排交 owner 睇圖，批准先 merge。C1合併或明確棄用之後先開 N1。本worker唔開下一批；C1／N1仍pending，F3等硬件。

@@ -1,0 +1,14 @@
+{
+  "files": [
+    "docs/VALIDATION.md",
+    "docs/handoffs/closeup-next.md",
+    "artifacts/closeup-next/F1/README.md",
+    "docs/EXHIBITION_SPEC.md",
+    "docs/handoffs/README.md",
+    "docs/handoffs/energy-city.md",
+    "docs/handoffs/headline-camera.md"
+  ],
+  "checkedLocalLinks": 345,
+  "errors": [],
+  "status": "PASS"
+}

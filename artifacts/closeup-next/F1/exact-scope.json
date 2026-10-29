@@ -1,0 +1,8 @@
+{
+  "baseline": "e69874dbca243674590ee87d60b03cffcd37379d",
+  "fixtureSha256": "77b835afe0f5ad70f7af8f72a4c01c1df4eb65289a4b1b00520f78f881adb78a",
+  "verbatimHelper": true,
+  "onlyTwoImportsHelperAndTwoWaits": true,
+  "allOtherAssertionsTimeoutQualityUnchanged": true,
+  "runtimeSurveyModuleSwapEnergyE5Changed": false
+}
