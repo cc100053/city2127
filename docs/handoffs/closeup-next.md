@@ -3,11 +3,11 @@
 下一個 agent 嘅入口文件（2026-10-29 寫）。冇 chat 歷史都可以由呢度開始。佢唔取代 [closeup-polish](closeup-polish.md)：A–D／Z 嘅標準同進度仍然以嗰份為準（最新版喺 `origin/feat/closeup-polish`，唔係 main）。
 
 - Owner: cc100053（產品／審美決定）；F1/F2 worker：Codex `01a1857c-e75a-7571-b8af-59b218b9b0aa`；coordinator：`01a1856f-6e56-73b2-b8f9-a8378a64fb71`。
-- Status: F1/F2 INTEGRATED LOCAL VERIFIED，待push main／CI；C1／N1 PENDING（美術 owner gate 保留）；F3 等展覽硬件。
+- Status: F1/F2 INTEGRATED／main CI PASS，交coordinator review；C1／N1 PENDING（美術 owner gate 保留）；F3 等展覽硬件。
 - Branch: F1/F2 `fix/energy-e4-headline`；C1 由 verified main 開 `feat/closeup-accepted`，舊 `feat/closeup-polish` 只留證據。
 - Base commit: F1/F2 `e69874dbca243674590ee87d60b03cffcd37379d`（2026-10-29 fetch，main／origin/main 0/0）；本文件最初 base `3d0f40e`。
 - Last verified commit: F1/F2 feature `61ec1bbfaf128691aaba97693b86365826a24c2a`，integrated `00303e133f797a40392dd81e7540f35d3cdd9ea0`；初版只核對文件，唔作 runtime 證據。
-- Remote availability: 初版／F2 修正已經喺 main；本批發布紀錄見下方。
+- Remote availability: F1/F2 已push feature及main `c3419758e342dfdebf2f0daf0ce310ba3cdf7d69`，main CI success；下方發布紀錄及後續純文件更新唔改source。
 
 ## Session Git state（寫呢份文件嗰個 session）
 
@@ -135,7 +135,8 @@ Z 已經由 Codex relay 完成（`origin/feat/closeup-polish` @ `f66cc3a`，量�
 ## F1/F2 integration — 2026-10-29
 
 - Feature `61ec1bbfaf128691aaba97693b86365826a24c2a` 已push到 `origin/fix/energy-e4-headline`。整合前重新fetch確認 `origin/main=e69874d`，clean main fast-forward後no-ff merge為 `00303e133f797a40392dd81e7540f35d3cdd9ea0`，完整tree與feature逐byte一致，無conflict。
-- Integrated root `npm test`／`npm run build`、helper self-check、`git diff --check origin/main..HEAD`全部PASS；[integration record](../../artifacts/closeup-next/F1/integration.json)及新logs留在本批證據。Formal browser所驗fixture hash與integrated完全相同；未為純metadata再重截圖。Main push／CI待核實；本段後只有整合metadata／logs，runtime與fixture未變。
+- Integrated root `npm test`／`npm run build`、helper self-check、`git diff --check origin/main..HEAD`全部PASS；[integration record](../../artifacts/closeup-next/F1/integration.json)及新logs留在本批證據。Formal browser所驗fixture hash與integrated完全相同；未為純metadata再重截圖。該JSON係push前snapshot，發布狀態由本段取代。
+- Main `c3419758e342dfdebf2f0daf0ce310ba3cdf7d69` 已push，fresh fetch確認origin/main一致；[main CI40808519827](https://github.com/cc100053/city2127/actions/runs/40808519827) completed／success（head SHA同上，root test/build、survey test/build、module-swap test/build、whitespace全部PASS）。本段係之後純文件完成紀錄，按workflow跳過CI；runtime／fixture／原圖未變，local links／fact及完整committed diff再核對。F1/F2 writer／全部owned services已release，coordinator按result review後先派C1。
 
 ## Next expected step
 
