@@ -2,8 +2,8 @@
 
 下一個 agent 嘅入口文件（2026-10-29 寫）。冇 chat 歷史都可以由呢度開始。佢唔取代 [closeup-polish](closeup-polish.md)：A–D／Z 嘅標準同進度仍然以嗰份為準（最新版喺 `origin/feat/closeup-polish`，唔係 main）。
 
-- Owner: cc100053（產品／審美決定）；F1/F2 worker：Codex `01a1857c-e75a-7571-b8af-59b218b9b0aa`；coordinator：`01a1856f-6e56-73b2-b8f9-a8378a64fb71`。
-- Status: F1/F2 INTEGRATED／main CI PASS，交coordinator review；C1／N1 PENDING（美術 owner gate 保留）；F3 等展覽硬件。
+- Owner: cc100053（產品／審美決定）；F1/F2 worker：Codex `01a1857c-e75a-7571-b8af-59b218b9b0aa`；C1唯一writer：Codex `01a185a2-dd7b-7711-ba9f-97204080bf80`；coordinator：`01a1856f-6e56-73b2-b8f9-a8378a64fb71`。
+- Status: F1/F2 INTEGRATED；C1 INTEGRATED（owner 2026-10-29「修完就 merge」，見「C1 owner 批准同整合」）；N1 PENDING；F3 等展覽硬件。
 - Branch: F1/F2 `fix/energy-e4-headline`；C1 由 verified main 開 `feat/closeup-accepted`，舊 `feat/closeup-polish` 只留證據。
 - Base commit: F1/F2 `e69874dbca243674590ee87d60b03cffcd37379d`（2026-10-29 fetch，main／origin/main 0/0）；本文件最初 base `3d0f40e`。
 - Last verified commit: F1/F2 feature `61ec1bbfaf128691aaba97693b86365826a24c2a`，integrated `00303e133f797a40392dd81e7540f35d3cdd9ea0`；初版只核對文件，唔作 runtime 證據。
@@ -138,6 +138,35 @@ Z 已經由 Codex relay 完成（`origin/feat/closeup-polish` @ `f66cc3a`，量�
 - Integrated root `npm test`／`npm run build`、helper self-check、`git diff --check origin/main..HEAD`全部PASS；[integration record](../../artifacts/closeup-next/F1/integration.json)及新logs留在本批證據。Formal browser所驗fixture hash與integrated完全相同；未為純metadata再重截圖。該JSON係push前snapshot，發布狀態由本段取代。
 - Main `c3419758e342dfdebf2f0daf0ce310ba3cdf7d69` 已push，fresh fetch確認origin/main一致；[main CI40808519827](https://github.com/cc100053/city2127/actions/runs/40808519827) completed／success（head SHA同上，root test/build、survey test/build、module-swap test/build、whitespace全部PASS）。本段係之後純文件完成紀錄，按workflow跳過CI；runtime／fixture／原圖未變，local links／fact及完整committed diff再核對。F1/F2 writer／全部owned services已release，coordinator按result review後先派C1。
 
+## C1 owner 批准同整合 — 2026-10-29
+
+- Owner 喺 Claude session `6034e339` 揀「修完就 merge」，即係批准三點：
+  1. A5 改為睇 FPS（≥ S0 95%）同 hero calls（≤110%）；個別 shot 嘅 draw calls 只做診斷，因為新 pose 影入更多城市，同舊 pose 比冇意義。
+  2. 將 `sw:focal` 拉遠到 A1 過關。
+  3. 修完就 merge，唔等 24 組相鄰 tier 兩秒辨認。呢個 owner gate **冇做**，記低做已知缺口，唔當 PASS。
+- 接手：Claude 喺 `.task-relay/closeup-next/state.json` revision 11 記低接手；Codex coordinator 停喺 `NEEDS_INPUT`，冇同時寫 branch。
+- 修正：`sw:focal` position `[-164,61,147]` → `[-168,64,152]`（沿視線拉遠約 6%，target 不變）。A1／A2／A6／repro 6/6 PASS。
+- 仍然 FAIL、照記：`sw:focal` FPS 兩次量度係 S0 嘅 91.2–95.1%，日景兩次都低過 95%。同機 hero 喺 run 之間波動約 5%，vsync 鎖 60。SE district A2 10 FAIL、NW −2→0 幾乎冇分別（Meter 低檔內容問題）、global V3 同設施辨識，全部照舊。[證據](../../artifacts/closeup-next/C1/sw-pullback/README.md)
+- 驗證：root `npm test`／`npm run build`／`git diff --check` PASS；survey、module-swap 冇改。
+
 ## Next expected step
 
-F1/F2 整合及 main CI 完成後，由 coordinator review 本批，再派 C1：由 verified main 開 `feat/closeup-accepted`，做「2026-10-29 近鏡 A–D 決定」入面收嘅4個 pose 加 `eebff28` 服務面，同埋 `sw:focal` 一輪 pose；同 S0 並排交 owner 睇圖，批准先 merge。C1合併或明確棄用之後先開 N1。本worker唔開下一批；C1／N1仍pending，F3等硬件。
+C1 已經入 main。下一步開 N1（能源講解），由 main 開 `feat/energy-narration`，`energy:ring` 用新 pose。24 組 tier 兩秒辨認係 owner 隨時可以補做嘅檢查，唔阻 N1。F3 等硬件。另外兩個設計任務未開：全城植栽語言（V3），同 NW／SE focal 設施辨識。
+
+## C1 candidate — 2026-10-29
+
+- 獨立clone `/Users/fatboy/city2127/.task-relay/closeup-next/checkout` 由 clean `main@cd401e0b0ca25a87c5cb754289d3f56664251d37` 開 `feat/closeup-accepted`；fresh fetch main0/0。Clone原本只fetch main，另明確fetch舊feature `f66cc3a`作指定行／patch來源；冇cherry-pick整個commit，冇改原root或舊closeup-polish checkout／evidence。實際providerlimit一次中斷後由同一worker續作，逐一核對三個source hash，冇重開writer或改SW候選。
+- Runtime `9bd0605`：四個選定SHOTS逐行等同舊feature；`automationHub.ts`完整檔逐byte等同 `eebff28`，只帶服務面／操作接縫，用既有材質及batch，保留六服務槽、入口人體clearance及late GLB載入。SW唯一pose候選固定 `position[-164,61,147]`／`target[-105,10,60]`，寫之前已看S0／B r2／r3原圖，量度後冇改。其他poses／builders、hero／FOV42、counts／footprints、3s／60s、selection／headline timeline皆不變。[Exact scope](../../artifacts/closeup-next/C1/exact-scope.json)。
+- Test fixture `d6bed36`：沿用eebff28兩組必要tests；stub由empty Group改成一個mesh，真實驗late-load baking並去除空fixture警告。初次警告log保留；完整root suite用修正fixture且無該警告。Root `npm test`／`npm run build`、survey fixture build、headline test、runner/report/live self-check及完整diff whitespace PASS；build僅既有JSON import-attributes／chunk-size警告，survey及module-swap source無改、獨立suite不另跑。
+- [C1原圖／重跑方法](../../artifacts/closeup-next/C1/README.md)：五個選定shot加hero完整S0矩陣40態／80張JPEG90，reviewTime20、hour12/22、1920×1080／DPR1／default；每個狀態兩次fresh navigation，固定用第二take。40張final及40張對應S0原圖均逐張original-detail檢視，完整並排與V1–V6理由見[REVIEW](../../artifacts/closeup-next/C1/REVIEW.md)。S0完整原圖hash保持。A6 40/40 PASS；vsync59.9–60.3；repro13/40，其餘27組FAIL保留。SW focal中性／高值高度61.38%超60%（四張A1 FAIL）；SE district10張A2 FAIL（bounds雖唔再跨near plane，中心仍在畫面下方）。未加輪次或改helper主體。
+- Canonical A5：兩個uncapping flags、每次獨立navigation至少16s warmup、兩個至少5s raw rAF窗；12組完整保留原intervals／calls／shadow outliers。7 PASS／5 FAIL；FPS88.47–109.80，全部≥S0的95%，失敗係calls：NW日957/775、SW focal日夜771/606、SE district日夜925/743，超110%。SW district／ring／hero日夜六組及NW夜通過。Chrome `156.0.8078.48`→`.73`差異明記，不稱同版本隔離優化；逐張instant calls亦保留為diagnostic，A5 calls按指定canonical mean判定，冇揀樣本或rerun抹FAIL。
+- A3數字仍≥7/9、A4仍≥6%／12%，只作diagnostic；numeric A4 2/38 PASS，全部FAIL列出。24組相鄰採樣Meter tier的owner兩秒辨認hard gate仍PENDING；能源配置唔係tier，B／mixed原本共用同一個環body，其numeric比較仍保留，唔要求虛構部件差異。A1／A2／A5／A6及V hard gates保留；global V3全城植栽FAIL、NW／SW focal及SE district功能辨識限制未被功能tests代替。其他舊A–D失敗同原圖不改寫。
+- Live／formal結果、final metadata SHA、remote／cleanup見本節下方完成紀錄及worker `result-C1.json`。當前實作完成不等於全部verification或美術接受；只可交owner睇具體原圖，未獲批准不得merge main。本worker唔開N1，唔加輪次；F3仍等展覽硬件。
+
+### C1 completion / review boundary
+
+- 新 scratch live 真實 HTTP/WebSocket／current-v4／dev:auto，五個 headline 各4項合共20/20 PASS，errors0：ring、SW focal、SW district、SE district、NW focal；逐項驗相符hold/card、共享3s中途geometry、四site／能源權威counts、正常返回、reload snapshot、Undo prior configuration、reduced-motion hero及無pulse。五張hold原圖已檢視；120-frame診斷只證明中途狀態，精確3s用root test，不稱browser毫秒精度。[Live原始結果](../../artifacts/closeup-next/C1/live/browser.json)。
+- 未修改現行F1 formal E4 runner，在C1重跑14項全部PASS：SQLite7→8原文／obsolete草稿、Q3/review、pre/post commit同ID retry、首票Meter及次票能源headline、Undo、mixed portfolio、日／暮／夜、TCP reconnect、reduced motion、普通resize、reset／舊ID。exceptions0；只有預期favicon404、obsolete409及兩次注入abort。12張新原圖保留，逐張檢視Q3／兩張結果／mixed夜景／reduced-motion／reset六張；clock jumps及未鎖hero限制保留，不作訪客時間或canonical效能證據。[Formal原始結果](../../artifacts/closeup-next/C1/formal/browser.json)。
+- [衍生報告](../../artifacts/closeup-next/C1/report.json)核對40個狀態、12組perf、38組比較、固定pose／URL、raw窗口、全部S0原圖hash及3個source hash；原圖manifest共102張（80 static、10 live、12 formal）。初次report錯將top-level perf row當raw round，修正為逐round核對URL／pose後成功，無改量測／原圖；錯誤紀錄保留。Root完整suite／build已在同一source hash上PASS，後續只新增證據／文件，local links及最終diff再核對。
+- [Cleanup](../../artifacts/closeup-next/C1/cleanup.json)：所有owned browsers／scratch services已經await finally退出，Vite5194已停止，scratch62584／62697／62778／62863／62939／63066逐port無listener，owned runners為空。只push `feat/closeup-accepted`，無main merge／部署。最終feature SHA、fresh remote divergence、writer release及callback以persistent worker `/Users/fatboy/city2127/.task-relay/closeup-next/result-C1.json`為準；該檔係操作交接紀錄，唔包含新source。
+- 限制及owner gate：root/live/formal PASS與實作完成分開於美術接受；A1四FAIL／A2十FAIL／A5五組calls FAIL、global V3及其他V FAIL全部保留。Owner原圖批准與24組兩秒辨認未完成；未測展覽硬件／4K／Safari／iPad／Windows／長跑／真人理解。N1未開，F3仍等硬件。

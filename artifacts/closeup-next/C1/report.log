@@ -1,0 +1,67 @@
+{
+  "states": 40,
+  "rawStaticOriginals": 80,
+  "originalFinalImagesReviewed": 40,
+  "A1": {
+    "PASS": 32,
+    "FAIL": 4,
+    "N/A": 4
+  },
+  "A2": {
+    "PASS": 26,
+    "FAIL": 10,
+    "N/A": 4
+  },
+  "A3diagnostic": {
+    "FAIL": 36,
+    "N/A": 4
+  },
+  "A4diagnostic": {
+    "pass": 2,
+    "pairs": 38,
+    "adjacentOwnerGate": "PENDING"
+  },
+  "A5": {
+    "FAIL": 19,
+    "PASS": 21
+  },
+  "canonicalPerformance": {
+    "FAIL": 5,
+    "PASS": 7
+  },
+  "A6": {
+    "PASS": 40
+  },
+  "reproducibility": {
+    "FAIL": 27,
+    "PASS": 13
+  },
+  "V": {
+    "V1": {
+      "FAIL": 22,
+      "PASS": 14,
+      "N/A": 4
+    },
+    "V2": {
+      "PASS": 34,
+      "FAIL": 6
+    },
+    "V3": {
+      "FAIL": 40
+    },
+    "V4": {
+      "FAIL": 6,
+      "PASS": 32,
+      "N/A": 2
+    },
+    "V5": {
+      "N/A": 21,
+      "PASS": 11,
+      "FAIL": 8
+    },
+    "V6": {
+      "PASS (static)": 38,
+      "N/A": 2
+    }
+  }
+}

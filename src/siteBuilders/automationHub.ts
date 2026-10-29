@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { AutomationDistrict } from '../districtMeters.ts';
-import { arc, bake, box, cream, faces, futureLight, glass, publicLight, sign, solar, teal, trim, type Kit } from '../cityRig.ts';
+import { arc, bake, box, cream, dark, faces, futureLight, glass, publicLight, sign, solar, teal, trim, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import { remapCityMaterials, type SiteAssetLoaderCache } from '../siteAssets/assetLoader.ts';
 import type { Band } from '../surveyView.ts';
@@ -151,6 +151,19 @@ export function buildAutomationHub(scene: T.Scene, kit: Kit, assets: SiteAssetLo
     const angle = i * Math.PI / 2 + Math.PI / 4;
     box(hubBase, [.12, .7, .12], [Math.cos(angle) * 3.7, 12.15, -Math.sin(angle) * 3.7], solar, .02);
   }
+  // Recessed service faces align with the six existing counters, above the public approach.
+  for (let i = 0; i < SERVICE_SLOTS; i++) {
+    const x = (i - 2.5) * 1.02, z = i % 2 ? -1 : 1;
+    box(hubBase, [.78, 1.5, .08], [x, 2.7, z * 3.04], dark, .02);
+    for (const dx of [-.44, .44]) box(hubBase, [.06, 1.9, .14], [x + dx, 2.7, z * 3.06], trim, .01);
+    box(hubBase, [.84, .08, .14], [x, 3.65, z * 3.06], trim, .01);
+    box(hubBase, [.38, .035, .03], [x, 3.48, z * 3.12], publicLight, .01);
+  }
+  // Floor-height joints subdivide the existing envelope without changing the upper GLB or its cache.
+  for (const y of [4, 7, 10]) faces(hubBase, 7, 6, (face, across, out) => {
+    for (let x = -across / 2 + .7; x < across / 2; x += 1.1)
+      box(face, [.045, .9, .12], [x, y, out + .04], trim, .01);
+  });
   sign(hubBase, kit, '自動サービス / AUTO HUB', 0, 2.2, 3.2, 6.2, .8, '#46676e');
 
   const slots: ServiceSlot[] = [];
@@ -179,6 +192,12 @@ export function buildAutomationHub(scene: T.Scene, kit: Kit, assets: SiteAssetLo
   }
   const automationHub = createAutomationHubRuntime(slots,root,hubBase,neutralPropsLayer.group);
   const automationDistrict = new AutomationDistrict(scene);
+
+  const upperJoints = new T.Group(); upperJoints.name = 'automation-hub-service-joints';
+  for (const y of [2.7, 5.7, 8.7, 11.7, 14.7, 17.7]) {
+    arc(upperJoints, 2.29, 2.35, .045, [0, y, 0], publicLight, .8, 1.6);
+  }
+  upperJoints.add(...bake(upperJoints)); hubUpper.add(upperJoints);
 
   const hubUpperFallback = new T.Group();
   hubUpperFallback.name = 'automation-hub-upper-procedural-fallback';

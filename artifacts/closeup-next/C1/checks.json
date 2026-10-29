@@ -1,0 +1,112 @@
+{
+  "rootTest": {
+    "status": "PASS",
+    "log": "test.log"
+  },
+  "rootBuild": {
+    "status": "PASS",
+    "log": "build.log",
+    "warnings": "Existing JSON import-attributes and chunk-size warnings."
+  },
+  "scope": {
+    "status": "PASS",
+    "record": "exact-scope.json"
+  },
+  "whitespace": {
+    "status": "PASS",
+    "scope": "staged evidence/docs and complete baseline-to-working-tree task diff; committed range rechecked after commit"
+  },
+  "platform": {
+    "os": "macOS27.0.1",
+    "node": "26.0.0",
+    "browser": "156.0.8078.73",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "dpr": 1,
+    "quality": "default"
+  },
+  "runtimeCommit": "9bd0605",
+  "testFixtureCommit": "d6bed36",
+  "sourceScope": "Only SHOTS five lines and exact eebff28 service-face/operating-joint patch; fixture adapted to contain batchable mesh.",
+  "pending": [
+    "Owner original-image approval and adjacent-tier comparison",
+    "F3 exhibition hardware",
+    "N1 remains unopened"
+  ],
+  "live": {
+    "status": "PASS",
+    "checks": 20,
+    "errors": 0,
+    "report": "live/browser.json",
+    "reviewedOriginals": [
+      "live/A-hold.jpg",
+      "live/B-hold.jpg",
+      "live/S-hold.jpg",
+      "live/C-hold.jpg",
+      "live/D-hold.jpg"
+    ],
+    "scope": "Five actual headline shots, intermediate transition, all-site/energy authority, normal return, reload snapshot, Undo and reduced motion; exact3s duration in root tests."
+  },
+  "formalE4": {
+    "status": "PASS",
+    "tests": 14,
+    "exceptions": 0,
+    "report": "formal/browser.json",
+    "expectedOnly": "favicon404, obsolete409, two injected net::ERR_FAILED aborts",
+    "reviewedOriginals": [
+      "formal/q3-current.png",
+      "formal/recorded-no-change.png",
+      "formal/live-one-garden-result.png",
+      "formal/mixed-22.png",
+      "formal/mixed-reduced-motion.png",
+      "formal/reset-baseline.png"
+    ]
+  },
+  "capture": {
+    "status": "COMPLETE",
+    "states": 40,
+    "doubleTakeOriginals": 80,
+    "A6Pass": 40,
+    "reproPass": 13,
+    "vsyncRange": [
+      59.9,
+      60.3
+    ],
+    "originalFinalReviewed": 40,
+    "matchingS0Reviewed": 40
+  },
+  "performance": {
+    "status": "COMPLETE, gate FAILs retained",
+    "cases": 12,
+    "canonicalPass": 7,
+    "canonicalFail": 5,
+    "rawWindows": 24,
+    "fpsRange": [
+      88.47078372789495,
+      109.79676831579619
+    ],
+    "thresholds": {
+      "fpsRatioMin": 0.95,
+      "callsRatioMax": 1.1,
+      "vsyncMin": 58
+    },
+    "numericA4": {
+      "pairs": 38,
+      "pass": 2,
+      "diagnostic": true
+    }
+  },
+  "ownerGate": {
+    "status": "PENDING",
+    "adjacentSampledMeterPairs": 24,
+    "timeSeconds": 2,
+    "artAcceptance": false
+  },
+  "links": {
+    "status": "PASS",
+    "localTargetsAndAnchors": 682,
+    "record": "link-check.json"
+  }
+}

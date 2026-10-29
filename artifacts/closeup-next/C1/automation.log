@@ -1,0 +1,4 @@
+PASS: six bounded MAGNET service slots retarget smoothly and restore to the mixed 3/3 baseline.
+PASS: six recessed service faces stay behind the existing accessible approach.
+THREE.Object3D.add: object not an instance of THREE.Object3D. undefined
+PASS: upper operating joints survive late GLB loading without rebuilding their batch.

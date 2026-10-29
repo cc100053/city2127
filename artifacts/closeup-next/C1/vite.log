@@ -1,0 +1,12 @@
+
+> city2127@1.0.0 dev
+> vite --host 127.0.0.1 --port 5194
+
+
+  VITE v7.3.6  ready in 91 ms
+
+  ➜  Local:   http://127.0.0.1:5194/
+1:12:04 PM [vite] (client) page reload survey/dist/admin.html
+1:12:04 PM [vite] (client) page reload survey/dist/guest.html
+1:12:04 PM [vite] (client) page reload survey/dist/index.html
+1:12:04 PM [vite] (client) page reload survey/dist/monitor.html

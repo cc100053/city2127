@@ -1,0 +1,34 @@
+{
+  "pass": true,
+  "sourceFiles": [
+    "src/headlineCamera.ts",
+    "src/siteBuilders/automationHub.ts"
+  ],
+  "onlyShotLines": [
+    "nw:focal",
+    "sw:focal",
+    "sw:district",
+    "se:district",
+    "energy:ring"
+  ],
+  "serviceSourceExact": "eebff28",
+  "runtimeCommit": "9bd06056075cef2d1724ddea0d1138c1997ccf25",
+  "srcHashes": {
+    "src/headlineCamera.ts": "950702131a9333156589a975f793121347944721a6bb47ee6b12d90ade7e9487",
+    "src/siteBuilders/automationHub.ts": "705fd3d9f770afab156e15057294a42700ddd14acff22986924521f478de3483"
+  },
+  "changedCodeFiles": [
+    "src/headlineCamera.ts",
+    "src/siteBuilders/automationHub.ts",
+    "tests/automationHub.test.ts"
+  ],
+  "servicePatchExact": true,
+  "testPatchExactExceptMeshFixture": true,
+  "selectedFourPosesExact": true,
+  "frozenSWCandidateExact": true,
+  "verifiedHashes": {
+    "src/headlineCamera.ts": "950702131a9333156589a975f793121347944721a6bb47ee6b12d90ade7e9487",
+    "src/siteBuilders/automationHub.ts": "705fd3d9f770afab156e15057294a42700ddd14acff22986924521f478de3483",
+    "tests/automationHub.test.ts": "5abc76ef5a74babce6425346eebc8e8fbc818250957dbedb280ae84d812d2e97"
+  }
+}

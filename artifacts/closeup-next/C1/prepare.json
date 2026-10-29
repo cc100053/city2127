@@ -1,0 +1,23 @@
+{
+  "baseline": "cd401e0b0ca25a87c5cb754289d3f56664251d37",
+  "recoveryHashesVerified": {
+    "src/headlineCamera.ts": "950702131a9333156589a975f793121347944721a6bb47ee6b12d90ade7e9487",
+    "src/siteBuilders/automationHub.ts": "705fd3d9f770afab156e15057294a42700ddd14acff22986924521f478de3483",
+    "tests/automationHub.test.ts": "385253c85293d45b966ea17797419b4adaab3380aeee4d21ec2ad54bf5982564"
+  },
+  "swOneCandidate": {
+    "position": [
+      -164,
+      61,
+      147
+    ],
+    "target": [
+      -105,
+      10,
+      60
+    ]
+  },
+  "oldSource": "f66cc3a",
+  "servicePatch": "eebff28",
+  "owner": "01a185a2-dd7b-7711-ba9f-97204080bf80"
+}
