@@ -19,6 +19,7 @@
 | [分級階梯＋headline](meter-ladder.md) | DONE；±3格、每份提案最多一格、headline已merge入main `0b84a29`，main CI通過；headline camera另開任務 | cc100053；實作Claude |
 | [儲能環 polish](storage-ring-polish.md) | 已整合main，實際main CI通過，本機／遠端task分支已安全刪除；[整合交接](energy-polish-integration.md)，原審美／硬件限制保留 | Codex batch owner |
 | [近鏡推近／先推近後變化](closeup-zoom.md) | PLANNED（2026-10-29 Claude review）；T 時間線 → F 構圖 → A 四個 focal 主體，連續做，owner 最後一次過 review 先 merge | cc100053；實作Codex |
+| [每位Guest近鏡＋明顯變化](guest-agency.md) | PLANNED（2026-10-29；G0 已批，加 G7 變化位置近鏡）；依賴 closeup-zoom T／F | cc100053 |
 | [近鏡後續／能源講解](closeup-next.md) | F1/F2、C1 INTEGRATED（C1 owner批准，24組兩秒辨認未做）；N1 能源講解 INTEGRATED（13s／日文），F3等硬件（2026-10-29） | cc100053 |
 
 已完成或不再適用的53份交接及Meter截圖見 [歸檔索引](archive/README.md)。歷史下一步不會自動變成backlog；Shibuya不再開發。人類美術review／實機未測等限制保留，不因歸檔而結案。
