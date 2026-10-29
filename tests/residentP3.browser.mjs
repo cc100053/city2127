@@ -104,7 +104,8 @@ try {
   await screen(a, 'welcome'); await answer(a, 2); await a.locator('[data-auto-action=submit]').click(); await screen(a, 'result');
   await city.emulateMedia({ reducedMotion: 'reduce' });
   await snapshot();
-  assert.equal(await city.locator('.causal-panel').getAttribute('data-presentation'), 'ambient');
+  // matchMedia 'change' is dispatched on a later rendering frame than emulateMedia resolves; bound the wait to prove it is immediate.
+  await city.waitForFunction(() => document.querySelector('.causal-panel')?.dataset.presentation === 'ambient', null, { timeout: 1000 });
   await city.reload(); await snapshot();
   assert.equal(await city.locator('.causal-panel').getAttribute('data-presentation'), 'ambient');
   await admin.getByRole('button', { name: '直前の提案を取り消す', exact: true }).click();

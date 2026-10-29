@@ -57,6 +57,8 @@ Start the services and use their printed ports as described in [README](../READM
 
 Optional runnable browser checks use installed Playwright and local services: [surveyAuto.browser.mjs](../tests/surveyAuto.browser.mjs), [adminUndo.browser.mjs](../tests/adminUndo.browser.mjs), [twoStations.browser.mjs](../tests/twoStations.browser.mjs), [residentP2.browser.mjs](../tests/residentP2.browser.mjs), [residentP3.browser.mjs](../tests/residentP3.browser.mjs), [residentP4.browser.mjs](../tests/residentP4.browser.mjs). Read each script's environment/ports before execution. These are focused regressions, not proof of exhibition-day hardware acceptance.
 
+Browser assertions on City state must wait for the state they check, not only for `snapshot()` (guest count and layout). A Playwright `emulateMedia` change reaches the page's `matchMedia` `change` listener on a later rendering frame, so `residentP3` waits up to 1 s for `data-presentation="ambient"` after enabling reduced motion; an immediate read raced that frame and saw `result` (2026-10-29, reproduced on `main` 8f2a8d9; PASS ×2 after the fix, Chrome 1280×720 hour16).
+
 Street-life interactions (2026-10-06): root `mobility.test.ts` checks conversational speaker/listener/quiet turns and continuous
 outbound/stay/return/indoor timing. `odaiba.test.ts` publishes real landmark doorways after creating the actor fleets, checks the
 visitor curves on actual paving and clear of buildings/sites, then samples each journey against actual people/robots for 240 s
