@@ -1,4 +1,4 @@
-import { ENERGY_PHASES, ENERGY_STATIC } from './devEnergy.ts';
+import { ENERGY_PHASES } from './devEnergy.ts';
 import type { CarrierChange } from './cityChangeManager.ts';
 import type { EnergyRuntime } from './energyRuntime.ts';
 import { shotTimeline, type ShotId } from './headlineCamera.ts';
@@ -7,12 +7,12 @@ import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 type Part = 'garden' | 'garden2' | 'ring' | 'wing' | 'island';
 const CYCLE_SECONDS = 60;
 // The result card names whose voice and what changed; this caption only says how the shown part works.
-export const NARRATION: Record<Part, { title: string; steps: readonly [string, string, string]; still: string }> = {
-  garden: { title: '上下水庭 · 水力儲能', steps: [ENERGY_PHASES.a.charge, ENERGY_PHASES.a.hold, ENERGY_PHASES.a.release], still: ENERGY_STATIC.a },
-  garden2: { title: '第二處水庭 · 水力儲能', steps: [ENERGY_PHASES.a.charge, ENERGY_PHASES.a.hold, ENERGY_PHASES.a.release], still: ENERGY_STATIC.a },
-  ring: { title: '富士儲能環 · 旋轉儲能', steps: [ENERGY_PHASES.b.charge, ENERGY_PHASES.b.hold, ENERGY_PHASES.b.release], still: ENERGY_STATIC.b },
-  wing: { title: '接收翼 · 外部供電', steps: ['接收翼 → 接收外部供電', '岸邊配電門架 → 承接供電', '街區配電節點 → 街區用電'], still: '靜態閱讀：接收翼 → 岸邊配電門架 → 街區配電節點。' },
-  island: { title: '能源島 · 島嶼供電', steps: ['能源島 → 供電', '跨水檢修橋 → 服務線', '街區配電節點 → 街區用電'], still: ENERGY_STATIC.c },
+export const NARRATION: Record<Part, { title: string; steps: readonly [string, string, string] }> = {
+  garden: { title: '上下水庭 · 水力儲能', steps: [ENERGY_PHASES.a.charge, ENERGY_PHASES.a.hold, ENERGY_PHASES.a.release] },
+  garden2: { title: '第二處水庭 · 水力儲能', steps: [ENERGY_PHASES.a.charge, ENERGY_PHASES.a.hold, ENERGY_PHASES.a.release] },
+  ring: { title: '富士儲能環 · 旋轉儲能', steps: [ENERGY_PHASES.b.charge, ENERGY_PHASES.b.hold, ENERGY_PHASES.b.release] },
+  wing: { title: '接收翼 · 外部供電', steps: ['接收翼 → 接收外部供電', '岸邊配電門架 → 承接供電', '街區配電節點 → 街區用電'] },
+  island: { title: '能源島 · 島嶼供電', steps: ['能源島 → 供電', '跨水檢修橋 → 服務線', '街區配電節點 → 街區用電'] },
 };
 
 /** The part a headline close-up shows, while it stays in the city: removals get the card alone. */
@@ -48,11 +48,11 @@ export class EnergyNarration {
   private readonly note: HTMLElement;
   private plan: NarrationPlan | null = null;
   private part: Part | null = null;
-  private stillUntil = -1;
   private energy: () => EnergyRuntime | undefined;
   constructor(energy: () => EnergyRuntime | undefined) {
     this.energy = energy;
-    this.panel.className = 'causal-panel energy-narration'; this.panel.hidden = true;
+    // Not a `.causal-panel`: that class is the survey card's, which runners and styles select by.
+    this.panel.className = 'energy-narration'; this.panel.hidden = true;
     this.panel.innerHTML = '<h2 class="causal-title"></h2><ol></ol><p class="causal-status"></p>';
     document.body.appendChild(this.panel);
     this.title = this.panel.querySelector('h2')!; this.list = this.panel.querySelector('ol')!; this.note = this.panel.querySelector('p')!;
@@ -65,28 +65,20 @@ export class EnergyNarration {
     this.show(part, part === 'wing' || part === 'island' ? '供電路線示意' : '60 秒儲能循環 · 壓縮示意');
     this.plan = narrationPlan(now, displayMs);
   }
-  /** Reduced motion: the static reading for the result's display slot, with no cycle. */
-  still(shot: ShotId | null, change: CarrierChange | undefined, now: number, displayMs = DISPLAY_MS) {
-    this.cancel();
-    const part = narratedPart(shot, change);
-    if (!part) return;
-    this.show(part, NARRATION[part].still);
-    this.panel.hidden = false; this.stillUntil = now + displayMs / 1000;
-    document.body.dataset.energyNarration = JSON.stringify({ part, step: 'still' });
-  }
   /** Snapshots, resets, Undo, reconnects and superseding results: hide at once and return every part to the shared clock. */
   cancel() {
-    this.plan = null; this.part = null; this.stillUntil = -1; this.panel.hidden = true;
+    this.plan = null; this.part = null; this.panel.hidden = true;
     const energy = this.energy(); if (energy) energy.clock = {};
     delete document.body.dataset.energyNarration;
   }
   update(now: number, reducedMotion: boolean) {
-    if (this.stillUntil >= 0) { if (now >= this.stillUntil) this.cancel(); return; }
     if (!this.plan || !this.part) return;
+    // Reduced motion receives results as immediate snapshots with no card, so a cycle switched off mid-way simply stops.
     if (reducedMotion) return this.cancel();
     const local = narratedSeconds(this.plan, now), energy = this.energy();
     // After the window the offset stays, so the part continues smoothly instead of jumping back to the shared phase.
-    if (energy) energy.clock = { [this.part === 'wing' || this.part === 'island' ? 'distribution' : this.part]: local, distribution: local };
+    // Wing and island have no storage loop: their narration drives the shared distribution rail only.
+    if (energy) energy.clock = this.part === 'wing' || this.part === 'island' ? { distribution: local } : { [this.part]: local, distribution: local };
     const step = narrationStep(this.plan, now);
     this.panel.hidden = step < 0;
     Array.from(this.list.children).forEach((li, i) => li.classList.toggle('active', i === step));

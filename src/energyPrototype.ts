@@ -503,7 +503,7 @@ export function energyPrototype() {
   const garden2 = garden.clone(); garden2.name = 'energy-district-garden';
   garden2.position.set(30, 0, -395); garden2.scale.setScalar(.72); root.add(garden2);
   const gardens = [garden, garden2];
-  // Short markers stay inside the two pipe frames; they illustrate direction, never a visible energy beam.
+  // Short markers follow the two pipe frames; they illustrate direction, never a visible energy beam.
   const flowGeometry = new T.SphereGeometry(.48, 8, 6);
   const flows = gardens.map(g => {
     const markers = new T.InstancedMesh(flowGeometry, publicLight, 8);
@@ -553,8 +553,9 @@ export function energyPrototype() {
       lower.position.y = .1 - c.level * .8; lower.scale.set(1 - .32 * c.level, 1, 1 - .32 * c.level);
       g.getObjectByName('energy-turbine')!.rotation.z = reducedMotion ? .4 : c.phase === 'release' ? Math.PI * 2 * ((c.t - 40) / 20) - Math.sin(Math.PI * 2 * (c.t - 40) / 20) : 0;
       const pumping = c.phase === 'charge';
-      from.set(pumping ? 5 : 2, pumping ? .5 : 23, pumping ? 8 : -7);
-      to.set(pumping ? 15 : -5, pumping ? 23 : 5.5, pumping ? 8 : -7);
+      // Falling markers run just outside the gravity pipes' near side: inside them, the support leg hides every marker from the close-up.
+      from.set(pumping ? 5 : 2, pumping ? .5 : 23, pumping ? 8 : -9.6);
+      to.set(pumping ? 15 : -5, pumping ? 23 : 5.5, pumping ? 8 : -9.6);
       flows[i].visible = reducedMotion || c.phase !== 'hold';
       pose.scale.setScalar(reducedMotion ? 1 : 1.8);
       for (let j = 0; j < 8; j++) {

@@ -80,15 +80,12 @@ try {
   narration.cancel();
   assert.deepEqual(runtime.clock, {}); assert.equal(panel.hidden, true);
   narration.update(plan.start + 1, false); assert.deepEqual(runtime.clock, {}, 'a cancelled narration restarts');
-  // A second live result supersedes the first; a reduced-motion one shows the static reading only.
+  // A second live result supersedes the first; switching to reduced motion stops the cycle.
   narration.play('energy:ring', change(none, { ...none, flywheel: true }), now);
   narration.play('nw:focal', undefined, now + 3);
   narration.update(plan.start + 1, false); assert.deepEqual(runtime.clock, {});
   narration.play('energy:ring', change(none, { ...none, flywheel: true }), now);
-  narration.update(plan.start + 1, true); assert.deepEqual(runtime.clock, {}, 'reduced motion stops the cycle');
-  narration.still('energy:ring', change(none, { ...none, flywheel: true }), now);
-  narration.update(now + 1, true); assert.equal(panel.hidden, false); assert.deepEqual(runtime.clock, {});
-  narration.update(now + DISPLAY_MS / 1000, true); assert.equal(panel.hidden, true);
+  narration.update(plan.start + 1, true); assert.deepEqual(runtime.clock, {}, 'reduced motion stops the cycle'); assert.equal(panel.hidden, true);
 } finally {
   if (descriptor) Object.defineProperty(globalThis, 'document', descriptor);
   else Reflect.deleteProperty(globalThis, 'document');

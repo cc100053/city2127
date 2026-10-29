@@ -1,7 +1,6 @@
 /// <reference types="vite/client" />
-import { HeadlineCamera, SHOTS, headlineShot, type ShotId } from './headlineCamera';
+import { HeadlineCamera, SHOTS, type ShotId } from './headlineCamera';
 import { EnergyNarration } from './energyNarration';
-import { DISPLAY_MS } from '../survey/src/shared/displayTiming';
 import * as T from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -202,9 +201,7 @@ try {
       }
       headlineCamera?.cancel();narration?.cancel();
       journey!.setLanterns(view.recentProposals);
-      const changes=cityChanges!.applyExhibitionLayout(view.layout,kind,now,view.slotSeeds);
-      if(kind==='city-state-updated'&&latest&&displayMs>=DISPLAY_MS-100)narration?.still(headlineShot(changes[0]),changes[0],now,displayMs);
-      return changes;
+      return cityChanges!.applyExhibitionLayout(view.layout,kind,now,view.slotSeeds);
     }
     headlineCamera?.cancel();narration?.cancel();journey!.cancel();
     world.blendTo(scoresToWorldState(view.scores),now);
