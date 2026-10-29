@@ -5,8 +5,8 @@
 - Status: IN PROGRESS（2026-10-29；T 實作中，F／A 未開始）
 - Branch: `feat/closeup-zoom`（由 verified main 開；T、F、A 三個 checkpoint）
 - Base commit: `2050883e93082af4f96da680c59a7de152fea853`（2026-10-29 fetch，main／origin/main 0/0）
-- Last verified commit: NONE
-- Remote availability: NOT PUSHED
+- Last verified commit: `967f5e57ec059f052904e68a45429ca6f46a0edc`（T root test/build/diff；browser 部分驗證）
+- Remote availability: `origin/feat/closeup-zoom` at `967f5e57ec059f052904e68a45429ca6f46a0edc`
 
 ## Session Git state
 
@@ -181,4 +181,4 @@ Hero 距離 target ≈787 m。現行 shot 距離（position→target）：
 
 ## 進度
 
-2026-10-29：由協調 session `01a187f8-f4b4-7d01-9817-76ed476e890a` 派 subagent 在獨立 clone 實作；T 程式及 targeted tests 完成，五組 scratch live 20/20、errors 0；root test/build PASS，F / A 未開始。餘下 live shot、A/B 早到及 no-op 未驗。新 8.38 s 能源講解中最長文字約 5.4 字／秒，待真人閱讀測試。
+2026-10-29：由協調 session `01a187f8-f4b4-7d01-9817-76ed476e890a` 派 subagent 在獨立 clone 實作；T 程式及 targeted tests 完成，五組 scratch live 20/20、errors 0；root test/build PASS，F / A 未開始。餘下 live shot、A/B 早到及 no-op 未驗。新 8.38 s 能源講解中最長文字約 5.4 字／秒，待真人閱讀測試。補修無 `displayAt` 的 reduced-motion 理由即時性；正常 server 的 reduced-motion ambient UI 補測 4/4、errors 0。

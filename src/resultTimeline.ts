@@ -8,3 +8,6 @@ export const shotTimeline = (displayMs = DISPLAY_MS) => {
   return { flyIn: ARRIVAL_SECONDS, hold, change, changeEnd: change + SITE_TRANSITION_SECONDS,
     flyOut: displayMs / 1000, done: displayMs / 1000 + FLY_OUT };
 };
+
+export const reasonDelayMs = (displayMs: number, reducedMotion: boolean) =>
+  reducedMotion || displayMs < DISPLAY_MS - 100 ? 0 : shotTimeline(displayMs).changeEnd * 1000;

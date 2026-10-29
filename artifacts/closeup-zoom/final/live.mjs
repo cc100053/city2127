@@ -42,7 +42,7 @@ async function open(){
  const services=createSurveyServer({ctx,devAuto:true,staticDir:new URL('../../../survey/dist',import.meta.url).pathname});await new Promise(r=>services.server.listen(0,'127.0.0.1',r));owned={...services,ctx};base=`http://127.0.0.1:${services.server.address().port}`;
  const config=await api('/api/admin/dev-survey-config');assert.equal(config.questionSetVersion,4);assert.equal(config.energy.options.length,4);origins.push({origin:base,database:join(dir,'survey.sqlite'),devAuto:true,config});
  await page.goto((process.env.CITY2127_CITY_URL??'http://127.0.0.1:5184')+'/?survey='+encodeURIComponent(base.replace('http','ws')+'/ws')+'&hour=12');
- await page.waitForFunction(()=>document.querySelector('canvas')?.dataset.fps && document.querySelector('canvas')?.dataset.siteAssets && document.querySelector('canvas')?.dataset.energy);
+ await page.waitForFunction(()=>document.querySelector('canvas')?.dataset.fps && document.querySelector('canvas')?.dataset.siteAssets && document.querySelector('canvas')?.dataset.energy, null, {timeout:120000});
 }
 async function submit(axis){
  const s=await api('/api/proposal-sessions',{});assert.equal(s.questions.length,4);
@@ -70,12 +70,13 @@ try{
   assert.ok(intermediate,'shared 3s transition exposes real complementary geometry or local fade');
   checks.push({check:'current-v4 live, card/shot match, intermediate transition, normal return and authoritative all-site/energy counts',...spec,place:spec.place.source,beforeView,proposal,samples,after,pass:true});
   await page.screenshot({path:`${out}/${spec.sector}-return.jpg`,type:'jpeg',quality:90});
-  await page.reload();await page.waitForFunction(()=>document.querySelector('canvas')?.dataset.fps && document.querySelector('canvas')?.dataset.siteAssets && document.querySelector('canvas')?.dataset.energy);await at(HERO_POSITION);const reloaded=await settled(proposal.view);assert.deepEqual(configuration(reloaded),configuration(after));checks.push({check:'reload snapshot at hero preserves all settled configurations',sector:spec.sector,pass:true});
+  await page.reload();await page.waitForFunction(()=>document.querySelector('canvas')?.dataset.fps && document.querySelector('canvas')?.dataset.siteAssets && document.querySelector('canvas')?.dataset.energy, null, {timeout:120000});await at(HERO_POSITION);const reloaded=await settled(proposal.view);assert.deepEqual(configuration(reloaded),configuration(after));checks.push({check:'reload snapshot at hero preserves all settled configurations',sector:spec.sector,pass:true});
   const admin=await api('/api/admin/current-run');await api('/api/admin/lifecycle',{command:'undo-proposal',expectedRevision:admin.lifecycle.revision,proposalId:proposal.view.latestProposal.id});await page.waitForTimeout(250);await at(HERO_POSITION);
   const undone=await settled(await api('/api/city-view'));assert.deepEqual(configuration(undone),configuration(before));checks.push({check:'Undo immediately restores hero and exact prior four-site/energy configuration',sector:spec.sector,pass:true});
   await page.emulateMedia({reducedMotion:'reduce'});const reduced=await submit(spec.axis);await page.waitForTimeout(250);await at(HERO_POSITION);const immediate=await settled(reduced.view);await at(HERO_POSITION);
   for(const site of Object.values(configuration(immediate).sites))for(const [name,d]of Object.entries(site))if(name.endsWith('District'))assert.equal(d.activePulses,0);
-  checks.push({check:'reduced motion stays hero and all authoritative configurations settle with zero district pulses',sector:spec.sector,view:reduced.view,diagnostics:immediate,pass:true});await page.emulateMedia({reducedMotion:'no-preference'});
+  assert.equal(await page.locator('.causal-panel').getAttribute('data-presentation'),'ambient', 'reduced motion restores the ambient card without a delayed reason');
+  checks.push({check:'reduced motion stays hero, restores ambient card and all authoritative configurations settle with zero district pulses',sector:spec.sector,view:reduced.view,diagnostics:immediate,pass:true});await page.emulateMedia({reducedMotion:'no-preference'});
  }
  assert.deepEqual(errors,[]);complete=true;
 }finally{

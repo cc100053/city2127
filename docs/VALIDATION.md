@@ -388,3 +388,5 @@ N1 更新（同日 owner 決定）：`DISPLAY_MS` 10 → 13 s（所有結果，l
 ## Closeup zoom T — 2026-10-29（進行中）
 
 獨立 clone 基於 `2050883e93082af4f96da680c59a7de152fea853`；T 時間線修改後 root `npm test`、`npm run build` 及 `git diff --check` 通過。初次 sandbox 測試因禁止 loopback (`EPERM`) 中止，重跑使用獲准的 loopback。Build 有既有 JSON import attributes / chunk-size warning。`energyNarration.test.ts` 新的 8.38 秒窗口實測每步 2.79 秒，現有最長文字約 5.4 字／秒；尚待真人閱讀測試。Scratch live runner（Chrome 156.0.8078.73、1920×1080、DPR 1）五組：能源環、SW focal／district、SE district、NW focal；20/20 檢查通過、console/page error 0，包括三時點圖、reload、Undo、reduced motion：[原圖與資料](../artifacts/closeup-zoom/final/T-verified/browser.json)。兩次初跑分別因 runner 過早檢查返回 hero 和等待 diagnostics 不足而失敗，修正 runner 後重跑；其餘 shot、A/B 早到、no-op 尚未驗證。
+
+T 補測：無 `displayAt` 的 v2 更新在 reduced motion 時，理由延遲函數回傳 0；catch-up 亦為 0，正常 live 為 8120 ms（`headlineCamera.test.ts`）。Scratch server SW focal 額外確認 reduced motion 即時恢復 ambient 卡，4/4、errors 0（[browser.json](../artifacts/closeup-zoom/final/T-reduced-retry/browser.json)）；首次初始化在其他 Chrome capture 佔用下 30 秒逾時，延長等待後重跑通過。

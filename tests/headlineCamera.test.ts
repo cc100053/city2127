@@ -6,6 +6,7 @@ import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
 import { HeadlineCamera, SHOTS, headlineShot, shotStage, shotTimeline, type ShotId } from '../src/headlineCamera.ts';
 import { HERO_POSITION, HERO_TARGET } from '../src/heroCamera.ts';
 import { ARRIVAL_SECONDS } from '../src/voteJourney.ts';
+import { reasonDelayMs } from '../src/resultTimeline.ts';
 import { SITE_TRANSITION_SECONDS } from '../src/siteBuilders/siteRuntime.ts';
 import { energyChangedPart, residentResult } from '../src/surveyAtmosphere.ts';
 import type { ExhibitionProposal } from '../src/surveyView.ts';
@@ -43,6 +44,9 @@ assert.equal(t.flyIn,ARRIVAL_SECONDS);assert.equal(t.flyOut,DISPLAY_MS/1000);ass
 assert.ok(t.change>=t.hold && t.changeEnd<=t.flyOut);
 assert.ok(Math.abs(t.changeEnd-t.change-SITE_TRANSITION_SECONDS)<1e-9);
 assert.ok(Math.abs(t.change-5.12)<1e-9 && Math.abs(t.changeEnd-8.12)<1e-9);
+assert.ok(Math.abs(reasonDelayMs(DISPLAY_MS,false)-8120)<1e-6);
+assert.equal(reasonDelayMs(DISPLAY_MS,true),0);
+assert.equal(reasonDelayMs(DISPLAY_MS-101,false),0);
 assert.equal(shotStage(3),'fly-in','the flight starts after the vote journey');
 assert.deepEqual([0,t.flyIn,t.hold,t.flyOut,t.done].map(elapsed=>shotStage(elapsed)),['journey','fly-in','hold','fly-out','done']);
 assert.equal(Object.keys(SHOTS).length,13);
