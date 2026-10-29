@@ -158,9 +158,11 @@ Z 已經由 Codex relay 完成（`origin/feat/closeup-polish` @ `f66cc3a`，量�
 - 驗證：root `npm test`／`npm run build`／`git diff --check` PASS；五個部件真 live 全 PASS、errors 0（每步 1.90–2.00 s，Undo／下一個結果／reconnect／reset／reload 各中斷一次並還原鐘）；A6 34/34；A5 hero PASS，能源 8/10，ring 夜 94.3%、wing 日 94.2% FAIL（同 session 對 main A/B 差 ≤1%，屬波動，照記 FAIL）。[證據同方法](../../artifacts/closeup-next/N1/README.md)。
 - 所有 dev server／browser 已停；survey／module-swap 冇改。
 
+- Owner 2026-10-29 回覆：(1) 延長：所有結果 `DISPLAY_MS` 10 → 13 s（lease 18 s）；(2) 所有 UI 一律日文（嚴格指示），字幕已改日文、標題用結果卡地名；(3) 環／接收翼／能源島主要靠字幕：接受；(4) reduced motion 唔講解：接受。實作同驗證見 [N1 README 頂部](../../artifacts/closeup-next/N1/README.md)：root／survey test+build PASS，live-13s 五部件 PASS，formal E4 PASS；`residentP3` reduced-motion 一步失敗，喺未改嘅 `origin/main` 一樣失敗，屬既有問題，另開任務。
+
 ## Next expected step
 
-N1 等 owner 睇 `artifacts/closeup-next/N1/live/` 嘅充能／釋能原圖，並決定上面四點；批准先由本 branch merge 入 main。24 組 tier 兩秒辨認係 owner 隨時可以補做嘅檢查，唔阻 N1。F3 等硬件。另外兩個設計任務未開：全城植栽語言（V3），同 NW／SE focal 設施辨識。
+N1 等 owner 睇 13 s／日文版 `artifacts/closeup-next/N1/live-13s/` 原圖；批准先由本 branch merge 入 main。另開任務：`residentP3` reduced-motion 既有失敗。24 組 tier 兩秒辨認係 owner 隨時可以補做嘅檢查，唔阻 N1。F3 等硬件。另外兩個設計任務未開：全城植栽語言（V3），同 NW／SE focal 設施辨識。
 
 ## C1 candidate — 2026-10-29
 

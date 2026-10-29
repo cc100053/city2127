@@ -3,9 +3,9 @@ import { ENERGY_OPTIONS, energyPrototype, type EnergyOption } from './energyProt
 
 /** Storage-cycle phases, shared with the live energy close-up narration. */
 export const ENERGY_PHASES = {
-  a: { charge: '接收／外部供電 → 抽水上行、上水庭蓄水', hold: '暫存 → 上水庭保水、渦輪停定', release: '釋能／分配 → 落水經渦輪 → 街區用電' },
-  b: { charge: '接收／外部供電 → 旋轉環充能', hold: '暫存 → 旋轉環續轉', release: '釋能／分配 → 旋轉環減速 → 街區用電' },
-  mixed: { charge: '接收／外部供電 → 抽水上行、旋轉環充能', hold: '暫存 → 上水庭保水、旋轉環續轉', release: '釋能／分配 → 落水經渦輪、旋轉環減速 → 街區用電' },
+  a: { charge: '充電 → 外部電力で水を上の池へ', hold: '蓄電 → 上の池に水をためる', release: '放電 → 落水でタービンを回し、街へ' },
+  b: { charge: '充電 → 外部電力で環を回す', hold: '蓄電 → 環が回り続ける', release: '放電 → 環の回転を電気にして街へ' },
+  mixed: { charge: '充電 → 水を上の池へ、環を回す', hold: '蓄電 → 上の池に水、環は回り続ける', release: '放電 → 落水と環の回転で街へ' },
 };
 
 /** Reload-free comparison in the unchanged hero camera, isolated from survey and Meter review. */
@@ -40,7 +40,7 @@ export function startEnergyReview(scene: Scene, params: URLSearchParams) {
   return (seconds: number) => {
     const cycle = study.update(seconds, motion.matches || still.checked);
     const staticText = study.option === 'b' ? '靜態閱讀：接收 → 儲能 → 街區；接收翼、旋轉環與配電門架保持固定。' : '靜態閱讀：接收 → 儲能 → 街區；箭頭標示落水／抽水回管，水位與機械保持固定。';
-    const text = study.option === 'baseline' ? '' : study.option === 'c' ? '能源島 → 檢修橋服務線 → 街區配電節點（供電路線示意）' : motion.matches || still.checked ? staticText : `60 秒示意循環 · ${ENERGY_PHASES[study.option][cycle.phase]}`;
+    const text = study.option === 'baseline' ? '' : study.option === 'c' ? '能源島 → 檢修橋服務線 → 街區配電節點（供電路線示意）' : motion.matches || still.checked ? staticText : `60秒の循環イメージ · ${ENERGY_PHASES[study.option][cycle.phase]}`;
     if (text !== previous) { status.textContent = text; previous = text; }
   };
 }

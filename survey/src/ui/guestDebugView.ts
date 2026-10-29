@@ -615,7 +615,7 @@ if (new URLSearchParams(location.search).has('dev-auto')) {
   void import('./autoAnswerPanel.ts').then(({ mountAutoAnswerPanel }) => mountAutoAnswerPanel({
     async start(signal) {
       // Result/handoff use chained timers that a hidden tab may delay; never race them.
-      for (const deadline = Date.now() + 10_000; (screen === 'result' || screen === 'handoff') && Date.now() < deadline;) {
+      for (const deadline = Date.now() + DISPLAY_MS + HANDOFF_MS; (screen === 'result' || screen === 'handoff') && Date.now() < deadline;) {
         await new Promise(resolve => setTimeout(resolve, 100));
         signal.throwIfAborted();
       }

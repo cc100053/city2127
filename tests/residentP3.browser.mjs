@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createContext, createSurveyServer } from '../survey/src/server/server.ts';
+import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH).href);
 const directory = mkdtempSync(join(tmpdir(), 'resident-p3-browser-'));
 const evidence = process.env.CITY2127_EVIDENCE_DIR ?? 'artifacts';
@@ -64,7 +65,7 @@ try {
   await b.reload(); await screen(b, 'waiting');
   const view = await read('/api/city-view'), savedB = view.latestProposal;
   assert.equal(view.guestCount, 2);
-  assert.equal(Date.parse(savedB.displayAt) - Date.parse(savedA.proposal.displayAt), 10_000);
+  assert.equal(Date.parse(savedB.displayAt) - Date.parse(savedA.proposal.displayAt), DISPLAY_MS);
   assert.equal(await b.locator('.guest-result-number').textContent(), identity(savedB));
   // Early device handoff cannot release A or truncate its live card.
   await a.getByRole('button', { name: '次の方へ', exact: true }).click();
@@ -83,20 +84,20 @@ try {
   assert.equal(await label(), identity(savedB));
   const displays = await city.evaluate(() => window.residentDisplays);
   const interval = displays[1].at - displays[0].at;
-  assert.ok(interval >= 9950 && interval < 11_000, `${interval} ms reading interval`);
+  assert.ok(interval >= DISPLAY_MS - 50 && interval < DISPLAY_MS + 1_000, `${interval} ms reading interval`);
   await b.waitForTimeout(3300);
   await snapshot();
   const replayReply = b.waitForResponse(r => r.url().endsWith('/api/proposals'));
   await b.reload(); await screen(b, 'result');
   const replay = (await (await replayReply).json()).data;
-  assert.ok(replay.displayRemainingMs > 0 && replay.displayRemainingMs < 6700, 'reload resumes remaining reading time');
+  assert.ok(replay.displayRemainingMs > 0 && replay.displayRemainingMs < DISPLAY_MS - 3300, 'reload resumes remaining reading time');
   assert.equal(await label(), identity(savedB));
   await city.screenshot({ path: join(evidence, 'resident-p3-city-B-reason.png') });
   await b.screenshot({ path: join(evidence, 'resident-p3-guest-B-look-up.png') });
   await b.getByRole('button', { name: '次の方へ', exact: true }).click();
   await b.getByRole('button', { name: 'はじめる画面へ', exact: true }).click();
   assert.equal((await read('/api/city-view')).runId, view.runId, 'reset cannot truncate B reading');
-  await city.waitForFunction(() => document.querySelector('.causal-panel')?.dataset.guestCount === '0', null, { timeout: 15_000 });
+  await city.waitForFunction(() => document.querySelector('.causal-panel')?.dataset.guestCount === '0', null, { timeout: DISPLAY_MS + 5_000 });
   assert.equal((await read('/api/admin/current-run')).lifecycle.totalGuestCount, 2);
   assert.equal(await city.locator('.causal-panel').getAttribute('data-presentation'), 'ambient');
   // New proposal followed by reduced motion/reload/Undo: settle immediately, no old text or pulses.

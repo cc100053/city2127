@@ -15,6 +15,7 @@ import { CorruptStateError, replayExhibitionRun } from '../src/server/runStore.t
 import { devSurveyConfig } from '../src/server/devSurvey.ts';
 import { selectAutoAnswers } from '../src/ui/autoAnswers.ts';
 import { CURRENT_EXHIBITION_QUESTIONS_PATH, EXHIBITION_QUESTIONS_PATH, ok, errorCode, staff } from './surveyFixture.ts';
+import { DISPLAY_MS } from '../src/shared/displayTiming.ts';
 
 const current = validateExhibitionQuestionSet(loadQuestionSetFile(CURRENT_EXHIBITION_QUESTIONS_PATH));
 const legacy = loadQuestionSetFile(EXHIBITION_QUESTIONS_PATH);
@@ -57,7 +58,7 @@ try {
   const oldRequest = { submissionId: 'legacy', guestSessionId: oldSession.session.id, expectedRevision: 0,
     answers: oldSession.questions.map(q => ({ questionId: q.id, optionId: q.options[2].id })) };
   const oldSaved = ok(submitProposal(ctx, oldRequest).response);
-  clock += 10_001;
+  clock += DISPLAY_MS + 1;
   const oldDraft = ok(createProposalSession(ctx).response);
   const oldView = currentView(ctx);
   const oldRows = ctx.db.prepare('SELECT * FROM proposal_events').all();
@@ -87,7 +88,7 @@ try {
     assert.deepEqual([accepted.proposal.afterLayout.bands.ne, accepted.proposal.afterLayout.treeCount, accepted.proposal.afterLayout.plantedFraction, accepted.proposal.afterLayout.coolingFins],
       [oldLayout.bands.ne, oldLayout.treeCount, oldLayout.plantedFraction, oldLayout.coolingFins], 'energy guests never rescale the old climate');
     assert.deepEqual(ok(submitProposal(ctx, lastRequest).response).state, accepted.state, 'same-ID retries do not add energy votes');
-    clock += 10_001;
+    clock += DISPLAY_MS + 1;
   }
   const undo = lifecycleCommand(ctx, { command: 'undo-proposal', proposalId: 'new-69', expectedRevision: readLifecycle(ctx.db).revision });
   ok(undo.response);

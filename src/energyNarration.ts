@@ -8,11 +8,11 @@ type Part = 'garden' | 'garden2' | 'ring' | 'wing' | 'island';
 const CYCLE_SECONDS = 60;
 // The result card names whose voice and what changed; this caption only says how the shown part works.
 export const NARRATION: Record<Part, { title: string; steps: readonly [string, string, string] }> = {
-  garden: { title: '上下水庭 · 水力儲能', steps: [ENERGY_PHASES.a.charge, ENERGY_PHASES.a.hold, ENERGY_PHASES.a.release] },
-  garden2: { title: '第二處水庭 · 水力儲能', steps: [ENERGY_PHASES.a.charge, ENERGY_PHASES.a.hold, ENERGY_PHASES.a.release] },
-  ring: { title: '富士儲能環 · 旋轉儲能', steps: [ENERGY_PHASES.b.charge, ENERGY_PHASES.b.hold, ENERGY_PHASES.b.release] },
-  wing: { title: '接收翼 · 外部供電', steps: ['接收翼 → 接收外部供電', '岸邊配電門架 → 承接供電', '街區配電節點 → 街區用電'] },
-  island: { title: '能源島 · 島嶼供電', steps: ['能源島 → 供電', '跨水檢修橋 → 服務線', '街區配電節點 → 街區用電'] },
+  garden: { title: '海辺の蓄電庭園 · 揚水式', steps: [ENERGY_PHASES.a.charge, ENERGY_PHASES.a.hold, ENERGY_PHASES.a.release] },
+  garden2: { title: '二つ目の蓄電庭園 · 揚水式', steps: [ENERGY_PHASES.a.charge, ENERGY_PHASES.a.hold, ENERGY_PHASES.a.release] },
+  ring: { title: 'フジテレビ前・蓄電環 · 回転式', steps: [ENERGY_PHASES.b.charge, ENERGY_PHASES.b.hold, ENERGY_PHASES.b.release] },
+  wing: { title: '沖の受電翼 · 外部からの受電', steps: ['受電 → 翼が軌道からの電力を受ける', '送電 → 岸の配電ゲートへ', '配電 → 街区の拠点から街へ'] },
+  island: { title: '沖のエネルギー島 · 島からの送電', steps: ['発電 → 沖の島の原子力施設', '送電 → 検修橋に沿って岸へ', '配電 → 街区の拠点から街へ'] },
 };
 
 /** The part a headline close-up shows, while it stays in the city: removals get the card alone. */
@@ -24,7 +24,7 @@ export function narratedPart(shot: ShotId | null, change: CarrierChange | undefi
   return present[part] ? part : null;
 }
 
-/** One storage cycle from charge, compressed between the camera's arrival and the hold's end (the 10 s slot is unchanged). */
+/** One storage cycle from charge, compressed between the camera's arrival and the hold's end (8.88 s of the 13 s slot). */
 export function narrationPlan(now: number, displayMs = DISPLAY_MS) {
   const t = shotTimeline(displayMs), start = now + t.hold, end = now + t.flyOut;
   return { start, end, base: Math.ceil(start / CYCLE_SECONDS) * CYCLE_SECONDS, rate: CYCLE_SECONDS / (end - start) };
@@ -62,7 +62,7 @@ export class EnergyNarration {
     this.cancel();
     const part = narratedPart(shot, change);
     if (!part) return;
-    this.show(part, part === 'wing' || part === 'island' ? '供電路線示意' : '60 秒儲能循環 · 壓縮示意');
+    this.show(part, part === 'wing' || part === 'island' ? '送電経路のイメージ' : '60秒の蓄電サイクルを短縮して表示');
     this.plan = narrationPlan(now, displayMs);
   }
   /** Snapshots, resets, Undo, reconnects and superseding results: hide at once and return every part to the shared clock. */

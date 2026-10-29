@@ -10,6 +10,7 @@ import { currentView } from '../survey/src/server/answerService.ts';
 import { ENERGY_CHOICES, emptyEnergyConfiguration } from '../survey/src/shared/energy.ts';
 import { pickHeadline } from '../survey/src/shared/cityView.ts';
 import { residentResult } from '../src/surveyAtmosphere.ts';
+import { DISPLAY_MS, RESULT_LEASE_MS } from '../survey/src/shared/displayTiming.ts';
 const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH).href);
 const directory = mkdtempSync(join(tmpdir(), 'energy-e4-browser-'));
 const evidence = process.env.CITY2127_EVIDENCE_DIR ?? 'artifacts/energy-city-e4/formal'; mkdirSync(evidence, { recursive: true });
@@ -24,7 +25,7 @@ const oldSession = unwrap(createProposalSession(old).response);
 const oldRequest = { submissionId: 'legacy-before-upgrade', guestSessionId: oldSession.session.id, expectedRevision: 0,
   answers: oldSession.questions.map(q => ({ questionId: q.id, optionId: q.options[q.id === 'cooling-2127' ? 2 : 1].id })) };
 const oldSaved = unwrap(submitProposal(old, oldRequest).response);
-offset += 11_000;
+offset += DISPLAY_MS + 1_000;
 const oldDraft = unwrap(createProposalSession(old).response);
 old.db.exec('ALTER TABLE exhibition_snapshots DROP COLUMN energy_json; PRAGMA user_version = 7'); old.db.close();
 const ctx = createContext({ dbPath, questionsPath, now });
@@ -116,7 +117,7 @@ try {
   assert.equal(view.scores.environmentalPriority, oldSaved.state.scores.environmentalPriority);
   await city.screenshot({ path: join(evidence, 'one-garden-settled.png') });
   // Staff Undo removes that actual model; it restores the preceding energy tally without reinterpreting climate.
-  offset += 16_000;
+  offset += RESULT_LEASE_MS + 1_000;
   await admin.getByRole('button', { name: '直前の提案を取り消す', exact: true }).click();
   view = await read('/api/city-view'); assert.equal(view.energy.counts['water-storage'], 1); assert.equal(view.layout.energy.waterGardens, 0);
   await model(view); assert.equal(await city.locator('.causal-panel').getAttribute('data-presentation'), 'ambient');
@@ -124,7 +125,7 @@ try {
   // Real recorded proposals build a mixed portfolio; fixture clock jumps skip visitor waits, then reload takes the latest snapshot.
   let sequence = 0;
   for (const choice of ENERGY_CHOICES) for (let n = choice === 'water-storage' ? 1 : 0; n < 4; n++) {
-    offset += 16_000;
+    offset += RESULT_LEASE_MS + 1_000;
     const session = await post('/api/proposal-sessions', {});
     await post('/api/proposals', { submissionId: `mixed-${++sequence}`, guestSessionId: session.session.id, expectedRevision: session.state.revision,
       answers: session.questions.map(q => ({ questionId: q.id, optionId: q.id === 'energy-2127' ? choice : q.options[1].id })) });
@@ -153,7 +154,7 @@ try {
   assert.deepEqual(await city.locator('canvas').evaluate(c => [c.clientWidth, c.clientHeight]), [1440, 900]);
   await city.setViewportSize(viewport);
   await city.waitForFunction(() => document.querySelector('canvas')?.clientWidth === 1920);
-  offset += 16_000;
+  offset += RESULT_LEASE_MS + 1_000;
   let state = await read('/api/admin/current-run');
   await post('/api/admin/lifecycle', { command: 'guest-left', expectedRevision: state.lifecycle.revision });
   state = await read('/api/admin/current-run');

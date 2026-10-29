@@ -8,6 +8,7 @@ import {SHOTS} from '../../../src/headlineCamera.ts';
 import {HERO_POSITION} from '../../../src/heroCamera.ts';
 import {energyCycle} from '../../../src/energyPrototype.ts';
 import {NARRATION} from '../../../src/energyNarration.ts';
+import {DISPLAY_MS} from '../../../survey/src/shared/displayTiming.ts';
 
 const {chromium}=await import(process.env.CITY2127_PLAYWRIGHT_PATH??'/opt/homebrew/lib/node_modules/@playwright/cli/node_modules/playwright/index.mjs');
 const out=process.env.CITY2127_EVIDENCE_DIR??'artifacts/closeup-next/N1/live';assert.ok(!existsSync(out),'Use fresh evidence directory');mkdirSync(out,{recursive:true});
@@ -66,7 +67,7 @@ try{
   await page.emulateMedia({reducedMotion:'no-preference'});await page.waitForTimeout(800);
   // Full live narration with the real clock.
   const started=Date.now(),view=await submit(spec.option),samples=[];let charge=null,release=null,hold=false;
-  while(Date.now()-started<13500){
+  while(Date.now()-started<DISPLAY_MS+2500){
    const n=await narration(),p=await pose(),elapsedMs=Date.now()-started;
    if(near(p.position,SHOTS[`energy:${spec.part}`].position))hold=true;
    const t=n.data&&typeof n.data.seconds==='number'?((n.data.seconds%60)+60)%60:null;
@@ -102,6 +103,6 @@ try{
 }finally{
  writeFileSync(`${out}/browser.json`,JSON.stringify({complete,browser:browser.version(),viewport:[1920,1080],dpr:1,quality:'default',
   mode:'Same createSurveyServer devAuto:true and fresh mkdtemp SQLite isolation as npm run dev:auto, dynamic loopback ports; proposals through the real HTTP API, city over real WebSocket. Guest UI not exercised.',
-  timing:'Real clock and unchanged DISPLAY_MS. The single-station server refuses a second proposal until the reading slot ends, so the second live result arrives after the caption window (it then cancels the persisted part clock). Sampling ~80 ms plus evaluate latency, so step seconds are ±0.2 s; exact plan timing is in tests/energyNarration.test.ts.',checks,errors},null,2)+'\n');
+  timing:`Real clock, DISPLAY_MS ${DISPLAY_MS} ms. The single-station server refuses a second proposal until the reading slot ends, so the second live result arrives after the caption window (it then cancels the persisted part clock).`+' Sampling ~80 ms plus evaluate latency, so step seconds are ±0.2 s; exact plan timing is in tests/energyNarration.test.ts.',checks,errors},null,2)+'\n');
  await browser.close();await close();for(const dir of scratch)rmSync(dir,{recursive:true,force:true});
 }

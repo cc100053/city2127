@@ -11,6 +11,7 @@ import { currentView } from '../survey/src/server/answerService.ts';
 import { createProposalSession, submitProposal } from '../survey/src/server/proposalService.ts';
 import { CURRENT_EXHIBITION_QUESTIONS_PATH, exhibitionFixture, ok, startServer } from '../survey/tests/surveyFixture.ts';
 import { ENERGY_CHOICES, emptyEnergyConfiguration, type EnergyChoice } from '../survey/src/shared/energy.ts';
+import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 
 const documentBefore = Object.getOwnPropertyDescriptor(globalThis, 'document');
 Object.defineProperty(globalThis, 'document', { configurable: true, value: {
@@ -73,7 +74,7 @@ try {
     const response = await server.request('/api/proposals', request); ok(response.body);
     for (let n = 0; n < 100 && !messages.some(m => (m as { submissionId?: string }).submissionId === id); n++) await new Promise(r => setTimeout(r, 5));
     const event = messages.find(m => (m as { submissionId?: string }).submissionId === id); assert.ok(event);
-    clock.ms += 10_001;
+    clock.ms += DISPLAY_MS + 1;
     return eventOf(event);
   };
   manager.applyExhibitionLayout((currentView(ctx) as ExhibitionView).layout, 'city-state-snapshot', 10);

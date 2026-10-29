@@ -10,6 +10,7 @@ import { SCHEMA_VERSION, migrations, schemaVersion } from '../src/server/migrati
 import { CorruptStateError, replayExhibitionRun, replayRun, runAnswerEvents } from '../src/server/runStore.ts';
 import { createProposalSession, getProposalSession, endStationSession, submitProposal } from '../src/server/proposalService.ts';
 import { ok, errorCode, EXHIBITION_QUESTIONS_PATH, staff } from './surveyFixture.ts';
+import { DISPLAY_MS } from '../src/shared/displayTiming.ts';
 
 const dir = mkdtempSync(join(tmpdir(), 'survey-exhibition-migration-'));
 try {
@@ -32,7 +33,7 @@ try {
       answers: data.questions.map(q => ({ questionId: q.id, optionId: q.options[2].id })) });
     const recordedRequest = requestFor(first, 'old-submitted');
     const recorded = ok(submitProposal(old, recordedRequest).response);
-    nowMs += 10_000;
+    nowMs += DISPLAY_MS;
     if (stationId) ok(endStationSession(old, first.session.id).response);
     const draft = start(), draftRequest = requestFor(draft, 'old-draft');
     const beforeUpgrade = currentView(old);

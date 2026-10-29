@@ -1,5 +1,14 @@
 # N1 energy-part narration — 2026-10-29
 
+## Owner decisions after first review (2026-10-29) — supersede the 10 s notes below
+
+1. **Extend**: all results, `DISPLAY_MS` 10 s → 13 s (survey reading slot, A/B spacing, lease 15 → 18 s, card, close-up return 13–15 s). Narration window 4.12–13 s = 8.88 s, ≈2.96 s per step.
+2. **Japanese only — strict, all UI**: caption, titles (the result card's own place names) and `ENERGY_PHASES` are Japanese; each step ≤16 characters, ≤5.1 chars/s (unit-tested).
+3. Ring/wing/island mostly caption-only: accepted.
+4. Reduced motion without narration: accepted.
+
+Evidence for this version: [live-13s/](live-13s/) (same runner, all five parts PASS, errors 0, steps 2.90–3.00 s, interrupts Undo 5 ms / next result / reconnect 2 ms / reset 6 ms / reload; rotor restored) and the unchanged formal E4 runner at 13 s ([formal-13s/](formal-13s/), PASS, no page exceptions; its fixture clock jumps now derive from `DISPLAY_MS`/`RESULT_LEASE_MS`). Root and survey `npm test`/`npm run build` PASS. A5/A6 were not re-measured: the slot change and copy alter no geometry, material or draw path. `tests/residentP3.browser.mjs` (timings now from `DISPLAY_MS`) fails at its reduced-motion step (`data-presentation` 'result', expected 'ambient') — **the identical failure reproduces on unchanged `origin/main`**, so it predates N1 and is left as a separate follow-up. The 10 s evidence below is kept as history.
+
 Branch `feat/energy-narration` from verified `origin/main` `8f2a8d9` (fetch 0/0). Runtime source verified at `045025d`; later commits add evidence/docs only. **Review candidate, not merged: the owner must approve the images first.**
 
 ## What changed

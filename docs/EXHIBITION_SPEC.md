@@ -80,7 +80,7 @@ Live headline（[pickHeadline](../survey/src/shared/cityView.ts)）：新到達�
 
 Headline 近鏡（2026-10-27）：live 結果先在 hero 播完 2.62 秒 vote journey，再用 1.5 秒推近 headline，與原本 3 秒場景過渡重疊，沒有延遲過渡。4.12–10 秒停留，10 秒與 ambient 卡同步開始用 2 秒返回 hero；原因文字仍在第 3 秒出現。八個 site shot（四站各 focal／district）及五個能源 shot 用常數表，保留 hero 方向及海／地標定位；focal 與 district 同時改以 district 為準。能源鏡頭與結果卡共用部件優先次序，移除設備亦看原位置。新結果從現有位置先平滑回 hero；snapshot／reset／Undo／reconnect／reduced motion／legacy／追趕中的結果立即 hero。無 headline 不推近；如接續仍在播放的近鏡，先從當前位置用 2 秒平滑返回，再保持 hero 並恢復操作。普通 standalone 及其他 DEV review 不自動播放；DEV 可用 `?shot=` 逐鏡檢查。近鏡的模型／材質打磨及真人閱讀／展示硬件驗收另作任務。
 
-能源講解 N1（2026-10-29，`feat/energy-narration`，**待 owner 睇圖批准，未入 main**）：headline 係結果後仍存在嘅能源部件時，鏡頭到位（4.12 s）至停留結束（10 s）喺左下顯示一個字幕框，將 60 秒儲能週期壓縮成 5.88 秒播一次（充能 → 暫存 → 釋能，每步約 1.96 秒逐步高亮）；10 秒 slot、survey 時序不變。只有被講解嘅部件行自己嘅時鐘，其他能源部件唔跳相。結果卡講「邊個嘅聲音、改咗乜」，字幕只講設施點運作。Snapshot／reset／Undo／reconnect／下一個 live 結果即時取消並還原時鐘；reduced motion 唔講解（client 本身已將 reduced-motion 結果即時變 snapshot，冇結果卡）。字幕用 DEV 中文文案，而結果卡係日文，語言要 owner 決定。
+能源講解 N1（2026-10-29，`feat/energy-narration`，**待 owner 睇圖批准，未入 main**）：owner 同日決定將所有結果嘅閱讀 slot 由 10 秒延長到 13 秒（`DISPLAY_MS`；lease 18 秒），所以上面嘅 headline 近鏡改為 4.12–13 秒停留、13–15 秒返回 hero。Headline 係結果後仍存在嘅能源部件時，鏡頭到位（4.12 s）至停留結束（13 s）喺左下顯示日文字幕框，將 60 秒儲能週期壓縮成 8.88 秒播一次（充能 → 蓄電 → 放電，每步約 2.96 秒逐步高亮，每步 ≤16 字）。只有被講解嘅部件行自己嘅時鐘，其他能源部件唔跳相。結果卡講「邊個嘅聲音、改咗乜」，字幕只講設施點運作，標題沿用結果卡地名。Snapshot／reset／Undo／reconnect／下一個 live 結果即時取消並還原時鐘；reduced motion 唔講解（client 本身已將 reduced-motion 結果即時變 snapshot，冇結果卡）。所有 UI 文字用日文（owner 嚴格指示）。
 
 近鏡打磨S0（2026-10-28，coordinator接受量度基準並整合main `c802bba`）：[完整基準](../artifacts/closeup-polish/S0/README.md)記錄98個日夜狀態、96組像素比較及28組兩輪效能；沒有美術、pose、時間線或梯級改動。A1/A2/A3與夜間／綠化仍有明確失敗，20個district狀態跨near plane不可量測；這是後續A–D的起點，並非視覺完成或owner接受。所有正式第二take原圖已逐張檢視，展示硬件及真人辨認未驗；[整合驗證](../artifacts/closeup-polish/S0/integration.json)root test/build/diff PASS，實際published SHA及main CI由本批integration result記錄。
 
@@ -115,14 +115,14 @@ Live 使用可重新定向的 **3 秒**過渡；pulse 只標示真的 live 變�
 
 ## Guest、單站與 A/B
 
-流程：Start → 四題 → review → submit → result 10 秒 → handoff 5 秒 → Start。未知提交結果用同一 submission ID 重試；不新建一票猜測成功。
+流程：Start → 四題 → review → submit → result 13 秒（owner 2026-10-29 由 10 秒延長）→ handoff 5 秒 → Start。未知提交結果用同一 submission ID 重試；不新建一票猜測成功。
 
 | 模式 | 開始／交接 | Reset |
 | --- | --- | --- |
 | 單站 `/guest` | 下一位 Start 自動結束已提交體驗，毋須 Admin 確認離場 | 保留中的 reset 在下一位 Start 套用；Admin 可中止未完成問卷 |
 | `/guest?station=A`／`B` | 獨立 session／草稿／結果；同一站一個體驗。不能混用活躍單站與 A/B | 停止新開始，等兩站問卷及結果／交接排出；Admin 中止必須指定一個未完成 session |
 
-A/B 按 server transaction 提交順序累積，容許舊 city revision、拒絕未來 revision；單站仍要求完全一致。單站／A-B City 顯示起點相隔至少 10 秒，城市動畫保持3秒；Guest 排隊顯示已保存／等待展示，再顯示自己的結果。提前Guest交接不截斷已排定展示；server拒絕在10秒閱讀結束前release／下一單站Start，reset遵守drain。問卷5分鐘期限、已提交result lease固定於展示開始後15秒釋放離線站；同ID retry／reload只接續剩餘時段，不延長lease；重連／斷線／過期late事件／reduced motion直接恢復最新完整城市並清掉舊字幕timer，不重播漏掉的過渡。`displayWaitMs`／`displayAt`只表示排程，不確認viewer在線或播放；不新增viewer-ack服務。
+A/B 按 server transaction 提交順序累積，容許舊 city revision、拒絕未來 revision；單站仍要求完全一致。單站／A-B City 顯示起點相隔至少 13 秒，城市動畫保持3秒；Guest 排隊顯示已保存／等待展示，再顯示自己的結果。提前Guest交接不截斷已排定展示；server拒絕在10秒閱讀結束前release／下一單站Start，reset遵守drain。問卷5分鐘期限、已提交result lease固定於展示開始後15秒釋放離線站；同ID retry／reload只接續剩餘時段，不延長lease；重連／斷線／過期late事件／reduced motion直接恢復最新完整城市並清掉舊字幕timer，不重播漏掉的過渡。`displayWaitMs`／`displayAt`只表示排程，不確認viewer在線或播放；不新增viewer-ack服務。
 
 ## Admin、資料與照明
 
