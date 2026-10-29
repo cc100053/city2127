@@ -1,0 +1,14 @@
+{
+  "files": [
+    "docs/PROJECT.md",
+    "docs/EXHIBITION_SPEC.md",
+    "docs/VALIDATION.md",
+    "docs/handoffs/closeup-next.md",
+    "docs/handoffs/README.md",
+    "artifacts/closeup-next/C1/README.md",
+    "artifacts/closeup-next/C1/REVIEW.md"
+  ],
+  "checkedLocalLinks": 682,
+  "errors": [],
+  "status": "PASS"
+}

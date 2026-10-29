@@ -1,0 +1,37 @@
+{
+  "checkedAtUTC": "2026-10-29T05:08:00.106033+00:00",
+  "ownedVitePid": 20135,
+  "ports": [
+    {
+      "port": 5194,
+      "closed": true
+    },
+    {
+      "port": 62584,
+      "closed": true
+    },
+    {
+      "port": 62697,
+      "closed": true
+    },
+    {
+      "port": 62778,
+      "closed": true
+    },
+    {
+      "port": 62863,
+      "closed": true
+    },
+    {
+      "port": 62939,
+      "closed": true
+    },
+    {
+      "port": 63066,
+      "closed": true
+    }
+  ],
+  "ownedRunnerProcesses": [],
+  "browserClosure": "capture, live and formal runners all exited0 after awaited browser.close/finally; their scratch services/databases closed.",
+  "servicesReleased": true
+}

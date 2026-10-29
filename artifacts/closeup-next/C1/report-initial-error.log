@@ -1,0 +1,1 @@
+Initial report derivation failed: TypeError [ERR_INVALID_URL]: Invalid URL, input undefined at canonical(report.mjs:22), called on top-level performance rows. Fixed by checking each raw round, where URL and pose are stored. No capture or measurement changed.

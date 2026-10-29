@@ -366,3 +366,11 @@ S0終版：有效uncapped平均79.51–133.60FPS。原E4在現行ladder headline
 ## Closeup S0 main integration — 2026-10-28
 
 Coordinator接受19e9ae2為完整量度基準，保留全部視覺失敗。Fresh mainfdc4a0c以no-ff整合為c802bba，無衝突；在整合結果重新跑root npm test、npm run build及git diff --check全部PASS，僅既有build warnings。[整合JSON／logs](../artifacts/closeup-polish/S0/integration.json)。Runtime/tests/package/lock與接受checkpoint完全相同，因此原DEV／production／headline-aware recovery evidence仍適用，沒有重複宣稱新browser或FPS量度。Survey／module-swap未改，local不另跑。Main最終SHA／實際CI與服務、writer釋放由result-S0-integration.json記錄；長feature保留，原root舊feature checkout不動。A–D未開始、未部署；S0整合不代表art gates獲通過。
+
+## C1 selected closeup candidate — 2026-10-29
+
+Feature-only `feat/closeup-accepted`，baseline `cd401e0`、runtime `9bd0605`、mesh-fixture test `d6bed36`。只帶四個owner選定pose、eebff28服務面／操作接縫及SW focal唯一pose；[完整scope／原圖／checks](../artifacts/closeup-next/C1/README.md)、[逐圖S0並排](../artifacts/closeup-next/C1/REVIEW.md)、[handoff及最後狀態](handoffs/closeup-next.md)。Root test/build、survey fixture build及diff檢查PASS，其他package source未改。macOS27.0.1／Chrome156.0.8078.73／ANGLE Metal Apple M6，1920×1080／DPR1／default／reviewTime20，40態80原圖，40張final及40張S0原圖逐張original-detail review，S0 hash保持。A6 40/40；vsync59.9–60.3；repro13/40，所有FAIL保留。
+
+A1 SW focal中性／高值4 FAIL；A2 SE district10 FAIL。12組雙flag uncapped canonical7 PASS／5 calls FAIL（NW日、SW focal及SE district日夜），FPS88.47–109.80；raw兩個≥5s窗口／≥16s warmup／shadow outliers全部保留，和原S0跨Chrome patch比較，無重跑挑樣。A3≥7/9及數值A4≥6%/12%改diagnostic（owner2026-10-29決定，數字不變；A4 2/38），新增owner兩秒相鄰tier辨認hard gate仍PENDING；其他A/V hard gates及global V3 FAIL不變。全部功能PASS都唔表示近鏡美術接受。Live／formal新證據與cleanup以handoff完成紀錄為準；展示硬件、Safari/iPad／Windows、長測及真人辨認未驗，N1／F3未開，未merge main／未部署。
+
+C1 新scratch live五shot合共20/20 PASS、errors0；未修改formal E4在C1重跑14項全PASS、exceptions0（只有預期favicon404／obsolete409／兩次注入abort）。[Live](../artifacts/closeup-next/C1/live/browser.json)、[formal](../artifacts/closeup-next/C1/formal/browser.json)及[cleanup](../artifacts/closeup-next/C1/cleanup.json)保留全部原始證據；12張formal原圖中六張、五張live hold已檢視。全部owned browsers、Vite5194及六個scratch ports已關閉。最終feature SHA／remote／writer release由handoff指向worker result；無main integration或新main CI主張。
