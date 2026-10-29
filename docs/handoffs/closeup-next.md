@@ -3,7 +3,7 @@
 下一個 agent 嘅入口文件（2026-10-29 寫）。冇 chat 歷史都可以由呢度開始。佢唔取代 [closeup-polish](closeup-polish.md)：A–D／Z 嘅標準同進度仍然以嗰份為準（最新版喺 `origin/feat/closeup-polish`，唔係 main）。
 
 - Owner: cc100053（產品／審美決定）；F1/F2 worker：Codex `01a1857c-e75a-7571-b8af-59b218b9b0aa`；C1唯一writer：Codex `01a185a2-dd7b-7711-ba9f-97204080bf80`；coordinator：`01a1856f-6e56-73b2-b8f9-a8378a64fb71`。
-- Status: F1/F2 INTEGRATED／main CI PASS，交coordinator review；C1 REVIEW_READY 候選（未過全部hard gates、未merge；美術 owner gate 保留）／N1 PENDING；F3 等展覽硬件。
+- Status: F1/F2 INTEGRATED；C1 INTEGRATED（owner 2026-10-29「修完就 merge」，見「C1 owner 批准同整合」）；N1 PENDING；F3 等展覽硬件。
 - Branch: F1/F2 `fix/energy-e4-headline`；C1 由 verified main 開 `feat/closeup-accepted`，舊 `feat/closeup-polish` 只留證據。
 - Base commit: F1/F2 `e69874dbca243674590ee87d60b03cffcd37379d`（2026-10-29 fetch，main／origin/main 0/0）；本文件最初 base `3d0f40e`。
 - Last verified commit: F1/F2 feature `61ec1bbfaf128691aaba97693b86365826a24c2a`，integrated `00303e133f797a40392dd81e7540f35d3cdd9ea0`；初版只核對文件，唔作 runtime 證據。
@@ -138,9 +138,20 @@ Z 已經由 Codex relay 完成（`origin/feat/closeup-polish` @ `f66cc3a`，量�
 - Integrated root `npm test`／`npm run build`、helper self-check、`git diff --check origin/main..HEAD`全部PASS；[integration record](../../artifacts/closeup-next/F1/integration.json)及新logs留在本批證據。Formal browser所驗fixture hash與integrated完全相同；未為純metadata再重截圖。該JSON係push前snapshot，發布狀態由本段取代。
 - Main `c3419758e342dfdebf2f0daf0ce310ba3cdf7d69` 已push，fresh fetch確認origin/main一致；[main CI40808519827](https://github.com/cc100053/city2127/actions/runs/40808519827) completed／success（head SHA同上，root test/build、survey test/build、module-swap test/build、whitespace全部PASS）。本段係之後純文件完成紀錄，按workflow跳過CI；runtime／fixture／原圖未變，local links／fact及完整committed diff再核對。F1/F2 writer／全部owned services已release，coordinator按result review後先派C1。
 
+## C1 owner 批准同整合 — 2026-10-29
+
+- Owner 喺 Claude session `6034e339` 揀「修完就 merge」，即係批准三點：
+  1. A5 改為睇 FPS（≥ S0 95%）同 hero calls（≤110%）；個別 shot 嘅 draw calls 只做診斷，因為新 pose 影入更多城市，同舊 pose 比冇意義。
+  2. 將 `sw:focal` 拉遠到 A1 過關。
+  3. 修完就 merge，唔等 24 組相鄰 tier 兩秒辨認。呢個 owner gate **冇做**，記低做已知缺口，唔當 PASS。
+- 接手：Claude 喺 `.task-relay/closeup-next/state.json` revision 11 記低接手；Codex coordinator 停喺 `NEEDS_INPUT`，冇同時寫 branch。
+- 修正：`sw:focal` position `[-164,61,147]` → `[-168,64,152]`（沿視線拉遠約 6%，target 不變）。A1／A2／A6／repro 6/6 PASS。
+- 仍然 FAIL、照記：`sw:focal` FPS 兩次量度係 S0 嘅 91.2–95.1%，日景兩次都低過 95%。同機 hero 喺 run 之間波動約 5%，vsync 鎖 60。SE district A2 10 FAIL、NW −2→0 幾乎冇分別（Meter 低檔內容問題）、global V3 同設施辨識，全部照舊。[證據](../../artifacts/closeup-next/C1/sw-pullback/README.md)
+- 驗證：root `npm test`／`npm run build`／`git diff --check` PASS；survey、module-swap 冇改。
+
 ## Next expected step
 
-C1 候選及全部授權本機驗證已完成，coordinator 先 review 本節結果，再交 owner 開 [S0／C1 並排原圖](../../artifacts/closeup-next/C1/REVIEW.md)及24組相鄰Meter tier作兩秒辨認。保留 hard-gate FAIL，未獲 owner 批准不得 merge main；C1合併或明確棄用之後先開 N1。本worker唔開下一批或新增pose輪次，F3等硬件。
+C1 已經入 main。下一步開 N1（能源講解），由 main 開 `feat/energy-narration`，`energy:ring` 用新 pose。24 組 tier 兩秒辨認係 owner 隨時可以補做嘅檢查，唔阻 N1。F3 等硬件。另外兩個設計任務未開：全城植栽語言（V3），同 NW／SE focal 設施辨識。
 
 ## C1 candidate — 2026-10-29
 

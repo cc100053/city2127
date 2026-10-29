@@ -82,7 +82,7 @@ Headline 近鏡（2026-10-27）：live 結果先在 hero 播完 2.62 秒 vote jo
 
 近鏡打磨S0（2026-10-28，coordinator接受量度基準並整合main `c802bba`）：[完整基準](../artifacts/closeup-polish/S0/README.md)記錄98個日夜狀態、96組像素比較及28組兩輪效能；沒有美術、pose、時間線或梯級改動。A1/A2/A3與夜間／綠化仍有明確失敗，20個district狀態跨near plane不可量測；這是後續A–D的起點，並非視覺完成或owner接受。所有正式第二take原圖已逐張檢視，展示硬件及真人辨認未驗；[整合驗證](../artifacts/closeup-polish/S0/integration.json)root test/build/diff PASS，實際published SHA及main CI由本批integration result記錄。
 
-2026-10-29 owner 只選近鏡四個 pose（能源環、SE／SW district、NW focal）連 NW 服務面，另授權 SW focal 一輪 pose-only；C1 只在 feature 製作候選，未接受或合併 main。A3 保留 ≥7/9、數值 A4 保留相鄰 ≥6%／極值 ≥12%，兩項改作診斷；新增 hard gate 係 owner 並排原圖、兩秒辨認相鄰狀態變化。A1／A2／A5／A6 同 V hard gates 不變，全部失敗保留，global V3 植栽另作設計任務。[決定與新驗證](handoffs/closeup-next.md)。
+2026-10-29 owner 只選近鏡四個 pose（能源環、SE／SW district、NW focal）連 NW 服務面，另授權 SW focal 一輪 pose-only；C1 只在 feature 製作候選，未接受或合併 main。A3 保留 ≥7/9、數值 A4 保留相鄰 ≥6%／極值 ≥12%，兩項改作診斷；新增 hard gate 係 owner 並排原圖、兩秒辨認相鄰狀態變化。A1／A2／A5／A6 同 V hard gates 不變，全部失敗保留，global V3 植栽另作設計任務。同日 owner 批准 merge：SW focal 拉遠至 A1 過關，A5 改睇 FPS 同 hero calls，shot calls 作診斷；24 組兩秒辨認未做、記作缺口。[決定與新驗證](handoffs/closeup-next.md)。
 
 `ladderLayout(tiers, energy)` 是唯一權威映射；focal 數值由 tier 符號決定（`t`= 1／.5／0 對應 >0／0／<0）：
 

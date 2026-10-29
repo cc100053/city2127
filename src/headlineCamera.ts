@@ -11,7 +11,7 @@ type Pose = { position: [number, number, number]; target: [number, number, numbe
 export const SHOTS: Record<ShotId, Pose> = {
   'nw:focal': { position: [40, 130, -508], target: [40, 43, -300] },
   'ne:focal': { position: [-280, 85, -245], target: [-210, 14, -135] },
-  'sw:focal': { position: [-164, 61, 147], target: [-105, 10, 60] },
+  'sw:focal': { position: [-168, 64, 152], target: [-105, 10, 60] },
   'se:focal': { position: [-20, 245, -240], target: [175, 65, -45] },
   'nw:district': { position: [-180, 180, -470], target: [10, 28, -210] },
   'ne:district': { position: [-440, 200, -355], target: [-210, 25, -120] },
