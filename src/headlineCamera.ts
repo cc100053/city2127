@@ -9,17 +9,17 @@ type Site = CarrierChange['socketId'];
 export type ShotId = `${Site}:${'focal' | 'district'}` | `energy:${'garden' | 'garden2' | 'ring' | 'wing' | 'island'}`;
 type Pose = { position: [number, number, number]; target: [number, number, number] };
 export const SHOTS: Record<ShotId, Pose> = {
-  'nw:focal': { position: [-105, 150, -475], target: [40, 48, -300] },
+  'nw:focal': { position: [40, 130, -508], target: [40, 43, -300] },
   'ne:focal': { position: [-280, 85, -245], target: [-210, 14, -135] },
-  'sw:focal': { position: [-150, 40, -10], target: [-105, 12, 60] },
+  'sw:focal': { position: [-164, 61, 147], target: [-105, 10, 60] },
   'se:focal': { position: [-20, 245, -240], target: [175, 65, -45] },
   'nw:district': { position: [-180, 180, -470], target: [10, 28, -210] },
   'ne:district': { position: [-440, 200, -355], target: [-210, 25, -120] },
-  'sw:district': { position: [-365, 135, -420], target: [-180, 8, -235] },
-  'se:district': { position: [-105, 235, -295], target: [140, 40, -30] },
+  'sw:district': { position: [-160, 420, -400], target: [-120, 5, -260] },
+  'se:district': { position: [-200, 300, -365], target: [15, 35, -80] },
   'energy:garden': { position: [-372, 62, -232], target: [-306, 12, -150] },
   'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },
-  'energy:ring': { position: [-118, 148, -138], target: [-18, 96, -24] },
+  'energy:ring': { position: [-70, 135, -170], target: [-18, 99, -24] },
   'energy:wing': { position: [56, 64, -496], target: [125, 22, -424] },
   'energy:island': { position: [-142, 66, -556], target: [-60, 4, -470] },
 };
