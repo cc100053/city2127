@@ -57,13 +57,15 @@ export class HeadlineCamera {
   private readonly target = new Vector3();
   constructor(camera: PerspectiveCamera, controls: Controls) { this.camera = camera; this.controls = controls; }
   get active() { return this.shot !== null || this.returning; }
-  play(changes: readonly CarrierChange[], now: number, displayMs = DISPLAY_MS) {
+  /** Returns the shot it flies to (null when it stays at, or returns to, the hero pose). */
+  play(changes: readonly CarrierChange[], now: number, displayMs = DISPLAY_MS): ShotId | null {
     const shot = headlineShot(changes[0]);
-    if (displayMs < DISPLAY_MS - 100 || (!shot && !this.active)) { this.cancel(); return; }
+    if (displayMs < DISPLAY_MS - 100 || (!shot && !this.active)) { this.cancel(); return null; }
     this.fromPosition.copy(this.camera.position); this.fromTarget.copy(this.controls.target);
     if (shot) { this.position.set(...SHOTS[shot].position); this.target.set(...SHOTS[shot].target); }
     this.returning = shot === null;
     this.shot = shot; this.started = now; this.displayMs = displayMs; this.controls.enabled = false;
+    return shot;
   }
   cancel() {
     this.shot = null; this.returning = false;

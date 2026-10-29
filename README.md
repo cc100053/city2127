@@ -68,7 +68,7 @@ Admin 新增 **直前の提案を取り消す**：只可撤銷最後一份已完
 
 兩部答題裝置用同一個 LAN／同一個 survey server，各開 `http://<展覽電腦 LAN IP>:8787/guest?station=A` 同 `/guest?station=B`。展覽電腦按上方 LAN 指示啟動 server；如果 City 留喺展覽電腦，root Vite 可維持 loopback。每站有獨立草稿、四題、結果同交接，一站完成唔會清掉另一站；server 按收到提交嘅順序累積，重試只計一次。每站同時只接受一個體驗；同一站唔好重複開多個頁面。Server 用 `SURVEY_HOST=0.0.0.0` 啟動時會喺 terminal 印出 `LAN Guest:` A／B 完整網址，照抄去 iPad 即可；iPad／router 現場設定見 [LAN 雙站交接](docs/handoffs/lan-guest-stations.md)。原本 `/guest` 單站流程保留，但未完成體驗期間唔可混用單站／A/B。
 
-城市live結果依記錄順序保留至少10秒觀看時段，動畫仍3秒，標示提案編號同 A/B；排隊嘅 Guest 顯示已保存、等待展示，再顯示自己嘅結果10秒／交接5秒。City 重新連接會直接復原最新完整狀態。A/B reset 會暫停新開始，等兩站問卷及結果／交接完成先執行；Admin 可單獨中止 **A／B の未完了の体験を終了**。離線站會喺問卷5分鐘期限，或已提交結果租期（展示開始後15秒）結束後釋放；Admin 無須確認離場。City reset 保留總人數，full reset 清零但保留歷史。
+城市live結果依記錄順序保留至少13秒觀看時段（2026-10-29 由10秒延長），動畫仍3秒，標示提案編號同 A/B；排隊嘅 Guest 顯示已保存、等待展示，再顯示自己嘅結果13秒／交接5秒。City 重新連接會直接復原最新完整狀態。A/B reset 會暫停新開始，等兩站問卷及結果／交接完成先執行；Admin 可單獨中止 **A／B の未完了の体験を終了**。離線站會喺問卷5分鐘期限，或已提交結果租期（展示開始後15秒）結束後釋放；Admin 無須確認離場。City reset 保留總人數，full reset 清零但保留歷史。
 
 更新後重新 build／啟動 survey server，同時刷新 Guest／City／Admin；SQLite 自動升至 schema 8，保留既有城市及歷史。實作及驗證見 [雙裝置交接](docs/handoffs/archive/two-guest-devices.md)。
 
@@ -98,7 +98,7 @@ Root `src/` 以 Three.js / WebGL 2 載入 Odaiba district 地形、六棟地標 
 
 城市自動日夜循環一日 180 秒；`?hour=22` 可固定時間。鏡頭、共享材質／InstancedMesh、3 秒變化與立即 reset/reconnect 的實作見 [PROJECT](docs/PROJECT.md)。後製包括 MSAA、GTAO、bloom、vignette、output 及 colour grade。GPU 較弱嘅電腦（例如 M1 接 4K 螢幕）可以喺城市網址加 `&quality=low`：關閉 MSAA、GTAO 同陰影，pixel ratio 上限 1；預設畫面不變（2026-10-15）。2026-10-27 起預設用半解像度 GTAO、2× MSAA，陰影每秒更新 4 次，行人同車輛唔投影（hero 距離幾乎睇唔出分別）。
 
-Live headline 先在 hero 播 2.62 秒投票旅程，再推近變化地點，10–12 秒返回 hero；無 headline 不推近，如接續近鏡先用 2 秒平滑返回；snapshot／Undo／重連／reduced motion 立即 hero。DEV `?shot=nw:focal` 可逐鏡檢查，console `cityShot()` 讀目前 pose；完整 shot list 見 [headline camera](src/headlineCamera.ts)。
+Live headline 先在 hero 播 2.62 秒投票旅程，再推近變化地點，13–15 秒返回 hero；能源部件停留期間以日文字幕講解一次壓縮儲能週期；無 headline 不推近，如接續近鏡先用 2 秒平滑返回；snapshot／Undo／重連／reduced motion 立即 hero。DEV `?shot=nw:focal` 可逐鏡檢查，console `cityShot()` 讀目前 pose；完整 shot list 見 [headline camera](src/headlineCamera.ts)。
 
 開發時可用 `?meters=nw:high,ne:low`（band 或 −12..12）直接 review v2 layout，console `cityMeters('ne:high')` 睇 live 過渡；`&metersTo=ne:high&metersAge=8.3` 配合 `reviewTime` 截圖。這些工具不提交提案、不改展覽資料。 DEV能源研究可用`?energy=baseline&hour=12&reviewTime=20`切換基準／A／B／C／混合城市組合，E3加入兩處沿岸水庭／配電門架及60秒儲能流程；`reviewTime=10|30|50`固定階段，面板「靜態閱讀」或系統reduced motion固定能源動態；須與`survey`、`meters`、`scaleLab`分開使用。[E3比較與限制](artifacts/energy-city-e3/README.md)。
 

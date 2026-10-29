@@ -1,0 +1,556 @@
+{
+  "complete": true,
+  "browser": "156.0.8078.73",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "mode": "Same createSurveyServer devAuto:true and fresh mkdtemp SQLite isolation as npm run dev:auto, dynamic loopback ports; proposals through the real HTTP API, city over real WebSocket. Guest UI not exercised.",
+  "timing": "Real clock and unchanged DISPLAY_MS. The single-station server refuses a second proposal until the reading slot ends, so the second live result arrives after the caption window (it then cancels the persisted part clock). Sampling ~80 ms plus evaluate latency, so step seconds are ±0.2 s; exact plan timing is in tests/energyNarration.test.ts.",
+  "checks": [
+    {
+      "part": "garden",
+      "option": "water-storage",
+      "preload": 1,
+      "cancel": {
+        "kind": "Undo",
+        "before": {
+          "part": "garden",
+          "step": 1,
+          "seconds": 80.04
+        },
+        "after": null,
+        "cancelMs": 4,
+        "heroAfter": true,
+        "rotor": {
+          "time": 58.89,
+          "angle": 3.576031154659444,
+          "expected": 3.57595185,
+          "pass": true
+        },
+        "pass": true
+      },
+      "origin": {
+        "origin": "http://127.0.0.1:53183",
+        "database": "/var/folders/st/ml4_0zfx7g129gh2305ynz5c0000gn/T/n1-narration-C1ILlh/survey.sqlite",
+        "devAuto": true
+      },
+      "reduced": {
+        "energy": {
+          "waterGardens": 1,
+          "receiver": "none",
+          "flywheel": false,
+          "island": false
+        },
+        "samples": 20,
+        "presentation": "ambient",
+        "pass": true
+      },
+      "live": {
+        "view": {
+          "waterGardens": 1,
+          "receiver": "none",
+          "flywheel": false,
+          "island": false
+        },
+        "samples": [
+          {
+            "elapsedMs": 7,
+            "step": null,
+            "hidden": true,
+            "t": null
+          },
+          {
+            "elapsedMs": 91,
+            "step": -1,
+            "hidden": true,
+            "t": 55.96000000000001
+          },
+          {
+            "elapsedMs": 4174,
+            "step": 0,
+            "hidden": false,
+            "t": 0.4799999999999969
+          },
+          {
+            "elapsedMs": 6157,
+            "step": 1,
+            "hidden": false,
+            "t": 20.709999999999994
+          },
+          {
+            "elapsedMs": 8073,
+            "step": 2,
+            "hidden": false,
+            "t": 40.269999999999996
+          },
+          {
+            "elapsedMs": 10058,
+            "step": -1,
+            "hidden": true,
+            "t": 0.04999999999999716
+          }
+        ],
+        "charge": {
+          "elapsedMs": 5759,
+          "t": 16.629999999999995,
+          "card": "あなたは、蓄電の仕組みが身近にある海辺の庭を選びました。ほかの住民の声と重なり、海辺の蓄電庭園は1か所の配置になりました。",
+          "place": "街の画面：海辺の蓄電庭園"
+        },
+        "release": {
+          "elapsedMs": 9239,
+          "t": 52.18000000000001,
+          "card": "あなたは、蓄電の仕組みが身近にある海辺の庭を選びました。ほかの住民の声と重なり、海辺の蓄電庭園は1か所の配置になりました。",
+          "place": "街の画面：海辺の蓄電庭園"
+        },
+        "stepSeconds": [
+          1.983,
+          1.916,
+          1.985
+        ],
+        "captionFirstMs": 4174,
+        "chars": [
+          18,
+          13,
+          16
+        ],
+        "pass": true
+      }
+    },
+    {
+      "part": "garden2",
+      "option": "water-storage",
+      "preload": 2,
+      "cancel": {
+        "kind": "second live result",
+        "before": {
+          "part": "garden2",
+          "step": 1,
+          "seconds": 140.04
+        },
+        "after": null,
+        "cancelMs": 4041,
+        "heroAfter": null,
+        "rotor": {
+          "time": 77.6,
+          "angle": 4.416559921817604,
+          "expected": 4.416639999999999,
+          "pass": true
+        },
+        "pass": true
+      },
+      "origin": {
+        "origin": "http://127.0.0.1:53215",
+        "database": "/var/folders/st/ml4_0zfx7g129gh2305ynz5c0000gn/T/n1-narration-wSutEV/survey.sqlite",
+        "devAuto": true
+      },
+      "reduced": {
+        "energy": {
+          "waterGardens": 2,
+          "receiver": "none",
+          "flywheel": false,
+          "island": false
+        },
+        "samples": 20,
+        "presentation": "ambient",
+        "pass": true
+      },
+      "live": {
+        "view": {
+          "waterGardens": 2,
+          "receiver": "none",
+          "flywheel": false,
+          "island": false
+        },
+        "samples": [
+          {
+            "elapsedMs": 10,
+            "step": null,
+            "hidden": true,
+            "t": null
+          },
+          {
+            "elapsedMs": 93,
+            "step": -1,
+            "hidden": true,
+            "t": 55.97999999999999
+          },
+          {
+            "elapsedMs": 4194,
+            "step": 0,
+            "hidden": false,
+            "t": 0.8100000000000023
+          },
+          {
+            "elapsedMs": 6092,
+            "step": 1,
+            "hidden": false,
+            "t": 20.189999999999998
+          },
+          {
+            "elapsedMs": 8093,
+            "step": 2,
+            "hidden": false,
+            "t": 40.61
+          },
+          {
+            "elapsedMs": 10075,
+            "step": -1,
+            "hidden": true,
+            "t": 0.0799999999999983
+          }
+        ],
+        "charge": {
+          "elapsedMs": 5693,
+          "t": 16.11,
+          "card": "あなたは、蓄電の仕組みが身近にある海辺の庭を選びました。ほかの住民の声と重なり、海辺の蓄電庭園は2か所の配置になりました。",
+          "place": "街の画面：海辺の蓄電庭園"
+        },
+        "release": {
+          "elapsedMs": 9258,
+          "t": 52.5,
+          "card": "あなたは、蓄電の仕組みが身近にある海辺の庭を選びました。ほかの住民の声と重なり、海辺の蓄電庭園は2か所の配置になりました。",
+          "place": "街の画面：海辺の蓄電庭園"
+        },
+        "stepSeconds": [
+          1.898,
+          2.001,
+          1.982
+        ],
+        "captionFirstMs": 4194,
+        "chars": [
+          18,
+          13,
+          16
+        ],
+        "pass": true
+      },
+      "secondAfterMs": 4041
+    },
+    {
+      "part": "ring",
+      "option": "rotor-storage",
+      "preload": 1,
+      "cancel": {
+        "kind": "reconnect",
+        "before": {
+          "part": "ring",
+          "step": 1,
+          "seconds": 80.03
+        },
+        "after": null,
+        "cancelMs": 2,
+        "heroAfter": true,
+        "rotor": {
+          "time": 56.73,
+          "angle": 3.5186709264646447,
+          "expected": 3.5185606499999995,
+          "pass": true
+        },
+        "pass": true
+      },
+      "origin": {
+        "origin": "http://127.0.0.1:53265",
+        "database": "/var/folders/st/ml4_0zfx7g129gh2305ynz5c0000gn/T/n1-narration-zg8ytq/survey.sqlite",
+        "devAuto": true
+      },
+      "reduced": {
+        "energy": {
+          "waterGardens": 0,
+          "receiver": "none",
+          "flywheel": true,
+          "island": false
+        },
+        "samples": 20,
+        "presentation": "ambient",
+        "pass": true
+      },
+      "live": {
+        "view": {
+          "waterGardens": 0,
+          "receiver": "none",
+          "flywheel": true,
+          "island": false
+        },
+        "samples": [
+          {
+            "elapsedMs": 5,
+            "step": null,
+            "hidden": true,
+            "t": null
+          },
+          {
+            "elapsedMs": 89,
+            "step": -1,
+            "hidden": true,
+            "t": 55.96000000000001
+          },
+          {
+            "elapsedMs": 4187,
+            "step": 0,
+            "hidden": false,
+            "t": 0.6400000000000006
+          },
+          {
+            "elapsedMs": 6092,
+            "step": 1,
+            "hidden": false,
+            "t": 20.03
+          },
+          {
+            "elapsedMs": 8088,
+            "step": 2,
+            "hidden": false,
+            "t": 40.43000000000001
+          },
+          {
+            "elapsedMs": 10075,
+            "step": -1,
+            "hidden": true,
+            "t": 0.06999999999999318
+          }
+        ],
+        "charge": {
+          "elapsedMs": 5773,
+          "t": 16.790000000000006,
+          "card": "あなたは、街の中心で電気を蓄える暮らしを選びました。ほかの住民の声と重なり、劇場の前に、独立した蓄電環が加わりました。",
+          "place": "街の画面：フジテレビ前・蓄電環"
+        },
+        "release": {
+          "elapsedMs": 9260,
+          "t": 52.33,
+          "card": "あなたは、街の中心で電気を蓄える暮らしを選びました。ほかの住民の声と重なり、劇場の前に、独立した蓄電環が加わりました。",
+          "place": "街の画面：フジテレビ前・蓄電環"
+        },
+        "stepSeconds": [
+          1.905,
+          1.996,
+          1.987
+        ],
+        "captionFirstMs": 4187,
+        "chars": [
+          13,
+          8,
+          16
+        ],
+        "pass": true
+      }
+    },
+    {
+      "part": "wing",
+      "option": "orbital-supply",
+      "preload": 1,
+      "cancel": {
+        "kind": "reset",
+        "before": {
+          "part": "wing",
+          "step": 1,
+          "seconds": 80.02
+        },
+        "after": null,
+        "cancelMs": 5,
+        "heroAfter": true,
+        "rotor": null,
+        "pass": true
+      },
+      "origin": {
+        "origin": "http://127.0.0.1:53298",
+        "database": "/var/folders/st/ml4_0zfx7g129gh2305ynz5c0000gn/T/n1-narration-5gKnqX/survey.sqlite",
+        "devAuto": true
+      },
+      "reduced": {
+        "energy": {
+          "waterGardens": 0,
+          "receiver": "small",
+          "flywheel": false,
+          "island": false
+        },
+        "samples": 20,
+        "presentation": "ambient",
+        "pass": true
+      },
+      "live": {
+        "view": {
+          "waterGardens": 0,
+          "receiver": "small",
+          "flywheel": false,
+          "island": false
+        },
+        "samples": [
+          {
+            "elapsedMs": 9,
+            "step": null,
+            "hidden": true,
+            "t": null
+          },
+          {
+            "elapsedMs": 93,
+            "step": -1,
+            "hidden": true,
+            "t": 55.96000000000001
+          },
+          {
+            "elapsedMs": 4174,
+            "step": 0,
+            "hidden": false,
+            "t": 0.4799999999999969
+          },
+          {
+            "elapsedMs": 6162,
+            "step": 1,
+            "hidden": false,
+            "t": 20.72
+          },
+          {
+            "elapsedMs": 8083,
+            "step": 2,
+            "hidden": false,
+            "t": 40.260000000000005
+          },
+          {
+            "elapsedMs": 10075,
+            "step": -1,
+            "hidden": true,
+            "t": 0.06999999999999318
+          }
+        ],
+        "charge": {
+          "elapsedMs": 5764,
+          "t": 16.629999999999995,
+          "card": "あなたは、海上の設備で空から電気を受け取る暮らしを選びました。ほかの住民の声と重なり、海上の受電翼は小さな配置になりました。",
+          "place": "街の画面：沖の受電翼"
+        },
+        "release": {
+          "elapsedMs": 9255,
+          "t": 52.33,
+          "card": "あなたは、海上の設備で空から電気を受け取る暮らしを選びました。ほかの住民の声と重なり、海上の受電翼は小さな配置になりました。",
+          "place": "街の画面：沖の受電翼"
+        },
+        "stepSeconds": [
+          1.988,
+          1.921,
+          1.992
+        ],
+        "captionFirstMs": 4174,
+        "chars": [
+          10,
+          11,
+          11
+        ],
+        "pass": true
+      }
+    },
+    {
+      "part": "island",
+      "option": "island-supply",
+      "preload": 1,
+      "cancel": {
+        "kind": "reload snapshot",
+        "before": {
+          "part": "island",
+          "step": 1,
+          "seconds": 80.03
+        },
+        "after": null,
+        "cancelMs": 15271,
+        "heroAfter": true,
+        "rotor": {
+          "time": 16.73,
+          "angle": 0.7542147573608367,
+          "expected": 0.7544393500000003,
+          "pass": true
+        },
+        "pass": true
+      },
+      "origin": {
+        "origin": "http://127.0.0.1:53372",
+        "database": "/var/folders/st/ml4_0zfx7g129gh2305ynz5c0000gn/T/n1-narration-Qcq20X/survey.sqlite",
+        "devAuto": true
+      },
+      "reduced": {
+        "energy": {
+          "waterGardens": 0,
+          "receiver": "none",
+          "flywheel": false,
+          "island": true
+        },
+        "samples": 20,
+        "presentation": "ambient",
+        "pass": true
+      },
+      "live": {
+        "view": {
+          "waterGardens": 0,
+          "receiver": "none",
+          "flywheel": false,
+          "island": true
+        },
+        "samples": [
+          {
+            "elapsedMs": 7,
+            "step": null,
+            "hidden": true,
+            "t": null
+          },
+          {
+            "elapsedMs": 91,
+            "step": -1,
+            "hidden": true,
+            "t": 55.96000000000001
+          },
+          {
+            "elapsedMs": 4173,
+            "step": 0,
+            "hidden": false,
+            "t": 0.46000000000000085
+          },
+          {
+            "elapsedMs": 6158,
+            "step": 1,
+            "hidden": false,
+            "t": 20.700000000000003
+          },
+          {
+            "elapsedMs": 8072,
+            "step": 2,
+            "hidden": false,
+            "t": 40.269999999999996
+          },
+          {
+            "elapsedMs": 10074,
+            "step": -1,
+            "hidden": true,
+            "t": 0.060000000000002274
+          }
+        ],
+        "charge": {
+          "elapsedMs": 5763,
+          "t": 16.620000000000005,
+          "card": "あなたは、海の一部を使い、沖の原子力施設から電気を届ける暮らしを選びました。ほかの住民の声と重なり、沖に、原子力施設を置く島と検修橋が加わりました。",
+          "place": "街の画面：沖のエネルギー島"
+        },
+        "release": {
+          "elapsedMs": 9250,
+          "t": 52.16,
+          "card": "あなたは、海の一部を使い、沖の原子力施設から電気を届ける暮らしを選びました。ほかの住民の声と重なり、沖に、原子力施設を置く島と検修橋が加わりました。",
+          "place": "街の画面：沖のエネルギー島"
+        },
+        "stepSeconds": [
+          1.985,
+          1.914,
+          2.002
+        ],
+        "captionFirstMs": 4173,
+        "chars": [
+          6,
+          9,
+          11
+        ],
+        "pass": true
+      }
+    }
+  ],
+  "errors": []
+}

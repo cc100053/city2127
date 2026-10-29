@@ -10,6 +10,7 @@ import { createProposalSession, submitProposal } from '../src/server/proposalSer
 import { createContext } from '../src/server/server.ts';
 import type { SurveyContext } from '../src/server/context.ts';
 import { errorCode, EXHIBITION_QUESTIONS_PATH, exhibitionFixture, ok, staff } from './surveyFixture.ts';
+import { DISPLAY_MS } from '../src/shared/displayTiming.ts';
 
 const ZERO = { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 };
 let counter = 0;
@@ -31,7 +32,7 @@ assert.equal(readLifecycle(ctx.db).phase, 'awaiting_exit', 'finishing the questi
 assert.deepEqual([a.state.guestCount, readLifecycle(ctx.db).totalGuestCount], [1, 1]);
 assert.deepEqual(state(ctx), a.state, 'no reset between normal guests');
 assert.equal(errorCode(createProposalSession(ctx).response), 'lifecycle_blocked', 'early next Start preserves the reading slot');
-clock.ms += 10_000;
+clock.ms += DISPLAY_MS;
 const sessionB = ok(createProposalSession(ctx).response);
 assert.deepEqual(sessionB.state, a.state, 'guest B inherits guest A\'s city');
 
@@ -43,7 +44,7 @@ assert.deepEqual([b.state.guestCount, b.state.runId], [2, a.state.runId], 'guest
 assert.deepEqual([readLifecycle(ctx.db).phase, readLifecycle(ctx.db).pendingReset], ['awaiting_exit', 'city']);
 assert.deepEqual(state(ctx), b.state, 'the result stays visible after submission');
 assert.equal(errorCode(createProposalSession(ctx).response), 'lifecycle_blocked', 'queued reset cannot truncate a result');
-clock.ms += 10_000;
+clock.ms += DISPLAY_MS;
 ctx.db.exec(`CREATE TRIGGER fail_next_guest BEFORE INSERT ON proposal_sessions
   BEGIN SELECT RAISE(ABORT, 'injected handoff failure'); END`);
 const beforeHandoff = readLifecycle(ctx.db);
@@ -110,7 +111,7 @@ assert.equal(readLifecycle(ctx.db).pendingReset, 'full');
 ok(submit(ctx, sessionD).response);
 const beforeFull = state(ctx);
 assert.equal(beforeFull.guestCount, 2);
-clock.ms = Date.parse(String(ctx.db.prepare('SELECT display_at FROM active_proposal_events ORDER BY sequence DESC LIMIT 1').get()?.display_at)) + 10_000;
+clock.ms = Date.parse(String(ctx.db.prepare('SELECT display_at FROM active_proposal_events ORDER BY sequence DESC LIMIT 1').get()?.display_at)) + DISPLAY_MS;
 const full = createProposalSession(ctx);
 assert.equal(full.event?.type === 'run-reset' && full.event.previousRunId, beforeFull.runId);
 assert.deepEqual([readLifecycle(ctx.db).phase, readLifecycle(ctx.db).pendingReset, readLifecycle(ctx.db).totalGuestCount],
@@ -138,7 +139,7 @@ try {
   assert.deepEqual([saved.phase, saved.pendingReset], ['in_experience', 'city']);
   const result = ok(submit(restarted, session).response);
   assert.equal(result.state.guestCount, 1, 'the guest finishes after a restart without the reset firing');
-  const displayEnd = Date.parse(result.proposal.displayAt!) + 10_000;
+  const displayEnd = Date.parse(result.proposal.displayAt!) + DISPLAY_MS;
   assert.equal(errorCode(createProposalSession(restarted).response), 'lifecycle_blocked');
   restarted.now = () => new Date(displayEnd);
   const handoff = createProposalSession(restarted);

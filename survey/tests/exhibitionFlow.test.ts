@@ -3,6 +3,7 @@ import type { LifecycleData, ProposalData, ProposalRequest, ProposalSessionData,
 import { currentState, currentView } from '../src/server/answerService.ts';
 import { createProposalSession, parseProposalRequest, submitProposal } from '../src/server/proposalService.ts';
 import { exhibitionFixture, ok, staff, startServer } from './surveyFixture.ts';
+import { DISPLAY_MS } from '../src/shared/displayTiming.ts';
 
 function requestFor(ctx: ReturnType<typeof exhibitionFixture>['ctx'], session: ProposalSessionData, id: string): ProposalRequest {
   return {
@@ -33,7 +34,7 @@ for (let ordinal = 0; ordinal < 100; ordinal++) {
   assert.equal(result.replayed, false);
   assert.equal(result.proposal.ordinal, ordinal + 1);
   if (ordinal === 0) { firstRequest = request; firstResult = result; }
-  clock.ms += 10_000;
+  clock.ms += DISPLAY_MS;
 }
 assert.ok(firstRequest && firstResult);
 assert.equal(currentState(ctx).revision, 100);
@@ -137,7 +138,7 @@ try {
   assert.equal(resetResponse.status, 200);
   assert.equal(ok(resetResponse.body).executedReset, null, 'the result remains visible until the next guest starts');
   assert.equal((await server.request('/api/proposal-sessions', {})).status, 409, 'reading slot guards an early reset/handoff');
-  httpFixture.clock.ms += 10_000;
+  httpFixture.clock.ms += DISPLAY_MS;
   const nextResponse = await server.request<ProposalSessionData>('/api/proposal-sessions', {});
   assert.equal(nextResponse.status, 201, 'no Admin exit confirmation is required');
   const nextSession = ok(nextResponse.body);

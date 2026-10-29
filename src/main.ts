@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 import { HeadlineCamera, SHOTS, type ShotId } from './headlineCamera';
+import { EnergyNarration } from './energyNarration';
 import * as T from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -182,6 +183,8 @@ try {
     if(to!==null)playMeters(to,now-Number(params.get('metersAge')??1));
   });
   const journey=surveyUrl?new VoteJourney(scene,camera):null;
+  // A live energy headline narrates one compressed storage cycle during the close-up hold.
+  const narration=surveyUrl&&headlineCamera?new EnergyNarration(()=>cityChanges?.energy):null;
   if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view,displayMs)=>{
     devShot=null;
     if(isExhibitionView(view)){
@@ -193,14 +196,14 @@ try {
       if(kind==='city-state-updated'&&latest&&!cameraMotion.matches){
         journey!.play(latest.votes,latest.ordinal,now);
         const changes=cityChanges!.applyExhibitionLayout(view.layout,kind,now+ARRIVAL_SECONDS,view.slotSeeds);
-        headlineCamera?.play(changes,now,displayMs);
+        narration?.play(headlineCamera?.play(changes,now,displayMs)??null,changes[0],now,displayMs);
         return changes;
       }
-      headlineCamera?.cancel();
+      headlineCamera?.cancel();narration?.cancel();
       journey!.setLanterns(view.recentProposals);
       return cityChanges!.applyExhibitionLayout(view.layout,kind,now,view.slotSeeds);
     }
-    headlineCamera?.cancel();journey!.cancel();
+    headlineCamera?.cancel();narration?.cancel();journey!.cancel();
     world.blendTo(scoresToWorldState(view.scores),now);
     if(kind==='city-state-updated')cityChanges!.applyIncrementalUpdate(view,now);
     else cityChanges!.restoreFromSnapshot(view,now);
@@ -237,6 +240,7 @@ try {
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
     controls.update();panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);
     if(headlineCamera?.active&&cameraMotion.matches)headlineCamera.cancel();else headlineCamera?.update(now);
+    narration?.update(now,cameraMotion.matches);
     if(import.meta.env.DEV&&devShot){const pose=SHOTS[devShot];camera.position.set(...pose.position);controls.target.set(...pose.target);camera.lookAt(controls.target);}
     cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.

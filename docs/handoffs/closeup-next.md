@@ -3,7 +3,7 @@
 下一個 agent 嘅入口文件（2026-10-29 寫）。冇 chat 歷史都可以由呢度開始。佢唔取代 [closeup-polish](closeup-polish.md)：A–D／Z 嘅標準同進度仍然以嗰份為準（最新版喺 `origin/feat/closeup-polish`，唔係 main）。
 
 - Owner: cc100053（產品／審美決定）；F1/F2 worker：Codex `01a1857c-e75a-7571-b8af-59b218b9b0aa`；C1唯一writer：Codex `01a185a2-dd7b-7711-ba9f-97204080bf80`；coordinator：`01a1856f-6e56-73b2-b8f9-a8378a64fb71`。
-- Status: F1/F2 INTEGRATED；C1 INTEGRATED（owner 2026-10-29「修完就 merge」，見「C1 owner 批准同整合」）；N1 PENDING；F3 等展覽硬件。
+- Status: F1/F2 INTEGRATED；C1 INTEGRATED（owner 2026-10-29「修完就 merge」，見「C1 owner 批准同整合」）；N1 REVIEW_READY（`feat/energy-narration`，等 owner 睇圖，未 merge）；F3 等展覽硬件。
 - Branch: F1/F2 `fix/energy-e4-headline`；C1 由 verified main 開 `feat/closeup-accepted`，舊 `feat/closeup-polish` 只留證據。
 - Base commit: F1/F2 `e69874dbca243674590ee87d60b03cffcd37379d`（2026-10-29 fetch，main／origin/main 0/0）；本文件最初 base `3d0f40e`。
 - Last verified commit: F1/F2 feature `61ec1bbfaf128691aaba97693b86365826a24c2a`，integrated `00303e133f797a40392dd81e7540f35d3cdd9ea0`；初版只核對文件，唔作 runtime 證據。
@@ -149,9 +149,20 @@ Z 已經由 Codex relay 完成（`origin/feat/closeup-polish` @ `f66cc3a`，量�
 - 仍然 FAIL、照記：`sw:focal` FPS 兩次量度係 S0 嘅 91.2–95.1%，日景兩次都低過 95%。同機 hero 喺 run 之間波動約 5%，vsync 鎖 60。SE district A2 10 FAIL、NW −2→0 幾乎冇分別（Meter 低檔內容問題）、global V3 同設施辨識，全部照舊。[證據](../../artifacts/closeup-next/C1/sw-pullback/README.md)
 - 驗證：root `npm test`／`npm run build`／`git diff --check` PASS；survey、module-swap 冇改。
 
+## N1 實作 — 2026-10-29
+
+- Owner：cc100053；writer：Claude session（由 C1 session `local_7d248543…` 派出）。Preflight：worktree clean，HEAD＝origin/main `8f2a8d9`，fetch 成功 0/0；由此開 `feat/energy-narration`。Runtime source verified `045025d`，之後只加證據／文件。
+- 做咗：新 [energyNarration.ts](../../src/energyNarration.ts) 字幕（左下 `.energy-narration`）＋逐部件能源鐘；`ENERGY_PHASES` 由 devEnergy export；水庭水面隨儲水縮放、釋能光點移出被支柱擋住嘅位置；`HeadlineCamera.play` 回傳 shot。`DISPLAY_MS`／時間線／survey 冇改。
+- 本 session 代決（owner 可推翻）：講解由鏡頭到位 4.12 s 開始到 10 s（5.88 s，每步約 1.96 s；頭約 1.5 s 充能同部件淡入重疊）；結果卡講「邊個嘅聲音、改咗乜」，字幕只講點運作；移除部件唔講解；**reduced motion 唔講解**（client 已將 reduced-motion 結果即時變 snapshot、冇結果卡）。
+- 要 owner 決定：(1) 可讀性：步長 6–18 字，最長一步要約 9 字／秒，超出舒適範圍；建議縮短文案（≤8 字）或者延長 slot（產品改動）。(2) 字幕係中文 DEV 文案，結果卡係日文。(3) 環只係轉速唔同、接收翼／能源島兩張圖冇模型變化，實際上只靠字幕。(4) 批准圖先 merge。
+- 驗證：root `npm test`／`npm run build`／`git diff --check` PASS；五個部件真 live 全 PASS、errors 0（每步 1.90–2.00 s，Undo／下一個結果／reconnect／reset／reload 各中斷一次並還原鐘）；A6 34/34；A5 hero PASS，能源 8/10，ring 夜 94.3%、wing 日 94.2% FAIL（同 session 對 main A/B 差 ≤1%，屬波動，照記 FAIL）。[證據同方法](../../artifacts/closeup-next/N1/README.md)。
+- 所有 dev server／browser 已停；survey／module-swap 冇改。
+
+- Owner 2026-10-29 回覆：(1) 延長：所有結果 `DISPLAY_MS` 10 → 13 s（lease 18 s）；(2) 所有 UI 一律日文（嚴格指示），字幕已改日文、標題用結果卡地名；(3) 環／接收翼／能源島主要靠字幕：接受；(4) reduced motion 唔講解：接受。實作同驗證見 [N1 README 頂部](../../artifacts/closeup-next/N1/README.md)：root／survey test+build PASS，live-13s 五部件 PASS，formal E4 PASS；`residentP3` reduced-motion 一步失敗，喺未改嘅 `origin/main` 一樣失敗，屬既有問題，另開任務。
+
 ## Next expected step
 
-C1 已經入 main。下一步開 N1（能源講解），由 main 開 `feat/energy-narration`，`energy:ring` 用新 pose。24 組 tier 兩秒辨認係 owner 隨時可以補做嘅檢查，唔阻 N1。F3 等硬件。另外兩個設計任務未開：全城植栽語言（V3），同 NW／SE focal 設施辨識。
+N1 等 owner 睇 13 s／日文版 `artifacts/closeup-next/N1/live-13s/` 原圖；批准先由本 branch merge 入 main。另開任務：`residentP3` reduced-motion 既有失敗。24 組 tier 兩秒辨認係 owner 隨時可以補做嘅檢查，唔阻 N1。F3 等硬件。另外兩個設計任務未開：全城植栽語言（V3），同 NW／SE focal 設施辨識。
 
 ## C1 candidate — 2026-10-29
 

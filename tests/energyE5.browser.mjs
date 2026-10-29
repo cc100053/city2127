@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { createContext, createSurveyServer } from '../survey/src/server/server.ts';
+import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 import { ENERGY_CHOICES } from '../survey/src/shared/energy.ts';
 
 function frameStats(values) {
@@ -156,7 +157,7 @@ try {
   await phase('soak-low-auto', minutes * 60, async () => {
     await Promise.all([answer(a, ENERGY_CHOICES[count++ % 4]), answer(b, ENERGY_CHOICES[count++ % 4])]);
     const latest = report.proposals.slice(-2).sort((x, y) => Date.parse(x.displayAt) - Date.parse(y.displayAt));
-    assert.equal(Date.parse(latest[1].displayAt) - Date.parse(latest[0].displayAt), 10_000);
+    assert.equal(Date.parse(latest[1].displayAt) - Date.parse(latest[0].displayAt), DISPLAY_MS);
   });
   const expected = await view();
   assert.equal(expected.guestCount, 16 + count); report.finalView = expected;

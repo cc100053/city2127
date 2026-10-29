@@ -24,6 +24,8 @@ body[data-time=night] footer,body[data-time=night] .intro{text-shadow:0 0 10px r
 .resident-card-title{font-size:21px;line-height:1.5;margin-bottom:10px!important}
 .resident-card-copy{font-size:17px;line-height:1.85}
 .resident-place{font-size:13px;color:#46676e;margin-top:14px!important}
+/* Live energy close-up narration: bottom-left, clear of the result card. */
+.energy-narration{position:fixed;bottom:44px;left:44px;width:440px;padding:18px 20px;background:#f9f8f0e6;border:1px solid #ffffff80;border-radius:8px;box-shadow:0 8px 40px #38432b14;backdrop-filter:blur(12px);font-size:17px;line-height:1.7;color:#354139}.energy-narration h2,.energy-narration p{margin:0}.energy-narration .causal-title{font-size:21px}.energy-narration ol{font-size:17px;padding-left:1.4em;margin:6px 0}.energy-narration li{opacity:.4;transition:opacity .25s}.energy-narration li.active{opacity:1;font-weight:600}.energy-narration .causal-status{font-size:12px}
 /* DEV Scale Lab (`?scaleLab`). */
 .scale-lab{left:20px;right:auto;top:20px;width:330px;max-height:calc(100vh - 40px);z-index:20;display:grid;gap:6px}.scale-lab label{display:flex;justify-content:space-between;align-items:center;gap:8px}.scale-lab select,.scale-lab input[type=number]{width:170px;font:inherit}.scale-lab .lab-check{justify-content:flex-start}
 .lab-transport{display:flex;gap:4px}.lab-transport button{flex:1;font:inherit;padding:5px;border:1px solid #35413930;border-radius:5px;background:#fff9;cursor:pointer}

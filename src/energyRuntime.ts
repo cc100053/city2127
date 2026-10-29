@@ -1,5 +1,5 @@
 import { Mesh, MeshStandardMaterial, type Material, type Scene } from 'three';
-import { energyPrototype } from './energyPrototype.ts';
+import { energyPrototype, type EnergyClock } from './energyPrototype.ts';
 import { sameEnergyConfiguration, emptyEnergyConfiguration, type EnergyConfiguration } from '../survey/src/shared/energy.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 
@@ -10,6 +10,8 @@ export class EnergyRuntime {
   private readonly motions;
   private wingFrom = 1;
   private wingTo = 1;
+  /** Per-part narrated seconds (see energyNarration); empty = every part on the shared clock. */
+  clock: EnergyClock = {};
   constructor(scene: Scene) {
     this.model.root.name = 'energy-city'; scene.add(this.model.root);
     this.motions = [this.model.parts.wing, ...this.model.gardens, this.model.parts.ring, this.model.parts.island, this.model.parts.distribution]
@@ -56,7 +58,7 @@ export class EnergyRuntime {
     }
   }
   update(now: number, reducedMotion: boolean) {
-    this.model.update(now, reducedMotion);
+    this.model.update(now, reducedMotion, this.clock);
     for (const m of this.motions) {
       const t = reducedMotion ? 1 : Math.min(1, Math.max(0, (now - m.start) / SITE_TRANSITION_SECONDS));
       const eased = t * t * (3 - 2 * t);

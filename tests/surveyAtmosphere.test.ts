@@ -3,6 +3,7 @@ import { cityText, residentResult, residentCards, residentIdentity, exhibitionFe
 import { presets } from '../src/presets.ts';
 import { connectSurvey, isExhibitionView, parseSurveyEvent, supersedes, type CityView } from '../src/surveyView.ts';
 import { createWorldState } from '../src/worldState.ts';
+import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 
 const zero = { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 };
 assert.deepEqual(scoresToWorldState(zero), presets.neutral);
@@ -244,13 +245,13 @@ try {
   connectSurvey('ws://example.test/ws', (_kind, next) => stationChanges.push(next.revision), () => {});
   const stationEvent = (stationView: unknown, displayWaitMs: number) => messageListener?.({ data: JSON.stringify({ type: 'city-state-updated', view: stationView, displayWaitMs }) });
   stationEvent(stationViewA, 0);
-  stationEvent(stationViewB, 10_000); // Each on-time result has its ten-second reading slot.
+  stationEvent(stationViewB, DISPLAY_MS); // Each on-time result has its full reading slot.
   assert.deepEqual(stationChanges, [1]);
   messageListener?.({ data: JSON.stringify({ type: 'city-state-snapshot', view: stationViewB, displayMode: 'night' }) });
   assert.deepEqual(stationChanges, [1], 'lighting cannot skip a queued proposal');
-  await new Promise(resolve => setTimeout(resolve, 10_050));
+  await new Promise(resolve => setTimeout(resolve, DISPLAY_MS + 50));
   assert.deepEqual(stationChanges, [1, 2]);
-  stationEvent(stationViewB, 10_000);
+  stationEvent(stationViewB, DISPLAY_MS);
   messageListener?.({ data: JSON.stringify({ type: 'city-state-snapshot', view: initialV2, undoneProposalId: 'station-b' }) });
   assert.deepEqual(stationChanges, [1, 2, 0], 'Undo/reset snapshots clear queued live views and restore immediately');
   for (const metadata of [{ stationId: 'C', displayAt: stationA.displayAt }, { stationId: 'A', displayAt: 'bad-date' }, { stationId: 'A' }]) {
@@ -263,7 +264,7 @@ try {
   connectSurvey('ws://example.test/ws', (kind, next) => recovery.push(`${kind}:${next.revision}`), () => {});
   messageListener?.({ data: JSON.stringify({ type: 'city-state-snapshot', view: initialV2 }) });
   stationEvent(stationViewA, 0);
-  stationEvent(stationViewB, 10_000);
+  stationEvent(stationViewB, DISPLAY_MS);
   const originalTimeout = globalThis.setTimeout;
   // Test disconnect restoration without starting a real reconnect after restoring the socket mock.
   globalThis.setTimeout = ((callback, ms, ...args) => ms === 500
@@ -278,7 +279,7 @@ try {
     const motion: string[] = [];
     connectSurvey('ws://example.test/ws', (kind, next) => motion.push(`${kind}:${next.revision}`), () => {});
     messageListener?.({ data: JSON.stringify({ type: 'city-state-snapshot', view: initialV2 }) });
-    stationEvent(stationViewA, 0); stationEvent(stationViewB, 10_000);
+    stationEvent(stationViewA, 0); stationEvent(stationViewB, DISPLAY_MS);
     media.matches = true; mediaChange?.();
     assert.deepEqual(motion, ['city-state-snapshot:0', 'city-state-updated:1', 'city-state-snapshot:2'], 'reduced-motion changes clear queue immediately');
     const late: string[] = [];

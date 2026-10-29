@@ -7,6 +7,7 @@ import { currentState, currentView } from '../src/server/answerService.ts';
 import { createProposalSession, getProposalSession, submitProposal } from '../src/server/proposalService.ts';
 import type { LifecycleData, ProposalRequest, ProposalSessionData, ServerEvent } from '../src/shared/protocol.ts';
 import { exhibitionFixture, errorCode, ok, staff, startServer } from './surveyFixture.ts';
+import { DISPLAY_MS } from '../src/shared/displayTiming.ts';
 
 const dir = mkdtempSync(join(tmpdir(), 'admin-undo-'));
 const dbPath = join(dir, 'survey.sqlite');
@@ -25,7 +26,7 @@ try {
   // More than the visible 64 proposals: Undo restores the full-history hash, not just the visible band.
   for (let i = 0; i < 65; i++) {
     ok(submitProposal(ctx, request(ok(createProposalSession(ctx).response), `history-${i}`, i % 3)).response);
-    clock.ms += 10_000;
+    clock.ms += DISPLAY_MS;
   }
   const before = currentState(ctx), beforeView = currentView(ctx);
   const session = ok(createProposalSession(ctx).response);
