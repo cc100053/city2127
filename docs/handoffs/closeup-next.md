@@ -3,7 +3,7 @@
 下一個 agent 嘅入口文件（2026-10-29 寫）。冇 chat 歷史都可以由呢度開始。佢唔取代 [closeup-polish](closeup-polish.md)：A–D／Z 嘅標準同進度仍然以嗰份為準（最新版喺 `origin/feat/closeup-polish`，唔係 main）。
 
 - Owner: cc100053（產品／審美決定）；實作：下一個 agent，開工時喺「進度」記低 session。
-- Status: PLANNED
+- Status: PLANNED（C1 嘅 owner 決定 2026-10-29 已記低，見下面）
 - Branch: 每個工作包一條，見下面；C1 用現有 `feat/closeup-polish`。
 - Base commit: `3d0f40ebd5d7350ecdcc05ab3420cacf926dfd9a`（origin/main，2026-10-29 fetch）
 - Last verified commit: NONE（本文件只做文件／連結核對）
@@ -20,6 +20,32 @@
 
 1. 近鏡打磨「開工」。實際狀態：A–D 已經各自做完有限輪數（A／B 三輪；C 嘅 focal／district 三輪、ring 兩輪；D 嘅 NW／wing 三輪、garden2／island 兩輪），全部係 `REVIEW_READY`，**所有 sector 嘅美術 gate 都仲係 FAIL，worker 同 coordinator 都建議唔接受**。所以「開工」即係繼續 relay 嘅下一步（C1），唔係由 A 重新做。
 2. energy-demo 原型「講解儲能週期」嘅做法帶入近鏡嘅能源部件階段（N1）。`feat/energy-demo-camera` 刪除：source、test、完整 diff 同截圖已經存喺 [artifacts/energy-demo-camera](../../artifacts/energy-demo-camera/reference/devEnergyDemo.ts)，handoff 歸檔去 [archive/energy-demo-camera](archive/energy-demo-camera.md)。
+
+## 2026-10-29 近鏡 A–D 決定（owner 授權 Claude 按審美代決，owner 可推翻）
+
+Z 已經由 Codex relay 完成（`origin/feat/closeup-polish` @ `f66cc3a`，量度 checkpoint `f2572e8`）。決定根據 S0 對 Z 嘅 neutral／mixed 日景原圖逐張並排，加 A–D、Z 嘅 REVIEW.md。原則：**只收一眼睇得出比 S0 好、又冇帶來新問題嘅改動**；三輪 pose／builder 微調大多數睇唔出分別，冇必要入 main。
+
+1. **A–D 處理：只收 4 個 pose，其餘全部棄用。**
+   - 收（只改 [headlineCamera.ts](../../src/headlineCamera.ts) `SHOTS` 嗰行，值取自 `origin/feat/closeup-polish`）：
+     - `energy:ring`：環喺畫面正中，個球喺環入面，明顯好過 S0。
+     - `se:district`：S0 個 carrier 跨過 near plane，新 pose 修正咗。
+     - `sw:district`：成條水岸設施睇得全，V1 PASS。
+     - `nw:focal`：正面睇到服務入口。前提係連埋 `eebff28` 嘅 automationHub 服務面一齊收；冇咗服務面，正面只係一個平箱，咁就連 pose 都唔收。
+   - 棄用：
+     - `sw:focal` r3：前景支柱擋住廣場，比 S0 差。
+     - `ne:district`：太俯視，主體太細。佢同 `nw:district` 嘅新 pose 差唔多望住同一段岸，兩個 Meter 會睇落一樣，所以兩個都棄用。
+     - `energy:garden`：拉遠咗，主體細咗。
+     - 其餘 shot（`ne:focal`、`se:focal`、`energy:garden2`／`wing`／`island`）同 S0 幾乎一樣，唔值得收。
+     - 所有 builder 改動，`eebff28` 除外：A 嘅公園樹多咗直身樹幹，同[綠化重形態唔重數量](../ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)嘅方向相反；C 嘅 draw calls 去到約 124%；能源部件嘅改動喺近鏡睇唔出。
+   - `feat/closeup-polish` 唔 merge，保留做證據。收嘅改動由 main 開新 branch 重新做，唔好 cherry-pick 成個 commit；跑 `tests/headlineCamera.test.ts` 同 root 檢查，再用 closeup capture runner 截呢 4 個 shot，同 S0 對比。
+2. **A3／A4：重新定義，唔放寬數字，亦唔再做 hard gate。**
+   - A3 改為只做診斷。S0 量咗 594 條 ray，有 266 條根本冇穿過 world AABB，另外 182 條穿過 bounds 入面嘅空隙，量度方法本身唔準，加實心美術都修唔好。
+   - A4 改為只做診斷。Hard gate 改為 owner 睇相鄰 tier 並排原圖，兩秒內講得出邊張變咗。±1 tier 本身就係細改動，6%／12% 像素差會罰正確嘅設計。
+   - A1、A2、A5、A6 同 V 項目維持 hard gate，A5 用 canonical performance。
+3. **追加輪次：唔開全面第四輪。**
+   - 只授權 `sw:focal` 一輪，淨係改 pose，唔改 builder。要避開 S0 頂部嗰條淺藍高架，又唔可以好似 r3 咁畀支柱擋住廣場，喺 S0 同 r2 之間揀。
+   - 全城 V3 都 FAIL（棒棒糖樹同格仔盆景），呢個係全城植栽語言嘅問題，唔係逐區打磨可以解決，要另開設計任務。
+   - focal 設施認唔出（se、nw 嘅 V1），要改設施設計，唔係打磨可以解決。
 
 ## 工作包（按次序）
 
@@ -48,7 +74,7 @@
   1. Review D：result `closeup-polish-D-1-ddeb642a…`，checkpoint `4a3ad9f`，runtime `44521a0`。對住 `3bb99ce..4a3ad9f` 嘅 source diff 同原圖做，做法同 coordinator-review.md 裏面 A–C 嗰幾段一樣。
   2. Z：照 closeup-polish 第 5 步做。全部 13 個 shot 加 hero，用目前累積 source 喺 S0 條件下重截，同 S0 比較。用 survey `dev:auto` 每個 sector 播一次 live。Chrome 版本由 S0 嘅 `.48` 變咗 `.73`，要記低，唔可以當成同版本比較。
   3. 將 A–D 嘅 `REVIEW.md`（`artifacts/closeup-polish/<A–D>/REVIEW.md`，喺 feature branch 上）交畀 owner。冇 owner 批准，任何 sector 嘅美術都唔准 merge 入 main。
-- 要 owner 決定（C1 完成之後問，唔好自己決定）：
+- D review 同 Z 已經由 relay 完成，owner 決定見「2026-10-29 近鏡 A–D 決定」，下面三點只係保留原本嘅問題：
   - A／B／C／D 每一區：接受、部分接受（例如只要 pose，唔要 builder），定棄用。B 嘅 r3 focal 比 r2 差，前景支柱擋住廣場。
   - A3／A4 門檻：A3 喺所有 sector 差唔多全部 FAIL，A4 只有大約 1–10% 過關。S0 coordinator 已經指出 A3 嘅 world-AABB 取樣空隙唔可以靠加實心美術修好。要 owner 揀：維持門檻、修改量度定義，定接受現狀。**唔准靜靜放寬。**
   - 要唔要第四輪：需要 owner 另外授權。
@@ -102,4 +128,4 @@
 
 ## Next expected step
 
-下一個 agent 先做 F1，再核對 F2，然後按「協調」嗰點確認 C1 由邊個負責之後開始 C1。N1 要等 C1 有 owner 決定先開。
+下一個 agent 先做 F1，再核對 F2。之後由 main 開 `feat/closeup-accepted`，做「2026-10-29 近鏡 A–D 決定」入面收嘅 4 個 pose 加 `eebff28` 服務面，同埋 `sw:focal` 嗰一輪 pose；做完同 S0 並排，交 owner 睇圖先 merge。合併之後先開 N1。
