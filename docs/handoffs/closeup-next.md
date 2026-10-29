@@ -167,7 +167,7 @@ Z 已經由 Codex relay 完成（`origin/feat/closeup-polish` @ `f66cc3a`，量�
 
 ## Next expected step
 
-N1 已入 main。`residentP3` reduced-motion 既有失敗由獨立 session 處理。另開任務：`residentP3` reduced-motion 既有失敗。24 組 tier 兩秒辨認係 owner 隨時可以補做嘅檢查，唔阻 N1。F3 等硬件。另外兩個設計任務未開：全城植栽語言（V3），同 NW／SE focal 設施辨識。
+N1 已入 main。`residentP3` reduced-motion 既有失敗已修（runner 等 `matchMedia` change，`9023c00`），merge 入 main `6ec568c`：合併後 root test／build／diff-check PASS，`residentP3` 13 s 兩次 PASS（Chrome headless 1280×720 hour16）。24 組 tier 兩秒辨認係 owner 隨時可以補做嘅檢查，唔阻 N1。F3 等硬件。另外兩個設計任務未開：全城植栽語言（V3），同 NW／SE focal 設施辨識。
 
 ## C1 candidate — 2026-10-29
 
