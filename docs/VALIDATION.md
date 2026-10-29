@@ -192,6 +192,8 @@ P3在現行v4回歸PASS：Chrome1280×720、hour16，實測A/B閱讀間隔10,002
 
 重跑：先build survey，開root本機預覽，使用既有Playwright安裝；設定`CITY2127_PLAYWRIGHT_PATH`指向其index.mjs，可用`CITY2127_CITY_URL`選預覽、`CITY2127_EVIDENCE_DIR`選新證據資料夾、`CITY2127_CHECKED_COMMIT`記基準，然後`node tests/energyE4.browser.mjs`。該script建立並清理自己的scratch DB／server／browser，不使用展覽SQLite；本機需允許localhost listen及已安裝Chrome。P2亦支援證據資料夾，避免覆寫舊截圖。
 
+2026-10-29 F1/F2（`fix/energy-e4-headline`，baseline `e69874d`）：正式E4 runner逐字採用S0已接受的`headlineResult(view)`與`pickHeadline`／`residentResult` imports，兩處舊能源wait改按headline驗結果；其他斷言、quality、timeout及runtime不變。Root test/build、survey build、helper分支self-check及diff whitespace PASS。macOS27.0.1／已安裝headless Chrome156.0.8078.73、City1920×1080／DPR1／default、Guest1280×900，scratch真實SQLite7→8原矩陣全PASS，page exceptions0，只有預期favicon404／obsolete409／兩次注入abort。第一份結果實際走Meter偏好，第二份走一庭能源fallback；12張新原圖與logs保存在[本批證據](../artifacts/closeup-next/F1/README.md)，舊S0失敗log及原圖保留。F2四項現行文件事實核對通過，無需再改。實際verified／整合／CI見[handoff](handoffs/closeup-next.md)；未量FPS、展覽硬件／Safari／iPad／Windows／訪客理解，C1／N1美術gate仍pending。
+
 
 ## Energy E5 Mac mini baseline — 2026-10-24
 

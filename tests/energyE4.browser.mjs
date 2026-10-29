@@ -8,6 +8,8 @@ import { createContext, createSurveyServer } from '../survey/src/server/server.t
 import { createProposalSession, submitProposal } from '../survey/src/server/proposalService.ts';
 import { currentView } from '../survey/src/server/answerService.ts';
 import { ENERGY_CHOICES, emptyEnergyConfiguration } from '../survey/src/shared/energy.ts';
+import { pickHeadline } from '../survey/src/shared/cityView.ts';
+import { residentResult } from '../src/surveyAtmosphere.ts';
 const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH).href);
 const directory = mkdtempSync(join(tmpdir(), 'energy-e4-browser-'));
 const evidence = process.env.CITY2127_EVIDENCE_DIR ?? 'artifacts/energy-city-e4/formal'; mkdirSync(evidence, { recursive: true });
@@ -61,6 +63,17 @@ async function model(view = currentView(ctx)) {
   }, view, { timeout: 45_000 });
   return view;
 }
+async function headlineResult(view) {
+  await city.waitForFunction(count => document.querySelector('.causal-panel')?.dataset.guestCount === String(count)
+    && document.querySelector('.causal-panel')?.dataset.presentation === 'result'
+    && document.querySelector('.resident-card-copy')?.textContent?.includes('あなたは'), view.guestCount);
+  const proposal=view.latestProposal, headline=pickHeadline(proposal.beforeLayout,proposal.afterLayout);
+  if(headline && 'socketId' in headline) {
+    const expected=residentResult(proposal,[{socketId:headline.socketId,focal:true,district:false}]);
+    assert.ok((await city.locator('.resident-card-copy').textContent()).startsWith(expected.preference));
+    assert.equal(await city.locator('.causal-panel').getAttribute('data-result-kind'),'configuration');
+  } else assert.match(await city.locator('.resident-card-copy').textContent(),/街のエネルギー設備は今の配置|蓄電庭園は1か所/);
+}
 async function answerWater() {
   await guest.locator('[data-auto-action=start]').click();
   for (let i = 0; i < 4; i++) { await guest.locator('input[type=radio]').nth(i === 2 ? 0 : 1).check(); await guest.locator('[data-auto-action=next]').click(); }
@@ -88,7 +101,7 @@ try {
   await guest.getByRole('button', { name: '記録を確認する', exact: true }).click(); await screen(guest, 'result');
   assert.deepEqual(requests[0], requests[1]);
   let view = await read('/api/city-view'); assert.equal(view.energy.counts['water-storage'], 1); assert.equal(view.layout.energy.waterGardens, 0);
-  await city.getByText(/街のエネルギー設備は今の配置/).waitFor();
+  await headlineResult(view);
   await city.screenshot({ path: join(evidence, 'recorded-no-change.png') });
   await guest.locator('[data-auto-action=start]').waitFor({ timeout: 25_000 });
   await answerWater();
@@ -97,7 +110,7 @@ try {
   await guest.getByRole('button', { name: '記録を確認する', exact: true }).click(); await screen(guest, 'result');
   assert.deepEqual(requests[2], requests[3], 'lost committed response retains the identical submission ID');
   view = await read('/api/city-view'); assert.equal(view.energy.counts['water-storage'], 2);
-  await city.getByText(/蓄電庭園は1か所/).waitFor();
+  await headlineResult(view);
   await city.screenshot({ path: join(evidence, 'live-one-garden-result.png') });
   await model(view);
   assert.equal(view.scores.environmentalPriority, oldSaved.state.scores.environmentalPriority);
