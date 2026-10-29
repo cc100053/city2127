@@ -31,8 +31,8 @@ export class SlotLevels {
   }
 
   /** Returns whether any target changed. `immediate` jumps (snapshots, resets, reduced motion). */
-  setTargets(target: (i: number) => number, now: number, immediate: boolean, seed = 0): boolean {
-    this.update(now);
+  setTargets(target: (i: number) => number, now: number, immediate: boolean, seed = 0, sampleAt = now): boolean {
+    this.update(sampleAt);
     // Shuffle the existing ranks, preserving their counts and complementary covers. Zero keeps the original order.
     const order = Array.from({ length: this.to.length }, (_, i) => i);
     let random = seed;
@@ -335,21 +335,21 @@ export class SharingDistrict {
   }
 
   /** `quiet` settles a live change without pulses (another site carries the result's headline). */
-  setTarget({ tiers }: LadderTarget, now: number, immediate: boolean, seed = 0, quiet = false): boolean {
+  setTarget({ tiers }: LadderTarget, now: number, immediate: boolean, seed = 0, quiet = false, sampleAt = now): boolean {
     if (immediate) this.pulses.clear();
     const tier = tiers.sw;
     this.target = ladderShare(tier, .5);
-    const kiosks = this.kiosk.setTargets(() => agree(tiers, 'sw', 'nw', 'high') ? 1 : 0, now, immediate);
-    const orchards = this.orchard.setTargets(() => agree(tiers, 'sw', 'ne', 'high') ? 1 : 0, now, immediate);
+    const kiosks = this.kiosk.setTargets(() => agree(tiers, 'sw', 'nw', 'high') ? 1 : 0, now, immediate, 0, sampleAt);
+    const orchards = this.orchard.setTargets(() => agree(tiers, 'sw', 'ne', 'high') ? 1 : 0, now, immediate, 0, sampleAt);
     // Mixed keeps about a third of rooms and courts open (the former mixed curve); rung 2 goes halfway to all open / all private.
     const mixed = T.MathUtils.smoothstep(.5, .25, .875);
     const roomCut = ladderCut(ranks(this.bays.length, i => rank(i + 401)), tier, mixed), courtCut = ladderCut(ranks(COURT_SITES.length, i => rank(i + 977)), tier, mixed);
     this.root.visible = true;
-    const rooms = this.levels.setTargets(i => rank(i + 401) < roomCut ? 1 : 0, now, immediate, seed);
-    const courts = this.court.setTargets(i => rank(i + 977) < courtCut ? 1 : 0, now, immediate, seed);
+    const rooms = this.levels.setTargets(i => rank(i + 401) < roomCut ? 1 : 0, now, immediate, seed, sampleAt);
+    const courts = this.court.setTargets(i => rank(i + 977) < courtCut ? 1 : 0, now, immediate, seed, sampleAt);
     const hybrid = ladderHybrid(tier);
-    const hr = this.hybridRooms.setTargets(i => rank(i + 433) < hybrid ? 1 : 0, now, immediate, seed);
-    const hc = this.hybridCourts.setTargets(i => rank(i + 1019) < hybrid ? 1 : 0, now, immediate, seed);
+    const hr = this.hybridRooms.setTargets(i => rank(i + 433) < hybrid ? 1 : 0, now, immediate, seed, sampleAt);
+    const hc = this.hybridCourts.setTargets(i => rank(i + 1019) < hybrid ? 1 : 0, now, immediate, seed, sampleAt);
     const changed = rooms || courts || hr || hc || kiosks || orchards;
     const roomSlots = new Set([...(rooms ? this.levels.changed : []), ...(hr ? this.hybridRooms.changed : [])]);
     const courtSlots = new Set([...(courts ? this.court.changed : []), ...(hc ? this.hybridCourts.changed : []), ...(kiosks ? this.kiosk.changed : []),
@@ -664,16 +664,16 @@ export class EnvironmentDistrict {
     this.write();
   }
 
-  private setRoofTargets(now: number, immediate: boolean): boolean {
+  private setRoofTargets(now: number, immediate: boolean, sampleAt = now): boolean {
     const green = (i: number) => rank(i + 37) < this.targetCanopy ? 1 : 0;
-    const a = this.roofSail.setTargets(i => 1 - green(i), now, immediate, this.orderSeed);
-    const b = this.roofCrown.setTargets(green, now, immediate, this.orderSeed);
-    const c = this.roofHybrid.setTargets(i => rank(i + 887) < this.targetHybrid ? 1 : 0, now, immediate, this.orderSeed);
+    const a = this.roofSail.setTargets(i => 1 - green(i), now, immediate, this.orderSeed, sampleAt);
+    const b = this.roofCrown.setTargets(green, now, immediate, this.orderSeed, sampleAt);
+    const c = this.roofHybrid.setTargets(i => rank(i + 887) < this.targetHybrid ? 1 : 0, now, immediate, this.orderSeed, sampleAt);
     return a || b || c;
   }
 
   /** The share of canopy-shaded bays is .5 at mixed, .25 / .75 at rung ∓2 and 0 / 1 in the complete form. */
-  setTarget({ tiers }: LadderTarget, now: number, immediate: boolean, seed = 0, quiet = false): boolean {
+  setTarget({ tiers }: LadderTarget, now: number, immediate: boolean, seed = 0, quiet = false, sampleAt = now): boolean {
     if (immediate) this.pulses.clear();
     const share = ladderShare(tiers.ne, .5);
     this.targetCanopy = share;
@@ -683,13 +683,13 @@ export class EnvironmentDistrict {
     this.applied = true;
     this.root.visible = true;
     const green = (i: number) => rank(i) < share ? 1 : 0;
-    const a = this.canopy.setTargets(green, now, immediate, seed);
-    const b = this.sail.setTargets(i => 1 - green(i), now, immediate, seed);
+    const a = this.canopy.setTargets(green, now, immediate, seed, sampleAt);
+    const b = this.sail.setTargets(i => 1 - green(i), now, immediate, seed, sampleAt);
     // Mist towers only below the midpoint: most at the low end, none from mixed upward.
-    const c = this.tower.setTargets(i => rank(i + 101) >= share * 2 ? 1 : 0, now, immediate, seed);
-    const h = this.hybrid.setTargets(i => rank(i + 577) < this.targetHybrid ? 1 : 0, now, immediate, seed);
-    const d = this.setRoofTargets(now, immediate) || h;
-    this.facade.setTargets(i => facadeShare(i ? 1 - share : share), now, immediate);
+    const c = this.tower.setTargets(i => rank(i + 101) >= share * 2 ? 1 : 0, now, immediate, seed, sampleAt);
+    const h = this.hybrid.setTargets(i => rank(i + 577) < this.targetHybrid ? 1 : 0, now, immediate, seed, sampleAt);
+    const d = this.setRoofTargets(now, immediate, sampleAt) || h;
+    this.facade.setTargets(i => facadeShare(i ? 1 - share : share), now, immediate, 0, sampleAt);
     if ((a || b || c || d) && !immediate && !quiet) {
       const bays = new Set([...this.canopy.changed, ...this.sail.changed, ...this.hybrid.changed, ...this.tower.changed.map(j => this.towerBays[j])]);
       const roofs = new Set([...this.roofSail.changed, ...this.roofCrown.changed, ...this.roofHybrid.changed]);
@@ -944,16 +944,16 @@ export class AutomationDistrict {
 
   get level(): number | undefined { return this.root.visible ? this.automation.value[0] : undefined; }
 
-  setTarget({ tiers }: LadderTarget, now: number, immediate: boolean, seed = 0, quiet = false): boolean {
+  setTarget({ tiers }: LadderTarget, now: number, immediate: boolean, seed = 0, quiet = false, sampleAt = now): boolean {
     if (immediate) this.pulses.clear();
     const tier = tiers.nw;
     // Fleets, aircraft and street pods stay mixed until rung 3 completes the district; the bays switch from rung 2.
     this.target = rungStep(tier) === 1 ? tier > 0 ? 1 : 0 : .5;
     this.root.visible = true;
-    const a = this.automation.setTargets(() => this.target, now, immediate);
+    const a = this.automation.setTargets(() => this.target, now, immediate, 0, sampleAt);
     const cut = ladderCut(ranks(this.bays.length, i => rank(i + 203)), tier, .5);
-    const b = this.staffed.setTargets(i => rank(i + 203) >= cut ? 1 : 0, now, immediate, seed);
-    const h = this.hybrid.setTargets(i => rank(i + 307) < ladderHybrid(tier) ? 1 : 0, now, immediate, seed);
+    const b = this.staffed.setTargets(i => rank(i + 203) >= cut ? 1 : 0, now, immediate, seed, sampleAt);
+    const h = this.hybrid.setTargets(i => rank(i + 307) < ladderHybrid(tier) ? 1 : 0, now, immediate, seed, sampleAt);
     // The fleets change everywhere at once, so the hub anchors the pulse; changed bays (pavilion ↔ drone port ↔ hybrid) mark their terraces.
     const bays = new Set([...(b ? this.staffed.changed : []), ...(h ? this.hybrid.changed : [])]);
     if ((a || b || h) && !immediate && !quiet) this.pulses.emit([sitePulse('nw'), ...[...bays].map(i => ({ x: this.bays[i].x, y: this.bays[i].y + 20, z: this.bays[i].z, r: 26 }))], now);
@@ -1186,21 +1186,21 @@ export class ConcentrationDistrict {
     this.root.visible = false; parent.add(this.root); this.write();
   }
 
-  setTarget({ tiers }: LadderTarget, now: number, immediate: boolean, seed = 0, quiet = false): boolean {
+  setTarget({ tiers }: LadderTarget, now: number, immediate: boolean, seed = 0, quiet = false, sampleAt = now): boolean {
     if (immediate) this.pulses.clear();
     const tier = tiers.se;
     this.target = ladderShare(tier, .5);
-    const f = this.forest.setTargets(() => agree(tiers, 'se', 'ne', 'high') ? 1 : 0, now, immediate);
-    const d = this.docks.setTargets(() => agree(tiers, 'se', 'nw', 'high') ? 1 : 0, now, immediate);
-    const sp = this.solarPods.setTargets(() => agree(tiers, 'se', 'ne', 'low') ? 1 : 0, now, immediate);
+    const f = this.forest.setTargets(() => agree(tiers, 'se', 'ne', 'high') ? 1 : 0, now, immediate, 0, sampleAt);
+    const d = this.docks.setTargets(() => agree(tiers, 'se', 'nw', 'high') ? 1 : 0, now, immediate, 0, sampleAt);
+    const sp = this.solarPods.setTargets(() => agree(tiers, 'se', 'ne', 'low') ? 1 : 0, now, immediate, 0, sampleAt);
     // Mixed keeps about half of towers and pods (the former mixed curve); rung 2 goes halfway to the complete form.
     const share = ladderShare(tier, T.MathUtils.smoothstep(.5, .3, .75));
     this.root.visible = true;
     // Golden-ratio order: with only ten towers a hash rank clusters, this keeps any share evenly spread across both groups.
     const order = (i: number, offset: number) => (i * .6180339887 + offset) % 1;
-    const a = this.towerLevels.setTargets(i => order(i, .31) < share ? 1 : 0, now, immediate, seed);
-    const b = this.podLevels.setTargets(i => order(i, .77) >= share ? 1 : 0, now, immediate, seed);
-    const m = this.midRise.setTargets(i => rank(i + 1301) < ladderHybrid(tier) ? 1 : 0, now, immediate, seed);
+    const a = this.towerLevels.setTargets(i => order(i, .31) < share ? 1 : 0, now, immediate, seed, sampleAt);
+    const b = this.podLevels.setTargets(i => order(i, .77) >= share ? 1 : 0, now, immediate, seed, sampleAt);
+    const m = this.midRise.setTargets(i => rank(i + 1301) < ladderHybrid(tier) ? 1 : 0, now, immediate, seed, sampleAt);
     if ((a || b || m || f || d || sp) && !immediate && !quiet) this.pulses.emit([
       sitePulse('se'),
       ...[...new Set([...(a ? this.towerLevels.changed : []), ...(m ? this.midRise.changed : []), ...(f ? this.forest.changed : []), ...(d ? this.docks.changed : [])])]

@@ -108,8 +108,8 @@ export class CityChangeManager {
     this.transitionChangedSitesOnly(view, now, true);
   }
 
-  /** V2 bands and parameters are authoritative for all four sites. */
-  applyExhibitionLayout(layout: ExhibitionLayout, kind: SurveyEventKind, now: number, slotSeeds?: Scores): CarrierChange[] {
+  /** V2 bands are authoritative; sampleAt is the rendered present when now schedules a future start. */
+  applyExhibitionLayout(layout: ExhibitionLayout, kind: SurveyEventKind, now: number, slotSeeds?: Scores, sampleAt = now): CarrierChange[] {
     const automationHub = this.sites.magnetEast.automationHub;
     const commonsPlaza = this.sites.dogenzakaSouth.commonsPlaza;
     const concentrationTower = this.sites.centerGaiRear.concentrationTower;
@@ -117,7 +117,7 @@ export class CityChangeManager {
     if (!automationHub || !commonsPlaza || !concentrationTower || !park) {
       throw new Error('Missing exhibition runtime for one or more change sites.');
     }
-    this.update(now);
+    this.update(sampleAt);
     if (!this.exhibitionInitialized) this.restoreExhibitionBaseline(now);
     const fresh = kind === 'city-state-updated' && !prefersReducedMotion();
     const immediate = !fresh;
@@ -135,27 +135,27 @@ export class CityChangeManager {
     };
     const before = Object.fromEntries(Object.entries(districts).map(([id, district]) => [id, JSON.stringify(district?.getConfiguration())]));
     const focal = {
-      nw: automationHub.setTarget({ band: layout.bands.nw, automatedPorts: layout.automatedPorts }, now, immediate),
-      sw: commonsPlaza.setTarget({ band: layout.bands.sw, sharedSeats: layout.sharedSeats }, now, immediate),
-      se: concentrationTower.setTarget({ band: layout.bands.se, functionModules: layout.functionModules }, now, immediate),
-      ne: park.setTarget(environmentParkTarget(layout), now, immediate),
+      nw: automationHub.setTarget({ band: layout.bands.nw, automatedPorts: layout.automatedPorts }, now, immediate, sampleAt),
+      sw: commonsPlaza.setTarget({ band: layout.bands.sw, sharedSeats: layout.sharedSeats }, now, immediate, sampleAt),
+      se: concentrationTower.setTarget({ band: layout.bands.se, functionModules: layout.functionModules }, now, immediate, sampleAt),
+      ne: park.setTarget(environmentParkTarget(layout), now, immediate, sampleAt),
     };
     const changed = [
       ['magnetEast', [
         focal.nw,
-        this.sites.magnetEast.automationDistrict?.setTarget(layout, now, immediate, slotSeeds?.automation, quiet('nw')) ?? false,
+        this.sites.magnetEast.automationDistrict?.setTarget(layout, now, immediate, slotSeeds?.automation, quiet('nw'), sampleAt) ?? false,
       ].some(Boolean)],
       ['dogenzakaSouth', [
         focal.sw,
-        this.sites.dogenzakaSouth.sharingDistrict?.setTarget(layout, now, immediate, slotSeeds?.publicSharing, quiet('sw')) ?? false,
+        this.sites.dogenzakaSouth.sharingDistrict?.setTarget(layout, now, immediate, slotSeeds?.publicSharing, quiet('sw'), sampleAt) ?? false,
       ].some(Boolean)],
       ['centerGaiRear', [
         focal.se,
-        this.sites.centerGaiRear.concentrationDistrict?.setTarget(layout, now, immediate, slotSeeds?.urbanConcentration, quiet('se')) ?? false,
+        this.sites.centerGaiRear.concentrationDistrict?.setTarget(layout, now, immediate, slotSeeds?.urbanConcentration, quiet('se'), sampleAt) ?? false,
       ].some(Boolean)],
       ['stationEastPark', [
         focal.ne,
-        this.sites.stationEastPark.environmentDistrict?.setTarget(layout, now, immediate, slotSeeds?.environmentalPriority, quiet('ne')) ?? false,
+        this.sites.stationEastPark.environmentDistrict?.setTarget(layout, now, immediate, slotSeeds?.environmentalPriority, quiet('ne'), sampleAt) ?? false,
       ].some(Boolean)],
     ] as const;
     for (const [siteId, siteChanged] of changed) if (siteChanged && fresh && !quiet(SITE_SOCKETS[siteId])) this.markFresh(siteId, now);

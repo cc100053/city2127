@@ -2,9 +2,9 @@
 
 - Owner: cc100053（產品／審美最終批准，**全部做完先一次過 review**）；實作：Codex（開工時喺「進度」記低 session／thread id）
 - Review 模式（owner 2026-10-29）：長任務，T → F → A 中途**唔使停低等 owner 睇圖**。Codex 自己按下面嘅數字標準同 self-review 判斷，連續做落去；最後交一份總 review 包（見「最終交付」）。
-- Status: PLANNED（2026-10-29 Claude review 後寫；未開工）
+- Status: IN PROGRESS（2026-10-29；T 實作中，F／A 未開始）
 - Branch: `feat/closeup-zoom`（由 verified main 開；T、F、A 三個 checkpoint）
-- Base commit: `00fc5c60abdae164f28956fdce04378b186e8a97`（2026-10-29 fetch，main／origin/main 0/0）
+- Base commit: `2050883e93082af4f96da680c59a7de152fea853`（2026-10-29 fetch，main／origin/main 0/0）
 - Last verified commit: NONE
 - Remote availability: NOT PUSHED
 
@@ -12,11 +12,11 @@
 
 接手 agent 開工時自己填，唔好沿用寫計劃時嘅狀態。
 
-- Session starting branch and HEAD:
-- Last fetched origin/main commit:
+- Session starting branch and HEAD: `main` `2050883e93082af4f96da680c59a7de152fea853`（主 checkout；獨立 clone）
+- Last fetched origin/main commit: `2050883e93082af4f96da680c59a7de152fea853`（2026-10-29）
 - Local changes present at session start:（主 checkout 有未追蹤 `.playwright-cli/`、`.task-relay/`，唔好郁）
-- Upstream integration status:
-- Pending Git conflicts or synchronization blockers:
+- Upstream integration status: main / origin/main 0/0；由此建立 task branch
+- Pending Git conflicts or synchronization blockers: NONE
 
 ## Owner 2026-10-29 反映嘅三個問題
 
@@ -181,4 +181,4 @@ Hero 距離 target ≈787 m。現行 shot 距離（position→target）：
 
 ## 進度
 
-（Codex 開工後填）
+2026-10-29：由協調 session `01a187f8-f4b4-7d01-9817-76ed476e890a` 派 subagent 在獨立 clone 實作；T 程式及 targeted tests 完成，五組 scratch live 20/20、errors 0；root test/build PASS，F / A 未開始。餘下 live shot、A/B 早到及 no-op 未驗。新 8.38 s 能源講解中最長文字約 5.4 字／秒，待真人閱讀測試。

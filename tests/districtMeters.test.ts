@@ -20,6 +20,14 @@ levels.update(3);
 assert.deepEqual([...levels.value], [1, 1]);
 assert.equal(levels.setTargets(() => 1, 4, false), false, 'same target is not a change');
 
+// A second scheduled result samples the currently displayed state, not the first transition's future.
+const pending = new SlotLevels(1);
+pending.setTargets(() => 1, 5.12, false);
+pending.setTargets(() => 0, 8.12, false, 0, 3);
+assert.equal(pending.value[0], 0, 'superseding before start must not jump to the old target');
+pending.update(8.12);
+assert.equal(pending.value[0], 0);
+
 // History changes the order, not the number of selected slots; matching complements still cover every slot.
 const seeded = new SlotLevels(17), complement = new SlotLevels(17);
 seeded.setTargets(i => i < 8 ? 1 : 0, 0, true, 1234);

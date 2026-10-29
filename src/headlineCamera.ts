@@ -3,7 +3,8 @@ import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 import type { CarrierChange } from './cityChangeManager.ts';
 import { HERO_POSITION, HERO_TARGET } from './heroCamera.ts';
 import { energyChangedPart } from './surveyAtmosphere.ts';
-import { ARRIVAL_SECONDS } from './voteJourney.ts';
+import { FLY_OUT, shotTimeline } from './resultTimeline.ts';
+export { FLY_IN, FLY_OUT, shotTimeline } from './resultTimeline.ts';
 
 type Site = CarrierChange['socketId'];
 export type ShotId = `${Site}:${'focal' | 'district'}` | `energy:${'garden' | 'garden2' | 'ring' | 'wing' | 'island'}`;
@@ -35,8 +36,6 @@ export function headlineShot(change: CarrierChange | undefined): ShotId | null {
     default: return null;
   }
 }
-export const FLY_IN = 1.5, FLY_OUT = 2;
-export const shotTimeline = (displayMs = DISPLAY_MS) => ({ flyIn: ARRIVAL_SECONDS, hold: ARRIVAL_SECONDS + FLY_IN, flyOut: displayMs / 1000, done: displayMs / 1000 + FLY_OUT });
 export function shotStage(elapsed: number, displayMs = DISPLAY_MS) {
   const t = shotTimeline(displayMs);
   return elapsed < t.flyIn ? 'journey' : elapsed < t.hold ? 'fly-in' : elapsed < t.flyOut ? 'hold' : elapsed < t.done ? 'fly-out' : 'done';

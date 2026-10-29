@@ -40,8 +40,10 @@ for (const [before,after,shot,place,part] of cases) {
 assert.equal(energyChangedPart(emptyEnergyConfiguration(),emptyEnergyConfiguration()),null);
 const t=shotTimeline();
 assert.equal(t.flyIn,ARRIVAL_SECONDS);assert.equal(t.flyOut,DISPLAY_MS/1000);assert.ok(t.done<RESULT_LEASE_MS/1000);
-assert.ok(t.hold<ARRIVAL_SECONDS+SITE_TRANSITION_SECONDS && t.flyOut>ARRIVAL_SECONDS+SITE_TRANSITION_SECONDS);
-assert.equal(shotStage(3),'fly-in','reason appears during the authored 1.5s flight; hold starts at 4.12s');
+assert.ok(t.change>=t.hold && t.changeEnd<=t.flyOut);
+assert.ok(Math.abs(t.changeEnd-t.change-SITE_TRANSITION_SECONDS)<1e-9);
+assert.ok(Math.abs(t.change-5.12)<1e-9 && Math.abs(t.changeEnd-8.12)<1e-9);
+assert.equal(shotStage(3),'fly-in','the flight starts after the vote journey');
 assert.deepEqual([0,t.flyIn,t.hold,t.flyOut,t.done].map(elapsed=>shotStage(elapsed)),['journey','fly-in','hold','fly-out','done']);
 assert.equal(Object.keys(SHOTS).length,13);
 for (const pose of Object.values(SHOTS)) {

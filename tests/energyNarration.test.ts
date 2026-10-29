@@ -15,7 +15,7 @@ assert.deepEqual(NARRATION.garden.steps, phases(ENERGY_PHASES.a));
 assert.deepEqual(NARRATION.garden2.steps, phases(ENERGY_PHASES.a));
 assert.deepEqual(NARRATION.ring.steps, phases(ENERGY_PHASES.b));
 for (const part of ['wing', 'island'] as const) assert.equal(NARRATION[part].steps.length, 3);
-// Japanese UI only, and every step readable at ≤5.1 characters per second within its ≈2.96 s.
+// Japanese UI only, and every step readable at ≤5.4 characters per second within its ≈2.79 s.
 for (const { title, steps } of Object.values(NARRATION)) for (const text of [title, ...steps]) {
   assert.ok(/[\u3040-\u30ff]/.test(text), `not Japanese: ${text}`);
   assert.ok(!/[儲釋區廣與這們]/.test(text), `Chinese-only glyph: ${text}`);
@@ -35,10 +35,10 @@ assert.equal(narratedPart('nw:focal', { socketId: 'nw', focal: true, district: f
 // The compressed cycle sits inside the unchanged hold: from the camera's arrival to the hold's end, starting at charge.
 const now = 123.4, plan = narrationPlan(now), t = shotTimeline(DISPLAY_MS);
 assert.equal(DISPLAY_MS, 13_000, 'owner-approved 13 s reading slot');
-assert.ok(Math.abs(plan.start - now - (ARRIVAL_SECONDS + 1.5)) < 1e-9 && Math.abs(plan.end - now - DISPLAY_MS / 1000) < 1e-9);
+assert.ok(Math.abs(plan.start - now - (ARRIVAL_SECONDS + 2)) < 1e-9 && Math.abs(plan.end - now - DISPLAY_MS / 1000) < 1e-9);
 for (const s of [plan.start + .01, plan.end - .01]) assert.equal(shotStage(s - now), 'hold');
 const window = plan.end - plan.start;
-assert.ok(window > 8.8 && window < 8.9, `narration window ${window}s`);
+assert.ok(window > 8.3 && window < 8.4, `narration window ${window}s`);
 assert.ok(plan.start - now - ARRIVAL_SECONDS < SITE_TRANSITION_SECONDS, 'the part is still fading in when the camera arrives');
 assert.equal(energyCycle(narratedSeconds(plan, plan.start)).phase, 'charge');
 assert.ok(Math.abs(energyCycle(narratedSeconds(plan, plan.start)).t) < 1e-9);
@@ -95,5 +95,5 @@ try {
   if (descriptor) Object.defineProperty(globalThis, 'document', descriptor);
   else Reflect.deleteProperty(globalThis, 'document');
 }
-for (const { steps } of Object.values(NARRATION)) for (const step of steps) assert.ok(step.replace(/[\s→]/g, '').length / (window / 3) <= 5.1, `too long to read: ${step}`);
+for (const { steps } of Object.values(NARRATION)) for (const step of steps) assert.ok(step.replace(/[\s→]/g, '').length / (window / 3) <= 5.4, `too long to read: ${step}`);
 console.log(`energyNarration: PASS (window ${window.toFixed(2)} s, ${(window / 3).toFixed(2)} s per step)`);

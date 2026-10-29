@@ -23,7 +23,7 @@ export interface ConcentrationTowerDiagnostics {
 }
 
 export interface ConcentrationTowerRuntime {
-  setTarget(target: ConcentrationTowerTarget, now: number, immediate: boolean): boolean;
+  setTarget(target: ConcentrationTowerTarget, now: number, immediate: boolean, sampleAt?: number): boolean;
   update(now: number): void;
   restoreLegacy(): void;
   getDiagnostics(): ConcentrationTowerDiagnostics;
@@ -76,8 +76,8 @@ class ConcentrationTowerController implements ConcentrationTowerRuntime {
     this.write();
   }
 
-  setTarget(target: ConcentrationTowerTarget, now: number, immediate: boolean): boolean {
-    this.update(now);
+  setTarget(target: ConcentrationTowerTarget, now: number, immediate: boolean, sampleAt = now): boolean {
+    this.update(sampleAt);
     const changed = !this.applied || target.band !== this.target.band || target.functionModules !== this.target.functionModules;
     this.target = target;
     this.applied = true;

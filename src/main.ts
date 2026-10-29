@@ -26,6 +26,8 @@ import { isExhibitionView } from './surveyView';
 import { createCityChangeManager } from './createCityChangeManager';
 import { renderQuality } from './renderQuality';
 import { ARRIVAL_SECONDS, VoteJourney } from './voteJourney';
+import { shotTimeline } from './resultTimeline';
+import { DISPLAY_MS } from '../survey/src/shared/displayTiming';
 import { housingPrototype } from './housingPrototype';
 import './style.css';
 
@@ -173,7 +175,7 @@ try {
     const playMeters=(meters:string,at:number)=>{
       devShot=null;
       const reduced=cameraMotion.matches;
-      const changes=cityChanges!.applyExhibitionLayout(devLayout(meters),reduced?'city-state-snapshot':'city-state-updated',reduced?at:at+ARRIVAL_SECONDS);
+      const changes=cityChanges!.applyExhibitionLayout(devLayout(meters),reduced?'city-state-snapshot':'city-state-updated',reduced?at:at+(headlineCamera?shotTimeline().change:ARRIVAL_SECONDS),undefined,at);
       if(reduced)headlineCamera?.cancel();else headlineCamera?.play(changes,at);
       return changes;
     };
@@ -191,17 +193,17 @@ try {
       // Cancel any legacy score blend while preserving its current rendered atmosphere.
       world.blendTo(world.state,now);
       const latest=view.latestProposal;
-      // Vote journey: a live result's four votes fly to the sites first; the city transition and pulses start as they land,
+      // Vote journey: a live result's four votes fly to the sites first; the city transition and pulses start after the close-up settles,
       // while the carrier evidence for the resident card is computed now. Snapshots, resets, Undo and reduced motion stay immediate.
-      if(kind==='city-state-updated'&&latest&&!cameraMotion.matches){
+      if(kind==='city-state-updated'&&latest&&!cameraMotion.matches&&displayMs>=DISPLAY_MS-100){
         journey!.play(latest.votes,latest.ordinal,now);
-        const changes=cityChanges!.applyExhibitionLayout(view.layout,kind,now+ARRIVAL_SECONDS,view.slotSeeds);
+        const changes=cityChanges!.applyExhibitionLayout(view.layout,kind,now+(headlineCamera?shotTimeline(displayMs).change:ARRIVAL_SECONDS),view.slotSeeds,now);
         narration?.play(headlineCamera?.play(changes,now,displayMs)??null,changes[0],now,displayMs);
         return changes;
       }
       headlineCamera?.cancel();narration?.cancel();
       journey!.setLanterns(view.recentProposals);
-      return cityChanges!.applyExhibitionLayout(view.layout,kind,now,view.slotSeeds);
+      return cityChanges!.applyExhibitionLayout(view.layout,kind==='city-state-updated'?'city-state-snapshot':kind,now,view.slotSeeds);
     }
     headlineCamera?.cancel();narration?.cancel();journey!.cancel();
     world.blendTo(scoresToWorldState(view.scores),now);

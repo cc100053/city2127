@@ -308,6 +308,14 @@ assert.equal(hubController.calls.at(-1)?.changed, true);
 assert.equal(hubController.calls.at(-1)?.immediate, false);
 assert.equal(hubController.transitionStart, 22.6);
 
+// A new result before an earlier scheduled transition samples the current frame.
+manager.applyExhibitionLayout(neutral, 'city-state-snapshot', 40);
+manager.applyExhibitionLayout(nwHigh, 'city-state-updated', 45.12, undefined, 40);
+manager.applyExhibitionLayout(neutral, 'city-state-updated', 48.12, undefined, 43);
+close(groups.get('hubUpper')!.scale.y, .001);
+manager.update(48.12);
+close(groups.get('hubUpper')!.scale.y, .001);
+
 // A snapshot settles a live transition and clears every site's pulse immediately.
 manager.applyExhibitionLayout(nwHighFivePorts, 'city-state-snapshot', 23);
 close(groups.get('hubUpper')!.scale.y, 1);
