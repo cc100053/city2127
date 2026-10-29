@@ -163,7 +163,7 @@ Z 已經由 Codex relay 完成（`origin/feat/closeup-polish` @ `f66cc3a`，量�
 ## N1 整合 — 2026-10-29
 
 - Owner 喺本 session 回覆「批准，merge」。Fetch 後 origin/main 仍係 `8f2a8d9`，feature `58ce712` 0 behind；喺 detached `origin/main` 上 no-ff merge 成 `658bb3b`，tree 同 feature 逐 byte 一致，冇 conflict。主 checkout `/Users/fatboy/city2127`（連未追蹤 `.playwright-cli/`、`.task-relay/`）冇郁。
-- 整合 tree：root `npm test`／`npm run build`、survey `npm test`／`npm run build`、`git diff --check origin/main..HEAD` 全部 PASS；module-swap 冇改。Push 後 main CI 結果見下一次記錄／GitHub Actions。
+- 整合 tree：root `npm test`／`npm run build`、survey `npm test`／`npm run build`、`git diff --check origin/main..HEAD` 全部 PASS；module-swap 冇改。已 push main `1d2173e`（merge `658bb3b` + handoff），fresh fetch 確認一致；[main CI 40871259666](https://github.com/cc100053/city2127/actions/runs/40871259666) success。本句係其後純文件更新（CI 按 workflow 跳過）。
 
 ## Next expected step
 
