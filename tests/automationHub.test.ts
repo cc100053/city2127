@@ -15,7 +15,7 @@ Object.defineProperty(globalThis, 'document', {
   },
 });
 
-const assets = { async cloneRoot() { return new T.Group(); } };
+const assets = { async cloneRoot() { return new T.Group().add(new T.Mesh(new T.BoxGeometry(1, 1, 1), dark)); } };
 const scene = new T.Scene();
 const site = buildAutomationHub(scene, { windows: [], signs: [], random: () => .5 }, assets as never);
 if (descriptor) Object.defineProperty(globalThis, 'document', descriptor);
