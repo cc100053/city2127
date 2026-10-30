@@ -1,0 +1,23 @@
+{
+  "complete": false,
+  "browser": "156.0.8078.74",
+  "mode": "fresh scratch real server, two guest sessions and real HTTP/WebSocket; frames document actual scheduler delivery",
+  "frames": [
+    {
+      "elapsedMs": 1793325886466,
+      "type": "connected"
+    },
+    {
+      "elapsedMs": 1793325890606,
+      "type": "city-state-snapshot",
+      "revision": 0
+    },
+    {
+      "elapsedMs": 10,
+      "type": "city-state-updated",
+      "revision": 1
+    }
+  ],
+  "checks": [],
+  "errors": []
+}

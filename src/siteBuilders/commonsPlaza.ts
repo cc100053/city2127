@@ -23,7 +23,7 @@ export interface CommonsPlazaDiagnostics {
 }
 
 export interface CommonsPlazaRuntime {
-  setTarget(target: CommonsPlazaTarget, now: number, immediate: boolean): boolean;
+  setTarget(target: CommonsPlazaTarget, now: number, immediate: boolean, sampleAt?: number): boolean;
   update(now: number): void;
   restoreLegacy(): void;
   getDiagnostics(): CommonsPlazaDiagnostics;
@@ -108,11 +108,11 @@ function createCommonsPlazaRuntime(plaza: T.Group): CommonsPlazaRuntime {
   writeInstances();
 
   const runtime: CommonsPlazaRuntime = {
-    setTarget(next, now, immediate) {
+    setTarget(next, now, immediate, sampleAt = now) {
       if (!Number.isInteger(next.sharedSeats) || next.sharedSeats < 0 || next.sharedSeats > SEAT_COUNT) {
         throw new RangeError(`sharedSeats must be an integer from 0 to ${SEAT_COUNT}.`);
       }
-      runtime.update(now);
+      runtime.update(sampleAt);
       const enteringExhibition = !exhibitionTargetApplied;
       const changed = enteringExhibition || next.band !== target.band || next.sharedSeats !== target.sharedSeats;
       target = { band: next.band, sharedSeats: next.sharedSeats };

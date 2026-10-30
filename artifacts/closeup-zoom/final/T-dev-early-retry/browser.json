@@ -1,0 +1,169 @@
+{
+  "complete": true,
+  "mode": "DEV cityMeters invokes the same client transition path; not the A/B survey scheduler or real simultaneous submissions",
+  "before": {
+    "time": 21.32,
+    "hub": {
+      "band": "mixed",
+      "targetAutomatedPorts": 3,
+      "visibleAutomatedPorts": 3,
+      "targetHumanCounters": 3,
+      "visibleHumanCounters": 3
+    }
+  },
+  "atSecond": 3503,
+  "beforeSecond": {
+    "time": 25.32,
+    "hub": {
+      "band": "high",
+      "targetAutomatedPorts": 6,
+      "visibleAutomatedPorts": 3,
+      "targetHumanCounters": 0,
+      "visibleHumanCounters": 3
+    }
+  },
+  "afterSecond": {
+    "time": 25.32,
+    "hub": {
+      "band": "high",
+      "targetAutomatedPorts": 6,
+      "visibleAutomatedPorts": 3,
+      "targetHumanCounters": 0,
+      "visibleHumanCounters": 3
+    }
+  },
+  "oldPose": {
+    "position": [
+      -313.37299973410575,
+      221.9877652057338,
+      -550.4215203186275
+    ],
+    "target": [
+      -6.264979548425423,
+      32.59037960160428,
+      -161.20506135472374
+    ]
+  },
+  "newPose": {
+    "position": [
+      -313.37299973410575,
+      221.9877652057338,
+      -550.4215203186275
+    ],
+    "target": [
+      -6.264979548425423,
+      32.59037960160428,
+      -161.20506135472374
+    ]
+  },
+  "samples": [
+    {
+      "mark": 200,
+      "elapsed": 3718,
+      "time": 25.32,
+      "hub": {
+        "band": "high",
+        "targetAutomatedPorts": 6,
+        "visibleAutomatedPorts": 3,
+        "targetHumanCounters": 0,
+        "visibleHumanCounters": 3
+      },
+      "pose": {
+        "position": [
+          -319.20886648601373,
+          224.19110265288273,
+          -552.3866591228414
+        ],
+        "target": [
+          -7.217774120165499,
+          32.376000822962766,
+          -158.3466776395035
+        ]
+      }
+    },
+    {
+      "mark": 4800,
+      "elapsed": 8379,
+      "time": 29.32,
+      "hub": {
+        "band": "low",
+        "targetAutomatedPorts": 0,
+        "visibleAutomatedPorts": 3,
+        "targetHumanCounters": 6,
+        "visibleHumanCounters": 3
+      },
+      "pose": {
+        "position": [
+          -29.987439822941212,
+          114.98708096073955,
+          -454.9721881793698
+        ],
+        "target": [
+          40,
+          43,
+          -300
+        ]
+      }
+    },
+    {
+      "mark": 8500,
+      "elapsed": 12148,
+      "time": 33.32,
+      "hub": {
+        "band": "low",
+        "targetAutomatedPorts": 0,
+        "visibleAutomatedPorts": 3,
+        "targetHumanCounters": 6,
+        "visibleHumanCounters": 6
+      },
+      "pose": {
+        "position": [
+          -27.704802074306713,
+          112.63922499071546,
+          -449.9177760216791
+        ],
+        "target": [
+          40,
+          43,
+          -300
+        ]
+      }
+    },
+    {
+      "mark": 15000,
+      "elapsed": 18717,
+      "time": 39.32,
+      "hub": {
+        "band": "low",
+        "targetAutomatedPorts": 0,
+        "visibleAutomatedPorts": 0,
+        "targetHumanCounters": 6,
+        "visibleHumanCounters": 6
+      },
+      "pose": {
+        "position": [
+          -520,
+          300,
+          -620.0000000000002
+        ],
+        "target": [
+          -40,
+          25,
+          -59.999999999999986
+        ]
+      }
+    },
+    {
+      "mark": "settled",
+      "time": 39.32,
+      "hub": {
+        "band": "low",
+        "targetAutomatedPorts": 0,
+        "visibleAutomatedPorts": 0,
+        "targetHumanCounters": 6,
+        "visibleHumanCounters": 6
+      }
+    }
+  ],
+  "errors": []
+}

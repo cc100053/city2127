@@ -384,3 +384,21 @@ SW focal pull-back（2026-10-29，owner批准後）：`sw:focal` 拉遠到 `[-16
 `feat/energy-narration`（base `8f2a8d9`，runtime `045025d`），**未 merge，等 owner 睇圖**。Root `npm test`（新 [energyNarration.test.ts](../tests/energyNarration.test.ts)：phase 文字對應、5.88 s 窗口喺 hold 入面、由充能開始、時鐘連續、只講一個週期、水庭三 phase 可見分別、其他部件跟共享鐘、取消／下一結果／reduced motion 還原鐘）、`npm run build`、`git diff --check` PASS；build 只有既有 chunk-size／JSON import-attributes warning。macOS 27.0.1、Chrome 156.0.8078.73 headless、1920×1080 DPR1 default：[live runner](../artifacts/closeup-next/N1/live.mjs) 用 dev:auto 模式 scratch server／SQLite、真 HTTP／WebSocket，五個部件各跑 reduced motion（唔講解、留 hero）、完整講解（每步實測 1.90–2.00 s）同一次中途中斷（Undo、下一結果、TCP reconnect、reset、reload），errors 0；15 張原圖已逐張睇。S0 capture runner：A6 34/34；A5 hero 日／夜 104.8%／100.3% FPS、calls 950／948 PASS，能源 8/10，ring 夜 94.3%、wing 日 94.2% FAIL；同 session 對 `origin/main` 診斷 A/B 差 ≤1%。[證據、代決同限制](../artifacts/closeup-next/N1/README.md)。未測展覽硬件、Safari／iPad／Windows、長跑同真人閱讀。
 
 N1 更新（同日 owner 決定）：`DISPLAY_MS` 10 → 13 s（所有結果，lease 18 s），字幕同 `ENERGY_PHASES` 改日文。Root／survey `npm test`／`npm run build`、`git diff --check` PASS；測試入面寫死嘅 10 s／15 s 改為由 `DISPLAY_MS`／`RESULT_LEASE_MS` 推算。[live-13s](../artifacts/closeup-next/N1/live-13s/browser.json) 五部件 PASS（每步 2.90–3.00 s），formal E4 PASS。`residentP3.browser.mjs` reduced-motion 一步（期望 ambient、實際 result）喺未改嘅 `origin/main` 同樣失敗，屬既有問題。A5／A6 冇重量（冇改幾何／材質）。
+
+## Closeup zoom T — 2026-10-29（進行中）
+
+獨立 clone 基於 `2050883e93082af4f96da680c59a7de152fea853`；T 時間線修改後 root `npm test`、`npm run build` 及 `git diff --check` 通過。初次 sandbox 測試因禁止 loopback (`EPERM`) 中止，重跑使用獲准的 loopback。Build 有既有 JSON import attributes / chunk-size warning。`energyNarration.test.ts` 新的 8.38 秒窗口實測每步 2.79 秒，現有最長文字約 5.4 字／秒；尚待真人閱讀測試。Scratch live runner（Chrome 156.0.8078.73、1920×1080、DPR 1）五組：能源環、SW focal／district、SE district、NW focal；20/20 檢查通過、console/page error 0，包括三時點圖、reload、Undo、reduced motion：[原圖與資料](../artifacts/closeup-zoom/final/T-verified/browser.json)。兩次初跑分別因 runner 過早檢查返回 hero 和等待 diagnostics 不足而失敗，修正 runner 後重跑；其餘 shot、A/B 早到、no-op 尚未驗證。
+
+T 補測：無 `displayAt` 的 v2 更新在 reduced motion 時，理由延遲函數回傳 0；catch-up 亦為 0，正常 live 為 8120 ms（`headlineCamera.test.ts`）。Scratch server SW focal 額外確認 reduced motion 即時恢復 ambient 卡，4/4、errors 0（[browser.json](../artifacts/closeup-zoom/final/T-reduced-retry/browser.json)）；首次初始化在其他 Chrome capture 佔用下 30 秒逾時，延長等待後重跑通過。
+
+Closeup-zoom F 候選（2026-10-30）：SW 真實 scratch server live／reload／Undo／reduced motion 4/4、errors 0；hold 慢推與 fly-out 連續有單元測試。F 視覺硬門檻仍 FAIL：SE／NW focal 尺寸與 district carrier 辨認未達；原圖、量度和試驗失敗見 [F review](../artifacts/closeup-zoom/final/F-review.md)。展示硬件 FPS、真人辨認、其餘 live scenarios 未驗。
+
+Closeup-zoom A NE（2026-10-30）：三輪自評未達，保留原公園；日夜 tier／hero 圖、穩定 FPS／calls 與 R3 patch 見 [NE review](../artifacts/closeup-zoom/final/A-ne-review/README.md)。R3 夜近鏡 calls 比基準多 45.3%，FAIL；數據只反映當次本機 headless Chrome，真人及展示機未驗。
+
+Closeup-zoom A SW（2026-10-30）：三輪自評未達，保留 F checkpoint 設計；日夜 tier／hero 圖、穩定 FPS／總 calls 與 R3 patch 見 [SW review](../artifacts/closeup-zoom/final/A-sw-review/README.md)。Per-site calls、真人辨認及展示機未驗。
+
+Closeup-zoom A SE（2026-10-30）：保留 R3 候選，邊界、色帶及材質測試通過；F 主體過細仍未解決，夜景色帶偏白。日夜 tier／hero 圖、穩定 FPS、總 calls 及 per-site mesh 代理值見 [SE review](../artifacts/closeup-zoom/final/A-se-review/README.md)；真人、展示機及 per-site GPU calls 未驗。
+
+Closeup-zoom A NW（2026-10-30）：三輪仍未能清楚辨認屋頂物流，恢復 F 原候選；[原圖、受污染擷取及限制](../artifacts/closeup-zoom/final/A-nw-review/README.md)。全 root `npm test`、`npm run build`、`git diff --check` PASS（sandbox 首跑 loopback EPERM，獲准後重跑；build 有既有 warning）。能源花園實際模型的 [pose 對比](../artifacts/closeup-zoom/final/energy-garden-review/) 顯示中央柱遮擋減輕，但左側仍有柱；水庭第二份提案 live／reload／Undo／reduced motion 4/4，首份沒有觸發變化，首跑失敗保留；獨立 no-op hero 檢查 1/1，errors 0。最終 owner 接受未主張。
+
+Closeup-zoom 追加 live：水庭第二次 4/4、no-op 1/1；[A/B](../artifacts/closeup-zoom/final/T-live-ab-stations/browser.json) 第二次 3509 ms、WebSocket 3514 ms 到達，排程顯示 A 後 13 秒，最終狀態一致、errors 0；未量逐 frame 相機連續。[DEV 提前取代](../artifacts/closeup-zoom/final/T-dev-early-retry/browser.json) 3503 ms 最終回 low；首次診斷未刷新而失敗。前兩次 A/B fixture 用單站而被拒絕，結果見總 review。

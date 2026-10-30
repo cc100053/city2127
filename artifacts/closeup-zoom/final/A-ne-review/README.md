@@ -1,0 +1,8 @@
+# NE park — three trials, main retained
+
+2026-10-30 self-review: **FAIL**. Three candidates added curved shoreline terraces and joined foliage masses while retaining tree slots, materials and baked batches. R1 placed foliage low; R2 lifted it; R3 widened it. The added masses still look suspended among the existing tree forms rather than forming a convincing layered canopy, and neighbouring tiers are not reliably distinguishable in two seconds. R3's measured night focal draw calls also exceeded the 10% gate. The implementation was therefore removed and the existing F checkpoint park retained, as the handoff permits; [the compressed R3 patch](r3.patch.gz) and every original screenshot remain for review.
+
+- [Day tier comparison](tiers-12.jpg), [night tier comparison](tiers-22.jpg), [hero before/R3](hero.jpg).
+- Raw baseline and R1/R2/R3 hero, focal and district images at −2/0/+2 and 12:00/22:00: sibling `A-ne-before`, `A-ne-r1`, `A-ne-r2`, `A-ne-r3` folders; corresponding `capture.json` records browser and viewport.
+- Stable 120-frame samples after two updates: baseline hero day 60.1 FPS / 950 calls, focal 59.9 / 817; hero night 60 / 950, focal 60 / 817. R3 hero day 60 / 950, focal 60.1 / 817; hero night 60 / 950, focal 60 / 1187. The R3 night focal count is 45.3% above baseline and fails the ≤10% cap. See sibling `A-ne-perf-before` and `A-ne-perf-r3` capture records. These are single samples on the current ARM64 macOS host with headless Chrome 156.0.8078.74 at 1600×900 DPR1, not exhibition hardware.
+- Hero comparison does not establish the requested visual improvement; owner review and real guest recognition remain untested. No claim of acceptance or performance stability is made.

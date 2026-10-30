@@ -6,6 +6,7 @@ import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
 import { HeadlineCamera, SHOTS, headlineShot, shotStage, shotTimeline, type ShotId } from '../src/headlineCamera.ts';
 import { HERO_POSITION, HERO_TARGET } from '../src/heroCamera.ts';
 import { ARRIVAL_SECONDS } from '../src/voteJourney.ts';
+import { reasonDelayMs } from '../src/resultTimeline.ts';
 import { SITE_TRANSITION_SECONDS } from '../src/siteBuilders/siteRuntime.ts';
 import { energyChangedPart, residentResult } from '../src/surveyAtmosphere.ts';
 import type { ExhibitionProposal } from '../src/surveyView.ts';
@@ -40,13 +41,19 @@ for (const [before,after,shot,place,part] of cases) {
 assert.equal(energyChangedPart(emptyEnergyConfiguration(),emptyEnergyConfiguration()),null);
 const t=shotTimeline();
 assert.equal(t.flyIn,ARRIVAL_SECONDS);assert.equal(t.flyOut,DISPLAY_MS/1000);assert.ok(t.done<RESULT_LEASE_MS/1000);
-assert.ok(t.hold<ARRIVAL_SECONDS+SITE_TRANSITION_SECONDS && t.flyOut>ARRIVAL_SECONDS+SITE_TRANSITION_SECONDS);
-assert.equal(shotStage(3),'fly-in','reason appears during the authored 1.5s flight; hold starts at 4.12s');
+assert.ok(t.change>=t.hold && t.changeEnd<=t.flyOut);
+assert.ok(Math.abs(t.changeEnd-t.change-SITE_TRANSITION_SECONDS)<1e-9);
+assert.ok(Math.abs(t.change-5.12)<1e-9 && Math.abs(t.changeEnd-8.12)<1e-9);
+assert.ok(Math.abs(reasonDelayMs(DISPLAY_MS,false)-8120)<1e-6);
+assert.equal(reasonDelayMs(DISPLAY_MS,true),0);
+assert.equal(reasonDelayMs(DISPLAY_MS-101,false),0);
+assert.equal(shotStage(3),'fly-in','the flight starts after the vote journey');
 assert.deepEqual([0,t.flyIn,t.hold,t.flyOut,t.done].map(elapsed=>shotStage(elapsed)),['journey','fly-in','hold','fly-out','done']);
 assert.equal(Object.keys(SHOTS).length,13);
-for (const pose of Object.values(SHOTS)) {
+for (const [id, pose] of Object.entries(SHOTS)) {
   const p=new Vector3(...pose.position),target=new Vector3(...pose.target);
   assert.ok(p.y>target.y);assert.ok(p.distanceTo(target)>=40&&p.distanceTo(target)<=450);
+  if(id.endsWith(':district')) assert.ok(p.distanceTo(target)<=260);
   assert.ok(p.x<target.x||p.z<target.z);
 }
 const camera=new PerspectiveCamera(42),controls={target:new Vector3(...HERO_TARGET),enabled:true,update(){}};
@@ -55,6 +62,10 @@ const controller=new HeadlineCamera(camera,controls),first={socketId:'ne' as con
 controller.play([first],10);assert.equal(controller.active,true);assert.equal(controls.enabled,false);
 controller.update(10);assert.deepEqual(camera.position.toArray(),HERO_POSITION);
 controller.update(10+t.hold);assert.deepEqual(camera.position.toArray(),SHOTS['ne:focal'].position);
+controller.update(10+t.flyOut);
+const pushed=new Vector3(...SHOTS['ne:focal'].position).lerp(new Vector3(...SHOTS['ne:focal'].target),.07);
+assert.ok(camera.position.distanceTo(pushed)<1e-8, 'hold pushes in by seven percent');
+controller.update(10+t.flyOut+1e-6);assert.ok(camera.position.distanceTo(pushed)<1e-6, 'fly-out starts without a jump');
 const interrupted=camera.position.clone(),aim=controls.target.clone();
 controller.play([{socketId:'sw',focal:false,district:true}],20);controller.update(20);
 assert.ok(camera.position.equals(interrupted));assert.ok(controls.target.equals(aim));

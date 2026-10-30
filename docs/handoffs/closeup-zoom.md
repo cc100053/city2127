@@ -2,21 +2,21 @@
 
 - Owner: cc100053（產品／審美最終批准，**全部做完先一次過 review**）；實作：Codex（開工時喺「進度」記低 session／thread id）
 - Review 模式（owner 2026-10-29）：長任務，T → F → A 中途**唔使停低等 owner 睇圖**。Codex 自己按下面嘅數字標準同 self-review 判斷，連續做落去；最後交一份總 review 包（見「最終交付」）。
-- Status: PLANNED（2026-10-29 Claude review 後寫；未開工）
+- Status: INTEGRATION（owner 2026-10-30 指示 merge 候選；F／A 視覺硬門檻未達）
 - Branch: `feat/closeup-zoom`（由 verified main 開；T、F、A 三個 checkpoint）
-- Base commit: `00fc5c60abdae164f28956fdce04378b186e8a97`（2026-10-29 fetch，main／origin/main 0/0）
-- Last verified commit: NONE
-- Remote availability: NOT PUSHED
+- Base commit: `2050883e93082af4f96da680c59a7de152fea853`（2026-10-29 fetch，main／origin/main 0/0）
+- Last verified feature commit: `86931ed218fdec442b54ed375d45dc964c7edd55`（root test/build/diff；browser 部分驗證）
+- Remote availability: `origin/feat/closeup-zoom` at `86931ed218fdec442b54ed375d45dc964c7edd55`
 
 ## Session Git state
 
 接手 agent 開工時自己填，唔好沿用寫計劃時嘅狀態。
 
-- Session starting branch and HEAD:
-- Last fetched origin/main commit:
+- Session starting branch and HEAD: `main` `2050883e93082af4f96da680c59a7de152fea853`（主 checkout；獨立 clone）
+- Last fetched origin/main commit: `2050883e93082af4f96da680c59a7de152fea853`（2026-10-29）
 - Local changes present at session start:（主 checkout 有未追蹤 `.playwright-cli/`、`.task-relay/`，唔好郁）
-- Upstream integration status:
-- Pending Git conflicts or synchronization blockers:
+- Upstream integration status: main / origin/main 0/0；由此建立 task branch
+- Pending Git conflicts or synchronization blockers: NONE
 
 ## Owner 2026-10-29 反映嘅三個問題
 
@@ -181,4 +181,21 @@ Hero 距離 target ≈787 m。現行 shot 距離（position→target）：
 
 ## 進度
 
-（Codex 開工後填）
+2026-10-29：由協調 session `01a187f8-f4b4-7d01-9817-76ed476e890a` 派 subagent 在獨立 clone 實作；T 程式及 targeted tests 完成，五組 scratch live 20/20、errors 0；root test/build PASS，F / A 未開始。餘下 live shot、A/B 早到及 no-op 未驗。新 8.38 s 能源講解中最長文字約 5.4 字／秒，待真人閱讀測試。補修無 `displayAt` 的 reduced-motion 理由即時性；正常 server 的 reduced-motion ambient UI 補測 4/4、errors 0。
+
+2026-10-30 續作：遠端 fetch 等待約 1 分鐘無回應而中止；遠端新鮮度未能重新核實。保留現有 feature checkout／F 未提交工作；整合或推送前必須重試。
+
+F 候選自評：NE／SW focal 達數字範圍；SE／NW focal 未達、SW 等 district carrier 不可讀；整體 FAIL，詳見 [量度及原圖](../../artifacts/closeup-zoom/final/F-review.md)。保留未通過項目供 A 與後續驗證，不視作 owner 接受。
+2026-10-30 限時重試 fetch 成功：`origin/main` 前進至 `f91236b`（新增 guest-agency 計劃，明確依賴本任務先完成）；本 feature 與其 remote 0/0。按流程未自動 merge；整合前須再核對。
+
+A NE（2026-10-30）：三輪均未達自評，保留既有公園程式；原因、數字、原圖及 R3 patch 見 [NE review](../../artifacts/closeup-zoom/final/A-ne-review/README.md)。不視為美術完成或 owner 接受；繼續 SW。
+
+A SW（2026-10-30）：三輪活動仍難辨、牌字仍裁切，保留 F checkpoint 原設計；[SW review](../../artifacts/closeup-zoom/final/A-sw-review/README.md) 保存圖、patch 及效能。Per-site draw calls 未獨立測，未驗收；繼續 SE。
+
+A SE（2026-10-30）：保留 R3 候選，新增屋頂框架、低 tier 構架及以共享材質／instance colour 實現的 Meter 環；日景橙色可見、夜景偏白。主體仍過細、真人辨認及 per-site GPU calls 未驗；[SE review](../../artifacts/closeup-zoom/final/A-se-review/README.md) 保存三輪、基準及實測。繼續 NW，最終 owner 一次過 review。
+
+A NW（2026-10-30）：三輪屋頂物流及近鏡嘗試仍未能清楚辨識，恢復 F 原候選；[NW review](../../artifacts/closeup-zoom/final/A-nw-review/README.md) 保存各輪及受污染擷取的限制。NW A 與 F 尺寸仍未通過，留待 owner review。
+
+總 review（2026-10-30）：[統一證據與缺口](../../artifacts/closeup-zoom/final/README.md)。能源花園候選 pose 減少中央柱遮擋，左側仍有柱；marker 未更動。F／A 未達標；owner 已明確指示合併目前候選。Root npm test／build／diff check PASS，展示硬件、真人辨認及缺少的 live 情境未驗。
+
+G7 協調（2026-10-30，依 main `f91236b` 的 [guest-agency G7](https://github.com/cc100053/city2127/blob/f91236b/docs/handoffs/guest-agency.md)）：本任務既有 `*:district` 是未有 `CarrierChange.points` 時的 fallback；guest-agency 會另設覆蓋實際變化 slot 的 authored viewpoints，按 points 揀選。G7 沿用本任務先推近、settle、再變化的時間線與 hold 慢推。不要把現有 district 構圖未達標說成 G7 已完成；本任務不實作 G7 或修改 guest-agency handoff。

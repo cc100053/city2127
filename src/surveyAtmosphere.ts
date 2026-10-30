@@ -1,6 +1,6 @@
 import type { EnergyConfiguration } from '../survey/src/shared/energy.ts';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
-import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
+import { reasonDelayMs } from './resultTimeline.ts';
 import type { CarrierChange } from './cityChangeManager.ts';
 import type { DisplayMode } from './dayCycle.ts';
 import { presets, type WorldState } from './presets.ts';
@@ -288,8 +288,8 @@ export function startSurveyAtmosphere(
         const showReason = () => {
           latest.querySelector('.resident-card-copy')!.textContent = `${result.preference}${result.effect}`;
         };
-        const transitionMs = SITE_TRANSITION_SECONDS * 1000;
-        if (displayMs < DISPLAY_MS - 100) showReason();
+        const transitionMs = reasonDelayMs(displayMs, globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
+        if (transitionMs === 0) showReason();
         else reasonTimer = window.setTimeout(showReason, transitionMs);
         storyTimer = window.setTimeout(showAmbient, displayMs);
       } else {

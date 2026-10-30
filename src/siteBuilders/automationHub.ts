@@ -25,7 +25,7 @@ export interface AutomationHubDiagnostics {
 }
 
 export interface AutomationHubRuntime {
-  setTarget(target: AutomationHubTarget, now: number, immediate: boolean): boolean;
+  setTarget(target: AutomationHubTarget, now: number, immediate: boolean, sampleAt?: number): boolean;
   update(now: number): void;
   restoreLegacy(): void;
   getDiagnostics(): AutomationHubDiagnostics;
@@ -87,8 +87,8 @@ function createAutomationHubRuntime(slots: ServiceSlot[], root:T.Group, base:T.G
 
   settle(3);
   return {
-    setTarget(next, now, immediate) {
-      this.update(now);
+    setTarget(next, now, immediate, sampleAt = now) {
+      this.update(sampleAt);
       const changed = !applied || next.band !== target.band || next.automatedPorts !== target.automatedPorts;
       target = next;
       applied = true;

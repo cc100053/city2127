@@ -27,7 +27,7 @@ export interface EnvironmentParkDiagnostics {
 }
 
 export interface EnvironmentParkRuntime {
-  setTarget(target: EnvironmentParkTarget, now: number, immediate: boolean): boolean;
+  setTarget(target: EnvironmentParkTarget, now: number, immediate: boolean, sampleAt?: number): boolean;
   restoreLegacy(): void;
   update(now: number): void;
   getDiagnostics(): EnvironmentParkDiagnostics;

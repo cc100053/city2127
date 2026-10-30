@@ -1,0 +1,151 @@
+{
+  "site": "se",
+  "images": [
+    {
+      "hour": 12,
+      "kind": "hero",
+      "score": 0,
+      "file": "hero-12.jpg",
+      "metrics": {
+        "fps": 8.8,
+        "drawCalls": 950
+      }
+    },
+    {
+      "hour": 12,
+      "kind": "focal",
+      "score": -4,
+      "file": "focal--4-12.jpg",
+      "metrics": {
+        "fps": 8.8,
+        "drawCalls": 950
+      }
+    },
+    {
+      "hour": 12,
+      "kind": "focal",
+      "score": 0,
+      "file": "focal-0-12.jpg",
+      "metrics": {
+        "fps": 60,
+        "drawCalls": 1042
+      }
+    },
+    {
+      "hour": 12,
+      "kind": "focal",
+      "score": 4,
+      "file": "focal-4-12.jpg",
+      "metrics": {
+        "fps": 60.1,
+        "drawCalls": 702
+      }
+    },
+    {
+      "hour": 12,
+      "kind": "district",
+      "score": -4,
+      "file": "district--4-12.jpg",
+      "metrics": {
+        "fps": 60,
+        "drawCalls": 678
+      }
+    },
+    {
+      "hour": 12,
+      "kind": "district",
+      "score": 0,
+      "file": "district-0-12.jpg",
+      "metrics": {
+        "fps": 60,
+        "drawCalls": 678
+      }
+    },
+    {
+      "hour": 12,
+      "kind": "district",
+      "score": 4,
+      "file": "district-4-12.jpg",
+      "metrics": {
+        "fps": 60,
+        "drawCalls": 702
+      }
+    },
+    {
+      "hour": 22,
+      "kind": "hero",
+      "score": 0,
+      "file": "hero-22.jpg",
+      "metrics": {
+        "fps": 6,
+        "drawCalls": 950
+      }
+    },
+    {
+      "hour": 22,
+      "kind": "focal",
+      "score": -4,
+      "file": "focal--4-22.jpg",
+      "metrics": {
+        "fps": 6,
+        "drawCalls": 950
+      }
+    },
+    {
+      "hour": 22,
+      "kind": "focal",
+      "score": 0,
+      "file": "focal-0-22.jpg",
+      "metrics": {
+        "fps": 60,
+        "drawCalls": 674
+      }
+    },
+    {
+      "hour": 22,
+      "kind": "focal",
+      "score": 4,
+      "file": "focal-4-22.jpg",
+      "metrics": {
+        "fps": 60.1,
+        "drawCalls": 702
+      }
+    },
+    {
+      "hour": 22,
+      "kind": "district",
+      "score": -4,
+      "file": "district--4-22.jpg",
+      "metrics": {
+        "fps": 60,
+        "drawCalls": 678
+      }
+    },
+    {
+      "hour": 22,
+      "kind": "district",
+      "score": 0,
+      "file": "district-0-22.jpg",
+      "metrics": {
+        "fps": 60,
+        "drawCalls": 678
+      }
+    },
+    {
+      "hour": 22,
+      "kind": "district",
+      "score": 4,
+      "file": "district-4-22.jpg",
+      "metrics": {
+        "fps": 59.9,
+        "drawCalls": 1086
+      }
+    }
+  ],
+  "errors": [],
+  "browser": "156.0.8078.74",
+  "viewport": [
+    1600,
+    900
+  ]
+}

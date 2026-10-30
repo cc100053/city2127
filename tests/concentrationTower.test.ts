@@ -3,6 +3,8 @@ import * as T from 'three';
 import type { Kit } from '../src/cityRig.ts';
 import { changeSites } from '../src/layout.ts';
 import { buildConcentrationTower } from '../src/siteBuilders/concentrationTower.ts';
+import { METER_COLORS } from '../src/districtMeters.ts';
+import { publicLight } from '../src/cityRig.ts';
 
 const HIDDEN = 1e-3;
 const documentDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'document');
@@ -41,6 +43,14 @@ try {
   const baseLayer = site.layers.towerBase!.group;
   const neutralPropsLayer = site.layers.towerNeutralProps!.group;
   const upperState = { visible: upperLayer.visible, scaleY: upperLayer.scale.y };
+  const bands = site.root.getObjectsByProperty('name', 'tower-meter-band') as T.InstancedMesh[];
+  assert.equal(bands.length, 2);
+  for (const band of bands) {
+    assert.equal(band.material, publicLight, 'meter bands reuse the shared finish');
+    const color = new T.Color(); band.getColorAt(0, color);
+    const expected = new T.Color(METER_COLORS.urbanConcentration);
+    assert.ok(Math.abs(color.r-expected.r)<1e-6 && Math.abs(color.g-expected.g)<1e-6 && Math.abs(color.b-expected.b)<1e-6);
+  }
 
   assert.equal(runtime.setTarget({ band: 'low', functionModules: 2 }, 0, false), true);
   assert.equal(runtime.getDiagnostics().representation, 'pavilion-pair');

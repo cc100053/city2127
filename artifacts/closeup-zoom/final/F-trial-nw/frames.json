@@ -1,0 +1,296 @@
+{
+  "results": [
+    {
+      "id": "nw:focal",
+      "score": -4,
+      "frame": {
+        "id": "nw:focal",
+        "subject": "survey-site-nw",
+        "box": {
+          "left": 0.3875130044185724,
+          "right": 0.6124869955814276,
+          "top": 0.4968904818661253,
+          "bottom": 0.9964723205098692
+        },
+        "reason": null,
+        "worldBounds": {
+          "min": [
+            24.40000057220459,
+            1.2000000178813934,
+            -314.0999994277954
+          ],
+          "max": [
+            55.59999942779541,
+            37.5,
+            -285.9000005722046
+          ]
+        },
+        "hits": 5,
+        "samples": [
+          {
+            "x": 0.5,
+            "y": 0.7466814011879972,
+            "hit": true,
+            "first": "fixed-kit",
+            "distance": 113.51587625458333
+          },
+          {
+            "x": 0.4100104035348579,
+            "y": 0.5468486657304996,
+            "hit": false,
+            "first": "TERRAIN_LOW_DENSITY",
+            "distance": 208.5567253207685
+          },
+          {
+            "x": 0.589989596465142,
+            "y": 0.5468486657304996,
+            "hit": false,
+            "first": "concentration-vertical-towers",
+            "distance": 151.76623651340697
+          },
+          {
+            "x": 0.4100104035348579,
+            "y": 0.9465141366454948,
+            "hit": true,
+            "first": "guest-marker-nw",
+            "distance": 128.81112287473024
+          },
+          {
+            "x": 0.589989596465142,
+            "y": 0.9465141366454948,
+            "hit": true,
+            "first": "guest-marker-nw",
+            "distance": 128.81112287473024
+          },
+          {
+            "x": 0.5,
+            "y": 0.5468486657304996,
+            "hit": true,
+            "first": "fixed-kit",
+            "distance": 121.89335250535925
+          },
+          {
+            "x": 0.5,
+            "y": 0.9465141366454948,
+            "hit": true,
+            "first": "fixed-kit",
+            "distance": 124.63783252606852
+          },
+          {
+            "x": 0.4100104035348579,
+            "y": 0.7466814011879972,
+            "hit": false,
+            "first": "surveyed-coastal-canopy",
+            "distance": 145.00438441616035
+          },
+          {
+            "x": 0.589989596465142,
+            "y": 0.7466814011879972,
+            "hit": false,
+            "first": "TERRAIN_LOW_DENSITY",
+            "distance": 158.79239177901653
+          }
+        ]
+      },
+      "metrics": {
+        "fps": 6.2,
+        "drawCalls": 822
+      }
+    },
+    {
+      "id": "nw:focal",
+      "score": 0,
+      "frame": {
+        "id": "nw:focal",
+        "subject": "survey-site-nw",
+        "box": {
+          "left": 0.3875130044185724,
+          "right": 0.6124869955814276,
+          "top": 0.4968904818661253,
+          "bottom": 0.9964723205098692
+        },
+        "reason": null,
+        "worldBounds": {
+          "min": [
+            24.40000057220459,
+            1.2000000178813934,
+            -314.0999994277954
+          ],
+          "max": [
+            55.59999942779541,
+            37.5,
+            -285.9000005722046
+          ]
+        },
+        "hits": 5,
+        "samples": [
+          {
+            "x": 0.5,
+            "y": 0.7466814011879972,
+            "hit": true,
+            "first": "fixed-kit",
+            "distance": 113.51587625458333
+          },
+          {
+            "x": 0.4100104035348579,
+            "y": 0.5468486657304996,
+            "hit": false,
+            "first": "TERRAIN_LOW_DENSITY",
+            "distance": 208.5567253207685
+          },
+          {
+            "x": 0.589989596465142,
+            "y": 0.5468486657304996,
+            "hit": false,
+            "first": "concentration-vertical-towers",
+            "distance": 151.76623651340697
+          },
+          {
+            "x": 0.4100104035348579,
+            "y": 0.9465141366454948,
+            "hit": true,
+            "first": "guest-marker-nw",
+            "distance": 128.81112287473024
+          },
+          {
+            "x": 0.589989596465142,
+            "y": 0.9465141366454948,
+            "hit": true,
+            "first": "guest-marker-nw",
+            "distance": 128.81112287473024
+          },
+          {
+            "x": 0.5,
+            "y": 0.5468486657304996,
+            "hit": true,
+            "first": "fixed-kit",
+            "distance": 121.89335250535925
+          },
+          {
+            "x": 0.5,
+            "y": 0.9465141366454948,
+            "hit": true,
+            "first": "fixed-kit",
+            "distance": 124.63783252606852
+          },
+          {
+            "x": 0.4100104035348579,
+            "y": 0.7466814011879972,
+            "hit": false,
+            "first": "surveyed-coastal-canopy",
+            "distance": 145.00438441616035
+          },
+          {
+            "x": 0.589989596465142,
+            "y": 0.7466814011879972,
+            "hit": false,
+            "first": "TERRAIN_LOW_DENSITY",
+            "distance": 158.79239177901653
+          }
+        ]
+      },
+      "metrics": {
+        "fps": 7.4,
+        "drawCalls": 1190
+      }
+    },
+    {
+      "id": "nw:focal",
+      "score": 4,
+      "frame": {
+        "id": "nw:focal",
+        "subject": "survey-site-nw",
+        "box": {
+          "left": 0.3551610729776248,
+          "right": 0.6448389270223752,
+          "top": -0.23323767712255095,
+          "bottom": 0.9964723205098692
+        },
+        "reason": null,
+        "worldBounds": {
+          "min": [
+            24.40000057220459,
+            1.2000000178813934,
+            -314.0999994277954
+          ],
+          "max": [
+            55.59999942779541,
+            96.89999771118164,
+            -285.9000005722046
+          ]
+        },
+        "hits": 3,
+        "samples": [
+          {
+            "x": 0.5,
+            "y": 0.38161732169365914,
+            "hit": true,
+            "first": "fixed-kit",
+            "distance": 101.6843590605712
+          },
+          {
+            "x": 0.3841288583820998,
+            "y": -0.11026667735930892,
+            "hit": false,
+            "first": "",
+            "distance": 1479.9944784201318
+          },
+          {
+            "x": 0.6158711416179001,
+            "y": -0.11026667735930892,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 408.0099660316526
+          },
+          {
+            "x": 0.3841288583820998,
+            "y": 0.8735013207466272,
+            "hit": false,
+            "first": "TERRAIN_LOW_DENSITY",
+            "distance": 140.35843924735096
+          },
+          {
+            "x": 0.6158711416179001,
+            "y": 0.8735013207466272,
+            "hit": false,
+            "first": "TERRAIN_LOW_DENSITY",
+            "distance": 140.41830317908799
+          },
+          {
+            "x": 0.5,
+            "y": -0.11026667735930892,
+            "hit": true,
+            "first": "fixed-kit",
+            "distance": 97.20322579298828
+          },
+          {
+            "x": 0.5,
+            "y": 0.8735013207466272,
+            "hit": true,
+            "first": "fixed-kit",
+            "distance": 121.02683473631193
+          },
+          {
+            "x": 0.3841288583820998,
+            "y": 0.38161732169365914,
+            "hit": false,
+            "first": "fixed-kit",
+            "distance": 206.72015435808632
+          },
+          {
+            "x": 0.6158711416179001,
+            "y": 0.38161732169365914,
+            "hit": false,
+            "first": "concentration-vertical-towers",
+            "distance": 148.23747912448886
+          }
+        ]
+      },
+      "metrics": {
+        "fps": 6.5,
+        "drawCalls": 828
+      }
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,356 @@
+{
+  "results": [
+    {
+      "id": "sw:district",
+      "score": -4,
+      "frame": {
+        "id": "sw:district",
+        "subject": "sharing-district",
+        "box": null,
+        "reason": "bounds cross camera near plane",
+        "worldBounds": {
+          "min": [
+            -483.9283384136665,
+            -4.7683716530855236e-8,
+            -501.55952380984263
+          ],
+          "max": [
+            245.9273722530428,
+            21.474942058585157,
+            316.4669850713883
+          ]
+        },
+        "hits": 0,
+        "samples": []
+      },
+      "focal": {
+        "id": "sw:focal",
+        "subject": "survey-site-sw",
+        "box": {
+          "left": 0.3259090745128246,
+          "right": 0.6690335976250814,
+          "top": 0.30274887245925863,
+          "bottom": 0.7612474972865455
+        },
+        "reason": null,
+        "worldBounds": {
+          "min": [
+            -133.79999923706055,
+            0.6799997985363007,
+            35.20000076293945
+          ],
+          "max": [
+            -76.20000076293945,
+            20.68000030517578,
+            84.79999923706055
+          ]
+        },
+        "hits": 0,
+        "samples": [
+          {
+            "x": 0.497471336068953,
+            "y": 0.5319981848729021,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 38.80520476101749
+          },
+          {
+            "x": 0.3602215268240503,
+            "y": 0.34859873494198734,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 81.19751132182901
+          },
+          {
+            "x": 0.6347211453138557,
+            "y": 0.34859873494198734,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 74.77113729792269
+          },
+          {
+            "x": 0.3602215268240503,
+            "y": 0.7153976348038169,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 41.64573723418923
+          },
+          {
+            "x": 0.6347211453138557,
+            "y": 0.7153976348038169,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 61.23321763208847
+          },
+          {
+            "x": 0.497471336068953,
+            "y": 0.34859873494198734,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 61.51756404566186
+          },
+          {
+            "x": 0.497471336068953,
+            "y": 0.7153976348038169,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 52.44706216744632
+          },
+          {
+            "x": 0.3602215268240503,
+            "y": 0.5319981848729021,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 32.307474348640355
+          },
+          {
+            "x": 0.6347211453138557,
+            "y": 0.5319981848729021,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 50.88585510457691
+          }
+        ]
+      },
+      "metrics": {
+        "fps": 4,
+        "drawCalls": 614
+      }
+    },
+    {
+      "id": "sw:district",
+      "score": 0,
+      "frame": {
+        "id": "sw:district",
+        "subject": "sharing-district",
+        "box": null,
+        "reason": "bounds cross camera near plane",
+        "worldBounds": {
+          "min": [
+            -483.9283384136665,
+            -4.7683716530855236e-8,
+            -501.55952380984263
+          ],
+          "max": [
+            245.9273722530428,
+            19.140575021245013,
+            316.4669850713883
+          ]
+        },
+        "hits": 0,
+        "samples": []
+      },
+      "focal": {
+        "id": "sw:focal",
+        "subject": "survey-site-sw",
+        "box": {
+          "left": 0.3259090745128246,
+          "right": 0.6690335976250814,
+          "top": 0.30274887245925863,
+          "bottom": 0.7744633805582735
+        },
+        "reason": null,
+        "worldBounds": {
+          "min": [
+            -133.79999923706055,
+            -1.2736248075962067,
+            35.20000076293945
+          ],
+          "max": [
+            -76.20000076293945,
+            20.68000030517578,
+            84.79999923706055
+          ]
+        },
+        "hits": 0,
+        "samples": [
+          {
+            "x": 0.497471336068953,
+            "y": 0.538606126508766,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 38.94150764227513
+          },
+          {
+            "x": 0.3602215268240503,
+            "y": 0.3499203232691601,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 81.10042375831951
+          },
+          {
+            "x": 0.6347211453138557,
+            "y": 0.3499203232691601,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 74.81919039129522
+          },
+          {
+            "x": 0.3602215268240503,
+            "y": 0.727291929748372,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 45.73914984696475
+          },
+          {
+            "x": 0.6347211453138557,
+            "y": 0.727291929748372,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 62.45932610150924
+          },
+          {
+            "x": 0.497471336068953,
+            "y": 0.3499203232691601,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 61.54758218450909
+          },
+          {
+            "x": 0.497471336068953,
+            "y": 0.727291929748372,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 51.93471579935092
+          },
+          {
+            "x": 0.3602215268240503,
+            "y": 0.538606126508766,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 32.525439948786335
+          },
+          {
+            "x": 0.6347211453138557,
+            "y": 0.538606126508766,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 51.107908952645126
+          }
+        ]
+      },
+      "metrics": {
+        "fps": 48.7,
+        "drawCalls": 614
+      }
+    },
+    {
+      "id": "sw:district",
+      "score": 4,
+      "frame": {
+        "id": "sw:district",
+        "subject": "sharing-district",
+        "box": null,
+        "reason": "bounds cross camera near plane",
+        "worldBounds": {
+          "min": [
+            -483.9283384136665,
+            -4.7683716530855236e-8,
+            -499.63578215901936
+          ],
+          "max": [
+            245.9273722530428,
+            10.879999876022339,
+            316.4669850713883
+          ]
+        },
+        "hits": 0,
+        "samples": []
+      },
+      "focal": {
+        "id": "sw:focal",
+        "subject": "survey-site-sw",
+        "box": {
+          "left": 0.3259090745128246,
+          "right": 0.6690335976250814,
+          "top": 0.30274887245925863,
+          "bottom": 0.7744633805582735
+        },
+        "reason": null,
+        "worldBounds": {
+          "min": [
+            -133.79999923706055,
+            -1.2736248075962067,
+            35.20000076293945
+          ],
+          "max": [
+            -76.20000076293945,
+            20.68000030517578,
+            84.79999923706055
+          ]
+        },
+        "hits": 0,
+        "samples": [
+          {
+            "x": 0.497471336068953,
+            "y": 0.538606126508766,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 38.94150764227513
+          },
+          {
+            "x": 0.3602215268240503,
+            "y": 0.3499203232691601,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 81.10042375831951
+          },
+          {
+            "x": 0.6347211453138557,
+            "y": 0.3499203232691601,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 74.81919039129522
+          },
+          {
+            "x": 0.3602215268240503,
+            "y": 0.727291929748372,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 45.73914984696475
+          },
+          {
+            "x": 0.6347211453138557,
+            "y": 0.727291929748372,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 62.45932610150924
+          },
+          {
+            "x": 0.497471336068953,
+            "y": 0.3499203232691601,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 61.54758218450909
+          },
+          {
+            "x": 0.497471336068953,
+            "y": 0.727291929748372,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 51.93471579935092
+          },
+          {
+            "x": 0.3602215268240503,
+            "y": 0.538606126508766,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 32.525439948786335
+          },
+          {
+            "x": 0.6347211453138557,
+            "y": 0.538606126508766,
+            "hit": false,
+            "first": "fuji-civic-chassis",
+            "distance": 51.107908952645126
+          }
+        ]
+      },
+      "metrics": {
+        "fps": 59.9,
+        "drawCalls": 614
+      }
+    }
+  ],
+  "errors": []
+}

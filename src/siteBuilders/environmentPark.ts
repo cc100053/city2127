@@ -70,8 +70,8 @@ class ParkRuntime implements EnvironmentParkRuntime {
     this.writeInstances();
   }
 
-  setTarget(target: EnvironmentParkTarget, now: number, immediate: boolean): boolean {
-    this.update(now);
+  setTarget(target: EnvironmentParkTarget, now: number, immediate: boolean, sampleAt = now): boolean {
+    this.update(sampleAt);
     const enteringExhibition = !this.exhibitionTargetApplied;
     const changed = !this.exhibitionTargetApplied
       || target.treeCount !== this.target.treeCount

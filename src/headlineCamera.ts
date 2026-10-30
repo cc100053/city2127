@@ -3,7 +3,8 @@ import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 import type { CarrierChange } from './cityChangeManager.ts';
 import { HERO_POSITION, HERO_TARGET } from './heroCamera.ts';
 import { energyChangedPart } from './surveyAtmosphere.ts';
-import { ARRIVAL_SECONDS } from './voteJourney.ts';
+import { FLY_OUT, shotTimeline } from './resultTimeline.ts';
+export { FLY_IN, FLY_OUT, shotTimeline } from './resultTimeline.ts';
 
 type Site = CarrierChange['socketId'];
 export type ShotId = `${Site}:${'focal' | 'district'}` | `energy:${'garden' | 'garden2' | 'ring' | 'wing' | 'island'}`;
@@ -11,13 +12,13 @@ type Pose = { position: [number, number, number]; target: [number, number, numbe
 export const SHOTS: Record<ShotId, Pose> = {
   'nw:focal': { position: [40, 130, -508], target: [40, 43, -300] },
   'ne:focal': { position: [-280, 85, -245], target: [-210, 14, -135] },
-  'sw:focal': { position: [-168, 64, 152], target: [-105, 10, 60] },
-  'se:focal': { position: [-20, 245, -240], target: [175, 65, -45] },
-  'nw:district': { position: [-180, 180, -470], target: [10, 28, -210] },
-  'ne:district': { position: [-440, 200, -355], target: [-210, 25, -120] },
-  'sw:district': { position: [-160, 420, -400], target: [-120, 5, -260] },
-  'se:district': { position: [-200, 300, -365], target: [15, 35, -80] },
-  'energy:garden': { position: [-372, 62, -232], target: [-306, 12, -150] },
+  'sw:focal': { position: [-120, 64, 152], target: [-105, 10, 60] },
+  'se:focal': { position: [0, 225, -220], target: [175, 65, -45] },
+  'nw:district': { position: [-30, 115, -455], target: [40, 43, -300] },
+  'ne:district': { position: [-320, 110, -300], target: [-210, 14, -135] },
+  'sw:district': { position: [-108, 80, 180], target: [-105, 10, 60] },
+  'se:district': { position: [20, 150, -195], target: [175, 40, -45] },
+  'energy:garden': { position: [-365, 38, -205], target: [-307, 12, -151] },
   'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },
   'energy:ring': { position: [-70, 135, -170], target: [-18, 99, -24] },
   'energy:wing': { position: [56, 64, -496], target: [125, 22, -424] },
@@ -35,8 +36,6 @@ export function headlineShot(change: CarrierChange | undefined): ShotId | null {
     default: return null;
   }
 }
-export const FLY_IN = 1.5, FLY_OUT = 2;
-export const shotTimeline = (displayMs = DISPLAY_MS) => ({ flyIn: ARRIVAL_SECONDS, hold: ARRIVAL_SECONDS + FLY_IN, flyOut: displayMs / 1000, done: displayMs / 1000 + FLY_OUT });
 export function shotStage(elapsed: number, displayMs = DISPLAY_MS) {
   const t = shotTimeline(displayMs);
   return elapsed < t.flyIn ? 'journey' : elapsed < t.hold ? 'fly-in' : elapsed < t.flyOut ? 'hold' : elapsed < t.done ? 'fly-out' : 'done';
@@ -85,7 +84,9 @@ export class HeadlineCamera {
       this.controls.target.lerpVectors(this.fromTarget, heroTarget, blend);
     } else {
       const blend = stage === 'fly-out' ? 1 - MathUtils.smoothstep(elapsed, t.flyOut, t.done) : MathUtils.smoothstep(elapsed, t.flyIn, t.hold);
-      this.camera.position.copy(heroPosition).lerp(this.position, blend);
+      const push = .07 * MathUtils.smoothstep(elapsed, t.hold, t.flyOut);
+      this.camera.position.copy(this.position).lerp(this.target, push);
+      this.camera.position.lerpVectors(heroPosition, this.camera.position, blend);
       this.controls.target.copy(heroTarget).lerp(this.target, blend);
     }
     this.camera.lookAt(this.controls.target);

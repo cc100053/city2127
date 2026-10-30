@@ -66,6 +66,15 @@ runtime.restoreLegacy();
 assert.equal(runtime.getDiagnostics().targetAutomatedPorts, 3);
 assert.equal(runtime.getDiagnostics().visibleHumanCounters, 3, 'legacy restore returns to the existing 3/3 neutral');
 
+// A newer result may replace a future transition before it starts.
+runtime.setTarget({ band: 'low', automatedPorts: 0 }, 10, true);
+runtime.setTarget({ band: 'high', automatedPorts: 6 }, 15.12, false, 10);
+runtime.setTarget({ band: 'low', automatedPorts: 0 }, 18.12, false, 13);
+assert.equal(runtime.getDiagnostics().visibleAutomatedPorts, 0);
+runtime.update(18.12);
+assert.equal(runtime.getDiagnostics().visibleAutomatedPorts, 0);
+runtime.restoreLegacy();
+
 // Actual service customers/staff use full-size instances on the podium; mode changes release them without squashing their bodies.
 const people=site.root.children.find(o=>o.name==='hub-service-people') as T.InstancedMesh,m=new T.Matrix4(),at=new T.Vector3(),size=new T.Vector3();
 const ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),body=new T.Vector3(),world=new T.Vector3();
