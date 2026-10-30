@@ -2,7 +2,7 @@
 
 - Owner: cc100053（產品／審美最終批准，**全部做完先一次過 review**）；實作：Codex（開工時喺「進度」記低 session／thread id）
 - Review 模式（owner 2026-10-29）：長任務，T → F → A 中途**唔使停低等 owner 睇圖**。Codex 自己按下面嘅數字標準同 self-review 判斷，連續做落去；最後交一份總 review 包（見「最終交付」）。
-- Status: INTEGRATION（owner 2026-10-30 指示 merge 候選；F／A 視覺硬門檻未達）
+- Status: INTEGRATED CANDIDATE（owner 2026-10-30 指示 merge；F／A 視覺硬門檻未達）
 - Branch: `feat/closeup-zoom`（由 verified main 開；T、F、A 三個 checkpoint）
 - Base commit: `2050883e93082af4f96da680c59a7de152fea853`（2026-10-29 fetch，main／origin/main 0/0）
 - Last verified feature commit: `86931ed218fdec442b54ed375d45dc964c7edd55`（root test/build/diff；browser 部分驗證）
@@ -199,3 +199,5 @@ A NW（2026-10-30）：三輪屋頂物流及近鏡嘗試仍未能清楚辨識，
 總 review（2026-10-30）：[統一證據與缺口](../../artifacts/closeup-zoom/final/README.md)。能源花園候選 pose 減少中央柱遮擋，左側仍有柱；marker 未更動。F／A 未達標；owner 已明確指示合併目前候選。Root npm test／build／diff check PASS，展示硬件、真人辨認及缺少的 live 情境未驗。
 
 G7 協調（2026-10-30，依 main `f91236b` 的 [guest-agency G7](https://github.com/cc100053/city2127/blob/f91236b/docs/handoffs/guest-agency.md)）：本任務既有 `*:district` 是未有 `CarrierChange.points` 時的 fallback；guest-agency 會另設覆蓋實際變化 slot 的 authored viewpoints，按 points 揀選。G7 沿用本任務先推近、settle、再變化的時間線與 hold 慢推。不要把現有 district 構圖未達標說成 G7 已完成；本任務不實作 G7 或修改 guest-agency handoff。
+
+整合（2026-10-30）：owner 明確指示合併既有候選。以最新 main `f91236b` 與 feature `86931ed` no-ff 整合為 `f77df2614ebb3f44c0de13eb56924d46b076ba4c`；交接索引衝突保留 guest-agency 及本任務未達標紀錄。整合結果 root `npm test`、`npm run build`、`git diff --check origin/main..HEAD` PASS；scratch live 水庭 reload／Undo／reduced motion 4/4、errors 0（[原圖與資料](../../artifacts/closeup-zoom/final/integration-live/browser.json)）。全套新證據不等於 F／A 視覺驗收；展示硬件、真人辨認及未列明 live 情境仍未驗。Main push／CI 需由整合結果回報實際狀態。
