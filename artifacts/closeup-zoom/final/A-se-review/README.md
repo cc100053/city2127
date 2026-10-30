@@ -1,0 +1,9 @@
+# SE concentration site — R3 candidate
+
+2026-10-30 self-review: **partial; not accepted**. R1 added a roof terrace, high crown and low-tier gateway. R2 made the mid-rise crown a more distinct frame. R3 added amber Meter rings using the existing `publicLight` material and instance colours, without changing the site footprint, slots or tier logic. The rings read amber by day but become pale at night; the focal site remains too small under the F framing gate. The low/mixed/high silhouettes differ, but no real two-second recognition test has been performed. Owner visual approval remains outstanding.
+
+- [Day tier comparison](tiers-12.jpg), [night tier comparison](tiers-22.jpg), [hero before/R3](hero.jpg). Original hero, focal and district day/night images for all three tiers are in sibling `A-se-before`, `A-se-r1`, `A-se-r2`, `A-se-r3` folders.
+- Site-root visible meshes per band, one-render-pass proxy, baseline → R3: low 24 → 20, mixed 23 → 25 (+8.7%), high 37 → 40 (+8.1%); see [baseline](mesh-count-before.jsonl), [R3](mesh-count-r3.jsonl) and the reproducible `site-calls.mjs`. This is not isolated GPU draw-call measurement.
+- Stable whole-render samples, baseline hero/focal: day 60 FPS, 950/674 calls; night 60 FPS, 950/674. R3 day 60/59.9 FPS, 954/678 calls; night 60/60 FPS, 954/678. One earlier R2 day focal sample reported 1045 calls; a repeat reported 676. The cause was not proven, and the anomalous sample is retained in `A-se-perf-r2`. R3/baseline records are in sibling `A-se-perf-r3` and `A-se-perf-before`.
+- Samples: current ARM64 macOS host, headless Chrome 156.0.8078.74, 1600×900 DPR1. Exhibition hardware, per-site GPU calls and human recognition remain untested.
+- R3 `cityShotFrame` at −2/0/+2: widths 13.0/12.1/13.9%, heights 48.8/35.3/62.9%, centres (.500,.541)/(.500,.604)/(.500,.467); no focal near-plane crossing. Width fails in all tiers and height fails at 0. Raw data and images: sibling `A-se-frame-r3`.

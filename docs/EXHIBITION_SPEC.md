@@ -82,6 +82,8 @@ Headline 近鏡（2026-10-27；時間線於 2026-10-29 修訂）：live 結果�
 
 Closeup-zoom F 候選（2026-10-30）：district 改為較闊焦點構圖、停留期間慢推 7%；SW focal 避開主要遮擋。SE／NW 焦點及 district carrier 可讀性未達驗收，詳見 [F 自評](../artifacts/closeup-zoom/final/F-review.md)，最終仍待 owner 審閱。
 
+SE 近鏡候選（2026-10-30）：設施加框架平台、冠部、低 tier 構架及橙色 Meter 環，保留 footprint 與 tier 規則；夜景顏色偏白、主體大小及真人辨認仍未過關，待 owner review（[證據](../artifacts/closeup-zoom/final/A-se-review/README.md)）。
+
 能源講解 N1（2026-10-29，`feat/energy-narration`，**待 owner 睇圖批准，未入 main**）：owner 同日決定將所有結果嘅閱讀 slot 由 10 秒延長到 13 秒（`DISPLAY_MS`；lease 18 秒），所以上面嘅 headline 近鏡為 4.62–13 秒停留、13–15 秒返回 hero。Headline 係結果後仍存在嘅能源部件時，鏡頭到位（4.62 s）至停留結束（13 s）喺左下顯示日文字幕框，將 60 秒儲能週期壓縮成 8.38 秒播一次（充能 → 蓄電 → 放電，每步約 2.79 秒逐步高亮，每步 ≤16 字）。只有被講解嘅部件行自己嘅時鐘，其他能源部件唔跳相。結果卡講「邊個嘅聲音、改咗乜」，字幕只講設施點運作，標題沿用結果卡地名。Snapshot／reset／Undo／reconnect／下一個 live 結果即時取消並還原時鐘；reduced motion 唔講解（client 本身已將 reduced-motion 結果即時變 snapshot，冇結果卡）。所有 UI 文字用日文（owner 嚴格指示）。
 
 近鏡打磨S0（2026-10-28，coordinator接受量度基準並整合main `c802bba`）：[完整基準](../artifacts/closeup-polish/S0/README.md)記錄98個日夜狀態、96組像素比較及28組兩輪效能；沒有美術、pose、時間線或梯級改動。A1/A2/A3與夜間／綠化仍有明確失敗，20個district狀態跨near plane不可量測；這是後續A–D的起點，並非視覺完成或owner接受。所有正式第二take原圖已逐張檢視，展示硬件及真人辨認未驗；[整合驗證](../artifacts/closeup-polish/S0/integration.json)root test/build/diff PASS，實際published SHA及main CI由本批integration result記錄。

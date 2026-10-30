@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { arc, bake, box, cream, faces, futureLight, glass, leaf, publicLight, sage, shrubs, sign, solar, trim, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
-import { ConcentrationDistrict } from '../districtMeters.ts';
+import { ConcentrationDistrict, METER_COLORS } from '../districtMeters.ts';
 import type { Band } from '../surveyView.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, SITE_TRANSITION_SECONDS, type BuiltSite } from './siteRuntime.ts';
 
@@ -171,8 +171,21 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
       box(base, [.4, .35, 7.6], [4.25, y + .32, 0], leaf, .15);
     }
   }
+  // A framed roof terrace gives the mid-rise a distinct public crown within the existing lot.
+  arc(base, 2.9, 3.8, .22, [0, 17.95, 0], trim);
+  arc(base, 3.6, 3.78, .08, [0, 18.17, 0], futureLight);
+  for (const x of [-3.65, 3.65]) for (const z of [-3.65, 3.65])
+    box(base, [.2, 5.2, .2], [x, 20.6, z], trim, .02);
+  for (const z of [-3.65, 3.65]) box(base, [7.5, .2, .2], [0, 23.2, z], trim, .03);
+  for (const x of [-3.65, 3.65]) box(base, [.2, .2, 7.5], [x, 23.2, 0], trim, .03);
+
   sign(base, kit, '都市集約 / 2127', 0, 2.4, 4.2, 5.5, .8, '#527789');
   base.add(...bake(base));
+  const meterColor = new T.Color(METER_COLORS.urbanConcentration);
+  const roofBand = new T.InstancedMesh(new T.RingGeometry(3.7, 4.05, 48).rotateX(-Math.PI / 2), publicLight, 1);
+  roofBand.name = 'tower-meter-band';
+  roofBand.setMatrixAt(0, new T.Matrix4().makeTranslation(0, 23.33, 0));
+  roofBand.setColorAt(0, meterColor); base.add(roofBand);
 
   const pavilions = new T.Group();
   pavilions.name = 'tower-low-pavilion-pair';
@@ -189,6 +202,13 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
     box(pod, [2.65, .08, .35], [0, 3.08, -1.65], solar, .02);
   }
   pavilions.add(...bake(pavilions));
+  const pavilionBands = new T.InstancedMesh(new T.RingGeometry(1.2, 1.4, 32).rotateX(-Math.PI / 2), publicLight, 2);
+  pavilionBands.name = 'tower-meter-band';
+  for (const [i, x] of [-1.95, 1.95].entries()) {
+    pavilionBands.setMatrixAt(i, new T.Matrix4().makeTranslation(x, 3.02, 0));
+    pavilionBands.setColorAt(i, meterColor);
+  }
+  pavilions.add(pavilionBands);
 
   const serviceSpines = new T.Group();
   serviceSpines.name = 'tower-low-service-spines';
@@ -217,6 +237,11 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
     cap.add(...bake(cap));
   }
 
+  // The low alternative connects the service heads as one inhabited gateway.
+  box(serviceSpines, [6.3, .25, .3], [0, 33.2, 0], trim, .03);
+  box(serviceSpines, [5.6, .07, .12], [0, 33.05, .2], futureLight, .02);
+  serviceSpines.add(...bake(serviceSpines));
+
   const core = new T.Mesh(new T.CylinderGeometry(3, 3, 26, 40), glass);
   core.position.y = 13;
   towerUpper.add(core);
@@ -234,6 +259,8 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
   arc(towerUpper, 3.1, 3.7, .45, [0, 26.4, 0], trim);
   shrubs(towerUpper, 2.8, 26.5, 0, Math.PI * 2, 18);
   for (let i = 0; i < 4; i++) box(towerUpper, [.12, 1.1, 3], [-1.2 + i * .8, 27.1, 0], solar, .02);
+  arc(towerUpper, 3.4, 4.1, .2, [0, 27.4, 0], trim);
+  arc(towerUpper, 3.85, 4.05, .08, [0, 27.6, 0], futureLight);
   towerUpper.add(...bake(towerUpper));
 
   // Mixed keeps the existing four-module baseline; two symmetric slots extend it to six.

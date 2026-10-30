@@ -396,3 +396,5 @@ Closeup-zoom F 候選（2026-10-30）：SW 真實 scratch server live／reload�
 Closeup-zoom A NE（2026-10-30）：三輪自評未達，保留原公園；日夜 tier／hero 圖、穩定 FPS／calls 與 R3 patch 見 [NE review](../artifacts/closeup-zoom/final/A-ne-review/README.md)。R3 夜近鏡 calls 比基準多 45.3%，FAIL；數據只反映當次本機 headless Chrome，真人及展示機未驗。
 
 Closeup-zoom A SW（2026-10-30）：三輪自評未達，保留 F checkpoint 設計；日夜 tier／hero 圖、穩定 FPS／總 calls 與 R3 patch 見 [SW review](../artifacts/closeup-zoom/final/A-sw-review/README.md)。Per-site calls、真人辨認及展示機未驗。
+
+Closeup-zoom A SE（2026-10-30）：保留 R3 候選，邊界、色帶及材質測試通過；F 主體過細仍未解決，夜景色帶偏白。日夜 tier／hero 圖、穩定 FPS、總 calls 及 per-site mesh 代理值見 [SE review](../artifacts/closeup-zoom/final/A-se-review/README.md)；真人、展示機及 per-site GPU calls 未驗。

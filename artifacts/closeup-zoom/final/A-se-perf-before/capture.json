@@ -1,0 +1,51 @@
+{
+  "site": "se",
+  "images": [
+    {
+      "hour": 12,
+      "kind": "hero",
+      "score": 0,
+      "file": "hero-12.jpg",
+      "metrics": {
+        "fps": 60,
+        "drawCalls": 950
+      }
+    },
+    {
+      "hour": 12,
+      "kind": "focal",
+      "score": 0,
+      "file": "focal-0-12.jpg",
+      "metrics": {
+        "fps": 60,
+        "drawCalls": 674
+      }
+    },
+    {
+      "hour": 22,
+      "kind": "hero",
+      "score": 0,
+      "file": "hero-22.jpg",
+      "metrics": {
+        "fps": 60,
+        "drawCalls": 950
+      }
+    },
+    {
+      "hour": 22,
+      "kind": "focal",
+      "score": 0,
+      "file": "focal-0-22.jpg",
+      "metrics": {
+        "fps": 60,
+        "drawCalls": 674
+      }
+    }
+  ],
+  "errors": [],
+  "browser": "156.0.8078.74",
+  "viewport": [
+    1600,
+    900
+  ]
+}

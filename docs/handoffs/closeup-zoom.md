@@ -191,3 +191,5 @@ F 候選自評：NE／SW focal 達數字範圍；SE／NW focal 未達、SW 等 d
 A NE（2026-10-30）：三輪均未達自評，保留既有公園程式；原因、數字、原圖及 R3 patch 見 [NE review](../../artifacts/closeup-zoom/final/A-ne-review/README.md)。不視為美術完成或 owner 接受；繼續 SW。
 
 A SW（2026-10-30）：三輪活動仍難辨、牌字仍裁切，保留 F checkpoint 原設計；[SW review](../../artifacts/closeup-zoom/final/A-sw-review/README.md) 保存圖、patch 及效能。Per-site draw calls 未獨立測，未驗收；繼續 SE。
+
+A SE（2026-10-30）：保留 R3 候選，新增屋頂框架、低 tier 構架及以共享材質／instance colour 實現的 Meter 環；日景橙色可見、夜景偏白。主體仍過細、真人辨認及 per-site GPU calls 未驗；[SE review](../../artifacts/closeup-zoom/final/A-se-review/README.md) 保存三輪、基準及實測。繼續 NW，最終 owner 一次過 review。
