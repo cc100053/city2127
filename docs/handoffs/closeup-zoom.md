@@ -189,3 +189,5 @@ F 候選自評：NE／SW focal 達數字範圍；SE／NW focal 未達、SW 等 d
 2026-10-30 限時重試 fetch 成功：`origin/main` 前進至 `f91236b`（新增 guest-agency 計劃，明確依賴本任務先完成）；本 feature 與其 remote 0/0。按流程未自動 merge；整合前須再核對。
 
 A NE（2026-10-30）：三輪均未達自評，保留既有公園程式；原因、數字、原圖及 R3 patch 見 [NE review](../../artifacts/closeup-zoom/final/A-ne-review/README.md)。不視為美術完成或 owner 接受；繼續 SW。
+
+A SW（2026-10-30）：三輪活動仍難辨、牌字仍裁切，保留 F checkpoint 原設計；[SW review](../../artifacts/closeup-zoom/final/A-sw-review/README.md) 保存圖、patch 及效能。Per-site draw calls 未獨立測，未驗收；繼續 SE。
