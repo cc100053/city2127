@@ -392,3 +392,5 @@ N1 更新（同日 owner 決定）：`DISPLAY_MS` 10 → 13 s（所有結果，l
 T 補測：無 `displayAt` 的 v2 更新在 reduced motion 時，理由延遲函數回傳 0；catch-up 亦為 0，正常 live 為 8120 ms（`headlineCamera.test.ts`）。Scratch server SW focal 額外確認 reduced motion 即時恢復 ambient 卡，4/4、errors 0（[browser.json](../artifacts/closeup-zoom/final/T-reduced-retry/browser.json)）；首次初始化在其他 Chrome capture 佔用下 30 秒逾時，延長等待後重跑通過。
 
 Closeup-zoom F 候選（2026-10-30）：SW 真實 scratch server live／reload／Undo／reduced motion 4/4、errors 0；hold 慢推與 fly-out 連續有單元測試。F 視覺硬門檻仍 FAIL：SE／NW focal 尺寸與 district carrier 辨認未達；原圖、量度和試驗失敗見 [F review](../artifacts/closeup-zoom/final/F-review.md)。展示硬件 FPS、真人辨認、其餘 live scenarios 未驗。
+
+Closeup-zoom A NE（2026-10-30）：三輪自評未達，保留原公園；日夜 tier／hero 圖、穩定 FPS／calls 與 R3 patch 見 [NE review](../artifacts/closeup-zoom/final/A-ne-review/README.md)。R3 夜近鏡 calls 比基準多 45.3%，FAIL；數據只反映當次本機 headless Chrome，真人及展示機未驗。

@@ -187,3 +187,5 @@ Hero 距離 target ≈787 m。現行 shot 距離（position→target）：
 
 F 候選自評：NE／SW focal 達數字範圍；SE／NW focal 未達、SW 等 district carrier 不可讀；整體 FAIL，詳見 [量度及原圖](../../artifacts/closeup-zoom/final/F-review.md)。保留未通過項目供 A 與後續驗證，不視作 owner 接受。
 2026-10-30 限時重試 fetch 成功：`origin/main` 前進至 `f91236b`（新增 guest-agency 計劃，明確依賴本任務先完成）；本 feature 與其 remote 0/0。按流程未自動 merge；整合前須再核對。
+
+A NE（2026-10-30）：三輪均未達自評，保留既有公園程式；原因、數字、原圖及 R3 patch 見 [NE review](../../artifacts/closeup-zoom/final/A-ne-review/README.md)。不視為美術完成或 owner 接受；繼續 SW。
