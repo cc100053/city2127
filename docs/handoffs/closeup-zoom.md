@@ -193,3 +193,5 @@ A NE（2026-10-30）：三輪均未達自評，保留既有公園程式；原因
 A SW（2026-10-30）：三輪活動仍難辨、牌字仍裁切，保留 F checkpoint 原設計；[SW review](../../artifacts/closeup-zoom/final/A-sw-review/README.md) 保存圖、patch 及效能。Per-site draw calls 未獨立測，未驗收；繼續 SE。
 
 A SE（2026-10-30）：保留 R3 候選，新增屋頂框架、低 tier 構架及以共享材質／instance colour 實現的 Meter 環；日景橙色可見、夜景偏白。主體仍過細、真人辨認及 per-site GPU calls 未驗；[SE review](../../artifacts/closeup-zoom/final/A-se-review/README.md) 保存三輪、基準及實測。繼續 NW，最終 owner 一次過 review。
+
+A NW（2026-10-30）：三輪屋頂物流及近鏡嘗試仍未能清楚辨識，恢復 F 原候選；[NW review](../../artifacts/closeup-zoom/final/A-nw-review/README.md) 保存各輪及受污染擷取的限制。NW A 與 F 尺寸仍未通過，留待 owner review。
