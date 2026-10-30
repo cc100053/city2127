@@ -201,3 +201,5 @@ A NW（2026-10-30）：三輪屋頂物流及近鏡嘗試仍未能清楚辨識，
 G7 協調（2026-10-30，依 main `f91236b` 的 [guest-agency G7](https://github.com/cc100053/city2127/blob/f91236b/docs/handoffs/guest-agency.md)）：本任務既有 `*:district` 是未有 `CarrierChange.points` 時的 fallback；guest-agency 會另設覆蓋實際變化 slot 的 authored viewpoints，按 points 揀選。G7 沿用本任務先推近、settle、再變化的時間線與 hold 慢推。不要把現有 district 構圖未達標說成 G7 已完成；本任務不實作 G7 或修改 guest-agency handoff。
 
 整合（2026-10-30）：owner 明確指示合併既有候選。以最新 main `f91236b` 與 feature `86931ed` no-ff 整合為 `f77df2614ebb3f44c0de13eb56924d46b076ba4c`；交接索引衝突保留 guest-agency 及本任務未達標紀錄。整合結果 root `npm test`、`npm run build`、`git diff --check origin/main..HEAD` PASS；scratch live 水庭 reload／Undo／reduced motion 4/4、errors 0（[原圖與資料](../../artifacts/closeup-zoom/final/integration-live/browser.json)）。全套新證據不等於 F／A 視覺驗收；展示硬件、真人辨認及未列明 live 情境仍未驗。Main push／CI 需由整合結果回報實際狀態。
+
+Main CI（2026-10-30）：整合結果 `56175a7eaf49503abbc796f8150a0af4a83e135a` 的 [GitHub Actions run 41019517908](https://github.com/cc100053/city2127/actions/runs/41019517908) 通過 root、survey、module-swap 同 whitespace（6m10s）。本紀錄是之後的純文件更新；F／A 視覺失敗與未驗事項不變。

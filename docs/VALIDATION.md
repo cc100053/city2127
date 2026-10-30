@@ -404,3 +404,5 @@ Closeup-zoom A NW（2026-10-30）：三輪仍未能清楚辨認屋頂物流，�
 Closeup-zoom 追加 live：水庭第二次 4/4、no-op 1/1；[A/B](../artifacts/closeup-zoom/final/T-live-ab-stations/browser.json) 第二次 3509 ms、WebSocket 3514 ms 到達，排程顯示 A 後 13 秒，最終狀態一致、errors 0；未量逐 frame 相機連續。[DEV 提前取代](../artifacts/closeup-zoom/final/T-dev-early-retry/browser.json) 3503 ms 最終回 low；首次診斷未刷新而失敗。前兩次 A/B fixture 用單站而被拒絕，結果見總 review。
 
 Closeup-zoom 整合候選（2026-10-30）：最新 main `f91236b`、feature `86931ed` no-ff 整合結果 `f77df26`；root `npm test`、`npm run build`、整合 diff whitespace PASS。[整合後 live 水庭](../artifacts/closeup-zoom/final/integration-live/browser.json) 4/4、errors 0。原 F／A 失敗與未驗項不變；main CI 以實際執行結果為準。
+
+Closeup-zoom main CI：[run 41019517908](https://github.com/cc100053/city2127/actions/runs/41019517908) 在 `56175a7eaf49503abbc796f8150a0af4a83e135a` 通過 root、survey、module-swap 及 whitespace；其後此純文件紀錄不改 runtime。
