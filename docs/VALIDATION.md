@@ -398,3 +398,7 @@ Closeup-zoom A NE（2026-10-30）：三輪自評未達，保留原公園；日�
 Closeup-zoom A SW（2026-10-30）：三輪自評未達，保留 F checkpoint 設計；日夜 tier／hero 圖、穩定 FPS／總 calls 與 R3 patch 見 [SW review](../artifacts/closeup-zoom/final/A-sw-review/README.md)。Per-site calls、真人辨認及展示機未驗。
 
 Closeup-zoom A SE（2026-10-30）：保留 R3 候選，邊界、色帶及材質測試通過；F 主體過細仍未解決，夜景色帶偏白。日夜 tier／hero 圖、穩定 FPS、總 calls 及 per-site mesh 代理值見 [SE review](../artifacts/closeup-zoom/final/A-se-review/README.md)；真人、展示機及 per-site GPU calls 未驗。
+
+Closeup-zoom A NW（2026-10-30）：三輪仍未能清楚辨認屋頂物流，恢復 F 原候選；[原圖、受污染擷取及限制](../artifacts/closeup-zoom/final/A-nw-review/README.md)。全 root `npm test`、`npm run build`、`git diff --check` PASS（sandbox 首跑 loopback EPERM，獲准後重跑；build 有既有 warning）。能源花園實際模型的 [pose 對比](../artifacts/closeup-zoom/final/energy-garden-review/) 顯示中央柱遮擋減輕，但左側仍有柱；水庭第二份提案 live／reload／Undo／reduced motion 4/4，首份沒有觸發變化，首跑失敗保留；獨立 no-op hero 檢查 1/1，errors 0。最終 owner 接受未主張。
+
+Closeup-zoom 追加 live：水庭第二次 4/4、no-op 1/1；[A/B](../artifacts/closeup-zoom/final/T-live-ab-stations/browser.json) 第二次 3509 ms、WebSocket 3514 ms 到達，排程顯示 A 後 13 秒，最終狀態一致、errors 0；未量逐 frame 相機連續。[DEV 提前取代](../artifacts/closeup-zoom/final/T-dev-early-retry/browser.json) 3503 ms 最終回 low；首次診斷未刷新而失敗。前兩次 A/B fixture 用單站而被拒絕，結果見總 review。

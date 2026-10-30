@@ -195,3 +195,7 @@ A SW（2026-10-30）：三輪活動仍難辨、牌字仍裁切，保留 F checkp
 A SE（2026-10-30）：保留 R3 候選，新增屋頂框架、低 tier 構架及以共享材質／instance colour 實現的 Meter 環；日景橙色可見、夜景偏白。主體仍過細、真人辨認及 per-site GPU calls 未驗；[SE review](../../artifacts/closeup-zoom/final/A-se-review/README.md) 保存三輪、基準及實測。繼續 NW，最終 owner 一次過 review。
 
 A NW（2026-10-30）：三輪屋頂物流及近鏡嘗試仍未能清楚辨識，恢復 F 原候選；[NW review](../../artifacts/closeup-zoom/final/A-nw-review/README.md) 保存各輪及受污染擷取的限制。NW A 與 F 尺寸仍未通過，留待 owner review。
+
+總 review（2026-10-30）：[統一證據與缺口](../../artifacts/closeup-zoom/final/README.md)。能源花園候選 pose 減少中央柱遮擋，左側仍有柱；marker 未更動。F／A 未達標，須 owner review，未 merge。Root npm test／build／diff check PASS，展示硬件、真人辨認及缺少的 live 情境未驗。
+
+G7 協調（2026-10-30，依 main `f91236b` 的 [guest-agency G7](https://github.com/cc100053/city2127/blob/f91236b/docs/handoffs/guest-agency.md)）：本任務既有 `*:district` 是未有 `CarrierChange.points` 時的 fallback；guest-agency 會另設覆蓋實際變化 slot 的 authored viewpoints，按 points 揀選。G7 沿用本任務先推近、settle、再變化的時間線與 hold 慢推。不要把現有 district 構圖未達標說成 G7 已完成；本任務不實作 G7 或修改 guest-agency handoff。

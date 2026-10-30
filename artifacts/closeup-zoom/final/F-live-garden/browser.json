@@ -1,0 +1,110 @@
+{
+  "complete": false,
+  "browser": "156.0.8078.74",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "mode": "Same createSurveyServer devAuto:true and fresh mkdtemp SQLite isolation as npm run dev:auto, dynamic loopback ports. Verified DEV config endpoint; proposals submitted through real HTTP API. Guest UI/auto-answer panel not exercised by this runner.",
+  "timing": "Real clock, no shortened reading slot. Each live sampled through normal return at15.5s. Diagnostics refresh120frames; intermediate samples do not measure exact3.000s (root suite covers that). A is rotor ring after one real preload; S and C are second sharing/function votes to exercise district shots. B and D use first sharing/service votes. All five selected shots must appear.",
+  "origins": [
+    {
+      "origin": "http://127.0.0.1:64067",
+      "database": "/var/folders/st/ml4_0zfx7g129gh2305ynz5c0000gn/T/closeup-z-auto-dSnq1o/survey.sqlite",
+      "devAuto": true,
+      "config": {
+        "questionSetVersion": 4,
+        "energy": {
+          "questionId": "energy-2127",
+          "options": [
+            {
+              "id": "water-storage",
+              "label": "水の音や機械が身近でも、海辺の庭で電気を蓄える暮らし"
+            },
+            {
+              "id": "rotor-storage",
+              "label": "大きな機械が景色に加わっても、街の中心で電気を蓄える暮らし"
+            },
+            {
+              "id": "orbital-supply",
+              "label": "海の上に受け取る面が広がっても、空から届く電気を使う暮らし"
+            },
+            {
+              "id": "island-supply",
+              "label": "海の一部が設備の陸地に変わっても、沖の原子力施設から電気を届ける暮らし"
+            }
+          ]
+        },
+        "meters": [
+          {
+            "axis": "automation",
+            "questionId": "service-2127",
+            "options": [
+              {
+                "id": "human-led",
+                "label": "待ち時間があっても、人に相談したい。技術はその人を支えてほしい",
+                "vote": -1
+              },
+              {
+                "id": "human-machine",
+                "label": "普段は自動で、困ったときは人に相談したい",
+                "vote": 0
+              },
+              {
+                "id": "autonomous",
+                "label": "人に相談する機会は少なくても、いつでも自動で利用したい",
+                "vote": 1
+              }
+            ]
+          },
+          {
+            "axis": "publicSharing",
+            "questionId": "commons-2127",
+            "options": [
+              {
+                "id": "private-pods",
+                "label": "予約して、一人や親しい人と静かに過ごせる場所",
+                "vote": -1
+              },
+              {
+                "id": "mixed-seating",
+                "label": "静かな席と、自由に集まれる場所が半分ずつある海辺",
+                "vote": 0
+              },
+              {
+                "id": "open-commons",
+                "label": "予約せず、誰でも一緒に使える開かれた海辺",
+                "vote": 1
+              }
+            ]
+          },
+          {
+            "axis": "urbanConcentration",
+            "questionId": "functions-2127",
+            "options": [
+              {
+                "id": "distributed-pavilions",
+                "label": "少し歩いても、水辺に点在する低い建物をめぐりたい",
+                "vote": -1
+              },
+              {
+                "id": "mixed-functions",
+                "label": "低い建物と高い建物が混ざる街で暮らしたい",
+                "vote": 0
+              },
+              {
+                "id": "vertical-functions",
+                "label": "上へ移動して、一つのタワーで用事を済ませたい",
+                "vote": 1
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "checks": [],
+  "errors": []
+}
