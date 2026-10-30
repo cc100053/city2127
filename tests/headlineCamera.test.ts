@@ -50,9 +50,10 @@ assert.equal(reasonDelayMs(DISPLAY_MS-101,false),0);
 assert.equal(shotStage(3),'fly-in','the flight starts after the vote journey');
 assert.deepEqual([0,t.flyIn,t.hold,t.flyOut,t.done].map(elapsed=>shotStage(elapsed)),['journey','fly-in','hold','fly-out','done']);
 assert.equal(Object.keys(SHOTS).length,13);
-for (const pose of Object.values(SHOTS)) {
+for (const [id, pose] of Object.entries(SHOTS)) {
   const p=new Vector3(...pose.position),target=new Vector3(...pose.target);
   assert.ok(p.y>target.y);assert.ok(p.distanceTo(target)>=40&&p.distanceTo(target)<=450);
+  if(id.endsWith(':district')) assert.ok(p.distanceTo(target)<=260);
   assert.ok(p.x<target.x||p.z<target.z);
 }
 const camera=new PerspectiveCamera(42),controls={target:new Vector3(...HERO_TARGET),enabled:true,update(){}};
@@ -61,6 +62,10 @@ const controller=new HeadlineCamera(camera,controls),first={socketId:'ne' as con
 controller.play([first],10);assert.equal(controller.active,true);assert.equal(controls.enabled,false);
 controller.update(10);assert.deepEqual(camera.position.toArray(),HERO_POSITION);
 controller.update(10+t.hold);assert.deepEqual(camera.position.toArray(),SHOTS['ne:focal'].position);
+controller.update(10+t.flyOut);
+const pushed=new Vector3(...SHOTS['ne:focal'].position).lerp(new Vector3(...SHOTS['ne:focal'].target),.07);
+assert.ok(camera.position.distanceTo(pushed)<1e-8, 'hold pushes in by seven percent');
+controller.update(10+t.flyOut+1e-6);assert.ok(camera.position.distanceTo(pushed)<1e-6, 'fly-out starts without a jump');
 const interrupted=camera.position.clone(),aim=controls.target.clone();
 controller.play([{socketId:'sw',focal:false,district:true}],20);controller.update(20);
 assert.ok(camera.position.equals(interrupted));assert.ok(controls.target.equals(aim));

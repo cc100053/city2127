@@ -5,8 +5,8 @@
 - Status: IN PROGRESS（2026-10-29；T 實作中，F／A 未開始）
 - Branch: `feat/closeup-zoom`（由 verified main 開；T、F、A 三個 checkpoint）
 - Base commit: `2050883e93082af4f96da680c59a7de152fea853`（2026-10-29 fetch，main／origin/main 0/0）
-- Last verified commit: `967f5e57ec059f052904e68a45429ca6f46a0edc`（T root test/build/diff；browser 部分驗證）
-- Remote availability: `origin/feat/closeup-zoom` at `967f5e57ec059f052904e68a45429ca6f46a0edc`
+- Last verified commit: `b05779fe669ab361bdc29c1889b74ab218fa10af`（T root test/build/diff；browser 部分驗證）
+- Remote availability: `origin/feat/closeup-zoom` at `b05779fe669ab361bdc29c1889b74ab218fa10af`
 
 ## Session Git state
 
@@ -182,3 +182,8 @@ Hero 距離 target ≈787 m。現行 shot 距離（position→target）：
 ## 進度
 
 2026-10-29：由協調 session `01a187f8-f4b4-7d01-9817-76ed476e890a` 派 subagent 在獨立 clone 實作；T 程式及 targeted tests 完成，五組 scratch live 20/20、errors 0；root test/build PASS，F / A 未開始。餘下 live shot、A/B 早到及 no-op 未驗。新 8.38 s 能源講解中最長文字約 5.4 字／秒，待真人閱讀測試。補修無 `displayAt` 的 reduced-motion 理由即時性；正常 server 的 reduced-motion ambient UI 補測 4/4、errors 0。
+
+2026-10-30 續作：遠端 fetch 等待約 1 分鐘無回應而中止；遠端新鮮度未能重新核實。保留現有 feature checkout／F 未提交工作；整合或推送前必須重試。
+
+F 候選自評：NE／SW focal 達數字範圍；SE／NW focal 未達、SW 等 district carrier 不可讀；整體 FAIL，詳見 [量度及原圖](../../artifacts/closeup-zoom/final/F-review.md)。保留未通過項目供 A 與後續驗證，不視作 owner 接受。
+2026-10-30 限時重試 fetch 成功：`origin/main` 前進至 `f91236b`（新增 guest-agency 計劃，明確依賴本任務先完成）；本 feature 與其 remote 0/0。按流程未自動 merge；整合前須再核對。

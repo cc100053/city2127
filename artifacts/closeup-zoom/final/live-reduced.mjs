@@ -60,7 +60,7 @@ try{
   const beforeView=await api('/api/city-view'),before=await settled(beforeView),started=Date.now(),proposal=await submit(spec.axis),samples=[];let image=false,hold=false;const captures=new Set();
   while(Date.now()-started<15500){
    const d=await data(),p=await pose();const elapsed=Date.now()-started;if(samples.at(-1)?.time!==d.time)samples.push({elapsedMs:elapsed,...d,pose:p});for(const [ms,label] of [[4900,'before'],[6600,'changing'],[9500,'after']])if(elapsed>=ms&&!captures.has(label)){await page.screenshot({path:`${out}/${spec.sector}-${label}.jpg`,type:'jpeg',quality:90});captures.add(label);}
-   if(Math.hypot(...p.position.map((x,i)=>x-SHOTS[spec.id].position[i]))<.02){
+   if(Math.hypot(...p.position.map((x,i)=>x-SHOTS[spec.id].position[i]))<=.071*Math.hypot(...SHOTS[spec.id].position.map((x,i)=>x-SHOTS[spec.id].target[i]))){
     hold=true;if(!image&&Date.now()-started>6500){const place=await page.locator('.resident-place').textContent();assert.match(place,spec.place);await page.screenshot({path:`${out}/${spec.sector}-hold.jpg`,type:'jpeg',quality:90});image=true;}
    }
    await page.waitForTimeout(100);

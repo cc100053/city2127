@@ -1,0 +1,3141 @@
+{
+  "complete": true,
+  "browser": "156.0.8078.74",
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "default",
+  "mode": "Same createSurveyServer devAuto:true and fresh mkdtemp SQLite isolation as npm run dev:auto, dynamic loopback ports. Verified DEV config endpoint; proposals submitted through real HTTP API. Guest UI/auto-answer panel not exercised by this runner.",
+  "timing": "Real clock, no shortened reading slot. Each live sampled through normal return at15.5s. Diagnostics refresh120frames; intermediate samples do not measure exact3.000s (root suite covers that). A is rotor ring after one real preload; S and C are second sharing/function votes to exercise district shots. B and D use first sharing/service votes. All five selected shots must appear.",
+  "origins": [
+    {
+      "origin": "http://127.0.0.1:59414",
+      "database": "/var/folders/st/ml4_0zfx7g129gh2305ynz5c0000gn/T/closeup-z-auto-91ezao/survey.sqlite",
+      "devAuto": true,
+      "config": {
+        "questionSetVersion": 4,
+        "energy": {
+          "questionId": "energy-2127",
+          "options": [
+            {
+              "id": "water-storage",
+              "label": "水の音や機械が身近でも、海辺の庭で電気を蓄える暮らし"
+            },
+            {
+              "id": "rotor-storage",
+              "label": "大きな機械が景色に加わっても、街の中心で電気を蓄える暮らし"
+            },
+            {
+              "id": "orbital-supply",
+              "label": "海の上に受け取る面が広がっても、空から届く電気を使う暮らし"
+            },
+            {
+              "id": "island-supply",
+              "label": "海の一部が設備の陸地に変わっても、沖の原子力施設から電気を届ける暮らし"
+            }
+          ]
+        },
+        "meters": [
+          {
+            "axis": "automation",
+            "questionId": "service-2127",
+            "options": [
+              {
+                "id": "human-led",
+                "label": "待ち時間があっても、人に相談したい。技術はその人を支えてほしい",
+                "vote": -1
+              },
+              {
+                "id": "human-machine",
+                "label": "普段は自動で、困ったときは人に相談したい",
+                "vote": 0
+              },
+              {
+                "id": "autonomous",
+                "label": "人に相談する機会は少なくても、いつでも自動で利用したい",
+                "vote": 1
+              }
+            ]
+          },
+          {
+            "axis": "publicSharing",
+            "questionId": "commons-2127",
+            "options": [
+              {
+                "id": "private-pods",
+                "label": "予約して、一人や親しい人と静かに過ごせる場所",
+                "vote": -1
+              },
+              {
+                "id": "mixed-seating",
+                "label": "静かな席と、自由に集まれる場所が半分ずつある海辺",
+                "vote": 0
+              },
+              {
+                "id": "open-commons",
+                "label": "予約せず、誰でも一緒に使える開かれた海辺",
+                "vote": 1
+              }
+            ]
+          },
+          {
+            "axis": "urbanConcentration",
+            "questionId": "functions-2127",
+            "options": [
+              {
+                "id": "distributed-pavilions",
+                "label": "少し歩いても、水辺に点在する低い建物をめぐりたい",
+                "vote": -1
+              },
+              {
+                "id": "mixed-functions",
+                "label": "低い建物と高い建物が混ざる街で暮らしたい",
+                "vote": 0
+              },
+              {
+                "id": "vertical-functions",
+                "label": "上へ移動して、一つのタワーで用事を済ませたい",
+                "vote": 1
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "checks": [
+    {
+      "check": "current-v4 live, card/shot match, intermediate transition, normal return and authoritative all-site/energy counts",
+      "sector": "B",
+      "id": "sw:focal",
+      "axis": "commons-2127",
+      "preload": 0,
+      "place": "アクアシティ南",
+      "beforeView": {
+        "version": 2,
+        "runId": "46e31f0e-987a-4785-b283-fbd6e97042be",
+        "revision": 0,
+        "guestCount": 0,
+        "algorithmVersion": 2,
+        "voteSums": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "recentVotes": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "scores": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "slotSeeds": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "layout": {
+          "version": 2,
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "mixed",
+            "se": "mixed"
+          },
+          "tiers": {
+            "nw": 0,
+            "ne": 0,
+            "sw": 0,
+            "se": 0
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 4,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4
+        },
+        "recentProposals": []
+      },
+      "proposal": {
+        "request": {
+          "submissionId": "26287217-0c32-4bfb-afa5-0dfb5961ffb3",
+          "guestSessionId": "bc8be3e5-0441-4100-b668-9924686284f0",
+          "expectedRevision": 0,
+          "answers": [
+            {
+              "questionId": "service-2127",
+              "optionId": "human-machine"
+            },
+            {
+              "questionId": "commons-2127",
+              "optionId": "open-commons"
+            },
+            {
+              "questionId": "energy-2127",
+              "optionId": "water-storage"
+            },
+            {
+              "questionId": "functions-2127",
+              "optionId": "mixed-functions"
+            }
+          ]
+        },
+        "saved": {
+          "proposal": {
+            "id": "26287217-0c32-4bfb-afa5-0dfb5961ffb3",
+            "runId": "46e31f0e-987a-4785-b283-fbd6e97042be",
+            "guestSessionId": "bc8be3e5-0441-4100-b668-9924686284f0",
+            "ordinal": 1,
+            "displayAt": "2026-10-30T00:57:21.449Z",
+            "questionSetVersion": 4,
+            "algorithmVersion": 2,
+            "answers": [
+              {
+                "questionId": "service-2127",
+                "optionId": "human-machine",
+                "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+                "optionLabel": "普段は自動で、困ったときは人に相談したい"
+              },
+              {
+                "questionId": "commons-2127",
+                "optionId": "open-commons",
+                "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+                "optionLabel": "予約せず、誰でも一緒に使える開かれた海辺"
+              },
+              {
+                "questionId": "energy-2127",
+                "optionId": "water-storage",
+                "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+                "optionLabel": "水の音や機械が身近でも、海辺の庭で電気を蓄える暮らし"
+              },
+              {
+                "questionId": "functions-2127",
+                "optionId": "mixed-functions",
+                "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+                "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+              }
+            ],
+            "votes": {
+              "automation": 0,
+              "publicSharing": 1,
+              "energy": "water-storage",
+              "environmentalPriority": 0,
+              "urbanConcentration": 0
+            },
+            "revisionBefore": 0,
+            "revisionAfter": 1,
+            "submittedAt": "2026-10-30T00:57:21.449Z",
+            "beforeScores": {
+              "automation": 0,
+              "publicSharing": 0,
+              "environmentalPriority": 0,
+              "urbanConcentration": 0
+            },
+            "afterScores": {
+              "automation": 0,
+              "publicSharing": 7.5,
+              "environmentalPriority": 0,
+              "urbanConcentration": 0
+            },
+            "beforeLayout": {
+              "version": 2,
+              "bands": {
+                "nw": "mixed",
+                "ne": "mixed",
+                "sw": "mixed",
+                "se": "mixed"
+              },
+              "tiers": {
+                "nw": 0,
+                "ne": 0,
+                "sw": 0,
+                "se": 0
+              },
+              "automatedPorts": 3,
+              "sharedSeats": 4,
+              "treeCount": 8,
+              "plantedFraction": 0.5,
+              "coolingFins": 3,
+              "functionModules": 4
+            },
+            "afterLayout": {
+              "version": 2,
+              "energy": {
+                "waterGardens": 0,
+                "receiver": "none",
+                "flywheel": false,
+                "island": false
+              },
+              "bands": {
+                "nw": "mixed",
+                "ne": "mixed",
+                "sw": "high",
+                "se": "mixed"
+              },
+              "tiers": {
+                "nw": 0,
+                "ne": 0,
+                "sw": 1,
+                "se": 0
+              },
+              "automatedPorts": 3,
+              "sharedSeats": 8,
+              "treeCount": 8,
+              "plantedFraction": 0.5,
+              "coolingFins": 3,
+              "functionModules": 4
+            },
+            "cityChanges": [
+              {
+                "socketId": "sw",
+                "label": "共有座位",
+                "before": {
+                  "band": "mixed",
+                  "tier": 0,
+                  "sharedSeats": 4
+                },
+                "after": {
+                  "band": "high",
+                  "tier": 1,
+                  "sharedSeats": 8
+                }
+              }
+            ]
+          },
+          "state": {
+            "runId": "46e31f0e-987a-4785-b283-fbd6e97042be",
+            "revision": 1,
+            "guestCount": 1,
+            "algorithmVersion": 2,
+            "voteSums": {
+              "automation": 0,
+              "publicSharing": 1,
+              "environmentalPriority": 0,
+              "urbanConcentration": 0
+            },
+            "recentVotes": {
+              "automation": 0,
+              "publicSharing": 0.25,
+              "environmentalPriority": 0,
+              "urbanConcentration": 0
+            },
+            "scores": {
+              "automation": 0,
+              "publicSharing": 7.5,
+              "environmentalPriority": 0,
+              "urbanConcentration": 0
+            },
+            "updatedAt": "2026-10-30T00:57:21.449Z",
+            "energy": {
+              "climateGuestCount": 0,
+              "counts": {
+                "water-storage": 1,
+                "rotor-storage": 0,
+                "orbital-supply": 0,
+                "island-supply": 0
+              }
+            }
+          },
+          "replayed": false,
+          "displayWaitMs": 0,
+          "displayRemainingMs": 13000
+        },
+        "view": {
+          "version": 2,
+          "runId": "46e31f0e-987a-4785-b283-fbd6e97042be",
+          "revision": 1,
+          "guestCount": 1,
+          "algorithmVersion": 2,
+          "voteSums": {
+            "automation": 0,
+            "publicSharing": 1,
+            "environmentalPriority": 0,
+            "urbanConcentration": 0
+          },
+          "recentVotes": {
+            "automation": 0,
+            "publicSharing": 0.25,
+            "environmentalPriority": 0,
+            "urbanConcentration": 0
+          },
+          "scores": {
+            "automation": 0,
+            "publicSharing": 7.5,
+            "environmentalPriority": 0,
+            "urbanConcentration": 0
+          },
+          "slotSeeds": {
+            "automation": 0,
+            "publicSharing": 0,
+            "environmentalPriority": 0,
+            "urbanConcentration": 0
+          },
+          "layout": {
+            "version": 2,
+            "energy": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "bands": {
+              "nw": "mixed",
+              "ne": "mixed",
+              "sw": "high",
+              "se": "mixed"
+            },
+            "tiers": {
+              "nw": 0,
+              "ne": 0,
+              "sw": 1,
+              "se": 0
+            },
+            "automatedPorts": 3,
+            "sharedSeats": 8,
+            "treeCount": 8,
+            "plantedFraction": 0.5,
+            "coolingFins": 3,
+            "functionModules": 4
+          },
+          "energy": {
+            "climateGuestCount": 0,
+            "counts": {
+              "water-storage": 1,
+              "rotor-storage": 0,
+              "orbital-supply": 0,
+              "island-supply": 0
+            }
+          },
+          "recentProposals": [
+            {
+              "id": "26287217-0c32-4bfb-afa5-0dfb5961ffb3",
+              "runId": "46e31f0e-987a-4785-b283-fbd6e97042be",
+              "guestSessionId": "bc8be3e5-0441-4100-b668-9924686284f0",
+              "ordinal": 1,
+              "displayAt": "2026-10-30T00:57:21.449Z",
+              "questionSetVersion": 4,
+              "algorithmVersion": 2,
+              "answers": [
+                {
+                  "questionId": "service-2127",
+                  "optionId": "human-machine",
+                  "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+                  "optionLabel": "普段は自動で、困ったときは人に相談したい"
+                },
+                {
+                  "questionId": "commons-2127",
+                  "optionId": "open-commons",
+                  "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+                  "optionLabel": "予約せず、誰でも一緒に使える開かれた海辺"
+                },
+                {
+                  "questionId": "energy-2127",
+                  "optionId": "water-storage",
+                  "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+                  "optionLabel": "水の音や機械が身近でも、海辺の庭で電気を蓄える暮らし"
+                },
+                {
+                  "questionId": "functions-2127",
+                  "optionId": "mixed-functions",
+                  "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+                  "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+                }
+              ],
+              "votes": {
+                "automation": 0,
+                "publicSharing": 1,
+                "energy": "water-storage",
+                "environmentalPriority": 0,
+                "urbanConcentration": 0
+              },
+              "revisionBefore": 0,
+              "revisionAfter": 1,
+              "submittedAt": "2026-10-30T00:57:21.449Z",
+              "beforeScores": {
+                "automation": 0,
+                "publicSharing": 0,
+                "environmentalPriority": 0,
+                "urbanConcentration": 0
+              },
+              "afterScores": {
+                "automation": 0,
+                "publicSharing": 7.5,
+                "environmentalPriority": 0,
+                "urbanConcentration": 0
+              },
+              "beforeLayout": {
+                "version": 2,
+                "bands": {
+                  "nw": "mixed",
+                  "ne": "mixed",
+                  "sw": "mixed",
+                  "se": "mixed"
+                },
+                "tiers": {
+                  "nw": 0,
+                  "ne": 0,
+                  "sw": 0,
+                  "se": 0
+                },
+                "automatedPorts": 3,
+                "sharedSeats": 4,
+                "treeCount": 8,
+                "plantedFraction": 0.5,
+                "coolingFins": 3,
+                "functionModules": 4
+              },
+              "afterLayout": {
+                "version": 2,
+                "energy": {
+                  "waterGardens": 0,
+                  "receiver": "none",
+                  "flywheel": false,
+                  "island": false
+                },
+                "bands": {
+                  "nw": "mixed",
+                  "ne": "mixed",
+                  "sw": "high",
+                  "se": "mixed"
+                },
+                "tiers": {
+                  "nw": 0,
+                  "ne": 0,
+                  "sw": 1,
+                  "se": 0
+                },
+                "automatedPorts": 3,
+                "sharedSeats": 8,
+                "treeCount": 8,
+                "plantedFraction": 0.5,
+                "coolingFins": 3,
+                "functionModules": 4
+              },
+              "cityChanges": [
+                {
+                  "socketId": "sw",
+                  "label": "共有座位",
+                  "before": {
+                    "band": "mixed",
+                    "tier": 0,
+                    "sharedSeats": 4
+                  },
+                  "after": {
+                    "band": "high",
+                    "tier": 1,
+                    "sharedSeats": 8
+                  }
+                }
+              ]
+            }
+          ],
+          "latestProposal": {
+            "id": "26287217-0c32-4bfb-afa5-0dfb5961ffb3",
+            "runId": "46e31f0e-987a-4785-b283-fbd6e97042be",
+            "guestSessionId": "bc8be3e5-0441-4100-b668-9924686284f0",
+            "ordinal": 1,
+            "displayAt": "2026-10-30T00:57:21.449Z",
+            "questionSetVersion": 4,
+            "algorithmVersion": 2,
+            "answers": [
+              {
+                "questionId": "service-2127",
+                "optionId": "human-machine",
+                "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+                "optionLabel": "普段は自動で、困ったときは人に相談したい"
+              },
+              {
+                "questionId": "commons-2127",
+                "optionId": "open-commons",
+                "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+                "optionLabel": "予約せず、誰でも一緒に使える開かれた海辺"
+              },
+              {
+                "questionId": "energy-2127",
+                "optionId": "water-storage",
+                "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+                "optionLabel": "水の音や機械が身近でも、海辺の庭で電気を蓄える暮らし"
+              },
+              {
+                "questionId": "functions-2127",
+                "optionId": "mixed-functions",
+                "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+                "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+              }
+            ],
+            "votes": {
+              "automation": 0,
+              "publicSharing": 1,
+              "energy": "water-storage",
+              "environmentalPriority": 0,
+              "urbanConcentration": 0
+            },
+            "revisionBefore": 0,
+            "revisionAfter": 1,
+            "submittedAt": "2026-10-30T00:57:21.449Z",
+            "beforeScores": {
+              "automation": 0,
+              "publicSharing": 0,
+              "environmentalPriority": 0,
+              "urbanConcentration": 0
+            },
+            "afterScores": {
+              "automation": 0,
+              "publicSharing": 7.5,
+              "environmentalPriority": 0,
+              "urbanConcentration": 0
+            },
+            "beforeLayout": {
+              "version": 2,
+              "bands": {
+                "nw": "mixed",
+                "ne": "mixed",
+                "sw": "mixed",
+                "se": "mixed"
+              },
+              "tiers": {
+                "nw": 0,
+                "ne": 0,
+                "sw": 0,
+                "se": 0
+              },
+              "automatedPorts": 3,
+              "sharedSeats": 4,
+              "treeCount": 8,
+              "plantedFraction": 0.5,
+              "coolingFins": 3,
+              "functionModules": 4
+            },
+            "afterLayout": {
+              "version": 2,
+              "energy": {
+                "waterGardens": 0,
+                "receiver": "none",
+                "flywheel": false,
+                "island": false
+              },
+              "bands": {
+                "nw": "mixed",
+                "ne": "mixed",
+                "sw": "high",
+                "se": "mixed"
+              },
+              "tiers": {
+                "nw": 0,
+                "ne": 0,
+                "sw": 1,
+                "se": 0
+              },
+              "automatedPorts": 3,
+              "sharedSeats": 8,
+              "treeCount": 8,
+              "plantedFraction": 0.5,
+              "coolingFins": 3,
+              "functionModules": 4
+            },
+            "cityChanges": [
+              {
+                "socketId": "sw",
+                "label": "共有座位",
+                "before": {
+                  "band": "mixed",
+                  "tier": 0,
+                  "sharedSeats": 4
+                },
+                "after": {
+                  "band": "high",
+                  "tier": 1,
+                  "sharedSeats": 8
+                }
+              }
+            ]
+          }
+        }
+      },
+      "samples": [
+        {
+          "elapsedMs": 18,
+          "time": 14.13,
+          "sites": {
+            "magnetEast": {
+              "variant": "automation-mixed",
+              "layers": {
+                "hubBase": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "hubUpper": {
+                  "kind": "glb",
+                  "assetId": "automation-hub-upper",
+                  "assetStatus": "idle"
+                },
+                "hubNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "automationDistrict": {
+                "enabled": true,
+                "serviceDrones": 11,
+                "nightRhythm": 1,
+                "targetAutomation": 0.5,
+                "automation": 0.5,
+                "activePulses": 0,
+                "pavilions": 11,
+                "visibleStaffedPavilions": 3,
+                "visibleDronePorts": 8,
+                "hybridBays": 6,
+                "loopAircraft": 16,
+                "guidewayPods": 18,
+                "walkers": 260
+              },
+              "automationHub": {
+                "band": "mixed",
+                "targetAutomatedPorts": 3,
+                "visibleAutomatedPorts": 3,
+                "targetHumanCounters": 3,
+                "visibleHumanCounters": 3
+              }
+            },
+            "stationEastPark": {
+              "variant": "exhibition-neutral",
+              "layers": {
+                "parkSurface": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "parkTrees": {
+                  "kind": "glb",
+                  "assetId": "future-tree-2127",
+                  "assetStatus": "ready"
+                },
+                "parkCoolingFins": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "environmentPark": {
+                "band": "mixed",
+                "targetTreeCount": 8,
+                "visibleTreeCount": 8,
+                "targetPlantedFraction": 0.5,
+                "plantedFraction": 0.5,
+                "targetCoolingFins": 3,
+                "visibleCoolingFins": 3,
+                "representation": "glb"
+              },
+              "environmentDistrict": {
+                "nightRhythm": 1,
+                "slots": 17,
+                "targetCanopy": 0.5,
+                "visibleCanopies": 9,
+                "visibleSails": 8,
+                "visibleCoolingTowers": 0,
+                "roofs": 53,
+                "visibleRoofSails": 31,
+                "visibleRoofCrowns": 22,
+                "hybridBays": 12,
+                "hybridRoofs": 29,
+                "activePulses": 0
+              }
+            },
+            "dogenzakaSouth": {
+              "variant": "commons-mixed",
+              "layers": {
+                "plaza": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "commonsNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "sharingDistrict": {
+                "enabled": true,
+                "nightRhythm": 1,
+                "plazaPeople": 24,
+                "targetSharing": 0.5,
+                "rooms": 6,
+                "activePulses": 0,
+                "vaults": 3,
+                "courts": 10,
+                "hybridRooms": 3,
+                "hybridCourts": 5,
+                "droneKiosks": 0,
+                "orchardCourts": 0,
+                "visibleOpenCourts": 4,
+                "visibleOpenRooms": 3,
+                "visiblePrivateRooms": 3
+              },
+              "commonsPlaza": {
+                "band": "mixed",
+                "targetSharedSeats": 4,
+                "visibleSharedSeats": 4,
+                "targetScreenedSeats": 4,
+                "visibleScreenedSeats": 4
+              }
+            },
+            "centerGaiRear": {
+              "variant": "tower-mixed",
+              "layers": {
+                "towerBase": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "towerUpper": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "towerNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "concentrationDistrict": {
+                "enabled": true,
+                "nightRhythm": 1,
+                "targetConcentration": 0.5,
+                "towers": 10,
+                "pods": 26,
+                "activePulses": 0,
+                "visibleTowers": 5,
+                "visiblePods": 15,
+                "midRises": 2,
+                "forestTowers": 0,
+                "droneDocks": 0,
+                "solarPods": 0
+              },
+              "concentrationTower": {
+                "band": "mixed",
+                "targetFunctionModules": 4,
+                "activeFunctionModules": 4,
+                "transitioning": false,
+                "representation": "mid-rise-hall"
+              }
+            }
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 0.5820104841598137,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          },
+          "guestCount": 1,
+          "pose": {
+            "position": [
+              -520,
+              300,
+              -620.0000000000002
+            ],
+            "target": [
+              -40,
+              25,
+              -59.999999999999986
+            ]
+          }
+        },
+        {
+          "elapsedMs": 2035,
+          "time": 16.13,
+          "sites": {
+            "magnetEast": {
+              "variant": "automation-mixed",
+              "layers": {
+                "hubBase": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "hubUpper": {
+                  "kind": "glb",
+                  "assetId": "automation-hub-upper",
+                  "assetStatus": "idle"
+                },
+                "hubNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "automationDistrict": {
+                "enabled": true,
+                "serviceDrones": 11,
+                "nightRhythm": 1,
+                "targetAutomation": 0.5,
+                "automation": 0.5,
+                "activePulses": 0,
+                "pavilions": 11,
+                "visibleStaffedPavilions": 3,
+                "visibleDronePorts": 8,
+                "hybridBays": 6,
+                "loopAircraft": 16,
+                "guidewayPods": 18,
+                "walkers": 260
+              },
+              "automationHub": {
+                "band": "mixed",
+                "targetAutomatedPorts": 3,
+                "visibleAutomatedPorts": 3,
+                "targetHumanCounters": 3,
+                "visibleHumanCounters": 3
+              }
+            },
+            "stationEastPark": {
+              "variant": "exhibition-neutral",
+              "layers": {
+                "parkSurface": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "parkTrees": {
+                  "kind": "glb",
+                  "assetId": "future-tree-2127",
+                  "assetStatus": "ready"
+                },
+                "parkCoolingFins": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "environmentPark": {
+                "band": "mixed",
+                "targetTreeCount": 8,
+                "visibleTreeCount": 8,
+                "targetPlantedFraction": 0.5,
+                "plantedFraction": 0.5,
+                "targetCoolingFins": 3,
+                "visibleCoolingFins": 3,
+                "representation": "glb"
+              },
+              "environmentDistrict": {
+                "nightRhythm": 1,
+                "slots": 17,
+                "targetCanopy": 0.5,
+                "visibleCanopies": 9,
+                "visibleSails": 8,
+                "visibleCoolingTowers": 0,
+                "roofs": 53,
+                "visibleRoofSails": 31,
+                "visibleRoofCrowns": 22,
+                "hybridBays": 12,
+                "hybridRoofs": 29,
+                "activePulses": 0
+              }
+            },
+            "dogenzakaSouth": {
+              "variant": "commons-high",
+              "layers": {
+                "plaza": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "commonsNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "sharingDistrict": {
+                "enabled": true,
+                "nightRhythm": 1,
+                "plazaPeople": 24,
+                "targetSharing": 0.5,
+                "rooms": 6,
+                "activePulses": 0,
+                "vaults": 3,
+                "courts": 10,
+                "hybridRooms": 3,
+                "hybridCourts": 5,
+                "droneKiosks": 0,
+                "orchardCourts": 0,
+                "visibleOpenCourts": 4,
+                "visibleOpenRooms": 3,
+                "visiblePrivateRooms": 3
+              },
+              "commonsPlaza": {
+                "band": "high",
+                "targetSharedSeats": 8,
+                "visibleSharedSeats": 4,
+                "targetScreenedSeats": 0,
+                "visibleScreenedSeats": 4
+              }
+            },
+            "centerGaiRear": {
+              "variant": "tower-mixed",
+              "layers": {
+                "towerBase": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "towerUpper": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "towerNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "concentrationDistrict": {
+                "enabled": true,
+                "nightRhythm": 1,
+                "targetConcentration": 0.5,
+                "towers": 10,
+                "pods": 26,
+                "activePulses": 0,
+                "visibleTowers": 5,
+                "visiblePods": 15,
+                "midRises": 2,
+                "forestTowers": 0,
+                "droneDocks": 0,
+                "solarPods": 0
+              },
+              "concentrationTower": {
+                "band": "mixed",
+                "targetFunctionModules": 4,
+                "activeFunctionModules": 4,
+                "transitioning": false,
+                "representation": "mid-rise-hall"
+              }
+            }
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 0.7127832841597967,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          },
+          "guestCount": 1,
+          "pose": {
+            "position": [
+              -520,
+              300,
+              -620
+            ],
+            "target": [
+              -40,
+              25,
+              -60
+            ]
+          }
+        },
+        {
+          "elapsedMs": 4025,
+          "time": 18.13,
+          "sites": {
+            "magnetEast": {
+              "variant": "automation-mixed",
+              "layers": {
+                "hubBase": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "hubUpper": {
+                  "kind": "glb",
+                  "assetId": "automation-hub-upper",
+                  "assetStatus": "idle"
+                },
+                "hubNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "automationDistrict": {
+                "enabled": true,
+                "serviceDrones": 11,
+                "nightRhythm": 1,
+                "targetAutomation": 0.5,
+                "automation": 0.5,
+                "activePulses": 0,
+                "pavilions": 11,
+                "visibleStaffedPavilions": 3,
+                "visibleDronePorts": 8,
+                "hybridBays": 6,
+                "loopAircraft": 16,
+                "guidewayPods": 18,
+                "walkers": 260
+              },
+              "automationHub": {
+                "band": "mixed",
+                "targetAutomatedPorts": 3,
+                "visibleAutomatedPorts": 3,
+                "targetHumanCounters": 3,
+                "visibleHumanCounters": 3
+              }
+            },
+            "stationEastPark": {
+              "variant": "exhibition-neutral",
+              "layers": {
+                "parkSurface": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "parkTrees": {
+                  "kind": "glb",
+                  "assetId": "future-tree-2127",
+                  "assetStatus": "ready"
+                },
+                "parkCoolingFins": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "environmentPark": {
+                "band": "mixed",
+                "targetTreeCount": 8,
+                "visibleTreeCount": 8,
+                "targetPlantedFraction": 0.5,
+                "plantedFraction": 0.5,
+                "targetCoolingFins": 3,
+                "visibleCoolingFins": 3,
+                "representation": "glb"
+              },
+              "environmentDistrict": {
+                "nightRhythm": 1,
+                "slots": 17,
+                "targetCanopy": 0.5,
+                "visibleCanopies": 9,
+                "visibleSails": 8,
+                "visibleCoolingTowers": 0,
+                "roofs": 53,
+                "visibleRoofSails": 31,
+                "visibleRoofCrowns": 22,
+                "hybridBays": 12,
+                "hybridRoofs": 29,
+                "activePulses": 0
+              }
+            },
+            "dogenzakaSouth": {
+              "variant": "commons-high",
+              "layers": {
+                "plaza": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "commonsNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "sharingDistrict": {
+                "enabled": true,
+                "nightRhythm": 1,
+                "plazaPeople": 24,
+                "targetSharing": 0.5,
+                "rooms": 6,
+                "activePulses": 0,
+                "vaults": 3,
+                "courts": 10,
+                "hybridRooms": 3,
+                "hybridCourts": 5,
+                "droneKiosks": 0,
+                "orchardCourts": 0,
+                "visibleOpenCourts": 4,
+                "visibleOpenRooms": 3,
+                "visiblePrivateRooms": 3
+              },
+              "commonsPlaza": {
+                "band": "high",
+                "targetSharedSeats": 8,
+                "visibleSharedSeats": 4,
+                "targetScreenedSeats": 0,
+                "visibleScreenedSeats": 4
+              }
+            },
+            "centerGaiRear": {
+              "variant": "tower-mixed",
+              "layers": {
+                "towerBase": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "towerUpper": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "towerNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "concentrationDistrict": {
+                "enabled": true,
+                "nightRhythm": 1,
+                "targetConcentration": 0.5,
+                "towers": 10,
+                "pods": 26,
+                "activePulses": 0,
+                "visibleTowers": 5,
+                "visiblePods": 15,
+                "midRises": 2,
+                "forestTowers": 0,
+                "droneDocks": 0,
+                "solarPods": 0
+              },
+              "concentrationTower": {
+                "band": "mixed",
+                "targetFunctionModules": 4,
+                "activeFunctionModules": 4,
+                "transitioning": false,
+                "representation": "mid-rise-hall"
+              }
+            }
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 0.8555486455346677,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          },
+          "guestCount": 1,
+          "pose": {
+            "position": [
+              -207.25818326922314,
+              115.48232812884166,
+              -16.408293709600684
+            ],
+            "target": [
+              -90.82054521875125,
+              13.272181872595867,
+              33.82254501923306
+            ]
+          }
+        },
+        {
+          "elapsedMs": 5999,
+          "time": 20.13,
+          "sites": {
+            "magnetEast": {
+              "variant": "automation-mixed",
+              "layers": {
+                "hubBase": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "hubUpper": {
+                  "kind": "glb",
+                  "assetId": "automation-hub-upper",
+                  "assetStatus": "idle"
+                },
+                "hubNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "automationDistrict": {
+                "enabled": true,
+                "serviceDrones": 11,
+                "nightRhythm": 1,
+                "targetAutomation": 0.5,
+                "automation": 0.5,
+                "activePulses": 0,
+                "pavilions": 11,
+                "visibleStaffedPavilions": 3,
+                "visibleDronePorts": 8,
+                "hybridBays": 6,
+                "loopAircraft": 16,
+                "guidewayPods": 18,
+                "walkers": 260
+              },
+              "automationHub": {
+                "band": "mixed",
+                "targetAutomatedPorts": 3,
+                "visibleAutomatedPorts": 3,
+                "targetHumanCounters": 3,
+                "visibleHumanCounters": 3
+              }
+            },
+            "stationEastPark": {
+              "variant": "exhibition-neutral",
+              "layers": {
+                "parkSurface": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "parkTrees": {
+                  "kind": "glb",
+                  "assetId": "future-tree-2127",
+                  "assetStatus": "ready"
+                },
+                "parkCoolingFins": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "environmentPark": {
+                "band": "mixed",
+                "targetTreeCount": 8,
+                "visibleTreeCount": 8,
+                "targetPlantedFraction": 0.5,
+                "plantedFraction": 0.5,
+                "targetCoolingFins": 3,
+                "visibleCoolingFins": 3,
+                "representation": "glb"
+              },
+              "environmentDistrict": {
+                "nightRhythm": 1,
+                "slots": 17,
+                "targetCanopy": 0.5,
+                "visibleCanopies": 9,
+                "visibleSails": 8,
+                "visibleCoolingTowers": 0,
+                "roofs": 53,
+                "visibleRoofSails": 31,
+                "visibleRoofCrowns": 22,
+                "hybridBays": 12,
+                "hybridRoofs": 29,
+                "activePulses": 0
+              }
+            },
+            "dogenzakaSouth": {
+              "variant": "commons-high",
+              "layers": {
+                "plaza": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "commonsNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "sharingDistrict": {
+                "enabled": true,
+                "nightRhythm": 1,
+                "plazaPeople": 24,
+                "targetSharing": 0.5,
+                "rooms": 6,
+                "activePulses": 0,
+                "vaults": 3,
+                "courts": 10,
+                "hybridRooms": 3,
+                "hybridCourts": 5,
+                "droneKiosks": 0,
+                "orchardCourts": 0,
+                "visibleOpenCourts": 4,
+                "visibleOpenRooms": 3,
+                "visiblePrivateRooms": 3
+              },
+              "commonsPlaza": {
+                "band": "high",
+                "targetSharedSeats": 8,
+                "visibleSharedSeats": 8,
+                "targetScreenedSeats": 0,
+                "visibleScreenedSeats": 4
+              }
+            },
+            "centerGaiRear": {
+              "variant": "tower-mixed",
+              "layers": {
+                "towerBase": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "towerUpper": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "towerNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "concentrationDistrict": {
+                "enabled": true,
+                "nightRhythm": 1,
+                "targetConcentration": 0.5,
+                "towers": 10,
+                "pods": 26,
+                "activePulses": 0,
+                "visibleTowers": 5,
+                "visiblePods": 15,
+                "midRises": 2,
+                "forestTowers": 0,
+                "droneDocks": 0,
+                "solarPods": 0
+              },
+              "concentrationTower": {
+                "band": "mixed",
+                "targetFunctionModules": 4,
+                "activeFunctionModules": 4,
+                "transitioning": false,
+                "representation": "mid-rise-hall"
+              }
+            }
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.0102719999998806,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          },
+          "guestCount": 1,
+          "pose": {
+            "position": [
+              -119.92404720314823,
+              63.726569931333614,
+              151.5341561793091
+            ],
+            "target": [
+              -105,
+              10,
+              60
+            ]
+          }
+        },
+        {
+          "elapsedMs": 8034,
+          "time": 22.13,
+          "sites": {
+            "magnetEast": {
+              "variant": "automation-mixed",
+              "layers": {
+                "hubBase": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "hubUpper": {
+                  "kind": "glb",
+                  "assetId": "automation-hub-upper",
+                  "assetStatus": "idle"
+                },
+                "hubNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "automationDistrict": {
+                "enabled": true,
+                "serviceDrones": 11,
+                "nightRhythm": 1,
+                "targetAutomation": 0.5,
+                "automation": 0.5,
+                "activePulses": 0,
+                "pavilions": 11,
+                "visibleStaffedPavilions": 3,
+                "visibleDronePorts": 8,
+                "hybridBays": 6,
+                "loopAircraft": 16,
+                "guidewayPods": 18,
+                "walkers": 260
+              },
+              "automationHub": {
+                "band": "mixed",
+                "targetAutomatedPorts": 3,
+                "visibleAutomatedPorts": 3,
+                "targetHumanCounters": 3,
+                "visibleHumanCounters": 3
+              }
+            },
+            "stationEastPark": {
+              "variant": "exhibition-neutral",
+              "layers": {
+                "parkSurface": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "parkTrees": {
+                  "kind": "glb",
+                  "assetId": "future-tree-2127",
+                  "assetStatus": "ready"
+                },
+                "parkCoolingFins": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "environmentPark": {
+                "band": "mixed",
+                "targetTreeCount": 8,
+                "visibleTreeCount": 8,
+                "targetPlantedFraction": 0.5,
+                "plantedFraction": 0.5,
+                "targetCoolingFins": 3,
+                "visibleCoolingFins": 3,
+                "representation": "glb"
+              },
+              "environmentDistrict": {
+                "nightRhythm": 1,
+                "slots": 17,
+                "targetCanopy": 0.5,
+                "visibleCanopies": 9,
+                "visibleSails": 8,
+                "visibleCoolingTowers": 0,
+                "roofs": 53,
+                "visibleRoofSails": 31,
+                "visibleRoofCrowns": 22,
+                "hybridBays": 12,
+                "hybridRoofs": 29,
+                "activePulses": 0
+              }
+            },
+            "dogenzakaSouth": {
+              "variant": "commons-high",
+              "layers": {
+                "plaza": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "commonsNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "sharingDistrict": {
+                "enabled": true,
+                "nightRhythm": 1,
+                "plazaPeople": 24,
+                "targetSharing": 0.5,
+                "rooms": 6,
+                "activePulses": 0,
+                "vaults": 3,
+                "courts": 10,
+                "hybridRooms": 3,
+                "hybridCourts": 5,
+                "droneKiosks": 0,
+                "orchardCourts": 0,
+                "visibleOpenCourts": 4,
+                "visibleOpenRooms": 3,
+                "visiblePrivateRooms": 3
+              },
+              "commonsPlaza": {
+                "band": "high",
+                "targetSharedSeats": 8,
+                "visibleSharedSeats": 8,
+                "targetScreenedSeats": 0,
+                "visibleScreenedSeats": 4
+              }
+            },
+            "centerGaiRear": {
+              "variant": "tower-mixed",
+              "layers": {
+                "towerBase": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "towerUpper": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "towerNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "concentrationDistrict": {
+                "enabled": true,
+                "nightRhythm": 1,
+                "targetConcentration": 0.5,
+                "towers": 10,
+                "pods": 26,
+                "activePulses": 0,
+                "visibleTowers": 5,
+                "visiblePods": 15,
+                "midRises": 2,
+                "forestTowers": 0,
+                "droneDocks": 0,
+                "solarPods": 0
+              },
+              "concentrationTower": {
+                "band": "mixed",
+                "targetFunctionModules": 4,
+                "activeFunctionModules": 4,
+                "transitioning": false,
+                "representation": "mid-rise-hall"
+              }
+            }
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.1702800000000002,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          },
+          "guestCount": 1,
+          "pose": {
+            "position": [
+              -119.6193612227471,
+              62.629700401889494,
+              149.66541549951546
+            ],
+            "target": [
+              -105,
+              10,
+              60
+            ]
+          }
+        },
+        {
+          "elapsedMs": 10001,
+          "time": 24.13,
+          "sites": {
+            "magnetEast": {
+              "variant": "automation-mixed",
+              "layers": {
+                "hubBase": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "hubUpper": {
+                  "kind": "glb",
+                  "assetId": "automation-hub-upper",
+                  "assetStatus": "idle"
+                },
+                "hubNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "automationDistrict": {
+                "enabled": true,
+                "serviceDrones": 11,
+                "nightRhythm": 1,
+                "targetAutomation": 0.5,
+                "automation": 0.5,
+                "activePulses": 0,
+                "pavilions": 11,
+                "visibleStaffedPavilions": 3,
+                "visibleDronePorts": 8,
+                "hybridBays": 6,
+                "loopAircraft": 16,
+                "guidewayPods": 18,
+                "walkers": 260
+              },
+              "automationHub": {
+                "band": "mixed",
+                "targetAutomatedPorts": 3,
+                "visibleAutomatedPorts": 3,
+                "targetHumanCounters": 3,
+                "visibleHumanCounters": 3
+              }
+            },
+            "stationEastPark": {
+              "variant": "exhibition-neutral",
+              "layers": {
+                "parkSurface": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "parkTrees": {
+                  "kind": "glb",
+                  "assetId": "future-tree-2127",
+                  "assetStatus": "ready"
+                },
+                "parkCoolingFins": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "environmentPark": {
+                "band": "mixed",
+                "targetTreeCount": 8,
+                "visibleTreeCount": 8,
+                "targetPlantedFraction": 0.5,
+                "plantedFraction": 0.5,
+                "targetCoolingFins": 3,
+                "visibleCoolingFins": 3,
+                "representation": "glb"
+              },
+              "environmentDistrict": {
+                "nightRhythm": 1,
+                "slots": 17,
+                "targetCanopy": 0.5,
+                "visibleCanopies": 9,
+                "visibleSails": 8,
+                "visibleCoolingTowers": 0,
+                "roofs": 53,
+                "visibleRoofSails": 31,
+                "visibleRoofCrowns": 22,
+                "hybridBays": 12,
+                "hybridRoofs": 29,
+                "activePulses": 0
+              }
+            },
+            "dogenzakaSouth": {
+              "variant": "commons-high",
+              "layers": {
+                "plaza": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "commonsNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "sharingDistrict": {
+                "enabled": true,
+                "nightRhythm": 1,
+                "plazaPeople": 24,
+                "targetSharing": 0.5,
+                "rooms": 6,
+                "activePulses": 0,
+                "vaults": 3,
+                "courts": 10,
+                "hybridRooms": 3,
+                "hybridCourts": 5,
+                "droneKiosks": 0,
+                "orchardCourts": 0,
+                "visibleOpenCourts": 4,
+                "visibleOpenRooms": 3,
+                "visiblePrivateRooms": 3
+              },
+              "commonsPlaza": {
+                "band": "high",
+                "targetSharedSeats": 8,
+                "visibleSharedSeats": 8,
+                "targetScreenedSeats": 0,
+                "visibleScreenedSeats": 0
+              }
+            },
+            "centerGaiRear": {
+              "variant": "tower-mixed",
+              "layers": {
+                "towerBase": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "towerUpper": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "towerNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "concentrationDistrict": {
+                "enabled": true,
+                "nightRhythm": 1,
+                "targetConcentration": 0.5,
+                "towers": 10,
+                "pods": 26,
+                "activePulses": 0,
+                "visibleTowers": 5,
+                "visiblePods": 15,
+                "midRises": 2,
+                "forestTowers": 0,
+                "droneDocks": 0,
+                "solarPods": 0
+              },
+              "concentrationTower": {
+                "band": "mixed",
+                "targetFunctionModules": 4,
+                "activeFunctionModules": 4,
+                "transitioning": false,
+                "representation": "mid-rise-hall"
+              }
+            }
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.3302800000000001,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          },
+          "guestCount": 1,
+          "pose": {
+            "position": [
+              -119.25742511027488,
+              61.32673039698969,
+              147.44554067635283
+            ],
+            "target": [
+              -105,
+              10,
+              60
+            ]
+          }
+        },
+        {
+          "elapsedMs": 12016,
+          "time": 26.13,
+          "sites": {
+            "magnetEast": {
+              "variant": "automation-mixed",
+              "layers": {
+                "hubBase": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "hubUpper": {
+                  "kind": "glb",
+                  "assetId": "automation-hub-upper",
+                  "assetStatus": "idle"
+                },
+                "hubNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "automationDistrict": {
+                "enabled": true,
+                "serviceDrones": 11,
+                "nightRhythm": 1,
+                "targetAutomation": 0.5,
+                "automation": 0.5,
+                "activePulses": 0,
+                "pavilions": 11,
+                "visibleStaffedPavilions": 3,
+                "visibleDronePorts": 8,
+                "hybridBays": 6,
+                "loopAircraft": 16,
+                "guidewayPods": 18,
+                "walkers": 260
+              },
+              "automationHub": {
+                "band": "mixed",
+                "targetAutomatedPorts": 3,
+                "visibleAutomatedPorts": 3,
+                "targetHumanCounters": 3,
+                "visibleHumanCounters": 3
+              }
+            },
+            "stationEastPark": {
+              "variant": "exhibition-neutral",
+              "layers": {
+                "parkSurface": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "parkTrees": {
+                  "kind": "glb",
+                  "assetId": "future-tree-2127",
+                  "assetStatus": "ready"
+                },
+                "parkCoolingFins": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "environmentPark": {
+                "band": "mixed",
+                "targetTreeCount": 8,
+                "visibleTreeCount": 8,
+                "targetPlantedFraction": 0.5,
+                "plantedFraction": 0.5,
+                "targetCoolingFins": 3,
+                "visibleCoolingFins": 3,
+                "representation": "glb"
+              },
+              "environmentDistrict": {
+                "nightRhythm": 1,
+                "slots": 17,
+                "targetCanopy": 0.5,
+                "visibleCanopies": 9,
+                "visibleSails": 8,
+                "visibleCoolingTowers": 0,
+                "roofs": 53,
+                "visibleRoofSails": 31,
+                "visibleRoofCrowns": 22,
+                "hybridBays": 12,
+                "hybridRoofs": 29,
+                "activePulses": 0
+              }
+            },
+            "dogenzakaSouth": {
+              "variant": "commons-high",
+              "layers": {
+                "plaza": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "commonsNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "sharingDistrict": {
+                "enabled": true,
+                "nightRhythm": 1,
+                "plazaPeople": 24,
+                "targetSharing": 0.5,
+                "rooms": 6,
+                "activePulses": 0,
+                "vaults": 3,
+                "courts": 10,
+                "hybridRooms": 3,
+                "hybridCourts": 5,
+                "droneKiosks": 0,
+                "orchardCourts": 0,
+                "visibleOpenCourts": 4,
+                "visibleOpenRooms": 3,
+                "visiblePrivateRooms": 3
+              },
+              "commonsPlaza": {
+                "band": "high",
+                "targetSharedSeats": 8,
+                "visibleSharedSeats": 8,
+                "targetScreenedSeats": 0,
+                "visibleScreenedSeats": 0
+              }
+            },
+            "centerGaiRear": {
+              "variant": "tower-mixed",
+              "layers": {
+                "towerBase": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "towerUpper": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "towerNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "concentrationDistrict": {
+                "enabled": true,
+                "nightRhythm": 1,
+                "targetConcentration": 0.5,
+                "towers": 10,
+                "pods": 26,
+                "activePulses": 0,
+                "visibleTowers": 5,
+                "visiblePods": 15,
+                "midRises": 2,
+                "forestTowers": 0,
+                "droneDocks": 0,
+                "solarPods": 0
+              },
+              "concentrationTower": {
+                "band": "mixed",
+                "targetFunctionModules": 4,
+                "activeFunctionModules": 4,
+                "transitioning": false,
+                "representation": "mid-rise-hall"
+              }
+            }
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.4902719999998806,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          },
+          "guestCount": 1,
+          "pose": {
+            "position": [
+              -118.99003233846236,
+              60.36411641846453,
+              145.80553167590256
+            ],
+            "target": [
+              -105,
+              10,
+              60
+            ]
+          }
+        },
+        {
+          "elapsedMs": 14017,
+          "time": 28.13,
+          "sites": {
+            "magnetEast": {
+              "variant": "automation-mixed",
+              "layers": {
+                "hubBase": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "hubUpper": {
+                  "kind": "glb",
+                  "assetId": "automation-hub-upper",
+                  "assetStatus": "idle"
+                },
+                "hubNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "automationDistrict": {
+                "enabled": true,
+                "serviceDrones": 11,
+                "nightRhythm": 1,
+                "targetAutomation": 0.5,
+                "automation": 0.5,
+                "activePulses": 0,
+                "pavilions": 11,
+                "visibleStaffedPavilions": 3,
+                "visibleDronePorts": 8,
+                "hybridBays": 6,
+                "loopAircraft": 16,
+                "guidewayPods": 18,
+                "walkers": 260
+              },
+              "automationHub": {
+                "band": "mixed",
+                "targetAutomatedPorts": 3,
+                "visibleAutomatedPorts": 3,
+                "targetHumanCounters": 3,
+                "visibleHumanCounters": 3
+              }
+            },
+            "stationEastPark": {
+              "variant": "exhibition-neutral",
+              "layers": {
+                "parkSurface": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "parkTrees": {
+                  "kind": "glb",
+                  "assetId": "future-tree-2127",
+                  "assetStatus": "ready"
+                },
+                "parkCoolingFins": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "environmentPark": {
+                "band": "mixed",
+                "targetTreeCount": 8,
+                "visibleTreeCount": 8,
+                "targetPlantedFraction": 0.5,
+                "plantedFraction": 0.5,
+                "targetCoolingFins": 3,
+                "visibleCoolingFins": 3,
+                "representation": "glb"
+              },
+              "environmentDistrict": {
+                "nightRhythm": 1,
+                "slots": 17,
+                "targetCanopy": 0.5,
+                "visibleCanopies": 9,
+                "visibleSails": 8,
+                "visibleCoolingTowers": 0,
+                "roofs": 53,
+                "visibleRoofSails": 31,
+                "visibleRoofCrowns": 22,
+                "hybridBays": 12,
+                "hybridRoofs": 29,
+                "activePulses": 0
+              }
+            },
+            "dogenzakaSouth": {
+              "variant": "commons-high",
+              "layers": {
+                "plaza": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "commonsNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "sharingDistrict": {
+                "enabled": true,
+                "nightRhythm": 1,
+                "plazaPeople": 24,
+                "targetSharing": 0.5,
+                "rooms": 6,
+                "activePulses": 0,
+                "vaults": 3,
+                "courts": 10,
+                "hybridRooms": 3,
+                "hybridCourts": 5,
+                "droneKiosks": 0,
+                "orchardCourts": 0,
+                "visibleOpenCourts": 4,
+                "visibleOpenRooms": 3,
+                "visiblePrivateRooms": 3
+              },
+              "commonsPlaza": {
+                "band": "high",
+                "targetSharedSeats": 8,
+                "visibleSharedSeats": 8,
+                "targetScreenedSeats": 0,
+                "visibleScreenedSeats": 0
+              }
+            },
+            "centerGaiRear": {
+              "variant": "tower-mixed",
+              "layers": {
+                "towerBase": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "towerUpper": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                },
+                "towerNeutralProps": {
+                  "kind": "procedural",
+                  "assetStatus": "not-applicable"
+                }
+              },
+              "concentrationDistrict": {
+                "enabled": true,
+                "nightRhythm": 1,
+                "targetConcentration": 0.5,
+                "towers": 10,
+                "pods": 26,
+                "activePulses": 0,
+                "visibleTowers": 5,
+                "visiblePods": 15,
+                "midRises": 2,
+                "forestTowers": 0,
+                "droneDocks": 0,
+                "solarPods": 0
+              },
+              "concentrationTower": {
+                "band": "mixed",
+                "targetFunctionModules": 4,
+                "activeFunctionModules": 4,
+                "transitioning": false,
+                "representation": "mid-rise-hall"
+              }
+            }
+          },
+          "energy": {
+            "target": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "rotorAngle": 1.650263999999761,
+            "parts": [
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 0.72,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              },
+              {
+                "visible": false,
+                "scaleY": 1,
+                "opacity": 0
+              }
+            ]
+          },
+          "guestCount": 1,
+          "pose": {
+            "position": [
+              -324.1067613144324,
+              182.87924006476646,
+              -246.06151899233726
+            ],
+            "target": [
+              -71.74930934936266,
+              17.67323630399323,
+              -1.3858904319458603
+            ]
+          }
+        }
+      ],
+      "after": {
+        "time": 28.13,
+        "sites": {
+          "magnetEast": {
+            "variant": "automation-mixed",
+            "layers": {
+              "hubBase": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              },
+              "hubUpper": {
+                "kind": "glb",
+                "assetId": "automation-hub-upper",
+                "assetStatus": "idle"
+              },
+              "hubNeutralProps": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              }
+            },
+            "automationDistrict": {
+              "enabled": true,
+              "serviceDrones": 11,
+              "nightRhythm": 1,
+              "targetAutomation": 0.5,
+              "automation": 0.5,
+              "activePulses": 0,
+              "pavilions": 11,
+              "visibleStaffedPavilions": 3,
+              "visibleDronePorts": 8,
+              "hybridBays": 6,
+              "loopAircraft": 16,
+              "guidewayPods": 18,
+              "walkers": 260
+            },
+            "automationHub": {
+              "band": "mixed",
+              "targetAutomatedPorts": 3,
+              "visibleAutomatedPorts": 3,
+              "targetHumanCounters": 3,
+              "visibleHumanCounters": 3
+            }
+          },
+          "stationEastPark": {
+            "variant": "exhibition-neutral",
+            "layers": {
+              "parkSurface": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              },
+              "parkTrees": {
+                "kind": "glb",
+                "assetId": "future-tree-2127",
+                "assetStatus": "ready"
+              },
+              "parkCoolingFins": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              }
+            },
+            "environmentPark": {
+              "band": "mixed",
+              "targetTreeCount": 8,
+              "visibleTreeCount": 8,
+              "targetPlantedFraction": 0.5,
+              "plantedFraction": 0.5,
+              "targetCoolingFins": 3,
+              "visibleCoolingFins": 3,
+              "representation": "glb"
+            },
+            "environmentDistrict": {
+              "nightRhythm": 1,
+              "slots": 17,
+              "targetCanopy": 0.5,
+              "visibleCanopies": 9,
+              "visibleSails": 8,
+              "visibleCoolingTowers": 0,
+              "roofs": 53,
+              "visibleRoofSails": 31,
+              "visibleRoofCrowns": 22,
+              "hybridBays": 12,
+              "hybridRoofs": 29,
+              "activePulses": 0
+            }
+          },
+          "dogenzakaSouth": {
+            "variant": "commons-high",
+            "layers": {
+              "plaza": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              },
+              "commonsNeutralProps": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              }
+            },
+            "sharingDistrict": {
+              "enabled": true,
+              "nightRhythm": 1,
+              "plazaPeople": 24,
+              "targetSharing": 0.5,
+              "rooms": 6,
+              "activePulses": 0,
+              "vaults": 3,
+              "courts": 10,
+              "hybridRooms": 3,
+              "hybridCourts": 5,
+              "droneKiosks": 0,
+              "orchardCourts": 0,
+              "visibleOpenCourts": 4,
+              "visibleOpenRooms": 3,
+              "visiblePrivateRooms": 3
+            },
+            "commonsPlaza": {
+              "band": "high",
+              "targetSharedSeats": 8,
+              "visibleSharedSeats": 8,
+              "targetScreenedSeats": 0,
+              "visibleScreenedSeats": 0
+            }
+          },
+          "centerGaiRear": {
+            "variant": "tower-mixed",
+            "layers": {
+              "towerBase": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              },
+              "towerUpper": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              },
+              "towerNeutralProps": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              }
+            },
+            "concentrationDistrict": {
+              "enabled": true,
+              "nightRhythm": 1,
+              "targetConcentration": 0.5,
+              "towers": 10,
+              "pods": 26,
+              "activePulses": 0,
+              "visibleTowers": 5,
+              "visiblePods": 15,
+              "midRises": 2,
+              "forestTowers": 0,
+              "droneDocks": 0,
+              "solarPods": 0
+            },
+            "concentrationTower": {
+              "band": "mixed",
+              "targetFunctionModules": 4,
+              "activeFunctionModules": 4,
+              "transitioning": false,
+              "representation": "mid-rise-hall"
+            }
+          }
+        },
+        "energy": {
+          "target": {
+            "waterGardens": 0,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "rotorAngle": 1.650263999999761,
+          "parts": [
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 0.72,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            }
+          ]
+        },
+        "guestCount": 1
+      },
+      "pass": true
+    },
+    {
+      "check": "reload snapshot at hero preserves all settled configurations",
+      "sector": "B",
+      "pass": true
+    },
+    {
+      "check": "Undo immediately restores hero and exact prior four-site/energy configuration",
+      "sector": "B",
+      "pass": true
+    },
+    {
+      "check": "reduced motion stays hero, restores ambient card and all authoritative configurations settle with zero district pulses",
+      "sector": "B",
+      "view": {
+        "version": 2,
+        "runId": "46e31f0e-987a-4785-b283-fbd6e97042be",
+        "revision": 1,
+        "guestCount": 1,
+        "algorithmVersion": 2,
+        "voteSums": {
+          "automation": 0,
+          "publicSharing": 1,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "recentVotes": {
+          "automation": 0,
+          "publicSharing": 0.25,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "scores": {
+          "automation": 0,
+          "publicSharing": 7.5,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "slotSeeds": {
+          "automation": 0,
+          "publicSharing": 0,
+          "environmentalPriority": 0,
+          "urbanConcentration": 0
+        },
+        "layout": {
+          "version": 2,
+          "energy": {
+            "waterGardens": 0,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "bands": {
+            "nw": "mixed",
+            "ne": "mixed",
+            "sw": "high",
+            "se": "mixed"
+          },
+          "tiers": {
+            "nw": 0,
+            "ne": 0,
+            "sw": 1,
+            "se": 0
+          },
+          "automatedPorts": 3,
+          "sharedSeats": 8,
+          "treeCount": 8,
+          "plantedFraction": 0.5,
+          "coolingFins": 3,
+          "functionModules": 4
+        },
+        "energy": {
+          "climateGuestCount": 0,
+          "counts": {
+            "water-storage": 1,
+            "rotor-storage": 0,
+            "orbital-supply": 0,
+            "island-supply": 0
+          }
+        },
+        "recentProposals": [
+          {
+            "id": "9ac971b0-3633-453e-980b-66f2c6fe3827",
+            "runId": "46e31f0e-987a-4785-b283-fbd6e97042be",
+            "guestSessionId": "094d2718-914d-4afa-a501-616151efe816",
+            "ordinal": 1,
+            "displayAt": "2026-10-30T00:57:55.309Z",
+            "questionSetVersion": 4,
+            "algorithmVersion": 2,
+            "answers": [
+              {
+                "questionId": "service-2127",
+                "optionId": "human-machine",
+                "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+                "optionLabel": "普段は自動で、困ったときは人に相談したい"
+              },
+              {
+                "questionId": "commons-2127",
+                "optionId": "open-commons",
+                "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+                "optionLabel": "予約せず、誰でも一緒に使える開かれた海辺"
+              },
+              {
+                "questionId": "energy-2127",
+                "optionId": "water-storage",
+                "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+                "optionLabel": "水の音や機械が身近でも、海辺の庭で電気を蓄える暮らし"
+              },
+              {
+                "questionId": "functions-2127",
+                "optionId": "mixed-functions",
+                "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+                "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+              }
+            ],
+            "votes": {
+              "automation": 0,
+              "publicSharing": 1,
+              "energy": "water-storage",
+              "environmentalPriority": 0,
+              "urbanConcentration": 0
+            },
+            "revisionBefore": 0,
+            "revisionAfter": 1,
+            "submittedAt": "2026-10-30T00:57:55.309Z",
+            "beforeScores": {
+              "automation": 0,
+              "publicSharing": 0,
+              "environmentalPriority": 0,
+              "urbanConcentration": 0
+            },
+            "afterScores": {
+              "automation": 0,
+              "publicSharing": 7.5,
+              "environmentalPriority": 0,
+              "urbanConcentration": 0
+            },
+            "beforeLayout": {
+              "version": 2,
+              "bands": {
+                "nw": "mixed",
+                "ne": "mixed",
+                "sw": "mixed",
+                "se": "mixed"
+              },
+              "tiers": {
+                "nw": 0,
+                "ne": 0,
+                "sw": 0,
+                "se": 0
+              },
+              "automatedPorts": 3,
+              "sharedSeats": 4,
+              "treeCount": 8,
+              "plantedFraction": 0.5,
+              "coolingFins": 3,
+              "functionModules": 4
+            },
+            "afterLayout": {
+              "version": 2,
+              "energy": {
+                "waterGardens": 0,
+                "receiver": "none",
+                "flywheel": false,
+                "island": false
+              },
+              "bands": {
+                "nw": "mixed",
+                "ne": "mixed",
+                "sw": "high",
+                "se": "mixed"
+              },
+              "tiers": {
+                "nw": 0,
+                "ne": 0,
+                "sw": 1,
+                "se": 0
+              },
+              "automatedPorts": 3,
+              "sharedSeats": 8,
+              "treeCount": 8,
+              "plantedFraction": 0.5,
+              "coolingFins": 3,
+              "functionModules": 4
+            },
+            "cityChanges": [
+              {
+                "socketId": "sw",
+                "label": "共有座位",
+                "before": {
+                  "band": "mixed",
+                  "tier": 0,
+                  "sharedSeats": 4
+                },
+                "after": {
+                  "band": "high",
+                  "tier": 1,
+                  "sharedSeats": 8
+                }
+              }
+            ]
+          }
+        ],
+        "latestProposal": {
+          "id": "9ac971b0-3633-453e-980b-66f2c6fe3827",
+          "runId": "46e31f0e-987a-4785-b283-fbd6e97042be",
+          "guestSessionId": "094d2718-914d-4afa-a501-616151efe816",
+          "ordinal": 1,
+          "displayAt": "2026-10-30T00:57:55.309Z",
+          "questionSetVersion": 4,
+          "algorithmVersion": 2,
+          "answers": [
+            {
+              "questionId": "service-2127",
+              "optionId": "human-machine",
+              "questionText": "日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？",
+              "optionLabel": "普段は自動で、困ったときは人に相談したい"
+            },
+            {
+              "questionId": "commons-2127",
+              "optionId": "open-commons",
+              "questionText": "海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？",
+              "optionLabel": "予約せず、誰でも一緒に使える開かれた海辺"
+            },
+            {
+              "questionId": "energy-2127",
+              "optionId": "water-storage",
+              "questionText": "毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？",
+              "optionLabel": "水の音や機械が身近でも、海辺の庭で電気を蓄える暮らし"
+            },
+            {
+              "questionId": "functions-2127",
+              "optionId": "mixed-functions",
+              "questionText": "買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？",
+              "optionLabel": "低い建物と高い建物が混ざる街で暮らしたい"
+            }
+          ],
+          "votes": {
+            "automation": 0,
+            "publicSharing": 1,
+            "energy": "water-storage",
+            "environmentalPriority": 0,
+            "urbanConcentration": 0
+          },
+          "revisionBefore": 0,
+          "revisionAfter": 1,
+          "submittedAt": "2026-10-30T00:57:55.309Z",
+          "beforeScores": {
+            "automation": 0,
+            "publicSharing": 0,
+            "environmentalPriority": 0,
+            "urbanConcentration": 0
+          },
+          "afterScores": {
+            "automation": 0,
+            "publicSharing": 7.5,
+            "environmentalPriority": 0,
+            "urbanConcentration": 0
+          },
+          "beforeLayout": {
+            "version": 2,
+            "bands": {
+              "nw": "mixed",
+              "ne": "mixed",
+              "sw": "mixed",
+              "se": "mixed"
+            },
+            "tiers": {
+              "nw": 0,
+              "ne": 0,
+              "sw": 0,
+              "se": 0
+            },
+            "automatedPorts": 3,
+            "sharedSeats": 4,
+            "treeCount": 8,
+            "plantedFraction": 0.5,
+            "coolingFins": 3,
+            "functionModules": 4
+          },
+          "afterLayout": {
+            "version": 2,
+            "energy": {
+              "waterGardens": 0,
+              "receiver": "none",
+              "flywheel": false,
+              "island": false
+            },
+            "bands": {
+              "nw": "mixed",
+              "ne": "mixed",
+              "sw": "high",
+              "se": "mixed"
+            },
+            "tiers": {
+              "nw": 0,
+              "ne": 0,
+              "sw": 1,
+              "se": 0
+            },
+            "automatedPorts": 3,
+            "sharedSeats": 8,
+            "treeCount": 8,
+            "plantedFraction": 0.5,
+            "coolingFins": 3,
+            "functionModules": 4
+          },
+          "cityChanges": [
+            {
+              "socketId": "sw",
+              "label": "共有座位",
+              "before": {
+                "band": "mixed",
+                "tier": 0,
+                "sharedSeats": 4
+              },
+              "after": {
+                "band": "high",
+                "tier": 1,
+                "sharedSeats": 8
+              }
+            }
+          ]
+        }
+      },
+      "diagnostics": {
+        "time": 19.64,
+        "sites": {
+          "magnetEast": {
+            "variant": "automation-mixed",
+            "layers": {
+              "hubBase": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              },
+              "hubUpper": {
+                "kind": "glb",
+                "assetId": "automation-hub-upper",
+                "assetStatus": "idle"
+              },
+              "hubNeutralProps": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              }
+            },
+            "automationDistrict": {
+              "enabled": true,
+              "serviceDrones": 11,
+              "nightRhythm": 1,
+              "targetAutomation": 0.5,
+              "automation": 0.5,
+              "activePulses": 0,
+              "pavilions": 11,
+              "visibleStaffedPavilions": 3,
+              "visibleDronePorts": 8,
+              "hybridBays": 6,
+              "loopAircraft": 16,
+              "guidewayPods": 18,
+              "walkers": 260
+            },
+            "automationHub": {
+              "band": "mixed",
+              "targetAutomatedPorts": 3,
+              "visibleAutomatedPorts": 3,
+              "targetHumanCounters": 3,
+              "visibleHumanCounters": 3
+            }
+          },
+          "stationEastPark": {
+            "variant": "exhibition-neutral",
+            "layers": {
+              "parkSurface": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              },
+              "parkTrees": {
+                "kind": "glb",
+                "assetId": "future-tree-2127",
+                "assetStatus": "ready"
+              },
+              "parkCoolingFins": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              }
+            },
+            "environmentPark": {
+              "band": "mixed",
+              "targetTreeCount": 8,
+              "visibleTreeCount": 8,
+              "targetPlantedFraction": 0.5,
+              "plantedFraction": 0.5,
+              "targetCoolingFins": 3,
+              "visibleCoolingFins": 3,
+              "representation": "glb"
+            },
+            "environmentDistrict": {
+              "nightRhythm": 1,
+              "slots": 17,
+              "targetCanopy": 0.5,
+              "visibleCanopies": 9,
+              "visibleSails": 8,
+              "visibleCoolingTowers": 0,
+              "roofs": 53,
+              "visibleRoofSails": 31,
+              "visibleRoofCrowns": 22,
+              "hybridBays": 12,
+              "hybridRoofs": 29,
+              "activePulses": 0
+            }
+          },
+          "dogenzakaSouth": {
+            "variant": "commons-high",
+            "layers": {
+              "plaza": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              },
+              "commonsNeutralProps": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              }
+            },
+            "sharingDistrict": {
+              "enabled": true,
+              "nightRhythm": 1,
+              "plazaPeople": 24,
+              "targetSharing": 0.5,
+              "rooms": 6,
+              "activePulses": 0,
+              "vaults": 3,
+              "courts": 10,
+              "hybridRooms": 3,
+              "hybridCourts": 5,
+              "droneKiosks": 0,
+              "orchardCourts": 0,
+              "visibleOpenCourts": 4,
+              "visibleOpenRooms": 3,
+              "visiblePrivateRooms": 3
+            },
+            "commonsPlaza": {
+              "band": "high",
+              "targetSharedSeats": 8,
+              "visibleSharedSeats": 8,
+              "targetScreenedSeats": 0,
+              "visibleScreenedSeats": 0
+            }
+          },
+          "centerGaiRear": {
+            "variant": "tower-mixed",
+            "layers": {
+              "towerBase": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              },
+              "towerUpper": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              },
+              "towerNeutralProps": {
+                "kind": "procedural",
+                "assetStatus": "not-applicable"
+              }
+            },
+            "concentrationDistrict": {
+              "enabled": true,
+              "nightRhythm": 1,
+              "targetConcentration": 0.5,
+              "towers": 10,
+              "pods": 26,
+              "activePulses": 0,
+              "visibleTowers": 5,
+              "visiblePods": 15,
+              "midRises": 2,
+              "forestTowers": 0,
+              "droneDocks": 0,
+              "solarPods": 0
+            },
+            "concentrationTower": {
+              "band": "mixed",
+              "targetFunctionModules": 4,
+              "activeFunctionModules": 4,
+              "transitioning": false,
+              "representation": "mid-rise-hall"
+            }
+          }
+        },
+        "energy": {
+          "target": {
+            "waterGardens": 0,
+            "receiver": "none",
+            "flywheel": false,
+            "island": false
+          },
+          "rotorAngle": 0.7,
+          "parts": [
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 0.72,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            },
+            {
+              "visible": false,
+              "scaleY": 1,
+              "opacity": 0
+            }
+          ]
+        },
+        "guestCount": 1
+      },
+      "pass": true
+    }
+  ],
+  "errors": []
+}
