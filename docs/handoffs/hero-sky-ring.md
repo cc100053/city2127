@@ -1,7 +1,7 @@
 # hero-sky-ring — 空の環（wow 方案 B：一個巨構）
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — 已實作，等 owner 目視同埋拍板高度（見 Important decisions）
+- Status: IN_PROGRESS — 已實作；高度 owner 已拍板 250 m（2026-11-02），整體目視驗收仍未做
 - Branch: `feat/hero-sky-ring`（由 `feat/hero-atmosphere` `7d09859` 切出；worktree `.claude/worktrees/hero-sky-ring-92de81`）
 - Base commit: `7d098593f8de61a40e6d1c3fa404c64143b41378`
 - Last verified commit: 本 handoff 所在 commit（root test／build／diff-check PASS）
@@ -53,9 +53,10 @@ Owner 覺得 2127 未夠 wow；方案 A（霧／光）「有好啲但未 wow」�
 
 ## Important decisions
 
-- 等 owner 拍板（首次審閱）：① 高度 250 m（建議，靚但離開 160–170 m 航道層）定 160–170 m（spec 原意，hero 變橫樑）；② 主功能 = 空中港；③ 燈點按數量 = 有；④ 暫時唔加日文解說卡（任何文案要日文兼 owner 批）。
+- 高度：owner 2026-11-02 決定保留 250 m（甲板頂），航道層仍然 160–170 m，環係航道上空嘅共用港。
+- 仍等 owner 確認（首次審閱）：② 主功能 = 空中港；③ 燈點按數量 = 有；④ 暫時唔加日文解說卡（任何文案要日文兼 owner 批）。
 - 環 geometry 唔跟 Meter；冇能源光束／系纜，唔搶 Q3。
 
 ## Next expected step
 
-Owner 睇 `artifacts/hero-sky-ring/before-after.jpg` 同 `spec-height-152-h16.jpg`，決定高度同去留。如果接受：更新 `EXHIBITION_SPEC.md`（巨構同空中港高度）、跑 headline close-up 同 Meter high／low、量 uncapped FPS；然後先 merge `feat/hero-atmosphere` 再 merge 呢條。
+Owner 目視 `artifacts/hero-sky-ring/before-after.jpg`，決定去留同其餘開放決定。如果接受：喺 `EXHIBITION_SPEC.md` 由「待驗收」改為已接受、跑 headline close-up 同 Meter high／low、量 uncapped FPS；然後先 merge `feat/hero-atmosphere` 再 merge 呢條。
