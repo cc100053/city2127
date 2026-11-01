@@ -100,7 +100,7 @@ export const changeSites = {
   nw:{name:'AUTO HUB',place:'デックス西',x:40,z:-300,w:8,d:7,h:32,scale:3},
   ne:{name:'PARK',place:'お台場海浜公園',x:-210,z:-135,w:10,d:10,h:8,scale:4},
   sw:{name:'COMMONS PLAZA',place:'アクアシティ南',x:-105,z:60,w:12,d:10,h:5,scale:4},
-  se:{name:'TOWER',place:'フジテレビ東',x:175,z:-45,w:10,d:10,h:46,scale:3},
+  se:{name:'TOWER',place:'フジテレビ東',x:182,z:-38,w:14,d:14,h:46,scale:3},
 } as const;
 
 // 2127 retrofit (src/odaiba2127.ts). Sky bridges at 24 m between facade points found by raycast; each clear of all other geometry.

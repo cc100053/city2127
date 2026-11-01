@@ -85,3 +85,23 @@ R1 判斷：+1 已經有獨立輪廓同升降井位置，方向啱；但三個�
    - 0／+1 狀態唔使跟住放大（塔仍置中），只係 −1 同 0 嘅低亭可以用多咗嘅位。
 6. **Mesh 數**：low／mixed 超出 +15% 預算可以接受（佔全場約 950 calls 嘅 1–2%），但 R2 唔好再加 group；新 `warm` material 盡量放喺已有 bake group 入面。報告實際數字。
 7. **截圖**：同 R1 一樣（`r2/` 目錄），另加 `vs-r1.jpg`（上排 R1、下排 R2，日間）。今次要試埋變化中途截圖：`?meters=se:-2.5&shot=se:focal&hour=12` 載入後，喺 console 搵 DEV 嘅 meters 播放 hook（`main.ts` 入面 `playMeters`）改到 `se:2.5`，開始後 1.5 s 截圖；仍然做唔到就寫明卡喺邊。
+
+# R3（Opus，2026-11-01；owner：−1 要做到目標圖咁大、推近鏡頭）
+
+**已改好（Opus，喺工作樹）**：`layout.ts` `changeSites.se` = `x:182, z:-38, w:14, d:14`（42 m；中心向東北移 7 m，避開兩棵 surveyed 樹 k2／k5——佢哋一被剔走，`plantCanopy` 後面所有樹冠嘅 index-based 旋轉都會移位，令遠處 district 塔／pod 嘅淨空 test 失敗）。全部 root test 已過。**唔好改 `coastalCanopy.ts`。**
+
+1. **鏡頭跟新中心**：`se:focal` → `{ position: [12, 115, -208], target: [182, 72, -38] }`；`se:district` → `{ position: [27, 150, -188], target: [182, 40, -38] }`。
+2. **−1 推近 shot**：
+   - `cityChangeManager.ts` 嘅 `CarrierChange` 加 optional `low?: true`：focal 變化前或後嘅 band 係 `low` 時設定（喺 `applyExhibitionLayout` 建 change 嗰度，按 site 前後 band 判斷；四個 site 通用）。
+   - `headlineCamera.ts` `headlineShot`：focal shot 時，如果 `change.low` 而且 `SHOTS` 有 `${socket}:focal-low`，就用佢；否則照舊。只為 SE 加 `'se:focal-low'`，起始值 `{ position: [96, 85, -124], target: [182, 18, -38] }`（約 140 m）。用截圖微調：**−1 低亭群闊度要佔畫面約 35–45%（對照 target-rung-1.jpg 嘅比例再大少少都得），同時 0 狀態中高樓（約 55 m）唔可以出界**，因為 −1↔0 變化前後用同一個鏡頭。保持 hero 側規則同 `tests/headlineCamera.test.ts` 距離限制。
+   - `tests/headlineCamera.test.ts` 加斷言：`low` focal change → `se:focal-low`；冇 `low` → `se:focal`；其他 site 有 `low` 但冇對應 shot → `:focal`。
+3. **−1 重做（14×14 地塊，target-rung-1.jpg 為準）**：
+   - 四座亭佔滿地塊，留步道空間：兩座要明顯係**兩層**（約 3.2–3.6 單位高，≈10 m），一座拱頂木亭要做到目標圖咁大（約 5×4 平面），一座綠屋頂亭有一層屋頂花園。
+   - 地面店面要大片暖色（`warm` 背板＋`glass`）——目標圖嘅亭係「發光」嘅，唔係實心盒。
+   - S 形有蓋步道貫穿地塊，上蓋闊 1.5、離地 2.4，兩邊有矮花槽同 `leafyCrown` 細樹（6–10 棵）。
+   - 行人 20–28 個，分佈喺步道同店前，部分坐喺長凳；人仍然係一個 InstancedMesh。
+   - 低攤檔（function modules）沿步道。
+4. **0／+1 用多咗嘅位**：0 嘅兩座木亭同步道按比例放大填地塊前方；+1 嘅平台改為 10×10 有樹嘅廣場平台（塔身尺寸唔變）。
+5. **升降艙**：喺新鏡頭仍然要睇到——如果唔明顯，加大到 1.6×2.2×1.6，或者喺井框加 `amber` 導軌線。
+6. **測試**：`npm test && npm run build && git diff --check`。
+7. **截圖**（`r3/`）：同 R2，另外 −1 同 0 都要喺 `se:focal-low` 影（`?shot=se:focal-low`），+1 喺 `se:focal`。`vs-target.jpg`（目標 vs R3：−1 用 focal-low、0 用 focal-low、+1 用 focal）、`triple-night.jpg`、`vs-r2.jpg`、變化中途（−1→0，用 focal-low）。

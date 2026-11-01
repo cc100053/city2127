@@ -1,4 +1,5 @@
 import * as T from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { arc, bake, box, cream, dark, faces, glass, leaf, leafyCrown, paint, shrubs, sign, stone, trim, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import { ConcentrationDistrict, METER_COLORS } from '../districtMeters.ts';
@@ -16,7 +17,7 @@ const warm = new T.MeshStandardMaterial({ color: '#f3cf98', emissive: '#ffb45a',
 const unitBox = new T.BoxGeometry(1, 1, 1);
 const vaultGeometry = new T.CylinderGeometry(1, 1, 1, 20, 1, false, 0, Math.PI).rotateZ(Math.PI / 2);
 const crownGeometry = leafyCrown(1);
-const CABIN_LOW = 1.5, CABIN_HIGH = 37, CABIN_PERIOD = 14;
+const CABIN_LOW = 1.5, CABIN_HIGH = 36.5, CABIN_PERIOD = 14;
 
 /** Elevator rise 0..1: 6 s up, 1 s parked, 6 s down, 1 s parked. */
 function cabinRise(now: number): number {
@@ -136,28 +137,34 @@ function tree(parent: T.Object3D, x: number, y: number, z: number, s: number) {
   parent.add(crown);
 }
 
-/** Covered walk between two ground points: stone strip, thin roof plate and posts every 1.6. */
-function walk(parent: T.Object3D, [x0, z0]: [number, number], [x1, z1]: [number, number]) {
+/** Covered walk between two ground points: stone strip, thin roof plate 2.4 up, posts every 1.6, optionally low planters with small trees. */
+function walk(parent: T.Object3D, [x0, z0]: [number, number], [x1, z1]: [number, number], planted = false) {
   const dx = x1 - x0, dz = z1 - z0, len = Math.hypot(dx, dz) + 1.2;
   const g = new T.Group();
   g.position.set((x0 + x1) / 2, 0, (z0 + z1) / 2);
   g.rotation.y = Math.atan2(dx, dz);
   parent.add(g);
   box(g, [1.2, .05, len], [0, .025, 0], stone, .02);
-  box(g, [1.5, .1, len], [0, 2, 0], trim, .03);
-  for (let t = -len / 2 + .3; t <= len / 2 - .2; t += 1.6) for (const s of [-.7, .7]) box(g, [.08, 2, .08], [s, 1, t], trim, .02);
+  box(g, [1.5, .1, len], [0, 2.4, 0], trim, .03);
+  for (let t = -len / 2 + .3; t <= len / 2 - .2; t += 1.6) for (const s of [-.7, .7]) box(g, [.08, 2.4, .08], [s, 1.2, t], trim, .02);
+  if (!planted || len < 2.5) return;
+  for (const s of [-1.05, 1.05]) box(g, [.35, .3, len - 1.4], [s, .15, 0], leaf, .08);
+  for (let t = -len / 2 + 1; t < len / 2 - .8; t += 2.4) tree(g, t % 4.8 ? -1.05 : 1.05, .3, t, .45);
 }
 
-const person = (parent: T.Object3D, x: number, z: number, seated = false) => {
-  const y = seated ? .36 : 0;
-  box(parent, [.14, .5, .1], [x, y + .25, z], dark, .03);
-  box(parent, [.12, .12, .12], [x, y + .56, z], dark, .03);
+const personGeometry = mergeGeometries([new T.BoxGeometry(.14, .5, .1).translate(0, .25, 0), new T.BoxGeometry(.12, .12, .12).translate(0, .56, 0)])!;
+/** One instanced crowd: dark figures placed [x, z, seated]; add it after the group's bake so it stays one mesh. */
+const crowd = (spots: [number, number, boolean?][]) => {
+  const mesh = new T.InstancedMesh(personGeometry, dark, spots.length);
+  mesh.name = 'tower-crowd';
+  mesh.castShadow = true;
+  spots.forEach(([x, z, seated], i) => mesh.setMatrixAt(i, new T.Matrix4().makeRotationY(i * 2.4).setPosition(x, seated ? .36 : 0, z)));
+  return mesh;
 };
 
 const bench = (parent: T.Object3D, x: number, z: number) => {
-  box(parent, [.8, .1, .25], [x, .3, z], timber, .02);
-  for (const s of [-.3, .3]) box(parent, [.06, .26, .2], [x + s, .13, z], trim, .02);
-  person(parent, x - .2, z, true);
+  box(parent, [1.2, .12, .3], [x, .3, z], timber, .02);
+  for (const s of [-.45, .45]) box(parent, [.06, .26, .24], [x + s, .13, z], trim, .02);
 };
 
 // The geometry rests on y = 0 (instances are placed by their centre), so lot bounds can be read without instance matrices.
@@ -278,7 +285,7 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
   base.name = 'tower-mid-rise-hall';
   towerBase.add(base);
   const body = new T.Group();
-  body.position.set(1.2, 0, 1.2);
+  body.position.set(2.2, 0, 2.2);
   base.add(body);
   const tiers: [number, number, number][] = [[7, 0, 11], [6, 11, 13], [5, 13, 15], [4, 15, 17]];
   for (const [w, y0, y1] of tiers) {
@@ -299,41 +306,49 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
   shrubs(body, 1.3, 17.2, 0, Math.PI * 2, 12);
   for (const x of [-1, 1]) for (const z of [-1, 1]) tree(body, x, 17.2, z, .7);
   base.add(...bake(base));
-  base.add(ring(2.3, .08, [[1.2, 18.2, 1.2]]));
+  base.add(ring(2.3, .08, [[2.2, 18.2, 2.2]]));
 
-  // -1: four pavilions on a covered S-walk, with stalls and people.
+  // -1: four pavilions filling the lot, two of them two-storey, on a planted covered S-walk with stalls and a crowd.
   const pavilions = new T.Group();
   pavilions.name = 'tower-low-pavilion-pair';
   towerBase.add(pavilions);
-  kiosk(pavilions, -2.8, -2.8, 4.2, 3, 1.8);
-  vault(pavilions, -2.8, 1.8, -2.8, 4.4, 3.4, 1.9);
-  eave(pavilions, -2.8, 1.85, -2.8, 4.4, 3.4);
-  const garden = kiosk(pavilions, 2.95, -2.9, 3.7, 3.4, 1.6);
-  box(garden, [3.9, .16, 3.6], [0, 1.68, 0], trim, .04);
-  box(garden, [3, 1.2, 2.6], [0, 2.36, 0], cream, .06);
-  faces(garden, 3, 2.6, (f, a, out) => front(f, a - .5, out, 2.36, .9), [2, 3]);
-  box(garden, [3.5, .24, 3.1], [0, 3.08, 0], leaf, .05);
-  shrubs(garden, 1.2, 3.2, 0, Math.PI * 2, 10);
-  tree(garden, .7, 3.2, .4, .45);
-  eave(garden, 0, 1.75, 0, 3.9, 3.6);
-  kiosk(pavilions, -2.7, 2.9, 3.4, 2.9, 2);
-  box(pavilions, [4.4, .2, 3.8], [-2.7, 2.1, 2.9], trim, .04);
-  for (const z of [-1.9, 1.9]) box(pavilions, [4.4, .07, .08], [-2.7, 2.23, 2.9 + z], amber, .02);
-  for (const x of [-2.2, 2.2]) box(pavilions, [.08, .07, 3.8], [-2.7 + x, 2.23, 2.9], amber, .02);
-  kiosk(pavilions, 2.9, 3, 2.8, 2.8, 1.5);
-  vault(pavilions, 2.9, 1.5, 3, 3, 3, 1.5);
-  eave(pavilions, 2.9, 1.55, 3, 3, 3);
-  const path: [number, number][] = [[.2, -4.3], [.2, -1.2], [.9, -1.2], [.9, 1.2], [.2, 1.2], [.2, 4.4]];
-  for (let i = 1; i < path.length; i++) walk(pavilions, path[i - 1], path[i]);
-  for (const [x, z] of [[.1, -4], [.4, -3.2], [0, -2.4], [.3, -1.6], [.9, -.4], [.7, .6], [.2, 1.9], [.3, 3], [-3.3, -4.75], [2.2, -4.85], [-4.8, 3], [1.2, 3.8]]) person(pavilions, x, z);
-  for (const [x, z] of [[-4, -4.85], [3.9, -4.85], [-2.7, 0]]) bench(pavilions, x, z);
-  tree(pavilions, -4.3, 0, -.1, .6);
-  tree(pavilions, 4.3, 0, .3, .6);
+  kiosk(pavilions, -3.6, -3.6, 5.2, 4.2, 1.8);
+  vault(pavilions, -3.6, 1.8, -3.6, 5.4, 4.4, 1.9);
+  eave(pavilions, -3.6, 1.85, -3.6, 5.4, 4.4);
+  const garden = kiosk(pavilions, 3.9, -3.7, 4.6, 4, 1.7);
+  box(garden, [4.8, .16, 4.2], [0, 1.78, 0], trim, .04);
+  box(garden, [3.8, 1.4, 3.2], [0, 2.56, 0], cream, .06);
+  faces(garden, 3.8, 3.2, (f, a, out) => front(f, a - .5, out, 2.56, 1), [2, 3]);
+  box(garden, [4.4, .26, 3.8], [0, 3.39, 0], leaf, .05);
+  shrubs(garden, 1.6, 3.5, 0, Math.PI * 2, 12);
+  tree(garden, .9, 3.5, .5, .3);
+  tree(garden, -1.1, 3.5, -.3, .3);
+  eave(garden, 0, 1.78, 0, 4.8, 4.2);
+  const tall = kiosk(pavilions, -3.8, 3.6, 4.2, 3.4, 1.7);
+  box(tall, [3.6, 1.3, 2.8], [0, 2.35, 0], cream, .06);
+  faces(tall, 3.6, 2.8, (f, a, out) => front(f, a - .5, out, 2.35, .95), [2, 3]);
+  box(pavilions, [5.6, .2, 4.8], [-3.8, 3.1, 3.6], trim, .04);
+  for (const z of [-2.4, 2.4]) box(pavilions, [5.6, .07, .08], [-3.8, 3.23, 3.6 + z], amber, .02);
+  for (const x of [-2.8, 2.8]) box(pavilions, [.08, .07, 4.8], [-3.8 + x, 3.23, 3.6], amber, .02);
+  kiosk(pavilions, 4.2, 3.8, 3.4, 3, 1.5);
+  vault(pavilions, 4.2, 1.5, 3.8, 3.6, 3.2, 1.6);
+  eave(pavilions, 4.2, 1.55, 3.8, 3.6, 3.2);
+  const path: [number, number][] = [[.2, -6.3], [.2, -1.8], [1.4, -.3], [1.4, .8], [.2, 2], [.2, 6.3]];
+  for (let i = 1; i < path.length; i++) walk(pavilions, path[i - 1], path[i], true);
+  bench(pavilions, -3, -.2);
+  bench(pavilions, 4.4, -.3);
+  tree(pavilions, -6.2, 0, .1, .6);
+  tree(pavilions, 6.2, 0, .2, .6);
   pavilions.add(...bake(pavilions));
-  pavilions.add(ring(.9, .06, [[2.95, 3.65, -2.9], [-2.7, 2.7, 2.9]]));
+  pavilions.add(ring(1.2, .06, [[3.9, 3.9, -3.7], [-3.8, 3.7, 3.6]]));
+  pavilions.add(crowd([[.1, -6], [.5, -5.2], [0, -4.4], [.4, -3.6], [.1, -2.6], [.8, -1.4], [1.4, -.5], [1.6, .5], [.9, 1.6], [.2, 2.8], [.5, 3.8], [0, 4.8], [.4, 5.8],
+    [-2.5, -6.3], [-4.2, -6.4], [-5.6, -6.2], [2.8, -6.3], [4.6, -6.3], [-6.5, 3], [-4, .8], [-2.6, .6], [3.4, 1.3], [5, 1.2],
+    [-3.2, -.2, true], [-2.8, -.2, true], [4.2, -.3, true], [4.6, -.3, true]]));
 
   // +1: a street tower rising from the ground, one elevator and six two-storey function bands.
-  const sx = -3;
+  const sx = -3.6;
+  box(towerUpper, [10, .4, 10], [0, .2, 0], stone, .08);
+  for (const [x, z] of [[-4.5, -4.5], [4.5, -4.5], [-4.5, 4.5], [4.5, 4.5], [0, -4.6], [0, 4.6], [4.6, 0], [-4.6, 1.8]]) tree(towerUpper, x, .4, z, .6);
   box(towerUpper, [8.4, 1.4, 8.4], [0, .7, 0], cream, .15);
   faces(towerUpper, 8.4, 8.4, (f, a, out) => front(f, a - 1, out, .7, .9));
   for (const [a, b] of [[1.4, 11.9], [13.1, 24.4], [25.6, 39]]) {
@@ -357,13 +372,15 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
     shrubs(towerUpper, 2.15, yc - .46, 0, Math.PI * 2, 10);
     for (const [x, z] of [[1.5, -2.6], [2.6, -1.2], [-1, 2.6]]) tree(towerUpper, x, yc - .16, z, .45);
   }
-  // The shaft is an open cream frame without glass, so the amber cabin is plainly visible as it travels.
-  for (const x of [-.86, .86]) for (const z of [-.86, .86]) box(towerUpper, [.18, 37.6, .18], [sx + x, 20.2, sx + z], cream, .03);
+  // The shaft is an open cream frame without glass, with amber guide rails, so the amber cabin is plainly visible as it travels.
+  for (const x of [-1, 1]) for (const z of [-1, 1]) box(towerUpper, [.18, 37.6, .18], [sx + x, 20.2, sx + z], cream, .03);
   for (let y = 1.4; y < 39; y += 3.9) {
-    box(towerUpper, [1.9, .12, .18], [sx, y, sx - .86], cream, .02);
-    box(towerUpper, [.18, .12, 1.9], [sx - .86, y, sx], cream, .02);
+    box(towerUpper, [2.2, .12, .18], [sx, y, sx - 1], cream, .02);
+    box(towerUpper, [.18, .12, 2.2], [sx - 1, y, sx], cream, .02);
   }
-  for (const y of [1.4, 39]) box(towerUpper, [2, .14, 2], [sx, y, sx], cream, .03);
+  for (const y of [1.4, 39]) box(towerUpper, [2.3, .14, 2.3], [sx, y, sx], cream, .03);
+  box(towerUpper, [.06, 37.6, .06], [sx - 1.1, 20.2, sx], amber, .01);
+  box(towerUpper, [.06, 37.6, .06], [sx, 20.2, sx - 1.1], amber, .01);
   // Crown: round terraced roof garden behind a parapet, with the Meter ring on top of it.
   arc(towerUpper, 0, 3.9, .4, [0, 39, 0], cream);
   arc(towerUpper, 3.6, 4, 1.1, [0, 39.4, 0], cream);
@@ -380,31 +397,31 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
   const elevator = new T.Group();
   elevator.name = 'tower-elevator-cabin';
   elevator.position.set(sx, CABIN_LOW, sx);
-  box(elevator, [1.3, 1.68, 1.3], [0, .96, 0], amber, .05);
-  for (const y of [.06, 1.86]) box(elevator, [1.4, .12, 1.4], [0, y, 0], cream, .03);
+  box(elevator, [1.6, 2.04, 1.6], [0, 1.14, 0], amber, .06);
+  for (const y of [.06, 2.22]) box(elevator, [1.7, .12, 1.7], [0, y, 0], cream, .03);
   elevator.add(...bake(elevator));
   towerUpper.add(elevator);
 
-  const lowStalls: [number, number, number][] = [[-1, -.5, 1], [-1, .5, 1], [2.1, -.5, -1], [2.1, .5, -1], [3.3, -.4, -1], [3.3, .5, -1]];
+  const lowStalls: [number, number, number][] = [[-.9, -.8, 1], [-.9, .2, 1], [2.6, -.8, -1], [2.6, .2, -1], [1.4, 4.4, -1], [1.4, 5.4, -1]];
   const lowModules = lowStalls.map(([x, z, q], i) => addModule(pavilions, `tower-function-low-${i + 1}`, x, 0, z, q * Math.PI / 2, stall));
 
   // Mixed court: two timber-vault pavilions and a short walk to the tower foot, only while mixed shows.
   const court = new T.Group();
   court.name = 'tower-mixed-court';
   neutralPropsLayer.group.add(court);
-  kiosk(court, -3.6, .5, 2, 3.2, 1.6);
-  vault(court, -3.6, 1.6, .5, 3.4, 2.3, 1.5, Math.PI / 2);
-  eave(court, -3.6, 1.65, .5, 2.3, 3.4);
-  kiosk(court, .8, -3.5, 3.2, 2, 1.6);
-  vault(court, .8, 1.6, -3.5, 3.4, 2.3, 1.5);
-  eave(court, .8, 1.65, -3.5, 3.4, 2.3);
-  walk(court, [-3.4, -3.7], [-2.1, -2.1]);
-  for (const [x, z] of [[-3, -3.1], [-2.65, -2.7], [-2.3, -2.3], [-1.7, -3.4], [.8, -4.7], [3, -3], [3.9, -2.6], [-4.4, -.8]]) person(court, x, z);
-  tree(court, 4.2, 0, -2.6, .6);
-  tree(court, -4.2, 0, 3.4, .6);
-  tree(court, -3, 0, 4, .5);
+  kiosk(court, -5, .5, 3, 5, 1.8);
+  vault(court, -5, 1.8, .5, 5.2, 3.4, 1.9, Math.PI / 2);
+  eave(court, -5, 1.85, .5, 3.4, 5.2);
+  kiosk(court, .5, -5, 5, 3, 1.8);
+  vault(court, .5, 1.8, -5, 5.2, 3.4, 1.9);
+  eave(court, .5, 1.85, -5, 5.2, 3.4);
+  walk(court, [-3.3, -3.3], [-1.5, -1.5], true);
+  tree(court, 6.2, 0, -4.5, .6);
+  tree(court, -6.2, 0, 5.5, .6);
+  tree(court, -3.5, 0, 6.2, .6);
   court.add(...bake(court));
-  const mixedStalls: [number, number, number][] = [[-4.2, -4.1, 0], [-3, -4.4, 0], [-1.9, -4.1, 0], [-4.45, -2.8, 1], [-4.45, -1.6, 1], [3.8, -4, 0]];
+  court.add(crowd([[-3.1, -3.7], [-2.7, -3.1], [-2.3, -2.6], [-1.9, -2.2], [-5.2, -5.4], [-2.8, -6.2], [1.6, -6.6], [3.6, -3.4], [4.6, -2.8], [-6.6, -1.9], [-4.3, -3.2], [4.3, -5.8]]));
+  const mixedStalls: [number, number, number][] = [[-6.2, -5.8, 0], [-4.8, -6.2, 0], [-3.4, -5.9, 0], [-6.4, -3.6, 1], [-6.4, -2.7, 1], [4.5, -5.5, 0]];
   const mixedModules = mixedStalls.map(([x, z, q], i) => addModule(neutralPropsLayer.group, `tower-function-mixed-${i + 1}`, x, 0, z, q * Math.PI / 2, stall));
 
   // Two-storey bands up the vertical street: a wood face with furniture silhouettes and amber lines, proud of the floor slabs.

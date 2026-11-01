@@ -78,8 +78,8 @@ try {
   assert.equal(group('tower-mid-rise-hall').visible, false, 'high replaces the mid-rise');
   const cabin = group('tower-elevator-cabin');
   runtime.update(0); assert.equal(cabin.position.y, 1.5);
-  runtime.update(3); assert.ok(cabin.position.y > 1.5 && cabin.position.y < 37);
-  runtime.update(6.5); assert.equal(cabin.position.y, 37);
+  runtime.update(3); assert.ok(cabin.position.y > 1.5 && cabin.position.y < 36.5);
+  runtime.update(6.5); assert.equal(cabin.position.y, 36.5);
   runtime.update(14); assert.equal(cabin.position.y, 1.5);
   assert.deepEqual({ visible: upperLayer.visible, scaleY: upperLayer.scale.y }, upperState);
   runtime.restoreLegacy();

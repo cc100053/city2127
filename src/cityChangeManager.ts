@@ -46,7 +46,7 @@ export interface SiteDiagnostic {
 }
 
 /** `headline`: the one change a live result presents with pulses, marker and resident card; it comes first in the returned list. */
-export type CarrierChange = { socketId: LotSocketId; focal: boolean; district: boolean; points?: readonly ChangedPoint[]; focalOnly?: boolean; headline?: boolean; energy?: { before: EnergyConfiguration; after: EnergyConfiguration; part?: EnergyPart } };
+export type CarrierChange = { socketId: LotSocketId; focal: boolean; district: boolean; points?: readonly ChangedPoint[]; focalOnly?: boolean; low?: true; headline?: boolean; energy?: { before: EnergyConfiguration; after: EnergyConfiguration; part?: EnergyPart } };
 
 export type CityChangeDiagnostics = Readonly<Record<SiteId, SiteDiagnostic>>;
 
@@ -164,6 +164,7 @@ export class CityChangeManager {
     const changes: CarrierChange[] = [...(energy ? [{ socketId: 'ne' as const, focal: false, district: true, energy: { ...energy, ...(headline && 'energy' in headline && headline.part ? { part: headline.part } : {}) }, ...(headline && 'energy' in headline ? { headline: true } : {}) }] : []),
       ...(Object.keys(districts) as LotSocketId[]).map(socketId => ({ socketId, focal: focal[socketId],
         district: before[socketId] !== JSON.stringify(districts[socketId]?.getConfiguration()),
+        ...(previousLayout?.bands[socketId] === 'low' || layout.bands[socketId] === 'low' ? { low: true as const } : {}),
         focalOnly: !!previousLayout && Math.max(Math.abs(previousLayout.tiers[socketId]), Math.abs(layout.tiers[socketId])) <= 1,
         ...('changedPoints' in (districts[socketId] ?? {}) ? { points: (districts[socketId] as { changedPoints: ChangedPoint[] }).changedPoints } : {}),
         ...(quiet(socketId) ? {} : { headline: true }),

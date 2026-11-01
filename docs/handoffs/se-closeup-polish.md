@@ -1,10 +1,10 @@
 # se-closeup-polish — SE 集約 focal 近鏡樣板
 
 - Owner: cc100053（唯一驗收人；owner 一人同意即合格）
-- Status: IN_PROGRESS — R2 等 owner review
+- Status: IN_PROGRESS — R3 等 owner review
 - Branch: `feat/se-closeup-polish`
 - Base commit: `4248e8a23f45b9af9a471678cc7d68dcf5245dd2`
-- Last verified commit: 本 commit（R2；root test／build／diff-check PASS）
+- Last verified commit: 本 commit（R3；root test／build／diff-check PASS）
 - Remote availability: `origin/feat/se-closeup-polish`
 
 ## Session Git state
@@ -79,3 +79,11 @@ Owner 2026-11-01：觀眾睇唔出城市變化。做法係揀一個場景打磨�
 ## Next step
 
 Owner review R2 → 決定 −1 細嘅處理（見對話：鏡頭按狀態微調、或接受）→ R3 → FPS 實測 → owner 接受後 merge，再寫 Skill 同套用 SW／NW。
+
+## R3（2026-11-01）
+
+- Owner：−1 要做到目標圖咁大、推近鏡頭、問可否刪海岸樹林。結論：唔使刪——地塊 ≥11 會剔走 surveyed 樹 k2／k5，`plantCanopy` 用剔走後嘅 index 決定樹冠旋轉，所以全城樹冠移位，撞到遠處 district 塔／pod 淨空 test。改為 `changeSites.se` = `x:182, z:-38, w:14, d:14`（42 m，中心東北移 7 m 避開兩棵樹），全城其他物件不變。
+- 新 `CarrierChange.low`（focal 前或後 band 係 low）＋ `headlineShot` 揀 `${socket}:focal-low`（如有）；只有 SE 有 `se:focal-low` `{ position: [104, 80, -116], target: [182, 17, -38] }`。`se:focal`／`se:district` 跟新中心。
+- −1 重做（兩座兩層亭、大拱頂木亭、綠屋頂亭、S 形有蓋步道、27 人）；0 前庭放大；+1 10×10 植樹平台、升降艙 1.6×2.2×1.6 加琥珀導軌。
+- 驗證：`npm test` exit 0、build ✓、diff-check clean。Site visible meshes low 34／mixed 42／high 29。截圖：[R3 對目標](../../artifacts/se-closeup-polish/r3/vs-target.jpg)、[−1 日間](../../artifacts/se-closeup-polish/r3/se-rung-1-day.png)、[夜景](../../artifacts/se-closeup-polish/r3/triple-night.jpg)、[−1→0 中途](../../artifacts/se-closeup-polish/r3/se-transition-mid.png)。
+- Opus R3 判斷：−1 大細已達目標（約佔畫面闊 35%）；但鏡頭偏俯視，亭身黃橙色＋藍窗似玩具，步道同行人唔明顯，後面粉紅傘廣場搶眼。FPS、reduced-motion 升降艙未處理。
