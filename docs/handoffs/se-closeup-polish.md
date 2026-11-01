@@ -101,4 +101,5 @@ Owner review R2 → 決定 −1 細嘅處理（見對話：鏡頭按狀態微調
 - Owner 接受 R4 做 SE 樣板；**暫時唔套用到 SW／NW**。
 - FPS（headless Chrome，1920×1080 DPR1，vsync）：見 [VALIDATION](../VALIDATION.md) SE close-up 段；+1 第一輪 53–56、重測 60，其餘 60。
 - 流程寫成 Skill：`.claude/skills/closeup-polish/SKILL.md`。
+- Integrated：main `f219d56`（`--no-ff`；merge 結果 root test／build／diff-check PASS），main CI run 41276211123 success。
 - 未做：展覽機 FPS、draw call、真人辨認；拱頂木色偏橙、行人細、左邊大樓佔畫面約四分一、粉紅傘少量露出（owner 已接受）。
