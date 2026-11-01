@@ -22,6 +22,7 @@
 | [每位Guest近鏡＋明顯變化](guest-agency.md) | G1–G3、G7、G2 候選已 merge main `95c70be`（CI 通過）；G5 文案、G4／G7 視覺與性能 gate、真人兩秒辨認未驗收 | cc100053 |
 | [SE 集約近鏡樣板](se-closeup-polish.md) | DONE（2026-11-01）；owner 接受 R4，暫不套用 SW／NW | cc100053 |
 | [Hero 未來感](hero-futurism.md) | DONE（2026-11-01）；c2 低 hero、天空反射物料、航道光痕，owner 接受 R1＋R2 | cc100053 |
+| [空の環 Sky Ring](hero-sky-ring.md) | IN_PROGRESS（2026-11-02）；方案 B 巨構：250 m 桁架環＋六支 V 斜柱＋泊位＋居民聲音燈點，等 owner 目視同高度決定 | cc100053 |
 | [Hero 霧與光層次](hero-atmosphere.md) | IN_PROGRESS（2026-11-02）；R1 高度霧／夜間窗燈層次／夜空地平線，R2 水面燈光倒影，等 owner 目視 | cc100053 |
 | [近鏡後續／能源講解](closeup-next.md) | F1/F2、C1 INTEGRATED（C1 owner批准，24組兩秒辨認未做）；N1 能源講解 INTEGRATED（13s／日文），F3等硬件（2026-10-29） | cc100053 |
 
