@@ -71,3 +71,17 @@ playwright-cli, 1920×1080/DPR1, `npm run dev -- --port 5174 --strictPort`, slee
 4. `r1-se-focal.png` — SE close-up regression (`?shot=se:focal` or the shot-preview param `src/main.ts` uses; compare with `artifacts/se-closeup-polish/r4/`). Slot 0 is 68 m from the SE site: if the open-frame tower appears in the SE close-up, say so.
 5. `before-after-h16.jpg`, `before-after-h21.jpg` — left main (`../hero-futurism/r2/r2b-h16.png` / `r2b-h21.png`), right branch, side by side (ImageMagick `magick … +append -resize 50%` or ffmpeg).
 6. `fps.txt` — canvas `data-fps` 6×2.5 s after 14 s load, vsync and uncapped (`--disable-gpu-vsync`), day and night, branch then main (`git stash`-free: run main from a second clone/worktree or compare with the R1 numbers and say which), plus draws/triangles from the same attribute.
+
+## R1 review (Opus) → R2
+
+R1 commit `b2d61db`. Direction right; owner not shown yet because of visible bugs.
+
+| # | R1 observation | R2 change |
+| --- | --- | --- |
+| A | Day sky trails show **black dashes** (50–120 px dark bars along corridors A/B, `r1-h16.png` x 1000–1900, y 100–310). Not at night. | Diagnose and fix at the root. Suspect: `GTAOPass` draws the additive transparent trails into its normal/depth pass (which also explains +18 unexplained draws); else the dark `glass` parts of craft. Fix so transparent light streaks never reach AO (e.g. exclude by layer/visibility in the AO pass the way three supports, or `transparent` objects skipped) — one shared rule, not per fleet. Verify the shuttle wakes too. |
+| B | Corridor B's band runs through the **top-right HUD** (DAYLIGHT TOKYO / STUDY line, x > 1540, y < 150). | Add a second exclusion rect x > 1500 ∧ y < 160 px to the sky-corridor test and the guide mask (one helper, both rects). |
+| C | Open-frame towers read as **power pylons / scaffolding** (thin members, many small X-braces, grey at night). Terraces only visible side-on. | Make it a megaframe, fewer and bolder members: columns 2.6 → **4 m**; **drop the per-bay X-braces**; instead one **mega-diagonal per hero-facing face** (`chrome`, 2.4 m, .05 → .55 h, then reversed .55 → 1.0, a big zig-zag like the Civic Core escalator); ring beams **only at slab levels**, 2 m deep fascia, with a thin emissive strip under each (`futureLight` or the `lobby` material) so the frame outlines at night. Terraces: slabs 24 × 24, cantilever ±7 m, 4–6 crowns per slab, bigger (r 3–5), hedge kept. **Glass**: replace the three glass boxes with **two `skyGlass` spheres** (r 9 m, y-scale compensated with the mean h ≈ 115) at ≈ .3 h and .66 h, each with a small warm `lobby` core sphere inside (night glow). Keep slim lit core, halo and mast. Stay inside the clearance radii. |
+| D | Water: no boat reads in the hero (channels at 2–2.5 km behind buildings, 12–15 px). | Move/redo channels so their samples are **visible water from the hero** (raycast from `HERO_POSITION` → sample, first hit must be the bay water; target the bay band left of Aqua City x 0–650 px, y 400–460, and/or the right horizon water). Boats there may be bigger ambient **ferries**: BOAT_SCALE × **3**, 6–8 per lane, light wake length **90 m**, width 5 m. Test: ≥ 80 % of each channel's samples visible from the hero. |
+| E | Corridor C faint. | Trail width C ×1.5 or bring it 30 % nearer; keep inside y 120–460 and outside both rects. |
+
+Unchanged: everything else in R1. Captures as R1 into `r2/` (same list; before-after = main left, R2 right) plus `r2-se-focal.png`. FPS as R1 (branch vs the R1 main numbers is enough unless draws change by > 20).
