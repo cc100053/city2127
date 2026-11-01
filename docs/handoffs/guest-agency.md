@@ -210,3 +210,5 @@ G7 未達完整視覺驗收：64 個保守目標包圍盒只排除自身跨 near
 最終檢查（2026-10-31）：root／survey 各 `npm test`、`npm run build` 通過；root build 有既有 JSON import attributes／chunk-size 提示。曾試兩條街道多段、不同高度與方位，最終用實際街道 `.8` 路段；真實 8 票第 8 票選中街道，車流和卡片上方海面可見，左側近景柱與其他場景的全程遮擋仍待 review。40 票使用的其他 pose 在最後一次僅街道 pose 改動時未變；街道本身已單獨以真實序列重測。原始數據與定位限制見 VALIDATION 和 relay G7 result。實作候選供 coordinator review，G7／G4／G6 及 owner 兩秒真人 gate 不標記通過。
 
 2026-11-01 recovery：機器重啟令 `/private/tmp` checkout 消失，Codex 於持久 checkout（基於 `6e3514f`，branch `codex/guest-agency-recovery`）重組 G1–G3、G7 與 G2 候選；部分檔案只由紀錄還原，未能逐位元證實與原 commit 相同。接手後 root `npm test`（修正 `energyPrototype` 靜態 batch 上限：加入 8 個 activity frame，由 `< 50` 改為 `< 50 + 3 * 8`）、root／survey `npm run build`、survey `npm test`、`git diff --check` 均通過。G5 文案（owner 暫緩）、G4 視覺（SW court3 與 focal 重疊、SE 難辨、街道前景柱、水庭構圖）、陰影配對性能、owner 一人在家兩秒辨認仍未完成；不 merge、不 push。
+
+2026-11-01 court3／street 鏡頭：`sw:court3` 改為 [-122,60,360]→[-110,3,230]（原 [-145,113,330]，太貼近俯視、前景柱）；`nw:street` 改為 [213,75,-345]→[113,4,-333]（原 [203,65,-423]，前景大樓佔左邊，海面少）。各試 8 個 130／100 m 方位候選，靜態 high 狀態日（12:00）與夜（22:00）檢視；court3 日間地面仍偏白、僅靠紅傘分辨，街道左側仍有屋頂佔約 1/4。未測 live 過場、遮擋／near plane 全程。root `npm test`、`npm run build` 通過。
