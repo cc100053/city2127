@@ -119,6 +119,8 @@ District 直接讀 tier；DEV `?meters`／carrier 測試用 `deriveExhibitionLay
 
 Live 使用可重新定向的 **3 秒**過渡；pulse 只標示真的 live 變化；每個改變嘅 Meter 只喺其 site 出光柱，district slots 只有淡色光圈（2026-10-04）。Snapshot、reset、Undo、reconnect、reduced motion 直接恢復權威狀態，清除排隊及 pulse。重複事件不重播。配對、counts、固定 footprint 及限制見 [Meter handoff](handoffs/archive/meter-variety.md)。
 
+SE 起樓轉換原型（2026-11-01，`feat/se-build-transition`，未 merge，待 owner 睇效果）：SE 建築唔再縮放，改為一條發光嘅高度切線由地面起樓、由頂拆落；舊建築用 3 秒嘅頭 70%，新建築用尾 70%，中段重疊；功能 module 跟住切線逐個出現。3 秒長度、時間線、即時 snapshot 路徑都唔變；SW／NW／NE 仍然係縮放。[handoff](handoffs/se-build-transition.md)。
+
 ## Guest、單站與 A/B
 
 流程：Start → 四題 → review → submit → result 13 秒（owner 2026-10-29 由 10 秒延長）→ handoff 5 秒 → Start。未知提交結果用同一 submission ID 重試；不新建一票猜測成功。
