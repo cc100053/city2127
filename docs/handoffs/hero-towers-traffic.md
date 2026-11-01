@@ -1,7 +1,7 @@
 # hero-towers-traffic — 前景塔樓換開放結構＋天空／水面交通光帶（hero 未來感第 4、5 項）
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — R2 等 owner 目視
+- Status: DONE — owner 接受 R2（2026-11-02），merge main
 - Branch: `feat/hero-towers-traffic`
 - Base commit: `5fb2428aa10f9da441239b1304b46a37b4be81e0`
 - Last verified commit: `4a1966d`（root test／build／diff-check PASS）
@@ -46,7 +46,7 @@ Owner 2026-11-01：hero 要一眼睇得出係 2127（[hero-futurism](hero-futuri
 
 ## Actual validation results
 
-- Verification status: PARTIAL — 機械檢查 PASS；owner 目視未接受
+- Verification status: PASSED — 機械檢查 PASS；owner 目視接受 R2（2026-11-02）
 - `4a1966d`：root `npm test` exit 0、`npm run build`、`git diff --check` PASS（Opus 重跑）
 - FPS（headless Chrome 1920×1080/DPR1，`?meters=nw:0,ne:0,sw:0,se:0&reviewTime=40`）：vsync 日／夜 60；uncapped 日 main 88.7 → R2 88.1，夜 R2 88–90（main 76.8，機器負載唔同，唔算改善）；draws 970 → 1000，triangles 16.27M → 16.49M。詳見 `artifacts/hero-towers-traffic/r2/fps.txt`
 - 證據：`artifacts/hero-towers-traffic/r2/before-after-day-night.jpg`、`r2-h16.png`、`r2-h21.png`、`r2-sehigh-h16.png`、`r2-se-focal.png`
@@ -66,4 +66,4 @@ Owner 2026-11-01：hero 要一眼睇得出係 2127（[hero-futurism](hero-futuri
 
 ## Next expected step
 
-owner 睇 R2 日／夜 before/after：接受就同步 PROJECT／VALIDATION／handoff index 再 merge `--no-ff` main；否則指定 R3。
+已 merge main。後續候選（各自另開任務）：夜晚新塔燈帶加強、其餘 6 座舊 family 塔、Civic Core 放大（第 2 項）、水面倒影、展覽機 FPS。
