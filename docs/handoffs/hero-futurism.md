@@ -1,10 +1,10 @@
 # hero-futurism — 「一睇就知」嘅 2127 未來感（hero 鏡頭＋全域物料同光）
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS
+- Status: IN_PROGRESS — R1 owner 接受（2026-11-01），R2 航道待目視
 - Branch: `feat/hero-futurism`
 - Base commit: `f35fe178a7eb8efae04efa59b1b0f4170b2e3241`
-- Last verified commit: `d2696af`（root test／build／diff-check PASS）
+- Last verified commit: R2 commit（root test／build／diff-check PASS）
 - Remote availability: `origin/feat/hero-futurism`
 
 ## Session Git state
@@ -39,6 +39,14 @@ Owner 2026-11-01：幾輪打磨後城市合理但唔夠未來感；要誇張視�
 - 鏡頭：owner 揀 c2 `[-360,120,-440]→[-20,65,-10]` fov42。代價（已寫入測試同 PROJECT）：Commons Plaza 喺 hero 被 Aqua City 擋（`heroSightline` 只容許 Aqua City）；sharing courts 1/4/6/7 喺 hero 睇唔到（`HERO_HIDDEN_COURTS`）；energy 測試由「全部部件喺 frame」改為「energy vote 落點喺 frame」。四個 site 錨點仍喺 frame，vote journey 照飛。
 - 物料同光（Sonnet 實作，Opus 審）：反射天空濾鏡 `saturate(.55) sepia(.12) brightness(1.04)` → `saturate(.8) sepia(.06) brightness(1.08)`；`nightLighting` environment `.6*(1-night*.65)` → `.85*(1-night*.75)`、bloom `.1+night*.14` → `.16+night*.08`；共用 `trim` roughness .48→.26、metalness 0→.28；`trail` ×3→×4；新 `skyGlass`（`chrome` clone，透明 .7）用喺 `skyways` 懸空球；空中航道 guide ×1.6→×3；`bayWater` roughness .16→.1、metalness .1→.15。
 - Opus 判斷：鏡頭係主要進步；玻璃球變透明係物料方面最清楚嘅一項；水面同光帶未到 R01（線太幼、水只係更藍）。新問題：天空背景下，空中航道變成一行行青色虛線，比之前顯眼。
+
+## R2（2026-11-01）：航道虛線
+
+- Owner 接受 R1，指定下輪修空中航道虛線。
+- 成因：`mobility.ts` 四條空中航道各 96 條 guide strip，loop 上一直以 `GUIDE_FLOOR` 尺寸顯示成固定虛線；c2 低鏡頭以天空做背景，變成橫過畫面嘅青色雜訊。
+- 改法：刪除 `GUIDE_FLOOR`（冇飛行器嘅航道唔再亮）；亮起嘅 strip 沿切線拉長到接住相鄰 strip（`stripLength`），變成連續、逐漸收窄嘅光痕；`guideStrength` 寬度 .07 → .035，每架飛行器只拖約 7 條 strip。
+- 證據：`artifacts/hero-futurism/r2/r2b-h16.png`、`r2b-h21.png`（`r2-*` 係未縮短前）。headless vsync FPS 51–55，draws 970 不變（同時段 main 未重量）。
+- 剩餘：近側光痕仍然長（飛行器喺 frame 外）；左上光痕會短暫穿過標題字。
 
 ## Actual validation results
 
