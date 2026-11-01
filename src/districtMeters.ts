@@ -1153,35 +1153,46 @@ export class ConcentrationDistrict {
       unit(new T.CylinderGeometry(.4, .8, .12, 8), trim, -10.5, 1.06);
     });
     const openFrame = family(unit => {
-      // Exposed trim frame (corner columns, ring beams every .125 h, chrome X-braces facing the hero) around stacked cream terraces
-      // that cantilever alternately ±5 m, planted on top; glass volumes between them leave the sky readable through the gaps.
-      const sy = .0087, jitter = (k: number, n: number) => Math.sin((k * 3 + n + 1) * 91.7);
-      for (const x of [-12, 12]) for (const z of [-12, 12]) unit(new T.BoxGeometry(2.6, .95, 2.6), trim, x, .525, z);
-      for (let k = 1; k <= 8; k++) for (const e of [-12, 12]) { unit(new T.BoxGeometry(26, .012, 1.6), trim, 0, k * .125, e); unit(new T.BoxGeometry(1.6, .012, 26), trim, e, k * .125, 0); }
-      // Corner-to-corner in unit space, so the y scale shears each brace with the frame and it keeps meeting the columns.
-      const brace = (a: number[], b: number[], nx: number, nz: number) => {
+      // Megaframe: four 4 m corner columns, one chrome zig-zag mega-diagonal on each of the two faces towards the hero camera (the instance
+      // is not turned, see `write`), fascia beams only at the slab levels with a lit strip under each, around stacked cream terraces that
+      // cantilever ±6 m alternately and are planted; two sky-glass spheres with warm cores sit between the terraces.
+      const sy = .0087, jitter = (k: number, n: number) => Math.sin((k * 3 + n + 1) * 91.7), levels = [.16, .3, .44, .58, .72, .86, 1];
+      for (const x of [-12, 12]) for (const z of [-12, 12]) unit(new T.BoxGeometry(4, .95, 4), trim, x, .525, z);
+      // Corner-to-corner in unit space, so the y scale shears each leg with the frame and it keeps meeting the columns: 2.6 m across in the
+      // plane of its face (ix, iz), 2.4 m deep out of it (nx, nz).
+      const leg = (a: number[], b: number[], ix: number, iz: number, nx: number, nz: number) => {
         const g = new T.BoxGeometry(1, 1, 1), p = g.attributes.position;
-        for (let i = 0; i < p.count; i++) { const u = p.getX(i) + .5, v = p.getY(i) * .007, w = p.getZ(i); p.setXYZ(i, a[0] + (b[0] - a[0]) * u + nx * w, a[1] + (b[1] - a[1]) * u + v, a[2] + (b[2] - a[2]) * u + nz * w); }
+        for (let k = 0; k < p.count; k++) {
+          const u = p.getX(k) + .5, v = p.getY(k) * 2.6, w = p.getZ(k) * 2.4;
+          p.setXYZ(k, a[0] + (b[0] - a[0]) * u + ix * v + nx * w, a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u + iz * v + nz * w);
+        }
         return g.computeVertexNormals(), g;
       };
-      for (const [y0, y1] of [[.05, .25], [.25, .5], [.5, .75], [.75, 1]]) for (const [lo, hi] of [[y0, y1], [y1, y0]]) {
-        unit(brace([-12, lo, -12], [12, hi, -12], 0, 1), chrome, 0, 0, 0);
-        unit(brace([-12, lo, -12], [-12, hi, 12], 1, 0), chrome, 0, 0, 0);
+      for (const [lo, hi] of [[.05, .55], [.55, 1]]) {
+        unit(leg([lo === .05 ? -12 : 12, lo, -12], [lo === .05 ? 12 : -12, hi, -12], 1, 0, 0, 1), chrome, 0, 0, 0);
+        unit(leg([-12, lo, lo === .05 ? -12 : 12], [-12, hi, lo === .05 ? 12 : -12], 0, 1, 1, 0), chrome, 0, 0, 0);
+      }
+      for (const y of levels) for (const e of [-12, 12]) {
+        unit(new T.BoxGeometry(28, .017, 2), trim, 0, y, e); unit(new T.BoxGeometry(2, .017, 24), trim, e, y, 0);
+        unit(new T.BoxGeometry(24, .004, 1.2), lobby, 0, y - .0105, e); unit(new T.BoxGeometry(1.2, .004, 22), lobby, e, y - .0105, 0);
       }
       for (let k = 0; k < 6; k++) {
-        const y = .16 + k * .14, alongX = k % 2 === 0, dir = k % 4 < 2 ? 1 : -1, sx = alongX ? 5 * dir : 0, sz = alongX ? 0 : 5 * dir;
-        unit(new T.BoxGeometry(20, .012, 20), cream, sx, y, sz);
-        unit(new T.BoxGeometry(20.8, .006, 20.8), trim, sx, y - .0045, sz);
-        unit(new T.BoxGeometry(18.4, .006, 18.4), leaf, sx, y + .009, sz);
+        const y = levels[k], alongX = k % 2 === 0, dir = k % 4 < 2 ? 1 : -1, sx = alongX ? 6 * dir : 0, sz = alongX ? 0 : 6 * dir;
+        unit(new T.BoxGeometry(24, .012, 24), cream, sx, y, sz);
+        unit(new T.BoxGeometry(24.8, .006, 24.8), trim, sx, y - .0045, sz);
+        unit(new T.BoxGeometry(22.4, .006, 22.4), leaf, sx, y + .009, sz);
         // Hedge round the rim: from the hero's level eye the planted tops are edge-on, so the green has to stand up.
-        for (const e of [-9.2, 9.2]) { unit(new T.BoxGeometry(20, .016, 1.6), leaf, sx, y + .014, sz + e); unit(new T.BoxGeometry(1.6, .016, 17), leaf, sx + e, y + .014, sz); }
-        unit(new T.BoxGeometry(19, .02, 19), lobby, sx, y - .016, sz);
-        for (let n = 0; n < 3; n++) {
-          const r = 2.6 + 1.6 * ((k + n * 2) % 5) / 4, along = dir * (12.4 + .8 * jitter(k, n)), across = (n - 1) * 6.2 + 1.3 * jitter(k, n + 3);
+        for (const e of [-11.2, 11.2]) { unit(new T.BoxGeometry(24, .016, 1.6), leaf, sx, y + .014, sz + e); unit(new T.BoxGeometry(1.6, .016, 21), leaf, sx + e, y + .014, sz); }
+        unit(new T.BoxGeometry(23, .02, 23), lobby, sx, y - .016, sz);
+        for (let n = 0; n < 5; n++) {
+          const r = 3 + 1.6 * ((k + n * 2) % 5) / 4, along = dir * (14.2 + .8 * jitter(k, n)), across = (n - 2) * 4.4 + 1.2 * jitter(k, n + 3);
           unit(leafyCrown(1).scale(r, r * sy, r), leaf, alongX ? along : across, y + .012 + .0035 * r, alongX ? across : along);
         }
       }
-      for (const [y0, y1] of [[.05, .15], [.45, .57], [.73, .85]]) unit(new T.BoxGeometry(16, y1 - y0, 16), skyGlass, 0, (y0 + y1) / 2, 0);
+      for (const y of [.37, .65]) {
+        unit(new T.SphereGeometry(9, 24, 16).scale(1, sy, 1), skyGlass, 0, y, 0);
+        unit(new T.SphereGeometry(3.4, 12, 8).scale(1, sy, 1), lobby, 0, y, 0);
+      }
       unit(new T.CylinderGeometry(3.5, 3.5, .95, 16), lobby, 0, .525, 0);
       unit(new T.TorusGeometry(15, .9, 6, 48).rotateX(Math.PI / 2).scale(1, sy, 1), trim, 0, 1.02, 0);
       unit(new T.CylinderGeometry(.4, .8, .1, 8), chrome, 0, 1.05, 0);
@@ -1303,14 +1314,14 @@ export class ConcentrationDistrict {
     this.towers.forEach((site, i) => {
       // Towers rise from the plaza; hidden ones keep a tiny invertible scale (flattened normals poison the G-buffer).
       const level = this.height(i), footprint = level > .02 ? 1 : HIDDEN;
-      this.dummy.position.set(site.x, 0, site.z); this.dummy.rotation.set(0, i, 0);
+      const { family, instance } = towerFamily(i), yaw = family === 3 ? 0 : i;
+      this.dummy.position.set(site.x, 0, site.z); this.dummy.rotation.set(0, yaw, 0);
       this.dummy.scale.set(footprint, Math.max(HIDDEN, level) * site.h, footprint); this.dummy.updateMatrix();
-      const { family, instance } = towerFamily(i);
       for (const mesh of this.families[family]) mesh.setMatrixAt(instance, this.dummy.matrix);
       // Pairing extras ride full towers only (never mid-rises): a crown on the roof plus three at the lower lobby edge, and a dock ring
       // with two drones at the upper lobby.
       const full = this.towerLevels.value[i], forest = this.forest.value[i] * full, dock = this.docks.value[i] * full, h = full * site.h;
-      const roof = [.95, 1, 1, 1][family] * h, c = Math.cos(i), s = Math.sin(i), shift = [0, 0, -10.5, 8][family], ox = shift * c, oz = -shift * s;
+      const roof = [.95, 1, 1, 1][family] * h, c = Math.cos(yaw), s = Math.sin(yaw), shift = [0, 0, -10.5, 8][family], ox = shift * c, oz = -shift * s;
       const crown = (k: number, x: number, y: number, z: number, r: number) => {
         this.dummy.position.set(x, y + r * .4, z); this.dummy.rotation.set(0, 0, 0);
         this.dummy.scale.set(r, r * .7, r).multiplyScalar(Math.max(HIDDEN, forest)); this.dummy.updateMatrix(); this.forestCrowns.setMatrixAt(i * 4 + k, this.dummy.matrix);

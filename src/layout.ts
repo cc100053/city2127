@@ -55,12 +55,13 @@ export const bayCruisers: readonly (readonly [number,number,number])[] = [
   // Far water beyond the island's south-west shore, top middle of the hero frame (target v2's distant boats).
   [450,1000,2.5],[700,1100,1.2],[1000,1250,-.4],[1200,1000,1.9],[250,1250,-1.3],
 ];
-// Ambient bay shuttle lanes (independent of the Meters): two crossings of the open bay south of the island, 40 m or more from every cruiser run
-// and far from the shore, piers and rooms. The foreground water of the hero frame is already full (shore rooms, interchange pier, beach loop),
-// so the lit lines run in the far bay band instead; each lane carries 10 boats (tests/mobility.test.ts, tests/odaiba.test.ts).
+// Ambient bay ferry lanes (independent of the Meters) on the sea the hero frame really shows (src/heroCamera.ts heroSettledCamera): the strip
+// left of the Civic Core (about x 525–775 px, y 424–435 at 1920×1080: the east bay) and the one right of it (x 1210–1480 px, y 412–422: the south bay).
+// Control points sit on the curved sea (y falls with the earth curve beyond the plate, bayContext EARTH); tests/odaiba.test.ts proves
+// each lane is visible from the hero position.
 export const bayChannels: readonly (readonly P3[])[] = [
-  [[-420,-.6,1690],[-200,-.6,1700],[0,-.6,1700],[200,-.6,1690],[420,-.6,1650],[640,-.6,1580],[850,-.6,1500]],
-  [[-440,-.6,2150],[-200,-.6,2130],[100,-.6,2090],[400,-.6,2030],[700,-.6,1950],[1000,-.6,1850]],
+  [[1530,-1,860],[1370,-.6,880],[1200,-.6,910],[1060,-.6,940]],
+  [[860,-3.5,1820],[700,-3.2,1860],[520,-2.4,1860],[380,-1.8,1830]],
 ];
 // Sweep: a lit transit skyway descending from the Grand Nikko ring (92 m) west past Hilton and out of the frame's lower right,
 // above the Yurikamome deck and clear of Nikko and Hilton footprints; a short white train shuttles on it (mobility).
@@ -79,12 +80,12 @@ export const shoreLane: readonly P3[] = [...shoreLaneInner,
   [-520,90,-80],[-503,100,-117],[-413,100,-171],[-339,100,-247],[-254,100,-285],[-193,100,-321],[-108,100,-379],[-50,90,-350]];
 // Regional light corridors (ambient: independent of the Meters): three open centre lines at 200–320 m, tuned against the c2 hero pose
 // (src/heroCamera.ts; tests/mobility.test.ts) so that every sample in front of the camera projects in the upper sky band and clear of the
-// title block. A behind the Civic Core, B diagonal from the upper right toward the centre, C low along the bay horizon. Each corridor is
+// title block and the top-right HUD (`heroTextZone`). A behind the Civic Core, B diagonal from the upper right toward the centre, C low along the bay horizon. Each corridor is
 // a bundle of two lanes SKY_LANE_GAP m apart, flown in opposite directions (lane 2k forward, 2k+1 reversed).
 export const SKY_LANE_GAP = 24;
 const skyCentres: readonly (readonly P3[])[] = [
   [[640,240,370],[380,245,550],[110,250,780],[-150,255,1080],[-370,260,1390],[-700,265,1850],[-1000,270,2250]],
-  [[-310,300,800],[-130,303,920],[140,306,1130],[560,310,1370],[1320,314,1810],[2550,318,2490]],
+  [[-300,278,1010],[-100,290,1120],[200,300,1310],[630,308,1520],[1410,314,1930],[2640,318,2580]],
   [[2180,200,2960],[1450,205,3470],[740,210,3980],[50,215,4480],[-520,218,5100]],
 ];
 export const skyCorridors: readonly (readonly P3[])[] = skyCentres.flatMap(c => [1,-1].map(side => c.map((p,i) => {

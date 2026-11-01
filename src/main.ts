@@ -109,10 +109,11 @@ try {
   const ao=new GTAOPass(scene,camera,innerWidth,innerHeight);ao.updateGtaoMaterial({radius:3,distanceFallOff:.8,thickness:3,samples:16});ao.blendIntensity=1;ao.enabled=quality.ambientOcclusion;
   // The composer resizes every pass to the canvas; AO keeps its reduced buffer and its blend upsamples onto the full frame.
   const aoSize=ao.setSize.bind(ao);ao.setSize=(width,height)=>aoSize(Math.round(width*quality.aoScale),Math.round(height*quality.aoScale));composer.addPass(ao);
-  // GTAO's normal/depth prepass uses an override material without the earth curvature, so the far bay would ghost above the horizon: skip the curved sea and bay context there, and the transparent boat wakes and Meter pulses (no normals; they read as black AO).
+  // GTAO's normal/depth prepass uses an override material without the earth curvature, so the far bay would ghost above the horizon: skip the curved sea and bay context there, and every transparent unlit overlay (boat wakes, light trails and streaks, Meter pulses: no normals, so the prepass wrote them as opaque and AO drew black bars over them).
   const aoPass=ao as unknown as {_overrideVisibility():void;_restoreVisibility():void},hideFlat=aoPass._overrideVisibility.bind(aoPass),showFlat=aoPass._restoreVisibility.bind(aoPass);
-  let flat:T.Object3D[]=[];
-  aoPass._overrideVisibility=()=>{hideFlat();flat=[floor,scene.getObjectByName('bay-context'),scene.getObjectByName('water-taxi-wakes'),...scene.getObjectsByProperty('name','meter-pulse')].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
+  // ponytail: the overlay list is rescanned every 120 AO frames (about 2 s), so one created later may show its AO bar until then.
+  let flat:T.Object3D[]=[],overlays:T.Object3D[]=[],aoFrame=0;
+  aoPass._overrideVisibility=()=>{hideFlat();if(aoFrame++%120===0){overlays=[];scene.traverse(o=>{const m=(o as T.Mesh).material as T.Material|undefined;if(m?.transparent&&(m as T.MeshBasicMaterial).isMeshBasicMaterial)overlays.push(o);});}flat=[floor,scene.getObjectByName('bay-context'),...overlays].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
   aoPass._restoreVisibility=()=>{showFlat();for(const o of flat)o.visible=true;};
   const bloom=new UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.2,.7,1);composer.addPass(bloom);
   const vignette=new ShaderPass(VignetteShader);vignette.uniforms.offset.value=.9;vignette.uniforms.darkness.value=.9;composer.addPass(vignette);composer.addPass(new OutputPass());
