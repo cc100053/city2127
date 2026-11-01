@@ -209,6 +209,14 @@ const openGround = /^(TERRAIN|PHASE03C_LANDSCAPE|PHASE03C_PLAZA|PRIMARY_PLAZA|PH
 const ray = new Raycaster(), down = new Vector3(0, -1, 0);
 const camera = heroCamera(1920, 1080);
 camera.updateMatrixWorld(true);
+// Owner 2026-11-01 (c2 low hero): Aqua City may hide the low Commons Plaza, whose headline close-up shows the change; nothing else may.
+const heroSightline = (site: (typeof changeSites)[keyof typeof changeSites], context: string) => {
+  const look = new Vector3(site.x, site.h * site.scale / 4, site.z);
+  ray.set(camera.position, look.clone().sub(camera.position).normalize());
+  const blocker = ray.intersectObject(city, true)[0];
+  const clear = !blocker || blocker.distance > camera.position.distanceTo(look) - 1 || (site.name === 'COMMONS PLAZA' && blocker.object.parent?.name === 'aqua-city-odaiba');
+  assert.ok(clear, `${site.name} hidden from the hero pose by ${blocker?.object.name}${context}`);
+};
 for (const site of Object.values(changeSites)) {
   const w = site.w * site.scale, d = site.d * site.scale;
   for (let x = -w / 2 - 5; x <= w / 2 + 5; x += 5) for (let z = -d / 2 - 5; z <= d / 2 + 5; z += 5) {
@@ -219,9 +227,7 @@ for (const site of Object.values(changeSites)) {
   // A point a quarter of the way up the tallest variant must be in frame and not hidden behind a landmark or context block.
   const look = new Vector3(site.x, site.h * site.scale / 4, site.z), ndc = look.clone().project(camera);
   assert.ok(Math.abs(ndc.x) < .95 && Math.abs(ndc.y) < .95, `${site.name} leaves the hero frame: ${ndc.x.toFixed(2)},${ndc.y.toFixed(2)}`);
-  ray.set(camera.position, look.clone().sub(camera.position).normalize());
-  const blocker = ray.intersectObject(city, true)[0];
-  assert.ok(!blocker || blocker.distance > camera.position.distanceTo(look) - 1, `${site.name} hidden from the hero pose by ${blocker?.object.name}`);
+  heroSightline(site, '');
 }
 // Actors: pods ride on the guideway deck, walkers (both lanes) stay on open ground outside the site lots, boats stay on water.
 const actorPaths = routes(), side = new Vector3(), tangent = new Vector3(), up = new Vector3(0, 1, 0);
@@ -378,12 +384,7 @@ for (const se of [-3, 0, 3]) {
     }
   }
   city.add(concentration.root);
-  for (const site of Object.values(changeSites)) {
-    const look = new Vector3(site.x, site.h * site.scale / 4, site.z);
-    ray.set(camera.position, look.clone().sub(camera.position).normalize());
-    const blocker = ray.intersectObject(city, true)[0];
-    assert.ok(!blocker || blocker.distance > camera.position.distanceTo(look) - 1, `${site.name} hidden by ${blocker?.object.name} at concentration ${se}`);
-  }
+  for (const site of Object.values(changeSites)) heroSightline(site, ` at concentration ${se}`);
   city.remove(concentration.root);
 }
 console.log(`Odaiba: ${concentration.towers.length} vertical towers, ${concentration.bridges.length} sky bridges and ${concentration.pods.length} pods stand on open ground, clear of landmarks, context and routes; sites stay visible.`);
@@ -405,12 +406,7 @@ for (const sw of [-3, 3]) {
     assert.equal(ray.intersectObject(sharingDistrict.root, true).length, 0, `sharing ${sw} court blocks a pod/walker route`);
   }
   city.add(sharingDistrict.root);
-  for (const site of Object.values(changeSites)) {
-    const look = new Vector3(site.x, site.h * site.scale / 4, site.z);
-    ray.set(camera.position, look.clone().sub(camera.position).normalize());
-    const blocker = ray.intersectObject(city, true)[0];
-    assert.ok(!blocker || blocker.distance > camera.position.distanceTo(look) - 1, `${site.name} hidden by ${blocker?.object.name} at sharing ${sw}`);
-  }
+  for (const site of Object.values(changeSites)) heroSightline(site, ` at sharing ${sw}`);
   city.remove(sharingDistrict.root);
 }
 console.log(`Odaiba: ${sharingDistrict.courts.length} sharing courts stand on open ground clear of context, routes and other Meter sites; sites stay visible.`);
@@ -434,7 +430,9 @@ const courtPixels = (x: number, z: number, yaw = 0, half = 20) => {
   return area * seen / 81;
 };
 const courtVisibility = sharingDistrict.courts.map(c => courtPixels(c.x, c.z, c.yaw));
-for (const [i, px] of courtVisibility.entries()) assert.ok(px >= 600, `court ${i} shows only ${px.toFixed(0)} px from the hero pose`);
+// Owner 2026-11-01 (c2 low hero): courts 1, 4, 6 and 7 fall behind landmarks or out of frame; the SW district shot shows them.
+const HERO_HIDDEN_COURTS = [1, 4, 6, 7];
+for (const [i, px] of courtVisibility.entries()) if (!HERO_HIDDEN_COURTS.includes(i)) assert.ok(px >= 600, `court ${i} shows only ${px.toFixed(0)} px from the hero pose`);
 console.log(`Odaiba: sharing courts show ${courtVisibility.map(px => px.toFixed(0)).join(' / ')} px of ground in the hero frame.`);
 
 if (process.env.SCAN_COURTS) {

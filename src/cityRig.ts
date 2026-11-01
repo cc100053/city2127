@@ -8,11 +8,11 @@ import { occupantFleet } from './occupants.ts';
 
 // Three finishes: matte ceramic composite, refined metal, and reflective glass. Same shader, different response to the one environment map.
 export const paint = (color: T.ColorRepresentation, roughness=.52, metalness=0) => new T.MeshStandardMaterial({ color, roughness, metalness });
-export const cream = paint('#e2ddd2',.58), teal = paint('#839da8',.44,.05), sage = paint('#a9c5c2',.5), pink = paint('#b9b7ac',.56), dark = paint('#27414f',.16,.7), trim = paint('#eee9df',.48);
+export const cream = paint('#e2ddd2',.58), teal = paint('#839da8',.44,.05), sage = paint('#a9c5c2',.5), pink = paint('#b9b7ac',.56), dark = paint('#27414f',.16,.7), trim = paint('#eee9df',.26,.28);
 export const futureLight=new T.MeshStandardMaterial({color:'#8ce5d8',emissive:'#68d9de',emissiveIntensity:.8,roughness:.65});
 export const publicLight=new T.MeshStandardMaterial({color:'#ecf4ed',emissive:'#dcebe6',emissiveIntensity:.15,roughness:.6});
 // Blue light trails: saturated and above the bloom threshold in daylight, so the 2127 network reads as lit blue lines (not white trim) from the hero pose.
-export const trail = new T.MeshBasicMaterial({ color: new T.Color('#4da3ff').multiplyScalar(3) });
+export const trail = new T.MeshBasicMaterial({ color: new T.Color('#4da3ff').multiplyScalar(4) });
 export const solar=paint('#486b83',.3,.85);
 export const membrane=new T.MeshStandardMaterial({color:'#9abdb9',roughness:.3,metalness:.25,transparent:true,opacity:.72,side:T.DoubleSide});
 // Pilot finishes (docs/ART.md): silvered glass that reads the sky, living green, pale stone paving.
@@ -54,7 +54,9 @@ const mirrorSky=(()=>{
 })();
 export const chrome=new T.MeshPhysicalMaterial({color:'#f1f4f6',metalness:.92,roughness:.05,clearcoat:1,clearcoatRoughness:.02,envMap:mirrorSky,envMapIntensity:1});
 /** Materials that use `mirrorSky` (its own envMap skips scene.environmentIntensity), dimmed with the night in `cityRig().update`. */
-export const mirrors:T.MeshStandardMaterial[]=[chrome];
+// Clear glass sphere: the chrome mirror, thinned so masts and cradles show through; dims with the night like every mirror.
+export const skyGlass=chrome.clone();skyGlass.color.set('#f4f8fa');skyGlass.transparent=true;skyGlass.opacity=.7;skyGlass.depthWrite=false;
+export const mirrors:T.MeshStandardMaterial[]=[chrome,skyGlass];
 const rounded = new Map<string, RoundedBoxGeometry>();
 export function box(parent:T.Object3D, size:[number,number,number], position:[number,number,number], material:T.Material, radius=.18) {
   const key = [...size,radius].join(',');
