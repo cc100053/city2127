@@ -5,7 +5,7 @@ import { Box3, Group, InstancedMesh, Matrix4, Mesh, Quaternion, Raycaster, Scene
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
 import { changeSites, skyBridges, inDistrict, DISTRICT } from '../src/layout.ts';
-import { heroCamera } from '../src/heroCamera.ts';
+import { heroCamera, heroSettledCamera } from '../src/heroCamera.ts';
 import { pavilionFlight, plazaPose, routes, mobility, publishDoorways, publishEntrances, forecourtVisits, promenadeBenches, visitPose, entranceJourneys, entrancePose, laneOffset } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { civicCore } from '../src/civicCore.ts';
@@ -252,6 +252,28 @@ for (const [name, route] of [['water loop', actorPaths.water], ['ferry lane', ac
   const p = route.getPointAt(i / 400); route.getTangentAt(i / 400, tangent); p.addScaledVector(side.crossVectors(up, tangent).normalize(), beam);
   const hit = groundAt(p.x, p.z);
   assert.ok(!hit || /^WATER/.test(hit.object.name), `${name} runs aground on ${hit?.object.name} at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
+}
+const settled = heroSettledCamera(1920, 1080);
+// Bay ferry lanes: visible from the hero position (as OrbitControls settles it) (the first surveyed hit along the ray is farther than the sample, or is water) for at least
+// 80 % of each lane.
+for (const [k, route] of actorPaths.channels.entries()) {
+  let seen = 0;
+  for (let i = 0; i <= 200; i++) {
+    const p = route.getPointAt(i / 200), toSample = p.clone().sub(settled.position), dist = toSample.length();
+    ray.set(settled.position, toSample.normalize()); ray.far = Infinity;
+    const blocker = ray.intersectObject(city, true)[0];
+    if (!blocker || blocker.distance > dist - 1 || /^WATER/.test(blocker.object.name)) seen++;
+  }
+  assert.ok(seen >= .8 * 201, `bay channel ${k} is visible from the hero at only ${seen} of 201 samples`);
+}
+// Bay ferry lanes are open water: nothing but water within a 6 m beam, and no surveyed ground, tidal edge or bridge pier within 32 m (half a 61 m hull plus a margin).
+for (const [k, route] of actorPaths.channels.entries()) for (let i = 0; i <= 200; i++) {
+  const p = route.getPointAt(i / 200); route.getTangentAt(i / 200, tangent);
+  for (const [beam, reach] of [[-6, 0], [0, 0], [6, 0], [0, 32]]) for (let a = 0; a < (reach ? 12 : 1); a++) {
+    const q = p.clone().addScaledVector(side.crossVectors(up, tangent).normalize(), beam).add(new Vector3(Math.cos(a / 12 * Math.PI * 2), 0, Math.sin(a / 12 * Math.PI * 2)).multiplyScalar(reach));
+    const hit = groundAt(q.x, q.z);
+    assert.ok(!hit || /^WATER/.test(hit.object.name), `bay channel ${k} within ${reach} m of ${hit?.object.name} at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
+  }
 }
 // Air taxis keep 20 m above the bay bridges and backdrop they overfly.
 for (const route of [actorPaths.air, actorPaths.approach]) for (let i = 0; i <= 400; i++) {

@@ -1,0 +1,12 @@
+R2 hero towers and traffic, 2026-11-01, headless Chrome (playwright-cli), 1920x1080/DPR1, ?meters=nw:0,ne:0,sw:0,se:0&reviewTime=40, canvas data-fps/drawCalls/triangles, 6 samples x 2.5 s after 14 s load (first sample is warm-up).
+Branch only (R1 main reference: 970 draws / 16.27 M triangles, uncapped day 88.0-90.1, night 76.1-77.4 on a slower machine state; R1 branch: 1004 / 16.50 M).
+
+uncapped (--disable-gpu-vsync --disable-frame-rate-limit), clean run, fps/draws/triangles:
+day:   88.5/1000/16488646 86.3/1000/16488646 88.5/1000/16488646 88.8/1000/16488646 88.6/1000/16488646 88.1/1000/16488646
+night: undefined/undefined/undefined 89.6/1000/16488646 89.2/1000/16488646 88.2/1000/16488646 88.9/1000/16488646 89.6/1000/16488646
+vsync (default):
+day:   50.8/1000/16488646 60.0/1000/16488646 60.0/1000/16488646 60.0/1000/16488646 60.0/1000/16488646 60.0/1000/16488646
+night: undefined/undefined/undefined 4.3/1385/21307464 60.1/1000/16488646 60.0/1000/16488646 59.9/1385/21307464 60.0/1000/16488646
+
+Earlier uncapped runs on the same build read 41-46 FPS (day and night) while another agent's Chrome session and an npm test were running on this machine; the last two samples of one of them (87.6, 88.3) show the recovery once the load ended. Those runs are not valid and are not used.
+Draws 1000 (R1 branch 1004, main 970): +30 vs main (own meshes about +16; the rest not isolated). Triangles +0.22 M vs main.

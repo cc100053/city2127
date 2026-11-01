@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { arc, bake, box, glass, leaf, leafyCrown, publicLight, solar, stone, trail, trim } from './cityRig.ts';
+import { arc, bake, box, chrome, cream, glass, leaf, leafyCrown, publicLight, skyGlass, solar, stone, trail, trim } from './cityRig.ts';
 import { changeSites, seaward } from './layout.ts';
 import { shoreRoomBays } from './waterRooms.ts';
 import { automationActivity, pavilionFlight, pedestrians, plazaPose, routes, serviceDrones } from './mobility.ts';
@@ -1039,6 +1039,11 @@ export const towerGlow = { value: .3 };
 const TOWER_SITES: readonly (readonly [number, number, number])[] = [
   [115, -25, 128], [67, -89, 112], [27, -249, 120], [83, -305, 104], [-189, -1, 140], [-221, -73, 116], [-157, 63, 124], [-61, 111, 104], [179, 287, 120], [-13, 279, 110],
 ];
+/** Hero-view slots (392–631 m from the c2 camera, where the blue-striped cylinders stood) rebuilt as open structural frames; the rest keep their i % 3 family. */
+export const HERO_FRAME_SLOTS = [0, 2, 3, 5];
+const slotFamilies = TOWER_SITES.map((_, i) => HERO_FRAME_SLOTS.includes(i) ? 3 : i % 3);
+/** Silhouette family (0 twisted, 1 terraced, 2 twin, 3 open frame) of tower slot `i` and its instance index in that family's batches. */
+export const towerFamily = (i: number) => ({ family: slotFamilies[i], instance: slotFamilies.slice(0, i).filter(f => f === slotFamilies[i]).length });
 const POD_SITES: readonly (readonly [number, number])[] = [
   [-293, 147], [-253, -33], [-233, 47], [-218, -23], [-183, -43], [-168, -128], [-103, 17], [-53, 147], [-33, 167], [-23, 107], [7, -58], [27, 87], [77, 107], [87, 57], [97, -73], [107, -123], [107, 77], [117, 7], [137, -103], [207, 37], [217, -43], [217, 87], [237, -73], [237, 57], [247, -103], [252, 147],
 ];
@@ -1056,7 +1061,7 @@ export class ConcentrationDistrict {
   /** P9: at mixed a share of tower sites stands as a terraced mid-rise (45 % of the tower height) instead of open lawn. */
   private readonly midRise = new SlotLevels(this.towers.length);
   private readonly podLevels = new SlotLevels(this.pods.length);
-  /** Tower meshes per silhouette family (slot i uses family i % 3, instance ⌊i / 3⌋). */
+  /** Tower meshes per silhouette family (slot i: `towerFamily(i)`). */
   private readonly families: T.InstancedMesh[][];
   private readonly podMeshes: T.InstancedMesh[];
   /** P8 design per pod site: two-tier pod (0) / garden ring pavilion (1). */
@@ -1101,7 +1106,7 @@ export class ConcentrationDistrict {
     };
     facade.customProgramCacheKey = () => 'concentration-tower-glass';
     const lobby = this.light; lobby.emissive.set('#ffe1b8'); lobby.emissiveIntensity = .9;
-    // Three unit-height (1 m, scaled per site) silhouette families by slot, all on an ivory podium and all marked at the .4 / .72 sky-lobby
+    // Unit-height (1 m, scaled per site) silhouette families by slot (`towerFamily`), all on an ivory podium and all marked at the .4 / .72 sky-lobby
     // levels where bridges land: a twisted glass shaft, a terraced setback tower with planted terraces, and linked twin shafts.
     const family = (build: (unit: (geometry: T.BufferGeometry, material: T.Material, x: number, y: number, z?: number, yaw?: number) => void) => void) => {
       const tower = new T.Group();
@@ -1147,8 +1152,53 @@ export class ConcentrationDistrict {
       for (const y of [.4, .72]) { unit(new T.BoxGeometry(14, .03, 7), trim, 0, y); unit(new T.BoxGeometry(13, .02, 6), lobby, 0, y + .025); }
       unit(new T.CylinderGeometry(.4, .8, .12, 8), trim, -10.5, 1.06);
     });
-    this.families = [twisted, terraced, twin].map((group, f) =>
-      this.instances(bake(group), this.towers.filter((_, i) => i % 3 === f).length, 'concentration-vertical-towers'));
+    const openFrame = family(unit => {
+      // Megaframe: four 4 m corner columns, one chrome zig-zag mega-diagonal on each of the two faces towards the hero camera (the instance
+      // is not turned, see `write`), fascia beams only at the slab levels with a lit strip under each, around stacked cream terraces that
+      // cantilever ±6 m alternately and are planted; two sky-glass spheres with warm cores sit between the terraces.
+      const sy = .0087, jitter = (k: number, n: number) => Math.sin((k * 3 + n + 1) * 91.7), levels = [.16, .3, .44, .58, .72, .86, 1];
+      for (const x of [-12, 12]) for (const z of [-12, 12]) unit(new T.BoxGeometry(4, .95, 4), trim, x, .525, z);
+      // Corner-to-corner in unit space, so the y scale shears each leg with the frame and it keeps meeting the columns: 2.6 m across in the
+      // plane of its face (ix, iz), 2.4 m deep out of it (nx, nz).
+      const leg = (a: number[], b: number[], ix: number, iz: number, nx: number, nz: number) => {
+        const g = new T.BoxGeometry(1, 1, 1), p = g.attributes.position;
+        for (let k = 0; k < p.count; k++) {
+          const u = p.getX(k) + .5, v = p.getY(k) * 2.6, w = p.getZ(k) * 2.4;
+          p.setXYZ(k, a[0] + (b[0] - a[0]) * u + ix * v + nx * w, a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u + iz * v + nz * w);
+        }
+        return g.computeVertexNormals(), g;
+      };
+      for (const [lo, hi] of [[.05, .55], [.55, 1]]) {
+        unit(leg([lo === .05 ? -12 : 12, lo, -12], [lo === .05 ? 12 : -12, hi, -12], 1, 0, 0, 1), chrome, 0, 0, 0);
+        unit(leg([-12, lo, lo === .05 ? -12 : 12], [-12, hi, lo === .05 ? 12 : -12], 0, 1, 1, 0), chrome, 0, 0, 0);
+      }
+      for (const y of levels) for (const e of [-12, 12]) {
+        unit(new T.BoxGeometry(28, .017, 2), trim, 0, y, e); unit(new T.BoxGeometry(2, .017, 24), trim, e, y, 0);
+        unit(new T.BoxGeometry(24, .004, 1.2), lobby, 0, y - .0105, e); unit(new T.BoxGeometry(1.2, .004, 22), lobby, e, y - .0105, 0);
+      }
+      for (let k = 0; k < 6; k++) {
+        const y = levels[k], alongX = k % 2 === 0, dir = k % 4 < 2 ? 1 : -1, sx = alongX ? 6 * dir : 0, sz = alongX ? 0 : 6 * dir;
+        unit(new T.BoxGeometry(24, .012, 24), cream, sx, y, sz);
+        unit(new T.BoxGeometry(24.8, .006, 24.8), trim, sx, y - .0045, sz);
+        unit(new T.BoxGeometry(22.4, .006, 22.4), leaf, sx, y + .009, sz);
+        // Hedge round the rim: from the hero's level eye the planted tops are edge-on, so the green has to stand up.
+        for (const e of [-11.2, 11.2]) { unit(new T.BoxGeometry(24, .016, 1.6), leaf, sx, y + .014, sz + e); unit(new T.BoxGeometry(1.6, .016, 21), leaf, sx + e, y + .014, sz); }
+        unit(new T.BoxGeometry(23, .02, 23), lobby, sx, y - .016, sz);
+        for (let n = 0; n < 5; n++) {
+          const r = 3 + 1.6 * ((k + n * 2) % 5) / 4, along = dir * (14.2 + .8 * jitter(k, n)), across = (n - 2) * 4.4 + 1.2 * jitter(k, n + 3);
+          unit(leafyCrown(1).scale(r, r * sy, r), leaf, alongX ? along : across, y + .012 + .0035 * r, alongX ? across : along);
+        }
+      }
+      for (const y of [.37, .65]) {
+        unit(new T.SphereGeometry(9, 24, 16).scale(1, sy, 1), skyGlass, 0, y, 0);
+        unit(new T.SphereGeometry(3.4, 12, 8).scale(1, sy, 1), lobby, 0, y, 0);
+      }
+      unit(new T.CylinderGeometry(3.5, 3.5, .95, 16), lobby, 0, .525, 0);
+      unit(new T.TorusGeometry(15, .9, 6, 48).rotateX(Math.PI / 2).scale(1, sy, 1), trim, 0, 1.02, 0);
+      unit(new T.CylinderGeometry(.4, .8, .1, 8), chrome, 0, 1.05, 0);
+    });
+    this.families = [twisted, terraced, twin, openFrame].map((group, f) =>
+      this.instances(bake(group), slotFamilies.filter(g => g === f).length, 'concentration-vertical-towers'));
     // Sky bridges join neighbouring towers at both lobby levels of the lower one (a connected vertical street).
     this.towers.forEach((a, i) => this.towers.forEach((b, j) => {
       if (j > i && Math.hypot(a.x - b.x, a.z - b.z) < 80) for (const level of [.4, .72]) this.bridges.push({ i, j, y: level * Math.min(a.h, b.h) });
@@ -1264,20 +1314,21 @@ export class ConcentrationDistrict {
     this.towers.forEach((site, i) => {
       // Towers rise from the plaza; hidden ones keep a tiny invertible scale (flattened normals poison the G-buffer).
       const level = this.height(i), footprint = level > .02 ? 1 : HIDDEN;
-      this.dummy.position.set(site.x, 0, site.z); this.dummy.rotation.set(0, i, 0);
+      const { family, instance } = towerFamily(i), yaw = family === 3 ? 0 : i;
+      this.dummy.position.set(site.x, 0, site.z); this.dummy.rotation.set(0, yaw, 0);
       this.dummy.scale.set(footprint, Math.max(HIDDEN, level) * site.h, footprint); this.dummy.updateMatrix();
-      for (const mesh of this.families[i % 3]) mesh.setMatrixAt(Math.floor(i / 3), this.dummy.matrix);
+      for (const mesh of this.families[family]) mesh.setMatrixAt(instance, this.dummy.matrix);
       // Pairing extras ride full towers only (never mid-rises): a crown on the roof plus three at the lower lobby edge, and a dock ring
       // with two drones at the upper lobby.
       const full = this.towerLevels.value[i], forest = this.forest.value[i] * full, dock = this.docks.value[i] * full, h = full * site.h;
-      const family = i % 3, roof = [.95, 1, 1][family] * h, c = Math.cos(i), s = Math.sin(i), ox = family === 2 ? -10.5 * c : 0, oz = family === 2 ? 10.5 * s : 0;
+      const roof = [.95, 1, 1, 1][family] * h, c = Math.cos(yaw), s = Math.sin(yaw), shift = [0, 0, -10.5, 8][family], ox = shift * c, oz = -shift * s;
       const crown = (k: number, x: number, y: number, z: number, r: number) => {
         this.dummy.position.set(x, y + r * .4, z); this.dummy.rotation.set(0, 0, 0);
         this.dummy.scale.set(r, r * .7, r).multiplyScalar(Math.max(HIDDEN, forest)); this.dummy.updateMatrix(); this.forestCrowns.setMatrixAt(i * 4 + k, this.dummy.matrix);
       };
-      crown(0, site.x + ox, roof, site.z + oz, family === 0 ? 9 : 7);
+      crown(0, site.x + ox, roof, site.z + oz, [9, 7, 7, 5][family]);
       for (let k = 0; k < 3; k++) {
-        const a = i + k * 2.1, r = [19, 14, 12][family];
+        const a = i + k * 2.1, r = [19, 14, 12, 16][family];
         crown(k + 1, site.x + Math.cos(a) * r, .4 * h, site.z + Math.sin(a) * r, 4.5);
       }
       this.dummy.position.set(site.x, .72 * h, site.z); this.dummy.rotation.set(0, i, 0); this.dummy.scale.setScalar(Math.max(HIDDEN, dock)); this.dummy.updateMatrix();

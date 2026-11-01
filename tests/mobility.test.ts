@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { routes, podPose, boatPoses, HULL, WATER_PERIOD, BOATS as BOAT_COUNT, trainPose, TRAIN_SPEED, walkerPose, walkerRoute, walkerParty, doorwayPose, robotPose, collectorPose, ROBOT_HALT, HANDOFF, promenadeStops, RAIL_OUT, STOOL_FRONT, streetCarPose, STREET_GAP, dropOffPose, DROP_OFF, streetRhythm, promenadeBenches, BENCH_OUT, transferPose, dockMotion, guideStrength, aircraftSlot, podShare, automationActivity, CARS, CAR_GAP, TRAINS, WALKERS, TRANSFERS, PLATOON } from '../src/mobility.ts';
-import { changeSites, SPHERE_DOCK, INTERCHANGE } from '../src/layout.ts';
+import { changeSites, SPHERE_DOCK, INTERCHANGE, SKY_LANE_GAP } from '../src/layout.ts';
+import { heroSettledCamera, heroTextZone } from '../src/heroCamera.ts';
+import { skyPose, skyCount, shuttleCount, shuttlePoses, SHUTTLE_SCALE } from '../src/mobility.ts';
 import { laneBeaconSites } from '../src/waterRooms.ts';
 import { conversationPose, visitPose, entrancePose, servicePose, mobility, roadFill, CROSSINGS, CARRIAGEWAY, laneOffset } from '../src/mobility.ts';
 import * as T from 'three';
@@ -195,6 +197,42 @@ path.streets.forEach((street, r) => {
   for (let t = 0; t < WATER_PERIOD; t += .25) {
     const boats = boatPoses(t, path).map((b, i) => ({ b, i, full: i <= BOAT_COUNT + 1 ? 1.7 : 1.35 })).filter(o => o.b.scale > .3 * o.full).map(o => ({ i: o.i, h: hull(o.b) }));
     for (let a = 0; a < boats.length; a++) for (let b = a + 1; b < boats.length; b++) assert.ok(!meet(boats[a].h, boats[b].h), `boats ${boats[a].i} and ${boats[b].i} meet at ${t}s`);
+  }
+}
+// Regional light corridors (ambient): every sample in front of the hero camera lies in the upper sky band and clear of the title block and HUD, all above
+// 185 m; each lane's trails (.8 × the craft spacing) leave gaps shorter than a trail, so the lane reads as one band, not a dotted line.
+{
+  const hero = heroSettledCamera(1920, 1080);
+  assert.equal(path.sky.length, 6);
+  path.sky.forEach((lane, k) => {
+    for (let i = 0; i <= 600; i++) {
+      const p = lane.getPointAt(i / 600), v = p.clone().applyMatrix4(hero.matrixWorldInverse), n = p.clone().project(hero), x = (n.x + 1) * 960, y = (1 - n.y) * 540;
+      assert.ok(p.y > 185, `sky lane ${k} drops to ${p.y.toFixed(0)} m`);
+      if (v.z >= 0) continue;
+      assert.ok(y >= 120 && y <= 460 && !heroTextZone(x, y), `sky lane ${k} projects to ${x.toFixed(0)},${y.toFixed(0)}`);
+    }
+    const length = lane.getLength(), n = skyCount(length), trail = skyPose(0, k, length, 0).trail;
+    assert.ok(n >= 10 && n <= 12 && length > 2000 && length < 4000, `sky lane ${k}: ${n} craft over ${length.toFixed(0)} m`);
+    for (let t = 0; t < 120; t += 7) {
+      const us = Array.from({ length: n }, (_, i) => skyPose(t, k, length, i).u).sort((a, b) => a - b);
+      us.forEach((u, i) => assert.ok(((us[(i + 1) % n] - u + 1) % 1) * length - trail < trail, `lane ${k} trails leave a dotted gap at ${t}s`));
+    }
+  });
+  for (let c = 0; c < 6; c += 2) for (let i = 0; i <= 50; i++) {
+    const a = path.sky[c].getPointAt(i / 50), b = path.sky[c + 1].getPointAt(i / 50);
+    assert.ok(Math.abs(Math.hypot(a.x - b.x, a.z - b.z) - SKY_LANE_GAP) < 3, `corridor ${c / 2} lanes drift from ${SKY_LANE_GAP} m`);
+  }
+}
+// Bay ferry lanes (ambient): 6–8 boats per lane, and over the whole period no ferry hull meets another boat's within 2 m (the odaiba test proves the
+// lanes are visible open water; lane 0 shares open bay with the far cruiser runs, so the timing is checked, not a fixed distance).
+{
+  path.channels.forEach((lane, k) => assert.ok(shuttleCount(lane.getLength()) >= 6 && shuttleCount(lane.getLength()) <= 8, `channel ${k} carries ${shuttleCount(lane.getLength())} ferries`));
+  // Hull circles (centre at mid-hull, radius to the bow corner) keep 2 m between every shuttle and every other boat.
+  const circle = (b: { yaw: number; scale: number; x: number; z: number }) => ({ x: b.x + Math.sin(b.yaw) * (HULL.bow + HULL.stern) / 2 * b.scale, z: b.z + Math.cos(b.yaw) * (HULL.bow + HULL.stern) / 2 * b.scale,
+    r: Math.hypot(HULL.x, (HULL.bow - HULL.stern) / 2) * b.scale });
+  for (let t = 0; t < WATER_PERIOD; t += .5) {
+    const shuttles = shuttlePoses(t, path.channels).filter(b => b.scale > .05).map(circle), others = boatPoses(t, path).filter(b => b.scale > .05).map(circle);
+    shuttles.forEach((a, i) => [...shuttles.slice(i + 1), ...others].forEach(b => assert.ok(Math.hypot(a.x - b.x, a.z - b.z) > a.r + b.r + 2, `shuttle and boat meet at ${t}s`)));
   }
 }
 // Trains: each track's trains keep a fixed gap (never closing up), and each runs one way on its own beam.

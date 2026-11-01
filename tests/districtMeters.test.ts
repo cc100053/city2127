@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { ladderHybrid, ladderShare, rungStep, AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, PRIVATE_RISE, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
+import { HERO_FRAME_SLOTS, towerFamily, ladderHybrid, ladderShare, rungStep, AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, PRIVATE_RISE, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
 import { changeSites } from '../src/layout.ts';
 import { publicLight, trail } from '../src/cityRig.ts';
 import { mobility, promenadeStops, routes, walkerParty, walkerPose, walkerRoute } from '../src/mobility.ts';
@@ -239,12 +239,14 @@ assert.deepEqual(counts(), [0, concentration.pods.length]);
 concentration.setTarget(at({ se: 3 }), 1, false);
 concentration.update(2.5);
 const towerMesh = concentration.root.getObjectByName('concentration-vertical-towers') as T.InstancedMesh;
-// P7: three silhouette families (twisted / terraced / twin) split the slots; their batches hold exactly the ten towers.
+// P7: four silhouette families (twisted / terraced / twin / open frame on the hero slots) split the slots; their batches hold exactly the ten towers.
 const towerBatches = concentration.root.children.filter(o => o.name === 'concentration-vertical-towers') as T.InstancedMesh[];
-assert.deepEqual([...new Set(towerBatches.map(m => m.count))].sort(), [3, 4], 'towers split into three families of 4 / 3 / 3');
+assert.deepEqual([...new Set(towerBatches.map(m => m.count))].sort(), [1, 2, 3, 4], 'towers split into four families of 2 / 3 / 1 / 4');
+assert.deepEqual(HERO_FRAME_SLOTS.map(i => towerFamily(i).family), [3, 3, 3, 3], 'hero slots use the open-frame family');
 const rising = new T.Vector3();
 towerMesh.getMatrixAt(0, matrix); rising.setFromMatrixScale(matrix);
-assert.ok(rising.y > concentration.towers[0].h * .3 && rising.y < concentration.towers[0].h * .7, 'towers rise over the 3-second transition');
+const lead = concentration.towers[concentration.towers.findIndex((_, i) => towerFamily(i).family === 0)];
+assert.ok(rising.y > lead.h * .3 && rising.y < lead.h * .7, 'towers rise over the 3-second transition');
 assert.equal(concentration.setTarget(at({ se: 3 }), 2.5, false), false);
 concentration.update(4);
 assert.deepEqual(counts(), [concentration.towers.length, 0]);
@@ -258,7 +260,7 @@ assert.ok(mixedTowers > 0 && mixedTowers < concentration.towers.length && mixedP
 concentration.hide();
 assert.deepEqual(counts(), [0, 0]);
 assert.equal(concentration.root.visible, false);
-console.log(`PASS: concentration district — ${concentration.towers.length} towers in 3 silhouette families / ${concentration.bridges.length} sky bridges vs ${concentration.pods.length} pods, rise, same target, mixed hybrid, invertible hidden matrices, legacy hide.`);
+console.log(`PASS: concentration district — ${concentration.towers.length} towers in 4 silhouette families / ${concentration.bridges.length} sky bridges vs ${concentration.pods.length} pods, rise, same target, mixed hybrid, invertible hidden matrices, legacy hide.`);
 
 // P8: every slot-based carrier mixes ≥ 2 design families within each band, and only the slot's own design is drawn.
 {
@@ -307,7 +309,7 @@ console.log(`PASS: concentration district — ${concentration.towers.length} tow
   // A mid-rise (hybrid site without a full tower) stands at 45 % of its tower height in its family batch.
   const levels = c as unknown as { midRise: SlotLevels; towerLevels: SlotLevels };
   const m = c.towers.findIndex((_, k) => levels.midRise.value[k] === 1 && levels.towerLevels.value[k] === 0);
-  assert.ok(m >= 0 && full('concentration-vertical-towers', Math.floor(m / 3), .45 * c.towers[m].h), 'mid-rise at 45 % height');
+  assert.ok(m >= 0 && full('concentration-vertical-towers', towerFamily(m).instance, .45 * c.towers[m].h), 'mid-rise at 45 % height');
   console.log(`PASS: P9 hybrids — none at low / high, ${mixedHybrids.join(' / ')} (automation / sharing / mid-rise / environment) at mixed; hybrid bay composes both designs.`);
 }
 
