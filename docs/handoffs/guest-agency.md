@@ -1,8 +1,8 @@
 # guest-agency — 每位 Guest 都有近鏡＋明顯變化
 
 - Owner: cc100053（產品方向 G0 決定、最終 review）；實作：G3 relay worker
-- Status: G1 and G3 implemented; G2, G4–G7 and final acceptance pending
-- Branch: `feat/guest-agency`（由 verified main 開；依賴 `feat/closeup-zoom` 先 merge）
+- Status: G1–G3、G7 候選已實作（branch `codex/guest-agency-recovery`，2026-11-01 owner 決定先收尾）；G5 文案、G4／G7 視覺與性能 gate、真人兩秒辨認未完成，不視為驗收
+- Branch: `codex/guest-agency-recovery`（基於 `6e3514f`，closeup-zoom 已 merge）
 - Base commit: `6e3514f03e67cbe0918d8257f930b89ec0fe4346`（2026-10-30 fetch，main／origin/main 0/0；包含 closeup-zoom）
 - Last verified commit: G3 checkpoint (see Git history; checks recorded below)
 - Remote availability: NOT PUSHED
