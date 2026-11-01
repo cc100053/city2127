@@ -1,11 +1,11 @@
 # guest-agency — 每位 Guest 都有近鏡＋明顯變化
 
-- Owner: cc100053（產品方向 G0 決定、最終 review）；實作：G3 relay worker
-- Status: G1–G3、G7 候選已實作（branch `codex/guest-agency-recovery`，2026-11-01 owner 決定先收尾）；G5 文案、G4／G7 視覺與性能 gate、真人兩秒辨認未完成，不視為驗收
-- Branch: `codex/guest-agency-recovery`（基於 `6e3514f`，closeup-zoom 已 merge）
+- Owner: cc100053（產品方向 G0 決定、最終 review）；實作：Codex relay worker，2026-11-01 由 Claude 恢復並 merge
+- Status: G1–G3、G7、G2 候選已 merge main（2026-11-01 owner 決定先收尾）；G5 文案、G4／G7 視覺與性能 gate、真人兩秒辨認未完成，不視為驗收
+- Branch: `codex/guest-agency-recovery`（已 fast-forward 入 main；待刪，基於 `6e3514f`，closeup-zoom 已 merge）
 - Base commit: `6e3514f03e67cbe0918d8257f930b89ec0fe4346`（2026-10-30 fetch，main／origin/main 0/0；包含 closeup-zoom）
-- Last verified commit: G3 checkpoint (see Git history; checks recorded below)
-- Remote availability: NOT PUSHED
+- Last verified commit: `95c70be`（main；root／survey `npm test`、`npm run build`、`git diff --check` 通過；[main CI](https://github.com/cc100053/city2127/actions/runs/41262525072) 通過）。部分檔案由 Codex 紀錄還原，未能逐位元證實同原 commit 一致
+- Remote availability: PUSHED（main）
 
 ## 目標
 
@@ -183,9 +183,11 @@ AGENTS.md（每票影響力描述）、EXHIBITION_SPEC（分級階梯段、能�
 
 ## Next expected step
 
-1. Coordinator review G2 candidate and its original evidence; G1 tier–target and G2 owner decisions are recorded below.
-2. Continue independent G7／G5 work as appropriate, then G2 after the decision; complete G4／G6 and review package.
-3. Final human recognition gate: owner alone, at home (2026-10-30 decision).
+1. Owner 定 G5 日文結果卡文案（「あなたの声も加わり…」類歸因句；現時只有 G2 能源「整備フレーム／整備船」句，未獲批）。
+2. G4／G7 視覺：live 過場、夜景、其餘 viewpoint、SE 難辨、水庭構圖、全程遮擋／near plane；`sw:court3`、`nw:street` 已於 2026-11-01 重新構圖，只驗證靜態日夜畫面。
+3. 性能：SE tower6 1191 calls 對 district 中位數 718，需配對陰影重繪比較。
+4. 最終真人兩秒辨認：owner 一人在家（2026-10-30 決定）。
+5. 展覽前開新 run（replay 規則已變）；完成後歸檔本 handoff 並刪除 `codex/guest-agency-recovery`。
 
 ## 進度
 

@@ -428,3 +428,11 @@ Scratch Vite 5199、臨時 SQLite／server、Chrome 156.0.8078.74、macOS 27.0.1
 自動測試檢查覆蓋表、覆蓋數／平手輪替、focal／空 points fallback、pulse slot 正反及 stale 清除；64 個保守目標包圍盒在進場及 hold 取樣沒有自身跨 near plane，10 座 SE 塔的保守完整高度在最大 hold push 時落中間三分之二。這不是全場景 near-plane、動態交通與第三方遮擋的證明。街道真實第 8 票可見道路、車流和海，但左側有近景柱，卡片遮住部分海；SW court3 與 focal 重疊及若干 SE 畫面辨識仍須 review。早期 NW 前景飛行器遮擋和 SE 塔裁切已保存失敗原圖，候選改角後有對照，不能外推所有時間、seed 與 slot。G2 水庭框架、未配對陰影重繪最壞 draw calls、展覽硬件與 owner 一人在家的兩秒辨認仍未驗。
 
 G7 鏡頭效能（同機、同 Chrome、同日、1920×1080 DPR1，NW／SW／SE 全 high；固定 shot、renderer `data-fps` 與 `data-draw-calls`）：三個原 district 視角各取 3 次，新 64 視角各取 1 次。原 NW／SW／SE district 的 FPS 中位數均 60.0，calls 中位數分別 838／752／718；新 NW 12 個 60.0–60.1 FPS、522–860 calls；SW 16 個 59.9–60.1 FPS、448–731 calls；SE 36 個 59.8–60.1 FPS、489–1191 calls。SE 最高為 `se:tower6`，比原 SE 中位數高 65.9%；單次取樣和 shadow refresh 未配對，不能推斷穩定增幅或最壞情況，亦不作 performance gate PASS。所有原始數字保存在 relay `g7-performance/browser.json` 和 `summary.json`；此為本機數字，非展覽硬件。
+
+## Guest agency 整合與未完成 gates — 2026-11-01
+
+Codex 於機器重啟後在持久 checkout 重組 G1–G3、G7、G2 候選，Claude 接手後 fast-forward 入 main `95c70be`。驗證（Node 26、macOS）：root `npm test`（修正 `tests/energyPrototype.test.ts` 靜態 batch 上限為 `50 + 3 * 8`，因 8 個 activity frame 各加至多每種 finish 一個 batch）、root／survey `npm run build`、survey `npm test`、`git diff --check` 通過；[main CI](https://github.com/cc100053/city2127/actions/runs/41262525072) 通過。部分檔案由紀錄還原，未能逐位元證實與原 commit 相同。
+
+2026-11-01 headless Chrome（1600×900／1280×720，scratch Vite）只看靜態 high 狀態日（12:00）／夜（22:00）畫面：`se:tower6` 清楚；`sw:court3`、`nw:street` 重新構圖（`f079988`）後較佳，但 court3 日間地面偏白、街道左側屋頂仍佔約 1/4。未量 FPS／draw calls，未測 live 過場。
+
+**未驗收（不得標記通過）**：G5 日文歸因文案（owner 待定）；G4／G7 live 過場、夜景、其餘 viewpoint、SE 難辨、水庭構圖與全程遮擋／near plane；SE tower6 1191 calls 對 district 中位數 718 的配對陰影重繪比較；G2 陰影最壞 draw calls；owner 一人在家的兩秒辨認。G1 改了 replay 規則，展覽前須開新 run。

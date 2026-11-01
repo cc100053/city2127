@@ -236,6 +236,10 @@ Q1服務（交通／物流的日常服務接口）、Q2共享（社会・生活�
 - E5實際硬件／性能／訪客理解仍另留後續；沒有新增部署、依賴或外部資產。能源仍為2127形態／流程示意，不提供容量／可靠度／海岸工程認證。
 
 
+## G2 能源保底配置（2026-10-30 owner 決定；2026-11-01 merge）
+
+為使每份提案都有近鏡與變化：`EnergyConfiguration` 可帶 `activity`（每類 1／2 兩種可辨認整備配置，嚴格 wire 驗證）。當提案沒有其他與該 Guest 相關的變化時，所選能源類別在兩種配置間輪替；該類未建成時顯示整備框架／整備船（不宣稱設施已成），已成熟則換配置。按有效提案次序 fold 並由伺服器重建，replay／Undo／snapshot 一致；能源門檻（≥2票＋20%）與規模規則不變。渲染重用既有材質，每類兩個烘焙 frame（共 8 組）；非陰影 draw calls +0.7–1.0%，陰影重繪未配對量度。視覺與真人辨認 gate 未驗收，見 [guest-agency](handoffs/guest-agency.md)。
+
 ## E5本機部分完成（2026-10-24）
 
 使用者本輪限定先測目前Mac mini。M6／24GB／macOS27.0.1、headed Chrome156／ANGLE Metal、City1920×1080／DPR1、Vite DEV：low自動日夜真實1801.94秒平均59.94FPS，p95／p99 17.9／18.6ms、max66.7ms；90份原生Guest A/B＋16份HTTP種子，最終count106，沒有page crash／exception／context loss。60秒default兩種場景31.10／32.36FPS，low均59.94；鏡頭曾偏離初始hero，不能當完全固定鏡頭或能源GPU增量benchmark。
