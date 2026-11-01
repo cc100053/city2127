@@ -15,6 +15,10 @@ const layout = deriveExhibitionLayout(zero);
 const proposal: ExhibitionProposal = { id:'p',runId:'r',guestSessionId:'g',ordinal:1,questionSetVersion:4,algorithmVersion:2,
   answers:[],votes:zero,revisionBefore:0,revisionAfter:1,submittedAt:'2026-10-27T00:00:00Z',beforeScores:zero,afterScores:zero,beforeLayout:layout,afterLayout:layout,cityChanges:[] };
 assert.equal(headlineShot(undefined), null);
+assert.equal(headlineShot({ socketId:'se',focal:true,district:false,low:true }), 'se:focal-low');
+assert.equal(headlineShot({ socketId:'se',focal:true,district:false }), 'se:focal');
+assert.equal(headlineShot({ socketId:'nw',focal:true,district:false,low:true }), 'nw:focal', 'no pushed-in shot for other sites');
+assert.equal(headlineShot({ socketId:'se',focal:true,district:true,low:true }), 'se:district');
 for (const socketId of ['nw', 'ne', 'sw', 'se'] as const) {
   assert.equal(headlineShot({ socketId, focal:true,district:false }), `${socketId}:focal`);
   for (const focal of [false,true]) assert.equal(headlineShot({ socketId,focal,district:true }), `${socketId}:district`);
@@ -49,7 +53,7 @@ assert.equal(reasonDelayMs(DISPLAY_MS,true),0);
 assert.equal(reasonDelayMs(DISPLAY_MS-101,false),0);
 assert.equal(shotStage(3),'fly-in','the flight starts after the vote journey');
 assert.deepEqual([0,t.flyIn,t.hold,t.flyOut,t.done].map(elapsed=>shotStage(elapsed)),['journey','fly-in','hold','fly-out','done']);
-assert.equal(Object.keys(SHOTS).length,77);
+assert.equal(Object.keys(SHOTS).length,78);
 for (const [id, pose] of Object.entries(SHOTS)) {
   const p=new Vector3(...pose.position),target=new Vector3(...pose.target);
   assert.ok(p.y>target.y);assert.ok(p.distanceTo(target)>=40&&p.distanceTo(target)<=450);

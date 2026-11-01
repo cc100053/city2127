@@ -13,11 +13,13 @@ export const SHOTS: Record<ShotId, Pose> = {
   'nw:focal': { position: [40, 130, -508], target: [40, 43, -300] },
   'ne:focal': { position: [-280, 85, -245], target: [-210, 14, -135] },
   'sw:focal': { position: [-120, 64, 152], target: [-105, 10, 60] },
-  'se:focal': { position: [0, 225, -220], target: [175, 65, -45] },
+  'se:focal': { position: [12, 115, -208], target: [182, 72, -38] },
+  // The -1 pavilions are ~5% of a lot-wide frame at se:focal; this pushed-in pose is used when a focal change starts or ends at the low band.
+  'se:focal-low': { position: [100, 34, -120], target: [182, 26, -38] },
   'nw:district': { position: [-30, 115, -455], target: [40, 43, -300] },
   'ne:district': { position: [-320, 110, -300], target: [-210, 14, -135] },
   'sw:district': { position: [-108, 80, 180], target: [-105, 10, 60] },
-  'se:district': { position: [20, 150, -195], target: [175, 40, -45] },
+  'se:district': { position: [27, 150, -188], target: [182, 40, -38] },
   'sw:room1': { position: [145, 72, -555], target: [214, 5, -475] },
   'sw:room2': { position: [8, 72, -503], target: [77, 5, -423] },
   'sw:room3': { position: [-123, 72, -413], target: [-54, 5, -333] },
@@ -157,7 +159,10 @@ export const VIEWPOINT_COVERAGE: Readonly<Record<string, readonly string[]>> = {
 };
 export function headlineShot(change: CarrierChange | undefined): ShotId | null {
   if (!change) return null;
-  if (!change.energy) return `${change.socketId}:${change.focalOnly || (change.focal && !change.district) ? 'focal' : 'district'}`;
+  if (!change.energy) {
+    const focal = change.focalOnly || (change.focal && !change.district);
+    return `${change.socketId}:${focal ? (change.low && Object.hasOwn(SHOTS, `${change.socketId}:focal-low`) ? 'focal-low' : 'focal') : 'district'}` as ShotId;
+  }
   const { before, after } = change.energy;
   switch (change.energy.part ?? energyChangedPart(before, after)) {
     case 'waterGardens': return before.waterGardens === 1 && after.waterGardens === 2 ? 'energy:garden2' : 'energy:garden';

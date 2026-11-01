@@ -3,7 +3,7 @@ import type { EnergyRuntime } from './energyRuntime.ts';
 import type * as T from 'three';
 import { CHANGE_CATALOG, SITE_IDS, environmentParkTarget, selectExhibitionSiteVariants, selectSiteVariants, variantLayers, type SiteId, type SiteLayerDefinition, type SiteLayerId, type SiteVariantId } from './changeCatalog.ts';
 import type { BuiltSite, BuiltSiteMap, SiteLayerRuntime } from './siteBuilders/index.ts';
-import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
+import { prefersReducedMotion, SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 import type { EnvironmentParkDiagnostics } from './siteBuilders/siteRuntime.ts';
 import type { EnvironmentDistrictDiagnostics, ChangedPoint } from './districtMeters.ts';
 import type { Scores, SurveyView } from './surveyView.ts';
@@ -46,7 +46,7 @@ export interface SiteDiagnostic {
 }
 
 /** `headline`: the one change a live result presents with pulses, marker and resident card; it comes first in the returned list. */
-export type CarrierChange = { socketId: LotSocketId; focal: boolean; district: boolean; points?: readonly ChangedPoint[]; focalOnly?: boolean; headline?: boolean; energy?: { before: EnergyConfiguration; after: EnergyConfiguration; part?: EnergyPart } };
+export type CarrierChange = { socketId: LotSocketId; focal: boolean; district: boolean; points?: readonly ChangedPoint[]; focalOnly?: boolean; low?: true; headline?: boolean; energy?: { before: EnergyConfiguration; after: EnergyConfiguration; part?: EnergyPart } };
 
 export type CityChangeDiagnostics = Readonly<Record<SiteId, SiteDiagnostic>>;
 
@@ -56,9 +56,6 @@ const EXHIBITION_BASE_VARIANTS: Record<SiteId, SiteVariantId> = {
 };
 
 const SITE_SOCKETS: Record<SiteId, LotSocketId> = { magnetEast: 'nw', stationEastPark: 'ne', dogenzakaSouth: 'sw', centerGaiRear: 'se' };
-
-const prefersReducedMotion = () => typeof globalThis.matchMedia === 'function'
-  && globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const smoothstep = (value: number) => value * value * (3 - 2 * value);
 
@@ -164,6 +161,7 @@ export class CityChangeManager {
     const changes: CarrierChange[] = [...(energy ? [{ socketId: 'ne' as const, focal: false, district: true, energy: { ...energy, ...(headline && 'energy' in headline && headline.part ? { part: headline.part } : {}) }, ...(headline && 'energy' in headline ? { headline: true } : {}) }] : []),
       ...(Object.keys(districts) as LotSocketId[]).map(socketId => ({ socketId, focal: focal[socketId],
         district: before[socketId] !== JSON.stringify(districts[socketId]?.getConfiguration()),
+        ...(previousLayout?.bands[socketId] === 'low' || layout.bands[socketId] === 'low' ? { low: true as const } : {}),
         focalOnly: !!previousLayout && Math.max(Math.abs(previousLayout.tiers[socketId]), Math.abs(layout.tiers[socketId])) <= 1,
         ...('changedPoints' in (districts[socketId] ?? {}) ? { points: (districts[socketId] as { changedPoints: ChangedPoint[] }).changedPoints } : {}),
         ...(quiet(socketId) ? {} : { headline: true }),

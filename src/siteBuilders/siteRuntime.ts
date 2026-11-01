@@ -143,3 +143,7 @@ export function createGuestMarker(parent: T.Group, socketId: LotSocketId): SiteM
   parent.add(mesh);
   return { mesh, material };
 }
+
+/** Reduced-motion preference; false where `matchMedia` is unavailable (Node tests, old browsers). */
+export const prefersReducedMotion = () => typeof globalThis.matchMedia === 'function'
+  && globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches;

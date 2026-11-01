@@ -2,9 +2,8 @@ import assert from 'node:assert/strict';
 import * as T from 'three';
 import type { Kit } from '../src/cityRig.ts';
 import { changeSites } from '../src/layout.ts';
-import { buildConcentrationTower } from '../src/siteBuilders/concentrationTower.ts';
+import { amber, buildConcentrationTower } from '../src/siteBuilders/concentrationTower.ts';
 import { METER_COLORS } from '../src/districtMeters.ts';
-import { publicLight } from '../src/cityRig.ts';
 
 const HIDDEN = 1e-3;
 const documentDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'document');
@@ -44,13 +43,11 @@ try {
   const neutralPropsLayer = site.layers.towerNeutralProps!.group;
   const upperState = { visible: upperLayer.visible, scaleY: upperLayer.scale.y };
   const bands = site.root.getObjectsByProperty('name', 'tower-meter-band') as T.InstancedMesh[];
-  assert.equal(bands.length, 2);
-  for (const band of bands) {
-    assert.equal(band.material, publicLight, 'meter bands reuse the shared finish');
-    const color = new T.Color(); band.getColorAt(0, color);
-    const expected = new T.Color(METER_COLORS.urbanConcentration);
-    assert.ok(Math.abs(color.r-expected.r)<1e-6 && Math.abs(color.g-expected.g)<1e-6 && Math.abs(color.b-expected.b)<1e-6);
-  }
+  assert.equal(bands.length, 3, 'one amber ring each for the pavilions, mid-rise and tower');
+  const expected = new T.Color(METER_COLORS.urbanConcentration);
+  for (const band of bands) assert.equal(band.material, amber);
+  assert.ok(amber.color.equals(expected) && amber.emissive.equals(expected), 'amber is the Meter colour, lit independently of the day');
+  assert.equal(upperLayer.position.y, 0, 'the tower grows from the ground');
 
   assert.equal(runtime.setTarget({ band: 'low', functionModules: 2 }, 0, false), true);
   assert.equal(runtime.getDiagnostics().representation, 'pavilion-pair');
@@ -78,6 +75,17 @@ try {
 
   assert.equal(runtime.setTarget({ band: 'high', functionModules: 6 }, 10, true), true);
   assert.equal(runtime.getDiagnostics().activeFunctionModules, 6);
+  assert.equal(group('tower-mid-rise-hall').visible, false, 'high replaces the mid-rise');
+  const cabin = group('tower-elevator-cabin');
+  runtime.update(0); assert.equal(cabin.position.y, 1.5);
+  runtime.update(3); assert.ok(cabin.position.y > 1.5 && cabin.position.y < 36.5);
+  runtime.update(6.5); assert.equal(cabin.position.y, 36.5);
+  runtime.update(14); assert.equal(cabin.position.y, 1.5);
+  Object.defineProperty(globalThis, 'matchMedia', { configurable: true, value: () => ({ matches: true }) });
+  runtime.update(3); assert.equal(cabin.position.y, 19, 'reduced motion parks the cabin');
+  runtime.update(6.5); assert.equal(cabin.position.y, 19);
+  delete (globalThis as typeof globalThis & { matchMedia?: unknown }).matchMedia;
+  runtime.update(1); assert.ok(cabin.position.y !== 19);
   assert.deepEqual({ visible: upperLayer.visible, scaleY: upperLayer.scale.y }, upperState);
   runtime.restoreLegacy();
   assert.equal(runtime.getDiagnostics().targetFunctionModules, 4);

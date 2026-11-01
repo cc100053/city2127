@@ -38,4 +38,4 @@
 
 ## Repository skill
 
-[Dream Loop 介紹](../.agents/skills/dream-loop/README.md)及[skill 入口](../.agents/skills/dream-loop/SKILL.md)是獨立工具指引，不是產品規格。本次文件整理沒有執行其生成／實作流程。
+[Dream Loop 介紹](../.agents/skills/dream-loop/README.md)及[skill 入口](../.agents/skills/dream-loop/SKILL.md)是獨立工具指引，不是產品規格。[近鏡打磨 skill](../.agents/skills/closeup-polish/SKILL.md)（2026-11-01，由 SE 樣板整理）記錄 Opus 規格／Sonnet 實作／owner 驗收嘅流程同教訓；Claude 經 `.claude/skills/closeup-polish` 本機 symlink 讀取（`.claude/` 唔入 Git）。本次文件整理沒有執行其生成／實作流程。
