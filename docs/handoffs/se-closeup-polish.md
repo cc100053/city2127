@@ -1,7 +1,7 @@
 # se-closeup-polish — SE 集約 focal 近鏡樣板
 
 - Owner: cc100053（唯一驗收人；owner 一人同意即合格）
-- Status: PLANNED — 等 owner 拍板「待決定」三項
+- Status: PLANNED — 等 owner 提供目標圖
 - Branch: `feat/se-closeup-polish`
 - Base commit: `4248e8a23f45b9af9a471678cc7d68dcf5245dd2`
 - Last verified commit: NONE
@@ -27,7 +27,7 @@ Owner 2026-11-01：觀眾睇唔出城市變化。做法係揀一個場景打磨�
 
 | # | 問題 | 證據 |
 | --- | --- | --- |
-| D1 | **尺度太細**：地塊約 9×9 m、+1 塔高約 28 m，左右鄰居 60–100 m；鏡頭距離約 295 m，主體只佔畫面寬約 11–14% | `concentrationTower.ts`；[A-se-review](../../artifacts/closeup-zoom/final/A-se-review/README.md) |
+| D1 | **鏡頭太高太遠**：site root `scale:3`，地塊實際約 27×27 m、+1 塔頂約 130 m，尺度唔細；但 `se:focal` 由約 295 m 外高角度望落，壓扁咗高度，主體只佔畫面寬約 11–14%（2026-11-01 更正：之前誤當地塊 9 m） | `layout.ts` `changeSites.se`；[A-se-review](../../artifacts/closeup-zoom/final/A-se-review/README.md) |
 | D2 | **+1 塔同鄰居同一套語言**（藍／米色疊環），融入背景，唔似「新起」 | se-focal-rung+1 |
 | D3 | **−1 太簡陋**：兩個 3 m 盒＋兩支 32 m 光桿（service spines），讀成兩支電線桿 | se-focal-rung-1 |
 | D4 | **變化方式係成組由中心點縮放**（`group.scale.setScalar`），係「彈出／縮走」，唔係「起樓／拆走」 | `ConcentrationTowerController.write` |
@@ -45,11 +45,15 @@ Owner 2026-11-01：觀眾睇唔出城市變化。做法係揀一個場景打磨�
 - **鏡頭**：重定 `se:focal` pose，距離約 120–160 m，三個狀態主體高度佔畫面 45–65%（沿用 closeup-zoom F 標準），背景盡量係天或海。
 - **不變**：tier／ladder／headline 規則、survey 協議、`DISPLAY_MS`、時間線、結果卡文字（文字另議）。
 
-## 待決定（owner）
+## Owner 決定（2026-11-01）
 
-1. **可唔可以擴大地塊同高度？** 舊 closeup-zoom brief 規定「唔改 footprint」，但 D1 係根本問題。建議容許擴到約 20×20 m、+1 塔高約 60–70 m（須先查周邊步道／路線淨空）。
-2. **目標圖點嚟？** `dream-loop` 要先有一張生成嘅目標截圖，但呢個環境冇圖像生成工具。選擇：(a) owner 用外部圖像模型，以 baseline 截圖為底生成 −1／+1 目標圖；(b) 唔用目標圖，按上面文字規格做，owner 睇截圖判斷。
-3. **用 code 定 Blender 起模？** 建議先用現有 `cityRig` kit（code），因為逐層動畫要可獨立控制嘅部件，而且唔使新 pipeline；打磨到 code 嘅上限先轉 Blender GLB。
+1. **地塊／高度可以改**（跟建議）。更正 D1 後，現有 27 m 地塊同約 130 m 塔高已足夠；先用新鏡頭解決，真係唔夠先擴，擴之前查周邊步道／路線淨空。
+2. **目標圖由 owner 用外部圖像模型生成**：底圖同 prompt 見 [prompts.md](../../artifacts/se-closeup-polish/prompts.md)，結果放 `artifacts/se-closeup-polish/target/`。
+3. **先用 code（現有 `cityRig` kit）起模**，到上限先轉 Blender GLB。
+
+## 候選鏡頭 `se:d4`
+
+`position [5, 115, -215]`、`target [175, 72, -45]`（距離約 245 m，hero 一側）。三個狀態主體全入鏡，+1 塔頂對天，背景見海：[baseline 三連圖](../../artifacts/se-closeup-polish/baseline/se-d4-triple.jpg)。已試但棄用：d1 `[40,60,-175]`（太低，塔頂出界）、d2 `[20,100,-185]`（塔頂出界）、d3 `[95,35,-210]`（鏡頭入咗建築）。目標圖確定後再微調；未寫入 `SHOTS`。
 
 ## In-scope files
 
@@ -59,6 +63,7 @@ Owner 2026-11-01：觀眾睇唔出城市變化。做法係揀一個場景打磨�
 
 - `AGENTS.md`：加 visual polish delegation 授權（owner 2026-11-01）。
 - 本 handoff：診斷同目標規格草案。
+- Baseline 截圖（`se:d4`，−1／0／+1，12:00，headless Chrome 1600×900 via `playwright-cli`）同目標圖 prompt。截圖要 `reviewTime` 後等約 10 s，否則 `page.screenshot` 5 s timeout。
 
 ## Actual validation results
 
@@ -66,4 +71,4 @@ Owner 2026-11-01：觀眾睇唔出城市變化。做法係揀一個場景打磨�
 
 ## Next step
 
-Owner 答「待決定」三項 → Opus 寫逐部件規格（尺寸／材質／動畫）→ Sonnet agent 實作＋固定鏡頭截圖 −1／0／+1、日／夜、變化中途 → Opus 審 → owner 睇對照頁。
+Owner 提供目標圖 → Opus 寫逐部件規格（尺寸／材質／動畫）→ Sonnet agent 實作＋固定鏡頭截圖 −1／0／+1、日／夜、變化中途 → Opus 審 → owner 睇對照頁。
