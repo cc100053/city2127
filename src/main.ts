@@ -31,6 +31,12 @@ import { DISPLAY_MS } from '../survey/src/shared/displayTiming';
 import { housingPrototype } from './housingPrototype';
 import './style.css';
 
+// Height fog: FogExp2 thickens toward the water (45 m scale height), so low ground and the far shore fall into haze while towers stand clear.
+// World height comes from the view-space position (rigid view matrix), so instanced meshes and every fogged material need no extra uniform.
+T.ShaderChunk.fog_pars_vertex+='\n#ifdef USE_FOG\nvarying float vFogY;\n#endif';
+T.ShaderChunk.fog_vertex+='\n#ifdef USE_FOG\nvFogY=(transpose(mat3(viewMatrix))*mvPosition.xyz+cameraPosition).y;\n#endif';
+T.ShaderChunk.fog_pars_fragment+='\n#ifdef USE_FOG\nvarying float vFogY;\n#endif';
+T.ShaderChunk.fog_fragment=T.ShaderChunk.fog_fragment.replace('fogDensity * fogDensity * vFogDepth * vFogDepth','fogDensity * fogDensity * vFogDepth * vFogDepth * (1. + 1.4 * exp(-max(vFogY, 0.) / 45.))');
 try {
   const scene=new T.Scene();scene.background=new T.Color('#dfd6cd');scene.fog=new T.FogExp2('#dfd6cd',.0005);
   const renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
@@ -213,7 +219,7 @@ try {
   // Day tints per mood, then dusk and night colours laid over them by the clock.
   const dayBase=new T.Color('#d3dde0'),dayPulse=new T.Color('#accbdc'),dayStill=new T.Color('#e0e6dc');
   const topBase=new T.Color('#6e9cc6'),topPulse=new T.Color('#6a8db0'),topStill=new T.Color('#a9bcc4');
-  const duskHorizon=new T.Color('#f6b58a'),duskTop=new T.Color('#7a86ad'),nightHorizon=new T.Color('#1c2941'),nightTop=new T.Color('#070d1c');
+  const duskHorizon=new T.Color('#f6b58a'),duskTop=new T.Color('#7a86ad'),nightHorizon=new T.Color('#2a3354'),nightTop=new T.Color('#070d1c');
   const sunLow=new T.Color('#ffae78'),sunHigh=new T.Color('#ffe7c4'),moon=new T.Color('#7d9be0'),ambientDay=new T.Color('#e3ebee'),ambientPulse=new T.Color('#a7c9ed'),ambientNight=new T.Color('#899dbd'),ambientLate=new T.Color('#f4dcc0'),white=new T.Color('#ffffff'),cloudGold=new T.Color('#ffcf98'),seaHaze=new T.Color('#a9c4d6'),horizonCream=new T.Color('#f7ead8'),sunBloom=new T.Color('#ffe2b0'),sunDirection=new T.Vector3();
   const start=performance.now();
   let frames=0,measureStart=start,shadowDrawn=-Infinity;
@@ -224,8 +230,8 @@ try {
     const s=withNight(surveyUrl?world.state:moodAt(hour),dark);
     const pulse=T.MathUtils.clamp((s.neon-.25)/.7,0,1)*day,still=T.MathUtils.clamp((s.warmth-.55)/.3,0,1);
     (scene.background as T.Color).copy(dayBase).lerp(dayPulse,pulse).lerp(dayStill,still).lerp(duskHorizon,glow*.85).lerp(nightHorizon,nightSky);
-    // Clear bay air by day: the district stays crisp, the sea keeps its blue to the horizon and far shores fade to a cool haze.
-    (scene.fog as T.FogExp2).color.copy(scene.background as T.Color).lerp(seaHaze,day*.6);(scene.fog as T.FogExp2).density=.00015+s.haze*.0001;grade.uniforms.amount.value=.35+.65*day;
+    // Aerial perspective (hero atmosphere): the district stays readable, the far bay and shores fall into a cool haze that hugs the water.
+    (scene.fog as T.FogExp2).color.copy(scene.background as T.Color).lerp(seaHaze,day*.6);(scene.fog as T.FogExp2).density=.0004+s.haze*.0001;grade.uniforms.amount.value=.35+.65*day;
     sky.material.uniforms.day.value=day;sky.material.uniforms.tint.value.copy(white).lerp(cloudGold,glow*.45);
     sky.position.copy(camera.position);sky.material.uniforms.horizon.value.copy(scene.background as T.Color).lerp(horizonCream,day*.6);sky.material.uniforms.top.value.copy(topBase).lerp(topPulse,pulse).lerp(topStill,still).lerp(duskTop,glow*.5).lerp(nightTop,nightSky);
     // The sun arcs east to west; below the horizon the same light becomes a dim moon from the opposite side, so shadows never stop.

@@ -5,7 +5,7 @@ import layout from './odaiba-layout.json';
 import { civicCore } from './civicCore';
 import { publishOccupants, publishRoofWalks } from './occupants';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
-import { facadeClimate, publishRoofGardens, towerGlow } from './districtMeters';
+import { facadeClimate, publishRoofGardens, towerGlow, towerNight } from './districtMeters';
 import { CORRIDOR_GLSL, plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
 import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
@@ -86,11 +86,27 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
   material.customProgramCacheKey = () => 'curtain-wall';
 }
 const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a'), dayGlow = .42; // r5 pass 2: warmer lit bands by day (target v2's golden hotel glazing)
+const glazingNight = { value: 0 };
+// Hero atmosphere: at night about half the 6 m × 4.2 m glazing cells go dark (world-space hash), so lit rooms read as scattered life, not a lamp.
+function nightRooms(material: T.MeshStandardMaterial) {
+  material.onBeforeCompile = shader => {
+    shader.uniforms.glazingNight = glazingNight;
+    shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 roomP;')
+      .replace('#include <project_vertex>', '#include <project_vertex>\nroomP = (modelMatrix * vec4(transformed, 1.)).xyz;');
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float glazingNight;\nvarying vec3 roomP;')
+      .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+      float room = fract(sin(dot(floor(vec2((roomP.x + roomP.z) / 6., roomP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453);
+      totalEmissiveRadiance *= mix(1., step(.5, room), glazingNight);`);
+  };
+  material.customProgramCacheKey = () => 'night-rooms';
+}
 /** Retained landmark glazing glows warm, strongest at night; the civic chassis uses the shared city finishes. */
 export function updateOdaiba(night: number) {
   // A faint daytime glow keeps the dark glazing reading as occupied, warm interiors (CITY_MASTER_TASTE) instead of voids.
-  for (const material of glazing) material.emissiveIntensity = dayGlow + night * (.55 - dayGlow);
-  curtainGlow.value = .45 + night * .8; curtainNight.value = night; towerGlow.value = .3 + night * .9;
+  // Hero atmosphere: night keeps a light hierarchy — fewer, brighter lit rooms and scattered lit floors, so landmarks lead.
+  for (const material of glazing) material.emissiveIntensity = dayGlow + night * (.7 - dayGlow);
+  glazingNight.value = night;
+  curtainGlow.value = .45 + night * .45; curtainNight.value = night * .15; towerGlow.value = .3 + night * .9; towerNight.value = night;
 }
 
 // Ground finishes lie within centimetres of each other (building pads over the lawn terrain, plazas and service yards beside them), finer
@@ -183,7 +199,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
       if (!(object instanceof T.Mesh)) return;
       for (const material of [object.material].flat() as T.MeshStandardMaterial[])
         if (curtainWalls[material.name]) { if (!material.customProgramCacheKey().startsWith('curtain')) curtainWall(material, curtainWalls[material.name]); }
-        else if (/glass|glazing|window reflection/i.test(material.name) && !glazing.has(material)) { material.emissive.copy(warm); material.emissiveIntensity = dayGlow; material.roughness=.22;material.metalness=.38;glazing.add(material); }
+        else if (/glass|glazing|window reflection/i.test(material.name) && !glazing.has(material)) { material.emissive.copy(warm); material.emissiveIntensity = dayGlow; material.roughness=.22;material.metalness=.38;nightRooms(material);glazing.add(material); }
         else if (roofRetrofit[material.name]) { const [color, roughness, metalness] = roofRetrofit[material.name]; material.color.set(color); material.roughness = roughness; material.metalness = metalness; }
     });
     // One draw per finish instead of one per surveyed part (30–50 per landmark); materials stay shared, so night glazing still applies.
