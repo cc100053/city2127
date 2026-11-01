@@ -1,4 +1,5 @@
 import * as T from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { bake, trim, stone, glass, futureLight, chrome } from './cityRig.ts';
 import { SKY_RING } from './layout.ts';
 
@@ -29,6 +30,16 @@ function member(parent: T.Object3D, a: T.Vector3, b: T.Vector3, w: number, h: nu
   mesh.quaternion.setFromRotationMatrix(basis); mesh.position.copy(a).add(b).multiplyScalar(.5); mesh.scale.set(w, h, length);
   parent.add(mesh); return mesh;
 }
+/** A round member from a (radius r0) to b (radius r1): pylon legs taper towards the ring. */
+function strut(parent: T.Object3D, a: T.Vector3, b: T.Vector3, r0: number, r1: number, material: T.Material) {
+  const mesh = new T.Mesh(new T.CylinderGeometry(r1, r0, a.distanceTo(b), 8), material);
+  mesh.quaternion.setFromUnitVectors(UP, b.clone().sub(a).normalize()); mesh.position.copy(a).add(b).multiplyScalar(.5);
+  parent.add(mesh); return mesh;
+}
+/** A mesh of `geometry` at `at` in `parent` (berth and pod parts). */
+function part(parent: T.Object3D, geometry: T.BufferGeometry, material: T.Material, at: T.Vector3) {
+  const mesh = new T.Mesh(geometry, material); mesh.position.copy(at); parent.add(mesh); return mesh;
+}
 
 export function skyRing(scene: T.Scene) {
   const root = new T.Group(); root.name = 'sky-ring';
@@ -36,44 +47,70 @@ export function skyRing(scene: T.Scene) {
   const corners = (a: number) => ({ to: ringPoint(a, top - .7, WIDTH / 2), ti: ringPoint(a, top - .7, -WIDTH / 2), bo: ringPoint(a, bottom, WIDTH / 2), bi: ringPoint(a, bottom, -WIDTH / 2) });
   for (let i = 0; i < PANELS; i++) {
     const a0 = i / PANELS * Math.PI * 2, a1 = (i + 1) / PANELS * Math.PI * 2, p = corners(a0), q = corners(a1);
-    for (const k of ['to', 'ti', 'bo', 'bi'] as const) member(root, p[k], q[k], 1.4, 1.4, trim);
+    // Member hierarchy: heavy bottom chords (the line seen from the city), lighter top chords, posts, then slim web diagonals.
+    for (const k of ['to', 'ti'] as const) member(root, p[k], q[k], 1.5, 1.5, trim);
+    for (const k of ['bo', 'bi'] as const) member(root, p[k], q[k], 2.2, 2.2, trim);
     member(root, p.to, p.bo, .9, .9, trim); member(root, p.ti, p.bi, .9, .9, trim); member(root, p.bo, p.bi, .8, .8, trim);
     // Warren triangulation on both faces and the soffit, so the ring reads as built structure from below.
-    member(root, i % 2 ? p.to : p.bo, i % 2 ? q.bo : q.to, .7, .7, trim); member(root, i % 2 ? p.bi : p.ti, i % 2 ? q.ti : q.bi, .7, .7, trim);
-    member(root, p.bo, q.bi, .6, .6, trim);
-    // Deck: the walkway and berth apron the corridor traffic lands on; its outer edge carries the corridor's docking line.
+    member(root, i % 2 ? p.to : p.bo, i % 2 ? q.bo : q.to, .55, .55, trim); member(root, i % 2 ? p.bi : p.ti, i % 2 ? q.ti : q.bi, .55, .55, trim);
+    member(root, p.bo, q.bi, .45, .45, trim);
+    // Deck: the walkway and berth apron the corridor traffic lands on, edged by a stone fascia and a glass parapet on both sides;
+    // the outer fascia carries the corridor's docking line.
     member(root, ringPoint(a0, top - .3), ringPoint(a1, top - .3), WIDTH + 2, .6, stone, UP);
-    member(root, ringPoint(a0, top + .1, WIDTH / 2 + 1), ringPoint(a1, top + .1, WIDTH / 2 + 1), .45, .3, futureLight);
+    for (const s of [-1, 1]) {
+      member(root, ringPoint(a0, top - 1, s * (WIDTH / 2 + 1.2)), ringPoint(a1, top - 1, s * (WIDTH / 2 + 1.2)), .4, 2.4, stone);
+      member(root, ringPoint(a0, top + .75, s * (WIDTH / 2 + .9)), ringPoint(a1, top + .75, s * (WIDTH / 2 + .9)), .15, 1.5, glass);
+    }
+    member(root, ringPoint(a0, top - .7, WIDTH / 2 + 1.45), ringPoint(a1, top - .7, WIDTH / 2 + 1.45), .12, .4, futureLight);
   }
   // Berths: cantilevered aprons off the outer face, each braced back to the bottom chord, with a lit docking edge and one parked craft.
   for (let b = 0; b < BERTHS; b++) {
     const a = (b + .5) / BERTHS * Math.PI * 2, t = 12 / Math.hypot(SKY_RING.rx, SKY_RING.rz) * 1.4;
     const inner = ringPoint(a, top - .5, WIDTH / 2), outer = ringPoint(a, top - .5, WIDTH / 2 + 18);
     member(root, inner, outer, 22, 1, stone);
-    for (const s of [-1, 1]) member(root, ringPoint(a + s * t * .55, top - 1, WIDTH / 2 + 18), ringPoint(a + s * t * .55, bottom, WIDTH / 2), .8, .8, trim);
-    member(root, ringPoint(a - t * .55, top + .05, WIDTH / 2 + 18.1), ringPoint(a + t * .55, top + .05, WIDTH / 2 + 18.1), .5, .25, futureLight);
-    // Parked air pod (the mobility fleet's pod proportions at its 5× scale): pale shell, glass canopy, four rotor guards.
+    member(root, ringPoint(a, top - 1.4, WIDTH / 2 + 18), ringPoint(a, top - 1.4, WIDTH / 2 + 18.4), 22, 2.2, stone);
+    for (const s of [-1, 1]) {
+      member(root, ringPoint(a + s * t * .55, top - 1, WIDTH / 2 + 18), ringPoint(a + s * t * .55, bottom, WIDTH / 2), .8, .8, trim);
+      member(root, ringPoint(a + s * t * .64, top + .75, WIDTH / 2 + 1), ringPoint(a + s * t * .64, top + .75, WIDTH / 2 + 18), .15, 1.5, glass);
+    }
+    member(root, ringPoint(a - t * .55, top - .7, WIDTH / 2 + 18.65), ringPoint(a + t * .55, top - .7, WIDTH / 2 + 18.65), .12, .4, futureLight);
+    // Pad: a docking ring on the apron (the same docking light) and a glazed boarding gate where the apron meets the deck.
+    part(root, new T.TorusGeometry(7, .22, 4, 40).rotateX(Math.PI / 2), futureLight, ringPoint(a, top + .05, WIDTH / 2 + 9.5));
+    const gate = new T.Group(); gate.position.copy(ringPoint(a, top, WIDTH / 2 - 2.5)); gate.lookAt(ringPoint(a, top, 0)); root.add(gate);
+    part(gate, new RoundedBoxGeometry(8, 3, 3, 2, .4), glass, new T.Vector3(0, 1.5, 0));
+    part(gate, new RoundedBoxGeometry(9.5, .45, 4.4, 2, .2), trim, new T.Vector3(0, 3.2, 0));
+    // Parked air pod (the mobility fleet's rounded pod at its 5× scale): pale shell, glass canopy, docking-light keel, four ducted rotors on skids.
     const craft = new T.Group(), heading = ringPoint(a + .01, 0).sub(ringPoint(a - .01, 0)).normalize();
-    craft.position.copy(ringPoint(a, top + 2.2, WIDTH / 2 + 9)); craft.lookAt(craft.position.clone().add(heading)); root.add(craft);
-    member(craft, new T.Vector3(0, 0, -6), new T.Vector3(0, 0, 6), 7.5, 4, trim);
-    member(craft, new T.Vector3(0, 1.6, -2.5), new T.Vector3(0, 1.6, 5), 7.8, 1.5, glass);
-    for (const [x, z] of [[-5.8, -4.8], [5.8, -4.8], [-5.8, 4.8], [5.8, 4.8]]) member(craft, new T.Vector3(x, .7, z - 2.5), new T.Vector3(x, .7, z + 2.5), 5, .4, chrome);
+    craft.position.copy(ringPoint(a, top + 2.2, WIDTH / 2 + 9.5)); craft.lookAt(craft.position.clone().add(heading)); root.add(craft);
+    part(craft, new RoundedBoxGeometry(7.5, 4, 12, 2, 1.75), trim, new T.Vector3(0, .5, 0));
+    part(craft, new RoundedBoxGeometry(7.8, 1.5, 7.5, 2, .6), glass, new T.Vector3(0, 1.6, 1.25));
+    part(craft, new RoundedBoxGeometry(6, .4, 10, 2, .15), futureLight, new T.Vector3(0, -1.5, 0));
+    for (const [x, z] of [[-5.75, -4.75], [5.75, -4.75], [-5.75, 4.75], [5.75, 4.75]]) part(craft, new T.TorusGeometry(2.75, .4, 6, 20).rotateX(Math.PI / 2), trim, new T.Vector3(x, .75, z));
+    for (const x of [-2.6, 2.6]) member(craft, new T.Vector3(x, -1.9, -4.5), new T.Vector3(x, -1.9, 4.5), .4, .4, chrome);
   }
-  // V pylons: two diagonal legs from one foot on the water / open ground up to the bottom chord, braced at thirds (Fuji frame and diagonal DNA).
+  // V pylons: two tapering diagonal legs from one cast knuckle on a stone pier (water / open ground) up to saddle beams under both
+  // bottom chords, tied once (Fuji frame and diagonal DNA).
   for (const a of PYLONS) {
-    const foot = ringPoint(a, -1.2, WIDTH / 2 + 95), spread = 55 / Math.hypot(SKY_RING.rx, SKY_RING.rz) * 1.4;
-    const tops = [-1, 1].map(s => ringPoint(a + s * spread, bottom, WIDTH / 2 - 1));
-    for (const t of tops) member(root, foot, t, 5, 5, trim);
-    for (const f of [.36, .7]) member(root, foot.clone().lerp(tops[0], f), foot.clone().lerp(tops[1], f), 2.2, 2.2, trim);
-    member(root, tops[0], tops[1], 2.4, 2.4, trim);
-    const plinth = new T.Mesh(new T.CylinderGeometry(9, 11, 6, 8), stone); plinth.position.copy(foot).setY(1); root.add(plinth);
+    const foot = ringPoint(a, 8, WIDTH / 2 + 95), spread = 55 / Math.hypot(SKY_RING.rx, SKY_RING.rz) * 1.4;
+    const tops = [-1, 1].map(s => ringPoint(a + s * spread, bottom - 3, WIDTH / 2 - 1));
+    for (const t of tops) strut(root, foot, t, 3.4, 2, trim);
+    member(root, foot.clone().lerp(tops[0], .55), foot.clone().lerp(tops[1], .55), 1.6, 1.6, trim);
+    for (const s of [-1, 1]) member(root, ringPoint(a + s * spread, bottom - 2.3, WIDTH / 2 + 2.5), ringPoint(a + s * spread, bottom - 2.3, -WIDTH / 2 - 2.5), 3.6, 3.4, trim);
+    part(root, new T.CylinderGeometry(9, 12, 9.2, 8), stone, foot.clone().setY(1.4));
+    part(root, new T.CylinderGeometry(3.6, 5.2, 4, 8), trim, foot.clone().setY(8));
+  }
+  // Voice fittings: a pendant stem and cap under each bottom chord, so every node (lit or still waiting) hangs from the structure.
+  for (let i = 0; i < VOICE_NODES; i++) {
+    const at = (i + .5) / VOICE_NODES * Math.PI * 2, out = i % 2 ? -WIDTH / 2 : WIDTH / 2;
+    member(root, ringPoint(at, bottom - 1, out), ringPoint(at, bottom - 2.4, out), .25, .25, trim);
+    part(root, new T.CylinderGeometry(.5, .9, .4, 8), trim, ringPoint(at, bottom - 2.3, out));
   }
   const fixed = bake(root);
   // Residents' voices: one node per accumulated proposal on the rim, hung below the bottom chords (alternately outer / inner).
-  const voices = new T.InstancedMesh(new T.IcosahedronGeometry(1.3, 1), new T.MeshBasicMaterial(), VOICE_NODES); voices.name = 'sky-ring-voices';
+  const voices = new T.InstancedMesh(new T.IcosahedronGeometry(1, 1), new T.MeshBasicMaterial(), VOICE_NODES); voices.name = 'sky-ring-voices';
   const dummy = new T.Object3D(), warm = new T.Color('#fff0d6'), fitting = new T.Color('#b9bcbd'), lit = new T.Color(), unlit = new T.Color();
   for (let i = 0; i < VOICE_NODES; i++) {
-    dummy.position.copy(ringPoint((i + .5) / VOICE_NODES * Math.PI * 2, bottom - 1.2, i % 2 ? -WIDTH / 2 : WIDTH / 2)); dummy.updateMatrix();
+    dummy.position.copy(ringPoint((i + .5) / VOICE_NODES * Math.PI * 2, bottom - 3.3, i % 2 ? -WIDTH / 2 : WIDTH / 2)); dummy.updateMatrix();
     voices.setMatrixAt(i, dummy.matrix);
   }
   scene.add(...fixed, voices);
@@ -94,7 +131,7 @@ export function skyRing(scene: T.Scene) {
     /** By day the nodes are pale fittings, the lit ones faintly warm; at night lit nodes are HDR points (bloom) and unlit ones go dark. */
     update(darkness: number) {
       if (Math.abs(darkness - dark) < .02) return; dark = darkness;
-      lit.copy(warm).multiplyScalar(.95 + 2.8 * darkness); unlit.copy(fitting).multiplyScalar(.75 - .65 * darkness); paint();
+      lit.copy(warm).multiplyScalar(.95 + 2.8 * darkness); unlit.copy(fitting).multiplyScalar(.75 - .5 * darkness); paint();
     },
   };
 }

@@ -60,3 +60,42 @@ Owner 覺得 2127 未夠 wow；方案 A（霧／光）「有好啲但未 wow」�
 ## Next expected step
 
 Owner 目視 `artifacts/hero-sky-ring/before-after.jpg`，決定去留同其餘開放決定。如果接受：喺 `EXHIBITION_SPEC.md` 由「待驗收」改為已接受、跑 headline close-up 同 Meter high／low、量 uncapped FPS；然後先 merge `feat/hero-atmosphere` 再 merge 呢條。
+
+## Close-up polish R1
+
+- Owner/session: cc100053；`/closeup-polish` 改用喺環本身（唔係 Meter site），2026-11-02
+- Branch: `feat/hero-sky-ring-polish`（由 `feat/hero-sky-ring` `975370b` 切出）；NOT PUSHED、NOT MERGED
+- 固定冇郁：甲板頂 250 m、700 m 平面同 `SKY_RING`、六支斜柱角度 `PYLONS`、燈點只跟提案數量、冇 Meter 依賴、冇能源光束／系纜、冇 UI 文案、冇新材質（重用 `trim`／`stone`／`glass`／`futureLight`／`chrome` 同 `bake`）。
+- Target images: NOT RUN — 冇用 Gemini 生成（skill 列為逐個 task opt-in）。今輪以下面嘅診斷做文字 target，owner 直接驗收 after 截圖；如果要圖像 target，下一輪先做。
+
+審閱鏡頭（DEV `?review=ring&reviewTime=40&hour=16`，`hour=21` 睇夜晚；`review=ring` 沿用 street review 嘅 `cam`/`at`，但唔夾 district pan、可以向上望）：
+
+| 鏡頭 | `cam` | `at` |
+|---|---|---|
+| truss（北面外側，泊位 + 截面） | `23,236,375` | `-57,244,310` |
+| pylon（1.2 號斜柱，連 DiverCity） | `323,70,639` | `101,120,323` |
+| berth（第 2 個泊位，俯望） | `244,282,276` | `174,250,254` |
+| voices（環內由下望底弦） | `-97,200,229` | `-50,236,310` |
+
+診斷 → 改動：
+
+| 症狀（before） | 原因 | 改動 |
+|---|---|---|
+| 桁架似棚架，冇主次 | 所有弦桿 1.4 m、斜撐 .7 m 同一粗幼 | 底弦 2.2 m（城市睇到嗰條線）、頂弦 1.5 m、豎桿 .9 m、斜撐 .55／.45 m |
+| 甲板邊係一塊平板 | 只有板 + 頂面燈線 | 兩側 2.4 m 石面 fascia、1.5 m 玻璃欄河；泊靠燈線移到外側 fascia 面（由下面／外面都睇到） |
+| 斜柱係兩條方棍 + 一條平橫樑 | 5 m 方形 member、兩條三分點橫撐、頂部一條 tie | 圓錐斜腿（腳 3.4 m → 頂 2 m 半徑）、腳下石墩（9.2 m 高）+ 鑄件節點、只留 .55 處一條 tie、頂部兩條橫跨兩條底弦嘅 saddle beam |
+| 泊位係一塊板，pod 似一疊方盒 | box member 拼 pod | 泊位前緣 fascia + 燈線、兩側玻璃欄河、`futureLight` 泊靠圈、玻璃登機閘口；pod 改成車隊 pod 嘅圓角機身 ×5（圓角艙、玻璃罩、燈龍骨、四個 torus 導管旋翼、兩條 skid） |
+| 燈點似浮喺空中嘅波；夜晚未亮嘅變黑波 | 1.3 m 球貼住底弦、未亮色 ×.1 | 每粒有吊桿 + 燈罩（baked 入 `trim`），球 1.0 m、吊低 2 m；未亮夜晚 ×.25（灰色配件，唔再係黑洞） |
+
+Validation（development Mac headless Chrome，playwright-cli，1920×1080 DPR1，Vite DEV，載入 25 s 後每 2.5 s 讀 canvas）：
+
+- hero `?meters=nw:0,ne:0,sw:0,se:0&reviewTime=40&hour=16`：60.0 ×4 FPS vsync，draws 983（不變），triangles 16.43M（+0.08M）
+- 同上 `hour=21`：60.1／60.0／59.9／60.0，draws 984（不變）
+- civic `?review=civic&reviewTime=40&hour=16`：60.0–60.1，draws 456（不變）
+- Root `npm test` exit 0（`skyRing` test：12 條 hero 視線仍然清；頂 254.7 m）、`npm run build` ✓、`git diff --check` clean；survey／module-swap 冇改，冇跑
+- 證據：`artifacts/hero-sky-ring/polish/closeups-before-after.jpg`（truss／pylon／berth／voices 夜，左 before 右 after）、每個鏡頭嘅 `*-before-after.jpg`、`after/hero-h16.jpg`、`after/hero-h21.jpg`、`after/civic-h16.jpg`
+- NOT RUN：Gemini target images、owner 目視、展覽機 FPS、uncapped FPS、dusk、Meter high／low
+
+Known issues：civic close-up 仍然見到斜腿做背景線（腿而家係圓錐，冇加粗，但冇移位）；登機閘口企喺甲板外側行人道上（14 m 甲板仲有 ~9 m 通道）。
+
+Next expected step：owner 睇 `closeups-before-after.jpg` 同 hero 日夜；接受就 merge 入 `feat/hero-sky-ring`，或者指出下一輪（例如要 Gemini target、加人／加夜間泊位燈）。
