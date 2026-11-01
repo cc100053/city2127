@@ -2,14 +2,15 @@ import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets.ts';
-import { guideway, guidewayTracks, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers, sweepway, streets, shoreLane, interchangeApproach, interchangeBoatLane, INTERCHANGE, midDecks, gardenDecks } from './layout.ts';
+import { heroCamera } from './heroCamera.ts';
+import { guideway, guidewayTracks, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers, bayChannels, skyCorridors, sweepway, streets, shoreLane, interchangeApproach, interchangeBoatLane, INTERCHANGE, midDecks, gardenDecks } from './layout.ts';
 
 const ease=(t:number)=>T.MathUtils.smoothstep(t,0,1);
 const curve=(points:readonly (readonly [number,number,number])[],closed=false)=>new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p)),closed,'centripetal');
 /** Every actor path in the Odaiba scene, in metres. */
 export function routes() {
   return {guideway:curve(guideway),tracks:guidewayTracks.map(p=>curve(p)),promenades:promenades.map(p=>curve(p)),water:curve(waterLoop,true),ferry:curve(ferryLane),air:curve(airLoop,true),approach:curve(sphereApproach),sweep:curve(sweepway),
-    shore:curve(shoreLane,true),ixApproach:curve(interchangeApproach),ixBoat:curve(interchangeBoatLane),decks:[...midDecks,...gardenDecks].map(p=>curve(p)),streets:streets.map(p=>curve(p))};
+    shore:curve(shoreLane,true),sky:skyCorridors.map(c=>curve(c)),channels:bayChannels.map(c=>curve(c)),ixApproach:curve(interchangeApproach),ixBoat:curve(interchangeBoatLane),decks:[...midDecks,...gardenDecks].map(p=>curve(p)),streets:streets.map(p=>curve(p))};
 }
 /** 0→1→0 over `period` seconds: out-and-back routes reverse instead of jumping. */
 const pingPong=(time:number,period:number,offset=0)=>{const p=((time/period+offset)%2+2)%2;return {u:p<1?p:2-p,forward:p<1};};
@@ -53,7 +54,25 @@ export function boatPoses(time:number,path:Pick<ReturnType<typeof routes>,'water
   });
   return [...loop,{...at(path.ferry,f.u,!f.forward),scale:BOAT_SCALE*(1-ease((f.u-.85)/.15))},{...ix,yaw:ix.yaw+dock.turn,scale:BOAT_SCALE*dock.visible,dock},...cruisers];
 }
+/** Bay shuttles (ambient, `bayChannels`): up to 10 boats per lane at 40 m or wider spacing (a 30 m hull), one way at SHUTTLE_SPEED, drawn at
+ * 1.5× the taxis and grown/shrunk over the 40 m at each lane end. */
+export const SHUTTLE_SPEED=12, SHUTTLE_SCALE=BOAT_SCALE*1.5;
+export const shuttleCount=(length:number)=>Math.min(10,Math.floor(length/40));
+export function shuttlePoses(time:number,channels:readonly T.Curve<T.Vector3>[]) {
+  const p=new T.Vector3(),t=new T.Vector3();
+  return channels.flatMap((route,lane)=>{const length=route.getLength(),n=shuttleCount(length);
+    return Array.from({length:n},(_,i)=>{const u=((time*SHUTTLE_SPEED/length+i/n)%1+1)%1;route.getPointAt(u,p);route.getTangentAt(u,t);
+      return {x:p.x,y:p.y,z:p.z,yaw:Math.atan2(t.x,t.z),scale:SHUTTLE_SCALE*ease(u*length/40)*ease((1-u)*length/40),lane};});});
+}
 export const WALKERS=120, AIR_SCALE=5;
+/** Regional craft (ambient, `skyCorridors`): AIR_SCALE × 1.8, 10–12 per lane, SKY_SPEED m/s; each trails a SKY_TRAIL m wide light streak .8 × the craft spacing. */
+export const SKY_SCALE=AIR_SCALE*1.8, SKY_SPEED=35, SKY_TRAIL=4;
+export const skyCount=(length:number)=>T.MathUtils.clamp(Math.round(length/250),10,12);
+/** Craft `i` of a lane `length` m long at `time`: `u` along the lane (odd lanes fly it backwards) and its 0..1 fade over the 300 m at each end. */
+export function skyPose(time:number,lane:number,length:number,i:number) {
+  const n=skyCount(length),dir=lane%2?-1:1,u=((time*SKY_SPEED/length*dir+(i+hash(lane*16+i,40)*.3-.15)/n)%1+1)%1;
+  return {u,reverse:dir<0,fade:ease(u*length/300)*ease((1-u)*length/300),trail:.8*length/n};
+}
 const MAX_WALKERS=400, DOOR_WALKERS=120, ROBOTS=14, FORECOURT_GROUPS=20, MAX_TRAINS=4, LOOP_AIRCRAFT=30;
 /** Aircraft slot: groups 0..9 spread evenly, even groups on the regional district loop, odd on the city shore lane; slots 10+ join a
  * group as wingmen `k` × PLATOON m behind, so platoons form only as automation fills the fleet. */
@@ -210,6 +229,16 @@ function wake() {
   };
   strip(-1.2,-6,.22,.6,.45);strip(1.2,6,.22,.6,.45);strip(0,0,.9,2.2,.5);
   const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.Float32BufferAttribute(position,3));geometry.setAttribute('color',new T.Float32BufferAttribute(color,4));
+  return geometry;
+}
+/** Additive light material: vertex colours fade the streak, so overlaps and the bloom pass build one continuous band. */
+const glow=(color:string,gain:number)=>new T.MeshBasicMaterial({color:new T.Color(color).multiplyScalar(gain),vertexColors:true,transparent:true,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide});
+/** Tapered streak trailing -Z from `from` over `length`: `width` at the head to a point, brightness 1 → 0. `y` = flat on the water; omitted = crossed flat and upright, so it reads edge-on. */
+function streak(from:number,length:number,width:number,y?:number) {
+  const position:number[]=[],color:number[]=[];
+  const tri=(x:number,h:number)=>{for(const [px,py,pz,c] of [[-x,h,from,1],[x,-h,from,1],[0,0,from-length,0]])position.push(px,y??py,pz),color.push(c,c,c);};
+  tri(width/2,0);if(y===undefined)tri(0,width/2);
+  const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.Float32BufferAttribute(position,3));geometry.setAttribute('color',new T.Float32BufferAttribute(color,3));
   return geometry;
 }
 function wing(mat:T.Material=shell):Part {
@@ -608,13 +637,23 @@ export function mobility(scene:T.Scene) {
   const hull=new T.ExtrudeGeometry(plan,{depth:1.3,bevelEnabled:true,bevelThickness:.15,bevelSize:.15,bevelSegments:2}).rotateX(-Math.PI/2).translate(0,-.2,0);
   // Slots: loop taxis, the ferry (BOATS), the interchange boat (BOATS+1), then the bay cruisers.
   const BOAT_SLOTS=BOATS+2+bayCruisers.length;
-  const boats=fleet(scene,[{geometry:hull,material:shell},part([2.9,1.1,5.4],[0,1.55,-1],glass,.4),part([3,.3,5.8],[0,2.2,-1.1],shell,.15),part([3.7,.12,11.1],[0,.25,-.2],mint,.05),part([2.4,.12,.12],[0,1,5.5],coral,.05)],BOAT_SLOTS,'water-taxis');
+  const boatParts=[{geometry:hull,material:shell},part([2.9,1.1,5.4],[0,1.55,-1],glass,.4),part([3,.3,5.8],[0,2.2,-1.1],shell,.15),part([3.7,.12,11.1],[0,.25,-.2],mint,.05),part([2.4,.12,.12],[0,1,5.5],coral,.05)];
+  const boats=fleet(scene,boatParts,BOAT_SLOTS,'water-taxis');
   // Wakes: a fading V and prop wash trailing each taxi on the water (no shadow).
-  const wakes=fleet(scene,[{geometry:wake(),material:new T.MeshBasicMaterial({vertexColors:true,transparent:true,depthWrite:false})}],BOAT_SLOTS,'water-taxi-wakes');
+  const wakeMaterial=new T.MeshBasicMaterial({vertexColors:true,transparent:true,depthWrite:false});
+  const wakes=fleet(scene,[{geometry:wake(),material:wakeMaterial}],BOAT_SLOTS,'water-taxi-wakes');
+  // Bay shuttles (ambient): the taxi parts at 1.5× on `bayChannels`, each with the white wake plus a mint additive light streak on the water (R01's lit lines).
+  const shuttleSlots=path.channels.reduce((n,c)=>n+shuttleCount(c.getLength()),0);
+  const shuttles=fleet(scene,boatParts,shuttleSlots,'bay-shuttles');
+  const shuttleWakes=fleet(scene,[{geometry:wake(),material:wakeMaterial},{geometry:streak(-5.5,45/SHUTTLE_SCALE,3/SHUTTLE_SCALE,-.05),material:glow('#74dace',2.5)}],shuttleSlots,'bay-shuttle-wakes');
   // Human-led air taxis: 22 m winged craft. Slots: loop craft, then the sphere and interchange berth shuttles.
   const airShell=shell.clone(); airShell.emissive.set('#c1e9e4');
-  const drones=fleet(scene,[wing(airShell),part([.8,.35,2.5],[0,.1,0],airShell,.15),part([.55,.2,1],[0,.34,.45],glass,.08),
-    part([.6,.1,.16],[0,.11,-1.27],mint,.025),part([.09,.4,.65],[0,.32,-.8],glass,.02)],LOOP_AIRCRAFT+2,'air-taxis');
+  const winged=()=>[wing(airShell),part([.8,.35,2.5],[0,.1,0],airShell,.15),part([.55,.2,1],[0,.34,.45],glass,.08),
+    part([.6,.1,.16],[0,.11,-1.27],mint,.025),part([.09,.4,.65],[0,.32,-.8],glass,.02)];
+  const drones=fleet(scene,winged(),LOOP_AIRCRAFT+2,'air-taxis');
+  // Regional corridors (ambient, `skyCorridors`): the same winged craft at SKY_SCALE, each with a tapered light trail (own fleet, scaled per lane to .8 × its craft spacing).
+  const skyLength=path.sky.map(c=>c.getLength()),skySlots=skyLength.reduce((n,l)=>n+skyCount(l),0);
+  const regional=fleet(scene,winged(),skySlots,'regional-air'),trails=fleet(scene,[{geometry:streak(0,1,1),material:glow('#88d6d3',3)}],skySlots,'regional-air-trails');
   // Autonomous pods: a rounded cabin on four ducted rotors, 17 m across; they take a winged craft's slot as automation rises (podShare).
   const airPods=fleet(scene,[part([1.5,.8,2.4],[0,.1,0],airShell,.35),part([1.56,.3,1.5],[0,.32,.25],glass,.12),part([1.2,.08,2],[0,-.3,0],mint,.03),
     ...[[-1.15,-.95],[1.15,-.95],[-1.15,.95],[1.15,.95]].map(([x,z])=>({geometry:new T.TorusGeometry(.55,.08,6,20).rotateX(Math.PI/2).translate(x,.15,z),material:airShell}))],LOOP_AIRCRAFT+2,'air-pods');
@@ -672,6 +711,9 @@ export function mobility(scene:T.Scene) {
   const guides=fleet(scene,[part([.36,.1,2.1],[0,0,0],guideMaterial,.03)],airCurves.length*96,'air-corridor-guides');
   const samples=airCurves.map(route=>Array.from({length:96},(_,i)=>({p:route.getPointAt(i/96),t:route.getTangentAt(i/96)})));
   const stripLength=airCurves.map(route=>route.getLength()/96*1.05);
+  // Strips whose sample falls on the hero frame's title block (x < 600, y < 440 px at 1920×1080) stay dark, so no streak crosses the headline.
+  const hero=heroCamera(1920,1080),ndc=new T.Vector3();hero.updateMatrixWorld(true);
+  const titled=samples.map(row=>row.map(({p})=>{ndc.set(p.x,p.y-2,p.z).applyMatrix4(hero.matrixWorldInverse);const front=ndc.z<0;ndc.set(p.x,p.y-2,p.z).project(hero);return front&&(ndc.x+1)*960<600&&(1-ndc.y)*540<440;}));
   // Both loops fly at the district loop's original 0.004 laps/s ground speed.
   const lanes=[path.air,path.shore],laneLength=lanes.map(l=>l.getLength()),speed=.004*laneLength[0];
   const SLOTS=LOOP_AIRCRAFT+2,heads=new Float32Array(SLOTS),weights=new Float32Array(SLOTS),corridor=new Uint8Array(SLOTS);
@@ -1027,6 +1069,8 @@ export function mobility(scene:T.Scene) {
       pose.rotation.z=0;if('dock' in b)pose.scale.multiplyScalar(Math.max(1-b.dock.settle,1e-4));wakes.set(i,pose);
     });
     boats.flush();wakes.flush();
+    shuttlePoses(time,path.channels).forEach((b,i)=>{pose.position.set(b.x,b.y+Math.sin(time*1.1+i)*.08,b.z);pose.rotation.set(0,b.yaw,0);pose.scale.setScalar(b.scale);shuttles.set(i,pose);shuttleWakes.set(i,pose);});
+    shuttles.flush();shuttleWakes.flush();
     for(let i=0;i<LOOP_AIRCRAFT;i++){
       const slot=aircraftSlot(i),length=laneLength[slot.lane];
       const t=activity?((time*speed-slot.wingman*PLATOON)/length+slot.phase+1e3)%1:(time*speed/length*(1+i%3*.375)+i/6)%1;
@@ -1035,6 +1079,12 @@ export function mobility(scene:T.Scene) {
       pose.scale.setScalar(AIR_SCALE*density*(1-pod));drones.set(i,pose);pose.scale.setScalar(AIR_SCALE*density*pod);airPods.set(i,pose);
       heads[i]=t;weights[i]=density;corridor[i]=slot.lane?2:0;
     }
+    // Regional craft and their light trails (ambient: independent of the Meters and the automation curve); the trail starts at the tail.
+    let k=0;path.sky.forEach((route,lane)=>{for(let i=0;i<skyCount(skyLength[lane]);i++,k++){
+      const {u,reverse,fade,trail}=skyPose(time,lane,skyLength[lane],i);place(route,u,reverse);pose.rotation.z=Math.sin(time*.7+k)*.03;
+      pose.scale.setScalar(SKY_SCALE*fade);regional.set(k,pose);
+      pose.rotation.z=0;pose.position.addScaledVector(tangent,-1.3*SKY_SCALE*fade);pose.scale.set(SKY_TRAIL*fade,SKY_TRAIL*fade,trail*fade);trails.set(k,pose);}});
+    regional.flush();trails.flush();
     // Berth shuttles: the sphere (40 s cycle) and the interchange mast (offset 20 s), pods once automation passes mixed.
     const berthPod=activity?podSwitch(activity.level,POD_SWITCH[2]):0;
     const berth=(index:number,route:T.Curve<T.Vector3>,dock:ReturnType<typeof dockMotion>,r:number)=>{
@@ -1050,7 +1100,7 @@ export function mobility(scene:T.Scene) {
       for(let i=0;i<SLOTS;i++)if(corridor[i]===r)strength=Math.max(strength,guideStrength(j/96,heads[i],closed[r])*weights[i]);
       // Owner 2026-11-01: lit strips stretch to meet their neighbours, so each craft trails one tapered light streak; between craft the
       // sky stays clear (the resting dotted line read as noise against the low hero's sky).
-      const sample=samples[r][j],width=strength*(closed[r]&&activity?3+activity.level*7:3);pose.position.copy(sample.p).y-=2;pose.rotation.set(0,Math.atan2(sample.t.x,sample.t.z),0);
+      const sample=samples[r][j],width=titled[r][j]?0:strength*(closed[r]&&activity?3+activity.level*7:3)*1.6;pose.position.copy(sample.p).y-=2;pose.rotation.set(0,Math.atan2(sample.t.x,sample.t.z),0);
       pose.scale.set(width,width,width>0?Math.max(width,stripLength[r]/2.1):0);guides.set(r*96+j,pose);
     }guides.flush();
   };

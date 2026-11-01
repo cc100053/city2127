@@ -1,0 +1,16 @@
+R1 hero towers and traffic, 2026-11-01, headless Chrome (playwright-cli), 1920x1080/DPR1, ?meters=nw:0,ne:0,sw:0,se:0&reviewTime=40, canvas data-fps/drawCalls/triangles, 6 samples x 2.5 s after 14 s load (first sample undefined/warm-up).
+main = 5fb2428 (detached worktree, port 5175), branch = feat/hero-towers-traffic working tree (port 5174), measured back to back.
+
+main-day uncapped (--disable-gpu-vsync --disable-frame-rate-limit), fps/draws/triangles: undefined/undefined/undefined 88.0/970/16268854 89.1/970/16268854 88.1/970/16268854 88.1/970/16268854 90.1/970/16268854
+branch-day uncapped (--disable-gpu-vsync --disable-frame-rate-limit), fps/draws/triangles: 92.3/1004/16497178 81.3/1004/16497178 89.5/1004/16497178 87.3/1004/16497178 90.8/1004/16497178 87.2/1004/16497178
+main-night uncapped (--disable-gpu-vsync --disable-frame-rate-limit), fps/draws/triangles: undefined/undefined/undefined 70.8/970/16268854 76.1/970/16268854 77.4/970/16268854 76.5/970/16268854 77.2/970/16268854
+branch-night uncapped (--disable-gpu-vsync --disable-frame-rate-limit), fps/draws/triangles: undefined/undefined/undefined 78.8/1004/16497178 78.0/1004/16497178 79.3/1004/16497178 77.3/1004/16497178 76.5/1004/16497178
+
+main-day vsync (default), fps/draws/triangles:  60.0/970/16268854 60.0/970/16268854 60.0/970/16268854 60.0/970/16268854 60.0/1346/21071262 60.0/970/16268854
+branch-day vsync (default), fps/draws/triangles:  60.0/1004/16497178 60.0/1004/16497178 60.0/1004/16497178 60.0/1004/16497178 59.9/1386/21303994 60.0/1004/16497178
+main-night vsync (default), fps/draws/triangles:  undefined/undefined/undefined 5.3/970/16268854 59.9/970/16268854 60.0/970/16268854 60.1/970/16268854 60.0/970/16268854
+branch-night vsync (default), fps/draws/triangles:  60.0/1004/16497178 59.9/1004/16497178 60.0/1004/16497178 60.0/1004/16497178 60.0/1004/16497178 60.0/1004/16497178
+
+Shadow-update frames (every ~1 s): main 1346 draws / 21.07M triangles, branch 1386 / 21.30M.
+
+Summary (uncapped, mean of the valid samples): day main 88.7 -> branch 88.0 (-0.8 %); night main 75.6 (76.8 without the 70.8 warm-up sample) -> branch 78.0. Vsync: 60.0 both (cap). Draws +34 (970 -> 1004): +16 own meshes (6 tower, 4 regional air, 4 shuttles, 2 shuttle wakes), drawn again in the GTAO normal pass for the opaque ones. Triangles +0.23 M (16.27 M -> 16.50 M).

@@ -55,6 +55,13 @@ export const bayCruisers: readonly (readonly [number,number,number])[] = [
   // Far water beyond the island's south-west shore, top middle of the hero frame (target v2's distant boats).
   [450,1000,2.5],[700,1100,1.2],[1000,1250,-.4],[1200,1000,1.9],[250,1250,-1.3],
 ];
+// Ambient bay shuttle lanes (independent of the Meters): two crossings of the open bay south of the island, 40 m or more from every cruiser run
+// and far from the shore, piers and rooms. The foreground water of the hero frame is already full (shore rooms, interchange pier, beach loop),
+// so the lit lines run in the far bay band instead; each lane carries 10 boats (tests/mobility.test.ts, tests/odaiba.test.ts).
+export const bayChannels: readonly (readonly P3[])[] = [
+  [[-420,-.6,1690],[-200,-.6,1700],[0,-.6,1700],[200,-.6,1690],[420,-.6,1650],[640,-.6,1580],[850,-.6,1500]],
+  [[-440,-.6,2150],[-200,-.6,2130],[100,-.6,2090],[400,-.6,2030],[700,-.6,1950],[1000,-.6,1850]],
+];
 // Sweep: a lit transit skyway descending from the Grand Nikko ring (92 m) west past Hilton and out of the frame's lower right,
 // above the Yurikamome deck and clear of Nikko and Hilton footprints; a short white train shuttles on it (mobility).
 export const sweepway: readonly P3[] = [[-290,92,265],[-345,74,250],[-400,56,205],[-440,44,152],[-475,34,92],[-520,28,40],[-580,24,-10]];
@@ -70,6 +77,20 @@ export const sphereApproach: readonly P3[] = [[-620,160,-640],[-380,160,-360],[-
 export const shoreLaneInner: readonly P3[] = [[-65,80,-317],[-152,80,-258],[-220,80,-218],[-294,80,-186],[-367,80,-112],[-464,80,-53]];
 export const shoreLane: readonly P3[] = [...shoreLaneInner,
   [-520,90,-80],[-503,100,-117],[-413,100,-171],[-339,100,-247],[-254,100,-285],[-193,100,-321],[-108,100,-379],[-50,90,-350]];
+// Regional light corridors (ambient: independent of the Meters): three open centre lines at 200–320 m, tuned against the c2 hero pose
+// (src/heroCamera.ts; tests/mobility.test.ts) so that every sample in front of the camera projects in the upper sky band and clear of the
+// title block. A behind the Civic Core, B diagonal from the upper right toward the centre, C low along the bay horizon. Each corridor is
+// a bundle of two lanes SKY_LANE_GAP m apart, flown in opposite directions (lane 2k forward, 2k+1 reversed).
+export const SKY_LANE_GAP = 24;
+const skyCentres: readonly (readonly P3[])[] = [
+  [[640,240,370],[380,245,550],[110,250,780],[-150,255,1080],[-370,260,1390],[-700,265,1850],[-1000,270,2250]],
+  [[-310,300,800],[-130,303,920],[140,306,1130],[560,310,1370],[1320,314,1810],[2550,318,2490]],
+  [[2180,200,2960],[1450,205,3470],[740,210,3980],[50,215,4480],[-520,218,5100]],
+];
+export const skyCorridors: readonly (readonly P3[])[] = skyCentres.flatMap(c => [1,-1].map(side => c.map((p,i) => {
+  const a=c[Math.max(i-1,0)],b=c[Math.min(i+1,c.length-1)],l=Math.hypot(b[0]-a[0],b[2]-a[2]);
+  return [p[0]-side*SKY_LANE_GAP/2*(b[2]-a[2])/l,p[1],p[2]+side*SKY_LANE_GAP/2*(b[0]-a[0])/l] as const;
+})));
 // Multimodal interchange on the shore in front of Aqua City: a pier `PIER` m out to sea, a boat berth at its head and an arrival mast
 // beside it whose berth deck takes shore-lane air taxis (INTERCHANGE.deck: parked craft height, deck top 1.2 m lower). sea = unit vector out to sea, along = westward.
 const IX={x:-94,z:-243,sea:[-.56,-.828],along:[-.828,.56]} as const, at=(out:number,side=0,y=0):P3=>[IX.x+IX.sea[0]*out+IX.along[0]*side,y,IX.z+IX.sea[1]*out+IX.along[1]*side];

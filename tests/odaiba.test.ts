@@ -253,6 +253,15 @@ for (const [name, route] of [['water loop', actorPaths.water], ['ferry lane', ac
   const hit = groundAt(p.x, p.z);
   assert.ok(!hit || /^WATER/.test(hit.object.name), `${name} runs aground on ${hit?.object.name} at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
 }
+// Bay shuttle lanes: open water (nothing but water within a 6 m beam, and no surveyed ground, tidal edge or bridge pier within 24 m: the 30 m hull plus a margin; the tidal edge steps 14 m out from the 40 m revetment line).
+for (const [k, route] of actorPaths.channels.entries()) for (let i = 0; i <= 200; i++) {
+  const p = route.getPointAt(i / 200); route.getTangentAt(i / 200, tangent);
+  for (const [beam, reach] of [[-6, 0], [0, 0], [6, 0], [0, 24]]) for (let a = 0; a < (reach ? 12 : 1); a++) {
+    const q = p.clone().addScaledVector(side.crossVectors(up, tangent).normalize(), beam).add(new Vector3(Math.cos(a / 12 * Math.PI * 2), 0, Math.sin(a / 12 * Math.PI * 2)).multiplyScalar(reach));
+    const hit = groundAt(q.x, q.z);
+    assert.ok(!hit || /^WATER/.test(hit.object.name), `bay channel ${k} within ${reach} m of ${hit?.object.name} at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
+  }
+}
 // Air taxis keep 20 m above the bay bridges and backdrop they overfly.
 for (const route of [actorPaths.air, actorPaths.approach]) for (let i = 0; i <= 400; i++) {
   const p = route.getPointAt(i / 400); ray.set(p, down);
