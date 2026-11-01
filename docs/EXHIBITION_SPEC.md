@@ -53,11 +53,11 @@ Root 用固定360px右上卡片（2026-10-04由左移右，避免遮住focal sit
 
 ### E4 Q3能源生活取捨（2026-10-24使用者確認）
 
-Q3採[能源計劃正式四選項](ENERGY_CITY_PLAN.md#e4正式接入2026-10-24)，另外三題原文／effects不變。每位居民仍一份四題提案；能源不按low/mixed/high排列。四類票獨立累計；每類至少2票且`票數×5≥能源回答總數+4`才出現；水庭／翼在`票數×5≥2×(能源回答總數+4)`時兩庭／大翼，否則一庭／小翼。環／島各最多一組；設備可共存，翼尺寸及同一庭有無互斥。這是展示門檻，並非容量或供電佔比；前四個基準席位不代表未記錄居民。設備門檻不因第一票改變；G2 候選另外顯示能源整備狀態，視覺仍待驗收。
+Q3採[能源計劃正式四選項](ENERGY_CITY_PLAN.md#e4正式接入2026-10-24)，另外三題原文／effects不變。每位居民仍一份四題提案；能源不按low/mixed/high排列。四類票獨立累計；每類至少2票且`票數×5≥能源回答總數+4`才出現；水庭／翼在`票數×5≥2×(能源回答總數+4)`時兩庭／大翼，否則一庭／小翼。環／島各最多一組；設備可共存，翼尺寸及同一庭有無互斥。這是展示門檻，並非容量或供電佔比；前四個基準席位不代表未記錄居民。設備門檻不因第一票改變；G2 另外顯示能源整備狀態（已 merge main，視覺及真人辨認仍待驗收）。
 
 舊cooling問題、原文及效應保留原意；新能源答案對氣候是缺席，氣候EMA／分數／刻度以有效舊氣候回答人數維持，不按能源回答數稀釋。新run維持D=0成熟混合氣候；其餘三軸如常變化與配對。外部電網為設定前提，水庭／環只儲能，軌道／核能為供電路線推演；沒有容量／可靠度／工程認證，不設災難獎勵特效。
 
-Server產出`layout.energy`，root套用模型並比較實際前後target。新第四票的旅程及lantern在沿岸能源接點，舊氣候票仍在公園；既有時間及立即恢復契約延續。結果卡描述真實設備或整備狀態變化；G2 候選在沒有訪客相關變化時，切換所選能源的整備配置。SQLite8新增nullable能源snapshot欄，保留schema7全部原始歷史；新舊server／City須一起更新，舊草稿重新預約、Q3重選，已保存舊ID仍可回原紀錄。
+Server產出`layout.energy`，root套用模型並比較實際前後target。新第四票的旅程及lantern在沿岸能源接點，舊氣候票仍在公園；既有時間及立即恢復契約延續。結果卡描述真實設備或整備狀態變化，不由本人選項推論共同結果（G5 歸因文案未獲 owner 批准前維持此規則）；G2 在沒有訪客相關變化時，切換所選能源的整備配置。SQLite8新增nullable能源snapshot欄，保留schema7全部原始歷史；新舊server／City須一起更新，舊草稿重新預約、Q3重選，已保存舊ID仍可回原紀錄。
 
 ## 累積與權威 layout
 
@@ -76,6 +76,8 @@ E4後automation／publicSharing／urbanConcentration每軸每份提案只有一�
 
 P10 配對要兩個 site 同一邊都到 ±3。環境軸 E4 後凍結喺 mixed，所以 sails／冷卻塔／屋頂／外牆唔做格（舊氣候 run 照用同一 ladder）。每個 district 第一次到 ±2 時固定該軸 `slotSeeds`（之前為 0），之後各格 slot 互相包含，唔會每票重排。
 
+Headline 近鏡 G7（2026-10-31，已 merge main，視覺及性能未驗收）：近鏡現有 77 個固定 shot（含 NW／SW／SE 的 64 個手寫 viewpoint 及 `nw:street`）。district 變化（±2／±3）時，district 把本次變動 slot 的座標與 ID 交給鏡頭（`CarrierChange.points`），揀覆蓋最多變動 slot 的 viewpoint，打和揀最久未用；±1 保持 focal，能源保持能源 shot，無 points 回退 `*:district`。細節見 [PROJECT](PROJECT.md)。
+
 Live headline（[pickHeadline](../survey/src/shared/cityView.ts)）：先揀向今位訪客投票方向移動的 site（中間票向 0），其次揀該訪客選的能源部件有變的情況；否則沿用新到達最高格、載體變化最多、能源的次序。能源部件同時變動時，鏡頭與結果卡跟所選部件；只有 headline site 有亮 pulse／marker 同結果卡，其他變化（例如同時嘅能源門檻）靜靜過渡。
 
 Headline 近鏡（2026-10-27；時間線於 2026-10-29 修訂）：live 結果先在 hero 播完 2.62 秒 vote journey，再用 2 秒推近 headline，停定 0.5 秒後於 5.12 秒開始 3 秒場景過渡。4.62–13 秒停留，13 秒與 ambient 卡同步開始用 2 秒返回 hero；原因文字於 8.12 秒出現。八個 site shot（四站各 focal／district）及五個能源 shot 用常數表，保留 hero 方向及海／地標定位；focal 與 district 同時改以 district 為準。能源鏡頭與結果卡共用部件優先次序，移除設備亦看原位置。新結果從現有位置先平滑回 hero；snapshot／reset／Undo／reconnect／reduced motion／legacy／追趕中的結果立即 hero。無 headline 不推近；如接續仍在播放的近鏡，先從當前位置用 2 秒平滑返回，再保持 hero 並恢復操作。普通 standalone 及其他 DEV review 不自動播放；DEV 可用 `?shot=` 逐鏡檢查。近鏡的模型／材質打磨及真人閱讀／展示硬件驗收另作任務。
@@ -84,11 +86,11 @@ Closeup-zoom F 候選（2026-10-30）：district 改為較闊焦點構圖、停�
 
 SE 近鏡候選（2026-10-30）：設施加框架平台、冠部、低 tier 構架及橙色 Meter 環，保留 footprint 與 tier 規則；夜景顏色偏白、主體大小及真人辨認仍未過關，待 owner review（[證據](../artifacts/closeup-zoom/final/A-se-review/README.md)）。
 
-能源講解 N1（2026-10-29，`feat/energy-narration`，**待 owner 睇圖批准，未入 main**）：owner 同日決定將所有結果嘅閱讀 slot 由 10 秒延長到 13 秒（`DISPLAY_MS`；lease 18 秒），所以上面嘅 headline 近鏡為 4.62–13 秒停留、13–15 秒返回 hero。Headline 係結果後仍存在嘅能源部件時，鏡頭到位（4.62 s）至停留結束（13 s）喺左下顯示日文字幕框，將 60 秒儲能週期壓縮成 8.38 秒播一次（充能 → 蓄電 → 放電，每步約 2.79 秒逐步高亮，每步 ≤16 字）。只有被講解嘅部件行自己嘅時鐘，其他能源部件唔跳相。結果卡講「邊個嘅聲音、改咗乜」，字幕只講設施點運作，標題沿用結果卡地名。Snapshot／reset／Undo／reconnect／下一個 live 結果即時取消並還原時鐘；reduced motion 唔講解（client 本身已將 reduced-motion 結果即時變 snapshot，冇結果卡）。所有 UI 文字用日文（owner 嚴格指示）。
+能源講解 N1（2026-10-29，已 merge main；見 [closeup-next](handoffs/closeup-next.md)）：owner 同日決定將所有結果嘅閱讀 slot 由 10 秒延長到 13 秒（`DISPLAY_MS`；lease 18 秒），所以上面嘅 headline 近鏡為 4.62–13 秒停留、13–15 秒返回 hero。Headline 係結果後仍存在嘅能源部件時，鏡頭到位（4.62 s）至停留結束（13 s）喺左下顯示日文字幕框，將 60 秒儲能週期壓縮成 8.38 秒播一次（充能 → 蓄電 → 放電，每步約 2.79 秒逐步高亮，每步 ≤16 字）。只有被講解嘅部件行自己嘅時鐘，其他能源部件唔跳相。結果卡講「邊個嘅聲音、改咗乜」，字幕只講設施點運作，標題沿用結果卡地名。Snapshot／reset／Undo／reconnect／下一個 live 結果即時取消並還原時鐘；reduced motion 唔講解（client 本身已將 reduced-motion 結果即時變 snapshot，冇結果卡）。所有 UI 文字用日文（owner 嚴格指示）。
 
 近鏡打磨S0（2026-10-28，coordinator接受量度基準並整合main `c802bba`）：[完整基準](../artifacts/closeup-polish/S0/README.md)記錄98個日夜狀態、96組像素比較及28組兩輪效能；沒有美術、pose、時間線或梯級改動。A1/A2/A3與夜間／綠化仍有明確失敗，20個district狀態跨near plane不可量測；這是後續A–D的起點，並非視覺完成或owner接受。所有正式第二take原圖已逐張檢視，展示硬件及真人辨認未驗；[整合驗證](../artifacts/closeup-polish/S0/integration.json)root test/build/diff PASS，實際published SHA及main CI由本批integration result記錄。
 
-2026-10-29 owner 只選近鏡四個 pose（能源環、SE／SW district、NW focal）連 NW 服務面，另授權 SW focal 一輪 pose-only；C1 只在 feature 製作候選，未接受或合併 main。A3 保留 ≥7/9、數值 A4 保留相鄰 ≥6%／極值 ≥12%，兩項改作診斷；新增 hard gate 係 owner 並排原圖、兩秒辨認相鄰狀態變化。A1／A2／A5／A6 同 V hard gates 不變，全部失敗保留，global V3 植栽另作設計任務。同日 owner 批准 merge：SW focal 拉遠至 A1 過關，A5 改睇 FPS 同 hero calls，shot calls 作診斷；24 組兩秒辨認未做、記作缺口。[決定與新驗證](handoffs/closeup-next.md)。
+2026-10-29 owner 只選近鏡四個 pose（能源環、SE／SW district、NW focal）連 NW 服務面，另授權 SW focal 一輪 pose-only；C1 其後經 owner 批准已 merge main（見下）。A3 保留 ≥7/9、數值 A4 保留相鄰 ≥6%／極值 ≥12%，兩項改作診斷；新增 hard gate 係 owner 並排原圖、兩秒辨認相鄰狀態變化。A1／A2／A5／A6 同 V hard gates 不變，全部失敗保留，global V3 植栽另作設計任務。同日 owner 批准 merge：SW focal 拉遠至 A1 過關，A5 改睇 FPS 同 hero calls，shot calls 作診斷；24 組兩秒辨認未做、記作缺口。[決定與新驗證](handoffs/closeup-next.md)。
 
 `ladderLayout(tiers, energy)` 是唯一權威映射；focal 數值由 tier 符號決定（`t`= 1／.5／0 對應 >0／0／<0）：
 
