@@ -1,10 +1,10 @@
 # se-closeup-polish — SE 集約 focal 近鏡樣板
 
 - Owner: cc100053（唯一驗收人；owner 一人同意即合格）
-- Status: IN_PROGRESS — R3 等 owner review
+- Status: IN_PROGRESS — R4 等 owner review
 - Branch: `feat/se-closeup-polish`
 - Base commit: `4248e8a23f45b9af9a471678cc7d68dcf5245dd2`
-- Last verified commit: 本 commit（R3；root test／build／diff-check PASS）
+- Last verified commit: 本 commit（R4；root test／build／diff-check PASS）
 - Remote availability: `origin/feat/se-closeup-polish`
 
 ## Session Git state
@@ -87,3 +87,11 @@ Owner review R2 → 決定 −1 細嘅處理（見對話：鏡頭按狀態微調
 - −1 重做（兩座兩層亭、大拱頂木亭、綠屋頂亭、S 形有蓋步道、27 人）；0 前庭放大；+1 10×10 植樹平台、升降艙 1.6×2.2×1.6 加琥珀導軌。
 - 驗證：`npm test` exit 0、build ✓、diff-check clean。Site visible meshes low 34／mixed 42／high 29。截圖：[R3 對目標](../../artifacts/se-closeup-polish/r3/vs-target.jpg)、[−1 日間](../../artifacts/se-closeup-polish/r3/se-rung-1-day.png)、[夜景](../../artifacts/se-closeup-polish/r3/triple-night.jpg)、[−1→0 中途](../../artifacts/se-closeup-polish/r3/se-transition-mid.png)。
 - Opus R3 判斷：−1 大細已達目標（約佔畫面闊 35%）；但鏡頭偏俯視，亭身黃橙色＋藍窗似玩具，步道同行人唔明顯，後面粉紅傘廣場搶眼。FPS、reduced-motion 升降艙未處理。
+
+## R4（2026-11-01，owner 批准）
+
+- `se:focal-low` 降低：`{ position: [100, 34, -120], target: [182, 26, -38] }`（約 117 m，俯角約 16°）；棄用 y=62（屋頂主導、似模型）、y=42（粉紅傘廣場露出多）。
+- −1 亭身：`cream` 柱＋`timber` 簷篷＋大片 `warm` 落地店面加 `trim` 直欞，鏡頭面冇 glass；28 人（淺色衫 instance colour，6 坐）、4 組咖啡座、12 棵樹（6 棵 s ≥ .5）、步道 `cream` 上蓋＋`amber` 中線。0 前庭亭共用新外觀。
+- `prefersReducedMotion` 搬去 `siteRuntime.ts` export（避免 circular import）；減少動態時升降艙停 y=19，有 test。
+- 驗證：`npm test` exit 0、build ✓、diff-check clean；meshes low 34／mixed 42／high 29。截圖：[R4 對目標](../../artifacts/se-closeup-polish/r4/vs-target.jpg)、[−1 日](../../artifacts/se-closeup-polish/r4/se-rung-1-day.png)、[−1 夜](../../artifacts/se-closeup-polish/r4/se-rung-1-night.png)、[R3 vs R4](../../artifacts/se-closeup-polish/r4/vs-r3.jpg)。
+- Opus R4 判斷：唔再似玩具，店面暖光、咖啡座、樹、夜景都讀到；餘下：拱頂木色偏橙、行人喺呢個距離仍然細、左邊大格仔樓佔畫面約四分一、後面粉紅傘仍然露少少。FPS 未量。

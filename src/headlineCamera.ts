@@ -15,7 +15,7 @@ export const SHOTS: Record<ShotId, Pose> = {
   'sw:focal': { position: [-120, 64, 152], target: [-105, 10, 60] },
   'se:focal': { position: [12, 115, -208], target: [182, 72, -38] },
   // The -1 pavilions are ~5% of a lot-wide frame at se:focal; this pushed-in pose is used when a focal change starts or ends at the low band.
-  'se:focal-low': { position: [104, 80, -116], target: [182, 17, -38] },
+  'se:focal-low': { position: [100, 34, -120], target: [182, 26, -38] },
   'nw:district': { position: [-30, 115, -455], target: [40, 43, -300] },
   'ne:district': { position: [-320, 110, -300], target: [-210, 14, -135] },
   'sw:district': { position: [-108, 80, 180], target: [-105, 10, 60] },

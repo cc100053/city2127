@@ -3,7 +3,7 @@ import type { EnergyRuntime } from './energyRuntime.ts';
 import type * as T from 'three';
 import { CHANGE_CATALOG, SITE_IDS, environmentParkTarget, selectExhibitionSiteVariants, selectSiteVariants, variantLayers, type SiteId, type SiteLayerDefinition, type SiteLayerId, type SiteVariantId } from './changeCatalog.ts';
 import type { BuiltSite, BuiltSiteMap, SiteLayerRuntime } from './siteBuilders/index.ts';
-import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
+import { prefersReducedMotion, SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 import type { EnvironmentParkDiagnostics } from './siteBuilders/siteRuntime.ts';
 import type { EnvironmentDistrictDiagnostics, ChangedPoint } from './districtMeters.ts';
 import type { Scores, SurveyView } from './surveyView.ts';
@@ -56,9 +56,6 @@ const EXHIBITION_BASE_VARIANTS: Record<SiteId, SiteVariantId> = {
 };
 
 const SITE_SOCKETS: Record<SiteId, LotSocketId> = { magnetEast: 'nw', stationEastPark: 'ne', dogenzakaSouth: 'sw', centerGaiRear: 'se' };
-
-const prefersReducedMotion = () => typeof globalThis.matchMedia === 'function'
-  && globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const smoothstep = (value: number) => value * value * (3 - 2 * value);
 

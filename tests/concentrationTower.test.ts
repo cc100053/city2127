@@ -81,6 +81,11 @@ try {
   runtime.update(3); assert.ok(cabin.position.y > 1.5 && cabin.position.y < 36.5);
   runtime.update(6.5); assert.equal(cabin.position.y, 36.5);
   runtime.update(14); assert.equal(cabin.position.y, 1.5);
+  Object.defineProperty(globalThis, 'matchMedia', { configurable: true, value: () => ({ matches: true }) });
+  runtime.update(3); assert.equal(cabin.position.y, 19, 'reduced motion parks the cabin');
+  runtime.update(6.5); assert.equal(cabin.position.y, 19);
+  delete (globalThis as typeof globalThis & { matchMedia?: unknown }).matchMedia;
+  runtime.update(1); assert.ok(cabin.position.y !== 19);
   assert.deepEqual({ visible: upperLayer.visible, scaleY: upperLayer.scale.y }, upperState);
   runtime.restoreLegacy();
   assert.equal(runtime.getDiagnostics().targetFunctionModules, 4);

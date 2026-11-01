@@ -105,3 +105,26 @@ R1 判斷：+1 已經有獨立輪廓同升降井位置，方向啱；但三個�
 5. **升降艙**：喺新鏡頭仍然要睇到——如果唔明顯，加大到 1.6×2.2×1.6，或者喺井框加 `amber` 導軌線。
 6. **測試**：`npm test && npm run build && git diff --check`。
 7. **截圖**（`r3/`）：同 R2，另外 −1 同 0 都要喺 `se:focal-low` 影（`?shot=se:focal-low`），+1 喺 `se:focal`。`vs-target.jpg`（目標 vs R3：−1 用 focal-low、0 用 focal-low、+1 用 focal）、`triple-night.jpg`、`vs-r2.jpg`、變化中途（−1→0，用 focal-low）。
+
+# R4（Opus，2026-11-01；owner 批准做 R4）
+
+R3 判斷：−1 大細已達標，但似玩具。今輪只改質感同鏡頭，**唔改地塊、唔改 0／+1 嘅建築**。對照 `target/target-rung-1.jpg`。
+
+1. **`se:focal-low` 降低角度**：俯角約 15–25°（R3 約 30° 以上），距離 110–140 m。構圖要求：
+   - 主要見到亭嘅**店面同立面**，屋頂次要；
+   - 後面嗰個粉紅太陽傘廣場（唔屬 SE）大部分被亭擋住或者出畫；
+   - 0 狀態中高樓連冠環都要喺畫面內；−1 群闊度仍然 ≥ 35%；
+   - 唔可以被左邊大格仔樓或者右邊藍塔擋住主體；保持 hero 側規則同 headlineCamera test。
+   - 可以試 2–4 個 pose，揀最好嗰個，報告數字同揀嘅理由。
+2. **亭身材質**：而家牆身係偏黃橙色（`warm` 用咗做外牆）加藍色窗，似模型。改為：
+   - 外牆／柱／樓板邊用 `cream`＋`trim`，木面（屋簷底、拱頂、百葉）用 `timber`；
+   - 店面係**大片落地暖光**：`warm` 背板＋前面 `trim` 細直欞（每 .6 一條），**鏡頭面唔用 `glass`**（佢反射天空變藍）；
+   - 二樓用細一啲嘅暖光窗帶；`amber` 只做屋簷線同細節，唔做大面積。
+3. **生活感**：
+   - 行人放大到約 .62 單位高，身體用 instance colour 混幾種淺色衫（米、白、淺藍、赭）而唔係全部深色；集中喺店前同步道入口（鏡頭看得到嘅一邊），4–6 個坐喺長凳／咖啡座；
+   - 咖啡亭前加 3–4 組戶外枱椅（`cream` 枱＋`timber` 椅，用 bake）；
+   - 步道上蓋 `cream`、底面一條 `amber` 細線，地面用淺 `stone` 加深色邊，令條路讀得出；
+   - 亭之間加花槽同 8–12 棵 `leafyCrown` 細樹（尺寸要大過 R3 嘅 s=.3，至少一半要 ≥ .5），對照目標圖嘅綠化密度。
+4. **減少動態**：`prefers-reduced-motion` 時升降艙停喺固定位置（重用 `cityChangeManager.ts` 嘅 `prefersReducedMotion` 做法，可以 export 佢；加一個 test）。
+5. **測試**：`npm test && npm run build && git diff --check`。
+6. **截圖**（`r4/`）：−1 同 0 用 `se:focal-low`，+1 用 `se:focal`，日夜；`vs-target.jpg`、`vs-r3.jpg`（−1 R3 vs R4）、`triple-night.jpg`、−1→0 變化中途。
