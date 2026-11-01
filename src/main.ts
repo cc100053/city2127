@@ -11,6 +11,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { VignetteShader } from 'three/addons/shaders/VignetteShader.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { FullScreenQuad, Pass } from 'three/addons/postprocessing/Pass.js';
 import { cityRig } from './cityRig';
 import { heroCamera, HERO_TARGET } from './heroCamera';
 import { DISTRICT } from './layout';
@@ -20,7 +21,7 @@ import { overlay } from './overlay';
 import { addCityModel } from './modelAssets';
 import { loadOdaiba, updateOdaiba } from './odaibaScene';
 import { build2127 } from './odaiba2127';
-import { bayWater } from './bayWater';
+import { bayWater, waterLights } from './bayWater';
 import { scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
 import { createCityChangeManager } from './createCityChangeManager';
@@ -111,6 +112,20 @@ try {
   controls.minDistance=streetReview?30:150;controls.maxDistance=1000;controls.minPolarAngle=.35;controls.maxPolarAngle=1.42;controls.screenSpacePanning=false;controls.update();
   // MSAA target: the composer's default target has no samples, so edges were aliased once post-processing ran.
   const composer=new EffectComposer(renderer,new T.WebGLRenderTarget(innerWidth,innerHeight,{type:T.HalfFloatType,samples:quality.msaaSamples}));composer.setSize(innerWidth,innerHeight);composer.addPass(new RenderPass(scene,camera));
+  // Night water reflections: copy the lit scene (water masked out by its zero alpha) at quarter resolution; the bay samples it next frame.
+  const lightCopy=new T.WebGLRenderTarget(1,1,{type:T.HalfFloatType});waterLights.frame.value=lightCopy.texture;
+  // The same pass restores alpha in the scene buffer, since later passes (bloom/AO compositing) do not tolerate the water's zero alpha.
+  const copyQuad=new FullScreenQuad(new T.ShaderMaterial({uniforms:{tDiffuse:{value:null},mask:{value:1}},
+    vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader:'uniform sampler2D tDiffuse;uniform float mask;varying vec2 vUv;void main(){vec4 c=texture2D(tDiffuse,vUv);gl_FragColor=vec4(c.rgb*mix(1.,c.a,mask),1.);}'}));
+  composer.addPass(new class extends Pass{
+    render(r:T.WebGLRenderer,write:T.WebGLRenderTarget,read:T.WebGLRenderTarget){
+      const u=(copyQuad.material as T.ShaderMaterial).uniforms;u.tDiffuse.value=read.texture;
+      if(waterLights.night.value>0){u.mask.value=1;r.setRenderTarget(lightCopy);copyQuad.render(r);}
+      u.mask.value=0;r.setRenderTarget(write);copyQuad.render(r);
+    }
+    setSize(width:number,height:number){lightCopy.setSize(width>>2,height>>2);waterLights.size.value.set(width,height);}
+  }());
   // Contact shadows where slabs, planters and cores meet: the cheapest step from blockout to built object.
   const ao=new GTAOPass(scene,camera,innerWidth,innerHeight);ao.updateGtaoMaterial({radius:3,distanceFallOff:.8,thickness:3,samples:16});ao.blendIntensity=1;ao.enabled=quality.ambientOcclusion;
   // The composer resizes every pass to the canvas; AO keeps its reduced buffer and its blend upsamples onto the full frame.
@@ -245,6 +260,7 @@ try {
     ambient.intensity=(.6+pulse*.15+still*.15)*(1-glow*.18*day)*light.ambient;
     ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientLate,glow*.6).lerp(ambientNight,dark);
     scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure*(1+.16*day);
+    waterLights.night.value=nightSky;
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
     controls.update();panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);
     if(headlineCamera?.active&&cameraMotion.matches)headlineCamera.cancel();else headlineCamera?.update(now);
