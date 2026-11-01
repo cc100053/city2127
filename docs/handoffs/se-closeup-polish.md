@@ -1,11 +1,11 @@
 # se-closeup-polish — SE 集約 focal 近鏡樣板
 
 - Owner: cc100053（唯一驗收人；owner 一人同意即合格）
-- Status: PLANNED — 等 owner 提供目標圖
+- Status: IN_PROGRESS — R2 等 owner review
 - Branch: `feat/se-closeup-polish`
 - Base commit: `4248e8a23f45b9af9a471678cc7d68dcf5245dd2`
-- Last verified commit: NONE
-- Remote availability: NOT PUSHED
+- Last verified commit: 本 commit（R2；root test／build／diff-check PASS）
+- Remote availability: `origin/feat/se-closeup-polish`
 
 ## Session Git state
 
@@ -65,10 +65,17 @@ Owner 2026-11-01：觀眾睇唔出城市變化。做法係揀一個場景打磨�
 - 本 handoff：診斷同目標規格草案。
 - Baseline 截圖（`se:d4`，−1／0／+1，12:00，headless Chrome 1600×900 via `playwright-cli`）同目標圖 prompt。截圖要 `reviewTime` 後等約 10 s，否則 `page.screenshot` 5 s timeout。
 
+- R1／R2（Sonnet 實作，Opus 規格同審核；規格同審核意見：[spec.md](../../artifacts/se-closeup-polish/spec.md)）：`concentrationTower.ts` 重寫為 −1 四座低亭＋有蓋步道＋行人、0 米白退台中高樓＋兩座木亭、+1 地面起嘅米白框垂直街道塔（暖色室內、升降艙按時鐘上落 14 s 週期、琥珀冠環）；新 material `amber`（Meter 色、自發光，日夜都係琥珀）、`timber`、`warm`；`towerUpper` layer 改由 y=0 起（變化＝由地面長高）；high 唔再顯示 mixed hall；`se:focal` 改為 d4 pose；`changeSites.se` w／d 9→10（11／12 被 `tests/odaiba.test.ts` 嘅 surveyed-coastal-canopy 淨空擋住）。
+
 ## Actual validation results
 
-- Verification status: NOT RUN（只有文件改動）
+- Verification status: PARTIAL
+- 2026-11-01，R2 工作樹：`npm test` exit 0（`concentrationTower: PASS`；bounds low x −5.00..4.90、mixed y 0..18.53、high y 0..41.58）、`npm run build` ✓、`git diff --check` clean。survey／module-swap 未改。
+- 截圖（headless Chrome via `playwright-cli`，1600×900，12:00／22:00）：[R2 對目標](../../artifacts/se-closeup-polish/r2/vs-target.jpg)、[R2 夜景](../../artifacts/se-closeup-polish/r2/triple-night.jpg)、[變化中途](../../artifacts/se-closeup-polish/r2/se-transition-mid.png)、[R1 對目標](../../artifacts/se-closeup-polish/r1/vs-target.jpg)。
+- Site visible meshes（Node 量，非 GPU draw call）：low 34／mixed 42／high 28，baseline 20／25／40；low／mixed 超出 +15% 預算（約佔全場 950 calls 嘅 1–2%）。瀏覽器 FPS 同 draw call 未量。
+- Opus R2 判斷：+1、0 輪廓同色調接近目標，夜景 +1 讀到一層層暖光；**−1 喺 245 m 鏡頭仍然太細**（10×10 地塊）；+1 升降艙喺呢個距離唔明顯；變化中途係成棟塔垂直壓扁再長高，唔係逐層起。
+- 未做：owner review、FPS、reduced-motion 下升降艙仍會郁（未處理）。
 
 ## Next step
 
-Owner 提供目標圖 → Opus 寫逐部件規格（尺寸／材質／動畫）→ Sonnet agent 實作＋固定鏡頭截圖 −1／0／+1、日／夜、變化中途 → Opus 審 → owner 睇對照頁。
+Owner review R2 → 決定 −1 細嘅處理（見對話：鏡頭按狀態微調、或接受）→ R3 → FPS 實測 → owner 接受後 merge，再寫 Skill 同套用 SW／NW。

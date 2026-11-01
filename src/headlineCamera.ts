@@ -13,7 +13,7 @@ export const SHOTS: Record<ShotId, Pose> = {
   'nw:focal': { position: [40, 130, -508], target: [40, 43, -300] },
   'ne:focal': { position: [-280, 85, -245], target: [-210, 14, -135] },
   'sw:focal': { position: [-120, 64, 152], target: [-105, 10, 60] },
-  'se:focal': { position: [0, 225, -220], target: [175, 65, -45] },
+  'se:focal': { position: [5, 115, -215], target: [175, 72, -45] },
   'nw:district': { position: [-30, 115, -455], target: [40, 43, -300] },
   'ne:district': { position: [-320, 110, -300], target: [-210, 14, -135] },
   'sw:district': { position: [-108, 80, 180], target: [-105, 10, 60] },
