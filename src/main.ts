@@ -29,6 +29,7 @@ import { ARRIVAL_SECONDS, VoteJourney } from './voteJourney';
 import { shotTimeline } from './resultTimeline';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming';
 import { housingPrototype } from './housingPrototype';
+import { BuildCut } from './siteBuilders/buildCut';
 import './style.css';
 
 try {
@@ -109,10 +110,10 @@ try {
   const ao=new GTAOPass(scene,camera,innerWidth,innerHeight);ao.updateGtaoMaterial({radius:3,distanceFallOff:.8,thickness:3,samples:16});ao.blendIntensity=1;ao.enabled=quality.ambientOcclusion;
   // The composer resizes every pass to the canvas; AO keeps its reduced buffer and its blend upsamples onto the full frame.
   const aoSize=ao.setSize.bind(ao);ao.setSize=(width,height)=>aoSize(Math.round(width*quality.aoScale),Math.round(height*quality.aoScale));composer.addPass(ao);
-  // GTAO's normal/depth prepass uses an override material without the earth curvature, so the far bay would ghost above the horizon: skip the curved sea and bay context there, and the transparent boat wakes and Meter pulses (no normals; they read as black AO).
+  // GTAO's normal/depth prepass uses an override material without the earth curvature, so the far bay would ghost above the horizon: skip the curved sea and bay context there, and the transparent boat wakes and Meter pulses (no normals; they read as black AO), and buildings mid-way through a build cut (the override cannot discard).
   const aoPass=ao as unknown as {_overrideVisibility():void;_restoreVisibility():void},hideFlat=aoPass._overrideVisibility.bind(aoPass),showFlat=aoPass._restoreVisibility.bind(aoPass);
   let flat:T.Object3D[]=[];
-  aoPass._overrideVisibility=()=>{hideFlat();flat=[floor,scene.getObjectByName('bay-context'),scene.getObjectByName('water-taxi-wakes'),...scene.getObjectsByProperty('name','meter-pulse')].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
+  aoPass._overrideVisibility=()=>{hideFlat();flat=[floor,scene.getObjectByName('bay-context'),scene.getObjectByName('water-taxi-wakes'),...scene.getObjectsByProperty('name','meter-pulse'),...BuildCut.building].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
   aoPass._restoreVisibility=()=>{showFlat();for(const o of flat)o.visible=true;};
   const bloom=new UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.2,.7,1);composer.addPass(bloom);
   const vignette=new ShaderPass(VignetteShader);vignette.uniforms.offset.value=.9;vignette.uniforms.darkness.value=.9;composer.addPass(vignette);composer.addPass(new OutputPass());

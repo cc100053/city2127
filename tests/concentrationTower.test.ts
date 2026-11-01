@@ -45,7 +45,8 @@ try {
   const bands = site.root.getObjectsByProperty('name', 'tower-meter-band') as T.InstancedMesh[];
   assert.equal(bands.length, 3, 'one amber ring each for the pavilions, mid-rise and tower');
   const expected = new T.Color(METER_COLORS.urbanConcentration);
-  for (const band of bands) assert.equal(band.material, amber);
+  // Each building reveals through its own cut, so the rings carry per-building clones of amber.
+  for (const band of bands) assert.ok((band.material as T.MeshStandardMaterial).emissive.equals(amber.emissive));
   assert.ok(amber.color.equals(expected) && amber.emissive.equals(expected), 'amber is the Meter colour, lit independently of the day');
   assert.equal(upperLayer.position.y, 0, 'the tower grows from the ground');
 
@@ -62,13 +63,15 @@ try {
 
   assert.equal(runtime.setTarget({ band: 'low', functionModules: 6 }, 3, false), true);
   runtime.update(4.5);
-  assert.ok(Math.abs(lowSixth.scale.x - .5) < .001);
+  assert.ok(group('tower-function-low-3').scale.x > lowSixth.scale.x, 'new modules appear one after another');
   runtime.update(6);
   assert.equal(lowSixth.scale.x, 1);
 
   assert.equal(runtime.setTarget({ band: 'mixed', functionModules: 4 }, 6, false), true);
   runtime.update(7.5);
-  assert.ok(Math.abs(group('tower-mid-rise-hall').scale.x - .5) < .001);
+  const hall = group('tower-mid-rise-hall'), pavilionPair = group('tower-low-pavilion-pair');
+  assert.ok(hall.visible && pavilionPair.visible, 'the hall rises while the pavilions come down');
+  assert.equal(hall.scale.x, 1, 'buildings are revealed by their cut, never scaled');
   runtime.update(9);
   assert.equal(runtime.getDiagnostics().representation, 'mid-rise-hall');
   assert.equal(runtime.getDiagnostics().activeFunctionModules, 4);

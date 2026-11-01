@@ -58,6 +58,12 @@ const EXHIBITION_BASE_VARIANTS: Record<SiteId, SiteVariantId> = {
 const SITE_SOCKETS: Record<SiteId, LotSocketId> = { magnetEast: 'nw', stationEastPark: 'ne', dogenzakaSouth: 'sw', centerGaiRear: 'se' };
 
 const smoothstep = (value: number) => value * value * (3 - 2 * value);
+const layerLevel = (motion: LayerMotion) => motion.layer.cut ? motion.layer.cut.level : motion.group.scale.y;
+function showLayer(motion: LayerMotion, value: number): void {
+  const level = Math.max(HIDDEN_SCALE, value);
+  if (motion.layer.cut) motion.layer.cut.set(level); else motion.group.scale.y = level;
+  motion.group.visible = value > HIDDEN_SCALE;
+}
 
 /** Runtime-only renderer state. The survey server's CityView remains the authoritative city state. */
 export class CityChangeManager {
@@ -213,11 +219,9 @@ export class CityChangeManager {
           this.prepareAsset(motion, now);
         }
         const raw = Math.min(1, Math.max(0, (now - motion.start) / SITE_TRANSITION_SECONDS));
-        const value = motion.from + (motion.to - motion.from) * smoothstep(raw);
-        motion.group.scale.y = Math.max(HIDDEN_SCALE, value);
-        motion.group.visible = value > HIDDEN_SCALE;
+        showLayer(motion, motion.from + (motion.to - motion.from) * smoothstep(raw));
       }
-      const shown = Math.max(0, ...[...motions.values()].map(motion => motion.group.visible ? motion.group.scale.y : 0));
+      const shown = Math.max(0, ...[...motions.values()].map(motion => motion.group.visible ? layerLevel(motion) : 0));
       const rose = Math.max(-Infinity, ...[...motions.values()].map(motion => motion.to ? motion.fresh : -Infinity));
       const { mesh, material } = this.sites[siteId].marker;
       mesh.visible = shown > HIDDEN_SCALE;
@@ -246,14 +250,13 @@ export class CityChangeManager {
           motion.start = now;
           motion.fresh = -Infinity;
           motion.retryAt = to ? motion.retryAt : Infinity;
-          motion.group.scale.y = to ? 1 : HIDDEN_SCALE;
-          motion.group.visible = to === 1;
+          showLayer(motion, to);
           this.sites[siteId].marker.material.emissiveIntensity = .2;
           continue;
         }
         if (motion.to === to) continue;
         if (to === 1) this.prepareAsset(motion, now);
-        motion.from = motion.group.visible ? motion.group.scale.y : 0;
+        motion.from = motion.group.visible ? layerLevel(motion) : 0;
         motion.to = to;
         motion.start = now;
         motion.fresh = fresh && to === 1 ? now : -Infinity;
@@ -275,8 +278,7 @@ export class CityChangeManager {
         motion.start = now;
         motion.fresh = -Infinity;
         motion.retryAt = Infinity;
-        motion.group.scale.y = active ? 1 : HIDDEN_SCALE;
-        motion.group.visible = active;
+        showLayer(motion, active ? 1 : 0);
         if (active) this.prepareAsset(motion, now);
       }
       this.variants[siteId] = EXHIBITION_BASE_VARIANTS[siteId];

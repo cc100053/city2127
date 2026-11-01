@@ -4,6 +4,7 @@ import { arc, bake, box, cream, faces, glass, leaf, leafyCrown, paint, shrubs, p
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import { ConcentrationDistrict, METER_COLORS } from '../districtMeters.ts';
 import type { Band } from '../surveyView.ts';
+import { BuildCut } from './buildCut.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, prefersReducedMotion, SITE_TRANSITION_SECONDS, type BuiltSite } from './siteRuntime.ts';
 
 const HIDDEN = 1e-3;
@@ -47,7 +48,8 @@ export interface ConcentrationTowerRuntime {
 
 export type ConcentrationTowerBuiltSite = BuiltSite & { readonly concentrationTower: ConcentrationTowerRuntime };
 
-type Part = { group: T.Group; level: number; from: number; to: number };
+/** `window`: the share [start, end] of the site transition this part moves in; `cut` reveals a building instead of scaling it. */
+type Part = { group: T.Group; level: number; from: number; to: number; window: [number, number]; cut?: BuildCut };
 type TowerGroups = {
   base: T.Group;
   pavilions: T.Group;
@@ -55,6 +57,8 @@ type TowerGroups = {
   lowModules: T.Group[];
   mixedModules: T.Group[];
   highModules: T.Group[];
+  baseCut: BuildCut;
+  pavilionCut: BuildCut;
 };
 
 /** One function module: a baked group that scales in from its own origin. */
@@ -219,7 +223,7 @@ class ConcentrationTowerController implements ConcentrationTowerRuntime {
     this.highStart = this.mixedStart + groups.mixedModules.length;
     const levels = [1, 0, ...groups.lowModules.map(() => 0), ...groups.mixedModules.map((_, i) => i < 4 ? 1 : 0), ...groups.highModules.map(() => 0)];
     this.parts = [groups.base, groups.pavilions, ...groups.lowModules, ...groups.mixedModules, ...groups.highModules]
-      .map((group, i) => ({ group, level: levels[i], from: levels[i], to: levels[i] }));
+      .map((group, i) => ({ group, level: levels[i], from: levels[i], to: levels[i], window: [0, 1], cut: [groups.baseCut, groups.pavilionCut][i] }));
     this.write();
   }
 
@@ -240,6 +244,7 @@ class ConcentrationTowerController implements ConcentrationTowerRuntime {
     for (let i = 0; i < this.parts.length; i++) {
       this.parts[i].from = this.parts[i].level;
       this.parts[i].to = next[i];
+      this.parts[i].window = this.window(i);
     }
     this.start = now;
     this.active = !immediate;
@@ -255,8 +260,10 @@ class ConcentrationTowerController implements ConcentrationTowerRuntime {
     if (this.target.band === 'high') this.elevator.position.y = prefersReducedMotion() ? CABIN_REST : CABIN_LOW + (CABIN_HIGH - CABIN_LOW) * cabinRise(now);
     if (!this.active) return;
     const raw = Math.min(1, Math.max(0, (now - this.start) / SITE_TRANSITION_SECONDS));
-    const progress = smoothstep(raw);
-    for (const part of this.parts) part.level = part.from + (part.to - part.from) * progress;
+    for (const part of this.parts) {
+      const [a, b] = part.window;
+      part.level = part.from + (part.to - part.from) * smoothstep(Math.min(1, Math.max(0, (raw - a) / (b - a))));
+    }
     this.active = raw < 1;
     this.write();
   }
@@ -280,6 +287,19 @@ class ConcentrationTowerController implements ConcentrationTowerRuntime {
     };
   }
 
+  /**
+   * The old building comes down in the first 70% while the new one rises in the last 70%. Function modules follow the
+   * building's cut one after another: bottom-up as they appear, top-down as they go.
+   */
+  private window(i: number): [number, number] {
+    const { from, to } = this.parts[i];
+    if (i < this.lowStart) return to > from ? [.3, 1] : [0, .7];
+    const [start, end] = i < this.mixedStart ? [this.lowStart, this.mixedStart] : i < this.highStart ? [this.mixedStart, this.highStart] : [this.highStart, this.parts.length];
+    const order = (i - start) / Math.max(1, end - start - 1);
+    const begin = to > from ? .25 + .5 * order : .5 * (1 - order);
+    return [begin, begin + .25];
+  }
+
   private targetLevels(target: ConcentrationTowerTarget): number[] {
     return [
       target.band === 'mixed' ? 1 : 0,
@@ -291,8 +311,8 @@ class ConcentrationTowerController implements ConcentrationTowerRuntime {
   }
 
   private write(): void {
-    for (const { group, level } of this.parts) {
-      group.scale.setScalar(Math.max(HIDDEN, level));
+    for (const { group, level, cut } of this.parts) {
+      if (cut) cut.set(Math.max(HIDDEN, level)); else group.scale.setScalar(Math.max(HIDDEN, level));
       group.visible = level > HIDDEN;
     }
   }
@@ -462,7 +482,12 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
       for (const s of [-1, 1]) box(f, [w, .05, .08], [0, s * 1.2, out + .14], amber, .02);
     }, [2, 3])));
 
-  const concentrationTower = new ConcentrationTowerController({ base, pavilions, elevator, lowModules, mixedModules, highModules });
+  // Cuts are made last, once every module, ring and crowd sits in its building.
+  const glow = METER_COLORS.urbanConcentration, signs = new Set<T.Material>(kit.signs);
+  towerUpperLayer.cut = new BuildCut(towerUpper, glow);
+  neutralPropsLayer.cut = new BuildCut(neutralPropsLayer.group, glow);
+  const baseCut = new BuildCut(base, glow, signs), pavilionCut = new BuildCut(pavilions, glow);
+  const concentrationTower = new ConcentrationTowerController({ base, pavilions, elevator, lowModules, mixedModules, highModules, baseCut, pavilionCut });
   return {
     id: 'centerGaiRear', root,
     layers: { towerBase: towerBaseLayer, towerUpper: towerUpperLayer, towerNeutralProps: neutralPropsLayer },

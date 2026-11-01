@@ -6,6 +6,7 @@ import type { AutomationHubRuntime } from './automationHub.ts';
 import type { AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, SharingDistrict } from '../districtMeters.ts';
 import type { CommonsPlazaRuntime } from './commonsPlaza.ts';
 import type { ConcentrationTowerRuntime } from './concentrationTower.ts';
+import type { BuildCut } from './buildCut.ts';
 
 const GUEST = '#ff9a2e';
 export const SITE_TRANSITION_SECONDS = 3;
@@ -56,6 +57,8 @@ export interface SiteLayerRuntime {
   readonly group: T.Group;
   readonly assetStatus: SiteAssetStatus;
   readonly assetError?: string;
+  /** When set, the change manager reveals the layer through this cut instead of scaling it. */
+  readonly cut?: BuildCut;
   prepare(): Promise<void>;
 }
 
@@ -64,6 +67,7 @@ export class MutableSiteLayerRuntime implements SiteLayerRuntime {
   readonly group = new T.Group();
   assetStatus: SiteAssetStatus;
   assetError?: string;
+  cut?: BuildCut;
   private prepareHandler?: () => Promise<void>;
   private task?: Promise<void>;
 
