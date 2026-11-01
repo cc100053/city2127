@@ -49,6 +49,12 @@ Owner 2026-11-01：城市變化時建築唔應該只係縮細放大彈出嚟。�
 - 第一次轉換會 compile 新 shader program（每種材質一個，所有 cut 共用）；load 時已經用緊，所以應該喺 load 時已 compile，未量。
 - 每棟 cut 建築材質變成獨立 clone：draw call 不變，但材質數增加。
 
+## SE 轉換 debug 面板（2026-11-01）
+
+- Owner 要求喺城市畫面加一個只睇 SE 轉換嘅 debug 工具（owner 揀 DEV 面板，唔係 admin 頁）。
+- `src/devSeTransition.ts`＋`main.ts`：`?seTransition` 開面板；變化前／後（−1 低層／0 混在／+1 タワー）、時間軸 0–3.5 s 可前後拖、▶ 再生／⏸、0.25／0.5／1×、「最初から」。每次揀狀態用新嘅時間基準重播，鏡頭鎖 `se:focal`（有 −1 就 `se:focal-low`），收埋 overlay；預設 12:00，`&hour=22` 睇夜景。Production bundle 冇呢個面板。
+- 驗證：headless Chrome 1600×900，拖到 1.20 s／0.40 s（`data-time` 跟住前後變）、0→+1 再生正常；console 只有已知 favicon 404。test／build／diff-check PASS。
+
 ## Next expected step
 
 Owner 睇 `artifacts/se-build-transition/*-sheet.jpg`（或者實機 `cityMeters('se:2.5')`）→ 決定：保留／調光帶強度／套用到 SW／NW／NE。接受後量 FPS，再按 CONTRIBUTING merge。

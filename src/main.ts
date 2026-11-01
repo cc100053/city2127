@@ -128,7 +128,7 @@ try {
   const surveyParam=params.get('survey');
   const surveyUrl=surveyParam===null?null:/^wss?:\/\//.test(surveyParam)?surveyParam:`ws://${location.hostname}:8787/ws`;
   // `?hour=21` holds the clock at one hour, for review captures.
-  const heldHour=Number(params.get('hour')??NaN),hold=heldHour>=0&&heldHour<24?heldHour:null;
+  const heldHour=Number(params.get('hour')??NaN),hold=heldHour>=0&&heldHour<24?heldHour:import.meta.env.DEV&&params.has('seTransition')?12:null;
   let displayMode: DisplayMode = 'auto';
   const updateOverlay=overlay();
   // DEV-only `?meters=nw:high,ne:low` (band or score −12..12 per site, unlisted = 0) applies a v2 layout without the survey server, for review captures; `window.cityMeters('ne:high')` then animates a live change.
@@ -138,6 +138,8 @@ try {
   const housing=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&!params.has('energy')&&params.has('housing');
   const energyReview=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&params.has('energy');
   const shotPreview=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&!housing&&!energyReview&&!civicReview&&!streetReview&&params.has('shot');
+  // DEV-only `?seTransition`: a panel that replays and scrubs just the SE focal change (devSeTransition).
+  const seTransition=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&!housing&&!energyReview&&!shotPreview&&params.has('seTransition');
   if(!housing&&!energyReview){
     // Fixed city background: votes and recovery never retarget the dwellings; the update cycle stays in DEV.
     const background=housingPrototype();background.select('mixed');background.root.name='housing-background';scene.add(background.root);
@@ -146,7 +148,7 @@ try {
   let devFrame:((now:number,darkness:number)=>void)|undefined;
   if(import.meta.env.DEV&&energyReview)
     import('./devEnergy').then(({startEnergyReview})=>{devFrame=startEnergyReview(scene,params);});
-  const cityChanges=surveyUrl||metersParam!==null||scaleLab||housing||shotPreview?createCityChangeManager(scene):null;
+  const cityChanges=surveyUrl||metersParam!==null||scaleLab||housing||shotPreview||seTransition?createCityChangeManager(scene):null;
   if(import.meta.env.DEV&&housing)import('./devHousing').then(async({startHousingReview})=>{
     if(!await odaibaReady)return;
     devFrame=startHousingReview(scene,camera,controls,cityChanges!,params);
@@ -158,6 +160,11 @@ try {
   // Civic/street reviews keep their own authored camera.
   const headlineCamera=(surveyUrl||metersParam!==null||shotPreview)&&!civicReview&&!streetReview?new HeadlineCamera(camera,controls):null;
   let devShot:ShotId|null=null;
+  let devClock:(()=>number)|undefined;
+  if(import.meta.env.DEV&&seTransition)import('./devSeTransition').then(async({startSeTransition})=>{
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    devClock=startSeTransition(cityChanges!,id=>{devShot=id;controls.enabled=false;});
+  });
   const cameraMotion=matchMedia('(prefers-reduced-motion: reduce)');
   if(import.meta.env.DEV){
     import('./devShotFrame').then(({cityShotFrame})=>Object.assign(window,{cityShotFrame:(id:string)=>cityShotFrame(scene,camera,id)}));
@@ -219,7 +226,7 @@ try {
   const start=performance.now();
   let frames=0,measureStart=start,shadowDrawn=-Infinity;
   renderer.setAnimationLoop(()=>{
-    now=Number.isFinite(reviewTime)&&reviewTime>=0 ? reviewTime : (performance.now()-start)/1000;
+    now=devClock ? devClock() : Number.isFinite(reviewTime)&&reviewTime>=0 ? reviewTime : (performance.now()-start)/1000;
     const hour=hold??displayHour(displayMode,now),height=sunHeight(hour),day=daylight(hour),dark=1-day,glow=1-T.MathUtils.smoothstep(Math.abs(height),0,1),nightSky=T.MathUtils.smoothstep(dark,.35,1);
     if(surveyUrl)world.update(now);
     const s=withNight(surveyUrl?world.state:moodAt(hour),dark);

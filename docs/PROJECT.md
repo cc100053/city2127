@@ -46,6 +46,7 @@ DEV 近鏡量度（closeup-polish S0）：`main.ts` 只在 `import.meta.env.DEV`
 | [voteJourney.ts](../src/voteJourney.ts) | Live vote journey (2026-10-13): Meter-colour orbs, scan rings and per-guest lanterns (latest 64), additive and unlit, named `meter-pulse` so GTAO skips them |
 | [energyPrototype.ts](../src/energyPrototype.ts), [devEnergy.ts](../src/devEnergy.ts) | DEV-only E3能源城市組合／五配置及慢速儲能流程；不讀Meter、不接survey；見[能源計劃](ENERGY_CITY_PLAN.md) |
 | [scaleLab.ts](../src/scaleLab.ts), [devScaleLab.ts](../src/devScaleLab.ts) | DEV-only `?scaleLab`: seeded guest sequences through the server reducer and Scale A with live journey timing; see [handoff](handoffs/archive/vote-journey.md) |
+| [devSeTransition.ts](../src/devSeTransition.ts) | DEV-only `?seTransition` (`&hour=22` for night; default 12:00): a panel replays and scrubs just the SE focal change (−1／0／+1 before/after, 0–3.5 s slider, 0.25–1× playback) on its own clock, camera held on `se:focal`／`se:focal-low`, overlay hidden; see [handoff](handoffs/se-build-transition.md) |
 | [housingPrototype.ts](../src/housingPrototype.ts), [devHousing.ts](../src/devHousing.ts) | 正式城市固定mixed住宅／U停泊A；DEV五配置與90秒循環重用同一工廠，獨立於投票權威 |
 | [dayCycle.ts](../src/dayCycle.ts), [presets.ts](../src/presets.ts), [worldState.ts](../src/worldState.ts) | Clock/light curves, numeric atmosphere presets, legacy 10 s WorldState blend |
 | [overlay.ts](../src/overlay.ts), [style.css](../src/style.css), [modelAssets.ts](../src/modelAssets.ts) | Desktop title/time UI, GLTFLoader and DEV-only local asset preview |
