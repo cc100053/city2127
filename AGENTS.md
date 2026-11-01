@@ -15,6 +15,7 @@ This repository is **2127 — Frozen Intersection**, an exhibition project for c
 - Trace the changed code and its callers before editing. Reuse existing factories, materials and instancing; prefer Three.js/native features over new dependencies.
 - Make the smallest complete change, scoped to the task's lines rather than broad reformatting or speculative abstractions. Document a deliberate shortcut with a `ponytail:` comment only when it has a real limitation.
 - Work in this task; spawn agents only when the user or applicable instructions request delegation.
+- Visual polish delegation (owner decision, 2026-11-01): Opus plans, writes concrete specs and judges visuals; implementation and screenshot capture may go to Sonnet agents with a scoped brief (which files to read), then return to Opus for review. Visual acceptance is the owner's sole approval.
 - Deployment, backend services and external asset packs are separate tasks, never incidental work. A debug log does not establish a Firebase deployment configuration.
 
 ## Start and finish
