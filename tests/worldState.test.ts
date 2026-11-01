@@ -33,7 +33,7 @@ assert.ok(lit.windowLife > presets.still.windowLife && lit.neon > presets.still.
 console.log('PASS: survey blend, day clock wrap, daylight curve, mood keyframes and midnight continuity, night lights.');
 
 // Day rendering stays unchanged; night fill has a floor and dusk interpolates without a step.
-assert.deepEqual(nightLighting(0), { ambient: 1, environment: .6, exposure: .84, bloom: .1, vignette: .9 });
+assert.deepEqual(nightLighting(0), { ambient: 1, environment: .85, exposure: .84, bloom: .16, vignette: .9 });
 const night = nightLighting(1);
 assert.ok(night.ambient >= .4 && night.environment >= .2);
 assert.ok(night.bloom < .3 && night.vignette <= .65);

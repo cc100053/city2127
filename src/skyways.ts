@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { arc, bake, box, chrome, leaf, leafyCrown, paint, stone, trail, trim } from './cityRig.ts';
+import { arc, bake, box, skyGlass, leaf, leafyCrown, paint, stone, trail, trim } from './cityRig.ts';
 import { changeSites, gardenDecks, midDecks, sweepway } from './layout.ts';
 import { routes } from './mobility.ts';
 import layout from './odaiba-layout.json' with { type: 'json' };
@@ -95,7 +95,7 @@ function parapet(curve: T.Curve<T.Vector3>, offset: number, samples: number) {
 
 function sphere(root: T.Object3D, [x, y, z]: P3, r: number, deckRadius?: number) {
   const g = new T.Group(); g.position.set(x, y, z); root.add(g);
-  g.add(new T.Mesh(new T.SphereGeometry(r, 48, 24), chrome));
+  g.add(new T.Mesh(new T.SphereGeometry(r, 48, 24), skyGlass));
   // Hairline mullions (r5 pass 3): the panel grid reads only up close, so from the hero pose the sphere is one silver ball, not a geodesic dome.
   for (let i = 0; i < 6; i++) { const rib = new T.Mesh(new T.TorusGeometry(r + .05, .09, 4, 64), trim); rib.rotation.y = i * Math.PI / 6; g.add(rib); }
   for (const f of [-.5, 0, .5]) { const lat = new T.Mesh(new T.TorusGeometry(Math.sqrt(1 - f * f) * r + .05, .11, 4, 64), trim); lat.rotation.x = Math.PI / 2; lat.position.y = f * r; g.add(lat); }

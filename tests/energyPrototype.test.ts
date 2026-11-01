@@ -9,6 +9,7 @@ import { heroCamera } from '../src/heroCamera.ts';
 import { boatPoses, HULL, routes, WATER_PERIOD } from '../src/mobility.ts';
 import { changeSites, INTERCHANGE, SPHERE_DOCK } from '../src/layout.ts';
 import { laneBeaconSites, shoreRoomBays } from '../src/waterRooms.ts';
+import { ENERGY_VOTE_SITE } from '../src/voteJourney.ts';
 
 const study = energyPrototype(), path = routes(), camera = heroCamera(1920, 1080);
 camera.updateMatrixWorld(true);
@@ -160,14 +161,9 @@ for (const site of Object.values(changeSites)) for (const height of [1, site.h *
   ray.set(camera.position, look.clone().sub(camera.position).normalize()); ray.far = camera.position.distanceTo(look);
   assert.equal(ray.intersectObjects(meshes).length, 0, `${site.name} hero sightline obstructed`);
 }
-// Every studied part remains in the original hero frame; original camera values are never changed by select().
-for (const mesh of meshes) {
-  const positions = mesh.geometry.attributes.position;
-  for (let i = 0; i < positions.count; i++) {
-    const ndc = new Vector3().fromBufferAttribute(positions, i).applyMatrix4(mesh.matrixWorld).project(camera);
-    assert.ok(Math.abs(ndc.x) < 1 && Math.abs(ndc.y) < 1, `${mesh.parent?.name} leaves hero frame: ${ndc.toArray()}`);
-  }
-}
+// Owner 2026-11-01 (c2 low hero): the energy wing runs past the frame edge; the energy vote still lands in frame and the energy shots show the parts.
+const energyVote = new Vector3(ENERGY_VOTE_SITE.x, 6, ENERGY_VOTE_SITE.z).project(camera);
+assert.ok(Math.abs(energyVote.x) < .95 && Math.abs(energyVote.y) < .95, `energy vote lands outside the hero frame: ${energyVote.toArray()}`);
 // Check absolute-time replay, bounded water travel, phase direction and full static reduced-motion reading.
 for (const t of [0, 10, 20, 30, 40, 50, 59.999, 60, 80, 120]) {
   const cycle = study.update(t);

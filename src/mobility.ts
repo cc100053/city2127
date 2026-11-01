@@ -72,8 +72,6 @@ export const podShare=(level:number,index:number)=>{const q=(index*.618)%1;retur
 export const walkerRoute=(index:number)=>index%5<4?index%2:2+Math.floor(index/5)%4;
 /** Interchange transfers: even people step off the boat and walk ashore, odd walk out, queue at the head and board while it is docked. */
 export const TRANSFERS=16;
-/** Resting guide-strip scale on the two loops (a passing craft lights strips to 3–10). */
-export const GUIDE_FLOOR=.7;
 /** Human-led and autonomous service both retain a complete transit system. Ports 1..5 span the readable alternatives. */
 export function automationActivity(share:number) {
   const level=T.MathUtils.smoothstep(share,1/6,5/6);
@@ -187,7 +185,7 @@ export function dockMotion(time:number) {
 export function guideStrength(sample:number,head:number,closed:boolean) {
   let d=sample-head;
   if(closed)d=((d+.5)%1+1)%1-.5;
-  return Math.max(0,1-Math.abs(d-.022)/.07);
+  return Math.max(0,1-Math.abs(d-.022)/.035); // short streak: one craft lights ~7 of a loop's 96 strips
 }
 
 function material(color:string,emissive=false) {
@@ -668,11 +666,12 @@ export function mobility(scene:T.Scene) {
   seams.name='carriageway-seams';laneGuides.name='carriageway-guides';seams.receiveShadow=laneGuides.receiveShadow=true;scene.add(seams,laneGuides);
   const berthLight=new T.PointLight('#b9e2cf',0,60,2);berthLight.position.set(SPHERE_DOCK[0],SPHERE_DOCK[1]+4,SPHERE_DOCK[2]);scene.add(berthLight);
   const ixLight=new T.PointLight('#b9e2cf',0,45,2);ixLight.position.set(INTERCHANGE.mast[0],INTERCHANGE.deck+4,INTERCHANGE.mast[2]);scene.add(ixLight);
-  const guideMaterial=new T.MeshBasicMaterial({color:new T.Color('#88d6d3').multiplyScalar(1.6)});
+  const guideMaterial=new T.MeshBasicMaterial({color:new T.Color('#88d6d3').multiplyScalar(3)});
   // Guide strips on every corridor: district loop, sphere approach, shore lane, interchange approach (96 each).
   const airCurves=[path.air,path.approach,path.shore,path.ixApproach],closed=[true,false,true,false];
   const guides=fleet(scene,[part([.36,.1,2.1],[0,0,0],guideMaterial,.03)],airCurves.length*96,'air-corridor-guides');
   const samples=airCurves.map(route=>Array.from({length:96},(_,i)=>({p:route.getPointAt(i/96),t:route.getTangentAt(i/96)})));
+  const stripLength=airCurves.map(route=>route.getLength()/96*1.05);
   // Both loops fly at the district loop's original 0.004 laps/s ground speed.
   const lanes=[path.air,path.shore],laneLength=lanes.map(l=>l.getLength()),speed=.004*laneLength[0];
   const SLOTS=LOOP_AIRCRAFT+2,heads=new Float32Array(SLOTS),weights=new Float32Array(SLOTS),corridor=new Uint8Array(SLOTS);
@@ -1049,9 +1048,10 @@ export function mobility(scene:T.Scene) {
     for(let r=0;r<airCurves.length;r++)for(let j=0;j<96;j++){
       let strength=0;
       for(let i=0;i<SLOTS;i++)if(corridor[i]===r)strength=Math.max(strength,guideStrength(j/96,heads[i],closed[r])*weights[i]);
-      // Loops keep a faint fixed-size dotted line between craft so the corridor reads as infrastructure, not empty sky.
-      const sample=samples[r][j];pose.position.copy(sample.p).y-=2;pose.rotation.set(0,Math.atan2(sample.t.x,sample.t.z),0);
-      pose.scale.setScalar(Math.max(strength*(closed[r]&&activity?3+activity.level*7:3),closed[r]?GUIDE_FLOOR:0));guides.set(r*96+j,pose);
+      // Owner 2026-11-01: lit strips stretch to meet their neighbours, so each craft trails one tapered light streak; between craft the
+      // sky stays clear (the resting dotted line read as noise against the low hero's sky).
+      const sample=samples[r][j],width=strength*(closed[r]&&activity?3+activity.level*7:3);pose.position.copy(sample.p).y-=2;pose.rotation.set(0,Math.atan2(sample.t.x,sample.t.z),0);
+      pose.scale.set(width,width,width>0?Math.max(width,stripLength[r]/2.1):0);guides.set(r*96+j,pose);
     }guides.flush();
   };
   /** Street traffic as simulated, for checks: every lane slot (lane travel `x`, metres behind its free slot, length, speed, in its bay)

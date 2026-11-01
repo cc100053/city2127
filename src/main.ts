@@ -62,7 +62,7 @@ try {
     const capture=new RoomEnvironment(),pmrem=new T.PMREMGenerator(renderer);
     // Reflections see a softened, warmer copy of the sky: the generated blue is too saturated for bay water and glass at golden hour.
     const soft=document.createElement('canvas');soft.width=texture.image.width;soft.height=texture.image.height;
-    const context=soft.getContext('2d')!;context.filter='saturate(.55) sepia(.12) brightness(1.04)';context.drawImage(texture.image,0,0);
+    const context=soft.getContext('2d')!;context.filter='saturate(.8) sepia(.06) brightness(1.08)';context.drawImage(texture.image,0,0);
     const reflected=new T.CanvasTexture(soft);reflected.colorSpace=T.SRGBColorSpace;reflected.mapping=T.EquirectangularReflectionMapping;
     capture.background=reflected;
     capture.traverse(object=>{if(object instanceof T.Mesh && object.material instanceof T.MeshStandardMaterial)object.visible=false;});
