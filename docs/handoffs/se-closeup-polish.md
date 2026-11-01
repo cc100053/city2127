@@ -1,7 +1,7 @@
 # se-closeup-polish — SE 集約 focal 近鏡樣板
 
 - Owner: cc100053（唯一驗收人；owner 一人同意即合格）
-- Status: IN_PROGRESS — R4 等 owner review
+- Status: DONE — owner 2026-11-01 接受 R4；暫時唔套用 SW／NW（owner 指示）
 - Branch: `feat/se-closeup-polish`
 - Base commit: `4248e8a23f45b9af9a471678cc7d68dcf5245dd2`
 - Last verified commit: 本 commit（R4；root test／build／diff-check PASS）
@@ -95,3 +95,10 @@ Owner review R2 → 決定 −1 細嘅處理（見對話：鏡頭按狀態微調
 - `prefersReducedMotion` 搬去 `siteRuntime.ts` export（避免 circular import）；減少動態時升降艙停 y=19，有 test。
 - 驗證：`npm test` exit 0、build ✓、diff-check clean；meshes low 34／mixed 42／high 29。截圖：[R4 對目標](../../artifacts/se-closeup-polish/r4/vs-target.jpg)、[−1 日](../../artifacts/se-closeup-polish/r4/se-rung-1-day.png)、[−1 夜](../../artifacts/se-closeup-polish/r4/se-rung-1-night.png)、[R3 vs R4](../../artifacts/se-closeup-polish/r4/vs-r3.jpg)。
 - Opus R4 判斷：唔再似玩具，店面暖光、咖啡座、樹、夜景都讀到；餘下：拱頂木色偏橙、行人喺呢個距離仍然細、左邊大格仔樓佔畫面約四分一、後面粉紅傘仍然露少少。FPS 未量。
+
+## Owner 接受（2026-11-01）
+
+- Owner 接受 R4 做 SE 樣板；**暫時唔套用到 SW／NW**。
+- FPS（headless Chrome，1920×1080 DPR1，vsync）：見 [VALIDATION](../VALIDATION.md) SE close-up 段；+1 第一輪 53–56、重測 60，其餘 60。
+- 流程寫成 Skill：`.claude/skills/closeup-polish/SKILL.md`。
+- 未做：展覽機 FPS、draw call、真人辨認；拱頂木色偏橙、行人細、左邊大樓佔畫面約四分一、粉紅傘少量露出（owner 已接受）。
