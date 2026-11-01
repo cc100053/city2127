@@ -154,7 +154,7 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
 // complete every ladder (so both runs reach the same tiers) after the districts froze their rung-2 seeds from differently ordered
 // histories; alternating guests then bring every site back to mixed, where those seeds decide the slot distribution.
 {
-  const histories = [[1, -1], [-1, 1]].map(prefix => [...prefix, ...Array<1>(20).fill(1), ...Array.from({ length: 140 }, (_, i) => i % 2 ? -1 : 1)]);
+  const histories = [[1, -1], [-1, 1]].map(prefix => [...prefix, ...Array<1>(6).fill(1), ...Array.from({ length: 140 }, (_, i) => i % 2 ? -1 : 1)]);
   const districtRoots = [sites.magnetEast.automationDistrict!.root, sites.dogenzakaSouth.sharingDistrict!.root,
     sites.stationEastPark.environmentDistrict!.root, sites.centerGaiRear.concentrationDistrict!.root];
   const matrices = () => districtRoots.map(root => root.children.filter(o => o instanceof T.InstancedMesh && !['meter-pulse', 'plaza-crowds', 'service-drones'].includes(o.name))
@@ -237,7 +237,7 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
 }
 
 // P10 pairings need both sites at rung ±3, which a single first proposal no longer reaches: an agreeing low crowd completes every
-// ladder for solar pods (P11's agreeing high crowd covers the four high pairings).
+// ladder for solar pods; then an agreeing high crowd covers the four high pairings.
 {
   const { ctx } = exhibitionFixture();
   try {
@@ -252,6 +252,14 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
       ok(staff(ctx, 'guest-left'));
     }
     assert.deepEqual((currentView(ctx) as ExhibitionCityView).layout.tiers, { nw: -3, ne: -3, sw: -3, se: -3 });
+    for (let i = 20; i < 80; i++) {
+      const session = ok(createProposalSession(ctx).response);
+      const outcome = submitProposal(ctx, { submissionId: `high-crowd-${i}`, guestSessionId: session.session.id, expectedRevision: i,
+        answers: answersForVotes(METER_CONTRACTS, Object.fromEntries(METER_CONTRACTS.map(m => [m.axis, 1])) as Record<string, 1>) });
+      ok(outcome.response); applyEvent(outcome.event, 8004 + i * 4);
+      ok(staff(ctx, 'guest-left'));
+    }
+    assert.deepEqual((currentView(ctx) as ExhibitionCityView).layout.tiers, { nw: 3, ne: 3, sw: 3, se: 3 });
   } finally { ctx.db.close(); }
 }
 

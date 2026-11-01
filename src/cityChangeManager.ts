@@ -1,11 +1,11 @@
-import { emptyEnergyConfiguration, type EnergyConfiguration } from '../survey/src/shared/energy.ts';
+import { emptyEnergyConfiguration, type EnergyChoice, type EnergyConfiguration, type EnergyPart } from '../survey/src/shared/energy.ts';
 import type { EnergyRuntime } from './energyRuntime.ts';
 import type * as T from 'three';
 import { CHANGE_CATALOG, SITE_IDS, environmentParkTarget, selectExhibitionSiteVariants, selectSiteVariants, variantLayers, type SiteId, type SiteLayerDefinition, type SiteLayerId, type SiteVariantId } from './changeCatalog.ts';
 import type { BuiltSite, BuiltSiteMap, SiteLayerRuntime } from './siteBuilders/index.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 import type { EnvironmentParkDiagnostics } from './siteBuilders/siteRuntime.ts';
-import type { EnvironmentDistrictDiagnostics } from './districtMeters.ts';
+import type { EnvironmentDistrictDiagnostics, ChangedPoint } from './districtMeters.ts';
 import type { Scores, SurveyView } from './surveyView.ts';
 import { pickHeadline } from '../survey/src/shared/cityView.ts';
 import type { ExhibitionLayout, LotSocketId, SurveyEventKind } from './surveyView.ts';
@@ -46,7 +46,7 @@ export interface SiteDiagnostic {
 }
 
 /** `headline`: the one change a live result presents with pulses, marker and resident card; it comes first in the returned list. */
-export type CarrierChange = { socketId: LotSocketId; focal: boolean; district: boolean; headline?: boolean; energy?: { before: EnergyConfiguration; after: EnergyConfiguration } };
+export type CarrierChange = { socketId: LotSocketId; focal: boolean; district: boolean; points?: readonly ChangedPoint[]; focalOnly?: boolean; headline?: boolean; energy?: { before: EnergyConfiguration; after: EnergyConfiguration; part?: EnergyPart } };
 
 export type CityChangeDiagnostics = Readonly<Record<SiteId, SiteDiagnostic>>;
 
@@ -109,7 +109,7 @@ export class CityChangeManager {
   }
 
   /** V2 bands are authoritative; sampleAt is the rendered present when now schedules a future start. */
-  applyExhibitionLayout(layout: ExhibitionLayout, kind: SurveyEventKind, now: number, slotSeeds?: Scores, sampleAt = now): CarrierChange[] {
+  applyExhibitionLayout(layout: ExhibitionLayout, kind: SurveyEventKind, now: number, slotSeeds?: Scores, sampleAt = now, votes?: Scores & { energy?: EnergyChoice }): CarrierChange[] {
     const automationHub = this.sites.magnetEast.automationHub;
     const commonsPlaza = this.sites.dogenzakaSouth.commonsPlaza;
     const concentrationTower = this.sites.centerGaiRear.concentrationTower;
@@ -122,8 +122,9 @@ export class CityChangeManager {
     const fresh = kind === 'city-state-updated' && !prefersReducedMotion();
     const immediate = !fresh;
     // Only the headline site pulses and blinks its marker; other live changes settle quietly.
-    const headline = fresh && this.exhibitionLayout ? pickHeadline(this.exhibitionLayout, layout) : undefined;
+    const headline = fresh && this.exhibitionLayout ? pickHeadline(this.exhibitionLayout, layout, votes) : undefined;
     const quiet = (socketId: LotSocketId) => !headline || !('socketId' in headline) || headline.socketId !== socketId;
+    const previousLayout = this.exhibitionLayout;
     this.exhibitionLayout = layout;
     // Quiet sites keep whatever marker blink an earlier result left; this result adds none.
     const earlier = SITE_IDS.filter(id => quiet(SITE_SOCKETS[id])).map(id => [...this.motions.get(id)!.values()].map(m => [m, m.fresh] as const)).flat();
@@ -160,9 +161,12 @@ export class CityChangeManager {
     ] as const;
     for (const [siteId, siteChanged] of changed) if (siteChanged && fresh && !quiet(SITE_SOCKETS[siteId])) this.markFresh(siteId, now);
     const energy = this.energy?.setTarget(layout.energy ?? emptyEnergyConfiguration(), now, immediate);
-    const changes: CarrierChange[] = [...(energy ? [{ socketId: 'ne' as const, focal: false, district: true, energy, ...(headline && 'energy' in headline ? { headline: true } : {}) }] : []),
+    const changes: CarrierChange[] = [...(energy ? [{ socketId: 'ne' as const, focal: false, district: true, energy: { ...energy, ...(headline && 'energy' in headline && headline.part ? { part: headline.part } : {}) }, ...(headline && 'energy' in headline ? { headline: true } : {}) }] : []),
       ...(Object.keys(districts) as LotSocketId[]).map(socketId => ({ socketId, focal: focal[socketId],
-        district: before[socketId] !== JSON.stringify(districts[socketId]?.getConfiguration()), ...(quiet(socketId) ? {} : { headline: true }),
+        district: before[socketId] !== JSON.stringify(districts[socketId]?.getConfiguration()),
+        focalOnly: !!previousLayout && Math.max(Math.abs(previousLayout.tiers[socketId]), Math.abs(layout.tiers[socketId])) <= 1,
+        ...('changedPoints' in (districts[socketId] ?? {}) ? { points: (districts[socketId] as { changedPoints: ChangedPoint[] }).changedPoints } : {}),
+        ...(quiet(socketId) ? {} : { headline: true }),
       })).filter(change => change.focal || change.district)];
     return changes.sort((a, b) => Number(!!b.headline) - Number(!!a.headline));
   }

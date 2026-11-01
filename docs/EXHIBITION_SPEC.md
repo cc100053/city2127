@@ -53,11 +53,11 @@ Root 用固定360px右上卡片（2026-10-04由左移右，避免遮住focal sit
 
 ### E4 Q3能源生活取捨（2026-10-24使用者確認）
 
-Q3採[能源計劃正式四選項](ENERGY_CITY_PLAN.md#e4正式接入2026-10-24)，另外三題原文／effects不變。每位居民仍一份四題提案；能源不按low/mixed/high排列。四類票獨立累計；每類至少2票且`票數×5≥能源回答總數+4`才出現；水庭／翼在`票數×5≥2×(能源回答總數+4)`時兩庭／大翼，否則一庭／小翼。環／島各最多一組；設備可共存，翼尺寸及同一庭有無互斥。這是展示門檻，並非容量或供電佔比；前四個基準席位不代表未記錄居民。第一票可沒有可見設備差異。
+Q3採[能源計劃正式四選項](ENERGY_CITY_PLAN.md#e4正式接入2026-10-24)，另外三題原文／effects不變。每位居民仍一份四題提案；能源不按low/mixed/high排列。四類票獨立累計；每類至少2票且`票數×5≥能源回答總數+4`才出現；水庭／翼在`票數×5≥2×(能源回答總數+4)`時兩庭／大翼，否則一庭／小翼。環／島各最多一組；設備可共存，翼尺寸及同一庭有無互斥。這是展示門檻，並非容量或供電佔比；前四個基準席位不代表未記錄居民。設備門檻不因第一票改變；G2 候選另外顯示能源整備狀態，視覺仍待驗收。
 
 舊cooling問題、原文及效應保留原意；新能源答案對氣候是缺席，氣候EMA／分數／刻度以有效舊氣候回答人數維持，不按能源回答數稀釋。新run維持D=0成熟混合氣候；其餘三軸如常變化與配對。外部電網為設定前提，水庭／環只儲能，軌道／核能為供電路線推演；沒有容量／可靠度／工程認證，不設災難獎勵特效。
 
-Server產出`layout.energy`，root套用模型並比較實際前後target。新第四票的旅程及lantern在沿岸能源接點，舊氣候票仍在公園；既有時間及立即恢復契約延續。結果卡只描述真實設備變化，不由本人選項推論共同結果；沒有可見差異就說能源配置延續。SQLite8新增nullable能源snapshot欄，保留schema7全部原始歷史；新舊server／City須一起更新，舊草稿重新預約、Q3重選，已保存舊ID仍可回原紀錄。
+Server產出`layout.energy`，root套用模型並比較實際前後target。新第四票的旅程及lantern在沿岸能源接點，舊氣候票仍在公園；既有時間及立即恢復契約延續。結果卡描述真實設備或整備狀態變化；G2 候選在沒有訪客相關變化時，切換所選能源的整備配置。SQLite8新增nullable能源snapshot欄，保留schema7全部原始歷史；新舊server／City須一起更新，舊草稿重新預約、Q3重選，已保存舊ID仍可回原紀錄。
 
 ## 累積與權威 layout
 
@@ -65,7 +65,7 @@ E4後automation／publicSharing／urbanConcentration每軸每份提案只有一�
 
 **刻度 A（2026-10-13 user決定，取代舊刻度）**：實際 run 嘅 M 多數只喺 ±5 之內，所以 layout 讀「展示分數」`D=clamp(M×g(n),-12,12)`，n 係目前累積觀眾數。`g(n)=0.85+1.55×min(1,(n−1)/11)`：第一位觀眾 ×0.85（溫和開場，第一票 ±1 只到 D=±6.375；2026-10-27 起再受每份一格限制，第一位只令一個 focal site 轉），之後逐位加強，第 12 位起固定 ×2.4（第一格門檻 |D|≥1.5 相當於 M≈±0.63）。計分 reducer 不變；提案紀錄嘅 before/after layout 讀取時由分數同觀眾數重新計算，所以舊歷史一齊轉用新刻度，冇資料遷移。新舊比較見 DEV `?scaleLab` 及 [handoff](handoffs/archive/meter-scale-a.md)。
 
-**分級階梯＋headline（2026-10-27 user決定，取代 `D≤−3／D≥3` 一次翻轉整個 band）**：每個 site 有 −3…+3 格（`layout.tiers`）。目標格由 D 決定：`|D|≥1.5／4／7` 分別到 ±1／±2／±3；退返 mixed 要 D 再過門檻 2（遲滯，例如由 +1 退到 0 要 `D≤−0.5`）。**每份提案最多令一個 site 移一格**：先揀差距最大嘅 site，打和揀今位訪客投向嗰個方向嘅 site，再打和按觀眾數輪替（[ladderStep](../survey/src/shared/cityView.ts)）。所以格係歷史 fold 出嚟（同 slotSeeds 一樣 O(guests)，由 active proposals 重算；Undo、舊歷史、snapshot 無資料遷移），唔係單一分數嘅純函數。
+**分級階梯＋headline（2026-10-30 G1）**：每個 site 有 −3…+3 格（`layout.tiers`），累積目標由 D 的 ±1.5／4／7 門檻決定。每份提案最多令一個 site 移一格：優先沿今位訪客投票方向（中間票向 0），候選移動後須在目標 ±1 格內；選目前離目標最遠者，打和偏向非中間票，再按觀眾數輪替。沒有候選時回退原有遲滯規則（退向 mixed 要再過門檻 2）。±1 是候選條件，並非全部 site 每一刻都在目標 ±1 格內；目標變動及 fallback 都可造成更大差距。[ladderStep](../survey/src/shared/cityView.ts) 由 active proposals fold（O(guests)），Undo、舊歷史及 snapshot 均重算，無資料遷移；既有 run 重開後城市可能改變，展前應開新 run 或由 owner 接受。Root 與 survey 須一起更新。
 
 | 格 | 自動化 nw | 共有 sw | 集約 se |
 | --- | --- | --- | --- |
@@ -76,7 +76,7 @@ E4後automation／publicSharing／urbanConcentration每軸每份提案只有一�
 
 P10 配對要兩個 site 同一邊都到 ±3。環境軸 E4 後凍結喺 mixed，所以 sails／冷卻塔／屋頂／外牆唔做格（舊氣候 run 照用同一 ladder）。每個 district 第一次到 ±2 時固定該軸 `slotSeeds`（之前為 0），之後各格 slot 互相包含，唔會每票重排。
 
-Live headline（[pickHeadline](../survey/src/shared/cityView.ts)）：新到達最高格嘅 site，否則載體變化最多嘅 site，否則能源；只有 headline site 有亮 pulse／marker 同結果卡，其他變化（例如同時嘅能源門檻）靜靜過渡。
+Live headline（[pickHeadline](../survey/src/shared/cityView.ts)）：先揀向今位訪客投票方向移動的 site（中間票向 0），其次揀該訪客選的能源部件有變的情況；否則沿用新到達最高格、載體變化最多、能源的次序。能源部件同時變動時，鏡頭與結果卡跟所選部件；只有 headline site 有亮 pulse／marker 同結果卡，其他變化（例如同時嘅能源門檻）靜靜過渡。
 
 Headline 近鏡（2026-10-27；時間線於 2026-10-29 修訂）：live 結果先在 hero 播完 2.62 秒 vote journey，再用 2 秒推近 headline，停定 0.5 秒後於 5.12 秒開始 3 秒場景過渡。4.62–13 秒停留，13 秒與 ambient 卡同步開始用 2 秒返回 hero；原因文字於 8.12 秒出現。八個 site shot（四站各 focal／district）及五個能源 shot 用常數表，保留 hero 方向及海／地標定位；focal 與 district 同時改以 district 為準。能源鏡頭與結果卡共用部件優先次序，移除設備亦看原位置。新結果從現有位置先平滑回 hero；snapshot／reset／Undo／reconnect／reduced motion／legacy／追趕中的結果立即 hero。無 headline 不推近；如接續仍在播放的近鏡，先從當前位置用 2 秒平滑返回，再保持 hero 並恢復操作。普通 standalone 及其他 DEV review 不自動播放；DEV 可用 `?shot=` 逐鏡檢查。近鏡的模型／材質打磨及真人閱讀／展示硬件驗收另作任務。
 

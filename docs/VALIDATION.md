@@ -292,6 +292,10 @@ Survey／module-swap source未改，未另跑本機獨立suite；整合與main C
 
 2026-10-27 A整合完成：feature `d83ee62`、無衝突merge `ba54961` tree相同；整合後root test/build/committed whitespace PASS。Main `7ea9ec0100bebd24a1e9144dde1b9006bc23995a`的[CI 40421964460](https://github.com/cc100053/city2127/actions/runs/40421964460)實際completed／success，root／survey／module-swap及whitespace全部通過。後續僅Markdown紀錄，依paths規則skip；runtime及最終browser source hashes不變。所有owned services停止。
 
+## Guest agency G1 — 2026-10-30
+
+[agencySim](../survey/scripts/agencySim.ts) is a deterministic gate in survey `npm test`: 200 runs × 40 simulated leaning guests, fixed seed, E4 energy votes. Current implementation: 95.5% guest-directed site moves (including neutral toward zero), 2.4% opposite, 0.1% energy-only, 1.9% no change; 54% of moves reverse that site's previous move; the largest observed absolute tier–target distance was 6 (mean 0.80). This assumption-based model is not a guarantee for every proposal or real visitors. The historical figures below describe the 2026-10-27 implementation, not G1.
+
 ## 分級階梯＋headline — 2026-10-27
 
 `feat/meter-ladder`（base `047cb2c`），[handoff](handoffs/meter-ladder.md)。User 批准咗：±3 格、|D| 1.5／4／7、遲滯 2、每份提案最多一格。
@@ -406,3 +410,21 @@ Closeup-zoom 追加 live：水庭第二次 4/4、no-op 1/1；[A/B](../artifacts/
 Closeup-zoom 整合候選（2026-10-30）：最新 main `f91236b`、feature `86931ed` no-ff 整合結果 `f77df26`；root `npm test`、`npm run build`、整合 diff whitespace PASS。[整合後 live 水庭](../artifacts/closeup-zoom/final/integration-live/browser.json) 4/4、errors 0。原 F／A 失敗與未驗項不變；main CI 以實際執行結果為準。
 
 Closeup-zoom main CI：[run 41019517908](https://github.com/cc100053/city2127/actions/runs/41019517908) 在 `56175a7eaf49503abbc796f8150a0af4a83e135a` 通過 root、survey、module-swap 及 whitespace；其後此純文件紀錄不改 runtime。
+
+### G2 能源保底候選（2026-10-31）
+
+此候選尚待 coordinator 視覺 review 和 owner 真人辨認，不等於 G6 驗收。Root 與 survey 的 `npm test`／`npm run build` 已通過；四類各 40 份中間票，以及 200×40 偏向模型均檢查 guest headline，後者仍是分佈假設，不是觀眾行為證據。能源 pipeline 檢查了 strict wire、立即 snapshot、Undo／重啟、及 320 秒船隊路線對新海上物件的保守淨空；並非全部地標／空中交通淨空的證明。
+
+Scratch Vite 5199、臨時 SQLite／server、Chrome 156.0.8078.74、macOS 27.0.1／Apple M6、1920×1080 DPR1：四類各自首次及成熟設備重複票 live 的 4.9／6.6／9.5 秒原圖與實際取樣時間、E4 Undo／重連／reset／reduced motion 原圖保存在 relay G2 result 所指路徑。E4 瀏覽器回歸通過；G6 的 40 份 live、其他瀏覽器及 owner 一人在家的兩秒辨認仍未完成。
+
+同角度 baseline→首次保底，每個狀態取三個 renderer 採樣，以非陰影重繪的最低 calls 比較：水庭 829→835（+0.72%）、環 643→649（+0.93%）、翼 591→597（+1.02%）、島 677→683（+0.89%）。所取樣窗口分別約 59.6–60.1 FPS，為上述本機 headless Chrome 的數字，不代表展覽硬件表現。部分樣本含額外陰影重繪但沒有配對的重繪基準，不能宣稱完整陰影最壞增幅已驗證。實際原圖與所有 samples 見 relay result；初次單樣本偶遇陰影的異常讀數保留。
+
+### G7 slot viewpoints 候選（2026-10-31）
+
+功能及畫面仍是候選，以下測試不等於 owner 真人驗收或 G4／G6 通過。Scratch Vite 5197、臨時 SQLite 與真實 HTTP／WebSocket；macOS 27.0.1、Apple M6、headless Chrome 156.0.8078.74、1920×1080 DPR1。40 份真實提案每份有 4.9／6.6／9.5 s 原圖及 request 相對時間；程式依 `pickGuestHeadline` 與鏡頭位置最近的 authored pose 核對 headline 類別及時間，40/40 無該等失敗、page exception 0，錄到 22 種 shot（含 focal／能源），不等於逐圖真人辨認通過。這 40 份沒有選中街道；其後只調整街道 pose，另用真實 8 票序列在第 8 票選中街道，保存結果卡與三時點原圖。位置資料及選擇規則不因該 pose 修改而改變。
+
+固定 seed 1234 的隔離 DEV harness 拍攝 NW／SW／SE 各 ±2→±3、±3→±2、0→±2 三時點；0→±2 不是單份真實提案，因 owner 規則每份最多移一格。NW 改 pose 後另重拍六組；各組有變動 positions、page exception 0。臨時 harness 已還原，原圖、逐次 timestamp、真實提案資料及失敗試圖保存於主工作區 `.task-relay/guest-agency/` 的 `g7-live40-final3/`、`g7-live-street-sequence/`、`g7-seeded-transitions/`、`g7-seeded-nw-route/` 等目錄，不放入 repo。
+
+自動測試檢查覆蓋表、覆蓋數／平手輪替、focal／空 points fallback、pulse slot 正反及 stale 清除；64 個保守目標包圍盒在進場及 hold 取樣沒有自身跨 near plane，10 座 SE 塔的保守完整高度在最大 hold push 時落中間三分之二。這不是全場景 near-plane、動態交通與第三方遮擋的證明。街道真實第 8 票可見道路、車流和海，但左側有近景柱，卡片遮住部分海；SW court3 與 focal 重疊及若干 SE 畫面辨識仍須 review。早期 NW 前景飛行器遮擋和 SE 塔裁切已保存失敗原圖，候選改角後有對照，不能外推所有時間、seed 與 slot。G2 水庭框架、未配對陰影重繪最壞 draw calls、展覽硬件與 owner 一人在家的兩秒辨認仍未驗。
+
+G7 鏡頭效能（同機、同 Chrome、同日、1920×1080 DPR1，NW／SW／SE 全 high；固定 shot、renderer `data-fps` 與 `data-draw-calls`）：三個原 district 視角各取 3 次，新 64 視角各取 1 次。原 NW／SW／SE district 的 FPS 中位數均 60.0，calls 中位數分別 838／752／718；新 NW 12 個 60.0–60.1 FPS、522–860 calls；SW 16 個 59.9–60.1 FPS、448–731 calls；SE 36 個 59.8–60.1 FPS、489–1191 calls。SE 最高為 `se:tower6`，比原 SE 中位數高 65.9%；單次取樣和 shadow refresh 未配對，不能推斷穩定增幅或最壞情況，亦不作 performance gate PASS。所有原始數字保存在 relay `g7-performance/browser.json` 和 `summary.json`；此為本機數字，非展覽硬件。

@@ -170,7 +170,7 @@ const DISTRICT_RESULTS = {
 
 /** The result card and camera follow the same first changed energy location. */
 export function energyChangedPart(before: EnergyConfiguration, after: EnergyConfiguration) {
-  return (['waterGardens', 'receiver', 'flywheel', 'island'] as const).find(part => before[part] !== after[part]) ?? null;
+  return (['waterGardens', 'receiver', 'flywheel', 'island'] as const).find(part => before[part] !== after[part] || before.activity?.[part] !== after.activity?.[part]) ?? null;
 }
 
 /** Evidence is the renderer's before/after targets, including visible pairings and shuffled slots. */
@@ -202,8 +202,12 @@ export function residentResult(proposal: ExhibitionProposal, changes?: readonly 
     }
     if (change.energy) {
       const { before, after } = change.energy;
-      const part = energyChangedPart(before, after);
-      if (part === 'waterGardens') {
+      const part = change.energy.part ?? energyChangedPart(before, after);
+      if (part && before[part] === after[part] && before.activity?.[part] !== after.activity?.[part]) {
+        place = { waterGardens: '海辺の蓄電庭園', receiver: '沖の受電翼', flywheel: 'フジテレビ前・蓄電環', island: '沖のエネルギー島' }[part];
+        effect = part === 'island' ? (before.activity?.[part] ? '沖の整備船の設備配置が変わりました。' : '沖に整備船が加わりました。')
+          : before.activity?.[part] ? 'エネルギー拠点の整備フレームの配置が変わりました。' : 'エネルギー拠点に整備フレームが加わりました。';
+      } else if (part === 'waterGardens') {
         place = '海辺の蓄電庭園'; effect = `海辺の蓄電庭園は${after.waterGardens === 0 ? '配置から外れました' : `${after.waterGardens}か所の配置になりました`}。`;
       } else if (part === 'receiver') {
         place = '沖の受電翼'; effect = after.receiver === 'none' ? '海上の受電翼は配置から外れました。' : `海上の受電翼は${after.receiver === 'small' ? '小さな' : '大きな'}配置になりました。`;

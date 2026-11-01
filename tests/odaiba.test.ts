@@ -390,6 +390,7 @@ console.log(`Odaiba: ${concentration.towers.length} vertical towers, ${concentra
 // Sharing courts: open ground, clear of context, routes, P2 pavilions and P4 towers / pods in both identities; sites stay visible.
 for (const court of sharingDistrict.courts) {
   assert.equal(offGround(court.x, court.z, 20) ?? blocked(court.x, court.z, 3, 20) ?? blocked(court.x, court.z, 10, 20), undefined, `court at ${court.x},${court.z}`);
+  assert.ok(Math.hypot(court.x - changeSites.sw.x, court.z - changeSites.sw.z) > 60, 'sharing courts clear the commons focal site');
   assert.ok(concentration.towers.every(t => Math.hypot(t.x - court.x, t.z - court.z) > 48) && concentration.pods.every(p => Math.hypot(p.x - court.x, p.z - court.z) > 36), 'courts share no ground with towers / pods');
   assert.ok(serviceDistrict.bays.every(b => Math.hypot(b.x - court.x, b.z - court.z) > 54), 'courts share no ground with staffed pavilions');
 }

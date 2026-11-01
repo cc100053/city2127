@@ -515,11 +515,50 @@ export function energyPrototype() {
     markers.boundingSphere = new T.Sphere(new T.Vector3(3.4, 2.6, 42.5), 9);
     node.add(markers); return markers;
   });
+  // Two service-frame arrangements remain visible even before the larger facility is installed.
+  const activity = Object.fromEntries(([
+    ['waterGardens', [-335, 9.8, -162]], ['receiver', [110, 0, -438]],
+    ['flywheel', [-28, 80, -53]], ['island', [-96, 0, -470]],
+  ] as const).map(([part, position]) => {
+    const frames = [1, 2].map(mode => {
+      const group = new T.Group(); group.name = `energy-${part}-activity-${mode}`;
+      group.position.set(position[0], position[1], position[2]);
+      if (part === 'waterGardens') group.scale.setScalar(.7);
+      root.add(group);
+      if (part === 'island') {
+        // A service vessel sits alongside the future island rather than claiming a reactor is already present.
+        box(group, [20, 2, 8], [0, 0, 0], trim);
+        box(group, [17, .6, 7], [-1, 1.3, 0], stone);
+        const bow = new T.Mesh(new T.ConeGeometry(4, 7, 4), trim);
+        bow.rotation.z = -Math.PI / 2; bow.rotation.x = Math.PI / 4; bow.position.set(13, 0, 0); group.add(bow);
+        box(group, [4, 4, 5], [-6, 3.5, 0], stone);
+        box(group, [3.6, 1.3, .15], [-6, 4.1, 2.58], teal);
+        for (const z of [-3.2, 3.2]) box(group, [14, .25, .25], [1, 2.5, z], trim);
+        for (const x of (mode === 1 ? [-1, 3, 7] : [0, 6]))
+          box(group, [mode === 1 ? 2 : 4, mode === 1 ? 4 : 2.5, 3], [x, mode === 1 ? 3.5 : 2.75, 0], teal);
+        group.add(...bake(group)); group.visible = false; return group;
+      }
+      box(group, [18, 1.2, 5], [0, 0, 0], stone);
+      for (const x of [-7, 7]) box(group, [1, 9, 1], [x, 5, 0], trim);
+      box(group, [15, 1, 1], [0, 9, 0], trim);
+      if (part === 'flywheel') for (const x of [-7, 7]) box(group, [.35, 45, .35], [x, 31.5, 0], trim);
+      if (part === 'waterGardens') {
+        box(group, [22, 1, 9], [0, -13, 0], stone);
+        const connector = box(group, [22, 1, 5], [9, -13, 4], stone); connector.rotation.y = -Math.atan2(11, 25);
+        for (const x of [-7, 7]) box(group, [.7, 14, .7], [x, -7, 0], trim);
+      }
+      for (const x of (mode === 1 ? [-4, 0, 4] : [-5, 5]))
+        box(group, [mode === 1 ? 2 : 4, mode === 1 ? 6 : 3, 1], [x, 4.5, .7], teal);
+      group.add(...bake(group)); group.visible = false; return group;
+    });
+    return [part, frames];
+  })) as Record<import('../survey/src/shared/energy.ts').EnergyPart, T.Group[]>;
   const pose = new T.Object3D(), from = new T.Vector3(), to = new T.Vector3();
   let option: EnergyOption = 'baseline';
   let configuration: EnergyConfiguration;
   function configure(next: EnergyConfiguration) {
-    configuration = { ...next };
+    configuration = { ...next, ...(next.activity ? { activity: { ...next.activity } } : {}) };
+    for (const [part, frames] of Object.entries(activity)) frames.forEach((group, index) => { group.visible = next.activity?.[part as keyof typeof activity] === index + 1; });
     wing.visible = next.receiver !== 'none';
     wing.scale.setScalar(next.receiver === 'small' ? .65 : 1);
     garden.visible = next.waterGardens > 0;
@@ -577,5 +616,5 @@ export function energyPrototype() {
     return cycle;
   }
   select(option); update(0);
-  return { root, parts, gardens, rotor, select, configure, update, getConfiguration: () => ({ ...configuration }), get option() { return option; } };
+  return { root, parts, gardens, activity, rotor, select, configure, update, getConfiguration: () => ({ ...configuration, ...(configuration.activity ? { activity: { ...configuration.activity } } : {}) }), get option() { return option; } };
 }

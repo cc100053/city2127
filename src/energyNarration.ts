@@ -18,6 +18,8 @@ export const NARRATION: Record<Part, { title: string; steps: readonly [string, s
 /** The part a headline close-up shows, while it stays in the city: removals get the card alone. */
 export function narratedPart(shot: ShotId | null, change: CarrierChange | undefined): Part | null {
   const after = change?.energy?.after;
+  const before = change?.energy?.before, changedPart = change?.energy?.part;
+  if (before && after && changedPart && before[changedPart] === after[changedPart] && before.activity?.[changedPart] !== after.activity?.[changedPart]) return null;
   if (!after || !shot?.startsWith('energy:')) return null;
   const part = shot.slice(7) as Part;
   const present = { garden: after.waterGardens > 0, garden2: after.waterGardens === 2, ring: after.flywheel, wing: after.receiver !== 'none', island: after.island };

@@ -16,6 +16,7 @@ import { devSurveyConfig } from '../src/server/devSurvey.ts';
 import { selectAutoAnswers } from '../src/ui/autoAnswers.ts';
 import { CURRENT_EXHIBITION_QUESTIONS_PATH, EXHIBITION_QUESTIONS_PATH, ok, errorCode, staff } from './surveyFixture.ts';
 import { DISPLAY_MS } from '../src/shared/displayTiming.ts';
+import { pickGuestHeadline } from '../src/shared/cityView.ts';
 
 const current = validateExhibitionQuestionSet(loadQuestionSetFile(CURRENT_EXHIBITION_QUESTIONS_PATH));
 const legacy = loadQuestionSetFile(EXHIBITION_QUESTIONS_PATH);
@@ -82,6 +83,7 @@ try {
     lastRequest = { submissionId: `new-${i}`, guestSessionId: session.session.id, expectedRevision: session.state.revision,
       answers: session.questions.map(q => ({ questionId: q.id, optionId: q.id === 'energy-2127' ? ENERGY_CHOICES[i % 4] : q.options[1].id })) };
     const accepted = ok(submitProposal(ctx, lastRequest).response);
+    assert.ok(pickGuestHeadline(accepted.proposal.beforeLayout, accepted.proposal.afterLayout, accepted.proposal.votes), 'every energy proposal has a guest-related headline');
     assert.equal(accepted.state.scores.environmentalPriority, oldClimate);
     assert.equal(accepted.state.recentVotes.environmentalPriority, oldSaved.state.recentVotes.environmentalPriority);
     assert.equal(accepted.state.energy!.climateGuestCount, 1);

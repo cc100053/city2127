@@ -67,7 +67,7 @@ async function headlineResult(view) {
   await city.waitForFunction(count => document.querySelector('.causal-panel')?.dataset.guestCount === String(count)
     && document.querySelector('.causal-panel')?.dataset.presentation === 'result'
     && document.querySelector('.resident-card-copy')?.textContent?.includes('あなたは'), view.guestCount);
-  const proposal=view.latestProposal, headline=pickHeadline(proposal.beforeLayout,proposal.afterLayout);
+  const proposal=view.latestProposal, headline=pickHeadline(proposal.beforeLayout,proposal.afterLayout,proposal.votes);
   if(headline && 'socketId' in headline) {
     const expected=residentResult(proposal,[{socketId:headline.socketId,focal:true,district:false}]);
     assert.ok((await city.locator('.resident-card-copy').textContent()).startsWith(expected.preference));

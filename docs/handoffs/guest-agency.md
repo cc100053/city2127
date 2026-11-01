@@ -1,10 +1,10 @@
 # guest-agency — 每位 Guest 都有近鏡＋明顯變化
 
-- Owner: cc100053（產品方向 G0 決定、最終 review）；實作：待定
-- Status: PLANNED，G0 已批准（2026-10-29 owner：「跟 suggestion 去做」，並加 G7 變化位置近鏡）；未開工
+- Owner: cc100053（產品方向 G0 決定、最終 review）；實作：G3 relay worker
+- Status: G1 and G3 implemented; G2, G4–G7 and final acceptance pending
 - Branch: `feat/guest-agency`（由 verified main 開；依賴 `feat/closeup-zoom` 先 merge）
-- Base commit: `2050883`（2026-10-29 fetch，main／origin/main 0/0）
-- Last verified commit: NONE
+- Base commit: `6e3514f03e67cbe0918d8257f930b89ec0fe4346`（2026-10-30 fetch，main／origin/main 0/0；包含 closeup-zoom）
+- Last verified commit: G3 checkpoint (see Git history; checks recorded below)
 - Remote availability: NOT PUSHED
 
 ## 目標
@@ -19,7 +19,7 @@
 
 近鏡只喺 `pickHeadline` 有結果先播（[cityChangeManager.ts](../../src/cityChangeManager.ts) line 125、[main.ts](../../src/main.ts) line 199）。`pickHeadline` 只睇 before／after layout，**唔睇呢位 Guest 投咗乜**（[cityView.ts](../../survey/src/shared/cityView.ts) line 240）。
 
-[agencySim](../../artifacts/guest-agency/agencySim.ts)（真 reducer＋`ladderStep`，200 run × 40 位偏向型 Guest，唔係真人數據）：
+當時 agencySim 原型（真 reducer＋當時 `ladderStep`，200 run × 40 位偏向型 Guest，唔係真人數據；現行 gate 見 [agencySim](../../survey/scripts/agencySim.ts)）：
 
 | 每份提案結果 | 現行 |
 | --- | --- |
@@ -63,7 +63,7 @@
 以下係當時嘅選項同理由，保留做記錄。
 
 1. **Ladder 規則改做「Guest 主導」？**（建議：是，`LEAD=1`）
-   呢個改動會改「一票之聲，唔係規劃師」嘅平衡：城市會更跟住最近嗰位 Guest 搖擺。限制係 tier 永遠喺累積分數目標 ±1 格之內，所以長遠仍然係累積結果。
+   呢個改動會改「一票之聲，唔係規劃師」嘅平衡：城市會更跟住最近嗰位 Guest 搖擺。候選移動後須喺累積目標 ±1 格內；這不是所有 tier 時刻保持 ±1 的保證（目標可移動，fallback 亦不受此條件限制）。
 
    | 指標（sim） | 現行 | Guest 主導 LEAD=1 | LEAD=2 |
    | --- | --- | --- | --- |
@@ -176,18 +176,37 @@ AGENTS.md（每票影響力描述）、EXHIBITION_SPEC（分級階梯段、能�
 
 ## Known issues and blockers
 
-- 真人辨認 gate 人數／場地未定。
-- 依賴 closeup-zoom T／F 先 merge。
+- 真人辨認 gate 已定 owner 一人、在家；仍待最終執行。
+- closeup-zoom 已 merge；整合候選的視覺 gates 仍待驗證。
 - Sim 用嘅 Guest 偏向模型係假設；真實展覽可能有更多中間選項。
 - G1 改咗 replay 規則：現有 run 重新 fold 後格數會變，reload 時城市可能同之前唔同。展覽前要開新 run，或者 owner 接受。
 
 ## Next expected step
 
-1. closeup-zoom T／F merge main（G7 嘅 district 部分要同佢協調，見 G7 第 5 點）。
-2. 由 verified main 開 `feat/guest-agency`，做 G1 → G3 → G2 → G7 → G5，每個一個 checkpoint commit。
-3. G4／G6 驗證，交 review 包到 `artifacts/guest-agency/final/`。
-4. Owner 定真人辨認 gate 嘅人數同場地。
+1. Coordinator review G2 candidate and its original evidence; G1 tier–target and G2 owner decisions are recorded below.
+2. Continue independent G7／G5 work as appropriate, then G2 after the decision; complete G4／G6 and review package.
+3. Final human recognition gate: owner alone, at home (2026-10-30 decision).
 
 ## 進度
 
-（實作者開工後填）
+2026-10-30 G1：正式 shared ladder 使用 guest-led LEAD=1、原遲滯 fallback、固定 seed；server fold、Scale Lab 和 ladderSim 沿用同一函數。Simulation gate 使用正式程式，200×40 偏向模型得同向 95.5%、反向 2.4%、無變化 1.9%；neutral 向 0 算同向，並非每位真人的保證。原型只輪替三個 site，正式實作保留四個（含 legacy 氣候軸），因此結果略有不同。模擬中 tier 與累積目標距離平均 0.80、最大 6 格；每次只移一格而目標可大幅變動，LEAD 並不約束未選 site 或 fallback，需 owner 知悉。現有 run replay 可能改變城市；展前開新 run 或由 owner 接受。驗證：root 和 survey 各自 `npm test`／`npm run build` PASS；`git diff --check` 和變更文件本地連結 PASS。初次沙箱限制 loopback，允許後重跑通過；root 既有 replay fixture 已按新 ladder 更新並保留四區與配對覆蓋。Human gate 已定 owner 一人、在家，留待最終 review。G2/G3 未完成：仍可能沒有近鏡或出現反向 headline。
+
+2026-10-30 G3：live headline 優先 guest 同向 tier（中間票向 0），其次該 guest 選擇而有變的能源部件，其餘保留舊次序；能源同時多部件改變時，鏡頭、結果卡及講解跟選中部件。Root live 傳入 votes，無 votes 的 DEV／舊 callers 保留舊規則。G1 的 ±1 全域決定未改；G2 保底和 G5 歸因文案仍待實作，fallback 仍可能與 guest 投票方向相反或沒有 headline。Root 與 survey 各 `npm test`／`npm run build`、`git diff --check` 與修改文件本地連結檢查 PASS；初次沙箱測試因 loopback EPERM 失敗，以允許 loopback 重跑通過。Scratch E4 browser 回歸重試 PASS（Chrome 156.0.8078.74、1920×1080 DPR1，page exception 0）；首次結果卡等待逾時，原因未證實，兩輪原圖及完整限制見 relay G3 result。G4／G6 視覺及真人 gates 未完成。
+
+2026-10-30 G2 feasibility checkpoint：原 G1／G3 fold 的可執行反例（checkpoint 79059c6）原載 `survey/scripts/g2Counterexample.ts`：40 位依次三軸選中間、能源選蓄電環；第 2 票起環已啟用，第 3–40 票 tier、能源配置均不變，headline 為空；G2 候選後腳本已改為驗證這些票有保底 headline。只在未過門檻時累加 0–N 建設段，對第 3 票起完全無效；即使放寬至已啟用設備，單調有限進度終會滿額，同樣不能保證任意長連續投票。這是確定性反例，不依賴 sim 的觀眾分佈。G2 的「建設中有限進度」與每票保底同時成立需要額外產品決定，未宣稱已完成。
+
+當時供 owner 決定的最小方向（後由下方決定修正成有條件輪替）：保留原能源規模及佔比規則，讓每類能源根據該類累計票數的奇偶切換兩個可辨認的維護／構件配置（而非假稱持續建設）；每次選中該能源都切換，即使已滿額亦適用。選中的配置必須存於 server-authoritative layout、由相同 counts 重建，並貫通 headline、camera、card、動畫和 immediate snapshot／Undo／replay；能源互相稀釋引起的真實退回仍照實描述。這會使已成熟設施交替變化，屬批准的「未過門檻逐段建設」以外的產品語義，不能自行拍板。另一選項是保留有限建設段並明確放棄每票保證。兩者均需之後實作並完成視覺、draw calls 及 G6 gates；真人 gate 由 owner 一人在家完成。G1 owner 已定每提案最多一 site 一格，±1 只限制候選，並非全局限制。
+
+2026-10-30 owner G2 decision：加入成熟能源設施兩種可辨認配置；沒有其他與訪客相關變化時輪替，令每票有近鏡與變化。保留累積城市及 replay／Undo 一致性，驗證全部能源、滿額和重複投票；畫面及文案必須實際可辨認且準確。條件輪替不能單靠每類全部票數奇偶計算，必須按有效提案次序 fold 並重建，亦須涵蓋所選能源尚未啟用時的可見狀態。
+
+2026-10-30 G2 候選：shared ladder fold 按先前配置、該票與 site 變化切換所選能源 activity；四類各 40 次中間票及 200×40 偏向 sim 的每票 guest headline 通過。資料重播可重建 activity、Undo 恢復完整 view；本輪已拍四種首次／成熟重複票 live 原圖，E4 browser 回歸通過；三次採樣的非陰影最低 draw calls 各增加 6（約 0.7–1.0%），未配對的陰影重繪最壞值仍待驗證。詳見 VALIDATION 及 relay result。候選仍待畫面與真人 gate，不可標記 G2 驗收或合併。Owner 定每份最多一 site 一格、±1 為候選條件；真人 gate 一人、在家。
+
+2026-10-31 G7 partial checkpoint：NW／SW／SE district 將本次 pulse 同一組實際變動位置交予 `CarrierChange.points`，包括 quiet／即時更新；同一目標清空舊位置，正反方向的 slot 位置有測試。其後候選加入固定 viewpoints、覆蓋數及最久未用平手輪替、無 points fallback；真實提案與合成 seed 測試有原圖，完整視覺／near-plane、性能和 owner 真人 gate 仍待驗收。原有 `*:district` 鏡頭保留為 fallback，先推近後變化時間線未改；G2 視覺、陰影最壞 draw calls、G4／G6 和 owner 真人 gate 仍未驗收。
+
+2026-10-31 G7 候選：NW／SW／SE 將 pulse 對應 slot 座標及 ID 傳給鏡頭，64 個手寫固定視角按已聲明覆蓋數選最多、平手選最久未用，±1 保持 focal，無 points 用既有 district；NW 全城交通變化亦標記街道。40 真實 scratch 提案記錄 22 種 shot，page exception 0、方向／pose 類別及時點檢查無失敗；最後一次只調整未被該 40 次選中的街道 pose，另以真實 8 票序列觸發街道並保存三時點／結果卡。固定 seed 的 ±2↔±3 及合成 0→±2 已拍，0→±2 非真實單份提案（owner 每份一格）。原圖及時間在 relay G7 result；更多數字、方法及限制見 VALIDATION。
+
+G7 未達完整視覺驗收：64 個保守目標包圍盒只排除自身跨 near plane，未證明其他建築／飛行器全程不遮擋；部分 SE 畫面仍難辨、SW court3 與 focal 重疊需 review；街道卡片遮住部分海且左側有近景柱。SE 單次 FPS／calls 最高 1191 對原 district 中位數 718，陰影重繪未配對，性能 gate 不能宣稱通過。G2 水庭視覺與陰影最壞值、G4／G6、展覽硬件和 owner 一人在家的兩秒辨認仍待驗證。不要 merge 或將候選標記接受。
+
+最終檢查（2026-10-31）：root／survey 各 `npm test`、`npm run build` 通過；root build 有既有 JSON import attributes／chunk-size 提示。曾試兩條街道多段、不同高度與方位，最終用實際街道 `.8` 路段；真實 8 票第 8 票選中街道，車流和卡片上方海面可見，左側近景柱與其他場景的全程遮擋仍待 review。40 票使用的其他 pose 在最後一次僅街道 pose 改動時未變；街道本身已單獨以真實序列重測。原始數據與定位限制見 VALIDATION 和 relay G7 result。實作候選供 coordinator review，G7／G4／G6 及 owner 兩秒真人 gate 不標記通過。
+
+2026-11-01 recovery：機器重啟令 `/private/tmp` checkout 消失，Codex 於持久 checkout（基於 `6e3514f`，branch `codex/guest-agency-recovery`）重組 G1–G3、G7 與 G2 候選；部分檔案只由紀錄還原，未能逐位元證實與原 commit 相同。接手後 root `npm test`（修正 `energyPrototype` 靜態 batch 上限：加入 8 個 activity frame，由 `< 50` 改為 `< 50 + 3 * 8`）、root／survey `npm run build`、survey `npm test`、`git diff --check` 均通過。G5 文案（owner 暫緩）、G4 視覺（SW court3 與 focal 重疊、SE 難辨、街道前景柱、水庭構圖）、陰影配對性能、owner 一人在家兩秒辨認仍未完成；不 merge、不 push。

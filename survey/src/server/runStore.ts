@@ -233,7 +233,7 @@ export function toProposalRecord(row: Row, ladder: ProposalLadder): ProposalReco
     throw new CorruptStateError(`proposal ${str(row, 'id')} has inconsistent revisions`);
   const expected = applyProposalVotes(before, votes, submittedAt);
   if (JSON.stringify(expected) !== JSON.stringify(after)) throw new CorruptStateError(`proposal ${str(row, 'id')} does not match its stored vote result`);
-  const beforeLayout = ladderLayout(ladder.before.tiers, before.energy), afterLayout = ladderLayout(ladder.after.tiers, after.energy);
+  const beforeLayout = ladderLayout(ladder.before.tiers, before.energy, ladder.before.activity), afterLayout = ladderLayout(ladder.after.tiers, after.energy, ladder.after.activity);
   return {
     id: str(row, 'id'), runId, guestSessionId: str(row, 'guest_session_id'), ordinal: after.guestCount,
     ...(row.station_id ? { stationId: str(row, 'station_id') as 'A' | 'B' } : {}),

@@ -191,7 +191,7 @@ function parseExhibitionView(value: unknown): ExhibitionView | null {
     || !Array.isArray(value.recentProposals) || value.recentProposals.length > 64
     || !value.recentProposals.every(proposal => isExhibitionProposal(proposal, value.runId as string, value.revision as number))) return null;
   if (Object.hasOwn(value, 'energy')) {
-    if (!isEnergyState(value.energy, value.guestCount) || (!value.layout.energy || !sameEnergyConfiguration(value.layout.energy, energyConfiguration(value.energy.counts)))) return null;
+    if (!isEnergyState(value.energy, value.guestCount) || (!value.layout.energy || !sameEnergyConfiguration({ ...value.layout.energy, activity: undefined }, energyConfiguration(value.energy.counts)))) return null;
   } else if (value.layout.energy !== undefined) return null;
   const recent = value.recentProposals as ExhibitionProposal[];
   if (value.guestCount === 0 && value.slotSeeds && AXES.some(axis => (value.slotSeeds as Scores)[axis] !== 0)) return null;

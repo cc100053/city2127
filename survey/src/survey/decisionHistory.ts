@@ -33,7 +33,7 @@ export function buildExhibitionCityView(state: ExhibitionState, proposals: Propo
   return {
     version: 2, runId: state.runId, revision: state.revision, guestCount: state.guestCount, algorithmVersion: 2,
     voteSums: state.voteSums, recentVotes: state.recentVotes, scores: state.scores, slotSeeds: ladder.seeds,
-    layout: ladderLayout(ladder.tiers, state.energy), ...(state.energy ? { energy: state.energy } : {}), recentProposals,
+    layout: ladderLayout(ladder.tiers, state.energy, ladder.activity), ...(state.energy ? { energy: state.energy } : {}), recentProposals,
     latestProposal: recentProposals.at(-1),
   };
 }

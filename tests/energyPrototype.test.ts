@@ -42,7 +42,7 @@ for (const waterGardens of [0, 1, 2] as const) for (const receiver of ['none', '
   }
 study.select('mixed');
 const after: string[] = []; study.root.traverse(o => { if (o instanceof Mesh && !(o instanceof InstancedMesh)) after.push(o.uuid); });
-assert.deepEqual(after, originalMeshes, 'switching configurations reuses the same geometry'); assert.ok(count < 50, 'static study batches by shared finish');
+assert.deepEqual(after, originalMeshes, 'switching configurations reuses the same geometry'); assert.ok(count < 50 + 3 * 8, 'static study batches by shared finish; each of the eight activity frames adds at most one batch per finish');
 // Both reservoirs and their district clone reuse one physical water finish through every cycle.
 const waters = study.gardens.flatMap(g => ['energy-lower-water', 'energy-upper-water'].map(name => g.getObjectByName(name) as Mesh));
 assert.ok(waters.every(w => w.material === waters[0].material), 'reservoir clones allocate separate water finishes');

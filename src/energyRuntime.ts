@@ -14,7 +14,7 @@ export class EnergyRuntime {
   clock: EnergyClock = {};
   constructor(scene: Scene) {
     this.model.root.name = 'energy-city'; scene.add(this.model.root);
-    this.motions = [this.model.parts.wing, ...this.model.gardens, this.model.parts.ring, this.model.parts.island, this.model.parts.distribution]
+    this.motions = [this.model.parts.wing, ...this.model.gardens, this.model.parts.ring, this.model.parts.island, this.model.parts.distribution, ...Object.values(this.model.activity).flat()]
       .map(group => {
         // Clone shared finishes once per independently fading group; never fade the city's shared materials.
         const finishes = new Map<Material, { source: Material; material: Material; opacity: number; transparent: boolean; depthWrite: boolean }>();
@@ -26,10 +26,11 @@ export class EnergyRuntime {
         return { group, finishes: [...finishes.values()], amount: 0, from: 0, to: 0, start: 0 };
       });
   }
-  getConfiguration(): EnergyConfiguration { return { ...this.target }; }
+  getConfiguration(): EnergyConfiguration { return { ...this.target, ...(this.target.activity ? { activity: { ...this.target.activity } } : {}) }; }
   getDiagnostics() {
     return { target: this.getConfiguration(), rotorAngle: this.model.rotor.rotation.z,
-      parts: this.motions.map(({ group, amount }) => ({ visible: group.visible, scaleY: group.scale.y, opacity: amount })) };
+      parts: this.motions.slice(0, 6).map(({ group, amount }) => ({ visible: group.visible, scaleY: group.scale.y, opacity: amount })),
+      activity: this.motions.slice(6).map(({ group, amount }) => ({ visible: group.visible, opacity: amount })) };
   }
   setTarget(next: EnergyConfiguration, now: number, immediate: boolean) {
     const before = this.getConfiguration(), changed = !sameEnergyConfiguration(before, next);
@@ -37,7 +38,7 @@ export class EnergyRuntime {
     this.wingFrom = this.model.parts.wing.scale.x;
     this.wingTo = next.receiver === 'small' ? .65 : next.receiver === 'none' ? this.wingFrom : 1;
     if (immediate) this.wingFrom = this.wingTo;
-    this.model.configure(next); this.target = { ...next };
+    this.model.configure(next); this.target = { ...next, ...(next.activity ? { activity: { ...next.activity } } : {}) };
     this.model.parts.wing.scale.setScalar(this.wingFrom);
     for (const m of this.motions) {
       const to = m.group.visible ? 1 : 0;

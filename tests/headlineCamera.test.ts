@@ -3,7 +3,7 @@ import { PerspectiveCamera, Vector3 } from 'three';
 import { DISPLAY_MS, RESULT_LEASE_MS } from '../survey/src/shared/displayTiming.ts';
 import { emptyEnergyConfiguration, type EnergyConfiguration } from '../survey/src/shared/energy.ts';
 import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
-import { HeadlineCamera, SHOTS, headlineShot, shotStage, shotTimeline, type ShotId } from '../src/headlineCamera.ts';
+import { HeadlineCamera, SHOTS, VIEWPOINT_COVERAGE, headlineShot, shotStage, shotTimeline, type ShotId } from '../src/headlineCamera.ts';
 import { HERO_POSITION, HERO_TARGET } from '../src/heroCamera.ts';
 import { ARRIVAL_SECONDS } from '../src/voteJourney.ts';
 import { reasonDelayMs } from '../src/resultTimeline.ts';
@@ -49,7 +49,7 @@ assert.equal(reasonDelayMs(DISPLAY_MS,true),0);
 assert.equal(reasonDelayMs(DISPLAY_MS-101,false),0);
 assert.equal(shotStage(3),'fly-in','the flight starts after the vote journey');
 assert.deepEqual([0,t.flyIn,t.hold,t.flyOut,t.done].map(elapsed=>shotStage(elapsed)),['journey','fly-in','hold','fly-out','done']);
-assert.equal(Object.keys(SHOTS).length,13);
+assert.equal(Object.keys(SHOTS).length,77);
 for (const [id, pose] of Object.entries(SHOTS)) {
   const p=new Vector3(...pose.position),target=new Vector3(...pose.target);
   assert.ok(p.y>target.y);assert.ok(p.distanceTo(target)>=40&&p.distanceTo(target)<=450);
@@ -95,3 +95,27 @@ for (const interruptedAt of [t.hold, t.flyOut + .5]) {
 controller.play([],30);assert.equal(controller.active,false);assert.deepEqual(camera.position.toArray(),HERO_POSITION);
 controller.play([first],40);controller.update(40+t.hold);controller.play([],50,5000);assert.deepEqual(camera.position.toArray(),HERO_POSITION,'catch-up still cuts immediately');
 console.log('PASS: no-headline interruptions preserve the first frame in hold/fly-out and return without another fly-in.');
+
+// Live district positions choose a covered authored shot; ties rotate, and missing positions fall back.
+const point = (slot: string) => ({slot,x:0,y:0,z:0,r:1});
+const picker=new HeadlineCamera(new PerspectiveCamera(42),{target:new Vector3(...HERO_TARGET),enabled:true,update(){}});
+const district = {socketId:'nw' as const,focal:false,district:true};
+assert.equal(picker.play([{...district,points:[point('nw:bay1')]}],100),'nw:bay1');
+assert.equal(picker.play([{...district,points:[point('nw:bay1'),point('nw:bay2')]}],101),'nw:bay2');
+assert.equal(picker.play([{...district,points:[point('nw:bay1'),point('nw:bay2'),point('nw:bay3')]}],102),'nw:bay1', 'coverage count wins over least recent use');
+assert.equal(picker.play([{...district,points:[]}],103),'nw:district');
+assert.equal(picker.play([{...district,focalOnly:true,points:[point('nw:bay1')]}],104),'nw:focal');
+
+for (const [site, groups] of Object.entries({nw:{bay:11},sw:{room:6,court:10},se:{tower:10,pod:26}})) {
+  for (const [group, count] of Object.entries(groups)) for (let i=1;i<=count;i++) {
+    const slot = `${site}:${group}${i}`;
+    assert.ok(Object.values(VIEWPOINT_COVERAGE).some(covered=>covered.includes(slot)), `${slot} has a viewpoint`);
+  }
+}
+assert.equal(picker.play([{...district,points:[point('nw:unknown')]}],105),'nw:district');
+const tie = new HeadlineCamera(new PerspectiveCamera(42),{target:new Vector3(...HERO_TARGET),enabled:true,update(){}});
+const two = {...district,points:[point('nw:bay1'),point('nw:bay2')]};
+assert.equal(tie.play([two],0),'nw:bay1');
+assert.equal(tie.play([two],1,DISPLAY_MS-101),null);
+assert.equal(tie.play([two],2),'nw:bay2','catch-up must not change rotation');
+assert.equal(picker.play([{...district,points:[point('nw:street')]}],106),'nw:street');

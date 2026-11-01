@@ -68,12 +68,12 @@ async function headlineResult(view) {
   await city.waitForFunction(count => document.querySelector('.causal-panel')?.dataset.guestCount === String(count)
     && document.querySelector('.causal-panel')?.dataset.presentation === 'result'
     && document.querySelector('.resident-card-copy')?.textContent?.includes('あなたは'), view.guestCount);
-  const proposal=view.latestProposal, headline=pickHeadline(proposal.beforeLayout,proposal.afterLayout);
+  const proposal=view.latestProposal, headline=pickHeadline(proposal.beforeLayout,proposal.afterLayout,proposal.votes);
   if(headline && 'socketId' in headline) {
     const expected=residentResult(proposal,[{socketId:headline.socketId,focal:true,district:false}]);
     assert.ok((await city.locator('.resident-card-copy').textContent()).startsWith(expected.preference));
     assert.equal(await city.locator('.causal-panel').getAttribute('data-result-kind'),'configuration');
-  } else assert.match(await city.locator('.resident-card-copy').textContent(),/街のエネルギー設備は今の配置|蓄電庭園は1か所/);
+  } else assert.match(await city.locator('.resident-card-copy').textContent(),/街のエネルギー設備は今の配置|蓄電庭園は1か所|整備フレーム|整備船/);
 }
 async function answerWater() {
   await guest.locator('[data-auto-action=start]').click();
@@ -131,7 +131,7 @@ try {
       answers: session.questions.map(q => ({ questionId: q.id, optionId: q.id === 'energy-2127' ? choice : q.options[1].id })) });
   }
   view = await read('/api/city-view');
-  assert.deepEqual(view.layout.energy, { waterGardens: 1, receiver: 'small', flywheel: true, island: true });
+  assert.deepEqual({ ...view.layout.energy, activity: undefined }, { waterGardens: 1, receiver: 'small', flywheel: true, island: true, activity: undefined });
   await city.reload(); await model(view);
   for (const hour of [12, 18.5, 22]) { if (hour !== 12) { await city.goto(url(hour)); await model(view); } await city.screenshot({ path: join(evidence, `mixed-${hour}.png`) }); }
   // Disconnect the actual City TCP transport. Reconnect restores the same portfolio with ambient text.
@@ -171,7 +171,7 @@ try {
   writeFileSync(join(evidence, 'browser.json'), JSON.stringify({ browser: browser.version(), viewport, quality: 'default', hour: [12,18.5,22],
     checkedCommit: process.env.CITY2127_CHECKED_COMMIT ?? 'working tree', exceptions, warnings, badResponses, failures,
     tests: ['schema7→8 with original proposal and obsolete draft', 'old climate unchanged', 'Q3 four native radios and review', 'pre/post commit same-ID retry',
-      'first preference no visible change', 'second preference actual model/result', 'Undo removes energy model', 'recorded mixed portfolio snapshot',
+      'first preference may show a fallback frame', 'second preference actual model/result', 'Undo removes energy model', 'recorded mixed portfolio snapshot',
       'day/dusk/night', 'TCP reconnect', 'browser prefers-reduced-motion', 'normal desktop resize', 'reset removes all equipment', 'old retry after reset'],
     fixtureClockJumps: '11s old reading, then 16s skips for Undo and mixed seeding; not visitor timing' }, null, 2)+'\n');
   console.log('PASS E4 formal browser: old/new history, current Q3, pre/post-commit retry, maintained/actual results, energy Undo, recorded mixed portfolio, day/dusk/night, TCP reconnect, reduced motion, resize and reset; no page exceptions.');

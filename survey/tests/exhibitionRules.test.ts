@@ -123,8 +123,17 @@ assert.deepEqual([1, 2, 3].map(tier => ladderLayout({ nw: tier, ne: 0, sw: -tier
     else if (ladder.seeds.automation) assert.equal(next.seeds.automation, ladder.seeds.automation, 'seed stays frozen');
     ladder = next;
   }
-  assert.equal(ladder.tiers.nw, 3, 'a steady automation crowd climbs the whole ladder');
-  assert.notEqual(ladder.seeds.automation, 0);
+  assert.ok(Object.values(ladder.seeds).some(Boolean), 'a district reaching rung 2 freezes its seed');
+}
+// Guest direction, the one-rung eligibility bound, neutral return and hysteresis fallback.
+{
+  const at = (nw: number): ExhibitionLadder => ({ ...initialLadder(), tiers: { ...initialLadder().tiers, nw } });
+  const after = (automation: number) => ({ scores: { ...zeroScores(), automation }, guestCount: 20 });
+  const step = (tier: number, score: number, vote: -1 | 0 | 1) => ladderStep(at(tier), after(score), { ...votes(0), automation: vote }, zeroScores()).tiers.nw;
+  assert.equal(step(0, 0, 1), 1, 'guest can lead the cumulative target by one');
+  assert.equal(step(1, 0, 1), 1, 'guest cannot lead by two');
+  assert.equal(step(1, 0, 0), 0, 'neutral vote moves toward mixed');
+  assert.equal(step(2, 0, 1), 1, 'no eligible guest move falls back to hysteresis');
 }
 // Ties prefer a site the guest voted toward over the rotation's first site.
 {
@@ -147,6 +156,15 @@ assert.deepEqual([1, 2, 3].map(tier => ladderLayout({ nw: tier, ne: 0, sw: -tier
   assert.deepEqual(pickHeadline({ ...water(0), tiers: { ...water(0).tiers, nw: 0 } }, water(1)), { socketId: 'nw' }, 'a tier beats energy');
   assert.equal(pickHeadline(water(1), water(1)), undefined);
   assert.equal(pickHeadline(at(1, 0), water(0)), undefined, 'absent energy equals the empty configuration');
+  const guest = { ...votes(0), automation: 1 as const, publicSharing: -1 as const, energy: 'rotor-storage' as const };
+  const energyBefore = { waterGardens: 1 as const, receiver: 'none' as const, flywheel: false, island: false };
+  const energyAfter = { ...energyBefore, waterGardens: 0 as const, flywheel: true };
+  const before = { ...at(0, 2), energy: energyBefore }, after = { ...at(1, 3), energy: energyAfter };
+  assert.deepEqual(pickHeadline(before, after, guest), { socketId: 'nw' }, 'aligned site beats higher opposite site and guest energy');
+  assert.deepEqual(pickHeadline({ ...before, tiers: { ...before.tiers, nw: 1 } }, after, guest), { energy: true, part: 'flywheel' }, 'guest energy beats opposite site and other energy changes');
+  assert.deepEqual(pickHeadline(before, after, { ...guest, automation: -1, energy: 'island-supply' }), { socketId: 'sw' }, 'unchanged guest energy retains existing fallback');
+  assert.deepEqual(pickHeadline(at(2, 0), at(1, 0), votes(0)), { socketId: 'nw' }, 'neutral vote moves toward zero');
+  assert.deepEqual(pickHeadline(at(0, 0, 0, 0), at(0, 0, 0, 1), { ...votes(0), energy: 'rotor-storage' }), { socketId: 'ne' }, 'unused climate placeholder falls back to legacy rule');
 }
 
 const questionPath = new URL('../src/survey/questions.exhibition.v3.json', import.meta.url).pathname;

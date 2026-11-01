@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { Scene, Group, Mesh, MeshStandardMaterial } from 'three';
+import { Scene, Group, Mesh, MeshStandardMaterial, Box3, Raycaster, Vector3 } from 'three';
+import { boatPoses, routes, WATER_PERIOD, HULL } from '../src/mobility.ts';
 import { publicLight } from '../src/cityRig.ts';
 import { CityChangeManager } from '../src/cityChangeManager.ts';
 import { EnergyRuntime } from '../src/energyRuntime.ts';
@@ -11,6 +12,7 @@ import { currentView } from '../survey/src/server/answerService.ts';
 import { createProposalSession, submitProposal } from '../survey/src/server/proposalService.ts';
 import { CURRENT_EXHIBITION_QUESTIONS_PATH, exhibitionFixture, ok, startServer } from '../survey/tests/surveyFixture.ts';
 import { ENERGY_CHOICES, emptyEnergyConfiguration, type EnergyChoice } from '../survey/src/shared/energy.ts';
+import { headlineShot } from '../src/headlineCamera.ts';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 
 const documentBefore = Object.getOwnPropertyDescriptor(globalThis, 'document');
@@ -21,6 +23,22 @@ const scene = new Scene(), energy = new EnergyRuntime(scene);
 const sites = buildSurveySites(scene, { cloneRoot: () => new Promise<Group>(() => {}) } as never);
 if (documentBefore) Object.defineProperty(globalThis, 'document', documentBefore); else delete (globalThis as { document?: unknown }).document;
 const manager = new CityChangeManager(sites, energy);
+// Conservative circumscribed boat radius keeps all fallback structures out of active shipping routes.
+scene.updateMatrixWorld(true);
+for (const frame of energy.model.activity.waterGardens) for (const [x, z] of [[-335, -162], [-322.8, -156.6]]) {
+  const hits = new Raycaster(new Vector3(x, 2, z), new Vector3(0, -1, 0)).intersectObject(frame, true);
+  assert.ok(hits.some(hit => Math.abs(hit.point.y - 1.05) < .01), 'water platform reaches the garden base in either configuration');
+}
+const activityBounds = (['waterGardens', 'receiver', 'island'] as const).flatMap(part => energy.model.activity[part].map(group => new Box3().setFromObject(group)));
+const waterRoutes = routes(), boatRadius = Math.hypot(HULL.x, HULL.stern);
+for (let t = 0; t < WATER_PERIOD; t += .25) for (const boat of boatPoses(t, waterRoutes)) {
+  if (boat.scale < .05) continue;
+  for (const bounds of activityBounds) {
+    const dx = Math.max(bounds.min.x - boat.x, 0, boat.x - bounds.max.x), dz = Math.max(bounds.min.z - boat.z, 0, boat.z - bounds.max.z);
+    assert.ok(Math.hypot(dx, dz) - boatRadius * boat.scale > 2.5, `fallback reaches a boat route at ${t}s`);
+  }
+}
+
 const fixture = () => exhibitionFixture(':memory:', Date.parse('2026-10-24T00:00:00Z'), CURRENT_EXHIBITION_QUESTIONS_PATH);
 const eventOf = (event: unknown) => {
   const parsed = parseSurveyEvent(JSON.parse(JSON.stringify(event)));
@@ -50,7 +68,7 @@ for (const energyChoice of ENERGY_CHOICES) for (const a of [0, 1, 2]) for (const
     assertModel(parsed.view);
     assert.equal(parsed.view.scores.environmentalPriority, 0);
     assert.equal(parsed.view.layout.bands.ne, 'mixed');
-    assert.equal(changes.some(c => c.energy), false, 'first energy preference alone leaves the equipment configuration');
+    assert.equal(changes.some(c => c.energy), !!parsed.view.layout.energy?.activity, 'fallback appears only when needed');
     assert.ok(!residentResult(parsed.view.latestProposal!, changes).effect.includes('この公園'));
     const d = manager.getDiagnostics();
     assert.equal(d.magnetEast.automationHub!.visibleAutomatedPorts, parsed.view.layout.automatedPorts);
@@ -80,12 +98,30 @@ try {
   manager.applyExhibitionLayout((currentView(ctx) as ExhibitionView).layout, 'city-state-snapshot', 10);
   const first = await submit('water-storage', 'water-1');
   const noChange = manager.applyExhibitionLayout(first.view.layout, 'city-state-updated', 11);
-  assert.equal(noChange.length, 0);
-  assert.match(residentResult(first.view.latestProposal!, noChange).effect, /今の配置/);
+  assert.equal(noChange.length, 1);
+  assert.match(residentResult(first.view.latestProposal!, noChange).effect, /整備フレーム/);
+  assert.equal(headlineShot(noChange[0]), 'energy:garden');
+  manager.update(14); assert.equal(energy.model.activity.waterGardens[0].visible, true);
+  assert.equal(energy.model.activity.waterGardens[1].visible, false);
+  const copy = energy.getConfiguration(); copy.activity!.waterGardens = 2;
+  assert.equal(energy.getConfiguration().activity!.waterGardens, 1, 'diagnostics cannot mutate the target');
   assert.match(residentResult(first.view.latestProposal!).effect, /回答を記録/, 'no actual predecessor evidence stays conservative');
   const second = await submit('water-storage', 'water-2');
   const changes = manager.applyExhibitionLayout(second.view.layout, 'city-state-updated', 20);
   assert.equal(changes.length, 1); assert.ok(changes[0].energy);
+  const multi = { ...changes[0], energy: { before: { waterGardens: 1 as const, receiver: 'none' as const, flywheel: false, island: false },
+    after: { waterGardens: 0 as const, receiver: 'none' as const, flywheel: true, island: false }, part: 'flywheel' as const } };
+  assert.equal(headlineShot(multi), 'energy:ring');
+  assert.match(residentResult(second.view.latestProposal!, [multi]).place, /蓄電環/, 'card and camera name the selected energy part');
+  const baseline = { ...second.view.layout, energy: multi.energy.before };
+  manager.applyExhibitionLayout(baseline, 'city-state-snapshot', 20);
+  const selected = manager.applyExhibitionLayout({ ...baseline, energy: multi.energy.after }, 'city-state-updated', 20, undefined, 20,
+    { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0, energy: 'rotor-storage' });
+  assert.equal(selected[0].energy?.part, 'flywheel');
+  assert.equal(headlineShot(selected[0]), 'energy:ring');
+  assert.match(residentResult(second.view.latestProposal!, selected).place, /蓄電環/);
+  manager.applyExhibitionLayout(first.view.layout, 'city-state-snapshot', 20);
+  manager.applyExhibitionLayout(second.view.layout, 'city-state-updated', 20);
   assert.equal(energy.model.gardens[0].visible, false, 'new model waits for the scheduled arrival');
   manager.update(19); assert.equal(energy.model.gardens[0].visible, false);
   manager.update(21.5); assert.equal(energy.getDiagnostics().parts[1].opacity, .5);
@@ -105,10 +141,11 @@ try {
   if (reducedBefore) Object.defineProperty(globalThis, 'matchMedia', reducedBefore); else delete (globalThis as { matchMedia?: unknown }).matchMedia;
   // Reordered or invalid input is checked at the wire boundary; old v2 was already exercised by the original pipeline.
   const snapshot = { type: 'city-state-snapshot', view: third.view };
-  const reordered = structuredClone(snapshot); reordered.view.layout.energy = { island: false, flywheel: false, receiver: 'none', waterGardens: 2 };
+  const reordered = structuredClone(snapshot); reordered.view.layout.energy = { island: false, flywheel: false, receiver: 'none', waterGardens: 2, activity: reordered.view.layout.energy?.activity };
   assert.ok(parseSurveyEvent(reordered));
-  for (const bad of ['size', 'extra', 'tally', 'choice'] as const) {
+  for (const bad of ['size', 'extra', 'tally', 'choice', 'activity'] as const) {
     const input = structuredClone(snapshot);
+    if (bad === 'activity') Object.assign(input.view.layout.energy!, { activity: { waterGardens: 3 } });
     if (bad === 'size') (input.view.layout.energy as unknown as { waterGardens: number }).waterGardens = 3;
     if (bad === 'extra') Object.assign(input.view.layout.energy!, { extra: true });
     if (bad === 'tally') input.view.energy!.counts['water-storage']++;
@@ -124,7 +161,7 @@ try {
     manager.applyExhibitionLayout(parsed.view.layout, 'city-state-updated', 100 + step * 4);
     manager.update(103 + step * 4); assertModel(parsed.view);
   }
-  assert.deepEqual(energy.getConfiguration(), { waterGardens: 1, receiver: 'small', flywheel: true, island: true });
+  assert.deepEqual({ ...energy.getConfiguration(), activity: undefined }, { waterGardens: 1, receiver: 'small', flywheel: true, island: true, activity: undefined });
   assert.equal(residentCards(currentView(ctx) as ExhibitionView).filter(c => c.id.startsWith('energy.')).length, 4);
   const resourceIds = () => {
     const ids: string[] = [];

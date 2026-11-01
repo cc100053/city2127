@@ -1,7 +1,12 @@
 /** Independent resident energy preferences; shares describe a display, never electrical capacity. */
 export const ENERGY_CHOICES = ['water-storage', 'rotor-storage', 'orbital-supply', 'island-supply'] as const;
 export type EnergyChoice = typeof ENERGY_CHOICES[number];
+export const ENERGY_PARTS = ['waterGardens', 'receiver', 'flywheel', 'island'] as const;
+export type EnergyPart = typeof ENERGY_PARTS[number];
+export type EnergyActivity = Partial<Record<EnergyPart, 1 | 2>>;
+export const ENERGY_CHOICE_PART: Record<EnergyChoice, EnergyPart> = { 'water-storage': 'waterGardens', 'rotor-storage': 'flywheel', 'orbital-supply': 'receiver', 'island-supply': 'island' };
 export type EnergyConfiguration = {
+  activity?: EnergyActivity;
   waterGardens: 0 | 1 | 2;
   receiver: 'none' | 'small' | 'large';
   flywheel: boolean;
@@ -14,7 +19,8 @@ export const isEnergyChoice = (value: unknown): value is EnergyChoice => typeof 
 const record = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
 const keys = (v: Record<string, unknown>, names: readonly string[]) => Object.keys(v).length === names.length && names.every(k => Object.hasOwn(v, k));
 export function isEnergyConfiguration(v: unknown): v is EnergyConfiguration {
-  return record(v) && keys(v, ['waterGardens', 'receiver', 'flywheel', 'island'])
+  return record(v) && keys(v, ['waterGardens', 'receiver', 'flywheel', 'island', ...(Object.hasOwn(v, 'activity') ? ['activity'] : [])])
+    && (!Object.hasOwn(v, 'activity') || (record(v.activity) && Object.entries(v.activity).every(([k, n]) => ENERGY_PARTS.includes(k as EnergyPart) && (n === 1 || n === 2))))
     && [0, 1, 2].includes(v.waterGardens as number) && ['none', 'small', 'large'].includes(v.receiver as string)
     && typeof v.flywheel === 'boolean' && typeof v.island === 'boolean';
 }
@@ -37,5 +43,5 @@ export function energyConfiguration(counts: EnergyState['counts']): EnergyConfig
 }
 
 export function sameEnergyConfiguration(a: EnergyConfiguration, b: EnergyConfiguration): boolean {
-  return a.waterGardens === b.waterGardens && a.receiver === b.receiver && a.flywheel === b.flywheel && a.island === b.island;
+  return ENERGY_PARTS.every(part => a.activity?.[part] === b.activity?.[part]) && a.waterGardens === b.waterGardens && a.receiver === b.receiver && a.flywheel === b.flywheel && a.island === b.island;
 }

@@ -1,4 +1,4 @@
-import { emptyEnergyConfiguration, energyConfiguration, sameEnergyConfiguration, type EnergyState, type EnergyConfiguration } from './energy.ts';
+import { emptyEnergyConfiguration, energyConfiguration, sameEnergyConfiguration, ENERGY_CHOICE_PART, type EnergyState, type EnergyConfiguration, type EnergyActivity, type EnergyPart } from './energy.ts';
 import type { CityScores, ExhibitionState, ExhibitionVotes } from './citySurveyState.ts';
 
 /**
@@ -157,10 +157,10 @@ export function exhibitionDisplayScores(scores: CityScores, guestCount: number):
 
 export const SOCKET_AXES = { nw: 'automation', ne: 'environmentalPriority', sw: 'publicSharing', se: 'urbanConcentration' } as const;
 /** Display-score edges of rungs 1/2/3 (2026-10-27 user decision); stepping back toward mixed needs D a further 2 past the edge. */
-export const LADDER_EDGES = [1.5, 4, 7] as const, LADDER_HYSTERESIS = 2;
+export const LADDER_EDGES = [1.5, 4, 7] as const, LADDER_HYSTERESIS = 2, LEAD = 1;
 export type ExhibitionTiers = ExhibitionLayout['tiers'];
 /** Shown tiers plus the per-axis slot seed each district froze when it first reached rung 2. */
-export type ExhibitionLadder = { tiers: ExhibitionTiers; seeds: CityScores };
+export type ExhibitionLadder = { tiers: ExhibitionTiers; seeds: CityScores; activity?: EnergyActivity };
 export const initialLadder = (): ExhibitionLadder => ({
   tiers: { nw: 0, ne: 0, sw: 0, se: 0 }, seeds: { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 },
 });
@@ -182,14 +182,23 @@ export function exhibitionStateDisplay(state: Pick<ExhibitionState, 'scores' | '
 }
 
 /**
- * One proposal moves at most one site one rung: the largest pending gap, then a site this guest voted toward, then a rotation by
- * guest count. `slotSeeds` is the run's full-history hash after this proposal; a district adopts its axis seed the first time it reaches
- * rung 2, so later rungs switch nested slots instead of reshuffling.
+ * One proposal moves at most one site one rung: prefer the guest direction within one rung of the cumulative target,
+ * then fall back to the hysteresis gap. Ties rotate by guest count. `slotSeeds` is the full-history hash after this proposal;
+ * a district adopts its axis seed on reaching rung 2 so later rungs switch nested slots instead of reshuffling.
  */
-export function ladderStep(ladder: ExhibitionLadder, after: Pick<ExhibitionState, 'scores' | 'guestCount' | 'energy'>, votes: ExhibitionVotes, slotSeeds: CityScores): ExhibitionLadder {
+function ladderStepBase(ladder: ExhibitionLadder, after: Pick<ExhibitionState, 'scores' | 'guestCount' | 'energy'>, votes: ExhibitionVotes, slotSeeds: CityScores): ExhibitionLadder {
   const display = exhibitionStateDisplay(after);
-  let best: ExhibitionSocketId | undefined, bestScore = 0, bestGap = 0;
+  let best: ExhibitionSocketId | undefined, bestScore = -1, bestGap = 0;
   for (let j = 0; j < EXHIBITION_SOCKET_IDS.length; j++) {
+    const id = EXHIBITION_SOCKET_IDS[(after.guestCount + j) % EXHIBITION_SOCKET_IDS.length], axis = SOCKET_AXES[id];
+    const tier = ladder.tiers[id], target = ladderGap(0, display[axis]), vote = votes[axis];
+    const direction = vote || -Math.sign(tier), next = tier + direction;
+    if (!direction || Math.abs(next) > 3 || Math.abs(next - target) > LEAD) continue;
+    const score = Math.abs(target - tier) * 4 + (vote !== 0 ? 2 : 0);
+    if (score > bestScore) { best = id; bestScore = score; bestGap = direction; }
+  }
+  if (!best) bestScore = 0;
+  if (!best) for (let j = 0; j < EXHIBITION_SOCKET_IDS.length; j++) {
     const id = EXHIBITION_SOCKET_IDS[(after.guestCount + j) % EXHIBITION_SOCKET_IDS.length], axis = SOCKET_AXES[id];
     const gap = ladderGap(ladder.tiers[id], display[axis]);
     const score = Math.abs(gap) * 4 + (Math.sign(gap) === votes[axis] ? 2 : 0);
@@ -198,7 +207,19 @@ export function ladderStep(ladder: ExhibitionLadder, after: Pick<ExhibitionState
   if (!best) return ladder;
   const tiers = { ...ladder.tiers, [best]: ladder.tiers[best] + Math.sign(bestGap) }, seeds = { ...ladder.seeds }, axis = SOCKET_AXES[best];
   if (Math.abs(tiers[best]) === 2 && seeds[axis] === 0) seeds[axis] = slotSeeds[axis];
-  return { tiers, seeds };
+  return { ...ladder, tiers, seeds };
+}
+
+/** Fold fallback activity with the same ordered history as the tier ladder. */
+export function ladderStep(ladder: ExhibitionLadder, after: Pick<ExhibitionState, 'scores' | 'guestCount' | 'energy'>, votes: ExhibitionVotes, slotSeeds: CityScores): ExhibitionLadder {
+  const next = ladderStepBase(ladder, after, votes, slotSeeds);
+  if (!votes.energy || !after.energy) return next;
+  const counts = { ...after.energy.counts, [votes.energy]: after.energy.counts[votes.energy] - 1 };
+  const before = ladderLayout(ladder.tiers, { ...after.energy, counts }, ladder.activity);
+  const candidate = ladderLayout(next.tiers, after.energy, ladder.activity);
+  if (pickGuestHeadline(before, candidate, votes)) return next;
+  const part = ENERGY_CHOICE_PART[votes.energy];
+  return { ...next, activity: { ...ladder.activity, [part]: ladder.activity?.[part] === 1 ? 2 : 1 } };
 }
 
 /** Unlimited tiers straight from display scores: dev `?meters` captures and carrier tests, never a live run. */
@@ -215,13 +236,13 @@ export function deriveExhibitionLayout(scores: CityScores): ExhibitionLayout {
 }
 
 /** Server-authoritative layout: tiers from the run's ladder fold, plus the energy configuration of its counts. */
-export function ladderLayout(tiers: ExhibitionTiers, energy?: EnergyState): ExhibitionLayout {
+export function ladderLayout(tiers: ExhibitionTiers, energy?: EnergyState, activity?: EnergyActivity): ExhibitionLayout {
   // Focal sites read the complete low/high form from rung 1; t is the site's 0..1 position.
   const t = (id: ExhibitionSocketId) => tiers[id] > 0 ? 1 : tiers[id] < 0 ? 0 : .5;
   const band = (id: ExhibitionSocketId): Band => tiers[id] > 0 ? 'high' : tiers[id] < 0 ? 'low' : 'mixed';
   return {
     version: 2,
-    ...(energy ? { energy: energyConfiguration(energy.counts) } : {}),
+    ...(energy ? { energy: { ...energyConfiguration(energy.counts), ...(activity && Object.keys(activity).length ? { activity } : {}) } } : {}),
     bands: { nw: band('nw'), ne: band('ne'), sw: band('sw'), se: band('se') },
     tiers: { ...tiers },
     automatedPorts: Math.round(6 * t('nw')),
@@ -234,10 +255,25 @@ export function ladderLayout(tiers: ExhibitionTiers, energy?: EnergyState): Exhi
 }
 
 /**
- * Headline of a live result: the site whose tier newly reached the highest rung, else the site with the most changed carrier
- * values, else the energy configuration. Undefined when nothing visible changed.
+ * Prefer a guest-directed tier change, then their changed energy part; otherwise retain the existing headline rules.
  */
-export function pickHeadline(before: ExhibitionLayout, after: ExhibitionLayout): { socketId: ExhibitionSocketId } | { energy: true } | undefined {
+export function pickGuestHeadline(before: ExhibitionLayout, after: ExhibitionLayout, votes: CityScores & Pick<ExhibitionVotes, 'energy'>): { socketId: ExhibitionSocketId } | { energy: true; part: EnergyPart } | undefined {
+  const tiered = EXHIBITION_SOCKET_IDS.filter(id => before.tiers[id] !== after.tiers[id]);
+  const aligned = tiered.filter(id => {
+    const axis = SOCKET_AXES[id];
+    if (axis === 'environmentalPriority' && votes.energy) return false;
+    const direction = votes[axis] || -Math.sign(before.tiers[id]);
+    return direction !== 0 && Math.sign(after.tiers[id] - before.tiers[id]) === direction;
+  });
+  if (aligned.length) return { socketId: aligned.reduce((a, b) => Math.abs(after.tiers[b]) > Math.abs(after.tiers[a]) ? b : a) };
+  const part = votes.energy && ENERGY_CHOICE_PART[votes.energy];
+  const a = before.energy ?? emptyEnergyConfiguration(), b = after.energy ?? emptyEnergyConfiguration();
+  if (part && (a[part] !== b[part] || a.activity?.[part] !== b.activity?.[part])) return { energy: true, part };
+}
+
+export function pickHeadline(before: ExhibitionLayout, after: ExhibitionLayout, votes?: CityScores & Pick<ExhibitionVotes, 'energy'>): { socketId: ExhibitionSocketId } | { energy: true; part?: EnergyPart } | undefined {
+  const guest = votes && pickGuestHeadline(before, after, votes);
+  if (guest) return guest;
   const tiered = EXHIBITION_SOCKET_IDS.filter(id => before.tiers[id] !== after.tiers[id]);
   if (tiered.length) return { socketId: tiered.reduce((a, b) => Math.abs(after.tiers[b]) > Math.abs(after.tiers[a]) ? b : a) };
   const changes = exhibitionLayoutChanges(before, after);

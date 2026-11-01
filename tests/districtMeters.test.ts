@@ -195,6 +195,14 @@ sharing.update(4);
 assert.equal(sharing.getDiagnostics().visibleOpenRooms, sharing.bays.length);
 assert.equal(sharing.getDiagnostics().visiblePrivateRooms, 0);
 {
+  const parasols = sharing.root.getObjectsByProperty('name', 'sharing-open-plazas')[1] as T.InstancedMesh;
+  sharing.root.updateMatrixWorld(true);
+  const transform = new T.Matrix4(); parasols.getMatrixAt(2, transform);
+  const origin = new T.Vector3(-3, 30, -6).applyMatrix4(transform).applyMatrix4(parasols.matrixWorld);
+  const hits = new T.Raycaster(origin, new T.Vector3(0, -1, 0)).intersectObject(parasols);
+  assert.ok(hits.some(hit => hit.instanceId === 2 && hit.point.y > 8), 'parasol canopy is visible from above');
+}
+{
   const scaleOf = (mesh: T.InstancedMesh, i: number) => { const m = new T.Matrix4(), v = new T.Vector3(); mesh.getMatrixAt(i, m); return v.setFromMatrixScale(m).x; };
   const halos = sharing.root.getObjectsByProperty('name', 'sharing-open-halos')[0] as T.InstancedMesh;
   const steps = sharing.root.getObjectByName('sharing-open-steps') as T.InstancedMesh;
@@ -355,7 +363,7 @@ for (const score of [-7.5, 0, 7.5]) {
   assert.equal(drawn, life.getDiagnostics().plazaPeople);
   assert.equal(crowd.visible, drawn > 0);
   assert.equal(service.getDiagnostics().serviceDrones, drone.count);
-  assert.equal(life.getDiagnostics().plazaPeople, score < 0 ? 0 : score > 0 ? 96 : 24);
+  assert.equal(life.getDiagnostics().plazaPeople, score < 0 ? 0 : score > 0 ? 108 : 24);
   const before = Array.from(drone.instanceMatrix.array);
   ownDistricts.forEach(d => d.update(26, 1));
   assert.notDeepEqual(Array.from(drone.instanceMatrix.array), before, 'service drones move on the shared clock');
@@ -368,7 +376,7 @@ life.setTarget(highLife, 30, true);
 life.setTarget({ ...highLife, tiers: { ...highLife.tiers, sw: -3 } }, 30, false); life.update(31.5, 1);
 assert.equal(life.getDiagnostics().plazaPeople, 0, 'crowds clear before private gardens grow');
 life.setTarget(highLife, 31.5, true); life.update(31.5, 1);
-assert.equal(life.getDiagnostics().plazaPeople, 96, 'snapshot immediately restores settled crowd');
+assert.equal(life.getDiagnostics().plazaPeople, 108, 'snapshot immediately restores settled crowd');
 life.hide(); service.hide();
 assert.equal(life.getDiagnostics().plazaPeople + service.getDiagnostics().serviceDrones, 0);
 console.log('PASS: P12 current-slot crowds, live/snapshot/legacy, moving service drones, four night rhythms and civic material isolation.');
@@ -419,4 +427,33 @@ console.log('PASS: P3 carrier evidence covers uniform seed no-op, same-score red
   a.setTarget(at({ nw: 3 }), 11, false, 1234); a.update(11.5);
   assert.ok(a.getDiagnostics().activePulses > 0);
   console.log(`PASS: ladder rungs — focal-only rung 1, drone ports ${counts} at rungs 0/2/3 nested, fleets at rung 3, quiet live changes.`);
+}
+
+// Camera locations must follow the same changed slots as district pulses, in both directions.
+for (const [district, axis] of [
+  [new AutomationDistrict(new T.Scene()), 'nw'],
+  [new SharingDistrict(new T.Scene()), 'sw'],
+  [new ConcentrationDistrict(new T.Scene()), 'se'],
+] as const) {
+  district.setTarget(at({ [axis]: -3 }), 0, true, 42);
+  district.setTarget(at({ [axis]: 3 }), 1, false, 42);
+  assert.ok(district.changedPoints.length > 0, `${axis} reports changed positions`);
+  const forward = district.changedPoints.map(p => `${p.x},${p.z}`).sort();
+  district.setTarget(at({ [axis]: 3 }), 2, false, 42);
+  assert.equal(district.changedPoints.length, 0, `${axis} clears stale positions`);
+  district.setTarget(at({ [axis]: -3 }), 3, false, 42);
+  assert.deepEqual(district.changedPoints.map(p => `${p.x},${p.z}`).sort(), forward, `${axis} reports reverse positions`);
+}
+{
+  const district = new ConcentrationDistrict(new T.Scene());
+  for (const seed of [0, 1234]) for (let from = -3; from <= 3; from++) for (const to of [from - 1, from + 1]) {
+    if (to < -3 || to > 3) continue;
+    district.setTarget(at({ se: from, nw: 3, ne: 3 }), 0, true, seed);
+    const before = district.getConfiguration();
+    district.setTarget(at({ se: to, nw: 3, ne: 3 }), 1, false, seed);
+    const after = district.getConfiguration();
+    const expected = after.flatMap((group, k) => group.flatMap((value, i) =>
+      JSON.stringify(value) !== JSON.stringify(before[k][i]) ? [`se:${k ? 'pod' : 'tower'}${i + 1}`] : []));
+    assert.deepEqual(district.changedPoints.map(point => point.slot), expected, 'camera and pulses identify only visible SE changes');
+  }
 }

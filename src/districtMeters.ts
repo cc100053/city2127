@@ -74,6 +74,7 @@ export class SlotLevels {
 
 /** P5: each Meter's change-moment colour (the visual language of its district layer). */
 export const METER_COLORS = { automation: '#3fa9ff', publicSharing: '#ff6f91', environmentalPriority: '#5fe08a', urbanConcentration: '#ffb347' } as const;
+export type ChangedPoint = PulsePoint & { slot: string };
 /** `focus`: the Meter's site anchor, the one place a change is read from; other changed slots only ring faintly. */
 export type PulsePoint = { x: number; y: number; z: number; r: number; focus?: boolean };
 export const PULSE_SECONDS = 3, PULSE_WAVES = 2, PULSE_WAVE_GAP = 1.2;
@@ -178,7 +179,7 @@ const HALO = .42;
 /** Inland sharing courts [x, z, yaw]: open ground scanned clear of landmarks, context, routes, P2 pavilions and P4 towers / pods.
  * P7 ranks by estimated visible hero-frame pixels (`SCAN_COURTS=20` in tests/odaiba.test.ts lists candidates best first). */
 const COURT_SITES: readonly (readonly [number, number, number])[] = [
-  [-220, -140, .4], [-410, 120, 1.1], [-100, 60, 2.3], [50, -340, .9], [170, -360, 3.6], [-70, 180, 1.7], [-290, 290, 5.1], [-460, 290, .2], [220, 0, 2.8], [-20, 210, 4.4],
+  [-220, -140, .4], [-410, 120, 1.1], [-110, 230, 2.3], [50, -340, .9], [170, -360, 3.6], [-70, 180, 1.7], [-290, 290, 5.1], [-460, 290, .2], [220, 0, 2.8], [-20, 210, 4.4],
 ];
 const COURT = 40;
 /** Garden crowns inside a private court [x, z, size], clear of the glass room and the entrance. */
@@ -190,6 +191,7 @@ const PARASOLS: readonly (readonly [number, number])[] = [[-6, -6], [8, -2], [-2
 /** Existing planted islands become private water gardens (every other one under a glass vault) or open waterfront commons:
  * stepped seating where the vaults stood, planted halo canopies on the others. */
 export class SharingDistrict {
+  changedPoints: ChangedPoint[] = [];
   readonly root = new T.Group();
   readonly bays = shoreRoomBays().map(b => ({ x: b.x, z: b.z, yaw: b.yaw, r: b.r + 1.5, y: 2.8, sx: 1, sz: 1 }));
   private readonly levels = new SlotLevels(this.bays.length);
@@ -301,12 +303,13 @@ export class SharingDistrict {
     this.courtCrowns = batch(leafyCrown(1), new T.MeshStandardMaterial({ color: '#ffffff', roughness: .92 }), 'sharing-private-courts', n * COURT_TREES.length);
     const color = new T.Color();
     for (let i = 0; i < n * COURT_TREES.length; i++) this.courtCrowns.setColorAt(i, i % 4 === 2 ? color.set('#efc2cf') : color.setHSL(.26 + (i % 5) * .01, .4, .22 + (i % 3) * .02));
-    // Shared plaza: a pale paved disc with three white parasols on slim masts (9 m canopies about 9 m up).
+    // Shared plaza: a pale paved disc with three rose parasols on slim masts (9 m canopies about 9 m up).
     this.plazaPaving = batch(new T.CylinderGeometry(H - 1, H - 1, .3, 48).translate(0, .15, 0), commons, 'sharing-open-plazas');
+    const parasol = trim.clone(); parasol.color.set('#a66f72'); parasol.side = T.DoubleSide;
     this.plazaParasols = batch(mergeGeometries(PARASOLS.flatMap(([x, z]) => [
       new T.ConeGeometry(9, 2.2, 24, 1, true).rotateX(Math.PI).translate(x, 9.1, z).toNonIndexed(),
       new T.CylinderGeometry(.25, .3, 9, 8).translate(x, 4.5, z).toNonIndexed(),
-    ])), trim, 'sharing-open-plazas');
+    ])), parasol, 'sharing-open-plazas');
     // Winter garden: a 30 × 24 m glass house, 6.5 m high on seven ivory portal frames, the court's crowns growing inside
     // (kept low: the court in front of PARK must not hide the site from the hero pose).
     this.winterGardens = batch(new T.BoxGeometry(30, 6.5, 24).translate(0, 3.25, 0), privacy, 'sharing-private-courts');
@@ -354,9 +357,10 @@ export class SharingDistrict {
     const roomSlots = new Set([...(rooms ? this.levels.changed : []), ...(hr ? this.hybridRooms.changed : [])]);
     const courtSlots = new Set([...(courts ? this.court.changed : []), ...(hc ? this.hybridCourts.changed : []), ...(kiosks ? this.kiosk.changed : []),
       ...(orchards ? this.orchard.changed : [])]);
-    if (changed && !immediate && !quiet) this.pulses.emit([sitePulse('sw'), ...[...roomSlots].map(i => {
-      const b = this.bays[i]; return { x: b.x, y: b.y, z: b.z, r: b.r * b.sx * 1.3 };
-    }), ...[...courtSlots].map(i => ({ x: this.courts[i].x, y: 0, z: this.courts[i].z, r: COURT * .75 }))], now);
+    this.changedPoints = [...[...roomSlots].map(i => {
+      const b = this.bays[i]; return { slot: `sw:room${i + 1}`, x: b.x, y: b.y, z: b.z, r: b.r * b.sx * 1.3 };
+    }), ...[...courtSlots].map(i => ({ slot: `sw:court${i + 1}`, x: this.courts[i].x, y: 0, z: this.courts[i].z, r: COURT * .75 }))];
+    if (changed && !immediate && !quiet) this.pulses.emit([sitePulse('sw'), ...this.changedPoints], now);
     this.write(); return changed;
   }
 
@@ -811,6 +815,7 @@ export const PORT_DECK = 46;
 /** Q1: staffed waterfront pavilions give way to autonomous drone ports on the same bays, with denser district circulation.
  * World-space batches stay independent of the hub's scaled lot and use the same 3 s clock. */
 export class AutomationDistrict {
+  changedPoints: ChangedPoint[] = [];
   readonly root = new T.Group();
   readonly bays: { x: number; y: number; z: number; yaw: number }[] = [];
   private readonly automation = new SlotLevels(1);
@@ -938,7 +943,7 @@ export class AutomationDistrict {
     this.staffedDesign = this.bays.map((_, i) => designOf(i, 233, 2));
     this.autonomousDesign = this.bays.map((_, i) => designOf(i, 271, 2));
     this.drones = serviceDrones(this.root, this.bays.length);
-    this.pulses = new PulseRings(this.root, METER_COLORS.automation, (this.bays.length + 1) * PULSE_WAVES);
+    this.pulses = new PulseRings(this.root, METER_COLORS.automation, (this.bays.length + 2) * PULSE_WAVES);
     this.root.visible = false; parent.add(this.root); this.write();
   }
 
@@ -954,9 +959,12 @@ export class AutomationDistrict {
     const cut = ladderCut(ranks(this.bays.length, i => rank(i + 203)), tier, .5);
     const b = this.staffed.setTargets(i => rank(i + 203) >= cut ? 1 : 0, now, immediate, seed, sampleAt);
     const h = this.hybrid.setTargets(i => rank(i + 307) < ladderHybrid(tier) ? 1 : 0, now, immediate, seed, sampleAt);
-    // The fleets change everywhere at once, so the hub anchors the pulse; changed bays (pavilion ↔ drone port ↔ hybrid) mark their terraces.
+    // Changed bays mark their terraces; fleet-wide changes also mark one street route.
     const bays = new Set([...(b ? this.staffed.changed : []), ...(h ? this.hybrid.changed : [])]);
-    if ((a || b || h) && !immediate && !quiet) this.pulses.emit([sitePulse('nw'), ...[...bays].map(i => ({ x: this.bays[i].x, y: this.bays[i].y + 20, z: this.bays[i].z, r: 26 }))], now);
+    const street = routes().streets[0].getPointAt(.8);
+    this.changedPoints = [...[...bays].map(i => ({ slot: `nw:bay${i + 1}`, x: this.bays[i].x, y: this.bays[i].y + 20, z: this.bays[i].z, r: 26 })),
+      ...(a ? [{ slot: 'nw:street', x: street.x, y: street.y, z: street.z, r: 20 }] : [])];
+    if ((a || b || h) && !immediate && !quiet) this.pulses.emit([sitePulse('nw'), ...this.changedPoints], now);
     this.write(); return a || b || h;
   }
 
@@ -1039,6 +1047,7 @@ const POD_SITES: readonly (readonly [number, number])[] = [
  * High raises slender glass towers with lit sky lobbies on open ground; low scatters low glass pavilion pods across the lawns.
  * Both are complete 2127 forms; mixed shows about half of each. Positions are traced open ground (actual-mesh checks in odaiba.test.ts). */
 export class ConcentrationDistrict {
+  changedPoints: ChangedPoint[] = [];
   readonly root = new T.Group();
   /** [x, z, height]: spire tips (1.06 × height) stay below the 170 m air-taxi loop. */
   readonly towers: readonly { x: number; z: number; h: number }[] = TOWER_SITES.map(([x, z, h]) => ({ x, z, h }));
@@ -1190,6 +1199,10 @@ export class ConcentrationDistrict {
     if (immediate) this.pulses.clear();
     const tier = tiers.se;
     this.target = ladderShare(tier, .5);
+    const towerTarget = (i: number) => [Math.max(this.towerLevels.targets[i], .45 * this.midRise.targets[i]),
+      this.forest.targets[i] * this.towerLevels.targets[i], this.docks.targets[i] * this.towerLevels.targets[i]];
+    const podTarget = (i: number) => [this.podLevels.targets[i], this.solarPods.targets[i] * this.podLevels.targets[i]];
+    const beforeTowers = this.towers.map((_, i) => towerTarget(i)), beforePods = this.pods.map((_, i) => podTarget(i));
     const f = this.forest.setTargets(() => agree(tiers, 'se', 'ne', 'high') ? 1 : 0, now, immediate, 0, sampleAt);
     const d = this.docks.setTargets(() => agree(tiers, 'se', 'nw', 'high') ? 1 : 0, now, immediate, 0, sampleAt);
     const sp = this.solarPods.setTargets(() => agree(tiers, 'se', 'ne', 'low') ? 1 : 0, now, immediate, 0, sampleAt);
@@ -1201,12 +1214,11 @@ export class ConcentrationDistrict {
     const a = this.towerLevels.setTargets(i => order(i, .31) < share ? 1 : 0, now, immediate, seed, sampleAt);
     const b = this.podLevels.setTargets(i => order(i, .77) >= share ? 1 : 0, now, immediate, seed, sampleAt);
     const m = this.midRise.setTargets(i => rank(i + 1301) < ladderHybrid(tier) ? 1 : 0, now, immediate, seed, sampleAt);
-    if ((a || b || m || f || d || sp) && !immediate && !quiet) this.pulses.emit([
-      sitePulse('se'),
-      ...[...new Set([...(a ? this.towerLevels.changed : []), ...(m ? this.midRise.changed : []), ...(f ? this.forest.changed : []), ...(d ? this.docks.changed : [])])]
-        .map(i => ({ x: this.towers[i].x, y: 1, z: this.towers[i].z, r: 30 })),
-      ...[...new Set([...(b ? this.podLevels.changed : []), ...(sp ? this.solarPods.changed : [])])].map(i => ({ x: this.pods[i].x, y: 1, z: this.pods[i].z, r: 14 })),
-    ], now);
+    this.changedPoints = [
+      ...this.towers.flatMap((site, i) => towerTarget(i).some((v, j) => v !== beforeTowers[i][j]) ? [{ slot: `se:tower${i + 1}`, x: site.x, y: 1, z: site.z, r: 30 }] : []),
+      ...this.pods.flatMap((site, i) => podTarget(i).some((v, j) => v !== beforePods[i][j]) ? [{ slot: `se:pod${i + 1}`, x: site.x, y: 1, z: site.z, r: 14 }] : []),
+    ];
+    if ((a || b || m || f || d || sp) && !immediate && !quiet) this.pulses.emit([sitePulse('se'), ...this.changedPoints], now);
     this.write(); return a || b || m || f || d || sp;
   }
 

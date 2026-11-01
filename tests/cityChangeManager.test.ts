@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { CHANGE_CATALOG, SITE_IDS, selectExhibitionSiteVariants, siteLayerDefinition, type EnvironmentParkTarget, type SiteLayerDefinition, type SiteLayerId } from '../src/changeCatalog.ts';
+import { AutomationDistrict } from '../src/districtMeters.ts';
 import { CityChangeManager, SITE_ASSET_RETRY_SECONDS } from '../src/cityChangeManager.ts';
 import type { BuiltSite, BuiltSiteMap } from '../src/siteBuilders/index.ts';
 import { MutableSiteLayerRuntime } from '../src/siteBuilders/siteRuntime.ts';
@@ -394,6 +395,13 @@ assert.equal(manager.getDiagnostics().stationEastPark.environmentPark?.visibleTr
   assert.ok(sites.centerGaiRear.marker.material.emissiveIntensity > .2);
   close(sites.magnetEast.marker.material.emissiveIntensity, .2);
   manager.applyExhibitionLayout(neutral, 'run-reset', 33);
+  const votes = { automation: 1 as const, publicSharing: 0 as const, environmentalPriority: 0 as const, urbanConcentration: -1 as const };
+  const directed = manager.applyExhibitionLayout({ ...two, tiers: { ...two.tiers, nw: 1, se: 2 } }, 'city-state-updated', 34, undefined, 34, votes);
+  assert.deepEqual(directed.map(change => [change.socketId, !!change.headline]), [['nw', true], ['se', false]]);
+  manager.update(34.5);
+  assert.ok(sites.magnetEast.marker.material.emissiveIntensity > .2);
+  close(sites.centerGaiRear.marker.material.emissiveIntensity, .2);
+  manager.applyExhibitionLayout(neutral, 'run-reset', 35);
 }
 
 manager.applyIncrementalUpdate(view(layout({ ne: lot('park') }), 8), 33);
@@ -410,3 +418,18 @@ assert.equal(manager.getDiagnostics().centerGaiRear.concentrationTower?.targetFu
 assert.throws(() => new CityChangeManager({ ...sites, magnetEast: { ...sites.magnetEast, automationHub: undefined } } as BuiltSiteMap)
   .applyExhibitionLayout(neutral, 'city-state-snapshot', 34), /Missing exhibition runtime/);
 console.log('PASS: four-site v2 targets, isolated axes, same-band retargets, snapshots/resets, and preserved v1 paths.');
+
+// District pulse positions pass through the real manager without retaining the previous update's slots.
+{
+  const district = new AutomationDistrict(new T.Group());
+  const withDistrict = { ...sites, magnetEast: { ...sites.magnetEast, automationDistrict: district } } as BuiltSiteMap;
+  const actual = new CityChangeManager(withDistrict);
+  const low = exhibitionLayout({tiers:{nw:-2,sw:0,se:0,ne:0}});
+  const high = exhibitionLayout({tiers:{nw:3,sw:0,se:0,ne:0}});
+  actual.applyExhibitionLayout(low,'city-state-snapshot',100,undefined,100);
+  const changed = actual.applyExhibitionLayout(high,'city-state-updated',105,undefined,100);
+  const nw = changed.find(c=>c.socketId==='nw');
+  assert.ok(nw?.district && nw.points?.length);
+  assert.deepEqual(nw.points, district.changedPoints);
+  assert.ok(nw.points.every(p=>p.slot.startsWith('nw:bay') || p.slot === 'nw:street'));
+}
