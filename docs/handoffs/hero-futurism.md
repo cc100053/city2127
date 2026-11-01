@@ -1,7 +1,7 @@
 # hero-futurism — 「一睇就知」嘅 2127 未來感（hero 鏡頭＋全域物料同光）
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — R1 owner 接受（2026-11-01），R2 航道待目視
+- Status: DONE — owner 接受 R1＋R2（2026-11-01），merge main
 - Branch: `feat/hero-futurism`
 - Base commit: `f35fe178a7eb8efae04efa59b1b0f4170b2e3241`
 - Last verified commit: R2 commit（root test／build／diff-check PASS）
@@ -50,7 +50,7 @@ Owner 2026-11-01：幾輪打磨後城市合理但唔夠未來感；要誇張視�
 
 ## Actual validation results
 
-- Verification status: PARTIAL — 機械檢查 PASS；owner 目視 PENDING
+- Verification status: PASSED — 機械檢查 PASS；owner 目視接受 R1、R2（2026-11-01）
 - `d2696af`：root `npm test`（exit 0）、`npm run build`、`git diff --check` PASS
 - FPS（headless，詳見 VALIDATION）：vsync 兩邊 60；uncapped main 87 → branch 89–90；draws 972→970
 - 證據：`artifacts/hero-futurism/before-after.jpg`、`r1/c2r1-h16.png`、`r1/c2r1-h21.png`、`r1/` 中間 pass、`camera/`
@@ -64,4 +64,4 @@ Owner 2026-11-01：幾輪打磨後城市合理但唔夠未來感；要誇張視�
 
 ## Next expected step
 
-Owner 目視 R1；決定下一輪做：航道虛線、前景塔樓、Civic Core 放大，或者 court 重新揀位。未 merge main。
+已 merge main。後續候選（各自另開任務）：前景藍間條塔樓（第 4 項）、Civic Core 放大（第 2 項）、sharing courts 1/4/6/7 用 `SCAN_COURTS` 重新揀位、水面倒影同較闊光帶（要新 pass，須先量效能）、展覽機 FPS。
