@@ -198,6 +198,15 @@ Avoid:
 
 The future is radical because the **city operates differently**, not because every surface is visually loud.
 
+## Owner amendment (2026-11-01): exaggerate the hero, keep the street calm
+
+After several polish rounds the owner judged the city plausible but not readable as 2127 at a glance. The futurism must now be **obvious in the first second of the hero view**, so these override the restraint above at hero scale:
+
+- **Camera and scale:** the hero frame reads the Civic Core (Fuji TV) as the dominant landmark seen from a lower, closer viewpoint — looking up at a megastructure, not down at a model table (R01).
+- **Material and light:** glossy white metal, clear glass and water that reflect the sky; mobility routes and vehicle trails may glow as light bands with bloom. "Arbitrary glowing objects" stays forbidden: a glow must belong to a system (mobility, energy, Meter accent, occupied rooms).
+- **Restraint still applies** at street and close-up scale: no cyberpunk palette, neon signage, clutter or anti-gravity blobs; Meter colours stay the only saturated accent.
+- **Performance is part of taste:** an exaggerated effect that drops the exhibition view below 60 FPS (vsync, 1920×1080) is not accepted.
+
 ---
 
 # 4. The 2127 test
