@@ -1,6 +1,7 @@
 import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { bake, trim, stone, glass, futureLight, chrome } from './cityRig.ts';
+import { bake, trim, stone, glass, futureLight, chrome, skyGlass, leaf, leafyCrown } from './cityRig.ts';
+import { pedestrians } from './mobility.ts';
 import { SKY_RING } from './layout.ts';
 
 // 空の環 (Sky Ring, Plan B hero megastructure): the regional air tier's shared port. A box truss ellipse (deck top SKY_RING.deck,
@@ -54,31 +55,39 @@ export function skyRing(scene: T.Scene) {
     // Warren triangulation on both faces and the soffit, so the ring reads as built structure from below.
     member(root, i % 2 ? p.to : p.bo, i % 2 ? q.bo : q.to, .55, .55, trim); member(root, i % 2 ? p.bi : p.ti, i % 2 ? q.ti : q.bi, .55, .55, trim);
     member(root, p.bo, q.bi, .45, .45, trim);
-    // Deck: the walkway and berth apron the corridor traffic lands on, edged by a stone fascia and a glass parapet on both sides;
-    // the outer fascia carries the corridor's docking line.
+    // Deck: the walkway and berth apron the corridor traffic lands on, edged by a deep stone fascia and a glass parapet on both sides;
+    // both fascias carry the corridor's docking-light line.
     member(root, ringPoint(a0, top - .3), ringPoint(a1, top - .3), WIDTH + 2, .6, stone, UP);
+    // The outer parapet opens where a berth meets the deck (berths sit on the boundary of panels 12b+5 and 12b+6).
     for (const s of [-1, 1]) {
-      member(root, ringPoint(a0, top - 1, s * (WIDTH / 2 + 1.2)), ringPoint(a1, top - 1, s * (WIDTH / 2 + 1.2)), .4, 2.4, stone);
-      member(root, ringPoint(a0, top + .75, s * (WIDTH / 2 + .9)), ringPoint(a1, top + .75, s * (WIDTH / 2 + .9)), .15, 1.5, glass);
+      member(root, ringPoint(a0, top - 1.4, s * (WIDTH / 2 + 1.2)), ringPoint(a1, top - 1.4, s * (WIDTH / 2 + 1.2)), .5, 3.2, stone);
+      if (s < 0 || i % 12 < 5 || i % 12 > 6) member(root, ringPoint(a0, top + .75, s * (WIDTH / 2 + .9)), ringPoint(a1, top + .75, s * (WIDTH / 2 + .9)), .15, 1.5, glass);
+      member(root, ringPoint(a0, top - .9, s * (WIDTH / 2 + 1.5)), ringPoint(a1, top - .9, s * (WIDTH / 2 + 1.5)), .12, .55, futureLight);
     }
-    member(root, ringPoint(a0, top - .7, WIDTH / 2 + 1.45), ringPoint(a1, top - .7, WIDTH / 2 + 1.45), .12, .4, futureLight);
+    // Cast nodes where chords, posts and diagonals meet, so joints read as built connections rather than crossing boxes.
+    for (const k of ['to', 'ti', 'bo', 'bi'] as const) { const n = k[0] === 'b' ? 3 : 2.2; part(root, new RoundedBoxGeometry(n, n, n, 1, n * .3), trim, p[k]).lookAt(q[k]); }
+    // Planted inner edge: a stone planter per panel under a continuous hedge and three crowns of varied size, the residents' garden walk.
+    member(root, ringPoint(a0 + .006, top + .45, -WIDTH / 2 + 1.6), ringPoint(a1 - .006, top + .45, -WIDTH / 2 + 1.6), 2.4, .9, stone);
+    member(root, ringPoint(a0 + .004, top + 1.2, -WIDTH / 2 + 1.6), ringPoint(a1 - .004, top + 1.2, -WIDTH / 2 + 1.6), 2.1, .8, leaf);
+    for (const [j, f] of [.18, .5, .82].entries()) {
+      const size = .7 + ((i * 7 + j * 3) % 5) * .14, crown = part(root, leafyCrown(1), leaf, ringPoint(a0 + (a1 - a0) * f, top + 1.6 + size * 1.6, -WIDTH / 2 + 1.6));
+      crown.scale.set(2.2, 2.4, 2.2).multiplyScalar(size);
+    }
   }
   // Berths: cantilevered aprons off the outer face, each braced back to the bottom chord, with a lit docking edge and one parked craft.
   for (let b = 0; b < BERTHS; b++) {
     const a = (b + .5) / BERTHS * Math.PI * 2, t = 12 / Math.hypot(SKY_RING.rx, SKY_RING.rz) * 1.4;
-    const inner = ringPoint(a, top - .5, WIDTH / 2), outer = ringPoint(a, top - .5, WIDTH / 2 + 18);
-    member(root, inner, outer, 22, 1, stone);
-    member(root, ringPoint(a, top - 1.4, WIDTH / 2 + 18), ringPoint(a, top - 1.4, WIDTH / 2 + 18.4), 22, 2.2, stone);
-    for (const s of [-1, 1]) {
-      member(root, ringPoint(a + s * t * .55, top - 1, WIDTH / 2 + 18), ringPoint(a + s * t * .55, bottom, WIDTH / 2), .8, .8, trim);
-      member(root, ringPoint(a + s * t * .64, top + .75, WIDTH / 2 + 1), ringPoint(a + s * t * .64, top + .75, WIDTH / 2 + 18), .15, 1.5, glass);
-    }
-    member(root, ringPoint(a - t * .55, top - .7, WIDTH / 2 + 18.65), ringPoint(a + t * .55, top - .7, WIDTH / 2 + 18.65), .12, .4, futureLight);
-    // Pad: a docking ring on the apron (the same docking light) and a glazed boarding gate where the apron meets the deck.
+        // Rounded apron (24 m along the ring, 19 m out) with a docking-light band round its edge.
+    const apron = new T.Group(); apron.position.copy(ringPoint(a, top, WIDTH / 2 + 9)); apron.lookAt(ringPoint(a, top, 0)); root.add(apron);
+    part(apron, new RoundedBoxGeometry(24, 1.6, 19, 2, .75), stone, new T.Vector3(0, -.8, 0));
+    part(apron, new RoundedBoxGeometry(24.4, .35, 19.4, 2, .2), futureLight, new T.Vector3(0, -.9, 0));
+    for (const s of [-1, 1]) member(root, ringPoint(a + s * t * .55, top - 1.5, WIDTH / 2 + 17), ringPoint(a + s * t * .55, bottom, WIDTH / 2), .8, .8, trim);
+    // Pad: a docking ring on the apron (the same docking light) and a glazed boarding hall on the outer half of the deck behind it.
     part(root, new T.TorusGeometry(7, .22, 4, 40).rotateX(Math.PI / 2), futureLight, ringPoint(a, top + .05, WIDTH / 2 + 9.5));
-    const gate = new T.Group(); gate.position.copy(ringPoint(a, top, WIDTH / 2 - 2.5)); gate.lookAt(ringPoint(a, top, 0)); root.add(gate);
-    part(gate, new RoundedBoxGeometry(8, 3, 3, 2, .4), glass, new T.Vector3(0, 1.5, 0));
-    part(gate, new RoundedBoxGeometry(9.5, .45, 4.4, 2, .2), trim, new T.Vector3(0, 3.2, 0));
+    const gate = new T.Group(); gate.position.copy(ringPoint(a, top, WIDTH / 2 - 3)); gate.lookAt(ringPoint(a, top, 0)); root.add(gate);
+    part(gate, new RoundedBoxGeometry(24, 4.6, 5.4, 2, .5), skyGlass, new T.Vector3(0, 2.3, 0));
+    part(gate, new RoundedBoxGeometry(28, .5, 8.5, 2, .22), trim, new T.Vector3(0, 4.85, -.6));
+    for (const x of [-13, 13]) member(gate, new T.Vector3(x, 0, -4), new T.Vector3(x, 4.6, -4), .35, .35, trim);
     // Parked air pod (the mobility fleet's rounded pod at its 5× scale): pale shell, glass canopy, docking-light keel, four ducted rotors on skids.
     const craft = new T.Group(), heading = ringPoint(a + .01, 0).sub(ringPoint(a - .01, 0)).normalize();
     craft.position.copy(ringPoint(a, top + 2.2, WIDTH / 2 + 9.5)); craft.lookAt(craft.position.clone().add(heading)); root.add(craft);
@@ -113,6 +122,15 @@ export function skyRing(scene: T.Scene) {
     dummy.position.copy(ringPoint((i + .5) / VOICE_NODES * Math.PI * 2, bottom - 3.3, i % 2 ? -WIDTH / 2 : WIDTH / 2)); dummy.updateMatrix();
     voices.setMatrixAt(i, dummy.matrix);
   }
+  // Residents on the deck: a few waiting at each boarding hall, others strolling the garden walk (standing poses; the ring is a review subject, not a route).
+  const RESIDENTS = 200, people = pedestrians(scene, RESIDENTS, 'sky-ring-residents'), pose = new T.Object3D();
+  for (let k = 0; k < RESIDENTS; k++) {
+    const atGate = k < 80, b = k % BERTHS, j = Math.floor(k / BERTHS);
+    const a = atGate ? (b + .5) / BERTHS * Math.PI * 2 + ((j * 37) % 23 - 11) / SKY_RING.rx : (k * 1.618) % (Math.PI * 2);
+    const out = atGate ? (j % 2 ? WIDTH / 2 - 7.2 : WIDTH / 2 + 4 + (j * 5) % 9) : -WIDTH / 2 + 4 + ((k * 13) % 7);
+    pose.position.copy(ringPoint(a, top, out)); pose.rotation.set(0, (k * 2.39) % (Math.PI * 2), 0); people.set(k, pose); people.gait(k, 0, 0);
+  }
+  people.flush();
   scene.add(...fixed, voices);
   let shown = 0, dark = -1;
   const paint = () => {
@@ -121,7 +139,7 @@ export function skyRing(scene: T.Scene) {
     voices.instanceColor!.needsUpdate = true;
   };
   return {
-    root: [...fixed, voices],
+    root: [...fixed, voices, ...people.meshes],
     /** Light one node per proposal so far (count only); the ring is full from VOICE_NODES guests on. */
     setVoices(count: number) {
       const n = Math.min(VOICE_NODES, Math.max(0, Math.floor(count)));

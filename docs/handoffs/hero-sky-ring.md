@@ -99,3 +99,31 @@ Validation（development Mac headless Chrome，playwright-cli，1920×1080 DPR1�
 Known issues：civic close-up 仍然見到斜腿做背景線（腿而家係圓錐，冇加粗，但冇移位）；登機閘口企喺甲板外側行人道上（14 m 甲板仲有 ~9 m 通道）。
 
 Next expected step：owner 睇 `closeups-before-after.jpg` 同 hero 日夜；接受就 merge 入 `feat/hero-sky-ring`，或者指出下一輪（例如要 Gemini target、加人／加夜間泊位燈）。
+
+## Close-up polish R2（Gemini target）
+
+- Owner 2026-11-02：close-up polish **預設要先用 Gemini 出 target 圖**（R1 跳過咗呢步）。`artifacts/hero-sky-ring/polish/prompts.md` 以 R1 截圖做底圖（`baseline/`，1600×900）；Sonnet agent 經 Claude in Chrome 喺 Gemini `/u/3/app` 生成（truss 試咗 2 次，其餘 1 次），owner 揀晒四張放入 `target/`。`gen/` 同 `target/` 檔案一樣，冇 commit `gen/`。
+- 生成時 agent 誤撳過一次 Gemini「分享公開連結」對話框，即刻閂咗、冇複製連結；如果介意，可以喺 Gemini 刪除 "Odaiba Sky Ring Engine Screenshot Redesign" 嗰個 chat。
+
+Target → 改動（`src/skyRing.ts`，重用 `cityRig` 材質，新增用到 `skyGlass`、`leaf`／`leafyCrown`，同 `mobility.ts` 嘅 `pedestrians`）：
+
+| Target 讀到 | 改動 |
+|---|---|
+| 深而順嘅甲板封邊 + 明顯 mint 線（由下面都睇到） | 封邊 2.4 → 3.2 m；兩側封邊都有 0.55 m `futureLight` 線 |
+| 桁架節點係鑄件，唔係交叉方棍 | 每格四個弦桿節點加圓角節點塊（底 3 m、頂 2.2 m） |
+| 甲板內側係花園步道 | 每格石花槽 + 連續綠籬 + 三個大小唔同嘅樹冠（`leafyCrown`） |
+| 圓角泊位平台、邊緣 mint 帶 | 泊位改成 24 × 19 m 圓角平台 + 一圈 `futureLight` 邊帶；外側欄河喺泊位位開口 |
+| 玻璃登機大堂 | 細閘口改成 24 × 5.4 m `skyGlass` 大堂、28 m 白色屋頂、兩條柱 |
+| 甲板有人 | 200 個居民（靜止企位；80 個喺各大堂／泊位，其餘喺花園步道），用現有 `pedestrians` |
+| Pylon target | R1 嘅圓錐斜腿同 target 已經好接近，冇再改 |
+
+冇跟 target 做：truss target 嘅桁架內下層步道同粗身分節斜柱（同 pylon target 矛盾，亦超出截面）；berth target 嘅人群密度（只放咗 200 人）；夜晚甲板底面嘅城市反光。
+
+Validation（同 R1 方法）：
+
+- hero `hour=16`：60.0／60.1 FPS vsync，draws 983 → **1001**，triangles 16.43M → **17.17M**（+0.73M）；`hour=21`：60.0 ×4，draws 984 → 1002；civic：59.9–60.2，draws 456 → 474。陰影更新幀偶然 1384／22.1M。Console 0 error。
+- Root `npm test` exit 0（12 條 hero 視線仍然清，環頂 256.3 m）、`npm run build` ✓、`git diff --check` clean。
+- 證據：`polish/r2/vs-target.jpg`（每行：R1 底圖｜target｜R2）、`r2/<shot>.jpg`、`r2/hero-h16.jpg`、`r2/hero-h21.jpg`
+- NOT RUN：uncapped FPS（+18 draws／+0.73M 三角形未量裕度）、展覽機、dusk
+
+Next expected step：owner 睇 `r2/vs-target.jpg`，接受就 merge 入 `feat/hero-sky-ring`，或者指出 R3。
