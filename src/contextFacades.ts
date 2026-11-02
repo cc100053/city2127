@@ -20,6 +20,7 @@ export function contextFacades(environment: T.Object3D) {
       for (let y = Math.ceil(Math.min(...ys) / 4) * 4 + 2; y < Math.max(...ys) - 1.6; y += 4) {
         for (let u = Math.ceil(Math.min(...us) / 4) * 4 + 2; u < Math.max(...us) - 1.8; u += 4) {
           point.copy(normal).multiplyScalar(plane).addScaledVector(across, u).setY(y);
+          const m = y % 16.8; if (m < 2.7 || m > 15.6) continue; // clear of the shader's megaframe band and seam
           if (!triangle.containsPoint(point) || !inDistrict(point.x, point.z)) continue;
           const key = point.toArray().map(v => v.toFixed(2)).join(',');
           if (occupied.has(key)) continue;
@@ -28,7 +29,7 @@ export function contextFacades(environment: T.Object3D) {
           transform.quaternion.setFromUnitVectors(forward, normal);
           // r5 pass 2: one even glass grid per tower (target v2) — full-width panes, thin mullions and a 1.1 m pale floor band between storeys.
           // r9 pass 3: narrower panes so ivory piers and floor bands frame each bay (target v2's light ivory towers, not dark glass slabs).
-          transform.scale.set(3.2, 2.6, 1);transform.updateMatrix();panels.push(transform.matrix.clone());
+          transform.scale.set(2.6, 2.6, 1);transform.updateMatrix();panels.push(transform.matrix.clone());
           const row = Math.floor(y / 4), col = Math.floor(u / 4);
           // r6 pass 3: warm champagne glass (the same tone as the curtain-wall shader underneath, so uncovered faces no longer show as
           // beige blocks against blue-grey) with a soft per-bay brightness; whole lit floor runs on about one storey in four.
@@ -38,7 +39,7 @@ export function contextFacades(environment: T.Object3D) {
           const jitter = Math.abs(Math.sin(row * 4.1) * 1e4) % 1;
           // r9: the unlit panes become cool blue-grey glass reading the sky (target v2: ivory frames, blue-grey glazing, golden lit floors);
           // the champagne panes made towers read as sandstone brick. The curtain-wall shader's panes match, so faces stay one system.
-          shades.push(lit ? new T.Color().setHSL(.1, .48, .74 + jitter * .04) : new T.Color().setHSL(.57, .1, .68 + jitter * .04));
+          shades.push(lit ? new T.Color().setHSL(.1, .48, .74 + jitter * .04) : new T.Color().setHSL(.57, .1, .76 + jitter * .04));
         }
       }
     }
