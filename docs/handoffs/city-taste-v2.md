@@ -116,3 +116,4 @@ Coordinator session runs `artifacts/city-taste-v2/coordinator.md`: P1→P6 again
 
 - Decision: **pass**, merged `--no-ff` (b45a72e merges `feat/city-taste-v2-p5` 34e1afc). Ring and hull carry continuous shrub bands + irregular tree clusters (lush, not rows); pink cherry colouring gone (cherry → spring green); tall tower roofs are stepped rims with shrub bands and ≤ 2 trees (terrace data unchanged, Meter publishing intact); four hovering machine planter discs on the plaza deck (±0.4 m bob). Foliage+shrub instances 3610 → 4142 (+14.7%), ≈ +3 draws (1099 day). Weak: hull still reads as tree clusters over glass from hero; two small non-canopy pink dots remain.
 - Checks on the merge (coordinator): tests fail 0, build 0, diff-check clean. FPS (agent) 60/60. No test edits.
+- 04:40 JST: P6 r1 started (agent branch `feat/city-taste-v2-p6` from a8ef475). P7 spec r1 drafted.
