@@ -69,30 +69,31 @@ export const sweepway: readonly P3[] = [[-290,92,265],[-345,74,250],[-400,56,205
 // Sky Ring (空の環, src/skyRing.ts): a 700 m truss ring whose deck top sits at `deck` m, a shared port above the regional air tier; the district
 // loop follows its plan below. Above the hero eye (~148 m) so it arcs across the sky; at the tier's own 160–170 m it read as a flat bar at eye level.
 export const SKY_RING = {x:-40,z:-40,rx:350,rz:350,deck:250} as const;
+// P4 plaza deck (plazaDeck.ts) on the former Aqua City lot; local +z runs out to sea. `plazaAt` maps plaza-local metres to world x, z.
+export const PLAZA = { x: -92.3, z: -103.3, yaw: -2.55, hu: 80, hv: 40, h: 5 } as const;
+export const plazaAt = (lx: number, lz: number): [number, number] => [PLAZA.x + lx * Math.cos(PLAZA.yaw) + lz * Math.sin(PLAZA.yaw), PLAZA.z - lx * Math.sin(PLAZA.yaw) + lz * Math.cos(PLAZA.yaw)];
+const HERO_EYE: P3 = [-358,148,-437];
+export const VOICES_AT = plazaAt(0,-37.5), AIR_AT = plazaAt(66,30);
+/** Face point 30 m from a panel toward the hero eye, 8.5 m lower (the panel tilts down about 15 degrees). */
+const aimAt = ([x,z]:readonly [number,number], y:number): P3 => { const d = Math.hypot(HERO_EYE[0]-x, HERO_EYE[2]-z); return [x+(HERO_EYE[0]-x)/d*30, y-8.5, z+(HERO_EYE[2]-z)/d*30]; };
 // Hero holograms (src/heroHolograms.ts, artifacts/hero-holograms/spec.md): 8 holographic panels at resident scale. Each hangs at a real anchor found by raycast against the
 // loaded city (2026-11-02) and faces the pedestrian eye it is meant for, not the hero camera. at = panel centre, w x h = size, face = the world point it turns towards
 // (the walkers' eye, lowered so a high panel tilts down by about 10-15 degrees instead of craning), view = the main viewing distance in metres (main word >= view / 40).
 // `eye` is only the settled hero camera, kept for the hero visibility and sightline tests.
 export const HOLOGRAMS = {
-  eye: [-358,148,-437] as P3,
+  eye: HERO_EYE,
   panels: [
     // Civic Core (Fuji TV frame) north face, 1.8 m outside the beams (front faces reach z -17.2): the upper media bay (x 6..54 between the central and east columns, y 71..105, above the
     // 58-67 m floor beam), facing the main plaza and the hero
     {id:'district',at:[30,88,-19] as P3,w:48,h:34,face:[30,62,-110] as P3,view:120},
     // Daiba station front: Fuji podium north-east face (curved, top 24 m) above the Yurikamome deck, facing the plaza and station forecourt
     {id:'transit',at:[17.7,20.5,-38] as P3,w:10,h:5,face:[33.8,16,-59.4] as P3,view:28},
-    // Aqua City seaward facade (flat to 30 m, plane -0.55x - 0.83z = 183.4), upper floors, facing the seaside promenade
-    {id:'air',at:[-137.3,29.5,-131.8] as P3,w:10,h:5,face:[-155.7,20,-159.6] as P3,view:35},
-    // Aqua City seaward facade at the avenue, residents' voice board 9 m above the ground, facing the promenade lawn
-    {id:'voices',at:[-108.2,15,-151] as P3,w:16,h:12,face:[-132.2,3,-187.2] as P3,view:45},
+    // Mast on the plaza deck's west perimeter (P4 r2: Aqua City is gone), data panel facing the hero
+    {id:'air',at:[AIR_AT[0],29.5,AIR_AT[1]] as P3,w:10,h:5,face:aimAt(AIR_AT,29.5),view:35},
+    // Mast at the plaza deck's land-side edge, residents' voice board 11.5 m above the deck facing the hero (P4 r2)
+    {id:'voices',at:[VOICES_AT[0],17.5,VOICES_AT[1]] as P3,w:16,h:12,face:aimAt(VOICES_AT,17.5),view:45},
     // Fuji TV media screen, same face 1.8 m outside the beams, the lower bay (y 32.5..63.5: 2.5 m over the podium roof that reaches y 30 near x 21; it stands 1.8 m in front of the 58-67 m floor beam, not in it), facing the plaza and the hero
     {id:'culture',at:[31,48,-19] as P3,w:44,h:31,face:[31,26,-85] as P3,view:85},
-    // Sky bridge Aqua City <-> Fuji TV (deck 24 m): direction sign 6.5 m over the deck facing walkers who come from the Aqua City end
-    {id:'tag-a',at:[-32,30.5,-61] as P3,w:4,h:1.35,face:[-49,28,-90] as P3,view:30},
-    // Sky bridge Aqua City <-> DECKS: sign 6.5 m over the deck facing walkers from the Aqua City end
-    {id:'tag-b',at:[60.5,30.5,-196.5] as P3,w:4,h:1.35,face:[31,28,-177] as P3,view:30},
-    // Garden deck DECKS <-> Aqua City roof (deck 35.5 m): sign 6.5 m over the deck facing walkers from the Aqua City landing
-    {id:'tag-c',at:[85,42,-150] as P3,w:4,h:1.35,face:[55.3,37.5,-146.4] as P3,view:30},
   ],
 } as const;
 // Far backdrop space elevator (2026-11-02): ~7.5 km from the settled hero camera at screen x≈1220/1920, open sea; its anchor sinks ~480 m behind the curved horizon. Heights in metres before curvature.
@@ -135,15 +136,12 @@ export const interchangeBoatLane: readonly P3[] = [[-380,-.6,-560],[-260,-.6,-44
 export const midDecks: readonly (readonly P3[])[] = [
   [[-86,40,18],[-130,40.5,26],[-180,41,34],[-220,40.5,40],[-250,40,44]],
 ];
-// P4 plaza deck (plazaDeck.ts) on the former Aqua City lot; local +z runs out to sea. `plazaAt` maps plaza-local metres to world x, z.
-export const PLAZA = { x: -92.3, z: -103.3, yaw: -2.55, hu: 80, hv: 40, h: 5 } as const;
-export const plazaAt = (lx: number, lz: number): [number, number] => [PLAZA.x + lx * Math.cos(PLAZA.yaw) + lz * Math.sin(PLAZA.yaw), PLAZA.z - lx * Math.sin(PLAZA.yaw) + lz * Math.cos(PLAZA.yaw)];
-const deckTop = PLAZA.h + .35;
+const deckTop = PLAZA.h + .6;
 /** Elevated white walkways (deck top y at the points): ring plinth to the plaza, plaza to the civic core's landing, plaza to the hull apron. Walkers use them. */
 export const plazaWalks: readonly (readonly P3[])[] = [
-  [[72,12,-183],[42,14.5,-172],[10,13,-158],[...plazaAt(-92,12),8],[...plazaAt(-80,10),6.5],[...plazaAt(-62,8),deckTop]],
-  [[...plazaAt(-20,-34),deckTop],[...plazaAt(-14,-54),8],[-34,12,-64],[-48,11,-45],[-38,7,-22],[-34,3.2,-4]],
-  [[...plazaAt(60,-6),deckTop],[...plazaAt(92,-10),9],[-195,11,-45],[-208,7,-10],[-212,3.2,18]],
+  [[72,16,-183],[45,15,-176],[18,12.5,-168],[-5,10.5,-163],[...plazaAt(-88,11),7.2],[...plazaAt(-80,10),deckTop],[...plazaAt(-66,8),deckTop],[...plazaAt(-56,8),deckTop]],
+  [[...plazaAt(-26,-34),deckTop],[...plazaAt(-16,-48),deckTop],[...plazaAt(-14,-60),11],[-34,15,-66],[-50,15.5,-48],[-46,12,-28],[-40,7.5,-14],[-36,3,-2]],
+  [[...plazaAt(56,-8),deckTop],[...plazaAt(68,-10),deckTop],[...plazaAt(92,-10),12],[-176,16,-42],[-200,16,-22],[-210,11,0],[-214,6,14],[-214,3,26]],
 ];
 // Planted mid-level decks (r6 pass 3, target v2's tree-lined middle layer; 5.2 m lawn bed down the middle). Raycast-checked against the
 // environment, landmarks and Fuji chassis: clear between their docked ends, and off every survey site's line of sight from the hero pose.
