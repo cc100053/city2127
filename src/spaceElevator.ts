@@ -5,11 +5,11 @@ import { SPACE_ELEVATOR } from './layout.ts';
 import { HERO_POSITION } from './heroCamera.ts';
 
 // 軌道エレベーター: a far backdrop silhouette, ~7.5 km beyond the Civic Core, right of it in the hero frame. Its anchor island sinks
-// behind the curved sea, so guests see only a hazed spire, one transfer station and the tether climbing out of frame. No Meters.
+// behind the curved sea, so guests see only a hazed column, one transfer station and the tether climbing out of frame. No Meters.
 // Unlit and fog-free (exp² fog would erase it at this range): every frame it takes the fog colour, a shade darker, and at night its
-// station windows, docking bays, tether joints, climber pods and spire beacons glow faintly instead.
+// station windows, docking bays, tether joints, climber pods and cap beacons glow faintly instead.
 const mat = () => new T.MeshBasicMaterial({ fog: false }), body = mat(), lamp = mat(), pane = mat(), beacon = mat();
-// Volume (owner R3): a soft fixed key light from the left-front rounds the spire and tether and darkens disc undersides; the lower
+// Volume (owner R3): a soft fixed key light from the left-front rounds the column and tether and darkens disc undersides; the lower
 // parts fade into the haze colour so the mass sits behind the horizon instead of reading as a flat cutout. `lit` 0 = no shading (lamps at night).
 const haze = { value: new T.Color() };
 function shaded(material: T.MeshBasicMaterial, lit: { value: number }) {
@@ -26,7 +26,7 @@ function shaded(material: T.MeshBasicMaterial, lit: { value: number }) {
 }
 const bodyLit = { value: 1 }, glowLit = { value: 1 };
 shaded(body, bodyLit); for (const m of [lamp, pane, beacon]) shaded(m, glowLit);
-const LAMP = new T.Color('#8ce5d8').multiplyScalar(.9), PANE = new T.Color('#ffcf8a').multiplyScalar(.8), BEACON = new T.Color('#ff4a3a').multiplyScalar(.75), luminance = (c: T.Color) => .2126 * c.r + .7152 * c.g + .0722 * c.b;
+const LAMP = new T.Color('#8ce5d8').multiplyScalar(.9), PANE = new T.Color('#ffcf8a').multiplyScalar(.6), BEACON = new T.Color('#ff4a3a').multiplyScalar(.6), luminance = (c: T.Color) => .2126 * c.r + .7152 * c.g + .0722 * c.b;
 
 /** Shade darker than the haze (day) and glow strength (night) for a given fog colour. */
 export function elevatorTone(fog: T.Color) {
@@ -40,34 +40,27 @@ export function spaceElevator(scene: T.Scene) {
   const add = (geometry: T.BufferGeometry, material: T.Material, y: number, x = 0, z = 0) => { const m = new T.Mesh(geometry, material); m.position.set(x, y, z); parts.add(m); return m; };
   // A part at polar (angle, radius) about the tether, its local +x pointing outward.
   const polar = (geometry: T.BufferGeometry, material: T.Material, angle: number, r: number, y: number) => { const m = add(geometry, material, y, Math.cos(angle) * r, Math.sin(angle) * r); m.rotation.order = 'YZX'; m.rotation.y = -angle; return m; };
-  const { spire, tether, station } = SPACE_ELEVATOR, cyl = (rt: number, rb: number, h: number, n: number, open = false) => new T.CylinderGeometry(rt, rb, h, n, 1, open);
-  const toCam = Math.atan2(HERO_POSITION[2] - SPACE_ELEVATOR.z, HERO_POSITION[0] - SPACE_ELEVATOR.x), coneR = (y: number) => 2000 - 1760 * y / spire;
-  // R5 (owner 2026-11-02): detail that still reads at 7 km, all from a few primitives. Heights are root-local metres.
-  // Spire: the R4 cone, eight buttress fins on its flanks, three ring bands carrying red aviation beacons, and a collar under the station.
-  add(cyl(240, 2000, spire, 32), body, spire / 2);
-  const run = 880, dr = coneR(0) - coneR(run), len = Math.hypot(dr, run), tilt = Math.atan2(dr, run);
-  for (let k = 0; k < 8; k++) {
-    const fin = polar(new T.BoxGeometry(150, len, 60), body, .2 + k * Math.PI / 4, (coneR(0) + coneR(run)) / 2 + 75 * Math.cos(tilt), run / 2 + 75 * Math.sin(tilt)); fin.rotation.z = tilt;
-  }
-  for (const y of [250, 500, 720]) {
-    add(cyl(coneR(y) + 40, coneR(y) + 40, 30, 32), body, y);
-    for (let k = 0; k < 8; k++) polar(new T.BoxGeometry(40, 20, 40), beacon, .2 + (k + .5) * Math.PI / 4, coneR(y) + 50, y);
-  }
-  add(cyl(260, 300, 130, 24), body, spire + 65);
-  // Transfer station: three decks stepping inward under a cap, a window band round each, 24 docking bays with a parked craft, a hub with twelve spokes under D1.
-  for (const [y, rt, rb, h] of [[1150, 1400, 1300, 70], [1235, 1100, 1050, 80], [1320, 760, 720, 80], [1385, 460, 520, 50]]) {
+  const { tether } = SPACE_ELEVATOR, cyl = (rt: number, rb: number, h: number, n: number, open = false) => new T.CylinderGeometry(rt, rb, h, n, 1, open);
+  const toCam = Math.atan2(HERO_POSITION[2] - SPACE_ELEVATOR.z, HERO_POSITION[0] - SPACE_ELEVATOR.x), col = 1080;
+  // R6 (owner 2026-11-02): no wide cone. A slim column carries the station, which is thick enough to show side faces to the low hero camera.
+  // Column (sinks into the horizon haze) with three joint collars, each with a thin lamp band like the tether rings.
+  add(cyl(300, 360, col, 24), body, col / 2);
+  for (const y of [400, 700, 950]) { add(cyl(380, 380, 40, 24), body, y); add(cyl(383, 383, 10, 24, true), lamp, y); }
+  // Transfer station: three decks stepping inward under a cap, a continuous window band round each, 16 docking bays with a parked craft, a hub with eight spokes under D1.
+  for (const [y, rt, rb, h] of [[1150, 1400, 1320, 180], [1320, 1080, 1040, 160], [1470, 740, 700, 140], [1575, 440, 500, 70]]) {
     add(cyl(rt, rb, h, 48), body, y);
-    if (h > 50) add(cyl((rt + rb) / 2 + 6, (rt + rb) / 2 + 6, h * .45, 48, true), pane, y);
+    if (h > 70) add(cyl((rt + rb) / 2 + 6, (rt + rb) / 2 + 6, h * .4, 48, true), pane, y);
   }
-  add(cyl(1405, 1405, 24, 48, true), lamp, station + 35);
-  for (let k = 0; k < 24; k++) {
-    const a = k * Math.PI / 12;
-    polar(new T.BoxGeometry(140, 40, 90), body, a, 1430, station); polar(new T.BoxGeometry(30, 12, 30), lamp, a, 1478, station + 26); polar(new T.BoxGeometry(70, 22, 36), body, a, 1520, station + 31);
+  add(cyl(1405, 1405, 24, 48, true), lamp, 1150 + 90 - 12);
+  for (let k = 0; k < 16; k++) {
+    const a = k * Math.PI / 8;
+    polar(new T.BoxGeometry(100, 40, 70), body, a, 1420, 1150); polar(new T.BoxGeometry(30, 12, 30), lamp, a, 1455, 1176); polar(new T.BoxGeometry(60, 20, 32), body, a, 1495, 1180);
   }
-  add(cyl(320, 280, 120, 24), body, station - 70);
-  for (let k = 0; k < 12; k++) polar(new T.BoxGeometry(1030, 40, 40), body, k * Math.PI / 6 + .1, 835, station - 45).rotation.z = 4 * Math.PI / 180;
+  for (let k = 0; k < 4; k++) polar(new T.BoxGeometry(40, 20, 40), beacon, k * Math.PI / 2 + Math.PI / 4, 420, 1620);
+  add(cyl(380, 340, 100, 24), body, 1010);
+  for (let k = 0; k < 8; k++) polar(new T.BoxGeometry(1320 - 380, 30, 30), body, k * Math.PI / 4 + .1, (1320 + 380) / 2, 1150 - 90 - 18);
   // Tether: a thick sleeve with a joint ring (and a thin lamp band) every 300 m, two guide tracks either side of the camera-facing line, four climber pods on the camera side.
-  const base = spire + 130, tall = tether - base, mid = (tether + base) / 2;
+  const tall = tether - col, mid = (tether + col) / 2;
   add(cyl(140, 150, tall, 16), body, mid);
   for (let y = 1500; y <= 5700; y += 300) { add(cyl(178, 178, 30, 16), body, y); add(cyl(181, 181, 8, 16, true), lamp, y); }
   for (const side of [-1, 1]) add(new T.BoxGeometry(40, tall, 40), body, mid, Math.cos(toCam + side * Math.PI / 2) * 165, Math.sin(toCam + side * Math.PI / 2) * 165);
@@ -83,7 +76,7 @@ export function spaceElevator(scene: T.Scene) {
     if (!(s.fog instanceof T.FogExp2)) return;
     const tone = elevatorTone(s.fog.color);
     body.color.copy(tone.body); lamp.color.copy(tone.body).lerp(LAMP, tone.glow);
-    pane.color.copy(tone.body).multiplyScalar(.72).lerp(PANE, tone.glow); beacon.color.copy(tone.body).lerp(BEACON, tone.glow);
+    pane.color.copy(tone.body).multiplyScalar(.45).lerp(PANE, tone.glow); beacon.color.copy(tone.body).lerp(BEACON, tone.glow);
     haze.value.copy(s.fog.color); glowLit.value = 1 - tone.glow;
   };
   return root;

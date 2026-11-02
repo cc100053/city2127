@@ -56,3 +56,4 @@ Gemini 生成日／夜目標圖到 `artifacts/far-landmark/gen/`；owner 揀圖�
 - R5：closeup-polish 流程。Gemini 細節目標圖 `artifacts/far-landmark/target/`（owner 揀兩張都用），`spec.md`，Sonnet 實作：尖塔 8 肋＋3 環帶＋紅燈、三層中轉站＋窗帶＋24 泊位＋12 輻射骨架、粗纜線＋接駁環＋導軌＋4 爬升艙；4 batches。新 `tests/spaceElevator.test.ts`。
 - 驗證：`npm test` exit 0、`npm run build` exit 0、`git diff --check` clean（Opus 重跑）。截圖 `artifacts/far-landmark/r5/`。FPS NOT RUN。
 - Opus 審：日間中轉站喺眼平線上 ~500 m，鏡頭只見底面（骨架、泊位齒），甲板側面同窗帶太薄；目標圖見到側面。夜間紅燈浮喺黑色、窗帶斷續，比目標零碎。
+- R6（owner：「remove the big triangle bottom, polish the other」）：刪闊尖塔錐、肋、環帶、24 紅燈；改用 `cyl(300,360,1080)` 主柱＋3 接駁領；中轉站三層加厚（180/160/140）見側面，連續窗帶，16 泊位，8 條平貼 spokes，頂蓋 4 粒紅燈。4 batches。`npm test`／`build`／`diff-check` 全過（Opus 重跑），console 0 error。截圖 `artifacts/far-landmark/r6/`。Opus 審：日間形態接近目標（主柱托階梯中轉站）；比目標實淨少少、霧感少啲；夜間窗帶成暖色弧，比目標光少少、零碎啲。FPS NOT RUN。
