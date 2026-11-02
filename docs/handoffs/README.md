@@ -26,6 +26,7 @@
 | [空の環 Sky Ring](hero-sky-ring.md) | DONE（2026-11-02）；方案 B 巨構：250 m 桁架環＋六支 V 斜柱＋泊位＋居民聲音燈點；close-up polish owner 接受 R5 | cc100053 |
 | [Hero holograms](hero-holograms.md) | DONE（2026-11-02）；8 塊居民尺度 hologram（Fuji TV 地標屏、站前、空氣、live 住民の声、天橋 tag），owner 接受 R5 | cc100053 |
 | [Guest explore 空の環を見る](guest-explore.md) | DONE（2026-11-02）；iPad 揀 Sky Ring → 大畫面泊位近景＋全環聲音；side 鏡頭、20 s 撳掣，owner 接受；升降機 LOD 後續 | cc100053 |
+| [City taste v2](city-taste-v2.md) | IN_PROGRESS（2026-11-02）；taste 改寫為「睇得見嘅超高科技」；下一步：全城 Gemini 總目標圖，之後逐部份打磨 | cc100053 |
 | [遠景軌道升降機](far-landmark.md) | DONE（2026-11-02）；約 7.5 km 外霧中剪影：幼主柱＋三層中轉站＋分節纜線，Gemini 目標圖 closeup-polish，owner 接受 R6 | cc100053 |
 | [Hero 霧與光層次](hero-atmosphere.md) | IN_PROGRESS（2026-11-02）；R1 高度霧／夜間窗燈層次／夜空地平線，R2 水面燈光倒影，等 owner 目視 | cc100053 |
 | [近鏡後續／能源講解](closeup-next.md) | F1/F2、C1 INTEGRATED（C1 owner批准，24組兩秒辨認未做）；N1 能源講解 INTEGRATED（13s／日文），F3等硬件（2026-10-29） | cc100053 |

@@ -1,6 +1,6 @@
 # Art rules — Odaiba runtime
 
-Current implementation rules, checked 2026-10-02. [CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) is the visual/world authority; this file documents materials, batching, lighting and choice semantics. [PROJECT](PROJECT.md) maps the source. Owner: cc100053; documentation: Codex.
+Current implementation rules, checked 2026-10-02. [CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) is the visual/world authority (rewritten 2026-11-02 toward visible high technology; the palette rows below predate it, and its cool white-blue technology light is added as parts are rebuilt); this file documents materials, batching, lighting and choice semantics. [PROJECT](PROJECT.md) maps the source. Owner: cc100053; documentation: Codex.
 
 Shibuya art passes and Pic 2 are historical references; their remaining work is closed. They are not a second visual target. See the [archived rules](history/SHIBUYA_ART.md) and original [art handoff](handoffs/archive/art-direction.md) for dated evidence.
 
