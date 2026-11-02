@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { arc, bake, box, leaf, paint } from './cityRig.ts';
-import { plantClusters } from './coastalCanopy.ts';
+import { hash, plantClusters, plantShrubs } from './coastalCanopy.ts';
 import { megaGlass, megaRib, megaSeam, megaShell } from './megastructures.ts';
 import { publishRoofGardens } from './districtMeters.ts';
 import { publishOccupants, publishRoofWalks, type Spot, type Walk } from './occupants.ts';
@@ -14,6 +14,28 @@ const ivory = paint('#e9e5da', .8), pool = paint('#7fb6cc', .12, .2), band = pai
 const fascia = paint('#c9d0d4', .6), shadow = paint('#98a3a9', .6); // walkway underside and its darker shadow band
 const walkSeam = megaSeam.clone(); // day 1.0, night 2.4 (updatePlaza)
 const jet = new T.MeshBasicMaterial({ color: '#dff2ff', transparent: true, opacity: .32, blending: T.AdditiveBlending, depthWrite: false });
+/** P5 hovering planter discs over the plaza: white machine rim, seam under-ring, emitter plate, a shrub mass and one tree each (no rock look). One group, bobbing +/-.4 m over 7 s. */
+const hover = new T.Group();
+export const updateHoverBeds = (now: number) => { hover.position.y = Math.sin(now * Math.PI * 2 / 7) * .4; };
+function hoverBeds(scene: T.Object3D) {
+  hover.name = 'hover-beds';
+  const shrubs: [number, number, number, number, number][] = [], part = (geometry: T.BufferGeometry, material: T.Material, x: number, y: number, z: number) => { const m = new T.Mesh(geometry, material); m.position.set(x, y, z); hover.add(m); };
+  ([[Math.PI / 4, 10], [Math.PI * .75, 13], [Math.PI * 1.25, 11], [Math.PI * 1.75, 15]] as const).forEach(([a, R], k) => {
+    const [x, z] = plazaAt(Math.cos(a) * 42, Math.sin(a) * 22), y = top + 5 + (k % 2) * 1.5;
+    part(new T.CylinderGeometry(R, R * .86, 1.6, 40), megaShell, x, y, z); // rim
+    part(new T.CylinderGeometry(R * .8, R * .4, 1.6, 40), megaShell, x, y - 1.3, z); // machine hull
+    part(new T.CylinderGeometry(R * .93, R * .93, .3, 40), megaSeam, x, y - .55, z); // under-ring seam (proud of the tapered rim)
+    part(new T.CylinderGeometry(R * .4, R * .4, .12, 32), megaSeam, x, y - 2.15, z); // emitter plate
+    part(new T.CylinderGeometry(R - .5, R - .5, .12, 40), leaf, x, y + .86, z); // bed
+    part(new T.CylinderGeometry(.35, .5, 3, 8), megaShell, x + R * .2, y + 2, z); // tree stem (a white pylon)
+    shrubs.push([x + R * .2, y + 3.2, z, 3.4, 3.6]); // the one tree's crown
+    const n = Math.round(R * 4.4 / 3.4);
+    for (let j = 0; j < n; j++) { const b = j / n * Math.PI * 2 + k; shrubs.push([x + Math.cos(b) * R * .74, y + .6, z + Math.sin(b) * R * .74, 1.8 + hash(k * 30 + j) * .6, 1 + hash(k * 30 + j + 3) * .4]); }
+    shrubs.push([x - R * .25, y + .6, z, R * .3, 1.5]);
+  });
+  const merged = bake(hover); merged.forEach(mesh => { mesh.name = 'hover-beds'; mesh.castShadow = mesh.material !== megaSeam; });
+  hover.add(...merged); plantShrubs(hover, shrubs); scene.add(hover);
+}
 export const updatePlaza = (night: number) => { walkSeam.emissiveIntensity = 1 + night * 1.4; };
 const column = new T.CylinderGeometry(1, 1, 1, 10);
 type P3 = readonly [number, number, number];
@@ -82,6 +104,7 @@ export function plazaDeck(scene: T.Object3D, panels: readonly { id: string; at: 
   });
   const clusters = [...ring(6, Math.PI / 6, 22, 22, 4.6), ...ring(8, Math.PI / 8, 62, 33, 5.2)];
   plantClusters(scene, clusters, .6); publishRoofGardens(clusters);
+  hoverBeds(scene);
   for (const p of panels) if (p.id === 'voices' || p.id === 'air') mast(root, p.id === 'voices' ? VOICES_AT : AIR_AT, p.at[1], p.w, p.h, p.face);
   root.updateMatrixWorld(true);
   const roofPeople = publishRoofWalks(root, clusters);
