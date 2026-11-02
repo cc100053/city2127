@@ -1,7 +1,7 @@
 # elevator-closeup-lod — 軌道升降機中距離近景 LOD
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — diagnosis done, Gemini targets next
+- Status: IN_PROGRESS — targets picked, R1 (near model) in progress
 - Branch: `feat/elevator-closeup-lod`
 - Base commit: 27899d543bbb5ae468875033e0616fdff9cd7906
 - Last verified commit: NONE
@@ -67,7 +67,9 @@ Symptoms at E1, cause:
 
 - 2026-11-02 owner accepts scope Q1–Q4 (above).
 - 2026-11-02 Opus: pose E1, camera inside the curvature plate.
+- 2026-11-02 owner: targets = Gemini day-1 / night-1 (`target/`); elevator position unchanged, the targets' column foot in the sea is not followed (base keeps sinking behind the horizon).
+- Rounds: R1 near model + DEV toggle only; R2 explore wiring (spec after R1 is accepted). Spec: `artifacts/elevator-closeup-lod/spec.md`.
 
 ## Next expected step
 
-Write `artifacts/elevator-closeup-lod/prompts.md`, generate day/night Gemini candidates into `gen/`; owner picks winners into `target/`.
+R1: Sonnet implements `spaceElevatorNear` per spec, captures `r1/`; Opus reviews; owner judges `r1/vs-target.jpg`.
