@@ -117,3 +117,8 @@ Coordinator session runs `artifacts/city-taste-v2/coordinator.md`: P1→P6 again
 - Decision: **pass**, merged `--no-ff` (b45a72e merges `feat/city-taste-v2-p5` 34e1afc). Ring and hull carry continuous shrub bands + irregular tree clusters (lush, not rows); pink cherry colouring gone (cherry → spring green); tall tower roofs are stepped rims with shrub bands and ≤ 2 trees (terrace data unchanged, Meter publishing intact); four hovering machine planter discs on the plaza deck (±0.4 m bob). Foliage+shrub instances 3610 → 4142 (+14.7%), ≈ +3 draws (1099 day). Weak: hull still reads as tree clusters over glass from hero; two small non-canopy pink dots remain.
 - Checks on the merge (coordinator): tests fail 0, build 0, diff-check clean. FPS (agent) 60/60. No test edits.
 - 04:40 JST: P6 r1 started (agent branch `feat/city-taste-v2-p6` from a8ef475). P7 spec r1 drafted.
+
+## P6 r1 (2026-11-03 05:05 JST) — PASS
+
+- Decision: **pass**, merged `--no-ff` (merges `feat/city-taste-v2-p6` 10e0dc9). Regional sky lanes 6 → 2 (only the low corridor below the ring deck), trails 0.8 → 0.3 × spacing, nothing crosses the floater/civic sphere; shore-lane pod band now a thin pale guideway rail lit only near craft (`#cfe8ff`); idle drones fly as four V-formations of three. Not done: small foreground boats (lagoon too narrow for existing shuttles; needs a smaller craft type) — left for the owner/P8.
+- Test edits: `tests/mobility.test.ts` (sky lane count 2, trail ≤ .35 × spacing). Checks on the merge (coordinator): tests fail 0, build 0, diff-check clean. FPS (agent) 60/60.
