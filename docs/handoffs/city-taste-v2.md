@@ -92,3 +92,4 @@ Coordinator session runs `artifacts/city-taste-v2/coordinator.md`: P1→P6 again
 
 - Decision: **pass**, merged `--no-ff` (416f673 merges `feat/city-taste-v2-p2` 8d8508e). Civic sphere bright silver and unobstructed (upper escalator diagonal removed; `tests/odaiba.test.ts` now expects one Fuji ride), floater reads as a panelled machine with thick glowing double rings and emitter discs, self-assembling building shows modules + beams in front of the hull. Weak spots left: assembly glass reads white more than blue by day; holograms "2127/フジ" still saturated (P3).
 - Checks on the merge (coordinator): `npm test` 0, `npm run build` 0, `git diff --check` clean. FPS (agent) 60/60 (vsync cap); canvas draw calls ≈ 1092; floaters group 16 meshes.
+- 02:30 JST: P3 r1 started (agent branch `feat/city-taste-v2-p3` from a084810). P4 spec r1 drafted (Aqua City → civic plaza deck, elevated walkways).
