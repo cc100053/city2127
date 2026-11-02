@@ -86,3 +86,9 @@ R1: Sonnet implements `spaceElevatorNear` per spec, captures `r1/`; Opus reviews
 - Spec R2 (`spec.md`): less station haze, darker undersides, column slots + pilasters, night body ×(1 − .6·dark), 48 bigger mint dashes (×2.5 at night, offset half a step off the bays), slim climbers on the rails, terrace clumps at the deck edges. Only `src/spaceElevator.ts` changed.
 - Checks (Opus rerun): `npm test` exit 0, `npm run build` exit 0, `git diff --check` clean. Hero unchanged (`r2/hero-check.png`). FPS NOT RUN.
 - Opus review (`r2/vs-target.jpg`): day now reads as a solid lit volume with a green rim; night underside dark navy, mint dashes read. Still off: day underside slightly too blue-grey; green rim heavy and dark; night amber band thicker and flatter than the target; lower column vanishes in the night haze; climbers small.
+
+## R3 (2026-11-02, owner: one more polish round)
+
+- Spec R3: darkness-dependent underside darkening (.42 → .65) with desaturated undersides, lighter sparse tufts on three deck edges, thinner window bands with mullions (night emissive .75), night haze halved, longer climbers with six window rings. Only `src/spaceElevator.ts` changed.
+- Checks (Opus rerun): `npm test` exit 0, `npm run build` exit 0, `git diff --check` clean. Hero unchanged (`r3/hero-check.png`). FPS NOT RUN.
+- Opus review (`r3/vs-target.jpg`): day underside now neutral grey, window bands read as segmented glass; night column a dark navy shaft with mint collars, band segmented and thinner. Off: tufts now too sparse (overcorrected from R2); climbers still read as ring stacks, not long amber capsules; day bands pale blue-grey (target dark navy glass); bays still plain blocks.
