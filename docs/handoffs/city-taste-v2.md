@@ -93,3 +93,8 @@ Coordinator session runs `artifacts/city-taste-v2/coordinator.md`: P1→P6 again
 - Decision: **pass**, merged `--no-ff` (416f673 merges `feat/city-taste-v2-p2` 8d8508e). Civic sphere bright silver and unobstructed (upper escalator diagonal removed; `tests/odaiba.test.ts` now expects one Fuji ride), floater reads as a panelled machine with thick glowing double rings and emitter discs, self-assembling building shows modules + beams in front of the hull. Weak spots left: assembly glass reads white more than blue by day; holograms "2127/フジ" still saturated (P3).
 - Checks on the merge (coordinator): `npm test` 0, `npm run build` 0, `git diff --check` clean. FPS (agent) 60/60 (vsync cap); canvas draw calls ≈ 1092; floaters group 16 meshes.
 - 02:30 JST: P3 r1 started (agent branch `feat/city-taste-v2-p3` from a084810). P4 spec r1 drafted (Aqua City → civic plaza deck, elevated walkways).
+
+## P3 r1 (2026-11-03 02:50 JST) — PASS
+
+- Decision: **pass**, merged `--no-ff` (c3cb8bf merges `feat/city-taste-v2-p3` 2c9b106). Facade system (curtain-wall shader + contextFacades) now white piers, pale glass, 16.8 m slab bands with cool seams (night 2.2); beige finishes gone; holograms thin cool sheets (voices keeps Meter colours); district towers and skyway rings/spheres on the mega material family. Left: tall context tower inside the ring still a plain grid with rooftop trees (P5 for the trees).
+- Checks on the merge (coordinator): `npm test` exit 0 (`fail 0`; the "hubUpper procedural fallback" log line is an expected diagnostic), build 0, diff-check clean. FPS (agent) 60/60. No test edits.
