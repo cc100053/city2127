@@ -250,11 +250,16 @@ export function startSurveyAtmosphere(
   historyCount.hidden = true;
   historyLegend.hidden = true;
   const title = el('h2', 'causal-title', '2127 — 選択が都市を変える');
-  // Decorative HUD status for the resident card; CSS hides it on the legacy panel.
-  const hud = el('div', 'resident-hud');
-  hud.setAttribute('aria-hidden', 'true');
-  hud.append(el('span', 'resident-live', 'ライブ'), el('span', '', '状態：接続中'), el('span', '', '北緯35°37′ 東経139°46′'));
-  panel.append(title, hud, pending, latest, historyTitle, historyCount, historyLegend, history, scores, status);
+  // Decorative HUD layers for the resident card (static markup); CSS hides them on the legacy panel.
+  const hud = el('div', 'resident-hud'), deco = el('div', 'resident-deco'), strip = el('div', 'resident-strip');
+  hud.innerHTML = '<span class="resident-live"><svg viewBox="0 0 16 12"><path d="M1 4.5a10 10 0 0 1 14 0M3.5 7a6.4 6.4 0 0 1 9 0M6 9.4a3 3 0 0 1 4 0"/><circle cx="8" cy="11" r="1"/></svg>ライブ</span>'
+    + '<span>状態：接続中</span><span>接続番号 64228</span><span>北緯35°37′ 東経139°46′</span>';
+  deco.innerHTML = '<i class="resident-tabs"><b></b><b></b><b></b></i><i class="resident-node"></i><i class="resident-bars"><b></b><b></b><b></b><b></b></i>'
+    + '<svg class="resident-ring" viewBox="0 0 52 52"><circle cx="26" cy="26" r="22"/><circle cx="26" cy="26" r="15"/><circle cx="26" cy="26" r="4"/></svg>'
+    + '<span class="resident-micro">研究 № 023 — 北緯35°37′ 東経139°46′ — お台場</span>';
+  strip.innerHTML = '<span>都市応答</span><span class="resident-chevrons">❯❯❯❯❯</span><span class="resident-meter"></span>';
+  for (const node of [hud, deco, strip]) node.setAttribute('aria-hidden', 'true');
+  panel.append(title, hud, deco, pending, latest, strip, historyTitle, historyCount, historyLegend, history, scores, status);
   document.body.appendChild(panel);
   let current: CityView | undefined;
   let cardIndex = 0;

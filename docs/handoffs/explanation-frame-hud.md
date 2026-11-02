@@ -15,6 +15,7 @@ Owner 2026-11-02 揀咗一張 HUD 目標圖（深色煙燻玻璃、青色發光�
 
 - `src/style.css`：`.resident-panel` 全套 HUD 樣式；寬度、位置（360px 右上）不變，避免遮 focal site。標題用 `word-break:auto-phrase` 喺句讀斷行。
 - `src/surveyAtmosphere.ts`：加一個 `aria-hidden` 嘅 `.resident-hud`（ライブ／状態：接続中／座標），legacy panel 由 CSS 隱藏。
+- 細節第二輪（owner「add more detail」）：TL／BR 切角（`corner-shape:bevel`，舊瀏覽器退回圓角）、外層第二框線、琥珀角標、頂部短條、左側圓點節點同刻度尺、右側直條、左下旋轉環、卡底微型文字、卡內掃描線＋網格、Wi-Fi 圖示、裝飾性「都市応答 ❯❯❯ ▮▮▮」條（冇數值）。
 - 文件：EXHIBITION_SPEC、RESIDENT_COPY。
 
 ## Not done (deliberate)
