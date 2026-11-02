@@ -73,3 +73,4 @@ Coordinator session runs `artifacts/city-taste-v2/coordinator.md`: P1→P6 again
 
 - Decision: **polish again (final round)** → `P1/spec-r3.md`. Ring/arch now matte white and read as megastructures; hull reads as a white stepped hull at screen right. Remaining: a district Meter tower pierces the hull (modelling fault), hull steps still read greener than the target's white lines.
 - Evidence: `feat/city-taste-v2-p1` 5aa5d34, `P1/r2/`. Agent checks pass; FPS 60/60 (vsync cap); +8 draw calls; Hilton dropped (inside new hull footprint), Grand Nikko dropped in r1.
+- 00:51 JST 11-03: Sonnet rate limit (reset 00:50) stopped P1 r3 mid-way; resumed. Night master agent started (Gemini). P2 spec r1 drafted.
