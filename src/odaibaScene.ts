@@ -3,6 +3,7 @@ import { addCityModel } from './modelAssets';
 import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
 import { civicCore } from './civicCore';
+import { floaters } from './floaters';
 import { bodyFootprints, carveContext, inRect, megastructures, updateMegastructures } from './megastructures';
 import { publishOccupants, publishRoofWalks } from './occupants';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
@@ -183,7 +184,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) receded.add(object.material); });
   receded.forEach(material => { if (cutGround.has(material.name)) openBay(material); recedeBeyondDistrict(material); });
   carveContext(environment);
-  scene.add(contextFacades(environment), bayContext(), megastructures());
+  scene.add(contextFacades(environment), bayContext(), megastructures(), floaters());
   plantCanopy(scene,trees,true);
   plantBackdropGrove(scene,environment);
   // Sky gardens crown the tall context towers (the only CTX mesh above 30 m inside the district).

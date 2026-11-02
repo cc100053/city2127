@@ -1,6 +1,8 @@
 import * as T from 'three';
-import { arc, bake, box, chrome, glass, mirrors, leaf, leafyCrown, membrane, publicLight as cityLight, solar as citySolar, stone as cityStone, trim as cityTrim } from './cityRig.ts';
+import { arc, bake, box, chrome, mirrors, leaf, leafyCrown, membrane, publicLight as cityLight, solar as citySolar, stone as cityStone, trim as cityTrim } from './cityRig.ts';
 import type { Ride, Spot, Walk } from './occupants.ts';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { megaGlass as glass } from './megastructures.ts';
 
 /** Occupied media headquarters within Fuji's civic chassis, retaining the sphere berth and site alignment. Metres. Its people are not
  * baked: `occupants` lists them (staff, audience, forum crowds, strollers and escalator riders) for `publishOccupants` to animate. */
@@ -9,9 +11,9 @@ export function civicCore() {
   const spots:Spot[]=[],walks:Walk[]=[],rides:Ride[]=[];
   // Building-local finishes (still one batch each): warm cream frame and slabs, and dark charcoal furniture, people and hangers,
   // so occupied rooms read as silhouettes against warm light instead of blue-grey rows.
-  const trim=cityTrim.clone();trim.color.set('#f6eee0');
-  const stone=cityStone.clone();stone.color.set('#f2e9d8');
-  const solar=citySolar.clone();solar.color.set('#3b3430'); // warm umber: unlit room depth reads brown-dark under the amber light
+  const trim=cityTrim.clone();trim.color.set('#f3f2ec');
+  const stone=trim; // P2: one white finish for frame and slabs (keeps the batch count)
+  const solar=citySolar.clone();solar.color.set('#6a7279'); // warm umber: unlit room depth reads brown-dark under the amber light
   // Warm occupied rooms follow the existing city clock, using one shared finish for this building.
   const publicLight=cityLight.clone();publicLight.color.set('#f2dcb4');publicLight.emissive.set('#ffd29c');publicLight.emissiveIntensity=1;
   publicLight.onBeforeCompile=shader=>{
@@ -43,7 +45,7 @@ export function civicCore() {
   };
   publicLight.customProgramCacheKey=()=>'fuji-room-light';
   // Broadcast light stays inside production rooms; public circulation retains its warm finish.
-  const broadcastLight=publicLight.clone();broadcastLight.color.set('#2c4a96');broadcastLight.emissive.set('#3f7cff');
+  const broadcastLight=publicLight.clone();broadcastLight.color.set('#cfe2f0');broadcastLight.emissive.set('#9fc8ff');broadcastLight.emissiveIntensity=.5;
   broadcastLight.onBeforeCompile=publicLight.onBeforeCompile;broadcastLight.customProgramCacheKey=publicLight.customProgramCacheKey;
   // A clear environmental envelope exposes the chamber floors while retaining a silver sky reflection.
   const silverGlass=chrome.clone();silverGlass.color.set('#d2dfe3');silverGlass.transparent=true;silverGlass.opacity=.2;silverGlass.metalness=.15;silverGlass.depthWrite=false;mirrors.push(silverGlass);
@@ -581,6 +583,26 @@ export function civicCore() {
       grove(-18+Math.cos(angle)*31.5,64.1,23-Math.sin(angle)*31.5,i);
     }
   }
+  // P2: one polished chrome sphere (Ø 56 m, hides the theatre inside) hangs in the frame, held by four tension members. Baked with the rest, in its own mirror batch.
+  const sphereMat=chrome.clone();sphereMat.color.set('#e8ecef');sphereMat.roughness=.08;sphereMat.metalness=1;sphereMat.clearcoat=0;
+  // Chrome needs contrast to read: a small equirect gradient (deep sky, white horizon band, dark ground) on this one material.
+  const stops:[number,string][]=[[0,'#6f98c4'],[.35,'#b5d0e6'],[.5,'#ffffff'],[.56,'#c9d3cf'],[.8,'#7b8a84'],[1,'#4a5852']],envData=new Uint8Array(4*64*32),c0=new T.Color(),c1=new T.Color();
+  for(let y=0;y<32;y++){
+    const t=1-y/31,k=stops.findIndex(([at])=>at>=t),[a0,h0]=stops[Math.max(0,k-1)],[a1,h1]=stops[Math.max(0,k)],f=a1>a0?(t-a0)/(a1-a0):0;
+    c0.set(h0).lerp(c1.set(h1),f);
+    for(let x=0;x<64;x++)envData.set([c0.r*255,c0.g*255,c0.b*255,255].map(Math.round),(y*64+x)*4);
+  }
+  const env=new T.DataTexture(envData,64,32);env.needsUpdate=true;env.mapping=T.EquirectangularReflectionMapping;env.colorSpace=T.SRGBColorSpace;sphereMat.envMap=env;sphereMat.envMapIntensity=1.1;mirrors.push(sphereMat);
+  const SR=28,seams:T.BufferGeometry[]=[],cables:T.BufferGeometry[]=[],centre=new T.Vector3(-18,100,23);
+  const prep=(g:T.BufferGeometry,m:T.Matrix4)=>{const f=g.toNonIndexed();f.deleteAttribute('uv');f.applyMatrix4(m);return f;};
+  for(let i=0;i<12;i++)seams.push(prep(new T.TorusGeometry(SR+.08,.1,4,64),new T.Matrix4().makeRotationY(i*Math.PI/12).setPosition(centre)));
+  seams.push(prep(new T.TorusGeometry(SR+.12,.3,4,64),new T.Matrix4().makeRotationX(Math.PI/2).setPosition(centre)));
+  for(const [cx,cy,cz] of [[-68,130,-12],[64,62,-12],[-68,62,70],[64,130,70]]){
+    const to=new T.Vector3(cx,cy,cz),d=to.clone().sub(centre),dir=d.clone().normalize(),from=centre.clone().addScaledVector(dir,SR-.5);
+    const len=to.distanceTo(from);cables.push(prep(new T.CylinderGeometry(.22,.22,len,5),new T.Matrix4().compose(from.clone().add(to).multiplyScalar(.5),new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),dir),new T.Vector3(1,1,1))));
+  }
+  const sphere=new T.Mesh(new T.SphereGeometry(SR,64,40),sphereMat);sphere.position.copy(centre);sphere.name='civic-chrome-sphere';sphere.castShadow=true;
+  root.add(sphere,new T.Mesh(mergeGeometries(seams),broadcastLight),new T.Mesh(mergeGeometries(cables),trim));
   const generated=new Set<T.BufferGeometry>();
   root.traverse(object=>{if(object instanceof T.Mesh && object.geometry.type!=='RoundedBoxGeometry')generated.add(object.geometry);});
   const batches=bake(root);root.clear();batches.forEach(mesh=>{mesh.name='fuji-civic-chassis';root.add(mesh);});
