@@ -1,10 +1,10 @@
 # hero-holograms — Hero 全景 hologram 廣告／資訊
 
 - Owner: cc100053
-- Status: PLANNED
+- Status: DONE（owner 2026-11-02 接受 R5）
 - Branch: `feat/hero-holograms`（worktree `.claude/worktrees/feat+hero-holograms`）
 - Base commit: c166ae585a0bae0ba5286ca41d724b39ae1662cb
-- Last verified commit: NONE
+- Last verified commit: 0982a4c532140462a50ba6a21c4143ff2e822c53（R5；之後只改文件）
 - Remote availability: origin/feat/hero-holograms
 
 ## Session Git state
@@ -89,4 +89,4 @@ NONE
 
 ## Next expected step
 
-Owner 確認 `spec.md` 後，Sonnet agent 按 spec 做 R1 實作同截圖（`r1/`），Opus 審核後交 owner。
+Owner 2026-11-02 接受 R5；`--no-ff` merge 入 main（integration 結果見 git log／main CI）。仍要做：喺空閒機器（load average < 1）量 hero 1920×1080 vsync `hour=16`／`21` 60 FPS；headline close-up、survey live 件數、iPad 流程未跑。
