@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { bake, trim, stone, glass, futureLight, chrome, skyGlass, leaf, leafyCrown } from './cityRig.ts';
+import { bake, trim, stone, glass, futureLight, chrome, dark as darkBand, pink, leaf, leafyCrown } from './cityRig.ts';
 import { pedestrians } from './mobility.ts';
 import { SKY_RING } from './layout.ts';
 
@@ -14,8 +14,8 @@ export const STANDALONE_VOICES = 120;
 /** Ellipse angles of the V pylons: feet on the bay or open ground, legs clear of skyways, the Yurikamome and context blocks (browser raycast), and of the hero sightlines to the four sites. */
 export const PYLONS = [.25, 1.2, 2, 3.25, 4.45, 5.1];
 const UP = new T.Vector3(0, 1, 0);
-/** Boarding-hall glazing: the city's pale sky glass at .3 opacity, so a two-wall pavilion stays see-through. */
-const hallGlass = skyGlass.clone(); hallGlass.opacity = .3;
+/** Boarding-hall glazing: the city's pale blue glass made see-through, so the waiting residents show inside. */
+const hallGlass = glass.clone(); hallGlass.transparent = true; hallGlass.opacity = .45; hallGlass.depthWrite = false;
 
 /** Point on the ring's centre line at height `y`, offset `out` m along the horizontal outward normal. */
 export function ringPoint(a: number, y: number, out = 0) {
@@ -39,6 +39,21 @@ function strut(parent: T.Object3D, a: T.Vector3, b: T.Vector3, r0: number, r1: n
   mesh.quaternion.setFromUnitVectors(UP, b.clone().sub(a).normalize()); mesh.position.copy(a).add(b).multiplyScalar(.5);
   parent.add(mesh); return mesh;
 }
+/** Plan outline of a w × d rectangle with corner radius r (shape y = outward); `open` leaves the deck side (y = -d/2) open as a U strip of width t. */
+function plan(w: number, d: number, r: number, open = 0) {
+  const s = new T.Shape(), x = w / 2, y = d / 2;
+  if (!open) {
+    s.moveTo(-x + r, -y); s.lineTo(x - r, -y); s.absarc(x - r, -y + r, r, -Math.PI / 2, 0, false); s.lineTo(x, y - r); s.absarc(x - r, y - r, r, 0, Math.PI / 2, false);
+    s.lineTo(-x + r, y); s.absarc(-x + r, y - r, r, Math.PI / 2, Math.PI, false); s.lineTo(-x, -y + r); s.absarc(-x + r, -y + r, r, Math.PI, Math.PI * 1.5, false);
+    return s;
+  }
+  const t = open, ri = r - t;
+  s.moveTo(-x, -y); s.lineTo(-x, y - r); s.absarc(-x + r, y - r, r, Math.PI, Math.PI / 2, true); s.lineTo(x - r, y); s.absarc(x - r, y - r, r, Math.PI / 2, 0, true); s.lineTo(x, -y);
+  s.lineTo(x - t, -y); s.lineTo(x - t, y - r); s.absarc(x - r, y - r, ri, 0, Math.PI / 2, false); s.lineTo(-x + r, y - t); s.absarc(-x + r, y - r, ri, Math.PI / 2, Math.PI, false); s.lineTo(-x + t, -y);
+  return s;
+}
+/** A flat slab of `plan` outline, h thick, its top at y = 0 (berth layers with large plan radii, which RoundedBoxGeometry cannot give a thin slab). */
+const slab = (shape: T.Shape, h: number) => new T.ExtrudeGeometry(shape, { depth: h, bevelEnabled: false, curveSegments: 6 }).rotateX(Math.PI / 2);
 /** A mesh of `geometry` at `at` in `parent` (berth and pod parts). */
 function part(parent: T.Object3D, geometry: T.BufferGeometry, material: T.Material, at: T.Vector3) {
   const mesh = new T.Mesh(geometry, material); mesh.position.copy(at); parent.add(mesh); return mesh;
@@ -81,31 +96,42 @@ export function skyRing(scene: T.Scene) {
   // Berths: cantilevered aprons off the outer face, each braced back to the bottom chord, with a lit docking edge and one parked craft.
   for (let b = 0; b < BERTHS; b++) {
     const a = (b + .5) / BERTHS * Math.PI * 2, t = 12 / Math.hypot(SKY_RING.rx, SKY_RING.rz) * 1.4;
-        // Rounded apron (24 m along the ring, 19 m out) with a docking-light band round its edge.
-    const apron = new T.Group(); apron.position.copy(ringPoint(a, top, WIDTH / 2 + 9)); apron.lookAt(ringPoint(a, top, 0)); root.add(apron);
-    part(apron, new RoundedBoxGeometry(24, 1.6, 19, 2, .75), stone, new T.Vector3(0, -.8, 0));
-    part(apron, new RoundedBoxGeometry(24.4, .35, 19.4, 2, .2), futureLight, new T.Vector3(0, -.9, 0));
-    // Rounded belly under the apron, so from below and the side it reads as a shaped cantilever rather than a flat slab.
-    part(apron, new RoundedBoxGeometry(19, 1.6, 14, 2, .7), trim, new T.Vector3(0, -2, .8));
+    // Layered apron (24 m along the ring, 19 m out, 5 m plan radius): stone deck with a grey pad field, glass rim on the three open
+    // sides, white fascia with the docking-light stripe, a dark shadow band, then a smaller rounded belly so the cantilever reads shaped.
+    const apron = new T.Group(); apron.position.copy(ringPoint(a, top, WIDTH / 2 + 9)); apron.lookAt(ringPoint(a, top, 0)); apron.rotateY(Math.PI); root.add(apron);
+    part(apron, slab(plan(24, 19, 5), .3), stone, new T.Vector3(0, 0, 0));
+    part(apron, slab(plan(17, 14.5, 3), .04), pink, new T.Vector3(0, .04, -.8));
+    part(apron, slab(plan(24, 19, 5, .2), 1.1), hallGlass, new T.Vector3(0, 1.1, 0));
+    part(apron, slab(plan(21.4, 16.4, 3.7, .3), .05), futureLight, new T.Vector3(0, .06, 0));
+    part(apron, slab(plan(24.2, 19.2, 5.1), .7), trim, new T.Vector3(0, -.3, 0));
+    part(apron, slab(plan(24.3, 19.3, 5.15), .22), futureLight, new T.Vector3(0, -.55, 0));
+    part(apron, slab(plan(23.4, 18.4, 4.7), .7), darkBand, new T.Vector3(0, -1, 0));
+    part(apron, slab(plan(20, 15, 4), 1.1), trim, new T.Vector3(0, -1.7, -.6));
     for (const s of [-1, 1]) member(root, ringPoint(a + s * t * .55, top - 1.5, WIDTH / 2 + 17), ringPoint(a + s * t * .55, bottom, WIDTH / 2), .8, .8, trim);
     // Pad: a docking ring on the apron (the same docking light) and a glazed boarding hall on the outer half of the deck behind it.
-    part(root, new T.TorusGeometry(7, .22, 4, 40).rotateX(Math.PI / 2), futureLight, ringPoint(a, top + .05, WIDTH / 2 + 9.5));
+    part(root, new T.TorusGeometry(6.4, .38, 4, 48).rotateX(Math.PI / 2), futureLight, ringPoint(a, top + .1, WIDTH / 2 + 9.5));
+    for (const s of [0, 1]) part(root, new T.TorusGeometry(4.8, .14, 3, 24, Math.PI * .6).rotateX(Math.PI / 2).rotateY(Math.PI * (s + .2)), futureLight, ringPoint(a, top + .1, WIDTH / 2 + 9.5));
     const gate = new T.Group(); gate.position.copy(ringPoint(a, top, WIDTH / 2 - 3)); gate.lookAt(ringPoint(a, top, 0)); root.add(gate);
-    // Open pavilion: clear glass walls on slim mullions under the white roof, so the waiting residents show through.
-    for (const z of [-2.7, 2.7]) {
-      part(gate, new T.BoxGeometry(24, 4.2, .12), hallGlass, new T.Vector3(0, 2.3, z));
-      for (let x = -12; x <= 12; x += 3) member(gate, new T.Vector3(x, .2, z), new T.Vector3(x, 4.6, z), .22, .22, trim);
-      member(gate, new T.Vector3(-12, 4.45, z), new T.Vector3(12, 4.45, z), .3, .3, trim);
+    // Two-level glass pavilion: clear blue glazing on slim mullions, a white mezzanine band, and a long rounded roof cantilevered past
+    // both ends (kept under the ring's 8 m roofline).
+    for (const z of [-2.8, 2.8]) {
+      part(gate, new T.BoxGeometry(24, 6.8, .12), hallGlass, new T.Vector3(0, 3.5, z));
+      for (let x = -12; x <= 12; x += 2) member(gate, new T.Vector3(x, .1, z), new T.Vector3(x, 6.9, z), .18, .18, trim);
     }
-    part(gate, new RoundedBoxGeometry(28, .5, 8.5, 2, .22), trim, new T.Vector3(0, 4.85, -.6));
-    for (const x of [-13, 13]) member(gate, new T.Vector3(x, 0, -4), new T.Vector3(x, 4.6, -4), .35, .35, trim);
+    for (const x of [-12, 12]) part(gate, new T.BoxGeometry(.12, 6.8, 5.6), hallGlass, new T.Vector3(x, 3.5, 0));
+    part(gate, slab(plan(25, 6.4, 1.5), .45), trim, new T.Vector3(0, 3.6, 0));
+    part(gate, slab(plan(38, 10, 4), .5), trim, new T.Vector3(0, 7.5, -.4));
+    for (const x of [-17, 17]) member(gate, new T.Vector3(x, 0, -4), new T.Vector3(x, 7, -4), .3, .3, trim);
     // Parked air pod (the mobility fleet's rounded pod at its 5× scale): pale shell, glass canopy, docking-light keel, four ducted rotors on skids.
     const craft = new T.Group(), heading = ringPoint(a + .01, 0).sub(ringPoint(a - .01, 0)).normalize();
     craft.position.copy(ringPoint(a, top + 2.2, WIDTH / 2 + 9.5)); craft.lookAt(craft.position.clone().add(heading)); root.add(craft);
     part(craft, new RoundedBoxGeometry(7.5, 4, 12, 2, 1.75), trim, new T.Vector3(0, .5, 0));
-    part(craft, new RoundedBoxGeometry(7.8, 1.5, 7.5, 2, .6), glass, new T.Vector3(0, 1.6, 1.25));
+    part(craft, new RoundedBoxGeometry(7.7, 1.5, 12.2, 2, .65), glass, new T.Vector3(0, 1.1, 0));
     part(craft, new RoundedBoxGeometry(6, .4, 10, 2, .15), futureLight, new T.Vector3(0, -1.5, 0));
-    for (const [x, z] of [[-5.75, -4.75], [5.75, -4.75], [-5.75, 4.75], [5.75, 4.75]]) part(craft, new T.TorusGeometry(2.75, .4, 6, 20).rotateX(Math.PI / 2), trim, new T.Vector3(x, .75, z));
+    for (const [x, z] of [[-6.2, -5], [6.2, -5], [-6.2, 5], [6.2, 5]]) {
+      part(craft, new T.TorusGeometry(3, .5, 8, 24).rotateX(Math.PI / 2), trim, new T.Vector3(x, 1.2, z));
+      member(craft, new T.Vector3(Math.sign(x) * 3.2, 1.2, z * .7), new T.Vector3(x * .75, 1.2, z * .9), .5, .5, trim);
+    }
     for (const x of [-2.6, 2.6]) member(craft, new T.Vector3(x, -1.9, -4.5), new T.Vector3(x, -1.9, 4.5), .4, .4, chrome);
   }
   // V pylons: two tapering diagonal legs from one cast knuckle on a stone pier (water / open ground) up to saddle beams under both

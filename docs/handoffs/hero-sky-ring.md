@@ -148,4 +148,28 @@ Validation（同 R1 方法）：
 - 證據：`polish/r3/vs-target.jpg`（每行：R2｜target｜R3）、`r3/<shot>.jpg`、`r3/hero-h16.jpg`、`r3/hero-h21.jpg`
 - NOT RUN：uncapped FPS、civic 鏡頭、展覽機、dusk
 
-Next expected step：owner 睇 `r3/vs-target.jpg`，接受就 merge 入 `feat/hero-sky-ring`，或者指出 R4。
+Next expected step：owner 2026-11-02 指出 R4（泊位）。
+
+## Close-up polish R4（泊位）
+
+Owner 2026-11-02：「重點 polish 泊位嘅 design，顏色、形狀都同目標差好遠」。對住 `target/berth.jpeg` 重做泊位（`src/skyRing.ts`）：
+
+| Target 讀到 | R4 改動 |
+|---|---|
+| 平台平面大圓角、多層外沿 | 新 `plan()`／`slab()`（`ExtrudeGeometry`，平面圓角 5 m；`RoundedBoxGeometry` 薄板做唔到大圓角）：石甲板、白色封邊 + mint 燈帶、深色帶（`dark`）、細啲嘅圓角白腹板 |
+| 三面淺藍玻璃欄 | U 形玻璃欄（向甲板嗰面開口），用 `hallGlass` |
+| 灰色停機坪 + 粗 mint 圈 + 內弧線 | `pink` 灰坪；mint 圈 0.38 粗；兩段內弧；平台內圈 mint 導引線 |
+| 機艙有藍色玻璃帶、大轉子連臂 | 機身加一圈 1.5 m 藍玻璃帶；轉子半徑 3、加連接臂 |
+| 兩層玻璃大堂、長圓角屋頂 | 大堂高 7 m、中層白色樓板、四面玻璃、2 m 直框；38 × 10 m 圓角屋頂（環頂仍 ≤ 甲板 + 8 m，257.5 m） |
+| 淺藍透明玻璃 | `hallGlass` 改由 `glass` 複製（opacity .45） |
+
+仍然冇跟：target 平台沿環方向延伸成弧形連接步道、大堂旁樓梯、人群密度。
+
+Validation：
+
+- hero `hour=16`：60.0 FPS vsync，draws 1001 → **1005**，triangles 17.53M → **17.56M**；`hour=21`：60.1，draws 1006。
+- Root `npm test` exit 0（sky ring：17 batches，環頂 257.5 m，12 條 hero 視線清）、`npm run build` ✓、`git diff --check` clean。
+- 證據：`polish/r4/vs-target.jpg`（每行 R3｜target｜R4）、`r4/berth-r3-target-r4.jpg`、`r4/<shot>.jpg`、`r4/hero-h16.jpg`、`r4/hero-h21.jpg`
+- NOT RUN：uncapped FPS、civic 鏡頭、R4 console error 檢查、展覽機、dusk
+
+Next expected step：owner 睇 `r4/berth-r3-target-r4.jpg`，接受就 merge 入 `feat/hero-sky-ring`，或者指出 R5。
