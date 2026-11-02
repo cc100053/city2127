@@ -1,10 +1,10 @@
 # far-landmark — 遠景軌道升降機（hero 背景剪影）
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — R2 已實作；Gemini 目標圖（closeup-polish 流程，只做 hero 遠景）進行中
+- Status: DONE — owner 2026-11-02 接受 R6
 - Branch: `feat/far-landmark`（worktree `.claude/worktrees/far-landmark`）
 - Base commit: `c166ae5d…`（origin/main，2026-11-02）
-- Last verified commit: NONE（`tsc --noEmit` clean；`npm test`／`build` NOT RUN）
+- Last verified commit: R6 `67a8184` + docs（test／build／diff-check PASS）
 - Remote availability: `origin/feat/far-landmark`
 
 ## Session Git state
@@ -47,7 +47,7 @@ Owner 要喺遠景加一座巨構：軌道升降機，放好遠，客人只見�
 
 ## Next expected step
 
-Gemini 生成日／夜目標圖到 `artifacts/far-landmark/gen/`；owner 揀圖抄去 `target/`；之後寫 `spec.md` 做 R3。
+冇。已 merge main（見 VALIDATION）。未做：展覽機 FPS、uncapped、dusk、headline close-up 入面嘅背景檢查；夜燈比目標略零碎、日間比目標實少少（owner 已接受）。
 
 ## R3–R5（2026-11-02）
 
@@ -57,3 +57,4 @@ Gemini 生成日／夜目標圖到 `artifacts/far-landmark/gen/`；owner 揀圖�
 - 驗證：`npm test` exit 0、`npm run build` exit 0、`git diff --check` clean（Opus 重跑）。截圖 `artifacts/far-landmark/r5/`。FPS NOT RUN。
 - Opus 審：日間中轉站喺眼平線上 ~500 m，鏡頭只見底面（骨架、泊位齒），甲板側面同窗帶太薄；目標圖見到側面。夜間紅燈浮喺黑色、窗帶斷續，比目標零碎。
 - R6（owner：「remove the big triangle bottom, polish the other」）：刪闊尖塔錐、肋、環帶、24 紅燈；改用 `cyl(300,360,1080)` 主柱＋3 接駁領；中轉站三層加厚（180/160/140）見側面，連續窗帶，16 泊位，8 條平貼 spokes，頂蓋 4 粒紅燈。4 batches。`npm test`／`build`／`diff-check` 全過（Opus 重跑），console 0 error。截圖 `artifacts/far-landmark/r6/`。Opus 審：日間形態接近目標（主柱托階梯中轉站）；比目標實淨少少、霧感少啲；夜間窗帶成暖色弧，比目標光少少、零碎啲。FPS NOT RUN。
+- 驗收：owner 2026-11-02「收貨」R6。Hero vsync FPS 日 60.0/60.0/59.9（draws 1043）、夜 60.1/60.0/59.9（draws 1044）。
