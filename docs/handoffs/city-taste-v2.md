@@ -82,3 +82,8 @@ Coordinator session runs `artifacts/city-taste-v2/coordinator.md`: P1→P6 again
 - Removed for the megastructures: Grand Nikko and Hilton landmarks, context massing under footprints, district Meter towers at old slots 3/4/6 (7 of 10 remain), pods 0/2/15/18. `tests/districtMeters.test.ts` family-count asserts now follow the surviving towers (not a visibility assert).
 - Checks on the merge (coordinator): `npm test` exit 0, `npm run build` exit 0, `git diff --check` clean. FPS (agent): day 60 / night 60 median (vsync cap). Evidence `P1/r3/`.
 - 01:40 JST: P2 r1 started (agent branch `feat/city-taste-v2-p2` from e2ad1ca). P3 spec r1 drafted.
+
+## P2 r1 (2026-11-03 02:10 JST)
+
+- Decision: **polish again** → `P2/spec-r2.md`. Placement right for all three; civic sphere reads as a dark blue mirror ball half behind the inner escalator (black at night), floater reads as a white balloon with thin hoops, self-assembling building lost against the hull.
+- Evidence `feat/city-taste-v2-p2` 7ef6e2b, `P2/r1/`. Agent checks pass; FPS 60/60 (vsync cap); ≈ +13 draw calls (1086 total day); no assertions deleted.
