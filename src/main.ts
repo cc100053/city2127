@@ -54,7 +54,9 @@ try {
   const civicReview=import.meta.env.DEV && reviewParams.get('review')==='civic';
   if(civicReview){camera.position.set(-180,105,-235);camera.lookAt(-10,78,20);}
   // DEV street review: a promenade bench, its walkers and the seaside avenue from 40 m (orbit may close to 30 m).
-  const streetReview=import.meta.env.DEV && reviewParams.get('review')==='street';
+  // `review=ring` reuses it to aim at the Sky Ring from any side, including from below (polar clamp relaxed).
+  const ringReview=import.meta.env.DEV && reviewParams.get('review')==='ring';
+  const streetReview=import.meta.env.DEV && (reviewParams.get('review')==='street'||ringReview);
   // `&cam=x,y,z` moves the street-review camera (at least 30 m out) to see past canopies; `&at=x,y,z` aims it elsewhere than the bench.
   const triple=(key:string,fallback:[number,number,number])=>{const v=reviewParams.get(key)?.split(',').map(Number);return v?.length===3&&v.every(Number.isFinite)?v as [number,number,number]:fallback;};
   const reviewAim=triple('at',[-24,0,-268]);
@@ -112,7 +114,7 @@ try {
   if(streetReview)controls.target.set(...reviewAim);
   // Orbit and pan stay on the hero district; the hazed ground beyond is backdrop, not a destination.
   const districtMin=new T.Vector3(DISTRICT.minX,0,DISTRICT.minZ),districtMax=new T.Vector3(DISTRICT.maxX,160,DISTRICT.maxZ),panBack=new T.Vector3();
-  controls.minDistance=streetReview?30:150;controls.maxDistance=1000;controls.minPolarAngle=.35;controls.maxPolarAngle=1.42;controls.screenSpacePanning=false;controls.update();
+  controls.minDistance=streetReview?30:150;controls.maxDistance=1000;controls.minPolarAngle=ringReview?0:.35;controls.maxPolarAngle=ringReview?Math.PI-.05:1.42;controls.screenSpacePanning=false;controls.update();
   // MSAA target: the composer's default target has no samples, so edges were aliased once post-processing ran.
   const composer=new EffectComposer(renderer,new T.WebGLRenderTarget(innerWidth,innerHeight,{type:T.HalfFloatType,samples:quality.msaaSamples}));composer.setSize(innerWidth,innerHeight);composer.addPass(new RenderPass(scene,camera));
   // Night water reflections: copy the lit scene (water masked out by its zero alpha) at quarter resolution; the bay samples it next frame.
@@ -265,7 +267,7 @@ try {
     scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure*(1+.16*day);
     waterLights.night.value=nightSky;
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
-    controls.update();panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);
+    controls.update();if(!ringReview){panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);}
     if(headlineCamera?.active&&cameraMotion.matches)headlineCamera.cancel();else headlineCamera?.update(now);
     narration?.update(now,cameraMotion.matches);
     if(import.meta.env.DEV&&devShot){const pose=SHOTS[devShot];camera.position.set(...pose.position);controls.target.set(...pose.target);camera.lookAt(controls.target);}
