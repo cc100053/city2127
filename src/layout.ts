@@ -69,6 +69,28 @@ export const sweepway: readonly P3[] = [[-290,92,265],[-345,74,250],[-400,56,205
 // Sky Ring (空の環, src/skyRing.ts): a 700 m truss ring whose deck top sits at `deck` m, a shared port above the regional air tier; the district
 // loop follows its plan below. Above the hero eye (~148 m) so it arcs across the sky; at the tier's own 160–170 m it read as a flat bar at eye level.
 export const SKY_RING = {x:-40,z:-40,rx:350,rz:350,deck:250} as const;
+// Hero holograms (src/heroHolograms.ts, artifacts/hero-holograms/spec.md): 13 floating information panels and fictional 2127 adverts, placed once from
+// the hero camera as the page settles it (`eye`, DEV measurement 2026-11-02). Each centre sits 0.82 × d along the ray through the target's screen point
+// (d = nearest solid distance under the panel's footprint, 540 m where it hangs over open sky), so every panel floats clear of what it overlaps, keeps its screen spot and size at
+// 1600 × 900 and faces `eye` once (no billboarding). at = centre, w × h = size, all metres.
+export const HOLOGRAMS = {
+  eye: [-358,148,-437] as P3,
+  panels: [
+    {id:'district',at:[70,131,-178] as P3,w:82,h:62},
+    {id:'transit',at:[6,72,-223] as P3,w:59,h:29},
+    {id:'smartlife',at:[12,96,-101] as P3,w:17,h:69},
+    {id:'air',at:[-104,70,-194] as P3,w:39,h:20},
+    {id:'newgen',at:[-127,162,-60] as P3,w:45,h:30},
+    {id:'release',at:[-206,148,-21] as P3,w:18,h:18},
+    {id:'voices',at:[-171,82,-151] as P3,w:45,h:34},
+    {id:'daily',at:[-227,104,-150] as P3,w:11,h:54},
+    {id:'culture',at:[-265,96,-149] as P3,w:59,h:44},
+    {id:'tide',at:[-189,39,-236] as P3,w:50,h:20},
+    {id:'tag-a',at:[-27,152,-143] as P3,w:12,h:4},
+    {id:'tag-b',at:[-74,155,-97] as P3,w:12,h:4},
+    {id:'tag-c',at:[-305,131,2] as P3,w:12,h:4},
+  ],
+} as const;
 // Air-taxi corridors: a district loop above every landmark and tall site, and an approach from the bay that ends above the sphere berth.
 export const airLoop: readonly P3[] = Array.from({length:12},(_,i)=>{
   const a=i/12*Math.PI*2;return [SKY_RING.x+Math.cos(a)*SKY_RING.rx,170+Math.sin(a*2)*6,SKY_RING.z+Math.sin(a)*SKY_RING.rz] as const;

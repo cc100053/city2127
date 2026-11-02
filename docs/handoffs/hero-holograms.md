@@ -32,9 +32,20 @@ Hero 層（`src/` hero 構件、`SHOTS` hero）；`docs/ODAIBA_2127_REFERENCES/C
 - Owner 2026-11-02：**位置跟 R2（夜）、design 完全跟參考圖**。`target/hero-layout-night.png`（= `gen/r2-hero-night-2.png`，只管位置）、`target/hologram-style.webp`（= `reference.webp`，只管物料）。
 - `artifacts/hero-holograms/spec.md` R1：13 塊 panel（畫面座標 + 落位方法）、三層物料（玻璃 pane／additive 發光內容／halo）、3D wireframe 地球、`voices` live panel（Meter tier 柱 + 提案數）、程式位置、測試、截圖同 FPS 要求。
 
+## R1（2026-11-02，Sonnet 實作，Opus 審核）
+
+- 新 `src/heroHolograms.ts`（13 塊 panel：玻璃 pane + additive canvas 內容 + halo；`district` 3D wireframe 地球；`tide` 捲動波形；浮動同閃爍；`voices` live：`setVoices`／`setTiers`）、`src/glowTexture.ts`（由 `voteJourney.ts` 抽出共用）、`HOLOGRAMS`（`layout.ts`）、`tests/heroHolograms.test.ts`；`main.ts` 喺 survey view 同 DEV `?meters` 兩條路都餵 count／tiers。Taste 文件加 2026-11-02 owner amendment；PROJECT source map 加一行。
+- 同 spec 唔同：落位距離用 panel 覆蓋範圍內最近實體 ×0.82（只用中心點會插入較近建築後面）；`district` 移到 (.225,.35) 闊 .12、`transit` u .22、`daily` v .49，避開 SE 塔／site 橙框。日間 pane `#0f6a86` opacity .62（spec .22 喺 HDR 日景差唔多睇唔到），夜 `#0b4558` .16；線寬約 spec 兩倍。夜間地面反光（optional）未做。軸短詞 RESIDENT_COPY 冇，暫用 人と自律／私と共有／設備と植栽／分散と集中。
+- Opus 審核（`r1/vs-target.jpg`、`hero-h16.png`、`hero-h21.png`）：方向啱，已經係「光」唔係膠板，位置貼 target。問題：①日文字 canvas glow 太矇，細 panel（住民の声標籤、空気清浄度、ゆりかもめ、水位）讀唔到；②「台場 2127」、「水位 安定」、「フジ 文化放送」文字同圖形／框重疊；③表演者線稿似樽，唔似人；④日間 pane 偏灰白，參考圖係較深嘅 teal 玻璃；⑤panel 比 target 細，空中 pod 會飛過遮住 `air`。
+
 ## Actual validation results
 
-- Verification status: NOT RUN
+- Verification status: PARTIAL（owner 目視未做）
+- Date and checked commit/worktree: 2026-11-02，R1 worktree 改動（commit 見 git log）
+- Commands/manual checks and results: Opus 重跑 root `npm test` exit 0（含新 heroHolograms test：13 panel、冇拉丁字母、四 site／Civic Core／畫面中心視線清、tier clamp、「提案 1,284件」）、`npm run build` ✓、`git diff --check` clean。survey／module-swap 冇改，冇跑。
+- FPS（Sonnet 量，development Mac headless Chrome，1920×1080，vsync，load 25 s 後讀 canvas `data-fps`）：hour 16 60.0（draws 1081，hologram 隱藏 1039），hour 21 60.0（draws 1082）；triangles +80。
+- Evidence: `artifacts/hero-holograms/r1/`（`hero-h16.png`、`hero-h21.png`、`vs-target.jpg`、`style-crop.jpg`）
+- 未檢查：headline close-up／orbit 角度下 panel 會唔會入鏡、survey server live 路徑、iPad 流程。
 
 ## Known issues and blockers
 

@@ -8,6 +8,7 @@ import { CITY_AXES, type CityAxis } from '../survey/src/shared/citySurveyState.t
 type Votes = Readonly<Record<CityAxis, number> & { energy?: EnergyChoice }>;
 import { METER_COLORS } from './districtMeters.ts';
 import { changeSites } from './layout.ts';
+import { glowTexture } from './glowTexture.ts';
 
 const SOCKET: Record<CityAxis, keyof typeof changeSites> = { automation: 'nw', publicSharing: 'sw', environmentalPriority: 'ne', urbanConcentration: 'se' };
 const NEUTRAL = '#fff1d6';
@@ -30,14 +31,6 @@ export function lanternSpot(ordinal: number, axis: CityAxis, energy = false): T.
   const s = voteSite(axis, energy), i = ordinal * 4 + CITY_AXES.indexOf(axis);
   const angle = hash(i) * Math.PI * 2, radius = Math.max(s.w, s.d) * s.scale * (.4 + .7 * Math.sqrt(hash(i + .5)));
   return new T.Vector3(s.x + Math.cos(angle) * radius, 42 + 22 * hash(i + .25), s.z + Math.sin(angle) * radius);
-}
-
-function glowTexture(): T.Texture {
-  const c = document.createElement('canvas'); c.width = c.height = 64;
-  const g = c.getContext('2d')!, r = g.createRadialGradient(32, 32, 0, 32, 32, 32);
-  r.addColorStop(0, '#fff'); r.addColorStop(.25, '#ffffffcc'); r.addColorStop(1, '#fff0');
-  g.fillStyle = r; g.fillRect(0, 0, 64, 64);
-  return new T.CanvasTexture(c);
 }
 
 type Flight = { axis: CityAxis; vote: number; color: T.Color; curve: T.CatmullRomCurve3; start: number; landed: boolean; ordinal: number; energy: boolean };

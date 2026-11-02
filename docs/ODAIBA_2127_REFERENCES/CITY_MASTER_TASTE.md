@@ -207,6 +207,10 @@ After several polish rounds the owner judged the city plausible but not readable
 - **Restraint still applies** at street and close-up scale: no cyberpunk palette, neon signage, clutter or anti-gravity blobs; Meter colours stay the only saturated accent.
 - **Performance is part of taste:** an exaggerated effect that drops the exhibition view below 60 FPS (vsync, 1920×1080) is not accepted.
 
+## Owner amendment (2026-11-02): hologram media in the hero panorama
+
+The hero panorama may carry holographic information panels and fictional 2127 adverts (civic data, transit wayfinding, a live resident-voice meter, culture broadcast), made of light as in `artifacts/hero-holograms/target/hologram-style.webp`: near-clear pale glass, thin glowing edges, line-art content, no poles, no solid colour fills (Meter colours stay the only saturated accent). §15 "Media taste" still holds at close-up and street scale; this amendment applies to the hero frame only.
+
 ---
 
 # 4. The 2127 test
@@ -682,6 +686,8 @@ Avoid:
 - glowing UI everywhere.
 
 Technology should feel mature enough that it no longer needs to constantly advertise itself.
+
+Owner amendment (2026-11-02): the hero panorama may carry hologram information panels and fictional 2127 adverts, with materials following `artifacts/hero-holograms/target/hologram-style.webp`; close-up and street levels stay as above (see the hero amendments before §4).
 
 ---
 
