@@ -195,4 +195,6 @@ Validation：
 - 證據：`polish/r5/berth-r4-ref-r5.jpg`（R4｜owner 參考｜R5 近鏡）、`r5/<shot>.jpg`、`r5/hero-h16.jpg`、`r5/hero-h21.jpg`
 - FPS 喺 slate 調淺之前量；之後只改咗一個顏色值。NOT RUN：uncapped FPS、civic 鏡頭、展覽機、dusk
 
-Next expected step：owner 睇 `r5/berth-r4-ref-r5.jpg`，接受就 merge 入 `feat/hero-sky-ring`，或者指出 R6。
+**Owner 2026-11-02 接受 R5**（close-up polish 完成）。`feat/hero-sky-ring-polish` 以 `--no-ff` merge 入 `feat/hero-sky-ring`（未入 main）。
+
+Next expected step：`feat/hero-sky-ring` 按 CONTRIBUTING 整合入 main（屬 parent task）；可選 follow-up：泊位沿環弧形連接步道、大堂樓梯、uncapped FPS。
