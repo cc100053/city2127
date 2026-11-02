@@ -232,6 +232,14 @@ function isDecision(value: unknown): value is Decision {
       && typeof change.label === 'string');
 }
 
+/** A guest's look at a landmark on the shared screen; `ordinal` lights their own voice node. */
+export type ExploreLook = { target: 'sky-ring'; ordinal: number };
+/** null ends the look; undefined is malformed. */
+export function parseExplore(data: Record<string, unknown>): ExploreLook | null | undefined {
+  if (data.target === null) return null;
+  return data.target === 'sky-ring' && Number.isSafeInteger(data.ordinal) && (data.ordinal as number) > 0 ? { target: 'sky-ring', ordinal: data.ordinal as number } : undefined;
+}
+
 /** Parses one WebSocket message from the survey server; anything malformed returns null. */
 export function parseSurveyEvent(data: unknown): ParsedSurveyEvent | null {
   if (!isRecord(data) || !isRecord(data.view)) return null;
@@ -265,6 +273,7 @@ export function connectSurvey(
   onView: (kind: SurveyEventKind, view: CityView, displayMs?: number) => void,
   onStatus: (status: string) => void,
   onDisplayMode?: (mode: DisplayMode) => void,
+  onExplore?: (look: ExploreLook | null) => void,
 ) {
   let delay = 500;
   const pending: { kind: SurveyEventKind; view: CityView; at: number; until: number }[] = [];
@@ -300,6 +309,11 @@ export function connectSurvey(
       let event: ParsedSurveyEvent | null = null;
       let data: unknown;
       try { data = JSON.parse(String(message.data)); event = parseSurveyEvent(data); } catch { event = null; }
+      if (isRecord(data) && data.type === 'explore') {
+        const look = parseExplore(data);
+        if (look !== undefined) onExplore?.(look); else console.warn('Ignored malformed explore message');
+        return;
+      }
       if (event && 'kind' in event && event.kind === 'city-state-snapshot' && isRecord(data)) {
         const mode = data.displayMode === undefined ? 'auto' : data.displayMode;
         if (isDisplayMode(mode)) onDisplayMode?.(mode);

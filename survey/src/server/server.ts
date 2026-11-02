@@ -18,6 +18,7 @@ import { attachRealtime } from './realtime.ts';
 import { createProposalSession, getProposalSession, submitProposal, endStationSession } from './proposalService.ts';
 import { UnsupportedRunVersionError } from './runStore.ts';
 import { devSurveyConfig } from './devSurvey.ts';
+import { createExplore } from './exploreService.ts';
 
 const statusFor: Record<ErrorCode, number> = {
   bad_request: 400, not_found: 404, forbidden: 403, internal_error: 500,
@@ -25,7 +26,7 @@ const statusFor: Record<ErrorCode, number> = {
   no_question_available: 409, session_not_found: 404, session_expired: 410, already_answered: 409,
   unknown_question: 400, unknown_option: 400, option_question_mismatch: 400, question_not_assigned: 409,
   revision_conflict: 409, answer_conflict: 409, reset_confirmation_invalid: 400, proposal_undone: 409,
-  lifecycle_conflict: 409, lifecycle_blocked: 409,
+  lifecycle_conflict: 409, lifecycle_blocked: 409, explore_busy: 409,
 };
 
 const MAX_BODY = 16 * 1024;
@@ -96,9 +97,15 @@ export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddr
   }, 1000);
   stationTimer.unref();
   server.on('close', () => clearInterval(stationTimer));
+  const explore = createExplore(ctx);
   const publish = <T>(res: ServerResponse, outcome: ServiceOutcome<T>, okStatus = 200) => {
     sendJson(res, outcome.response, okStatus);
-    if (outcome.event) realtime.broadcast(outcome.event);
+    // A live result, reset or Undo takes the shared screen back from a guest's look; lighting and station bookkeeping do not.
+    const event = outcome.event;
+    if (event && (event.type === 'city-state-updated' || event.type === 'run-reset' || (event.type === 'city-state-snapshot' && event.undoneProposalId))) {
+      const ended = explore.end(); if (ended) realtime.broadcast(ended);
+    }
+    if (event) realtime.broadcast(event);
   };
 
   async function serveFile(res: ServerResponse, relative: string) {
@@ -139,7 +146,12 @@ export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddr
       const outcome = submitAnswer(ctx, await readJson(req));
       return publish(res, outcome, outcome.response.ok && !outcome.response.data.replayed ? 201 : 200);
     }
-    if (path === '/api/proposal-sessions' && method === 'POST') return publish(res, createProposalSession(ctx, await readJson(req)), 201);
+    if (path === '/api/proposal-sessions' && method === 'POST') {
+      const body = await readJson(req), outcome = createProposalSession(ctx, body);
+      if (outcome.response.ok) { const ended = explore.endFor(outcome.response.data.session.stationId); if (ended) realtime.broadcast(ended); }
+      return publish(res, outcome, 201);
+    }
+    if (path === '/api/explore' && method === 'POST') return publish(res, explore.request(await readJson(req)));
     const endSession = /^\/api\/proposal-sessions\/([^/]+)\/end$/.exec(path);
     if (endSession && method === 'POST') return publish(res, endStationSession(ctx, endSession[1]));
     const proposalSession = /^\/api\/proposal-sessions\/([^/]+)$/.exec(path);

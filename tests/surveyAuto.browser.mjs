@@ -69,7 +69,7 @@ try {
   assert.equal((await read('/api/admin/current-run')).lifecycle.phase, 'awaiting_exit');
   await checkModel();
   await city.reload(); await checkModel();
-  await guest.waitForFunction(() => document.querySelector('#app')?.dataset.screen === 'welcome', null, { timeout: 20_000 });
+  await guest.waitForFunction(() => document.querySelector('#app')?.dataset.screen === 'welcome', null, { timeout: 45_000 });
   const admin = await read('/api/admin/current-run');
   assert.equal((await context.request.post(survey + '/api/admin/lifecycle', { data: { command: 'guest-left', expectedRevision: admin.lifecycle.revision } })).status(), 200);
   // The server commits but the browser loses the response: automation stops, then the

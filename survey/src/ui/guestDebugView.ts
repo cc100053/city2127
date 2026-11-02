@@ -1,8 +1,8 @@
 import './debug.css';
 import type { ExhibitionState } from '../shared/citySurveyState.ts';
-import type { ProposalData, ProposalRequest, ProposalSessionData } from '../shared/protocol.ts';
+import type { ExploreTarget, ProposalData, ProposalRequest, ProposalSessionData } from '../shared/protocol.ts';
 import { api, connectEvents, el, newAnswerId } from './debugApi.ts';
-import { DISPLAY_MS, HANDOFF_MS } from '../shared/displayTiming.ts';
+import { DISPLAY_MS } from '../shared/displayTiming.ts';
 import { buildProposalRequest } from './guestFlow.ts';
 
 const app = document.querySelector<HTMLElement>('#app')!;
@@ -40,6 +40,11 @@ let busy = false;
 /** Set by a review-screen 変更: submitting that question returns to review. */
 let editingFromReview = false;
 let recoveryUnavailable = false;
+/** This guest has turned the shared screen to a landmark; the other station's guest holds it. */
+let exploring = false;
+let othersExploring = false;
+/** The handoff screen stays up this long so the guest can still choose 空の環を見る (owner 2026-11-02); the server lease is unchanged. */
+const EXPLORE_OFFER_MS = 20_000;
 
 const axisNames: Record<keyof ExhibitionState['scores'], string> = {
   automation: '自動化', publicSharing: '公共共有',
@@ -517,9 +522,22 @@ function renderHandoff() {
   page('次の方へどうぞ。', residentIdentity(saved.proposal),
     el('p', { class: 'guest-lead' }, '街はこのまま次の方へ引き継がれます。'),
     ...noticeNodes(),
-    el('div', { class: 'guest-actions' }, action('はじめる画面へ', nextGuest, true)));
+    el('div', { class: 'guest-actions' },
+      exploring ? action('戻る', () => void explore(null), true) : action('空の環を見る', () => void explore('sky-ring'), false, busy || othersExploring),
+      action('はじめる画面へ', nextGuest, !exploring)));
   focusTitle();
-  flowTimer = window.setTimeout(nextGuest, Math.max(HANDOFF_MS, resultEndsAt - performance.now()));
+  // While this guest looks at a landmark the screen waits for 戻る, the next Start or a new result; staff end a forgotten one.
+  if (!exploring) flowTimer = window.setTimeout(nextGuest, Math.max(EXPLORE_OFFER_MS, resultEndsAt - performance.now()));
+}
+
+async function explore(target: ExploreTarget | null) {
+  if (!saved || busy) return;
+  busy = true;
+  const result = await api<{ target: ExploreTarget | null }>('/api/explore', { guestSessionId: saved.proposal.guestSessionId, target });
+  busy = false;
+  if (result.ok || target === null) { exploring = result.ok && target !== null; notice = undefined; }
+  else notice = { role: 'status', text: result.error.code === 'explore_busy' ? '他の方が街の画面を使っています。少しお待ちください。' : '今は街の画面を切り替えられません。' };
+  if (screen === 'handoff') renderHandoff();
 }
 
 async function nextGuest() {
@@ -528,6 +546,7 @@ async function nextGuest() {
     notice = { role: 'status', text: '街の画面で、あなたの回答をご案内しています。表示が終わると、はじめる画面に戻ります。' };
     renderHandoff(); return;
   }
+  if (exploring && saved) { exploring = false; void api('/api/explore', { guestSessionId: saved.proposal.guestSessionId, target: null }); }
   if (stationId && session) {
     if (busy) return;
     busy = true;
@@ -590,6 +609,13 @@ async function showUndone() {
 }
 
 connectEvents(event => {
+  if (event.type === 'explore') {
+    // A null target means nobody holds the screen any more (戻る, a new result, a reset or the next Start).
+    othersExploring = event.target !== null && event.stationId !== stationId;
+    if (event.target === null) exploring = false;
+    if (screen === 'handoff') renderHandoff();
+    return;
+  }
   if (event.type !== 'city-state-snapshot' || !event.undoneProposalId) return;
   undoneSubmissionId = event.undoneProposalId;
   if (saved?.proposal.id === undoneSubmissionId || pendingRequest?.submissionId === undoneSubmissionId) showUndone();
@@ -615,7 +641,7 @@ if (new URLSearchParams(location.search).has('dev-auto')) {
   void import('./autoAnswerPanel.ts').then(({ mountAutoAnswerPanel }) => mountAutoAnswerPanel({
     async start(signal) {
       // Result/handoff use chained timers that a hidden tab may delay; never race them.
-      for (const deadline = Date.now() + DISPLAY_MS + HANDOFF_MS; (screen === 'result' || screen === 'handoff') && Date.now() < deadline;) {
+      for (const deadline = Date.now() + DISPLAY_MS + EXPLORE_OFFER_MS; (screen === 'result' || screen === 'handoff') && Date.now() < deadline;) {
         await new Promise(resolve => setTimeout(resolve, 100));
         signal.throwIfAborted();
       }

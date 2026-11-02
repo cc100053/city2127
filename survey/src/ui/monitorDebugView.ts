@@ -22,6 +22,7 @@ function setState(view: CityView, snapshot = false) {
 }
 
 function onEvent(event: ServerEvent) {
+  if (event.type === 'explore') return;
   if (event.type === 'city-state-snapshot') {
     setState(event.view, true);
     if (event.undoneProposalId) {

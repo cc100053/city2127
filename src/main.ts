@@ -31,6 +31,8 @@ import { shotTimeline } from './resultTimeline';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming';
 import { housingPrototype } from './housingPrototype';
 import { skyRing, STANDALONE_VOICES } from './skyRing';
+import { GuestExplore } from './guestExplore';
+import type { ExploreLook } from './surveyView';
 import { heroHolograms } from './heroHolograms';
 import { spaceElevator } from './spaceElevator';
 import './style.css';
@@ -220,8 +222,19 @@ try {
   const journey=surveyUrl?new VoteJourney(scene,camera):null;
   // A live energy headline narrates one compressed storage cycle during the close-up hold.
   const narration=surveyUrl&&headlineCamera?new EnergyNarration(()=>cityChanges?.energy):null;
+  // A guest's look at the Sky Ring (iPad, after their result) takes the camera from wherever it is; any city event takes it back.
+  const explore=headlineCamera?new GuestExplore(camera,controls,ring):null;
+  const startExplore=(look:ExploreLook,at=now)=>{
+    const position=camera.position.clone(),target=controls.target.clone();
+    headlineCamera!.cancel();narration?.cancel();devShot=null;camera.position.copy(position);controls.target.copy(target);explore!.play(look,at);
+  };
+  if(import.meta.env.DEV&&explore){
+    // `cityExplore(ordinal)` / `cityExplore(null)`; `&explore=<ordinal>&exploreAt=<s>` starts a look that many seconds ago (held `reviewTime` freezes it).
+    Object.assign(window,{cityExplore:(ordinal:number|null)=>ordinal===null?explore.back(now):startExplore({target:'sky-ring',ordinal})});
+    if(params.has('explore'))requestAnimationFrame(()=>requestAnimationFrame(()=>{explore.voices=ring.litVoices();startExplore({target:'sky-ring',ordinal:Number(params.get('explore'))||1},now-Number(params.get('exploreAt')??0));}));
+  }
   if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view,displayMs)=>{
-    devShot=null;
+    devShot=null;explore?.interrupt();if(explore&&isExhibitionView(view))explore.voices=view.guestCount;
     if(isExhibitionView(view)){
       // Cancel any legacy score blend while preserving its current rendered atmosphere.
       world.blendTo(world.state,now);ring.setVoices(view.guestCount);holo.setVoices(view.guestCount);holo.setTiers(view.layout.tiers);
@@ -242,7 +255,7 @@ try {
     world.blendTo(scoresToWorldState(view.scores),now);
     if(kind==='city-state-updated')cityChanges!.applyIncrementalUpdate(view,now);
     else cityChanges!.restoreFromSnapshot(view,now);
-  }, mode => { displayMode = mode; });
+  }, mode => { displayMode = mode; }, look => { if(!explore)return; if(look)startExplore(look); else explore.back(now); });
   // Day tints per mood, then dusk and night colours laid over them by the clock.
   const dayBase=new T.Color('#d3dde0'),dayPulse=new T.Color('#accbdc'),dayStill=new T.Color('#e0e6dc');
   const topBase=new T.Color('#6e9cc6'),topPulse=new T.Color('#6a8db0'),topStill=new T.Color('#a9bcc4');
@@ -276,7 +289,7 @@ try {
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
     controls.update();if(!ringReview){panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);}
     if(headlineCamera?.active&&cameraMotion.matches)headlineCamera.cancel();else headlineCamera?.update(now);
-    narration?.update(now,cameraMotion.matches);
+    narration?.update(now,cameraMotion.matches);explore?.update(now,cameraMotion.matches);
     if(import.meta.env.DEV&&devShot){const pose=SHOTS[devShot];camera.position.set(...pose.position);controls.target.set(...pose.target);camera.lookAt(controls.target);}
     cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.
