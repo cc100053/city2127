@@ -1,3 +1,4 @@
+import { addHudChrome } from './hudFrame.ts';
 import { ENERGY_PHASES } from './devEnergy.ts';
 import type { CarrierChange } from './cityChangeManager.ts';
 import type { EnergyRuntime } from './energyRuntime.ts';
@@ -56,6 +57,7 @@ export class EnergyNarration {
     // Not a `.causal-panel`: that class is the survey card's, which runners and styles select by.
     this.panel.className = 'energy-narration'; this.panel.hidden = true;
     this.panel.innerHTML = '<h2 class="causal-title"></h2><ol></ol><p class="causal-status"></p>';
+    addHudChrome(this.panel);
     document.body.appendChild(this.panel);
     this.title = this.panel.querySelector('h2')!; this.list = this.panel.querySelector('ol')!; this.note = this.panel.querySelector('p')!;
   }

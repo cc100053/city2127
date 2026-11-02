@@ -1,3 +1,4 @@
+import { addHudChrome } from './hudFrame.ts';
 import * as T from 'three';
 import { HERO_POSITION, HERO_TARGET } from './heroCamera.ts';
 import { SKY_RING } from './layout.ts';
@@ -71,6 +72,7 @@ export class GuestExplore {
     this.camera = camera; this.controls = controls; this.ring = ring;
     this.panel.className = 'explore-narration'; this.panel.hidden = true;
     this.panel.innerHTML = '<h2 class="causal-title"></h2><ol></ol><p class="causal-status"></p>';
+    addHudChrome(this.panel);
     this.panel.querySelector('h2')!.textContent = EXPLORE_COPY.title;
     this.list = this.panel.querySelector('ol')!; this.note = this.panel.querySelector('p')!;
     this.list.replaceChildren(...EXPLORE_COPY.steps.map(step => Object.assign(document.createElement('li'), { textContent: step })));

@@ -16,6 +16,7 @@ Owner 2026-11-02 揀咗一張 HUD 目標圖（深色煙燻玻璃、青色發光�
 - `src/style.css`：`.resident-panel` 全套 HUD 樣式；寬度、位置（360px 右上）不變，避免遮 focal site。標題用 `word-break:auto-phrase` 喺句讀斷行。
 - `src/surveyAtmosphere.ts`：加一個 `aria-hidden` 嘅 `.resident-hud`（ライブ／状態：接続中／座標），legacy panel 由 CSS 隱藏。
 - 細節第二輪（owner「add more detail」）：TL／BR 切角（`corner-shape:bevel`，舊瀏覽器退回圓角）、外層第二框線、琥珀角標、頂部短條、左側圓點節點同刻度尺、右側直條、左下旋轉環、卡底微型文字、卡內掃描線＋網格、Wi-Fi 圖示、裝飾性「都市応答 ❯❯❯ ▮▮▮」條（冇數值）。
+- 第三輪（owner「搭通埋其他文字說明框」）：HUD chrome 抽出做 `src/hudFrame.ts`（`addHudChrome`），結果卡、能源旁白 `.energy-narration`（包括沖の受電翼／軌道エレベーター受電）、空の環 `.explore-narration` 共用；CSS 用 `:is(.resident-panel,.energy-narration,.explore-narration)`。旁白框標題薄荷發光、現步驟薄荷、狀態只顯示ライブ＋状態兩行（長標題唔使斷行）。軌道エレベーター本身冇獨立文字框。`tests/energyNarration.test.ts` 嘅假 DOM 加 `setAttribute`／`append`。
 - 文件：EXHIBITION_SPEC、RESIDENT_COPY。
 
 ## Not done (deliberate)

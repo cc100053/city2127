@@ -69,7 +69,7 @@ assert.notEqual(g.getObjectByName('energy-upper-water')!.scale.x, shared[0]);
 
 // Cancelling (snapshot, Undo, reset, reconnect, next result) hides the caption and restores the shared clock.
 const node = () => ({ hidden: false, textContent: '', className: '', innerHTML: '', children: [] as { classList: { toggle(): void } }[],
-  querySelector: () => node(), replaceChildren(...c: never[]) { this.children = c; }, classList: { toggle() {} } });
+  querySelector: () => node(), replaceChildren(...c: never[]) { this.children = c; }, classList: { toggle() {} }, setAttribute() {}, append() {} });
 const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'document');
 Object.defineProperty(globalThis, 'document', { configurable: true, value: { createElement: node, body: { appendChild() {}, dataset: {} as Record<string, string> } } });
 try {
