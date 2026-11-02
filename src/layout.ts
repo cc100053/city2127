@@ -95,6 +95,8 @@ export const HOLOGRAMS = {
     {id:'tag-c',at:[85,42,-150] as P3,w:4,h:1.35,face:[55.3,37.5,-146.4] as P3,view:30},
   ],
 } as const;
+// Far backdrop space elevator (2026-11-02): ~7.5 km from the settled hero camera at screen x≈1220/1920, open sea; its anchor sinks ~480 m behind the curved horizon. Heights in metres before curvature.
+export const SPACE_ELEVATOR = {x:3130,z:6200,spire:900,station:1150,tether:6000} as const;
 // Air-taxi corridors: a district loop above every landmark and tall site, and an approach from the bay that ends above the sphere berth.
 export const airLoop: readonly P3[] = Array.from({length:12},(_,i)=>{
   const a=i/12*Math.PI*2;return [SKY_RING.x+Math.cos(a)*SKY_RING.rx,170+Math.sin(a*2)*6,SKY_RING.z+Math.sin(a)*SKY_RING.rz] as const;
