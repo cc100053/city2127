@@ -126,4 +126,26 @@ Validation（同 R1 方法）：
 - 證據：`polish/r2/vs-target.jpg`（每行：R1 底圖｜target｜R2）、`r2/<shot>.jpg`、`r2/hero-h16.jpg`、`r2/hero-h21.jpg`
 - NOT RUN：uncapped FPS（+18 draws／+0.73M 三角形未量裕度）、展覽機、dusk
 
-Next expected step：owner 睇 `r2/vs-target.jpg`，接受就 merge 入 `feat/hero-sky-ring`，或者指出 R3。
+Next expected step：owner 2026-11-02 揀咗做 R3（見下）。
+
+## Close-up polish R3
+
+Owner 2026-11-02「做 R3」，冇指定方向；Opus 對住同一套 `target/` 揀 R2 最弱嘅三點：
+
+| R2 問題 | R3 改動（`src/skyRing.ts`） |
+|---|---|
+| 花園樹冠又大又圓、等距排，好似一行波板糖 | 綠籬降低至 0.5 m；每格四團矮灌木（`leafyCrown`，0.75–1.15 倍）加一棵細樹（位置每格交替），整體貼近甲板 |
+| `skyGlass` 大堂似實心白盒，睇唔到入面 | 改成通透候機亭：兩面 0.12 m 玻璃牆（新材質 `hallGlass` = `skyGlass` 複製、opacity .3）、每 3 m 一條 `trim` 直框 + 頂框，屋頂同柱不變 |
+| 泊位平台由側面睇係平板 | 平台底加 19 × 14 m 圓角 `trim` 腹板，側面讀到係有形狀嘅懸臂 |
+| 人太少 | 居民 200 → 320；140 個喺泊位（大堂內、大堂後、平台上各三分一），其餘喺花園步道 |
+
+仍然冇跟：truss target 嘅下層步道同粗身斜柱、夜晚底面城市反光（唔加新光源）；人群仍未及 berth target 咁密。
+
+Validation（同 R1 方法）：
+
+- hero `hour=16`：60.0 ×4 FPS vsync，draws **1001**（同 R2），triangles 17.17M → **17.53M**（+0.36M）；`hour=21`：59.9–60.0，draws 1002。Console 0 error。
+- Root `npm test` exit 0（sky ring 視線測試照過）、`npm run build` ✓、`git diff --check` clean。
+- 證據：`polish/r3/vs-target.jpg`（每行：R2｜target｜R3）、`r3/<shot>.jpg`、`r3/hero-h16.jpg`、`r3/hero-h21.jpg`
+- NOT RUN：uncapped FPS、civic 鏡頭、展覽機、dusk
+
+Next expected step：owner 睇 `r3/vs-target.jpg`，接受就 merge 入 `feat/hero-sky-ring`，或者指出 R4。

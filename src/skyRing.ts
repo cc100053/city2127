@@ -14,6 +14,8 @@ export const STANDALONE_VOICES = 120;
 /** Ellipse angles of the V pylons: feet on the bay or open ground, legs clear of skyways, the Yurikamome and context blocks (browser raycast), and of the hero sightlines to the four sites. */
 export const PYLONS = [.25, 1.2, 2, 3.25, 4.45, 5.1];
 const UP = new T.Vector3(0, 1, 0);
+/** Boarding-hall glazing: the city's pale sky glass at .3 opacity, so a two-wall pavilion stays see-through. */
+const hallGlass = skyGlass.clone(); hallGlass.opacity = .3;
 
 /** Point on the ring's centre line at height `y`, offset `out` m along the horizontal outward normal. */
 export function ringPoint(a: number, y: number, out = 0) {
@@ -66,12 +68,14 @@ export function skyRing(scene: T.Scene) {
     }
     // Cast nodes where chords, posts and diagonals meet, so joints read as built connections rather than crossing boxes.
     for (const k of ['to', 'ti', 'bo', 'bi'] as const) { const n = k[0] === 'b' ? 3 : 2.2; part(root, new RoundedBoxGeometry(n, n, n, 1, n * .3), trim, p[k]).lookAt(q[k]); }
-    // Planted inner edge: a stone planter per panel under a continuous hedge and three crowns of varied size, the residents' garden walk.
-    member(root, ringPoint(a0 + .006, top + .45, -WIDTH / 2 + 1.6), ringPoint(a1 - .006, top + .45, -WIDTH / 2 + 1.6), 2.4, .9, stone);
-    member(root, ringPoint(a0 + .004, top + 1.2, -WIDTH / 2 + 1.6), ringPoint(a1 - .004, top + 1.2, -WIDTH / 2 + 1.6), 2.1, .8, leaf);
-    for (const [j, f] of [.18, .5, .82].entries()) {
-      const size = .7 + ((i * 7 + j * 3) % 5) * .14, crown = part(root, leafyCrown(1), leaf, ringPoint(a0 + (a1 - a0) * f, top + 1.6 + size * 1.6, -WIDTH / 2 + 1.6));
-      crown.scale.set(2.2, 2.4, 2.2).multiplyScalar(size);
+    // Planted inner edge: a stone planter per panel under a continuous low hedge with shrub mounds and one small tree per panel,
+    // the residents' garden walk (low and dense, so the deck line stays clean instead of a row of lollipops).
+    member(root, ringPoint(a0 + .006, top + .4, -WIDTH / 2 + 1.6), ringPoint(a1 - .006, top + .4, -WIDTH / 2 + 1.6), 2.6, .8, stone);
+    member(root, ringPoint(a0 + .003, top + .95, -WIDTH / 2 + 1.6), ringPoint(a1 - .003, top + .95, -WIDTH / 2 + 1.6), 2.3, .5, leaf);
+    for (const [j, f] of [.12, .37, .63, .88].entries()) {
+      const size = .75 + ((i * 7 + j * 3) % 5) * .1, tree = j === 1 + i % 2;
+      const crown = part(root, leafyCrown(1), leaf, ringPoint(a0 + (a1 - a0) * f, top + 1.2 + (tree ? 2.4 : size * .6), -WIDTH / 2 + 1.6 + (j % 2 ? .35 : -.35)));
+      crown.scale.set(1.6, tree ? 1.8 : 1.1, 1.6).multiplyScalar(tree ? 1.1 : size);
     }
   }
   // Berths: cantilevered aprons off the outer face, each braced back to the bottom chord, with a lit docking edge and one parked craft.
@@ -81,11 +85,18 @@ export function skyRing(scene: T.Scene) {
     const apron = new T.Group(); apron.position.copy(ringPoint(a, top, WIDTH / 2 + 9)); apron.lookAt(ringPoint(a, top, 0)); root.add(apron);
     part(apron, new RoundedBoxGeometry(24, 1.6, 19, 2, .75), stone, new T.Vector3(0, -.8, 0));
     part(apron, new RoundedBoxGeometry(24.4, .35, 19.4, 2, .2), futureLight, new T.Vector3(0, -.9, 0));
+    // Rounded belly under the apron, so from below and the side it reads as a shaped cantilever rather than a flat slab.
+    part(apron, new RoundedBoxGeometry(19, 1.6, 14, 2, .7), trim, new T.Vector3(0, -2, .8));
     for (const s of [-1, 1]) member(root, ringPoint(a + s * t * .55, top - 1.5, WIDTH / 2 + 17), ringPoint(a + s * t * .55, bottom, WIDTH / 2), .8, .8, trim);
     // Pad: a docking ring on the apron (the same docking light) and a glazed boarding hall on the outer half of the deck behind it.
     part(root, new T.TorusGeometry(7, .22, 4, 40).rotateX(Math.PI / 2), futureLight, ringPoint(a, top + .05, WIDTH / 2 + 9.5));
     const gate = new T.Group(); gate.position.copy(ringPoint(a, top, WIDTH / 2 - 3)); gate.lookAt(ringPoint(a, top, 0)); root.add(gate);
-    part(gate, new RoundedBoxGeometry(24, 4.6, 5.4, 2, .5), skyGlass, new T.Vector3(0, 2.3, 0));
+    // Open pavilion: clear glass walls on slim mullions under the white roof, so the waiting residents show through.
+    for (const z of [-2.7, 2.7]) {
+      part(gate, new T.BoxGeometry(24, 4.2, .12), hallGlass, new T.Vector3(0, 2.3, z));
+      for (let x = -12; x <= 12; x += 3) member(gate, new T.Vector3(x, .2, z), new T.Vector3(x, 4.6, z), .22, .22, trim);
+      member(gate, new T.Vector3(-12, 4.45, z), new T.Vector3(12, 4.45, z), .3, .3, trim);
+    }
     part(gate, new RoundedBoxGeometry(28, .5, 8.5, 2, .22), trim, new T.Vector3(0, 4.85, -.6));
     for (const x of [-13, 13]) member(gate, new T.Vector3(x, 0, -4), new T.Vector3(x, 4.6, -4), .35, .35, trim);
     // Parked air pod (the mobility fleet's rounded pod at its 5× scale): pale shell, glass canopy, docking-light keel, four ducted rotors on skids.
@@ -123,11 +134,11 @@ export function skyRing(scene: T.Scene) {
     voices.setMatrixAt(i, dummy.matrix);
   }
   // Residents on the deck: a few waiting at each boarding hall, others strolling the garden walk (standing poses; the ring is a review subject, not a route).
-  const RESIDENTS = 200, people = pedestrians(scene, RESIDENTS, 'sky-ring-residents'), pose = new T.Object3D();
+  const RESIDENTS = 320, people = pedestrians(scene, RESIDENTS, 'sky-ring-residents'), pose = new T.Object3D();
   for (let k = 0; k < RESIDENTS; k++) {
-    const atGate = k < 80, b = k % BERTHS, j = Math.floor(k / BERTHS);
+    const atGate = k < 140, b = k % BERTHS, j = Math.floor(k / BERTHS);
     const a = atGate ? (b + .5) / BERTHS * Math.PI * 2 + ((j * 37) % 23 - 11) / SKY_RING.rx : (k * 1.618) % (Math.PI * 2);
-    const out = atGate ? (j % 2 ? WIDTH / 2 - 7.2 : WIDTH / 2 + 4 + (j * 5) % 9) : -WIDTH / 2 + 4 + ((k * 13) % 7);
+    const out = atGate ? [WIDTH / 2 - 3 + ((j * 3) % 5 - 2) * .9, WIDTH / 2 - 7.2, WIDTH / 2 + 4 + (j * 5) % 9][j % 3] : -WIDTH / 2 + 4 + ((k * 13) % 9);
     pose.position.copy(ringPoint(a, top, out)); pose.rotation.set(0, (k * 2.39) % (Math.PI * 2), 0); people.set(k, pose); people.gait(k, 0, 0);
   }
   people.flush();
