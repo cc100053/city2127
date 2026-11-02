@@ -42,6 +42,8 @@ Owner problems (2026-11-02): the city lacks 2127 taste; close-ups expose weak mo
 - 2026-11-02 owner: technology light = cool white-blue, low saturation; Meter colours stay the only saturated accents.
 - 2026-11-02 owner: everything may be moved or redesigned (Sky Ring, holograms, facility forms); exhibition roles stay.
 - 2026-11-02 owner: overnight part-by-part polish, a fresh session per part, Opus decides keep polishing vs next part.
+- 2026-11-02 owner: the four Meter sites need not be visible from hero; sightline rules removed from ART/VALIDATION/HOUSING plan; blocking test assertions may be deleted.
+- 2026-11-02 owner: the reviewing/conductor role runs in its own fresh session (protocol `artifacts/city-taste-v2/coordinator.md`) to avoid context pollution; night target after the Gemini reset (~00:35 JST 11-03).
 
 ## Step 0 — master target (2026-11-02)
 
@@ -53,4 +55,4 @@ Owner problems (2026-11-02): the city lacks 2127 taste; close-ups expose weak mo
 
 ## Next expected step
 
-Overnight part loop from P1 against `target/master-day.png` (fresh session per part, Opus reviews, nothing to main). Night master after the Gemini reset, before P7.
+Coordinator session runs `artifacts/city-taste-v2/coordinator.md`: P1→P6 against `target/master-day.png`, night master after ~00:35 JST, then P7; morning review board for the owner. Nothing to main.

@@ -33,6 +33,7 @@ Use these words in target prompts and part specs: anti-gravity floating block, m
 
 - Odaiba stays recognisable: Tokyo Bay, Rainbow Bridge, Fuji TV DNA (frame, sphere, diagonal) as lineage, not as limits.
 - Everything else may move or be redesigned, including the Sky Ring, holograms and the four Meter facility forms; their roles in the exhibition flow stay.
+- The hero does not have to show the four Meter sites: no sightline or visibility rule may block a megastructure or other design (owner 2026-11-02). Changes are shown by the headline close-ups and the vote journey.
 - 60 FPS (vsync, 1920×1080) on the exhibition view; all UI text in Japanese.
 - Greenery stays lush; futurism through form (edges, terraces, hovering beds), never sparse planting.
 

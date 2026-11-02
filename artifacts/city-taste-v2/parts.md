@@ -4,7 +4,7 @@ Target: `target/master-day.png` (owner-locked) and `target/master-night.png` (pe
 
 Loop per part: a fresh session implements one round on branch `feat/city-taste-v2-<part>` from the integration branch `feat/city-taste-v2`, runs `npm test && npm run build && git diff --check`, captures `rN/hero-h16.png`, `rN/hero-h21.png`, `rN/vs-target.jpg` (baseline | round | target) and samples hero FPS (vsync, 1920×1080, `data-fps`). Opus reviews: **polish again** (max 3 rounds), **pass** (merge into `feat/city-taste-v2`, next part) or **revert**. Nothing merges to `main` without the owner.
 
-Global gates every round: hero 60 FPS day and night; the four Meter sites stay visible from hero; tests green; all UI Japanese; no floating islands / rocks / waterfalls.
+Global gates every round: hero 60 FPS day and night; tests green; all UI Japanese; no floating islands / rocks / waterfalls. The four Meter sites do NOT have to be visible from hero (owner 2026-11-02): when a hero-sightline assertion blocks a design (`tests/odaiba.test.ts` `heroSightline`, `skyRing`, `spaceElevator`, `heroHolograms`, `energyPrototype`, `housingCityCheck`), delete that assertion and say so in the round report — never bend the design around it.
 
 | # | Part | Target read | Likely code |
 |---|---|---|---|

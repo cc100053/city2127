@@ -25,7 +25,7 @@ Persistent civic lighting and live proposal pulses have different meanings. Mete
 
 All low/mixed/high outcomes are complete, mature 2127 architectures. Human-led service and private space remain technologically credible; low does not mean empty or obsolete. District carriers mix deterministic design families; mixed uses hybrids and partner Meters can add facilities. Counts/selection follow the authoritative layout and seeds, not art-side rerolls.
 
-Preserve waterfront, civic-core and landmark relationships, sightlines to all four sites, grounded piers/access and route clearance. Odaiba is metres: prioritize detail by projected size in the authored hero and orbit view, not old Shibuya 45/90-unit thresholds. Curves, terraces and greenery must read as structure; keep support/join logic intelligible. Avoid contemporary logos and trademarked character geometry.
+Preserve waterfront, civic-core and landmark relationships, grounded piers/access and route clearance. Odaiba is metres: prioritize detail by projected size in the authored hero and orbit view, not old Shibuya 45/90-unit thresholds. Curves, terraces and greenery must read as structure; keep support/join logic intelligible. Avoid contemporary logos and trademarked character geometry.
 
 ## Glass, sky and day/night
 
@@ -41,6 +41,6 @@ Batch static geometry by material; use InstancedMesh for repeated/moving pieces.
 
 ## Review gates and evidence
 
-Check future identity, readable low/mixed/high differences, complete hybrid states, public access/support, site visibility, night readability, 3 s retargeting, immediate recovery and route clearance. Performance must be measured on stated hardware; old Shibuya captures are not current evidence.
+Check future identity, readable low/mixed/high differences, complete hybrid states, public access/support, night readability, 3 s retargeting, immediate recovery and route clearance. Performance must be measured on stated hardware; old Shibuya captures are not current evidence.
 
 Odaiba visual history: [first civic pass](handoffs/archive/odaiba-art-direction-01.md), [Dream Loop](handoffs/archive/odaiba-dream-loop.md), [second target](handoffs/odaiba-dream-loop-2.md), [hero district/backdrop](handoffs/archive/odaiba-district.md), [Meter variety](handoffs/archive/meter-variety.md). Integration does not prove a previously unmet generated target was reached. Current procedures and dated evidence index: [VALIDATION](VALIDATION.md).
