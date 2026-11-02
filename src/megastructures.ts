@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { plantCanopy } from './coastalCanopy.ts';
+import { hash, plantCanopy, plantShrubs } from './coastalCanopy.ts';
 import { bodyFootprints, inRect } from './megaFootprints.ts';
 
 // P1 (city-taste-v2): the three colossal megastructures of the master target — ring-on-edge building, white arch, stepped terraced hull.
@@ -27,6 +27,8 @@ megaGlass.customProgramCacheKey = () => 'mega-glass';
 const megaJoint = new T.MeshStandardMaterial({ color: '#4b5258', roughness: .6, metalness: .3 });
 export const updateMegastructures = (night: number) => { megaSeam.emissiveIntensity = .6 + night * 1.6; roomGlow.value = night; };
 
+type Plant = { position: number[]; scale: number; type: string };
+type Shrub = [number, number, number, number, number];
 type Batch = Map<T.Material, T.BufferGeometry[]>;
 /** Queue a geometry (placed by `m`) under a material; everything is normalised so per-material merging always succeeds. */
 function put(batch: Batch, material: T.Material, g: T.BufferGeometry, m?: T.Matrix4) {
@@ -50,7 +52,7 @@ function bar(batch: Batch, material: T.Material, a: T.Vector3, b: T.Vector3, w: 
 }
 
 // ---- A. Ring-on-edge building: local frame, ring in XY, axis +Z, centred on the hoop; the group is turned by `yaw` and lifted to centreY.
-function ring(batch: Batch, trees: { position: number[]; scale: number; type: string }[]) {
+function ring(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
   const { outer, inner, depth, plinth, centreY } = RING, half = depth / 2, L = (r: number, h: number) => new T.CylinderGeometry(r, r, h, 96, 1, true).rotateX(Math.PI / 2);
   const place = (x: number, y: number, z: number) => { const v = new T.Vector3(x, y, z).applyAxisAngle(new T.Vector3(0, 1, 0), RING.yaw); return [RING.x + v.x, centreY + v.y, RING.z + v.z] as const; };
   const world = new T.Matrix4().compose(new T.Vector3(RING.x, centreY, RING.z), new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 1, 0), RING.yaw), new T.Vector3(1, 1, 1));
@@ -83,10 +85,15 @@ function ring(batch: Batch, trees: { position: number[]; scale: number; type: st
     const shape = new T.Shape(); shape.absarc(0, 0, inner, -Math.PI * .95, -Math.PI * .05, false); shape.absarc(0, 0, inner - 9, -Math.PI * .05, -Math.PI * .95, true);
     add(megaShell, new T.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: false, curveSegments: 24 }), new T.Matrix4().makeTranslation(0, 0, z - .5));
     add(megaPlant, new T.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: false, curveSegments: 24 }), new T.Matrix4().makeTranslation(0, 0, z + .5).multiply(new T.Matrix4().makeScale(.97, .97, 1)));
-    for (let i = 0; i < 40; i++) {
-      const a = -Math.PI * (.08 + .84 * i / 39), r = inner - 3.5 - (i % 2) * 2.5, p = place(Math.cos(a) * r, Math.sin(a) * r + 1.5, z);
-      trees.push({ position: [p[0], -p[2], p[1]], scale: 1.5 + (i % 3) * .25, type: i % 5 === 0 ? 'columnar' : 'broadleaf' });
-    }
+    // P5: a continuous shrub band spilling over the lip and a second one mid-ledge, with irregular tree clusters (3-5 crowns every 30-45 m).
+    const zi = Math.round(z * 10);
+    for (const [rr, gap, lift] of [[inner - .6, 4.4, 1], [inner - 5.5, 6, .8]] as const)
+      for (let a = -Math.PI * .08, i = 0; a > -Math.PI * .92; a -= gap / rr, i++) { const p = place(Math.cos(a) * rr, Math.sin(a) * rr + lift, z); shrubs.push([p[0], p[1], p[2], 2.6 + hash(zi + i) * .9, 1.5 + hash(zi + i + 5) * .6]); }
+    for (let a = -Math.PI * .1 - hash(zi) * .1, c = 0; a > -Math.PI * .9; a -= (30 + hash(zi + c) * 15) / inner, c++)
+      for (let j = 0, n = 3 + Math.floor(hash(zi + c + 3) * 3); j < n; j++) {
+        const aj = a + (hash(zi + c * 9 + j) - .5) * 6 / inner, r = inner - 4 - hash(zi + c * 7 + j) * 4, p = place(Math.cos(aj) * r, Math.sin(aj) * r + 1.5, z);
+        trees.push({ position: [p[0], -p[2], p[1]], scale: 1 + hash(zi + c * 5 + j) * .5, type: j === 1 ? 'columnar' : 'broadleaf' });
+      }
   }
   const rail = new T.TorusGeometry(inner - 1.2, .45, 6, 64, Math.PI * 1.2);
   add(megaRib, rail, new T.Matrix4().makeRotationZ(-Math.PI * 1.1).setPosition(0, 0, 0));
@@ -134,7 +141,7 @@ function arch(batch: Batch, tops: [number, number][]) {
 }
 
 // ---- C. Stepped terraced mega-hull; local depth 0 is the camera-facing front, +depth the back, +u runs toward the low left end.
-function hull(batch: Batch, trees: { position: number[]; scale: number; type: string }[]) {
+function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
   const { length, depth, steps, step, recede } = HULL, q = new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 1, 0), HULL.yaw);
   const root = new T.Matrix4().compose(new T.Vector3(HULL.x, 0, HULL.z), q, new T.Vector3(1, 1, 1)), L2 = length / 2;
   const world = (u: number, d: number, y: number) => new T.Vector3(u, y, d).applyQuaternion(q).add(new T.Vector3(HULL.x, 0, HULL.z));
@@ -165,10 +172,14 @@ function hull(batch: Batch, trees: { position: number[]; scale: number; type: st
     // planter deck behind the lip: low hedge bands, a tree about every 13 m
     for (const [off, w, mat, h] of [[.75, 1.5, megaShell, .5], [3.6, 2.4, megaPlant, .6], [6.6, 2, megaPlant, .6]] as const) for (let i = 0; i < f.length - 1; i++) // white deck edge, then low hedges
       bar(batch, mat, world(f[i][0], f[i][1] + off, y0 + step + h / 2), world(f[i + 1][0], f[i + 1][1] + off, y0 + step + h / 2), w, h);
-    for (let u = u0 + 6 + (k % 3) * 4; u < L2 - 4; u += 13) {
-      const p = world(u, dAt(k, u, 0) + 4.8, y0 + step + .5);
-      trees.push({ position: [p.x, -p.z, p.y], scale: .85 + (k % 2) * .2, type: k % 4 === 0 ? 'columnar' : 'broadleaf' });
-    }
+    // P5: shrub band spilling over the deck edge, then tree clusters at irregular 30-45 m gaps
+    for (const [off, gap, r] of [[1.1, 4.2, 3], [5.2, 7, 2.6]] as const)
+      for (let u = u0 + 2, i = 0; u < L2 - 2; u += gap, i++) { const p = world(u, dAt(k, u, 0) + off, y0 + step + .5); shrubs.push([p.x, p.y, p.z, r + hash(k * 99 + i + off) * .7, 1.4 + hash(k * 99 + i + 4) * .5]); }
+    for (let u = u0 + 8 + hash(k) * 12, c = 0; u < L2 - 8; u += 24 + hash(k * 7 + c) * 16, c++)
+      for (let j = 0, n = 4 + Math.floor(hash(k * 13 + c) * 3); j < n; j++) {
+        const uj = u + (hash(k * 31 + c * 5 + j) - .5) * 9, p = world(uj, dAt(k, uj, 0) + 4 + hash(k * 17 + c * 3 + j) * 3.5, y0 + step + .5);
+        trees.push({ position: [p.x, -p.z, p.y], scale: .8 + hash(k * 3 + c * 11 + j) * .5, type: j === 1 ? 'columnar' : 'broadleaf' });
+      }
     if (k === 2) { // service rail along this lip with two static pods
       const fl = front(k, 2);
       for (let i = 0; i < fl.length - 1; i++) bar(batch, megaRib, world(fl[i][0], fl[i][1] - .8, y0 + 6), world(fl[i + 1][0], fl[i + 1][1] - .8, y0 + 6), .7, .5);
@@ -198,11 +209,11 @@ export function carveContext(environment: T.Object3D) {
 /** The three megastructures, one merged mesh per finish plus the planted crowns. */
 export function megastructures(): T.Group {
   const root = new T.Group(); root.name = 'megastructures';
-  const batch: Batch = new Map(), trees: { position: number[]; scale: number; type: string }[] = [], tops: [number, number][] = [];
-  ring(batch, trees); arch(batch, tops); hull(batch, trees);
+  const batch: Batch = new Map(), trees: Plant[] = [], shrubs: Shrub[] = [], tops: [number, number][] = [];
+  ring(batch, trees, shrubs); arch(batch, tops); hull(batch, trees, shrubs);
   for (const [material, list] of batch) {
     const mesh = new T.Mesh(mergeGeometries(list), material); mesh.castShadow = mesh.receiveShadow = true; mesh.name = 'megastructure'; root.add(mesh); list.forEach(g => g.dispose());
   }
-  plantCanopy(root, { instances: trees });
+  plantCanopy(root, { instances: trees }); plantShrubs(root, shrubs);
   return root;
 }
