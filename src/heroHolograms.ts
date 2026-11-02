@@ -207,11 +207,6 @@ const PANELS: readonly Panel[] = [
     say(d, 'フジ', s(8), s(92), 96, { weight: 700, title: true }); say(d, '文化放送', s(8), s(130), 28, { weight: 600, title: true });
     arcGauge(d, 222, 34, 13, .7); ticks(d, 206, 62, 236, 62, { alpha: .4 }); dataBlocks(d, 10, 142, 14, 14, 5); circuit(d, [[154, 150], [130, 150], [124, 144], [106, 144]]); cornerMarks(d, 240, 169);
   } },
-  // No text: a small triangle, a level meter and one circuit run.
-  ...(['a', 'b', 'c'] as const).map((n, i): Panel => ({ id: `tag-${n}`, sw: 56, long: 1024, violet: false, hud: false, draw(d) {
-    const s = d.sc; line(d, 1.2, g => { g.moveTo(s(7), s(5)); g.lineTo(s(14), s(5)); g.lineTo(s(10.5), s(12)); g.closePath(); }, { alpha: ICON });
-    dataBlocks(d, 20, 4, 6 + i, 11, 3); circuit(d, [[42 + i * 2, 9], [46 + i * 2, 9], [49 + i * 2, 5], [52, 5]], .4);
-  } })),
 ];
 
 const unit = new T.PlaneGeometry(1, 1);

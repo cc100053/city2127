@@ -88,7 +88,7 @@ const POD_SWITCH=[.078,.328,.672,.922];
 export const podSwitch=(level:number,at:number)=>T.MathUtils.smoothstep(level,at-.05,at+.05);
 export const podShare=(level:number,index:number)=>{const q=(index*.618)%1;return podSwitch(level,POD_SWITCH[q<.15?0:q<.5?1:q<.85?2:3]);};
 /** Walkers: four of five stroll the seaside promenades (even east, odd west), every fifth a mid-level skyway deck. */
-export const walkerRoute=(index:number)=>index%5<4?index%2:2+Math.floor(index/5)%4;
+export const walkerRoute=(index:number)=>index%5<4?index%2:2+Math.floor(index/5)%(midDecks.length+gardenDecks.length);
 /** Interchange transfers: even people step off the boat and walk ashore, odd walk out, queue at the head and board while it is docked. */
 export const TRANSFERS=16;
 /** Human-led and autonomous service both retain a complete transit system. Ports 1..5 span the readable alternatives. */

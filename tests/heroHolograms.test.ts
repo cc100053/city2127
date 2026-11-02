@@ -12,9 +12,9 @@ const scene = new Scene(), holo = heroHolograms(scene);
 if (descriptor) Object.defineProperty(globalThis, 'document', descriptor); else delete (globalThis as { document?: Document }).document;
 scene.updateMatrixWorld(true);
 
-// 8 panels (newgen, release, smartlife, daily and tide are gone), every visible string free of Latin letters (Japanese copy and numerals only).
+// 5 panels (the three sky-bridge tags went with the Aqua City bridges in P4 r2; newgen, release, smartlife, daily and tide are gone), every visible string free of Latin letters (Japanese copy and numerals only).
 const texts = holo.texts();
-assert.equal(texts.size, 8); assert.equal(holo.root.children.length, 8);
+assert.equal(texts.size, 5); assert.equal(holo.root.children.length, 5);
 for (const gone of ['newgen', 'release', 'smartlife', 'daily', 'tide']) assert.ok(!texts.has(gone) && !holo.root.getObjectByName(`hologram-${gone}`), `${gone} is removed`);
 for (const [id, strings] of texts) { assert.ok(id.startsWith('tag-') || strings.length > 0, `${id} has copy`); for (const s of strings) assert.ok(!/[A-Za-z]/.test(s), `${id}: "${s}" contains Latin letters`); }
 

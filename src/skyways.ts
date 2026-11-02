@@ -39,7 +39,7 @@ const LINKS: (readonly (readonly [number, number, number])[])[] = ([
 ] as (readonly (readonly [number, number, number])[])[]).filter(link => !link.some(p => inMega(p[0], p[2], 6))); // P1: nothing stands inside a megastructure footprint
 
 /** Box-section deck along a curve, `top` at the curve and `depth` below it; outward winding, flat-shaded quads. */
-function deck(curve: T.Curve<T.Vector3>, width: number, depth: number, samples: number) {
+export function deck(curve: T.Curve<T.Vector3>, width: number, depth: number, samples: number) {
   const up = new T.Vector3(0, 1, 0), p = new T.Vector3(), t = new T.Vector3(), side = new T.Vector3(), rings: T.Vector3[][] = [];
   for (let i = 0; i <= samples; i++) {
     curve.getPointAt(i / samples, p); curve.getTangentAt(i / samples, t);
@@ -55,7 +55,7 @@ function deck(curve: T.Curve<T.Vector3>, width: number, depth: number, samples: 
   return geometry;
 }
 /** Tube offset sideways from a curve (light trails on both deck faces). */
-function offsetTube(curve: T.Curve<T.Vector3>, offset: number, dy: number, radius: number, closed: boolean) {
+export function offsetTube(curve: T.Curve<T.Vector3>, offset: number, dy: number, radius: number, closed: boolean) {
   const up = new T.Vector3(0, 1, 0), n = closed ? 120 : 80;
   const points = Array.from({ length: closed ? n : n + 1 }, (_, i) => {
     const u = i / n, side = new T.Vector3().crossVectors(up, curve.getTangentAt(u)).setY(0).normalize();
@@ -67,7 +67,7 @@ function offsetTube(curve: T.Curve<T.Vector3>, offset: number, dy: number, radiu
 const solids = layout.buildings.map(b => { const [min, max] = b.boundsBlender; return { x0: min[0], x1: max[0], z0: -max[1], z1: -min[1] }; });
 const guideSamples = routes().guideway.getSpacedPoints(80);
 /** A pier may stand here: open ground outside landmarks, survey lots and the Yurikamome deck. */
-const pierFree = (x: number, z: number) =>
+export const pierFree = (x: number, z: number) =>
   solids.every(s => x < s.x0 - 3 || x > s.x1 + 3 || z < s.z0 - 3 || z > s.z1 + 3) &&
   Object.values(changeSites).every(s => Math.abs(x - s.x) > s.w * s.scale / 2 + 12 || Math.abs(z - s.z) > s.d * s.scale / 2 + 12) &&
   guideSamples.every(g => Math.hypot(g.x - x, g.z - z) > 12);
