@@ -34,7 +34,7 @@ Gemini /u/3 resets ~2.5 h after 22:00. After 00:35, brief a Sonnet subagent (Age
 
 ## Keep going
 
-Invoke the `loop` skill (dynamic, no interval) so you wake every 20–30 min as a fallback when no session event arrives. Stop at 08:30 JST or when P1–P7 are done.
+Invoke the `loop` skill (dynamic, no interval) so you wake every 20–30 min as a fallback when no session event arrives. Stop at 11:00 JST 2026-11-03 (owner moved it from 08:30 on 2026-11-02) or when P1–P7 are done; have the morning deliverable ready by 11:00.
 
 ## Morning deliverable (before stopping)
 

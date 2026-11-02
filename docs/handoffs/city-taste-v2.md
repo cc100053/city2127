@@ -62,3 +62,4 @@ Coordinator session runs `artifacts/city-taste-v2/coordinator.md`: P1→P6 again
 - 22:01 JST coordinator preflight: worktree `.claude/worktrees/city-taste-v2-coord-909e45` switched to `feat/city-taste-v2` (894b88a, equal to origin). Fetch OK.
 - Deviation: the app refuses `start_session` from a session that was itself started by another session (needs the owner's own words). Each part therefore runs as a fresh Sonnet background agent (Agent tool, own git worktree, fresh context, resumed for later rounds) — same isolation goal, allowed by AGENTS.md visual-polish delegation. Keep-awake request was also denied by the auto-mode classifier; the Mac may idle-sleep overnight.
 - 22:15 P1 r1 briefed: `artifacts/city-taste-v2/P1/spec-r1.md` (30243b4); agent branch `feat/city-taste-v2-p1`.
+- 22:40 owner (relayed): stop time and morning deliverable moved to 11:00 JST 11-03.
