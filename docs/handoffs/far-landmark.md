@@ -48,3 +48,11 @@ Owner 要喺遠景加一座巨構：軌道升降機，放好遠，客人只見�
 ## Next expected step
 
 Gemini 生成日／夜目標圖到 `artifacts/far-landmark/gen/`；owner 揀圖抄去 `target/`；之後寫 `spec.md` 做 R3。
+
+## R3–R5（2026-11-02）
+
+- R3：owner 要「大 10 倍」→ 揀「粗 10 倍、高度不變」。
+- R4（`c48f5aa`）：固定左前 key light＋下半淡入霧色（`shaded()`），夜燈改幼、亮度約 R4 前三分一。
+- R5：closeup-polish 流程。Gemini 細節目標圖 `artifacts/far-landmark/target/`（owner 揀兩張都用），`spec.md`，Sonnet 實作：尖塔 8 肋＋3 環帶＋紅燈、三層中轉站＋窗帶＋24 泊位＋12 輻射骨架、粗纜線＋接駁環＋導軌＋4 爬升艙；4 batches。新 `tests/spaceElevator.test.ts`。
+- 驗證：`npm test` exit 0、`npm run build` exit 0、`git diff --check` clean（Opus 重跑）。截圖 `artifacts/far-landmark/r5/`。FPS NOT RUN。
+- Opus 審：日間中轉站喺眼平線上 ~500 m，鏡頭只見底面（骨架、泊位齒），甲板側面同窗帶太薄；目標圖見到側面。夜間紅燈浮喺黑色、窗帶斷續，比目標零碎。
