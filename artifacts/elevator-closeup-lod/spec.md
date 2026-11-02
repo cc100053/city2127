@@ -77,3 +77,15 @@ Review of `r1/vs-target.jpg`. Same files, same DEV toggle, same captures into `r
 Not in R2: the city light streak across the night frame (hidden during the look in R3), explore wiring.
 
 Captures as R1 into `r2/` (`day.png`, `night.png`, `hero-check.png`, `vs-target.jpg` = target | r2).
+
+## R3 — second polish round (owner 2026-11-02: "one more polish round")
+
+Review of `r2/vs-target.jpg`. Same rules: only `spaceElevatorNear` in `src/spaceElevator.ts`, no scene lighting changes, captures into `r3/`. (Explore wiring moves to R4.)
+
+1. **Day underside too blue-grey.** Make the underside darkening depend on darkness: a uniform `down` = `.42` by day → `.65` at night (`lerp(.42,.65,dark)` in `update`), replacing the constant `.6`. Also tint downward faces slightly warm-neutral: `outgoingLight = mix(outgoingLight, vec3(dot(outgoingLight, vec3(.333))), .35*vDown)` before the darkening (desaturates the sky-blue bounce).
+2. **Green rim too heavy and dark.** `nearGreen` → `#6f8a5a`. Clumps `IcosahedronGeometry(30, 0)`, y scale .7, size .6–1.2; per ring keep 64 positions but skip where `rand > .55` so tufts come in irregular groups with gaps. Add a third, sparser ring on D3's edge (r 730, y 1540, 32 positions, same skip).
+3. **Night amber band thick and flat.** Band height `.45·h` → `.28·h`. Add mullions across each band: `nearBody` boxes 8 radial × (band + 4) × 26 tangential, 36 on D1, 28 on D2, 20 on D3, evenly around, sitting on the band surface, so the band reads as segmented windows. Glass night emissive `.9` → `.75`.
+4. **Night lower column vanishes.** Haze amount × `(1 − .5·dark)` (a `hazeAmount` uniform set in `update`), so at night the column stays a dark navy shaft with its mint collars; by day unchanged.
+5. **Climbers small.** Pod `CapsuleGeometry(46, 420, 4, 12)`; six window rings `cyl(48, 48, 18, 12, open)` at y −150, −90, −30, 30, 90, 150; mint clamp rings `cyl(54, 54, 10, 12, open)` at ±230; mount radius 205 → 215. Keep `NEAR_CLIMB` and the loop.
+
+Captures as before into `r3/` (`day.png`, `night.png`, `hero-check.png`, `vs-target.jpg`).
