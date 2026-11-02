@@ -32,6 +32,30 @@ Late afternoon daylight, 16:00. The holograms are bright but translucent in dayl
 Night, 21:00. The holograms are the brightest things in the scene: vivid cyan and violet glow, soft bloom, and a faint coloured light spill on the building facades and plazas directly beneath each panel. Everything else stays as dark as it is now.
 ```
 
+## R2 重做風格（owner 2026-11-02：位置 OK，但 hologram「好膠」，跟參考圖重做設計）
+
+做法：一次上傳兩張圖。圖 1 = R1 候選（`gen/hero-day.png`／`gen/hero-night.png`，保留位置），圖 2 = `reference.webp`（只參考 hologram 物料）。候選存 `gen/r2-hero-day.png`、`gen/r2-hero-night.png`。
+
+R1 點解「膠」：panel 底色實淨飽和（teal／紫色塑膠板）、粗框、企喺柱上似路牌、大塊平面插畫（人像、產品剪影）。
+
+```text
+You are given two images. Image 1 is a real-time 3D engine screenshot of a city with floating holographic panels. Image 2 is a style reference only.
+
+Edit Image 1. Keep the camera, every building, the white ring, the sky, the sea, the orange ground outlines, the corner UI text, and the POSITION, SIZE and TEXT of every holographic panel exactly as they are. Do not add or remove panels. Keep the stylised low-poly game-engine look of the city.
+
+Only REDESIGN the material and graphic style of every holographic panel so it matches the holograms in Image 2 (for example the "2127" globe panel on its left, "CLEAN AIR 98.7%" and "WATER LEVEL STABLE"):
+- Made of light, not plastic: a very transparent pale cyan glass pane (mostly see-through, the buildings behind clearly visible), no opaque or saturated colour fill.
+- Edges are thin, bright, glowing cyan-white light lines with small corner brackets, not thick coloured frames.
+- Content is emitted light: crisp white-cyan glowing text and fine wireframe line-art (a wireframe globe with orbit rings, thin line charts, small outline icons, tiny data rows, thin divider lines and HUD ticks), not flat printed illustrations. Replace the performer and product pictures with glowing wireframe line-art of the same subject.
+- Soft bloom glow around text and edges, a faint scanline shimmer, and a soft cyan light spill on surfaces just below each panel.
+- Colour: mostly cyan and white light; a little soft violet only on two or three of the advert panels, as glowing light, never as a solid fill.
+- Panels float freely in the air: remove the dark poles and stalks under them (wall-mounted ones stay on their facade).
+Japanese text stays Japanese and stays the same words.
+```
+
+hero-day 加：`Daylight: the panels are fainter and more transparent than at night but their edges and text still glow clearly.`
+hero-night 加：`Night: the panels glow strongly with bloom and light the facades beneath them; the rest of the city stays as dark as it is.`
+
 ## 揀圖準則
 
 - 鏡頭、建築、環、天同四個 site 橙框冇變（有變就唔用）。

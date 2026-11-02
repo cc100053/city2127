@@ -27,6 +27,7 @@ Hero 層（`src/` hero 構件、`SHOTS` hero）；`docs/ODAIBA_2127_REFERENCES/C
 
 - 開 worktree／branch。
 - Gemini target 候選（2026-11-02，Sonnet agent 經 Claude in Chrome、`/u/3`，各 1 次）：`gen/hero-day.png`、`gen/hero-night.png`（2730×1536）；對照 `vs-gen.jpg`（左底圖｜右候選）。日：9 塊 panel，鏡頭同塔比例輕微走樣，左上 panel 標題亂碼。夜：11 塊 panel，鏡頭最貼底圖，日文清楚。兩張角落 UI 字都被改壞（實作唔郁 UI）。等 owner 揀圖入 `target/`。
+- Owner 睇 R1：位置 OK，hologram「好膠」，要跟參考圖重做設計。R2（prompts.md「R2 重做風格」，R1 候選 + `reference.webp` 兩圖上傳）：`gen/r2-hero-{day,night}{,-2}.png`；對照 `vs-r1-r2.jpg`（左 R1｜右 R2 -2）。進步：地球、人像變 wireframe，邊線細咗、有 corner bracket。仍然膠：大部分 panel 仲有半透明 teal／紫色底、直幡同廣告似實色卡、柱未拆。Gemini 5 小時額度用晒。
 
 ## Actual validation results
 
