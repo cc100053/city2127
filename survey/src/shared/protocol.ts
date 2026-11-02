@@ -43,7 +43,7 @@ export type ErrorCode =
   | 'no_question_available' | 'session_not_found' | 'session_expired' | 'already_answered'
   | 'unknown_question' | 'unknown_option' | 'option_question_mismatch' | 'question_not_assigned'
   | 'revision_conflict' | 'answer_conflict' | 'reset_confirmation_invalid'
-  | 'lifecycle_conflict' | 'lifecycle_blocked' | 'proposal_undone';
+  | 'lifecycle_conflict' | 'lifecycle_blocked' | 'proposal_undone' | 'explore_busy';
 
 export type ApiError = { code: ErrorCode; message: string };
 /** Every JSON response. Conflicts that the client can recover from carry the latest state. */
@@ -104,6 +104,14 @@ export type LifecycleData = {
 
 export type DisplayMode = 'auto' | 'day' | 'night';
 
+/** Landmarks a guest may look at on the shared screen after their result (the far space elevator joins once its close-up LOD exists). */
+export const EXPLORE_TARGETS = ['sky-ring'] as const;
+export type ExploreTarget = typeof EXPLORE_TARGETS[number];
+/** `target: null` ends the guest's look; it is never stored, so it needs no revision. */
+export type ExploreRequest = { guestSessionId: string; target: ExploreTarget | null };
+/** Ephemeral: never stored, never replayed in snapshots, so reconnecting viewers return to the hero pose. */
+export type ExploreEvent = { type: 'explore'; target: ExploreTarget | null; ordinal?: number; stationId?: 'A' | 'B' };
+
 export type AdminCurrentRun = {
   displayMode: DisplayMode;
   run: RunSummary;
@@ -146,4 +154,5 @@ export type ServerEvent =
       proposal: ProposalRecord;
       view: CityView;
     }
-  | { type: 'run-reset'; previousRunId: string; state: CitySurveyState | ExhibitionState; view: CityView };
+  | { type: 'run-reset'; previousRunId: string; state: CitySurveyState | ExhibitionState; view: CityView }
+  | ExploreEvent;

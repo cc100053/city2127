@@ -5,7 +5,7 @@ import type { CarrierChange } from './cityChangeManager.ts';
 import type { DisplayMode } from './dayCycle.ts';
 import { presets, type WorldState } from './presets.ts';
 import { changeSites } from './layout.ts';
-import { AXES, connectSurvey, isExhibitionView, supersedes, type CityView, type Decision, type ExhibitionProposal, type ExhibitionView, type SurveyEventKind, type SurveyView } from './surveyView.ts';
+import { AXES, connectSurvey, isExhibitionView, supersedes, type CityView, type Decision, type ExhibitionProposal, type ExhibitionView, type SurveyEventKind, type SurveyView, type ExploreLook } from './surveyView.ts';
 
 // Root-scene side of the survey server's CityView contract (survey/src/shared/cityView.ts).
 // Scores drive the atmosphere; the CityChangeManager renders the server-derived layout.
@@ -237,6 +237,7 @@ export function startSurveyAtmosphere(
   url: string,
   apply: (kind: SurveyEventKind, view: CityView, displayMs: number) => CarrierChange[] | void,
   onDisplayMode?: (mode: DisplayMode) => void,
+  onExplore?: (look: ExploreLook | null) => void,
 ) {
   document.body.dataset.mode = 'survey';
   // Latest choice → policy change → city effect, then the run's history (ported from module-swap's CausalPanel).
@@ -318,7 +319,7 @@ export function startSurveyAtmosphere(
       panel.insertBefore(latest, historyTitle);
       renderLegacyFeedback(view, latest, history, scores);
     }
-  }, text => { status.textContent = `サーバー: ${text}`; }, onDisplayMode);
+  }, text => { status.textContent = `サーバー: ${text}`; }, onDisplayMode, onExplore);
 }
 
 function renderLegacyFeedback(view: SurveyView, latest: HTMLElement, history: HTMLElement, scores: HTMLElement) {

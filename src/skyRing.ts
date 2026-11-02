@@ -3,6 +3,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { bake, trim, stone, glass, futureLight, chrome, paint, leaf, leafyCrown } from './cityRig.ts';
 import { pedestrians } from './mobility.ts';
 import { SKY_RING } from './layout.ts';
+import { glowTexture } from './glowTexture.ts';
 
 // 空の環 (Sky Ring, Plan B hero megastructure): the regional air tier's shared port. A box truss ellipse (deck top SKY_RING.deck,
 // 14 m wide, 12 m deep) carried by diagonal V pylons on the water and open ground, with berths and parked craft on its outer edge.
@@ -26,6 +27,17 @@ export function ringPoint(a: number, y: number, out = 0) {
 }
 /** Guest k (0-based) lights node `voiceSlot(k)`: a stride coprime with VOICE_NODES spreads the accumulated voices around the whole ring. */
 export const voiceSlot = (k: number) => (k * 97) % VOICE_NODES;
+
+/** Berth whose pod is left unbaked, so a guest's look at the ring can fly it in and out (the berth nearest the hero side). */
+export const EXPLORE_BERTH = 6;
+export const berthAngle = (b: number) => (b + .5) / BERTHS * Math.PI * 2;
+/** Parked pod position (y = deck + 2.1, over the pad) and its heading along the ring. */
+export function berthPark(b: number) {
+  const a = berthAngle(b);
+  return { position: ringPoint(a, SKY_RING.deck + 2.1, WIDTH / 2 + 9.5), heading: ringPoint(a + .01, 0).sub(ringPoint(a - .01, 0)).normalize() };
+}
+/** Centre of voice node i (pendants alternate outer / inner under the bottom chords). */
+export const voicePosition = (i: number) => ringPoint((i + .5) / VOICE_NODES * Math.PI * 2, SKY_RING.deck - DEPTH - 3.3, i % 2 ? -WIDTH / 2 : WIDTH / 2);
 
 const unit = new T.BoxGeometry(1, 1, 1), basis = new T.Matrix4();
 /** A w × h member from a to b, its height axis kept near `up`. */
@@ -62,8 +74,21 @@ function part(parent: T.Object3D, geometry: T.BufferGeometry, material: T.Materi
   const mesh = new T.Mesh(geometry, material); mesh.position.copy(at); parent.add(mesh); return mesh;
 }
 
+/** The mobility fleet's rounded pod at its 5× scale: pale shell, pill visors, docking-light keel, four ducted rotors on skids. */
+function airPod() {
+  const craft = new T.Group();
+  part(craft, new RoundedBoxGeometry(7.5, 4, 12, 2, 1.75), pearl, new T.Vector3(0, .5, 0));
+  // Pill visors along both top edges (dark blue-grey glass) instead of a wrap-round band.
+  for (const x of [-1, 1]) part(craft, new T.CapsuleGeometry(.75, 7.5, 4, 12).rotateX(Math.PI / 2), visor, new T.Vector3(x * 2.75, 1.9, .4));
+  part(craft, new RoundedBoxGeometry(6, .4, 10, 2, .15), futureLight, new T.Vector3(0, -1.5, 0));
+  for (const [x, z] of [[-6.2, -5], [6.2, -5], [-6.2, 5], [6.2, 5]]) part(craft, new T.TorusGeometry(3, .55, 10, 28).rotateX(Math.PI / 2), pearl, new T.Vector3(x, 1.2, z));
+  for (const x of [-2.6, 2.6]) member(craft, new T.Vector3(x, -1.85, -4.5), new T.Vector3(x, -1.85, 4.5), .4, .4, chrome);
+  return craft;
+}
+
 export function skyRing(scene: T.Scene) {
   const root = new T.Group(); root.name = 'sky-ring';
+  let explorePod: T.Group | undefined;
   const top = SKY_RING.deck, bottom = top - DEPTH;
   const corners = (a: number) => ({ to: ringPoint(a, top - .7, WIDTH / 2), ti: ringPoint(a, top - .7, -WIDTH / 2), bo: ringPoint(a, bottom, WIDTH / 2), bi: ringPoint(a, bottom, -WIDTH / 2) });
   for (let i = 0; i < PANELS; i++) {
@@ -98,7 +123,7 @@ export function skyRing(scene: T.Scene) {
   }
   // Berths: cantilevered aprons off the outer face, each braced back to the bottom chord, with a lit docking edge and one parked craft.
   for (let b = 0; b < BERTHS; b++) {
-    const a = (b + .5) / BERTHS * Math.PI * 2, t = 12 / Math.hypot(SKY_RING.rx, SKY_RING.rz) * 1.4;
+    const a = berthAngle(b), t = 12 / Math.hypot(SKY_RING.rx, SKY_RING.rz) * 1.4;
     // Layered apron (24 m along the ring, 19 m out, 5 m plan radius), owner target R5: a satin pearl deck whose raised rounded curb
     // frames a cool grey pad field, a low glass rim on the three open sides, a thick rounded pearl fascia carrying docking-light bars
     // on its straight faces, a recessed slate shadow band, then a smaller rounded belly so the cantilever reads shaped.
@@ -131,15 +156,10 @@ export function skyRing(scene: T.Scene) {
     part(gate, slab(plan(25, 6.4, 1.5), .45), trim, new T.Vector3(0, 3.6, 0));
     part(gate, slab(plan(38, 10, 4), .5), trim, new T.Vector3(0, 7.5, -.4));
     for (const x of [-17, 17]) member(gate, new T.Vector3(x, 0, -4), new T.Vector3(x, 7, -4), .3, .3, trim);
-    // Parked air pod (the mobility fleet's rounded pod at its 5× scale): pale shell, glass canopy, docking-light keel, four ducted rotors on skids.
-    const craft = new T.Group(), heading = ringPoint(a + .01, 0).sub(ringPoint(a - .01, 0)).normalize();
-    craft.position.copy(ringPoint(a, top + 2.1, WIDTH / 2 + 9.5)); craft.lookAt(craft.position.clone().add(heading)); root.add(craft);
-    part(craft, new RoundedBoxGeometry(7.5, 4, 12, 2, 1.75), pearl, new T.Vector3(0, .5, 0));
-    // Pill visors along both top edges (dark blue-grey glass) instead of a wrap-round band.
-    for (const x of [-1, 1]) part(craft, new T.CapsuleGeometry(.75, 7.5, 4, 12).rotateX(Math.PI / 2), visor, new T.Vector3(x * 2.75, 1.9, .4));
-    part(craft, new RoundedBoxGeometry(6, .4, 10, 2, .15), futureLight, new T.Vector3(0, -1.5, 0));
-    for (const [x, z] of [[-6.2, -5], [6.2, -5], [-6.2, 5], [6.2, 5]]) part(craft, new T.TorusGeometry(3, .55, 10, 28).rotateX(Math.PI / 2), pearl, new T.Vector3(x, 1.2, z));
-    for (const x of [-2.6, 2.6]) member(craft, new T.Vector3(x, -1.85, -4.5), new T.Vector3(x, -1.85, 4.5), .4, .4, chrome);
+    // Parked air pod; the explore berth's pod stays a separate group so a guest's look can fly it.
+    const craft = airPod(), park = berthPark(b);
+    craft.position.copy(park.position); craft.lookAt(craft.position.clone().add(park.heading));
+    if (b === EXPLORE_BERTH) explorePod = craft; else root.add(craft);
   }
   // V pylons: two tapering diagonal legs from one cast knuckle on a stone pier (water / open ground) up to saddle beams under both
   // bottom chords, tied once (Fuji frame and diagonal DNA).
@@ -163,7 +183,7 @@ export function skyRing(scene: T.Scene) {
   const voices = new T.InstancedMesh(new T.IcosahedronGeometry(1, 1), new T.MeshBasicMaterial(), VOICE_NODES); voices.name = 'sky-ring-voices';
   const dummy = new T.Object3D(), warm = new T.Color('#fff0d6'), fitting = new T.Color('#b9bcbd'), lit = new T.Color(), unlit = new T.Color();
   for (let i = 0; i < VOICE_NODES; i++) {
-    dummy.position.copy(ringPoint((i + .5) / VOICE_NODES * Math.PI * 2, bottom - 3.3, i % 2 ? -WIDTH / 2 : WIDTH / 2)); dummy.updateMatrix();
+    dummy.position.copy(voicePosition(i)); dummy.updateMatrix();
     voices.setMatrixAt(i, dummy.matrix);
   }
   // Residents on the deck: a few waiting at each boarding hall, others strolling the garden walk (standing poses; the ring is a review subject, not a route).
@@ -175,15 +195,30 @@ export function skyRing(scene: T.Scene) {
     pose.position.copy(ringPoint(a, top, out)); pose.rotation.set(0, (k * 2.39) % (Math.PI * 2), 0); people.set(k, pose); people.gait(k, 0, 0);
   }
   people.flush();
-  scene.add(...fixed, voices);
-  let shown = 0, dark = -1;
+  // One guest's own node during their look: a halo drawn over the structure (it may hang on the far side of the ring) above a node brightened by the caller's pulse.
+  const halo = new T.Sprite(new T.SpriteMaterial({ map: typeof document === 'undefined' ? null : glowTexture(), color: '#ffd9a0', transparent: true, depthTest: false, depthWrite: false, blending: T.AdditiveBlending, fog: false }));
+  halo.name = 'sky-ring-own-voice'; halo.visible = false;
+  const pod = explorePod!; pod.name = 'sky-ring-explore-pod';
+  scene.add(...fixed, voices, pod, halo);
+  let shown = 0, dark = -1, own = -1, ownGlow = 0;
+  const ownColor = new T.Color();
   const paint = () => {
     for (let i = 0; i < VOICE_NODES; i++) voices.setColorAt(i, unlit);
     for (let k = 0; k < shown; k++) voices.setColorAt(voiceSlot(k), lit);
+    if (own >= 0) voices.setColorAt(own, ownColor.copy(lit).lerp(warm, .3).multiplyScalar(1 + 3 * ownGlow));
     voices.instanceColor!.needsUpdate = true;
   };
   return {
-    root: [...fixed, voices, ...people.meshes],
+    root: [...fixed, voices, pod, ...people.meshes],
+    /** The explore berth's pod, parked unless a guest's look is flying it. */
+    pod,
+    /** Guest k's own node (0-based, null to clear) at glow 0–1; the halo is sized for the whole-ring view. */
+    highlight(k: number | null, glow = 0) {
+      own = k === null ? -1 : voiceSlot(k); ownGlow = glow;
+      halo.visible = own >= 0 && glow > 0;
+      if (halo.visible) { halo.position.copy(voicePosition(own)); halo.scale.setScalar(18 + 22 * glow); halo.material.opacity = .35 + .65 * glow; }
+      paint();
+    },
     /** Light one node per proposal so far (count only); the ring is full from VOICE_NODES guests on. */
     setVoices(count: number) {
       const n = Math.min(VOICE_NODES, Math.max(0, Math.floor(count)));
