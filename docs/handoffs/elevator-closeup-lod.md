@@ -73,3 +73,10 @@ Symptoms at E1, cause:
 ## Next expected step
 
 R1: Sonnet implements `spaceElevatorNear` per spec, captures `r1/`; Opus reviews; owner judges `r1/vs-target.jpg`.
+
+## R1 (2026-11-02)
+
+- Sonnet implemented `spaceElevatorNear(scene, far)` in `src/spaceElevator.ts` (lazy build, 6 baked batches + 3 unbaked climbers, lit `MeshStandardMaterial`, own height haze, no fog/shadows/AO), DEV `cityElevatorNear(on)` / `?elevatorNear`, test asserts. Deviation from spec: window band sits 3 m proud between 6 m lips (−8 m buried it); undersides darkened up to 40% in the shader.
+- Checks (Opus rerun): `npm test` exit 0, `npm run build` exit 0, `git diff --check` clean. Hero without the flag shows the R6 silhouette (`r1/hero-check.png`). FPS NOT RUN.
+- Evidence `artifacts/elevator-closeup-lod/r1/` (`vs-target.jpg`).
+- Opus review vs targets: silhouette, spokes, stepped decks, collars and amber night band match. Off: day too pale and hazed (underside, column channels low contrast); night underside too bright grey-blue (target dark navy); mint bay dashes weak; climbers read as amber blobs on the tether (target: slim pods beside it); no visible terrace green; a city light streak crosses the night frame behind the station.

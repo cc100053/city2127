@@ -34,7 +34,7 @@ import { skyRing, STANDALONE_VOICES } from './skyRing';
 import { GuestExplore } from './guestExplore';
 import type { ExploreLook } from './surveyView';
 import { heroHolograms } from './heroHolograms';
-import { spaceElevator } from './spaceElevator';
+import { spaceElevator, spaceElevatorNear } from './spaceElevator';
 import './style.css';
 
 // Height fog: FogExp2 thickens toward the water (45 m scale height), so low ground and the far shore fall into haze while towers stand clear.
@@ -102,7 +102,7 @@ try {
   const ring=skyRing(scene);ring.setVoices(STANDALONE_VOICES);
   // Hero holograms: the same count feeds the 住民の声 panel; its four Meter bars follow the layout's rungs.
   const holo=heroHolograms(scene,renderer.capabilities.getMaxAnisotropy());holo.setVoices(STANDALONE_VOICES);
-  const elevator=spaceElevator(scene);
+  const elevator=spaceElevator(scene),elevatorNear=spaceElevatorNear(scene,elevator);
   const odaibaReady=loadOdaiba(scene,water).then(()=>true).catch(error=>{const message=document.createElement('p');message.className='error';message.textContent='Odaiba could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);return false;});
   if(import.meta.env.DEV && new URLSearchParams(location.search).has('asset-preview')){
     const input=document.createElement('input');input.type='file';input.accept='.glb,model/gltf-binary';input.className='asset-preview';input.title='Preview a Blender GLB in the city scene';input.setAttribute('aria-label','Preview a Blender GLB');
@@ -146,7 +146,7 @@ try {
   const aoPass=ao as unknown as {_overrideVisibility():void;_restoreVisibility():void},hideFlat=aoPass._overrideVisibility.bind(aoPass),showFlat=aoPass._restoreVisibility.bind(aoPass);
   // ponytail: the overlay list is rescanned every 120 AO frames (about 2 s), so one created later may show its AO bar until then.
   let flat:T.Object3D[]=[],overlays:T.Object3D[]=[],aoFrame=0;
-  aoPass._overrideVisibility=()=>{hideFlat();if(aoFrame++%120===0){overlays=[];scene.traverse(o=>{const m=(o as T.Mesh).material as T.Material|undefined;if(m?.transparent&&(m as T.MeshBasicMaterial).isMeshBasicMaterial)overlays.push(o);});}flat=[floor,scene.getObjectByName('bay-context'),elevator,...overlays].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
+  aoPass._overrideVisibility=()=>{hideFlat();if(aoFrame++%120===0){overlays=[];scene.traverse(o=>{const m=(o as T.Mesh).material as T.Material|undefined;if(m?.transparent&&(m as T.MeshBasicMaterial).isMeshBasicMaterial)overlays.push(o);});}flat=[floor,scene.getObjectByName('bay-context'),elevator,elevatorNear.root,...overlays].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
   aoPass._restoreVisibility=()=>{showFlat();for(const o of flat)o.visible=true;};
   const bloom=new UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.2,.7,1);composer.addPass(bloom);
   const vignette=new ShaderPass(VignetteShader);vignette.uniforms.offset.value=.9;vignette.uniforms.darkness.value=.9;composer.addPass(vignette);composer.addPass(new OutputPass());
@@ -202,7 +202,10 @@ try {
     // `cityPose([x,y,z],[tx,ty,tz])`: free review camera for poses that are not in SHOTS yet.
     cityPose:(position:[number,number,number],target:[number,number,number])=>{
       headlineCamera?.cancel();devShot={position,target};controls.enabled=false;
-    }});
+    },
+    // `cityElevatorNear(true)` / `?elevatorNear`: the R1 mid-distance elevator model instead of the far R6 silhouette.
+    cityElevatorNear:(on:boolean)=>elevatorNear.setActive(on)});
+    if(params.has('elevatorNear'))elevatorNear.setActive(true);
     const shot=params.get('shot');
     if(shot!==null)(window as unknown as {cityShot:(id:string)=>void}).cityShot(shot);
   }
@@ -295,7 +298,7 @@ try {
     if(headlineCamera?.active&&cameraMotion.matches)headlineCamera.cancel();else headlineCamera?.update(now);
     narration?.update(now,cameraMotion.matches);explore?.update(now,cameraMotion.matches);
     if(import.meta.env.DEV&&devShot){camera.position.set(...devShot.position);controls.target.set(...devShot.target);camera.lookAt(controls.target);}
-    cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();
+    cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.
     if(performance.now()-shadowDrawn>=1000/quality.shadowHz){renderer.shadowMap.needsUpdate=true;shadowDrawn=performance.now();}
     composer.render();
