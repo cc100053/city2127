@@ -14,14 +14,14 @@ export const megaRib = new T.MeshStandardMaterial({ color: '#dde1e2', roughness:
 export const megaSeam = new T.MeshStandardMaterial({ color: '#cfe8ff', emissive: '#cfe8ff', emissiveIntensity: .6, roughness: .5 });
 export const megaGlass = new T.MeshStandardMaterial({ color: '#8fa3ae', roughness: .15, metalness: .3 });
 const megaPlant = new T.MeshStandardMaterial({ color: '#6f9a5c', roughness: .9 });
-// Night: about 30% of the glass cells (6 m × 4.2 m, world hash) glow warm, like the retained landmarks' lit rooms.
+// Night: about 60% of the glass cells (6 m × 4.2 m, world hash) glow warm, like the retained landmarks' lit rooms.
 const roomGlow = { value: 0 };
 megaGlass.onBeforeCompile = shader => {
   shader.uniforms.roomGlow = roomGlow;
   shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 megaP;').replace('#include <project_vertex>', '#include <project_vertex>\nmegaP = (modelMatrix * vec4(transformed, 1.)).xyz;');
   shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float roomGlow;\nvarying vec3 megaP;')
     .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-    totalEmissiveRadiance += vec3(1., .78, .5) * roomGlow * 1.1 * step(.7, fract(sin(dot(floor(vec2((megaP.x + megaP.z) / 6., megaP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453));`);
+    totalEmissiveRadiance += vec3(1., .58, .24) * roomGlow * .74 * step(.4, fract(sin(dot(floor(vec2((megaP.x + megaP.z) / 6., megaP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453));`);
 };
 megaGlass.customProgramCacheKey = () => 'mega-glass';
 const megaJoint = new T.MeshStandardMaterial({ color: '#4b5258', roughness: .6, metalness: .3 });

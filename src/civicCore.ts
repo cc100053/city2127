@@ -2,7 +2,7 @@ import * as T from 'three';
 import { arc, bake, box, chrome, mirrors, leaf, leafyCrown, membrane, publicLight as cityLight, solar as citySolar, stone as cityStone, trim as cityTrim } from './cityRig.ts';
 import type { Ride, Spot, Walk } from './occupants.ts';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { megaGlass } from './megastructures.ts';
+import { megaGlass, megaSeam } from './megastructures.ts';
 
 /** Occupied media headquarters within Fuji's civic chassis, retaining the sphere berth and site alignment. Metres. Its people are not
  * baked: `occupants` lists them (staff, audience, forum crowds, strollers and escalator riders) for `publishOccupants` to animate. */
@@ -18,12 +18,12 @@ export function civicCore() {
   // Warm occupied rooms follow the existing city clock, using one shared finish for this building.
   const publicLight=cityLight.clone();publicLight.color.set('#f2dcb4');publicLight.emissive.set('#ffd29c');publicLight.emissiveIntensity=1;
   publicLight.onBeforeCompile=shader=>{
-    shader.uniforms.roomLight={get value(){return 1.15+cityLight.emissiveIntensity*.55;}};
+    shader.uniforms.roomLight={get value(){return 1.15+cityLight.emissiveIntensity*.55;}};shader.uniforms.roomNight={get value(){return Math.min(1,Math.max(0,(cityLight.emissiveIntensity-.15)/1.3));}};
     // Each ~5×6 m room cell gets its own light level, and upward-facing floors glow less than ceilings and screens,
     // so stacked workrooms read as separate occupied rooms with depth instead of one flat lit slab.
     shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vRoomPos;\nvarying float vRoomUp;')
       .replace('#include <project_vertex>','#include <project_vertex>\nvRoomPos=(modelMatrix*vec4(transformed,1.)).xyz;\nvRoomUp=normalize(mat3(modelMatrix)*objectNormal).y;');
-    shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nuniform float roomLight;\nvarying vec3 vRoomPos;\nvarying float vRoomUp;')
+    shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nuniform float roomLight,roomNight;\nvarying vec3 vRoomPos;\nvarying float vRoomUp;')
       .replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>
         float roomCell=fract(sin(dot(floor(vRoomPos.xz/vec2(5.,6.))+floor(vRoomPos.y/9.)*vec2(7.,3.),vec2(12.9898,78.233)))*43758.5453);
         float roomFloor=smoothstep(.5,.9,vRoomUp);
@@ -33,7 +33,7 @@ export function civicCore() {
         float theatreR=length(vRoomPos-vec3(-18.,100.,23.));
         float theatreWall=smoothstep(23.,23.12,theatreR)*(1.-smoothstep(23.28,23.4,theatreR));
         // Wider per-room contrast and dim, desaturated floors: stacked rooms stop reading as clipped amber shelves.
-        totalEmissiveRadiance *= roomLight*(.4+1.1*roomCell)*mix(vec3(1.),vec3(.2,.21,.24),roomFloor)*mix(1.,.45,theatreWall);
+        totalEmissiveRadiance *= roomLight*(.4+1.1*roomCell)*mix(vec3(1.),vec3(.8,.62,.4),roomNight)*mix(vec3(1.),vec3(.2,.21,.24),roomFloor)*mix(1.,.45,theatreWall);
         // The inner theatre shell has a dark painted finish: daylight through the glass no longer turns the dome pale lilac.
         diffuseColor.rgb*=mix(1.,.18,theatreWall);
         // The theatre wall carries a violet stage wash, so the whole auditorium glows blue-violet around the warm rig.
@@ -84,6 +84,7 @@ export function civicCore() {
       box(root,[18,3,18],[x,1.5,z],stone);
       member([x,3,z],[x,30,z],9,12);
       for(const dx of [-7,7])member([x,25,z],[x+dx,134,z],5,8);
+      for(const sx of [-9,9])for(const sz of [-9,9])box(root,[.45,104,.45],[x+sx,82,z+sz],megaSeam,.05); // P7: cool seam on the four corner columns
       member([x-7,134,z],[x+7,134,z],6,9);
       // The split pier carries visible vertical transfer infrastructure and ceramic joints.
       for(const dx of [-2,2])member([x+dx,5,z-5],[x+dx,130,z-5],.5,.7,glass);
@@ -103,6 +104,7 @@ export function civicCore() {
     }
     for(const y of [62,130]) {
       member([-75,y,z],[71,y,z],6,8);
+      if(y===130)box(root,[146,.45,.45],[-2,134.1,z-3],megaSeam,.05);
       if(y===62 && z===-12)continue; // The bay face keeps one clean mid-height band; the rear frame stays trussed.
       member([-75,y+9,z],[71,y+9,z],3,5);
       for(let x=-75;x<71;x+=24)member([x,y,z],[Math.min(x+24,71),y+9,z],1.3,2,solar);
@@ -110,6 +112,7 @@ export function civicCore() {
   }
   for(const x of [-68,64]) {
     member([x,130,-12],[x,130,70],7,7);
+    box(root,[.45,.45,82],[x,134.1,29],megaSeam,.05); // P7: cool seam along the top beams
   }
   // The former podium is an open forum; the existing Aqua link lands here at Y=24.
   box(root,[100,3,36],[-8,22.5,-14],stone);

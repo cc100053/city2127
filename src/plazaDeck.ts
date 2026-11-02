@@ -5,6 +5,7 @@ import { megaGlass, megaRib, megaSeam, megaShell } from './megastructures.ts';
 import { publishRoofGardens } from './districtMeters.ts';
 import { publishOccupants, publishRoofWalks, type Spot, type Walk } from './occupants.ts';
 import { AIR_AT, PLAZA, plazaAt, plazaWalks, VOICES_AT } from './layout.ts';
+import { glowTexture } from './glowTexture.ts';
 import { deck, offsetTube, pierFree } from './skyways.ts';
 
 // P4 (city-taste-v2): the former Aqua City lot is a civic plaza deck — one white storey, ivory paving with ring and radial inlay, a light-ring
@@ -36,7 +37,18 @@ function hoverBeds(scene: T.Object3D) {
   const merged = bake(hover); merged.forEach(mesh => { mesh.name = 'hover-beds'; mesh.castShadow = mesh.material !== megaSeam; });
   hover.add(...merged); plantShrubs(hover, shrubs); scene.add(hover);
 }
-export const updatePlaza = (night: number) => { walkSeam.emissiveIntensity = 1 + night * 1.4; };
+// P7 r2: soft cool lamp pools (one instanced additive decal, no lights) on a ~30 m grid over the deck and along the walkways, plus a faint lit paving.
+const poolMat = new T.MeshBasicMaterial({ color: '#dfeeff', transparent: true, opacity: 0, blending: T.AdditiveBlending, depthWrite: false, fog: false });
+const pools: T.Vector3[] = [];
+ivory.emissive.set('#2a3340');
+export const updatePlaza = (night: number) => { walkSeam.emissiveIntensity = 1 + night * 1.4; poolMat.opacity = .35 * night; ivory.emissiveIntensity = night; };
+function lampPools(root: T.Object3D) {
+  if (typeof document === 'undefined') return;
+  poolMat.map = glowTexture();
+  const mesh = new T.InstancedMesh(new T.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), poolMat, pools.length), m = new T.Matrix4();
+  pools.forEach((p, i) => mesh.setMatrixAt(i, m.compose(p, new T.Quaternion(), new T.Vector3(17, 1, 17))));
+  mesh.name = 'plaza-lamp-pools'; mesh.frustumCulled = false; mesh.renderOrder = 2; root.add(mesh);
+}
 const column = new T.CylinderGeometry(1, 1, 1, 10);
 type P3 = readonly [number, number, number];
 const pts = (list: readonly P3[]) => new T.CatmullRomCurve3(list.map(p => new T.Vector3(...p)), false, 'centripetal');
@@ -52,6 +64,7 @@ function walkway(root: T.Object3D, curve: T.Curve<T.Vector3>) {
   for (const side of [-4.5, 4.5]) root.add(new T.Mesh(offsetTube(curve, side, .05, .42, false), walkSeam));
   for (let d = 15; d < length - 8; d += 30) {
     const p = curve.getPointAt(d / length);
+    pools.push(new T.Vector3(p.x, p.y + .45, p.z));
     if (p.y < top + 1.5 || !pierFree(p.x, p.z)) continue;
     const c = new T.Mesh(column, megaShell); c.scale.set(.75, p.y - 1.7, .75); c.position.set(p.x, (p.y - 1.7) / 2, p.z); root.add(c);
     const collar = new T.Mesh(column, walkSeam); collar.scale.set(1, .3, 1); collar.position.set(p.x, p.y - 1.9, p.z); root.add(collar);
@@ -73,6 +86,8 @@ export function plazaDeck(scene: T.Object3D, panels: readonly { id: string; at: 
   const root = new T.Group(); root.name = 'plaza-deck';
   const g = new T.Group(); g.position.set(PLAZA.x, 0, PLAZA.z); g.rotation.y = PLAZA.yaw; root.add(g);
   const { hu, hv, h } = PLAZA;
+  pools.length = 0;
+  for (const [x, z] of [[-60, -20], [-60, 20], [-30, -20], [-30, 20], [30, -20], [30, 20], [60, -20], [60, 20], [0, -30], [0, 30], [-45, 0], [45, 0]]) { const [wx, wz] = plazaAt(x, z); pools.push(new T.Vector3(wx, h + .45, wz)); }
   box(g, [hu * 2, h, hv * 2], [0, h / 2, 0], megaShell, .2);
   box(g, [hu * 2 + .3, 1.3, hv * 2 + .3], [0, 3.1, 0], megaGlass, .1); // glazed storey band round the podium
   box(g, [hu * 2 - 1, .25, hv * 2 - 1], [0, h + .1, 0], ivory, .05);
@@ -138,7 +153,7 @@ export function plazaDeck(scene: T.Object3D, panels: readonly { id: string; at: 
   root.traverse(o => { if (o instanceof T.Mesh && o.geometry !== column && o.geometry.type !== 'RoundedBoxGeometry') generated.add(o.geometry); });
   const merged = bake(root); generated.forEach(x => x.dispose()); root.clear();
   for (const mesh of merged) { mesh.name = 'plaza-deck'; mesh.receiveShadow = true; if (mesh.material === megaSeam || mesh.material === walkSeam || mesh.material === jet) mesh.castShadow = false; }
-  root.add(...merged);
+  root.add(...merged); lampPools(root);
   const people = roofPeople.spots.length + roofPeople.walks.reduce((n, w) => n + (w.pair ? 2 : 1), 0) + spots.length + walks.reduce((n, w) => n + (w.pair ? 2 : 1), 0);
   return Object.assign(root, { people });
 }

@@ -181,7 +181,7 @@ export function skyRing(scene: T.Scene) {
   const fixed = bake(root);
   // Residents' voices: one node per accumulated proposal on the rim, hung below the bottom chords (alternately outer / inner).
   const voices = new T.InstancedMesh(new T.IcosahedronGeometry(1, 1), new T.MeshBasicMaterial(), VOICE_NODES); voices.name = 'sky-ring-voices';
-  const dummy = new T.Object3D(), warm = new T.Color('#fff0d6'), fitting = new T.Color('#b9bcbd'), lit = new T.Color(), unlit = new T.Color();
+  const dummy = new T.Object3D(), warm = new T.Color('#fff0d6'), coolLamp = new T.Color('#e6f2ff'), fitting = new T.Color('#b9bcbd'), lit = new T.Color(), unlit = new T.Color();
   for (let i = 0; i < VOICE_NODES; i++) {
     dummy.position.copy(voicePosition(i)); dummy.updateMatrix();
     voices.setMatrixAt(i, dummy.matrix);
@@ -228,7 +228,7 @@ export function skyRing(scene: T.Scene) {
     /** By day the nodes are pale fittings, the lit ones faintly warm; at night lit nodes are HDR points (bloom) and unlit ones go dark. */
     update(darkness: number) {
       if (Math.abs(darkness - dark) < .02) return; dark = darkness;
-      lit.copy(warm).multiplyScalar(.95 + 2.8 * darkness); unlit.copy(fitting).multiplyScalar(.75 - .5 * darkness); paint();
+      lit.copy(warm).lerp(coolLamp, darkness).multiplyScalar(.95 + 2.8 * darkness); unlit.copy(fitting).multiplyScalar(.75 - .5 * darkness); paint();
     },
   };
 }
