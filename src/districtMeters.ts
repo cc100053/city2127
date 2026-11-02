@@ -1031,7 +1031,7 @@ export class AutomationDistrict {
 }
 
 /** Lit-room strength on the concentration towers' glass (odaibaScene.updateOdaiba follows the night). */
-export const towerGlow = { value: .3 };
+export const towerGlow = { value: .3 }, towerNight = { value: 0 };
 
 // Traced open ground (tests/odaiba.test.ts checks ground, landmarks, context and routes): towers rise beside the SE site, at the DECKS
 // waterfront and from the western lawns where low concentration scatters its pods.
@@ -1090,7 +1090,7 @@ export class ConcentrationDistrict {
     // ivory mid-rise city by day and as lit towers at night (`towerGlow`, driven by updateOdaiba).
     const facade = new T.MeshStandardMaterial({ color: '#6f9cbd', roughness: .18, metalness: .15, emissive: '#ffd6a0' });
     facade.onBeforeCompile = shader => {
-      shader.uniforms.towerGlow = towerGlow;
+      shader.uniforms.towerGlow = towerGlow; shader.uniforms.towerNight = towerNight;
       shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 towerP;\nvarying vec2 towerC;')
         .replace('#include <project_vertex>', `#include <project_vertex>
         { vec4 w = vec4(transformed, 1.), c = vec4(0., 0., 0., 1.);
@@ -1098,10 +1098,11 @@ export class ConcentrationDistrict {
           w = instanceMatrix * w; c = instanceMatrix * c;
         #endif
           towerP = (modelMatrix * w).xyz; towerC = (modelMatrix * c).xz; }`);
-      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float towerGlow;\nvarying vec3 towerP;\nvarying vec2 towerC;')
+      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float towerGlow, towerNight;\nvarying vec3 towerP;\nvarying vec2 towerC;')
         .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
         vec2 room = vec2(floor(atan(towerP.x - towerC.x, towerP.z - towerC.y) * 2.546), floor(towerP.y / 4.2));
-        float lit = step(.5, fract(sin(dot(room + towerC, vec2(12.9898, 78.233))) * 43758.5453)) * step(.25, fract(towerP.y / 4.2));
+        // Hero atmosphere: half the rooms lit by day, about one in four at night (fewer, brighter rooms instead of a lamp).
+        float lit = step(.5 + .25 * towerNight, fract(sin(dot(room + towerC, vec2(12.9898, 78.233))) * 43758.5453)) * step(.25, fract(towerP.y / 4.2));
         totalEmissiveRadiance *= lit * towerGlow;`);
     };
     facade.customProgramCacheKey = () => 'concentration-tower-glass';

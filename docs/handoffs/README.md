@@ -23,6 +23,8 @@
 | [SE 集約近鏡樣板](se-closeup-polish.md) | DONE（2026-11-01）；owner 接受 R4，暫不套用 SW／NW | cc100053 |
 | [Hero 未來感](hero-futurism.md) | DONE（2026-11-01）；c2 低 hero、天空反射物料、航道光痕，owner 接受 R1＋R2 | cc100053 |
 | [Hero 塔樓＋交通](hero-towers-traffic.md) | DONE（2026-11-02）；前景 4 座開放巨框塔、天空光帶走廊、渡輪，owner 接受 R2 | cc100053 |
+| [空の環 Sky Ring](hero-sky-ring.md) | DONE（2026-11-02）；方案 B 巨構：250 m 桁架環＋六支 V 斜柱＋泊位＋居民聲音燈點；close-up polish owner 接受 R5 | cc100053 |
+| [Hero 霧與光層次](hero-atmosphere.md) | IN_PROGRESS（2026-11-02）；R1 高度霧／夜間窗燈層次／夜空地平線，R2 水面燈光倒影，等 owner 目視 | cc100053 |
 | [近鏡後續／能源講解](closeup-next.md) | F1/F2、C1 INTEGRATED（C1 owner批准，24組兩秒辨認未做）；N1 能源講解 INTEGRATED（13s／日文），F3等硬件（2026-10-29） | cc100053 |
 
 已完成或不再適用的53份交接及Meter截圖見 [歸檔索引](archive/README.md)。歷史下一步不會自動變成backlog；Shibuya不再開發。人類美術review／實機未測等限制保留，不因歸檔而結案。

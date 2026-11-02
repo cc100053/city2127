@@ -11,6 +11,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { VignetteShader } from 'three/addons/shaders/VignetteShader.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { FullScreenQuad, Pass } from 'three/addons/postprocessing/Pass.js';
 import { cityRig } from './cityRig';
 import { heroCamera, HERO_TARGET } from './heroCamera';
 import { DISTRICT } from './layout';
@@ -20,7 +21,7 @@ import { overlay } from './overlay';
 import { addCityModel } from './modelAssets';
 import { loadOdaiba, updateOdaiba } from './odaibaScene';
 import { build2127 } from './odaiba2127';
-import { bayWater } from './bayWater';
+import { bayWater, waterLights } from './bayWater';
 import { scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
 import { createCityChangeManager } from './createCityChangeManager';
@@ -29,8 +30,15 @@ import { ARRIVAL_SECONDS, VoteJourney } from './voteJourney';
 import { shotTimeline } from './resultTimeline';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming';
 import { housingPrototype } from './housingPrototype';
+import { skyRing, STANDALONE_VOICES } from './skyRing';
 import './style.css';
 
+// Height fog: FogExp2 thickens toward the water (45 m scale height), so low ground and the far shore fall into haze while towers stand clear.
+// World height comes from the view-space position (rigid view matrix), so instanced meshes and every fogged material need no extra uniform.
+T.ShaderChunk.fog_pars_vertex+='\n#ifdef USE_FOG\nvarying float vFogY;\n#endif';
+T.ShaderChunk.fog_vertex+='\n#ifdef USE_FOG\nvFogY=(transpose(mat3(viewMatrix))*mvPosition.xyz+cameraPosition).y;\n#endif';
+T.ShaderChunk.fog_pars_fragment+='\n#ifdef USE_FOG\nvarying float vFogY;\n#endif';
+T.ShaderChunk.fog_fragment=T.ShaderChunk.fog_fragment.replace('fogDensity * fogDensity * vFogDepth * vFogDepth','fogDensity * fogDensity * vFogDepth * vFogDepth * (1. + 1.4 * exp(-max(vFogY, 0.) / 45.))');
 try {
   const scene=new T.Scene();scene.background=new T.Color('#dfd6cd');scene.fog=new T.FogExp2('#dfd6cd',.0005);
   const renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
@@ -46,7 +54,9 @@ try {
   const civicReview=import.meta.env.DEV && reviewParams.get('review')==='civic';
   if(civicReview){camera.position.set(-180,105,-235);camera.lookAt(-10,78,20);}
   // DEV street review: a promenade bench, its walkers and the seaside avenue from 40 m (orbit may close to 30 m).
-  const streetReview=import.meta.env.DEV && reviewParams.get('review')==='street';
+  // `review=ring` reuses it to aim at the Sky Ring from any side, including from below (polar clamp relaxed).
+  const ringReview=import.meta.env.DEV && reviewParams.get('review')==='ring';
+  const streetReview=import.meta.env.DEV && (reviewParams.get('review')==='street'||ringReview);
   // `&cam=x,y,z` moves the street-review camera (at least 30 m out) to see past canopies; `&at=x,y,z` aims it elsewhere than the bench.
   const triple=(key:string,fallback:[number,number,number])=>{const v=reviewParams.get(key)?.split(',').map(Number);return v?.length===3&&v.every(Number.isFinite)?v as [number,number,number]:fallback;};
   const reviewAim=triple('at',[-24,0,-268]);
@@ -84,6 +94,8 @@ try {
   const floor=new T.Mesh(new T.PlaneGeometry(18000,18000,180,180),water);floor.rotation.x=-Math.PI/2;floor.position.y=-1.2;floor.receiveShadow=true;scene.add(floor);
   const rig=cityRig(scene);
   build2127(scene);
+  // Sky Ring voices: the proposal count from the survey server, a plausible mid count in standalone review.
+  const ring=skyRing(scene);ring.setVoices(STANDALONE_VOICES);
   const odaibaReady=loadOdaiba(scene,water).then(()=>true).catch(error=>{const message=document.createElement('p');message.className='error';message.textContent='Odaiba could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);return false;});
   if(import.meta.env.DEV && new URLSearchParams(location.search).has('asset-preview')){
     const input=document.createElement('input');input.type='file';input.accept='.glb,model/gltf-binary';input.className='asset-preview';input.title='Preview a Blender GLB in the city scene';input.setAttribute('aria-label','Preview a Blender GLB');
@@ -102,9 +114,23 @@ try {
   if(streetReview)controls.target.set(...reviewAim);
   // Orbit and pan stay on the hero district; the hazed ground beyond is backdrop, not a destination.
   const districtMin=new T.Vector3(DISTRICT.minX,0,DISTRICT.minZ),districtMax=new T.Vector3(DISTRICT.maxX,160,DISTRICT.maxZ),panBack=new T.Vector3();
-  controls.minDistance=streetReview?30:150;controls.maxDistance=1000;controls.minPolarAngle=.35;controls.maxPolarAngle=1.42;controls.screenSpacePanning=false;controls.update();
+  controls.minDistance=streetReview?30:150;controls.maxDistance=1000;controls.minPolarAngle=ringReview?0:.35;controls.maxPolarAngle=ringReview?Math.PI-.05:1.42;controls.screenSpacePanning=false;controls.update();
   // MSAA target: the composer's default target has no samples, so edges were aliased once post-processing ran.
   const composer=new EffectComposer(renderer,new T.WebGLRenderTarget(innerWidth,innerHeight,{type:T.HalfFloatType,samples:quality.msaaSamples}));composer.setSize(innerWidth,innerHeight);composer.addPass(new RenderPass(scene,camera));
+  // Night water reflections: copy the lit scene (water masked out by its zero alpha) at quarter resolution; the bay samples it next frame.
+  const lightCopy=new T.WebGLRenderTarget(1,1,{type:T.HalfFloatType});waterLights.frame.value=lightCopy.texture;
+  // The same pass restores alpha in the scene buffer, since later passes (bloom/AO compositing) do not tolerate the water's zero alpha.
+  const copyQuad=new FullScreenQuad(new T.ShaderMaterial({uniforms:{tDiffuse:{value:null},mask:{value:1}},
+    vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader:'uniform sampler2D tDiffuse;uniform float mask;varying vec2 vUv;void main(){vec4 c=texture2D(tDiffuse,vUv);gl_FragColor=vec4(c.rgb*mix(1.,c.a,mask),1.);}'}));
+  composer.addPass(new class extends Pass{
+    render(r:T.WebGLRenderer,write:T.WebGLRenderTarget,read:T.WebGLRenderTarget){
+      const u=(copyQuad.material as T.ShaderMaterial).uniforms;u.tDiffuse.value=read.texture;
+      if(waterLights.night.value>0){u.mask.value=1;r.setRenderTarget(lightCopy);copyQuad.render(r);}
+      u.mask.value=0;r.setRenderTarget(write);copyQuad.render(r);
+    }
+    setSize(width:number,height:number){lightCopy.setSize(width>>2,height>>2);waterLights.size.value.set(width,height);}
+  }());
   // Contact shadows where slabs, planters and cores meet: the cheapest step from blockout to built object.
   const ao=new GTAOPass(scene,camera,innerWidth,innerHeight);ao.updateGtaoMaterial({radius:3,distanceFallOff:.8,thickness:3,samples:16});ao.blendIntensity=1;ao.enabled=quality.ambientOcclusion;
   // The composer resizes every pass to the canvas; AO keeps its reduced buffer and its blend upsamples onto the full frame.
@@ -192,7 +218,7 @@ try {
     devShot=null;
     if(isExhibitionView(view)){
       // Cancel any legacy score blend while preserving its current rendered atmosphere.
-      world.blendTo(world.state,now);
+      world.blendTo(world.state,now);ring.setVoices(view.guestCount);
       const latest=view.latestProposal;
       // Vote journey: a live result's four votes fly to the sites first; the city transition and pulses start after the close-up settles,
       // while the carrier evidence for the resident card is computed now. Snapshots, resets, Undo and reduced motion stay immediate.
@@ -214,7 +240,7 @@ try {
   // Day tints per mood, then dusk and night colours laid over them by the clock.
   const dayBase=new T.Color('#d3dde0'),dayPulse=new T.Color('#accbdc'),dayStill=new T.Color('#e0e6dc');
   const topBase=new T.Color('#6e9cc6'),topPulse=new T.Color('#6a8db0'),topStill=new T.Color('#a9bcc4');
-  const duskHorizon=new T.Color('#f6b58a'),duskTop=new T.Color('#7a86ad'),nightHorizon=new T.Color('#1c2941'),nightTop=new T.Color('#070d1c');
+  const duskHorizon=new T.Color('#f6b58a'),duskTop=new T.Color('#7a86ad'),nightHorizon=new T.Color('#2a3354'),nightTop=new T.Color('#070d1c');
   const sunLow=new T.Color('#ffae78'),sunHigh=new T.Color('#ffe7c4'),moon=new T.Color('#7d9be0'),ambientDay=new T.Color('#e3ebee'),ambientPulse=new T.Color('#a7c9ed'),ambientNight=new T.Color('#899dbd'),ambientLate=new T.Color('#f4dcc0'),white=new T.Color('#ffffff'),cloudGold=new T.Color('#ffcf98'),seaHaze=new T.Color('#a9c4d6'),horizonCream=new T.Color('#f7ead8'),sunBloom=new T.Color('#ffe2b0'),sunDirection=new T.Vector3();
   const start=performance.now();
   let frames=0,measureStart=start,shadowDrawn=-Infinity;
@@ -225,8 +251,8 @@ try {
     const s=withNight(surveyUrl?world.state:moodAt(hour),dark);
     const pulse=T.MathUtils.clamp((s.neon-.25)/.7,0,1)*day,still=T.MathUtils.clamp((s.warmth-.55)/.3,0,1);
     (scene.background as T.Color).copy(dayBase).lerp(dayPulse,pulse).lerp(dayStill,still).lerp(duskHorizon,glow*.85).lerp(nightHorizon,nightSky);
-    // Clear bay air by day: the district stays crisp, the sea keeps its blue to the horizon and far shores fade to a cool haze.
-    (scene.fog as T.FogExp2).color.copy(scene.background as T.Color).lerp(seaHaze,day*.6);(scene.fog as T.FogExp2).density=.00015+s.haze*.0001;grade.uniforms.amount.value=.35+.65*day;
+    // Aerial perspective (hero atmosphere): the district stays readable, the far bay and shores fall into a cool haze that hugs the water.
+    (scene.fog as T.FogExp2).color.copy(scene.background as T.Color).lerp(seaHaze,day*.6);(scene.fog as T.FogExp2).density=.0004+s.haze*.0001;grade.uniforms.amount.value=.35+.65*day;
     sky.material.uniforms.day.value=day;sky.material.uniforms.tint.value.copy(white).lerp(cloudGold,glow*.45);
     sky.position.copy(camera.position);sky.material.uniforms.horizon.value.copy(scene.background as T.Color).lerp(horizonCream,day*.6);sky.material.uniforms.top.value.copy(topBase).lerp(topPulse,pulse).lerp(topStill,still).lerp(duskTop,glow*.5).lerp(nightTop,nightSky);
     // The sun arcs east to west; below the horizon the same light becomes a dim moon from the opposite side, so shadows never stop.
@@ -240,12 +266,13 @@ try {
     ambient.intensity=(.6+pulse*.15+still*.15)*(1-glow*.18*day)*light.ambient;
     ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientLate,glow*.6).lerp(ambientNight,dark);
     scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure*(1+.16*day);
+    waterLights.night.value=nightSky;
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
-    controls.update();panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);
+    controls.update();if(!ringReview){panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);}
     if(headlineCamera?.active&&cameraMotion.matches)headlineCamera.cancel();else headlineCamera?.update(now);
     narration?.update(now,cameraMotion.matches);
     if(import.meta.env.DEV&&devShot){const pose=SHOTS[devShot];camera.position.set(...pose.position);controls.target.set(...pose.target);camera.lookAt(controls.target);}
-    cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();
+    cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);ring.update(dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.
     if(performance.now()-shadowDrawn>=1000/quality.shadowHz){renderer.shadowMap.needsUpdate=true;shadowDrawn=performance.now();}
     composer.render();
