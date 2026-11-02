@@ -80,3 +80,9 @@ R1: Sonnet implements `spaceElevatorNear` per spec, captures `r1/`; Opus reviews
 - Checks (Opus rerun): `npm test` exit 0, `npm run build` exit 0, `git diff --check` clean. Hero without the flag shows the R6 silhouette (`r1/hero-check.png`). FPS NOT RUN.
 - Evidence `artifacts/elevator-closeup-lod/r1/` (`vs-target.jpg`).
 - Opus review vs targets: silhouette, spokes, stepped decks, collars and amber night band match. Off: day too pale and hazed (underside, column channels low contrast); night underside too bright grey-blue (target dark navy); mint bay dashes weak; climbers read as amber blobs on the tether (target: slim pods beside it); no visible terrace green; a city light streak crosses the night frame behind the station.
+
+## R2 (2026-11-02)
+
+- Spec R2 (`spec.md`): less station haze, darker undersides, column slots + pilasters, night body ×(1 − .6·dark), 48 bigger mint dashes (×2.5 at night, offset half a step off the bays), slim climbers on the rails, terrace clumps at the deck edges. Only `src/spaceElevator.ts` changed.
+- Checks (Opus rerun): `npm test` exit 0, `npm run build` exit 0, `git diff --check` clean. Hero unchanged (`r2/hero-check.png`). FPS NOT RUN.
+- Opus review (`r2/vs-target.jpg`): day now reads as a solid lit volume with a green rim; night underside dark navy, mint dashes read. Still off: day underside slightly too blue-grey; green rim heavy and dark; night amber band thicker and flatter than the target; lower column vanishes in the night haze; climbers small.

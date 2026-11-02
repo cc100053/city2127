@@ -90,16 +90,16 @@ function hazed<M extends T.Material>(material: M) {
     shader.uniforms.nearHaze = nearHaze;
     shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying float vHeight,vDown;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvHeight=(modelMatrix*vec4(transformed,1.)).y;vDown=max(-(modelMatrix*vec4(normal,0.)).y,0.);'); // world y before curvature: climbers move
     shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform vec3 nearHaze;varying float vHeight,vDown;')
-      .replace('#include <opaque_fragment>', '\n#ifdef STANDARD\noutgoingLight*=1.-.4*vDown;\n#endif\noutgoingLight=mix(outgoingLight,nearHaze,.15+.7*(1.-smoothstep(150.,900.,vHeight)));\n#include <opaque_fragment>');
+      .replace('#include <opaque_fragment>', '\n#ifdef STANDARD\noutgoingLight*=1.-.6*vDown;\n#endif\noutgoingLight=mix(outgoingLight,nearHaze,.05+.8*(1.-smoothstep(150.,1000.,vHeight)));\n#include <opaque_fragment>');
   };
   curveBeyondPlate(material); return material;
 }
-const nearBody = hazed(new T.MeshStandardMaterial({ color: '#e8e4dc', roughness: .7, metalness: .1, fog: false })),
+const nearBody = hazed(new T.MeshStandardMaterial({ color: '#dedad2', roughness: .7, metalness: .1, fog: false })),
   nearDark = hazed(new T.MeshStandardMaterial({ color: '#6f7882', roughness: .7, metalness: .1, fog: false })),
   nearGlass = hazed(new T.MeshStandardMaterial({ color: '#8fa3b4', roughness: .3, emissive: '#ffcf8a', emissiveIntensity: 0, fog: false })),
   nearGreen = hazed(new T.MeshStandardMaterial({ color: '#4f6b45', roughness: .9, fog: false })),
   nearMint = hazed(new T.MeshBasicMaterial({ color: '#8ce5d8', fog: false })), nearBeacon = hazed(new T.MeshBasicMaterial({ color: '#ff4a3a', fog: false }));
-const NEAR_MINT = new T.Color('#8ce5d8'), NEAR_RED = new T.Color('#ff4a3a').multiplyScalar(1.6), tmp = new T.Color();
+const NEAR_BODY = new T.Color('#dedad2'), NEAR_DARK = new T.Color('#6f7882'), NEAR_MINT = new T.Color('#8ce5d8'), NEAR_RED = new T.Color('#ff4a3a').multiplyScalar(1.6), tmp = new T.Color();
 /** Climber loop: each climbs from inside the station to above the frame in 40 s. */
 export const NEAR_CLIMB = [1650, 3400] as const;
 
@@ -115,7 +115,11 @@ export function spaceElevatorNear(scene: T.Scene, far: T.Object3D) {
     const rand = (k: number) => { const v = Math.sin(k * 12.9898) * 43758.5453; return v - Math.floor(v); };
     // Column with 12 recessed channels (tilted to follow the taper) and three collars with a mint band.
     add(cyl(300, 360, col, 32), nearBody, col / 2);
-    for (let k = 0; k < 12; k++) polar(box(16, 900, 40), nearDark, k * Math.PI / 6, 330, 530).rotation.z = Math.atan(60 / col);
+    // Slots sit centred on the tapered surface (r = 360 - 60 y / 1080); pilasters stand 6 m proud of it between them.
+    for (let k = 0; k < 12; k++) {
+      const tilt = Math.atan(60 / col), rs = 360 - 60 * 470 / col;
+      polar(box(24, 820, 36), nearDark, k * Math.PI / 6, rs, 470).rotation.z = tilt; polar(box(14, 820, 14), nearBody, (k + .5) * Math.PI / 6, rs + 6, 470).rotation.z = tilt;
+    }
     for (const y of [400, 700, 950]) { add(cyl(385, 385, 50), nearBody, y); add(cyl(388, 388, 12, 48, true), nearMint, y); }
     add(cyl(560, 380, 160), nearBody, 990); add(cyl(440, 440, 10, 48, true), nearMint, 960);
     // 20 beams from the hub to D1's rim, sloping 6 degrees down toward the hub.
@@ -128,17 +132,18 @@ export function spaceElevatorNear(scene: T.Scene, far: T.Object3D) {
       add(cyl(rAt(y + bh / 2) + 3, rAt(y - bh / 2) + 3, bh), nearGlass, y); // 3 m proud of the deck, 3 m behind the lips: reads recessed
       for (const s of [1, -1]) { const yl = y + s * (bh / 2 + 5), r = rAt(yl) + 6; add(cyl(r, r, 10), nearBody, yl); }
     }
-    const clump = new T.IcosahedronGeometry(28, 0);
-    for (const [y, lo, hi] of [[1248, 1100, 1380], [1408, 800, 1060]]) for (let k = 0; k < 40; k++) {
-      const a = (k + rand(k + y)) / 40 * Math.PI * 2, r = lo + (hi - lo) * rand(k * 3 + y), m = add(clump, nearGreen, y, Math.cos(a) * r, Math.sin(a) * r);
-      m.scale.set(.7 + rand(k + 7) * .7, .6, .7 + rand(k + 11) * .7);
+    const clump = new T.IcosahedronGeometry(45, 0);
+    // Planting stands on the deck edges, where the low camera sees it in silhouette.
+    for (const [y, edge] of [[1248, 1370], [1408, 1050]]) for (let k = 0; k < 64; k++) {
+      const a = (k + rand(k + y)) / 64 * Math.PI * 2, r = edge + (rand(k * 3 + y) - .5) * 40, s = .7 + rand(k + 7) * .6, m = add(clump, nearGreen, y, Math.cos(a) * r, Math.sin(a) * r);
+      m.scale.set(s, .7 * s, s);
     }
     // 16 docking bays with a parked craft, and 48 mint dashes under D1's rim.
     for (let k = 0; k < 16; k++) {
       const a = k * Math.PI / 8;
       polar(box(100, 40, 70), nearDark, a, 1375, 1060); polar(box(90, 18, 34), nearBody, a, 1450, 1060); polar(box(40, 10, 24), nearGlass, a, 1450, 1074);
     }
-    for (let k = 0; k < 48; k++) polar(box(6, 6, 30), nearMint, k * Math.PI / 24, 1300, 1057);
+    for (let k = 0; k < 48; k++) polar(box(10, 10, 70), nearMint, (k + .5) * Math.PI / 24, 1340, 1060); // offset half a step: clear of the bays
     for (let k = 0; k < 6; k++) { const a = k * Math.PI / 3; polar(cyl(4, 4, 90, 6), nearBody, a, 300, 1655); polar(box(12, 12, 12), nearBeacon, a, 300, 1706); }
     // Tether: sleeve, joint rings with a mint band, two guide rails either side of the camera line.
     add(cyl(140, 150, tall, 24), nearBody, mid);
@@ -149,8 +154,8 @@ export function spaceElevatorNear(scene: T.Scene, far: T.Object3D) {
     root.add(...meshes, climbers);
     // Climbers share the rail line on the camera side; update() slides them.
     const pod = new T.Group(), part = (g: T.BufferGeometry, m: T.Material, y = 0) => { const o = new T.Mesh(g, m); o.position.y = y; o.frustumCulled = false; pod.add(o); };
-    part(new T.CapsuleGeometry(60, 260, 4, 12), nearBody); part(cyl(62, 62, 180, 12, true), nearGlass); part(cyl(70, 70, 14, 12, true), nearMint, 120); part(cyl(70, 70, 14, 12, true), nearMint, -120);
-    for (let k = 0; k < 3; k++) { const c = pod.clone(); c.position.set(Math.cos(toCam) * 230, 1650, Math.sin(toCam) * 230); climbers.add(c); }
+    part(new T.CapsuleGeometry(38, 300, 4, 12), nearBody); for (const y of [-90, -30, 30, 90]) part(cyl(40, 40, 16, 12, true), nearGlass, y); for (const y of [-170, 170]) part(cyl(46, 46, 10, 12, true), nearMint, y);
+    for (let k = 0; k < 3; k++) { const c = pod.clone(), a = toCam + (k % 2 ? -1 : 1) * Math.PI / 2; c.position.set(Math.cos(a) * 205, 1650, Math.sin(a) * 205); climbers.add(c); } // on the rails, just outside them
     built = true;
   };
   return {
@@ -160,7 +165,8 @@ export function spaceElevatorNear(scene: T.Scene, far: T.Object3D) {
     update(now: number, dark: number) {
       if (!active) return;
       if (scene.fog) nearHaze.value.copy(scene.fog.color);
-      nearGlass.emissiveIntensity = .9 * dark; nearMint.color.copy(nearBody.color).lerp(NEAR_MINT, .4).lerp(tmp.copy(NEAR_MINT).multiplyScalar(1.6), dark); nearBeacon.color.copy(nearBody.color).lerp(NEAR_RED, dark);
+      nearGlass.emissiveIntensity = .9 * dark; nearMint.color.copy(NEAR_BODY).lerp(NEAR_MINT, .4).lerp(tmp.copy(NEAR_MINT).multiplyScalar(2.5), dark); nearBeacon.color.copy(NEAR_BODY).lerp(NEAR_RED, dark);
+      nearBody.color.copy(NEAR_BODY).multiplyScalar(1 - .6 * dark); nearDark.color.copy(NEAR_DARK).multiplyScalar(1 - .6 * dark); // night: the shell falls to dark navy under the scene's night light
       climbers.children.forEach((c, k) => { c.position.y = NEAR_CLIMB[0] + (NEAR_CLIMB[1] - NEAR_CLIMB[0]) * ((now / 40 + k / 3) % 1); });
     },
   };
