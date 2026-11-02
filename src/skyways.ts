@@ -1,5 +1,7 @@
 import * as T from 'three';
-import { arc, bake, box, skyGlass, leaf, leafyCrown, paint, stone, trail, trim } from './cityRig.ts';
+import { arc, bake, box, skyGlass, leaf, leafyCrown, paint, stone, trail } from './cityRig.ts';
+import { megaSeam, megaShell } from './megastructures.ts';
+const trim = megaShell; // r1 (P3): white engineered members, one material family with the megastructures
 import { changeSites, gardenDecks, midDecks, sweepway } from './layout.ts';
 import { routes } from './mobility.ts';
 import { inMega } from './megaFootprints.ts';
@@ -74,7 +76,7 @@ function skyway(root: T.Object3D, curve: T.Curve<T.Vector3>, closed: boolean) {
   const length = curve.getLength(), samples = Math.ceil(length / 3);
   root.add(new T.Mesh(deck(curve, 9, 2.6, samples), trim));
   for (const side of [-4.65, 4.65]) {
-    root.add(new T.Mesh(offsetTube(curve, side, -1.1, .75, closed), trail));
+    root.add(new T.Mesh(offsetTube(curve, side, -1.1, .75, closed), megaSeam));
     root.add(new T.Mesh(parapet(curve, side * .98, samples), stone));
   }
   for (let d = 30; d < length - 10; d += 64) {
@@ -100,6 +102,7 @@ function sphere(root: T.Object3D, [x, y, z]: P3, r: number, deckRadius?: number)
   // Hairline mullions (r5 pass 3): the panel grid reads only up close, so from the hero pose the sphere is one silver ball, not a geodesic dome.
   for (let i = 0; i < 6; i++) { const rib = new T.Mesh(new T.TorusGeometry(r + .05, .09, 4, 64), trim); rib.rotation.y = i * Math.PI / 6; g.add(rib); }
   for (const f of [-.5, 0, .5]) { const lat = new T.Mesh(new T.TorusGeometry(Math.sqrt(1 - f * f) * r + .05, .11, 4, 64), trim); lat.rotation.x = Math.PI / 2; lat.position.y = f * r; g.add(lat); }
+  const equator = new T.Mesh(new T.TorusGeometry(r + .15, .22, 6, 96), megaSeam); equator.rotation.x = Math.PI / 2; g.add(equator);
   // Cradle and a single mast with three splayed struts to the ground.
   arc(g, r * .45, r * .8, 1.4, [0, -r * .78, 0], trim);
   const mast = new T.Mesh(pole, trim); mast.scale.set(2, y - r * .7, 2); mast.position.set(0, -(y + r * .7) / 2, 0); g.add(mast);
@@ -190,7 +193,7 @@ export function skyways() {
   const generated = new Set<T.BufferGeometry>();
   root.traverse(o => { if (o instanceof T.Mesh && o.geometry !== pole && o.geometry !== crown && o.geometry.type !== 'RoundedBoxGeometry') generated.add(o.geometry); });
   const merged = bake(root); generated.forEach(g => g.dispose()); root.clear();
-  for (const mesh of merged) { mesh.name = 'skyways'; if (mesh.material === trail || mesh.material === foam || mesh.material === waterfall) mesh.castShadow = false; }
+  for (const mesh of merged) { mesh.name = 'skyways'; if (mesh.material === trail || mesh.material === megaSeam || mesh.material === foam || mesh.material === waterfall) mesh.castShadow = false; }
   root.add(...merged);
   return root;
 }

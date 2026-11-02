@@ -3,6 +3,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { arc, bake, box, chrome, cream, glass, leaf, leafyCrown, publicLight, skyGlass, solar, stone, trail, trim } from './cityRig.ts';
 import { changeSites, seaward } from './layout.ts';
 import { inMega } from './megaFootprints.ts';
+import { megaGlass, megaRib, megaShell } from './megastructures.ts';
 import { shoreRoomBays } from './waterRooms.ts';
 import { automationActivity, pavilionFlight, pedestrians, plazaPose, routes, serviceDrones } from './mobility.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
@@ -1092,7 +1093,9 @@ export class ConcentrationDistrict {
     this.root.name = 'concentration-district';
     // Sky-blue glass with warm-lit rooms on 4.2 m storeys (about half the bays occupied): the new vertical district reads apart from the
     // ivory mid-rise city by day and as lit towers at night (`towerGlow`, driven by updateOdaiba).
-    const facade = new T.MeshStandardMaterial({ color: '#6f9cbd', roughness: .18, metalness: .15, emissive: '#ffd6a0' });
+    // r1 (P3): one mega material family — white frame and slab bands, pale blue-grey glass, cool seam light under each band.
+    const trim = megaShell, cream = megaShell, chrome = megaRib;
+    const facade = new T.MeshStandardMaterial({ color: '#' + megaGlass.color.getHexString(), roughness: .18, metalness: .15, emissive: '#ffd6a0' });
     facade.onBeforeCompile = shader => {
       shader.uniforms.towerGlow = towerGlow; shader.uniforms.towerNight = towerNight;
       shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 towerP;\nvarying vec2 towerC;')
@@ -1110,7 +1113,7 @@ export class ConcentrationDistrict {
         totalEmissiveRadiance *= lit * towerGlow;`);
     };
     facade.customProgramCacheKey = () => 'concentration-tower-glass';
-    const lobby = this.light; lobby.emissive.set('#ffe1b8'); lobby.emissiveIntensity = .9;
+    const lobby = this.light; lobby.emissive.set('#cfe8ff'); lobby.emissiveIntensity = .9;
     // Unit-height (1 m, scaled per site) silhouette families by slot (`towerFamily`), all on an ivory podium and all marked at the .4 / .72 sky-lobby
     // levels where bridges land: a twisted glass shaft, a terraced setback tower with planted terraces, and linked twin shafts.
     const family = (build: (unit: (geometry: T.BufferGeometry, material: T.Material, x: number, y: number, z?: number, yaw?: number) => void) => void) => {
