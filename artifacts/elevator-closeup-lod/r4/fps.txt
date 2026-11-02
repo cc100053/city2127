@@ -1,0 +1,9 @@
+R4 elevator explore look, 2026-11-02. Development Mac, headless Google Chrome (playwright-core, --use-angle=metal), 1920x1080 DPR1, Vite DEV.
+Canvas data-fps (120-frame average) every 2.5 s after 16 s load, first sample discarded. fps/drawCalls.
+Headless: not a display vsync measurement; compare within this run only.
+
+look hour=14 (?meters&hour=14&explore=1&exploreTarget=space-elevator): 53.5 54.3 54.5 53.4 53.7 (draws 421, triangles 9.03M)
+look hour=21: 52.9 53.5 52.7 52.9 53.3 (draws 422)
+hero hour=14 (?meters&hour=14): 36.2 37.4 37.4 39.0 41.2 (draws 1069)
+hero hour=21: 38.5 37.9 37.9 36.0 35.5 (draws 1070)
+look hour=21 rerun: 54.2 53.7 54.0 54.4 53.5 (draws 422)

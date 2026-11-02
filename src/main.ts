@@ -229,16 +229,19 @@ try {
   const journey=surveyUrl?new VoteJourney(scene,camera):null;
   // A live energy headline narrates one compressed storage cycle during the close-up hold.
   const narration=surveyUrl&&headlineCamera?new EnergyNarration(()=>cityChanges?.energy):null;
-  // A guest's look at the Sky Ring (iPad, after their result) takes the camera from wherever it is; any city event takes it back.
-  const explore=headlineCamera?new GuestExplore(camera,controls,ring):null;
+  // A guest's look at the Sky Ring or the space elevator (iPad, after their result) takes the camera from wherever it is; any city event takes it back.
+  // The elevator look swaps in the near LOD and hides the ambient sky-corridor trails, one of which crosses E1 edge-on behind the station.
+  const skyTrails=scene.getObjectByName('regional-air-trails');
+  const explore=headlineCamera?new GuestExplore(camera,controls,ring,on=>{elevatorNear.setActive(on);if(skyTrails)skyTrails.visible=!on;}):null;
   const startExplore=(look:ExploreLook,at=now)=>{
     const position=camera.position.clone(),target=controls.target.clone();
     headlineCamera!.cancel();narration?.cancel();devShot=null;camera.position.copy(position);controls.target.copy(target);explore!.play(look,at);
   };
   if(import.meta.env.DEV&&explore){
-    // `cityExplore(ordinal)` / `cityExplore(null)`; `&explore=<ordinal>&exploreAt=<s>` starts a look that many seconds ago (held `reviewTime` freezes it).
-    Object.assign(window,{cityExplore:(ordinal:number|null)=>ordinal===null?explore.back(now):startExplore({target:'sky-ring',ordinal})});
-    if(params.has('explore'))requestAnimationFrame(()=>requestAnimationFrame(()=>{explore.voices=ring.litVoices();startExplore({target:'sky-ring',ordinal:Number(params.get('explore'))||1},now-Number(params.get('exploreAt')??0));}));
+    // `cityExplore(ordinal, target?)` / `cityExplore(null)`; `&explore=<ordinal>&exploreAt=<s>&exploreTarget=space-elevator` starts a look that many seconds ago (held `reviewTime` freezes it).
+    const exploreTarget=(t:unknown):ExploreLook['target']=>t==='space-elevator'?t:'sky-ring';
+    Object.assign(window,{cityExplore:(ordinal:number|null,target?:string)=>ordinal===null?explore.back(now):startExplore({target:exploreTarget(target),ordinal})});
+    if(params.has('explore'))requestAnimationFrame(()=>requestAnimationFrame(()=>{explore.voices=ring.litVoices();startExplore({target:exploreTarget(params.get('exploreTarget')),ordinal:Number(params.get('explore'))||1},now-Number(params.get('exploreAt')??0));}));
   }
   if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view,displayMs)=>{
     devShot=null;explore?.interrupt();if(explore&&isExhibitionView(view))explore.voices=view.guestCount;

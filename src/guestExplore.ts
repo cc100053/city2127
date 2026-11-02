@@ -7,10 +7,16 @@ import type { ExploreLook } from './surveyView.ts';
 // A guest's look at the Sky Ring after their result (iPad 空の環を見る / 戻る): fly to the explore berth, then loop three 4 s steps —
 // a pod climbs in from the regional loop and lands, residents transfer, the camera widens to the whole ring and the guest's own
 // voice node glows — until 戻る, the next Start or a new result. The pod is the berth's own parked pod, so at rest nothing changes.
+// The space elevator look (ELEVATOR_COPY) flies to pose E1 and holds it while the caption loops; reduced motion holds every look's pose.
 export const EXPLORE_FLY = 2, EXPLORE_STEP = 4, EXPLORE_CYCLE = 3 * EXPLORE_STEP;
 export const EXPLORE_COPY = {
   title: '空の環 · 空の港',
   steps: ['航路のポッドが空の港へ入る', 'ここで乗り換え、街の各地へ', '灯る点は住民の声、あなたの声も'],
+} as const;
+/** The space elevator look (iPad 軌道エレベーターを見る): the near LOD's climbers rise past the station; the camera holds pose E1. Owner may edit. */
+export const ELEVATOR_COPY = {
+  title: '軌道エレベーター · 空への駅',
+  steps: ['昇降機が宇宙へ向かう', '中継駅で乗り換え、街から軌道へ', '駅の灯りが、街と宇宙を結ぶ'],
 } as const;
 
 type Pose = { position: T.Vector3; target: T.Vector3 };
@@ -21,6 +27,8 @@ const near = (o: number, t: number, y: number, look: T.Vector3): Pose => ({ posi
 export const EXPLORE_SHOTS = {
   side: near(75, 70, park.position.y + 14, park.position.clone().addScaledVector(out, 5).setY(park.position.y - 4)),
   ring: { position: new T.Vector3(SKY_RING.x, 0, SKY_RING.z).addScaledVector(out, 760).setY(150), target: new T.Vector3(SKY_RING.x, 250, SKY_RING.z) },
+  /** E1 (artifacts/elevator-closeup-lod): the station ≈ 5.5 km out, camera inside the curvature plate (r < EARTH.plate) so the sea stays flat. */
+  elevator: { position: new T.Vector3(676, 120, 1339), target: new T.Vector3(3130, 620, 6200) },
 } satisfies Record<string, Pose>;
 
 const bezier = (p0: T.Vector3, p1: T.Vector3, p2: T.Vector3, u: number, into = new T.Vector3()) =>
@@ -67,20 +75,25 @@ export class GuestExplore {
   private camera: T.PerspectiveCamera;
   private controls: Controls;
   private ring: Ring;
-  constructor(camera: T.PerspectiveCamera, controls: Controls, ring: Ring) {
-    this.camera = camera; this.controls = controls; this.ring = ring;
+  /** Swaps in the elevator's near LOD (and hides what crosses its frame); on through the return flight, so the swap happens at hero. */
+  private elevatorLook: (on: boolean) => void;
+  private elevatorOn = false;
+  constructor(camera: T.PerspectiveCamera, controls: Controls, ring: Ring, elevatorLook: (on: boolean) => void) {
+    this.camera = camera; this.controls = controls; this.ring = ring; this.elevatorLook = elevatorLook;
     this.panel.className = 'explore-narration'; this.panel.hidden = true;
     this.panel.innerHTML = '<h2 class="causal-title"></h2><ol></ol><p class="causal-status"></p>';
-    this.panel.querySelector('h2')!.textContent = EXPLORE_COPY.title;
     this.list = this.panel.querySelector('ol')!; this.note = this.panel.querySelector('p')!;
-    this.list.replaceChildren(...EXPLORE_COPY.steps.map(step => Object.assign(document.createElement('li'), { textContent: step })));
     document.body.appendChild(this.panel);
   }
   get active() { return this.look !== null || this.returning; }
   /** Start (or keep) a look; the camera flies from wherever it is. */
   play(look: ExploreLook, now: number) {
-    if (this.look?.ordinal === look.ordinal && !this.returning) return;
+    if (this.look?.ordinal === look.ordinal && this.look.target === look.target && !this.returning) return;
     this.capture(now); this.look = look; this.returning = false; this.controls.enabled = false;
+    const copy = look.target === 'space-elevator' ? ELEVATOR_COPY : EXPLORE_COPY;
+    this.panel.querySelector('h2')!.textContent = copy.title;
+    this.list.replaceChildren(...copy.steps.map(step => Object.assign(document.createElement('li'), { textContent: step })));
+    this.elevator(look.target === 'space-elevator');
   }
   /** 戻る: fly back to the hero pose, then hand the camera back to the controls. */
   back(now: number) {
@@ -88,7 +101,7 @@ export class GuestExplore {
     this.stop(); this.capture(now); this.returning = true;
   }
   /** A live result, snapshot or reconnect owns the camera now: drop the look without moving the camera. */
-  interrupt() { this.stop(); this.returning = false; }
+  interrupt() { this.stop(); this.returning = false; this.elevator(false); }
   update(now: number, reducedMotion: boolean) {
     if (!this.active) return;
     const elapsed = Math.max(0, now - this.started), cam = this.camera.position, target = this.controls.target;
@@ -96,17 +109,25 @@ export class GuestExplore {
       const blend = reducedMotion ? 1 : T.MathUtils.smoothstep(elapsed, 0, EXPLORE_FLY);
       cam.lerpVectors(this.from.position, heroPosition, blend); target.lerpVectors(this.from.target, heroTarget, blend);
       this.camera.lookAt(target);
-      if (blend >= 1) { this.returning = false; this.controls.enabled = true; }
+      if (blend >= 1) { this.returning = false; this.controls.enabled = true; this.elevator(false); }
       return;
     }
-    const berth = EXPLORE_SHOTS.side, wide = EXPLORE_SHOTS.ring, k = this.look!.ordinal - 1;
+    const tower = this.look!.target === 'space-elevator', berth = tower ? EXPLORE_SHOTS.elevator : EXPLORE_SHOTS.side, wide = EXPLORE_SHOTS.ring, k = this.look!.ordinal - 1;
     this.panel.hidden = false;
     this.note.textContent = `住民の声 ${this.voices}件 · iPadの「戻る」で街の全景へ`;
+    if (tower && !reducedMotion && elapsed >= EXPLORE_FLY) {
+      // The station holds still in frame while the near LOD's climbers rise; the caption loops its three steps.
+      const step = Math.floor((elapsed - EXPLORE_FLY) / EXPLORE_STEP) % 3;
+      cam.copy(berth.position); target.copy(berth.target); this.camera.lookAt(target);
+      Array.from(this.list.children).forEach((li, i) => li.classList.toggle('active', i === step));
+      document.body.dataset.explore = JSON.stringify({ target: this.look!.target, step });
+      return;
+    }
     if (reducedMotion) {
       // Still: the berth pose, every step shown, the pod parked and the guest's node steadily lit.
       cam.copy(berth.position); target.copy(berth.target); this.camera.lookAt(target);
       Array.from(this.list.children).forEach(li => li.classList.add('active'));
-      this.park(); this.ring.highlight(k, 1);
+      this.park(); this.ring.highlight(tower ? null : k, 1);
       document.body.dataset.explore = JSON.stringify({ target: this.look!.target, step: -1 });
       return;
     }
@@ -127,6 +148,7 @@ export class GuestExplore {
     document.body.dataset.explore = JSON.stringify({ target: this.look!.target, step, local: +local.toFixed(2) });
   }
   private capture(now: number) { this.started = now; this.from.position.copy(this.camera.position); this.from.target.copy(this.controls.target); }
+  private elevator(on: boolean) { if (this.elevatorOn !== on) { this.elevatorOn = on; this.elevatorLook(on); } }
   private park() { const pod = this.ring.pod; pod.visible = true; pod.position.copy(park.position); pod.lookAt(park.position.clone().add(park.heading)); }
   private stop() {
     this.look = null; this.panel.hidden = true; this.park(); this.ring.highlight(null);

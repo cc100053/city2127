@@ -28,10 +28,12 @@ submit(b, 'b');
 assert.equal(errorCode(explore.request({ guestSessionId: b.session.id, target: 'sky-ring' }).response), 'lifecycle_blocked');
 clock.ms += DISPLAY_MS;
 assert.equal(errorCode(explore.request({ guestSessionId: b.session.id, target: 'sky-ring' }).response), 'explore_busy', 'one guest at a time');
+assert.equal(errorCode(explore.request({ guestSessionId: b.session.id, target: 'space-elevator' }).response), 'explore_busy', 'one guest at a time, whatever the landmark');
 assert.equal(explore.request({ guestSessionId: b.session.id, target: null }).event, undefined, 'only the holder can end it');
 assert.equal(explore.endFor('B'), undefined);
 assert.deepEqual(explore.endFor('A'), { type: 'explore', target: null }, "station A's next Start ends A's look");
 assert.equal(explore.request({ guestSessionId: b.session.id, target: 'sky-ring' }).response.ok, true);
+assert.deepEqual(explore.request({ guestSessionId: b.session.id, target: 'space-elevator' }).event, { type: 'explore', target: 'space-elevator', ordinal: savedA.proposal.ordinal + 1, stationId: 'B' }, 'the holder may switch landmarks');
 assert.deepEqual(explore.request({ guestSessionId: b.session.id, target: null }).event, { type: 'explore', target: null });
 assert.equal(explore.holder, null);
 

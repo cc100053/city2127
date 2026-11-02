@@ -1,10 +1,10 @@
 # elevator-closeup-lod — 軌道升降機中距離近景 LOD
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — targets picked, R1 (near model) in progress
+- Status: IN_PROGRESS — owner accepted the near LOD after R3; R4 explore wiring done, visual acceptance pending
 - Branch: `feat/elevator-closeup-lod`
 - Base commit: 27899d543bbb5ae468875033e0616fdff9cd7906
-- Last verified commit: NONE
+- Last verified commit: R4 commit on `feat/elevator-closeup-lod` (checks below ran on the committed tree)
 - Remote availability: origin/feat/elevator-closeup-lod
 
 ## Session Git state
@@ -92,3 +92,17 @@ R1: Sonnet implements `spaceElevatorNear` per spec, captures `r1/`; Opus reviews
 - Spec R3: darkness-dependent underside darkening (.42 → .65) with desaturated undersides, lighter sparse tufts on three deck edges, thinner window bands with mullions (night emissive .75), night haze halved, longer climbers with six window rings. Only `src/spaceElevator.ts` changed.
 - Checks (Opus rerun): `npm test` exit 0, `npm run build` exit 0, `git diff --check` clean. Hero unchanged (`r3/hero-check.png`). FPS NOT RUN.
 - Opus review (`r3/vs-target.jpg`): day underside now neutral grey, window bands read as segmented glass; night column a dark navy shaft with mint collars, band segmented and thinner. Off: tufts now too sparse (overcorrected from R2); climbers still read as ring stacks, not long amber capsules; day bands pale blue-grey (target dark navy glass); bays still plain blocks.
+
+## R4 (2026-11-02, explore wiring; owner accepted the R3 polish)
+
+- Explore target `space-elevator` beside `sky-ring`: `EXPLORE_TARGETS` (protocol), `POST /api/explore` (unchanged rules: one guest at a time across both landmarks; the holder may switch landmark), guest handoff shows 軌道エレベーターを見る next to 空の環を見る (same 20 s window, buttons only), `surveyView.parseExplore`, `main.ts`.
+- `GuestExplore` takes an `elevatorLook(on)` callback: on → `spaceElevatorNear.setActive(true)` and `regional-air-trails` hidden. The bright horizontal streak behind the station is an ambient sky-corridor lane seen edge-on at E1; the whole trails layer is hidden during the look (craft keep flying), restored afterwards. 戻る keeps the near LOD through the 2 s return and swaps at hero; a live result/snapshot interrupt swaps at once.
+- Pose `EXPLORE_SHOTS.elevator` = E1. Fly 2 s, then hold while three 4 s steps loop; reduced motion holds E1 with all steps.
+- Copy `ELEVATOR_COPY` (owner may edit): title 軌道エレベーター · 空への駅; steps 昇降機が宇宙へ向かう / 中継駅で乗り換え、街から軌道へ / 駅の灯りが、街と宇宙を結ぶ. Step 3 replaces the Sky Ring's voice-node line: the elevator has no voice nodes, so no new mechanic was invented. Alternatives for the owner: 宇宙で働く人も、この街の住民 / 軌道から、この街を見守る.
+- DEV `cityExplore(ordinal, 'space-elevator')`, `?meters&explore=<n>&exploreTarget=space-elevator&exploreAt=<s>`.
+- Checks: root `npm test`, `npm run build`; survey `npm test`, `npm run build`; `git diff --check` PASS. Browser evidence and FPS: [VALIDATION](../VALIDATION.md) entry "Elevator explore R4", `artifacts/elevator-closeup-lod/r4/`.
+- NOT RUN: headed vsync FPS, iPad button end-to-end with `survey dev:auto`, live-result interruption in the browser, exhibition machine.
+
+## Next expected step
+
+Owner judges `r4/` (day/night step captures, hero check) and the step-3 copy. On acceptance: merge to main per CONTRIBUTING, confirm main CI.
