@@ -87,3 +87,8 @@ Coordinator session runs `artifacts/city-taste-v2/coordinator.md`: P1→P6 again
 
 - Decision: **polish again** → `P2/spec-r2.md`. Placement right for all three; civic sphere reads as a dark blue mirror ball half behind the inner escalator (black at night), floater reads as a white balloon with thin hoops, self-assembling building lost against the hull.
 - Evidence `feat/city-taste-v2-p2` 7ef6e2b, `P2/r1/`. Agent checks pass; FPS 60/60 (vsync cap); ≈ +13 draw calls (1086 total day); no assertions deleted.
+
+## P2 r2 (2026-11-03 02:25 JST) — PASS
+
+- Decision: **pass**, merged `--no-ff` (416f673 merges `feat/city-taste-v2-p2` 8d8508e). Civic sphere bright silver and unobstructed (upper escalator diagonal removed; `tests/odaiba.test.ts` now expects one Fuji ride), floater reads as a panelled machine with thick glowing double rings and emitter discs, self-assembling building shows modules + beams in front of the hull. Weak spots left: assembly glass reads white more than blue by day; holograms "2127/フジ" still saturated (P3).
+- Checks on the merge (coordinator): `npm test` 0, `npm run build` 0, `git diff --check` clean. FPS (agent) 60/60 (vsync cap); canvas draw calls ≈ 1092; floaters group 16 meshes.
