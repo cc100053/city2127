@@ -1,44 +1,57 @@
-# SE 目標圖 prompt（2026-11-01）
+# SE 目標圖 prompt v2（2026-11-02）
 
-用法：每條 prompt 配一張底圖，用外部圖像模型做 **image edit／image-to-image**（唔係由零生成）。生成結果放返 `artifacts/se-closeup-polish/target/`，檔名 `target-rung-1.png`、`target-rung+1.png`（0 可選）。
+v1（2026-11-01）出咗 2026 年嘅建築：木屋頂、玻璃地舖、玻璃升降機塔，因為 prompt 列嘅係今日嘅建築詞彙。v2 改用 [CITY_MASTER_TASTE](../../docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) 嘅 2127 DNA（megaframe、懸吊體量、圓／球、斜向動線、多層公共地面），亦都比 v1 大膽。
 
-底圖（同一鏡頭 `se:d4`，1600×900，12:00）：
+用法：image edit，唔係由零生成。可以加上 `docs/ODAIBA_2127_REFERENCES/R01_MASTER_HERO.png` 做第二張參考圖。候選圖放 `gen/`，owner 揀咗先抄去 `target/`。
 
-- −1：`baseline/se-d4-rung-1.png`
-- 0：`baseline/se-d4-rung0.png`
-- +1：`baseline/se-d4-rung+1.png`
+底圖（現行低機位 close-up，1600×900，12:00）：
+
+- −1：`r4/se-rung-1-day.png`
+- 0：`r4/se-rung0-day.png`
+- +1：`r4/se-rung+1-day.png`
 
 ## 共通部分（每條 prompt 前面都加）
 
 ```text
-Edit this real-time 3D game engine screenshot. Output must look like the same in-engine screenshot from the same build: same camera, same lens, same midday lighting and shadows, same stylised low-poly WebGL rendering style with clean flat-shaded materials and soft ambient occlusion. Do NOT make it photorealistic, cinematic, painterly or concept-art. Keep every other building, the sky, the sea, the roads, the trees and the UI text in the corners exactly as they are.
+Edit this real-time 3D game engine screenshot. Output must look like the same in-engine screenshot from the same build: same camera, same lens, same midday lighting and shadows, same stylised low-poly WebGL rendering style with clean flat-shaded materials and soft ambient occlusion. Do NOT make it photorealistic, cinematic, painterly or concept-art. Keep every other building, the sky, the elevated ring track, the trees, the ground and the UI text in the corners exactly as they are.
 
-Only change the single building site on the light plaza in the middle of the image: the lot between the large grey-and-cream grid-facade block on the left and the blue-and-cream tower with round cream discs in the centre-right. The site stands on a square lot about 27 m wide, with a thin orange outline on the ground.
+Only change the single building site in the centre of the image: the lot with the thin orange outline on the ground, between the large grey-and-cream block on the left and the blue-and-cream tower on the right. Remove everything currently standing on that lot and replace it.
 
-The site belongs to a futuristic Odaiba waterfront in the year 2127. It must read as a mature, well-designed, inhabited place, not a prototype. Give it its own identity so it does not look like its neighbours: use warm amber (#E8A33D) as the single accent colour (light strips, a ring, small glowing details), with cream, white and pale timber-tone surfaces. No blue-and-cream window pattern like the neighbouring towers.
+This is Odaiba, Tokyo, in the year 2127, one hundred years after today. Nothing on the site may look like a building that could be built in 2026: no timber pavilions, no glass-box shops, no curtain-wall towers, no pitched or barrel roofs, no ordinary storefronts. The architecture is descended from the Fuji TV building's ideas, evolved for a century: an exposed white structural megaframe, inhabited volumes (spheres, discs, capsules, rings) suspended inside or hung from the frame, diagonal ramps and escalators crossing through it, large open voids, public space on several levels at once, planting woven into the structure. Be bold and imaginative, but it must still read as a real, mature, inhabited place with people using it, not a sculpture.
+
+It must NOT look like a toy: no rounded plastic capsules, no cartoon pods, no playground or theme-park shapes, no chunky simplified blocks. Think of Kenzo Tange's Metabolist megastructures (he designed the Fuji TV building) realised a century later with far better engineering: monumental civic scale, very slender precise structural members, deep layered floor slabs, every suspended volume is a real two-to-four-storey building with visible floor plates, continuous window bands, recessed terraces, interior light and people inside. Architectural precision and weight, like a serious architecture competition entry, still rendered in the same clean flat-shaded engine style.
+
+Materials: off-white and pale silver structure, frosted translucent pods, planting. Use warm amber (#E8A33D) as the single accent colour (light rings, edge lines, glowing details). No blue-and-cream window patterns like the neighbouring towers.
 ```
 
-## −1：點在する低い建物（底圖 se-d4-rung-1.png）
+## −1：點在する低い建物（底圖 r4/se-rung-1-day.png）
 
 ```text
-Replace the two tiny boxes and the two thin tall poles on the site with a cluster of three or four low waterfront pavilions, each one or two storeys tall (about 5–9 m), spread across the lot with space between them. Each pavilion has a distinctive roof: a gently curved timber-tone roof, a planted green roof, a thin cantilevered canopy. Large glass ground floors show small shops, a café and a service counter, lit with warm amber light. A single covered walkway with a slim white canopy loops between all pavilions like a garden path, with a few small pedestrians walking along it and sitting on benches. Low planting and small trees between pavilions. The overall silhouette must be wide, low and horizontal, clearly much lower than every neighbouring building, so that the sea and sky behind are visible above it. Remove the two tall poles completely.
+The resident chose "scattered low buildings". It must read in two seconds as a cluster of several separate low buildings spread across the lot, held together by one bold 2127 structure.
+
+Structure: not a thin truss bridge. A thick, layered white megaframe, about 20–25 m high: deep square-section beams (3–4 m deep) forming an open grid of large square bays, like the Fuji TV building's exposed frame scaled across the ground, standing on a few massive square-section columns and one big diagonal leg. One end climbs as a wide diagonal inclined bridge up to the elevated ring track above.
+
+Buildings: five or six separate low buildings, each clearly a real small building about 10–15 m across and two to three storeys, two to three times larger than small pods, distributed through the grid at different heights: two stand directly on the ground in a sunken public garden, two sit on the frame's beams as rooftop houses with terraces, one large half-sphere civic chamber is suspended in the largest bay and cut open on one side to show its stepped interior full of people, one long low workshop building is slung under a beam. Each has distinct massing, real floor plates, deep recessed window bands, terraces and people, with warm amber light at its edges. They must look like architecture with weight, not ornaments, pods or furniture.
+
+Ground: a sunken public garden with water, steps, seating and many people, threading between the ground buildings and the columns. Overall silhouette: wide, low, porous and horizontal, still clearly lower than every neighbouring tower, with sky visible through the frame.
 ```
 
-## 0：低い建物と高い建物が混ざる（底圖 se-d4-rung0.png，可選）
+## 0：低い建物と高い建物が混ざる（底圖 r4/se-rung0-day.png）
 
 ```text
-Replace the existing pale-blue glass mid-rise box with one mid-rise building of about 15 storeys (around 55 m) with stepped terraces on its upper floors and a planted roof crown with a thin amber ring, plus two low one-storey pavilions with curved timber-tone roofs beside it, connected by a short covered walkway with a few pedestrians. The mix of one medium building and low pavilions must be obvious at a glance.
+The resident chose "a mix of low and tall buildings". One medium-height open megaframe, about 50 m, an exposed white lattice with three or four inhabited pods (a sphere, stacked discs) suspended at different heights inside it and a planted ring at its top edge, stands at one end of the lot. Beside it, two or three small low pods sit on short legs in a ground garden, linked to the tall frame by a diagonal glazed ramp that climbs from the garden into the frame, with people walking on it. The mix of one medium frame and low pods must be obvious at a glance.
 ```
 
-## +1：一つのタワーで上へ（底圖 se-d4-rung+1.png）
+## +1：一つのタワーで上へ（底圖 r4/se-rung+1-day.png）
 
 ```text
-Replace the existing stacked glass cylinder tower and its pale-blue base with one slender, elegant vertical tower of about 130 m, standing on a small public podium. On the side facing the camera, a fully glazed elevator shaft runs the full height with one visible glass elevator cabin about two-thirds of the way up. The tower is stacked as a "vertical street": every few floors a different function is visible behind the glass (shops, a clinic, a library, a sports hall, a café terrace), each floor band lit with a slightly different warm tone, separated by thin amber light lines. Two or three sky terraces with greenery break the shaft at intervals. The top is a planted sky garden crown with a glowing amber ring. The tower must be the most recognisable silhouette in the frame: taller and more slender than the neighbouring blue tower, clearly different in form and colour, with the sky visible on both sides of its upper half.
+The resident chose "everything goes up into one tower". One slender vertical spine, about 130 m, made of an exposed white structural lattice with an open core. Along its height, a sequence of different inhabited volumes is hung on it: a glowing sphere, a planted disc garden, a ring-shaped running track, a stack of capsule homes, a cantilevered civic chamber. A diagonal transit tube spirals around the spine with a capsule climbing it. At the top, a large planted ring floats around the spine, edged with a glowing amber line. At the base, a small open public podium with people. It must be the most recognisable silhouette in the frame, taller and more slender than the neighbouring blue tower, with sky visible through the open lattice.
 ```
 
 ## 揀圖準則
 
-- 鏡頭、周邊建築、天同海冇變（有變就唔用，因為之後要逐格對照）。
-- 只睇輪廓，兩秒內分得出 −1（闊、低）同 +1（修長、垂直）。
+- 鏡頭、周邊建築、天同環形軌道冇變（有變就唔用，因為之後要逐格對照）。
+- 第一眼係咪「只可能屬於 2127 嘅 Odaiba」，唔係「加咗未來感道具嘅 2026 年建築」。
+- 兩秒內分得出 −1（闊、低、通透）同 +1（修長、垂直）。
 - 唔似鄰居：冇藍／米色窗格。
-- 可以做幾次，揀最好嘅一張；局部唔啱（例如行人太大）可以照用，我實作時會按規格修正。
+- 天馬行空可以，但要做得出：最終要用 low-poly 模型砌返出嚟，有機曲面同大量細節會被簡化。
