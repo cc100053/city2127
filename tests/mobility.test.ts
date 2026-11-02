@@ -200,10 +200,10 @@ path.streets.forEach((street, r) => {
   }
 }
 // Regional light corridors (ambient): every sample in front of the hero camera lies in the upper sky band and clear of the title block and HUD, all above
-// 185 m; each lane's trails (.8 × the craft spacing) leave gaps shorter than a trail, so the lane reads as one band, not a dotted line.
+// 185 m; one corridor (two lanes) remains and its trails stay ≤ .35 × the craft spacing (P6: no scratches across the upper sky).
 {
   const hero = heroSettledCamera(1920, 1080);
-  assert.equal(path.sky.length, 6);
+  assert.equal(path.sky.length, 2);
   path.sky.forEach((lane, k) => {
     for (let i = 0; i <= 600; i++) {
       const p = lane.getPointAt(i / 600), v = p.clone().applyMatrix4(hero.matrixWorldInverse), n = p.clone().project(hero), x = (n.x + 1) * 960, y = (1 - n.y) * 540;
@@ -213,12 +213,9 @@ path.streets.forEach((street, r) => {
     }
     const length = lane.getLength(), n = skyCount(length), trail = skyPose(0, k, length, 0).trail;
     assert.ok(n >= 10 && n <= 12 && length > 2000 && length < 4000, `sky lane ${k}: ${n} craft over ${length.toFixed(0)} m`);
-    for (let t = 0; t < 120; t += 7) {
-      const us = Array.from({ length: n }, (_, i) => skyPose(t, k, length, i).u).sort((a, b) => a - b);
-      us.forEach((u, i) => assert.ok(((us[(i + 1) % n] - u + 1) % 1) * length - trail < trail, `lane ${k} trails leave a dotted gap at ${t}s`));
-    }
+    assert.ok(trail <= .35 * length / n, `lane ${k} trail ${trail.toFixed(0)} m is longer than .35 × spacing`);
   });
-  for (let c = 0; c < 6; c += 2) for (let i = 0; i <= 50; i++) {
+  for (let c = 0; c < 2; c += 2) for (let i = 0; i <= 50; i++) {
     const a = path.sky[c].getPointAt(i / 50), b = path.sky[c + 1].getPointAt(i / 50);
     assert.ok(Math.abs(Math.hypot(a.x - b.x, a.z - b.z) - SKY_LANE_GAP) < 3, `corridor ${c / 2} lanes drift from ${SKY_LANE_GAP} m`);
   }
