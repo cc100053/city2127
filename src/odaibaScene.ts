@@ -70,7 +70,7 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
       // even, golden glass grid (target v2) instead of a patchwork of dark blue and beige where the two facade systems meet.
       float occupied = .35 + .65 * fract(sin(dot(floor(vec2(curtainP.x / 5.4, curtainP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453);
       // r9: cool blue-grey glass with whole lit floor runs on about one bay in three (matches contextFacades), not a warm champagne wash.
-      occupied = .08 + .92 * step(.78, occupied);
+      occupied = .08 + .92 * step(mix(.78, .61, curtainNight / .15), occupied); // P7: ~60% of bays lit at night
       // r9 pass 3: lighter sky-grey glass so mid-rises read ivory and glazed (target v2), not dark-striped.
       diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.5, .57, .62), pane);
       // r1 megaframe: every 4 storeys (16.8 m) a white slab band with a cool seam line under it and a darker shadow lip.
@@ -91,7 +91,7 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
       float seamLine = seam;`)
       // Panes are glass: glossy and partly metallic so they pick up the sky instead of reading as flat dark dots.
       .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, .14, pane);\nmetalnessFactor = mix(metalnessFactor, .4, pane);')
-      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1., .78, .5) * pane * (curtainGlow * occupied + curtainNight * .3) + vec3(.81, .91, 1.) * seamLine * curtainSeam * 1.6;');
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1., .72, .4) * pane * (curtainGlow * occupied + curtainNight * .3) + vec3(.81, .91, 1.) * seamLine * curtainSeam * 1.6;');
   };
   material.customProgramCacheKey = () => 'curtain-wall';
 }
@@ -106,7 +106,7 @@ function nightRooms(material: T.MeshStandardMaterial) {
     shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float glazingNight;\nvarying vec3 roomP;')
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
       float room = fract(sin(dot(floor(vec2((roomP.x + roomP.z) / 6., roomP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453);
-      totalEmissiveRadiance *= mix(1., step(.5, room), glazingNight);`);
+      totalEmissiveRadiance *= mix(1., step(.4, room), glazingNight);`);
   };
   material.customProgramCacheKey = () => 'night-rooms';
 }
@@ -116,7 +116,7 @@ export function updateOdaiba(night: number) {
   // Hero atmosphere: night keeps a light hierarchy — fewer, brighter lit rooms and scattered lit floors, so landmarks lead.
   for (const material of glazing) material.emissiveIntensity = dayGlow + night * (.7 - dayGlow);
   glazingNight.value = night;
-  curtainGlow.value = .15 + night * .75; curtainNight.value = night * .15; curtainSeam.value = .6 + night * 1.6; towerGlow.value = .3 + night * .9; towerNight.value = night;
+  curtainGlow.value = .15 + night * .8; curtainNight.value = night * .15; curtainSeam.value = .6 + night * 1.6; towerGlow.value = .3 + night * .9; towerNight.value = night;
   updateMegastructures(night); updatePlaza(night);
 }
 

@@ -2,7 +2,7 @@ import * as T from 'three';
 import { arc, bake, box, chrome, mirrors, leaf, leafyCrown, membrane, publicLight as cityLight, solar as citySolar, stone as cityStone, trim as cityTrim } from './cityRig.ts';
 import type { Ride, Spot, Walk } from './occupants.ts';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { megaGlass } from './megastructures.ts';
+import { megaGlass, megaSeam } from './megastructures.ts';
 
 /** Occupied media headquarters within Fuji's civic chassis, retaining the sphere berth and site alignment. Metres. Its people are not
  * baked: `occupants` lists them (staff, audience, forum crowds, strollers and escalator riders) for `publishOccupants` to animate. */
@@ -84,6 +84,7 @@ export function civicCore() {
       box(root,[18,3,18],[x,1.5,z],stone);
       member([x,3,z],[x,30,z],9,12);
       for(const dx of [-7,7])member([x,25,z],[x+dx,134,z],5,8);
+      for(const sx of [-9,9])for(const sz of [-9,9])box(root,[.45,104,.45],[x+sx,82,z+sz],megaSeam,.05); // P7: cool seam on the four corner columns
       member([x-7,134,z],[x+7,134,z],6,9);
       // The split pier carries visible vertical transfer infrastructure and ceramic joints.
       for(const dx of [-2,2])member([x+dx,5,z-5],[x+dx,130,z-5],.5,.7,glass);
@@ -103,6 +104,7 @@ export function civicCore() {
     }
     for(const y of [62,130]) {
       member([-75,y,z],[71,y,z],6,8);
+      if(y===130)box(root,[146,.45,.45],[-2,134.1,z-3],megaSeam,.05);
       if(y===62 && z===-12)continue; // The bay face keeps one clean mid-height band; the rear frame stays trussed.
       member([-75,y+9,z],[71,y+9,z],3,5);
       for(let x=-75;x<71;x+=24)member([x,y,z],[Math.min(x+24,71),y+9,z],1.3,2,solar);
@@ -110,6 +112,7 @@ export function civicCore() {
   }
   for(const x of [-68,64]) {
     member([x,130,-12],[x,130,70],7,7);
+    box(root,[.45,.45,82],[x,134.1,29],megaSeam,.05); // P7: cool seam along the top beams
   }
   // The former podium is an open forum; the existing Aqua link lands here at Y=24.
   box(root,[100,3,36],[-8,22.5,-14],stone);

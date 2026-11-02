@@ -105,7 +105,7 @@ const core=civicCore();city.add(core);
 landmarks.push(core);
 const coreBounds=new Box3().setFromObject(core);
 assert.ok(coreBounds.min.y>=-5 && coreBounds.max.y<155, 'Civic chassis stays below the district aerial corridor');
-assert.ok(core.children.length<=9, 'Static civic chassis batches by shared material, including broadcast screens');
+assert.ok(core.children.length<=10, 'Static civic chassis batches by shared material, including broadcast screens');
 assert.ok(core.children.every(object=>object instanceof Mesh && !Array.isArray(object.material)), 'No per-member draws');
 // Actual chassis must preserve the bay approach and berth, including a 22 m aircraft wing envelope.
 core.updateMatrixWorld(true);

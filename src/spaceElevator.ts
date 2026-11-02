@@ -26,7 +26,7 @@ function shaded(material: T.MeshBasicMaterial, lit: { value: number }) {
 }
 const bodyLit = { value: 1 }, glowLit = { value: 1 };
 shaded(body, bodyLit); for (const m of [lamp, pane, beacon]) shaded(m, glowLit);
-const LAMP = new T.Color('#8ce5d8').multiplyScalar(.9), PANE = new T.Color('#ffcf8a').multiplyScalar(.6), BEACON = new T.Color('#ff4a3a').multiplyScalar(.6), luminance = (c: T.Color) => .2126 * c.r + .7152 * c.g + .0722 * c.b;
+const LAMP = new T.Color('#e6f2ff').multiplyScalar(.9), PANE = new T.Color('#d4e6ff').multiplyScalar(.6), BEACON = new T.Color('#ff4a3a').multiplyScalar(.6), luminance = (c: T.Color) => .2126 * c.r + .7152 * c.g + .0722 * c.b;
 
 /** Shade darker than the haze (day) and glow strength (night) for a given fog colour. */
 export function elevatorTone(fog: T.Color) {
