@@ -1,6 +1,7 @@
 import type { EnergyConfiguration } from '../survey/src/shared/energy.ts';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 import { reasonDelayMs } from './resultTimeline.ts';
+import { addHudChrome } from './hudFrame.ts';
 import type { CarrierChange } from './cityChangeManager.ts';
 import type { DisplayMode } from './dayCycle.ts';
 import { presets, type WorldState } from './presets.ts';
@@ -250,7 +251,12 @@ export function startSurveyAtmosphere(
   historyCount.hidden = true;
   historyLegend.hidden = true;
   const title = el('h2', 'causal-title', '2127 — 選択が都市を変える');
-  panel.append(title, pending, latest, historyTitle, historyCount, historyLegend, history, scores, status);
+  // Decorative strip for the resident card; CSS hides it (and the HUD chrome) on the legacy panel.
+  const strip = el('div', 'resident-strip');
+  strip.innerHTML = '<span>都市応答</span><span class="resident-chevrons">❯❯❯❯❯</span><span class="resident-meter"></span>';
+  strip.setAttribute('aria-hidden', 'true');
+  addHudChrome(panel);
+  panel.append(title, pending, latest, strip, historyTitle, historyCount, historyLegend, history, scores, status);
   document.body.appendChild(panel);
   let current: CityView | undefined;
   let cardIndex = 0;
