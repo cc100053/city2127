@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
-import { Box3, Mesh, InstancedMesh } from 'three';
+import { Box3, Group, Mesh, InstancedMesh } from 'three';
+import { ConcentrationDistrict } from '../src/districtMeters.ts';
 import { changeSites } from '../src/layout.ts';
-import { ARCH, groundContacts, HULL, inRect, megastructures, RING } from '../src/megastructures.ts';
+import { ARCH, FOOTPRINTS, groundContacts, HULL, inMega, inRect, megastructures, RING } from '../src/megastructures.ts';
 
 // P1: the three megastructures exist, reach their table heights (±25%) and stand clear of the Meter sites (+14 m) and the civic core.
 const group = megastructures(), box = new Box3(), parts = new Map<string, Box3>();
@@ -24,4 +25,7 @@ for (const site of Object.values(changeSites)) {
   }
 }
 for (const r of all) assert.ok(!inRect(r, -18, 23) && Math.hypot(r.cx + 18, r.cz - 23) > 60, 'contact too near the civic core');
+// Nothing pierces a megastructure: no district tower or pod stands inside the shared footprint list.
+const district = new ConcentrationDistrict(new Group());
+for (const t of [...district.towers, ...district.pods]) assert.ok(!FOOTPRINTS.some(r => inRect(r, t.x, t.z)) && !inMega(t.x, t.z), `district structure at ${t.x},${t.z} stands inside a megastructure`);
 console.log('megastructures ok');

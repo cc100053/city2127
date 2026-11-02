@@ -2,6 +2,7 @@ import * as T from 'three';
 import { arc, bake, box, skyGlass, leaf, leafyCrown, paint, stone, trail, trim } from './cityRig.ts';
 import { changeSites, gardenDecks, midDecks, sweepway } from './layout.ts';
 import { routes } from './mobility.ts';
+import { inMega } from './megaFootprints.ts';
 import layout from './odaiba-layout.json' with { type: 'json' };
 import { shoreRoomBays } from './waterRooms.ts';
 
@@ -16,16 +17,16 @@ const crown = leafyCrown(1), pole = new T.CylinderGeometry(1, 1, 1, 10);
 // Skyway network (metres, deck top): a ring around the 151 m tower east of DECKS, a link into the Fuji chassis ring floor (61 m),
 // on to a ring around Grand Nikko (92 m, above Hilton's 83 m roof) and two suspended glass spheres. Routed clear of every
 // survey site, the 113/151 m context towers and the Fuji chassis members; west of each site's line of sight from the hero pose.
-const RINGS: { centre: P3; radius: number }[] = [
+const RINGS: { centre: P3; radius: number }[] = ([
   { centre: [259, 90, -351], radius: 50 },
   { centre: [-240, 92, 178], radius: 100 },
-];
-const SPHERES: { centre: P3; radius: number; deck?: number }[] = [
+] as { centre: P3; radius: number }[]).filter(r => !inMega(r.centre[0], r.centre[2], r.radius));
+const SPHERES: { centre: P3; radius: number; deck?: number }[] = ([
   { centre: [160, 92, 40], radius: 20, deck: 28 },
   { centre: [-80, 100, 180], radius: 22, deck: 30 },
   { centre: [-300, 104, 40], radius: 17, deck: 26 },
-];
-const LINKS: (readonly (readonly [number, number, number])[])[] = [
+] as { centre: P3; radius: number; deck?: number }[]).filter(r => !inMega(r.centre[0], r.centre[2], r.radius + 8));
+const LINKS: (readonly (readonly [number, number, number])[])[] = ([
   [[276.3, 90, -304.1], [300, 78, -240], [285, 67, -150], [262, 62, -60], [215, 62, 0], [140, 62, 20], [70, 62.5, 14], [12.3, 63, 7.6]],
   [[-41.3, 63, 47.8], [-75, 64, 50], [-120, 79, 94], [-159.4, 92, 118.9]],
   [[-106, 98, 180], [-124, 95, 179], [-140, 92, 178]],
@@ -33,7 +34,7 @@ const LINKS: (readonly (readonly [number, number, number])[])[] = [
   // Front-left: out of the 151 m tower ring over the north-east waterfront to the frame edge (target v2's long front-left skyway).
   [[304, 90, -373], [350, 80, -400], [410, 68, -440], [480, 60, -490], [560, 56, -545]],
   ...midDecks,
-];
+] as (readonly (readonly [number, number, number])[])[]).filter(link => !link.some(p => inMega(p[0], p[2], 6))); // P1: nothing stands inside a megastructure footprint
 
 /** Box-section deck along a curve, `top` at the curve and `depth` below it; outward winding, flat-shaded quads. */
 function deck(curve: T.Curve<T.Vector3>, width: number, depth: number, samples: number) {

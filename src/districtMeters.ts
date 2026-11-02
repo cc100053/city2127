@@ -2,6 +2,7 @@ import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { arc, bake, box, chrome, cream, glass, leaf, leafyCrown, publicLight, skyGlass, solar, stone, trail, trim } from './cityRig.ts';
 import { changeSites, seaward } from './layout.ts';
+import { inMega } from './megaFootprints.ts';
 import { shoreRoomBays } from './waterRooms.ts';
 import { automationActivity, pavilionFlight, pedestrians, plazaPose, routes, serviceDrones } from './mobility.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
@@ -178,9 +179,9 @@ const SPREAD = 1.45;
 const HALO = .42;
 /** Inland sharing courts [x, z, yaw]: open ground scanned clear of landmarks, context, routes, P2 pavilions and P4 towers / pods.
  * P7 ranks by estimated visible hero-frame pixels (`SCAN_COURTS=20` in tests/odaiba.test.ts lists candidates best first). */
-const COURT_SITES: readonly (readonly [number, number, number])[] = [
+const COURT_SITES: readonly (readonly [number, number, number])[] = ([
   [-220, -140, .4], [-410, 120, 1.1], [-110, 230, 2.3], [50, -340, .9], [170, -360, 3.6], [-70, 180, 1.7], [-290, 290, 5.1], [-460, 290, .2], [220, 0, 2.8], [-20, 210, 4.4],
-];
+] as const).filter(([x, z]) => !inMega(x, z, 22)); // P1: nothing stands inside a megastructure footprint
 const COURT = 40;
 /** Garden crowns inside a private court [x, z, size], clear of the glass room and the entrance. */
 const COURT_TREES: readonly (readonly [number, number, number])[] = [[-10, 8, 4.2], [0, -3, 3.4], [8, 9, 3.8], [10, -9, 3.2], [-2, 13, 2.8], [-14, -14, 2.6]];
@@ -1036,17 +1037,20 @@ export const towerGlow = { value: .3 }, towerNight = { value: 0 };
 // Traced open ground (tests/odaiba.test.ts checks ground, landmarks, context and routes): towers rise beside the SE site, at the DECKS
 // waterfront and from the western lawns where low concentration scatters its pods.
 // ponytail: skyway clearance was checked once in the browser (skyways.ts imports JSON Node cannot load); recheck these sites if skyways move.
-const TOWER_SITES: readonly (readonly [number, number, number])[] = [
+const ALL_TOWERS: readonly (readonly [number, number, number])[] = [
   [115, -25, 128], [67, -89, 112], [27, -249, 120], [83, -305, 104], [-189, -1, 140], [-221, -73, 116], [-157, 63, 124], [-61, 111, 104], [179, 287, 120], [-13, 279, 110],
 ];
+// P1: towers that would pierce a megastructure are not built; hero frame slots follow their towers to the new indices.
+const TOWER_KEPT = ALL_TOWERS.map((t, i) => [t, i] as const).filter(([t]) => !inMega(t[0], t[1], 16));
+const TOWER_SITES: readonly (readonly [number, number, number])[] = TOWER_KEPT.map(([t]) => t);
 /** Hero-view slots (392–631 m from the c2 camera, where the blue-striped cylinders stood) rebuilt as open structural frames; the rest keep their i % 3 family. */
-export const HERO_FRAME_SLOTS = [0, 2, 3, 5];
+export const HERO_FRAME_SLOTS = [0, 2, 3, 5].flatMap(a => { const i = TOWER_KEPT.findIndex(([, o]) => o === a); return i < 0 ? [] : [i]; });
 const slotFamilies = TOWER_SITES.map((_, i) => HERO_FRAME_SLOTS.includes(i) ? 3 : i % 3);
 /** Silhouette family (0 twisted, 1 terraced, 2 twin, 3 open frame) of tower slot `i` and its instance index in that family's batches. */
 export const towerFamily = (i: number) => ({ family: slotFamilies[i], instance: slotFamilies.slice(0, i).filter(f => f === slotFamilies[i]).length });
-const POD_SITES: readonly (readonly [number, number])[] = [
+const POD_SITES: readonly (readonly [number, number])[] = ([
   [-293, 147], [-253, -33], [-233, 47], [-218, -23], [-183, -43], [-168, -128], [-103, 17], [-53, 147], [-33, 167], [-23, 107], [7, -58], [27, 87], [77, 107], [87, 57], [97, -73], [107, -123], [107, 77], [117, 7], [137, -103], [207, 37], [217, -43], [217, 87], [237, -73], [237, 57], [247, -103], [252, 147],
-];
+] as const).filter(([x, z]) => !inMega(x, z, 14));
 
 /** Q4: one walkable vertical district or functions spread through the parks.
  * High raises slender glass towers with lit sky lobbies on open ground; low scatters low glass pavilion pods across the lawns.

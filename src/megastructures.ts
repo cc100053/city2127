@@ -1,13 +1,12 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { plantCanopy } from './coastalCanopy.ts';
+import { bodyFootprints, inRect } from './megaFootprints.ts';
 
 // P1 (city-taste-v2): the three colossal megastructures of the master target — ring-on-edge building, white arch, stepped terraced hull.
 // Ground contacts and sizes are exported for the test and for carving the context massing they replace. Metres.
-export const RING = { x: 95, z: -195, centreY: 90, outer: 105, inner: 73, depth: 45, yaw: -2.05 + .8, plinth: [60, 50] as const };
-export const ARCH = { a: [-9, -237] as const, b: [58, -5] as const, apex: 135 };
-// r2: front base line (-160, 20) to (-330, 95); local +x runs along it toward the left end, +z recedes from the camera. Low left end (3 terraces), 8 at the right end.
-export const HULL = { x: -260, z: 64, yaw: .4155, length: 180, depth: 90, steps: 8, step: 15, recede: 9 };
+export * from './megaFootprints.ts';
+import { ARCH, HULL, RING } from './megaFootprints.ts';
 
 /** Finishes shared by all three pieces; the seam glows with the night. */
 export const megaShell = new T.MeshStandardMaterial({ color: '#f3f2ec', roughness: .5, metalness: .08 });
@@ -151,11 +150,11 @@ function hull(batch: Batch, trees: { position: number[]; scale: number; type: st
   for (let k = 0; k < steps; k++) {
     const y0 = k * step, f = front(k, 0), u0 = left(k);
     slab(k, y0, 1.2, 1.6, megaSeam); // glowing lip at the foot of each face
-    slab(k, y0 + 1.2, 3, 1.2, megaShell); // 3 m solid white slab
-    slab(k, y0 + 4.2, step - 4.2, 0, megaGlass); // two glass storeys
-    slab(k, y0 + 9.6, .6, .35, megaShell);
-    const fin = new T.BoxGeometry(.5, step - 4.8, .7);
-    for (let u = u0 + 3; u < L2 - 1; u += 6) put(batch, megaRib, fin, at(u, dAt(k, u, 0) - .3, y0 + 4.5 + (step - 4.8) / 2));
+    slab(k, y0 + 1.2, 5, 1.2, megaShell); // 5 m solid white slab
+    slab(k, y0 + 6.2, step - 6.2, 0, megaGlass); // two glass storeys
+    slab(k, y0 + 10.8, .6, .35, megaShell);
+    const fin = new T.BoxGeometry(.5, step - 6.8, .7);
+    for (let u = u0 + 3; u < L2 - 1; u += 6) put(batch, megaRib, fin, at(u, dAt(k, u, 0) - .3, y0 + 6.5 + (step - 6.8) / 2));
     // end bulkheads: white walls with fins every 8 m and one vertical seam at the front corner
     for (const [u, sgn] of [[L2, 1], [u0, -1]] as const) {
       const d0 = dAt(k, u, 0), len = depth - d0, wall = new T.BoxGeometry(2.4, step, len);
@@ -164,8 +163,8 @@ function hull(batch: Batch, trees: { position: number[]; scale: number; type: st
       put(batch, megaSeam, new T.BoxGeometry(.6, step, .6), at(u + sgn * 2.6, d0 + 1, y0 + step / 2));
     }
     // planter deck behind the lip: low hedge bands, a tree about every 13 m
-    for (const [off, w] of [[3.2, 2.6], [6.4, 2]] as const) for (let i = 0; i < f.length - 1; i++)
-      bar(batch, megaPlant, world(f[i][0], f[i][1] + off, y0 + step + .5), world(f[i + 1][0], f[i + 1][1] + off, y0 + step + .5), w, 1.2);
+    for (const [off, w, mat, h] of [[.75, 1.5, megaShell, .5], [3.6, 2.4, megaPlant, .6], [6.6, 2, megaPlant, .6]] as const) for (let i = 0; i < f.length - 1; i++) // white deck edge, then low hedges
+      bar(batch, mat, world(f[i][0], f[i][1] + off, y0 + step + h / 2), world(f[i + 1][0], f[i + 1][1] + off, y0 + step + h / 2), w, h);
     for (let u = u0 + 6 + (k % 3) * 4; u < L2 - 4; u += 13) {
       const p = world(u, dAt(k, u, 0) + 4.8, y0 + step + .5);
       trees.push({ position: [p.x, -p.z, p.y], scale: .85 + (k % 2) * .2, type: k % 4 === 0 ? 'columnar' : 'broadleaf' });
@@ -177,26 +176,6 @@ function hull(batch: Batch, trees: { position: number[]; scale: number; type: st
     }
   }
 }
-
-const rect = (cx: number, cz: number, ux: number, uz: number, hu: number, hv: number) => ({ cx, cz, ux, uz, hu, hv });
-/** Hull footprint rectangle, `front` m wider toward the camera and `side` m longer. */
-const hullRect = (front: number, side: number) => rect(HULL.x + Math.sin(HULL.yaw) * (HULL.depth - front) / 2, HULL.z + Math.cos(HULL.yaw) * (HULL.depth - front) / 2, Math.cos(HULL.yaw), -Math.sin(HULL.yaw), HULL.length / 2 + side, (HULL.depth + front) / 2);
-/** Ground footprints (centre, unit axis, half extents along axis and across it) of what each piece stands on; the test and the carve use them. */
-export const groundContacts = () => ({
-  ring: rect(RING.x, RING.z, Math.cos(RING.yaw), -Math.sin(RING.yaw), RING.plinth[0] / 2, RING.plinth[1] / 2),
-  archFeet: [ARCH.a, ARCH.b].map(f => rect(f[0], f[1], 1, 0, 12.5, 12.5)),
-  hull: hullRect(8, 0),
-});
-/** Context massing under or inside a megastructure's body: the whole hoop's shadow, the arch's span and the hull's footprint. */
-export function bodyFootprints() {
-  const d = new T.Vector2(ARCH.b[0] - ARCH.a[0], ARCH.b[1] - ARCH.a[1]);
-  return [
-    rect(RING.x, RING.z, Math.cos(RING.yaw), -Math.sin(RING.yaw), RING.outer + 4, RING.depth / 2 + 6),
-    rect((ARCH.a[0] + ARCH.b[0]) / 2, (ARCH.a[1] + ARCH.b[1]) / 2, d.x / d.length(), d.y / d.length(), d.length() / 2 + 6, 14),
-    hullRect(60, 10),
-  ];
-}
-export const inRect = (r: ReturnType<typeof rect>, x: number, z: number) => { const dx = x - r.cx, dz = z - r.cz; return Math.abs(dx * r.ux + dz * r.uz) <= r.hu && Math.abs(-dx * r.uz + dz * r.ux) <= r.hv; };
 
 /** Remove context-massing triangles whose centre lies in a megastructure footprint (they are replaced, not overlapped). */
 export function carveContext(environment: T.Object3D) {
