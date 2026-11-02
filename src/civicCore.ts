@@ -2,7 +2,7 @@ import * as T from 'three';
 import { arc, bake, box, chrome, mirrors, leaf, leafyCrown, membrane, publicLight as cityLight, solar as citySolar, stone as cityStone, trim as cityTrim } from './cityRig.ts';
 import type { Ride, Spot, Walk } from './occupants.ts';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { megaGlass as glass } from './megastructures.ts';
+import { megaGlass } from './megastructures.ts';
 
 /** Occupied media headquarters within Fuji's civic chassis, retaining the sphere berth and site alignment. Metres. Its people are not
  * baked: `occupants` lists them (staff, audience, forum crowds, strollers and escalator riders) for `publishOccupants` to animate. */
@@ -11,6 +11,7 @@ export function civicCore() {
   const spots:Spot[]=[],walks:Walk[]=[],rides:Ride[]=[];
   // Building-local finishes (still one batch each): warm cream frame and slabs, and dark charcoal furniture, people and hangers,
   // so occupied rooms read as silhouettes against warm light instead of blue-grey rows.
+  const glass=megaGlass.clone();glass.color.set('#c5d3db');glass.roughness=.4;glass.metalness=.05; // pale glass for the frame's window panels
   const trim=cityTrim.clone();trim.color.set('#f3f2ec');
   const stone=trim; // P2: one white finish for frame and slabs (keeps the batch count)
   const solar=citySolar.clone();solar.color.set('#6a7279'); // warm umber: unlit room depth reads brown-dark under the amber light
@@ -114,7 +115,7 @@ export function civicCore() {
   box(root,[100,3,36],[-8,22.5,-14],stone);
   for(const x of [-50,34])for(const z of [-27,0])member([x,2,z],[x,21,z],3,4);
   // Inhabited diagonals are wide public terrain, with a deep triangulated underside, not escalator banks.
-  const spine=[[52,3,-12],[-54,62,-12],[52,121,-12]];
+  const spine=[[52,3,-12],[-54,62,-12]]; // P2 r2: the upper diagonal that crossed in front of the chrome sphere is removed
   for(let i=1;i<spine.length;i++) {
     const a=new T.Vector3(...spine[i-1]),b=new T.Vector3(...spine[i]),length=a.distanceTo(b);
     const street=new T.Group();street.position.copy(a).add(b).multiplyScalar(.5);root.add(street);
@@ -584,15 +585,16 @@ export function civicCore() {
     }
   }
   // P2: one polished chrome sphere (Ø 56 m, hides the theatre inside) hangs in the frame, held by four tension members. Baked with the rest, in its own mirror batch.
-  const sphereMat=chrome.clone();sphereMat.color.set('#e8ecef');sphereMat.roughness=.08;sphereMat.metalness=1;sphereMat.clearcoat=0;
+  const sphereMat=chrome.clone();sphereMat.color.set('#f2f4f5');sphereMat.roughness=.14;sphereMat.metalness=1;sphereMat.clearcoat=0;sphereMat.emissive.set('#2a3440'); // never dimmed with the night: a faint reflected city light keeps it a lit sphere, not a hole
+
   // Chrome needs contrast to read: a small equirect gradient (deep sky, white horizon band, dark ground) on this one material.
-  const stops:[number,string][]=[[0,'#6f98c4'],[.35,'#b5d0e6'],[.5,'#ffffff'],[.56,'#c9d3cf'],[.8,'#7b8a84'],[1,'#4a5852']],envData=new Uint8Array(4*64*32),c0=new T.Color(),c1=new T.Color();
+  const stops:[number,string][]=[[0,'#dfe9f1'],[.35,'#eef3f6'],[.5,'#ffffff'],[.56,'#e8e4dc'],[.8,'#b9b6ae'],[1,'#8d8a83']],envData=new Uint8Array(4*64*32),c0=new T.Color(),c1=new T.Color();
   for(let y=0;y<32;y++){
     const t=1-y/31,k=stops.findIndex(([at])=>at>=t),[a0,h0]=stops[Math.max(0,k-1)],[a1,h1]=stops[Math.max(0,k)],f=a1>a0?(t-a0)/(a1-a0):0;
     c0.set(h0).lerp(c1.set(h1),f);
     for(let x=0;x<64;x++)envData.set([c0.r*255,c0.g*255,c0.b*255,255].map(Math.round),(y*64+x)*4);
   }
-  const env=new T.DataTexture(envData,64,32);env.needsUpdate=true;env.mapping=T.EquirectangularReflectionMapping;env.colorSpace=T.SRGBColorSpace;sphereMat.envMap=env;sphereMat.envMapIntensity=1.1;mirrors.push(sphereMat);
+  const env=new T.DataTexture(envData,64,32);env.needsUpdate=true;env.mapping=T.EquirectangularReflectionMapping;env.colorSpace=T.SRGBColorSpace;sphereMat.envMap=env;sphereMat.envMapIntensity=1.1;
   const SR=28,seams:T.BufferGeometry[]=[],cables:T.BufferGeometry[]=[],centre=new T.Vector3(-18,100,23);
   const prep=(g:T.BufferGeometry,m:T.Matrix4)=>{const f=g.toNonIndexed();f.deleteAttribute('uv');f.applyMatrix4(m);return f;};
   for(let i=0;i<12;i++)seams.push(prep(new T.TorusGeometry(SR+.08,.1,4,64),new T.Matrix4().makeRotationY(i*Math.PI/12).setPosition(centre)));
