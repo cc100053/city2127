@@ -43,6 +43,14 @@ Owner problems (2026-11-02): the city lacks 2127 taste; close-ups expose weak mo
 - 2026-11-02 owner: everything may be moved or redesigned (Sky Ring, holograms, facility forms); exhibition roles stay.
 - 2026-11-02 owner: overnight part-by-part polish, a fresh session per part, Opus decides keep polishing vs next part.
 
+## Step 0 — master target (2026-11-02)
+
+- Baselines `artifacts/city-taste-v2/baseline/hero-h16|h21.png` (hero `?meters=nw:0,ne:0,sw:0,se:0&reviewTime=40`, 1600×900, HUD hidden, Vite DEV on this worktree).
+- Round 1: four Gemini day candidates A–D (`gen/day-*.jpg`, sheet `candidates.jpg`). Owner: base on B (megastructures) but keep the centre as land; other buildings in A's style (megaframes, glowing seams, facade holograms); C's building designs welcome, no floating sky islands.
+- Round 2: `gen/master-day-1|2.jpg` (sheet `masters-day.jpg`); owner locked version 2 → `target/master-day.png`.
+- Night master NOT generated: Gemini /u/3 hit its usage limit ("resets on Nov 3"). Prompt ready in `prompts.md` § Night master.
+- Part breakdown draft: `artifacts/city-taste-v2/parts.md` (P1 megastructures → P7 night; P8 facility change impact after an owner discussion).
+
 ## Next expected step
 
-Opus captures hero baselines (day/night), writes the master prompt from the new taste, generates 3–4 Gemini candidates via Claude in Chrome; owner picks the master into `artifacts/city-taste-v2/target/`.
+Overnight part loop from P1 against `target/master-day.png` (fresh session per part, Opus reviews, nothing to main). Night master after the Gemini reset, before P7.
