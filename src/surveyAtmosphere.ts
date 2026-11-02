@@ -250,7 +250,11 @@ export function startSurveyAtmosphere(
   historyCount.hidden = true;
   historyLegend.hidden = true;
   const title = el('h2', 'causal-title', '2127 — 選択が都市を変える');
-  panel.append(title, pending, latest, historyTitle, historyCount, historyLegend, history, scores, status);
+  // Decorative HUD status for the resident card; CSS hides it on the legacy panel.
+  const hud = el('div', 'resident-hud');
+  hud.setAttribute('aria-hidden', 'true');
+  hud.append(el('span', 'resident-live', 'ライブ'), el('span', '', '状態：接続中'), el('span', '', '北緯35°37′ 東経139°46′'));
+  panel.append(title, hud, pending, latest, historyTitle, historyCount, historyLegend, history, scores, status);
   document.body.appendChild(panel);
   let current: CityView | undefined;
   let cardIndex = 0;

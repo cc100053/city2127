@@ -18,12 +18,28 @@ body:not([data-time=night]) .question{opacity:.85;text-shadow:0 0 10px rgba(240,
 body[data-time=night] footer,body[data-time=night] .intro{text-shadow:0 0 10px rgba(7,13,28,.95),0 0 3px rgba(7,13,28,.8)}
 
 /* P2: one fixed desktop reading card; keep the hero city visible. Right side: at 1280–3840 px wide the four focal sites all project left of it. */
-.causal-panel.resident-panel{width:360px;max-height:none;overflow:visible;padding:18px 20px;font-size:16px;line-height:1.7}
-.resident-panel .causal-title{font-size:13px;letter-spacing:1px;margin-bottom:12px!important}
-.resident-panel .causal-context{font-size:15px;opacity:1;color:#46676e;margin-bottom:10px!important}
-.resident-card-title{font-size:21px;line-height:1.5;margin-bottom:10px!important}
-.resident-card-copy{font-size:17px;line-height:1.85}
-.resident-place{font-size:13px;color:#46676e;margin-top:14px!important}
+/* HUD look (owner target 2026-11-02): smoked glass, cyan glow edge, corner brackets, side ruler; dark in day and night for one contrast. */
+.causal-panel.resident-panel{width:360px;max-height:none;overflow:visible;padding:20px 22px 18px;font-size:16px;line-height:1.7;color:#eef8ff;border-radius:3px;
+  background:linear-gradient(165deg,rgba(10,28,42,.84),rgba(6,18,30,.76));border:1.5px solid rgba(110,236,255,.85);backdrop-filter:blur(14px) saturate(140%);
+  box-shadow:0 0 18px rgba(80,225,255,.45),inset 0 0 22px rgba(80,225,255,.16),0 10px 40px rgba(0,10,20,.35)}
+.resident-panel:before{content:'';position:absolute;inset:-9px;pointer-events:none;filter:drop-shadow(0 0 4px #6feaff);--c:#6feaff;
+  background:linear-gradient(var(--c),var(--c)) 0 0/34px 2px,linear-gradient(var(--c),var(--c)) 0 0/2px 34px,
+    linear-gradient(#ffc94d,#ffc94d) 100% 0/34px 2px,linear-gradient(#ffc94d,#ffc94d) 100% 0/2px 22px,
+    linear-gradient(var(--c),var(--c)) 0 100%/2px 22px,linear-gradient(var(--c),var(--c)) 100% 100%/34px 2px,linear-gradient(var(--c),var(--c)) 100% 100%/2px 34px;background-repeat:no-repeat}
+.resident-panel:after{content:'';position:absolute;left:-17px;top:22%;height:56%;width:6px;pointer-events:none;opacity:.7;
+  background:repeating-linear-gradient(#6feaff 0 1px,transparent 1px 9px);border-right:1px solid rgba(110,236,255,.6)}
+.resident-panel .causal-title{font-size:13px;letter-spacing:2px;font-weight:500;color:#bfeaf5;margin-bottom:22px!important}
+.resident-hud{display:none}
+.resident-panel .resident-hud{display:flex;flex-direction:column;align-items:flex-end;position:absolute;top:16px;right:20px;font:9px/1.5 ui-monospace,'SF Mono',Menlo,monospace;letter-spacing:.5px;color:#8fc9d8}
+.resident-live{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:2px;color:#7dffd9;text-shadow:0 0 8px #7dffd9}
+.resident-live:before{content:'';width:7px;height:7px;border-radius:50%;background:#7dffd9;box-shadow:0 0 8px #7dffd9;animation:resident-blink 1.6s infinite}
+@keyframes resident-blink{50%{opacity:.25}}
+.resident-panel .causal-context{font-size:15px;opacity:1;color:#e2f3fa;margin-bottom:8px!important}
+.resident-card-title{font-size:26px;line-height:1.4;font-weight:700;color:#7ff5df;text-shadow:0 0 14px rgba(80,240,210,.55);word-break:auto-phrase;text-wrap:balance;margin-bottom:10px!important}
+.resident-card-copy{font-size:17px;line-height:1.85;color:#f2f9ff}
+.resident-place{font-size:13px;color:#a9d6e2;margin-top:14px!important;padding-top:10px;border-top:1px solid rgba(110,236,255,.25)}
+.resident-place:before{content:'◢ ';color:#6feaff}
+@media(prefers-reduced-motion:reduce){.resident-live:before{animation:none}}
 /* Live energy close-up narration: bottom-left, clear of the result card. */
 .energy-narration,.explore-narration{position:fixed;bottom:44px;left:44px;width:440px;padding:18px 20px;background:#f9f8f0e6;border:1px solid #ffffff80;border-radius:8px;box-shadow:0 8px 40px #38432b14;backdrop-filter:blur(12px);font-size:17px;line-height:1.7;color:#354139}.energy-narration h2,.energy-narration p,.explore-narration h2,.explore-narration p{margin:0}.energy-narration .causal-title,.explore-narration .causal-title{font-size:21px}.energy-narration ol,.explore-narration ol{font-size:17px;padding-left:1.4em;margin:6px 0}.energy-narration li,.explore-narration li{opacity:.4;transition:opacity .25s}.energy-narration li.active,.explore-narration li.active{opacity:1;font-weight:600}.energy-narration .causal-status,.explore-narration .causal-status{font-size:12px}
 /* DEV Scale Lab (`?scaleLab`). */
