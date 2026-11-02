@@ -116,8 +116,7 @@ export const shoreLane: readonly P3[] = [...shoreLaneInner,
 // a bundle of two lanes SKY_LANE_GAP m apart, flown in opposite directions (lane 2k forward, 2k+1 reversed).
 export const SKY_LANE_GAP = 24;
 const skyCentres: readonly (readonly P3[])[] = [
-  [[640,240,370],[380,245,550],[110,250,780],[-150,255,1080],[-370,260,1390],[-700,265,1850],[-1000,270,2250]],
-  [[-300,278,1010],[-100,290,1120],[200,300,1310],[630,308,1520],[1410,314,1930],[2640,318,2580]],
+  // P6: only the low bay-horizon corridor C stays (below the Sky Ring deck, behind the skyline); A and B streaked across the hero's upper sky.
   [[2180,200,2960],[1450,205,3470],[740,210,3980],[50,215,4480],[-520,218,5100]],
 ];
 export const skyCorridors: readonly (readonly P3[])[] = skyCentres.flatMap(c => [1,-1].map(side => c.map((p,i) => {
