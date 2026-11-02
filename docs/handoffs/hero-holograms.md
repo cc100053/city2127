@@ -25,7 +25,8 @@ Hero 層（`src/` hero 構件、`SHOTS` hero）；`docs/ODAIBA_2127_REFERENCES/C
 
 ## Completed work
 
-- 開 worktree／branch；Gemini target 圖流程進行中（`artifacts/hero-holograms/`）。
+- 開 worktree／branch。
+- Gemini target 候選（2026-11-02，Sonnet agent 經 Claude in Chrome、`/u/3`，各 1 次）：`gen/hero-day.png`、`gen/hero-night.png`（2730×1536）；對照 `vs-gen.jpg`（左底圖｜右候選）。日：9 塊 panel，鏡頭同塔比例輕微走樣，左上 panel 標題亂碼。夜：11 塊 panel，鏡頭最貼底圖，日文清楚。兩張角落 UI 字都被改壞（實作唔郁 UI）。等 owner 揀圖入 `target/`。
 
 ## Actual validation results
 
