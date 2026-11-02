@@ -7,13 +7,13 @@ import { ARCH, groundContacts, HULL, inRect, megastructures, RING } from '../src
 const group = megastructures(), box = new Box3(), parts = new Map<string, Box3>();
 group.updateMatrixWorld(true);
 group.traverse(o => { if (o instanceof Mesh && !(o instanceof InstancedMesh)) { o.geometry.computeBoundingBox(); parts.set(`${o.material.color.getHexString()}${parts.size}`, box.copy(o.geometry.boundingBox!).clone()); } });
-const shell =[...parts.entries()].find(([k]) => k.startsWith('eef1f2'))![1];
+const shell =[...parts.entries()].find(([k]) => k.startsWith('f3f2ec'))![1];
 assert.ok(group.children.length >= 4 && group.children.length <= 12, `draw calls ${group.children.length}`);
 // Heights: the hoop's top, the arch apex and the hull top all lie inside the shell batch's bounds.
 const within = (v: number, want: number, what: string) => assert.ok(v >= want * .75 && v <= want * 1.25, `${what} ${v.toFixed(0)} m vs ${want} m`);
-within(RING.centreY + RING.outer, 195, 'ring top'); within(ARCH.apex, 170, 'arch apex'); within(HULL.steps * HULL.step, 65, 'hull top');
+within(RING.centreY + RING.outer, 195, 'ring top'); within(ARCH.apex, 170, 'arch apex'); within(HULL.steps * HULL.step, 120, 'hull top');
 assert.ok(shell.max.y >= HULL.steps * HULL.step * .9 && shell.max.y <= 200, `shell top ${shell.max.y}`);
-within(RING.outer * 2, 210, 'ring diameter'); within(Math.hypot(ARCH.b[0] - ARCH.a[0], ARCH.b[1] - ARCH.a[1]), 240, 'arch span'); within(HULL.length, 240, 'hull length');
+within(RING.outer * 2, 210, 'ring diameter'); within(Math.hypot(ARCH.b[0] - ARCH.a[0], ARCH.b[1] - ARCH.a[1]), 240, 'arch span'); within(HULL.length, 190, 'hull length');
 // Ground contacts (plinth, arch feet, hull footprint) keep 14 m clear of every Meter site and of the civic core base.
 const contacts = groundContacts(), all = [contacts.ring, ...contacts.archFeet, contacts.hull];
 for (const site of Object.values(changeSites)) {

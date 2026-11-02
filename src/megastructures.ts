@@ -6,15 +6,27 @@ import { plantCanopy } from './coastalCanopy.ts';
 // Ground contacts and sizes are exported for the test and for carving the context massing they replace. Metres.
 export const RING = { x: 95, z: -195, centreY: 90, outer: 105, inner: 73, depth: 45, yaw: -2.05 + .8, plinth: [60, 50] as const };
 export const ARCH = { a: [-9, -237] as const, b: [58, -5] as const, apex: 135 };
-export const HULL = { x: -210, z: 135, yaw: .0416, length: 240, depth: 90, steps: 7, step: 11 };
+// r2: front base line (-160, 20) to (-330, 95); local +x runs along it toward the left end, +z recedes from the camera. Low left end (3 terraces), 8 at the right end.
+export const HULL = { x: -260, z: 64, yaw: .4155, length: 180, depth: 90, steps: 8, step: 15, recede: 9 };
 
 /** Finishes shared by all three pieces; the seam glows with the night. */
-export const megaShell = new T.MeshStandardMaterial({ color: '#eef1f2', roughness: .32, metalness: .45 });
-export const megaRib = new T.MeshStandardMaterial({ color: '#c9d0d4', roughness: .4, metalness: .55 });
+export const megaShell = new T.MeshStandardMaterial({ color: '#f3f2ec', roughness: .5, metalness: .08 });
+export const megaRib = new T.MeshStandardMaterial({ color: '#dde1e2', roughness: .5, metalness: .2 });
 export const megaSeam = new T.MeshStandardMaterial({ color: '#cfe8ff', emissive: '#cfe8ff', emissiveIntensity: .6, roughness: .5 });
-export const megaGlass = new T.MeshStandardMaterial({ color: '#6b7780', roughness: .14, metalness: .4 });
+export const megaGlass = new T.MeshStandardMaterial({ color: '#8fa3ae', roughness: .15, metalness: .3 });
+const megaPlant = new T.MeshStandardMaterial({ color: '#6f9a5c', roughness: .9 });
+// Night: about 30% of the glass cells (6 m × 4.2 m, world hash) glow warm, like the retained landmarks' lit rooms.
+const roomGlow = { value: 0 };
+megaGlass.onBeforeCompile = shader => {
+  shader.uniforms.roomGlow = roomGlow;
+  shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 megaP;').replace('#include <project_vertex>', '#include <project_vertex>\nmegaP = (modelMatrix * vec4(transformed, 1.)).xyz;');
+  shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float roomGlow;\nvarying vec3 megaP;')
+    .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+    totalEmissiveRadiance += vec3(1., .78, .5) * roomGlow * 1.1 * step(.7, fract(sin(dot(floor(vec2((megaP.x + megaP.z) / 6., megaP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453));`);
+};
+megaGlass.customProgramCacheKey = () => 'mega-glass';
 const megaJoint = new T.MeshStandardMaterial({ color: '#4b5258', roughness: .6, metalness: .3 });
-export const updateMegastructures = (night: number) => { megaSeam.emissiveIntensity = .6 + night * 1.6; };
+export const updateMegastructures = (night: number) => { megaSeam.emissiveIntensity = .6 + night * 1.6; roomGlow.value = night; };
 
 type Batch = Map<T.Material, T.BufferGeometry[]>;
 /** Queue a geometry (placed by `m`) under a material; everything is normalised so per-material merging always succeeds. */
@@ -50,16 +62,16 @@ function ring(batch: Batch, trees: { position: number[]; scale: number; type: st
   for (const s of [1, -1]) {
     const q = new T.Matrix4().makeRotationY(s > 0 ? 0 : Math.PI);
     add(megaShell, new T.RingGeometry(inner, outer, 96), q.clone().setPosition(0, 0, s * half));
-    add(megaGlass, new T.RingGeometry(inner + 9, inner + 20, 96), q.clone().setPosition(0, 0, s * (half + 1.3)));
     add(megaSeam, new T.RingGeometry(inner, inner + 1.6, 96), q.clone().setPosition(0, 0, s * (half + .8)));
     add(megaSeam, L(outer + .15, 1.2), new T.Matrix4().makeTranslation(0, 0, s * (half - 1.4))); // two light bands along the outer edges
   }
   // Outer ribs every 6° (1.5 m proud, running across the hoop depth) and radial ribs on both faces every 6°.
+  for (const z of [-14, -4.5, 4.5, 14]) add(megaGlass, L(outer + .3, 2.4), new T.Matrix4().makeTranslation(0, 0, z)); // storey bands round the hoop
   const rib = new T.BoxGeometry(1.5, 1.4, depth), fin = new T.BoxGeometry(outer - inner - 2, 1, .8);
   for (let i = 0; i < 60; i++) {
     const a = i / 60 * Math.PI * 2, rz = new T.Matrix4().makeRotationZ(a);
     add(megaRib, rib, rz.clone().setPosition(Math.cos(a) * (outer + .6), Math.sin(a) * (outer + .6), 0));
-    for (const s of [1, -1]) add(megaRib, fin, rz.clone().setPosition(Math.cos(a) * (inner + outer) / 2, Math.sin(a) * (inner + outer) / 2, s * (half + 1.3)));
+    for (const s of [1, -1]) if (i % 2 === 0) add(megaRib, fin, rz.clone().setPosition(Math.cos(a) * (inner + outer) / 2, Math.sin(a) * (inner + outer) / 2, s * (half + 1.3)));
   }
   const bands = 10, bh = depth / bands;
   for (let b = 0; b < bands; b++) {
@@ -68,12 +80,13 @@ function ring(batch: Batch, trees: { position: number[]; scale: number; type: st
     add(megaShell, flip(L(inner - 1.5 - (b % 2) * .8, 1.1)), new T.Matrix4().makeTranslation(0, 0, z + bh / 2));
   }
   // Planted ledges on the lower inner arc (crowns go through the shared canopy instancer) and the service rail with three static pods.
-  for (const z of [-half + bh * 2, -half + bh * 5, -half + bh * 8]) {
-    const shape = new T.Shape(); shape.absarc(0, 0, inner, -Math.PI * .78, -Math.PI * .22, false); shape.absarc(0, 0, inner - 5.5, -Math.PI * .22, -Math.PI * .78, true);
+  for (const z of [-half + bh * 1.5, -half + bh * 4, -half + bh * 6.5, -half + bh * 9]) {
+    const shape = new T.Shape(); shape.absarc(0, 0, inner, -Math.PI * .95, -Math.PI * .05, false); shape.absarc(0, 0, inner - 9, -Math.PI * .05, -Math.PI * .95, true);
     add(megaShell, new T.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: false, curveSegments: 24 }), new T.Matrix4().makeTranslation(0, 0, z - .5));
-    for (let i = 0; i < 26; i++) {
-      const a = -Math.PI * (.26 + .48 * i / 25), r = inner - 2.8 - (i % 2) * 1.3, p = place(Math.cos(a) * r, Math.sin(a) * r + 1, z);
-      trees.push({ position: [p[0], -p[2], p[1]], scale: 1.0 + (i % 3) * .2, type: i % 5 === 0 ? 'columnar' : 'broadleaf' });
+    add(megaPlant, new T.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: false, curveSegments: 24 }), new T.Matrix4().makeTranslation(0, 0, z + .5).multiply(new T.Matrix4().makeScale(.97, .97, 1)));
+    for (let i = 0; i < 40; i++) {
+      const a = -Math.PI * (.08 + .84 * i / 39), r = inner - 3.5 - (i % 2) * 2.5, p = place(Math.cos(a) * r, Math.sin(a) * r + 1.5, z);
+      trees.push({ position: [p[0], -p[2], p[1]], scale: 1.5 + (i % 3) * .25, type: i % 5 === 0 ? 'columnar' : 'broadleaf' });
     }
   }
   const rail = new T.TorusGeometry(inner - 1.2, .45, 6, 64, Math.PI * 1.2);
@@ -109,10 +122,10 @@ function arch(batch: Batch, tops: [number, number][]) {
     const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return g;
   };
   const width = (t: number) => 1.45 * (9 + 5 * Math.abs(2 * t - 1) ** 1.6);
-  put(batch, megaShell, sweep(0, 1, N, t => ({ hw: width(t) / 2, hh: width(t) * .36 })));
+  put(batch, megaShell, sweep(0, 1, N, t => ({ hw: width(t) / 2, hh: width(t) * .3125, k: 4 })));
   // Seam along each edge of the inner (underside) face; joints every ~20 m (≈ 330 m of arc).
-  for (const side of [1, -1]) put(batch, megaSeam, sweep(.01, .99, N, t => ({ hw: .4, hh: .35, os: side * width(t) * .36, ou: -width(t) * .36 - .1, k: 2 })));
-  for (let j = 1; j < 16; j++) { const t = j / 16; put(batch, megaJoint, sweep(t - .0013, t + .0013, 1, () => ({ hw: width(t) / 2 + .15, hh: width(t) * .36 + .15 }))); }
+  for (const side of [1, -1]) put(batch, megaSeam, sweep(.01, .99, N, t => ({ hw: .4, hh: .35, os: side * width(t) * .36, ou: -width(t) * .3125 - .1, k: 2 })));
+  for (let j = 1; j < 16; j++) { const t = j / 16; put(batch, megaJoint, sweep(t - .0013, t + .0013, 1, () => ({ hw: width(t) / 2 + .15, hh: width(t) * .3125 + .15, k: 4 }))); }
   // Foot collars with an emitter seam.
   for (const f of [f1, f2]) {
     put(batch, megaShell, new T.CylinderGeometry(11.5, 12.5, 4, 32), mat({ x: f.x, y: 2, z: f.z }));
@@ -121,50 +134,58 @@ function arch(batch: Batch, tops: [number, number][]) {
   tops.push([point(.5).x, point(.5).z]);
 }
 
-// ---- C. Stepped terraced mega-hull; local depth 0 is the camera-facing front, +depth the back.
+// ---- C. Stepped terraced mega-hull; local depth 0 is the camera-facing front, +depth the back, +u runs toward the low left end.
 function hull(batch: Batch, trees: { position: number[]; scale: number; type: string }[]) {
-  const { length, depth, steps, step } = HULL, root = new T.Matrix4().compose(new T.Vector3(HULL.x, 0, HULL.z), new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 1, 0), HULL.yaw), new T.Vector3(1, 1, 1));
-  const q = new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 1, 0), HULL.yaw);
+  const { length, depth, steps, step, recede } = HULL, q = new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 1, 0), HULL.yaw);
+  const root = new T.Matrix4().compose(new T.Vector3(HULL.x, 0, HULL.z), q, new T.Vector3(1, 1, 1)), L2 = length / 2;
   const world = (u: number, d: number, y: number) => new T.Vector3(u, y, d).applyQuaternion(q).add(new T.Vector3(HULL.x, 0, HULL.z));
-  /** Plan outline of terrace k: bowed front (toward the camera), straight back; `grow` pushes it outward by the lip. */
-  const front = (k: number, grow: number, n = 24) => {
-    const L2 = length / 2 - k * 5 + grow;
-    return Array.from({ length: n + 1 }, (_, i) => { const u = -L2 + 2 * L2 * i / n; return [u, k * 12.4 - grow - 11 * (1 - (u / (length / 2)) ** 2)] as [number, number]; });
-  };
+  const left = (k: number) => -L2 + (k > 2 ? (k - 2) * length * .75 / (steps - 3) : 0); // terraces 0-2 run the full length, then the left end steps in
+  const dAt = (k: number, u: number, grow: number) => k * recede - grow - 8 * (1 - (u / L2) ** 2);
+  const front = (k: number, grow: number, n = 24) => Array.from({ length: n + 1 }, (_, i) => { const u = left(k) - grow + (L2 - left(k) + 2 * grow) * i / n; return [u, dAt(k, u, grow)] as [number, number]; });
   const slab = (k: number, y: number, h: number, grow: number, material: T.Material) => {
     const f = front(k, grow), shape = new T.Shape(); shape.moveTo(f[0][0], -f[0][1]); f.forEach(([u, d]) => shape.lineTo(u, -d));
-    const L2 = f[f.length - 1][0]; shape.lineTo(L2, -depth); shape.lineTo(-L2, -depth);
+    shape.lineTo(f[f.length - 1][0], -depth); shape.lineTo(f[0][0], -depth);
     put(batch, material, new T.ExtrudeGeometry(shape, { depth: h, bevelEnabled: false }).rotateX(-Math.PI / 2), root.clone().multiply(new T.Matrix4().makeTranslation(0, y, 0)));
   };
+  const at = (u: number, d: number, y: number) => new T.Matrix4().compose(world(u, d, y), q, new T.Vector3(1, 1, 1));
   for (let k = 0; k < steps; k++) {
-    const y0 = k * step, f = front(k, 0);
-    slab(k, y0, step - 2.4, 0, megaGlass);
-    slab(k, y0 + step - 2.4, 2.4, 1.2, megaShell);
-    slab(k, y0 + 5, .9, .5, megaShell); // thin mid-storey slab: two storeys per terrace
-    const fl = front(k, 1.2);
-    for (let i = 0; i < fl.length - 1; i++) { // seam line at the terrace lip
-      const a = world(fl[i][0], fl[i][1] - .1, y0 + step - 1), b = world(fl[i + 1][0], fl[i + 1][1] - .1, y0 + step - 1); bar(batch, megaSeam, a, b, .55, .5);
+    const y0 = k * step, f = front(k, 0), u0 = left(k);
+    slab(k, y0, 1.2, 1.6, megaSeam); // glowing lip at the foot of each face
+    slab(k, y0 + 1.2, 3, 1.2, megaShell); // 3 m solid white slab
+    slab(k, y0 + 4.2, step - 4.2, 0, megaGlass); // two glass storeys
+    slab(k, y0 + 9.6, .6, .35, megaShell);
+    const fin = new T.BoxGeometry(.5, step - 4.8, .7);
+    for (let u = u0 + 3; u < L2 - 1; u += 6) put(batch, megaRib, fin, at(u, dAt(k, u, 0) - .3, y0 + 4.5 + (step - 4.8) / 2));
+    // end bulkheads: white walls with fins every 8 m and one vertical seam at the front corner
+    for (const [u, sgn] of [[L2, 1], [u0, -1]] as const) {
+      const d0 = dAt(k, u, 0), len = depth - d0, wall = new T.BoxGeometry(2.4, step, len);
+      put(batch, megaShell, wall, at(u + sgn * 1.2, d0 + len / 2, y0 + step / 2));
+      for (let d = d0 + 6; d < depth - 2; d += 8) put(batch, megaRib, new T.BoxGeometry(1.1, step - 1, .8), at(u + sgn * 2.6, d, y0 + step / 2));
+      put(batch, megaSeam, new T.BoxGeometry(.6, step, .6), at(u + sgn * 2.6, d0 + 1, y0 + step / 2));
     }
-    // vertical rib fins about every 12 m on the glass front
-    const fin = new T.BoxGeometry(.9, step - 2.4, 1.1);
-    for (let u = -length / 2 + k * 5 + 6; u < length / 2 - k * 5 - 2; u += 12) {
-      const dd = k * 12.4 - 11 * (1 - (u / (length / 2)) ** 2), p = world(u, dd - .3, y0 + (step - 2.4) / 2);
-      put(batch, megaRib, fin, new T.Matrix4().compose(p, q, new T.Vector3(1, 1, 1)));
+    // planter deck behind the lip: low hedge bands, a tree about every 13 m
+    for (const [off, w] of [[3.2, 2.6], [6.4, 2]] as const) for (let i = 0; i < f.length - 1; i++)
+      bar(batch, megaPlant, world(f[i][0], f[i][1] + off, y0 + step + .5), world(f[i + 1][0], f[i + 1][1] + off, y0 + step + .5), w, 1.2);
+    for (let u = u0 + 6 + (k % 3) * 4; u < L2 - 4; u += 13) {
+      const p = world(u, dAt(k, u, 0) + 4.8, y0 + step + .5);
+      trees.push({ position: [p.x, -p.z, p.y], scale: .85 + (k % 2) * .2, type: k % 4 === 0 ? 'columnar' : 'broadleaf' });
     }
-    // dense planted lip: a crown about every 4 m, set back from the edge
-    for (let i = 0; i < f.length - 1; i += 1) for (const e of [0, .5]) {
-      const u = f[i][0] + (f[i + 1][0] - f[i][0]) * e, d = f[i][1] + (f[i + 1][1] - f[i][1]) * e + 2.5 + (i % 3) * 1.8, p = world(u, d, y0 + step);
-      trees.push({ position: [p.x, -p.z, p.y], scale: .7 + (i % 3) * .12, type: (i + k) % 6 === 0 ? 'columnar' : 'broadleaf' });
+    if (k === 2) { // service rail along this lip with two static pods
+      const fl = front(k, 2);
+      for (let i = 0; i < fl.length - 1; i++) bar(batch, megaRib, world(fl[i][0], fl[i][1] - .8, y0 + 6), world(fl[i + 1][0], fl[i + 1][1] - .8, y0 + 6), .7, .5);
+      for (const u of [-30, 40]) put(batch, megaShell, new T.BoxGeometry(6, 2.4, 3.4), at(u, dAt(k, u, 2) - .8, y0 + 7.4));
     }
   }
 }
 
 const rect = (cx: number, cz: number, ux: number, uz: number, hu: number, hv: number) => ({ cx, cz, ux, uz, hu, hv });
+/** Hull footprint rectangle, `front` m wider toward the camera and `side` m longer. */
+const hullRect = (front: number, side: number) => rect(HULL.x + Math.sin(HULL.yaw) * (HULL.depth - front) / 2, HULL.z + Math.cos(HULL.yaw) * (HULL.depth - front) / 2, Math.cos(HULL.yaw), -Math.sin(HULL.yaw), HULL.length / 2 + side, (HULL.depth + front) / 2);
 /** Ground footprints (centre, unit axis, half extents along axis and across it) of what each piece stands on; the test and the carve use them. */
 export const groundContacts = () => ({
   ring: rect(RING.x, RING.z, Math.cos(RING.yaw), -Math.sin(RING.yaw), RING.plinth[0] / 2, RING.plinth[1] / 2),
   archFeet: [ARCH.a, ARCH.b].map(f => rect(f[0], f[1], 1, 0, 12.5, 12.5)),
-  hull: rect(HULL.x, HULL.z + HULL.depth / 2 - 8, Math.cos(HULL.yaw), -Math.sin(HULL.yaw), HULL.length / 2, HULL.depth / 2 + 8),
+  hull: hullRect(8, 0),
 });
 /** Context massing under or inside a megastructure's body: the whole hoop's shadow, the arch's span and the hull's footprint. */
 export function bodyFootprints() {
@@ -172,7 +193,7 @@ export function bodyFootprints() {
   return [
     rect(RING.x, RING.z, Math.cos(RING.yaw), -Math.sin(RING.yaw), RING.outer + 4, RING.depth / 2 + 6),
     rect((ARCH.a[0] + ARCH.b[0]) / 2, (ARCH.a[1] + ARCH.b[1]) / 2, d.x / d.length(), d.y / d.length(), d.length() / 2 + 6, 14),
-    rect(HULL.x, HULL.z + HULL.depth / 2 - 20, Math.cos(HULL.yaw), -Math.sin(HULL.yaw), HULL.length / 2 + 10, HULL.depth / 2 + 20),
+    hullRect(60, 10),
   ];
 }
 export const inRect = (r: ReturnType<typeof rect>, x: number, z: number) => { const dx = x - r.cx, dz = z - r.cz; return Math.abs(dx * r.ux + dz * r.uz) <= r.hu && Math.abs(-dx * r.uz + dz * r.ux) <= r.hv; };
