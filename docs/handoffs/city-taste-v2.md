@@ -122,3 +122,8 @@ Coordinator session runs `artifacts/city-taste-v2/coordinator.md`: P1→P6 again
 
 - Decision: **pass**, merged `--no-ff` (merges `feat/city-taste-v2-p6` 10e0dc9). Regional sky lanes 6 → 2 (only the low corridor below the ring deck), trails 0.8 → 0.3 × spacing, nothing crosses the floater/civic sphere; shore-lane pod band now a thin pale guideway rail lit only near craft (`#cfe8ff`); idle drones fly as four V-formations of three. Not done: small foreground boats (lagoon too narrow for existing shuttles; needs a smaller craft type) — left for the owner/P8.
 - Test edits: `tests/mobility.test.ts` (sky lane count 2, trail ≤ .35 × spacing). Checks on the merge (coordinator): tests fail 0, build 0, diff-check clean. FPS (agent) 60/60.
+
+## P7 r1 (2026-11-03 05:30 JST)
+
+- Decision: **polish again** → `P7/spec-r2.md`. Teal cast removed (source: teal elevator lamps `#8ce5d8`, warm hemisphere ground bounce at night, too-low night ambient); ring lit ~60%, Sky Ring and elevator cool white, civic frame corner/top seams. Misses: windows clip to cream instead of amber, plaza/ground dark, night FPS only one valid sample.
+- Evidence `feat/city-taste-v2-p7` 6c4d43c, `P7/r1/`. Agent checks: tests fail 0, build ok, diff-check clean; `tests/odaiba.test.ts` civic batch cap 9 → 10 (new seam batch). Day h16 pixel diff vs P6 mean 0.71 (motion only).
