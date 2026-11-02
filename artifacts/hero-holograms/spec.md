@@ -252,3 +252,16 @@ Owner：再刪兩塊；hologram 係俾城入面嘅居民睇，所以距離同大
 - `hero-h16.png`、`hero-h21.png`、`vs-target.jpg`（R3｜參考圖裁片｜R4）。
 - **居民視角**：每塊一張 `street-<id>-h16.png`（`?review=street&cam=x,y,z&at=x,y,z&reviewTime=40&hour=16`，相機喺行人眼高 1.6–3 m、距離 panel 30–80 m），另加 `street-voices-h21.png`。
 - FPS 同前。
+
+---
+
+# R5（2026-11-02）— 放大兩塊地標屏
+
+Owner：放大地標兩塊（`district`「2127」、`culture`「フジ 文化放送」），令 hero 全景都睇到；其餘 6 塊（`transit`、`air`、`voices`、3 tag）保持 R4 居民尺度，唔郁。
+
+- 兩塊仍然貼富士電視台框架北牆（面向 hero 同主廣場），變成**佔滿一格立面嘅媒體屏**：先量框架梁柱之間嘅開口（梁、柱嘅實際位置由 geometry／raycast 量），每塊填滿一格開口，四邊同梁柱留 1.5–2 m 淨空，唔可以同梁重疊（R4 `district` 底邊畀 60 m 梁切咗）。
+- 目標大細：`district` 闊 ≥ 45 m；`culture` 闊 ≥ 36 m。如果一格開口唔夠，可以橫跨兩格，但要放喺柱前面 1 m，唔可以插入柱。
+- Hero 讀得到：hero 截圖（1600×900）入面兩塊主字（「2127」、「フジ」）≥ 24 px 高、≥ 80% 面積可見（唔畀梁擋）。如果北牆嘅開口喺 hero 會被前面嘅梁擋，可以將 panel 放喺梁外側 1–2 m（貼住框架外面），但唔好浮離建築。
+- 內容版面按新比例重排（主字仍然最大，細節密度可以跟住面積加），主字高 ≥ 觀看距離 / 40 照舊。
+- 視線測試（四 site、Civic Core 核心）照舊要過；Civic Core 核心定義如有需要，同 Opus 報告。
+- 截圖 `r5/`：`hero-h16.png`、`hero-h21.png`、`street-district-h16.png`、`street-culture-h16.png`、`vs-r4.jpg`（R4｜R5 hero 日夜）。FPS 照量，同時記錄量度時嘅 `uptime` load average。

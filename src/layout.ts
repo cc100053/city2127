@@ -76,16 +76,17 @@ export const SKY_RING = {x:-40,z:-40,rx:350,rz:350,deck:250} as const;
 export const HOLOGRAMS = {
   eye: [-358,148,-437] as P3,
   panels: [
-    // Civic Core (Fuji TV frame) north wall z -2.7, above the 65 m beam, facing the main plaza north of it
-    {id:'district',at:[39,80.5,-6.5] as P3,w:28,h:21,face:[30,60,-80] as P3,view:100},
+    // Civic Core (Fuji TV frame) north face, 1.8 m outside the beams (front faces reach z -17.2): the upper media bay (x 6..54 between the central and east columns, y 71..105, above the
+    // 58-67 m floor beam), facing the main plaza and the hero
+    {id:'district',at:[30,88,-19] as P3,w:48,h:34,face:[30,62,-110] as P3,view:120},
     // Daiba station front: Fuji podium north-east face (curved, top 24 m) above the Yurikamome deck, facing the plaza and station forecourt
     {id:'transit',at:[17.7,20.5,-38] as P3,w:10,h:5,face:[33.8,16,-59.4] as P3,view:28},
     // Aqua City seaward facade (flat to 30 m, plane -0.55x - 0.83z = 183.4), upper floors, facing the seaside promenade
     {id:'air',at:[-137.3,29.5,-131.8] as P3,w:10,h:5,face:[-155.7,20,-159.6] as P3,view:35},
     // Aqua City seaward facade at the avenue, residents' voice board 9 m above the ground, facing the promenade lawn
     {id:'voices',at:[-108.2,15,-151] as P3,w:16,h:12,face:[-132.2,3,-187.2] as P3,view:45},
-    // Fuji TV media wall (the same z -2.7 wall, above the 44 m ledge and under the 60 m beam), facing the main plaza
-    {id:'culture',at:[40,50.25,-6.5] as P3,w:22,h:16.5,face:[40,35,-62] as P3,view:65},
+    // Fuji TV media screen, same face 1.8 m outside the beams, the lower bay (y 32.5..63.5: 2.5 m over the podium roof that reaches y 30 near x 21; it stands 1.8 m in front of the 58-67 m floor beam, not in it), facing the plaza and the hero
+    {id:'culture',at:[31,48,-19] as P3,w:44,h:31,face:[31,26,-85] as P3,view:85},
     // Sky bridge Aqua City <-> Fuji TV (deck 24 m): direction sign 6.5 m over the deck facing walkers who come from the Aqua City end
     {id:'tag-a',at:[-32,30.5,-61] as P3,w:4,h:1.35,face:[-49,28,-90] as P3,view:30},
     // Sky bridge Aqua City <-> DECKS: sign 6.5 m over the deck facing walkers from the Aqua City end

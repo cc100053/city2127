@@ -68,8 +68,8 @@ const train = (g: Ctx, x: number, y: number, s: number) => {
   g.moveTo(x - .6 * s, y + 1.05 * s); g.lineTo(x + .6 * s, y + 1.05 * s);
 };
 /** The Fuji TV sphere observatory on its frame, with three broadcast arcs to each side that fade outwards. */
-function observatory(d: Draw, cx: number, cy: number) {
-  const r = d.sc(21), s = d.sc;
+function observatory(d: Draw, cx: number, cy: number, k = 1) {
+  const s = (n: number) => d.sc(n * k), r = s(21);
   line(d, 1.4, g => {
     g.moveTo(cx + r, cy); g.arc(cx, cy, r, 0, Math.PI * 2);
     for (const y of [-.5, 0, .5]) { const rx = Math.sqrt(1 - y * y) * r; g.moveTo(cx + rx, cy + y * r); g.ellipse(cx, cy + y * r, rx, rx * .22, 0, 0, Math.PI * 2); }
@@ -161,12 +161,13 @@ function chrome(d: Draw, hud: boolean) {
 
 // One main word (≥ 30 px on the 1600 × 900 hero frame), at most one secondary word (≥ 20 px), the rest fine line-art; no other text. Detail pieces keep clear of the main word.
 const PANELS: readonly Panel[] = [
-  // Left 48 %: the 3D globe (a separate mesh) over a Tokyo Bay coastline, ringed by two opposed gauges. Right: 台場 over 2127 between brackets, a level meter and a circuit.
-  { id: 'district', sw: 224, long: 2048, violet: false, hud: true, draw(d) {
-    const s = d.sc; hexField(d); coastline(d, 62, 84, 82);
-    say(d, '台場', s(132), s(46), 20, { weight: 600, title: true }); say(d, '2127', s(132), s(100), 36, { weight: 600, num: true, title: true });
-    bracketLines(d, 124, 218, 70, 34); arcGauge(d, 62, 84, 48, .62); arcGauge(d, 62, 84, 54, .4, .35, Math.PI);
-    dataBlocks(d, 132, 118, 18, 16, 4); circuit(d, [[214, 150], [176, 150], [168, 142], [150, 142]]); ticks(d, 14, 10, 212, 10, { arrows: true, alpha: .4 }); cornerMarks(d, 224, 168);
+  // Landmark screen (48 × 34 m, 240 × 170 design px): top band holds the 3D globe (a separate mesh) over a Tokyo Bay coastline with two opposed gauges and a ruler, 台場 and a circuit;
+  // the main word 2127 fills the middle band edge to edge (cap height ≈ 12 m, ≥ 24 px in the hero frame); a level meter and a circuit run along the foot.
+  { id: 'district', sw: 240, long: 2048, violet: false, hud: true, draw(d) {
+    const s = d.sc; hexField(d); coastline(d, 40, 34, 64);
+    say(d, '台場', s(100), s(30), 28, { weight: 600, title: true }); say(d, '2127', s(120), s(142), 88, { weight: 700, num: true, title: true, align: 'center' });
+    arcGauge(d, 40, 34, 30, .62); arcGauge(d, 40, 34, 36, .4, .35, Math.PI); ticks(d, 100, 48, 232, 48, { arrows: true, alpha: .4 });
+    circuit(d, [[232, 16], [204, 16], [198, 10], [170, 10]]); dotGrid(d, 200, 24, 6, 3, 5); dataBlocks(d, 14, 150, 36, 12, 5); circuit(d, [[232, 160], [196, 160], [190, 154], [160, 154]]); cornerMarks(d, 240, 170);
   } },
   // Train icon, station name and minutes; a five-station route line ending at 台場 with an arrow; a ruler, a circuit and a level meter.
   { id: 'transit', sw: 192, long: 1024, violet: false, hud: true, draw(d) {
@@ -199,11 +200,12 @@ const PANELS: readonly Panel[] = [
     ticks(d, 158, 88, 158, 118, { alpha: .4 });
   } },
   // Left: sphere observatory and broadcast arcs. Right: フジ over 文化放送, a gauge, a circuit, a level meter and a ruler.
+  // Landmark screen (44 × 31 m, 240 × 169 design px): フジ fills the upper left (kana height ≈ 26 px in the hero frame), 文化放送 under it; a small gauge top right; the sphere observatory with its
+  // broadcast arcs at the lower right; a level meter and a circuit along the foot.
   { id: 'culture', sw: 240, long: 2048, violet: true, hud: true, draw(d) {
-    const s = d.sc; hexField(d); observatory(d, s(65), s(65));
-    say(d, 'フジ', s(134), s(64), 36, { weight: 700, title: true }); say(d, '文化放送', s(134), s(92), 20, { weight: 600, title: true });
-    circuit(d, [[228, 112], [190, 112], [182, 104], [150, 104]]); arcGauge(d, 176, 140, 20, .7); dataBlocks(d, 20, 146, 12, 14, 5); dotGrid(d, 196, 20, 6, 3, 5);
-    ticks(d, 134, 12, 226, 12, { alpha: .4 }); cornerMarks(d, 240, 180);
+    const s = d.sc; hexField(d); observatory(d, s(190), s(116), .7);
+    say(d, 'フジ', s(8), s(92), 96, { weight: 700, title: true }); say(d, '文化放送', s(8), s(130), 28, { weight: 600, title: true });
+    arcGauge(d, 222, 34, 13, .7); ticks(d, 206, 62, 236, 62, { alpha: .4 }); dataBlocks(d, 10, 142, 14, 14, 5); circuit(d, [[154, 150], [130, 150], [124, 144], [106, 144]]); cornerMarks(d, 240, 169);
   } },
   // No text: a small triangle, a level meter and one circuit run.
   ...(['a', 'b', 'c'] as const).map((n, i): Panel => ({ id: `tag-${n}`, sw: 56, long: 1024, violet: false, hud: false, draw(d) {
@@ -267,10 +269,10 @@ export function heroHolograms(scene: T.Scene, anisotropy = 8) {
     part(1, glass, 0, 10); part(1.18, aura, -.2, 9); part(1, content, .2, 11);
     paneMaterials.push(glass); haloMaterials.push(aura); inks.push(content);
     if (p.id === 'district') {
-      // A real 3D globe turning in front of the panel's left zone (48 %), with a tilted orbit ring that stays inside it.
-      const r = place.h * .23, tilt = new T.Group(), spin = new T.Group(), wire = (g: T.BufferGeometry) => { const m = new T.LineBasicMaterial({ color: CYAN, transparent: true, opacity: .9, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false, fog: false }); inks.push(m); return new T.LineSegments(g, m); };
-      spin.add(wire(globeGeometry())); tilt.add(spin); const ringLine = wire(orbitGeometry()); ringLine.scale.setScalar(1.15); ringLine.rotation.z = 20 * Math.PI / 180; tilt.add(ringLine);
-      tilt.rotation.z = -.35; tilt.scale.setScalar(r); tilt.position.set(-.223 * place.w, 0, .5); group.add(tilt); globe = spin;
+      // A real 3D globe turning in front of the panel's left zone, with a tilted orbit ring that stays inside it.
+      const r = place.w * .106, tilt = new T.Group(), spin = new T.Group(), wire = (g: T.BufferGeometry) => { const m = new T.LineBasicMaterial({ color: CYAN, transparent: true, opacity: .9, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false, fog: false }); inks.push(m); return new T.LineSegments(g, m); };
+      spin.add(wire(globeGeometry(8, 5))); tilt.add(spin); const ringLine = wire(orbitGeometry()); ringLine.scale.setScalar(1.15); ringLine.rotation.z = 20 * Math.PI / 180; tilt.add(ringLine);
+      tilt.rotation.z = -.35; tilt.scale.setScalar(r); tilt.position.set(-16 / 48 * place.w, (85 - 34) / 170 * place.h, .5); group.add(tilt); globe = spin;
     }
     bob.push({ group, y: place.at[1], amp: p.id.startsWith('tag-') ? .15 : 0, period: 6 + (n * 7) % 4, phase: n * 1.7 }); root.add(group);
   });

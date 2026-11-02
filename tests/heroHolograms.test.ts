@@ -29,7 +29,7 @@ for (const [id, glyphs] of holo.glyphs()) {
 // Resident scale (spec "居民尺度"): every panel is a real size, hangs at a real height, faces the walkers it is for, and its main word is readable from its viewing distance
 // (word height in metres >= view / 40).
 const RANGE: Record<string, readonly [number, number, number, number]> = { // [min width, max width, min bottom, max bottom] in metres
-  district: [24, 32, 40, 70], transit: [10, 14, 14, 30], air: [8, 12, 25, 40], voices: [12, 16, 8, 12], culture: [18, 24, 30, 55], 'tag-a': [3, 5, 20, 40], 'tag-b': [3, 5, 20, 40], 'tag-c': [3, 5, 30, 55],
+  district: [45, 60, 40, 75], transit: [10, 14, 14, 30], air: [8, 12, 25, 40], voices: [12, 16, 8, 12], culture: [36, 50, 25, 55], 'tag-a': [3, 5, 20, 40], 'tag-b': [3, 5, 20, 40], 'tag-c': [3, 5, 30, 55],
 };
 for (const place of HOLOGRAMS.panels) {
   const [w0, w1, b0, b1] = RANGE[place.id], bottom = place.at[1] - place.h / 2;
