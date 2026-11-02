@@ -3,6 +3,7 @@ import { addCityModel } from './modelAssets';
 import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
 import { civicCore } from './civicCore';
+import { bodyFootprints, carveContext, inRect, megastructures, updateMegastructures } from './megastructures';
 import { publishOccupants, publishRoofWalks } from './occupants';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
 import { facadeClimate, publishRoofGardens, towerGlow, towerNight } from './districtMeters';
@@ -107,6 +108,7 @@ export function updateOdaiba(night: number) {
   for (const material of glazing) material.emissiveIntensity = dayGlow + night * (.7 - dayGlow);
   glazingNight.value = night;
   curtainGlow.value = .45 + night * .45; curtainNight.value = night * .15; towerGlow.value = .3 + night * .9; towerNight.value = night;
+  updateMegastructures(night);
 }
 
 // Ground finishes lie within centimetres of each other (building pads over the lawn terrain, plazas and service yards beside them), finer
@@ -180,14 +182,15 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   // After finishes: shared materials are re-tuned once per mesh above, which would drop an earlier wrap.
   environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) receded.add(object.material); });
   receded.forEach(material => { if (cutGround.has(material.name)) openBay(material); recedeBeyondDistrict(material); });
-  scene.add(contextFacades(environment), bayContext());
+  carveContext(environment);
+  scene.add(contextFacades(environment), bayContext(), megastructures());
   plantCanopy(scene,trees,true);
   plantBackdropGrove(scene,environment);
   // Sky gardens crown the tall context towers (the only CTX mesh above 30 m inside the district).
   // Each roof garden's terraces go to the district Meters (sails/forest) and take a few residents (stroll line, standing group).
   const roofGarden=(model:T.Object3D,tower?:boolean)=>{const terraces=plantRoofCanopy(scene,model,tower);publishRoofGardens(terraces);publishRoofWalks(model,terraces);};
   environment.traverse(object=>{if(object instanceof T.Mesh && object.name.startsWith('CTX_') && new T.Box3().setFromObject(object).max.y>30)roofGarden(object,true);});
-  await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1])).map(async placement => {
+  await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1]) && !bodyFootprints().some(zone => inRect(zone, placement.positionBlender[0], -placement.positionBlender[1]))).map(async placement => {
     if(placement.id==='fuji-tv'){const core=civicCore();scene.add(core);publishOccupants(core.occupants);return;}
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);
     model.name = placement.id;
