@@ -62,3 +62,18 @@ Batch everything static with `bake` (≤ 8 batches). `frustumCulled = false`, no
 ## R2 (later) — explore wiring
 
 Explore target `space-elevator` (survey protocol, `exploreService`, guest buttons 空の環を見る / 軌道エレベーターを見る), pose E1 as `EXPLORE_SHOTS.elevator`, three caption steps, one craft flying into a bay. Spec written after R1 is accepted.
+
+## R2 — material and detail polish (owner go 2026-11-02)
+
+Review of `r1/vs-target.jpg`. Same files, same DEV toggle, same captures into `r2/`. Exposure/scene lighting stay untouched; fix inside `spaceElevatorNear` only.
+
+1. **Day too pale and hazed.** Haze curve → `.05 + .8*(1 - smoothstep(150., 1000., vHeight))` (station almost clean, lower column still dissolves). Underside darkening `.4` → `.6` (STANDARD only). `nearBody` `#e8e4dc` → `#dedad2`.
+2. **Column channels invisible.** They sit inside the tapered surface. Make them dark slots that read: `box(24 radial, 820, 36 tangential)` centred on the surface (radius at that height = 360 − 60·y/1080, so ≈ 332 at y 470), tilt kept; 12 of them. Also 12 thin `nearBody` pilasters `box(14, 820, 14)` 6 m outside the surface between the slots.
+3. **Night underside too bright** (grey-blue vs target dark navy). In `update`: scale `nearBody.color` and `nearDark.color` from their day colours by `1 - .6*dark` (keep day colours in constants; mint/beacon lerps keep using the day body colour).
+4. **Mint dashes weak.** 48 dashes → `box(10, 10, 70)` at r 1340, y 1060; night mint × 2.5 (was 1.6) for these and the collars (one material, fine). Day mint lerp stays .4.
+5. **Climbers read as amber blobs on the tether.** Rebuild: slim pod `CapsuleGeometry(38, 300, 4, 12)` `nearBody`; four window rings `cyl(40, 40, 16, 12, open)` `nearGlass` at y −90, −30, 30, 90; mint clamp rings `cyl(46, 46, 10, 12, open)` at ±170. Mount on the guide rails, not in front of the tether: alternate sides `toCam ± π/2` at r 205 (just outside the rails at 165). 3 pods, same loop.
+6. **Terrace green invisible.** Move clumps to the deck edges where the low camera sees them in silhouette: D1 ring at r = 1370, y = 1248; D2 at r = 1050, y = 1408; 64 per ring, `IcosahedronGeometry(45, 0)`, scale y .7, random size .7–1.3, small radial jitter ±20.
+
+Not in R2: the city light streak across the night frame (hidden during the look in R3), explore wiring.
+
+Captures as R1 into `r2/` (`day.png`, `night.png`, `hero-check.png`, `vs-target.jpg` = target | r2).
