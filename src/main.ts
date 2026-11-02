@@ -190,14 +190,18 @@ try {
   });
   // Civic/street reviews keep their own authored camera.
   const headlineCamera=(surveyUrl||metersParam!==null||shotPreview)&&!civicReview&&!streetReview?new HeadlineCamera(camera,controls):null;
-  let devShot:ShotId|null=null;
+  let devShot:{position:readonly [number,number,number];target:readonly [number,number,number]}|null=null;
   const cameraMotion=matchMedia('(prefers-reduced-motion: reduce)');
   if(import.meta.env.DEV){
     import('./devShotFrame').then(({cityShotFrame})=>Object.assign(window,{cityShotFrame:(id:string)=>cityShotFrame(scene,camera,id)}));
     Object.assign(window,{cityShot:(id?:string)=>{
       if(id===undefined){const pose={position:camera.position.toArray(),target:controls.target.toArray()};console.log(pose);return pose;}
       if(!Object.hasOwn(SHOTS,id))throw new Error(`Unknown shot: ${id}`);
-      headlineCamera?.cancel();devShot=id as ShotId;controls.enabled=false;
+      headlineCamera?.cancel();devShot=SHOTS[id as ShotId];controls.enabled=false;
+    },
+    // `cityPose([x,y,z],[tx,ty,tz])`: free review camera for poses that are not in SHOTS yet.
+    cityPose:(position:[number,number,number],target:[number,number,number])=>{
+      headlineCamera?.cancel();devShot={position,target};controls.enabled=false;
     }});
     const shot=params.get('shot');
     if(shot!==null)(window as unknown as {cityShot:(id:string)=>void}).cityShot(shot);
@@ -290,7 +294,7 @@ try {
     controls.update();if(!ringReview){panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);}
     if(headlineCamera?.active&&cameraMotion.matches)headlineCamera.cancel();else headlineCamera?.update(now);
     narration?.update(now,cameraMotion.matches);explore?.update(now,cameraMotion.matches);
-    if(import.meta.env.DEV&&devShot){const pose=SHOTS[devShot];camera.position.set(...pose.position);controls.target.set(...pose.target);camera.lookAt(controls.target);}
+    if(import.meta.env.DEV&&devShot){camera.position.set(...devShot.position);controls.target.set(...devShot.target);camera.lookAt(controls.target);}
     cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.
     if(performance.now()-shadowDrawn>=1000/quality.shadowHz){renderer.shadowMap.needsUpdate=true;shadowDrawn=performance.now();}
