@@ -75,3 +75,9 @@ Coordinator session runs `artifacts/city-taste-v2/coordinator.md`: P1→P6 again
 - Evidence: `feat/city-taste-v2-p1` 5aa5d34, `P1/r2/`. Agent checks pass; FPS 60/60 (vsync cap); +8 draw calls; Hilton dropped (inside new hull footprint), Grand Nikko dropped in r1.
 - 00:51 JST 11-03: Sonnet rate limit (reset 00:50) stopped P1 r3 mid-way; resumed. Night master agent started (Gemini). P2 spec r1 drafted.
 - 01:00 JST: night master generated (Gemini /u/3, prompts.md § Night master): `gen/master-night-1|2.png`. Coordinator pick: **2** → `target/master-night.png` (geometry matches master-day, warm amber windows + cool seams/field rings, crisper in-engine look; 1 is darker and grainier with fewer lit windows). Owner to confirm in the morning.
+
+## P1 r3 (2026-11-03 01:35 JST) — PASS
+
+- Decision: **pass**, merged `--no-ff` (051c632 merges `feat/city-taste-v2-p1` cd67a86). Hull reads as a white stepped mass at screen right, ring and arch white and on the target spots, nothing pierces a megastructure (`src/megaFootprints.ts` shared footprints filter district towers/pods/courts and skyway rings/spheres/links at construction). Uniform tree rows on every hull step are left to P5.
+- Removed for the megastructures: Grand Nikko and Hilton landmarks, context massing under footprints, district Meter towers at old slots 3/4/6 (7 of 10 remain), pods 0/2/15/18. `tests/districtMeters.test.ts` family-count asserts now follow the surviving towers (not a visibility assert).
+- Checks on the merge (coordinator): `npm test` exit 0, `npm run build` exit 0, `git diff --check` clean. FPS (agent): day 60 / night 60 median (vsync cap). Evidence `P1/r3/`.
