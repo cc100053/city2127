@@ -68,3 +68,8 @@ Coordinator session runs `artifacts/city-taste-v2/coordinator.md`: P1→P6 again
 
 - Decision: **polish again** → `artifacts/city-taste-v2/P1/spec-r2.md`. Ring and arch sit on the target's screen spots, seams glow at night; hull reads as tree shelves behind the dome towers, and the shell finish (metalness .45) reads grey-blue/chrome instead of the target's white.
 - Evidence: branch `feat/city-taste-v2-p1` e41bbdf, `artifacts/city-taste-v2/P1/r1/` on that branch. Checks (agent): `npm test`, `npm run build`, `git diff --check` pass; +7 draw calls; Grand Nikko dropped (inside hull footprint). FPS 60/60 day/night (vsync cap). No test assertions deleted.
+
+## P1 r2 (2026-11-02 23:05 JST)
+
+- Decision: **polish again (final round)** → `P1/spec-r3.md`. Ring/arch now matte white and read as megastructures; hull reads as a white stepped hull at screen right. Remaining: a district Meter tower pierces the hull (modelling fault), hull steps still read greener than the target's white lines.
+- Evidence: `feat/city-taste-v2-p1` 5aa5d34, `P1/r2/`. Agent checks pass; FPS 60/60 (vsync cap); +8 draw calls; Hilton dropped (inside new hull footprint), Grand Nikko dropped in r1.
