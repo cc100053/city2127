@@ -1,4 +1,5 @@
 import * as T from 'three';
+import { plazaDeck } from './plazaDeck.ts';
 import { addCityModel } from './modelAssets';
 import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
@@ -197,7 +198,8 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   // Each roof garden's terraces go to the district Meters (sails/forest) and take a few residents (stroll line, standing group).
   const roofGarden=(model:T.Object3D,tower?:boolean)=>{const terraces=plantRoofCanopy(scene,model,tower);publishRoofGardens(terraces);publishRoofWalks(model,terraces);};
   environment.traverse(object=>{if(object instanceof T.Mesh && object.name.startsWith('CTX_') && new T.Box3().setFromObject(object).max.y>30)roofGarden(object,true);});
-  await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1]) && !bodyFootprints().some(zone => inRect(zone, placement.positionBlender[0], -placement.positionBlender[1]))).map(async placement => {
+  scene.add(plazaDeck(scene)); // P4: the Aqua City lot is the civic plaza deck
+  await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1]) && placement.id !== 'aqua-city-odaiba' && !bodyFootprints().some(zone => inRect(zone, placement.positionBlender[0], -placement.positionBlender[1]))).map(async placement => {
     if(placement.id==='fuji-tv'){const core=civicCore();scene.add(core);publishOccupants(core.occupants);return;}
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);
     model.name = placement.id;
@@ -217,6 +219,6 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     const merged = bake(model); model.clear(); parts.forEach(geometry => geometry.dispose());
     merged.forEach(mesh => { mesh.name = placement.id; model.add(mesh); });
   }));
-  plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name)));
+  plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name) || object.name==='plaza-deck'));
   publishEntrances(scene,environment);
 }

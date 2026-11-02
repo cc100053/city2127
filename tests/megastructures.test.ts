@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { Box3, Group, Mesh, InstancedMesh } from 'three';
 import { ConcentrationDistrict } from '../src/districtMeters.ts';
-import { changeSites } from '../src/layout.ts';
+import { changeSites, PLAZA, plazaAt } from '../src/layout.ts';
 import { ARCH, FOOTPRINTS, groundContacts, HULL, inMega, inRect, megastructures, RING } from '../src/megastructures.ts';
 
 // P1: the three megastructures exist, reach their table heights (±25%) and stand clear of the Meter sites (+14 m) and the civic core.
@@ -28,4 +28,6 @@ for (const r of all) assert.ok(!inRect(r, -18, 23) && Math.hypot(r.cx + 18, r.cz
 // Nothing pierces a megastructure: no district tower or pod stands inside the shared footprint list.
 const district = new ConcentrationDistrict(new Group());
 for (const t of [...district.towers, ...district.pods]) assert.ok(!FOOTPRINTS.some(r => inRect(r, t.x, t.z)) && !inMega(t.x, t.z), `district structure at ${t.x},${t.z} stands inside a megastructure`);
+// P4: the plaza deck's corners stand clear of the megastructures.
+for (const [lx, lz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) { const [x, z] = plazaAt(lx * PLAZA.hu, lz * PLAZA.hv); assert.ok(!inMega(x, z, 4), `plaza corner ${x},${z} in a megastructure`); }
 console.log('megastructures ok');

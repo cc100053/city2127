@@ -58,7 +58,7 @@ export function plantCanopy(scene: T.Object3D, trees: { instances: { position: n
 
 /** r8 (user: 2127 form, same green volume): green gathers in dense clusters on engineered two-step terraces — a wide white-rimmed
  * lawn tier with a ring of crowns and a raised inner tier with taller ones — instead of trees spread evenly. [x, z, ground y, radius]. */
-function plantClusters(scene:T.Object3D,clusters:[number,number,number,number][],scale=1){
+export function plantClusters(scene:T.Object3D,clusters:[number,number,number,number][],scale=1){
   const trees:{position:number[];scale:number;type:string}[]=[],dummy=new T.Object3D(),n=clusters.length*2;
   const rims=new T.InstancedMesh(drum,trim,n),beds=new T.InstancedMesh(drum,leaf,n);
   clusters.forEach(([x,z,y,R],i)=>{

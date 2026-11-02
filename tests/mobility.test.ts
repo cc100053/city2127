@@ -93,7 +93,7 @@ for (let i = 0; i < 400; i++) {
 }
 assert.ok(dwelling > 0, 'no walker stops at a viewpoint');
 assert.ok(paces.size > 10 && Math.max(...paces) >= 23, 'walkers share one pace or nobody jogs');
-assert.deepEqual([0, 1, 2, 3, 4, 9, 14, 19].map(walkerRoute), [0, 1, 0, 1, 2, 3, 4, 5]);
+assert.deepEqual([0, 1, 2, 3, 4, 9, 14, 19].map(walkerRoute), [0, 1, 0, 1, 2, 3, 2, 3]); // P4: two mid-level decks left (the Aqua City ones went with the lot), so deck routes wrap at 2
 for (let i = 0; i < 60; i++) { const p = walkerParty(i); assert.ok(walkerParty(p.leader).leader === p.leader && walkerParty(p.leader).id === p.id); }
 assert.deepEqual([0, 1, 2, 3, 4, 5].map(i => walkerParty(i).size), [1, 2, 2, 3, 3, 3]);
 

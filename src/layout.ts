@@ -133,14 +133,22 @@ export const interchangeBoatLane: readonly P3[] = [[-380,-.6,-560],[-260,-.6,-44
 // Walkable mid-level skyways (deck top at the points, 9 m wide). Mid: Aqua City's east end to Hilton at 30 m, behind the PARK site from
 // the hero pose (r5 pass 3); Fuji chassis west face to Hilton at 40 m, south of the COMMONS PLAZA lot, so the gap reads layered (r6).
 export const midDecks: readonly (readonly P3[])[] = [
-  [[-183,30,-50],[-205,30.5,-30],[-228,30.5,-8],[-248,30,8]],
   [[-86,40,18],[-130,40.5,26],[-180,41,34],[-220,40.5,40],[-250,40,44]],
+];
+// P4 plaza deck (plazaDeck.ts) on the former Aqua City lot; local +z runs out to sea. `plazaAt` maps plaza-local metres to world x, z.
+export const PLAZA = { x: -92.3, z: -103.3, yaw: -2.55, hu: 80, hv: 40, h: 5 } as const;
+export const plazaAt = (lx: number, lz: number): [number, number] => [PLAZA.x + lx * Math.cos(PLAZA.yaw) + lz * Math.sin(PLAZA.yaw), PLAZA.z - lx * Math.sin(PLAZA.yaw) + lz * Math.cos(PLAZA.yaw)];
+const deckTop = PLAZA.h + .35;
+/** Elevated white walkways (deck top y at the points): ring plinth to the plaza, plaza to the civic core's landing, plaza to the hull apron. Walkers use them. */
+export const plazaWalks: readonly (readonly P3[])[] = [
+  [[72,12,-183],[42,14.5,-172],[10,13,-158],[...plazaAt(-92,12),8],[...plazaAt(-80,10),6.5],[...plazaAt(-62,8),deckTop]],
+  [[...plazaAt(-20,-34),deckTop],[...plazaAt(-14,-54),8],[-34,12,-64],[-48,11,-45],[-38,7,-22],[-34,3.2,-4]],
+  [[...plazaAt(60,-6),deckTop],[...plazaAt(92,-10),9],[-195,11,-45],[-208,7,-10],[-212,3.2,18]],
 ];
 // Planted mid-level decks (r6 pass 3, target v2's tree-lined middle layer; 5.2 m lawn bed down the middle). Raycast-checked against the
 // environment, landmarks and Fuji chassis: clear between their docked ends, and off every survey site's line of sight from the hero pose.
 export const gardenDecks: readonly (readonly P3[])[] = [
   // DECKS south face over the open ground to a landing on Aqua City's planted roof (30 m).
-  [[150,40,-222],[150,39,-195],[125,37,-168],[85,35.5,-150],[40,34.5,-145],[20,34.5,-142]],
   // The 151 m tower down to DECKS' east face at 42 m.
   [[252,42,-346],[250,42,-315],[232,42,-290],[195,42,-281],[168,42,-280]],
 ];
@@ -158,8 +166,7 @@ export const changeSites = {
 
 // 2127 retrofit (src/odaiba2127.ts). Sky bridges at 24 m between facade points found by raycast; each clear of all other geometry.
 export const skyBridges: readonly {name:string;from:P3;to:P3}[] = [
-  {name:'AQUA ↔ FUJI TV',from:[-49,24,-90],to:[-15,24,-32]}, // crosses 10 m above the guideway trains
-  {name:'AQUA ↔ DECKS',from:[31,24,-177],to:[90,24,-216]},
+  // P4 r1: Aqua City became the plaza deck (plazaDeck.ts); both bridges began at its facades, so they are gone (the plaza walkways replace them).
 ];
 // Floating decks off the east promenade: [x, z, yaw], 10 × 36 m, long axis along the shore; on water and 30 m from boat routes.
 // North shore: seaward edge of COAST_REVETMENT from the DECKS pier west past Hilton, traced from the district GLB (x, z). The tidal edge steps down into the sea from it.
