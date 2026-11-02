@@ -29,6 +29,9 @@ Hero 層（`src/` hero 構件、`SHOTS` hero）；`docs/ODAIBA_2127_REFERENCES/C
 - Gemini target 候選（2026-11-02，Sonnet agent 經 Claude in Chrome、`/u/3`，各 1 次）：`gen/hero-day.png`、`gen/hero-night.png`（2730×1536）；對照 `vs-gen.jpg`（左底圖｜右候選）。日：9 塊 panel，鏡頭同塔比例輕微走樣，左上 panel 標題亂碼。夜：11 塊 panel，鏡頭最貼底圖，日文清楚。兩張角落 UI 字都被改壞（實作唔郁 UI）。等 owner 揀圖入 `target/`。
 - Owner 睇 R1：位置 OK，hologram「好膠」，要跟參考圖重做設計。R2（prompts.md「R2 重做風格」，R1 候選 + `reference.webp` 兩圖上傳）：`gen/r2-hero-{day,night}{,-2}.png`；對照 `vs-r1-r2.jpg`（左 R1｜右 R2 -2）。進步：地球、人像變 wireframe，邊線細咗、有 corner bracket。仍然膠：大部分 panel 仲有半透明 teal／紫色底、直幡同廣告似實色卡、柱未拆。Gemini 5 小時額度用晒。
 
+- Owner 2026-11-02：**位置跟 R2（夜）、design 完全跟參考圖**。`target/hero-layout-night.png`（= `gen/r2-hero-night-2.png`，只管位置）、`target/hologram-style.webp`（= `reference.webp`，只管物料）。
+- `artifacts/hero-holograms/spec.md` R1：13 塊 panel（畫面座標 + 落位方法）、三層物料（玻璃 pane／additive 發光內容／halo）、3D wireframe 地球、`voices` live panel（Meter tier 柱 + 提案數）、程式位置、測試、截圖同 FPS 要求。
+
 ## Actual validation results
 
 - Verification status: NOT RUN
@@ -45,4 +48,4 @@ NONE
 
 ## Next expected step
 
-Sonnet agent 用 Gemini 由 `baseline/` 生成 `gen/` 候選；owner 揀圖抄入 `target/`；之後寫 `spec.md`。
+Owner 確認 `spec.md` 後，Sonnet agent 按 spec 做 R1 實作同截圖（`r1/`），Opus 審核後交 owner。
