@@ -179,3 +179,76 @@ Owner：質感問題係內容。參考圖每塊 panel 係**一個大字**（例�
 - `tests/heroHolograms.test.ts`：每塊 ≤ 2 段字；主字 ≥ 30 px、副字 ≥ 20 px（`glyphs()`）；`voices` 副字 = 「1,284件」（`setVoices(1284)`）；`culture` 有「フジ」「文化放送」；仍然冇拉丁字母；視線測試照舊。
 - 截圖存 `r3/`：`hero-h16.png`、`hero-h21.png`、`vs-target.jpg`（每行 R2｜參考圖裁片｜R3，日夜各一行）、`panels-crop.jpg`（日間每塊原尺寸）。
 - FPS 同前（1920×1080，hour 16／21）。
+
+---
+
+# R4（2026-11-02）— 減三塊、玻璃發光、加密細節
+
+Owner：拿走三塊冇咁重要嘅 panel（而家太多），其餘繼續打磨質感。
+
+## A. 刪走（Opus 揀，最次要、最搶畫面）
+
+- `newgen`「新世代」、`release`「新発売」：兩塊細廣告，冇資訊，擠喺天際線。
+- `smartlife`「スマートライフ」：直幡擋住 Civic Core 左邊，同 `daily` 重複。
+- 由 `HOLOGRAMS`、`heroHolograms.ts`、測試全部刪除（包括只俾佢哋用嘅 icon 函數）。剩 10 塊：`district`、`transit`、`air`、`voices`、`tide`、`daily`、`culture`、3 個 tag。
+
+## B. 玻璃要有內發光（參考圖最大分別）
+
+- Pane 改為**飽和藍青玻璃**：canvas 漸變 fill，邊緣較亮（`#2fb8e0`，alpha .55）→ 中間較深（`#0a4a66`，alpha .35），即係邊緣內發光；夜間同一組顏色，整體 opacity 低一級。
+- 內框：外框入面 4% 再加一條淡青細線（alpha .3），玻璃厚度感。
+- 頂部一條斜向淡白反光帶（alpha .08，佔高度 15%），似玻璃反光。
+- 主字底嘅深色片取消：主字靠玻璃深色中心 + 實色字自己讀得清；如果日間讀唔清，只加柔邊（羽化 ≥ 主字高 40%）嘅暗暈，唔好有硬邊方塊。
+- `culture`、`daily` 用同一套，只係將青換做柔紫（`#a98cf0`／`#3a2a66`）。
+
+## C. 細節密度（目標：參考圖左邊「2127」）
+
+- `district`：加淡日本地形輪廓（東京灣海岸線，簡化 polyline，alpha .3）喺地球後面；地球外兩層 `arcGauge`（唔同半徑，反向缺口）；四角 `crosshair` 或細 L；右邊主字下加 `dataBlocks`。
+- 每塊資訊 panel 細節件數由 3–5 加到 5–7，但唔可以壓住主字（主字周圍留主字高 30% 嘅淨空）。
+- 背景加一層淡 hex 網或點陣（alpha .12），鋪滿玻璃。
+
+## D. `voices` 間距
+
+- 「住民の声」主字同「N件」分開兩行或左右分開，中間淨空 ≥ 副字高；用 `setVoices(99999)` 試最長數字都唔可以撞（加測試）。
+
+## E. 測試同截圖
+
+- 測試：panel 數 = 10；`newgen`／`release`／`smartlife` 唔存在；`voices` 99,999件 唔撞主字（用 `glyphs()` bbox）；其他照舊。
+- 截圖 `r4/`：`hero-h16.png`、`hero-h21.png`、`vs-target.jpg`（每行 R3｜參考圖 panel 裁片｜R4）、`panels-crop.jpg`。
+- FPS 同前。
+
+## R4 追加（2026-11-02，owner）— 再刪兩塊、改為居民尺度
+
+Owner：再刪兩塊；hologram 係俾城入面嘅居民睇，所以距離同大細要改。以下取代 R1–R4 嘅「由 hero 相機射 ray 落位、面向 hero」做法。
+
+### F. 再刪
+
+- `daily`「未来の日常」（同 `culture` 重複廣告角色）、`tide`「水位 安定」（同 `air` 重複環境數據，又坐喺前景中央）。刪除方式同 A。
+- 剩：`district`、`transit`、`air`、`voices`、`culture`、3 個 tag。
+
+### G. 居民尺度落位（貼建築／廣場，面向街道）
+
+每塊錨定喺一個真實嘅居民場景，朝向嗰度嘅行人視點（眼高 1.6 m），唔再面向 hero：
+
+| id | 錨點（喺 code／layout 搵實際位置，用 raycast 確認貼得到） | 闊 | 底邊高度 | 朝向 |
+|---|---|---|---|---|
+| `transit` | ゆりかもめ台場駅（或最近嘅 Yurikamome 站／行人 deck）入口上方 | 10–14 m | deck 上 6–10 m | 面向站前行人 deck，向下傾 10° |
+| `voices` | 居民聚集嘅公共廣場（揀 hero 睇得到、唔係四個 site 橙框入面嘅廣場或 deck） | 12–16 m | 地面上 8–12 m | 面向廣場中心 |
+| `air` | 住宅塔立面中段，貼牆（離牆 1–2 m 浮） | 8–12 m | 25–40 m | 面向下面條街，向下傾 15° |
+| `district` | 城市級地標屏：Civic Core 或旁邊大樓面向主廣場／主行人軸嘅立面 | 24–32 m | 40–70 m | 面向主廣場 |
+| `culture` | Fuji TV 媒體立面（球體附近），面向廣場 | 18–24 m | 30–55 m | 面向廣場 |
+| `tag-a/b/c` | 行人天橋／路口嘅細導向標 | 3–5 m | 地面或 deck 上 5–8 m | 面向行人流向 |
+
+- 主字高度 ≥ 該 panel 主要觀看距離 / 40（例如 60 m 外睇 → 主字 ≥ 1.5 m）；寫入測試（以世界米計）。
+- Hero 鏡頭唔再要求主字 ≥ 30 px；改為：每塊喺 hero 截圖入面最少部分可見（唔被完全遮住），而且仍然唔遮四個 site 橙框、Civic Core 核心（視線測試照舊）。
+- 浮動幅度縮細到 ±0.15 m（貼牆嘅零浮動），因為貼近建築。
+- `HOLOGRAMS` 每項加錨點名（comment 一行）同 `face`（面向嘅世界點），取代 hero 眼位。
+
+### H. 日間玻璃
+
+- R4 日間截圖玻璃太實太奶白，似磨砂板：日間 pane 整體 opacity 再降（目標邊緣發光保留、中心可以睇穿後面建築），報告最後數值。
+
+### I. 截圖（`r4/`，取代之前未完成嘅一套）
+
+- `hero-h16.png`、`hero-h21.png`、`vs-target.jpg`（R3｜參考圖裁片｜R4）。
+- **居民視角**：每塊一張 `street-<id>-h16.png`（`?review=street&cam=x,y,z&at=x,y,z&reviewTime=40&hour=16`，相機喺行人眼高 1.6–3 m、距離 panel 30–80 m），另加 `street-voices-h21.png`。
+- FPS 同前。

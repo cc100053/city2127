@@ -52,10 +52,18 @@ Hero 層（`src/` hero 構件、`SHOTS` hero）；`docs/ODAIBA_2127_REFERENCES/C
 - 位置改動：`release` .075、`smartlife` .04（v .33）、`daily` .035（.675,.44）放得落 30 px 主字；`air` 移到 (.40,.53) 避 pod。
 - Opus 審核（`r3/vs-target.jpg` 中間欄係參考圖 panel 裁片）：主字清楚有力，比 R2 更似參考圖。仍差：參考圖玻璃係飽和藍青、有內發光，我哋較淡較灰；細節密度比參考圖「2127」疏；「住民の声」同「120件」貼得太近；日間主字下面深色片似字幕底。
 
+## R4（2026-11-02，減至 8 塊、居民尺度）
+
+- Owner：先刪 `newgen`、`release`、`smartlife`，再刪 `daily`、`tide`；hologram 係俾城入面居民睇，改為貼建築／廣場、面向街道（spec「R4」同「R4 追加」F–I）。
+- 剩 8 塊，全部錨定實際位置、真實尺寸、面向居民眼高（`HOLOGRAMS` 有 `face`）：`district` 28×21 m、`culture` 22×16.5 m（Fuji TV 框架北牆，60 m 梁上／下）；`transit` 10×5 m（Fuji podium，ゆりかもめ deck 站前）；`air` 10×5 m、`voices` 16×12 m（Aqua City 海邊立面）；3 個 tag 4×1.35 m（天橋上）。主字高 ≥ 觀看距離 / 40（測試以米計）。
+- 玻璃：中心 `#0a4a66` alpha .3 睇得穿、邊緣 `#2fb8e0` 發光、內框、頂部反光、只喺字下面有羽化暗暈；日 opacity .85、夜 .7。細節加密（hex 網、海岸線）；`voices` 主字同件數分兩行（測試 99,999件）。
+- 街景截圖用 `?review=ring&cam=…&at=…`（`review=street` 會限制 polar angle，相機升高）。
+- Opus 審核（`r4/hero-h16.png`、`r4/panels-crop.jpg` 街景）：街景好睇，`voices`、`air`、`culture`、`transit` 似真實城市屏幕。代價：hero 全景入面 panel 差唔多睇唔到（細，`district`／`culture` 喺 Civic Core 梁後面）；`district` 街景底邊被 60 m 梁切；tag 太細太平淡，`tag-c` 街景被樹遮。
+
 ## Actual validation results
 
 - Verification status: PARTIAL（owner 目視未做）
-- Date and checked commit/worktree: 2026-11-02，R1 同 R2 worktree 改動（commit 見 git log）；R2：Opus 重跑 root `npm test` exit 0、`npm run build` exit 0、`git diff --check` clean；Sonnet 量 FPS hour 16 60.0（draws 1081）、hour 21 60.0–60.1（draws 1082），textures 47 → 59；R3：Opus 重跑 `npm test`／`npm run build` exit 0、`git diff --check` clean；Sonnet 量 hour 16／21 60.0 FPS（draws 1081／1082）
+- Date and checked commit/worktree: 2026-11-02，R1 同 R2 worktree 改動（commit 見 git log）；R2：Opus 重跑 root `npm test` exit 0、`npm run build` exit 0、`git diff --check` clean；Sonnet 量 FPS hour 16 60.0（draws 1081）、hour 21 60.0–60.1（draws 1082），textures 47 → 59；R3：Opus 重跑 `npm test`／`npm run build` exit 0、`git diff --check` clean；Sonnet 量 hour 16／21 60.0 FPS（draws 1081／1082）；R4：Opus 重跑 `npm test`／`npm run build` exit 0、`git diff --check` clean；FPS **未確認**：Sonnet 量到 hour 16 約 40–41（hologram 隱藏都係 40.2）、hour 21 約 40.5–40.8，當時機器 load average 約 3（Opus 16:04 再睇仍然 2.98），所以係機器繁忙，唔係 hologram（只加 26 draws、48 triangles）；要喺空閒機器重量 60 FPS
 - Commands/manual checks and results: Opus 重跑 root `npm test` exit 0（含新 heroHolograms test：13 panel、冇拉丁字母、四 site／Civic Core／畫面中心視線清、tier clamp、「提案 1,284件」）、`npm run build` ✓、`git diff --check` clean。survey／module-swap 冇改，冇跑。
 - FPS（Sonnet 量，development Mac headless Chrome，1920×1080，vsync，load 25 s 後讀 canvas `data-fps`）：hour 16 60.0（draws 1081，hologram 隱藏 1039），hour 21 60.0（draws 1082）；triangles +80。
 - Evidence: `artifacts/hero-holograms/r1/`（`hero-h16.png`、`hero-h21.png`、`vs-target.jpg`、`style-crop.jpg`）

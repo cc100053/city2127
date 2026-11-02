@@ -69,26 +69,29 @@ export const sweepway: readonly P3[] = [[-290,92,265],[-345,74,250],[-400,56,205
 // Sky Ring (空の環, src/skyRing.ts): a 700 m truss ring whose deck top sits at `deck` m, a shared port above the regional air tier; the district
 // loop follows its plan below. Above the hero eye (~148 m) so it arcs across the sky; at the tier's own 160–170 m it read as a flat bar at eye level.
 export const SKY_RING = {x:-40,z:-40,rx:350,rz:350,deck:250} as const;
-// Hero holograms (src/heroHolograms.ts, artifacts/hero-holograms/spec.md): 13 floating information panels and fictional 2127 adverts, placed once from
-// the hero camera as the page settles it (`eye`, DEV measurement 2026-11-02). Each centre sits 0.82 × d along the ray through the target's screen point
-// (d = nearest solid distance under the panel's footprint, 540 m where it hangs over open sky), so every panel floats clear of what it overlaps, keeps its screen spot and size at
-// 1600 × 900 and faces `eye` once (no billboarding). at = centre, w × h = size, all metres.
+// Hero holograms (src/heroHolograms.ts, artifacts/hero-holograms/spec.md): 8 holographic panels at resident scale. Each hangs at a real anchor found by raycast against the
+// loaded city (2026-11-02) and faces the pedestrian eye it is meant for, not the hero camera. at = panel centre, w x h = size, face = the world point it turns towards
+// (the walkers' eye, lowered so a high panel tilts down by about 10-15 degrees instead of craning), view = the main viewing distance in metres (main word >= view / 40).
+// `eye` is only the settled hero camera, kept for the hero visibility and sightline tests.
 export const HOLOGRAMS = {
   eye: [-358,148,-437] as P3,
   panels: [
-    {id:'district',at:[70,131,-185] as P3,w:95,h:71},
-    {id:'transit',at:[-38,84,-265] as P3,w:60,h:30},
-    {id:'smartlife',at:[11,137,-100] as P3,w:27,h:115},
-    {id:'air',at:[-25,68,-119] as P3,w:61,h:30},
-    {id:'newgen',at:[-127,162,-60] as P3,w:45,h:30},
-    {id:'release',at:[-206,148,-21] as P3,w:45,h:45},
-    {id:'voices',at:[-178,85,-163] as P3,w:50,h:38},
-    {id:'daily',at:[-224,115,-149] as P3,w:15,h:76},
-    {id:'culture',at:[-265,96,-149] as P3,w:63,h:47},
-    {id:'tide',at:[-190,40,-237] as P3,w:54,h:22},
-    {id:'tag-a',at:[-11,158,-162] as P3,w:21,h:7},
-    {id:'tag-b',at:[-74,155,-97] as P3,w:21,h:7},
-    {id:'tag-c',at:[-305,131,2] as P3,w:21,h:7},
+    // Civic Core (Fuji TV frame) north wall z -2.7, above the 65 m beam, facing the main plaza north of it
+    {id:'district',at:[39,80.5,-6.5] as P3,w:28,h:21,face:[30,60,-80] as P3,view:100},
+    // Daiba station front: Fuji podium north-east face (curved, top 24 m) above the Yurikamome deck, facing the plaza and station forecourt
+    {id:'transit',at:[17.7,20.5,-38] as P3,w:10,h:5,face:[33.8,16,-59.4] as P3,view:28},
+    // Aqua City seaward facade (flat to 30 m, plane -0.55x - 0.83z = 183.4), upper floors, facing the seaside promenade
+    {id:'air',at:[-137.3,29.5,-131.8] as P3,w:10,h:5,face:[-155.7,20,-159.6] as P3,view:35},
+    // Aqua City seaward facade at the avenue, residents' voice board 9 m above the ground, facing the promenade lawn
+    {id:'voices',at:[-108.2,15,-151] as P3,w:16,h:12,face:[-132.2,3,-187.2] as P3,view:45},
+    // Fuji TV media wall (the same z -2.7 wall, above the 44 m ledge and under the 60 m beam), facing the main plaza
+    {id:'culture',at:[40,50.25,-6.5] as P3,w:22,h:16.5,face:[40,35,-62] as P3,view:65},
+    // Sky bridge Aqua City <-> Fuji TV (deck 24 m): direction sign 6.5 m over the deck facing walkers who come from the Aqua City end
+    {id:'tag-a',at:[-32,30.5,-61] as P3,w:4,h:1.35,face:[-49,28,-90] as P3,view:30},
+    // Sky bridge Aqua City <-> DECKS: sign 6.5 m over the deck facing walkers from the Aqua City end
+    {id:'tag-b',at:[60.5,30.5,-196.5] as P3,w:4,h:1.35,face:[31,28,-177] as P3,view:30},
+    // Garden deck DECKS <-> Aqua City roof (deck 35.5 m): sign 6.5 m over the deck facing walkers from the Aqua City landing
+    {id:'tag-c',at:[85,42,-150] as P3,w:4,h:1.35,face:[55.3,37.5,-146.4] as P3,view:30},
   ],
 } as const;
 // Air-taxi corridors: a district loop above every landmark and tall site, and an approach from the bay that ends above the sphere berth.

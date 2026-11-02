@@ -209,7 +209,7 @@ After several polish rounds the owner judged the city plausible but not readable
 
 ## Owner amendment (2026-11-02): hologram media in the hero panorama
 
-The hero panorama may carry holographic information panels and fictional 2127 adverts (civic data, transit wayfinding, a live resident-voice meter, culture broadcast), made of light as in `artifacts/hero-holograms/target/hologram-style.webp`: near-clear pale glass, thin glowing edges, line-art content, no poles, no solid colour fills (Meter colours stay the only saturated accent). §15 "Media taste" still holds at close-up and street scale; this amendment applies to the hero frame only.
+The city may carry a few holographic information panels and fictional 2127 adverts (civic data, transit wayfinding, a live resident-voice meter, culture broadcast), made of light as in `artifacts/hero-holograms/target/hologram-style.webp`: near-clear pale glass, thin glowing edges, line-art content, no poles, no solid colour fills (Meter colours stay the only saturated accent). They hang at resident scale on real building walls, decks and station fronts, facing the people they are for (eight panels in total); §15 "Media taste" still holds everywhere else (no free-floating holograms, no advert density).
 
 ---
 
@@ -687,7 +687,7 @@ Avoid:
 
 Technology should feel mature enough that it no longer needs to constantly advertise itself.
 
-Owner amendment (2026-11-02): the hero panorama may carry hologram information panels and fictional 2127 adverts, with materials following `artifacts/hero-holograms/target/hologram-style.webp`; close-up and street levels stay as above (see the hero amendments before §4).
+Owner amendment (2026-11-02): the hero panorama may carry hologram information panels and fictional 2127 adverts, with materials following `artifacts/hero-holograms/target/hologram-style.webp`; they are a handful of wall-mounted panels at resident scale, and the rest of the street stays as above (see the hero amendments before §4).
 
 ---
 
