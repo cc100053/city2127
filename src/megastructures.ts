@@ -21,7 +21,7 @@ megaGlass.onBeforeCompile = shader => {
   shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 megaP;').replace('#include <project_vertex>', '#include <project_vertex>\nmegaP = (modelMatrix * vec4(transformed, 1.)).xyz;');
   shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float roomGlow;\nvarying vec3 megaP;')
     .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-    totalEmissiveRadiance += vec3(1., .72, .4) * roomGlow * 1.05 * step(.4, fract(sin(dot(floor(vec2((megaP.x + megaP.z) / 6., megaP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453));`);
+    totalEmissiveRadiance += vec3(1., .58, .24) * roomGlow * .74 * step(.4, fract(sin(dot(floor(vec2((megaP.x + megaP.z) / 6., megaP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453));`);
 };
 megaGlass.customProgramCacheKey = () => 'mega-glass';
 const megaJoint = new T.MeshStandardMaterial({ color: '#4b5258', roughness: .6, metalness: .3 });

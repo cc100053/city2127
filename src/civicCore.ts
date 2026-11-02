@@ -18,12 +18,12 @@ export function civicCore() {
   // Warm occupied rooms follow the existing city clock, using one shared finish for this building.
   const publicLight=cityLight.clone();publicLight.color.set('#f2dcb4');publicLight.emissive.set('#ffd29c');publicLight.emissiveIntensity=1;
   publicLight.onBeforeCompile=shader=>{
-    shader.uniforms.roomLight={get value(){return 1.15+cityLight.emissiveIntensity*.55;}};
+    shader.uniforms.roomLight={get value(){return 1.15+cityLight.emissiveIntensity*.55;}};shader.uniforms.roomNight={get value(){return Math.min(1,Math.max(0,(cityLight.emissiveIntensity-.15)/1.3));}};
     // Each ~5×6 m room cell gets its own light level, and upward-facing floors glow less than ceilings and screens,
     // so stacked workrooms read as separate occupied rooms with depth instead of one flat lit slab.
     shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vRoomPos;\nvarying float vRoomUp;')
       .replace('#include <project_vertex>','#include <project_vertex>\nvRoomPos=(modelMatrix*vec4(transformed,1.)).xyz;\nvRoomUp=normalize(mat3(modelMatrix)*objectNormal).y;');
-    shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nuniform float roomLight;\nvarying vec3 vRoomPos;\nvarying float vRoomUp;')
+    shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nuniform float roomLight,roomNight;\nvarying vec3 vRoomPos;\nvarying float vRoomUp;')
       .replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>
         float roomCell=fract(sin(dot(floor(vRoomPos.xz/vec2(5.,6.))+floor(vRoomPos.y/9.)*vec2(7.,3.),vec2(12.9898,78.233)))*43758.5453);
         float roomFloor=smoothstep(.5,.9,vRoomUp);
@@ -33,7 +33,7 @@ export function civicCore() {
         float theatreR=length(vRoomPos-vec3(-18.,100.,23.));
         float theatreWall=smoothstep(23.,23.12,theatreR)*(1.-smoothstep(23.28,23.4,theatreR));
         // Wider per-room contrast and dim, desaturated floors: stacked rooms stop reading as clipped amber shelves.
-        totalEmissiveRadiance *= roomLight*(.4+1.1*roomCell)*mix(vec3(1.),vec3(.2,.21,.24),roomFloor)*mix(1.,.45,theatreWall);
+        totalEmissiveRadiance *= roomLight*(.4+1.1*roomCell)*mix(vec3(1.),vec3(.8,.62,.4),roomNight)*mix(vec3(1.),vec3(.2,.21,.24),roomFloor)*mix(1.,.45,theatreWall);
         // The inner theatre shell has a dark painted finish: daylight through the glass no longer turns the dome pale lilac.
         diffuseColor.rgb*=mix(1.,.18,theatreWall);
         // The theatre wall carries a violet stage wash, so the whole auditorium glows blue-violet around the warm rig.

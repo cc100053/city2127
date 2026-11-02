@@ -91,11 +91,11 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
       float seamLine = seam;`)
       // Panes are glass: glossy and partly metallic so they pick up the sky instead of reading as flat dark dots.
       .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, .14, pane);\nmetalnessFactor = mix(metalnessFactor, .4, pane);')
-      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1., .72, .4) * pane * (curtainGlow * occupied + curtainNight * .3) + vec3(.81, .91, 1.) * seamLine * curtainSeam * 1.6;');
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += mix(vec3(1., .72, .4), vec3(.7, .41, .17), curtainNight / .15) * pane * (curtainGlow * occupied + curtainNight * .3) + vec3(.81, .91, 1.) * seamLine * curtainSeam * 1.6;');
   };
   material.customProgramCacheKey = () => 'curtain-wall';
 }
-const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a'), dayGlow = .14; // r5 pass 2: warmer lit bands by day (target v2's golden hotel glazing)
+const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a'), amber = new T.Color('#ff9440'), dayGlow = .14; // r5 pass 2: warmer lit bands by day (target v2's golden hotel glazing)
 const glazingNight = { value: 0 };
 // Hero atmosphere: at night about half the 6 m × 4.2 m glazing cells go dark (world-space hash), so lit rooms read as scattered life, not a lamp.
 function nightRooms(material: T.MeshStandardMaterial) {
@@ -114,7 +114,7 @@ function nightRooms(material: T.MeshStandardMaterial) {
 export function updateOdaiba(night: number) {
   // A faint daytime glow keeps the dark glazing reading as occupied, warm interiors (CITY_MASTER_TASTE) instead of voids.
   // Hero atmosphere: night keeps a light hierarchy — fewer, brighter lit rooms and scattered lit floors, so landmarks lead.
-  for (const material of glazing) material.emissiveIntensity = dayGlow + night * (.7 - dayGlow);
+  for (const material of glazing) { material.emissive.copy(warm).lerp(amber, night); material.emissiveIntensity = dayGlow + night * (.5 - dayGlow); } // P7 r2: saturated, lower-energy amber survives tonemapping
   glazingNight.value = night;
   curtainGlow.value = .15 + night * .8; curtainNight.value = night * .15; curtainSeam.value = .6 + night * 1.6; towerGlow.value = .3 + night * .9; towerNight.value = night;
   updateMegastructures(night); updatePlaza(night);
