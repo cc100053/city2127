@@ -1,7 +1,7 @@
 # elevator-closeup-lod — 軌道升降機中距離近景 LOD
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — owner accepted the near LOD after R3; R4 explore wiring done, visual acceptance pending
+- Status: DONE — owner accepted R4 (look and copy) 2026-11-02; merged to main
 - Branch: `feat/elevator-closeup-lod`
 - Base commit: 27899d543bbb5ae468875033e0616fdff9cd7906
 - Last verified commit: R4 commit on `feat/elevator-closeup-lod` (checks below ran on the committed tree)
@@ -70,10 +70,6 @@ Symptoms at E1, cause:
 - 2026-11-02 owner: targets = Gemini day-1 / night-1 (`target/`); elevator position unchanged, the targets' column foot in the sea is not followed (base keeps sinking behind the horizon).
 - Rounds: R1 near model + DEV toggle only; R2 explore wiring (spec after R1 is accepted). Spec: `artifacts/elevator-closeup-lod/spec.md`.
 
-## Next expected step
-
-R1: Sonnet implements `spaceElevatorNear` per spec, captures `r1/`; Opus reviews; owner judges `r1/vs-target.jpg`.
-
 ## R1 (2026-11-02)
 
 - Sonnet implemented `spaceElevatorNear(scene, far)` in `src/spaceElevator.ts` (lazy build, 6 baked batches + 3 unbaked climbers, lit `MeshStandardMaterial`, own height haze, no fog/shadows/AO), DEV `cityElevatorNear(on)` / `?elevatorNear`, test asserts. Deviation from spec: window band sits 3 m proud between 6 m lips (−8 m buried it); undersides darkened up to 40% in the shader.
@@ -105,4 +101,4 @@ R1: Sonnet implements `spaceElevatorNear` per spec, captures `r1/`; Opus reviews
 
 ## Next expected step
 
-Owner judges `r4/` (day/night step captures, hero check) and the step-3 copy. On acceptance: merge to main per CONTRIBUTING, confirm main CI.
+None. Owner accepted R4 2026-11-02 ("Accept, merge"); merged `--no-ff` to main (integration checks in VALIDATION). Known visual gaps the owner accepted: sparse tufts, ring-stack climbers, pale day window bands, plain docking bays. Follow-ups if wanted: headed vsync FPS, iPad end-to-end with `survey dev:auto`, exhibition machine.
