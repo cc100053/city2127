@@ -17,14 +17,11 @@ type Pose = { position: T.Vector3; target: T.Vector3 };
 const a = berthAngle(EXPLORE_BERTH), park = berthPark(EXPLORE_BERTH);
 const out = new T.Vector3(Math.cos(a), 0, Math.sin(a)), along = new T.Vector3(-Math.sin(a), 0, Math.cos(a));
 const near = (o: number, t: number, y: number, look: T.Vector3): Pose => ({ position: park.position.clone().addScaledVector(out, o).addScaledVector(along, t).setY(y), target: look });
-/** Owner picks one berth pose (DEV `&exploreShot=`); the whole-ring pose looks up from outside the hero-side rim, so the hanging voice nodes read against the sky. */
+/** Berth pose `side` (owner pick 2026-11-02); the whole-ring pose looks up from outside the hero-side rim, so the hanging voice nodes read against the sky. */
 export const EXPLORE_SHOTS = {
   side: near(75, 70, park.position.y + 14, park.position.clone().addScaledVector(out, 5).setY(park.position.y - 4)),
-  low: near(95, 40, 215, park.position.clone().addScaledVector(out, -10).setY(park.position.y - 2)),
-  high: near(60, 55, park.position.y + 50, park.position.clone().addScaledVector(out, 8).setY(park.position.y - 6)),
   ring: { position: new T.Vector3(SKY_RING.x, 0, SKY_RING.z).addScaledVector(out, 760).setY(150), target: new T.Vector3(SKY_RING.x, 250, SKY_RING.z) },
 } satisfies Record<string, Pose>;
-export type BerthShot = Exclude<keyof typeof EXPLORE_SHOTS, 'ring'>;
 
 const bezier = (p0: T.Vector3, p1: T.Vector3, p2: T.Vector3, u: number, into = new T.Vector3()) =>
   into.copy(p0).multiplyScalar((1 - u) ** 2).addScaledVector(p1, 2 * u * (1 - u)).addScaledVector(p2, u * u);
@@ -60,7 +57,6 @@ const heroPosition = new T.Vector3(...HERO_POSITION), heroTarget = new T.Vector3
 export class GuestExplore {
   /** Accumulated proposals, shown under the caption. */
   voices = 0;
-  shot: BerthShot = 'side';
   private look: ExploreLook | null = null;
   private returning = false;
   private started = 0;
@@ -103,7 +99,7 @@ export class GuestExplore {
       if (blend >= 1) { this.returning = false; this.controls.enabled = true; }
       return;
     }
-    const berth = EXPLORE_SHOTS[this.shot], wide = EXPLORE_SHOTS.ring, k = this.look!.ordinal - 1;
+    const berth = EXPLORE_SHOTS.side, wide = EXPLORE_SHOTS.ring, k = this.look!.ordinal - 1;
     this.panel.hidden = false;
     this.note.textContent = `住民の声 ${this.voices}件 · iPadの「戻る」で街の全景へ`;
     if (reducedMotion) {

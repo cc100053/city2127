@@ -101,7 +101,7 @@ try {
   await city.screenshot({ path: join(evidence, 'resident-p4-maintained-city.png') });
   const inherited = await read('/api/city-view');
   assert.equal(inherited.guestCount, 1);
-  await screen(guest, 'welcome');
+  await guest.waitForFunction(() => document.querySelector('#app')?.dataset.screen === 'welcome', null, { timeout: 45_000 });
   await answer(guest, 2);
   assert.deepEqual(await read('/api/city-view'), inherited, 'next guest inherits city before submitting');
   await guest.locator('[data-auto-action=submit]').tap(); await screen(guest, 'result');

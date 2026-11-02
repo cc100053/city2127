@@ -2,7 +2,7 @@ import './debug.css';
 import type { ExhibitionState } from '../shared/citySurveyState.ts';
 import type { ExploreTarget, ProposalData, ProposalRequest, ProposalSessionData } from '../shared/protocol.ts';
 import { api, connectEvents, el, newAnswerId } from './debugApi.ts';
-import { DISPLAY_MS, HANDOFF_MS } from '../shared/displayTiming.ts';
+import { DISPLAY_MS } from '../shared/displayTiming.ts';
 import { buildProposalRequest } from './guestFlow.ts';
 
 const app = document.querySelector<HTMLElement>('#app')!;
@@ -43,6 +43,8 @@ let recoveryUnavailable = false;
 /** This guest has turned the shared screen to a landmark; the other station's guest holds it. */
 let exploring = false;
 let othersExploring = false;
+/** The handoff screen stays up this long so the guest can still choose 空の環を見る (owner 2026-11-02); the server lease is unchanged. */
+const EXPLORE_OFFER_MS = 20_000;
 
 const axisNames: Record<keyof ExhibitionState['scores'], string> = {
   automation: '自動化', publicSharing: '公共共有',
@@ -525,7 +527,7 @@ function renderHandoff() {
       action('はじめる画面へ', nextGuest, !exploring)));
   focusTitle();
   // While this guest looks at a landmark the screen waits for 戻る, the next Start or a new result; staff end a forgotten one.
-  if (!exploring) flowTimer = window.setTimeout(nextGuest, Math.max(HANDOFF_MS, resultEndsAt - performance.now()));
+  if (!exploring) flowTimer = window.setTimeout(nextGuest, Math.max(EXPLORE_OFFER_MS, resultEndsAt - performance.now()));
 }
 
 async function explore(target: ExploreTarget | null) {
@@ -639,7 +641,7 @@ if (new URLSearchParams(location.search).has('dev-auto')) {
   void import('./autoAnswerPanel.ts').then(({ mountAutoAnswerPanel }) => mountAutoAnswerPanel({
     async start(signal) {
       // Result/handoff use chained timers that a hidden tab may delay; never race them.
-      for (const deadline = Date.now() + DISPLAY_MS + HANDOFF_MS; (screen === 'result' || screen === 'handoff') && Date.now() < deadline;) {
+      for (const deadline = Date.now() + DISPLAY_MS + EXPLORE_OFFER_MS; (screen === 'result' || screen === 'handoff') && Date.now() < deadline;) {
         await new Promise(resolve => setTimeout(resolve, 100));
         signal.throwIfAborted();
       }

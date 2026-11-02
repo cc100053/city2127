@@ -229,7 +229,6 @@ try {
     headlineCamera!.cancel();narration?.cancel();devShot=null;camera.position.copy(position);controls.target.copy(target);explore!.play(look,at);
   };
   if(import.meta.env.DEV&&explore){
-    const shot=params.get('exploreShot');if(shot==='side'||shot==='low'||shot==='high')explore.shot=shot;
     // `cityExplore(ordinal)` / `cityExplore(null)`; `&explore=<ordinal>&exploreAt=<s>` starts a look that many seconds ago (held `reviewTime` freezes it).
     Object.assign(window,{cityExplore:(ordinal:number|null)=>ordinal===null?explore.back(now):startExplore({target:'sky-ring',ordinal})});
     if(params.has('explore'))requestAnimationFrame(()=>requestAnimationFrame(()=>{explore.voices=ring.litVoices();startExplore({target:'sky-ring',ordinal:Number(params.get('explore'))||1},now-Number(params.get('exploreAt')??0));}));
