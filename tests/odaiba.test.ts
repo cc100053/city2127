@@ -133,7 +133,7 @@ lanes.forEach((points,l)=>points.forEach(p=>{
 // Strollers keep to their own lanes: 1 m between any two, so passing people never touch.
 for(let a=0;a<lanes.length;a++)for(let b=a+1;b<lanes.length;b++)for(const p of lanes[a])for(const q of lanes[b])
   if(Math.abs(p.y-q.y)<1.5)assert.ok(Math.hypot(p.x-q.x,p.z-q.z)>.95,`Fuji lanes ${a} and ${b} meet near ${p.toArray().map(v=>v.toFixed(1))}`);
-assert.ok(fuji.spots.filter(s=>s.mode==='audience').length>80&&fuji.walks.length>=50&&fuji.rides.length===2,'Fuji keeps its audience, strollers and both escalators');
+assert.ok(fuji.spots.filter(s=>s.mode==='audience').length>80&&fuji.walks.length>=50&&fuji.rides.length===1,'Fuji keeps its audience, strollers and its escalator (the upper diagonal crossing the chrome sphere was removed in P2 r2)');
 const approach=routes().approach,clearanceRay=new Raycaster();
 for(let i=0;i<=160;i++) {
   const p=approach.getPointAt(i/160);
