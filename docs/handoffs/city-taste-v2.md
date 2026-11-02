@@ -63,3 +63,8 @@ Coordinator session runs `artifacts/city-taste-v2/coordinator.md`: P1→P6 again
 - Deviation: the app refuses `start_session` from a session that was itself started by another session (needs the owner's own words). Each part therefore runs as a fresh Sonnet background agent (Agent tool, own git worktree, fresh context, resumed for later rounds) — same isolation goal, allowed by AGENTS.md visual-polish delegation. Keep-awake request was also denied by the auto-mode classifier; the Mac may idle-sleep overnight.
 - 22:15 P1 r1 briefed: `artifacts/city-taste-v2/P1/spec-r1.md` (30243b4); agent branch `feat/city-taste-v2-p1`.
 - 22:40 owner (relayed): stop time and morning deliverable moved to 11:00 JST 11-03.
+
+## P1 r1 (2026-11-02 22:35 JST)
+
+- Decision: **polish again** → `artifacts/city-taste-v2/P1/spec-r2.md`. Ring and arch sit on the target's screen spots, seams glow at night; hull reads as tree shelves behind the dome towers, and the shell finish (metalness .45) reads grey-blue/chrome instead of the target's white.
+- Evidence: branch `feat/city-taste-v2-p1` e41bbdf, `artifacts/city-taste-v2/P1/r1/` on that branch. Checks (agent): `npm test`, `npm run build`, `git diff --check` pass; +7 draw calls; Grand Nikko dropped (inside hull footprint). FPS 60/60 day/night (vsync cap). No test assertions deleted.
