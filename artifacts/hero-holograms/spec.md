@@ -130,3 +130,52 @@ Owner：唔要表演者，換做其他嘢；打磨 panel 顯示嘅內容。位�
 - `tests/heroHolograms.test.ts`：加「冇 `performer`」唔使；加 `culture` 文字有「フジ」「文化放送」；所有字仍然冇拉丁字母。
 - 截圖存 `r2/`：`hero-h16.png`、`hero-h21.png`、`vs-target.jpg`（每行 R1｜target｜R2，日夜各一行）、`panels-crop.jpg`（R2 日間每塊 panel 原尺寸裁圖排成一張，方便睇字清唔清）。
 - FPS 同 R1 一樣量（1920×1080，hour 16／21）。
+
+---
+
+# R3（2026-11-02）— 一個大字 + 科幻細節線條
+
+Owner：質感問題係內容。參考圖每塊 panel 係**一個大字**（例如「2127」、「98.7%」），再加一啲**科幻細節線條**，咁先有質感；唔係好多行細字。位置、大細、物料三層、live 接口唔變。
+
+## A. 內容規則（所有 panel）
+
+- 每塊最多 **兩段字**：一個主字（大），最多一個副字。主字喺 1600×900 hero 截圖 ≥ **30 px** 高，副字 ≥ **20 px**。R2 所有 < 20 px 嘅字全部刪除（座標、站名細行、標籤、「今夜 20:00」、「湾岸フェス」、「潮位 +12」、tag 數字）。
+- 刪咗嘅字由**細節線條**補位，唔好留空。
+- 層次（alpha）：主字 1.0 → 主線稿（icon、地球、波形、柱）.9 → 細節線條 .35–.55 → 背景格／點陣 .15–.25。細節線條喺畫面上大約 1 px 闊（`d.sc` 換算），唔好粗。
+
+## B. 細節線條 kit（共用函數，喺 `heroHolograms.ts` 寫一次，各 panel 揀用）
+
+1. `circuit`：直角走線，轉角 45° 斜切，末端細圓點（2–4 條一組，由 panel 邊伸入，避開主字）。
+2. `arcGauge`：同心半圓／四分一圓弧，外圈有刻度（每 6°），一段較亮代表數值。
+3. `ticks`：邊緣刻度尺（長短交替），配一兩個細三角箭咀。
+4. `dotGrid`：細點陣小方塊（6×4 點）。
+5. `dataBlocks`：一排細長方塊（長短唔同，好似 level meter），冇字。
+6. `crosshair`：十字準星 + 細圓，放喺圖形旁邊。
+7. `bracketLines`：主字左／右側嘅細括號線，同一條長分隔線，線尾一粒點。
+
+每塊 panel 用 3–5 種，密度跟參考圖左邊「2127」嗰塊（細線多但唔搶主字）。
+
+## C. 每塊 panel
+
+| id | 主字 | 副字 | 圖形 + 細節 |
+|---|---|---|---|
+| `district` | 「2127」 | 「台場」 | 3D 地球照留；地球外加 `arcGauge` 同 `crosshair`；右下 `circuit` + `dotGrid` |
+| `transit` | 「台場駅」 | 「3分」 | 列車線稿 icon；一條路線圖（橫線 + 5 粒站點，台場站最亮 + 箭咀）；`ticks` |
+| `air` | 「98.7%」 | 「空気」 | 葉 icon 外圍一個 `arcGauge`（98.7% 亮）；底 sparkline；`dataBlocks` |
+| `voices` | 「住民の声」 | 「N件」（live，`toLocaleString('ja-JP')`） | 四條 Meter 色柱（冇標籤），柱旁 `ticks` 刻度；`bracketLines`；`dotGrid` |
+| `tide` | 「水位 安定」 | — | 波形 + 淡格線；`ticks` 喺左右兩邊；`circuit` 一組 |
+| `newgen` | 「新世代」 | — | 手機線稿；`crosshair`；`dataBlocks` |
+| `release` | 「新発売」 | — | 方塊線稿；`ticks` |
+| `smartlife`、`daily` | 直寫（不變） | — | 上下加 `ticks`；兩側細 `circuit` 線 |
+| `culture` | 「フジ」 | 「文化放送」 | 球體 + 廣播弧照留；`arcGauge`；`circuit` |
+| `tag-a/b/c` | — | — | 冇字：細三角 icon + `dataBlocks` + 一條 `circuit` |
+
+## D. 日間玻璃
+
+- 字少咗、大咗，字底深色片可以減：under-text alpha 只喺主字同副字範圍；日間 pane opacity 由 .95 試降（目標 .7–.8），以主字仍然清楚為準，報告最後數值。
+
+## E. 測試同截圖
+
+- `tests/heroHolograms.test.ts`：每塊 ≤ 2 段字；主字 ≥ 30 px、副字 ≥ 20 px（`glyphs()`）；`voices` 副字 = 「1,284件」（`setVoices(1284)`）；`culture` 有「フジ」「文化放送」；仍然冇拉丁字母；視線測試照舊。
+- 截圖存 `r3/`：`hero-h16.png`、`hero-h21.png`、`vs-target.jpg`（每行 R2｜參考圖裁片｜R3，日夜各一行）、`panels-crop.jpg`（日間每塊原尺寸）。
+- FPS 同前（1920×1080，hour 16／21）。

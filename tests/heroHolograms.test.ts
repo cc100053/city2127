@@ -15,15 +15,17 @@ scene.updateMatrixWorld(true);
 // 13 panels, every visible string free of Latin letters (Japanese copy and numerals only).
 const texts = holo.texts();
 assert.equal(texts.size, 13); assert.equal(holo.root.children.length, 13);
-for (const [id, strings] of texts) { assert.ok(strings.length > 0, `${id} has copy`); for (const s of strings) assert.ok(!/[A-Za-z]/.test(s), `${id}: "${s}" contains Latin letters`); }
+for (const [id, strings] of texts) { assert.ok(id.startsWith('tag-') || strings.length > 0, `${id} has copy`); for (const s of strings) assert.ok(!/[A-Za-z]/.test(s), `${id}: "${s}" contains Latin letters`); }
 
-// R2 copy: the culture panel is the Fuji TV broadcast card (no performer); every glyph is at least 12 px tall in the 1600 × 900 hero frame and titles at least 18 px.
+// R3 copy: at most two strings per panel, a main word of at least 30 px and a secondary of at least 20 px (1600 × 900 hero frame); tags carry no text.
 const culture = texts.get('culture')!;
 for (const word of ['フジ', '文化放送']) assert.ok(culture.includes(word), `culture panel shows ${word}`);
-assert.ok(culture.some(s => s.includes('湾岸フェス')));
-for (const [id, glyphs] of holo.glyphs()) for (const g of glyphs) {
-  assert.ok(g.px >= 12, `${id}: "${g.str}" is ${g.px} px`);
-  if (g.title) assert.ok(g.px >= 18, `${id}: title "${g.str}" is ${g.px} px`);
+for (const [id, glyphs] of holo.glyphs()) {
+  assert.ok(glyphs.length <= 2, `${id} has ${glyphs.length} strings`);
+  if (id.startsWith('tag-')) assert.equal(glyphs.length, 0, `${id} is text-free`);
+  const px = glyphs.map(g => g.px).sort((a, b) => b - a);
+  if (px[0] !== undefined) assert.ok(px[0] >= 30, `${id}: main word is ${px[0]} px`);
+  if (px[1] !== undefined) assert.ok(px[1] >= 20, `${id}: secondary word is ${px[1]} px`);
 }
 
 // Hero sightlines: no panel (pane, halo or content plane) stands between the settled hero camera and a focal site (ground, a quarter up, the top, and the
@@ -43,13 +45,13 @@ for (const site of Object.values(changeSites)) {
 }
 clear(new Vector3(-20, 65, -10), 'Civic Core centre');
 
-// Live panel: rungs clamp to −3..3 and a bar is (tier + 3) / 6 long; the proposal count reads 「提案 1,284件」.
+// Live panel: rungs clamp to −3..3 and a bar is (tier + 3) / 6 long; the secondary word reads 「1,284件」 and the main word 「住民の声」.
 assert.equal(tierBar(9), 1); assert.equal(tierBar(-9), 0); assert.equal(tierBar(0), .5);
 holo.setTiers({ nw: 3, ne: -3, sw: 0, se: 9 });
 assert.deepEqual(HOLOGRAM_AXES.map(a => a.socket), ['nw', 'sw', 'ne', 'se']);
 assert.deepEqual(holo.bars(), [1, .5, 0, 1]);
-holo.setVoices(1284); assert.ok(holo.texts().get('voices')!.includes('提案 1,284件'));
-holo.setVoices(-5); assert.ok(holo.texts().get('voices')!.includes('提案 0件'));
+holo.setVoices(1284); assert.deepEqual(holo.texts().get('voices'), ['住民の声', '1,284件']);
+holo.setVoices(-5); assert.ok(holo.texts().get('voices')!.includes('0件'));
 for (const strings of holo.texts().values()) for (const s of strings) assert.ok(!/[A-Za-z]/.test(s));
 
 // Day / night parameters blend and nothing throws in a frame.

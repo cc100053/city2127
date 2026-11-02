@@ -30,7 +30,7 @@ export type Glyphs = { str: string; px: number; title: boolean };
 type Zone = readonly [number, number, number, number];
 type Draw = { g: Ctx; W: number; H: number; sc: (screenPx: number) => number; tint: string; ink: string; rec: Glyphs[]; zones: Zone[]; s: State };
 type Panel = { id: string; sw: number; long: number; violet: boolean; hud: boolean; draw: (d: Draw) => void };
-type Say = { weight?: number; align?: CanvasTextAlign; alpha?: number; num?: boolean; title?: boolean };
+type Say = { weight?: number; align?: CanvasTextAlign; alpha?: number; num?: boolean; title?: boolean; part?: boolean };
 
 /** Glowing text in two passes: a soft glow underlay, then a crisp unshadowed fill. Every string is recorded so tests can check the copy and its size. */
 function say(d: Draw, str: string, x: number, y: number, px: number, o: Say = {}) {
@@ -41,7 +41,7 @@ function say(d: Draw, str: string, x: number, y: number, px: number, o: Say = {}
     if (!crisp) { g.shadowColor = d.tint; g.shadowBlur = d.sc(2.4); }
     g.fillText(str, x, y); g.restore();
   }
-  d.rec.push({ str, px, title: !!o.title });
+  if (!o.part) d.rec.push({ str, px, title: !!o.title });
   const size = d.sc(px), w = g.measureText(str)?.width ?? 0, left = o.align === 'right' ? x - w : o.align === 'center' ? x - w / 2 : x;
   d.zones.push([left - size * .45, y - size * 1, w + size * .9, size * 1.4]);
 }
@@ -94,14 +94,61 @@ function observatory(d: Draw, cx: number, cy: number) {
   });
   [.9, .6, .35].forEach((alpha, i) => line(d, 1.4, g => { const R = r + s(8 + 7 * i); arcAt(g, cx, cy, R, -.7, .7); arcAt(g, cx, cy, R, Math.PI - .7, Math.PI + .7); }, { alpha }));
 }
-/** Characters stacked top to bottom (vertical advert text), sized to the column and the available height; the long vowel mark is turned upright. */
+/** Characters stacked top to bottom (vertical advert text), sized to the column and the available height; the long vowel mark is turned upright. Recorded as one string. */
 function stacked(d: Draw, str: string, cx: number, top: number, height: number, width: number) {
-  const { g } = d, size = Math.min(width * .7, height / (str.length * 1.08)), step = size * 1.08;
+  const { g } = d, size = Math.min(width * .7, height / (str.length * 1.08)), step = size * 1.08, px = size / d.sc(1);
   [...str].forEach((c, i) => {
-    const y = top + step * (i + .85), px = size / d.sc(1);
-    if (c !== 'ー') { say(d, c, cx, y, px, { weight: 600, align: 'center', title: true }); return; }
-    g.save(); g.translate(cx, y - size * .35); g.rotate(Math.PI / 2); say(d, c, 0, size * .35, px, { weight: 600, align: 'center', title: true }); g.restore();
+    const y = top + step * (i + .85);
+    if (c !== 'ー') { say(d, c, cx, y, px, { weight: 600, align: 'center', part: true }); return; }
+    g.save(); g.translate(cx, y - size * .35); g.rotate(Math.PI / 2); say(d, c, 0, size * .35, px, { weight: 600, align: 'center', part: true }); g.restore();
   });
+  d.rec.push({ str, px, title: true });
+}
+
+// Detail-line kit (spec R3 B): fine sci-fi linework, about 1 screen px wide, shared by every panel. Coordinates and sizes are screen px of the 1600 × 900 hero frame.
+// Alpha hierarchy: main word 1 → main line-art .9 → detail lines .35–.55 → background grids and dot fields .15–.25.
+const ICON = .9, DETAIL = .45, GRID = .2;
+/** Right-angle run with chamfered corners (give the 45° bends in `pts`) ending in a small dot. */
+function circuit(d: Draw, pts: readonly (readonly [number, number])[], alpha = DETAIL) {
+  const s = d.sc, [x, y] = pts[pts.length - 1];
+  line(d, 1, g => { pts.forEach(([px, py], i) => i ? g.lineTo(s(px), s(py)) : g.moveTo(s(px), s(py))); g.moveTo(s(x) + s(2), s(y)); g.arc(s(x), s(y), s(2), 0, Math.PI * 2); }, { alpha });
+}
+/** Gauge: an outer arc with a tick every 6°, an inner hairline arc, and a bright band for `value` (0…1) on the middle ring. */
+function arcGauge(d: Draw, cx: number, cy: number, r: number, value: number, alpha = DETAIL) {
+  const s = d.sc, a0 = .75 * Math.PI, sweep = 1.5 * Math.PI, X = s(cx), Y = s(cy);
+  line(d, 1, g => { arcAt(g, X, Y, s(r), a0, a0 + sweep); arcAt(g, X, Y, s(r * .74), a0, a0 + sweep); for (let a = 0; a <= sweep + 1e-6; a += Math.PI / 30) { g.moveTo(X + Math.cos(a0 + a) * s(r), Y + Math.sin(a0 + a) * s(r)); g.lineTo(X + Math.cos(a0 + a) * s(r + 2.5), Y + Math.sin(a0 + a) * s(r + 2.5)); } }, { alpha });
+  line(d, 2, g => arcAt(g, X, Y, s(r * .87), a0, a0 + sweep * value), { alpha: ICON });
+}
+/** Ruler along a line with long and short ticks alternating on one side and an optional small arrowhead at each end. */
+function ticks(d: Draw, x0: number, y0: number, x1: number, y1: number, o: { arrows?: boolean; alpha?: number; flip?: boolean } = {}) {
+  const s = d.sc, len = Math.hypot(x1 - x0, y1 - y0), ux = (x1 - x0) / len, uy = (y1 - y0) / len, nx = -uy * (o.flip ? -1 : 1), ny = ux * (o.flip ? -1 : 1);
+  line(d, 1, g => {
+    g.moveTo(s(x0), s(y0)); g.lineTo(s(x1), s(y1));
+    for (let t = 0, i = 0; t <= len; t += 4, i++) { const L = i % 4 ? 3 : 6; g.moveTo(s(x0 + ux * t), s(y0 + uy * t)); g.lineTo(s(x0 + ux * t + nx * L), s(y0 + uy * t + ny * L)); }
+    if (o.arrows) for (const [x, y, f] of [[x0, y0, -1], [x1, y1, 1]] as const) { g.moveTo(s(x + nx * 3), s(y + ny * 3)); g.lineTo(s(x + ux * f * 4 + nx * 0), s(y + uy * f * 4)); g.lineTo(s(x - nx * 3), s(y - ny * 3)); }
+  }, { alpha: o.alpha ?? DETAIL });
+}
+/** A small field of dots (cols × rows, `step` px apart). */
+function dotGrid(d: Draw, x: number, y: number, cols = 6, rows = 4, step = 4, alpha = GRID) {
+  const s = d.sc; line(d, 1.5, g => { for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) { g.moveTo(s(x + i * step), s(y + j * step)); g.lineTo(s(x + i * step + .01), s(y + j * step)); } }, { alpha });
+}
+/** A row of thin vertical blocks of uneven height, like a level meter; no text. */
+function dataBlocks(d: Draw, x: number, y: number, n: number, height: number, step = 4, alpha = DETAIL) {
+  const s = d.sc; line(d, 2, g => { for (let i = 0; i < n; i++) { const h = height * (.3 + .7 * Math.abs(Math.sin(i * 2.3 + 1))); g.moveTo(s(x + i * step), s(y + height)); g.lineTo(s(x + i * step), s(y + height - h)); } }, { alpha });
+}
+/** Cross hairs with a gap at the centre and a small circle. */
+function crosshair(d: Draw, cx: number, cy: number, r: number, alpha = DETAIL) {
+  const s = d.sc, X = s(cx), Y = s(cy);
+  line(d, 1, g => { g.moveTo(X + s(r), Y); g.arc(X, Y, s(r), 0, Math.PI * 2); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { g.moveTo(X + dx * s(r * 1.5), Y + dy * s(r * 1.5)); g.lineTo(X + dx * s(r * 2.6), Y + dy * s(r * 2.6)); } }, { alpha });
+}
+/** Fine square brackets at both ends of a span (`x0` … `x1`, `h` tall from `y`) plus a long divider under it ending in a dot. */
+function bracketLines(d: Draw, x0: number, x1: number, y: number, h: number, alpha = DETAIL) {
+  const s = d.sc;
+  line(d, 1, g => {
+    g.moveTo(s(x0 + 4), s(y)); g.lineTo(s(x0), s(y)); g.lineTo(s(x0), s(y + h)); g.lineTo(s(x0 + 4), s(y + h));
+    g.moveTo(s(x1 - 4), s(y)); g.lineTo(s(x1), s(y)); g.lineTo(s(x1), s(y + h)); g.lineTo(s(x1 - 4), s(y + h));
+    g.moveTo(s(x0), s(y + h + 6)); g.lineTo(s(x1 - 8), s(y + h + 6)); g.moveTo(s(x1 - 5), s(y + h + 6)); g.arc(s(x1 - 7), s(y + h + 6), s(2), 0, Math.PI * 2);
+  }, { alpha });
 }
 
 /** Common frame: faint glass edge, four corner brackets and scanlines; `hud` adds a tick row in the bottom 10 %. */
@@ -111,68 +158,83 @@ function chrome(d: Draw, hud: boolean) {
   g.globalAlpha = 1; g.lineWidth = sc(1.8); g.lineCap = 'square'; g.beginPath();
   for (const [x, y, sx, sy] of [[m, m, 1, 1], [W - m, m, -1, 1], [m, H - m, 1, -1], [W - m, H - m, -1, -1]]) { g.moveTo(x, y + sy * b); g.lineTo(x, y); g.lineTo(x + sx * b, y); }
   g.stroke(); g.restore();
-  if (hud) line(d, 1, g => { let i = 0; for (let x = W * .06; x <= W * .94; x += sc(4), i++) { g.moveTo(x, H * .965); g.lineTo(x, H * .965 - sc(i % 5 ? 2 : 4)); } }, { alpha: .8 });
+  if (hud) line(d, 1, g => { let i = 0; for (let x = W * .06; x <= W * .94; x += sc(4), i++) { g.moveTo(x, H * .965); g.lineTo(x, H * .965 - sc(i % 5 ? 2 : 4)); } }, { alpha: .4 });
   g.save(); g.fillStyle = '#fff'; g.globalAlpha = .012; for (let y = 0; y < H; y += sc(3)) g.fillRect(0, y, W, sc(.7)); g.restore();
 }
 
+// One main word (≥ 30 px on the 1600 × 900 hero frame), at most one secondary word (≥ 20 px), the rest fine line-art; no other text.
 const PANELS: readonly Panel[] = [
-  // Left 48 %: the 3D globe (a separate mesh). Right 52 %: title, year, rule, two coordinate rows.
+  // Left 48 %: the 3D globe (a separate mesh) ringed by a gauge and cross hairs. Right 52 %: 台場 over 2127 between brackets, then dots and a circuit.
   { id: 'district', sw: 224, long: 2048, violet: false, hud: true, draw(d) {
-    const { W, H } = d, x = W * .54; say(d, '台場', x, H * .31, 22, { weight: 600, title: true }); say(d, '2127', x, H * .55, 32, { weight: 600, num: true, title: true });
-    line(d, 1, g => { g.moveTo(x, H * .62); g.lineTo(W * .94, H * .62); }); say(d, '北緯35.62', x, H * .74, 12, { alpha: .9 }); say(d, '東経139.77', x, H * .85, 12, { alpha: .9 });
+    const s = d.sc; say(d, '台場', s(122), s(46), 20, { weight: 600, title: true }); say(d, '2127', s(122), s(100), 38, { weight: 600, num: true, title: true });
+    bracketLines(d, 116, 218, 70, 34); arcGauge(d, 60, 84, 54, .62); crosshair(d, 22, 148, 6); dotGrid(d, 124, 124, 6, 4, 5); circuit(d, [[214, 148], [176, 148], [168, 140], [150, 140]]); ticks(d, 14, 10, 212, 10, { arrows: true, alpha: .4 });
   } },
-  // Two table rows split by a rule: icon, name, and a large arrow / minutes on the right.
+  // Train icon, station name and minutes; a five-station route line ending at 台場 with an arrow; a ruler.
   { id: 'transit', sw: 192, long: 1024, violet: false, hud: true, draw(d) {
-    const { W, H, sc } = d; line(d, 1.4, g => train(g, W * .12, H * .27, sc(10))); say(d, 'ゆりかもめ 台場駅', W * .24, H * .27 + sc(4), 12, { weight: 600 }); say(d, '→', W * .94, H * .27 + sc(5), 16, { align: 'right', weight: 600 });
-    line(d, 1, g => { g.moveTo(W * .06, H * .47); g.lineTo(W * .94, H * .47); });
-    line(d, 1.4, g => bus(g, W * .12, H * .65, sc(9))); say(d, '空港シャトル', W * .24, H * .65 + sc(4), 12, { weight: 600 }); say(d, '3分', W * .94, H * .65 + sc(6), 18, { align: 'right', weight: 600, title: true });
+    const s = d.sc; line(d, 1.6, g => train(g, s(22), s(24), s(10)), { alpha: ICON });
+    say(d, '台場駅', s(44), s(36), 30, { weight: 600, title: true }); say(d, '3分', s(184), s(36), 20, { align: 'right', weight: 600, title: true });
+    line(d, 1, g => { g.moveTo(s(12), s(58)); g.lineTo(s(168), s(58)); }, { alpha: .55 });
+    line(d, 1.2, g => { for (const x of [12, 48, 84, 120]) { g.moveTo(s(x) + s(2), s(58)); g.arc(s(x), s(58), s(2), 0, Math.PI * 2); } }, { alpha: .6 });
+    line(d, 1.6, g => { g.moveTo(s(152) + s(4.5), s(58)); g.arc(s(152), s(58), s(4.5), 0, Math.PI * 2); g.moveTo(s(170), s(53)); g.lineTo(s(180), s(58)); g.lineTo(s(170), s(63)); }, { alpha: ICON });
+    ticks(d, 12, 70, 180, 70, { alpha: .4 }); circuit(d, [[12, 82], [30, 82], [36, 88], [52, 88]], .35);
   } },
-  { id: 'smartlife', sw: 48, long: 1024, violet: true, hud: false, draw(d) {
-    const { W, H } = d; stacked(d, 'スマートライフ', W / 2, H * .1, H * .8, W);
-    line(d, 1, g => { for (const y of [.03, .05, .07, .93, .95, .97]) { g.moveTo(W * .35, H * y); g.lineTo(W * .65, H * y); } });
+  { id: 'smartlife', sw: 64, long: 1024, violet: true, hud: false, draw(d) {
+    const { W } = d, s = d.sc; stacked(d, 'スマートライフ', W / 2, s(22), s(232), W);
+    ticks(d, 8, 10, 56, 10, { alpha: .4 }); ticks(d, 8, 262, 56, 262, { alpha: .4, flip: true });
+    circuit(d, [[6, 60], [6, 110], [12, 116], [12, 160]], .35); circuit(d, [[58, 100], [58, 170], [52, 176], [52, 214]], .35);
   } },
-  // Left 30 %: leaf. Right 70 %: label, big figure, sparkline.
+  // Left: leaf inside a gauge (98.7 % lit). Right: 空気 and 98.7 %, a sparkline under them, a level meter beside the label.
   { id: 'air', sw: 152, long: 1024, violet: false, hud: true, draw(d) {
-    const { W, H, sc } = d; line(d, 1.6, g => leaf(g, W * .17, H * .5, sc(13))); say(d, '空気清浄度', W * .34, H * .3, 12, { weight: 600 }); say(d, '98.7%', W * .34, H * .66, 26, { weight: 600, num: true, title: true });
-    line(d, 1, g => { for (let i = 0; i <= 12; i++) { const x = W * (.34 + .6 * i / 12), y = H * (.8 - .035 * Math.sin(i * 1.3) - .02 * i / 12); i ? g.lineTo(x, y) : g.moveTo(x, y); } });
+    const s = d.sc; arcGauge(d, 26, 38, 22, .987); line(d, 1.6, g => leaf(g, s(26), s(38), s(9)), { alpha: ICON });
+    say(d, '空気', s(54), s(26), 20, { weight: 600, title: true }); say(d, '98.7%', s(54), s(60), 30, { weight: 700, num: true, title: true });
+    dataBlocks(d, 100, 10, 9, 14, 5);
+    line(d, 1, g => { for (let i = 0; i <= 14; i++) { const x = s(54 + 90 * i / 14), y = s(67 - 1.8 * Math.sin(i * 1.3) - .8 * i / 14); i ? g.lineTo(x, y) : g.moveTo(x, y); } }, { alpha: .55 });
   } },
+  // Top row: phone, cross hairs, level meter. Main word below.
   { id: 'newgen', sw: 120, long: 1024, violet: true, hud: false, draw(d) {
-    const { W, H, sc } = d; line(d, 1.6, g => phone(g, W * .2, H * .5, sc(22))); say(d, '新世代', W * .4, H * .46, 18, { weight: 600, title: true }); say(d, '登場', W * .4, H * .8, 18, { weight: 600, title: true });
+    const s = d.sc; line(d, 1.6, g => phone(g, s(20), s(22), s(14)), { alpha: ICON }); crosshair(d, 52, 22, 6); dataBlocks(d, 72, 10, 9, 24, 4);
+    say(d, '新世代', s(60), s(68), 30, { weight: 600, align: 'center', title: true });
   } },
-  { id: 'release', sw: 64, long: 1024, violet: true, hud: false, draw(d) {
-    const { W, H, sc } = d; line(d, 1.6, g => cube(g, W * .5, H * .32, sc(11))); say(d, '新発売', W * .5, H * .9, 18, { weight: 600, align: 'center', title: true });
+  { id: 'release', sw: 120, long: 1024, violet: true, hud: false, draw(d) {
+    const s = d.sc; line(d, 1.8, g => cube(g, s(60), s(36), s(22)), { alpha: ICON }); ticks(d, 12, 72, 108, 72, { arrows: true, alpha: .4 }); dotGrid(d, 12, 14, 4, 3, 4); crosshair(d, 100, 18, 4);
+    say(d, '新発売', s(60), s(106), 30, { weight: 600, align: 'center', title: true });
   } },
-  // Header: title left, count right. Four rows: label (left 40 %), Meter-colour bar with a bright end dot (right).
+  // Main 住民の声 and the live 「N件」 between fine brackets; four unlabelled Meter-colour bars with a ruler beside them.
   { id: 'voices', sw: 176, long: 2048, violet: false, hud: true, draw(d) {
-    const { g, W, H, s, sc } = d; say(d, '住民の声', W * .06, H * .2, 18, { weight: 600, title: true }); say(d, `提案 ${s.voices.toLocaleString('ja-JP')}件`, W * .94, H * .2, 12, { align: 'right', weight: 600 });
+    const { g, s: st, sc } = d; say(d, '住民の声', sc(10), sc(34), 30, { weight: 600, title: true });
+    say(d, `${st.voices.toLocaleString('ja-JP')}件`, sc(166), sc(60), 20, { align: 'right', weight: 600, title: true });
+    dotGrid(d, 140, 12, 6, 3, 5); bracketLines(d, 8, 168, 40, 26);
     HOLOGRAM_AXES.forEach((a, i) => {
-      const cy = H * (.38 + i * .14), x0 = W * .46, len = W * .48, bar = tierBar(s.tiers[a.socket]), th = sc(8);
-      say(d, a.label, W * .06, cy + sc(4), 12);
-      line(d, 1, g => { g.roundRect(x0, cy - th / 2, len, th, th / 2); });
+      const cy = sc(82 + i * 11), x0 = sc(10), len = sc(136), th = sc(6), bar = tierBar(st.tiers[a.socket]);
+      line(d, 1, g => { g.roundRect(x0, cy - th / 2, len, th, th / 2); }, { alpha: .5 });
       const w = Math.max(th, (len - sc(2)) * bar);
       g.save(); g.fillStyle = METER_COLORS[a.axis]; g.shadowColor = METER_COLORS[a.axis]; g.shadowBlur = sc(3); g.beginPath(); g.roundRect(x0 + sc(1), cy - th / 2 + sc(1), w - sc(1), th - sc(2), th / 2); g.fill(); g.restore();
-      g.save(); g.fillStyle = '#fff'; g.shadowColor = METER_COLORS[a.axis]; g.shadowBlur = sc(3); g.beginPath(); g.arc(x0 + w - th * .45, cy, sc(1.8), 0, Math.PI * 2); g.fill(); g.restore();
+      g.save(); g.fillStyle = '#fff'; g.shadowColor = METER_COLORS[a.axis]; g.shadowBlur = sc(3); g.beginPath(); g.arc(x0 + w - th * .45, cy, sc(1.6), 0, Math.PI * 2); g.fill(); g.restore();
     });
+    ticks(d, 158, 76, 158, 118, { alpha: .4 });
   } },
-  { id: 'daily', sw: 40, long: 1024, violet: true, hud: false, draw(d) {
-    const { W, H } = d; stacked(d, '未来の日常', W / 2, H * .1, H * .8, W);
-    line(d, 1, g => { for (const y of [.03, .05, .07, .93, .95, .97]) { g.moveTo(W * .35, H * y); g.lineTo(W * .65, H * y); } });
+  { id: 'daily', sw: 56, long: 1024, violet: true, hud: false, draw(d) {
+    const { W } = d, s = d.sc; stacked(d, '未来の日常', W / 2, s(26), s(232), W);
+    ticks(d, 8, 10, 48, 10, { alpha: .4 }); ticks(d, 8, 274, 48, 274, { alpha: .4, flip: true });
+    circuit(d, [[5, 60], [5, 110], [10, 115], [10, 150]], .35); circuit(d, [[51, 110], [51, 180], [46, 185], [46, 220]], .35);
   } },
-  // Left 50 %: sphere observatory and broadcast arcs. Right 50 %: station name and the evening event.
+  // Left: sphere observatory and broadcast arcs. Right: フジ over 文化放送, a gauge and a circuit.
   { id: 'culture', sw: 240, long: 2048, violet: true, hud: true, draw(d) {
-    const { W, H } = d, x = W * .56; observatory(d, W * .27, H * .36);
-    say(d, 'フジ', x, H * .3, 30, { weight: 700, title: true }); say(d, '文化放送', x, H * .5, 18, { weight: 600, title: true });
-    line(d, 1, g => { g.moveTo(x, H * .6); g.lineTo(W * .94, H * .6); }); say(d, '今夜 20:00', x, H * .73, 12, { alpha: .95 }); say(d, '湾岸フェス', x, H * .85, 12, { alpha: .95 });
+    const s = d.sc; observatory(d, s(65), s(65));
+    say(d, 'フジ', s(134), s(64), 36, { weight: 700, title: true }); say(d, '文化放送', s(134), s(92), 20, { weight: 600, title: true });
+    circuit(d, [[228, 110], [190, 110], [182, 102], [150, 102]]); arcGauge(d, 176, 138, 20, .7); dataBlocks(d, 20, 146, 12, 14, 5); dotGrid(d, 196, 14, 6, 3, 5);
   } },
-  // Left 35 %: two big words. Right 65 %: a faint grid with a tag; the scrolling wave is a separate mesh over this zone.
+  // One main phrase over a scrolling wave (a separate mesh) in a faint grid, with rulers either side and a circuit.
   { id: 'tide', sw: 224, long: 2048, violet: false, hud: true, draw(d) {
-    const { W, H } = d; say(d, '水位', W * .07, H * .46, 22, { weight: 600, title: true }); say(d, '安定', W * .07, H * .82, 22, { weight: 600, title: true });
-    say(d, '潮位 +12', W * .94, H * .22, 12, { align: 'right', alpha: .9 });
-    line(d, 1, g => { g.rect(W * .42, H * .3, W * .52, H * .52); for (const f of [.25, .5, .75]) { g.moveTo(W * .42, H * (.3 + .52 * f)); g.lineTo(W * .94, H * (.3 + .52 * f)); } }, { alpha: .45 });
+    const s = d.sc; say(d, '水位 安定', s(12), s(36), 30, { weight: 600, title: true });
+    dotGrid(d, 160, 10, 6, 3, 5); circuit(d, [[212, 34], [190, 34], [182, 26], [170, 26]]);
+    line(d, 1, g => { g.rect(s(12), s(46), s(200), s(30)); for (const y of [53.5, 61, 68.5]) { g.moveTo(s(12), s(y)); g.lineTo(s(212), s(y)); } }, { alpha: GRID + .1 });
+    ticks(d, 6, 44, 6, 78, { alpha: .4 }); ticks(d, 218, 44, 218, 78, { alpha: .4, flip: true });
   } },
+  // No text: a small triangle, a level meter and one circuit run.
   ...(['a', 'b', 'c'] as const).map((n, i): Panel => ({ id: `tag-${n}`, sw: 56, long: 1024, violet: false, hud: false, draw(d) {
-    const { W, H, sc } = d; line(d, 1.2, g => { g.moveTo(W * .1, H * .3); g.lineTo(W * .1 + sc(9), H * .3); g.lineTo(W * .1 + sc(4.5), H * .3 + sc(8)); g.closePath(); });
-    say(d, ['04.12', '17.40', '09.66'][i], W * .27, H * .5 + sc(4.2), 12, { num: true, weight: 600 });
+    const s = d.sc; line(d, 1.2, g => { g.moveTo(s(7), s(5)); g.lineTo(s(14), s(5)); g.lineTo(s(10.5), s(12)); g.closePath(); }, { alpha: ICON });
+    dataBlocks(d, 20, 4, 6 + i, 11, 3); circuit(d, [[42 + i * 2, 9], [46 + i * 2, 9], [49 + i * 2, 5], [52, 5]], .4);
   } })),
 ];
 
@@ -236,7 +298,7 @@ export function heroHolograms(scene: T.Scene, anisotropy = 8) {
         for (let x = 0; x <= 512; x += 4) { const a = x / 512 * Math.PI * 2, y = 64 + 22 * Math.sin(a * 2) + 12 * Math.sin(a * 5 + 1); x ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); g.restore();
       }
       waves = new T.CanvasTexture(c); waves.wrapS = T.RepeatWrapping; waves.colorSpace = T.SRGBColorSpace; waves.anisotropy = anisotropy;
-      const m = additive(waves, '#ffffff'), mesh = new T.Mesh(unit, m); mesh.scale.set(place.w * .5, place.h * .44, 1); mesh.position.set(.18 * place.w, -.06 * place.h, .25); mesh.renderOrder = 11; group.add(mesh); inks.push(m);
+      const m = additive(waves, '#ffffff'), mesh = new T.Mesh(unit, m); mesh.scale.set(place.w * .875, place.h * .31, 1); mesh.position.set(0, -.178 * place.h, .25); mesh.renderOrder = 11; group.add(mesh); inks.push(m);
     }
     bob.push({ group, y: place.at[1], period: 6 + (n * 7) % 4, phase: n * 1.7 }); root.add(group);
   });
@@ -261,7 +323,7 @@ export function heroHolograms(scene: T.Scene, anisotropy = 8) {
     update(now: number, darkness: number) {
       const d = T.MathUtils.lerp, bright = d(2.6, 1.6, darkness);
       if (Math.abs(darkness - dark) >= .005) {
-        dark = darkness; for (const m of paneMaterials) { m.opacity = d(.95, .35, darkness); m.color.lerpColors(PANE_DAY, PANE_NIGHT, darkness); } for (const m of haloMaterials) m.opacity = d(.06, .28, darkness);
+        dark = darkness; for (const m of paneMaterials) { m.opacity = d(.8, .35, darkness); m.color.lerpColors(PANE_DAY, PANE_NIGHT, darkness); } for (const m of haloMaterials) m.opacity = d(.06, .28, darkness);
       }
       inks.forEach((m, i) => m.color.setScalar(bright * (1 + .04 * Math.sin(now * .9 + i * 2.1))));
       for (const b of bob) b.group.position.y = b.y + .4 * Math.sin(now * Math.PI * 2 / b.period + b.phase);
