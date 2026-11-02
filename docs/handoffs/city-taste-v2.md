@@ -98,3 +98,4 @@ Coordinator session runs `artifacts/city-taste-v2/coordinator.md`: P1→P6 again
 
 - Decision: **pass**, merged `--no-ff` (c3cb8bf merges `feat/city-taste-v2-p3` 2c9b106). Facade system (curtain-wall shader + contextFacades) now white piers, pale glass, 16.8 m slab bands with cool seams (night 2.2); beige finishes gone; holograms thin cool sheets (voices keeps Meter colours); district towers and skyway rings/spheres on the mega material family. Left: tall context tower inside the ring still a plain grid with rooftop trees (P5 for the trees).
 - Checks on the merge (coordinator): `npm test` exit 0 (`fail 0`; the "hubUpper procedural fallback" log line is an expected diagnostic), build 0, diff-check clean. FPS (agent) 60/60. No test edits.
+- 02:55 JST: P4 r1 started (agent branch `feat/city-taste-v2-p4` from ec2a156). P5 spec r1 drafted.
