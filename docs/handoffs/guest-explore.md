@@ -1,7 +1,7 @@
 # guest-explore — Guest looks at the Sky Ring (空の環を見る)
 
 - Owner: cc100053
-- Status: IN_PROGRESS — implemented and checked; owner picked `side` and a 20 s button window (2026-11-02); visual acceptance pending
+- Status: DONE — owner accepted 2026-11-02 (`side` berth shot, whole-ring step 3, 20 s button window); merged to main
 - Branch: feat/guest-explore
 - Base commit: 8d89ca4ed66b3a795c7696d8ca5e24f8a527054f
 - Last verified commit: see `git log feat/guest-explore` (checks below ran on the committed tree)
@@ -39,7 +39,7 @@
 
 ## Unresolved issues and next step
 
-1. Resolved 2026-11-02: berth camera `side` (the `low`/`high` candidates were removed; evidence kept in r1). The handoff screen now stays 20 s (`EXPLORE_OFFER_MS`, guest UI only; `HANDOFF_MS` and the server lease unchanged); surveyAuto/residentP4 runners wait 45 s for welcome. Whole-ring pose for step 3 still needs owner approval.
-2. Owner visual acceptance of the full look (day/night) pending.
+1. Resolved 2026-11-02: berth camera `side` (the `low`/`high` candidates were removed; evidence kept in r1). The handoff screen now stays 20 s (`EXPLORE_OFFER_MS`, guest UI only; `HANDOFF_MS` and the server lease unchanged); surveyAuto/residentP4 runners wait 45 s for welcome. Whole-ring pose for step 3 accepted with the look.
+2. Owner accepted the full look 2026-11-02.
 3. The hero title block stays over the close-up (as in headline shots).
 4. Space elevator LOD + button: separate closeup-polish task.
