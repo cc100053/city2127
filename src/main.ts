@@ -98,7 +98,7 @@ try {
   // Sky Ring voices: the proposal count from the survey server, a plausible mid count in standalone review.
   const ring=skyRing(scene);ring.setVoices(STANDALONE_VOICES);
   // Hero holograms: the same count feeds the 住民の声 panel; its four Meter bars follow the layout's rungs.
-  const holo=heroHolograms(scene);holo.setVoices(STANDALONE_VOICES);
+  const holo=heroHolograms(scene,renderer.capabilities.getMaxAnisotropy());holo.setVoices(STANDALONE_VOICES);
   const odaibaReady=loadOdaiba(scene,water).then(()=>true).catch(error=>{const message=document.createElement('p');message.className='error';message.textContent='Odaiba could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);return false;});
   if(import.meta.env.DEV && new URLSearchParams(location.search).has('asset-preview')){
     const input=document.createElement('input');input.type='file';input.accept='.glb,model/gltf-binary';input.className='asset-preview';input.title='Preview a Blender GLB in the city scene';input.setAttribute('aria-label','Preview a Blender GLB');

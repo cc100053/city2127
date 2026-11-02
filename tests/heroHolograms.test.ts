@@ -17,6 +17,15 @@ const texts = holo.texts();
 assert.equal(texts.size, 13); assert.equal(holo.root.children.length, 13);
 for (const [id, strings] of texts) { assert.ok(strings.length > 0, `${id} has copy`); for (const s of strings) assert.ok(!/[A-Za-z]/.test(s), `${id}: "${s}" contains Latin letters`); }
 
+// R2 copy: the culture panel is the Fuji TV broadcast card (no performer); every glyph is at least 12 px tall in the 1600 × 900 hero frame and titles at least 18 px.
+const culture = texts.get('culture')!;
+for (const word of ['フジ', '文化放送']) assert.ok(culture.includes(word), `culture panel shows ${word}`);
+assert.ok(culture.some(s => s.includes('湾岸フェス')));
+for (const [id, glyphs] of holo.glyphs()) for (const g of glyphs) {
+  assert.ok(g.px >= 12, `${id}: "${g.str}" is ${g.px} px`);
+  if (g.title) assert.ok(g.px >= 18, `${id}: title "${g.str}" is ${g.px} px`);
+}
+
 // Hero sightlines: no panel (pane, halo or content plane) stands between the settled hero camera and a focal site (ground, a quarter up, the top, and the
 // four footprint corners at the ground), the Civic Core centre, or the screen's own centre.
 const camera = heroSettledCamera(1600, 900), eye = camera.position, ray = new Raycaster();

@@ -38,10 +38,17 @@ Hero 層（`src/` hero 構件、`SHOTS` hero）；`docs/ODAIBA_2127_REFERENCES/C
 - 同 spec 唔同：落位距離用 panel 覆蓋範圍內最近實體 ×0.82（只用中心點會插入較近建築後面）；`district` 移到 (.225,.35) 闊 .12、`transit` u .22、`daily` v .49，避開 SE 塔／site 橙框。日間 pane `#0f6a86` opacity .62（spec .22 喺 HDR 日景差唔多睇唔到），夜 `#0b4558` .16；線寬約 spec 兩倍。夜間地面反光（optional）未做。軸短詞 RESIDENT_COPY 冇，暫用 人と自律／私と共有／設備と植栽／分散と集中。
 - Opus 審核（`r1/vs-target.jpg`、`hero-h16.png`、`hero-h21.png`）：方向啱，已經係「光」唔係膠板，位置貼 target。問題：①日文字 canvas glow 太矇，細 panel（住民の声標籤、空気清浄度、ゆりかもめ、水位）讀唔到；②「台場 2127」、「水位 安定」、「フジ 文化放送」文字同圖形／框重疊；③表演者線稿似樽，唔似人；④日間 pane 偏灰白，參考圖係較深嘅 teal 玻璃；⑤panel 比 target 細，空中 pod 會飛過遮住 `air`。
 
+## R2（2026-11-02，內容打磨）
+
+- Owner：唔要表演者，打磨內容。Spec R2 A–E（`spec.md` 尾段）。
+- `culture` 改為 Fuji TV 球體展望室線稿 + 廣播弧 +「フジ」「文化放送」「今夜 20:00」「湾岸フェス」；`performer()` 刪除。文字兩次畫（淡 glow + 實色）、最細 12 px／標題 18 px（test 用 `glyphs()` 檢查）、大 panel 2048 canvas、max anisotropy（`main.ts` 傳入）、每塊固定分區。
+- 同 spec 唔同：日間 pane `#083f50` opacity .95 + alpha map（中間 .55、邊 .35、字底 1.0），因為 .45 喺 HDR 日景字會洗白；`district` u .215、`transit` u .19 w .12（避 SE 塔）；`release`、tags、`smartlife` 加大放得落 12 px 字；`air` 0.82·d（計埋 pod）約 155 m，喺 pod 航道前面。
+- Opus 審核（`r2/hero-h16.png`、`hero-h21.png`、`vs-target.jpg`、`panels-crop.jpg`）：大進步，大字（台場 2127、スマートライフ、未来の日常、フジ 文化放送、水位 安定、新世代 登場）清楚，版面冇重疊，球體 + 廣播弧好睇。仍弱：細字（空気清浄度、ゆりかもめ 台場駅、住民の声四個標籤、提案 N件、湾岸フェス）原尺寸仲有啲矇；日間字底深色片比參考圖實；線稿密度比參考圖疏；一條 mobility 光帶穿過 `air` 嘅「98.7%」。
+
 ## Actual validation results
 
 - Verification status: PARTIAL（owner 目視未做）
-- Date and checked commit/worktree: 2026-11-02，R1 worktree 改動（commit 見 git log）
+- Date and checked commit/worktree: 2026-11-02，R1 同 R2 worktree 改動（commit 見 git log）；R2：Opus 重跑 root `npm test` exit 0、`npm run build` exit 0、`git diff --check` clean；Sonnet 量 FPS hour 16 60.0（draws 1081）、hour 21 60.0–60.1（draws 1082），textures 47 → 59
 - Commands/manual checks and results: Opus 重跑 root `npm test` exit 0（含新 heroHolograms test：13 panel、冇拉丁字母、四 site／Civic Core／畫面中心視線清、tier clamp、「提案 1,284件」）、`npm run build` ✓、`git diff --check` clean。survey／module-swap 冇改，冇跑。
 - FPS（Sonnet 量，development Mac headless Chrome，1920×1080，vsync，load 25 s 後讀 canvas `data-fps`）：hour 16 60.0（draws 1081，hologram 隱藏 1039），hour 21 60.0（draws 1082）；triangles +80。
 - Evidence: `artifacts/hero-holograms/r1/`（`hero-h16.png`、`hero-h21.png`、`vs-target.jpg`、`style-crop.jpg`）

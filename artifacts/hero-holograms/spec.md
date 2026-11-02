@@ -82,3 +82,51 @@ Owner 決定：**位置跟 `target/hero-layout-night.png`**（Gemini R2 夜，�
 - `hero-h16.png`、`hero-h21.png`（同 baseline URL）
 - `vs-target.jpg`：每行 baseline｜target（layout）｜R1，日夜各一行；再加一張 `style-crop.jpg`：R1 `district` 同 `air` 兩塊 panel 放大，旁邊放參考圖左邊「2127」同「CLEAN AIR」嘅裁圖。
 - FPS：hero 1920×1080 vsync，`hour=16` 同 `21`，load 25 s 後每 2.5 s 讀 canvas `data-fps` 4 次（丟第一次）；同時記 draws／triangles 對比 baseline（R4 sky ring：draws 1009）。低過 60 FPS 唔收。
+
+---
+
+# R2（2026-11-02）— 內容打磨
+
+Owner：唔要表演者，換做其他嘢；打磨 panel 顯示嘅內容。位置、數量、三層物料同 live 接口唔變。R1 審核問題：字太矇、文字同圖形重疊、日間玻璃偏灰白、panel 比 target 細、pod 遮住 `air`。
+
+## A. 字要清（所有 panel）
+
+- **兩次畫**：每段文字同線稿先畫一次 glow（`shadowBlur 6·k`、alpha .55），再喺上面畫一次**冇 shadow** 嘅實色（`INK`）。唔好再用 22·k 嘅大 blur 做唯一一層。
+- **最細字**：喺 1600×900 hero 截圖入面，每個字最少 **12 px 高**（標題 ≥ 18 px）。用 panel 嘅畫面闊度換算 canvas 字號；放唔落就刪字，唔好縮細。
+- 數字用 tabular（`font-variant-numeric` 唔得就用等寬數字字體 fallback `'SF Mono',monospace`），粗 600。
+- Texture：`anisotropy = renderer.capabilities.getMaxAnisotropy()`，mipmap 開；大 panel（`district`、`culture`、`voices`、`tide`）canvas 長邊 2048，其餘 1024。
+
+## B. 版面：分區、唔重疊
+
+每塊 panel 用固定分區（比例係 canvas 闊／高）：留 6% 內邊距；文字區同圖形區唔可以重疊；HUD 刻度行只佔底部 10%，唔好壓住內容。
+
+| id | 版面 |
+|---|---|
+| `district` | 左 48%：3D 地球（半徑改為 panel 高 .28，中心對準左區中心，唔好伸入右區）。右 52%：「台場」（大）、下面「2127」（更大數字）、細分隔線、一行細字「北緯35.62 東経139.77」。 |
+| `transit` | 兩行表格，中間一條分隔線。每行：左 icon（列車／巴士線稿）、中站名、右邊大數字或箭咀：「ゆりかもめ 台場駅 →」；「空港シャトル 3分」。 |
+| `air` | 左 30%：葉 icon。右 70%：上細字「空気清浄度」、中大數字「98.7%」、底一條細 sparkline。 |
+| `voices` | 頂行：左「住民の声」、右「提案 N件」。四行：左 38% 標籤、右 62% 柱（細外框 track + Meter 色實柱，柱尾一粒亮點）。行距平均，唔好貼邊。 |
+| `tide` | 左 35%：「水位」「安定」上下兩行大字。右 65%：波形圖，加淡格線同一個細標「潮位 +12」（唔用 m／cm，因為拉丁字母唔准）。 |
+| `newgen` | 左 35% 手機線稿；右 65%「新世代」「登場」兩行。 |
+| `release` | 上 65% 方塊線稿；下 35%「新発売」。 |
+| `smartlife`、`daily` | 直寫字放大到欄闊 70%，置中；頂同底各一組細刻度。 |
+| `culture` | 見 C。 |
+
+## C. `culture` 換內容：表演者 → 球體展望室（Fuji TV 球）
+
+- 刪 `performer` 函數同所有表演者線稿。
+- 新圖（左 50%）：Fuji TV 球體展望室線稿 — 一個圓（經緯線 4×3），下面一段方格框架（2 層、3 格），球兩邊各三條同心廣播弧（左右對稱，越外越淡）。
+- 右 50%：「フジ」大字、「文化放送」、細字「今夜 20:00 湾岸フェス」。
+- 紫色光（`VIOLET`）只用喺呢塊同其他廣告；Meter 色唔用。
+
+## D. 日間玻璃同大小
+
+- 日間 pane：`#0a5468`，opacity `.45`（R1 `.62` 偏灰白）；content 日間乘數 `2.6`，令青白字喺深 teal 玻璃上跳出嚟。夜間不變。
+- 跟 target 放大：`district` w .14、`voices` .11、`air` .095、`transit` .11、`tide` .14、`culture` .15；放大之後 sightline test 一定要過，唔過就逐塊縮返到過為止，報告最後數值。
+- `air`：放喺 `0.7·d`（比其他近啲），或者向上移到 pod 航道上面，總之 hero 截圖入面唔可以被 pod 遮住。
+
+## E. 測試同截圖
+
+- `tests/heroHolograms.test.ts`：加「冇 `performer`」唔使；加 `culture` 文字有「フジ」「文化放送」；所有字仍然冇拉丁字母。
+- 截圖存 `r2/`：`hero-h16.png`、`hero-h21.png`、`vs-target.jpg`（每行 R1｜target｜R2，日夜各一行）、`panels-crop.jpg`（R2 日間每塊 panel 原尺寸裁圖排成一張，方便睇字清唔清）。
+- FPS 同 R1 一樣量（1920×1080，hour 16／21）。
