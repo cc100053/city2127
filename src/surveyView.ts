@@ -233,11 +233,12 @@ function isDecision(value: unknown): value is Decision {
 }
 
 /** A guest's look at a landmark on the shared screen; `ordinal` lights their own voice node. */
-export type ExploreLook = { target: 'sky-ring'; ordinal: number };
+export type ExploreLook = { target: 'sky-ring' | 'space-elevator'; ordinal: number };
 /** null ends the look; undefined is malformed. */
 export function parseExplore(data: Record<string, unknown>): ExploreLook | null | undefined {
   if (data.target === null) return null;
-  return data.target === 'sky-ring' && Number.isSafeInteger(data.ordinal) && (data.ordinal as number) > 0 ? { target: 'sky-ring', ordinal: data.ordinal as number } : undefined;
+  return (data.target === 'sky-ring' || data.target === 'space-elevator') && Number.isSafeInteger(data.ordinal) && (data.ordinal as number) > 0
+    ? { target: data.target, ordinal: data.ordinal as number } : undefined;
 }
 
 /** Parses one WebSocket message from the survey server; anything malformed returns null. */

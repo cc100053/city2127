@@ -104,8 +104,8 @@ export type LifecycleData = {
 
 export type DisplayMode = 'auto' | 'day' | 'night';
 
-/** Landmarks a guest may look at on the shared screen after their result (the far space elevator joins once its close-up LOD exists). */
-export const EXPLORE_TARGETS = ['sky-ring'] as const;
+/** Landmarks a guest may look at on the shared screen after their result. */
+export const EXPLORE_TARGETS = ['sky-ring', 'space-elevator'] as const;
 export type ExploreTarget = typeof EXPLORE_TARGETS[number];
 /** `target: null` ends the guest's look; it is never stored, so it needs no revision. */
 export type ExploreRequest = { guestSessionId: string; target: ExploreTarget | null };

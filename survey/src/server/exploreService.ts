@@ -24,7 +24,7 @@ export function createExplore(ctx: SurveyContext) {
     get holder() { return holder; },
     request(body: unknown): ServiceOutcome<{ target: ExploreTarget | null }> {
       const request = parseExploreRequest(body);
-      if (!request) return { response: fail('bad_request', 'Expected guestSessionId and target sky-ring or null.') };
+      if (!request) return { response: fail('bad_request', 'Expected guestSessionId and target sky-ring, space-elevator or null.') };
       if (request.target === null) {
         const event = holder?.sessionId === request.guestSessionId ? end() : undefined;
         return { response: { ok: true, data: { target: null } }, event };

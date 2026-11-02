@@ -523,7 +523,8 @@ function renderHandoff() {
     el('p', { class: 'guest-lead' }, '街はこのまま次の方へ引き継がれます。'),
     ...noticeNodes(),
     el('div', { class: 'guest-actions' },
-      exploring ? action('戻る', () => void explore(null), true) : action('空の環を見る', () => void explore('sky-ring'), false, busy || othersExploring),
+      ...exploring ? [action('戻る', () => void explore(null), true)]
+        : [action('空の環を見る', () => void explore('sky-ring'), false, busy || othersExploring), action('軌道エレベーターを見る', () => void explore('space-elevator'), false, busy || othersExploring)],
       action('はじめる画面へ', nextGuest, !exploring)));
   focusTitle();
   // While this guest looks at a landmark the screen waits for 戻る, the next Start or a new result; staff end a forgotten one.

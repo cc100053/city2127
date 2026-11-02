@@ -34,7 +34,7 @@ import { skyRing, STANDALONE_VOICES } from './skyRing';
 import { GuestExplore } from './guestExplore';
 import type { ExploreLook } from './surveyView';
 import { heroHolograms } from './heroHolograms';
-import { spaceElevator } from './spaceElevator';
+import { spaceElevator, spaceElevatorNear } from './spaceElevator';
 import './style.css';
 
 // Height fog: FogExp2 thickens toward the water (45 m scale height), so low ground and the far shore fall into haze while towers stand clear.
@@ -102,7 +102,7 @@ try {
   const ring=skyRing(scene);ring.setVoices(STANDALONE_VOICES);
   // Hero holograms: the same count feeds the 住民の声 panel; its four Meter bars follow the layout's rungs.
   const holo=heroHolograms(scene,renderer.capabilities.getMaxAnisotropy());holo.setVoices(STANDALONE_VOICES);
-  const elevator=spaceElevator(scene);
+  const elevator=spaceElevator(scene),elevatorNear=spaceElevatorNear(scene,elevator);
   const odaibaReady=loadOdaiba(scene,water).then(()=>true).catch(error=>{const message=document.createElement('p');message.className='error';message.textContent='Odaiba could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);return false;});
   if(import.meta.env.DEV && new URLSearchParams(location.search).has('asset-preview')){
     const input=document.createElement('input');input.type='file';input.accept='.glb,model/gltf-binary';input.className='asset-preview';input.title='Preview a Blender GLB in the city scene';input.setAttribute('aria-label','Preview a Blender GLB');
@@ -146,7 +146,7 @@ try {
   const aoPass=ao as unknown as {_overrideVisibility():void;_restoreVisibility():void},hideFlat=aoPass._overrideVisibility.bind(aoPass),showFlat=aoPass._restoreVisibility.bind(aoPass);
   // ponytail: the overlay list is rescanned every 120 AO frames (about 2 s), so one created later may show its AO bar until then.
   let flat:T.Object3D[]=[],overlays:T.Object3D[]=[],aoFrame=0;
-  aoPass._overrideVisibility=()=>{hideFlat();if(aoFrame++%120===0){overlays=[];scene.traverse(o=>{const m=(o as T.Mesh).material as T.Material|undefined;if(m?.transparent&&(m as T.MeshBasicMaterial).isMeshBasicMaterial)overlays.push(o);});}flat=[floor,scene.getObjectByName('bay-context'),elevator,...overlays].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
+  aoPass._overrideVisibility=()=>{hideFlat();if(aoFrame++%120===0){overlays=[];scene.traverse(o=>{const m=(o as T.Mesh).material as T.Material|undefined;if(m?.transparent&&(m as T.MeshBasicMaterial).isMeshBasicMaterial)overlays.push(o);});}flat=[floor,scene.getObjectByName('bay-context'),elevator,elevatorNear.root,...overlays].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
   aoPass._restoreVisibility=()=>{showFlat();for(const o of flat)o.visible=true;};
   const bloom=new UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.2,.7,1);composer.addPass(bloom);
   const vignette=new ShaderPass(VignetteShader);vignette.uniforms.offset.value=.9;vignette.uniforms.darkness.value=.9;composer.addPass(vignette);composer.addPass(new OutputPass());
@@ -190,15 +190,22 @@ try {
   });
   // Civic/street reviews keep their own authored camera.
   const headlineCamera=(surveyUrl||metersParam!==null||shotPreview)&&!civicReview&&!streetReview?new HeadlineCamera(camera,controls):null;
-  let devShot:ShotId|null=null;
+  let devShot:{position:readonly [number,number,number];target:readonly [number,number,number]}|null=null;
   const cameraMotion=matchMedia('(prefers-reduced-motion: reduce)');
   if(import.meta.env.DEV){
     import('./devShotFrame').then(({cityShotFrame})=>Object.assign(window,{cityShotFrame:(id:string)=>cityShotFrame(scene,camera,id)}));
     Object.assign(window,{cityShot:(id?:string)=>{
       if(id===undefined){const pose={position:camera.position.toArray(),target:controls.target.toArray()};console.log(pose);return pose;}
       if(!Object.hasOwn(SHOTS,id))throw new Error(`Unknown shot: ${id}`);
-      headlineCamera?.cancel();devShot=id as ShotId;controls.enabled=false;
-    }});
+      headlineCamera?.cancel();devShot=SHOTS[id as ShotId];controls.enabled=false;
+    },
+    // `cityPose([x,y,z],[tx,ty,tz])`: free review camera for poses that are not in SHOTS yet.
+    cityPose:(position:[number,number,number],target:[number,number,number])=>{
+      headlineCamera?.cancel();devShot={position,target};controls.enabled=false;
+    },
+    // `cityElevatorNear(true)` / `?elevatorNear`: the R1 mid-distance elevator model instead of the far R6 silhouette.
+    cityElevatorNear:(on:boolean)=>elevatorNear.setActive(on)});
+    if(params.has('elevatorNear'))elevatorNear.setActive(true);
     const shot=params.get('shot');
     if(shot!==null)(window as unknown as {cityShot:(id:string)=>void}).cityShot(shot);
   }
@@ -222,16 +229,19 @@ try {
   const journey=surveyUrl?new VoteJourney(scene,camera):null;
   // A live energy headline narrates one compressed storage cycle during the close-up hold.
   const narration=surveyUrl&&headlineCamera?new EnergyNarration(()=>cityChanges?.energy):null;
-  // A guest's look at the Sky Ring (iPad, after their result) takes the camera from wherever it is; any city event takes it back.
-  const explore=headlineCamera?new GuestExplore(camera,controls,ring):null;
+  // A guest's look at the Sky Ring or the space elevator (iPad, after their result) takes the camera from wherever it is; any city event takes it back.
+  // The elevator look swaps in the near LOD and hides the ambient sky-corridor trails, one of which crosses E1 edge-on behind the station.
+  const skyTrails=scene.getObjectByName('regional-air-trails');
+  const explore=headlineCamera?new GuestExplore(camera,controls,ring,on=>{elevatorNear.setActive(on);if(skyTrails)skyTrails.visible=!on;}):null;
   const startExplore=(look:ExploreLook,at=now)=>{
     const position=camera.position.clone(),target=controls.target.clone();
     headlineCamera!.cancel();narration?.cancel();devShot=null;camera.position.copy(position);controls.target.copy(target);explore!.play(look,at);
   };
   if(import.meta.env.DEV&&explore){
-    // `cityExplore(ordinal)` / `cityExplore(null)`; `&explore=<ordinal>&exploreAt=<s>` starts a look that many seconds ago (held `reviewTime` freezes it).
-    Object.assign(window,{cityExplore:(ordinal:number|null)=>ordinal===null?explore.back(now):startExplore({target:'sky-ring',ordinal})});
-    if(params.has('explore'))requestAnimationFrame(()=>requestAnimationFrame(()=>{explore.voices=ring.litVoices();startExplore({target:'sky-ring',ordinal:Number(params.get('explore'))||1},now-Number(params.get('exploreAt')??0));}));
+    // `cityExplore(ordinal, target?)` / `cityExplore(null)`; `&explore=<ordinal>&exploreAt=<s>&exploreTarget=space-elevator` starts a look that many seconds ago (held `reviewTime` freezes it).
+    const exploreTarget=(t:unknown):ExploreLook['target']=>t==='space-elevator'?t:'sky-ring';
+    Object.assign(window,{cityExplore:(ordinal:number|null,target?:string)=>ordinal===null?explore.back(now):startExplore({target:exploreTarget(target),ordinal})});
+    if(params.has('explore'))requestAnimationFrame(()=>requestAnimationFrame(()=>{explore.voices=ring.litVoices();startExplore({target:exploreTarget(params.get('exploreTarget')),ordinal:Number(params.get('explore'))||1},now-Number(params.get('exploreAt')??0));}));
   }
   if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view,displayMs)=>{
     devShot=null;explore?.interrupt();if(explore&&isExhibitionView(view))explore.voices=view.guestCount;
@@ -290,8 +300,8 @@ try {
     controls.update();if(!ringReview){panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);}
     if(headlineCamera?.active&&cameraMotion.matches)headlineCamera.cancel();else headlineCamera?.update(now);
     narration?.update(now,cameraMotion.matches);explore?.update(now,cameraMotion.matches);
-    if(import.meta.env.DEV&&devShot){const pose=SHOTS[devShot];camera.position.set(...pose.position);controls.target.set(...pose.target);camera.lookAt(controls.target);}
-    cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();
+    if(import.meta.env.DEV&&devShot){camera.position.set(...devShot.position);controls.target.set(...devShot.target);camera.lookAt(controls.target);}
+    cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.
     if(performance.now()-shadowDrawn>=1000/quality.shadowHz){renderer.shadowMap.needsUpdate=true;shadowDrawn=performance.now();}
     composer.render();
