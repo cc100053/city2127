@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS
 - Branch: `feat/city-taste-v2`
 - Base commit: 27899d5f (origin/main, 2026-11-02)
-- Last verified commit: NONE (documentation only so far)
+- Last verified commit: c658078 (tests fail 0, build, diff-check on the P7 merge)
 - Remote availability: `origin/feat/city-taste-v2` once pushed
 
 ## Session Git state
@@ -127,3 +127,25 @@ Coordinator session runs `artifacts/city-taste-v2/coordinator.md`: P1→P6 again
 
 - Decision: **polish again** → `P7/spec-r2.md`. Teal cast removed (source: teal elevator lamps `#8ce5d8`, warm hemisphere ground bounce at night, too-low night ambient); ring lit ~60%, Sky Ring and elevator cool white, civic frame corner/top seams. Misses: windows clip to cream instead of amber, plaza/ground dark, night FPS only one valid sample.
 - Evidence `feat/city-taste-v2-p7` 6c4d43c, `P7/r1/`. Agent checks: tests fail 0, build ok, diff-check clean; `tests/odaiba.test.ts` civic batch cap 9 → 10 (new seam batch). Day h16 pixel diff vs P6 mean 0.71 (motion only).
+
+## P7 r2 (2026-11-03 06:05 JST) — PASS
+
+- Decision: **pass**, merged `--no-ff` (c658078 merges `feat/city-taste-v2-p7` 39930d4). Night windows saturated amber (megastructures, curtain walls, retained glazing, civic rooms), plaza/walkway lamp pools (1 instanced additive draw) + faint paving emissive, all gated on night. Day h16 unchanged (pixel diff mean 0.72, motion only). Weak: hero plaza away from pools still mid-grey; ground greenery albedo-green at night.
+- FPS (agent, `data-fps` every 2.6 s): day 60.0, 60.0, 60.0, 60.0, 60.0, 60.1, 60.0; night 60.1, 60.0, 60.0, 60.1, 59.9, 60.1, 60.0 (vsync cap; uncapped headroom not measured).
+- Checks on the merge (coordinator): tests fail 0, build 0, diff-check clean.
+
+## Overnight result (2026-11-03 06:10 JST)
+
+- Status: P1–P7 all **passed** and merged into `feat/city-taste-v2` (rounds: P1 3, P2 2, P3 1, P4 2, P5 1, P6 1, P7 2). Nothing reverted or skipped. Nothing merged to `main`.
+- Review board: `artifacts/city-taste-v2/review.jpg` (per part: before | final | target; top two rows = whole hero day/night baseline → final vs `master-day.png` / `master-night.png`).
+- Removed for the new layout (owner should confirm): Grand Nikko, Hilton and Aqua City landmarks; 3 of 10 district Meter towers + 4 pods inside megastructure footprints; both sky bridges, `midDecks[0]`, `gardenDecks[0]`, hologram tags `tag-a/b/c`; Aqua doorway meeting points; the civic core's upper escalator diagonal. `voices` and `air` panels moved to masts on the plaza deck (live).
+- Test edits across parts: `tests/districtMeters.test.ts` (family counts follow surviving towers), `tests/odaiba.test.ts` (one Fuji ride; civic batch cap 10), `tests/mobility.test.ts` (walker routes over two decks; 2 sky lanes, short trails), `tests/heroHolograms.test.ts` (5 panels); new `tests/megastructures.test.ts`, `tests/floaters.test.ts`. No hero-visibility assertion had to be deleted.
+- Process deviation: parts ran as Sonnet background agents (the app refused `start_session` from a session started by another session); keep-awake was denied; a Sonnet rate limit paused P1 r3 from ~23:10 to 00:50.
+- Known gaps: hull reads as tree clusters over glass from hero; self-assembling modules white rather than blue by day; plaza mid-size at hero and grey at night away from lamp pools; no small foreground boats (needs a smaller craft type); "2127/フジ" billboards still opaque-ish line-art; uncapped FPS not measured anywhere (all readings at the 60 vsync cap); Meter high/low states not checked visually after the restyle; `survey/` and `module-swap/` untouched (not rerun).
+
+## Next expected step (owner)
+
+1. Look at `review.jpg` and judge visually (owner sole acceptance).
+2. Confirm the night target pick (`gen/master-night-2.png` → `target/master-night.png`; alternative `gen/master-night-1.png`).
+3. Agree P8 scope (facility change impact) and which gaps above to polish.
+4. Decide on merging `feat/city-taste-v2` to `main` (needs a Meter high/low + headline close-up check first).
