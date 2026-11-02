@@ -31,6 +31,7 @@ import { shotTimeline } from './resultTimeline';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming';
 import { housingPrototype } from './housingPrototype';
 import { skyRing, STANDALONE_VOICES } from './skyRing';
+import { spaceElevator } from './spaceElevator';
 import './style.css';
 
 // Height fog: FogExp2 thickens toward the water (45 m scale height), so low ground and the far shore fall into haze while towers stand clear.
@@ -96,6 +97,7 @@ try {
   build2127(scene);
   // Sky Ring voices: the proposal count from the survey server, a plausible mid count in standalone review.
   const ring=skyRing(scene);ring.setVoices(STANDALONE_VOICES);
+  const elevator=spaceElevator(scene);
   const odaibaReady=loadOdaiba(scene,water).then(()=>true).catch(error=>{const message=document.createElement('p');message.className='error';message.textContent='Odaiba could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);return false;});
   if(import.meta.env.DEV && new URLSearchParams(location.search).has('asset-preview')){
     const input=document.createElement('input');input.type='file';input.accept='.glb,model/gltf-binary';input.className='asset-preview';input.title='Preview a Blender GLB in the city scene';input.setAttribute('aria-label','Preview a Blender GLB');
@@ -139,7 +141,7 @@ try {
   const aoPass=ao as unknown as {_overrideVisibility():void;_restoreVisibility():void},hideFlat=aoPass._overrideVisibility.bind(aoPass),showFlat=aoPass._restoreVisibility.bind(aoPass);
   // ponytail: the overlay list is rescanned every 120 AO frames (about 2 s), so one created later may show its AO bar until then.
   let flat:T.Object3D[]=[],overlays:T.Object3D[]=[],aoFrame=0;
-  aoPass._overrideVisibility=()=>{hideFlat();if(aoFrame++%120===0){overlays=[];scene.traverse(o=>{const m=(o as T.Mesh).material as T.Material|undefined;if(m?.transparent&&(m as T.MeshBasicMaterial).isMeshBasicMaterial)overlays.push(o);});}flat=[floor,scene.getObjectByName('bay-context'),...overlays].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
+  aoPass._overrideVisibility=()=>{hideFlat();if(aoFrame++%120===0){overlays=[];scene.traverse(o=>{const m=(o as T.Mesh).material as T.Material|undefined;if(m?.transparent&&(m as T.MeshBasicMaterial).isMeshBasicMaterial)overlays.push(o);});}flat=[floor,scene.getObjectByName('bay-context'),elevator,...overlays].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
   aoPass._restoreVisibility=()=>{showFlat();for(const o of flat)o.visible=true;};
   const bloom=new UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.2,.7,1);composer.addPass(bloom);
   const vignette=new ShaderPass(VignetteShader);vignette.uniforms.offset.value=.9;vignette.uniforms.darkness.value=.9;composer.addPass(vignette);composer.addPass(new OutputPass());
