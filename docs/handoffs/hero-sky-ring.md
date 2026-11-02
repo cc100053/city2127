@@ -172,4 +172,27 @@ Validation：
 - 證據：`polish/r4/vs-target.jpg`（每行 R3｜target｜R4）、`r4/berth-r3-target-r4.jpg`、`r4/<shot>.jpg`、`r4/hero-h16.jpg`、`r4/hero-h21.jpg`
 - NOT RUN：uncapped FPS、civic 鏡頭、R4 console error 檢查、展覽機、dusk
 
-Next expected step：owner 睇 `r4/berth-r3-target-r4.jpg`，接受就 merge 入 `feat/hero-sky-ring`，或者指出 R5。
+Next expected step：owner 2026-11-02 指出 R5（泊位配色、mint 位置、質感）。
+
+## Close-up polish R5（泊位配色／mint／質感）
+
+Owner 2026-11-02 畀咗一張泊位近鏡參考（`polish/r5/owner-ref-berth.png`，target berth 嘅放大），話「依個配色，藍光環位置，質感，再 polish」。改動（`src/skyRing.ts`）：
+
+| 參考讀到 | R5 改動 |
+|---|---|
+| 冷色珍珠白、緞面反光 | 新材質 `pearl`（#eef1f2，roughness .2，metalness .35）用喺平台、封邊、腹板、機身同轉子 |
+| 冷灰停機坪、外圈凸起圓邊 | `padGrey`（#c3cbd1）坪面；U 形珍珠白路緣（1.3 m 闊、圓角 bevel）圍住坪面，低玻璃欄企喺路緣上 |
+| 厚而圓嘅封邊、下面一條灰帶 | `slab()` 加 bevel：1.3 m 圓邊封邊、`slate`（#6b767e）凹入灰帶、圓邊腹板 |
+| Mint 燈：大扁圈喺轉子下面、封邊直面上分段燈條、坪面導引線 | 一個扁平 `RingGeometry` 大圈（5.7–6.5 m）；封邊外面同兩側各一條燈條，到圓角前停；甲板側一條導引線，外側兩條角位短線；刪咗 R4 嘅整圈燈帶、內弧同 U 形內線 |
+| 機身頂有藍灰玻璃膠囊窗 | 兩條 `visor`（#5f7d90）膠囊窗沿頂邊；刪咗 R4 嘅玻璃帶同轉子連臂 |
+
+仍然冇跟：平台沿環方向嘅弧形連接步道、大堂旁樓梯、人群密度。
+
+Validation：
+
+- hero `hour=16`：60.0 ×4 FPS vsync，draws **1009**（R4 1005），triangles **17.60M**（陰影更新幀偶然 1396／22.6M）；`hour=21`：60.1，draws 1010。Console 0 error（hero 頁）。
+- Root `npm test` exit 0（sky ring：19 batches，環頂 257.5 m，12 條 hero 視線清）、`npm run build` ✓、`git diff --check` clean。
+- 證據：`polish/r5/berth-r4-ref-r5.jpg`（R4｜owner 參考｜R5 近鏡）、`r5/<shot>.jpg`、`r5/hero-h16.jpg`、`r5/hero-h21.jpg`
+- FPS 喺 slate 調淺之前量；之後只改咗一個顏色值。NOT RUN：uncapped FPS、civic 鏡頭、展覽機、dusk
+
+Next expected step：owner 睇 `r5/berth-r4-ref-r5.jpg`，接受就 merge 入 `feat/hero-sky-ring`，或者指出 R6。
