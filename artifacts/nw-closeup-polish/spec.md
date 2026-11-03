@@ -89,3 +89,11 @@ Language: the bays are small siblings of the R1 flagship — same materials (`tr
 
 - `npm test && npm run build && git diff --check`. Draw calls: report the instanced mesh count before/after (`AutomationDistrict.root` children); keep it within +4.
 - Evidence `~/city2127-evidence/nw-closeup-polish/r2/`: `nw-bay-{low,mixed,high}-day.png`, `-night` (hour 22), one `nw:district` capture per band, the existing `nw:bay1` headline shot at high, and `vs-target.jpg` (3 rows × [r2 | bay target], 800×450). Publish only `vs-target.jpg` to `nw-closeup-polish/r2`.
+
+## R3 — bays at target size (owner 2026-11-03: 「放大到目標圖咁大」)
+
+R2 bays are metre-true (hall 22 m) and fill ≈ 15 % of the `nw:bay-e` review frame; the targets show ≈ 35 %. Scale every bay design (staffed pavilion + canopy, hybrid column, both autonomous towers, docked drones) **uniformly by 2×** about its foot: one constant (e.g. `BAY_SCALE = 2`) applied in `write()` / `writeDrones()` instance matrices, so geometry code stays in R2 metres. People inside keep reading as people at 2× (they are part of the batch — acceptable; if they look giant against promenade walkers in captures, keep the people batch at 1× and only scale the architecture).
+
+Placement: the 2× plinth (48 × 36 m) and 90 m tower must still pass every clearance/route test in `tests/odaiba.test.ts` and `tests/districtMeters.test.ts`. Fix failures in this order: (1) push the bay further from its promenade (the constructor's 22 m offset → whatever clears, per bay if needed), (2) rotate the bay, (3) shrink that one bay's scale to the largest that clears (not below 1.5×). Do not drop bays: `SHOTS['nw:bayN']` and the coverage table in `src/headlineCamera.ts` are keyed by bay index. If a bay moves, update its `nw:bayN` shot so the bay is in frame (check one capture per moved bay). Never delete a clearance assertion; widen sample grids to the new footprint instead.
+
+Captures `~/city2127-evidence/nw-closeup-polish/r3/`: `nw-bay-{low,mixed,high}-day.png` at `nw:bay-e`, `nw-district-{low,high}-day.png`, the hero view `?meters=nw:high&hour=12` and `?meters=nw:low&hour=12` (no shot param) to check the bays don't dominate the hero, one `nw:bayN` per moved bay, `vs-target.jpg` (3 rows × [r3 | bay target]) → publish to `nw-closeup-polish/r3`. Report per-bay final position/scale, the frame share at `nw:bay-e`, and checks.
