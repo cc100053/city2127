@@ -194,3 +194,14 @@ Base: R7 (c0bc45e). Same pose, captures and lot. Judged by absolute scores **and
 - **Canopy emitters** (`fl-canopy`): judges split between R6 cones and R7 bulbs. Target: four discrete bright spots flush under the lens with a short soft glow beneath (not hanging spheres, not large cones). Make the bulbs flush/flattened pads with a small downward glow cone (short, low opacity).
 
 Do not touch the high state or the mixed column/arm/rings. Captures into `~/city2127-evidence/nw-closeup-polish/r8/` (day ×3, night ×3, focal shots); publish `vs-target.jpg` to `nw-closeup-polish/r8`. Do not judge.
+
+## R9 — last four flagship items (owner 2026-11-03: 「開 R9」)
+
+Base: R8 (ab7f8bc). Same pose, captures, lot and judging (absolute + blind pairwise R8 vs R9). Targets from [r8/scores](r8/scores.md); keep every other item and the R8 night warmth.
+
+- **Deep cantilever, recessed glass** (`fl-glazing`): the target's roof is a thin white slab projecting well past a glass line set back under it. Set the low hall's glazing (mullions + glass + room front) back ≥ 1.2 pre-scale units from the slab's front edge so a deep shaded soffit shows between slab edge and glass; slab edge stays thin. Lighter mullions (thinner, fewer — ≈ 4–5 bays across) so the room reads as a hall interior, not a lit panel. Keep the people readable.
+- **Clean up under the canopy and at the right** (`fl-material`): remove or hide the dark blue striped column visible in the canopy gap at the review pose (find what it is — canopy mast/stalk or a neighbour — and make it white/thin or drop it if the canopy is meant to hover free), and find the beige box at the hall's right side in the crop (likely an existing neighbour or a hub prop); if it belongs to the hub make it white, if it is a neighbour leave it and report.
+- **Parcels to scale** (`fh-arms`): parcels on the +1 arms ≈ ⅓ of their current size (target-sized), still amber; keep ≥ 6 arms visible.
+- **Drone streams in the air** (`fh-drones`): ≥ 12 small hub drones airborne in 2–3 visible streams near the upper tower against the sky at the review pose (not docked, not behind the tower); the oversized teal city flyers are not ours — if a hub drone class is oversized, shrink it to the stream size.
+
+Captures into `~/city2127-evidence/nw-closeup-polish/r9/` (day ×3, night ×3, focal shots); publish `vs-target.jpg` to `nw-closeup-polish/r9`. Do not judge.
