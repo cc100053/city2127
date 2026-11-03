@@ -1,7 +1,7 @@
 # city-taste-v2 — Rewrite the city taste toward visible high technology
 
 - Owner: cc100053
-- Status: AWAITING OWNER REVIEW (P1–P7 merged on feat/city-taste-v2)
+- Status: AWAITING OWNER REVIEW (P1–P7 + polish2 merged on feat/city-taste-v2)
 - Branch: `feat/city-taste-v2`
 - Base commit: 27899d5f (origin/main, 2026-11-02)
 - Last verified commit: c658078 (tests fail 0, build, diff-check on the P7 merge)
@@ -149,3 +149,15 @@ Coordinator session runs `artifacts/city-taste-v2/coordinator.md`: P1→P6 again
 2. Confirm the night target pick (`gen/master-night-2.png` → `target/master-night.png`; alternative `gen/master-night-1.png`).
 3. Agree P8 scope (facility change impact) and which gaps above to polish.
 4. Decide on merging `feat/city-taste-v2` to `main` (needs a Meter high/low + headline close-up check first).
+
+## Polish 2 — centre, night, hull (2026-11-03, Opus, branch `feat/city-taste-v2-polish2` from 9dc52aa)
+
+Owner asked after the overnight review: centre plaza and frame tower too weak, night too grey with no warm ring, right hull reads as tree clusters. Opus implemented directly (no Sonnet round-trip; scope was small enough to judge in-browser). Evidence `artifacts/city-taste-v2/polish2/<gap>/rN/` (hero h16/h21 + `vs-target.jpg` = P7 final | round | target); board `artifacts/city-taste-v2/review2.jpg`.
+
+- **Centre r1 → r2 (pass).** Fuji civic chassis scaled 1.35× about its west-front foot and set back to (-63, 22) (`CIVIC`/`civicAt` in `layout.ts`; frame now spans ≈ the target's screen box, top ≈ 192 m). People, rides and the theatre shader follow the transform. Its footprint joins `bodyFootprints` (context carved, no towers/pods/skyway rings inside); Divercity Tokyo Plaza is dropped (it sat under the new frame). Sphere berth and the air-taxi approach rise with it (regional tier now 160–205 m). District/culture hologram screens moved to the frame's east face (off the hero, which no longer sees 「2127」「フジ」 over the frame). `HERO_CLEAR` (`megaFootprints.ts`) keeps district towers, pods and automation bays out of the plaza apron, hull forecourt and ring forecourt. Plaza deck extended 45 m east to under the arch (`PLAZA.east`), walkway A re-landed on the new end, extra resident groups; crowns smaller. r2: civic rooms pale by day and warm only at night.
+- **Night r1 → r2 (pass).** Ring faces are now a window facade (`megaFace`): pale glass by day, ~65 % rooms lit amber at night. Night fill: ambient 1−.3·night (was .45), exposure +.18 (was +.08). Chrome sphere's sky reflection dims at night (`updateCivic`). Plaza paving night emissive `#3e4b5e`, lamp pools .5.
+- **Hull r1 (pass).** Each step: 8.3 m white slab + cool seam line, one glass storey set 0.8 m back; rim trees scaled .5–.8 (shrub bands unchanged, still lush).
+- Not done (time): small foreground boats; blue/beam-lit self-assembly by day.
+- Test edits: `odaiba.test.ts` (civic bounds −7…195 m; work-floor probes via `civicAt`; seat/floor tolerance ×k; court 9 added to hero-hidden list — now behind the frame), `heroHolograms.test.ts` (district/culture exempt from the hero-facing check, owner rule). No other assertion removed.
+- Checks: root `npm test` all files pass (run per file), `npm run build` ✓, `git diff --check` clean. Hero FPS (headless Chrome, vsync, 1920×1080, `data-fps` every 2.6 s, first dropped): day 60.0 ×6, night 60.0 ×6; draws ≈ 1085 (P7 1099). Uncapped not measured. survey/module-swap untouched.
+- **Meter check (before merge to main)** — `polish2/meter-check/`: NW, NE and SW headline close-ups at low/high are unchanged and read correctly. **SE is broken, before and after this polish:** the P1 ring stands in front of both `se:focal` and `se:focal-low` (low view looks through a ring beam; high view is filled by the ring's inside). Hero all-high vs all-low still differs, but less than before: the hero-foreground concentration towers (old slots 2, 5) and three automation bays are no longer built, so district change reads mostly via SE/far pieces. Both need an owner decision (move SE camera / site, or accept).
