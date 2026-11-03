@@ -160,3 +160,15 @@ Base: R4b (e368748). Same review pose and capture method as R4; lot stays 16×24
 ### Checks and captures
 
 `npm test && npm run build && git diff --check`; mesh budgets hold. Evidence `~/city2127-evidence/nw-closeup-polish/r5/`: `flagship-{low,mixed,high}.png` at 3200×1800 at the review pose, `nw:focal`/`nw:focal-low` 1600×900 per band, one night capture (hour 22) of low and high at the review pose, `vs-target.jpg` → publish to `nw-closeup-polish/r5`. Do not judge.
+
+## R6 — warm rooms, emitters, drones, arms (owner 2026-11-03: 「開 R6」)
+
+Base: R5 (55a808e). Same pose, captures and lot. Aim at the 1-score items in [r5/scores](r5/scores.md); every 2-score item must stay 2 (`fl-people-in`, `fl-forecourt`, `fm-arm`, `fm-column`, `fh-rings`, `fh-base`, `fh-cap`).
+
+- **Warm rooms** (`fl-glazing`, `fm-hall`, `fl-material`): the interior must glow like the target — warm amber-orange light (`warm`-family emissive, intensity high enough to read brighter than the white shell in daylight), not a matte peach/beige wall. Light the back wall, ceiling strip and floor emissively with a gradient (brighter ceiling, deeper back); keep the screens but make them small cool accents on the counters, not a row of teal stripes across the wall. **Night (hour 22): the rooms glow** — today the low hall interior goes dark; fix the material/lighting path so both halls read lit at night (check how SE's `warm` stays lit at night).
+- **Canopy emitters** (`fl-canopy`): 4 emitters that read as light sources from the review pose: a bright white-blue core disc on the canopy underside plus a short soft beam/glow below each (like the target's four bright spots). They must be visible from the pose — check they are not hidden behind the roof or seen edge-on.
+- **Docked drones** (`fm-rings`): drones on the mixed rings read as drones — a body plus 4 rotor discs, seen from below/side; place them on the ring rim where the pose sees them, ≥ 2 per ring. Add 2–3 arriving in the air near the rings.
+- **Flying drones** (`fh-drones`): ≥ 10 individually readable quad drones near the upper tower, crisp (not blurred blobs): enough size/contrast against sky (white body with a dark rotor ring or blue light), spaced so they don't merge. Hub drones only; city traffic doesn't count.
+- **Arms with parcels** (`fh-arms`): ≥ 6 arms with amber parcels visible from the pose (camera side or silhouetted at the tower edges), parcels large enough to read.
+
+Checks/captures as R5 into `~/city2127-evidence/nw-closeup-polish/r6/` (including night low/mixed/high), publish `vs-target.jpg` to `nw-closeup-polish/r6`. Do not judge.
