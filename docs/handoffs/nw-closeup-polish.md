@@ -1,7 +1,7 @@
 # nw-closeup-polish — NW 自動化旗艦＋district 載體，新 taste 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — R9 旗艦 25/28，等 owner 校準
+- Status: IN_PROGRESS — 旗艦 owner 接受（R9 25/28）；bay 開工
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
 - Last verified commit: R3 commit（test／build／diff-check PASS）
@@ -149,6 +149,10 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 - 仲係 1：`fl-glazing`（review pose 只係微俯視，soffit 讀唔到）、`fl-material`（室內後牆似平面＋鄰居 kiosk）、`fm-hall`（R8 係 2，code 冇改 → 評審雜訊）。
 - Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean；夜景暖光保持。
 
+## Owner 2026-11-03：旗艦「分數OK」
+
+- Owner 接受 R9 旗艦盲評分數（25/28），作為 rubric 校準：旗艦以 R9 為準，剩低 3 項唔再追。Bay 交新 session 做。
+
 ## Next step
 
-旗艦接近平台期：剩低嘅受鏡頭角度同鄰居限制。建議 owner 睇 R9 board 校準 rubric（逐項 pass／fail），再決定旗艦收貨定改鏡頭／鄰居；之後 bay（judge 1 7/20）。
+Bay（`AutomationDistrict`，rubric `bl-*`／`bm-*`／`bh-*`，judge 1 7/20）：跟 closeup-polish skill（rubric → spec → Sonnet round → 絕對＋pairwise 盲評）。
