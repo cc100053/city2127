@@ -1,7 +1,7 @@
 # nw-closeup-polish — NW 自動化旗艦＋district 載體，新 taste 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — 旗艦 owner 接受（R9 25/28）；bay owner 接受（R2 19/20）；剩 skill step 8
+- Status: DONE — 旗艦 R9 25/28、bay R2 19/20，owner 接受；FPS／文件同步完成，merge main
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
 - Last verified commit: Bay R2 `4092b62`（test／build／diff-check PASS）
@@ -188,6 +188,12 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 
 - Owner 接受 Bay R2 盲評分數（19/20）作為 bay 校準：bay 以 R2（4092b62）為準，`bl-canopy`／`bl-glazing` 唔再追。
 
+## FPS 2026-11-04
+
+- Headless Chrome（playwright-cli，1920×1080，冇 vsync，機器有負載）：本分支 hero 39–43、`nw:bay-e` 46–50；main `34f1fd3` hero 43–44、bay pose 51–52，兩輪 branch 之間差 3 FPS → 雜訊大，唔作結論。
+- Owner：「just hero shot day and night FPS check once」→ 真 Google Chrome headed（`--browser=chrome --headed`，DPR 1，1920×1080，`data-fps` 6×2.6 s，第一個 sample 唔計）：本分支 hero `nw:high` 日 40.7–41.1、夜 40.2–41.3；main 同條件（中途停嘅一輪）hero `nw:mixed` 日 41.3–41.8、夜 40.5–41.4 → 冇可量度退步；呢部機 hero 兩邊都去唔到 60。原始數據 `~/city2127-evidence/nw-closeup-polish/fps/`。展覽機未量。
+- 文件同步：PROJECT（新三個 automation 檔、service bay 數 11→6）、EXHIBITION_SPEC（NW 近鏡）、VALIDATION、handoff index。
+
 ## Next step
 
-Skill step 8：每個 state 量 canvas `data-fps`（1920×1080，第一個 sample 唔計）；同步 `PROJECT`、`EXHIBITION_SPEC`、`VALIDATION` 同 handoff index（新檔 `automationKit.ts`／`automationBayModels.ts`／`automationBays.ts`）；按 CONTRIBUTING `--no-ff` merge 入 main，確認 main CI。
+已 merge main（見 git log）；剩低：展覽機 FPS、旗艦 3 項／bay 2 項未過嘅 rubric（owner 已接受分數）。
