@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { buildAutomationHub, FOLK, HUB_LOT, HUB_PLINTH } from '../src/siteBuilders/automationHub.ts';
+import { changeSites } from '../src/layout.ts';
+import { buildAutomationHub, FOLK, HUB_PLINTH, SHARED_LOT } from '../src/siteBuilders/automationHub.ts';
 
 const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'document');
 Object.defineProperty(globalThis, 'document', {
@@ -23,15 +24,15 @@ const hall = { low: state('low'), mixed: state('mixed') };
 const level = (group: T.Object3D) => group.visible ? group.scale.y : 0;
 scene.updateMatrixWorld(true);
 
-// Every state's plinth stays inside the amber outline it is drawn with (root units; the root carries the Odaiba position and scale):
-// the grown low plinth inside HUB_LOT.low, the shared one (mixed, high) inside HUB_LOT.other. Outline inner edge = lot + .8 a side.
+// Every state's plinth stays inside the lot it is drawn with (root units; the root carries the Odaiba position and scale): the grown low plinth fills
+// the changeSites.nw lot; the shared one (mixed, high) sits inside SHARED_LOT, whose amber outline inner edge is .8 outside it.
 const inRoot = (object: T.Object3D) => new T.Box3().setFromObject(object).applyMatrix4(site.root.matrixWorld.clone().invert());
-const within = (box: T.Box3, lot: { w: number; d: number }) => box.min.x >= -lot.w / 2 - .8 - 1e-3 && box.max.x <= lot.w / 2 + .8 + 1e-3 && box.min.z >= -lot.d / 2 - .8 - 1e-3 && box.max.z <= lot.d / 2 + .8 + 1e-3;
-assert.ok(within(inRoot(site.root.getObjectByName('hub-plinth')!), HUB_LOT.other), 'plinth leaves its lot');
+const within = (box: T.Box3, lot: { w: number; d: number }, margin: number) => box.min.x >= -lot.w / 2 - margin - 1e-3 && box.max.x <= lot.w / 2 + margin + 1e-3 && box.min.z >= -lot.d / 2 - margin - 1e-3 && box.max.z <= lot.d / 2 + margin + 1e-3;
+assert.ok(within(inRoot(site.root.getObjectByName('hub-plinth')!), SHARED_LOT, .8), 'plinth leaves its lot');
 runtime.setTarget({ band: 'low', automatedPorts: 0 }, 0, true);
 const lowPlinth = inRoot(state('low'));
-assert.ok(within(lowPlinth, HUB_LOT.low), 'the low state leaves its lot');
-assert.ok(lowPlinth.max.x - lowPlinth.min.x > 17 && lowPlinth.max.z - lowPlinth.min.z > HUB_PLINTH.low.x * 2 - .5, 'the low state is the x2 target-size group');
+assert.ok(within(lowPlinth, changeSites.nw, 0), 'the low state leaves the nw lot');
+assert.ok(lowPlinth.max.x - lowPlinth.min.x > 15.5 && lowPlinth.max.z - lowPlinth.min.z > HUB_PLINTH.low.x * 2 - .5, 'the low state is the x2 target-size group');
 runtime.restoreLegacy();
 
 // Band-level diagnostics: ports are self-service points, counters staffed ones (0 / 3 / 6 by the Meter).

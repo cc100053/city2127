@@ -1,7 +1,7 @@
 # nw-closeup-polish — NW 自動化旗艦＋district 載體，新 taste 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: BLOCKED — R4 旗艦 15/28，等 owner 揀 lot blocker 選項
+- Status: IN_PROGRESS — R4b lot 已擴，下一步 R5 旗艦質感
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
 - Last verified commit: R3 commit（test／build／diff-check PASS）
@@ -105,6 +105,14 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 - **Blocker（等 owner）**：×2 低 plinth（≈92×53 m）跨咗北面共享 court (50,−340) 同 tidal edge；`changeSites.nw` 擴闊會令 `districtMeters`／`megastructures`／`odaiba` 三個 test fail（coastalCanopy 連鎖令 (−20,210) court 入樹）。而家 lot 保持 8×7，plinth 嘅越界冇 test 覆蓋（`ponytail:` 註）。選項：1）搬 court＋修 canopy 連鎖再擴 lot；2）保持 ×2 取消拉長（仍要修連鎖）；3）全 site 南移（同目標構圖相反）。
 - Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
 
+## R4b（owner：「搬 court 擴地段」）
+
+- `changeSites.nw` → x 43, z −300, w 16, d 24（舊 x 40, 8×7）；西面 x<12／北面 z<−340 係海岸、東面 DECKS，16×24 已經係上限。低 plinth 收到 24×16 units，廳面喺 review pose 變 x .35–.67（R4 .35–.73，目標 .37–.77）——更闊要郁海岸／DECKS／context block 或者鏡頭。
+- 共享 court (50,−340) → (110,−320)：最近嘅 SCAN_COURTS 候選，slot／yaw／排名不變，hero 3097 px，crowd 108。
+- coastalCanopy 連鎖根因：樹冠姿勢跟 list index；lot 變大剔走樹會令後面所有樹移位（(−20,210) court 入樹）。修正：`HUB_LEGACY_LOT` 保持舊 lot 計 index，真 lot 入面嘅樹／cluster 原地縮到 0，其他樹完全唔郁。冇刪／放寬 assertion。
+- Opus 截圖確認 `nw:focal`（low／mixed／high）同 `nw:focal-low` 都框到 site；`nw:focal-low` 下廳面平面橙色更明顯。
+- Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
+
 ## Next step
 
-Owner 揀 blocker 選項；之後 R5 針對廳內深度／職員、細 seam、無人機、磁浮軌。Bay（judge 1 7/20）未開工。
+R5（旗艦）：廳內深度＋職員（而家係平面橙牆）、幼 seam、無人機、磁浮軌、cap 入 crop。之後 bay（judge 1 7/20）。

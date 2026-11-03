@@ -18,11 +18,9 @@ const DRONE = .75 / 3; // parked drone ~3 m across (the district mesh is 4 m at 
 const SCALE: Record<Band, number> = { low: 2, mixed: 1.2, high: 1 };
 export const FOLK: Record<Band, number> = { low: 2.6, mixed: 1.6, high: 1 }; // residents' size per state (people read at the targets' size, larger than their stage's scale)
 // Resident bounds per state on its plinth (stage units): the low plinth is the grown one, mixed and high stand on the shared 9.6 x 9.4.
-// ponytail: the grown low plinth (and the x1.2 mixed one) outgrows the 8 x 7 `changeSites.nw` lot; the other districts' exclusion zones still use that lot,
-// because a bigger lot shifts the greedy coastal-canopy clusters and blocks the sharing court at (-20, 210), and the court at (50, -340) and the tidal edge at x 8
-// lie inside the grown footprint. Upgrade to a bigger `changeSites.nw` once those two are re-scanned (owner decision needed, see the R4 report).
-export const HUB_LOT: Record<'low' | 'other', { w: number; d: number }> = { low: { w: 16, d: 29.2 }, other: { w: 8, d: 8 } };
-export const HUB_PLINTH: Record<Band, { x: number; z: number }> = { low: { x: 15.4, z: 8.8 }, mixed: { x: 4.8, z: 4.7 }, high: { x: 4.8, z: 4.7 } };
+// The mixed and high states stand on the shared 9.6 x 9.4 plinth; their amber outline is this lot (the low plinth fills the `changeSites.nw` lot).
+export const SHARED_LOT = { w: 8, d: 8 };
+export const HUB_PLINTH: Record<Band, { x: number; z: number }> = { low: { x: 12, z: 8 }, mixed: { x: 4.8, z: 4.7 }, high: { x: 4.8, z: 4.7 } };
 const smoothstep = (value: number) => value * value * (3 - 2 * value);
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 const beam = new T.MeshBasicMaterial({ color: '#9fe8ff', transparent: true, opacity: .28, blending: T.AdditiveBlending, depthWrite: false });
@@ -293,7 +291,7 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
   const seatedPair = (band: Band, x: number, z: number) => people(band, [{ x: x - .25, z, yaw: 0, seated: true }, { x: x + .25, z, yaw: 0, seated: true }]);
   const scaled = (g: T.Group, band: Band) => { const k = new T.Group(); k.scale.setScalar(SCALE[band]); g.add(k); return k; };
   const K = SCALE.low, M = SCALE.mixed;
-  const LOW_W = 12.4, LOW_SHIFT = 1, // the hall stands right of the lot centre (screen right, as in the target)
+  const LOW_W = 10.6, LOW_SHIFT = .25, // the hall stands right of the lot centre (screen right, as in the target)
    LOW_H = 4.8, LOW_ZB = -3.4, LOW_ZF = 1, LOW_FRONT = 2, LOW_ZC = (LOW_ZB + LOW_ZF) / 2, LOW_ROOF = LOW_H + .35;
   const lowK = (i: number) => -LOW_W / 2 + (i + .5) * LOW_W / 6, lowX = (i: number) => lowK(i) + LOW_SHIFT; // in the shifted group / in stage design units
   stateGroup('hub-state-low', 'low', 0, 0, 1, g => {
@@ -303,12 +301,12 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
     hall(k, LOW_W, LOW_ZB, LOW_ZF, 6, LOW_H, LOW_FRONT, 3.8);
     arc(k, 0, 3.2, .05, [0, LOW_ROOF, LOW_ZC + (LOW_FRONT - .4) / 2], white);
     for (let i = 0; i < 6; i++) { counter(k, lowK(i), .12); chair(k, lowK(i), .62); }
-    bench(k, -3.6, 3.9); bench(k, -.6, 3.95); bench(k, 2.4, 4);
-    tree(k, -4.8, 0, 2.2, .6); tree(k, 4.9, 0, 2, .6);
+    bench(k, -3.4, 3.4); bench(k, -.4, 3.45); bench(k, 2.4, 3.5);
+    tree(k, -4.6, 0, 2.1, .6); tree(k, 4.7, 0, 1.9, .6);
   }, false, true);
   for (let i = 0; i < 6; i++) people('low', [{ x: lowX(i), z: -.4, yaw: 0, talk: [i, 0, 2] }, { x: lowX(i), z: .62, yaw: Math.PI, seated: true, talk: [i, 1, 2] }]);
-  talkers('low', 0, -2.4 + LOW_SHIFT, 2.5, 3); talkers('low', 1, .6 + LOW_SHIFT, 2.2, 3); talkers('low', 2, 3.6 + LOW_SHIFT, 3.2, 3);
-  seatedPair('low', -3.6 + LOW_SHIFT, 3.9);
+  talkers('low', 0, -2.2 + LOW_SHIFT, 2.4, 3); talkers('low', 1, .6 + LOW_SHIFT, 2.2, 3); talkers('low', 2, 3.4 + LOW_SHIFT, 2.9, 3);
+  seatedPair('low', -3.4 + LOW_SHIFT, 3.4);
 
   // Hovering canopy: the technology signature. Its own group, so it can bob and ride the hall roof up and down.
   const canopy = new T.Group();
@@ -466,8 +464,8 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
   people('high', [{ x: -2, z: 4, yaw: 1.2, talk: [30, 0, 2] }, { x: -1.7, z: 4.3, yaw: -2, talk: [30, 1, 2] }]);
 
   // The amber outline hugs the plinth in use: the grown low plinth, or the shared one for mixed and high.
-  const marker = createGuestMarker(root, 'nw', HUB_LOT.other);
-  const lotMarker = createGuestMarker(root, 'nw', HUB_LOT.low);
+  const marker = createGuestMarker(root, 'nw', SHARED_LOT);
+  const lotMarker = createGuestMarker(root, 'nw');
   lotMarker.mesh.removeFromParent();
   const mainOutline = marker.mesh.geometry, lowOutline = lotMarker.mesh.geometry;
   const wrap = (angle: number) => Math.atan2(Math.sin(angle), Math.cos(angle));
