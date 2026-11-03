@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { AutomationDistrict, automationBlue } from '../districtMeters.ts';
-import { arc, bake, box, futureLight, teal, warm, type Kit } from '../cityRig.ts';
+import { arc, bake, box, futureLight, nightLit, teal, warm, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import type { SiteAssetLoaderCache } from '../siteAssets/assetLoader.ts';
 import type { Band } from '../surveyView.ts';
@@ -12,16 +12,17 @@ import { createGuestMarker, createSiteLayer, createSiteRoot, prefersReducedMotio
 // Pure white structure: the shared `trim` (#eee9df, metallic) reads beige in shade, which the rubric's fl-material rejects.
 const white = new T.MeshStandardMaterial({ color: '#f8f9fb', roughness: .42, metalness: .08 });
 // Soft shadow band under the roof slab, amber parcels, an amber lot-edge inlay.
-// Room light: pale cream walls with a warm emissive wash (they keep glowing at night), a warm ceiling cove and warm floor pools; the back wall's vertex colours grade from peach below to near-white above.
-const roomLight = (color: T.ColorRepresentation, emissive: string, emissiveIntensity: number) => new T.MeshStandardMaterial({ color, emissive, emissiveIntensity, roughness: 1 });
-const wallLight = new T.MeshStandardMaterial({ color: '#ffffff', vertexColors: true, emissive: '#ffc890', emissiveIntensity: .32, roughness: 1 });
-const glowMid = roomLight('#f6e8d6', '#ffc890', .3);
-const glowFloor = roomLight('#f3e3cf', '#ffc088', .26), glowCeil = roomLight('#fff3dc', '#ffd9a0', 1.3);
+// Room light: warm-white walls with a moderate warm emissive by day (clearly warmer and brighter than the white shell, peach near the floor), amber at night (`nightLit` follows the night rig);
+// the back wall's vertex colours grade from peach below to near-white above.
+const roomLight = (color: T.ColorRepresentation, emissive: string, day: number, night: number, nightColor: string) => nightLit(new T.MeshStandardMaterial({ color, emissive, emissiveIntensity: day, roughness: 1 }), night, nightColor);
+const wallLight = nightLit(new T.MeshStandardMaterial({ color: '#ffffff', vertexColors: true, emissive: '#ffb878', emissiveIntensity: .48, roughness: 1 }), .85, '#ff9a3c');
+const glowMid = roomLight('#f6e0c4', '#ffb878', .42, .8, '#ff9a3c');
+const glowFloor = roomLight('#f0d2b0', '#ffae6c', .4, .7, '#ff9a3c'), glowCeil = roomLight('#fff3dc', '#ffd9a0', 1.3, 1.7, '#ffb860');
 // A cool, faint pane across the glazing, so the room reads behind glass.
 const glassPane = new T.MeshBasicMaterial({ color: '#cfe6f5', transparent: true, opacity: .13, depthWrite: false });
 const shade = new T.MeshBasicMaterial({ color: '#1b2430', transparent: true, opacity: .2, depthWrite: false });
 const parcel = new T.MeshStandardMaterial({ color: '#e9a24f', roughness: .6 });
-const amberInlay = new T.MeshStandardMaterial({ color: '#ff9f1c', emissive: '#ff9f1c', emissiveIntensity: .35, roughness: .5 });
+const amberInlay = new T.MeshStandardMaterial({ color: '#ff9f1c', emissive: '#ff9f1c', emissiveIntensity: .7, roughness: .5 });
 const rotorMat = new T.MeshStandardMaterial({ color: '#2b3a47', roughness: .5 });
 /** Hub drones: a white body on an X frame, four dark rotor rings and a blue underside light, so they read as quads against sky and tower (5.6 m across at scale 1, like the district mesh). */
 function quadFleet(parent: T.Object3D, count: number) {
@@ -51,9 +52,10 @@ export const FOLK: Record<Band, number> = { low: 2.6, mixed: 1.6, high: 1 }; // 
 // Resident bounds per state on its plinth (stage units): the low plinth is the grown one, mixed and high stand on the shared 9.6 x 9.4.
 // The mixed and high states stand on the shared 9.6 x 9.4 plinth; their amber outline is this lot (the low plinth fills the `changeSites.nw` lot).
 export const SHARED_LOT = { w: 8, d: 8 };
-export const HUB_PLINTH: Record<Band, { x: number; z: number }> = { low: { x: 12, z: 7.4 }, mixed: { x: 4.8, z: 4.7 }, high: { x: 4.8, z: 4.7 } };
+export const HUB_PLINTH: Record<Band, { x: number; z: number }> = { low: { x: 12, z: 7 }, mixed: { x: 4.8, z: 4.7 }, high: { x: 4.8, z: 4.7 } };
 const smoothstep = (value: number) => value * value * (3 - 2 * value);
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
+const beam = new T.MeshBasicMaterial({ color: '#9fe8ff', transparent: true, opacity: .16, blending: T.AdditiveBlending, depthWrite: false });
 const glow = new T.MeshBasicMaterial({ color: new T.Color('#d8f8ff').multiplyScalar(2.5), toneMapped: false });
 // Honest port count per band (the Meter maps 0 / 3 / 6): how many service points are self-service in that state, and how many are staffed.
 const PORTS: Record<Band, number> = { low: 0, mixed: 3, high: 6 };
@@ -187,7 +189,7 @@ function hall(group: T.Group, w: number, zBack: number, zFront: number, bays: nu
   const d = zFront - zBack, zc = (zBack + zFront) / 2, wall = glass - .05;
   box(group, [w - .3, .01, d - .3], [0, .005, zc], glowFloor, .004);
   // Back wall in three lit bands (deep below, brighter above), pilasters between the bays, side walls and a hot ceiling cove: a glowing room, not one flat field.
-  const backWall = new T.PlaneGeometry(w - .3, wall, 1, 6), shades = new Float32Array(14 * 3), low = new T.Color('#ecc9a2'), high = new T.Color('#fcf5ea'), c = new T.Color();
+  const backWall = new T.PlaneGeometry(w - .3, wall, 1, 6), shades = new Float32Array(14 * 3), low = new T.Color('#e6b080'), high = new T.Color('#fbebd4'), c = new T.Color();
   for (let v = 0; v < 14; v++) c.copy(low).lerp(high, 1 - Math.floor(v / 2) / 6).toArray(shades, v * 3);
   backWall.setAttribute('color', new T.BufferAttribute(shades, 3));
   const backMesh = new T.Mesh(backWall, wallLight);
@@ -343,8 +345,8 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
   stateGroup('hub-state-low', 'low', 0, 0, 1, g => {
     box(g, [HUB_PLINTH.low.x * 2, .8, HUB_PLINTH.low.z * 2], [0, -.4, 0], white, .05);
     // Amber inlay along the forecourt's front and side edges: the lot outline stays readable from the review pose.
-    box(g, [HUB_PLINTH.low.x * 2 - .6, .03, .3], [0, .015, HUB_PLINTH.low.z - .3], amberInlay, .01);
-    for (const s of [-1, 1]) box(g, [.3, .03, HUB_PLINTH.low.z * 2 - .6], [s * (HUB_PLINTH.low.x - .3), .015, 0], amberInlay, .01);
+    box(g, [HUB_PLINTH.low.x * 2 - .6, .04, .5], [0, .02, HUB_PLINTH.low.z - .35], amberInlay, .01);
+    for (const s of [-1, 1]) box(g, [.45, .04, HUB_PLINTH.low.z * 2 - .6], [s * (HUB_PLINTH.low.x - .35), .02, 0], amberInlay, .01);
     const k = scaled(g, 'low');
     k.position.x = LOW_SHIFT * K;
     hall(k, LOW_W, LOW_ZB, LOW_ZF, 6, LOW_H, LOW_FRONT, 3.8, .22, .75);
@@ -366,10 +368,12 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
   torus(canopy, 5.2, .03, 0, automationBlue);
   for (let i = 0; i < 4; i++) {
     const a = i * Math.PI / 2 + Math.PI / 4, x = Math.cos(a) * 3.4, z = Math.sin(a) * 3.4;
-    // Under-emitter: a small bright white-blue bulb under the lens (the camera is level with the canopy, so a flat disc would be edge-on) (no halo: the glow material itself blooms).
-    const bulb = new T.Mesh(new T.SphereGeometry(.4, 16, 10).scale(1, .6, 1), glow);
-    bulb.position.set(x, -.6, z);
-    canopy.add(bulb);
+    // Under-emitter: a bright flattened pad flush under the lens (white-blue core) with a short, faint downward glow cone.
+    const pad = new T.Mesh(new T.SphereGeometry(.6, 16, 8).scale(1, .3, 1), glow);
+    pad.position.set(x, -.44, z);
+    const cone = new T.Mesh(new T.CylinderGeometry(.45, .75, .55, 16, 1, true), beam);
+    cone.position.set(x, -.8, z);
+    canopy.add(pad, cone);
   }
   canopy.add(...bake(canopy));
   canopy.visible = false;

@@ -32,7 +32,7 @@ assert.ok(within(inRoot(site.root.getObjectByName('hub-plinth')!), SHARED_LOT, .
 runtime.setTarget({ band: 'low', automatedPorts: 0 }, 0, true);
 const lowPlinth = inRoot(state('low'));
 assert.ok(within(lowPlinth, changeSites.nw, 0), 'the low state leaves the nw lot');
-assert.ok(lowPlinth.max.x - lowPlinth.min.x > 14 && lowPlinth.max.z - lowPlinth.min.z > HUB_PLINTH.low.x * 2 - .5, 'the low state is the x2 target-size group');
+assert.ok(lowPlinth.max.x - lowPlinth.min.x > 13.5 && lowPlinth.max.z - lowPlinth.min.z > HUB_PLINTH.low.x * 2 - .5, 'the low state is the x2 target-size group');
 runtime.restoreLegacy();
 
 // Band-level diagnostics: ports are self-service points, counters staffed ones (0 / 3 / 6 by the Meter).

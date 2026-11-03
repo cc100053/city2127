@@ -1,7 +1,7 @@
 # nw-closeup-polish — NW 自動化旗艦＋district 載體，新 taste 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — R7 保留（pairwise 勝 R6 4:2），夜景暖光退步待修
+- Status: IN_PROGRESS — R8 旗艦 24/28，pairwise 勝 R7 1:0
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
 - Last verified commit: R3 commit（test／build／diff-check PASS）
@@ -134,7 +134,13 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 - Opus 自己睇：夜景 −1／0 室內變灰白，暖光淡咗（退步）；日景室內同白殼對比低。
 - Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
 
+## R8（夜晚暖光、日景對比、琥珀邊、發光 pad）
+
+- Sonnet：`cityRig.ts` 新 `nightLit()`：登記嘅 emissive 材質跟 `night` 訊號由日間值漸變到夜間值（`update` 同 `publicLight` 一齊行）；廳嘅後牆／側牆／地面／天花暖光槽登記咗，夜晚返到 R6 咁暖。日景後牆桃→淡奶油、emissive .48。琥珀 inlay 加闊加光，plinth 深度 7.4→7（test 闊度門檻 14→13.5）。遮篷改 4 個扁平發光 pad＋短淡光錐。Mesh 27/32/23。
+- 絕對盲評 **24 / 28**；pairwise R7 vs R8：R8 贏 `fl-canopy`，其餘 13 項 =（pairwise 只睇日景，夜晚暖光修正佢睇唔到）→ 保留 R8。[scores](../../artifacts/nw-closeup-polish/r8/scores.md)、[pair](../../artifacts/nw-closeup-polish/r8/pair.md)、[R8 對目標](../../artifacts/nw-closeup-polish/r8/vs-target.jpg)。
+- 仲係 1：`fl-glazing`（屋頂懸挑仍然似平頂，冇凹入玻璃線）、`fl-material`（遮篷下深藍條紋柱、右邊米色盒）、`fh-arms`（包裹大過目標約 3 倍）、`fh-drones`（空中細無人機唔夠 10 架成串）。
+- Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean；夜景截圖確認 −1／0 室內暖光返嚟。
+
 ## Next step
 
-- 評審方法：單次絕對分數有 ±1 雜訊；之後每輪加盲 pairwise（上輪 vs 今輪），或者 3 個評審取中位數。
-- R8：夜晚室內暖光返到 R6 水平（日夜分開 emissive）、日景室內暖啲但唔好飽和、`fl-forecourt` 琥珀邊返入 crop、遮篷發光器。之後 bay（judge 1 7/20），owner 校準 rubric 未做。
+R9（如果繼續）：低廳屋頂深懸挑＋玻璃線退入、拎走遮篷下深藍柱／右邊米色盒、+1 包裹縮細、空中無人機成串 ≥ 10。之後 bay（judge 1 7/20），owner 校準 rubric 未做。

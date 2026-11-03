@@ -108,6 +108,12 @@ export function sign(group:T.Group, kit:Kit, text:string, x:number,y:number,z:nu
   box(group,[w+.2,h+.2,.25],[x,y,z-.05],trim,.1);
   const panel=new T.Mesh(new T.PlaneGeometry(w,h),material);panel.position.set(x,y,z+.09);group.add(panel);
 }
+/** Emissive materials that follow the night signal (`cityRig(...).update`'s `night`): `day` intensity and colour by day, `night` intensity and `nightColor` at night. */
+const nightGlow:{material:T.MeshStandardMaterial;day:number;night:number;dayColor:T.Color;nightColor:T.Color}[]=[];
+export function nightLit<M extends T.MeshStandardMaterial>(material:M,night:number,nightColor:T.ColorRepresentation):M {
+  nightGlow.push({material,day:material.emissiveIntensity,night,dayColor:material.emissive.clone(),nightColor:new T.Color(nightColor)});
+  return material;
+}
 /** Shared finishes, the civic lights at the survey sites and the ambient actors; the Odaiba ground and landmarks load in `odaibaScene`. */
 export function cityRig(scene:T.Scene) {
   const civicLights:T.PointLight[]=[];
@@ -128,6 +134,7 @@ export function cityRig(scene:T.Scene) {
   return {
     update(state:WorldState,time:number,night:number,automationShare?:number,hour?:number) {
       publicLight.emissiveIntensity=.15+night*1.3;
+      for(const g of nightGlow){g.material.emissiveIntensity=g.day+(g.night-g.day)*night;g.material.emissive.copy(g.dayColor).lerp(g.nightColor,night);}
       for(const m of mirrors)m.envMapIntensity=1-night*.85;
       civicLights.forEach(light=>light.intensity=night*light.userData.peak);
       futureLight.emissiveIntensity=.25+state.neon*.5+night*.45;
