@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
+import { onBayPlinth } from '../src/automationBays.ts';
 import { HERO_FRAME_SLOTS, towerFamily, ladderHybrid, ladderShare, rungStep, AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, PRIVATE_RISE, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
 import { changeSites } from '../src/layout.ts';
 import { publicLight, trail } from '../src/cityRig.ts';
@@ -114,8 +115,10 @@ const high = automation.getDiagnostics();
 assert.equal(high.visibleStaffedPavilions, 0);
 assert.equal(high.visibleDronePorts, high.pavilions, 'P7: every bay becomes a drone port, not empty ground');
 const portMatrix = new T.Matrix4(), portScale = new T.Vector3();
-(automation.root.getObjectByName('automation-drone-ports') as T.InstancedMesh).getMatrixAt(automation.autonomousDesign.indexOf(0), portMatrix);
-assert.ok(Math.abs(portScale.setFromMatrixScale(portMatrix).y - 1) < 1e-6, 'drone port stands at full size');
+const portBay = automation.autonomousDesign.indexOf(0);
+(automation.root.getObjectByName('automation-drone-ports') as T.InstancedMesh).getMatrixAt(portBay, portMatrix);
+assert.ok(Math.abs(portScale.setFromMatrixScale(portMatrix).y - automation.scales[portBay]) < 1e-6, 'ring tower stands at its bay scale (R3)');
+assert.ok(automation.scales.every(k => k >= 1.5 && k <= 2), 'every bay keeps 1.5-2x');
 assert.deepEqual([high.loopAircraft, high.guidewayPods, high.walkers], [30, 24, 120]);
 automation.setTarget(at({ nw: -3 }), 5, false);
 automation.update(6);
@@ -283,7 +286,7 @@ console.log(`PASS: concentration district — ${concentration.towers.length} tow
   const ports = autonomous[0], masts = autonomous.at(-1)!;
   const size = (mesh: T.InstancedMesh, i: number) => { mesh.getMatrixAt(i, matrix); return new T.Vector3().setFromMatrixScale(matrix).y; };
   automationDesigns.autonomousDesign.forEach((d, i) => {
-    assert.ok(Math.abs(size(d ? masts : ports, i) - 1) < 1e-6 && size(d ? ports : masts, i) < 1e-3, `bay ${i} draws only its own autonomous design`);
+    assert.ok(Math.abs(size(d ? masts : ports, i) - automationDesigns.scales[i]) < 1e-6 && size(d ? ports : masts, i) < 1e-3, `bay ${i} draws only its own autonomous design`);
   });
   console.log('PASS: P8 design families — every carrier mixes ≥ 2 families per band; each slot draws only its own design.');
 }
@@ -302,17 +305,31 @@ console.log(`PASS: concentration district — ${concentration.towers.length} tow
   assert.deepEqual(band('high'), [0, 0, 0, 0], 'no hybrids at high');
   const mixedHybrids = band('mixed');
   assert.ok(mixedHybrids.every(n => n > 0), `every Meter shows hybrids at mixed (${mixedHybrids})`);
-  // A hybrid automation bay draws its autonomous design at full size over a 60 % staffed kiosk (full hall where the bay stays staffed).
+  // A hybrid automation bay draws its service column at full size over a 60 % staffed pavilion (full hall where the bay stays staffed).
   const staffing = a as unknown as { hybrid: SlotLevels; staffed: SlotLevels };
   const i = staffing.hybrid.value.findIndex((h, k) => h === 1 && staffing.staffed.value[k] === 0);
   const full = (name: string, slot: number, y = 1) => (a.root.children.concat(c.root.children).filter(o => o.name === name) as T.InstancedMesh[])
     .some(mesh => slot < mesh.count && (mesh.getMatrixAt(slot, matrix), Math.abs(new T.Vector3().setFromMatrixScale(matrix).y - y) < 1e-4));
-  assert.ok(i >= 0 && full('automation-staffed-pavilions', i, .6) && full('automation-drone-ports', i), 'hybrid bay composes staffed kiosk and autonomous deck');
+  assert.ok(i >= 0 && full('automation-staffed-pavilions', i, .6 * a.scales[i]) && full('automation-hybrid-columns', i, a.scales[i]), 'hybrid bay composes the 60 % pavilion and its service column');
   // A mid-rise (hybrid site without a full tower) stands at 45 % of its tower height in its family batch.
   const levels = c as unknown as { midRise: SlotLevels; towerLevels: SlotLevels };
   const m = c.towers.findIndex((_, k) => levels.midRise.value[k] === 1 && levels.towerLevels.value[k] === 0);
   assert.ok(m >= 0 && full('concentration-vertical-towers', towerFamily(m).instance, .45 * c.towers[m].h), 'mid-rise at 45 % height');
   console.log(`PASS: P9 hybrids — none at low / high, ${mixedHybrids.join(' / ')} (automation / sharing / mid-rise / environment) at mixed; hybrid bay composes both designs.`);
+}
+
+// Bay R1: every ring tower carries eight small quad drones, visible only with the tower; no city tree stands on a bay's plinth.
+{
+  const a = new AutomationDistrict(new T.Scene());
+  const streams = a.root.children.filter(o => o.name === 'automation-bay-drones') as T.InstancedMesh[];
+  assert.ok(streams.length > 0 && streams.every(mesh => mesh.count === a.bays.length * 8), 'eight stream drones per bay');
+  const size = (i: number) => { streams[0].getMatrixAt(i, matrix); return new T.Vector3().setFromMatrixScale(matrix).y; };
+  a.setTarget(at({ nw: -3 }), 0, true);
+  assert.ok(a.bays.every((_, i) => size(i * 8) < 1e-3), 'no stream drones over staffed bays');
+  a.setTarget(at({ nw: 3 }), 0, true);
+  assert.ok(a.bays.every((_, i) => Math.abs(size(i * 8 + 7) - .7) < 1e-6), 'stream drones (3.9 m quads) appear with the tower');
+  assert.ok(a.bays.every(bay => onBayPlinth(bay.x, bay.z)) && !onBayPlinth(0, 0), 'bay plinth lookup');
+  console.log('PASS: Bay R1 — eight stream drones per ring tower, hidden over staffed bays; plinth lookup keeps city trees off the bays.');
 }
 
 // P5: a live change pulses only where its district changed, in two waves that fade within PULSE_WAVE_GAP + PULSE_SECONDS;

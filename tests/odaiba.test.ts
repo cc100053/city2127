@@ -301,22 +301,26 @@ console.log('Odaiba: pods ride the guideway deck, walkers keep to open ground ou
 console.log('Odaiba: survey sites sit on open ground, clear of roads, landmarks and guideway, and are visible from the hero pose.');
 console.log('Odaiba: eight GLBs match Phase 03D world bounds within 2 mm, grounded, unit scale, legacy axis verified.');
 
-// P2 raised service pavilions: terraces clear existing context/trees; piers land off roads and routes remain unobstructed.
+// P2 service pavilions: the 38 x 34 m terrace sample grid clears existing context/trees; the hall footprint stands on open ground and routes remain unobstructed.
 const serviceDistrict = new AutomationDistrict(new Group());
 serviceDistrict.setTarget(rungs({ nw: -3 }), 0, true);
 serviceDistrict.root.updateMatrixWorld(true);
-for (const bay of serviceDistrict.bays) {
+for (const [bayIndex, bay] of serviceDistrict.bays.entries()) {
+  const k = serviceDistrict.scales[bayIndex] / 2; // the samples below are authored for the 2x footprint
   const at = (x: number, z: number) => new Vector3(bay.x + x * Math.cos(bay.yaw) + z * Math.sin(bay.yaw), 0,
     bay.z - x * Math.sin(bay.yaw) + z * Math.cos(bay.yaw));
-  for (const x of [-19, 0, 19]) for (const z of [-27, 0, 27]) {
-    const p = at(x, z), hit = groundAt(p.x, p.z);
+  // R3: the 2x footprint (48 x 36 m plinth, canopy to 26 m); the old dome sample grid (+-19 x +-27) belonged to the 38 x 54 m terrace.
+  for (const x of [-26, -13, 0, 13, 26]) for (const z of [-18, -9, 0, 9, 18]) {
+    const p = at(x * k, z * k), hit = groundAt(p.x, p.z);
     assert.ok(hit && hit.point.y < 18, `service terrace obstructed by ${hit?.object.name} at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
   }
-  for (const x of [-16, 16]) for (const z of [-12, 12]) {
-    const p = at(x, z), hit = groundAt(p.x, p.z, 18);
-    assert.ok(hit && (openGround.test(hit.object.name) || /canopy/.test(hit.object.name)), `service pier on ${hit?.object.name} at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
+  // The ground-level plinth (48 x 36 m at the R3 2x scale, hall and canopy above) takes the old piers' role: its four corners stand on open ground
+  // (the sample grid above bounds everything between them below 18 m).
+  for (const x of [-24, 24]) for (const z of [-18, 18]) {
+    const p = at(x * k, z * k), hit = groundAt(p.x, p.z, 18);
+    assert.ok(hit && (openGround.test(hit.object.name) || /canopy/.test(hit.object.name)), `service pavilion on ${hit?.object.name} at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
     const foot = groundAt(p.x, p.z, 3);
-    assert.ok(foot && openGround.test(foot.object.name), `service pier foot on ${foot?.object.name}`);
+    assert.ok(foot && openGround.test(foot.object.name), `service pavilion foot on ${foot?.object.name}`);
   }
 }
 for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
@@ -326,7 +330,7 @@ for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promen
     assert.equal(ray.intersectObject(serviceDistrict.root, true).length, 0, 'service pavilions block pod/walker route');
   }
 }
-console.log(`Odaiba: ${serviceDistrict.bays.length} raised staffed pavilions clear context and actor routes; piers land on open ground.`);
+console.log(`Odaiba: ${serviceDistrict.bays.length} staffed pavilions clear context and actor routes; their footprints stand on open ground.`);
 
 // Both water-room identities preserve boat beams, promenade lanes and the landward entrance.
 const sharingDistrict = new SharingDistrict(new Group());
@@ -511,9 +515,10 @@ for (const nw of [-3, 0, 3]) {
   const obstacles = [...city.children, ...serviceDistrict.root.children.filter(o => o.name !== 'service-drones' && o.name !== 'meter-pulse')];
   for (let i = 0; i < drone.count; i++) {
     drone.getMatrixAt(i, crowdMatrix); actorPosition.setFromMatrixPosition(crowdMatrix);
-    const bottom = actorPosition.y - 24 * pavilionFlight(0, i) - .84;
-    for (const dx of [-1.8, 0, 1.8]) for (const dz of [-1.8, 0, 1.8]) {
-      ray.set(new Vector3(actorPosition.x + dx, bottom + 25.68, actorPosition.z + dz), down); ray.far = 25.68;
+    const k = serviceDistrict.scales[i]; // the drone is scaled with its bay (R3): body half-height .84 m and rotor reach 1.8 m at 1x
+    const bottom = actorPosition.y - 24 * pavilionFlight(0, i) - .84 * k;
+    for (const dx of [-1.8 * k, 0, 1.8 * k]) for (const dz of [-1.8 * k, 0, 1.8 * k]) {
+      ray.set(new Vector3(actorPosition.x + dx, bottom + 24 + 1.68 * k, actorPosition.z + dz), down); ray.far = 24 + 1.68 * k;
       const hit = ray.intersectObjects(obstacles, true)[0];
       assert.equal(hit?.object.name, undefined, `service drone column ${i} intersects ${hit?.object.name}`);
     }

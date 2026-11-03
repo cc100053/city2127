@@ -162,11 +162,14 @@ export const gardenDecks: readonly (readonly P3[])[] = [
 // nw automation hub on the waterfront west of DECKS, ne park on the seaside lawn, sw commons between Aqua City and Hilton, se tower east of Fuji TV.
 // Hub and tower sit on different hero bearings (30° / 40°) so they never stack into one silhouette.
 export const changeSites = {
-  nw:{name:'AUTO HUB',place:'デックス西',x:40,z:-300,w:8,d:7,h:32,scale:3},
+  nw:{name:'AUTO HUB',place:'デックス西',x:43,z:-300,w:16,d:24,h:32,scale:3},
   ne:{name:'PARK',place:'お台場海浜公園',x:-210,z:-135,w:10,d:10,h:8,scale:4},
   sw:{name:'COMMONS PLAZA',place:'アクアシティ南',x:-105,z:60,w:12,d:10,h:5,scale:4},
   se:{name:'TOWER',place:'フジテレビ東',x:182,z:-38,w:14,d:14,h:46,scale:3},
 } as const;
+
+/** The NW lot before the grown AUTO HUB plinth (R4): `coastalCanopy` still claims its greedy cluster lattice against it, so the lot growth leaves every other cluster, court and tower where it was. */
+export const HUB_LEGACY_LOT = {x:40,z:-300,w:8,d:7,scale:3} as const;
 
 // 2127 retrofit (src/odaiba2127.ts). Sky bridges at 24 m between facade points found by raycast; each clear of all other geometry.
 export const skyBridges: readonly {name:string;from:P3;to:P3}[] = [

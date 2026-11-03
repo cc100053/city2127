@@ -116,7 +116,6 @@ const parkRuntime: EnvironmentParkRuntime = {
 
 const groups = new Map<SiteLayerId, T.Group>();
 let parkTreePreparations = 0;
-let hubUpperPreparations = 0;
 const sites = Object.fromEntries(SITE_IDS.map(siteId => {
   const root = new T.Group();
   const layers: BuiltSite['layers'] = {};
@@ -126,7 +125,6 @@ const sites = Object.fromEntries(SITE_IDS.map(siteId => {
     const layer = new MutableSiteLayerRuntime(definition, root);
     if (definition.assetId) layer.setPreparation(async () => {
       if (definition.id === 'parkTrees') parkTreePreparations++;
-      if (definition.id === 'hubUpper') hubUpperPreparations++;
     });
     layers[definition.id] = layer;
     groups.set(definition.id, layer.group);
@@ -163,7 +161,7 @@ assert.ok(hubUpper.scale.y > 1e-3);
 assert.ok(hubMarker.material.emissiveIntensity > .2);
 manager.update(4.5);
 close(hubUpper.scale.y, .5);
-assert.equal(hubUpperPreparations, 1);
+assert.equal(sites.magnetEast.layers.hubUpper?.assetStatus, 'not-applicable', 'the hub spire is procedural: no asset load');
 
 // Reapplying an unchanged visual variant must not restart its transition.
 manager.applyIncrementalUpdate(view(layout({ nw: lot('empty', 'tall') }), 3), 4.5);
@@ -195,7 +193,8 @@ assert.equal(park.visible, false);
 close(park.scale.y, 1e-3);
 assert.equal(manager.getDiagnostics().stationEastPark.layers.parkTrees?.kind, 'glb');
 assert.equal(manager.getDiagnostics().stationEastPark.layers.parkTrees?.assetId, 'future-tree-2127');
-assert.equal(manager.getDiagnostics().magnetEast.layers.hubUpper?.assetId, 'automation-hub-upper');
+assert.equal(manager.getDiagnostics().magnetEast.layers.hubUpper?.kind, 'procedural');
+assert.equal(manager.getDiagnostics().magnetEast.layers.hubUpper?.assetId, undefined);
 
 assert.throws(() => new CityChangeManager({ ...sites, magnetEast: undefined } as unknown as BuiltSiteMap), /Missing runtime/);
 const mismatched = new MutableSiteLayerRuntime(siteLayerDefinition('stationEastPark', 'parkTrees'), new T.Group());
@@ -213,7 +212,7 @@ const retrySites = Object.fromEntries(SITE_IDS.map(siteId => {
   for (const definition of definitions) {
     const layer = new MutableSiteLayerRuntime(definition, root);
     if (definition.assetId) layer.setPreparation(async () => {
-      if (definition.id === 'hubUpper' && ++retryAttempts === 1) throw new Error('temporary network failure');
+      if (definition.id === 'parkTrees' && ++retryAttempts === 1) throw new Error('temporary network failure');
     });
     layers[definition.id] = layer;
   }
@@ -224,9 +223,9 @@ const retrySites = Object.fromEntries(SITE_IDS.map(siteId => {
 const retryManager = new CityChangeManager(retrySites);
 const originalError = console.error; console.error = () => {};
 try {
-  retryManager.applyIncrementalUpdate(view(layout({ nw: lot('empty', 'tall') }), 1), 0);
+  retryManager.applyIncrementalUpdate(view(layout({ ne: lot('park') }), 1), 0);
   await new Promise<void>(resolve => setTimeout(resolve, 0));
-  assert.equal(retrySites.magnetEast.layers.hubUpper?.assetStatus, 'fallback');
+  assert.equal(retrySites.stationEastPark.layers.parkTrees?.assetStatus, 'fallback');
   retryManager.update(SITE_ASSET_RETRY_SECONDS - .01);
   assert.equal(retryAttempts, 1);
   retryManager.update(SITE_ASSET_RETRY_SECONDS);
@@ -235,7 +234,7 @@ try {
   console.error = originalError;
 }
 assert.equal(retryAttempts, 2);
-assert.equal(retrySites.magnetEast.layers.hubUpper?.assetStatus, 'ready');
+assert.equal(retrySites.stationEastPark.layers.parkTrees?.assetStatus, 'ready');
 
 const neutral = exhibitionLayout();
 const zeroScores = { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 };

@@ -1,6 +1,7 @@
 import * as T from 'three';
-import { changeSites, DISTRICT, inDistrict, seaward } from './layout.ts';
+import { changeSites, DISTRICT, HUB_LEGACY_LOT, inDistrict, seaward } from './layout.ts';
 import { routes } from './mobility.ts';
+import { onBayPlinth } from './automationBays.ts';
 import { recedeBeyondDistrict } from './bayContext.ts';
 import { leaf, leafyCrown, trim } from './cityRig.ts';
 
@@ -19,15 +20,19 @@ const drum=new T.CylinderGeometry(1,1,1,40),crown=leafyCrown(),lowCrown=leafyCro
  * r8 pass 2: surveyed `waterfront` trees become palms (tall slim trunk, flat radiating crown — target v2's seaside palms), and with
  * `pits` every ground tree stands in a crisp white raised planter ring instead of loose on the lawn (2127 engineered edge, same volume). */
 export function plantCanopy(scene: T.Object3D, trees: { instances: { position: number[]; scale: number; type: string }[] }, pits=false) {
-  const positions=trees.instances.filter(tree=>inDistrict(tree.position[0],-tree.position[1]) && !seaward(tree.position[0],-tree.position[1]) && !(tree.position[2]<3 && (swale(tree.position[0],-tree.position[1])<-1.1 || corridor(tree.position[0],-tree.position[1])<.2)) && !Object.values(changeSites).some(site=>Math.abs(tree.position[0]-site.x)<site.w*site.scale/2+9 && Math.abs(-tree.position[1]-site.z)<site.d*site.scale/2+9));
+  const inLot=(tree:{position:number[]},sites:{x:number;z:number;w:number;d:number;scale:number}[])=>sites.some(site=>Math.abs(tree.position[0]-site.x)<site.w*site.scale/2+9 && Math.abs(-tree.position[1]-site.z)<site.d*site.scale/2+9);
+  // Each crown's pose depends on its index here, so the list is indexed against the NW lot as it was before the grown AUTO HUB plinth (R4); trees inside the real lot are then hidden in place, which leaves every other crown as it was.
+  const positions=trees.instances.filter(tree=>inDistrict(tree.position[0],-tree.position[1]) && !seaward(tree.position[0],-tree.position[1]) && !(tree.position[2]<3 && (swale(tree.position[0],-tree.position[1])<-1.1 || corridor(tree.position[0],-tree.position[1])<.2)) && !inLot(tree,Object.values({...changeSites,nw:HUB_LEGACY_LOT})));
+  const lots=Object.values(changeSites),gone=positions.map(tree=>inLot(tree,lots) || onBayPlinth(tree.position[0],-tree.position[1],2)); // bay plinths (automationBays.ts) keep their ground clear the same way
   // Instance colours already provide the leaf pigment; a second green tint crushed the lit canopy.
   const foliage=new T.InstancedMesh(crown,new T.MeshStandardMaterial({color:'#ffffff',roughness:.92}),positions.length*4);
   const trunks=new T.InstancedMesh(new T.CylinderGeometry(.35,.6,1,6),new T.MeshStandardMaterial({color:'#776957',roughness:1}),positions.length);
-  const planted=pits?positions.filter(tree=>tree.position[2]<3):[];
+  const planted=pits?positions.filter((tree,i)=>tree.position[2]<3 && !gone[i]):[];
   const rims=new T.InstancedMesh(drum,trim,planted.length),beds=new T.InstancedMesh(drum,leaf,planted.length);
   const dummy=new T.Object3D(),color=new T.Color();
   positions.forEach((tree,i)=>{
     const [x,y,z]=tree.position,s=tree.scale,palm=tree.type==='waterfront',h=(tree.type==='columnar'?10:palm?9.5:7)*s;
+    if(gone[i]){dummy.position.set(x,z,-y);dummy.scale.setScalar(0);dummy.rotation.set(0,0,0);dummy.updateMatrix();trunks.setMatrixAt(i,dummy.matrix);for(let j=0;j<4;j++){foliage.setMatrixAt(i*4+j,dummy.matrix);foliage.setColorAt(i*4+j,color);}return;}
     dummy.position.set(x,z+h*.35,-y);dummy.scale.set(palm?s*.55:s,h*.7,palm?s*.55:s);dummy.rotation.set(0,0,0);dummy.updateMatrix();trunks.setMatrixAt(i,dummy.matrix);
     for(let j=0;j<4;j++){
       const a=j*(palm?Math.PI/2:2.4)+i;
@@ -75,10 +80,12 @@ export function plantShrubs(scene:T.Object3D,add:Shrub[]){
 
 /** r8 (user: 2127 form, same green volume): green gathers in dense clusters on engineered two-step terraces — a wide white-rimmed
  * lawn tier with a ring of crowns and a raised inner tier with taller ones — instead of trees spread evenly. [x, z, ground y, radius]. */
-export function plantClusters(scene:T.Object3D,clusters:[number,number,number,number][],scale=1,band=0){
+export function plantClusters(scene:T.Object3D,clusters:[number,number,number,number][],scale=1,band=0,hidden:boolean[]=[]){
   const trees:{position:number[];scale:number;type:string}[]=[],shrubs:Shrub[]=[],dummy=new T.Object3D(),n=clusters.length*2;
   const rims=new T.InstancedMesh(drum,trim,n),beds=new T.InstancedMesh(drum,leaf,n);
   clusters.forEach(([x,z,y,R],i)=>{
+    // `hidden` clusters keep their index (every pose below depends on it) but are collapsed, so hiding one never moves another.
+    if(hidden[i]){dummy.position.set(x,y,z);dummy.scale.setScalar(0);dummy.rotation.set(0,0,0);dummy.updateMatrix();for(let k=0;k<2;k++){rims.setMatrixAt(i*2+k,dummy.matrix);beds.setMatrixAt(i*2+k,dummy.matrix);}return;}
     // Oval, turned per cluster, so the terraces read as shaped landform rather than a polka-dot grid.
     const yaw=Math.sin(x*.37+z*.11)*3,stretch=1.15+(i%3)*.12;
     const at=(f:number,a:number)=>{const lx=Math.cos(a)*f*R*stretch,lz=Math.sin(a)*f*R/stretch;return [x+lx*Math.cos(yaw)+lz*Math.sin(yaw),z-lx*Math.sin(yaw)+lz*Math.cos(yaw)];};
@@ -136,7 +143,7 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
   environment.updateMatrixWorld(true);
   const pads=buildings.map(building=>new T.Box3().setFromObject(building));
   const paths=routes(),clearPaths=[paths.guideway,...paths.promenades].flatMap(path=>path.getSpacedPoints(400));
-  const ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),clusters:[number,number,number,number][]=[];
+  const ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),clusters:[number,number,number,number][]=[],hiddenAt:boolean[]=[];
   const landscapeAt=(x:number,z:number)=>{
     ray.set(new T.Vector3(x,300,z),down);
     const hit=ray.intersectObject(environment,true)[0];
@@ -146,7 +153,10 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
   const pathGap=(x:number,z:number)=>Math.min(...clearPaths.map(p=>Math.hypot(p.x-x,p.z-z)));
   for(let x=DISTRICT.minX+26;x<DISTRICT.maxX-26;x+=21)for(let z=DISTRICT.minZ+26;z<DISTRICT.maxZ-26;z+=21){
     const px=x+Math.sin(z*1.7+x)*8,pz=z+Math.cos(x*1.3-z)*8,R=8+(Math.sin(x*.7+z)+1)*2.5,reach=R*1.4;
-    if(seaward(px,pz) || Object.values(changeSites).some(site=>Math.abs(px-site.x)<site.w*site.scale/2+16+reach && Math.abs(pz-site.z)<site.d*site.scale/2+16+reach))continue;
+    const near=(site:{x:number;z:number;w:number;d:number;scale:number})=>Math.abs(px-site.x)<site.w*site.scale/2+16+reach && Math.abs(pz-site.z)<site.d*site.scale/2+16+reach;
+    // The greedy lattice below is order dependent: a cluster skipped near a lot frees its neighbours, and that shift ran on to unrelated courts and towers.
+    // So clusters are claimed against the NW lot as it was before the grown AUTO HUB plinth (R4) and only the ones inside the real lot are left unplanted.
+    if(seaward(px,pz) || Object.values({...changeSites,nw:HUB_LEGACY_LOT}).some(near))continue;
     const pad=padGap(px,pz),path=pathGap(px,pz),sw=swale(px,pz),cor=corridor(px,pz);
     // Keep the terrace off pads, paths, ponds (swale changes up to ~.05 per metre) and the corridor channel.
     if(pad<reach+6 || path<reach+10 || sw<-1.15+reach*.05 || cor<.14+reach*.045)continue;
@@ -157,8 +167,9 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
     // Denser grid (r8 pass 3): terraces may not overlap, or their coplanar lawn tiers would z-fight.
     if(clusters.some(([cx,cz,,cr])=>Math.hypot(cx-px,cz-pz)<(cr+R)*1.4))continue;
     clusters.push([px,pz,y,R]);
+    hiddenAt.push(Object.values(changeSites).some(near));
   }
-  plantClusters(scene,clusters);
+  plantClusters(scene,clusters,1,0,hiddenAt);
   // r8 pass 3: the waterfront promenades become planted allées in white planter rings (target v2's tree-lined shore walk) —
   // palms on the side facing the water, broadleaf with cherry accents on the landward side, every ~8 m.
   const allee:{position:number[];scale:number;type:string}[]=[];

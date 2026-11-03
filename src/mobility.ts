@@ -210,7 +210,7 @@ export function guideStrength(sample:number,head:number,closed:boolean) {
 function material(color:string,emissive=false) {
   return new T.MeshStandardMaterial({color,roughness:.65,emissive:emissive?color:0,emissiveIntensity:emissive?1.3:0});
 }
-const shell=material('#f4f3ee'),glass=material('#284f65'),mint=material('#74dace',true),coral=material('#e7a097');
+const shell=material('#f4f3ee'),glass=material('#284f65'),droneBody=material('#f3f6f7'),mint=material('#74dace',true),coral=material('#e7a097');
 /** Wearable collar light on every person (promenade, deck, interchange and plaza crowds): a dark band by day, lit at night. */
 const collar=new T.MeshStandardMaterial({color:'#3a4a52',emissive:'#cdeeff',emissiveIntensity:0,roughness:.4});
 type Part={geometry:T.BufferGeometry;material:T.Material};
@@ -599,7 +599,7 @@ export function promenadeStops(lengths:readonly number[]) {
 
 /** Small service quadrotors match the parked district drones; four rotors share the trim batch. */
 export function serviceDrones(scene:T.Object3D,count:number) {
-  return fleet(scene,[{geometry:new T.SphereGeometry(1.4,12,8).scale(1.4,.6,1),material:glass},
+  return fleet(scene,[{geometry:new T.SphereGeometry(1.4,12,8).scale(1.4,.6,1),material:droneBody},
     ...[[-1.8,-1.8],[1.8,-1.8],[-1.8,1.8],[1.8,1.8]].map(([x,z])=>({geometry:new T.CylinderGeometry(1,1,.12,12).translate(x,.3,z),material:shell}))],count,'service-drones');
 }
 

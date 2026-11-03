@@ -76,13 +76,15 @@ E4後automation／publicSharing／urbanConcentration每軸每份提案只有一�
 
 P10 配對要兩個 site 同一邊都到 ±3。環境軸 E4 後凍結喺 mixed，所以 sails／冷卻塔／屋頂／外牆唔做格（舊氣候 run 照用同一 ladder）。每個 district 第一次到 ±2 時固定該軸 `slotSeeds`（之前為 0），之後各格 slot 互相包含，唔會每票重排。
 
-Headline 近鏡 G7（2026-10-31，已 merge main，視覺及性能未驗收）：近鏡現有 78 個固定 shot（2026-11-01 加 `se:focal-low`：SE focal 變化涉及 low 時用較近、較低嘅鏡頭）（含 NW／SW／SE 的 64 個手寫 viewpoint 及 `nw:street`）。district 變化（±2／±3）時，district 把本次變動 slot 的座標與 ID 交給鏡頭（`CarrierChange.points`），揀覆蓋最多變動 slot 的 viewpoint，打和揀最久未用；±1 保持 focal，能源保持能源 shot，無 points 回退 `*:district`。細節見 [PROJECT](PROJECT.md)。
+Headline 近鏡 G7（2026-10-31，已 merge main，視覺及性能未驗收）：近鏡現有 74 個固定 shot（2026-11-01 加 `se:focal-low`、2026-11-03 加 `nw:focal-low`：SE／NW focal 變化涉及 low 時用較近、較低嘅鏡頭）（含 NW／SW／SE 的 59 個手寫 viewpoint（2026-11-03 NW bay shot 改跟現存 6 個 bay） 及 `nw:street`）。district 變化（±2／±3）時，district 把本次變動 slot 的座標與 ID 交給鏡頭（`CarrierChange.points`），揀覆蓋最多變動 slot 的 viewpoint，打和揀最久未用；±1 保持 focal，能源保持能源 shot，無 points 回退 `*:district`。細節見 [PROJECT](PROJECT.md)。
 
 Live headline（[pickHeadline](../survey/src/shared/cityView.ts)）：先揀向今位訪客投票方向移動的 site（中間票向 0），其次揀該訪客選的能源部件有變的情況；否則沿用新到達最高格、載體變化最多、能源的次序。能源部件同時變動時，鏡頭與結果卡跟所選部件；只有 headline site 有亮 pulse／marker 同結果卡，其他變化（例如同時嘅能源門檻）靜靜過渡。
 
 Headline 近鏡（2026-10-27；時間線於 2026-10-29 修訂）：live 結果先在 hero 播完 2.62 秒 vote journey，再用 2 秒推近 headline，停定 0.5 秒後於 5.12 秒開始 3 秒場景過渡。4.62–13 秒停留，13 秒與 ambient 卡同步開始用 2 秒返回 hero；原因文字於 8.12 秒出現。八個 site shot（四站各 focal／district）及五個能源 shot 用常數表，保留 hero 方向及海／地標定位；focal 與 district 同時改以 district 為準。能源鏡頭與結果卡共用部件優先次序，移除設備亦看原位置。新結果從現有位置先平滑回 hero；snapshot／reset／Undo／reconnect／reduced motion／legacy／追趕中的結果立即 hero。無 headline 不推近；如接續仍在播放的近鏡，先從當前位置用 2 秒平滑返回，再保持 hero 並恢復操作。普通 standalone 及其他 DEV review 不自動播放；DEV 可用 `?shot=` 逐鏡檢查。近鏡的模型／材質打磨及真人閱讀／展示硬件驗收另作任務。
 
 Closeup-zoom F 候選（2026-10-30）：district 改為較闊焦點構圖、停留期間慢推 7%；SW focal 避開主要遮擋。SE／NW 焦點及 district carrier 可讀性未達驗收，詳見 [F 自評](../artifacts/closeup-zoom/final/F-review.md)，最終仍待 owner 審閱。
+
+NW 近鏡（2026-11-04，`feat/nw-closeup-polish`，owner 接受盲評分數）：AUTO HUB 同六個服務 bay 跟 owner 揀嘅 Gemini 目標圖重建成白色機械語言——−1 有人嘅玻璃暖房服務廳＋懸浮遮篷碟，0 小廳＋泊位柱＋機械臂，+1 密環自律塔＋無人機流＋藍光大堂；旗艦 R9 25/28、bay R2 19/20（rubric＋新評審盲評＋pairwise）。Bay 大細受淨空限制，owner 決定 bay crop 對準實際位置、唔再放大。未過：旗艦 `fl-glazing`／`fl-material`／`fm-hall`，bay `bl-canopy`／`bl-glazing`。[handoff](handoffs/nw-closeup-polish.md)。
 
 SE 近鏡候選（2026-10-30）：設施加框架平台、冠部、低 tier 構架及橙色 Meter 環，保留 footprint 與 tier 規則；夜景顏色偏白、主體大小及真人辨認仍未過關，待 owner review（[證據](../artifacts/closeup-zoom/final/A-se-review/README.md)）。
 

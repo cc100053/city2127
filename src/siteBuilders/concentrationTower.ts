@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { arc, bake, box, cream, faces, glass, leaf, leafyCrown, paint, shrubs, pink, sign, stone, trim, type Kit } from '../cityRig.ts';
+import { arc, bake, box, cream, faces, glass, leaf, leafyCrown, paint, shrubs, pink, sign, stone, trim, warm, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import { ConcentrationDistrict, METER_COLORS } from '../districtMeters.ts';
 import type { Band } from '../surveyView.ts';
@@ -12,8 +12,6 @@ const smoothstep = (t: number) => t * t * (3 - 2 * t);
 // Emissive and instance-colour-free, so the Meter amber reads day and night (publicLight x instance colour went white after dark).
 export const amber = new T.MeshStandardMaterial({ color: METER_COLORS.urbanConcentration, emissive: METER_COLORS.urbanConcentration, emissiveIntensity: .9, roughness: .5 });
 const timber = paint('#c99258', .62);
-// Warm interior backing: the lit-room read that glass (it mirrors the sky blue) cannot give.
-const warm = new T.MeshStandardMaterial({ color: '#f3cf98', emissive: '#ffb45a', emissiveIntensity: .35, roughness: .7 });
 const unitBox = new T.BoxGeometry(1, 1, 1);
 const vaultGeometry = new T.CylinderGeometry(1, 1, 1, 20, 1, false, 0, Math.PI).rotateZ(Math.PI / 2);
 const crownGeometry = leafyCrown(1);
@@ -80,7 +78,7 @@ function stall(group: T.Group) {
 }
 
 /** Mullions are plain scaled unit boxes: far cheaper than rounded boxes at this count. */
-function slat(parent: T.Object3D, size: [number, number, number], position: [number, number, number], material: T.Material) {
+export function slat(parent: T.Object3D, size: [number, number, number], position: [number, number, number], material: T.Material) {
   const mesh = new T.Mesh(unitBox, material);
   mesh.scale.set(...size);
   mesh.position.set(...position);
@@ -137,7 +135,7 @@ function vault(parent: T.Object3D, x: number, y: number, z: number, len: number,
   parent.add(mesh);
 }
 
-function tree(parent: T.Object3D, x: number, y: number, z: number, s: number) {
+export function tree(parent: T.Object3D, x: number, y: number, z: number, s: number) {
   box(parent, [.08, .5 * s, .08], [x, y + .25 * s, z], timber, .02);
   const crown = new T.Mesh(crownGeometry, leaf);
   crown.position.set(x, y + s, z);

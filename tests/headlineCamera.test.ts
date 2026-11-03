@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { PerspectiveCamera, Vector3 } from 'three';
+import { Group, PerspectiveCamera, Vector3 } from 'three';
 import { DISPLAY_MS, RESULT_LEASE_MS } from '../survey/src/shared/displayTiming.ts';
 import { emptyEnergyConfiguration, type EnergyConfiguration } from '../survey/src/shared/energy.ts';
 import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
@@ -9,6 +9,7 @@ import { ARRIVAL_SECONDS } from '../src/voteJourney.ts';
 import { reasonDelayMs } from '../src/resultTimeline.ts';
 import { SITE_TRANSITION_SECONDS } from '../src/siteBuilders/siteRuntime.ts';
 import { energyChangedPart, residentResult } from '../src/surveyAtmosphere.ts';
+import { AutomationDistrict } from '../src/districtMeters.ts';
 import type { ExhibitionProposal } from '../src/surveyView.ts';
 const zero = { automation: 0, environmentalPriority: 0, publicSharing: 0, urbanConcentration: 0 };
 const layout = deriveExhibitionLayout(zero);
@@ -17,7 +18,9 @@ const proposal: ExhibitionProposal = { id:'p',runId:'r',guestSessionId:'g',ordin
 assert.equal(headlineShot(undefined), null);
 assert.equal(headlineShot({ socketId:'se',focal:true,district:false,low:true }), 'se:focal-low');
 assert.equal(headlineShot({ socketId:'se',focal:true,district:false }), 'se:focal');
-assert.equal(headlineShot({ socketId:'nw',focal:true,district:false,low:true }), 'nw:focal', 'no pushed-in shot for other sites');
+assert.equal(headlineShot({ socketId:'nw',focal:true,district:false,low:true }), 'nw:focal-low');
+assert.equal(headlineShot({ socketId:'nw',focal:true,district:false }), 'nw:focal');
+for (const socketId of ['ne','sw'] as const) assert.equal(headlineShot({ socketId,focal:true,district:false,low:true }), `${socketId}:focal`, 'no pushed-in shot for other sites');
 assert.equal(headlineShot({ socketId:'se',focal:true,district:true,low:true }), 'se:district');
 for (const socketId of ['nw', 'ne', 'sw', 'se'] as const) {
   assert.equal(headlineShot({ socketId, focal:true,district:false }), `${socketId}:focal`);
@@ -53,7 +56,7 @@ assert.equal(reasonDelayMs(DISPLAY_MS,true),0);
 assert.equal(reasonDelayMs(DISPLAY_MS-101,false),0);
 assert.equal(shotStage(3),'fly-in','the flight starts after the vote journey');
 assert.deepEqual([0,t.flyIn,t.hold,t.flyOut,t.done].map(elapsed=>shotStage(elapsed)),['journey','fly-in','hold','fly-out','done']);
-assert.equal(Object.keys(SHOTS).length,78);
+assert.equal(Object.keys(SHOTS).length,74);
 for (const [id, pose] of Object.entries(SHOTS)) {
   const p=new Vector3(...pose.position),target=new Vector3(...pose.target);
   assert.ok(p.y>target.y);assert.ok(p.distanceTo(target)>=40&&p.distanceTo(target)<=450);
@@ -110,7 +113,10 @@ assert.equal(picker.play([{...district,points:[point('nw:bay1'),point('nw:bay2')
 assert.equal(picker.play([{...district,points:[]}],103),'nw:district');
 assert.equal(picker.play([{...district,focalOnly:true,points:[point('nw:bay1')]}],104),'nw:focal');
 
-for (const [site, groups] of Object.entries({nw:{bay:11},sw:{room:6,court:10},se:{tower:10,pod:26}})) {
+// NW bay slots follow the live district (slot `nw:bay${i + 1}`), so removed bays cannot leave shots aimed at empty ground.
+const bays = new AutomationDistrict(new Group()).bays.length;
+assert.equal(Object.keys(VIEWPOINT_COVERAGE).filter(id => id.startsWith('nw:bay')).length, bays, 'one NW bay viewpoint per live bay');
+for (const [site, groups] of Object.entries({nw:{bay:bays},sw:{room:6,court:10},se:{tower:10,pod:26}})) {
   for (const [group, count] of Object.entries(groups)) for (let i=1;i<=count;i++) {
     const slot = `${site}:${group}${i}`;
     assert.ok(Object.values(VIEWPOINT_COVERAGE).some(covered=>covered.includes(slot)), `${slot} has a viewpoint`);

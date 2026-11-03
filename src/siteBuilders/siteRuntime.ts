@@ -123,8 +123,7 @@ export function createSiteLayer(parent: T.Group, definition: SiteLayerDefinition
   return new MutableSiteLayerRuntime(definition, parent, y);
 }
 
-export function createGuestMarker(parent: T.Group, socketId: LotSocketId): SiteMarkerRuntime {
-  const { w, d } = changeSites[socketId];
+export function createGuestMarker(parent: T.Group, socketId: LotSocketId, { w, d }: { w: number; d: number } = changeSites[socketId]): SiteMarkerRuntime {
   const material = new T.MeshStandardMaterial({
     color: GUEST, emissive: GUEST, emissiveIntensity: .2, roughness: .5, transparent: true, depthWrite: false,
   });
