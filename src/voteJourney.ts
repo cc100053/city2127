@@ -33,7 +33,21 @@ export function lanternSpot(ordinal: number, axis: CityAxis, energy = false): T.
   return new T.Vector3(s.x + Math.cos(angle) * radius, 42 + 22 * hash(i + .25), s.z + Math.sin(angle) * radius);
 }
 
-type Flight = { axis: CityAxis; vote: number; color: T.Color; curve: T.CatmullRomCurve3; start: number; landed: boolean; ordinal: number; energy: boolean };
+type Flight = { axis: CityAxis; vote: number; color: T.Color; curve: T.CatmullRomCurve3; start: number; landed: boolean; ordinal: number; energy: boolean; scans: readonly Omit<Scan, 'color' | 'start'>[] };
+/** Where a live headline actually changed: the district slots of the guest's axis (CarrierChange.points). */
+export type JourneyLanding = { readonly socketId: string; readonly points?: readonly { readonly x: number; readonly z: number; readonly r: number }[] };
+const MAX_LANDING_SCANS = 8;
+
+/** Ground point and scan rings an orb lands on: the changed slots of the headline axis, else the focal site. */
+export function landingFor(axis: CityAxis, energy: boolean, landing?: JourneyLanding): { x: number; z: number; scans: Omit<Scan, 'color' | 'start'>[] } {
+  const points = !energy && landing && SOCKET[axis] === landing.socketId ? landing.points?.slice(0, MAX_LANDING_SCANS) ?? [] : [];
+  if (points.length) return {
+    x: points.reduce((sum, p) => sum + p.x, 0) / points.length, z: points.reduce((sum, p) => sum + p.z, 0) / points.length,
+    scans: points.map(p => ({ x: p.x, z: p.z, r: p.r })),
+  };
+  const s = voteSite(axis, energy);
+  return { x: s.x, z: s.z, scans: [{ x: s.x, z: s.z, r: Math.max(s.w, s.d) * s.scale * 1.15 }] };
+}
 type Scan = { x: number; z: number; r: number; color: T.Color; start: number };
 
 export class VoteJourney {
@@ -71,16 +85,16 @@ export class VoteJourney {
     scene.add(this.points, this.scans, this.lanterns);
   }
 
-  /** Launches guest `ordinal`'s four votes from the lower-right (the stations' side of the screen). */
-  play(votes: Votes, ordinal: number, now: number): void {
+  /** Launches guest `ordinal`'s four votes from the lower-right (the stations' side of the screen); the headline axis lands on its changed slots. */
+  play(votes: Votes, ordinal: number, now: number, landing?: JourneyLanding): void {
     this.cancel();
     const origin = new T.Vector3(.86, -.78, .5).unproject(this.camera).sub(this.camera.position).setLength(420).add(this.camera.position);
     CITY_AXES.forEach((axis, i) => {
       const energy = axis === 'environmentalPriority' && !!votes.energy;
-      const s = voteSite(axis, energy), site = new T.Vector3(s.x, 6, s.z);
+      const land = landingFor(axis, energy, landing), site = new T.Vector3(land.x, 6, land.z);
       const apex = origin.clone().lerp(site, .55).setY(120 + i * 8);
       const curve = new T.CatmullRomCurve3([origin, origin.clone().lerp(apex, .5).setY(origin.y + 40), apex, site.clone().setY(70), site]);
-      this.flights.push({ axis, vote: votes[axis], color: voteColor(axis, votes[axis], energy), curve, start: now + i * ORB_STAGGER, landed: false, ordinal, energy });
+      this.flights.push({ axis, vote: votes[axis], color: voteColor(axis, votes[axis], energy), curve, start: now + i * ORB_STAGGER, landed: false, ordinal, energy, scans: land.scans });
     });
   }
 
@@ -118,8 +132,8 @@ export class VoteJourney {
       if (raw >= 1) {
         if (!f.landed) {
           f.landed = true;
-          const s = voteSite(f.axis, f.energy);
-          this.scanList.push({ x: s.x, z: s.z, r: Math.max(s.w, s.d) * s.scale * 1.15, color: f.color, start: f.start + FLIGHT_SECONDS });
+          for (const scan of f.scans) this.scanList.push({ ...scan, color: f.color, start: f.start + FLIGHT_SECONDS });
+          // shortcut: the lantern stays in the focal halo (setLanterns can rebuild it without the change points), even when the orb landed on district slots.
           this.addLantern(f.ordinal, f.axis, f.vote, f.energy);
         }
         continue;
