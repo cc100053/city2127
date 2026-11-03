@@ -35,7 +35,7 @@ assert.deepEqual(siteLayerDefinition('stationEastPark', 'parkTrees'), {
   id: 'parkTrees', kind: 'glb', assetId: 'future-tree-2127', enterAnimation: 'rise', exitAnimation: 'sink',
 });
 assert.deepEqual(siteLayerDefinition('magnetEast', 'hubUpper'), {
-  id: 'hubUpper', kind: 'glb', assetId: 'automation-hub-upper', enterAnimation: 'rise', exitAnimation: 'sink',
+  id: 'hubUpper', kind: 'procedural', assetId: undefined, enterAnimation: 'rise', exitAnimation: 'sink',
 });
 assert.throws(() => variantLayers('stationEastPark', 'plaza'), /Unknown variant/);
 assert.throws(() => siteLayerDefinition('magnetEast', 'parkTrees'), /Unknown layer/);

@@ -65,7 +65,7 @@ export const CHANGE_CATALOG: Readonly<Record<SiteId, SiteDefinition>> = {
     id: 'magnetEast', socketId: 'nw',
     layers: {
       hubBase: layer('hubBase', 'procedural'),
-      hubUpper: layer('hubUpper', 'glb', 'automation-hub-upper'),
+      hubUpper: layer('hubUpper', 'procedural'),
       hubNeutralProps: layer('hubNeutralProps', 'procedural'),
     },
     variants: {

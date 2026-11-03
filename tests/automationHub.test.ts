@@ -1,122 +1,149 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { dark } from '../src/cityRig.ts';
 import { buildAutomationHub } from '../src/siteBuilders/automationHub.ts';
 
 const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'document');
 Object.defineProperty(globalThis, 'document', {
   configurable: true,
-  value: {
-    createElement: () => ({
-      width: 0,
-      height: 0,
-      getContext: () => ({ fillRect() {}, fillText() {} }),
-    }),
-  },
+  value: { createElement: () => ({ width: 0, height: 0, getContext: () => ({ fillRect() {}, fillText() {} }) }) },
 });
-
-const assets = { async cloneRoot() { return new T.Group().add(new T.Mesh(new T.BoxGeometry(1, 1, 1), dark)); } };
 const scene = new T.Scene();
-const site = buildAutomationHub(scene, { windows: [], signs: [], random: () => .5 }, assets as never);
+const site = buildAutomationHub(scene, { windows: [], signs: [], random: () => .5 }, { async cloneRoot() { throw new Error('the hub loads no asset'); } } as never);
 if (descriptor) Object.defineProperty(globalThis, 'document', descriptor);
 else delete (globalThis as { document?: Document }).document;
 
 const runtime = site.automationHub;
-site.layers.hubBase!.group.visible=true;site.layers.hubBase!.group.scale.y=1;
-const props = site.layers.hubNeutralProps!.group;
-props.visible = true;
-props.scale.set(1, 1, 1);
-const slots = props.children.filter(child => child.name.startsWith('hub-service-slot-'));
-assert.equal(slots.length, 6, 'the v2 baseline has exactly six mutable service slots');
-
+const base = site.layers.hubBase!.group, props = site.layers.hubNeutralProps!.group;
+base.visible = props.visible = true;
+base.scale.y = props.scale.y = 1;
+assert.equal(site.layers.hubUpper!.definition.kind, 'procedural', 'the hub no longer loads a GLB');
+assert.equal(site.layers.hubUpper!.assetStatus, 'not-applicable');
+const state = (band: string) => site.root.getObjectByName(`hub-state-${band}`)!;
+const hall = { low: state('low'), mixed: state('mixed') };
+const level = (group: T.Object3D) => group.visible ? group.scale.y : 0;
 scene.updateMatrixWorld(true);
-// Lot limits are in site units; the root carries the Odaiba position and scale.
-const bounds = new T.Box3().setFromObject(props).applyMatrix4(site.root.matrixWorld.clone().invert());
-assert.ok(bounds.min.x >= -4.001);
-assert.ok(bounds.max.x <= 4.001);
-assert.ok(bounds.min.z >= -3.501);
-assert.ok(bounds.max.z <= 3.501);
 
-assert.deepEqual(runtime.getDiagnostics(), {
-  band: 'mixed', targetAutomatedPorts: 3, visibleAutomatedPorts: 3,
-  targetHumanCounters: 3, visibleHumanCounters: 3,
-});
-assert.equal(runtime.setTarget({ band: 'low', automatedPorts: 0 }, 0, true), true);
-assert.equal(runtime.getDiagnostics().visibleAutomatedPorts, 0);
-assert.equal(runtime.getDiagnostics().visibleHumanCounters, 6);
+// The plinth may overhang the 8 x 7 lot by <= .7 units a side (root units; the root carries the Odaiba position and scale).
+const plinthBox = new T.Box3().setFromObject(site.root.getObjectByName('hub-plinth')!).applyMatrix4(site.root.matrixWorld.clone().invert());
+assert.ok(plinthBox.min.x >= -4.701 && plinthBox.max.x <= 4.701 && plinthBox.min.z >= -4.201 && plinthBox.max.z <= 4.201, 'plinth leaves its lot');
 
-assert.equal(runtime.setTarget({ band: 'low', automatedPorts: 1 }, 1, false), true);
+// Band-level diagnostics: ports are self-service points, counters staffed ones (0 / 3 / 6 by the Meter).
+assert.deepEqual(runtime.getDiagnostics(), { band: 'mixed', targetAutomatedPorts: 3, visibleAutomatedPorts: 3, targetHumanCounters: 3, visibleHumanCounters: 3 });
+for (const [band, ports] of [['low', 0], ['mixed', 3], ['high', 6]] as const) {
+  runtime.setTarget({ band, automatedPorts: ports }, 0, true);
+  assert.deepEqual(runtime.getDiagnostics(), { band, targetAutomatedPorts: ports, visibleAutomatedPorts: ports, targetHumanCounters: 6 - ports, visibleHumanCounters: 6 - ports });
+}
+
+// Same-band retarget: one 3 s smoothstep; the same target does not restart; a newer target starts from the current state.
+runtime.setTarget({ band: 'mixed', automatedPorts: 3 }, 0, true);
+assert.equal(runtime.setTarget({ band: 'low', automatedPorts: 0 }, 1, false), true);
 runtime.update(2.5);
-const firstAuto = slots[0].getObjectByName('hub-automated-port-0')!;
-assert.ok(Math.abs(firstAuto.scale.y - .5) < 1e-9, 'same-band count changes use the 3-second smoothstep');
-assert.equal(runtime.setTarget({ band: 'low', automatedPorts: 1 }, 2.5, false), false, 'same target does not restart');
+assert.ok(Math.abs(level(hall.low) - .5) < 1e-9, 'the low hall rises along the 3-second smoothstep');
+assert.equal(runtime.setTarget({ band: 'low', automatedPorts: 0 }, 2.5, false), false, 'same target does not restart');
+assert.equal(runtime.setTarget({ band: 'high', automatedPorts: 6 }, 2.5, false), true);
 runtime.update(4);
-assert.equal(runtime.getDiagnostics().visibleAutomatedPorts, 1);
-assert.equal(runtime.getDiagnostics().visibleHumanCounters, 5);
-
-assert.equal(runtime.setTarget({ band: 'high', automatedPorts: 6 }, 4, false), true);
-runtime.update(5.5);
-const secondAuto = slots[1].getObjectByName('hub-automated-port-1')!;
-assert.ok(Math.abs(secondAuto.scale.y - .5) < 1e-9, 'retargeting starts from the current slot state');
-runtime.setTarget({ band: 'mixed', automatedPorts: 3 }, 5.5, true);
+assert.ok(Math.abs(level(hall.low) - .25) < 1e-9, 'retargeting starts from the current hall level and sinks it');
+runtime.update(6);
+assert.equal(level(hall.low), 0);
+assert.equal(level(hall.mixed), 0);
+assert.equal(runtime.getDiagnostics().visibleAutomatedPorts, 6);
+runtime.setTarget({ band: 'mixed', automatedPorts: 3 }, 6, true);
 assert.equal(runtime.getDiagnostics().visibleAutomatedPorts, 3, 'snapshot/reset applies immediately');
-assert.equal(runtime.getDiagnostics().visibleHumanCounters, 3);
-runtime.setTarget({ band: 'high', automatedPorts: 6 }, 6, true);
+runtime.setTarget({ band: 'high', automatedPorts: 6 }, 7, true);
 runtime.restoreLegacy();
 assert.equal(runtime.getDiagnostics().targetAutomatedPorts, 3);
-assert.equal(runtime.getDiagnostics().visibleHumanCounters, 3, 'legacy restore returns to the existing 3/3 neutral');
-
+assert.equal(runtime.getDiagnostics().visibleHumanCounters, 3, 'legacy restore returns to the mixed 3/3 neutral');
 // A newer result may replace a future transition before it starts.
 runtime.setTarget({ band: 'low', automatedPorts: 0 }, 10, true);
 runtime.setTarget({ band: 'high', automatedPorts: 6 }, 15.12, false, 10);
 runtime.setTarget({ band: 'low', automatedPorts: 0 }, 18.12, false, 13);
-assert.equal(runtime.getDiagnostics().visibleAutomatedPorts, 0);
 runtime.update(18.12);
 assert.equal(runtime.getDiagnostics().visibleAutomatedPorts, 0);
 runtime.restoreLegacy();
 
-// Actual service customers/staff use full-size instances on the podium; mode changes release them without squashing their bodies.
-const people=site.root.children.find(o=>o.name==='hub-service-people') as T.InstancedMesh,m=new T.Matrix4(),at=new T.Vector3(),size=new T.Vector3();
-const ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),body=new T.Vector3(),world=new T.Vector3();
-for(const [band,ports,staff] of [['low',0,2],['mixed',3,2],['high',6,0]] as const){
-  runtime.setTarget({band,automatedPorts:ports},0,true);let uses=0,walks=0;
-  for(let t=0;t<50;t+=.25){runtime.update(t);site.root.updateMatrixWorld(true);let employees=0;
-    for(let k=0;k<4;k++){
-      people.getMatrixAt(k,m);size.setFromMatrixScale(m).multiply(site.root.scale);
-      if(size.x<.5)continue;assert.ok(Math.abs(size.x-1)<1e-6&&Math.abs(size.y-1)<1e-6,'service person is shrunk');
-      at.setFromMatrixPosition(m);assert.ok(Math.abs(at.y-1.2)<1e-6);
-      assert.ok(Math.abs(at.x)<=3.81&&Math.abs(Math.abs(at.z)-3.6)<1e-6,'service body leaves podium');
-      world.copy(at).applyMatrix4(site.root.matrixWorld);
-      ray.set(world.clone().add(new T.Vector3(0,.1,0)),down);ray.far=.2;
-      assert.ok(ray.intersectObject(site.layers.hubBase!.group,true).some(h=>Math.abs(h.point.y-world.y)<1e-5),'service feet have no platform support');
-      for(const height of [.4,1.2,1.6])for(let k=0;k<8;k++){
-        ray.set(body.copy(world).add(new T.Vector3(0,height,0)),new T.Vector3(Math.cos(k*Math.PI/4),0,Math.sin(k*Math.PI/4)));ray.far=.25;
-        assert.equal(ray.intersectObjects([props,site.layers.hubBase!.group],true).length,0,'service body clips facade/counter');
+// Floors stack bottom-first while the spire builds and come down top-first.
+const rings = site.root.getObjectByName('hub-spire-rings') as T.InstancedMesh;
+const ringScale = (i: number) => { const m = new T.Matrix4(); rings.getMatrixAt(i, m); return new T.Vector3().setFromMatrixScale(m).x; };
+runtime.setTarget({ band: 'low', automatedPorts: 0 }, 20, true);
+runtime.setTarget({ band: 'high', automatedPorts: 6 }, 20, false);
+runtime.update(21.5);
+assert.ok(ringScale(0) > ringScale(13) && ringScale(13) <= 1.0001e-3, 'spire rings rise from the drum upward');
+runtime.setTarget({ band: 'high', automatedPorts: 6 }, 24, true);
+runtime.setTarget({ band: 'low', automatedPorts: 0 }, 24, false);
+runtime.update(25.5);
+assert.ok(ringScale(13) < ringScale(0), 'spire rings come down from the top');
+
+// Visible mesh budget per state (previous hub: 28 / 28 / 33 meshes, +20 %).
+for (const [band, ports, budget] of [['low', 0, 33], ['mixed', 3, 33], ['high', 6, 40]] as const) {
+  runtime.setTarget({ band, automatedPorts: ports }, 30, true);
+  let meshes = 0;
+  site.root.traverseVisible(object => { if (object instanceof T.Mesh && !object.name.startsWith('guest-marker')) meshes++; });
+  assert.ok(meshes <= budget, `${band} state draws ${meshes} meshes (budget ${budget})`);
+}
+
+// Residents stand on the plinth at full size; none is squashed while a state changes, and each state has its own cast.
+const people = site.root.getObjectByName('hub-service-people') as T.InstancedMesh;
+const m = new T.Matrix4(), at = new T.Vector3(), size = new T.Vector3(), world = new T.Vector3();
+const ray = new T.Raycaster(), down = new T.Vector3(0, -1, 0), solids: T.Mesh[] = [];
+const gait = people.geometry.getAttribute('gait'), social = people.geometry.getAttribute('social');
+const collectSolids = () => { solids.length = 0; base.traverseVisible(o => { if (o instanceof T.Mesh && !(o instanceof T.InstancedMesh)) solids.push(o); }); };
+for (const [band, ports, cast] of [['low', 0, 23], ['mixed', 3, 15], ['high', 6, 6]] as const) {
+  runtime.setTarget({ band, automatedPorts: ports }, 0, true);
+  collectSolids();
+  let uses = 0, walks = 0;
+  for (let t = 0; t < 50; t += .25) {
+    runtime.update(t);
+    site.root.updateMatrixWorld(true);
+    let shown = 0;
+    for (let k = 0; k < 24; k++) {
+      people.getMatrixAt(k, m);
+      size.setFromMatrixScale(m).multiply(new T.Vector3().setFromMatrixScale(people.parent!.matrixWorld));
+      if (size.x < .5) continue;
+      shown++;
+      assert.ok(Math.abs(size.x - 1) < 1e-6 && Math.abs(size.y - 1) < 1e-6, 'resident is shrunk');
+      at.setFromMatrixPosition(m);
+      assert.ok(Math.abs(at.x) <= 4.101 && Math.abs(at.z) <= 4.701, 'resident leaves the plinth');
+      world.copy(at).applyMatrix4(people.parent!.matrixWorld);
+      ray.set(world.clone().add(new T.Vector3(0, .1, 0)), down);
+      ray.far = .2;
+      assert.ok(ray.intersectObjects(solids, false).some(h => Math.abs(h.point.y - world.y) < .05), 'resident has no platform support');
+      if (gait.getW(k) < .5) for (const height of [.4, 1.2, 1.6]) for (let d = 0; d < 8; d++) {
+        ray.set(world.clone().add(new T.Vector3(0, height, 0)), new T.Vector3(Math.cos(d * Math.PI / 4), 0, Math.sin(d * Math.PI / 4)));
+        ray.far = .25;
+        assert.equal(ray.intersectObjects(solids, false).length, 0, `${band}: standing resident ${k} clips the building`);
       }
-      if(k%2)employees++;else if(people.geometry.getAttribute('gait').getY(k)>0)walks++;else if(people.geometry.getAttribute('social').getY(k)>.1)uses++;
-    }assert.equal(employees,staff);
-  }assert.ok(uses&&walks,'service mode has no visible approach/use cycle');
+      if (gait.getY(k) > 0) walks++;
+      else if (social.getY(k) > .1) uses++;
+    }
+    assert.equal(shown, cast, `${band} cast`);
+  }
+  assert.ok(uses, `${band}: nobody gestures or uses a service`);
+  if (band === 'high') assert.ok(walks, 'self-service users have no visible approach');
 }
-runtime.setTarget({band:'low',automatedPorts:0},60,false);runtime.update(61.5);
-people.getMatrixAt(0,m);assert.ok(size.setFromMatrixScale(m).x<.001&&m.determinant()>0,'changing port retains a visible customer or singular hidden matrix');
-runtime.setTarget({band:'mixed',automatedPorts:3},61.5,true);people.getMatrixAt(0,m);
-assert.ok(Math.abs(size.setFromMatrixScale(m).x-1/3)<1e-6,'immediate recovery leaves a stale hidden customer');
-props.visible=false;runtime.update(62);assert.equal(people.visible,false,'actors outlive a hidden frontage');
+// Mid-change nobody is on a moving floor; a snapshot puts the settled cast back at once; a hidden frontage hides them.
+runtime.setTarget({ band: 'mixed', automatedPorts: 3 }, 60, true);
+runtime.setTarget({ band: 'high', automatedPorts: 6 }, 60, false);
+runtime.update(61.5);
+for (let k = 0; k < 24; k++) { people.getMatrixAt(k, m); assert.ok(size.setFromMatrixScale(m).x < .001 && m.determinant() > 0, 'a visible resident stays during a state change'); }
+runtime.setTarget({ band: 'mixed', automatedPorts: 3 }, 61.5, true);
+people.getMatrixAt(0, m);
+assert.ok(Math.abs(size.setFromMatrixScale(m).x - 1 / 3) < 1e-6, 'immediate recovery leaves a stale hidden resident');
+props.visible = false;
+runtime.update(62);
+assert.equal(people.visible, false, 'residents outlive a hidden frontage');
+props.visible = true;
 
-console.log('PASS: six bounded MAGNET service slots retarget smoothly and restore to the mixed 3/3 baseline.');
+// The canopy bobs +-.08 over 6 s and stays still for reduced-motion users.
+runtime.setTarget({ band: 'low', automatedPorts: 0 }, 70, true);
+const canopy = site.root.getObjectByName('hub-canopy')!;
+runtime.update(72); const y0 = canopy.position.y;
+runtime.update(73.5); const y1 = canopy.position.y;
+assert.ok(Math.abs(y1 - y0) > .05 && Math.abs(y1 - y0) < .2, 'canopy hovers');
+const matchMedia = Object.getOwnPropertyDescriptor(globalThis, 'matchMedia');
+Object.defineProperty(globalThis, 'matchMedia', { configurable: true, value: () => ({ matches: true }) });
+runtime.update(72); const s0 = canopy.position.y;
+runtime.update(73.5);
+assert.equal(canopy.position.y, s0, 'reduced motion keeps the canopy still');
+if (matchMedia) Object.defineProperty(globalThis, 'matchMedia', matchMedia); else delete (globalThis as { matchMedia?: unknown }).matchMedia;
 
-// Every existing service slot has a recessed face; approach/body-clearance tests above still apply.
-site.root.updateMatrixWorld(true);
-for(let i=0;i<6;i++){
-  const side=i%2?-1:1,origin=new T.Vector3((i-2.5)*1.02,3,side*3.3).applyMatrix4(site.root.matrixWorld);
-  ray.set(origin,new T.Vector3(0,0,-side).transformDirection(site.root.matrixWorld));ray.far=1;
-  const first=ray.intersectObject(site.layers.hubBase!.group,true)[0];
-  assert.ok(first&&first.object instanceof T.Mesh&&first.object.material===dark,'slot has no recessed service face above its existing sign');
-}
-console.log('PASS: six recessed service faces stay behind the existing accessible approach.');
-
-const joints=site.layers.hubUpper!.group.getObjectByName('automation-hub-service-joints')!;
-assert.ok(joints&&joints.children.length===1,'upper operating joints do not share one static batch');
-await site.layers.hubUpper!.prepare();
-assert.equal(site.layers.hubUpper!.group.getObjectByName('automation-hub-service-joints'),joints,'late GLB replacement removed the operating joints');
-console.log('PASS: upper operating joints survive late GLB loading without rebuilding their batch.');
+console.log('PASS: three AUTO HUB states (hall + canopy, hall + column, spire) retarget smoothly, stack floor by floor, seat residents on the plinth and restore to mixed.');
