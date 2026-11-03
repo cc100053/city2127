@@ -172,3 +172,14 @@ Base: R5 (55a808e). Same pose, captures and lot. Aim at the 1-score items in [r5
 - **Arms with parcels** (`fh-arms`): ≥ 6 arms with amber parcels visible from the pose (camera side or silhouetted at the tower edges), parcels large enough to read.
 
 Checks/captures as R5 into `~/city2127-evidence/nw-closeup-polish/r6/` (including night low/mixed/high), publish `vs-target.jpg` to `nw-closeup-polish/r6`. Do not judge.
+
+## R7 — last four flagship items (owner 2026-11-03: 「開 R7」)
+
+Base: R6 (3681080). Same pose, captures and lot. Targets: `fl-glazing`, `fl-material`, `fl-canopy`, `fm-rings` from [r6/scores](r6/scores.md); the other 10 items must stay 2 (re-crop them and compare against `~/city2127-evidence/nw-closeup-polish/r6/crops/` before reporting).
+
+- **Soft warm room, not an orange wall** (`fl-glazing`, `fl-material`; apply the same tone to the mixed hall without losing `fm-hall`): look at the target crop — a pale warm-white room lit from above, warm only near the lights, the glass reading as glass. Lower the interior's saturation and emissive (cream-white walls with a warm ceiling glow and warm pools on the floor; the deepest tone peach, never saturated orange). Add a faint cool glass plane across the glazing (slight sky reflection / low-opacity tint) so the room reads behind glass. Night must still glow warm (check night captures).
+- **Roof overhang reads** (`fl-glazing`): the low roof slab is a thin white plate (not a box) projecting clearly past the glazing on the camera side and both ends, with a dark shadow line under its edge, like the target's cantilever. Thin the box-like parapet.
+- **Emitters as discrete pads** (`fl-canopy`): remove the large translucent cyan cones and glow spheres. Four small bright white-blue pads/bulbs on the canopy underside, each with at most a small soft halo; the gap between canopy and roof stays clear and readable.
+- **Hollow docking rings** (`fm-rings`): the mixed rings become open rings like the target — a torus/annulus with a visible hole around the column (a gap between ring and core bridged by 3–4 thin spokes), an inner track/rail ring, blue seam on the outer edge, docked drones on the rim.
+
+Checks/captures as R6 into `~/city2127-evidence/nw-closeup-polish/r7/` (day ×3, night ×3, focal shots); publish `vs-target.jpg` to `nw-closeup-polish/r7`. Do not judge.
