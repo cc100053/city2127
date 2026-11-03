@@ -1,0 +1,9 @@
+# P4 — spec r2 (coordinator review of r1 35955f9, 2026-11-03)
+
+r1 opened the centre: the civic core base and the land between arch and core now read, which is the target's main move. Keep the plaza position and size. Fix:
+
+1. **Walkways must read at hero.** Raise to 15–18 m peak, deck 9 m wide; underside and fascia in `megaRib` grey (`#c9d0d4`) with a 1.2 m darker shadow band so the white top separates from the pale ground; `megaSeam` edge lines both sides, intensity day 1.0 / night 2.4. Fix walkway A sinking into the ramp slab at the plaza end — land it on the deck edge with a short level landing. Keep columns every 30 m (white, with a seam collar at the top).
+2. **Plaza life and pattern.** Target plaza is busy: double the people (≈ 200, mostly in loose flows along the ring inlays + groups near planters), arrange the planters on two concentric rings round the central pool (12–16 round planters, low shrubs + 1 tree each, lush), and give the central pool a raised **light-ring fountain** (thin `megaSeam` ring 1.5 m above the water, Ø 18 m, + 6 thin vertical water/light jets as additive cylinders, soft at day). Paving: a few wider ivory/grey radial bands so the plaza reads patterned from 500 m.
+3. **Orphaned holograms.** `HOLOGRAMS` panels anchored to the removed Aqua facades/bridges (`voices`, `air`, `tag-a`, `tag-b`, `tag-c`): re-anchor them to the plaza deck — `voices` (the live one) on a slim white mast at the plaza's land-side edge, facing hero, at the same screen size as before; the others on the plaza perimeter or remove the tags if they clutter (list). Keep layout tests consistent.
+
+Captures to `P4/r2/` (`vs-target.jpg` = r1 h16 | r2 h16 | target), refresh `close-plaza.png` / `close-walkway.png` after the final change, FPS, checks (read `fail` count), commit, push `feat/city-taste-v2-p4`, stop servers, report (commit + FPS first).

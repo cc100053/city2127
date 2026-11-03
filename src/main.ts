@@ -20,6 +20,8 @@ import { displayHour, type DisplayMode, sunHeight, daylight, moodAt, withNight, 
 import { overlay } from './overlay';
 import { addCityModel } from './modelAssets';
 import { loadOdaiba, updateOdaiba } from './odaibaScene';
+import { updateFloaters } from './floaters';
+import { updateHoverBeds } from './plazaDeck';
 import { build2127 } from './odaiba2127';
 import { bayWater, waterLights } from './bayWater';
 import { scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
@@ -270,7 +272,8 @@ try {
   const dayBase=new T.Color('#d3dde0'),dayPulse=new T.Color('#accbdc'),dayStill=new T.Color('#e0e6dc');
   const topBase=new T.Color('#6e9cc6'),topPulse=new T.Color('#6a8db0'),topStill=new T.Color('#a9bcc4');
   const duskHorizon=new T.Color('#f6b58a'),duskTop=new T.Color('#7a86ad'),nightHorizon=new T.Color('#2a3354'),nightTop=new T.Color('#070d1c');
-  const sunLow=new T.Color('#ffae78'),sunHigh=new T.Color('#ffe7c4'),moon=new T.Color('#7d9be0'),ambientDay=new T.Color('#e3ebee'),ambientPulse=new T.Color('#a7c9ed'),ambientNight=new T.Color('#899dbd'),ambientLate=new T.Color('#f4dcc0'),white=new T.Color('#ffffff'),cloudGold=new T.Color('#ffcf98'),seaHaze=new T.Color('#a9c4d6'),horizonCream=new T.Color('#f7ead8'),sunBloom=new T.Color('#ffe2b0'),sunDirection=new T.Vector3();
+  const sunLow=new T.Color('#ffae78'),sunHigh=new T.Color('#ffe7c4'),moon=new T.Color('#7d9be0'),ambientDay=new T.Color('#e3ebee'),ambientPulse=new T.Color('#a7c9ed'),ambientNight=new T.Color('#9fb4d0'),ambientLate=new T.Color('#f4dcc0'),white=new T.Color('#ffffff'),cloudGold=new T.Color('#ffcf98'),seaHaze=new T.Color('#a9c4d6'),horizonCream=new T.Color('#f7ead8'),sunBloom=new T.Color('#ffe2b0'),sunDirection=new T.Vector3();
+  const groundDay=new T.Color('#8a8274'),groundNight=new T.Color('#7b8ca4'); // P7: the warm ground bounce turned the night greenery olive-teal
   const start=performance.now();
   let frames=0,measureStart=start,shadowDrawn=-Infinity;
   renderer.setAnimationLoop(()=>{
@@ -293,7 +296,7 @@ try {
     sun.intensity=(3.15+pulse*.2+still*.05+glow*.5)*T.MathUtils.smoothstep(height,-.02,.2)+.55*T.MathUtils.smoothstep(-height,.02,.25);
     const light=nightLighting(dark);
     ambient.intensity=(.6+pulse*.15+still*.15)*(1-glow*.18*day)*light.ambient;
-    ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientLate,glow*.6).lerp(ambientNight,dark);
+    ambient.color.copy(ambientDay).lerp(ambientPulse,pulse).lerp(ambientLate,glow*.6).lerp(ambientNight,dark);ambient.groundColor.copy(groundDay).lerp(groundNight,nightSky);
     scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure*(1+.16*day);
     waterLights.night.value=nightSky;
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
@@ -301,7 +304,7 @@ try {
     if(headlineCamera?.active&&cameraMotion.matches)headlineCamera.cancel();else headlineCamera?.update(now);
     narration?.update(now,cameraMotion.matches);explore?.update(now,cameraMotion.matches);
     if(import.meta.env.DEV&&devShot){camera.position.set(...devShot.position);controls.target.set(...devShot.target);camera.lookAt(controls.target);}
-    cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateOverlay(hour,dark>.5);renderer.info.reset();
+    cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.
     if(performance.now()-shadowDrawn>=1000/quality.shadowHz){renderer.shadowMap.needsUpdate=true;shadowDrawn=performance.now();}
     composer.render();

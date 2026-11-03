@@ -30,6 +30,7 @@
 | [Shibuya Plan 01](SHIBUYA.md)／[Plan 02](history/SHIBUYA_PLAN02.md)／[Art](history/SHIBUYA_ART.md) | 已結束歷史；未完成項目不再推進 |
 | [Original MVP](history/EXHIBITION_MVP.md) | 原始規劃及 dated updates；由現行 SPEC 取代 |
 | [Implementation snapshot](history/PROJECT_2026-10-02.md)／[Validation snapshot](history/VALIDATION_2026-10-02.md) | 保留舊 deep links／證據，不作現行規則 |
+| [City master taste 2026-11-02 前版](history/CITY_MASTER_TASTE_2026-11-02.md) | 「克制、合理」版 taste 及 hologram／hero amendments；由現行 taste 取代 |
 | [Survey original log](../survey/docs/log/survey-state-mvp.md) | schema1 原製作記錄；repo import 狀態見相關 handoff |
 
 ## 任務 handoffs

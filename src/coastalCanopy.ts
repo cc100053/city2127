@@ -11,6 +11,9 @@ const swale=(x:number,z:number)=>Math.sin(x*.023+Math.sin(z*.018)*2)+Math.cos(z*
 export const corridor=(x:number,z:number)=>Math.abs(x*.023+Math.sin(z*.018)*2+Math.PI/2);
 export const CORRIDOR_GLSL='abs(w.x*.023+sin(w.y*.018)*2.+1.5708)';
 
+/** P5 leaf tones (h,s,l): deep, mid, olive — the light spring green is the former cherry tint. */
+const GREENS=[[.30,.45,.24],[.27,.42,.29],[.21,.38,.27]] as const;
+export const hash=(n:number)=>{const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s);};
 const drum=new T.CylinderGeometry(1,1,1,40),crown=leafyCrown(),lowCrown=leafyCrown(1);
 /** Reuse the surveyed planting locations; layered crowns replace the tiny blockout cones.
  * r8 pass 2: surveyed `waterfront` trees become palms (tall slim trunk, flat radiating crown — target v2's seaside palms), and with
@@ -37,11 +40,9 @@ export function plantCanopy(scene: T.Object3D, trees: { instances: { position: n
         dummy.scale.set(3.4*s,(tree.type==='columnar'?4.4:2.9)*s,3*s);dummy.rotation.set(.1*i,a,.15*j);
       }
       dummy.updateMatrix();foliage.setMatrixAt(i*4+j,dummy.matrix);
-      // About one tree in eleven (and every `cherry`) is a flowering cherry: pale pink crowns through the green (target reference).
-      if(!palm && (tree.type==='cherry' || i%11===5))color.setHSL(.95+(j%2)*.01,.38,.7+(j%3)*.03);
-      else if(palm)color.setHSL(.24+(j%2)*.01,.34,.3+(j%3)*.02);
-      // r9: deeper, cooler leaf green (target v2's lush groves) with a lighter sunlit upper lobe, instead of pale olive balls.
-      else color.setHSL(.24+(i%5)*.009,.34+(j%3)*.05,.19+(i%7)*.016+(j%2)*.04);
+      // P5: no pink — `cherry` and about one tree in eleven take the light spring green; other crowns pick deep / mid / olive by hash.
+      if(palm)color.setHSL(.24+(j%2)*.01,.34,.3+(j%3)*.02);
+      else{const [h,sa,l]=tree.type==='cherry' || i%11===5?[.27,.45,.44]:GREENS[(i*3+j+(i>>2))%3];color.setHSL(h+(i%5)*.004,sa,l+(i%7)*.01+(j%2)*.03);}
       foliage.setColorAt(i*4+j,color);
     }
   });
@@ -56,10 +57,26 @@ export function plantCanopy(scene: T.Object3D, trees: { instances: { position: n
   scene.add(foliage,trunks);if(planted.length)scene.add(rims,beds);
 }
 
+/** P5: continuous low shrub bands — bumpy squashed crowns, one instance each. [x, y, z, radius, height] (y = base).
+ * Calls on the same `scene` merge into one instanced mesh (one draw for every roof garden). */
+type Shrub=[number,number,number,number,number];
+const shrubPool=new WeakMap<T.Object3D,{mesh:T.InstancedMesh;list:Shrub[]}>();
+export function plantShrubs(scene:T.Object3D,add:Shrub[]){
+  if(!add.length)return;
+  const old=shrubPool.get(scene),list=[...old?.list??[],...add];
+  if(old){old.mesh.removeFromParent();old.mesh.material instanceof T.Material&&old.mesh.material.dispose();old.mesh.dispose();}
+  const mesh=new T.InstancedMesh(lowCrown,new T.MeshStandardMaterial({color:'#ffffff',roughness:.92}),list.length),d=new T.Object3D(),c=new T.Color();
+  list.forEach(([x,y,z,r,h],i)=>{
+    d.position.set(x,y+h*.4,z);d.rotation.set(0,hash(i)*6.3,0);d.scale.set(r,h,r*(.85+hash(i+9)*.3));d.updateMatrix();mesh.setMatrixAt(i,d.matrix);
+    const [hh,sa,l]=i%7===3?[.27,.45,.42]:GREENS[i%3];c.setHSL(hh+hash(i+3)*.015,sa,l+hash(i+5)*.07);mesh.setColorAt(i,c);
+  });
+  mesh.name='shrub-bands';mesh.receiveShadow=true;scene.add(mesh);shrubPool.set(scene,{mesh,list});
+}
+
 /** r8 (user: 2127 form, same green volume): green gathers in dense clusters on engineered two-step terraces — a wide white-rimmed
  * lawn tier with a ring of crowns and a raised inner tier with taller ones — instead of trees spread evenly. [x, z, ground y, radius]. */
-function plantClusters(scene:T.Object3D,clusters:[number,number,number,number][],scale=1){
-  const trees:{position:number[];scale:number;type:string}[]=[],dummy=new T.Object3D(),n=clusters.length*2;
+export function plantClusters(scene:T.Object3D,clusters:[number,number,number,number][],scale=1,band=0){
+  const trees:{position:number[];scale:number;type:string}[]=[],shrubs:Shrub[]=[],dummy=new T.Object3D(),n=clusters.length*2;
   const rims=new T.InstancedMesh(drum,trim,n),beds=new T.InstancedMesh(drum,leaf,n);
   clusters.forEach(([x,z,y,R],i)=>{
     // Oval, turned per cluster, so the terraces read as shaped landform rather than a polka-dot grid.
@@ -70,13 +87,22 @@ function plantClusters(scene:T.Object3D,clusters:[number,number,number,number][]
       dummy.position.set(x,y+top/2,z);dummy.scale.set(R*f*stretch,top,R*f/stretch);dummy.updateMatrix();rims.setMatrixAt(i*2+k,dummy.matrix);
       dummy.position.set(x,y+top+.02,z);dummy.scale.set(R*f*stretch-.5,.06,R*f/stretch-.5);dummy.updateMatrix();beds.setMatrixAt(i*2+k,dummy.matrix);
     });
+    if(band){
+      // P5 roof crowns: a continuous shrub band spilling over each rim lip, and only a few trees (band 2 = tall tower roof: at most 2).
+      ([[.97,.7,4.2],[.52,1.9,5]] as const).forEach(([f,top,gap],k)=>{
+        const n=Math.max(5,Math.round(Math.PI*2*R*f*1.05/gap));
+        for(let j=0;j<n;j++){const [sx,sz]=at(f,j/n*Math.PI*2+k);shrubs.push([sx,y+top,sz,1.5+hash(i*40+j)*.6,.9+hash(i*40+j+7)*.4]);}
+      });
+      const nt=band===2?2:Math.max(3,Math.round(R*.4));
+      for(let j=0;j<nt;j++){const [tx,tz]=at(j?.3:0,j*Math.PI+i);trees.push({position:[tx,-tz,y+1.9],scale:scale*(.8+(j%2)*.25),type:j===1?'columnar':'broadleaf'});}
+      return;
+    }
     // r8 pass 3: denser rim tier (about one crown per 6 m of rim) so each grove reads as one closed canopy mass.
     const ring=Math.max(4,Math.round(R*.8));
     for(let j=0;j<ring;j++){const [tx,tz]=at(.74,j/ring*Math.PI*2+i);trees.push({position:[tx,-tz,y+.7],scale:scale*(.85+((i+j)%4)*.1),type:(i+j)%5===0?'columnar':'broadleaf'});}
-    // Every other cluster crowns its raised tier with a cherry (target v2's pink scattered through the groves).
-    for(let j=0;j<3;j++){const [tx,tz]=at(j?.28:0,j*Math.PI+i);trees.push({position:[tx,-tz,y+1.9],scale:scale*1.15,type:!j && i%2?'cherry':'broadleaf'});}
+    for(let j=0;j<3;j++){const [tx,tz]=at(j?.28:0,j*Math.PI+i);trees.push({position:[tx,-tz,y+1.9],scale:scale*1.15,type:'broadleaf'});}
   });
-  plantCanopy(scene,{instances:trees});
+  plantCanopy(scene,{instances:trees});plantShrubs(scene,shrubs);
   rims.name=beds.name='grove-terraces';rims.castShadow=beds.castShadow=true;rims.receiveShadow=beds.receiveShadow=true;scene.add(rims,beds);
 }
 
@@ -101,7 +127,7 @@ export function plantRoofCanopy(scene: T.Object3D, model: T.Object3D, tower=fals
     const r=flat(x,z,p.y,R*1.3+1)?R:flat(x,z,p.y,R*.7+1)?R*.55:0;
     if(r)clusters.push([x,z,p.y,r]);
   }
-  plantClusters(scene,clusters,tower?.9:.6);
+  plantClusters(scene,clusters,tower?.9:.6,tower?2:1);
   return clusters;
 }
 

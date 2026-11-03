@@ -1,7 +1,10 @@
 import * as T from 'three';
-import { arc, bake, box, skyGlass, leaf, leafyCrown, paint, stone, trail, trim } from './cityRig.ts';
+import { arc, bake, box, skyGlass, leaf, leafyCrown, paint, stone, trail } from './cityRig.ts';
+import { megaSeam, megaShell } from './megastructures.ts';
+const trim = megaShell; // r1 (P3): white engineered members, one material family with the megastructures
 import { changeSites, gardenDecks, midDecks, sweepway } from './layout.ts';
 import { routes } from './mobility.ts';
+import { inMega } from './megaFootprints.ts';
 import layout from './odaiba-layout.json' with { type: 'json' };
 import { shoreRoomBays } from './waterRooms.ts';
 
@@ -16,16 +19,16 @@ const crown = leafyCrown(1), pole = new T.CylinderGeometry(1, 1, 1, 10);
 // Skyway network (metres, deck top): a ring around the 151 m tower east of DECKS, a link into the Fuji chassis ring floor (61 m),
 // on to a ring around Grand Nikko (92 m, above Hilton's 83 m roof) and two suspended glass spheres. Routed clear of every
 // survey site, the 113/151 m context towers and the Fuji chassis members; west of each site's line of sight from the hero pose.
-const RINGS: { centre: P3; radius: number }[] = [
+const RINGS: { centre: P3; radius: number }[] = ([
   { centre: [259, 90, -351], radius: 50 },
   { centre: [-240, 92, 178], radius: 100 },
-];
-const SPHERES: { centre: P3; radius: number; deck?: number }[] = [
+] as { centre: P3; radius: number }[]).filter(r => !inMega(r.centre[0], r.centre[2], r.radius));
+const SPHERES: { centre: P3; radius: number; deck?: number }[] = ([
   { centre: [160, 92, 40], radius: 20, deck: 28 },
   { centre: [-80, 100, 180], radius: 22, deck: 30 },
   { centre: [-300, 104, 40], radius: 17, deck: 26 },
-];
-const LINKS: (readonly (readonly [number, number, number])[])[] = [
+] as { centre: P3; radius: number; deck?: number }[]).filter(r => !inMega(r.centre[0], r.centre[2], r.radius + 8));
+const LINKS: (readonly (readonly [number, number, number])[])[] = ([
   [[276.3, 90, -304.1], [300, 78, -240], [285, 67, -150], [262, 62, -60], [215, 62, 0], [140, 62, 20], [70, 62.5, 14], [12.3, 63, 7.6]],
   [[-41.3, 63, 47.8], [-75, 64, 50], [-120, 79, 94], [-159.4, 92, 118.9]],
   [[-106, 98, 180], [-124, 95, 179], [-140, 92, 178]],
@@ -33,10 +36,10 @@ const LINKS: (readonly (readonly [number, number, number])[])[] = [
   // Front-left: out of the 151 m tower ring over the north-east waterfront to the frame edge (target v2's long front-left skyway).
   [[304, 90, -373], [350, 80, -400], [410, 68, -440], [480, 60, -490], [560, 56, -545]],
   ...midDecks,
-];
+] as (readonly (readonly [number, number, number])[])[]).filter(link => !link.some(p => inMega(p[0], p[2], 6))); // P1: nothing stands inside a megastructure footprint
 
 /** Box-section deck along a curve, `top` at the curve and `depth` below it; outward winding, flat-shaded quads. */
-function deck(curve: T.Curve<T.Vector3>, width: number, depth: number, samples: number) {
+export function deck(curve: T.Curve<T.Vector3>, width: number, depth: number, samples: number) {
   const up = new T.Vector3(0, 1, 0), p = new T.Vector3(), t = new T.Vector3(), side = new T.Vector3(), rings: T.Vector3[][] = [];
   for (let i = 0; i <= samples; i++) {
     curve.getPointAt(i / samples, p); curve.getTangentAt(i / samples, t);
@@ -52,7 +55,7 @@ function deck(curve: T.Curve<T.Vector3>, width: number, depth: number, samples: 
   return geometry;
 }
 /** Tube offset sideways from a curve (light trails on both deck faces). */
-function offsetTube(curve: T.Curve<T.Vector3>, offset: number, dy: number, radius: number, closed: boolean) {
+export function offsetTube(curve: T.Curve<T.Vector3>, offset: number, dy: number, radius: number, closed: boolean) {
   const up = new T.Vector3(0, 1, 0), n = closed ? 120 : 80;
   const points = Array.from({ length: closed ? n : n + 1 }, (_, i) => {
     const u = i / n, side = new T.Vector3().crossVectors(up, curve.getTangentAt(u)).setY(0).normalize();
@@ -64,7 +67,7 @@ function offsetTube(curve: T.Curve<T.Vector3>, offset: number, dy: number, radiu
 const solids = layout.buildings.map(b => { const [min, max] = b.boundsBlender; return { x0: min[0], x1: max[0], z0: -max[1], z1: -min[1] }; });
 const guideSamples = routes().guideway.getSpacedPoints(80);
 /** A pier may stand here: open ground outside landmarks, survey lots and the Yurikamome deck. */
-const pierFree = (x: number, z: number) =>
+export const pierFree = (x: number, z: number) =>
   solids.every(s => x < s.x0 - 3 || x > s.x1 + 3 || z < s.z0 - 3 || z > s.z1 + 3) &&
   Object.values(changeSites).every(s => Math.abs(x - s.x) > s.w * s.scale / 2 + 12 || Math.abs(z - s.z) > s.d * s.scale / 2 + 12) &&
   guideSamples.every(g => Math.hypot(g.x - x, g.z - z) > 12);
@@ -73,7 +76,7 @@ function skyway(root: T.Object3D, curve: T.Curve<T.Vector3>, closed: boolean) {
   const length = curve.getLength(), samples = Math.ceil(length / 3);
   root.add(new T.Mesh(deck(curve, 9, 2.6, samples), trim));
   for (const side of [-4.65, 4.65]) {
-    root.add(new T.Mesh(offsetTube(curve, side, -1.1, .75, closed), trail));
+    root.add(new T.Mesh(offsetTube(curve, side, -1.1, .75, closed), megaSeam));
     root.add(new T.Mesh(parapet(curve, side * .98, samples), stone));
   }
   for (let d = 30; d < length - 10; d += 64) {
@@ -99,6 +102,7 @@ function sphere(root: T.Object3D, [x, y, z]: P3, r: number, deckRadius?: number)
   // Hairline mullions (r5 pass 3): the panel grid reads only up close, so from the hero pose the sphere is one silver ball, not a geodesic dome.
   for (let i = 0; i < 6; i++) { const rib = new T.Mesh(new T.TorusGeometry(r + .05, .09, 4, 64), trim); rib.rotation.y = i * Math.PI / 6; g.add(rib); }
   for (const f of [-.5, 0, .5]) { const lat = new T.Mesh(new T.TorusGeometry(Math.sqrt(1 - f * f) * r + .05, .11, 4, 64), trim); lat.rotation.x = Math.PI / 2; lat.position.y = f * r; g.add(lat); }
+  const equator = new T.Mesh(new T.TorusGeometry(r + .15, .22, 6, 96), megaSeam); equator.rotation.x = Math.PI / 2; g.add(equator);
   // Cradle and a single mast with three splayed struts to the ground.
   arc(g, r * .45, r * .8, 1.4, [0, -r * .78, 0], trim);
   const mast = new T.Mesh(pole, trim); mast.scale.set(2, y - r * .7, 2); mast.position.set(0, -(y + r * .7) / 2, 0); g.add(mast);
@@ -189,7 +193,7 @@ export function skyways() {
   const generated = new Set<T.BufferGeometry>();
   root.traverse(o => { if (o instanceof T.Mesh && o.geometry !== pole && o.geometry !== crown && o.geometry.type !== 'RoundedBoxGeometry') generated.add(o.geometry); });
   const merged = bake(root); generated.forEach(g => g.dispose()); root.clear();
-  for (const mesh of merged) { mesh.name = 'skyways'; if (mesh.material === trail || mesh.material === foam || mesh.material === waterfall) mesh.castShadow = false; }
+  for (const mesh of merged) { mesh.name = 'skyways'; if (mesh.material === trail || mesh.material === megaSeam || mesh.material === foam || mesh.material === waterfall) mesh.castShadow = false; }
   root.add(...merged);
   return root;
 }

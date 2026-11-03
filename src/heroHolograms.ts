@@ -10,7 +10,7 @@ import { LOT_SOCKET_IDS, type LotSocketId } from './surveyView.ts';
 // four Meter rungs); every canvas is drawn once and redrawn only when its data changes. All visible text is Japanese or numerals.
 // Every size below is in SCREEN px of the 1600 × 900 hero frame (`d.sc` converts to canvas px): no glyph is smaller than 12 px and titles are at least 18 px.
 const FONT = "'Hiragino Sans','Noto Sans JP',sans-serif", NUM = "'SF Mono','Menlo','Consolas',monospace";
-const CYAN = '#bff6ff', INK = '#e9fdff', VIOLET = '#c9a8ff', VIOLET_INK = '#f3eaff', GLOW = '#5fd8ff';
+const CYAN = '#bff6ff', INK = '#e9fdff', VIOLET = '#dcecff', VIOLET_INK = '#f4faff', GLOW = '#cfe8ff';
 /** Meter row order and short public labels (RESIDENT_COPY has no short axis words; these are the four question pairs). */
 export const HOLOGRAM_AXES = [
   { axis: 'automation', socket: 'nw', label: '人と自律' },
@@ -207,25 +207,20 @@ const PANELS: readonly Panel[] = [
     say(d, 'フジ', s(8), s(92), 96, { weight: 700, title: true }); say(d, '文化放送', s(8), s(130), 28, { weight: 600, title: true });
     arcGauge(d, 222, 34, 13, .7); ticks(d, 206, 62, 236, 62, { alpha: .4 }); dataBlocks(d, 10, 142, 14, 14, 5); circuit(d, [[154, 150], [130, 150], [124, 144], [106, 144]]); cornerMarks(d, 240, 169);
   } },
-  // No text: a small triangle, a level meter and one circuit run.
-  ...(['a', 'b', 'c'] as const).map((n, i): Panel => ({ id: `tag-${n}`, sw: 56, long: 1024, violet: false, hud: false, draw(d) {
-    const s = d.sc; line(d, 1.2, g => { g.moveTo(s(7), s(5)); g.lineTo(s(14), s(5)); g.lineTo(s(10.5), s(12)); g.closePath(); }, { alpha: ICON });
-    dataBlocks(d, 20, 4, 6 + i, 11, 3); circuit(d, [[42 + i * 2, 9], [46 + i * 2, 9], [49 + i * 2, 5], [52, 5]], .4);
-  } })),
 ];
 
 const unit = new T.PlaneGeometry(1, 1);
 /** Glass colour map (256 px wide): a see-through deep centre (`#0a4a66`, α .3) lit towards the rim (`#2fb8e0`, α .65) by four edge gradients, a faint slanted reflection across the top 15 % and, under each
  *  string, a feathered dark shade (soft edge ≥ 40 % of the glyph height) so copy stays readable on sunlit buildings. Violet panels use `#3a2a66` / `#a98cf0`. */
 function drawPane(c: HTMLCanvasElement, W: number, zones: readonly Zone[], violet: boolean) {
-  const g = c.getContext('2d')!, w = c.width, h = c.height, k = w / W, rim = violet ? '169,140,240' : '47,184,224', mid = violet ? '58,42,102' : '10,74,102', band = Math.min(w, h) * .26;
-  g.clearRect(0, 0, w, h); g.fillStyle = `rgba(${mid},.3)`; g.fillRect(0, 0, w, h);
+  const g = c.getContext('2d')!, w = c.width, h = c.height, k = w / W, rim = '207,232,255', mid = '170,200,225', band = Math.min(w, h) * .16; // r1: thin cool sheet, no saturated fill (violet kept in the signature only)
+  g.clearRect(0, 0, w, h); g.fillStyle = `rgba(${mid},.1)`; g.fillRect(0, 0, w, h);
   for (const [x0, y0, x1, y1, bw, bh] of [[0, 0, band, 0, band, h], [w, 0, w - band, 0, band, h], [0, 0, 0, band, w, band], [0, h, 0, h - band, w, band]] as const) {
-    const grad = g.createLinearGradient(x0, y0, x1, y1); grad.addColorStop(0, `rgba(${rim},.65)`); grad.addColorStop(1, `rgba(${rim},0)`);
+    const grad = g.createLinearGradient(x0, y0, x1, y1); grad.addColorStop(0, `rgba(${rim},.5)`); grad.addColorStop(1, `rgba(${rim},0)`);
     g.fillStyle = grad; g.fillRect(x1 < x0 ? x1 : x0, y1 < y0 ? y1 : y0, bw, bh);
   }
   g.fillStyle = 'rgba(255,255,255,.08)'; g.beginPath(); g.moveTo(0, 0); g.lineTo(w * .78, 0); g.lineTo(w * .52, h * .15); g.lineTo(0, h * .15); g.closePath(); g.fill();
-  g.save(); g.shadowOffsetX = 4000; g.shadowColor = 'rgba(2,22,32,.5)'; g.fillStyle = '#000';
+  g.save(); g.shadowOffsetX = 4000; g.shadowColor = 'rgba(20,40,60,.38)'; g.fillStyle = '#000';
   for (const [x, y, zw, zh] of zones) { g.shadowBlur = Math.max(2, zh * k * .5); g.fillRect(x * k - 4000, y * k, zw * k, zh * k); }
   g.restore();
 }
@@ -265,7 +260,7 @@ export function heroHolograms(scene: T.Scene, anisotropy = 8) {
     const part = (geometryScale: number, material: T.MeshBasicMaterial, z: number, order: number) => {
       const mesh = new T.Mesh(unit, material); mesh.scale.set(place.w * geometryScale, place.h * geometryScale, 1); mesh.position.z = z; mesh.renderOrder = order; group.add(mesh); return mesh;
     };
-    const glass = new T.MeshBasicMaterial({ map: paneMap, color: '#ffffff', transparent: true, depthWrite: false, toneMapped: false, fog: false }), content = additive(texture, '#ffffff'), aura = additive(halo, p.violet ? '#b99cff' : GLOW);
+    const glass = new T.MeshBasicMaterial({ map: paneMap, color: '#ffffff', transparent: true, depthWrite: false, toneMapped: false, fog: false }), content = additive(texture, '#ffffff'), aura = additive(halo, GLOW);
     part(1, glass, 0, 10); part(1.18, aura, -.2, 9); part(1, content, .2, 11);
     paneMaterials.push(glass); haloMaterials.push(aura); inks.push(content);
     if (p.id === 'district') {

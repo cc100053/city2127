@@ -2,6 +2,8 @@ import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { arc, bake, box, chrome, cream, glass, leaf, leafyCrown, publicLight, skyGlass, solar, stone, trail, trim } from './cityRig.ts';
 import { changeSites, seaward } from './layout.ts';
+import { inCivic, inHeroClear, inMega } from './megaFootprints.ts';
+import { megaGlass, megaRib, megaShell } from './megastructures.ts';
 import { shoreRoomBays } from './waterRooms.ts';
 import { automationActivity, pavilionFlight, pedestrians, plazaPose, routes, serviceDrones } from './mobility.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
@@ -178,9 +180,9 @@ const SPREAD = 1.45;
 const HALO = .42;
 /** Inland sharing courts [x, z, yaw]: open ground scanned clear of landmarks, context, routes, P2 pavilions and P4 towers / pods.
  * P7 ranks by estimated visible hero-frame pixels (`SCAN_COURTS=20` in tests/odaiba.test.ts lists candidates best first). */
-const COURT_SITES: readonly (readonly [number, number, number])[] = [
+const COURT_SITES: readonly (readonly [number, number, number])[] = ([
   [-220, -140, .4], [-410, 120, 1.1], [-110, 230, 2.3], [50, -340, .9], [170, -360, 3.6], [-70, 180, 1.7], [-290, 290, 5.1], [-460, 290, .2], [220, 0, 2.8], [-20, 210, 4.4],
-];
+] as const).filter(([x, z]) => !inMega(x, z, 22)); // P1: nothing stands inside a megastructure footprint
 const COURT = 40;
 /** Garden crowns inside a private court [x, z, size], clear of the glass room and the entrance. */
 const COURT_TREES: readonly (readonly [number, number, number])[] = [[-10, 8, 4.2], [0, -3, 3.4], [8, 9, 3.8], [10, -9, 3.2], [-2, 13, 2.8], [-14, -14, 2.6]];
@@ -846,12 +848,13 @@ export class AutomationDistrict {
         p.x -= Math.sin(yaw) * 22; p.z -= Math.cos(yaw) * 22;
         if (Object.values(changeSites).some(s => Math.abs(p.x - s.x) < s.w * s.scale / 2 + 24 && Math.abs(p.z - s.z) < s.d * s.scale / 2 + 24)) continue;
         if (p.x > -65 && p.x < -25) continue; // Existing north-west context block.
+        if (inHeroClear(p.x, p.z)) continue; // polish2: the plaza deck's hero apron stays open
         this.bays.push({ x: p.x, y: p.y, z: p.z, yaw });
       }
     }
     // Traced open plazas at the mall approaches and western waterfront (actual-mesh checks in odaiba.test.ts).
     for (const [x, z, yaw] of [[20, 145, 0], [-200, 80, 0], [-130, 170, 0], [75, -160, 0], [-438, 45, -.9]])
-      this.bays.push({ x, y: 0, z, yaw });
+      if (!inCivic(x, z, 33)) this.bays.push({ x, y: 0, z, yaw }); // polish2: the mall approach bay sits under the enlarged Fuji frame
     this.staffed = new SlotLevels(this.bays.length);
     this.hybrid = new SlotLevels(this.bays.length);
     const pavilion = new T.Group();
@@ -1036,17 +1039,20 @@ export const towerGlow = { value: .3 }, towerNight = { value: 0 };
 // Traced open ground (tests/odaiba.test.ts checks ground, landmarks, context and routes): towers rise beside the SE site, at the DECKS
 // waterfront and from the western lawns where low concentration scatters its pods.
 // ponytail: skyway clearance was checked once in the browser (skyways.ts imports JSON Node cannot load); recheck these sites if skyways move.
-const TOWER_SITES: readonly (readonly [number, number, number])[] = [
+const ALL_TOWERS: readonly (readonly [number, number, number])[] = [
   [115, -25, 128], [67, -89, 112], [27, -249, 120], [83, -305, 104], [-189, -1, 140], [-221, -73, 116], [-157, 63, 124], [-61, 111, 104], [179, 287, 120], [-13, 279, 110],
 ];
+// P1: towers that would pierce a megastructure are not built; hero frame slots follow their towers to the new indices.
+const TOWER_KEPT = ALL_TOWERS.map((t, i) => [t, i] as const).filter(([t]) => !inMega(t[0], t[1], 16) && !inHeroClear(t[0], t[1]));
+const TOWER_SITES: readonly (readonly [number, number, number])[] = TOWER_KEPT.map(([t]) => t);
 /** Hero-view slots (392–631 m from the c2 camera, where the blue-striped cylinders stood) rebuilt as open structural frames; the rest keep their i % 3 family. */
-export const HERO_FRAME_SLOTS = [0, 2, 3, 5];
+export const HERO_FRAME_SLOTS = [0, 2, 3, 5].flatMap(a => { const i = TOWER_KEPT.findIndex(([, o]) => o === a); return i < 0 ? [] : [i]; });
 const slotFamilies = TOWER_SITES.map((_, i) => HERO_FRAME_SLOTS.includes(i) ? 3 : i % 3);
 /** Silhouette family (0 twisted, 1 terraced, 2 twin, 3 open frame) of tower slot `i` and its instance index in that family's batches. */
 export const towerFamily = (i: number) => ({ family: slotFamilies[i], instance: slotFamilies.slice(0, i).filter(f => f === slotFamilies[i]).length });
-const POD_SITES: readonly (readonly [number, number])[] = [
+const POD_SITES: readonly (readonly [number, number])[] = ([
   [-293, 147], [-253, -33], [-233, 47], [-218, -23], [-183, -43], [-168, -128], [-103, 17], [-53, 147], [-33, 167], [-23, 107], [7, -58], [27, 87], [77, 107], [87, 57], [97, -73], [107, -123], [107, 77], [117, 7], [137, -103], [207, 37], [217, -43], [217, 87], [237, -73], [237, 57], [247, -103], [252, 147],
-];
+] as const).filter(([x, z]) => !inMega(x, z, 14) && !inHeroClear(x, z));
 
 /** Q4: one walkable vertical district or functions spread through the parks.
  * High raises slender glass towers with lit sky lobbies on open ground; low scatters low glass pavilion pods across the lawns.
@@ -1088,7 +1094,9 @@ export class ConcentrationDistrict {
     this.root.name = 'concentration-district';
     // Sky-blue glass with warm-lit rooms on 4.2 m storeys (about half the bays occupied): the new vertical district reads apart from the
     // ivory mid-rise city by day and as lit towers at night (`towerGlow`, driven by updateOdaiba).
-    const facade = new T.MeshStandardMaterial({ color: '#6f9cbd', roughness: .18, metalness: .15, emissive: '#ffd6a0' });
+    // r1 (P3): one mega material family — white frame and slab bands, pale blue-grey glass, cool seam light under each band.
+    const trim = megaShell, cream = megaShell, chrome = megaRib;
+    const facade = new T.MeshStandardMaterial({ color: '#' + megaGlass.color.getHexString(), roughness: .18, metalness: .15, emissive: '#ffd6a0' });
     facade.onBeforeCompile = shader => {
       shader.uniforms.towerGlow = towerGlow; shader.uniforms.towerNight = towerNight;
       shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 towerP;\nvarying vec2 towerC;')
@@ -1106,7 +1114,7 @@ export class ConcentrationDistrict {
         totalEmissiveRadiance *= lit * towerGlow;`);
     };
     facade.customProgramCacheKey = () => 'concentration-tower-glass';
-    const lobby = this.light; lobby.emissive.set('#ffe1b8'); lobby.emissiveIntensity = .9;
+    const lobby = this.light; lobby.emissive.set('#cfe8ff'); lobby.emissiveIntensity = .9;
     // Unit-height (1 m, scaled per site) silhouette families by slot (`towerFamily`), all on an ivory podium and all marked at the .4 / .72 sky-lobby
     // levels where bridges land: a twisted glass shaft, a terraced setback tower with planted terraces, and linked twin shafts.
     const family = (build: (unit: (geometry: T.BufferGeometry, material: T.Material, x: number, y: number, z?: number, yaw?: number) => void) => void) => {

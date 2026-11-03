@@ -65,13 +65,13 @@ export function shuttlePoses(time:number,channels:readonly T.Curve<T.Vector3>[])
       return {x:p.x,y:p.y,z:p.z,yaw:Math.atan2(t.x,t.z),scale:SHUTTLE_SCALE*ease(u*length/60)*ease((1-u)*length/60),lane};});});
 }
 export const WALKERS=120, AIR_SCALE=5;
-/** Regional craft (ambient, `skyCorridors`): AIR_SCALE × 1.8, 10–12 per lane, SKY_SPEED m/s; each trails a SKY_TRAIL m wide light streak .8 × the craft spacing. */
+/** Regional craft (ambient, `skyCorridors`): AIR_SCALE × 1.8, 10–12 per lane, SKY_SPEED m/s; each trails a SKY_TRAIL m wide light streak .3 × the craft spacing. */
 export const SKY_SCALE=AIR_SCALE*1.8, SKY_SPEED=35, SKY_TRAIL=4;
 export const skyCount=(length:number)=>T.MathUtils.clamp(Math.round(length/250),10,12);
 /** Craft `i` of a lane `length` m long at `time`: `u` along the lane (odd lanes fly it backwards) and its 0..1 fade over the 300 m at each end. */
 export function skyPose(time:number,lane:number,length:number,i:number) {
   const n=skyCount(length),dir=lane%2?-1:1,u=((time*SKY_SPEED/length*dir+(i+hash(lane*16+i,40)*.3-.15)/n)%1+1)%1;
-  return {u,reverse:dir<0,fade:ease(u*length/300)*ease((1-u)*length/300),trail:.8*length/n};
+  return {u,reverse:dir<0,fade:ease(u*length/300)*ease((1-u)*length/300),trail:.3*length/n};
 }
 const MAX_WALKERS=400, DOOR_WALKERS=120, ROBOTS=14, FORECOURT_GROUPS=20, MAX_TRAINS=4, LOOP_AIRCRAFT=30;
 /** Aircraft slot: groups 0..9 spread evenly, even groups on the regional district loop, odd on the city shore lane; slots 10+ join a
@@ -88,7 +88,7 @@ const POD_SWITCH=[.078,.328,.672,.922];
 export const podSwitch=(level:number,at:number)=>T.MathUtils.smoothstep(level,at-.05,at+.05);
 export const podShare=(level:number,index:number)=>{const q=(index*.618)%1;return podSwitch(level,POD_SWITCH[q<.15?0:q<.5?1:q<.85?2:3]);};
 /** Walkers: four of five stroll the seaside promenades (even east, odd west), every fifth a mid-level skyway deck. */
-export const walkerRoute=(index:number)=>index%5<4?index%2:2+Math.floor(index/5)%4;
+export const walkerRoute=(index:number)=>index%5<4?index%2:2+Math.floor(index/5)%(midDecks.length+gardenDecks.length);
 /** Interchange transfers: even people step off the boat and walk ashore, odd walk out, queue at the head and board while it is docked. */
 export const TRANSFERS=16;
 /** Human-led and autonomous service both retain a complete transit system. Ports 1..5 span the readable alternatives. */
@@ -204,7 +204,7 @@ export function dockMotion(time:number) {
 export function guideStrength(sample:number,head:number,closed:boolean) {
   let d=sample-head;
   if(closed)d=((d+.5)%1+1)%1-.5;
-  return Math.max(0,1-Math.abs(d-.022)/.035); // short streak: one craft lights ~7 of a loop's 96 strips
+  return Math.max(0,1-Math.abs(d-.02)/.024); // short streak: one craft lights ~5 of a loop's 96 strips
 }
 
 function material(color:string,emissive=false) {
@@ -653,7 +653,7 @@ export function mobility(scene:T.Scene) {
   const drones=fleet(scene,winged(),LOOP_AIRCRAFT+2,'air-taxis');
   // Regional corridors (ambient, `skyCorridors`): the same winged craft at SKY_SCALE, each with a tapered light trail (own fleet, scaled per lane to .8 × its craft spacing).
   const skyLength=path.sky.map(c=>c.getLength()),skySlots=skyLength.reduce((n,l)=>n+skyCount(l),0);
-  const regional=fleet(scene,winged(),skySlots,'regional-air'),trails=fleet(scene,[{geometry:streak(0,1,1),material:glow('#88d6d3',3)}],skySlots,'regional-air-trails');
+  const regional=fleet(scene,winged(),skySlots,'regional-air'),trails=fleet(scene,[{geometry:streak(0,1,1),material:glow('#88d6d3',1.8)}],skySlots,'regional-air-trails');
   // Autonomous pods: a rounded cabin on four ducted rotors, 17 m across; they take a winged craft's slot as automation rises (podShare).
   const airPods=fleet(scene,[part([1.5,.8,2.4],[0,.1,0],airShell,.35),part([1.56,.3,1.5],[0,.32,.25],glass,.12),part([1.2,.08,2],[0,-.3,0],mint,.03),
     ...[[-1.15,-.95],[1.15,-.95],[-1.15,.95],[1.15,.95]].map(([x,z])=>({geometry:new T.TorusGeometry(.55,.08,6,20).rotateX(Math.PI/2).translate(x,.15,z),material:airShell}))],LOOP_AIRCRAFT+2,'air-pods');
@@ -705,9 +705,11 @@ export function mobility(scene:T.Scene) {
   seams.name='carriageway-seams';laneGuides.name='carriageway-guides';seams.receiveShadow=laneGuides.receiveShadow=true;scene.add(seams,laneGuides);
   const berthLight=new T.PointLight('#b9e2cf',0,60,2);berthLight.position.set(SPHERE_DOCK[0],SPHERE_DOCK[1]+4,SPHERE_DOCK[2]);scene.add(berthLight);
   const ixLight=new T.PointLight('#b9e2cf',0,45,2);ixLight.position.set(INTERCHANGE.mast[0],INTERCHANGE.deck+4,INTERCHANGE.mast[2]);scene.add(ixLight);
-  const guideMaterial=new T.MeshBasicMaterial({color:new T.Color('#88d6d3').multiplyScalar(3)});
+  const guideMaterial=new T.MeshBasicMaterial({color:new T.Color('#cfe8ff').multiplyScalar(2.2)});
   // Guide strips on every corridor: district loop, sphere approach, shore lane, interchange approach (96 each).
   const airCurves=[path.air,path.approach,path.shore,path.ixApproach],closed=[true,false,true,false];
+  // Guideway rail: a thin pale beam along the shore lane, so the light band under the craft reads as a system rather than a painted line.
+  const rail=new T.Mesh(new T.TubeGeometry(path.shore,240,.3,4,true).translate(0,-2,0),new T.MeshBasicMaterial({color:'#eaf4ff',transparent:true,opacity:.5}));rail.name='shore-guideway-rail';scene.add(rail);
   const guides=fleet(scene,[part([.36,.1,2.1],[0,0,0],guideMaterial,.03)],airCurves.length*96,'air-corridor-guides');
   const samples=airCurves.map(route=>Array.from({length:96},(_,i)=>({p:route.getPointAt(i/96),t:route.getTangentAt(i/96)})));
   const stripLength=airCurves.map(route=>route.getLength()/96*1.05);
@@ -1073,11 +1075,13 @@ export function mobility(scene:T.Scene) {
     shuttles.flush();shuttleWakes.flush();
     for(let i=0;i<LOOP_AIRCRAFT;i++){
       const slot=aircraftSlot(i),length=laneLength[slot.lane];
-      const t=activity?((time*speed-slot.wingman*PLATOON)/length+slot.phase+1e3)%1:(time*speed/length*(1+i%3*.375)+i/6)%1;
-      const density=activity?amount(activity.aircraft,i):i<6?T.MathUtils.smoothstep(.2+state.traffic*.35-i/9,-.07,.07):0,pod=activity?podShare(activity.level,i):0;
-      place(lanes[slot.lane],t);pose.rotation.z=Math.sin(time+i)*.035;
+      // Standalone/idle (no automation): four tidy V-formations of three on the 80–100 m shore lane, a quarter lap apart (P6).
+      const wing=Math.floor(i/4),idle=activity?0:i%4,lateral=wing===0?0:wing===1?10:-10;
+      const t=activity?((time*speed-slot.wingman*PLATOON)/length+slot.phase+1e3)%1:((time*speed-(wing?18:0))/laneLength[1]+idle/4+1e3)%1;
+      const density=activity?amount(activity.aircraft,i):i<12?T.MathUtils.smoothstep(.2+state.traffic*.9-i/9,-.07,.07):0,pod=activity?podShare(activity.level,i):0;
+      place(lanes[activity?slot.lane:1],t);if(!activity)pose.position.x+=tangent.z*lateral,pose.position.z-=tangent.x*lateral;pose.rotation.z=Math.sin(time+i)*.035;
       pose.scale.setScalar(AIR_SCALE*density*(1-pod));drones.set(i,pose);pose.scale.setScalar(AIR_SCALE*density*pod);airPods.set(i,pose);
-      heads[i]=t;weights[i]=density;corridor[i]=slot.lane?2:0;
+      heads[i]=t;weights[i]=density;corridor[i]=activity?slot.lane?2:0:2;
     }
     // Regional craft and their light trails (ambient: independent of the Meters and the automation curve); the trail starts at the tail.
     let k=0;path.sky.forEach((route,lane)=>{for(let i=0;i<skyCount(skyLength[lane]);i++,k++){
@@ -1100,7 +1104,7 @@ export function mobility(scene:T.Scene) {
       for(let i=0;i<SLOTS;i++)if(corridor[i]===r)strength=Math.max(strength,guideStrength(j/96,heads[i],closed[r])*weights[i]);
       // Owner 2026-11-01: lit strips stretch to meet their neighbours, so each craft trails one tapered light streak; between craft the
       // sky stays clear (the resting dotted line read as noise against the low hero's sky).
-      const sample=samples[r][j],width=titled[r][j]?0:strength*(closed[r]&&activity?3+activity.level*7:3)*1.6;pose.position.copy(sample.p).y-=2;pose.rotation.set(0,Math.atan2(sample.t.x,sample.t.z),0);
+      const sample=samples[r][j],width=titled[r][j]?0:strength*(closed[r]&&activity?3+activity.level*7:3)*1.2;pose.position.copy(sample.p).y-=2;pose.rotation.set(0,Math.atan2(sample.t.x,sample.t.z),0);
       pose.scale.set(width,width,width>0?Math.max(width,stripLength[r]/2.1):0);guides.set(r*96+j,pose);
     }guides.flush();
   };

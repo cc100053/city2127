@@ -1,8 +1,12 @@
 import * as T from 'three';
+import { plazaDeck, updatePlaza } from './plazaDeck.ts';
+import { HOLOGRAMS } from './layout.ts';
 import { addCityModel } from './modelAssets';
 import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
-import { civicCore } from './civicCore';
+import { civicCore, updateCivic } from './civicCore';
+import { floaters } from './floaters';
+import { bodyFootprints, carveContext, inRect, megastructures, updateMegastructures } from './megastructures';
 import { publishOccupants, publishRoofWalks } from './occupants';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
 import { facadeClimate, publishRoofGardens, towerGlow, towerNight } from './districtMeters';
@@ -33,24 +37,24 @@ const environmentFinish: Record<string, [color: string, roughness: number, metal
 
 // 2127 retrofit by material: mall roofs become planted, hotel roofs pale ceramic terraces (r5 pass 2: target v2 has no blue metal roofs), stark white cladding warm ceramic; no extra geometry.
 const roofRetrofit: Record<string, [color: string, roughness: number, metalness: number]> = {
-  'Roof and Shadow': ['#7f9b6d', .85, 0], 'Standing seam roof.001': ['#e6ddcc', .55, .05], 'Gray roof metal': ['#e6ddcc', .55, .05],
-  'PCa_Panel_OffWhite': ['#e4d9c5', .62, 0],
+  'Roof and Shadow': ['#7f9b6d', .85, 0], 'Standing seam roof.001': ['#f1f0ea', .55, .05], 'Gray roof metal': ['#f1f0ea', .55, .05],
+  'PCa_Panel_OffWhite': ['#f1f0ea', .62, 0],
   // r6 pass 2: DECKS' coral and ochre fins read as red stripes; target v2's mid-rises are ivory only.
-  'Muted Coral Vertical Structure': ['#ebe2d2', .58, 0], 'Ochre Accent Structure': ['#ebe2d2', .58, 0], 'Facade_White': ['#e2d8c6', .6, 0],
-  'Warm Ivory Structure': ['#e8dcc8', .6, 0], 'Pale balcony slab and crown': ['#e9dfcd', .6, 0], 'Light vertical piers.001': ['#ebe0cd', .6, 0],
+  'Muted Coral Vertical Structure': ['#f1f0ea', .58, 0], 'Ochre Accent Structure': ['#f1f0ea', .58, 0], 'Facade_White': ['#f1f0ea', .6, 0],
+  'Warm Ivory Structure': ['#f1f0ea', .6, 0], 'Pale balcony slab and crown': ['#f1f0ea', .6, 0], 'Light vertical piers.001': ['#f1f0ea', .6, 0],
 };
 // Aqua City and DECKS flat facade panels become storey-banded curtain walls: warm spandrels, dark panes with lit interiors per bay.
 const curtainWalls: Record<string, string> = {
   // r4 pass 4: warm ivory spandrels (target v2's cream mid-rises), no brown or ochre bands; r9: paler ivory so frames read white, not sandstone.
-  'Muted Pink Panels': '#e8e2d5',
+  'Muted Pink Panels': '#f3f2ec',
   // r6 pass 2: the hotel walls and the Grand Nikko tower become the same banded curtain wall (target v2's glass hotels).
-  'Warm ivory facade': '#ede8dd', 'Warm off white facade.001': '#ede8dd', 'Pale Mint Panels': '#ebe6db', 'Ochre Commercial Panels': '#e5dfd1', 'Blue Gray Cladding': '#e9e4d9', 'Dark Blue Gray Glazing': '#e2ddd1',
+  'Warm ivory facade': '#f3f2ec', 'Warm off white facade.001': '#f3f2ec', 'Pale Mint Panels': '#f3f2ec', 'Ochre Commercial Panels': '#f3f2ec', 'Blue Gray Cladding': '#f3f2ec', 'Dark Blue Gray Glazing': '#f3f2ec',
 };
-const curtainGlow = { value: .45 }, curtainNight = { value: 0 };
+const curtainGlow = { value: .15 }, curtainNight = { value: 0 }, curtainSeam = { value: .6 };
 function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
   material.color.set(spandrel); material.roughness = .45; material.metalness = .1;
   material.onBeforeCompile = shader => {
-    shader.uniforms.curtainGlow = curtainGlow; shader.uniforms.curtainNight = curtainNight;
+    shader.uniforms.curtainGlow = curtainGlow; shader.uniforms.curtainNight = curtainNight; shader.uniforms.curtainSeam = curtainSeam;
     shader.uniforms.facadeGreen = facadeClimate.green; shader.uniforms.facadeLouvre = facadeClimate.louvre;
     // Along-facade coordinate from the world normal, so bays run on every face orientation; roofs (normal up) stay plain.
     shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 curtainP;')
@@ -58,17 +62,22 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
       { vec3 n = normalize(mat3(modelMatrix) * objectNormal); vec4 w = modelMatrix * vec4(transformed, 1.); curtainP = vec3(abs(n.x) > abs(n.z) ? w.z : w.x, w.y, abs(n.y)); }`);
     // r6 pass 2 (target v2): full-height glass storeys between thin pale slab bands. Only whole floor runs of occupied bays glow warm;
     // the rest is clear blue-grey glass, so facades read as glazing with lit rooms instead of a beige wash with dark dots.
-    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float curtainGlow, curtainNight, facadeGreen, facadeLouvre;\nvarying vec3 curtainP;')
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float curtainGlow, curtainNight, curtainSeam, facadeGreen, facadeLouvre;\nvarying vec3 curtainP;')
       .replace('#include <map_fragment>', `#include <map_fragment>
       float storey = fract(curtainP.y / 4.2), mullion = fract(curtainP.x / 1.8);
-      float pane = step(.2, storey) * step(storey, .96) * step(mullion, .93) * (1. - step(.5, curtainP.z)) * step(1.2, curtainP.y);
+      float pane = step(.3, storey) * step(storey, .9) * step(mullion, .75) * (1. - step(.5, curtainP.z)) * step(1.2, curtainP.y);
       // r6 pass 3: soft occupancy (no on/off blocks) and warm champagne glass, matching contextFacades' panels, so towers read as one
       // even, golden glass grid (target v2) instead of a patchwork of dark blue and beige where the two facade systems meet.
       float occupied = .35 + .65 * fract(sin(dot(floor(vec2(curtainP.x / 5.4, curtainP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453);
       // r9: cool blue-grey glass with whole lit floor runs on about one bay in three (matches contextFacades), not a warm champagne wash.
-      occupied = .08 + .92 * step(.78, occupied);
+      occupied = .08 + .92 * step(mix(.78, .61, curtainNight / .15), occupied); // P7: ~60% of bays lit at night
       // r9 pass 3: lighter sky-grey glass so mid-rises read ivory and glazed (target v2), not dark-striped.
-      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.42, .45, .48), pane);
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.5, .57, .62), pane);
+      // r1 megaframe: every 4 storeys (16.8 m) a white slab band with a cool seam line under it and a darker shadow lip.
+      float f4 = fract(curtainP.y / 16.8), wallF = (1. - step(.5, curtainP.z)) * step(1.2, curtainP.y);
+      float band = wallF * step(f4, .083), lip = wallF * step(.083, f4) * step(f4, .1), seam = wallF * step(.955, f4);
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.96, .96, .93), band);
+      diffuseColor.rgb *= 1. - .22 * lip; pane *= 1. - max(max(band, lip), seam);
       // Environment Meter (districtMeters.ts): a share of bays becomes planted balconies (canopy cooling) or white solar louvres
       // (active cooling); one hash splits the two sets, so they never overlap and bays switch one by one as the share eases.
       vec2 bay = floor(vec2(curtainP.x / 5.4, curtainP.y / 4.2));
@@ -78,14 +87,15 @@ function curtainWall(material: T.MeshStandardMaterial, spandrel: string) {
       float leafNoise = fract(sin(dot(floor(curtainP.xy * 1.6), vec2(12.99, 78.23))) * 43758.5);
       diffuseColor.rgb = mix(diffuseColor.rgb, mix(vec3(.05, .12, .03), vec3(.13, .24, .07), leafNoise), foliage);
       diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.86, .85, .8), louvre);
-      pane *= (1. - foliage) * (1. - louvre);`)
+      pane *= (1. - foliage) * (1. - louvre);
+      float seamLine = seam;`)
       // Panes are glass: glossy and partly metallic so they pick up the sky instead of reading as flat dark dots.
       .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, .14, pane);\nmetalnessFactor = mix(metalnessFactor, .4, pane);')
-      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1., .78, .5) * pane * (curtainGlow * occupied + curtainNight * .3);');
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += mix(vec3(1., .72, .4), vec3(.7, .41, .17), curtainNight / .15) * pane * (curtainGlow * occupied + curtainNight * .3) + vec3(.81, .91, 1.) * seamLine * curtainSeam * 1.6;');
   };
   material.customProgramCacheKey = () => 'curtain-wall';
 }
-const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a'), dayGlow = .42; // r5 pass 2: warmer lit bands by day (target v2's golden hotel glazing)
+const glazing = new Set<T.MeshStandardMaterial>(), warm = new T.Color('#ffd49a'), amber = new T.Color('#ff9440'), dayGlow = .14; // r5 pass 2: warmer lit bands by day (target v2's golden hotel glazing)
 const glazingNight = { value: 0 };
 // Hero atmosphere: at night about half the 6 m × 4.2 m glazing cells go dark (world-space hash), so lit rooms read as scattered life, not a lamp.
 function nightRooms(material: T.MeshStandardMaterial) {
@@ -96,17 +106,19 @@ function nightRooms(material: T.MeshStandardMaterial) {
     shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float glazingNight;\nvarying vec3 roomP;')
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
       float room = fract(sin(dot(floor(vec2((roomP.x + roomP.z) / 6., roomP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453);
-      totalEmissiveRadiance *= mix(1., step(.5, room), glazingNight);`);
+      totalEmissiveRadiance *= mix(1., step(.4, room), glazingNight);`);
   };
   material.customProgramCacheKey = () => 'night-rooms';
 }
 /** Retained landmark glazing glows warm, strongest at night; the civic chassis uses the shared city finishes. */
 export function updateOdaiba(night: number) {
+  updateCivic(night);
   // A faint daytime glow keeps the dark glazing reading as occupied, warm interiors (CITY_MASTER_TASTE) instead of voids.
   // Hero atmosphere: night keeps a light hierarchy — fewer, brighter lit rooms and scattered lit floors, so landmarks lead.
-  for (const material of glazing) material.emissiveIntensity = dayGlow + night * (.7 - dayGlow);
+  for (const material of glazing) { material.emissive.copy(warm).lerp(amber, night); material.emissiveIntensity = dayGlow + night * (.5 - dayGlow); } // P7 r2: saturated, lower-energy amber survives tonemapping
   glazingNight.value = night;
-  curtainGlow.value = .45 + night * .45; curtainNight.value = night * .15; towerGlow.value = .3 + night * .9; towerNight.value = night;
+  curtainGlow.value = .15 + night * .8; curtainNight.value = night * .15; curtainSeam.value = .6 + night * 1.6; towerGlow.value = .3 + night * .9; towerNight.value = night;
+  updateMegastructures(night); updatePlaza(night);
 }
 
 // Ground finishes lie within centimetres of each other (building pads over the lawn terrain, plazas and service yards beside them), finer
@@ -180,14 +192,16 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   // After finishes: shared materials are re-tuned once per mesh above, which would drop an earlier wrap.
   environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) receded.add(object.material); });
   receded.forEach(material => { if (cutGround.has(material.name)) openBay(material); recedeBeyondDistrict(material); });
-  scene.add(contextFacades(environment), bayContext());
+  carveContext(environment);
+  scene.add(contextFacades(environment), bayContext(), megastructures(), floaters());
   plantCanopy(scene,trees,true);
   plantBackdropGrove(scene,environment);
   // Sky gardens crown the tall context towers (the only CTX mesh above 30 m inside the district).
   // Each roof garden's terraces go to the district Meters (sails/forest) and take a few residents (stroll line, standing group).
   const roofGarden=(model:T.Object3D,tower?:boolean)=>{const terraces=plantRoofCanopy(scene,model,tower);publishRoofGardens(terraces);publishRoofWalks(model,terraces);};
   environment.traverse(object=>{if(object instanceof T.Mesh && object.name.startsWith('CTX_') && new T.Box3().setFromObject(object).max.y>30)roofGarden(object,true);});
-  await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1])).map(async placement => {
+  scene.add(plazaDeck(scene, HOLOGRAMS.panels)); // P4: the Aqua City lot is the civic plaza deck
+  await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1]) && placement.id !== 'aqua-city-odaiba' && placement.id !== 'divercity-tokyo-plaza' /* polish2: under the enlarged Fuji frame */ && (placement.id === 'fuji-tv' || !bodyFootprints().some(zone => inRect(zone, placement.positionBlender[0], -placement.positionBlender[1])))).map(async placement => {
     if(placement.id==='fuji-tv'){const core=civicCore();scene.add(core);publishOccupants(core.occupants);return;}
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);
     model.name = placement.id;
@@ -207,6 +221,6 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     const merged = bake(model); model.clear(); parts.forEach(geometry => geometry.dispose());
     merged.forEach(mesh => { mesh.name = placement.id; model.add(mesh); });
   }));
-  plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name)));
+  plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name) || object.name==='plaza-deck'));
   publishEntrances(scene,environment);
 }

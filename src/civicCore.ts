@@ -1,7 +1,13 @@
 import * as T from 'three';
-import { arc, bake, box, chrome, glass, mirrors, leaf, leafyCrown, membrane, publicLight as cityLight, solar as citySolar, stone as cityStone, trim as cityTrim } from './cityRig.ts';
+import { arc, bake, box, chrome, mirrors, leaf, leafyCrown, membrane, publicLight as cityLight, solar as citySolar, stone as cityStone, trim as cityTrim } from './cityRig.ts';
 import type { Ride, Spot, Walk } from './occupants.ts';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { megaGlass, megaSeam } from './megastructures.ts';
+import { CIVIC, civicAt } from './layout.ts';
 
+/** polish2: the chrome sphere's sky reflection dims at night (gunmetal with highlights, as the night target), set by `updateCivic`. */
+const civicSphere={material:null as T.MeshPhysicalMaterial|null};
+export const updateCivic=(night:number)=>{if(civicSphere.material)civicSphere.material.envMapIntensity=1.1-night*.7;};
 /** Occupied media headquarters within Fuji's civic chassis, retaining the sphere berth and site alignment. Metres. Its people are not
  * baked: `occupants` lists them (staff, audience, forum crowds, strollers and escalator riders) for `publishOccupants` to animate. */
 export function civicCore() {
@@ -9,41 +15,44 @@ export function civicCore() {
   const spots:Spot[]=[],walks:Walk[]=[],rides:Ride[]=[];
   // Building-local finishes (still one batch each): warm cream frame and slabs, and dark charcoal furniture, people and hangers,
   // so occupied rooms read as silhouettes against warm light instead of blue-grey rows.
-  const trim=cityTrim.clone();trim.color.set('#f6eee0');
-  const stone=cityStone.clone();stone.color.set('#f2e9d8');
-  const solar=citySolar.clone();solar.color.set('#3b3430'); // warm umber: unlit room depth reads brown-dark under the amber light
+  const glass=megaGlass.clone();glass.color.set('#c5d3db');glass.roughness=.4;glass.metalness=.05; // pale glass for the frame's window panels
+  const trim=cityTrim.clone();trim.color.set('#f3f2ec');
+  const stone=trim; // P2: one white finish for frame and slabs (keeps the batch count)
+  const solar=citySolar.clone();solar.color.set('#6a7279'); // warm umber: unlit room depth reads brown-dark under the amber light
   // Warm occupied rooms follow the existing city clock, using one shared finish for this building.
-  const publicLight=cityLight.clone();publicLight.color.set('#f2dcb4');publicLight.emissive.set('#ffd29c');publicLight.emissiveIntensity=1;
+  const publicLight=cityLight.clone();publicLight.color.set('#e4e8ea');publicLight.emissive.set('#ffd29c');publicLight.emissiveIntensity=1;
+  const K=CIVIC.k,f=(v:number)=>v.toFixed(3); // shader positions are world metres, so the room cells and theatre shell follow the polish2 scale
   publicLight.onBeforeCompile=shader=>{
-    shader.uniforms.roomLight={get value(){return 1.15+cityLight.emissiveIntensity*.55;}};
+    shader.uniforms.roomLight={get value(){const night=Math.min(1,Math.max(0,(cityLight.emissiveIntensity-.15)/1.3));return T.MathUtils.lerp(.3,1.15+cityLight.emissiveIntensity*.55,night);}}; // polish2: rooms glow at night only, so the frame reads white by dayshader.uniforms.roomNight={get value(){return Math.min(1,Math.max(0,(cityLight.emissiveIntensity-.15)/1.3));}};
     // Each ~5×6 m room cell gets its own light level, and upward-facing floors glow less than ceilings and screens,
     // so stacked workrooms read as separate occupied rooms with depth instead of one flat lit slab.
     shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vRoomPos;\nvarying float vRoomUp;')
       .replace('#include <project_vertex>','#include <project_vertex>\nvRoomPos=(modelMatrix*vec4(transformed,1.)).xyz;\nvRoomUp=normalize(mat3(modelMatrix)*objectNormal).y;');
-    shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nuniform float roomLight;\nvarying vec3 vRoomPos;\nvarying float vRoomUp;')
+    shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nuniform float roomLight,roomNight;\nvarying vec3 vRoomPos;\nvarying float vRoomUp;')
       .replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>
-        float roomCell=fract(sin(dot(floor(vRoomPos.xz/vec2(5.,6.))+floor(vRoomPos.y/9.)*vec2(7.,3.),vec2(12.9898,78.233)))*43758.5453);
+        float roomCell=fract(sin(dot(floor(vRoomPos.xz/vec2(${f(5*K)},${f(6*K)}))+floor(vRoomPos.y/${f(9*K)})*vec2(7.,3.),vec2(12.9898,78.233)))*43758.5453);
         float roomFloor=smoothstep(.5,.9,vRoomUp);
+        diffuseColor.rgb*=mix(vec3(1.),vec3(1.,.8,.56),roomNight); // polish2: pale rooms by day turn warm at night
         // Floors read as dark oak under lit ceilings: rooms gain depth instead of a pale yellow slab seen from above.
         diffuseColor.rgb*=mix(vec3(1.),vec3(.46,.38,.3),roomFloor);
         // The theatre's inner shell (r≈23.2 about the chamber centre) is a dim stage-wash wall, so rig, stage and audience glow against it.
-        float theatreR=length(vRoomPos-vec3(-18.,100.,23.));
-        float theatreWall=smoothstep(23.,23.12,theatreR)*(1.-smoothstep(23.28,23.4,theatreR));
+        float theatreR=length(vRoomPos-vec3(${civicAt([-18,100,23]).map(f).join(',')}));
+        float theatreWall=smoothstep(${f(23*K)},${f(23.12*K)},theatreR)*(1.-smoothstep(${f(23.28*K)},${f(23.4*K)},theatreR));
         // Wider per-room contrast and dim, desaturated floors: stacked rooms stop reading as clipped amber shelves.
-        totalEmissiveRadiance *= roomLight*(.4+1.1*roomCell)*mix(vec3(1.),vec3(.2,.21,.24),roomFloor)*mix(1.,.45,theatreWall);
+        totalEmissiveRadiance *= roomLight*(.4+1.1*roomCell)*mix(vec3(1.),vec3(.8,.62,.4),roomNight)*mix(vec3(1.),vec3(.2,.21,.24),roomFloor)*mix(1.,.45,theatreWall);
         // The inner theatre shell has a dark painted finish: daylight through the glass no longer turns the dome pale lilac.
         diffuseColor.rgb*=mix(1.,.18,theatreWall);
         // The theatre wall carries a violet stage wash, so the whole auditorium glows blue-violet around the warm rig.
         totalEmissiveRadiance=mix(totalEmissiveRadiance,vec3(.34,.3,.95)*dot(totalEmissiveRadiance,vec3(.4)),theatreWall);
         // The dome above the rig fades to a deep navy (not black), so the sphere reads as a lit glass theatre with its house lights.
-        totalEmissiveRadiance*=mix(1.,.2,smoothstep(104.,117.,vRoomPos.y)*theatreWall);
+        totalEmissiveRadiance*=mix(1.,.2,smoothstep(${f(104*K)},${f(117*K)},vRoomPos.y)*theatreWall);
         // Blue-lit seat backs and step lights in the audience rake (below the chamber centre, ahead of the stage) read as violet house seating.
-        float theatreSeat=(1.-smoothstep(22.,22.6,theatreR))*step(vRoomPos.y,101.)*step(vRoomPos.z,25.5)*step(totalEmissiveRadiance.r,totalEmissiveRadiance.b);
+        float theatreSeat=(1.-smoothstep(${f(22*K)},${f(22.6*K)},theatreR))*step(vRoomPos.y,${f(101*K)})*step(vRoomPos.z,${f(civicAt([0,0,25.5])[2])})*step(totalEmissiveRadiance.r,totalEmissiveRadiance.b);
         totalEmissiveRadiance=mix(totalEmissiveRadiance,vec3(.52,.36,1.)*totalEmissiveRadiance.b,theatreSeat);`);
   };
   publicLight.customProgramCacheKey=()=>'fuji-room-light';
   // Broadcast light stays inside production rooms; public circulation retains its warm finish.
-  const broadcastLight=publicLight.clone();broadcastLight.color.set('#2c4a96');broadcastLight.emissive.set('#3f7cff');
+  const broadcastLight=publicLight.clone();broadcastLight.color.set('#cfe2f0');broadcastLight.emissive.set('#9fc8ff');broadcastLight.emissiveIntensity=.5;
   broadcastLight.onBeforeCompile=publicLight.onBeforeCompile;broadcastLight.customProgramCacheKey=publicLight.customProgramCacheKey;
   // A clear environmental envelope exposes the chamber floors while retaining a silver sky reflection.
   const silverGlass=chrome.clone();silverGlass.color.set('#d2dfe3');silverGlass.transparent=true;silverGlass.opacity=.2;silverGlass.metalness=.15;silverGlass.depthWrite=false;mirrors.push(silverGlass);
@@ -81,6 +90,7 @@ export function civicCore() {
       box(root,[18,3,18],[x,1.5,z],stone);
       member([x,3,z],[x,30,z],9,12);
       for(const dx of [-7,7])member([x,25,z],[x+dx,134,z],5,8);
+      for(const sx of [-9,9])for(const sz of [-9,9])box(root,[.45,104,.45],[x+sx,82,z+sz],megaSeam,.05); // P7: cool seam on the four corner columns
       member([x-7,134,z],[x+7,134,z],6,9);
       // The split pier carries visible vertical transfer infrastructure and ceramic joints.
       for(const dx of [-2,2])member([x+dx,5,z-5],[x+dx,130,z-5],.5,.7,glass);
@@ -100,6 +110,7 @@ export function civicCore() {
     }
     for(const y of [62,130]) {
       member([-75,y,z],[71,y,z],6,8);
+      if(y===130)box(root,[146,.45,.45],[-2,134.1,z-3],megaSeam,.05);
       if(y===62 && z===-12)continue; // The bay face keeps one clean mid-height band; the rear frame stays trussed.
       member([-75,y+9,z],[71,y+9,z],3,5);
       for(let x=-75;x<71;x+=24)member([x,y,z],[Math.min(x+24,71),y+9,z],1.3,2,solar);
@@ -107,12 +118,13 @@ export function civicCore() {
   }
   for(const x of [-68,64]) {
     member([x,130,-12],[x,130,70],7,7);
+    box(root,[.45,.45,82],[x,134.1,29],megaSeam,.05); // P7: cool seam along the top beams
   }
   // The former podium is an open forum; the existing Aqua link lands here at Y=24.
   box(root,[100,3,36],[-8,22.5,-14],stone);
   for(const x of [-50,34])for(const z of [-27,0])member([x,2,z],[x,21,z],3,4);
   // Inhabited diagonals are wide public terrain, with a deep triangulated underside, not escalator banks.
-  const spine=[[52,3,-12],[-54,62,-12],[52,121,-12]];
+  const spine=[[52,3,-12],[-54,62,-12]]; // P2 r2: the upper diagonal that crossed in front of the chrome sphere is removed
   for(let i=1;i<spine.length;i++) {
     const a=new T.Vector3(...spine[i-1]),b=new T.Vector3(...spine[i]),length=a.distanceTo(b);
     const street=new T.Group();street.position.copy(a).add(b).multiplyScalar(.5);root.add(street);
@@ -581,9 +593,36 @@ export function civicCore() {
       grove(-18+Math.cos(angle)*31.5,64.1,23-Math.sin(angle)*31.5,i);
     }
   }
+  // P2: one polished chrome sphere (Ø 56 m, hides the theatre inside) hangs in the frame, held by four tension members. Baked with the rest, in its own mirror batch.
+  const sphereMat=civicSphere.material=chrome.clone();sphereMat.color.set('#f2f4f5');sphereMat.roughness=.14;sphereMat.metalness=1;sphereMat.clearcoat=0;sphereMat.emissive.set('#2a3440'); // never dimmed with the night: a faint reflected city light keeps it a lit sphere, not a hole
+
+  // Chrome needs contrast to read: a small equirect gradient (deep sky, white horizon band, dark ground) on this one material.
+  const stops:[number,string][]=[[0,'#dfe9f1'],[.35,'#eef3f6'],[.5,'#ffffff'],[.56,'#e8e4dc'],[.8,'#b9b6ae'],[1,'#8d8a83']],envData=new Uint8Array(4*64*32),c0=new T.Color(),c1=new T.Color();
+  for(let y=0;y<32;y++){
+    const t=1-y/31,k=stops.findIndex(([at])=>at>=t),[a0,h0]=stops[Math.max(0,k-1)],[a1,h1]=stops[Math.max(0,k)],f=a1>a0?(t-a0)/(a1-a0):0;
+    c0.set(h0).lerp(c1.set(h1),f);
+    for(let x=0;x<64;x++)envData.set([c0.r*255,c0.g*255,c0.b*255,255].map(Math.round),(y*64+x)*4);
+  }
+  const env=new T.DataTexture(envData,64,32);env.needsUpdate=true;env.mapping=T.EquirectangularReflectionMapping;env.colorSpace=T.SRGBColorSpace;sphereMat.envMap=env;sphereMat.envMapIntensity=1.1;
+  const SR=28,seams:T.BufferGeometry[]=[],cables:T.BufferGeometry[]=[],centre=new T.Vector3(-18,100,23);
+  const prep=(g:T.BufferGeometry,m:T.Matrix4)=>{const f=g.toNonIndexed();f.deleteAttribute('uv');f.applyMatrix4(m);return f;};
+  for(let i=0;i<12;i++)seams.push(prep(new T.TorusGeometry(SR+.08,.1,4,64),new T.Matrix4().makeRotationY(i*Math.PI/12).setPosition(centre)));
+  seams.push(prep(new T.TorusGeometry(SR+.12,.3,4,64),new T.Matrix4().makeRotationX(Math.PI/2).setPosition(centre)));
+  for(const [cx,cy,cz] of [[-68,130,-12],[64,62,-12],[-68,62,70],[64,130,70]]){
+    const to=new T.Vector3(cx,cy,cz),d=to.clone().sub(centre),dir=d.clone().normalize(),from=centre.clone().addScaledVector(dir,SR-.5);
+    const len=to.distanceTo(from);cables.push(prep(new T.CylinderGeometry(.22,.22,len,5),new T.Matrix4().compose(from.clone().add(to).multiplyScalar(.5),new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),dir),new T.Vector3(1,1,1))));
+  }
+  const sphere=new T.Mesh(new T.SphereGeometry(SR,64,40),sphereMat);sphere.position.copy(centre);sphere.name='civic-chrome-sphere';sphere.castShadow=true;
+  root.add(sphere,new T.Mesh(mergeGeometries(seams),broadcastLight),new T.Mesh(mergeGeometries(cables),trim));
   const generated=new Set<T.BufferGeometry>();
   root.traverse(object=>{if(object instanceof T.Mesh && object.geometry.type!=='RoundedBoxGeometry')generated.add(object.geometry);});
   const batches=bake(root);root.clear();batches.forEach(mesh=>{mesh.name='fuji-civic-chassis';root.add(mesh);});
   generated.forEach(geometry=>geometry.dispose()); // Cached box geometry remains shared with the rest of the city.
+  // polish2: the whole chassis is scaled about its west-front foot (layout CIVIC); people and rides follow, seated people keep their .48 m seat drop.
+  root.scale.setScalar(CIVIC.k);root.position.set(...civicAt([0,0,0]));
+  const place=new T.Matrix4().compose(root.position,root.quaternion,root.scale);
+  for(const spot of spots){spot.at.applyMatrix4(place);if(spot.seated)spot.at.y+=.48*(CIVIC.k-1);}
+  for(const walk of walks){(walk.curve as T.CatmullRomCurve3).points.forEach(p=>p.applyMatrix4(place));walk.curve.updateArcLengths();}
+  for(const ride of rides){ride.from.applyMatrix4(place);ride.to.applyMatrix4(place);ride.through=ride.through?.map(([a,b])=>[a*CIVIC.k,b*CIVIC.k] as const);}
   return Object.assign(root,{occupants:{spots,walks,rides}});
 }

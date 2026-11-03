@@ -40,9 +40,9 @@ export const withNight = (s: WorldState, night: number): WorldState => ({
 
 /** Night fill keeps pale surfaces readable while the sky remains dark. Day values stay unchanged. */
 export const nightLighting = (night: number) => ({
-  ambient: 1 - night * .55,
-  environment: .85 * (1 - night * .75),
-  exposure: .84 + night * .08,
+  ambient: 1 - night * .3, // polish2: brighter night fill (target: pale plaza and white structures read under a navy sky)
+  environment: .85 * (1 - night * .6),
+  exposure: .84 + night * .18,
   bloom: .16 + night * .08,
   vignette: .9 - night * .25,
 });
