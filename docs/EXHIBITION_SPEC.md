@@ -115,7 +115,7 @@ District 直接讀 tier；DEV `?meters`／carrier 測試用 `deriveExhibitionLay
 - Concentration：低層 pods／中間高度／十座塔、sky lobbies 與連橋。
 - Mixed 有自己的 hybrid 組合；跨 Meter 條件（兩 site 同邊 ±3）產生配對設施；完整 active run 的投票次序推導四軸 `slotSeeds`，各 district 第一次到 ±2 時固定（2026-10-27），相同分數可保留不同槽位分布。最新 64 份顯示 history 不截斷 seed 來源。
 
-**一票旅程（2026-10-13 user要求）**：live 結果先播約 2.6 秒旅程——觀眾四票化成 Meter 色光點（中性票暖白），由畫面右下（站台方向）飛去四個 focal site（E4後新Q3改到沿岸能源接點，舊氣候票仍到公園），著陸時掃描環升起；每票留低一粒浮喺 site 上空嘅光點（日間淡、夜間亮），保留最近 64 位觀眾，snapshot／reload 由 `recentProposals` 重建。著陸後先推近並停定，於 5.12 秒開始 3 秒過渡及 pulse；結果卡證據喺收到事件時已經計好，理由句於 8.12 秒出現。Snapshot、reset、Undo、reconnect、reduced motion 唔播旅程，即時恢復。
+**一票旅程（2026-10-13 user要求）**：live 結果先播約 2.6 秒旅程——觀眾四票化成 Meter 色光點（中性票暖白），由畫面右下（站台方向）飛去四個 focal site（E4後新Q3改到沿岸能源接點，舊氣候票仍到公園），著陸時掃描環升起（2026-11-03 起：headline 係 district 變化時，該軸光點改為飛去今次真正變動嘅 slot，每個變動 slot 升起掃描環；其他軸、能源及 focal 變化照舊落 focal site）；每票留低一粒浮喺 site 上空嘅光點（日間淡、夜間亮），保留最近 64 位觀眾，snapshot／reload 由 `recentProposals` 重建。著陸後先推近並停定，於 5.12 秒開始 3 秒過渡及 pulse；結果卡證據喺收到事件時已經計好，理由句於 8.12 秒出現。Snapshot、reset、Undo、reconnect、reduced motion 唔播旅程，即時恢復。
 
 Live 使用可重新定向的 **3 秒**過渡；pulse 只標示真的 live 變化；每個改變嘅 Meter 只喺其 site 出光柱，district slots 只有淡色光圈（2026-10-04）。Snapshot、reset、Undo、reconnect、reduced motion 直接恢復權威狀態，清除排隊及 pulse。重複事件不重播。配對、counts、固定 footprint 及限制見 [Meter handoff](handoffs/archive/meter-variety.md)。
 
