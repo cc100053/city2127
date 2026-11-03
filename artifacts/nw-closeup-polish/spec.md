@@ -1,6 +1,6 @@
 # NW close-up polish — spec
 
-Targets (owner-picked 2026-11-03): [flagship-low](target/flagship-low.jpg), [flagship-mixed](target/flagship-mixed.jpg), [flagship-high](target/flagship-high.jpg). Bay targets: pending (Gemini r2). Taste: [CITY MASTER TASTE](../../docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md). SE golden sample for patterns: `src/siteBuilders/concentrationTower.ts`, [SE handoff](../../docs/handoffs/se-closeup-polish.md).
+Targets (owner-picked 2026-11-03): [flagship-low](target/flagship-low.jpg), [flagship-mixed](target/flagship-mixed.jpg), [flagship-high](target/flagship-high.jpg). Bay targets (owner-picked 2026-11-03): [bay-low](target/bay-low.jpg), [bay-mixed](target/bay-mixed.jpg), [bay-high](target/bay-high.jpg). Taste: [CITY MASTER TASTE](../../docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md). SE golden sample for patterns: `src/siteBuilders/concentrationTower.ts`, [SE handoff](../../docs/handoffs/se-closeup-polish.md).
 
 Units: site-local units; `changeSites.nw` has `scale: 3` (1 unit = 3 m), lot 8×7 units centred (40, −300). Front = local +Z unless noted; the new camera looks from the east (+X world), so camera-facing faces are local **+X** (verify by capture and rotate the composition if needed — the glazed staffed face and counters must face the camera).
 
@@ -56,6 +56,36 @@ Units: site-local units; `changeSites.nw` has `scale: 3` (1 unit = 3 m), lot 8×
 
 Evidence folder `~/city2127-evidence/nw-closeup-polish/r1/`: `nw-focal-{low,mixed,high}-day.png` (`?meters=nw:<band>&shot=nw:focal&hour=12`), same at `hour=22` (`-night`), one mid-transition (`?meters=nw:low&metersTo=nw:high&metersAge=…` at ≈ 1.5 s into the change; see `main.ts`), and `vs-target.jpg` (3 rows low/mixed/high × [r1 day | target], 800×450 cells). Publish only `vs-target.jpg` with `node scripts/publish-evidence.mjs nw-closeup-polish/r1 <path>`.
 
-## R2 — district bays
+## R2 — district bays (`AutomationDistrict`, `src/districtMeters.ts`)
 
-Pending owner pick of `gen/bay2-*`.
+Units here are **metres** (district carriers are unscaled). Bays sit 22 m off the promenades; their yaw faces along the route. Review pose `nw:bay-e` = `cityPose([-10,40,-90],[75,32,-160])` (bay 10 at (75, −160)); captures use `?meters=nw:<band>&hour=12` then that `cityPose`.
+
+Language: the bays are small siblings of the R1 flagship — same materials (`trim`/`cream` white, warm emissive backing behind `trim` mullions, `futureLight` emitters, the shared **`automationBlue`** Meter accent: if R1 defined it locally in `automationHub.ts`, move it to one export both files import). No `solar` slate/navy, no `glass` capsule people, no sphere-dome roof.
+
+### Staffed pavilion (replaces domed hall and stacked-deck hall; target bay-low)
+
+- Ground-level hall `trim` 22 × 9 × 15 (L × H × D) on a 24 × .5 × 18 `cream` plinth; roof slab 24 × .5 × 17 overhang. Route-facing long side fully glazed (warm backing + `trim` mullions every 2.7 m); the other faces solid with one `futureLight` seam.
+- Inside: 4 warm counters with staff and seated residents (instanced low-poly people that suit an InstancedMesh; e.g. capsule torso + sphere head in `cream`/`trim` with instance-free materials — no `glass` people).
+- Front: 3 benches, 2 planters with small shrubs.
+- Hovering canopy disc: lens cylinder r 13 → 11.5, h 1.2, `trim`, at roof + 3.5 m gap; `automationBlue` rim torus; 4 `futureLight` under-emitters. Two design families stay (`staffedDesign` 0/1) for variety: 0 = round canopy disc, 1 = elongated (scale x 1.35, z .8) canopy — no other differences.
+- Ground footprint must stay clear of guideway/promenade/sweep routes (run the route-blocking and clearance checks in `tests/odaiba.test.ts` / `tests/districtMeters.test.ts`; if a bay fails, shrink or rotate that design, do not delete the test).
+
+### Hybrid (bay at mixed; target bay-mixed)
+
+- Staffed pavilion at 60 % (as now) **plus** a service column from its roof centre to 40 m: `trim` core r 1.2, three docking rings (r 3.2, tube .45 `trim` + `automationBlue` inner seam) at 28, 32.5, 37 m, one docked drone, a short 2-segment robot arm with parcel on the roof. This replaces showing the full autonomous design on hybrid bays; keep `SlotLevels` logic, add one instanced set for the column and update `write()`, `writeDrones()` dock positions and `getConfiguration()` (its ponytail comment says it mirrors `write()`).
+
+### Autonomous tower (replaces drone port and charging mast; target bay-high)
+
+- Slim white ring tower ≈ 45 m: base drum `trim` r 3.2 h 4; core r 1.4 to 42 m; cap to 45 m with antenna; 8 docking rings r 3, tube .5 `trim` + `automationBlue` seam, from 10 m to 40 m; service arm every 2nd ring. Two design families (`autonomousDesign` 0/1): 0 = as described; 1 = 6 rings and a floating landing disc (r 6, `trim`, `automationBlue` rim) hovering 1.5 m above a 34 m core top.
+- Foot: light locker (`trim` box 3 × 2.4 × 1.2 with `automationBlue` emissive face) where residents collect parcels. No staff.
+- Service drones (`serviceDrones`, `pavilionFlight`) dock at the new ring/disc positions (update `writeDrones` x/y).
+
+### Transition and runtime
+
+- Keep the existing 3 s clocks, `SlotLevels`, ladder/hybrid/changedPoints/pulses logic and diagnostics names (`automation-staffed-pavilions`, `automation-drone-ports` instanced names stay — tests look them up). Rise from the foot as now; rings may stay part of the same instanced scale (no per-ring stagger needed in R2).
+- Keep `PORT_DECK` export if anything imports it; otherwise update its users.
+
+### Checks and captures
+
+- `npm test && npm run build && git diff --check`. Draw calls: report the instanced mesh count before/after (`AutomationDistrict.root` children); keep it within +4.
+- Evidence `~/city2127-evidence/nw-closeup-polish/r2/`: `nw-bay-{low,mixed,high}-day.png`, `-night` (hour 22), one `nw:district` capture per band, the existing `nw:bay1` headline shot at high, and `vs-target.jpg` (3 rows × [r2 | bay target], 800×450). Publish only `vs-target.jpg` to `nw-closeup-polish/r2`.
