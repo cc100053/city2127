@@ -1,7 +1,7 @@
 # nw-closeup-polish — NW 自動化旗艦＋district 載體，新 taste 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — R4b lot 已擴，下一步 R5 旗艦質感
+- Status: IN_PROGRESS — R5 旗艦盲評 21/28，下一步 R6
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
 - Last verified commit: R3 commit（test／build／diff-check PASS）
@@ -113,6 +113,13 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 - Opus 截圖確認 `nw:focal`（low／mixed／high）同 `nw:focal-low` 都框到 site；`nw:focal-low` 下廳面平面橙色更明顯。
 - Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
 
+## R5（旗艦細節，[spec](../../artifacts/nw-closeup-polish/spec.md)）
+
+- Sonnet：廳變房（後牆退 ≈4 units、桃色牆、天花暖光條、櫃檯後退、6 對職員／居民）、前庭 3 樹 3 凳 3 組人＋琥珀 inlay、遮篷 rim 幼咗＋發光 pad；0 廳櫃檯＋3 kiosk、包裹放大轉琥珀色、環加 deck／pad；+1 seam 幼咗、塔身板縫＋細窗、24 架細無人機、磁浮軌、`SPIRE_TOP` 36→31.5 等 cap 入鏡（`COLUMN_TOP` 37 分開）。Mesh low/mixed/high 25/29/22。Test：低 plinth 闊度 check 15.5→14（plinth 而家 14.8）。
+- 盲評旗艦 **21 / 28**（R4 15）：2 分 — `fl-people-in`、`fl-forecourt`、`fm-arm`、`fm-column`、`fh-rings`、`fh-base`、`fh-cap`；1 分 — `fl-glazing`／`fm-hall`（室內係平面米色，唔係暖光）、`fl-canopy`（pad 讀唔到係發光器）、`fl-material`（米色牆＋青色屏幕條）、`fm-rings`（泊住嘅唔似無人機）、`fh-arms`（由 2 跌到 1，只讀到 3 個包裹）、`fh-drones`（<10 架讀得到）。[scores](../../artifacts/nw-closeup-polish/r5/scores.md)、[R5 對目標](../../artifacts/nw-closeup-polish/r5/vs-target.jpg)。
+- Opus 自己睇：夜景 −1 廳室內冇亮（退步，暖房應該夜晚發光）；日景室內淡到似廣告板。
+- Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
+
 ## Next step
 
-R5（旗艦）：廳內深度＋職員（而家係平面橙牆）、幼 seam、無人機、磁浮軌、cap 入 crop。之後 bay（judge 1 7/20）。
+R6（旗艦）：室內暖光 emissive（日夜都亮、唔好米色）、遮篷發光器亮、無人機讀得到（泊住＋飛行）、≥ 4 支服務臂連包裹入鏡。之後 bay（judge 1 7/20）。

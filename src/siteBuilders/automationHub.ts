@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { AutomationDistrict, automationBlue } from '../districtMeters.ts';
-import { arc, bake, box, cream, futureLight, teal, warm, type Kit } from '../cityRig.ts';
+import { arc, bake, box, futureLight, teal, warm, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import type { SiteAssetLoaderCache } from '../siteAssets/assetLoader.ts';
 import type { Band } from '../surveyView.ts';
@@ -11,20 +11,26 @@ import { createGuestMarker, createSiteLayer, createSiteRoot, prefersReducedMotio
 
 // Pure white structure: the shared `trim` (#eee9df, metallic) reads beige in shade, which the rubric's fl-material rejects.
 const white = new T.MeshStandardMaterial({ color: '#f8f9fb', roughness: .42, metalness: .08 });
+// Room interior: warm white-peach walls and floor (less saturated than the shared `warm`), a soft shadow band under the roof slab, amber parcels, an amber lot-edge inlay.
+const peach = new T.MeshStandardMaterial({ color: '#f7e8d9', emissive: '#ffc9a0', emissiveIntensity: .2, roughness: .8 });
+const peachFloor = new T.MeshStandardMaterial({ color: '#f2decb', emissive: '#ffb98a', emissiveIntensity: .16, roughness: .7 });
+const shade = new T.MeshBasicMaterial({ color: '#1b2430', transparent: true, opacity: .2, depthWrite: false });
+const parcel = new T.MeshStandardMaterial({ color: '#e9a24f', roughness: .6 });
+const amberInlay = new T.MeshStandardMaterial({ color: '#ff9f1c', emissive: '#ff9f1c', emissiveIntensity: .35, roughness: .5 });
 const HIDDEN = 1e-3;
 const PT = 1.2; // plinth top: every state group stands on it
-const DRONE = .75 / 3; // parked drone ~3 m across (the district mesh is 4 m at scale 1)
+const DRONE = .5 / 3, DOCKED = .55 / 3; // flying drones ~2.8 m across (~0.5 % of the review frame), docked ones ~3 m (the district mesh is 5.6 m at scale 1), so streams read as small quads
 // Target-size scale of each state's stage content (owner 2026-11-03): residents and positions follow it, so people read like the targets'.
 const SCALE: Record<Band, number> = { low: 2, mixed: 1.2, high: 1 };
 export const FOLK: Record<Band, number> = { low: 2.6, mixed: 1.6, high: 1 }; // residents' size per state (people read at the targets' size, larger than their stage's scale)
 // Resident bounds per state on its plinth (stage units): the low plinth is the grown one, mixed and high stand on the shared 9.6 x 9.4.
 // The mixed and high states stand on the shared 9.6 x 9.4 plinth; their amber outline is this lot (the low plinth fills the `changeSites.nw` lot).
 export const SHARED_LOT = { w: 8, d: 8 };
-export const HUB_PLINTH: Record<Band, { x: number; z: number }> = { low: { x: 12, z: 8 }, mixed: { x: 4.8, z: 4.7 }, high: { x: 4.8, z: 4.7 } };
+export const HUB_PLINTH: Record<Band, { x: number; z: number }> = { low: { x: 12, z: 7.4 }, mixed: { x: 4.8, z: 4.7 }, high: { x: 4.8, z: 4.7 } };
 const smoothstep = (value: number) => value * value * (3 - 2 * value);
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 const beam = new T.MeshBasicMaterial({ color: '#9fe8ff', transparent: true, opacity: .28, blending: T.AdditiveBlending, depthWrite: false });
-const glow = new T.MeshBasicMaterial({ color: new T.Color('#b8f2ff').multiplyScalar(2.5), toneMapped: false });
+const glow = new T.MeshBasicMaterial({ color: new T.Color('#d8f8ff').multiplyScalar(2.5), toneMapped: false });
 const halo = new T.MeshBasicMaterial({ color: '#7fe3ff', transparent: true, opacity: .8, blending: T.AdditiveBlending, depthWrite: false });
 // Honest port count per band (the Meter maps 0 / 3 / 6): how many service points are self-service in that state, and how many are staffed.
 const PORTS: Record<Band, number> = { low: 0, mixed: 3, high: 6 };
@@ -142,8 +148,9 @@ const counter = (parent: T.Object3D, x: number, z: number) => {
 };
 const chair = (parent: T.Object3D, x: number, z: number) => box(parent, [.3, .17, .3], [x, .085, z], white, .02);
 /** Self-service terminal facing local +Z: housing on a white post with a cool screen. */
-function terminal(parent: T.Object3D, x: number, z: number, yaw = 0) {
+function terminal(parent: T.Object3D, x: number, z: number, yaw = 0, size = 1) {
   const group = new T.Group();
+  group.scale.setScalar(size);
   group.position.set(x, 0, z);
   group.rotation.y = yaw;
   parent.add(group);
@@ -152,17 +159,26 @@ function terminal(parent: T.Object3D, x: number, z: number, yaw = 0) {
   box(group, [.36, .22, .03], [0, .45, .05], futureLight, .01);
 }
 
-/** Open hall: warm lit interior (floor and back wall), solid white sides, back and fascia, camera face (+Z) open between white mullions and a transom. */
+/** Open hall: a room seen through the open camera face (+Z) between white mullions: peach back and side walls with white panels and cool screens, peach floor, warm ceiling strip, a shadow band under the roof slab. */
 function hall(group: T.Group, w: number, zBack: number, zFront: number, bays: number, h = 3.6, front = .4, glass = 2.25) {
   const d = zFront - zBack, zc = (zBack + zFront) / 2;
-  box(group, [w - .3, .01, d - .3], [0, .005, zc], warm, .004);
-  box(group, [w - .3, glass - .05, .06], [0, glass / 2 + .025, zBack + .23], warm, .01);
+  box(group, [w - .3, .01, d - .3], [0, .005, zc], peachFloor, .004);
+  box(group, [w - .3, glass - .05, .06], [0, glass / 2 + .025, zBack + .23], peach, .01);
+  for (const s of [-1, 1]) box(group, [.04, glass - .05, d - .5], [s * (w / 2 - .27), glass / 2 + .025, zc], peach, .01);
+  box(group, [w - .5, .06, d - .5], [0, glass - .06, zc], warm, .01);
+  // Back-wall panels with cool screens, so the wall is not one flat field.
+  for (let k = 0; k < bays; k++) {
+    const x = -w / 2 + (k + .5) * w / bays;
+    box(group, [w / bays - .5, 1.05, .08], [x, 1.45, zBack + .3], white, .02);
+    box(group, [w / bays * .45, .3, .03], [x, 1.55, zBack + .36], futureLight, .01);
+  }
   box(group, [w, h, .2], [0, h / 2, zBack + .1], white, .04);
   for (const s of [-1, 1]) box(group, [.2, h, d], [s * (w / 2 - .1), h / 2, zc], white, .04);
   box(group, [w, h - glass, .2], [0, (h + glass) / 2, zFront - .1], white, .04);
   box(group, [w, .1, .14], [0, glass, zFront - .03], white, .02);
   for (let k = 0; k <= bays; k++) slat(group, [.08, glass, .1], [-w / 2 + k * w / bays, glass / 2, zFront - .02], white);
   box(group, [w + .8, .35, d + .4 + front], [0, h + .175, zc + (front - .4) / 2], white, .06);
+  box(group, [w - .4, .5, .02], [0, glass - .3, zFront - .06], shade, .005); // the slab's shadow on the glazing
   for (const s of [-1, 1]) box(group, [.04, .05, d - .5], [s * (w / 2 + .01), 2.45, zc], automationBlue, .01);
   box(group, [w - .5, .05, .04], [0, 2.45, zBack - .01], automationBlue, .01);
 }
@@ -191,7 +207,7 @@ class RingStack {
     this.meshes = [this.rings, this.seams];
     if (armGeometry && parcelGeometry && armed) {
       this.arms = new T.InstancedMesh(armGeometry, white, armed);
-      this.parcels = new T.InstancedMesh(parcelGeometry, cream, armed);
+      this.parcels = new T.InstancedMesh(parcelGeometry, parcel, armed);
       this.meshes.push(this.arms, this.parcels);
     }
     this.meshes.forEach(mesh => { mesh.name = name; mesh.castShadow = true; mesh.visible = false; parent.add(mesh); });
@@ -233,7 +249,7 @@ const armGeometry = () => mergeGeometries([
   geo(new T.SphereGeometry(.17, 10, 8), [5.35, 1.02, 0]),
   geo(new T.BoxGeometry(.2, .28, .7), [5.35, .86, 0]),
 ].map(g => g.index ? g.toNonIndexed() : g))!;
-const parcelGeometry = () => new T.BoxGeometry(.6, .5, .55).translate(5.35, .45, 0);
+const parcelGeometry = () => new T.BoxGeometry(.75, .62, .7).translate(5.35, .4, 0);
 
 export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAssetLoaderCache): AutomationHubBuiltSite {
   const root = createSiteRoot(scene, 'nw');
@@ -286,27 +302,31 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
   const people = (band: Band, list: Actor[]) => actors[band].push(...list);
   const talkers = (band: Band, g: number, cx: number, cz: number, n: number) => people(band, Array.from({ length: n }, (_, j) => {
     const a = j * Math.PI * 2 / n + g;
-    return { x: cx + Math.sin(a) * .45, z: cz + Math.cos(a) * .45, yaw: a + Math.PI, talk: [100 + g, j, n] as [number, number, number] };
+    return { x: cx + Math.sin(a) * .38, z: cz + Math.cos(a) * .38, yaw: a + Math.PI, talk: [100 + g, j, n] as [number, number, number] };
   }));
   const seatedPair = (band: Band, x: number, z: number) => people(band, [{ x: x - .25, z, yaw: 0, seated: true }, { x: x + .25, z, yaw: 0, seated: true }]);
   const scaled = (g: T.Group, band: Band) => { const k = new T.Group(); k.scale.setScalar(SCALE[band]); g.add(k); return k; };
   const K = SCALE.low, M = SCALE.mixed;
   const LOW_W = 10.6, LOW_SHIFT = .25, // the hall stands right of the lot centre (screen right, as in the target)
-   LOW_H = 4.8, LOW_ZB = -3.4, LOW_ZF = 1, LOW_FRONT = 2, LOW_ZC = (LOW_ZB + LOW_ZF) / 2, LOW_ROOF = LOW_H + .35;
+   LOW_H = 4.8, LOW_ZB = -3.4, LOW_ZF = 1, LOW_FRONT = 2, LOW_COUNTER = -1.4, LOW_ZC = (LOW_ZB + LOW_ZF) / 2, LOW_ROOF = LOW_H + .35;
+  // The counters stand back in the room (LOW_COUNTER), staff behind them, residents seated in front.
   const lowK = (i: number) => -LOW_W / 2 + (i + .5) * LOW_W / 6, lowX = (i: number) => lowK(i) + LOW_SHIFT; // in the shifted group / in stage design units
   stateGroup('hub-state-low', 'low', 0, 0, 1, g => {
     box(g, [HUB_PLINTH.low.x * 2, .8, HUB_PLINTH.low.z * 2], [0, -.4, 0], white, .05);
+    // Amber inlay along the forecourt's front and side edges: the lot outline stays readable from the review pose.
+    box(g, [HUB_PLINTH.low.x * 2 - .6, .03, .3], [0, .015, HUB_PLINTH.low.z - .3], amberInlay, .01);
+    for (const s of [-1, 1]) box(g, [.3, .03, HUB_PLINTH.low.z * 2 - .6], [s * (HUB_PLINTH.low.x - .3), .015, 0], amberInlay, .01);
     const k = scaled(g, 'low');
     k.position.x = LOW_SHIFT * K;
     hall(k, LOW_W, LOW_ZB, LOW_ZF, 6, LOW_H, LOW_FRONT, 3.8);
     arc(k, 0, 3.2, .05, [0, LOW_ROOF, LOW_ZC + (LOW_FRONT - .4) / 2], white);
-    for (let i = 0; i < 6; i++) { counter(k, lowK(i), .12); chair(k, lowK(i), .62); }
-    bench(k, -3.4, 3.4); bench(k, -.4, 3.45); bench(k, 2.4, 3.5);
-    tree(k, -4.6, 0, 2.1, .6); tree(k, 4.7, 0, 1.9, .6);
+    for (let i = 0; i < 6; i++) { counter(k, lowK(i), LOW_COUNTER); chair(k, lowK(i), LOW_COUNTER + .5); }
+    bench(k, -3.5, 2.9); bench(k, 0, 3.05); bench(k, 3.4, 2.9);
+    tree(k, -3.5, 0, 2.1, .55); tree(k, 1.9, 0, 2.2, .55); tree(k, 4.8, 0, 1.8, .55);
   }, false, true);
-  for (let i = 0; i < 6; i++) people('low', [{ x: lowX(i), z: -.4, yaw: 0, talk: [i, 0, 2] }, { x: lowX(i), z: .62, yaw: Math.PI, seated: true, talk: [i, 1, 2] }]);
-  talkers('low', 0, -2.2 + LOW_SHIFT, 2.4, 3); talkers('low', 1, .6 + LOW_SHIFT, 2.2, 3); talkers('low', 2, 3.4 + LOW_SHIFT, 2.9, 3);
-  seatedPair('low', -3.4 + LOW_SHIFT, 3.4);
+  for (let i = 0; i < 6; i++) people('low', [{ x: lowX(i), z: LOW_COUNTER - .55, yaw: 0, talk: [i, 0, 2] }, { x: lowX(i), z: LOW_COUNTER + .5, yaw: Math.PI, seated: true, talk: [i, 1, 2] }]);
+  talkers('low', 0, -1.7 + LOW_SHIFT, 2.2, 3); talkers('low', 1, 3.1 + LOW_SHIFT, 2.3, 3); talkers('low', 2, -.2 + LOW_SHIFT, 2.4, 3);
+  seatedPair('low', -3.5 + LOW_SHIFT, 2.9);
 
   // Hovering canopy: the technology signature. Its own group, so it can bob and ride the hall roof up and down.
   const canopy = new T.Group();
@@ -314,14 +334,13 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
   const lens = new T.Mesh(new T.LatheGeometry([[0, -.5], [1.6, -.5], [3.4, -.38], [4.7, -.12], [5.2, 0], [4.7, .14], [3.4, .45], [1.7, .8], [0, .9]].map(([r, y]) => new T.Vector2(r, y)), 64), white);
   lens.castShadow = true;
   canopy.add(lens);
-  torus(canopy, 5.2, .09, 0, automationBlue);
+  torus(canopy, 5.2, .03, 0, automationBlue);
   for (let i = 0; i < 4; i++) {
     const a = i * Math.PI / 2 + Math.PI / 4, x = Math.cos(a) * 3.4, z = Math.sin(a) * 3.4;
-    cyl(canopy, .65, .65, .06, -.55, glow, x, z);
-    cyl(canopy, .95, .95, .01, -.6, halo, x, z);
-    const cone = new T.Mesh(new T.CylinderGeometry(.15, .75, 1.1, 16, 1, true), beam);
-    cone.position.set(x, -1.15, z);
-    canopy.add(cone);
+    // Under-emitter pad: a bright flat disc with a soft glow disc on the air below it.
+    cyl(canopy, .9, .9, .16, -.52, glow, x, z);
+    cyl(canopy, 1.6, 1.6, .01, -.62, halo, x, z);
+    cyl(canopy, 1.2, 1.2, .01, -.9, beam, x, z);
   }
   canopy.add(...bake(canopy));
   canopy.visible = false;
@@ -331,21 +350,23 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
 
   // 0 mixed: compact hall (staffed counters left, self-service right) with an automated service column.
   const MIX_W = 7, MIX_H = 4.4, MIX_ZB = -3.4, MIX_ZF = 1, MIX_ZC = (MIX_ZB + MIX_ZF) / 2 * M, MIX_ROOF = (MIX_H + .35) * M;
-  const mixX = (k: number) => -MIX_W / 2 + (k + .5) * MIX_W / 6;
   stateGroup('hub-state-mixed', 'mixed', 0, 0, .5, g => {
     const k = scaled(g, 'mixed');
     hall(k, MIX_W, MIX_ZB, MIX_ZF, 6, MIX_H, .4, 3.4);
-    for (let i = 0; i < 3; i++) { counter(k, mixX(i), .12); chair(k, mixX(i), .62); terminal(k, mixX(i + 3), .3); }
+    // Left: one staffed counter (staff behind, residents in front); right: tall self-service kiosks.
+    box(k, [3.1, .45, .45], [-1.9, .225, -1.4], white, .04);
+    for (const x of [-2.8, -1.9, -1]) box(k, [.5, .28, .04], [x, .6, -1.5], futureLight, .01);
+    for (const x of [1, 2.1, 3.1]) terminal(k, x, -1.6, 0, 1.7);
     bench(k, -3, 3.3);
     tree(k, 3.6, 0, 2.4, .6); tree(k, -3.6, 0, 2.5, .6);
   }, false, true);
-  for (let k = 0; k < 3; k++) people('mixed', [{ x: mixX(k), z: -.4, yaw: 0, talk: [20 + k, 0, 2] }, { x: mixX(k), z: .62, yaw: Math.PI, seated: true, talk: [20 + k, 1, 2] }]);
-  people('mixed', [{ x: mixX(3), z: .72, yaw: Math.PI }, { x: mixX(5), z: .72, yaw: Math.PI }]);
+  for (const [i, x] of [-2.8, -1.9, -1].entries()) people('mixed', [{ x, z: -1.95, yaw: 0, talk: [20 + i, 0, 2] }, { x: x + .15, z: -.85, yaw: Math.PI, talk: [20 + i, 1, 2] }]);
+  for (const x of [1, 3.1]) people('mixed', [{ x, z: -.95, yaw: Math.PI }]);
   talkers('mixed', 3, 1, 2.6, 3); talkers('mixed', 4, -.8, 3, 2);
   seatedPair('mixed', -3, 3.3);
 
-  const SPIRE_BASE = 3, SPIRE_TOP = 36, RINGS = 18;
-  const COLUMN_TOP = SPIRE_TOP + 1, COLUMN_R = 1.6;
+  const SPIRE_BASE = 3, SPIRE_TOP = 31.5, RINGS = 18; // the crown (antennas, windows) stands inside the review frame
+  const COLUMN_TOP = 37, COLUMN_R = 1.6;
   stateGroup('hub-state-mixed-column', 'mixed', MIX_ROOF, .5, .5, g => {
     const h = COLUMN_TOP - MIX_ROOF;
     cyl(g, COLUMN_R, COLUMN_R, h, h / 2 - .05, white, 0, MIX_ZC);
@@ -358,11 +379,14 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
   const ringGroup = new T.Group();
   rel.add(ringGroup);
   ringGroup.position.z = MIX_ZC;
-  const MIX_RING = 3;
-  const dockRing = new T.TorusGeometry(MIX_RING, .42, 10, 48).rotateX(Math.PI / 2);
-  const struts = [0, 1, 2, 3].map(k => new T.BoxGeometry(MIX_RING - COLUMN_R, .2, .24).translate((MIX_RING + COLUMN_R) / 2, 0, 0).rotateY(k * Math.PI / 2));
-  const mixedRingGeometry = mergeGeometries([dockRing, ...struts].map(g => g.index ? g.toNonIndexed() : g))!;
-  const mixedRings = new RingStack(ringGroup, 'hub-mixed-rings', mixedRingGeometry, new T.TorusGeometry(MIX_RING + .4, .1, 6, 56).rotateX(Math.PI / 2).translate(0, .05, 0), [28.5, 32, 35.5]);
+  // Docking rings: a flat deck with an inner rail and an outer lip, four pads on each face (blue; the camera looks up at the rings, so the drones dock on the underside), a thin blue seam on the outer face.
+  const MIX_RING = 3.4, MIX_PAD = 2.75, padAngles = [1, 3, 5, 7].map(k => k * Math.PI / 4);
+  const strut = (k: number) => new T.BoxGeometry(2.2 - COLUMN_R, .2, .24).translate((2.2 + COLUMN_R) / 2, 0, 0).rotateY(k * Math.PI / 2);
+  const mixedRingGeometry = mergeGeometries([ringGeo(2.1, MIX_RING, .4, -.2), ringGeo(2.1, 2.22, .24, .2), ringGeo(MIX_RING - .1, MIX_RING, .24, .2),
+    ...[0, 1, 2, 3].map(strut).map(g => g.toNonIndexed())])!;
+  const mixedSeams = mergeGeometries([new T.TorusGeometry(MIX_RING + .02, .045, 6, 64).rotateX(Math.PI / 2),
+    ...padAngles.flatMap(a => [.22, -.22].map(y => new T.CylinderGeometry(.45, .45, .05, 16).translate(Math.cos(a) * MIX_PAD, y, Math.sin(a) * MIX_PAD).toNonIndexed()))].map(g => g.index ? g.toNonIndexed() : g))!;
+  const mixedRings = new RingStack(ringGroup, 'hub-mixed-rings', mixedRingGeometry, mixedSeams, [28.5, 32, 35.5]);
   [0, 1, 2].forEach(i => addPart('mixed', .7 + i * .12, .3, level => { mixedRings.levels[i] = level; if (i === 2) mixedRings.commit(); }));
 
   // Robotic arm on the hall roof: base, shoulder ball, two segments, wrist and gripper over the counters, lifting and lowering a parcel.
@@ -386,9 +410,10 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
   elbow.rotation.z = -1;
   box(elbow, [1.8, .3, .3], [.9, 0, 0], white, .05);
   ball(elbow, .2, 1.8);
-  for (const z of [-.26, .26]) box(elbow, [.08, .4, .08], [1.95, -.15, z], white, .01);
-  box(elbow, [.2, .08, .66], [1.95, .06, 0], white, .01);
-  box(elbow, [.46, .4, .46], [1.95, -.15, 0], cream, .04);
+  // Gripper: a wrist plate with two dark fingers closed on a large amber parcel.
+  box(elbow, [.3, .1, .9], [1.95, .02, 0], teal, .01);
+  for (const z of [-.46, .46]) box(elbow, [.12, .55, .1], [1.95, -.25, z], teal, .01);
+  box(elbow, [.8, .7, .8], [1.95, -.4, 0], parcel, .04);
   pivot.add(elbow);
   pivot.add(...bake(pivot));
   shoulder.add(pivot);
@@ -413,44 +438,52 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
     for (const x of [-.925, .925]) box(g, [.25, .9, .22], [x, .45, DRUM], white, .02);
     cyl(g, .8, .8, .05, .9, futureLight, 0, DRUM - .1).rotation.x = Math.PI / 2;
     box(g, [1.6, .9, .05], [0, .45, DRUM - .1], futureLight, .01);
-    const pod = new T.Mesh(new T.CapsuleGeometry(.4, 1.0, 4, 12).rotateX(Math.PI / 2).scale(.9, 1, 1), white);
-    pod.position.set(0, .55, DRUM + .55);
-    pod.castShadow = true;
-    g.add(pod);
-    box(g, [.5, .08, .1], [0, .62, DRUM + 1.42], futureLight, .01);
+    // Maglev: a guide beam with two rails runs out of the portal across the plaza on posts; the pod rides it, half inside the portal.
+    const TRACK_END = 8.5, trackLen = TRACK_END - DRUM + .4;
+    box(g, [1.1, .3, trackLen], [0, .15, DRUM - .4 + trackLen / 2], white, .03);
+    for (const x of [-.38, .38]) box(g, [.1, .1, trackLen], [x, .35, DRUM - .4 + trackLen / 2], teal, .01);
+    for (const z of [5.6, 7.4]) box(g, [.5, 1.5, .5], [0, -.5, z], white, .03);
+    box(g, [.95, .6, 1.6], [0, .8, DRUM + .7], white, .2);
+    box(g, [.78, .26, .04], [0, .9, DRUM + 1.5], teal, .01);
+    box(g, [.6, .06, .05], [0, .6, DRUM + 1.5], futureLight, .01);
+    for (const x of [-.48, .48]) box(g, [.03, .06, 1.3], [x, .72, DRUM + .7], futureLight, .01);
     for (const { a, x, z } of terminalAt) terminal(g, x, z, a);
   }, true, true);
-  const CORE_R = 1.8, CORE_H = SPIRE_TOP - SPIRE_BASE;
+  const CORE_R = 1.8, CORE_H = SPIRE_TOP - SPIRE_BASE, RING_Y0 = 4.4, RING_PITCH = (SPIRE_TOP - 1.7 - RING_Y0) / (RINGS - 1);
   stateGroup('hub-state-high-core', 'high', SPIRE_BASE, .08, .5, g => {
     cyl(g, CORE_R, CORE_R, CORE_H, CORE_H / 2, white);
     for (let y = 1; y < CORE_H; y += 2) cyl(g, CORE_R + .04, CORE_R + .04, .08, y, teal, 0, 0); // panel joints
+    // Vertical panel lines, and small lit windows in every gap between two rings, on the camera side.
+    const at = (a: number, r: number) => [Math.sin(a) * r, Math.cos(a) * r] as const;
+    for (let k = 0; k < 10; k++) { const a = k * Math.PI / 5 - .4, [x, z] = at(a, CORE_R + .015); box(g, [.05, CORE_H - 1, .05], [x, CORE_H / 2, z], teal, .01).rotation.y = a; }
+    for (let i = 0; i < RINGS - 1; i++) for (const a of [-.75, -.25, .25, .75]) { const [x, z] = at(a, CORE_R + .03); box(g, [.3, .24, .05], [x, RING_Y0 + (i + .5) * RING_PITCH - SPIRE_BASE, z], futureLight, .01).rotation.y = a; }
     for (const a of [.5, -.5]) box(g, [.1, CORE_H - 2, .08], [Math.sin(a) * (CORE_R + .02), CORE_H / 2, Math.cos(a) * (CORE_R + .02)], futureLight, .01).rotation.y = a;
   });
   stateGroup('hub-state-high-cap', 'high', SPIRE_TOP, 1, .3, g => {
     cyl(g, CORE_R, CORE_R, .5, .25, white);
     cyl(g, 1.5, 1.5, .8, .9, white);
     cyl(g, 1, 1, 1.2, 1.9, white);
-    for (const x of [-.25, .25]) box(g, [.12, 3, .12], [x, 3.4, -.1], white, .01);
-    for (const x of [-.4, .4]) box(g, [.36, .5, .06], [x, 1.1, Math.sqrt(1.5 ** 2 - x * x) - .02], futureLight, .01);
-    for (const x of [-.25, .25]) box(g, [.28, .36, .06], [x, 2.1, Math.sqrt(1 - x * x) - .02], futureLight, .01);
+    for (const x of [-.3, .3]) box(g, [.12, 2.2, .12], [x, 3, -.1], white, .01);
+    for (const x of [-.55, .55]) box(g, [.4, .5, .06], [x, 1.1, Math.sqrt(1.5 ** 2 - x * x) - .02], futureLight, .01);
+    for (const x of [-.3, .3]) box(g, [.3, .4, .06], [x, 1.95, Math.sqrt(1 - x * x) - .02], futureLight, .01);
   }, true);
-  const spireYs = Array.from({ length: RINGS }, (_, i) => 4.4 + i * 30.1 / (RINGS - 1));
+  const spireYs = Array.from({ length: RINGS }, (_, i) => RING_Y0 + i * RING_PITCH);
   const armAngles = spireYs.map((_, i) => i % 2 ? undefined : (i % 4 ? Math.PI : 0) + [.3, -.35, .2, -.25, .4][i / 2 % 5 | 0]); // pointing to either side of the camera
   const spireRings = new RingStack(rel, 'hub-spire-rings', ringGeo(CORE_R, 3.3, .95, -.475),
-    mergeGeometries([ringGeo(3.3, 3.4, .3, -.15), ringGeo(2.7, 2.8, .04, .475)])!,
+    mergeGeometries([ringGeo(3.3, 3.36, .1, -.05), ringGeo(2.7, 2.78, .04, .475)])!,
     spireYs, armGeometry(), parcelGeometry(), armAngles);
   spireYs.forEach((_, i) => addPart('high', .12 + .88 * i / (RINGS - 1), .3, level => { spireRings.levels[i] = level; if (i === RINGS - 1) spireRings.commit(); }));
 
   // Drones: a shared fleet in stage space (2 parked on the canopy, 6 on the column rings, one pair on each armed spire ring, 18 in three streams).
   const droneSlots = { canopy: 0, column: 2, spire: 8, stream: 8 + armAngles.filter(a => a !== undefined).length * 2, count: 0 };
-  droneSlots.count = droneSlots.stream + 18;
+  droneSlots.count = droneSlots.stream + 24;
   const drones = serviceDrones(stage, droneSlots.count);
   drones.meshes.forEach(mesh => { mesh.name = 'hub-drones'; });
   const dummy = new T.Object3D();
-  const place = (slot: number, x: number, y: number, z: number, yaw: number, level: number) => {
+  const place = (slot: number, x: number, y: number, z: number, yaw: number, level: number, size = DRONE) => {
     dummy.position.set(x, y, z);
     dummy.rotation.set(0, yaw, 0);
-    dummy.scale.setScalar(Math.max(HIDDEN, level) * DRONE);
+    dummy.scale.setScalar(Math.max(HIDDEN, level) * size);
     drones.set(slot, dummy);
   };
 
@@ -465,7 +498,7 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
 
   // The amber outline hugs the plinth in use: the grown low plinth, or the shared one for mixed and high.
   const marker = createGuestMarker(root, 'nw', SHARED_LOT);
-  const lotMarker = createGuestMarker(root, 'nw');
+  const lotMarker = createGuestMarker(root, 'nw', { w: HUB_PLINTH.low.z * 2, d: HUB_PLINTH.low.x * 2 });
   lotMarker.mesh.removeFromParent();
   const mainOutline = marker.mesh.geometry, lowOutline = lotMarker.mesh.geometry;
   const wrap = (angle: number) => Math.atan2(Math.sin(angle), Math.cos(angle));
@@ -485,8 +518,8 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
     }
     // Docked drones sit on their ring, scaling and lifting with it.
     for (let i = 0; i < 3; i++) for (let k = 0; k < 2; k++) {
-      const l = mixedRings.levels[i], a = i * 1.3 + k * Math.PI + .6;
-      place(droneSlots.column + i * 2 + k, Math.cos(a) * MIX_RING * l, PT + mixedRings.y(i) + .85 * l, MIX_ZC + Math.sin(a) * MIX_RING * l, a + 1.2, ready ? l : 0);
+      const l = mixedRings.levels[i], a = padAngles[k];
+      place(droneSlots.column + i * 2 + k, Math.cos(a) * MIX_PAD * l, PT + mixedRings.y(i) - .45 * l, MIX_ZC + Math.sin(a) * MIX_PAD * l, a + 1.2, ready ? l : 0, DOCKED);
     }
     let dock = 0;
     spireYs.forEach((_, i) => {
@@ -495,20 +528,20 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
       const l = spireRings.levels[i];
       for (const k of [-1, 1]) {
         const a = angle + k * 1.25;
-        place(droneSlots.spire + dock++, Math.cos(a) * 2.6 * l, PT + spireRings.y(i) + .85 * l, Math.sin(a) * 2.6 * l, a + 1.2, ready ? l : 0);
+        place(droneSlots.spire + dock++, Math.cos(a) * 2.6 * l, PT + spireRings.y(i) + .7 * l, Math.sin(a) * 2.6 * l, a + 1.2, ready ? l : 0, DOCKED);
       }
     });
-    // Three V streams spiral into the upper rings (radius 7.8 -> 4.4, 20 s); under reduced motion they park on the rings.
+    // Three streams arc into the upper rings (radius 7.8 -> 4.4, 20 s); under reduced motion they park on the rings.
     const high = lead.high.level;
-    for (let s = 0; s < 3; s++) for (let j = 0; j < 6; j++) {
-      const slot = droneSlots.stream + s * 6 + j;
+    for (let s = 0; s < 3; s++) for (let j = 0; j < 8; j++) {
+      const slot = droneSlots.stream + s * 8 + j;
       if (still) {
-        const i = RINGS - 1 - ((s * 6 + j) % RINGS), a = (s * 6 + j) * 2.1 + .5, l = spireRings.levels[i];
+        const i = RINGS - 1 - ((s * 8 + j) % RINGS), a = (s * 8 + j) * 2.1 + .5, l = spireRings.levels[i];
         place(slot, Math.cos(a) * 2.5 * l, PT + spireRings.y(i) + .85 * l, Math.sin(a) * 2.5 * l, a + 1.2, ready ? l : 0);
         continue;
       }
-      const u = (((now / 20 + j / 6 * .42 + s / 3) % 1) + 1) % 1, a = u * Math.PI * 4 + s * Math.PI * 2 / 3 + j * .12, r = 7.8 - 3.4 * u;
-      place(slot, Math.cos(a) * r, PT + 12 + u * 23 + Math.abs(j - 2.5) * .25, Math.sin(a) * r, a + Math.PI / 2, ready ? .7 * high * smoothstep(clamp01(Math.min(u, 1 - u) / .12)) : 0);
+      const u = (((now / 20 + j / 8 * .42 + s / 3) % 1) + 1) % 1, a = -.5 + s * .6 + u * 1.5 + j * .06, r = 7.8 - 3.4 * u; // arcs on the camera side of the tower, so the streams stay readable
+      place(slot, Math.cos(a) * r, PT + 10 + u * (SPIRE_TOP - 12) + Math.abs(j - 3.5) * .25, Math.sin(a) * r, a + Math.PI / 2, ready ? .7 * high * smoothstep(clamp01(Math.min(u, 1 - u) / .12)) : 0);
     }
     drones.show(ready && (lowLevel > HIDDEN || lead.mixed.level > HIDDEN || high > HIDDEN));
     drones.flush();
