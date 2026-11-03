@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { buildAutomationHub } from '../src/siteBuilders/automationHub.ts';
+import { buildAutomationHub, FOLK, HUB_LOT, HUB_PLINTH } from '../src/siteBuilders/automationHub.ts';
 
 const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'document');
 Object.defineProperty(globalThis, 'document', {
@@ -23,9 +23,16 @@ const hall = { low: state('low'), mixed: state('mixed') };
 const level = (group: T.Object3D) => group.visible ? group.scale.y : 0;
 scene.updateMatrixWorld(true);
 
-// The plinth may overhang the 8 x 7 lot by <= .7 units a side (root units; the root carries the Odaiba position and scale).
-const plinthBox = new T.Box3().setFromObject(site.root.getObjectByName('hub-plinth')!).applyMatrix4(site.root.matrixWorld.clone().invert());
-assert.ok(plinthBox.min.x >= -4.701 && plinthBox.max.x <= 4.701 && plinthBox.min.z >= -4.201 && plinthBox.max.z <= 4.201, 'plinth leaves its lot');
+// Every state's plinth stays inside the amber outline it is drawn with (root units; the root carries the Odaiba position and scale):
+// the grown low plinth inside HUB_LOT.low, the shared one (mixed, high) inside HUB_LOT.other. Outline inner edge = lot + .8 a side.
+const inRoot = (object: T.Object3D) => new T.Box3().setFromObject(object).applyMatrix4(site.root.matrixWorld.clone().invert());
+const within = (box: T.Box3, lot: { w: number; d: number }) => box.min.x >= -lot.w / 2 - .8 - 1e-3 && box.max.x <= lot.w / 2 + .8 + 1e-3 && box.min.z >= -lot.d / 2 - .8 - 1e-3 && box.max.z <= lot.d / 2 + .8 + 1e-3;
+assert.ok(within(inRoot(site.root.getObjectByName('hub-plinth')!), HUB_LOT.other), 'plinth leaves its lot');
+runtime.setTarget({ band: 'low', automatedPorts: 0 }, 0, true);
+const lowPlinth = inRoot(state('low'));
+assert.ok(within(lowPlinth, HUB_LOT.low), 'the low state leaves its lot');
+assert.ok(lowPlinth.max.x - lowPlinth.min.x > 17 && lowPlinth.max.z - lowPlinth.min.z > HUB_PLINTH.low.x * 2 - .5, 'the low state is the x2 target-size group');
+runtime.restoreLegacy();
 
 // Band-level diagnostics: ports are self-service points, counters staffed ones (0 / 3 / 6 by the Meter).
 assert.deepEqual(runtime.getDiagnostics(), { band: 'mixed', targetAutomatedPorts: 3, visibleAutomatedPorts: 3, targetHumanCounters: 3, visibleHumanCounters: 3 });
@@ -76,11 +83,11 @@ const ringScale = (i: number) => { const m = new T.Matrix4(); rings.getMatrixAt(
 runtime.setTarget({ band: 'low', automatedPorts: 0 }, 20, true);
 runtime.setTarget({ band: 'high', automatedPorts: 6 }, 20, false);
 runtime.update(21.5);
-assert.ok(ringScale(0) > ringScale(13) && ringScale(13) <= 1.0001e-3, 'spire rings rise from the drum upward');
+assert.ok(ringScale(0) > ringScale(17) && ringScale(17) <= 1.0001e-3, 'spire rings rise from the drum upward');
 runtime.setTarget({ band: 'high', automatedPorts: 6 }, 24, true);
 runtime.setTarget({ band: 'low', automatedPorts: 0 }, 24, false);
 runtime.update(25.5);
-assert.ok(ringScale(13) < ringScale(0), 'spire rings come down from the top');
+assert.ok(ringScale(17) < ringScale(0), 'spire rings come down from the top');
 
 // Visible mesh budget per state (previous hub: 28 / 28 / 33 meshes, +20 %).
 for (const [band, ports, budget] of [['low', 0, 33], ['mixed', 3, 33], ['high', 6, 40]] as const) {
@@ -109,9 +116,9 @@ for (const [band, ports, cast] of [['low', 0, 23], ['mixed', 3, 15], ['high', 6,
       size.setFromMatrixScale(m).multiply(new T.Vector3().setFromMatrixScale(people.parent!.matrixWorld));
       if (size.x < .5) continue;
       shown++;
-      assert.ok(Math.abs(size.x - 1) < 1e-6 && Math.abs(size.y - 1) < 1e-6, 'resident is shrunk');
+      assert.ok(Math.abs(size.x - FOLK[band]) < 1e-6 && Math.abs(size.y - FOLK[band]) < 1e-6, 'resident is shrunk');
       at.setFromMatrixPosition(m);
-      assert.ok(Math.abs(at.x) <= 4.101 && Math.abs(at.z) <= 4.701, 'resident leaves the plinth');
+      assert.ok(Math.abs(at.x) <= HUB_PLINTH[band].x + .101 && Math.abs(at.z) <= HUB_PLINTH[band].z + .001, 'resident leaves the plinth');
       world.copy(at).applyMatrix4(people.parent!.matrixWorld);
       ray.set(world.clone().add(new T.Vector3(0, .1, 0)), down);
       ray.far = .2;
@@ -136,7 +143,7 @@ runtime.update(61.5);
 for (let k = 0; k < 24; k++) { people.getMatrixAt(k, m); assert.ok(size.setFromMatrixScale(m).x < .001 && m.determinant() > 0, 'a visible resident stays during a state change'); }
 runtime.setTarget({ band: 'mixed', automatedPorts: 3 }, 61.5, true);
 people.getMatrixAt(0, m);
-assert.ok(Math.abs(size.setFromMatrixScale(m).x - 1 / 3) < 1e-6, 'immediate recovery leaves a stale hidden resident');
+assert.ok(Math.abs(size.setFromMatrixScale(m).x - FOLK.mixed / 3) < 1e-6, 'immediate recovery leaves a stale hidden resident');
 props.visible = false;
 runtime.update(62);
 assert.equal(people.visible, false, 'residents outlive a hidden frontage');

@@ -1,7 +1,7 @@
 # nw-closeup-polish — NW 自動化旗艦＋district 載體，新 taste 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — 盲評 22/48，等 owner 校準 rubric
+- Status: BLOCKED — R4 旗艦 15/28，等 owner 揀 lot blocker 選項
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
 - Last verified commit: R3 commit（test／build／diff-check PASS）
@@ -97,6 +97,14 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 - Rubric 缺陷：`fl-canopy`、`fm-rings` 嘅 crop 跟目標位置，現況主體細啲所以出咗 crop（judge 照睇全圖畀 1）；下一版要先決定旗艦大細跟目標定跟真實米數（owner 決定），再調 crop。
 - 未做：owner 校準（skill step 7 第一輪），夜景。
 
+## R4（owner：旗艦「放大到目標」）
+
+- [Spec R4](../../artifacts/nw-closeup-polish/spec.md#r4--flagship-at-target-size-rubric-items-owner-2026-11-03-放大到目標)。Sonnet 實作：−1 成組 ×2（人 2.6×）＋廳拉長，0 廳 ×1.2、柱 r 1.6 去到 y 37，+1 環 ×1.2、18 環；新 `white` 材質代替 hub 嘅 `trim`；`nw:focal-low` → `[140,28,-332]`→`[40,26,-300]`（舊 pose 喺 ×2 廳入面）。
+- 畫面大細已經對到目標（−1 廳面 x .35–.73 vs .37–.77）。[R4 對目標](../../artifacts/nw-closeup-polish/r4/vs-target.jpg)。
+- 盲評旗艦 **15 / 28**（judge 1 都係 15）：`fm-column`、`fh-arms` 升到 2，`fh-base` 跌到 1；其餘 1。[scores](../../artifacts/nw-closeup-polish/r4/scores.md)。最低：廳內係平面橙牆冇深度、冇職員、藍 seam 太粗、無人機讀唔到、磁浮艙冇軌、cap 天線喺 crop 外。
+- **Blocker（等 owner）**：×2 低 plinth（≈92×53 m）跨咗北面共享 court (50,−340) 同 tidal edge；`changeSites.nw` 擴闊會令 `districtMeters`／`megastructures`／`odaiba` 三個 test fail（coastalCanopy 連鎖令 (−20,210) court 入樹）。而家 lot 保持 8×7，plinth 嘅越界冇 test 覆蓋（`ponytail:` 註）。選項：1）搬 court＋修 canopy 連鎖再擴 lot；2）保持 ×2 取消拉長（仍要修連鎖）；3）全 site 南移（同目標構圖相反）。
+- Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
+
 ## Next step
 
-Owner 睇兩張 board，逐項話 pass／fail 校準 rubric，並決定旗艦喺 `nw:e` 要唔要放大到目標大細 → 按最低分項寫 R4 spec。
+Owner 揀 blocker 選項；之後 R5 針對廳內深度／職員、細 seam、無人機、磁浮軌。Bay（judge 1 7/20）未開工。
