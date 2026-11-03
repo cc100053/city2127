@@ -1,5 +1,6 @@
 // Optional browser acceptance; reuses installed Playwright and a fresh scratch survey DB.
 import assert from 'node:assert/strict';
+import { evidenceDir } from '../scripts/evidence.mjs';
 import { pathToFileURL } from 'node:url';
 if (!process.env.CITY2127_PLAYWRIGHT_PATH) throw new Error('Set CITY2127_PLAYWRIGHT_PATH to the installed Playwright index.mjs');
 const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH).href);
@@ -43,7 +44,7 @@ try {
   await monitor.goto(`${survey}/monitor`);
   await city.goto(`${cityURL}/?survey=${encodeURIComponent(survey.replace('http', 'ws') + '/ws')}&hour=16`);
   await checkCity(initial);
-  await city.screenshot({ path: 'artifacts/resident-p2-admin-undo-city-before.png' });
+  await city.screenshot({ path: `${evidenceDir('resident')}/resident-p2-admin-undo-city-before.png` });
   assert.equal(await undoButton.isDisabled(), true);
   await answerAll();
   await checkCity(await read('/api/city-view'));
@@ -56,8 +57,8 @@ try {
   assert.deepEqual(await read('/api/city-view'), initial);
   await checkCity(initial);
   await monitor.getByText('管理者が直前の提案を取り消しました。', { exact: true }).waitFor();
-  await city.screenshot({ path: 'artifacts/resident-p2-admin-undo-city-restored.png' });
-  await admin.screenshot({ path: 'artifacts/resident-p2-admin-undo-admin.png' });
+  await city.screenshot({ path: `${evidenceDir('resident')}/resident-p2-admin-undo-city-restored.png` });
+  await admin.screenshot({ path: `${evidenceDir('resident')}/resident-p2-admin-undo-admin.png` });
   await city.reload(); await checkCity(initial);
   // A replacement is counted once; next Guest start closes Undo even if staff end that draft.
   await answerAll();

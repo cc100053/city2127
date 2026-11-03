@@ -1,5 +1,6 @@
 // Local Mac stability evidence; physical display and visitor acceptance stay separate.
 import assert from 'node:assert/strict';
+import { evidenceDir } from '../scripts/evidence.mjs';
 import { mkdtempSync, mkdirSync, writeFileSync, appendFileSync, readFileSync, rmSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -31,7 +32,7 @@ const compareSeconds = Number(process.env.CITY2127_COMPARE_SECONDS ?? 60);
 assert.ok(Number.isFinite(minutes) && minutes >= 1);
 assert.ok(Number.isFinite(compareSeconds) && compareSeconds >= 5);
 const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH).href);
-const evidence = process.env.CITY2127_EVIDENCE_DIR ?? 'artifacts/energy-city-e5/mac-mini';
+const evidence = process.env.CITY2127_EVIDENCE_DIR ?? evidenceDir('energy-city-e5', 'mac-mini');
 assert.ok(!existsSync(join(evidence, 'browser.json')) && !existsSync(join(evidence, 'samples.ndjson')), 'Use a fresh evidence directory.');
 mkdirSync(evidence, { recursive: true });
 const scratch = mkdtempSync(join(tmpdir(), 'energy-e5-'));

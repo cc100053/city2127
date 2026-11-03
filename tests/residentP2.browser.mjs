@@ -1,5 +1,6 @@
 // P2 desktop copy/review/focus and pre-upgrade A/B draft recovery on a real scratch SQLite.
 import assert from 'node:assert/strict';
+import { evidenceDir } from '../scripts/evidence.mjs';
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -9,7 +10,7 @@ import { createProposalSession } from '../survey/src/server/proposalService.ts';
 const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH).href);
 const directory = mkdtempSync(join(tmpdir(), 'resident-p2-browser-'));
 const questionsPath = new URL('../survey/src/survey/questions.exhibition.json', import.meta.url).pathname;
-const evidence = process.env.CITY2127_EVIDENCE_DIR ?? 'artifacts'; mkdirSync(evidence, { recursive: true });
+const evidence = process.env.CITY2127_EVIDENCE_DIR ?? evidenceDir('resident'); mkdirSync(evidence, { recursive: true });
 const oldQuestions = JSON.parse(readFileSync(new URL('../survey/src/survey/questions.exhibition.v3.json', import.meta.url), 'utf8'));
 oldQuestions.version = 2;
 oldQuestions.questions[0].text = 'Previous question copy';

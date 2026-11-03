@@ -27,6 +27,7 @@
 | [Hero holograms](hero-holograms.md) | DONE（2026-11-02）；8 塊居民尺度 hologram（Fuji TV 地標屏、站前、空氣、live 住民の声、天橋 tag），owner 接受 R5 | cc100053 |
 | [Guest explore 空の環を見る](guest-explore.md) | DONE（2026-11-02）；iPad 揀 Sky Ring → 大畫面泊位近景＋全環聲音；side 鏡頭、20 s 撳掣，owner 接受；升降機 LOD 後續 | cc100053 |
 | [Elevator close-up LOD](elevator-closeup-lod.md) | DONE（2026-11-02）；升降機中距離近景 LOD＋iPad「軌道エレベーターを見る」，owner 接受，已 merge main | cc100053 |
+| [Artifacts evidence split](artifacts-evidence-split.md) | DONE（2026-11-03）；截圖分兩層：原始證據放 `~/city2127-evidence/`（唔入 Git），只 commit 經 `publish-evidence.mjs` 壓縮嘅紀錄；CI 擋新 PNG／> 4 MB；968 個冇引用嘅截圖（1.19 GB）搬出 Git | cc100053 |
 | [City taste v2](city-taste-v2.md) | DONE（2026-11-03）；「睇得見嘅超高科技」taste，P1–P7＋polish2（中央框塔／廣場、夜景、階梯 hull），owner 批准 merge main；SE close-up 被 ring 擋住待決定 | cc100053 |
 | [遠景軌道升降機](far-landmark.md) | DONE（2026-11-02）；約 7.5 km 外霧中剪影：幼主柱＋三層中轉站＋分節纜線，Gemini 目標圖 closeup-polish，owner 接受 R6 | cc100053 |
 | [Hero 霧與光層次](hero-atmosphere.md) | IN_PROGRESS（2026-11-02）；R1 高度霧／夜間窗燈層次／夜空地平線，R2 水面燈光倒影，等 owner 目視 | cc100053 |

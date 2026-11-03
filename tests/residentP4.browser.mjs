@@ -1,5 +1,6 @@
 // P4 missing desktop cases. Scratch DB; real wall time except explicit server lease jumps.
 import assert from 'node:assert/strict';
+import { evidenceDir } from '../scripts/evidence.mjs';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -7,7 +8,7 @@ import { pathToFileURL } from 'node:url';
 import { createContext, createSurveyServer } from '../survey/src/server/server.ts';
 const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH).href);
 const directory = mkdtempSync(join(tmpdir(), 'resident-p4-browser-'));
-const evidence = process.env.CITY2127_EVIDENCE_DIR ?? 'artifacts';
+const evidence = process.env.CITY2127_EVIDENCE_DIR ?? evidenceDir('resident');
 mkdirSync(evidence, { recursive: true });
 let clockOffset = 0;
 const ctx = createContext({ dbPath: join(directory, 'survey.sqlite'), now: () => new Date(Date.now() + clockOffset),

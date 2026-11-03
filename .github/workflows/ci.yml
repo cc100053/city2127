@@ -44,7 +44,7 @@ jobs:
       - name: module-swap
         working-directory: module-swap
         run: npm ci --prefix app && npm test && npm run build
-      - name: Check diff whitespace
+      - name: Resolve diff base
         env:
           BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
@@ -55,4 +55,9 @@ jobs:
               BASE=$(git hash-object -t tree /dev/null)
             fi
           fi
-          git diff --check "$BASE" HEAD
+          echo "BASE=$BASE" >> "$GITHUB_ENV"
+      - name: Check diff whitespace
+        run: git diff --check "$BASE" HEAD
+      # Raw captures stay in the evidence folder; artifacts/ takes only published JPEG records (docs/VALIDATION.md, Evidence storage).
+      - name: Check new artifacts are published records
+        run: scripts/check-artifacts.sh "$BASE"

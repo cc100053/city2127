@@ -1,5 +1,6 @@
 // Formal E4 acceptance: real questions/server/SQLite/WebSocket, no DEV energy switch.
 import assert from 'node:assert/strict';
+import { evidenceDir } from '../scripts/evidence.mjs';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -13,7 +14,7 @@ import { residentResult } from '../src/surveyAtmosphere.ts';
 import { DISPLAY_MS, RESULT_LEASE_MS } from '../survey/src/shared/displayTiming.ts';
 const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH).href);
 const directory = mkdtempSync(join(tmpdir(), 'energy-e4-browser-'));
-const evidence = process.env.CITY2127_EVIDENCE_DIR ?? 'artifacts/energy-city-e4/formal'; mkdirSync(evidence, { recursive: true });
+const evidence = process.env.CITY2127_EVIDENCE_DIR ?? evidenceDir('energy-city-e4', 'formal'); mkdirSync(evidence, { recursive: true });
 const questionsPath = new URL('../survey/src/survey/questions.exhibition.json', import.meta.url).pathname;
 const legacyPath = new URL('../survey/src/survey/questions.exhibition.v3.json', import.meta.url).pathname;
 const dbPath = join(directory, 'scratch.sqlite');
