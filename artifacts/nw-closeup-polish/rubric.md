@@ -7,7 +7,7 @@ Poses (the targets were generated from these, so captures use them too, 12:00, H
 - Flagship: `cityPose([192,44,-338],[40,54,-300])` (`nw:e`) — targets [flagship-low](target/flagship-low.jpg), [mixed](target/flagship-mixed.jpg), [high](target/flagship-high.jpg).
 - Bay 10: `cityPose([-10,40,-90],[75,32,-160])` (`nw:bay-e`) — targets [bay-low](target/bay-low.jpg), [mixed](target/bay-mixed.jpg), [high](target/bay-high.jpg).
 
-Owner bar: not calibrated yet (round 1 of judging is the calibration, 2026-11-03).
+Owner bar: flagship accepted at R9 25/28 (「分數OK」, 2026-11-03); bays accepted at Bay R2 19/20 (「Accept R2 scores」, 2026-11-04).
 
 ## Flagship −1 `low`
 

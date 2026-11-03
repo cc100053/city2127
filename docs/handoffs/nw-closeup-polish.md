@@ -1,7 +1,7 @@
 # nw-closeup-polish — NW 自動化旗艦＋district 載體，新 taste 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — 旗艦 owner 接受（R9 25/28）；bay 以 R2 為準（19/20），3 輪完，等 owner 決定
+- Status: IN_PROGRESS — 旗艦 owner 接受（R9 25/28）；bay owner 接受（R2 19/20）；剩 skill step 8
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
 - Last verified commit: Bay R2 `4092b62`（test／build／diff-check PASS）
@@ -184,6 +184,10 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 - 絕對 **17 / 20**；pairwise R2 vs R3：R3 贏 `bm-hall`、`bm-column`，輸 `bl-canopy`（pod 冇光）、`bl-material`（啡色櫃檯似米色塊）→ 2:2，**唔保留**，code 退返 R2（patch 留喺 evidence `bay-r3/r3.patch`）。`bm-arm` code 冇改都 2→1 ＝評審雜訊。[scores](../../artifacts/nw-closeup-polish/bay-r3/scores.md)、[pair](../../artifacts/nw-closeup-polish/bay-r3/pair.md)。
 - 3 輪完（skill：停低報分）。Bay 最佳＝R2 19/20：未過 `bl-canopy`（1）；`bl-glazing` 2 但 pairwise 輸 R1。
 
+## Owner 2026-11-04：bay「Accept R2 scores」
+
+- Owner 接受 Bay R2 盲評分數（19/20）作為 bay 校準：bay 以 R2（4092b62）為準，`bl-canopy`／`bl-glazing` 唔再追。
+
 ## Next step
 
-Owner：接受 bay R2 分數，或者指定下一輪（`bl-canopy` 發光器、`bl-glazing` 暖房）。之後 skill step 8（FPS、文件同步、merge）。
+Skill step 8：每個 state 量 canvas `data-fps`（1920×1080，第一個 sample 唔計）；同步 `PROJECT`、`EXHIBITION_SPEC`、`VALIDATION` 同 handoff index（新檔 `automationKit.ts`／`automationBayModels.ts`／`automationBays.ts`）；按 CONTRIBUTING `--no-ff` merge 入 main，確認 main CI。
