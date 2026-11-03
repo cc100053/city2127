@@ -12,11 +12,13 @@ import { createGuestMarker, createSiteLayer, createSiteRoot, prefersReducedMotio
 // Pure white structure: the shared `trim` (#eee9df, metallic) reads beige in shade, which the rubric's fl-material rejects.
 const white = new T.MeshStandardMaterial({ color: '#f8f9fb', roughness: .42, metalness: .08 });
 // Soft shadow band under the roof slab, amber parcels, an amber lot-edge inlay.
-// Room light: amber emissive surfaces (they keep glowing at night) and a back wall whose vertex colours grade from deep orange below to pale cream above.
+// Room light: pale cream walls with a warm emissive wash (they keep glowing at night), a warm ceiling cove and warm floor pools; the back wall's vertex colours grade from peach below to near-white above.
 const roomLight = (color: T.ColorRepresentation, emissive: string, emissiveIntensity: number) => new T.MeshStandardMaterial({ color, emissive, emissiveIntensity, roughness: 1 });
-const wallLight = new T.MeshStandardMaterial({ color: '#ffffff', vertexColors: true, emissive: '#ffa855', emissiveIntensity: .55, roughness: 1 });
-const glowMid = roomLight('#e0a672', '#ffa24a', .7);
-const glowFloor = roomLight('#e6b080', '#ff9a4a', .55), glowCeil = roomLight('#fff0d0', '#ffd9a0', 1.4);
+const wallLight = new T.MeshStandardMaterial({ color: '#ffffff', vertexColors: true, emissive: '#ffc890', emissiveIntensity: .32, roughness: 1 });
+const glowMid = roomLight('#f6e8d6', '#ffc890', .3);
+const glowFloor = roomLight('#f3e3cf', '#ffc088', .26), glowCeil = roomLight('#fff3dc', '#ffd9a0', 1.3);
+// A cool, faint pane across the glazing, so the room reads behind glass.
+const glassPane = new T.MeshBasicMaterial({ color: '#cfe6f5', transparent: true, opacity: .13, depthWrite: false });
 const shade = new T.MeshBasicMaterial({ color: '#1b2430', transparent: true, opacity: .2, depthWrite: false });
 const parcel = new T.MeshStandardMaterial({ color: '#e9a24f', roughness: .6 });
 const amberInlay = new T.MeshStandardMaterial({ color: '#ff9f1c', emissive: '#ff9f1c', emissiveIntensity: .35, roughness: .5 });
@@ -52,9 +54,7 @@ export const SHARED_LOT = { w: 8, d: 8 };
 export const HUB_PLINTH: Record<Band, { x: number; z: number }> = { low: { x: 12, z: 7.4 }, mixed: { x: 4.8, z: 4.7 }, high: { x: 4.8, z: 4.7 } };
 const smoothstep = (value: number) => value * value * (3 - 2 * value);
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
-const beam = new T.MeshBasicMaterial({ color: '#9fe8ff', transparent: true, opacity: .28, blending: T.AdditiveBlending, depthWrite: false });
 const glow = new T.MeshBasicMaterial({ color: new T.Color('#d8f8ff').multiplyScalar(2.5), toneMapped: false });
-const halo = new T.MeshBasicMaterial({ color: '#7fe3ff', transparent: true, opacity: .22, blending: T.AdditiveBlending, depthWrite: false });
 // Honest port count per band (the Meter maps 0 / 3 / 6): how many service points are self-service in that state, and how many are staffed.
 const PORTS: Record<Band, number> = { low: 0, mixed: 3, high: 6 };
 
@@ -187,7 +187,7 @@ function hall(group: T.Group, w: number, zBack: number, zFront: number, bays: nu
   const d = zFront - zBack, zc = (zBack + zFront) / 2, wall = glass - .05;
   box(group, [w - .3, .01, d - .3], [0, .005, zc], glowFloor, .004);
   // Back wall in three lit bands (deep below, brighter above), pilasters between the bays, side walls and a hot ceiling cove: a glowing room, not one flat field.
-  const backWall = new T.PlaneGeometry(w - .3, wall, 1, 6), shades = new Float32Array(14 * 3), low = new T.Color('#c98a55'), high = new T.Color('#f4d3a4'), c = new T.Color();
+  const backWall = new T.PlaneGeometry(w - .3, wall, 1, 6), shades = new Float32Array(14 * 3), low = new T.Color('#ecc9a2'), high = new T.Color('#fcf5ea'), c = new T.Color();
   for (let v = 0; v < 14; v++) c.copy(low).lerp(high, 1 - Math.floor(v / 2) / 6).toArray(shades, v * 3);
   backWall.setAttribute('color', new T.BufferAttribute(shades, 3));
   const backMesh = new T.Mesh(backWall, wallLight);
@@ -204,7 +204,10 @@ function hall(group: T.Group, w: number, zBack: number, zFront: number, bays: nu
   box(group, [w, .1, .14], [0, glass, zFront - .03], white, .02);
   for (let k = 0; k <= bays; k++) slat(group, [.08, glass, .1], [-w / 2 + k * w / bays, glass / 2, zFront - .02], white);
   box(group, [w + side * 2, roofT, d + .4 + front], [0, h + roofT / 2, zc + (front - .4) / 2], white, .06);
-  box(group, [w - .4, .5, .02], [0, glass - .3, zFront - .06], shade, .005); // the slab's shadow on the glazing
+  box(group, [w - .4, .6, .02], [0, glass - .35, zFront - .06], shade, .005); // the slab's shadow on the glazing
+  box(group, [w, .09, .02], [0, h - .05, zFront + .01], shade, .005); // dark line under the slab's edge
+  box(group, [w - .3, glass, .01], [0, glass / 2, zFront - .04], glassPane, .002);
+  for (let k = 0; k < bays; k++) { const pool = new T.Mesh(new T.CylinderGeometry(.75, .75, .01, 20), glowCeil); pool.position.set(-w / 2 + (k + .5) * w / bays, .012, zBack + 1.4); group.add(pool); } // warm pools on the floor
   for (const s of [-1, 1]) box(group, [.04, .05, d - .5], [s * (w / 2 + .01), 2.45, zc], automationBlue, .01);
   box(group, [w - .5, .05, .04], [0, 2.45, zBack - .01], automationBlue, .01);
 }
@@ -333,8 +336,8 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
   const seatedPair = (band: Band, x: number, z: number) => people(band, [{ x: x - .25, z, yaw: 0, seated: true }, { x: x + .25, z, yaw: 0, seated: true }]);
   const scaled = (g: T.Group, band: Band) => { const k = new T.Group(); k.scale.setScalar(SCALE[band]); g.add(k); return k; };
   const K = SCALE.low, M = SCALE.mixed;
-  const LOW_W = 10.6, LOW_SHIFT = .25, // the hall stands right of the lot centre (screen right, as in the target)
-   LOW_H = 4.8, LOW_ZB = -3.4, LOW_ZF = 1, LOW_FRONT = 2.4, LOW_COUNTER = -1.4, LOW_ZC = (LOW_ZB + LOW_ZF) / 2, LOW_ROOF = LOW_H + .6;
+  const LOW_W = 10.2, LOW_SHIFT = .1, // the hall stands right of the lot centre (screen right, as in the target)
+   LOW_H = 4.8, LOW_ZB = -3.4, LOW_ZF = 1, LOW_FRONT = 2.4, LOW_COUNTER = -1.4, LOW_ZC = (LOW_ZB + LOW_ZF) / 2, LOW_ROOF = LOW_H + .22;
   // The counters stand back in the room (LOW_COUNTER), staff behind them, residents seated in front.
   const lowK = (i: number) => -LOW_W / 2 + (i + .5) * LOW_W / 6, lowX = (i: number) => lowK(i) + LOW_SHIFT; // in the shifted group / in stage design units
   stateGroup('hub-state-low', 'low', 0, 0, 1, g => {
@@ -344,7 +347,7 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
     for (const s of [-1, 1]) box(g, [.3, .03, HUB_PLINTH.low.z * 2 - .6], [s * (HUB_PLINTH.low.x - .3), .015, 0], amberInlay, .01);
     const k = scaled(g, 'low');
     k.position.x = LOW_SHIFT * K;
-    hall(k, LOW_W, LOW_ZB, LOW_ZF, 6, LOW_H, LOW_FRONT, 3.8, .6);
+    hall(k, LOW_W, LOW_ZB, LOW_ZF, 6, LOW_H, LOW_FRONT, 3.8, .22, .75);
     arc(k, 0, 3.2, .05, [0, LOW_ROOF, LOW_ZC + (LOW_FRONT - .4) / 2], white);
     for (let i = 0; i < 6; i++) { counter(k, lowK(i), LOW_COUNTER); chair(k, lowK(i), LOW_COUNTER + .5); }
     bench(k, -3.5, 2.9); bench(k, 0, 3.05); bench(k, 3.4, 2.9);
@@ -363,14 +366,10 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
   torus(canopy, 5.2, .03, 0, automationBlue);
   for (let i = 0; i < 4; i++) {
     const a = i * Math.PI / 2 + Math.PI / 4, x = Math.cos(a) * 3.4, z = Math.sin(a) * 3.4;
-    // Under-emitter: a bright white-blue bulb hanging below the lens (the camera is level with the canopy, so a flat disc would be edge-on), a soft glow sphere around it and a short beam below.
-    const bulb = new T.Mesh(new T.SphereGeometry(.34, 16, 10).scale(1, .6, 1), glow);
+    // Under-emitter: a small bright white-blue bulb under the lens (the camera is level with the canopy, so a flat disc would be edge-on) (no halo: the glow material itself blooms).
+    const bulb = new T.Mesh(new T.SphereGeometry(.4, 16, 10).scale(1, .6, 1), glow);
     bulb.position.set(x, -.6, z);
-    const aura = new T.Mesh(new T.SphereGeometry(.62, 16, 10), halo);
-    aura.position.set(x, -.7, z);
-    const cone = new T.Mesh(new T.CylinderGeometry(.3, .85, .9, 16, 1, true), beam);
-    cone.position.set(x, -1.2, z);
-    canopy.add(bulb, aura, cone);
+    canopy.add(bulb);
   }
   canopy.add(...bake(canopy));
   canopy.visible = false;
@@ -409,13 +408,12 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
   const ringGroup = new T.Group();
   rel.add(ringGroup);
   ringGroup.position.z = MIX_ZC;
-  // Docking rings: a flat deck with an inner rail and an outer lip, four pads on each face (blue; the camera looks up at the rings, so the drones dock on the underside), a thin blue seam on the outer face.
+  // Docking rings: an open annulus (a hole around the column, bridged by four thin spokes to an inner track ring), an inner rail and an outer lip, four pads on each face (blue; the camera looks up at the rings, so the drones dock on the underside), a thin blue seam on the outer face.
   const MIX_RING = 3.4, MIX_PAD = 3.05, padAngles = [0, Math.PI, Math.PI / 2, -Math.PI / 2];
-  const strut = (k: number) => new T.BoxGeometry(2.2 - COLUMN_R, .2, .24).translate((2.2 + COLUMN_R) / 2, 0, 0).rotateY(k * Math.PI / 2);
-  const mixedRingGeometry = mergeGeometries([ringGeo(2.1, MIX_RING, .4, -.2), ringGeo(2.1, 2.22, .24, .2), ringGeo(MIX_RING - .1, MIX_RING, .24, .2),
-    ...[0, 1, 2, 3].map(strut).map(g => g.toNonIndexed())])!;
+  const spoke = (k: number) => new T.BoxGeometry(2.8 - COLUMN_R, .12, .12).translate((2.8 + COLUMN_R) / 2, 0, 0).rotateY(k * Math.PI / 2 + Math.PI / 4).toNonIndexed();
+  const mixedRingGeometry = mergeGeometries([ringGeo(2.7, MIX_RING, .4, -.2), ringGeo(MIX_RING - .1, MIX_RING, .24, .2), ringGeo(2.7, 2.8, .2, .2), ringGeo(2.25, 2.45, .14, -.07), ...[0, 1, 2, 3].map(spoke)])!;
   const mixedSeams = mergeGeometries([new T.TorusGeometry(MIX_RING + .02, .045, 6, 64).rotateX(Math.PI / 2),
-    ...padAngles.flatMap(a => [.22, -.22].map(y => new T.CylinderGeometry(.45, .45, .05, 16).translate(Math.cos(a) * MIX_PAD, y, Math.sin(a) * MIX_PAD).toNonIndexed()))].map(g => g.index ? g.toNonIndexed() : g))!;
+    ...padAngles.flatMap(a => [.22, -.22].map(y => new T.CylinderGeometry(.3, .3, .05, 16).translate(Math.cos(a) * MIX_PAD, y, Math.sin(a) * MIX_PAD).toNonIndexed()))].map(g => g.index ? g.toNonIndexed() : g))!;
   const mixedRings = new RingStack(ringGroup, 'hub-mixed-rings', mixedRingGeometry, mixedSeams, [28.5, 32, 35.5]);
   [0, 1, 2].forEach(i => addPart('mixed', .7 + i * .12, .3, level => { mixedRings.levels[i] = level; if (i === 2) mixedRings.commit(); }));
 

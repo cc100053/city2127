@@ -1,7 +1,7 @@
 # nw-closeup-polish — NW 自動化旗艦＋district 載體，新 taste 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — R6 旗艦盲評 24/28
+- Status: IN_PROGRESS — R7 保留（pairwise 勝 R6 4:2），夜景暖光退步待修
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
 - Last verified commit: R3 commit（test／build／diff-check PASS）
@@ -126,6 +126,15 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 - 盲評旗艦 **24 / 28**（R5 21）。仲係 1：`fl-glazing`、`fl-material`（日景室內係飽和橙色平面，冇玻璃深度，屋頂懸挑讀唔到）、`fl-canopy`（發光器變咗大青色光錐，塞住隙位）、`fm-rings`（似平墊圈，唔似目標嘅中空泊位環）。[scores](../../artifacts/nw-closeup-polish/r6/scores.md)、[R6 對目標](../../artifacts/nw-closeup-polish/r6/vs-target.jpg)。
 - Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
 
+## R7（柔和暖房、薄屋頂、發光燈泡、中空環）
+
+- Sonnet：室內改淡奶油（後牆桃→白漸變、emissive .32、天花暖光槽、地面暖光圈、玻璃 .13）；低廳屋頂變薄板（.22，前凸 2.4）＋陰影線，廳闊 10.6→10.2；遮篷光錐／光暈拎走，4 粒細燈泡；0 環變中空環（內軌＋4 支幼輻條）。Mesh 26/32/23。
+- 絕對盲評 **20 / 28**（R6 24）。但 `fm-column`、`fh-arms`、`fh-drones` 嘅 code 冇改都跌咗分 → 單次評審有雜訊。
+- 盲 pairwise R6 vs R7（[結果](../../artifacts/nw-closeup-polish/r7/pair-r6-vs-r7.md)）：R7 較近目標 4 項（`fl-glazing`、`fm-hall`、`fm-arm`、`fm-rings`），R6 較近 2 項（`fl-forecourt` 琥珀邊喺 R7 crop 走咗、`fl-canopy`），其餘 8 項相同 → 保留 R7。
+- Opus 自己睇：夜景 −1／0 室內變灰白，暖光淡咗（退步）；日景室內同白殼對比低。
+- Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
+
 ## Next step
 
-R7（旗艦最後 4 項）：日景室內柔和暖光（降飽和、有玻璃反光／深度）、低廳屋頂懸挑明顯、遮篷發光器收細做獨立發光點、0 環做中空泊位環。之後 bay（judge 1 7/20），owner 校準 rubric 未做。
+- 評審方法：單次絕對分數有 ±1 雜訊；之後每輪加盲 pairwise（上輪 vs 今輪），或者 3 個評審取中位數。
+- R8：夜晚室內暖光返到 R6 水平（日夜分開 emissive）、日景室內暖啲但唔好飽和、`fl-forecourt` 琥珀邊返入 crop、遮篷發光器。之後 bay（judge 1 7/20），owner 校準 rubric 未做。
