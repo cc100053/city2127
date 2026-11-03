@@ -273,3 +273,13 @@ Base: Bay R1 (58d023b). Bay size, positions and camera stay. Judging now crops t
 ### Checks
 
 `npm test && npm run build && git diff --check`; root children ≤ 32 (R1: 30). Evidence `~/city2127-evidence/nw-closeup-polish/bay-r2/`: `bay-{low,mixed,high}.png` day 3200×1800 at the review pose, `-night` (hour 22), `district-{low,high}.png`, `vs-target.jpg` (3 rows × [bay-r2 | target], 1200×675 cells). Do not judge.
+
+## Bay R3 — lit room, crisp lens (last round before the 3-round report)
+
+Base: Bay R2 (4092b62). Same pose, captures, capture rectangles and judging (absolute + blind pairwise R2 vs R3). R2: 19/20 ([scores](bay-r2/scores.md), [pair](bay-r2/pair.md)). Not passed: `bl-canopy` (1) and `bl-glazing` (2, but the blind pairwise preferred R1's softer interior). Judges also called the R2 interiors "flat paint" and the column's blue window squares "toy-like". Change only the items below; every other item must stay as R2 (re-crop and compare with `bay-r2/`).
+
+- **Lit room, not paint** (`bl-glazing`, also the hybrid hall for `bm-hall`): the target room is lit — bright warm-white ceiling cove/strip lights, warm light pools on a paler floor, back wall graded from peach-amber low to warm cream high, counters and people reading as darker shapes against it. Replace the uniform orange with that gradient (vertex colour or 2–3 materials), between R1's peach and R2's orange in saturation; add the visible ceiling light strips. Night stays warm (`nightLit`).
+- **Crisp lens** (`bl-canopy`): the lens must read thick from the review camera — a visible white side band (rim thickness ≥ .8 pre-scale, centre ≥ 2.6) with the thin blue seam on that band, a slightly domed top. Emitters: 3–4 **crisp** pods: a small bright white-blue disc (pod body visible as a white housing) with a tight halo no wider than ~1.5× the pod, below the rim where the camera sees them; no wide soft bloom blobs. Stay inside capture [.25,.57,.63,.72].
+- **Column windows** (`bm-column`, low risk): replace the blue squares with white panel modules carrying small dark-glass windows with a thin blue edge; keep the spire, rings and seams.
+
+Checks/captures as R2 into `~/city2127-evidence/nw-closeup-polish/bay-r3/` (day ×3, night ×3, district low/high, `vs-target.jpg`). Do not judge.

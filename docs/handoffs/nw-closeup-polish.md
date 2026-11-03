@@ -1,10 +1,10 @@
 # nw-closeup-polish — NW 自動化旗艦＋district 載體，新 taste 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — 旗艦 owner 接受（R9 25/28）；bay R2 19/20（`bl-canopy` 1、`bl-glazing` pairwise 輸）
+- Status: IN_PROGRESS — 旗艦 owner 接受（R9 25/28）；bay 以 R2 為準（19/20），3 輪完，等 owner 決定
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
-- Last verified commit: R3 commit（test／build／diff-check PASS）
+- Last verified commit: Bay R2 `4092b62`（test／build／diff-check PASS）
 - Remote availability: `origin/feat/nw-closeup-polish`
 
 ## Session Git state
@@ -178,6 +178,12 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 - 仲未過：`bl-canopy` 1（鏡片薄似平板、發光器係朦朧光暈唔係清楚嘅 pod）；`bl-glazing` 2 但 pairwise 輸（橙色似平塗油，唔似光；R1 較近）。評審亦話 `bm-hall` 橙色平、`bm-column` 藍方塊窗似玩具（勉強 2）。
 - Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
 
+## Bay R3（唔保留）
+
+- [Spec](../../artifacts/nw-closeup-polish/spec.md#bay-r3--lit-room-crisp-lens-last-round-before-the-3-round-report)：漸變暖房＋天花燈條、厚鏡片＋清楚 pod、柱窗改白板深色窗。
+- 絕對 **17 / 20**；pairwise R2 vs R3：R3 贏 `bm-hall`、`bm-column`，輸 `bl-canopy`（pod 冇光）、`bl-material`（啡色櫃檯似米色塊）→ 2:2，**唔保留**，code 退返 R2（patch 留喺 evidence `bay-r3/r3.patch`）。`bm-arm` code 冇改都 2→1 ＝評審雜訊。[scores](../../artifacts/nw-closeup-polish/bay-r3/scores.md)、[pair](../../artifacts/nw-closeup-polish/bay-r3/pair.md)。
+- 3 輪完（skill：停低報分）。Bay 最佳＝R2 19/20：未過 `bl-canopy`（1）；`bl-glazing` 2 但 pairwise 輸 R1。
+
 ## Next step
 
-Bay（`AutomationDistrict`，rubric `bl-*`／`bm-*`／`bh-*`，judge 1 7/20）：跟 closeup-polish skill（rubric → spec → Sonnet round → 絕對＋pairwise 盲評）。
+Owner：接受 bay R2 分數，或者指定下一輪（`bl-canopy` 發光器、`bl-glazing` 暖房）。之後 skill step 8（FPS、文件同步、merge）。
