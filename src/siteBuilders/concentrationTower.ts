@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { arc, bake, box, cream, faces, glass, leaf, leafyCrown, paint, shrubs, pink, sign, stone, trim, type Kit } from '../cityRig.ts';
+import { arc, bake, box, cream, faces, glass, leaf, leafyCrown, paint, shrubs, pink, sign, stone, trim, warm, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import { ConcentrationDistrict, METER_COLORS } from '../districtMeters.ts';
 import type { Band } from '../surveyView.ts';
@@ -12,8 +12,6 @@ const smoothstep = (t: number) => t * t * (3 - 2 * t);
 // Emissive and instance-colour-free, so the Meter amber reads day and night (publicLight x instance colour went white after dark).
 export const amber = new T.MeshStandardMaterial({ color: METER_COLORS.urbanConcentration, emissive: METER_COLORS.urbanConcentration, emissiveIntensity: .9, roughness: .5 });
 const timber = paint('#c99258', .62);
-// Warm interior backing: the lit-room read that glass (it mirrors the sky blue) cannot give.
-export const warm = new T.MeshStandardMaterial({ color: '#f3cf98', emissive: '#ffb45a', emissiveIntensity: .35, roughness: .7 });
 const unitBox = new T.BoxGeometry(1, 1, 1);
 const vaultGeometry = new T.CylinderGeometry(1, 1, 1, 20, 1, false, 0, Math.PI).rotateZ(Math.PI / 2);
 const crownGeometry = leafyCrown(1);

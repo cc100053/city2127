@@ -301,7 +301,7 @@ console.log('Odaiba: pods ride the guideway deck, walkers keep to open ground ou
 console.log('Odaiba: survey sites sit on open ground, clear of roads, landmarks and guideway, and are visible from the hero pose.');
 console.log('Odaiba: eight GLBs match Phase 03D world bounds within 2 mm, grounded, unit scale, legacy axis verified.');
 
-// P2 raised service pavilions: terraces clear existing context/trees; piers land off roads and routes remain unobstructed.
+// P2 service pavilions: the 38 x 34 m terrace sample grid clears existing context/trees; the hall footprint stands on open ground and routes remain unobstructed.
 const serviceDistrict = new AutomationDistrict(new Group());
 serviceDistrict.setTarget(rungs({ nw: -3 }), 0, true);
 serviceDistrict.root.updateMatrixWorld(true);
@@ -312,11 +312,12 @@ for (const bay of serviceDistrict.bays) {
     const p = at(x, z), hit = groundAt(p.x, p.z);
     assert.ok(hit && hit.point.y < 18, `service terrace obstructed by ${hit?.object.name} at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
   }
-  for (const x of [-16, 16]) for (const z of [-12, 12]) {
+  // The ground-level hall and plinth (24 x 18 m, canopy above) stand on open ground: corners, edge midpoints and centre.
+  for (const x of [-12, 0, 12]) for (const z of [-9, 0, 9]) {
     const p = at(x, z), hit = groundAt(p.x, p.z, 18);
-    assert.ok(hit && (openGround.test(hit.object.name) || /canopy/.test(hit.object.name)), `service pier on ${hit?.object.name} at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
+    assert.ok(hit && (openGround.test(hit.object.name) || /canopy/.test(hit.object.name)), `service pavilion on ${hit?.object.name} at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
     const foot = groundAt(p.x, p.z, 3);
-    assert.ok(foot && openGround.test(foot.object.name), `service pier foot on ${foot?.object.name}`);
+    assert.ok(foot && openGround.test(foot.object.name), `service pavilion foot on ${foot?.object.name}`);
   }
 }
 for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
@@ -326,7 +327,7 @@ for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promen
     assert.equal(ray.intersectObject(serviceDistrict.root, true).length, 0, 'service pavilions block pod/walker route');
   }
 }
-console.log(`Odaiba: ${serviceDistrict.bays.length} raised staffed pavilions clear context and actor routes; piers land on open ground.`);
+console.log(`Odaiba: ${serviceDistrict.bays.length} staffed pavilions clear context and actor routes; their footprints stand on open ground.`);
 
 // Both water-room identities preserve boat beams, promenade lanes and the landward entrance.
 const sharingDistrict = new SharingDistrict(new Group());

@@ -13,6 +13,8 @@ export const futureLight=new T.MeshStandardMaterial({color:'#8ce5d8',emissive:'#
 export const publicLight=new T.MeshStandardMaterial({color:'#ecf4ed',emissive:'#dcebe6',emissiveIntensity:.15,roughness:.6});
 // Blue light trails: saturated and above the bloom threshold in daylight, so the 2127 network reads as lit blue lines (not white trim) from the hero pose.
 export const trail = new T.MeshBasicMaterial({ color: new T.Color('#4da3ff').multiplyScalar(4) });
+// Warm interior backing: the lit-room read that glass (it mirrors the sky blue) cannot give. Shared by the SE tower, the NW hub and the bays.
+export const warm=new T.MeshStandardMaterial({color:'#f3cf98',emissive:'#ffb45a',emissiveIntensity:.35,roughness:.7});
 export const solar=paint('#486b83',.3,.85);
 export const membrane=new T.MeshStandardMaterial({color:'#9abdb9',roughness:.3,metalness:.25,transparent:true,opacity:.72,side:T.DoubleSide});
 // Pilot finishes (docs/ART.md): silvered glass that reads the sky, living green, pale stone paving.

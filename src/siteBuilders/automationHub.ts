@@ -1,12 +1,12 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { AutomationDistrict, METER_COLORS } from '../districtMeters.ts';
-import { arc, bake, box, cream, futureLight, trim, type Kit } from '../cityRig.ts';
+import { AutomationDistrict, automationBlue } from '../districtMeters.ts';
+import { arc, bake, box, cream, futureLight, trim, warm, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import type { SiteAssetLoaderCache } from '../siteAssets/assetLoader.ts';
 import type { Band } from '../surveyView.ts';
 import { conversationPose, pedestrians, serviceDrones, servicePose } from '../mobility.ts';
-import { slat, tree, warm } from './concentrationTower.ts';
+import { slat, tree } from './concentrationTower.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, prefersReducedMotion, SITE_TRANSITION_SECONDS, type BuiltSite } from './siteRuntime.ts';
 
 const HIDDEN = 1e-3;
@@ -14,8 +14,6 @@ const PT = 1.2; // plinth top: every state group stands on it
 const DRONE = .7 / 3; // parked drone ~2.8 m across (the district mesh is 4 m at scale 1)
 const smoothstep = (value: number) => value * value * (3 - 2 * value);
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
-// Emissive and instance-colour-free, so the Meter blue reads day and night (the only saturated accent of the hub).
-export const automationBlue = new T.MeshStandardMaterial({ color: METER_COLORS.automation, emissive: METER_COLORS.automation, emissiveIntensity: .9, roughness: .5 });
 const beam = new T.MeshBasicMaterial({ color: '#9fe8ff', transparent: true, opacity: .2, blending: T.AdditiveBlending, depthWrite: false });
 // Honest port count per band (the Meter maps 0 / 3 / 6): how many service points are self-service in that state, and how many are staffed.
 const PORTS: Record<Band, number> = { low: 0, mixed: 3, high: 6 };
@@ -47,9 +45,10 @@ type Part = { readonly band: Band; readonly at: number; readonly span: number; r
 /** A resident of a state, in stage coordinates (stage +Z is the camera-facing front). `use` walks to a self-service terminal and back. */
 type Actor = { x: number; z: number; yaw: number; seated?: boolean; talk?: [number, number, number]; use?: { to: [number, number]; yaw: number } };
 
-function createAutomationHubRuntime(parts: Part[], lead: Record<Band, Part>, frame: (now: number) => void): AutomationHubRuntime {
+function createAutomationHubRuntime(parts: Part[], lead: Record<Band, Part>, frame: (now: number) => void, legacyBand: () => Band): AutomationHubRuntime {
   let target: AutomationHubTarget = { band: 'mixed', automatedPorts: 3 };
   let applied = false;
+  let exhibition = false; // legacy v1 never calls setTarget: its tall variant shows hubUpper, which then means the high spire
   let active = false;
   let start = 0;
   const write = () => { for (const part of parts) part.apply(part.level); };
@@ -68,6 +67,7 @@ function createAutomationHubRuntime(parts: Part[], lead: Record<Band, Part>, fra
       const changed = !applied || next.band !== target.band || next.automatedPorts !== target.automatedPorts;
       target = next;
       applied = true;
+      exhibition = true;
       if (!changed && !immediate) return false;
       retarget(next.band);
       start = now;
@@ -76,6 +76,7 @@ function createAutomationHubRuntime(parts: Part[], lead: Record<Band, Part>, fra
       return changed;
     },
     update(now) {
+      if (!exhibition && lead[legacyBand()].level < 1) settle(legacyBand());
       if (active) {
         const raw = clamp01((now - start) / SITE_TRANSITION_SECONDS);
         // Floors stack up bottom-first while a state builds and come down top-first, each over `span` of the 3 s.
@@ -91,6 +92,7 @@ function createAutomationHubRuntime(parts: Part[], lead: Record<Band, Part>, fra
     restoreLegacy() {
       target = { band: 'mixed', automatedPorts: 3 };
       applied = false;
+      exhibition = false;
       settle('mixed');
     },
     getDiagnostics() {
@@ -500,7 +502,7 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
     crowd.flush();
   };
 
-  const automationHub = createAutomationHubRuntime(parts, lead, frame);
+  const automationHub = createAutomationHubRuntime(parts, lead, frame, () => hubUpperLayer.group.visible ? 'high' : 'mixed');
   const automationDistrict = new AutomationDistrict(scene);
   // The hub's upper layer is procedural and empty: the spire lives in the three state groups the runtime shows per band.
   return { id: 'magnetEast', root, layers: { hubBase: hubBaseLayer, hubUpper: hubUpperLayer, hubNeutralProps: neutralPropsLayer }, marker: createGuestMarker(root, 'nw'), automationHub, automationDistrict };

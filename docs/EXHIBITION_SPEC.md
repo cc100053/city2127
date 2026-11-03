@@ -76,7 +76,7 @@ E4後automation／publicSharing／urbanConcentration每軸每份提案只有一�
 
 P10 配對要兩個 site 同一邊都到 ±3。環境軸 E4 後凍結喺 mixed，所以 sails／冷卻塔／屋頂／外牆唔做格（舊氣候 run 照用同一 ladder）。每個 district 第一次到 ±2 時固定該軸 `slotSeeds`（之前為 0），之後各格 slot 互相包含，唔會每票重排。
 
-Headline 近鏡 G7（2026-10-31，已 merge main，視覺及性能未驗收）：近鏡現有 78 個固定 shot（2026-11-01 加 `se:focal-low`：SE focal 變化涉及 low 時用較近、較低嘅鏡頭）（含 NW／SW／SE 的 64 個手寫 viewpoint 及 `nw:street`）。district 變化（±2／±3）時，district 把本次變動 slot 的座標與 ID 交給鏡頭（`CarrierChange.points`），揀覆蓋最多變動 slot 的 viewpoint，打和揀最久未用；±1 保持 focal，能源保持能源 shot，無 points 回退 `*:district`。細節見 [PROJECT](PROJECT.md)。
+Headline 近鏡 G7（2026-10-31，已 merge main，視覺及性能未驗收）：近鏡現有 79 個固定 shot（2026-11-01 加 `se:focal-low`、2026-11-03 加 `nw:focal-low`：SE／NW focal 變化涉及 low 時用較近、較低嘅鏡頭）（含 NW／SW／SE 的 64 個手寫 viewpoint 及 `nw:street`）。district 變化（±2／±3）時，district 把本次變動 slot 的座標與 ID 交給鏡頭（`CarrierChange.points`），揀覆蓋最多變動 slot 的 viewpoint，打和揀最久未用；±1 保持 focal，能源保持能源 shot，無 points 回退 `*:district`。細節見 [PROJECT](PROJECT.md)。
 
 Live headline（[pickHeadline](../survey/src/shared/cityView.ts)）：先揀向今位訪客投票方向移動的 site（中間票向 0），其次揀該訪客選的能源部件有變的情況；否則沿用新到達最高格、載體變化最多、能源的次序。能源部件同時變動時，鏡頭與結果卡跟所選部件；只有 headline site 有亮 pulse／marker 同結果卡，其他變化（例如同時嘅能源門檻）靜靜過渡。
 

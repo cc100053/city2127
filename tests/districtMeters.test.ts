@@ -302,12 +302,12 @@ console.log(`PASS: concentration district — ${concentration.towers.length} tow
   assert.deepEqual(band('high'), [0, 0, 0, 0], 'no hybrids at high');
   const mixedHybrids = band('mixed');
   assert.ok(mixedHybrids.every(n => n > 0), `every Meter shows hybrids at mixed (${mixedHybrids})`);
-  // A hybrid automation bay draws its autonomous design at full size over a 60 % staffed kiosk (full hall where the bay stays staffed).
+  // A hybrid automation bay draws its service column at full size over a 60 % staffed pavilion (full hall where the bay stays staffed).
   const staffing = a as unknown as { hybrid: SlotLevels; staffed: SlotLevels };
   const i = staffing.hybrid.value.findIndex((h, k) => h === 1 && staffing.staffed.value[k] === 0);
   const full = (name: string, slot: number, y = 1) => (a.root.children.concat(c.root.children).filter(o => o.name === name) as T.InstancedMesh[])
     .some(mesh => slot < mesh.count && (mesh.getMatrixAt(slot, matrix), Math.abs(new T.Vector3().setFromMatrixScale(matrix).y - y) < 1e-4));
-  assert.ok(i >= 0 && full('automation-staffed-pavilions', i, .6) && full('automation-drone-ports', i), 'hybrid bay composes staffed kiosk and autonomous deck');
+  assert.ok(i >= 0 && full('automation-staffed-pavilions', i, .6) && full('automation-hybrid-columns', i), 'hybrid bay composes the 60 % pavilion and its service column');
   // A mid-rise (hybrid site without a full tower) stands at 45 % of its tower height in its family batch.
   const levels = c as unknown as { midRise: SlotLevels; towerLevels: SlotLevels };
   const m = c.towers.findIndex((_, k) => levels.midRise.value[k] === 1 && levels.towerLevels.value[k] === 0);

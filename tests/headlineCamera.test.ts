@@ -17,7 +17,9 @@ const proposal: ExhibitionProposal = { id:'p',runId:'r',guestSessionId:'g',ordin
 assert.equal(headlineShot(undefined), null);
 assert.equal(headlineShot({ socketId:'se',focal:true,district:false,low:true }), 'se:focal-low');
 assert.equal(headlineShot({ socketId:'se',focal:true,district:false }), 'se:focal');
-assert.equal(headlineShot({ socketId:'nw',focal:true,district:false,low:true }), 'nw:focal', 'no pushed-in shot for other sites');
+assert.equal(headlineShot({ socketId:'nw',focal:true,district:false,low:true }), 'nw:focal-low');
+assert.equal(headlineShot({ socketId:'nw',focal:true,district:false }), 'nw:focal');
+for (const socketId of ['ne','sw'] as const) assert.equal(headlineShot({ socketId,focal:true,district:false,low:true }), `${socketId}:focal`, 'no pushed-in shot for other sites');
 assert.equal(headlineShot({ socketId:'se',focal:true,district:true,low:true }), 'se:district');
 for (const socketId of ['nw', 'ne', 'sw', 'se'] as const) {
   assert.equal(headlineShot({ socketId, focal:true,district:false }), `${socketId}:focal`);
@@ -53,7 +55,7 @@ assert.equal(reasonDelayMs(DISPLAY_MS,true),0);
 assert.equal(reasonDelayMs(DISPLAY_MS-101,false),0);
 assert.equal(shotStage(3),'fly-in','the flight starts after the vote journey');
 assert.deepEqual([0,t.flyIn,t.hold,t.flyOut,t.done].map(elapsed=>shotStage(elapsed)),['journey','fly-in','hold','fly-out','done']);
-assert.equal(Object.keys(SHOTS).length,78);
+assert.equal(Object.keys(SHOTS).length,79);
 for (const [id, pose] of Object.entries(SHOTS)) {
   const p=new Vector3(...pose.position),target=new Vector3(...pose.target);
   assert.ok(p.y>target.y);assert.ok(p.distanceTo(target)>=40&&p.distanceTo(target)<=450);

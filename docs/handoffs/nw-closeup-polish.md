@@ -1,7 +1,7 @@
 # nw-closeup-polish — NW 自動化旗艦＋district 載體，新 taste 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: PLANNED — 等 owner 揀 Gemini 目標圖
+- Status: IN_PROGRESS — R1／R1b／R2 實作完，等 owner 睇圖
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
 - Last verified commit: 未有（未改 code）
@@ -44,3 +44,36 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 
 1. Gemini 目標圖（6 張：旗艦 −1/0/+1、bay −1/0/+1），prompt 見 [prompts.md](../../artifacts/nw-closeup-polish/prompts.md)；candidate 放 evidence `gen/`。
 2. Owner 揀 → `artifacts/nw-closeup-polish/target/` → spec.md → Sonnet rounds。
+
+## 目標圖（owner 2026-11-03）
+
+- 旗艦：揀咗 Gemini 第一輪上排 → `artifacts/nw-closeup-polish/target/flagship-{low,mixed,high}.jpg`。
+- Bay：第一輪唔採用；第二輪跟旗艦語言（上傳旗艦目標做參考）→ `target/bay-{low,mixed,high}.jpg`。
+- Spec：[spec.md](../../artifacts/nw-closeup-polish/spec.md)（R1 旗艦、R2 bay）。
+
+## R1（e334311）旗艦
+
+- `automationHub.ts` 重寫：−1 開放服務廳＋懸浮遮篷碟（藍邊、4 個發光器、bob ±.08）；0 細廳＋72 m 泊位柱（3 環）＋屋頂機械臂；+1 108 m 自律環塔（14 環 instanced、7 支服務臂、15 架無人機流、磁浮艙口、自助終端）。環由下而上逐層疊、拆時由上而下；換狀態時人先收埋。
+- 新 emissive `automationBlue`（`METER_COLORS.automation`）；`hubUpper` 改 procedural（GLB 檔同 catalog 保留）。`nw:focal` → `[212,64,-342]`→`[40,62,-300]`（東面，背景海＋天；`p.y > target.y` test 要求鏡頭高過目標）。
+- Site visible meshes low/mixed/high 20/24/21（之前 28/28/33）。
+- [R1 對目標](../../artifacts/nw-closeup-polish/r1/vs-target.jpg)。Opus：外形對到目標，+1 最似；−1 只佔畫面約 13%。
+
+## R1b＋R2（本 commit）
+
+- 新 `nw:focal-low` `[88,16,-322]`→`[38,13,-300]`（約 55 m）；−1 廳＋遮篷佔畫面約 36%。[R1b 對目標](../../artifacts/nw-closeup-polish/r1b/vs-target.jpg)。
+- `serviceDrones` 機身改白（全城服務無人機一齊變）。Legacy v1 `automation-tall` 顯示高塔。
+- R2 `AutomationDistrict`：staffed = 地面 22×9×15 m 玻璃服務亭＋懸浮遮篷碟（圓／長兩款）；hybrid = 60% 亭＋40 m 三環柱（新 instanced `automation-hybrid-columns`）；autonomous = 45 m 白色環塔（8 環）／34 m 塔＋懸浮降落碟，塔腳藍光取件櫃。舊 `solar` 深藍桅、圓頂、glass 人取消；`PORT_DECK` 刪除（冇人 import）。西面 plaza bay (−200,80)→(−196,85) 避 guideway。Instanced children 23→22。
+- `warm` 搬去 `cityRig.ts`；`automationBlue` 由 `districtMeters.ts` export。
+- [R2 對目標](../../artifacts/nw-closeup-polish/r2/vs-target.jpg)。Opus：外形同語言對到目標；bay 係真實米數，喺 review pose（約 110 m）細過目標圖（約 15% vs 35%），district 鏡頭下人同機械臂好細。
+- Test 改動：`automationHub.test.ts` 重寫（保留 plinth、retarget、snapshot、人有承托／唔穿模；新增環序、mesh budget、reduced motion）；`headlineCamera.test.ts`（NW 有 focal-low，NE／SW 冇；79 shots）；`changeCatalog`／`cityChangeManager`（hubUpper procedural）；`districtMeters.test.ts`（hybrid column）；`odaiba.test.ts`（pier → 24×18 m footprint 落喺空地）。冇刪除 route-blocking test。
+
+## Actual validation results
+
+- Verification status: PARTIAL
+- 2026-11-03 Opus 重跑（R1b＋R2 工作樹）：`npm test` exit 0（fail 0）、`npm run build` ✓、`git diff --check` clean。survey／module-swap 冇改。
+- 截圖：headless Chrome via `playwright-cli`，1600×900，12:00／22:00；原始證據 `~/city2127-evidence/nw-closeup-polish/r1|r1b|r2/`。
+- 未做：FPS、owner 驗收、bay 喺 district headline 鏡頭下嘅可讀性、夜景室內暖光偏弱。
+
+## Next step
+
+Owner 睇 R1b／R2 → 決定 bay 係咪要放大（或者接受真實米數）→ R3 → FPS → merge。

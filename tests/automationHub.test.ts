@@ -53,6 +53,15 @@ runtime.setTarget({ band: 'high', automatedPorts: 6 }, 7, true);
 runtime.restoreLegacy();
 assert.equal(runtime.getDiagnostics().targetAutomatedPorts, 3);
 assert.equal(runtime.getDiagnostics().visibleHumanCounters, 3, 'legacy restore returns to the mixed 3/3 neutral');
+// Legacy v1 'tall' shows hubUpper without any Meter target: that means the high spire.
+runtime.restoreLegacy();
+site.layers.hubUpper!.group.visible = true;
+runtime.update(8);
+assert.equal(level(state('high')), 1, 'legacy tall shows the spire');
+site.layers.hubUpper!.group.visible = false;
+runtime.update(9);
+assert.equal(level(state('high')), 0);
+assert.equal(level(hall.mixed), 1, 'legacy medium returns to the mixed hub');
 // A newer result may replace a future transition before it starts.
 runtime.setTarget({ band: 'low', automatedPorts: 0 }, 10, true);
 runtime.setTarget({ band: 'high', automatedPorts: 6 }, 15.12, false, 10);
