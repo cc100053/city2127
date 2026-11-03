@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS — R1／R1b／R2 實作完，等 owner 睇圖
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
-- Last verified commit: `f120ccb`（R1b＋R2；test／build／diff-check PASS）
+- Last verified commit: R3 commit（test／build／diff-check PASS）
 - Remote availability: `origin/feat/nw-closeup-polish`
 
 ## Session Git state
@@ -74,6 +74,15 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 - 截圖：headless Chrome via `playwright-cli`，1600×900，12:00／22:00；原始證據 `~/city2127-evidence/nw-closeup-polish/r1|r1b|r2/`。
 - 未做：FPS、owner 驗收、bay 喺 district headline 鏡頭下嘅可讀性、夜景室內暖光偏弱。
 
+## R3（owner：「放大到目標圖咁大」）
+
+- `BAY_SCALE = 2`（instance matrix 放大，幾何仍係 R2 米數；人保持 1×）。`nw:bay-e` 下服務廳佔畫面約 32%（目標約 35%）。
+- 位置（world x,z）：bay1 (−340.5,−31.6)→(−321,−39)；bay2 (−383.8,−4) 不變但 1.6×（2× 搵唔到空位，下限 1.5×）；bay3 (−196,85)→(−184,92)；bay4 (−130,170) 不變；bay5 (75,−160)→(75,−166)；bay6 (−438,45)→(−440.5,41.9)。
+- **舊 bug 修正**：P1／polish2 剔走巨構範圍同 hero apron 嘅 bay 之後，只剩 6 個 bay，但 `SHOTS`／`VIEWPOINT_COVERAGE` 仲用舊 11 個 bay 編號，所以 `nw:bay1` 等鏡頭對住空地。而家 NW bay shot 跟現存 bay index 重排（74 shots，59 個 district viewpoint）；bay1／bay2 兩個鏡頭都影到兩個 bay（已截圖確認），保留配對。`headlineCamera.test.ts` 改為由 `AutomationDistrict.bays.length` 計 bay 數，唔再寫死 11。
+- Test：`odaiba.test.ts` 淨空抽樣擴大到 2× footprint（plinth 四角要落空地）；`districtMeters.test.ts` 按每個 bay 嘅 scale 驗，新增 scale 1.5–2× 範圍。
+- [R3 對目標](../../artifacts/nw-closeup-polish/r3/vs-target.jpg)。Opus：大細同目標一致；hero 入面 bay 喺兩邊，冇搶中間。弱點：`nw:bay-e` 下 +1 塔頂出鏡（約 100 m）；bay3 鏡頭被酒店階梯樓擋；2× 廳入面啲人顯得好細；bay2 細過其他。
+- 驗證（Opus 2026-11-03）：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
+
 ## Next step
 
-Owner 睇 R1b／R2 → 決定 bay 係咪要放大（或者接受真實米數）→ R3 → FPS → merge。
+FPS 實測（hero＋NW 近鏡，vsync 1920×1080）→ owner 驗收 → merge main。

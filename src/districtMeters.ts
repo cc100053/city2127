@@ -819,6 +819,14 @@ const cylinder = (parent: T.Object3D, r0: number, r1: number, h: number, y: numb
 };
 /** Hall roof top above the bay's ground and the canopy's hover: the dock heights below follow them. */
 const HALL_ROOF = 10, CANOPY_Y = 14.1, HALL_Z = -.5;
+/** R3 (owner 2026-11-03): every bay design is built in R2 metres and scaled by this about its foot, so the bays read as large as the target images. People stay 1x. */
+export const BAY_SCALE = 2;
+/** Distance of a promenade bay's centre from its route: the 2x plinth (half depth 18 m) plus the route's 3 m walker guard. */
+const BAY_OFFSET = 22;
+/** Per-bay R3 placement found by searching the real city (tests/odaiba.test.ts footprint, terrace and route checks): bay 0 slides 20 m along its route and 6 m away from it;
+ * bay 1 only clears at 1.6x. Everything else keeps the shared 2x. */
+const BAY_ALONG_BACK: Record<number, readonly [number, number]> = { 0: [-20, 6] };
+const BAY_SCALE_OVERRIDES: Record<number, number> = { 1: 1.6 };
 /** Elongated canopy depth factor: .65 keeps its rim 3 m clear of the 14 m deck that crosses bay 3 (the spec's .8 reached it). */
 const CANOPY_SQUEEZE = .65;
 /** Q1: staffed waterfront pavilions give way to autonomous ring towers on the same bays, with denser district circulation.
@@ -827,6 +835,8 @@ export class AutomationDistrict {
   changedPoints: ChangedPoint[] = [];
   readonly root = new T.Group();
   readonly bays: { x: number; y: number; z: number; yaw: number }[] = [];
+  /** Per-bay scale: BAY_SCALE unless that bay's footprint only clears the city smaller (never below 1.5). */
+  readonly scales: number[] = [];
   private readonly automation = new SlotLevels(1);
   private readonly staffed: SlotLevels;
   /** P9: hybrid bays at mixed show both designs composed — a smaller (60 %) staffed pavilion under a service column. */
@@ -852,17 +862,19 @@ export class AutomationDistrict {
       const n = Math.floor(path.getLength() / 40);
       for (let i = 1; i < n; i++) {
         const p = path.getPointAt(i / n), t = path.getTangentAt(i / n), yaw = Math.atan2(-t.z, t.x);
-        p.x -= Math.sin(yaw) * 22; p.z -= Math.cos(yaw) * 22;
+        p.x -= Math.sin(yaw) * BAY_OFFSET; p.z -= Math.cos(yaw) * BAY_OFFSET;
         if (Object.values(changeSites).some(s => Math.abs(p.x - s.x) < s.w * s.scale / 2 + 24 && Math.abs(p.z - s.z) < s.d * s.scale / 2 + 24)) continue;
         if (p.x > -65 && p.x < -25) continue; // Existing north-west context block.
         if (inHeroClear(p.x, p.z)) continue; // polish2: the plaza deck's hero apron stays open
-        this.bays.push({ x: p.x, y: p.y, z: p.z, yaw });
+        const [along, back] = BAY_ALONG_BACK[this.bays.length] ?? [0, 0];
+        this.bays.push({ x: p.x + along * Math.cos(yaw) - back * Math.sin(yaw), y: p.y, z: p.z - along * Math.sin(yaw) - back * Math.cos(yaw), yaw });
       }
     }
-    // Traced open plazas at the mall approaches and western waterfront (actual-mesh checks in odaiba.test.ts). The western plaza sits 6 m off its old
-    // centre: the 14 m guideway deck cuts diagonally through it and the ground-level hall must stay 3 m clear of that route.
-    for (const [x, z, yaw] of [[20, 145, 0], [-196, 85, 0], [-130, 170, 0], [75, -160, 0], [-438, 45, -.9]])
+    // Traced open plazas at the mall approaches and western waterfront (actual-mesh checks in odaiba.test.ts), each re-searched in R3 for the 2x
+    // footprint (4-6 m moves). The second plaza sits 12 m off its old centre: a 14 m guideway deck cuts diagonally through it and the plinth must stay 3 m clear.
+    for (const [x, z, yaw] of [[20, 145, 0], [-184, 92, 0], [-130, 170, 0], [75, -166, 0], [-440.5, 41.9, -.9]])
       if (!inCivic(x, z, 33)) this.bays.push({ x, y: 0, z, yaw }); // polish2: the mall approach bay sits under the enlarged Fuji frame
+    this.scales = this.bays.map((_, i) => BAY_SCALE_OVERRIDES[i] ?? BAY_SCALE);
     this.staffed = new SlotLevels(this.bays.length);
     this.hybrid = new SlotLevels(this.bays.length);
     const instances = (group: T.Object3D, name: string) => bake(group).map(source => {
@@ -873,8 +885,9 @@ export class AutomationDistrict {
     const unit = new T.IcosahedronGeometry(1, 1);
     /** Low-poly resident (instance-free materials, baked with their group): capsule torso and a sphere head. */
     const person = (group: T.Object3D, x: number, y: number, z: number, body: T.Material, seated = false) => {
-      const torso = new T.Mesh(new T.CapsuleGeometry(.3, .6, 3, 6), body); torso.position.set(x, y + (seated ? .8 : 1.1), z);
-      const head = new T.Mesh(new T.SphereGeometry(.23, 8, 6), cream); head.position.set(x, y + (seated ? 1.45 : 1.75), z);
+      const k = 1 / BAY_SCALE; // the batch is scaled up with the architecture, so build residents at 1/BAY_SCALE: they stay 1.7 m tall
+      const torso = new T.Mesh(new T.CapsuleGeometry(.3 * k, .6 * k, 3, 6), body); torso.position.set(x, y + (seated ? .8 : 1.1) * k, z);
+      const head = new T.Mesh(new T.SphereGeometry(.23 * k, 8, 6), cream); head.position.set(x, y + (seated ? 1.45 : 1.75) * k, z);
       torso.castShadow = head.castShadow = true; group.add(torso, head);
     };
 
@@ -1049,10 +1062,11 @@ export class AutomationDistrict {
       // ponytail: one reserved vertical service column per bay, no inter-bay travel; add dispatch only if journeys are required.
       const { x, y, z, level } = this.dock(i);
       const c = Math.cos(bay.yaw), s = Math.sin(bay.yaw);
-      this.dummy.position.set(bay.x + x * c + z * s, bay.y + y + 24 * pavilionFlight(now, i), bay.z - x * s + z * c);
+      const k = this.scales[i];
+      this.dummy.position.set(bay.x + (x * c + z * s) * k, bay.y + y * k + 24 * pavilionFlight(now, i), bay.z + (-x * s + z * c) * k);
       this.dummy.rotation.set(0, bay.yaw, 0);
       // Fade through the carrier handover rather than teleport a visible drone to its other landing spot.
-      this.dummy.scale.setScalar(Math.max(HIDDEN, T.MathUtils.smoothstep(level, .98, 1)));
+      this.dummy.scale.setScalar(Math.max(HIDDEN, T.MathUtils.smoothstep(level, .98, 1)) * k);
       this.drones.set(i, this.dummy);
     }); this.drones.flush();
   }
@@ -1062,14 +1076,15 @@ export class AutomationDistrict {
     this.bays.forEach((bay, i) => {
       // The autonomous tower rises from its foot as the staffed hall folds away (same 3 s clock); hidden designs keep an invertible tiny scale.
       const s = this.staffed.value[i], h = this.hybrid.value[i], hall = Math.max(s, .6 * h);
-      const scale = (level: number, x = 1, z = 1) => this.dummy.scale.set(Math.max(HIDDEN, level) * x, Math.max(HIDDEN, level), Math.max(HIDDEN, level) * z);
+      const k = this.scales[i];
+      const scale = (level: number, x = 1, z = 1) => this.dummy.scale.set(Math.max(HIDDEN, level) * x * k, Math.max(HIDDEN, level) * k, Math.max(HIDDEN, level) * z * k);
       const place = (meshes: T.InstancedMesh[], y = 0) => {
         this.dummy.position.set(bay.x, bay.y + y, bay.z); this.dummy.rotation.set(0, bay.yaw, 0); this.dummy.updateMatrix();
         for (const mesh of meshes) mesh.setMatrixAt(i, this.dummy.matrix);
       };
       scale(hall); place(this.meshes);
       this.staffedDesign[i] ? scale(s * (1 - h), 1.35, CANOPY_SQUEEZE) : scale(s * (1 - h)); place(this.canopies);
-      scale(h); place(this.columns, HALL_ROOF * hall);
+      scale(h); place(this.columns, HALL_ROOF * hall * k);
       scale(this.autonomousDesign[i] ? 0 : (1 - s) * (1 - h)); place(this.ports);
       scale(this.autonomousDesign[i] ? (1 - s) * (1 - h) : 0); place(this.masts);
     });
