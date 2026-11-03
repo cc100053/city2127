@@ -1,5 +1,6 @@
 // Formal A acceptance: production scene, real scratch survey, fixed housing identity across recovery.
 import assert from 'node:assert/strict';
+import { evidenceDir } from '../scripts/evidence.mjs';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -7,7 +8,7 @@ import { pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
 import { createContext, createSurveyServer } from '../survey/src/server/server.ts';
 const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH ?? '/opt/homebrew/lib/node_modules/@playwright/cli/node_modules/playwright/index.mjs').href);
-const out = process.env.CITY2127_EVIDENCE_DIR ?? 'artifacts/housing-background/final';
+const out = process.env.CITY2127_EVIDENCE_DIR ?? evidenceDir('housing-background', 'final');
 assert.ok(!existsSync(join(out, 'browser.json')), 'Preserve prior evidence'); mkdirSync(out, { recursive: true });
 const base = process.env.CITY2127_CITY_URL ?? 'http://127.0.0.1:5189';
 const scratch = mkdtempSync(join(tmpdir(), 'housing-background-'));

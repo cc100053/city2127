@@ -1,5 +1,6 @@
 // P3 desktop timing/recovery check; fresh scratch SQLite, installed Chrome/Playwright, existing root preview.
 import assert from 'node:assert/strict';
+import { evidenceDir } from '../scripts/evidence.mjs';
 import { mkdtempSync, mkdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -8,7 +9,7 @@ import { createContext, createSurveyServer } from '../survey/src/server/server.t
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH).href);
 const directory = mkdtempSync(join(tmpdir(), 'resident-p3-browser-'));
-const evidence = process.env.CITY2127_EVIDENCE_DIR ?? 'artifacts';
+const evidence = process.env.CITY2127_EVIDENCE_DIR ?? evidenceDir('resident');
 mkdirSync(evidence, { recursive: true });
 const ctx = createContext({ dbPath: join(directory, 'survey.sqlite'),
   questionsPath: new URL('../survey/src/survey/questions.exhibition.json', import.meta.url).pathname });

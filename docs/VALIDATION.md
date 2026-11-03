@@ -34,6 +34,15 @@ CI uses Node 24, installs/tests/builds all three packages and checks committed w
 
 Documentation-only changes require local Markdown file/anchor checks, tracked-target checks, renamed-path/plain-text-reference checks, source fact checks and self-review of the complete diff. Check both working/staged diffs and `git diff --check origin/main...HEAD`. Rendering/tests/builds are not required for prose-only changes, and CI skips pushes that touch only `docs/**` or `*.md`. No source/asset change can be disguised as documentation-only.
 
+## Evidence storage
+
+Owner decision 2026-11-03: screenshots and round evidence are two layers.
+
+- **Evidence** (raw captures, rounds, crops, Gemini candidates, logs): outside Git in `$CITY2127_EVIDENCE_ROOT/<task>/`, default `~/city2127-evidence/`. Every worktree on one Mac shares that absolute path, so sessions hand evidence over without pushing it. Browser runners write there through `scripts/evidence.mjs`; `CITY2127_EVIDENCE_DIR` still overrides one run.
+- **Records** (owner targets, review boards, the captures a document links to): committed under `artifacts/<task>/` only through `node scripts/publish-evidence.mjs <task> <image>...`, which writes JPEG q85 at ≤ 2400 px width.
+- CI (`scripts/check-artifacts.sh`) fails when a push adds a PNG/video or a file over 4 MB to `artifacts/`; split or crop a larger board. Existing files are unaffected.
+- On 2026-11-03, 968 tracked captures (1.19 GB) that no document, skill, source or artifact page linked to moved to the evidence folder at the same relative path ([handoff](handoffs/artifacts-evidence-split.md)). Evidence exists only on the owner's Mac and its Time Machine backup; collaborators see records.
+
 ## Browser regression checks for the current prototype
 
 Start the services and use their printed ports as described in [README](../README.md). Use scratch SQLite for destructive reset/Undo checks; preserve the exhibition DB. Desktop only. Record actual viewport, browser/GPU/device, commit, hour/actor time and console/network results. Reuse project previews; do not kill unrelated processes.

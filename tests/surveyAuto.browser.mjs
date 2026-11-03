@@ -1,6 +1,7 @@
 // Optional browser acceptance: use an existing Playwright installation, not a new repo dependency.
 // Start survey `npm run dev:auto` and root Vite; this check requires a fresh scratch DB.
 import assert from 'node:assert/strict';
+import { evidenceDir } from '../scripts/evidence.mjs';
 import { pathToFileURL } from 'node:url';
 
 if (!process.env.CITY2127_PLAYWRIGHT_PATH) throw new Error('Set CITY2127_PLAYWRIGHT_PATH to the installed Playwright index.mjs');
@@ -47,8 +48,8 @@ try {
     assert.equal(view.guestCount, expectedCount);
     if (profile === 'low') assert.ok(Object.values(view.layout.bands).every(band => band === 'low'));
     assert.equal((await read('/api/admin/current-run')).lifecycle.phase, 'ready');
-    await city.screenshot({ path: `artifacts/survey-auto-${profile}-city.png` });
-    if (profile === 'high') await guest.screenshot({ path: 'artifacts/survey-auto-guest.png' });
+    await city.screenshot({ path: `${evidenceDir('survey-auto')}/survey-auto-${profile}-city.png` });
+    if (profile === 'high') await guest.screenshot({ path: `${evidenceDir('survey-auto')}/survey-auto-guest.png` });
     console.log(`PASS browser ${profile}: ${view.guestCount} proposals, matching actual model diagnostics`, JSON.stringify(view.layout));
   }
   // Stop during the real question flow: no submission and no inferred exit.

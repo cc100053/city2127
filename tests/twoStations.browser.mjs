@@ -1,5 +1,6 @@
 // Desktop acceptance with two isolated browser clients and a fresh scratch survey DB.
 import assert from 'node:assert/strict';
+import { evidenceDir } from '../scripts/evidence.mjs';
 import { pathToFileURL } from 'node:url';
 const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH).href);
 const survey = process.env.CITY2127_SURVEY_URL ?? 'http://127.0.0.1:8795';
@@ -79,8 +80,8 @@ try {
   const displays = await city.evaluate(() => window.stationDisplays);
   assert.deepEqual(displays.slice(0, 2).map(d => d.label), combined.recentProposals.map(p => `ステーション ${p.stationId} · 暮らしの声 #${p.ordinal}`));
   assert.ok(displays[1].at - displays[0].at >= 9950, `separate reading slots: ${displays[1].at - displays[0].at} ms`);
-  await a.screenshot({ path: 'artifacts/resident-p2-two-stations-a.png' }); await b.screenshot({ path: 'artifacts/resident-p2-two-stations-b.png' });
-  await city.screenshot({ path: 'artifacts/resident-p2-two-stations-city.png' });
+  await a.screenshot({ path: `${evidenceDir('resident')}/resident-p2-two-stations-a.png` }); await b.screenshot({ path: `${evidenceDir('resident')}/resident-p2-two-stations-b.png` });
+  await city.screenshot({ path: `${evidenceDir('resident')}/resident-p2-two-stations-city.png` });
   // Exercise next-start while the later station is still protected, whichever committed first.
   if (ownA.ordinal > ownB.ordinal) [a, b] = [b, a];
   const early = combined.recentProposals[0], late = combined.recentProposals[1];
@@ -120,7 +121,7 @@ try {
   assert.equal(await b.locator('#app').getAttribute('data-screen'), 'review');
   await b.locator('[data-auto-action=submit]').click(); await screen(b, 'result');
   await checkCity(await read('/api/city-view'));
-  await admin.screenshot({ path: 'artifacts/resident-p2-two-stations-admin.png' });
+  await admin.screenshot({ path: `${evidenceDir('resident')}/resident-p2-two-stations-admin.png` });
   await city.reload(); await checkCity(await read('/api/city-view'));
   assert.deepEqual(errors, []);
   console.log(`PASS browser: two isolated clients, simultaneous submit/lost-response reload counted once, own results, ${Math.round(displays[1].at - displays[0].at)} ms display order (${early.stationId} then ${late.stationId}), draft reload, independent next Guest, reset draining/admission/counts, targeted Admin cancellation and actual City/reload; no page exceptions.`);

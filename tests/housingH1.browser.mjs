@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
+import { evidenceDir } from '../scripts/evidence.mjs';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 
 const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH ?? '/opt/homebrew/lib/node_modules/@playwright/cli/node_modules/playwright/index.mjs').href);
-const out = process.env.CITY2127_EVIDENCE_DIR ?? 'artifacts/housing-city-h1b/new-run';
+const out = process.env.CITY2127_EVIDENCE_DIR ?? evidenceDir('housing-city-h1b', 'new-run');
 assert.ok(!existsSync(`${out}/browser.json`), 'Preserve previous evidence'); mkdirSync(out, { recursive: true });
 const base = process.env.CITY2127_CITY_URL ?? 'http://127.0.0.1:5188';
 const browser = await chromium.launch({ channel: 'chrome', headless: true });

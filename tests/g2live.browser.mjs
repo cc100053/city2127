@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { evidenceDir } from '../scripts/evidence.mjs';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { exhibitionFixture, CURRENT_EXHIBITION_QUESTIONS_PATH, ok, startServer } from '../survey/tests/surveyFixture.ts';
@@ -6,7 +7,7 @@ import { ENERGY_CHOICES, ENERGY_CHOICE_PART } from '../survey/src/shared/energy.
 import { createProposalSession, submitProposal } from '../survey/src/server/proposalService.ts';
 import { RESULT_LEASE_MS } from '../survey/src/shared/displayTiming.ts';
 const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH).href);
-const dir = process.env.CITY2127_EVIDENCE_DIR ?? 'artifacts/g2-live'; mkdirSync(dir, { recursive: true });
+const dir = process.env.CITY2127_EVIDENCE_DIR ?? evidenceDir('g2-live'); mkdirSync(dir, { recursive: true });
 const browser = await chromium.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true });
 const errors = [], observations = [];
 try {
