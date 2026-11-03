@@ -131,3 +131,32 @@ Lot and neighbours: the ×2 low plinth outgrows the 8×7 lot. Grow it toward ope
 ### Checks and captures
 
 `npm test && npm run build && git diff --check`. Report site visible meshes per state and the final low plinth footprint. Evidence `~/city2127-evidence/nw-closeup-polish/r4/`: `flagship-{low,mixed,high}.png` at 3200×1800 at the review pose (HUD hidden, same method as judge 1), plus `nw:focal`/`nw:focal-low` day captures per state to check the live headline shots still frame the site, and `vs-target.jpg` (3 rows × [r4 | target], 800×450). Publish only `vs-target.jpg` to `nw-closeup-polish/r4`. Do not judge; Opus runs the blind judge.
+
+## R5 — flagship detail to the rubric (owner 2026-11-03: 「開 R5」)
+
+Base: R4b (e368748). Same review pose and capture method as R4; lot stays 16×24 (no geometry growth). Aim at every flagship item below 2 in [r4/scores](r4/scores.md); `fm-column` and `fh-arms` (2) must not regress. Compare against the target crops in your captures, not against this text alone.
+
+### Low hall (`fl-*`)
+
+- **Interior depth** (`fl-glazing`, `fl-material`): the warm field is a flat opaque panel at the glass line. Replace with a room: glass plane (thin, slightly transparent or simply open between mullions) at the face, warm emissive **back wall set ≥ 3 units behind it**, warm ceiling strip, floor; counters stand inside between them so the room reads deep. The back wall is less saturated than now (warm white-peach, not orange) and partly covered by counters/screens so it is not one flat field.
+- **Overhang** (`fl-glazing`): roof slab projects ≥ 1.2 pre-scale units past the glazing on the camera side, with a visible shadow band under it.
+- **People inside** (`fl-people-in`): ≥ 6 readable — staff standing behind counters facing out, residents seated across facing in; counters are low desks with cool screens, set back from the glass.
+- **Forecourt** (`fl-forecourt`): 2–3 small trees and 3 benches inside the forecourt (not only at its edges); residents in 3–4 tight groups (2–4 people each, facing each other); the amber outline stays visible along the forecourt edge.
+- **Canopy** (`fl-canopy`): blue rim seam thin (≈ ⅓ current tube), 4 under-emitter **pads** (bright flat discs with a soft glow disc) instead of light cones.
+
+### Mixed (`fm-*`)
+
+- `fm-hall`: same room treatment as low; one side a staffed counter with ≥ 3 people (staff + residents), other side ≥ 2 glowing kiosks with a resident each.
+- `fm-arm`: parcel larger (≈ 2× now) in an amber/orange-cream colour that reads against white; gripper visible.
+- `fm-rings`: rings get docking detail — a flat deck on top, small bay notches/pads, drones sitting in them (≥ 2 per ring visible from the pose).
+
+### High (`fh-*`)
+
+- `fh-rings`: blue seams thin (≈ ⅓ current), panelled core between rings (vertical panel lines + small windows), like `fm-column`.
+- `fh-drones`: ≥ 10 small quad-rotor drones readable in streams near the upper tower at the review pose (scale them so a drone is ≈ 0.4–0.6 % of frame width); no glowing blobs.
+- `fh-base`: the pod sits on a visible maglev track (two rails or a guide beam) running out of the portal across the plaza; keep terminals, residents, outline.
+- `fh-cap`: antennas and 3–4 lit windows inside the frame at the review pose (cap windows at y ≈ .05–.12); trim the core top slightly if needed, keeping ring widths.
+
+### Checks and captures
+
+`npm test && npm run build && git diff --check`; mesh budgets hold. Evidence `~/city2127-evidence/nw-closeup-polish/r5/`: `flagship-{low,mixed,high}.png` at 3200×1800 at the review pose, `nw:focal`/`nw:focal-low` 1600×900 per band, one night capture (hour 22) of low and high at the review pose, `vs-target.jpg` → publish to `nw-closeup-polish/r5`. Do not judge.
