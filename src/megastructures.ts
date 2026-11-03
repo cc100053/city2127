@@ -24,6 +24,20 @@ megaGlass.onBeforeCompile = shader => {
     totalEmissiveRadiance += vec3(1., .58, .24) * roomGlow * .74 * step(.4, fract(sin(dot(floor(vec2((megaP.x + megaP.z) / 6., megaP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453));`);
 };
 megaGlass.customProgramCacheKey = () => 'mega-glass';
+// polish2: the hoop's two faces are its facade — white frame, 3 m × 4.2 m storey windows (pale blue-grey glass by day), ~65% occupied rooms lit warm at night.
+const megaFace = megaShell.clone();
+megaFace.onBeforeCompile = shader => {
+  shader.uniforms.roomGlow = roomGlow;
+  shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 megaP;').replace('#include <project_vertex>', '#include <project_vertex>\nmegaP = (modelMatrix * vec4(transformed, 1.)).xyz;');
+  shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float roomGlow;\nvarying vec3 megaP;')
+    .replace('#include <color_fragment>', `#include <color_fragment>
+    vec2 faceCell = vec2(dot(megaP.xz, vec2(${Math.cos(RING.yaw).toFixed(4)}, ${(-Math.sin(RING.yaw)).toFixed(4)})) / 3., megaP.y / 4.2), faceF = fract(faceCell);
+    float faceWin = step(.16, faceF.x) * step(faceF.x, .84) * step(.24, faceF.y) * step(faceF.y, .9);
+    diffuseColor.rgb = mix(diffuseColor.rgb, mix(vec3(.6, .68, .74), vec3(.2, .22, .26), roomGlow), faceWin * .8); // dark panes at night, so lit rooms stay amber`)
+    .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+    totalEmissiveRadiance += vec3(1., .55, .2) * roomGlow * .8 * faceWin * step(.35, fract(sin(dot(floor(faceCell), vec2(12.9898, 78.233))) * 43758.5453));`);
+};
+megaFace.customProgramCacheKey = () => 'mega-face';
 const megaJoint = new T.MeshStandardMaterial({ color: '#4b5258', roughness: .6, metalness: .3 });
 export const updateMegastructures = (night: number) => { megaSeam.emissiveIntensity = .6 + night * 1.6; roomGlow.value = night; };
 
@@ -62,7 +76,7 @@ function ring(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
   add(megaShell, L(outer, depth));
   for (const s of [1, -1]) {
     const q = new T.Matrix4().makeRotationY(s > 0 ? 0 : Math.PI);
-    add(megaShell, new T.RingGeometry(inner, outer, 96), q.clone().setPosition(0, 0, s * half));
+    add(megaFace, new T.RingGeometry(inner, outer, 96), q.clone().setPosition(0, 0, s * half));
     add(megaSeam, new T.RingGeometry(inner, inner + 1.6, 96), q.clone().setPosition(0, 0, s * (half + .8)));
     add(megaSeam, L(outer + .15, 1.2), new T.Matrix4().makeTranslation(0, 0, s * (half - 1.4))); // two light bands along the outer edges
   }
@@ -157,11 +171,13 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
   for (let k = 0; k < steps; k++) {
     const y0 = k * step, f = front(k, 0), u0 = left(k);
     slab(k, y0, 1.2, 1.6, megaSeam); // glowing lip at the foot of each face
-    slab(k, y0 + 1.2, 5, 1.2, megaShell); // 5 m solid white slab
-    slab(k, y0 + 6.2, step - 6.2, 0, megaGlass); // two glass storeys
-    slab(k, y0 + 10.8, .6, .35, megaShell);
-    const fin = new T.BoxGeometry(.5, step - 6.8, .7);
-    for (let u = u0 + 3; u < L2 - 1; u += 6) put(batch, megaRib, fin, at(u, dAt(k, u, 0) - .3, y0 + 6.5 + (step - 6.8) / 2));
+    // polish2: the white slab carries the read (target: white terraced hull), one recessed glass storey under the next lip.
+    const g0 = 9.5;
+    slab(k, y0 + 1.2, g0 - 1.2, 1.2, megaShell);
+    slab(k, y0 + g0 - .5, .35, 1.5, megaSeam); // cool seam line along the top of the white slab
+    slab(k, y0 + g0, step - g0, -.8, megaGlass); // glass set 0.8 m back under the slab
+    const fin = new T.BoxGeometry(.5, step - g0 - .3, .7);
+    for (let u = u0 + 3; u < L2 - 1; u += 6) put(batch, megaRib, fin, at(u, dAt(k, u, 0) + .5, y0 + g0 + (step - g0) / 2));
     // end bulkheads: white walls with fins every 8 m and one vertical seam at the front corner
     for (const [u, sgn] of [[L2, 1], [u0, -1]] as const) {
       const d0 = dAt(k, u, 0), len = depth - d0, wall = new T.BoxGeometry(2.4, step, len);
@@ -178,7 +194,7 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
     for (let u = u0 + 8 + hash(k) * 12, c = 0; u < L2 - 8; u += 24 + hash(k * 7 + c) * 16, c++)
       for (let j = 0, n = 4 + Math.floor(hash(k * 13 + c) * 3); j < n; j++) {
         const uj = u + (hash(k * 31 + c * 5 + j) - .5) * 9, p = world(uj, dAt(k, uj, 0) + 4 + hash(k * 17 + c * 3 + j) * 3.5, y0 + step + .5);
-        trees.push({ position: [p.x, -p.z, p.y], scale: .8 + hash(k * 3 + c * 11 + j) * .5, type: j === 1 ? 'columnar' : 'broadleaf' });
+        trees.push({ position: [p.x, -p.z, p.y], scale: .5 + hash(k * 3 + c * 11 + j) * .3, type: j === 1 ? 'columnar' : 'broadleaf' }); // polish2: rim-scale trees, so the terraces read
       }
     if (k === 2) { // service rail along this lip with two static pods
       const fl = front(k, 2);
