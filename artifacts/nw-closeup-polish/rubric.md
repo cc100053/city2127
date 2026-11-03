@@ -32,21 +32,25 @@ Owner bar: not calibrated yet (round 1 of judging is the calibration, 2026-11-03
 - `fh-base` [0.42,0.80,0.60,1.00] — base drum with a portal and a maglev pod, at least 2 glowing terminals, residents on foot, amber lot outline.
 - `fh-cap` [0.45,0.00,0.55,0.13] — stepped cap with antennas and small lit windows.
 
+## Bay crops (owner 2026-11-03, after Bay R1: 「Align crops, keep size」)
+
+The bay targets show the bay ≈ 1.35× larger and further right/up than the city can place it (bay size is clearance-bound, R3). Owner decision: keep the bay size and camera; crop the **target** at the first rectangle and the **capture** at the `capture [...]` rectangle, which frames the same subject where the bay actually stands at `nw:bay-e`. Rounds must keep their subject inside the capture rectangle.
+
 ## Bay −1 `low`
 
-- `bl-glazing` [0.36,0.60,0.78,0.97] — the hall's camera-facing frontage is glazed and warm-lit, with counters and at least 6 readable people inside.
-- `bl-forecourt` [0.40,0.82,0.60,0.98] — a paved forecourt with benches, small trees and at least 6 residents standing.
-- `bl-canopy` [0.38,0.48,0.78,0.61] — a thick lens disc with blue rim and at least 3 glowing under-emitters, hovering close above the roof.
-- `bl-material` [0.34,0.45,0.82,0.98] — pure white with thin seams; no beige mass, no teal stripe.
+- `bl-glazing` [0.36,0.60,0.78,0.97] capture [.27,.66,.62,.99] — the hall's camera-facing frontage is glazed and warm-lit, with counters and at least 6 readable people inside.
+- `bl-forecourt` [0.40,0.82,0.60,0.98] capture [.38,.80,.60,.99] — a paved forecourt with benches, small trees and at least 6 residents standing.
+- `bl-canopy` [0.38,0.48,0.78,0.61] capture [.25,.57,.63,.72] — a thick lens disc with blue rim and at least 3 glowing under-emitters, hovering close above the roof.
+- `bl-material` [0.34,0.45,0.82,0.98] capture [.25,.56,.64,.99] — pure white with thin seams; no beige mass, no teal stripe.
 
 ## Bay 0 `mixed`
 
-- `bm-hall` [0.40,0.70,0.64,0.98] — a glazed hall, warm inside, staffed counter and terminals, at least 4 readable people.
-- `bm-arm` [0.42,0.52,0.58,0.76] — a readable robot arm with parcel on the roof.
-- `bm-column` [0.42,0.00,0.56,0.70] — column with panel joints and rings with blue seams, a spire or antenna on top.
+- `bm-hall` [0.40,0.70,0.64,0.98] capture [.34,.72,.58,.96] — a glazed hall, warm inside, staffed counter and terminals, at least 4 readable people.
+- `bm-arm` [0.42,0.52,0.58,0.76] capture [.38,.60,.52,.80] — a readable robot arm with parcel on the roof.
+- `bm-column` [0.42,0.00,0.56,0.70] capture [.38,.05,.52,.78] — column with panel joints and rings with blue seams, a spire or antenna on top.
 
 ## Bay +1 `high`
 
-- `bh-rings` [0.40,0.00,0.60,0.80] — at least 10 closely stacked rings with blue seams around a panelled core.
-- `bh-drones` [0.36,0.00,0.70,0.70] — at least 6 drones around the tower.
-- `bh-base` [0.40,0.75,0.62,0.99] — base lobby with blue-lit glazing, terminals and residents; no palm tree.
+- `bh-rings` [0.40,0.00,0.60,0.80] capture [.38,.08,.56,.72] — at least 10 closely stacked rings with blue seams around a panelled core.
+- `bh-drones` [0.36,0.00,0.70,0.70] capture [.32,.08,.66,.70] — at least 6 drones around the tower.
+- `bh-base` [0.40,0.75,0.62,0.99] capture [.32,.68,.60,.97] — base lobby with blue-lit glazing, terminals and residents; no palm tree.

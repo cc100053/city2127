@@ -247,3 +247,29 @@ Language = the owner-accepted flagship (`src/siteBuilders/automationHub.ts` R9):
 ### Captures (`~/city2127-evidence/nw-closeup-polish/bay-r1/`)
 
 `bay-{low,mixed,high}.png` (day, review pose, 3200×1800), `bay-{low,mixed,high}-night.png` (hour 22), `district-{low,high}.png` (`?meters=nw:<band>&shot=nw:district&hour=12`, 1600×900) and one hero `?meters=nw:high&hour=12` 1600×900 to check the bays don't dominate. `vs-target.jpg`: 3 rows × [bay-r1 day | target], 1200×675 cells. Do not crop or judge — Opus does.
+
+## Bay R2 — warmth, floating canopy, column (owner 2026-11-03: 「Align crops, keep size」)
+
+Base: Bay R1 (58d023b). Bay size, positions and camera stay. Judging now crops the capture at the `capture [...]` rectangles in [rubric.md](rubric.md) (the target keeps its own rectangle): **every subject must stay inside its capture rectangle** at `nw:bay-e` — check by cropping your captures with those rectangles. Bay R1 re-judged on those crops: **16 / 20** ([bay-r1/scores-aligned.md](bay-r1/scores-aligned.md)); below 2 are `bl-glazing`, `bm-hall` (interior not warm), `bl-canopy` (emitters do not glow), `bm-column` (plain tube, blunt top). Judging: absolute + blind pairwise vs Bay R1; R2 must win more items than it loses.
+
+**Do not change** the forecourt, materials, robot arm, ring tower, drones or lobby (all scored 2); re-crop them from your captures and compare with `~/city2127-evidence/nw-closeup-polish/bay-r1/` before reporting. Look at the targets (`artifacts/nw-closeup-polish/target/bay-*.jpg`) beside your captures.
+
+### Warm halls (`bl-glazing`, `bm-hall`)
+
+- The target's interior is a clearly amber-orange glowing room, warmer and brighter than the white shell; ours reads pale peach/white by day. Use the flagship low hall's day values (`automationHub.ts` R8/R9 room materials: back wall, ceiling cove, floor pool) or stronger; keep the `nightLit` warmth at night. Floor, back wall and ceiling must read warm across the whole glazed width, in both the −1 hall and the hybrid's 60 % hall.
+- Staff **seated** behind the counters (the target shows seated staff facing residents), residents across; ≥ 10 readable people in the −1 hall, ≥ 5 in the hybrid hall, not hidden behind mullions/terminals.
+
+### Floating canopy with glowing emitters (`bl-canopy`)
+
+- Today it sits almost on the roof and overhangs past the hall front, reading as a thin tilted plate. Target: a lens about **¾ of the roof's width**, centred over the roof, a **clear gap ≈ 3 m pre-scale** (roof visible under it from the camera), thicker centre, thin blue rim.
+- Emitters: 4 bright white-blue pads under the lens near the rim, each with a small **additive glow halo** (sprite or emissive disc) that reads as a light source from above at the review pose — at least 3 visibly glowing in the capture. Update `CANOPY_Y` and the dock heights; the canopy must stay inside `bl-canopy` capture [.25,.57,.63,.72].
+
+### Column (`bm-column`)
+
+- Core radius ≈ 1.4× today; panel joints and 2 blue seams kept; 2 small window/hatch **modules** between the rings (target: panelled modules with small windows).
+- **Thicker docking rings** (tube ≥ .8 pre-scale, flat deck on top, bright blue seam on the outer edge); 4 rings if they fit, else 3.
+- A **long needle spire** (≥ ¼ of the column height) above a stepped cap, tip at y ≈ .07–.10 of the frame (inside capture [.38,.05,.52,.78]). Keep the arm's position and look relative to the column.
+
+### Checks
+
+`npm test && npm run build && git diff --check`; root children ≤ 32 (R1: 30). Evidence `~/city2127-evidence/nw-closeup-polish/bay-r2/`: `bay-{low,mixed,high}.png` day 3200×1800 at the review pose, `-night` (hour 22), `district-{low,high}.png`, `vs-target.jpg` (3 rows × [bay-r2 | target], 1200×675 cells). Do not judge.

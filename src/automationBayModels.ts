@@ -1,6 +1,7 @@
 import * as T from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { arc, box, leaf, leafyCrown } from './cityRig.ts';
-import { amberInlay, automationBlue, glassPane, glow, painted, roomCool, tint, wallLight, white } from './automationKit.ts';
+import { amberInlay, automationBlue, glassPane, glow, halo, painted, roomCool, roomWarm, tint, white } from './automationKit.ts';
 
 // R2 metres, built before the bay's own BAY_SCALE: +X along the route, +Z towards it (the review camera sees the +Z long face and the -X end).
 // Language of the owner-accepted flagship (siteBuilders/automationHub.ts): white structure, warm night-lit rooms behind faint glass, amber lot edge, articulated arms, quad drones.
@@ -10,11 +11,11 @@ export const HALL_W = 20, HALL_ZB = -8, HALL_ZF = 2, HALL_ROOF = 7, HALL_OVER = 
 const FLOOR = .5, SLAB = .5, GLASS = HALL_ROOF - SLAB - FLOOR, HALL_D = HALL_ZF - HALL_ZB;
 /** Centre of the roof slab: column and canopy stand on it. */
 export const HALL_Z = (HALL_ZB - .2 + HALL_ZF + HALL_OVER) / 2;
-/** Canopy lens half thickness and centre: its underside hovers 1.75 above the slab. */
-export const LENS = 1.3, CANOPY_Y = HALL_ROOF + 1.75 + LENS;
+/** Canopy lens half thickness and centre: ~3/4 of the roof's width, its underside floating 3 above the slab. */
+export const LENS = 1.3, CANOPY_GAP = 3, CANOPY_R = 8.8, CANOPY_Y = HALL_ROOF + CANOPY_GAP + LENS;
 /** Service column above the hall's roof (y = 0 is the roof surface): docking rings and the top ring's landing pad. */
-const COLUMN_R = 1.3, COLUMN_RINGS = [16.5, 20.5, 24.5], COLUMN_SHAFT = 26.5;
-export const COLUMN_PAD = COLUMN_RINGS[2] + .27;
+const COLUMN_R = 1.8, COLUMN_RINGS = [8, 11, 14, 17], COLUMN_SHAFT = 19, COLUMN_RING_R = 4.6, COLUMN_TUBE = .9;
+export const COLUMN_PAD = COLUMN_RINGS[3] + COLUMN_TUBE / 2, COLUMN_DOCK_X = COLUMN_RING_R + 1.1;
 /** Autonomous tower: 12 (design 0) or 10 (design 1) closely stacked rings, .8 thick at a 1.3 pitch (gap .5), above the 5 m lobby. */
 const RING0 = 11, PITCH = 1.3, THICK = .8, RING_R = 3.6, PORT_RINGS = 12, MAST_RINGS = 10;
 export const PORT_TOP = RING0 + (PORT_RINGS - 1) * PITCH + THICK / 2;
@@ -31,7 +32,7 @@ const piece = (parent: T.Object3D, geometry: T.BufferGeometry, color: T.ColorRep
 };
 const paintBox = (parent: T.Object3D, [w, h, d]: [number, number, number], [x, y, z]: [number, number, number], color: T.ColorRepresentation) => piece(parent, new T.BoxGeometry(w, h, d), color, x, y, z);
 /** Lit-room piece: a box in the vertex-coloured warm room material. */
-const lit = (parent: T.Object3D, [w, h, d]: [number, number, number], [x, y, z]: [number, number, number], color: T.ColorRepresentation, material: T.Material = wallLight) => {
+const lit = (parent: T.Object3D, [w, h, d]: [number, number, number], [x, y, z]: [number, number, number], color: T.ColorRepresentation, material: T.Material = roomWarm) => {
   const mesh = new T.Mesh(tint(new T.BoxGeometry(w, h, d), color), material); mesh.position.set(x, y, z); parent.add(mesh); return mesh;
 };
 const cyl = (parent: T.Object3D, r0: number, r1: number, h: number, y: number, x = 0, z = 0, material: T.Material = white) => {
@@ -80,9 +81,9 @@ const amberEdge = (parent: T.Object3D, hx: number, hz: number, top = FLOOR) => {
   }
 };
 
-/** Room wall in three lit bands, deep peach below to near-white above (vertex colours of `wallLight`). */
+/** Room wall in three lit bands, deep peach below to near-white above (vertex colours of `roomWarm`). */
 const warmWall = (w: number, h: number) => {
-  const wall = new T.PlaneGeometry(w, h, 1, 6), shades = new Float32Array(14 * 3), low = new T.Color('#e6b080'), high = new T.Color('#fbebd4'), c = new T.Color();
+  const wall = new T.PlaneGeometry(w, h, 1, 6), shades = new Float32Array(14 * 3), low = new T.Color('#ec8f45'), high = new T.Color('#ffd7a3'), c = new T.Color();
   for (let v = 0; v < 14; v++) c.copy(low).lerp(high, 1 - Math.floor(v / 2) / 6).toArray(shades, v * 3);
   return wall.setAttribute('color', new T.BufferAttribute(shades, 3));
 };
@@ -93,10 +94,10 @@ export function buildPavilion(): T.Group {
   box(g, [24, FLOOR, 18], [0, FLOOR / 2, 0], white, .05);
   amberEdge(g, 12, 9);
   // Warm room: floor pool, graded back wall, the far end wall and a hot ceiling cove behind the faint glass.
-  lit(g, [W - .4, .02, HALL_D - .4], [0, FLOOR + .01, zc], '#f0d2b0');
-  lit(g, [W - .4, .08, HALL_D - .4], [0, topY - .06, zc], '#fff3dc');
-  const back = new T.Mesh(warmWall(W - .5, GLASS - .1), wallLight); back.position.set(0, FLOOR + GLASS / 2, HALL_ZB + .4); g.add(back);
-  const east = new T.Mesh(warmWall(HALL_D - .5, GLASS - .1), wallLight); east.rotation.y = -Math.PI / 2; east.position.set(W / 2 - .7, FLOOR + GLASS / 2, zc); g.add(east);
+  lit(g, [W - .4, .02, HALL_D - .4], [0, FLOOR + .01, zc], '#f2a05c');
+  lit(g, [W - .4, .08, HALL_D - .4], [0, topY - .06, zc], '#ffd29a');
+  const back = new T.Mesh(warmWall(W - .5, GLASS - .1), roomWarm); back.position.set(0, FLOOR + GLASS / 2, HALL_ZB + .4); g.add(back);
+  const east = new T.Mesh(warmWall(HALL_D - .5, GLASS - .1), roomWarm); east.rotation.y = -Math.PI / 2; east.position.set(W / 2 - .7, FLOOR + GLASS / 2, zc); g.add(east);
   // Structure: solid back wall, corner piers, 4 thin mullions across the front and 2 on each end, sills and head rails, faint panes.
   box(g, [W, GLASS, .3], [0, mid, HALL_ZB + .15], white, .03);
   for (const x of [-6.6, 0, 6.6]) box(g, [.12, GLASS - .6, .04], [x, mid, HALL_ZB - .01], automationBlue, .01); // seams on the solid back, seen from the district shot
@@ -119,8 +120,9 @@ export function buildPavilion(): T.Group {
     const x = -4.6 + k * 2.8, z = -3.6;
     box(g, [2.5, 1.1, 1], [x, FLOOR + .55, z], white, .05);
     box(g, [1.1, .5, .06], [x, FLOOR + 1.45, z - .15], automationBlue, .01);
-    lit(g, [2.9, .02, 2.4], [x, FLOOR + .03, z + .4], '#fff3dc');
-    person(g, x, z - 1.1, k);
+    lit(g, [2.9, .02, 2.4], [x, FLOOR + .03, z + .4], '#ffc27d');
+    box(g, [.6, .4, .6], [x, FLOOR + .2, z - 1.75], white, .04);
+    person(g, x, z - 1.45, k, { seated: true }); // staff sit behind the counter, facing the residents
     if (k % 2) { box(g, [.6, .4, .6], [x, FLOOR + .2, z + 1.5], white, .04); person(g, x, z + 1.5, k + 4, { yaw: Math.PI, seated: true }); }
     else person(g, x, z + 1.6, k + 4, { yaw: Math.PI });
   }
@@ -134,16 +136,18 @@ export function buildPavilion(): T.Group {
   return g;
 }
 
-/** Hovering canopy: a thick lens over the roof, a thin blue rim seam and six bright emitter pads under the rim. */
+/** Floating canopy: a thick lens (~3/4 of the roof's width) centred over the roof with a clear gap under it, a thin blue rim seam and four bright white-blue emitter pads, each in a soft additive halo. */
 export function buildCanopy(): T.Group {
-  const g = new T.Group();
-  const lens = new T.Mesh(new T.LatheGeometry([[0, -LENS], [5.5, -1.15], [9.2, -.7], [11.4, -.2], [12, 0], [11.4, .2], [8.3, .75], [3.7, 1.2], [0, LENS]].map(([r, y]) => new T.Vector2(r, y)), 56), white);
+  const g = new T.Group(), R = CANOPY_R;
+  const lens = new T.Mesh(new T.LatheGeometry([[0, -LENS], [R * .45, -1.15], [R * .77, -.7], [R * .95, -.2], [R, 0], [R * .95, .2], [R * .68, .75], [R * .32, 1.2], [0, LENS]].map(([r, y]) => new T.Vector2(r, y)), 56), white);
   lens.position.set(0, CANOPY_Y, HALL_Z); lens.castShadow = true; g.add(lens);
-  const rim = new T.Mesh(new T.TorusGeometry(12, .12, 6, 64).rotateX(Math.PI / 2), automationBlue); rim.position.copy(lens.position); g.add(rim);
-  for (let k = 0; k < 6; k++) {
-    const a = k * Math.PI / 3 + Math.PI / 6;
-    const pad = new T.Mesh(new T.SphereGeometry(1.3, 16, 8).scale(1, .38, 1), glow);
-    pad.position.set(Math.cos(a) * 10.7, CANOPY_Y - .75, HALL_Z + Math.sin(a) * 10.7); g.add(pad);
+  const rim = new T.Mesh(new T.TorusGeometry(R, .12, 6, 64).rotateX(Math.PI / 2), automationBlue); rim.position.copy(lens.position); g.add(rim);
+  // The review camera looks down at ~10 degrees from the -X/+Z side: pads on that rim hang just outside the lens edge, where they are seen below it.
+  for (const a of [-65, -22, 22, 65].map(d => (138 + d) * Math.PI / 180)) {
+    const x = Math.cos(a) * (R + .3), z = HALL_Z + Math.sin(a) * (R + .3), y = CANOPY_Y - 1;
+    const pad = new T.Mesh(new T.SphereGeometry(1.1, 16, 8).scale(1, .45, 1), glow); pad.position.set(x, y, z);
+    const light = new T.Mesh(mergeGeometries([1.1, 1.5, 1.9, 2.3, 2.7].map(r => new T.SphereGeometry(r, 16, 12).toNonIndexed())), halo); light.position.set(x, y - .1, z);
+    g.add(pad, light);
   }
   return g;
 }
@@ -170,23 +174,32 @@ function robotArm(parent: T.Object3D, x: number, y: number, z: number, scale: nu
   paintBox(a, [.8, .7, .7], [3.3, 1.55, 0], '#e9a24f');
 }
 
-/** Hybrid service column from the hall roof (y = 0): panelled shaft with blue seams, collar, three docking rings, stepped cap and a spire; an articulated arm stands on the roof's camera side. */
+/** Hybrid service column from the hall roof (y = 0): a stout panelled core with blue seams, two small window modules, a collar, four thick docking rings (flat deck, bright blue edge), a stepped cap and a long needle spire; an articulated arm stands on the roof's camera side. */
 export function buildColumn(): T.Group {
-  const g = new T.Group(), top = COLUMN_SHAFT;
+  const g = new T.Group(), top = COLUMN_SHAFT, cam = -.84; // `cam`: the bearing of the review camera from +Z
   cyl(g, COLUMN_R, COLUMN_R, top, top / 2, 0, HALL_Z);
   for (let y = 2.5; y < top; y += 2.5) joint(g, COLUMN_R + .04, y, 0, HALL_Z);
-  for (const a of [.6, -.6]) { const seam = new T.Mesh(new T.BoxGeometry(.18, top - 4, .1), automationBlue); seam.rotation.y = a; seam.position.set(Math.sin(a) * (COLUMN_R + .02), top / 2 + .5, HALL_Z + Math.cos(a) * (COLUMN_R + .02)); g.add(seam); }
-  cyl(g, 1.8, 1.8, .8, .4, 0, HALL_Z);
-  cyl(g, 1.84, 1.84, .1, .55, 0, HALL_Z, automationBlue);
-  for (const y of COLUMN_RINGS) {
-    arc(g, COLUMN_R, 3.8, .55, [0, y - .28, HALL_Z], white);
-    arc(g, 3.8, 3.92, .3, [0, y - .15, HALL_Z], automationBlue);
+  for (const a of [cam + .55, cam - .55]) { const seam = new T.Mesh(new T.BoxGeometry(.2, top - 3, .1), automationBlue); seam.rotation.y = a; seam.position.set(Math.sin(a) * (COLUMN_R + .02), top / 2 + .5, HALL_Z + Math.cos(a) * (COLUMN_R + .02)); g.add(seam); }
+  // Two window modules between the rings, facing the camera.
+  for (const y of [9.5, 15.5]) {
+    const m = new T.Group(); m.rotation.y = cam; m.position.set(Math.sin(cam) * COLUMN_R, y, HALL_Z + Math.cos(cam) * COLUMN_R); g.add(m);
+    box(m, [2.4, 1.7, .5], [0, 0, 0], white, .06);
+    for (const x of [-.55, .55]) box(m, [.65, .55, .06], [x, .1, .27], automationBlue, .01);
+    box(m, [1.9, .1, .06], [0, -.6, .27], automationBlue, .01);
   }
-  pad(g, 3.8, COLUMN_PAD, HALL_Z);
-  cyl(g, 1.7, COLUMN_R, .8, top + .4, 0, HALL_Z);
-  cyl(g, 1, 1, 1.2, top + 1.4, 0, HALL_Z);
-  cyl(g, .38, .14, 3, top + 3.5, 0, HALL_Z);
-  robotArm(g, -3.2, 0, HALL_Z + .6, 1.2, -.84); // reaches screen-right at the review pose: the arm reads side-on, in front of the column
+  cyl(g, COLUMN_R + .45, COLUMN_R + .45, .8, .4, 0, HALL_Z);
+  cyl(g, COLUMN_R + .5, COLUMN_R + .5, .1, .55, 0, HALL_Z, automationBlue);
+  for (const y of COLUMN_RINGS) {
+    arc(g, COLUMN_R, COLUMN_RING_R, COLUMN_TUBE, [0, y - COLUMN_TUBE / 2, HALL_Z], white);
+    arc(g, COLUMN_RING_R, COLUMN_RING_R + .14, .38, [0, y + COLUMN_TUBE / 2 - .38, HALL_Z], automationBlue);
+  }
+  pad(g, COLUMN_RING_R, COLUMN_PAD, HALL_Z);
+  cyl(g, COLUMN_R + .3, COLUMN_R, .9, top + .45, 0, HALL_Z);
+  cyl(g, 1.2, 1.2, 1.2, top + 1.5, 0, HALL_Z);
+  cyl(g, .7, .7, .5, top + 2.35, 0, HALL_Z);
+  cyl(g, .1, .5, 8, top + 6.6, 0, HALL_Z); // tapering to the tip
+  for (const y of [top + 4, top + 6.2]) cyl(g, .45 - (y - top - 4) * .1, .45 - (y - top - 4) * .1, .16, y, 0, HALL_Z, automationBlue);
+  robotArm(g, -3.2, 0, HALL_Z + .6, 1.2, -.84);
   return g;
 }
 

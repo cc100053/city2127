@@ -1,7 +1,7 @@
 # nw-closeup-polish — NW 自動化旗艦＋district 載體，新 taste 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — 旗艦 owner 接受（R9 25/28）；bay R1 13/20，等 owner 校準
+- Status: IN_PROGRESS — 旗艦 owner 接受（R9 25/28）；bay R2 19/20（`bl-canopy` 1、`bl-glazing` pairwise 輸）
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
 - Last verified commit: R3 commit（test／build／diff-check PASS）
@@ -164,6 +164,18 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 - 絕對盲評 **13 / 20**（judge 1 7）；pairwise judge 1 vs bay R1：R1 贏 9，輸 1（`bl-canopy`）→ 保留。[scores](../../artifacts/nw-closeup-polish/bay-r1/scores.md)、[pair](../../artifacts/nw-closeup-polish/bay-r1/pair.md)、[對目標](../../artifacts/nw-closeup-polish/bay-r1/vs-target.jpg)。
 - 仲未 2：`bl-canopy` 0（遮篷落咗 crop 外）、`bl-glazing`／`bm-hall`（室內淡，唔夠暖；人細）、`bm-arm`（粗糙）、`bm-column`（環薄、尖頂矮）、`bh-drones`（約 5 架讀到）。
 - **構圖差（等 owner）**：同一 review pose 下目標嘅 bay 大約大 1.35 倍、中心偏右上（Gemini 放大／移咗，同旗艦 judge 1 一樣）；bay 大細受 clearance 限制（R3 已經 2×）。所以 rubric crop 對唔正（遮篷 0 分主要係呢個）。另外 review bay 東邊有鄰居（巨構 skirt／deck）遮住廳右後同大堂東端。
+- Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
+
+## Owner 2026-11-03：bay crop「Align crops, keep size」
+
+- 目標圖嘅 bay 比城市實際可放大約大 1.35 倍、偏右上；owner 決定 bay 大細同鏡頭唔郁，rubric 每項加 `capture [...]` 長方形（目標用原長方形，截圖用 capture 長方形框住同一主體）。[rubric](../../artifacts/nw-closeup-polish/rubric.md#bay-crops-owner-2026-11-03-after-bay-r1-align-crops-keep-size)。
+- Bay R1 用新 crop 重評：**16 / 20**（[scores-aligned](../../artifacts/nw-closeup-polish/bay-r1/scores-aligned.md)）。
+
+## Bay R2（暖房、懸浮遮篷、服務柱）
+
+- Sonnet：新 `roomWarm`（兩個廳嘅暖房，日間琥珀橙、夜晚 `nightLit`）、職員坐喺櫃檯後；遮篷 r 8.8（屋頂約 ¾）、離屋頂 3、4 個發光 pad＋additive halo（新 `halo`）；服務柱核心 r 1.8、窗模組、4 個厚環、8 長針尖頂（tip y≈.09）。Root children 30→31。
+- 絕對盲評 **19 / 20**（R1 對齊 16）；pairwise R1 vs R2：R2 贏 `bl-canopy`、`bm-hall`、`bm-column`，輸 `bl-glazing`，其餘 6 =  → 保留。[scores](../../artifacts/nw-closeup-polish/bay-r2/scores.md)、[pair](../../artifacts/nw-closeup-polish/bay-r2/pair.md)、[對目標](../../artifacts/nw-closeup-polish/bay-r2/vs-target.jpg)。
+- 仲未過：`bl-canopy` 1（鏡片薄似平板、發光器係朦朧光暈唔係清楚嘅 pod）；`bl-glazing` 2 但 pairwise 輸（橙色似平塗油，唔似光；R1 較近）。評審亦話 `bm-hall` 橙色平、`bm-column` 藍方塊窗似玩具（勉強 2）。
 - Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
 
 ## Next step

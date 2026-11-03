@@ -16,6 +16,10 @@ export const roomLight = (color: T.ColorRepresentation, emissive: string, day: n
 export const wallLight = nightLit(new T.MeshStandardMaterial({ color: '#ffffff', vertexColors: true, emissive: '#ffb878', emissiveIntensity: .48, roughness: 1 }), .85, '#ff9a3c');
 export const glowMid = roomLight('#f6e0c4', '#ffb878', .42, .8, '#ff9a3c');
 export const glowFloor = roomLight('#f0d2b0', '#ffae6c', .4, .7, '#ff9a3c'), glowCeil = roomLight('#fff3dc', '#ffd9a0', 1.3, 1.7, '#ffb860');
+/** The bay halls' amber-orange room (vertex-coloured): clearly warmer and brighter than the white shell by day, glowing amber at night. */
+export const roomWarm = nightLit(new T.MeshStandardMaterial({ color: '#ffffff', vertexColors: true, emissive: '#ff9440', emissiveIntensity: .9, roughness: 1 }), 1.2, '#ff9a3c');
+/** Soft additive halo around a bright emitter pad. */
+export const halo = new T.MeshBasicMaterial({ color: '#bfeaff', transparent: true, opacity: .07, blending: T.AdditiveBlending, depthWrite: false, toneMapped: false });
 /** The autonomous lobby's cool counterpart of the warm rooms. */
 export const roomCool = roomLight('#8cc3ff', '#4f9dff', .95, 1.5, '#4aa0ff');
 // A cool, faint pane across the glazing, so the room reads behind glass.

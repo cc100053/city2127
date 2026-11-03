@@ -5,7 +5,7 @@ import { changeSites, seaward } from './layout.ts';
 import { inHeroClear, inMega } from './megaFootprints.ts';
 import { automationBays, BAY_SCALE } from './automationBays.ts';
 import { automationBlue, METER_COLORS, quadFleet } from './automationKit.ts';
-import { buildCanopy, buildColumn, buildMast, buildPavilion, buildPort, CANOPY_Y, COLUMN_PAD, HALL_ROOF, HALL_Z, LENS, MAST_TOP, PORT_TOP, TOWER_PITCH, TOWER_RING0, TOWER_RING_R, TOWER_RINGS } from './automationBayModels.ts';
+import { buildCanopy, buildColumn, buildMast, buildPavilion, buildPort, CANOPY_Y, COLUMN_DOCK_X, COLUMN_PAD, HALL_ROOF, HALL_Z, MAST_TOP, PORT_TOP, TOWER_PITCH, TOWER_RING0, TOWER_RING_R, TOWER_RINGS } from './automationBayModels.ts';
 import { megaGlass, megaRib, megaShell } from './megastructures.ts';
 import { shoreRoomBays } from './waterRooms.ts';
 import { automationActivity, pavilionFlight, pedestrians, plazaPose, routes, serviceDrones } from './mobility.ts';
@@ -925,8 +925,8 @@ export class AutomationDistrict {
   private dock(i: number): { x: number; y: number; z: number; level: number } {
     const s = this.staffed.value[i], h = this.hybrid.value[i], hall = Math.max(s, .6 * h);
     const canopy = s * (1 - h), column = h, tower = (1 - s) * (1 - h);
-    if (column >= canopy && column >= tower) return { x: 4.9, y: HALL_ROOF * hall + COLUMN_PAD + .9, z: HALL_Z, level: column };
-    if (canopy >= tower) { const wide = this.staffedDesign[i] ? 1.35 : 1; return { x: 7 * wide, y: CANOPY_Y + LENS + .9, z: HALL_Z * (this.staffedDesign[i] ? CANOPY_SQUEEZE : 1), level: canopy }; }
+    if (column >= canopy && column >= tower) return { x: COLUMN_DOCK_X, y: HALL_ROOF * hall + COLUMN_PAD + .9, z: HALL_Z, level: column };
+    if (canopy >= tower) { const wide = this.staffedDesign[i] ? 1.35 : 1; return { x: 7 * wide, y: CANOPY_Y + 1.9, z: HALL_Z * (this.staffedDesign[i] ? CANOPY_SQUEEZE : 1), level: canopy }; }
     return this.autonomousDesign[i] ? { x: 2.6, y: MAST_TOP + .95, z: 0, level: tower } : { x: 4.7, y: PORT_TOP + .9, z: 0, level: tower };
   }
 
