@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS — R1／R1b／R2 實作完，等 owner 睇圖
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
-- Last verified commit: 未有（未改 code）
+- Last verified commit: `f120ccb`（R1b＋R2；test／build／diff-check PASS）
 - Remote availability: `origin/feat/nw-closeup-polish`
 
 ## Session Git state
@@ -40,7 +40,7 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 - 旗艦 `nw:e`：`[192,44,-338]` → `[40,54,-300]`（東面低角，背景海＋天；+1 全高入鏡）。棄用：西南 `[-70,45,-180]`（前景 Sky Ring 腳）、北 `[40,45,-450]`（背景巨構搶眼）、拉遠 `[225,58,-350]`（Sky Ring 腳入鏡）。
 - Bay 10 `nw:bay-e`：`[-10,40,-90]` → `[75,32,-160]`（ring 環框住 bay）。
 
-## Next step
+## Plan（2026-11-03 開工時）
 
 1. Gemini 目標圖（6 張：旗艦 −1/0/+1、bay −1/0/+1），prompt 見 [prompts.md](../../artifacts/nw-closeup-polish/prompts.md)；candidate 放 evidence `gen/`。
 2. Owner 揀 → `artifacts/nw-closeup-polish/target/` → spec.md → Sonnet rounds。
