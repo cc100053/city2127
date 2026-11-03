@@ -1,5 +1,7 @@
 # City taste v2 — overnight coordinator protocol (2026-11-02 → 11-03 morning)
 
+History: this protocol let weak parts pass; its successor is the [long-polish-loop skill](../../.agents/skills/long-polish-loop/SKILL.md).
+
 You are the **coordinator** (Opus). You do not implement; you brief, review and integrate. The owner is asleep and approves visuals in the morning; nothing goes to `main`.
 
 ## Read first
