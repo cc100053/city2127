@@ -1,7 +1,7 @@
 # nw-closeup-polish — NW 自動化旗艦＋district 載體，新 taste 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — R5 旗艦盲評 21/28，下一步 R6
+- Status: IN_PROGRESS — R6 旗艦盲評 24/28
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
 - Last verified commit: R3 commit（test／build／diff-check PASS）
@@ -120,6 +120,12 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 - Opus 自己睇：夜景 −1 廳室內冇亮（退步，暖房應該夜晚發光）；日景室內淡到似廣告板。
 - Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
 
+## R6（暖房、發光器、無人機、服務臂）
+
+- Sonnet：室內改 emissive 暖色（vertex 色由深橙到淡奶油、天花暖光槽、柱位＋層架），青色屏幕條拎走；夜晚低／中廳都亮（修正 R5 退步）；遮篷 4 個白藍燈泡＋光暈＋短光束；0 環上泊住嘅改用新四旋翼無人機（擺喺環邊，對天空剪影）＋3 架飛緊；+1 自己一隊 hub 無人機（3 個 instanced mesh，`hub-drones`），24 架分散；9 支臂向鏡頭／右邊，包裹放大。Mesh low/mixed/high 27/31/23。
+- 盲評旗艦 **24 / 28**（R5 21）。仲係 1：`fl-glazing`、`fl-material`（日景室內係飽和橙色平面，冇玻璃深度，屋頂懸挑讀唔到）、`fl-canopy`（發光器變咗大青色光錐，塞住隙位）、`fm-rings`（似平墊圈，唔似目標嘅中空泊位環）。[scores](../../artifacts/nw-closeup-polish/r6/scores.md)、[R6 對目標](../../artifacts/nw-closeup-polish/r6/vs-target.jpg)。
+- Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
+
 ## Next step
 
-R6（旗艦）：室內暖光 emissive（日夜都亮、唔好米色）、遮篷發光器亮、無人機讀得到（泊住＋飛行）、≥ 4 支服務臂連包裹入鏡。之後 bay（judge 1 7/20）。
+R7（旗艦最後 4 項）：日景室內柔和暖光（降飽和、有玻璃反光／深度）、低廳屋頂懸挑明顯、遮篷發光器收細做獨立發光點、0 環做中空泊位環。之後 bay（judge 1 7/20），owner 校準 rubric 未做。
