@@ -83,6 +83,11 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 - [R3 對目標](../../artifacts/nw-closeup-polish/r3/vs-target.jpg)。Opus：大細同目標一致；hero 入面 bay 喺兩邊，冇搶中間。弱點：`nw:bay-e` 下 +1 塔頂出鏡（約 100 m）；bay3 鏡頭被酒店階梯樓擋；2× 廳入面啲人顯得好細；bay2 細過其他。
 - 驗證（Opus 2026-11-03）：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
 
+## FPS（2026-11-03，headless Chrome via playwright-cli，1920×1080，Vite DEV，`data-fps` 每 2.6 s，第一個 sample 唔計）
+
+- 本分支（727cedd）：hero nw:high 12:00 47.1–48.1；22:00 46.4–47.3；`nw:focal` high 50.2–54.0；`nw:focal-low` low 60.0 ×4；`nw:bay1` high 22:00 60.0 ×4。
+- 同機同條件、main 34f1fd3（臨時 worktree，port 5185）同本分支交替量 hero nw:high 兩輪：main 37.2–40.2，本分支 35.0–39.8 → **冇退步**；部機當時有負載（其他 session），所以 60 FPS 未能喺呢部機證實。展覽機未量。
+
 ## Next step
 
-FPS 實測（hero＋NW 近鏡，vsync 1920×1080）→ owner 驗收 → merge main。
+Owner 驗收（R1b 旗艦 −1 近鏡、R3 bay）→ 喺冇負載嘅機重量 FPS → merge main。
