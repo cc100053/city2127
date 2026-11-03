@@ -185,9 +185,10 @@ function terminal(parent: T.Object3D, x: number, z: number, yaw = 0, size = 1) {
 }
 
 /** Open hall: a glowing room seen through the open camera face (+Z) between white mullions, under a deep roof slab with a shadow band on the glazing. */
-function hall(group: T.Group, w: number, zBack: number, zFront: number, bays: number, h = 3.6, front = .4, glass = 2.25, roofT = .35, side = .4) {
-  const d = zFront - zBack, zc = (zBack + zFront) / 2, wall = glass - .05;
-  box(group, [w - .3, .01, d - .3], [0, .005, zc], glowFloor, .004);
+function hall(group: T.Group, w: number, zBack: number, zFront: number, bays: number, h = 3.6, front = .4, glass = 2.25, roofT = .35, side = .4, recess = 0, mullions = bays) {
+  // The glazing (mullions, glass, room floor and cove) stands `recess` behind the fascia, so a shaded soffit shows between the slab edge and the glass.
+  const zG = zFront - recess, dG = zG - zBack, zcG = (zBack + zG) / 2, d = zFront - zBack, zc = (zBack + zFront) / 2, wall = glass - .05;
+  box(group, [w - .3, .01, dG - .3], [0, .005, zcG], glowFloor, .004);
   // Back wall in three lit bands (deep below, brighter above), pilasters between the bays, side walls and a hot ceiling cove: a glowing room, not one flat field.
   const backWall = new T.PlaneGeometry(w - .3, wall, 1, 6), shades = new Float32Array(14 * 3), low = new T.Color('#e6b080'), high = new T.Color('#fbebd4'), c = new T.Color();
   for (let v = 0; v < 14; v++) c.copy(low).lerp(high, 1 - Math.floor(v / 2) / 6).toArray(shades, v * 3);
@@ -197,18 +198,21 @@ function hall(group: T.Group, w: number, zBack: number, zFront: number, bays: nu
   group.add(backMesh);
   for (let k = 0; k < bays; k++) for (const y of [1, 1.75]) box(group, [w / bays - .5, .06, .22], [-w / 2 + (k + .5) * w / bays, y, zBack + .36], white, .01); // shelves
   for (let k = 0; k <= bays; k++) box(group, [.14, wall, .3], [-w / 2 + .15 + k * (w - .3) / bays, wall / 2 + .025, zBack + .35], white, .02);
-  for (const s of [-1, 1]) box(group, [.04, wall, d - .5], [s * (w / 2 - .27), glass / 2 + .025, zc], glowMid, .01);
-  box(group, [w - .5, .08, d - .5], [0, glass - .08, zc], glowCeil, .01);
+  for (const s of [-1, 1]) box(group, [.04, wall, dG - .5], [s * (w / 2 - .27), glass / 2 + .025, zcG], glowMid, .01);
+  box(group, [w - .5, .08, dG - .5], [0, glass - .08, zcG], glowCeil, .01);
   box(group, [w - .5, .14, .5], [0, glass - .14, zBack + .5], glowCeil, .01);
   box(group, [w, h, .2], [0, h / 2, zBack + .1], white, .04);
   for (const s of [-1, 1]) box(group, [.2, h, d], [s * (w / 2 - .1), h / 2, zc], white, .04);
   box(group, [w, h - glass, .2], [0, (h + glass) / 2, zFront - .1], white, .04);
-  box(group, [w, .1, .14], [0, glass, zFront - .03], white, .02);
-  for (let k = 0; k <= bays; k++) slat(group, [.08, glass, .1], [-w / 2 + k * w / bays, glass / 2, zFront - .02], white);
+  box(group, [w, .08, .1], [0, glass, zG - .03], white, .02);
+  for (let k = 0; k <= mullions; k++) slat(group, [.06, glass, .08], [-w / 2 + k * w / mullions, glass / 2, zG - .02], white);
+  if (recess) {
+    box(group, [w, .02, recess], [0, glass + .02, zFront - recess / 2], shade, .005); // soffit under the fascia, in shade
+  }
   box(group, [w + side * 2, roofT, d + .4 + front], [0, h + roofT / 2, zc + (front - .4) / 2], white, .06);
-  box(group, [w - .4, .6, .02], [0, glass - .35, zFront - .06], shade, .005); // the slab's shadow on the glazing
+  box(group, [w - .4, .6, .02], [0, glass - .35, zG - .06], shade, .005); // the slab's shadow on the glazing
   box(group, [w, .09, .02], [0, h - .05, zFront + .01], shade, .005); // dark line under the slab's edge
-  box(group, [w - .3, glass, .01], [0, glass / 2, zFront - .04], glassPane, .002);
+  box(group, [w - .3, glass, .01], [0, glass / 2, zG - .04], glassPane, .002);
   for (let k = 0; k < bays; k++) { const pool = new T.Mesh(new T.CylinderGeometry(.75, .75, .01, 20), glowCeil); pool.position.set(-w / 2 + (k + .5) * w / bays, .012, zBack + 1.4); group.add(pool); } // warm pools on the floor
   for (const s of [-1, 1]) box(group, [.04, .05, d - .5], [s * (w / 2 + .01), 2.45, zc], automationBlue, .01);
   box(group, [w - .5, .05, .04], [0, 2.45, zBack - .01], automationBlue, .01);
@@ -280,7 +284,7 @@ const armGeometry = () => mergeGeometries([
   geo(new T.SphereGeometry(.17, 10, 8), [5.35, 1.02, 0]),
   geo(new T.BoxGeometry(.2, .28, .7), [5.35, .86, 0]),
 ].map(g => g.index ? g.toNonIndexed() : g))!;
-const parcelGeometry = () => new T.BoxGeometry(1, .85, .9).translate(5.35, .35, 0);
+const parcelGeometry = () => new T.BoxGeometry(.4, .34, .36).translate(5.35, .55, 0);
 
 export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAssetLoaderCache): AutomationHubBuiltSite {
   const root = createSiteRoot(scene, 'nw');
@@ -349,7 +353,7 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
     for (const s of [-1, 1]) box(g, [.45, .04, HUB_PLINTH.low.z * 2 - .6], [s * (HUB_PLINTH.low.x - .35), .02, 0], amberInlay, .01);
     const k = scaled(g, 'low');
     k.position.x = LOW_SHIFT * K;
-    hall(k, LOW_W, LOW_ZB, LOW_ZF, 6, LOW_H, LOW_FRONT, 3.8, .22, .75);
+    hall(k, LOW_W, LOW_ZB, LOW_ZF, 6, LOW_H, LOW_FRONT, 3.8, .22, .75, 1.3, 3); // 3 wide bays: the counters stand in pairs between the mullions
     arc(k, 0, 3.2, .05, [0, LOW_ROOF, LOW_ZC + (LOW_FRONT - .4) / 2], white);
     for (let i = 0; i < 6; i++) { counter(k, lowK(i), LOW_COUNTER); chair(k, lowK(i), LOW_COUNTER + .5); }
     bench(k, -3.5, 2.9); bench(k, 0, 3.05); bench(k, 3.4, 2.9);
@@ -568,7 +572,7 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
         place(droneSlots.spire + dock++, Math.cos(a) * 2.6 * l, PT + spireRings.y(i) + .7 * l, Math.sin(a) * 2.6 * l, a + 1.2, ready ? l : 0, DOCKED);
       }
     });
-    // Three streams arc into the upper rings (radius 7.8 -> 4.4, 20 s); under reduced motion they park on the rings.
+    // Three streams climb the sky to the right of the tower (screen right = stage +x) and curl into the upper rings (radius 12 -> 6, 20 s); under reduced motion they park on the rings.
     const high = lead.high.level;
     for (let s = 0; s < 3; s++) for (let j = 0; j < 8; j++) {
       const slot = droneSlots.stream + s * 8 + j;
@@ -577,8 +581,8 @@ export function buildAutomationHub(scene: T.Scene, _kit: Kit, _assets: SiteAsset
         place(slot, Math.cos(a) * 2.5 * l, PT + spireRings.y(i) + .85 * l, Math.sin(a) * 2.5 * l, a + 1.2, ready ? l : 0);
         continue;
       }
-      const u = (((now / 20 + j / 8 * .85 + s / 3) % 1) + 1) % 1, a = -.5 + s * .6 + u * 1.5 + j * .06, r = 7.8 - 3.4 * u; // arcs on the camera side of the tower, so the streams stay readable
-      place(slot, Math.cos(a) * r, PT + 10 + u * (SPIRE_TOP - 12) + Math.abs(j - 3.5) * .25, Math.sin(a) * r, a + Math.PI / 2, ready ? .7 * high * smoothstep(clamp01(Math.min(u, 1 - u) / .12)) : 0);
+      const u = (((now / 20 + j / 8 * .75 + s / 3) % 1) + 1) % 1, a = -.25 + s * .22 + u * .35, r = 13 - 6.5 * u;
+      place(slot, Math.cos(a) * r, PT + 6 + s * 3 + u * (SPIRE_TOP - 14) + Math.abs(j - 3.5) * .15, Math.sin(a) * r, a + Math.PI / 2, ready ? .7 * high * smoothstep(clamp01(Math.min(u, 1 - u) / .1)) : 0);
     }
     drones.show(ready && (lowLevel > HIDDEN || lead.mixed.level > HIDDEN || high > HIDDEN));
     drones.flush();

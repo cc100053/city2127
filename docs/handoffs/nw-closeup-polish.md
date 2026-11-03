@@ -1,7 +1,7 @@
 # nw-closeup-polish — NW 自動化旗艦＋district 載體，新 taste 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — R8 旗艦 24/28，pairwise 勝 R7 1:0
+- Status: IN_PROGRESS — R9 旗艦 25/28，等 owner 校準
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
 - Last verified commit: R3 commit（test／build／diff-check PASS）
@@ -141,6 +141,14 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 - 仲係 1：`fl-glazing`（屋頂懸挑仍然似平頂，冇凹入玻璃線）、`fl-material`（遮篷下深藍條紋柱、右邊米色盒）、`fh-arms`（包裹大過目標約 3 倍）、`fh-drones`（空中細無人機唔夠 10 架成串）。
 - Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean；夜景截圖確認 −1／0 室內暖光返嚟。
 
+## R9（懸挑、包裹比例、無人機串）
+
+- Sonnet：低廳玻璃線（窗框、玻璃、室內前沿、天花槽）退入 1.3 units，中間深色 soffit；窗框 7→4 支（3 格），櫃檯兩兩夾喺中間；+1 包裹縮到約 ⅖；3 串無人機改喺塔右邊天空（screen-right），≥ 20 架。Mesh 27/32/23。
+- 遮篷下深藍條紋柱＝`odaiba2127.ts` 海岸 interchange 嘅 arrival mast（`INTERCHANGE.mast`），右邊米色盒＝東面海岸 kiosk；兩樣都係鄰居，冇郁（要改鏡頭或者鄰居＝產品決定）。
+- 絕對盲評 **25 / 28**；pairwise R8 vs R9：R9 贏 `fh-arms`、`fh-drones`，輸 `fm-arm`（code 冇改，動畫時間令包裹出咗 crop）→ 保留 R9。[scores](../../artifacts/nw-closeup-polish/r9/scores.md)、[pair](../../artifacts/nw-closeup-polish/r9/pair.md)、[R9 對目標](../../artifacts/nw-closeup-polish/r9/vs-target.jpg)。
+- 仲係 1：`fl-glazing`（review pose 只係微俯視，soffit 讀唔到）、`fl-material`（室內後牆似平面＋鄰居 kiosk）、`fm-hall`（R8 係 2，code 冇改 → 評審雜訊）。
+- Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean；夜景暖光保持。
+
 ## Next step
 
-R9（如果繼續）：低廳屋頂深懸挑＋玻璃線退入、拎走遮篷下深藍柱／右邊米色盒、+1 包裹縮細、空中無人機成串 ≥ 10。之後 bay（judge 1 7/20），owner 校準 rubric 未做。
+旗艦接近平台期：剩低嘅受鏡頭角度同鄰居限制。建議 owner 睇 R9 board 校準 rubric（逐項 pass／fail），再決定旗艦收貨定改鏡頭／鄰居；之後 bay（judge 1 7/20）。
