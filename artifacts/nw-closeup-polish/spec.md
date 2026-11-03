@@ -97,3 +97,37 @@ R2 bays are metre-true (hall 22 m) and fill ≈ 15 % of the `nw:bay-e` review fr
 Placement: the 2× plinth (48 × 36 m) and 90 m tower must still pass every clearance/route test in `tests/odaiba.test.ts` and `tests/districtMeters.test.ts`. Fix failures in this order: (1) push the bay further from its promenade (the constructor's 22 m offset → whatever clears, per bay if needed), (2) rotate the bay, (3) shrink that one bay's scale to the largest that clears (not below 1.5×). Do not drop bays: `SHOTS['nw:bayN']` and the coverage table in `src/headlineCamera.ts` are keyed by bay index. If a bay moves, update its `nw:bayN` shot so the bay is in frame (check one capture per moved bay). Never delete a clearance assertion; widen sample grids to the new footprint instead.
 
 Captures `~/city2127-evidence/nw-closeup-polish/r3/`: `nw-bay-{low,mixed,high}-day.png` at `nw:bay-e`, `nw-district-{low,high}-day.png`, the hero view `?meters=nw:high&hour=12` and `?meters=nw:low&hour=12` (no shot param) to check the bays don't dominate the hero, one `nw:bayN` per moved bay, `vs-target.jpg` (3 rows × [r3 | bay target]) → publish to `nw-closeup-polish/r3`. Report per-bay final position/scale, the frame share at `nw:bay-e`, and checks.
+
+## R4 — flagship at target size, rubric items (owner 2026-11-03: 「放大到目標」)
+
+Judged against [rubric.md](rubric.md) items `fl-*`, `fm-*`, `fh-*` (judge 1: 13 × 1, `fh-base` 2; [scores](judge1/scores.md)). Review pose is the target's: `cityPose([192,44,-338],[40,54,-300])`, 12:00. Sizes below are **frame fractions at that pose** (x left→right, y top→bottom, measured on 1600×900 from the targets vs judge-1 captures); local units are the means, the frame numbers are the acceptance.
+
+### Size (owner decision: match the target)
+
+| State | Part | Judge 1 | Target | Change |
+| --- | --- | --- | --- | --- |
+| low | hall camera face | x .44–.56, roof y .82, floor y .96 | x .37–.77, roof y .65, floor y .93 | whole low group uniform ×2 about the plinth centre (people, benches, trees and canopy included, so people read like the target's); then lengthen the hall along the camera-facing axis until the face spans ≈ .37–.77 |
+| low | canopy | x .46–.56, y ≈ .76 | x .40–.71, y .56–.62 | follows the ×2 group; radius to match the target span |
+| mixed | hall | x .45–.57, top y .75 | x .43–.56, top y .71 | hall ×1.2 |
+| mixed | column | core ≈ 2.3 % wide, top y .32 | core ≈ 4 % wide, top beyond frame, three rings at y .05–.20 | core radius ×1.7; top ≈ `SPIRE_TOP`; the three docking rings move up with it |
+| high | rings | ≈ 7.6 % wide | ≈ 9.3 % wide, top at y 0 | ring radius ×1.2; height unchanged |
+
+Lot and neighbours: the ×2 low plinth outgrows the 8×7 lot. Grow it toward open ground; the amber outline (`createGuestMarker`) follows the new plinth. Fix clearance failures in this order: shift the low group's centre, rotate, then reduce the extra lengthening (never the ×2). If the target size still collides with a neighbour, a route or a clearance test, stop and report the blocker with options; do not shrink quietly, do not delete a test.
+
+### Rubric fixes
+
+- `fl-material`: no `cream` masses and no teal seam on the low hall; `trim` white, seams `futureLight` thin or `automationBlue`.
+- `fl-glazing`: roof slab overhangs the glazing clearly on the camera side (≥ 8 % of hall depth).
+- `fl-people-in`: staff stand behind counters, residents sit across, ≥ 6 readable through the glass.
+- `fl-canopy`: lens profile (thicker centre, ≥ 2× the current height), blue rim, 4 bright under-emitters with a visible glow disc each.
+- `fm-arm`: articulated arm — base, shoulder joint (sphere), two segments, wrist, gripper holding a `cream` parcel; spans ≥ ¼ of the hall width.
+- `fm-column`: panel joints (thin dark-trim rings every ≈ 2 units), two vertical `automationBlue` seams, a mid collar band with blue seam.
+- `fm-rings`: three rings with blue seams and ≥ 2 docked drones each.
+- `fh-rings`: gaps between rings ≤ ring thickness (thicker rings or more rings — up to 18 in the same height); core gets panel joints like `fm-column`.
+- `fh-arms`: ≥ 4 arms readable from the pose, each with a parcel.
+- `fh-drones`: drones read as quad-rotor bodies, not puffs (check material/size at this distance; the white district drone mesh is fine if it reads).
+- `fh-cap`: 2 antennas and small lit windows on the cap, visible at the pose.
+
+### Checks and captures
+
+`npm test && npm run build && git diff --check`. Report site visible meshes per state and the final low plinth footprint. Evidence `~/city2127-evidence/nw-closeup-polish/r4/`: `flagship-{low,mixed,high}.png` at 3200×1800 at the review pose (HUD hidden, same method as judge 1), plus `nw:focal`/`nw:focal-low` day captures per state to check the live headline shots still frame the site, and `vs-target.jpg` (3 rows × [r4 | target], 800×450). Publish only `vs-target.jpg` to `nw-closeup-polish/r4`. Do not judge; Opus runs the blind judge.
