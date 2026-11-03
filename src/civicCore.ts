@@ -3,7 +3,11 @@ import { arc, bake, box, chrome, mirrors, leaf, leafyCrown, membrane, publicLigh
 import type { Ride, Spot, Walk } from './occupants.ts';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { megaGlass, megaSeam } from './megastructures.ts';
+import { CIVIC, civicAt } from './layout.ts';
 
+/** polish2: the chrome sphere's sky reflection dims at night (gunmetal with highlights, as the night target), set by `updateCivic`. */
+const civicSphere={material:null as T.MeshPhysicalMaterial|null};
+export const updateCivic=(night:number)=>{if(civicSphere.material)civicSphere.material.envMapIntensity=1.1-night*.7;};
 /** Occupied media headquarters within Fuji's civic chassis, retaining the sphere berth and site alignment. Metres. Its people are not
  * baked: `occupants` lists them (staff, audience, forum crowds, strollers and escalator riders) for `publishOccupants` to animate. */
 export function civicCore() {
@@ -16,22 +20,24 @@ export function civicCore() {
   const stone=trim; // P2: one white finish for frame and slabs (keeps the batch count)
   const solar=citySolar.clone();solar.color.set('#6a7279'); // warm umber: unlit room depth reads brown-dark under the amber light
   // Warm occupied rooms follow the existing city clock, using one shared finish for this building.
-  const publicLight=cityLight.clone();publicLight.color.set('#f2dcb4');publicLight.emissive.set('#ffd29c');publicLight.emissiveIntensity=1;
+  const publicLight=cityLight.clone();publicLight.color.set('#e4e8ea');publicLight.emissive.set('#ffd29c');publicLight.emissiveIntensity=1;
+  const K=CIVIC.k,f=(v:number)=>v.toFixed(3); // shader positions are world metres, so the room cells and theatre shell follow the polish2 scale
   publicLight.onBeforeCompile=shader=>{
-    shader.uniforms.roomLight={get value(){return 1.15+cityLight.emissiveIntensity*.55;}};shader.uniforms.roomNight={get value(){return Math.min(1,Math.max(0,(cityLight.emissiveIntensity-.15)/1.3));}};
+    shader.uniforms.roomLight={get value(){const night=Math.min(1,Math.max(0,(cityLight.emissiveIntensity-.15)/1.3));return T.MathUtils.lerp(.3,1.15+cityLight.emissiveIntensity*.55,night);}}; // polish2: rooms glow at night only, so the frame reads white by dayshader.uniforms.roomNight={get value(){return Math.min(1,Math.max(0,(cityLight.emissiveIntensity-.15)/1.3));}};
     // Each ~5×6 m room cell gets its own light level, and upward-facing floors glow less than ceilings and screens,
     // so stacked workrooms read as separate occupied rooms with depth instead of one flat lit slab.
     shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vRoomPos;\nvarying float vRoomUp;')
       .replace('#include <project_vertex>','#include <project_vertex>\nvRoomPos=(modelMatrix*vec4(transformed,1.)).xyz;\nvRoomUp=normalize(mat3(modelMatrix)*objectNormal).y;');
     shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nuniform float roomLight,roomNight;\nvarying vec3 vRoomPos;\nvarying float vRoomUp;')
       .replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>
-        float roomCell=fract(sin(dot(floor(vRoomPos.xz/vec2(5.,6.))+floor(vRoomPos.y/9.)*vec2(7.,3.),vec2(12.9898,78.233)))*43758.5453);
+        float roomCell=fract(sin(dot(floor(vRoomPos.xz/vec2(${f(5*K)},${f(6*K)}))+floor(vRoomPos.y/${f(9*K)})*vec2(7.,3.),vec2(12.9898,78.233)))*43758.5453);
         float roomFloor=smoothstep(.5,.9,vRoomUp);
+        diffuseColor.rgb*=mix(vec3(1.),vec3(1.,.8,.56),roomNight); // polish2: pale rooms by day turn warm at night
         // Floors read as dark oak under lit ceilings: rooms gain depth instead of a pale yellow slab seen from above.
         diffuseColor.rgb*=mix(vec3(1.),vec3(.46,.38,.3),roomFloor);
         // The theatre's inner shell (r≈23.2 about the chamber centre) is a dim stage-wash wall, so rig, stage and audience glow against it.
-        float theatreR=length(vRoomPos-vec3(-18.,100.,23.));
-        float theatreWall=smoothstep(23.,23.12,theatreR)*(1.-smoothstep(23.28,23.4,theatreR));
+        float theatreR=length(vRoomPos-vec3(${civicAt([-18,100,23]).map(f).join(',')}));
+        float theatreWall=smoothstep(${f(23*K)},${f(23.12*K)},theatreR)*(1.-smoothstep(${f(23.28*K)},${f(23.4*K)},theatreR));
         // Wider per-room contrast and dim, desaturated floors: stacked rooms stop reading as clipped amber shelves.
         totalEmissiveRadiance *= roomLight*(.4+1.1*roomCell)*mix(vec3(1.),vec3(.8,.62,.4),roomNight)*mix(vec3(1.),vec3(.2,.21,.24),roomFloor)*mix(1.,.45,theatreWall);
         // The inner theatre shell has a dark painted finish: daylight through the glass no longer turns the dome pale lilac.
@@ -39,9 +45,9 @@ export function civicCore() {
         // The theatre wall carries a violet stage wash, so the whole auditorium glows blue-violet around the warm rig.
         totalEmissiveRadiance=mix(totalEmissiveRadiance,vec3(.34,.3,.95)*dot(totalEmissiveRadiance,vec3(.4)),theatreWall);
         // The dome above the rig fades to a deep navy (not black), so the sphere reads as a lit glass theatre with its house lights.
-        totalEmissiveRadiance*=mix(1.,.2,smoothstep(104.,117.,vRoomPos.y)*theatreWall);
+        totalEmissiveRadiance*=mix(1.,.2,smoothstep(${f(104*K)},${f(117*K)},vRoomPos.y)*theatreWall);
         // Blue-lit seat backs and step lights in the audience rake (below the chamber centre, ahead of the stage) read as violet house seating.
-        float theatreSeat=(1.-smoothstep(22.,22.6,theatreR))*step(vRoomPos.y,101.)*step(vRoomPos.z,25.5)*step(totalEmissiveRadiance.r,totalEmissiveRadiance.b);
+        float theatreSeat=(1.-smoothstep(${f(22*K)},${f(22.6*K)},theatreR))*step(vRoomPos.y,${f(101*K)})*step(vRoomPos.z,${f(civicAt([0,0,25.5])[2])})*step(totalEmissiveRadiance.r,totalEmissiveRadiance.b);
         totalEmissiveRadiance=mix(totalEmissiveRadiance,vec3(.52,.36,1.)*totalEmissiveRadiance.b,theatreSeat);`);
   };
   publicLight.customProgramCacheKey=()=>'fuji-room-light';
@@ -588,7 +594,7 @@ export function civicCore() {
     }
   }
   // P2: one polished chrome sphere (Ø 56 m, hides the theatre inside) hangs in the frame, held by four tension members. Baked with the rest, in its own mirror batch.
-  const sphereMat=chrome.clone();sphereMat.color.set('#f2f4f5');sphereMat.roughness=.14;sphereMat.metalness=1;sphereMat.clearcoat=0;sphereMat.emissive.set('#2a3440'); // never dimmed with the night: a faint reflected city light keeps it a lit sphere, not a hole
+  const sphereMat=civicSphere.material=chrome.clone();sphereMat.color.set('#f2f4f5');sphereMat.roughness=.14;sphereMat.metalness=1;sphereMat.clearcoat=0;sphereMat.emissive.set('#2a3440'); // never dimmed with the night: a faint reflected city light keeps it a lit sphere, not a hole
 
   // Chrome needs contrast to read: a small equirect gradient (deep sky, white horizon band, dark ground) on this one material.
   const stops:[number,string][]=[[0,'#dfe9f1'],[.35,'#eef3f6'],[.5,'#ffffff'],[.56,'#e8e4dc'],[.8,'#b9b6ae'],[1,'#8d8a83']],envData=new Uint8Array(4*64*32),c0=new T.Color(),c1=new T.Color();
@@ -612,5 +618,11 @@ export function civicCore() {
   root.traverse(object=>{if(object instanceof T.Mesh && object.geometry.type!=='RoundedBoxGeometry')generated.add(object.geometry);});
   const batches=bake(root);root.clear();batches.forEach(mesh=>{mesh.name='fuji-civic-chassis';root.add(mesh);});
   generated.forEach(geometry=>geometry.dispose()); // Cached box geometry remains shared with the rest of the city.
+  // polish2: the whole chassis is scaled about its west-front foot (layout CIVIC); people and rides follow, seated people keep their .48 m seat drop.
+  root.scale.setScalar(CIVIC.k);root.position.set(...civicAt([0,0,0]));
+  const place=new T.Matrix4().compose(root.position,root.quaternion,root.scale);
+  for(const spot of spots){spot.at.applyMatrix4(place);if(spot.seated)spot.at.y+=.48*(CIVIC.k-1);}
+  for(const walk of walks){(walk.curve as T.CatmullRomCurve3).points.forEach(p=>p.applyMatrix4(place));walk.curve.updateArcLengths();}
+  for(const ride of rides){ride.from.applyMatrix4(place);ride.to.applyMatrix4(place);ride.through=ride.through?.map(([a,b])=>[a*CIVIC.k,b*CIVIC.k] as const);}
   return Object.assign(root,{occupants:{spots,walks,rides}});
 }

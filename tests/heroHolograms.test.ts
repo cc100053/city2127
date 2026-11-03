@@ -49,9 +49,10 @@ for (const place of HOLOGRAMS.panels) {
 }
 
 // Hero: every panel is front-facing to the settled hero camera and its centre is inside the frame (occlusion by buildings is checked in the browser).
+// polish2 (owner 2026-11-02: hero visibility never blocks a design): the Fuji district/culture screens moved to the frame's east face and are exempt.
 {
   const cam = heroSettledCamera(1600, 900);
-  for (const place of HOLOGRAMS.panels) {
+  for (const place of HOLOGRAMS.panels.filter(p => p.id !== 'district' && p.id !== 'culture')) {
     const group = holo.root.getObjectByName(`hologram-${place.id}`)!, normal = new Vector3(0, 0, 1).applyQuaternion(group.quaternion), c = new Vector3(...place.at);
     assert.ok(normal.dot(cam.position.clone().sub(c).normalize()) > .05, `${place.id} faces away from the hero camera`);
     const ndc = c.clone().project(cam); assert.ok(Math.abs(ndc.x) < 1 && Math.abs(ndc.y) < 1, `${place.id} is outside the hero frame`);

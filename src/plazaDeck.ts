@@ -40,8 +40,8 @@ function hoverBeds(scene: T.Object3D) {
 // P7 r2: soft cool lamp pools (one instanced additive decal, no lights) on a ~30 m grid over the deck and along the walkways, plus a faint lit paving.
 const poolMat = new T.MeshBasicMaterial({ color: '#dfeeff', transparent: true, opacity: 0, blending: T.AdditiveBlending, depthWrite: false, fog: false });
 const pools: T.Vector3[] = [];
-ivory.emissive.set('#2a3340');
-export const updatePlaza = (night: number) => { walkSeam.emissiveIntensity = 1 + night * 1.4; poolMat.opacity = .35 * night; ivory.emissiveIntensity = night; };
+ivory.emissive.set('#3e4b5e'); // polish2: paler night paving (target: light plaza under cool lamps)
+export const updatePlaza = (night: number) => { walkSeam.emissiveIntensity = 1 + night * 1.4; poolMat.opacity = .5 * night; ivory.emissiveIntensity = night; };
 function lampPools(root: T.Object3D) {
   if (typeof document === 'undefined') return;
   poolMat.map = glowTexture();
@@ -85,15 +85,15 @@ function mast(root: T.Object3D, [x, z]: readonly [number, number], y: number, w:
 export function plazaDeck(scene: T.Object3D, panels: readonly { id: string; at: readonly number[]; w: number; h: number; face: readonly number[] }[] = []) {
   const root = new T.Group(); root.name = 'plaza-deck';
   const g = new T.Group(); g.position.set(PLAZA.x, 0, PLAZA.z); g.rotation.y = PLAZA.yaw; root.add(g);
-  const { hu, hv, h } = PLAZA;
+  const { hu, hv, h, east } = PLAZA, mid = (hu - east) / 2, span = hu + east; // the deck runs local x -east..hu
   pools.length = 0;
-  for (const [x, z] of [[-60, -20], [-60, 20], [-30, -20], [-30, 20], [30, -20], [30, 20], [60, -20], [60, 20], [0, -30], [0, 30], [-45, 0], [45, 0]]) { const [wx, wz] = plazaAt(x, z); pools.push(new T.Vector3(wx, h + .45, wz)); }
-  box(g, [hu * 2, h, hv * 2], [0, h / 2, 0], megaShell, .2);
-  box(g, [hu * 2 + .3, 1.3, hv * 2 + .3], [0, 3.1, 0], megaGlass, .1); // glazed storey band round the podium
-  box(g, [hu * 2 - 1, .25, hv * 2 - 1], [0, h + .1, 0], ivory, .05);
+  for (const [x, z] of [[-60, -20], [-60, 20], [-30, -20], [-30, 20], [30, -20], [30, 20], [60, -20], [60, 20], [0, -30], [0, 30], [-45, 0], [45, 0], [-90, -20], [-90, 20], [-115, 0]]) { const [wx, wz] = plazaAt(x, z); pools.push(new T.Vector3(wx, h + .45, wz)); }
+  box(g, [span, h, hv * 2], [mid, h / 2, 0], megaShell, .2);
+  box(g, [span + .3, 1.3, hv * 2 + .3], [mid, 3.1, 0], megaGlass, .1); // glazed storey band round the podium
+  box(g, [span - 1, .25, hv * 2 - 1], [mid, h + .1, 0], ivory, .05);
   // Radial paving bands (wider grey strips from the pool to the deck edge) and ring inlays, so the plaza reads patterned from a distance.
   for (let k = 0; k < 6; k++) {
-    const a = k * Math.PI / 3, c = Math.abs(Math.cos(a)), s = Math.abs(Math.sin(a)), end = Math.min(c > 1e-6 ? (hu - 2) / c : 1e9, s > 1e-6 ? (hv - 2) / s : 1e9), len = end - 12;
+    const a = k * Math.PI / 3, c = Math.abs(Math.cos(a)), s = Math.abs(Math.sin(a)), end = Math.min(c > 1e-6 ? ((Math.cos(a) < 0 ? east : hu) - 2) / c : 1e9, s > 1e-6 ? (hv - 2) / s : 1e9), len = end - 12;
     const b = box(g, [len, .04, 3.6], [Math.cos(a) * (12 + len / 2), top - .005, -Math.sin(a) * (12 + len / 2)], band, .015); b.rotation.y = a;
   }
   for (const r of [14, 24, 36]) arc(g, r - .25, r + .25, .06, [0, top + .01, 0], megaRib);
@@ -105,20 +105,20 @@ export function plazaDeck(scene: T.Object3D, panels: readonly { id: string; at: 
     const a2 = a + Math.PI / 6, j = new T.Mesh(new T.CylinderGeometry(.08, .22, 1, 8), jet); j.scale.set(1, 3.2 + (k % 2) * 1.3, 1); j.position.set(Math.cos(a2) * 5, h + .15 + j.scale.y / 2, Math.sin(a2) * 5); g.add(j);
   }
   arc(g, 9.3, 9.9, .12, [0, top + .02, 0], megaSeam);
-  for (const [w, d, x, z] of [[hu * 2, .5, 0, hv - .25], [hu * 2, .5, 0, -hv + .25], [.5, hv * 2, hu - .25, 0], [.5, hv * 2, -hu + .25, 0]]) box(g, [w, .15, d], [x, top + .05, z], megaSeam, .03);
+  for (const [w, d, x, z] of [[span, .5, mid, hv - .25], [span, .5, mid, -hv + .25], [.5, hv * 2, hu - .25, 0], [.5, hv * 2, -east + .25, 0]]) box(g, [w, .15, d], [x, top + .05, z], megaSeam, .03);
   // Broad ramps down to the ground at both ends of the deck, and a second ring set round each end.
   for (const side of [1, -1]) {
     const shape = new T.Shape().moveTo(0, 0).lineTo(18, 0).lineTo(0, h).lineTo(0, 0);
-    const m = new T.Mesh(new T.ExtrudeGeometry(shape, { depth: 26, bevelEnabled: false }).translate(0, 0, -13), megaShell); m.rotation.y = side > 0 ? 0 : Math.PI; m.position.set(side * hu, 0, 0); g.add(m);
-    for (const r of [8, 15]) arc(g, r - .25, r + .25, .06, [side * 55, top + .01, 0], megaRib);
+    const m = new T.Mesh(new T.ExtrudeGeometry(shape, { depth: 26, bevelEnabled: false }).translate(0, 0, -13), megaShell); m.rotation.y = side > 0 ? 0 : Math.PI; m.position.set(side > 0 ? hu : -east, 0, 0); g.add(m);
+    for (const r of [8, 15]) arc(g, r - .25, r + .25, .06, [side > 0 ? 55 : -east + 25, top + .01, 0], megaRib);
   }
   // Planted terraces (the roof-garden Meter and strollers read these) on two rings round the fountain: 6 inner and 8 outer.
   const ring = (n: number, a0: number, rx: number, rz: number, r: number) => Array.from({ length: n }, (_, k) => {
     const a = a0 + k * 2 * Math.PI / n, [x, z] = plazaAt(Math.cos(a) * rx, Math.sin(a) * rz);
     return [x, z, h + .25, r + (k % 2) * .5] as [number, number, number, number];
   });
-  const clusters = [...ring(6, Math.PI / 6, 22, 22, 4.6), ...ring(8, Math.PI / 8, 62, 33, 5.2)];
-  plantClusters(scene, clusters, .6); publishRoofGardens(clusters);
+  const clusters = [...ring(6, Math.PI / 6, 22, 22, 4.6), ...ring(8, Math.PI / 8, 62, 33, 4.4)];
+  plantClusters(scene, clusters, .45); // polish2: smaller crowns, so the open white paving reads publishRoofGardens(clusters);
   hoverBeds(scene);
   for (const p of panels) if (p.id === 'voices' || p.id === 'air') mast(root, p.id === 'voices' ? VOICES_AT : AIR_AT, p.at[1], p.w, p.h, p.face);
   root.updateMatrixWorld(true);
@@ -144,6 +144,12 @@ export function plazaDeck(scene: T.Object3D, panels: readonly { id: string; at: 
       for (let j = 0; j < 3 + ((k + side) & 1); j++) spots.push({ at: c.clone().add(new T.Vector3(Math.cos(j * 2.1) * .7, 0, Math.sin(j * 2.1) * .7)), yaw: 0, mode: 'talk', crowd: kinds[(k + j) % 3] });
     }
   });
+  // polish2: groups and strollers on the open east deck under the arch.
+  [[-92, -24], [-104, 24], [-118, -14], [-96, 8], [-112, 12]].forEach(([lx, lz], k) => {
+    const [x, z] = plazaAt(lx, lz);
+    for (let j = 0; j < 4; j++) spots.push({ at: new T.Vector3(x + Math.cos(j * 1.6) * .8, top, z + Math.sin(j * 1.6) * .8), yaw: 0, mode: 'talk', crowd: kinds[(k + j) % 3] });
+  });
+  for (const lz of [-30, -12, 18, 32]) walks.push({ curve: line(Math.PI, .9, 1.7, lz), crowd: kinds[walks.length % 3], pair: lz > 0 ? .45 : undefined, rest: [3, 10] });
   for (const points of plazaWalks) {
     const curve = pts(points); walkway(root, curve);
     for (const pair of [2.2, 0]) walks.push({ curve, crowd: 'public', pair: pair || undefined, rest: [5, 15] }); // strollers on each walkway

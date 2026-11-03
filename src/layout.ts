@@ -36,8 +36,13 @@ export const streets: readonly (readonly P3[])[] = [
   [[-207,0,-86.4],[-108.9,0,-151.5],[-10.8,0,-216.6],[87,0,-282.1],[168.4,0,-336.7],[217.5,0,-369.3]],
   [[259.8,0,-256],[175.9,0,-199.5],[108.9,0,-154.3],[24.6,0,-98.4],[-59.9,0,-42.9],[-127.5,0,1.5],[-160.6,0,24],[-244,0,80.9],[-255.6,0,88.6]],
 ];
-// Top of the Fuji TV sphere (centre about -18, 107, 23; radius 22): the air-taxi berth.
-export const SPHERE_DOCK: P3 = [-18,131,23];
+// polish2 (2026-11-03): the Fuji frame tower is the hero centrepiece. civicCore builds in its original metres and the whole chassis is scaled
+// `k` about its west-front foot (-75, 0, -12), which lands at (x, 0, z): set back off the arch foot, east of COMMONS PLAZA and the guideway.
+export const CIVIC = {k:1.35,x:-63,z:22} as const;
+/** World point of a civicCore-local point. */
+export const civicAt = ([x,y,z]:readonly number[]):P3 => [CIVIC.x+(x+75)*CIVIC.k,y*CIVIC.k,CIVIC.z+(z+12)*CIVIC.k];
+// Top of the Fuji TV chrome sphere (local centre -18, 100, 23; radius 28): the air-taxi berth.
+export const SPHERE_DOCK: P3 = civicAt([-18,131,23]);
 // Water taxis: a shuttle loop along the beach and a ferry lane out to the bay (the open sea continues past the plate).
 // The loop's return leg runs about 28 m seaward of the outbound leg, so taxis passing the other way never touch.
 export const waterLoop: readonly P3[] = [
@@ -70,7 +75,8 @@ export const sweepway: readonly P3[] = [[-290,92,265],[-345,74,250],[-400,56,205
 // loop follows its plan below. Above the hero eye (~148 m) so it arcs across the sky; at the tier's own 160–170 m it read as a flat bar at eye level.
 export const SKY_RING = {x:-40,z:-40,rx:350,rz:350,deck:250} as const;
 // P4 plaza deck (plazaDeck.ts) on the former Aqua City lot; local +z runs out to sea. `plazaAt` maps plaza-local metres to world x, z.
-export const PLAZA = { x: -92.3, z: -103.3, yaw: -2.55, hu: 80, hv: 40, h: 5 } as const;
+// polish2: the deck runs `east` m out on its -x side (to under the arch), so the plaza reads as the large central deck of the target.
+export const PLAZA = { x: -92.3, z: -103.3, yaw: -2.55, hu: 80, hv: 40, h: 5, east: 125 } as const;
 export const plazaAt = (lx: number, lz: number): [number, number] => [PLAZA.x + lx * Math.cos(PLAZA.yaw) + lz * Math.sin(PLAZA.yaw), PLAZA.z - lx * Math.sin(PLAZA.yaw) + lz * Math.cos(PLAZA.yaw)];
 const HERO_EYE: P3 = [-358,148,-437];
 export const VOICES_AT = plazaAt(0,-37.5), AIR_AT = plazaAt(66,30);
@@ -80,20 +86,20 @@ const aimAt = ([x,z]:readonly [number,number], y:number): P3 => { const d = Math
 // loaded city (2026-11-02) and faces the pedestrian eye it is meant for, not the hero camera. at = panel centre, w x h = size, face = the world point it turns towards
 // (the walkers' eye, lowered so a high panel tilts down by about 10-15 degrees instead of craning), view = the main viewing distance in metres (main word >= view / 40).
 // `eye` is only the settled hero camera, kept for the hero visibility and sightline tests.
+const EAST = civicAt([75,0,29]); // centre of the Fuji frame's east face, 2 m outside its piers
 export const HOLOGRAMS = {
   eye: HERO_EYE,
   panels: [
-    // Civic Core (Fuji TV frame) north face, 1.8 m outside the beams (front faces reach z -17.2): the upper media bay (x 6..54 between the central and east columns, y 71..105, above the
-    // 58-67 m floor beam), facing the main plaza and the hero
-    {id:'district',at:[30,88,-19] as P3,w:48,h:34,face:[30,62,-110] as P3,view:120},
+    // Civic Core (Fuji TV frame) upper media bay; polish2 moved it off the hero-facing north face to the east face, facing the TOWER side.
+    {id:'district',at:[EAST[0],88,EAST[2]] as P3,w:48,h:34,face:[EAST[0]+90,62,EAST[2]] as P3,view:120},
     // Daiba station front: Fuji podium north-east face (curved, top 24 m) above the Yurikamome deck, facing the plaza and station forecourt
-    {id:'transit',at:[17.7,20.5,-38] as P3,w:10,h:5,face:[33.8,16,-59.4] as P3,view:28},
+    {id:'transit',at:civicAt([17.7,20.5,-38]),w:10,h:5,face:civicAt([33.8,16,-59.4]),view:28},
     // Mast on the plaza deck's west perimeter (P4 r2: Aqua City is gone), data panel facing the hero
     {id:'air',at:[AIR_AT[0],29.5,AIR_AT[1]] as P3,w:10,h:5,face:aimAt(AIR_AT,29.5),view:35},
     // Mast at the plaza deck's land-side edge, residents' voice board 11.5 m above the deck facing the hero (P4 r2)
     {id:'voices',at:[VOICES_AT[0],17.5,VOICES_AT[1]] as P3,w:16,h:12,face:aimAt(VOICES_AT,17.5),view:45},
-    // Fuji TV media screen, same face 1.8 m outside the beams, the lower bay (y 32.5..63.5: 2.5 m over the podium roof that reaches y 30 near x 21; it stands 1.8 m in front of the 58-67 m floor beam, not in it), facing the plaza and the hero
-    {id:'culture',at:[31,48,-19] as P3,w:44,h:31,face:[31,26,-85] as P3,view:85},
+    // Fuji TV media screen below it on the same east face (polish2).
+    {id:'culture',at:[EAST[0],48,EAST[2]] as P3,w:44,h:31,face:[EAST[0]+66,26,EAST[2]] as P3,view:85},
   ],
 } as const;
 // Far backdrop space elevator (2026-11-02): ~7.5 km from the settled hero camera at screen x≈1220/1920, open sea; its anchor sinks ~480 m behind the curved horizon. Heights in metres before curvature.
@@ -102,8 +108,9 @@ export const SPACE_ELEVATOR = {x:3130,z:6200,spire:900,station:1150,tether:6000}
 export const airLoop: readonly P3[] = Array.from({length:12},(_,i)=>{
   const a=i/12*Math.PI*2;return [SKY_RING.x+Math.cos(a)*SKY_RING.rx,170+Math.sin(a*2)*6,SKY_RING.z+Math.sin(a)*SKY_RING.rz] as const;
 });
-export const sphereApproach: readonly P3[] = [[-620,160,-640],[-380,160,-360],[-160,158,-120],[-60,150,-20],[SPHERE_DOCK[0],SPHERE_DOCK[1]+6,SPHERE_DOCK[2]]];
-// Air tiers (2127 mobility layers): regional 160–170 m (district loop, sphere approach), city 80–100 m (shore lane), service 30–45 m
+// polish2: the approach comes in over the enlarged frame's top beams (≈ 182 m) and drops through the open roof to the berth.
+export const sphereApproach: readonly P3[] = [[-620,190,-640],[-380,195,-360],[-160,200,-120],[-40,205,15],[0,200,50],[SPHERE_DOCK[0],SPHERE_DOCK[1]+6,SPHERE_DOCK[2]]];
+// Air tiers (2127 mobility layers): regional 160–205 m (district loop, sphere approach), city 80–100 m (shore lane), service 30–45 m
 // (district quadrotors). The shore lane is one closed loop off the north shore: its inbound leg runs 45 m out at 80 m westward, its
 // outbound leg 120 m out at 100 m eastward, so the two directions read as separate lanes. Offsets of a smoothed shore, ending west of
 // the AUTO HUB site.
@@ -138,7 +145,7 @@ export const midDecks: readonly (readonly P3[])[] = [
 const deckTop = PLAZA.h + .6;
 /** Elevated white walkways (deck top y at the points): ring plinth to the plaza, plaza to the civic core's landing, plaza to the hull apron. Walkers use them. */
 export const plazaWalks: readonly (readonly P3[])[] = [
-  [[72,16,-183],[45,15,-176],[18,12.5,-168],[-5,10.5,-163],[...plazaAt(-88,11),7.2],[...plazaAt(-80,10),deckTop],[...plazaAt(-66,8),deckTop],[...plazaAt(-56,8),deckTop]],
+  [[72,16,-183],[45,13,-178],[...plazaAt(-140,-6),9],[...plazaAt(-128,-5),deckTop],[...plazaAt(-100,2),deckTop],[...plazaAt(-80,8),deckTop],[...plazaAt(-56,8),deckTop]],
   [[...plazaAt(-26,-34),deckTop],[...plazaAt(-16,-48),deckTop],[...plazaAt(-14,-60),11],[-34,15,-66],[-50,15.5,-48],[-46,12,-28],[-40,7.5,-14],[-36,3,-2]],
   [[...plazaAt(56,-8),deckTop],[...plazaAt(68,-10),deckTop],[...plazaAt(92,-10),12],[-176,16,-42],[-200,16,-22],[-210,11,0],[-214,6,14],[-214,3,26]],
 ];

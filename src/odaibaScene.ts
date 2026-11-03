@@ -4,7 +4,7 @@ import { HOLOGRAMS } from './layout.ts';
 import { addCityModel } from './modelAssets';
 import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
-import { civicCore } from './civicCore';
+import { civicCore, updateCivic } from './civicCore';
 import { floaters } from './floaters';
 import { bodyFootprints, carveContext, inRect, megastructures, updateMegastructures } from './megastructures';
 import { publishOccupants, publishRoofWalks } from './occupants';
@@ -112,6 +112,7 @@ function nightRooms(material: T.MeshStandardMaterial) {
 }
 /** Retained landmark glazing glows warm, strongest at night; the civic chassis uses the shared city finishes. */
 export function updateOdaiba(night: number) {
+  updateCivic(night);
   // A faint daytime glow keeps the dark glazing reading as occupied, warm interiors (CITY_MASTER_TASTE) instead of voids.
   // Hero atmosphere: night keeps a light hierarchy — fewer, brighter lit rooms and scattered lit floors, so landmarks lead.
   for (const material of glazing) { material.emissive.copy(warm).lerp(amber, night); material.emissiveIntensity = dayGlow + night * (.5 - dayGlow); } // P7 r2: saturated, lower-energy amber survives tonemapping
@@ -200,7 +201,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   const roofGarden=(model:T.Object3D,tower?:boolean)=>{const terraces=plantRoofCanopy(scene,model,tower);publishRoofGardens(terraces);publishRoofWalks(model,terraces);};
   environment.traverse(object=>{if(object instanceof T.Mesh && object.name.startsWith('CTX_') && new T.Box3().setFromObject(object).max.y>30)roofGarden(object,true);});
   scene.add(plazaDeck(scene, HOLOGRAMS.panels)); // P4: the Aqua City lot is the civic plaza deck
-  await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1]) && placement.id !== 'aqua-city-odaiba' && !bodyFootprints().some(zone => inRect(zone, placement.positionBlender[0], -placement.positionBlender[1]))).map(async placement => {
+  await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1]) && placement.id !== 'aqua-city-odaiba' && placement.id !== 'divercity-tokyo-plaza' /* polish2: under the enlarged Fuji frame */ && (placement.id === 'fuji-tv' || !bodyFootprints().some(zone => inRect(zone, placement.positionBlender[0], -placement.positionBlender[1])))).map(async placement => {
     if(placement.id==='fuji-tv'){const core=civicCore();scene.add(core);publishOccupants(core.occupants);return;}
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);
     model.name = placement.id;

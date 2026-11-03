@@ -2,7 +2,7 @@ import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { arc, bake, box, chrome, cream, glass, leaf, leafyCrown, publicLight, skyGlass, solar, stone, trail, trim } from './cityRig.ts';
 import { changeSites, seaward } from './layout.ts';
-import { inMega } from './megaFootprints.ts';
+import { inCivic, inHeroClear, inMega } from './megaFootprints.ts';
 import { megaGlass, megaRib, megaShell } from './megastructures.ts';
 import { shoreRoomBays } from './waterRooms.ts';
 import { automationActivity, pavilionFlight, pedestrians, plazaPose, routes, serviceDrones } from './mobility.ts';
@@ -848,12 +848,13 @@ export class AutomationDistrict {
         p.x -= Math.sin(yaw) * 22; p.z -= Math.cos(yaw) * 22;
         if (Object.values(changeSites).some(s => Math.abs(p.x - s.x) < s.w * s.scale / 2 + 24 && Math.abs(p.z - s.z) < s.d * s.scale / 2 + 24)) continue;
         if (p.x > -65 && p.x < -25) continue; // Existing north-west context block.
+        if (inHeroClear(p.x, p.z)) continue; // polish2: the plaza deck's hero apron stays open
         this.bays.push({ x: p.x, y: p.y, z: p.z, yaw });
       }
     }
     // Traced open plazas at the mall approaches and western waterfront (actual-mesh checks in odaiba.test.ts).
     for (const [x, z, yaw] of [[20, 145, 0], [-200, 80, 0], [-130, 170, 0], [75, -160, 0], [-438, 45, -.9]])
-      this.bays.push({ x, y: 0, z, yaw });
+      if (!inCivic(x, z, 33)) this.bays.push({ x, y: 0, z, yaw }); // polish2: the mall approach bay sits under the enlarged Fuji frame
     this.staffed = new SlotLevels(this.bays.length);
     this.hybrid = new SlotLevels(this.bays.length);
     const pavilion = new T.Group();
@@ -1042,7 +1043,7 @@ const ALL_TOWERS: readonly (readonly [number, number, number])[] = [
   [115, -25, 128], [67, -89, 112], [27, -249, 120], [83, -305, 104], [-189, -1, 140], [-221, -73, 116], [-157, 63, 124], [-61, 111, 104], [179, 287, 120], [-13, 279, 110],
 ];
 // P1: towers that would pierce a megastructure are not built; hero frame slots follow their towers to the new indices.
-const TOWER_KEPT = ALL_TOWERS.map((t, i) => [t, i] as const).filter(([t]) => !inMega(t[0], t[1], 16));
+const TOWER_KEPT = ALL_TOWERS.map((t, i) => [t, i] as const).filter(([t]) => !inMega(t[0], t[1], 16) && !inHeroClear(t[0], t[1]));
 const TOWER_SITES: readonly (readonly [number, number, number])[] = TOWER_KEPT.map(([t]) => t);
 /** Hero-view slots (392–631 m from the c2 camera, where the blue-striped cylinders stood) rebuilt as open structural frames; the rest keep their i % 3 family. */
 export const HERO_FRAME_SLOTS = [0, 2, 3, 5].flatMap(a => { const i = TOWER_KEPT.findIndex(([, o]) => o === a); return i < 0 ? [] : [i]; });
@@ -1051,7 +1052,7 @@ const slotFamilies = TOWER_SITES.map((_, i) => HERO_FRAME_SLOTS.includes(i) ? 3 
 export const towerFamily = (i: number) => ({ family: slotFamilies[i], instance: slotFamilies.slice(0, i).filter(f => f === slotFamilies[i]).length });
 const POD_SITES: readonly (readonly [number, number])[] = ([
   [-293, 147], [-253, -33], [-233, 47], [-218, -23], [-183, -43], [-168, -128], [-103, 17], [-53, 147], [-33, 167], [-23, 107], [7, -58], [27, 87], [77, 107], [87, 57], [97, -73], [107, -123], [107, 77], [117, 7], [137, -103], [207, 37], [217, -43], [217, 87], [237, -73], [237, 57], [247, -103], [252, 147],
-] as const).filter(([x, z]) => !inMega(x, z, 14));
+] as const).filter(([x, z]) => !inMega(x, z, 14) && !inHeroClear(x, z));
 
 /** Q4: one walkable vertical district or functions spread through the parks.
  * High raises slender glass towers with lit sky lobbies on open ground; low scatters low glass pavilion pods across the lawns.

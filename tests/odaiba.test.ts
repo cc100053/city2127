@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { Box3, Group, InstancedMesh, Matrix4, Mesh, Quaternion, Raycaster, Scene, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
-import { changeSites, skyBridges, inDistrict, DISTRICT } from '../src/layout.ts';
+import { changeSites, skyBridges, inDistrict, DISTRICT, CIVIC, civicAt } from '../src/layout.ts';
 import { heroCamera, heroSettledCamera } from '../src/heroCamera.ts';
 import { pavilionFlight, plazaPose, routes, mobility, publishDoorways, publishEntrances, forecourtVisits, promenadeBenches, visitPose, entranceJourneys, entrancePose, laneOffset } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
@@ -104,23 +104,23 @@ assert.equal(triangles, 339919, 'All eight complete GLBs retain reviewed geometr
 const core=civicCore();city.add(core);
 landmarks.push(core);
 const coreBounds=new Box3().setFromObject(core);
-assert.ok(coreBounds.min.y>=-5 && coreBounds.max.y<155, 'Civic chassis stays below the district aerial corridor');
+assert.ok(coreBounds.min.y>=-7 && coreBounds.max.y<195, 'Civic chassis (polish2: 1.35× frame) stays below the sphere approach tier'); // the district loop at 164–176 m runs ~350 m out
 assert.ok(core.children.length<=10, 'Static civic chassis batches by shared material, including broadcast screens');
 assert.ok(core.children.every(object=>object instanceof Mesh && !Array.isArray(object.material)), 'No per-member draws');
 // Actual chassis must preserve the bay approach and berth, including a 22 m aircraft wing envelope.
 core.updateMatrixWorld(true);
 // Occupied production floors in both wings need real support and standing headroom after material batching.
 for(const x of [-55,41])for(const y of [24,43,64,83,102]) {
-  const floorRay=new Raycaster(new Vector3(x,y+4,18),new Vector3(0,-1,0),0,4);
+  const at=new Vector3(...civicAt([x,y+4,18])),floorRay=new Raycaster(at,new Vector3(0,-1,0),0,4*CIVIC.k);
   const hit=floorRay.intersectObject(core,true)[0];
-  assert.ok(hit && Math.abs(hit.point.y-(y+1.225))<.3, `Fuji work floor ${x}/${y} needs support and clear headroom`);
+  assert.ok(hit && Math.abs(hit.point.y-(y+1.225)*CIVIC.k)<.3*CIVIC.k, `Fuji work floor ${x}/${y} needs support and clear headroom`);
 }
 // Fuji's people (civicCore `occupants`) stand on real floor with clear headroom, or sit on a real seat; strollers and escalator riders
 // keep that along their whole lane and stay clear of everyone placed (seated knees reach further).
 const fuji=core.occupants,footing=new Raycaster(),downward=new Vector3(0,-1,0);
 const support=(p:Vector3,seated=false)=>{
   footing.set(p.clone().setY(p.y+(seated?1.6:1.85)),downward);footing.far=2;const hit=footing.intersectObject(core,true)[0];
-  return !!hit&&Math.abs(hit.point.y-(p.y+(seated?.48:0)))<.1;
+  return !!hit&&Math.abs(hit.point.y-(p.y+(seated?.48:0)))<.1*CIVIC.k; // inlays and rugs scale with the polish2 frame
 };
 for(const s of fuji.spots)assert.ok(support(s.at,s.seated),`Fuji ${s.mode} at ${s.at.toArray().map(v=>v.toFixed(1))} needs a floor or seat and headroom`);
 const lanes=[...fuji.walks.map(w=>w.curve.getSpacedPoints(Math.ceil(w.curve.getLength()/.5))),
@@ -453,7 +453,8 @@ const courtPixels = (x: number, z: number, yaw = 0, half = 20) => {
 };
 const courtVisibility = sharingDistrict.courts.map(c => courtPixels(c.x, c.z, c.yaw));
 // Owner 2026-11-01 (c2 low hero): courts 1, 4, 6 and 7 fall behind landmarks or out of frame; the SW district shot shows them.
-const HERO_HIDDEN_COURTS = [1, 4, 6, 7];
+// polish2: court 9 (-20, 210) now sits behind the enlarged Fuji frame (owner 2026-11-02: hero visibility never blocks a design).
+const HERO_HIDDEN_COURTS = [1, 4, 6, 7, 9];
 for (const [i, px] of courtVisibility.entries()) if (!HERO_HIDDEN_COURTS.includes(i)) assert.ok(px >= 600, `court ${i} shows only ${px.toFixed(0)} px from the hero pose`);
 console.log(`Odaiba: sharing courts show ${courtVisibility.map(px => px.toFixed(0)).join(' / ')} px of ground in the hero frame.`);
 
