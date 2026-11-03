@@ -27,16 +27,18 @@ The same open service hall at the bottom (warm counters, staff, residents), now 
 
 The hall is gone; a tall white autonomous service spire rises about 110 m: a precise white core wrapped by many stacked docking rings that glow blue #3fa9ff at their seams, with a steady drone swarm flying in formation into and out of the rings, giant service arms sorting parcels, and maglev delivery pods gliding into ports at its base. At ground level residents use self-service light terminals on their own, no staff counters. Reads at a glance: one vertical machine that serves the city by itself, day and night.
 
-## District bay — state blocks
+## District bay — state blocks (r2, owner 2026-11-03: same language as the flagship targets)
+
+Round 1 bay images were not chosen; the owner picked the flagship row and asked for the bay in the flagship's language. Each bay prompt also uploads the matching chosen flagship target as a second image with: "The second image shows the flagship of this service network; make the centre building a smaller neighbourhood version in exactly the same design language (same white frame, glazing, hovering canopy disc, docking rings, drone and light style)."
 
 ### Bay −1 staffed service pavilion
 
-Replace the bare white stacked platforms in the centre with a staffed neighbourhood service pavilion: a white open-sided hall about 20 m tall under a broad thin hovering canopy (visible gap and soft under-emitters), a warm-lit counter with staff and residents talking, planters and benches round it. No drone mast.
+Replace the bare white stacked platforms in the centre with a small version of the flagship's low hall: a low, wide glazed white pavilion about 12 m tall whose camera-facing side is open, warm-lit counters with staff and residents sitting face to face, and a thin white canopy disc hovering above the roof on four glowing stabiliser emitters. Benches and planters at the front. No mast.
 
 ### Bay 0 hybrid
 
-The same staffed pavilion, smaller, with a slim white drone deck rising from one corner: a hovering landing disc on stabiliser rings with a blue #3fa9ff rim and one parked drone. People at the counter below.
+The same small glazed pavilion with warm counters and staff, plus one slender white service column rising from its centre to about 40 m: three stacked docking rings with #3fa9ff seams, one drone docking, a short robotic arm handing a parcel down next to the counter. Flat roof, no pool or water.
 
-### Bay +1 autonomous drone port
+### Bay +1 autonomous
 
-Replace the dark navy mast with a white autonomous drone port about 45 m tall: a slim white mast with precise seams carrying a wide landing disc that floats a little above the mast top on glowing stabiliser rings, a blue #3fa9ff rim light, three drones docked and one drone taking off. No staff; residents pick up parcels from a light locker at the foot.
+The pavilion is gone; a slim white autonomous service tower about 45 m tall in the flagship spire's language: white core wrapped by stacked docking rings with #3fa9ff seams, a small drone formation flying into the rings, a light locker at the foot where residents collect parcels themselves. No staff.
