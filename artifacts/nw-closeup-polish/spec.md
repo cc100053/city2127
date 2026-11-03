@@ -183,3 +183,14 @@ Base: R6 (3681080). Same pose, captures and lot. Targets: `fl-glazing`, `fl-mate
 - **Hollow docking rings** (`fm-rings`): the mixed rings become open rings like the target — a torus/annulus with a visible hole around the column (a gap between ring and core bridged by 3–4 thin spokes), an inner track/rail ring, blue seam on the outer edge, docked drones on the rim.
 
 Checks/captures as R6 into `~/city2127-evidence/nw-closeup-polish/r7/` (day ×3, night ×3, focal shots); publish `vs-target.jpg` to `nw-closeup-polish/r7`. Do not judge.
+
+## R8 — night warmth, room contrast, outline, emitters (owner 2026-11-03: 「再開 R8」)
+
+Base: R7 (c0bc45e). Same pose, captures and lot. Judged by absolute scores **and** blind pairwise R7 vs R8 (skill step 7); R8 must win more items than it loses.
+
+- **Night warmth back** (`fl-glazing`, `fm-hall` at hour 22): R7 night rooms read grey-white. Restore R6-level warm glow at night (amber ceiling cove and back wall clearly lit) while keeping R7's soft day tone — e.g. drive the room emissive from the site's day/night signal (see how other lit windows/`warm` respond to the night rig) rather than one fixed value. Night low and mixed must read warm-lit at a glance.
+- **Day room contrast** (`fl-glazing`, `fl-material`): R7's day interior nearly matches the white shell. Target: a warm-white room clearly warmer and slightly brighter than the shell, peach near the floor, no saturated orange. Middle ground between R6 and R7: raise warmth/emissive moderately, keep the gradient.
+- **Amber outline in frame** (`fl-forecourt`): R7's hall trim moved the outline out of the crop's front edge; make the amber edge visible along the forecourt's front at the review pose (the plinth inlay strip or outline marker), without moving the hall.
+- **Canopy emitters** (`fl-canopy`): judges split between R6 cones and R7 bulbs. Target: four discrete bright spots flush under the lens with a short soft glow beneath (not hanging spheres, not large cones). Make the bulbs flush/flattened pads with a small downward glow cone (short, low opacity).
+
+Do not touch the high state or the mixed column/arm/rings. Captures into `~/city2127-evidence/nw-closeup-polish/r8/` (day ×3, night ×3, focal shots); publish `vs-target.jpg` to `nw-closeup-polish/r8`. Do not judge.
