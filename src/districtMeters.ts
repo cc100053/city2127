@@ -1,12 +1,15 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { arc, bake, box, chrome, cream, futureLight, glass, leaf, leafyCrown, pink, publicLight, skyGlass, solar, stone, trail, trim, warm } from './cityRig.ts';
+import { arc, bake, box, chrome, cream, glass, leaf, leafyCrown, publicLight, skyGlass, solar, stone, trail, trim, warm } from './cityRig.ts';
 import { changeSites, seaward } from './layout.ts';
-import { inCivic, inHeroClear, inMega } from './megaFootprints.ts';
+import { inHeroClear, inMega } from './megaFootprints.ts';
+import { automationBays, BAY_SCALE } from './automationBays.ts';
+import { automationBlue, METER_COLORS, quadFleet } from './automationKit.ts';
+import { buildCanopy, buildColumn, buildMast, buildPavilion, buildPort, CANOPY_Y, COLUMN_PAD, HALL_ROOF, HALL_Z, LENS, MAST_TOP, PORT_TOP, TOWER_PITCH, TOWER_RING0, TOWER_RING_R, TOWER_RINGS } from './automationBayModels.ts';
 import { megaGlass, megaRib, megaShell } from './megastructures.ts';
 import { shoreRoomBays } from './waterRooms.ts';
 import { automationActivity, pavilionFlight, pedestrians, plazaPose, routes, serviceDrones } from './mobility.ts';
-import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
+import { prefersReducedMotion, SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 import type { ExhibitionLayout } from './surveyView.ts';
 
 const HIDDEN = 1e-4;
@@ -74,10 +77,8 @@ export class SlotLevels {
   }
 }
 
-/** P5: each Meter's change-moment colour (the visual language of its district layer). */
-export const METER_COLORS = { automation: '#3fa9ff', publicSharing: '#ff6f91', environmentalPriority: '#5fe08a', urbanConcentration: '#ffb347' } as const;
-/** The one saturated accent of the automation hub and its bays: emissive and instance-colour-free, so it reads day and night. */
-export const automationBlue = new T.MeshStandardMaterial({ color: METER_COLORS.automation, emissive: METER_COLORS.automation, emissiveIntensity: .9, roughness: .5 });
+export { METER_COLORS, automationBlue };
+export { BAY_SCALE };
 export type ChangedPoint = PulsePoint & { slot: string };
 /** `focus`: the Meter's site anchor, the one place a change is read from; other changed slots only ring faintly. */
 export type PulsePoint = { x: number; y: number; z: number; r: number; focus?: boolean };
@@ -813,22 +814,10 @@ export class EnvironmentDistrict {
   }
 }
 
-/** Plain cylinder on `parent` centred at (x, y, z). */
-const cylinder = (parent: T.Object3D, r0: number, r1: number, h: number, y: number, material: T.Material, x = 0, z = 0) => {
-  const mesh = new T.Mesh(new T.CylinderGeometry(r0, r1, h, 32), material); mesh.position.set(x, y, z); mesh.castShadow = true; parent.add(mesh); return mesh;
-};
-/** Hall roof top above the bay's ground and the canopy's hover: the dock heights below follow them. */
-const HALL_ROOF = 10, CANOPY_Y = 14.1, HALL_Z = -.5;
-/** R3 (owner 2026-11-03): every bay design is built in R2 metres and scaled by this about its foot, so the bays read as large as the target images. People stay 1x. */
-export const BAY_SCALE = 2;
-/** Distance of a promenade bay's centre from its route: the 2x plinth (half depth 18 m) plus the route's 3 m walker guard. */
-const BAY_OFFSET = 22;
-/** Per-bay R3 placement found by searching the real city (tests/odaiba.test.ts footprint, terrace and route checks): bay 0 slides 20 m along its route and 6 m away from it;
- * bay 1 only clears at 1.6x. Everything else keeps the shared 2x. */
-const BAY_ALONG_BACK: Record<number, readonly [number, number]> = { 0: [-20, 6] };
-const BAY_SCALE_OVERRIDES: Record<number, number> = { 1: 1.6 };
 /** Elongated canopy depth factor: .65 keeps its rim 3 m clear of the 14 m deck that crosses bay 3 (the spec's .8 reached it). */
 const CANOPY_SQUEEZE = .65;
+/** Drones per bay in the ring towers' streams. */
+const STREAM = 8;
 /** Q1: staffed waterfront pavilions give way to autonomous ring towers on the same bays, with denser district circulation.
  * World-space batches stay independent of the hub's scaled lot and use the same 3 s clock. Bay frame: +X along the route, +Z towards it. */
 export class AutomationDistrict {
@@ -851,6 +840,8 @@ export class AutomationDistrict {
   readonly autonomousDesign: number[];
   private readonly pulses: PulseRings;
   private readonly drones: ReturnType<typeof serviceDrones>;
+  /** Quad drones circling each ring tower's upper rings (STREAM per bay, in two loose streams). */
+  private readonly streams: ReturnType<typeof quadFleet>;
   private nightRhythm = 1;
   private readonly dummy = new T.Object3D();
   private target = .5;
@@ -858,23 +849,8 @@ export class AutomationDistrict {
 
   constructor(parent: T.Object3D) {
     this.root.name = 'automation-district';
-    for (const path of routes().promenades) {
-      const n = Math.floor(path.getLength() / 40);
-      for (let i = 1; i < n; i++) {
-        const p = path.getPointAt(i / n), t = path.getTangentAt(i / n), yaw = Math.atan2(-t.z, t.x);
-        p.x -= Math.sin(yaw) * BAY_OFFSET; p.z -= Math.cos(yaw) * BAY_OFFSET;
-        if (Object.values(changeSites).some(s => Math.abs(p.x - s.x) < s.w * s.scale / 2 + 24 && Math.abs(p.z - s.z) < s.d * s.scale / 2 + 24)) continue;
-        if (p.x > -65 && p.x < -25) continue; // Existing north-west context block.
-        if (inHeroClear(p.x, p.z)) continue; // polish2: the plaza deck's hero apron stays open
-        const [along, back] = BAY_ALONG_BACK[this.bays.length] ?? [0, 0];
-        this.bays.push({ x: p.x + along * Math.cos(yaw) - back * Math.sin(yaw), y: p.y, z: p.z - along * Math.sin(yaw) - back * Math.cos(yaw), yaw });
-      }
-    }
-    // Traced open plazas at the mall approaches and western waterfront (actual-mesh checks in odaiba.test.ts), each re-searched in R3 for the 2x
-    // footprint (4-6 m moves). The second plaza sits 12 m off its old centre: a 14 m guideway deck cuts diagonally through it and the plinth must stay 3 m clear.
-    for (const [x, z, yaw] of [[20, 145, 0], [-184, 92, 0], [-130, 170, 0], [75, -166, 0], [-440.5, 41.9, -.9]])
-      if (!inCivic(x, z, 33)) this.bays.push({ x, y: 0, z, yaw }); // polish2: the mall approach bay sits under the enlarged Fuji frame
-    this.scales = this.bays.map((_, i) => BAY_SCALE_OVERRIDES[i] ?? BAY_SCALE);
+    const placed = automationBays();
+    this.bays = placed.bays; this.scales = placed.scales;
     this.staffed = new SlotLevels(this.bays.length);
     this.hybrid = new SlotLevels(this.bays.length);
     const instances = (group: T.Object3D, name: string) => bake(group).map(source => {
@@ -882,119 +858,16 @@ export class AutomationDistrict {
       mesh.name = name; mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;
       mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); this.root.add(mesh); return mesh;
     });
-    const unit = new T.IcosahedronGeometry(1, 1);
-    /** Low-poly resident (instance-free materials, baked with their group): capsule torso and a sphere head. */
-    const person = (group: T.Object3D, x: number, y: number, z: number, body: T.Material, seated = false) => {
-      const k = 1 / BAY_SCALE; // the batch is scaled up with the architecture, so build residents at 1/BAY_SCALE: they stay 1.7 m tall
-      const torso = new T.Mesh(new T.CapsuleGeometry(.3 * k, .6 * k, 3, 6), body); torso.position.set(x, y + (seated ? .8 : 1.1) * k, z);
-      const head = new T.Mesh(new T.SphereGeometry(.23 * k, 8, 6), cream); head.position.set(x, y + (seated ? 1.45 : 1.75) * k, z);
-      torso.castShadow = head.castShadow = true; group.add(torso, head);
-    };
-
-
-    // Staffed pavilion: an open ground-level hall on a plinth, warm lit inside (no glass), trim mullions on the route-facing long side.
-    const pavilion = new T.Group();
-    const W = 22, ZB = -8, ZF = 7, FLOOR = .5, GLASS = 5.6;
-    box(pavilion, [24, .5, 18], [0, .25, 0], cream, .05);
-    box(pavilion, [W - 1, .08, ZF - ZB - 1], [0, FLOOR + .04, HALL_Z], warm, .02);
-    box(pavilion, [W - 1, GLASS, .3], [0, FLOOR + GLASS / 2, ZB + .75], warm, .02);
-    box(pavilion, [W, 9, .6], [0, FLOOR + 4.5, ZB + .3], trim, .1);
-    for (const s of [-1, 1]) box(pavilion, [.6, 9, ZF - ZB], [s * (W / 2 - .3), FLOOR + 4.5, HALL_Z], trim, .1);
-    box(pavilion, [W, 9 - GLASS, .6], [0, FLOOR + (9 + GLASS) / 2, ZF - .3], trim, .1);
-    box(pavilion, [W, .3, .4], [0, FLOOR + GLASS, ZF - .05], trim, .05);
-    for (let k = 0; k <= 8; k++) { const mullion = new T.Mesh(new T.BoxGeometry(.25, GLASS, .3), trim); mullion.position.set(-W / 2 + k * W / 8, FLOOR + GLASS / 2, ZF - .1); mullion.castShadow = true; pavilion.add(mullion); }
-    box(pavilion, [24, .5, 17], [0, HALL_ROOF - .25, HALL_Z], trim, .1);
-    arc(pavilion, 0, 7, .1, [0, HALL_ROOF, HALL_Z], cream);
-    for (const s of [-1, 1]) box(pavilion, [.12, .3, ZF - ZB - 1.5], [s * (W / 2 + .05), FLOOR + 6.4, HALL_Z], futureLight, .02);
-    box(pavilion, [W - 2, .3, .12], [0, FLOOR + 6.4, ZB - .05], futureLight, .02);
-    // Four counters: staff behind (grey-beige), a seated resident in front (cream).
-    for (let k = 0; k < 4; k++) {
-      const x = (k - 1.5) * 5.5;
-      box(pavilion, [3.2, 1.1, 1.1], [x, FLOOR + .55, 4], cream, .1);
-      box(pavilion, [1.6, .8, .1], [x, FLOOR + 1.5, 3.8], warm, .03);
-      person(pavilion, x, FLOOR, 2.6, pink);
-      box(pavilion, [.8, .5, .8], [x, FLOOR + .25, 5.7], trim, .05);
-      person(pavilion, x, FLOOR, 5.7, cream, true);
-    }
-    for (const x of [-6, 0, 6]) {
-      box(pavilion, [3, .35, .9], [x, FLOOR + .8, 8.2], trim, .05);
-      for (const dx of [-1.2, 1.2]) box(pavilion, [.3, .6, .7], [x + dx, FLOOR + .3, 8.2], trim, .05);
-    }
-    for (const x of [-10, 10]) {
-      box(pavilion, [3.2, 1, 1.4], [x, FLOOR + .5, 8.2], cream, .1);
-      for (const [dx, dy, r] of [[-.9, 1.3, .7], [.2, 1.5, .8], [1, 1.2, .6]] as const) {
-        const shrub = new T.Mesh(unit, leaf); shrub.position.set(x + dx, FLOOR + dy, 8.2); shrub.scale.setScalar(r); shrub.castShadow = true; pavilion.add(shrub);
-      }
-    }
-    this.meshes = instances(pavilion, 'automation-staffed-pavilions');
-    // Hovering canopy disc over the roof: lens trim, Meter-blue rim, four cool emitters; its own instances, so the elongated design only stretches it.
-    const canopy = new T.Group();
-    const lens = new T.Mesh(new T.LatheGeometry([[0, -.6], [9.5, -.6], [12.3, -.35], [13, 0], [12.3, .3], [8.5, .6], [0, .6]].map(([r, y]) => new T.Vector2(r, y)), 56), trim);
-    lens.position.set(0, CANOPY_Y, HALL_Z); lens.castShadow = true; canopy.add(lens);
-    const rim = new T.Mesh(new T.TorusGeometry(13, .14, 6, 64).rotateX(Math.PI / 2), automationBlue); rim.position.copy(lens.position); canopy.add(rim);
-    for (let k = 0; k < 4; k++) {
-      const a = k * Math.PI / 2 + Math.PI / 4;
-      const emitter = new T.Mesh(new T.CylinderGeometry(1, 1, .25, 20), futureLight); emitter.position.set(Math.cos(a) * 7, CANOPY_Y - .7, HALL_Z + Math.sin(a) * 7); canopy.add(emitter);
-    }
-    this.canopies = instances(canopy, 'automation-staffed-pavilions');
-    // Hybrid column: a service column from the pavilion's roof centre to 40 m with three docking rings and a roof robot arm.
-    const column = new T.Group();
-    // Cantilevered landing pad off a ring: the drone's whole 24 m column must clear the core and cap, whatever the bay's yaw.
-    const pad = (g: T.Object3D, ring: number, top: number, z: number) => {
-      cylinder(g, 2.2, 2.2, .4, top - .2, trim, ring + 1.1, z);
-      const strut = new T.Mesh(new T.BoxGeometry(2, .4, .8), trim); strut.position.set(ring, top - .2, z); g.add(strut);
-    };
-    const colUp = (g: T.Object3D, rd: number, rt: number, struts: number, y: number, x = 0, z = HALL_Z) => {
-      const ring = new T.Mesh(new T.TorusGeometry(rd, rt, 8, 40).rotateX(Math.PI / 2), trim); ring.position.set(x, y, z); ring.castShadow = true; g.add(ring);
-      const seam = new T.Mesh(new T.TorusGeometry(rd, .1, 6, 48).rotateX(Math.PI / 2), automationBlue); seam.position.set(x, y + rt - .15, z); g.add(seam);
-      for (let k = 0; k < struts; k++) { const strut = new T.Mesh(new T.BoxGeometry(rd - 1, .3, .35), trim); strut.rotation.y = k * Math.PI * 2 / struts; strut.position.set(x + Math.cos(strut.rotation.y) * (rd + 1) / 2, y, z - Math.sin(strut.rotation.y) * (rd + 1) / 2); g.add(strut); }
-    };
-    cylinder(column, 1.2, 1.2, 30, 15, trim, 0, HALL_Z);
-    cylinder(column, 1.6, 1.2, 1.2, 30.4, trim, 0, HALL_Z);
-    for (const y of [18, 22.5, 27]) colUp(column, 3.4, .6, 4, y);
-    for (const a of [.6, -.6]) { const seam = new T.Mesh(new T.BoxGeometry(.2, 24, .12), automationBlue); seam.rotation.y = a; seam.position.set(Math.sin(a) * 1.21, 14, HALL_Z + Math.cos(a) * 1.21); column.add(seam); }
-    const arm = (g: T.Object3D, x: number, y: number, z: number, scale: number) => {
-      const a = new T.Group(); a.position.set(x, y, z); a.scale.setScalar(scale); g.add(a);
-      cylinder(a, 1.1, 1.3, .4, .2, trim);
-      const up = new T.Mesh(new T.BoxGeometry(5, .8, .8), trim); up.position.set(-2, 2.6, 0); up.rotation.z = -.9; a.add(up);
-      const down = new T.Mesh(new T.BoxGeometry(4, .7, .7), trim); down.position.set(-5.2, 4.9, 0); down.rotation.z = .8; a.add(down);
-      const parcel = new T.Mesh(new T.BoxGeometry(1.5, 1.3, 1.5), cream); parcel.position.set(-6.6, 3.4, 0); a.add(parcel);
-    };
-    arm(column, 5, .25, HALL_Z + 2.5, 1);
-    pad(column, 3.4, 27.6, HALL_Z);
-    this.columns = instances(column, 'automation-hybrid-columns');
-    // Autonomous ring tower (design 0): drum, core to 42 m with a cap and antenna, eight docking rings (service arm on every second) and a parcel locker at the foot.
-    const foot = (g: T.Object3D) => {
-      box(g, [16, .5, 12], [0, .25, 0], cream, .05);
-      box(g, [3, 2.4, 1.2], [6, 1.7, 2], trim, .1);
-      box(g, [2.6, 1.7, .12], [6, 1.75, 2.66], automationBlue, .02);
-    };
-    const tower = (g: T.Object3D, coreTop: number, ringYs: number[], armed: boolean) => {
-      foot(g);
-      cylinder(g, 3.2, 3.2, 4, 2.5, trim);
-      cylinder(g, 1.4, 1.4, coreTop - 4.5, (coreTop + 4.5) / 2, trim);
-      for (const a of [.7, -.7]) { const seam = new T.Mesh(new T.BoxGeometry(.2, coreTop - 12, .12), automationBlue); seam.rotation.y = a; seam.position.set(Math.sin(a) * 1.41, coreTop / 2 + 2, Math.cos(a) * 1.41); g.add(seam); }
-      ringYs.forEach((y, k) => {
-        arc(g, 1.4, 3.9, 1.2, [0, y - .6, 0], trim);
-        arc(g, 3.9, 4.05, .4, [0, y - .5, 0], automationBlue);
-        if (armed && k % 2 === 0) arm(g, Math.cos(k * 2) * 2.6, y + .6, Math.sin(k * 2) * 2.6, .5);
-      });
-    };
-    const port = new T.Group();
-    tower(port, 42, Array.from({ length: 8 }, (_, k) => 10 + k * 30 / 7), true);
-    cylinder(port, 1.5, 1.5, 1.5, 42.75, trim); cylinder(port, 1, 1, 1.5, 44.25, trim);
-    pad(port, 3.9, 40.6, 0);
-    const antenna = new T.Mesh(new T.BoxGeometry(.15, 5, .15), trim); antenna.position.y = 47.5; port.add(antenna);
-    this.ports = instances(port, 'automation-drone-ports');
-    // Design 1: six rings and a floating landing disc hovering 1.5 m above a 34 m core.
-    const mast = new T.Group();
-    tower(mast, 34, Array.from({ length: 6 }, (_, k) => 10 + k * 4.2), false);
-    cylinder(mast, 6, 6, .6, 35.8, trim);
-    const edge = new T.Mesh(new T.TorusGeometry(6, .25, 6, 48).rotateX(Math.PI / 2), automationBlue); edge.position.y = 36.1; mast.add(edge);
-    this.masts = instances(mast, 'automation-drone-ports');
+    // Staffed pavilion (also the hybrid's 60 % hall), hovering canopy, hybrid service column and the two autonomous tower designs: models in automationBayModels.ts.
+    this.meshes = instances(buildPavilion(), 'automation-staffed-pavilions');
+    this.canopies = instances(buildCanopy(), 'automation-staffed-pavilions');
+    this.columns = instances(buildColumn(), 'automation-hybrid-columns');
+    this.ports = instances(buildPort(), 'automation-drone-ports');
+    this.masts = instances(buildMast(), 'automation-drone-ports');
     this.staffedDesign = this.bays.map((_, i) => designOf(i, 233, 2));
     this.autonomousDesign = this.bays.map((_, i) => designOf(i, 271, 2));
     this.drones = serviceDrones(this.root, this.bays.length);
+    this.streams = quadFleet(this.root, this.bays.length * STREAM, 'automation-bay-drones');
     this.pulses = new PulseRings(this.root, METER_COLORS.automation, (this.bays.length + 2) * PULSE_WAVES);
     this.root.visible = false; parent.add(this.root); this.write();
   }
@@ -1052,9 +925,9 @@ export class AutomationDistrict {
   private dock(i: number): { x: number; y: number; z: number; level: number } {
     const s = this.staffed.value[i], h = this.hybrid.value[i], hall = Math.max(s, .6 * h);
     const canopy = s * (1 - h), column = h, tower = (1 - s) * (1 - h);
-    if (column >= canopy && column >= tower) return { x: 4.5, y: HALL_ROOF * hall + 27.6 + .9, z: HALL_Z, level: column };
-    if (canopy >= tower) { const wide = this.staffedDesign[i] ? 1.35 : 1; return { x: 7 * wide, y: CANOPY_Y + .6 + .9, z: HALL_Z * (this.staffedDesign[i] ? CANOPY_SQUEEZE : 1), level: canopy }; }
-    return this.autonomousDesign[i] ? { x: 3.8, y: 36.35 + .95, z: 0, level: tower } : { x: 5, y: 40.6 + .9, z: 0, level: tower };
+    if (column >= canopy && column >= tower) return { x: 4.9, y: HALL_ROOF * hall + COLUMN_PAD + .9, z: HALL_Z, level: column };
+    if (canopy >= tower) { const wide = this.staffedDesign[i] ? 1.35 : 1; return { x: 7 * wide, y: CANOPY_Y + LENS + .9, z: HALL_Z * (this.staffedDesign[i] ? CANOPY_SQUEEZE : 1), level: canopy }; }
+    return this.autonomousDesign[i] ? { x: 2.6, y: MAST_TOP + .95, z: 0, level: tower } : { x: 4.7, y: PORT_TOP + .9, z: 0, level: tower };
   }
 
   private writeDrones(now: number): void {
@@ -1068,7 +941,26 @@ export class AutomationDistrict {
       // Fade through the carrier handover rather than teleport a visible drone to its other landing spot.
       this.dummy.scale.setScalar(Math.max(HIDDEN, T.MathUtils.smoothstep(level, .98, 1)) * k);
       this.drones.set(i, this.dummy);
-    }); this.drones.flush();
+      this.writeStream(i, now);
+    }); this.drones.flush(); this.streams.flush();
+  }
+
+  /** Eight small quads (3.9 m, like the hub's stream drones) circle the tower's upper rings at ring radius + 3-8 m in two loose streams; parked on the rings under reduced motion. */
+  private writeStream(i: number, now: number): void {
+    const bay = this.bays[i], k = this.scales[i], c = Math.cos(bay.yaw), s = Math.sin(bay.yaw), design = this.autonomousDesign[i];
+    const level = T.MathUtils.smoothstep((1 - this.staffed.value[i]) * (1 - this.hybrid.value[i]), .98, 1), still = prefersReducedMotion();
+    const top = design ? MAST_TOP : PORT_TOP, rings = TOWER_RINGS[design];
+    for (let j = 0; j < STREAM; j++) {
+      const stream = j >> 2, n = j & 3, dir = stream ? -1 : 1;
+      let r: number, y: number, a = n * Math.PI / 2 + stream * 1.1 + (stream ? .5 : 0);
+      if (still) { const ring = rings - 1 - j; r = 2.7; y = TOWER_RING0 + ring * TOWER_PITCH + .5 + .35; a = j * 2.1; }
+      else { a += now * .28 * dir; r = TOWER_RING_R[design] + 3 + n * 1.6 + stream * .6; y = top - 7 + stream * 3.4 + n * 2.1 + Math.sin(now * .6 + j) * .4; }
+      const x = Math.cos(a) * r, z = Math.sin(a) * r;
+      this.dummy.position.set(bay.x + (x * c + z * s) * k, bay.y + y * k, bay.z + (-x * s + z * c) * k);
+      this.dummy.rotation.set(0, bay.yaw - a + Math.PI / 2 * dir, 0);
+      this.dummy.scale.setScalar(Math.max(HIDDEN, level) * .7);
+      this.streams.set(i * STREAM + j, this.dummy);
+    }
   }
 
   private write(): void {

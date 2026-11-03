@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
+import { onBayPlinth } from '../src/automationBays.ts';
 import { HERO_FRAME_SLOTS, towerFamily, ladderHybrid, ladderShare, rungStep, AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, PRIVATE_RISE, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
 import { changeSites } from '../src/layout.ts';
 import { publicLight, trail } from '../src/cityRig.ts';
@@ -315,6 +316,20 @@ console.log(`PASS: concentration district — ${concentration.towers.length} tow
   const m = c.towers.findIndex((_, k) => levels.midRise.value[k] === 1 && levels.towerLevels.value[k] === 0);
   assert.ok(m >= 0 && full('concentration-vertical-towers', towerFamily(m).instance, .45 * c.towers[m].h), 'mid-rise at 45 % height');
   console.log(`PASS: P9 hybrids — none at low / high, ${mixedHybrids.join(' / ')} (automation / sharing / mid-rise / environment) at mixed; hybrid bay composes both designs.`);
+}
+
+// Bay R1: every ring tower carries eight small quad drones, visible only with the tower; no city tree stands on a bay's plinth.
+{
+  const a = new AutomationDistrict(new T.Scene());
+  const streams = a.root.children.filter(o => o.name === 'automation-bay-drones') as T.InstancedMesh[];
+  assert.ok(streams.length > 0 && streams.every(mesh => mesh.count === a.bays.length * 8), 'eight stream drones per bay');
+  const size = (i: number) => { streams[0].getMatrixAt(i, matrix); return new T.Vector3().setFromMatrixScale(matrix).y; };
+  a.setTarget(at({ nw: -3 }), 0, true);
+  assert.ok(a.bays.every((_, i) => size(i * 8) < 1e-3), 'no stream drones over staffed bays');
+  a.setTarget(at({ nw: 3 }), 0, true);
+  assert.ok(a.bays.every((_, i) => Math.abs(size(i * 8 + 7) - .7) < 1e-6), 'stream drones (3.9 m quads) appear with the tower');
+  assert.ok(a.bays.every(bay => onBayPlinth(bay.x, bay.z)) && !onBayPlinth(0, 0), 'bay plinth lookup');
+  console.log('PASS: Bay R1 — eight stream drones per ring tower, hidden over staffed bays; plinth lookup keeps city trees off the bays.');
 }
 
 // P5: a live change pulses only where its district changed, in two waves that fade within PULSE_WAVE_GAP + PULSE_SECONDS;

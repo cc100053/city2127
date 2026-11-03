@@ -157,12 +157,12 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
   const histories = [[1, -1], [-1, 1]].map(prefix => [...prefix, ...Array<1>(6).fill(1), ...Array.from({ length: 140 }, (_, i) => i % 2 ? -1 : 1)]);
   const districtRoots = [sites.magnetEast.automationDistrict!.root, sites.dogenzakaSouth.sharingDistrict!.root,
     sites.stationEastPark.environmentDistrict!.root, sites.centerGaiRear.concentrationDistrict!.root];
-  const matrices = () => districtRoots.map(root => root.children.filter(o => o instanceof T.InstancedMesh && !['meter-pulse', 'plaza-crowds', 'service-drones'].includes(o.name))
+  const matrices = () => districtRoots.map(root => root.children.filter(o => o instanceof T.InstancedMesh && !['meter-pulse', 'plaza-crowds', 'service-drones', 'automation-bay-drones'].includes(o.name))
     .map(o => [...(o as T.InstancedMesh).instanceMatrix.array]));
   // Architecture restores independently of animation time; P12 actors restore at a common held phase.
   const actorsAt = (now: number) => {
     manager.update(now, 1);
-    return districtRoots.map(root => root.children.filter(o => o instanceof T.InstancedMesh && ['plaza-crowds', 'service-drones'].includes(o.name))
+    return districtRoots.map(root => root.children.filter(o => o instanceof T.InstancedMesh && ['plaza-crowds', 'service-drones', 'automation-bay-drones'].includes(o.name))
       .map(o => [...(o as T.InstancedMesh).instanceMatrix.array]));
   };
   const views: ExhibitionCityView[] = [], cities: ReturnType<typeof matrices>[] = [];

@@ -1,7 +1,7 @@
 # nw-closeup-polish — NW 自動化旗艦＋district 載體，新 taste 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — 旗艦 owner 接受（R9 25/28）；bay 開工
+- Status: IN_PROGRESS — 旗艦 owner 接受（R9 25/28）；bay R1 13/20，等 owner 校準
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
 - Last verified commit: R3 commit（test／build／diff-check PASS）
@@ -152,6 +152,19 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 ## Owner 2026-11-03：旗艦「分數OK」
 
 - Owner 接受 R9 旗艦盲評分數（25/28），作為 rubric 校準：旗艦以 R9 為準，剩低 3 項唔再追。Bay 交新 session 做。
+
+## Bay R1（bay 跟目標，[spec](../../artifacts/nw-closeup-polish/spec.md#bay-r1--district-bays-to-the-rubric-task-2026-11-03-after-the-owner-accepted-the-flagship-at-r9)）
+
+- Sonnet：旗艦共用材質／`quadFleet` 抽去新 `src/automationKit.ts`（`automationBlue` 搬埋去，避 import cycle；旗艦外觀不變）；bay 模型去新 `src/automationBayModels.ts`；bay 位置搬去新 `src/automationBays.ts`（位置不變，加 `onBayPlinth()`）。
+- −1：全白、冇米色冇青光條；+Z 面同兩端玻璃、薄屋頂懸挑 1.5＋soffit 線、暖房（`nightLit`）、11 個人；廳深 15→10，plinth 內開 7 m 前庭（3 凳 3 樹 9 人 3 組）；四邊琥珀邊；遮篷鏡片 2.6 厚、離屋頂 1.75、rim 下 6 個發光 pod。人跟 bay 放大（唔再 1/BAY_SCALE）。`HALL_ROOF` 10→7。
+- 0：60 % 廳同樣玻璃暖房＋3 個終端；關節機械臂（深色關節＋琥珀包裹）；柱有板縫、藍 seam、collar、3 環、尖頂入鏡。
+- +1：design 0 12 環（pitch 1.3），design 1 10 環＋降落碟；每 bay 8 架 quad 無人機兩串（新 instanced `automation-bay-drones`）；地面玻璃藍光大堂＋4 終端＋取件櫃＋5 人。
+- 棕櫚樹＝`plantCanopy` 嘅 allée palm 企喺 bay plinth 上；而家 `onBayPlinth` 原地縮到 0（同 `HUB_LEGACY_LOT` 一樣，唔重新 filter）。
+- Root children 22→30。Test：`districtMeters.test.ts` 加 Bay R1 block；`surveyMeterPipeline.test.ts` 將 `automation-bay-drones` 歸入動畫 actor（同 `service-drones`）。冇刪／放寬 assertion。
+- 絕對盲評 **13 / 20**（judge 1 7）；pairwise judge 1 vs bay R1：R1 贏 9，輸 1（`bl-canopy`）→ 保留。[scores](../../artifacts/nw-closeup-polish/bay-r1/scores.md)、[pair](../../artifacts/nw-closeup-polish/bay-r1/pair.md)、[對目標](../../artifacts/nw-closeup-polish/bay-r1/vs-target.jpg)。
+- 仲未 2：`bl-canopy` 0（遮篷落咗 crop 外）、`bl-glazing`／`bm-hall`（室內淡，唔夠暖；人細）、`bm-arm`（粗糙）、`bm-column`（環薄、尖頂矮）、`bh-drones`（約 5 架讀到）。
+- **構圖差（等 owner）**：同一 review pose 下目標嘅 bay 大約大 1.35 倍、中心偏右上（Gemini 放大／移咗，同旗艦 judge 1 一樣）；bay 大細受 clearance 限制（R3 已經 2×）。所以 rubric crop 對唔正（遮篷 0 分主要係呢個）。另外 review bay 東邊有鄰居（巨構 skirt／deck）遮住廳右後同大堂東端。
+- Opus 重跑：`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
 
 ## Next step
 

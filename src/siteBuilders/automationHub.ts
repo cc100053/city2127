@@ -1,6 +1,7 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { AutomationDistrict, automationBlue } from '../districtMeters.ts';
+import { AutomationDistrict } from '../districtMeters.ts';
+import { amberInlay, automationBlue, glassPane, glow, glowCeil, glowFloor, glowMid, parcel, quadFleet, shade, wallLight, white } from '../automationKit.ts';
 import { arc, bake, box, futureLight, nightLit, teal, warm, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import type { SiteAssetLoaderCache } from '../siteAssets/assetLoader.ts';
@@ -9,40 +10,6 @@ import { conversationPose, pedestrians, servicePose } from '../mobility.ts';
 import { slat, tree } from './concentrationTower.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, prefersReducedMotion, SITE_TRANSITION_SECONDS, type BuiltSite } from './siteRuntime.ts';
 
-// Pure white structure: the shared `trim` (#eee9df, metallic) reads beige in shade, which the rubric's fl-material rejects.
-const white = new T.MeshStandardMaterial({ color: '#f8f9fb', roughness: .42, metalness: .08 });
-// Soft shadow band under the roof slab, amber parcels, an amber lot-edge inlay.
-// Room light: warm-white walls with a moderate warm emissive by day (clearly warmer and brighter than the white shell, peach near the floor), amber at night (`nightLit` follows the night rig);
-// the back wall's vertex colours grade from peach below to near-white above.
-const roomLight = (color: T.ColorRepresentation, emissive: string, day: number, night: number, nightColor: string) => nightLit(new T.MeshStandardMaterial({ color, emissive, emissiveIntensity: day, roughness: 1 }), night, nightColor);
-const wallLight = nightLit(new T.MeshStandardMaterial({ color: '#ffffff', vertexColors: true, emissive: '#ffb878', emissiveIntensity: .48, roughness: 1 }), .85, '#ff9a3c');
-const glowMid = roomLight('#f6e0c4', '#ffb878', .42, .8, '#ff9a3c');
-const glowFloor = roomLight('#f0d2b0', '#ffae6c', .4, .7, '#ff9a3c'), glowCeil = roomLight('#fff3dc', '#ffd9a0', 1.3, 1.7, '#ffb860');
-// A cool, faint pane across the glazing, so the room reads behind glass.
-const glassPane = new T.MeshBasicMaterial({ color: '#cfe6f5', transparent: true, opacity: .13, depthWrite: false });
-const shade = new T.MeshBasicMaterial({ color: '#1b2430', transparent: true, opacity: .2, depthWrite: false });
-const parcel = new T.MeshStandardMaterial({ color: '#e9a24f', roughness: .6 });
-const amberInlay = new T.MeshStandardMaterial({ color: '#ff9f1c', emissive: '#ff9f1c', emissiveIntensity: .7, roughness: .5 });
-const rotorMat = new T.MeshStandardMaterial({ color: '#2b3a47', roughness: .5 });
-/** Hub drones: a white body on an X frame, four dark rotor rings and a blue underside light, so they read as quads against sky and tower (5.6 m across at scale 1, like the district mesh). */
-function quadFleet(parent: T.Object3D, count: number) {
-  const frame = mergeGeometries([new T.BoxGeometry(1.6, .7, 1.6), ...[Math.PI / 4, -Math.PI / 4].map(a => new T.BoxGeometry(5.4, .2, .32).rotateY(a))].map(g => g.toNonIndexed()))!;
-  const rotors = mergeGeometries([[1.9, 1.9], [-1.9, 1.9], [1.9, -1.9], [-1.9, -1.9]].map(([x, z]) => new T.TorusGeometry(1.15, .17, 6, 16).rotateX(Math.PI / 2).translate(x, .35, z).toNonIndexed()))!;
-  const light = new T.BoxGeometry(.9, .12, .9).translate(0, -.42, 0);
-  const meshes = ([[frame, white], [rotors, rotorMat], [light, automationBlue]] as const).map(([geometry, material]) => {
-    const mesh = new T.InstancedMesh(geometry, material, count);
-    mesh.name = 'hub-drones';
-    mesh.frustumCulled = false;
-    mesh.instanceMatrix.setUsage(T.DynamicDrawUsage);
-    parent.add(mesh);
-    return mesh;
-  });
-  return {
-    set(index: number, pose: T.Object3D) { pose.updateMatrix(); meshes.forEach(m => m.setMatrixAt(index, pose.matrix)); },
-    flush() { meshes.forEach(m => { m.instanceMatrix.needsUpdate = true; }); },
-    show(visible: boolean) { meshes.forEach(m => { m.visible = visible; }); },
-  };
-}
 const HIDDEN = 1e-3;
 const PT = 1.2; // plinth top: every state group stands on it
 const DRONE = .7 / 3, DOCKED = .6 / 3; // flying drones ~3.9 m across, docked ones ~3.4 m (the quad mesh is 5.6 m at scale 1) (the district mesh is 5.6 m at scale 1), so streams read as small quads
@@ -56,7 +23,6 @@ export const HUB_PLINTH: Record<Band, { x: number; z: number }> = { low: { x: 12
 const smoothstep = (value: number) => value * value * (3 - 2 * value);
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 const beam = new T.MeshBasicMaterial({ color: '#9fe8ff', transparent: true, opacity: .16, blending: T.AdditiveBlending, depthWrite: false });
-const glow = new T.MeshBasicMaterial({ color: new T.Color('#d8f8ff').multiplyScalar(2.5), toneMapped: false });
 // Honest port count per band (the Meter maps 0 / 3 / 6): how many service points are self-service in that state, and how many are staffed.
 const PORTS: Record<Band, number> = { low: 0, mixed: 3, high: 6 };
 

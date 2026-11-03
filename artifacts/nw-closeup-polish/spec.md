@@ -205,3 +205,45 @@ Base: R8 (ab7f8bc). Same pose, captures, lot and judging (absolute + blind pairw
 - **Drone streams in the air** (`fh-drones`): ≥ 12 small hub drones airborne in 2–3 visible streams near the upper tower against the sky at the review pose (not docked, not behind the tower); the oversized teal city flyers are not ours — if a hub drone class is oversized, shrink it to the stream size.
 
 Captures into `~/city2127-evidence/nw-closeup-polish/r9/` (day ×3, night ×3, focal shots); publish `vs-target.jpg` to `nw-closeup-polish/r9`. Do not judge.
+
+## Bay R1 — district bays to the rubric (task 2026-11-03, after the owner accepted the flagship at R9)
+
+Base: 8f352d1. Code: `AutomationDistrict` in `src/districtMeters.ts` (bay frame: +X along the route, **+Z towards the route**; built in R2 metres, scaled by `BAY_SCALE` 2 about the foot). Judged on rubric items `bl-*`, `bm-*`, `bh-*` ([rubric](rubric.md); judge 1 scored 7/20, [scores](judge1/scores.md), [board](judge1/review-bay.jpg)) by an absolute blind judge **and** a blind pairwise vs judge 1's captures. Review pose `nw:bay-e`: `?meters=nw:<band>&hour=12`, then `window.cityPose([-10,40,-90],[75,32,-160])`, hide every non-canvas body child, 3200×1800. The review bay is the plaza bay at (75, −166), yaw 0: the camera sees its **+Z long face and its −X end**, from above (camera y 40 m ≈ canopy height).
+
+Language = the owner-accepted flagship (`src/siteBuilders/automationHub.ts` R9): its `white` structure, warm night-lit room (`roomLight`/`nightLit()` pattern, `glassPane`, `shade` soffit), `amberInlay` lot edge, amber `parcel`, `quadFleet` drones, articulated arm. Move what the bays reuse into one export both files import (e.g. export from `automationHub.ts` or move to `cityRig.ts`; do not duplicate materials). No `cream` masses, no `futureLight` teal stripes, no `pink` people torsos on the bay.
+
+### Shared
+
+- **Material**: every `cream`/`trim` structural part of the bays → `white`; seams only thin `automationBlue`. Remove the three `futureLight` stripes on the hall (`FLOOR + 6.4` boxes).
+- **People at architecture scale**: build bay residents at 1 (drop `k = 1 / BAY_SCALE`), so they scale ×2 with the bay like the flagship's 2.6× people (≈ 3.4 m tall against an 11 m glazed storey, the target's proportion). Bodies in muted mixed colours (reuse what the flagship people use, or 3–4 instance-free materials), heads skin/cream.
+- **Amber lot edge**: an `amberInlay` strip (≈ .35 wide, flush on the plinth top) along every plinth edge, as the targets show around each bay.
+
+### −1 staffed pavilion (`bl-*`; target bay-low)
+
+- `bl-glazing`: the camera sees the +Z face foreshortened and the −X end square-on. Glaze **the +Z long face and both end faces** (corner piers only, back −Z wall solid). Glazing runs floor to just under a **thin roof slab** that overhangs ≈ 1.5 m on the glazed sides with a dark `shade` soffit line; remove the 3.4 m solid fascia above the glass. Behind the glass a warm room like the flagship low hall: warm back wall, ceiling glow, floor pool (`nightLit` so it glows at night), faint `glassPane`, 4–5 thin `white` mullions per face. Inside, ≥ 8 readable people: staff standing behind 3–4 counters, residents seated/standing across, plus 1–2 visible through the −X end.
+- `bl-forecourt`: shrink the hall's depth (e.g. ZB −8 → ZF 2) so a ≥ 6 m (pre-scale) forecourt opens on the +Z side inside the existing 24 × 18 plinth (the plinth must not grow: clearance). On it: 3 benches, 2–3 small trees (the flagship forecourt trees), **≥ 8 residents standing in 3 groups** facing each other, the amber edge visible along its front.
+- `bl-canopy`: thicker lens (centre ≥ 2.4 thick, rim tapered) hovering **≈ 1.5–2 m** (pre-scale) above the roof slab (lower `CANOPY_Y` and the dock heights with it). The camera is above the canopy, so under-emitters are invisible today: hang **4–6 emitter pods at the rim** (r ≈ 11–12), each a bright white-blue flattened pad/bulb protruding below the rim with a small soft glow, readable from above. Thin `automationBlue` rim seam.
+- `bl-material`: pure white, thin seams, no beige, no teal.
+
+### 0 hybrid (`bm-*`; target bay-mixed)
+
+- `bm-hall`: the 60 % hall gets the same glazed, warm, peopled room (glazing on +Z and both ends), ≥ 4 readable people at a staffed counter **and ≥ 2 glowing self-service terminals** (cool screens on white posts) with a resident at one. Amber edge on its plinth.
+- `bm-arm`: replace the two-bar arm with the flagship-style articulated arm — dark base disc, sphere joints (`rotorMat`-like dark), two white segments, wrist and gripper holding an amber `parcel`; place it on the roof on the **camera side** of the column (local −X/+Z quadrant), ≥ ¼ of the hall width.
+- `bm-column`: panel joints (thin dark rings every ≈ 2.5 m), two vertical `automationBlue` seams, a collar band with blue seam where it leaves the roof; three docking rings with blue seams, a stepped cap and a **spire/antenna on top**. At the review pose the spire tip must be **inside the frame (y ≈ .03–.08)** and the rings between y ≈ .15–.40 — today the column leaves the top of the frame; shorten the column/rings to fit (measure from the capture).
+
+### +1 autonomous tower (`bh-*`; target bay-high)
+
+- `bh-rings`: design 0 → **12 rings** from ≈ 12 m to 40 m, gap ≤ ring thickness (thickness ≈ 1.2, pitch ≈ 2.4), each with a thin blue seam; core with panel joints/vertical seams between rings; stepped cap + antennas. Design 1 → **10 rings** at the same pitch under its landing disc. Top in frame at the review pose.
+- `bh-drones`: per bay **≥ 8 quad drones** (`quadFleet`, sized like the flagship stream drones) circling/hovering around the upper tower at ring radius + 3–8 m, in 2 loose streams, visible only with the tower (scale by tower level like `writeDrones`); still under `prefersReducedMotion` (parked on rings). Keep the existing per-bay service drone.
+- `bh-base`: replace the plain drum with a **glazed lobby box** (≈ 10 × 5 × 8 m pre-scale) lit cool blue inside (`automationBlue`-tinted room, `nightLit`), 3–4 glowing terminals at the front, the parcel locker, ≥ 4 residents on foot outside, amber edge. A palm tree stands in front of the review bay's base today: find its source; if it is a city tree inside this bay's plinth, shrink it in place to 0 the way `HUB_LEGACY_LOT` does for the hub (never re-filter the list — later crowns would shift); if moving or hiding it needs a test change or touches a neighbour, stop and report.
+
+### Constraints and checks
+
+- Plinth footprints, bay positions and scales stay as R3 (route/clearance tests in `tests/odaiba.test.ts`, `tests/districtMeters.test.ts`). Never delete or loosen an assertion; if a target item needs more room, stop and report with options.
+- Keep diagnostics names (`automation-staffed-pavilions`, `automation-hybrid-columns`, `automation-drone-ports`), `SlotLevels`/ladder logic, `dock()`/`writeDrones()` and `getConfiguration()` consistent with the new heights.
+- Report `AutomationDistrict.root` child count before/after (now 22 instanced + drones + pulses); stay within +8.
+- `npm test && npm run build && git diff --check`.
+
+### Captures (`~/city2127-evidence/nw-closeup-polish/bay-r1/`)
+
+`bay-{low,mixed,high}.png` (day, review pose, 3200×1800), `bay-{low,mixed,high}-night.png` (hour 22), `district-{low,high}.png` (`?meters=nw:<band>&shot=nw:district&hour=12`, 1600×900) and one hero `?meters=nw:high&hour=12` 1600×900 to check the bays don't dominate. `vs-target.jpg`: 3 rows × [bay-r1 day | target], 1200×675 cells. Do not crop or judge — Opus does.
