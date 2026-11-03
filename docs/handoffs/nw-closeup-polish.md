@@ -1,7 +1,7 @@
 # nw-closeup-polish — NW 自動化旗艦＋district 載體，新 taste 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — R1／R1b／R2 實作完，等 owner 睇圖
+- Status: IN_PROGRESS — 盲評 22/48，等 owner 校準 rubric
 - Branch: `feat/nw-closeup-polish`
 - Base commit: `34f1fd35e7761e164e5dc51648709cefbbc0c145`（main = origin/main）
 - Last verified commit: R3 commit（test／build／diff-check PASS）
@@ -88,6 +88,15 @@ Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」�
 - 本分支（727cedd）：hero nw:high 12:00 47.1–48.1；22:00 46.4–47.3；`nw:focal` high 50.2–54.0；`nw:focal-low` low 60.0 ×4；`nw:bay1` high 22:00 60.0 ×4。
 - 同機同條件、main 34f1fd3（臨時 worktree，port 5185）同本分支交替量 hero nw:high 兩輪：main 37.2–40.2，本分支 35.0–39.8 → **冇退步**；部機當時有負載（其他 session），所以 60 FPS 未能喺呢部機證實。展覽機未量。
 
+## Judge 1（2026-11-03，新 closeup-polish 規則重判 R3 HEAD 727cedd）
+
+- Owner：「上個 session 點解覺得收得貨」→ skill 加 rubric／盲評／0-1-2 門檻（f10d6aa）→ 用佢重判。
+- [rubric.md](../../artifacts/nw-closeup-polish/rubric.md)：24 項（旗艦 5/4/5、bay 4/3/3），crop 對住目標圖嘅生成鏡頭 `nw:e`／`nw:bay-e`。截圖 3200×1800 12:00，證據 `~/city2127-evidence/nw-closeup-polish/judge1/`。
+- 盲評（新 subagent，只有 rubric＋crop）：**22 / 48**，只有 `fh-base` 2 分；`bl-material`、`bh-drones`、`bh-base` 0 分。[scores](../../artifacts/nw-closeup-polish/judge1/scores.md)、[旗艦 board](../../artifacts/nw-closeup-polish/judge1/review-flagship.jpg)、[bay board](../../artifacts/nw-closeup-polish/judge1/review-bay.jpg)。
+- 主要差距：bay 仍係米黃＋青色光條、玻璃唔向鏡頭、冇人；旗艦喺 `nw:e` 只有目標約 1/3 大（Gemini 放大咗），人細到讀唔到；機械臂冇關節冇包裹；柱同塔身冇板縫；+1 環距約 2× 環厚。
+- Rubric 缺陷：`fl-canopy`、`fm-rings` 嘅 crop 跟目標位置，現況主體細啲所以出咗 crop（judge 照睇全圖畀 1）；下一版要先決定旗艦大細跟目標定跟真實米數（owner 決定），再調 crop。
+- 未做：owner 校準（skill step 7 第一輪），夜景。
+
 ## Next step
 
-Owner 驗收（R1b 旗艦 −1 近鏡、R3 bay）→ 喺冇負載嘅機重量 FPS → merge main。
+Owner 睇兩張 board，逐項話 pass／fail 校準 rubric，並決定旗艦喺 `nw:e` 要唔要放大到目標大細 → 按最低分項寫 R4 spec。
