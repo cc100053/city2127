@@ -98,3 +98,19 @@ Opus zoom of R2 (`r2/flagship-low.png` x1100–2200 y700–1250, `flagship-mixed
 - **Pavilions (fh-tables).** Glass must read as glass rooms: tinted panes (#dff1ff, opacity .45) on all visible faces incl. a pitched glass roof, white mullions every .4, strong warm interior (warm back wall emissive ≥ .9, sofa, ceiling light); 4 tables keep their residents.
 
 Screenshots to `~/city2127-evidence/closeup-night/sw/r3/` (same names) + `vs-target.jpg`.
+
+## R4 — last round (R3 18/30, kept 4–3; lost fl-emitters, fl-garden, fh-amph)
+
+Keep (re-crop and compare with R3, must not lose): `fm-deck`, `fh-tables`, `fh-planting`; restore R2's `fh-amph` pink-seam saturation.
+
+Opus zoom of R3: high forecourt is a huge empty white plane in front, the terraces sit in the back half as straight bleachers; pod residents read as tall dark bottles (backs/heads above the seats, no legs); pods overlap in two clumps; emitter rings are white-green, not cool blue.
+
+- **High amphitheatre (fh-amph, fh-people).** Re-lay as a wide fan like the target: arcs centred off the lot's front-right corner (≈ local (−5, −6), screen lower-right), 6 terraces at radii ≈ 4.5 … 9.5 sweeping diagonally from back-left to the right side, so curved terraces fill most of the lot and the flat forecourt is only the front-right wedge. Long continuous curved benches on every second tread, saturated `sharePink` edge seams (emissive ≥ .9, as R2). Back deck, pavilions, tables and trees stay where they are (fh-tables, fh-planting keep). Residents seated along the curved benches in groups of 2–3 (≥ 12), children running on the forecourt (walking gait, varied directions).
+- **Pod residents (fl-people-in, fm-pods).** Turn the two residents 3/4 toward the camera (yaw ±.6 from facing each other), lower the seats to .22 and pull people forward so thighs and knees show above the seat front behind the glass; residents ×1.15 inside pods; light, varied clothing if the crowd supports per-instance colour.
+- **Pod layout (fl-pods, fl-screens).** No overlap from the camera: pod scale ×.92 and spread them over the whole terrace (use the lot width), 6 membrane screens each standing in a visible gap between two pods, slightly angled toward the camera.
+- **Emitters (fl-emitters, fm-pods, fm-canopy).** Cool blue-white: ring colour #9fe8ff × 2.5 (toneMapped false), halo #8fd8ff additive opacity .5; under-belly pad brighter. Mixed canopy: raise to y 3.6, ring emitters r .45 on the camera-facing half of the rim (front-left, front, front-right, right) so all read below the rim.
+- **Garden (fl-garden).** Fewer blob clumps, more readable small trees with trunks (≥ 8 visible), fern clusters between, lighter greens; pink benches visible on the path edges with seated residents.
+- **Divider (fm-divider).** 7 trees, lighter varied greens and smaller crowns (target-like), shrubs spilling over the planter edge.
+- **Ring children (fm-ring).** 3 children in bright clothes sitting on the front step edge facing the circle.
+
+Screenshots to `~/city2127-evidence/closeup-night/sw/r4/` (same names) + `vs-target.jpg`.
