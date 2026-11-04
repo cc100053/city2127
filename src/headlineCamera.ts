@@ -13,9 +13,10 @@ export const SHOTS: Record<ShotId, Pose> = {
   'nw:focal': { position: [212, 64, -342], target: [40, 62, -300] },
   'ne:focal': { position: [-280, 85, -245], target: [-210, 14, -135] },
   'sw:focal': { position: [-95, 30, -15], target: [-105, 10, 60] },
-  'se:focal': { position: [12, 115, -208], target: [182, 72, -38] },
-  // The -1 pavilions are ~5% of a lot-wide frame at se:focal; this pushed-in pose is used when a focal change starts or ends at the low band.
-  'se:focal-low': { position: [100, 34, -120], target: [182, 26, -38] },
+  // East pose (owner 2026-11-04): the only clear sightline that frames the full +1 tower; 0<->+1 changes.
+  'se:focal': { position: [360, 45, -50], target: [182, 58, -38] },
+  // Near-level pose from the NW, just clear of the P1 beams; used when a focal change starts or ends at the low band (-1<->0).
+  'se:focal-low': { position: [130, 28, -95], target: [182, 24, -38] },
   // nw:focal frames the +1 spire; this east-side pose (clear of the x2 -1 hall) is used when a focal change starts or ends at the low band.
   'nw:focal-low': { position: [140, 28, -332], target: [40, 26, -300] },
   'nw:district': { position: [-30, 115, -455], target: [40, 43, -300] },
