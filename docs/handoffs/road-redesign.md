@@ -1,7 +1,7 @@
 # road-redesign — 2127 street network and street kit
 
 - Owner: cc100053
-- Status: IN_PROGRESS (kit polish R3 owner-accepted; network stage 1 implemented, owner visual acceptance pending; stages 2–3 next)
+- Status: IN_PROGRESS (kit polish R3 and network stage 1 owner-accepted 2026-11-04; stage 2 next, then stage 3)
 - Branch: `claude/road-net-stage1-a14ae6` (from `claude/street-kit-polish-86d81f` at 1cf1a70, which continues the [road audit](road-audit.md) commit 866cdbe; not merged — the owner merges after all stages)
 - Base commit: 5a56230a9b2748344624197265406bcb3de39ef0 (main)
 - Remote availability: pushed (`origin/claude/road-net-stage1-a14ae6`)
@@ -84,10 +84,10 @@
   `npm test` exit 0; `npm run build` PASS; `git diff --check` PASS. Live re-raster (1 m, production page): the nearest solid outside the kit
   to a car body edge is a Yurikamome pier at 1 m; kit planter rims 1.15 m by geometry. FPS (`fps.sh`, headed Chrome 1920×1080, DPR 1,
   `meters=nw:0`, hero): day 59.9–60.0, night 59.9–60.0 (vsync cap). Captures `~/city2127-evidence/road-net-stage1/r1/` (hero, avenue
-  `cam=-125,32,-5&at=-40,0,-55`, link `cam=-150,30,45&at=-190,0,-40`; day 13, night 21; `capture.mjs`). Visual acceptance: owner only, pending.
+  `cam=-125,32,-5&at=-40,0,-55`, link `cam=-150,30,45&at=-190,0,-40`; day 13, night 21; `capture.mjs`). Owner accepted stage 1 as captured (2026-11-04).
 
 ## Next expected step
 
-Owner reviews stage 1 (`~/city2127-evidence/road-net-stage1/r1/`) on the pushed branch. After acceptance: stage 2 (④ boulevard B, cut the
+Stage 2 (owner 2026-11-04: in a new session, from this branch): ④ boulevard B ( cut the
 old ~90 m band and its side streets, retire the remaining district GLB streets), then stage 3 (court pool, canal park); merge after all
 stages are accepted.
