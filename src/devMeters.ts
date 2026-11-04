@@ -17,3 +17,10 @@ export function devLayout(meters: string): ExhibitionLayout {
   }
   return deriveExhibitionLayout(scores);
 }
+
+const RUNG_SCORE = [-8, -5, -2, 0, 2, 5, 8];
+/** A simulated guest choice: move `site` one rung (clamped to ±3), keep the others, as a `cityMeters` string. */
+export function stepMeters(tiers: ExhibitionLayout['tiers'], site: keyof typeof AXIS_BY_SITE, direction: 1 | -1): string {
+  const next = { ...tiers, [site]: Math.max(-3, Math.min(3, tiers[site] + direction)) };
+  return Object.entries(next).map(([id, tier]) => `${id}:${RUNG_SCORE[tier + 3]}`).join(',');
+}
