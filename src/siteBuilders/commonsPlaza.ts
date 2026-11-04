@@ -31,8 +31,10 @@ const propBlue = paint('#5d9ad0', .6), propYellow = paint('#eec35a', .6);
 const coreGrey = paint('#5d646e', .6);
 const peach = nightLit(new T.MeshStandardMaterial({ color: '#ffd2a6', emissive: '#ff9a58', emissiveIntensity: .75, roughness: 1 }), 1.1, '#ff9a3c');
 // Cool white-blue halo on the terrace under an emitter (additive, above the bloom threshold's reach so it also reads by day).
-const emitHalo = new T.MeshBasicMaterial({ color: '#bfeaff', transparent: true, opacity: .45, blending: T.AdditiveBlending, depthWrite: false, toneMapped: false });
-const hedgeGreen = paint('#5c9a4f', .85), shrubGreen = paint('#4a8446', .85), bedGreen = paint('#477a43', .9);
+const emitRing = new T.MeshBasicMaterial({ color: new T.Color('#9fe8ff').multiplyScalar(2.5), toneMapped: false });
+const emitPad = new T.MeshBasicMaterial({ color: new T.Color('#e4faff').multiplyScalar(3), toneMapped: false });
+const emitHalo = new T.MeshBasicMaterial({ color: '#8fd8ff', transparent: true, opacity: .5, blending: T.AdditiveBlending, depthWrite: false, toneMapped: false });
+const hedgeGreen = paint('#72b45e', .85), shrubGreen = paint('#5f9f52', .85), bedGreen = paint('#477a43', .9);
 
 export type CommonsPlazaTarget = {
   readonly band: Band;
@@ -194,7 +196,7 @@ const benchArc = (g: T.Object3D, r: number, y: number, x: number, z: number, sta
 const POD_H = .6; // hover gap between the terrace and the pod floor (a visible dark gap)
 const POD_BASE = .2; // interior floor above the pod's lowest point
 const PD = 1.35; // pod depth
-const POD_SEAT = POD_H + POD_BASE + .3; // seat top above the terrace under the pod
+const POD_SEAT = POD_H + POD_BASE + .22; // seat top above the terrace under the pod
 
 /** Softens an extruded shell: sides bulge at mid-depth and the top is deeper than the bottom (centre height cy, half height 0.75). */
 function soften(geometry: T.BufferGeometry, cy: number): T.BufferGeometry {
@@ -230,15 +232,15 @@ function podUnit(withPanel: boolean): T.Group {
   box(g, [1.0, .04, .9], [0, cy + .54, 0], glowCeil, .01);
   mesh(g, new T.CylinderGeometry(.12, .12, .03, 14), glow, 0, cy + .51, 0);
   for (const s of [-1, 1]) {
-    box(g, [.42, .3, .5], [s * .43, seatY + .15, .12], sharePink, .04);
-    box(g, [.07, .5, .5], [s * .62, seatY + .4, .12], sharePink, .02);
+    box(g, [.42, .22, .5], [s * .43, seatY + .11, .26], sharePink, .04);
+    box(g, [.07, .5, .5], [s * .62, seatY + .36, .26], sharePink, .02);
   }
-  box(g, [.3, .22, .4], [0, seatY + .11, .12], white, .03);
+  box(g, [.3, .18, .4], [0, seatY + .09, .26], white, .03);
   mesh(g, new T.SphereGeometry(1, 28, 14).scale(.76, .6, .13), glassPane, 0, cy, PD / 2 - .1);
   if (withPanel) box(g, [.04, .9, .9], [.93, cy, -.05], sharePink, .015);
   // Emitter: a flat bright pad under the belly, a bright ring at mid-gap and a cool halo on the terrace.
-  mesh(g, new T.CylinderGeometry(.45, .45, .04, 28), glow, 0, POD_H - .04, 0);
-  ringTorus(g, .65, .09, glow, 0, POD_H / 2, 0);
+  mesh(g, new T.CylinderGeometry(.45, .45, .04, 28), emitPad, 0, POD_H - .04, 0);
+  ringTorus(g, .65, .09, emitRing, 0, POD_H / 2, 0);
   disc(g, 1.0, emitHalo, 0, .03, 0);
   return g;
 }
@@ -340,21 +342,22 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
 
   // ---------- -1 low: private pod garden ----------
   const FRONT = Math.PI; // a pod's glass faces stage -Z, nudged toward the camera
-  const LK = 1.15; // low pods stand 15 % larger than the unit
-  const lowPods = [[3.15, -.8, .12], [3.2, 2.0, .05], [1.2, 3.55, .02], [-1.3, 3.55, -.04], [-3.25, 1.8, -.08], [-3.3, -.8, -.12]]
+  const LK = .92; // low pods, spread over the whole terrace so none overlaps another from the hero camera
+  // Order: front +x, front -x, middle +x, middle -x, back +x, back -x (+x is screen-left).
+  const lowPods = [[4.6, -3.0, .14], [-4.6, -3.0, -.14], [2.2, -.4, .06], [-2.2, -.4, -.06], [3.7, 3.4, .04], [-3.7, 3.4, -.04]]
     .map(([x, z, tilt]) => ({ x, z, yaw: FRONT - tilt, k: LK }));
   // An S from the front entrance, then branches to each pod door: Catmull curves cut into short rotated slabs.
   const curves: [number, number][][] = [
     [[0, -5.3], [.9, -4.4], [-.8, -3.2], [0, -1.8]],
-    [[0, -1.8], [1.5, -2.3], [3.15, -2.45]], [[0, -1.8], [-1.5, -2.3], [-3.3, -2.45]],
-    [[0, -1.8], [.9, -.4], [1.7, .45], [2.5, .95]], [[0, -1.8], [-.9, -.4], [-1.7, .35], [-2.4, .75]],
-    [[0, -1.8], [-.3, .1], [.2, 1.3], [1.0, 2.3]], [[.2, 1.3], [-.4, 2.0], [-1.2, 2.3]],
+    [[.5, -4.3], [2.5, -4.6], [4.6, -4.55]], [[-.5, -3.9], [-2.5, -4.5], [-4.6, -4.55]],
+    [[0, -1.8], [1.0, -1.8], [2.2, -1.75]], [[0, -1.8], [-1.0, -1.8], [-2.2, -1.75]],
+    [[0, -1.8], [.4, 0], [1.2, 1.5], [2.6, 2.1], [3.6, 2.2]], [[0, -1.8], [-.4, 0], [-1.2, 1.5], [-2.6, 2.1], [-3.6, 2.2]],
   ];
   const sampled = curves.map(points => new T.CatmullRomCurve3(points.map(([x, z]) => new T.Vector3(x, 0, z))).getPoints(points.length * 28).map(v => [v.x, v.z] as [number, number]));
   const walks = sampled.flatMap(line => line.slice(1).map((q, i) => [line[i], q] as [[number, number], [number, number]]));
   const nearPath = (x: number, z: number) => walks.some(([a, b]) => distToSegment(x, z, a, b) < .8);
   const onCurve = (i: number, u: number, y = BED + .03): [number, number, number] => { const l = sampled[i], p = l[Math.round(u * (l.length - 1))]; return [p[0], p[1], y]; };
-  const benches: [number, number, number][] = [[-1.7, -3.7, .2], [1.75, -3.1, -.25], [3.6, -3.9, 0]];
+  const benches: [number, number, number][] = [[1.75, -3.1, -.25], [-1.85, -3.4, .2], [1.55, 1.5, 1.2]];
   stateGroup('commons-state-low', 'low', 0, .6, g => {
     plate(g, 13.2, 11.2, SLAB, 1.4, 0);
     plate(g, 12.6, 10.6, BED - SLAB, 1.1, SLAB, bedGreen);
@@ -363,23 +366,23 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
     for (let x = -6.1; x <= 6.15; x += .5) if (Math.abs(x) > 1.0) bush(g, x, BED - .05, -5.2, .27, hedgeGreen, .62);
     for (let z = -4.7; z <= 5.2; z += .5) for (const s of [-1, 1]) bush(g, s * 6.05, BED - .05, z, .28, hedgeGreen, .62);
     for (let x = -5.8; x <= 5.8; x += .6) bush(g, x, BED - .05, 5.2, .27, hedgeGreen, .6);
-    // Cover every non-path spot inside the hedge: dense leafy clumps (two greens, flattened, varied scale) and fern-like spiky clusters.
-    const free = (x: number, z: number) => !nearPath(x, z) && !lowPods.some(p => Math.hypot(x - p.x, z - p.z) < 1.4) && z > -4.8 && z < 4.9 && Math.abs(x) < 5.6;
-    for (let i = 0; i < 1500; i++) {
+    // Open planting: lighter leafy clumps (two greens, flattened, varied scale) between the paths, fern-like spiky clusters, and small trees with trunks.
+    const free = (x: number, z: number) => !nearPath(x, z) && !lowPods.some(p => Math.hypot(x - p.x, z - p.z) < 1.3) && z > -4.8 && z < 4.9 && Math.abs(x) < 5.6;
+    for (let i = 0; i < 900; i++) {
       const x = (hash(i) - .5) * 11.8, z = (hash(i + 500) - .5) * 10;
       if (!free(x, z)) continue;
-      const size = .25 + hash(i + 900) * .3;
+      const size = .2 + hash(i + 900) * .22;
       bush(g, x, BED - .05, z, size, hash(i + 77) > .5 ? shrubGreen : hedgeGreen, .6);
     }
-    for (let i = 0; i < 90; i++) {
+    for (let i = 0; i < 160; i++) {
       const x = (hash(i + 2000) - .5) * 11.4, z = (hash(i + 2500) - .5) * 9.8;
       if (!free(x, z)) continue;
       for (let k = 0; k < 6; k++) {
-        const a = k * 1.05 + i, cone = mesh(g, new T.ConeGeometry(.05, .5, 5), fernGreen, x + Math.cos(a) * .1, BED + .22, z + Math.sin(a) * .1);
+        const a = k * 1.05 + i, cone = mesh(g, new T.ConeGeometry(.05, .55, 5), fernGreen, x + Math.cos(a) * .1, BED + .24, z + Math.sin(a) * .1);
         cone.rotation.set(Math.sin(a) * .6, 0, -Math.cos(a) * .6);
       }
     }
-    for (const [x, z, s] of [[4.9, .8, .62], [-4.9, .4, .65], [-1.9, -1.0, .55], [1.95, -1.1, .55], [0, 4.5, .6], [4.9, -3.4, .6], [-4.9, -3.3, .62], [4.7, 3.5, .6], [-4.7, 3.3, .6], [.2, -.1, .5]]) tree(g, x, BED, z, s);
+    for (const [x, z, s] of [[5.4, 1.2, .8], [-5.4, 1.2, .85], [1.5, 4.6, .75], [-1.5, 4.6, .75], [5.4, 4.4, .8], [-5.4, 4.4, .8], [5.3, -.9, .8], [-5.3, -.9, .8], [0, 4.9, .7], [.0, .9, .65]]) tree(g, x, BED, z, s);
     // Three pink-topped benches along the front path and four slim reservation posts by the pod doors.
     for (const [x, z, yaw] of benches) {
       const b = new T.Group();
@@ -390,20 +393,20 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
       box(b, [1.15, .04, .34], [0, .27, 0], sharePink, .01);
       g.add(b);
     }
-    for (const [x, z] of [[2.2, -1.6], [-2.2, -1.6], [2.0, 1.9], [-2.0, 1.5]]) {
+    for (const [x, z] of [[3.2, -4.0], [-3.2, -4.0], [1.4, .9], [-1.4, .9]]) {
       box(g, [.06, .95, .06], [x, BED + .475, z], white, .02);
       mesh(g, new T.SphereGeometry(.08, 10, 8), glow, x, BED + .98, z);
     }
     // Six free-standing membrane screens at the midpoints between neighbouring pods: white translucent, pink frame, slim white foot.
-    for (let i = 0; i < 6; i++) {
-      const p = lowPods[i], q = lowPods[(i + 1) % 6], s = new T.Group();
-      s.position.set((p.x + q.x) / 2, BED, (p.z + q.z) / 2 - .5);
-      s.rotation.y = Math.atan2(q.x - p.x, q.z - p.z) + Math.PI / 2 + (i % 2 ? .45 : -.45);
-      box(s, [1.0, 2.2, .04], [0, 1.1 + .06, 0], screenGlass, .01);
-      for (const sx of [-.5, .5]) box(s, [.05, 2.2, .07], [sx, 1.16, 0], sharePink, .01);
-      for (const sy of [.06, 2.26]) box(s, [1.05, .05, .07], [0, sy, 0], sharePink, .01);
-      box(s, [.5, .06, .24], [0, .03, 0], white, .02);
-      g.add(s);
+    for (const [pi, qi] of [[0, 2], [1, 3], [2, 4], [3, 5], [4, 5], [0, 4]]) {
+      const p = lowPods[pi], q = lowPods[qi], sc = new T.Group();
+      sc.position.set((p.x + q.x) / 2, BED, (p.z + q.z) / 2 - .2);
+      sc.rotation.y = Math.atan2(q.x - p.x, q.z - p.z) + Math.PI / 2 + (pi % 2 ? .35 : -.35); // slightly angled toward the camera
+      box(sc, [1.0, 2.2, .04], [0, 1.1 + .06, 0], screenGlass, .01);
+      for (const sx of [-.5, .5]) box(sc, [.05, 2.2, .07], [sx, 1.16, 0], sharePink, .01);
+      for (const sy of [.06, 2.26]) box(sc, [1.05, .05, .07], [0, sy, 0], sharePink, .01);
+      box(sc, [.5, .06, .24], [0, .03, 0], white, .02);
+      g.add(sc);
     }
   }, true);
   const lowPlace = podFleet(stage, 'commons-pods-low', lowPods, false, BED);
@@ -411,17 +414,17 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
   lowPods.forEach((pod, i) => {
     for (const s of [-1, 1]) {
       if (i > 3 && s > 0) continue;
-      const p = podPoint(pod, s * .43, .12);
-      people('low', [{ ...p, y: POD_SEAT * pod.k + BED, yaw: pod.yaw - s * Math.PI / 2, seated: true, big: 1.3, talk: [i, s < 0 ? 0 : 1, 2] }]);
+      const p = podPoint(pod, s * .43, .3);
+      people('low', [{ ...p, y: POD_SEAT * pod.k + BED, yaw: pod.yaw - s * (Math.PI / 2 - .6), seated: true, big: 1.2, talk: [i, s < 0 ? 0 : 1, 2] }]);
     }
   });
   people('low', [
-    { x: benches[0][0] - .25, z: benches[0][1], y: BED + .27, yaw: Math.PI + .2, seated: true }, { x: benches[1][0] - .25, z: benches[1][1], y: BED + .27, yaw: Math.PI - .25, seated: true },
-    { x: benches[1][0] + .25, z: benches[1][1], y: BED + .27, yaw: Math.PI - .25, seated: true }, { x: benches[2][0], z: benches[2][1], y: BED + .27, yaw: Math.PI, seated: true },
-    walker('low', onCurve(0, .1), onCurve(0, .95), 18, 0), walker('low', onCurve(3, .95), onCurve(3, .1), 22, .3), walker('low', onCurve(4, .1), onCurve(4, .95), 24, .6),
-    walker('low', onCurve(5, .15), onCurve(5, .95), 20, .8), walker('low', onCurve(1, .95), onCurve(1, .15), 17, .45),
+    { x: benches[0][0] - .25, z: benches[0][1], y: BED + .27, yaw: Math.PI - .25, seated: true }, { x: benches[0][0] + .25, z: benches[0][1], y: BED + .27, yaw: Math.PI - .25, seated: true },
+    { x: benches[1][0], z: benches[1][1], y: BED + .27, yaw: Math.PI + .2, seated: true }, { x: benches[2][0], z: benches[2][1], y: BED + .27, yaw: 1.2 + Math.PI, seated: true },
+    walker('low', onCurve(0, .1), onCurve(0, .95), 18, 0), walker('low', onCurve(5, .95), onCurve(5, .1), 22, .3), walker('low', onCurve(6, .1), onCurve(6, .95), 24, .6),
+    walker('low', onCurve(1, .1), onCurve(1, .95), 20, .8), walker('low', onCurve(2, .95), onCurve(2, .15), 17, .45),
   ]);
-  talkers('low', 3, -.2, BED + .03, -2.5, 2);
+  talkers('low', 3, -.2, BED + .03, -2.6, 2);
 
   // ---------- 0 mixed: half pods, half open circle ----------
   const DC = { x: 0, z: .1 }, RC = { x: -2.8, z: .4 }, RING_IN = 1.7, RING_OUT = 2.0, FLOOR = DECK - .35, SEAT = FLOOR + .3;
@@ -457,10 +460,10 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
     }
     for (let i = 0; i <= 28; i++) {
       const [x, z] = divider(i / 28), side = i % 2 ? 1 : -1;
-      bush(g, x + side * (.2 + hash(i) * .3), DECK + WALL - .15, z, .26 + hash(i + 3) * .2, i % 3 ? shrubGreen : hedgeGreen);
+      bush(g, x + side * (.25 + hash(i) * .3), DECK + WALL - .2, z, .22 + hash(i + 3) * .16, i % 3 ? shrubGreen : hedgeGreen);
       bush(g, x - side * .1, DECK + WALL, z + .15, .2 + hash(i + 9) * .15, i % 3 ? hedgeGreen : shrubGreen);
     }
-    [[.04, .85], [.2, 1.2], [.4, .9], [.58, 1.3], [.78, 1.0], [.95, 1.15]].forEach(([t, s]) => { const [x, z] = divider(t); tree(g, x, DECK + WALL, z, s); });
+    [[.03, .65], [.17, .9], [.33, .7], [.5, 1.0], [.66, .75], [.82, .9], [.96, .7]].forEach(([t, s]) => { const [x, z] = divider(t); tree(g, x, DECK + WALL, z, s); });
     for (const [x, z] of [[1.6, .1], [1.45, -.35]]) box(g, [.7, .14, .5], [x, DECK + .07, z], white, .02);
     bush(g, 4.3, DECK, 3.6, .4); bush(g, 4.5, DECK, -3.0, .38); bush(g, 3.4, DECK, -3.8, .36);
   }, true);
@@ -473,7 +476,7 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
   }
   const stepSeat = (a: number) => ({ x: DC.x + Math.cos(a) * 5.58, z: DC.z - Math.sin(a) * 5.58, y: DECK - .15, yaw: Math.atan2(-Math.cos(a), Math.sin(a)) });
   people('mixed', [
-    ...mixedPods.slice(0, 2).flatMap((pod, i) => [-1, 1].map(sd => ({ ...podPoint(pod, sd * .43, .12), y: DECK + POD_SEAT * pod.k, yaw: pod.yaw - sd * Math.PI / 2, seated: true, big: 1.3, talk: [70 + i, sd < 0 ? 0 : 1, 2] as [number, number, number] }))),
+    ...mixedPods.slice(0, 2).flatMap((pod, i) => [-1, 1].map(sd => ({ ...podPoint(pod, sd * .43, .3), y: DECK + POD_SEAT * pod.k, yaw: pod.yaw - sd * (Math.PI / 2 - .6), seated: true, big: 1.2, talk: [70 + i, sd < 0 ? 0 : 1, 2] as [number, number, number] }))),
     { x: 1.45, z: -.35, y: DECK + .14, yaw: -1.4, seated: true }, { x: 1.6, z: .2, y: DECK + .14, yaw: -1.4, seated: true },
     ...[2.3, 2.42, 2.54].map(a => ({ ...stepSeat(a), seated: true, kid: true, big: 1.2 })),
   ]);
@@ -494,10 +497,10 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
   const MIX_SCALE = 2.4 / 5.2;
   const mixedCanopy = canopy('mixed', MIX_SCALE, g => {
     ringTorus(g, 5.2, .05, sharePink, 0, 0, 0);
-    for (let i = 0; i < 4; i++) {
-      const a = i * Math.PI / 2 + Math.PI / 4;
-      ringTorus(g, .35 / MIX_SCALE, .07 / MIX_SCALE, glow, Math.cos(a) * 2.45 / MIX_SCALE, -.35 / MIX_SCALE, Math.sin(a) * 2.45 / MIX_SCALE);
-      disc(g, .5 / MIX_SCALE, emitHalo, Math.cos(a) * 2.45 / MIX_SCALE, -.4 / MIX_SCALE, Math.sin(a) * 2.45 / MIX_SCALE);
+    // Four ring emitters on the camera-facing half of the rim (front-left, front, front-right, right), hanging below it.
+    for (const [x, z] of [[1.75, -1.75], [0, -2.45], [-1.75, -1.75], [-2.45, 0]]) {
+      ringTorus(g, .45 / MIX_SCALE, .08 / MIX_SCALE, emitRing, x / MIX_SCALE, -.35 / MIX_SCALE, z / MIX_SCALE);
+      disc(g, .65 / MIX_SCALE, emitHalo, x / MIX_SCALE, -.4 / MIX_SCALE, z / MIX_SCALE);
     }
   });
   addPart('mixed', .6, .4, level => { canopyLevel.mixed = level; });
@@ -507,7 +510,7 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
     for (let i = 0; i < 8; i++) arc(g, 5.0, 5.28, .12, [0, -.06, 0], sharePink, i * Math.PI / 4 + .07, Math.PI / 4 - .14);
     ringTorus(g, 5.2, .02, white, 0, -.3, 0);
     for (let i = 0; i < 8; i++) rib(g, i * Math.PI / 4 + Math.PI / 8, .12);
-    ringTorus(g, 3, .14, glow, 0, -.85, 0);
+    ringTorus(g, 3, .14, emitRing, 0, -.85, 0);
     mesh(g, new T.CylinderGeometry(1.3, 1.5, .6, 24), white, 0, -.75, 0);
     mesh(g, new T.CylinderGeometry(.7, .9, .5, 16), coreGrey, 0, -1.15, 0);
     for (let i = 0; i < 12; i++) {
@@ -518,37 +521,45 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
     }
     for (let i = 0; i < 6; i++) {
       const a = i * Math.PI / 3 + Math.PI / 6;
-      mesh(g, new T.SphereGeometry(.45, 14, 8).scale(1, .3, 1), glow, Math.cos(a) * 3.9, -.42, Math.sin(a) * 3.9);
+      mesh(g, new T.SphereGeometry(.45, 14, 8).scale(1, .3, 1), emitPad, Math.cos(a) * 3.9, -.42, Math.sin(a) * 3.9);
       disc(g, .7, emitHalo, Math.cos(a) * 3.9, -.6, Math.sin(a) * 3.9);
     }
   }, HIGH_SX);
 
   // ---------- +1 high: open commons amphitheatre ----------
-  const AC = { x: 0, z: 6.5 }, DECK_HIGH = 1.6;
-  const terraces = [[4.5, 1.4], [5.15, 1.15], [5.8, .9], [6.45, .65], [7.1, .4]].map(([inner, top]) => ({ inner, outer: inner + .65, top }));
+  // A wide fan: terrace arcs centred off the front-right corner (screen lower-right), sweeping from back-left to the right side; the flat forecourt is the wedge near the centre.
+  const AC = { x: -5, z: -6 }, DECK_HIGH = 1.6, PHI_STAIR = .98;
+  const terraces = Array.from({ length: 6 }, (_, k) => ({ inner: 4.5 + k, outer: 5.5 + k, top: SLAB + .21 * (k + 1) }));
+  const dirAt = (phi: number, r: number) => [AC.x + Math.cos(phi) * r, AC.z + Math.sin(phi) * r] as const;
+  // Angular span (from +x towards +z) in which a terrace stays inside the lot.
+  const spans = terraces.map(t => {
+    let lo = Infinity, hi = -Infinity;
+    for (let phi = -.4; phi < 2.4; phi += .003) {
+      if ([t.inner, t.outer].every(r => { const [x, z] = dirAt(phi, r); return Math.abs(x) <= 6.35 && z >= -5.45 && z <= 5.35; })) { lo = Math.min(lo, phi); hi = Math.max(hi, phi); }
+    }
+    return [lo, hi] as const;
+  });
   const heightAt = (x: number, z: number) => {
     if (z >= 2) return DECK_HIGH;
     const r = Math.hypot(x - AC.x, z - AC.z);
     return terraces.find(t => r >= t.inner && r < t.outer)?.top ?? SLAB;
   };
-  const angles = (t: { inner: number; outer: number }) => Math.max(Math.asin(Math.min(1, 1.7 / t.inner)), t.outer > 6 ? Math.acos(6 / t.outer) : 0);
   const tables = [[-1.9, 2.75], [1.9, 2.75], [-1.05, 4.0], [1.05, 4.0]];
   stateGroup('commons-state-high', 'high', 0, .6, g => {
     plate(g, 13.2, 11.2, SLAB, 1.4, 0);
     box(g, [12, DECK_HIGH - SLAB, 2.6], [0, SLAB + (DECK_HIGH - SLAB) / 2, 3.3], white, .05);
     const gap = .8;
-    for (const t of terraces) {
-      const mid = (t.inner + t.outer) / 2, a0 = angles(t), d = gap / mid, h = t.top - SLAB;
-      for (const [start, end] of [[a0, Math.PI / 2 - d], [Math.PI / 2 + d, Math.PI - a0]]) {
-        arc(g, t.inner, t.outer, h, [AC.x, SLAB, AC.z], white, start, end - start);
-        arc(g, t.outer - .06, t.outer, .025, [AC.x, t.top, AC.z], sharePink, start, end - start);
+    terraces.forEach((t, k) => {
+      const mid = (t.inner + t.outer) / 2, [lo, hi] = spans[k], d = gap / mid, h = t.top - SLAB;
+      for (const [p0, p1] of [[lo, PHI_STAIR - d], [PHI_STAIR + d, hi]]) {
+        if (p1 <= p0) continue;
+        arc(g, t.inner, t.outer, h, [AC.x, SLAB, AC.z], white, -p1, p1 - p0);
+        arc(g, t.outer - .14, t.outer, .06, [AC.x, t.top, AC.z], sharePink, -p1, p1 - p0); // saturated edge seam
+        if (k % 2) benchArc(g, mid + .05, t.top, AC.x, AC.z, -(p1 - .06), p1 - p0 - .12); // long continuous bench on every second tread
       }
-      box(g, [gap * 2, h, t.outer - t.inner + .02], [0, SLAB + h / 2, AC.z - mid], white, .03);
-      // Long curved bench on the tread (two runs, either side of the stair).
-      const bd = (gap + .4) / (mid + .1);
-      benchArc(g, mid + .1, t.top, AC.x, AC.z, a0 + .25, Math.PI / 2 - bd - a0 - .25);
-      benchArc(g, mid + .1, t.top, AC.x, AC.z, Math.PI / 2 + bd, Math.PI / 2 - bd - a0 - .25);
-    }
+      const [sx, sz] = dirAt(PHI_STAIR, mid);
+      box(g, [gap * 2, h, t.outer - t.inner + .02], [sx, SLAB + h / 2, sz], white, .03).rotation.y = Math.PI / 2 - PHI_STAIR;
+    });
     box(g, [12, .03, .06], [0, DECK_HIGH, 2.0], sharePink, .01);
     // Raised planters on the terraces: five trees and shrub beds, strongest on the left.
     const planter = (x: number, z: number, w: number, d: number, yaw: number, trees: [number, number][]) => {
@@ -609,19 +620,20 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
       people('high', [{ x: x + Math.sin(a) * r, z: z + Math.cos(a) * r, y: DECK_HIGH + .3, yaw: a + Math.PI, seated: true, talk: [80 + i, k, 4] }]);
     }
   });
-  const onTerrace = (n: number, angle: number, dx = 0) => {
-    const t = terraces[n], r = (t.inner + t.outer) / 2 + .1;
-    return { x: AC.x + Math.cos(angle) * r + dx, z: AC.z - Math.sin(angle) * r, y: t.top + .2, yaw: Math.atan2(Math.cos(angle), -Math.sin(angle)), seated: true };
+  // Groups of two or three on the long curved benches (every second terrace), facing down the fan.
+  const seatOn = (k: number, frac: number) => {
+    const t = terraces[k], [lo, hi] = spans[k], phi = lo + frac * (hi - lo), [x, z] = dirAt(phi, (t.inner + t.outer) / 2 + .05);
+    return { x, z, y: t.top + .215, yaw: Math.atan2(-Math.cos(phi), -Math.sin(phi)), seated: true as const };
   };
+  [[1, [.12, .18]], [1, [.72, .78]], [3, [.14, .2, .26]], [3, [.72, .78]], [5, [.2, .26]], [5, [.82, .88, .94]]].forEach(([k, fr], gi) => {
+    (fr as number[]).forEach((f, j) => people('high', [{ ...seatOn(k as number, f), talk: [90 + gi, j, (fr as number[]).length] }]));
+  });
+  const stairA = dirAt(PHI_STAIR, 4.2), stairB = dirAt(PHI_STAIR, 9.9);
   people('high', [
-    { ...onTerrace(0, 2.25), talk: [90, 0, 2] }, { ...onTerrace(0, 2.1), talk: [90, 1, 2] },
-    { ...onTerrace(1, 1.15), talk: [91, 0, 2] }, { ...onTerrace(1, 1.0), talk: [91, 1, 2] },
-    { ...onTerrace(2, 2.05) }, { ...onTerrace(3, 2.3), talk: [92, 0, 2] }, { ...onTerrace(3, 2.15), talk: [92, 1, 2] },
-    { ...onTerrace(4, 2.45), talk: [93, 0, 2] }, { ...onTerrace(4, 2.3), talk: [93, 1, 2] }, { ...onTerrace(1, .95) },
-    { ...onTerrace(3, .9) },
-    walker('high', [.3, 1.6, DECK_HIGH], [.3, -1.2, .4], 22, 0), walker('high', [-.3, -1.2, .4], [-.3, 1.6, DECK_HIGH], 26, .5),
-    walker('high', [2.2, -3.4, SLAB], [3.7, -2.4, SLAB], 7, 0, true), walker('high', [-.2, -3.3, SLAB], [1.3, -2.1, SLAB], 6, .3, true), walker('high', [3.5, -3.8, SLAB], [2.1, -2.8, SLAB], 8, .6, true), walker('high', [-2.5, -3.2, SLAB], [-1.3, -4.1, SLAB], 6.5, .1, true),
-    { x: 0, z: -3.6, y: SLAB, yaw: 2.8, talk: [94, 0, 2] }, { x: -.4, z: -3.8, y: SLAB, yaw: -.3, talk: [94, 1, 2] },
+    walker('high', [stairA[0], stairA[1], SLAB], [stairB[0], stairB[1], DECK_HIGH], 22, 0), walker('high', [stairB[0], stairB[1], DECK_HIGH], [stairA[0], stairA[1], SLAB], 26, .5),
+    // Children on the forecourt wedge, each crossing a different way.
+    walker('high', [-4.5, -4.2, SLAB], [-2.5, -3.5, SLAB], 6, 0, true), walker('high', [-3, -5, SLAB], [-1.5, -4.2, SLAB], 7, .3, true), walker('high', [-5, -3, SLAB], [-3.5, -2, SLAB], 5.5, .6, true), walker('high', [-2, -3.2, SLAB], [-3.2, -4.9, SLAB], 6.5, .1, true),
+    { x: -2.3, z: -3.0, y: SLAB, yaw: 2.8, talk: [94, 0, 2] }, { x: -2.7, z: -3.2, y: SLAB, yaw: -.3, talk: [94, 1, 2] },
   ]);
 
   // Residents, drawn only when a band is settled so a changing state never squashes a visible body.
@@ -634,7 +646,7 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
     const ready = stage.visible && stage.scale.y > .999;
     // Canopies lower in / lift away with their part, and bob gently once up (±.06 over the circle, ±.08 over the lot).
     for (const [c, level, x, y, z, bobAmp] of [
-      [mixedCanopy, canopyLevel.mixed, RC.x, 3.0, -.9, .06], [highCanopy, canopyLevel.high, 0, 6.8, 0, .08],
+      [mixedCanopy, canopyLevel.mixed, RC.x, 3.6, -.9, .06], [highCanopy, canopyLevel.high, 0, 6.8, 0, .08],
     ] as const) {
       c.group.visible = level > HIDDEN;
       c.group.position.set(x, y + (1 - level) * 3 + (still ? 0 : Math.sin(now * Math.PI * 2 / 6) * bobAmp * level), z);
