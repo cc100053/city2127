@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { changeSites, DISTRICT, HUB_LEGACY_LOT, inDistrict, seaward } from './layout.ts';
-import { routes } from './mobility.ts';
+import { onStreetKit, routes } from './mobility.ts';
 import { onBayPlinth } from './automationBays.ts';
 import { recedeBeyondDistrict } from './bayContext.ts';
 import { leaf, leafyCrown, trim } from './cityRig.ts';
@@ -23,7 +23,7 @@ export function plantCanopy(scene: T.Object3D, trees: { instances: { position: n
   const inLot=(tree:{position:number[]},sites:{x:number;z:number;w:number;d:number;scale:number}[])=>sites.some(site=>Math.abs(tree.position[0]-site.x)<site.w*site.scale/2+9 && Math.abs(-tree.position[1]-site.z)<site.d*site.scale/2+9);
   // Each crown's pose depends on its index here, so the list is indexed against the NW lot as it was before the grown AUTO HUB plinth (R4); trees inside the real lot are then hidden in place, which leaves every other crown as it was.
   const positions=trees.instances.filter(tree=>inDistrict(tree.position[0],-tree.position[1]) && !seaward(tree.position[0],-tree.position[1]) && !(tree.position[2]<3 && (swale(tree.position[0],-tree.position[1])<-1.1 || corridor(tree.position[0],-tree.position[1])<.2)) && !inLot(tree,Object.values({...changeSites,nw:HUB_LEGACY_LOT})));
-  const lots=Object.values(changeSites),gone=positions.map(tree=>inLot(tree,lots) || onBayPlinth(tree.position[0],-tree.position[1],2)); // bay plinths (automationBays.ts) keep their ground clear the same way
+  const lots=Object.values(changeSites),gone=positions.map(tree=>inLot(tree,lots) || onBayPlinth(tree.position[0],-tree.position[1],2) || (pits && onStreetKit(tree.position[0],-tree.position[1],.5))); // bay plinths (automationBays.ts) and, for ground trees, the street kit (its planters bring their own) keep their ground clear the same way
   // Instance colours already provide the leaf pigment; a second green tint crushed the lit canopy.
   const foliage=new T.InstancedMesh(crown,new T.MeshStandardMaterial({color:'#ffffff',roughness:.92}),positions.length*4);
   const trunks=new T.InstancedMesh(new T.CylinderGeometry(.35,.6,1,6),new T.MeshStandardMaterial({color:'#776957',roughness:1}),positions.length);

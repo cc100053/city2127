@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
 import { changeSites, skyBridges, inDistrict, DISTRICT, CIVIC, civicAt } from '../src/layout.ts';
 import { heroCamera, heroSettledCamera } from '../src/heroCamera.ts';
-import { pavilionFlight, plazaPose, routes, mobility, publishDoorways, publishEntrances, forecourtVisits, promenadeBenches, visitPose, entranceJourneys, entrancePose, laneOffset, ROAD_FILL } from '../src/mobility.ts';
+import { pavilionFlight, plazaPose, routes, mobility, publishDoorways, publishEntrances, forecourtVisits, promenadeBenches, visitPose, entranceJourneys, entrancePose, laneOffset, CARRIAGEWAY } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { civicCore } from '../src/civicCore.ts';
 import { publishOccupants, publishRoofWalks, occupantFleet, occupants, rideShown, strollPose } from '../src/occupants.ts';
@@ -19,6 +19,8 @@ import { bayContext } from '../src/bayContext.ts';
 import { acceleratedRaycast, MeshBVH } from 'three-mesh-bvh';
 import { checkHousingCity } from './housingCityCheck.ts';
 import { repairRoads, ROAD_CUTS, ROAD_LINKS } from '../src/roadRepair.ts';
+import { streetCuts, streetNetwork } from '../src/streetKit.ts';
+import { STREET_KIT } from '../src/layout.ts';
 /** A ladder target with the given rungs; the rest mixed. */
 const rungs = (t: Partial<Record<'nw' | 'ne' | 'sw' | 'se', number>>) => ({ tiers: { nw: 0, ne: 0, sw: 0, se: 0, ...t } });
 
@@ -164,26 +166,31 @@ environment.traverse(object => {
   }
 });
 assert.ok(!environment.getObjectByName('ROADSIDE_TREE_INSTANCES'), 'Hidden roadside blockout is dropped');
-// Road audit (as loadOdaiba): cut streets keep no paving, the linked avenue is paved through, and the avenues beside each cut stay whole.
-repairRoads(environment);
+// Road audit and street network stage 1 (as loadOdaiba): cut streets keep no surveyed paving, the junction link is paved, the ④ band stays,
+// and the street kit paves the U route end to end (carriageway, and footway on both sides) once its ground joins the environment.
+repairRoads(environment, streetCuts());
+const streetKit = streetNetwork(environment);
 {
   const paved = (x: number, z: number, names: RegExp) => new Raycaster(new Vector3(x, 50, z), new Vector3(0, -1, 0)).intersectObject(environment, true).some(h => names.test(h.object.name));
   assert.ok(!environment.getObjectByName('ROAD_ACCESS'), 'Isolated driveway stubs are dropped');
-  for (const [ax, az, bx, bz] of ROAD_CUTS) for (const t of [.2, .5, .8])
+  for (const [ax, az, bx, bz] of [...ROAD_CUTS, ...streetCuts()]) for (const t of [.2, .5, .8])
     assert.ok(!paved(ax + (bx - ax) * t, az + (bz - az) * t, /^(ROAD_|SIDEWALK_NETWORK|MAJOR_ROAD_MARKINGS)/), `cut street still paved at ${ax},${az} t=${t}`);
   for (const [ax, az, bx, bz] of ROAD_LINKS) for (const t of [.1, .5, .9])
     assert.ok(paved(ax + (bx - ax) * t, az + (bz - az) * t, /^ROAD_LINK$/) && paved(ax + (bx - ax) * t, az + (bz - az) * t, /^SIDEWALK_LINK$/), `road link unpaved at t=${t}`);
-  for (const [x, z] of [[-264.6, -47.9], [27.3, -242.05], [-206.7, -78.4]]) assert.ok(paved(x, z, /^(ROAD_SECONDARY|SIDEWALK_NETWORK)$/), `kept junction ${x},${z} lost its paving`);
-  // Both street-car avenues keep their surface end to end (the reroutes cut beside them); loadOdaiba's roadFill paves the one junction mouth.
-  routes().streets.forEach((street, r) => { const length = street.getLength(); for (let d = 0; d <= length; d += 2) {
-    if (r === ROAD_FILL.road && d >= ROAD_FILL.from && d <= ROAD_FILL.to) continue;
-    const p = street.getPointAt(d / length); assert.ok(paved(p.x, p.z, /^(ROAD_|SIDEWALK_|MAJOR_ROAD_MARKINGS)/), `street ${r} unpaved at d ${d}`); } });
+  for (const [x, z] of [[185.2, -187.7], [18.8, -76.6], [-81.6, -10.7]]) assert.ok(paved(x, z, /^ROAD_(MAJOR|SECONDARY)$/), `④ band lost its road at ${x},${z}`);
+  const street = routes().streets[0], length = street.getLength(), reach = (side: number, d: number) => (side < 0 ? STREET_KIT.inside : STREET_KIT.outside).find(([f, t]) => d >= f && d < t)![2];
+  for (let d = STREET_KIT.from + 1; d < length - 1; d += 2) {
+    const p = street.getPointAt(d / length), t = street.getTangentAt(d / length), at = (o: number): [number, number] => [p.x + t.z * o, p.z - t.x * o];
+    assert.ok(paved(...at(0), /^street-ceramic$/) && paved(...at(CARRIAGEWAY[0].half - .3), /^street-ceramic$/) && paved(...at(.3 - CARRIAGEWAY[0].half), /^street-ceramic$/), `U unpaved at d ${d}`);
+    for (const side of [-1, 1]) assert.ok(paved(...at(side * (CARRIAGEWAY[0].half + reach(side, d) - .3)), /^street-footway$/), `U footway missing at d ${d} side ${side}`);
+  }
 }
 // Street cars pass through nothing: every lane's car body (±0.95 m, 0.5 and 1.2 m up, scaled as drawn by the 12 m fade at each
-// avenue end) along both avenues, probed 0.3 m in four directions against the landmarks, civic core and environment (guideway
-// piers, Hilton's chapel, Aqua City's walls). Faces are hit from either side for this check only.
+// route end) along the U route, probed 0.3 m in four directions against the landmarks, civic core, environment (guideway piers,
+// Hilton's chapel) and the street kit's planters, plants and rings. Faces are hit from either side for this check only.
 {
-  const solids = [environment, ...landmarks], sides = new Map<any, number>(), ground = /^(road|road_marking|sidewalk|plaza|landscape|water|service_area)$/;
+  // Aqua City and DiverCity Tokyo Plaza are fixture-only: loadOdaiba builds the plaza deck and the enlarged Fuji frame on their lots.
+  const solids = [environment, ...landmarks.filter(l => l.name !== 'aqua-city-odaiba' && l.name !== 'divercity-tokyo-plaza'), streetKit], sides = new Map<any, number>(), ground = /^(road|road_marking|sidewalk|plaza|landscape|water|service_area)$/;
   for (const root of solids) root.traverse(o => { if (o instanceof Mesh && !Array.isArray(o.material)) { sides.set(o.material, o.material.side); o.material.side = 2; } });
   environment.updateMatrixWorld(true);
   const probe = new Raycaster(), dirs = [new Vector3(1, 0, 0), new Vector3(-1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 0, -1)], hits: string[] = [];
@@ -211,7 +218,7 @@ const edge=tidalEdge();
 assert.ok(edge.children.length>0 && edge.children.length<=5, 'North tidal edge batches by shared finish');
 const bay=bayContext();
 assert.ok(bay.children.length<=5, 'Bay bridges, shores and Ariake parkland batch by finish; skyline is one instanced draw');
-city.add(environment,panels,edge,bay);
+city.add(environment,panels,edge,bay,streetKit);
 plantCanopy(city, JSON.parse(readFileSync(new URL('../asset/models/odaiba-masterplan/tree_instances.json', import.meta.url), 'utf8')));
 const groveStart=city.children.length;
 plantLandscapeCanopy(city,environment,landmarks);
@@ -221,7 +228,7 @@ for (const grove of city.children.filter(o => o instanceof InstancedMesh && o.na
   for (let i = 0; i < grove.count; i++) { grove.getMatrixAt(i, m); c.setFromMatrixPosition(m); assert.ok(inDistrict(c.x, c.z), `tree outside the district at ${c.x.toFixed(0)},${c.z.toFixed(0)}`); }
 }
 city.updateMatrixWorld(true);
-const openGround = /^(TERRAIN|PHASE03C_LANDSCAPE|PHASE03C_PLAZA|PRIMARY_PLAZA|PHASE03C_SERVICE|SERVICE_BAY|SIDEWALK|WATERFRONT_PROMENADE)/;
+const openGround = /^(TERRAIN|PHASE03C_LANDSCAPE|PHASE03C_PLAZA|PRIMARY_PLAZA|PHASE03C_SERVICE|SERVICE_BAY|SIDEWALK|WATERFRONT_PROMENADE|street-(footway|ceramic|edge|seams|line-glow)$)/; // the street kit's flat finishes, as the surveyed paving slab over the avenues they replace
 const ray = new Raycaster(), down = new Vector3(0, -1, 0);
 const camera = heroCamera(1920, 1080);
 camera.updateMatrixWorld(true);
@@ -546,7 +553,8 @@ console.log('Odaiba: P12 two-cycle continuity, separated plaza crowds, orchard/k
 // Late-loaded landmarks publish real door-to-group journeys. Sample their swept body on paving and the actual visitor fleet
 // against every walking/resting person and robot over several complete cycles at all automation levels.
 const peopleScene = new Scene(), updatePeople = mobility(peopleScene);
-for (const landmark of landmarks.filter(m => m !== core)) publishDoorways(landmark, environment);
+// As loadOdaiba: Aqua City and DiverCity Tokyo Plaza are fixture-only (the plaza deck and the enlarged Fuji frame stand on their lots).
+for (const landmark of landmarks.filter(m => m !== core && m.name !== 'aqua-city-odaiba' && m.name !== 'divercity-tokyo-plaza')) publishDoorways(landmark, environment);
 assert.equal(entranceJourneys().length,0,'entrances must wait for complete static geometry');
 publishEntrances(city,environment);
 const visits = forecourtVisits();

@@ -13,8 +13,6 @@ import { VignetteShader } from 'three/addons/shaders/VignetteShader.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { FullScreenQuad, Pass } from 'three/addons/postprocessing/Pass.js';
 import { cityRig } from './cityRig';
-import { useKitCarriageway } from './mobility';
-import { ROAD_KIT_PREVIEW } from './streetKit';
 import { heroCamera, HERO_TARGET } from './heroCamera';
 import { DISTRICT } from './layout';
 import { createWorldState } from './worldState';
@@ -100,7 +98,6 @@ try {
   const water=bayWater();
   // 100 m cells so the sea can curve down to its horizon beyond the plate.
   const floor=new T.Mesh(new T.PlaneGeometry(18000,18000,180,180),water);floor.rotation.x=-Math.PI/2;floor.position.y=-1.2;floor.receiveShadow=true;scene.add(floor);
-  if(import.meta.env.DEV && new URLSearchParams(location.search).has('roadKit'))useKitCarriageway(ROAD_KIT_PREVIEW.crossing); // before cityRig builds the street traffic
   const rig=cityRig(scene);
   build2127(scene);
   // Sky Ring voices: the proposal count from the survey server, a plausible mid count in standalone review.

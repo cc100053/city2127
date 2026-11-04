@@ -18,9 +18,9 @@ export const ROAD_CUTS: readonly Strip[] = [
   [106, -135.8, 133.4, -153.3, 4.6], // 296's first 32 m under the ring's foot; street cars keep the major lane beside it (audit 6)
   [106.45, -136.05, 110.5, -130.9, 4.6], // 264's first 6.5 m, same foot
 ];
-/** New paving: the north-west avenue stopped 17 m short of its junction (audit 9). Road and paving continue the avenue's own strip.
- * The six-way junction under the guideway (about 100, −138) has a lawn island where its medians meet; paving covers it up to the ring's foot. */
-export const ROAD_LINKS: readonly Strip[] = [[-224.55, -74.75, -210.07, -84.58, 4.5], [91, -133, 106, -137.5, 5]];
+/** New paving: the six-way junction under the guideway (about 100, −138) has a lawn island where its medians meet; paving covers it up to the
+ * ring's foot. (Audit 9's link on the north-west avenue went with that avenue in the street network's stage 1, src/streetKit.ts.) */
+export const ROAD_LINKS: readonly Strip[] = [[91, -133, 106, -137.5, 5]];
 const ROAD_HALF = 2.45;
 
 const clip = (poly: T.Vector3[], keep: (v: T.Vector3) => number) => {
@@ -46,11 +46,11 @@ function outside(poly: T.Vector3[], r: ReturnType<typeof rect>) {
   return pieces;
 }
 
-/** `extra` cuts (DEV street-kit preview) clip like `ROAD_CUTS`. */
+/** `extra` cuts (the street kit's `streetCuts`, the DEV boulevard preview) clip like `ROAD_CUTS`. */
 export function repairRoads(environment: T.Object3D, extra: readonly Strip[] = []) {
   // Seven driveway stubs: the six in the district join no street (audit 2, 3, 7, 8, 19, 21, 23, 28, 30–34); the seventh lies 1.1 km south in the receded backdrop.
   environment.getObjectByName('ROAD_ACCESS')?.removeFromParent();
-  const zones = [...ROAD_CUTS, ...extra].map(zone);
+  const zones = [...ROAD_CUTS, ...extra].map(zone), reach = zones.map(z => Math.hypot(z.hu, z.hv));
   environment.updateMatrixWorld(true);
   let road: T.Material | undefined, paving: T.Material | undefined;
   environment.traverse(object => {
@@ -71,7 +71,8 @@ export function repairRoads(environment: T.Object3D, extra: readonly Strip[] = [
         continue;
       }
       let pieces = [tri];
-      for (const z of zones) pieces = pieces.flatMap(poly => outside(poly, z));
+      const cx = (tri[0].x + tri[1].x + tri[2].x) / 3, cz = (tri[0].z + tri[1].z + tri[2].z) / 3, r = Math.max(...tri.map(v => Math.hypot(v.x - cx, v.z - cz)));
+      zones.forEach((z, k) => { if (Math.hypot(z.cx - cx, z.cz - cz) < reach[k] + r) pieces = pieces.flatMap(poly => outside(poly, z)); });
       if (pieces.length !== 1 || pieces[0].length !== 3) changed = true;
       for (const poly of pieces) for (let k = 1; k < poly.length - 1; k++) {
         const [a, b, c] = [poly[0], poly[k], poly[k + 1]];

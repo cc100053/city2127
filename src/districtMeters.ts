@@ -886,7 +886,7 @@ export class AutomationDistrict {
     const h = this.hybrid.setTargets(i => rank(i + 307) < ladderHybrid(tier) ? 1 : 0, now, immediate, seed, sampleAt);
     // Changed bays mark their terraces; fleet-wide changes also mark one street route.
     const bays = new Set([...(b ? this.staffed.changed : []), ...(h ? this.hybrid.changed : [])]);
-    const street = routes().streets[0].getPointAt(.8);
+    const street = routes().streets[0].getPointAt(.908); // the seaside avenue north of DECKS
     this.changedPoints = [...[...bays].map(i => ({ slot: `nw:bay${i + 1}`, x: this.bays[i].x, y: this.bays[i].y + 20, z: this.bays[i].z, r: 26 })),
       ...(a ? [{ slot: 'nw:street', x: street.x, y: street.y, z: street.z, r: 20 }] : [])];
     if ((a || b || h) && !immediate && !quiet) this.pulses.emit([sitePulse('nw'), ...this.changedPoints], now);

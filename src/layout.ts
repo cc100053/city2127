@@ -29,14 +29,44 @@ export const promenades: readonly (readonly P3[])[] = [
   [[1,0,-318],[3,0,-296],[-14,0,-269],[-43,0,-260],[-62,0,-250],[-86,0,-228],[-118,0,-207],[-148,0,-191],[-178,0,-173]],
   [[-259,0,-145],[-273,0,-123],[-288,0,-92],[-310,0,-76],[-347,0,-54],[-375,0,-33],[-411,0,-14],[-427,0,6]],
 ];
-// Street avenues, centrelines snapped to the environment's road surfaces (tests/mobility.test.ts): the 5 m seaside avenue north of Aqua
-// City and DECKS, and the 7 m avenue under the Yurikamome guideway. Neither crosses the other, so their street cars need no signals.
-// The guideway avenue ends at (-166.2, 27.8), 5 m short of the hull megastructure, which stands on its surveyed road beyond (road audit
-// 2026-11-04, src/roadRepair.ts cuts that road; it used to run on to (-255.6, 88.6) inside the hull).
-export const streets: readonly (readonly P3[])[] = [
-  [[-207,0,-86.4],[-108.9,0,-151.5],[-10.8,0,-216.6],[87,0,-282.1],[168.4,0,-336.7],[217.5,0,-369.3]],
-  [[259.8,0,-256],[175.9,0,-199.5],[108.9,0,-154.3],[24.6,0,-98.4],[-59.9,0,-42.9],[-127.5,0,1.5],[-160.6,0,24],[-166.2,0,27.8]],
-];
+// Street network stage 1 (owner 2026-11-04, artifacts/street-kit-closeup-polish/network-stage1.md): one U route, the street kit's carriageway
+// centre (section A, src/streetKit.ts), traced every ~10 m from the live scene. It runs the guideway avenue ② from its east end west, 4 m north
+// of the surveyed road (the Yurikamome piers stand on its south half; eased to 1 m past the ring's foot), turns north on the link ③ round the
+// plaza deck's west end (25 m corners), and runs the seaside avenue ① east (eased 1.5 m south past the arch foot). The street cars drive it.
+export const streets: readonly (readonly P3[])[] = [[
+  [257.6,0,-259.3],[249.3,0,-253.7],[241,0,-248.1],[232.7,0,-242.6],[224.4,0,-237],[216.1,0,-231.4],[207.8,0,-225.8],[199.5,0,-220.2],[191.2,0,-214.6],
+  [182.9,0,-209],[174.6,0,-203.4],[166.3,0,-197.9],[158,0,-192.3],[149.8,0,-186.6],[142.4,0,-179.6],[134.9,0,-173],[126.6,0,-167.4],[117.9,0,-162.3],
+  [108.6,0,-158.3],[100,0,-153.2],[91.7,0,-147.6],[83.4,0,-142.1],[75,0,-136.6],[66.7,0,-131],[58.4,0,-125.5],[50,0,-120],[41.7,0,-114.5],
+  [33.3,0,-109],[25,0,-103.5],[16.7,0,-98],[8.3,0,-92.5],[0,0,-87],[-8.4,0,-81.5],[-16.8,0,-76],[-25.1,0,-70.5],[-33.5,0,-65],[-41.8,0,-59.5],
+  [-50.2,0,-54],[-58.6,0,-48.6],[-66.9,0,-43.1],[-75.3,0,-37.6],[-83.7,0,-32.1],[-92,0,-26.6],[-100.4,0,-21.2],[-108.8,0,-15.7],[-117.1,0,-10.2],
+  [-125.5,0,-4.7],[-133.3,0,0.5],[-135.7,0,1.9],[-138.2,0,3],[-140.9,0,3.9],[-143.6,0,4.4],[-146.4,0,4.6],[-149.2,0,4.5],[-152,0,4.1],[-154.7,0,3.4],
+  [-157.3,0,2.4],[-159.8,0,1.1],[-162.1,0,-0.4],[-164.2,0,-2.2],[-166.1,0,-4.3],[-167.8,0,-6.5],[-173.7,0,-15.3],[-179.5,0,-24],[-185.4,0,-32.8],
+  [-191.2,0,-41.5],[-197,0,-50.3],[-202.9,0,-59.1],[-204.3,0,-61.5],[-205.4,0,-64],[-206.3,0,-66.7],[-206.8,0,-69.5],[-207.1,0,-72.3],[-207,0,-75.1],
+  [-206.6,0,-77.9],[-205.9,0,-80.6],[-204.9,0,-83.2],[-203.6,0,-85.7],[-202,0,-88],[-200.2,0,-90.2],[-198.2,0,-92.1],[-195.9,0,-93.8],[-191,0,-97],
+  [-182.6,0,-102.6],[-174.3,0,-108.1],[-166,0,-113.6],[-157.6,0,-119.2],[-149.3,0,-124.7],[-141,0,-130.2],[-132.6,0,-135.7],[-124.3,0,-141.3],
+  [-116,0,-146.8],[-107.6,0,-152.3],[-99.3,0,-157.9],[-91,0,-163.4],[-82.6,0,-168.9],[-74.3,0,-174.4],[-66,0,-180],[-57.6,0,-185.5],[-49.3,0,-191],
+  [-41,0,-196.5],[-32.6,0,-202.1],[-24.3,0,-207.6],[-15.5,0,-212.5],[-6.8,0,-217.4],[1.5,0,-223],[9.8,0,-228.6],[17.6,0,-235],[25.6,0,-240.9],
+  [33.9,0,-246.5],[42.2,0,-252.1],[50.5,0,-257.6],[58.8,0,-263.2],[67.1,0,-268.8],[75.4,0,-274.3],[83.7,0,-279.9],[92,0,-285.5],[100.3,0,-291.1],
+  [108.6,0,-296.6],[117,0,-302.2],[125.3,0,-307.8],[133.6,0,-313.4],[141.9,0,-318.9],[150.2,0,-324.5],[158.5,0,-330.1],[166.8,0,-335.6],
+  [175.1,0,-341.2],[183.4,0,-346.7],[191.8,0,-352.2],[200.1,0,-357.8],[208.4,0,-363.3],[216.8,0,-368.8],[217.5,0,-369.3]
+]];
+/** The kit along `streets[0]`, in metres along it: carriageway half width, verges [from, to, reach beyond the carriageway edge] on the inside
+ * (right of the route, −n: toward the plaza deck) and the outside, planter gaps [from, to] (the Yurikamome piers are found in the environment),
+ * light-panel crossings, and where the kit starts (a pier stands on the road at d 2–6). Reaches stop short of DECKS, the ring and arch feet,
+ * the plaza deck and the ④ band's paving; planters need ≥ 6.35 m. */
+export const STREET_KIT = {
+  from: 8, half: 3.5,
+  inside: [[8, 190, 1.5], [190, 612, 9], [612, 830, 5.5], [830, 1000, 7], [1000, 1020, 4.5], [1020, 1109, 7]],
+  outside: [[8, 125, 9], [125, 190, 6], [190, 1109, 9]],
+  // Both sides: the Meter pieces' open ground (an automation bay at d 188–221 inside, two sharing courts at d 972–1011 and 1044–1083). Inside:
+  // ③'s two corners (straight beds would cut into the bend), the deck's west stair, the AUTO HUB lot's margin (① crosses its north corner),
+  // the east connector (the drop-off bays stand on ①'s plaza frontage, which has no planters). Outside: the ring foot and its side street, the
+  // deck's south member, the side street at ③'s south corner, the PARK lot's margin, the arch foot, the AUTO HUB lot's margin, the backdrop
+  // grove plinth.
+  gaps: { inside: [[186, 222], [466, 514], [520, 540], [568, 616], [890, 942], [972, 1011], [1044, 1083], [1092, 1109]],
+    outside: [[195, 216], [350, 362], [474, 490], [618, 636], [832, 862], [890, 942], [972, 1011], [1044, 1083], [1095, 1109]] },
+  crossings: [398, 545],
+} as const;
 // polish2 (2026-11-03): the Fuji frame tower is the hero centrepiece. civicCore builds in its original metres and the whole chassis is scaled
 // `k` about its west-front foot (-75, 0, -12), which lands at (x, 0, z): set back off the arch foot, east of COMMONS PLAZA and the guideway.
 export const CIVIC = {k:1.35,x:-63,z:22} as const;

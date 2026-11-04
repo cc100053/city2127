@@ -73,6 +73,7 @@ Reroutes (owner 2026-11-04, "改路線"). Contacts were classified by clearance:
 
 - Pre-existing, unrelated to roads: with loadOdaiba's own landmark set (no Aqua City or DiverCity Tokyo Plaza), the doorway fleet check reports
   delivery robots 7 and 13 meeting at 83.5 s, on main as well. The test fixture loads both landmarks, so it does not catch this.
+  Fixed in the street network's stage 1 (road-redesign handoff): at most six walkers and one robot per doorway trip; the test now uses loadOdaiba's set.
 - Out of scope: background grove plinths on roads beyond the district (1, 24, 25, 29, 35, 36). Cutting the road under them would expose
   lawn and move the grove's raycast placement. Also out of scope: 26 (skyway pier), 27 (grove terraces) and 37 (fixed kit, outside the district).
 
