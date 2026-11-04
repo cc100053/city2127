@@ -133,6 +133,9 @@
   night 54.2–56.5 (stage 2: 55.2–56.2 / 55.6–57.0, same machine, same evening). Captures `~/city2127-evidence/road-net-stage3/r1/` (hero; pool
   `cam=22,45,175&at=22,0,118`; canal `cam=-260,30,330&at=-150,0,210`; wide `cam=-170,70,320&at=30,0,165`; day 13, night 21; `capture.mjs`).
   Owner accepted stage 3 as captured and asked to merge it to main (2026-11-04).
+- 2026-11-04, stage 3 integration: merged into main as b4167be (`--no-ff` on origin/main 5e54d15, which had not moved; tree equals the branch tip
+  e909978). On the merge result: `npm test` exit 0, `npm run build` PASS, `git diff --check origin/main..HEAD` PASS. Main CI run 41852657043 passed.
+  `survey/` and `module-swap/` unchanged, not rerun locally.
 
 ## Next expected step
 
