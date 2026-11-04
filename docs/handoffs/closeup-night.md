@@ -92,6 +92,19 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 - 2 分：fh-floors。0 分：fl-garden、tm-tower、tm-base、fh-gardens。
 - 主要問題：−1 亭擠埋一齊、似開放柱廊、碟下冇發光 collar、花園光禿；0 室內平塗桃色＋深啡傢俬；H 鏡位 0 塔細過目標（見 Blocked）；+1 頂被切、柱太粗、冇樹露台。
 
+## SE R2（唔 keep）
+
+- 分數 20/38；pairwise 對 R1 5 勝 9 負 → **唔 keep**，source 還原返 R1，diff 存咗 `~/city2127-evidence/closeup-night/se/r2/r2-not-kept.diff`。
+- 試咗乜：−1 改五個亭＋長 S 步道（fl-walkway 2 分）＋水道＋梯級花槽；+1 降到 ≈ 38 等 H 見到成個頂；室內改淺白。
+- 輸喺邊：室內由桃色變到冷白，judge 全部話「唔暖」；−1 亭似柱廊、碟冇 gap。R3 由 R1 出發，只搬 R2 結構改動，室內改暖桃色。
+
+## SE R3
+
+- 分數 18/38；pairwise 對 R1 14 勝 3 負 → keep。
+- 改咗乜：由 R1 出發，搬返 R2 嘅結構（五亭＋S 步道＋水道、+1 降到 ≈ 38 見到成個頂、5 層露台）；室內改暖桃色（`#f7cfb0` emissive），亭牆加淡玻璃筒，人仔放大到 .75，halo 貼近屋頂花園。
+- 2 分：fh-floors。0 分：fl-garden、tm-tower（H 鏡位 0 塔細，crop 見唔到頂）。
+- 仍然弱：−1 喺 L 鏡位佔畫面細、似擠埋一角、碟 gap 細；花園光禿；人似方塊；+1 柱讀成方、升降機冇玻璃井。
+
 ## Blocked
 
 - **人仔可讀性**（fl-people-in、fm-ring、fh-people 卡喺 1）：全城共用 `pedestrians()` 人仔 mesh，冇 per-instance 衫色、坐姿由呢個 15° 鏡位睇大腿好短，似企。選項：(a) 只喺 SW 加一個更大、淺色衫、明顯屈膝嘅坐姿人仔變體（淨係 `commonsPlaza.ts`）；(b) 喺 `mobility.ts` 加 per-instance tint／坐姿誇張度（會影響其他 site，要 owner 批）；(c) 接受 1 分。今晚揀咗保持設計、唔郁共用 crowd，項目留喺 1。
