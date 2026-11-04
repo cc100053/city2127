@@ -127,3 +127,18 @@ Keep (2 in R4; re-crop and compare with R4, must not lose): `fl-pods`, `fl-scree
 6. **Pavilions / tables (fh-tables)** — pavilions as warm-lit glass rooms: brighter warm interior (emissive back wall + floor glow), clear glass, white frame; ≥ 3 tables clearly visible in front of them with seated residents.
 
 Screenshots to `~/city2127-evidence/closeup-night/sw/r5/` (same names) + `vs-target.jpg`.
+
+## R6 — last round (R5 22/30, kept 6–4; lost fl-emitters, fl-garden, fm-pods, fh-disc)
+
+Keep (2 in R5; must not lose): `fl-pods`, `fl-screens`, `fm-ring`, `fm-deck`, `fh-amph`, `fh-people`, `fh-planting`. Keep the R5 figures as they are.
+
+- **Emitters (fl-emitters, fm-pods)** — R4's look won the pairwise: bring back R4's bright cyan ring + halo *directly under* each pod (ring at the pod belly, halo just beneath it, not a disc on the lawn), and keep a clear dark gap to the terrace (≥ .45) between the halo and the ground. No terrace disc. The ring must be the brightest thing under the pod by day.
+- **Mixed pods (fm-pods)** — spread the 4 pods so none overlaps from the camera (use the +X half of the deck fully, front-to-back), pink side panels ≥ .12 wide and emissive, 2 residents seated in ≥ 3 pods.
+- **Garden (fl-garden)** — paths as smooth curves (no arrow/Y slabs: build each path from many short slabs along a Catmull-Rom curve, widths .5–.6), ≥ 8 small trees with trunks visible *between the pods* (not only at the edges), leafy beds dense.
+- **Pod interiors (fl-people-in)** — less tangle: table smaller (.25 × .25) and lower than the knees, seats against the side walls, the two residents clearly separated; interior warmer (ceiling glow brighter, back wall warm gradient if cheap).
+- **Divider (fm-divider)** — 7 trees with visible trunks, crowns smaller and lighter (two greens), varied heights, shrubs spilling over the planter edge on both sides.
+- **Mixed canopy (fm-canopy)** — it still reads over the water: move the disc toward the camera and lower so its image overlaps the circle and the deck: centre z ≈ −2.0, y ≈ 2.7, r 2.2 (still inside the lot); keep R5's slim ring emitters (they won the pairwise).
+- **High disc (fh-disc)** — flatter lens (top not a cone: rise ≤ .5 at the centre), white/light-grey underside machinery (R4's lighter boxes won), keep the continuous pink rim and ribs, slim bright stabiliser ring.
+- **Tables (fh-tables)** — ≥ 3 round tables clearly visible in front of the pavilions (bring one table forward to the front edge of the back deck), residents seated around each.
+
+Screenshots to `~/city2127-evidence/closeup-night/sw/r6/` (same names) + `vs-target.jpg`.
