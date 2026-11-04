@@ -28,7 +28,7 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 
 | Site | Pose | Targets | Size decision | Rounds | Score | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| SW | `sw:n` `[-95,30,-15]`→`[-105,10,60]` | | | | | TARGETS |
+| SW | `sw:n` `[-95,30,-15]`→`[-105,10,60]` | [target](../../artifacts/closeup-night/sw/target/) | 放大到目標（填滿 lot，唔越橙邊；碟可以向上） | | | READY |
 | NE | `ne:s2` | — | — | — | — | SKIPPED（owner 2026-11-04：Q3 改能源題後 NE 公園恆定 0，客人去唔到 ±1） |
 | SE | | | | | | PREP |
 
@@ -46,6 +46,7 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 
 ## Important decisions
 
+- SW（owner 2026-11-04）：三張 Gemini 目標全部接受；0 同 +1 嘅懸浮碟喺目標圖飄出／大過 lot，rubric 寫成碟喺 lot 範圍內。
 - Evidence folder：`~/city2127-evidence/closeup-night/<site>/`。
 
 ## Next expected step
