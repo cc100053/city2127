@@ -49,22 +49,33 @@ export const streets: readonly (readonly P3[])[] = [[
   [33.9,0,-246.5],[42.2,0,-252.1],[50.5,0,-257.6],[58.8,0,-263.2],[67.1,0,-268.8],[75.4,0,-274.3],[83.7,0,-279.9],[92,0,-285.5],[100.3,0,-291.1],
   [108.6,0,-296.6],[117,0,-302.2],[125.3,0,-307.8],[133.6,0,-313.4],[141.9,0,-318.9],[150.2,0,-324.5],[158.5,0,-330.1],[166.8,0,-335.6],
   [175.1,0,-341.2],[183.4,0,-346.7],[191.8,0,-352.2],[200.1,0,-357.8],[208.4,0,-363.3],[216.8,0,-368.8],[217.5,0,-369.3]
+], [
+  // ④ boulevard (network stage 2, owner 2026-11-04, artifacts/street-kit-closeup-polish/network-stage2.md): section B's centre, from the backdrop band
+  // past the south-west district edge along the old ~90 m band's axis, through the glass sphere's tripod (mast and one foot on the median), south
+  // of the Fuji frame, out between Fuji and the DiverCity office tower and back onto the band past the east edge. Street pods drive its two channels.
+  [-285,0,322.4],[-229.1,0,283.6],[-179.8,0,249.3],[-130.6,0,215.1],[-80.1,0,180],[-64.9,0,169.4],[-40,0,163],[-10,0,166],[30,0,174.5],[70,0,181.5],
+  [96,0,181.5],[122,0,175],[145,0,165],[162,0,146],[175,0,120],[185,0,88],[207,0,52],[230,0,16],[248,0,-8],[265,0,-27],
 ]];
+/** Section B along `streets[1]`, in metres along it: light-bridge crossings, and the planter gaps round the glass sphere's mast and feet
+ * (`skyways.ts`, sphere at −80, 180: mast and its south-west foot on the median, the other two feet just outside both terraces). */
+export const BOULEVARD = {
+  crossings: [124, 311, 474],
+  gaps: { median: [[230, 240], [244, 255]], terraces: [[252, 262]] },
+} as const;
 /** The kit along `streets[0]`, in metres along it: carriageway half width, verges [from, to, reach beyond the carriageway edge] on the inside
  * (right of the route, −n: toward the plaza deck) and the outside, planter gaps [from, to] (the Yurikamome piers are found in the environment),
  * light-panel crossings, and where the kit starts (a pier stands on the road at d 2–6). Reaches stop short of DECKS, the ring and arch feet,
- * the plaza deck and the ④ band's paving; planters need ≥ 6.35 m. */
+ * and the plaza deck; planters need ≥ 6.35 m. */
 export const STREET_KIT = {
   from: 8, half: 3.5,
   inside: [[8, 190, 1.5], [190, 612, 9], [612, 830, 5.5], [830, 1000, 7], [1000, 1020, 4.5], [1020, 1109, 7]],
   outside: [[8, 125, 9], [125, 190, 6], [190, 1109, 9]],
   // Both sides: the Meter pieces' open ground (an automation bay at d 188–221 inside, two sharing courts at d 972–1011 and 1044–1083). Inside:
-  // ③'s two corners (straight beds would cut into the bend), the deck's west stair, the AUTO HUB lot's margin (① crosses its north corner),
-  // the east connector (the drop-off bays stand on ①'s plaza frontage, which has no planters). Outside: the ring foot and its side street, the
-  // deck's south member, the side street at ③'s south corner, the PARK lot's margin, the arch foot, the AUTO HUB lot's margin, the backdrop
-  // grove plinth.
-  gaps: { inside: [[186, 222], [466, 514], [520, 540], [568, 616], [890, 942], [972, 1011], [1044, 1083], [1092, 1109]],
-    outside: [[195, 216], [350, 362], [474, 490], [618, 636], [832, 862], [890, 942], [972, 1011], [1044, 1083], [1095, 1109]] },
+  // ③'s two corners (straight beds would cut into the bend), the deck's west stair, the AUTO HUB lot's margin (① crosses its north corner;
+  // the drop-off bays stand on ①'s plaza frontage, which has no planters). Outside: the ring foot, the deck's south member, the PARK lot's
+  // margin, the arch foot, the AUTO HUB lot's margin, the backdrop grove plinth. (Stage 2 removed the side streets whose mouths had gaps.)
+  gaps: { inside: [[186, 222], [466, 514], [520, 540], [568, 616], [890, 942], [972, 1011], [1044, 1083]],
+    outside: [[195, 216], [350, 362], [618, 636], [832, 862], [890, 942], [972, 1011], [1044, 1083], [1095, 1109]] },
   crossings: [398, 545],
 } as const;
 // polish2 (2026-11-03): the Fuji frame tower is the hero centrepiece. civicCore builds in its original metres and the whole chassis is scaled

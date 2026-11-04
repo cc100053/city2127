@@ -139,8 +139,9 @@ export function plantRoofCanopy(scene: T.Object3D, model: T.Object3D, tower=fals
 }
 
 /** Coastal groves gather along structure — building edges, guideway, promenades and the water corridor — on authored landscape only, leaving open lawns between; circulation and landmark pads remain open. */
-/** `streets`: extra street centrelines groves keep clear of, as of the guideway (DEV street-kit preview). */
-export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,buildings:T.Object3D[],streets:T.Curve<T.Vector3>[]=[]) {
+/** `streets`: extra street centrelines groves keep clear of, as of the guideway (the ④ boulevard); `cleared`: ground the old district streets covered,
+ * left open lawn (src/roadRepair.ts). */
+export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,buildings:T.Object3D[],streets:T.Curve<T.Vector3>[]=[],cleared=(_x:number,_z:number)=>false) {
   environment.updateMatrixWorld(true);
   const pads=buildings.map(building=>new T.Box3().setFromObject(building));
   const paths=routes(),clearPaths=[paths.guideway,...paths.promenades,...streets].flatMap(path=>path.getSpacedPoints(400));
@@ -148,7 +149,7 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
   const landscapeAt=(x:number,z:number)=>{
     ray.set(new T.Vector3(x,300,z),down);
     const hit=ray.intersectObject(environment,true)[0];
-    return hit && hit.object instanceof T.Mesh && !Array.isArray(hit.object.material) && hit.object.material.name==='landscape' && hit.point.y<3 ? hit.point.y : null;
+    return hit && hit.object instanceof T.Mesh && !Array.isArray(hit.object.material) && hit.object.material.name==='landscape' && hit.point.y<3 && !cleared(x,z) ? hit.point.y : null;
   };
   const padGap=(x:number,z:number)=>Math.min(Infinity,...pads.map(p=>Math.hypot(Math.max(p.min.x-x,0,x-p.max.x),Math.max(p.min.z-z,0,z-p.max.z))));
   const pathGap=(x:number,z:number)=>Math.min(...clearPaths.map(p=>Math.hypot(p.x-x,p.z-z)));

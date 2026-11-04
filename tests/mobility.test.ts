@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { routes, podPose, boatPoses, HULL, WATER_PERIOD, BOATS as BOAT_COUNT, trainPose, TRAIN_SPEED, walkerPose, walkerRoute, walkerParty, doorwayPose, robotPose, collectorPose, ROBOT_HALT, HANDOFF, promenadeStops, RAIL_OUT, STOOL_FRONT, streetCarPose, STREET_GAP, dropOffPose, DROP_OFF, streetRhythm, promenadeBenches, BENCH_OUT, transferPose, dockMotion, guideStrength, aircraftSlot, podShare, automationActivity, CARS, CAR_GAP, TRAINS, WALKERS, TRANSFERS, PLATOON } from '../src/mobility.ts';
+import { routes, podPose, boatPoses, HULL, WATER_PERIOD, BOATS as BOAT_COUNT, trainPose, TRAIN_SPEED, walkerPose, walkerRoute, walkerParty, doorwayPose, robotPose, collectorPose, ROBOT_HALT, HANDOFF, promenadeStops, RAIL_OUT, STOOL_FRONT, streetCarPose, streetCarCount, dropOffPose, DROP_OFF, streetRhythm, promenadeBenches, BENCH_OUT, transferPose, dockMotion, guideStrength, aircraftSlot, podShare, automationActivity, CARS, CAR_GAP, TRAINS, WALKERS, TRANSFERS, PLATOON } from '../src/mobility.ts';
 import { changeSites, SPHERE_DOCK, INTERCHANGE, SKY_LANE_GAP } from '../src/layout.ts';
 import { heroSettledCamera, heroTextZone } from '../src/heroCamera.ts';
 import { skyPose, skyCount, shuttleCount, shuttlePoses, SHUTTLE_SCALE } from '../src/mobility.ts';
 import { laneBeaconSites } from '../src/waterRooms.ts';
 import { conversationPose, visitPose, entrancePose, servicePose, mobility, CROSSINGS, CARRIAGEWAY, laneOffset } from '../src/mobility.ts';
-import { STREET_KIT } from '../src/layout.ts';
+import { BOULEVARD, STREET_KIT } from '../src/layout.ts';
 import * as T from 'three';
 import { presets } from '../src/presets.ts';
 
@@ -108,7 +108,7 @@ for (let k = 0; k < 40; k++) for (let t = 0; t < 300; t += .5) {
 // in a lane, and move ≤ 15 m/s. `reach`: the kit's verge on one side (-1 inside, +1 outside) at d; planters need ≥ 6.35 m.
 const reach = (side: number, d: number) => (side < 0 ? STREET_KIT.inside : STREET_KIT.outside).find(([f, t]) => d >= f && d < t)?.[2] ?? 0;
 path.streets.forEach((street, r) => {
-  const length = street.getLength(), cars = Math.round((length + 40) / STREET_GAP);
+  const length = street.getLength(), cars = streetCarCount(r, length);
   for (const lane of [0, 1]) { const n = lane ? -laneOffset(r, 1) : laneOffset(r, 0); for (const edge of [-.95, .95]) assert.ok(Math.abs(n + edge) <= CARRIAGEWAY[r].half - .5, `street ${r} lane ${lane} off the carriageway`); }
   for (const lane of [0, 1]) for (let t = 0; t < 300; t += .5) {
     const at = Array.from({ length: cars }, (_, c) => streetCarPose(t, r, lane, c, cars, length));
@@ -119,7 +119,7 @@ path.streets.forEach((street, r) => {
 });
 // Drop-off: the bay car is continuous, rests on the kit's footway clear of the carriageway and of any planter, and is back in its own lane slot whenever not in the bay.
 {
-  const street = path.streets[DROP_OFF.road], length = street.getLength(), cars = Math.round((length + 40) / STREET_GAP);
+  const street = path.streets[DROP_OFF.road], length = street.getLength(), cars = streetCarCount(DROP_OFF.road, length);
   DROP_OFF.cars.forEach((car, k) => {
     let parkedSeen = 0;
     for (let t = 0; t < 400; t += .25) {
@@ -321,17 +321,20 @@ for (let ports = 0; ports <= 6; ports++) {
 assert.ok(guideStrength(.01, .99, true) > .9);
 assert.equal(guideStrength(.01, .99, false), 0);
 assert.equal(guideStrength(.5, 0, true), 0);
-// Crossings: on the kit (where it draws their light panels), with footway at least 1.5 m deep on both sides 8.7 m up and down the route.
+// Crossings: on the kit (where it draws their light panels or bridges); on the U with footway at least 1.5 m deep on both sides 8.7 m up and
+// down the route; on the boulevard clear of the planter gaps round the sphere's tripod.
 for (const { road, d } of CROSSINGS) {
-  assert.ok(STREET_KIT.crossings.includes(d) && d > STREET_KIT.from + 9 && d < path.streets[road].getLength() - 9, `crossing ${d} off the kit`);
-  for (let along = -8.7; along <= 8.7; along += .5) for (const side of [-1, 1]) assert.ok(reach(side, d + along) >= 1.5, `crossing ${d} footway too shallow at ${along}`);
+  const kit = road ? BOULEVARD.crossings : STREET_KIT.crossings, from = road ? 0 : STREET_KIT.from;
+  assert.ok((kit as readonly number[]).includes(d) && d > from + 9 && d < path.streets[road].getLength() - 9, `crossing ${d} off the kit`);
+  if (road) assert.ok([...BOULEVARD.gaps.median, ...BOULEVARD.gaps.terraces].every(([f, t]) => d + 9 < f || d - 9 > t), `crossing ${d} at the tripod`);
+  else for (let along = -8.7; along <= 8.7; along += .5) for (const side of [-1, 1]) assert.ok(reach(side, d + along) >= 1.5, `crossing ${d} footway too shallow at ${along}`);
 }
 // Street traffic as simulated by the real actors over 15 min at 0.1 s (evening crowd and commute): cars never close within 1.5 m in a
 // lane or exceed 15 m/s, never stand between a crossing's stop line and its far side while residents cross, actually stop and queue
 // for crossings, catch up with their free slots afterwards, and every crosser drawn keeps clear of every car body drawn.
 {
   const scene = new T.Scene(), update = mobility(scene), mesh = (name: string) => scene.children.find(o => o.name === name) as T.InstancedMesh;
-  const people = mesh('doorway-walkers'), bodies = [mesh('street-cars'), mesh('street-pods')], m = new T.Matrix4(), q = new T.Matrix4(), v = new T.Vector3(), sc = new T.Vector3();
+  const people = mesh('doorway-walkers'), bodies = [mesh('street-cars'), mesh('street-pods'), mesh('boulevard-pods')], m = new T.Matrix4(), q = new T.Matrix4(), v = new T.Vector3(), sc = new T.Vector3();
   const crossers = people.count - 2 * CROSSINGS.length, crossed = CROSSINGS.map(() => 0), was = CROSSINGS.map(() => 'idle');
   let stops = 0, queued = 0, brakes = 0, lag = 0, parked = 0, drawn = 0, prev: ReturnType<ReturnType<typeof mobility>['traffic']>['cars'] | null = null;
   for (let t = 1000; t < 1900; t += .1) {
@@ -342,7 +345,7 @@ for (const { road, d } of CROSSINGS) {
       for (let k = 1; k < inLane.length; k++) assert.ok(inLane[k].x - inLane[k].length / 2 - inLane[k - 1].x - inLane[k - 1].length / 2 > 1.5, `cars close up on ${road}/${lane} at ${t.toFixed(1)}s`);
       queued += inLane.filter((c, k) => c.v < .1 && k + 1 < inLane.length && inLane[k + 1].v < .1 && inLane[k + 1].x - c.x < 12).length;
     }
-    cars.forEach((c, k) => { assert.ok(c.v <= 15, 'street car too fast'); lag = Math.max(lag, c.lag); if (c.bay) parked++; if (prev && !c.bay && Math.abs(c.x - prev[k].x) < 100) assert.ok(Math.abs(c.x - prev[k].x) < 1.6, 'street car jumps'); if (c.brake) brakes++; });
+    cars.forEach((c, k) => { assert.ok(c.v <= 15, 'street car too fast'); lag = Math.max(lag, c.lag - (c.road ? 200 : 0)); if (c.bay) parked++; if (prev && !c.bay && Math.abs(c.x - prev[k].x) < 100) assert.ok(Math.abs(c.x - prev[k].x) < 1.6, 'street car jumps'); if (c.brake) brakes++; });
     crossings.forEach((c, k) => {
       if (c.phase === 'cross' && was[k] !== 'cross') crossed[k]++; was[k] = c.phase;
       for (const { lane, x } of c.lanes) for (const car of cars) if (car.road === c.road && car.lane === lane && !car.bay) {
@@ -362,8 +365,9 @@ for (const { road, d } of CROSSINGS) {
       }
     }
   }
-  assert.ok(crossed.every(n => n >= 10) && stops > 50 && queued > 20 && brakes > 500 && drawn > 2000, `crossings ${crossed}, stops ${stops}, queued ${queued}, brakes ${brakes}, drawn crossers ${drawn}`);
-  // Delays recover: no slot falls more than 200 m behind its free slot, and the drop-off cars still spend long spells in their bays.
+  assert.ok(crossed.every((n, k) => n >= (CROSSINGS[k].road ? 5 : 10)) && stops > 50 && queued > 20 && brakes > 500 && drawn > 2000, `crossings ${crossed}, stops ${stops}, queued ${queued}, brakes ${brakes}, drawn crossers ${drawn}`);
+  // Delays recover: no slot falls more than 200 m behind its free slot (400 m on the boulevard, whose light bridges take 13 s to cross; measured peaks 215 m evening, 303 m morning),
+  // and the drop-off cars still spend long spells in their bays. The boulevard's bridges are crossed less often (every 2 min or so).
   assert.ok(lag < 200 && parked > 4000, `lag ${lag.toFixed(0)} m, parked frames ${parked}`);
   // A longer, cheaper run (morning, low automation, fresh actors): lanes, crossings and recovery only. Lane ends wrap round the loop
   // and once stopped a car there every lap; drop-off pull-outs once merged into queues.
@@ -375,7 +379,7 @@ for (const { road, d } of CROSSINGS) {
       const inLane = cars.filter(c => c.road === road && c.lane === lane && !c.bay).sort((a, b) => a.x - b.x);
       for (let k = 1; k < inLane.length; k++) assert.ok(inLane[k].x - inLane[k].length / 2 - inLane[k - 1].x - inLane[k - 1].length / 2 > 1.5, `morning cars close up on ${road}/${lane} at ${t.toFixed(1)}s`);
     }
-    assert.ok(cars.every(c => c.lag < 200), `morning lag at ${t.toFixed(1)}s`);
+    assert.ok(cars.every(c => c.lag < (c.road ? 400 : 200)), `morning lag at ${t.toFixed(1)}s`);
     for (const c of crossings) if (c.phase === 'cross') for (const { lane, x } of c.lanes) for (const car of cars)
       if (car.road === c.road && car.lane === lane && !car.bay) assert.ok(car.x + car.length / 2 < x - 3.5 || car.x - car.length / 2 > x + 2.5, `morning car on a crossing at ${t.toFixed(1)}s`);
   }

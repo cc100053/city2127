@@ -1,10 +1,10 @@
 # road-redesign — 2127 street network and street kit
 
 - Owner: cc100053
-- Status: IN_PROGRESS (kit polish R3 and network stage 1 owner-accepted 2026-11-04; stage 2 next, then stage 3)
-- Branch: `claude/road-net-stage1-a14ae6` (from `claude/street-kit-polish-86d81f` at 1cf1a70, which continues the [road audit](road-audit.md) commit 866cdbe; not merged — the owner merges after all stages)
+- Status: IN_PROGRESS (kit polish R3 and network stage 1 owner-accepted 2026-11-04; stage 2 implemented, owner acceptance pending; then stage 3)
+- Branch: `claude/road-net-stage2-63b23f` (from stage 1's `claude/road-net-stage1-a14ae6` at 5404ca8, itself from `claude/street-kit-polish-86d81f` at 1cf1a70, which continues the [road audit](road-audit.md) commit 866cdbe; not merged — the owner merges after all stages)
 - Base commit: 5a56230a9b2748344624197265406bcb3de39ef0 (main)
-- Remote availability: pushed (`origin/claude/road-net-stage1-a14ae6`)
+- Remote availability: pushed (`origin/claude/road-net-stage1-a14ae6`; stage 2 on `origin/claude/road-net-stage2-63b23f`)
 
 ## Decisions (owner, 2026-11-04)
 
@@ -75,6 +75,25 @@
   planters (corners, stair); the kit's east start sits 4 m north of the surveyed ② that continues beyond the district (seam at the edge);
   footways stand up to 0.48 m over lawn where the terrain dips (−0.25 m) on ①'s seaward verge.
 
+## Network stage 2 (branch `claude/road-net-stage2-63b23f`)
+
+- Spec, owner-approved 2026-11-04 before code with traffic option (b), pods drive B: [network-stage2.md](../../artifacts/street-kit-closeup-polish/network-stage2.md)
+  (§8 as built). Plan maps, rasters and measurement scripts: `~/city2127-evidence/road-net-stage2/spec/` (`map-b4.png`, `prof4.ts`, `over4.ts`,
+  `podclear.ts`, `bay.ts`); captures `~/city2127-evidence/road-net-stage2/r1/`.
+- ④ = `streets[1]` (704 m + 4 m past each edge, south-west band axis → through the glass sphere's tripod, mast and one foot on the median →
+  south of the Fuji frame → between Fuji and the DiverCity office tower → back onto the band past the east edge); `BOULEVARD` (light bridges
+  124, 311, 474; median and terrace gaps at the tripod). `streetNetwork` builds A on the U and B on ④; B's ceramic and terraces join the environment.
+- `repairRoads(environment, landmarks)` removes every surveyed street inside `DISTRICT`, except paving within 14 m of a built landmark (its
+  forecourt: doorway trips and visits match stage 1 exactly; without it Hilton and Grand Nikko lost theirs). It records the removed ground
+  (`onFormerStreet`), which `plantLandscapeCanopy` leaves as lawn. `?roadKit`, `ROAD_KIT_PREVIEW`, `streetKitPreview`, `streetCuts`, `ROAD_CUTS`,
+  `ROAD_LINKS` and `coolGlassGlow` are gone; the U's side-street planter gaps (outside 474–490, inside 1092–1109) are filled.
+- Pods: `boulevard-pods` fleet, 9 per lane on the guide channels (±5 m), at every automation level; three crossings (every 113–149 s, 13 s
+  to cross); crossers stand on the bridge or terrace.
+- Meter pieces on the line moved to the nearest valid site (bay 3, two pods, courts 2, 5, 6, 8; list in the spec §8); court 5 joins the
+  hero-hidden courts (about 450 px). The odaiba test checks every Meter piece keeps 2 m off ④.
+- Known: hero FPS about 4 below stage 1 (see Validation); lag of ④'s pods behind their free slots peaks at about 300 m (bounded; test allows 400 m); the old landscape sine ponds and the
+  corridor channel still show (stage 3); a surveyed tree in a ring stands 14 m off ④'s south edge in the close frame (as in R3).
+
 ## Validation
 
 - 2026-11-04, uncommitted delta on 5a56230 then committed: `npm test` exit 0, `npm run build` PASS, `git diff --check` PASS.
@@ -86,8 +105,14 @@
   `meters=nw:0`, hero): day 59.9–60.0, night 59.9–60.0 (vsync cap). Captures `~/city2127-evidence/road-net-stage1/r1/` (hero, avenue
   `cam=-125,32,-5&at=-40,0,-55`, link `cam=-150,30,45&at=-190,0,-40`; day 13, night 21; `capture.mjs`). Owner accepted stage 1 as captured (2026-11-04).
 
+- 2026-11-04, stage 2 on `claude/road-net-stage2-63b23f` (uncommitted tree on 5404ca8, then committed unchanged): `npm test` exit 0; `npm run build`
+  PASS; `git diff --check` PASS. Live re-raster along ④ (1 m, production page): nearest solid to a pod body edge 1.75 m (a median bush).
+  FPS (`fps.sh`, headed Chrome 1920×1080, DPR 1, `meters=nw:0`, hero): day 55.2–56.2, night 55.6–57.0; stage 1 (5404ca8) on the same machine the
+  same hour 59.9–60.0 / 60.0. ④'s bushes and leaf clumps cast no shadows (they cost about 12 fps by day: 41–50 with them); the rest of
+  the gap is ④'s geometry (no further gain without any of its shadows). Captures `~/city2127-evidence/road-net-stage2/r1/` (hero, close
+  `cam=-45,24,212&at=0,0,168`, wide `cam=-170,70,320&at=30,0,165`; day 13, night 21; `capture.mjs`). Owner visual acceptance pending.
+
 ## Next expected step
 
-Stage 2 (owner 2026-11-04: in a new session, from this branch): ④ boulevard B (cut the
-old ~90 m band and its side streets, retire the remaining district GLB streets), then stage 3 (court pool, canal park); merge after all
-stages are accepted.
+Owner visual acceptance of stage 2 on `claude/road-net-stage2-63b23f`; then stage 3 (court pool under the Fuji frame, canal park on the old
+band, sine ponds and corridor channel removed); merge after all stages are accepted.

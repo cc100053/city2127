@@ -1,14 +1,14 @@
 // 2127 street kit (road redesign, owner targets 2026-11-04 in ~/city2127-evidence/road-design/gen): A, the light-guided shared avenue
 // (avenue-A.jpg) and B, the maglev guide-channel boulevard (boulevard-B.jpg). Each street is built from a centreline and a cross-section
-// of bands in metres left of the route (`n`, up × tangent). A paves the street-car U route (`streetNetwork`, road redesign stage 1);
-// DEV `?roadKit` previews B for stage 2.
+// of bands in metres left of the route (`n`, up × tangent). `streetNetwork` lays A on the street-car U route (road redesign stage 1) and B on
+// the ④ boulevard (stage 2).
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { leaf, trim } from './cityRig.ts';
 import { glowTexture } from './glowTexture.ts';
 import { hash, plantCanopy } from './coastalCanopy.ts';
-import { routes, streetPodFleet } from './mobility.ts';
-import { STREET_KIT } from './layout.ts';
+import { routes } from './mobility.ts';
+import { BOULEVARD, STREET_KIT } from './layout.ts';
 
 /** Large pale ceramic panels: a 256 px tile with fine seams on two edges, repeated per panel in metres through the strip's uv. */
 function panelTexture() {
@@ -203,8 +203,9 @@ export function avenueStreet(c: Curve, d0: number, d1: number, carriage: [number
 
 /** Section B (24 m): planted median (slim cypresses over dense bushes and leaf clumps) between two 7 m ceramic carriageways, each with one recessed guide channel
  * (0.18 m deep, two lit lines on its floor, lit lines at the carriageway edges); footways on 0.45 m terraces edged with a lit lip and a continuous planter band; curved
- * white lamp blades every 20 m along the terrace edges; flush light-bridge crossings (4 m deep) that the terraces step down to. */
-export function boulevardStreet(c: Curve, d0: number, d1: number, crossings: number[] = [], groundAt = ground) {
+ * white lamp blades every 20 m along the terrace edges; flush light-bridge crossings (4 m deep) that the terraces step down to. `gaps`: spans [from, to]
+ * the median planter and the terrace planter bands leave open (a mast or strut foot standing there). */
+export function boulevardStreet(c: Curve, d0: number, d1: number, crossings: readonly number[] = [], groundAt = ground, gaps: { median: readonly (readonly [number, number])[]; terraces: readonly (readonly [number, number])[] } = { median: [], terraces: [] }) {
   textured(); ground = groundAt; const root = new T.Group(); root.name = 'street-boulevard';
   const y = .235, step = .45, len = c.getLength(), flat: T.BufferGeometry[] = [], paving: T.BufferGeometry[] = [], channels: T.BufferGeometry[] = [], chWalls: T.BufferGeometry[] = [], risers: T.BufferGeometry[] = [], bLines: T.BufferGeometry[] = [], rails: T.BufferGeometry[] = [], seams: T.BufferGeometry[] = [], glows: T.BufferGeometry[] = [];
   const walls: T.BufferGeometry[] = [], soil: T.BufferGeometry[] = [], blades: T.BufferGeometry[] = [], pools: T.BufferGeometry[] = [], deck: T.BufferGeometry[] = [], beds: Bed[] = [];
@@ -223,10 +224,10 @@ export function boulevardStreet(c: Curve, d0: number, d1: number, crossings: num
     for (const o of [1.65, 8.35]) { seams.push(B(o - .09, o + .09, y + .006)); glows.push(G(o, y + .004)); }
     // Terrace runs between the bridges: 0.45 m step with a darker riser face and a lit lip (top seam and a lit strip on the riser), stone footway, one continuous planter band at the outer edge.
     for (const [p, q] of runs) {
-      paving.push(B(8.5, 13, y + step, step, [2.4, 2.4], p, q)); risers.push(B(8.49, 8.5, y + step, step, [1, 1], p, q)); seams.push(B(8.5, 8.7, y + step + .003, 0, [1, 1], p, q), B(8.46, 8.47, y + step - .04, .08, [1, 1], p, q)); glows.push(G(8.6, y + step + .004, p, q), G(8, y + .004, p, q, 1));
+      paving.push(B(8.5, 13, y + step, step + .6, [2.4, 2.4], p, q)); // sides reach 0.6 m under the carriageway: the outer face meets lawn down to −0.35 risers.push(B(8.49, 8.5, y + step, step, [1, 1], p, q)); seams.push(B(8.5, 8.7, y + step + .003, 0, [1, 1], p, q), B(8.46, 8.47, y + step - .04, .08, [1, 1], p, q)); glows.push(G(8.6, y + step + .004, p, q), G(8, y + .004, p, q, 1));
       if (p > d0) paving.push(cap(c, p, s * 8.5, s * 13, y, y + step, -1)); if (q < d1) paving.push(cap(c, q, s * 8.5, s * 13, y, y + step, 1));
     }
-    for (const [p, q] of cut([[d0, d1]], bridges.map(([f, t]): Span => [f - 2, t + 2]), 6)) { const r = run(c, p, q, s * 11.8, 2.4, y + step, 'none'); walls.push(...r.walls); soil.push(r.soil); beds.push(r.bed); }
+    for (const [p, q] of cut([[d0, d1]], [...bridges.map(([f, t]): Span => [f - 2, t + 2]), ...gaps.terraces], 6)) { const r = run(c, p, q, s * 11.8, 2.4, y + step, 'none'); walls.push(...r.walls); soil.push(r.soil); beds.push(r.bed); }
     // Lamp blades every 20 m at the carriageway side of the planter, with a light pool under each tip.
     for (let d = d0 + 6; d < d1 - 4; d += 20) {
       if (bridges.some(([f, t]) => d > f - 3 && d < t + 3)) continue;
@@ -237,7 +238,7 @@ export function boulevardStreet(c: Curve, d0: number, d1: number, crossings: num
   }
   // Median: paved strip with one continuous raised planter run (cut only at the bridges); slim cypresses every 6 m.
   paving.push(band(c, d0, d1, -1.5, 1.5, y, 0, [2.4, 2.4]));
-  for (const [p, q] of cut([[d0, d1]], bridges.map(([f, t]): Span => [f - 1.5, t + 1.5]), 6)) { const r = run(c, p, q, 0, 3, y, 'columnar', .55); walls.push(...r.walls); soil.push(r.soil); beds.push(r.bed); }
+  for (const [p, q] of cut([[d0, d1]], [...bridges.map(([f, t]): Span => [f - 1.5, t + 1.5]), ...gaps.median], 6)) { const r = run(c, p, q, 0, 3, y, 'columnar', .55); walls.push(...r.walls); soil.push(r.soil); beds.push(r.bed); }
   // Light bridges: a pale deck at carriageway level across the whole street and both terraces, lit seams along its two edges; channel and edge lines run on over it.
   for (const [f, t] of bridges) {
     deck.push(band(c, f, t, -13, 13, y + .012));
@@ -250,22 +251,16 @@ export function boulevardStreet(c: Curve, d0: number, d1: number, crossings: num
     mesh(glows, lineGlow, 'boulevard-line-glow', false), mesh(paving, footway, 'boulevard-terraces'), mesh(walls, trim, 'boulevard-planters'), mesh(soil, leaf, 'boulevard-beds'), mesh(blades, metal, 'boulevard-blades'),
     mesh(pools, bladePool, 'boulevard-blade-glow', false), mesh(deck, bridgeDeck, 'boulevard-bridge', false));
   plantBeds(root, beds);
+  // 700 m of dense bushes and leaf clumps in the shadow pass cost about 12 fps at the hero pose by day (fps.sh, 2026-11-04); in their beds their own shadows hardly read, the cypresses keep theirs.
+  for (const name of ['street-bushes', 'street-leaves']) root.getObjectByName(name)!.castShadow = false;
   return root;
 }
 
-/** Stage-1 cuts (`repairRoads` extra strips): the surveyed streets under the U route, as rectangles every 10 m reaching 9.5 m either side of the
- * kit's centre (the surveyed road and its paving lie within it; the ④ band's paving starts 14 m out), and the pieces the U leaves: ②'s west stub
- * past the corner and ①'s south-west extension to the ④ band. */
-export function streetCuts() {
-  const u = routes().streets[0], L = u.getLength(), out: [number, number, number, number, number][] = [];
-  for (let d = STREET_KIT.from; d < L; d += 10) { const a = u.getPointAt(Math.max(d - .5, 0) / L), b = u.getPointAt(Math.min(d + 10.5, L) / L); out.push([a.x, a.z, b.x, b.z, 9.5]); }
-  out.push([-128, 1.5, -168, 29.5, 6], [-208.7, -85.3, -302, -23.2, 6]);
-  return out;
-}
-/** Section A along the U route (`STREET_KIT`): the ceramic and footway join `environment` (it then stands on them); the planters, plants, rings and
- * lines come back for the scene. Planters also keep 1.5 m clear of every Yurikamome pier within the verges, found in the loaded environment. */
+/** The kit along the street network: A on the U route (`STREET_KIT`), B on the ④ boulevard (`BOULEVARD`). The ceramic, footways and terraces join
+ * `environment` (it then stands on them); the planters, plants, rings, blades and lines come back for the scene. A's planters also keep 1.5 m
+ * clear of every Yurikamome pier within the verges, found in the loaded environment. */
 export function streetNetwork(environment: T.Object3D) {
-  const u = routes().streets[0], L = u.getLength(), K = STREET_KIT, samples = Array.from({ length: Math.ceil(L) + 1 }, (_, d) => frame(u, d, L));
+  const [u, boulevard] = routes().streets, L = u.getLength(), K = STREET_KIT, samples = Array.from({ length: Math.ceil(L) + 1 }, (_, d) => frame(u, d, L));
   const hits: [number[], number[]] = [[], []], v = new T.Vector3();
   environment.updateMatrixWorld(true);
   environment.traverse(o => {
@@ -280,32 +275,9 @@ export function streetNetwork(environment: T.Object3D) {
   });
   // Pier spans per side: metres along that a pier's foot reaches, padded 1.5 m and merged.
   const piers = hits.map(ds => ds.sort((a, b) => a - b).reduce((out: Span[], d) => { const last = out.at(-1); if (last && d - 1.5 <= last[1]) last[1] = d + 1.5; else out.push([d - 1.5, d + 1.5]); return out; }, []));
-  const root = avenueStreet(u, K.from, L, [-K.half, K.half], { reach: K.inside, gaps: [...K.gaps.inside, ...piers[0]] }, { reach: K.outside, gaps: [...K.gaps.outside, ...piers[1]] }, K.crossings, () => 0);
-  for (const name of ['street-ceramic', 'street-footway']) environment.add(root.getObjectByName(name)!);
-  root.name = 'street-network';
-  return root;
-}
-
-/** DEV `?roadKit` preview (stage 2): B on the planned boulevard south of the Fuji frame (road redesign sketch v2), with the old ~90 m major band
- * under it cut away, and four static demo pods on its channels. */
-export const ROAD_KIT_PREVIEW = {
-  cuts: [[-230, 295, 140, 15, 58]] as [number, number, number, number, number][],
-  boulevard: [[-215, 272], [-160, 238], [-120, 212], [-75, 182], [-10, 170], [70, 168], [120, 172], [152, 160]] as const,
-  bridge: 218,
-};
-export const previewBoulevard = () => new T.CatmullRomCurve3(ROAD_KIT_PREVIEW.boulevard.map(([x, z]) => new T.Vector3(x, 0, z)));
-export function streetKitPreview(environment: T.Object3D) {
-  const root = new T.Group(); root.name = 'street-kit-preview';
-  const terrain = environment.getObjectByName('TERRAIN_LOW_DENSITY'), ray = new T.Raycaster(), down = new T.Vector3(0, -1, 0);
-  environment.updateMatrixWorld(true);
-  const terrainAt = (x: number, z: number) => { if (!terrain) return 0; ray.set(new T.Vector3(x, 50, z), down); return Math.max(0, ray.intersectObject(terrain, true)[0]?.point.y ?? 0); };
-  const boulevard = previewBoulevard();
-  root.add(boulevardStreet(boulevard, 0, boulevard.getLength(), [ROAD_KIT_PREVIEW.bridge], terrainAt));
-  const pose = new T.Object3D(), pods = streetPodFleet(root, 4, 'street-kit-pods');
-  ([[212, 1], [234, 1], [214, -1], [236, -1]] as const).forEach(([d, s], i) => {
-    const f = frame(boulevard, d, boulevard.getLength()); pose.position.copy(f.p).addScaledVector(f.n, s * 5); pose.position.y = .235 + terrainAt(pose.position.x, pose.position.z);
-    pose.rotation.set(0, Math.atan2(f.t.x, f.t.z) + (s > 0 ? 0 : Math.PI), 0); pods.set(i, pose);
-  });
-  pods.flush();
+  const root = new T.Group(); root.name = 'street-network';
+  root.add(avenueStreet(u, K.from, L, [-K.half, K.half], { reach: K.inside, gaps: [...K.gaps.inside, ...piers[0]] }, { reach: K.outside, gaps: [...K.gaps.outside, ...piers[1]] }, K.crossings, () => 0),
+    boulevardStreet(boulevard, 0, boulevard.getLength(), BOULEVARD.crossings, () => 0, BOULEVARD.gaps));
+  for (const name of ['street-ceramic', 'street-footway', 'boulevard-ceramic', 'boulevard-terraces']) environment.add(root.getObjectByName(name)!);
   return root;
 }

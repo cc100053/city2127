@@ -6,7 +6,7 @@ import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
 import { civicCore, updateCivic } from './civicCore';
 import { floaters } from './floaters';
-import { bodyFootprints, carveContext, coolGlassGlow, inRect, megastructures, updateMegastructures } from './megastructures';
+import { bodyFootprints, carveContext, inRect, megastructures, updateMegastructures } from './megastructures';
 import { publishOccupants, publishRoofWalks } from './occupants';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
 import { facadeClimate, publishRoofGardens, towerGlow, towerNight } from './districtMeters';
@@ -15,9 +15,9 @@ import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
 import { changeSites, DISTRICT, inDistrict, SEAWARD_GLSL } from './layout';
 import { bayContext, recedeBeyondDistrict } from './bayContext';
-import { publishDoorways, publishEntrances } from './mobility';
-import { repairRoads } from './roadRepair';
-import { previewBoulevard, ROAD_KIT_PREVIEW, streetCuts, streetKitPreview, streetNetwork, updateStreetKit } from './streetKit';
+import { publishDoorways, publishEntrances, routes } from './mobility';
+import { onFormerStreet, repairRoads } from './roadRepair';
+import { streetNetwork, updateStreetKit } from './streetKit';
 
 // Literal paths bundle the district-detailed environment (scripts/crop-odaiba-district.py) and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
 const environmentUrl = new URL('../asset/models/odaiba-masterplan/odaiba_district_v01_environment.glb', import.meta.url).href;
@@ -180,14 +180,13 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     // The sea lies under the whole plate; grazing shadows on it only produce acne.
     if (material.name === 'water') { object.castShadow = object.receiveShadow = false; if(water) object.material=water; }
   });
-  const roadKit = import.meta.env.DEV && new URLSearchParams(location.search).has('roadKit');
-  repairRoads(environment, [...streetCuts(), ...(roadKit ? ROAD_KIT_PREVIEW.cuts : [])]);
+  const built = layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1]) && placement.id !== 'aqua-city-odaiba' && placement.id !== 'divercity-tokyo-plaza' /* polish2: under the enlarged Fuji frame */ && (placement.id === 'fuji-tv' || !bodyFootprints().some(zone => inRect(zone, placement.positionBlender[0], -placement.positionBlender[1]))));
+  repairRoads(environment, built.filter(placement => placement.id !== 'fuji-tv')); // Fuji is the civic frame, which stands on its own pads
   // After finishes: shared materials are re-tuned once per mesh above, which would drop an earlier wrap.
   environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) receded.add(object.material); });
   receded.forEach(material => { if (cutGround.has(material.name)) openBay(material); recedeBeyondDistrict(material); });
   carveContext(environment);
   scene.add(contextFacades(environment), bayContext(), megastructures(), floaters(), streetNetwork(environment)); // after the recede wrap: the kit's ground keeps its own shading
-  if (roadKit) { scene.add(streetKitPreview(environment)); coolGlassGlow(); }
   plantCanopy(scene,trees,true);
   plantBackdropGrove(scene,environment);
   // Sky gardens crown the tall context towers (the only CTX mesh above 30 m inside the district).
@@ -195,7 +194,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   const roofGarden=(model:T.Object3D,tower?:boolean)=>{const terraces=plantRoofCanopy(scene,model,tower);publishRoofGardens(terraces);publishRoofWalks(model,terraces);};
   environment.traverse(object=>{if(object instanceof T.Mesh && object.name.startsWith('CTX_') && new T.Box3().setFromObject(object).max.y>30)roofGarden(object,true);});
   scene.add(plazaDeck(scene, HOLOGRAMS.panels)); // P4: the Aqua City lot is the civic plaza deck
-  await Promise.all(layout.buildings.filter(placement => inDistrict(placement.positionBlender[0], -placement.positionBlender[1]) && placement.id !== 'aqua-city-odaiba' && placement.id !== 'divercity-tokyo-plaza' /* polish2: under the enlarged Fuji frame */ && (placement.id === 'fuji-tv' || !bodyFootprints().some(zone => inRect(zone, placement.positionBlender[0], -placement.positionBlender[1])))).map(async placement => {
+  await Promise.all(built.map(async placement => {
     if(placement.id==='fuji-tv'){const core=civicCore();scene.add(core);publishOccupants(core.occupants);return;}
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);
     model.name = placement.id;
@@ -215,6 +214,6 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     const merged = bake(model); model.clear(); parts.forEach(geometry => geometry.dispose());
     merged.forEach(mesh => { mesh.name = placement.id; model.add(mesh); });
   }));
-  plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name) || object.name==='plaza-deck'),roadKit?[previewBoulevard()]:[]);
+  plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name) || object.name==='plaza-deck'),[routes().streets[1]],onFormerStreet);
   publishEntrances(scene,environment);
 }

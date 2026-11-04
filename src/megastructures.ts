@@ -16,8 +16,6 @@ export const megaGlass = new T.MeshStandardMaterial({ color: '#8fa3ae', roughnes
 const megaPlant = new T.MeshStandardMaterial({ color: '#6f9a5c', roughness: .9 });
 // Night: about 60% of the glass cells (6 m × 4.2 m, world hash) glow warm, like the retained landmarks' lit rooms.
 const roomGlow = { value: 0 }, glassGlow = { value: new T.Vector3(1, .58, .24) };
-/** DEV `?roadKit`: the plaza deck's glazed band lights cool white-blue at night, so the street kit's frame has no warm light. Production keeps the warm rooms. */
-export const coolGlassGlow = () => glassGlow.value.set(.81, .91, 1);
 megaGlass.onBeforeCompile = shader => {
   shader.uniforms.roomGlow = roomGlow; shader.uniforms.glassGlow = glassGlow;
   shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 megaP;').replace('#include <project_vertex>', '#include <project_vertex>\nmegaP = (modelMatrix * vec4(transformed, 1.)).xyz;');

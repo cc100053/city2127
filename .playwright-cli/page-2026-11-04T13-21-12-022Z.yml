@@ -1,0 +1,29 @@
+- generic [active]:
+  - generic "The Odaiba waterfront around the Fuji TV sphere in 2127. Drag to orbit, scroll to zoom, right-drag to pan. One city day, dawn to night, passes every three minutes." [ref=e1]
+  - main:
+    - generic:
+      - link "2127 home" [ref=e2] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e3]: ✳
+        - generic [ref=e4]:
+          - text: "2127"
+          - generic [ref=e5]: TOKYO / CIVIC FUTURES
+      - generic:
+        - text: ONE WATERFRONT. TWO FUTURES.
+        - text: STUDY № 002 — 35°37′ N 139°46′ E · ODAIBA
+    - generic:
+      - paragraph: A SMALL PLACE. A BIG DECISION.
+      - heading "The same shore. A different tomorrow." [level=1]:
+        - text: The same shore.
+        - text: A different
+        - emphasis: tomorrow.
+      - paragraph:
+        - text: May a perfect future erase
+        - text: an imperfect past?
+    - complementary:
+      - generic: PULSE TOKYO
+      - generic: 22:00
+    - generic:
+      - generic:
+        - text: DRAG TO ORBIT · SCROLL TO ZOOM
+        - text: One city day passes every three minutes

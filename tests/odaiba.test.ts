@@ -18,9 +18,9 @@ import { AutomationDistrict, ConcentrationDistrict, SharingDistrict } from '../s
 import { bayContext } from '../src/bayContext.ts';
 import { acceleratedRaycast, MeshBVH } from 'three-mesh-bvh';
 import { checkHousingCity } from './housingCityCheck.ts';
-import { repairRoads, ROAD_CUTS, ROAD_LINKS } from '../src/roadRepair.ts';
-import { streetCuts, streetNetwork } from '../src/streetKit.ts';
-import { STREET_KIT } from '../src/layout.ts';
+import { onFormerStreet, repairRoads } from '../src/roadRepair.ts';
+import { streetNetwork } from '../src/streetKit.ts';
+import { BOULEVARD, STREET_KIT } from '../src/layout.ts';
 /** A ladder target with the given rungs; the rest mixed. */
 const rungs = (t: Partial<Record<'nw' | 'ne' | 'sw' | 'se', number>>) => ({ tiers: { nw: 0, ne: 0, sw: 0, se: 0, ...t } });
 
@@ -166,18 +166,34 @@ environment.traverse(object => {
   }
 });
 assert.ok(!environment.getObjectByName('ROADSIDE_TREE_INSTANCES'), 'Hidden roadside blockout is dropped');
-// Road audit and street network stage 1 (as loadOdaiba): cut streets keep no surveyed paving, the junction link is paved, the ④ band stays,
-// and the street kit paves the U route end to end (carriageway, and footway on both sides) once its ground joins the environment.
-repairRoads(environment, streetCuts());
+// Street network stages 1–2 (as loadOdaiba): no surveyed street (road, markings, paving but the landmarks' 14 m forecourt aprons, guardrails, lights) is left inside the district, the
+// backdrop band and avenues carry on past its edges, the ground they covered is recorded for the groves, and the street kit paves the U route
+// (carriageway, and footway on both sides) and the ④ boulevard (both carriageways and terraces) end to end once its ground joins the environment.
+const built = layout.buildings.filter((p: { id: string; positionBlender: number[] }) => inDistrict(p.positionBlender[0], -p.positionBlender[1]) && !['aqua-city-odaiba', 'divercity-tokyo-plaza', 'fuji-tv'].includes(p.id));
+repairRoads(environment, built); // as loadOdaiba
 const streetKit = streetNetwork(environment);
 {
   const paved = (x: number, z: number, names: RegExp) => new Raycaster(new Vector3(x, 50, z), new Vector3(0, -1, 0)).intersectObject(environment, true).some(h => names.test(h.object.name));
   assert.ok(!environment.getObjectByName('ROAD_ACCESS'), 'Isolated driveway stubs are dropped');
-  for (const [ax, az, bx, bz] of [...ROAD_CUTS, ...streetCuts()]) for (const t of [.2, .5, .8])
-    assert.ok(!paved(ax + (bx - ax) * t, az + (bz - az) * t, /^(ROAD_|SIDEWALK_NETWORK|MAJOR_ROAD_MARKINGS)/), `cut street still paved at ${ax},${az} t=${t}`);
-  for (const [ax, az, bx, bz] of ROAD_LINKS) for (const t of [.1, .5, .9])
-    assert.ok(paved(ax + (bx - ax) * t, az + (bz - az) * t, /^ROAD_LINK$/) && paved(ax + (bx - ax) * t, az + (bz - az) * t, /^SIDEWALK_LINK$/), `road link unpaved at t=${t}`);
-  for (const [x, z] of [[185.2, -187.7], [18.8, -76.6], [-81.6, -10.7]]) assert.ok(paved(x, z, /^ROAD_(MAJOR|SECONDARY)$/), `④ band lost its road at ${x},${z}`);
+  const v = new Vector3(), inside = (x: number, z: number) => x > DISTRICT.minX + .01 && x < DISTRICT.maxX - .01 && z > DISTRICT.minZ + .01 && z < DISTRICT.maxZ - .01;
+  const footpath = (x: number, z: number) => built.some(({ boundsBlender: [min, max] }: { boundsBlender: number[][] }) => x >= min[0] - 14.01 && x <= max[0] + 14.01 && -z >= min[1] - 14.01 && -z <= max[1] + 14.01); // forecourt aprons
+  environment.traverse(o => {
+    if (!(o instanceof Mesh) || !/^(ROAD_(MAJOR|SECONDARY)|MAJOR_ROAD_MARKINGS|SIDEWALK_NETWORK|PHASE03D_GUARDRAILS|STREETLIGHT_INSTANCES|PUBLIC_LIGHTING)$/.test(o.name)) return;
+    const p = o.geometry.attributes.position, index = o.geometry.index, n = index?.count ?? p.count, flat = /^(ROAD|MAJOR|SIDEWALK)/.test(o.name);
+    for (let i = 0; i < n; i += 3) {
+      let cx = 0, cz = 0, any = false;
+      for (let j = 0; j < 3; j++) { v.fromBufferAttribute(p, index ? index.getX(i + j) : i + j).applyMatrix4(o.matrixWorld); cx += v.x / 3; cz += v.z / 3; any ||= inside(v.x, v.z); }
+      assert.ok(!(flat ? any && !(o.name === 'SIDEWALK_NETWORK' && footpath(cx, cz)) : inside(cx, cz)), `${o.name} left inside the district near ${cx.toFixed(0)},${cz.toFixed(0)}`);
+    }
+  });
+  for (const [x, z] of [[-290, 340], [302, -57]]) assert.ok(paved(x, z, /^ROAD_MAJOR$/), `backdrop band lost its road at ${x},${z}`);
+  for (const [x, z] of [[-25, 139], [98, 54], [208, 2]]) assert.ok(onFormerStreet(x, z) && !paved(x, z, /^ROAD_/), `old band ground not recorded at ${x},${z}`);
+  const boulevard = routes().streets[1], bl = boulevard.getLength();
+  for (let d = 1; d < bl - 1; d += 2) {
+    const p = boulevard.getPointAt(d / bl), t = boulevard.getTangentAt(d / bl), at = (o: number): [number, number] => [p.x + t.z * o, p.z - t.x * o], bridge = BOULEVARD.crossings.some(c => Math.abs(c - d) < 2.5);
+    for (const o of [-8, -2.5, 2.5, 8]) assert.ok(paved(...at(o), /^boulevard-ceramic$/), `④ carriageway unpaved at d ${d} offset ${o}`);
+    for (const o of [-12.7, -9, 0, 9, 12.7]) assert.ok(bridge && o || paved(...at(o), /^boulevard-terraces$/), `④ terrace or median missing at d ${d} offset ${o}`);
+  }
   const street = routes().streets[0], length = street.getLength(), reach = (side: number, d: number) => (side < 0 ? STREET_KIT.inside : STREET_KIT.outside).find(([f, t]) => d >= f && d < t)![2];
   for (let d = STREET_KIT.from + 1; d < length - 1; d += 2) {
     const p = street.getPointAt(d / length), t = street.getTangentAt(d / length), at = (o: number): [number, number] => [p.x + t.z * o, p.z - t.x * o];
@@ -221,14 +237,14 @@ assert.ok(bay.children.length<=5, 'Bay bridges, shores and Ariake parkland batch
 city.add(environment,panels,edge,bay,streetKit);
 plantCanopy(city, JSON.parse(readFileSync(new URL('../asset/models/odaiba-masterplan/tree_instances.json', import.meta.url), 'utf8')));
 const groveStart=city.children.length;
-plantLandscapeCanopy(city,environment,landmarks);
+plantLandscapeCanopy(city,environment,landmarks,[routes().streets[1]],onFormerStreet); // as loadOdaiba
 assert.ok(city.children[groveStart] instanceof InstancedMesh && city.children[groveStart].count>100, 'Authored landscape carries coastal groves');
 for (const grove of city.children.filter(o => o instanceof InstancedMesh && o.name === 'surveyed-coastal-trunks') as InstancedMesh[]) {
   const m = new Matrix4(), c = new Vector3();
   for (let i = 0; i < grove.count; i++) { grove.getMatrixAt(i, m); c.setFromMatrixPosition(m); assert.ok(inDistrict(c.x, c.z), `tree outside the district at ${c.x.toFixed(0)},${c.z.toFixed(0)}`); }
 }
 city.updateMatrixWorld(true);
-const openGround = /^(TERRAIN|PHASE03C_LANDSCAPE|PHASE03C_PLAZA|PRIMARY_PLAZA|PHASE03C_SERVICE|SERVICE_BAY|SIDEWALK|WATERFRONT_PROMENADE|street-(footway|ceramic|edge|seams|line-glow)$)/; // the street kit's flat finishes, as the surveyed paving slab over the avenues they replace
+const openGround = /^(TERRAIN|PHASE03C_LANDSCAPE|PHASE03C_PLAZA|PRIMARY_PLAZA|PHASE03C_SERVICE|SERVICE_BAY|SIDEWALK|BUILDING_PADS|WATERFRONT_PROMENADE|street-(footway|ceramic|edge|seams|line-glow)$|boulevard-(ceramic|terraces|channels|rails|seams|line-glow|bridge|bridge-lines)$)/; // the street kit's flat finishes, as the surveyed paving slab over the avenues they replace; the flat building pads the removed street paving lay over
 const ray = new Raycaster(), down = new Vector3(0, -1, 0);
 const camera = heroCamera(1920, 1080);
 camera.updateMatrixWorld(true);
@@ -407,6 +423,24 @@ if (process.env.PROBE_CONCENTRATION) {
     console.log('PROBE', entry, (h ? towerProblem(x, z, h) : podProblem(x, z)) ?? 'OK');
   }
 }
+/** Estimated hero-frame pixels (1920 × 929 capture) of a court's 40 m ground square left visible: a 9 × 9 sample grid, each visible
+ * sample weighted by its share of the square's projected area. Replaces a single centre ray, which kept courts that landmarks mostly hide. */
+const capture = heroCamera(1920, 929); capture.updateMatrixWorld(true);
+const courtPixels = (x: number, z: number, yaw = 0, half = 20) => {
+  const corners = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, b]) => new Vector3(x + a * half, 0, z + b * half).project(capture))
+    .map(p => [(p.x + 1) * 960, (1 - p.y) * 464.5]);
+  const area = Math.abs(corners.reduce((sum, [ax, ay], k) => { const [bx, by] = corners[(k + 1) % 4]; return sum + ax * by - bx * ay; }, 0)) / 2;
+  let seen = 0;
+  for (let i = 0; i < 9; i++) for (let k = 0; k < 9; k++) {
+    const u = (i - 4) / 4.5 * half, v = (k - 4) / 4.5 * half;
+    const look = new Vector3(x + u * Math.cos(yaw) + v * Math.sin(yaw), 1, z - u * Math.sin(yaw) + v * Math.cos(yaw)), ndc = look.clone().project(capture);
+    if (Math.abs(ndc.x) > 1 || Math.abs(ndc.y) > 1) continue;
+    ray.set(capture.position, look.clone().sub(capture.position).normalize());
+    const hit = ray.intersectObject(city, true)[0];
+    if (!hit || hit.distance > capture.position.distanceTo(look) - 2) seen++;
+  }
+  return area * seen / 81;
+};
 for (const tower of concentration.towers) assert.equal(towerProblem(tower.x, tower.z, tower.h), undefined, `tower at ${tower.x},${tower.z}`);
 // P10 drone dock rings (radius 26 at the upper lobby) and kiosks in court corners clear existing geometry.
 for (const tower of concentration.towers) assert.equal(blocked(tower.x, tower.z, .72 * tower.h, 27.5), undefined, `drone dock at ${tower.x},${tower.z}`);
@@ -458,30 +492,22 @@ for (const sw of [-3, 3]) {
   for (const site of Object.values(changeSites)) heroSightline(site, ` at sharing ${sw}`);
   city.remove(sharingDistrict.root);
 }
+// Street network stage 2: Meter pieces keep 2 m off the ④ boulevard's 26 m (pods' and towers' discs, courts' squares, pavilion plinths).
+{
+  const bl = routes().streets[1].getSpacedPoints(1400), toB = (x: number, z: number) => Math.min(...bl.map(p => Math.hypot(p.x - x, p.z - z)));
+  const square = (x: number, z: number, yaw: number, hu: number, hv: number) => { let m = 1e9; for (let u = -1; u <= 1; u += .1) for (let v = -1; v <= 1; v += .1) m = Math.min(m, toB(x + u * hu * Math.cos(yaw) + v * hv * Math.sin(yaw), z - u * hu * Math.sin(yaw) + v * hv * Math.cos(yaw))); return m; };
+  for (const p of concentration.pods) assert.ok(toB(p.x, p.z) > 13 + 10.5 + 2, `pod at ${p.x},${p.z} on the ④ boulevard`);
+  for (const t of concentration.towers) assert.ok(toB(t.x, t.z) > 13 + 18.5 + 2, `tower at ${t.x},${t.z} on the ④ boulevard`);
+  for (const c of sharingDistrict.courts) assert.ok(square(c.x, c.z, c.yaw, 20, 20) > 15, `court at ${c.x},${c.z} on the ④ boulevard`);
+  serviceDistrict.bays.forEach((b, i) => assert.ok(square(b.x, b.z, b.yaw, 24 * serviceDistrict.scales[i] / 2, 18 * serviceDistrict.scales[i] / 2) > 15, `pavilion at ${b.x},${b.z} on the ④ boulevard`));
+}
 console.log(`Odaiba: ${sharingDistrict.courts.length} sharing courts stand on open ground clear of context, routes and other Meter sites; sites stay visible.`);
 
-/** Estimated hero-frame pixels (1920 × 929 capture) of a court's 40 m ground square left visible: a 9 × 9 sample grid, each visible
- * sample weighted by its share of the square's projected area. Replaces a single centre ray, which kept courts that landmarks mostly hide. */
-const capture = heroCamera(1920, 929); capture.updateMatrixWorld(true);
-const courtPixels = (x: number, z: number, yaw = 0, half = 20) => {
-  const corners = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, b]) => new Vector3(x + a * half, 0, z + b * half).project(capture))
-    .map(p => [(p.x + 1) * 960, (1 - p.y) * 464.5]);
-  const area = Math.abs(corners.reduce((sum, [ax, ay], k) => { const [bx, by] = corners[(k + 1) % 4]; return sum + ax * by - bx * ay; }, 0)) / 2;
-  let seen = 0;
-  for (let i = 0; i < 9; i++) for (let k = 0; k < 9; k++) {
-    const u = (i - 4) / 4.5 * half, v = (k - 4) / 4.5 * half;
-    const look = new Vector3(x + u * Math.cos(yaw) + v * Math.sin(yaw), 1, z - u * Math.sin(yaw) + v * Math.cos(yaw)), ndc = look.clone().project(capture);
-    if (Math.abs(ndc.x) > 1 || Math.abs(ndc.y) > 1) continue;
-    ray.set(capture.position, look.clone().sub(capture.position).normalize());
-    const hit = ray.intersectObject(city, true)[0];
-    if (!hit || hit.distance > capture.position.distanceTo(look) - 2) seen++;
-  }
-  return area * seen / 81;
-};
 const courtVisibility = sharingDistrict.courts.map(c => courtPixels(c.x, c.z, c.yaw));
 // Owner 2026-11-01 (c2 low hero): courts 1, 4, 6 and 7 fall behind landmarks or out of frame; the SW district shot shows them.
 // polish2: court 9 (-20, 210) now sits behind the enlarged Fuji frame (owner 2026-11-02: hero visibility never blocks a design).
-const HERO_HIDDEN_COURTS = [1, 4, 6, 7, 9];
+// Stage 2: court 5 moved off the ④ boulevard to (-137, 286), about 450 px.
+const HERO_HIDDEN_COURTS = [1, 4, 5, 6, 7, 9];
 for (const [i, px] of courtVisibility.entries()) if (!HERO_HIDDEN_COURTS.includes(i)) assert.ok(px >= 600, `court ${i} shows only ${px.toFixed(0)} px from the hero pose`);
 console.log(`Odaiba: sharing courts show ${courtVisibility.map(px => px.toFixed(0)).join(' / ')} px of ground in the hero frame.`);
 

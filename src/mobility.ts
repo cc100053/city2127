@@ -3,7 +3,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets.ts';
 import { heroSettledCamera, heroTextZone } from './heroCamera.ts';
-import { guideway, guidewayTracks, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers, bayChannels, skyCorridors, sweepway, streets, STREET_KIT, shoreLane, interchangeApproach, interchangeBoatLane, INTERCHANGE, midDecks, gardenDecks } from './layout.ts';
+import { guideway, guidewayTracks, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers, bayChannels, skyCorridors, sweepway, streets, STREET_KIT, BOULEVARD, shoreLane, interchangeApproach, interchangeBoatLane, INTERCHANGE, midDecks, gardenDecks } from './layout.ts';
 
 const ease=(t:number)=>T.MathUtils.smoothstep(t,0,1);
 const curve=(points:readonly (readonly [number,number,number])[],closed=false)=>new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p)),closed,'centripetal');
@@ -445,8 +445,10 @@ export function collectorPose(waited:number) {
 }
 /** Street cars per lane on each avenue: `cars` spread round the lane's loop (the avenue plus 40 m out of sight) at irregular gaps of
  * 0.45–1.6× the mean, moving at one lane speed (8–11 m/s with a shared ±15 % surge), so they never close up. They fade in and out at the
- * avenue ends. Lane 0 drives with the route, lane 1 against it; Japan keeps left. Returns `d` metres along the route. */
-export const STREET_GAP=27;
+ * avenue ends. Lane 0 drives with the route, lane 1 against it; Japan keeps left. Returns `d` metres along the route. `STREET_GAP`: the mean
+ * gap per route (the ④ boulevard's guide channels carry a sparse pod service). */
+export const STREET_GAP=[27,81] as const;
+export const streetCarCount=(road:number,length:number)=>Math.round((length+40)/STREET_GAP[road]);
 /** A lane car's free slot: `travelled` metres round its lane's loop (`rate` m/s now), as travel `x` from the lane's start (-20 …
  * length + 20, the ends out of sight) and its lap count. Car k-1 always leads car k. */
 function laneTravel(time:number,road:number,lane:number,car:number,cars:number,length:number) {
@@ -488,26 +490,29 @@ function dropOffAt({x,lap,speed,span}:{x:number;lap:number;speed:number;span:num
   const signal=even&&x>=stop-SHIFT-SIGNAL&&parked<0&&(x<stop||brake>0)?1:(parked>=0&&leaving<3)||(!even&&x>=stop&&x<stop+2*BRAKE+SHIFT)?-1:0;
   return {d:DROP_OFF.lane?length-p:p,bay,steer,visible:fadeEnds(p,length),parked,leaving,signal,brake,pitch};
 }
-/** Shared-space crossings (no signals): `d` metres along `streets[road]`, the street kit's light-panel crossings (`STREET_KIT`). Residents walk
- * to the kerb, wait until every approaching car has stopped short of the stop line or passed, cross, and walk on; cars brake for a requested
- * crossing when they still can and queue behind each other (`mobility`). One on the guideway avenue past the drop-off bays, one on the link ③
- * from the deck's west stair to the west lawn. */
-export const CROSSINGS=[{road:0,d:STREET_KIT.crossings[0],period:70},{road:0,d:STREET_KIT.crossings[1],period:83}] as const;
-/** Paved half width per route: the kit's carriageway (the surveyed avenues under it are cut, src/streetKit.ts). */
-export const ROAD_HALF=[STREET_KIT.half] as const;
+/** Shared-space crossings (no signals): `d` metres along `streets[road]`, the street kit's light-panel crossings (`STREET_KIT`) and light bridges
+ * (`BOULEVARD`). Residents walk to the kerb, wait until every approaching car has stopped short of the stop line or passed, cross, and walk on;
+ * cars brake for a requested crossing when they still can and queue behind each other (`mobility`). On the U: one on the guideway avenue past the
+ * drop-off bays, one on the link ③ from the deck's west stair to the west lawn; three on the ④ boulevard. */
+export const CROSSINGS=[{road:0,d:STREET_KIT.crossings[0],period:70},{road:0,d:STREET_KIT.crossings[1],period:83},
+  {road:1,d:BOULEVARD.crossings[0],period:131},{road:1,d:BOULEVARD.crossings[1],period:113},{road:1,d:BOULEVARD.crossings[2],period:149}] as const;
+/** Paved half width per route: the kit's carriageway on the U, the terraces' outer edge on the ④ boulevard (src/streetKit.ts). */
+export const ROAD_HALF=[STREET_KIT.half,13] as const;
 /** Where cars drive, in metres left of the route (`n`, up × tangent): the U route is the kit carriageway's centre, 7 m, one lane each way
- * (`lane`: each lane centre from the carriageway centre; Japan keeps left); car bodies keep ≥ 1 m from planter rims and every solid
- * (tests/odaiba.test.ts checks 0.3 m). */
-export const CARRIAGEWAY=[{centre:0,half:STREET_KIT.half,lane:1.75}] as const;
-/** Whether (x, z) lies on the street kit's footprint (carriageway and verges, `pad` m more): surveyed trees standing there are hidden. */
-let footprint:{p:T.Vector3;n:T.Vector3;d:number}[]|null=null;
+ * (`lane`: each lane centre from the carriageway centre; Japan keeps left); on the ④ boulevard pods ride the guide channel 5 m out on either
+ * side of the median. Car bodies keep ≥ 1 m from planter rims and every solid (tests/odaiba.test.ts checks 0.3 m). */
+export const CARRIAGEWAY=[{centre:0,half:STREET_KIT.half,lane:1.75},{centre:0,half:8.5,lane:5}] as const;
+/** Whether (x, z) lies on the street kit's footprint (A's carriageway and verges, B's whole width; `pad` m more): surveyed trees standing there are hidden. */
+let footprints:{p:T.Vector3;n:T.Vector3;d:number}[][]|null=null;
 export function onStreetKit(x:number,z:number,pad=0){
-  const u=routes().streets[0],L=u.getLength();
-  footprint??=Array.from({length:Math.ceil(L)+1},(_,d)=>{const t=u.getTangentAt(Math.min(d/L,1));return {p:u.getPointAt(Math.min(d/L,1)),n:new T.Vector3(t.z,0,-t.x),d};});
-  let best=footprint[0],e=Infinity;for(const f of footprint){const q=(f.p.x-x)**2+(f.p.z-z)**2;if(q<e){e=q;best=f;}}
-  if(best.d<STREET_KIT.from||best.d>=L-1)return false;
-  const o=(x-best.p.x)*best.n.x+(z-best.p.z)*best.n.z,reach=(o<0?STREET_KIT.inside:STREET_KIT.outside).find(([f,t])=>best.d>=f&&best.d<t)?.[2]??0;
-  return Math.abs(o)<STREET_KIT.half+reach+pad;
+  const all=routes().streets;
+  footprints??=all.map(u=>{const L=u.getLength();return Array.from({length:Math.ceil(L)+1},(_,d)=>{const t=u.getTangentAt(Math.min(d/L,1));return {p:u.getPointAt(Math.min(d/L,1)),n:new T.Vector3(t.z,0,-t.x),d};});});
+  return footprints.some((footprint,r)=>{
+    let best=footprint[0],e=Infinity;for(const f of footprint){const q=(f.p.x-x)**2+(f.p.z-z)**2;if(q<e){e=q;best=f;}}
+    if(best.d<(r?0:STREET_KIT.from)||best.d>=footprint.length-2)return false;
+    const o=(x-best.p.x)*best.n.x+(z-best.p.z)*best.n.z,reach=r?0:(o<0?STREET_KIT.inside:STREET_KIT.outside).find(([f,t])=>best.d>=f&&best.d<t)?.[2]??0;
+    return Math.abs(o)<(r?ROAD_HALF[1]:STREET_KIT.half+reach)+pad;
+  });
 }
 /** A lane's centre, metres along its own left (`up × travel direction`): lane 0 travels with the route, lane 1 against it. */
 export const laneOffset=(road:number,lane:number)=>{const {centre,lane:l}=CARRIAGEWAY[road];return lane?l-centre:centre+l;};
@@ -662,7 +667,7 @@ export function mobility(scene:T.Scene) {
   // Delivery robots: 0.8 m rovers with a lit lid, on the doorway forecourts.
   const robots=fleet(scene,[part([.62,.5,.8],[0,.42,0],shell,.12),part([.5,.05,.5],[0,.68,0],mint,.02),part([.66,.16,.7],[0,.12,0],glass,.05)],ROBOTS,'delivery-robots');
   const carBody=material('#ffffff'),headlight=new T.MeshStandardMaterial({color:'#f4f6f2',emissive:'#fff6e0',emissiveIntensity:0,roughness:.3}),taillight=new T.MeshStandardMaterial({color:'#b85a50',emissive:'#ff4a3a',emissiveIntensity:0,roughness:.3});
-  const streetLength=path.streets.map(c=>c.getLength()),streetCars=streetLength.map(length=>Math.round((length+40)/STREET_GAP)),carSlots=streetCars.reduce((n,c)=>n+2*c,0);
+  const streetLength=path.streets.map(c=>c.getLength()),streetCars=streetLength.map((length,r)=>streetCarCount(r,length)),carSlots=streetCars.reduce((n,c)=>n+2*c,0);
   const cars=fleet(scene,[part([1.85,1.1,4.6],[0,.75,0],carBody,.45),part([1.7,.6,2.6],[0,1.45,-.2],glass,.25),part([1.9,.1,4.3],[0,.45,0],mint,.04),
     part([1.5,.14,.08],[0,.95,2.3],headlight,.03),part([1.5,.14,.08],[0,.95,-2.3],taillight,.03)],carSlots,'street-cars');
   const carColors=['#f4f3ee','#e9eef0','#dfe4e2','#c9d3d0','#e8e0d0','#8fa8ad','#5f6f78','#2f3a40'];
@@ -671,6 +676,9 @@ export function mobility(scene:T.Scene) {
   // glass canopy and a thin mint roof line, the cars' 4.6 m length so the drop-off lamps still fit; a van slot becomes a cargo pod.
   const podBody=material('#ffffff'),streetPods=fleet(scene,streetPodParts(podBody,headlight,taillight),carSlots,'street-pods');
   for(let i=0;i<carSlots;i++)streetPods.tint(i,podBody,carColors[Math.floor(hash(i,16)*4)]);
+  // The ④ boulevard's guide channels carry pods only, whatever the automation (their own fleet: `street-pods` stays the U's automation swap).
+  const boulevardBase=2*streetCars[0],boulevardPods=fleet(scene,streetPodParts(podBody,headlight,taillight),carSlots-boulevardBase,'boulevard-pods');
+  for(let i=boulevardBase;i<carSlots;i++)boulevardPods.tint(i-boulevardBase,podBody,carColors[Math.floor(hash(i,16)*4)]);
   // Drop-off cues per bay car: an amber indicator pair (front and rear corner, set on the signalled side) and a bright brake lamp over
   // the tail light; hidden when off.
   const amber=new T.MeshBasicMaterial({color:'#ffae2e'}),brakeRed=new T.MeshBasicMaterial({color:'#ff3326'});
@@ -1005,9 +1013,10 @@ export function mobility(scene:T.Scene) {
       // Every seventh car is a 7 m van; traffic density and the commute rhythm thin the fleet (drop-off cars always run).
       // Human-driven cars give way to autonomous pods slot by slot as automation rises; standalone keeps the cars.
       const van=vanOf[slot]===1,density=drop<0?carGate(slot,state.traffic*.6+.5>hash(slot,18)&&rhythm.cars>hash(slot,22)):1;
-      const shown=car.visible*density,pod=activity?podShare(activity.level,slot):0;
+      const shown=car.visible*density,pod=r===1?1:activity?podShare(activity.level,slot):0;
       pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(shown*(1-pod));cars.set(slot,pose);
-      pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(shown*pod);streetPods.set(slot,pose);
+      pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(r===1?0:shown*pod);streetPods.set(slot,pose);
+      if(r===1){pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(shown);boulevardPods.set(slot-boulevardBase,pose);}
       // Brake lamp over the tail light (a pod's sits .13 m lower).
       const lit=Math.max(carBrake[slot],drop>=0?(car as ReturnType<typeof dropOffPose>).brake:0);
       pose.position.y-=pod>.5?.13*(van?1.3:1):0;pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(shown*lit);brakeLamps.set(slot,pose);pose.position.y+=pod>.5?.13*(van?1.3:1):0;
@@ -1033,14 +1042,16 @@ export function mobility(scene:T.Scene) {
       for(let j=0;j<2;j++){
         // A pair stays 0.7 m apart along the avenue: abreast crossing it, one behind the other on the footway.
         const slot=CROSSERS+k*2+j,offset=c.size===2?(j?.35:-.35):0;
-        pose.position.set(at.p.x+at.t.z*c.side*a+at.t.x*(along+offset),0,at.p.z-at.t.x*c.side*a+at.t.z*(along+offset));
+        // On the boulevard they stand on its light bridge (4 m deep) or, before and after, on its 0.45 m terrace.
+        const y=CROSSINGS[k].road===1?.235+(Math.abs(along+offset)>2.2?.45:.012):0;
+        pose.position.set(at.p.x+at.t.z*c.side*a+at.t.x*(along+offset),y,at.p.z-at.t.x*c.side*a+at.t.z*(along+offset));
         pose.rotation.set(0,alongYaw+yawTo(alongYaw,across)*turn,0);
         pose.scale.setScalar(j<c.size?shown*(.93+.12*hash(slot,8)):0);doorPeople.set(slot,pose);
         doorPeople.gait(slot,walked*5.5+slot,c.phase==='wait'?0:.45);doorPeople.social(slot,0,0);
       }
       pose.position.copy(at.p);pose.rotation.set(0,at.yaw,0);pose.scale.set(2*at.half+.6,1,1).multiplyScalar(requested(k,time)?1:0);crossLights.set(k,pose);
     });
-    cars.flush();streetPods.flush();doorPeople.flush();indicators.flush();brakeLamps.flush();crossLights.flush();
+    cars.flush();streetPods.flush();boulevardPods.flush();doorPeople.flush();indicators.flush();brakeLamps.flush();crossLights.flush();
     // Boats (boatPoses) bob and roll a little; loop taxis thin with traffic and the berthed interchange boat leaves no wake.
     boatPoses(time,path).forEach((b,i)=>{
       pose.position.set(b.x,b.y+Math.sin(time*(i<BOATS?1.3:1.1)+i)*.08,b.z);pose.rotation.set(0,b.yaw,i<BOATS?Math.sin(time*.9+i)*.02:0);

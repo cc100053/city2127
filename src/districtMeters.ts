@@ -182,9 +182,11 @@ const SPREAD = 1.45;
 /** Halo canopy height as a share of room radius (about 6–8 m). */
 const HALO = .42;
 /** Inland sharing courts [x, z, yaw]: open ground scanned clear of landmarks, context, routes, P2 pavilions and P4 towers / pods. Court 4 moved from (50, -340) to (110, -320) when the AUTO HUB lot grew over it (R4).
+ * Street network stage 2 (2026-11-04): courts 2, 5, 6 and 8 stood on the ④ boulevard's line and moved to the nearest site passing the same checks with their
+ * square 15 m off its centreline (from -110, 230; -70, 180; -290, 290; 220, 0).
  * P7 ranks by estimated visible hero-frame pixels (`SCAN_COURTS=20` in tests/odaiba.test.ts lists candidates best first). */
 const COURT_SITES: readonly (readonly [number, number, number])[] = ([
-  [-220, -140, .4], [-410, 120, 1.1], [-110, 230, 2.3], [110, -320, .9], [170, -360, 3.6], [-70, 180, 1.7], [-290, 290, 5.1], [-460, 290, .2], [220, 0, 2.8], [-20, 210, 4.4],
+  [-220, -140, .4], [-410, 120, 1.1], [-110, 250, 2.3], [110, -320, .9], [170, -360, 3.6], [-137, 286, 1.7], [-385, 290, 5.1], [-460, 290, .2], [190, 0, 2.8], [-20, 210, 4.4],
 ] as const).filter(([x, z]) => !inMega(x, z, 22)); // P1: nothing stands inside a megastructure footprint
 const COURT = 40;
 /** Garden crowns inside a private court [x, z, size], clear of the glass room and the entrance. */
@@ -1001,8 +1003,10 @@ export const HERO_FRAME_SLOTS = [0, 2, 3, 5].flatMap(a => { const i = TOWER_KEPT
 const slotFamilies = TOWER_SITES.map((_, i) => HERO_FRAME_SLOTS.includes(i) ? 3 : i % 3);
 /** Silhouette family (0 twisted, 1 terraced, 2 twin, 3 open frame) of tower slot `i` and its instance index in that family's batches. */
 export const towerFamily = (i: number) => ({ family: slotFamilies[i], instance: slotFamilies.slice(0, i).filter(f => f === slotFamilies[i]).length });
+// Street network stage 2 (2026-11-04): two pods stood on the ④ boulevard's line and moved to the nearest site passing the pod checks, 25.5 m off its centreline
+// (from -33, 167 and 207, 37).
 const POD_SITES: readonly (readonly [number, number])[] = ([
-  [-293, 147], [-253, -33], [-233, 47], [-218, -23], [-183, -43], [-168, -128], [-103, 17], [-53, 147], [-33, 167], [-23, 107], [7, -58], [27, 87], [77, 107], [87, 57], [97, -73], [107, -123], [107, 77], [117, 7], [137, -103], [207, 37], [217, -43], [217, 87], [237, -73], [237, 57], [247, -103], [252, 147],
+  [-293, 147], [-253, -33], [-233, 47], [-218, -23], [-183, -43], [-168, -128], [-103, 17], [-53, 147], [-79, 137], [-23, 107], [7, -58], [27, 87], [77, 107], [87, 57], [97, -73], [107, -123], [107, 77], [117, 7], [137, -103], [182, 37], [217, -43], [217, 87], [237, -73], [237, 57], [247, -103], [252, 147],
 ] as const).filter(([x, z]) => !inMega(x, z, 14) && !inHeroClear(x, z));
 
 /** Q4: one walkable vertical district or functions spread through the parks.
