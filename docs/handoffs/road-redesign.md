@@ -53,6 +53,7 @@
   b-bridge, bn-rails, bn-lip, bn-planting. Below 2 after three rounds (stop, owner decides): a-planters (thin grey rim, gem-like
   shrubs), a-rings (chrome tubes, lost pairwise), an-rings (2 but lost pairwise), a-crossing (day contrast), b-channels (faint inner
   lines), b-median (crown ratio ≈ 2.5, grey rim), b-terrace (day lip unlit), b-pods (no people for scale), bn-blades (no light pool).
+- Owner accepted R3 as is (2026-11-04); the kit stays DEV `?roadKit` until it is applied to the network.
 
 ## Validation
 

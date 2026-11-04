@@ -48,3 +48,5 @@ Scores: 0 absent, 1 present but off target, 2 matches the bar.
 
 R1 (2026-11-04): owner agreed with the R1 judge scores as the bar (「我同意R1嘅分數」): thin saturated blue lines, sphere-and-spike
 planting, thin rings and blades, a flat channel and a dim bridge all score 1; the night glow, pods and night planting colour score 2.
+
+R3 (2026-11-04): owner accepted R3 as is (「Accept as is」) at 32/40, with nine items still below 2 (handoff R3 entry).
