@@ -73,3 +73,16 @@ Warmth (the item every judge named): rooms must glow **warm peach**, not yellow 
 - **People**: figure height .75 (seated proportionally), shirts light; 3–4 people per room standing near the glass on the camera side.
 - **0**: halo lower (gap ≈ .3 above the trees), tube thicker (≈ .12), brighter; wing discs with a visible gap and glowing collar; 3 benches with seated people on the forecourt, ≥ 12 residents.
 - **+1**: corner columns real cylinders (r .25, 12 segments); each floor 2–3 people and 2–3 furniture pieces near the +X glass; terraces carry 2 small **trees** (crown ≥ .5) each, not shrubs; lift shaft with thin amber guide rails and faint glazing, cabin parked at mid height when reduced motion is off is fine — make the cabin larger (1.6 × 2.2) and warm-lit so it reads; crown roof garden 7 trees visible above the parapet.
+
+## R4 (R3 kept 18/38)
+
+Keep: `fh-floors` (2), the warm peach rooms, R3's +1 height. Re-crop and compare with R3.
+
+**−1 is the priority (6 items, all ≤ 1).** At L the lot's front third is below the frame and the camera looks down on the roofs, so the discs hide the glazing and the pavilions crowd the bottom edge (see `r3/flagship-low.png`).
+- Move the 5 pavilions into the **back two thirds** of the lot (x, z ≥ −3.5 for centres; screen-up = +X/+Z), so they sit mid-frame, not on the bottom edge; front third becomes garden (hedged lawn beds, water channel, benches, walkway start).
+- Pavilion walls **2.0 high**; discs radius r+.35 (barely wider than the roof) at gap .7, so the warm glazed wall reads below the disc from L; collar light ring clearly lit inside the gap (emissive ≈ 2, two rings).
+- Drum walls: wider glazing panes (mullions every ~.8, not slats), so rooms read through; inside a counter, a round table with chairs, a shelf, 3 people standing at the glass.
+- Garden (currently 0): every non-building patch inside the outline is lawn with hedge borders (`leaf` boxes .3 high), ≥ 14 trees spread across the lot (not only edges), a 3-step terraced planting bed beside the walkway in the visible middle, 4 white benches with seated people in the front third, ≥ 10 residents walking on the paths, the water channel along the walkway.
+- Walkway: keep R2/R3 S-curve but lengthen it from the front edge to the back edge, columns 1.1 tall so it reads raised.
+- **0**: forecourt — 3 white benches placed in the camera-facing front, each with 2 seated people; halo emissive brighter and thicker (tube .15) so it reads glowing at day.
+- **+1**: corner columns r .3 with 16 segments, white, so they read round; lift shaft: light-blue faint glazing panels (opacity ≈ .3) on the −Z face with white frame and thin amber rails; park the cabin animation's capture-time position irrelevant — add a second static cabin at mid height (y ≈ 18) so one cabin is always visible; sky terraces: trees crown .7 (2 per terrace) protruding past the +X face.
