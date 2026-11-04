@@ -34,6 +34,14 @@
 - B: no pods (the boulevard has no traffic yet); lamp blades thin; field edges faint; light bridge out of frame; median trees not slim cypress.
 - Night: seams and rails lack glow.
 
+## Street-kit close-up polish (branch `claude/street-kit-polish-86d81f`, from 866cdbe)
+
+- Rubric and spec: [rubric](../../artifacts/street-kit-closeup-polish/rubric.md), [spec](../../artifacts/street-kit-closeup-polish/spec.md);
+  rounds in `~/city2127-evidence/street-kit-closeup-polish/` (`r0` = R4 captures, `target/` = the chosen Gemini images).
+- Owner decisions (2026-11-04): widen A toward the plaza to ≈ 7 m (DEV `?roadKit` override of the street cars' lanes; production
+  unchanged until rollout); B reviewed at the close pose `-45,24,212` → `0,0,168` with crops following the city (street keeps 24 m);
+  static demo pods on B's channels in the preview; night scored by rubric only (no Gemini night targets).
+
 ## Validation
 
 - 2026-11-04, uncommitted delta on 5a56230 then committed: `npm test` exit 0, `npm run build` PASS, `git diff --check` PASS.

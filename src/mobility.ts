@@ -264,6 +264,10 @@ function fleet(scene:T.Object3D,parts:Part[],count:number,name:string) {
   };
 }
 
+const streetPodParts=(body:T.Material,head:T.Material,tail:T.Material)=>[part([1.8,1.3,4.6],[0,.8,0],body,.6),part([1.84,.62,3.5],[0,1.28,-.1],glass,.3),
+  part([.24,.04,2.8],[0,1.6,-.1],mint,.02),part([1.3,.1,.08],[0,.82,2.29],head,.03),part([1.3,.1,.08],[0,.82,-2.29],tail,.03)];
+/** The street pod (traffic and DEV street-kit demo pods): `count` instances, white body (tint per instance), poses set by the caller. */
+export const streetPodFleet=(scene:T.Object3D,count:number,name:string)=>fleet(scene,streetPodParts(material('#ffffff'),new T.MeshStandardMaterial({color:'#f4f6f2',emissive:'#fff6e0',emissiveIntensity:0,roughness:.3}),new T.MeshStandardMaterial({color:'#b85a50',emissive:'#ff4a3a',emissiveIntensity:0,roughness:.3})),count,name);
 /** Gait per person (`gait` instance attribute, see `pedestrians`): x stride phase (rad), y swing (rad), z carried item (0 none,
  * 1 backpack, 2 shoulder bag), w seated 0..1. Legs swing about the hip and arms about the shoulder in the vertex shader, so a walk
  * costs no extra draws. Seated, the thigh folds forward at the hip (.58) and the shin back down at the knee (.26), so the figure sits
@@ -499,6 +503,12 @@ export const ROAD_HALF=[2.5,3.5] as const;
  * the piers. `lane`: each lane centre from the carriageway centre (Japan keeps
  * left); car bodies keep ≥ 0.3 m from every solid (tests/odaiba.test.ts). */
 export const CARRIAGEWAY=[{centre:.25,half:2.25,lane:1.25},{centre:-2.8,half:2.3,lane:1.15}] as const;
+/** DEV `?roadKit` (call before `mobility()`): the street kit's 7 m shared carriageway on the guideway avenue (lane centres −2.3 and −5.8 m, planter rims 1 m clear of car bodies)
+ * and its first crossing moved to `d`, so the street cars, crossers and stop lines follow the preview. Production values stay as they are. */
+export function useKitCarriageway(d:number){
+  (CARRIAGEWAY as unknown as {centre:number;half:number;lane:number}[])[1]={centre:-4.05,half:3.55,lane:1.75};
+  (CROSSINGS as unknown as {road:number;d:number;period:number}[])[0]={...CROSSINGS[0],d};
+}
 /** A lane's centre, metres along its own left (`up × travel direction`): lane 0 travels with the route, lane 1 against it. */
 export const laneOffset=(road:number,lane:number)=>{const {centre,lane:l}=CARRIAGEWAY[road];return lane?l-centre:centre+l;};
 /** The guideway avenue's junction mouth has no road surface in the environment (terrain shows between d 492 and 501): a strip of
@@ -670,8 +680,7 @@ export function mobility(scene:T.Scene) {
   for(let i=0;i<carSlots;i++)cars.tint(i,carBody,carColors[Math.floor(hash(i,16)*carColors.length)]);
   // Autonomous street pods take a car's slot as automation rises (podShare, as the aircraft): a rounded pale cabin under a wraparound
   // glass canopy and a thin mint roof line, the cars' 4.6 m length so the drop-off lamps still fit; a van slot becomes a cargo pod.
-  const podBody=material('#ffffff'),streetPods=fleet(scene,[part([1.8,1.3,4.6],[0,.8,0],podBody,.6),part([1.84,.62,3.5],[0,1.28,-.1],glass,.3),
-    part([.24,.04,2.8],[0,1.6,-.1],mint,.02),part([1.3,.1,.08],[0,.82,2.29],headlight,.03),part([1.3,.1,.08],[0,.82,-2.29],taillight,.03)],carSlots,'street-pods');
+  const podBody=material('#ffffff'),streetPods=fleet(scene,streetPodParts(podBody,headlight,taillight),carSlots,'street-pods');
   for(let i=0;i<carSlots;i++)streetPods.tint(i,podBody,carColors[Math.floor(hash(i,16)*4)]);
   // Drop-off cues per bay car: an amber indicator pair (front and rear corner, set on the signalled side) and a bright brake lamp over
   // the tail light; hidden when off.
