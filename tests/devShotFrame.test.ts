@@ -28,3 +28,6 @@ const outOfFrame=projectShotBox(new Box3(new Vector3(10,0,-3),new Vector3(12,1,-
 assert.ok(outOfFrame.left>1,'projection preserves off-screen bounds');
 assert.throws(()=>cityShotFrame(scene,camera,'invalid'));
 console.log('PASS: four-site tier mapping, projection, nine samples, visible subjects and first-hit occlusion.');
+import { stepMeters } from '../src/devMeters.ts';
+assert.deepEqual(devLayout(stepMeters({ nw: 0, ne: -1, sw: 2, se: 3 }, 'se', 1)).tiers, { nw: 0, ne: -1, sw: 2, se: 3 });
+assert.deepEqual(devLayout(stepMeters({ nw: 0, ne: -1, sw: 2, se: 3 }, 'ne', -1)).tiers, { nw: 0, ne: -2, sw: 2, se: 3 });

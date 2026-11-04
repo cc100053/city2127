@@ -224,6 +224,7 @@ try {
       return changes;
     };
     Object.assign(window,{cityMeters:(meters:string)=>playMeters(meters,now)});
+    import('./devShotPanel').then(({mountShotPanel})=>mountShotPanel(first.tiers,meters=>playMeters(meters,now),(window as unknown as {cityShot:(id:string)=>void}).cityShot));
     // `&metersTo=se:high&metersAge=8.3`: seconds since the live result; held `reviewTime` previews the settled headline shot.
     const to=params.get('metersTo');
     if(to!==null)playMeters(to,now-Number(params.get('metersAge')??1));
