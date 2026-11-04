@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { arc, bake, box, cream, faces, glass, leaf, leafyCrown, paint, shrubs, pink, sign, stone, trim, warm, type Kit } from '../cityRig.ts';
+import { arc, bake, box, faces, leaf, leafyCrown, paint, shrubs, warm, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import { ConcentrationDistrict, METER_COLORS } from '../districtMeters.ts';
 import type { Band } from '../surveyView.ts';
@@ -11,9 +11,14 @@ const DEFAULT_TARGET: ConcentrationTowerTarget = { band: 'mixed', functionModule
 const smoothstep = (t: number) => t * t * (3 - 2 * t);
 // Emissive and instance-colour-free, so the Meter amber reads day and night (publicLight x instance colour went white after dark).
 export const amber = new T.MeshStandardMaterial({ color: METER_COLORS.urbanConcentration, emissive: METER_COLORS.urbanConcentration, emissiveIntensity: .9, roughness: .5 });
-const timber = paint('#c99258', .62);
+const white = paint('#f4f2ec', .4), oak = paint('#d2a574', .6), dwood = paint('#b88c62', .6), fabric = paint('#d98d6c', .8), dark = paint('#4a5258', .5), pale = paint('#e8dcc0', .6);
+const bark = paint('#c99258', .62);
+const room = new T.MeshStandardMaterial({ color: '#ffe2b8', emissive: '#ffbf80', emissiveIntensity: .4, roughness: .7 });
+const light = new T.MeshStandardMaterial({ color: '#fff4dc', emissive: '#fff4dc', emissiveIntensity: 1.2, roughness: .5 });
+const lamp = new T.MeshStandardMaterial({ color: '#ffe3b4', emissive: '#ffc77a', emissiveIntensity: .8, roughness: .7, side: T.DoubleSide });
+const pane = new T.MeshStandardMaterial({ color: '#cfe6f2', roughness: .1, transparent: true, opacity: .14, depthWrite: false });
+const water = new T.MeshStandardMaterial({ color: '#7cc4ea', emissive: '#3a86b8', emissiveIntensity: .15, roughness: .25 });
 const unitBox = new T.BoxGeometry(1, 1, 1);
-const vaultGeometry = new T.CylinderGeometry(1, 1, 1, 20, 1, false, 0, Math.PI).rotateZ(Math.PI / 2);
 const crownGeometry = leafyCrown(1);
 const CABIN_LOW = 1.5, CABIN_HIGH = 36.5, CABIN_REST = 19, CABIN_PERIOD = 14;
 
@@ -55,88 +60,47 @@ type TowerGroups = {
   highModules: T.Group[];
 };
 
-/** One function module: a baked group that scales in from its own origin. */
-function addModule(parent: T.Group, name: string, x: number, y: number, z: number, angle: number, build: (group: T.Group) => void): T.Group {
+
+/** One function module: a baked group that scales in from its own origin; `build` may return extra objects (people) added after the bake. */
+function addModule(parent: T.Group, name: string, x: number, y: number, z: number, angle: number, build: (group: T.Group) => T.Object3D | void): T.Group {
   const group = new T.Group();
   group.name = name;
   group.position.set(x, y, z);
   group.rotation.y = angle;
   parent.add(group);
-  build(group);
+  const extra = build(group);
   group.add(...bake(group));
+  if (extra) group.add(extra);
   group.scale.setScalar(HIDDEN);
   group.visible = false;
   return group;
 }
 
-/** Street stall (front = local +Z): cream body, timber roof, glass counter, amber edge. */
-function stall(group: T.Group) {
-  box(group, [.9, .55, .7], [0, .275, 0], cream, .05);
-  box(group, [1, .08, .8], [0, .6, 0], timber, .03);
-  box(group, [.7, .3, .06], [0, .33, .36], glass, .02);
-  box(group, [.8, .05, .06], [0, .5, .38], amber, .02);
+/** Plain scaled unit box (cheap), optionally turned about Y. */
+function strip(parent: T.Object3D, material: T.Material, x: number, y: number, z: number, w: number, h: number, d: number, yaw = 0) {
+  const mesh = new T.Mesh(unitBox, material);
+  mesh.scale.set(w, h, d);
+  mesh.position.set(x, y, z);
+  mesh.rotation.y = yaw;
+  mesh.castShadow = true;
+  parent.add(mesh);
 }
 
 /** Mullions are plain scaled unit boxes: far cheaper than rounded boxes at this count. */
 export function slat(parent: T.Object3D, size: [number, number, number], position: [number, number, number], material: T.Material) {
-  const mesh = new T.Mesh(unitBox, material);
-  mesh.scale.set(...size);
+  strip(parent, material, ...position, ...size);
+}
+
+/** One-sided plane: seen only from the side its normal faces, so a near wall never hides the room behind it. */
+function plane(parent: T.Object3D, material: T.Material, w: number, h: number, position: [number, number, number], rotX: number, rotY: number) {
+  const mesh = new T.Mesh(new T.PlaneGeometry(w, h), material);
   mesh.position.set(...position);
-  mesh.castShadow = true;
-  parent.add(mesh);
-}
-
-/** Ground-floor shopfront: warm backing with a narrower glass pane, so the interior still reads warm. */
-function front(g: T.Group, across: number, out: number, y: number, h: number) {
-  box(g, [across, h, .06], [0, y, out + .02], warm, .02);
-  box(g, [across * .6, h * .66, .05], [0, y, out + .06], glass, .02);
-  box(g, [across, .06, .07], [0, y + h / 2, out + .05], amber, .02);
-}
-
-/** Pavilion shopfront: a big warm lit pane between cream piers, trim mullions every .6, lintel, sill and a timber awning; no glass, so it never mirrors the sky blue. */
-function shopfront(g: T.Group, across: number, out: number, y: number, h: number) {
-  box(g, [across, h, .05], [0, y, out + .03], warm, .01);
-  for (let x = -across / 2 + .6; x < across / 2 - .1; x += .6) slat(g, [.05, h, .07], [x, y, out + .07], trim);
-  box(g, [across + .2, .12, .12], [0, y + h / 2 + .06, out + .06], trim, .03);
-  box(g, [across + .2, .1, .14], [0, y - h / 2 - .05, out + .07], trim, .03);
-  box(g, [across + .3, .06, .5], [0, y + h / 2 + .2, out + .25], timber, .02);
-}
-
-/** Upper-floor window: warm backing, thick cream sill and trim mullions every .9; no glass, so it never mirrors the sky. */
-function bay(g: T.Group, across: number, out: number, y: number, h: number, mullions = true) {
-  box(g, [across, h, .05], [0, y, out + .02], warm, .01);
-  box(g, [across + .1, .22, .12], [0, y - h / 2 - .08, out + .04], cream, .03);
-  if (mullions) for (let x = -across / 2 + .45; x < across / 2 - .1; x += .9) slat(g, [.06, h, .08], [x, y, out + .06], trim);
-}
-
-/** Amber eave lines on a roof's camera-facing (-Z, -X) edges. */
-function eave(parent: T.Object3D, x: number, y: number, z: number, w: number, d: number) {
-  box(parent, [w, .1, .1], [x, y, z - d / 2 + .05], amber, .02);
-  box(parent, [.1, .1, d], [x - w / 2 + .05, y, z], amber, .02);
-}
-
-/** Low pavilion body with shopfronts on the camera-facing (-Z, -X) sides. */
-function kiosk(parent: T.Object3D, x: number, z: number, w: number, d: number, h: number): T.Group {
-  const g = new T.Group();
-  g.position.set(x, 0, z);
-  parent.add(g);
-  box(g, [w, h, d], [0, h / 2, 0], cream, .08);
-  faces(g, w, d, (f, a, out) => shopfront(f, a - 1, out, h / 2 - .05, h - .55), [2, 3]);
-  return g;
-}
-
-/** Half-cylinder timber roof; the long axis runs along X (or Z when `turn` is a quarter turn). */
-function vault(parent: T.Object3D, x: number, y: number, z: number, len: number, span: number, rise: number, turn = 0) {
-  const mesh = new T.Mesh(vaultGeometry, timber);
-  mesh.position.set(x, y, z);
-  mesh.rotation.y = turn;
-  mesh.scale.set(len, rise, span / 2);
-  mesh.castShadow = true;
+  mesh.rotation.set(rotX, rotY, 0);
   parent.add(mesh);
 }
 
 export function tree(parent: T.Object3D, x: number, y: number, z: number, s: number) {
-  box(parent, [.08, .5 * s, .08], [x, y + .25 * s, z], timber, .02);
+  box(parent, [.08, .5 * s, .08], [x, y + .25 * s, z], bark, .02);
   const crown = new T.Mesh(crownGeometry, leaf);
   crown.position.set(x, y + s, z);
   crown.scale.setScalar(s);
@@ -144,61 +108,165 @@ export function tree(parent: T.Object3D, x: number, y: number, z: number, s: num
   parent.add(crown);
 }
 
-/** Covered walk between two ground points: stone strip, thin roof plate 2.4 up, posts every 1.6, optionally low planters with small trees. */
-function walk(parent: T.Object3D, [x0, z0]: [number, number], [x1, z1]: [number, number], planted = false) {
-  const dx = x1 - x0, dz = z1 - z0, len = Math.hypot(dx, dz) + 1.2;
-  const g = new T.Group();
-  g.position.set((x0 + x1) / 2, 0, (z0 + z1) / 2);
-  g.rotation.y = Math.atan2(dx, dz);
-  parent.add(g);
-  box(g, [1.2, .05, len], [0, .025, 0], stone, .02);
-  for (const e of [-.65, .65]) box(g, [.1, .06, len], [e, .03, 0], pink, .02);
-  box(g, [1.5, .1, len], [0, 2.4, 0], cream, .03);
-  box(g, [.08, .03, len - .2], [0, 2.335, 0], amber, .01);
-  for (let t = -len / 2 + .3; t <= len / 2 - .2; t += 1.6) for (const s of [-.7, .7]) box(g, [.08, 2.4, .08], [s, 1.2, t], trim, .02);
-  if (!planted || len < 2.5) return;
-  for (const s of [-1.05, 1.05]) box(g, [.35, .3, len - 1.4], [s, .15, 0], leaf, .08);
-  for (let t = -len / 2 + 1; t < len / 2 - .8; t += 2.4) tree(g, t % 4.8 ? -1.05 : 1.05, .3, t, .6);
+const bush = (parent: T.Object3D, x: number, y: number, z: number, s: number) => {
+  const mesh = new T.Mesh(crownGeometry, leaf);
+  mesh.position.set(x, y + s * .75, z);
+  mesh.scale.set(s, s * .7, s);
+  mesh.castShadow = true;
+  parent.add(mesh);
+};
+
+/** Glazed warm rooms: slab, lit ceiling, one-sided warm inner walls, thin mullions, optional corner columns, amber slab edge and roof. */
+function glazed(g: T.Group, cx: number, y0: number, cz: number, w: number, d: number, h: number, o: { columns?: boolean; amber?: boolean; roof?: boolean } = {}) {
+  const t = .22, q = new T.Group();
+  q.position.set(cx, y0, cz);
+  g.add(q);
+  box(q, [w + .12, t, d + .12], [0, t / 2, 0], white, .03);
+  if (o.roof) box(q, [w + .24, .2, d + .24], [0, h + .1, 0], white, .04);
+  plane(q, lamp, w - .3, d - .3, [0, h - .02, 0], Math.PI / 2, 0);
+  faces(q, w, d, (f, a, out) => {
+    plane(f, room, a - .3, h - t - .08, [0, (h + t) / 2, out - .1], 0, Math.PI);
+    const n = Math.max(2, Math.round(a / 1.15));
+    for (let i = 0; i <= n; i++) strip(f, white, -a / 2 + a * i / n, (h + t) / 2, out + .01, .06, h - t, .07);
+    strip(f, white, 0, h - .04, out + .01, a, .07, .08);
+    if (o.amber) strip(f, amber, 0, .06, out + .09, a + .12, .09, .06);
+    if (o.roof) strip(f, amber, 0, h + .03, out + .14, a + .24, .05, .06);
+  });
+  if (o.columns) for (const sx of [-1, 1]) for (const sz of [-1, 1]) strip(q, white, sx * w / 2, h / 2, sz * d / 2, .16, h, .16);
 }
 
-const personGeometry = mergeGeometries([new T.BoxGeometry(.2, .5, .14).translate(0, .25, 0), new T.BoxGeometry(.15, .15, .15).translate(0, .58, 0)])!;
-const shirts = ['#efe6d0', '#ffffff', '#b9d3e6', '#c9955a', '#d8c7a8'].map(c => new T.Color(c));
-/** One instanced crowd in light clothes (instance colour over `cream`), placed [x, z, seated]; add it after the group's bake so it stays one mesh. */
-const crowd = (spots: [number, number, boolean?][]) => {
-  const mesh = new T.InstancedMesh(personGeometry, cream, spots.length);
-  mesh.name = 'tower-crowd';
-  mesh.castShadow = true;
-  spots.forEach(([x, z, seated], i) => {
-    mesh.setMatrixAt(i, new T.Matrix4().makeRotationY(i * 2.4).setPosition(x, seated ? .34 : 0, z));
-    mesh.setColorAt(i, shirts[i % shirts.length]);
-  });
-  return mesh;
-};
+/** Hovering roof disc on a short collar with emissive light rings; `y` is the roof top. */
+function emitter(g: T.Object3D, x: number, y: number, z: number, R: number) {
+  arc(g, 0, .5, .45, [x, y, z], white);
+  arc(g, .45, .6, .07, [x, y + .1, z], light);
+  arc(g, .42, .58, .05, [x, y + .4, z], light);
+  arc(g, 0, R, .2, [x, y + .45, z], white);
+  arc(g, R - .1, R, .1, [x, y + .65, z], white);
+  arc(g, 0, R * .5, .1, [x, y + .65, z], white);
+}
 
-/** Outdoor cafe set: cream table and two timber chairs along X. */
-const cafe = (parent: T.Object3D, x: number, z: number) => {
-  box(parent, [.55, .05, .55], [x, .5, z], cream, .02);
-  box(parent, [.08, .48, .08], [x, .25, z], cream, .02);
-  for (const s of [-.5, .5]) {
-    box(parent, [.28, .05, .28], [x + s, .3, z], timber, .02);
-    box(parent, [.28, .3, .04], [x + s, .47, z + .12], timber, .02);
-    box(parent, [.05, .28, .05], [x + s, .14, z], timber, .01);
+// People: separate head, torso, arms and legs; shirt vertices are white so the instance colour tints them.
+const tint = (geometry: T.BufferGeometry, hex: string) => {
+  const c = new T.Color(hex), n = geometry.attributes.position.count;
+  geometry.setAttribute('color', new T.Float32BufferAttribute(Array.from({ length: n * 3 }, (_, i) => [c.r, c.g, c.b][i % 3]), 3));
+  return geometry;
+};
+const bx = (w: number, h: number, d: number, x: number, y: number, z: number, hex: string) => tint(new T.BoxGeometry(w, h, d).translate(x, y, z), hex);
+const head = (y: number) => tint(new T.SphereGeometry(.075, 10, 8).translate(0, y, 0), '#e0b08c');
+const standingGeometry = mergeGeometries([head(.555), bx(.2, .27, .12, 0, .385, 0, '#fff'), bx(.05, .24, .07, -.125, .39, 0, '#fff'), bx(.05, .24, .07, .125, .39, 0, '#fff'),
+  bx(.08, .25, .09, -.05, .125, 0, '#454c55'), bx(.08, .25, .09, .05, .125, 0, '#454c55')])!;
+const seatedGeometry = mergeGeometries([head(.575), bx(.2, .27, .12, 0, .405, 0, '#fff'), bx(.05, .24, .07, -.125, .41, 0, '#fff'), bx(.05, .24, .07, .125, .41, 0, '#fff'),
+  bx(.08, .08, .22, -.05, .23, .11, '#454c55'), bx(.08, .08, .22, .05, .23, .11, '#454c55'), bx(.08, .22, .08, -.05, .11, .21, '#454c55'), bx(.08, .22, .08, .05, .11, .21, '#454c55')])!;
+const personMaterial = new T.MeshStandardMaterial({ vertexColors: true, roughness: .7 });
+const shirts = ['#ffffff', '#f1e9d6', '#bcd8ee', '#f2c7b0', '#cfe6c9', '#e6d3f0'].map(c => new T.Color(c));
+type P = [x: number, y: number, z: number, seated?: boolean, yaw?: number];
+/** Standing and seated residents as two instanced meshes; add after the group's bake. */
+const crowd = (spots: P[]) => {
+  const group = new T.Group();
+  group.name = 'tower-crowd';
+  for (const seated of [false, true]) {
+    const list = spots.filter(s => !!s[3] === seated);
+    if (!list.length) continue;
+    const mesh = new T.InstancedMesh(seated ? seatedGeometry : standingGeometry, personMaterial, list.length);
+    mesh.castShadow = true;
+    list.forEach(([x, y, z, , yaw], i) => {
+      mesh.setMatrixAt(i, new T.Matrix4().makeRotationY(yaw ?? i * 2.4).setPosition(x, y, z));
+      mesh.setColorAt(i, shirts[(i + (seated ? 2 : 0)) % shirts.length]);
+    });
+    group.add(mesh);
   }
+  return group;
 };
 
-const bench = (parent: T.Object3D, x: number, z: number) => {
-  box(parent, [1.2, .12, .3], [x, .3, z], timber, .02);
-  for (const s of [-.45, .45]) box(parent, [.06, .26, .24], [x + s, .13, z], trim, .02);
+const table = (g: T.Object3D, x: number, y: number, z: number) => { strip(g, oak, x, y + .36, z, .62, .04, .5); strip(g, white, x, y + .17, z, .06, .34, .06); };
+const chair = (g: T.Object3D, x: number, y: number, z: number) => { strip(g, pale, x, y + .24, z, .28, .04, .28); strip(g, white, x, y + .11, z, .05, .22, .05); };
+const shelf = (g: T.Object3D, x: number, y: number, z: number, len: number, yaw: number) => {
+  const s = new T.Group();
+  s.position.set(x, y, z);
+  s.rotation.y = yaw;
+  g.add(s);
+  strip(s, dwood, 0, .5, 0, len, 1, .26);
+  for (const yy of [.28, .58, .88]) strip(s, pale, 0, yy, 0, len - .1, .05, .28);
+};
+const bench = (g: T.Object3D, x: number, z: number, yaw = 0) => {
+  const s = new T.Group();
+  s.position.set(x, 0, z);
+  s.rotation.y = yaw;
+  g.add(s);
+  strip(s, oak, 0, .27, 0, 1.2, .06, .3);
+  for (const k of [-.5, .5]) strip(s, white, k, .12, 0, .06, .24, .24);
+};
+const planter = (g: T.Object3D, x: number, y: number, z: number, w: number, d: number) => {
+  strip(g, white, x, y + .15, z, w, .3, d);
+  strip(g, leaf, x, y + .31, z, w - .1, .06, d - .1);
+  for (let i = 0; i < Math.max(2, Math.round(w / .45)); i++) bush(g, x - w / 2 + .3 + i * .45, y + .33, z, .26);
 };
 
-// The geometry rests on y = 0 (instances are placed by their centre), so lot bounds can be read without instance matrices.
-const ring = (radius: number, tube: number, spots: [number, number, number][]) => {
+/** Fit-out of one glazed room (`y` = floor top): six kinds so floors differ; returns the people it seats. */
+function furnish(g: T.Object3D, kind: number, w: number, cx: number, y: number, cz: number): P[] {
+  const e = w / 2 - .25, X = (x: number) => cx + x, Z = (z: number) => cz + z;
+  const desk = (x: number, z: number) => { strip(g, oak, X(x), y + .36, Z(z), .9, .04, .5); strip(g, dark, X(x), y + .48, Z(z) - .12, .3, .2, .03); strip(g, white, X(x) - .4, y + .17, Z(z), .05, .34, .4); strip(g, white, X(x) + .4, y + .17, Z(z), .05, .34, .4); };
+  const seat = (x: number, z: number, yaw: number): P => [X(x), y, Z(z), true, yaw];
+  switch (kind % 6) {
+    case 0:
+      desk(-.8, -.6); desk(.8, -.6); desk(0, .7);
+      chair(g, X(-.8), y, Z(-.1)); chair(g, X(.8), y, Z(-.1)); chair(g, X(0), y, Z(1.2));
+      return [seat(-.8, -.1, Math.PI), seat(.8, -.1, Math.PI), [X(.2), y, Z(.1)]];
+    case 1:
+      shelf(g, X(e), y, Z(0), w - 1.2, Math.PI / 2); shelf(g, X(-e), y, Z(0), w - 1.2, Math.PI / 2); shelf(g, X(0), y, Z(e), w - 1.2, 0);
+      table(g, X(-.2), y, Z(-.4)); chair(g, X(-.7), y, Z(-.4)); chair(g, X(.3), y, Z(-.4));
+      return [seat(-.7, -.4, Math.PI / 2), seat(.3, -.4, -Math.PI / 2), [X(e - .6), y, Z(.5)]];
+    case 2:
+      strip(g, white, X(0), y + .25, Z(e - .2), w - 1.6, .5, .4); strip(g, oak, X(0), y + .52, Z(e - .2), w - 1.5, .04, .45);
+      for (const [x, z] of [[-.9, -.6], [.8, -.7], [-.2, .35]]) { table(g, X(x), y, Z(z)); chair(g, X(x - .5), y, Z(z)); chair(g, X(x + .5), y, Z(z)); }
+      return [seat(-1.4, -.6, Math.PI / 2), seat(1.3, -.7, -Math.PI / 2), [X(-.4), y, Z(e - .7)], seat(.3, .35, -Math.PI / 2)];
+    case 3:
+      planter(g, X(0), y, Z(e - .2), w - 1.2, .45); planter(g, X(e - .2), y, Z(-.2), 1.4, .45);
+      bench(g, X(-.3), Z(-.6)); tree(g, X(-e + .3), y, Z(e - .3), .35);
+      return [[X(-.3 - .3), y, Z(-.6), true, Math.PI], [X(-.3 + .3), y, Z(-.6), true, Math.PI], [X(.7), y, Z(.3)]];
+    case 4:
+      strip(g, dark, X(0), y + .35, Z(e - .2), 1.4, .7, .3);
+      for (const x of [-.9, .8]) { strip(g, dark, X(x), y + .2, Z(-.4), .3, .4, 1); strip(g, fabric, X(x + .6), y + .02, Z(-.4), .5, .04, 1.1); }
+      return [[X(-.2), y, Z(.2)], [X(.5), y, Z(.5)], [X(.8), y + .4, Z(-.4), true, Math.PI]];
+    default:
+      strip(g, white, X(.6), y + .25, Z(.2), 1.4, .5, .6); strip(g, oak, X(.6), y + .52, Z(.2), 1.5, .04, .65);
+      strip(g, fabric, X(-e + .3), y + .2, Z(0), .55, .4, 1.7); strip(g, fabric, X(-e + .05), y + .45, Z(0), .12, .5, 1.7);
+      chair(g, X(.3), y, Z(-.5)); chair(g, X(.9), y, Z(-.5));
+      return [seat(.3, -.5, Math.PI), seat(.9, -.5, Math.PI), [X(-.4), y, Z(.9)]];
+  }
+}
+
+/** Plant + one resident: a function module's fit-out. */
+const fitout = (g: T.Group, x: number, y: number, z: number): T.Object3D => {
+  planter(g, x, y, z, .8, .4);
+  return crowd([[x + .7, y, z + .1]]);
+};
+
+/** Meter ring(s); each spot is [x, y, z, scale]. The geometry rests on y = 0 (instances are placed by their base), so lot bounds can be read without instance matrices. */
+const ring = (radius: number, tube: number, spots: [number, number, number, number?][]) => {
   const mesh = new T.InstancedMesh(new T.TorusGeometry(radius, tube, 8, 48).rotateX(Math.PI / 2).translate(0, tube, 0), amber, spots.length);
   mesh.name = 'tower-meter-band';
-  spots.forEach(([x, y, z], i) => mesh.setMatrixAt(i, new T.Matrix4().makeTranslation(x, y - tube, z)));
+  spots.forEach(([x, y, z, s = 1], i) => mesh.setMatrixAt(i, new T.Matrix4().makeScale(s, s, s).setPosition(x, y - tube * s, z)));
   return mesh;
 };
 
+/** Glazed warm cylinder pavilion: floor, white roof, lit ceiling, warm far wall (the camera looks in through the open near half), mullions all round, lawn ring. */
+function drum(g: T.Group, x: number, z: number, r: number, H: number) {
+  const q = new T.Group();
+  q.position.set(x, 0, z);
+  g.add(q);
+  arc(q, 0, r + .05, .12, [0, 0, 0], white);
+  arc(q, 0, r + .1, .18, [0, H, 0], white);
+  arc(q, 0, r - .08, .04, [0, H - .04, 0], lamp);
+  arc(q, r - .14, r - .1, H - .14, [0, .12, 0], room, -Math.PI / 4 - .65 * Math.PI, 1.3 * Math.PI);
+  arc(q, r - .04, r + .02, .06, [0, H - .08, 0], white);
+  arc(q, r + .05, r + .6, .08, [0, 0, 0], leaf);
+  for (let i = 0, n = Math.round(r * 6); i < n; i++) bush(q, Math.cos(i / n * 6.283) * (r + .3), .08, Math.sin(i / n * 6.283) * (r + .3), .26);
+  for (let i = 0, n = Math.round(Math.PI * 2 * r / .55); i < n; i++) {
+    const a = i / n * Math.PI * 2;
+    strip(q, white, r * Math.cos(a), (H + .12) / 2, r * Math.sin(a), .05, H - .12, .06, Math.PI / 2 - a);
+  }
+}
 class ConcentrationTowerController implements ConcentrationTowerRuntime {
   private readonly parts: Part[];
   private readonly elevator: T.Group;
@@ -296,7 +364,21 @@ class ConcentrationTowerController implements ConcentrationTowerRuntime {
   }
 }
 
-export function buildConcentrationTower(scene: T.Scene, kit: Kit): ConcentrationTowerBuiltSite {
+const FACE_CAM = -3 * Math.PI / 4; // yaw that turns a resident to face the -X/-Z camera
+/** Glazed lift cabin: white frame, warm-lit inside (origin on its floor). */
+const cabinParts = (g: T.Object3D) => {
+  strip(g, warm, 0, 1, 0, 1, 1.7, 1);
+  for (const y of [.06, 1.9]) strip(g, white, 0, y, 0, 1.2, .12, 1.2);
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) strip(g, white, sx * .55, 1, sz * .55, .08, 1.8, .08);
+};
+/** Open lift shaft frame: white posts, rails every `step`, faint glazing on three faces. */
+const shaft = (g: T.Object3D, x: number, z: number, h: number, step: number) => {
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) strip(g, white, x + sx * .7, h / 2, z + sz * .7, .12, h, .12);
+  for (let y = .04; y <= h; y += step) strip(g, white, x, y, z, 1.4, .08, 1.4);
+  strip(g, pane, x, h / 2, z - .7, 1.4, h, .02); strip(g, pane, x - .7, h / 2, z, .02, h, 1.4); strip(g, pane, x + .7, h / 2, z, .02, h, 1.4);
+};
+
+export function buildConcentrationTower(scene: T.Scene, _kit: Kit): ConcentrationTowerBuiltSite {
   const root = createSiteRoot(scene, 'se');
   const towerBaseLayer = createSiteLayer(root, siteLayerDefinition('centerGaiRear', 'towerBase'));
   const towerUpperLayer = createSiteLayer(root, siteLayerDefinition('centerGaiRear', 'towerUpper'));
@@ -304,161 +386,179 @@ export function buildConcentrationTower(scene: T.Scene, kit: Kit): Concentration
   const towerBase = towerBaseLayer.group;
   const towerUpper = towerUpperLayer.group;
 
-  // 0: a cream mid-rise with three stepped, planted setbacks, pushed to the lot's +X/+Z corner so the court sits on the camera side.
+  // 0: one slender glazed tower, two low glazed wings under hovering discs, a bridge, an escalator and a lift.
+  const MX = .5, MZ = .5, TW = 4.6, FH = 2.4, SL = .22;
   const base = new T.Group();
   base.name = 'tower-mid-rise-hall';
   towerBase.add(base);
-  const body = new T.Group();
-  body.position.set(2.2, 0, 2.2);
-  base.add(body);
-  const tiers: [number, number, number][] = [[7, 0, 11], [6, 11, 13], [5, 13, 15], [4, 15, 17]];
-  for (const [w, y0, y1] of tiers) {
-    box(body, [w, y1 - y0, w], [0, (y0 + y1) / 2, 0], cream, .12);
-    for (let y = y0 ? y0 + .9 : 3.4; y < y1 - .3; y += 1.5) faces(body, w, w, (f, a, out, side) => bay(f, a - 1.2, out, y, .55, side > 1));
-    if (y1 === 17) continue;
-    for (const s of [-1, 1]) {
-      box(body, [w - .3, .28, .3], [0, y1 + .14, s * (w / 2 - .22)], leaf, .08);
-      box(body, [.3, .28, w - .3], [s * (w / 2 - .22), y1 + .14, 0], leaf, .08);
-      for (const t of [-1, 1]) tree(body, s * (w / 2 - .5), y1 + .1, t * (w / 2 - .5), .35);
-    }
-    shrubs(body, w / 2 - .3, y1 + .2, 0, Math.PI * 2, 14);
+  const mixedPeople: P[] = [];
+  for (let k = 0; k < 6; k++) {
+    glazed(base, MX, k * FH, MZ, TW, TW, FH, { columns: true, amber: k % 2 === 1 });
+    mixedPeople.push(...furnish(base, k, TW - .4, MX, k * FH + SL, MZ));
   }
-  faces(body, 7, 7, (f, a, out) => front(f, a - 1, out, .8, 1.2));
-  faces(body, 7, 7, (f, a, out) => { for (const s of [-1, 1]) box(f, [.3, 9, .08], [s * (a / 2 - .5), 6, out + .04], amber, .02); }, [2, 3]);
-  faces(body, 7, 7, (f, _a, out) => sign(f, kit, '都市集約 / 2127', 0, 2, out, 3.4, .6, '#527789'), [2]);
-  box(body, [3.8, .2, 3.8], [0, 17.1, 0], leaf, .08);
-  shrubs(body, 1.3, 17.2, 0, Math.PI * 2, 12);
-  for (const x of [-1, 1]) for (const z of [-1, 1]) tree(body, x, 17.2, z, .7);
+  box(base, [TW + .12, SL, TW + .12], [MX, 6 * FH + SL / 2, MZ], white, .03);
+  for (const s of [-1, 1]) {
+    strip(base, white, MX, 6 * FH + .4, MZ + s * (TW / 2 - .05), TW, .4, .1);
+    strip(base, white, MX + s * (TW / 2 - .05), 6 * FH + .4, MZ, .1, .4, TW);
+  }
+  strip(base, leaf, MX, 6 * FH + .35, MZ, TW - .2, .2, TW - .2);
+  const roof = new T.Group();
+  roof.position.set(MX, 0, MZ);
+  base.add(roof);
+  shrubs(roof, 1.7, 6 * FH + .45, 0, Math.PI * 2, 12);
+  shrubs(roof, .8, 6 * FH + .45, 0, Math.PI * 2, 6);
+  for (const [x, z] of [[1.2, 1.2], [-1.2, 1.2], [1.2, -1.2], [-1.3, -1.1], [0, 0]]) tree(roof, x, 6 * FH + .45, z, .75);
+  for (const k of [2, 4]) { // planted balcony edges on the -Z and -X faces
+    strip(base, white, MX, k * FH + .3, MZ - TW / 2 - .3, TW, .12, .5); strip(base, leaf, MX, k * FH + .42, MZ - TW / 2 - .3, TW - .1, .12, .4);
+    strip(base, white, MX - TW / 2 - .3, k * FH + .3, MZ, .5, .12, TW); strip(base, leaf, MX - TW / 2 - .3, k * FH + .42, MZ, .4, .12, TW - .1);
+    for (let i = 0; i < 4; i++) { bush(base, MX - TW / 2 + .5 + i, k * FH + .48, MZ - TW / 2 - .3, .25); bush(base, MX - TW / 2 - .3, k * FH + .48, MZ - TW / 2 + .5 + i, .25); }
+  }
+  shaft(base, -2.5, 2.1, 6 * FH, FH);
+  const cabin = new T.Group();
+  cabin.position.set(-2.5, 4.7, 2.1);
+  cabinParts(cabin);
+  base.add(cabin);
+  // Escalator on the -Z face: white side walls, dark tread, faint balustrade, rising to the floor-2 slab.
+  const eStart = new T.Vector3(-.9, 0, -5.7), eEnd = new T.Vector3(-.9, 2 * FH, -1.9);
+  const eLen = eStart.distanceTo(eEnd), eAng = Math.atan2(eEnd.y - eStart.y, eEnd.z - eStart.z);
+  const esc = new T.Group();
+  esc.position.copy(eStart.clone().add(eEnd).multiplyScalar(.5)).y += .1;
+  esc.rotation.x = -eAng;
+  base.add(esc);
+  for (const s of [-.45, .45]) { strip(esc, white, s, .35, 0, .08, .5, eLen); strip(esc, pane, s, .8, 0, .02, .5, eLen); }
+  strip(esc, dark, 0, .12, 0, .8, .05, eLen);
+  for (const t of [.2, .4, .62, .85]) { const p = eStart.clone().lerp(eEnd, t); mixedPeople.push([p.x, p.y + .24, p.z, false, 0]); }
   base.add(...bake(base));
-  base.add(ring(2.3, .08, [[2.2, 18.2, 2.2]]));
+  base.add(ring(2.6, .05, [[MX, 16.7, MZ]]));
+  base.add(crowd(mixedPeople));
 
-  // -1: four pavilions filling the lot, two of them two-storey, on a planted covered S-walk with stalls and a crowd.
+  // -1: six round single-storey pavilions with hovering emitter discs, an S-shaped raised walkway, water, lawns and residents.
   const pavilions = new T.Group();
   pavilions.name = 'tower-low-pavilion-pair';
   towerBase.add(pavilions);
-  kiosk(pavilions, -3.6, -3.6, 5.2, 4.2, 1.8);
-  vault(pavilions, -3.6, 1.8, -3.6, 5.4, 4.4, 1.9);
-  eave(pavilions, -3.6, 1.85, -3.6, 5.4, 4.4);
-  const garden = kiosk(pavilions, 3.9, -3.7, 4.6, 4, 1.7);
-  box(garden, [4.8, .16, 4.2], [0, 1.78, 0], trim, .04);
-  box(garden, [3.8, 1.4, 3.2], [0, 2.56, 0], cream, .06);
-  faces(garden, 3.8, 3.2, (f, a, out) => shopfront(f, a - 1, out, 2.5, .8), [2, 3]);
-  box(garden, [4.4, .26, 3.8], [0, 3.39, 0], leaf, .05);
-  shrubs(garden, 1.6, 3.5, 0, Math.PI * 2, 12);
-  tree(garden, .9, 3.5, .5, .3);
-  tree(garden, -1.1, 3.5, -.3, .3);
-  eave(garden, 0, 1.78, 0, 4.8, 4.2);
-  const tall = kiosk(pavilions, -3.8, 3.6, 4.2, 3.4, 1.7);
-  box(tall, [3.6, 1.3, 2.8], [0, 2.35, 0], cream, .06);
-  faces(tall, 3.6, 2.8, (f, a, out) => shopfront(f, a - .9, out, 2.3, .8), [2, 3]);
-  box(pavilions, [5.6, .2, 4.8], [-3.8, 3.1, 3.6], trim, .04);
-  for (const z of [-2.4, 2.4]) box(pavilions, [5.6, .07, .08], [-3.8, 3.23, 3.6 + z], amber, .02);
-  for (const x of [-2.8, 2.8]) box(pavilions, [.08, .07, 4.8], [-3.8 + x, 3.23, 3.6], amber, .02);
-  kiosk(pavilions, 4.2, 3.8, 3.4, 3, 1.5);
-  vault(pavilions, 4.2, 1.5, 3.8, 3.6, 3.2, 1.6);
-  eave(pavilions, 4.2, 1.55, 3.8, 3.6, 3.2);
-  const path: [number, number][] = [[.2, -6.3], [.2, -1.8], [1.4, -.3], [1.4, .8], [.2, 2], [.2, 6.3]];
-  for (let i = 1; i < path.length; i++) walk(pavilions, path[i - 1], path[i], true);
-  bench(pavilions, -3, -.2);
-  bench(pavilions, 4.4, -.3);
-  for (const [x, z] of [[-5.3, -6.25], [-3.6, -6.35], [-1.9, -6.25], [3.3, -6.3]]) cafe(pavilions, x, z);
-  for (const x of [-5.2, 5.2]) box(pavilions, [2, .3, .4], [x, .15, -1], leaf, .08);
-  for (const [x, z, k] of [[-6.2, .1, .6], [6.2, .2, .6], [-4.8, .4, .65], [5.4, .5, .65], [-6.2, -.9, .4], [6.3, -1, .4]]) tree(pavilions, x, 0, z, k);
+  const PH = 1.6;
+  const spots: [number, number, number][] = [[-4.2, -4.4, 2], [4.2, -4.4, 2], [-4.7, .4, 1.6], [4.7, .4, 1.6], [-4.7, 4.8, 1.6], [4.7, 4.8, 1.6]];
+  const uv = (u: number, v: number): [number, number] => [(u - v) * .7071, (u + v) * .7071];
+  const lowPeople: P[] = [];
+  const seams: [number, number, number, number][] = [];
+  spots.forEach(([x, z, r]) => {
+    drum(pavilions, x, z, r, PH);
+    emitter(pavilions, x, PH + .18, z, r + .6);
+    seams.push([x, PH - .02, z, r + .08]);
+    const at = (u: number, v: number): [number, number] => { const [a, b] = uv(u, v); return [x + a, z + b]; };
+    const piece = (u: number, v: number, fn: (s: T.Group) => void) => { const [a, b] = at(u, v); const s = new T.Group(); s.position.set(a, .12, b); s.rotation.y = Math.PI / 4; pavilions.add(s); fn(s); };
+    piece(.55 * r, .5 * r, s => { strip(s, white, 0, .25, 0, 1.3, .5, .4); strip(s, oak, 0, .52, 0, 1.4, .04, .45); });
+    shelf(pavilions, ...((): [number, number, number, number, number] => { const [a, b] = at(r - .4, -.5 * r); return [a, .12, b, 1.2, Math.PI / 4]; })());
+    shelf(pavilions, ...((): [number, number, number, number, number] => { const [a, b] = at(r - .4, .15 * r); return [a, .12, b, 1, Math.PI / 4]; })());
+    for (const [u, v] of [[.15 * r, -.3 * r], [-.1 * r, .35 * r]]) {
+      const [a, b] = at(u, v);
+      table(pavilions, a, .12, b); chair(pavilions, a - .45, .12, b); chair(pavilions, a + .45, .12, b);
+      lowPeople.push([a - .45, .12, b, true, Math.PI / 2], [a + .45, .12, b, true, -Math.PI / 2]);
+    }
+    const [sx, sz] = at(.55 * r - .5, .5 * r);
+    lowPeople.push([sx, .12, sz]);
+  });
+  // Walkway: a 1.0 wide white slab at y 1.1 on thin columns, amber centre line.
+  const curve = new T.CatmullRomCurve3([[.2, 0, -6.5], [.6, 0, -4.5], [-.4, 0, -1.6], [.4, 0, 1.5], [-.3, 0, 4], [0, 0, 6.5]].map(p => new T.Vector3(...p)));
+  const pts = curve.getSpacedPoints(36);
+  pts.forEach((p, i) => {
+    if (!i) return;
+    const a = pts[i - 1], dx = p.x - a.x, dz = p.z - a.z, len = Math.hypot(dx, dz) + .08, yaw = Math.atan2(dx, dz), mx = (p.x + a.x) / 2, mz = (p.z + a.z) / 2;
+    strip(pavilions, white, mx, 1.06, mz, 1, .12, len, yaw);
+    strip(pavilions, amber, mx, 1.13, mz, .08, .02, len, yaw);
+    if (i % 3 === 0) for (const s of [-.4, .4]) strip(pavilions, white, mx + Math.cos(yaw) * s, .5, mz - Math.sin(yaw) * s, .05, 1, .05);
+  });
+  const onWalk = (t: number): P => { const p = curve.getPointAt(t); return [p.x, 1.12, p.z]; };
+  // Water channel crossing under the walkway, with pale curbs.
+  strip(pavilions, water, 0, .05, -1.65, 13.8, .06, .8);
+  for (const s of [-.45, .45]) strip(pavilions, white, 0, .07, -1.65 + s, 13.8, .1, .08);
+  for (const s of [-1, 1]) { // hedged beds with terraced planting at the back (3 steps)
+    for (const [i, [w, d]] of [[1.2, 2], [1, 1.6], [.8, 1.2]].entries()) strip(pavilions, leaf, s * 1.55, .1 + i * .2, 5.9, w, .2 + i * .0, d);
+    for (const x of [-.3, .3]) bush(pavilions, s * 1.55 + x, .65, 5.9, .28);
+  }
+  for (const [x, z, k] of [[-6.1, -1.9, .55], [6.1, -1.9, .55], [-1.8, -6.3, .5], [1.9, -6.3, .5], [-1.8, -3.2, .5], [2, -3.2, .5], [-1.9, 1.7, .5], [2, 1.7, .5], [-6.1, 2.6, .5], [6.1, 2.6, .5], [-1.8, 3.4, .45], [2.1, 3.5, .45], [-6.1, 6.2, .5], [6.1, 6.2, .5]]) tree(pavilions, x, 0, z, k);
+  bench(pavilions, .9, -4.4, Math.PI / 2); bench(pavilions, -1.6, -5.9, 0); bench(pavilions, 1.7, -2.4, Math.PI / 2); bench(pavilions, -2.1, 2.7, 0);
   pavilions.add(...bake(pavilions));
-  pavilions.add(ring(1.2, .06, [[3.9, 3.9, -3.7], [-3.8, 3.7, 3.6]]));
-  pavilions.add(crowd([[-.4, -6.3], [.5, -6.4], [.2, -5.4], [.7, -4.6], [.1, -3.8], [.4, -2.8], [.9, -1.4], [1.4, -.4], [1.6, .5], [.6, 1.6], [.2, 3], [.4, 4.2],
-    [2.6, -6.4], [4.1, -6.6], [4.8, -6.3], [5.6, -6.4], [-6.5, 2.4], [-6.5, 3.8], [-6.4, 5], [-4.4, -6.9], [-2.7, -6.9], [3.6, 1.3],
-    [-5.75, -6.25, true], [-3.15, -6.35, true], [-1.45, -6.25, true], [-3.2, -.2, true], [-2.8, -.2, true], [4.4, -.3, true]]));
+  pavilions.add(ring(1, .025, seams));
+  const outside: P[] = [onWalk(.15), onWalk(.5), onWalk(.78), [.7, 0, -4.4, true, -Math.PI / 2], [1.1, 0, -4.4, true, -Math.PI / 2], [-1.9, 0, -5.9, true, FACE_CAM], [-1.3, 0, -5.9, true, FACE_CAM], [1.7, 0, -2.0, true, FACE_CAM],
+    [-.9, 0, -6.4], [.4, 0, -5.6], [1.2, 0, -3.6], [-.8, 0, -2.9], [.1, 0, -.4], [1.3, 0, 3.1], [-1.1, 0, 2.3], [.2, 0, 5.2], [-1.2, 0, -.2], [2.6, 0, -6.3], [-2.6, 0, -6.2]];
+  pavilions.add(crowd([...lowPeople, ...outside]));
 
-  // +1: a street tower rising from the ground, one elevator and six two-storey function bands.
-  const sx = -3.6;
-  box(towerUpper, [10, .4, 10], [0, .2, 0], stone, .08);
-  for (const [x, z] of [[-4.5, -4.5], [4.5, -4.5], [-4.5, 4.5], [4.5, 4.5], [0, -4.6], [0, 4.6], [4.6, 0], [-4.6, 1.8]]) tree(towerUpper, x, .4, z, .6);
-  box(towerUpper, [8.4, 1.4, 8.4], [0, .7, 0], cream, .15);
-  faces(towerUpper, 8.4, 8.4, (f, a, out) => front(f, a - 1, out, .7, .9));
-  for (const [a, b] of [[1.4, 11.9], [13.1, 24.4], [25.6, 39]]) {
-    box(towerUpper, [5.4, b - a, 5.4], [0, (a + b) / 2, 0], warm, .05);
-    faces(towerUpper, 5.6, 5.6, (f, _w, out) => { for (let x = -1.8; x < 1.85; x += .9) slat(f, [.06, b - a, .08], [x, (a + b) / 2, out + .06], trim); });
-    const n = Math.round((b - a) / 1.3);
-    for (let k = 0; k <= n; k++) {
-      const y = a + (b - a) * k / n;
-      box(towerUpper, [5.75, .22, 5.75], [0, y, 0], cream, .04);
-      if (k % 3 === 0) faces(towerUpper, 5.6, 5.6, (f, w, out) => box(f, [w - .2, .07, .1], [0, y, out + .1], amber, .02), [2, 3]);
+  // +1: one vertical street: 14 glazed floors between four round white columns, planted terraces, glazed lift, round crown.
+  const HW = 5.2, LOBBY = 3.2, HF = 2.6, TOP = LOBBY + 14 * HF;
+  const highPeople: P[] = [];
+  glazed(towerUpper, 0, 0, 0, HW, HW, LOBBY, { amber: true });
+  highPeople.push(...furnish(towerUpper, 2, HW - .5, 0, SL, 0));
+  for (let i = 0; i < 14; i++) {
+    const y0 = LOBBY + i * HF;
+    glazed(towerUpper, 0, y0, 0, HW, HW, HF, { amber: true });
+    highPeople.push(...furnish(towerUpper, i, HW - .5, 0, y0 + SL, 0));
+    if (i % 3 === 2) { // sky terrace on the +X face
+      strip(towerUpper, white, HW / 2 + .4, y0 + .07, 0, .8, .14, HW - .6);
+      strip(towerUpper, leaf, HW / 2 + .45, y0 + .17, 0, .6, .08, HW - .9);
+      for (const z of [-1.7, -.6, .5, 1.6]) bush(towerUpper, HW / 2 + .45, y0 + .2, z, .27);
+      tree(towerUpper, HW / 2 + .5, y0 + .2, 2.0, .4);
     }
   }
-  for (const x of [-2.45, 2.45]) for (const z of [-2.45, 2.45]) box(towerUpper, [.7, 37.6, .7], [x, 20.2, z], cream, .05);
-  for (const yc of [12.5, 25]) {
-    box(towerUpper, [4.4, 1.2, 4.4], [0, yc, 0], warm, .08);
-    box(towerUpper, [5.9, .14, 5.9], [0, yc - .53, 0], cream, .04);
-    box(towerUpper, [3.6, .3, .4], [.9, yc - .31, -2.6], leaf, .08);
-    box(towerUpper, [.4, .3, 3.6], [-2.6, yc - .31, .9], leaf, .08);
-    box(towerUpper, [5, .3, .4], [0, yc - .31, 2.6], leaf, .08);
-    box(towerUpper, [.4, .3, 5], [2.6, yc - .31, 0], leaf, .08);
-    shrubs(towerUpper, 2.15, yc - .46, 0, Math.PI * 2, 10);
-    for (const [x, z] of [[1.5, -2.6], [2.6, -1.2], [-1, 2.6]]) tree(towerUpper, x, yc - .16, z, .45);
-  }
-  // The shaft is an open cream frame without glass, with amber guide rails, so the amber cabin is plainly visible as it travels.
-  for (const x of [-1, 1]) for (const z of [-1, 1]) box(towerUpper, [.18, 37.6, .18], [sx + x, 20.2, sx + z], cream, .03);
-  for (let y = 1.4; y < 39; y += 3.9) {
-    box(towerUpper, [2.2, .12, .18], [sx, y, sx - 1], cream, .02);
-    box(towerUpper, [.18, .12, 2.2], [sx - 1, y, sx], cream, .02);
-  }
-  for (const y of [1.4, 39]) box(towerUpper, [2.3, .14, 2.3], [sx, y, sx], cream, .03);
-  box(towerUpper, [.06, 37.6, .06], [sx - 1.1, 20.2, sx], amber, .01);
-  box(towerUpper, [.06, 37.6, .06], [sx, 20.2, sx - 1.1], amber, .01);
-  // Crown: round terraced roof garden behind a parapet, with the Meter ring on top of it.
-  arc(towerUpper, 0, 3.9, .4, [0, 39, 0], cream);
-  arc(towerUpper, 3.6, 4, 1.1, [0, 39.4, 0], cream);
-  arc(towerUpper, 0, 3.6, .15, [0, 39.4, 0], leaf);
-  arc(towerUpper, 0, 2.1, .8, [0, 39.4, 0], cream);
-  arc(towerUpper, 0, 2.1, .15, [0, 40.2, 0], leaf);
-  shrubs(towerUpper, 2.8, 39.55, 0, Math.PI * 2, 14);
-  shrubs(towerUpper, 1.7, 40.35, 0, Math.PI * 2, 8);
-  for (let i = 0; i < 5; i++) tree(towerUpper, Math.cos(.5 + i * 1.26) * 2.9, 39.55, Math.sin(.5 + i * 1.26) * 2.9, .7);
-  for (let i = 0; i < 3; i++) tree(towerUpper, Math.cos(1 + i * 2.1) * .9, 40.35, Math.sin(1 + i * 2.1) * .9, .65);
+  strip(towerUpper, white, 0, TOP + .11, 0, HW + .12, .22, HW + .12);
+  for (const x of [-1, 1]) for (const z of [-1, 1]) arc(towerUpper, 0, .35, TOP + 2, [x * (HW / 2 - .02), 0, z * (HW / 2 - .02)], white);
+  // Portal on +X.
+  for (const z of [-.9, .9]) strip(towerUpper, white, HW / 2 + .06, 1.3, z, .14, 2.6, .14);
+  strip(towerUpper, white, HW / 2 + .06, 2.65, 0, .14, .14, 2); strip(towerUpper, light, HW / 2 + .1, 2.52, 0, .05, .06, 1.7);
+  // Glazed lift shaft on the -Z face.
+  const sz = -HW / 2 - .7;
+  shaft(towerUpper, 0, sz, TOP, 3.9);
+  // Round crown: white drum, glowing amber rim, roof garden.
+  arc(towerUpper, 0, 3, 2, [0, TOP, 0], white);
+  arc(towerUpper, 0, 2.7, .25, [0, TOP + 2, 0], leaf);
+  shrubs(towerUpper, 2.3, TOP + 2.2, 0, Math.PI * 2, 14);
+  shrubs(towerUpper, 1.2, TOP + 2.2, 0, Math.PI * 2, 8);
+  for (let i = 0; i < 6; i++) tree(towerUpper, Math.cos(.4 + i * 1.05) * 1.9, TOP + 2.2, Math.sin(.4 + i * 1.05) * 1.9, .7);
+  tree(towerUpper, 0, TOP + 2.2, 0, .8);
+  // Base: ring of trees, planters, benches, residents.
+  for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2 + .2, r = 4.9; if (Math.cos(a) > .8) continue; tree(towerUpper, Math.cos(a) * r, 0, Math.sin(a) * r * .95, .55 + (i % 3) * .08); }
+  for (const z of [-1.9, 1.9]) planter(towerUpper, 3.7, 0, z, .8, 1.2);
+  for (const z of [-3, 0, 3]) bench(towerUpper, 3.4 + (z ? 0 : .9), z, Math.PI / 2);
   towerUpper.add(...bake(towerUpper));
-  towerUpper.add(ring(4.2, .35, [[0, 40.5, 0]]));
+  towerUpper.add(ring(3.04, .12, [[0, TOP + 1.4, 0]]));
+  highPeople.push([3.4, 0, -3, true, Math.PI / 2], [3.4, 0, 3, true, Math.PI / 2], [4.3, 0, 0, true, Math.PI / 2], [3.2, 0, -.8], [4.6, 0, -1.2], [3.0, 0, 1.0], [5.2, 0, 1.9], [4.4, 0, -2.4], [5.0, 0, 0.4]);
+  towerUpper.add(crowd(highPeople));
 
   const elevator = new T.Group();
   elevator.name = 'tower-elevator-cabin';
-  elevator.position.set(sx, CABIN_LOW, sx);
-  box(elevator, [1.6, 2.04, 1.6], [0, 1.14, 0], amber, .06);
-  for (const y of [.06, 2.22]) box(elevator, [1.7, .12, 1.7], [0, y, 0], cream, .03);
+  elevator.position.set(0, CABIN_LOW, sz);
+  cabinParts(elevator);
   elevator.add(...bake(elevator));
   towerUpper.add(elevator);
 
-  const lowStalls: [number, number, number][] = [[-.9, -.8, 1], [-.9, .2, 1], [2.6, -.8, -1], [2.6, .2, -1], [1.4, 4.4, -1], [1.4, 5.4, -1]];
-  const lowModules = lowStalls.map(([x, z, q], i) => addModule(pavilions, `tower-function-low-${i + 1}`, x, 0, z, q * Math.PI / 2, stall));
+  const lowModules = spots.map(([x, z, r], i) => addModule(pavilions, `tower-function-low-${i + 1}`, x, 0, z, 0, g => { const [a, b] = uv(.1 * r, .8 * r); return fitout(g, a, .12, b); }));
 
-  // Mixed court: two timber-vault pavilions and a short walk to the tower foot, only while mixed shows.
+  // Mixed court: two glazed wings under hovering discs, the bridge between them and the forecourt, only while mixed shows.
   const court = new T.Group();
   court.name = 'tower-mixed-court';
   neutralPropsLayer.group.add(court);
-  kiosk(court, -5, .5, 3, 5, 1.8);
-  vault(court, -5, 1.8, .5, 5.2, 3.4, 1.9, Math.PI / 2);
-  eave(court, -5, 1.85, .5, 3.4, 5.2);
-  kiosk(court, .5, -5, 5, 3, 1.8);
-  vault(court, .5, 1.8, -5, 5.2, 3.4, 1.9);
-  eave(court, .5, 1.85, -5, 5.2, 3.4);
-  walk(court, [-3.3, -3.3], [-1.5, -1.5], true);
-  tree(court, 6.2, 0, -4.5, .6);
-  tree(court, -6.2, 0, 5.5, .6);
-  tree(court, -3.5, 0, 6.2, .6);
+  const courtPeople: P[] = [];
+  const W1: [number, number] = [3, -4.6], W2: [number, number] = [-4.95, 2.6];
+  glazed(court, W1[0], 0, W1[1], 5, 3.2, 2.2, { columns: true, roof: true });
+  glazed(court, W2[0], 0, W2[1], 3.2, 5, 2.2, { columns: true, roof: true });
+  courtPeople.push(...furnish(court, 2, 2.9, W1[0] - 1.1, SL, W1[1]), ...furnish(court, 0, 2.9, W1[0] + 1.1, SL, W1[1]), ...furnish(court, 5, 2.9, W2[0], SL, W2[1] - 1.2), ...furnish(court, 1, 2.9, W2[0], SL, W2[1] + 1.2));
+  emitter(court, W1[0], 2.4, W1[1], 2);
+  emitter(court, W2[0], 2.4, W2[1], 2);
+  // Bridge (L-shaped, y 2.3..2.5) from the wing-1 roof to the wing-2 roof, in front of the tower.
+  strip(court, white, -1.8, 2.4, -5, 4.8, .2, 1.2); strip(court, white, -4.2, 2.4, -2.2, 1.2, .2, 5.6);
+  strip(court, amber, -1.8, 2.51, -5, 4.8, .02, .08); strip(court, amber, -4.2, 2.51, -2.2, .08, .02, 5.6);
+  strip(court, pane, -1.8, 2.75, -5.6, 4.8, .5, .02); strip(court, pane, -4.8, 2.75, -2.2, .02, .5, 5.6);
+  for (const [x, z] of [[-1.2, -6.3], [2.5, -1.7]]) planter(court, x, 0, z, 1.6, .7);
+  planter(court, -6.2, 0, -.9, .7, 1.5); planter(court, -2.0, 0, -1.4 , 1.2, .5);
+  bench(court, -2.1, -6.6, 0); bench(court, -6.2, -3.6, Math.PI / 2); bench(court, 3.9, -1.9, 0);
+  for (const [x, z, k] of [[6.1, -1.7, .55], [-6.1, 6.1, .5], [-3.3, 6.2, .5], [6.1, 4, .55], [3, 6.1, .5], [-6.1, -6.1, .5], [6.1, -6.1, .5]]) tree(court, x, 0, z, k);
   court.add(...bake(court));
-  court.add(crowd([[-3.1, -3.7], [-2.7, -3.1], [-2.3, -2.6], [-1.9, -2.2], [-5.2, -5.4], [-2.8, -6.2], [1.6, -6.6], [3.6, -3.4], [4.6, -2.8], [-6.6, -1.9], [-4.3, -3.2], [4.3, -5.8]]));
-  const mixedStalls: [number, number, number][] = [[-6.2, -5.8, 0], [-4.8, -6.2, 0], [-3.4, -5.9, 0], [-6.4, -3.6, 1], [-6.4, -2.7, 1], [4.5, -5.5, 0]];
-  const mixedModules = mixedStalls.map(([x, z, q], i) => addModule(neutralPropsLayer.group, `tower-function-mixed-${i + 1}`, x, 0, z, q * Math.PI / 2, stall));
+  courtPeople.push([-2.5, 0, -6.6, true, FACE_CAM], [-1.7, 0, -6.6, true, FACE_CAM], [-6.2, 0, -3.9, true, -Math.PI / 2], [-6.2, 0, -3.3, true, -Math.PI / 2], [3.9, 0, -2.2, true, FACE_CAM],
+    [-3.0, 0, -6.2], [-1.2, 0, -5.9], [-.1, 0, -6.4], [-4.8, 0, -5.6], [-3.4, 0, -2.8], [-2.4, 0, -3.5], [-5.4, 0, -1.6], [1.0, 0, -2.4], [2.4, 0, -2.5], [5.2, 0, -1.9]);
+  court.add(crowd(courtPeople));
+  const mixedModules = [0, 1, 2, 3, 4, 5].map(k => addModule(neutralPropsLayer.group, `tower-function-mixed-${k + 1}`, MX, k * FH, MZ, 0, g => fitout(g, 1.2, SL, -1.1)));
 
-  // Two-storey bands up the vertical street: a wood face with furniture silhouettes and amber lines, proud of the floor slabs.
-  const highModules = [4, 9, 15, 21, 27, 33].map((y, i) => addModule(towerUpper, `tower-function-high-${i + 1}`, 0, y, 0, 0, group =>
-    faces(group, 5.6, 5.6, (f, a, out) => {
-      const w = a - 1.6;
-      box(f, [w, 2.3, .05], [0, 0, out + .1], timber, .02);
-      box(f, [.8, .34, .28], [-1.2, -.98, out + .24], cream, .04);
-      box(f, [.5, .26, .34], [.1, -1.02, out + .24], cream, .04);
-      box(f, [.28, .95, .22], [1.4, -.67, out + .21], cream, .03);
-      for (const s of [-1, 1]) box(f, [w, .05, .08], [0, s * 1.2, out + .14], amber, .02);
-    }, [2, 3])));
+  const highModules = [1, 3, 5, 7, 9, 11].map((f, i) => addModule(towerUpper, `tower-function-high-${i + 1}`, 0, LOBBY + f * HF, 0, 0, g => fitout(g, 1.5, SL, -1.6)));
 
   const concentrationTower = new ConcentrationTowerController({ base, pavilions, elevator, lowModules, mixedModules, highModules });
   return {
