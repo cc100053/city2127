@@ -59,6 +59,13 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 - 主要問題：坐低嘅人企咗喺座位上面；艙內唔暖；屏風黐住艙；花園係一張波波草氈；0 嘅碟飄出水面；+1 碟底冇機械；後面兩間亭冇玻璃。
 - Evidence：`~/city2127-evidence/closeup-night/sw/r1/`（`pair.md`、`review.jpg`）。
 
+## SW R2
+
+- 分數 19/30；pairwise 對 R1 9 勝 2 負（fl-screens、fm-ring 輸）→ keep（commit `c7aedd5`）。
+- 改咗乜：艙暖光內部、粉紅座位、地面發光環、獨立屏風、S 形小路、0 嘅碟拉返入 lot 罩住圓圈、+1 碟橢圓放大加機械、後亭加玻璃頂。
+- 2 分：fm-deck、fh-amph、fh-people、fh-planting（全部 pairwise `=`）。冇 0 分。
+- 仍然弱：人坐唔落（艙入面人企喺座位後面、圓圈嘅人企住）；艙企喺深色柱上，唔似懸浮；屏風似清玻璃；花園似草地＋石板；+1 碟肋位唔夠；後亭唔似玻璃房。
+
 ## Next expected step
 
 Phase B：dispatcher 開 SW site session（`feat/closeup-night-sw`，port 5191，06:00 前停），完成後驗證、merge 入 `feat/closeup-night`，再開 SE（port 5192，09:00 停）；10:00 前交 night board。
