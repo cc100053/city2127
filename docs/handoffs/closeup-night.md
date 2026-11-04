@@ -84,9 +84,19 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 - FPS（headed `fps.sh`，hero 1920×1080 DPR 1，branch `22109e3`）：`sw:high` 日 60.0 60.0 57.5 60.1 59.9 60.0／夜 60.0×6；`sw:low` 日 60.0 59.9 59.8 60.0 60.0 60.0／夜 60.0×6（第一個 sample 唔計）。
 - Evidence：`~/city2127-evidence/closeup-night/sw/r4/`（`pair.md`、`review.jpg` = baseline | R4 | target 每項全尺寸 crop 連分數、`fps.txt`、日夜截圖）。
 
+## SE R1
+
+- 分數 16/38（42 %）；pairwise 對 baseline 17 勝 1 負（輸 fl-walkway、fm-tower、fh-floors 判 A/B 有矛盾，記低）→ keep，commit `02fb945`。
+- 改咗乜：`concentrationTower.ts` 全部重寫做新 taste：−1 六個圓形玻璃亭＋懸浮碟＋S 形架空步道；0 六層玻璃塔＋玻璃升降機＋扶手電梯＋兩翼懸浮碟＋天橋；+1 14 層玻璃垂直街＋外置升降機＋圓頂；SE 自己嘅人仔（頭、身、手、腳，坐姿屈膝，per-instance 衫色）。拆咗木色拱頂、cream 塊、舊英文招牌。
+- 鏡位：`se:focal` = H、`se:focal-low` = L（owner 2026-11-04）。`tests/headlineCamera.test.ts` 嘅「鏡頭要高過目標」只為 `se:focal` 放寬（owner 嘅 H 鏡位係向上望），其他 pose 照舊。
+- 2 分：fh-floors。0 分：fl-garden、tm-tower、tm-base、fh-gardens。
+- 主要問題：−1 亭擠埋一齊、似開放柱廊、碟下冇發光 collar、花園光禿；0 室內平塗桃色＋深啡傢俬；H 鏡位 0 塔細過目標（見 Blocked）；+1 頂被切、柱太粗、冇樹露台。
+
 ## Blocked
 
 - **人仔可讀性**（fl-people-in、fm-ring、fh-people 卡喺 1）：全城共用 `pedestrians()` 人仔 mesh，冇 per-instance 衫色、坐姿由呢個 15° 鏡位睇大腿好短，似企。選項：(a) 只喺 SW 加一個更大、淺色衫、明顯屈膝嘅坐姿人仔變體（淨係 `commonsPlaza.ts`）；(b) 喺 `mobility.ts` 加 per-instance tint／坐姿誇張度（會影響其他 site，要 owner 批）；(c) 接受 1 分。今晚揀咗保持設計、唔郁共用 crowd，項目留喺 1。
+
+- **SE 0 塔高度**（tm-tower、tm-base）：L 鏡位頂框約 18 local units，0 塔要入得 L，所以喺 H 只係目標約一半高（Gemini 放大咗）。選項：(a) 塔頂 ≈ 17，H 用 capture 框跟住城市實際位置（今晚揀咗，淨改 SE rubric）；(b) 塔加高到 ≈ 30，L 切頂；(c) 改 L 鏡位（owner 定嘅，唔郁）。
 
 ## Next expected step
 
