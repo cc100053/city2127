@@ -79,3 +79,22 @@ Keep (scored 2; re-crop and compare with R1, must not lose): `fm-deck`, `fh-amph
 - **Pavilions (fh-tables).** Back-corner pavilions glazed: pitched glass roof + glass walls (`glassPane`) with white mullions, warm-lit interior (warm back wall + ceiling light, a sofa); 4 round tables with residents seated around them.
 
 Screenshots to `~/city2127-evidence/closeup-night/sw/r2/` (same names as R1) + `vs-target.jpg`.
+
+## R3 — items below 2 (R2 19/30, kept)
+
+Keep (2 in R2, pairwise `=`; re-crop and compare with R2, must not lose): `fm-deck`, `fh-amph`, `fh-people`, `fh-planting`.
+
+Opus zoom of R2 (`r2/flagship-low.png` x1100–2200 y700–1250, `flagship-mixed.png` x1100–2200 y800–1300):
+
+- **Residents still read as standing columns (fl-people-in, fm-pods, fm-ring).** In pods the two residents stand at the *back wall behind* the pink seats, dark; on the ring they stand upright in a circle. Before anything else, render one test view low and close (e.g. `cityPose` 6 m from a pod, eye level) and prove a seated actor bends at hip and knee; compare with NW's seated low-hall residents (`automationHub.ts` `seated: true`). Then: pod residents sit ON the pink seats, seats moved to the sides of the pod near the glass (x ≈ ±.45 of pod width, z ≈ .2 behind the glass), people in profile facing each other over a small table (narrower, lower than the seats' backs), not behind them. Exclude pod shells from shadow casting/receiving onto people if they darken them. Ring residents: hips on the bench top, thighs/knees toward the circle centre, facing in.
+- **Pods on dark stems (fl-emitters, fm-pods).** Remove the dark-grey core; nothing touches the ground. Under each pod's belly a bright flattened emitter pad (`glow`, r .45) + the ring (`glow` torus r .65 tube .09, toneMapped false, at mid-gap) + a cool halo on the terrace (`MeshBasicMaterial` #bfeaff additive, opacity .45, r 1.0). Gap ≥ .55.
+- **Pod shape (fl-pods).** Softer capsule: the front glass outline a squircle with large corner radius, the shell sides bulging (e.g. a superellipsoid/scaled sphere lathe, or a rounded box with corner radius ≈ 40 % of height); the shell deeper at the top than at the bottom, as in the target.
+- **Screens (fl-screens).** White membrane, not clear glass: `MeshStandardMaterial` #f6f7fb, emissive #ffffff .15, opacity .85, `sharePink` frame .05 wide; ≥ 6 placed where the camera sees them, each standing between two pods, 1.0 × 2.2.
+- **Garden (fl-garden).** It reads as open lawn + slabs. Cover every non-path area inside the hedge with planting: dense leafy clumps (2–3 greens, varied scale .25–.6, flattened `leafyCrown`), fern-like spiky clumps (a few thin cone/plane clusters), 10 small trees; paths smooth curves (more segments, no fan spikes at bends).
+- **Mixed ring (fm-ring).** Seated (as above); a solid white table r .6 on a pedestal with 3–4 small coloured props; 3 children sitting together on the front step edge (×.6), readable.
+- **Divider (fm-divider).** 6 trees varied height (.8–1.3) and dense shrubs spilling over both sides of the planter; the planter runs the full depth of the deck between the pods and the circle.
+- **Mixed canopy (fm-canopy).** Keep its R2 position (pairwise won); the 4 stabiliser rings must show: hang them .35 below the rim at radius 2.0, torus r .35 tube .07 bright `glow` + additive halo discs, visible from the camera below the rim.
+- **High disc (fh-disc).** Rim: a thick `sharePink` band (.12 high) all round, segmented by 8 short white gaps; 8 raised `sharePink` radial ribs on the top surface (.12 wide, emissive, readable from this camera); underside: solid bright stabiliser ring (`glow` torus r 3, tube .14, opaque), central hub drum, 10–12 dark-grey machinery boxes and 6 under-emitters with halos.
+- **Pavilions (fh-tables).** Glass must read as glass rooms: tinted panes (#dff1ff, opacity .45) on all visible faces incl. a pitched glass roof, white mullions every .4, strong warm interior (warm back wall emissive ≥ .9, sofa, ceiling light); 4 tables keep their residents.
+
+Screenshots to `~/city2127-evidence/closeup-night/sw/r3/` (same names) + `vs-target.jpg`.
