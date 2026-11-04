@@ -1,7 +1,7 @@
 # closeup-night — 夜間重做 SW、NE、SE 旗艦 headline 近鏡
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — Phase B：SW park（20/30），SE 進行中
+- Status: IN_PROGRESS — Phase B：SW park（20/30），SE park（20/38，R6）
 - Branch: `feat/closeup-night`（site branch `feat/closeup-night-<site>`）
 - Base commit: `5a56230`（origin/main）＋ merge `chore/long-polish-loop-v2` `6e60d04` → `dd1f5a9`
 - Last verified commit: NONE
@@ -30,7 +30,7 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 | --- | --- | --- | --- | --- | --- | --- |
 | SW | `sw:n` `[-95,30,-15]`→`[-105,10,60]` | [target](../../artifacts/closeup-night/sw/target/) | 放大到目標（填滿 lot，唔越橙邊；碟可以向上） | R1–R4 | 20/30（67 %）R4 | PARKED（merged `55a5d2b`，dispatcher 驗證 test/build/check 綠） |
 | NE | `ne:s2` | — | — | — | — | SKIPPED（owner 2026-11-04：Q3 改能源題後 NE 公園恆定 0，客人去唔到 ±1） |
-| SE | L `[130,28,-95]`→`[182,24,-38]`（−1、0）；H `[360,45,-50]`→`[182,58,-38]`（0、+1） | [target](../../artifacts/closeup-night/se/target/)（`tower-mixed` = 0 喺 H） | 放大到目標 | | | READY |
+| SE | L `[130,28,-95]`→`[182,24,-38]`（−1、0）；H `[360,45,-50]`→`[182,58,-38]`（0、+1） | [target](../../artifacts/closeup-night/se/target/)（`tower-mixed` = 0 喺 H） | 放大到目標（lot 內） | R1–R6 | 20/38（53 %）R6 | PARKED（`feat/closeup-night-se`，未 merge） |
 
 ## Completed work
 
@@ -84,9 +84,58 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 - FPS（headed `fps.sh`，hero 1920×1080 DPR 1，branch `22109e3`）：`sw:high` 日 60.0 60.0 57.5 60.1 59.9 60.0／夜 60.0×6；`sw:low` 日 60.0 59.9 59.8 60.0 60.0 60.0／夜 60.0×6（第一個 sample 唔計）。
 - Evidence：`~/city2127-evidence/closeup-night/sw/r4/`（`pair.md`、`review.jpg` = baseline | R4 | target 每項全尺寸 crop 連分數、`fps.txt`、日夜截圖）。
 
+## SE R1
+
+- 分數 16/38（42 %）；pairwise 對 baseline 17 勝 1 負（輸 fl-walkway、fm-tower、fh-floors 判 A/B 有矛盾，記低）→ keep，commit `02fb945`。
+- 改咗乜：`concentrationTower.ts` 全部重寫做新 taste：−1 六個圓形玻璃亭＋懸浮碟＋S 形架空步道；0 六層玻璃塔＋玻璃升降機＋扶手電梯＋兩翼懸浮碟＋天橋；+1 14 層玻璃垂直街＋外置升降機＋圓頂；SE 自己嘅人仔（頭、身、手、腳，坐姿屈膝，per-instance 衫色）。拆咗木色拱頂、cream 塊、舊英文招牌。
+- 鏡位：`se:focal` = H、`se:focal-low` = L（owner 2026-11-04）。`tests/headlineCamera.test.ts` 嘅「鏡頭要高過目標」只為 `se:focal` 放寬（owner 嘅 H 鏡位係向上望），其他 pose 照舊。
+- 2 分：fh-floors。0 分：fl-garden、tm-tower、tm-base、fh-gardens。
+- 主要問題：−1 亭擠埋一齊、似開放柱廊、碟下冇發光 collar、花園光禿；0 室內平塗桃色＋深啡傢俬；H 鏡位 0 塔細過目標（見 Blocked）；+1 頂被切、柱太粗、冇樹露台。
+
+## SE R2（唔 keep）
+
+- 分數 20/38；pairwise 對 R1 5 勝 9 負 → **唔 keep**，source 還原返 R1，diff 存咗 `~/city2127-evidence/closeup-night/se/r2/r2-not-kept.diff`。
+- 試咗乜：−1 改五個亭＋長 S 步道（fl-walkway 2 分）＋水道＋梯級花槽；+1 降到 ≈ 38 等 H 見到成個頂；室內改淺白。
+- 輸喺邊：室內由桃色變到冷白，judge 全部話「唔暖」；−1 亭似柱廊、碟冇 gap。R3 由 R1 出發，只搬 R2 結構改動，室內改暖桃色。
+
+## SE R3
+
+- 分數 18/38；pairwise 對 R1 14 勝 3 負 → keep。
+- 改咗乜：由 R1 出發，搬返 R2 嘅結構（五亭＋S 步道＋水道、+1 降到 ≈ 38 見到成個頂、5 層露台）；室內改暖桃色（`#f7cfb0` emissive），亭牆加淡玻璃筒，人仔放大到 .75，halo 貼近屋頂花園。
+- 2 分：fh-floors。0 分：fl-garden、tm-tower（H 鏡位 0 塔細，crop 見唔到頂）。
+- 仍然弱：−1 喺 L 鏡位佔畫面細、似擠埋一角、碟 gap 細；花園光禿；人似方塊；+1 柱讀成方、升降機冇玻璃井。
+
+## SE R4
+
+- 分數 21/38；pairwise 對 R3 7 勝 1 負（輸 fm-crown）→ keep。
+- 改咗乜：−1 五個亭移去 lot 後三分之二，前面變花園（梯級花槽、水道、長凳）；亭牆加高到 2.0、碟細啲高啲，L 鏡位見到暖色玻璃牆；0 前庭加長凳坐人、halo 加粗；+1 圓柱 r .3、−Z 面藍玻璃升降井、第二部固定升降機、露台樹放大。
+- 2 分：fl-people-in、fm-wings、fh-frame。0 分：fh-lift（H 鏡位睇唔到升降井）。
+- 仍然弱：−1 亭擠成一堆（14×14 lot 限制）、碟 collar 光唔夠；步道短；0 halo 太粗、前庭坐低嘅人睇唔到；+1 露台似灌木唔似樹。
+
+## SE R5
+
+- 分數 18/38（absolute judge 飄 ±1）；pairwise 對 R4 8 勝 5 負 → keep。
+- 改咗乜：+1 升降井搬去 +X 面 −Z 邊（H 鏡位正面見到），藍玻璃＋兩部升降機；露台樹放大有樹幹；屋頂 7 棵樹；0 升降井加粗、halo 變幼；−1 碟下 collar 光環放大、步道兩個彎由前到後。
+- 0 分：fm-ground（L 鏡位前庭喺畫面底以外，長凳睇唔到）。冇 2 分（R4 嘅 2 分項 pairwise 冇輸）。
+
+## SE R6（最後一輪，park）
+
+- 分數 20/38（53 %）；pairwise 對 R5 3 勝 2 負（輸 fm-wings、fm-ground）→ keep。未過 90 % 門檻，round cap 6 用晒 → **park 喺 R6**。
+- 改咗乜：0 成組（塔、升降井、扶手電梯、兩翼、天橋）向 +X/+Z 移 1.6，等 L 鏡位見到前庭（花槽、3 張長凳坐 6 人、10 個企住嘅人）；兩翼加實心白端牆＋amber 簷線、室內改咖啡店／書店／lounge；−1 長凳同人移去畫面中段；+1 頂部光環加粗（tube .25）。
+- 2 分（1）：fh-frame。冇 0 分。
+- 1 分（18）：fl-pavilions、fl-discs、fl-people-in、fl-walkway、fl-garden、fl-material、fm-tower、fm-lift、fm-crown、fm-wings、fm-ground、tm-tower、tm-base、fh-floors、fh-crown、fh-lift、fh-gardens、fh-base。
+- 低過 2 嘅原因（直講）：−1 喺 L 鏡位 lot 前三分之一喺畫面底以外，五個亭只能擠喺後面，佔畫面遠細過目標（Gemini 將亭散到 lot 外）；人仔似方塊；碟 collar 光唔夠搶眼；0 喺 H 只得目標一半高（見 Blocked）；+1 傢俬重複、露台似灌木、升降井貼住立面唔夠突出；absolute judge 每輪同一張圖都會 ±1 飄（R4 21 → R5 18 → R6 20，pairwise 全部 keep）。
+- Gates：`npm test`／`npm run build`／`git diff --check` 綠；L（−1、0）同 H（0、+1）主體冇遮擋；冇新 UI 字（舊 `都市集約 / 2127` 招牌已拆）；綠化保持茂密；懸浮碟全部有 collar 發光環，唔係浮島。
+- FPS（headed `fps.sh`，hero 1920×1080 DPR 1，`se:high`，branch R6）：日 60.0 60.0 60.2 60.0 60.0 60.0／夜 60.0×6（第一個 sample 唔計）。
+- Evidence：`~/city2127-evidence/closeup-night/se/r6/`（`pair.md`、`review.jpg` = baseline | R6 | target 每項 crop 連分數、`fps.txt`、日夜截圖、`vs-target.jpg`）。
+
 ## Blocked
 
 - **人仔可讀性**（fl-people-in、fm-ring、fh-people 卡喺 1）：全城共用 `pedestrians()` 人仔 mesh，冇 per-instance 衫色、坐姿由呢個 15° 鏡位睇大腿好短，似企。選項：(a) 只喺 SW 加一個更大、淺色衫、明顯屈膝嘅坐姿人仔變體（淨係 `commonsPlaza.ts`）；(b) 喺 `mobility.ts` 加 per-instance tint／坐姿誇張度（會影響其他 site，要 owner 批）；(c) 接受 1 分。今晚揀咗保持設計、唔郁共用 crowd，項目留喺 1。
+
+- **SE −1 構圖**（fl-pavilions、fl-garden）：L 鏡位 lot 前三分之一喺畫面底以外，Gemini 目標將亭散到 lot 外。選項：(a) 守 14×14 lot、亭擠喺後三分之二（今晚揀咗）；(b) 擴大 SE lot（改其他檔案、要 owner 批）；(c) L 鏡位向後拉高（owner 定嘅鏡位，唔郁）。
+- **SE `se:focal` 向上望**：owner 嘅 H 鏡位鏡頭低過目標，`tests/headlineCamera.test.ts` 只為 `se:focal` 放寬「鏡頭高過目標」規則（其他 73 個 pose 照舊）。
+- **SE 0 塔高度**（tm-tower、tm-base）：L 鏡位頂框約 18 local units，0 塔要入得 L，所以喺 H 只係目標約一半高（Gemini 放大咗）。選項：(a) 塔頂 ≈ 17，H 用 capture 框跟住城市實際位置（今晚揀咗，淨改 SE rubric）；(b) 塔加高到 ≈ 30，L 切頂；(c) 改 L 鏡位（owner 定嘅，唔郁）。
 
 ## Next expected step
 

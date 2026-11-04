@@ -59,7 +59,8 @@ assert.deepEqual([0,t.flyIn,t.hold,t.flyOut,t.done].map(elapsed=>shotStage(elaps
 assert.equal(Object.keys(SHOTS).length,74);
 for (const [id, pose] of Object.entries(SHOTS)) {
   const p=new Vector3(...pose.position),target=new Vector3(...pose.target);
-  assert.ok(p.y>target.y);assert.ok(p.distanceTo(target)>=40&&p.distanceTo(target)<=450);
+  // se:focal (owner 2026-11-04) looks up from the east at the full +1 tower; the only clear sightline, so it alone may aim upward.
+  assert.ok(p.y>target.y||id==='se:focal');assert.ok(p.distanceTo(target)>=40&&p.distanceTo(target)<=450);
   if(id.endsWith(':district')) assert.ok(p.distanceTo(target)<=260);
   assert.ok(p.x<target.x||p.z<target.z);
 }
