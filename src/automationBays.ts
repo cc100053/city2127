@@ -32,7 +32,8 @@ export function automationBays(): { bays: AutomationBay[]; scales: number[] } {
   }
   // Traced open plazas at the mall approaches and western waterfront (actual-mesh checks in odaiba.test.ts), each re-searched in R3 for the 2x
   // footprint (4-6 m moves). The second plaza sits 12 m off its old centre: a 14 m guideway deck cuts diagonally through it and the plinth must stay 3 m clear.
-  for (const [x, z, yaw] of [[20, 145, 0], [-184, 92, 0], [-130, 170, 0], [75, -166, 0], [-440.5, 41.9, -.9]])
+  // The third moved 15 m north in street network stage 2 (from -130, 170), its plinth 15 m clear of the ④ boulevard's centreline (raster search).
+  for (const [x, z, yaw] of [[20, 145, 0], [-184, 92, 0], [-124, 156, 0], [75, -166, 0], [-440.5, 41.9, -.9]])
     if (!inCivic(x, z, 33)) bays.push({ x, y: 0, z, yaw }); // polish2: the mall approach bay sits under the enlarged Fuji frame
   return { bays, scales: bays.map((_, i) => BAY_SCALE_OVERRIDES[i] ?? BAY_SCALE) };
 }

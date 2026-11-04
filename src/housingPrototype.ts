@@ -7,7 +7,7 @@ export const HOUSING_OPTIONS = {
   baseline: '基準城市', material: 'M · 輕材架空住宅', membrane: 'P · 植物膜住宅', mobile: 'U · 可換生活艙', mixed: '三類共存 · 複合住宅',
 } as const;
 export type HousingOption = keyof typeof HOUSING_OPTIONS;
-export const HOUSING_SITES = { material: [-165, -165], membrane: [45, -215], mobile: [-265, -60] } as const;
+export const HOUSING_SITES = { material: [-165, -165], membrane: [45, -215], mobile: [-270, -67] } as const; // road audit: U moved 9 m off the north-west avenue it overlapped
 
 export const HOUSING_HOME_ROUTE = { start: [-5.2, 5.14, -4.4], end: [5.2, 5.14, -4.4] } as const;
 

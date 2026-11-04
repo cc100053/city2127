@@ -3,7 +3,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets.ts';
 import { heroSettledCamera, heroTextZone } from './heroCamera.ts';
-import { guideway, guidewayTracks, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers, bayChannels, skyCorridors, sweepway, streets, shoreLane, interchangeApproach, interchangeBoatLane, INTERCHANGE, midDecks, gardenDecks } from './layout.ts';
+import { guideway, guidewayTracks, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers, bayChannels, skyCorridors, sweepway, streets, STREET_KIT, BOULEVARD, shoreLane, interchangeApproach, interchangeBoatLane, INTERCHANGE, midDecks, gardenDecks } from './layout.ts';
 
 const ease=(t:number)=>T.MathUtils.smoothstep(t,0,1);
 const curve=(points:readonly (readonly [number,number,number])[],closed=false)=>new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p)),closed,'centripetal');
@@ -264,6 +264,10 @@ function fleet(scene:T.Object3D,parts:Part[],count:number,name:string) {
   };
 }
 
+const streetPodParts=(body:T.Material,head:T.Material,tail:T.Material)=>[part([1.8,1.3,4.6],[0,.8,0],body,.6),part([1.84,.62,3.5],[0,1.28,-.1],glass,.3),
+  part([.24,.04,2.8],[0,1.6,-.1],mint,.02),part([1.3,.1,.08],[0,.82,2.29],head,.03),part([1.3,.1,.08],[0,.82,-2.29],tail,.03)];
+/** The street pod (traffic and DEV street-kit demo pods): `count` instances, white body (tint per instance), poses set by the caller. */
+export const streetPodFleet=(scene:T.Object3D,count:number,name:string)=>fleet(scene,streetPodParts(material('#ffffff'),new T.MeshStandardMaterial({color:'#f4f6f2',emissive:'#fff6e0',emissiveIntensity:0,roughness:.3}),new T.MeshStandardMaterial({color:'#b85a50',emissive:'#ff4a3a',emissiveIntensity:0,roughness:.3})),count,name);
 /** Gait per person (`gait` instance attribute, see `pedestrians`): x stride phase (rad), y swing (rad), z carried item (0 none,
  * 1 backpack, 2 shoulder bag), w seated 0..1. Legs swing about the hip and arms about the shoulder in the vertex shader, so a walk
  * costs no extra draws. Seated, the thigh folds forward at the hip (.58) and the shin back down at the knee (.26), so the figure sits
@@ -441,8 +445,10 @@ export function collectorPose(waited:number) {
 }
 /** Street cars per lane on each avenue: `cars` spread round the lane's loop (the avenue plus 40 m out of sight) at irregular gaps of
  * 0.45–1.6× the mean, moving at one lane speed (8–11 m/s with a shared ±15 % surge), so they never close up. They fade in and out at the
- * avenue ends. Lane 0 drives with the route, lane 1 against it; Japan keeps left. Returns `d` metres along the route. */
-export const STREET_GAP=27;
+ * avenue ends. Lane 0 drives with the route, lane 1 against it; Japan keeps left. Returns `d` metres along the route. `STREET_GAP`: the mean
+ * gap per route (the ④ boulevard's guide channels carry a sparse pod service). */
+export const STREET_GAP=[27,81] as const;
+export const streetCarCount=(road:number,length:number)=>Math.round((length+40)/STREET_GAP[road]);
 /** A lane car's free slot: `travelled` metres round its lane's loop (`rate` m/s now), as travel `x` from the lane's start (-20 …
  * length + 20, the ends out of sight) and its lap count. Car k-1 always leads car k. */
 function laneTravel(time:number,road:number,lane:number,car:number,cars:number,length:number) {
@@ -457,13 +463,13 @@ export function streetCarPose(time:number,road:number,lane:number,car:number,car
   const {x}=laneTravel(time,road,lane,car,cars,length);
   return {d:lane?length-x:x,visible:fadeEnds(x,length)};
 }
-/** Kerbside drop-off on the paved forecourt south of Aqua City, beside the guideway avenue's westbound lane: two cars, each stopping at
+/** Kerbside drop-off on the seaside avenue's footway along the plaza deck's north face, beside the U route's lane 1 (westbound there): two cars, each stopping at
  * its own bay `stops` m along the lane, `bay` m beyond the lane centre. On even laps the car eases over SHIFT m into the bay at speed,
  * brakes over 2·BRAKE m of its slot's travel to rest BRAKE m on, waits a whole lap, and rejoins its own slot as it comes round (in
  * `mobility` it also waits there until the lane beside the pull-out is clear). Cues: `signal` +1 indicates toward the kerb from SIGNAL m before easing in until it stops, -1 toward
  * the road from 3 s before pulling away until back in lane; `brake` lights while braking; `pitch` (rad, + nose down) dips the nose
  * under braking and lifts it pulling away. */
-export const DROP_OFF={road:1,lane:1,cars:[0,14],stops:[223,273],bay:2.3} as const;
+export const DROP_OFF={road:0,lane:1,cars:[0,14],stops:[358.3,408.3],bay:2.3} as const; // stops: lane-1 metres from the U's end (bays at U d 750 and 700)
 const BRAKE=12,SHIFT=35,SIGNAL=30;
 export function dropOffPose(time:number,car:number,cars:number,length:number,stop:number) {
   return dropOffAt(laneTravel(time,DROP_OFF.road,DROP_OFF.lane,car,cars,length),length,stop);
@@ -484,34 +490,32 @@ function dropOffAt({x,lap,speed,span}:{x:number;lap:number;speed:number;span:num
   const signal=even&&x>=stop-SHIFT-SIGNAL&&parked<0&&(x<stop||brake>0)?1:(parked>=0&&leaving<3)||(!even&&x>=stop&&x<stop+2*BRAKE+SHIFT)?-1:0;
   return {d:DROP_OFF.lane?length-p:p,bay,steer,visible:fadeEnds(p,length),parked,leaving,signal,brake,pitch};
 }
-/** Shared-space crossings (no signals): `d` metres along `streets[road]`. Residents walk to the kerb, wait until every approaching car
- * has stopped short of the stop line or passed, cross, and walk on; cars brake for a requested crossing when they still can and queue
- * behind each other (`mobility`). Both on the guideway avenue, where paving on each side is open 12 m out at body height (under the
- * guideway): south of Aqua City past the drop-off bays, and just before the junction mouth. The seaside avenue has no north footway (Aqua
- * City's wall stands 2.3 m from its centre line). */
-export const CROSSINGS=[{road:1,d:286,period:70},{road:1,d:480,period:83}] as const;
-/** Surveyed road half-width per avenue (5 m and 7 m). */
-export const ROAD_HALF=[2.5,3.5] as const;
-/** Where cars drive, in metres left of each avenue's route (`n`, up × tangent): the seaside avenue's lanes sit 0.25 m off centre in
- * its 5 m road, away from Aqua City's wall (2.3 m right of the centre line); under the guideway the Yurikamome piers stand in the
- * right half of the 7 m road about every 50 m, so its carriageway is widened 1.6 m to the left onto the paving slab and shifted
- * clear of them (−5.1 … −0.5 m; piers reach 0.36 m left of the centre line where cars are drawn full size), the right half left to
- * the piers. `lane`: each lane centre from the carriageway centre (Japan keeps
- * left); car bodies keep ≥ 0.3 m from every solid (tests/odaiba.test.ts). */
-export const CARRIAGEWAY=[{centre:.25,half:2.25,lane:1.25},{centre:-2.8,half:2.3,lane:1.15}] as const;
+/** Shared-space crossings (no signals): `d` metres along `streets[road]`, the street kit's light-panel crossings (`STREET_KIT`) and light bridges
+ * (`BOULEVARD`). Residents walk to the kerb, wait until every approaching car has stopped short of the stop line or passed, cross, and walk on;
+ * cars brake for a requested crossing when they still can and queue behind each other (`mobility`). On the U: one on the guideway avenue past the
+ * drop-off bays, one on the link ③ from the deck's west stair to the west lawn; three on the ④ boulevard. */
+export const CROSSINGS=[{road:0,d:STREET_KIT.crossings[0],period:70},{road:0,d:STREET_KIT.crossings[1],period:83},
+  {road:1,d:BOULEVARD.crossings[0],period:131},{road:1,d:BOULEVARD.crossings[1],period:113},{road:1,d:BOULEVARD.crossings[2],period:149}] as const;
+/** Paved half width per route: the kit's carriageway on the U, the terraces' outer edge on the ④ boulevard (src/streetKit.ts). */
+export const ROAD_HALF=[STREET_KIT.half,13] as const;
+/** Where cars drive, in metres left of the route (`n`, up × tangent): the U route is the kit carriageway's centre, 7 m, one lane each way
+ * (`lane`: each lane centre from the carriageway centre; Japan keeps left); on the ④ boulevard pods ride the guide channel 5 m out on either
+ * side of the median. Car bodies keep ≥ 1 m from planter rims and every solid (tests/odaiba.test.ts checks 0.3 m). */
+export const CARRIAGEWAY=[{centre:0,half:STREET_KIT.half,lane:1.75},{centre:0,half:8.5,lane:5}] as const;
+/** Whether (x, z) lies on the street kit's footprint (A's carriageway and verges, B's whole width; `pad` m more): surveyed trees standing there are hidden. */
+let footprints:{p:T.Vector3;n:T.Vector3;d:number}[][]|null=null;
+export function onStreetKit(x:number,z:number,pad=0){
+  const all=routes().streets;
+  footprints??=all.map(u=>{const L=u.getLength();return Array.from({length:Math.ceil(L)+1},(_,d)=>{const t=u.getTangentAt(Math.min(d/L,1));return {p:u.getPointAt(Math.min(d/L,1)),n:new T.Vector3(t.z,0,-t.x),d};});});
+  return footprints.some((footprint,r)=>{
+    let best=footprint[0],e=Infinity;for(const f of footprint){const q=(f.p.x-x)**2+(f.p.z-z)**2;if(q<e){e=q;best=f;}}
+    if(best.d<(r?0:STREET_KIT.from)||best.d>=footprint.length-2)return false;
+    const o=(x-best.p.x)*best.n.x+(z-best.p.z)*best.n.z,reach=r?0:(o<0?STREET_KIT.inside:STREET_KIT.outside).find(([f,t])=>best.d>=f&&best.d<t)?.[2]??0;
+    return Math.abs(o)<(r?ROAD_HALF[1]:STREET_KIT.half+reach)+pad;
+  });
+}
 /** A lane's centre, metres along its own left (`up × travel direction`): lane 0 travels with the route, lane 1 against it. */
 export const laneOffset=(road:number,lane:number)=>{const {centre,lane:l}=CARRIAGEWAY[road];return lane?l-centre:centre+l;};
-/** The guideway avenue's junction mouth has no road surface in the environment (terrain shows between d 492 and 501): a strip of
- * the paving finish that covers the other avenues fills it (`loadOdaiba`). Left/right edge points (x, z) every metre, for the scene mesh and the road test. */
-export const ROAD_FILL={road:1,from:486,to:507,left:5.2,right:3.7} as const;
-export function roadFill() {
-  const street=routes().streets[ROAD_FILL.road],length=street.getLength(),edges:[number,number][][]=[];
-  for(let d=ROAD_FILL.from;d<=ROAD_FILL.to;d++){
-    const p=street.getPointAt(d/length),t=street.getTangentAt(d/length);
-    edges.push([-ROAD_FILL.left,ROAD_FILL.right].map(n=>[p.x+t.z*n,p.z-t.x*n] as [number,number]));
-  }
-  return edges;
-}
 /** City day rhythm, 0..1 per group at `hour` (undefined: everything at full, as the standalone and Meter tests expect). Most people out
  * in the evening, joggers at dawn and dusk, strollers toward sunset, children by day, sitters from late morning, delivery robots
  * busiest at night, cars at the two commutes. */
@@ -663,46 +667,27 @@ export function mobility(scene:T.Scene) {
   // Delivery robots: 0.8 m rovers with a lit lid, on the doorway forecourts.
   const robots=fleet(scene,[part([.62,.5,.8],[0,.42,0],shell,.12),part([.5,.05,.5],[0,.68,0],mint,.02),part([.66,.16,.7],[0,.12,0],glass,.05)],ROBOTS,'delivery-robots');
   const carBody=material('#ffffff'),headlight=new T.MeshStandardMaterial({color:'#f4f6f2',emissive:'#fff6e0',emissiveIntensity:0,roughness:.3}),taillight=new T.MeshStandardMaterial({color:'#b85a50',emissive:'#ff4a3a',emissiveIntensity:0,roughness:.3});
-  const streetLength=path.streets.map(c=>c.getLength()),streetCars=streetLength.map(length=>Math.round((length+40)/STREET_GAP)),carSlots=streetCars.reduce((n,c)=>n+2*c,0);
+  const streetLength=path.streets.map(c=>c.getLength()),streetCars=streetLength.map((length,r)=>streetCarCount(r,length)),carSlots=streetCars.reduce((n,c)=>n+2*c,0);
   const cars=fleet(scene,[part([1.85,1.1,4.6],[0,.75,0],carBody,.45),part([1.7,.6,2.6],[0,1.45,-.2],glass,.25),part([1.9,.1,4.3],[0,.45,0],mint,.04),
     part([1.5,.14,.08],[0,.95,2.3],headlight,.03),part([1.5,.14,.08],[0,.95,-2.3],taillight,.03)],carSlots,'street-cars');
   const carColors=['#f4f3ee','#e9eef0','#dfe4e2','#c9d3d0','#e8e0d0','#8fa8ad','#5f6f78','#2f3a40'];
   for(let i=0;i<carSlots;i++)cars.tint(i,carBody,carColors[Math.floor(hash(i,16)*carColors.length)]);
   // Autonomous street pods take a car's slot as automation rises (podShare, as the aircraft): a rounded pale cabin under a wraparound
   // glass canopy and a thin mint roof line, the cars' 4.6 m length so the drop-off lamps still fit; a van slot becomes a cargo pod.
-  const podBody=material('#ffffff'),streetPods=fleet(scene,[part([1.8,1.3,4.6],[0,.8,0],podBody,.6),part([1.84,.62,3.5],[0,1.28,-.1],glass,.3),
-    part([.24,.04,2.8],[0,1.6,-.1],mint,.02),part([1.3,.1,.08],[0,.82,2.29],headlight,.03),part([1.3,.1,.08],[0,.82,-2.29],taillight,.03)],carSlots,'street-pods');
+  const podBody=material('#ffffff'),streetPods=fleet(scene,streetPodParts(podBody,headlight,taillight),carSlots,'street-pods');
   for(let i=0;i<carSlots;i++)streetPods.tint(i,podBody,carColors[Math.floor(hash(i,16)*4)]);
+  // The ④ boulevard's guide channels carry pods only, whatever the automation (their own fleet: `street-pods` stays the U's automation swap).
+  const boulevardBase=2*streetCars[0],boulevardPods=fleet(scene,streetPodParts(podBody,headlight,taillight),carSlots-boulevardBase,'boulevard-pods');
+  for(let i=boulevardBase;i<carSlots;i++)boulevardPods.tint(i-boulevardBase,podBody,carColors[Math.floor(hash(i,16)*4)]);
   // Drop-off cues per bay car: an amber indicator pair (front and rear corner, set on the signalled side) and a bright brake lamp over
   // the tail light; hidden when off.
   const amber=new T.MeshBasicMaterial({color:'#ffae2e'}),brakeRed=new T.MeshBasicMaterial({color:'#ff3326'});
   const indicators=fleet(scene,[part([.06,.14,.3],[0,.95,2.05],amber,.02),part([.06,.14,.3],[0,.95,-2.05],amber,.02)],DROP_OFF.cars.length,'drop-off-indicators');
   // Every street vehicle's brake lamp (slot as `cars`): lit while slowing, queued or stopped at a crossing, and for the drop-off stop.
   const brakeLamps=fleet(scene,[part([1.54,.16,.06],[0,.95,-2.33],brakeRed,.03)],carSlots,'brake-lamps');
-  // Crossings: a pale band just above the paving slab that covers the avenues (x scaled to the carriageway width; car bodies clear
-  // it), with mint edge lines lit while a crossing is requested.
-  const crossBands=fleet(scene,[part([1,.02,3.6],[0,.23,0],shell,.01)],CROSSINGS.length,'crossing-bands'),crossLights=fleet(scene,
-    [part([1,.02,.1],[0,.245,1.85],mint,.01),part([1,.02,.1],[0,.245,-1.85],mint,.01)],CROSSINGS.length,'crossing-lights');
-  crossBands.meshes.forEach(m=>m.receiveShadow=true);
-  // Shared-surface carriageways (2127: no asphalt, no painted lines): darker stone seams inlaid at each carriageway edge and a thin mint
-  // guide under each lane centre, flush on the paving slab (crossing bands lie over them). One merged mesh per finish.
-  const inlay=(offsets:(r:number)=>[number,number][])=>{
-    const position:number[]=[],index:number[]=[];
-    path.streets.forEach((street,r)=>{for(const [n,w] of offsets(r)){
-      const length=street.getLength(),base=position.length/3;
-      for(let d=0;d<=length;d+=2){const p=street.getPointAt(Math.min(d/length,1)),t=street.getTangentAt(Math.min(d/length,1));
-        for(const a of [n-w/2,n+w/2])position.push(p.x+t.z*a,.225,p.z-t.x*a);}
-      for(let i=base;i<position.length/3-2;i+=2)index.push(i,i+1,i+2,i+1,i+3,i+2);
-    }});
-    const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(position,3));g.setIndex(index);g.computeVertexNormals();
-    if(g.attributes.normal.getY(0)<0)g.index!.array.reverse(); // keep the strips facing up whatever the route's direction
-    g.computeVertexNormals();return g;
-  };
-  const seamStone=material('#bdb5a4');seamStone.polygonOffset=true;seamStone.polygonOffsetFactor=seamStone.polygonOffsetUnits=-2;
-  const guideMint=mint.clone();guideMint.polygonOffset=true;guideMint.polygonOffsetFactor=guideMint.polygonOffsetUnits=-2;
-  const seams=new T.Mesh(inlay(r=>[[CARRIAGEWAY[r].centre-CARRIAGEWAY[r].half,.3],[CARRIAGEWAY[r].centre+CARRIAGEWAY[r].half,.3]]),seamStone);
-  const laneGuides=new T.Mesh(inlay(r=>[[laneOffset(r,0),.1],[-laneOffset(r,1),.1]]),guideMint);
-  seams.name='carriageway-seams';laneGuides.name='carriageway-guides';seams.receiveShadow=laneGuides.receiveShadow=true;scene.add(seams,laneGuides);
+  // Crossings (the street kit draws their light panels): mint edge lines either side, x scaled to the carriageway width, lit while a
+  // crossing is requested.
+  const crossLights=fleet(scene,[part([1,.02,.1],[0,.245,1.85],mint,.01),part([1,.02,.1],[0,.245,-1.85],mint,.01)],CROSSINGS.length,'crossing-lights');
   const berthLight=new T.PointLight('#b9e2cf',0,60,2);berthLight.position.set(SPHERE_DOCK[0],SPHERE_DOCK[1]+4,SPHERE_DOCK[2]);scene.add(berthLight);
   const ixLight=new T.PointLight('#b9e2cf',0,45,2);ixLight.position.set(INTERCHANGE.mast[0],INTERCHANGE.deck+4,INTERCHANGE.mast[2]);scene.add(ixLight);
   const guideMaterial=new T.MeshBasicMaterial({color:new T.Color('#cfe8ff').multiplyScalar(2.2)});
@@ -745,9 +730,8 @@ export function mobility(scene:T.Scene) {
     place(path.streets[road],d/streetLength[road]);const {centre,half}=CARRIAGEWAY[road];
     // `p`: the carriageway's centre at the crossing.
     pose.position.add(new T.Vector3(tangent.z*centre,0,-tangent.x*centre));
-    pose.scale.set(2*half+.6,1,1);crossBands.set(k,pose);pose.scale.set(1,1,1);
     return {p:pose.position.clone(),t:tangent.clone(),half,kerb:half+.5,yaw:pose.rotation.y};
-  });crossBands.flush();
+  });
   const stops=promenadeStops(walkLength.slice(0,2));
   const resting=pedestrians(scene,spots.length+FORECOURT_GROUPS*3,'resting-people');
   /** Drop-off passengers: one steps out 2 s after the car parks and walks to the nearest landmark door; another walks out to arrive
@@ -870,7 +854,7 @@ export function mobility(scene:T.Scene) {
     fade=Number.isFinite(lastTime)&&time>lastTime?(time-lastTime)/1.5:1;dt=time>lastTime&&time-lastTime<.5?time-lastTime:0;lastTime=time;
     const amount=(count:number,index:number)=>T.MathUtils.clamp(count-index,0,1);
     stepTraffic(time,rhythm.people);
-    guideMint.emissiveIntensity=mint.emissiveIntensity=.65+state.neon*1.8;
+    mint.emissiveIntensity=.65+state.neon*1.8;
     airShell.emissiveIntensity=activity?activity.level*.85:0;
     collar.emissiveIntensity=night*4;
     headlight.emissiveIntensity=.2+night*4;taillight.emissiveIntensity=.15+night*3;
@@ -942,7 +926,8 @@ export function mobility(scene:T.Scene) {
     };
     // Forecourt walkers and robots keep right on their trip and make way for each other (passingLanes); a halted robot and its
     // collector hold still. Movers' `path` is the trip.
-    const tripOf=(k:number)=>k%Math.max(doorWalks.length,1),robotTrip=(k:number)=>(k+3)%Math.max(doorWalks.length,1); // one robot per trip while trips ≥ ROBOTS
+    // At most six walkers and one robot per trip: with few trips (loadOdaiba's landmark set has about eight) the rest stay in, as more on one trip graze.
+    const tripOf=(k:number)=>k<6*doorWalks.length?k%doorWalks.length:-1,robotTrip=(k:number)=>k<doorWalks.length?(k+3)%doorWalks.length:-1;
     const doorMovers:Mover[]=[],doorMover:number[]=[],robotMover:number[]=[],doorPoses=[] as ReturnType<typeof doorwayPose>[],robotPoses=[] as ReturnType<typeof robotPose>[];
     const lane={inner:.15,outer:1.3};
     for(let k=0;k<DOOR_WALKERS-4;k++){
@@ -1028,9 +1013,10 @@ export function mobility(scene:T.Scene) {
       // Every seventh car is a 7 m van; traffic density and the commute rhythm thin the fleet (drop-off cars always run).
       // Human-driven cars give way to autonomous pods slot by slot as automation rises; standalone keeps the cars.
       const van=vanOf[slot]===1,density=drop<0?carGate(slot,state.traffic*.6+.5>hash(slot,18)&&rhythm.cars>hash(slot,22)):1;
-      const shown=car.visible*density,pod=activity?podShare(activity.level,slot):0;
+      const shown=car.visible*density,pod=r===1?1:activity?podShare(activity.level,slot):0;
       pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(shown*(1-pod));cars.set(slot,pose);
-      pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(shown*pod);streetPods.set(slot,pose);
+      pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(r===1?0:shown*pod);streetPods.set(slot,pose);
+      if(r===1){pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(shown);boulevardPods.set(slot-boulevardBase,pose);}
       // Brake lamp over the tail light (a pod's sits .13 m lower).
       const lit=Math.max(carBrake[slot],drop>=0?(car as ReturnType<typeof dropOffPose>).brake:0);
       pose.position.y-=pod>.5?.13*(van?1.3:1):0;pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(shown*lit);brakeLamps.set(slot,pose);pose.position.y+=pod>.5?.13*(van?1.3:1):0;
@@ -1056,14 +1042,16 @@ export function mobility(scene:T.Scene) {
       for(let j=0;j<2;j++){
         // A pair stays 0.7 m apart along the avenue: abreast crossing it, one behind the other on the footway.
         const slot=CROSSERS+k*2+j,offset=c.size===2?(j?.35:-.35):0;
-        pose.position.set(at.p.x+at.t.z*c.side*a+at.t.x*(along+offset),0,at.p.z-at.t.x*c.side*a+at.t.z*(along+offset));
+        // On the boulevard they stand on its light bridge (4 m deep) or, before and after, on its 0.45 m terrace.
+        const y=CROSSINGS[k].road===1?.235+(Math.abs(along+offset)>2.2?.45:.012):0;
+        pose.position.set(at.p.x+at.t.z*c.side*a+at.t.x*(along+offset),y,at.p.z-at.t.x*c.side*a+at.t.z*(along+offset));
         pose.rotation.set(0,alongYaw+yawTo(alongYaw,across)*turn,0);
         pose.scale.setScalar(j<c.size?shown*(.93+.12*hash(slot,8)):0);doorPeople.set(slot,pose);
         doorPeople.gait(slot,walked*5.5+slot,c.phase==='wait'?0:.45);doorPeople.social(slot,0,0);
       }
       pose.position.copy(at.p);pose.rotation.set(0,at.yaw,0);pose.scale.set(2*at.half+.6,1,1).multiplyScalar(requested(k,time)?1:0);crossLights.set(k,pose);
     });
-    cars.flush();streetPods.flush();doorPeople.flush();indicators.flush();brakeLamps.flush();crossLights.flush();
+    cars.flush();streetPods.flush();boulevardPods.flush();doorPeople.flush();indicators.flush();brakeLamps.flush();crossLights.flush();
     // Boats (boatPoses) bob and roll a little; loop taxis thin with traffic and the berthed interchange boat leaves no wake.
     boatPoses(time,path).forEach((b,i)=>{
       pose.position.set(b.x,b.y+Math.sin(time*(i<BOATS?1.3:1.1)+i)*.08,b.z);pose.rotation.set(0,b.yaw,i<BOATS?Math.sin(time*.9+i)*.02:0);
