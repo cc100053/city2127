@@ -137,6 +137,14 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 - **SE `se:focal` 向上望**：owner 嘅 H 鏡位鏡頭低過目標，`tests/headlineCamera.test.ts` 只為 `se:focal` 放寬「鏡頭高過目標」規則（其他 73 個 pose 照舊）。
 - **SE 0 塔高度**（tm-tower、tm-base）：L 鏡位頂框約 18 local units，0 塔要入得 L，所以喺 H 只係目標約一半高（Gemini 放大咗）。選項：(a) 塔頂 ≈ 17，H 用 capture 框跟住城市實際位置（今晚揀咗，淨改 SE rubric）；(b) 塔加高到 ≈ 30，L 切頂；(c) 改 L 鏡位（owner 定嘅，唔郁）。
 
+## SW R5（cap 升到 6，owner）
+
+- 05:20 dispatcher 重開 SW；先 merge `feat/closeup-night`（`24341f8`，fast-forward）入 SW branch。
+- 分數 22/30（73 %）；pairwise 對 R4 6 勝 4 負（輸 fl-emitters、fl-garden、fm-pods、fh-disc）→ keep，commit `09c9273`。
+- 改咗乜：Blocked 選項 (a)——SW 自己嘅人仔（跟 SE `concentrationTower.ts` 做法：頭／身／手／腳、屈膝坐姿、per-instance 淺色衫、小朋友 ×.65），取代共用 `pedestrians()`，淨係郁 `commonsPlaza.ts`；艙底發光領圈；花園加蕨同 12 棵有樹幹嘅樹；0 碟去 halo；+1 碟粉紅邊連續、深灰機械；後亭更暖。
+- 2 分（7）：fl-pods、fl-screens、fm-ring、fm-deck、fh-amph、fh-people、fh-planting。冇 0 分。
+- 1 分（8）：fl-people-in、fl-emitters、fl-garden、fm-pods、fm-divider、fm-canopy、fh-disc、fh-tables。
+
 ## Next expected step
 
 Phase B：dispatcher 開 SW site session（`feat/closeup-night-sw`，port 5191，06:00 前停），完成後驗證、merge 入 `feat/closeup-night`，再開 SE（port 5192，09:00 停）；10:00 前交 night board。
