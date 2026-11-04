@@ -181,7 +181,7 @@ export function housingPrototype() {
     return [x, 15.55 + z * 20 / 12, z, 1.05 + (i % 3) * .04];
   }), -slope);
 
-  // U stands over an existing shader-water swale: slender piles preserve the wet ground rather than filling it.
+  // U stands over a low swale (the shader drew a pond there until road stage 3): slender piles keep the ground open rather than filling it.
   const u = parts.mobile;
   box(u, [22, .45, 15], [0, 2.5, 0], stone);
   for (const x of [-9, 0, 9]) for (const z of [-6, 6]) member(u, [x, .15, z], [x, 2.5, z], .4);

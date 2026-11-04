@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
 import { changeSites, skyBridges, inDistrict, DISTRICT, CIVIC, civicAt } from '../src/layout.ts';
 import { heroCamera, heroSettledCamera } from '../src/heroCamera.ts';
-import { pavilionFlight, plazaPose, routes, mobility, publishDoorways, publishEntrances, forecourtVisits, promenadeBenches, visitPose, entranceJourneys, entrancePose, laneOffset, CARRIAGEWAY } from '../src/mobility.ts';
+import { pavilionFlight, plazaPose, routes, mobility, publishDoorways, publishEntrances, forecourtVisits, promenadeBenches, visitPose, entranceJourneys, entrancePose, laneOffset, CARRIAGEWAY, inWater } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { civicCore } from '../src/civicCore.ts';
 import { publishOccupants, publishRoofWalks, occupantFleet, occupants, rideShown, strollPose } from '../src/occupants.ts';
@@ -20,7 +20,7 @@ import { acceleratedRaycast, MeshBVH } from 'three-mesh-bvh';
 import { checkHousingCity } from './housingCityCheck.ts';
 import { onFormerStreet, repairRoads } from '../src/roadRepair.ts';
 import { streetNetwork } from '../src/streetKit.ts';
-import { BOULEVARD, STREET_KIT } from '../src/layout.ts';
+import { BOULEVARD, STREET_KIT, WATER } from '../src/layout.ts';
 /** A ladder target with the given rungs; the rest mixed. */
 const rungs = (t: Partial<Record<'nw' | 'ne' | 'sw' | 'se', number>>) => ({ tiers: { nw: 0, ne: 0, sw: 0, se: 0, ...t } });
 
@@ -502,6 +502,32 @@ for (const sw of [-3, 3]) {
   serviceDistrict.bays.forEach((b, i) => assert.ok(square(b.x, b.z, b.yaw, 24 * serviceDistrict.scales[i] / 2, 18 * serviceDistrict.scales[i] / 2) > 15, `pavilion at ${b.x},${b.z} on the ④ boulevard`));
 }
 console.log(`Odaiba: ${sharingDistrict.courts.length} sharing courts stand on open ground clear of context, routes and other Meter sites; sites stay visible.`);
+// Street network stage 3: the court pool and the canal. Their water and coping (+2 m) stand under nothing lower than 6 m; no Meter piece, tree, grove
+// terrace or pod/walker/street route reaches them; their ground finishes are open (cut by the shader, so the colour pass shows the water).
+{
+  const pad = WATER.coping + 2, ground = /^(road|road_marking|sidewalk|plaza|landscape|water|service_area)$/, low: string[] = [];
+  for (let x = -400; x < 100; x += 1.5) for (let z = 60; z < 330; z += 1.5) {
+    if (!inWater(x, z, pad)) continue;
+    ray.set(new Vector3(x, 40, z), down);
+    const hit = ray.intersectObject(city, true).find(h => !ground.test(((h.object as Mesh).material as { name: string }).name) && !h.object.name.startsWith('water-garden') && h.point.y < 6);
+    if (hit) low.push(`${hit.object.name}@${x.toFixed(0)},${z.toFixed(0)}`);
+  }
+  assert.deepEqual(low.slice(0, 5), [], 'solids stand in the stage 3 water');
+  for (const name of ['water-garden-water', 'water-garden-coping', 'water-garden-seams', 'water-garden-bridge']) assert.ok(city.getObjectByName(name), `${name} missing`);
+  const disc = (x: number, z: number, r: number) => [0, 1].some(f => Array.from({ length: f ? 16 : 1 }, (_, k) => k / 16 * Math.PI * 2).some(a => inWater(x + Math.cos(a) * r * f, z + Math.sin(a) * r * f, pad)));
+  for (const p of concentration.pods) assert.ok(!disc(p.x, p.z, 10.5), `pod at ${p.x},${p.z} in the water`);
+  for (const t of concentration.towers) assert.ok(!disc(t.x, t.z, 18.5), `tower at ${t.x},${t.z} in the water`);
+  const square = (x: number, z: number, yaw: number, hu: number, hv: number) => { for (let u = -1; u <= 1; u += .1) for (let v = -1; v <= 1; v += .1) if (inWater(x + u * hu * Math.cos(yaw) + v * hv * Math.sin(yaw), z - u * hu * Math.sin(yaw) + v * hv * Math.cos(yaw), pad)) return true; return false; };
+  for (const c of sharingDistrict.courts) assert.ok(!square(c.x, c.z, c.yaw, 20, 20), `court at ${c.x},${c.z} in the water`);
+  serviceDistrict.bays.forEach((b, i) => assert.ok(!square(b.x, b.z, b.yaw, 24 * serviceDistrict.scales[i] / 2, 18 * serviceDistrict.scales[i] / 2), `pavilion at ${b.x},${b.z} in the water`));
+  for (const site of Object.values(changeSites)) assert.ok(!disc(site.x, site.z, Math.hypot(site.w, site.d) * site.scale / 2), `${site.name} in the water`);
+  const m = new Matrix4(), c = new Vector3(), q = new Quaternion(), sc = new Vector3();
+  for (const o of city.children.filter(o => o instanceof InstancedMesh && /^(surveyed-coastal-trunks|grove-terraces)$/.test(o.name)) as InstancedMesh[])
+    for (let i = 0; i < o.count; i++) { o.getMatrixAt(i, m); m.decompose(c, q, sc); if (sc.x > 0) assert.ok(!inWater(c.x, c.z, o.name === 'grove-terraces' ? Math.max(sc.x, sc.z) + 1 : 1), `${o.name} ${i} at ${c.x.toFixed(0)},${c.z.toFixed(0)} in the water`); }
+  for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades, ...actorPaths.decks, ...actorPaths.streets]) for (const p of route.getSpacedPoints(800))
+    assert.ok(p.y > 6 || !inWater(p.x, p.z, 1), `a route crosses the water at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
+}
+
 
 const courtVisibility = sharingDistrict.courts.map(c => courtPixels(c.x, c.z, c.yaw));
 // Owner 2026-11-01 (c2 low hero): courts 1, 4, 6 and 7 fall behind landmarks or out of frame; the SW district shot shows them.

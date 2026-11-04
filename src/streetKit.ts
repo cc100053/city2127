@@ -1,14 +1,14 @@
 // 2127 street kit (road redesign, owner targets 2026-11-04 in ~/city2127-evidence/road-design/gen): A, the light-guided shared avenue
 // (avenue-A.jpg) and B, the maglev guide-channel boulevard (boulevard-B.jpg). Each street is built from a centreline and a cross-section
 // of bands in metres left of the route (`n`, up × tangent). `streetNetwork` lays A on the street-car U route (road redesign stage 1) and B on
-// the ④ boulevard (stage 2).
+// the ④ boulevard (stage 2); `waterGarden` adds the stage 3 court pool and canal.
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { leaf, trim } from './cityRig.ts';
 import { glowTexture } from './glowTexture.ts';
 import { hash, plantCanopy } from './coastalCanopy.ts';
-import { routes } from './mobility.ts';
-import { BOULEVARD, STREET_KIT } from './layout.ts';
+import { routes, waterways } from './mobility.ts';
+import { BOULEVARD, STREET_KIT, WATER } from './layout.ts';
 
 /** Large pale ceramic panels: a 256 px tile with fine seams on two edges, repeated per panel in metres through the strip's uv. */
 function panelTexture() {
@@ -256,7 +256,40 @@ export function boulevardStreet(c: Curve, d0: number, d1: number, crossings: rea
   return root;
 }
 
-/** The kit along the street network: A on the U route (`STREET_KIT`), B on the ④ boulevard (`BOULEVARD`). The ceramic, footways and terraces join
+// Stage 3 water: dark still water (the old shader ponds' finish), a 1 m white coping 0.35 m over it, a lit seam along the coping's inner edge.
+const pool = new T.MeshStandardMaterial({ color: '#3c6f86', roughness: .06, metalness: .35, name: 'pool-water' });
+/** Stadium outline, `l` × `w`, centred on the origin, long axis on x. */
+const stadium = (l: number, w: number, path: T.Path = new T.Shape()) => { const r = w / 2; path.absarc(l / 2 - r, 0, r, -Math.PI / 2, Math.PI / 2, false); path.absarc(-l / 2 + r, 0, r, Math.PI / 2, Math.PI * 1.5, false); return path; };
+/** The court pool under the Fuji frame and the canal beside ④ (`WATER`). The ground finishes there are cut away (odaibaScene `waterGLSL`). */
+export function waterGarden() {
+  ground = () => 0;
+  const { pool: P, canal: C, coping: k, bridge } = WATER, top = .05, water = top - .35, deep = .6, root = new T.Group(); root.name = 'water-garden';
+  const stone: T.BufferGeometry[] = [], walls: T.BufferGeometry[] = [], surface: T.BufferGeometry[] = [], seams: T.BufferGeometry[] = [], deck: T.BufferGeometry[] = [];
+  // Pool: one coping ring extruded `deep` down from its top (its inner face is the pool wall), the water, a 0.12 m lit ring inside the coping.
+  const ring = (l: number, w: number, inset: number) => { const s = stadium(l, w) as T.Shape; s.holes.push(stadium(l - 2 * inset, w - 2 * inset, new T.Path())); return s; };
+  const flat = (g: T.BufferGeometry, y: number) => g.rotateX(-Math.PI / 2).translate(P.x, y, P.z);
+  stone.push(flat(new T.ExtrudeGeometry(ring(P.length, P.width, k), { depth: deep, bevelEnabled: false, curveSegments: 24 }), top - deep));
+  surface.push(flat(new T.ShapeGeometry(stadium(P.length - 2 * k, P.width - 2 * k) as T.Shape, 24), water));
+  seams.push(flat(new T.ShapeGeometry(ring(P.length - 2 * k, P.width - 2 * k, .12), 24), top + .004));
+  // Canal: along the straight ④ segment it follows (`line` runs one coping width past each end); copings as slabs with both faces, the end ones with a wall toward the water.
+  const { a, b, u, len } = waterways(), line = new T.LineCurve3(a.clone().addScaledVector(u, -k), b.clone().addScaledVector(u, k)), L = len + 2 * k, lo = C.offset - C.width / 2, hi = C.offset + C.width / 2;
+  stone.push(band(line, 0, L, lo - k, lo, top, deep), band(line, 0, L, hi, hi + k, top, deep), band(line, 0, k, lo, hi, top, deep), band(line, L - k, L, lo, hi, top, deep));
+  walls.push(cap(line, k, lo, hi, water, top, 1), cap(line, L - k, lo, hi, water, top, -1));
+  surface.push(band(line, k, L - k, lo, hi, water));
+  seams.push(band(line, k, L - k, lo - .12, lo, top + .004), band(line, k, L - k, hi, hi + .12, top + .004));
+  // ④'s light bridge carries on from its north-west terrace edge over the canal to the lawn beyond: a lit deck on a white slab whose faces reach the lawn
+  // (over the canal only a 0.25 m fascia, so it reads as a span, not a weir).
+  const boulevard = routes().streets[1], end = hi + k + 1, f = bridge - 2, t = bridge + 2;
+  stone.push(band(boulevard, f, t, 13, end, .24, .6));
+  for (const [e, dir] of [[f, -1], [t, 1]]) for (const [p, q, y0] of [[13, lo - k, -.35], [lo - k, hi + k, 0], [hi + k, end, -.35]]) stone.push(cap(boulevard, e, p, q, y0, .24, dir));
+  deck.push(band(boulevard, f, t, 13, end, .247));
+  for (const e of [f, t]) seams.push(band(boulevard, e - .07, e + .07, 13, end, .265));
+  const w = mesh(surface, pool, 'water-garden-water', false); w.receiveShadow = false; // the lawn's shadow caster stands over it (it is only cut in the colour pass)
+  root.add(w, mesh(stone, trim, 'water-garden-coping'), mesh(walls, riser, 'water-garden-walls'), mesh(seams, seamLight, 'water-garden-seams', false), mesh(deck, bridgeDeck, 'water-garden-bridge', false));
+  return root;
+}
+
+/** The kit along the street network: A on the U route (`STREET_KIT`), B on the ④ boulevard (`BOULEVARD`), and the stage 3 water (`waterGarden`). The ceramic, footways and terraces join
  * `environment` (it then stands on them); the planters, plants, rings, blades and lines come back for the scene. A's planters also keep 1.5 m
  * clear of every Yurikamome pier within the verges, found in the loaded environment. */
 export function streetNetwork(environment: T.Object3D) {
@@ -277,7 +310,7 @@ export function streetNetwork(environment: T.Object3D) {
   const piers = hits.map(ds => ds.sort((a, b) => a - b).reduce((out: Span[], d) => { const last = out.at(-1); if (last && d - 1.5 <= last[1]) last[1] = d + 1.5; else out.push([d - 1.5, d + 1.5]); return out; }, []));
   const root = new T.Group(); root.name = 'street-network';
   root.add(avenueStreet(u, K.from, L, [-K.half, K.half], { reach: K.inside, gaps: [...K.gaps.inside, ...piers[0]] }, { reach: K.outside, gaps: [...K.gaps.outside, ...piers[1]] }, K.crossings, () => 0),
-    boulevardStreet(boulevard, 0, boulevard.getLength(), BOULEVARD.crossings, () => 0, BOULEVARD.gaps));
+    boulevardStreet(boulevard, 0, boulevard.getLength(), BOULEVARD.crossings, () => 0, BOULEVARD.gaps), waterGarden());
   for (const name of ['street-ceramic', 'street-footway', 'boulevard-ceramic', 'boulevard-terraces']) environment.add(root.getObjectByName(name)!);
   return root;
 }

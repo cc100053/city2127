@@ -62,6 +62,10 @@ export const BOULEVARD = {
   crossings: [124, 311, 474],
   gaps: { median: [[230, 240], [244, 255]], terraces: [[252, 262]] },
 } as const;
+/** Stage 3 designed water (artifacts/street-kit-closeup-polish/network-stage3.md), replacing the landscape shader's ponds: a court pool under the
+ * Fuji frame (stadium, outer size) and a canal on the old band north-west of ④ (④ d `from`–`to`, water `offset` ± `width`/2 m left of it),
+ * both edged with a 1 m white coping 0.35 m over the water. ④'s light bridge at d 124 runs on over the canal. */
+export const WATER = { pool: { x: 22, z: 118, length: 70, width: 24 }, canal: { from: 4, to: 200, offset: 30, width: 8 }, coping: 1, bridge: BOULEVARD.crossings[0] } as const;
 /** The kit along `streets[0]`, in metres along it: carriageway half width, verges [from, to, reach beyond the carriageway edge] on the inside
  * (right of the route, −n: toward the plaza deck) and the outside, planter gaps [from, to] (the Yurikamome piers are found in the environment),
  * light-panel crossings, and where the kit starts (a pier stands on the road at d 2–6). Reaches stop short of DECKS, the ring and arch feet,

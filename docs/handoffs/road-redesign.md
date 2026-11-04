@@ -1,7 +1,7 @@
 # road-redesign — 2127 street network and street kit
 
 - Owner: cc100053
-- Status: IN_PROGRESS (kit polish R3 and network stages 1–2 owner-accepted 2026-11-04 and merged to main at the owner's request; stage 3 next)
+- Status: IN_PROGRESS (kit polish R3 and network stages 1–2 owner-accepted 2026-11-04 and merged to main; stage 3 built on `claude/road-net-stage3`, owner visual acceptance pending)
 - Branch: `claude/road-net-stage2-63b23f` (from stage 1's `claude/road-net-stage1-a14ae6` at 5404ca8, itself from `claude/street-kit-polish-86d81f` at 1cf1a70, which continues the [road audit](road-audit.md) commit 866cdbe; not merged — the owner merges after all stages)
 - Base commit: 5a56230a9b2748344624197265406bcb3de39ef0 (main)
 - Remote availability: pushed (`origin/claude/road-net-stage1-a14ae6`; stage 2 on `origin/claude/road-net-stage2-63b23f`)
@@ -92,7 +92,20 @@
 - Meter pieces on the line moved to the nearest valid site (bay 3, two pods, courts 2, 5, 6, 8; list in the spec §8); court 5 joins the
   hero-hidden courts (about 450 px). The odaiba test checks every Meter piece keeps 2 m off ④.
 - Known: hero FPS about 4 below stage 1 (see Validation); lag of ④'s pods behind their free slots peaks at about 300 m (bounded; test allows 400 m); the old landscape sine ponds and the
-  corridor channel still show (stage 3); a surveyed tree in a ring stands 14 m off ④'s south edge in the close frame (as in R3).
+  corridor channel still showed (removed in stage 3); a surveyed tree in a ring stands 14 m off ④'s south edge in the close frame (as in R3).
+
+## Network stage 3 (branch `claude/road-net-stage3`, from main 5e54d15)
+
+- Spec, owner-approved 2026-11-04 before code: [network-stage3.md](../../artifacts/street-kit-closeup-polish/network-stage3.md) (§7 as built). Plan maps
+  and scripts: `~/city2127-evidence/road-net-stage3/spec/` (`plan-all.png`, `plan-sw.png`, `plan3.mts`, `prop.mts`, `look.mjs`); captures `r1/`.
+- The landscape shader's swale ponds, corridor channel and rims are gone (gravel walks stay); `CORRIDOR_GLSL` removed. The grove lattice keeps its
+  swale/corridor fields, so no grove, court or tower moved; the old pond sites are lawn clearings.
+- `WATER` (layout.ts) and `waterGarden` (streetKit.ts): a 70 × 24 m stadium pool in the Fuji frame's ground court (22, 118) and an 8 m canal 26–34 m
+  north-west of ④ from d 4 to **d 200** (not 210: automation bay 3's 48 × 36 m plinth); white 1 m coping 0.35 m over the water, lit inner seam;
+  ④'s d 124 light bridge runs on over the canal. `openBay` cuts every ground finish over the water (`waterGLSL`); `inWater` hides surveyed trees
+  within 4 m. The housing prototype's comment about standing over shader water was updated.
+- Known: the pool's sky reflection shows soft concentric banding at the review pose by day; the canal's night seam is faint at the canal pose;
+  `preview_start` (`.claude/launch.json` root-5174) serves the main checkout, not this worktree: run Vite from the worktree for captures.
 
 ## Validation
 
@@ -115,7 +128,12 @@
 - 2026-11-04, integration: merged into main as 536ba07 (`--no-ff` on origin/main 5a56230, which had not moved); its tree equals the
   validated branch tip, so `npm test`, `npm run build` and `git diff --check` above stand for it; `git diff --check origin/main..HEAD` PASS.
 
+- 2026-11-04, stage 3 on `claude/road-net-stage3` (uncommitted tree on 5e54d15, then committed unchanged): `npm test` exit 0 (odaiba stage 3 water
+  checks pass); `npm run build` PASS; `git diff --check` PASS. FPS (`fps.sh`, headed Chrome 1920×1080, DPR 1, `meters=nw:0`, hero): day 54.1–56.3,
+  night 54.2–56.5 (stage 2: 55.2–56.2 / 55.6–57.0, same machine, same evening). Captures `~/city2127-evidence/road-net-stage3/r1/` (hero; pool
+  `cam=22,45,175&at=22,0,118`; canal `cam=-260,30,330&at=-150,0,210`; wide `cam=-170,70,320&at=30,0,165`; day 13, night 21; `capture.mjs`).
+  Visual acceptance: owner only, pending.
+
 ## Next expected step
 
-Stage 3 in a new task branch from main: court pool under the Fuji frame, canal park on the old band (its ground is `onFormerStreet`),
-landscape sine ponds and corridor channel removed.
+Owner reviews stage 3 captures; on acceptance, merge `claude/road-net-stage3` into main (validate the merge result, push, confirm main CI).

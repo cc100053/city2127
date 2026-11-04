@@ -1,19 +1,20 @@
 import * as T from 'three';
 import { changeSites, DISTRICT, HUB_LEGACY_LOT, inDistrict, seaward } from './layout.ts';
-import { onStreetKit, routes } from './mobility.ts';
+import { inWater, onStreetKit, routes } from './mobility.ts';
 import { onBayPlinth } from './automationBays.ts';
 import { recedeBeyondDistrict } from './bayContext.ts';
 import { leaf, leafyCrown, trim } from './cityRig.ts';
 
-/** Grove field: the landscape shader (odaibaScene.ts) fills swales below -1.24 with ponds; groves keep clear of them. */
+/** Grove field: groves keep clear of its swales below about -1.15 (where the landscape shader drew ponds before stage 3; kept so the grove lattice stays put). */
 const swale=(x:number,z:number)=>Math.sin(x*.023+Math.sin(z*.018)*2)+Math.cos(z*.031);
-/** r8: one climate corridor — the swale valley line through the district centre (sine term at its minimum) runs through its ponds,
- * so the shader cuts a channel along it (|corridor| < .1, about 4 m each side) joining them into one water system. Mirrored in odaibaScene. */
+/** r8: one climate corridor — the swale valley line through the district centre (sine term at its minimum); groves gather along it and keep
+ * about 6 m off it (the shader's old channel, removed in stage 3), so the lattice is unchanged. */
 export const corridor=(x:number,z:number)=>Math.abs(x*.023+Math.sin(z*.018)*2+Math.PI/2);
-export const CORRIDOR_GLSL='abs(w.x*.023+sin(w.y*.018)*2.+1.5708)';
 
 /** P5 leaf tones (h,s,l): deep, mid, olive — the light spring green is the former cherry tint. */
 const GREENS=[[.30,.45,.24],[.27,.42,.29],[.21,.38,.27]] as const;
+/** Trees keep their trunk and planter ring off the water and its coping. */
+const WATER_PAD=4;
 export const hash=(n:number)=>{const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s);};
 const drum=new T.CylinderGeometry(1,1,1,40),crown=leafyCrown(),lowCrown=leafyCrown(1);
 /** Reuse the surveyed planting locations; layered crowns replace the tiny blockout cones.
@@ -23,7 +24,7 @@ export function plantCanopy(scene: T.Object3D, trees: { instances: { position: n
   const inLot=(tree:{position:number[]},sites:{x:number;z:number;w:number;d:number;scale:number}[])=>sites.some(site=>Math.abs(tree.position[0]-site.x)<site.w*site.scale/2+9 && Math.abs(-tree.position[1]-site.z)<site.d*site.scale/2+9);
   // Each crown's pose depends on its index here, so the list is indexed against the NW lot as it was before the grown AUTO HUB plinth (R4); trees inside the real lot are then hidden in place, which leaves every other crown as it was.
   const positions=trees.instances.filter(tree=>inDistrict(tree.position[0],-tree.position[1]) && !seaward(tree.position[0],-tree.position[1]) && !(tree.position[2]<3 && (swale(tree.position[0],-tree.position[1])<-1.1 || corridor(tree.position[0],-tree.position[1])<.2)) && !inLot(tree,Object.values({...changeSites,nw:HUB_LEGACY_LOT})));
-  const lots=Object.values(changeSites),gone=positions.map(tree=>inLot(tree,lots) || onBayPlinth(tree.position[0],-tree.position[1],2) || (pits && onStreetKit(tree.position[0],-tree.position[1],.5))); // bay plinths (automationBays.ts) and, for ground trees, the street kit (its planters bring their own) keep their ground clear the same way
+  const lots=Object.values(changeSites),gone=positions.map(tree=>inLot(tree,lots) || onBayPlinth(tree.position[0],-tree.position[1],2) || (pits && onStreetKit(tree.position[0],-tree.position[1],.5)) || inWater(tree.position[0],-tree.position[1],WATER_PAD)); // bay plinths (automationBays.ts), the stage 3 water and, for ground trees, the street kit (its planters bring their own) keep their ground clear the same way
   // Instance colours already provide the leaf pigment; a second green tint crushed the lit canopy.
   const foliage=new T.InstancedMesh(crown,new T.MeshStandardMaterial({color:'#ffffff',roughness:.92}),positions.length*4);
   const trunks=new T.InstancedMesh(new T.CylinderGeometry(.35,.6,1,6),new T.MeshStandardMaterial({color:'#776957',roughness:1}),positions.length);
@@ -160,7 +161,7 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
     // So clusters are claimed against the NW lot as it was before the grown AUTO HUB plinth (R4) and only the ones inside the real lot are left unplanted.
     if(seaward(px,pz) || Object.values({...changeSites,nw:HUB_LEGACY_LOT}).some(near))continue;
     const pad=padGap(px,pz),path=pathGap(px,pz),sw=swale(px,pz),cor=corridor(px,pz);
-    // Keep the terrace off pads, paths, ponds (swale changes up to ~.05 per metre) and the corridor channel.
+    // Keep the terrace off pads, paths, the old pond swales (swale changes up to ~.05 per metre) and the corridor line.
     if(pad<reach+6 || path<reach+10 || sw<-1.15+reach*.05 || cor<.14+reach*.045)continue;
     // r9 pass 2: groves reach further out from structure (target v2's near-continuous canopy) — still terraced clusters, open lawn only far from it.
     if(!(pad<reach+70 || path<reach+56 || cor<.14+reach*.045+1.4 || sw<-.1))continue;

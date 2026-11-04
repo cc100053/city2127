@@ -3,7 +3,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets.ts';
 import { heroSettledCamera, heroTextZone } from './heroCamera.ts';
-import { guideway, guidewayTracks, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers, bayChannels, skyCorridors, sweepway, streets, STREET_KIT, BOULEVARD, shoreLane, interchangeApproach, interchangeBoatLane, INTERCHANGE, midDecks, gardenDecks } from './layout.ts';
+import { guideway, guidewayTracks, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers, bayChannels, skyCorridors, sweepway, streets, STREET_KIT, BOULEVARD, WATER, shoreLane, interchangeApproach, interchangeBoatLane, INTERCHANGE, midDecks, gardenDecks } from './layout.ts';
 
 const ease=(t:number)=>T.MathUtils.smoothstep(t,0,1);
 const curve=(points:readonly (readonly [number,number,number])[],closed=false)=>new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p)),closed,'centripetal');
@@ -513,6 +513,22 @@ export function onStreetKit(x:number,z:number,pad=0){
     const o=(x-best.p.x)*best.n.x+(z-best.p.z)*best.n.z,reach=r?0:(o<0?STREET_KIT.inside:STREET_KIT.outside).find(([f,t])=>best.d>=f&&best.d<t)?.[2]??0;
     return Math.abs(o)<(r?ROAD_HALF[1]:STREET_KIT.half+reach)+pad;
   });
+}
+/** Stage 3 water (`WATER`): the canal's axis along the straight ④ segment it follows (ends a, b, direction u, left normal n, length). */
+let waterShape:{a:T.Vector3;b:T.Vector3;u:T.Vector3;n:T.Vector3;len:number}|null=null;
+export function waterways(){
+  if(!waterShape){const c=routes().streets[1],L=c.getLength(),a=c.getPointAt(WATER.canal.from/L),b=c.getPointAt(WATER.canal.to/L),u=b.clone().sub(a).normalize();waterShape={a,b,u,n:new T.Vector3(u.z,0,-u.x),len:a.distanceTo(b)};}
+  return waterShape;
+}
+/** Whether (x, z) lies within `pad` m of the pool's or canal's water (`pad` = WATER.coping: on the coping too). */
+export function inWater(x:number,z:number,pad=0){
+  const {a,u,n,len}=waterways(),{pool,canal}=WATER,s=(x-a.x)*u.x+(z-a.z)*u.z,o=(x-a.x)*n.x+(z-a.z)*n.z,h=pool.length/2-pool.width/2;
+  return (s>-pad && s<len+pad && Math.abs(o-canal.offset)<canal.width/2+pad) || Math.hypot(Math.max(Math.abs(x-pool.x)-h,0),z-pool.z)<pool.width/2-WATER.coping+pad;
+}
+/** `inWater(p.x, p.y)` in GLSL (vec2 p = world x, z): the ground finishes discard their surface over the water. */
+export function waterGLSL(pad=.05){
+  const {a,u,n,len}=waterways(),{pool,canal}=WATER,f=(v:number)=>v.toFixed(4),h=pool.length/2-pool.width/2,q=`(p-vec2(${f(a.x)},${f(a.z)}))`;
+  return `(abs(dot(${q},vec2(${f(u.x)},${f(u.z)}))-${f(len/2)})<${f(len/2+pad)} && abs(dot(${q},vec2(${f(n.x)},${f(n.z)}))-${f(canal.offset)})<${f(canal.width/2+pad)}) || length(vec2(max(abs(p.x-${f(pool.x)})-${f(h)},0.),p.y-${f(pool.z)}))<${f(pool.width/2-WATER.coping+pad)}`;
 }
 /** A lane's centre, metres along its own left (`up × travel direction`): lane 0 travels with the route, lane 1 against it. */
 export const laneOffset=(road:number,lane:number)=>{const {centre,lane:l}=CARRIAGEWAY[road];return lane?l-centre:centre+l;};

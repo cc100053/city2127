@@ -10,12 +10,12 @@ import { bodyFootprints, carveContext, inRect, megastructures, updateMegastructu
 import { publishOccupants, publishRoofWalks } from './occupants';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
 import { facadeClimate, publishRoofGardens, towerGlow, towerNight } from './districtMeters';
-import { CORRIDOR_GLSL, plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
+import { plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
 import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
-import { changeSites, DISTRICT, inDistrict, SEAWARD_GLSL } from './layout';
+import { DISTRICT, inDistrict, SEAWARD_GLSL } from './layout';
 import { bayContext, recedeBeyondDistrict } from './bayContext';
-import { publishDoorways, publishEntrances, routes } from './mobility';
+import { publishDoorways, publishEntrances, routes, waterGLSL } from './mobility';
 import { onFormerStreet, repairRoads } from './roadRepair';
 import { streetNetwork, updateStreetKit } from './streetKit';
 
@@ -127,16 +127,17 @@ export function updateOdaiba(night: number) {
 // than the depth precision at hero range, so they z-fight. A depth offset per finish fixes the stacking order at any distance; up close the
 // real geometry still decides. Same-finish pairs (pads/footpaths, planters/terrain) share a colour, so they need no order.
 const groundLayer: Record<string, number> = { road: 1, service_area: 1, plaza: 2, sidewalk: 3, road_marking: 4 };
-// Ground finishes that stop at the seaward cut; massing, guideway and revetment keep their geometry.
-const cutGround = new Set(['landscape', 'road', 'sidewalk', 'road_marking']);
-function openBay(material: T.Material) {
+// Ground finishes that stop at the seaward cut; massing, guideway and revetment keep their geometry. All ground finishes open over the stage 3
+// water (streetKit `waterGarden`), whose surface lies 0.35 m under its coping.
+const cutGround = new Set(['landscape', 'road', 'sidewalk', 'road_marking']), wetGround = new Set([...cutGround, 'plaza', 'service_area']);
+function openBay(material: T.Material, bay = true) {
   const compile = material.onBeforeCompile.bind(material), key = material.customProgramCacheKey.bind(material);
   material.onBeforeCompile = (shader, renderer) => {
     compile(shader, renderer);
     shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 bayCut;').replace('#include <project_vertex>', '#include <project_vertex>\nbayCut=(modelMatrix*vec4(transformed,1.)).xz;');
-    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 bayCut;').replace('#include <clipping_planes_fragment>', `{ vec2 p=bayCut; if(${SEAWARD_GLSL}) discard; }\n#include <clipping_planes_fragment>`);
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 bayCut;').replace('#include <clipping_planes_fragment>', `{ vec2 p=bayCut; if(${bay ? `(${SEAWARD_GLSL}) || ` : ''}${waterGLSL()}) discard; }\n#include <clipping_planes_fragment>`);
   };
-  material.customProgramCacheKey = () => key() + '|open-bay';
+  material.customProgramCacheKey = () => key() + (bay ? '|open-bay' : '|open-water');
 }
 
 /** Phase 03D environment (detail inside the district only), the bay context, six surveyed landmarks and the Fuji civic core, in metres. */
@@ -159,23 +160,15 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
       // World metres keep the authored terrain patches at one consistent texture scale.
       material.onBeforeCompile=shader=>{
         shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\ngrassUv=(modelMatrix*vec4(transformed,1.)).xz/32.;');
-        // Inside the district the lawns become a park landscape: reflecting ponds in the grove swales (the same field plantLandscapeCanopy
-        // leaves clear, so no crowns stand in water; survey sites stay dry) with pale stone rims, and meandering gravel walks along another field's contours.
+        // Inside the district the lawns carry meandering gravel walks along a field's contours. (Stage 3: the swale ponds and corridor channel
+        // that were drawn here are gone; the designed water is streetKit's waterGarden, cut out of the ground by openBay.)
         shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <map_fragment>',`diffuseColor.rgb *= mix(texture2D(map,grassUv).rgb,texture2D(map,grassUv*.19).rgb,.35);
           vec2 w=grassUv*32.;
           float inside=step(${DISTRICT.minX.toFixed(1)},w.x)*step(w.x,${DISTRICT.maxX.toFixed(1)})*step(${DISTRICT.minZ.toFixed(1)},w.y)*step(w.y,${DISTRICT.maxZ.toFixed(1)});
-          float swale=sin(w.x*.023+sin(w.y*.018)*2.)+cos(w.y*.031);
-          float site=${Object.values(changeSites).map(c=>`step(abs(w.x-(${c.x.toFixed(1)})),${(c.w*c.scale/2+14).toFixed(1)})*step(abs(w.y-(${c.z.toFixed(1)})),${(c.d*c.scale/2+14).toFixed(1)})`).join('+')};
-          // r8: the corridor channel (coastalCanopy.corridor) joins the ponds into one water/climate corridor, all edged in crisp white.
-          float lawnOpen=inside*(1.-min(site,1.)),corridor=${CORRIDOR_GLSL};
-          float pond=lawnOpen*max(1.-smoothstep(-1.28,-1.24,swale),1.-smoothstep(.09,.1,corridor));
-          float rim=max(lawnOpen*max(1.-smoothstep(-1.17,-1.13,swale),1.-smoothstep(.13,.14,corridor))-pond,0.);
           float walk=inside*(1.-smoothstep(.06,.1,abs(sin(w.x*.037+cos(w.y*.029)*1.6)+sin(w.y*.033+w.x*.011))));
-          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.84,.81,.74),walk*(1.-pond)); // r8 pass 3: pale ivory walks, crisper engineered edge than tan gravel
-          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.9,.89,.85),rim);
-          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.16,.36,.46),pond);`).replace('#include <metalnessmap_fragment>','#include <metalnessmap_fragment>\nroughnessFactor=mix(roughnessFactor,.06,pond);metalnessFactor=mix(metalnessFactor,.35,pond);');
+          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.84,.81,.74),walk); // r8 pass 3: pale ivory walks, crisper engineered edge than tan gravel`);
       };
-      material.customProgramCacheKey=()=>'coastal-grass-ponds';
+      material.customProgramCacheKey=()=>'coastal-grass';
     }
     // The sea lies under the whole plate; grazing shadows on it only produce acne.
     if (material.name === 'water') { object.castShadow = object.receiveShadow = false; if(water) object.material=water; }
@@ -184,7 +177,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   repairRoads(environment, built.filter(placement => placement.id !== 'fuji-tv')); // Fuji is the civic frame, which stands on its own pads
   // After finishes: shared materials are re-tuned once per mesh above, which would drop an earlier wrap.
   environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) receded.add(object.material); });
-  receded.forEach(material => { if (cutGround.has(material.name)) openBay(material); recedeBeyondDistrict(material); });
+  receded.forEach(material => { if (wetGround.has(material.name)) openBay(material, cutGround.has(material.name)); recedeBeyondDistrict(material); });
   carveContext(environment);
   scene.add(contextFacades(environment), bayContext(), megastructures(), floaters(), streetNetwork(environment)); // after the recede wrap: the kit's ground keeps its own shading
   plantCanopy(scene,trees,true);
