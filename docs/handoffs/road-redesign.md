@@ -112,6 +112,8 @@
   the gap is ④'s geometry (no further gain without any of its shadows). Captures `~/city2127-evidence/road-net-stage2/r1/` (hero, close
   `cam=-45,24,212&at=0,0,168`, wide `cam=-170,70,320&at=30,0,165`; day 13, night 21; `capture.mjs`). Owner accepted stage 2 as captured and asked
   to merge it to main now (2026-11-04), ahead of stage 3.
+- 2026-11-04, integration: merged into main as 536ba07 (`--no-ff` on origin/main 5a56230, which had not moved); its tree equals the
+  validated branch tip, so `npm test`, `npm run build` and `git diff --check` above stand for it; `git diff --check origin/main..HEAD` PASS.
 
 ## Next expected step
 
