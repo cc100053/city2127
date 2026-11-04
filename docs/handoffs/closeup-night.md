@@ -66,6 +66,13 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 - 2 分：fm-deck、fh-amph、fh-people、fh-planting（全部 pairwise `=`）。冇 0 分。
 - 仍然弱：人坐唔落（艙入面人企喺座位後面、圓圈嘅人企住）；艙企喺深色柱上，唔似懸浮；屏風似清玻璃；花園似草地＋石板；+1 碟肋位唔夠；後亭唔似玻璃房。
 
+## SW R3
+
+- 分數 18/30；pairwise 對 R2 4 勝 3 負（輸 fl-emitters、fl-garden、fh-amph）→ keep（commit 見 branch）。
+- 改咗乜：艙去咗深色柱真係懸浮、坐姿證實正常（由鏡位睇大腿好短）、白膜屏風、密植花園、0 碟下面環、+1 碟粉紅肋同機械、後亭玻璃。
+- 2 分：fm-deck、fh-tables、fh-planting。fh-amph 由 2 跌 1（judge 話似直排看台）。
+- 仍然弱：艙內人似深色樽；艙互相重疊；發光環偏白綠；+1 前面一大片空白廣場，階梯擠喺後半。
+
 ## Next expected step
 
 Phase B：dispatcher 開 SW site session（`feat/closeup-night-sw`，port 5191，06:00 前停），完成後驗證、merge 入 `feat/closeup-night`，再開 SE（port 5192，09:00 停）；10:00 前交 night board。
