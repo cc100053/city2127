@@ -1,7 +1,7 @@
 # road-redesign — 2127 street network and street kit
 
 - Owner: cc100053
-- Status: IN_PROGRESS (kit polish R3 and network stage 1 owner-accepted 2026-11-04; stage 2 implemented, owner acceptance pending; then stage 3)
+- Status: IN_PROGRESS (kit polish R3 and network stages 1–2 owner-accepted 2026-11-04 and merged to main at the owner's request; stage 3 next)
 - Branch: `claude/road-net-stage2-63b23f` (from stage 1's `claude/road-net-stage1-a14ae6` at 5404ca8, itself from `claude/street-kit-polish-86d81f` at 1cf1a70, which continues the [road audit](road-audit.md) commit 866cdbe; not merged — the owner merges after all stages)
 - Base commit: 5a56230a9b2748344624197265406bcb3de39ef0 (main)
 - Remote availability: pushed (`origin/claude/road-net-stage1-a14ae6`; stage 2 on `origin/claude/road-net-stage2-63b23f`)
@@ -110,9 +110,10 @@
   FPS (`fps.sh`, headed Chrome 1920×1080, DPR 1, `meters=nw:0`, hero): day 55.2–56.2, night 55.6–57.0; stage 1 (5404ca8) on the same machine the
   same hour 59.9–60.0 / 60.0. ④'s bushes and leaf clumps cast no shadows (they cost about 12 fps by day: 41–50 with them); the rest of
   the gap is ④'s geometry (no further gain without any of its shadows). Captures `~/city2127-evidence/road-net-stage2/r1/` (hero, close
-  `cam=-45,24,212&at=0,0,168`, wide `cam=-170,70,320&at=30,0,165`; day 13, night 21; `capture.mjs`). Owner visual acceptance pending.
+  `cam=-45,24,212&at=0,0,168`, wide `cam=-170,70,320&at=30,0,165`; day 13, night 21; `capture.mjs`). Owner accepted stage 2 as captured and asked
+  to merge it to main now (2026-11-04), ahead of stage 3.
 
 ## Next expected step
 
-Owner visual acceptance of stage 2 on `claude/road-net-stage2-63b23f`; then stage 3 (court pool under the Fuji frame, canal park on the old
-band, sine ponds and corridor channel removed); merge after all stages are accepted.
+Stage 3 in a new task branch from main: court pool under the Fuji frame, canal park on the old band (its ground is `onFormerStreet`),
+landscape sine ponds and corridor channel removed.
