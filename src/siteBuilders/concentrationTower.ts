@@ -123,7 +123,7 @@ const bush = (parent: T.Object3D, x: number, y: number, z: number, s: number) =>
 };
 
 /** Glazed warm rooms: slab, lit ceiling, one-sided warm inner walls, thin mullions, optional corner columns, amber slab edge and roof. */
-function glazed(g: T.Group, cx: number, y0: number, cz: number, w: number, d: number, h: number, o: { columns?: boolean; amber?: boolean; roof?: boolean } = {}) {
+function glazed(g: T.Group, cx: number, y0: number, cz: number, w: number, d: number, h: number, o: { columns?: boolean; amber?: boolean; roof?: boolean; solidEnds?: 'x' | 'z' } = {}) {
   const t = .22, q = new T.Group();
   q.position.set(cx, y0, cz);
   g.add(q);
@@ -132,7 +132,12 @@ function glazed(g: T.Group, cx: number, y0: number, cz: number, w: number, d: nu
   plane(q, lamp, w - .3, d - .3, [0, h - .02, 0], Math.PI / 2, 0);
   strip(q, stripLight, 0, h - .05, 0, w * .6, .03, .14);
   strip(q, floorMat, 0, t + .004, 0, w - .2, .01, d - .2);
-  faces(q, w, d, (f, a, out) => {
+  faces(q, w, d, (f, a, out, side) => {
+    if (o.solidEnds && (o.solidEnds === 'x' ? side % 2 === 1 : side % 2 === 0)) { // solid white end wall
+      strip(f, white, 0, (h + t) / 2, out, a, h - t, .14);
+      if (o.roof) strip(f, amber, 0, h + .03, out + .14, a + .24, .05, .06);
+      return;
+    }
     plane(f, room, a - .3, h - t - .08, [0, (h + t) / 2, out - .1], 0, Math.PI);
     const n = Math.max(2, Math.round(a / 1.15));
     for (let i = 0; i <= n; i++) strip(f, white, -a / 2 + a * i / n, (h + t) / 2, out + .01, .06, h - t, .07);
@@ -207,7 +212,7 @@ const bench = (g: T.Object3D, x: number, z: number, yaw = 0) => {
   strip(s, white, 0, .58, .14, 1.2, .38, .04);
 };
 const planter = (g: T.Object3D, x: number, y: number, z: number, w: number, d: number) => {
-  strip(g, white, x, y + .15, z, w, .3, d);
+  strip(g, pale, x, y + .15, z, w, .3, d);
   strip(g, leaf, x, y + .31, z, w - .1, .06, d - .1);
   for (let i = 0; i < Math.max(2, Math.round(w / .45)); i++) bush(g, x - w / 2 + .3 + i * .45, y + .33, z, .26);
 };
@@ -410,6 +415,7 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit): Concentratio
   const MX = .5, MZ = .5, TW = 4.6, FH = 2.4, SL = .22;
   const base = new T.Group();
   base.name = 'tower-mid-rise-hall';
+  base.position.set(1.6, 0, 1.6); // the whole 0 composition sits toward +X/+Z so the forecourt shows at L
   towerBase.add(base);
   const mixedPeople: P[] = [];
   for (let k = 0; k < 6; k++) {
@@ -499,13 +505,13 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit): Concentratio
     for (const x of [-.45, .45]) bush(pavilions, bx0 + x, .65, bz0, .3);
   }
   for (const [x, z, k] of [[-6.1, -6.1, .55], [-6.2, -3.2, .5], [-6.2, 1, .5], [-6.1, 5.2, .5], [-1.6, -3.6, .45], [2.4, -5.6, .5], [6.2, -6, .5], [6.3, -1.6, .45], [2.5, .3, .35], [2.9, 3.3, .4], [-.9, 6.3, .4], [-6.2, 6.2, .5], [6.3, 6.3, .4], [-4.6, -2.3, .45], [-1.2, -.3, .35], [-.1, 3.2, .35]]) tree(pavilions, x, 0, z, k);
-  const benches: [number, number][] = [[-4.5, -5.5], [-1.6, -6.4], [3, -6.1], [5.2, -4.6]];
-  for (const [x, z] of benches) bench(pavilions, x, z, 0);
+  const benches: [number, number, number][] = [[-1.1, 2.3, 0], [2, 3, 0], [2.4, -.3, 0], [-5.6, 1.5, Math.PI / 2]];
+  for (const [x, z, yaw] of benches) bench(pavilions, x, z, yaw);
   pavilions.add(...bake(pavilions));
   pavilions.add(ring(1, .025, seams));
   const outside: P[] = [onWalk(.1), onWalk(.3), onWalk(.5), onWalk(.7), onWalk(.9),
-    ...benches.flatMap(([x, z]): P[] => [[x - .25, 0, z, true, FACE_CAM], [x + .25, 0, z, true, FACE_CAM]]),
-    [-3.4, 0, -6.3], [-.6, 0, -5.4], [.9, 0, -3.8], [-1.9, 0, -2.8], [1.1, 0, -.9], [-.3, 0, 1.6], [1.2, 0, 4.6], [-3.4, 0, -3.2], [3.4, 0, -5.2], [0, 0, 2.6]];
+    ...benches.flatMap(([x, z, yaw]): P[] => yaw ? [[x, 0, z - .3, true, FACE_CAM], [x, 0, z + .3, true, FACE_CAM]] : [[x - .3, 0, z, true, FACE_CAM], [x + .3, 0, z, true, FACE_CAM]]),
+    [1.1, 0, -1.6], [-.3, 0, .9], [1.2, 0, .4], [1, 0, 2.3], [-.3, 0, 3.0], [2.8, 0, 1.9], [-.2, 0, 4.4], [2.9, 0, -1.0], [1.3, 0, 3.8], [-3.4, 0, -6.3], [.9, 0, -3.8]];
   pavilions.add(crowd([...lowPeople, ...outside]));
 
   // +1: one vertical street: 14 glazed floors between four slim round white columns, planted terraces, glazed lift, round overhanging crown.
@@ -549,7 +555,7 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit): Concentratio
   for (const z of [1.8, 3.7]) bench(towerUpper, 4.7, z, Math.PI / 2);
   for (const [x, z] of [[5.5, -3.4], [5.9, -1.4], [5.9, .6], [5.6, 2.8], [5.2, 4.6], [4.4, -4.7]]) tree(towerUpper, x, 0, z, .9);
   towerUpper.add(...bake(towerUpper));
-  towerUpper.add(ring(3.4, .12, [[0, TOP + .65, 0]]));
+  towerUpper.add(ring(3.4, .25, [[0, TOP + .7, 0]]));
   highPeople.push([4.7, 0, 1.5, true, Math.PI / 2], [4.7, 0, 2.1, true, Math.PI / 2], [4.7, 0, 3.4, true, Math.PI / 2], [4.7, 0, 4, true, Math.PI / 2], [5.3, 0, -1.0], [3.4, 0, .1], [5.2, 0, 1.0], [4.0, 0, -3.4], [5.0, 0, 3.1], [3.2, 0, 3.4]);
   towerUpper.add(crowd(highPeople));
 
@@ -562,30 +568,34 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit): Concentratio
 
   const lowModules = [...spots, [-3, -6.2, 0] as [number, number, number]].map(([x, z, r], i) => addModule(pavilions, `tower-function-low-${i + 1}`, x, 0, z, 0, g => { const [a, b] = uv(.1 * r, .8 * r); return fitout(g, a, i < 5 ? .12 : .06, b); }));
 
-  // Mixed court: two glazed wings under hovering discs, the bridge between them and the forecourt, only while mixed shows.
+  // Mixed court: two glazed wings under hovering discs and the bridge (shifted toward +X/+Z so a forecourt shows in front at L), plus the forecourt, only while mixed shows.
   const court = new T.Group();
   court.name = 'tower-mixed-court';
   neutralPropsLayer.group.add(court);
-  const courtPeople: P[] = [];
+  const mv = new T.Group();
+  mv.position.set(1.2, 0, 1.6);
+  court.add(mv);
+  const wingPeople: P[] = [];
   const W1: [number, number] = [3, -4.6], W2: [number, number] = [-4.95, 2.6];
-  glazed(court, W1[0], 0, W1[1], 5, 3.2, 2.2, { columns: true, roof: true });
-  glazed(court, W2[0], 0, W2[1], 3.2, 5, 2.2, { columns: true, roof: true });
-  courtPeople.push(...furnish(court, 2, 2.9, W1[0] - 1.1, SL, W1[1]), ...furnish(court, 0, 2.9, W1[0] + 1.1, SL, W1[1]), ...furnish(court, 5, 2.9, W2[0], SL, W2[1] - 1.2), ...furnish(court, 1, 2.9, W2[0], SL, W2[1] + 1.2));
-  emitter(court, W1[0], 2.4, W1[1], 2);
-  emitter(court, W2[0], 2.4, W2[1], 2);
+  glazed(mv, W1[0], 0, W1[1], 4.6, 3.2, 2.2, { columns: true, roof: true, solidEnds: 'x' });
+  glazed(mv, W2[0], 0, W2[1], 3.2, 5, 2.2, { columns: true, roof: true, solidEnds: 'z' });
+  wingPeople.push(...furnish(mv, 2, 2.9, W1[0] - 1, SL, W1[1]), ...furnish(mv, 1, 2.9, W1[0] + 1, SL, W1[1]), ...furnish(mv, 5, 2.9, W2[0], SL, W2[1] - 1.2), ...furnish(mv, 2, 2.9, W2[0], SL, W2[1] + 1.2));
+  emitter(mv, W1[0], 2.4, W1[1], 2);
+  emitter(mv, W2[0], 2.4, W2[1], 2);
   // Bridge (L-shaped, y 2.3..2.5) from the wing-1 roof to the wing-2 roof, in front of the tower.
-  strip(court, white, -1.8, 2.4, -5, 4.8, .2, 1.2); strip(court, white, -4.2, 2.4, -2.2, 1.2, .2, 5.6);
-  strip(court, amber, -1.8, 2.51, -5, 4.8, .02, .08); strip(court, amber, -4.2, 2.51, -2.2, .08, .02, 5.6);
-  strip(court, pane, -1.8, 2.75, -5.6, 4.8, .5, .02); strip(court, pane, -4.8, 2.75, -2.2, .02, .5, 5.6);
-  for (const [x, z] of [[-1.2, -6.3], [1.6, -2.4]]) planter(court, x, 0, z, 1.6, .7);
-  planter(court, -6.2, 0, -.9, .7, 1.5); planter(court, -2.0, 0, -1.4 , 1.2, .5);
-  bench(court, -2.4, -6.5, 0); bench(court, -5.2, -5.4, 0); bench(court, -.1, -6.5, 0);
-  for (const [x, z, k] of [[6.1, -1.7, .55], [-6.1, 6.1, .5], [-3.3, 6.2, .5], [6.1, 4, .55], [3, 6.1, .5], [-6.1, -6.1, .5], [6.1, -6.1, .5]]) tree(court, x, 0, z, k);
+  strip(mv, white, -1.6, 2.4, -5, 5, .2, 1.2); strip(mv, white, -4.2, 2.4, -2.2, 1.2, .2, 5.6);
+  strip(mv, amber, -1.6, 2.51, -5, 5, .02, .08); strip(mv, amber, -4.2, 2.51, -2.2, .08, .02, 5.6);
+  strip(mv, pane, -1.6, 2.75, -5.6, 5, .5, .02); strip(mv, pane, -4.8, 2.75, -2.2, .02, .5, 5.6);
+  // Forecourt in the band in front of the wings: planters, three white benches with seated pairs, standing residents.
+  for (const [x, z] of [[-4.8, -1.8], [-1.9, -4.5]]) planter(court, x, 0, z, 1.6, .7);
+  const courtBenches: [number, number][] = [[-1, -6.3], [-3.6, -6.3], [-5.8, -4.2]];
+  for (const [x, z] of courtBenches) bench(court, x, z, 0);
+  for (const [x, z, k] of [[6.1, -6.1, .5], [6.2, -.4, .5], [6.2, 5, .5], [-.4, 6.2, .5], [-6.1, 6.1, .5], [-6.1, -6.1, .5], [1.6, 6.3, .45]]) tree(court, x, 0, z, k);
   court.add(...bake(court));
-  courtPeople.push(...([[-2.4, -6.5], [-5.2, -5.4], [-.1, -6.5]] as [number, number][]).flatMap(([x, z]): P[] => [[x - .25, 0, z, true, FACE_CAM], [x + .25, 0, z, true, FACE_CAM]]),
-    [-3.0, 0, -6.2], [-1.2, 0, -5.9], [-.1, 0, -6.4], [-4.8, 0, -5.6], [-3.4, 0, -2.8], [-2.4, 0, -3.5], [-5.4, 0, -1.6], [1.0, 0, -2.4], [2.4, 0, -2.5], [5.2, 0, -1.9]);
-  court.add(crowd(courtPeople));
-  const mixedModules = [0, 1, 2, 3, 4, 5].map(k => addModule(neutralPropsLayer.group, `tower-function-mixed-${k + 1}`, MX, k * FH, MZ, 0, g => fitout(g, 1.2, SL, -1.1)));
+  mv.add(crowd(wingPeople));
+  court.add(crowd([...courtBenches.flatMap(([x, z]): P[] => [[x - .3, 0, z, true, FACE_CAM], [x + .3, 0, z, true, FACE_CAM]]),
+    [-2.2, 0, -5.4], [-.2, 0, -5.9], [-4.6, 0, -5.0], [-6.0, 0, -2.4], [-3.2, 0, -2.2], [-2.6, 0, -3.2], [.5, 0, -5.3], [-5.5, 0, -.3], [-4.0, 0, -3.6], [-6.2, 0, -5.4]]));
+  const mixedModules = [0, 1, 2, 3, 4, 5].map(k => addModule(neutralPropsLayer.group, `tower-function-mixed-${k + 1}`, MX + 1.6, k * FH, MZ + 1.6, 0, g => fitout(g, 1.2, SL, -1.1)));
 
   const highModules = [1, 3, 5, 7, 9, 11].map((f, i) => addModule(towerUpper, `tower-function-high-${i + 1}`, 0, LOBBY + f * HF, 0, 0, g => fitout(g, 1.5, SL, -1.6)));
 
