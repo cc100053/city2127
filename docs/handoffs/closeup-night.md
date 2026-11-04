@@ -28,8 +28,8 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 
 | Site | Pose | Targets | Size decision | Rounds | Score | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| SW | | | | | | PREP |
-| NE | | | | | | PREP |
+| SW | `sw:n` `[-95,30,-15]`→`[-105,10,60]` | | | | | TARGETS |
+| NE | `ne:s2` | — | — | — | — | SKIPPED（owner 2026-11-04：Q3 改能源題後 NE 公園恆定 0，客人去唔到 ±1） |
 | SE | | | | | | PREP |
 
 ## Completed work
