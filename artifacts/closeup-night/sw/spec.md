@@ -114,3 +114,16 @@ Opus zoom of R3: high forecourt is a huge empty white plane in front, the terrac
 - **Ring children (fm-ring).** 3 children in bright clothes sitting on the front step edge facing the circle.
 
 Screenshots to `~/city2127-evidence/closeup-night/sw/r4/` (same names) + `vs-target.jpg`.
+
+## R5 — cap raised to 6 (owner); from R4 20/30
+
+Keep (2 in R4; re-crop and compare with R4, must not lose): `fl-pods`, `fl-screens`, `fm-deck`, `fh-amph`, `fh-planting`.
+
+1. **Site-local residents (fl-people-in, fm-ring, fh-people, fm-pods)** — the Blocked option (a), touches only `commonsPlaza.ts`. Replace the shared `pedestrians()` crowd on this site with local figures built like SE's (`concentrationTower.ts` lines ≈160–195: separate head / torso / arms / legs merged per pose, white shirt vertices tinted by `setColorAt`, light shirt palette, dark-grey legs): a **standing**, a **seated** (thighs forward, shins down, clearly bent at hip and knee — exaggerate the thighs so they read from a 15° camera: thigh length ≥ .45 × standing height) and a **child** (×.65) pose, as `InstancedMesh`es per state group. Size: adults ≈ .55–.6 units standing (≈ 2.3 m in this 4 m/unit site — larger than real, as the targets show people), seated proportionally; light clothing (white, cream, pale blue, peach, pale green, lilac; a few saturated: one red, one yellow, one blue per state for children). Faces toward the camera where the target shows faces (pod pairs 3/4 to camera; ring residents on the far side face the camera, near side in profile). Residents still show only in a settled state (fade/scale with the band group is fine since the figures are part of it). Walkers become standing figures placed mid-stride is not needed — stand them on paths in pairs/groups, a few with an arm forward (talking).
+2. **Emitters (fl-emitters, fm-pods)** — not a flat disc: under each pod a **vertical emissive collar** (open cylinder r .5, height .18, cool `#9fe8ff`×2.5 toneMapped false) hanging from the pod belly, a smaller bright ring at the bottom of the collar, then a **visible dark gap** (≥ .45) to the terrace; on the terrace only a small soft halo (r .7, opacity .3), not a big flat disc. The ring must read as a glowing torus seen in perspective, brighter in the centre.
+3. **Garden (fl-garden)** — match the target density: ≥ 12 small trees with visible trunks spread over the beds (not just 2–3 visible), dense leafy fern clusters covering all beds (spiky lighter greens, varied heights .2–.6), hedge border; curving paths stay; benches visible.
+4. **Mixed canopy (fm-canopy)** — the cyan halos read as large ovals outside the lot: drop the halo discs, keep only the 4 compact glowing ring emitters (torus r .3) hanging *directly under* the rim on the camera side; disc must read inside the lot.
+5. **High disc (fh-disc)** — continuous saturated `sharePink` rim band (no white gaps), the stabiliser ring an opaque bright torus (not a translucent slab), machinery boxes dark-grey and readable.
+6. **Pavilions / tables (fh-tables)** — pavilions as warm-lit glass rooms: brighter warm interior (emissive back wall + floor glow), clear glass, white frame; ≥ 3 tables clearly visible in front of them with seated residents.
+
+Screenshots to `~/city2127-evidence/closeup-night/sw/r5/` (same names) + `vs-target.jpg`.
