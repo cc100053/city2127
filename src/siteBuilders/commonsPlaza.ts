@@ -2,7 +2,7 @@ import * as T from 'three';
 import { METER_COLORS, glassPane, glow, glowCeil, glowFloor, glowMid, halo, white } from '../automationKit.ts';
 import { arc, bake, box, leafyCrown, nightLit, paint, stone } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
-import { conversationPose, pedestrians } from '../mobility.ts';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { SharingDistrict } from '../districtMeters.ts';
 import type { ExhibitionLayout } from '../surveyView.ts';
 import { tree } from './concentrationTower.ts';
@@ -17,22 +17,24 @@ const DECK = .65; // mixed round deck top; the circle floor is .35 below it
 const smoothstep = (value: number) => value * value * (3 - 2 * value);
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 const hash = (n: number) => Math.abs(Math.sin(n * 12.9898) * 43758.5453) % 1;
-// Residents' size (world metres of a standing adult / 1.65) per state: people read at the target's size, not their stage's.
-export const COMMONS_FOLK: Record<Band, number> = { low: 2.4, mixed: 2.6, high: 2.3 };
 
 /** The one saturated accent of the commons: emissive and instance-colour-free, so it reads day and night. */
 export const sharePink = new T.MeshStandardMaterial({ color: METER_COLORS.publicSharing, emissive: METER_COLORS.publicSharing, emissiveIntensity: .9, roughness: .5 });
 // White membrane (not clear glass): milky and faintly self-lit.
 const screenGlass = new T.MeshStandardMaterial({ color: '#f6f7fb', emissive: '#ffffff', emissiveIntensity: .15, roughness: .5, transparent: true, opacity: .85, depthWrite: false });
 const paneGlass = new T.MeshStandardMaterial({ color: '#dff1ff', roughness: .1, transparent: true, opacity: .45, depthWrite: false });
-const warmWall = nightLit(new T.MeshStandardMaterial({ color: '#ffd9a8', emissive: '#ffa860', emissiveIntensity: .95, roughness: 1 }), 1.3, '#ff9a3c');
-const fernGreen = paint('#3f7d3a', .85);
+const warmWall = nightLit(new T.MeshStandardMaterial({ color: '#ffd9a8', emissive: '#ffa860', emissiveIntensity: 1.3, roughness: 1 }), 1.5, '#ff9a3c');
+const fernGreen = paint('#6fae4e', .85), fernLight = paint('#8cc760', .85);
 const propBlue = paint('#5d9ad0', .6), propYellow = paint('#eec35a', .6);
 const coreGrey = paint('#5d646e', .6);
 const peach = nightLit(new T.MeshStandardMaterial({ color: '#ffd2a6', emissive: '#ff9a58', emissiveIntensity: .75, roughness: 1 }), 1.1, '#ff9a3c');
 // Cool white-blue halo on the terrace under an emitter (additive, above the bloom threshold's reach so it also reads by day).
 const emitRing = new T.MeshBasicMaterial({ color: new T.Color('#9fe8ff').multiplyScalar(2.5), toneMapped: false });
 const emitPad = new T.MeshBasicMaterial({ color: new T.Color('#e4faff').multiplyScalar(3), toneMapped: false });
+const stabRing = new T.MeshBasicMaterial({ color: new T.Color('#9fe8ff').multiplyScalar(2), toneMapped: false });
+const emitCollar = new T.MeshBasicMaterial({ color: new T.Color('#9fe8ff').multiplyScalar(2.5), toneMapped: false, side: T.DoubleSide });
+const softHalo = new T.MeshBasicMaterial({ color: '#8fd8ff', transparent: true, opacity: .3, blending: T.AdditiveBlending, depthWrite: false, toneMapped: false });
+const machGrey = paint('#454c55', .6);
 const emitHalo = new T.MeshBasicMaterial({ color: '#8fd8ff', transparent: true, opacity: .5, blending: T.AdditiveBlending, depthWrite: false, toneMapped: false });
 const hedgeGreen = paint('#72b45e', .85), shrubGreen = paint('#5f9f52', .85), bedGreen = paint('#477a43', .9);
 
@@ -191,9 +193,41 @@ const benchArc = (g: T.Object3D, r: number, y: number, x: number, z: number, sta
   arc(g, r - .13, r + .13, .035, [x, y + .18, z], sharePink, start, length);
 };
 
+// ---- residents ----
+// Site-local figures built like the SE tower's: separate head, torso, arms and legs merged per pose; shirt vertices are white so the instance colour tints them.
+const tintVerts = (geometry: T.BufferGeometry, hex: string) => {
+  const c = new T.Color(hex), n = geometry.attributes.position.count;
+  geometry.setAttribute('color', new T.Float32BufferAttribute(Array.from({ length: n * 3 }, (_, i) => [c.r, c.g, c.b][i % 3]), 3));
+  return geometry;
+};
+const bx = (w: number, h: number, d: number, x: number, y: number, z: number, hex: string) => tintVerts(new T.BoxGeometry(w, h, d).translate(x, y, z), hex);
+/** Head with hair cap and two dark eyes on its +Z face (so a figure turned to the camera shows a face). */
+const headParts = (y: number) => [
+  tintVerts(new T.SphereGeometry(.075, 12, 9).translate(0, y, 0), '#e0b08c'),
+  tintVerts(new T.SphereGeometry(.081, 12, 6, 0, Math.PI * 2, 0, Math.PI * .48).translate(0, y + .006, -.01), '#5a463b'),
+  bx(.016, .018, .012, -.03, y - .004, .072, '#2b2b2b'), bx(.016, .018, .012, .03, y - .004, .072, '#2b2b2b'),
+];
+const LEG = '#454c55';
+const FIG_H = .63; // unscaled standing height
+const merge = (parts: T.BufferGeometry[]) => mergeGeometries(parts.map(g => (g.index ? g.toNonIndexed() : g)))!;
+const standingGeometry = merge([...headParts(.555), bx(.2, .27, .12, 0, .385, 0, '#fff'), bx(.05, .24, .07, -.125, .39, 0, '#fff'), bx(.05, .24, .07, .125, .39, 0, '#fff'),
+  bx(.08, .25, .09, -.05, .125, 0, LEG), bx(.08, .25, .09, .05, .125, 0, LEG)]);
+// Talking: the right arm reaches forward.
+const talkingGeometry = merge([...headParts(.555), bx(.2, .27, .12, 0, .385, 0, '#fff'), bx(.05, .24, .07, -.125, .39, 0, '#fff'), bx(.05, .07, .22, .125, .44, .12, '#fff'),
+  bx(.08, .25, .09, -.05, .125, 0, LEG), bx(.08, .25, .09, .05, .125, 0, LEG)]);
+// Seated: hips at .26, thighs (.30, exaggerated) forward, shins straight down, forearms on the lap. The thigh underside (.21) rests on the seat.
+const seatedGeometry = merge([...headParts(.585), bx(.2, .27, .12, 0, .415, 0, '#fff'), bx(.05, .22, .07, -.125, .42, 0, '#fff'), bx(.05, .22, .07, .125, .42, 0, '#fff'),
+  bx(.05, .06, .16, -.125, .3, .08, '#fff'), bx(.05, .06, .16, .125, .3, .08, '#fff'),
+  bx(.08, .08, .30, -.05, .25, .15, LEG), bx(.08, .08, .30, .05, .25, .15, LEG), bx(.08, .24, .08, -.05, .12, .3, LEG), bx(.08, .24, .08, .05, .12, .3, LEG)]);
+const SEAT_DROP = .21; // unscaled height of the thigh underside above the feet
+const personMaterial = new T.MeshStandardMaterial({ vertexColors: true, roughness: .7 });
+const shirts = ['#ffffff', '#f1e9d6', '#bcd8ee', '#f2c7b0', '#cfe6c9', '#e6d3f0'].map(c => new T.Color(c));
+const kidShirts = ['#ff8a80', '#ffd54f', '#64b5f6'].map(c => new T.Color(c));
+const FIG = 1.15; // adults stand ≈ .72 units (≈ 2.9 m at 4 m/unit): larger than life, as the targets show people
+
 // ---- pods ----
 
-const POD_H = .6; // hover gap between the terrace and the pod floor (a visible dark gap)
+const POD_H = .7; // hover gap between the terrace and the pod floor (a visible dark gap)
 const POD_BASE = .2; // interior floor above the pod's lowest point
 const PD = 1.35; // pod depth
 const POD_SEAT = POD_H + POD_BASE + .22; // seat top above the terrace under the pod
@@ -238,10 +272,10 @@ function podUnit(withPanel: boolean): T.Group {
   box(g, [.3, .18, .4], [0, seatY + .09, .26], white, .03);
   mesh(g, new T.SphereGeometry(1, 28, 14).scale(.76, .6, .13), glassPane, 0, cy, PD / 2 - .1);
   if (withPanel) box(g, [.04, .9, .9], [.93, cy, -.05], sharePink, .015);
-  // Emitter: a flat bright pad under the belly, a bright ring at mid-gap and a cool halo on the terrace.
-  mesh(g, new T.CylinderGeometry(.45, .45, .04, 28), emitPad, 0, POD_H - .04, 0);
-  ringTorus(g, .65, .09, emitRing, 0, POD_H / 2, 0);
-  disc(g, 1.0, emitHalo, 0, .03, 0);
+  // Emitter: a vertical emissive collar hanging from the belly, a bright ring at its lower rim, a dark gap, and a small soft halo on the terrace.
+  mesh(g, new T.CylinderGeometry(.5, .5, .18, 32, 1, true), emitCollar, 0, POD_H - .09, 0);
+  ringTorus(g, .5, .06, emitPad, 0, POD_H - .18, 0);
+  disc(g, .55, softHalo, 0, .03, 0);
   return g;
 }
 
@@ -374,15 +408,15 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
       const size = .2 + hash(i + 900) * .22;
       bush(g, x, BED - .05, z, size, hash(i + 77) > .5 ? shrubGreen : hedgeGreen, .6);
     }
-    for (let i = 0; i < 160; i++) {
+    for (let i = 0; i < 520; i++) {
       const x = (hash(i + 2000) - .5) * 11.4, z = (hash(i + 2500) - .5) * 9.8;
       if (!free(x, z)) continue;
       for (let k = 0; k < 6; k++) {
-        const a = k * 1.05 + i, cone = mesh(g, new T.ConeGeometry(.05, .55, 5), fernGreen, x + Math.cos(a) * .1, BED + .24, z + Math.sin(a) * .1);
+        const a = k * 1.05 + i, cone = mesh(g, new T.ConeGeometry(.045, .2 + hash(i * 7 + k) * .4, 5), i % 2 ? fernGreen : fernLight, x + Math.cos(a) * .1, BED + .2, z + Math.sin(a) * .1);
         cone.rotation.set(Math.sin(a) * .6, 0, -Math.cos(a) * .6);
       }
     }
-    for (const [x, z, s] of [[5.4, 1.2, .8], [-5.4, 1.2, .85], [1.5, 4.6, .75], [-1.5, 4.6, .75], [5.4, 4.4, .8], [-5.4, 4.4, .8], [5.3, -.9, .8], [-5.3, -.9, .8], [0, 4.9, .7], [.0, .9, .65]]) tree(g, x, BED, z, s);
+    for (const [x, z, s] of [[5.4, 1.2, .8], [-5.4, 1.2, .85], [1.5, 4.6, .75], [-1.5, 4.6, .75], [5.4, 4.4, .8], [-5.4, 4.4, .8], [5.3, -.9, .8], [-5.3, -.9, .8], [0, 4.9, .7], [0, .9, .65], [3.3, .9, .7], [-3.3, .9, .7], [3.0, -5.0, .6], [-3.0, -5.0, .6]]) if (free(x, z) || z < -4.8) tree(g, x, BED, z, s);
     // Three pink-topped benches along the front path and four slim reservation posts by the pod doors.
     for (const [x, z, yaw] of benches) {
       const b = new T.Group();
@@ -497,32 +531,27 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
   const MIX_SCALE = 2.4 / 5.2;
   const mixedCanopy = canopy('mixed', MIX_SCALE, g => {
     ringTorus(g, 5.2, .05, sharePink, 0, 0, 0);
-    // Four ring emitters on the camera-facing half of the rim (front-left, front, front-right, right), hanging below it.
-    for (const [x, z] of [[1.75, -1.75], [0, -2.45], [-1.75, -1.75], [-2.45, 0]]) {
-      ringTorus(g, .45 / MIX_SCALE, .08 / MIX_SCALE, emitRing, x / MIX_SCALE, -.35 / MIX_SCALE, z / MIX_SCALE);
-      disc(g, .65 / MIX_SCALE, emitHalo, x / MIX_SCALE, -.4 / MIX_SCALE, z / MIX_SCALE);
-    }
+    // Four compact ring emitters directly under the rim on the camera-facing side.
+    for (const [x, z] of [[1.65, -1.65], [0, -2.3], [-1.65, -1.65], [-2.3, 0]]) ringTorus(g, .3 / MIX_SCALE, .06 / MIX_SCALE, emitRing, x / MIX_SCALE, -.28 / MIX_SCALE, z / MIX_SCALE);
   });
   addPart('mixed', .6, .4, level => { canopyLevel.mixed = level; });
   const HIGH_SCALE = 5 / 5.2, HIGH_SX = 1.15; // an ellipse 5.75 x 5.0
   const highCanopy = canopy('high', HIGH_SCALE, g => {
-    // Thick pink rim band (.12 high) in 8 segments with short white gaps; 8 raised radial ribs; a solid bright stabiliser ring underneath.
-    for (let i = 0; i < 8; i++) arc(g, 5.0, 5.28, .12, [0, -.06, 0], sharePink, i * Math.PI / 4 + .07, Math.PI / 4 - .14);
-    ringTorus(g, 5.2, .02, white, 0, -.3, 0);
+    // Continuous thick pink rim band (.12 high); 8 raised radial ribs; a solid bright stabiliser ring underneath.
+    arc(g, 5.0, 5.28, .12, [0, -.06, 0], sharePink);
     for (let i = 0; i < 8; i++) rib(g, i * Math.PI / 4 + Math.PI / 8, .12);
-    ringTorus(g, 3, .14, emitRing, 0, -.85, 0);
+    ringTorus(g, 3, .08, stabRing, 0, -.85, 0);
     mesh(g, new T.CylinderGeometry(1.3, 1.5, .6, 24), white, 0, -.75, 0);
     mesh(g, new T.CylinderGeometry(.7, .9, .5, 16), coreGrey, 0, -1.15, 0);
     for (let i = 0; i < 12; i++) {
       const a = i * Math.PI / 6 + .3;
-      box(g, [.9, .4, .6], [Math.cos(a) * 2.0, -.8, Math.sin(a) * 2.0], white, .05).rotation.y = -a;
+      box(g, [.9, .4, .6], [Math.cos(a) * 2.0, -.8, Math.sin(a) * 2.0], machGrey, .05).rotation.y = -a;
       box(g, [.7, .12, .3], [Math.cos(a) * 2.0, -1.05, Math.sin(a) * 2.0], coreGrey, .02).rotation.y = -a;
       box(g, [.12, .14, 1.6], [Math.cos(a) * 1.7, -.7, Math.sin(a) * 1.7], coreGrey, .02).rotation.y = -a + Math.PI / 2;
     }
     for (let i = 0; i < 6; i++) {
       const a = i * Math.PI / 3 + Math.PI / 6;
       mesh(g, new T.SphereGeometry(.45, 14, 8).scale(1, .3, 1), emitPad, Math.cos(a) * 3.9, -.42, Math.sin(a) * 3.9);
-      disc(g, .7, emitHalo, Math.cos(a) * 3.9, -.6, Math.sin(a) * 3.9);
     }
   }, HIGH_SX);
 
@@ -584,7 +613,7 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
       p.position.set(s * 3.9, DECK_HIGH, 3.4);
       g.add(p);
       const w = 2.2, h = 1.5, d = 1.6;
-      box(p, [w, .06, d], [0, .03, 0], glowFloor, .01);
+      box(p, [w, .06, d], [0, .03, 0], warmWall, .01);
       box(p, [w - .1, h - .1, .06], [0, h / 2, d / 2 - .1], warmWall, .01); // back wall (the pavilion front is the −Z side)
       for (let k = 0; k <= 5; k++) for (const sz of [-d / 2, d / 2]) box(p, [.05, h, .05], [-w / 2 + k * w / 5, h / 2, sz], white, .01); // mullions every .4
       for (const sx of [-w / 2, w / 2]) for (let k = 0; k <= 4; k++) box(p, [.05, h, .05], [sx, h / 2, -d / 2 + k * d / 4], white, .01);
@@ -636,48 +665,48 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
     { x: -2.3, z: -3.0, y: SLAB, yaw: 2.8, talk: [94, 0, 2] }, { x: -2.7, z: -3.2, y: SLAB, yaw: -.3, talk: [94, 1, 2] },
   ]);
 
-  // Residents, drawn only when a band is settled so a changing state never squashes a visible body.
-  const residents = pedestrians(stage, 44, 'commons-people');
-  const pose = new T.Object3D();
+  // Residents: three instanced meshes (standing, talking, seated), drawn only when a band is settled so a changing state never squashes a visible body.
+  const figureMesh = (geometry: T.BufferGeometry, name: string, cap: number) => {
+    const m = new T.InstancedMesh(geometry, personMaterial, cap);
+    m.name = name;
+    m.castShadow = true;
+    m.frustumCulled = false;
+    m.visible = false;
+    stage.add(m);
+    return m;
+  };
+  const figs = [figureMesh(standingGeometry, 'commons-people-stand', 48), figureMesh(talkingGeometry, 'commons-people-talk', 24), figureMesh(seatedGeometry, 'commons-people-seat', 48)];
+  const placed = new T.Matrix4(), quat = new T.Quaternion(), up = new T.Vector3(0, 1, 0), pos = new T.Vector3(), scl = new T.Vector3();
   const marker = createGuestMarker(root, 'sw');
   const frame = (now: number) => {
-    const still = prefersReducedMotion();
-    const t = still ? 0 : now;
+    const bob = prefersReducedMotion() ? 0 : Math.sin(now * Math.PI * 2 / 6);
     const ready = stage.visible && stage.scale.y > .999;
     // Canopies lower in / lift away with their part, and bob gently once up (±.06 over the circle, ±.08 over the lot).
     for (const [c, level, x, y, z, bobAmp] of [
       [mixedCanopy, canopyLevel.mixed, RC.x, 3.6, -.9, .06], [highCanopy, canopyLevel.high, 0, 6.8, 0, .08],
     ] as const) {
       c.group.visible = level > HIDDEN;
-      c.group.position.set(x, y + (1 - level) * 3 + (still ? 0 : Math.sin(now * Math.PI * 2 / 6) * bobAmp * level), z);
+      c.group.position.set(x, y + (1 - level) * 3 + bob * bobAmp * level, z);
       c.group.scale.set(c.sx, 1, 1).multiplyScalar(Math.max(HIDDEN, smoothstep(level)) * c.scale);
     }
     const settled = (['low', 'mixed', 'high'] as const).find(band => parts.every(part => part.band === band ? part.level > .999 : part.level < HIDDEN));
-    let slot = 0;
+    const used = [0, 0, 0];
+    let kids = 0;
     for (const actor of settled && ready ? actors[settled] : []) {
-      const s = COMMONS_FOLK[settled!] / root.scale.x * (actor.kid ? .6 : 1) * (actor.big ?? 1);
+      const kind = actor.seated ? 2 : actor.talk && actor.talk[1] === 0 ? 1 : 0, S = FIG * (actor.kid ? .65 : 1) * (actor.big ?? 1);
       let { x, z, y, yaw } = actor;
-      let walk = 0, phase = 0;
-      if (actor.walk && !still) {
-        const u = ((now / actor.walk.period + actor.walk.phase) % 1 + 1) % 1, there = u < .5, e = smoothstep(there ? u * 2 : 2 - u * 2);
-        const [bx, bz, by] = actor.walk.to, dx = bx - actor.x, dz = bz - actor.z;
-        x = T.MathUtils.lerp(actor.x, bx, e); z = T.MathUtils.lerp(actor.z, bz, e); y = T.MathUtils.lerp(actor.y, by, e);
-        yaw = facing(there ? dx : -dx, there ? dz : -dz);
-        walk = .4; phase = now * 5 + slot;
-      } else if (actor.walk) yaw = facing(actor.walk.to[0] - actor.x, actor.walk.to[1] - actor.z);
-      const gesture = actor.talk ? conversationPose(now, actor.talk[0] + (actor.talk[0] < 100 ? 3000 : 0), actor.talk[1], actor.talk[2]).gesture : 0;
-      pose.position.set(x, y - (actor.seated ? .56 * s : 0), z);
-      pose.rotation.set(0, yaw, 0);
-      pose.scale.setScalar(s);
-      residents.set(slot, pose);
-      residents.gait(slot, phase, walk, actor.seated ? 1 : 0);
-      residents.social(slot, 0, gesture);
-      slot++;
+      if (actor.walk) { x = (actor.x + actor.walk.to[0]) / 2; z = (actor.z + actor.walk.to[1]) / 2; y = (actor.y + actor.walk.to[2]) / 2; yaw = facing(actor.walk.to[0] - actor.x, actor.walk.to[1] - actor.z); }
+      const mesh = figs[kind], i = used[kind]++;
+      placed.compose(pos.set(x, y - (actor.seated ? SEAT_DROP * S : 0), z), quat.setFromAxisAngle(up, yaw), scl.setScalar(S));
+      mesh.setMatrixAt(i, placed);
+      mesh.setColorAt(i, actor.kid ? kidShirts[kids++ % 3] : shirts[(i * 5 + kind) % shirts.length]);
     }
-    pose.scale.setScalar(HIDDEN / root.scale.x);
-    for (; slot < 44; slot++) { residents.set(slot, pose); residents.gait(slot, 0, 0); residents.social(slot, 0, 0); }
-    residents.show(settled !== undefined && ready);
-    residents.flush();
+    figs.forEach((mesh, k) => {
+      mesh.count = used[k];
+      mesh.visible = used[k] > 0;
+      mesh.instanceMatrix.needsUpdate = true;
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    });
   };
   const commonsPlaza = createCommonsPlazaRuntime(parts, frame);
   return {
