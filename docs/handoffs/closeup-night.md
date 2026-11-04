@@ -30,7 +30,7 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 | --- | --- | --- | --- | --- | --- | --- |
 | SW | `sw:n` `[-95,30,-15]`→`[-105,10,60]` | [target](../../artifacts/closeup-night/sw/target/) | 放大到目標（填滿 lot，唔越橙邊；碟可以向上） | | | READY |
 | NE | `ne:s2` | — | — | — | — | SKIPPED（owner 2026-11-04：Q3 改能源題後 NE 公園恆定 0，客人去唔到 ±1） |
-| SE | | | | | | PREP |
+| SE | L `[130,28,-95]`→`[182,24,-38]`（−1、0）；H `[360,45,-50]`→`[182,58,-38]`（0、+1） | | 放大到目標 | | | TARGETS |
 
 ## Completed work
 
@@ -47,6 +47,7 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 ## Important decisions
 
 - SW（owner 2026-11-04）：三張 Gemini 目標全部接受；0 同 +1 嘅懸浮碟喺目標圖飄出／大過 lot，rubric 寫成碟喺 lot 範圍內。
+- SE（owner 2026-11-04）：main 嘅 `se:focal` 已被巨構拱＋白框塔遮死；−1／0 用 L（取代 `se:focal-low`），0／+1 用 H。L 方向向上搖做唔到（42° fov 要 ≈165 m 視線，L 只有 80–120 m 通），owner 接受 H，鄰居同前景魚傘當背景。
 - Evidence folder：`~/city2127-evidence/closeup-night/<site>/`。
 
 ## Next expected step
