@@ -1,7 +1,7 @@
 # closeup-night — 夜間重做 SW、NE、SE 旗艦 headline 近鏡
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — Phase A 完成（2026-11-04），Phase B 等 owner 一句開 SW
+- Status: IN_PROGRESS — Phase B：SW park（20/30），SE 進行中
 - Branch: `feat/closeup-night`（site branch `feat/closeup-night-<site>`）
 - Base commit: `5a56230`（origin/main）＋ merge `chore/long-polish-loop-v2` `6e60d04` → `dd1f5a9`
 - Last verified commit: NONE
@@ -28,7 +28,7 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 
 | Site | Pose | Targets | Size decision | Rounds | Score | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| SW | `sw:n` `[-95,30,-15]`→`[-105,10,60]` | [target](../../artifacts/closeup-night/sw/target/) | 放大到目標（填滿 lot，唔越橙邊；碟可以向上） | 4 | 20/30（R4） | PARKED `feat/closeup-night-sw` `22109e3` |
+| SW | `sw:n` `[-95,30,-15]`→`[-105,10,60]` | [target](../../artifacts/closeup-night/sw/target/) | 放大到目標（填滿 lot，唔越橙邊；碟可以向上） | R1–R4 | 20/30（67 %）R4 | PARKED（merged `55a5d2b`，dispatcher 驗證 test/build/check 綠） |
 | NE | `ne:s2` | — | — | — | — | SKIPPED（owner 2026-11-04：Q3 改能源題後 NE 公園恆定 0，客人去唔到 ±1） |
 | SE | L `[130,28,-95]`→`[182,24,-38]`（−1、0）；H `[360,45,-50]`→`[182,58,-38]`（0、+1） | [target](../../artifacts/closeup-night/se/target/)（`tower-mixed` = 0 喺 H） | 放大到目標 | | | READY |
 
