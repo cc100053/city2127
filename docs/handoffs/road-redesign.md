@@ -88,6 +88,6 @@
 
 ## Next expected step
 
-Stage 2 (owner 2026-11-04: in a new session, from this branch): ④ boulevard B ( cut the
+Stage 2 (owner 2026-11-04: in a new session, from this branch): ④ boulevard B (cut the
 old ~90 m band and its side streets, retire the remaining district GLB streets), then stage 3 (court pool, canal park); merge after all
 stages are accepted.
