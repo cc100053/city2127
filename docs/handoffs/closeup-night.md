@@ -51,6 +51,14 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 - SE（owner 2026-11-04）：四張 Gemini 目標全部接受。
 - Evidence folder：`~/city2127-evidence/closeup-night/<site>/`。
 
+## SW R1
+
+- 分數 18/30（60 %）；pairwise 對 baseline 15 勝 0 負 → keep（commit `40ca5b1`）。
+- 改咗乜：`commonsPlaza.ts` 由白色涼亭重寫成三個 band stage（−1 六個懸浮私人艙花園；0 半艙半開放下沉圓圈＋懸浮碟；+1 開放階梯劇場＋大懸浮碟），新材料 `sharePink`，`sw:focal` 改做 `sw:n` 鏡位；seat 計數 diagnostics 保留（`ponytail:` 註明）。地台 13.2×11.2，喺橙邊內圈 0.8 margin 之內（同 NW 測試做法）。
+- 2 分：fm-deck、fh-amph、fh-people、fh-planting。0 分：fl-emitters（艙底冇發光環、冇空隙）。
+- 主要問題：坐低嘅人企咗喺座位上面；艙內唔暖；屏風黐住艙；花園係一張波波草氈；0 嘅碟飄出水面；+1 碟底冇機械；後面兩間亭冇玻璃。
+- Evidence：`~/city2127-evidence/closeup-night/sw/r1/`（`pair.md`、`review.jpg`）。
+
 ## Next expected step
 
 Phase B：dispatcher 開 SW site session（`feat/closeup-night-sw`，port 5191，06:00 前停），完成後驗證、merge 入 `feat/closeup-night`，再開 SE（port 5192，09:00 停）；10:00 前交 night board。
