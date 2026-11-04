@@ -30,8 +30,8 @@ Bar: NW bay R2 board (19/20, 「Accept R2 scores」) and the owner words in [NW 
 
 ## Tower 0 `mixed`
 
-- `tm-tower` [0.38,0.08,0.58,0.75] capture [0.38,0.30,0.58,0.85] — from the east the same glazed white tower reads clearly against its neighbours: several warm glazed floors, the lift shaft, roof garden and amber halo.
-- `tm-base` [0.36,0.62,0.62,0.98] capture [0.36,0.65,0.62,1.00] — two low glazed wings with hovering roof discs at the base and residents in the courtyard between them.
+- `tm-tower` [0.38,0.08,0.58,0.75] capture [0.42,0.52,0.56,0.92] — from the east the same glazed white tower reads clearly against its neighbours: several warm glazed floors, the lift shaft, roof garden and amber halo.
+- `tm-base` [0.36,0.62,0.62,0.98] capture [0.42,0.80,0.62,1.00] — two low glazed wings with hovering roof discs at the base and residents in the courtyard between them.
 
 ## Flagship +1 `high`
 
