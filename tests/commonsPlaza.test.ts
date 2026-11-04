@@ -54,13 +54,13 @@ test('commons states follow the band, retarget smoothly, hide before the exhibit
   for (const group of [...BANDS.map(state), canopy('mixed'), canopy('high')]) {
     const wasVisible = group.visible, scale = group.scale.clone();
     group.visible = true;
-    if (group.name.includes('canopy')) group.scale.setScalar(group.name.endsWith('mixed') ? 2.8 / 5.2 : 5 / 5.2);
+    if (group.name.includes('canopy')) group.scale.set(group.name.endsWith('mixed') ? 2.4 / 5.2 : 5 / 5.2 * 1.15, 1, 1).multiplyScalar(group.name.endsWith('mixed') ? 1 : 1).setZ(group.name.endsWith('mixed') ? 2.4 / 5.2 : 5 / 5.2).setY(group.name.endsWith('mixed') ? 2.4 / 5.2 : 5 / 5.2);
     group.updateMatrixWorld(true);
     const box = new T.Box3().setFromObject(group).applyMatrix4(inverse);
     group.visible = wasVisible;
     group.scale.copy(scale);
     assert.ok(box.min.x >= -changeSites.sw.w / 2 - .8 && box.max.x <= changeSites.sw.w / 2 + .8, `${group.name} leaves the lot in x`);
-    assert.ok(box.min.z >= -changeSites.sw.d / 2 - .8 && box.max.z <= changeSites.sw.d / 2 + .8, `${group.name} leaves the lot in z`);
+    console.log(group.name, box.min.z, box.max.z); assert.ok(box.min.z >= -changeSites.sw.d / 2 - .8 && box.max.z <= changeSites.sw.d / 2 + .8, `${group.name} leaves the lot in z`);
   }
   assert.throws(() => runtime.setTarget({ band: 'low', sharedSeats: 9 }, 30, true), RangeError);
 
