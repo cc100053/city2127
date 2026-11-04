@@ -1,0 +1,64 @@
+# SW close-up (closeup-night) — spec
+
+Targets (owner-picked 2026-11-04): [flagship-low](target/flagship-low.jpg), [flagship-mixed](target/flagship-mixed.jpg), [flagship-high](target/flagship-high.jpg). Rubric: [rubric.md](rubric.md). Taste: [CITY MASTER TASTE](../../../docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md). Pattern to copy: NW `src/siteBuilders/automationHub.ts` (band state groups as `Part`s, `bake()`, residents via `pedestrians()` + `conversationPose`, settled-state-only people, hovering lens canopy with under-emitters).
+
+Units: site-local, `changeSites.sw` scale 4 (1 unit = 4 m), lot 12 × 10 units centred (−105, 60), i.e. x ∈ [−6, 6], z ∈ [−5, 5]. Camera `sw:n` `[-95,30,-15]` → `[-105,10,60]` looks from local **−Z** toward +Z: camera-facing faces are local **−Z**, screen-left is local **+X**, screen-right is local **−X** (verify with one capture, mirror the layout if wrong). Size (owner): fill the lot, nothing past the orange outline (keep every mesh inside x ±5.9, z ±4.9); hovering discs may rise.
+
+## R1 — rebuild `src/siteBuilders/commonsPlaza.ts`
+
+### Shared
+
+- **Material `sharePink`** (new, in `commonsPlaza.ts`): `MeshStandardMaterial({ color: METER_COLORS.publicSharing, emissive: METER_COLORS.publicSharing, emissiveIntensity: .9, roughness: .5 })` — the only saturated accent: pod glass frames, screen frames, bench tops, terrace edge seams, disc rim/ribs. Never via `publicLight` × instance colour.
+- Structure `white` (automationKit); glazing `glassPane` over a warm backing (`glowMid` / `roomWarm` as NW does — not `glass`, it mirrors sky blue); emitters `glow` / `futureLight` (cool white-blue). No `dark`, no `teal`, no beige.
+- Retire the old gazebo: 6 columns, roof ring, membrane skylight, old arcs, old pink arcs, and the `sign('公共広場 / COMMONS')` (Latin letters; the target has no text). `createGuestMarker` outline unchanged.
+- Trees: `tree()` from `concentrationTower.ts`; shrubs: `shrubs()`/leafy crowns from `cityRig.ts`. Greenery stays lush.
+- Residents: one `pedestrians(stage, N, 'commons-people')` crowd, people shown only when a band is settled (NW pattern). Size them like the targets (a standing adult ≈ .5 units; seated people readable through pod glass) — use a per-band FOLK factor like NW if needed.
+
+### State −1 `low` — private pod garden (target flagship-low)
+
+- Terrace: white slab filling the lot, rounded corners, 11.6 × .3 × 9.6 (top y ≈ .3); a continuous clipped-hedge border (≈ .5 high) along the front and both sides, leaving a front entrance gap at the centre; pale paths (`stone`, slightly raised) in a Y from the front entrance to the back.
+- **6 pods**, positions ≈ (+3.1, −0.6), (+2.3, +1.9), (+0.7, +3.2), (−2.0, +3.1), (−3.4, +1.1), (−1.1, −0.1) (read from the target; adjust for paths): each a rounded white capsule ≈ 1.8 w × 1.5 h × 1.6 d (rounded box with large radius or a scaled capsule/lathe), floor at y ≈ .75 so it **hovers ≈ .4 above** the terrace; front (−Z, rotate each slightly toward the camera) is one large rounded glass opening ≈ 1.4 × 1.1 with a `sharePink` frame seam all round; inside: warm backing, two facing seats (`sharePink`/white), a small table, **2 seated residents** per pod in ≥ 4 pods (1 in the others).
+- Under every pod: ring emitter — `glow` torus r .55 tube .06 at y ≈ .45 + a flat bright disc/halo, on a short white pedestal ring stub so the gap reads.
+- **Screens**: 6 tall membrane panels .9 w × 1.9 h × .04 between neighbouring pods, white translucent (`skyGlass` or a white `MeshStandardMaterial` opacity .75) with a `sharePink` frame.
+- Planting: 5 small trees between pods, shrub beds filling the gaps, low hedges along paths. 4 slim reservation light-posts (white post + `glow` cap) by pod doors. 3 pink-topped benches along the front path.
+- People outside: ≥ 6 (walking the paths, sitting on the benches).
+
+### State 0 `mixed` — half pods, half open circle (target flagship-mixed)
+
+- Round white deck r 4.8, .35 high, centred (0, 0, +.1), stepped edge; `sharePink` steps (3 treads) at the front-right (≈ (−3, −3.6)).
+- Pod half (+X, screen-left): **4 pods** (same pod part, may be smaller ×.85) at ≈ (+3.0, −1.2), (+3.4, +1.4), (+1.6, +2.6), (+1.4, −2.4), on ring emitters; pink side panels; 2–3 residents in / beside them.
+- Divider: a curved raised planting bed (white planter wall .6 high) from front (≈ (0, −3)) to back (≈ (−.5, +3.5)) packed with 4 trees and shrubs.
+- Open half (−X, screen-right): sunken circle (floor .25 below deck) centred ≈ (−2.6, +.6), r 1.9, ringed by a continuous curved bench with `sharePink` top (two tiers on the back half), a round table at the centre; **≥ 14 residents** seated round it facing in, **3 children** (FOLK ×.6) near the steps.
+- **Canopy disc** over the open circle: white lens (NW lathe profile scaled) r 2.4 at y ≈ 4.2, centred over the circle (must stay inside x ≥ −5.9); 4 `glow` stabiliser rings (torus r .4) hanging under its rim + a `sharePink` rim seam; gentle bob ±.06 (still under `prefersReducedMotion`).
+
+### State +1 `high` — open commons amphitheatre (target flagship-high)
+
+- Plinth filling the lot (as −1), white; the whole lot is open: no pods, no screens.
+- Upper back deck (z +2 … +4.6) at y ≈ 1.6 with **2 glazed pavilions** at the back corners (x ±3.9, z +3.4): 2.2 × 1.5 × 1.6, `glassPane` + white mullions + warm-lit interior with sofa/bench.
+- **Amphitheatre**: 5 curved terraces (concentric arcs facing −Z, centre ≈ (0, +6)), each .3 rise, tread ≈ .65, descending from the back deck to the forecourt (y ≈ .3, z −1.5 … −4.6); every terrace edge a thin `sharePink` seam; long curved white benches on the treads; a straight central stair (≈ 1.6 wide) through the middle. The front forecourt is open, flat, white.
+- Raised planters on the terraces with **5 trees** + shrub beds (left side strong, as in the target).
+- **4 round tables** (white, 4 stools) on the upper deck / left terrace with residents.
+- Residents **≥ 22**: seated on terrace benches in groups, around tables, 4 children playing on the forecourt, 2–3 walking the stair.
+- **Big canopy disc**: white lens r 5.3 (x extent must stay within ±5.9; trim r if needed), centred (0, +.5), underside at y ≈ 8.5–9.5 (raise until it sits in the target's frame position, upper third); 8 radial `sharePink` ribs on the top surface and a `sharePink` rim seam; under it a stabiliser ring (torus r 3, `glow`) and 4–6 white machinery pods/boxes around a hub; 6 small under-emitters. No mast. Bob ±.08.
+
+### Transition (3 s, `SITE_TRANSITION_SECONDS`)
+
+- Band state groups as NW `Part`s: the outgoing state sinks/shrinks, the incoming grows; pods descend onto / lift off their emitters; the disc lowers in / lifts away. People only in a settled state.
+
+### Runtime and diagnostics
+
+- `CommonsPlazaRuntime` API and `CommonsPlazaDiagnostics` fields stay as they are: `cityChangeManager`, `tests/surveyMeterPipeline.test.ts`, `tests/*.browser.mjs` read `band` and `visibleSharedSeats` (must equal `layout.sharedSeats` once settled). Keep the 8-slot seat-level counter for diagnostics and the smooth 3 s count retarget; the visible geometry follows the band. Mark that split with a `ponytail:` comment.
+- Update `tests/commonsPlaza.test.ts` to the new structure; keep every intent (diagnostics, smooth retarget, hidden before the exhibition target / after `restoreLegacy`, everything inside the SW lot incl. the discs) — no assertion deleted without a replacement.
+
+### Camera
+
+- `SHOTS['sw:focal']` (`src/headlineCamera.ts`) → `{ position: [-95, 30, -15], target: [-105, 10, 60] }` (= `sw:n`). Fix any test that pins the old pose. `sw:district` unchanged.
+
+### Budget and checks
+
+- Report visible mesh/draw counts per state like NW; `bake()` static parts, instancing for pods/emitters/benches where repeated.
+- `npm test && npm run build && git diff --check` green.
+
+### Screenshots
+
+Evidence `~/city2127-evidence/closeup-night/sw/r1/`, Vite on port 5191: copy `~/city2127-evidence/closeup-night/sw/capture.mjs` and change the port; 3200×1800, HUD hidden, pose via `cityPose([-95,30,-15],[-105,10,60])`, `?meters=sw:<band>&hour=12` and `hour=22`. Name day captures `flagship-low.png`, `flagship-mixed.png`, `flagship-high.png` and night `flagship-<state>-night.png`. Build `vs-target.jpg` (3 rows: round day | target, 1200×675 cells). Do not publish anything to `artifacts/`.
