@@ -1,7 +1,7 @@
 # road-redesign — 2127 street network and street kit
 
 - Owner: cc100053
-- Status: IN_PROGRESS (kit polish R3 and network stages 1–2 owner-accepted 2026-11-04 and merged to main; stage 3 built on `claude/road-net-stage3`, owner visual acceptance pending)
+- Status: DONE (kit polish R3 and network stages 1–3 owner-accepted 2026-11-04 and merged to main)
 - Branch: `claude/road-net-stage2-63b23f` (from stage 1's `claude/road-net-stage1-a14ae6` at 5404ca8, itself from `claude/street-kit-polish-86d81f` at 1cf1a70, which continues the [road audit](road-audit.md) commit 866cdbe; not merged — the owner merges after all stages)
 - Base commit: 5a56230a9b2748344624197265406bcb3de39ef0 (main)
 - Remote availability: pushed (`origin/claude/road-net-stage1-a14ae6`; stage 2 on `origin/claude/road-net-stage2-63b23f`)
@@ -132,8 +132,8 @@
   checks pass); `npm run build` PASS; `git diff --check` PASS. FPS (`fps.sh`, headed Chrome 1920×1080, DPR 1, `meters=nw:0`, hero): day 54.1–56.3,
   night 54.2–56.5 (stage 2: 55.2–56.2 / 55.6–57.0, same machine, same evening). Captures `~/city2127-evidence/road-net-stage3/r1/` (hero; pool
   `cam=22,45,175&at=22,0,118`; canal `cam=-260,30,330&at=-150,0,210`; wide `cam=-170,70,320&at=30,0,165`; day 13, night 21; `capture.mjs`).
-  Visual acceptance: owner only, pending.
+  Owner accepted stage 3 as captured and asked to merge it to main (2026-11-04).
 
 ## Next expected step
 
-Owner reviews stage 3 captures; on acceptance, merge `claude/road-net-stage3` into main (validate the merge result, push, confirm main CI).
+None in this task. Open polish for a later task: the pool's day reflection banding and the canal's faint night seam (see stage 3 Known).
