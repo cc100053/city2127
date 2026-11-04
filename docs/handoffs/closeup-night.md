@@ -105,6 +105,13 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 - 2 分：fh-floors。0 分：fl-garden、tm-tower（H 鏡位 0 塔細，crop 見唔到頂）。
 - 仍然弱：−1 喺 L 鏡位佔畫面細、似擠埋一角、碟 gap 細；花園光禿；人似方塊；+1 柱讀成方、升降機冇玻璃井。
 
+## SE R4
+
+- 分數 21/38；pairwise 對 R3 7 勝 1 負（輸 fm-crown）→ keep。
+- 改咗乜：−1 五個亭移去 lot 後三分之二，前面變花園（梯級花槽、水道、長凳）；亭牆加高到 2.0、碟細啲高啲，L 鏡位見到暖色玻璃牆；0 前庭加長凳坐人、halo 加粗；+1 圓柱 r .3、−Z 面藍玻璃升降井、第二部固定升降機、露台樹放大。
+- 2 分：fl-people-in、fm-wings、fh-frame。0 分：fh-lift（H 鏡位睇唔到升降井）。
+- 仍然弱：−1 亭擠成一堆（14×14 lot 限制）、碟 collar 光唔夠；步道短；0 halo 太粗、前庭坐低嘅人睇唔到；+1 露台似灌木唔似樹。
+
 ## Blocked
 
 - **人仔可讀性**（fl-people-in、fm-ring、fh-people 卡喺 1）：全城共用 `pedestrians()` 人仔 mesh，冇 per-instance 衫色、坐姿由呢個 15° 鏡位睇大腿好短，似企。選項：(a) 只喺 SW 加一個更大、淺色衫、明顯屈膝嘅坐姿人仔變體（淨係 `commonsPlaza.ts`）；(b) 喺 `mobility.ts` 加 per-instance tint／坐姿誇張度（會影響其他 site，要 owner 批）；(c) 接受 1 分。今晚揀咗保持設計、唔郁共用 crowd，項目留喺 1。

@@ -86,3 +86,15 @@ Keep: `fh-floors` (2), the warm peach rooms, R3's +1 height. Re-crop and compare
 - Walkway: keep R2/R3 S-curve but lengthen it from the front edge to the back edge, columns 1.1 tall so it reads raised.
 - **0**: forecourt — 3 white benches placed in the camera-facing front, each with 2 seated people; halo emissive brighter and thicker (tube .15) so it reads glowing at day.
 - **+1**: corner columns r .3 with 16 segments, white, so they read round; lift shaft: light-blue faint glazing panels (opacity ≈ .3) on the −Z face with white frame and thin amber rails; park the cabin animation's capture-time position irrelevant — add a second static cabin at mid height (y ≈ 18) so one cabin is always visible; sky terraces: trees crown .7 (2 per terrace) protruding past the +X face.
+
+## R5 (R4 kept 21/38)
+
+Keep (2): `fl-people-in`, `fm-wings`, `fh-frame` — re-crop and compare with R4. H looks from +X (only slightly −Z), so the −Z face is edge-on there: anything meant for H goes on the **+X face**.
+
+- **fh-lift (0)**: move the +1 lift shaft to the **+X face at its −Z edge**, protruding +1.2 from the face, full height: white frame (4 posts, ring beams every floor), light-blue glazing panels opacity ≈ .45, thin amber rails, and the static warm-lit cabin (1.6 × 2.2, white, peach window, amber trim) at y ≈ 18 plus the animated one. Same idea for **fm-lift**: a bolder glazed shaft on the 0 tower where both L (−X face, right end) and H can see it.
+- **fh-gardens / fh-crown**: terrace trees with visible trunks and crown scale ≥ 1.0 on balconies projecting 1.2 off the +X face; crown roof garden 7 trees of crown ≥ .9 standing clearly above the parapet.
+- **fm-crown**: halo thinner (tube .09), .5 above the trees, bright emissive (it lost pairwise for being thick).
+- **fm-ground / fl-garden**: benches must be seen: put 3 benches on the camera-side (−X/−Z) edge of the forecourt/front garden, white seat .5 high, each with 2 clearly seated people facing the camera; ≥ 10 standing residents spread over the paths.
+- **fl-discs**: collar light ring larger (radius ≈ .6 r) and brighter, gap .8, so a glowing band reads under every disc.
+- **fl-walkway**: lengthen the S-curve so it spans front edge to back edge with two bends, 5 people on it, columns every 1.2.
+- **fh-base**: 2 benches with seated people and ≥ 6 trees of crown ≥ .9 round the +X foot.
