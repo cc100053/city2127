@@ -16,6 +16,8 @@ import { bake } from './cityRig';
 import { changeSites, DISTRICT, inDistrict, SEAWARD_GLSL } from './layout';
 import { bayContext, recedeBeyondDistrict } from './bayContext';
 import { publishDoorways, publishEntrances, roadFill } from './mobility';
+import { repairRoads } from './roadRepair';
+import { previewBoulevard, ROAD_KIT_PREVIEW, streetKitPreview, updateStreetKit } from './streetKit';
 
 // Literal paths bundle the district-detailed environment (scripts/crop-odaiba-district.py) and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
 const environmentUrl = new URL('../asset/models/odaiba-masterplan/odaiba_district_v01_environment.glb', import.meta.url).href;
@@ -118,7 +120,7 @@ export function updateOdaiba(night: number) {
   for (const material of glazing) { material.emissive.copy(warm).lerp(amber, night); material.emissiveIntensity = dayGlow + night * (.5 - dayGlow); } // P7 r2: saturated, lower-energy amber survives tonemapping
   glazingNight.value = night;
   curtainGlow.value = .15 + night * .8; curtainNight.value = night * .15; curtainSeam.value = .6 + night * 1.6; towerGlow.value = .3 + night * .9; towerNight.value = night;
-  updateMegastructures(night); updatePlaza(night);
+  updateMegastructures(night); updatePlaza(night); updateStreetKit(night);
 }
 
 // Ground finishes lie within centimetres of each other (building pads over the lawn terrain, plazas and service yards beside them), finer
@@ -189,11 +191,14 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     fill.computeVertexNormals();
     const strip = new T.Mesh(fill, paving); strip.name = 'ROAD_JUNCTION_FILL'; strip.receiveShadow = true; environment.add(strip);
   }
+  const roadKit = import.meta.env.DEV && new URLSearchParams(location.search).has('roadKit');
+  repairRoads(environment, roadKit ? ROAD_KIT_PREVIEW.cuts : []);
   // After finishes: shared materials are re-tuned once per mesh above, which would drop an earlier wrap.
   environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) receded.add(object.material); });
   receded.forEach(material => { if (cutGround.has(material.name)) openBay(material); recedeBeyondDistrict(material); });
   carveContext(environment);
   scene.add(contextFacades(environment), bayContext(), megastructures(), floaters());
+  if (roadKit) scene.add(streetKitPreview(environment));
   plantCanopy(scene,trees,true);
   plantBackdropGrove(scene,environment);
   // Sky gardens crown the tall context towers (the only CTX mesh above 30 m inside the district).
@@ -221,6 +226,6 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     const merged = bake(model); model.clear(); parts.forEach(geometry => geometry.dispose());
     merged.forEach(mesh => { mesh.name = placement.id; model.add(mesh); });
   }));
-  plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name) || object.name==='plaza-deck'));
+  plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name) || object.name==='plaza-deck'),roadKit?[previewBoulevard()]:[]);
   publishEntrances(scene,environment);
 }

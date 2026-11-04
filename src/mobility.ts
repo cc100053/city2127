@@ -463,7 +463,7 @@ export function streetCarPose(time:number,road:number,lane:number,car:number,car
  * `mobility` it also waits there until the lane beside the pull-out is clear). Cues: `signal` +1 indicates toward the kerb from SIGNAL m before easing in until it stops, -1 toward
  * the road from 3 s before pulling away until back in lane; `brake` lights while braking; `pitch` (rad, + nose down) dips the nose
  * under braking and lifts it pulling away. */
-export const DROP_OFF={road:1,lane:1,cars:[0,14],stops:[223,273],bay:2.3} as const;
+export const DROP_OFF={road:1,lane:1,cars:[0,14],stops:[114.9,164.9],bay:2.3} as const; // stops: metres along the westbound lane from the avenue's west end (bays at avenue d 397 and 347)
 const BRAKE=12,SHIFT=35,SIGNAL=30;
 export function dropOffPose(time:number,car:number,cars:number,length:number,stop:number) {
   return dropOffAt(laneTravel(time,DROP_OFF.road,DROP_OFF.lane,car,cars,length),length,stop);

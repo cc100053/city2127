@@ -31,10 +31,11 @@ export const promenades: readonly (readonly P3[])[] = [
 ];
 // Street avenues, centrelines snapped to the environment's road surfaces (tests/mobility.test.ts): the 5 m seaside avenue north of Aqua
 // City and DECKS, and the 7 m avenue under the Yurikamome guideway. Neither crosses the other, so their street cars need no signals.
-// The guideway avenue ends at (-255.6, 88.6), short of Hilton's chapel and podium, which stand across its surveyed road beyond.
+// The guideway avenue ends at (-166.2, 27.8), 5 m short of the hull megastructure, which stands on its surveyed road beyond (road audit
+// 2026-11-04, src/roadRepair.ts cuts that road; it used to run on to (-255.6, 88.6) inside the hull).
 export const streets: readonly (readonly P3[])[] = [
   [[-207,0,-86.4],[-108.9,0,-151.5],[-10.8,0,-216.6],[87,0,-282.1],[168.4,0,-336.7],[217.5,0,-369.3]],
-  [[259.8,0,-256],[175.9,0,-199.5],[108.9,0,-154.3],[24.6,0,-98.4],[-59.9,0,-42.9],[-127.5,0,1.5],[-160.6,0,24],[-244,0,80.9],[-255.6,0,88.6]],
+  [[259.8,0,-256],[175.9,0,-199.5],[108.9,0,-154.3],[24.6,0,-98.4],[-59.9,0,-42.9],[-127.5,0,1.5],[-160.6,0,24],[-166.2,0,27.8]],
 ];
 // polish2 (2026-11-03): the Fuji frame tower is the hero centrepiece. civicCore builds in its original metres and the whole chassis is scaled
 // `k` about its west-front foot (-75, 0, -12), which lands at (x, 0, z): set back off the arch foot, east of COMMONS PLAZA and the guideway.

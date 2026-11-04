@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
 import { changeSites, skyBridges, inDistrict, DISTRICT, CIVIC, civicAt } from '../src/layout.ts';
 import { heroCamera, heroSettledCamera } from '../src/heroCamera.ts';
-import { pavilionFlight, plazaPose, routes, mobility, publishDoorways, publishEntrances, forecourtVisits, promenadeBenches, visitPose, entranceJourneys, entrancePose, laneOffset } from '../src/mobility.ts';
+import { pavilionFlight, plazaPose, routes, mobility, publishDoorways, publishEntrances, forecourtVisits, promenadeBenches, visitPose, entranceJourneys, entrancePose, laneOffset, ROAD_FILL } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { civicCore } from '../src/civicCore.ts';
 import { publishOccupants, publishRoofWalks, occupantFleet, occupants, rideShown, strollPose } from '../src/occupants.ts';
@@ -18,6 +18,7 @@ import { AutomationDistrict, ConcentrationDistrict, SharingDistrict } from '../s
 import { bayContext } from '../src/bayContext.ts';
 import { acceleratedRaycast, MeshBVH } from 'three-mesh-bvh';
 import { checkHousingCity } from './housingCityCheck.ts';
+import { repairRoads, ROAD_CUTS, ROAD_LINKS } from '../src/roadRepair.ts';
 /** A ladder target with the given rungs; the rest mixed. */
 const rungs = (t: Partial<Record<'nw' | 'ne' | 'sw' | 'se', number>>) => ({ tiers: { nw: 0, ne: 0, sw: 0, se: 0, ...t } });
 
@@ -163,6 +164,21 @@ environment.traverse(object => {
   }
 });
 assert.ok(!environment.getObjectByName('ROADSIDE_TREE_INSTANCES'), 'Hidden roadside blockout is dropped');
+// Road audit (as loadOdaiba): cut streets keep no paving, the linked avenue is paved through, and the avenues beside each cut stay whole.
+repairRoads(environment);
+{
+  const paved = (x: number, z: number, names: RegExp) => new Raycaster(new Vector3(x, 50, z), new Vector3(0, -1, 0)).intersectObject(environment, true).some(h => names.test(h.object.name));
+  assert.ok(!environment.getObjectByName('ROAD_ACCESS'), 'Isolated driveway stubs are dropped');
+  for (const [ax, az, bx, bz] of ROAD_CUTS) for (const t of [.2, .5, .8])
+    assert.ok(!paved(ax + (bx - ax) * t, az + (bz - az) * t, /^(ROAD_|SIDEWALK_NETWORK|MAJOR_ROAD_MARKINGS)/), `cut street still paved at ${ax},${az} t=${t}`);
+  for (const [ax, az, bx, bz] of ROAD_LINKS) for (const t of [.1, .5, .9])
+    assert.ok(paved(ax + (bx - ax) * t, az + (bz - az) * t, /^ROAD_LINK$/) && paved(ax + (bx - ax) * t, az + (bz - az) * t, /^SIDEWALK_LINK$/), `road link unpaved at t=${t}`);
+  for (const [x, z] of [[-264.6, -47.9], [27.3, -242.05], [-206.7, -78.4]]) assert.ok(paved(x, z, /^(ROAD_SECONDARY|SIDEWALK_NETWORK)$/), `kept junction ${x},${z} lost its paving`);
+  // Both street-car avenues keep their surface end to end (the reroutes cut beside them); loadOdaiba's roadFill paves the one junction mouth.
+  routes().streets.forEach((street, r) => { const length = street.getLength(); for (let d = 0; d <= length; d += 2) {
+    if (r === ROAD_FILL.road && d >= ROAD_FILL.from && d <= ROAD_FILL.to) continue;
+    const p = street.getPointAt(d / length); assert.ok(paved(p.x, p.z, /^(ROAD_|SIDEWALK_|MAJOR_ROAD_MARKINGS)/), `street ${r} unpaved at d ${d}`); } });
+}
 // Street cars pass through nothing: every lane's car body (±0.95 m, 0.5 and 1.2 m up, scaled as drawn by the 12 m fade at each
 // avenue end) along both avenues, probed 0.3 m in four directions against the landmarks, civic core and environment (guideway
 // piers, Hilton's chapel, Aqua City's walls). Faces are hit from either side for this check only.

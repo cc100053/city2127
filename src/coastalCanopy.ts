@@ -139,10 +139,11 @@ export function plantRoofCanopy(scene: T.Object3D, model: T.Object3D, tower=fals
 }
 
 /** Coastal groves gather along structure — building edges, guideway, promenades and the water corridor — on authored landscape only, leaving open lawns between; circulation and landmark pads remain open. */
-export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,buildings:T.Object3D[]) {
+/** `streets`: extra street centrelines groves keep clear of, as of the guideway (DEV street-kit preview). */
+export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,buildings:T.Object3D[],streets:T.Curve<T.Vector3>[]=[]) {
   environment.updateMatrixWorld(true);
   const pads=buildings.map(building=>new T.Box3().setFromObject(building));
-  const paths=routes(),clearPaths=[paths.guideway,...paths.promenades].flatMap(path=>path.getSpacedPoints(400));
+  const paths=routes(),clearPaths=[paths.guideway,...paths.promenades,...streets].flatMap(path=>path.getSpacedPoints(400));
   const ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),clusters:[number,number,number,number][]=[],hiddenAt:boolean[]=[];
   const landscapeAt=(x:number,z:number)=>{
     ray.set(new T.Vector3(x,300,z),down);
