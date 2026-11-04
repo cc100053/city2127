@@ -22,11 +22,16 @@ export const COMMONS_FOLK: Record<Band, number> = { low: 2.4, mixed: 2.6, high: 
 
 /** The one saturated accent of the commons: emissive and instance-colour-free, so it reads day and night. */
 export const sharePink = new T.MeshStandardMaterial({ color: METER_COLORS.publicSharing, emissive: METER_COLORS.publicSharing, emissiveIntensity: .9, roughness: .5 });
-const screenGlass = new T.MeshStandardMaterial({ color: '#ffffff', roughness: .4, transparent: true, opacity: .75, depthWrite: false });
+// White membrane (not clear glass): milky and faintly self-lit.
+const screenGlass = new T.MeshStandardMaterial({ color: '#f6f7fb', emissive: '#ffffff', emissiveIntensity: .15, roughness: .5, transparent: true, opacity: .85, depthWrite: false });
+const paneGlass = new T.MeshStandardMaterial({ color: '#dff1ff', roughness: .1, transparent: true, opacity: .45, depthWrite: false });
+const warmWall = nightLit(new T.MeshStandardMaterial({ color: '#ffd9a8', emissive: '#ffa860', emissiveIntensity: .95, roughness: 1 }), 1.3, '#ff9a3c');
+const fernGreen = paint('#3f7d3a', .85);
+const propBlue = paint('#5d9ad0', .6), propYellow = paint('#eec35a', .6);
 const coreGrey = paint('#5d646e', .6);
 const peach = nightLit(new T.MeshStandardMaterial({ color: '#ffd2a6', emissive: '#ff9a58', emissiveIntensity: .75, roughness: 1 }), 1.1, '#ff9a3c');
 // Cool white-blue halo on the terrace under an emitter (additive, above the bloom threshold's reach so it also reads by day).
-const emitHalo = new T.MeshBasicMaterial({ color: '#cfeeff', transparent: true, opacity: .35, blending: T.AdditiveBlending, depthWrite: false, toneMapped: false });
+const emitHalo = new T.MeshBasicMaterial({ color: '#bfeaff', transparent: true, opacity: .45, blending: T.AdditiveBlending, depthWrite: false, toneMapped: false });
 const hedgeGreen = paint('#5c9a4f', .85), shrubGreen = paint('#4a8446', .85), bedGreen = paint('#477a43', .9);
 
 export type CommonsPlazaTarget = {
@@ -191,39 +196,50 @@ const POD_BASE = .2; // interior floor above the pod's lowest point
 const PD = 1.35; // pod depth
 const POD_SEAT = POD_H + POD_BASE + .3; // seat top above the terrace under the pod
 
-/** One private pod in its own frame: front (the glass) on +Z, resting on y 0, floating POD_H above its emitter. */
+/** Softens an extruded shell: sides bulge at mid-depth and the top is deeper than the bottom (centre height cy, half height 0.75). */
+function soften(geometry: T.BufferGeometry, cy: number): T.BufferGeometry {
+  const pos = geometry.attributes.position as T.BufferAttribute;
+  for (let i = 0; i < pos.count; i++) {
+    const yn = (pos.getY(i) - cy) / .75, zn = pos.getZ(i) / (PD / 2);
+    pos.setX(i, pos.getX(i) * (1 + .07 * (1 - zn * zn)));
+    pos.setZ(i, pos.getZ(i) * (1 + .12 * yn));
+  }
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+/** One private pod in its own frame: front (the glass) on +Z, resting on y 0, floating POD_H above its emitter; nothing touches the ground. */
 function podUnit(withPanel: boolean): T.Group {
-  const g = new T.Group(), cy = POD_H + .75;
-  // Rounded-square shell: a tube with a big front opening (~80 % of the front), a rounded lip and a closed back.
-  const lip = { bevelEnabled: true, bevelThickness: .07, bevelSize: .07, bevelOffset: -.07, bevelSegments: 3, curveSegments: 10 };
-  const shell = rr(new T.Shape(), 1.8, 1.5, .55);
-  shell.holes.push(rr(new T.Path(), 1.46, 1.14, .4));
-  mesh(g, new T.ExtrudeGeometry(shell, { ...lip, depth: 1.21 }).translate(0, 0, -PD / 2 + .07).translate(0, cy, 0), white);
-  mesh(g, new T.ExtrudeGeometry(rr(new T.Shape(), 1.8, 1.5, .55), { ...lip, depth: .02 }).translate(0, cy, -PD / 2 + .07), white);
+  const g = new T.Group(), cy = POD_H + .75, seatY = POD_H + POD_BASE;
+  // Soft capsule: a large-radius squircle tube with a big front opening (~80 % of the front), rounded lip and closed back.
+  const lip = { bevelEnabled: true, bevelThickness: .07, bevelSize: .07, bevelOffset: -.07, bevelSegments: 4, curveSegments: 14 };
+  const shell = rr(new T.Shape(), 1.8, 1.5, .58);
+  shell.holes.push(rr(new T.Path(), 1.46, 1.14, .42));
+  mesh(g, soften(new T.ExtrudeGeometry(shell, { ...lip, depth: 1.21 }).translate(0, 0, -PD / 2 + .07), 0), white).position.y = cy;
+  mesh(g, soften(new T.ExtrudeGeometry(rr(new T.Shape(), 1.8, 1.5, .58), { ...lip, depth: .02 }).translate(0, 0, -PD / 2 + .07), 0), white).position.y = cy;
   // Pink seam around the glass.
-  const seam = rr(new T.Shape(), 1.62, 1.3, .46);
-  seam.holes.push(rr(new T.Path(), 1.5, 1.18, .42));
-  mesh(g, new T.ExtrudeGeometry(seam, { depth: .03, bevelEnabled: false, curveSegments: 10 }).translate(0, cy, PD / 2 - .015), sharePink);
-  // Lit room behind the glass: warm liner, bright warm back wall, cream floor, ceiling light, two facing pink seats and a white table.
-  const liner = rr(new T.Shape(), 1.45, 1.13, .38);
-  liner.holes.push(rr(new T.Path(), 1.3, .98, .3));
-  mesh(g, new T.ExtrudeGeometry(liner, { depth: 1.0, bevelEnabled: false, curveSegments: 8 }).translate(0, cy, -.5), peach);
-  mesh(g, new T.ShapeGeometry(rr(new T.Shape(), 1.45, 1.13, .38), 8), peach, 0, cy, -.5);
-  box(g, [1.3, .03, 1.0], [0, POD_H + POD_BASE - .01, 0], glowFloor, .01);
+  const seam = rr(new T.Shape(), 1.62, 1.3, .5);
+  seam.holes.push(rr(new T.Path(), 1.5, 1.18, .46));
+  mesh(g, new T.ExtrudeGeometry(seam, { depth: .03, bevelEnabled: false, curveSegments: 12 }).translate(0, cy, PD / 2 - .015), sharePink);
+  // Lit room behind the glass: warm liner and back wall, cream floor, ceiling light; two pink seats at the sides near the glass, a low white table between.
+  const liner = rr(new T.Shape(), 1.45, 1.13, .48);
+  liner.holes.push(rr(new T.Path(), 1.3, .98, .4));
+  mesh(g, new T.ExtrudeGeometry(liner, { depth: 1.0, bevelEnabled: false, curveSegments: 10 }).translate(0, cy, -.5), peach);
+  mesh(g, new T.ShapeGeometry(rr(new T.Shape(), 1.45, 1.13, .48), 10), peach, 0, cy, -.5);
+  box(g, [1.3, .03, 1.0], [0, seatY - .01, 0], glowFloor, .01);
   box(g, [1.0, .04, .9], [0, cy + .54, 0], glowCeil, .01);
   mesh(g, new T.CylinderGeometry(.12, .12, .03, 14), glow, 0, cy + .51, 0);
   for (const s of [-1, 1]) {
-    box(g, [.4, .3, .45], [s * .5, POD_H + POD_BASE + .15, 0], sharePink, .04);
-    box(g, [.07, .5, .45], [s * .72, POD_H + POD_BASE + .4, 0], sharePink, .02);
+    box(g, [.42, .3, .5], [s * .43, seatY + .15, .12], sharePink, .04);
+    box(g, [.07, .5, .5], [s * .62, seatY + .4, .12], sharePink, .02);
   }
-  box(g, [.4, .34, .5], [0, POD_H + POD_BASE + .17, 0], white, .03);
-  // Glass: a slightly bulging ellipsoid sheet over the opening.
+  box(g, [.3, .22, .4], [0, seatY + .11, .12], white, .03);
   mesh(g, new T.SphereGeometry(1, 28, 14).scale(.76, .6, .13), glassPane, 0, cy, PD / 2 - .1);
   if (withPanel) box(g, [.04, .9, .9], [.93, cy, -.05], sharePink, .015);
-  // Emitter: a thin dark core holds the pod; a bright cool ring and a halo on the terrace read as lift over a clear gap.
-  mesh(g, new T.CylinderGeometry(.18, .22, POD_H, 16), coreGrey, 0, POD_H / 2, 0);
-  ringTorus(g, .65, .09, glow, 0, .14, 0);
-  disc(g, .9, emitHalo, 0, .03, 0);
+  // Emitter: a flat bright pad under the belly, a bright ring at mid-gap and a cool halo on the terrace.
+  mesh(g, new T.CylinderGeometry(.45, .45, .04, 28), glow, 0, POD_H - .04, 0);
+  ringTorus(g, .65, .09, glow, 0, POD_H / 2, 0);
+  disc(g, 1.0, emitHalo, 0, .03, 0);
   return g;
 }
 
@@ -233,7 +249,7 @@ function podFleet(parent: T.Object3D, name: string, spots: readonly { x: number;
   const meshes = bake(unit).map(source => {
     const instanced = new T.InstancedMesh(source.geometry, source.material, spots.length);
     instanced.name = name;
-    instanced.receiveShadow = true; // no cast: the shell would shade the residents seated inside
+    // no shadows either way: the shell would darken the residents seated inside
     instanced.frustumCulled = false;
     parent.add(instanced);
     return instanced;
@@ -269,13 +285,15 @@ function canopyLens(): T.Group {
   mesh(g, new T.LatheGeometry(lensProfile.map(([r, y]) => new T.Vector2(r, y)), 64), white);
   return g;
 }
-/** Radial pink rib on the lens top, following its profile (a double-sided ribbon). */
+/** Raised radial pink rib on the lens top, following its profile: a prism .1 high (top and both sides, each double-sided). */
 function rib(g: T.Group, angle: number, width: number) {
   const pos: number[] = [], c = Math.cos(angle), s = Math.sin(angle), nx = -s * width / 2, nz = c * width / 2;
+  const at = (r: number, y: number, side: number) => [c * r + side * nx, y, s * r + side * nz];
+  const quad = (p0: number[], p1: number[], p2: number[], p3: number[]) => pos.push(...p0, ...p1, ...p2, ...p1, ...p3, ...p2, ...p0, ...p2, ...p1, ...p1, ...p2, ...p3);
   for (let i = 0; i < topSurface.length - 1; i++) {
     const [r0, y0] = topSurface[i], [r1, y1] = topSurface[i + 1];
-    const a = [c * r0 - nx, y0 + .03, s * r0 - nz], b = [c * r0 + nx, y0 + .03, s * r0 + nz], d = [c * r1 - nx, y1 + .03, s * r1 - nz], e = [c * r1 + nx, y1 + .03, s * r1 + nz];
-    pos.push(...a, ...b, ...d, ...b, ...e, ...d, ...a, ...d, ...b, ...b, ...d, ...e);
+    quad(at(r0, y0 + .1, -1), at(r0, y0 + .1, 1), at(r1, y1 + .1, -1), at(r1, y1 + .1, 1));
+    for (const side of [-1, 1]) quad(at(r0, y0 - .01, side), at(r0, y0 + .1, side), at(r1, y1 - .01, side), at(r1, y1 + .1, side));
   }
   const geometry = new T.BufferGeometry().setAttribute('position', new T.Float32BufferAttribute(pos, 3));
   geometry.computeVertexNormals();
@@ -332,7 +350,7 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
     [[0, -1.8], [.9, -.4], [1.7, .45], [2.5, .95]], [[0, -1.8], [-.9, -.4], [-1.7, .35], [-2.4, .75]],
     [[0, -1.8], [-.3, .1], [.2, 1.3], [1.0, 2.3]], [[.2, 1.3], [-.4, 2.0], [-1.2, 2.3]],
   ];
-  const sampled = curves.map(points => new T.CatmullRomCurve3(points.map(([x, z]) => new T.Vector3(x, 0, z))).getPoints(points.length * 16).map(v => [v.x, v.z] as [number, number]));
+  const sampled = curves.map(points => new T.CatmullRomCurve3(points.map(([x, z]) => new T.Vector3(x, 0, z))).getPoints(points.length * 28).map(v => [v.x, v.z] as [number, number]));
   const walks = sampled.flatMap(line => line.slice(1).map((q, i) => [line[i], q] as [[number, number], [number, number]]));
   const nearPath = (x: number, z: number) => walks.some(([a, b]) => distToSegment(x, z, a, b) < .8);
   const onCurve = (i: number, u: number, y = BED + .03): [number, number, number] => { const l = sampled[i], p = l[Math.round(u * (l.length - 1))]; return [p[0], p[1], y]; };
@@ -345,15 +363,23 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
     for (let x = -6.1; x <= 6.15; x += .5) if (Math.abs(x) > 1.0) bush(g, x, BED - .05, -5.2, .27, hedgeGreen, .62);
     for (let z = -4.7; z <= 5.2; z += .5) for (const s of [-1, 1]) bush(g, s * 6.05, BED - .05, z, .28, hedgeGreen, .62);
     for (let x = -5.8; x <= 5.8; x += .6) bush(g, x, BED - .05, 5.2, .27, hedgeGreen, .6);
-    // Leafy low planting: small clumps at varied scale in two greens, kept off the paths and pods.
-    for (let i = 0; i < 420; i++) {
-      const x = (hash(i) - .5) * 11.6, z = (hash(i + 500) - .5) * 9.8;
-      if (nearPath(x, z) || lowPods.some(p => Math.hypot(x - p.x, z - p.z) < 1.5) || z < -4.7) continue;
-      const big = hash(i + 300) > .85, size = big ? .2 + hash(i + 900) * .1 : .09 + hash(i + 900) * .1;
-      bush(g, x, BED - .05, z, size, hash(i + 77) > .5 ? shrubGreen : hedgeGreen, big ? .9 : 1.15);
-      if (!big) bush(g, x + .12, BED - .05, z + .08, size * .7, hash(i + 78) > .5 ? hedgeGreen : shrubGreen, 1.3);
+    // Cover every non-path spot inside the hedge: dense leafy clumps (two greens, flattened, varied scale) and fern-like spiky clusters.
+    const free = (x: number, z: number) => !nearPath(x, z) && !lowPods.some(p => Math.hypot(x - p.x, z - p.z) < 1.4) && z > -4.8 && z < 4.9 && Math.abs(x) < 5.6;
+    for (let i = 0; i < 1500; i++) {
+      const x = (hash(i) - .5) * 11.8, z = (hash(i + 500) - .5) * 10;
+      if (!free(x, z)) continue;
+      const size = .25 + hash(i + 900) * .3;
+      bush(g, x, BED - .05, z, size, hash(i + 77) > .5 ? shrubGreen : hedgeGreen, .6);
     }
-    for (const [x, z, s] of [[4.9, .8, .62], [-4.9, .4, .65], [-1.9, -1.0, .55], [1.95, -1.1, .55], [0, 4.5, .6], [4.9, -3.4, .6], [-4.9, -3.3, .62]]) tree(g, x, BED, z, s);
+    for (let i = 0; i < 90; i++) {
+      const x = (hash(i + 2000) - .5) * 11.4, z = (hash(i + 2500) - .5) * 9.8;
+      if (!free(x, z)) continue;
+      for (let k = 0; k < 6; k++) {
+        const a = k * 1.05 + i, cone = mesh(g, new T.ConeGeometry(.05, .5, 5), fernGreen, x + Math.cos(a) * .1, BED + .22, z + Math.sin(a) * .1);
+        cone.rotation.set(Math.sin(a) * .6, 0, -Math.cos(a) * .6);
+      }
+    }
+    for (const [x, z, s] of [[4.9, .8, .62], [-4.9, .4, .65], [-1.9, -1.0, .55], [1.95, -1.1, .55], [0, 4.5, .6], [4.9, -3.4, .6], [-4.9, -3.3, .62], [4.7, 3.5, .6], [-4.7, 3.3, .6], [.2, -.1, .5]]) tree(g, x, BED, z, s);
     // Three pink-topped benches along the front path and four slim reservation posts by the pod doors.
     for (const [x, z, yaw] of benches) {
       const b = new T.Group();
@@ -371,11 +397,11 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
     // Six free-standing membrane screens at the midpoints between neighbouring pods: white translucent, pink frame, slim white foot.
     for (let i = 0; i < 6; i++) {
       const p = lowPods[i], q = lowPods[(i + 1) % 6], s = new T.Group();
-      s.position.set((p.x + q.x) / 2, BED, (p.z + q.z) / 2);
+      s.position.set((p.x + q.x) / 2, BED, (p.z + q.z) / 2 - .5);
       s.rotation.y = Math.atan2(q.x - p.x, q.z - p.z) + Math.PI / 2 + (i % 2 ? .45 : -.45);
-      box(s, [1.0, 2.1, .04], [0, 1.05 + .06, 0], screenGlass, .01);
-      for (const sx of [-.5, .5]) box(s, [.05, 2.1, .07], [sx, 1.11, 0], sharePink, .01);
-      for (const sy of [.06, 2.16]) box(s, [1.05, .05, .07], [0, sy, 0], sharePink, .01);
+      box(s, [1.0, 2.2, .04], [0, 1.1 + .06, 0], screenGlass, .01);
+      for (const sx of [-.5, .5]) box(s, [.05, 2.2, .07], [sx, 1.16, 0], sharePink, .01);
+      for (const sy of [.06, 2.26]) box(s, [1.05, .05, .07], [0, sy, 0], sharePink, .01);
       box(s, [.5, .06, .24], [0, .03, 0], white, .02);
       g.add(s);
     }
@@ -385,7 +411,7 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
   lowPods.forEach((pod, i) => {
     for (const s of [-1, 1]) {
       if (i > 3 && s > 0) continue;
-      const p = podPoint(pod, s * .5, 0);
+      const p = podPoint(pod, s * .43, .12);
       people('low', [{ ...p, y: POD_SEAT * pod.k + BED, yaw: pod.yaw - s * Math.PI / 2, seated: true, big: 1.3, talk: [i, s < 0 ? 0 : 1, 2] }]);
     }
   });
@@ -400,7 +426,7 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
   // ---------- 0 mixed: half pods, half open circle ----------
   const DC = { x: 0, z: .1 }, RC = { x: -2.8, z: .4 }, RING_IN = 1.7, RING_OUT = 2.0, FLOOR = DECK - .35, SEAT = FLOOR + .3;
   const mixedPods = [[3.5, -1.5, .1], [3.9, 1.5, .02], [2.3, 3.2, -.02], [2.2, -3.1, .14]].map(([x, z, tilt]) => ({ x, z, yaw: FRONT - tilt, k: .98 }));
-  const divider = (t: number): [number, number] => [(1 - t) * (1 - t) * -.2 + 2 * t * (1 - t) * .9 + t * t * -.6, (1 - t) * (1 - t) * -3.1 + 2 * t * (1 - t) * .2 + t * t * 3.6];
+  const divider = (t: number): [number, number] => [(1 - t) * (1 - t) * -.2 + 2 * t * (1 - t) * .9 + t * t * -.6, (1 - t) * (1 - t) * -4.3 + 2 * t * (1 - t) * .2 + t * t * 4.5];
   const WALL = .7;
   stateGroup('commons-state-mixed', 'mixed', 0, .6, g => {
     // Round deck with a stepped edge: a wide foot ring under the deck disc, the deck hollowed by the sunken circle (its riser wall is the hole edge).
@@ -419,22 +445,22 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
     arc(g, RING_OUT, RING_OUT + .18, .035, [RC.x, DECK + .22, RC.z], sharePink, Math.PI, Math.PI);
     mesh(g, new T.CylinderGeometry(.6, .55, .08, 28), white, RC.x, FLOOR + .38, RC.z);
     mesh(g, new T.CylinderGeometry(.14, .2, .34, 16), white, RC.x, FLOOR + .17, RC.z);
-    for (const [dx, dz, c] of [[.2, -.15, 0], [-.25, .1, 1], [.1, .3, 2]]) box(g, [.18, .04, .12], [RC.x + dx, FLOOR + .44, RC.z + dz], c === 1 ? sharePink : stone, .01);
+    for (const [dx, dz, c] of [[.25, -.15, 0], [-.3, .1, 1], [.1, .3, 2], [-.1, -.3, 3]]) box(g, [.2, .07, .14], [RC.x + dx, FLOOR + .46, RC.z + dz], [propBlue, sharePink, propYellow, shrubGreen][c], .01);
     // Front-right pink steps (three treads) leading in from the lawn.
     [[5.45, 5.7, DECK - .15], [5.7, 5.95, DECK - .32], [5.95, 6.2, DECK - .49]].forEach(([inner, outer, top]) => arc(g, inner, outer, top, [DC.x, 0, DC.z], sharePink, 2.0, .75));
     // Planter wall dividing the pod half from the open circle, packed with four trees of varied height and dense shrubs spilling over the edge.
-    const N = 12;
+    const N = 16;
     for (let i = 0; i < N; i++) {
       const a = divider(i / N), b = divider((i + 1) / N);
       segment(g, a, b, .95, WALL, DECK, white, .05);
       segment(g, a, b, .8, .05, DECK + WALL, bedGreen, .01);
     }
-    for (let i = 0; i <= 20; i++) {
-      const [x, z] = divider(i / 20), side = i % 2 ? 1 : -1;
+    for (let i = 0; i <= 28; i++) {
+      const [x, z] = divider(i / 28), side = i % 2 ? 1 : -1;
       bush(g, x + side * (.2 + hash(i) * .3), DECK + WALL - .15, z, .26 + hash(i + 3) * .2, i % 3 ? shrubGreen : hedgeGreen);
       bush(g, x - side * .1, DECK + WALL, z + .15, .2 + hash(i + 9) * .15, i % 3 ? hedgeGreen : shrubGreen);
     }
-    [[.1, .7], [.35, .95], [.65, .8], [.92, 1.05]].forEach(([t, s]) => { const [x, z] = divider(t); tree(g, x, DECK + WALL, z, s); });
+    [[.04, .85], [.2, 1.2], [.4, .9], [.58, 1.3], [.78, 1.0], [.95, 1.15]].forEach(([t, s]) => { const [x, z] = divider(t); tree(g, x, DECK + WALL, z, s); });
     for (const [x, z] of [[1.6, .1], [1.45, -.35]]) box(g, [.7, .14, .5], [x, DECK + .07, z], white, .02);
     bush(g, 4.3, DECK, 3.6, .4); bush(g, 4.5, DECK, -3.0, .38); bush(g, 3.4, DECK, -3.8, .36);
   }, true);
@@ -443,13 +469,13 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
   const ringSeat = (angle: number, r = (RING_IN + RING_OUT) / 2 + .02) => ({ x: RC.x + Math.cos(angle) * r, z: RC.z - Math.sin(angle) * r, yaw: Math.atan2(-Math.cos(angle), Math.sin(angle)) });
   for (let i = 0; i < 14; i++) {
     const a = (i + .5) / 14 * Math.PI * 2 + .15, s = ringSeat(a);
-    people('mixed', [{ ...s, y: SEAT + .035, seated: true, big: 1.15, talk: [40 + (i >> 1), i & 1, 2] }]);
+    people('mixed', [{ ...s, yaw: s.yaw + (i % 2 ? .5 : -.5), y: SEAT + .035, seated: true, big: 1.15, talk: [40 + (i >> 1), i & 1, 2] }]);
   }
   const stepSeat = (a: number) => ({ x: DC.x + Math.cos(a) * 5.58, z: DC.z - Math.sin(a) * 5.58, y: DECK - .15, yaw: Math.atan2(-Math.cos(a), Math.sin(a)) });
   people('mixed', [
-    ...mixedPods.slice(0, 2).flatMap((pod, i) => [-1, 1].map(sd => ({ ...podPoint(pod, sd * .5, 0), y: DECK + POD_SEAT * pod.k, yaw: pod.yaw - sd * Math.PI / 2, seated: true, big: 1.3, talk: [70 + i, sd < 0 ? 0 : 1, 2] as [number, number, number] }))),
+    ...mixedPods.slice(0, 2).flatMap((pod, i) => [-1, 1].map(sd => ({ ...podPoint(pod, sd * .43, .12), y: DECK + POD_SEAT * pod.k, yaw: pod.yaw - sd * Math.PI / 2, seated: true, big: 1.3, talk: [70 + i, sd < 0 ? 0 : 1, 2] as [number, number, number] }))),
     { x: 1.45, z: -.35, y: DECK + .14, yaw: -1.4, seated: true }, { x: 1.6, z: .2, y: DECK + .14, yaw: -1.4, seated: true },
-    ...[2.15, 2.4, 2.65].map(a => ({ ...stepSeat(a), seated: true, kid: true })),
+    ...[2.3, 2.42, 2.54].map(a => ({ ...stepSeat(a), seated: true, kid: true, big: 1.2 })),
   ]);
 
   // Canopy: a white hovering lens, shared construction for the mixed disc and the +1 roof; each state adds its own seams and emitters.
@@ -470,21 +496,22 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
     ringTorus(g, 5.2, .05, sharePink, 0, 0, 0);
     for (let i = 0; i < 4; i++) {
       const a = i * Math.PI / 2 + Math.PI / 4;
-      ringTorus(g, .45 / MIX_SCALE, .07 / MIX_SCALE, glow, Math.cos(a) * 3.7, -1.1, Math.sin(a) * 3.7);
-      disc(g, .6 / MIX_SCALE, emitHalo, Math.cos(a) * 3.7, -1.12, Math.sin(a) * 3.7);
+      ringTorus(g, .35 / MIX_SCALE, .07 / MIX_SCALE, glow, Math.cos(a) * 2.45 / MIX_SCALE, -.35 / MIX_SCALE, Math.sin(a) * 2.45 / MIX_SCALE);
+      disc(g, .5 / MIX_SCALE, emitHalo, Math.cos(a) * 2.45 / MIX_SCALE, -.4 / MIX_SCALE, Math.sin(a) * 2.45 / MIX_SCALE);
     }
   });
   addPart('mixed', .6, .4, level => { canopyLevel.mixed = level; });
   const HIGH_SCALE = 5 / 5.2, HIGH_SX = 1.15; // an ellipse 5.75 x 5.0
   const highCanopy = canopy('high', HIGH_SCALE, g => {
-    ringTorus(g, 5.2, .06, sharePink, 0, 0, 0);
+    // Thick pink rim band (.12 high) in 8 segments with short white gaps; 8 raised radial ribs; a solid bright stabiliser ring underneath.
+    for (let i = 0; i < 8; i++) arc(g, 5.0, 5.28, .12, [0, -.06, 0], sharePink, i * Math.PI / 4 + .07, Math.PI / 4 - .14);
     ringTorus(g, 5.2, .02, white, 0, -.3, 0);
-    for (let i = 0; i < 8; i++) rib(g, i * Math.PI / 4 + Math.PI / 8, .16);
-    ringTorus(g, 3, .12, glow, 0, -.85, 0);
+    for (let i = 0; i < 8; i++) rib(g, i * Math.PI / 4 + Math.PI / 8, .12);
+    ringTorus(g, 3, .14, glow, 0, -.85, 0);
     mesh(g, new T.CylinderGeometry(1.3, 1.5, .6, 24), white, 0, -.75, 0);
     mesh(g, new T.CylinderGeometry(.7, .9, .5, 16), coreGrey, 0, -1.15, 0);
-    for (let i = 0; i < 6; i++) {
-      const a = i * Math.PI / 3 + .3;
+    for (let i = 0; i < 12; i++) {
+      const a = i * Math.PI / 6 + .3;
       box(g, [.9, .4, .6], [Math.cos(a) * 2.0, -.8, Math.sin(a) * 2.0], white, .05).rotation.y = -a;
       box(g, [.7, .12, .3], [Math.cos(a) * 2.0, -1.05, Math.sin(a) * 2.0], coreGrey, .02).rotation.y = -a;
       box(g, [.12, .14, 1.6], [Math.cos(a) * 1.7, -.7, Math.sin(a) * 1.7], coreGrey, .02).rotation.y = -a + Math.PI / 2;
@@ -547,20 +574,22 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
       g.add(p);
       const w = 2.2, h = 1.5, d = 1.6;
       box(p, [w, .06, d], [0, .03, 0], glowFloor, .01);
-      box(p, [w - .1, h - .1, .06], [0, h / 2, d / 2 - .1], glowMid, .01); // back wall (the pavilion front is the −Z side)
+      box(p, [w - .1, h - .1, .06], [0, h / 2, d / 2 - .1], warmWall, .01); // back wall (the pavilion front is the −Z side)
+      for (let k = 0; k <= 5; k++) for (const sz of [-d / 2, d / 2]) box(p, [.05, h, .05], [-w / 2 + k * w / 5, h / 2, sz], white, .01); // mullions every .4
+      for (const sx of [-w / 2, w / 2]) for (let k = 0; k <= 4; k++) box(p, [.05, h, .05], [sx, h / 2, -d / 2 + k * d / 4], white, .01);
+      box(p, [w, .04, .05], [0, .12, -d / 2], white, .01);
+      box(p, [w, .05, .05], [0, h, -d / 2], white, .01);
+      box(p, [w, h, .01], [0, h / 2, -d / 2 - .01], paneGlass, .002);
+      box(p, [.01, h, d], [-s * w / 2 - .01 * s, h / 2, 0], paneGlass, .002);
+      box(p, [.01, h, d], [s * w / 2 + .01 * s, h / 2, 0], paneGlass, .002);
       // Pitched glass roof: two slopes to a white ridge beam, white eaves and rafters, a warm ceiling light under the ridge.
       for (const k of [-1, 1]) {
-        box(p, [1.25, .03, d + .2], [k * .6, h + .2, 0], glassPane, .002).rotation.z = -k * .32;
+        box(p, [1.25, .03, d + .2], [k * .6, h + .2, 0], paneGlass, .002).rotation.z = -k * .32;
         box(p, [.06, .07, d + .3], [k * (w / 2 + .05), h, 0], white, .01);
         for (const sz of [-d / 2 - .05, d / 2 + .05]) box(p, [1.25, .05, .05], [k * .6, h + .2, sz], white, .01).rotation.z = -k * .32;
       }
       box(p, [.08, .08, d + .3], [0, h + .39, 0], white, .01);
       box(p, [.6, .03, d - .3], [0, h + .3, 0], glowCeil, .01);
-      for (let k = 0; k <= 4; k++) for (const sz of [-d / 2, d / 2]) box(p, [.05, h, .05], [-w / 2 + k * w / 4, h / 2, sz], white, .01);
-      for (const sx of [-w / 2, w / 2]) for (const k of [0, 1]) box(p, [.05, h, .05], [sx, h / 2, -d / 2 + (k + .5) * d / 2], white, .01);
-      box(p, [w, .03, .05], [0, .12, -d / 2], white, .01);
-      box(p, [w, h, .01], [0, h / 2, -d / 2 - .01], glassPane, .002);
-      box(p, [.01, h, d], [s * -w / 2 - .01 * s, h / 2, 0], glassPane, .002);
       box(p, [1.2, .22, .45], [0, .17, .3], white, .05);
       box(p, [1.2, .3, .1], [0, .4, .5], sharePink, .03);
       box(p, [.4, .2, .4], [-s * .7, .13, -.1], white, .03);
