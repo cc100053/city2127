@@ -46,4 +46,5 @@ Scores: 0 absent, 1 present but off target, 2 matches the bar.
 
 ## Calibration
 
-(Owner's pass/fail words from round 1 go here.)
+R1 (2026-11-04): owner agreed with the R1 judge scores as the bar (「我同意R1嘅分數」): thin saturated blue lines, sphere-and-spike
+planting, thin rings and blades, a flat channel and a dim bridge all score 1; the night glow, pods and night planting colour score 2.

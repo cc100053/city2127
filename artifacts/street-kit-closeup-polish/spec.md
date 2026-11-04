@@ -69,3 +69,63 @@ Avenue `?roadKit&review=street&cam=-125,32,-5&at=-40,0,-55`, boulevard `cam=-45,
 
 `npm test` (no production behaviour change, so existing tests stand); add one small check if the carriageway override has logic beyond a
 swap (e.g. production `CARRIAGEWAY[1]` unchanged after import).
+
+## R2
+
+Aimed at the R1 items below 2 (judge evidence in `r1/judge/scores.md`). Owner's 7 m carriageway for A stands; the judge's "narrower than
+the target" is Gemini's enlargement, not a spec item.
+
+### Keep (scored 2 in R1; re-crop and compare with R1)
+
+`an-seams`, `an-rings`, `an-crossing`, `b-pods`, `bn-rails`, `bn-blades`, `bn-planting`. Night line, ring and blade glow levels stay as R1
+(the day changes below must not lower them).
+
+### Shared planting (`a-planters`, `a-far-verge`, `b-median`, `b-terrace`)
+
+R1 read as "sparse spheres and spiky tufts". Replace both shapes in `plantBeds` (stop calling `plantShrubs`; keep `plantCanopy` trees):
+
+- **Leafy bush**: 3 lobes of `IcosahedronGeometry(.5, 0)` merged (offsets ≈ ±.3 m, one raised), vertices jittered ±12 % by `hash`, scaled
+  y .75 — a faceted lumpy mound, never a sphere. One `InstancedMesh` `street-bushes`.
+- **Broad-leaf clump**: 6–7 broad flat leaves fanned from one point (each an `OctahedronGeometry(.35)` scaled (1, .18, .5), pushed out .3 m,
+  tilted up 25–45°), merged. One `InstancedMesh` `street-leaves`. Delete the cone fern geometry.
+- **Density**: spacing .65 m along, rows = max(2, round(bed w / .85)), jitter ±.2 m both ways; 60 % bushes / 40 % clumps; size .7–1.5 m,
+  mounded: scale × (1 + .45 × (1 − |q| / (w/2))) so the middle of each bed is higher. Greens: 4 tints, HSL h .22–.32, s .4–.55, l .24–.42
+  (dark and light leaves side by side as in the target). Soil hidden: no bed patch wider than .4 m showing.
+- Budget: report the total instance count; keep ≤ 10 000 across the kit.
+
+### A avenue
+
+- **`a-carriage` day lines**: lines must read as lit white-blue seams, not blue paint. Day colour pale (`#cfe8ff` family, brighter than the
+  ceramic, low saturation) and `lineGlow` opacity ≈ .25 by day (night stays as R1). Edge seams move to `a + .2` / `b − .2` so they read as
+  the carriageway's edges.
+- **Planters** (`a-planters`, `a-far-verge`): bed width W 5.0 m (was 4.2), rim .45 m thick, .6 m tall. Inner rim face still starts .35 m
+  beyond the carriageway edge. Keep piers clear (≥ .5 m). Right verge beds get the same fill and 2 broadleaf trees each.
+- **Rings** (`a-rings`): radius 2.4 m, tube .28 m (white `metal`), lit inner seam tube .1 m; halo pool 6 × 6 m, day opacity .5. Add a light
+  mist under each ring: open `CylinderGeometry(2.2, 2.2, 2.4, 32, 1, true)` between ring and shrubs, additive (`glows`), uv remapped so the
+  glow texture fades at top and bottom (as `glowLine`), opacity .2 day → .55 night. One merged mesh for all mists.
+- **Crossing** (`a-crossing`): one row of panels spanning the carriageway edge to edge: panels 1.0 m across × 2.8 m along, .3 m gaps, the
+  outer panels .1 m from the edges. Material pale blue-white, emissive `#cfe8ff`, day intensity 1.1 (clearly brighter than the ceramic in
+  sunlight), night as R1 or brighter.
+- **Footway** (`a-footway`): large pale paving: give `footway` its own canvas texture (as `panelTexture`, base `#e8e3d8`, joints `#d2ccbf`
+  2 px) tiled at 2.4 m squares. Make the metal edge flush (no 0.05 m raise), .15 m wide, so footway and carriageway read as one level.
+- **`an-planting` warm light**: find the warm orange night bands on the Yurikamome guideway barrier in the avenue frame (grep the guideway /
+  `yurikamome` builders and night materials) and under `?roadKit` only make them cool white-blue (`#cfe6ff`). Production unchanged.
+
+### B boulevard
+
+- **`b-channels`**: recess .18 m deep (was .06): floor `channel` at y − .18, walls 0.18 m tall in a new darker `channelWall`
+  (`#6f8296`, roughness .5) so the camera-side wall is visible, a flush white `metal` lip .06 m wide along both top edges. Rails sit on
+  the floor (y − .16), glow under them. Day lines as A (pale white-blue + day glow).
+- **`b-median`**: one continuous raised run (`run`, 3.0 m wide, .55 m tall, rim .45) from d0 to d1, cut only at the bridges (±1.5 m),
+  rounded/capped ends; cypresses every 6 m as R1; dense fill above.
+- **`b-terrace` / `bn-lip`**: step .45 m (was .3; one constant, everything standing on the terrace follows). Lit lip: keep the top seam
+  (widen to .14 m) and add a lit vertical strip .08 m tall on the riser face just under its top edge (`band` with `h`, `seamLight`), same
+  runs; glow band in front of the riser on the carriageway. Riser face reads as a distinct step in the day capture.
+- **`b-blades`**: a real tapered crescent: 9 m tall, base 1.1 m wide, tip .25 m, extrusion depth .7 m, curving to lean 2.6 m over the
+  carriageway at the tip (strong curve in the top third), lit strip tube .12 m along the inner edge. Pools stay under the new tip.
+- **`b-bridge`**: deck day emissive ≈ 1.0 (pale `#e8f4ff`), clearly brighter than the ceramic by day; lit seams along both deck edges
+  across the whole street; lines over the deck stay continuous.
+
+### Captures and checks
+
+As R1, into `r2/`; `npm test && npm run build && git diff --check`. Production (no `?roadKit`) unchanged.

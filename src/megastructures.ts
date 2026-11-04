@@ -15,13 +15,15 @@ export const megaSeam = new T.MeshStandardMaterial({ color: '#cfe8ff', emissive:
 export const megaGlass = new T.MeshStandardMaterial({ color: '#8fa3ae', roughness: .15, metalness: .3 });
 const megaPlant = new T.MeshStandardMaterial({ color: '#6f9a5c', roughness: .9 });
 // Night: about 60% of the glass cells (6 m × 4.2 m, world hash) glow warm, like the retained landmarks' lit rooms.
-const roomGlow = { value: 0 };
+const roomGlow = { value: 0 }, glassGlow = { value: new T.Vector3(1, .58, .24) };
+/** DEV `?roadKit`: the plaza deck's glazed band lights cool white-blue at night, so the street kit's frame has no warm light. Production keeps the warm rooms. */
+export const coolGlassGlow = () => glassGlow.value.set(.81, .91, 1);
 megaGlass.onBeforeCompile = shader => {
-  shader.uniforms.roomGlow = roomGlow;
+  shader.uniforms.roomGlow = roomGlow; shader.uniforms.glassGlow = glassGlow;
   shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 megaP;').replace('#include <project_vertex>', '#include <project_vertex>\nmegaP = (modelMatrix * vec4(transformed, 1.)).xyz;');
-  shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float roomGlow;\nvarying vec3 megaP;')
+  shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float roomGlow;\nuniform vec3 glassGlow;\nvarying vec3 megaP;')
     .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-    totalEmissiveRadiance += vec3(1., .58, .24) * roomGlow * .74 * step(.4, fract(sin(dot(floor(vec2((megaP.x + megaP.z) / 6., megaP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453));`);
+    totalEmissiveRadiance += glassGlow * roomGlow * .74 * step(.4, fract(sin(dot(floor(vec2((megaP.x + megaP.z) / 6., megaP.y / 4.2)), vec2(12.9898, 78.233))) * 43758.5453));`);
 };
 megaGlass.customProgramCacheKey = () => 'mega-glass';
 // polish2: the hoop's two faces are its facade — white frame, 3 m × 4.2 m storey windows (pale blue-grey glass by day), ~65% occupied rooms lit warm at night.

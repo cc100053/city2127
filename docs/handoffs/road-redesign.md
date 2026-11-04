@@ -41,6 +41,12 @@
 - Owner decisions (2026-11-04): widen A toward the plaza to ≈ 7 m (DEV `?roadKit` override of the street cars' lanes; production
   unchanged until rollout); B reviewed at the close pose `-45,24,212` → `0,0,168` with crops following the city (street keeps 24 m);
   static demo pods on B's channels in the preview; night scored by rubric only (no Gemini night targets).
+- R1 (e93ee88): absolute 27/40, pairwise 19–1 over R0, kept; owner agreed with the R1 scores as the bar (2026-11-04).
+- R2: dense faceted bushes and broad-leaf clumps (5825 instances), A 5 m planters, thick rings with a light mist, one-row crossing,
+  paved footway, cool plaza glass at night (`coolGlassGlow`, `?roadKit` only); B 0.18 m channel, continuous median, 0.45 m terrace with
+  lit riser, 9 m crescent blades, bright bridge deck. Absolute 29/40, pairwise 11–6 over R1, kept. Passed: a-footway, an-planting,
+  b-median, b-blades, bn-rails, bn-planting. Regressions vs R1: an-seams, an-crossing (2 but lost pairwise), bn-blades and b-pods 2 → 1.
+  Main R3 cause: the ring mist cylinders read as round glass tubs, so A's planters, rings and far verge read wrong.
 
 ## Validation
 
