@@ -47,6 +47,12 @@
   lit riser, 9 m crescent blades, bright bridge deck. Absolute 29/40, pairwise 11–6 over R1, kept. Passed: a-footway, an-planting,
   b-median, b-blades, bn-rails, bn-planting. Regressions vs R1: an-seams, an-crossing (2 but lost pairwise), bn-blades and b-pods 2 → 1.
   Main R3 cause: the ring mist cylinders read as round glass tubs, so A's planters, rings and far verge read wrong.
+- R3: ring mist removed, ring seam on the top inner edge, brighter day lines and square crossing panels, R1 night line values restored;
+  B channel lips removed, `riser` material, `bridgeLine` over the deck, 7 m blade pools, demo pods moved into the crop. Absolute 32/40,
+  pairwise 5–3 over R2 (12 ties), kept. Passed: a-carriage, a-footway, a-far-verge, an-seams, an-crossing, an-planting, b-blades,
+  b-bridge, bn-rails, bn-lip, bn-planting. Below 2 after three rounds (stop, owner decides): a-planters (thin grey rim, gem-like
+  shrubs), a-rings (chrome tubes, lost pairwise), an-rings (2 but lost pairwise), a-crossing (day contrast), b-channels (faint inner
+  lines), b-median (crown ratio ≈ 2.5, grey rim), b-terrace (day lip unlit), b-pods (no people for scale), bn-blades (no light pool).
 
 ## Validation
 

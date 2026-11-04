@@ -129,3 +129,43 @@ R1 read as "sparse spheres and spiky tufts". Replace both shapes in `plantBeds` 
 ### Captures and checks
 
 As R1, into `r2/`; `npm test && npm run build && git diff --check`. Production (no `?roadKit`) unchanged.
+
+## R3
+
+Last round of three. Aimed at R2's items below 2 or lost pairwise (`r2/pair.md`). Main cause: the R2 ring mist cylinders read as round
+glass tubs, so A's planters, rings and far verge read wrong (judge: "round glassy tubs").
+
+### Keep (passed R2; re-crop and compare with R2)
+
+`a-footway`, `an-planting`, `b-median`, `b-blades`, `bn-rails`, `bn-planting`. Keep the R2 planting shapes, density and bed sizes.
+
+### A avenue
+
+- **Remove the ring mist** (`mist`, `street-ring-mist`) completely. `a-planters`, `a-far-verge`: with it gone, the long 5 m stadium beds
+  and their thick white rims must read in the day crop; if plants still hide the rim, lower the rows' inset so the rim top stays visible.
+- **`a-rings` / `an-rings`**: the ring hovers 2.6 m over the bed (no column under it). Move the lit seam onto the ring's top inner edge
+  (tube .12 m, y +.1 over the ring centre line) so the high camera sees it. Halo pool on the shrubs: day .6, night .9, size 6 × 6 m,
+  just over the shrub tops (not under them).
+- **`a-carriage` day lines**: R2's were too faint (lost to R1). Day colour `#a9d3ff` × 1.3, width .18 m, `lineGlow` .3 by day: pale blue
+  lit lines clearly visible on the ceramic, not saturated paint.
+- **`an-seams` night**: restore R1's night look exactly (seam `#7fc0ff` × 4, rail `#74bbff` × 4, `lineGlow` .5). The day/night blend
+  must reach those values at `dark = 1`.
+- **`a-crossing` / `an-crossing`**: two rows of square panels 1.3 m, .3 m gaps, spanning edge to edge (outer panels .1 m from the
+  edges). Colour `#d6ecff`, emissive day 1.6 (clearly brighter than the ceramic in sun), night 2.4 or above, each square distinct.
+
+### B boulevard
+
+- **`b-channels`**: remove the white metal channel lips (extra parallel strips read as multi-track). Rail and edge lines use A's day
+  values, so they read as lit by day.
+- **`b-terrace` / `bn-lip`**: the 0.45 m step must read. Give the riser face its own material `riser` (`#b9c3cc`, roughness .6), a darker
+  band against the footway and ceramic. Top lip seam .2 m wide; at night the riser strip and a 1.0 m glow band in front of it.
+- **`b-bridge`**: lines across the deck in a new `bridgeLine` (`#8cc4ff` × 1.5 by day, night as rails), so they contrast with the bright
+  deck; deck stays bright.
+- **`bn-blades`**: pool opacity night .9, size 7 × 7 m, centred under the R2 blade tip (≈ 2.6 m out over the carriageway; check it
+  follows the new lean).
+- **`b-pods`**: the pods must sit in the crop: put ≥ 2 demo pods (≥ 3 m from blades and the bridge) so they project inside normalised
+  [0.05, 0.45, 0.55, 0.95] of the boulevard frame (project with the review camera; do not guess).
+
+### Captures and checks
+
+As R2, into `r3/`; `npm test && npm run build && git diff --check`. Production (no `?roadKit`) unchanged.
