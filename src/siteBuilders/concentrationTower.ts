@@ -10,7 +10,7 @@ const HIDDEN = 1e-3;
 const DEFAULT_TARGET: ConcentrationTowerTarget = { band: 'mixed', functionModules: 4 };
 const smoothstep = (t: number) => t * t * (3 - 2 * t);
 // Emissive and instance-colour-free, so the Meter amber reads day and night (publicLight x instance colour went white after dark).
-export const amber = new T.MeshStandardMaterial({ color: METER_COLORS.urbanConcentration, emissive: METER_COLORS.urbanConcentration, emissiveIntensity: 1.6, roughness: .5 });
+export const amber = new T.MeshStandardMaterial({ color: METER_COLORS.urbanConcentration, emissive: METER_COLORS.urbanConcentration, emissiveIntensity: 2, roughness: .5 });
 const white = paint('#f4f2ec', .4), oak = paint('#efe3cf', .6), dwood = paint('#efe6d6', .6), fabric = paint('#e9b8a0', .8), dark = paint('#6a737a', .5), pale = paint('#f1e8d6', .6);
 const books = ['#c98f6e', '#9fc0b4', '#e6c26a'].map(c => paint(c, .6));
 const bark = paint('#c99258', .62);
@@ -21,7 +21,7 @@ const glassWall = new T.MeshStandardMaterial({ color: '#ffffff', emissive: '#ffc
 const light = new T.MeshStandardMaterial({ color: '#fff4dc', emissive: '#fff4dc', emissiveIntensity: 2.6, roughness: .5 });
 const lamp = new T.MeshStandardMaterial({ color: '#f7cfb0', emissive: '#f7cfb0', emissiveIntensity: .6, roughness: .7, side: T.DoubleSide });
 const pane = new T.MeshStandardMaterial({ color: '#cfe6f2', roughness: .1, transparent: true, opacity: .18, depthWrite: false });
-const paneBlue = new T.MeshStandardMaterial({ color: '#bfe0f5', roughness: .1, transparent: true, opacity: .3, depthWrite: false });
+const paneBlue = new T.MeshStandardMaterial({ color: '#bfe0f5', roughness: .1, transparent: true, opacity: .45, depthWrite: false });
 const water = new T.MeshStandardMaterial({ color: '#7cc4ea', emissive: '#3a86b8', emissiveIntensity: .15, roughness: .25 });
 const unitBox = new T.BoxGeometry(1, 1, 1);
 const postGeometry = new T.CylinderGeometry(.03, .03, .94, 6);
@@ -145,10 +145,10 @@ function glazed(g: T.Group, cx: number, y0: number, cz: number, w: number, d: nu
 }
 
 /** Hovering roof disc (.14 thick, gap .5) on a collar with bright emissive light rings; `y` is the roof top. */
-function emitter(g: T.Object3D, x: number, y: number, z: number, R: number, gap = .5) {
-  arc(g, 0, .5, gap, [x, y, z], white);
-  arc(g, .46, .66, .1, [x, y + gap * .3, z], light);
-  arc(g, .46, .66, .06, [x, y + gap - .1, z], light);
+function emitter(g: T.Object3D, x: number, y: number, z: number, R: number, gap = .5, c = .5) {
+  arc(g, 0, c, gap, [x, y, z], white);
+  arc(g, c - .04, c + .16, .1, [x, y + gap * .3, z], light);
+  arc(g, c - .04, c + .16, .06, [x, y + gap - .1, z], light);
   arc(g, 0, R, .14, [x, y + gap, z], white);
 }
 
@@ -204,6 +204,7 @@ const bench = (g: T.Object3D, x: number, z: number, yaw = 0) => {
   g.add(s);
   strip(s, white, 0, .32, 0, 1.2, .06, .3);
   for (const k of [-.5, .5]) strip(s, white, k, .15, 0, .06, .3, .24);
+  strip(s, white, 0, .58, .14, 1.2, .38, .04);
 };
 const planter = (g: T.Object3D, x: number, y: number, z: number, w: number, d: number) => {
   strip(g, white, x, y + .15, z, w, .3, d);
@@ -393,8 +394,8 @@ const cabinParts = (g: T.Object3D, w = 1, h = 1.7) => {
 const shaft = (g: T.Object3D, x: number, z: number, h: number, step: number, hw = .7, rails = false, front: T.Material = pane) => {
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) strip(g, white, x + sx * hw, h / 2, z + sz * hw, .12, h, .12);
   for (let y = .04; y <= h; y += step) strip(g, white, x, y, z, hw * 2, .08, hw * 2);
-  strip(g, front, x, h / 2, z - hw, hw * 2, h, .02); strip(g, pane, x - hw, h / 2, z, .02, h, hw * 2); strip(g, pane, x + hw, h / 2, z, .02, h, hw * 2);
-  if (rails) for (const sx of [-1, 1]) strip(g, amber, x + sx * (hw - .1), h / 2, z - hw + .08, .04, h, .04);
+  strip(g, front, x, h / 2, z - hw, hw * 2, h, .02); strip(g, pane, x - hw, h / 2, z, .02, h, hw * 2); strip(g, front, x + hw, h / 2, z, .02, h, hw * 2);
+  if (rails) for (const sx of [-1, 1]) { strip(g, amber, x + sx * (hw - .1), h / 2, z - hw + .08, .04, h, .04); strip(g, amber, x + hw - .08, h / 2, z + sx * (hw - .1), .04, h, .04); }
 };
 
 export function buildConcentrationTower(scene: T.Scene, _kit: Kit): ConcentrationTowerBuiltSite {
@@ -431,10 +432,10 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit): Concentratio
     strip(base, white, MX, k * FH + .37, MZ - TW / 2 - .3, TW, .3, .45); strip(base, white, MX - TW / 2 - .3, k * FH + .37, MZ, .45, .3, TW);
     for (let i = 0; i < 5; i++) { bush(base, MX - TW / 2 + .4 + i * .85, k * FH + .52, MZ - TW / 2 - .3, .28); bush(base, MX - TW / 2 - .3, k * FH + .52, MZ - TW / 2 + .4 + i * .85, .28); }
   }
-  shaft(base, -2.5, 2.1, 6 * FH, FH);
+  shaft(base, 3.6, -1, 6 * FH, FH, .8, true, paneBlue);
   const cabin = new T.Group();
-  cabin.position.set(-2.5, 4.7, 2.1);
-  cabinParts(cabin);
+  cabin.position.set(3.6, 4.9, -1);
+  cabinParts(cabin, 1.2, 1.8);
   base.add(cabin);
   // Escalator on the -Z face: white side walls, dark tread, faint balustrade, rising to the floor-2 slab.
   const eStart = new T.Vector3(-.9, 0, -5.7), eEnd = new T.Vector3(-.9, 2 * FH, -1.9);
@@ -447,7 +448,7 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit): Concentratio
   strip(esc, dark, 0, .12, 0, .8, .05, eLen);
   for (const t of [.2, .4, .62, .85]) { const p = eStart.clone().lerp(eEnd, t); mixedPeople.push([p.x, p.y + .24, p.z, false, 0]); }
   base.add(...bake(base));
-  base.add(ring(2.6, .15, [[MX, 16.55, MZ]]));
+  base.add(ring(2.6, .09, [[MX, 16.6, MZ]]));
   base.add(crowd(mixedPeople));
 
   // -1: five round glazed pavilions (two big, nearest the camera at screen-left and -right; three small behind), hovering emitter discs, one S-shaped raised walkway, water, lawns and residents.
@@ -462,7 +463,7 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit): Concentratio
   strip(pavilions, leaf, 0, .03, 0, 13.8, .06, 13.8); // lawn under everything; paved aprons and the path ribbon sit on it
   spots.forEach(([x, z, r]) => {
     drum(pavilions, x, z, r, PH);
-    emitter(pavilions, x, PH + .18, z, r + .35, .7);
+    emitter(pavilions, x, PH + .18, z, r + .35, .8, .6 * r);
     seams.push([x, PH - .02, z, r + .08]);
     const at = (u: number, v: number): [number, number] => { const [a, b] = uv(u, v); return [x + a, z + b]; };
     const piece = (u: number, v: number, fn: (s: T.Group) => void) => { const [a, b] = at(u, v); const s = new T.Group(); s.position.set(a, .12, b); s.rotation.y = Math.PI / 4; pavilions.add(s); fn(s); };
@@ -479,7 +480,7 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit): Concentratio
     const [n5, n6] = at(-.75 * r, -.05 * r);
     lowPeople.push([n1, .12, n2], [n3, .12, n4], [n5, .12, n6]);
   });
-  const curve = new T.CatmullRomCurve3([[-1.2, 0, -6.0], [-.2, 0, -4.3], [.9, 0, -2.5], [.2, 0, -.5], [.9, 0, 1.8], [.2, 0, 3.8], [.9, 0, 5.1], [.4, 0, 5.8]].map(p => new T.Vector3(...p)));
+  const curve = new T.CatmullRomCurve3([[-1.3, 0, -6.1], [-.2, 0, -4.3], [.9, 0, -2.5], [.2, 0, -.5], [.9, 0, 1.8], [.2, 0, 3.8], [.9, 0, 5.1], [.4, 0, 6.1]].map(p => new T.Vector3(...p)));
   const pts = curve.getSpacedPoints(48);
   pts.forEach((p, i) => {
     if (!i) return;
@@ -502,7 +503,7 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit): Concentratio
   for (const [x, z] of benches) bench(pavilions, x, z, 0);
   pavilions.add(...bake(pavilions));
   pavilions.add(ring(1, .025, seams));
-  const outside: P[] = [onWalk(.12), onWalk(.4), onWalk(.62), onWalk(.85),
+  const outside: P[] = [onWalk(.1), onWalk(.3), onWalk(.5), onWalk(.7), onWalk(.9),
     ...benches.flatMap(([x, z]): P[] => [[x - .25, 0, z, true, FACE_CAM], [x + .25, 0, z, true, FACE_CAM]]),
     [-3.4, 0, -6.3], [-.6, 0, -5.4], [.9, 0, -3.8], [-1.9, 0, -2.8], [1.1, 0, -.9], [-.3, 0, 1.6], [1.2, 0, 4.6], [-3.4, 0, -3.2], [3.4, 0, -5.2], [0, 0, 2.6]];
   pavilions.add(crowd([...lowPeople, ...outside]));
@@ -516,23 +517,21 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit): Concentratio
     const y0 = LOBBY + i * HF;
     glazed(towerUpper, 0, y0, 0, HW, HW, HF, { amber: true });
     highPeople.push(...furnish(towerUpper, i, HW - .5, 0, y0 + SL, 0));
-    if ([1, 4, 7, 10, 12].includes(i)) { // sky terraces: +X face and the +X/-Z corner, white planters with shrubs and 2-3 trees
-      strip(towerUpper, white, HW / 2 + .4, y0 + .07, 0, .8, .14, HW - .6);
-      strip(towerUpper, white, HW / 2 + .7, y0 + .27, 0, .3, .26, HW - .8);
-      for (const z of [-1.8, -.9, 0, .9, 1.8]) bush(towerUpper, HW / 2 + .7, y0 + .35, z, .24);
-      for (const z of [-1.3, 1.3]) tree(towerUpper, HW / 2 + .35, y0 + .14, z, .7);
-      strip(towerUpper, white, HW / 2 + .4, y0 + .07, -HW / 2 - .4, .8, .14, .8);
-      bush(towerUpper, HW / 2 + .4, y0 + .14, -HW / 2 - .4, .26); tree(towerUpper, HW / 2 + .5, y0 + .14, -HW / 2 - .5, .5);
+    if ([1, 4, 7, 10, 12].includes(i)) { // sky terraces projecting 1.2 off the +X face: white slab and planter, two big trees with visible trunks
+      strip(towerUpper, white, HW / 2 + .6, y0 + .07, 1.1, 1.2, .14, 3);
+      strip(towerUpper, white, HW / 2 + 1.1, y0 + .27, 1.1, .3, .26, 2.8);
+      for (const z of [-.2, .6, 1.4, 2.2]) bush(towerUpper, HW / 2 + 1.1, y0 + .35, z, .22);
+      for (const z of [.2, 2]) tree(towerUpper, HW / 2 + .55, y0 + .14, z, 1);
     }
   }
   strip(towerUpper, white, 0, TOP + .11, 0, HW + .12, .22, HW + .12);
   for (const x of [-1, 1]) for (const z of [-1, 1]) arc(towerUpper, 0, .3, TOP, [x * (HW / 2 - .02), 0, z * (HW / 2 - .02)], white);
   for (const z of [-.9, .9]) strip(towerUpper, white, HW / 2 + .06, 1.4, z, .14, 2.8, .14); // portal on +X
   strip(towerUpper, white, HW / 2 + .06, 2.85, 0, .14, .14, 2); strip(towerUpper, light, HW / 2 + .1, 2.72, 0, .05, .06, 1.7);
-  const sz = -HW / 2 - .95;
-  shaft(towerUpper, 0, sz, TOP, 3.9, .95, true, paneBlue);
+  const lx = HW / 2 + .95, lz = -HW / 2 + .95; // lift on the +X face at its -Z edge, so H sees it face-on
+  shaft(towerUpper, lx, lz, TOP, HF, .95, true, paneBlue);
   const midCabin = new T.Group(); // a second, static cabin so one is always visible
-  midCabin.position.set(0, 18, sz);
+  midCabin.position.set(lx, 18, lz);
   cabinParts(midCabin, 1.6, 2.2);
   towerUpper.add(midCabin);
   // Crown: white cap (radius 3.4) overhanging the shaft with a glowing amber edge ring, parapet and roof garden.
@@ -541,21 +540,22 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit): Concentratio
   arc(towerUpper, 0, 3, .2, [0, TOP + .6, 0], leaf);
   shrubs(towerUpper, 2.4, TOP + .8, 0, Math.PI * 2, 14);
   shrubs(towerUpper, 1.2, TOP + .8, 0, Math.PI * 2, 8);
-  for (let i = 0; i < 6; i++) tree(towerUpper, Math.cos(.4 + i * 1.05) * 1.9, TOP + .8, Math.sin(.4 + i * 1.05) * 1.9, .8);
-  tree(towerUpper, 0, TOP + .8, 0, .9);
+  for (let i = 0; i < 6; i++) tree(towerUpper, Math.cos(.4 + i * 1.05) * 1.9, TOP + .8, Math.sin(.4 + i * 1.05) * 1.9, .95);
+  tree(towerUpper, 0, TOP + .8, 0, 1);
   // Base: ring of trees, hedged beds, planters, benches, residents.
-  for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2 + .2, r = 4.8; if (Math.cos(a) > .9) continue; tree(towerUpper, Math.cos(a) * r, 0, Math.sin(a) * r * .95, .55 + (i % 3) * .08); }
-  for (const [x, z, w, d] of [[0, 4.1, HW + 1.2, .5], [-3.6, 0, .5, HW], [0, -4.6, HW + 1.2, .5], [3.7, 3.2, .5, 1.6], [3.7, -3.2, .5, 1.6]]) { strip(towerUpper, leaf, x, .17, z, w, .34, d); for (let k = -2; k <= 2; k++) bush(towerUpper, x + (w > d ? k * w / 5 : 0), .3, z + (w > d ? 0 : k * d / 5), .24); }
-  for (const z of [-1.9, 1.9]) planter(towerUpper, 3.7, 0, z, .8, 1.2);
-  for (const z of [-3, 0, 3]) bench(towerUpper, 3.4 + (z ? 0 : .9), z, Math.PI / 2);
+  for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2 + .2, r = 4.8; if (Math.cos(a) > .35) continue; tree(towerUpper, Math.cos(a) * r, 0, Math.sin(a) * r * .95, .55 + (i % 3) * .08); }
+  for (const [x, z, w, d] of [[0, 4.1, HW + 1.2, .5], [-3.6, 0, .5, HW], [0, -4.6, HW + 1.2, .5], [3.7, 3.2, .5, 1.6], [3.7, -3.7, .5, 1.6]]) { strip(towerUpper, leaf, x, .17, z, w, .34, d); for (let k = -2; k <= 2; k++) bush(towerUpper, x + (w > d ? k * w / 5 : 0), .3, z + (w > d ? 0 : k * d / 5), .24); }
+  planter(towerUpper, 3.7, 0, 1.9, .8, 1.2);
+  for (const z of [1.8, 3.7]) bench(towerUpper, 4.7, z, Math.PI / 2);
+  for (const [x, z] of [[5.5, -3.4], [5.9, -1.4], [5.9, .6], [5.6, 2.8], [5.2, 4.6], [4.4, -4.7]]) tree(towerUpper, x, 0, z, .9);
   towerUpper.add(...bake(towerUpper));
   towerUpper.add(ring(3.4, .12, [[0, TOP + .65, 0]]));
-  highPeople.push([3.4, 0, -3, true, Math.PI / 2], [3.4, 0, 3, true, Math.PI / 2], [4.3, 0, 0, true, Math.PI / 2], [3.2, 0, -.8], [4.6, 0, -1.2], [3.0, 0, 1.0], [5.2, 0, 1.9], [4.4, 0, -2.4], [5.0, 0, 0.4]);
+  highPeople.push([4.7, 0, 1.5, true, Math.PI / 2], [4.7, 0, 2.1, true, Math.PI / 2], [4.7, 0, 3.4, true, Math.PI / 2], [4.7, 0, 4, true, Math.PI / 2], [5.3, 0, -1.0], [3.4, 0, .1], [5.2, 0, 1.0], [4.0, 0, -3.4], [5.0, 0, 3.1], [3.2, 0, 3.4]);
   towerUpper.add(crowd(highPeople));
 
   const elevator = new T.Group();
   elevator.name = 'tower-elevator-cabin';
-  elevator.position.set(0, CABIN_LOW, sz);
+  elevator.position.set(lx, CABIN_LOW, lz);
   cabinParts(elevator, 1.6, 2.2);
   elevator.add(...bake(elevator));
   towerUpper.add(elevator);
@@ -577,7 +577,7 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit): Concentratio
   strip(court, white, -1.8, 2.4, -5, 4.8, .2, 1.2); strip(court, white, -4.2, 2.4, -2.2, 1.2, .2, 5.6);
   strip(court, amber, -1.8, 2.51, -5, 4.8, .02, .08); strip(court, amber, -4.2, 2.51, -2.2, .08, .02, 5.6);
   strip(court, pane, -1.8, 2.75, -5.6, 4.8, .5, .02); strip(court, pane, -4.8, 2.75, -2.2, .02, .5, 5.6);
-  for (const [x, z] of [[-1.2, -6.3], [2.5, -1.7]]) planter(court, x, 0, z, 1.6, .7);
+  for (const [x, z] of [[-1.2, -6.3], [1.6, -2.4]]) planter(court, x, 0, z, 1.6, .7);
   planter(court, -6.2, 0, -.9, .7, 1.5); planter(court, -2.0, 0, -1.4 , 1.2, .5);
   bench(court, -2.4, -6.5, 0); bench(court, -5.2, -5.4, 0); bench(court, -.1, -6.5, 0);
   for (const [x, z, k] of [[6.1, -1.7, .55], [-6.1, 6.1, .5], [-3.3, 6.2, .5], [6.1, 4, .55], [3, 6.1, .5], [-6.1, -6.1, .5], [6.1, -6.1, .5]]) tree(court, x, 0, z, k);

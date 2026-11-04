@@ -98,3 +98,12 @@ Keep (2): `fl-people-in`, `fm-wings`, `fh-frame` — re-crop and compare with R4
 - **fl-discs**: collar light ring larger (radius ≈ .6 r) and brighter, gap .8, so a glowing band reads under every disc.
 - **fl-walkway**: lengthen the S-curve so it spans front edge to back edge with two bends, 5 people on it, columns every 1.2.
 - **fh-base**: 2 benches with seated people and ≥ 6 trees of crown ≥ .9 round the +X foot.
+
+## R6 (R5 kept; last round)
+
+At L the front third of the lot is below the frame for **both** −1 and 0, so life placed there is never seen (`r5/flagship-mixed.png`, `r5/flagship-low.png`).
+
+- **0 at L**: shift the whole 0 composition (tower, lift, escalator, wings, bridge) by (+1.6, +1.6) toward +X/+Z (stay inside the lot; keep the escalator on the camera side) so a paved forecourt in the **visible** band in front of the wings appears: 2 planter beds with shrubs, 3 white benches with 2 seated people each, ≥ 8 standing residents. Wings: solid white end walls and roof fascia with a thin amber line, closed warm glazing on camera faces, 3–4 people each with a counter/shelf (not desk rows).
+- **−1**: put benches with seated people and ≥ 8 residents along the walkway and between pavilions in the **visible middle band**, not the front third. No blue-tinted surfaces on our planters.
+- **+1 at H**: crown rim ring thicker (tube ≈ .25) and bright so it reads as a glowing halo; lobby closed warm peach glazing on +X with 2 benches and 6 residents in front.
+Keep everything else as R5.
