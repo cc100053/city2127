@@ -60,3 +60,90 @@ Expected bounds (three): x −2.8..3.9, z −2.8..2.8 (lift and terrace stay in 
 ## Captures
 
 `node ~/city2127-evidence/closeup-night/se/capture.mjs <out> 12,22 flagship-high` (Vite on 5192), 3200 × 1800, into `~/city2127-evidence/se-high-blender/r1/`; also run `tower-mixed` and `flagship-mixed` once to confirm 0 is unchanged. Blender review sheet (`blender-asset-qa/scripts/review_shots.py`) into the same folder.
+
+---
+
+# R2 — from the target, not from R6 (owner 2026-11-05)
+
+Owner: "spec r2, do not lock the materials, except person. And if the parts made in this process can reuse on other scene too, such as tree." R1 judged 6/12 absolute (median of 3; pairwise vs R6 night 5–0, day 3–1), but it kept R6's rooms, greenery and terraces, so it looked like R6 (Dev_QA Q5). R2 is written line by line from [flagship-high.jpg](../closeup-night/se/target/flagship-high.jpg). **Judge absolute against the target first**; R6/R1 pairwise is only a regression check.
+
+## Locked
+
+Only the **person**: `standingGeometry`, `seatedGeometry`, `personMaterial`, `shirts`, `crowd()`. Where people stand is free. −1 and 0 *code* is out of scope, but shared materials (`white`, `amber`, `room`, `pane`, `lamp`, `light`, `leaf` …) may change. If you change a shared one, capture `flagship-low`, `flagship-mixed` and `tower-mixed` day and night and report what changed. Prefer a new +1-only material when only +1 needs the look.
+
+## Target, item by item (pose H, three.js local units; camera faces +X, screen-right ≈ −Z)
+
+| # | Target shows | R1 has | R2 spec |
+| --- | --- | --- | --- |
+| T1 | 13 office floors + an open top floor + double-height lobby; same slender proportion | 14 glazed floors + lobby | keep `HW 5.2`, `LOBBY 3.6`, `HF 2.4`; floors 0–12 glazed, **floor 13 open-air** (crown, T7) |
+| T2 | **3 wide bays** per face: thick white corner piers + 2 slim mullions, clear glass | 5 bays, round corner columns, amber rails across the face | corner piers square .4 × .4 white (replace round columns); 2 mullions .06 per face; head/sill rail .06; clear `pane` |
+| T3 | thick, proud **amber band only every ~3 floors**; other slab edges white | thin amber band on every slab | slab edge white .26 bullnose on all; amber band .2 tall, .08 proud on slabs at floors 0, 3, 6, 9, 12 and under the crown cap |
+| T4 | bright **white ceilings with 2 linear lights** per floor; deep rooms; lower floors warm peach, upper floors cream-white | flat peach back wall, tiny furniture | ceiling: new `ceilingHigh` (white, mild emissive) + 2 `light` strips across x per floor; back walls: floors 0–5 warm peach (`room`), 6–12 a new cream-white emissive; floor finish pale; rooms read 4 m deep (no core box in the H sightline) |
+| T5 | **readable furniture**: dark desks with monitors, black chairs, bookshelves, kitchen counters, sofas, lamps; 1–3 people per floor, some seated | R6 `furnishBase` strips at tiny scale | kit furniture (K below) at person scale; each floor its own programme: office ×4, library ×2, café/kitchen ×2, lounge ×2, gym ×1, studio ×1, plus garden floors (T6); 2–3 people per floor placed by the +X glass, ≥ 1 seated |
+| T6 | **trees inside the floors** (round-crown small trees and potted shrubs behind the glass) on ~5 floors; no external balconies on the tower | external balcony slabs with bush pairs | delete the external terraces; garden floors 2, 5, 7, 9, 11: 2–3 kit indoor trees + potted shrubs + a long planter along the +X glass, 1–2 people |
+| T7 | **open top floor**: no glazing, white water-tank drum inside, spotlights under the cap; thick white cap with a wide glowing amber edge; dense roof garden on top | glazed drum band, cap r 3.5 | floor 13 open: corner piers only, white drum r 1.1 h 1.9 at (−.6, ·, .6), 6 small `light` spots under the cap; cap r 3.4, .7 thick bullnose; `tower-meter-band` on its rim widened (tube .3); roof: planter rim, 5 kit trees + kit shrubs, dense |
+| T8 | **separate glazed lift tube beside the tower** (screen-right), full height ground→cap, two amber rails on its front edges, white rings every ~4 floors, **large white cabin with a window** clearly visible mid-height | slim tube flush on the face, cabin unreadable | tube 1.6 × 1.6 centred (1.0, ·, −3.6) — gap .2 from the −Z face; rounded corners r .3; `pane` glazing; 2 amber rails r .05 on its +X edges, white rails on the back edges; white ring band every 4 floors; tie brackets at those rings; tube top tucked under the cap. Cabin = kit `lift_cabin` (1.3 w × 1.8 h × 1.3 d local, white, glazed front, warm-lit inside, 1–2 people); keep the animated cabin and the static mid-height one, both moved into the tube |
+| T9 | **double-height warm lobby** with a central white-framed double door; **paved forecourt**, 2 benches flanking the path, 4–6 people, layered tree clusters both sides, hedge planters along the base | lawn at the foot, tree ring hides the lobby, no benches in view | lobby: peach warm room, door frame white with `light` lintel; forecourt: pale paving (new `paving`) x 2.6..6.6, z −3.2..3.2 with a path to the door; 2 kit benches at z ±1.2 facing +X; 5 people (2 seated); kit tree clusters (3 per side) at z ±(3.0..5.0), x 3..6; low hedge planters along x = 2.8 except the door; **no trees in front of the door** |
+| T10 | white structure, warm rooms, amber only on bands, lift rails and crown ring | — | as T2–T8; no other amber |
+
+Height check: cap top ≈ TOP + .7 + garden; must stay inside the H frame (R6 rubric `fh-crown` crop).
+
+## Reusable prop kit `city-kit-2127` (Blender)
+
+One GLB of named props, reusable by every site (owner: "such as tree").
+
+- **Files**: `asset/models/city-kit-2127/build_kit.py`, `.blend`, `.glb`; same headless recipe and `gltf` export preset as R1.
+- **Units**: **real metres for a 1.8 m person**, origin at ground contact (or pot base), front −Y in Blender (+Z three).
+  - The site scales differ (SE ×3, NE/SW ×4), and the stylised people are larger than life. SE's standing figure is .74 local ≈ 2.2 m.
+  - So the consumer passes `unitsPerMetre` (SE: .74 / 1.8 ≈ .41).
+- **Root**: `ROOT_CITY_KIT_2127` with one child empty per prop, named `kit_<name>`. Each prop is ≤ 3 materials and has one mesh per material.
+- **Props**:
+  - Trees: `tree_round_s`, `tree_round_m`, `tree_round_l`. A trunk plus 3–6 clustered round lobes in two greens, matching the target's lumpy cluster crowns, not one sphere.
+  - Indoor greenery: `tree_indoor` (white pot + small crown), `shrub_cluster`, `potted_plant`, `planter_1m` (white trough, soil and shrubs).
+  - Furniture: `bench` (white frame, wood seat), `desk_monitor`, `chair_office`, `sofa`, `bookshelf`, `kitchen_counter`, `cafe_set` (round table + 2 chairs), `floor_lamp`, `treadmill`.
+  - `lift_cabin`.
+  - Budget ≤ 1.5k tris per tree and ≤ 600 per furniture piece.
+- **Materials**: named `kit_*`: `kit_leaf_a`, `kit_leaf_b`, `kit_bark`, `kit_white`, `kit_wood`, `kit_dark`, `kit_fabric`, `kit_screen` (emissive), `kit_soil`, `kit_glass`. Policy `preserve`: the Principled colours come through glTF, so every scene gets the same look. `kit_screen` and the cabin interior are emissive, so they glow at night.
+- **Runtime**: new `src/siteAssets/propKit.ts`.
+  - `loadPropKit(assets)` loads once through `SiteAssetLoaderCache.load`. A `kit` catalog category is not tied to one site, so `compatibleSite`/`compatibleLayer` become optional for it.
+  - `instanceProps(kit, placements: { name, position, yaw, scale }[], unitsPerMetre)` returns a `T.Group` with one `InstancedMesh` per (prop, material). Instances are placed by base, cast shadows and are named `kit-<name>`.
+  - Unit test with a stub GLB: counts, transforms, unknown name throws.
+- **Fallback**: each site keeps its procedural props until the kit arrives, using the same `setPreparation` swap as the tower shell. The +1 layer prepares the tower GLB and the kit together.
+- **Reuse beyond SE (not this round)**: the handoff lists where the kit can replace procedural props: SE −1/0 trees and benches, SW plaza trees and benches, the NW bay furniture, district street trees. Each is a later task with its own capture check, so this round changes no other site.
+
+## Tower GLB changes (`concentration-tower-high`)
+
+Rebuild per T1–T3, T7–T9:
+- Square corner piers; 3 bays.
+- Amber bands on floors 0/3/6/9/12 and the cap.
+- Open floor 13 with the tank drum and cap spots.
+- Lift tube at (1.0, −3.6) with rings and brackets.
+- Lobby door frame.
+- Paving and the forecourt path. These may live in the tower GLB as `se_paving`, or as procedural paving; pick one and say which.
+- No external terraces.
+
+Keep the identity root, `city-roles` remap, preload-at-build and procedural fallback. The roles list may grow, e.g. `se_ceiling`, `se_paving`.
+
+## Code (`concentrationTower.ts` +1 block)
+
+- `furnish` / `furnishBase` / `fitout` for +1 are replaced by kit placements per T5/T6. The procedural versions remain the fallback.
+- −1/0 keep their code.
+- High function modules 1–6 become kit fit-outs: one floor programme each. They keep the scale-in groups, names and counts the tests assert.
+- `lx`/`lz` move to the T8 tube; cabin animation constants unchanged unless the tube height needs it.
+- Remove: external terrace greenery, base tree ring in front of the door, R6 bush balls on +1.
+
+## Rubric additions (judge against target)
+
+Same `fh-*` six items. Add two observables to the judge brief:
+- "rooms have white ceilings with linear lights and readable furniture"
+- "lift is a separate tube beside the tower with a visible cabin"
+
+Bar: every `fh-*` item scores 2 on the median of three fresh absolute judges against the target, and no regression on −1/0 captures.
+
+## Captures and checks
+
+- **Captures**: `se:focal` `flagship-high` day and night at 3200 × 1800. The R2 output folder is `~/city2127-evidence/se-high-blender/r2/`.
+- **Kit sheet**: a Blender review sheet of every kit prop, `kit-review.png`, plus one render of all props next to a 1.8 m figure.
+- **Other states**: −1/0 captures, if a shared material changed.
+- **Gates**: `npm test && npm run build && git diff --check`, plus one headed FPS run (`.agents/skills/closeup-polish/scripts/fps.sh`, `se:high`).
+- **Metrics**: tris, materials and bytes for both GLBs.
