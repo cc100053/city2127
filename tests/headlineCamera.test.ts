@@ -59,10 +59,9 @@ assert.deepEqual([0,t.flyIn,t.hold,t.flyOut,t.done].map(elapsed=>shotStage(elaps
 assert.equal(Object.keys(SHOTS).length,74);
 for (const [id, pose] of Object.entries(SHOTS)) {
   const p=new Vector3(...pose.position),target=new Vector3(...pose.target);
-  // se:focal (owner 2026-11-04) looks up from the east at the full +1 tower; the only clear sightline, so it alone may aim upward.
-  assert.ok(p.y>target.y||id==='se:focal');assert.ok(p.distanceTo(target)>=40&&p.distanceTo(target)<=450);
-  if(id.endsWith(':district')) assert.ok(p.distanceTo(target)<=260);
-  assert.ok(p.x<target.x||p.z<target.z);
+  // No elevation or heading rule (owner 2026-11-05): each building's clear sightline decides its angle; only distance is bounded.
+  assert.ok(p.distanceTo(target)>=40&&p.distanceTo(target)<=450,id);
+  if(id.endsWith(':district')) assert.ok(p.distanceTo(target)<=260,id);
 }
 const camera=new PerspectiveCamera(42),controls={target:new Vector3(...HERO_TARGET),enabled:true,update(){}};
 camera.position.set(...HERO_POSITION);
