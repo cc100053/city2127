@@ -145,6 +145,12 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 - 2 分（7）：fl-pods、fl-screens、fm-ring、fm-deck、fh-amph、fh-people、fh-planting。冇 0 分。
 - 1 分（8）：fl-people-in、fl-emitters、fl-garden、fm-pods、fm-divider、fm-canopy、fh-disc、fh-tables。
 
+## SW R6（drop）
+
+- 15/30——Opus 用量撞咗上限，所以改用 Sonnet 評分，同之前嘅 Opus 分唔可以比；pairwise 對 R5 3 勝 4 負 → **唔 keep**，source 還原返 R5 `09c9273`，diff 存喺 `~/city2127-evidence/closeup-night/sw/r6/dropped.diff`。
+- 贏：fm-pods（艙散開、粉紅側板闊啲）、fm-divider（淺色有樹幹嘅樹）、fh-disc（淺灰機械）。輸：fm-canopy（碟拉近鏡頭遮咗圓圈，fm-ring 跟住輸）、fh-planting（為咗擺檯拆咗花槽）、fl-emitters。
+- Owner 話唔理時限 → 開 R7，以 R5 做底，只拎 R6 贏咗嘅部分。
+
 ## Next expected step
 
 Phase B：dispatcher 開 SW site session（`feat/closeup-night-sw`，port 5191，06:00 前停），完成後驗證、merge 入 `feat/closeup-night`，再開 SE（port 5192，09:00 停）；10:00 前交 night board。
