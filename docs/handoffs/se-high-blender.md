@@ -4,8 +4,8 @@
 - Status: IN_PROGRESS（R1 等 owner）
 - Branch: `feat/se-high-blender`（worktree `../city2127-se-blender`）
 - Base commit: `304084d58a9541a2dde5d63f2820d01b60d6654b`（origin/main）
-- Last verified commit: NONE
-- Remote availability: NOT PUSHED
+- Last verified commit: `734533b`（R1）
+- Remote availability: `origin/feat/se-high-blender` `734533b`
 
 ## Session Git state
 
