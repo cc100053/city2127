@@ -1,7 +1,7 @@
 # se-high-blender — SE +1 tower 用 Blender 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS（R1 等 owner）
+- Status: IN_PROGRESS（R2 等 owner）
 - Branch: `feat/se-high-blender`（worktree `../city2127-se-blender`）
 - Base commit: `304084d58a9541a2dde5d63f2820d01b60d6654b`（origin/main）
 - Last verified commit: `734533b`（R1）
@@ -37,7 +37,13 @@ Owner 2026-11-05：SE 夜間分最低（closeup-night R6 20/38，SW 23/30），�
 - Judge（`fh-*` 6 項，fresh blind）：absolute 三個 6/6/7 → median **6/12**（R6 喺同 rubric 7/12）；pairwise 對 R6：日 3 勝 1 負 2 和（輸 fh-base），夜 5 勝 0 負 1 和 → keep。Board：`r1/review.jpg`（日）、`r1n/review.jpg`（夜）。
 - FPS：NOT RUN。
 
+- R2（`333678a`）：由 target 逐項重做塔 GLB（3 bays、每 3 層 amber、頂層開放＋水缸、獨立升降井、鋪地前庭）＋新 reusable prop kit `city-kit-2127`（19 件，7,202 tris，198 KB，`propKit.ts`）。共用材質冇改（只加 +1 專用 `ceilingHigh`／`cream`／`paving`），所以 −1／0 冇重影。Opus 重跑 test／build／diff-check 全綠。
+- R2 judge：absolute 日 10/10/10 → median **10/12**，夜 9/12；pairwise 對 R1 日夜都係 5 勝 1 負（輸 fh-crown：屋頂樹疏、似棒棒糖，amber 環下緣雙層鋸齒）→ keep。Board：`~/city2127-evidence/se-high-blender/r2/review.jpg`、`r2n/review.jpg`、`r2/compare-r6-r2.jpg`。FPS：NOT RUN。
+
 ## Known issues and blockers
+
+- R2 低過 2：fh-floors（上層冷白、每層傢俬重複）、fh-lift（得 amber 扶手，玻璃管同 cabin 睇唔到）；夜間 fh-gardens 1。fh-crown 2 分但 pairwise 輸 R1（樹疏＋環鋸齒）。
+- Kit 樹幹太長（棒棒糖），同 target 矮叢樹唔同。
 
 - fh-lift 0：井冇凸出、cabin 喺 H 幾乎睇唔到；amber 扶手似立面上嘅 amber 格（fh-frame 由 2 跌到 1）。
 - fh-floors 1：傢俬細、每層一樣；fh-gardens 1：露台綠化仍係 procedural 圓球。
@@ -53,4 +59,4 @@ Owner 2026-11-05：SE 夜間分最低（closeup-night R6 20/38，SW 23/30），�
 
 ## Next expected step
 
-Owner 2026-11-05 叫寫 R2（[spec](../../artifacts/se-high-blender/spec.md) `# R2`）：由 target 逐項寫（T1–T10），材質唔再鎖（只鎖人仔），新做 reusable prop kit `city-kit-2127`（樹、室內植物、傢俬、長凳、lift cabin，真實米＋每 site `unitsPerMetre`）。下一步：owner 批 spec → Sonnet 實作 R2 → 三個 absolute judge 對 target。
+R2 完成，等 owner 睇 board。R3 建議：上層暖色、每層傢俬唔同、升降井玻璃管要讀到＋cabin 大而實、kit 樹改矮叢、頂環修鋸齒加密屋頂花園。（R2 背景：owner 2026-11-05 叫寫 R2（[spec](../../artifacts/se-high-blender/spec.md) `# R2`）：由 target 逐項寫（T1–T10），材質唔再鎖（只鎖人仔），新做 reusable prop kit `city-kit-2127`（樹、室內植物、傢俬、長凳、lift cabin，真實米＋每 site `unitsPerMetre`）。下一步：owner 批 spec → Sonnet 實作 R2 → 三個 absolute judge 對 target。
