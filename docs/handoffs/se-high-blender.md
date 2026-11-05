@@ -1,7 +1,7 @@
 # se-high-blender — SE +1 tower 用 Blender 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS（R3 等 owner；三輪未全 2，按 skill 停低報告）
+- Status: PARKED — owner 2026-11-06「stop at r3, blender seems way better than pure three.js」；R3 `8e7478c` 喺 branch，未 merge
 - Branch: `feat/se-high-blender`（worktree `../city2127-se-blender`）
 - Base commit: `304084d58a9541a2dde5d63f2820d01b60d6654b`（origin/main）
 - Last verified commit: `734533b`（R1）
@@ -63,4 +63,4 @@ Owner 2026-11-05：SE 夜間分最低（closeup-night R6 20/38，SW 23/30），�
 
 ## Next expected step
 
-R3 完成，三輪都未全部 2 分，等 owner 決定。R4 建議（逐項揀）：floors／gardens 用 R3；crown 用 R3 單環＋R2 嗰種高樹（新 kit 樹）；lift 白環減到每 4 層、玻璃更實、cabin 更大更實；角柱加粗圓角（frame 係 locked，要 owner 批）；查夜間 FPS。（舊：R3 建議：上層暖色、每層傢俬唔同、升降井玻璃管要讀到＋cabin 大而實、kit 樹改矮叢、頂環修鋸齒加密屋頂花園。（R2 背景：owner 2026-11-05 叫寫 R2（[spec](../../artifacts/se-high-blender/spec.md) `# R2`）：由 target 逐項寫（T1–T10），材質唔再鎖（只鎖人仔），新做 reusable prop kit `city-kit-2127`（樹、室內植物、傢俬、長凳、lift cabin，真實米＋每 site `unitsPerMetre`）。下一步：owner 批 spec → Sonnet 實作 R2 → 三個 absolute judge 對 target。）
+Owner 2026-11-06 叫停喺 R3（未 merge）。如果再開：R4 建議（逐項揀）：floors／gardens 用 R3；crown 用 R3 單環＋R2 嗰種高樹（新 kit 樹）；lift 白環減到每 4 層、玻璃更實、cabin 更大更實；角柱加粗圓角（frame 係 locked，要 owner 批）；查夜間 FPS。（舊：R3 建議：上層暖色、每層傢俬唔同、升降井玻璃管要讀到＋cabin 大而實、kit 樹改矮叢、頂環修鋸齒加密屋頂花園。（R2 背景：owner 2026-11-05 叫寫 R2（[spec](../../artifacts/se-high-blender/spec.md) `# R2`）：由 target 逐項寫（T1–T10），材質唔再鎖（只鎖人仔），新做 reusable prop kit `city-kit-2127`（樹、室內植物、傢俬、長凳、lift cabin，真實米＋每 site `unitsPerMetre`）。下一步：owner 批 spec → Sonnet 實作 R2 → 三個 absolute judge 對 target。）
