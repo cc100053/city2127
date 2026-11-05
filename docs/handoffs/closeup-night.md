@@ -28,7 +28,7 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 
 | Site | Pose | Targets | Size decision | Rounds | Score | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| SW | `sw:n` `[-95,30,-15]`→`[-105,10,60]` | [target](../../artifacts/closeup-night/sw/target/) | 放大到目標（填滿 lot，唔越橙邊；碟可以向上） | R1–R4 | 20/30（67 %）R4 | PARKED（merged `55a5d2b`，dispatcher 驗證 test/build/check 綠） |
+| SW | `sw:n` `[-95,30,-15]`→`[-105,10,60]` | [target](../../artifacts/closeup-night/sw/target/) | 放大到目標（填滿 lot，唔越橙邊；碟可以向上） | R1–R7（R6 drop） | 21/30 R7（R5 22/30） | PARKED `feat/closeup-night-sw` `d156db5`（R4 曾 merge `55a5d2b`；R5–R7 未 merge 入 integration） |
 | NE | `ne:s2` | — | — | — | — | SKIPPED（owner 2026-11-04：Q3 改能源題後 NE 公園恆定 0，客人去唔到 ±1） |
 | SE | L `[130,28,-95]`→`[182,24,-38]`（−1、0）；H `[360,45,-50]`→`[182,58,-38]`（0、+1） | [target](../../artifacts/closeup-night/se/target/)（`tower-mixed` = 0 喺 H） | 放大到目標（lot 內） | R1–R6（R2 drop） | 20/38（53 %）R6 | PARKED（merged `757dac2`，dispatcher 驗證綠） |
 
