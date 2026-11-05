@@ -114,3 +114,63 @@ Opus zoom of R3: high forecourt is a huge empty white plane in front, the terrac
 - **Ring children (fm-ring).** 3 children in bright clothes sitting on the front step edge facing the circle.
 
 Screenshots to `~/city2127-evidence/closeup-night/sw/r4/` (same names) + `vs-target.jpg`.
+
+## R5 — cap raised to 6 (owner); from R4 20/30
+
+Keep (2 in R4; re-crop and compare with R4, must not lose): `fl-pods`, `fl-screens`, `fm-deck`, `fh-amph`, `fh-planting`.
+
+1. **Site-local residents (fl-people-in, fm-ring, fh-people, fm-pods)** — the Blocked option (a), touches only `commonsPlaza.ts`. Replace the shared `pedestrians()` crowd on this site with local figures built like SE's (`concentrationTower.ts` lines ≈160–195: separate head / torso / arms / legs merged per pose, white shirt vertices tinted by `setColorAt`, light shirt palette, dark-grey legs): a **standing**, a **seated** (thighs forward, shins down, clearly bent at hip and knee — exaggerate the thighs so they read from a 15° camera: thigh length ≥ .45 × standing height) and a **child** (×.65) pose, as `InstancedMesh`es per state group. Size: adults ≈ .55–.6 units standing (≈ 2.3 m in this 4 m/unit site — larger than real, as the targets show people), seated proportionally; light clothing (white, cream, pale blue, peach, pale green, lilac; a few saturated: one red, one yellow, one blue per state for children). Faces toward the camera where the target shows faces (pod pairs 3/4 to camera; ring residents on the far side face the camera, near side in profile). Residents still show only in a settled state (fade/scale with the band group is fine since the figures are part of it). Walkers become standing figures placed mid-stride is not needed — stand them on paths in pairs/groups, a few with an arm forward (talking).
+2. **Emitters (fl-emitters, fm-pods)** — not a flat disc: under each pod a **vertical emissive collar** (open cylinder r .5, height .18, cool `#9fe8ff`×2.5 toneMapped false) hanging from the pod belly, a smaller bright ring at the bottom of the collar, then a **visible dark gap** (≥ .45) to the terrace; on the terrace only a small soft halo (r .7, opacity .3), not a big flat disc. The ring must read as a glowing torus seen in perspective, brighter in the centre.
+3. **Garden (fl-garden)** — match the target density: ≥ 12 small trees with visible trunks spread over the beds (not just 2–3 visible), dense leafy fern clusters covering all beds (spiky lighter greens, varied heights .2–.6), hedge border; curving paths stay; benches visible.
+4. **Mixed canopy (fm-canopy)** — the cyan halos read as large ovals outside the lot: drop the halo discs, keep only the 4 compact glowing ring emitters (torus r .3) hanging *directly under* the rim on the camera side; disc must read inside the lot.
+5. **High disc (fh-disc)** — continuous saturated `sharePink` rim band (no white gaps), the stabiliser ring an opaque bright torus (not a translucent slab), machinery boxes dark-grey and readable.
+6. **Pavilions / tables (fh-tables)** — pavilions as warm-lit glass rooms: brighter warm interior (emissive back wall + floor glow), clear glass, white frame; ≥ 3 tables clearly visible in front of them with seated residents.
+
+Screenshots to `~/city2127-evidence/closeup-night/sw/r5/` (same names) + `vs-target.jpg`.
+
+## R6 — last round (R5 22/30, kept 6–4; lost fl-emitters, fl-garden, fm-pods, fh-disc)
+
+Keep (2 in R5; must not lose): `fl-pods`, `fl-screens`, `fm-ring`, `fm-deck`, `fh-amph`, `fh-people`, `fh-planting`. Keep the R5 figures as they are.
+
+- **Emitters (fl-emitters, fm-pods)** — R4's look won the pairwise: bring back R4's bright cyan ring + halo *directly under* each pod (ring at the pod belly, halo just beneath it, not a disc on the lawn), and keep a clear dark gap to the terrace (≥ .45) between the halo and the ground. No terrace disc. The ring must be the brightest thing under the pod by day.
+- **Mixed pods (fm-pods)** — spread the 4 pods so none overlaps from the camera (use the +X half of the deck fully, front-to-back), pink side panels ≥ .12 wide and emissive, 2 residents seated in ≥ 3 pods.
+- **Garden (fl-garden)** — paths as smooth curves (no arrow/Y slabs: build each path from many short slabs along a Catmull-Rom curve, widths .5–.6), ≥ 8 small trees with trunks visible *between the pods* (not only at the edges), leafy beds dense.
+- **Pod interiors (fl-people-in)** — less tangle: table smaller (.25 × .25) and lower than the knees, seats against the side walls, the two residents clearly separated; interior warmer (ceiling glow brighter, back wall warm gradient if cheap).
+- **Divider (fm-divider)** — 7 trees with visible trunks, crowns smaller and lighter (two greens), varied heights, shrubs spilling over the planter edge on both sides.
+- **Mixed canopy (fm-canopy)** — it still reads over the water: move the disc toward the camera and lower so its image overlaps the circle and the deck: centre z ≈ −2.0, y ≈ 2.7, r 2.2 (still inside the lot); keep R5's slim ring emitters (they won the pairwise).
+- **High disc (fh-disc)** — flatter lens (top not a cone: rise ≤ .5 at the centre), white/light-grey underside machinery (R4's lighter boxes won), keep the continuous pink rim and ribs, slim bright stabiliser ring.
+- **Tables (fh-tables)** — ≥ 3 round tables clearly visible in front of the pavilions (bring one table forward to the front edge of the back deck), residents seated around each.
+
+Screenshots to `~/city2127-evidence/closeup-night/sw/r6/` (same names) + `vs-target.jpg`.
+
+## R6 result — dropped
+
+R6 15/30 (Sonnet judges: the Opus limit was hit, so this score is not comparable with the Opus-judged rounds); pairwise vs R5 3–4 → not kept, source restored to R5 `09c9273`, diff at `~/city2127-evidence/closeup-night/sw/r6/dropped.diff`. R6 parts that **won** pairwise: `fm-pods` (spread pods, wider pink side panels), `fm-divider` (lighter trees with trunks), `fh-disc` (light-grey machinery, flatter lens). Parts that **lost**: `fm-canopy` (moved toward the camera it covered the ring → fm-ring lost too), `fh-planting` (planter at (−1.4, 2.35) removed for a table), `fl-emitters`.
+
+## R7 — from R5 (owner: no time limit)
+
+Keep (2 in R5; must not lose): `fl-pods`, `fl-screens`, `fm-ring`, `fm-deck`, `fh-amph`, `fh-people`, `fh-planting`. R5 figures unchanged.
+
+- **Take from R6's diff only:** mixed pod layout + .14 pink side panels (fm-pods); divider trees (fm-divider); high-disc flatter lens + light-grey machinery + slim stabiliser ring (fh-disc); smaller/lower pod table and seats at side walls (fl-people-in); Catmull-Rom garden paths (fl-garden). Nothing else from R6.
+- **Mixed canopy (fm-canopy)** — keep it over the circle centre (R5 x/z), not toward the camera; lower it to y ≈ 2.5 and r 2.0 so its image sits over the deck's back half instead of the water; 4 slim ring emitters under its rim; no halo discs. Check in the capture that the near half of the ring and its seated residents stay unoccluded.
+- **Emitters (fl-emitters)** — neither the R5 terrace halo nor R6 version won clearly. Make the glow unmistakable: under each pod belly a bright ring (`#9fe8ff`×3, toneMapped false, torus r .6 tube .1) plus a second wider additive torus (r .7, tube .2, opacity .35) as a bloom; small bright pad in the ring centre; clear dark gap below; nothing flat on the lawn.
+- **Tables (fh-tables)** — a 4th table visible in front of a pavilion **without removing any planter or tree** (find free deck space, e.g. in front of the left pavilion).
+- **Garden (fl-garden)** — ≥ 8 small trees with visible trunks between the pods, beds dense.
+
+Screenshots to `~/city2127-evidence/closeup-night/sw/r7/` (same names) + `vs-target.jpg`.
+
+## R8 — the 1-score items (R7 21/30, kept 6–1)
+
+Keep (2 in R7; must not lose): `fm-ring`, `fm-deck`, `fh-amph`, `fh-people`, `fh-tables`, `fh-planting`. Figures' build unchanged except where named.
+
+- **Pod shell (fl-pods)** — reads as boxy cubes. Make it a horizontal capsule like the target: width 1.0 : height .85 : depth 1.3, dome-rounded top and sides (capsule/lathe/superellipsoid, no flat faces visible), the front a large rounded "TV" opening; glass must read as glass: a clear curved sheet with a pale specular highlight band (e.g. `MeshPhysicalMaterial` low opacity + clearcoat, or a thin white gradient strip along the top edge) in front of the warm interior — not a flat orange fill.
+- **Pod residents (fl-people-in)** — no mirror-twins: vary each pair (one leaning forward with an arm gesture, the other leaning back; different shirt colours; slight yaw difference); no clipping with seats or table.
+- **Emitters (fl-emitters, fm-pods)** — washed-out by day. Use contrast instead of additive bloom: a mid-grey belly plate (#5d6872, r .55) under the pod, a solid saturated cyan ring on it (#38c8ff, emissive strong, toneMapped false, torus r .5 tube .08), a small bright core pad; keep only a faint bloom (opacity ≤ .15). Clear dark gap to the ground.
+- **Screens (fl-screens)** — no foliage within .6 of a screen; make the membrane material opaque-ish (opacity ≥ .92 with `depthWrite: true`, or opaque white with emissive .1) so sorting artifacts ("dark green holes") disappear.
+- **Garden (fl-garden)** — no flat lawn visible inside the hedge except the paths: cover all beds with dense leafy planting (mixed heights .2–.7, two-three greens), ≥ 8 small trees with trunks between pods.
+- **Mixed pods (fm-pods)** — mixed pods ×.85, staggered so none overlaps another from the camera (check in the capture).
+- **Divider (fm-divider)** — a wider two-tier stepped planter (≈ 1.2 wide, tiers .45 and .8 high) with 6–7 trees of varied height and dense shrubs spilling over both tiers.
+- **Mixed canopy (fm-canopy)** — R7 reads small and low at the back edge: r 2.4, y 2.9, centre shifted .6 toward the camera from the circle centre (stay inside the lot); 4 compact bright stabiliser rings under the rim. Verify the near half of the ring and its residents remain unoccluded.
+- **High disc (fh-disc)** — remove the stray glowing white ellipses under the disc (replace with 6 small bright emitter pads r ≤ .25); keep light machinery, pink rim and ribs.
+
+Screenshots to `~/city2127-evidence/closeup-night/sw/r8/` (same names) + `vs-target.jpg`.

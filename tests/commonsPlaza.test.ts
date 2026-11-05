@@ -24,6 +24,9 @@ test('commons states follow the band, retarget smoothly, hide before the exhibit
   assert.deepEqual(shown(), ['low']);
   assert.ok(plaza.children.some(child => child.name === 'commons-pods-low' && child.visible), 'pods stand in the low state');
   assert.deepEqual(runtime.getDiagnostics(), { band: 'low', targetSharedSeats: 0, visibleSharedSeats: 0, targetScreenedSeats: 8, visibleScreenedSeats: 8 });
+  // Site-local resident figures: seated (bent) and standing instances, shown only in a settled state.
+  const figure = (kind: string) => plaza.getObjectByName(`commons-people-${kind}`) as T.InstancedMesh;
+  assert.ok(figure('seat').visible && figure('seat').count >= 8 && figure('stand').count >= 2, 'low state shows seated and standing residents');
 
   runtime.setTarget({ band: 'mixed', sharedSeats: 4 }, 0, true);
   assert.deepEqual(shown(), ['mixed']);
