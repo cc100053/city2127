@@ -28,7 +28,7 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 
 | Site | Pose | Targets | Size decision | Rounds | Score | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| SW | `sw:n` `[-95,30,-15]`→`[-105,10,60]` | [target](../../artifacts/closeup-night/sw/target/) | 放大到目標（填滿 lot，唔越橙邊；碟可以向上） | R1–R7（R6 drop） | 21/30 R7（R5 22/30） | PARKED `feat/closeup-night-sw` `d156db5`（R4 曾 merge `55a5d2b`；R5–R7 未 merge 入 integration） |
+| SW | `sw:n` `[-95,30,-15]`→`[-105,10,60]` | [target](../../artifacts/closeup-night/sw/target/) | 放大到目標（填滿 lot，唔越橙邊；碟可以向上） | R1–R8（R6 drop） | 23/30 R8 | PARKED `feat/closeup-night-sw` `992f339`（R4 曾 merge `55a5d2b`；R5–R8 未 merge 入 integration） |
 | NE | `ne:s2` | — | — | — | — | SKIPPED（owner 2026-11-04：Q3 改能源題後 NE 公園恆定 0，客人去唔到 ±1） |
 | SE | L `[130,28,-95]`→`[182,24,-38]`（−1、0）；H `[360,45,-50]`→`[182,58,-38]`（0、+1） | [target](../../artifacts/closeup-night/se/target/)（`tower-mixed` = 0 喺 H） | 放大到目標（lot 內） | R1–R6（R2 drop） | 20/38（53 %）R6 | PARKED（merged `757dac2`，dispatcher 驗證綠） |
 
@@ -160,6 +160,15 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 - 1 分（9）：fl-pods、fl-people-in、fl-emitters、fl-screens、fl-garden、fm-pods、fm-divider、fm-canopy、fh-disc。fl-pods、fl-screens R5 係 2，今輪絕對分跌咗做 1（pairwise 一個 `=`、一個輸，屏風前面有樹叢穿出嚟）。
 - FPS（headed `fps.sh`，hero 1920×1080 DPR 1，`d156db5`，`sw:high`）：日 60.0×6／夜 60.0×6。
 - Evidence：`~/city2127-evidence/closeup-night/sw/r7/`（`pair.md`、`review.jpg` = baseline | R7 | target 全尺寸 crop 連分數、`fps.txt`）。
+
+## SW R8（keep，最新）
+
+- 以 R7 做底，改 1 分項目：膠囊形艙＋玻璃反光帶、艙內一對人姿勢唔同、灰色底板＋飽和青色環（唔再用 bloom）、屏風改近乎不透明＋周圍 .8 冇植物、花槽密植唔見草地、0 艙 ×.85 錯開、兩級分隔花槽、0 碟 r 2.4 y 2.9 向鏡頭移 .6、+1 碟底去咗多餘白色橢圓。
+- 分數 **23/30（77 %）**（Opus 評分）；pairwise 對 R7 9 勝 3 負（輸 fl-emitters、fm-canopy、fh-tables）→ keep，commit `992f339`。
+- 2 分（8）：fl-pods、fl-screens、fm-ring、fm-deck、fh-disc、fh-amph、fh-people、fh-planting。冇 0 分。
+- 1 分（7）：fl-people-in（人仔方塊、穿模）、fl-emitters（環太飽和、空隙唔夠明顯）、fl-garden（小路仍似硬 Y 字、長凳得 1 張有人）、fm-pods（艙仍然擠）、fm-divider（似一條波波柱）、fm-canopy（碟後半仍然似喺水面上）、fh-tables（後亭似骨架＋平面桃色板，唔似玻璃房）。
+- FPS（headed `fps.sh`，hero 1920×1080 DPR 1，`992f339`）：`sw:high` 日 60.0 59.9 60.0 60.0 60.0 60.0／夜 60.0×6；`sw:low` 日夜 60.0×6。
+- Evidence：`~/city2127-evidence/closeup-night/sw/r8/`（`pair.md`、`review.jpg` = baseline | R8 | target、`fps.txt`）。
 
 ## Next expected step
 
