@@ -49,7 +49,7 @@ Root 用固定360px右上卡片（2026-10-04由左移右，避免遮住focal sit
 | `service-2127` | automation | デックス西（nw） | 人員主導 → 人機協作 → 自律服務 |
 | `commons-2127` | publicSharing | アクアシティ南（sw） | 私密空間 → 混合庭院 → 開放共享 |
 | `energy-2127` | 獨立能源累計（不作Meter） | 沿岸能源接點；設備分佈於水庭／富士／外海 | 水庭儲能／儲能環／軌道接收翼／核能島可共存 |
-| `functions-2127` | urbanConcentration | フジテレビ東（se） | 分散機能艙 → 混合館 → 垂直集中（2026-11-01 owner 接受 SE 樣板：低亭群＋有蓋步道 → 米白退台中高樓 → 暖光垂直街道塔，Meter 琥珀色日夜可讀；[handoff](handoffs/archive/se-closeup-polish.md)） |
+| `functions-2127` | urbanConcentration | フジテレビ東（se） | 分散機能艙 → 混合館 → 垂直集中（2026-11-01 owner 接受 SE 樣板：低亭群＋有蓋步道 → 米白退台中高樓 → 暖光垂直街道塔，Meter 琥珀色日夜可讀；[handoff](handoffs/archive/se-closeup-polish.md)。2026-11-06 +1 塔改用 Blender GLB＋可重用 prop kit，R3 對目標 9/12，owner 叫停並 merge；[handoff](handoffs/se-high-blender.md)） |
 
 ### E4 Q3能源生活取捨（2026-10-24使用者確認）
 

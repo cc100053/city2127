@@ -28,7 +28,7 @@ Lesson from NW (2026-11-03): R1–R3 went to the owner as "matches the target" w
 
 Proven on SE +1 (2026-11-05/06): 6 → 10 → 9/12 against the target in three rounds, after seven procedural rounds had stalled at 7/12.
 
-- **Not on `main` yet.** The work is parked, unmerged, on branch `feat/se-high-blender` (its handoff is `docs/handoffs/se-high-blender.md` there). Everything below that this section names lives on that branch: the tower GLB, `city-kit-2127`, `propKit.ts`, `geo_helpers.py`. Start a new Blender task from that branch, or merge it first with the owner's approval.
+- **On `main` since 2026-11-06.** The tower GLB, `city-kit-2127`, `propKit.ts` and `geo_helpers.py` were merged at R3 by owner request; the handoff is [se-high-blender](../../../docs/handoffs/se-high-blender.md).
 - **Blender skills:** `blender-core` (headless runner), `blender-hardsurface-modeling`, `blender-export-pipelines` (`gltf` preset, no Meshopt) and `blender-asset-qa` (`qa_check`, `review_shots`), under `.agents/skills/blender-*`. They are vendored in the owner's checkout but not committed yet.
 - **Blender:** 5.2 at `/Applications/Blender.app/Contents/MacOS/Blender`. The MCP add-on is not needed.
 
