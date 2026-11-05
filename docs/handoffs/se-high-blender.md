@@ -59,4 +59,4 @@ Owner 2026-11-05：SE 夜間分最低（closeup-night R6 20/38，SW 23/30），�
 
 ## Next expected step
 
-R2 完成，等 owner 睇 board。R3 建議：上層暖色、每層傢俬唔同、升降井玻璃管要讀到＋cabin 大而實、kit 樹改矮叢、頂環修鋸齒加密屋頂花園。（R2 背景：owner 2026-11-05 叫寫 R2（[spec](../../artifacts/se-high-blender/spec.md) `# R2`）：由 target 逐項寫（T1–T10），材質唔再鎖（只鎖人仔），新做 reusable prop kit `city-kit-2127`（樹、室內植物、傢俬、長凳、lift cabin，真實米＋每 site `unitsPerMetre`）。下一步：owner 批 spec → Sonnet 實作 R2 → 三個 absolute judge 對 target。
+R2 完成，等 owner 睇 board。R3 建議：上層暖色、每層傢俬唔同、升降井玻璃管要讀到＋cabin 大而實、kit 樹改矮叢、頂環修鋸齒加密屋頂花園。（R2 背景：owner 2026-11-05 叫寫 R2（[spec](../../artifacts/se-high-blender/spec.md) `# R2`）：由 target 逐項寫（T1–T10），材質唔再鎖（只鎖人仔），新做 reusable prop kit `city-kit-2127`（樹、室內植物、傢俬、長凳、lift cabin，真實米＋每 site `unitsPerMetre`）。下一步：owner 批 spec → Sonnet 實作 R2 → 三個 absolute judge 對 target。）
