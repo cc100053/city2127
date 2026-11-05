@@ -142,3 +142,19 @@ Keep (2 in R5; must not lose): `fl-pods`, `fl-screens`, `fm-ring`, `fm-deck`, `f
 - **Tables (fh-tables)** — ≥ 3 round tables clearly visible in front of the pavilions (bring one table forward to the front edge of the back deck), residents seated around each.
 
 Screenshots to `~/city2127-evidence/closeup-night/sw/r6/` (same names) + `vs-target.jpg`.
+
+## R6 result — dropped
+
+R6 15/30 (Sonnet judges: the Opus limit was hit, so this score is not comparable with the Opus-judged rounds); pairwise vs R5 3–4 → not kept, source restored to R5 `09c9273`, diff at `~/city2127-evidence/closeup-night/sw/r6/dropped.diff`. R6 parts that **won** pairwise: `fm-pods` (spread pods, wider pink side panels), `fm-divider` (lighter trees with trunks), `fh-disc` (light-grey machinery, flatter lens). Parts that **lost**: `fm-canopy` (moved toward the camera it covered the ring → fm-ring lost too), `fh-planting` (planter at (−1.4, 2.35) removed for a table), `fl-emitters`.
+
+## R7 — from R5 (owner: no time limit)
+
+Keep (2 in R5; must not lose): `fl-pods`, `fl-screens`, `fm-ring`, `fm-deck`, `fh-amph`, `fh-people`, `fh-planting`. R5 figures unchanged.
+
+- **Take from R6's diff only:** mixed pod layout + .14 pink side panels (fm-pods); divider trees (fm-divider); high-disc flatter lens + light-grey machinery + slim stabiliser ring (fh-disc); smaller/lower pod table and seats at side walls (fl-people-in); Catmull-Rom garden paths (fl-garden). Nothing else from R6.
+- **Mixed canopy (fm-canopy)** — keep it over the circle centre (R5 x/z), not toward the camera; lower it to y ≈ 2.5 and r 2.0 so its image sits over the deck's back half instead of the water; 4 slim ring emitters under its rim; no halo discs. Check in the capture that the near half of the ring and its seated residents stay unoccluded.
+- **Emitters (fl-emitters)** — neither the R5 terrace halo nor R6 version won clearly. Make the glow unmistakable: under each pod belly a bright ring (`#9fe8ff`×3, toneMapped false, torus r .6 tube .1) plus a second wider additive torus (r .7, tube .2, opacity .35) as a bloom; small bright pad in the ring centre; clear dark gap below; nothing flat on the lawn.
+- **Tables (fh-tables)** — a 4th table visible in front of a pavilion **without removing any planter or tree** (find free deck space, e.g. in front of the left pavilion).
+- **Garden (fl-garden)** — ≥ 8 small trees with visible trunks between the pods, beds dense.
+
+Screenshots to `~/city2127-evidence/closeup-night/sw/r7/` (same names) + `vs-target.jpg`.
