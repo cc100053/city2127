@@ -4,7 +4,7 @@ Per [closeup-polish](../../../.agents/skills/closeup-polish/SKILL.md) step 4. Ea
 
 Poses (owner 2026-11-04), 12:00, HUD hidden:
 
-- **L** `se:focal-low` = `cityPose([130,28,-95],[182,24,-38])` — −1 [flagship-low](target/flagship-low.jpg) and 0 [flagship-mixed](target/flagship-mixed.jpg).
+- **L** `se:focal-low` = `cityPose([118,38,-107],[182,18,-38])` (owner 2026-11-05 option b, pulled back and up from the target pose `[130,28,-95]→[182,24,-38]`; from R7 the `fl-*`/`fm-*` capture rectangles frame the whole lot there) — −1 [flagship-low](target/flagship-low.jpg) and 0 [flagship-mixed](target/flagship-mixed.jpg).
 - **H** `se:focal` = `cityPose([360,45,-50],[182,58,-38])` — 0 [tower-mixed](target/tower-mixed.jpg) and +1 [flagship-high](target/flagship-high.jpg).
 
 Size (owner): grow the model to the target's frame share within the 14×14 lot. The −1 target spreads pavilions past the lot (Gemini), so the −1 capture rectangle frames the lot. The 0 tower must also fit the L frame (top of frame ≈ 18 local units above the lot at L), so at H it stands lower than `tower-mixed` shows; the `tm-*` capture rectangles frame it where it stands (see `## Blocked` in the handoff).
@@ -13,20 +13,20 @@ Bar: NW bay R2 board (19/20, 「Accept R2 scores」) and the owner words in [NW 
 
 ## Flagship −1 `low`
 
-- `fl-pavilions` [0.17,0.47,0.98,0.88] capture [0.15,0.45,0.88,1.00] — at least 5 separate round white single-storey pavilions (drums) spread over the lot, each with a wide camera-facing glazed wall warm-lit inside and a thin amber seam under the roof edge.
-- `fl-discs` [0.20,0.47,0.92,0.72] capture [0.15,0.42,0.88,0.85] — every pavilion carries a thin white roof disc wider than its drum, hovering above it with a visible gap and a glowing collar between disc and roof.
-- `fl-people-in` [0.20,0.58,0.92,0.86] capture [0.15,0.55,0.88,1.00] — inside at least 3 pavilions furnished rooms (tables, shelves, counters) with at least 2 readable people each.
-- `fl-walkway` [0.30,0.56,0.70,0.92] capture [0.25,0.50,0.80,1.00] — a raised white walkway on thin columns winds through the lot with an amber centre line, people on or under it.
-- `fl-garden` [0.10,0.50,0.98,0.98] capture [0.10,0.45,0.90,1.00] — lush planting between pavilions (trees, hedges, terraced planting beds, a water channel), pale paths with benches and at least 8 residents walking or sitting, the orange lot outline around it.
-- `fl-material` [0.17,0.47,0.98,0.92] capture [0.15,0.45,0.88,1.00] — white structure with thin amber seams only; no orange or timber roofs, no beige/cream boxes, no barrel vaults.
+- `fl-pavilions` [0.17,0.47,0.98,0.88] capture [0.28,0.45,0.72,0.85] — at least 5 separate round white single-storey pavilions (drums) spread over the lot, each with a wide camera-facing glazed wall warm-lit inside and a thin amber seam under the roof edge.
+- `fl-discs` [0.20,0.47,0.92,0.72] capture [0.28,0.45,0.72,0.75] — every pavilion carries a thin white roof disc wider than its drum, hovering above it with a visible gap and a glowing collar between disc and roof.
+- `fl-people-in` [0.20,0.58,0.92,0.86] capture [0.28,0.55,0.72,0.85] — inside at least 3 pavilions furnished rooms (tables, shelves, counters) with at least 2 readable people each.
+- `fl-walkway` [0.30,0.56,0.70,0.92] capture [0.32,0.50,0.68,0.88] — a raised white walkway on thin columns winds through the lot with an amber centre line, people on or under it.
+- `fl-garden` [0.10,0.50,0.98,0.98] capture [0.22,0.45,0.78,0.97] — lush planting between pavilions (trees, hedges, terraced planting beds, a water channel), pale paths with benches and at least 8 residents walking or sitting, the orange lot outline around it.
+- `fl-material` [0.17,0.47,0.98,0.92] capture [0.28,0.45,0.72,0.92] — white structure with thin amber seams only; no orange or timber roofs, no beige/cream boxes, no barrel vaults.
 
 ## Flagship 0 `mixed`
 
-- `fm-tower` [0.40,0.08,0.62,0.80] capture [0.36,0.00,0.66,0.85] — a slender white-framed tower of about 6 storeys, every floor fully glazed and warm-lit with furniture, plants and people inside, thin amber floor seams.
-- `fm-lift` [0.36,0.10,0.62,0.92] capture [0.30,0.05,0.68,0.98] — a glazed lift shaft beside the tower and an escalator rising diagonally from the ground to a middle floor, with people on it.
-- `fm-crown` [0.40,0.00,0.62,0.20] capture [0.36,0.00,0.66,0.25] — a planted roof garden on the tower top with a glowing amber halo ring hovering above it.
-- `fm-wings` [0.20,0.55,0.76,0.95] capture [0.18,0.55,0.82,1.00] — two low glazed warm-lit wings at the tower's foot, each under a hovering white roof disc, joined by a white bridge with an amber line.
-- `fm-ground` [0.15,0.70,0.80,0.98] capture [0.15,0.70,0.85,1.00] — residents on the forecourt (at least 8, some seated on benches), planters with shrubs, the orange lot outline.
+- `fm-tower` [0.40,0.08,0.62,0.80] capture [0.36,0.08,0.62,0.75] — a slender white-framed tower of about 6 storeys, every floor fully glazed and warm-lit with furniture, plants and people inside, thin amber floor seams.
+- `fm-lift` [0.36,0.10,0.62,0.92] capture [0.34,0.08,0.62,0.85] — a glazed lift shaft beside the tower and an escalator rising diagonally from the ground to a middle floor, with people on it.
+- `fm-crown` [0.40,0.00,0.62,0.20] capture [0.38,0.00,0.60,0.24] — a planted roof garden on the tower top with a glowing amber halo ring hovering above it.
+- `fm-wings` [0.20,0.55,0.76,0.95] capture [0.28,0.55,0.74,0.86] — two low glazed warm-lit wings at the tower's foot, each under a hovering white roof disc, joined by a white bridge with an amber line.
+- `fm-ground` [0.15,0.70,0.80,0.98] capture [0.28,0.72,0.74,0.98] — residents on the forecourt (at least 8, some seated on benches), planters with shrubs, the orange lot outline.
 
 ## Tower 0 `mixed`
 
