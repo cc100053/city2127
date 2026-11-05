@@ -132,6 +132,7 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 ## Blocked
 
 - **人仔可讀性**（fl-people-in、fm-ring、fh-people 卡喺 1）：全城共用 `pedestrians()` 人仔 mesh，冇 per-instance 衫色、坐姿由呢個 15° 鏡位睇大腿好短，似企。選項：(a) 只喺 SW 加一個更大、淺色衫、明顯屈膝嘅坐姿人仔變體（淨係 `commonsPlaza.ts`）；(b) 喺 `mobility.ts` 加 per-instance tint／坐姿誇張度（會影響其他 site，要 owner 批）；(c) 接受 1 分。今晚揀咗保持設計、唔郁共用 crowd，項目留喺 1。
+- **更新（R5，dispatcher 05:20）**：做咗選項 (a)，SW 自己嘅人仔（跟 SE 做法），只改 `commonsPlaza.ts`。fm-ring、fh-people 升到 2；fl-people-in 仍然 1（艙內人仔方塊感、左右對稱、穿模）。呢個 blocker 已經解除，剩低係 polish。
 
 - **SE −1 構圖**（fl-pavilions、fl-garden）：L 鏡位 lot 前三分之一喺畫面底以外，Gemini 目標將亭散到 lot 外。選項：(a) 守 14×14 lot、亭擠喺後三分之二（今晚揀咗）；(b) 擴大 SE lot（改其他檔案、要 owner 批）；(c) L 鏡位向後拉高（owner 定嘅鏡位，唔郁）。
 - **SE `se:focal` 向上望**：owner 嘅 H 鏡位鏡頭低過目標，`tests/headlineCamera.test.ts` 只為 `se:focal` 放寬「鏡頭高過目標」規則（其他 73 個 pose 照舊）。
@@ -150,6 +151,15 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 - 15/30——Opus 用量撞咗上限，所以改用 Sonnet 評分，同之前嘅 Opus 分唔可以比；pairwise 對 R5 3 勝 4 負 → **唔 keep**，source 還原返 R5 `09c9273`，diff 存喺 `~/city2127-evidence/closeup-night/sw/r6/dropped.diff`。
 - 贏：fm-pods（艙散開、粉紅側板闊啲）、fm-divider（淺色有樹幹嘅樹）、fh-disc（淺灰機械）。輸：fm-canopy（碟拉近鏡頭遮咗圓圈，fm-ring 跟住輸）、fh-planting（為咗擺檯拆咗花槽）、fl-emitters。
 - Owner 話唔理時限 → 開 R7，以 R5 做底，只拎 R6 贏咗嘅部分。
+
+## SW R7（keep，最新）
+
+- Owner 話唔理時限。以 R5 做底，加返 R6 贏咗嘅部分（0 艙散開＋粉紅側板、分隔花槽淺色有樹幹嘅樹、+1 碟淺灰機械＋平啲嘅碟身、艙內細檯、花園曲線小路）；0 碟留喺圓圈中心上面，降到 y 2.5、r 2.0；艙底加 bloom 發光環；+1 加第 5 張檯，冇拆花槽。
+- 分數 21/30（Opus 評分）；pairwise 對 R5 6 勝 1 負（輸 fl-screens）→ keep，commit `d156db5`。
+- 2 分（6）：fm-ring、fm-deck、fh-amph、fh-people、fh-tables、fh-planting。冇 0 分。
+- 1 分（9）：fl-pods、fl-people-in、fl-emitters、fl-screens、fl-garden、fm-pods、fm-divider、fm-canopy、fh-disc。fl-pods、fl-screens R5 係 2，今輪絕對分跌咗做 1（pairwise 一個 `=`、一個輸，屏風前面有樹叢穿出嚟）。
+- FPS（headed `fps.sh`，hero 1920×1080 DPR 1，`d156db5`，`sw:high`）：日 60.0×6／夜 60.0×6。
+- Evidence：`~/city2127-evidence/closeup-night/sw/r7/`（`pair.md`、`review.jpg` = baseline | R7 | target 全尺寸 crop 連分數、`fps.txt`）。
 
 ## Next expected step
 
