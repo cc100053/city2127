@@ -17,7 +17,7 @@
 
 ## 點解係下一步
 
-[headline-camera](headline-camera.md) 已經 merge 入 main，CI 亦通過。Owner 喺 2026-10-27 決定：鏡頭系統完成之後，就逐個打磨近鏡。近鏡將模型放大到佔畫面約三分一高度，hero 距離睇唔到嘅粗糙位而家會成為 headline 嘅主角。來回轉同 Scale A ramp 暫時唔調。
+[headline-camera](archive/headline-camera.md) 已經 merge 入 main，CI 亦通過。Owner 喺 2026-10-27 決定：鏡頭系統完成之後，就逐個打磨近鏡。近鏡將模型放大到佔畫面約三分一高度，hero 距離睇唔到嘅粗糙位而家會成為 headline 嘅主角。來回轉同 Scale A ramp 暫時唔調。
 
 2026-10-27 owner 再決定：驗收標準同 baseline capture 方法由 Claude 定，即係下面兩節；成個打磨同驗收交畀一個 long session，按 sector 分段做。
 
@@ -115,7 +115,7 @@ S0 加一個 DEV-only 嘅 `window.cityShotFrame(id)`，只喺 `import.meta.env.D
 ## Long session 做法
 
 1. **Preflight**：照 [AGENTS.md](../../AGENTS.md) 做。由已 fetch 嘅 main 開 `feat/closeup-polish`。讀：
-   - 本文件、[headline-camera](headline-camera.md)、ART 同 CITY MASTER TASTE；
+   - 本文件、[headline-camera](archive/headline-camera.md)、ART 同 CITY MASTER TASTE；
    - 每個 sector 開工前，讀嗰個 sector 嘅 builder、佢嘅 test，同埋對應嘅 target 映射（park 喺 `changeCatalog.ts`，其餘喺 builder 自己嘅 `*Target`）。
 2. **S0**：
    - 做 tier 對應 check、capture runner、`cityShotFrame` 同佢嘅 test。

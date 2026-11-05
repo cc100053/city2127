@@ -17,7 +17,7 @@
 
 ## Goal and acceptance criteria
 
-Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/SKILL.md)（每個 site 跟 [closeup-polish](../../.agents/skills/closeup-polish/SKILL.md)）用新 taste 重做 SW、NE、SE 旗艦 focal 近鏡（SE 連 focal-low），每個 −1/0/+1。NW 已收貨，只做回歸檢查。
+Owner 2026-11-04：用 [long-polish-loop](../../../.agents/skills/long-polish-loop/SKILL.md)（每個 site 跟 [closeup-polish](../../../.agents/skills/closeup-polish/SKILL.md)）用新 taste 重做 SW、NE、SE 旗艦 focal 近鏡（SE 連 focal-low），每個 −1/0/+1。NW 已收貨，只做回歸檢查。
 
 - 收貨水平：`~/city2127-evidence/nw-closeup-polish/bay-r2/review-bay-r2.jpg`（NW bay R2，19/20）。
 - Pass：總分 ≥ 90%、冇 0 分、2 分項目 pairwise 冇輸、gate 綠；第一輪 cap 4 round，未過就 park。**Owner 2026-11-05 03:20 改 cap 做 6（成個 task）**；之後 owner 叫兩個 session 唔理時限繼續（SW 到 R8、SE 到 R7）。
@@ -28,9 +28,9 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 
 | Site | Pose | Targets | Size decision | Rounds | Score | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| SW | `sw:n` `[-95,30,-15]`→`[-105,10,60]` | [target](../../artifacts/closeup-night/sw/target/) | 放大到目標（填滿 lot，唔越橙邊；碟可以向上） | R1–R8（R6 drop） | **23/30（77 %）** R8 | PARKED，merged `1aa34f2`（code `992f339`） |
+| SW | `sw:n` `[-95,30,-15]`→`[-105,10,60]` | [target](../../../artifacts/closeup-night/sw/target/) | 放大到目標（填滿 lot，唔越橙邊；碟可以向上） | R1–R8（R6 drop） | **23/30（77 %）** R8 | PARKED，merged `1aa34f2`（code `992f339`） |
 | NE | `ne:s2` | — | — | — | — | SKIPPED（owner 2026-11-04：Q3 改能源題後 NE 公園恆定 0，客人去唔到 ±1） |
-| SE | L `[118,38,-107]`→`[182,18,-38]`（−1、0；R7 owner 拉後拉高）；H `[360,45,-50]`→`[182,58,-38]`（0、+1） | [target](../../artifacts/closeup-night/se/target/)（`tower-mixed` = 0 喺 H） | 放大到目標（lot 內） | R1–R7（R2、R7 drop） | **20/38（53 %）** R6（喺舊 L 鏡位評；新 L 鏡位未再評） | PARKED，merged `1aa34f2` |
+| SE | L `[118,38,-107]`→`[182,18,-38]`（−1、0；R7 owner 拉後拉高）；H `[360,45,-50]`→`[182,58,-38]`（0、+1） | [target](../../../artifacts/closeup-night/se/target/)（`tower-mixed` = 0 喺 H） | 放大到目標（lot 內） | R1–R7（R2、R7 drop） | **20/38（53 %）** R6（喺舊 L 鏡位評；新 L 鏡位未再評） | PARKED，merged `1aa34f2` |
 
 ## Completed work
 
@@ -46,7 +46,7 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 - `npm test` exit 0、`npm run build` exit 0、`git diff --check origin/main` exit 0（root；survey／module-swap 冇改）。
 - FPS（headed `fps.sh`，hero 1920×1080 DPR 1，`nw:high,sw:high,se:high`）：日 60.0×6／夜 60.0×6（第一個 sample 唔計）。
 - 近鏡（1600×900 DPR 2，日 12 時／夜 22 時）：SW `sw:focal` −1/0/+1、SE `se:focal-low` −1/0、`se:focal` 0/+1、NW `nw:focal-low` −1/0、`nw:focal` 0/+1 全部見到主體、冇遮擋。NW builder 冇改（`git diff origin/main -- src/siteBuilders/` 淨係 `commonsPlaza.ts`、`concentrationTower.ts`），冇回歸。
-- Board：[`artifacts/closeup-night/board/night-board.jpg`](../../artifacts/closeup-night/board/night-board.jpg)、[`sw-r8-review.jpg`](../../artifacts/closeup-night/board/sw-r8-review.jpg)、[`se-r6-review.jpg`](../../artifacts/closeup-night/board/se-r6-review.jpg)；全尺寸喺 `~/city2127-evidence/closeup-night/deliver/`。
+- Board：[`artifacts/closeup-night/board/night-board.jpg`](../../../artifacts/closeup-night/board/night-board.jpg)、[`sw-r8-review.jpg`](../../../artifacts/closeup-night/board/sw-r8-review.jpg)、[`se-r6-review.jpg`](../../../artifacts/closeup-night/board/se-r6-review.jpg)；全尺寸喺 `~/city2127-evidence/closeup-night/deliver/`。
 
 ## Known issues and blockers
 

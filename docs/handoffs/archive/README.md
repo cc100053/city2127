@@ -1,13 +1,34 @@
 # 已歸檔 handoffs
 
-2026-10-03 建立（Codex）；2026-10-13 加入7份已完成交接。返回 [現行交接](../README.md)／[文件索引](../../README.md)。
+2026-10-03 建立（Codex）；2026-10-13 加入7份已完成交接；2026-11-05 加入21份已完成／已整合交接（energy polish 批次已由 energy-polish-integration 整合）。返回 [現行交接](../README.md)／[文件索引](../../README.md)。
 
-以下53份交接已完成、已整合或被後續階段取代。保留原本日期、owner、commit、驗證限制與下一步歷史；舊分支／舊「待整合」或「下一步」不代表現行指示。Shibuya 已結束，不再開發。
+以下74份交接已完成、已整合或被後續階段取代。保留原本日期、owner、commit、驗證限制與下一步歷史；舊分支／舊「待整合」或「下一步」不代表現行指示。Shibuya 已結束，不再開發。
 
 歸檔不等於未達成的視覺目標、實機／Windows／各工作站 Blender 驗證已通過。仍待處理的台場素材、P6/S5、延後 polish、LAN 雙站、P5 實機驗收及回顧章節見現行交接；展覽機 FPS、Fuji TV 目標細節、一票旅程光點大小等限制保留喺各自交接；產品與驗證 authority 仍是 [SPEC](../../EXHIBITION_SPEC.md)／[VALIDATION](../../VALIDATION.md)。Meter截圖跟隨其交接歸檔，圖片內容不變。
 
 | Task | 原標題 |
 | --- | --- |
+| [artifacts-evidence-split](artifacts-evidence-split.md) | artifacts-evidence-split — Keep raw screenshots out of Git（2026-11-05歸檔） |
+| [city-taste-v2](city-taste-v2.md) | city-taste-v2 — Rewrite the city taste toward visible high technology（2026-11-05歸檔） |
+| [closeup-night](closeup-night.md) | closeup-night — 夜間重做 SW、NE、SE 旗艦 headline 近鏡（2026-11-05歸檔） |
+| [elevator-closeup-lod](elevator-closeup-lod.md) | elevator-closeup-lod — 軌道升降機中距離近景 LOD（2026-11-05歸檔） |
+| [explanation-frame-hud](explanation-frame-hud.md) | explanation-frame-hud — 大屏幕右上說明卡換 HUD 外觀（2026-11-05歸檔） |
+| [far-landmark](far-landmark.md) | far-landmark — 遠景軌道升降機（hero 背景剪影）（2026-11-05歸檔） |
+| [guest-explore](guest-explore.md) | guest-explore — Guest looks at the Sky Ring (空の環を見る)（2026-11-05歸檔） |
+| [headline-camera](headline-camera.md) | headline-camera — 近鏡跟住 headline 變化（2026-11-05歸檔） |
+| [hero-futurism](hero-futurism.md) | hero-futurism — 「一睇就知」嘅 2127 未來感（hero 鏡頭＋全域物料同光）（2026-11-05歸檔） |
+| [hero-holograms](hero-holograms.md) | hero-holograms — Hero 全景 hologram 廣告／資訊（2026-11-05歸檔） |
+| [hero-towers-traffic](hero-towers-traffic.md) | hero-towers-traffic — 前景塔樓換開放結構＋天空／水面交通光帶（hero 未來感第 4、5 項）（2026-11-05歸檔） |
+| [meter-ladder](meter-ladder.md) | meter-ladder — 分級階梯＋headline（每份提案最多一格）（2026-11-05歸檔） |
+| [nw-closeup-polish](nw-closeup-polish.md) | nw-closeup-polish — NW 自動化旗艦＋district 載體，新 taste 重建（2026-11-05歸檔） |
+| [road-redesign](road-redesign.md) | road-redesign — 2127 street network and street kit（2026-11-05歸檔） |
+| [se-closeup-polish](se-closeup-polish.md) | se-closeup-polish — SE 集約 focal 近鏡樣板（2026-11-05歸檔） |
+| [energy-polish-integration](energy-polish-integration.md) | Energy polish publication and integration — 2026-10-25（2026-11-05歸檔） |
+| [energy-polish-recovery](energy-polish-recovery.md) | 能源 polish 恢復檢查 — 2026-10-25 JST（2026-11-05歸檔） |
+| [receiver-wing-polish](receiver-wing-polish.md) | 軌道接收翼 — Dream Loop Plus 三輪（2026-11-05歸檔） |
+| [ring-night-readability](ring-night-readability.md) | 儲能環夜間可讀性 — 一次已批准跟進試驗（2026-11-05歸檔） |
+| [storage-ring-polish](storage-ring-polish.md) | 富士前置儲能環／固定承托 — 三輪恢復續作（2026-11-05歸檔） |
+| [water-island-current-review](water-island-current-review.md) | 水庭／能源島現行核對 — 2026-10-25（2026-11-05歸檔） |
 | [energy-demo-camera](energy-demo-camera.md) | energy-demo-camera — DEV能源近鏡講解時間原型（2026-10-27；2026-10-29歸檔，被headline近鏡取代） |
 | [intro-origin-card](intro-origin-card.md) | intro-origin-card — 開場「街は、誰が決めるのか。」卡同 README 作品概念（2026-10-19） |
 | [guest-handoff-wait-notice](guest-handoff-wait-notice.md) | guest-handoff-wait-notice — 交接畫面等待提示（2026-10-15） |

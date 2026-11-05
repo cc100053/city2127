@@ -17,7 +17,7 @@
 
 ## Goal and acceptance criteria (owner 2026-11-02, scope Q1–Q4 accepted)
 
-- A mid-distance close-up LOD of the far space elevator ([far-landmark](far-landmark.md)), made with the [closeup-polish](../../.agents/skills/closeup-polish/SKILL.md) workflow (Gemini targets first).
+- A mid-distance close-up LOD of the far space elevator ([far-landmark](far-landmark.md)), made with the [closeup-polish](../../../.agents/skills/closeup-polish/SKILL.md) workflow (Gemini targets first).
 - Q1: the near model is built lazily and swapped in only while the elevator explore look is active; hero keeps the accepted R6 silhouette and its FPS.
 - Q2: one authored pose, day and night.
 - Q3: life — climber pods move on the tether, craft dock at the station; a three-step Japanese caption in the Sky Ring explore format.
@@ -96,7 +96,7 @@ Symptoms at E1, cause:
 - Pose `EXPLORE_SHOTS.elevator` = E1. Fly 2 s, then hold while three 4 s steps loop; reduced motion holds E1 with all steps.
 - Copy `ELEVATOR_COPY` (owner may edit): title 軌道エレベーター · 空への駅; steps 昇降機が宇宙へ向かう / 中継駅で乗り換え、街から軌道へ / 駅の灯りが、街と宇宙を結ぶ. Step 3 replaces the Sky Ring's voice-node line: the elevator has no voice nodes, so no new mechanic was invented. Alternatives for the owner: 宇宙で働く人も、この街の住民 / 軌道から、この街を見守る.
 - DEV `cityExplore(ordinal, 'space-elevator')`, `?meters&explore=<n>&exploreTarget=space-elevator&exploreAt=<s>`.
-- Checks: root `npm test`, `npm run build`; survey `npm test`, `npm run build`; `git diff --check` PASS. Browser evidence and FPS: [VALIDATION](../VALIDATION.md) entry "Elevator explore R4", `artifacts/elevator-closeup-lod/r4/`.
+- Checks: root `npm test`, `npm run build`; survey `npm test`, `npm run build`; `git diff --check` PASS. Browser evidence and FPS: [VALIDATION](../../VALIDATION.md) entry "Elevator explore R4", `artifacts/elevator-closeup-lod/r4/`.
 - NOT RUN: headed vsync FPS, iPad button end-to-end with `survey dev:auto`, live-result interruption in the browser, exhibition machine.
 
 ## Next expected step

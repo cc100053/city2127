@@ -24,7 +24,7 @@
 2. **次序錯**：而家係一邊飛一邊變；應該係「先推近，到咗先變」。
 3. **主體近睇唔好睇**：推到近鏡之後，target 本身唔靚。
 
-呢份文件取代 [headline-camera](headline-camera.md) 同 [closeup-next](closeup-next.md) 入面「近鏡同 transition 重疊、唔准延遲 transition」嗰條規則（owner 2026-10-29 改：**先推近、後變化**）。其餘 headline 規則（揀 shot、中斷、cancel、catch-up、reduced motion）不變。
+呢份文件取代 [headline-camera](archive/headline-camera.md) 同 [closeup-next](closeup-next.md) 入面「近鏡同 transition 重疊、唔准延遲 transition」嗰條規則（owner 2026-10-29 改：**先推近、後變化**）。其餘 headline 規則（揀 shot、中斷、cancel、catch-up、reduced motion）不變。
 
 ## Claude review（2026-10-29，main `00fc5c6`）
 

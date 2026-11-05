@@ -21,11 +21,11 @@ Owner 2026-11-02 揀咗一張 HUD 目標圖（深色煙燻玻璃、青色發光�
 
 ## Not done (deliberate)
 
-- 目標圖入面嘅「共有席 4 → 5」數值框、走勢線、箭咀：renderer 仲未有前後數值（[change-explanation](change-explanation.md) 仍係 PLANNED），唔虛構數字。嗰個任務做嘅時候再加同一風格嘅數值框。
+- 目標圖入面嘅「共有席 4 → 5」數值框、走勢線、箭咀：renderer 仲未有前後數值（[change-explanation](../change-explanation.md) 仍係 PLANNED），唔虛構數字。嗰個任務做嘅時候再加同一風格嘅數值框。
 
 ## Actual validation results
 
-見 [VALIDATION](../VALIDATION.md) 「Explanation frame HUD」一段。
+見 [VALIDATION](../../VALIDATION.md) 「Explanation frame HUD」一段。
 
 ## Next expected step
 

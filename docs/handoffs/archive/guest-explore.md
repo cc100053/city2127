@@ -34,7 +34,7 @@
 
 - Verification status: PARTIAL (software PASSED; visual acceptance pending)
 - Commands: root `npm test`, `npm run build`; survey `npm test`, `npm run build`; `git diff --check` — PASS.
-- Browser: see [VALIDATION](../VALIDATION.md) entry "Guest explore"; evidence [artifacts/guest-explore/r1](../../artifacts/guest-explore/r1/).
+- Browser: see [VALIDATION](../../VALIDATION.md) entry "Guest explore"; evidence [artifacts/guest-explore/r1](../../../artifacts/guest-explore/r1/).
 - NOT RUN: live-result interruption in the browser, two physical iPads, FPS during the look, exhibition machine.
 
 ## Unresolved issues and next step

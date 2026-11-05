@@ -22,7 +22,7 @@
 | 2（保存候選驗證） | `af619092d233f5f4db6c0fabb5487110031af270` | `47cf4d5d4887bf88f3e33cbf0a2e78016a35e86b49c22b95e059d2bc2cda7efe` |
 | 3（Plus fresh worker） | `cd6c6e65466df8c4cee070b25c475018f92162a8` | `27c1e4f36835267eccc64c9d0c2947203d65dd95b7f37dda90c06dfb6576d9fa` |
 
-[逐輪原圖／review／logs／hash入口](../../artifacts/energy-city-polish/storage-ring-recovered-20261025/README.md)。每輪完整branch bundle及source/target/evidence tar.gz在checkpoints/，逐輪JSON保存實際commit與archive SHA。第一／二輪verify及archive逐檔check PASS；第三輪以pass3.json為最終verify記錄。原target SHA70c988bb…，沒有生成新圖。
+[逐輪原圖／review／logs／hash入口](../../../artifacts/energy-city-polish/storage-ring-recovered-20261025/README.md)。每輪完整branch bundle及source/target/evidence tar.gz在checkpoints/，逐輪JSON保存實際commit與archive SHA。第一／二輪verify及archive逐檔check PASS；第三輪以pass3.json為最終verify記錄。原target SHA70c988bb…，沒有生成新圖。
 
 ## 實際驗收
 

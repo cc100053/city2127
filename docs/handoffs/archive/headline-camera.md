@@ -32,7 +32,7 @@
   - Live 結果先播 ≈2.62 s vote journey（`ARRIVAL_SECONDS`，`src/voteJourney.ts`），然後係 3 s site transition（`SITE_TRANSITION_SECONDS`）。
   - 閱讀時段 `DISPLAY_MS` 係 10 s，之後 `HANDOFF_MS` 5 s；result lease 由 display start 起計 15 s（`survey/src/shared/displayTiming.ts`）。
   - 結果卡喺 result 後 3 s 換成原因文字，10 s 後轉返 ambient 卡（`src/surveyAtmosphere.ts`）。
-- 參考做法（**唔好 merge，亦唔好依賴**）：`016f6d1:src/devEnergyDemo.ts`（分支2026-10-29已刪，副本喺 [artifacts/energy-demo-camera/reference](../../artifacts/energy-demo-camera/reference/devEnergyDemo.ts)）。
+- 參考做法（**唔好 merge，亦唔好依賴**）：`016f6d1:src/devEnergyDemo.ts`（分支2026-10-29已刪，副本喺 [artifacts/energy-demo-camera/reference](../../../artifacts/energy-demo-camera/reference/devEnergyDemo.ts)）。
   - 佢有純函數 `demoTimeline`／`demoStage`、smoothstep 飛入飛出、`controls.enabled = false`、snapshot 即時 cut 返 hero。
   - 五個能源近鏡 pose：garden、garden2、ring、wing、island。可以用 `git show 016f6d1:src/devEnergyDemo.ts` 抄數值做起點。
   - 佢為咗飛入將 transition 延遲咗 3 s。**今次唔可以咁做。**
@@ -114,11 +114,11 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 - FOV 預設沿用 42°。唔好用 FOV 代替推近。
 - 鏡頭由 hero 方向推近，唔好繞去背面，等觀眾保持方向感。
 - 檢查每個 pose：focal 主體冇被前景建築、樹或者 canopy 擋住；海、富士電視台、彩虹橋等地標最少有一個留喺畫面做定位。
-- 視覺標準跟 [CITY MASTER TASTE](../ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) 同 [ART](../ART.md)；綠化要飽滿，唔好將近鏡框成空曠嘅格仔地。
+- 視覺標準跟 [CITY MASTER TASTE](../../ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) 同 [ART](../../ART.md)；綠化要飽滿，唔好將近鏡框成空曠嘅格仔地。
 
 ## 實作步驟
 
-1. **Preflight**：照 [AGENTS.md](../../AGENTS.md) 做。`git fetch --prune origin`，然後 `git switch feat/headline-camera`。
+1. **Preflight**：照 [AGENTS.md](../../../AGENTS.md) 做。`git fetch --prune origin`，然後 `git switch feat/headline-camera`。
    - 如果 `origin/main` 喺 `00c0273` 之後有新 commit：呢個分支只有計劃，可以直接 rebase 上最新 main，再 `push --force-with-lease`（只限呢個 task 分支）；或者照 CONTRIBUTING merge 入嚟。
    - 讀：本文件、[meter-ladder handoff](meter-ladder.md)、`docs/PROJECT.md` 嘅 Hero camera 同 survey timing 段、`docs/EXHIBITION_SPEC.md` 嘅 headline 段。
 2. **新增 `src/headlineCamera.ts`**：
@@ -176,7 +176,7 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
      - A/B 兩站 3 s 內各送一份 → 冇瞬移，最後停喺第二份嘅 headline。
    - Reduced motion：用 DevTools emulate 或 `matchMedia` override → 全程 hero。
    - 完成之後停晒自己開嘅 server。
-8. **文件**（跟 [CONTRIBUTING 文件同步表](../CONTRIBUTING.md#documentation-sync)，camera、motion 同 timing 都屬於呢次範圍）：
+8. **文件**（跟 [CONTRIBUTING 文件同步表](../../CONTRIBUTING.md#documentation-sync)，camera、motion 同 timing 都屬於呢次範圍）：
    - `docs/PROJECT.md`：
      - Hero camera 段刪走「No automatic camera reframing」，改寫成 headline 近鏡規則、時間線，同埋邊啲情況唔播。
      - survey timing 段「Geometry/camera/resources remain unchanged」要更新。
@@ -213,7 +213,7 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 
 - Verification status: PASS (local software); coordinator review / owner merge approval pending.
 - Root `npm test`, `npm run build`, production DEV exclusion, `git diff --check`: PASS. Source/new-file exact-diff self-review complete; no survey/module-swap source change.
-- [Evidence / reproducible commands / FPS table](../../artifacts/headline-camera/README.md), [manifest](../../artifacts/headline-camera/final/manifest.json), [live](../../artifacts/headline-camera/final/live.json), [recovery](../../artifacts/headline-camera/final/recovery.json).
+- [Evidence / reproducible commands / FPS table](../../../artifacts/headline-camera/README.md), [manifest](../../../artifacts/headline-camera/final/manifest.json), [live](../../../artifacts/headline-camera/final/live.json), [recovery](../../../artifacts/headline-camera/final/recovery.json).
 - 14 static images (hero +13 shots), 14 settled live hold images (13 shots +water garden after Undo), original hashes verified. Development Mac macOS27.0.1 arm64, Chrome156.0.8078.48 headless/ANGLE Metal Apple M6, 1920×1080 DPR1 default/hour12. Hero60.1FPS/998 calls; static59.9–60.1FPS/455–958 calls; actual live59.9–60.1FPS/599–1186 calls. Short canvas cadence only, no sustained/hardware claim.
 - Live no-change/reload/Undo/reduced motion/A-B PASS; submissions1006ms apart, ordered display, second own headline. Eight extra real TCP/reset/DEV/legacy/standalone/catch-up checks PASS; shortened-slot uses real-view wire fixture, clearly separated from real server checks.
 - Page errors/console errors0. System font fallback explicit. All owned browsers/services closed; Vite5184 and dev:auto8798 confirmed free.
@@ -235,7 +235,7 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 ## Next expected step
 
 1. 此任務已完成：owner批准、main merge/push及實際CI通過，技術交付毋須下一個實作步驟；以下打磨另作任務。
-2. 之後另開打磨任務（2026-10-27 已寫成 [closeup-polish](closeup-polish.md)），以 shot list 做基準，按出現頻率排次序：
+2. 之後另開打磨任務（2026-10-27 已寫成 [closeup-polish](../closeup-polish.md)），以 shot list 做基準，按出現頻率排次序：
    - 先打磨各 site 第一格嘅 focal 近鏡（ne → sw → se → nw）。
    - 再打磨 district（±2）。
    - 然後係 ±3 加配對設施。
@@ -270,7 +270,7 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 - Real A/B second proposal has identical before/after layout:1018ms commit gap,0.1001m boundary step,6.1096m maximum sampled frame step,65 hero frames after return and controls work. No server/protocol/clock changes.
 - SW pose corrected to `[-365,135,-420] → [-180,8,-235]`: changed sharing rooms2/3/4 are central/readable; park is in the right background. Static/live60.0FPS,958/936 calls. New SW original pair plus B-at-hero proof; unchanged original hashes preserved. Full inland court occlusion sweep is not claimed.
 - Root tests/build/whitespace PASS again. Build includes existing chunk-size AND odaiba-layout JSON import-attributes warnings (prior report wording corrected). New manifest verifier compares saved hashes; explicit update followed by independent verify PASS, deliberate mismatched hash rejected.
-- [Correction evidence/report](../../artifacts/headline-camera/README.md#coordinator-correction-1--2026-10-27), [actual results](../../artifacts/headline-camera/correction-1/browser.json). Corrective code checkpoint `4c52d681a3715630e5eba52889831729355775fb` pushed successfully; main still requires human approval. All owned services/writers released for review.
+- [Correction evidence/report](../../../artifacts/headline-camera/README.md#coordinator-correction-1--2026-10-27), [actual results](../../../artifacts/headline-camera/correction-1/browser.json). Corrective code checkpoint `4c52d681a3715630e5eba52889831729355775fb` pushed successfully; main still requires human approval. All owned services/writers released for review.
 
 ## Main integration — 2026-10-27
 
@@ -278,12 +278,12 @@ Live 結果（`city-state-updated` 加上 `latestProposal`）有 headline 變化
 - Accepted feature `cf0fe82d6d781d4841b82f45bc64a4cc7fc69b46`；base/remote main `00c02737650008a450bd8f08e1a491ad023c77d2`。Clean feature upstream0/0；本clone新建tracking main、ff-only確認，再no-ff merge，無衝突。
 - Merge `51002890371ef3aa7bc7d16791cc34b23d98cffc`整個tree等同accepted feature。Integrated root test/build、committed/working whitespace、保存manifest比對PASS；兩項既有build warnings保留。Survey/module-swap未改，未另跑本地suite。
 - Production smoke：真實scratch v4 live nw近鏡／原因，reload立即ambient hero、DEV入口排除PASS；Chrome156.0.8078.48 headless、1920×1080 DPR1 default/hour12，新兩圖已查看、errors0。沒有新FPS或全13鏡頭重拍宣稱；原視覺證據由相同runtime／hash支援。
-- [整合原始logs／原圖／tree證據](../../artifacts/headline-camera/integration-1/README.md)。Owned servers/browser停止；5184已釋放。無部署、無刪分支。
-- Main `ad60a8912a62c5ad24bdbf965c5dc31527771562`已推送，fetch確認HEAD=origin/main、divergence0/0，包含merge `5100289`。實際push/main [CI40490237501](https://github.com/cc100053/city2127/actions/runs/40490237501) SUCCESS，root test/build、survey test/build、module-swap install/test/build及whitespace步驟全部成功；[原始run／steps證據](evidence/headline-camera-main-ci.json)。本紀錄取代上方各feature階段嘅main待批准／CI未驗狀態。
+- [整合原始logs／原圖／tree證據](../../../artifacts/headline-camera/integration-1/README.md)。Owned servers/browser停止；5184已釋放。無部署、無刪分支。
+- Main `ad60a8912a62c5ad24bdbf965c5dc31527771562`已推送，fetch確認HEAD=origin/main、divergence0/0，包含merge `5100289`。實際push/main [CI40490237501](https://github.com/cc100053/city2127/actions/runs/40490237501) SUCCESS，root test/build、survey test/build、module-swap install/test/build及whitespace步驟全部成功；[原始run／steps證據](../evidence/headline-camera-main-ci.json)。本紀錄取代上方各feature階段嘅main待批准／CI未驗狀態。
 - 最後跟進只改Markdown及docs內CI證據，按workflow跳過CI；runtime／tests／packages與上述成功run相同。文件連結／fact checks及diff自查另行通過，無需重跑相同browser／FPS矩陣。展示硬件／Safari／iPad／Windows／長測／觀眾理解及模型材質打磨限制保留。
 
 ## Review-mode fix — 2026-10-27
 
 - 問題：`review=civic|street` 配合 `?meters`／`?survey` 時，每次結果、snapshot 都 `cancel()`，將 review 鏡頭扯返 hero。
-- 修正：review 模式唔建 `HeadlineCamera`（[main.ts](../../src/main.ts)），所有 call 改 `?.`；其他模式行為不變。
+- 修正：review 模式唔建 `HeadlineCamera`（[main.ts](../../../src/main.ts)），所有 call 改 `?.`；其他模式行為不變。
 - 驗證：root `npm test`、`npm run build`、`git diff --check` PASS（只有既有 build warnings）。DEV browser（Browser pane，port 5191）用 `cityShot()` 讀 pose：civic `[-178.7,124.2,-233.1]`、street `[-40,20,-245]` 喺 `cityMeters` 後 1–8 秒不變；普通 `?meters=` 由 hero 推到 `se:district` `[-105,235,-295]`。Survey＋review 組合未實測（同一個 null guard）。

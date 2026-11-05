@@ -19,7 +19,7 @@
 
 ## Target與一次worker
 
-[完整證據入口](../../artifacts/energy-city-polish/ring-night-readability-20261025/README.md)。先新拍原source同鏡位day/night hero/detail及完整27圖，然後built-in imagegen對actual hour22 hero生成新target。逐字prompt、原圖、generated原檔及hash同存；workflow `.dream-loop/ring-night-readability/target.png`及持久artifact `target.png`都SHA256 `062aed68c2ad36de52bc2c153a20e540918fe2a45d4e7b67bc559a4d09ecee02`，16:05:29 JST鎖定並記clock。
+[完整證據入口](../../../artifacts/energy-city-polish/ring-night-readability-20261025/README.md)。先新拍原source同鏡位day/night hero/detail及完整27圖，然後built-in imagegen對actual hour22 hero生成新target。逐字prompt、原圖、generated原檔及hash同存；workflow `.dream-loop/ring-night-readability/target.png`及持久artifact `target.png`都SHA256 `062aed68c2ad36de52bc2c153a20e540918fe2a45d4e7b67bc559a4d09ecee02`，16:05:29 JST鎖定並記clock。
 
 Target1672×941對actual1920×1080，有重繪UI／背景／文字及平滑漂移；明確拒絕所有非環漂移，只以局部non-emissive銀灰明暗作reference，runtime畫框及幾何不追生成漂移。原已接受環target70c988bb…、receiver02bbde10…未覆寫。
 

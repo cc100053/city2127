@@ -7,7 +7,7 @@ description: Run a long unattended city2127 visual polish (overnight or multi-ho
 
 The unattended wrapper around [closeup-polish](../closeup-polish/SKILL.md): that skill is the per-site method (diagnose, target, rubric, spec, round, blind judge, pairwise judge); this one covers what changes when the owner is asleep and there are several sites.
 
-Lessons from city-taste-v2 (2026-11-02 overnight, [handoff](../../../docs/handoffs/city-taste-v2.md)): every part "passed" by 03:52, 7 h of budget went unused and the result sat far from the target — pass meant *better than before*, the coordinator judged its own specs, "Weak:" notes passed, nobody judged the whole frame, thumbnails hid detail, close-ups were never captured. NW (2026-11-03) added: Gemini enlarges the subject, so size must be decided before the rubric; a single absolute judge drifts ±1, so pairwise judging decides keep or drop. The accepted finish level is NW bay R2 (`$CITY2127_EVIDENCE_ROOT/nw-closeup-polish/bay-r2/review-bay-r2.jpg`, 19/20).
+Lessons from city-taste-v2 (2026-11-02 overnight, [handoff](../../../docs/handoffs/archive/city-taste-v2.md)): every part "passed" by 03:52, 7 h of budget went unused and the result sat far from the target — pass meant *better than before*, the coordinator judged its own specs, "Weak:" notes passed, nobody judged the whole frame, thumbnails hid detail, close-ups were never captured. NW (2026-11-03) added: Gemini enlarges the subject, so size must be decided before the rubric; a single absolute judge drifts ±1, so pairwise judging decides keep or drop. The accepted finish level is NW bay R2 (`$CITY2127_EVIDENCE_ROOT/nw-closeup-polish/bay-r2/review-bay-r2.jpg`, 19/20).
 
 ## Roles
 

@@ -26,7 +26,7 @@ Owner 2026-11-01：幾輪打磨後城市合理但唔夠未來感；要誇張視�
 
 ## In-scope files and dependencies
 
-[CITY_MASTER_TASTE §3 amendment](../ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)、`src/heroCamera.ts`、`src/main.ts`（環境、bloom、光預設）、`src/cityRig.ts` 共用材質、`src/mobility.ts` 光帶。唔做：Civic Core 放大（第 2 項）、前景塔樓重做（第 4 項）。
+[CITY_MASTER_TASTE §3 amendment](../../ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)、`src/heroCamera.ts`、`src/main.ts`（環境、bloom、光預設）、`src/cityRig.ts` 共用材質、`src/mobility.ts` 光帶。唔做：Civic Core 放大（第 2 項）、前景塔樓重做（第 4 項）。
 
 ## Completed work
 

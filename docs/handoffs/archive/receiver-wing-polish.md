@@ -13,7 +13,7 @@
 
 2026-10-25準備時先確認原city2127，main29d12db及`.playwright-cli/`保留；原repo fetch成功，沒有切branch／pull／改原source。指定持久clone乾淨5db4e6e，fetch後origin/main `db772bb2248aed345468d6b07fc011d518f7c7b2`，ahead5／behind0。14:35後續作62d000f乾淨，fresh fetch仍同一main，ahead6／behind0，不merge；第二worker fetch同main、ahead7／behind0。持久clone無.codegraph，依規則用rg，不索引。
 
-已讀repo產品／PROJECT／CONTRIBUTING／VALIDATION／ART／CITY MASTER TASTE、相關callers/tests、接收翼與儲能環handoff及Dream Loop Plus／ponytail／imagegen技能。前owner水庭／島／環已獲coordinator接受，不重做。[原準備派工](../../artifacts/energy-city-polish/receiver-wing-batch-01/dispatch.md)及[實作授權後派工](../../artifacts/energy-city-polish/receiver-wing-batch-01/implementation-dispatch.md)並存。
+已讀repo產品／PROJECT／CONTRIBUTING／VALIDATION／ART／CITY MASTER TASTE、相關callers/tests、接收翼與儲能環handoff及Dream Loop Plus／ponytail／imagegen技能。前owner水庭／島／環已獲coordinator接受，不重做。[原準備派工](../../../artifacts/energy-city-polish/receiver-wing-batch-01/dispatch.md)及[實作授權後派工](../../../artifacts/energy-city-polish/receiver-wing-batch-01/implementation-dispatch.md)並存。
 
 ## Scope與不變量
 
@@ -25,7 +25,7 @@ Callers：main → devEnergy.startEnergyReview → energyPrototype；正式creat
 
 ## Target與準備provenance
 
-[Artifact入口](../../artifacts/energy-city-polish/receiver-wing-batch-01/README.md)。鎖定target SHA256 `02bbde1032c230d51199d1d9cc219ca39fb9935f0af44b456fd843895ef51a40`；workflow `.dream-loop/receiver-wing-batch-01/target.png`。原接受環target `.dream-loop/target.png`仍SHA70c988bb，不覆寫。沒有重生成圖。
+[Artifact入口](../../../artifacts/energy-city-polish/receiver-wing-batch-01/README.md)。鎖定target SHA256 `02bbde1032c230d51199d1d9cc219ca39fb9935f0af44b456fd843895ef51a40`；workflow `.dream-loop/receiver-wing-batch-01/target.png`。原接受環target `.dream-loop/target.png`仍SHA70c988bb，不覆寫。沒有重生成圖。
 
 生成target1672×941，actual1920×1080；保留runtime framing／包絡，忽略生成UI／背景漂移。仍帶板列特徵，沒有target精準達成／設計／工程驗收宣稱。準備prompt誤存literal undefined，第一輪已從本chat實際imagegen呼叫逐字恢復；原錯誤檔及準備commit／bundle保存，見prompt-recovery.md。
 

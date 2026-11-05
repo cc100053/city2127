@@ -1,6 +1,6 @@
 # 現行 handoffs
 
-2026-10-13 整理（原 2026-10-03，Codex）。只列仍待接續的任務。產品決策 owner：cc100053；每項保留自己的 owner，修改共用模組或素材前先協調。
+2026-11-05 整理（原 2026-10-03／10-13）。只列仍待接續的任務。產品決策 owner：cc100053；每項保留自己的 owner，修改共用模組或素材前先協調。
 
 | 交接 | 狀態／下一步 | Owner |
 | --- | --- | --- |
@@ -14,28 +14,15 @@
 | [變化說明卡](change-explanation.md) | PLANNED（TODO）；右上卡片直接說明「乜嘢變成乜嘢」，未定案前先用參數前後變動 | cc100053 |
 | [能源城市](energy-city.md) | E1–E4完成並發布main，CI通過；Q3獨立能源權威配置、舊氣候／歷史與正式browser通過；E5本機Mac mini 30分鐘量測與TCP復原已驗；展覽硬件／訪客待驗 | Codex；產品決策cc100053 |
 | [建築・居住](housing-city.md) | SOFTWARE COMPLETE A：owner 2026-10-27選A固定背景，M搬位，已整合main且CI通過；只餘展覽硬件／訪客／工程驗收；[證據](../../artifacts/housing-background/README.md) | Codex；產品決策cc100053 |
-| [Headline 近鏡](headline-camera.md) | DONE；owner已批准並merge/push main；整合root／production smoke及實際main CI通過；feature分支保留 | cc100053；Codex worker |
 | [近鏡打磨](closeup-polish.md) | S0 INTEGRATED，98/98；coordinator接受量度基準，失敗保留；worker 01a17d74；分 S0 基準 → A NE → B SW → C SE → D NW → Z 回歸；驗收同 capture 標準已定，每個 sector 要 owner 睇圖批准先 merge | cc100053 |
-| [分級階梯＋headline](meter-ladder.md) | DONE；±3格、每份提案最多一格、headline已merge入main `0b84a29`，main CI通過；headline camera另開任務 | cc100053；實作Claude |
-| [儲能環 polish](storage-ring-polish.md) | 已整合main，實際main CI通過，本機／遠端task分支已安全刪除；[整合交接](energy-polish-integration.md)，原審美／硬件限制保留 | Codex batch owner |
 | [近鏡推近／先推近後變化](closeup-zoom.md) | INTEGRATED CANDIDATE（2026-10-30 owner 指示 merge）；F／A 視覺硬門檻仍未達 | cc100053；實作Codex |
 | [每位Guest近鏡＋明顯變化](guest-agency.md) | G1–G3、G7、G2 候選已 merge main `95c70be`（CI 通過）；G5 文案、G4／G7 視覺與性能 gate、真人兩秒辨認未驗收 | cc100053 |
-| [SE 集約近鏡樣板](se-closeup-polish.md) | DONE（2026-11-01）；owner 接受 R4，暫不套用 SW／NW | cc100053 |
-| [Hero 未來感](hero-futurism.md) | DONE（2026-11-01）；c2 低 hero、天空反射物料、航道光痕，owner 接受 R1＋R2 | cc100053 |
-| [Hero 塔樓＋交通](hero-towers-traffic.md) | DONE（2026-11-02）；前景 4 座開放巨框塔、天空光帶走廊、渡輪，owner 接受 R2 | cc100053 |
 | [空の環 Sky Ring](hero-sky-ring.md) | DONE（2026-11-02）；方案 B 巨構：250 m 桁架環＋六支 V 斜柱＋泊位＋居民聲音燈點；close-up polish owner 接受 R5 | cc100053 |
-| [Hero holograms](hero-holograms.md) | DONE（2026-11-02）；8 塊居民尺度 hologram（Fuji TV 地標屏、站前、空氣、live 住民の声、天橋 tag），owner 接受 R5 | cc100053 |
-| [Guest explore 空の環を見る](guest-explore.md) | DONE（2026-11-02）；iPad 揀 Sky Ring → 大畫面泊位近景＋全環聲音；side 鏡頭、20 s 撳掣，owner 接受；升降機 LOD 後續 | cc100053 |
-| [Elevator close-up LOD](elevator-closeup-lod.md) | DONE（2026-11-02）；升降機中距離近景 LOD＋iPad「軌道エレベーターを見る」，owner 接受，已 merge main | cc100053 |
-| [Artifacts evidence split](artifacts-evidence-split.md) | DONE（2026-11-03）；截圖分兩層：原始證據放 `~/city2127-evidence/`（唔入 Git），只 commit 經 `publish-evidence.mjs` 壓縮嘅紀錄；CI 擋新 PNG／> 4 MB；968 個冇引用嘅截圖（1.19 GB）搬出 Git | cc100053 |
-| [NW 旗艦＋district 載體](nw-closeup-polish.md) | DONE（2026-11-04）；closeup-polish 盲評：旗艦 R9 25/28、bay R2 19/20，owner 接受分數，已 merge main | cc100053 |
-| [City taste v2](city-taste-v2.md) | DONE（2026-11-03）；「睇得見嘅超高科技」taste，P1–P7＋polish2（中央框塔／廣場、夜景、階梯 hull），owner 批准 merge main；SE close-up 被 ring 擋住待決定 | cc100053 |
-| [遠景軌道升降機](far-landmark.md) | DONE（2026-11-02）；約 7.5 km 外霧中剪影：幼主柱＋三層中轉站＋分節纜線，Gemini 目標圖 closeup-polish，owner 接受 R6 | cc100053 |
 | [Hero 霧與光層次](hero-atmosphere.md) | IN_PROGRESS（2026-11-02）；R1 高度霧／夜間窗燈層次／夜空地平線，R2 水面燈光倒影，等 owner 目視 | cc100053 |
 | [近鏡後續／能源講解](closeup-next.md) | F1/F2、C1 INTEGRATED（C1 owner批准，24組兩秒辨認未做）；N1 能源講解 INTEGRATED（13s／日文），F3等硬件（2026-10-29） | cc100053 |
+| [Road audit](road-audit.md) | IN_PROGRESS（2026-11-04）；修路已 merge main，owner 目視驗收同餘下決定未做 | cc100053 |
+| [一票旅程落點](journey-landing.md) | DONE（實作）；光點落喺變化格，owner 目視驗收未做 | cc100053 |
 
-已完成或不再適用的53份交接及Meter截圖見 [歸檔索引](archive/README.md)。歷史下一步不會自動變成backlog；Shibuya不再開發。人類美術review／實機未測等限制保留，不因歸檔而結案。
+已完成或不再適用的74份交接及Meter截圖見 [歸檔索引](archive/README.md)。歷史下一步不會自動變成backlog；Shibuya不再開發。人類美術review／實機未測等限制保留，不因歸檔而結案。
 
 新交接沿用 [TEMPLATE](TEMPLATE.md)。完成後歸檔並修正連結；任務日期／commit／實際驗證仍留在各自文件。現行入口：[文件索引](../README.md)、[SPEC](../EXHIBITION_SPEC.md)、[PROJECT](../PROJECT.md)、[VALIDATION](../VALIDATION.md)。
-
-- [Guest agency](guest-agency.md)：G1–G3、G7 與 G2 候選已 merge（2026-11-01）；G5 文案、視覺／性能 gate 與 owner 一人在家的兩秒辨認待續，不視為驗收。

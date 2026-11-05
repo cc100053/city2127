@@ -5,7 +5,7 @@ description: Polish one city2127 change site's headline close-up (model, camera,
 
 # Close-up polish
 
-Golden-sample workflow, proven on SE (2026-11-01; [handoff](../../../docs/handoffs/se-closeup-polish.md), [spec rounds](../../../artifacts/se-closeup-polish/spec.md)). The deliverable is the whole causal chain at one site: the guest's option words → before → change → after, read in two seconds from the close-up.
+Golden-sample workflow, proven on SE (2026-11-01; [handoff](../../../docs/handoffs/archive/se-closeup-polish.md), [spec rounds](../../../artifacts/se-closeup-polish/spec.md)). The deliverable is the whole causal chain at one site: the guest's option words → before → change → after, read in two seconds from the close-up.
 
 Roles: **Opus** (you) diagnoses, writes rubrics and specs, decides. **Sonnet** subagent (`model: sonnet`, `effort: high`) implements and captures. **Judge**: a fresh subagent every round, no history, scores rounds against the rubric. **Owner** alone accepts. Keep one Sonnet agent for the whole task and resume it each round, so it keeps context.
 

@@ -19,7 +19,7 @@ Node26.0.0，root `npm test`、`npm run build`、`git diff --check origin/main..
 
 原`tests/energyE4.browser.mjs` PASS：Chrome156.0.8078.47 headless、1920×1080 DPR1／default、Guest1280×900、hour12／18.5／22，真實scratch schema7→8歷史／原文／ID／草稿、Q3/review、pre/post-commit同ID retry、維持／一庭實際結果、Undo、mixed snapshot、TCP重連、native reduced-motion、普通resize1440×900、reset及舊ID恢復。Exceptions0，只有runner允許的favicon404／obsolete409／注入abort。日夜mixed原圖另已目視核對，保留既有夜間環可讀性限制，不作新藝術達標或FPS宣稱。
 
-[Browser metadata](../../artifacts/energy-city-polish/main-integration-20261025/browser.json)、[feature tests](../../artifacts/energy-city-polish/main-integration-20261025/feature-test.log)、[feature build](../../artifacts/energy-city-polish/main-integration-20261025/feature-build.log)、[browser log](../../artifacts/energy-city-polish/main-integration-20261025/feature-browser.log)、[day](../../artifacts/energy-city-polish/main-integration-20261025/mixed-12.png)／[dusk](../../artifacts/energy-city-polish/main-integration-20261025/mixed-18.5.png)／[night](../../artifacts/energy-city-polish/main-integration-20261025/mixed-22.png)。未改原有證據。
+[Browser metadata](../../../artifacts/energy-city-polish/main-integration-20261025/browser.json)、[feature tests](../../../artifacts/energy-city-polish/main-integration-20261025/feature-test.log)、[feature build](../../../artifacts/energy-city-polish/main-integration-20261025/feature-build.log)、[browser log](../../../artifacts/energy-city-polish/main-integration-20261025/feature-browser.log)、[day](../../../artifacts/energy-city-polish/main-integration-20261025/mixed-12.png)／[dusk](../../../artifacts/energy-city-polish/main-integration-20261025/mixed-18.5.png)／[night](../../../artifacts/energy-city-polish/main-integration-20261025/mixed-22.png)。未改原有證據。
 
 ## Remaining limits and next step
 
@@ -31,7 +31,7 @@ Node26.0.0，root `npm test`、`npm run build`、`git diff --check origin/main..
 
 Merge commit `8ad644d63444558a4abfdc4f0d102343d842b3cd`，parents為fresh main `db772bb`及已push feature `44585bd0b5c9e7f5ce142b5aeb2771dd38d0554f`；no conflicts，merge tree與feature完全相同。乾淨working tree才切main、fast-forward及`--no-ff`合併。整合後root `npm test`／`npm run build`／完整committed whitespace再跑PASS（49／108／324／170775；既有chunk warning保留），正式E4 browser在該merge commit再跑全部PASS，平台／尺寸／配置與前次相同，exceptions0。Runtime／tests／config與feature逐byte一致。
 
-[Integrated test log](../../artifacts/energy-city-polish/main-integration-20261025/integrated-test.log)、[build log](../../artifacts/energy-city-polish/main-integration-20261025/integrated-build.log)、[formal browser log](../../artifacts/energy-city-polish/main-integration-20261025/integrated-browser.log)及[exact-commit browser metadata](../../artifacts/energy-city-polish/main-integration-20261025/integrated-browser.json)。兩次完整formal原圖及hash另保存在本chat持久visualizations目錄的`energy-polish-integration/`；沒有覆寫舊證據。第二次browser的scratch DB／HTTP／WebSocket／Chrome由原finally全部關閉，沒有使用展覽DB。
+[Integrated test log](../../../artifacts/energy-city-polish/main-integration-20261025/integrated-test.log)、[build log](../../../artifacts/energy-city-polish/main-integration-20261025/integrated-build.log)、[formal browser log](../../../artifacts/energy-city-polish/main-integration-20261025/integrated-browser.log)及[exact-commit browser metadata](../../../artifacts/energy-city-polish/main-integration-20261025/integrated-browser.json)。兩次完整formal原圖及hash另保存在本chat持久visualizations目錄的`energy-polish-integration/`；沒有覆寫舊證據。第二次browser的scratch DB／HTTP／WebSocket／Chrome由原finally全部關閉，沒有使用展覽DB。
 
 這次新增的整合證據／文件不改runtime。Main publication／CI及branch deletion實際結果見下節；之前各批次的審美、工程及硬件限制保留。
 

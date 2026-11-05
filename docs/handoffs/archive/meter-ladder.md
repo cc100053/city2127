@@ -20,7 +20,7 @@
 2026-10-27 模擬顯示一份提案常常同時翻幾個 band，而每次翻轉會改晒成個 district，user 覺得浪費。目標係將每條 Meter 拆成有次序嘅格，每份提案最多推一格，再揀一個 headline 變化去展示。以下各項都已完成：
 - user 批准格表：±3 格、門檻 |D| 1.5/4/7、遲滯 2、每份最多一格、slotSeed 第一次到 ±2 先固定、環境資產維持凍結。
 - ladder 同 headline 都已實作並有測試。
-- 模擬結果已記錄喺 [VALIDATION](../VALIDATION.md#分級階梯headline--2026-10-27)。
+- 模擬結果已記錄喺 [VALIDATION](../../VALIDATION.md#分級階梯headline--2026-10-27)。
 - 用 scratch `dev:auto` 做咗 browser check：每份提案只變一格。
 - 分支已 push。
 
@@ -61,7 +61,7 @@
   - `survey/` `npm test` PASS、`npm run build` PASS。
   - `git diff --check` PASS。
   - module-swap 未改，所以未跑。
-- 模擬：`node --experimental-strip-types survey/scripts/ladderSim.ts`。數字見 [VALIDATION](../VALIDATION.md#分級階梯headline--2026-10-27)：
+- 模擬：`node --experimental-strip-types survey/scripts/ladderSim.ts`。數字見 [VALIDATION](../../VALIDATION.md#分級階梯headline--2026-10-27)：
   - 73.0% 投稿啱啱變一個 site、0% 變兩個或以上，連能源計有 10.8% 變兩項。
   - 第 1–3 位訪客平均變 0.99／1.41／1.46 項；改之前 main 係 2.38／2.38／2.81。
 - Browser check：
@@ -69,7 +69,7 @@
   - 九份提案經 guest HTTP API 送出，每份都只有一個 site 移一格。第 1–9 位依次係：sw+1、se+1、nw+1、nw+2、se+2、sw+2、nw+3、sw+3、se+3。
   - 結果卡每次只講一個地點。#2 同時有能源門檻，卡片照講フジテレビ東。
   - Console 冇 error。
-  - 截圖：[#2 focal](../../artifacts/meter-ladder/guest2-se-focal.jpg)、[#9 district](../../artifacts/meter-ladder/guest9-se-rung3.jpg)。
+  - 截圖：[#2 focal](../../../artifacts/meter-ladder/guest2-se-focal.jpg)、[#9 district](../../../artifacts/meter-ladder/guest9-se-rung3.jpg)。
 - Integrated commit and checks: `0b84a29`（Merge branch 'feat/meter-ladder'）。Merge 結果上 root `npm test`／`npm run build` PASS、`survey/` `npm test`／`npm run build` PASS、`git diff --check origin/main..HEAD` PASS；push 前 ancestor check 通過；main CI run 40445156371 `check` success。
 - Changes since verification: 只有呢份 handoff、VALIDATION、SPEC、PROJECT 同 handoffs index 嘅文件改動。
 

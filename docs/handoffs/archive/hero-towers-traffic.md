@@ -30,7 +30,7 @@ Owner 2026-11-01：hero 要一眼睇得出係 2127（[hero-futurism](hero-futuri
 
 ## Completed work
 
-- 診斷（Opus，見 [spec](../../artifacts/hero-towers-traffic/spec.md)）：藍間條塔樓係 SE 集約 Meter 嘅 `ConcentrationDistrict` 塔（藍玻璃＋每 .08 h 一圈 `trim`），唔係 context facade。最近 hero 嘅可見 slot：5、2、3、0。飛行器數量跟 NW 自動化 Meter，所以第 5 項加「常駐區域交通」，唔改 Meter 曲線。
+- 診斷（Opus，見 [spec](../../../artifacts/hero-towers-traffic/spec.md)）：藍間條塔樓係 SE 集約 Meter 嘅 `ConcentrationDistrict` 塔（藍玻璃＋每 .08 h 一圈 `trim`），唔係 context facade。最近 hero 嘅可見 slot：5、2、3、0。飛行器數量跟 NW 自動化 Meter，所以第 5 項加「常駐區域交通」，唔改 Meter 曲線。
 
 ## R1（`b2d61db`）
 

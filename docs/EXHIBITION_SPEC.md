@@ -49,7 +49,7 @@ Root 用固定360px右上卡片（2026-10-04由左移右，避免遮住focal sit
 | `service-2127` | automation | デックス西（nw） | 人員主導 → 人機協作 → 自律服務 |
 | `commons-2127` | publicSharing | アクアシティ南（sw） | 私密空間 → 混合庭院 → 開放共享 |
 | `energy-2127` | 獨立能源累計（不作Meter） | 沿岸能源接點；設備分佈於水庭／富士／外海 | 水庭儲能／儲能環／軌道接收翼／核能島可共存 |
-| `functions-2127` | urbanConcentration | フジテレビ東（se） | 分散機能艙 → 混合館 → 垂直集中（2026-11-01 owner 接受 SE 樣板：低亭群＋有蓋步道 → 米白退台中高樓 → 暖光垂直街道塔，Meter 琥珀色日夜可讀；[handoff](handoffs/se-closeup-polish.md)） |
+| `functions-2127` | urbanConcentration | フジテレビ東（se） | 分散機能艙 → 混合館 → 垂直集中（2026-11-01 owner 接受 SE 樣板：低亭群＋有蓋步道 → 米白退台中高樓 → 暖光垂直街道塔，Meter 琥珀色日夜可讀；[handoff](handoffs/archive/se-closeup-polish.md)） |
 
 ### E4 Q3能源生活取捨（2026-10-24使用者確認）
 
@@ -84,7 +84,7 @@ Headline 近鏡（2026-10-27；時間線於 2026-10-29 修訂）：live 結果�
 
 Closeup-zoom F 候選（2026-10-30）：district 改為較闊焦點構圖、停留期間慢推 7%；SW focal 避開主要遮擋。SE／NW 焦點及 district carrier 可讀性未達驗收，詳見 [F 自評](../artifacts/closeup-zoom/final/F-review.md)，最終仍待 owner 審閱。
 
-NW 近鏡（2026-11-04，`feat/nw-closeup-polish`，owner 接受盲評分數）：AUTO HUB 同六個服務 bay 跟 owner 揀嘅 Gemini 目標圖重建成白色機械語言——−1 有人嘅玻璃暖房服務廳＋懸浮遮篷碟，0 小廳＋泊位柱＋機械臂，+1 密環自律塔＋無人機流＋藍光大堂；旗艦 R9 25/28、bay R2 19/20（rubric＋新評審盲評＋pairwise）。Bay 大細受淨空限制，owner 決定 bay crop 對準實際位置、唔再放大。未過：旗艦 `fl-glazing`／`fl-material`／`fm-hall`，bay `bl-canopy`／`bl-glazing`。[handoff](handoffs/nw-closeup-polish.md)。
+NW 近鏡（2026-11-04，`feat/nw-closeup-polish`，owner 接受盲評分數）：AUTO HUB 同六個服務 bay 跟 owner 揀嘅 Gemini 目標圖重建成白色機械語言——−1 有人嘅玻璃暖房服務廳＋懸浮遮篷碟，0 小廳＋泊位柱＋機械臂，+1 密環自律塔＋無人機流＋藍光大堂；旗艦 R9 25/28、bay R2 19/20（rubric＋新評審盲評＋pairwise）。Bay 大細受淨空限制，owner 決定 bay crop 對準實際位置、唔再放大。未過：旗艦 `fl-glazing`／`fl-material`／`fm-hall`，bay `bl-canopy`／`bl-glazing`。[handoff](handoffs/archive/nw-closeup-polish.md)。
 
 SE 近鏡候選（2026-10-30）：設施加框架平台、冠部、低 tier 構架及橙色 Meter 環，保留 footprint 與 tier 規則；夜景顏色偏白、主體大小及真人辨認仍未過關，待 owner review（[證據](../artifacts/closeup-zoom/final/A-se-review/README.md)）。
 
@@ -152,7 +152,7 @@ Admin Day／Night／Auto 保存為獨立 display setting：12:00／22:00／180 �
 | --- | --- |
 | S1–S4 | [S1](handoffs/archive/exhibition-s1.md)、[S2](handoffs/archive/exhibition-s2.md)、[S3](handoffs/archive/exhibition-s3.md)、[S4](handoffs/archive/exhibition-s4.md)：分開保留當時實作及驗收 |
 | Lifecycle、display、Undo、A/B | [lifecycle](handoffs/archive/exhibition-lifecycle.md)、[day/night](handoffs/archive/admin-day-night.md)、[Undo](handoffs/archive/admin-undo.md)、[雙站](handoffs/archive/two-guest-devices.md) |
-| Odaiba 換場 | [P0–P5 transition record](ODAIBA_VENUE_TRANSITION.md)，整合 `e6c7966` |
+| Odaiba 換場 | [P0–P5 transition record](history/ODAIBA_VENUE_TRANSITION.md)，整合 `e6c7966` |
 | Odaiba art／district | [art](handoffs/archive/odaiba-art-direction-01.md)、[Dream Loop](handoffs/archive/odaiba-dream-loop.md)、[district](handoffs/archive/odaiba-district.md) |
 | Meter variety | [P0–P12](handoffs/archive/meter-variety.md)，整合 `e7afbee`，published main `68b669a` |
 
@@ -160,20 +160,20 @@ Admin Day／Night／Auto 保存為獨立 display setting：12:00／22:00／180 �
 
 ### 能源模型 polish 恢復（2026-10-25）
 
-獨立本機 clone 已恢復水庭／能源島與富士前置儲能環首輪 source，沿用原生成 target；僅續作儲能環／原固定承托三輪批次，三輪本機實作gate已完成，等待總指揮視覺review。保留劇場、工作翼、斜街與原權威配置／歷史。恢復 provenance、逐輪驗收及總指揮視覺review狀態見 [儲能環交接](handoffs/storage-ring-polish.md)；沒有發布／整合，不能據此宣稱 target、工程或展覽驗收完成。
+獨立本機 clone 已恢復水庭／能源島與富士前置儲能環首輪 source，沿用原生成 target；僅續作儲能環／原固定承托三輪批次，三輪本機實作gate已完成，等待總指揮視覺review。保留劇場、工作翼、斜街與原權威配置／歷史。恢復 provenance、逐輪驗收及總指揮視覺review狀態見 [儲能環交接](handoffs/archive/storage-ring-polish.md)；沒有發布／整合，不能據此宣稱 target、工程或展覽驗收完成。
 
 
 ### 接收翼局部打磨 — 2026-10-25（本機續作）
 
-沿用能源Q3及既有接收翼，僅細化雙葉表面、承托接點／服務頸，保留原位置／包絡／大小配置語義與已接受水庭／環／島；沒有新用途、容量或工程宣稱。三輪Plus實作及owner實際驗收分開記在[接收翼交接](handoffs/receiver-wing-polish.md)，沒有push或main整合。生成target只作工藝reference，不依賴強光或背景／UI漂移證明軌道身份。
+沿用能源Q3及既有接收翼，僅細化雙葉表面、承托接點／服務頸，保留原位置／包絡／大小配置語義與已接受水庭／環／島；沒有新用途、容量或工程宣稱。三輪Plus實作及owner實際驗收分開記在[接收翼交接](handoffs/archive/receiver-wing-polish.md)，沒有push或main整合。生成target只作工藝reference，不依賴強光或背景／UI漂移證明軌道身份。
 
 
 ### 儲能環夜間可讀性一次跟進 — 2026-10-25（候選不採用）
 
-已批准的一次局部材質試驗未達原hour22 hero「完整環周與兩組固定承托連續可讀」要求；owner保留原已接受baseline及完整trial證據，夜間可讀性缺口仍在。沒有新產品方向、source變更、工程／target達成或發布宣稱；只交coordinator review，[實測與checkpoint](handoffs/ring-night-readability.md)。
+已批准的一次局部材質試驗未達原hour22 hero「完整環周與兩組固定承托連續可讀」要求；owner保留原已接受baseline及完整trial證據，夜間可讀性缺口仍在。沒有新產品方向、source變更、工程／target達成或發布宣稱；只交coordinator review，[實測與checkpoint](handoffs/archive/ring-night-readability.md)。
 
 
-2026-10-25 發布更新：使用者已明確要求推送能源polish及整合main，先前本機-only狀態由[本次整合交接](handoffs/energy-polish-integration.md)取代。既有runtime未再修改；root test/build／正式scratch browser已重跑PASS，整合後驗證、main CI與安全刪分支的實際結果統一記在該交接，原target／夜間可讀性／硬件限制保留。
+2026-10-25 發布更新：使用者已明確要求推送能源polish及整合main，先前本機-only狀態由[本次整合交接](handoffs/archive/energy-polish-integration.md)取代。既有runtime未再修改；root test/build／正式scratch browser已重跑PASS，整合後驗證、main CI與安全刪分支的實際結果統一記在該交接，原target／夜間可讀性／硬件限制保留。
 
 
 ### 住宅方案A — 2026-10-27 決定

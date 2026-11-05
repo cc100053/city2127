@@ -14,7 +14,7 @@
 
 ## 實際結果
 
-[報告／10張原PNG／取證程式／JSON](../../artifacts/energy-city-polish/water-island-current-review-20261025/README.md)。macOS Chrome156 headless／ANGLE Metal Apple M6／WebGL2，1920×1080 DPR1 default，hour12／22、actor50。正式scratch question-set4四類各4提案，16位，水庭1／small receiver／flywheel／island全在；無DEV energy selector。Console/network只有既有favicon404，exceptions0。有限formal live/reduced-motion rotor diagnostic通過；無新FPS或全產品regression。
+[報告／10張原PNG／取證程式／JSON](../../../artifacts/energy-city-polish/water-island-current-review-20261025/README.md)。macOS Chrome156 headless／ANGLE Metal Apple M6／WebGL2，1920×1080 DPR1 default，hour12／22、actor50。正式scratch question-set4四類各4提案，16位，水庭1／small receiver／flywheel／island全在；無DEV energy selector。Console/network只有既有favicon404，exceptions0。有限formal live/reduced-motion rotor diagnostic通過；無新FPS或全產品regression。
 
 有效6圖：hero日夜、水庭orbit日夜及detail日夜。島orbit2圖只覆蓋橋／上殼，下緣裁掉；預定島detail2圖拍成water room，**不能用作島近景證據**。原因為取證腳本未把既有target pan clamp z≥−360納入計劃；source未改、圖像原樣保留，沒有重拍突破10張上限。camera audit列出原requested及source推算後座標。Capture log的PASS是runtime assertions，非視覺取景合格。
 

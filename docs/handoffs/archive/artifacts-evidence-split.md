@@ -21,7 +21,7 @@ Owner 2026-11-03: the project used 22 GB locally, mostly committed screenshots (
 
 ## In-scope files and dependencies
 
-`scripts/evidence.mjs`, `scripts/publish-evidence.mjs`, `scripts/check-artifacts.sh`, `.github/workflows/ci.yml`, the twelve `tests/*.browser.mjs` runners that wrote captures into `artifacts/`, `.agents/skills/closeup-polish` and `long-polish-loop`, `AGENTS.md`, [VALIDATION § Evidence storage](../VALIDATION.md#evidence-storage), this handoff and the index. Excluded: history rewrite (`filter-repo`, force push), Git LFS, cloud storage.
+`scripts/evidence.mjs`, `scripts/publish-evidence.mjs`, `scripts/check-artifacts.sh`, `.github/workflows/ci.yml`, the twelve `tests/*.browser.mjs` runners that wrote captures into `artifacts/`, `.agents/skills/closeup-polish` and `long-polish-loop`, `AGENTS.md`, [VALIDATION § Evidence storage](../../VALIDATION.md#evidence-storage), this handoff and the index. Excluded: history rewrite (`filter-repo`, force push), Git LFS, cloud storage.
 
 ## Completed work
 

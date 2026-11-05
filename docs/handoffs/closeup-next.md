@@ -63,7 +63,7 @@ Z 已經由 Codex relay 完成（`origin/feat/closeup-polish` @ `f66cc3a`，量�
 - [EXHIBITION_SPEC](../EXHIBITION_SPEC.md)：住宅「正式歸屬尚未選定」改成 owner 2026-10-27 選咗 A，production 已有固定住宅。
 - [handoffs README](README.md)：住宅行改成 SOFTWARE COMPLETE A，加本文件一行，歸檔數目更新。
 - [energy-city](energy-city.md)：E5「main 發布／CI 待核對」改成已核實（`db772bb`，[CI 40069808324](https://github.com/cc100053/city2127/actions/runs/40069808324) success）。
-- [headline-camera](headline-camera.md)：參考 source 由已刪分支改指 artifact 副本。
+- [headline-camera](archive/headline-camera.md)：參考 source 由已刪分支改指 artifact 副本。
 - 衝突提示：`feat/closeup-polish` 都改咗 SPEC（line 82 之後）同 handoffs README 嘅近鏡行。F2 改嘅係其他行，預計 merge 唔會撞；如果撞到，兩邊都保留。
 
 ### C1 — 近鏡 relay：D review → Z → owner review
@@ -110,7 +110,7 @@ Z 已經由 Codex relay 完成（`origin/feat/closeup-polish` @ `f66cc3a`，量�
 
 ## 其他仍待 owner 決定（呢份文件唔處理，記低免得漏）
 
-- 儲能環同接收翼嘅美術：兩者已整合 main，但係 handoff 仲寫「原 target 達成仍待總指揮審美 review」；接收翼喺 hero 好細（[receiver-wing-polish](receiver-wing-polish.md)、[storage-ring-polish](storage-ring-polish.md)）。
+- 儲能環同接收翼嘅美術：兩者已整合 main，但係 handoff 仲寫「原 target 達成仍待總指揮審美 review」；接收翼喺 hero 好細（[receiver-wing-polish](archive/receiver-wing-polish.md)、[storage-ring-polish](archive/storage-ring-polish.md)）。
 - 展覽預設畫質（default 定 low）、展覽硬件，同實機／訪客測試幾時做（[render-quality](render-quality.md)、[resident-experience-p5](resident-experience-p5.md)）。
 
 ## In-scope files and dependencies

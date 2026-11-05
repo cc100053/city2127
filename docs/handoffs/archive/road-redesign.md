@@ -2,7 +2,7 @@
 
 - Owner: cc100053
 - Status: DONE (kit polish R3 and network stages 1–3 owner-accepted 2026-11-04 and merged to main)
-- Branch: `claude/road-net-stage2-63b23f` (from stage 1's `claude/road-net-stage1-a14ae6` at 5404ca8, itself from `claude/street-kit-polish-86d81f` at 1cf1a70, which continues the [road audit](road-audit.md) commit 866cdbe; not merged — the owner merges after all stages)
+- Branch: `claude/road-net-stage2-63b23f` (from stage 1's `claude/road-net-stage1-a14ae6` at 5404ca8, itself from `claude/street-kit-polish-86d81f` at 1cf1a70, which continues the [road audit](../road-audit.md) commit 866cdbe; not merged — the owner merges after all stages)
 - Base commit: 5a56230a9b2748344624197265406bcb3de39ef0 (main)
 - Remote availability: pushed (`origin/claude/road-net-stage1-a14ae6`; stage 2 on `origin/claude/road-net-stage2-63b23f`)
 
@@ -20,7 +20,7 @@
 
 ## Completed work
 
-- [streetKit.ts](../../src/streetKit.ts): `avenueStreet` (A) and `boulevardStreet` (B) build a street from a centreline and a cross-section
+- [streetKit.ts](../../../src/streetKit.ts): `avenueStreet` (A) and `boulevardStreet` (B) build a street from a centreline and a cross-section
   in metres left of the route; `streetKitPreview` lays A on the guideway avenue (d 270 → junction, carriageway −5.1 … −0.5 m where its
   cars drive) and B on the planned boulevard (`ROAD_KIT_PREVIEW`), with the old major band cut (`repairRoads(environment, extra)`).
   DEV only: `?roadKit` (odaibaScene); `plantLandscapeCanopy` takes extra street curves to keep groves clear.
@@ -36,7 +36,7 @@
 
 ## Street-kit close-up polish (branch `claude/street-kit-polish-86d81f`, from 866cdbe)
 
-- Rubric and spec: [rubric](../../artifacts/street-kit-closeup-polish/rubric.md), [spec](../../artifacts/street-kit-closeup-polish/spec.md);
+- Rubric and spec: [rubric](../../../artifacts/street-kit-closeup-polish/rubric.md), [spec](../../../artifacts/street-kit-closeup-polish/spec.md);
   rounds in `~/city2127-evidence/street-kit-closeup-polish/` (`r0` = R4 captures, `target/` = the chosen Gemini images).
 - Owner decisions (2026-11-04): widen A toward the plaza to ≈ 7 m (DEV `?roadKit` override of the street cars' lanes; production
   unchanged until rollout); B reviewed at the close pose `-45,24,212` → `0,0,168` with crops following the city (street keeps 24 m);
@@ -57,7 +57,7 @@
 
 ## Network stage 1 (branch `claude/road-net-stage1-a14ae6`)
 
-- Spec, owner-approved 2026-11-04 before code: [network-stage1.md](../../artifacts/street-kit-closeup-polish/network-stage1.md) (as-built deltas
+- Spec, owner-approved 2026-11-04 before code: [network-stage1.md](../../../artifacts/street-kit-closeup-polish/network-stage1.md) (as-built deltas
   noted there). Plan maps and measurement scripts: `~/city2127-evidence/road-net-stage1/` (`map-u.png`, `map-u-west.png`, `spec/`).
 - Production (no `?roadKit`): `streets = [U]` in layout.ts (② → ③ → ①, 1108 m, the kit carriageway's centre) and `STREET_KIT` (reaches,
   planter gaps, crossings 398 and 545). `streetNetwork` builds A along it; its ceramic and footway join the environment; `streetCuts` clip
@@ -77,7 +77,7 @@
 
 ## Network stage 2 (branch `claude/road-net-stage2-63b23f`)
 
-- Spec, owner-approved 2026-11-04 before code with traffic option (b), pods drive B: [network-stage2.md](../../artifacts/street-kit-closeup-polish/network-stage2.md)
+- Spec, owner-approved 2026-11-04 before code with traffic option (b), pods drive B: [network-stage2.md](../../../artifacts/street-kit-closeup-polish/network-stage2.md)
   (§8 as built). Plan maps, rasters and measurement scripts: `~/city2127-evidence/road-net-stage2/spec/` (`map-b4.png`, `prof4.ts`, `over4.ts`,
   `podclear.ts`, `bay.ts`); captures `~/city2127-evidence/road-net-stage2/r1/`.
 - ④ = `streets[1]` (704 m + 4 m past each edge, south-west band axis → through the glass sphere's tripod, mast and one foot on the median →
@@ -96,7 +96,7 @@
 
 ## Network stage 3 (branch `claude/road-net-stage3`, from main 5e54d15)
 
-- Spec, owner-approved 2026-11-04 before code: [network-stage3.md](../../artifacts/street-kit-closeup-polish/network-stage3.md) (§7 as built). Plan maps
+- Spec, owner-approved 2026-11-04 before code: [network-stage3.md](../../../artifacts/street-kit-closeup-polish/network-stage3.md) (§7 as built). Plan maps
   and scripts: `~/city2127-evidence/road-net-stage3/spec/` (`plan-all.png`, `plan-sw.png`, `plan3.mts`, `prop.mts`, `look.mjs`); captures `r1/`.
 - The landscape shader's swale ponds, corridor channel and rims are gone (gravel walks stay); `CORRIDOR_GLSL` removed. The grove lattice keeps its
   swale/corridor fields, so no grove, court or tower moved; the old pond sites are lawn clearings.

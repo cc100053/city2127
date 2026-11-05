@@ -223,4 +223,4 @@
 
 2026-11-01 guest-agency：live headline 先揀與該 Guest 投票同向的 site 變化（中間票向 0），其次該 Guest 所選而有變的能源部件，再用舊次序；結果卡與鏡頭、講解用同一部件。能源「未過門檻或已成熟」時的可辨認保底配置（`activity`）只用準確句子：未建成設施寫「整備フレームが加わりました／整備船が加わりました」，已有配置改變寫「配置が変わりました」，不假稱設施已落成。**歸因句（「あなたの声も加わり…」）尚未批准、未實作**，待 owner 定日文字眼；在此之前結果卡不把共同結果歸因於本人。
 
-2026-10-27 headline camera：同一 headline 同時有 focal／district evidence 時，以 district 地點及配置調整句為準，和近鏡保持一致；focal-only 仍用本站數量句。能源結果卡與鏡頭共用 waterGardens → receiver → flywheel → island 優先次序，包含設備移除；原有日文句子保留。時間線及中斷規則見 [PROJECT](PROJECT.md) 與 [headline camera](handoffs/headline-camera.md)。
+2026-10-27 headline camera：同一 headline 同時有 focal／district evidence 時，以 district 地點及配置調整句為準，和近鏡保持一致；focal-only 仍用本站數量句。能源結果卡與鏡頭共用 waterGardens → receiver → flywheel → island 優先次序，包含設備移除；原有日文句子保留。時間線及中斷規則見 [PROJECT](PROJECT.md) 與 [headline camera](handoffs/archive/headline-camera.md)。

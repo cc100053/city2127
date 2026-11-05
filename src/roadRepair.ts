@@ -1,4 +1,4 @@
-// Road redesign (docs/handoffs/road-redesign.md): the district's Phase 03D street layer predates the 2127 buildings and the street kit that
+// Road redesign (docs/handoffs/archive/road-redesign.md): the district's Phase 03D street layer predates the 2127 buildings and the street kit that
 // replaces it (src/streetKit.ts, network stages 1–2), so every surveyed street inside `DISTRICT` goes; the backdrop roads beyond stay.
 // Runs on the loaded environment before anything samples its ground (planting, doorways, paving checks).
 import * as T from 'three';

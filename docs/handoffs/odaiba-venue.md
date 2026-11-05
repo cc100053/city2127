@@ -22,7 +22,7 @@
 
 ## Goal and acceptance criteria
 
-Execute [completed venue transition record](../ODAIBA_VENUE_TRANSITION.md) P0–P6: the root exhibition scene becomes the Fuji TV / Daiba waterfront in 2127 with the same four-question v2 contract, four change sites, lifecycle and day/night.
+Execute [completed venue transition record](../history/ODAIBA_VENUE_TRANSITION.md) P0–P6: the root exhibition scene becomes the Fuji TV / Daiba waterfront in 2127 with the same four-question v2 contract, four change sites, lifecycle and day/night.
 
 ## In-scope files and dependencies
 

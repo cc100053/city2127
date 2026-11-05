@@ -3,7 +3,7 @@
 > 2026-10-29 歸檔：下面嘅 `src/`／`tests/` 路徑指已刪分支上嘅檔案，副本喺 [artifacts/energy-demo-camera/reference](../../../artifacts/energy-demo-camera/reference/devEnergyDemo.ts)（`prototype.diff` 係對 `047cb2c` 嘅完整 source diff）。後續做法見 [closeup-next](../closeup-next.md) N1。
 
 - Owner: cc100053
-- Status: ARCHIVED 2026-10-29 — superseded by [headline-camera](../headline-camera.md); owner decided to carry the narrated-cycle idea into the energy stage of [closeup-next](../closeup-next.md) and delete the branch
+- Status: ARCHIVED 2026-10-29 — superseded by [headline-camera](headline-camera.md); owner decided to carry the narrated-cycle idea into the energy stage of [closeup-next](../closeup-next.md) and delete the branch
 - Branch: feat/energy-demo-camera
 - Base commit: 047cb2c62c5224e1628a418659685d489695a3b9
 - Last verified commit: working tree on `feat/energy-demo-camera` before commit (code identical to the commit that adds this handoff)

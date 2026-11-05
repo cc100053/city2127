@@ -26,7 +26,7 @@
 
 | 文件 | 狀態 |
 | --- | --- |
-| [ODAIBA_VENUE_TRANSITION](ODAIBA_VENUE_TRANSITION.md) | 換場 P0–P5 已整合；P6/S5 仍待展覽驗收；原估計不是現行 runtime |
+| [ODAIBA_VENUE_TRANSITION](history/ODAIBA_VENUE_TRANSITION.md) | 換場 P0–P5 已整合；P6/S5 仍待展覽驗收；原估計不是現行 runtime |
 | [Shibuya Plan 01](SHIBUYA.md)／[Plan 02](history/SHIBUYA_PLAN02.md)／[Art](history/SHIBUYA_ART.md) | 已結束歷史；未完成項目不再推進 |
 | [Original MVP](history/EXHIBITION_MVP.md) | 原始規劃及 dated updates；由現行 SPEC 取代 |
 | [Implementation snapshot](history/PROJECT_2026-10-02.md)／[Validation snapshot](history/VALIDATION_2026-10-02.md) | 保留舊 deep links／證據，不作現行規則 |
@@ -35,7 +35,7 @@
 
 ## 任務 handoffs
 
-2026-10-13：交接目錄分開 [現行任務](handoffs/README.md) 與 [已完成／已取代的歸檔](handoffs/archive/README.md)。現行保留台場素材、P6/S5、延後視覺polish、LAN 雙站、居民P5實機驗收及 [回顧章節](handoffs/day-replay.md)；其餘50份交接保留原日期／commit／證據，舊下一步不重新建立任務。新任務用 [TEMPLATE](handoffs/TEMPLATE.md)。
+2026-10-13：交接目錄分開 [現行任務](handoffs/README.md) 與 [已完成／已取代的歸檔](handoffs/archive/README.md)。現行保留台場素材、P6/S5、延後視覺polish、LAN 雙站、居民P5實機驗收及 [回顧章節](handoffs/day-replay.md)；其餘50份交接保留原日期／commit／證據，舊下一步不重新建立任務。2026-11-05：再歸檔21份已完成交接（歸檔共74份），換場計劃移入 `history/`。新任務用 [TEMPLATE](handoffs/TEMPLATE.md)。
 
 ## Repository skill
 
