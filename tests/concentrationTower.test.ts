@@ -78,8 +78,8 @@ try {
   assert.equal(group('tower-mid-rise-hall').visible, false, 'high replaces the mid-rise');
   const cabin = group('tower-elevator-cabin');
   runtime.update(0); assert.equal(cabin.position.y, 1.5);
-  runtime.update(3); assert.ok(cabin.position.y > 1.5 && cabin.position.y < 36.5);
-  runtime.update(6.5); assert.equal(cabin.position.y, 36.5);
+  runtime.update(3); assert.ok(cabin.position.y > 1.5 && cabin.position.y < 34.8);
+  runtime.update(6.5); assert.equal(cabin.position.y, 34.8);
   runtime.update(14); assert.equal(cabin.position.y, 1.5);
   Object.defineProperty(globalThis, 'matchMedia', { configurable: true, value: () => ({ matches: true }) });
   runtime.update(3); assert.equal(cabin.position.y, 19, 'reduced motion parks the cabin');

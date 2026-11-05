@@ -1,29 +1,51 @@
 ---
 name: long-polish-loop
-description: Run a long unattended city2127 visual polish (overnight or multi-hour) toward owner-locked target images, part by part, judged by a rubric and a blind judge. Use when asked for an overnight or goal task, or to polish the city or several parts toward a target while the owner is away.
+description: Run a long unattended city2127 visual polish (overnight or multi-hour) over several sites or parts toward owner-picked target images, one fresh session per site, each run with the closeup-polish judge kit. Use when asked for an overnight or goal task, or to polish several close-ups or parts while the owner is away.
 ---
 
 # Long polish loop
 
-Lessons from city-taste-v2 (2026-11-02 overnight, [handoff](../../../docs/handoffs/city-taste-v2.md)): every part "passed" by 03:52, 7 h of budget went unused, and the result still sat far from the target. Causes: pass meant *better than before* instead of *close to the target*; the coordinator judged its own specs; "Weak:" notes still passed; nobody judged the whole frame; thumbnails hid detail; close-ups were never captured, so a megastructure blocked the SE headline unnoticed. This loop closes each of those.
+The unattended wrapper around [closeup-polish](../closeup-polish/SKILL.md): that skill is the per-site method (diagnose, target, rubric, spec, round, blind judge, pairwise judge); this one covers what changes when the owner is asleep and there are several sites.
 
-Roles: **coordinator** (Opus, its own session started from the owner's session — a session started by another session cannot `start_session`) writes rubrics and specs and decides. **Workers** (Sonnet subagents, `model: sonnet`) implement and capture. **Judge** (a fresh subagent every round, no history) scores. **Owner** alone accepts visuals and approves `main`.
+Lessons from city-taste-v2 (2026-11-02 overnight, [handoff](../../../docs/handoffs/city-taste-v2.md)): every part "passed" by 03:52, 7 h of budget went unused and the result sat far from the target — pass meant *better than before*, the coordinator judged its own specs, "Weak:" notes passed, nobody judged the whole frame, thumbnails hid detail, close-ups were never captured. NW (2026-11-03) added: Gemini enlarges the subject, so size must be decided before the rubric; a single absolute judge drifts ±1, so pairwise judging decides keep or drop. The accepted finish level is NW bay R2 (`$CITY2127_EVIDENCE_ROOT/nw-closeup-polish/bay-r2/review-bay-r2.jpg`, 19/20).
 
-## Steps
+## Roles
 
-1. **Preflight and targets.** AGENTS.md startup; integration branch `feat/<task>` from `main`, part branches `feat/<task>-<part>`. Raw captures and candidates live in the evidence folder `$CITY2127_EVIDENCE_ROOT/<task>/` (default `~/city2127-evidence`); targets are owner-picked images published to `artifacts/<task>/target/` with `node scripts/publish-evidence.mjs` (Gemini recipe: [closeup-polish](../closeup-polish/SKILL.md#gemini-target-images)). Done: targets locked by the owner, baseline captures saved.
-2. **Rubric.** For every part write `artifacts/<task>/<part>/rubric.md`: 3–5 items, each tied to a named crop rectangle (normalised x0,y0,x1,y1 of the hero frame) and stated as an observable a judge can score from images alone ("frame tower spans ≈25 % of frame width, right of centre", "> half the ring faces show warm windows at night"). Add `whole.md` for the full hero day and night. Done: every visible difference between baseline and target in that part's crops is an item.
-3. **Calibrate with the owner.** Before the owner leaves, run part 1 round 1 and show the judge's scores beside the crops. The owner marks each item pass or fail; record their words in `rubric.md` as the bar. Done: the owner has graded one round.
-4. **Round.** Worker implements a `spec-rN.md`, passes `npm test && npm run build && git diff --check`, captures at 3200×1800 (same camera as the target) day and night, crops every rubric rectangle from capture and target into the evidence folder's `<part>/rN/crops/`, captures the four headline close-ups high and low, samples hero `data-fps` day and night, commits code and text (no captures), pushes. Done: the evidence folder is complete.
-5. **Judge.** Spawn a new judge subagent with only: `rubric.md` (items + owner bar), the target crop, the round crop and the baseline crop per item. Withhold reports, round numbers and time left. It scores each item 0 (absent) / 1 (present, off target) / 2 (matches the bar) with one line of evidence. Done: `rN/scores.md` written by the judge.
-6. **Decide.** **Pass** = every item 2 and every gate green; merge `--no-ff` into the integration branch. Any item below 2 → next round, spec aimed at the lowest items. After 3 rounds without a pass, **park** the part at its score and move on. **Revert** only when gates break unrecoverably. A known weakness is a score below 2, never a note on a pass. Done: decision and score row appended to the handoff.
-7. **Whole frame.** After every two or three parts and at the end, judge `whole.md`; reopen the parts behind any item below 2. Done: whole scores recorded.
-8. **Spend the budget.** While time remains before deadline minus 1 h, return to the lowest-scoring parked or reopened part. Stop early only when every part and `whole.md` item scores 2. Done: deadline reached or all 2s.
-9. **Deliver.** `review.jpg` (published with `scripts/publish-evidence.mjs`, split if over 4 MB) built from full-size rubric crops (baseline | final | target per item, scores printed), the score table with trends in the handoff, every item below 2 listed plainly, and what needs the owner. Send it with SendUserFile. Done: the owner can judge from the board alone.
+- **Owner**: picks targets and decides sizes before leaving; alone accepts visuals and merges to `main` afterwards.
+- **Dispatcher** (Opus, the session the owner starts): preflight, integration branch, prep, Gemini, then starts **one site session at a time** and verifies, merges and re-dispatches. Only an owner-started session can `start_session`, so the dispatcher never hands this role on.
+- **Site session** (Opus, started by the dispatcher, fresh context, the dispatcher's folder): runs closeup-polish steps 4–7 for one site in a single turn without asking anyone.
+- **Worker**: one Sonnet subagent (`model: sonnet`) per site session, resumed every round. **Judges**: fresh subagents every round (absolute + pairwise), shown only `rN/judge/` and `rN/pair/`.
+
+## Phase A — owner awake (≈ 2 h before leaving)
+
+1. **Preflight.** AGENTS.md startup. Create the night folder: `git worktree add <repo>/../city2127-<task> -b feat/<task> origin/main`, symlink `node_modules` and `survey/node_modules`, push, write `docs/handoffs/<task>.md` (PLANNED, site queue, deadline). Call `request_keep_awake` for the whole night. Done: integration branch pushed.
+2. **Prep, in parallel.** One read-only session per site (`cwd` = night folder, own Vite port, no commits) does closeup-polish step 2 (diagnosis table, chosen pose) and step 3 up to `prompts.md`, writing to the evidence folder `<task>/<site>/`. Done: per site a pose, `baseline/` captures and `prompts.md`.
+3. **Targets.** One Sonnet agent generates every state in Gemini through Claude in Chrome ([recipe](../closeup-polish/SKILL.md#gemini-target-images)), sites in turn, into `<site>/gen/`. Show the owner a contact sheet per site; the owner picks, and for each subject answers the size question: *grow the model to the target's frame share* or *crops follow the city*. Publish picks to `artifacts/<task>/<site>/target/` with `node scripts/publish-evidence.mjs`; record the size answers in the handoff. Done: every state has an owner-picked target and a size decision.
+
+The owner may leave after step 3. Nothing below waits for them.
+
+## Phase B — unattended
+
+4. **Dispatch.** Start the next site session (`start_session`, `initiation: "user_asked"`, `context: "fresh"`, `cwd` = night folder) with a brief naming: site, its targets and evidence folder, the size decision, the round cap, the time it must stop, and **Site rules** below. Wait for its report — never poll; the app wakes the dispatcher when it ends its turn.
+5. **Verify.** Read the site's `rN/pair.md` and `rN/review.jpg` yourself (full size), rerun `npm test && npm run build && git diff --check`, check the gates, then merge the site branch `--no-ff` into `feat/<task>` and push — passed or parked alike (a parked site keeps its best kept round). Append the site's score row to the handoff. Done: integration branch holds the site.
+6. **Spend the budget.** When every site has had a first pass and time remains before deadline − 1 h, start a new session on the lowest-scoring parked site, brief: continue from its handoff entry, spec aimed at its lowest items. Stop dispatching at deadline − 1 h, and message every running site session to stop new rounds then; Deliver starts at deadline − 1 h whether or not sessions report, from the last pushed kept rounds.
+7. **Deliver** by the deadline: capture every headline close-up of every site in the queue *and* the already-accepted ones, low and high, day and night, at their live poses, and compare with the Phase A baseline (blocking or regression reopens nothing now — list it). Run [`fps.sh`](../closeup-polish/scripts/fps.sh) once on the integration branch at the heaviest meters. Build one night board (each site's `review.jpg` + score row), publish it, update the handoff (score table, every item below 2, each blocker with its options, branch refs, what needs the owner), send the board with SendUserFile (`proactive`). Done: the owner can decide from the board alone.
+
+## Site rules (put in every site brief)
+
+- Run closeup-polish steps 4–7 with its judge kit (`scripts/crops.py prep` / `decode`); skip step 7's owner calibration — the bar is the owner's words already in `artifacts/nw-closeup-polish/rubric.md` and the bay R2 board.
+- Branch `feat/<task>-<site>` from `feat/<task>` in the night folder; own Vite port; stop every server you start.
+- **Pass** = total ≥ 90 % of the maximum, no item 0, no 2-scored item losing its pairwise verdict, gates green. Round cap 4 on a first pass, then **park** at the best kept round.
+- **Never wait for the owner.** A constraint that blocks the target (route clearance, lot limits, tests guarding other sites, budget) goes in the handoff under `## Blocked` with options; take the option that keeps the design and touches only this site's files, else leave the item below 2 and work the others. Never lower the design quietly, never delete or relax another site's test.
+- A known weakness is a score below 2, never a note on a pass. Do not touch other sites' builders or poses beyond what the spec names.
+- Stop new rounds at the time in the brief; leave the branch at the last kept round, pushed, with an `## RN` handoff entry per round.
+- Per-item keep and locked regions (closeup-polish steps 5 and 7): a round never carries a lost item's regression forward when its code is separable.
+- **One writer per folder.** Only one site session edits the night folder at a time. A session reopened while another works (by the owner or the dispatcher) moves to its own worktree first (`git worktree add <repo>/../city2127-<task>-<site> feat/<task>-<site>`); never commit on another site's branch (2026-11-05: SE's dropped R7 tower edit landed on the SW branch).
 
 ## Gates (every round)
 
-- Tests, build and whitespace check green; hero 60 FPS day and night (vsync, 1920×1080, discard the first sample).
-- The four headline close-ups, high and low, still frame their site with nothing blocking it — compare with the previous round's captures.
-- All UI text Japanese; greenery lush; no floating islands. Site visibility from hero is no gate ([taste](../../../docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)).
-- Nothing reaches `main` without the owner.
+- `npm test`, `npm run build`, `git diff --check` green.
+- The site's headline close-ups, low and high, frame their subject with nothing blocking it — compare with the previous round.
+- All UI text Japanese; greenery lush; no floating islands. Site visibility from hero is no gate.
+- FPS once per site at its finish with headed `fps.sh` (headless numbers settle nothing); record, do not block the night on it.
+- Nothing reaches `main`.
