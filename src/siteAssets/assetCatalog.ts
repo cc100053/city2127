@@ -1,8 +1,10 @@
 import type { SiteAssetId, SiteId, SiteLayerId } from '../changeCatalog.ts';
 
-export type SiteAssetCategory = 'site-layer' | 'prop';
+export type SiteAssetCategory = 'site-layer' | 'prop' | 'kit';
 export type SiteAssetMaterialPolicy = 'preserve' | 'city-roles';
-export type CityMaterialRole = 'city_glass' | 'city_trim' | 'city_future_light' | 'city_solar';
+export type CityMaterialRole = 'city_glass' | 'city_trim' | 'city_future_light' | 'city_solar'
+  | 'se_white' | 'se_amber' | 'se_room' | 'se_lamp' | 'se_light' | 'se_pane'
+  | 'se_cream' | 'se_ceiling' | 'se_paving' | 'se_glass' | 'se_lift_glass';
 
 export interface SiteAssetMetadataContract {
   readonly category: SiteAssetCategory;
@@ -15,8 +17,9 @@ export interface SiteAssetDefinition {
   readonly url: string;
   readonly rootName: string;
   readonly category: SiteAssetCategory;
-  readonly compatibleSite: SiteId;
-  readonly compatibleLayer: SiteLayerId;
+  /** A site-bound asset names its site and layer; a `kit` (shared props, see propKit.ts) belongs to none. */
+  readonly compatibleSite?: SiteId;
+  readonly compatibleLayer?: SiteLayerId;
   readonly footprint: readonly [number, number];
   readonly maxHeight: number;
   readonly materialPolicy: SiteAssetMaterialPolicy;
@@ -48,5 +51,26 @@ export const SITE_ASSET_CATALOG: Readonly<Record<SiteAssetId, SiteAssetDefinitio
     materialPolicy: 'city-roles',
     materialRoles: ['city_glass', 'city_trim', 'city_future_light', 'city_solar'],
     metadata: { category: 'site-layer', forwardAxis: '-Y', frontMarkerName: 'front_marker' },
+  },
+  'concentration-tower-high': {
+    id: 'concentration-tower-high',
+    url: new URL('../../asset/models/concentration-tower-high/concentration-tower-high.glb', import.meta.url).href,
+    rootName: 'ROOT_CONCENTRATION_TOWER_HIGH',
+    category: 'site-layer',
+    compatibleSite: 'centerGaiRear',
+    compatibleLayer: 'towerUpper',
+    footprint: [10.4, 8.2],
+    maxHeight: 38.2,
+    materialPolicy: 'city-roles',
+    materialRoles: ['se_white', 'se_amber', 'se_room', 'se_cream', 'se_ceiling', 'se_light', 'se_glass', 'se_lift_glass', 'se_paving'],
+  },
+  'city-kit-2127': {
+    id: 'city-kit-2127',
+    url: new URL('../../asset/models/city-kit-2127/city-kit-2127.glb', import.meta.url).href,
+    rootName: 'ROOT_CITY_KIT_2127',
+    category: 'kit',
+    footprint: [33, 22], // the review grid of props; the runtime reads each prop relative to its own empty
+    maxHeight: 4.3,
+    materialPolicy: 'preserve',
   },
 };

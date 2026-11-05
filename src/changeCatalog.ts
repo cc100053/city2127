@@ -6,7 +6,7 @@ export type SiteId = typeof SITE_IDS[number];
 export const SITE_LAYER_IDS = ['hubBase', 'hubUpper', 'hubNeutralProps', 'parkSurface', 'parkTrees', 'parkCoolingFins', 'plaza', 'commonsNeutralProps', 'towerBase', 'towerUpper', 'towerNeutralProps'] as const;
 export type SiteLayerId = typeof SITE_LAYER_IDS[number];
 export type SiteLayerKind = 'procedural' | 'glb' | 'prop' | 'effect';
-export type SiteAssetId = 'future-tree-2127' | 'automation-hub-upper';
+export type SiteAssetId = 'future-tree-2127' | 'automation-hub-upper' | 'concentration-tower-high' | 'city-kit-2127';
 export type EnvironmentParkTarget = Pick<ExhibitionLayout, 'treeCount' | 'plantedFraction' | 'coolingFins'> & {
   readonly band: ExhibitionLayout['bands']['ne'];
 };
@@ -113,7 +113,7 @@ export const CHANGE_CATALOG: Readonly<Record<SiteId, SiteDefinition>> = {
     id: 'centerGaiRear', socketId: 'se',
     layers: {
       towerBase: layer('towerBase', 'procedural'),
-      towerUpper: layer('towerUpper', 'procedural'),
+      towerUpper: layer('towerUpper', 'procedural', 'concentration-tower-high'),
       towerNeutralProps: layer('towerNeutralProps', 'procedural'),
     },
     variants: {

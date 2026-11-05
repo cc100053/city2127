@@ -15,7 +15,7 @@ export function buildSurveySites(scene: T.Scene, assets = new SiteAssetLoaderCac
     buildAutomationHub(scene, kit, assets),
     buildEnvironmentPark(scene, kit, assets),
     buildCommonsPlaza(scene, kit),
-    buildConcentrationTower(scene, kit),
+    buildConcentrationTower(scene, kit, assets),
   ];
   return Object.fromEntries(sites.map(site => [site.id, site])) as unknown as BuiltSiteMap;
 }
