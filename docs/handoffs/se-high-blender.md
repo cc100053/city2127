@@ -46,8 +46,11 @@ Owner 2026-11-05：SE 夜間分最低（closeup-night R6 20/38，SW 23/30），�
 
 ## Important decisions
 
+- Owner 2026-11-05：R1 似 R6 因為 spec 由 R6 出發、鎖咗房間／綠化（Dev_QA Q5）。R2 起 judge 先對 target（absolute），R6／R1 pairwise 只做回歸。
+- Owner 2026-11-05：材質唔鎖，只鎖人仔；做出嚟嘅部件（例如樹）要可以喺其他 scene 重用。其他 site 換 kit 係之後嘅 task，今輪唔郁。
+
 - 塔殼（slab、柱、玻璃、升降井、露台、頂）入 GLB，用 `city-roles` 材質名 remap 去 SE 現有材質（夜間 emissive 照舊）；傢俬、人、綠化、cabin 動畫、meter 光環留喺 procedural。R6 嘅 procedural 殼保留做 GLB load 失敗時嘅 fallback。
 
 ## Next expected step
 
-Owner 睇 R1 board（round 1 = calibration），決定收貨定開 R2；R2 建議：升降井凸出＋cabin 夠大可讀、扶手改白、每層傢俬唔同、露台用細樹。
+Owner 2026-11-05 叫寫 R2（[spec](../../artifacts/se-high-blender/spec.md) `# R2`）：由 target 逐項寫（T1–T10），材質唔再鎖（只鎖人仔），新做 reusable prop kit `city-kit-2127`（樹、室內植物、傢俬、長凳、lift cabin，真實米＋每 site `unitsPerMetre`）。下一步：owner 批 spec → Sonnet 實作 R2 → 三個 absolute judge 對 target。
