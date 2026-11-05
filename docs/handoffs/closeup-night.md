@@ -1,7 +1,7 @@
 # closeup-night — 夜間重做 SW、NE、SE 旗艦 headline 近鏡
 
 - Owner: cc100053（唯一驗收人）
-- Status: DELIVERED — 等 owner 睇 board 決定（SW park R8 23/30，SE park R6 20/38；冇 site 過 90 %）
+- Status: MERGED — owner 2026-11-05「Merge to main as is」：`16ef28b` 入 `main`（SW park R8 23/30，SE park R6 20/38；冇 site 過 90 %）
 - Branch: `feat/closeup-night`（site branch `feat/closeup-night-<site>`）
 - Base commit: `5a56230`（origin/main）＋ merge `chore/long-polish-loop-v2` `6e60d04` → `dd1f5a9`
 - Last verified commit: `1aa34f2`（integration：SW R8＋SE R6 model＋新 L 鏡位）；之後只加 board 同 handoff
@@ -12,7 +12,7 @@
 - Session starting branch and HEAD: owner checkout `feat/road-audit-fixes` `866cdbe`（冇郁）；night folder `../city2127-closeup-night` 由 `origin/main` 開
 - Last fetched origin/main commit: `5a56230`（2026-11-04）
 - Local changes present at session start: owner checkout 有未追蹤截圖（唔郁）
-- Upstream integration status: NOT INTEGRATED（owner 朝早決定 merge main）
+- Upstream integration status: INTEGRATED — `main` `16ef28b`（merge `feat/closeup-night` `42efb57` 入 origin/main `90480df`，含 road-net stage 2–3）
 - Pending Git conflicts or synchronization blockers: NONE
 
 ## Goal and acceptance criteria
@@ -191,6 +191,12 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 - FPS（headed `fps.sh`，hero 1920×1080 DPR 1，`992f339`）：`sw:high` 日 60.0 59.9 60.0 60.0 60.0 60.0／夜 60.0×6；`sw:low` 日夜 60.0×6。
 - Evidence：`~/city2127-evidence/closeup-night/sw/r8/`（`pair.md`、`review.jpg` = baseline | R8 | target、`fps.txt`）。
 
+## Main integration（2026-11-05）
+
+- Merge 結果 `16ef28b`：root `npm test` exit 0、`npm run build` exit 0、`git diff --check origin/main..HEAD` exit 0（survey／module-swap 冇改）。
+- 喺 merge 結果重影全部近鏡（日，`~/city2127-evidence/closeup-night/deliver/main/`）：SW、SE L/H、NW L/H 主體清楚冇遮擋，road-net 改動冇影響。
+- Main CI：run `41952184733` on `16ef28b` success（job `check`）。
+
 ## Branch refs
 
 - Integration：`refs/heads/feat/closeup-night`（含 SW R8、SE R6＋新 L、skill 更新、board）
@@ -198,4 +204,4 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 
 ## Next expected step
 
-Owner 睇 board 決定：(1) 接受現狀 merge `feat/closeup-night` 入 `main`；(2) 揀 site 用新 skill 規則（逐項 keep）再開 round（SW 目標 7 個 1 分項；SE 建議先評 R6 喺新 L 鏡位，再攻 −1 亭同人仔）；(3) 確認 `se:focal` 測試放寬同 SE blocker 選項。
+已入 main。之後如果再做，owner 揀：(1) 揀 site 用新 skill 規則（逐項 keep）再開 round（SW 目標 7 個 1 分項；SE 建議先評 R6 喺新 L 鏡位，再攻 −1 亭同人仔）；(2) 確認 `se:focal` 測試放寬同 SE blocker 選項。
