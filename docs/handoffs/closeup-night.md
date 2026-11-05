@@ -157,6 +157,7 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 
 - **SE −1 構圖**（fl-pavilions、fl-garden）：L 鏡位 lot 前三分之一喺畫面底以外，Gemini 目標將亭散到 lot 外。選項：(a) 守 14×14 lot、亭擠喺後三分之二（今晚揀咗）；(b) 擴大 SE lot（改其他檔案、要 owner 批）；(c) L 鏡位向後拉高（owner 定嘅鏡位，唔郁）。
 - **SE `se:focal` 向上望**：owner 嘅 H 鏡位鏡頭低過目標，`tests/headlineCamera.test.ts` 只為 `se:focal` 放寬「鏡頭高過目標」規則（其他 73 個 pose 照舊）。
+  - **已解決（owner 2026-11-05）**：鏡位角度唔適用於每棟建築，`tests/headlineCamera.test.ts` 刪咗「鏡頭高過目標」同「鏡頭喺西／北面」兩條角度規則，只保留距離限制。
 - **SE 0 塔高度**（tm-tower、tm-base）：L 鏡位頂框約 18 local units，0 塔要入得 L，所以喺 H 只係目標約一半高（Gemini 放大咗）。選項：(a) 塔頂 ≈ 17，H 用 capture 框跟住城市實際位置（今晚揀咗，淨改 SE rubric）；(b) 塔加高到 ≈ 30，L 切頂；(c) 改 L 鏡位（owner 定嘅，唔郁）。
 
 ## SW R5（cap 升到 6，owner）
@@ -204,4 +205,4 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 
 ## Next expected step
 
-已入 main。之後如果再做，owner 揀：(1) 揀 site 用新 skill 規則（逐項 keep）再開 round（SW 目標 7 個 1 分項；SE 建議先評 R6 喺新 L 鏡位，再攻 −1 亭同人仔）；(2) 確認 `se:focal` 測試放寬同 SE blocker 選項。
+已入 main。之後如果再做，owner 揀：(1) 揀 site 用新 skill 規則（逐項 keep）再開 round（SW 目標 7 個 1 分項；SE 建議先評 R6 喺新 L 鏡位，再攻 −1 亭同人仔）；(2) SE blocker 選項（−1 構圖、0 塔高度）。
