@@ -147,3 +147,38 @@ Bar: every `fh-*` item scores 2 on the median of three fresh absolute judges aga
 - **Other states**: −1/0 captures, if a shared material changed.
 - **Gates**: `npm test && npm run build && git diff --check`, plus one headed FPS run (`.agents/skills/closeup-polish/scripts/fps.sh`, `se:high`).
 - **Metrics**: tris, materials and bytes for both GLBs.
+
+---
+
+# R3 — remaining gaps (owner 2026-11-05 "R3")
+
+R2: day median 10/12 (10/10/10), night 9/12; pairwise vs R1 5–1 (lost `fh-crown`). Below 2: `fh-floors`, `fh-lift`; night `fh-gardens` 1. Close-ups `~/city2127-evidence/se-high-blender/r2/` (top-day/night crops show the causes). Judge R3 absolute against the target first, pairwise vs R2 as regression.
+
+## Keep (locked — diff against `333678a` before capture, revert anything not named below)
+
+- `fh-frame` (2, won): tower GLB piers, mullions, slabs, white edges, amber bands on floors 0/3/6/9/12 (`build_tower.py` structure).
+- `fh-base` (2, won): `lobbyKit()`, `forecourtKit()`, lobby/door/paving in the GLB, `paving` material.
+- Person code (owner).
+
+## Diagnosis → fix
+
+| Item | Cause seen in R2 | R3 fix |
+| --- | --- | --- |
+| `fh-floors` warmth | Upper floors (6–12) use `cream` and a pale `ceilingHigh`; at night they read grey-white, by day sky-blue because `pane` mirrors the sky over the room | All floors warm like the target: floors 0–5 stay `room` peach; floors 6–12 a warm cream `#f7e2c8` with emissive `#ffd9b0` ≈ .5; `ceilingHigh` warm white `#fff6ea` emissive ≈ .6 so the ceiling glows at night; light strips stay. New +1-only `paneHigh` (opacity ≈ .08, no sky tint) on the tower glazing via a new role `se_glass` so rooms read through it; `pane` itself untouched |
+| `fh-floors` repetition | every floor reads as "desk row" or "planter row" (gardens use 3 identical `planter_1m` along the glass; offices 3 identical desks) | Each floor gets one **back-wall feature** facing +X and one **mid-room cluster**, all different. Back wall (x ≈ −2.1): bookshelves with coloured books (library), kitchen counter + upper cabinets + 3 `pendant_lamp` (café), long sofa + rug + art panel (lounge), mirror wall + equipment (gym), pin-board + big table (studio), office: 2 desk pairs facing each other + one meeting table + whiteboard. Gardens: drop the `planter_1m` row; 2–3 trees of **different** kit sizes + 2 potted plants + a bench with a seated person, placed at different z per garden floor. Furniture large enough to read at crop size (desk top ≥ .45 local wide). No two adjacent floors share a programme silhouette |
+| `fh-lift` | glazing `pane` at .18 opacity is invisible against sky/night; cabins sit outside the H crop band; only the two amber rails read | Tube glazing new `liftGlass` (white-blue `#dceefa`, opacity ≈ .35, mild emissive ≈ .15 at night) via role `se_lift_glass`; white ring band at **every** floor slab level (.12 tall) plus the brackets every 4; keep the two amber front rails, white back rails. Cabins: kit `lift_cabin` scaled to ≈ 1.2 w × 1.9 h local (≈ 75 % of tube width, ≈ 0.8 floor), white body, glazed front with warm-lit interior and one person, thin amber trim at the floor line. Static cabin at y ≈ 17 (mid-crop); animated cabin unchanged. The cabin must read at the `fh-lift` crop |
+| `fh-crown` (lost to R1) | two amber rings stacked (GLB cap band + procedural meter ring) → "doubled jagged edge"; roof trees are lollipops (trunk ≈ 60 % of height), roof sparse | Remove the GLB `se_amber` band under the cap; the procedural `tower-meter-band` is the only ring, one clean torus (tube .3, ≥ 64 radial segments) centred on the cap rim. Roof: a dense mound — 4 low cluster trees + 14 shrub clusters + low planter rim, crowns overlapping, nothing taller than ≈ 2.2 above the cap |
+| kit trees (all sites) | `tree_round_*` trunk ≈ 60 % of height, 4 lobes | Rebuild in `build_kit.py`: trunk ≤ 30 % of height (visible but short), 5–7 overlapping lobes, crown wider than tall, lowest lobe close to the trunk top; two greens. Same names, so every consumer gets the fix. `tree_indoor`: shorter stem, fuller crown |
+| `fh-gardens` night 1 | indoor trees read as small pots in a planter row | handled by the garden-floor redesign above; trees ≥ .9 local tall, crowns touching the ceiling light so they read at night |
+
+New kit props allowed: `pendant_lamp` (emissive shade), `rug`, `whiteboard`, `upper_cabinet`, `art_panel`, `meeting_table` (budget ≤ 600 tris each, `kit_*` materials).
+
+## Checks
+
+- **Gates:** `npm test && npm run build && git diff --check`.
+- **Captures:** `flagship-high` day and night into `~/city2127-evidence/se-high-blender/r3/`.
+- **Close-up crops:** add top-half crops like R2's top-day/top-night.
+- **Kit:** a new `kit-lineup.png`.
+- **Other states:** this round touches no shared material, so −1/0 are not re-captured. If you do touch one, capture them.
+- **Iterations:** at most three capture-fix iterations.
+- **FPS:** run `fps.sh se:high` once, if time allows.
