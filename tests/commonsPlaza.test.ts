@@ -57,7 +57,7 @@ test('commons states follow the band, retarget smoothly, hide before the exhibit
   for (const group of [...BANDS.map(state), canopy('mixed'), canopy('high')]) {
     const wasVisible = group.visible, scale = group.scale.clone();
     group.visible = true;
-    if (group.name.includes('canopy')) group.scale.set(group.name.endsWith('mixed') ? 2.4 / 5.2 : 5 / 5.2 * 1.15, 1, 1).multiplyScalar(group.name.endsWith('mixed') ? 1 : 1).setZ(group.name.endsWith('mixed') ? 2.4 / 5.2 : 5 / 5.2).setY(group.name.endsWith('mixed') ? 2.4 / 5.2 : 5 / 5.2);
+    if (group.name.includes('canopy')) group.scale.set(group.name.endsWith('mixed') ? 2.0 / 5.2 : 5 / 5.2 * 1.15, 1, 1).multiplyScalar(group.name.endsWith('mixed') ? 1 : 1).setZ(group.name.endsWith('mixed') ? 2.0 / 5.2 : 5 / 5.2).setY(group.name.endsWith('mixed') ? 2.0 / 5.2 : 5 / 5.2);
     group.updateMatrixWorld(true);
     const box = new T.Box3().setFromObject(group).applyMatrix4(inverse);
     group.visible = wasVisible;
