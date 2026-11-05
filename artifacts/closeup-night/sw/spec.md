@@ -158,3 +158,19 @@ Keep (2 in R5; must not lose): `fl-pods`, `fl-screens`, `fm-ring`, `fm-deck`, `f
 - **Garden (fl-garden)** — ≥ 8 small trees with visible trunks between the pods, beds dense.
 
 Screenshots to `~/city2127-evidence/closeup-night/sw/r7/` (same names) + `vs-target.jpg`.
+
+## R8 — the 1-score items (R7 21/30, kept 6–1)
+
+Keep (2 in R7; must not lose): `fm-ring`, `fm-deck`, `fh-amph`, `fh-people`, `fh-tables`, `fh-planting`. Figures' build unchanged except where named.
+
+- **Pod shell (fl-pods)** — reads as boxy cubes. Make it a horizontal capsule like the target: width 1.0 : height .85 : depth 1.3, dome-rounded top and sides (capsule/lathe/superellipsoid, no flat faces visible), the front a large rounded "TV" opening; glass must read as glass: a clear curved sheet with a pale specular highlight band (e.g. `MeshPhysicalMaterial` low opacity + clearcoat, or a thin white gradient strip along the top edge) in front of the warm interior — not a flat orange fill.
+- **Pod residents (fl-people-in)** — no mirror-twins: vary each pair (one leaning forward with an arm gesture, the other leaning back; different shirt colours; slight yaw difference); no clipping with seats or table.
+- **Emitters (fl-emitters, fm-pods)** — washed-out by day. Use contrast instead of additive bloom: a mid-grey belly plate (#5d6872, r .55) under the pod, a solid saturated cyan ring on it (#38c8ff, emissive strong, toneMapped false, torus r .5 tube .08), a small bright core pad; keep only a faint bloom (opacity ≤ .15). Clear dark gap to the ground.
+- **Screens (fl-screens)** — no foliage within .6 of a screen; make the membrane material opaque-ish (opacity ≥ .92 with `depthWrite: true`, or opaque white with emissive .1) so sorting artifacts ("dark green holes") disappear.
+- **Garden (fl-garden)** — no flat lawn visible inside the hedge except the paths: cover all beds with dense leafy planting (mixed heights .2–.7, two-three greens), ≥ 8 small trees with trunks between pods.
+- **Mixed pods (fm-pods)** — mixed pods ×.85, staggered so none overlaps another from the camera (check in the capture).
+- **Divider (fm-divider)** — a wider two-tier stepped planter (≈ 1.2 wide, tiers .45 and .8 high) with 6–7 trees of varied height and dense shrubs spilling over both tiers.
+- **Mixed canopy (fm-canopy)** — R7 reads small and low at the back edge: r 2.4, y 2.9, centre shifted .6 toward the camera from the circle centre (stay inside the lot); 4 compact bright stabiliser rings under the rim. Verify the near half of the ring and its residents remain unoccluded.
+- **High disc (fh-disc)** — remove the stray glowing white ellipses under the disc (replace with 6 small bright emitter pads r ≤ .25); keep light machinery, pink rim and ribs.
+
+Screenshots to `~/city2127-evidence/closeup-night/sw/r8/` (same names) + `vs-target.jpg`.
