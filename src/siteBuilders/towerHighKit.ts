@@ -10,64 +10,86 @@ export const HW = 5.2, LOBBY = 3.6, HF = 2.4, TOP = LOBBY + 14 * HF, FLOOR_TOP =
 const LOW = 2.2, TALL = 1.5, CHAIR = 1.8; // furniture and tall pieces: scaled up so a desk is person-sized, not 1.8 m-person-sized
 const PI = Math.PI, EAST = PI / 2, WEST = -PI / 2;
 
-type Programme = 'lounge' | 'office' | 'library' | 'cafe' | 'gym' | 'studio';
-// Office x4, library x2, cafe x2, lounge x2, gym, studio (+ one more office); garden floors add indoor trees (T6).
-const FLOORS: { programme: Programme; garden: boolean }[] = [
-  { programme: 'lounge', garden: false }, { programme: 'office', garden: false }, { programme: 'library', garden: true },
-  { programme: 'office', garden: false }, { programme: 'cafe', garden: false }, { programme: 'lounge', garden: true },
-  { programme: 'office', garden: false }, { programme: 'library', garden: true }, { programme: 'gym', garden: false },
-  { programme: 'cafe', garden: true }, { programme: 'office', garden: false }, { programme: 'studio', garden: true },
-  { programme: 'office', garden: false },
+const BACK = -2.2; // back wall (-X, facing the camera at H)
+type Put = (name: string, x: number, z: number, yaw?: number, scale?: number, lift?: number) => void;
+type Who = (x: number, z: number, yaw?: number, lift?: number) => void;
+interface Floor { garden: boolean; build: (put: Put, seat: Who, stand: Who, y: number) => void }
+
+/** R3: each floor has its own back-wall feature (facing +X) and mid-room cluster; garden floors have trees of different kit sizes, potted plants and a bench. */
+const FLOORS: Floor[] = [
+  { garden: false, build: (put, seat, stand) => { // lounge: long sofa, rug, art
+    put('sofa', BACK + .3, -.3, EAST, 2.6); put('rug', -.6, -.3, EAST, 2.4); put('art_panel', BACK + .05, -.9, EAST, 2); put('art_panel', BACK + .05, .3, EAST, 2);
+    put('cafe_set', .6, 1.3, EAST, 1.8); put('floor_lamp', 1.9, -1.8, 0, TALL); put('potted_plant', 1.9, 1.7, 0, 2.2);
+    seat(BACK + .5, -.6, EAST); stand(1.9, .2); } },
+  { garden: false, build: (put, seat, stand) => { // office: two facing desk pairs, meeting table, whiteboard
+    for (const z of [-1.5, -.2]) { put('desk_monitor', -1.0, z, EAST); put('chair_office', -.4, z, WEST, CHAIR); put('desk_monitor', .9, z, WEST); put('chair_office', .3, z, EAST, CHAIR); }
+    put('meeting_table', .2, 1.6, EAST, 1.4); put('whiteboard', BACK + .1, 1.2, EAST, 1.6);
+    seat(-.4, -1.5, WEST); seat(.3, -.2, EAST); stand(1.9, .9); } },
+  { garden: true, build: (put, seat, stand) => { // library + garden
+    for (const z of [-1.6, -.5, .6]) put('bookshelf', BACK + .1, z, EAST, 1.5);
+    put('rug', -.5, 1.5, EAST, 1.8); put('bench', -.5, 1.5, EAST, 1.8);
+    put('tree_indoor', 1.7, -1.6, 0, 2.6); put('tree_round_s', 1.5, 1.6, 0, 1.7); put('potted_plant', .3, .2, 0, 2.2); put('potted_plant', 1.9, .5, 0, 2);
+    seat(-.5, 1.4, EAST); stand(.9, -.4); } },
+  { garden: false, build: (put, seat, stand) => { // studio: pin-board wall, big table, lamps
+    for (const z of [-1.5, 0, 1.5]) put('art_panel', BACK + .05, z, EAST, 2.1);
+    put('meeting_table', -.2, -.3, EAST, 1.7); put('floor_lamp', 1.9, -2, 0, TALL); put('floor_lamp', 1.9, 2, 0, TALL);
+    seat(.34, -.3, WEST); seat(-.74, -.3, EAST); stand(1.8, .9); } },
+  { garden: false, build: (put, seat, stand, y) => { // cafe: counter, cabinets, pendants, two tables
+    put('kitchen_counter', BACK + .2, .5, EAST, 1.8); put('upper_cabinet', BACK + .05, .5, EAST, 1.8);
+    put('cafe_set', .4, -1.4, EAST, 1.8); put('cafe_set', .6, .2, EAST, 1.8); put('potted_plant', 1.9, 1.8, 0, 2);
+    for (const z of [-1.4, .2, 1.4]) put('pendant_lamp', .5, z, 0, 1.3, 2.14 - 1.2 * UNITS_PER_METRE * 1.3);
+    seat(.4, -1.4 - .8 * 1.8 * UNITS_PER_METRE, 0); stand(1.9, -.4); void y; } },
+  { garden: true, build: (put, seat, stand) => { // lounge + garden
+    put('sofa', BACK + .35, 1.2, EAST, 2.2); put('art_panel', BACK + .05, 1.2, EAST, 2.1); put('rug', -.5, 1.2, EAST, 2);
+    put('tree_indoor', 1.7, .9, 0, 2.4); put('tree_indoor', 1.7, -1.9, 0, 2.7); put('tree_round_s', -.3, -1.7, 0, 1.8); put('potted_plant', 1.0, 0, 0, 2.1);
+    seat(BACK + .55, 1.2, EAST); stand(1.9, -.6); } },
+  { garden: false, build: (put, seat, stand) => { // gym: mirror wall, treadmills
+    for (const z of [-1.5, 0, 1.5]) put('whiteboard', BACK + .1, z, EAST, 1.6);
+    for (const z of [-1.4, -.1, 1.2]) put('treadmill', -.1, z, WEST, 1.6);
+    put('bench', 1.6, 1.8, EAST, 1.6); put('potted_plant', 1.9, -2, 0, 2);
+    people_gym(stand); } },
+  { garden: true, build: (put, seat, stand) => { // library + garden, reading sofa
+    for (const z of [.2, 1.4]) put('bookshelf', BACK + .1, z, EAST, 1.5);
+    put('upper_cabinet', BACK + .05, -1.2, EAST, 1.8); put('sofa', -.1, -1.2, PI, 2.2); put('rug', -.1, -1.2, EAST, 2);
+    put('tree_round_s', 1.6, .4, 0, 1.9); put('tree_indoor', 1.8, -1.7, 0, 2.5); put('tree_round_s', -.2, 1.7, 0, 1.5); put('potted_plant', 1.0, 1.7, 0, 2);
+    seat(-.1, -1.2, PI); stand(1.2, -.2); } },
+  { garden: false, build: (put, seat, stand) => { // office: wall desks, art, meeting table, pendants
+    for (const z of [-1.6, -.3, 1.0]) { put('desk_monitor', BACK + .5, z, EAST); put('chair_office', -1.0, z, WEST, CHAIR); put('art_panel', BACK + .05, z, EAST, 2); }
+    put('meeting_table', .7, -.4, EAST, 1.5);
+    for (const z of [-.9, .1]) put('pendant_lamp', .7, z, 0, 1.3, 2.14 - 1.2 * UNITS_PER_METRE * 1.3);
+    seat(-1.0, -.3, WEST); seat(.7 + .5, -.4, WEST); stand(1.9, 1.2); } },
+  { garden: true, build: (put, seat, stand) => { // cafe + garden
+    put('kitchen_counter', BACK + .2, -1.0, EAST, 1.8); put('upper_cabinet', BACK + .05, -1.0, EAST, 1.8);
+    for (const z of [-1.4, -.2]) put('pendant_lamp', -.3, z, 0, 1.3, 2.14 - 1.2 * UNITS_PER_METRE * 1.3);
+    put('cafe_set', -.2, .3, EAST, 1.8); put('tree_indoor', 1.7, 1.5, 0, 2.5); put('tree_round_s', .4, 1.9, 0, 1.6); put('tree_indoor', 1.8, -1.6, 0, 2.2); put('bench', 1.2, -.1, EAST, 1.8);
+    seat(1.2, -.1, EAST); stand(-.9, 1.2); } },
+  { garden: false, build: (put, seat, stand) => { // lounge: two sofas around a rug
+    for (const z of [-1.5, .4]) put('bookshelf', BACK + .1, z, EAST, 1.5);
+    put('art_panel', BACK + .05, 1.7, EAST, 2); put('rug', .3, -.2, EAST, 2.4); put('sofa', -.3, -1.2, EAST, 2); put('sofa', .9, .9, WEST, 2);
+    put('floor_lamp', 1.9, -2, 0, TALL); put('floor_lamp', -1.8, 2, 0, TALL);
+    seat(-.3, -1.2, EAST); seat(.9, .9, WEST); stand(1.8, -.2); } },
+  { garden: true, build: (put, seat, stand) => { // studio + garden
+    for (const z of [-1.6, .8]) { put('desk_monitor', BACK + .5, z, EAST); put('art_panel', BACK + .05, z, EAST, 2.1); }
+    put('chair_office', -1.0, .8, WEST, CHAIR);
+    put('tree_indoor', 1.7, -.3, 0, 2.6); put('tree_round_s', 1.2, 1.8, 0, 1.7); put('tree_round_s', -.1, -1.9, 0, 1.4); put('potted_plant', .3, .6, 0, 2.1); put('floor_lamp', .3, -.9, 0, TALL);
+    seat(-1.0, .8, WEST); stand(.9, 1.3); } },
+  { garden: false, build: (put, seat, stand) => { // office: shelves, meeting table, pendants, corner sofa
+    for (const z of [-1.7, -.6, .5]) put('bookshelf', BACK + .1, z, EAST, 1.5);
+    put('meeting_table', .2, .2, EAST, 1.6); put('sofa', 1.4, -1.5, EAST, 1.6); put('rug', 1.4, -1.5, EAST, 1.4);
+    for (const z of [-.5, .2, .9]) put('pendant_lamp', .2, z, 0, 1.3, 2.14 - 1.2 * UNITS_PER_METRE * 1.3);
+    seat(.2 + .46, .2, WEST); seat(.2 - .46, .2, EAST); stand(1.9, 1.5); } },
 ];
-export const FLOOR_PROGRAMMES = FLOORS;
+export const FLOOR_COUNT = FLOORS.length;
+const people_gym = (stand: Who) => { stand(-.1, -1.4, EAST, .2); stand(-.1, 1.2, EAST, .2); stand(1.9, 0.3, PI); };
 
 /** Contents of floor `index` (0..12): world-local positions on that floor's slab top. Camera H looks in from +X. */
 export function floorKit(index: number): TowerKit {
-  const { programme, garden } = FLOORS[index];
+  const { garden, build } = FLOORS[index];
   const y = LOBBY + index * HF + FLOOR_TOP;
   const props: PropPlacement[] = [], people: Person[] = [];
-  const put = (name: string, x: number, z: number, yaw = 0, scale = LOW) => props.push({ name, position: [x, y, z], yaw, scale });
-  const seat = (x: number, z: number, yaw: number) => people.push([x, y, z, true, yaw]);
-  const stand = (x: number, z: number, yaw = EAST) => people.push([x, y, z, false, yaw]);
-  switch (programme) {
-    case 'office':
-      for (const z of [-1.6, -.2, 1.2]) { put('desk_monitor', -.5, z, EAST); put('chair_office', .1, z, WEST, CHAIR); }
-      seat(.1, -.2, WEST); seat(.1, 1.2, WEST); stand(1.9, -1.1);
-      put('floor_lamp', 2.0, 2.0, 0, TALL);
-      break;
-    case 'library':
-      for (const z of [-1.7, -.5, .7, 1.9]) put('bookshelf', -2.1, z, EAST, TALL);
-      put('sofa', .6, -1.0, EAST); put('floor_lamp', .5, 1.6, 0, TALL); put('potted_plant', 1.9, 1.6, 0, 1.9);
-      seat(.6, -1.0, EAST); stand(-1.3, .6, WEST); stand(1.9, -.2);
-      break;
-    case 'cafe':
-      put('kitchen_counter', -2.0, .6, EAST, 1.8);
-      for (const z of [-1.6, -.1]) put('cafe_set', .5, z, EAST, 1.8);
-      seat(.5, -.1 - .8 * 1.8 * UNITS_PER_METRE, 0); // the set's +x chair, turned to the table
-      stand(-1.2, .9, WEST); stand(1.9, 1.4);
-      break;
-    case 'lounge':
-      put('sofa', -1.5, -1.0, EAST); put('sofa', .8, 1.5, PI);
-      put('floor_lamp', -1.8, 2.0, 0, TALL); put('floor_lamp', 1.9, -1.9, 0, TALL);
-      seat(-1.5, -1.0, EAST); seat(.8, 1.5, PI); stand(1.8, -.4);
-      break;
-    case 'gym':
-      for (const z of [-1.6, -.2, 1.2]) put('treadmill', .2, z, WEST, 1.6);
-      people.push([.2, y + .2, -1.6, false, EAST], [.2, y + .2, 1.2, false, EAST]); seat(-1.7, .6, EAST);
-      put('potted_plant', 1.9, 2.0, 0, 1.9);
-      break;
-    case 'studio':
-      put('desk_monitor', -1.6, -1.2, EAST); put('chair_office', -1.0, -1.2, WEST, CHAIR);
-      put('desk_monitor', -1.6, .6, EAST); put('chair_office', -1.0, .6, WEST, CHAIR);
-      put('bookshelf', -2.1, 1.9, EAST, TALL); put('sofa', 1.0, 1.0, WEST);
-      seat(-1.0, -1.2, WEST); seat(1.0, 1.0, WEST); stand(1.9, -1.2);
-      break;
-  }
-  if (garden) { // T6: trees inside the floor, behind the +X glass, and a long planter along it
-    put('tree_indoor', 1.8, -1.8, 0, 2.3); put('tree_indoor', 1.8, 1.8, 0, 2.4); put('tree_indoor', -.4, 2.0, 0, 2.1);
-    put('potted_plant', 1.9, 0, 0, 1.9);
-    for (const z of [-.8, 0, .8]) put('planter_1m', 2.1, z + .1, EAST, 1.8);
-  }
+  const put: Put = (name, x, z, yaw = 0, scale = LOW, lift = 0) => props.push({ name, position: [x, y + lift, z], yaw, scale });
+  build(put, (x, z, yaw = EAST, lift = 0) => people.push([x, y + lift, z, true, yaw]), (x, z, yaw = EAST, lift = 0) => people.push([x, y + lift, z, false, yaw]), y);
+  void garden;
   return { props, people };
 }
 
@@ -95,18 +117,17 @@ export function forecourtKit(): TowerKit {
   return { props, people };
 }
 
-/** Roof garden (T7) on the cap top: five trees and shrubs around the rim. */
+/** Roof garden: a dense low mound on the cap top (R3): four low cluster trees and many overlapping shrubs, nothing above ~2.2 over the cap. */
 export function roofKit(): TowerKit {
   const y = TOP + .7, props: PropPlacement[] = [];
-  for (let i = 0; i < 5; i++) {
-    const a = .3 + i * 1.26;
-    props.push({ name: i % 2 ? 'tree_round_s' : 'tree_round_m', position: [Math.cos(a) * 1.9, y, Math.sin(a) * 1.9], yaw: i, scale: 2.1 });
+  // Camera H looks up at the roof from +X, so crowns need ~2.5 over the cap to clear the near rim (the spec's 2.2 is not visible from H).
+  [[2.6, 2.2, 'tree_round_m'], [3.7, 2.1, 'tree_round_m'], [.5, 1.9, 'tree_round_s'], [5.1, 2.0, 'tree_round_s']].forEach(([a, k, name], i) => {
+    props.push({ name: name as string, position: [Math.cos(a as number) * 1.6, y, Math.sin(a as number) * 1.6], yaw: i, scale: k as number });
+  });
+  for (let i = 0; i < 14; i++) {
+    const a = i * .9, r = [2.8, 2.2, 1.0][i % 3] + (i % 2) * .15;
+    props.push({ name: 'shrub_cluster', position: [Math.cos(a) * r, y, Math.sin(a) * r], yaw: i, scale: 2.1 + (i % 3) * .2 });
   }
-  for (let i = 0; i < 11; i++) {
-    const a = i * .57, r = i % 3 === 0 ? 2.9 : 2.5;
-    props.push({ name: 'shrub_cluster', position: [Math.cos(a) * r, y, Math.sin(a) * r], yaw: i, scale: 1.9 });
-  }
-  props.push({ name: 'shrub_cluster', position: [0, y, 0], scale: 2.2 });
   return { props, people: [] };
 }
 

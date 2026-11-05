@@ -27,8 +27,11 @@ const lamp = new T.MeshStandardMaterial({ color: '#f7cfb0', emissive: '#f7cfb0',
 const pane = new T.MeshStandardMaterial({ color: '#cfe6f2', roughness: .1, transparent: true, opacity: .18, depthWrite: false });
 const paneBlue = new T.MeshStandardMaterial({ color: '#bfe0f5', roughness: .1, transparent: true, opacity: .45, depthWrite: false });
 // +1 only (T4, T9): white ceilings with a mild glow, cream-white upper rooms, pale forecourt paving.
-const ceilingHigh = new T.MeshStandardMaterial({ color: '#ffffff', emissive: '#fff4e6', emissiveIntensity: .35, roughness: .7 });
-const cream = new T.MeshStandardMaterial({ color: '#fbf3e6', emissive: '#fff0dc', emissiveIntensity: .5, roughness: .7 });
+const ceilingHigh = new T.MeshStandardMaterial({ color: '#fff6ea', emissive: '#fff6ea', emissiveIntensity: .6, roughness: .7 });
+const cream = new T.MeshStandardMaterial({ color: '#f7e2c8', emissive: '#ffd9b0', emissiveIntensity: .5, roughness: .7 });
+// R3: tower glazing that tints nothing (unlit, so it never mirrors the sky over the rooms) and a visible white-blue lift tube.
+const paneHigh = new T.MeshBasicMaterial({ color: '#fff8ee', transparent: true, opacity: .08, depthWrite: false });
+const liftGlass = new T.MeshStandardMaterial({ color: '#dceefa', roughness: .1, transparent: true, opacity: .35, emissive: '#dceefa', emissiveIntensity: .15, depthWrite: false });
 const paving = paint('#ece6da', .8);
 const water = new T.MeshStandardMaterial({ color: '#7cc4ea', emissive: '#3a86b8', emissiveIntensity: .15, roughness: .25 });
 const unitBox = new T.BoxGeometry(1, 1, 1);
@@ -273,8 +276,8 @@ const fitout = (g: T.Group, x: number, y: number, z: number): T.Object3D => {
 };
 
 /** Meter ring(s); each spot is [x, y, z, scale]. The geometry rests on y = 0 (instances are placed by their base), so lot bounds can be read without instance matrices. */
-const ring = (radius: number, tube: number, spots: [number, number, number, number?][]) => {
-  const mesh = new T.InstancedMesh(new T.TorusGeometry(radius, tube, 8, 48).rotateX(Math.PI / 2).translate(0, tube, 0), amber, spots.length);
+const ring = (radius: number, tube: number, spots: [number, number, number, number?][], tubular = 48, radial = 8) => {
+  const mesh = new T.InstancedMesh(new T.TorusGeometry(radius, tube, radial, tubular).rotateX(Math.PI / 2).translate(0, tube, 0), amber, spots.length);
   mesh.name = 'tower-meter-band';
   spots.forEach(([x, y, z, s = 1], i) => mesh.setMatrixAt(i, new T.Matrix4().makeScale(s, s, s).setPosition(x, y - tube * s, z)));
   return mesh;
@@ -586,7 +589,7 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit, assets?: Site
     towerUpper.add(group);
     return { group, proc };
   };
-  const midCabin = lift('tower-mid-cabin', 18);
+  const midCabin = lift('tower-mid-cabin', 17);
   const liftCabin = lift('tower-elevator-cabin', CABIN_LOW);
   const elevator = liftCabin.group;
 
@@ -639,7 +642,7 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit, assets?: Site
     towerUpperLayer.setPreparation(async () => {
       const glb = await assets.cloneRoot('concentration-tower-high', 'centerGaiRear', 'towerUpper');
       const kit = await loadPropKit(assets); // sequential: a load that never resolves must not start the kit
-      remapCityMaterials(glb, { se_white: white, se_amber: amber, se_room: room, se_cream: cream, se_ceiling: ceilingHigh, se_light: light, se_pane: pane, se_paving: paving });
+      remapCityMaterials(glb, { se_white: white, se_amber: amber, se_room: room, se_cream: cream, se_ceiling: ceilingHigh, se_light: light, se_glass: paneHigh, se_lift_glass: liftGlass, se_paving: paving });
       const place = (spec: TowerKit, parent: T.Object3D, name: string) => {
         const group = instanceProps(kit, spec.props, UNITS_PER_METRE);
         group.name = name;
@@ -658,11 +661,11 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit, assets?: Site
       for (const [i, module] of highModulePool.entries()) { module.proc.visible = false; place(moduleKit(i), module.group, 'tower-high-module-kit'); }
       for (const cabinGroup of [midCabin, liftCabin]) {
         cabinGroup.proc.visible = false;
-        const spec: TowerKit = { props: [{ name: 'lift_cabin', position: [0, 0, 0], yaw: Math.PI / 2, scale: 1.4 / (2 * UNITS_PER_METRE) }], people: [[0, .12, 0, false, Math.PI / 2]] };
+        const spec: TowerKit = { props: [{ name: 'lift_cabin', position: [0, 0, 0], yaw: Math.PI / 2, scale: 1.2 / (2 * UNITS_PER_METRE) }], people: [[0, .08, 0, false, Math.PI / 2]] };
         place(spec, cabinGroup.group, 'tower-cabin-kit');
       }
       towerUpper.remove(meterRing); // the Meter ring moves onto the GLB cap rim: y TOP + .35, radius 3.7, tube .3
-      towerUpper.add(ring(3.7, .3, [[0, TOP + .35, 0]]));
+      towerUpper.add(ring(3.7, .3, [[0, TOP + .35, 0]], 96, 12));
     });
     void towerUpperLayer.prepare(); // load now, so the first 3 s rise already shows the GLB
   }

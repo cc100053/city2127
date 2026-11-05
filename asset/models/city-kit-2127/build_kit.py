@@ -20,11 +20,12 @@ sys.path.insert(0, os.path.dirname(HERE))
 from geo_helpers import Acc, blob, circle_pts, cyl, material, obox, plane, rot, rrect_pts, sweep, yawed, finish_mesh  # noqa: E402
 
 COLORS = {
-    "kit_leaf_a": ((.36, .58, .27, 1), {}), "kit_leaf_b": ((.5, .68, .33, 1), {}),
+    "kit_leaf_a": ((.3, .52, .23, 1), {}), "kit_leaf_b": ((.42, .62, .28, 1), {}),
     "kit_bark": ((.79, .57, .35, 1), {}), "kit_white": ((.96, .95, .92, 1), {}),
     "kit_wood": ((.85, .7, .5, 1), {}), "kit_dark": ((.2, .22, .25, 1), {}),
     "kit_fabric": ((.84, .6, .47, 1), {}), "kit_soil": ((.35, .27, .22, 1), {}),
     "kit_screen": ((1, .94, .82, 1), {"emit": (1, .9, .7, 1), "emit_strength": 1.6}),
+    "kit_amber": ((1, .7, .22, 1), {"emit": (1, .7, .22, 1), "emit_strength": 1.2}),
     "kit_glass": ((.81, .9, .95, .22), {}),
 }
 FOLIAGE = {"kit_leaf_a", "kit_leaf_b"}
@@ -39,30 +40,35 @@ class Prop:
 
 
 def blobs(p, lobes, sub=3, noise=.12):
-    for i, (cx, cy, cz, rx, ry, rz, m) in enumerate(lobes):
-        blob(p.a(m), (cx, cy, cz), (rx, ry, rz), sub=sub, seed=i * 2.7 + len(p.name), noise=noise)
+    """Lobes are (cx, cy, cz, rx, ry, rz, material[, subdivision])."""
+    for i, (cx, cy, cz, rx, ry, rz, m, *sd) in enumerate(lobes):
+        blob(p.a(m), (cx, cy, cz), (rx, ry, rz), sub=sd[0] if sd else sub, seed=i * 2.7 + len(p.name), noise=noise)
 
 
 def trunk(p, R, y0, y1, n=10):
     sweep(p.a("kit_bark"), lambda k: circle_pts(0, 0, R, n, k), [(0, y0), (R * .55, y1)])
 
 
-def tree(f, lobes):
+# R3: short trunk (<= 30 % of the height), 5-7 overlapping lobes, crown wider than tall, lowest lobe on the trunk top.
+LOBES_M = [(0, 1.55, 0, 1.35, .95, 1.35, "kit_leaf_a", 3), (1.0, 1.35, .35, .95, .7, .95, "kit_leaf_b", 3),
+           (-.95, 1.4, -.35, .95, .72, .95, "kit_leaf_b", 3), (.25, 2.2, -.55, .9, .68, .9, "kit_leaf_a", 2),
+           (-.35, 2.25, .55, .8, .62, .8, "kit_leaf_b", 2), (.6, 1.9, .95, .65, .5, .65, "kit_leaf_a", 2),
+           (-.75, 1.1, .7, .6, .48, .6, "kit_leaf_a", 2)]
+
+
+def tree(f, n):
     def build(p):
-        trunk(p, .09 * f, 0, 2.3 * f)
-        blobs(p, [(x * f, y * f, z * f, rx * f, ry * f, rz * f, m) for x, y, z, rx, ry, rz, m in lobes])
+        trunk(p, .11 * f, 0, 1.3 * f)  # runs up inside the lowest lobe; ~ 0.85 m shows
+        blobs(p, [(x * f, y * f, z * f, rx * f, ry * f, rz * f, m, sd) for x, y, z, rx, ry, rz, m, sd in LOBES_M[:n]])
     return build
-
-
-LOBES_M = [(0, 2.7, 0, 1.15, .95, 1.15, "kit_leaf_a"), (.7, 2.35, .3, .8, .7, .8, "kit_leaf_b"),
-           (-.6, 2.5, -.3, .85, .75, .85, "kit_leaf_a"), (.1, 3.3, -.2, .7, .6, .7, "kit_leaf_b")]
 
 
 def tree_indoor(p):
     cyl(p.a("kit_white"), 0, 0, .24, 0, .42, 16, r_top=.2)
     cyl(p.a("kit_bark"), 0, 0, .2, .38, .45, 16)  # soil, in the trunk colour: <= 3 materials
-    sweep(p.a("kit_bark"), lambda k: circle_pts(0, 0, .035, 8, k), [(0, .42), (.015, 1.3)])
-    blobs(p, [(0, 1.45, 0, .5, .42, .5, "kit_leaf_a"), (.18, 1.72, .06, .36, .3, .36, "kit_leaf_a"), (-.2, 1.65, -.1, .3, .27, .3, "kit_leaf_a")], sub=2)
+    sweep(p.a("kit_bark"), lambda k: circle_pts(0, 0, .045, 8, k), [(0, .42), (.02, .8)])
+    blobs(p, [(0, 1.15, 0, .62, .5, .62, "kit_leaf_a", 3), (.35, 1.0, .12, .42, .34, .42, "kit_leaf_a", 2), (-.35, 1.05, -.15, .42, .34, .42, "kit_leaf_a", 2),
+              (.05, 1.55, -.05, .45, .36, .45, "kit_leaf_a", 2), (-.2, 1.4, .35, .34, .28, .34, "kit_leaf_a", 2)])
 
 
 def shrub_cluster(p):
@@ -192,27 +198,87 @@ def treadmill(p):
 
 
 def lift_cabin(p):
-    W, G, S = p.a("kit_white"), p.a("kit_glass"), p.a("kit_screen")
-    w, h, t = 2.0, 2.8, .08
+    W, S, A = p.a("kit_white"), p.a("kit_screen"), p.a("kit_amber")
+    w, h, t = 2.0, 3.2, .08  # R3: 1.0 : 1.6, a tall cabin (placed at ~1.2 x 1.9 local units)
     obox(W, (0, .06, 0), (w, .12, w))
     obox(W, (0, h - .07, 0), (w + .06, .14, w + .06))
     obox(W, (0, h / 2, -w / 2 + t / 2), (w, h - .2, t))
     for x in (-1, 1):
         obox(W, (x * (w / 2 - t / 2), h / 2, 0), (t, h - .2, w - 2 * t))
-    obox(W, (0, .4, w / 2 - t / 2), (w, .56, t))  # front: sill, lintel, two pillars around a window
-    obox(W, (0, h - .55, w / 2 - t / 2), (w, .7, t))
+    sill, lintel = 1.0, h - .75  # front: sill and lintel panels, two pillars, one big window between
+    obox(W, (0, (.12 + sill) / 2, w / 2 - t / 2), (w, sill - .12, t))
+    obox(W, (0, (lintel + h - .14) / 2, w / 2 - t / 2), (w, h - .14 - lintel, t))
     for x in (-1, 1):
-        obox(W, (x * .85, (.68 + h - .9) / 2, w / 2 - t / 2), (.3, h - .9 - .68, t))
-    plane(G, [(-.7, .68, w / 2 - .04), (.7, .68, w / 2 - .04), (.7, h - .9, w / 2 - .04), (-.7, h - .9, w / 2 - .04)], (0, 0, 1))
+        obox(W, (x * .85, (sill + lintel) / 2, w / 2 - t / 2), (.3, lintel - sill, t))
     obox(S, (0, h / 2, -w / 2 + t + .01), (w - .3, h - .5, .01))  # warm lit back wall
     obox(S, (0, h - .22, 0), (1.2, .02, 1.2))
+    obox(A, (0, .19, w / 2 + .005), (w + .02, .1, .02))  # thin amber trim at the floor line
+    for x in (-1, 1):
+        obox(A, (x * (w / 2 + .005), .19, 0), (.02, .1, w))
+
+
+def pendant_lamp(p):
+    """Origin at the lamp's lowest point: hangs from a 1.2 m cord, so place it at ceiling height minus 1.2 m."""
+    D, S = p.a("kit_dark"), p.a("kit_screen")
+    cyl(S, 0, 0, .12, 0, .22, 16, r_top=.28)
+    cyl(D, 0, 0, .006, .22, 1.2, 4)
+
+
+def rug(p):
+    F, W = p.a("kit_fabric"), p.a("kit_white")
+    sweep(F, lambda k: rrect_pts(0, 0, 1.0, .7, (.08,) * 4, 3, k), [(0, 0), (0, .02)])
+    sweep(W, lambda k: rrect_pts(0, 0, 1.0, .7, (.08,) * 4, 3, k), [(.12, .015), (.12, .025)])
+
+
+def whiteboard(p):
+    W, D, F = p.a("kit_white"), p.a("kit_dark"), p.a("kit_fabric")
+    obox(W, (0, 1.4, 0), (1.6, 1.0, .03))
+    for y in (.9, 1.9):
+        obox(D, (0, y, 0), (1.66, .04, .05))
+    for x in (-.83, .83):
+        obox(D, (x, 1.4, 0), (.04, 1.0, .05))
+        obox(D, (x * .9, .45, 0), (.05, .9, .3))
+    for x, y, w in ((-.4, 1.6, .5), (.2, 1.45, .7), (-.2, 1.25, .4)):
+        obox(F, (x, y, .02), (w, .035, .005))
+
+
+def upper_cabinet(p):
+    W, O, D = p.a("kit_white"), p.a("kit_wood"), p.a("kit_dark")
+    obox(W, (0, 1.8, 0), (1.8, .7, .35))
+    for x in (-.45, .45):
+        obox(O, (x, 1.8, .18), (.86, .64, .02))
+        obox(D, (x * .15 + (-.4 if x < 0 else .4), 1.6, .2), (.02, .12, .02))
+
+
+def art_panel(p):
+    D, F, G = p.a("kit_white"), p.a("kit_fabric"), p.a("kit_leaf_a")
+    obox(D, (0, 1.5, 0), (1.2, .8, .04))
+    obox(F, (-.28, 1.5, .025), (.5, .64, .01))
+    obox(G, (.3, 1.58, .025), (.5, .48, .01))
+    obox(D, (.3, 1.3, .025), (.5, .1, .012))
+
+
+def meeting_table(p):
+    O, W, D = p.a("kit_wood"), p.a("kit_white"), p.a("kit_dark")
+    obox(O, (0, .75, 0), (2.4, .05, 1.0))
+    for x in (-1, 1):
+        obox(W, (x, .36, 0), (.08, .72, .7))
+    for x in (-.7, 0, .7):
+        for s in (-1, 1):
+            yaw = math.pi if s > 0 else 0  # chairs face the table
+            t, n = yawed(yaw)
+            obox(D, (x, .48, s * .78), (.44, .06, .44), t, n)
+            ox, oz = rot(0, -.2, yaw)
+            obox(D, (x + ox, .74, s * .78 + oz), (.44, .45, .05), t, n)
+            obox(D, (x, .22, s * .78), (.06, .44, .06))
 
 
 PROPS = {
-    "tree_round_s": tree(.65, LOBES_M[:3]), "tree_round_m": tree(1, LOBES_M), "tree_round_l": tree(1.45, LOBES_M),
+    "tree_round_s": tree(.65, 5), "tree_round_m": tree(1, 7), "tree_round_l": tree(1.45, 7),
     "tree_indoor": tree_indoor, "shrub_cluster": shrub_cluster, "potted_plant": potted_plant, "planter_1m": planter_1m,
     "bench": bench, "desk_monitor": desk_monitor, "chair_office": chair_office, "sofa": sofa, "bookshelf": bookshelf,
     "kitchen_counter": kitchen_counter, "cafe_set": cafe_set, "floor_lamp": floor_lamp, "treadmill": treadmill, "lift_cabin": lift_cabin,
+    "pendant_lamp": pendant_lamp, "rug": rug, "whiteboard": whiteboard, "upper_cabinet": upper_cabinet, "art_panel": art_panel, "meeting_table": meeting_table,
 }
 
 

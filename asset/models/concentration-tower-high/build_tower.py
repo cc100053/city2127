@@ -32,7 +32,7 @@ ROLES = {  # role: (preview rgba, emission)
     "se_white": ((.95, .94, .9, 1), None), "se_amber": ((1, .6, .15, 1), (1, .6, .15, 1)),
     "se_room": ((.97, .8, .65, 1), None), "se_cream": ((.99, .95, .9, 1), None),
     "se_ceiling": ((1, 1, 1, 1), None), "se_light": ((1, .96, .86, 1), (1, .96, .86, 1)),
-    "se_pane": ((.81, .9, .95, .2), None), "se_paving": ((.93, .9, .85, 1), None),
+    "se_glass": ((.95, .95, .95, .08), None), "se_lift_glass": ((.86, .93, .98, .35), None), "se_paving": ((.93, .9, .85, 1), None),
 }
 SIDES = (((1, 0), (0, 1)), ((-1, 0), (0, -1)), ((0, 1), (-1, 0)), ((0, -1), (1, 0)))  # (normal, tangent): +X -X +Z -Z
 
@@ -44,7 +44,8 @@ def at(side, u, dist):
 
 def build():
     acc = {k: Acc() for k in ROLES}
-    W, A, R, C, CE, G, P, V = (acc[k] for k in ("se_white", "se_amber", "se_room", "se_cream", "se_ceiling", "se_light", "se_pane", "se_paving"))
+    W, A, R, C, CE, G, P, V = (acc[k] for k in ("se_white", "se_amber", "se_room", "se_cream", "se_ceiling", "se_light", "se_glass", "se_paving"))
+    LG = acc["se_lift_glass"]
     sq = lambda w, r, n=6: (lambda k, w=w, r=r, n=n: rrect_pts(0, 0, w / 2, w / 2, (r,) * 4, n, k))
 
     sweep(W, sq(6.4, .9), [(0, 0), (0, .12)])  # plinth
@@ -92,16 +93,15 @@ def build():
     for i in range(6):
         a = 2 * math.pi * i / 6 + .3
         cyl(G, 2.0 * math.cos(a), 2.0 * math.sin(a), .1, TOP - .06, TOP + .01, 10)
-    # cap, planter rim and the amber band under it
+    # cap and planter rim (R3: the Meter ring is the only amber on the crown, so no GLB band under the cap)
     sweep(W, lambda k: circle_pts(0, 0, CAP_R, 64, k), bullnose(TOP, TOP + .7, .12))
     sweep(W, lambda k: circle_pts(0, 0, 3.5, 64, k), ring_section(0, .1, TOP + .68, TOP + .95), caps=(False, False), closed=True)
-    sweep(A, lambda k: circle_pts(0, 0, 3.55, 64, k), ring_section(0, .08, TOP - .12, TOP + .02), caps=(False, False), closed=True)
 
     # T8 separate lift tube, 1.6 x 1.6, beside the -Z face
     lx, lz = LIFT
     lift = lambda k, w=1.6: rrect_pts(lx, lz, w / 2, w / 2, (.3,) * 4, 4, k)
     top = TOP - .17
-    sweep(P, lift, [(0, .02), (0, top)], caps=(False, False), want=lambda c: (c[0] - lx, 0, c[2] - lz))
+    sweep(LG, lift, [(0, .02), (0, top)], caps=(False, False), want=lambda c: (c[0] - lx, 0, c[2] - lz))
     d = .5 + .3 * math.cos(math.pi / 4)
     for dx in (-1, 1):
         for dz in (-1, 1):
@@ -109,10 +109,11 @@ def build():
                 cyl(A, lx + dx * d, lz + dz * d, .05, .02, top, 8)
             else:
                 cyl(W, lx + dx * d, lz + dz * d, .06, .02, top, 8)
-    levels = [.2] + [LOBBY + 4 * k * HF + .13 for k in range(4)]  # white ring bands every 4 floors
-    for c in levels:
+    levels = [.2] + [LOBBY + i * HF + .13 for i in range(14)]  # R3: a white ring band at every slab, tie brackets every 4th
+    for n, c in enumerate(levels):
         sweep(W, lift, ring_section(-.06, -.005, c - .06, c + .06), caps=(False, False), closed=True)
-        obox(W, (lx, c, lz + .95), (.3, .1, .3))  # tie bracket to the -Z face
+        if n % 4 == 1 or n == 0:
+            obox(W, (lx, c, lz + .95), (.3, .1, .3))  # tie bracket to the -Z face
     sweep(W, lambda k: rrect_pts(lx, lz, .85, .85, (.35,) * 4, 4, k), [(0, top), (0, top + .15)])  # roof
 
     # T9 forecourt: pale paving with a white path to the door
@@ -128,7 +129,7 @@ def main():
     tris = 0
     for name, a in build().items():
         rgba, emit = ROLES[name]
-        ob = finish_mesh("TOWER_HIGH_" + name, a, material(name, rgba, .1 if name == "se_pane" else .6, emit=emit, emit_strength=1.0))
+        ob = finish_mesh("TOWER_HIGH_" + name, a, material(name, rgba, .1 if name in ("se_glass", "se_lift_glass") else .6, emit=emit, emit_strength=1.0))
         bpy.context.scene.collection.objects.link(ob)
         ob.parent = root
         tris += sum(len(p.vertices) - 2 for p in ob.data.polygons)

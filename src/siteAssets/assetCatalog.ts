@@ -4,7 +4,7 @@ export type SiteAssetCategory = 'site-layer' | 'prop' | 'kit';
 export type SiteAssetMaterialPolicy = 'preserve' | 'city-roles';
 export type CityMaterialRole = 'city_glass' | 'city_trim' | 'city_future_light' | 'city_solar'
   | 'se_white' | 'se_amber' | 'se_room' | 'se_lamp' | 'se_light' | 'se_pane'
-  | 'se_cream' | 'se_ceiling' | 'se_paving';
+  | 'se_cream' | 'se_ceiling' | 'se_paving' | 'se_glass' | 'se_lift_glass';
 
 export interface SiteAssetMetadataContract {
   readonly category: SiteAssetCategory;
@@ -62,15 +62,15 @@ export const SITE_ASSET_CATALOG: Readonly<Record<SiteAssetId, SiteAssetDefinitio
     footprint: [10.4, 8.2],
     maxHeight: 38.2,
     materialPolicy: 'city-roles',
-    materialRoles: ['se_white', 'se_amber', 'se_room', 'se_cream', 'se_ceiling', 'se_light', 'se_pane', 'se_paving'],
+    materialRoles: ['se_white', 'se_amber', 'se_room', 'se_cream', 'se_ceiling', 'se_light', 'se_glass', 'se_lift_glass', 'se_paving'],
   },
   'city-kit-2127': {
     id: 'city-kit-2127',
     url: new URL('../../asset/models/city-kit-2127/city-kit-2127.glb', import.meta.url).href,
     rootName: 'ROOT_CITY_KIT_2127',
     category: 'kit',
-    footprint: [32, 15], // the review grid of props; the runtime reads each prop relative to its own empty
-    maxHeight: 5.7,
+    footprint: [33, 22], // the review grid of props; the runtime reads each prop relative to its own empty
+    maxHeight: 4.3,
     materialPolicy: 'preserve',
   },
 };

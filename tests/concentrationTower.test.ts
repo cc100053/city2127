@@ -125,13 +125,13 @@ try {
   // The +1 shell and dressing are the procedural fallback: with the tower GLB and the prop kit ready they are replaced by the asset and kit props.
   const stubRoot = new T.Group();
   stubRoot.name = 'ROOT_CONCENTRATION_TOWER_HIGH';
-  for (const role of ['se_white', 'se_amber', 'se_room', 'se_cream', 'se_ceiling', 'se_light', 'se_pane', 'se_paving']) {
+  for (const role of ['se_white', 'se_amber', 'se_room', 'se_cream', 'se_ceiling', 'se_light', 'se_glass', 'se_lift_glass', 'se_paving']) {
     const material = new T.MeshStandardMaterial(); material.name = role;
     const mesh = new T.Mesh(new T.BoxGeometry(1, 1, 1), material); mesh.name = role; mesh.position.y = .5; stubRoot.add(mesh);
   }
   const kitRoot = new T.Group();
   kitRoot.name = 'ROOT_CITY_KIT_2127';
-  for (const name of ['tree_round_s', 'tree_round_m', 'tree_round_l', 'tree_indoor', 'shrub_cluster', 'potted_plant', 'planter_1m', 'bench', 'desk_monitor', 'chair_office', 'sofa', 'bookshelf', 'kitchen_counter', 'cafe_set', 'floor_lamp', 'treadmill', 'lift_cabin']) {
+  for (const name of ['tree_round_s', 'tree_round_m', 'tree_round_l', 'tree_indoor', 'shrub_cluster', 'potted_plant', 'planter_1m', 'bench', 'desk_monitor', 'chair_office', 'sofa', 'bookshelf', 'kitchen_counter', 'cafe_set', 'floor_lamp', 'treadmill', 'lift_cabin', 'pendant_lamp', 'rug', 'whiteboard', 'upper_cabinet', 'art_panel', 'meeting_table']) {
     const prop = new T.Group(); prop.name = `kit_${name}`; kitRoot.add(prop);
     const mesh = new T.Mesh(new T.BoxGeometry(1, 1, 1), new T.MeshStandardMaterial()); mesh.position.y = .5; prop.add(mesh);
   }
