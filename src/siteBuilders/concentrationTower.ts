@@ -5,6 +5,8 @@ import { siteLayerDefinition } from '../changeCatalog.ts';
 import { ConcentrationDistrict, METER_COLORS } from '../districtMeters.ts';
 import { remapCityMaterials } from '../siteAssets/assetLoader.ts';
 import type { SiteAssetLoaderCache } from '../siteAssets/assetLoader.ts';
+import { instanceProps, loadPropKit } from '../siteAssets/propKit.ts';
+import { floorKit, forecourtKit, lobbyKit, moduleKit, roofKit, UNITS_PER_METRE, type TowerKit } from './towerHighKit.ts';
 import type { Band } from '../surveyView.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, prefersReducedMotion, SITE_TRANSITION_SECONDS, type BuiltSite } from './siteRuntime.ts';
 
@@ -24,6 +26,10 @@ const light = new T.MeshStandardMaterial({ color: '#fff4dc', emissive: '#fff4dc'
 const lamp = new T.MeshStandardMaterial({ color: '#f7cfb0', emissive: '#f7cfb0', emissiveIntensity: .6, roughness: .7, side: T.DoubleSide });
 const pane = new T.MeshStandardMaterial({ color: '#cfe6f2', roughness: .1, transparent: true, opacity: .18, depthWrite: false });
 const paneBlue = new T.MeshStandardMaterial({ color: '#bfe0f5', roughness: .1, transparent: true, opacity: .45, depthWrite: false });
+// +1 only (T4, T9): white ceilings with a mild glow, cream-white upper rooms, pale forecourt paving.
+const ceilingHigh = new T.MeshStandardMaterial({ color: '#ffffff', emissive: '#fff4e6', emissiveIntensity: .35, roughness: .7 });
+const cream = new T.MeshStandardMaterial({ color: '#fbf3e6', emissive: '#fff0dc', emissiveIntensity: .5, roughness: .7 });
+const paving = paint('#ece6da', .8);
 const water = new T.MeshStandardMaterial({ color: '#7cc4ea', emissive: '#3a86b8', emissiveIntensity: .15, roughness: .25 });
 const unitBox = new T.BoxGeometry(1, 1, 1);
 const postGeometry = new T.CylinderGeometry(.03, .03, .94, 6);
@@ -516,39 +522,36 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit, assets?: Site
     [1.1, 0, -1.6], [-.3, 0, .9], [1.2, 0, .4], [1, 0, 2.3], [-.3, 0, 3.0], [2.8, 0, 1.9], [-.2, 0, 4.4], [2.9, 0, -1.0], [1.3, 0, 3.8], [-3.4, 0, -6.3], [.9, 0, -3.8]];
   pavilions.add(crowd([...lowPeople, ...outside]));
 
-  // +1: one vertical street: 14 glazed floors between four slim round white columns, planted terraces, glazed lift, round overhanging crown.
-  // The shell (slabs, glazing, columns, portal, lift, terrace slabs, crown) is `highShell`, the procedural fallback for the `concentration-tower-high` GLB
-  // (asset/models/concentration-tower-high); furniture, people, greenery, cabins and the Meter ring stay procedural in `towerUpper`.
+  // +1: one vertical street: 13 glazed floors and an open top floor between square white piers, a separate lift tube, a round crown.
+  // Procedural fallback: `highShell` (R6 slabs, glazing, crown, lift shaft) and `dressing` (R6 furniture, terraces, base greenery, residents).
+  // Once `concentration-tower-high` and the prop kit are ready both are replaced (see the preparation below).
   const HW = 5.2, LOBBY = 3.6, HF = 2.4, TOP = LOBBY + 14 * HF;
-  const CROWN_RISE = 1.15; // the GLB crown (soil at TOP + 1.75) sits this much above the fallback crown (TOP + .6)
   const highShell = new T.Group();
   highShell.name = 'tower-high-shell';
+  const dressing = new T.Group();
+  dressing.name = 'tower-high-dressing';
   const roofGarden = new T.Group();
   roofGarden.name = 'tower-roof-garden';
   const highPeople: P[] = [];
   glazed(highShell, 0, 0, 0, HW, HW, LOBBY, { amber: true });
-  highPeople.push(...furnish(towerUpper, 2, HW - .5, 0, SL, 0));
+  highPeople.push(...furnish(dressing, 2, HW - .5, 0, SL, 0));
   for (let i = 0; i < 14; i++) {
     const y0 = LOBBY + i * HF;
     glazed(highShell, 0, y0, 0, HW, HW, HF, { amber: true });
-    highPeople.push(...furnish(towerUpper, i, HW - .5, 0, y0 + SL, 0));
+    highPeople.push(...furnish(dressing, i, HW - .5, 0, y0 + SL, 0));
     if ([1, 4, 7, 10, 12].includes(i)) { // sky terraces projecting 1.2 off the +X face: white slab and planter, two big trees with visible trunks
       strip(highShell, white, HW / 2 + .6, y0 + .07, 1.1, 1.2, .14, 3);
       strip(highShell, white, HW / 2 + 1.1, y0 + .27, 1.1, .3, .26, 2.8);
-      for (const z of [-.2, .6, 1.4, 2.2]) bush(towerUpper, HW / 2 + 1.1, y0 + .35, z, .22);
-      for (const z of [.2, 2]) tree(towerUpper, HW / 2 + .55, y0 + .14, z, 1);
+      for (const z of [-.2, .6, 1.4, 2.2]) bush(dressing, HW / 2 + 1.1, y0 + .35, z, .22);
+      for (const z of [.2, 2]) tree(dressing, HW / 2 + .55, y0 + .14, z, 1);
     }
   }
   strip(highShell, white, 0, TOP + .11, 0, HW + .12, .22, HW + .12);
   for (const x of [-1, 1]) for (const z of [-1, 1]) arc(highShell, 0, .3, TOP, [x * (HW / 2 - .02), 0, z * (HW / 2 - .02)], white);
   for (const z of [-.9, .9]) strip(highShell, white, HW / 2 + .06, 1.4, z, .14, 2.8, .14); // portal on +X
   strip(highShell, white, HW / 2 + .06, 2.85, 0, .14, .14, 2); strip(highShell, light, HW / 2 + .1, 2.72, 0, .05, .06, 1.7);
-  const lx = 3.3, lz = -1.8; // lift off the +X face at its -Z edge, so H sees it face-on
-  shaft(highShell, lx, lz, TOP, HF, .6, true);
-  const midCabin = new T.Group(); // a second, static cabin so one is always visible
-  midCabin.position.set(lx, 18, lz);
-  cabinParts(midCabin, 1, 2);
-  towerUpper.add(midCabin);
+  const lx = 1, lz = -3.6; // lift tube beside the -Z face (screen-right at H), 1.6 x 1.6
+  shaft(highShell, lx, lz, TOP, HF, .8, true);
   // Crown: white cap (radius 3.4) overhanging the shaft with a glowing amber edge ring, parapet and roof garden.
   arc(highShell, 0, 3.4, .6, [0, TOP, 0], white);
   arc(highShell, 3, 3.4, .5, [0, TOP + .6, 0], white);
@@ -558,26 +561,34 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit, assets?: Site
   for (let i = 0; i < 6; i++) tree(roofGarden, Math.cos(.4 + i * 1.05) * 1.9, TOP + .8, Math.sin(.4 + i * 1.05) * 1.9, .95);
   tree(roofGarden, 0, TOP + .8, 0, 1);
   // Base: ring of trees, hedged beds, planters, benches, residents.
-  for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2 + .2, r = 4.8; if (Math.cos(a) > .35) continue; tree(towerUpper, Math.cos(a) * r, 0, Math.sin(a) * r * .95, .55 + (i % 3) * .08); }
-  for (const [x, z, w, d] of [[0, 4.1, HW + 1.2, .5], [-3.6, 0, .5, HW], [0, -4.6, HW + 1.2, .5], [3.7, 3.2, .5, 1.6], [3.7, -3.7, .5, 1.6]]) { strip(towerUpper, leaf, x, .17, z, w, .34, d); for (let k = -2; k <= 2; k++) bush(towerUpper, x + (w > d ? k * w / 5 : 0), .3, z + (w > d ? 0 : k * d / 5), .24); }
-  planter(towerUpper, 3.7, 0, 1.9, .8, 1.2);
-  for (const z of [1.8, 3.7]) bench(towerUpper, 4.7, z, Math.PI / 2);
-  for (const [x, z] of [[5.5, -3.4], [5.9, -1.4], [5.9, .6], [5.6, 2.8], [5.2, 4.6], [4.4, -4.7]]) tree(towerUpper, x, 0, z, .9);
-  towerUpper.add(...bake(towerUpper));
+  for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2 + .2, r = 4.8; if (Math.cos(a) > .35) continue; tree(dressing, Math.cos(a) * r, 0, Math.sin(a) * r * .95, .55 + (i % 3) * .08); }
+  for (const [x, z, w, d] of [[0, 4.1, HW + 1.2, .5], [-3.6, 0, .5, HW], [0, -4.6, HW + 1.2, .5], [3.7, 3.2, .5, 1.6], [3.7, -3.7, .5, 1.6]]) { strip(dressing, leaf, x, .17, z, w, .34, d); for (let k = -2; k <= 2; k++) bush(dressing, x + (w > d ? k * w / 5 : 0), .3, z + (w > d ? 0 : k * d / 5), .24); }
+  planter(dressing, 3.7, 0, 1.9, .8, 1.2);
+  for (const z of [1.8, 3.7]) bench(dressing, 4.7, z, Math.PI / 2);
+  for (const [x, z] of [[5.5, -3.4], [5.9, -1.4], [5.9, .6], [5.6, 2.8], [5.2, 4.6], [4.4, -4.7]]) tree(dressing, x, 0, z, .9);
+  dressing.add(...bake(dressing));
   highShell.add(...bake(highShell));
   roofGarden.add(...bake(roofGarden));
-  towerUpper.add(highShell, roofGarden);
+  highPeople.push([4.7, 0, 1.5, true, Math.PI / 2], [4.7, 0, 2.1, true, Math.PI / 2], [4.7, 0, 3.4, true, Math.PI / 2], [4.7, 0, 4, true, Math.PI / 2], [5.3, 0, -1.0], [3.4, 0, .1], [5.2, 0, 1.0], [4.0, 0, -3.4], [5.0, 0, 3.1], [3.2, 0, 3.4]);
+  dressing.add(crowd(highPeople));
+  towerUpper.add(highShell, dressing, roofGarden);
   const meterRing = ring(3.4, .25, [[0, TOP + .7, 0]]);
   towerUpper.add(meterRing);
-  highPeople.push([4.7, 0, 1.5, true, Math.PI / 2], [4.7, 0, 2.1, true, Math.PI / 2], [4.7, 0, 3.4, true, Math.PI / 2], [4.7, 0, 4, true, Math.PI / 2], [5.3, 0, -1.0], [3.4, 0, .1], [5.2, 0, 1.0], [4.0, 0, -3.4], [5.0, 0, 3.1], [3.2, 0, 3.4]);
-  towerUpper.add(crowd(highPeople));
 
-  const elevator = new T.Group();
-  elevator.name = 'tower-elevator-cabin';
-  elevator.position.set(lx, CABIN_LOW, lz);
-  cabinParts(elevator, 1, 2);
-  elevator.add(...bake(elevator));
-  towerUpper.add(elevator);
+  // Cabins: the static mid-height one and the animated one; each keeps its procedural body (`proc`) until the kit cabin replaces it.
+  const lift = (name: string, y: number) => {
+    const group = new T.Group(), proc = new T.Group();
+    group.name = name;
+    group.position.set(lx, y, lz);
+    cabinParts(proc, 1, 2);
+    proc.add(...bake(proc));
+    group.add(proc);
+    towerUpper.add(group);
+    return { group, proc };
+  };
+  const midCabin = lift('tower-mid-cabin', 18);
+  const liftCabin = lift('tower-elevator-cabin', CABIN_LOW);
+  const elevator = liftCabin.group;
 
   const lowModules = [...spots, [-3, -6.2, 0] as [number, number, number]].map(([x, z, r], i) => addModule(pavilions, `tower-function-low-${i + 1}`, x, 0, z, 0, g => { const [a, b] = uv(.1 * r, .8 * r); return fitout(g, a, i < 5 ? .12 : .06, b); }));
 
@@ -610,17 +621,48 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit, assets?: Site
     [-2.2, 0, -5.4], [-.2, 0, -5.9], [-4.6, 0, -5.0], [-6.0, 0, -2.4], [-3.2, 0, -2.2], [-2.6, 0, -3.2], [.5, 0, -5.3], [-5.5, 0, -.3], [-4.0, 0, -3.6], [-6.2, 0, -5.4]]));
   const mixedModules = [0, 1, 2, 3, 4, 5].map(k => addModule(neutralPropsLayer.group, `tower-function-mixed-${k + 1}`, MX + 1.6, k * FH, MZ + 1.6, 0, g => fitout(g, 1.2, SL, -1.1)));
 
-  const highModules = [1, 3, 5, 7, 9, 11].map((f, i) => addModule(towerUpper, `tower-function-high-${i + 1}`, 0, LOBBY + f * HF, 0, 0, g => fitout(g, 1.5, SL, -1.6)));
+  const highModulePool = [1, 3, 5, 7, 9, 11].map((f, i) => { // like addModule, but the procedural fit-out stays swappable (`proc`)
+    const group = new T.Group(), proc = new T.Group();
+    group.name = `tower-function-high-${i + 1}`;
+    group.position.set(0, LOBBY + f * HF, 0);
+    towerUpper.add(group);
+    const extra = fitout(proc, 1.5, SL, -1.6);
+    proc.add(...bake(proc), extra);
+    group.add(proc);
+    group.scale.setScalar(HIDDEN);
+    group.visible = false;
+    return { group, proc };
+  });
+  const highModules = highModulePool.map(module => module.group);
 
   if (assets) {
     towerUpperLayer.setPreparation(async () => {
       const glb = await assets.cloneRoot('concentration-tower-high', 'centerGaiRear', 'towerUpper');
-      remapCityMaterials(glb, { se_white: white, se_amber: amber, se_room: room, se_lamp: lamp, se_light: light, se_pane: pane });
-      towerUpper.remove(highShell);
+      const kit = await loadPropKit(assets); // sequential: a load that never resolves must not start the kit
+      remapCityMaterials(glb, { se_white: white, se_amber: amber, se_room: room, se_cream: cream, se_ceiling: ceilingHigh, se_light: light, se_pane: pane, se_paving: paving });
+      const place = (spec: TowerKit, parent: T.Object3D, name: string) => {
+        const group = instanceProps(kit, spec.props, UNITS_PER_METRE);
+        group.name = name;
+        group.add(crowd(spec.people));
+        parent.add(group);
+      };
+      towerUpper.remove(highShell, dressing);
+      roofGarden.visible = false;
       towerUpper.add(glb);
-      roofGarden.position.y = CROWN_RISE;
-      meterRing.position.y = CROWN_RISE - .35; // ring on the GLB cap rim: y TOP + 1.5, radius 3.5
-      meterRing.scale.set(3.5 / 3.4, 1, 3.5 / 3.4);
+      const furniture: TowerKit = { props: [], people: [] };
+      for (const spec of [lobbyKit(), ...Array.from({ length: 13 }, (_, i) => floorKit(i)), forecourtKit(), roofKit()]) { furniture.props.push(...spec.props); furniture.people.push(...spec.people); }
+      place(furniture, towerUpper, 'tower-high-kit');
+      const soil = new T.Group();
+      arc(soil, 0, 3.4, .1, [0, TOP + .7, 0], leaf);
+      towerUpper.add(...bake(soil));
+      for (const [i, module] of highModulePool.entries()) { module.proc.visible = false; place(moduleKit(i), module.group, 'tower-high-module-kit'); }
+      for (const cabinGroup of [midCabin, liftCabin]) {
+        cabinGroup.proc.visible = false;
+        const spec: TowerKit = { props: [{ name: 'lift_cabin', position: [0, 0, 0], yaw: Math.PI / 2, scale: 1.4 / (2 * UNITS_PER_METRE) }], people: [[0, .12, 0, false, Math.PI / 2]] };
+        place(spec, cabinGroup.group, 'tower-cabin-kit');
+      }
+      towerUpper.remove(meterRing); // the Meter ring moves onto the GLB cap rim: y TOP + .35, radius 3.7, tube .3
+      towerUpper.add(ring(3.7, .3, [[0, TOP + .35, 0]]));
     });
     void towerUpperLayer.prepare(); // load now, so the first 3 s rise already shows the GLB
   }

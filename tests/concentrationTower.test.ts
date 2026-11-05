@@ -122,24 +122,37 @@ try {
     console.log(`concentrationTower ${band} bounds x=${local.min.x.toFixed(2)}..${local.max.x.toFixed(2)} y=${local.min.y.toFixed(2)}..${local.max.y.toFixed(2)} z=${local.min.z.toFixed(2)}..${local.max.z.toFixed(2)}; modules z=${localModules.min.z.toFixed(2)}..${localModules.max.z.toFixed(2)}`);
   }
 
-  // The +1 shell is the procedural fallback: a ready concentration-tower-high GLB replaces it with the remapped asset root.
+  // The +1 shell and dressing are the procedural fallback: with the tower GLB and the prop kit ready they are replaced by the asset and kit props.
   const stubRoot = new T.Group();
   stubRoot.name = 'ROOT_CONCENTRATION_TOWER_HIGH';
-  for (const role of ['se_white', 'se_amber', 'se_room', 'se_lamp', 'se_light', 'se_pane']) {
+  for (const role of ['se_white', 'se_amber', 'se_room', 'se_cream', 'se_ceiling', 'se_light', 'se_pane', 'se_paving']) {
     const material = new T.MeshStandardMaterial(); material.name = role;
     const mesh = new T.Mesh(new T.BoxGeometry(1, 1, 1), material); mesh.name = role; mesh.position.y = .5; stubRoot.add(mesh);
   }
-  const stubAssets = new SiteAssetLoaderCache({ async loadAsync() { const scene = new T.Scene(); scene.add(stubRoot.clone(true)); return { scene, animations: [] }; } });
+  const kitRoot = new T.Group();
+  kitRoot.name = 'ROOT_CITY_KIT_2127';
+  for (const name of ['tree_round_s', 'tree_round_m', 'tree_round_l', 'tree_indoor', 'shrub_cluster', 'potted_plant', 'planter_1m', 'bench', 'desk_monitor', 'chair_office', 'sofa', 'bookshelf', 'kitchen_counter', 'cafe_set', 'floor_lamp', 'treadmill', 'lift_cabin']) {
+    const prop = new T.Group(); prop.name = `kit_${name}`; kitRoot.add(prop);
+    const mesh = new T.Mesh(new T.BoxGeometry(1, 1, 1), new T.MeshStandardMaterial()); mesh.position.y = .5; prop.add(mesh);
+  }
+  const stubAssets = new SiteAssetLoaderCache({
+    async loadAsync(url: string) { const scene = new T.Scene(); scene.add((url.includes('city-kit') ? kitRoot : stubRoot).clone(true)); return { scene, animations: [] }; },
+  });
   const assetSite = buildConcentrationTower(new T.Scene(), kit, stubAssets);
   const assetUpper = assetSite.layers.towerUpper!;
   assert.ok(assetUpper.group.getObjectByName('tower-high-shell'), 'the fallback shell is present until the GLB is ready');
+  assert.ok(assetUpper.group.getObjectByName('tower-high-dressing'), 'the fallback furniture and greenery are present until the kit is ready');
   await assetUpper.prepare();
   assert.equal(assetUpper.assetStatus, 'ready');
   assert.equal(assetUpper.group.getObjectByName('tower-high-shell'), undefined, 'the GLB replaces the procedural shell');
+  assert.equal(assetUpper.group.getObjectByName('tower-high-dressing'), undefined, 'kit props replace the procedural dressing');
   const glbRoot = assetUpper.group.getObjectByName('ROOT_CONCENTRATION_TOWER_HIGH__instance')!;
   assert.ok(glbRoot, 'the asset root is attached to towerUpper');
   assert.equal((glbRoot.getObjectByName('se_amber') as T.Mesh).material, amber, 'asset roles are remapped to the SE materials');
-  assert.ok(assetUpper.group.getObjectByName('tower-elevator-cabin'), 'cabins, furniture and greenery stay procedural');
+  assert.ok(assetUpper.group.getObjectByName('tower-high-kit')!.children.some(child => child.name === 'kit-bench'), 'the forecourt benches come from the kit');
+  assert.ok(assetUpper.group.getObjectByName('tower-high-kit')!.getObjectByName('tower-crowd'), 'residents are placed with the kit');
+  assert.ok(assetUpper.group.getObjectByName('tower-elevator-cabin')!.getObjectByName('tower-cabin-kit'), 'the animated cabin is the kit cabin');
+  assert.equal(assetSite.concentrationTower!.getDiagnostics().targetFunctionModules >= 0, true);
 } finally {
   if (documentDescriptor) Object.defineProperty(globalThis, 'document', documentDescriptor);
   else delete (globalThis as typeof globalThis & { document?: unknown }).document;

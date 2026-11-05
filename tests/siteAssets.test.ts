@@ -82,10 +82,10 @@ const tower = await new Promise<GLTF>((resolve, reject) => {
 const towerRoot = validateSiteAsset(SITE_ASSET_CATALOG['concentration-tower-high'], tower);
 const towerMeshes: T.Mesh[] = [];
 towerRoot.traverse(object => { if (object instanceof T.Mesh) towerMeshes.push(object); });
-assert.equal(towerMeshes.length, 6, 'one mesh per role material');
+assert.equal(towerMeshes.length, 8, 'one mesh per role material');
 assert.deepEqual(towerMeshes.map(mesh => (mesh.material as T.Material).name).sort(), [...SITE_ASSET_CATALOG['concentration-tower-high'].materialRoles!].sort());
 const towerBounds = new T.Box3().setFromObject(towerRoot);
-assert.ok(towerBounds.min.y > -.02 && towerBounds.max.y > 38 && towerBounds.max.x > 3.8 && towerBounds.max.x < 4.2, `tower bounds ${towerBounds.min.toArray()}..${towerBounds.max.toArray()}`);
+assert.ok(towerBounds.min.y > -.02 && towerBounds.max.y > 38 && towerBounds.max.x > 6 && towerBounds.max.x < 6.8 && towerBounds.min.z < -4.4, `tower bounds ${towerBounds.min.toArray()}..${towerBounds.max.toArray()}`);
 const missingMetadata = automationHubGltf();
 delete missingMetadata.scene.getObjectByName('ROOT_AUTOMATION_HUB_UPPER')!.userData.forward_axis;
 assert.throws(() => validateSiteAsset(SITE_ASSET_CATALOG['automation-hub-upper'], missingMetadata), /metadata forward_axis/);
