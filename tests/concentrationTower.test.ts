@@ -4,6 +4,7 @@ import type { Kit } from '../src/cityRig.ts';
 import { changeSites } from '../src/layout.ts';
 import { amber, buildConcentrationTower } from '../src/siteBuilders/concentrationTower.ts';
 import { METER_COLORS } from '../src/districtMeters.ts';
+import { SiteAssetLoaderCache } from '../src/siteAssets/assetLoader.ts';
 
 const HIDDEN = 1e-3;
 const documentDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'document');
@@ -120,6 +121,25 @@ try {
 
     console.log(`concentrationTower ${band} bounds x=${local.min.x.toFixed(2)}..${local.max.x.toFixed(2)} y=${local.min.y.toFixed(2)}..${local.max.y.toFixed(2)} z=${local.min.z.toFixed(2)}..${local.max.z.toFixed(2)}; modules z=${localModules.min.z.toFixed(2)}..${localModules.max.z.toFixed(2)}`);
   }
+
+  // The +1 shell is the procedural fallback: a ready concentration-tower-high GLB replaces it with the remapped asset root.
+  const stubRoot = new T.Group();
+  stubRoot.name = 'ROOT_CONCENTRATION_TOWER_HIGH';
+  for (const role of ['se_white', 'se_amber', 'se_room', 'se_lamp', 'se_light', 'se_pane']) {
+    const material = new T.MeshStandardMaterial(); material.name = role;
+    const mesh = new T.Mesh(new T.BoxGeometry(1, 1, 1), material); mesh.name = role; mesh.position.y = .5; stubRoot.add(mesh);
+  }
+  const stubAssets = new SiteAssetLoaderCache({ async loadAsync() { const scene = new T.Scene(); scene.add(stubRoot.clone(true)); return { scene, animations: [] }; } });
+  const assetSite = buildConcentrationTower(new T.Scene(), kit, stubAssets);
+  const assetUpper = assetSite.layers.towerUpper!;
+  assert.ok(assetUpper.group.getObjectByName('tower-high-shell'), 'the fallback shell is present until the GLB is ready');
+  await assetUpper.prepare();
+  assert.equal(assetUpper.assetStatus, 'ready');
+  assert.equal(assetUpper.group.getObjectByName('tower-high-shell'), undefined, 'the GLB replaces the procedural shell');
+  const glbRoot = assetUpper.group.getObjectByName('ROOT_CONCENTRATION_TOWER_HIGH__instance')!;
+  assert.ok(glbRoot, 'the asset root is attached to towerUpper');
+  assert.equal((glbRoot.getObjectByName('se_amber') as T.Mesh).material, amber, 'asset roles are remapped to the SE materials');
+  assert.ok(assetUpper.group.getObjectByName('tower-elevator-cabin'), 'cabins, furniture and greenery stay procedural');
 } finally {
   if (documentDescriptor) Object.defineProperty(globalThis, 'document', documentDescriptor);
   else delete (globalThis as typeof globalThis & { document?: unknown }).document;

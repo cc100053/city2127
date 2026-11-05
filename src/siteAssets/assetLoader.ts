@@ -78,7 +78,7 @@ export function validateSiteAsset(definition: SiteAssetDefinition, gltf: Pick<GL
   return root;
 }
 
-export function remapCityMaterials(root: T.Object3D, materials: Readonly<Record<CityMaterialRole, T.Material>>): void {
+export function remapCityMaterials(root: T.Object3D, materials: Readonly<Partial<Record<CityMaterialRole, T.Material>>>): void {
   root.traverse(object => {
     if (!(object instanceof T.Mesh)) return;
     const map = (material: T.Material) => {

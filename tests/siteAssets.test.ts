@@ -74,6 +74,18 @@ hubRoot.traverse(object => {
   }
 });
 assert.deepEqual(remapped, new Set(Object.values(replacements)));
+// The committed +1 SE tower GLB: parsed from disk, root/bounds/roles validated by the same loader contract.
+const towerFile = await readFile(new URL('../asset/models/concentration-tower-high/concentration-tower-high.glb', import.meta.url));
+const tower = await new Promise<GLTF>((resolve, reject) => {
+  new GLTFLoader().parse(towerFile.buffer.slice(towerFile.byteOffset, towerFile.byteOffset + towerFile.byteLength) as ArrayBuffer, '', resolve, reject);
+});
+const towerRoot = validateSiteAsset(SITE_ASSET_CATALOG['concentration-tower-high'], tower);
+const towerMeshes: T.Mesh[] = [];
+towerRoot.traverse(object => { if (object instanceof T.Mesh) towerMeshes.push(object); });
+assert.equal(towerMeshes.length, 6, 'one mesh per role material');
+assert.deepEqual(towerMeshes.map(mesh => (mesh.material as T.Material).name).sort(), [...SITE_ASSET_CATALOG['concentration-tower-high'].materialRoles!].sort());
+const towerBounds = new T.Box3().setFromObject(towerRoot);
+assert.ok(towerBounds.min.y > -.02 && towerBounds.max.y > 38 && towerBounds.max.x > 3.8 && towerBounds.max.x < 4.2, `tower bounds ${towerBounds.min.toArray()}..${towerBounds.max.toArray()}`);
 const missingMetadata = automationHubGltf();
 delete missingMetadata.scene.getObjectByName('ROOT_AUTOMATION_HUB_UPPER')!.userData.forward_axis;
 assert.throws(() => validateSiteAsset(SITE_ASSET_CATALOG['automation-hub-upper'], missingMetadata), /metadata forward_axis/);

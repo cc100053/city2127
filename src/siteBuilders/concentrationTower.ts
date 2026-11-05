@@ -3,6 +3,8 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { arc, bake, box, faces, leaf, leafyCrown, paint, shrubs, stone, warm, type Kit } from '../cityRig.ts';
 import { siteLayerDefinition } from '../changeCatalog.ts';
 import { ConcentrationDistrict, METER_COLORS } from '../districtMeters.ts';
+import { remapCityMaterials } from '../siteAssets/assetLoader.ts';
+import type { SiteAssetLoaderCache } from '../siteAssets/assetLoader.ts';
 import type { Band } from '../surveyView.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, prefersReducedMotion, SITE_TRANSITION_SECONDS, type BuiltSite } from './siteRuntime.ts';
 
@@ -403,7 +405,7 @@ const shaft = (g: T.Object3D, x: number, z: number, h: number, step: number, hw 
   if (rails) for (const sx of [-1, 1]) { strip(g, amber, x + sx * (hw - .1), h / 2, z - hw + .08, .04, h, .04); strip(g, amber, x + hw - .08, h / 2, z + sx * (hw - .1), .04, h, .04); }
 };
 
-export function buildConcentrationTower(scene: T.Scene, _kit: Kit): ConcentrationTowerBuiltSite {
+export function buildConcentrationTower(scene: T.Scene, _kit: Kit, assets?: SiteAssetLoaderCache): ConcentrationTowerBuiltSite {
   const root = createSiteRoot(scene, 'se');
   const towerBaseLayer = createSiteLayer(root, siteLayerDefinition('centerGaiRear', 'towerBase'));
   const towerUpperLayer = createSiteLayer(root, siteLayerDefinition('centerGaiRear', 'towerUpper'));
@@ -515,39 +517,46 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit): Concentratio
   pavilions.add(crowd([...lowPeople, ...outside]));
 
   // +1: one vertical street: 14 glazed floors between four slim round white columns, planted terraces, glazed lift, round overhanging crown.
+  // The shell (slabs, glazing, columns, portal, lift, terrace slabs, crown) is `highShell`, the procedural fallback for the `concentration-tower-high` GLB
+  // (asset/models/concentration-tower-high); furniture, people, greenery, cabins and the Meter ring stay procedural in `towerUpper`.
   const HW = 5.2, LOBBY = 3.6, HF = 2.4, TOP = LOBBY + 14 * HF;
+  const CROWN_RISE = 1.15; // the GLB crown (soil at TOP + 1.75) sits this much above the fallback crown (TOP + .6)
+  const highShell = new T.Group();
+  highShell.name = 'tower-high-shell';
+  const roofGarden = new T.Group();
+  roofGarden.name = 'tower-roof-garden';
   const highPeople: P[] = [];
-  glazed(towerUpper, 0, 0, 0, HW, HW, LOBBY, { amber: true });
+  glazed(highShell, 0, 0, 0, HW, HW, LOBBY, { amber: true });
   highPeople.push(...furnish(towerUpper, 2, HW - .5, 0, SL, 0));
   for (let i = 0; i < 14; i++) {
     const y0 = LOBBY + i * HF;
-    glazed(towerUpper, 0, y0, 0, HW, HW, HF, { amber: true });
+    glazed(highShell, 0, y0, 0, HW, HW, HF, { amber: true });
     highPeople.push(...furnish(towerUpper, i, HW - .5, 0, y0 + SL, 0));
     if ([1, 4, 7, 10, 12].includes(i)) { // sky terraces projecting 1.2 off the +X face: white slab and planter, two big trees with visible trunks
-      strip(towerUpper, white, HW / 2 + .6, y0 + .07, 1.1, 1.2, .14, 3);
-      strip(towerUpper, white, HW / 2 + 1.1, y0 + .27, 1.1, .3, .26, 2.8);
+      strip(highShell, white, HW / 2 + .6, y0 + .07, 1.1, 1.2, .14, 3);
+      strip(highShell, white, HW / 2 + 1.1, y0 + .27, 1.1, .3, .26, 2.8);
       for (const z of [-.2, .6, 1.4, 2.2]) bush(towerUpper, HW / 2 + 1.1, y0 + .35, z, .22);
       for (const z of [.2, 2]) tree(towerUpper, HW / 2 + .55, y0 + .14, z, 1);
     }
   }
-  strip(towerUpper, white, 0, TOP + .11, 0, HW + .12, .22, HW + .12);
-  for (const x of [-1, 1]) for (const z of [-1, 1]) arc(towerUpper, 0, .3, TOP, [x * (HW / 2 - .02), 0, z * (HW / 2 - .02)], white);
-  for (const z of [-.9, .9]) strip(towerUpper, white, HW / 2 + .06, 1.4, z, .14, 2.8, .14); // portal on +X
-  strip(towerUpper, white, HW / 2 + .06, 2.85, 0, .14, .14, 2); strip(towerUpper, light, HW / 2 + .1, 2.72, 0, .05, .06, 1.7);
-  const lx = HW / 2 + .95, lz = -HW / 2 + .95; // lift on the +X face at its -Z edge, so H sees it face-on
-  shaft(towerUpper, lx, lz, TOP, HF, .95, true, paneBlue);
+  strip(highShell, white, 0, TOP + .11, 0, HW + .12, .22, HW + .12);
+  for (const x of [-1, 1]) for (const z of [-1, 1]) arc(highShell, 0, .3, TOP, [x * (HW / 2 - .02), 0, z * (HW / 2 - .02)], white);
+  for (const z of [-.9, .9]) strip(highShell, white, HW / 2 + .06, 1.4, z, .14, 2.8, .14); // portal on +X
+  strip(highShell, white, HW / 2 + .06, 2.85, 0, .14, .14, 2); strip(highShell, light, HW / 2 + .1, 2.72, 0, .05, .06, 1.7);
+  const lx = 3.3, lz = -1.8; // lift off the +X face at its -Z edge, so H sees it face-on
+  shaft(highShell, lx, lz, TOP, HF, .6, true);
   const midCabin = new T.Group(); // a second, static cabin so one is always visible
   midCabin.position.set(lx, 18, lz);
-  cabinParts(midCabin, 1.6, 2.2);
+  cabinParts(midCabin, 1, 2);
   towerUpper.add(midCabin);
   // Crown: white cap (radius 3.4) overhanging the shaft with a glowing amber edge ring, parapet and roof garden.
-  arc(towerUpper, 0, 3.4, .6, [0, TOP, 0], white);
-  arc(towerUpper, 3, 3.4, .5, [0, TOP + .6, 0], white);
-  arc(towerUpper, 0, 3, .2, [0, TOP + .6, 0], leaf);
-  shrubs(towerUpper, 2.4, TOP + .8, 0, Math.PI * 2, 14);
-  shrubs(towerUpper, 1.2, TOP + .8, 0, Math.PI * 2, 8);
-  for (let i = 0; i < 6; i++) tree(towerUpper, Math.cos(.4 + i * 1.05) * 1.9, TOP + .8, Math.sin(.4 + i * 1.05) * 1.9, .95);
-  tree(towerUpper, 0, TOP + .8, 0, 1);
+  arc(highShell, 0, 3.4, .6, [0, TOP, 0], white);
+  arc(highShell, 3, 3.4, .5, [0, TOP + .6, 0], white);
+  arc(roofGarden, 0, 3, .2, [0, TOP + .6, 0], leaf);
+  shrubs(roofGarden, 2.4, TOP + .8, 0, Math.PI * 2, 14);
+  shrubs(roofGarden, 1.2, TOP + .8, 0, Math.PI * 2, 8);
+  for (let i = 0; i < 6; i++) tree(roofGarden, Math.cos(.4 + i * 1.05) * 1.9, TOP + .8, Math.sin(.4 + i * 1.05) * 1.9, .95);
+  tree(roofGarden, 0, TOP + .8, 0, 1);
   // Base: ring of trees, hedged beds, planters, benches, residents.
   for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2 + .2, r = 4.8; if (Math.cos(a) > .35) continue; tree(towerUpper, Math.cos(a) * r, 0, Math.sin(a) * r * .95, .55 + (i % 3) * .08); }
   for (const [x, z, w, d] of [[0, 4.1, HW + 1.2, .5], [-3.6, 0, .5, HW], [0, -4.6, HW + 1.2, .5], [3.7, 3.2, .5, 1.6], [3.7, -3.7, .5, 1.6]]) { strip(towerUpper, leaf, x, .17, z, w, .34, d); for (let k = -2; k <= 2; k++) bush(towerUpper, x + (w > d ? k * w / 5 : 0), .3, z + (w > d ? 0 : k * d / 5), .24); }
@@ -555,14 +564,18 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit): Concentratio
   for (const z of [1.8, 3.7]) bench(towerUpper, 4.7, z, Math.PI / 2);
   for (const [x, z] of [[5.5, -3.4], [5.9, -1.4], [5.9, .6], [5.6, 2.8], [5.2, 4.6], [4.4, -4.7]]) tree(towerUpper, x, 0, z, .9);
   towerUpper.add(...bake(towerUpper));
-  towerUpper.add(ring(3.4, .25, [[0, TOP + .7, 0]]));
+  highShell.add(...bake(highShell));
+  roofGarden.add(...bake(roofGarden));
+  towerUpper.add(highShell, roofGarden);
+  const meterRing = ring(3.4, .25, [[0, TOP + .7, 0]]);
+  towerUpper.add(meterRing);
   highPeople.push([4.7, 0, 1.5, true, Math.PI / 2], [4.7, 0, 2.1, true, Math.PI / 2], [4.7, 0, 3.4, true, Math.PI / 2], [4.7, 0, 4, true, Math.PI / 2], [5.3, 0, -1.0], [3.4, 0, .1], [5.2, 0, 1.0], [4.0, 0, -3.4], [5.0, 0, 3.1], [3.2, 0, 3.4]);
   towerUpper.add(crowd(highPeople));
 
   const elevator = new T.Group();
   elevator.name = 'tower-elevator-cabin';
   elevator.position.set(lx, CABIN_LOW, lz);
-  cabinParts(elevator, 1.6, 2.2);
+  cabinParts(elevator, 1, 2);
   elevator.add(...bake(elevator));
   towerUpper.add(elevator);
 
@@ -598,6 +611,19 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit): Concentratio
   const mixedModules = [0, 1, 2, 3, 4, 5].map(k => addModule(neutralPropsLayer.group, `tower-function-mixed-${k + 1}`, MX + 1.6, k * FH, MZ + 1.6, 0, g => fitout(g, 1.2, SL, -1.1)));
 
   const highModules = [1, 3, 5, 7, 9, 11].map((f, i) => addModule(towerUpper, `tower-function-high-${i + 1}`, 0, LOBBY + f * HF, 0, 0, g => fitout(g, 1.5, SL, -1.6)));
+
+  if (assets) {
+    towerUpperLayer.setPreparation(async () => {
+      const glb = await assets.cloneRoot('concentration-tower-high', 'centerGaiRear', 'towerUpper');
+      remapCityMaterials(glb, { se_white: white, se_amber: amber, se_room: room, se_lamp: lamp, se_light: light, se_pane: pane });
+      towerUpper.remove(highShell);
+      towerUpper.add(glb);
+      roofGarden.position.y = CROWN_RISE;
+      meterRing.position.y = CROWN_RISE - .35; // ring on the GLB cap rim: y TOP + 1.5, radius 3.5
+      meterRing.scale.set(3.5 / 3.4, 1, 3.5 / 3.4);
+    });
+    void towerUpperLayer.prepare(); // load now, so the first 3 s rise already shows the GLB
+  }
 
   const concentrationTower = new ConcentrationTowerController({ base, pavilions, elevator, lowModules, mixedModules, highModules });
   return {

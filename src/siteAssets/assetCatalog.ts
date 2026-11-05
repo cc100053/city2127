@@ -2,7 +2,8 @@ import type { SiteAssetId, SiteId, SiteLayerId } from '../changeCatalog.ts';
 
 export type SiteAssetCategory = 'site-layer' | 'prop';
 export type SiteAssetMaterialPolicy = 'preserve' | 'city-roles';
-export type CityMaterialRole = 'city_glass' | 'city_trim' | 'city_future_light' | 'city_solar';
+export type CityMaterialRole = 'city_glass' | 'city_trim' | 'city_future_light' | 'city_solar'
+  | 'se_white' | 'se_amber' | 'se_room' | 'se_lamp' | 'se_light' | 'se_pane';
 
 export interface SiteAssetMetadataContract {
   readonly category: SiteAssetCategory;
@@ -48,5 +49,17 @@ export const SITE_ASSET_CATALOG: Readonly<Record<SiteAssetId, SiteAssetDefinitio
     materialPolicy: 'city-roles',
     materialRoles: ['city_glass', 'city_trim', 'city_future_light', 'city_solar'],
     metadata: { category: 'site-layer', forwardAxis: '-Y', frontMarkerName: 'front_marker' },
+  },
+  'concentration-tower-high': {
+    id: 'concentration-tower-high',
+    url: new URL('../../asset/models/concentration-tower-high/concentration-tower-high.glb', import.meta.url).href,
+    rootName: 'ROOT_CONCENTRATION_TOWER_HIGH',
+    category: 'site-layer',
+    compatibleSite: 'centerGaiRear',
+    compatibleLayer: 'towerUpper',
+    footprint: [7.5, 7],
+    maxHeight: 39.2,
+    materialPolicy: 'city-roles',
+    materialRoles: ['se_white', 'se_amber', 'se_room', 'se_lamp', 'se_light', 'se_pane'],
   },
 };
