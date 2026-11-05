@@ -1,10 +1,10 @@
 # closeup-night — 夜間重做 SW、NE、SE 旗艦 headline 近鏡
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS — Phase B：SW park（20/30），SE park（20/38，R6）
+- Status: DELIVERED — 等 owner 睇 board 決定（SW park R8 23/30，SE park R6 20/38；冇 site 過 90 %）
 - Branch: `feat/closeup-night`（site branch `feat/closeup-night-<site>`）
 - Base commit: `5a56230`（origin/main）＋ merge `chore/long-polish-loop-v2` `6e60d04` → `dd1f5a9`
-- Last verified commit: NONE
+- Last verified commit: `1aa34f2`（integration：SW R8＋SE R6 model＋新 L 鏡位）；之後只加 board 同 handoff
 - Remote availability: `origin/feat/closeup-night`
 
 ## Session Git state
@@ -20,7 +20,7 @@
 Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/SKILL.md)（每個 site 跟 [closeup-polish](../../.agents/skills/closeup-polish/SKILL.md)）用新 taste 重做 SW、NE、SE 旗艦 focal 近鏡（SE 連 focal-low），每個 −1/0/+1。NW 已收貨，只做回歸檢查。
 
 - 收貨水平：`~/city2127-evidence/nw-closeup-polish/bay-r2/review-bay-r2.jpg`（NW bay R2，19/20）。
-- Pass：總分 ≥ 90%、冇 0 分、2 分項目 pairwise 冇輸、gate 綠；第一輪 cap 4 round，未過就 park。
+- Pass：總分 ≥ 90%、冇 0 分、2 分項目 pairwise 冇輸、gate 綠；第一輪 cap 4 round，未過就 park。**Owner 2026-11-05 03:20 改 cap 做 6（成個 task）**；之後 owner 叫兩個 session 唔理時限繼續（SW 到 R8、SE 到 R7）。
 - Site 次序：SW → NE → SE。Deadline 2026-11-05 10:00 JST；09:00 停開新 round。
 - 冇嘢入 `main`；owner 朝早睇 board 決定。
 
@@ -28,21 +28,35 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 
 | Site | Pose | Targets | Size decision | Rounds | Score | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| SW | `sw:n` `[-95,30,-15]`→`[-105,10,60]` | [target](../../artifacts/closeup-night/sw/target/) | 放大到目標（填滿 lot，唔越橙邊；碟可以向上） | R1–R8（R6 drop） | 23/30 R8 | PARKED `feat/closeup-night-sw` `992f339`（R4 曾 merge `55a5d2b`；R5–R8 未 merge 入 integration） |
+| SW | `sw:n` `[-95,30,-15]`→`[-105,10,60]` | [target](../../artifacts/closeup-night/sw/target/) | 放大到目標（填滿 lot，唔越橙邊；碟可以向上） | R1–R8（R6 drop） | **23/30（77 %）** R8 | PARKED，merged `1aa34f2`（code `992f339`） |
 | NE | `ne:s2` | — | — | — | — | SKIPPED（owner 2026-11-04：Q3 改能源題後 NE 公園恆定 0，客人去唔到 ±1） |
-| SE | L `[130,28,-95]`→`[182,24,-38]`（−1、0）；H `[360,45,-50]`→`[182,58,-38]`（0、+1） | [target](../../artifacts/closeup-night/se/target/)（`tower-mixed` = 0 喺 H） | 放大到目標（lot 內） | R1–R7 | 20/38（53 %）R6（R7 唔 keep） | PARKED（`feat/closeup-night-se`，R6 model＋新 L 鏡位） |
+| SE | L `[118,38,-107]`→`[182,18,-38]`（−1、0；R7 owner 拉後拉高）；H `[360,45,-50]`→`[182,58,-38]`（0、+1） | [target](../../artifacts/closeup-night/se/target/)（`tower-mixed` = 0 喺 H） | 放大到目標（lot 內） | R1–R7（R2、R7 drop） | **20/38（53 %）** R6（喺舊 L 鏡位評；新 L 鏡位未再評） | PARKED，merged `1aa34f2` |
 
 ## Completed work
 
-- Phase A step 1：night folder、integration branch、keep-awake。
+- Phase A：night folder、integration branch、keep-awake、SW／SE 目標同鏡位。
+- Phase B：SW R1–R8、SE R1–R7（每輪見下面 `## SW RN`／`## SE RN`）；dispatcher 逐次 merge 入 `feat/closeup-night`。
+- 清理（owner 2026-11-05）：兩個 session 共用 night folder，SE R7 唔 keep 嘅塔改動夾咗入 SW R7 commit `d156db5`；喺 SW branch 用 SE branch 嘅 `concentrationTower.ts`（R6 model）還原（`fix(se)` commit），integration 上 SE 檔案同 `origin/feat/closeup-night-se` 一致。
+- Skill（owner 2026-11-05）：`8f78305` closeup-polish 改做逐項 keep（輸嘅項目還原上一輪 code）、Keep 項目 code 鎖死、總分用 3 個 judge 中位數；long-polish-loop 加「一個 folder 一個寫手」同 deadline − 1 h 強制停。
+- Deliver：全部 headline 近鏡（SW、SE L/H、NW L/H 回歸）日夜 capture、FPS、night board。
 
 ## Actual validation results
 
-- Verification status: NOT RUN
+- Verification status: PASS（integration `1aa34f2`，dispatcher 2026-11-05 10:30）
+- `npm test` exit 0、`npm run build` exit 0、`git diff --check origin/main` exit 0（root；survey／module-swap 冇改）。
+- FPS（headed `fps.sh`，hero 1920×1080 DPR 1，`nw:high,sw:high,se:high`）：日 60.0×6／夜 60.0×6（第一個 sample 唔計）。
+- 近鏡（1600×900 DPR 2，日 12 時／夜 22 時）：SW `sw:focal` −1/0/+1、SE `se:focal-low` −1/0、`se:focal` 0/+1、NW `nw:focal-low` −1/0、`nw:focal` 0/+1 全部見到主體、冇遮擋。NW builder 冇改（`git diff origin/main -- src/siteBuilders/` 淨係 `commonsPlaza.ts`、`concentrationTower.ts`），冇回歸。
+- Board：[`artifacts/closeup-night/board/night-board.jpg`](../../artifacts/closeup-night/board/night-board.jpg)、[`sw-r8-review.jpg`](../../artifacts/closeup-night/board/sw-r8-review.jpg)、[`se-r6-review.jpg`](../../artifacts/closeup-night/board/se-r6-review.jpg)；全尺寸喺 `~/city2127-evidence/closeup-night/deliver/`。
 
 ## Known issues and blockers
 
-- NONE
+冇 site 過 90 % 門檻。低過 2 分嘅項目（直講）：
+
+- **SW R8（7 項 1 分）**：fl-people-in（艙內人仔方塊、穿模）、fl-emitters（環太飽和、空隙唔明顯）、fl-garden（小路似硬 Y 字、長凳得 1 張有人）、fm-pods（艙仍然擠）、fm-divider（似一條波波柱）、fm-canopy（碟後半似喺水面上）、fh-tables（後亭似骨架＋平面桃色板，唔似玻璃房）。
+- **SE R6（18 項 1 分，只有 fh-frame 2 分）**：fl-pavilions、fl-discs、fl-people-in、fl-walkway、fl-garden、fl-material、fm-tower、fm-lift、fm-crown、fm-wings、fm-ground、tm-tower、tm-base、fh-floors、fh-crown、fh-lift、fh-gardens、fh-base。主因：−1 亭擠喺 lot 後面；人仔方塊；0 塔喺 H 得目標一半高；+1 露台似灌木、升降井唔突出。
+- SE R7（新 L 鏡位＋亭改動）absolute 24/38 但 pairwise 輸 R6 2–10 → drop；R6 model 喺新 L 鏡位**未再評分**。
+- 判分噪音：同一版 absolute 會 ±1–3 飄（SE 21→18→20；SW R6 用 Sonnet judge，同 Opus 分唔可比）；keep 只睇 pairwise。
+- Blocker 連選項：見 `## Blocked`（SE −1 構圖、SE 0 塔高度、`se:focal` 測試放寬要 owner 確認）。
 
 ## Important decisions
 
@@ -177,6 +191,11 @@ Owner 2026-11-04：用 [long-polish-loop](../../.agents/skills/long-polish-loop/
 - FPS（headed `fps.sh`，hero 1920×1080 DPR 1，`992f339`）：`sw:high` 日 60.0 59.9 60.0 60.0 60.0 60.0／夜 60.0×6；`sw:low` 日夜 60.0×6。
 - Evidence：`~/city2127-evidence/closeup-night/sw/r8/`（`pair.md`、`review.jpg` = baseline | R8 | target、`fps.txt`）。
 
+## Branch refs
+
+- Integration：`refs/heads/feat/closeup-night`（含 SW R8、SE R6＋新 L、skill 更新、board）
+- Site：`refs/heads/feat/closeup-night-sw`、`refs/heads/feat/closeup-night-se`（已 merge 入 integration）
+
 ## Next expected step
 
-Phase B：dispatcher 開 SW site session（`feat/closeup-night-sw`，port 5191，06:00 前停），完成後驗證、merge 入 `feat/closeup-night`，再開 SE（port 5192，09:00 停）；10:00 前交 night board。
+Owner 睇 board 決定：(1) 接受現狀 merge `feat/closeup-night` 入 `main`；(2) 揀 site 用新 skill 規則（逐項 keep）再開 round（SW 目標 7 個 1 分項；SE 建議先評 R6 喺新 L 鏡位，再攻 −1 亭同人仔）；(3) 確認 `se:focal` 測試放寬同 SE blocker 選項。
