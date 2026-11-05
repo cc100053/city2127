@@ -1,7 +1,7 @@
 # se-high-blender — SE +1 tower 用 Blender 重建
 
 - Owner: cc100053（唯一驗收人）
-- Status: IN_PROGRESS（R2 等 owner）
+- Status: IN_PROGRESS（R3 等 owner；三輪未全 2，按 skill 停低報告）
 - Branch: `feat/se-high-blender`（worktree `../city2127-se-blender`）
 - Base commit: `304084d58a9541a2dde5d63f2820d01b60d6654b`（origin/main）
 - Last verified commit: `734533b`（R1）
@@ -40,6 +40,10 @@ Owner 2026-11-05：SE 夜間分最低（closeup-night R6 20/38，SW 23/30），�
 - R2（`333678a`）：由 target 逐項重做塔 GLB（3 bays、每 3 層 amber、頂層開放＋水缸、獨立升降井、鋪地前庭）＋新 reusable prop kit `city-kit-2127`（19 件，7,202 tris，198 KB，`propKit.ts`）。共用材質冇改（只加 +1 專用 `ceilingHigh`／`cream`／`paving`），所以 −1／0 冇重影。Opus 重跑 test／build／diff-check 全綠。
 - R2 judge：absolute 日 10/10/10 → median **10/12**，夜 9/12；pairwise 對 R1 日夜都係 5 勝 1 負（輸 fh-crown：屋頂樹疏、似棒棒糖，amber 環下緣雙層鋸齒）→ keep。Board：`~/city2127-evidence/se-high-blender/r2/review.jpg`、`r2n/review.jpg`、`r2/compare-r6-r2.jpg`。FPS：NOT RUN。
 
+- R3（`8e7478c`）：上層暖色＋`paneHigh`、每層唔同 back-wall＋中間傢俬、`liftGlass`＋每層白環＋大 cabin、cap 單一 meter 環、低屋頂 mound、kit 樹改短樹幹 5–7 lobe、新 kit props（pendant_lamp、rug、whiteboard、upper_cabinet、art_panel、meeting_table）。Keep 區（frame、lobby、forecourt、paving、人仔）同 R2 一樣。Opus 重跑 test／build／diff-check 全綠。
+- R3 judge：absolute 日 10/9/9 → median **9/12**（R2 10/12），夜 9/12。逐項 median：floors 2（↑）、frame 1（↓，code 冇改，judge 話角柱似薄平邊）、crown 1（↓，屋頂得矮 mound 冇樹）、lift 1（=，似 amber 梯）、gardens 2、base 2。Pairwise 對 R2：日 4 勝 0 負 2 和；夜 2 勝 2 負（輸 crown、lift）2 和。
+- FPS（Sonnet，headed，hero `se:high`，第一個 sample 冇剔）：日 60×6；夜 53.1–56.9。R6 夜係 60；R2 冇量，未知邊個改動拖慢（疑 transparent glass 或 kit instance 數）。
+
 ## Known issues and blockers
 
 - R2 低過 2：fh-floors（上層冷白、每層傢俬重複）、fh-lift（得 amber 扶手，玻璃管同 cabin 睇唔到）；夜間 fh-gardens 1。fh-crown 2 分但 pairwise 輸 R1（樹疏＋環鋸齒）。
@@ -59,4 +63,4 @@ Owner 2026-11-05：SE 夜間分最低（closeup-night R6 20/38，SW 23/30），�
 
 ## Next expected step
 
-R2 完成，等 owner 睇 board。R3 建議：上層暖色、每層傢俬唔同、升降井玻璃管要讀到＋cabin 大而實、kit 樹改矮叢、頂環修鋸齒加密屋頂花園。（R2 背景：owner 2026-11-05 叫寫 R2（[spec](../../artifacts/se-high-blender/spec.md) `# R2`）：由 target 逐項寫（T1–T10），材質唔再鎖（只鎖人仔），新做 reusable prop kit `city-kit-2127`（樹、室內植物、傢俬、長凳、lift cabin，真實米＋每 site `unitsPerMetre`）。下一步：owner 批 spec → Sonnet 實作 R2 → 三個 absolute judge 對 target。）
+R3 完成，三輪都未全部 2 分，等 owner 決定。R4 建議（逐項揀）：floors／gardens 用 R3；crown 用 R3 單環＋R2 嗰種高樹（新 kit 樹）；lift 白環減到每 4 層、玻璃更實、cabin 更大更實；角柱加粗圓角（frame 係 locked，要 owner 批）；查夜間 FPS。（舊：R3 建議：上層暖色、每層傢俬唔同、升降井玻璃管要讀到＋cabin 大而實、kit 樹改矮叢、頂環修鋸齒加密屋頂花園。（R2 背景：owner 2026-11-05 叫寫 R2（[spec](../../artifacts/se-high-blender/spec.md) `# R2`）：由 target 逐項寫（T1–T10），材質唔再鎖（只鎖人仔），新做 reusable prop kit `city-kit-2127`（樹、室內植物、傢俬、長凳、lift cabin，真實米＋每 site `unitsPerMetre`）。下一步：owner 批 spec → Sonnet 實作 R2 → 三個 absolute judge 對 target。）
