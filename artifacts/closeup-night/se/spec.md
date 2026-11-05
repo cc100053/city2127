@@ -107,3 +107,14 @@ At L the front third of the lot is below the frame for **both** −1 and 0, so l
 - **−1**: put benches with seated people and ≥ 8 residents along the walkway and between pavilions in the **visible middle band**, not the front third. No blue-tinted surfaces on our planters.
 - **+1 at H**: crown rim ring thicker (tube ≈ .25) and bright so it reads as a glowing halo; lobby closed warm peach glazing on +X with 2 benches and 6 residents in front.
 Keep everything else as R5.
+
+## R7 (owner 2026-11-05: option b + R7; R6 parked 20/38)
+
+New L pose `se:focal-low` = `[118,38,-107]→[182,18,-38]`: the **whole lot is now in frame** (see `~/city2127-evidence/closeup-night/se/r6L/flagship-low.png`, `flagship-mixed.png` — R6 code at the new pose, the pairwise baseline for R7). The front third is no longer cut, so use it.
+
+Keep: `fh-frame` (2), warm peach rooms, H as is.
+
+- **−1 grow to fill the lot**: spread the pavilions over the whole 14×14 (front third included): 5 drums, the two nearest the camera (−X/−Z half) big (r 2.6), three r 1.8 behind, ≥ 1.2 units between drums for garden/walkway; S-walkway from the −Z edge to the +Z edge between them; water channel along it; terraced bed and benches with seated people in the gaps; ≥ 12 residents outside. Discs: thin white lip with a thin amber edge line, a thick bright warm-white collar band (emissive ≈ 2) in the gap.
+- **People** (`fl-people-in`, `fm-ground`, `tm-base`, `fh-floors` — every judge says "blocky"): rebuild the site figure: sphere head, tapered torso (cylinder/capsule), separate arms and legs (thin cylinders), seated variant with bent knees; height .75; fewer but bigger figures per room (2–3), placed at the glass facing the camera.
+- **0**: move the composition back to centre now that the front is visible (undo R6's +1.6 shift if it helps framing); forecourt with 3 benches and seated people stays in front, in frame; halo a thin (tube .07) bright ring .4 above the roof trees; roof garden taller trees (crown ≥ .8).
+- **+1**: terrace trees with trunks (crown ≥ 1.0) on 5 balconies; lift shaft protruding 2 units off the +X face with a white frame; furniture varies floor to floor (shelves, dining table, plants, sofa, desks in rotation, never the same two floors in a row).
