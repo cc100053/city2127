@@ -11,6 +11,3 @@ dist/
 asset/models/**/*.blend1
 asset/models/**/*.blend2
 asset/models/**/*.blend@
-
-# Planning-team question candidates (kept outside the repo).
-question_candidates.md

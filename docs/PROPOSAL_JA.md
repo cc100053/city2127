@@ -211,7 +211,7 @@ iPadは「ステーションA」「ステーションB」の2台を用意し、2
 
 ### 追加の問いの候補【検討中】
 
-チームで作った9つの候補（[question_candidates.md](../question_candidates.md)）です。どれも同じ方針で書かれています。
+チームで作った9つの候補（[QUESTION_CANDIDATES_JA.md](QUESTION_CANDIDATES_JA.md)）です。どれも同じ方針で書かれています。
 
 | 候補 | 場面 | 見ている価値観 | 街での見え方（案） |
 | --- | --- | --- | --- |
@@ -410,4 +410,4 @@ n人目の答えを v（−1／0／+1）とします。物差しごとに、次�
 
 - 初版 企画・基本仕様書 v0.1（2026-10-05）
 - 提案版 統合基本仕様書 v0.2（2026-10-08）
-- [展示仕様](EXHIBITION_SPEC.md)、[住民向け文言](RESIDENT_COPY.md)、[今日の振り返りの計画](handoffs/day-replay.md)、[問いの候補](../question_candidates.md)
+- [展示仕様](EXHIBITION_SPEC.md)、[住民向け文言](RESIDENT_COPY.md)、[今日の振り返りの計画](handoffs/day-replay.md)、[問いの候補](QUESTION_CANDIDATES_JA.md)
