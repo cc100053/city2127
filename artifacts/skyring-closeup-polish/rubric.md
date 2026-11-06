@@ -1,6 +1,6 @@
 # Sky Ring close-up rubric
 
-Owner decisions 2026-11-06: enlarge the berth toward the target; use the segmented pylons in the truss target, which supersede the conflicting slim pylon image. Rectangles are normalized in each full image. Score 0 absent / 1 present but unlike target / 2 matches. Sky Ring is fixed infrastructure, so the carriers below are review poses rather than Meter states.
+Owner decisions 2026-11-06: enlarge the berth toward the target; use the segmented pylons in the truss target, which supersede the conflicting slim pylon image. Rectangles are normalized in each full image. Score 0 absent / 1 present but unlike target / 2 matches. Sky Ring is fixed infrastructure, so the carriers below are review poses rather than Meter states. Owner calibration 2026-11-06: 「fix score 1 items」; preserve the two 2-score items.
 
 ## Berth day `day`
 

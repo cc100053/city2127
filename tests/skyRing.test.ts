@@ -8,6 +8,7 @@ import { skyRing, VOICE_NODES, voiceSlot, ringPoint, PYLONS } from '../src/skyRi
 const scene = new Scene(), ring = skyRing(scene);
 scene.updateMatrixWorld(true);
 const meshes = ring.root.filter((o): o is Mesh => o instanceof Mesh);
+assert.ok(ring.root.some(o => o.name === 'sky-ring-architecture'), 'loaded architecture follows the ring lifecycle');
 
 // The ring never hides a focal site from the hero pose (ground and quarter height, plus the tower's top).
 const camera = new PerspectiveCamera(42, 16 / 9, 2, 9000); camera.position.set(...HERO_POSITION); camera.lookAt(...HERO_TARGET);
@@ -30,3 +31,13 @@ for (const a of PYLONS) assert.ok(ringPoint(a, 0, 100).distanceTo(new Vector3(SK
 assert.equal(new Set(Array.from({ length: VOICE_NODES }, (_, k) => voiceSlot(k))).size, VOICE_NODES);
 for (const [count, lit] of [[0, 0], [1, 1], [57, 57], [VOICE_NODES, VOICE_NODES], [5000, VOICE_NODES], [-3, 0]]) { ring.setVoices(count); assert.equal(ring.litVoices(), lit); }
 console.log(`skyRing tests passed: ${meshes.length} batches, top ${box.max.y.toFixed(1)} m, 12 hero sightlines clear`);
+
+// The Blender-authored GLB consumed by the runtime contains reusable shells and a supported staircase.
+const { readFile } = await import('node:fs/promises');
+const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+const glb = await readFile(new URL('../asset/models/sky-ring-architecture/sky-ring-architecture.glb', import.meta.url));
+const asset = await new Promise<import('three/addons/loaders/GLTFLoader.js').GLTF>((resolve, reject) =>
+  new GLTFLoader().parse(glb.buffer.slice(glb.byteOffset, glb.byteOffset + glb.byteLength), '', resolve, reject));
+for (const name of ['PylonShell', 'PylonChannel00', 'PylonChannel01', 'PylonChannel02', 'PylonChannel03', 'Stair00', 'Stair17', 'StairSupport'])
+  assert.ok(asset.scene.getObjectByName(name), `Sky Ring GLB contains ${name}`);
+assert.equal(asset.animations.length, 0);
