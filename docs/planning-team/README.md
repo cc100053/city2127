@@ -5,6 +5,7 @@
 | 文件 | 內容 |
 | --- | --- |
 | [SURVEY_V2.md](SURVEY_V2.md) | 「仮説連動型アンケート Ver.2」：Q01–Q09 共 9 題。每題有 P（心理テスト系）同 U（都市企画系）兩個版本，包括 A/B/C 選項、解釋理由、都市嘅具體變化 |
+| [SURVEY_V2_REVIEW.md](SURVEY_V2_REVIEW.md) | Ver.2 審查表（2026-11-06）：R01–R13 需要 owner 判斷嘅項目，同埋決策記錄 |
 | [HYPOTHESES_MOBILITY.md](HYPOTHESES_MOBILITY.md) | 交通・物流仮説 ①–⑧（改變、原因、都市影響、反論、都市分岐）、仮説之間嘅關係、歷史資料、同其他領域嘅關係、適合 3D 展示嘅變化、最終議論 |
 | [HYPOTHESES_SOCIETY_ENERGY.md](HYPOTHESES_SOCIETY_ENERGY.md) | 社會・生活仮説 ①–⑧（工時、共享、購物、AI 夥伴、職住、體驗娛樂、交流、銷售同儲存分離），加 4 個能源 brainstorm |
 | [IMAGE_PROMPTS.md](IMAGE_PROMPTS.md) | 27 案圖像生成 prompt（未來感がないバージョン）：用法、製作前提、範圍同尺寸、27 案一覽、第一次試做檢查 |
