@@ -22,6 +22,13 @@
 
 新產品決策寫入 SPEC，模組事實寫入 PROJECT，驗證方法寫入 VALIDATION；各任務的日期／commit／證據留在自己的 handoff。不要向歷史計劃追加新方向。
 
+## 企劃組提案（參考，非 authority）
+
+| 文件 | 狀態 |
+| --- | --- |
+| [PROPOSAL_JA](PROPOSAL_JA.md)／[PDF](PROPOSAL_JA.pdf) | 舊企劃書：現行 4 問／4 Meter 展覽嘅日文說明 |
+| [planning-team](planning-team/README.md) | 2026-11-06 新提案：アンケート Ver.2（9 題）、交通・社會仮説、27 案圖像 prompt；可能同舊提案矛盾，並列作對比 |
+
 ## 完成記錄與歷史
 
 | 文件 | 狀態 |
