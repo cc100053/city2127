@@ -1,7 +1,7 @@
 # car-closeup-polish — 街道車輛家族（Blender）
 
 - Owner: cc100053
-- Status: IN_PROGRESS — R2 待 owner 視覺驗收，未 merge
+- Status: DONE — owner 2026-11-07 接受 R2 並 merge；已知差距見 R2
 - Branch: `feat/car-closeup-polish`（worktree `../city2127-car`）
 - Base commit: `cbc58cc`（origin/main）
 - Last verified commit: 見 branch tip；`npm test`／`npm run build`／`git diff --check` 通過
@@ -57,8 +57,8 @@ FPS（`fps.sh`，headed Chrome，hero `se:high`，1920×1080，同一機況）�
 
 GTAO 喺近距離有地面顆粒，係全城設定，冇改。
 
-FPS（同條件 hero `se:high`）：中途版 家族 25.8–26.2；方盒 22.1–22.9。兩者次序同 R1 相反，即機況波動大於差異。最終版單獨一次：night: 6.3 26.7 27.2 27.2 26.9 26.9;。
+FPS（同條件 hero `se:high`）：中途版 家族 25.8–26.2；方盒 22.1–22.9。兩者次序同 R1 相反，即機況波動大於差異。最終版單獨一次：day: 26.5 26.3 26.5 26.4 26.6 26.6；night: 6.3 26.7 27.2 27.2 26.9 26.9（第一個 sample 剔除）。
 
 ## Next
 
-Owner 判斷 R2；通過就按 CONTRIBUTING merge（merge 後移除 worktree），否則開 R2。
+Owner 接受現狀。如果再開：先將車尾圓盤向兩側轉，再做強夜間燈帶、紅環同室內暖光。
