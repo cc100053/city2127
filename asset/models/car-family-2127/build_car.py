@@ -430,6 +430,7 @@ def main():
         a, b = build(name, human, x, mats, root)
         report[name] = sum(len(f) - 2 for f in a.f + b.f)
     blend, glb = os.path.join(HERE, "car-family-2127.blend"), os.path.join(HERE, "car-family-2127.glb")
+    bpy.context.preferences.filepaths.save_version = 0
     bpy.ops.wm.save_as_mainfile(filepath=blend, compress=True)
     bpy.ops.object.select_all(action="SELECT")
     bpy.ops.export_scene.gltf(filepath=glb, export_format="GLB", use_selection=True, export_yup=True, export_apply=True,
