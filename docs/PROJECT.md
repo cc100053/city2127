@@ -218,3 +218,7 @@ CityChangeManager將能源實際前後target加入CarrierChange，residentResult
 ### G2 能源保底配置（2026-10-30；已 merge main，視覺待驗收）
 
 每份新能源提案先以正式梯級及能源門檻計算；若沒有向訪客方向的 site 變化、所選能源設備亦無變化，active proposal fold 切換該能源的 `layout.energy.activity`（1／2）。它不修改能源票數或設備門檻；按完整歷史重建，snapshot、重啟和 Undo 沿用同一結果。Root 驗證可選 activity，與設備一起比較，由能源 runtime、headline、camera 和結果卡呈現。舊 run 重播可能產生新整備配置，root／survey 需一同更新。候選畫面仍須幾何、視覺及人類 gate 驗收，不可當作完成。
+
+## Guest terminal UI — 2026-11-07 feature branch
+
+`feat/guest-ui-graphite` imports Guest-only `survey/src/ui/guestTheme.css` after the shared debug stylesheet. The graphite surface, soft cyan selection, amber primary action and 5px control corners implement the owner-approved exhibition-desk palette. Guest markup adds a resident masthead and short option headings, while the server-provided full option labels remain visible. Three-option questions use rows; the four-option energy question uses two columns at the existing desktop/tablet width. Native radios, form handlers, IDs, recovery, submission, A/B scheduling and exploration continue through the existing Guest adapter. Admin and Monitor do not import the theme. The feature is isolated on its branch. See [handoff](handoffs/guest-ui-graphite.md).

@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "browser": "157.0.8103.38",
+  "viewport": "1024x900, emulated touch",
+  "checks": [
+    "Four questions, keyboard radio, selected styling, 2x2 energy layout, reload recovery, review editing, no partial vote",
+    "Actual submission recorded once, result/handoff timing, both existing exploration API actions and return, next guest",
+    "Independent A/B drafts, queued B waiting screen and three accumulated proposals",
+    "Guest-specific stylesheet absent from Admin"
+  ],
+  "errors": [],
+  "limitation": "No physical iPad or shared 3D display was tested."
+}

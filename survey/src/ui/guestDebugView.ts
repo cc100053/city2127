@@ -1,4 +1,5 @@
 import './debug.css';
+import './guestTheme.css';
 import type { ExhibitionState } from '../shared/citySurveyState.ts';
 import type { ExploreTarget, ProposalData, ProposalRequest, ProposalSessionData } from '../shared/protocol.ts';
 import { api, connectEvents, el, newAnswerId } from './debugApi.ts';
@@ -150,7 +151,11 @@ function page(title: string, eyebrow: string, ...content: (HTMLElement | string)
   app.dataset.screen = screen;
   app.replaceChildren(
     el('div', { class: 'guest-frame' },
-      el('header', { class: 'guest-masthead' }, el('span', {}, '2127 · ODAIBA'), el('span', {}, stationId ? `ステーション ${stationId} · この街で暮らすあなたへ` : 'この街で暮らすあなたへ')),
+      el('header', { class: 'guest-masthead' },
+        el('div', { class: 'guest-brand' },
+          el('span', { class: 'guest-brand-name' }, '2127 / ODAIBA'),
+          el('span', { class: 'guest-brand-caption' }, '住民の声')),
+        el('span', { class: 'guest-station' }, stationId ? `STATION ${stationId}` : 'この街で暮らすあなたへ')),
       el('section', { class: 'guest-screen' },
         el('p', { class: 'guest-eyebrow' }, eyebrow),
         el('h1', { tabindex: '-1' }, title),
@@ -195,8 +200,8 @@ function renderWelcome(focus = false) {
   const button = action(screen === 'starting' ? '準備中…' : 'はじめる', () => startSession(session !== undefined && draft.size > 0), true, busy);
   button.dataset.autoAction = 'start';
   const status = screen === 'starting' ? el('p', { class: 'guest-status', role: 'status', 'aria-live': 'polite' }, '四つの質問を準備しています。') : undefined;
-  page('あなたの日常を教えてください。', '2127年の暮らし',
-    el('p', { class: 'guest-lead' }, '四つの問いに答えたら、街の画面をご覧ください。'),
+  page('この街の未来に、あなたの声を。', '2127年・台場の暮らし',
+    el('p', { class: 'guest-lead' }, 'あなたは、2127年の台場に暮らす住民です。日々の暮らしについて、四つの質問にお答えください。'),
     el('p', { class: 'guest-copy' }, '回答は最後にまとめて確認してから記録します。選んでいる間、街の集計は変わりません。'),
     ...noticeNodes(),
     ...(status ? [status] : []),
@@ -306,9 +311,25 @@ function renderProgress() {
     el('p', { class: 'guest-progress-copy' }, `質問 ${questionIndex + 1} / ${session!.questions.length}`));
 }
 
+const choiceTitles: Record<string, string> = {
+  'human-led': '人に相談する',
+  'human-machine': '普段は自動、困ったら人へ',
+  autonomous: 'いつでも自動で',
+  'private-pods': '静かな自分たちの場所',
+  'mixed-seating': '静かな席も、集まる場所も',
+  'open-commons': '誰にでも開かれた海辺',
+  'water-storage': '水庭で蓄える',
+  'rotor-storage': '街の中心で蓄える',
+  'orbital-supply': '空から受け取る',
+  'island-supply': '沖の島から届ける',
+  'distributed-pavilions': '水辺の低い建物をめぐる',
+  'mixed-functions': '低い建物と高い建物の街',
+  'vertical-functions': 'ひとつのタワーで済ませる',
+};
+
 function renderQuestion(focus = true) {
   const question = session!.questions[questionIndex];
-  const fieldset = el('fieldset', { class: 'guest-choices' });
+  const fieldset = el('fieldset', { class: 'guest-choices', 'data-option-count': String(question.options.length) });
   const next = el('button', {
     type: 'submit', class: 'primary', 'data-auto-action': 'next', ...(!draft.has(question.id) ? { disabled: '' } : {}),
   }, questionIndex === session!.questions.length - 1 ? '回答を確認する' : '次へ');
@@ -325,8 +346,11 @@ function renderQuestion(focus = true) {
       persistRecovery();
       resetIdleTimer();
     });
+    const title = choiceTitles[option.id];
     fieldset.append(el('label', { class: 'guest-choice' }, input,
-      el('span', { class: 'guest-choice-copy' }, option.label),
+      el('span', { class: 'guest-choice-content' },
+        ...(title ? [el('span', { class: 'guest-choice-title' }, title)] : []),
+        el('span', { class: 'guest-choice-copy' }, option.label)),
       el('span', { class: 'guest-choice-state' }, '選択中')));
   });
 
