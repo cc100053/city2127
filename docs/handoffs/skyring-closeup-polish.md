@@ -4,8 +4,8 @@
 - Status: IN_PROGRESS
 - Branch: `feat/skyring-closeup-polish` (isolated clone `/private/tmp/city2127-skyring-polish`)
 - Base commit: `cbc58cca32d11f44b2e03e71fb2bf5c71d2949c8`
-- Last verified commit: `b56cb1d` plus the R2 implementation delta; full checks below.
-- Remote availability: `origin/feat/skyring-closeup-polish` (R2 push follows this handoff).
+- Last verified commit: `23830f5` plus the R3 composed delta; checks below.
+- Remote availability: `origin/feat/skyring-closeup-polish` at `23830f5`; R3 push follows this handoff.
 
 ## Session Git state
 
@@ -26,17 +26,17 @@ Use Blender to improve the Sky Ring against the owner's existing target images, 
 
 - Fetched remote references; created isolated task clone. Four historical owner-selected targets located outside Git.
 - Blender 5.2.2 LTS starts successfully outside the sandbox; Metal GPU Apple M6. Its MCP server was not listening. Background Blender inside sandbox exited 139.
-- Historical target and R5 captures compared; live baseline capture pending.
+- Historical target and R5 captures compared; current baseline and R1–R3 captures made.
 
 ## Actual validation results
 
-- Verification status: NOT RUN; no implementation yet.
-- Blender background environment report: PASS outside sandbox. Runtime, geometry QA, build, test, browser and FPS: NOT RUN.
+- Verification status: R1 and R2 passed; R3 validation below.
+- Blender background environment report: PASS outside sandbox. R3 detailed checks below; FPS NOT RUN.
 - Integrated commit and checks: NOT INTEGRATED.
 
 ## Known issues and next expected step
 
-Capture current origin/main baseline at berth, truss and voice review poses; prepare image-based rubric and a complete Blender/runtime design before modeling. Truss and pylon targets disagree; owner chose the truss image. Do not treat historical R5 validation as validation of this task.
+Review R3 scored crops with owner; do not treat historical R5 validation as validation of this task.
 
 ## R1 — 2026-11-06, awaiting owner calibration
 
@@ -59,3 +59,12 @@ A real `air-taxis` wing on the shore path at legal lateral −10 m intersects `P
 - Hall residents use hall-local coordinates; actual foot-mesh minima and both staircase connections have targeted checks. Pylon and stair game-profile QA passed; stair support local ground-z −0.25 m is an intended deck insertion warning. Source reopened; GLB reimported. Final build passed independently; diff whitespace check passed. Six final browser captures at 3200×1800 were taken; raw images and contact sheets are in `/private/tmp/skyring-evidence/r2/` (workstation only).
 - Three fresh absolute judges scored 15, 15, 14 of 22 (median **15/22**). Per-item medians: hall 2, apron 2, walk 1, garden 1, people 1; lower truss 1, frame 1, berth 1; lamps 2, structure 2; pylon 1. Pairwise blind comparison: R2 pylon wins, R1 truss-berth wins because the R2 lower stair is visually intrusive, all other items tie. [Target/candidate review](../../artifacts/skyring-closeup-polish/r2/vs-target.jpg).
 - R2 has not been accepted. Keep individually winning/tied regions; the R2 lower stair loss is separable, so R3 restores that area to R1 and replaces the staircase with a better-supported, unobtrusive connection without regressing the R2 pylon or owner-approved shore adjustment. R3 instructions: [spec-r3](../../artifacts/skyring-closeup-polish/spec-r3.md). FPS and exhibition hardware: NOT RUN.
+
+## R3 composed state — 2026-11-08
+
+- R3 replaces the visually intrusive R2 lower staircase with a Blender-authored 52-step switchback and physically connected landings, thickens the pylon shell and adds planting and upper-deck residents. After blind pairwise review, R2 lower-deck resident placement, frame nodes and lower lattice were restored; the staircase, bridge and rail openings are inseparable from the berth access and retained. The composed state was independently re-judged.
+- Three fresh absolute judges of the final composed crops scored **12, 14, 13/22** (median **13/22**). Item medians: hall 1, apron 1, walk 1, garden 1, people 1; lower walk 1, frame 1, berth 1; lamps 2, night structure 2; pylon 1. Fresh pairwise judge: composed state wins hall and people, nine ties, no losses versus R2. [Full target/candidate scored crops](../../artifacts/skyring-closeup-polish/r3/vs-target.jpg); raw 3200×1800 captures and contact sheets `/private/tmp/skyring-evidence/r3/` are workstation-only.
+- Blender 5.2.2: source reopened, GLB reimported, 31 meshes, 2,308 triangles and 155,740 bytes; pylon QA passed without warnings; stair QA passed with the accepted −0.22 m local ground warning for support into the lower bridge. Material and wireframe contact sheets reviewed. Browser captures show no asset-loading errors; favicon 404 remains.
+- Independent `npm test`, `npm run build` and `git diff --check` passed on the R3 composed delta. The clearance test checked 154 pylon/city candidate pairs and 2,425 shore positions; these are finite samples. FPS, exhibition hardware and final owner visual acceptance: NOT RUN. No integration.
+- New session 2026-11-08: original checkout main `304084d58a9541a2dde5d63f2820d01b60d6654b`, unrelated modifications preserved; original checkout `git fetch --prune origin` succeeded and fetched main `2d7c25d7797bd2e436b3d0aec03e20cddc48de7d`, 27 commits ahead of local main. R2 task branch `23830f5` is 4 commits ahead / 6 behind latest main. Isolated clone fetch failed (`pack has 104 unresolved deltas`), but original checkout successfully refreshed the remote. No automatic merge performed.
+- Three rounds completed without all 2s. In accordance with closeup-polish step 7, stop after reporting the score table and full-size crops; owner chooses acceptance or a further round. Any future merge must deliberately incorporate the latest main and validate the integrated result.

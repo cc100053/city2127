@@ -41,10 +41,15 @@ const asset = await new Promise<import('three/addons/loaders/GLTFLoader.js').GLT
 for (const name of ['PylonShell', 'PylonChannel00', 'PylonChannel01', 'PylonChannel02', 'PylonChannel03', 'Stair00', 'Stair17', 'StairSupport'])
   assert.ok(asset.scene.getObjectByName(name), `Sky Ring GLB contains ${name}`);
 assert.equal(asset.animations.length, 0);
-for (const name of ['LowerStair00', 'LowerStair51', 'LowerStairSupport']) assert.ok(asset.scene.getObjectByName(name), `Sky Ring GLB contains ${name}`);
+for (const name of ['CompactFlight00', 'CompactFlight03', 'CompactLanding00', 'CompactLanding02']) assert.ok(asset.scene.getObjectByName(name), `Sky Ring GLB contains ${name}`);
 
-// Every hall occupant must stand on its actual floor, and each staircase joins real landings.
+// Every resident must stand on an actual floor, and each staircase joins real landings.
 const { Matrix4, Group } = await import('three');
+const { MeshBVH, acceleratedRaycast } = await import('three-mesh-bvh');
+Mesh.prototype.raycast = function (raycaster, intersects) {
+  this.geometry.boundsTree ??= new MeshBVH(this.geometry, { indirect: true });
+  return acceleratedRaycast.call(this, raycaster, intersects);
+};
 const occupants = ring.root.find(o => o.name === 'sky-ring-residents') as import('three').InstancedMesh;
 const floors = ring.root.filter((o): o is Mesh => o instanceof Mesh && o.name === 'fixed-kit');
 const legGeometry = (ring.root.filter(o => o.name === 'sky-ring-residents') as import('three').InstancedMesh[]).map(m => { m.geometry.computeBoundingBox(); return m.geometry.boundingBox!.min.y; });
@@ -54,11 +59,11 @@ function support(point: import('three').Vector3, tolerance: number) {
   footRay.set(point.clone().add(new Vector3(0, tolerance, 0)), down); footRay.far = 2 * tolerance;
   return footRay.intersectObjects(floors).some(hit => Math.abs(hit.point.y - point.y) <= tolerance);
 }
-for (let k = 0; k < 300; k++) {
+for (let k = 0; k < 820; k++) {
   occupants.getMatrixAt(k, matrix);
   for (const x of [-.13, .13]) {
     foot.set(x, actualFootOffset, 0).applyMatrix4(matrix);
-    assert.ok(support(foot, .02), `hall occupant ${k} foot at ${foot.toArray()} must stand on the actual floor`);
+    assert.ok(support(foot, .02), `ring resident ${k} foot at ${foot.toArray()} must stand on the actual floor`);
   }
 }
 for (let b = 0; b < 10; b++) {
@@ -66,7 +71,7 @@ for (let b = 0; b < 10; b++) {
   gate.position.copy(ringPoint(a, SKY_RING.deck, 4)); gate.lookAt(ringPoint(a, SKY_RING.deck, 0)); gate.updateMatrixWorld(true);
   const doorRay = new Raycaster(new Vector3(0, 1.5, -3.5).applyMatrix4(gate.matrixWorld), new Vector3(0, 0, 1).transformDirection(gate.matrixWorld), 0, 1.4);
   assert.equal(doorRay.intersectObjects(floors).length, 0, `berth ${b} hall entrance is open`);
-  for (const [x, y, z, tolerance] of [[-26.67, .2, -1.5, .21], [-15.33, 3.6, -1.5, .08], [-11, -10.35, -3, .08], [-11, 0, -15, .08]]) {
+  for (const [x, y, z, tolerance] of [[-26.67, .2, -1.5, .21], [-15.33, 3.6, -1.5, .08], [-23, -10.35, -6.82, .08], [-23, .05, -5.18, .2]]) {
     const point = new Vector3(x, y, z).applyMatrix4(gate.matrixWorld);
     assert.ok(support(point, tolerance), `berth ${b} stair landing at ${x},${y},${z} needs real support`);
   }
@@ -78,4 +83,67 @@ for (const site of Object.values(changeSites)) for (const height of [1, site.h *
   const look = new Vector3(site.x, height, site.z);
   ray.set(camera.position, look.clone().sub(camera.position).normalize()); ray.far = camera.position.distanceTo(look);
   assert.equal(ray.intersectObject(loadedArchitecture, true).length, 0, `${site.name} hero sightline crosses the loaded Sky Ring architecture at ${height} m`);
+}
+
+// Check the exported switchback surfaces and the actual surrounding geometry at every riser.
+for (let k = 0; k < 820; k++) {
+  occupants.getMatrixAt(k, matrix); foot.setFromMatrixPosition(matrix); foot.y += actualFootOffset;
+  for (const height of [.2, 1, 1.6]) for (const direction of [[1, 0, 0], [-1, 0, 0], [0, 0, 1], [0, 0, -1]] as const) {
+    const probe = new Raycaster(foot.clone().add(new Vector3(0, height, 0)), new Vector3(...direction), 0, .3);
+    assert.equal(probe.intersectObjects(floors).length, 0, `resident ${k} clips nearby geometry`);
+    assert.equal(probe.intersectObject(loadedArchitecture, true).length, 0, `resident ${k} clips loaded stair or pylon geometry`);
+  }
+}
+for (let b = 0; b < 10; b++) {
+  const a = (b + .5) / 10 * Math.PI * 2, gate = new Group();
+  gate.position.copy(ringPoint(a, SKY_RING.deck, 4)); gate.lookAt(ringPoint(a, SKY_RING.deck, 0)); gate.updateMatrixWorld(true);
+  for (let flight = 0; flight < 4; flight++) for (let step = 0; step < 13; step++) {
+    const x = -2 + 4 * (step + .5) / 13, local = new Vector3(-25 - (flight % 2 ? -x : x), -10.35 + flight * 2.6 + (step + 1) * .2, -6 - (flight % 2 ? -.82 : .82));
+    const point = local.clone().applyMatrix4(gate.matrixWorld);
+    const foot = new Raycaster(point.clone().add(new Vector3(0, .08, 0)), down, 0, .16);
+    assert.ok(foot.intersectObject(loadedArchitecture, true).some(hit => Math.abs(hit.point.y - point.y) < .03), `berth ${b}, flight ${flight}, step ${step} needs a real GLB tread`);
+    const head = new Raycaster(point.clone().add(new Vector3(0, .05, 0)), new Vector3(0, 1, 0), 0, 1.7);
+    assert.equal(head.intersectObjects(floors).length, 0, `berth ${b}, flight ${flight}, step ${step} lacks headroom`);
+    for (const height of [.2, 1, 1.6]) for (const direction of [[1, 0, 0], [-1, 0, 0], [0, 0, 1], [0, 0, -1]] as const) {
+      const origin = local.clone().add(new Vector3(0, height, 0)).applyMatrix4(gate.matrixWorld);
+      const side = new Vector3(...direction).transformDirection(gate.matrixWorld), probe = new Raycaster(origin, side, 0, .3);
+      assert.equal(probe.intersectObjects(floors).length, 0, `berth ${b}, flight ${flight}, step ${step} clips nearby geometry`);
+    }
+  }
+  const bridgeOrigin = new Vector3(-23, -9.35, -6.8).applyMatrix4(gate.matrixWorld), bridgeDirection = new Vector3(0, 0, 1).transformDirection(gate.matrixWorld);
+  assert.equal(new Raycaster(bridgeOrigin, bridgeDirection, 0, 6).intersectObjects(floors).length, 0, `berth ${b} stair bridge is obstructed`);
+}
+
+// The GLB stair can meet its handrails and landings, but must not cut through the truss or berth body.
+const { Line3 } = await import('three');
+const compactPrefab = new Group(); asset.scene.updateMatrixWorld(true);
+asset.scene.traverse(o => {
+  if (!(o instanceof Mesh) || !o.name.startsWith('Compact')) return;
+  const copy = new Mesh(o.geometry, o.material); copy.applyMatrix4(o.matrixWorld); copy.position.z += 200; copy.name = o.name; compactPrefab.add(copy);
+});
+for (let b = 0; b < 10; b++) {
+  const a = (b + .5) / 10 * Math.PI * 2, gate = new Group();
+  gate.position.copy(ringPoint(a, SKY_RING.deck, 4)); gate.lookAt(ringPoint(a, SKY_RING.deck, 0)); gate.updateMatrixWorld(true);
+  const stair = compactPrefab.clone(); stair.position.set(-25, -10.35, -6); stair.rotation.y = Math.PI; gate.add(stair); gate.updateMatrixWorld(true);
+  stair.traverse(o => {
+    if (!(o instanceof Mesh)) return;
+    o.geometry.computeBoundingBox(); const bounds = o.geometry.boundingBox!.clone().applyMatrix4(o.matrixWorld);
+    for (const fixed of floors) {
+      fixed.geometry.computeBoundingBox(); if (!bounds.intersectsBox(fixed.geometry.boundingBox!.clone().applyMatrix4(fixed.matrixWorld))) continue;
+      const aTree = fixed.geometry.boundsTree ??= new MeshBVH(fixed.geometry, { indirect: true });
+      const bTree = o.geometry.boundsTree ??= new MeshBVH(o.geometry, { indirect: true });
+      const transform = fixed.matrixWorld.clone().invert().multiply(o.matrixWorld), segment = new Line3();
+      aTree.bvhcast(bTree, transform, { intersectsTriangles: (first, second) => {
+        if (!first.intersectsTriangle(second, segment, true)) return false;
+        for (const end of [segment.start, segment.end]) {
+          const p = gate.worldToLocal(end.clone().applyMatrix4(fixed.matrixWorld));
+          const handrail = Math.abs(p.z + 7.54) < .12 || Math.abs(p.z + 4.46) < .12;
+          const lowerContact = o.name === 'CompactFlight00' && p.y <= -10.34;
+          const upperContact = o.name === 'CompactFlight03' && p.y >= -.22 && p.x >= -23.11;
+          assert.ok(handrail || lowerContact || upperContact, `berth ${b} ${o.name} intersects structure at ${p.toArray()}`);
+        }
+        return false;
+      } });
+    }
+  });
 }
