@@ -2,6 +2,7 @@ import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets.ts';
+import { SiteAssetLoaderCache } from './siteAssets/assetLoader.ts';
 import { heroSettledCamera, heroTextZone } from './heroCamera.ts';
 import { guideway, guidewayTracks, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers, bayChannels, skyCorridors, sweepway, streets, STREET_KIT, BOULEVARD, WATER, shoreLane, interchangeApproach, interchangeBoatLane, INTERCHANGE, midDecks, gardenDecks } from './layout.ts';
 
@@ -247,14 +248,27 @@ function wing(mat:T.Material=shell):Part {
 }
 // Actors (people, vehicles, benches) cast no shadow: invisible from the hero frame, yet each fleet redrew in the shadow map.
 function fleet(scene:T.Object3D,parts:Part[],count:number,name:string) {
-  const batches=new Map<T.Material,T.BufferGeometry[]>();
-  parts.forEach(p=>{const list=batches.get(p.material)??[];list.push(p.geometry.index?p.geometry.toNonIndexed():p.geometry);batches.set(p.material,list);});
-  const meshes=[...batches].map(([mat,geometries])=>{
-    const mesh=new T.InstancedMesh(mergeGeometries(geometries),mat,count);
-    mesh.name=name;mesh.frustumCulled=false;
-    mesh.instanceMatrix.setUsage(T.DynamicDrawUsage);scene.add(mesh);return mesh;
-  });
+  const build=(parts:Part[])=>{
+    const batches=new Map<T.Material,T.BufferGeometry[]>();
+    parts.forEach(p=>{const list=batches.get(p.material)??[];list.push(p.geometry.index?p.geometry.toNonIndexed():p.geometry);batches.set(p.material,list);});
+    return [...batches].map(([mat,geometries])=>{
+      const mesh=new T.InstancedMesh(mergeGeometries(geometries),mat,count);
+      mesh.name=name;mesh.frustumCulled=false;
+      mesh.instanceMatrix.setUsage(T.DynamicDrawUsage);scene.add(mesh);return mesh;
+    });
+  };
+  const meshes=build(parts);
   return {
+    /** Swaps the fleet's model once a GLB arrives: poses carry over, and instance colours for a material both models use. */
+    rebuild(parts:Part[]){
+      const old=meshes.splice(0);
+      meshes.push(...build(parts));
+      for(const mesh of meshes){
+        mesh.instanceMatrix.array.set(old[0].instanceMatrix.array);mesh.instanceMatrix.needsUpdate=true;
+        mesh.instanceColor=old.find(m=>m.material===mesh.material)?.instanceColor??null;
+      }
+      old.forEach(m=>{m.removeFromParent();m.geometry.dispose();});
+    },
     set(index:number,pose:T.Object3D){pose.updateMatrix();meshes.forEach(m=>m.setMatrixAt(index,pose.matrix));},
     /** Per-actor colour for the parts drawn with `mat` (a white base the instance colour multiplies); set once at build. */
     tint(index:number,mat:T.Material,color:T.ColorRepresentation){meshes.forEach(m=>{if(m.material===mat)m.setColorAt(index,new T.Color(color));});},
@@ -264,6 +278,18 @@ function fleet(scene:T.Object3D,parts:Part[],count:number,name:string) {
   };
 }
 
+/** The GLB's model space: ground contact at 0; traffic poses sit .1 above the route, the carriageway .235, so models lift by the difference. */
+const CAR_ROAD=.135;
+/** Parts of a car_family variant (`car_pod`, `car_human`), one per glTF primitive, its material chosen by role name. */
+function carFamilyParts(root:T.Object3D,name:string,roles:Record<string,T.Material>):Part[] {
+  const variant=root.getObjectByName(name)!,parts:Part[]=[],toVariant=variant.matrixWorld.clone().invert();
+  variant.traverse(o=>{
+    if(!(o instanceof T.Mesh))return;
+    const geometry=o.geometry.clone().applyMatrix4(toVariant.clone().multiply(o.matrixWorld)).translate(0,CAR_ROAD,0);
+    parts.push({geometry,material:roles[(o.material as T.Material).name]});
+  });
+  return parts;
+}
 const streetPodParts=(body:T.Material,head:T.Material,tail:T.Material)=>[part([1.8,1.3,4.6],[0,.8,0],body,.6),part([1.84,.62,3.5],[0,1.28,-.1],glass,.3),
   part([.24,.04,2.8],[0,1.6,-.1],mint,.02),part([1.3,.1,.08],[0,.82,2.29],head,.03),part([1.3,.1,.08],[0,.82,-2.29],tail,.03)];
 /** The street pod (traffic and DEV street-kit demo pods): `count` instances, white body (tint per instance), poses set by the caller. */
@@ -695,12 +721,30 @@ export function mobility(scene:T.Scene) {
   // The ④ boulevard's guide channels carry pods only, whatever the automation (their own fleet: `street-pods` stays the U's automation swap).
   const boulevardBase=2*streetCars[0],boulevardPods=fleet(scene,streetPodParts(podBody,headlight,taillight),carSlots-boulevardBase,'boulevard-pods');
   for(let i=boulevardBase;i<carSlots;i++)boulevardPods.tint(i-boulevardBase,podBody,carColors[Math.floor(hash(i,16)*4)]);
+  // The Blender family (asset/models/car-family-2127) replaces the box shapes above once it loads; they stay as the fallback.
+  const carGlass=new T.MeshStandardMaterial({color:'#a9c8dc',transparent:true,opacity:.46,roughness:.06,metalness:.6,envMapIntensity:1.6,depthWrite:false});
+  const carSeam=new T.MeshStandardMaterial({color:'#cfe8ff',emissive:'#cfe8ff',roughness:.3});
+  const carInterior=new T.MeshStandardMaterial({color:'#ffffff',vertexColors:true,emissive:'#ffcf9a',emissiveIntensity:0,roughness:.7});
+  const hoverPool=glow('#cfe8ff',1),hoverPoolTint=hoverPool.color.clone();
+  const carTail=new T.MeshStandardMaterial({color:'#d9dde0',emissive:'#ff3a30',emissiveIntensity:0,roughness:.3}); // pale by day, the disc's red rings at night
+  const carShadow=new T.MeshBasicMaterial({color:0,vertexColors:true,transparent:true,depthWrite:false}); // traffic casts no real shadow
+  let podBrakeDrop=.13; // the box pod's tail sits lower; the family shares one tail disc
   // Drop-off cues per bay car: an amber indicator pair (front and rear corner, set on the signalled side) and a bright brake lamp over
   // the tail light; hidden when off.
   const amber=new T.MeshBasicMaterial({color:'#ffae2e'}),brakeRed=new T.MeshBasicMaterial({color:'#ff3326'});
   const indicators=fleet(scene,[part([.06,.14,.3],[0,.95,2.05],amber,.02),part([.06,.14,.3],[0,.95,-2.05],amber,.02)],DROP_OFF.cars.length,'drop-off-indicators');
   // Every street vehicle's brake lamp (slot as `cars`): lit while slowing, queued or stopped at a crossing, and for the drop-off stop.
   const brakeLamps=fleet(scene,[part([1.54,.16,.06],[0,.95,-2.33],brakeRed,.03)],carSlots,'brake-lamps');
+  if(typeof document!=='undefined')new SiteAssetLoaderCache().load('car-family-2127').then(({root})=>{ // the Node tests keep the box cars
+    root.updateWorldMatrix(true,true);
+    for(const body of [carBody,podBody]){body.vertexColors=true;body.roughness=.42;body.metalness=.5;body.side=T.DoubleSide;body.needsUpdate=true;}
+    const roles=(body:T.Material)=>({car_body:body,car_interior:carInterior,car_glass:carGlass,car_seam:carSeam,car_head:headlight,car_tail:carTail,car_pool:hoverPool,car_shadow:carShadow});
+    cars.rebuild(carFamilyParts(root,'car_human',roles(carBody)));
+    streetPods.rebuild(carFamilyParts(root,'car_pod',roles(podBody)));boulevardPods.rebuild(carFamilyParts(root,'car_pod',roles(podBody)));
+    // Cues follow the new body: the brake lamp rings the tail disc, the indicators sit on its flanks.
+    brakeLamps.rebuild([{geometry:new T.TorusGeometry(.43,.018,6,28).translate(0,.955,-2.29),material:brakeRed}]);podBrakeDrop=0;
+    indicators.rebuild([part([.06,.14,.3],[0,.95,1.2],amber,.02),part([.06,.14,.3],[0,.95,-1.55],amber,.02)]);
+  }).catch(error=>console.warn('car-family-2127: keeping the box cars.',error));
   // Crossings (the street kit draws their light panels): mint edge lines either side, x scaled to the carriageway width, lit while a
   // crossing is requested.
   const crossLights=fleet(scene,[part([1,.02,.1],[0,.245,1.85],mint,.01),part([1,.02,.1],[0,.245,-1.85],mint,.01)],CROSSINGS.length,'crossing-lights');
@@ -874,6 +918,7 @@ export function mobility(scene:T.Scene) {
     airShell.emissiveIntensity=activity?activity.level*.85:0;
     collar.emissiveIntensity=night*4;
     headlight.emissiveIntensity=.2+night*4;taillight.emissiveIntensity=.15+night*3;
+    carSeam.emissiveIntensity=.7+night*2.6;carTail.emissiveIntensity=night*3;carInterior.emissiveIntensity=night*.32;hoverPool.color.copy(hoverPoolTint).multiplyScalar(.2+night*.6);carShadow.opacity=1-night*.6;
     // Trains alternate between the south-west (even) and north-east (odd) tracks, two places per track whether or not both run.
     for(let train=0;train<MAX_TRAINS;train++)for(let car=0;car<CARS;car++){
       const track=train%2,{u,visible}=trainPose(time,train>>1,MAX_TRAINS/2,car,trackLength[track]);
@@ -1030,12 +1075,16 @@ export function mobility(scene:T.Scene) {
       // Human-driven cars give way to autonomous pods slot by slot as automation rises; standalone keeps the cars.
       const van=vanOf[slot]===1,density=drop<0?carGate(slot,state.traffic*.6+.5>hash(slot,18)&&rhythm.cars>hash(slot,22)):1;
       const shown=car.visible*density,pod=r===1?1:activity?podShare(activity.level,slot):0;
-      pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(shown*(1-pod));cars.set(slot,pose);
-      pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(r===1?0:shown*pod);streetPods.set(slot,pose);
-      if(r===1){pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(shown);boulevardPods.set(slot-boulevardBase,pose);}
-      // Brake lamp over the tail light (a pod's sits .13 m lower).
+      // A van keeps height and length in step, so the family's wheels and tail disc stay round.
+      pose.scale.set(1,van?1.55:1,van?1.55:1).multiplyScalar(shown*(1-pod));cars.set(slot,pose);
+      // Pods ride a slow 3 cm hover; poses go back afterwards for the lamps.
+      const hover=.03*Math.sin(time*1.1+slot*2.4);pose.position.y+=hover;
+      pose.scale.set(1,van?1.55:1,van?1.55:1).multiplyScalar(r===1?0:shown*pod);streetPods.set(slot,pose);
+      if(r===1){pose.scale.set(1,van?1.55:1,van?1.55:1).multiplyScalar(shown);boulevardPods.set(slot-boulevardBase,pose);}
+      pose.position.y-=hover;
+      // Brake lamp over the tail light.
       const lit=Math.max(carBrake[slot],drop>=0?(car as ReturnType<typeof dropOffPose>).brake:0);
-      pose.position.y-=pod>.5?.13*(van?1.3:1):0;pose.scale.set(1,van?1.3:1,van?1.55:1).multiplyScalar(shown*lit);brakeLamps.set(slot,pose);pose.position.y+=pod>.5?.13*(van?1.3:1):0;
+      const lower=pod>.5?podBrakeDrop*(van?1.55:1):0;pose.position.y-=lower;pose.scale.set(1,van?1.55:1,van?1.55:1).multiplyScalar(shown*lit);brakeLamps.set(slot,pose);pose.position.y+=lower;
       if(drop>=0){
         const cue=car as ReturnType<typeof dropOffPose>;passengers(drop,cue,pose.position.clone().addScaledVector(side,1.4).setY(0));
         // Indicators blink at 1.5 Hz on the kerb (+x, Japan keeps left) or road side, just proud of the body.

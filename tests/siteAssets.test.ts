@@ -307,3 +307,26 @@ for (let meshIndex = 0; meshIndex < glbMeshes.length; meshIndex++) {
 }
 
 console.log('PASS: asset cache/retry, Park animation, actual 12-tree GLB/fallback bounds, legacy transforms, and late attach.');
+
+// The street car family: the real GLB, both variants, every role the fleets draw, and the 4.6 m body the drop-off cues are placed against.
+const carBytes = await readFile(new URL('../asset/models/car-family-2127/car-family-2127.glb', import.meta.url));
+const carGltf: Pick<GLTF, 'scene' | 'animations'> = await new Promise((resolve, reject) =>
+  new GLTFLoader().parse(carBytes.buffer.slice(carBytes.byteOffset, carBytes.byteOffset + carBytes.byteLength) as ArrayBuffer, '', resolve, reject));
+const carRoot = await new SiteAssetLoaderCache({ async loadAsync() { return carGltf; } }).load('car-family-2127').then(loaded => loaded.root);
+for (const [name, roles] of [
+  ['car_pod', ['car_body', 'car_glass', 'car_head', 'car_interior', 'car_pool', 'car_seam', 'car_shadow', 'car_tail']],
+  ['car_human', ['car_body', 'car_glass', 'car_head', 'car_interior', 'car_seam', 'car_shadow', 'car_tail']],
+] as const) {
+  const variant = carRoot.getObjectByName(name)!, found = new Set<string>();
+  let tris = 0;
+  variant.traverse(o => {
+    if (!(o instanceof T.Mesh)) return;
+    found.add((o.material as T.Material).name);
+    tris += (o.geometry.index?.count ?? o.geometry.attributes.position.count) / 3;
+    assert.ok(o.geometry.attributes.color, `${o.name}: colour attribute`);
+  });
+  assert.deepEqual([...found].sort(), [...roles], `${name}: roles`);
+  assert.ok(tris <= 4000, `${name}: ${tris} triangles`);
+  const size = new T.Box3().setFromObject(variant).getSize(new T.Vector3());
+  assert.ok(size.z > 4.55 && size.z < 5.6 && /* the ground shadow is the widest part */ size.x < 2.7 && size.y < 2, `${name}: bounds ${size.toArray()}`);
+}
