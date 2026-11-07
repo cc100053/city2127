@@ -3,7 +3,7 @@ import { Box3, Mesh, PerspectiveCamera, Raycaster, Scene, Vector3 } from 'three'
 import { changeSites, SKY_RING } from '../src/layout.ts';
 import { HERO_POSITION, HERO_TARGET } from '../src/heroCamera.ts';
 import { routes } from '../src/mobility.ts';
-import { skyRing, VOICE_NODES, voiceSlot, ringPoint, PYLONS } from '../src/skyRing.ts';
+import { skyRing, skyRingArchitecture, VOICE_NODES, voiceSlot, ringPoint, PYLONS } from '../src/skyRing.ts';
 
 const scene = new Scene(), ring = skyRing(scene);
 scene.updateMatrixWorld(true);
@@ -41,3 +41,41 @@ const asset = await new Promise<import('three/addons/loaders/GLTFLoader.js').GLT
 for (const name of ['PylonShell', 'PylonChannel00', 'PylonChannel01', 'PylonChannel02', 'PylonChannel03', 'Stair00', 'Stair17', 'StairSupport'])
   assert.ok(asset.scene.getObjectByName(name), `Sky Ring GLB contains ${name}`);
 assert.equal(asset.animations.length, 0);
+for (const name of ['LowerStair00', 'LowerStair51', 'LowerStairSupport']) assert.ok(asset.scene.getObjectByName(name), `Sky Ring GLB contains ${name}`);
+
+// Every hall occupant must stand on its actual floor, and each staircase joins real landings.
+const { Matrix4, Group } = await import('three');
+const occupants = ring.root.find(o => o.name === 'sky-ring-residents') as import('three').InstancedMesh;
+const floors = ring.root.filter((o): o is Mesh => o instanceof Mesh && o.name === 'fixed-kit');
+const legGeometry = (ring.root.filter(o => o.name === 'sky-ring-residents') as import('three').InstancedMesh[]).map(m => { m.geometry.computeBoundingBox(); return m.geometry.boundingBox!.min.y; });
+const actualFootOffset = Math.min(...legGeometry); assert.ok(actualFootOffset > 0 && actualFootOffset < .1);
+const matrix = new Matrix4(), foot = new Vector3(), down = new Vector3(0, -1, 0), footRay = new Raycaster();
+function support(point: import('three').Vector3, tolerance: number) {
+  footRay.set(point.clone().add(new Vector3(0, tolerance, 0)), down); footRay.far = 2 * tolerance;
+  return footRay.intersectObjects(floors).some(hit => Math.abs(hit.point.y - point.y) <= tolerance);
+}
+for (let k = 0; k < 300; k++) {
+  occupants.getMatrixAt(k, matrix);
+  for (const x of [-.13, .13]) {
+    foot.set(x, actualFootOffset, 0).applyMatrix4(matrix);
+    assert.ok(support(foot, .02), `hall occupant ${k} foot at ${foot.toArray()} must stand on the actual floor`);
+  }
+}
+for (let b = 0; b < 10; b++) {
+  const a = (b + .5) / 10 * Math.PI * 2, gate = new Group();
+  gate.position.copy(ringPoint(a, SKY_RING.deck, 4)); gate.lookAt(ringPoint(a, SKY_RING.deck, 0)); gate.updateMatrixWorld(true);
+  const doorRay = new Raycaster(new Vector3(0, 1.5, -3.5).applyMatrix4(gate.matrixWorld), new Vector3(0, 0, 1).transformDirection(gate.matrixWorld), 0, 1.4);
+  assert.equal(doorRay.intersectObjects(floors).length, 0, `berth ${b} hall entrance is open`);
+  for (const [x, y, z, tolerance] of [[-26.67, .2, -1.5, .21], [-15.33, 3.6, -1.5, .08], [-11, -10.35, -3, .08], [-11, 0, -15, .08]]) {
+    const point = new Vector3(x, y, z).applyMatrix4(gate.matrixWorld);
+    assert.ok(support(point, tolerance), `berth ${b} stair landing at ${x},${y},${z} needs real support`);
+  }
+}
+
+// The exact loaded Blender geometry is part of the same hero sightline check.
+const loadedArchitecture = skyRingArchitecture(asset.scene); loadedArchitecture.updateMatrixWorld(true);
+for (const site of Object.values(changeSites)) for (const height of [1, site.h * site.scale / 4, site.h * site.scale]) {
+  const look = new Vector3(site.x, height, site.z);
+  ray.set(camera.position, look.clone().sub(camera.position).normalize()); ray.far = camera.position.distanceTo(look);
+  assert.equal(ray.intersectObject(loadedArchitecture, true).length, 0, `${site.name} hero sightline crosses the loaded Sky Ring architecture at ${height} m`);
+}

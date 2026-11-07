@@ -18,7 +18,9 @@ export const PYLONS = [.25, 1.2, 2, 3.25, 4.45, 5.1];
 const UP = new T.Vector3(0, 1, 0);
 /** Boarding-hall glazing: the city's pale blue glass made see-through, so the waiting residents show inside. */
 const hallGlass = glass.clone(); hallGlass.transparent = true; hallGlass.opacity = .22; hallGlass.depthWrite = false;
+const lobbyGlass = hallGlass.clone(); lobbyGlass.opacity = .1;
 /** Berth finish (owner target R5): cool satin pearl shells, a cool grey pad field, a slate shadow band and a dark blue-grey pod visor. */
+const hallFloor = paint('#b4c0c3', .75, .05);
 const warmUnder = paint('#eee5d8', .6, .05); warmUnder.emissive.set('#f4c590'); warmUnder.emissiveIntensity = 0;
 const pearl = paint('#eef1f2', .2, .35), padGrey = paint('#c3cbd1', .3, .15), slate = paint('#6b767e', .4, .1), visor = paint('#5f7d90', .08, .55);
 
@@ -26,6 +28,41 @@ const pearl = paint('#eef1f2', .2, .35), padGrey = paint('#c3cbd1', .3, .15), sl
 export function ringPoint(a: number, y: number, out = 0) {
   const n = new T.Vector3(Math.cos(a) / SKY_RING.rx, 0, Math.sin(a) / SKY_RING.rz).normalize();
   return new T.Vector3(SKY_RING.x + Math.cos(a) * SKY_RING.rx, y, SKY_RING.z + Math.sin(a) * SKY_RING.rz).addScaledVector(n, out);
+}
+/** Local transform shared by hall floors, residents, and the exported stairs. */
+export function skyRingGate(b: number) {
+  const a = (b + .5) / BERTHS * Math.PI * 2, gate = new T.Group();
+  gate.position.copy(ringPoint(a, SKY_RING.deck, WIDTH / 2 - 3)); gate.lookAt(ringPoint(a, SKY_RING.deck, 0)); gate.updateMatrixWorld(true);
+  return gate;
+}
+/** Endpoints of the twelve Blender-authored pylon shells. */
+export function skyRingPylonLegs() {
+  const spread = 55 / Math.hypot(SKY_RING.rx, SKY_RING.rz) * 1.4;
+  return PYLONS.flatMap(a => [-1, 1].map(side => ({ foot: ringPoint(a, 8, WIDTH / 2 + 95), top: ringPoint(a + side * spread, SKY_RING.deck - DEPTH - 3, WIDTH / 2 - 1) })));
+}
+/** Apply the same GLB node transforms in the live scene and in geometry checks. */
+export function skyRingArchitecture(model: T.Object3D) {
+  const details = new T.Group(), leg = new T.Group(), stairs = new T.Group(), lowerStairs = new T.Group();
+  model.updateMatrixWorld(true);
+  model.traverse(o => {
+    if (!(o instanceof T.Mesh)) return;
+    const copy = new T.Mesh(o.geometry, o.material); copy.applyMatrix4(o.matrixWorld);
+    if (o.name.startsWith('Pylon')) leg.add(copy);
+    if (o.name.startsWith('Stair')) { copy.position.z += 100; stairs.add(copy); }
+    if (o.name.startsWith('LowerStair')) { copy.position.z += 200; lowerStairs.add(copy); }
+  });
+  for (const { foot, top } of skyRingPylonLegs()) {
+    const shell = leg.clone(); shell.position.copy(foot); shell.quaternion.setFromUnitVectors(UP, top.clone().sub(foot).normalize());
+    shell.scale.set(10, foot.distanceTo(top), 10); details.add(shell);
+  }
+  for (let b = 0; b < BERTHS; b++) {
+    const gate = skyRingGate(b), stair = stairs.clone(); stair.position.set(-21, 0, -1.5); gate.add(stair);
+    stair.updateMatrixWorld(true); const copy = stair.clone(); copy.applyMatrix4(gate.matrixWorld); details.add(copy);
+    const lower = lowerStairs.clone(); lower.position.set(-11, -DEPTH + 1.65, -9); lower.rotation.y = Math.PI / 2; gate.add(lower);
+    lower.updateMatrixWorld(true); const lowerCopy = lower.clone(); lowerCopy.applyMatrix4(gate.matrixWorld); details.add(lowerCopy);
+  }
+  const architecture = new T.Group(); architecture.name = 'sky-ring-architecture'; architecture.add(...bake(details));
+  return architecture;
 }
 /** Guest k (0-based) lights node `voiceSlot(k)`: a stride coprime with VOICE_NODES spreads the accumulated voices around the whole ring. */
 export const voiceSlot = (k: number) => (k * 97) % VOICE_NODES;
@@ -91,7 +128,7 @@ function airPod() {
 export function skyRing(scene: T.Scene) {
   const root = new T.Group(); root.name = 'sky-ring';
   let explorePod: T.Group | undefined;
-  const pylonLegs: { foot: T.Vector3; top: T.Vector3 }[] = [], gates: T.Group[] = [];
+  const gates: T.Group[] = [];
   const top = SKY_RING.deck, bottom = top - DEPTH;
   const corners = (a: number) => ({ to: ringPoint(a, top - .7, WIDTH / 2), ti: ringPoint(a, top - .7, -WIDTH / 2), bo: ringPoint(a, bottom, WIDTH / 2), bi: ringPoint(a, bottom, -WIDTH / 2) });
   for (let i = 0; i < PANELS; i++) {
@@ -122,14 +159,20 @@ export function skyRing(scene: T.Scene) {
     }
     // Cast nodes where chords, posts and diagonals meet, so joints read as built connections rather than crossing boxes.
     for (const k of ['to', 'ti', 'bo', 'bi'] as const) { const n = k[0] === 'b' ? 3 : 2.2; part(root, new RoundedBoxGeometry(n, n, n, 1, n * .3), trim, p[k]).lookAt(q[k]); }
-    // Planted inner edge: a stone planter per panel under a continuous low hedge with shrub mounds and one small tree per panel,
-    // the residents' garden walk (low and dense, so the deck line stays clean instead of a row of lollipops).
-    member(root, ringPoint(a0 + .006, top + .4, -WIDTH / 2 + 1.6), ringPoint(a1 - .006, top + .4, -WIDTH / 2 + 1.6), 2.6, .8, stone);
-    member(root, ringPoint(a0 + .003, top + .95, -WIDTH / 2 + 1.6), ringPoint(a1 - .003, top + .95, -WIDTH / 2 + 1.6), 2.3, .5, leaf);
-    for (const [j, f] of [.07, .23, .42, .59, .76, .94].entries()) {
-      const size = .7 + ((i * 7 + j * 3) % 7) * .11, tree = j === 1 + i % 3;
-      const crown = part(root, leafyCrown(1), leaf, ringPoint(a0 + (a1 - a0) * f, top + 1.2 + (tree ? 2.4 : size * .6), -WIDTH / 2 + 1.6 + (j % 2 ? .35 : -.35)));
-      crown.scale.set(tree ? 1.15 : 1.4, tree ? 1.65 + (i % 3) * .15 : .8 + (j % 3) * .25, tree ? 1.15 : 1.4).multiplyScalar(tree ? 1.1 : size);
+    // Irregular planted islands leave a clear inner-deck walking lane between them.
+    if (i % 5 !== 0) {
+      member(root, ringPoint(a0 + .006, top + .4, -WIDTH / 2 + 1.6), ringPoint(a1 - .006, top + .4, -WIDTH / 2 + 1.6), 2.6, .8, stone);
+      for (let j = 0; j < 9; j++) {
+        const f = (j + .25 + ((i * 11 + j * 7) % 7) / 14) / 9, size = .55 + ((i * 7 + j * 3) % 8) * .09;
+        const tree = j === 2 + i % 4, at = a0 + (a1 - a0) * f, out = -WIDTH / 2 + 1.6 + (j % 2 ? .35 : -.35);
+        if (tree) strut(root, ringPoint(at, top + .65, out), ringPoint(at, top + 3.2, out), .16, .1, trim);
+        const crown = part(root, leafyCrown(1), leaf, ringPoint(at, top + 1 + (tree ? 2.4 : size * .6), out));
+        crown.scale.set(tree ? 1.2 : 1.15, tree ? 1.25 + (i % 3) * .25 : .6 + (j % 3) * .2, tree ? 1.2 : 1.15).multiplyScalar(tree ? 1.1 : size);
+        if (tree && i % 3 !== 0) {
+          const crown2 = part(root, leafyCrown(1), leaf, ringPoint(at + .001, top + 3.4, out + .55));
+          crown2.scale.set(.8, .8 + (i % 2) * .35, .8);
+        }
+      }
     }
   }
   // Berths: cantilevered aprons off the outer face, each braced back to the bottom chord, with a lit docking edge and one parked craft.
@@ -158,17 +201,24 @@ export function skyRing(scene: T.Scene) {
     part(root, new T.RingGeometry(5.7, 6.5, 56).rotateX(-Math.PI / 2), futureLight, ringPoint(a, top + .045, WIDTH / 2 + 9.5));
     part(apron, new T.BoxGeometry(16, .05, .3), futureLight, new T.Vector3(0, .08, -6.6));
     for (const x of [-1, 1]) part(apron, new T.BoxGeometry(.3, .05, 3.2), futureLight, new T.Vector3(x * 9.2, .08, 5.4));
-    const gate = new T.Group(); gate.position.copy(ringPoint(a, top, WIDTH / 2 - 3)); gate.lookAt(ringPoint(a, top, 0)); root.add(gate);
+    const gate = skyRingGate(b); root.add(gate);
     // Two-level glass pavilion: clear blue glazing on slim mullions, a white mezzanine band, and a long rounded roof cantilevered past
     // both ends (kept under the ring's 8 m roofline).
     for (const z of [-2.8, 2.8]) {
-      part(gate, new T.BoxGeometry(30, 6.8, .12), hallGlass, new T.Vector3(0, 3.5, z));
-      for (let x = -15; x <= 15; x += 2) member(gate, new T.Vector3(x, .1, z), new T.Vector3(x, 6.9, z), .18, .18, trim);
+      if (z < 0) for (const side of [-1, 1]) part(gate, new T.BoxGeometry(13.5, 6.8, .12), lobbyGlass, new T.Vector3(side * 8.25, 3.5, z));
+      else part(gate, new T.BoxGeometry(30, 6.8, .12), lobbyGlass, new T.Vector3(0, 3.5, z));
+      for (let x = -15; x <= 15; x += 2) if (z > 0 || Math.abs(x) > 1) member(gate, new T.Vector3(x, .1, z), new T.Vector3(x, 6.9, z), .18, .18, trim);
     }
-    for (const x of [-15, 15]) part(gate, new T.BoxGeometry(.12, 6.8, 5.6), hallGlass, new T.Vector3(x, 3.5, 0));
-    part(gate, slab(plan(31, 7.6, 1.5), .45), trim, new T.Vector3(0, 3.6, 0));
+    for (const x of [15]) part(gate, new T.BoxGeometry(.12, 6.8, 5.6), lobbyGlass, new T.Vector3(x, 3.5, 0));
+    part(gate, slab(plan(31, 7.6, 1.5), .45), hallFloor, new T.Vector3(0, 3.6, 0));
     part(gate, slab(plan(44, 10, 4), .5), trim, new T.Vector3(0, 7.5, -.4));
     for (const x of [-20, 20]) member(gate, new T.Vector3(x, 0, -4), new T.Vector3(x, 7, -4), .3, .3, trim);
+    part(gate, slab(plan(31, 7.6, 1.5), .12), stone, new T.Vector3(0, .08, 0));
+    // Raised landing joins the external stair to the mezzanine through the open end.
+    part(gate, new T.BoxGeometry(3, .3, 3), trim, new T.Vector3(-15.8, 3.44, -1.5));
+    // The lower stair starts inside the truss and ends at the adjoining apron.
+    part(gate, new T.BoxGeometry(4, .35, 4), stone, new T.Vector3(-11, bottom + 1.475 - top, -2));
+    part(gate, new T.BoxGeometry(3, .25, 3), pearl, new T.Vector3(-11, -.125, -14.5));
     gates.push(gate);
     // Parked air pod; the explore berth's pod stays a separate group so a guest's look can fly it.
     const craft = airPod(), park = berthPark(b);
@@ -180,7 +230,7 @@ export function skyRing(scene: T.Scene) {
   for (const a of PYLONS) {
     const foot = ringPoint(a, 8, WIDTH / 2 + 95), spread = 55 / Math.hypot(SKY_RING.rx, SKY_RING.rz) * 1.4;
     const tops = [-1, 1].map(s => ringPoint(a + s * spread, bottom - 3, WIDTH / 2 - 1));
-    for (const t of tops) { strut(root, foot.clone().lerp(t, .002), t.clone().lerp(foot, .002), 3.4, 2, trim); pylonLegs.push({ foot, top: t }); }
+    for (const t of tops) strut(root, foot.clone().lerp(t, .002), t.clone().lerp(foot, .002), 3.4, 2, trim);
     member(root, foot.clone().lerp(tops[0], .55), foot.clone().lerp(tops[1], .55), 1.6, 1.6, trim);
     for (const s of [-1, 1]) member(root, ringPoint(a + s * spread, bottom - 2.3, WIDTH / 2 + 2.5), ringPoint(a + s * spread, bottom - 2.3, -WIDTH / 2 - 2.5), 3.6, 3.4, trim);
     part(root, new T.CylinderGeometry(9, 12, 9.2, 8), stone, foot.clone().setY(1.4));
@@ -202,14 +252,23 @@ export function skyRing(scene: T.Scene) {
   }
   // Residents on the deck: a few waiting at each boarding hall, others strolling the garden walk (standing poses; the ring is a review subject, not a route).
   const RESIDENTS = 640, people = pedestrians(scene, RESIDENTS, 'sky-ring-residents'), pose = new T.Object3D();
+  const contact = new T.InstancedMesh(new T.CircleGeometry(.32, 12).rotateX(-Math.PI / 2), new T.MeshBasicMaterial({ color: '#5c6a6d', transparent: true, opacity: .32, depthWrite: false }), 300);
+  contact.name = 'sky-ring-hall-contact';
   for (let k = 0; k < RESIDENTS; k++) {
-    const lower = k >= 500, atGate = k < 240, b = k % BERTHS, j = Math.floor(k / BERTHS);
-    const a = atGate ? (b + .5) / BERTHS * Math.PI * 2 + ((j * 37) % 23 - 11) / SKY_RING.rx : (k * 1.618) % (Math.PI * 2);
-    const upper = atGate && j % 4 === 0;
-    const out = upper ? WIDTH / 2 - 3 : atGate ? [WIDTH / 2 - 3 + ((j * 3) % 5 - 2) * .9, WIDTH / 2 - 7.2, WIDTH / 2 + 4 + (j * 5) % 9][j % 3] : -WIDTH / 2 + 4 + ((k * 13) % 9);
-    pose.position.copy(ringPoint(a, lower ? bottom + 1.65 : (upper ? top + 3.6 : top), lower ? 0 : out)); pose.rotation.set(0, (k * 2.39) % (Math.PI * 2), 0); people.set(k, pose); people.gait(k, 0, 0);
+    if (k < 300) {
+      // Hall occupants use the hall's actual local floor, not the curved ring approximation.
+      const gate = gates[k % BERTHS], j = Math.floor(k / BERTHS);
+      pose.position.set((Math.floor(j / 2) % 5 - 2) * 5, j % 2 ? 3.6 : .08, (Math.floor(j / 10) - 1) * .9).applyMatrix4(gate.matrixWorld);
+    } else {
+      const lower = k >= 480, j = k - (lower ? 480 : 300);
+      const a = lower ? (Math.floor(j / 2) + (j % 2 ? .67 : .33)) / PANELS * Math.PI * 2 : (j * 1.618) % (Math.PI * 2);
+      pose.position.copy(ringPoint(a, lower ? bottom + 1.65 : top, lower ? (j % 2 ? 1 : -1) : (j % 3 - 1) * 2));
+    }
+    pose.position.y -= .05;
+    pose.rotation.set(0, (k * 2.39) % (Math.PI * 2), 0); people.set(k, pose); people.gait(k, 0, 0);
+    if (k < 300) { pose.position.y += .065; pose.updateMatrix(); contact.setMatrixAt(k, pose.matrix); }
   }
-  people.flush();
+  people.flush(); contact.instanceMatrix.needsUpdate = true; scene.add(contact);
   // One guest's own node during their look: a halo drawn over the structure (it may hang on the far side of the ring) above a node brightened by the caller's pulse.
   const halo = new T.Sprite(new T.SpriteMaterial({ map: typeof document === 'undefined' ? null : glowTexture(), color: '#ffd9a0', transparent: true, depthTest: false, depthWrite: false, blending: T.AdditiveBlending, fog: false }));
   halo.name = 'sky-ring-own-voice'; halo.visible = false;
@@ -218,23 +277,7 @@ export function skyRing(scene: T.Scene) {
   scene.add(...fixed, voices, pod, halo, architecture);
   // Blender-authored pylon shells and stairs remain separate from the animated pod and count-controlled lamps.
   if (typeof window !== 'undefined') new GLTFLoader().load(new URL('../asset/models/sky-ring-architecture/sky-ring-architecture.glb', import.meta.url).href, ({ scene: model }) => {
-    const details = new T.Group(), leg = new T.Group(), stairs = new T.Group();
-    model.updateMatrixWorld(true);
-    model.traverse(o => {
-      if (!(o instanceof T.Mesh)) return;
-      const copy = new T.Mesh(o.geometry, o.material); copy.applyMatrix4(o.matrixWorld);
-      if (o.name.startsWith('Pylon')) leg.add(copy);
-      if (o.name.startsWith('Stair')) { copy.position.z += 100; stairs.add(copy); }
-    });
-    for (const { foot, top: end } of pylonLegs) {
-      const shell = leg.clone(); shell.position.copy(foot); shell.quaternion.setFromUnitVectors(UP, end.clone().sub(foot).normalize());
-      shell.scale.set(10, foot.distanceTo(end), 10); details.add(shell);
-    }
-    for (const gate of gates) {
-      const stair = stairs.clone(); stair.position.set(-21, 0, -3); gate.add(stair);
-      stair.updateMatrixWorld(true); const copy = stair.clone(); copy.applyMatrix4(gate.matrixWorld); details.add(copy);
-    }
-    architecture.add(...bake(details));
+    architecture.add(skyRingArchitecture(model));
   }, undefined, error => console.error('Sky Ring architecture failed to load', error));
   let shown = 0, dark = -1, own = -1, ownGlow = 0;
   const ownColor = new T.Color();
@@ -245,7 +288,7 @@ export function skyRing(scene: T.Scene) {
     voices.instanceColor!.needsUpdate = true;
   };
   return {
-    root: [...fixed, voices, pod, architecture, ...people.meshes],
+    root: [...fixed, voices, pod, architecture, contact, ...people.meshes],
     /** The explore berth's pod, parked unless a guest's look is flying it. */
     pod,
     /** Guest k's own node (0-based, null to clear) at glow 0–1; the halo is sized for the whole-ring view. */
@@ -264,7 +307,7 @@ export function skyRing(scene: T.Scene) {
     /** By day the nodes are pale fittings, the lit ones faintly warm; at night lit nodes are HDR points (bloom) and unlit ones go dark. */
     update(darkness: number) {
       if (Math.abs(darkness - dark) < .02) return; dark = darkness;
-      warmUnder.emissiveIntensity = darkness * .35;
+      warmUnder.emissiveIntensity = darkness * .7;
       lit.copy(warm).lerp(coolLamp, darkness).multiplyScalar(.95 + 2.8 * darkness); unlit.copy(fitting).multiplyScalar(.75 - .5 * darkness); paint();
     },
   };
