@@ -6,7 +6,7 @@ Writes car-family-2127.blend and .glb next to this file (glTF preset, no Meshopt
 
 Real metres, ground contact at y = 0, front = +Z three.js (-Y Blender). Root ROOT_CAR_FAMILY_2127 holds the empties
 car_pod and car_human; the runtime merges each one's meshes by material name, its roles:
-car_body and car_interior (colour attribute), car_glass, car_seam, car_head, car_tail, car_pool (pod only).
+car_body and car_interior (colour attribute), car_glass, car_seam, car_head, car_tail, car_shadow, car_pool (pod only).
 
 The shell is one loft (t tail 0 .. nose 1, row k bottom centre .. top centre, mirrored), every vertex on the analytic
 surface `at(t, s)` with analytic normals. Rows follow designed height curves, so the seam, the windows and the belly
@@ -51,9 +51,9 @@ def lerp_table(table, t):
 
 
 # Silhouette: an egg, tallest 40 % back from the tail, a round tail for the disc, the nose low and tapered.
-TOP = [(0, 1.30), (.03, 1.42), (.09, 1.56), (.18, 1.67), (.3, 1.75), (.42, 1.78), (.56, 1.70), (.68, 1.50), (.8, 1.22), (.9, .98), (.97, .80), (1, .68)]
-BOT = [(0, .34), (.03, .30), (.09, .27), (.5, .26), (.85, .29), (.95, .36), (1, .46)]
-WID = [(0, .48), (.03, .66), (.09, .80), (.18, .89), (.35, .925), (.6, .92), (.8, .84), (.92, .66), (.98, .42), (1, .22)]
+TOP = [(0, 1.24), (.01, 1.37), (.025, 1.49), (.05, 1.6), (.09, 1.7), (.14, 1.78), (.2, 1.84), (.3, 1.9), (.38, 1.91), (.5, 1.84), (.6, 1.68), (.7, 1.48), (.8, 1.27), (.9, 1.05), (.97, .88), (1, .74)]
+BOT = [(0, .40), (.01, .33), (.025, .29), (.05, .27), (.09, .26), (.5, .26), (.85, .29), (.95, .36), (1, .46)]
+WID = [(0, .42), (.01, .54), (.025, .65), (.05, .75), (.09, .83), (.14, .885), (.2, .91), (.35, .925), (.6, .92), (.8, .86), (.92, .73), (.98, .5), (1, .26)]
 SQR = [(0, 2), (.1, 2.3), (.5, 2.6), (.9, 2.3), (1, 2)]
 
 # Row heights (absolute y).
@@ -61,11 +61,12 @@ BELLY = [(0, .52), (.12, .50), (.5, .42), (.85, .47), (1, .52)]
 SEAM = [(0, 1.16), (.05, 1.36), (.1, 1.4), (.14, 1.24), (.2, .92), (.26, .70), (.33, .55), (.42, .47), (.5, .47), (.56, .56), (.62, .76), (.68, .82), (.8, .80), (.92, .74), (1, .62)]
 FOOT_LOW = [(.33, .97), (.36, .78), (.41, .63), (.5, .61), (.56, .68), (.6, .86)]
 FOOT_TOP = [(.33, .98), (.45, .93), (.6, .87)]
-SILL = [(0, 1.22), (.1, 1.46), (.28, 1.5), (.31, 1.2), (.35, 1.08), (.5, 1.02), (.7, .98), (.82, .94), (.9, .96)]
+SILL = [(0, 1.22), (.1, 1.56), (.25, 1.8), (.285, 1.87), (.3, 1.68), (.32, 1.38), (.35, 1.16), (.4, 1.06), (.5, 1.02), (.7, .98), (.82, .94), (.9, .96)]
 SEAM_T, SEAM_W = .105, .05
 FOOT_T = (.33, .6)
 WIN_T = (.285, .885)
-ROOF_ROWS = 6  # rows from the sill to the top centre
+ROOF_ROWS = 5  # rows from the window frame to the top centre
+FRAME_W, FRAME_LIFT = .055, .014  # the raised rim round the side glass
 
 NORM = 1.0
 
@@ -102,7 +103,7 @@ def normal(t, s):
     n = [q / r for q in n]
     p = at(t, s)
     yc = sec(t)[0]
-    if n[0] * p[0] + n[1] * (p[1] - yc) < 0:
+    if n[0] * p[0] + n[1] * (p[1] - yc) - n[2] * (.5 if t < .1 else 0) < 0:
         n = [-q for q in n]
     return n
 
@@ -118,12 +119,13 @@ def rows_at(t):
     ys["foot0"] = max(lerp_table(FOOT_LOW, t) if FOOT_T[0] <= t <= FOOT_T[1] else 0, ys["seam1"] + .02)
     ys["foot1"] = max(lerp_table(FOOT_TOP, t) if FOOT_T[0] <= t <= FOOT_T[1] else 0, ys["foot0"] + .012)
     ys["sill"] = max(lerp_table(SILL, t), ys["foot1"] + .05)
+    ys["frame"] = ys["sill"] + FRAME_W
     s = [-1, s_of_y(t, (lerp_table(BOT, t) + ys["belly"]) / 2)]
     s.append(s_of_y(t, ys["belly"]))
     s.append(s_of_y(t, ys["belly"] + .012))
     # Two free rows, so the tall flank behind the seam's rise is not one flat chord.
     s += [s[-1] + (s_of_y(t, ys["seam0"]) - s[-1]) * j / 3 for j in (1, 2)]
-    for key in ("seam0", "seam1", "foot0", "foot1", "sill"):
+    for key in ("seam0", "seam1", "foot0", "foot1", "sill", "frame"):
         s.append(s_of_y(t, ys[key]))
     top = s[-1]
     s += [top + (1 - top) * (1 - math.cos(j / ROOF_ROWS * math.pi / 2)) ** .9 for j in range(1, ROOF_ROWS + 1)]
@@ -131,19 +133,19 @@ def rows_at(t):
     for k in range(1, len(s)):
         s[k] = max(s[k], s[k - 1] + 1e-4)
     # The tail ring is a true circle: even rows there, whatever the flank rows do.
-    return [-1 + 2 * k / (ROWS - 1) for k in range(ROWS)] if t <= .007 else s
+    return [-1 + 2 * k / (ROWS - 1) for k in range(ROWS)] if t <= .004 else s
 
 
-R_BELLY, R_S0, R_S1, R_F0, R_F1, R_W = 2, 6, 7, 8, 9, 10
-ROWS = 11 + ROOF_ROWS
-STATIONS = [0, .007, .03, .06, .09, .105, .125, .15, .18, .21, .25, .285, .31, .33, .36, .41, .46, .51, .56, .6, .64, .68, .74, .8, .86, .885, .92, .955, .985, 1]
+R_BELLY, R_S0, R_S1, R_F0, R_F1, R_W, R_G = 2, 6, 7, 8, 9, 10, 11
+ROWS = 12 + ROOF_ROWS
+STATIONS = [0, .004, .018, .035, .06, .09, .105, .125, .15, .18, .21, .25, .285, .3, .32, .345, .37, .41, .46, .51, .56, .6, .64, .68, .74, .8, .86, .885, .92, .955, .985, 1]
 
 
 def grey(v):
     return (v, v, v, 1)
 
 
-WHITE, BELLY_C = grey(.72), (.46, .5, .54, 1)  # the instance colour multiplies these; full white clips in the sun
+WHITE, BELLY_C = grey(.8), (.5, .54, .58, 1)  # the instance colour multiplies these; full white clips in the sun
 
 
 class Mesh:
@@ -184,6 +186,8 @@ def shell(mesh, human, wheels):
                     continue
                 p = at(t, s)
                 n = normal(t, s)
+                if k in (R_W, R_G) and WIN_T[0] <= t <= WIN_T[1]:
+                    p = tuple(p[a] + n[a] * FRAME_LIFT for a in range(3))
                 p, cut = arch_cut(p, wheels)
                 color = BELLY_C if k <= R_BELLY else WHITE
                 grid[(i, k, side)] = (mesh.vert((p[0] * side, p[1], p[2]), color, (n[0] * side, n[1], n[2])), cut)
@@ -196,7 +200,7 @@ def shell(mesh, human, wheels):
             return "car_seam"
         if k == R_F0 and FOOT_T[0] < t < FOOT_T[1]:
             return "car_glass"
-        if k >= R_W and WIN_T[0] < t < WIN_T[1]:
+        if k >= R_G and WIN_T[0] < t < WIN_T[1]:
             # The human car keeps an opaque roof spine over the cabin; its windscreen stays clear.
             return "car_body" if human and t < .62 and k >= ROWS - 3 else "car_glass"
         return "car_body"
@@ -213,17 +217,27 @@ def shell(mesh, human, wheels):
                 mesh.face(idx if side > 0 else idx[::-1], role(i, k))
     # Tail: a recessed round disc inside the lit ring.
     t0 = [grid[(0, k, 1)][0] for k in range(ROWS)] + [grid[(0, k, -1)][0] for k in range(ROWS - 2, 0, -1)]
-    z, yc = Z0 + .05, sec(0)[0]
-    inner = []
-    for j in range(len(t0)):
-        p = mesh.v[t0[j]]  # back in three.js coordinates: B(x, y, z) = (x, -z, y)
-        k = .42 / max(math.hypot(p[0], p[2] - yc), 1e-4)
-        inner.append(mesh.vert((p[0] * k, yc + (p[2] - yc) * k, z), WHITE, (0, 0, -1)))
-    hub = mesh.vert((0, yc, z), WHITE, (0, 0, -1))
-    for j in range(len(t0)):
-        b = (j + 1) % len(t0)
-        mesh.face((t0[j], t0[b], inner[b], inner[j]), "car_body")
-        mesh.face((inner[j], inner[b], hub), "car_body")
+    yc, z0, m = sec(0)[0], Z0 + .04, len(t0)
+    rim = [(mesh.v[v][0], mesh.v[v][2] - yc) for v in t0]  # back to three.js: B(x, y, z) = (x, -z, y)
+
+    def disc_ring(r, z, color=WHITE):
+        out = []
+        for x, y in rim:
+            k = r / max(math.hypot(x, y), 1e-4)
+            out.append(mesh.vert((x * k, yc + y * k, z), color, (0, 0, -1)))
+        return out
+
+    # Rim -> groove -> dome, split by the inner lit ring.
+    rings = [(t0, "car_body"), (disc_ring(.385, z0), "car_body"), (disc_ring(.36, z0 - .012), "car_body"), (disc_ring(.27, z0 - .03), "car_tail"), (disc_ring(.24, z0 - .03), "car_body")]
+    for j in range(len(rings) - 1):
+        a0, b0 = rings[j][0], rings[j + 1][0]
+        for i in range(m):
+            n = (i + 1) % m
+            mesh.face((a0[i], a0[n], b0[n], b0[i]), rings[j + 1][1])
+    hub = mesh.vert((0, yc, z0 - .05), WHITE, (0, 0, -1))
+    last = rings[-1][0]
+    for i in range(m):
+        mesh.face((last[i], last[(i + 1) % m], hub), "car_body")
     # Nose: close the last station.
     n0 = [grid[(len(STATIONS) - 1, k, 1)][0] for k in range(ROWS)] + [grid[(len(STATIONS) - 1, k, -1)][0] for k in range(ROWS - 2, 0, -1)]
     mesh.face(n0[::-1], "car_body")
@@ -231,7 +245,7 @@ def shell(mesh, human, wheels):
 
 def headband(mesh):
     """Warm headlight band hugging the nose."""
-    ts, y0, y1 = [.93, .955, .975, .99], .56, .62
+    ts, y0, y1 = [.93, .955, .975, .99], .55, .64
     verts = []
     for side in (1, -1):
         for t in ts if side > 0 else ts[::-1]:
@@ -279,14 +293,51 @@ def person(mesh, x, z, facing, coat, skin, hair, trousers):
         box(mesh, (x + dx, .47, z + .38 * f), (.12, .32, .12), trousers)
 
 
+def pad(mesh, c, r, color, seg=8, rings=4):
+    """Soft cushion: a flattened superellipsoid."""
+    grid = []
+    for j in range(1, rings):
+        a = -math.pi / 2 + math.pi * j / rings
+        ca, sa = math.cos(a) ** .55, math.copysign(abs(math.sin(a)) ** .55, a)
+        ring = []
+        for i in range(seg):
+            b = 2 * math.pi * i / seg
+            cb, sb = math.copysign(abs(math.cos(b)) ** .6, math.cos(b)), math.copysign(abs(math.sin(b)) ** .6, math.sin(b))
+            ring.append(mesh.vert((c[0] + r[0] * ca * cb, c[1] + r[1] * sa, c[2] + r[2] * ca * sb), color))
+        grid.append(ring)
+    low, high = mesh.vert((c[0], c[1] - r[1], c[2]), color), mesh.vert((c[0], c[1] + r[1], c[2]), color)
+    for j in range(len(grid) - 1):
+        for i in range(seg):
+            n = (i + 1) % seg
+            mesh.face((grid[j][i], grid[j + 1][i], grid[j + 1][n], grid[j][n]), "car_interior")
+    for i in range(seg):
+        n = (i + 1) % seg
+        mesh.face((low, grid[0][i], grid[0][n]), "car_interior")
+        mesh.face((high, grid[-1][n], grid[-1][i]), "car_interior")
+
+
 def seat(mesh, x, z, facing, color):
-    box(mesh, (x, .5, z), (.5, .16, .5), color)
-    box(mesh, (x, .8, z - .24 * facing), (.42, .54, .1), color)
+    pad(mesh, (x, .5, z), (.25, .085, .25), color)
+    pad(mesh, (x, .86, z - .25 * facing), (.24, .36, .07), color)
+
+
+def ground(mesh, human):
+    """Soft contact shadow: traffic casts no real shadow, so a faded disc grounds the body."""
+    n, rz = 20, 2.75
+    ring = lambda rx, rz2, a: [mesh.vert((rx * math.cos(2 * math.pi * i / n), .02, .05 + rz2 * math.sin(2 * math.pi * i / n)), (0, 0, 0, a)) for i in range(n)]
+    strength = .42 if human else .3
+    p, q = ring(.8, 1.9, strength), ring(1.3, rz, 0)
+    centre = mesh.vert((0, .02, .05), (0, 0, 0, strength))
+    for i in range(n):
+        j = (i + 1) % n
+        mesh.face((p[j], p[i], q[i], q[j]), "car_shadow")
+        mesh.face((p[j], centre, p[i]), "car_shadow")
 
 
 def interior(mesh, human):
-    pale, dark = grey(.6), grey(.3)
+    pale, dark = (.42, .47, .52, 1), grey(.25)
     box(mesh, (0, .42, .1), (1.1, .03, 2.8), grey(.5))
+    box(mesh, (0, .5, 2.235), (.46, .045, .05), grey(.12))  # nose slot
     if human:
         spots = [(.38, -.35, 1, True), (-.38, -.35, 1, False), (.38, .55, 1, False), (-.38, .55, 1, True)]
         box(mesh, (0, .86, 1.15), (1.36, .1, .34), pale)
@@ -309,11 +360,11 @@ def wheel(mesh, x, z, r, w):
     """Disc wheel: thin dark tyre and a white disc, in car_body so night interior light leaves it alone."""
     n = 18
     side = 1 if x > 0 else -1
-    tyre, disc = grey(.035), grey(.72)
+    tyre, disc = grey(.035), grey(.8)
     y = r + 0
     ring = lambda rr, dx, col: [mesh.vert((x + dx, y + rr * math.cos(2 * math.pi * i / n), z + rr * math.sin(2 * math.pi * i / n)), col) for i in range(n)]
     outer, inner = w / 2 * side, -w / 2 * side
-    a, b, c, d = ring(r, inner, tyre), ring(r, outer, tyre), ring(r * .86, outer, tyre), ring(r * .86, outer + .01 * side, disc)
+    a, b, c, d = ring(r, inner, tyre), ring(r, outer, tyre), ring(r * .9, outer, tyre), ring(r * .9, outer + .01 * side, disc)
     e = ring(r * .3, outer + .03 * side, disc)
     hub = mesh.vert((x + outer + .035 * side, y, z), disc)
     for i in range(n):
@@ -329,7 +380,7 @@ def hover(mesh):
     """Thin emitter ring under the belly and a soft light pool on the road (car_pool's colours fade it out)."""
     n = 28
     ring = lambda rx, rz, y: [mesh.vert((rx * math.cos(2 * math.pi * i / n), y, .1 + rz * math.sin(2 * math.pi * i / n))) for i in range(n)]
-    a, b, c, d = ring(.8, 1.12, .19), ring(.72, 1.02, .19), ring(.8, 1.12, .13), ring(.72, 1.02, .13)
+    a, b, c, d = ring(.62, .98, .2), ring(.55, .9, .2), ring(.62, .98, .15), ring(.55, .9, .15)
     for i in range(n):
         j = (i + 1) % n
         for f in ((a[j], a[i], b[i], b[j]), (a[i], a[j], c[j], c[i]), (b[j], b[i], d[i], d[j]), (d[j], d[i], c[i], c[j])):
@@ -352,7 +403,8 @@ ROLES = {
     "car_glass": ((.72, .84, .92, .3), {"rough": .08}),
     "car_seam": ((.81, .91, 1, 1), {"rough": .3, "emit": (.81, .91, 1, 1), "emit_strength": 2}),
     "car_head": ((.96, .96, .94, 1), {"rough": .3, "emit": (1, .96, .88, 1), "emit_strength": 1}),
-    "car_tail": ((.72, .35, .31, 1), {"rough": .3, "emit": (1, .29, .23, 1), "emit_strength": 1}),
+    "car_tail": ((.85, .86, .88, 1), {"rough": .3, "emit": (1, .23, .19, 1), "emit_strength": 1}),
+    "car_shadow": ((0, 0, 0, .4), {"rough": 1}),
     "car_pool": ((.81, .91, 1, 1), {"rough": 1, "emit": (.81, .91, 1, 1), "emit_strength": 1}),
 }
 
@@ -384,9 +436,8 @@ def to_object(name, mesh, mats, parent, analytic):
         bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
         for f in bm.faces:
             f.smooth = True
-            if f.material_index == order.index("car_pool") if "car_pool" in order else False:
-                if f.normal.z < 0:
-                    f.normal_flip()
+            if order[f.material_index] in ("car_pool", "car_shadow") and f.normal.z < 0:
+                f.normal_flip()
         for e in bm.edges:
             if len(e.link_faces) == 2 and e.calc_face_angle(0) > math.radians(30):
                 e.smooth = False
@@ -410,10 +461,11 @@ def build(name, human, x, mats, root):
     to_object(f"{name}_shell", body, mats, empty, True)
     parts = Mesh()
     interior(parts, human)
+    ground(parts, human)
     if human:
         for wz in (-1.42, 1.42):
             for wx in (-.8, .8):
-                wheel(parts, wx, wz, .34, .18)
+                wheel(parts, wx, wz, .34, .13)
     else:
         hover(parts)
     to_object(f"{name}_parts", parts, mats, empty, False)

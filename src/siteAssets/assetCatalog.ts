@@ -78,8 +78,8 @@ export const SITE_ASSET_CATALOG: Readonly<Record<SiteAssetId, SiteAssetDefinitio
     url: new URL('../../asset/models/car-family-2127/car-family-2127.glb', import.meta.url).href,
     rootName: 'ROOT_CAR_FAMILY_2127',
     category: 'kit',
-    footprint: [5.2, 4.7], // both variants side by side; mobility reads each relative to its own empty
-    maxHeight: 1.9,
+    footprint: [5.7, 5.7], // both variants side by side; mobility reads each relative to its own empty
+    maxHeight: 2,
     materialPolicy: 'preserve',
   },
 };

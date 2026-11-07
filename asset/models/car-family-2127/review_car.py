@@ -36,6 +36,8 @@ for name in ("car_body", "car_interior"):  # the runtime multiplies the colour a
     attr.layer_name = "Col"
     t.links.new(attr.outputs[0], bsdf.inputs["Base Color"])
 bpy.data.materials["car_glass"].node_tree.nodes["Principled BSDF"].inputs["Alpha"].default_value = .3
+bpy.data.materials["car_shadow"].node_tree.nodes["Principled BSDF"].inputs["Alpha"].default_value = 0
+bpy.data.materials["car_shadow"].surface_render_method = "BLENDED"
 # The pool is additive at runtime; Blender would draw it as an opaque disc.
 pool = bpy.data.materials["car_pool"].node_tree.nodes["Principled BSDF"]
 pool.inputs["Alpha"].default_value = 0

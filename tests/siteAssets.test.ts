@@ -314,8 +314,8 @@ const carGltf: Pick<GLTF, 'scene' | 'animations'> = await new Promise((resolve, 
   new GLTFLoader().parse(carBytes.buffer.slice(carBytes.byteOffset, carBytes.byteOffset + carBytes.byteLength) as ArrayBuffer, '', resolve, reject));
 const carRoot = await new SiteAssetLoaderCache({ async loadAsync() { return carGltf; } }).load('car-family-2127').then(loaded => loaded.root);
 for (const [name, roles] of [
-  ['car_pod', ['car_body', 'car_glass', 'car_head', 'car_interior', 'car_pool', 'car_seam', 'car_tail']],
-  ['car_human', ['car_body', 'car_glass', 'car_head', 'car_interior', 'car_seam', 'car_tail']],
+  ['car_pod', ['car_body', 'car_glass', 'car_head', 'car_interior', 'car_pool', 'car_seam', 'car_shadow', 'car_tail']],
+  ['car_human', ['car_body', 'car_glass', 'car_head', 'car_interior', 'car_seam', 'car_shadow', 'car_tail']],
 ] as const) {
   const variant = carRoot.getObjectByName(name)!, found = new Set<string>();
   let tris = 0;
@@ -326,7 +326,7 @@ for (const [name, roles] of [
     assert.ok(o.geometry.attributes.color, `${o.name}: colour attribute`);
   });
   assert.deepEqual([...found].sort(), [...roles], `${name}: roles`);
-  assert.ok(tris <= 3200, `${name}: ${tris} triangles, about the five rounded boxes it replaces`);
+  assert.ok(tris <= 4000, `${name}: ${tris} triangles`);
   const size = new T.Box3().setFromObject(variant).getSize(new T.Vector3());
-  assert.ok(Math.abs(size.z - 4.6) < .08 && /* the pod's light pool is the widest part */ size.x < 2.6 && size.y < 1.9, `${name}: bounds ${size.toArray()}`);
+  assert.ok(size.z > 4.55 && size.z < 5.6 && /* the ground shadow is the widest part */ size.x < 2.7 && size.y < 2, `${name}: bounds ${size.toArray()}`);
 }
