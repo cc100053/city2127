@@ -67,6 +67,8 @@ try {
   const triple=(key:string,fallback:[number,number,number])=>{const v=reviewParams.get(key)?.split(',').map(Number);return v?.length===3&&v.every(Number.isFinite)?v as [number,number,number]:fallback;};
   const reviewAim=triple('at',[-24,0,-268]);
   if(streetReview){camera.position.set(...triple('cam',[-40,20,-245]));camera.lookAt(...reviewAim);}
+  // Review captures reach the live scene here, e.g. to follow one car (artifacts/car-closeup-polish).
+  if(streetReview)(window as unknown as {cityReview:object}).cityReview={scene,camera};
   const reviewTime=import.meta.env.DEV && reviewParams.has('reviewTime') ? Number(reviewParams.get('reviewTime')) : NaN;
   const ambient=new T.HemisphereLight('#edf1e4','#8a8274',2.2);scene.add(ambient);
   const sun=new T.DirectionalLight('#ffe4b8',3.4);sun.position.set(-20,38,18);sun.castShadow=true;
