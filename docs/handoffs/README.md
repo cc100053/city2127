@@ -17,7 +17,7 @@
 | [近鏡打磨](closeup-polish.md) | S0 INTEGRATED，98/98；coordinator接受量度基準，失敗保留；worker 01a17d74；分 S0 基準 → A NE → B SW → C SE → D NW → Z 回歸；驗收同 capture 標準已定，每個 sector 要 owner 睇圖批准先 merge | cc100053 |
 | [近鏡推近／先推近後變化](closeup-zoom.md) | INTEGRATED CANDIDATE（2026-10-30 owner 指示 merge）；F／A 視覺硬門檻仍未達 | cc100053；實作Codex |
 | [每位Guest近鏡＋明顯變化](guest-agency.md) | G1–G3、G7、G2 候選已 merge main `95c70be`（CI 通過）；G5 文案、G4／G7 視覺與性能 gate、真人兩秒辨認未驗收 | cc100053 |
-| [導軌列車](train-closeup-polish.md) | IN_PROGRESS（2026-11-08）；owner 揀 A 夜景版，Blender R2 等 owner 睇 | cc100053 |
+| [導軌列車](train-closeup-polish.md) | IN_PROGRESS（2026-11-08）；owner 揀 A 夜景版，Blender R3 等 owner 睇 | cc100053 |
 | [街道車輛家族](car-closeup-polish.md) | DONE；owner 接受 R2 並 merge（獨立 judge 8/18，已知差距見 handoff） | cc100053 |
 | [空の環 Sky Ring](hero-sky-ring.md) | DONE（2026-11-02）；方案 B 巨構：250 m 桁架環＋六支 V 斜柱＋泊位＋居民聲音燈點；close-up polish owner 接受 R5 | cc100053 |
 | [Hero 霧與光層次](hero-atmosphere.md) | IN_PROGRESS（2026-11-02）；R1 高度霧／夜間窗燈層次／夜空地平線，R2 水面燈光倒影，等 owner 目視 | cc100053 |

@@ -1,7 +1,7 @@
 # train-closeup-polish — 導軌列車（Blender）
 
 - Owner: cc100053
-- Status: IN_PROGRESS — R2 等 owner 睇
+- Status: IN_PROGRESS — R3 等 owner 睇
 - Branch: `feat/train-closeup-polish`（worktree `../city2127-train`）
 - Base commit: `2d7c25d`（origin/main）
 - Last verified commit: 見 branch tip；`npm test`／`npm run build`／`git diff --check` 通過
@@ -77,6 +77,23 @@ FPS：NOT RUN（24+4 車廂，每卡約 3k tris，draw calls 由 8 增至約 39�
 
 FPS（`fps.sh` headed Chrome，hero `se:high`，1920×1080，同一部機同一時段）：GLB 第一次 日 12.8–13.3／夜 14.6–14.7，第二次 日 13.0–13.4／夜 13.0；方盒 fallback 日 12.7–13.6／夜 12.9（第一個 sample 已剔除）。兩者一樣，即係列車冇明顯成本；但絕對值只有 13 左右，今日部機好慢（車輛 handoff 記錄係 26），未有 60 FPS 結論。
 
+## R3
+
+對比圖 [r3/vs-target.jpg](../../artifacts/train-closeup-polish/r3/vs-target.jpg)（左 R2、中 R3、右目標；上日下夜）。Opus 目測，未跑 judge。開工前關咗一個閒置 11 小時嘅 playwright `r4` headless Chrome（本 project，非本任務開）。
+
+- 車頭：車頂全高保持到 `NOSE_START`（車身前端前 1.2 m）先開始落，所以車頭由長刺變成子彈頭；成個車頭頂係一塊深色反光擋風玻璃（新角色 `train_screen`，runtime `trainScreen`），刀鋒前段保持白色。頭車座艙收短到擋風玻璃後面（之前座位穿出車頭）。
+- 夜景室內：唔再用橙色 emissive 塗晒成個座艙；每卡車頂加一條暖白燈帶（新角色 `train_lamp`，日 .4／夜 3.4），室內 emissive 改淡暖白（日 .12／夜 .42），乘客保留自己衫色。
+- 日景玻璃：再淡啲、少反光（opacity .24、envMap .45），衫色對比加強。
+- 腰線夜間 3.5 → 5。
+
+仍低於目標：
+
+- 目標嘅擋風玻璃係透明、見到入面；R3 係深色反光（似新幹線）。如果要跟目標，要改返透明加白框。
+- 日景中後段車廂玻璃仍然偏白，乘客細節細。
+- 夜景乘客比目標暗。
+
+FPS：今輪冇再量（只改物料同少量幾何，三角形數同 R2 相若：lead 3,262、mid 2,894、tail 2,322）。
+
 ## Next
 
-Owner 睇 R2 → 接受就 sync PROJECT／VALIDATION 再 merge；或者 R3 針對車頭同室內。FPS 要喺機況正常時再量。
+Owner 睇 R3 → 接受就 sync PROJECT／VALIDATION、喺機況正常時量 FPS，再 merge；否則 R4。

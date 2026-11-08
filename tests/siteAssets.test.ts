@@ -338,9 +338,9 @@ const trainGltf: Pick<GLTF, 'scene' | 'animations'> = await new Promise((resolve
 const trainRoot = await new SiteAssetLoaderCache({ async loadAsync() { return trainGltf; } }).load('train-2127').then(loaded => loaded.root);
 trainRoot.updateWorldMatrix(true, true);
 for (const [name, roles, length] of [
-  ['train_lead', ['train_body', 'train_field', 'train_glass', 'train_head', 'train_interior', 'train_ring', 'train_seam'], [14.2, 14.8]],
-  ['train_mid', ['train_body', 'train_field', 'train_glass', 'train_interior', 'train_ring', 'train_seam'], [9.9, 10.1]],
-  ['train_tail', ['train_body', 'train_field', 'train_glass', 'train_interior', 'train_seam', 'train_tail'], [8.7, 8.9]],
+  ['train_lead', ['train_body', 'train_field', 'train_glass', 'train_head', 'train_interior', 'train_lamp', 'train_ring', 'train_screen', 'train_seam'], [14.2, 14.8]],
+  ['train_mid', ['train_body', 'train_field', 'train_glass', 'train_interior', 'train_lamp', 'train_ring', 'train_seam'], [9.9, 10.1]],
+  ['train_tail', ['train_body', 'train_field', 'train_glass', 'train_interior', 'train_lamp', 'train_seam', 'train_tail'], [8.7, 8.9]],
 ] as const) {
   const variant = trainRoot.getObjectByName(name)!, found = new Set<string>();
   let tris = 0;

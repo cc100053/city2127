@@ -28,6 +28,7 @@ LIFT = FLOAT - .62 + .15          # the cabin was laid out for a .62 belly; .15 
 SQ = 2.7                         # superellipse exponent of the section
 JOINT = -PITCH / 2               # the joint behind a car
 NOSE = 4.6                       # blade length ahead of the lead body (R1's 6.2 read as a needle)
+NOSE_START = HALF - 1.2          # R3: the roof holds full height to here, then the windscreen rakes down (R2 tapered from 1.2: a long spike)
 RING_R, RING_T = 2.0, .15  # its foot just clears the beam top
 
 
@@ -40,6 +41,8 @@ ROLES = {
     "train_head": ((.96, .96, .94, 1), {"rough": .3, "emit": (1, .95, .85, 1), "emit_strength": 1}),
     "train_tail": ((.85, .86, .88, 1), {"rough": .3, "emit": (1, .23, .19, 1), "emit_strength": 1}),
     "train_field": ((.75, .88, 1, .35), {"rough": 1, "emit": (.75, .88, 1, 1), "emit_strength": 1}),
+    "train_screen": ((.1, .14, .2, 1), {"rough": .08}),
+    "train_lamp": ((1, .95, .86, 1), {"rough": .5, "emit": (1, .93, .8, 1), "emit_strength": 2}),
 }
 
 
@@ -73,8 +76,8 @@ def section(z, kind):
         u = (-rear - z) / .9
         k = .55 + .45 * math.sqrt(max(1 - u * u, 0))
         return yc, h * k, w * k
-    if kind == "lead" and z > 1.2:  # the blade: drops and narrows to a low point NOSE ahead of the body
-        u = min((z - 1.2) / (HALF + NOSE - 1.2), 1)
+    if kind == "lead" and z > NOSE_START:  # windscreen then blade: drops and narrows to a low point NOSE ahead of the body
+        u = min((z - NOSE_START) / (HALF + NOSE - NOSE_START), 1)
         top = TOP - (TOP - FLOAT - .62) * smooth(u) ** .75
         bot = FLOAT + .36 * smooth(u)
         top = max(top, bot + .04)
@@ -105,7 +108,7 @@ BANDS = ["emit", "belly", "body", "body", "body", "body", "seam", "body", "win",
 def stations(kind):
     zs = [-HALF + i * .15 for i in range(7)] + [-HALF + .9 + i * .55 for i in range(int((2 * HALF - 1.8) / .55) + 1)]
     if kind == "lead":
-        zs = [z for z in zs if z <= 1.2] + [1.2 + (HALF + NOSE - 1.2) * (i / 22) ** .85 for i in range(1, 23)]
+        zs = [z for z in zs if z <= NOSE_START] + [NOSE_START + (HALF + NOSE - NOSE_START) * (i / 22) ** .85 for i in range(1, 23)]
     else:
         zs += [HALF - .9 + i * .15 for i in range(7)]
     zs = sorted(set(round(z, 4) for z in zs))
@@ -126,9 +129,10 @@ def shell(m, kind):
     def role(band, z0, z1):
         zm = (z0 + z1) / 2
         end = kind != "lead" and abs(zm) > HALF - .75 or kind == "lead" and zm < -HALF + .75
+        if kind == "lead" and band in ("win", "spine") and zm > NOSE_START - .5:
+            # One dark raked windscreen over the nose (target), ending at the blade's root; the blade stays white.
+            return "train_screen" if zm < HALF + NOSE * .5 else "train_body"
         if band == "win":
-            if kind == "lead" and zm > HALF + NOSE * .5:  # the windscreen ends at the blade's root; the blade stays white
-                return "train_body"
             return "train_body" if end else "train_glass"
         if band == "seam":
             if kind == "lead" and zm > HALF + .4:
@@ -215,7 +219,7 @@ def tube_z(m, z0, z1, yc, r, role, seg=16):
 
 
 SKIN = [(.93, .78, .66, 1), (.78, .6, .46, 1), (.55, .4, .3, 1)]
-CLOTH = [(.36, .42, .5, 1), (.85, .84, .8, 1), (.3, .33, .36, 1), (.55, .62, .58, 1), (.62, .55, .6, 1), (.9, .9, .88, 1), (.42, .5, .62, 1)]
+CLOTH = [(.22, .3, .45, 1), (.86, .84, .78, 1), (.18, .2, .24, 1), (.4, .55, .48, 1), (.62, .42, .5, 1), (.92, .92, .9, 1), (.3, .42, .62, 1)]  # R3: more contrast so riders read through the glass
 
 
 def person(m, x, z, seated, k, face=1):
@@ -239,7 +243,7 @@ def interior(m, kind, seed):
 
 def _interior(m, kind, seed):
     pale, seat = (.7, .68, .64, 1), (.42, .47, .54, 1)  # darker than the white shell, so the cabin reads through the glass
-    z0, z1 = -HALF + .7, (HALF + 1.2 if kind == "lead" else HALF - .7)
+    z0, z1 = -HALF + .7, (NOSE_START - .3 if kind == "lead" else HALF - .7)  # the lead cabin stops behind the windscreen
     box(m, (0, .92, (z0 + z1) / 2), (2.3, .16, z1 - z0), "train_interior", pale)
     k = seed
     # Facing pairs of seats down both sides, an aisle in the middle; a few people standing.
@@ -257,6 +261,12 @@ def _interior(m, kind, seed):
     for j, z in enumerate((z0 + 1.6, (z0 + z1) / 2 + .3, z1 - 1.4)):
         if (seed + j) % 2 == 0:
             person(m, .05 * (-1) ** j, z, False, seed + j)
+
+
+def lamp(m, kind):
+    """A warm ceiling strip down the cabin: the night interior glows from it, so riders keep their own colours."""
+    z0, z1 = -HALF + .9, (NOSE_START - .6 if kind == "lead" else HALF - .9)
+    box(m, (0, TOP - .32, (z0 + z1) / 2), (.7, .05, z1 - z0), "train_lamp")
 
 
 def coupler(m):
@@ -318,6 +328,7 @@ def build(kind, x, mats, root, seed):
     to_object(f"train_{kind}_shell", body, mats, empty, 50)
     parts = Mesh()
     interior(parts, kind, seed)
+    lamp(parts, kind)
     field(parts, kind)
     if kind != "tail":
         coupler(parts)
