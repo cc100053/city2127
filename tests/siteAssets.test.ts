@@ -338,7 +338,7 @@ const trainGltf: Pick<GLTF, 'scene' | 'animations'> = await new Promise((resolve
 const trainRoot = await new SiteAssetLoaderCache({ async loadAsync() { return trainGltf; } }).load('train-2127').then(loaded => loaded.root);
 trainRoot.updateWorldMatrix(true, true);
 for (const [name, roles, length] of [
-  ['train_lead', ['train_body', 'train_field', 'train_glass', 'train_head', 'train_interior', 'train_ring', 'train_seam'], [15.5, 16.5]],
+  ['train_lead', ['train_body', 'train_field', 'train_glass', 'train_head', 'train_interior', 'train_ring', 'train_seam'], [14.2, 14.8]],
   ['train_mid', ['train_body', 'train_field', 'train_glass', 'train_interior', 'train_ring', 'train_seam'], [9.9, 10.1]],
   ['train_tail', ['train_body', 'train_field', 'train_glass', 'train_interior', 'train_seam', 'train_tail'], [8.7, 8.9]],
 ] as const) {
@@ -353,7 +353,7 @@ for (const [name, roles, length] of [
   assert.deepEqual([...found].sort(), [...roles], `${name}: roles`);
   assert.ok(tris <= 4000, `${name}: ${tris} triangles`);
   const box = new T.Box3().setFromObject(variant), size = box.getSize(new T.Vector3());
-  // Floats clear of the beam (ring foot just above it) and fits the 2.7 m wide, 10 m pitch guideway car.
-  assert.ok(box.min.y > 0 && size.y < 3.7 && size.x < 3.7 && size.z > length[0] && size.z < length[1], `${name}: bounds ${size.toArray()}`);
+  // Floats clear of the beam (ring foot just above it) on the 10 m car pitch.
+  assert.ok(box.min.y > 0 && size.y < 4.5 && size.x < 4.4 && size.z > length[0] && size.z < length[1], `${name}: bounds ${size.toArray()}`);
 }
 console.log('PASS: train-2127 GLB variants, roles, triangle budget and bounds.');

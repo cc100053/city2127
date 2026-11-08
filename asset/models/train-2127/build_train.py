@@ -22,11 +22,13 @@ sys.path.insert(0, os.path.dirname(HERE))
 from geo_helpers import B, material  # noqa: E402
 
 PITCH, HALF = 10.0, 4.4          # car pitch, half body length
-FLOAT, TOP, HW = .62, 3.0, 1.32  # belly height, roof height, half width
+# R2 lifts the body to 1.02 so the ring (R2: radius 2.0) can be as big as the target's and still clear the beam top.
+FLOAT, TOP, HW = 1.02, 3.4, 1.32  # belly height, roof height, half width
+LIFT = FLOAT - .62 + .15          # the cabin was laid out for a .62 belly; .15 more puts shoulders above the sill
 SQ = 2.7                         # superellipse exponent of the section
 JOINT = -PITCH / 2               # the joint behind a car
-NOSE = 6.2                       # blade length ahead of the lead body
-RING_R, RING_T = 1.66, .12  # the ring clears the body corners by .3 and its foot the beam top
+NOSE = 4.6                       # blade length ahead of the lead body (R1's 6.2 read as a needle)
+RING_R, RING_T = 2.0, .15  # its foot just clears the beam top
 
 
 ROLES = {
@@ -45,8 +47,10 @@ class Mesh:
     def __init__(self):
         self.v, self.f, self.c, self.roles = [], [], [], []
 
+    dy = 0.0  # raises everything added while set (the cabin follows the lifted belly)
+
     def vert(self, p, col=(1, 1, 1, 1)):
-        self.v.append(B(p))
+        self.v.append(B((p[0], p[1] + self.dy, p[2])))
         self.c.append(col)
         return len(self.v) - 1
 
@@ -71,10 +75,10 @@ def section(z, kind):
         return yc, h * k, w * k
     if kind == "lead" and z > 1.2:  # the blade: drops and narrows to a low point NOSE ahead of the body
         u = min((z - 1.2) / (HALF + NOSE - 1.2), 1)
-        top = TOP - (TOP - 1.18) * smooth(u) ** .8
-        bot = FLOAT + (1.02 - FLOAT) * smooth(u)
-        top = max(top, bot + .03)
-        return (top + bot) / 2, (top - bot) / 2, w * (1 - u ** 1.6) ** .9 + .015
+        top = TOP - (TOP - FLOAT - .62) * smooth(u) ** .75
+        bot = FLOAT + .36 * smooth(u)
+        top = max(top, bot + .04)
+        return (top + bot) / 2, (top - bot) / 2, w * (1 - u ** 2.2) ** .7 + .02
     if kind != "lead" and z > rear:
         u = (z - rear) / .9
         k = .55 + .45 * math.sqrt(max(1 - u * u, 0))
@@ -92,8 +96,10 @@ def point(z, s, kind):
 
 # Rows round the half section and what each band between rows is.
 # The glass starts above a white shoulder (s .22), so the body keeps its mass from the raised review camera (R1 read as an open tray).
-S_ROWS = [-1, -.93, -.86, -.6, -.32, -.14, -.07, .08, .22, .45, .7, .92, 1]
-BANDS = ["emit", "belly", "body", "body", "body", "seam", "body", "body", "win", "win", "win", "spine"]
+# R2: the seam runs just under the sill (s -.04–.04): mid-flank (R1) is foreshortened away from the raised camera; the sill (.1)
+# sits below the riders' shoulders.
+S_ROWS = [-1, -.93, -.86, -.6, -.35, -.14, -.04, .04, .1, .4, .7, .92, 1]
+BANDS = ["emit", "belly", "body", "body", "body", "body", "seam", "body", "win", "win", "win", "spine"]
 
 
 def stations(kind):
@@ -121,7 +127,7 @@ def shell(m, kind):
         zm = (z0 + z1) / 2
         end = kind != "lead" and abs(zm) > HALF - .75 or kind == "lead" and zm < -HALF + .75
         if band == "win":
-            if kind == "lead" and zm > HALF + NOSE * .3:  # the windscreen ends at the blade's root; the blade stays white
+            if kind == "lead" and zm > HALF + NOSE * .5:  # the windscreen ends at the blade's root; the blade stays white
                 return "train_body"
             return "train_body" if end else "train_glass"
         if band == "seam":
@@ -157,14 +163,14 @@ def headband(m):
     """The lead's warm-white headlight band: a thin strip sweeping round the blade just below the windscreen."""
     pts = []
     for i in range(18):
-        z = HALF + .6 + (NOSE - 1.4) * i / 17
-        x, y, _ = point(z, -.05, "lead")
-        pts.append((x + .012, y, z))
+        z = HALF + .4 + (NOSE - 1.0) * i / 17
+        x, y, _ = point(z, .02, "lead")
+        pts.append((x + .04, y + .02, z))  # proud of the blade's facets
     for side in (1, -1):
         prev = None
         for x, y, z in pts:
-            a = m.vert((x * side, y - .07, z))
-            b = m.vert((x * side, y + .07, z))
+            a = m.vert((x * side, y - .1, z))
+            b = m.vert((x * side, y + .1, z))
             if prev:
                 q = [prev[0], a, b, prev[1]]
                 m.face(q[::-1] if side > 0 else q, "train_head")
@@ -226,8 +232,14 @@ def person(m, x, z, seated, k, face=1):
 
 
 def interior(m, kind, seed):
+    m.dy = LIFT
+    _interior(m, kind, seed)
+    m.dy = 0
+
+
+def _interior(m, kind, seed):
     pale, seat = (.7, .68, .64, 1), (.42, .47, .54, 1)  # darker than the white shell, so the cabin reads through the glass
-    z0, z1 = -HALF + .7, (HALF + 1.6 if kind == "lead" else HALF - .7)
+    z0, z1 = -HALF + .7, (HALF + 1.2 if kind == "lead" else HALF - .7)
     box(m, (0, .92, (z0 + z1) / 2), (2.3, .16, z1 - z0), "train_interior", pale)
     k = seed
     # Facing pairs of seats down both sides, an aisle in the middle; a few people standing.
@@ -255,10 +267,16 @@ def coupler(m):
 
 
 def field(m, kind):
-    """A thin field sheet under the belly, glowing on the beam (flat, faces up)."""
-    z0, z1 = -HALF + .3, (HALF + NOSE * .7 if kind == "lead" else HALF - .3)
-    a, b, c, d = (m.vert(p) for p in ((-1.05, .08, z0), (1.05, .08, z0), (1.05, .08, z1), (-1.05, .08, z1)))
+    """The levitation field: a sheet on the beam plus two curtains flaring from the belly edges down past the beam's sides,
+    bright at the belly and fading out at the foot (additive at runtime, so the colour is the brightness)."""
+    z0, z1 = -HALF + .3, (HALF + NOSE * .6 if kind == "lead" else HALF - .3)
+    hi, lo = (1, 1, 1, 1), (0, 0, 0, 1)
+    a, b, c, d = (m.vert(p, (.6, .6, .6, 1)) for p in ((-1.1, .06, z0), (1.1, .06, z0), (1.1, .06, z1), (-1.1, .06, z1)))
     m.face([a, d, c, b], "train_field")
+    for side in (1, -1):
+        q = [m.vert((side * .85, FLOAT + .02, z0), hi), m.vert((side * .85, FLOAT + .02, z1), hi),
+             m.vert((side * 1.6, .03, z1), lo), m.vert((side * 1.6, .03, z0), lo)]
+        m.face(q if side > 0 else q[::-1], "train_field")
 
 
 # ---------------------------------------------------------------- objects

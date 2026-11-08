@@ -1,7 +1,7 @@
 # train-closeup-polish — 導軌列車（Blender）
 
 - Owner: cc100053
-- Status: IN_PROGRESS — R1 等 owner 睇
+- Status: IN_PROGRESS — R2 等 owner 睇
 - Branch: `feat/train-closeup-polish`（worktree `../city2127-train`）
 - Base commit: `2d7c25d`（origin/main）
 - Last verified commit: 見 branch tip；`npm test`／`npm run build`／`git diff --check` 通過
@@ -58,6 +58,25 @@ Gemini 第 1 輪（保守 maglev：尖頭、玻璃帶、裙板）owner 退回：
 
 FPS：NOT RUN（24+4 車廂，每卡約 3k tris，draw calls 由 8 增至約 39）。Hero 截圖 `~/city2127-evidence/train-closeup-polish/r1/hero-day.png`。
 
+## R2
+
+針對 R1 五項。對比圖 [r2/vs-target.jpg](../../artifacts/train-closeup-polish/r2/vs-target.jpg)（左 R1、中 R2、右目標；上日下夜）。Opus 目測，未跑 judge。
+
+- 環：車身升到離導軌頂 1.02 m（`FLOAT`），環半徑 1.66 → 2.0、管 .12 → .15，腳仍然離導軌頂 .06。
+- 力場：車底光片之外加兩幅由車腹邊斜落導軌兩側嘅光簾（頂亮底暗，additive）；日間強度 .55 → .9。
+- 腰線：由車身中間移到窗台下（s −.04….04），呢個高鏡頭先睇得到；新 `trainSeam` 物料（日 1.3／夜 3.5）。
+- 車頭：刀鋒 6.2 → 4.6 m、闊身啲；擋風玻璃伸到刀鋒一半；頭燈帶加粗、凸出車殼面 4 cm（之前沉咗喺刀鋒面下面）；新 `trainHead`（日 1.2／夜 4.2）。
+- 乘客：窗台降到 s .1，座艙再升 .15 m，坐住嘅乘客頭同膊頭喺玻璃後面見到（R1 中間卡個頭喺窗台下面）。玻璃改深色、少反光（`#4f6f86`、opacity .34、envMap .6）。
+
+仍低於目標：
+
+- 車頭仍然似一支長刺；目標係闊啲、有明顯深色擋風玻璃同白框嘅車頭。
+- 日景玻璃仍然偏白，乘客細節弱。
+- 夜景室內係平嘅橙色剪影，目標係暖白室內加清楚嘅人。
+- 夜景腰線有，但唔夠目標咁亮咁清楚。
+
+FPS（`fps.sh` headed Chrome，hero `se:high`，1920×1080，同一部機同一時段）：GLB 第一次 日 12.8–13.3／夜 14.6–14.7；方盒 fallback 日 12.7–13.6／夜 12.9。兩者一樣，即係列車冇明顯成本；但絕對值只有 13 左右，今日部機好慢（車輛 handoff 記錄係 26），未有 60 FPS 結論。
+
 ## Next
 
-Owner 睇 R1 → R2 針對上面五項 → FPS（`fps.sh`）→ merge。
+Owner 睇 R2 → 接受就 sync PROJECT／VALIDATION 再 merge；或者 R3 針對車頭同室內。FPS 要喺機況正常時再量。

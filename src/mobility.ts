@@ -763,13 +763,15 @@ export function mobility(scene:T.Scene) {
   }).catch(error=>console.warn('car-family-2127: keeping the box cars.',error));
   // Guideway trains (owner target A, artifacts/train-closeup-polish/target): clearer glass than the cars so the seated riders read,
   // glowing joint rings and a field sheet glowing on the beam under each car.
-  const trainGlass=new T.MeshStandardMaterial({color:'#7d9bb0',transparent:true,opacity:.4,roughness:.05,metalness:.35,envMapIntensity:1,depthWrite:false});
+  const trainGlass=new T.MeshStandardMaterial({color:'#4f6f86',transparent:true,opacity:.34,roughness:.05,metalness:.2,envMapIntensity:.6,depthWrite:false});
   const trainRing=new T.MeshStandardMaterial({color:'#eef6ff',emissive:'#cfe8ff',roughness:.3});
   const trainField=glow('#bfe0ff',1),trainFieldTint=trainField.color.clone(),trainInterior=carInterior.clone();
+  // The waist seam and the nose band need their own, brighter-by-day lights: the cars' shared ones vanished on the white train (R1).
+  const trainSeam=new T.MeshStandardMaterial({color:'#a8d4ff',emissive:'#9fd0ff',roughness:.3}),trainHead=headlight.clone();
   if(typeof document!=='undefined')new SiteAssetLoaderCache().load('train-2127').then(({root})=>{ // the Node tests keep the box trains
     root.updateWorldMatrix(true,true);
     body.vertexColors=true;body.roughness=.36;body.metalness=.45;body.side=T.DoubleSide;body.needsUpdate=true;
-    const roles={train_body:body,train_interior:trainInterior,train_glass:trainGlass,train_seam:carSeam,train_ring:trainRing,train_head:headlight,train_tail:carTail,train_field:trainField};
+    const roles={train_body:body,train_interior:trainInterior,train_glass:trainGlass,train_seam:trainSeam,train_ring:trainRing,train_head:trainHead,train_tail:carTail,train_field:trainField};
     pods.rebuild(root,roles);sweepPods.rebuild(root,roles);
   }).catch(error=>console.warn('train-2127: keeping the box trains.',error));
   // Crossings (the street kit draws their light panels): mint edge lines either side, x scaled to the carriageway width, lit while a
@@ -945,7 +947,7 @@ export function mobility(scene:T.Scene) {
     airShell.emissiveIntensity=activity?activity.level*.85:0;
     collar.emissiveIntensity=night*4;
     headlight.emissiveIntensity=.2+night*4;taillight.emissiveIntensity=.15+night*3;
-    carSeam.emissiveIntensity=.7+night*2.6;trainRing.emissiveIntensity=1.1+night*2;trainInterior.emissiveIntensity=.08+night*.5;trainField.color.copy(trainFieldTint).multiplyScalar(.55+night*.55);carTail.emissiveIntensity=night*3;carInterior.emissiveIntensity=night*.32;hoverPool.color.copy(hoverPoolTint).multiplyScalar(.2+night*.6);carShadow.opacity=1-night*.6;
+    carSeam.emissiveIntensity=.7+night*2.6;trainRing.emissiveIntensity=1.1+night*2;trainInterior.emissiveIntensity=.08+night*.5;trainSeam.emissiveIntensity=1.3+night*2.2;trainHead.emissiveIntensity=1.2+night*3;trainField.color.copy(trainFieldTint).multiplyScalar(.9+night*.6);carTail.emissiveIntensity=night*3;carInterior.emissiveIntensity=night*.32;hoverPool.color.copy(hoverPoolTint).multiplyScalar(.2+night*.6);carShadow.opacity=1-night*.6;
     // Trains alternate between the south-west (even) and north-east (odd) tracks, two places per track whether or not both run.
     for(let train=0;train<MAX_TRAINS;train++)for(let car=0;car<CARS;car++){
       const track=train%2,{u,visible}=trainPose(time,train>>1,MAX_TRAINS/2,car,trackLength[track]);
