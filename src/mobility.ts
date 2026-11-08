@@ -280,12 +280,13 @@ function fleet(scene:T.Object3D,parts:Part[],count:number,name:string) {
 
 /** The GLB's model space: ground contact at 0; traffic poses sit .1 above the route, the carriageway .235, so models lift by the difference. */
 const CAR_ROAD=.135;
-/** Parts of a car_family variant (`car_pod`, `car_human`), one per glTF primitive, its material chosen by role name. */
-function carFamilyParts(root:T.Object3D,name:string,roles:Record<string,T.Material>):Part[] {
+/** Parts of a Blender variant (car_family `car_pod`/`car_human`, train-2127 `train_lead`/`train_mid`/`train_tail`), one per glTF
+ * primitive, its material chosen by role name; `lift` raises the model off its pose point. */
+function carFamilyParts(root:T.Object3D,name:string,roles:Record<string,T.Material>,lift=CAR_ROAD):Part[] {
   const variant=root.getObjectByName(name)!,parts:Part[]=[],toVariant=variant.matrixWorld.clone().invert();
   variant.traverse(o=>{
     if(!(o instanceof T.Mesh))return;
-    const geometry=o.geometry.clone().applyMatrix4(toVariant.clone().multiply(o.matrixWorld)).translate(0,CAR_ROAD,0);
+    const geometry=o.geometry.clone().applyMatrix4(toVariant.clone().multiply(o.matrixWorld)).translate(0,lift,0);
     parts.push({geometry,material:roles[(o.material as T.Material).name]});
   });
   return parts;
@@ -665,12 +666,27 @@ export function mobility(scene:T.Scene) {
   // Guideway pods (ART.md §7): rounded white cars with a glass band and a mint service line, 9 m long.
   const body=material('#ffffff');
   const podParts=()=>[part([2.7,2.6,9],[0,1.5,0],body,.6),part([2.76,.9,7.6],[0,2,0],glass,.3),part([2.8,.14,8],[0,.9,0],mint,.05),part([2.2,.12,.12],[0,1.3,4.5],coral,.05)];
-  const pods=fleet(scene,podParts(),MAX_TRAINS*CARS,'guideway-pods');
-  // 2127 white trains with a dark glass band (target v2), lightly warm/cool per train.
-  for(let i=0;i<MAX_TRAINS*CARS;i++)pods.tint(i,body,i<CARS?'#f4f3ee':'#e9eef0');
+  // Each train draws its lead car (car 0, always in front), middle cars and tail car as three fleets, so the Blender train
+  // (asset/models/train-2127: blade nose, joint rings, red tail band) can shape them apart; the boxes are the fallback.
+  const hidden=new T.Object3D();hidden.scale.setScalar(0);
+  const trainFleet=(name:string,trains:number,cars:number,tint:(train:number)=>string)=>{
+    const [lead,mid,tail]=[fleet(scene,podParts(),trains,`${name}-lead`),fleet(scene,podParts(),trains*cars,name),fleet(scene,podParts(),trains,`${name}-tail`)];
+    for(let t=0;t<trains;t++){lead.tint(t,body,tint(t));tail.tint(t,body,tint(t));for(let c=0;c<cars;c++)mid.tint(t*cars+c,body,tint(t));}
+    return {
+      set(train:number,car:number,pose:T.Object3D){
+        const end=car===0?lead:car===cars-1?tail:null;
+        if(end)end.set(train,pose);mid.set(train*cars+car,end?hidden:pose);
+      },
+      flush(){lead.flush();mid.flush();tail.flush();},
+      rebuild(root:T.Object3D,roles:Record<string,T.Material>){
+        lead.rebuild(carFamilyParts(root,'train_lead',roles,0));mid.rebuild(carFamilyParts(root,'train_mid',roles,0));tail.rebuild(carFamilyParts(root,'train_tail',roles,0));
+      },
+    };
+  };
+  // 2127 white trains, lightly warm/cool per train.
+  const pods=trainFleet('guideway-pods',MAX_TRAINS,CARS,t=>t===0?'#f4f3ee':'#e9eef0');
   // Sweep train: four cars shuttling on the descending skyway, pitched with the deck.
-  const SWEEP_CARS=4,SWEEP_SCALE=1.7,sweepLength=path.sweep.getLength(),sweepPods=fleet(scene,podParts(),SWEEP_CARS,'sweep-pods');
-  for(let i=0;i<SWEEP_CARS;i++)sweepPods.tint(i,body,'#f6f5f1');
+  const SWEEP_CARS=4,SWEEP_SCALE=1.7,sweepLength=path.sweep.getLength(),sweepPods=trainFleet('sweep-pods',1,SWEEP_CARS,()=>'#f6f5f1');
   // Walkers (promenades and mid-level decks) plus the interchange transfers after them.
   const people=pedestrians(scene,MAX_WALKERS+TRANSFERS,'promenade-walkers'),walks=[...path.promenades,...path.decks],walkLength=walks.map(c=>c.getLength());
   // Facade overlays mark the inferred entries; the wall is not cut and there is no simulated interior.
@@ -745,6 +761,17 @@ export function mobility(scene:T.Scene) {
     brakeLamps.rebuild([{geometry:new T.TorusGeometry(.43,.018,6,28).translate(0,.955,-2.29),material:brakeRed}]);podBrakeDrop=0;
     indicators.rebuild([part([.06,.14,.3],[0,.95,1.2],amber,.02),part([.06,.14,.3],[0,.95,-1.55],amber,.02)]);
   }).catch(error=>console.warn('car-family-2127: keeping the box cars.',error));
+  // Guideway trains (owner target A, artifacts/train-closeup-polish/target): clearer glass than the cars so the seated riders read,
+  // glowing joint rings and a field sheet glowing on the beam under each car.
+  const trainGlass=new T.MeshStandardMaterial({color:'#7d9bb0',transparent:true,opacity:.4,roughness:.05,metalness:.35,envMapIntensity:1,depthWrite:false});
+  const trainRing=new T.MeshStandardMaterial({color:'#eef6ff',emissive:'#cfe8ff',roughness:.3});
+  const trainField=glow('#bfe0ff',1),trainFieldTint=trainField.color.clone(),trainInterior=carInterior.clone();
+  if(typeof document!=='undefined')new SiteAssetLoaderCache().load('train-2127').then(({root})=>{ // the Node tests keep the box trains
+    root.updateWorldMatrix(true,true);
+    body.vertexColors=true;body.roughness=.36;body.metalness=.45;body.side=T.DoubleSide;body.needsUpdate=true;
+    const roles={train_body:body,train_interior:trainInterior,train_glass:trainGlass,train_seam:carSeam,train_ring:trainRing,train_head:headlight,train_tail:carTail,train_field:trainField};
+    pods.rebuild(root,roles);sweepPods.rebuild(root,roles);
+  }).catch(error=>console.warn('train-2127: keeping the box trains.',error));
   // Crossings (the street kit draws their light panels): mint edge lines either side, x scaled to the carriageway width, lit while a
   // crossing is requested.
   const crossLights=fleet(scene,[part([1,.02,.1],[0,.245,1.85],mint,.01),part([1,.02,.1],[0,.245,-1.85],mint,.01)],CROSSINGS.length,'crossing-lights');
@@ -918,16 +945,16 @@ export function mobility(scene:T.Scene) {
     airShell.emissiveIntensity=activity?activity.level*.85:0;
     collar.emissiveIntensity=night*4;
     headlight.emissiveIntensity=.2+night*4;taillight.emissiveIntensity=.15+night*3;
-    carSeam.emissiveIntensity=.7+night*2.6;carTail.emissiveIntensity=night*3;carInterior.emissiveIntensity=night*.32;hoverPool.color.copy(hoverPoolTint).multiplyScalar(.2+night*.6);carShadow.opacity=1-night*.6;
+    carSeam.emissiveIntensity=.7+night*2.6;trainRing.emissiveIntensity=1.1+night*2;trainInterior.emissiveIntensity=.08+night*.5;trainField.color.copy(trainFieldTint).multiplyScalar(.55+night*.55);carTail.emissiveIntensity=night*3;carInterior.emissiveIntensity=night*.32;hoverPool.color.copy(hoverPoolTint).multiplyScalar(.2+night*.6);carShadow.opacity=1-night*.6;
     // Trains alternate between the south-west (even) and north-east (odd) tracks, two places per track whether or not both run.
     for(let train=0;train<MAX_TRAINS;train++)for(let car=0;car<CARS;car++){
       const track=train%2,{u,visible}=trainPose(time,train>>1,MAX_TRAINS/2,car,trackLength[track]);
-      place(path.tracks[track],u);pose.scale.setScalar(visible*(activity?amount(activity.pods,train*CARS+car):train<TRAINS?T.MathUtils.smoothstep(state.traffic*.5+.5-train*.3,0,.1):0));pods.set(train*CARS+car,pose);
+      place(path.tracks[track],u);pose.scale.setScalar(visible*(activity?amount(activity.pods,train*CARS+car):train<TRAINS?T.MathUtils.smoothstep(state.traffic*.5+.5-train*.3,0,.1):0));pods.set(train,car,pose);
     }pods.flush();
     for(let car=0;car<SWEEP_CARS;car++){
       // Drawn at SWEEP_SCALE so the train reads at hero distance; the shortened length spaces the cars by the same factor.
       const {u,forward}=podPose(time+20,0,car,sweepLength/SWEEP_SCALE);
-      place(path.sweep,u,!forward);pose.rotation.x=-Math.asin(T.MathUtils.clamp(tangent.y,-1,1));pose.scale.setScalar(SWEEP_SCALE*T.MathUtils.smoothstep(state.traffic*.5+.5,0,.1));sweepPods.set(car,pose);
+      place(path.sweep,u,!forward);pose.rotation.x=-Math.asin(T.MathUtils.clamp(tangent.y,-1,1));pose.scale.setScalar(SWEEP_SCALE*T.MathUtils.smoothstep(state.traffic*.5+.5,0,.1));sweepPods.set(0,car,pose);
     }sweepPods.flush();
     // Leaders first: each party's pose, then the sidesteps that let faster parties pass slower ones (stoppers veer on their own).
     const leads:{w:ReturnType<typeof walkerPose>;stop:ReturnType<typeof stops.get>;lane:number}[]=[],movers:Mover[]=[],moverOf:number[]=[];

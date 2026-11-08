@@ -157,7 +157,7 @@ for (const [ports, aircraft, pods, walkers] of [[1, 3, 12, 400], [3, 17, 18, 260
   for (const state of [presets.still, presets.pulse]) {
     updateActors(state, 20, ports / 6);
     // Each aircraft slot is drawn as either a winged craft or an autonomous pod at settled levels.
-    assert.deepEqual([visible('air-taxis') + visible('air-pods'), visible('guideway-pods'), visible('promenade-walkers', 400)], [aircraft, pods, walking(walkers)]);
+    assert.deepEqual([visible('air-taxis') + visible('air-pods'), /* lead, middle and tail cars are separate fleets */ visible('guideway-pods-lead') + visible('guideway-pods') + visible('guideway-pods-tail'), visible('promenade-walkers', 400)], [aircraft, pods, walking(walkers)]);
   }
 }
 // Street traffic keeps every drawn slot while human-driven cars give way to autonomous pods: all cars at low, both at mixed, all pods at high.

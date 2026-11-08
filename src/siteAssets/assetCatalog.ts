@@ -82,4 +82,13 @@ export const SITE_ASSET_CATALOG: Readonly<Record<SiteAssetId, SiteAssetDefinitio
     maxHeight: 2,
     materialPolicy: 'preserve',
   },
+  'train-2127': {
+    id: 'train-2127',
+    url: new URL('../../asset/models/train-2127/train-2127.glb', import.meta.url).href,
+    rootName: 'ROOT_TRAIN_2127',
+    category: 'kit',
+    footprint: [11.5, 16.5], // lead, mid and tail cars side by side, the lead's blade ahead; mobility reads each relative to its own empty
+    maxHeight: 3.7,
+    materialPolicy: 'preserve',
+  },
 };
