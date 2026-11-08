@@ -38,7 +38,7 @@ const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
 const glb = await readFile(new URL('../asset/models/sky-ring-architecture/sky-ring-architecture.glb', import.meta.url));
 const asset = await new Promise<import('three/addons/loaders/GLTFLoader.js').GLTF>((resolve, reject) =>
   new GLTFLoader().parse(glb.buffer.slice(glb.byteOffset, glb.byteOffset + glb.byteLength), '', resolve, reject));
-for (const name of ['PylonShell', 'PylonChannel00', 'PylonChannel01', 'PylonChannel02', 'PylonChannel03', 'Stair00', 'Stair17', 'StairSupport'])
+for (const name of ['PylonShell', 'PylonChannel00', 'PylonChannel01', 'PylonChannel02', 'PylonChannel03', 'CanopyShell', 'JunctionCast', 'Stair00', 'Stair17', 'StairSupport'])
   assert.ok(asset.scene.getObjectByName(name), `Sky Ring GLB contains ${name}`);
 assert.equal(asset.animations.length, 0);
 for (const name of ['CompactFlight00', 'CompactFlight03', 'CompactLanding00', 'CompactLanding02']) assert.ok(asset.scene.getObjectByName(name), `Sky Ring GLB contains ${name}`);

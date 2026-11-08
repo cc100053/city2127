@@ -44,7 +44,7 @@ export function skyRingPylonLegs() {
 }
 /** Apply the same GLB node transforms in the live scene and in geometry checks. */
 export function skyRingArchitecture(model: T.Object3D) {
-  const details = new T.Group(), leg = new T.Group(), stairs = new T.Group(), compactStairs = new T.Group();
+  const details = new T.Group(), leg = new T.Group(), stairs = new T.Group(), compactStairs = new T.Group(), canopy = new T.Group(), junction = new T.Group();
   model.updateMatrixWorld(true);
   model.traverse(o => {
     if (!(o instanceof T.Mesh)) return;
@@ -52,16 +52,22 @@ export function skyRingArchitecture(model: T.Object3D) {
     if (o.name.startsWith('Pylon')) leg.add(copy);
     if (o.name.startsWith('Stair')) { copy.position.z += 100; stairs.add(copy); }
     if (o.name.startsWith('Compact')) { copy.position.z += 200; compactStairs.add(copy); }
+    if (o.name.startsWith('Canopy')) { copy.position.z += 300; canopy.add(copy); }
+    if (o.name.startsWith('Junction')) { copy.position.z += 500; junction.add(copy); }
   });
   for (const { foot, top } of skyRingPylonLegs()) {
     const shell = leg.clone(); shell.position.copy(foot); shell.quaternion.setFromUnitVectors(UP, top.clone().sub(foot).normalize());
     shell.scale.set(10, foot.distanceTo(top), 10); details.add(shell);
   }
   for (let b = 0; b < BERTHS; b++) {
-    const gate = skyRingGate(b), stair = stairs.clone(); stair.position.set(-21, 0, -1.5); gate.add(stair);
+    const gate = skyRingGate(b), roof = canopy.clone(); roof.position.set(0, 7.5, -.4); gate.add(roof); roof.updateMatrixWorld(true); const roofCopy = roof.clone(); roofCopy.applyMatrix4(gate.matrixWorld); details.add(roofCopy);
+    const stair = stairs.clone(); stair.position.set(-21, 0, -1.5); gate.add(stair);
     stair.updateMatrixWorld(true); const copy = stair.clone(); copy.applyMatrix4(gate.matrixWorld); details.add(copy);
     const lower = compactStairs.clone(); lower.position.set(-25, -DEPTH + 1.65, -6); lower.rotation.y = Math.PI; gate.add(lower);
     lower.updateMatrixWorld(true); const lowerCopy = lower.clone(); lowerCopy.applyMatrix4(gate.matrixWorld); details.add(lowerCopy);
+  }
+  for (let i = 0; i < PANELS; i++) for (const side of [-1, 1]) {
+    const a = i / PANELS * Math.PI * 2, joint = junction.clone(); joint.position.copy(ringPoint(a, SKY_RING.deck - DEPTH, side * WIDTH / 2)); joint.lookAt(ringPoint(a + .001, SKY_RING.deck - DEPTH, side * WIDTH / 2)); details.add(joint);
   }
   const architecture = new T.Group(); architecture.name = 'sky-ring-architecture'; architecture.add(...bake(details));
   return architecture;
@@ -135,9 +141,9 @@ export function skyRing(scene: T.Scene) {
   const corners = (a: number) => ({ to: ringPoint(a, top - .7, WIDTH / 2), ti: ringPoint(a, top - .7, -WIDTH / 2), bo: ringPoint(a, bottom, WIDTH / 2), bi: ringPoint(a, bottom, -WIDTH / 2) });
   for (let i = 0; i < PANELS; i++) {
     const a0 = i / PANELS * Math.PI * 2, a1 = (i + 1) / PANELS * Math.PI * 2, p = corners(a0), q = corners(a1);
-    // Member hierarchy: heavy bottom chords (the line seen from the city), lighter top chords, posts, then slim web diagonals.
+    // Top chords, open lower chords, posts and slim web diagonals.
     for (const k of ['to', 'ti'] as const) member(root, p[k], q[k], 1.5, 1.5, trim);
-    for (const k of ['bo', 'bi'] as const) member(root, p[k], q[k], 2.2, 2.2, trim);
+    for (const k of ['bo', 'bi'] as const) member(root, p[k].clone().add(new T.Vector3(0, -.65, 0)), q[k].clone().add(new T.Vector3(0, -.65, 0)), .55, .7, trim);
     // A second public deck sits inside the open truss, clear of its outer braces.
     member(root, ringPoint(a0, bottom + 1.4), ringPoint(a1, bottom + 1.4), WIDTH - 3, .5, warmUnder);
     for (const side of [-1, 1]) {
@@ -161,10 +167,13 @@ export function skyRing(scene: T.Scene) {
     // Close-spaced diagonal gussets along the lower chord.
     for (let j = 0; j < 4; j++) {
       const aa = a0 + (a1 - a0) * j / 4, ab = a0 + (a1 - a0) * (j + 1) / 4;
-      for (const side of [-1, 1]) member(root, ringPoint(aa, bottom + .8, side * WIDTH / 2), ringPoint(ab, bottom + 2.3, side * WIDTH / 2), .22, .22, trim);
+      for (const side of [-1, 1]) {
+        member(root, ringPoint(aa, bottom + (j % 2 ? 1.4 : -.65), side * WIDTH / 2), ringPoint(ab, bottom + (j % 2 ? -.65 : 1.4), side * WIDTH / 2), .16, .16, trim);
+        member(root, ringPoint(aa, bottom + 1.4, side * WIDTH / 2), ringPoint(ab, bottom + 1.4, side * WIDTH / 2), .16, .16, trim);
+      }
     }
     // Cast nodes where chords, posts and diagonals meet, so joints read as built connections rather than crossing boxes.
-    for (const k of ['to', 'ti', 'bo', 'bi'] as const) { const n = k[0] === 'b' ? 3 : 2.2; part(root, new RoundedBoxGeometry(n, n, n, 1, n * .3), trim, p[k]).lookAt(q[k]); }
+    for (const k of ['to', 'ti'] as const) { const n = 2.2; part(root, new RoundedBoxGeometry(n, n, n, 1, n * .3), trim, p[k]).lookAt(q[k]); }
     // Irregular planted islands leave a clear inner-deck walking lane between them.
     if (i % 5 !== 0) {
       for (const [start, end] of [[.03, .45], [.55, .97]]) member(root, ringPoint(T.MathUtils.lerp(a0, a1, start), top + .4, -WIDTH / 2 + 1.6), ringPoint(T.MathUtils.lerp(a0, a1, end), top + .4, -WIDTH / 2 + 1.6), 2.6, .8, stone);
@@ -196,6 +205,7 @@ export function skyRing(scene: T.Scene) {
     part(apron, slab(plan(23.7, 18.7, 4.85, 1.3), .5, .15), pearl, new T.Vector3(0, .45, 0));
     part(apron, slab(plan(19.6, 16, 3.4), .04), padGrey, new T.Vector3(0, .04, .8));
     part(apron, new T.BoxGeometry(14, .8, .12), hallGlass, new T.Vector3(0, .85, 9.25));
+    for (const side of [-1, 1]) part(apron, new T.BoxGeometry(.12, .8, 8), hallGlass, new T.Vector3(side * 11.65, .85, 2.8));
     for (const side of [-1, 1]) part(apron, slab(plan(10, 9, 3), .35, .1), pearl, new T.Vector3(side * 13, -.04, -5));
     part(apron, slab(plan(23.5, 18.5, 4.75), 1.3, .45), pearl, new T.Vector3(0, -.2, 0));
     part(apron, slab(plan(23.2, 18.2, 4.6), .6), slate, new T.Vector3(0, -1.45, 0));
@@ -221,7 +231,6 @@ export function skyRing(scene: T.Scene) {
     }
     for (const x of [15]) part(gate, new T.BoxGeometry(.12, 6.8, 5.6), lobbyGlass, new T.Vector3(x, 3.5, 0));
     part(gate, slab(plan(31, 7.6, 1.5), .45), hallFloor, new T.Vector3(0, 3.6, 0));
-    part(gate, slab(plan(44, 10, 4), .5), trim, new T.Vector3(0, 7.5, -.4));
     for (const x of [-20, 20]) member(gate, new T.Vector3(x, 0, -4), new T.Vector3(x, 7, -4), .3, .3, trim);
     part(gate, slab(plan(31, 7.6, 1.5), .12), stone, new T.Vector3(0, .08, 0));
     // Raised landing joins the external stair to the mezzanine through the open end.
@@ -281,11 +290,11 @@ export function skyRing(scene: T.Scene) {
       pose.position.set((Math.floor(j / 2) % 5 - 2) * 5, j % 2 ? 3.6 : .08, (Math.floor(j / 10) - 1) * .9).applyMatrix4(gate.matrixWorld);
     } else {
       const lower = k >= 480 && k < 640, j = lower ? k - 480 : k < 480 ? k - 300 : k - 460;
-      if (!lower && j < 80) {
-        const b = j % BERTHS, group = Math.floor(j / BERTHS), a = berthAngle(b) + ((group % 4) - 1.5) * 7 / SKY_RING.rx;
-        pose.position.copy(ringPoint(a, top, -2.5 + (group >= 4 ? .7 : 0)));
+      if (!lower && j < 120) {
+        const b = j % BERTHS, group = Math.floor(j / BERTHS), a = berthAngle(b) + ((group % 6) - 2.5) * 4.5 / SKY_RING.rx;
+        pose.position.copy(ringPoint(a, top, -2.5 + (group >= 6 ? .7 : 0)));
       } else {
-        const n = lower ? j : j - 80, panel = lower ? Math.floor(n / 2) : upperPanels[Math.floor(n / 4) % upperPanels.length];
+        const n = lower ? j : j - 120, panel = lower ? Math.floor(n / 2) : upperPanels[Math.floor(n / 4) % upperPanels.length];
         const a = lower ? (panel + (n % 2 ? .67 : .33)) / PANELS * Math.PI * 2 : (panel + .3 + (n % 4 > 1 ? .3 : 0)) / PANELS * Math.PI * 2;
         pose.position.copy(ringPoint(a, lower ? bottom + 1.65 : top, lower ? (n % 2 ? 1 : -1) : (n % 2 ? 1 : -1)));
       }
