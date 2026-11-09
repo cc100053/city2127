@@ -4,6 +4,8 @@ Current procedures, 2026-10-02. Product acceptance comes from [EXHIBITION_SPEC](
 
 ## Automated checks for the current prototype
 
+The focused [staff console browser check](../tests/adminUi.browser.mjs) exercises the real Admin and Guest pages with an in-memory SQLite database. Build the survey package, set `CITY2127_PLAYWRIGHT_PATH` to the Playwright entry point and optionally set `CITY2127_CHROME_PATH` and `CITY2127_EVIDENCE_DIR`. Run `node --experimental-strip-types tests/adminUi.browser.mjs` from the repository root. See the [staff console handoff](handoffs/admin-staff-console.md) for measured results.
+
 Use Node 24+. Run from the root (install only when absent/lockfile changes):
 
 ```sh
