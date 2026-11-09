@@ -1,7 +1,7 @@
 # train-closeup-polish — 導軌列車（Blender）
 
 - Owner: cc100053
-- Status: IN_PROGRESS — R3 等 owner 睇
+- Status: DONE — owner 2026-11-09 接受 R3 並 merge；已知差距見 R3
 - Branch: `feat/train-closeup-polish`（worktree `../city2127-train`）
 - Base commit: `2d7c25d`（origin/main）
 - Last verified commit: 見 branch tip；`npm test`／`npm run build`／`git diff --check` 通過
@@ -94,6 +94,10 @@ FPS（`fps.sh` headed Chrome，hero `se:high`，1920×1080，同一部機同一�
 
 FPS：今輪冇再量（只改物料同少量幾何，三角形數同 R2 相若：lead 3,262、mid 2,894、tail 2,322）。
 
+## Finish
+
+FPS（2026-11-09，`fps.sh` headed Chrome，hero `se:high`，1920×1080，同一 session，第一個 sample 剔除）：train GLB 日 38.4–39.8／夜 38.4–40.8；方盒 fallback 日 38.8–40.9／夜 39.8–40.4。日間約低 1 FPS，夜間冇分別；兩者都未到 60。昨日 13 FPS 嗰次有閒置 `r4` Chrome 喺背景，關咗之後回升。
+
 ## Next
 
-Owner 睇 R3 → 接受就 sync PROJECT／VALIDATION、喺機況正常時量 FPS，再 merge；否則 R4。
+Owner 接受現狀。如果再開：擋風玻璃改透明加白框（跟目標），日景後段車廂玻璃同夜景乘客亮度。
