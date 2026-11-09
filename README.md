@@ -10,6 +10,13 @@
 
 需要 Git、Node.js **24 或以上**（連 npm），以及支援 WebGL 2 嘅桌面瀏覽器。喺 repo 根目錄執行；每個 terminal tab 要保持開住。首次安裝或 lockfile 更新先跑 `npm ci`。目前係本機展覽流程，未設公開部署。
 
+第一次下載這套新版展場 UI，可以從 `feat/exhibition-ui-polish` 取得。以下 Windows 和 macOS 的啟動步驟都從 `city2127` 資料夾開始。
+
+```sh
+git clone --branch feat/exhibition-ui-polish https://github.com/cc100053/city2127.git
+cd city2127
+```
+
 ### Mac：Terminal 開兩個 tab
 
 **Tab 1 — 問卷 server**（API、WebSocket、guest／monitor／admin 頁面，同 SQLite 資料）：
@@ -48,15 +55,38 @@ npm run dev -- --port 5173
 
 `survey` server 預設喺 `127.0.0.1:8787`，root Vite 預設喺 `127.0.0.1:5173`。如果 Vite 顯示其他 port，城市網址請用 terminal 實際印出嚟嗰個；server port 如有更改，要喺城市網址指定完整 WebSocket URL。
 
-### 瀏覽器要開嘅頁面
+### 四個介面的功能與網址
 
-| 頁面 / tab | 網址（預設） | 用途 |
+啟動服務後，在同一台電腦的瀏覽器開啟下列網址。直接開啟 `survey/monitor.html` 等原始檔會無法載入畫面與即時事件。
+
+| 介面 | 本機網址（預設） | 功能 |
 | --- | --- | --- |
-| Guest（單站） | `http://127.0.0.1:8787/guest` | 觀眾完成四題、核對答案並提交一次提案。 |
-| Guest A／B（雙站） | `http://<展覽電腦 LAN IP>:8787/guest?station=A` ／ `?station=B` | 各站獨立答四題，同時提交，共用累積城市。 |
-| City | `http://127.0.0.1:5173/?survey` | 展示共同塑造嘅 2127 台場；經 `ws://127.0.0.1:8787/ws` 即時接收變化。展覽城市要用呢個 `?survey` 網址。 |
-| Admin | `http://127.0.0.1:8787/admin` | 工作人員睇狀態、中止未完成體驗、要求／取消 reset；只可喺運行 server 嗰部電腦以 localhost 開啟。 |
-| Monitor（可選） | `http://127.0.0.1:8787/monitor` | 文字方式檢查目前狀態同開頁後收到嘅提案／WebSocket 事件，唔係 3D 畫面。 |
+| 觀眾問卷 Guest | [單站](http://127.0.0.1:8787/guest) · [A 站](http://127.0.0.1:8787/guest?station=A) · [B 站](http://127.0.0.1:8787/guest?station=B) | 回答四題、核對與修改答案、送出提案。A／B 站各自保留草稿，共用同一座城市。畫面會提示等待或觀看大螢幕，也會引導處理草稿逾時、暫停受理和送出結果不明。 |
+| 3D 城市大螢幕 City | [城市畫面](http://127.0.0.1:5173/?survey) | 展示 2127 台場。輪到提案時會播放結果並顯示右上角結果卡。有對應地點時，鏡頭會帶到變化區域。 |
+| 工作人員操作台 Admin | [操作台](http://127.0.0.1:8787/admin) | 查看 A／B 站狀態、切換日夜、結束指定站的未完成體驗、撤銷符合條件的上一筆提案，以及預約或取消重設。限啟動問卷服務的電腦開啟。 |
+| 技術監控頁 Monitor | [監控頁](http://127.0.0.1:8787/monitor) | 顯示連線、最新收到的提案或管理操作，以及開頁後收到的最近 30 筆事件，包含斷線與重連。 |
+
+### 用獨立資料庫試跑
+
+在第一個終端機完成 `npm run build` 後，用下列命令取代最後一行 `npm run server`。命令會建立獨立的暫存資料庫保存試答，並使用問卷埠 `8791`。
+
+Windows PowerShell
+
+```powershell
+$env:SURVEY_DB_PATH = Join-Path $env:TEMP ("city2127-trial-" + [guid]::NewGuid().ToString("N") + ".sqlite")
+$env:SURVEY_PORT = "8791"
+npm run server
+```
+
+macOS Terminal
+
+```sh
+SURVEY_DB_PATH="$(mktemp -d)/survey.sqlite" SURVEY_PORT=8791 npm run server
+```
+
+第二個終端機照原步驟啟動城市。如果 `8791` 已被其他服務占用，換一個空閒的埠，並同步更新下面的網址。先開 [測試用大螢幕](http://127.0.0.1:5173/?survey=ws%3A%2F%2F127.0.0.1%3A8791%2Fws) 和 [監控頁](http://127.0.0.1:8791/monitor)，再從 [B 站問卷](http://127.0.0.1:8791/guest?station=B) 送出一筆。監控頁會新增紀錄，輪到這筆提案時，大螢幕會播放結果。需要切換日夜或測試重設時，可開 [測試用操作台](http://127.0.0.1:8791/admin)。
+
+### 展場操作與區域網路
 
 建議將 City 放展示屏、Guest 放輸入屏、Admin 留喺工作人員電腦。以下交接規則適用於單站 `/guest`；雙站按下方 A/B 說明操作。提案提交後 Guest 照常顯示結果同交接畫面；下一位撳 **はじめる** 就會自動交接，毋須 Admin 確認上一位離開。冇 reset 時會沿用累積城市；如有待執行 reset，會喺下一位開始時套用。Admin 嘅 **未完了の体験を終了** 只用作中止未完成問卷，並執行保留 reset。City 頁面唔需要獨立 host 或 build；Tab 2 嘅 Vite 已供應。Guest／Admin／Monitor 由 Tab 1 嘅 server 同一個 origin 供應，所以 `npm run build` 必須先完成。Admin 嘅 **昼／夜／自動** 可將已連接嘅 City 固定喺 12:00／22:00，或恢復日夜循環；設定會保存，唔影響提案同分數。城市網址若有 `?hour`，該固定時間會優先。更新呢項功能後要重開 survey server（保留原本 SQLite），再刷新 Admin。SQLite 預設寫入 `survey/data/survey.sqlite`；重開 server 會沿用已有城市狀態。
 
