@@ -330,3 +330,30 @@ for (const [name, roles] of [
   const size = new T.Box3().setFromObject(variant).getSize(new T.Vector3());
   assert.ok(size.z > 4.55 && size.z < 5.6 && /* the ground shadow is the widest part */ size.x < 2.7 && size.y < 2, `${name}: bounds ${size.toArray()}`);
 }
+
+// The guideway train: the real GLB, its three car kinds, every role the train fleets draw, and the 10 m car pitch it is built on.
+const trainBytes = await readFile(new URL('../asset/models/train-2127/train-2127.glb', import.meta.url));
+const trainGltf: Pick<GLTF, 'scene' | 'animations'> = await new Promise((resolve, reject) =>
+  new GLTFLoader().parse(trainBytes.buffer.slice(trainBytes.byteOffset, trainBytes.byteOffset + trainBytes.byteLength) as ArrayBuffer, '', resolve, reject));
+const trainRoot = await new SiteAssetLoaderCache({ async loadAsync() { return trainGltf; } }).load('train-2127').then(loaded => loaded.root);
+trainRoot.updateWorldMatrix(true, true);
+for (const [name, roles, length] of [
+  ['train_lead', ['train_body', 'train_field', 'train_glass', 'train_head', 'train_interior', 'train_lamp', 'train_ring', 'train_screen', 'train_seam'], [14.2, 14.8]],
+  ['train_mid', ['train_body', 'train_field', 'train_glass', 'train_interior', 'train_lamp', 'train_ring', 'train_seam'], [9.9, 10.1]],
+  ['train_tail', ['train_body', 'train_field', 'train_glass', 'train_interior', 'train_lamp', 'train_seam', 'train_tail'], [8.7, 8.9]],
+] as const) {
+  const variant = trainRoot.getObjectByName(name)!, found = new Set<string>();
+  let tris = 0;
+  variant.traverse(o => {
+    if (!(o instanceof T.Mesh)) return;
+    found.add((o.material as T.Material).name);
+    tris += (o.geometry.index?.count ?? o.geometry.attributes.position.count) / 3;
+    assert.ok(o.geometry.attributes.color, `${o.name}: colour attribute`);
+  });
+  assert.deepEqual([...found].sort(), [...roles], `${name}: roles`);
+  assert.ok(tris <= 4000, `${name}: ${tris} triangles`);
+  const box = new T.Box3().setFromObject(variant), size = box.getSize(new T.Vector3());
+  // Floats clear of the beam (ring foot just above it) on the 10 m car pitch.
+  assert.ok(box.min.y > 0 && size.y < 4.5 && size.x < 4.4 && size.z > length[0] && size.z < length[1], `${name}: bounds ${size.toArray()}`);
+}
+console.log('PASS: train-2127 GLB variants, roles, triangle budget and bounds.');
