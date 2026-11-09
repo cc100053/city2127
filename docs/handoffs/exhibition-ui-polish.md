@@ -1,11 +1,11 @@
 # exhibition-ui-polish — Exhibition UI delivery
 
 - Owner: Codex
-- Status: IN_PROGRESS
+- Status: DONE
 - Branch: feat/exhibition-ui-polish
 - Base commit: 4ecee296ce2b80a66af006da34c11c2881fc4ce2
-- Last verified commit: NONE. Checks cover the implementation delta on the base.
-- Remote availability: NOT PUSHED
+- Last verified implementation commit: 1aaeb0ace96caa68dcbc567367798c05bdf12af7. The subsequent delta is this handoff record.
+- Remote availability: origin/feat/exhibition-ui-polish. No main integration.
 
 ## Session Git state
 
@@ -22,5 +22,6 @@ Fetched main and the staff console branch on 2026-11-09. The checkout started on
 
 - Survey build and focused Chrome 157.0.8103.38 browser check passed with in-memory SQLite at 1280×900. The test observed a real disconnection and snapshot recovery, Guest idle continuation and expiry, and an exact retry of a committed proposal after the response was lost.
 - The Admin browser check passed on the combined branch. The Guest browser check passed at 1024×900 with emulated touch, including A/B queuing, submission, recovery and exploration.
-- Root build and survey tests passed on Windows. Survey tests use the external Windows file-URL path adapter documented in the Admin handoff. The root regression suite is running with the same adapter.
+- Root and survey builds and regression tests passed on Windows. The test commands use the external Windows file-URL path adapter documented in the Admin handoff. The committed whitespace check passed.
+- [GitHub CI](https://github.com/cc100053/city2127/actions/runs/42608517817) was cancelled during root tests near the configured 15-minute job limit. Subsequent CI steps were skipped. The local suite finished successfully.
 - Screenshots are kept outside Git. Exhibition hardware and venue conditions have not been tested.
