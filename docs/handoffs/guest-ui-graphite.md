@@ -45,7 +45,7 @@ Implement the approved questionnaire visual direction in the real Guest flow and
 - Survey native `npm test`: existing platform failure in `questionLoader.test.ts` because `new URL(...).pathname` produces `/C:/...` and encoded non-ASCII paths on Windows.
 - Survey `npm test` with a temporary external Node load hook converting file-URL path expressions through `fileURLToPath`: PASS. This adapter is outside the repository and does not modify runtime source, assertions or test data.
 - `node --experimental-strip-types tests/guestUi.browser.mjs`: PASS, actual Chrome 157.0.8103.38 at 1024x900, emulated touch, fresh temporary SQLite. Four questions, disabled-until-chosen action, native keyboard radios, selected colors, 2x2 energy layout, no horizontal overflow, review reload/restoration and editing, no partial vote, one real single-station submission, result/handoff, Sky Ring and space-elevator requests/return, next guest, independent A/B drafts, queued B result and three accumulated submissions, Admin stylesheet isolation. Zero page exceptions. Temporary browser/server/database teardown completed.
-- Screenshots `welcome.png`, `energy-selected.png` and `review.png` visually inspected. Additional result/handoff/A-B screenshots were captured locally. [Browser report](../../artifacts/guest-ui-graphite/report.json).
+- Screenshots `welcome.jpg`, `energy-selected.jpg` and `review.jpg` visually inspected. Additional result/handoff/A-B screenshots were captured locally. [Browser report](../../artifacts/guest-ui-graphite/report.json).
 - Working and staged `git diff --check`: PASS. New documentation links checked against local files.
 - Main integration: feature branch only.
 
