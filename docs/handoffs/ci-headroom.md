@@ -4,7 +4,7 @@
 - Status: DONE
 - Branch: test/odaiba-ci-headroom
 - Base commit: 520cd036260a01f8df3b6c384e757cd91a921f13
-- Last verified commit: see the branch tip that carries this handoff
+- Last verified commit: 759b7861c5ee121360cd947c589c7e172fcc0aed
 - Remote availability: origin/test/odaiba-ci-headroom
 
 ## Session Git state
@@ -29,7 +29,8 @@ Timing per section of `tests/odaiba.test.ts` (local, Node 26): the street-car cl
 
 ## Actual validation results
 
-- Verification status: PASSED (local); branch CI see below
+- Verification status: PASSED (local and branch CI)
+- Branch CI: run 42645964933 on `759b7861c5ee121360cd947c589c7e172fcc0aed` success, job 9 min 0 s total, `npm test` step 7 min 21 s (previous main runs: 10–14.5 min, one cancelled at 15 min).
 - Equivalence: one-off scratch comparison (not committed) of the grid cast against `intersectObjects(solids, true)` on every 7th probe — 20,823 probes, identical names and distances; repeated at 3 m reach with 3.5 m padding, 986 probes with hits, all identical.
 - `node --experimental-strip-types tests/odaiba.test.ts`: ~245 s → ~45 s, PASS.
 - Root `npm test` PASS in 2 min 58 s locally (2026-11-10, Node 26, Mac); `npm run build` PASS; `git diff --check` PASS.
