@@ -1,4 +1,5 @@
 import './debug.css';
+import './adminTheme.css';
 import type { AdminCurrentRun, ApiError, DisplayMode, AdminEventsData, LifecycleCommand, LifecycleData, LifecyclePhase, LifecycleStatus } from '../shared/protocol.ts';
 import { api, connectEvents, el, renderState } from './debugApi.ts';
 
@@ -7,7 +8,7 @@ import { api, connectEvents, el, renderState } from './debugApi.ts';
 const PHASE_TEXT: Record<LifecyclePhase, string> = {
   ready: '準備完了 — 次の観客を迎えられます',
   in_experience: '体験中 — 観客が体験しています',
-  awaiting_exit: '記録完了 — 次の観客を迎えられます',
+  awaiting_exit: '記録完了 — ステーション状況を確認してください',
 };
 const LIGHTING_TEXT: Record<DisplayMode, string> = { day: '昼', night: '夜', auto: '自動' };
 const ERROR_TEXT: Partial<Record<ApiError['code'], string>> = {
@@ -21,33 +22,55 @@ const ERROR_TEXT: Partial<Record<ApiError['code'], string>> = {
 };
 const errorText = (error: ApiError) => ERROR_TEXT[error.code] ?? '通信またはサーバーでエラーが発生しました。接続を確認して、もう一度お試しください。';
 const app = document.querySelector<HTMLElement>('#app')!;
-const status = el('div', { class: 'notice' }), summary = el('div'), stateBox = el('div'), events = el('div'), message = el('p');
-const lightingStatus = el('p'), lightingMessage = el('p', { 'aria-live': 'polite' });
+document.body.classList.add('admin-page');
+const status = el('div', { class: 'admin-status', role: 'status' }, '展示状態を読み込んでいます。');
+const summary = el('div'), stateBox = el('div'), events = el('div');
+const message = el('p', { class: 'admin-message', 'aria-live': 'polite' });
+const lightingStatus = el('p', { 'aria-live': 'polite' }, '設定を読み込んでいます。');
+const lightingMessage = el('p', { 'aria-live': 'polite' });
+const lightPreview = el('div', { class: 'admin-light-preview', 'aria-hidden': 'true' });
 const lightingButtons = (['day', 'night', 'auto'] as const).map(mode => {
   const button = el('button', { disabled: '', 'aria-pressed': 'false' }, LIGHTING_TEXT[mode]);
   button.addEventListener('click', () => void changeLighting(mode));
   return { mode, button };
 });
-const guestLeft = el('button', { class: 'primary', disabled: '' }, '未完了の体験を終了');
-const stationBox = el('div');
+const guestLeft = el('button', { disabled: '' }, '未完了の体験を終了');
+const stationBox = el('div', { class: 'admin-stations' });
+const direction = el('p', { class: 'admin-direction', 'aria-live': 'polite' });
 const undo = el('button', { disabled: '' }, '直前の提案を取り消す');
 const undoStatus = el('p');
-const resetCity = el('button', { disabled: '' }, '現在の都市をリセット');
+const resetCity = el('button', { class: 'admin-caution', disabled: '' }, '現在の都市をリセット');
 const cancel = el('button', { disabled: '' }, '保留中のリセットを取り消す');
+const resetStatus = el('p', {}, '展示状態を読み込んでいます。');
 const fullInput = el('input', { placeholder: '全データ初期化 と入力', autocomplete: 'off', 'aria-label': '全データ初期化の確認' });
 const fullReset = el('button', { class: 'danger', disabled: '' }, '全データを初期化');
-app.append(el('h1', {}, '展示管理（このパソコンのみ）'), status, summary,
-  el('div', { class: 'panel' }, el('h2', {}, '展示の操作'),
-    el('p', {}, '次の観客は管理操作なしで開始できます。A/B は独立して回答します。リセットは両ステーションの回答・結果表示が終わるまで保留され、新しい開始を停止します。'),
-    stationBox, el('div', { class: 'row' }, guestLeft, undo, resetCity, cancel), undoStatus, message),
-  el('div', { class: 'panel' }, el('h2', {}, '都市の照明'),
-    el('p', {}, '昼：12:00 · 夜：22:00 · 自動：日夜サイクル。接続中の都市に反映され、再起動後も保持されます。'),
-    el('div', { class: 'row' }, ...lightingButtons.map(({ button }) => button)), lightingStatus, lightingMessage),
-  stateBox,
-  el('div', { class: 'panel' }, el('h2', {}, '全データの初期化（テスト／展示開始用）'),
+
+app.append(
+  el('header', { class: 'admin-header' },
+    el('div', {}, el('p', { class: 'admin-eyebrow' }, '2127 / ODAIBA'), el('h1', {}, '展示運営パネル')),
+    el('span', { class: 'admin-local' }, '展示用パソコンのみ')),
+  el('div', { class: 'admin-overview' },
+    el('section', {},
+      el('p', { class: 'admin-eyebrow' }, '01 / GUEST STATIONS'), el('h2', {}, 'ステーション状況'),
+      status, stationBox, direction, el('div', { class: 'row' }, guestLeft)),
+    el('section', { class: 'admin-lighting' },
+      el('p', { class: 'admin-eyebrow' }, '02 / CITY DISPLAY'), el('h2', {}, '大画面の照明'),
+      lightPreview, el('div', { class: 'row admin-light-options', role: 'group', 'aria-label': '照明モード' }, ...lightingButtons.map(({ button }) => button)),
+      lightingStatus, lightingMessage,
+      el('p', { class: 'admin-muted' }, '昼 12:00 · 夜 22:00 · 自動 日夜サイクル'))),
+  el('section', { class: 'admin-section' },
+    el('p', { class: 'admin-eyebrow' }, '03 / SESSION CONTROLS'), el('h2', {}, '提案と街の管理'),
+    el('div', { class: 'admin-operation' },
+      el('div', {}, el('h3', {}, '直前の提案'), undoStatus), undo),
+    el('div', { class: 'admin-operation' },
+      el('div', {}, el('h3', {}, '街のリセット'), resetStatus), el('div', { class: 'row' }, resetCity, cancel)),
+    message),
+  el('details', { class: 'admin-section' }, el('summary', {}, '都市データと全データの初期化'),
+    summary, stateBox,
+    el('h2', {}, '全データの初期化（テスト／展示開始用）'),
     el('p', {}, '総参加人数と現在の都市を0に戻します。記録は削除されません。A/B は両体験の終了まで、単独モードは次の開始まで保留されます。'),
     el('div', { class: 'row' }, fullInput, fullReset)),
-  el('h2', {}, '最近のイベント'), events);
+  el('section', { class: 'admin-section admin-history' }, el('h2', {}, '最近のイベント'), events));
 
 let undoProposal: AdminCurrentRun['undoProposal'] = null;
 let stations: AdminCurrentRun['stations'] = [];
@@ -61,10 +84,12 @@ function updateButtons() {
   }
   const lc = lifecycle;
   undo.disabled = busy || !undoProposal;
-  guestLeft.disabled = busy || !lc || lc.phase !== 'in_experience' || stations.length > 0;
+  guestLeft.hidden = !lc || lc.phase !== 'in_experience' || stations.length > 0;
+  guestLeft.disabled = busy || guestLeft.hidden;
   for (const button of Array.from(stationBox.querySelectorAll<HTMLButtonElement>('button'))) button.disabled = busy;
   resetCity.disabled = busy || !lc || lc.pendingReset !== 'none';
-  cancel.disabled = busy || !lc || lc.pendingReset === 'none';
+  cancel.hidden = !lc || lc.pendingReset === 'none';
+  cancel.disabled = busy || cancel.hidden;
   fullReset.disabled = busy || !lc || lc.pendingReset === 'full' || fullInput.value !== '全データ初期化';
 }
 
@@ -112,29 +137,69 @@ fullReset.addEventListener('click', () => {
 
 async function refresh() {
   const [run, log] = await Promise.all([api<AdminCurrentRun>('/api/admin/current-run'), api<AdminEventsData>('/api/admin/events?limit=20')]);
-  if (!run.ok) { undoProposal = null; lifecycle = undefined; displayMode = undefined; updateButtons(); summary.replaceChildren(el('p', { class: 'notice warn' }, errorText(run.error))); return; }
+  if (!run.ok) {
+    undoProposal = null;
+    lifecycle = undefined;
+    displayMode = undefined;
+    stations = [];
+    stationBox.replaceChildren();
+    direction.textContent = '';
+    status.dataset.pending = 'true';
+    status.textContent = errorText(run.error);
+    lightingStatus.textContent = '照明の設定を確認できません。';
+    delete lightPreview.dataset.mode;
+    undoStatus.textContent = resetStatus.textContent = '展示状態を確認できません。';
+    updateButtons();
+    return;
+  }
   const d = run.data;
   lifecycle = d.lifecycle;
   stations = d.stations;
-  stationBox.replaceChildren(...stations.map(station => {
-    const row = el('div', { class: 'row' }, `ステーション ${station.stationId}：${station.status === 'reserved' ? '回答中' : '記録済み・結果表示中'}`);
-    if (station.status === 'reserved') {
-      const end = el('button', {}, `${station.stationId} の未完了の体験を終了`);
+  const pending = lifecycle.pendingReset !== 'none';
+  const singleActive = !stations.length && lifecycle.phase !== 'ready';
+  const supportsStations = d.run.algorithmVersion === 2;
+  const available = (['A', 'B'] as const).filter(id => supportsStations && !pending && !singleActive && !stations.some(station => station.stationId === id));
+  stationBox.replaceChildren(...(['A', 'B'] as const).map(id => {
+    const station = stations.find(item => item.stationId === id);
+    const ready = available.includes(id);
+    const title = station?.status === 'reserved' ? '回答中'
+      : station?.status === 'submitted' ? '記録済み' : ready ? '開始できます' : '受付停止中';
+    const detail = station?.status === 'reserved' ? '体験が終わるまでお待ちください。'
+      : station?.status === 'submitted' ? '結果の順番待ち、または表示中です。'
+        : ready ? '次の方をご案内できます。'
+          : pending ? 'リセットを待っています。'
+            : !supportsStations ? '現在の都市では A/B を開始できません。' : '単独モードの体験を確認してください。';
+    const card = el('article', { class: 'admin-station', 'data-station': id, 'data-available': String(ready) },
+      el('h3', {}, id + ' ステーション'), el('p', { class: 'admin-station-status' }, title), el('p', {}, detail));
+    if (station?.status === 'reserved') {
+      const end = el('button', {}, `${id} の未完了の体験を終了`);
       end.addEventListener('click', () => {
-        if (confirm(`ステーション ${station.stationId} の草稿だけを破棄します。もう一方の体験は続きます。`)) void send('guest-left', undefined, undefined, station.sessionId);
+        if (confirm(`ステーション ${id} の草稿だけを破棄します。もう一方の体験は続きます。`)) void send('guest-left', undefined, undefined, station.sessionId);
       });
-      row.append(end);
+      card.append(end);
     }
-    return row;
+    return card;
   }));
+  const guidance = pending ? '新しい体験の受付を停止しています。'
+    : !supportsStations ? '現在の都市では A/B を開始できません。'
+      : singleActive ? '単独モードの体験状況を確認してください。'
+        : available.length === 2 ? 'A・B どちらでもご案内できます。'
+          : available.length === 1 ? `次の方は ${available[0]} ステーションへ` : '両ステーションの体験が終わるまでお待ちください。';
+  if (direction.textContent !== guidance) direction.textContent = guidance;
+  resetStatus.textContent = pending
+    ? `保留中 · ${lifecycle.pendingReset === 'full' ? '全データの初期化' : '都市のリセット'}。A/B は両体験終了後、単独モードは次の開始時に実行します。`
+    : lifecycle.phase === 'ready' ? '現在の都市をリセットします。総参加人数は保持されます。'
+      : 'リセットを保留し、体験の終了を待ちます。';
   undoProposal = d.undoProposal;
   undoStatus.textContent = undoProposal ? `対象：提案 #${undoProposal.ordinal} · 次の観客が始める前のみ取り消せます。`
     : '取り消せる提案はありません（記録後、次の観客が始める前のみ利用可能）。';
   displayMode = d.displayMode;
-  if (!lightingBusy) lightingStatus.textContent = `都市の照明：${LIGHTING_TEXT[displayMode]}`;
-  status.className = d.lifecycle.pendingReset === 'none' ? 'notice status' : 'notice warn status';
-  status.replaceChildren(el('strong', {}, PHASE_TEXT[d.lifecycle.phase]),
-    ...(d.lifecycle.pendingReset === 'none' ? [] : [el('br'), `リセット保留中：${d.lifecycle.pendingReset === 'full' ? '全データの初期化' : '都市のリセット'}（A/B は両体験終了後、単独モードは次の開始時）`]));
+  const lightingLabel = `都市の照明：${LIGHTING_TEXT[displayMode]}`;
+  if (!lightingBusy && lightingStatus.textContent !== lightingLabel) lightingStatus.textContent = lightingLabel;
+  lightPreview.dataset.mode = displayMode;
+  status.dataset.pending = String(pending);
+  const phaseLabel = PHASE_TEXT[d.lifecycle.phase];
+  if (status.textContent !== phaseLabel) status.textContent = phaseLabel;
   summary.replaceChildren(el('table', {},
     ...([['総参加人数', String(d.lifecycle.totalGuestCount)],
       ['現在の都市の参加人数', String('guestCount' in d.state ? d.state.guestCount : d.state.answerCount)],
