@@ -209,6 +209,24 @@ const streetKit = streetNetwork(environment);
   const solids = [environment, ...landmarks.filter(l => l.name !== 'aqua-city-odaiba' && l.name !== 'divercity-tokyo-plaza'), streetKit], sides = new Map<any, number>(), ground = /^(road|road_marking|sidewalk|plaza|landscape|water|service_area)$/;
   for (const root of solids) root.traverse(o => { if (o instanceof Mesh && !Array.isArray(o.material)) { sides.set(o.material, o.material.side); o.material.side = 2; } });
   environment.updateMatrixWorld(true);
+  // CI headroom: three's InstancedMesh raycast tests every one of the street kit's ~6,700 plant instances per probe. Each instance
+  // becomes a stand-in mesh (same geometry, material, name, world matrix) filed with every other solid in 8 m cells by its world
+  // bounds plus the 0.3 m reach, so a probe tests only what it could touch and finds the same hits as the whole-scene cast.
+  const CELL = 8, grid = new Map<number, Mesh[]>(), cell = (x: number, z: number) => Math.floor(x / CELL) * 65536 + Math.floor(z / CELL), bounds = new Box3();
+  for (const root of solids) root.traverse(o => {
+    if (!(o instanceof Mesh)) return;
+    o.geometry.boundingBox ?? o.geometry.computeBoundingBox();
+    const parts = !(o instanceof InstancedMesh) ? [o] : Array.from({ length: o.count }, (_, i) => {
+      const stand = new Mesh(o.geometry, o.material); stand.name = o.name; stand.matrixAutoUpdate = stand.matrixWorldAutoUpdate = false;
+      o.getMatrixAt(i, stand.matrixWorld); stand.matrixWorld.premultiply(o.matrixWorld); return stand;
+    });
+    for (const part of parts) {
+      bounds.copy(o.geometry.boundingBox!).applyMatrix4(part.matrixWorld).expandByScalar(.5);
+      for (let x = Math.floor(bounds.min.x / CELL); x <= Math.floor(bounds.max.x / CELL); x++) for (let z = Math.floor(bounds.min.z / CELL); z <= Math.floor(bounds.max.z / CELL); z++) {
+        const key = x * 65536 + z; (grid.get(key) ?? grid.set(key, []).get(key)!).push(part);
+      }
+    }
+  });
   const probe = new Raycaster(), dirs = [new Vector3(1, 0, 0), new Vector3(-1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 0, -1)], hits: string[] = [];
   routes().streets.forEach((street, r) => {
     const length = street.getLength();
@@ -217,7 +235,7 @@ const streetKit = streetNetwork(environment);
       const drawn = Math.min(1, d / 12, (length - d) / 12);
       for (const across of [-.95, -.45, 0, .45, .95]) for (const y of [.5, 1.2]) for (const dir of dirs) {
         probe.set(new Vector3(p.x + t.z * (n + across * drawn), y * drawn, p.z - t.x * (n + across * drawn)), dir); probe.far = .3;
-        const hit = probe.intersectObjects(solids, true).find(h => !ground.test(((h.object as Mesh).material as { name: string }).name));
+        const hit = probe.intersectObjects(grid.get(cell(probe.ray.origin.x, probe.ray.origin.z)) ?? [], false).find(h => !ground.test(((h.object as Mesh).material as { name: string }).name));
         if (hit) hits.push(`${r}|${lane}|${d}|${hit.object.name}|${hit.object.parent?.name}|${hit.point.y.toFixed(1)}|${hit.distance.toFixed(2)}`);
       }
     }
