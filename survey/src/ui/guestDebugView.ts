@@ -31,7 +31,7 @@ let pendingRequest: ProposalRequest | undefined;
 let saved: ProposalData | undefined;
 let undoneSubmissionId: string | undefined;
 let conflictState: ExhibitionState | undefined;
-let notice: { text: string; role: 'status' | 'alert' } | undefined;
+let notice: { text: string; role: 'status' | 'alert'; title?: string } | undefined;
 let idleTimer = 0;
 let abandonTimer = 0;
 /** Scheduled reading slot → handoff → welcome; handoff cannot truncate the reading slot. */
@@ -168,9 +168,10 @@ function focusTitle() {
 }
 
 function renderNotice() {
-  return notice ? el('p', {
-    class: 'guest-notice', role: notice.role, 'aria-live': notice.role === 'alert' ? 'assertive' : 'polite',
-  }, notice.text) : undefined;
+  if (!notice) return undefined;
+  return el('div', { class: 'guest-notice', role: notice.role },
+    ...(notice.title ? [el('strong', { class: 'guest-notice-title' }, notice.title)] : []),
+    el('p', {}, notice.text));
 }
 
 function noticeNodes() {
@@ -188,7 +189,8 @@ function renderIdleWarning() {
   if (!idleWarning) return undefined;
   const keep = action('続ける', () => { resetIdleTimer(); renderCurrent(); }, true);
   return el('div', { class: 'guest-notice guest-notice--warn', role: 'alert', 'aria-live': 'assertive' },
-    el('p', {}, '操作がないため、15秒後にこの草稿を終了します。提案はまだ記録されていません。'), keep);
+    el('strong', { class: 'guest-notice-title' }, '回答を続けますか？'),
+    el('p', {}, '続ける場合は「続ける」を押してください。15秒後に草稿が終了します。'), keep);
 }
 
 function idleWarningNodes() {
@@ -224,7 +226,7 @@ async function startSession(keepDraft = false) {
     const ended = await api<{ ended: true }>(`/api/proposal-sessions/${encodeURIComponent(session.session.id)}/end`, {});
     if (!ended.ok) {
       busy = false; screen = 'welcome';
-      notice = { role: 'alert', text: errorText(ended.error.code, ended.error.message) };
+      notice = errorNotice(ended.error.code, 'start');
       renderWelcome(true); return;
     }
   }
@@ -232,7 +234,7 @@ async function startSession(keepDraft = false) {
   busy = false;
   if (!result.ok) {
     screen = 'welcome';
-    notice = { role: 'alert', text: errorText(result.error.code, result.error.message) };
+    notice = errorNotice(result.error.code, 'start');
     renderWelcome(true);
     return;
   }
@@ -279,7 +281,7 @@ async function restoreRecovery(recovery: GuestRecovery) {
     if (checked.state && 'guestCount' in checked.state && checked.state.revision > session.state.revision)
       conflictState = checked.state;
     lastErrorCode = checked.error.code;
-    notice = { role: 'alert', text: errorText(checked.error.code, checked.error.message) };
+    notice = errorNotice(checked.error.code, 'restore');
   }
 
   if (!checked.ok && checked.error.code === 'proposal_undone') return showUndone();
@@ -409,21 +411,23 @@ function renderReview(focus = true) {
       el('p', {}, '確認中に別の提案が先に記録されました。草稿は保存されています。最新の集計を確認してから、もう一度記録してください。'),
       renderScores(session!.state.scores, conflictState.scores))
     : undefined;
-  const uncertainNotice = uncertain
-    ? el('p', { class: 'guest-copy', role: 'status', 'aria-live': 'polite' }, '回答の記録を確認できませんでした。もう一度、確認してください。回答内容はそのまま確認します。')
+  const uncertainNotice = uncertain && !busy && !notice
+    ? el('p', { class: 'guest-copy', role: 'status' }, '「記録を確認する」を押すと、同じ回答の記録を確認できます。')
     : undefined;
   const resume = notice && ['session_expired', 'already_answered', 'unsupported_version'].includes(lastErrorCode ?? '')
     ? action('新しい予約で草稿を続ける', () => startSession(true), false, busy)
     : undefined;
+  const submitActions = el('div', { class: 'guest-actions guest-actions--between' },
+    ...(!uncertain ? [action('質問に戻る', () => { questionIndex = session!.questions.length - 1; screen = 'question'; renderQuestion(); }, false, busy)] : [el('span', { class: 'guest-action-spacer' })]),
+    submit);
   page('あなたの思いを確認してください。', '送信前の確認',
     el('p', { class: 'guest-copy' }, '変更する質問は「変更」から戻れます。記録後はこの提案を編集できません。'),
     ...noticeNodes(), ...recoveryNodes(), ...idleWarningNodes(),
     ...(conflict ? [conflict] : []),
     ...(uncertainNotice ? [uncertainNotice] : []),
+    ...(uncertain ? [submitActions] : []),
     el('ol', { class: 'guest-review-list' }, ...session!.questions.map((_, index) => renderAnswerRow(index, !busy && !uncertain))),
-    el('div', { class: 'guest-actions guest-actions--between' },
-      ...(!uncertain ? [action('質問に戻る', () => { questionIndex = session!.questions.length - 1; screen = 'question'; renderQuestion(); }, false, busy)] : [el('span', { class: 'guest-action-spacer' })]),
-      submit),
+    ...(!uncertain ? [submitActions] : []),
     ...(resume ? [el('div', { class: 'guest-actions' }, resume)] : []));
   if (focus) focusTitle();
 }
@@ -443,6 +447,7 @@ async function submitProposal() {
   pendingRequest = request;
   busy = true;
   screen = 'submitting';
+  notice = undefined;
   clearIdleTimers();
   renderReview(false);
   const result = await api<ProposalData>('/api/proposals', request);
@@ -464,7 +469,7 @@ async function submitProposal() {
   }
 
   lastErrorCode = result.error.code;
-  notice = { role: 'alert', text: errorText(result.error.code, result.error.message) };
+  notice = errorNotice(result.error.code, 'submit');
   screen = 'review';
   if (result.error.code === 'revision_conflict' && result.state && 'guestCount' in result.state) {
     // A revision conflict is a definite rejection; after review, the next request gets a fresh ID.
@@ -479,18 +484,30 @@ async function submitProposal() {
   renderReview();
 }
 
-function errorText(code: string, detail: string) {
-  const title: Record<string, string> = {
-    unsupported_version: '現在の展示runでは、この提案を受け付けられません。',
-    session_expired: '質問の予約期限が過ぎました。草稿を新しい予約へ引き継げます。',
-    already_answered: 'この予約はすでに送信済みです。',
-    revision_conflict: '街の集計が更新されています。現在の状態を確認してください。',
-    bad_request: '提案を確認できませんでした。草稿を見直してください。',
-    lifecycle_blocked: 'この体験の提案はすでに記録されています。はじめる画面に戻ってください。',
-  };
-  // Keep duplicate-experience feedback in the guest page's language.
-  if (code === 'lifecycle_blocked') return stationId ? 'このステーションは体験中、またはリセット待ちです。少し待ってから開始してください。' : title[code];
-  return `${title[code] ?? (code === 'internal_error' ? '送信結果を確認できません。再試行できます。' : `通信エラー（${code}）`)} ${detail}`;
+function errorNotice(code: string, action: 'start' | 'restore' | 'submit'): NonNullable<typeof notice> {
+  let title = 'スタッフにお声がけください';
+  let text = '体験を続けられませんでした。スタッフがこの画面を確認します。';
+  if (code === 'lifecycle_blocked' && action === 'start') {
+    title = '少しお待ちください';
+    text = stationId ? 'このステーションは体験中、またはリセット待ちです。少し待ってから開始してください。'
+      : '体験の切り替えを待っています。少し待ってから「はじめる」を押してください。';
+  } else if (action !== 'start' && ['session_expired', 'already_answered', 'unsupported_version'].includes(code)) {
+    title = '新しい予約が必要です';
+    text = '「新しい予約で草稿を続ける」を押すと、引き継げる回答を使って続けられます。';
+  } else if (code === 'revision_conflict') {
+    title = '街の状態が更新されました';
+    text = '最新の集計を確認してから、もう一度記録してください。';
+  } else if (code === 'internal_error' && action === 'submit') {
+    title = '送信結果を確認できません';
+    text = '「記録を確認する」を押してください。同じ回答の記録を確認します。';
+  } else if (code === 'internal_error' && action === 'start') {
+    title = '通信を確認してください';
+    text = '少し待ってから「はじめる」を押してください。続けられない場合はスタッフにお声がけください。';
+  } else if (code === 'bad_request' && action === 'submit') {
+    title = '回答を確認してください';
+    text = '「質問に戻る」から回答を見直してください。';
+  }
+  return { role: 'alert', title, text };
 }
 
 function signed(value: number) {

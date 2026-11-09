@@ -1,0 +1,35 @@
+body.monitor-page {
+  color-scheme: dark;
+  --monitor-ink: #f0eee6;
+  --monitor-muted: #c2cbc3;
+  --monitor-mint: #94c9c2;
+  --monitor-amber: #dfbd85;
+  --monitor-line: #526058;
+  max-width: 1080px;
+  color: var(--monitor-ink);
+  background: #1b211e;
+  font-family: 'Yu Gothic UI', system-ui, sans-serif;
+}
+
+.monitor-page #app { border: 1px solid var(--monitor-line); border-top: 3px solid var(--monitor-mint); border-radius: 8px; background: #222826; }
+.monitor-page .monitor-header, .monitor-page .monitor-overview, .monitor-page .monitor-section { padding: 20px 24px; }
+.monitor-page .monitor-header { background: #292f2c; }
+.monitor-page h1 { margin: 4px 0 0; font-size: 25px; }
+.monitor-page h2 { margin: 0 0 8px; font-size: 18px; }
+.monitor-page p { margin: 0; }
+.monitor-page .monitor-kicker { color: var(--monitor-amber); font: 12px/1.5 ui-monospace, monospace; letter-spacing: .08em; }
+.monitor-page .monitor-overview { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 20px; }
+.monitor-page .monitor-overview section { min-width: 0; overflow-wrap: anywhere; padding: 15px; border: 1px solid var(--monitor-line); border-radius: 5px; background: #2c3430; }
+.monitor-page .monitor-overview p { margin-top: 5px; }
+.monitor-page .monitor-status { color: var(--monitor-amber); font-size: 20px; font-weight: 650; }
+.monitor-page .monitor-status[data-connection='connected'], .monitor-page .monitor-proposal { color: var(--monitor-mint); }
+.monitor-page .monitor-revision, .monitor-page .monitor-meta { color: var(--monitor-muted); font-size: 13px; }
+.monitor-page .monitor-section { border-top: 1px solid var(--monitor-line); }
+.monitor-page .monitor-section summary { cursor: pointer; font-weight: 650; }
+.monitor-page .monitor-log { margin: 10px 0 0; padding: 0; list-style: none; }
+.monitor-page .monitor-log li { display: grid; grid-template-columns: 7ch minmax(0, 1fr); gap: 14px; padding: 10px 0; border-top: 1px solid var(--monitor-line); }
+.monitor-page .monitor-log time { color: var(--monitor-muted); font: 13px/1.6 ui-monospace, monospace; }
+.monitor-page .monitor-log p { overflow-wrap: anywhere; color: var(--monitor-muted); font-size: 13px; }
+.monitor-page .monitor-log [data-kind='warning'] strong { color: var(--monitor-amber); }
+.monitor-page .monitor-log [data-kind='connection'] strong { color: var(--monitor-mint); }
+@media (max-width: 700px) { .monitor-page .monitor-overview { grid-template-columns: 1fr; } }

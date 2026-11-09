@@ -136,6 +136,8 @@ A/B 按 server transaction 提交順序累積，容許舊 city revision、拒絕
 
 工作人員操作台使用石墨灰、青綠與琥珀色。A/B 狀態卡顯示作答中、已記錄、可開始或暫停受理，並依目前狀態提示下一位觀眾可前往的站點。照明與提案管理分區，完整初始化收在城市資料的展開區。
 
+監控頁 `/monitor` 顯示伺服器連線、最新收到的提案或管理操作，以及本頁收到的最近 30 筆事件。斷線後保留最後收到的資訊，重新收到城市快照才顯示已連線。問卷在無法確認提交、草稿即將逾時或站點暫停受理時，分別引導觀眾確認記錄、繼續作答或等候。
+
 Admin 只限 server 電腦 loopback，POST 另檢查 same-origin。City reset 開新城市、保留總人數；full reset 清零展示計數但保留 append-only 歷史。保留中的 reset 可取消。Undo 只可撤銷最後一份已完成提案、且下一位開始前；新草稿即使稍後取消亦不重開舊 Undo。保存不可變撤銷標記，還原提交前狀態／counts／seeds。
 
 目前 question-set **version4**、SQLite **schema 8**、algorithm／CityView **v2**；schema 3 轉換曾結束 v1 run 並保留歷史，schema 7 保留現有 v2 城市及歷史。重啟使用原 SQLite，不刪資料。Root／survey 配合更新，尤其 slotSeeds。`module-swap` 只接受 legacy v1，不是展覽城市。

@@ -6,6 +6,8 @@ Current source map, updated for resident P3 against base `e82b8f57ccfb36d6106f6c
 
 The staff console at `/admin` uses [adminView.ts](../survey/src/ui/adminView.ts) and the scoped [adminTheme.css](../survey/src/ui/adminTheme.css). It derives station guidance from the existing Admin current-run response. Server lifecycle commands remain authoritative for reservations, resets and Undo. The lighting strip illustrates the saved mode.
 
+[Monitor](../survey/src/ui/monitorDebugView.ts) keeps a bounded browser-local receive log and derives connection readiness from the city snapshot following WebSocket open. [Guest](../survey/src/ui/guestDebugView.ts) presents action-specific recovery copy while retry uses the existing pending submission ID and draft timing.
+
 The single exhibition venue is the **Odaiba waterfront in 2127**. Shibuya is a closed historical direction and will not be developed again (user decision, 2026-10-02). Historical unfinished tasks are not the current backlog. Legacy internal site IDs are compatibility identifiers, not a second venue.
 
 | Package | Current responsibility |

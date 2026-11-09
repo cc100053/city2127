@@ -93,6 +93,9 @@ body.guest-page {
 .guest .guest-review-row button { min-width: 88px; }
 .guest .guest-notice, .guest .guest-conflict { color: #f0d6b3; background: #41392c; border-color: #9c8058; border-radius: 5px; }
 .guest .guest-notice--quiet { color: #d0e1d5; background: #304339; border-color: #6e8d79; }
+.guest .guest-notice-title { display: block; margin-bottom: 5px; font-weight: 650; }
+.guest .guest-notice p { margin: 0; }
+.guest .guest-notice button { margin-top: 10px; }
 .guest .guest-status, .guest .guest-result-number, .guest .guest-arrow { color: var(--guest-cyan); font-weight: 500; }
 .guest .guest-score-table caption, .guest .guest-score-table thead { color: var(--guest-muted); }
 .guest .guest-score-table th, .guest .guest-score-table td { border-color: #4a554e; }
