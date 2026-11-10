@@ -229,3 +229,7 @@ G7 未達完整視覺驗收：64 個保守目標包圍盒只排除自身跨 near
 - 變化太細：`se:tower3`（2.5%，塔喺畫面入面好細）、`sw:room5`／`room6`、`sw:court1`、全部 `se:pod*`（每個 0.7–1.3%，pod 只係一個細綠色圓盤出現或消失）。
 - 其他：`se:tower4` 夜景右上有一大塊白色過曝；`se:tower1`／`tower2` 見到塔變，但畫面俾巨構同柱分散注意力。
 - 改鍵後嘅 SE pose（`se:tower3`／`tower4`、10 個 pod）同平移咗嘅 `sw:court4`／`court6`／`court7` 全部對準實際有變化嘅 slot。
+
+2026-11-11 district 舞台闊鏡（branch `feat/stage-closeups`，未合併，等 owner 睇圖）：owner 2026-11-10 批准將 37 個逐 slot viewpoint 收成 8 個舞台（`nw:stage-west`／`stage-mid`、`sw:stage-rooms-east`／`rooms-west`／`courts-south`／`courts-west`、`se:stage-east`／`stage-south`），揀選邏輯不變（涵蓋最多變動 slot，打和揀最久未用）。每個舞台試 8 個方位（部分再試第二、三輪），固定 shot 52 → 23。`nw:bay3` 貼住巨構，試過 8 個方位都冇乾淨視線，所以 `nw:stage-mid` 只涵蓋 `nw:bay4`；`nw:bay3`／`bay5`、`nw:street`、`sw:court1`／`4`／`5`／`9`、`se:pod1`–`3` 唔屬任何舞台。closeupFrequencySim：8000 份提案入面 9 份（0.11%）district 變化完全落喺舞台以外，跌入 `nw:district`；舞台佔比 `se:stage-east` 18.7%、`nw:stage-west` 15.5%、`sw:stage-courts-west` 9.4%、`sw:stage-rooms-west` 6.3%、`sw:stage-courts-south` 5.0%、`nw:stage-mid` 3.8%、`sw:stage-rooms-east` 3.8%、`se:stage-south` 0.9%。
+
+舞台對照表（14 行，日 12:00／夜 22:00，`~/city2127-evidence/stage-closeups/sheet/`；Claude 睇靜態圖，唔係 owner 驗收）：八個舞台都冇前景遮擋；`nw:stage-west`、`nw:stage-mid`、`se:stage-south` 變化清楚。但闊鏡之下每一格變化喺單一舞台入面通常只郁 1–2 個 slot，所以「成排一齊變」未做到：`se:stage-east`（佔比最高）-2→-3 幾乎睇唔出，`sw:stage-rooms-east` 日間有反光而且 room 細，`sw:stage-courts-west`／`rooms-west`／`courts-south` 只係一個細物件變。要令同一舞台嘅 slot 喺同一格一齊變，須改 slot 排序（`ladderCut` 嘅 rank），屬規則改動，待 owner 決定。未驗證 live 過場、near plane 同 FPS。

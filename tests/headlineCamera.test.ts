@@ -56,7 +56,7 @@ assert.equal(reasonDelayMs(DISPLAY_MS,true),0);
 assert.equal(reasonDelayMs(DISPLAY_MS-101,false),0);
 assert.equal(shotStage(3),'fly-in','the flight starts after the vote journey');
 assert.deepEqual([0,t.flyIn,t.hold,t.flyOut,t.done].map(elapsed=>shotStage(elapsed)),['journey','fly-in','hold','fly-out','done']);
-assert.equal(Object.keys(SHOTS).length,52);
+assert.equal(Object.keys(SHOTS).length,23);
 for (const [id, pose] of Object.entries(SHOTS)) {
   const p=new Vector3(...pose.position),target=new Vector3(...pose.target);
   // No elevation or heading rule (owner 2026-11-05): each building's clear sightline decides its angle; only distance is bounded.
@@ -106,35 +106,33 @@ console.log('PASS: no-headline interruptions preserve the first frame in hold/fl
 // Live district positions choose a covered authored shot; ties rotate, and missing positions fall back.
 const point = (slot: string) => ({slot,x:0,y:0,z:0,r:1});
 const picker=new HeadlineCamera(new PerspectiveCamera(42),{target:new Vector3(...HERO_TARGET),enabled:true,update(){}});
-const district = {socketId:'nw' as const,focal:false,district:true};
-assert.equal(picker.play([{...district,points:[point('nw:bay1')]}],100),'nw:bay1');
-assert.equal(picker.play([{...district,points:[point('nw:bay1'),point('nw:bay2')]}],101),'nw:bay2');
-assert.equal(picker.play([{...district,points:[point('nw:bay1'),point('nw:bay2'),point('nw:bay3')]}],102),'nw:bay1', 'coverage count wins over least recent use');
-assert.equal(picker.play([{...district,points:[]}],103),'nw:district');
-assert.equal(picker.play([{...district,focalOnly:true,points:[point('nw:bay1')]}],104),'nw:focal');
+const district = {socketId:'sw' as const,focal:false,district:true};
+assert.equal(picker.play([{...district,points:[point('sw:room1')]}],100),'sw:stage-rooms-east');
+assert.equal(picker.play([{...district,points:[point('sw:room1'),point('sw:room4')]}],101),'sw:stage-rooms-west', 'equal coverage rotates to the least recently used stage');
+assert.equal(picker.play([{...district,points:[point('sw:room4'),point('sw:court2'),point('sw:court7')]}],102),'sw:stage-courts-west', 'coverage count wins over least recent use');
+assert.equal(picker.play([{...district,points:[]}],103),'sw:district');
+assert.equal(picker.play([{...district,focalOnly:true,points:[point('sw:room1')]}],104),'sw:focal');
 
-// NW bay slots follow the live district (slot `nw:bay${i + 1}`), so removed bays cannot leave shots aimed at empty ground.
-const bays = new AutomationDistrict(new Group()).bays.length;
-assert.equal(Object.keys(VIEWPOINT_COVERAGE).filter(id => id.startsWith('nw:bay')).length, bays, 'one NW bay viewpoint per live bay');
-// Every live slot has a viewpoint aimed at it, and no viewpoint names a slot the district no longer builds (footprint filters renumber slots).
+// Stages follow the live districts: every covered slot still exists (footprint filters renumber slots) and lies within the stage's frame radius of its target.
 {
   const sw = new SharingDistrict(new Group()), se = new ConcentrationDistrict(new Group()), nw = new AutomationDistrict(new Group());
   const live = Object.fromEntries([
     ...nw.bays.map((p, i) => [`nw:bay${i + 1}`, p] as const), ...sw.bays.map((p, i) => [`sw:room${i + 1}`, p] as const), ...sw.courts.map((p, i) => [`sw:court${i + 1}`, p] as const),
     ...se.towers.map((p, i) => [`se:tower${i + 1}`, p] as const), ...se.pods.map((p, i) => [`se:pod${i + 1}`, p] as const),
   ]);
-  for (const [slot, p] of Object.entries(live)) {
-    const views = Object.entries(VIEWPOINT_COVERAGE).filter(([, covered]) => covered.includes(slot));
-    assert.ok(views.length, `${slot} has a viewpoint`);
-    const [x, , z] = SHOTS[slot as ShotId].target;
-    assert.ok(Math.hypot(x - p.x, z - p.z) <= 40, `${slot} viewpoint aims at its live slot`);
+  for (const [stage, covered] of Object.entries(VIEWPOINT_COVERAGE)) {
+    const [x, , z] = SHOTS[stage as ShotId].target;
+    for (const slot of covered) {
+      assert.ok(Object.hasOwn(live, slot), `${slot} is a live slot`);
+      assert.ok(slot.startsWith(stage.slice(0, 3)) && Math.hypot(x - live[slot].x, z - live[slot].z) <= 220, `${stage} frames ${slot}`);
+    }
   }
-  for (const slot of Object.values(VIEWPOINT_COVERAGE).flat()) assert.ok(slot === 'nw:street' || Object.hasOwn(live, slot), `${slot} is a live slot`);
+  assert.equal(new Set(Object.values(VIEWPOINT_COVERAGE).flat()).size, Object.values(VIEWPOINT_COVERAGE).flat().length, 'a slot belongs to one stage');
 }
-assert.equal(picker.play([{...district,points:[point('nw:unknown')]}],105),'nw:district');
+assert.equal(picker.play([{...district,points:[point('sw:unknown')]}],105),'sw:district');
 const tie = new HeadlineCamera(new PerspectiveCamera(42),{target:new Vector3(...HERO_TARGET),enabled:true,update(){}});
-const two = {...district,points:[point('nw:bay1'),point('nw:bay2')]};
-assert.equal(tie.play([two],0),'nw:bay1');
+const two = {...district,points:[point('sw:room1'),point('sw:room4')]};
+assert.equal(tie.play([two],0),'sw:stage-rooms-east');
 assert.equal(tie.play([two],1,DISPLAY_MS-101),null);
-assert.equal(tie.play([two],2),'nw:bay2','catch-up must not change rotation');
-assert.equal(picker.play([{...district,points:[point('nw:street')]}],106),'nw:street');
+assert.equal(tie.play([two],2),'sw:stage-rooms-west','catch-up must not change rotation');
+assert.equal(picker.play([{socketId:'nw' as const,focal:false,district:true,points:[point('nw:street')]}],106),'nw:district','a slot outside every stage falls back to the district shot');

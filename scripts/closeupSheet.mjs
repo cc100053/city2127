@@ -6,14 +6,17 @@ import { existsSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { evidenceDir } from './evidence.mjs';
 
-const city = process.argv[2] ?? 'http://127.0.0.1:5173/', out = evidenceDir('closeup-frequency-sheet');
+const city = process.argv[2] ?? 'http://127.0.0.1:5173/', out = evidenceDir('stage-closeups', 'sheet');
 const sim = JSON.parse(execFileSync('node', ['--experimental-strip-types', 'scripts/closeupFrequencySim.ts', '--json'], { encoding: 'utf8', maxBuffer: 1 << 26 }));
 const share = Object.fromEntries(sim.shots.map(([id, n]) => [id, n / sim.proposals]));
 const count = Object.fromEntries(sim.transitions);
 const focal = [['nw 0→+1', 'nw:focal'], ['nw 0→-1', 'nw:focal-low'], ['se 0→+1', 'se:focal'], ['se 0→-1', 'se:focal-low'], ['sw 0→+1', 'sw:focal'], ['sw 0→-1', 'sw:focal']];
-// Each district viewpoint shows the one-rung change that guests most often see there, among those that move its slot at seed 0.
-const district = Object.entries(sim.seed0).map(([shot, changes]) =>
-  [changes.reduce((a, b) => (count[`${b} | ${shot}`] ?? 0) > (count[`${a} | ${shot}`] ?? 0) ? b : a), shot]);
+// Each stage shows the one-rung change that moves most of its slots at seed 0; ties go to the change guests most often see there.
+const district = Object.entries(sim.stages).map(([shot, slots]) => {
+  const moved = change => slots.filter(slot => sim.seed0[slot]?.includes(change)).length;
+  const changes = [...new Set(slots.flatMap(slot => sim.seed0[slot] ?? []))];
+  return [changes.reduce((a, b) => moved(b) - moved(a) || (count[`${b} | ${shot}`] ?? 0) - (count[`${a} | ${shot}`] ?? 0) > 0 ? b : a), shot];
+});
 const RUNG_SCORE = { '-3': -8, '-2': -5, '-1': -2, '0': 0, '+1': 2, '+2': 5, '+3': 8 };
 const rows = [...focal, ...district].map(([change, shot]) => {
   const [site, steps] = change.split(' '), [from, to] = steps.split('→');

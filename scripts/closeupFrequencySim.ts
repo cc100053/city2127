@@ -59,6 +59,7 @@ for (let r = 0; r < RUNS; r++) {
   }
 }
 assert.equal(N, RUNS * GUESTS);
+const fallback = [...shots].filter(([id]) => id.endsWith(':district')).reduce((n, [, c]) => n + c, 0);
 const sorted = (map: Map<string, number>) => [...map].sort((a, b) => b[1] - a[1]);
 const never = Object.keys(VIEWPOINT_COVERAGE).filter(id => !shots.has(id));
 // DEV `?meters=` captures use slot seed 0 with the other sites mixed: list the one-rung changes that move each slot there, for the review sheet.
@@ -69,12 +70,13 @@ for (const id of ['nw', 'sw', 'se'] as const) for (let a = -3; a <= 3; a++) for 
   districts[id].setTarget(at(a), 0, true, 0); districts[id].setTarget(at(b), 1, false, 0);
   for (const point of districts[id].changedPoints) (seed0[point.slot] ??= []).push(`${id} ${sign(a)}→${sign(b)}`);
 }
-if (process.argv.includes('--json')) console.log(JSON.stringify({ proposals: N, shots: sorted(shots), transitions: sorted(transitions), never, seed0 }));
+if (process.argv.includes('--json')) console.log(JSON.stringify({ proposals: N, shots: sorted(shots), transitions: sorted(transitions), never, seed0, fallback, stages: VIEWPOINT_COVERAGE }));
 else {
   const pct = (n: number) => (100 * n / N).toFixed(2).padStart(6) + '%';
   console.log(`${N} proposals (${RUNS} runs × ${GUESTS} guests)\n\nShot frequency:`);
   for (const [id, n] of sorted(shots)) console.log(`${pct(n)} ${String(n).padStart(5)}  ${id}`);
   console.log('\nChange → shot:');
   for (const [id, n] of sorted(transitions)) console.log(`${pct(n)} ${String(n).padStart(5)}  ${id}`);
+  console.log(`\nDistrict changes that missed every stage (fallback shot): ${fallback}`);
   console.log(`\nViewpoints never picked (${never.length}/${Object.keys(VIEWPOINT_COVERAGE).length}): ${never.join(', ') || 'none'}`);
 }
