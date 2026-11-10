@@ -5,6 +5,8 @@ import type { ExploreTarget, ProposalData, ProposalRequest, ProposalSessionData 
 import { api, connectEvents, el, newAnswerId } from './debugApi.ts';
 import { DISPLAY_MS } from '../shared/displayTiming.ts';
 import { buildProposalRequest } from './guestFlow.ts';
+import { optionIcon } from './guestIcons.ts';
+import { renderTendency } from './guestTendency.ts';
 
 const app = document.querySelector<HTMLElement>('#app')!;
 app.classList.add('guest');
@@ -46,6 +48,25 @@ let exploring = false;
 let othersExploring = false;
 /** The handoff screen stays up this long so the guest can still choose 空の環を見る (owner 2026-11-02); the server lease is unchanged. */
 const EXPLORE_OFFER_MS = 20_000;
+/** Latest public city head count from the live socket, for the welcome line; undefined until the first event. */
+let cityGuestCount: number | undefined;
+/** Screen identity for the enter animation: a re-render of the same screen (warnings, busy states) does not animate. */
+let lastScreenKey = '';
+let lastQuestionIndex = 0;
+
+// Exhibition iPads must not dim between guests. Safari releases the lock when the page is hidden, so it is re-requested
+// on return and on the next touch; unsupported browsers just keep their own sleep setting.
+let wakeLock: WakeLockSentinel | null = null;
+async function keepScreenAwake() {
+  if (wakeLock || document.visibilityState !== 'visible' || !('wakeLock' in navigator)) return;
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release', () => { wakeLock = null; });
+  } catch { /* Not allowed yet (no user activation, low power); the next touch retries. */ }
+}
+document.addEventListener('visibilitychange', () => void keepScreenAwake());
+document.addEventListener('pointerdown', () => void keepScreenAwake());
+void keepScreenAwake();
 
 const axisNames: Record<keyof ExhibitionState['scores'], string> = {
   automation: '自動化', publicSharing: '公共共有',
@@ -146,9 +167,19 @@ function action(label: string, run: () => void, primary = false, disabled = fals
   return button;
 }
 
+function screenKey() {
+  const shown = screen === 'submitting' ? 'review' : screen === 'starting' ? 'welcome' : screen;
+  return shown === 'question' ? `question:${questionIndex}` : shown;
+}
+
 function page(title: string, eyebrow: string, ...content: (HTMLElement | string)[]) {
   persistRecovery();
   app.dataset.screen = screen;
+  const key = screenKey();
+  const entering = key !== lastScreenKey;
+  const backward = screen === 'question' && (lastScreenKey.startsWith('question:') ? questionIndex < lastQuestionIndex : lastScreenKey === 'review');
+  lastScreenKey = key;
+  lastQuestionIndex = questionIndex;
   app.replaceChildren(
     el('div', { class: 'guest-frame' },
       el('header', { class: 'guest-masthead' },
@@ -156,7 +187,7 @@ function page(title: string, eyebrow: string, ...content: (HTMLElement | string)
           el('span', { class: 'guest-brand-name' }, '2127 / ODAIBA'),
           el('span', { class: 'guest-brand-caption' }, '住民の声')),
         el('span', { class: 'guest-station' }, stationId ? `STATION ${stationId}` : 'この街で暮らすあなたへ')),
-      el('section', { class: 'guest-screen' },
+      el('section', { class: `guest-screen${entering ? ' is-entering' : ''}`, ...(entering && backward ? { 'data-direction': 'back' } : {}) },
         el('p', { class: 'guest-eyebrow' }, eyebrow),
         el('h1', { tabindex: '-1' }, title),
         ...content)),
@@ -203,10 +234,18 @@ function renderWelcome(focus = false) {
   page('この街の未来に、あなたの声を。', '2127年・台場の暮らし',
     el('p', { class: 'guest-lead' }, 'あなたは、2127年の台場に暮らす住民です。日々の暮らしについて、四つの質問にお答えください。'),
     el('p', { class: 'guest-copy' }, '回答は最後にまとめて確認してから記録します。選んでいる間、街の集計は変わりません。'),
+    el('ol', { class: 'guest-themes', 'aria-label': '四つの質問' },
+      ...['暮らしの助け', '海辺の休み方', '電気の設備', '街のめぐり方'].map((theme, index) => el('li', {}, el('span', { class: 'guest-theme-number' }, `0${index + 1}`), theme))),
+    el('p', { class: 'guest-city-count', role: 'status', 'aria-live': 'polite' }, cityCountText()),
     ...noticeNodes(),
     ...(status ? [status] : []),
     el('div', { class: 'guest-actions' }, button));
   if (focus) focusTitle();
+}
+
+function cityCountText() {
+  if (cityGuestCount === undefined) return '';
+  return cityGuestCount === 0 ? 'あなたが、この街の最初の住民になります。' : `これまでに ${cityGuestCount}人の住民が、この街に声を残しました。`;
 }
 
 async function startSession(keepDraft = false) {
@@ -347,9 +386,10 @@ function renderQuestion(focus = true) {
       resetIdleTimer();
     });
     const title = choiceTitles[option.id];
+    const icon = optionIcon(option.id);
     fieldset.append(el('label', { class: 'guest-choice' }, input,
       el('span', { class: 'guest-choice-content' },
-        ...(title ? [el('span', { class: 'guest-choice-title' }, title)] : []),
+        ...(title ? [el('span', { class: 'guest-choice-title' }, ...(icon ? [icon] : []), title)] : []),
         el('span', { class: 'guest-choice-copy' }, option.label)),
       el('span', { class: 'guest-choice-state' }, '選択中')));
   });
@@ -401,7 +441,7 @@ function renderReview(focus = true) {
     : uncertain ? '記録を確認する'
       : sessionBlocked ? '新しい予約で草稿を続けてください'
       : conflictState ? `最新 revision ${conflictState.revision} を確認して記録する`
-        : '回答を終える';
+        : 'この声を街へ届ける';
   const submit = action(submitLabel, () => submitProposal(), true, busy || sessionBlocked);
   submit.dataset.autoAction = 'submit';
   const conflict = conflictState
@@ -530,11 +570,20 @@ function renderResult(focus = true) {
   const { proposal } = saved;
   page('街の画面をご覧ください。', 'あなたの思いを記録しました',
     el('p', { class: 'guest-result-number' }, residentIdentity(proposal)),
-    el('p', { class: 'guest-copy', role: 'status' }, '回答を記録しました。'),
+    el('p', { class: 'guest-copy', role: 'status' }, `回答を記録しました。あなたは、この街の ${saved.state.guestCount}人目の住民です。`),
+    renderChosen(proposal.answers),
     el('div', { class: 'guest-actions' }, action('次の方へ', renderHandoff, true)));
   if (focus) focusTitle();
   clearTimeout(flowTimer);
   flowTimer = window.setTimeout(renderHandoff, Math.max(0, resultEndsAt - performance.now()));
+}
+
+/** The four choices as icon chips; the full wording was on the review screen. */
+function renderChosen(answers: ProposalData['proposal']['answers']) {
+  return el('ul', { class: 'guest-chosen', 'aria-label': 'あなたが選んだ暮らし' }, ...answers.map(answer => {
+    const icon = optionIcon(answer.optionId, 'guest-icon guest-icon--small');
+    return el('li', {}, ...(icon ? [icon] : []), choiceTitles[answer.optionId] ?? answer.optionId);
+  }));
 }
 
 function renderHandoff() {
@@ -545,6 +594,7 @@ function renderHandoff() {
   screen = 'handoff';
   page('次の方へどうぞ。', residentIdentity(saved.proposal),
     el('p', { class: 'guest-lead' }, '街はこのまま次の方へ引き継がれます。'),
+    renderTendency(saved.state, new Map(saved.proposal.answers.map(answer => [answer.questionId, answer.optionId]))),
     ...noticeNodes(),
     el('div', { class: 'guest-actions' },
       ...exploring ? [action('戻る', () => void explore(null), true)]
@@ -634,6 +684,12 @@ async function showUndone() {
 }
 
 connectEvents(event => {
+  if ('state' in event && 'guestCount' in event.state) {
+    cityGuestCount = event.state.guestCount;
+    // Update the welcome line in place; re-rendering would move focus and the Start button under a finger.
+    const line = app.querySelector<HTMLElement>('.guest-city-count');
+    if (line) line.textContent = cityCountText();
+  }
   if (event.type === 'explore') {
     // A null target means nobody holds the screen any more (戻る, a new result, a reset or the next Start).
     othersExploring = event.target !== null && event.stationId !== stationId;

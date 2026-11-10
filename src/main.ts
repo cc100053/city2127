@@ -24,7 +24,7 @@ import { updateFloaters } from './floaters';
 import { updateHoverBeds } from './plazaDeck';
 import { build2127 } from './odaiba2127';
 import { bayWater, waterLights } from './bayWater';
-import { scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
+import { residentIdentity, scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
 import { createCityChangeManager } from './createCityChangeManager';
 import { renderQuality } from './renderQuality';
@@ -34,6 +34,7 @@ import { DISPLAY_MS } from '../survey/src/shared/displayTiming';
 import { housingPrototype } from './housingPrototype';
 import { skyRing, STANDALONE_VOICES } from './skyRing';
 import { GuestExplore } from './guestExplore';
+import { VoiceLabel } from './voiceLabel';
 import type { ExploreLook } from './surveyView';
 import { heroHolograms } from './heroHolograms';
 import { spaceElevator, spaceElevatorNear } from './spaceElevator';
@@ -234,6 +235,8 @@ try {
   const journey=surveyUrl?new VoteJourney(scene,camera):null;
   // A live energy headline narrates one compressed storage cycle during the close-up hold.
   const narration=surveyUrl&&headlineCamera?new EnergyNarration(()=>cityChanges?.energy):null;
+  // 暮らしの声 #N over the close-up site; it lives only while the headline camera does, so every cancel path hides it.
+  const voiceLabel=surveyUrl&&headlineCamera?new VoiceLabel():null;
   // A guest's look at the Sky Ring or the space elevator (iPad, after their result) takes the camera from wherever it is; any city event takes it back.
   // The elevator look swaps in the near LOD and hides the ambient sky-corridor trails, one of which crosses E1 edge-on behind the station.
   const skyTrails=scene.getObjectByName('regional-air-trails');
@@ -259,7 +262,9 @@ try {
       if(kind==='city-state-updated'&&latest&&!cameraMotion.matches&&displayMs>=DISPLAY_MS-100){
         const changes=cityChanges!.applyExhibitionLayout(view.layout,kind,now+(headlineCamera?shotTimeline(displayMs).change:ARRIVAL_SECONDS),view.slotSeeds,now,latest.votes);
         journey!.play(latest.votes,latest.ordinal,now,changes[0]?.headline&&changes[0].district&&!changes[0].focalOnly?changes[0]:undefined);
-        narration?.play(headlineCamera?.play(changes,now,displayMs)??null,changes[0],now,displayMs);
+        const shot=headlineCamera?.play(changes,now,displayMs)??null;
+        narration?.play(shot,changes[0],now,displayMs);
+        if(shot&&voiceLabel){const t=shotTimeline(displayMs);voiceLabel.show(residentIdentity(latest),SHOTS[shot].target,now+t.hold,now+t.flyOut);}
         return changes;
       }
       headlineCamera?.cancel();narration?.cancel();
@@ -306,6 +311,7 @@ try {
     controls.update();if(!ringReview){panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);}
     if(headlineCamera?.active&&cameraMotion.matches)headlineCamera.cancel();else headlineCamera?.update(now);
     narration?.update(now,cameraMotion.matches);explore?.update(now,cameraMotion.matches);
+    if(headlineCamera?.active)voiceLabel?.update(camera,now);else voiceLabel?.hide();
     if(import.meta.env.DEV&&devShot){camera.position.set(...devShot.position);controls.target.set(...devShot.target);camera.lookAt(controls.target);}
     cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.
