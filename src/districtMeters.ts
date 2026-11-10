@@ -10,6 +10,7 @@ import { megaGlass, megaRib, megaShell } from './megastructures.ts';
 import { shoreRoomBays } from './waterRooms.ts';
 import { automationActivity, pavilionFlight, pedestrians, plazaPose, routes, serviceDrones } from './mobility.ts';
 import { prefersReducedMotion, SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
+import { BuildChoreography, buildProgress, type BuildItem } from './buildTransition.ts';
 import type { ExhibitionLayout } from './surveyView.ts';
 
 const HIDDEN = 1e-4;
@@ -28,8 +29,11 @@ export class SlotLevels {
   private readonly to: Float32Array;
   private start = -Infinity;
   private active = false;
+  private readonly ease: (raw: number) => number;
 
-  constructor(count: number) {
+  /** `ease` maps transition progress 0..1 to level progress; slots that play the build choreography pass `buildProgress`. */
+  constructor(count: number, ease = (raw: number) => raw * raw * (3 - 2 * raw)) {
+    this.ease = ease;
     this.value = new Float32Array(count);
     this.from = new Float32Array(count);
     this.to = new Float32Array(count);
@@ -61,7 +65,7 @@ export class SlotLevels {
   /** Returns whether values moved this frame. */
   update(now: number): boolean {
     if (!this.active) return false;
-    const raw = Math.min(1, Math.max(0, (now - this.start) / SITE_TRANSITION_SECONDS)), p = raw * raw * (3 - 2 * raw);
+    const raw = Math.min(1, Math.max(0, (now - this.start) / SITE_TRANSITION_SECONDS)), p = this.ease(raw);
     for (let i = 0; i < this.value.length; i++) this.value[i] = this.from[i] + (this.to[i] - this.from[i]) * p;
     this.active = raw < 1;
     return true;
@@ -1018,10 +1022,10 @@ export class ConcentrationDistrict {
   /** [x, z, height]: spire tips (1.06 × height) stay below the 170 m air-taxi loop. */
   readonly towers: readonly { x: number; z: number; h: number }[] = TOWER_SITES.map(([x, z, h]) => ({ x, z, h }));
   readonly pods: readonly { x: number; z: number; yaw: number }[] = POD_SITES.map(([x, z], i) => ({ x, z, yaw: i * 2.1 }));
-  private readonly towerLevels = new SlotLevels(this.towers.length);
+  private readonly towerLevels = new SlotLevels(this.towers.length, buildProgress);
   /** P9: at mixed a share of tower sites stands as a terraced mid-rise (45 % of the tower height) instead of open lawn. */
-  private readonly midRise = new SlotLevels(this.towers.length);
-  private readonly podLevels = new SlotLevels(this.pods.length);
+  private readonly midRise = new SlotLevels(this.towers.length, buildProgress);
+  private readonly podLevels = new SlotLevels(this.pods.length, buildProgress);
   /** Tower meshes per silhouette family (slot i: `towerFamily(i)`). */
   private readonly families: T.InstancedMesh[][];
   private readonly podMeshes: T.InstancedMesh[];
@@ -1039,6 +1043,7 @@ export class ConcentrationDistrict {
   readonly bridges: { i: number; j: number; y: number }[] = [];
   private readonly bridgeMeshes: T.InstancedMesh[];
   private readonly pulses: PulseRings;
+  private readonly build: BuildChoreography;
   private readonly light = publicLight.clone();
   private nightRhythm = 1;
   private readonly dummy = new T.Object3D();
@@ -1206,11 +1211,12 @@ export class ConcentrationDistrict {
     ];
     this.solarDiscs = extra(new T.CylinderGeometry(11, 11, .4, 32).rotateZ(.12), solar, this.pods.length, 'concentration-solar-pods');
     this.pulses = new PulseRings(this.root, METER_COLORS.urbanConcentration, (this.towers.length + this.pods.length + 1) * PULSE_WAVES);
+    this.build = new BuildChoreography(this.root, METER_COLORS.urbanConcentration, this.towers.length + this.pods.length);
     this.root.visible = false; parent.add(this.root); this.write();
   }
 
   setTarget({ tiers }: LadderTarget, now: number, immediate: boolean, seed = 0, quiet = false, sampleAt = now): boolean {
-    if (immediate) this.pulses.clear();
+    if (immediate) { this.pulses.clear(); this.build.clear(); }
     const tier = tiers.se;
     this.target = ladderShare(tier, .5);
     const towerTarget = (i: number) => [Math.max(this.towerLevels.targets[i], .45 * this.midRise.targets[i]),
@@ -1232,7 +1238,15 @@ export class ConcentrationDistrict {
       ...this.towers.flatMap((site, i) => towerTarget(i).some((v, j) => v !== beforeTowers[i][j]) ? [{ slot: `se:tower${i + 1}`, x: site.x, y: 1, z: site.z, r: 30 }] : []),
       ...this.pods.flatMap((site, i) => podTarget(i).some((v, j) => v !== beforePods[i][j]) ? [{ slot: `se:pod${i + 1}`, x: site.x, y: 1, z: site.z, r: 14 }] : []),
     ];
-    if ((a || b || m || f || d || sp) && !immediate && !quiet) this.pulses.emit([sitePulse('se'), ...this.changedPoints], now);
+    if ((a || b || m || f || d || sp) && !immediate && !quiet) {
+      this.pulses.emit([sitePulse('se'), ...this.changedPoints], now);
+      // Build heights in metres: tower or mid-rise top, two-tier pod (14.7 m) or ring pavilion (11.1 m).
+      const builds: BuildItem[] = this.changedPoints.map(({ slot, x, z }) => {
+        const tower = slot.startsWith('se:tower'), i = Number(slot.replace(/\D+/g, '')) - 1, scale = tower ? this.towers[i].h : this.podDesign[i] === 1 ? 11.1 : 14.7;
+        return { x, y: 0, z, r: tower ? 24 : 15, from: (tower ? beforeTowers : beforePods)[i][0] * scale, to: (tower ? towerTarget(i) : podTarget(i))[0] * scale };
+      });
+      this.build.play(builds, now);
+    }
     this.write(); return a || b || m || f || d || sp;
   }
 
@@ -1243,10 +1257,10 @@ export class ConcentrationDistrict {
     if (moved) this.write();
     this.nightRhythm = meterNightRhythm(now, mean(this.towerLevels), 3, darkness);
     this.light.emissiveIntensity = .9 * this.nightRhythm;
-    this.pulses.update(now);
+    this.pulses.update(now); this.build.update(now);
   }
 
-  hide(): void { this.root.visible = false; this.pulses.clear(); }
+  hide(): void { this.root.visible = false; this.pulses.clear(); this.build.clear(); }
 
   // ponytail: mirrors settled write() transforms; update this projection when adding carrier geometry.
   getConfiguration() {
@@ -1255,7 +1269,7 @@ export class ConcentrationDistrict {
   }
 
   getDiagnostics() {
-    return { enabled: this.root.visible, nightRhythm: this.nightRhythm, targetConcentration: this.target, towers: this.towers.length, pods: this.pods.length, activePulses: this.pulses.active(this.now),
+    return { enabled: this.root.visible, nightRhythm: this.nightRhythm, targetConcentration: this.target, towers: this.towers.length, pods: this.pods.length, activePulses: this.pulses.active(this.now), activeBuilds: this.build.active(this.now),
       visibleTowers: this.root.visible ? this.towerLevels.visible() : 0, visiblePods: this.root.visible ? this.podLevels.visible() : 0,
       midRises: this.root.visible ? this.towers.filter((_, i) => this.midRise.value[i] > HIDDEN && this.towerLevels.value[i] <= HIDDEN).length : 0,
       forestTowers: this.root.visible ? this.towers.filter((_, i) => this.forest.value[i] * this.towerLevels.value[i] > HIDDEN).length : 0,
