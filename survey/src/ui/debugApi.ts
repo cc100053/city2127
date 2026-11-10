@@ -19,6 +19,10 @@ export function newAnswerId(): string {
   return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
+// Staff-facing times are shown in venue-local Japan time.
+const LOCAL_TIME = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+export function localTime(iso: string) { const d = new Date(iso); return Number.isNaN(d.getTime()) ? iso : LOCAL_TIME.format(d); }
+
 export function el<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Partial<Record<string, string>> = {}, ...children: (Node | string)[]) {
   const node = document.createElement(tag);
   for (const [key, value] of Object.entries(attrs)) if (value !== undefined) node.setAttribute(key, value);
@@ -37,7 +41,7 @@ export function renderState(state: CitySurveyState | ExhibitionState): HTMLEleme
   });
   const count = 'guestCount' in state ? state.guestCount : state.answerCount;
   return el('div', {},
-    el('p', { class: 'meta' }, `都市の実行ID ${state.runId} · 更新番号 ${state.revision} · 提案／回答数 ${count} · 更新日時 ${state.updatedAt}`),
+    el('p', { class: 'meta' }, `都市 ${state.runId.slice(0, 8)} · 更新番号 ${state.revision} · 提案／回答数 ${count} · 更新 ${localTime(state.updatedAt)}`),
     el('table', { class: 'scores' }, ...rows));
 }
 
