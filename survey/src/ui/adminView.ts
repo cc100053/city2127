@@ -1,6 +1,6 @@
 import './debug.css';
 import type { AdminCurrentRun, ApiError, DisplayMode, AdminEventsData, LifecycleCommand, LifecycleData, LifecyclePhase, LifecycleStatus } from '../shared/protocol.ts';
-import { api, connectEvents, el, renderState } from './debugApi.ts';
+import { api, connectEvents, el, localTime, renderState } from './debugApi.ts';
 
 // Exhibition-PC admin page. The server returns 403 for this page and its API from non-loopback clients.
 // All lifecycle state lives on the server; every command carries the revision this page last saw.
@@ -20,6 +20,9 @@ const ERROR_TEXT: Partial<Record<ApiError['code'], string>> = {
   lifecycle_blocked: '現在の展示状態では、この操作を実行できません。',
 };
 const errorText = (error: ApiError) => ERROR_TEXT[error.code] ?? '通信またはサーバーでエラーが発生しました。接続を確認して、もう一度お試しください。';
+// Staff read times in venue-local Japan time; raw ISO stays in the title attribute for debugging.
+const jst = localTime;
+const timeCell = (iso: string) => el('td', { title: iso }, jst(iso));
 const app = document.querySelector<HTMLElement>('#app')!;
 const status = el('div', { class: 'notice' }), summary = el('div'), stateBox = el('div'), events = el('div'), message = el('p');
 const lightingStatus = el('p'), lightingMessage = el('p', { 'aria-live': 'polite' });
@@ -32,14 +35,15 @@ const guestLeft = el('button', { class: 'primary', disabled: '' }, '未完了の
 const stationBox = el('div');
 const undo = el('button', { disabled: '' }, '直前の提案を取り消す');
 const undoStatus = el('p');
-const resetCity = el('button', { disabled: '' }, '現在の都市をリセット');
+const resetCity = el('button', { class: 'danger', disabled: '' }, '現在の都市をリセット');
 const cancel = el('button', { disabled: '' }, '保留中のリセットを取り消す');
 const fullInput = el('input', { placeholder: '全データ初期化 と入力', autocomplete: 'off', 'aria-label': '全データ初期化の確認' });
 const fullReset = el('button', { class: 'danger', disabled: '' }, '全データを初期化');
 app.append(el('h1', {}, '展示管理（このパソコンのみ）'), status, summary,
   el('div', { class: 'panel' }, el('h2', {}, '展示の操作'),
     el('p', {}, '次の観客は管理操作なしで開始できます。A/B は独立して回答します。リセットは両ステーションの回答・結果表示が終わるまで保留され、新しい開始を停止します。'),
-    stationBox, el('div', { class: 'row' }, guestLeft, undo, resetCity, cancel), undoStatus, message),
+    stationBox, el('div', { class: 'row' }, guestLeft, undo), undoStatus,
+    el('div', { class: 'admin-reset-zone' }, el('h3', {}, '都市のリセット（注意）'), el('div', { class: 'row' }, resetCity, cancel)), message),
   el('div', { class: 'panel' }, el('h2', {}, '都市の照明'),
     el('p', {}, '昼：12:00 · 夜：22:00 · 自動：日夜サイクル。接続中の都市に反映され、再起動後も保持されます。'),
     el('div', { class: 'row' }, ...lightingButtons.map(({ button }) => button)), lightingStatus, lightingMessage),
@@ -135,21 +139,25 @@ async function refresh() {
   status.className = d.lifecycle.pendingReset === 'none' ? 'notice status' : 'notice warn status';
   status.replaceChildren(el('strong', {}, PHASE_TEXT[d.lifecycle.phase]),
     ...(d.lifecycle.pendingReset === 'none' ? [] : [el('br'), `リセット保留中：${d.lifecycle.pendingReset === 'full' ? '全データの初期化' : '都市のリセット'}（A/B は両体験終了後、単独モードは次の開始時）`]));
+  const rows = (pairs: string[][]) => pairs.map(([k, v]) => el('tr', {}, el('th', {}, k), el('td', {}, v)));
+  const wasOpen = summary.querySelector('details')?.open ?? false;
+  const details = el('details', {}, el('summary', {}, '技術情報'), el('table', {},
+    ...rows([['都市の実行ID', d.run.id], ['計算方式のバージョン', String(d.run.algorithmVersion)], ['都市の更新番号', String(d.state.revision)],
+      ['展示状態の更新番号', `${d.lifecycle.revision} · ${jst(d.lifecycle.updatedAt)}`]])));
+  details.open = wasOpen;
   summary.replaceChildren(el('table', {},
-    ...([['総参加人数', String(d.lifecycle.totalGuestCount)],
+    ...rows([['総参加人数', String(d.lifecycle.totalGuestCount)],
       ['現在の都市の参加人数', String('guestCount' in d.state ? d.state.guestCount : d.state.answerCount)],
-      ['都市の実行ID', d.run.id], ['開始日時', d.run.startedAt], ['計算方式のバージョン', String(d.run.algorithmVersion)], ['都市の更新番号', String(d.state.revision)],
-      ['予約中の観客セッション', String(d.reservedSessions)], ['展示状態の更新番号', `${d.lifecycle.revision} · ${d.lifecycle.updatedAt}`]]
-      .map(([k, v]) => el('tr', {}, el('th', {}, k), el('td', {}, v))))));
+      ['予約中の観客セッション', String(d.reservedSessions)], ['この都市の開始', jst(d.run.startedAt)]])), details);
   stateBox.replaceChildren(renderState(d.state));
   updateButtons();
   if (log.ok) {
     events.replaceChildren(
-      el('table', { class: 'log' }, ...log.data.answers.map(a => el('tr', {}, el('td', {}, `#${a.sequence}`), el('td', {}, a.runId.slice(0, 8)), el('td', {}, `${a.questionId} / ${a.optionId}`), el('td', {}, `更新 ${a.revisionAfter}`), el('td', {}, a.answeredAt)))),
+      el('table', { class: 'log' }, ...log.data.answers.map(a => el('tr', {}, el('td', {}, `#${a.sequence}`), el('td', {}, a.runId.slice(0, 8)), el('td', {}, `${a.questionId} / ${a.optionId}`), el('td', {}, `更新 ${a.revisionAfter}`), timeCell(a.answeredAt)))),
       el('h2', {}, '最近の提案'),
-      el('table', { class: 'log' }, ...log.data.proposals.map(p => el('tr', {}, el('td', {}, `#${p.ordinal}${p.undoneAt ? ' · 取り消し済み' : ''}${p.stationId ? ` · ${p.stationId}` : ''}`), el('td', {}, p.runId.slice(0, 8)), el('td', {}, p.answers.map(a => a.optionId).join(' / ')), el('td', {}, `更新 ${p.revisionAfter}`), el('td', {}, p.submittedAt)))),
+      el('table', { class: 'log' }, ...log.data.proposals.map(p => el('tr', {}, el('td', {}, `#${p.ordinal}${p.undoneAt ? ' · 取り消し済み' : ''}${p.stationId ? ` · ${p.stationId}` : ''}`), el('td', {}, p.runId.slice(0, 8)), el('td', {}, p.answers.map(a => a.optionId).join(' / ')), el('td', {}, `更新 ${p.revisionAfter}`), timeCell(p.submittedAt)))),
       el('h2', {}, '管理操作の履歴'),
-      el('table', { class: 'log' }, ...log.data.admin.map(a => el('tr', {}, el('td', {}, a.type === 'proposal-undone' ? `提案 #${a.detail.ordinal} を取り消し` : `都市の実行を切り替え（${a.detail.scope === 'full' ? '全データの初期化' : '都市のリセット'}）`), el('td', {}, a.type === 'proposal-undone' ? a.detail.proposalId : `${a.runId.slice(0, 8)} → ${a.detail.nextRunId.slice(0, 8)}`), el('td', {}, a.createdAt)))));
+      el('table', { class: 'log' }, ...log.data.admin.map(a => el('tr', {}, el('td', {}, a.type === 'proposal-undone' ? `提案 #${a.detail.ordinal} を取り消し` : `都市の実行を切り替え（${a.detail.scope === 'full' ? '全データの初期化' : '都市のリセット'}）`), el('td', {}, a.type === 'proposal-undone' ? a.detail.proposalId : `${a.runId.slice(0, 8)} → ${a.detail.nextRunId.slice(0, 8)}`), timeCell(a.createdAt)))));
   }
 }
 

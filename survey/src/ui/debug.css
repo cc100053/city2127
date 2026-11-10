@@ -97,3 +97,6 @@ body.dev-auto-page { margin-right: 340px; }
   .guest-screen { animation: guest-enter .18s ease-out; }
 }
 @keyframes guest-enter { from { opacity: .72; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.admin-reset-zone { margin-top: 18px; padding: 10px 12px; border: 1px dashed var(--warn); border-radius: 8px; }
+.admin-reset-zone h3 { margin: 0 0 8px; font-size: 14px; color: var(--warn); }
+details summary { cursor: pointer; padding: 6px 0; color: GrayText; }

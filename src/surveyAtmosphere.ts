@@ -325,7 +325,11 @@ export function startSurveyAtmosphere(
       panel.insertBefore(latest, historyTitle);
       renderLegacyFeedback(view, latest, history, scores);
     }
-  }, text => { status.textContent = `サーバー: ${text}`; }, onDisplayMode, onExplore);
+  }, text => {
+    status.textContent = `サーバー: ${text}`;
+    // Visitors only need this line when the link is down; keep it readable to assistive tech and tests.
+    status.classList.toggle('is-quiet', text === '接続済み');
+  }, onDisplayMode, onExplore);
 }
 
 function renderLegacyFeedback(view: SurveyView, latest: HTMLElement, history: HTMLElement, scores: HTMLElement) {
