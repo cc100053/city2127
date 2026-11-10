@@ -159,7 +159,7 @@ async function refresh() {
   const singleActive = !stations.length && lifecycle.phase !== 'ready';
   const supportsStations = d.run.algorithmVersion === 2;
   const available = (['A', 'B'] as const).filter(id => supportsStations && !pending && !singleActive && !stations.some(station => station.stationId === id));
-  stationBox.replaceChildren(...(['A', 'B'] as const).map(id => {
+  for (const id of ['A', 'B'] as const) {
     const station = stations.find(item => item.stationId === id);
     const ready = available.includes(id);
     const title = station?.status === 'reserved' ? '回答中'
@@ -169,7 +169,11 @@ async function refresh() {
         : ready ? '次の方をご案内できます。'
           : pending ? 'リセットを待っています。'
             : !supportsStations ? '現在の都市では A/B を開始できません。' : '単独モードの体験を確認してください。';
-    const card = el('article', { class: 'admin-station', 'data-station': id, 'data-available': String(ready) },
+    const previous = stationBox.querySelector<HTMLElement>(`[data-station="${id}"]`);
+    const stateKey = JSON.stringify([station?.sessionId, ready, title, detail]);
+    // Polling must keep the focused button mounted while its action still targets the same session.
+    if (previous?.dataset.stateKey === stateKey) continue;
+    const card = el('article', { class: 'admin-station', 'data-station': id, 'data-available': String(ready), 'data-state-key': stateKey },
       el('h3', {}, id + ' ステーション'), el('p', { class: 'admin-station-status' }, title), el('p', {}, detail));
     if (station?.status === 'reserved') {
       const end = el('button', {}, `${id} の未完了の体験を終了`);
@@ -178,8 +182,9 @@ async function refresh() {
       });
       card.append(end);
     }
-    return card;
-  }));
+    if (previous) previous.replaceWith(card);
+    else stationBox.append(card);
+  }
   const guidance = pending ? '新しい体験の受付を停止しています。'
     : !supportsStations ? '現在の都市では A/B を開始できません。'
       : singleActive ? '単独モードの体験状況を確認してください。'

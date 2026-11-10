@@ -37,6 +37,19 @@ try {
   assert.equal(await admin.locator('[data-station="B"] .admin-station-status').textContent(), '開始できます');
   assert.equal(await button('直前の提案を取り消す').isDisabled(), true);
   assert.equal(await admin.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+  const endA = button('A の未完了の体験を終了');
+  await admin.keyboard.press('Tab');
+  assert.equal(await endA.evaluate(element => element === document.activeElement), true);
+  const diagnostics = await admin.locator('details table').first().elementHandle();
+  await admin.waitForFunction(table => !table.isConnected, diagnostics);
+  assert.equal(await endA.evaluate(element => element === document.activeElement), true);
+  await diagnostics.dispose();
+  const cancelledEnd = admin.waitForEvent('dialog').then(async dialog => {
+    assert.match(dialog.message(), /ステーション A/);
+    await dialog.dismiss();
+  });
+  await Promise.all([cancelledEnd, admin.keyboard.press('Enter')]);
+  assert.equal(await admin.locator('[data-station="A"] .admin-station-status').textContent(), '回答中');
   const evidence = process.env.CITY2127_EVIDENCE_DIR;
   if (evidence) {
     mkdirSync(evidence, { recursive: true });
@@ -86,7 +99,7 @@ try {
   await admin.getByRole('textbox', { name: '全データ初期化の確認' }).fill('全データ初期化');
   assert.equal(await button('全データを初期化').isEnabled(), true);
   assert.deepEqual(errors, []);
-  console.log('PASS: Admin UI in Chrome ' + browser.version() + ' (1280×900). A/B availability, lighting, reset confirmation and cancellation, targeted end, undo and full-reset confirmation gate.');
+  console.log('PASS: Admin UI in Chrome ' + browser.version() + ' (1280×900). A/B availability, keyboard focus across polling, lighting, reset confirmation and cancellation, targeted end, undo and full-reset confirmation gate.');
 } finally {
   try {
     await browser?.close();

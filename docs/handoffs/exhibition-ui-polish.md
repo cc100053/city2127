@@ -25,3 +25,7 @@ Fetched main and the staff console branch on 2026-11-09. The checkout started on
 - Root and survey builds and regression tests passed on Windows. The test commands use the external Windows file-URL path adapter documented in the Admin handoff. The committed whitespace check passed.
 - [GitHub CI](https://github.com/cc100053/city2127/actions/runs/42608517817) was cancelled during root tests near the configured 15-minute job limit. Subsequent CI steps were skipped. The local suite finished successfully.
 - Screenshots are kept outside Git. Exhibition hardware and venue conditions have not been tested.
+
+## Keyboard follow-up (2026-11-10)
+
+The Admin polling refresh now keeps an unchanged station card mounted. The Chrome regression check reaches the A station action with Tab, waits for a completed poll, checks focus, then opens and dismisses the targeted confirmation. Admin and exhibition UI browser checks and the survey build passed. The README lists keyboard controls and a manual test with a scratch database.
