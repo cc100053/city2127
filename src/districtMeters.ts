@@ -11,6 +11,7 @@ import { shoreRoomBays } from './waterRooms.ts';
 import { automationActivity, pavilionFlight, pedestrians, plazaPose, routes, serviceDrones } from './mobility.ts';
 import { prefersReducedMotion, SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 import type { ExhibitionLayout } from './surveyView.ts';
+import { STAGE_SLOTS } from './stages.ts';
 
 const HIDDEN = 1e-4;
 
@@ -168,6 +169,24 @@ export function ladderCut(ranks: readonly number[], tier: number, mixed: number)
   return k >= n ? 1 : k <= 0 ? 0 : (sorted[k - 1] + sorted[k]) / 2;
 }
 const ranks = (n: number, key: (i: number) => number) => Array.from({ length: n }, (_, i) => key(i));
+/** Stage index of each slot `${prefix}${i + 1}` in `STAGE_SLOTS`; −1 outside every stage. */
+const stagesOf = (prefix: string, n: number) => Array.from({ length: n }, (_, i) => Object.values(STAGE_SLOTS).findIndex(slots => slots.includes(`${prefix}${i + 1}`)));
+/** Rank index per slot: slots of one close-up stage take neighbouring ranks of `key`, so they switch at the same rung and the stage's wide shot
+ * shows them changing together. The seed reorders whole stages only (zero keeps table order), never the number of slots switched. */
+export function stageRanks(stages: readonly number[], key: (i: number) => number, seed = 0): number[] {
+  const order = [...Object.keys(STAGE_SLOTS).keys(), -1];
+  let random = seed;
+  if (seed) for (let i = order.length - 1; i > 0; i--) {
+    random = (Math.imul(random, 1664525) + 1013904223) >>> 0;
+    const j = Math.floor(random / 0x100000000 * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  const slots = stages.map((_, i) => i).sort((a, b) => order.indexOf(stages[a]) - order.indexOf(stages[b]) || a - b);
+  const byRank = stages.map((_, i) => i).sort((a, b) => key(a) - key(b));
+  const out: number[] = [];
+  slots.forEach((slot, k) => { out[slot] = byRank[k]; });
+  return out;
+}
 /** P9: share of slots showing a hybrid design: 60 % at mixed, 30 % at rung 2, none in the complete form. */
 export const ladderHybrid = (tier: number) => .6 * (1 - rungStep(tier));
 /** P10: a pairing shows only when both its sites complete the same side (rung 3, or −3 for the low pairing). */
@@ -355,11 +374,15 @@ export class SharingDistrict {
     const mixed = T.MathUtils.smoothstep(.5, .25, .875);
     const roomCut = ladderCut(ranks(this.bays.length, i => rank(i + 401)), tier, mixed), courtCut = ladderCut(ranks(COURT_SITES.length, i => rank(i + 977)), tier, mixed);
     this.root.visible = true;
-    const rooms = this.levels.setTargets(i => rank(i + 401) < roomCut ? 1 : 0, now, immediate, seed, sampleAt);
-    const courts = this.court.setTargets(i => rank(i + 977) < courtCut ? 1 : 0, now, immediate, seed, sampleAt);
+    const roomStages = stagesOf('sw:room', this.bays.length), courtStages = stagesOf('sw:court', COURT_SITES.length);
+    // Hybrids take the opposite end of the stage order: they sit on still-private slots, and a rung that opens a slot also clears its hybrid.
+    const by = (stages: readonly number[], salt: number, end = 1) => { const r = stageRanks(stages, i => end * rank(i + salt), seed); return (i: number) => rank(r[i] + salt); };
+    const room = by(roomStages, 401), court = by(courtStages, 977), hybridRoom = by(roomStages, 433, -1), hybridCourt = by(courtStages, 1019, -1);
+    const rooms = this.levels.setTargets(i => room(i) < roomCut ? 1 : 0, now, immediate, 0, sampleAt);
+    const courts = this.court.setTargets(i => court(i) < courtCut ? 1 : 0, now, immediate, 0, sampleAt);
     const hybrid = ladderHybrid(tier);
-    const hr = this.hybridRooms.setTargets(i => rank(i + 433) < hybrid ? 1 : 0, now, immediate, seed, sampleAt);
-    const hc = this.hybridCourts.setTargets(i => rank(i + 1019) < hybrid ? 1 : 0, now, immediate, seed, sampleAt);
+    const hr = this.hybridRooms.setTargets(i => hybridRoom(i) < hybrid ? 1 : 0, now, immediate, 0, sampleAt);
+    const hc = this.hybridCourts.setTargets(i => hybridCourt(i) < hybrid ? 1 : 0, now, immediate, 0, sampleAt);
     const changed = rooms || courts || hr || hc || kiosks || orchards;
     const roomSlots = new Set([...(rooms ? this.levels.changed : []), ...(hr ? this.hybridRooms.changed : [])]);
     const courtSlots = new Set([...(courts ? this.court.changed : []), ...(hc ? this.hybridCourts.changed : []), ...(kiosks ? this.kiosk.changed : []),
@@ -884,8 +907,9 @@ export class AutomationDistrict {
     this.root.visible = true;
     const a = this.automation.setTargets(() => this.target, now, immediate, 0, sampleAt);
     const cut = ladderCut(ranks(this.bays.length, i => rank(i + 203)), tier, .5);
-    const b = this.staffed.setTargets(i => rank(i + 203) >= cut ? 1 : 0, now, immediate, seed, sampleAt);
-    const h = this.hybrid.setTargets(i => rank(i + 307) < ladderHybrid(tier) ? 1 : 0, now, immediate, seed, sampleAt);
+    const stages = stagesOf('nw:bay', this.bays.length), staffed = stageRanks(stages, i => rank(i + 203), seed), hybrid = stageRanks(stages, i => rank(i + 307), seed);
+    const b = this.staffed.setTargets(i => rank(staffed[i] + 203) >= cut ? 1 : 0, now, immediate, 0, sampleAt);
+    const h = this.hybrid.setTargets(i => rank(hybrid[i] + 307) < ladderHybrid(tier) ? 1 : 0, now, immediate, 0, sampleAt);
     // Changed bays mark their terraces; fleet-wide changes also mark one street route.
     const bays = new Set([...(b ? this.staffed.changed : []), ...(h ? this.hybrid.changed : [])]);
     const street = routes().streets[0].getPointAt(.908); // the seaside avenue north of DECKS
@@ -1225,9 +1249,13 @@ export class ConcentrationDistrict {
     this.root.visible = true;
     // Golden-ratio order: with only ten towers a hash rank clusters, this keeps any share evenly spread across both groups.
     const order = (i: number, offset: number) => (i * .6180339887 + offset) % 1;
-    const a = this.towerLevels.setTargets(i => order(i, .31) < share ? 1 : 0, now, immediate, seed, sampleAt);
-    const b = this.podLevels.setTargets(i => order(i, .77) >= share ? 1 : 0, now, immediate, seed, sampleAt);
-    const m = this.midRise.setTargets(i => rank(i + 1301) < ladderHybrid(tier) ? 1 : 0, now, immediate, seed, sampleAt);
+    const towerStages = stagesOf('se:tower', this.towers.length);
+    const tower = stageRanks(towerStages, i => order(i, .31), seed), pod = stageRanks(stagesOf('se:pod', this.pods.length), i => order(i, .77), seed);
+    // Mid-rises take the opposite end of the stage order, so they stand on slots whose tower is not built yet.
+    const mid = stageRanks(towerStages, i => -rank(i + 1301), seed);
+    const a = this.towerLevels.setTargets(i => order(tower[i], .31) < share ? 1 : 0, now, immediate, 0, sampleAt);
+    const b = this.podLevels.setTargets(i => order(pod[i], .77) >= share ? 1 : 0, now, immediate, 0, sampleAt);
+    const m = this.midRise.setTargets(i => rank(mid[i] + 1301) < ladderHybrid(tier) ? 1 : 0, now, immediate, 0, sampleAt);
     this.changedPoints = [
       ...this.towers.flatMap((site, i) => towerTarget(i).some((v, j) => v !== beforeTowers[i][j]) ? [{ slot: `se:tower${i + 1}`, x: site.x, y: 1, z: site.z, r: 30 }] : []),
       ...this.pods.flatMap((site, i) => podTarget(i).some((v, j) => v !== beforePods[i][j]) ? [{ slot: `se:pod${i + 1}`, x: site.x, y: 1, z: site.z, r: 14 }] : []),

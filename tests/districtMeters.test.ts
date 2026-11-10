@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { onBayPlinth } from '../src/automationBays.ts';
-import { HERO_FRAME_SLOTS, towerFamily, ladderHybrid, ladderShare, rungStep, AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, PRIVATE_RISE, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
+import { HERO_FRAME_SLOTS, towerFamily, ladderHybrid, ladderShare, rungStep, AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, stageRanks, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, PRIVATE_RISE, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';
 import { changeSites } from '../src/layout.ts';
 import { publicLight, trail } from '../src/cityRig.ts';
 import { mobility, promenadeStops, routes, walkerParty, walkerPose, walkerRoute } from '../src/mobility.ts';
@@ -384,7 +384,7 @@ for (const score of [-7.5, 0, 7.5]) {
   assert.equal(drawn, life.getDiagnostics().plazaPeople);
   assert.equal(crowd.visible, drawn > 0);
   assert.equal(service.getDiagnostics().serviceDrones, drone.count);
-  assert.equal(life.getDiagnostics().plazaPeople, score < 0 ? 0 : score > 0 ? 108 : 24);
+  assert.equal(life.getDiagnostics().plazaPeople, score < 0 ? 0 : score > 0 ? 108 : 48); // mixed: four open non-hybrid courts (stage order, 2026-11-11)
   const before = Array.from(drone.instanceMatrix.array);
   ownDistricts.forEach(d => d.update(26, 1));
   assert.notDeepEqual(Array.from(drone.instanceMatrix.array), before, 'service drones move on the shared clock');
@@ -477,4 +477,21 @@ for (const [district, axis] of [
       JSON.stringify(value) !== JSON.stringify(before[k][i]) ? [`se:${k ? 'pod' : 'tower'}${i + 1}`] : []));
     assert.deepEqual(district.changedPoints.map(point => point.slot), expected, 'camera and pulses identify only visible SE changes');
   }
+}
+
+// Stage order: slots of one close-up stage take neighbouring ranks, every rank is used once, and a seed moves whole stages only.
+{
+  const stages = [0, 1, 0, -1, 1, 0], key = (i: number) => [.9, .1, .5, .3, .7, .2][i];
+  const position = (seed: number) => { const r = stageRanks(stages, key, seed), sorted = [...stages.keys()].sort((a, b) => key(a) - key(b)); return r.map(i => sorted.indexOf(i)); };
+  assert.deepEqual(position(0), [0, 3, 1, 5, 4, 2], 'stage 0 takes ranks 0-2, stage 1 ranks 3-4, the rest comes last');
+  for (const seed of [1, 42, 1234, 99999]) {
+    const p = position(seed);
+    assert.deepEqual([...p].sort(), [0, 1, 2, 3, 4, 5], 'every rank used once');
+    for (const stage of [0, 1]) { const own = p.filter((_, i) => stages[i] === stage); assert.equal(Math.max(...own) - Math.min(...own), own.length - 1, 'a stage keeps neighbouring ranks under any seed'); }
+  }
+  // One rung on the real districts moves several slots of a single stage together.
+  const se = new ConcentrationDistrict(new T.Scene());
+  se.setTarget(at({ se: -3 }), 0, true); se.setTarget(at({ se: -2 }), 1, false);
+  assert.ok(se.changedPoints.filter(p => ['se:tower1', 'se:tower2', 'se:pod4', 'se:pod5', 'se:pod6', 'se:pod7', 'se:pod8', 'se:pod9', 'se:pod10'].includes(p.slot)).length >= 3, 'SE east stage changes at least three slots on one rung');
+  console.log('PASS: stage order keeps each close-up stage on neighbouring ranks under every seed.');
 }

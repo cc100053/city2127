@@ -4,6 +4,7 @@ import type { CarrierChange } from './cityChangeManager.ts';
 import { HERO_POSITION, HERO_TARGET } from './heroCamera.ts';
 import { energyChangedPart } from './surveyAtmosphere.ts';
 import { FLY_OUT, shotTimeline } from './resultTimeline.ts';
+import { STAGE_SLOTS } from './stages.ts';
 export { FLY_IN, FLY_OUT, shotTimeline } from './resultTimeline.ts';
 
 type Site = CarrierChange['socketId'];
@@ -31,7 +32,8 @@ export const SHOTS: Record<ShotId, Pose> = {
   'sw:stage-rooms-west': { position: [-70, 172, 7], target: [-267, 5, -190] },
   'sw:stage-courts-south': { position: [-247, 98, 249], target: [-89, 3, 249] },
   'sw:stage-courts-west': { position: [-578, 139, 393], target: [-418, 3, 233] },
-  'se:stage-east': { position: [388, 189, -143], target: [225, 5, 20] },
+  // Low and close from the east so the pods read at size, with the SE focal lot behind them as the anchor.
+  'se:stage-east': { position: [400, 90, 20], target: [225, 5, 20] },
   'se:stage-south': { position: [-161, 201, 372], target: [83, 45, 283] },
   'energy:garden': { position: [-375, 45, -215], target: [-322, 5, -161] },
   'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },
@@ -39,18 +41,8 @@ export const SHOTS: Record<ShotId, Pose> = {
   'energy:wing': { position: [56, 64, -496], target: [125, 22, -424] },
   'energy:island': { position: [-142, 66, -556], target: [-60, 4, -470] },
 };
-// Each stage lists the slots it shows. Slots outside every stage (nw:bay3, nw:bay5, nw:street, four courts, three pods) still change, but never lead a
-// close-up; scripts/closeupFrequencySim.ts counts how often a change misses every stage and falls back to the district shot.
-export const VIEWPOINT_COVERAGE: Readonly<Record<string, readonly string[]>> = {
-  'nw:stage-west': ['nw:bay1', 'nw:bay2', 'nw:bay6'],
-  'nw:stage-mid': ['nw:bay4'],
-  'sw:stage-rooms-east': ['sw:room1', 'sw:room2', 'sw:room3'],
-  'sw:stage-rooms-west': ['sw:room4', 'sw:room5', 'sw:room6'],
-  'sw:stage-courts-south': ['sw:court3', 'sw:court6', 'sw:court10'],
-  'sw:stage-courts-west': ['sw:court2', 'sw:court7', 'sw:court8'],
-  'se:stage-east': ['se:tower1', 'se:tower2', 'se:pod4', 'se:pod5', 'se:pod6', 'se:pod7', 'se:pod8', 'se:pod9', 'se:pod10'],
-  'se:stage-south': ['se:tower3', 'se:tower4'],
-};
+/** Each stage's slots; the picker flies to the stage covering most changed slots. */
+export const VIEWPOINT_COVERAGE = STAGE_SLOTS;
 export function headlineShot(change: CarrierChange | undefined): ShotId | null {
   if (!change) return null;
   if (!change.energy) {

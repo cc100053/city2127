@@ -15,7 +15,7 @@ const focal = [['nw 0→+1', 'nw:focal'], ['nw 0→-1', 'nw:focal-low'], ['se 0�
 const district = Object.entries(sim.stages).map(([shot, slots]) => {
   const moved = change => slots.filter(slot => sim.seed0[slot]?.includes(change)).length;
   const changes = [...new Set(slots.flatMap(slot => sim.seed0[slot] ?? []))];
-  return [changes.reduce((a, b) => moved(b) - moved(a) || (count[`${b} | ${shot}`] ?? 0) - (count[`${a} | ${shot}`] ?? 0) > 0 ? b : a), shot];
+  return [changes.reduce((a, b) => (moved(b) - moved(a) || (count[`${b} | ${shot}`] ?? 0) - (count[`${a} | ${shot}`] ?? 0)) > 0 ? b : a), shot];
 });
 const RUNG_SCORE = { '-3': -8, '-2': -5, '-1': -2, '0': 0, '+1': 2, '+2': 5, '+3': 8 };
 const rows = [...focal, ...district].map(([change, shot]) => {
