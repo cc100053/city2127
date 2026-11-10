@@ -188,11 +188,12 @@ assert.equal(sharing.getDiagnostics().vaults, Math.ceil(sharing.bays.length / 2)
   assert.ok(vaultScale(0) > 10 && vaultScale(1) < 1e-2, 'only vaulted rooms show glass when private');
 }
 sharing.setTarget(at({ sw: 3 }), 1, false);
-sharing.update(2.5);
+// Build choreography: the mass moves between BUILD_MASS (.35 s) and BUILD_BEAT (2.45 s), so its midpoint is 1.4 s in.
+sharing.update(2.4);
 const screens = sharing.root.getObjectByName('sharing-private-gardens') as T.InstancedMesh;
 const matrix = new T.Matrix4(), scale = new T.Vector3();
 screens.getMatrixAt(0, matrix); scale.setFromMatrixScale(matrix);
-assert.ok(Math.abs(scale.y - PRIVATE_RISE * sharing.bays[0].r / 2) < 1e-4, 'private wall lowers halfway through the 3-second transition');
+assert.ok(Math.abs(scale.y - PRIVATE_RISE * sharing.bays[0].r / 2) < 1e-4, 'private wall is halfway down at the middle of the build phase');
 assert.equal(sharing.setTarget(at({ sw: 3 }), 2.5, false), false);
 sharing.update(4);
 assert.equal(sharing.getDiagnostics().visibleOpenRooms, sharing.bays.length);

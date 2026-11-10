@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { BUILD_BEAT, BUILD_MASS, BuildChoreography, buildBeat, buildProgress } from '../src/buildTransition.ts';
-import { ConcentrationDistrict } from '../src/districtMeters.ts';
+import { AutomationDistrict, ConcentrationDistrict, SharingDistrict } from '../src/districtMeters.ts';
 import { SITE_TRANSITION_SECONDS } from '../src/siteBuilders/siteRuntime.ts';
 
 // Timing: nothing outside the 3 s window; the mass waits for the rig, moves monotonically and is complete before the end beat.
@@ -49,4 +49,17 @@ assert.equal(buildBeat(.5)!.rig, 1, 'rig stands before the mass has moved far');
   assert.equal(builds(23.1), 0); assert.equal(d.getDiagnostics().visibleTowers, d.towers.length, 'towers settle on target');
   d.setTarget(at(-3), 30, false); assert.ok(builds(31) > 0); d.hide(); assert.equal(builds(31.1), 0, 'legacy hide clears builds');
 }
-console.log('PASS: build transition — timing window, both directions, live-only, immediate/clear/hide cancel, zero idle batches.');
+// NW and SW: the same rig on every changed bay, room and court (never the street slot); snapshots and quiet changes play nothing.
+for (const [district, axis] of [[new AutomationDistrict(new T.Scene()), 'nw'], [new SharingDistrict(new T.Scene()), 'sw']] as const) {
+  const at = (tier: number) => ({ tiers: { nw: 0, ne: 0, sw: 0, se: 0, [axis]: tier } }) as never;
+  const builds = (now: number) => { district.update(now); return district.getDiagnostics().activeBuilds; };
+  district.setTarget(at(-3), 0, true); assert.equal(builds(1), 0, `${axis}: snapshot plays no build`);
+  district.setTarget(at(-2), 2, false, 0, true); assert.equal(builds(3), 0, `${axis}: quiet change plays no build`);
+  for (const [tier, now] of [[3, 10], [-3, 20]] as const) {
+    district.setTarget(at(tier), now, false);
+    const slots = district.changedPoints.filter(p => p.slot !== 'nw:street').length;
+    assert.ok(slots > 0); assert.equal(builds(now + 1), slots, `${axis}: one build per changed slot`); assert.equal(builds(now + 3.1), 0);
+  }
+  district.setTarget(at(3), 30, false); assert.ok(builds(31) > 0); district.setTarget(at(3), 31.2, true); assert.equal(builds(31.3), 0, `${axis}: immediate cancels`);
+}
+console.log('PASS: build transition (SE, NW, SW) — timing window, both directions, live-only, immediate/clear/hide cancel, zero idle batches.');

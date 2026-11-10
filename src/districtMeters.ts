@@ -149,6 +149,10 @@ export class PulseRings {
   }
 }
 
+/** Build items of a district's changed slots from each slot's settled mass height before and after the change (`null`: not a built slot). */
+const buildItems = (points: readonly ChangedPoint[], before: ReadonlyMap<string, number>, site: (slot: string) => Omit<BuildItem, 'from' | 'to'> & { top: number } | null): BuildItem[] =>
+  points.flatMap(({ slot }) => { const o = site(slot); return o ? [{ x: o.x, y: o.y, z: o.z, r: o.r, from: before.get(slot) ?? 0, to: o.top }] : []; });
+
 /** The site's own anchor pulses with its district, tying the lot to the district-wide change. */
 const sitePulse = (socket: keyof typeof changeSites): PulsePoint => {
   const s = changeSites[socket];
@@ -205,17 +209,17 @@ export class SharingDistrict {
   changedPoints: ChangedPoint[] = [];
   readonly root = new T.Group();
   readonly bays = shoreRoomBays().map(b => ({ x: b.x, z: b.z, yaw: b.yaw, r: b.r + 1.5, y: 2.8, sx: 1, sz: 1 }));
-  private readonly levels = new SlotLevels(this.bays.length);
+  private readonly levels = new SlotLevels(this.bays.length, buildProgress);
   private readonly screens: T.InstancedMesh;
   /** Rooms that carry a glass vault when private; the rest stay open gardens and become halo commons. */
   readonly vaulted = this.bays.map((_, i) => i % 2 === 0);
   /** Second carrier, inland: 40 m courts that are walled private gardens or open shared plazas under parasols. */
   readonly courts = COURT_SITES.map(([x, z, yaw]) => ({ x, z, yaw }));
-  private readonly court = new SlotLevels(COURT_SITES.length);
+  private readonly court = new SlotLevels(COURT_SITES.length, buildProgress);
   /** P9 hybrids at mixed: half-open rooms (a half-height vault over the open steps; garden islands gain the steps instead of a halo)
    * and shared garden courts (walls, crowns, paving, parasols). */
   private readonly hybridRooms: SlotLevels;
-  private readonly hybridCourts = new SlotLevels(COURT_SITES.length);
+  private readonly hybridCourts = new SlotLevels(COURT_SITES.length, buildProgress);
   private readonly courtWalls: T.InstancedMesh;
   private readonly courtPavilions: T.InstancedMesh;
   private readonly courtCrowns: T.InstancedMesh;
@@ -244,6 +248,7 @@ export class SharingDistrict {
   private readonly skylights: T.InstancedMesh;
   private readonly steps: T.InstancedMesh[];
   private readonly pulses: PulseRings;
+  private readonly build: BuildChoreography;
   private readonly crowd: ReturnType<typeof pedestrians>;
   private readonly lights: T.MeshStandardMaterial[];
   private nightRhythm = 1;
@@ -253,7 +258,7 @@ export class SharingDistrict {
 
   constructor(parent: T.Object3D) {
     this.root.name = 'sharing-district';
-    this.hybridRooms = new SlotLevels(this.bays.length);
+    this.hybridRooms = new SlotLevels(this.bays.length, buildProgress);
     // Gridshell vault: frosted pearl glass over the garden on ivory ribs and ring beams; rose (the sharing colour) stays on the rim and oculus.
     const privacy = glass.clone(); privacy.color.set('#f4f1ea'); privacy.emissive.set('#ffe2cf'); privacy.emissiveIntensity = .3;
     privacy.side = T.DoubleSide; privacy.transparent = true; privacy.opacity = .62; privacy.depthWrite = false;
@@ -345,13 +350,14 @@ export class SharingDistrict {
     for (let i = 0; i < n * ORCHARD.length; i++) this.orchardCrowns.setColorAt(i, color.set(i % 3 === 0 ? '#f6f1e8' : i % 3 === 1 ? '#f2bfd0' : '#7fa35e'));
     this.crowd = pedestrians(this.root, this.courts.length * 12, 'plaza-crowds');
     this.pulses = new PulseRings(this.root, METER_COLORS.publicSharing, (this.bays.length + n + 1) * PULSE_WAVES);
+    this.build = new BuildChoreography(this.root, METER_COLORS.publicSharing, this.bays.length + n);
     this.root.visible = false; parent.add(this.root); this.write();
   }
 
   /** `quiet` settles a live change without pulses (another site carries the result's headline). */
   setTarget({ tiers }: LadderTarget, now: number, immediate: boolean, seed = 0, quiet = false, sampleAt = now): boolean {
-    if (immediate) this.pulses.clear();
-    const tier = tiers.sw;
+    if (immediate) { this.pulses.clear(); this.build.clear(); }
+    const tier = tiers.sw, before = this.tops();
     this.target = ladderShare(tier, .5);
     const kiosks = this.kiosk.setTargets(() => agree(tiers, 'sw', 'nw', 'high') ? 1 : 0, now, immediate, 0, sampleAt);
     const orchards = this.orchard.setTargets(() => agree(tiers, 'sw', 'ne', 'high') ? 1 : 0, now, immediate, 0, sampleAt);
@@ -371,8 +377,22 @@ export class SharingDistrict {
     this.changedPoints = [...[...roomSlots].map(i => {
       const b = this.bays[i]; return { slot: `sw:room${i + 1}`, x: b.x, y: b.y, z: b.z, r: b.r * b.sx * 1.3 };
     }), ...[...courtSlots].map(i => ({ slot: `sw:court${i + 1}`, x: this.courts[i].x, y: 0, z: this.courts[i].z, r: COURT * .75 }))];
-    if (changed && !immediate && !quiet) this.pulses.emit([sitePulse('sw'), ...this.changedPoints], now);
+    if (changed && !immediate && !quiet) {
+      this.pulses.emit([sitePulse('sw'), ...this.changedPoints], now);
+      const after = this.tops();
+      this.build.play(buildItems(this.changedPoints, before, slot => {
+        const room = slot.startsWith('sw:room'), i = Number(slot.replace(/\D+/g, '')) - 1, b = this.bays[i], c = this.courts[i];
+        return room ? { x: b.x, y: b.y, z: b.z, r: b.r * b.sx * SPREAD, top: after.get(slot)! } : { x: c.x, y: 0, z: c.z, r: COURT * .68, top: after.get(slot)! };
+      }), now);
+    }
     this.write(); return changed;
+  }
+
+  /** Settled top (metres above the slot's ground) of each room and court: vault or halo canopy; walls, glasshouse, parasols, pergola or kiosk. */
+  private tops(): Map<string, number> {
+    const [rooms, courts] = this.getConfiguration();
+    return new Map([...rooms.map(([rise, , steps, halo], i) => [`sw:room${i + 1}`, Math.max(PRIVATE_RISE * this.bays[i].r * rise, HALO * this.bays[i].r * halo, 2.2 * steps)] as const),
+      ...courts.map(([walls, winter, , parasols, tables, crowns, kiosk], i) => [`sw:court${i + 1}`, Math.max(2.4 * walls, 6.7 * winter, 10.2 * parasols, 6.9 * tables, 5 * crowns, 13.5 * kiosk)] as const)]);
   }
 
   update(now: number, darkness = 0): void {
@@ -383,9 +403,9 @@ export class SharingDistrict {
     this.nightRhythm = meterNightRhythm(now, mean(this.court), 1, darkness);
     this.lights.forEach((light, i) => light.emissiveIntensity = (i ? 1.6 : 1.8) * this.nightRhythm);
     this.deckGlow.emissiveIntensity = (.2 + darkness * 1.8) * this.nightRhythm;
-    this.writeCrowd(now); this.pulses.update(now);
+    this.writeCrowd(now); this.pulses.update(now); this.build.update(now);
   }
-  hide(): void { this.root.visible = false; this.pulses.clear(); }
+  hide(): void { this.root.visible = false; this.pulses.clear(); this.build.clear(); }
   // ponytail: mirrors settled write() transforms; update this projection when adding carrier geometry.
   getConfiguration() {
     return [Array.from(this.levels.targets, (open, i) => {
@@ -402,7 +422,7 @@ export class SharingDistrict {
 
   getDiagnostics() {
     const open = this.root.visible ? this.levels.visible() : 0;
-    return { enabled: this.root.visible, nightRhythm: this.nightRhythm, plazaPeople: this.root.visible ? this.courts.reduce((n, _, i) => n + (this.crowdLevel(i) > HIDDEN ? 12 : 0), 0) : 0, targetSharing: this.target, rooms: this.bays.length, activePulses: this.pulses.active(this.now),
+    return { enabled: this.root.visible, nightRhythm: this.nightRhythm, plazaPeople: this.root.visible ? this.courts.reduce((n, _, i) => n + (this.crowdLevel(i) > HIDDEN ? 12 : 0), 0) : 0, targetSharing: this.target, rooms: this.bays.length, activePulses: this.pulses.active(this.now), activeBuilds: this.build.active(this.now),
       vaults: this.vaulted.filter(Boolean).length, courts: this.courts.length,
       hybridRooms: this.root.visible ? this.hybridRooms.visible() : 0, hybridCourts: this.root.visible ? this.hybridCourts.visible() : 0,
       droneKiosks: this.root.visible ? this.courts.filter((_, i) => this.kiosk.value[i] * this.court.value[i] > HIDDEN).length : 0,
@@ -845,6 +865,7 @@ export class AutomationDistrict {
   readonly staffedDesign: number[];
   readonly autonomousDesign: number[];
   private readonly pulses: PulseRings;
+  private readonly build: BuildChoreography;
   private readonly drones: ReturnType<typeof serviceDrones>;
   /** Quad drones circling each ring tower's upper rings (STREAM per bay, in two loose streams). */
   private readonly streams: ReturnType<typeof quadFleet>;
@@ -857,8 +878,8 @@ export class AutomationDistrict {
     this.root.name = 'automation-district';
     const placed = automationBays();
     this.bays = placed.bays; this.scales = placed.scales;
-    this.staffed = new SlotLevels(this.bays.length);
-    this.hybrid = new SlotLevels(this.bays.length);
+    this.staffed = new SlotLevels(this.bays.length, buildProgress);
+    this.hybrid = new SlotLevels(this.bays.length, buildProgress);
     const instances = (group: T.Object3D, name: string) => bake(group).map(source => {
       const mesh = new T.InstancedMesh(source.geometry, source.material, this.bays.length);
       mesh.name = name; mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;
@@ -875,14 +896,15 @@ export class AutomationDistrict {
     this.drones = serviceDrones(this.root, this.bays.length);
     this.streams = quadFleet(this.root, this.bays.length * STREAM, 'automation-bay-drones');
     this.pulses = new PulseRings(this.root, METER_COLORS.automation, (this.bays.length + 2) * PULSE_WAVES);
+    this.build = new BuildChoreography(this.root, METER_COLORS.automation, this.bays.length);
     this.root.visible = false; parent.add(this.root); this.write();
   }
 
   get level(): number | undefined { return this.root.visible ? this.automation.value[0] : undefined; }
 
   setTarget({ tiers }: LadderTarget, now: number, immediate: boolean, seed = 0, quiet = false, sampleAt = now): boolean {
-    if (immediate) this.pulses.clear();
-    const tier = tiers.nw;
+    if (immediate) { this.pulses.clear(); this.build.clear(); }
+    const tier = tiers.nw, before = this.tops();
     // Fleets, aircraft and street pods stay mixed until rung 3 completes the district; the bays switch from rung 2.
     this.target = rungStep(tier) === 1 ? tier > 0 ? 1 : 0 : .5;
     this.root.visible = true;
@@ -895,8 +917,24 @@ export class AutomationDistrict {
     const street = routes().streets[0].getPointAt(.908); // the seaside avenue north of DECKS
     this.changedPoints = [...[...bays].map(i => ({ slot: `nw:bay${i + 1}`, x: this.bays[i].x, y: this.bays[i].y + 20, z: this.bays[i].z, r: 26 })),
       ...(a ? [{ slot: 'nw:street', x: street.x, y: street.y, z: street.z, r: 20 }] : [])];
-    if ((a || b || h) && !immediate && !quiet) this.pulses.emit([sitePulse('nw'), ...this.changedPoints], now);
+    if ((a || b || h) && !immediate && !quiet) {
+      this.pulses.emit([sitePulse('nw'), ...this.changedPoints], now);
+      const after = this.tops();
+      // The street slot is fleet traffic, not a built slot.
+      this.build.play(buildItems(this.changedPoints, before, slot => {
+        const i = Number(slot.replace(/\D+/g, '')) - 1, bay = this.bays[i];
+        return slot.startsWith('nw:bay') ? { x: bay.x, y: bay.y, z: bay.z, r: 9.5 * this.scales[i], top: after.get(slot)! } : null;
+      }), now);
+    }
     this.write(); return a || b || h;
+  }
+
+  /** Settled top (metres above the bay's terrace) of each bay: staffed canopy, hybrid service column or autonomous tower. */
+  private tops(): Map<string, number> {
+    return new Map(Array.from(this.staffed.targets, (s, i) => {
+      const h = this.hybrid.targets[i], tower = this.autonomousDesign[i] ? MAST_TOP : PORT_TOP;
+      return [`nw:bay${i + 1}`, this.scales[i] * (h ? HALL_ROOF * .6 + COLUMN_PAD : s ? CANOPY_Y + 2 : tower)] as const;
+    }));
   }
 
   update(now: number, darkness = 0): void {
@@ -905,10 +943,10 @@ export class AutomationDistrict {
     const b = this.staffed.update(now), h = this.hybrid.update(now);
     if (b || h) this.write();
     this.nightRhythm = meterNightRhythm(now, this.automation.value[0], 0, darkness);
-    this.writeDrones(now); this.pulses.update(now);
+    this.writeDrones(now); this.pulses.update(now); this.build.update(now);
   }
 
-  hide(): void { this.root.visible = false; this.pulses.clear(); }
+  hide(): void { this.root.visible = false; this.pulses.clear(); this.build.clear(); }
 
   // ponytail: mirrors settled write() transforms; update this projection when adding carrier geometry.
   getConfiguration() {
@@ -919,7 +957,7 @@ export class AutomationDistrict {
 
   getDiagnostics() {
     const activity = automationActivity(this.level ?? .5);
-    return { enabled: this.root.visible, serviceDrones: this.root.visible ? this.bays.length : 0, nightRhythm: this.nightRhythm, targetAutomation: this.target, automation: this.level, activePulses: this.pulses.active(this.now),
+    return { enabled: this.root.visible, serviceDrones: this.root.visible ? this.bays.length : 0, nightRhythm: this.nightRhythm, targetAutomation: this.target, automation: this.level, activePulses: this.pulses.active(this.now), activeBuilds: this.build.active(this.now),
       pavilions: this.bays.length, visibleStaffedPavilions: this.root.visible ? this.staffed.visible() : 0,
       visibleDronePorts: this.root.visible ? this.staffed.value.filter(v => 1 - v > HIDDEN).length : 0,
       hybridBays: this.root.visible ? this.hybrid.visible() : 0,

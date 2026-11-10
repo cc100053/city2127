@@ -1,7 +1,7 @@
-# build-transition — 共用「起樓／拆樓」轉場（SE 原型）
+# build-transition — 共用「起樓／拆樓」轉場（SE／NW／SW）
 
 - Owner: cc100053（唯一視覺驗收人）
-- Status: IN_PROGRESS — SE 原型完成，等 owner 睇畫面決定去留／調整，先至推去 NW／SW
+- Status: IN_PROGRESS — owner 2026-11-10 睇過 SE 實機後話「可以推去 NW／SW」；NW／SW 已接上，等 owner 睇 NW／SW 畫面再決定 merge
 - Branch: `claude/build-transition-7716d4`
 - Base commit: `4495f05ee344a5694a9bf1e2b15107319627e5ff`
 - Last verified commit: 本 handoff 所在 commit（root `npm test`／`npm run build`／`git diff --check` PASS）
@@ -84,6 +84,17 @@
 - 我自己睇 sheet 嘅觀察（唔係驗收）：日夜兩邊橙色棚架喺 0.5 s 已經企好、位置一眼認到；塔喺棚架入面升／沉睇得出；2.75 s 起＝棚架升走＋冠環，拆＝棚架塌落地＋地面環收，兩個方向分得開。Pod 鏡頭前景被 skyway 遮住一部分。
 - FPS：headless software GL 約 4 fps，**唔可以當效能數字**，真 GPU 未量。
 
+## NW／SW 推展（2026-11-10，owner 批准 SE 後）
+
+- 同一個 `BuildChoreography`，每個 district 只加：一個 `tops()`（由 settled target 計每個 slot 嘅質量頂，米）＋ `setTarget` 入面用共用 `buildItems()` 砌 list。NW＝bay（職員亭頂／hybrid 服務柱／自動塔頂，`nw:street` 唔係建築所以唔播）；SW＝room（玻璃拱頂／halo 簷篷／階梯）同 court（圍牆、溫室、陽傘、pergola、kiosk 嘅最高者）。
+- NW／SW 係「一種形態換另一種」，方向由前後高度決定：變高＝起（棚架升走＋冠環），變矮＝拆（棚架塌落＋地面環收），一樣高（例如 court 只換款）＝只掃一次光。
+- NW `staffed`／`hybrid`、SW `levels`／`court`／`hybridRooms`／`hybridCourts` 改用 `buildProgress` easing；`tests/districtMeters.test.ts` 入面「3 秒中點」斷言相應改為建造段中點（1.4 s）。NE（environment）冇掂。
+- 測試：`tests/buildTransition.test.ts` 加 NW／SW——snapshot 同 quiet 唔播、每個變咗嘅 slot（street 除外）一個 build、3 s 後清、`immediate` 取消。`npm test` exit 0、`npm run build` ✓、`git diff --check` clean。
+- 截圖（同一套 headless 設定）：`nw:bay6`（`nw:2↔5`，27 m ↔ 52 m）、`sw:room1`（`sw:2↔5`，拱頂 16 m ↔ 2 m）、`sw:court8`（`sw:-5↔-2`，5 m ↔ 10 m），日 12:00／夜 22:00，t = 0.5／1.5／2.5／2.75／3.2 s；`sheet-nwsw-h12.jpg`／`sheet-nwsw-h22.jpg`、`draw-calls-nwsw.log`、`capture2.mjs`。Page error：0。
+- Draw call（穩定值，settled → t = 1.5 s）：bay6 904 → 916；room1 729 → 741；court8 668 → 680（夜晚各 +1，差一樣）。全部 **+12（編排 +8、原有 pulse +4）**，同時播 2 個（NW）定 10 個（SW）slot 都一樣。
+- 我自己睇 sheet 嘅觀察（唔係驗收）：NW 藍色棚架入面自動塔升／沉好清楚；SW room 拱頂開合讀得出；court 高度只有 5–10 m，棚架扁，方向感比塔弱。**夜晚 SW room 喺水面有好強嘅粉紅倒影條**（水面反射 unlit 棚架），日間冇。
+- `sw:court3／4／6／7／9` 喺本 branch 嘅舊 shot table 仲係瞄錯位（同 SE pod 一樣，另一個 branch 修緊），所以 court 用 `court8`。
+
 ## Known issues / not measured
 
 - **`se:pod2` 鏡頭**：本 branch 嘅 `SHOTS['se:pod2']` 仲係舊表（瞄住而家叫 pod1 嘅位）；`chore/closeup-frequency-sheet` 已經改緊。Pod 截圖用嗰個 branch 未 commit 嘅新 pose `cityPose([-173,38,7],[-103,3,17])`。新 pose 前景有藍色 skyway 橫過，遮住部分 pod——屬於 shot table，唔係本任務。
@@ -100,4 +111,4 @@
 
 ## Next expected step
 
-Owner 睇 `~/city2127-evidence/build-transition/` 嘅 sheet → 決定：接受／調（棚架粗幼、顏色、無人機、收尾拍）／唔要。接受之後先至：(a) 推去 NW bay、SW room／court（每個 district 加一段砌 `BuildItem` 嘅 code）；(b) 喺真 GPU 量 FPS；(c) `chore/closeup-frequency-sheet` 合併後同步 PROJECT／VALIDATION／EXHIBITION_SPEC；(d) 按 CONTRIBUTING 合併。**未得 owner 視覺批准唔好 merge main。**
+Owner 睇 `~/city2127-evidence/build-transition/` 嘅 sheet → 決定：接受／調（棚架粗幼、顏色、無人機、收尾拍）／唔要。接受之後先至：(a) ~~推去 NW／SW~~（已做，等 owner 睇 `sheet-nwsw-*.jpg`）；(a2) `chore/closeup-frequency-sheet` 合併後做「鏡頭優先揀塔」（owner 2026-11-10 問過，同意等嗰個 branch）；(b) 喺真 GPU 量 FPS；(c) `chore/closeup-frequency-sheet` 合併後同步 PROJECT／VALIDATION／EXHIBITION_SPEC；(d) 按 CONTRIBUTING 合併。**未得 owner 視覺批准唔好 merge main。**
