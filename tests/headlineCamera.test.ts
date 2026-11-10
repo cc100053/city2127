@@ -9,7 +9,7 @@ import { ARRIVAL_SECONDS } from '../src/voteJourney.ts';
 import { reasonDelayMs } from '../src/resultTimeline.ts';
 import { SITE_TRANSITION_SECONDS } from '../src/siteBuilders/siteRuntime.ts';
 import { energyChangedPart, residentResult } from '../src/surveyAtmosphere.ts';
-import { AutomationDistrict } from '../src/districtMeters.ts';
+import { AutomationDistrict, ConcentrationDistrict, SharingDistrict } from '../src/districtMeters.ts';
 import type { ExhibitionProposal } from '../src/surveyView.ts';
 const zero = { automation: 0, environmentalPriority: 0, publicSharing: 0, urbanConcentration: 0 };
 const layout = deriveExhibitionLayout(zero);
@@ -56,7 +56,7 @@ assert.equal(reasonDelayMs(DISPLAY_MS,true),0);
 assert.equal(reasonDelayMs(DISPLAY_MS-101,false),0);
 assert.equal(shotStage(3),'fly-in','the flight starts after the vote journey');
 assert.deepEqual([0,t.flyIn,t.hold,t.flyOut,t.done].map(elapsed=>shotStage(elapsed)),['journey','fly-in','hold','fly-out','done']);
-assert.equal(Object.keys(SHOTS).length,74);
+assert.equal(Object.keys(SHOTS).length,52);
 for (const [id, pose] of Object.entries(SHOTS)) {
   const p=new Vector3(...pose.position),target=new Vector3(...pose.target);
   // No elevation or heading rule (owner 2026-11-05): each building's clear sightline decides its angle; only distance is bounded.
@@ -116,11 +116,20 @@ assert.equal(picker.play([{...district,focalOnly:true,points:[point('nw:bay1')]}
 // NW bay slots follow the live district (slot `nw:bay${i + 1}`), so removed bays cannot leave shots aimed at empty ground.
 const bays = new AutomationDistrict(new Group()).bays.length;
 assert.equal(Object.keys(VIEWPOINT_COVERAGE).filter(id => id.startsWith('nw:bay')).length, bays, 'one NW bay viewpoint per live bay');
-for (const [site, groups] of Object.entries({nw:{bay:bays},sw:{room:6,court:10},se:{tower:10,pod:26}})) {
-  for (const [group, count] of Object.entries(groups)) for (let i=1;i<=count;i++) {
-    const slot = `${site}:${group}${i}`;
-    assert.ok(Object.values(VIEWPOINT_COVERAGE).some(covered=>covered.includes(slot)), `${slot} has a viewpoint`);
+// Every live slot has a viewpoint aimed at it, and no viewpoint names a slot the district no longer builds (footprint filters renumber slots).
+{
+  const sw = new SharingDistrict(new Group()), se = new ConcentrationDistrict(new Group()), nw = new AutomationDistrict(new Group());
+  const live = Object.fromEntries([
+    ...nw.bays.map((p, i) => [`nw:bay${i + 1}`, p] as const), ...sw.bays.map((p, i) => [`sw:room${i + 1}`, p] as const), ...sw.courts.map((p, i) => [`sw:court${i + 1}`, p] as const),
+    ...se.towers.map((p, i) => [`se:tower${i + 1}`, p] as const), ...se.pods.map((p, i) => [`se:pod${i + 1}`, p] as const),
+  ]);
+  for (const [slot, p] of Object.entries(live)) {
+    const views = Object.entries(VIEWPOINT_COVERAGE).filter(([, covered]) => covered.includes(slot));
+    assert.ok(views.length, `${slot} has a viewpoint`);
+    const [x, , z] = SHOTS[slot as ShotId].target;
+    assert.ok(Math.hypot(x - p.x, z - p.z) <= 40, `${slot} viewpoint aims at its live slot`);
   }
+  for (const slot of Object.values(VIEWPOINT_COVERAGE).flat()) assert.ok(slot === 'nw:street' || Object.hasOwn(live, slot), `${slot} is a live slot`);
 }
 assert.equal(picker.play([{...district,points:[point('nw:unknown')]}],105),'nw:district');
 const tie = new HeadlineCamera(new PerspectiveCamera(42),{target:new Vector3(...HERO_TARGET),enabled:true,update(){}});

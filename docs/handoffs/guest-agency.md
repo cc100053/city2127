@@ -187,7 +187,8 @@ AGENTS.md（每票影響力描述）、EXHIBITION_SPEC（分級階梯段、能�
 2. G4／G7 視覺：live 過場、夜景、其餘 viewpoint、SE 難辨、水庭構圖、全程遮擋／near plane；`sw:court3`、`nw:street` 已於 2026-11-01 重新構圖，只驗證靜態日夜畫面。
 3. 性能：SE tower6 1191 calls 對 district 中位數 718，需配對陰影重繪比較。
 4. 最終真人兩秒辨認：owner 一人在家（2026-10-30 決定）。
-5. 展覽前開新 run（replay 規則已變）；完成後歸檔本 handoff 並刪除 `codex/guest-agency-recovery`。
+5. 視角審視（owner 2026-11-05 提出；2026-11-10 已做頻率統計及鏡頭表修正，見下方進度）：餘下工作係 owner 睇對照表分流，以及決定 district 近鏡係咪由 37 個 slot viewpoint 收窄成每個 site 1–2 個闊鏡。Owner 2026-11-10 表示投票規則可以為展示效果調整；任何規則改動仍須先提交 owner。共用「建造過場」SE 原型喺 branch `claude/build-transition-7716d4`（未合併，等 owner 睇畫面）。
+6. 展覽前開新 run（replay 規則已變）；完成後歸檔本 handoff 並刪除 `codex/guest-agency-recovery`。
 
 ## 進度
 
@@ -214,3 +215,17 @@ G7 未達完整視覺驗收：64 個保守目標包圍盒只排除自身跨 near
 2026-11-01 recovery：機器重啟令 `/private/tmp` checkout 消失，Codex 於持久 checkout（基於 `6e3514f`，branch `codex/guest-agency-recovery`）重組 G1–G3、G7 與 G2 候選；部分檔案只由紀錄還原，未能逐位元證實與原 commit 相同。接手後 root `npm test`（修正 `energyPrototype` 靜態 batch 上限：加入 8 個 activity frame，由 `< 50` 改為 `< 50 + 3 * 8`）、root／survey `npm run build`、survey `npm test`、`git diff --check` 均通過。G5 文案（owner 暫緩）、G4 視覺（SW court3 與 focal 重疊、SE 難辨、街道前景柱、水庭構圖）、陰影配對性能、owner 一人在家兩秒辨認仍未完成；不 merge、不 push。
 
 2026-11-01 court3／street 鏡頭：`sw:court3` 改為 [-122,60,360]→[-110,3,230]（原 [-145,113,330]，太貼近俯視、前景柱）；`nw:street` 改為 [213,75,-345]→[113,4,-333]（原 [203,65,-423]，前景大樓佔左邊，海面少）。各試 8 個 130／100 m 方位候選，靜態 high 狀態日（12:00）與夜（22:00）檢視；court3 日間地面仍偏白、僅靠紅傘分辨，街道左側仍有屋頂佔約 1/4。未測 live 過場、遮擋／near plane 全程。root `npm test`、`npm run build` 通過。
+
+2026-11-10 頻率統計及鏡頭表修正（branch `chore/closeup-frequency-sheet`）：新增 [closeupFrequencySim](../../scripts/closeupFrequencySim.ts)，用正式 ladder／`pickHeadline`、真實 district `changedPoints` 及 `HeadlineCamera.play`，200×40 偏向模型（同 agencySim，唔係真人數據）統計每份提案觸發邊個 shot。8000 份提案全部有 shot：focal 5 個 shot 合共約 32%（`sw:focal` 10.5%，其餘四個各 5.1–5.6%）；district viewpoint 約 64%，最高 `nw:bay1` 5.6%、`nw:bay2` 4.3%，其餘每個 0.5–3.1%；能源 4 個 shot 合共約 4.5%，當中約九成係 G2 activity 輪替。`focal` 以「band 有變」近似，未建立真 focal controller。
+
+統計同時發現 P1 r3（`cd67a86`）清走 megastructure／hero 範圍內嘅塔、pod、水庭之後，鏡頭表冇跟住改：SE 只剩 4 座塔＋10 個 pod，但 `se:tower3`／`tower4` 同全部 10 個 `se:pod*` 仍係舊編號嘅 pose，鏡頭目標離實際 slot 158–592 單位（約佔模擬提案 14%）；另有 22 個 SE viewpoint 已無對應 slot；`sw:court4`／`court6`／`court7` 水庭移位後鏡頭偏離 63–125 單位。修正：SE 改用對應現存 slot 嘅舊 pose（`se:pod4` 因 pod 由 207,37 移到 182,37，整個 pose 平移），刪去 22 個死 viewpoint，三個水庭鏡頭連目標一齊平移；固定 shot 由 74 減至 52（district viewpoint 59 → 37）。`tests/headlineCamera.test.ts` 新增檢查：每個現存 slot 都有 viewpoint，而且鏡頭目標離 slot 不超過 40 單位，鏡頭表亦不可列出已不存在嘅 slot（舊表會喺 `sw:court4` 失敗）。平移／改鍵後嘅 pose 只做咗靜態畫面檢視，未驗證 live 過場、遮擋同 near plane。
+
+對照表：[closeupSheet](../../scripts/closeupSheet.mjs) 用 Vite DEV `?meters=&shot=`（slot seed 0、其他 site 喺 0、`reviewTime=20`）拍 43 行 before／after，日 12:00、夜 22:00，1600×900 headless Chrome，輸出喺 `~/city2127-evidence/closeup-frequency-sheet/`（`index.html`、`contact-*.jpg`）。屬靜態分流工具，唔代表 live 過場；能源近鏡未包括。
+
+對照表初步分流（2026-11-10，Claude 睇靜態日夜圖，唔係 owner 驗收；行號係對照表次序）：
+- 變化清楚：7 個 focal 行（1–3、5–7，合共約 32% 提案）全部一眼睇到；district 入面 `nw:bay1`、`nw:bay6`、`sw:room1`／`room2`／`room3`／`room4`、`sw:court2`／`court3`／`court7`／`court8` 清楚。
+- 靜態圖睇唔到變化：`nw:street`（2.6%，車流／飛行器變化靜態無分別，要 live 驗證）、`nw:bay3`（2.1%，前景屋頂遮住）。
+- 鏡頭被遮擋：`sw:court10`（1.0%，成個畫面係巨構表面）、`sw:court5`（0.8%，兩條斜柱橫過）、`nw:bay4`（1.8%，右邊四成係牆）、`nw:bay5`（1.5%，巨柱佔右邊）、`se:pod1`（1.2%，前景白色穹頂佔下半）、`se:pod2`（1.3%，天橋橫過）。
+- 變化太細：`se:tower3`（2.5%，塔喺畫面入面好細）、`sw:room5`／`room6`、`sw:court1`、全部 `se:pod*`（每個 0.7–1.3%，pod 只係一個細綠色圓盤出現或消失）。
+- 其他：`se:tower4` 夜景右上有一大塊白色過曝；`se:tower1`／`tower2` 見到塔變，但畫面俾巨構同柱分散注意力。
+- 改鍵後嘅 SE pose（`se:tower3`／`tower4`、10 個 pod）同平移咗嘅 `sw:court4`／`court6`／`court7` 全部對準實際有變化嘅 slot。
