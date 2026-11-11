@@ -160,7 +160,7 @@ export const sphereApproach: readonly P3[] = [[-620,190,-640],[-380,195,-360],[-
 // (district quadrotors). The shore lane is one closed loop off the north shore: its inbound leg runs 45 m out at 80 m westward, its
 // outbound leg 120 m out at 100 m eastward, so the two directions read as separate lanes. Offsets of a smoothed shore, ending west of
 // the AUTO HUB site.
-export const shoreLaneInner: readonly P3[] = [[-65,80,-317],[-152,80,-258],[-220,80,-218],[-294,80,-186],[-367,80,-112],[-464,80,-53]];
+export const shoreLaneInner: readonly P3[] = [[-65,80,-317],[-152,80,-258],[-220,80,-218],[-294,80,-186],[-367,80,-112],[-454,80,-28]];
 export const shoreLane: readonly P3[] = [...shoreLaneInner,
   [-520,90,-80],[-503,100,-117],[-413,100,-171],[-339,100,-247],[-254,100,-285],[-193,100,-321],[-108,100,-379],[-50,90,-350]];
 // Regional light corridors (ambient: independent of the Meters): three open centre lines at 200–320 m, tuned against the c2 hero pose

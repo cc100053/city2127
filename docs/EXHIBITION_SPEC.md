@@ -185,3 +185,5 @@ Admin Day／Night／Auto 保存為獨立 display setting：12:00／22:00／180 �
 ## 問卷介面配色 — 2026-11-07 獨立分支
 
 使用者確認問卷採石墨灰背景、柔和青綠選取色、暖琥珀主按鈕與 5px 圓角，呼應深灰金屬、青色燈條及橙黃裝飾的展台參考。`feat/guest-ui-graphite` 將此視覺延伸至開始、四題、核對、等待、結果與交接畫面。選項新增簡短日文標題，正式問題與完整選項原文持續顯示。操作沿用既有問卷與探索流程。此為獨立 UI 分支，實際 iPad 與現場照明舒適度仍待驗收。實作與驗證見[交接](handoffs/guest-ui-graphite.md)。
+
+Sky Ring Blender polish R4（2026-11-08）仍是待 owner 接受嘅候選；原沿岸航線與支柱相撞後，owner 決定局部調整航線，採樣驗證及逐項視覺改善見交接。詳見 [交接](handoffs/skyring-closeup-polish.md)。

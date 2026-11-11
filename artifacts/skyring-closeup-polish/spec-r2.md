@@ -1,0 +1,24 @@
+# Sky Ring Blender polish — R2
+
+Owner 2026-11-06: fix all score-1 items. R1 median 13/22; target/capture crops in `rubric.md`. Use the same four camera poses, 3200×1800. Keep R1 code and captures as the previous round for pairwise blind comparison.
+
+## Keep
+
+- `berth-apron` 2: `apron` layered `slab(plan(...))`, `padGrey`, `slate`, `pearl`, fascia lights, the root `RingGeometry` docking marking and `berthPark` alignment. Do not alter these parts; additional access must attach at their boundaries. Compare a fresh crop against R1.
+- `voices-lamps` 2: `voicePosition`, `VOICE_NODES`, lamp geometry, `voices`, `paint`, `setVoices`, `highlight`, lamp colours and emissive strengths. Do not alter these; recrop and compare against R1. The `warmUnder` material affects `voices-structure` and the lamp crop's apparent light; adjust only where it improves structure, and check lamps for regression.
+
+## Items to fix
+
+- `berth-hall`, `berth-people`: make the two distinct floors readable from the review camera, open transparent camera-facing glazing with narrow frames and a slim curved pearl roof; populate each floor with enough visible residents. Generate upper-floor positions in the hall's own local coordinates and prove their feet lie on the actual mezzanine, not the ellipse approximation; prevent people intersecting glazing or the pod. The exterior Blender staircase descends from the mezzanine to a real deck landing: verify both contacts, clear access, and avoid floating or clipping. Keep the hall at the scale chosen in R1 unless needed to meet the target.
+- `berth-walk`, `berth-garden`: a broad, clearly connected curved walkway around the hall with visible translucent edge guards; shape varied planted islands as in the berth target. Replace repetitive round crowns with dense irregular low shrubs and genuinely varied tree forms; keep a clear pedestrian route and ground under every person.
+- `truss-lower`, `truss-frame`, `truss-berth`: make the lower walk visually continuous inside the existing ring and explicitly connect the berth to it with supported stairs or equivalent; transparent rails and sufficient people must read against sky. Give the structural nodes rounded sculpted transitions and make the repeating triangular bottom chord clearly visible, retaining the main brace silhouette and cyan upper fascia. Give people adequate headroom and avoid intersections with rails, diagonals and lamps. Model the structural junction details in Blender where appropriate, and keep source/export in sync.
+- `pylon-shell`: replace the long near-smooth striped casing with a thick, visibly articulated tapered outer shell, with multiple transverse segmented joints, recessed dark longitudinal channels and shaped pylon-to-ring transitions like the target. All six pylon V supports keep their original attachment centres. Use Blender editable source/GLB; retain no coplanar internal duplicate faces. Check actual exported shell geometries for clearance against real loaded roads, buildings, sites and actor routes, and include the shell in the hero sightline test or an equivalent runtime browser raycast. A simple node-name test does not prove this.
+- `voices-structure`: make the lower structural surfaces read warm-white at night and preserve the cyan edge while keeping individual 240 count-controlled lamps unchanged. Compare the `voices-lamps` crop against R1 because the material behind it is shared.
+
+## Required checks and evidence
+
+Before the browser captures, diff all Keep code against R1 and undo unmentioned modifications. Verify Blender source opens, GLB reimports, Blender game-profile QA passes (fix errors and report warnings) and inspect material/wireframe contact sheets. Add small meaningful assertions or raycast checks for upper-floor/stair contact and new shell geometry/clearances; report actual measured scope, never infer unloaded GLB clearance from Node's synchronous test. Keep the animated explore pod and guest voice highlight aligned and independently controllable. Run `npm test`, `npm run build`, and `git diff --check`. Capture the same four named poses and hero day/night; at most three compare/capture iterations. If an actual clearance or other constraint prevents matching a target feature, stop and report the constraint for owner decision instead of lowering the spec. Report any changes after the screenshots and recapture those affected.
+
+## Owner decision — shore route
+
+2026-11-06: actual wing geometry on the shore route intersects pylon `PYLONS[3]`'s negative leg; the worker reproduced it on original main as well as R1 and R2. The owner chose to retain the thick segmented pylon and locally adjust the air route to clear it. Modify only the necessary shore segment and verify real aircraft over valid lateral variations, surrounding landmarks/sites/structures, other air traffic and all pylon legs; record measured clearances and test scope. Route adjustment is explicitly in scope.
