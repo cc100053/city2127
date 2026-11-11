@@ -1,7 +1,7 @@
 # build-transition — 共用「起樓／拆樓」轉場（SE／NW／SW）
 
 - Owner: cc100053（唯一視覺驗收人）
-- Status: IN_PROGRESS — owner 2026-11-10 睇過 SE 實機後話「可以推去 NW／SW」；NW／SW 已接上，等 owner 睇 NW／SW 畫面再決定 merge
+- Status: IN_PROGRESS — owner 2026-11-10 睇過 SE 實機後話「可以推去 NW／SW」；NW／SW 已接上，owner 2026-11-11 指示合併入 main（NW／SW 畫面未有獨立視覺驗收記錄）
 - Branch: `claude/build-transition-7716d4`
 - Base commit: `4495f05ee344a5694a9bf1e2b15107319627e5ff`
 - Last verified commit: 本 handoff 所在 commit（root `npm test`／`npm run build`／`git diff --check` PASS）
@@ -12,7 +12,7 @@
 - Session starting branch and HEAD: `claude/build-transition-7716d4` `4495f05ee344a5694a9bf1e2b15107319627e5ff`（worktree，clean）
 - Last fetched origin/main commit: `4495f05ee344a5694a9bf1e2b15107319627e5ff`（2026-11-10；HEAD 同 origin/main 0/0）
 - Local changes present at session start: NONE
-- Upstream integration status: NOT INTEGRATED（未合併 main，等 owner 視覺批准）
+- Upstream integration status: INTEGRATED — 2026-11-11 merge commit `641e80c`（owner 指示；合併後 root `npm test`／`npm run build`／`git diff --check` PASS）
 - Pending Git conflicts or synchronization blockers: `chore/closeup-frequency-sheet` 同時改緊 `src/headlineCamera.ts`（`SHOTS`／`VIEWPOINT_COVERAGE`）、`tests/headlineCamera.test.ts`、`docs/EXHIBITION_SPEC.md`、`docs/PROJECT.md`、`docs/handoffs/guest-agency.md`；本任務冇掂呢啲檔案，文件同步（PROJECT／VALIDATION）留返嗰個 branch 合併之後先做。
 
 ## Goal and acceptance criteria
