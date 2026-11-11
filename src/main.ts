@@ -213,7 +213,7 @@ try {
     if(params.has('elevatorNear'))elevatorNear.setActive(true);
     const shot=params.get('shot');
     // `?meters=nw:2&shot=nw:resident`: human-scale 湊 prototype (src/devMinato.ts); its pose is not in SHOTS, which stay the production close-ups.
-    if(shot==='nw:resident'){(window as unknown as {cityPose:(p:number[],t:number[])=>void}).cityPose([60.4,5.5,-286.8],[55.3,4.7,-290]);import('./devMinato').then(({startMinato})=>{devFrame=startMinato(scene);});}
+    if(shot==='nw:resident'){const at=new T.Vector3(59.3,5,-288.2);(window as unknown as {cityPose:(p:number[],t:number[])=>void}).cityPose(at.toArray(),[55.4,5.1,-289.4]);import('./devMinato').then(({startMinato})=>{devFrame=startMinato(scene,camera,at);});}
     else if(shot!==null)(window as unknown as {cityShot:(id:string)=>void}).cityShot(shot);
   }
   // Applied after the first frame, so `now` already holds the clock (or a held `reviewTime`) rather than its initial 0.

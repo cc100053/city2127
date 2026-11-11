@@ -1,25 +1,32 @@
-// DEV prototype "Minato's counter closes": the 5 s action as a pure function of time (loops every 7 s: 5 s action + 2 s hold). Metres, puppet space (+Z = counter front).
-export const MINATO_LOOP = 7;
+// DEV prototype "Minato's counter closes": the action as a pure function of time (7 s of action + 2 s hold, looping). Metres, puppet space (+Z = counter front, +X = right of the opening).
+export const MINATO_LOOP = 9;
 const sm = (v: number) => { const c = Math.min(1, Math.max(0, v)); return c * c * (3 - 2 * c); };
-const WALK_FROM = 3.3, WALK_TO = 5;
-// Two legs: sideways out of the booth (toward the camera side), then away from the camera (3 m in all).
-const LEG1 = { from: [0, -.35], to: [-1.3, -.35] }, LEG2 = { from: [-1.3, -.35], to: [-1.7, -2] };
+/** Smoothstep between [time, value] keys; holds the first and last value. */
+const key = (keys: readonly (readonly [number, number])[], t: number) => {
+  let i = keys.findIndex(k => k[0] > t);
+  if (i < 0) return keys[keys.length - 1][1];
+  if (i === 0) return keys[0][1];
+  const [t0, v0] = keys[i - 1], [t1, v1] = keys[i];
+  return v0 + (v1 - v0) * sm((t - t0) / (t1 - t0));
+};
+// Path keys [t, x, z]: inside the booth, out to the side then to the front of the opening (1.5-2.5 s), three steps away (4-5.2 s), a few more after the look back (6.5-7.2 s).
+const PATH = [[0, 0, -.35], [1.5, 0, -.35], [2, -1.25, -.35], [2.5, -1.25, .7], [4, -1.25, .7], [5.2, -1.05, -1.4], [6.5, -1.05, -1.4], [7.2, -1.1, -2.4]] as const;
+const DIST = PATH.reduce<number[]>((acc, p, i) => [...acc, i ? acc[i - 1] + Math.hypot(p[1] - PATH[i - 1][1], p[2] - PATH[i - 1][2]) : 0], []);
+const YAW = [[0, 0], [1.5, 0], [1.7, -1.57], [2, -1.57], [2.4, .6], [4, .6], [4.4, -2.8], [9, -2.8]] as const; // faces the shutter while pulling, away while walking
+const LOOK = [[0, 0], [5.2, 0], [5.8, -1.5], [6.5, -1.5], [6.9, 0]] as const; // upper body twists back toward the booth (the head follows further)
 
 export function minatoPose(time: number) {
   const t = ((time % MINATO_LOOP) + MINATO_LOOP) % MINATO_LOOP;
-  const walk = Math.min(1, Math.max(0, (t - WALK_FROM) / (WALK_TO - WALK_FROM)));
-  const len1 = Math.hypot(LEG1.to[0] - LEG1.from[0], LEG1.to[1] - LEG1.from[1]), len2 = Math.hypot(LEG2.to[0] - LEG2.from[0], LEG2.to[1] - LEG2.from[1]);
-  const d = walk * (len1 + len2), leg2 = d > len1, u = leg2 ? (d - len1) / len2 : d / len1, [a, b] = leg2 ? [LEG2.from, LEG2.to] : [LEG1.from, LEG1.to];
-  // Turns from the counter (+Z) to the exit direction in 3.0-3.3 s, then to his walking course.
-  const yaw = -Math.PI / 2 * sm((t - 3) / .3) - (Math.PI / 2) * sm((d - len1 + .2) / .4);
+  const next = PATH.findIndex(p => p[0] > t), i = next < 0 ? PATH.length - 1 : Math.max(1, next); // after the last key the final segment holds at u = 1
+  const [t0, x0, z0] = PATH[i - 1], [t1, x1, z1] = PATH[i], u = Math.min(1, Math.max(0, (t - t0) / (t1 - t0)));
   return {
     t,
-    x: a[0] + (b[0] - a[0]) * u, z: a[1] + (b[1] - a[1]) * u, yaw,
-    gait: walk > 0 && walk < 1 ? d * 3.2 : 0, moving: walk > 0 && walk < 1,
-    reach: sm((t - 1.5) / .4) * (1 - sm((t - 2.7) / .3)), // right arm up to the shutter handle and back
-    tablet: sm((t - 3) / .3), // left arm lifts the tablet to reading height
-    shutter: sm((t - 1.7) / 1.3), // 0 open .. 1 closed
-    light: 1 - sm((t - 1.8) / 1.2), // warm counter light
-    drone: (t - 1.5) / 2, // 0..1 while it crosses over; outside the range it is out of frame
+    x: x0 + (x1 - x0) * u, z: z0 + (z1 - z0) * u, yaw: key(YAW, t), look: key(LOOK, t),
+    gait: (DIST[i - 1] + (DIST[i] - DIST[i - 1]) * u) * 3.2, moving: u > 0 && u < 1 && (x0 !== x1 || z0 !== z1),
+    reach: sm((t - 2.6) / .4) * (1 - sm((t - 3.6) / .4)), // right arm up to the shutter and back
+    tablet: sm((t - 4) / .3), // left arm lifts the tablet to reading height
+    shutter: sm((t - 2.7) / 1.2), // 0 open .. 1 closed
+    light: 1 - sm((t - 2.8) / 1), // warm counter light
+    drone: (t - 2.2) / 2, // 0..1 while it crosses over (centre at 3.2 s)
   };
 }

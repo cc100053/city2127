@@ -14,7 +14,7 @@ const part = (parent: T.Object3D, geometry: T.BufferGeometry, material: T.Materi
 const cube = (w: number, h: number, d: number) => new T.BoxGeometry(w, h, d);
 
 /** Returns the per-frame callback for main's `devFrame`; `window.cityMinatoT = s` freezes the action at s seconds (frame capture). */
-export function startMinato(scene: T.Scene) {
+export function startMinato(scene: T.Scene, camera: T.PerspectiveCamera, at: T.Vector3) {
   const stage = scene.getObjectByName('hub-stage'), high = scene.getObjectByName('hub-state-high');
   if (!stage || !high) throw new Error('?shot=nw:resident needs the NW hub (meters=nw:2)');
   // Stage units are 3 m (site scale 3): scale the puppet space by 1/3 so everything is in metres. Floor = plinth top (1.2).
@@ -25,42 +25,62 @@ export function startMinato(scene: T.Scene) {
 
   const lamp = mat('#f6d9a8', '#ffb45a');
   const uniform = mat('#2b3a55'), skin = mat('#e8cdb0'), capMat = mat('#16233a');
-  // Booth: counter, two posts, header, lit back panel, shutter panel.
+  // Ground: a darker paving patch with joint lines, so the white plinth reads in day (DEV-only meshes, shared materials untouched).
+  const paving = mat('#7d8896'), joint = mat('#56616e');
+  part(rig, cube(8, .02, 7), paving, -.5, .03, -.2);
+  for (let k = -3; k <= 3; k++) { part(rig, cube(8, .025, .05), joint, -.5, .035, k * 1.1); part(rig, cube(.05, .025, 7), joint, -.5 + k * 1.1, .035, -.2); }
+  // Booth: counter, two posts, shutter housing (header), lit back panel, shutter panel that rolls down out of the housing.
   part(rig, cube(1.6, 1, .5), white, 0, .5, .5);
-  for (const x of [-.8, .8]) part(rig, cube(.1, 1.3, .1), white, x, 1.65, .5);
-  part(rig, cube(1.8, .15, .7), white, 0, 2.3, .5);
+  for (const x of [-.8, .8]) part(rig, cube(.1, 1.2, .1), white, x, 1.6, .5);
+  part(rig, cube(1.9, .45, .8), white, 0, 2.425, .5);
   part(rig, cube(1.5, 1.2, .05), lamp, 0, 1.6, -.75);
-  const shutter = part(rig, cube(1.5, 1.2, .06), mat('#c9d4de'), 0, 2.98, .9);
+  const shutter = part(rig, cube(1.5, 1.2, .06), mat('#c9d4de'), 0, 1.6, .5);
   const light = new T.PointLight('#ffb45a', 0, 6, 1.5);
   light.position.set(0, 1.6, -.3);
   rig.add(light);
 
-  // Minato: head, cap (dome + brim), torso, two arms (the left holds the tablet), two legs.
-  const man = new T.Group();
+  // Minato: legs below the hip; torso, arms and head (cap dome + brim) on `upper`, which twists at the hip for the look back.
+  const man = new T.Group(), upper = new T.Group(), head = new T.Group();
+  upper.position.y = .9;
+  head.position.y = 1.64 - .9;
   rig.add(man);
-  part(man, new T.SphereGeometry(.12, 12, 8), skin, 0, 1.62, 0);
-  part(man, new T.SphereGeometry(.13, 12, 6, 0, Math.PI * 2, 0, Math.PI * .5), capMat, 0, 1.66, 0);
-  part(man, cube(.2, .02, .14), capMat, 0, 1.67, .12);
-  part(man, new T.CapsuleGeometry(.17, .5, 3, 8), uniform, 0, 1.15, 0);
-  const limb = (x: number, y: number, r: number, len: number, material: T.Material) => {
+  man.add(upper);
+  upper.add(head);
+  part(head, new T.SphereGeometry(.12, 12, 8), skin, 0, -.02, 0);
+  part(head, new T.SphereGeometry(.13, 12, 6, 0, Math.PI * 2, 0, Math.PI * .5), capMat, 0, .02, 0);
+  part(head, cube(.2, .02, .14), capMat, 0, .03, .12);
+  part(upper, new T.CapsuleGeometry(.17, .5, 3, 8), uniform, 0, .25, 0);
+  const limb = (x: number, y: number, r: number, len: number, material: T.Material, parent: T.Object3D = man) => {
     const pivot = new T.Group();
     pivot.position.set(x, y, 0);
     part(pivot, new T.CapsuleGeometry(r, len, 3, 6), material, 0, -len / 2 - r, 0);
-    man.add(pivot);
+    parent.add(pivot);
     return pivot;
   };
-  const armR = limb(.25, 1.42, .05, .5, uniform), armL = limb(-.25, 1.42, .05, .5, uniform);
+  const armR = limb(.25, .52, .05, .5, uniform, upper), armL = limb(-.25, .52, .05, .5, uniform, upper);
   part(armL, cube(.2, .02, .27), mat('#10151c', '#4fb8ff'), 0, -.62, .1);
   const legR = limb(.09, .88, .07, .6, mat('#1f2a3a')), legL = limb(-.09, .88, .07, .6, mat('#1f2a3a'));
 
   // One delivery drone: the hub's own quad mesh, 1.5 m across.
   const drone = quadFleet(rig, 1, 'minato-drone'), pose = new T.Object3D();
-  pose.scale.setScalar(1.5 / 5.6);
+  pose.scale.setScalar(1.9 / 5.6);
+  const tint = new T.Color('#3b4655'); // the shared white frame vanishes against the white drum wall: darken this one instance
+  rig.traverse(o => { if (o instanceof T.InstancedMesh && o.name === 'minato-drone') o.setColorAt(0, tint); });
   let frozen: number | null = null;
   Object.assign(window, { cityMinatoT: (seconds: number | null) => { frozen = seconds; } });
 
+  // The pose's narrow lens applies only while the camera sits on this DEV pose (a shot button or a live change moves it away).
+  const fov = camera.fov, FOV = 52;
+  const edge = new T.Vector3();
+  Object.assign(window, { cityMinatoFigure: () => { // standing height as a fraction of the frame height
+    const top = man.localToWorld(edge.set(0, 1.72, 0)).project(camera).y, bottom = man.localToWorld(edge.set(0, 0, 0)).project(camera).y;
+    return (top - bottom) / 2;
+  } });
+
   return (now: number) => {
-    const shown = high.visible && high.scale.y > .999;
+    const here = camera.position.distanceTo(at) < .05;
+    if (camera.fov !== (here ? FOV : fov)) { camera.fov = here ? FOV : fov; camera.updateProjectionMatrix(); }
+    const shown = here && high.visible && high.scale.y > .999;
     rig.visible = shown;
     drone.show(shown);
     if (!shown) return;
@@ -69,12 +89,16 @@ export function startMinato(scene: T.Scene) {
     man.rotation.y = p.yaw;
     const swing = p.moving ? Math.sin(p.gait) * .5 : 0;
     legR.rotation.x = swing; legL.rotation.x = -swing;
+    upper.rotation.y = p.look;
+    head.rotation.y = p.look * .35;
     armR.rotation.x = -2.6 * p.reach + (p.moving ? -swing * .6 : 0);
     armL.rotation.x = -1.1 * p.tablet;
-    shutter.position.y = T.MathUtils.lerp(2.98, 1.6, p.shutter);
+    shutter.visible = p.shutter > .01;
+    shutter.scale.y = Math.max(.01, p.shutter);
+    shutter.position.y = 2.2 - .6 * shutter.scale.y; // hangs from the housing's underside
     light.intensity = p.light * 6;
     lamp.emissiveIntensity = .2 + p.light * .8;
-    pose.position.set(T.MathUtils.lerp(-6, 6, T.MathUtils.clamp(p.drone, 0, 1)), 3.2, -1.5);
+    pose.position.set(T.MathUtils.lerp(-3.2, 3.2, T.MathUtils.clamp(p.drone, 0, 1)), 3.6, -2.5);
     pose.rotation.y = Math.PI / 2;
     if (p.drone < 0 || p.drone > 1) pose.position.y = -50;
     drone.set(0, pose);
