@@ -97,8 +97,10 @@ export function createMinato(scene: T.Scene) {
     return (top - bottom) / 2;
   };
 
+  /** Screen y in CSS pixels of the point `y` metres above Minato's feet (debug measurement). */
+  const screenY = (camera: T.PerspectiveCamera, y: number) => (1 - man.localToWorld(edge.set(0, y, 0)).project(camera).y) / 2 * innerHeight;
   return {
-    standingHeight,
+    standingHeight, screenY,
     settled: () => high.visible && high.scale.y > .999,
     show(on: boolean, time: number) {
     rig.visible = on;
@@ -118,9 +120,10 @@ export function createMinato(scene: T.Scene) {
       b.head.rotation.y = -p.look * .35;
       b['upperArm.R'].rotation.x = -2.6 * p.reach + (p.moving ? -swing * .6 : 0);
       b['lowerArm.R'].rotation.x = -.3 * p.reach - (p.moving ? .25 : .05);
-      b['upperArm.L'].rotation.x = -.45 * p.tablet + (p.moving ? swing * .6 * (1 - p.tablet) : 0);
-      b['lowerArm.L'].rotation.x = -1.45 * p.tablet - .05;
-      b['hand.L'].rotation.x = -.5 * p.tablet;
+      // The tablet arm always holds the tablet up in front of the stomach (elbow about 90 deg), standing and walking.
+      b['upperArm.L'].rotation.x = -.3;
+      b['lowerArm.L'].rotation.x = -1.35;
+      b['hand.L'].rotation.x = -.25;
     }
     legR.rotation.x = swing; legL.rotation.x = -swing;
     upper.rotation.y = p.look;
@@ -145,7 +148,7 @@ export function createMinato(scene: T.Scene) {
 export function startMinato(scene: T.Scene, camera: T.PerspectiveCamera, at: T.Vector3) {
   const minato = createMinato(scene);
   let frozen: number | null = null;
-  Object.assign(window, { cityMinatoT: (seconds: number | null) => { frozen = seconds; }, cityMinatoFigure: () => minato.standingHeight(camera) });
+  Object.assign(window, { cityMinatoT: (seconds: number | null) => { frozen = seconds; }, cityMinatoFigure: () => minato.standingHeight(camera), cityMinatoScreenY: (y: number) => minato.screenY(camera, y) });
   // The pose's narrow lens applies only while the camera sits on this DEV pose (a shot button or a live change moves it away).
   const fov = camera.fov;
   return (now: number) => {

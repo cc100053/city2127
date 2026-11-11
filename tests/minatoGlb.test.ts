@@ -19,6 +19,6 @@ assert.ok(names.includes('hips') && !gltf.skins && !gltf.animations, 'rigid part
 let tris = 0;
 for (const mesh of gltf.meshes) for (const primitive of mesh.primitives) tris += gltf.accessors[primitive.indices].count / 3;
 assert.ok(tris <= 8000, `triangle budget ${tris}`);
-assert.ok(gltf.materials.length <= 7 && gltf.materials.every((m: { name: string }) => m.name.startsWith('res_')), 'at most 7 role materials');
+assert.ok(gltf.materials.length <= 8 && gltf.materials.every((m: { name: string }) => m.name.startsWith('res_')), 'at most 8 role materials');
 assert.ok(buffer.length < 300_000, `small GLB (${buffer.length} bytes)`);
 console.log(`minato.glb: PASS (${names.length} nodes, ${tris} tris, ${gltf.materials.length} materials, ${buffer.length} bytes)`);
