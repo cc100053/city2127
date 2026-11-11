@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
-import { HeadlineCamera, SHOTS, type ShotId } from './headlineCamera';
+import { HeadlineCamera, headlineShot, SHOTS, type ShotId } from './headlineCamera';
+import { BEAT_SECONDS } from './minatoTimeline';
 import { EnergyNarration } from './energyNarration';
 import * as T from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
@@ -235,6 +236,9 @@ try {
     if(to!==null)playMeters(to,now-Number(params.get('metersAge')??1));
   });
   const journey=surveyUrl?new VoteJourney(scene,camera):null;
+  // DEV `?survey=…&residentDemo`: a live NW +1 headline visits 湊 after the building change (src/devResidentDemo.ts); everything else keeps the normal timeline.
+  let residentDemo:{start:(changeEnd:number)=>void;cancel:()=>void}|null=null;
+  if(import.meta.env.DEV&&surveyUrl&&headlineCamera&&params.has('residentDemo'))import('./devResidentDemo').then(({startResidentDemo})=>{const demo=startResidentDemo(scene,camera,controls);residentDemo=demo;devFrame=now=>demo.frame(now,headlineCamera.active);});
   // A live energy headline narrates one compressed storage cycle during the close-up hold.
   const narration=surveyUrl&&headlineCamera?new EnergyNarration(()=>cityChanges?.energy):null;
   // 暮らしの声 #N over the close-up site; it lives only while the headline camera does, so every cancel path hides it.
@@ -254,7 +258,7 @@ try {
     if(params.has('explore'))requestAnimationFrame(()=>requestAnimationFrame(()=>{explore.voices=ring.litVoices();startExplore({target:exploreTarget(params.get('exploreTarget')),ordinal:Number(params.get('explore'))||1},now-Number(params.get('exploreAt')??0));}));
   }
   if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view,displayMs)=>{
-    devShot=null;explore?.interrupt();if(explore&&isExhibitionView(view))explore.voices=view.guestCount;
+    devShot=null;residentDemo?.cancel();explore?.interrupt();if(explore&&isExhibitionView(view))explore.voices=view.guestCount;
     if(isExhibitionView(view)){
       // Cancel any legacy score blend while preserving its current rendered atmosphere.
       world.blendTo(world.state,now);ring.setVoices(view.guestCount);holo.setVoices(view.guestCount);holo.setTiers(view.layout.tiers);
@@ -264,9 +268,12 @@ try {
       if(kind==='city-state-updated'&&latest&&!cameraMotion.matches&&displayMs>=DISPLAY_MS-100){
         const changes=cityChanges!.applyExhibitionLayout(view.layout,kind,now+(headlineCamera?shotTimeline(displayMs).change:ARRIVAL_SECONDS),view.slotSeeds,now,latest.votes);
         journey!.play(latest.votes,latest.ordinal,now,changes[0]?.headline&&changes[0].district&&!changes[0].focalOnly?changes[0]:undefined);
-        const shot=headlineCamera?.play(changes,now,displayMs)??null;
+        // DEV demo: the headline shot is held BEAT_SECONDS longer after the building change, so 湊's visit fits before the return to hero.
+        const visit=residentDemo&&view.layout.tiers.nw===1&&headlineShot(changes[0])==='nw:focal';
+        const shot=headlineCamera?.play(changes,now,visit?(shotTimeline(displayMs).changeEnd+BEAT_SECONDS)*1000:displayMs)??null;
         narration?.play(shot,changes[0],now,displayMs);
-        if(shot&&voiceLabel){const t=shotTimeline(displayMs);voiceLabel.show(residentIdentity(latest),SHOTS[shot].target,now+t.hold,now+t.flyOut);}
+        if(shot&&voiceLabel){const t=shotTimeline(displayMs);voiceLabel.show(residentIdentity(latest),SHOTS[shot].target,now+t.hold,now+(visit?t.changeEnd:t.flyOut));}
+        if(visit&&shot==='nw:focal')residentDemo!.start(now+shotTimeline(displayMs).changeEnd);
         return changes;
       }
       headlineCamera?.cancel();narration?.cancel();

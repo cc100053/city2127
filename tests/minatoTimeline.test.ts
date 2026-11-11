@@ -14,3 +14,11 @@ assert.deepEqual([minatoPose(5.2).look, minatoPose(6).look, minatoPose(6.5).look
 assert.equal(minatoPose(5.8).x, minatoPose(6.4).x, 'stands still during the look back');
 assert.ok(Math.abs(minatoPose(3.2).drone - .5) < 1e-9, 'the drone is overhead at 3.2 s');
 assert.deepEqual(minatoPose(MINATO_LOOP + 1), minatoPose(1), 'loops');
+
+import { BEAT_ACTION, BEAT_MOVE, BEAT_SECONDS, residentBeat } from '../src/minatoTimeline.ts';
+assert.deepEqual([residentBeat(0).blend, residentBeat(0).action, residentBeat(0).done], [0, 0, false], 'the beat starts on the headline camera with the action at 0');
+assert.deepEqual([residentBeat(BEAT_MOVE).blend, residentBeat(BEAT_MOVE).action], [1, 0], 'the action clock starts when the camera arrives');
+assert.equal(residentBeat(BEAT_MOVE + 3).action, 3, 'the action runs in real time');
+assert.equal(residentBeat(BEAT_MOVE + BEAT_ACTION + .3).action, BEAT_ACTION, 'the action holds its last pose while the camera returns');
+assert.ok(residentBeat(BEAT_SECONDS - .01).blend < .01 && residentBeat(BEAT_SECONDS).done, 'back on the headline camera exactly when the beat ends');
+assert.ok(BEAT_ACTION >= 7.2, 'covers the whole 7.2 s action');

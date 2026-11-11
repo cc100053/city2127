@@ -11,10 +11,11 @@ const part = (parent: T.Object3D, geometry: T.BufferGeometry, material: T.Materi
   parent.add(mesh);
   return mesh;
 };
+export const RESIDENT_FOV = 52;
 const cube = (w: number, h: number, d: number) => new T.BoxGeometry(w, h, d);
 
-/** Returns the per-frame callback for main's `devFrame`; `window.cityMinatoT = s` freezes the action at s seconds (frame capture). */
-export function startMinato(scene: T.Scene, camera: T.PerspectiveCamera, at: T.Vector3) {
+/** Builds the booth and puppet on the NW hub stage. `settled()`: the +1 state is fully up; `show(on, t)` poses the action at t seconds. */
+export function createMinato(scene: T.Scene) {
   const stage = scene.getObjectByName('hub-stage'), high = scene.getObjectByName('hub-state-high');
   if (!stage || !high) throw new Error('?shot=nw:resident needs the NW hub (meters=nw:2)');
   // Stage units are 3 m (site scale 3): scale the puppet space by 1/3 so everything is in metres. Floor = plinth top (1.2).
@@ -66,25 +67,20 @@ export function startMinato(scene: T.Scene, camera: T.PerspectiveCamera, at: T.V
   pose.scale.setScalar(1.9 / 5.6);
   const tint = new T.Color('#3b4655'); // the shared white frame vanishes against the white drum wall: darken this one instance
   rig.traverse(o => { if (o instanceof T.InstancedMesh && o.name === 'minato-drone') o.setColorAt(0, tint); });
-  let frozen: number | null = null;
-  Object.assign(window, { cityMinatoT: (seconds: number | null) => { frozen = seconds; } });
-
-  // The pose's narrow lens applies only while the camera sits on this DEV pose (a shot button or a live change moves it away).
-  const fov = camera.fov, FOV = 52;
   const edge = new T.Vector3();
-  Object.assign(window, { cityMinatoFigure: () => { // standing height as a fraction of the frame height
+  const standingHeight = (camera: T.PerspectiveCamera) => { // standing height as a fraction of the frame height
     const top = man.localToWorld(edge.set(0, 1.72, 0)).project(camera).y, bottom = man.localToWorld(edge.set(0, 0, 0)).project(camera).y;
     return (top - bottom) / 2;
-  } });
+  };
 
-  return (now: number) => {
-    const here = camera.position.distanceTo(at) < .05;
-    if (camera.fov !== (here ? FOV : fov)) { camera.fov = here ? FOV : fov; camera.updateProjectionMatrix(); }
-    const shown = here && high.visible && high.scale.y > .999;
-    rig.visible = shown;
-    drone.show(shown);
-    if (!shown) return;
-    const p = minatoPose(frozen ?? now % MINATO_LOOP);
+  return {
+    standingHeight,
+    settled: () => high.visible && high.scale.y > .999,
+    show(on: boolean, time: number) {
+    rig.visible = on;
+    drone.show(on);
+    if (!on) return;
+    const p = minatoPose(time);
     man.position.set(p.x, 0, p.z);
     man.rotation.y = p.yaw;
     const swing = p.moving ? Math.sin(p.gait) * .5 : 0;
@@ -103,5 +99,20 @@ export function startMinato(scene: T.Scene, camera: T.PerspectiveCamera, at: T.V
     if (p.drone < 0 || p.drone > 1) pose.position.y = -50;
     drone.set(0, pose);
     drone.flush();
+    },
+  };
+}
+
+/** `?shot=nw:resident`: returns the per-frame callback for main's `devFrame`; `window.cityMinatoT = s` freezes the action at s seconds (frame capture). */
+export function startMinato(scene: T.Scene, camera: T.PerspectiveCamera, at: T.Vector3) {
+  const minato = createMinato(scene);
+  let frozen: number | null = null;
+  Object.assign(window, { cityMinatoT: (seconds: number | null) => { frozen = seconds; }, cityMinatoFigure: () => minato.standingHeight(camera) });
+  // The pose's narrow lens applies only while the camera sits on this DEV pose (a shot button or a live change moves it away).
+  const fov = camera.fov;
+  return (now: number) => {
+    const here = camera.position.distanceTo(at) < .05;
+    if (camera.fov !== (here ? RESIDENT_FOV : fov)) { camera.fov = here ? RESIDENT_FOV : fov; camera.updateProjectionMatrix(); }
+    minato.show(here && minato.settled(), frozen ?? now % MINATO_LOOP);
   };
 }

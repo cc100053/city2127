@@ -30,3 +30,14 @@ export function minatoPose(time: number) {
     drone: (t - 2.2) / 2, // 0..1 while it crosses over (centre at 3.2 s)
   };
 }
+
+// Live-result demo (`?residentDemo`): after the building change ends, the camera moves to the resident (MOVE s), the action plays once (ACTION s), the camera comes back to the headline shot (BACK s).
+export const BEAT_MOVE = 1.5, BEAT_ACTION = 7.5, BEAT_BACK = 1, BEAT_SECONDS = BEAT_MOVE + BEAT_ACTION + BEAT_BACK;
+/** `u`: seconds since the building change ended. `blend`: 0 headline camera .. 1 resident camera; `action`: the action clock (0 until the camera arrives, held at the end). */
+export function residentBeat(u: number) {
+  return {
+    blend: u < BEAT_MOVE + BEAT_ACTION ? sm(u / BEAT_MOVE) : 1 - sm((u - BEAT_MOVE - BEAT_ACTION) / BEAT_BACK),
+    action: Math.min(BEAT_ACTION, Math.max(0, u - BEAT_MOVE)),
+    done: u >= BEAT_SECONDS,
+  };
+}
