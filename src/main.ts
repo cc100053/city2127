@@ -214,7 +214,12 @@ try {
     if(params.has('elevatorNear'))elevatorNear.setActive(true);
     const shot=params.get('shot');
     // `?meters=nw:2&shot=nw:resident`: human-scale 湊 prototype (src/devMinato.ts); its pose is not in SHOTS, which stay the production close-ups.
-    if(shot==='nw:resident'){const at=new T.Vector3(59.3,5,-288.2);(window as unknown as {cityPose:(p:number[],t:number[])=>void}).cityPose(at.toArray(),[55.4,5.1,-289.4]);import('./devMinato').then(({startMinato})=>{devFrame=startMinato(scene,camera,at);});}
+    // `&kiosk=x,z&cam=px,py,pz,tx,ty,tz` (kiosk stage position, camera relative to the kiosk in metres) override the default kiosk for pose surveys.
+    if(shot==='nw:resident')import('./devMinato').then(({startMinato,residentPose})=>{
+      const kp=params.get('kiosk')?.split(',').map(Number),cp=params.get('cam')?.split(',').map(Number),kiosk=kp?[kp[0],kp[1]] as [number,number]:undefined;
+      const pose=residentPose(kiosk,cp?{position:cp.slice(0,3),target:cp.slice(3,6)}:undefined),at=new T.Vector3(...pose.position);
+      (window as unknown as {cityPose:(p:number[],t:number[])=>void}).cityPose(pose.position,pose.target);devFrame=startMinato(scene,camera,at,kiosk);
+    });
     else if(shot!==null)(window as unknown as {cityShot:(id:string)=>void}).cityShot(shot);
   }
   // Applied after the first frame, so `now` already holds the clock (or a held `reviewTime`) rather than its initial 0.

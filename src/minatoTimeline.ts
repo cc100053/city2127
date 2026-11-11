@@ -10,10 +10,10 @@ const key = (keys: readonly (readonly [number, number])[], t: number) => {
   return v0 + (v1 - v0) * sm((t - t0) / (t1 - t0));
 };
 // Path keys [t, x, z]: inside the booth, out to the side then to the front of the opening (1.5-2.5 s), three steps away (4-5.2 s), a few more after the look back (6.5-7.2 s).
-const PATH = [[0, 0, -.35], [1.5, 0, -.35], [2, -1.25, -.35], [2.5, -1.25, .7], [4, -1.25, .7], [5.2, -1.05, -1.4], [6.5, -1.05, -1.4], [7.2, -1.1, -2.4]] as const;
+const PATH = [[0, 0, -.35], [1.5, 0, -.35], [2, 1.25, -.35], [2.5, 1.25, .7], [4, 1.25, .7], [5.2, 1.05, -1.4], [6.5, 1.05, -1.4], [7.2, 1.1, -2.4]] as const;
 const DIST = PATH.reduce<number[]>((acc, p, i) => [...acc, i ? acc[i - 1] + Math.hypot(p[1] - PATH[i - 1][1], p[2] - PATH[i - 1][2]) : 0], []);
-const YAW = [[0, 0], [1.5, 0], [1.7, -1.57], [2, -1.57], [2.4, .6], [4, .6], [4.4, -2.8], [9, -2.8]] as const; // faces the shutter while pulling, away while walking
-const LOOK = [[0, 0], [5.2, 0], [5.8, -1.5], [6.5, -1.5], [6.9, 0]] as const; // upper body twists back toward the booth (the head follows further)
+const YAW = [[0, 0], [1.5, 0], [1.7, 1.57], [2, 1.57], [2.4, -.6], [4, -.6], [4.4, 2.8], [9, 2.8]] as const; // faces the shutter while pulling, away while walking
+const LOOK = [[0, 0], [5.2, 0], [5.8, 1.5], [6.5, 1.5], [6.9, 0]] as const; // upper body twists back toward the booth (the head follows further)
 
 export function minatoPose(time: number) {
   const t = ((time % MINATO_LOOP) + MINATO_LOOP) % MINATO_LOOP;
