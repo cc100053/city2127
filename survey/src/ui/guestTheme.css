@@ -47,7 +47,7 @@ html:has(body.guest-page) { overscroll-behavior: none; background: #1b211e; }
 .guest .guest-masthead {
   align-items: center;
   gap: 20px;
-  min-height: 76px;
+  min-height: 64px;
   color: var(--guest-muted);
   border-color: #4a554e;
   font-weight: 400;
@@ -79,14 +79,14 @@ html:has(body.guest-page) { overscroll-behavior: none; background: #1b211e; }
 .guest button:disabled { opacity: 1; color: #b0b8ac; background: #414940; border-color: #414940; }
 .guest button:focus-visible, .guest .guest-choice:focus-within { outline-color: var(--guest-amber); }
 
-.guest .guest-progress-block { order: -1; margin-bottom: 26px; gap: 10px; }
+.guest .guest-progress-block { order: -1; margin-bottom: 16px; gap: 10px; }
 .guest .guest-progress-copy { order: -1; color: var(--guest-muted); font-size: 14px; font-weight: 400; }
 .guest .guest-steps { gap: 5px; }
 .guest .guest-steps li { box-sizing: border-box; width: auto; flex: 1; height: 6px; border: 0; border-radius: 3px; background: #3d4841; color: transparent; font-size: 0; }
 .guest .guest-steps li.is-complete { background: #637b70; }
 .guest .guest-steps li.is-current { color: transparent; background: var(--guest-cyan); outline: none; }
 .guest .guest-progress-block progress { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-.guest .guest-choices { grid-template-columns: 1fr; gap: 12px; padding-bottom: 24px; }
+.guest .guest-choices { grid-template-columns: 1fr; gap: 12px; padding-bottom: 14px; }
 .guest .guest-choices[data-option-count='4'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .guest .guest-choice { box-sizing: border-box; position: relative; grid-template-columns: minmax(0, 1fr) 26px; align-items: start; gap: 10px 14px; min-width: 0; min-height: 112px; padding: 18px; color: var(--guest-ink); border-color: var(--guest-line); border-radius: 5px; background: #2c3430; }
 .guest .guest-choice::before { content: ''; position: absolute; left: 0; top: 17px; width: 2px; height: 23px; background: #819b8a; pointer-events: none; }
@@ -99,6 +99,9 @@ html:has(body.guest-page) { overscroll-behavior: none; background: #1b211e; }
 .guest .guest-choice-copy { color: #d2d7ce; font-size: 15px; line-height: 1.85; }
 .guest .guest-choice-state { grid-column: 1; color: var(--guest-cyan); font-size: 13px; font-weight: 500; }
 .guest .guest-choices[data-option-count='4'] .guest-choice { min-height: 150px; }
+.guest[data-screen='question'] h1 { line-height: 1.45; }
+/* Three stacked options fit a landscape iPad: size to the text instead of a fixed block (tests/guestFit.browser.mjs). */
+.guest .guest-choices:not([data-option-count='4']) .guest-choice { min-height: 0; padding-block: 14px; }
 
 .guest .guest-review-list { gap: 0; margin: 8px 0 24px; }
 .guest .guest-review-row { padding: 18px 0; border: 0; border-bottom: 1px solid #46534b; border-radius: 0; background: transparent; }

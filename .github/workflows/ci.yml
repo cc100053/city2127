@@ -61,3 +61,42 @@ jobs:
       # Raw captures stay in the evidence folder; artifacts/ takes only published JPEG records (docs/VALIDATION.md, Evidence storage).
       - name: Check new artifacts are published records
         run: scripts/check-artifacts.sh "$BASE"
+
+  # Guest iPad pages in a real browser (2026-11-11). No 3D city: these runners start their own survey server on a
+  # temporary database, so they run on a GPU-less runner. City/WebGL runners stay manual (docs/VALIDATION.md).
+  guest-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: survey/package-lock.json
+      - run: npm ci --prefix survey
+      - run: npm run build --prefix survey
+      # Playwright stays out of the project's dependencies; the runners load it from CITY2127_PLAYWRIGHT_PATH.
+      - name: Install Playwright Chromium
+        working-directory: ${{ runner.temp }}
+        run: |
+          mkdir -p playwright && cd playwright
+          npm init -y > /dev/null
+          npm install --no-audit --no-fund playwright@1.65.0
+          npx playwright install --with-deps chromium
+      - name: Guest browser runners
+        env:
+          CITY2127_PLAYWRIGHT_PATH: ${{ runner.temp }}/playwright/node_modules/playwright/index.mjs
+          CITY2127_EVIDENCE_DIR: ${{ runner.temp }}/guest-browser-evidence
+        run: |
+          node --experimental-strip-types tests/guestUi.browser.mjs
+          node --experimental-strip-types tests/guestFit.browser.mjs
+      - name: Keep screenshots of a failed run
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: guest-browser-evidence
+          path: ${{ runner.temp }}/guest-browser-evidence
+          retention-days: 7
