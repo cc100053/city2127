@@ -9,7 +9,20 @@ body.guest-page {
   color: var(--guest-ink);
   background: #1b211e;
   font-family: 'Yu Gothic UI', 'Noto Sans JP', system-ui, sans-serif;
+  /* Exhibition iPad (2026-11-11): Safari's 100vh is the toolbar-hidden height, so size to the small viewport;
+     no text selection, long-press callout or tap flash; no rubber-band or pull-to-refresh mid-questionnaire. */
+  min-height: 100vh;
+  min-height: 100svh;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
 }
+html:has(body.guest-page) { overscroll-behavior: none; background: #1b211e; }
+
+.guest-link { position: fixed; inset: 0 0 auto; z-index: 10; margin: 0; padding: 10px 20px; color: #2c2e25; font-size: 15px; text-align: center; background: var(--guest-amber); box-shadow: 0 2px 12px #0006; }
+.guest-link[hidden] { display: none; }
 
 .guest .guest-frame {
   position: relative;

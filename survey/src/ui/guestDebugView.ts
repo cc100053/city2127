@@ -48,6 +48,27 @@ let exploring = false;
 let othersExploring = false;
 /** The handoff screen stays up this long so the guest can still choose 空の環を見る (owner 2026-11-02); the server lease is unchanged. */
 const EXPLORE_OFFER_MS = 20_000;
+/** The live socket has been down this long: show the banner and hold new starts (a short blip never shows). */
+const LINK_GRACE_MS = 3_000;
+let linkDown = false;
+let linkTimer = 0;
+const linkBanner = el('p', { class: 'guest-link', role: 'status', 'aria-live': 'polite', hidden: '' },
+  '街のサーバーとの接続を確認しています。しばらくお待ちください。');
+document.body.prepend(linkBanner);
+
+function setLinkDown(down: boolean) {
+  if (linkDown === down) return;
+  linkDown = down;
+  linkBanner.hidden = !down;
+  // Only the Start button depends on the link; a draft in progress keeps its own retry and recovery paths.
+  if (screen === 'welcome' && !busy) renderWelcome(false);
+}
+
+function onLinkStatus(status: string) {
+  if (status === 'connected') { clearTimeout(linkTimer); linkTimer = 0; setLinkDown(false); return; }
+  if (!linkTimer && !linkDown) linkTimer = window.setTimeout(() => { linkTimer = 0; setLinkDown(true); }, LINK_GRACE_MS);
+}
+
 /** Latest public city head count from the live socket, for the welcome line; undefined until the first event. */
 let cityGuestCount: number | undefined;
 /** Screen identity for the enter animation: a re-render of the same screen (warnings, busy states) does not animate. */
@@ -228,7 +249,7 @@ function idleWarningNodes() {
 }
 
 function renderWelcome(focus = false) {
-  const button = action(screen === 'starting' ? '準備中…' : 'はじめる', () => startSession(session !== undefined && draft.size > 0), true, busy);
+  const button = action(screen === 'starting' ? '準備中…' : 'はじめる', () => startSession(session !== undefined && draft.size > 0), true, busy || linkDown);
   button.dataset.autoAction = 'start';
   const status = screen === 'starting' ? el('p', { class: 'guest-status', role: 'status', 'aria-live': 'polite' }, '四つの質問を準備しています。') : undefined;
   page('この街の未来に、あなたの声を。', '2127年・台場の暮らし',
@@ -249,7 +270,7 @@ function cityCountText() {
 }
 
 async function startSession(keepDraft = false) {
-  if (busy) return;
+  if (busy || linkDown) return;
   if (stationParam !== null && !stationId) {
     notice = { role: 'alert', text: 'ステーション A または B のリンクを開いてください。' }; renderWelcome(true); return;
   }
@@ -570,7 +591,7 @@ function renderResult(focus = true) {
   const { proposal } = saved;
   page('街の画面をご覧ください。', 'あなたの思いを記録しました',
     el('p', { class: 'guest-result-number' }, residentIdentity(proposal)),
-    el('p', { class: 'guest-copy', role: 'status' }, `回答を記録しました。あなたは、この街の ${saved.state.guestCount}人目の住民です。`),
+    el('p', { class: 'guest-copy', role: 'status' }, `あなたは、この街の ${saved.state.guestCount}人目の住民です。街の画面で、あなたの声が形になります。`),
     renderChosen(proposal.answers),
     el('div', { class: 'guest-actions' }, action('次の方へ', renderHandoff, true)));
   if (focus) focusTitle();
@@ -700,7 +721,7 @@ connectEvents(event => {
   if (event.type !== 'city-state-snapshot' || !event.undoneProposalId) return;
   undoneSubmissionId = event.undoneProposalId;
   if (saved?.proposal.id === undoneSubmissionId || pendingRequest?.submissionId === undoneSubmissionId) showUndone();
-}, () => {});
+}, onLinkStatus);
 
 const recovery = readRecovery();
 if (recovery) void restoreRecovery(recovery);

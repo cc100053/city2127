@@ -1,12 +1,25 @@
 import * as T from 'three';
 
-// "暮らしの声 #N" over the site the headline camera closes in on (2026-11-10): the resident card says what changed,
-// this label says where, in the guest's own number. A DOM tag projected from the shot's target point, so Japanese text
-// stays crisp without a font atlas; it fades in once the camera holds and out as it flies back to the hero view.
+// "暮らしの声 #N" at the site the headline camera closes in on (2026-11-10): the resident card says what changed,
+// this label says where, in the guest's own number. A DOM tag projected from a world point, so Japanese text
+// stays crisp without a font atlas.
+// 2026-11-11: with wide district stage shots and the build choreography, the tag waits until the build has finished
+// and sits like a nameplate just below the changed slots' ground point, so it never covers a mass rising from there.
 
-/** Metres above the shot target, so the tag floats over the roofline instead of covering the change itself. */
-export const LABEL_LIFT = 24;
 export const LABEL_FADE = .45;
+/** CSS pixels between the anchor and the top of the tag, and the margin kept from the bottom of the screen. */
+export const LABEL_GAP = 16, LABEL_MARGIN = 64;
+
+type SlotPoint = { x: number; y: number; z: number; slot: string };
+
+/** Ground anchor for the tag: the centre of the changed slots this shot frames, else every changed slot, else the shot's target. */
+export function labelAnchor(target: readonly [number, number, number], points?: readonly SlotPoint[], covers?: readonly string[]): [number, number, number] {
+  const framed = covers ? points?.filter(point => covers.includes(point.slot)) : undefined;
+  const chosen = framed?.length ? framed : points ?? [];
+  if (!chosen.length) return [target[0], target[1], target[2]];
+  const sum = chosen.reduce((acc, point) => [acc[0] + point.x, acc[1] + point.y, acc[2] + point.z], [0, 0, 0]);
+  return [sum[0] / chosen.length, sum[1] / chosen.length, sum[2] / chosen.length];
+}
 
 /** Screen position in CSS pixels for a world point; `visible` is false behind the camera or well off-frame. */
 export function labelScreenPosition(point: T.Vector3, camera: T.Camera, width: number, height: number, into = new T.Vector3()) {
@@ -37,9 +50,9 @@ export class VoiceLabel {
     parent.append(this.element);
   }
 
-  show(text: string, target: readonly [number, number, number], from: number, until: number) {
+  show(text: string, anchor: readonly [number, number, number], from: number, until: number) {
     this.element.textContent = text;
-    this.point.set(target[0], target[1] + LABEL_LIFT, target[2]);
+    this.point.set(anchor[0], anchor[1], anchor[2]);
     this.from = from; this.until = until; this.active = true;
   }
 
@@ -56,6 +69,8 @@ export class VoiceLabel {
     this.element.hidden = opacity <= 0 || !visible;
     if (this.element.hidden) return;
     this.element.style.opacity = opacity.toFixed(3);
-    this.element.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -100%)`;
+    // Below the anchor, but kept on screen when the slots sit low in the frame.
+    const top = Math.min(y + LABEL_GAP, height - LABEL_MARGIN);
+    this.element.style.transform = `translate(${x.toFixed(1)}px, ${top.toFixed(1)}px) translate(-50%, 0)`;
   }
 }

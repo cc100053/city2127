@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { HeadlineCamera, SHOTS, type ShotId } from './headlineCamera';
+import { HeadlineCamera, SHOTS, VIEWPOINT_COVERAGE, type ShotId } from './headlineCamera';
 import { EnergyNarration } from './energyNarration';
 import * as T from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
@@ -34,7 +34,7 @@ import { DISPLAY_MS } from '../survey/src/shared/displayTiming';
 import { housingPrototype } from './housingPrototype';
 import { skyRing, STANDALONE_VOICES } from './skyRing';
 import { GuestExplore } from './guestExplore';
-import { VoiceLabel } from './voiceLabel';
+import { labelAnchor, VoiceLabel } from './voiceLabel';
 import type { ExploreLook } from './surveyView';
 import { heroHolograms } from './heroHolograms';
 import { spaceElevator, spaceElevatorNear } from './spaceElevator';
@@ -264,7 +264,8 @@ try {
         journey!.play(latest.votes,latest.ordinal,now,changes[0]?.headline&&changes[0].district&&!changes[0].focalOnly?changes[0]:undefined);
         const shot=headlineCamera?.play(changes,now,displayMs)??null;
         narration?.play(shot,changes[0],now,displayMs);
-        if(shot&&voiceLabel){const t=shotTimeline(displayMs);voiceLabel.show(residentIdentity(latest),SHOTS[shot].target,now+t.hold,now+t.flyOut);}
+        // The tag follows the build choreography (change → changeEnd), so it never hides the moment the slot is built.
+        if(shot&&voiceLabel){const t=shotTimeline(displayMs);voiceLabel.show(residentIdentity(latest),labelAnchor(SHOTS[shot].target,changes[0]?.points,VIEWPOINT_COVERAGE[shot]),now+t.changeEnd,now+t.flyOut);}
         return changes;
       }
       headlineCamera?.cancel();narration?.cancel();
