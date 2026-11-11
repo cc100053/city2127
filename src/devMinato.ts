@@ -1,5 +1,6 @@
 // DEV-only prototype (`?meters=nw:2&shot=nw:resident`): 湊's counter closes beside the NW hub's +1 lobby. Added to the hub stage at runtime, never built otherwise.
 import * as T from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { quadFleet, white } from './automationKit.ts';
 import { MINATO_LOOP, minatoPose } from './minatoTimeline.ts';
 
@@ -12,6 +13,9 @@ const part = (parent: T.Object3D, geometry: T.BufferGeometry, material: T.Materi
   return mesh;
 };
 export const RESIDENT_FOV = 52;
+const MINATO_URL = new URL('../asset/models/resident-minato/minato.glb', import.meta.url).href;
+/** Rigid-part nodes of minato.glb (build_minato.py); three.js drops the dots from node names. */
+const NODES = ['hips', 'torso', 'head', 'upperArm.L', 'upperArm.R', 'lowerArm.L', 'lowerArm.R', 'hand.L', 'hand.R', 'upperLeg.L', 'upperLeg.R', 'lowerLeg.L', 'lowerLeg.R'] as const;
 const cube = (w: number, h: number, d: number) => new T.BoxGeometry(w, h, d);
 
 /** Builds the booth and puppet on the NW hub stage. `settled()`: the +1 state is fully up; `show(on, t)` poses the action at t seconds. */
@@ -62,6 +66,26 @@ export function createMinato(scene: T.Scene) {
   part(armL, cube(.2, .02, .27), mat('#10151c', '#4fb8ff'), 0, -.62, .1);
   const legR = limb(.09, .88, .07, .6, mat('#1f2a3a')), legL = limb(-.09, .88, .07, .6, mat('#1f2a3a'));
 
+  // The Blender character (asset/models/resident-minato) replaces the capsule puppet once it has loaded; until then, or if it fails, the puppet stays.
+  // Mirrored in x so its tablet arm (.L) is the one away from the booth and .R reaches for the shutter, as in the puppet.
+  const mirror = new T.Group();
+  mirror.scale.x = -1;
+  mirror.position.y = .04; // on the paving patch
+  man.add(mirror);
+  const bones: Partial<Record<(typeof NODES)[number], T.Object3D>> = {};
+  let loaded = false;
+  new GLTFLoader().loadAsync(MINATO_URL).then(gltf => {
+    for (const name of NODES) {
+      const node = gltf.scene.getObjectByName(name.replace('.', ''));
+      if (!node) throw new Error(`minato.glb has no node ${name}`);
+      bones[name] = node;
+    }
+    gltf.scene.traverse(o => { if (o instanceof T.Mesh) { o.castShadow = true; o.frustumCulled = false; } });
+    mirror.add(gltf.scene);
+    for (const o of [upper, legR, legL]) o.visible = false;
+    loaded = true;
+  }).catch(error => console.warn('minato.glb did not load; keeping the capsule puppet', error));
+
   // One delivery drone: the hub's own quad mesh, 1.5 m across.
   const drone = quadFleet(rig, 1, 'minato-drone'), pose = new T.Object3D();
   pose.scale.setScalar(1.9 / 5.6);
@@ -84,6 +108,20 @@ export function createMinato(scene: T.Scene) {
     man.position.set(p.x, 0, p.z);
     man.rotation.y = p.yaw;
     const swing = p.moving ? Math.sin(p.gait) * .5 : 0;
+    if (loaded) {
+      const b = bones as Record<(typeof NODES)[number], T.Object3D>;
+      // All joint bends are rotations about x (negative = forward/up); mirrored parent, so the twist about y flips sign.
+      const knee = (phase: number) => p.moving ? Math.max(0, phase) * .8 : 0;
+      b['upperLeg.R'].rotation.x = swing; b['upperLeg.L'].rotation.x = -swing;
+      b['lowerLeg.R'].rotation.x = knee(-Math.cos(p.gait)); b['lowerLeg.L'].rotation.x = knee(Math.cos(p.gait));
+      b.torso.rotation.y = -p.look;
+      b.head.rotation.y = -p.look * .35;
+      b['upperArm.R'].rotation.x = -2.6 * p.reach + (p.moving ? -swing * .6 : 0);
+      b['lowerArm.R'].rotation.x = -.3 * p.reach - (p.moving ? .25 : .05);
+      b['upperArm.L'].rotation.x = -.45 * p.tablet + (p.moving ? swing * .6 * (1 - p.tablet) : 0);
+      b['lowerArm.L'].rotation.x = -1.45 * p.tablet - .05;
+      b['hand.L'].rotation.x = -.5 * p.tablet;
+    }
     legR.rotation.x = swing; legL.rotation.x = -swing;
     upper.rotation.y = p.look;
     head.rotation.y = p.look * .35;
