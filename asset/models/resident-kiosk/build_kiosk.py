@@ -6,11 +6,11 @@ Writes kiosk.blend and kiosk.glb next to this file (glTF preset, no Meshopt/Drac
 
 Real metres at x1.0 (Minato is 1.70 m), origin at the footprint centre on the ground, front (the open counter side) faces Blender -Y
 (= three +Z, like the other GLBs). Footprint 2.4 x 1.8 m, height 2.75 m. Nodes (names exact, pivots where the code rotates them):
-  kiosk (body: base, kick, counter top, rear and left walls, posts, canopy, housing, trim)
+  kiosk (body: rear and left walls, posts, housing), counter_base, counter_top, canopy (all three replaced in state -1 by glass_room's wide base/top and canopy_wide)
   interior          warm emissive inner faces and a shelf line
   shutter           slatted roll shutter, pivot at its top edge (scale it down to close it; open = scaled to ~0 inside the housing)
   arm_base > arm_upper > arm_fore > arm_grip   robot arm on the counter (state 0)
-  glass_room        glazed 1.6 m extension on the right (+X) (state -1)
+  glass_room        glazed 1.6 m extension on the right (+X) with the wide base and counter top, and canopy_wide: one roof over both (state -1)
 Smooth rounded forms; materials are roles (ksk_*).
 """
 import math
@@ -140,68 +140,89 @@ def build():
         parts[name] = p
         return p
 
-    W, D, H = 2.4, 1.8, 2.75
+    W, D, H = 2.4, 1.8, 2.45
     F = FRONT * D / 2  # front plane y
+    CAN0, CAN1 = H - .28, H                      # canopy 0.28 thick
+    CT = .95                                     # counter base height; the top slab sits on it (0.04)
+    CB = .6                                      # counter depth: the rest of the footprint is the floor Minato stands on
+    CY = F + CB / 2                              # counter centre y
+    TOP = CT + .04
+    prof_base = [(.015, .08), (0, .10), (0, CT - .03), (.015, CT)]
+    prof_top = [(0, CT), (0, CT + .03), (.012, TOP)]
+    prof_can = [(0, CAN0), (0, CAN1 - .08), (.025, CAN1 - .04), (.065, CAN1)]
     k = node("kiosk")
-    k.rprism("ksk_kick", W - .08, D - .08, .21, 0, .08)                                               # recessed dark kick
-    k.rprism("ksk_white", W, D, .25, .08, 1.0, profile=[(.015, .08), (0, .10), (0, .97), (.015, 1.0)])   # counter base, soft edges
-    k.rprism("ksk_top", W + .16, D + .16, .30, 1.0, 1.04, profile=[(0, 1.0), (0, 1.03), (.012, 1.04)])  # counter top slab, 0.08 proud
-    CAN0, CAN1 = H - .35, H                                                                             # canopy 0.35 thick
-    cw, cd = W + .30, D + .40
-    k.rprism("ksk_white", cw, cd, .34, CAN0, CAN1, cy=FRONT * .05, profile=[(.0, CAN0), (0, CAN1 - .09), (.03, CAN1 - .045), (.075, CAN1)], n=7)
-    k.rprism("ksk_trim", cw - .5, .035, .0175, CAN0 - .022, CAN0 + .002, cy=F - .05, n=3)             # cool-blue line under the front edge
-    k.box("ksk_white", (0, F + .09, CAN0 - .10), (W - .30, .18, .20), .03)                              # shutter housing under the canopy
+    cb = node("counter_base", "kiosk")                                                                  # hidden in -1, where the glass room's continuous base replaces it
+    cb.rprism("ksk_kick", W - .08, CB - .08, .21, 0, .08, cy=CY)                                         # recessed dark kick
+    cb.rprism("ksk_white", W, CB, .25, .08, CT, cy=CY, profile=prof_base)                                  # counter base, soft edges
     t = .09  # wall thickness
-    for x in (-W / 2 + t / 2,):                                                                         # closed left side (the right side is open)
-        k.box("ksk_white", (x, 0, (1.04 + CAN0) / 2), (t, D - .16, CAN0 - 1.04), .02)
-    k.box("ksk_white", (0, -F - t / 2 + .0, (1.04 + CAN0) / 2), (W - .1, t, CAN0 - 1.04), .02)         # closed rear
+    k.box("ksk_white", (-W / 2 + t / 2, 0, (TOP + CAN0) / 2), (t, D - .16, CAN0 - TOP), .02)            # closed left side (the right side is open)
+    k.box("ksk_white", (0, -F - t / 2, (TOP + CAN0) / 2), (W - .1, t, CAN0 - TOP), .02)                 # closed rear
+    k.box("ksk_white", (-W / 2 + t / 2, 0, (0 + TOP) / 2), (t, D - .16, TOP), .02)                      # left wall down to the floor
+    k.box("ksk_white", (0, -F - t / 2, TOP / 2), (W - .1, t, TOP), .02)                                 # rear wall down to the floor
     for x in (-W / 2 + .08, W / 2 - .06):                                                               # slim front corner posts
-        k.rprism("ksk_white", .12, .12, .05, 1.04, CAN0, cx=x, cy=F + .05, n=3)
+        k.rprism("ksk_white", .12, .12, .05, TOP, CAN0, cx=x, cy=F + .05, n=3)
+    k.box("ksk_white", (0, F + .09, CAN0 - .10), (W - .30, .18, .20), .03)                              # shutter housing under the canopy
+
+    ct = node("counter_top", "kiosk")
+    ct.rprism("ksk_top", W + .16, CB + .08, .30, CT, TOP, cy=CY - .04, profile=prof_top)               # counter top slab, 0.08 proud
+
+    cw, cd = W + .30, D + .40
+    cn = node("canopy", "kiosk")
+    cn.rprism("ksk_white", cw, cd, .34, CAN0, CAN1, cy=FRONT * .05, profile=prof_can, n=7)
+    cn.rprism("ksk_trim", cw - .5, .035, .0175, CAN0 - .022, CAN0 + .002, cy=F - .05, n=3)             # cool-blue line under the front edge
 
     ik = node("interior", "kiosk")
-    ik.box("ksk_warm", (0, -F - t - .004, 1.62), (W - .2, .02, CAN0 - 1.1), 0)                           # warm back wall
-    ik.box("ksk_warm", (-W / 2 + t + .004, 0, 1.62), (.02, D - .3, CAN0 - 1.1), 0)                       # warm left wall
+    ik.box("ksk_warm", (0, -F - t - .004, (TOP + CAN0) / 2 + .1), (W - .2, .02, CAN0 - TOP - .2), 0)    # warm back wall
+    ik.box("ksk_warm", (-W / 2 + t + .004, 0, (TOP + CAN0) / 2 + .1), (.02, D - .3, CAN0 - TOP - .2), 0)  # warm left wall
     ik.box("ksk_warm", (0, 0, CAN0 - .012), (W - .2, D - .3, .02), 0)                                  # warm ceiling
-    ik.box("ksk_top", (0, -F - t - .08, 1.6), (W - .35, .14, .035), .01)                                # a shelf line
+    ik.box("ksk_top", (0, -F - t - .08, 1.55), (W - .35, .14, .035), .01)                               # a shelf line
 
     sh = node("shutter", "kiosk", (0, F + .035, CAN0 - .20))                                            # pivot = top edge
-    slats, top, bottom = 15, CAN0 - .20, 1.06
+    slats, top, bottom = 13, CAN0 - .20, TOP + .03
     step = (top - bottom) / slats
+    sh.box("ksk_joint", (0, F + .045, (top + bottom) / 2), (W - .36, .012, top - bottom), 0)             # dark backing: the gaps between slats read dark
     for i in range(slats):
         zc = top - (i + .5) * step
-        sh.box("ksk_slat", (0, F + .035, zc), (W - .34, .03, step - .012), .006)
-    sh.box("ksk_white", (0, F + .035, bottom - .012), (W - .30, .04, .035), .01)                      # bottom bar
+        sh.box("ksk_slat", (0, F + .035, zc), (W - .34, .035, step - .022), .008)
+    sh.box("ksk_white", (0, F + .035, bottom - .012), (W - .30, .045, .04), .01)                      # bottom bar
 
-    # robot arm on the counter, right end (state 0): pivots at base, shoulder, elbow, wrist
-    AX, AY, AZ = .82, F + .5, 1.04
+    # robot arm at the counter's left-front corner (state 0): pivots at base, shoulder, elbow, wrist; segments r 0.07, reach about 1.2 m
+    AX, AY, AZ = -W / 2 + .3, F + .32, TOP
     ab = node("arm_base", "kiosk", (AX, AY, AZ))
-    ab.limb("ksk_white", (AX, AY, AZ), (AX, AY, AZ + .14), .11, .09)
-    ab.sphere("ksk_joint", (AX, AY, AZ + .17), (.07, .07, .07))
-    au = node("arm_upper", "arm_base", (AX, AY, AZ + .17))
-    au.limb("ksk_white", (AX, AY, AZ + .17), (AX, AY, AZ + .62), .05)
-    au.sphere("ksk_joint", (AX, AY, AZ + .64), (.06, .06, .06))
-    af = node("arm_fore", "arm_upper", (AX, AY, AZ + .64))
-    af.limb("ksk_white", (AX, AY, AZ + .64), (AX, AY, AZ + 1.02), .042, .036)
-    af.sphere("ksk_joint", (AX, AY, AZ + 1.04), (.05, .05, .05))
-    ag = node("arm_grip", "arm_fore", (AX, AY, AZ + 1.04))
-    ag.box("ksk_white", (AX, AY, AZ + 1.09), (.10, .04, .05), .01)
+    ab.limb("ksk_white", (AX, AY, AZ), (AX, AY, AZ + .16), .15, .12)
+    ab.sphere("ksk_joint", (AX, AY, AZ + .2), (.10, .10, .10))
+    au = node("arm_upper", "arm_base", (AX, AY, AZ + .2))
+    au.limb("ksk_white", (AX, AY, AZ + .2), (AX, AY, AZ + .72), .07)
+    au.sphere("ksk_joint", (AX, AY, AZ + .74), (.09, .09, .09))
+    af = node("arm_fore", "arm_upper", (AX, AY, AZ + .74))
+    af.limb("ksk_white", (AX, AY, AZ + .74), (AX, AY, AZ + 1.22), .065, .055)
+    af.sphere("ksk_joint", (AX, AY, AZ + 1.24), (.075, .075, .075))
+    ag = node("arm_grip", "arm_fore", (AX, AY, AZ + 1.24))
+    ag.box("ksk_white", (AX, AY, AZ + 1.31), (.16, .07, .07), .015)
     for s in (1, -1):
-        ag.box("ksk_joint", (AX + s * .045, AY, AZ + 1.16), (.02, .035, .11), .004)
+        ag.box("ksk_joint", (AX + s * .075, AY, AZ + 1.42), (.03, .06, .16), .006)
 
+    # state -1: one continuous building. canopy_wide replaces canopy over kiosk + glass room; the glass room has its own base, wide counter top and glazing.
+    gx0, gx1 = W / 2, W / 2 + 1.6
+    gcx = (gx0 + gx1) / 2
+    x_lo, x_hi = -W / 2 - .15, gx1 + .15
+    cwn = node("canopy_wide", "kiosk")
+    cwn.rprism("ksk_white", x_hi - x_lo, cd, .34, CAN0, CAN1, cx=(x_lo + x_hi) / 2, cy=FRONT * .05, profile=prof_can, n=7)
+    cwn.rprism("ksk_trim", x_hi - x_lo - .5, .035, .0175, CAN0 - .022, CAN0 + .002, cx=(x_lo + x_hi) / 2, cy=F - .05, n=3)
     gl = node("glass_room", "kiosk")
-    gx0, gx1 = W / 2 + .06, W / 2 + .06 + 1.6
-    gl.rprism("ksk_kick", 1.6 - .08, D - .08, .21, 0, .08, cx=(gx0 + gx1) / 2)
-    gl.rprism("ksk_white", 1.6, D, .25, .08, 1.0, cx=(gx0 + gx1) / 2, profile=[(.015, .08), (0, .10), (0, .97), (.015, 1.0)])
-    gl.rprism("ksk_top", 1.6 + .12, D + .16, .30, 1.0, 1.04, cx=(gx0 + gx1) / 2, profile=[(0, 1.0), (0, 1.03), (.012, 1.04)])
-    gl.rprism("ksk_white", 1.6 + .12, cd, .34, CAN0, CAN1, cx=(gx0 + gx1) / 2, cy=FRONT * .05, profile=[(.0, CAN0), (0, CAN1 - .09), (.03, CAN1 - .045), (.075, CAN1)], n=7)
-    for x in (gx1 - .05, (gx0 + gx1) / 2):                                                              # slim mullions front and right
-        gl.rprism("ksk_white", .07, .07, .03, 1.04, CAN0, cx=x, cy=F + .05, n=3)
-    gl.rprism("ksk_white", .07, .07, .03, 1.04, CAN0, cx=gx1 - .05, cy=-F - .08, n=3)
-    gl.rprism("ksk_white", .07, .07, .03, 1.04, CAN0, cx=gx1 - .05, cy=0, n=3)
-    gl.box("ksk_glass", ((gx0 + gx1) / 2, F + .06, (1.04 + CAN0) / 2), (gx1 - gx0 - .1, .012, CAN0 - 1.04), 0)  # front pane
-    gl.box("ksk_glass", (gx1 - .05, 0, (1.04 + CAN0) / 2), (.012, D - .2, CAN0 - 1.04), 0)               # right pane
-    gl.box("ksk_glass", ((gx0 + gx1) / 2, -F - .07, (1.04 + CAN0) / 2), (gx1 - gx0 - .1, .012, CAN0 - 1.04), 0)  # back pane
-    gl.box("ksk_warm", ((gx0 + gx1) / 2, -F - .09, 1.55), (gx1 - gx0 - .3, .02, CAN0 - 1.1), 0)         # warm back inside
+    gl.rprism("ksk_kick", gx1 - gx0 + W - .08 - .0, CB - .08, .21, 0, .08, cx=(-W / 2 + gx1) / 2, cy=CY)  # kick under the whole wide counter
+    gl.rprism("ksk_white", gx1 + W / 2, CB, .25, .08, CT, cx=(-W / 2 + gx1) / 2, cy=CY, profile=prof_base) # one continuous counter base across both
+    gl.rprism("ksk_top", gx1 + W / 2 + .16, CB + .08, .30, CT, TOP, cx=(-W / 2 + gx1) / 2, cy=CY - .04, profile=prof_top)  # wide counter top
+    gz = (TOP + CAN0) / 2
+    for x in (gx0 + .55, gx0 + 1.1, gx1 - .05):                                                         # slim mullions on the front
+        gl.rprism("ksk_white", .06, .06, .025, TOP, CAN0, cx=x, cy=F + .05, n=3)
+    for y in (F + .05, -F - .08):                                                                        # and at the far corners
+        gl.rprism("ksk_white", .06, .06, .025, TOP, CAN0, cx=gx1 - .05, cy=y, n=3)
+    gl.rprism("ksk_white", .06, .06, .025, TOP, CAN0, cx=gx1 - .05, cy=0, n=3)
+    gl.box("ksk_glass", ((gx0 + gx1) / 2, F + .06, gz), (gx1 - gx0 - .06, .012, CAN0 - TOP), 0)         # front glazing, continuous between the mullions
+    gl.box("ksk_glass", (gx1 - .05, 0, gz), (.012, D - .2, CAN0 - TOP), 0)                               # far side glazing
+    gl.box("ksk_glass", ((gx0 + gx1) / 2, -F - .07, gz), (gx1 - gx0 - .06, .012, CAN0 - TOP), 0)       # back glazing
+    gl.box("ksk_warm", ((gx0 + gx1) / 2, -F - .09, gz + .1), (gx1 - gx0 - .3, .02, CAN0 - TOP - .3), 0)  # warm back inside
 
     root = bpy.data.objects.new("ROOT_KIOSK", None)
     bpy.context.scene.collection.objects.link(root)

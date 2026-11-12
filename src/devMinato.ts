@@ -3,6 +3,7 @@
 import * as T from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { quadFleet } from './automationKit.ts';
 import { changeSites } from './layout.ts';
 import { MINATO_LOOP, minatoPose } from './minatoTimeline.ts';
@@ -30,7 +31,9 @@ const MINATO_URL = new URL('../asset/models/resident-minato/minato.glb', import.
 const KIOSK_URL = new URL('../asset/models/resident-kiosk/kiosk.glb', import.meta.url).href;
 /** Rigid-part nodes of minato.glb (build_minato.py); three.js drops the dots from node names. */
 const NODES = ['hips', 'torso', 'head', 'upperArm.L', 'upperArm.R', 'lowerArm.L', 'lowerArm.R', 'hand.L', 'hand.R', 'upperLeg.L', 'upperLeg.R', 'lowerLeg.L', 'lowerLeg.R'] as const;
-const KIOSK_NODES = ['shutter', 'glass_room', 'arm_base', 'arm_upper', 'arm_fore', 'arm_grip'] as const;
+const KIOSK_NODES = ['shutter', 'glass_room', 'canopy_wide', 'canopy', 'counter_base', 'counter_top', 'arm_base', 'arm_upper', 'arm_fore', 'arm_grip'] as const;
+/** The camera comes closer in 0 and -1 so Minato (behind the counter) still reads; +1 keeps the surveyed camera. */
+export const CLOSE: Record<Band, number> = { low: .85, mixed: .75, high: 1 };
 const mat = (color: string, emissive = '#000000', roughness = .8) => new T.MeshStandardMaterial({ color, emissive, roughness });
 const HIDDEN = 1e-3;
 
@@ -71,7 +74,7 @@ export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, n
     slabs.add(base, new T.Mesh(mergeGeometries(lines.map(g => g.toNonIndexed()))!, jointMat));
     // The blue line runs in from the left, curves round the front of the kiosk and leaves to the right, kept on the slabs.
     const zl = Math.min(z1 - .06, 1.55);
-    const pts: [number, number][] = [[x0 + .05, zl - .05], [-3.5, zl], [0, zl + .02], [3.4, zl - .1], [x1 - .6, zl - .9], [x1 - .05, -1.2]].filter(([x]) => x >= x0 && x <= x1) as [number, number][];
+    const pts: [number, number][] = [[x0 + .05, zl - .05], [-3.5, zl], [0, zl + .02], [2.4, zl - .05], [3.2, zl - .7], [3.6, zl - 1.8]].filter(([x]) => x >= x0 && x <= x1) as [number, number][];
     slabs.add(new T.Mesh(ribbon(pts, .09, .05), lineMat));
   };
 
@@ -90,13 +93,20 @@ export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, n
   const light = new T.PointLight('#ffb45a', 0, 7, 1.5); // the warm interior light that fades when the shutter closes
   light.position.set(0, 1.7, -.2);
   rig.add(light);
-  const fill = new T.PointLight('#fff0e0', 3.2, 3.6, 1.4); // a low fill so his face reads when he stands in the lit kiosk
-  fill.position.set(.3, 1.85, 1.3);
-  rig.add(fill);
+  const fillBase = 16;
+  const fill = new T.SpotLight('#fff3e6', 16, 0, .18, .8, 1.2); // a front-top fill from the camera side so his face reads against the amber interior
+  fill.position.set(2.4, 2.6, 3.6);
+  fill.target.position.set(0, 1.6, .1);
+  rig.add(fill, fill.target);
 
   // ---- set dressing from the prop kit (bench, planter) and a slim wayfinding post with an emissive screen (no text)
   const dressing = new T.Group();
   rig.add(dressing);
+  const benchMat = mat('#e9eef3', '#000000', .55); // DEV-local white rounded block bench (the kit's slatted wood bench is not in the targets)
+  const seat = new T.Mesh(new RoundedBoxGeometry(1.8, .42, .55, 3, .08), benchMat), back = new T.Mesh(new RoundedBoxGeometry(1.8, .55, .14, 3, .06), benchMat);
+  seat.position.set(0, .25, 0); back.position.set(0, .72, -.24); back.rotation.x = -.12;
+  seat.castShadow = back.castShadow = true;
+  dressing.add(seat, back);
   const post = new T.Group();
   const postBody = new T.Mesh(new T.BoxGeometry(.3, 1.9, .2), mat('#dfe5ec', '#000000', .6)), screen = new T.Mesh(new T.BoxGeometry(.22, .3, .02), new T.MeshBasicMaterial({ color: '#d9f6ff' }));
   postBody.position.y = .95;
@@ -105,7 +115,7 @@ export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, n
   post.add(new T.Mesh(new T.BoxGeometry(.18, .12, .02), new T.MeshBasicMaterial({ color: '#7e8794' })).translateY(1.1).translateZ(-.11));
   rig.add(post);
   loadPropKit(assets).then(kit => {
-    dressing.add(instanceProps(kit, [{ name: 'bench', position: [0, 0, 0] }, { name: 'planter_1m', position: [1.4, 0, -.2] }], 1));
+    dressing.add(instanceProps(kit, [{ name: 'planter_1m', position: [1.5, 0, -.2] }], 1));
     dressing.children.forEach(c => c.position.y = .04);
   }).catch(error => console.warn(`${CITY_KIT_ID} did not load`, error));
 
@@ -113,7 +123,7 @@ export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, n
   const crowd = pedestrians(rig, 8, 'minato-set-people');
   const figure = new T.Object3D();
   const placeFigures = (b: Band) => {
-    const list: [number, number, number][] = b === 'low' ? [[0, 1.9, Math.PI], [-1.15, 1.9, Math.PI / 2], [-2.1, 1.9, Math.PI / 2], [-3.05, 1.9, Math.PI / 2], [-4.0, 1.9, Math.PI / 2], [2.0, .1, 0]] : b === 'mixed' ? [[-.15, 1.9, Math.PI - .15]] : [];
+    const list: [number, number, number][] = b === 'low' ? [[-.95, 1.9, Math.PI], [-2.05, 1.9, Math.PI / 2], [-3.0, 1.9, Math.PI / 2], [-3.95, 1.9, Math.PI / 2], [-4.9, 1.9, Math.PI / 2], [2.0, .12, 0]] : b === 'mixed' ? [[2.5, .5, -1.3], [3.6, 0, -1.4]] : [];
     for (let i = 0; i < 8; i++) {
       const p = list[i];
       figure.position.set(p?.[0] ?? 0, .04, p?.[1] ?? 0);
@@ -140,8 +150,8 @@ export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, n
       if (!(o instanceof T.Mesh)) return;
       o.castShadow = true; o.frustumCulled = false;
       const m = o.material as T.MeshStandardMaterial; // carrier-only: this load's materials, lifted a little so the face reads indoors
-      if (m.name === 'res_skin') { m.emissive = new T.Color('#ffd2a8'); m.emissiveIntensity = .38; }
-      if (m.name === 'res_navy') { m.emissive = new T.Color('#16224a'); m.emissiveIntensity = .3; }
+      if (m.name === 'res_skin') { m.emissive = new T.Color('#ffd2a8'); m.emissiveIntensity = .55; }
+      if (m.name === 'res_navy') { m.emissive = new T.Color('#16224a'); m.emissiveIntensity = .4; }
     });
     man.add(gltf.scene);
     loaded = true;
@@ -163,14 +173,16 @@ export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, n
     rig.position.set(k[0], 1.2, k[1]);
     rig.scale.setScalar(f / 3);
     ground(b);
-    const side = b === 'low' ? 1.55 : 0; // the -1 glass room pushes the dressing to the right
-    dressing.position.set(3.0 + side, 0, .6);
-    dressing.rotation.y = -.55;
-    post.position.set(5.5 + side, .04, -.2);
+    const dir = b === 'mixed' ? -1 : 1, side = b === 'low' ? 1.55 : 0; // the -1 glass room pushes the dressing to the right; in 0 the visitors take the right, so it goes left
+    dressing.position.set(dir * (3.0 + side), 0, .6);
+    dressing.rotation.y = -.55 * dir;
+    post.position.set(dir * (5.5 + side), .04, -.2);
     if (kioskLoaded) {
-      knodes.glass_room!.visible = b === 'low';
-      for (const n of ['arm_base'] as const) knodes[n]!.visible = b === 'mixed';
+      for (const n of ['glass_room', 'canopy_wide'] as const) knodes[n]!.visible = b === 'low';
+      for (const n of ['counter_base', 'counter_top', 'canopy'] as const) knodes[n]!.visible = b !== 'low';
+      knodes.arm_base!.visible = b === 'mixed';
     }
+    fill.intensity = fillBase * f ** 1.2;
     placeFigures(b);
     hubPeople.length = 0; // the hub's own crowd stands exactly where the queue and the kiosk go in -1 and 0: hidden each frame for the DEV shot (it stays in +1)
     scene.traverse(o => { if (o.name === 'hub-service-people') hubPeople.push(o); });
@@ -222,21 +234,21 @@ export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, n
         drone.flush();
       } else {
         const t = time % 5;
-        man.position.set(0, .04, -.1);
+        man.position.set(0, .04, .1); // belly within 0.1 m of the counter's inner edge
         if (b === 'low') { // one bow toward the first person in the queue
-          man.rotation.y = 0;
+          man.rotation.y = .4;
           const bow = T.MathUtils.smoothstep(t, .8, 1.8) * (1 - T.MathUtils.smoothstep(t, 3.0, 4.2));
           bn.torso.rotation.x = .55 * bow; bn.head.rotation.x = .2 * bow;
         } else { // hands a small parcel to the robot arm, which swings it away
-          man.rotation.y = .75;
+          man.rotation.y = .25;
           const take = T.MathUtils.smoothstep(t, 1.3, 2.3), away = T.MathUtils.smoothstep(t, 2.6, 4.0), back = T.MathUtils.smoothstep(t, 4.2, 4.9);
           const hold = T.MathUtils.smoothstep(t, .3, 1.1) * (1 - T.MathUtils.smoothstep(t, 2.4, 3.0)); // the free arm offers the parcel
           bn['upperArm.R'].rotation.x = -.85 * hold; bn['lowerArm.R'].rotation.x = -.9 * hold;
-          kn.arm_upper.rotation.z = .85 * take - 1.25 * away * (1 - back) + 0 * back;
-          kn.arm_fore.rotation.z = .55 * take - .6 * away * (1 - back);
+          kn.arm_upper.rotation.z = -.75 * take * (1 - away); kn.arm_upper.rotation.x = .9 * away * (1 - back);
+          kn.arm_fore.rotation.z = -.65 * take * (1 - away); kn.arm_fore.rotation.x = .5 * away * (1 - back);
           man.updateMatrixWorld(true); kn.arm_grip.updateMatrixWorld(true);
           kn.arm_grip.getWorldPosition(handA); rig.worldToLocal(handA);
-          handB.set(.18, 1.05, .45).applyMatrix4(man.matrix); // between his hands, in front of his chest
+          handB.set(.1, 1.1, .45).applyMatrix4(man.matrix); // between his hands, in front of his chest
           if (t < 4.2) { parcel.visible = true; parcel.position.copy(handB).lerp(handA, take); }
         }
       }
@@ -258,7 +270,7 @@ export function startMinato(scene: T.Scene, camera: T.PerspectiveCamera, at: T.V
     const b = minato.detect();
     if (b !== posed) { // the camera offset scales with the state's crowd factor, so the framing is the same in -1, 0 and +1
       posed = b;
-      const pose = residentPose(override?.kiosk ?? KIOSK_BY[b], override?.cam ?? CAM_REL, FACTOR[b]);
+      const pose = residentPose(override?.kiosk ?? KIOSK_BY[b], override?.cam ?? CAM_REL, FACTOR[b] * CLOSE[b]);
       setPose(pose.position, pose.target);
       at.set(...pose.position);
     }
