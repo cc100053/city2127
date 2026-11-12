@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
-import { HeadlineCamera, SHOTS, type ShotId } from './headlineCamera';
+import { HeadlineCamera, headlineShot, SHOTS, type ShotId } from './headlineCamera';
+import { BEAT_SECONDS } from './minatoTimeline';
 import { EnergyNarration } from './energyNarration';
 import * as T from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
@@ -212,7 +213,16 @@ try {
     cityElevatorNear:(on:boolean)=>elevatorNear.setActive(on)});
     if(params.has('elevatorNear'))elevatorNear.setActive(true);
     const shot=params.get('shot');
-    if(shot!==null)(window as unknown as {cityShot:(id:string)=>void}).cityShot(shot);
+    // `?meters=nw:2&shot=nw:resident`: human-scale 湊 prototype (src/devMinato.ts); its pose is not in SHOTS, which stay the production close-ups.
+    // `&kiosk=x,z&cam=px,py,pz,tx,ty,tz` (kiosk stage position, camera relative to the kiosk in metres) override the default kiosk for pose surveys.
+    if(shot==='nw:resident')import('./devMinato').then(({startMinato,residentPose,KIOSK})=>{
+      const kp=params.get('kiosk')?.split(',').map(Number),cp=params.get('cam')?.split(',').map(Number);
+      const override={kiosk:kp?[kp[0],kp[1]] as [number,number]:undefined,cam:cp?{position:cp.slice(0,3),target:cp.slice(3,6)}:undefined};
+      const pose=residentPose(override.kiosk??KIOSK,override.cam),at=new T.Vector3(...pose.position);
+      const setPose=(p:number[],t:number[])=>(window as unknown as {cityPose:(p:number[],t:number[])=>void}).cityPose(p,t);
+      setPose(pose.position,pose.target);devFrame=startMinato(scene,camera,at,setPose,override);
+    });
+    else if(shot!==null)(window as unknown as {cityShot:(id:string)=>void}).cityShot(shot);
   }
   // Applied after the first frame, so `now` already holds the clock (or a held `reviewTime`) rather than its initial 0.
   if(import.meta.env.DEV && (metersParam!==null||shotPreview))import('./devMeters').then(async({devLayout})=>{
@@ -233,6 +243,9 @@ try {
     if(to!==null)playMeters(to,now-Number(params.get('metersAge')??1));
   });
   const journey=surveyUrl?new VoteJourney(scene,camera):null;
+  // DEV `?survey=…&residentDemo`: a live NW +1 headline visits 湊 after the building change (src/devResidentDemo.ts); everything else keeps the normal timeline.
+  let residentDemo:{start:(changeEnd:number,to:'low'|'mixed'|'high',previous:'low'|'mixed'|'high')=>void;cancel:()=>void}|null=null,nwBand:'low'|'mixed'|'high'='mixed';
+  if(import.meta.env.DEV&&surveyUrl&&headlineCamera&&params.has('residentDemo'))import('./devResidentDemo').then(({startResidentDemo})=>{const demo=startResidentDemo(scene,camera,controls);residentDemo=demo;devFrame=now=>demo.frame(now,headlineCamera.active);});
   // A live energy headline narrates one compressed storage cycle during the close-up hold.
   const narration=surveyUrl&&headlineCamera?new EnergyNarration(()=>cityChanges?.energy):null;
   // 暮らしの声 #N over the close-up site; it lives only while the headline camera does, so every cancel path hides it.
@@ -252,8 +265,9 @@ try {
     if(params.has('explore'))requestAnimationFrame(()=>requestAnimationFrame(()=>{explore.voices=ring.litVoices();startExplore({target:exploreTarget(params.get('exploreTarget')),ordinal:Number(params.get('explore'))||1},now-Number(params.get('exploreAt')??0));}));
   }
   if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view,displayMs)=>{
-    devShot=null;explore?.interrupt();if(explore&&isExhibitionView(view))explore.voices=view.guestCount;
+    devShot=null;residentDemo?.cancel();explore?.interrupt();if(explore&&isExhibitionView(view))explore.voices=view.guestCount;
     if(isExhibitionView(view)){
+      const prevNw=nwBand;nwBand=view.layout.bands.nw;
       // Cancel any legacy score blend while preserving its current rendered atmosphere.
       world.blendTo(world.state,now);ring.setVoices(view.guestCount);holo.setVoices(view.guestCount);holo.setTiers(view.layout.tiers);
       const latest=view.latestProposal;
@@ -262,9 +276,12 @@ try {
       if(kind==='city-state-updated'&&latest&&!cameraMotion.matches&&displayMs>=DISPLAY_MS-100){
         const changes=cityChanges!.applyExhibitionLayout(view.layout,kind,now+(headlineCamera?shotTimeline(displayMs).change:ARRIVAL_SECONDS),view.slotSeeds,now,latest.votes);
         journey!.play(latest.votes,latest.ordinal,now,changes[0]?.headline&&changes[0].district&&!changes[0].focalOnly?changes[0]:undefined);
-        const shot=headlineCamera?.play(changes,now,displayMs)??null;
+        // DEV demo: the headline shot is held BEAT_SECONDS longer after the building change, so 湊's visit fits before the return to hero.
+        const visit=residentDemo&&changes[0]?.socketId==='nw'&&['nw:focal','nw:focal-low'].includes(headlineShot(changes[0])??'');
+        const shot=headlineCamera?.play(changes,now,visit?(shotTimeline(displayMs).changeEnd+BEAT_SECONDS)*1000:displayMs)??null;
         narration?.play(shot,changes[0],now,displayMs);
-        if(shot&&voiceLabel){const t=shotTimeline(displayMs);voiceLabel.show(residentIdentity(latest),SHOTS[shot].target,now+t.hold,now+t.flyOut);}
+        if(shot&&voiceLabel){const t=shotTimeline(displayMs);voiceLabel.show(residentIdentity(latest),SHOTS[shot].target,now+t.hold,now+(visit?t.changeEnd:t.flyOut));}
+        if(visit&&(shot==='nw:focal'||shot==='nw:focal-low'))residentDemo!.start(now+shotTimeline(displayMs).changeEnd,view.layout.bands.nw,prevNw);
         return changes;
       }
       headlineCamera?.cancel();narration?.cancel();

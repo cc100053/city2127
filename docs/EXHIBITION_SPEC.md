@@ -187,3 +187,9 @@ Admin Day／Night／Auto 保存為獨立 display setting：12:00／22:00／180 �
 使用者確認問卷採石墨灰背景、柔和青綠選取色、暖琥珀主按鈕與 5px 圓角，呼應深灰金屬、青色燈條及橙黃裝飾的展台參考。`feat/guest-ui-graphite` 將此視覺延伸至開始、四題、核對、等待、結果與交接畫面。選項新增簡短日文標題，正式問題與完整選項原文持續顯示。操作沿用既有問卷與探索流程。此為獨立 UI 分支，實際 iPad 與現場照明舒適度仍待驗收。實作與驗證見[交接](handoffs/guest-ui-graphite.md)。
 
 Sky Ring Blender polish R4（2026-11-08）仍是待 owner 接受嘅候選；原沿岸航線與支柱相撞後，owner 決定局部調整航線，採樣驗證及逐項視覺改善見交接。詳見 [交接](handoffs/skyring-closeup-polish.md)。
+
+## 居民情景方向 — 2026-11-12（owner 採納；runtime 仍是 DEV 演示）
+
+Owner 採納方向 A：城市變化保持細緻，戲劇性放在居民生活。每個投票結果的目標次序是「投票 → 推近建築看變化 → 再推近看一位居民的行動」；每個變化單位先完成建築／變化元素的打磨並由 owner 收貨，再做人物情景故事。單位總表、四位居民、台詞、owner 決定及未核對項目以 [RESIDENT_SCENE_PLAN](RESIDENT_SCENE_PLAN.md) 為準。
+
+現況：只有 NW focal（デックス西）有人物一拍，並且只在 Vite DEV 加 `?residentDemo` 時出現（[交接](handoffs/resident-minato.md)）。正式展覽流程、13 秒閱讀時段、lease、A/B 排程及 iPad 畫面均未更改；把人物一拍接入正式流程會把返回 hero 的時間由約 15 秒延長至約 20 秒，屬產品契約改動，須另開任務並由 owner 批准。
