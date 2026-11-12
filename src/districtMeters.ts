@@ -1090,10 +1090,10 @@ export class ConcentrationDistrict {
   private readonly podLevels = new SlotLevels(this.pods.length, buildProgress);
   /** Tower meshes per silhouette family (slot i: `towerFamily(i)`). */
   private readonly families: T.InstancedMesh[][];
-  private readonly podMeshes: T.InstancedMesh[];
+  private podMeshes: T.InstancedMesh[];
   /** P8 design per pod site: two-tier pod (0) / garden ring pavilion (1). */
   readonly podDesign: number[] = POD_SITES.map((_, i) => designOf(i, 1201, 2));
-  private readonly ringMeshes: T.InstancedMesh[];
+  private ringMeshes: T.InstancedMesh[];
   /** P10 extras: vertical-forest crowns (concentration + environment high), drone docks (concentration + automation high) on towers,
    * and solar canopies over pods (concentration + environment low). */
   private readonly forest = new SlotLevels(TOWER_SITES.length);
@@ -1277,6 +1277,37 @@ export class ConcentrationDistrict {
     this.root.visible = false; parent.add(this.root); this.write();
   }
 
+  /** Swap only after all six variants are ready; the current levels also cover snapshots and in-flight changes. */
+  installDistrictAssets(root: T.Object3D): void {
+    root.updateWorldMatrix(true, true);
+    const names = ['twist', 'terraced', 'twin', 'frame', 'double', 'ring'];
+    const variants = names.map((name, i) => {
+      const group = root.getObjectByName(`district_${name}`);
+      if (!group) throw new Error(`Missing district variant ${name}`);
+      const sources: T.Mesh[] = [];
+      const inverse = group.matrixWorld.clone().invert();
+      group.traverse(object => {
+        if (!(object instanceof T.Mesh) || Array.isArray(object.material)) return;
+        const geometry = object.geometry.clone().applyMatrix4(inverse.clone().multiply(object.matrixWorld));
+        if (i < 4) geometry.scale(1, .01, 1);
+        sources.push(new T.Mesh(geometry, object.material));
+      });
+      if (!sources.length) throw new Error(`Empty district variant ${name}`);
+      return sources;
+    });
+    for (const source of variants.flat()) if (source.material instanceof T.Material && source.material.name === 'district_glass') {
+      source.material.side = T.DoubleSide; source.material.forceSinglePass = true;
+    }
+    const nextFamilies = variants.slice(0, 4).map((sources, family) => this.instances(sources,
+      slotFamilies.filter(value => value === family).length, 'concentration-vertical-towers'));
+    const nextPod = this.instances(variants[4], this.pods.length, 'concentration-distributed-pods');
+    const nextRing = this.instances(variants[5], this.pods.length, 'concentration-distributed-pods');
+    for (const mesh of [...this.families.flat(), ...this.podMeshes, ...this.ringMeshes]) this.root.remove(mesh);
+    this.families.splice(0, this.families.length, ...nextFamilies);
+    this.podMeshes = nextPod; this.ringMeshes = nextRing;
+    this.write();
+  }
+
   setTarget({ tiers }: LadderTarget, now: number, immediate: boolean, seed = 0, quiet = false, sampleAt = now): boolean {
     if (immediate) { this.pulses.clear(); this.build.clear(); }
     const tier = tiers.se;
@@ -1346,7 +1377,7 @@ export class ConcentrationDistrict {
   private instances(sources: T.Mesh[], count: number, name: string): T.InstancedMesh[] {
     return sources.map(source => {
       const mesh = new T.InstancedMesh(source.geometry, source.material, count);
-      mesh.name = name; mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;
+      mesh.name = name; mesh.castShadow = Array.isArray(source.material) || source.material.name !== 'district_glass'; mesh.receiveShadow = true; mesh.frustumCulled = false;
       mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); this.root.add(mesh); return mesh;
     });
   }

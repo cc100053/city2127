@@ -28,6 +28,11 @@ export interface SiteAssetDefinition {
 }
 
 export const SITE_ASSET_CATALOG: Readonly<Record<SiteAssetId, SiteAssetDefinition>> = {
+  'se-district-2127': {
+    id: 'se-district-2127',
+    url: new URL('../../asset/models/se-district-2127/se-district-2127.glb', import.meta.url).href,
+    rootName: 'ROOT_SE_DISTRICT_2127', category: 'kit', footprint: [40, 40], maxHeight: 112, materialPolicy: 'preserve',
+  },
   'future-tree-2127': {
     id: 'future-tree-2127',
     url: new URL('../../asset/models/future-tree-2127/future-tree-2127.glb', import.meta.url).href,

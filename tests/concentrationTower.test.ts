@@ -136,7 +136,7 @@ try {
     const mesh = new T.Mesh(new T.BoxGeometry(1, 1, 1), new T.MeshStandardMaterial()); mesh.position.y = .5; prop.add(mesh);
   }
   const stubAssets = new SiteAssetLoaderCache({
-    async loadAsync(url: string) { const scene = new T.Scene(); scene.add((url.includes('city-kit') ? kitRoot : stubRoot).clone(true)); return { scene, animations: [] }; },
+    async loadAsync(url: string) { if (url.includes('se-district-2127')) return new Promise<never>(() => {}); const scene = new T.Scene(); scene.add((url.includes('city-kit') ? kitRoot : stubRoot).clone(true)); return { scene, animations: [] }; },
   });
   const assetSite = buildConcentrationTower(new T.Scene(), kit, stubAssets);
   const assetUpper = assetSite.layers.towerUpper!;

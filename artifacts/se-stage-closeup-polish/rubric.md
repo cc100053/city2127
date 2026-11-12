@@ -4,19 +4,19 @@ Owner selected these three targets on 2026-11-12 and chose to retain the city's 
 
 ## East distributed `pods`
 
-- `ep-ring` [0.18,0.75,0.28,0.91] capture [0.19,0.78,0.29,0.90] — the left low pavilion has a green annular roof with a central tree and an uninterrupted glazed front with warm rooms.
-- `ep-double` [0.27,0.76,0.39,0.94] capture [0.28,0.79,0.40,0.94] — the middle pavilion reads as two separate levels of warm glazed rooms with white overhanging discs and planted roof.
-- `ep-entry` [0.81,0.79,0.96,0.97] capture [0.84,0.83,0.98,0.98] — a visible ground-level entrance in the right pavilion with a short connected threshold, one resident by the entrance and a warm furnished interior.
-- `ep-services` [0.17,0.75,0.40,0.94] capture [0.18,0.78,0.41,0.95] — room use is identifiable through the glazing from tables and seats or counters and shelves, with multiple distinct residents across the left and middle pavilions.
-- `ep-rhythm` [0.16,0.74,0.97,0.98] capture [0.17,0.76,0.99,0.98] — three separate low destinations with open ground between them, repeated white rims and narrow warm amber edging.
+- `ep-ring` [0.18,0.75,0.28,0.91] capture [0.249,0.686,0.327,0.779] — the left low pavilion has a green annular roof with a central tree and an uninterrupted glazed front with warm rooms.
+- `ep-double` [0.27,0.76,0.39,0.94] capture [0.304,0.686,0.397,0.804] — the middle pavilion reads as two separate levels of warm glazed rooms with white overhanging discs and planted roof.
+- `ep-entry` [0.81,0.79,0.96,0.97] capture [0.760,0.756,0.864,0.870] — a visible ground-level entrance in the right pavilion with a short connected threshold, one resident by the entrance and a warm furnished interior.
+- `ep-services` [0.17,0.75,0.40,0.94] capture [0.245,0.682,0.401,0.811] — room use is identifiable through the glazing from tables and seats or counters and shelves, with multiple distinct residents across the left and middle pavilions.
+- `ep-rhythm` [0.16,0.74,0.97,0.98] capture [0.243,0.677,0.867,0.874] — three separate low destinations with open ground between them, repeated white rims and narrow warm amber edging.
 
 ## East concentrated `towers`
 
-- `et-frame` [0.55,0.08,0.67,0.72] capture [0.56,0.08,0.67,0.73] — a white open structural frame, with visible voids, green terraces and at least three warm enclosed service volumes.
-- `et-setbacks` [0.67,0.20,0.79,0.72] capture [0.68,0.20,0.80,0.69] — three clear setbacks in the right tower with white structure, warm glazed bays and at least one planted lobby terrace.
-- `et-lift` [0.73,0.21,0.78,0.69] capture [0.73,0.22,0.79,0.68] — one narrow continuous glazed shaft along a visible edge of the stepped tower, with a distinct capsule.
-- `et-services` [0.56,0.22,0.79,0.72] capture [0.56,0.20,0.80,0.73] — multiple distinguishable rooms visible at different heights, including tables or counters and resident silhouettes.
-- `et-wayfinding` [0.55,0.08,0.79,0.72] capture [0.55,0.08,0.80,0.73] — both towers share thin amber seams, a clear entrance at the podium and vertical stacks of warm interiors.
+- `et-frame` [0.55,0.08,0.67,0.72] capture [0.587,0.109,0.680,0.687] — a white open structural frame, with visible voids, green terraces and at least three warm enclosed service volumes.
+- `et-setbacks` [0.67,0.20,0.79,0.72] capture [0.713,0.214,0.797,0.653] — three clear setbacks in the right tower with white structure, warm glazed bays and at least one planted lobby terrace.
+- `et-lift` [0.73,0.21,0.78,0.69] capture [0.741,0.214,0.798,0.653] — one narrow continuous glazed shaft along a visible edge of the stepped tower, with a distinct capsule.
+- `et-services` [0.56,0.22,0.79,0.72] capture [0.584,0.205,0.799,0.687] — multiple distinguishable rooms visible at different heights, including tables or counters and resident silhouettes.
+- `et-wayfinding` [0.55,0.08,0.79,0.72] capture [0.584,0.107,0.800,0.689] — both towers share thin amber seams, a clear entrance at the podium and vertical stacks of warm interiors.
 
 ## South vertical `towers`
 

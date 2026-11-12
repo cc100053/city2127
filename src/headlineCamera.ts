@@ -33,8 +33,8 @@ export const SHOTS: Record<ShotId, Pose> = {
   'sw:stage-courts-south': { position: [-247, 98, 249], target: [-89, 3, 249] },
   'sw:stage-courts-west': { position: [-578, 139, 393], target: [-418, 3, 233] },
   // Low and close from the east so the pods read at size, with the SE focal lot behind them as the anchor.
-  'se:stage-east': { position: [400, 90, 20], target: [225, 5, 20] },
-  'se:stage-south': { position: [-161, 201, 372], target: [83, 45, 283] },
+  'se:stage-east': { position: [440, 65, -25], target: [217, 48, 15] },
+  'se:stage-south': { position: [-180, 70, 375], target: [80, 56, 283] },
   'energy:garden': { position: [-375, 45, -215], target: [-322, 5, -161] },
   'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },
   'energy:ring': { position: [-70, 135, -170], target: [-18, 99, -24] },

@@ -19,7 +19,7 @@ export function checkHousingCity(city: Object3D) {
   let manager: CityChangeManager;
   try {
     Object.defineProperty(globalThis, 'document', { configurable: true, value: { createElement: () => ({ width: 0, height: 0, getContext: () => ({ fillRect() {}, fillText() {} }) }) } });
-    manager = new CityChangeManager(buildSurveySites(district, { cloneRoot: () => new Promise<Group>(() => {}) } as never), new EnergyRuntime(district));
+    manager = new CityChangeManager(buildSurveySites(district, { cloneRoot: () => new Promise<Group>(() => {}), load: () => new Promise<never>(() => {}) } as never), new EnergyRuntime(district));
   } finally {
     if (documentBefore) Object.defineProperty(globalThis, 'document', documentBefore); else delete (globalThis as { document?: unknown }).document;
   }
