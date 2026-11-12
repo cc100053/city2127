@@ -244,7 +244,7 @@ try {
   });
   const journey=surveyUrl?new VoteJourney(scene,camera):null;
   // DEV `?survey=…&residentDemo`: a live NW +1 headline visits 湊 after the building change (src/devResidentDemo.ts); everything else keeps the normal timeline.
-  let residentDemo:{start:(changeEnd:number)=>void;cancel:()=>void}|null=null;
+  let residentDemo:{start:(changeEnd:number,to:'low'|'mixed'|'high',previous:'low'|'mixed'|'high')=>void;cancel:()=>void}|null=null,nwBand:'low'|'mixed'|'high'='mixed';
   if(import.meta.env.DEV&&surveyUrl&&headlineCamera&&params.has('residentDemo'))import('./devResidentDemo').then(({startResidentDemo})=>{const demo=startResidentDemo(scene,camera,controls);residentDemo=demo;devFrame=now=>demo.frame(now,headlineCamera.active);});
   // A live energy headline narrates one compressed storage cycle during the close-up hold.
   const narration=surveyUrl&&headlineCamera?new EnergyNarration(()=>cityChanges?.energy):null;
@@ -267,6 +267,7 @@ try {
   if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view,displayMs)=>{
     devShot=null;residentDemo?.cancel();explore?.interrupt();if(explore&&isExhibitionView(view))explore.voices=view.guestCount;
     if(isExhibitionView(view)){
+      const prevNw=nwBand;nwBand=view.layout.bands.nw;
       // Cancel any legacy score blend while preserving its current rendered atmosphere.
       world.blendTo(world.state,now);ring.setVoices(view.guestCount);holo.setVoices(view.guestCount);holo.setTiers(view.layout.tiers);
       const latest=view.latestProposal;
@@ -276,11 +277,11 @@ try {
         const changes=cityChanges!.applyExhibitionLayout(view.layout,kind,now+(headlineCamera?shotTimeline(displayMs).change:ARRIVAL_SECONDS),view.slotSeeds,now,latest.votes);
         journey!.play(latest.votes,latest.ordinal,now,changes[0]?.headline&&changes[0].district&&!changes[0].focalOnly?changes[0]:undefined);
         // DEV demo: the headline shot is held BEAT_SECONDS longer after the building change, so 湊's visit fits before the return to hero.
-        const visit=residentDemo&&view.layout.tiers.nw===1&&headlineShot(changes[0])==='nw:focal';
+        const visit=residentDemo&&changes[0]?.socketId==='nw'&&['nw:focal','nw:focal-low'].includes(headlineShot(changes[0])??'');
         const shot=headlineCamera?.play(changes,now,visit?(shotTimeline(displayMs).changeEnd+BEAT_SECONDS)*1000:displayMs)??null;
         narration?.play(shot,changes[0],now,displayMs);
         if(shot&&voiceLabel){const t=shotTimeline(displayMs);voiceLabel.show(residentIdentity(latest),SHOTS[shot].target,now+t.hold,now+(visit?t.changeEnd:t.flyOut));}
-        if(visit&&shot==='nw:focal')residentDemo!.start(now+shotTimeline(displayMs).changeEnd);
+        if(visit&&(shot==='nw:focal'||shot==='nw:focal-low'))residentDemo!.start(now+shotTimeline(displayMs).changeEnd,view.layout.bands.nw,prevNw);
         return changes;
       }
       headlineCamera?.cancel();narration?.cancel();

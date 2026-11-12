@@ -51,7 +51,7 @@ function ribbon(points: readonly [number, number][], width: number, y: number) {
 }
 
 /** Builds the kiosk set and Minato on the NW hub stage. `settled()`: the state is fully up; `show(on, t)` poses the action at t seconds. */
-export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, number], anyState = false) {
+export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, number], anyState = false, settledOnly = false) {
   const stage = scene.getObjectByName('hub-stage'), groups = { low: scene.getObjectByName('hub-state-low'), mixed: scene.getObjectByName('hub-state-mixed'), high: scene.getObjectByName('hub-state-high') };
   if (!stage || !groups.high || !groups.mixed || !groups.low) throw new Error('?shot=nw:resident needs the NW hub (meters=nw:2)');
   const rig = new T.Group(); // stage space, turned to the kiosk: x across, y up, z out of the opening, in metres x the state's factor
@@ -139,7 +139,7 @@ export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, n
   const man = new T.Group(), bones: Partial<Record<(typeof NODES)[number], T.Object3D>> = {};
   man.position.y = .04;
   rig.add(man);
-  let loaded = false;
+  let loaded = false, skinMat: T.MeshStandardMaterial | null = null, navyMat: T.MeshStandardMaterial | null = null;
   new GLTFLoader().loadAsync(MINATO_URL).then(gltf => {
     for (const name of NODES) {
       const node = gltf.scene.getObjectByName(name.replace('.', ''));
@@ -150,8 +150,8 @@ export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, n
       if (!(o instanceof T.Mesh)) return;
       o.castShadow = true; o.frustumCulled = false;
       const m = o.material as T.MeshStandardMaterial; // carrier-only: this load's materials, lifted a little so the face reads indoors
-      if (m.name === 'res_skin') { m.emissive = new T.Color('#ffd2a8'); m.emissiveIntensity = .55; }
-      if (m.name === 'res_navy') { m.emissive = new T.Color('#16224a'); m.emissiveIntensity = .4; }
+      if (m.name === 'res_skin') { m.emissive = new T.Color('#ffd2a8'); m.emissiveIntensity = .55; skinMat = m; }
+      if (m.name === 'res_navy') { m.emissive = new T.Color('#16224a'); m.emissiveIntensity = .4; navyMat = m; }
     });
     man.add(gltf.scene);
     loaded = true;
@@ -182,13 +182,15 @@ export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, n
       for (const n of ['counter_base', 'counter_top', 'canopy'] as const) knodes[n]!.visible = b !== 'low';
       knodes.arm_base!.visible = b === 'mixed';
     }
-    fill.intensity = fillBase * f ** 1.2;
+    fill.intensity = fillBase * f ** 1.2 * (b === 'low' ? 6 : 1);
     placeFigures(b);
     hubPeople.length = 0; // the hub's own crowd stands exactly where the queue and the kiosk go in -1 and 0: hidden each frame for the DEV shot (it stays in +1)
     scene.traverse(o => { if (o.name === 'hub-service-people') hubPeople.push(o); });
   };
   const hubPeople: T.Object3D[] = [];
   const detect = (): Band => groups.low!.visible ? 'low' : groups.mixed!.visible ? 'mixed' : 'high';
+  // The live demo switches the set only when a state is fully up (the building change has finished), so nothing pops while the change plays.
+  const settledBand = (): Band | null => (['low', 'mixed', 'high'] as const).find(k => groups[k]!.visible && groups[k]!.scale.y > .999) ?? null;
 
   const edge = new T.Vector3(), handA = new T.Vector3(), handB = new T.Vector3();
   const standingHeight = (camera: T.PerspectiveCamera) => {
@@ -206,10 +208,11 @@ export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, n
       rig.visible = on;
       drone.show(on && band === 'high');
       if (!on) return;
-      const b = anyState ? detect() : 'high';
+      const b = anyState ? (settledOnly ? settledBand() ?? band ?? 'mixed' : detect()) : 'high';
       configure(b);
       if (b !== 'high') for (const o of hubPeople) o.visible = false;
       if (!loaded || !kioskLoaded) return;
+      if (skinMat && navyMat) { skinMat.emissiveIntensity = b === 'low' ? 2.2 : .55; navyMat.emissiveIntensity = b === 'low' ? 1.6 : .4; } // -1: he is backlit by the whole amber hall
       const bn = bones as Record<(typeof NODES)[number], T.Object3D>, kn = knodes as Record<(typeof KIOSK_NODES)[number], T.Object3D>;
       let shutter = 0, lightLevel = 1;
       for (const n of NODES) bn[n].rotation.set(0, 0, 0);
