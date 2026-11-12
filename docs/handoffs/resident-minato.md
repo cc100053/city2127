@@ -7,7 +7,7 @@
 - Branch: `feat/resident-minato-proto`
 - Base commit: `8773dab67ed36d70f486532f4822e930721a6fb5`
 - Last verified commit: `4b117c16053d6a1a102d933dd127209ef23131f7`（原型最後一個 source commit）；之後只有文件同 skill
-- Remote availability: 見下面「整合」
+- Remote availability: `origin/feat/resident-minato-proto` 同 `origin/main`（2026-11-12 push）
 
 ## Session Git state
 
@@ -77,4 +77,4 @@ Owner 揀：（a）執湊嘅演技同口形，或者（b）照 [resident-scene](
 
 ## 整合
 
-@INTEGRATION@
+2026-11-12，owner 指示「merge main」。`git merge --no-ff` 入 `origin/main` `8773dab`，merge commit `c902d46b1f0a69ec1969a56b959d2705e0695425`。Merge 結果嘅 tree 同已驗證嘅分支 tip `0aa3317` 完全一樣（`git diff` 空），所以沿用上面嘅 root test／build 結果，冇重跑。之後呢個紀錄 commit 只改本文件。Push 同 main CI 結果見 commit 之後嘅 [handoffs README](README.md) 或 `git log origin/main`。
