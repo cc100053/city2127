@@ -24,6 +24,8 @@ The [resident experience plan](RESIDENT_EXPERIENCE_PLAN.md) records P1–P3 impl
 
 DEV 近鏡量度（closeup-polish S0）：`main.ts` 只在 `import.meta.env.DEV` 動態載入 [devShotFrame.ts](../src/devShotFrame.ts)，提供 `window.cityShotFrame(id)`。主體依現有名稱取 socket site root、district carrier 或能源 group；回傳可見 mesh／instance 的 world AABB 投影、九個內縮取樣點及第一個可見 mesh 命中。沒有主體或 bounds 跨 near plane 時明確回傳 null，不能當 framing PASS。沿用現有 test dependency `three-mesh-bvh` 的 indirect 精確 raycast，僅同步量度期間暫換並還原 Mesh raycast；不改 render loop 或 production。CPU raycast 不模擬 shader displacement／貼圖 alpha，因此是計劃的幾何取樣條件，並非逐像素可見性證明。
 
+DEV 居民情景（2026-11-12，湊／NW focal）：`main.ts` 只在 `import.meta.env.DEV` 動態載入 [devMinato.ts](../src/devMinato.ts)（`?meters=nw:2&shot=nw:resident`，可加 `&kiosk=x,z&cam=px,py,pz,tx,ty,tz` 做鏡頭位勘察）及 [devResidentDemo.ts](../src/devResidentDemo.ts)（`?survey=…&residentDemo`）。後者在 live 結果的 headline 是 `nw:focal`／`nw:focal-low` 時，把 headline 鏡頭多留 `BEAT_SECONDS`（10 s），由建築變化完結起沿弧線移到居民鏡頭（FOV 52）、播一次行動、再返回；期間結果卡淡出、左下顯示一句字幕，任何新 survey 訊息都會取消。行動及鏡頭一拍是 [minatoTimeline.ts](../src/minatoTimeline.ts) 的純函數；人物及亭仔是 Blender 剛體分件 GLB（`asset/models/resident-minato`、`resident-kiosk`），由程式旋轉有名節點，沒有骨骼或 `AnimationMixer`。佈景、人物及鏡頭距離跟 hub 路人比例（+1 ×1.0、0 ×1.6、−1 ×2.6）放大。`SHOTS`、`shotTimeline` 及 production build 不受影響。詳見 [交接](handoffs/resident-minato.md)。
+
 | File / module | Responsibility |
 | --- | --- |
 | [main.ts](../src/main.ts) | Startup, WebGL renderer, lighting/sky/fog, composer, OrbitControls, loop/resize, survey hookup and diagnostics |

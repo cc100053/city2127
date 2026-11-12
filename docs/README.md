@@ -11,6 +11,7 @@
 | [PROJECT](PROJECT.md) | 現行模組、source/data/render flow、資源 lifecycle |
 | [RESIDENT_COPY](RESIDENT_COPY.md) | P1 日文居民文案與接入條件；P2文案／P3結果接入；設施增加仍須符合實際證據 |
 | [RESIDENT_EXPERIENCE_PLAN](RESIDENT_EXPERIENCE_PLAN.md) | 居民雙屏體驗 P1–P5 計劃、交付及驗收；P1–P3已實作，P4軟件驗證通過，P5驗收表已準備、實機未測 |
+| [RESIDENT_SCENE_PLAN](RESIDENT_SCENE_PLAN.md) | 方向 A（owner 2026-11-12 採納）：每個變化單位先打磨建築／變化，再做人物情景；單位總表、四位居民、台詞同 owner 決定。Runtime 只有 DEV 演示 |
 | [ENERGY_CITY_PLAN](ENERGY_CITY_PLAN.md) | 能源篇E1–E5計劃；E1–E4完成並發布main，CI通過；Q3能源獨立累積及權威模型接入，保留舊氣候／歷史；E5目前Mac mini 30分鐘性能／操作量測已完成，實機／訪客另待驗 |
 | [HOUSING_CITY_PLAN](HOUSING_CITY_PLAN.md) | 建築・居住篇H0–H3；H0具體提案／本機證據已簽收，H1隔離靜態比較已簽收；H1b靜態次設計已通過coordinator review；H2的90秒DEV搬運循環及H3評估已通過coordinator review；正式歸屬待人類決定；仮説4只保留概念，本輪不改問卷 |
 | [ART](ART.md)／[CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) | 實作美術規則／視覺與世界觀 authority |
@@ -48,3 +49,5 @@
 ## Repository skill
 
 [Dream Loop 介紹](../.agents/skills/dream-loop/README.md)及[skill 入口](../.agents/skills/dream-loop/SKILL.md)是獨立工具指引，不是產品規格。[近鏡打磨 skill](../.agents/skills/closeup-polish/SKILL.md)（2026-11-01，由 SE 樣板整理）記錄 Opus 規格／Sonnet 實作／owner 驗收嘅流程同教訓；[長時間打磨 skill](../.agents/skills/long-polish-loop/SKILL.md)（2026-11-03，由 city-taste-v2 通宵流程嘅教訓整理）規定逐部份 rubric、owner 校準、盲審 judge、用盡時間預算同每輪近鏡回歸檢查。Claude 經 `.claude/skills/<名>` 本機 symlink 讀取（`.claude/` 唔入 Git）。本次文件整理沒有執行其生成／實作流程。
+
+2026-11-12：[polish-ladder](../.agents/skills/polish-ladder/SKILL.md) 揀下一個變化單位並按兩級（建築／變化 → 人物情景）推進；[resident-scene](../.agents/skills/resident-scene/SKILL.md) 係第二級嘅流程同湊樣板嘅教訓。
