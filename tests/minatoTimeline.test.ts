@@ -2,10 +2,10 @@ import assert from 'node:assert/strict';
 import { MINATO_LOOP, minatoPose } from '../src/minatoTimeline.ts';
 
 const start = minatoPose(0), done = minatoPose(8);
-assert.deepEqual([start.shutter, start.light, start.reach, start.x, start.z], [0, 1, 0, 0, -.35], 'starts inside the open, lit booth');
-assert.ok(minatoPose(1.4).z === -.35 && minatoPose(2.2).x > .5 && minatoPose(2.5).x === 1.25, 'steps out beside the opening during 1.5-2.5 s');
+assert.deepEqual([start.shutter, start.light, start.reach, start.x, start.z], [0, 1, 0, 0, -.1], 'starts inside the open, lit booth');
+assert.ok(minatoPose(1.4).z === -.1 && minatoPose(2.2).x > .5 && minatoPose(2.5).x === 1.65, 'steps out beside the opening during 1.5-2.5 s');
 // He is outside the booth (|x| > .8 or in front of the counter at z > .75) the whole time the shutter moves, so it never hides him.
-for (let t = 2.5; t <= 4; t += .05) assert.ok(Math.abs(minatoPose(t).x) > .8, `outside the booth at ${t.toFixed(2)} s`);
+for (let t = 2.5; t <= 4; t += .05) assert.ok(Math.abs(minatoPose(t).x) > 1.4, `outside the booth at ${t.toFixed(2)} s`);
 assert.ok(minatoPose(3.3).shutter > 0 && minatoPose(3.3).shutter < 1 && minatoPose(3.3).reach > .9 && minatoPose(2.5).shutter === 0, 'pulls the shutter down with the arm up');
 assert.ok(minatoPose(3.3).light < minatoPose(2.8).light, 'warm light fades out while the shutter comes down');
 assert.deepEqual([done.shutter, done.light, done.reach], [1, 0, 0], 'closed, dark, arm down');

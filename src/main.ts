@@ -215,10 +215,12 @@ try {
     const shot=params.get('shot');
     // `?meters=nw:2&shot=nw:resident`: human-scale 湊 prototype (src/devMinato.ts); its pose is not in SHOTS, which stay the production close-ups.
     // `&kiosk=x,z&cam=px,py,pz,tx,ty,tz` (kiosk stage position, camera relative to the kiosk in metres) override the default kiosk for pose surveys.
-    if(shot==='nw:resident')import('./devMinato').then(({startMinato,residentPose})=>{
-      const kp=params.get('kiosk')?.split(',').map(Number),cp=params.get('cam')?.split(',').map(Number),kiosk=kp?[kp[0],kp[1]] as [number,number]:undefined;
-      const pose=residentPose(kiosk,cp?{position:cp.slice(0,3),target:cp.slice(3,6)}:undefined),at=new T.Vector3(...pose.position);
-      (window as unknown as {cityPose:(p:number[],t:number[])=>void}).cityPose(pose.position,pose.target);devFrame=startMinato(scene,camera,at,kiosk);
+    if(shot==='nw:resident')import('./devMinato').then(({startMinato,residentPose,KIOSK})=>{
+      const kp=params.get('kiosk')?.split(',').map(Number),cp=params.get('cam')?.split(',').map(Number);
+      const override={kiosk:kp?[kp[0],kp[1]] as [number,number]:undefined,cam:cp?{position:cp.slice(0,3),target:cp.slice(3,6)}:undefined};
+      const pose=residentPose(override.kiosk??KIOSK,override.cam),at=new T.Vector3(...pose.position);
+      const setPose=(p:number[],t:number[])=>(window as unknown as {cityPose:(p:number[],t:number[])=>void}).cityPose(p,t);
+      setPose(pose.position,pose.target);devFrame=startMinato(scene,camera,at,setPose,override);
     });
     else if(shot!==null)(window as unknown as {cityShot:(id:string)=>void}).cityShot(shot);
   }
