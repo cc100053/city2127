@@ -30,7 +30,7 @@
 | NW focal — デックス西 AUTO HUB（−1／0／+1） | 10.6% | 收貨（旗艦 R9） | 湊：DEV 演示齊，三個狀態、四種轉變（[handoff](handoffs/resident-minato.md)）；owner 接受作演示 | 階段 2 收尾：演技、口形、正式接入 |
 | NW bays — `nw:stage-west`／`stage-mid`／district | 19.4% | 收貨（Bay R2） | 未設計。提議：切返去湊同一個佈景 | 定 district 變化點樣接居民（owner 決定） |
 | SE focal — フジテレビ東（−1／0／+1） | 10.9% | 收貨（R4；+1 塔 Blender R3，9/12） | 時子：只有台詞同行動草稿 | 階段 2 由揀鏡頭位開始 |
-| SE 塔＋pod 組件 — `se:stage-east`／`stage-south` | 19.7% | **未打磨** | 提議：切返去時子 | 階段 1 |
+| SE 塔＋pod 組件 — `se:stage-east`／`stage-south` | 19.7% | [階段 1 進行中](handoffs/se-stage-closeup-polish.md)，R2 日夜各 16/30 | 提議：切返去時子 | 階段 1 |
 | SW rooms — `sw:stage-rooms-west`／`east` | 17.4% | **未打磨** | 未有居民（共有軸） | 階段 1；同時定 SW 居民 |
 | SW focal — アクアシティ南 | 10.5% | **未打磨** | 未有居民 | 階段 1 |
 | SW courts — `sw:stage-courts-west`／`south` | 7.2% | **未打磨** | 未有居民 | 階段 1 |

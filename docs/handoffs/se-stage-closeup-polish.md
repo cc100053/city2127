@@ -1,10 +1,10 @@
 # SE 塔＋pod — district close-up polish
 
 - Owner: cc100053（視覺驗收）；Codex 統籌，Terra 實作。
-- Status: IN_PROGRESS — owner selected targets, Terra building R1
+- Status: IN_PROGRESS — R2 measured and scored, Terra building R3
 - Branch: `feat/se-stage-closeup-polish`
 - Base commit: `056ce514a99587798756bcfcf2a74463e7b81cf5`
-- Last verified commit: NONE
+- Last verified commit: `d80eb33` (R1)
 - Remote availability: `origin/feat/se-stage-closeup-polish`
 
 ## Session Git state
@@ -48,7 +48,16 @@ Owner selected all three targets on 2026-11-12 and confirmed that the current as
 Terra built and integrated six Blender variants under `asset/models/se-district-2127/`, with a procedural fallback, instanced batches and current-state transforms applied on load. Final cameras are east `[440,65,-25] → [217,48,15]` and south `[-180,70,375] → [80,56,283]`.
 
 - GLB `c53aa55c6f6ef0ad3b4fea718fcbecd449e1cc4c8e7c90057938edc53cb1e7b3`, 1,767 KB approximate. Blender game QA six PASS, 0 errors. Separate import into empty Blender 5.2.2 confirmed all six variants. UV overlap applies to untextured projection UVs. Remaining warnings include planar n-gons, interior back-to-back surfaces and enclosed foundation/rim parts. Full all-variant wire review remains open.
-- Root `npm test`, `npm run build` and `git diff --check` passed for Terra. Real GLB checks cover bounds, roles, transparency and late swap at settled and in-flight matrices. Headless Chrome, 3200×1800, day/night six shots, 0 page errors. Real exhibition survey and complete fly-in/return samples remain open.
+- Root `npm test`, `npm run build` and `git diff --check` passed independently and for Terra. Real GLB checks cover bounds, roles, transparency and late swap at settled and in-flight matrices. Headless Chrome, 3200×1800, day/night six shots, 0 page errors. Independent DEV browser instrumentation on `d80eb33` sampled five seeded district transitions, verified both stage selections, active builds at 6.5 s, settlement by 8.35 s and hero by 15.1 s, with 0 page errors. Straight flight showed a nearby facade during both approaches at 3.8 s. An isolated SE-only altitude-arc prototype cleared that point in both approaches. Real exhibition survey remains open.
 - Headed Chrome hero `se:high`, 1920×1080 DPR 1, first sample removed: day 45.2–48.0 FPS, night 47.2–48.5 FPS. Baseline ranges overlap. Exhibition hardware NOT RUN.
 - Three blind judges scored 12 / 12 / 13 day and night. Per-item median **12/30** both. [Scored crops](../../artifacts/se-stage-closeup-polish/r1/vs-target.jpg). Passed: distribution and edging of the three pods, and the open frame with three warm volumes. Below target: pod glazing, two-tier rooms, entries and furnishings; stepped tower rooms, lift, services and wayfinding; south twins, twist, lift, life and materials.
 - Next: apply the [R2 spec](../../artifacts/se-stage-closeup-polish/spec-r2.md) in Terra, preserve R1 passes and rescore. Visual acceptance and main integration pending.
+
+## R2 — 2026-11-12
+
+Terra changed the opaque blocks into recessed service-room backs, added separate floor bands, figures, tables, doors, thresholds, planted decks and visible lift guides. The two SE camera paths now rise over the foreground during travel, with 140 m east and 100 m south midpoint offsets. Stop poses and timing stay at the R1 values.
+
+- GLB SHA256 `8da47d36b780f9b00ae4b0779926f214e66c269803fd6ca13bc1fe6661a8e67e`, 2,136,028 bytes, 35,792 triangles. Blender QA all six PASS, zero errors. Separate Blender reimport verified six variant roots, 36 meshes, six material roles. Multi-angle random/wire checked by Terra. Retained warnings: untextured overlapping UVs, planar n-gons, hidden back-to-back faces and enclosed components.
+- Root `npm test`, `npm run build`, `git diff --check` PASS by Terra. The camera test asserts both arc midpoints and unchanged endpoints. An independent 1600×900 DEV browser run repeated the five R1 transitions with the authored arc and checked stage, live builds, settlement and hero return. The travel clears the nearby facade at the sampled 3.8 s point. Headless Chrome 3200×1800, three day/night pairs, 0 page errors. Headed hero `se:high` 1920×1080 DPR 1, warm samples: day 45.6–47.1 FPS, night 46.2–48.3 FPS.
+- Median against target **16/30 day and night** (day totals 16/16/16, night 16/17/16). Pairwise R2 vs R1: 11 wins, 3 losses, 1 tie both. [Scored crops](../../artifacts/se-stage-closeup-polish/r2/vs-target.jpg). Only pod separation/trim reaches 2. R1 wins ring warmth, twist and south material, which share changed rooms with the R2 wins for entries, furniture and south interior life. Keep R2 as a whole, then recover the warmth in R3 with the furnished geometry intact.
+- Next: [R3 spec](../../artifacts/se-stage-closeup-polish/spec-r3.md). Owner visual acceptance and main integration pending.

@@ -122,6 +122,9 @@ export class HeadlineCamera {
       const push = .07 * MathUtils.smoothstep(elapsed, t.hold, t.flyOut);
       this.camera.position.copy(this.position).lerp(this.target, push);
       this.camera.position.lerpVectors(heroPosition, this.camera.position, blend);
+      // The east flight crosses a taller waterfront facade than the south flight.
+      const lift = this.shot === 'se:stage-east' ? 140 : this.shot === 'se:stage-south' ? 100 : 0;
+      this.camera.position.y += 4 * blend * (1 - blend) * lift;
       this.controls.target.copy(heroTarget).lerp(this.target, blend);
     }
     this.camera.lookAt(this.controls.target);
