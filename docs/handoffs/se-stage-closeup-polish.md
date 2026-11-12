@@ -1,7 +1,7 @@
 # SE 塔＋pod — district close-up polish
 
 - Owner: cc100053（視覺驗收）；Codex 統籌，Terra 實作。
-- Status: IN_PROGRESS — baseline and target candidates ready for owner selection
+- Status: IN_PROGRESS — owner selected targets, Terra building R1
 - Branch: `feat/se-stage-closeup-polish`
 - Base commit: `056ce514a99587798756bcfcf2a74463e7b81cf5`
 - Last verified commit: NONE
@@ -30,7 +30,7 @@
 | East, seed 0, rung −2 → −1 | Pods 6, 7, 8 disappear and tower 2 appears. Original shot clips both tower tops. | Original aim at 5 m points down to the pod group. The three roofs and white walls have low contrast with the foreground in daylight. | `[400,68,20] → [220,54,20]`. All three changing pods and the stepped tower fit in the reviewed transition. The far left support still enters the frame. |
 | South, seed 0, rung +1 → +2 | Tower 3 rises. The original shot hides part of its taller shaft behind a support and cuts the near twisted mid-rise at the bottom. | The high, downward west-side sightline intersects the Sky Ring pylon. | `[-180,70,375] → [80,56,283]`. Both sites are in frame in the reviewed transition and the twin shaft reads against the sky. |
 
-The first alternate east camera `[420,66,80]` and first alternate south camera `[70,110,495]` encountered foreground supports. The chosen south position was sampled against the twelve authored pylon axes before its browser check. Camera candidates are DEV overrides and haven't been wired into SHOTS.
+The first alternate east camera `[420,66,80]` and first alternate south camera `[70,110,495]` encountered foreground supports. The chosen south position was sampled against the twelve authored pylon axes before its browser check. Camera candidates are DEV overrides and have not been wired into SHOTS. South also fits both towers at +3. The foreground focal tower partly masks east tower 2 at +3. Node configuration sampling confirms seed 3 can change tower 2 and pods 8–10 on +2 → +3; east therefore needs a high-state check before choosing a production pose.
 
 ## Actual validation results
 
@@ -41,4 +41,4 @@ The first alternate east camera `[420,66,80]` and first alternate south camera `
 
 ## Next expected step
 
-Owner selects or revises the district target candidates and decides whether to hold the existing asset sizes. [Generation prompts](../../artifacts/se-stage-closeup-polish/prompts.md). Then record the chosen targets, align crops and write the rubric and spec for Terra. Owner visual acceptance follows implementation and scored review.
+Owner selected all three targets on 2026-11-12 and confirmed that the current asset dimensions govern. Reviewed all 15 baseline crop pairs. [Rubric](../../artifacts/se-stage-closeup-polish/rubric.md) · [R1 spec](../../artifacts/se-stage-closeup-polish/spec.md). Terra builds R1, including the seeded camera checks. Owner visual acceptance follows implementation and scored review.
