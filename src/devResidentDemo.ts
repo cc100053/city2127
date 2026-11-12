@@ -24,7 +24,7 @@ export function startResidentDemo(scene: T.Scene, camera: T.PerspectiveCamera, c
   const setFov = (value: number) => { if (camera.fov !== value) { camera.fov = value; camera.updateProjectionMatrix(); } };
   const card = () => document.querySelector<HTMLElement>('.resident-panel'); // the right-hand result card: only its opacity is touched here
   const end = () => { phase = 'done'; setFov(fov); box.hidden = true; const c = card(); if (c) c.style.opacity = ''; };
-  let last = { phase: 'idle', u: 0, blend: 0, headline: false, band: 'mixed' as string }; // `window.cityResidentDemo()`: for timing checks
+  let last = { phase: 'idle', u: 0, blend: 0, headline: false, band: 'mixed' as string, probe: null as unknown }; // `window.cityResidentDemo()`: for timing checks
   Object.assign(window, { cityResidentDemo: () => last });
   return {
     /** The headline camera's building change ends at `changeEnd` (clock seconds); NW arrives at band `to`, coming from `previous`. */
@@ -63,7 +63,7 @@ export function startResidentDemo(scene: T.Scene, camera: T.PerspectiveCamera, c
       }
       if (phase === 'beat' && now < from) action = held; // a new result arrived after a beat: the set keeps its last pose until its building change completes
       else if (phase !== 'beat') held = action;
-      last = { phase, u: phase === 'beat' ? now - from : 0, blend: phase === 'beat' ? residentBeat(now - from).blend : 0, headline: headlineActive, band: minato.band ?? '' };
+      last = { phase, u: phase === 'beat' ? now - from : 0, blend: phase === 'beat' ? residentBeat(now - from).blend : 0, headline: headlineActive, band: minato.band ?? '', probe: minato.probe() as unknown };
       minato.show(true, action);
     },
   };

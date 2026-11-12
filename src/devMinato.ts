@@ -182,7 +182,7 @@ export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, n
       for (const n of ['counter_base', 'counter_top', 'canopy'] as const) knodes[n]!.visible = b !== 'low';
       knodes.arm_base!.visible = b === 'mixed';
     }
-    fill.intensity = fillBase * f ** 1.2 * (b === 'low' ? 6 : 1);
+    fill.intensity = fillBase * f ** 1.2;
     placeFigures(b);
     hubPeople.length = 0; // the hub's own crowd stands exactly where the queue and the kiosk go in -1 and 0: hidden each frame for the DEV shot (it stays in +1)
     scene.traverse(o => { if (o.name === 'hub-service-people') hubPeople.push(o); });
@@ -200,8 +200,16 @@ export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, n
   /** Screen y in CSS pixels of the point `y` metres above Minato's feet (debug measurement). */
   const screenY = (camera: T.PerspectiveCamera, y: number) => (1 - man.localToWorld(edge.set(0, y, 0)).project(camera).y) / 2 * innerHeight;
 
+  /** Screen box (CSS px) of the face: a 0.2 m square centred 1.52 m above his feet (debug measurement). */
+  const faceBox = (camera: T.PerspectiveCamera) => {
+    const c = man.localToWorld(new T.Vector3(0, 1.44, 0)).project(camera), r = man.localToWorld(new T.Vector3(.1, 1.44, 0)).project(camera);
+    return { x: (c.x + 1) / 2 * innerWidth, y: (1 - c.y) / 2 * innerHeight, r: Math.abs(r.x - c.x) / 2 * innerWidth };
+  };
   return {
-    standingHeight, screenY, detect,
+    /** Resting-state probe for tests: the set variant, shutter, interior light and Minato's spot. */
+    probe: () => kioskLoaded ? { band, rig: rig.visible, shutterScale: +knodes.shutter!.scale.y.toFixed(3), shutterVisible: knodes.shutter!.visible, light: +light.intensity.toFixed(2),
+      glassRoom: knodes.glass_room!.visible, canopyWide: knodes.canopy_wide!.visible, canopy: knodes.canopy!.visible, arm: knodes.arm_base!.visible, man: [+man.position.x.toFixed(2), +man.position.z.toFixed(2)] } : null,
+    standingHeight, screenY, faceBox, detect,
     get band() { return band; },
     settled: () => anyState || (groups.high!.visible && groups.high!.scale.y > .999), // the shot shows the kiosk in every hub state; the live demo only in +1
     show(on: boolean, time: number) {
@@ -212,7 +220,7 @@ export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, n
       configure(b);
       if (b !== 'high') for (const o of hubPeople) o.visible = false;
       if (!loaded || !kioskLoaded) return;
-      if (skinMat && navyMat) { skinMat.emissiveIntensity = b === 'low' ? 2.2 : .55; navyMat.emissiveIntensity = b === 'low' ? 1.6 : .4; } // -1: he is backlit by the whole amber hall
+      if (skinMat && navyMat) { skinMat.emissiveIntensity = .55; navyMat.emissiveIntensity = .4; } // -1: he is backlit by the whole amber hall
       const bn = bones as Record<(typeof NODES)[number], T.Object3D>, kn = knodes as Record<(typeof KIOSK_NODES)[number], T.Object3D>;
       let shutter = 0, lightLevel = 1;
       for (const n of NODES) bn[n].rotation.set(0, 0, 0);
@@ -266,7 +274,7 @@ export function createMinato(scene: T.Scene, kioskOverride?: readonly [number, n
 export function startMinato(scene: T.Scene, camera: T.PerspectiveCamera, at: T.Vector3, setPose: (position: number[], target: number[]) => void, override?: { kiosk?: [number, number]; cam?: { position: number[]; target: number[] } }) {
   const minato = createMinato(scene, override?.kiosk, true);
   let frozen: number | null = null, posed: Band | null = null;
-  Object.assign(window, { cityMinatoT: (seconds: number | null) => { frozen = seconds; }, cityMinatoFigure: () => minato.standingHeight(camera), cityMinatoScreenY: (y: number) => minato.screenY(camera, y) });
+  Object.assign(window, { cityMinatoT: (seconds: number | null) => { frozen = seconds; }, cityMinatoFigure: () => minato.standingHeight(camera), cityMinatoScreenY: (y: number) => minato.screenY(camera, y), cityMinatoFace: () => minato.faceBox(camera) });
   // The pose's narrow lens applies only while the camera sits on this DEV pose (a shot button or a live change moves it away).
   const fov = camera.fov;
   return (now: number) => {
