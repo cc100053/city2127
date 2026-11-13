@@ -85,6 +85,22 @@
 
 [artifacts/resident-sw-nagi/prompts.md](../../artifacts/resident-sw-nagi/prompts.md)：共用段、−1 前、+1 前、0 日、0 夜、角色設定圖，各附基準圖。**尚未生成任何 Gemini 圖，也未挑選**；目標圖與角色須由 owner 挑選。
 
+**2026-11-14 嘗試（未完成）**：經 Claude in Chrome 驅動 Gemini（`/u/3/app`，帳號已登入）可上傳基準圖、選 Create image、貼 prompt 並成功生成 −1 前一張（對話標題「Nagi Awaits Her Room」，對話網址 `gemini.google.com/u/3/app/ef6c4b410fa104aa`，構圖保留鏡位與周邊，人物、長椅與花園可讀）。但按「Download full size」後 Gemini 顯示已下載，`~/Downloads` 與家目錄均找不到檔案，頁面內只有 1024×576 預覽 blob，故**沒有任何候選圖存入 `~/city2127-evidence/resident-sw-nagi/`，其餘三張場景與角色設定圖也未生成**。須先解決下載落點（或由 owner 直接以 prompts.md 在 Gemini 生成）才能繼續。上述 −1 前圖僅存在於 owner 的 Gemini 對話中，未經挑選。
+
+### 模組門實測（供步驟 5 定凪的尺寸）
+
+量度來源為 `asset/models/city-kit-2127/modules.py` 的 `_door`／`event_module`（GLB 以角色合併網格，節點無法逐件量；單位為公尺，場景以 `UNITS_PER_METRE` .25 縮放）：
+
+| 部件 | 尺寸 |
+|------|------|
+| 門扇 | 寬 1.05 m × 高 2.0 m |
+| 門框 | 寬 1.25 m × 高 2.1 m |
+| 雨篷 | 離門底 2.3 m，寬 1.9 m，出挑 .85 m |
+| 門前階 | 兩級，下級高 .22 m |
+| 模組整體 | 8.6 × 8.6 × 3.2 m（H 型廳 h = 7.4 m） |
+
+**建議凪身高 2.0 m**（場景比例；人群已縮至約 2.2 m）：門扇淨高 2.0 m，凪須略低於門框頂 2.1 m 方可站姿通過；若要與背景人群同高（≈ 2.2 m）則須放大門（高 2.3 m 以上）或讓她低頭進門。取 2.0 m 時頭頂離雨篷約 .3 m，肩寬 .45 m 可通過 1.05 m 門。兩者取捨交 owner 決定。
+
 ## Known issues and blockers
 
 - 階段 1（Meter 0／mixed 的棚）已由 owner 驗收（2026-11-14）；−1／+1 沿用 COMMONS，不在居民範圍。
