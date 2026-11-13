@@ -1,5 +1,5 @@
 // Fixed city captures into the evidence folder, one browser for the whole batch; closeupSheet.mjs shares the loader.
-// npm run capture -- [--size=3200x1800] [--settle=7] [--ui] <url> <task/round/name> [<url> <task/round/name>...]
+// npm run capture -- [--size=3200x1800] [--settle=7] <url> <task/round/name> [<url> <task/round/name>...]
 // A url starting with `?` goes to $CITY2127_URL (default http://127.0.0.1:5173/); a name without .jpg saves PNG.
 // Each image gets a .json sidecar: url, commit, dirty tree, viewport, DPR and the canvas diagnostics at capture.
 import assert from 'node:assert/strict';
@@ -22,7 +22,7 @@ export async function newCityPage(browser, { width = 1600, height = 900 } = {}, 
 }
 
 // Loads the city, waits for the first 120-frame diagnostics, then lets builds and fades settle before the shot.
-export async function captureCity(page, url, path, { settleMs = 7000, hideUi = true } = {}) {
+export async function captureCity(page, url, path, { settleMs = 7000, hideUi = false } = {}) {
   await page.goto(url, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => document.querySelector('canvas')?.dataset.fps, null, { timeout: 90000 });
   if (hideUi) await page.addStyleTag({ content: 'body *:not(canvas):not(:has(canvas)) { visibility: hidden !important }' });
@@ -32,16 +32,15 @@ export async function captureCity(page, url, path, { settleMs = 7000, hideUi = t
 }
 
 export function parseArgs(argv, base = 'http://127.0.0.1:5173/') {
-  const opts = { width: 1600, height: 900, settleMs: 7000, hideUi: true }, rest = [];
+  const opts = { width: 1600, height: 900, settleMs: 7000 }, rest = [];
   for (const arg of argv) {
     const [key, value] = arg.split('=');
     if (key === '--size') [opts.width, opts.height] = value.split('x').map(Number);
     else if (key === '--settle') opts.settleMs = Number(value) * 1000;
-    else if (key === '--ui') opts.hideUi = false;
     else if (arg.startsWith('--')) throw new Error(`unknown option ${arg}`);
     else rest.push(arg);
   }
-  if (!rest.length || rest.length % 2 || !(opts.width > 0 && opts.height > 0 && opts.settleMs >= 0)) throw new Error('usage: npm run capture -- [--size=WxH] [--settle=s] [--ui] <url> <task/round/name> ...');
+  if (!rest.length || rest.length % 2 || !(opts.width > 0 && opts.height > 0 && opts.settleMs >= 0)) throw new Error('usage: npm run capture -- [--size=WxH] [--settle=s] <url> <task/round/name> ...');
   const jobs = [];
   for (let i = 0; i < rest.length; i += 2) {
     const [url, name] = rest.slice(i, i + 2);
@@ -53,12 +52,12 @@ export function parseArgs(argv, base = 'http://127.0.0.1:5173/') {
 
 if (process.argv[2] === '--self-test') {
   const { opts, jobs } = parseArgs(['--size=3200x1800', '--settle=10', '?shot=nw:e&hour=12', 'nw/r3/day', 'http://127.0.0.1:5174/?hour=22', 'nw/r3/night.jpg'], 'http://127.0.0.1:5173/');
-  assert.deepEqual(opts, { width: 3200, height: 1800, settleMs: 10000, hideUi: true });
+  assert.deepEqual(opts, { width: 3200, height: 1800, settleMs: 10000 });
   assert.deepEqual(jobs, [
     { url: 'http://127.0.0.1:5173/?shot=nw:e&hour=12', dir: 'nw/r3', file: 'day.png' },
     { url: 'http://127.0.0.1:5174/?hour=22', dir: 'nw/r3', file: 'night.jpg' },
   ]);
-  for (const bad of [[], ['?x'], ['nw/day', '?x'], ['?x', 'day'], ['?x', '../day'], ['?x', '/abs/day'], ['--size=0x9', '?x', 'a/b'], ['--zoom', '?x', 'a/b']]) assert.throws(() => parseArgs(bad), bad.join(' '));
+  for (const bad of [[], ['?x'], ['nw/day', '?x'], ['?x', 'day'], ['?x', '../day'], ['?x', '/abs/day'], ['--size=0x9', '?x', 'a/b'], ['--ui', '?x', 'a/b']]) assert.throws(() => parseArgs(bad), bad.join(' '));
   console.log('capture self-test PASS');
 } else if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const { opts, jobs } = parseArgs(process.argv.slice(2), process.env.CITY2127_URL);
@@ -70,7 +69,7 @@ if (process.argv[2] === '--self-test') {
     for (const job of jobs) {
       const path = join(evidenceDir(job.dir), job.file), before = errors.length;
       const canvas = await captureCity(page, job.url, path, opts);
-      writeFileSync(path.replace(/\.(png|jpg)$/, '.json'), `${JSON.stringify({ url: job.url, ...source, viewport: { width: opts.width, height: opts.height }, dpr: 1, settleMs: opts.settleMs, hideUi: opts.hideUi, capturedAt: new Date().toISOString(), pageErrors: errors.slice(before), canvas }, null, 1)}\n`);
+      writeFileSync(path.replace(/\.(png|jpg)$/, '.json'), `${JSON.stringify({ url: job.url, ...source, viewport: { width: opts.width, height: opts.height }, dpr: 1, settleMs: opts.settleMs, capturedAt: new Date().toISOString(), pageErrors: errors.slice(before), canvas }, null, 1)}\n`);
       console.log(`${path}  fps ${canvas.fps}  hour ${canvas.hour}${source.dirty ? '  (uncommitted changes)' : ''}`);
     }
   } finally { await browser.close(); }
