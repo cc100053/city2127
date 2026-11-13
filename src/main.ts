@@ -206,7 +206,9 @@ try {
       headlineCamera?.cancel();devShot=SHOTS[id as ShotId];controls.enabled=false;
     },
     // `cityPose([x,y,z],[tx,ty,tz])`: free review camera for poses that are not in SHOTS yet.
-    cityPose:(position:[number,number,number],target:[number,number,number])=>{
+    // Optional `fov` (degrees) for resident-scene surveys; the camera keeps it until reload.
+    cityPose:(position:[number,number,number],target:[number,number,number],fov?:number)=>{
+      if(fov!==undefined&&camera.fov!==fov){camera.fov=fov;camera.updateProjectionMatrix();}
       headlineCamera?.cancel();devShot={position,target};controls.enabled=false;
     },
     // `cityElevatorNear(true)` / `?elevatorNear`: the R1 mid-distance elevator model instead of the far R6 silhouette.
@@ -222,6 +224,8 @@ try {
       const setPose=(p:number[],t:number[])=>(window as unknown as {cityPose:(p:number[],t:number[])=>void}).cityPose(p,t);
       setPose(pose.position,pose.target);devFrame=startMinato(scene,camera,at,setPose,override);
     });
+    // `?meters=sw:mixed&shot=free&pose=px,py,pz,tx,ty,tz&fov=52`: free review camera in world metres, for resident-scene surveys (`npm run capture` cannot call `cityPose`).
+    else if(shot==='free'){const c=params.get('pose')?.split(',').map(Number);if(c?.length===6&&c.every(Number.isFinite))(window as unknown as {cityPose:(p:number[],t:number[],f?:number)=>void}).cityPose(c.slice(0,3),c.slice(3),params.has('fov')?Number(params.get('fov')):undefined);}
     else if(shot!==null)(window as unknown as {cityShot:(id:string)=>void}).cityShot(shot);
   }
   // Applied after the first frame, so `now` already holds the clock (or a held `reviewTime`) rather than its initial 0.
@@ -237,7 +241,7 @@ try {
       return changes;
     };
     Object.assign(window,{cityMeters:(meters:string)=>playMeters(meters,now)});
-    import('./devShotPanel').then(({mountShotPanel})=>mountShotPanel(first.tiers,meters=>playMeters(meters,now),(window as unknown as {cityShot:(id:string)=>void}).cityShot));
+    if(!params.has('nopanel'))import('./devShotPanel').then(({mountShotPanel})=>mountShotPanel(first.tiers,meters=>playMeters(meters,now),(window as unknown as {cityShot:(id:string)=>void}).cityShot));
     // `&metersTo=se:high&metersAge=8.3`: seconds since the live result; held `reviewTime` previews the settled headline shot.
     const to=params.get('metersTo');
     if(to!==null)playMeters(to,now-Number(params.get('metersAge')??1));
