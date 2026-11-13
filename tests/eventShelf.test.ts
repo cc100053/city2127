@@ -78,4 +78,43 @@ shelf.update(13.1);
 assert.equal(shelf.count, 34);
 shelf.setCount(30, 20, true);
 assert.equal(shelf.visibleModules(), 30, 'an immediate change (snapshot / reset) restores the authoritative count at once');
+// Headline hoist, every count the DEV hook can reach (30..37) in both directions: the module never overlaps another module or the frame, never jumps, drives in from beyond the track end and ends exactly in its cell.
+{
+  const g = new T.Group(), sh = createEventShelf(g);
+  sh.setBandLevel(1); sh.update(0);
+  const inVariant = new Map<string, number>(), perVariant = new Map<string, number>();
+  for (const s of SHELF_SLOTS) { const n = perVariant.get(s.variant) ?? 0; inVariant.set(s.id, n); perVariant.set(s.variant, n + 1); }
+  const modules = sh.group.getObjectByName('event-shelf-modules')!;
+  const m4 = new T.Matrix4(), v = new T.Vector3();
+  const pose = (i: number) => { const s = SHELF_SLOTS[i], mesh = modules.children.find(c => c.name === `event-shelf-module-${s.variant}`) as T.InstancedMesh; mesh.getMatrixAt(inVariant.get(s.id)!, m4); v.setFromMatrixPosition(m4); return { x: v.x, y: v.y, z: v.z, shown: m4.elements[0] > .5 }; };
+  type Box = { x0: number; x1: number; y0: number; y1: number; z0: number; z1: number };
+  const box = (x: number, y: number, z: number, h: number, hw = SHELF.module / 2): Box => ({ x0: x - hw, x1: x + hw, y0: y, y1: y + h, z0: z - hw, z1: z + hw });
+  const hit = (a: Box, b: Box) => Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0) > 1e-6 && Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0) > 1e-6 && Math.min(a.z1, b.z1) - Math.max(a.z0, b.z0) > 1e-6;
+  const W = SHELF.cols * SHELF.cell, D = SHELF.rows * SHELF.cell, frame: Box[] = [];
+  const add = (sx: number, sy: number, sz: number, x: number, y: number, z: number) => frame.push({ x0: x - sx / 2, x1: x + sx / 2, y0: y - sy / 2, y1: y + sy / 2, z0: z - sz / 2, z1: z + sz / 2 });
+  for (let i = 0; i <= SHELF.cols; i++) for (let j = 0; j <= SHELF.rows; j++) add(SHELF.col, SHELF.levels * SHELF.floor, SHELF.col, -W / 2 + i * SHELF.cell, SHELF.levels * SHELF.floor / 2, -D / 2 + j * SHELF.cell);
+  for (let k = 1; k <= SHELF.levels; k++) {
+    for (let j = 0; j <= SHELF.rows; j++) add(W + SHELF.col, .8, .9, 0, k * SHELF.floor - .4, -D / 2 + j * SHELF.cell);
+    for (let i = 0; i <= SHELF.cols; i++) add(.9, .8, D + SHELF.col, -W / 2 + i * SHELF.cell, k * SHELF.floor - .4, 0);
+  }
+  for (let count = 30; count <= 37; count++) for (const dir of [1, -1]) {
+    const before = dir === 1 ? count - 1 : count, after = dir === 1 ? count : count - 1, slot = Math.max(before, after) - 1, s = SHELF_SLOTS[slot];
+    sh.setCount(before, 0, true); sh.update(0); sh.setCount(after, 100, false);
+    let last: { x: number; y: number; z: number } | undefined, seenZ = [Infinity, -Infinity];
+    for (let t = 100; t <= 103.001; t += .05) {
+      sh.update(t);
+      const p = pose(slot);
+      if (!p.shown) continue;
+      const b = box(p.x, p.y, p.z, s.variant === 'H' ? 7.4 : 3.2);
+      for (let i = 0; i < SHELF_SLOTS.length; i++) { const o = pose(i); if (i !== slot && o.shown) assert.ok(!hit(b, box(o.x, o.y, o.z, SHELF_SLOTS[i].variant === 'H' ? 7.4 : 3.2)), `${count}${dir > 0 ? '+' : '-'} ${s.id} meets ${SHELF_SLOTS[i].id} at ${(t - 100).toFixed(2)} s`); }
+      assert.ok(!frame.some(f => hit(b, f)), `${count}${dir > 0 ? '+' : '-'} ${s.id} meets the frame at ${(t - 100).toFixed(2)} s`);
+      if (last) assert.ok(Math.hypot(p.x - last.x, p.y - last.y, p.z - last.z) < 3, `${s.id} jumps ${(t - 100).toFixed(2)} s`);
+      last = p; seenZ = [Math.min(seenZ[0], p.z), Math.max(seenZ[1], p.z)];
+    }
+    assert.ok(seenZ[0] < -33, `${s.id} drives in from beyond the track end (z ${seenZ[0].toFixed(1)})`);
+    sh.update(103.2);
+    assert.equal(sh.count, after);
+    assert.equal(pose(slot).shown, after > before, 'the hoisted module ends in its cell (added) or gone (removed)');
+  }
+}
 console.log(`PASS: shelf slots (33 of ${SHELF_SLOTS.length}, deck level empty), GLB roles/bounds/${total} tris/${file.byteLength} bytes, GLB swap and single-hoist retarget`);

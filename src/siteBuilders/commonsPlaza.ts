@@ -501,7 +501,7 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown, assets?: SiteA
   stage.add(mixedGroup);
   const shelf = createEventShelf(mixedGroup);
   addPart('mixed', 0, .6, level => { mixedGroup.visible = level > HIDDEN; mixedGroup.scale.set(1, Math.max(HIDDEN, level), 1); }, true);
-  addPart('mixed', .35, .65, level => shelf.setBandLevel(level));
+  addPart('mixed', 1, .4, level => shelf.setBandLevel(level)); // modules slide in after the frame is up and out before it comes down, never squashed with it
   const YARD = .04; // paving top (0.15 m) in units
   stateGroup('commons-state-mixed-yard', 'mixed', 0, .6, g => {
     // Forecourt greenery on the shelf's paving; hedges and small trees along the front and rear edge, trees only where the tracks are not.

@@ -53,6 +53,21 @@ test('commons states follow the band, retarget smoothly, hide before the exhibit
   assert.deepEqual(runtime.getDiagnostics(), { band: 'high', targetSharedSeats: 8, visibleSharedSeats: 8, targetScreenedSeats: 0, visibleScreenedSeats: 0 });
   assert.ok(!plaza.children.some(child => child.name === 'commons-pods-low' && child.visible), 'no private pods in the +1 state');
 
+  // Band change order (the only shelf change the live ladder produces: mixed always means 4 seats): the frame is up before modules slide in, the modules are out before the frame comes down, and nothing is squashed with it.
+  const shelfFrame = state('mixed');
+  runtime.setTarget({ band: 'mixed', sharedSeats: 4 }, 40, false);
+  runtime.update(41.5);
+  assert.ok(shelfFrame.visible && shelfFrame.scale.y > 0 && shelfFrame.scale.y < 1 && runtime.getShelfDiagnostics().visibleModules === 0, 'frame still rising, no module yet');
+  runtime.update(43);
+  assert.equal(runtime.getShelfDiagnostics().visibleModules, 33);
+  runtime.setTarget({ band: 'low', sharedSeats: 0 }, 50, false);
+  runtime.update(50.9);
+  assert.ok(shelfFrame.scale.y === 1 && runtime.getShelfDiagnostics().visibleModules === 29, 'modules slide out first, frame still full height');
+  runtime.update(51.35);
+  assert.ok(shelfFrame.scale.y < 1 && runtime.getShelfDiagnostics().visibleModules === 0, 'frame comes down only after every module has left');
+  runtime.update(53);
+  assert.deepEqual(shown(), ['low']);
+
   // Every state (slab, deck, discs) stays inside the SW lot plus the .8 gap to the amber outline's inner edge.
   site.root.updateMatrixWorld(true);
   const inverse = site.root.matrixWorld.clone().invert();

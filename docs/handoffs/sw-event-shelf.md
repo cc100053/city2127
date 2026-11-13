@@ -1,7 +1,7 @@
 # sw-event-shelf — SW 新旗艦：活動モジュール棚
 
 - Owner: cc100053
-- Status: R3 IMPLEMENTED — 待 owner 視覺驗收（未 merge）
+- Status: R3b（動畫驗證與修正）完成 — 待 owner 視覺驗收（未 merge）
 - Branch: `feat/sw-event-shelf`（worktree：`.claude/worktrees/sw-event-shelf`，由 origin/main e13689b 切出；主 checkout 的無關未提交變更原封不動）
 - Base commit: e13689b3fd97eea312d421acac3fbe185b448ecc
 - Last verified commit: R2 commit（見 git log；測試與 build 於提交前通過）
@@ -76,6 +76,16 @@
   - 截圖（`~/city2127-evidence/sw-event-shelf/r3/`，不入 Git，3200 × 1800）：`focal-day`、`focal-night`、`overview`、`gantry-closeup`、`rail-hang-closeup`、`window-module-closeup`、`track-tug-closeup`、`hoist-sheet.jpg`（6 幀）、`r2-vs-r3.jpg`。
   - 已知問題／未達：導軌仍 4 條；斜俯視中排與後排樑仍疊成密線，疏朗度不及 B 圖；窗內剪影偏粗；模組 8.6 m；右側地軌延伸與 court 6 的傘形頂在俯視重疊；半滑入格與地面入場模組在 `focal-day` 可辨但偏小；前景樹冠仍遮部分地軌；桁頂約 45 m，quadrotor 路線未查；結果卡／設施文案、change sheet 未更新；夜間 hoist 未看。
   - 需 owner 決定：窗內剪影讀法（先前「人、傢俱不進 GLB」與本輪要求牴觸）、導軌 4／2 條、模組 8.6／7.7、地塊南移 15 m 是否接受、地軌是否接街道。
+
+- **R3b（2026-11-13，起點 8163d3a，只動動畫／時序碼與測試，建模外觀未動）**：
+  - 方法：`survey dev:auto`（新 scratch DB）＋ Vite DEV ＋ 無頭 Chrome 1920×1080 dpr1；城市頁以虛擬 `performance.now`（凍結後每 0.25 s 手動推進）接真實 WebSocket，真實 guest UI 作答（第 2 題 publicSharing：首／末選項；`?dev-auto` 面板在此 repo 狀態下回報「質問画面が変わりました」，未深究，改用真實 UI 點選）。證據 `~/city2127-evidence/sw-event-shelf/r3b/`（不入 Git）：`e1..e4` 逐 0.25 s 全幀（0–15.5 s）、`contact-*.jpg`、`band-switch-before-after.jpg`、`before/`（改前同流程）、`hoist-*`、`flow-summary.json`、`immediate-restore.json`。
+  - **時間軸（實測）**：投票旅程至拉近約 4.6 s → 過場由 ≈5.12 s 起（frame scale 於 5.25 s 起動，3 s 內完成）→ 鏡頭 13.25–15.0 s 飛回 hero（與 pre 幀逐像素差：15.0 s 起 ≈4/255，之前 ≈50）。四個事件（mixed→low、low→mixed、mixed→high、high→mixed）一致。
+  - **重大發現**：live 階梯下 mixed 的座位恆 4（low 0／high 8），所以「mixed 內增減 meter（共有 ±1）」不會令 hoist 在 live 觸發；live 只走 band 切換路徑。hoist 只能由 DEV 鉤子、單元測試驗證與錄影。若 owner 想在 live 看到吊運，須另決定（例如 low／high→mixed 時 headline 模組吊入、或改 mixed 座位隨 tier 內變化），會牽涉 spec「band 切換不重做搬運」與投票階梯，本輪未動。
+  - **發現並修正**：(1) band 切換時模組與框架一同垂直壓扁、同時滑動 → 模組 part 改為 `at 1, span .4`（先框架後模組／先模組後框架，`commonsPlaza.ts`）；(2) 地軌 `track` 的拖車與 `slide` 鎖燈在切換一開始即消失、吊掛模組纜索即消失 → 現隨模組同步滑動（`slideShift`）；(3) hoist 結束時纜索在 u=.66 突然消失 → 吊具回收（升回絞盤）；(4) 中欄 headline（`k4/6/8 c1`，DEV 計數 34／35／37）升降時與半滑入模組（k3c1）重疊約 0.1 m → 改在左導軌升降、頂端才橫移；(5) 地面入場無端出現 → 由地軌末端外（z −36.8）駛入（動畫起點外移，不新建道路、不動其他地塊），移除則反向駛出。
+  - **逐項檢查**：模組穿柱／梁——`tests/eventShelf.test.ts` 對 DEV 可達的 30–37 計數、加／減兩向、每 0.05 s 檢查 headline 模組與其他模組及框架包絡（柱、層梁；fallback 框架＝GLB 外包絡）無重疊、單步位移 < 3 m、起點 z < −33、終點在格；通過（改前 6 組有重疊）。GLB 的導軌、齒條等細部未入檢查（只靠錄影目測）。纜索：每幀由絞盤到吊環／吊環到屋頂吊耳為連續線段，長度必隨台車與模組位置；台車 x 隨 `anchor.x`；纜索穿過吊桁大梁內部（鼓在梁上、纜下穿兩梁之間再外斜）只在梁內，鏡頭看不到。橫移段：模組底緊貼層梁頂（零間隙、無穿入），滑入前緣經前樑平面時柱均離 ≥ 1.05 m。鎖燈：u .88–.96，滑入結束（.88）後才閃。其他模組滑入：全體剛性前移 12 m，與框架無重疊；上升時框架先完成再滑入，無壓扁（見 before/after）。上述 band 順序由 `tests/commonsPlaza.test.ts` 新增斷言。
+  - **立即恢復（`immediate-restore.json`、`reconnect.mjs`）**：Undo（admin API `undo-proposal`）、`reset-city`、頁面重載（snapshot）、reduced-motion 下的提案、重連（用 Playwright `routeWebSocket` 斷線期間提案，重連後）皆在虛擬 +0 s 即恢復權威狀態（scale／模組數正確）；斷線期間畫面維持舊狀態。第一版重連測試（`setOffline`）無效（連線未斷，只是 live 更新），已棄用。
+  - **仍不足／未解**：(a) 模組滑出／入時整批剛性移動，spec 的「`order` 次序錯開」未實作；滑出至 12 m 外才消失（instancing 無淡出）。(b) 地面入場在 `sw:focal` 被前景 court-6 傘形頂遮住，只見由傘後駛出；入場起點 z −36.8 的地面物件（樹、其他地塊）未逐項查，只目測錄影無穿插。(c) 吊掛模組在 band 切換時纜索隨之外斜，並非真實吊運。(d) 夜景錄影、FPS 未測（不引用數字）；錄影為虛擬時鐘逐幀，非即時流暢度。(e) 中欄 DEV 吊運須有 headline 在 c=1，live 無此情況。
+  - 驗證：根 `npm test`、`npm run build`、`git diff --check` 通過；`survey/`、`module-swap/` 未動（survey 只 `npm ci` 後跑 dev:auto）。
 
 ## Code findings (2026-11-13, read-only)
 

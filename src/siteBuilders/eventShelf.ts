@@ -15,6 +15,9 @@ const MODULE_H = 3.2, HALL_H = 7.4;
 const FRONT_RAIL_Z = -(SHELF.rows * SHELF.cell / 2 + SHELF.col / 2 + .3 + .75 + SHELF.module / 2); // module centre while it hangs on the front guide rails
 const TRACK_Z = -17.6; // module centre on the ground tracks, in front of the plinth edge
 const TRACK_X = 12, HANG_X = 12, HANG_Y = 22; // showpiece column: arriving module on the right track, hung module above it
+const TRACK_END = -32, ENTRY_Z = TRACK_END - SHELF.module / 2 - .5; // the ground tracks end at z -32; a headline module drives in from just beyond that
+// Headline hoist phases in progress u (0 = on the left track outside, 1 = latched in its cell): drive in, hook up and lift, cross to the cell column, slide in, lock, then the spreader goes back up.
+const U_DRIVE = .18, U_LIFT = .56, U_CROSS0 = .5, U_CROSS = .62, U_SLIDE = .88, U_LOCK = .92, SPREADER_UP = .1, TROLLEY_HOME = .25;
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const smooth = (v: number) => v * v * (3 - 2 * v);
 const hash = (n: number) => Math.abs(Math.sin(n * 12.9898) * 43758.5453) % 1;
@@ -151,11 +154,14 @@ export function createEventShelf(root: T.Group) {
   const hoistPath = (s: ShelfSlot, u: number): { x: number; y: number; z: number } => {
     const t = (a: number, b: number) => smooth(clamp01((u - a) / (b - a)));
     const x0 = -TRACK_X, top = levelY(s.k);
-    const z = u < .45 ? TRACK_Z + (FRONT_RAIL_Z - TRACK_Z) * t(0, .2) : FRONT_RAIL_Z + (s.z - FRONT_RAIL_Z) * t(.62, .87);
-    return { x: x0 + (s.x - x0) * t(0, .2), y: LEVEL0 + (top - LEVEL0) * t(.2, .6), z };
+    // It rises on the left rails and crosses to its own column only at the top, so a centre-column module never meets a half-slid one below it.
+    const z = u < U_CROSS ? ENTRY_Z + (FRONT_RAIL_Z - ENTRY_Z) * t(0, U_DRIVE) : FRONT_RAIL_Z + (s.z - FRONT_RAIL_Z) * t(U_CROSS, U_SLIDE);
+    return { x: x0 + (s.x - x0) * t(U_CROSS0, U_CROSS), y: LEVEL0 + (top - LEVEL0) * t(U_DRIVE, U_LIFT), z };
   };
   const hoistProgress = (now: number) => hoist ? clamp01((now - hoist.start) / SITE_TRANSITION_SECONDS) : 1;
   let clock = 0;
+  /** How far (m) a module is still out in front of its place while a band change slides it in or out; placeOne applies the same offset. */
+  const slideShift = (i: number) => { const p = i >= 0 ? presence[i] * bandLevel : 1; return p > HIDDEN && p < 1 - HIDDEN ? (1 - smooth(p)) * SHELF.cell : 0; };
   const placeOne = (i: number) => {
     const s = SHELF_SLOTS[i], idx = slotIndex.get(s.id)!;
     let p = presence[i] * bandLevel, { x, y, z } = settled(s, clock), visible = p > HIDDEN;
@@ -164,10 +170,8 @@ export function createEventShelf(root: T.Group) {
       const u = hoist.dir === 1 ? raw : 1 - raw;
       p = bandLevel;
       ({ x, y, z } = hoistPath(s, u));
-      visible = u > HIDDEN || hoist.dir === -1;
-    } else if (p > HIDDEN && p < 1 - HIDDEN) {
-      z -= (1 - smooth(p)) * SHELF.cell; // everyone else slides in from the front, quietly
-    }
+      visible = u > HIDDEN;
+    } else z -= slideShift(i); // everyone else slides in from the front, quietly
     for (const mesh of variantMeshes.get(s.variant) ?? []) mesh.setMatrixAt(idx, visible ? matrix.compose(pos.set(x, y, z), quat.identity(), scale.setScalar(1)) : zero);
   };
   const placeAll = () => {
@@ -236,13 +240,14 @@ export function createEventShelf(root: T.Group) {
       return { sx, top, arm, grip, led };
     }));
     const a = new T.Vector3(), b = new T.Vector3();
-    const set = (visible: boolean, drumX: number, mx: number, my: number, mz: number, h: number, gripped: boolean) => {
+    /** `engage` 0..1: how far the spreader has come down from the drum to the module's roof (slings show only at 1); `gripped`: the rail clamps are closed. */
+    const set = (visible: boolean, drumX: number, mx: number, my: number, mz: number, h: number, gripped: boolean, engage = 1) => {
       g.visible = visible;
       if (!visible) return;
-      const ringY = my + h + 1.5;
+      const ringY = DRUM_Y - 1.6 + (my + h + 1.5 - (DRUM_Y - 1.6)) * engage;
       ring.forEach(m => { const [s, i] = m.userData.at as [number, number]; m.position.set(mx + (i === 0 ? 0 : s * 3.3), ringY, mz + (i === 0 ? s * 3.3 : 0)); });
       cables.forEach((c, i) => { const sx = i & 1 ? 1 : -1, sz = i & 2 ? 1 : -1; rope(c, a.set(drumX + sx * 1.1, DRUM_Y, FRONT_RAIL_Z + sz * .8), b.set(mx + sx * 3.3, ringY, mz + sz * 3.3)); });
-      slings.forEach((c, i) => { const sx = i & 1 ? 1 : -1, sz = i & 2 ? 1 : -1; rope(c, a.set(mx + sx * 3.3, ringY, mz + sz * 3.3), b.set(mx + sx * 3.3, my + h + .1, mz + sz * 3.3)); });
+      slings.forEach((c, i) => { const sx = i & 1 ? 1 : -1, sz = i & 2 ? 1 : -1; c.visible = engage > .99; rope(c, a.set(mx + sx * 3.3, ringY, mz + sz * 3.3), b.set(mx + sx * 3.3, my + h + .1, mz + sz * 3.3)); });
       for (const { sx, top, arm, grip, led } of clamps) {
         const yy = my + (top ? h - .6 : .7), rz = mz + SHELF.module / 2 + .35;
         arm.visible = grip.visible = led.visible = gripped;
@@ -282,7 +287,7 @@ export function createEventShelf(root: T.Group) {
     mesh.name = name; mesh.receiveShadow = true;
     props.add(mesh);
   };
-  const TRACK_END = -32, TRACK_START = -22, trackLen = TRACK_START - TRACK_END;
+  const TRACK_START = -22, trackLen = TRACK_START - TRACK_END;
   const railBoxes: [number, number, number, number, number, number][] = [], sleepers: [number, number, number, number, number, number][] = [], strips: [number, number, number, number, number, number][] = [];
   for (const gx of [-12, 12]) {
     for (const dx of [-3.6, 3.6]) railBoxes.push([.3, .18, trackLen, gx + dx, .41, (TRACK_START + TRACK_END) / 2]);
@@ -305,12 +310,14 @@ export function createEventShelf(root: T.Group) {
     return light;
   }));
   const placeProps = (now: number) => {
-    const showTrack = trackIdx >= 0 && presence[trackIdx] * bandLevel > 1 - HIDDEN, showSlide = slideIdx >= 0 && presence[slideIdx] * bandLevel > 1 - HIDDEN;
-    tug.visible = showTrack;
-    const p = showSlide ? settled(SHELF_SLOTS[slideIdx], now) : undefined;
+    // The tug and the slide lights travel with their module when a band change slides it out or in.
+    const trackShift = slideShift(trackIdx), slideShiftZ = slideShift(slideIdx);
+    tug.visible = trackIdx >= 0 && presence[trackIdx] * bandLevel > HIDDEN;
+    tug.position.z = TRACK_Z - SHELF.module / 2 - 2.4 - trackShift;
+    const showSlide = slideIdx >= 0 && presence[slideIdx] * bandLevel > HIDDEN, p = showSlide ? settled(SHELF_SLOTS[slideIdx], now) : undefined;
     for (const light of slideLights) {
       light.visible = !!p;
-      if (p) { const [ox, oz] = light.userData.at as [number, number]; light.position.set(p.x + ox, p.y + MODULE_H - .6, p.z + oz); }
+      if (p) { const [ox, oz] = light.userData.at as [number, number]; light.position.set(p.x + ox, p.y + MODULE_H - .6, p.z + oz - slideShiftZ); }
     }
   };
 
@@ -319,20 +326,21 @@ export function createEventShelf(root: T.Group) {
     placeProps(now);
     const reduced = prefersReducedMotion();
     const idleX = reduced ? -6 : -6 + Math.sin(now * Math.PI * 2 / 9) * 3;
-    // Trolley A follows the hung showpiece; its module rides the rails slowly up and down.
+    // Trolley A follows the hung showpiece; its module rides the rails slowly up and down. In a band change it slides forward with the others, still on its cables, clamps open.
     const hangVisible = hangIdx >= 0 && presence[hangIdx] * bandLevel > 1 - HIDDEN;
-    const hangPose = settled(SHELF_SLOTS[hangIdx], now);
+    const hangPose = settled(SHELF_SLOTS[hangIdx], now), hangShift = slideShift(hangIdx);
     trolleyA.position.x = HANG_X;
-    carrierA.set(hangVisible, HANG_X, hangPose.x, hangPose.y, hangPose.z, MODULE_H, true);
+    carrierA.set(hangIdx >= 0 && presence[hangIdx] * bandLevel > HIDDEN, HANG_X, hangPose.x, hangPose.y, hangPose.z - hangShift, MODULE_H, hangShift < HIDDEN);
     // Trolley B: idle above the left runway, or off with the headline module while a hoist runs.
     let flash = 0, bx = idleX;
     if (hoist) {
       const raw = hoistProgress(now), u = hoist.dir === 1 ? raw : 1 - raw, s = SHELF_SLOTS[hoist.slot];
       const mod = hoistPath(s, u), h = moduleHeight(s.variant);
-      flash = clamp01(1 - Math.abs(u - .9) / .04);
-      const carrying = u < .66 && raw > .02, w = smooth(clamp01(raw / .15)) * smooth(clamp01((1 - raw) / .1));
-      bx = idleX + (mod.x - idleX) * w;
-      carrierB.set(carrying, bx, mod.x, mod.y, mod.z, h, true);
+      flash = clamp01(1 - Math.abs(u - U_LOCK) / .04);
+      // The spreader waits over the arrival point, comes down as the module stops there, rides it up and across, and goes back up to the drum once the module starts to slide in. The trolley is over it the whole time.
+      const anchor = hoistPath(s, Math.min(Math.max(u, U_DRIVE), U_CROSS)), engage = smooth(clamp01((u - .06) / (U_DRIVE - .06))) * (1 - smooth(clamp01((u - U_CROSS) / SPREADER_UP)));
+      bx = idleX + (anchor.x - idleX) * smooth(clamp01(u / .12)) * smooth(clamp01((1 - u) / TROLLEY_HOME));
+      carrierB.set(engage > .01 && raw > .02 && raw < .98, bx, anchor.x, anchor.y, anchor.z, h, u >= U_DRIVE && u < U_CROSS, engage);
       setLocks(flash, mod.x, mod.y, mod.z, h);
       if (raw >= 1) { hoist = undefined; for (let i = 0; i < presence.length; i++) presence[i] = i < count ? 1 : 0; }
     } else {
