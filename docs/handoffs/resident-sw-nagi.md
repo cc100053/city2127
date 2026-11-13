@@ -85,7 +85,7 @@
 
 [artifacts/resident-sw-nagi/prompts.md](../../artifacts/resident-sw-nagi/prompts.md)：共用段、−1 前、+1 前、0 日、0 夜、角色設定圖，各附基準圖。**尚未生成任何 Gemini 圖，也未挑選**；目標圖與角色須由 owner 挑選。
 
-**2026-11-14 嘗試（未完成）**：經 Claude in Chrome 驅動 Gemini（`/u/3/app`，帳號已登入）可上傳基準圖、選 Create image、貼 prompt 並成功生成 −1 前一張（對話標題「Nagi Awaits Her Room」，對話網址 `gemini.google.com/u/3/app/ef6c4b410fa104aa`，構圖保留鏡位與周邊，人物、長椅與花園可讀）。但按「Download full size」後 Gemini 顯示已下載，`~/Downloads` 與家目錄均找不到檔案，頁面內只有 1024×576 預覽 blob，故**沒有任何候選圖存入 `~/city2127-evidence/resident-sw-nagi/`，其餘三張場景與角色設定圖也未生成**。須先解決下載落點（或由 owner 直接以 prompts.md 在 Gemini 生成）才能繼續。上述 −1 前圖僅存在於 owner 的 Gemini 對話中，未經挑選。
+**2026-11-14 嘗試（未完成）**：經 Claude in Chrome 驅動 Gemini（`/u/3/app`，帳號已登入）可上傳基準圖、選 Create image、貼 prompt 並成功生成 −1 前一張（對話標題「Nagi Awaits Her Room」，對話網址 `gemini.google.com/u/3/app/ef6c4b410fa104aa`，構圖保留鏡位與周邊，人物、長椅與花園可讀）。但按「Download full size」後 Gemini 顯示已下載，`~/Downloads` 與家目錄均找不到檔案，頁面內只有 1024×576 預覽 blob，故**沒有任何候選圖存入 `~/city2127-evidence/resident-sw-nagi/`，其餘三張場景與角色設定圖也未生成**。須先解決下載落點（或由 owner 直接以 prompts.md 在 Gemini 生成）才能繼續。Owner 其後提供該檔（`~/Downloads/Gemini_Generated_Image_yhg0yiyhg0yiyhg0.jpeg`，2730×1536），已複製為候選 `~/city2127-evidence/resident-sw-nagi/gen/minus1-before-c1.jpg`；未挑選，未發布。可見：鏡位與周邊保留，花園矮牆、樹與長椅在，凪坐長椅舉手機、平板放膝上；背景人群尺寸與基準相近。尚待 owner 判斷。
 
 ### 模組門實測（供步驟 5 定凪的尺寸）
 
