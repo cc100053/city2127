@@ -1,6 +1,6 @@
 # NW close-up polish — spec
 
-Targets (owner-picked 2026-11-03): [flagship-low](target/flagship-low.jpg), [flagship-mixed](target/flagship-mixed.jpg), [flagship-high](target/flagship-high.jpg). Bay targets (owner-picked 2026-11-03): [bay-low](target/bay-low.jpg), [bay-mixed](target/bay-mixed.jpg), [bay-high](target/bay-high.jpg). Taste: [CITY MASTER TASTE](../../docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md). SE golden sample for patterns: `src/siteBuilders/concentrationTower.ts`, [SE handoff](../../docs/handoffs/se-closeup-polish.md).
+Targets (owner-picked 2026-11-03): [flagship-low](target/flagship-low.jpg), [flagship-mixed](target/flagship-mixed.jpg), [flagship-high](target/flagship-high.jpg). Bay targets (owner-picked 2026-11-03): [bay-low](target/bay-low.jpg), [bay-mixed](target/bay-mixed.jpg), [bay-high](target/bay-high.jpg). Taste: [CITY MASTER TASTE](../../docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md). SE golden sample for patterns: `src/siteBuilders/concentrationTower.ts`, [SE handoff](../../docs/handoffs/archive/se-closeup-polish.md).
 
 Units: site-local units; `changeSites.nw` has `scale: 3` (1 unit = 3 m), lot 8×7 units centred (40, −300). Front = local +Z unless noted; the new camera looks from the east (+X world), so camera-facing faces are local **+X** (verify by capture and rotate the composition if needed — the glazed staffed face and counters must face the camera).
 
