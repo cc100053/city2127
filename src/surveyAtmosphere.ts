@@ -97,7 +97,7 @@ export const exhibitionScoresText = (scores: ExhibitionView['scores']) =>
 
 type ResidentCard = { id: string; title: string; text: string; place: string };
 // P1 copy; facility selection follows rendered focal quantities, not the resident's vote.
-const RESIDENT_CARDS: Record<string, readonly [string, string]> = {
+export const RESIDENT_CARDS: Record<string, readonly [string, string]> = {
   'energy.water': ['海辺の庭に、電気を蓄える', '外から届く電力で水をくみ上げ、落水を通して取り出す蓄電庭園です。水辺の居場所と、エネルギー設備が隣り合っています。'],
   'energy.rotor': ['街の中心で、電気を蓄える', 'フジテレビの劇場とは別の環が、外部の電力で回転して蓄えます。劇場と公共の動線は、そのまま残っています。'],
   'energy.orbital': ['海の上で、空からの電気を受け取る', '海上に広がる翼は、軌道から届く電力を受け取る設備です。海の景色と空間を使う、2127年の構想です。'],
