@@ -200,6 +200,7 @@ try {
   const cameraMotion=matchMedia('(prefers-reduced-motion: reduce)');
   if(import.meta.env.DEV){
     import('./devShotFrame').then(({cityShotFrame})=>Object.assign(window,{cityShotFrame:(id:string)=>cityShotFrame(scene,camera,id)}));
+    Object.assign(window,{cityScene:scene,cityCamera:camera}); // DEV inspection handles for resident-scene surveys
     Object.assign(window,{cityShot:(id?:string)=>{
       if(id===undefined){const pose={position:camera.position.toArray(),target:controls.target.toArray()};console.log(pose);return pose;}
       if(!Object.hasOwn(SHOTS,id))throw new Error(`Unknown shot: ${id}`);
@@ -232,6 +233,8 @@ try {
   if(import.meta.env.DEV && (metersParam!==null||shotPreview))import('./devMeters').then(async({devLayout})=>{
     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     const first=devLayout(metersParam??'');holo.setTiers(first.tiers);
+    // `&nomarker`: hides the flat guest-site outline ring so resident-scene surveys see the ground clean (the change manager sets `visible` every frame, so it is pinned off).
+    if(params.has('nomarker'))scene.traverse(o=>{if(o.name.startsWith('guest-marker-'))Object.defineProperty(o,'visible',{get:()=>false,set:()=>{}});});
     cityChanges!.applyExhibitionLayout(first,'city-state-snapshot',now);
     const playMeters=(meters:string,at:number)=>{
       devShot=null;
