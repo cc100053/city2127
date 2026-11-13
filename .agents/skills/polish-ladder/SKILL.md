@@ -19,8 +19,16 @@ Roles on both rungs (owner 2026-11-11): **you advise** — diagnose, write specs
 1. **Pick the unit.** Read the unit table. Take the unit the owner named; otherwise the first row of the suggested order whose next step is open. Done: one unit and its current rung stated to the owner in one line.
 2. **Gate rung 1.** If the table says the unit is unpolished, show the owner its current close-up (−1/0/+1, day and night, from `~/city2127-evidence/closeup-frequency-sheet/` or a fresh capture) and ask one question: polish, or good enough. Done: the owner's answer is recorded in the table.
 3. **Climb.** Run the rung's skill to its own finish. Work on one unit and one rung per task branch; a rung-2 scene starts only on a building the owner has accepted, because the set, the camera and the resident's scale all hang off the finished model.
-4. **Record.** Update the unit's row (what was accepted, link to its handoff), the handoff, and the documents in the [sync table](../../../docs/CONTRIBUTING.md#documentation-sync). Done: a reader of the table alone knows the unit's rung and next step.
+4. **Record.** Update the unit's row (what was accepted, link to its handoff), the handoff, and the documents in the [sync table](../../../docs/CONTRIBUTING.md#documentation-sync). Then regenerate the owner's **change sheet** (see below). Done: a reader of the table alone knows the unit's rung and next step, and the sheet's date is today.
 5. **Report and stop.** Send the owner the evidence and name the next unit. The owner picks whether to go on.
+
+## Change sheet
+
+`~/city2127-evidence/change-review/index.html` is the owner's one-page review: per unit, the choice that pushes each change, the result-card sentences, what the building does, before/after frames and the resident's lines. It is generated, never edited: status and residents come from the plan, copy from `src/surveyAtmosphere.ts`, options from the live question set.
+
+- Regenerate with `node --experimental-strip-types scripts/changeSheet.ts` whenever the plan, the result or facility copy, or the question set changed.
+- When a model, camera or transition changed, first refresh the frames: start Vite and run `node scripts/closeupSheet.mjs <vite url>` (about ten minutes; it skips frames that exist, so delete the unit's `<shot>__*.jpg` in `~/city2127-evidence/stage-closeups/sheet/` first).
+- A new unit or resident needs one line in `UNITS` in `scripts/changeSheet.ts`; the script fails loudly when the plan and `UNITS` disagree.
 
 ## Working with the Sonnet agent
 
