@@ -141,7 +141,7 @@ Journey landing on changed slots (2026-11-03, `feat/journey-landing` from `b5653
 
 Resident scene, Minato (2026-11-12, `feat/resident-minato-proto` from `8773dab`, DEV-only demo merged on owner instruction): root `npm test` passes with three new tests ([minatoTimeline](../tests/minatoTimeline.test.ts), [minatoGlb](../tests/minatoGlb.test.ts) 2,356 tris, [kioskGlb](../tests/kioskGlb.test.ts) 5,088 tris); `npm run build` passes. Browser: `?survey=…&residentDemo` recorded for the four NW focal transitions at hours 12 and 22, plus Undo and a second result mid-beat, in headless Chrome 1600×900 (`~/city2127-evidence/resident-minato/r5`, `r6`). NOT RUN: FPS, snapshot/reset/reconnect during a beat, iPad and A/B timing at the ≈ 20 s length. Owner accepted it as a demo, not as exhibition runtime. [Handoff](handoffs/resident-minato.md).
 
-Change review sheet (2026-11-13): `scripts/changeSheet.ts` joins the unit table and residents in RESIDENT_SCENE_PLAN, `residentResult()`／`RESIDENT_CARDS`, the live question set and the `closeupSheet.mjs` frames into `~/city2127-evidence/change-review/index.html`. It throws when a unit, resident, question or option is missing. A review aid generated from static DEV frames, not evidence of the live transition.
+Change review sheet (2026-11-13): `scripts/changeSheet.ts` joins the unit table and residents in RESIDENT_SCENE_PLAN, `residentResult()`／`RESIDENT_CARDS`, the live question set and the `closeupSheet.mjs` frames into `artifacts/change-review/index.html`. It throws when a unit, resident, question or option is missing. A review aid generated from static DEV frames, not evidence of the live transition.
 
 ## Guest graphite UI — 2026-11-07 feature branch
 
