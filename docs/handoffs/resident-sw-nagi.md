@@ -3,7 +3,7 @@
 [居民情景計劃](../RESIDENT_SCENE_PLAN.md)階段 2 的第三個單位（SW focal，mixed 狀態進出）。已完成 [resident-scene](../../.agents/skills/resident-scene/SKILL.md) 步驟 1–3 及步驟 4 的 prompts 草稿；尚無人物模型、佈景或 DEV 演示。
 
 - Owner: cc100053
-- Status: IN PROGRESS（步驟 3 舞台勘察完成，步驟 4 prompts 草稿待 owner 挑選；Bible 以 owner 繼續指示視為採用）
+- Status: IN PROGRESS（步驟 5 角色模型已建成，待 owner 審閱；步驟 6 起未開始）
 - Branch: `claude/resident-nagi-72c6f8`（由 `feat/resident-nagi-draft` 的 e1a3e02 接續）
 - Base commit: `4575630` 的完整 SHA 見 `git log`（起點為 main `45756308c895ca9b424a1c7e0cccb7bc217171aa`）
 - Last verified commit: 本輪提交前的 working tree（起點 e1a3e02；`npm test`、`npm run build`、`git diff --check` 通過）
@@ -105,6 +105,44 @@
 
 **建議凪身高 2.0 m**（場景比例；人群已縮至約 2.2 m）：門扇淨高 2.0 m，凪須略低於門框頂 2.1 m 方可站姿通過；若要與背景人群同高（≈ 2.2 m）則須放大門（高 2.3 m 以上）或讓她低頭進門。取 2.0 m 時頭頂離雨篷約 .3 m，肩寬 .45 m 可通過 1.05 m 門。兩者取捨交 owner 決定。
 
+## Step 5 角色（凪）
+
+2026-11-14，起點 017ed0e。以 `character-sheet-c1.jpg` 為參考（owner 未另選）。建模：[build_nagi.py](../../asset/models/resident-nagi/build_nagi.py)（Blender 5.2 headless，輸出 `nagi.blend`／`nagi.glb`）；檢視：[review_nagi.py](../../asset/models/resident-nagi/review_nagi.py)；圖：[artifacts/resident-sw-nagi/character](../../artifacts/resident-sw-nagi/character/)（`turnaround.jpg` 正面／四分之三／側面／背面、`poses.jpg` 五個姿勢、`lineup.jpg` 與 1.8 m 參照柱、2.2 m 群像柱及 1.25 × 2.1 m 門框並排）。尚未接入任何場景程式，仍為 DEV 之前階段。
+
+**規格（H = 2.00 m，髮頂至鞋底，原點在雙腳之間，面朝 Blender −Y＝three +Z）**
+
+| 部件 | 尺寸／位置 | 材質角色 |
+| --- | --- | --- |
+| 頭（含髮） | 髮頂 2.00 m、下巴 1.615 m；顱寬 .30；短髮微蓋額 | `res_skin`、`res_hair` |
+| 外套 | 下擺 .97 → 肩 1.52 m（高 .55）；下擺寬 .43、胸寬 .40、厚 .25；立領 | `res_jacket`、`res_trim`（拉鏈、口袋斜線、肩縫、袖口環） |
+| 長褲 | 髖關節 .92 m、膝 .50 m、踝 .09 m；腿徑約 .16 | `res_trousers`，關節處深色球 `res_face_dark` |
+| 鞋 | .30 × .12 × .09，白色 | `res_shoe` |
+| 手臂 | 上臂 .30、前臂 .26、手 .17；肩寬（樞軸）.51 | `res_jacket` |
+| 平板 | .17 × .24 m，淡藍發光，掛在 `hand.L` | `res_tablet` |
+| 手機 | .072 × .15 m，深色機身＋發光屏，掛在 `hand.R` | `res_phone`、`res_tablet` |
+
+比例由設定圖正面視圖取得（頭＋髮 20 %、外套 28 %、腿 46 %）。與門的關係：身高 2.0 m < 門框頂 2.1 m（餘 .1 m）、肩寬約 .51 m（含手臂）< 門扇 1.05 m；與背景群像（≈ 2.2 m）矮約 .2 m，由 owner 於早先決定取 2.0 m。三處均為場景實際米制；畫面比例（約四分之一畫高）須待 Set 步驟以 `npm run capture` 量度，本步驟未量。
+
+**節點階層（20 個，剛體、無骨架、無蒙皮；樞軸於關節）**：`hips` > `torso` > `head` > `mouth.soft`／`mouth.smile`；`torso` > `upperArm.L/R` > `lowerArm.L/R` > `hand.L/R`（`tablet` 掛 `hand.L`，`phone` 掛 `hand.R`）；`hips` > `upperLeg.L/R` > `lowerLeg.L/R` > `foot.L/R`；根為 `ROOT_NAGI`。`.L` 為 +X。口形：`mouth.soft` 顯示，`mouth.smile` 縮至 0.0001，程式以縮放互換（吸取 Minato 的「表情是部件」教訓）。
+
+**動作要領**（`review_nagi.py` 的 `POSES` 即是旋轉表，單位度，Rx < 0 向前；實際以純函數時間線驅動，待下一步）：
+- 站立攜帶：`hand.L`、`hand.R` 腕轉 +90，裝置貼腿垂下、屏朝前。
+- 坐姿讀平板：`hips.z` 降至 .60；`upperLeg` −90、`lowerLeg` +90；`upperArm.L` −30、`lowerArm.L` −70、`hand.L` +80（平板近水平置於膝上）；`torso` −8、`head` +14。
+- 舉手機：`upperArm.R` −45、`lowerArm.R` −95、`hand.R` +40（屏朝臉）；左手平板收至腰前。
+- 走向門：腿前後擺 ±24／−22（膝彎 8／30）、右臂反向擺、`torso` yaw −8。
+- 進門：同走姿，`torso` yaw −14、`head` yaw 10 並略低頭、`hand.L` 將平板抱胸。
+
+**量度與 QA**：2,508 tris、20 節點、9 個 `res_*` 材質、154,732 bytes（`tests/nagiGlb.test.ts` 已入 `npm test`：節點階層、無 skin／animation、≤ 3,000 tris）。`blender-asset-qa`（render profile，兩種口形各跑一次）通過；保留的警告：無 UV（純色材質）、`mouth.smile` 設計上縮放為 0（與 `mouth.soft` 同位重疊，只在互換時單獨可見）、外套與手機各有少量背對背隱藏面（共 12 對，已接受）。QA 第一輪修正項：手機屏與機身共面、鞋與小腿間隙、口形重疊、外套邊縫懸空、下擺環穿出。證據不入 Git：`~/city2127-evidence/resident-sw-nagi/step5/`（含各角度原圖）。
+
+**已知取捨與未處理**：
+- 設定圖臉型偏中性；模型取同樣的短髮與簡面，未做性別特徵。
+- 外套與手臂為塊狀、手臂偏細；視覺是否貼近設定圖，由 owner 審閱。
+- 休止姿勢的兩件裝置朝前平放（沿用 Minato），須由腕轉擺位；沒有休止專用姿勢節點。
+- `hips`、鞋的 sit 姿勢未與具體座椅高度對齊（取 .60 m，座面約 .49 m），Set 時按實際座椅調整。
+- 未做場景佈置、動畫函數、DEV 接入；`docs/RESIDENT_COPY.md` 未動。
+
+**驗證**：`npm test`、`npm run build`、`git diff --check` 見下方「Actual validation results」更新；未量 FPS、未載入場景。
+
 ## Known issues and blockers
 
 - 階段 1（Meter 0／mixed 的棚）已由 owner 驗收（2026-11-14）；−1／+1 沿用 COMMONS，不在居民範圍。
@@ -123,4 +161,4 @@
 
 ## Next expected step
 
-由 owner 以 prompts.md 在 Gemini 生成並挑選四張場景目標（−1 前、+1 前、0 日、0 夜）與一張角色設定圖，之後才進入步驟 5（角色）；進入前先量模組 GLB 的門高並決定凪的尺寸。台詞搬入 RESIDENT_COPY 前仍須 owner 批准。
+Owner 審閱 Step 5 角色（`artifacts/resident-sw-nagi/character/`）並接受或指出修改；接受後進入步驟 6 Set（棚的右軌 showpiece 模組、可動門、樹與小拖車讓位、三態同光量度）與步驟 7 動作時間線。台詞搬入 RESIDENT_COPY 前仍須 owner 批准。

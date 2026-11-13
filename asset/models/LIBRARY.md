@@ -100,6 +100,7 @@ Whole assets. Reuse a site asset elsewhere only as background context, and ask t
 | `train-2127` | guideway train | `build_train.py` | guideway only |
 | `future-tree-2127` | landmark tree (catalog `prop`) | imported GLB | any planted deck |
 | `resident-minato` | named character Minato | `build_minato.py` | resident scenes |
+| `resident-nagi` | named character Nagi (2.0 m, 20 rigid nodes, sit / phone / walk recipes in `review_nagi.py`) | `build_nagi.py`; lineup `review_nagi.py` | resident scenes (draft, awaiting owner review) |
 | `resident-kiosk` | Minato's service kiosk | `build_kiosk.py` | Minato's scene |
 | `concentration-tower-high` | SE +1 tower shell | `build_tower.py` | site-only |
 | `se-district-2127` | SE stage towers and pods (six variants) | `build_district.py` (uses modules) | site-only shells; parts come from modules |
