@@ -87,6 +87,8 @@
 
 **2026-11-14 嘗試（未完成）**：經 Claude in Chrome 驅動 Gemini（`/u/3/app`，帳號已登入）可上傳基準圖、選 Create image、貼 prompt 並成功生成 −1 前一張（對話標題「Nagi Awaits Her Room」，對話網址 `gemini.google.com/u/3/app/ef6c4b410fa104aa`，構圖保留鏡位與周邊，人物、長椅與花園可讀）。但按「Download full size」後 Gemini 顯示已下載，`~/Downloads` 與家目錄均找不到檔案，頁面內只有 1024×576 預覽 blob，故**沒有任何候選圖存入 `~/city2127-evidence/resident-sw-nagi/`，其餘三張場景與角色設定圖也未生成**。須先解決下載落點（或由 owner 直接以 prompts.md 在 Gemini 生成）才能繼續。Owner 其後提供該檔（`~/Downloads/Gemini_Generated_Image_yhg0yiyhg0yiyhg0.jpeg`，2730×1536），已複製為候選 `~/city2127-evidence/resident-sw-nagi/gen/minus1-before-c1.jpg`；未挑選，未發布。可見：鏡位與周邊保留，花園矮牆、樹與長椅在，凪坐長椅舉手機、平板放膝上；背景人群尺寸與基準相近。尚待 owner 判斷。
 
+**候選圖全數生成（2026-11-14，每項一張，皆未挑選、未發布）**，存於 `~/city2127-evidence/resident-sw-nagi/gen/`：`minus1-before-c1.jpg`、`plus1-before-c1.jpg`（階梯廣場、黃昏，凪坐階上舉手機，遠處有數人）、`zero-day-c1.jpg`、`zero-night-c1.jpg`（模組停靠於軌道，門側有發光面板，凪持平板走向門；夜景模組窗為暖光、凪臉被平板照亮）、`character-sheet-c1.jpg`（正面、四分之三、背面三視圖，灰綠外套、深色褲、白鞋，各部件分明）。觀察：0 日圖中凪走出畫面右下、模組只佔畫面中段，兩者比基準大；0 夜圖凪在門左側；各圖凪的比例約佔畫面高度五分之一至三分之一，不盡一致。Gemini 出圖尺寸 2730×1536（角色圖 2752×1536），下載檔落在 `~/Downloads` 但有約 10 秒延遲。**未挑選，待 owner 判斷是否重生成或選用。**
+
 ### 模組門實測（供步驟 5 定凪的尺寸）
 
 量度來源為 `asset/models/city-kit-2127/modules.py` 的 `_door`／`event_module`（GLB 以角色合併網格，節點無法逐件量；單位為公尺，場景以 `UNITS_PER_METRE` .25 縮放）：
