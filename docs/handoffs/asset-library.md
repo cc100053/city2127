@@ -46,3 +46,15 @@ Rules adopted:
 - **SE branch adoption** (Codex/Terra task, not done here): when `feat/se-stage-closeup-polish` integrates, replace the builder closures with `modules.py` calls. Mapping: `room`→`glass_room`, `lift`→`glass_lift`, `entrance_glass`→`ring_doorways`, `Rect/Ring/furnish/person/seated_person` the same, with role keys mapped from `district_*`. Add a `se-district-2127` folder row, or `tests/assetLibrary.test.ts` fails. Also drop its committed `__pycache__/*.pyc`.
 - Owner: review `modules-lineup.jpg` and the `ROLES` recipe, then mark modules `accepted`.
 - Not done (suggested separately): token savings in the polish loop. These are a fresh implementer per round, fewer judges in middle rounds, and persistent clone directories.
+
+## Module polish 1 — 2026-11-13
+
+On owner instruction ("模組要再Polish"), the modules were polished against the owner-picked SE stage targets (`artifacts/se-stage-closeup-polish/target/`). The changes were iterated on `feat/se-stage-closeup-polish` (the only consumer) and cherry-picked to main.
+
+- `person`/`seated_person`: slimmer ≈ 1.78 m figure with shoes, slimmer arms, and a narrower head under a tapered hair cap (it used to read as a hat).
+- `glass_room`: thinner mullions, a planted trough inside each glass wall of sides ≥ 5 m (`planters=True`), an amber slab-edge line (`edge=True`), and area-based furnishing of ≈ 1 vignette per 16 m² (3–12; 6 above 8 m).
+- `glass_lift`: the capsule has an amber frame (rims and corner posts) and a lit back panel, and carries two riders facing −z.
+- `ring_doorways`: amber door frames and a white canopy over each door.
+- Recipe `ROLES`: `glass` alpha .16 → .10. `floor` is now warm amber-cream `(.88,.68,.44)` with emission `(1,.6,.26)` × .8, instead of glowing salmon `(.46,.30,.19)` with emission `(.62,.28,.10)` × 1.6.
+- `review_modules.py`: added `--eevee` (real glass, glow and sun; camera faces the −z side the lift cabins face) and `MODDIR` for old/new comparison. The lineup was republished.
+- Verification: see the SE handoff "Module polish 1". The lineup was reviewed against the old modules (EEVEE). Status stays `draft` until the owner accepts.

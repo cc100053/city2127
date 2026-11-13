@@ -65,21 +65,21 @@ Size is width × depth × height in metres.
 ## Modules — `city-kit-2127/modules.py` (Python, baked into a site GLB)
 
 - **Setup:** add `asset/models/city-kit-2127` to `sys.path` → `import modules as M` → `ctx = M.Ctx({role: Acc() for role in M.ROLES}, random.Random(seed))` → call modules → `finish_mesh` each non-empty `ctx.a[role]` with `M.ROLES[role]` (or your site's material for that role). The same seed and call order give the same geometry.
-- **Lineup:** `Blender -b --factory-startup --python-exit-code 1 -P review_modules.py -- out.png`. Glass is hidden. → [modules-lineup.jpg](../../artifacts/asset-library/modules-lineup.jpg)
-- **Provenance:** SE stage R5, `feat/se-stage-closeup-polish` `0f9afde`. The extraction reproduces all six R5 district variants within 1e-16 m.
-- **Status:** `draft` until the owner accepts the SE stage round.
+- **Lineup:** `Blender -b --factory-startup --python-exit-code 1 -P review_modules.py -- out.png [--eevee]`. Workbench hides glass; `--eevee` shows real glass, glow and sun. `MODDIR=<dir>` renders another `modules.py` for a side-by-side comparison. → [modules-lineup.jpg](../../artifacts/asset-library/modules-lineup.jpg) (EEVEE, polish 1)
+- **Provenance:** SE stage R5, `feat/se-stage-closeup-polish` `0f9afde`. The extraction reproduced all six R5 district variants byte for byte. Polish 1 (2026-11-13) targets the owner-picked SE stage images (`artifacts/se-stage-closeup-polish/target/`).
+- **Status:** `draft` (polish 1) until the owner accepts it from the lineup and SE captures.
 
 | Module | Use | Key parameters (defaults) | Roles |
 | --- | --- | --- | --- |
 | `kit_prop` | bake one kit prop into the site mesh | `name, x, y, z, yaw=0, fabric=None` (role override for `kit_fabric`) | mapped by `KITMAP` |
-| `person` | standing resident, varied clothing/skin/height | `x, y, z, scale=1, yaw=None` (random) | cloth_*, white, slate, wood, skin*, dark |
+| `person` | standing resident ≈ 1.78 m, shoes, slim arms, tapered hair cap; varied clothing/skin/height | `x, y, z, scale=1, yaw=None` (random) | cloth_*, white, slate, wood, skin*, dark |
 | `seated_person` | seated resident | `x, ysit` (seat top), `z, yaw` | as person |
 | `furnish` | scatter furniture vignettes + residents on a floor | `reg` (`Rect(ctx, cx, cz, w, d, ang=0)` or `Ring(ctx, cx, cz, r0, r1)`), `y, hh, items, people` | via props |
-| `glass_room` | glazed lit room, mullions, warm ceiling glow, furnished | `x, z, y, width, depth, height`. Keep `height` near 4–5 m per floor; >8 m caps furniture at 4 | white, floor, room, glow, glass + furnish |
-| `glass_lift` | glass shaft, white frame, amber front (−z) edges, landings every 12 m, lit capsule with rider | `x, z, y0, y1, ycap, wd=2.2, sz=2.0` | glass, white, amber, glow, floor |
-| `ring_doorways` | cylindrical glass wall with two 2.5 m doorways on ±x, lintels, thresholds, a resident at each door | `radius, y0, y1, cx=0, cz=0` | glass, white, amber |
+| `glass_room` | glazed lit room, slim mullions, warm ceiling glow, planted troughs inside the glass, amber slab-edge line, furnished ≈ 1 vignette / 16 m² (3–12) | `x, z, y, width, depth, height, planters=True, edge=True`. Keep `height` near 4–5 m per floor; >8 m caps furniture at 6 | white, floor, room, glow, glass, green, amber + furnish |
+| `glass_lift` | glass shaft, white frame, amber front (−z) edges, landings every 12 m; capsule with amber frame, lit back panel (+z), one or two riders facing −z | `x, z, y0, y1, ycap, wd=2.2, sz=2.0` | glass, white, amber, glow, floor |
+| `ring_doorways` | cylindrical glass wall with two 2.5 m doorways on ±x: amber door frame, white canopy, threshold, a resident at each door | `radius, y0, y1, cx=0, cz=0` | glass, white, amber |
 
-**Recipe `modules.ROLES`** (`draft`, SE R4/R5): warm interior glow seen through 16 % glass, and residents in saturated clothing so they read as people, not silhouettes, by day and night. Reuse it for any lit habitable interior before you tune a new one.
+**Recipe `modules.ROLES`** (`draft`, SE R4/R5, polish 1): warm interior glow seen through 10 % glass, warm amber-cream floors instead of glowing salmon planes, and residents in saturated clothing so they read as people, not silhouettes, by day and night. SE `build_district.py` takes its `district_*` materials from this recipe. Reuse it for any lit habitable interior before you tune a new one.
 
 ## Shared geometry — `geo_helpers.py`
 

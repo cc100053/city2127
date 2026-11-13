@@ -7,10 +7,8 @@ from geo_helpers import Acc, cyl, obox, finish_mesh, material, blob, tube, sweep
 sys.path.insert(0, os.path.join(os.path.dirname(HERE), 'city-kit-2127'))
 import modules as M  # shared library modules (asset/models/LIBRARY.md)
 
-ROLES = {'district_white': ((.94,.94,.90,1), None, .5), 'district_room': ((.68,.43,.27,1), (.85,.40,.15,1), 1.2), 'district_amber': ((1,.52,.08,1), (1,.42,.04,1), .5), 'district_green': ((.25,.48,.18,1), None, .5), 'district_dark': ((.065,.052,.045,1), None, .5), 'district_glass': ((.86,.92,.95,.16), None, .5), 'district_floor': ((.46,.30,.19,1), (.62,.28,.10,1), 1.6),
-         # R4: lit interiors (orange light seeps out through the glass) and people/furniture that read as people, not black silhouettes.
-         'district_glow': ((1,.62,.28,1), (1,.55,.18,1), 2.4), 'district_skin': ((.80,.57,.42,1), None, .5), 'district_cloth_a': ((.17,.30,.50,1), None, .5), 'district_cloth_b': ((.80,.28,.20,1), None, .5), 'district_wood': ((.50,.33,.20,1), None, .5),
-         'district_slate': ((.20,.22,.25,1), None, .5), 'district_fabric': ((.84,.60,.47,1), None, .5), 'district_skin_b': ((.52,.35,.26,1), None, .5), 'district_cloth_c': ((.20,.50,.46,1), None, .5)}
+# Material recipe comes from the library (modules.ROLES); district_* names and this order stay so the GLB roles and runtime remap are unchanged.
+ROLES = {'district_'+k: M.ROLES[k] for k in ['white','room','amber','green','dark','glass','floor','glow','skin','cloth_a','cloth_b','wood','slate','fabric','skin_b','cloth_c']}
 
 def build(kind):
     a={k:Acc() for k in ROLES}; w,r,amber,green,dark,glass,floor,glow,skin,clA,clB,wood,slate,fabric,skinB,clC=(a[k] for k in ROLES)
@@ -93,7 +91,7 @@ def build(kind):
                 for vx,vz in [t,n]:
                     obox(glass,(sign*vx*(side/2-.2),y+2.2,sign*vz*(side/2-.2)),(side,4.1,.08),(-vz,vx),(vx,vz))
             obox(glow,(0,y+4.05,0),(side-2,.06,side-2),t,n)
-            furnish(Rect(0,0,side-2,side-2,angle),y+.11,4.0,3,2)
+            furnish(Rect(0,0,side-2,side-2,angle),y+.11,4.0,6,4)
         for y in [40,72]:
             disc(w,0,0,18,y,2); disc(green,0,0,17,y+2,.5); disc(amber,0,0,18,y-.3,.25)
             for x,z in [(-10,-7),(-5,-10),(2,-11),(8,-8)]: blob(green,(x,y+3,z),(1.8,1.1,1.6),sub=1)
