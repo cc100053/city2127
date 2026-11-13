@@ -59,7 +59,7 @@ The owner pastes this prompt into a new session:
 1. **Start.** Run the AGENTS.md preflight in the worktree. Check that R(N−1) is committed and pushed, the tree is clean, and none of the earlier rounds' dev servers or `playwright-cli` sessions are still running (stop any you find).
 2. **Brief.** Copy the verdict word for word under `## R(N−1) verdict`. Then turn each of the owner's words into a measured row of `## RN brief`: metres, counts, or on-screen pixels at 3200 × 1800. When a word reads two ways ("more space between the frame"), build the likelier reading and name the other one in the report.
 3. **Build.** Follow the closeup-polish **Blender route**, with the library first. Allow at most three capture-compare passes. Rerun the building's own unit test while iterating, and the full suite once, at the end.
-4. **Capture** into `$CITY2127_EVIDENCE_ROOT/<task>/rN/`:
+4. **Capture** into `$CITY2127_EVIDENCE_ROOT/<task>/rN/` with one `npm run capture -- --size=3200x1800 <url> <task>/rN/<name> ...` batch (the closeup-polish **Capture** note):
    - `focal-day` and `focal-night`;
    - `overview`;
    - one close-up per brief row;
