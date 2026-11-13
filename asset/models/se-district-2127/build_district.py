@@ -156,7 +156,7 @@ def build(kind):
         # Second entry faces +X at the south review yaw, inside the existing plinth.
         box(dark,11.2,2,-.15,.16,3.8,2.5)
         for z in [-1.5,1.5]: box(w,11.3,2.02,z,.2,4,.2)
-        box(amber,11.34,4.05,0,.2,.18,3.2)
+        box(amber,11.34,4.05,0,.2,.18,2.9)
     elif kind=='double':
         disc(w,0,0,9,0,.7); disc(floor,0,0,7.2,.68,.1); disc(r,0,0,3.4,0.7,6.4)
         disc(w,0,0,12,7.1,1.2); disc(green,0,0,11.5,8.3,.3)
