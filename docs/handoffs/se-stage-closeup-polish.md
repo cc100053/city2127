@@ -102,3 +102,4 @@ On owner instruction, the two cylinder towers behind the twist tower (`twin` var
 - Captures at 1920×1080 (`?meters=se:8`, `shot=se:stage-south`, hour 12 and 22) in `~/city2127-evidence/se-twin/r1..r3` (local). Owner judged visually and accepted the merge.
 - Root `npm test`, `npm run build`, `git diff --check` PASS. FPS, the east stage and blind judging were NOT re-run for this change.
 - Known gap: day interiors still read pale against the target's warm lit rooms; no warm back wall; no amber lift capsule on the twins.
+- Integration: merged into main as `ab815a6` on owner instruction, 2026-11-13. Main CI run 43364800190: success. `origin/feat/se-stage-closeup-polish` stays at `d93e315`.
