@@ -1,6 +1,6 @@
 # Receiver-wing batch 01 — three authorized Plus passes
 
-Single owner: current receiver batch chat. [Current handoff](../../../docs/handoffs/receiver-wing-polish.md). 2026-10-25 14:35 JST natural-reset authorization supersedes preparation-only gate; no push/deploy/main integration or banked reset use.
+Single owner: current receiver batch chat. [Current handoff](../../../docs/handoffs/archive/receiver-wing-polish.md). 2026-10-25 14:35 JST natural-reset authorization supersedes preparation-only gate; no push/deploy/main integration or banked reset use.
 
 ## Locked inputs
 

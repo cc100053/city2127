@@ -4,7 +4,7 @@
 
 Owner: Codex batch chat `01a171dc-80a0-7e63-a14d-b7dbca7159b6`. Persistent clone `/Users/fatboy/city2127-energy-polish`, branch `codex/energy-city-polish`. No push/deploy/main integration.
 
-[Dispatch](dispatch.md) · [Preflight](preflight.json) · [Target prompt](target-prompt.txt) · [Target lock](target-lock.json) · [Worker](worker.json) · [Handoff](../../../docs/handoffs/ring-night-readability.md).
+[Dispatch](dispatch.md) · [Preflight](preflight.json) · [Target prompt](target-prompt.txt) · [Target lock](target-lock.json) · [Worker](worker.json) · [Handoff](../../../docs/handoffs/archive/ring-night-readability.md).
 
 ## Target and immutable scope
 

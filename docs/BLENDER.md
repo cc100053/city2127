@@ -16,6 +16,12 @@ On **each** Mac/Windows machine: check `codex mcp get blender` before adding a s
 
 **Current Mac evidence:** Blender 5.2.2, the pinned MCP server and add-on are installed; this Mac's add-on was packaged from the inspected Blender Lab source and installed with Blender's extension CLI, so the repository UI route above was not exercised here. `codex mcp get blender` is enabled. The user explicitly approved and enabled Blender Online Access on this Mac on 2026-09-23. A fresh Blender background process without extra flags reported the saved setting and answered a read-only MCP scene-summary call. The interactive desktop GUI and Windows machine have **not** been checked. Record each collaborator's OS, Blender version, MCP source/version, command path, add-on state, live call result and date in that task's handoff. Do not commit user-level Codex config or absolute workstation paths.
 
+## Agent skills (2026-11-05)
+
+Eight skills from [EL4CTEO/blender-skills](https://github.com/EL4CTEO/blender-skills) (MIT, commit `fb92cfb`, licence in `blender-core/LICENSE-blender-skills`) are vendored under `.agents/skills/blender-*`: core, hardsurface-modeling, pbr-materials, retopology-uv, texture-baking, export-pipelines, asset-qa, game-optimization. Claude reads them through `.claude/skills/<name>` symlinks. They work through the Blender MCP above or headless `blender -b`. Rigging, animation, sculpting and other upstream skills were left out because the buildings are static; references to those skills in the vendored files point nowhere here.
+
+This file wins where they differ: the `web` export preset turns on Meshopt compression, which our loader cannot decode, so export with the `gltf` preset (or `web` with `--set export_meshopt_compression_enable=False`). Update the skills by re-copying from upstream; do not edit the copies in place.
+
 ## Ownership and files
 
 Assign one named owner per asset task. Coordinate edits to the same binary before starting. For hand-authored assets, commit editable `.blend` source and corresponding production `.glb` together; use Git history instead of `final-final` filenames. Do not add LFS, export automation or decoder dependencies incidentally.
