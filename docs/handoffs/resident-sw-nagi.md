@@ -41,7 +41,7 @@
 
 ## Known issues and blockers
 
-- 階段 1 尚未由 owner 最終驗收；按 skill，居民的 rung 1 須先驗收才進入步驟 3 以後。
+- 階段 1（Meter 0／mixed 的棚）已由 owner 驗收（2026-11-14）；−1／+1 沿用 COMMONS，不在居民範圍。
 - 地面入場模組在 `sw:focal` 被前景 court 6 傘形頂遮住（見 sw-event-shelf R3c）；舞台勘察須三態同時找鏡位。
 - live 下 mixed 座位恆 4，故居民只接 band 切換，不接 mixed 內增減。
 - 現有模組 GLB 只有靜態門與雨篷，可動門與雨篷節點須在 Set 步驟另建。
@@ -57,4 +57,4 @@
 
 ## Next expected step
 
-Owner 審閱計劃文件的居民 5：批准、修改或換角色。批准後等階段 1 驗收，再做舞台勘察（skill 步驟 3）。
+新 session 從 skill 步驟 3（舞台勘察）開始；Bible（居民 5 v4）以 owner 的繼續指示視為採用，台詞搬入 RESIDENT_COPY 前仍須 owner 批准。
