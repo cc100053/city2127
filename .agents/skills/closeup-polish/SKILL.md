@@ -63,6 +63,6 @@ Proven 2026-11-01 (SE −1, ~3 min per image; owner-accepted as a pipeline). Nee
 - A high oblique camera flattens height. Close-ups sit low (15–25° pitch), facades over roofs.
 - All states share one camera through a change. When the low state is small, use `<socket>:focal-low` (`CarrierChange.low`, `headlineShot`) and keep the other state of that change in frame.
 - Growing a lot can drop surveyed trees; `plantCanopy` keys crown rotation by filtered index, so every later crown shifts and far clearance tests in `tests/odaiba.test.ts` fail. Shift the lot centre to keep those trees, and leave `coastalCanopy.ts` as is.
-- Capture with `playwright-cli -s=<name>`: `resize`, `goto`, sleep ~10 s, `screenshot --filename=<abs>`, retry on the 5 s timeout. The in-app browser pane cannot screenshot while hidden.
+- Capture round evidence with `npm run capture -- --size=3200x1800 --settle=10 '?shot=…&hour=12&reviewTime=20' <task>/r<N>/day …`: one headless browser for all pairs, UI hidden, a `.json` sidecar with URL, commit, dirty tree and canvas diagnostics. For a quick look at a live `playwright-cli -s=<name>` session, `screenshot --filename=<abs>` (retry on the 5 s timeout). The in-app browser pane cannot screenshot while hidden.
 - A Sonnet round took 11–22 minutes and 200–350k tokens; a precise spec is what keeps rounds few. Blender rounds (SE +1) took 15–20 minutes and 250–440k tokens.
 - The `crops.py` self-check is [`scripts/crops_selftest.py`](scripts/crops_selftest.py); run it after editing `crops.py`.

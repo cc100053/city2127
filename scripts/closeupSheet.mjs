@@ -3,7 +3,7 @@
 // Static DEV `?meters=&shot=` frames (slot seed 0, other sites mixed): a triage tool, not the live transition. Energy close-ups are not covered.
 import { execFileSync } from 'node:child_process';
 import { existsSync, writeFileSync } from 'node:fs';
-import { pathToFileURL } from 'node:url';
+import { captureCity, launchBrowser, newCityPage } from './capture.mjs';
 import { evidenceDir } from './evidence.mjs';
 
 const city = process.argv[2] ?? 'http://127.0.0.1:5173/', out = evidenceDir('stage-closeups', 'sheet');
@@ -27,20 +27,13 @@ const jobs = [...new Map(rows.flatMap(r => [12, 22].flatMap(hour => [r.from, r.t
   [name(r.shot, tier, hour), { file: name(r.shot, tier, hour), shot: r.shot, meters: `${r.site}:${RUNG_SCORE[tier]}`, hour }])))).values()]
   .filter(job => !existsSync(`${out}/${job.file}`));
 
-const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH ?? '/opt/homebrew/lib/node_modules/@playwright/cli/node_modules/playwright/index.mjs').href);
-const browser = await chromium.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true });
+const browser = await launchBrowser();
 const errors = [];
 await Promise.all(Array.from({ length: 3 }, async () => {
-  const page = await browser.newPage({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: 1 });
-  await page.route('https://fonts.googleapis.com/**', route => route.fulfill({ contentType: 'text/css', body: '' }));
-  page.on('pageerror', e => errors.push(e.message));
+  const page = await newCityPage(browser, { width: 1600, height: 900 }, errors);
   for (let job; (job = jobs.shift());) {
     const url = new URL(city); url.search = new URLSearchParams({ reviewTime: '20', hour: String(job.hour), meters: job.meters, shot: job.shot });
-    await page.goto(url.href, { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => document.querySelector('canvas')?.dataset.fps, null, { timeout: 90000 });
-    await page.addStyleTag({ content: 'body *:not(canvas):not(:has(canvas)) { visibility: hidden !important }' });
-    await page.waitForTimeout(7000);
-    await page.screenshot({ path: `${out}/${job.file}`, type: 'jpeg', quality: 85 });
+    await captureCity(page, url.href, `${out}/${job.file}`);
     console.log(job.file);
   }
 }));
