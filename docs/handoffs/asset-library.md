@@ -1,7 +1,7 @@
 # Asset library — reusable 3D parts index
 
 - Owner: cc100053 (owner accepts library entries from lineups). Implementation: Claude.
-- Status: INTEGRATED (2026-11-13, owner instruction "Merge 入 main"). The SE modules stay `draft` until the owner accepts them from the lineup.
+- Status: DONE. INTEGRATED 2026-11-13 (owner instruction "Merge 入 main"). Module polish 1 and the `ROLES` recipe were owner-accepted on 2026-11-13 (「收貨」).
 - Branch: `feat/asset-library`
 - Base commit: `056ce514a99587798756bcfcf2a74463e7b81cf5`
 - Last verified commit: `8653e54` (branch). Merged into main as `e1388bd`, with a tree identical to `8653e54`.
@@ -57,4 +57,4 @@ On owner instruction ("模組要再Polish"), the modules were polished against t
 - `ring_doorways`: amber door frames and a white canopy over each door.
 - Recipe `ROLES`: `glass` alpha .16 → .10. `floor` is now warm amber-cream `(.88,.68,.44)` with emission `(1,.6,.26)` × .8, instead of glowing salmon `(.46,.30,.19)` with emission `(.62,.28,.10)` × 1.6.
 - `review_modules.py`: added `--eevee` (real glass, glow and sun; camera faces the −z side the lift cabins face) and `MODDIR` for old/new comparison. The lineup was republished.
-- Verification: see the SE handoff "Module polish 1". The lineup was reviewed against the old modules (EEVEE). Status stays `draft` until the owner accepts.
+- Verification: see the SE handoff "Module polish 1". The lineup was reviewed against the old modules (EEVEE). The owner accepted on 2026-11-13 (「收貨」), so modules and recipe are `accepted` in LIBRARY.md. The SE stage round itself (`feat/se-stage-closeup-polish`) still awaits its own acceptance and merge.
