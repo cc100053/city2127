@@ -101,6 +101,7 @@ Whole assets. Reuse a site asset elsewhere only as background context, and ask t
 | `se-district-2127` | SE stage towers and pods (six variants) | `build_district.py` (uses modules) | site-only shells; parts come from modules |
 | `automation-hub-upper` | automation hub upper level | imported GLB | site-only |
 | `sky-ring-architecture` | Sky Ring | imported GLB | site-only |
+| `rectenna-farm-canopy` | rectenna canopy over terrace farm (draft, not placed) | `export_glb.py` text inside the .blend | site-only |
 | `odaiba-masterplan` | district environment | `odaiba_masterplan_v01_phase03d_generator.py` | site-only |
 | `aqua-city-odaiba` | landmark context | imported GLB | context |
 | `decks-tokyo-beach` | landmark context | imported GLB | context |
