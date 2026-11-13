@@ -22,7 +22,7 @@ const UNITS = [
   { plan: 'SE focal', shots: /^se:focal/, resident: 'フジテレビ東' },
   { plan: 'SE 塔', shots: /^se:(stage|district)/ },
   { plan: 'SW rooms', shots: /^sw:stage-rooms/ },
-  { plan: 'SW focal', shots: /^sw:focal/ },
+  { plan: 'SW focal', shots: /^sw:focal/, resident: 'お台場南岸' },
   { plan: 'SW courts', shots: /^sw:(stage-courts|district)/ },
   { plan: '能源', shots: /^energy:/ },
 ];
