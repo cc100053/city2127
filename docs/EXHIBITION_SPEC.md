@@ -80,7 +80,7 @@ Headline 近鏡 G7（2026-10-31，已 merge main，視覺及性能未驗收）�
 
 Live headline（[pickHeadline](../survey/src/shared/cityView.ts)）：先揀向今位訪客投票方向移動的 site（中間票向 0），其次揀該訪客選的能源部件有變的情況；否則沿用新到達最高格、載體變化最多、能源的次序。能源部件同時變動時，鏡頭與結果卡跟所選部件；只有 headline site 有亮 pulse／marker 同結果卡，其他變化（例如同時嘅能源門檻）靜靜過渡。
 
-Headline 近鏡（2026-10-27；時間線於 2026-10-29 修訂）：live 結果先在 hero 播完 2.62 秒 vote journey，再用 2 秒推近 headline，停定 0.5 秒後於 5.12 秒開始 3 秒場景過渡。4.62–13 秒停留，13 秒與 ambient 卡同步開始用 2 秒返回 hero；原因文字於 8.12 秒出現。八個 site shot（四站各 focal／district）及五個能源 shot 用常數表，保留 hero 方向及海／地標定位；focal 與 district 同時改以 district 為準。能源鏡頭與結果卡共用部件優先次序，移除設備亦看原位置。新結果從現有位置先平滑回 hero；snapshot／reset／Undo／reconnect／reduced motion／legacy／追趕中的結果立即 hero。無 headline 不推近；如接續仍在播放的近鏡，先從當前位置用 2 秒平滑返回，再保持 hero 並恢復操作。普通 standalone 及其他 DEV review 不自動播放；DEV 可用 `?shot=` 逐鏡檢查。近鏡的模型／材質打磨及真人閱讀／展示硬件驗收另作任務。
+Headline 近鏡（2026-10-27；時間線於 2026-10-29 修訂）：live 結果先在 hero 播完 2.62 秒 vote journey，再用 2 秒推近 headline，停定 0.5 秒後於 5.12 秒開始 3 秒場景過渡。4.62–13 秒停留，13 秒與 ambient 卡同步開始用 2 秒返回 hero；原因文字於 8.12 秒出現。**例外（owner 2026-11-13）**：SW 焦點変化（活動モジュール棚進／出 mixed）的場景過渡延長為 5 秒（`SHELF_TRANSITION_SECONDS`，只用於 SW）：5.12–10.12 秒，原因文字於 10.12 秒出現，之後約 2.9 秒閱讀，13 秒返回 hero 不變。順序見 [棚 spec](../artifacts/sw-event-shelf/spec.md#r3c)。八個 site shot（四站各 focal／district）及五個能源 shot 用常數表，保留 hero 方向及海／地標定位；focal 與 district 同時改以 district 為準。能源鏡頭與結果卡共用部件優先次序，移除設備亦看原位置。新結果從現有位置先平滑回 hero；snapshot／reset／Undo／reconnect／reduced motion／legacy／追趕中的結果立即 hero。無 headline 不推近；如接續仍在播放的近鏡，先從當前位置用 2 秒平滑返回，再保持 hero 並恢復操作。普通 standalone 及其他 DEV review 不自動播放；DEV 可用 `?shot=` 逐鏡檢查。近鏡的模型／材質打磨及真人閱讀／展示硬件驗收另作任務。
 
 Closeup-zoom F 候選（2026-10-30）：district 改為較闊焦點構圖、停留期間慢推 7%；SW focal 避開主要遮擋。SE／NW 焦點及 district carrier 可讀性未達驗收，詳見 [F 自評](../artifacts/closeup-zoom/final/F-review.md)，最終仍待 owner 審閱。
 
@@ -119,7 +119,7 @@ District 直接讀 tier；DEV `?meters`／carrier 測試用 `deriveExhibitionLay
 
 **一票旅程（2026-10-13 user要求）**：live 結果先播約 2.6 秒旅程——觀眾四票化成 Meter 色光點（中性票暖白），由畫面右下（站台方向）飛去四個 focal site（E4後新Q3改到沿岸能源接點，舊氣候票仍到公園），著陸時掃描環升起（2026-11-03 起：headline 係 district 變化時，該軸光點改為飛去今次真正變動嘅 slot，每個變動 slot 升起掃描環；其他軸、能源及 focal 變化照舊落 focal site）；每票留低一粒浮喺 site 上空嘅光點（日間淡、夜間亮），保留最近 64 位觀眾，snapshot／reload 由 `recentProposals` 重建。著陸後先推近並停定，於 5.12 秒開始 3 秒過渡及 pulse；結果卡證據喺收到事件時已經計好，理由句於 8.12 秒出現。Snapshot、reset、Undo、reconnect、reduced motion 唔播旅程，即時恢復。
 
-Live 使用可重新定向的 **3 秒**過渡；pulse 只標示真的 live 變化；每個改變嘅 Meter 只喺其 site 出光柱，district slots 只有淡色光圈（2026-10-04）。Snapshot、reset、Undo、reconnect、reduced motion 直接恢復權威狀態，清除排隊及 pulse。重複事件不重播。配對、counts、固定 footprint 及限制見 [Meter handoff](handoffs/archive/meter-variety.md)。
+Live 使用可重新定向的 **3 秒**過渡（SW 進／出 mixed 為 5 秒，見上）；pulse 只標示真的 live 變化；每個改變嘅 Meter 只喺其 site 出光柱，district slots 只有淡色光圈（2026-10-04）。Snapshot、reset、Undo、reconnect、reduced motion 直接恢復權威狀態，清除排隊及 pulse。重複事件不重播。配對、counts、固定 footprint 及限制見 [Meter handoff](handoffs/archive/meter-variety.md)。
 
 ## Guest、單站與 A/B
 

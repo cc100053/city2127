@@ -1,3 +1,4 @@
+import { SHELF_TRANSITION_SECONDS } from '../src/siteBuilders/shelfTimeline.ts';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { CityChangeManager } from '../src/cityChangeManager.ts';
@@ -86,7 +87,7 @@ function applyEvent(event: unknown, now: number) {
   const parsed = parseSurveyEvent(JSON.parse(JSON.stringify(event)));
   assert.ok(parsed && parsed.view.version === 2, 'real server event passes client validation');
   const changes = manager.applyExhibitionLayout(parsed.view.layout, parsed.kind, now, parsed.view.slotSeeds);
-  manager.update(now + 3.1);
+  manager.update(now + SHELF_TRANSITION_SECONDS + .1); // the SW mixed band change is the longest transition
   assertModels(parsed.view as ExhibitionCityView);
   if (parsed.kind === 'city-state-updated' && parsed.view.latestProposal) {
     const result = residentResult(parsed.view.latestProposal, changes);
@@ -102,12 +103,12 @@ for (const votes of meterCombinations(METER_CONTRACTS)) {
   const { ctx } = exhibitionFixture();
   try {
     const session = ok(createProposalSession(ctx).response);
-    applyEvent({ type: 'city-state-snapshot', view: currentView(ctx) }, count * 8);
+    applyEvent({ type: 'city-state-snapshot', view: currentView(ctx) }, count * 12);
     const outcome = submitProposal(ctx, { submissionId: `mesh-${count}`, guestSessionId: session.session.id, expectedRevision: 0,
       answers: answersForVotes(METER_CONTRACTS, votes) });
     const result = ok(outcome.response);
     assert.deepEqual(result.proposal.afterLayout, firstProposalGolden(METER_CONTRACTS, votes).layout);
-    const causal = applyEvent(outcome.event, count * 8 + 4)!;
+    const causal = applyEvent(outcome.event, count * 12 + 6)!;
     if (Object.values(votes).every(vote => vote === 0)) assert.equal(causal.result.kind, 'maintained');
     count++;
   } finally { ctx.db.close(); }

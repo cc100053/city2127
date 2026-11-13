@@ -45,27 +45,37 @@ test('commons states follow the band, retarget smoothly, hide before the exhibit
 
   // A band change crosses through both states, then settles on the new one only.
   assert.equal(runtime.setTarget({ band: 'high', sharedSeats: 8 }, 20, false), true);
-  runtime.update(21.5);
+  runtime.update(23.8);
   assert.ok(state('mixed').visible && state('high').visible, 'both states are visible mid-transition');
-  runtime.update(23);
+  runtime.update(24.9);
+  assert.ok(state('mixed').visible, 'the shelf frame stays up until its own window ends (5 s)');
+  runtime.update(25);
   assert.deepEqual(shown(), ['high']);
   assert.equal(canopy('high').visible, true);
   assert.deepEqual(runtime.getDiagnostics(), { band: 'high', targetSharedSeats: 8, visibleSharedSeats: 8, targetScreenedSeats: 0, visibleScreenedSeats: 0 });
   assert.ok(!plaza.children.some(child => child.name === 'commons-pods-low' && child.visible), 'no private pods in the +1 state');
 
-  // Band change order (the only shelf change the live ladder produces: mixed always means 4 seats): the frame is up before modules slide in, the modules are out before the frame comes down, and nothing is squashed with it.
-  const shelfFrame = state('mixed');
+  // Band change order (the only shelf change the live ladder produces: mixed always means 4 seats). Entering mixed (5 s): frame 0-1.3 s, quiet modules 1.3-2.1 s, headline hoist 1.9-5 s. Leaving: hoist 0-3.1 s, modules out 2.9-3.7 s, frame down 3.7-5 s. Nothing is squashed with the frame.
+  const shelfFrame = state('mixed'), seen = () => runtime.getShelfDiagnostics().visibleModules;
   runtime.setTarget({ band: 'mixed', sharedSeats: 4 }, 40, false);
-  runtime.update(41.5);
-  assert.ok(shelfFrame.visible && shelfFrame.scale.y > 0 && shelfFrame.scale.y < 1 && runtime.getShelfDiagnostics().visibleModules === 0, 'frame still rising, no module yet');
-  runtime.update(43);
-  assert.equal(runtime.getShelfDiagnostics().visibleModules, 33);
+  runtime.update(40.65);
+  assert.ok(shelfFrame.visible && shelfFrame.scale.y > 0 && shelfFrame.scale.y < 1 && seen() === 0, 'frame still rising, no module yet');
+  runtime.update(41.4);
+  assert.ok(shelfFrame.scale.y === 1 && seen() === 32 && seen() <= 33, 'frame is up; quiet modules slide in, the headline module has not started');
+  runtime.update(42.2);
+  assert.equal(seen(), 33, 'the headline module is hoisting in');
+  runtime.update(44);
+  assert.equal(seen(), 33);
+  runtime.update(45);
+  assert.equal(runtime.getShelfDiagnostics().visibleModules, 33, 'settled: every module in place');
   runtime.setTarget({ band: 'low', sharedSeats: 0 }, 50, false);
-  runtime.update(50.9);
-  assert.ok(shelfFrame.scale.y === 1 && runtime.getShelfDiagnostics().visibleModules === 29, 'modules slide out first, frame still full height');
-  runtime.update(51.35);
-  assert.ok(shelfFrame.scale.y < 1 && runtime.getShelfDiagnostics().visibleModules === 0, 'frame comes down only after every module has left');
-  runtime.update(53);
+  runtime.update(51.5);
+  assert.ok(shelfFrame.scale.y === 1 && seen() === 33, 'headline module is hoisting out, frame full height');
+  runtime.update(53.4);
+  assert.ok(shelfFrame.scale.y === 1 && seen() < 33, 'quiet modules slide out after the hoist');
+  runtime.update(53.9);
+  assert.ok(shelfFrame.scale.y < 1 && seen() === 0, 'frame comes down only after every module has left');
+  runtime.update(55);
   assert.deepEqual(shown(), ['low']);
 
   // Every state (slab, deck, discs) stays inside the SW lot plus the .8 gap to the amber outline's inner edge.

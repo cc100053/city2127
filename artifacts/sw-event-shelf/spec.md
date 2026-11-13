@@ -69,7 +69,7 @@ k8: 1 0 1 / 0 1 0   (4)... 以程式表為準：tests/eventShelf.test.ts 固定 
 | 2800–3000 | 纜索收回、吊桁待機位 |
 | 3–13 s（近鏡停留） | 吊桁慢速環境循環（bridge ±6 m、trolley ±10 m，週期 12 s） |
 
-移除（出場）為其逆序（鎖燈 → 縮回 → 降下 → 離軌）。後排格：1900–2600 為越頂橫移＋沿後立面放下，壓縮為 1900–2800。其餘模組：`order` 次序錯開，各自沿 z 從棚前方 12 m 外滑至格位（持續 800–1200 ms、ease-out），出場則反向。Band 切換（mixed ↔ low／high）：框架 `scale.y` 沿用 `Part` 層級（0–60 %）。**R3b 實測後改序**：模組 part 為 `at 1, span .4`，即上升時框架先完成（0–1.8 s）才滑入（1.8–3.0 s），下降時模組先滑出（0–1.2 s）框架才縮（1.2–3.0 s）；模組不再與框架一起被壓扁。不重做搬運。
+移除（出場）為其逆序（鎖燈 → 縮回 → 降下 → 離軌）。後排格：1900–2600 為越頂橫移＋沿後立面放下，壓縮為 1900–2800。其餘模組：`order` 次序錯開，各自沿 z 從棚前方 12 m 外滑至格位（持續 800–1200 ms、ease-out），出場則反向。Band 切換（mixed ↔ low／high）：框架 `scale.y` 沿用 `Part` 層級（0–60 %）。**R3b 實測後改序**：模組 part 為 `at 1, span .4`，即上升時框架先完成（0–1.8 s）才滑入（1.8–3.0 s），下降時模組先滑出（0–1.2 s）框架才縮（1.2–3.0 s）；模組不再與框架一起被壓扁。不重做搬運。**（R3c 已推翻「band 切換不重做搬運」，見 [R3c](#r3c)。）**
 
 **R3b 實況（真實投票流程）**：階梯下 mixed 的 `sharedSeats` 恆為 4（`ladderLayout`：tier 0 → `round(8·.5)`），low 0、high 8；故 live 只會發生 band 切換，**headline hoist 不會在 live 觸發**（模組數 29／33／37 隨 band 立即設定），hoist 只在 DEV 鉤子、單元測試與 v1／standalone 的座位變動出現。
 
@@ -280,3 +280,39 @@ DEV 臨時鉤子 `globalThis.__eventShelf`（僅 `import.meta.env.DEV`）加上�
 3. 模組 8.6 m 或 7.7 m（沿用）。
 4. 地塊南移 15 m（z 312 → 297）是否接受（取代：不移，並接受 −1／+1 北緣超出 14.4 m）。
 5. 地軌是否接到 75 m 外的街道（沿用）。
+
+
+---
+
+<a id="r3c"></a>
+# R3c（2026-11-13）— 進／出 mixed 的完整吊運與延長過場
+
+Owner 決定：SW 由 −1／+1 進入 mixed 時，框架出現，**然後 headline 模組走完整吊運**；離開 mixed 時，headline 模組先吊出離軌，再收框架。live 只會發生 band 切換，這是令吊運出現在真實投票的唯一路徑；不改投票階梯。
+
+## 時間表（SW 進／出 mixed，共 5.0 s，`shelfTimeline.ts` 為唯一來源）
+
+| 段 | 進入 mixed | 離開 mixed（鏡像） |
+| --- | --- | --- |
+| 框架＋庭院地面綠化 | 0–1.3 s | 3.7–5.0 s |
+| 其餘模組（靜靜整批前滑入／出） | 1.3–2.1 s | 2.9–3.7 s |
+| 低／高狀態（相反 band）退場／出現 | 0–2.1 s（沿用舊 at/span） | 2.9–5.0 s |
+| headline 模組吊運（3.1 s，u 相位同 R3b） | 1.9–5.0 s | 0–3.1 s（逆序） |
+
+headline 模組 = 該 mixed 座位數的最後一個（`SHELF_SLOTS[count-1]`，前排左／中柱列）。進入時由 `shelfCount(seats)` 的末格；離開時用離開前的數。吊運起點（1.9 s）晚於模組滑入起點但早於其終點，模組滑入時 headline 仍在棚外 z −36.8 處，單元測試逐 0.05 s 驗證不與任何模組／框架重疊。
+
+## 與整體節奏對齊
+
+| 秒 | 事件 |
+| --- | --- |
+| 0–2.62 | vote journey（hero） |
+| 2.62–4.62 | 2 s 推近（sw:focal） |
+| 4.62–5.12 | 0.5 s 靜止 |
+| **5.12–10.12** | **SW 棚 5 s 過場**（原 3 s） |
+| 10.12 | 原因文字出現（`reasonDelayMs`，SW 焦點變化帶 5 s） |
+| 10.12–13 | 閱讀，約 2.9 s（owner：約 3 s） |
+| 13–15 | 回 hero（不變） |
+
+`DISPLAY_MS`、結果 lease、survey 契約都未動。`SITE_TRANSITION_SECONDS`（3 s）不變，nw／ne／se 及 district 皆用它；只有 `commonsPlaza` 的 band 切換（進／出 mixed）與 `shotTimeline(…, transition)`／`reasonDelayMs(…, transition)` 的 SW 焦點變化使用 5 s。低↔高直接切換（live 不會發生）仍為 3 s。SW 的 district（`SharingDistrict`）、標記與脈衝仍為 3 s，先於棚完成。
+
+## 立即路徑
+snapshot／reset／Undo／reconnect／reduced-motion 的 `setTarget(…, immediate)` 走 `settle`，不使用吊運；模組數與 band 等於權威狀態。

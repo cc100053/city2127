@@ -8,6 +8,7 @@ import type { ExhibitionLayout } from '../surveyView.ts';
 import { tree } from './concentrationTower.ts';
 import { createEventShelf, shelfCount, type EventShelf } from './eventShelf.ts';
 import type { SiteAssetLoaderCache } from '../siteAssets/assetLoader.ts';
+import { SHELF_TRANSITION_SECONDS, shelfHoist, shelfWindow } from './shelfTimeline.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, prefersReducedMotion, SITE_TRANSITION_SECONDS, type BuiltSite } from './siteRuntime.ts';
 
 type Band = ExhibitionLayout['bands']['sw'];
@@ -81,12 +82,14 @@ function sharedSlotLevels(sharedSeats: number): Float32Array {
 }
 
 // ponytail: the visible geometry follows the band (pods / circle / amphitheatre); this 8-slot seat counter only drives the diagnostics and its smooth 3 s retarget.
-function createCommonsPlazaRuntime(parts: Part[], frame: (now: number) => void, onSeats: (seats: number, now: number, immediate: boolean) => void, shelf: EventShelf): CommonsPlazaRuntime {
+function createCommonsPlazaRuntime(parts: Part[], frame: (now: number) => void, onSeats: (seats: number, now: number, immediate: boolean, band?: { dir: 1 | -1; delay: number; seconds: number }) => void, shelf: EventShelf): CommonsPlazaRuntime {
   const levels = sharedSlotLevels(DEFAULT_TARGET.sharedSeats), from = new Float32Array(levels), to = new Float32Array(levels);
   let target: CommonsPlazaTarget = DEFAULT_TARGET;
   let exhibitionTargetApplied = false;
   let active = false;
   let start = 0;
+  // A band change into or out of mixed runs the shelf sequence (frame, quiet modules, headline hoist) over its own, longer clock; everything else keeps the 3 s default.
+  let duration: number = SITE_TRANSITION_SECONDS, mixedMove: 1 | -1 | 0 = 0;
   const write = () => { for (const part of parts) part.apply(part.level); };
   const settle = (band: Band) => {
     for (const part of parts) part.level = part.from = part.to = part.band === band ? 1 : 0;
@@ -114,17 +117,25 @@ function createCommonsPlazaRuntime(parts: Part[], frame: (now: number) => void, 
       to.set(sharedSlotLevels(next.sharedSeats));
       for (const part of parts) { part.from = part.level; part.to = part.band === next.band ? 1 : 0; }
       start = now;
+      mixedMove = next.band !== wasBand && (next.band === 'mixed' || wasBand === 'mixed') ? (next.band === 'mixed' ? 1 : -1) : 0;
+      duration = mixedMove ? SHELF_TRANSITION_SECONDS : SITE_TRANSITION_SECONDS;
       if (immediate) settle(next.band);
-      else { active = changed; onSeats(next.sharedSeats, now, next.band !== wasBand); }
+      else { active = changed; onSeats(next.sharedSeats, now, next.band !== wasBand && !mixedMove, mixedMove ? { dir: mixedMove, ...shelfHoist(mixedMove === 1) } : undefined); }
       return changed;
     },
     update(now) {
       if (active) {
-        const raw = clamp01((now - start) / SITE_TRANSITION_SECONDS);
+        const raw = clamp01((now - start) / duration), t = now - start;
         // A state builds bottom-first and comes down top-first, each part over `span` of the 3 s.
         for (const part of parts) {
+          if (mixedMove && part.band === 'mixed') { // shelf frame (at 0) and quiet modules (at 1) run in their own windows, in seconds
+            const [a, b] = shelfWindow(part.at === 0 ? 'frame' : 'modules', mixedMove === 1);
+            part.level = part.from + (part.to - part.from) * smoothstep(clamp01((t - a) / (b - a)));
+            continue;
+          }
+          const [a, b] = mixedMove ? shelfWindow('other', mixedMove === 1) : [0, duration];
           const begin = (part.to > part.from ? part.at : 1 - part.at) * (1 - part.span);
-          part.level = part.from + (part.to - part.from) * smoothstep(clamp01((raw - begin) / part.span));
+          part.level = part.from + (part.to - part.from) * smoothstep(clamp01(((t - a) / (b - a) - begin) / part.span));
         }
         const eased = smoothstep(raw);
         for (let i = 0; i < SEAT_COUNT; i++) levels[i] = from[i] + (to[i] - from[i]) * eased;
@@ -723,7 +734,7 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown, assets?: SiteA
     });
     void plazaLayer.prepare(); // load now, so the first 3 s rise already shows the GLB
   }
-  const commonsPlaza = createCommonsPlazaRuntime(parts, frame, (seats, now, immediate) => shelf.setCount(shelfCount(seats), now, immediate), shelf);
+  const commonsPlaza = createCommonsPlazaRuntime(parts, frame, (seats, now, immediate, band) => shelf.setCount(shelfCount(seats), now, immediate, band), shelf);
   return {
     id: 'dogenzakaSouth', root,
     layers: { plaza: plazaLayer, commonsNeutralProps: neutralPropsLayer },

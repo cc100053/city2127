@@ -1,7 +1,7 @@
 # sw-event-shelf — SW 新旗艦：活動モジュール棚
 
 - Owner: cc100053
-- Status: R3b（動畫驗證與修正）完成 — 待 owner 視覺驗收（未 merge）
+- Status: R3c（進／出 mixed 的完整吊運，5 s 過場）完成 — 待 owner 視覺驗收（未 merge）
 - Branch: `feat/sw-event-shelf`（worktree：`.claude/worktrees/sw-event-shelf`，由 origin/main e13689b 切出；主 checkout 的無關未提交變更原封不動）
 - Base commit: e13689b3fd97eea312d421acac3fbe185b448ecc
 - Last verified commit: R2 commit（見 git log；測試與 build 於提交前通過）
@@ -86,6 +86,14 @@
   - **立即恢復（`immediate-restore.json`、`reconnect.mjs`）**：Undo（admin API `undo-proposal`）、`reset-city`、頁面重載（snapshot）、reduced-motion 下的提案、重連（用 Playwright `routeWebSocket` 斷線期間提案，重連後）皆在虛擬 +0 s 即恢復權威狀態（scale／模組數正確）；斷線期間畫面維持舊狀態。第一版重連測試（`setOffline`）無效（連線未斷，只是 live 更新），已棄用。
   - **仍不足／未解**：(a) 模組滑出／入時整批剛性移動，spec 的「`order` 次序錯開」未實作；滑出至 12 m 外才消失（instancing 無淡出）。(b) 地面入場在 `sw:focal` 被前景 court-6 傘形頂遮住，只見由傘後駛出；入場起點 z −36.8 的地面物件（樹、其他地塊）未逐項查，只目測錄影無穿插。(c) 吊掛模組在 band 切換時纜索隨之外斜，並非真實吊運。(d) 夜景錄影、FPS 未測（不引用數字）；錄影為虛擬時鐘逐幀，非即時流暢度。(e) 中欄 DEV 吊運須有 headline 在 c=1，live 無此情況。
   - 驗證：根 `npm test`、`npm run build`、`git diff --check` 通過；`survey/`、`module-swap/` 未動（survey 只 `npm ci` 後跑 dev:auto）。
+
+- **R3c（2026-11-13，起點 fcc03f2，只動動畫／時序碼與測試，建模外觀未動）**：owner 版本：進 mixed＝框架出現後 headline 模組走完整吊運；出 mixed＝headline 先吊出再收框架。時間表與節奏對齊見 [spec R3c](../../artifacts/sw-event-shelf/spec.md#r3c)。
+  - 改了什麼：新 `src/siteBuilders/shelfTimeline.ts`（5 s、各段窗口、`headlineTransitionSeconds`）；`commonsPlaza.ts` 進／出 mixed 時 mixed 各 part 用秒窗口，相反 band 的 part 用 2.1 s 窗口；`eventShelf.ts` `setCount(…, band)` 的 `{dir, delay, seconds}` 吊運計劃（hoist 加 `seconds`，`visibleModules` 只計實際可見的 hoist 模組）；`resultTimeline.ts` `shotTimeline`／`reasonDelayMs` 加 `transition` 參數；`surveyAtmosphere.ts` 對 SW 焦點變化用 5 s 顯示原因文字。其他 site 與 `SITE_TRANSITION_SECONDS`、`DISPLAY_MS`、投票階梯、四題、DB 契約均未動。
+  - 測試：`tests/eventShelf.test.ts` 新增 band 進／出（座位 4／3／2，兩向）每 0.05 s 檢查 headline 與其他模組、框架無重疊、單步 < 3 m、距目標格單調、出現／消失在自己的窗口、結束狀態＝立即狀態；`commonsPlaza.test.ts` 按 5 s 重排；`headlineCamera.test.ts` 加 SW 5 s、其他 site 3 s、閱讀 ≥ 2.85 s、回 hero 13–15 s；`surveyMeterPipeline.test.ts` 事件間隔 12 s、等 5.1 s。
+  - 真實投票流程（`survey dev:auto` ＋ Vite DEV ＋ 無頭 Chrome 1920×1080 ＋ 虛擬時鐘，每 0.25 s 一幀，0–17 s，真實 guest UI 作答；腳本同 R3b，輸出 `~/city2127-evidence/sw-event-shelf/r3c/`：`e1-mixed-to-low`、`e2-low-to-mixed`、`e3-mixed-to-high`、`e4-high-to-mixed`、各 `contact-*-transition.jpg`（4.5–10.5 s）與 `contact-*-return.jpg`（10.5–16 s））。四組皆見到一次 `setCount`（帶 band 計劃）、5.12 s 起吊運，約 10.1 s 完成。
+  - **逐項（如實，僅依 contact sheet 目測，只細看了 e1／e2／e4 的過場與 e2 的回 hero，e3 只當與 e1 對稱而未逐幀細看）**：(1) 吊運在 close-up 鏡頭內可見：鏡頭 4.62 s 到位，吊運 7.0–10.1 s 在畫面右下前立面上升、橫移入格，全程在框內。(2) 框架出現與吊運：框架 5.1–6.4 s 先起，模組 6.4–7.2 s 滑入，之後吊運，彼此不重疊；進入時 5.12–6.5 s 才見框架，約 1.4 s 內畫面主要是框架生長。(3) 模組穿框：單元測試通過；錄影目測無穿柱。(4) 纜索與吊桁：目測跟隨，未逐幀量測。(5) **地面入場被前景傘形樹冠遮住**（同 R3b）：入場只見由傘後駛出，未解。(6) **e4（high→mixed）：+1 的圓頂傘與階梯座席在框架生長時仍可見，到約 6.5 s 才被框架蓋過／退場**（舊 high 狀態用舊 at/span 在 2.1 s 窗口內退場），框架生長期間有明顯重疊；e2（low）重疊較少但小亭仍在框架底部可見至約 6 s。未處理。(7) 結束後閱讀：10.12–13 s ≈ 2.9 s 棚靜止（模組 hang 姿態仍緩慢升降），13.25 s 起拉回 hero，15.0 s 前完成。(8) 原因文字 SW 焦點變化於 10.12 s 出現（單元測試覆蓋 `reasonDelayMs`；真實卡片未截圖逐幀）。
+  - 未驗證／未解：reduced-motion 只靠既有立即路徑與單元測試（未手動看）；snapshot／reset／Undo／reconnect 本輪未重跑 R3b 的 `immediate`／`reconnect` 腳本（只改了 `setTarget` 的非立即分支，`settle` 路徑未變）；夜景、FPS 未測（不引用數字）；headline 模組吊運速度較 R3b 慢（3.1 s 對 3.0 s，但整體 5 s 內其餘動作較快）；`low↔high` 直接切換與其他 site 仍 3 s。
+  - 驗證（commit 前）：根 `npm test`、`npm run build`、`git diff --check` 全部通過（另修正 `energyPipeline.test.ts` 的等待時間 5→7 s）。`survey/`、`module-swap/` 未動（survey 只用 dev:auto）。
 
 ## Code findings (2026-11-13, read-only)
 

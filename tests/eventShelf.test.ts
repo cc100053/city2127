@@ -1,3 +1,4 @@
+import { SHELF_TRANSITION_SECONDS, shelfHoist, shelfWindow } from '../src/siteBuilders/shelfTimeline.ts';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import * as T from 'three';
@@ -72,6 +73,7 @@ assert.ok(instanced.length >= 7 * 8, `${instanced.length} instanced module meshe
 assert.equal(shelf.visibleModules(), 33);
 // One module moves at a time: count + 1 hoists exactly one slot, everyone else snaps; the hoist ends in its cell.
 shelf.setCount(34, 10, false);
+shelf.update(10.2);
 assert.equal(shelf.visibleModules(), 34);
 shelf.update(11.4);
 shelf.update(13.1);
@@ -97,24 +99,52 @@ assert.equal(shelf.visibleModules(), 30, 'an immediate change (snapshot / reset)
     for (let j = 0; j <= SHELF.rows; j++) add(W + SHELF.col, .8, .9, 0, k * SHELF.floor - .4, -D / 2 + j * SHELF.cell);
     for (let i = 0; i <= SHELF.cols; i++) add(.9, .8, D + SHELF.col, -W / 2 + i * SHELF.cell, k * SHELF.floor - .4, 0);
   }
-  for (let count = 30; count <= 37; count++) for (const dir of [1, -1]) {
-    const before = dir === 1 ? count - 1 : count, after = dir === 1 ? count : count - 1, slot = Math.max(before, after) - 1, s = SHELF_SLOTS[slot];
-    sh.setCount(before, 0, true); sh.update(0); sh.setCount(after, 100, false);
-    let last: { x: number; y: number; z: number } | undefined, seenZ = [Infinity, -Infinity];
-    for (let t = 100; t <= 103.001; t += .05) {
-      sh.update(t);
+  const check = (label: string, slot: number, t0: number, t1: number, step: number, drive: (t: number) => void, expect: { z0?: number }) => {
+    const s = SHELF_SLOTS[slot];
+    let last: { x: number; y: number; z: number } | undefined, seenZ = [Infinity, -Infinity], lastY = -Infinity, lastShown = false;
+    for (let t = t0; t <= t1 + 1e-9; t += step) {
+      drive(t);
       const p = pose(slot);
       if (!p.shown) continue;
       const b = box(p.x, p.y, p.z, s.variant === 'H' ? 7.4 : 3.2);
-      for (let i = 0; i < SHELF_SLOTS.length; i++) { const o = pose(i); if (i !== slot && o.shown) assert.ok(!hit(b, box(o.x, o.y, o.z, SHELF_SLOTS[i].variant === 'H' ? 7.4 : 3.2)), `${count}${dir > 0 ? '+' : '-'} ${s.id} meets ${SHELF_SLOTS[i].id} at ${(t - 100).toFixed(2)} s`); }
-      assert.ok(!frame.some(f => hit(b, f)), `${count}${dir > 0 ? '+' : '-'} ${s.id} meets the frame at ${(t - 100).toFixed(2)} s`);
-      if (last) assert.ok(Math.hypot(p.x - last.x, p.y - last.y, p.z - last.z) < 3, `${s.id} jumps ${(t - 100).toFixed(2)} s`);
-      last = p; seenZ = [Math.min(seenZ[0], p.z), Math.max(seenZ[1], p.z)];
+      for (let i = 0; i < SHELF_SLOTS.length; i++) { const o = pose(i); if (i !== slot && o.shown) assert.ok(!hit(b, box(o.x, o.y, o.z, SHELF_SLOTS[i].variant === 'H' ? 7.4 : 3.2)), `${label} ${s.id} meets ${SHELF_SLOTS[i].id} at ${(t - t0).toFixed(2)} s`); }
+      assert.ok(!frame.some(f => hit(b, f)), `${label} ${s.id} meets the frame at ${(t - t0).toFixed(2)} s`);
+      if (last) assert.ok(Math.hypot(p.x - last.x, p.y - last.y, p.z - last.z) < 3, `${label} ${s.id} jumps ${(t - t0).toFixed(2)} s`);
+      last = p; lastShown = true; seenZ = [Math.min(seenZ[0], p.z), Math.max(seenZ[1], p.z)]; lastY = p.y;
     }
-    assert.ok(seenZ[0] < -33, `${s.id} drives in from beyond the track end (z ${seenZ[0].toFixed(1)})`);
+    assert.ok(lastShown && seenZ[0] < -33, `${label} ${s.id} drives in/out beyond the track end (z ${seenZ[0].toFixed(1)})`);
+    return lastY;
+  };
+  for (let count = 30; count <= 37; count++) for (const dir of [1, -1]) {
+    const before = dir === 1 ? count - 1 : count, after = dir === 1 ? count : count - 1, slot = Math.max(before, after) - 1, s = SHELF_SLOTS[slot];
+    sh.setCount(before, 0, true); sh.update(0); sh.setCount(after, 100, false);
+    check(`${count}${dir > 0 ? '+' : '-'}`, slot, 100, 103.001, .05, t => sh.update(t), {});
     sh.update(103.2);
     assert.equal(sh.count, after);
     assert.equal(pose(slot).shown, after > before, 'the hoisted module ends in its cell (added) or gone (removed)');
   }
+  // Band change into / out of mixed (SW, owner 2026-11-13): the whole 5 s sequence, with the quiet modules sliding on the shelf's band clock. The headline module (last of the mixed count) hoists in after them / out before them; no overlap with any module or the frame; path monotonic; end state = the immediate state.
+  const settledOf = (i: number) => ({ x: SHELF_SLOTS[i].x, y: SHELF_SLOTS[i].y, z: SHELF_SLOTS[i].z }), smooth = (v: number) => v * v * (3 - 2 * v), win = (kind: 'frame' | 'modules' | 'other', entering: boolean, t: number) => { const [a, b] = shelfWindow(kind, entering); return smooth(Math.min(1, Math.max(0, (t - a) / (b - a)))); };
+  for (const seats of [4, 3, 2]) for (const dir of [1, -1] as const) {
+    const mixed = shelfCount(seats), slot = mixed - 1, entering = dir === 1, cell = settledOf(slot), other = entering ? shelfCount(0) : shelfCount(8); // low / high hide their own count
+    sh.setBandLevel(entering ? 0 : 1); sh.setCount(entering ? other : mixed, 0, true); sh.update(0);
+    sh.setCount(entering ? mixed : other, 200, false, { dir, ...shelfHoist(entering) });
+    let prev = entering ? Infinity : -Infinity, shownAt: number[] = [];
+    check(`band ${entering ? 'enter' : 'leave'} ${seats}`, slot, 200, 205, .05, t => {
+      sh.setBandLevel(win('modules', entering, t - 200));
+      sh.update(t);
+      const p = pose(slot), d = p.shown ? Math.hypot(p.x - cell.x, p.y - cell.y, p.z - cell.z) : entering ? Infinity : -Infinity;
+      if (p.shown) shownAt.push(t);
+      // The headline's distance to its cell only shrinks entering (grows leaving): one hoist, no back-and-forth.
+      assert.ok(!p.shown || (entering ? d <= prev + 1e-6 : d >= prev - 1e-6), `band ${seats}${entering ? '+' : '-'} path not monotone at ${(t - 200).toFixed(2)} s`);
+      if (p.shown) prev = d;
+    }, {});
+    const hs = shelfHoist(entering);
+    assert.ok(Math.abs(shownAt[0] - 200 - (entering ? hs.delay : 0)) < .06 && Math.abs(shownAt.at(-1)! - 200 - (entering ? 5 : hs.seconds)) < .06, 'the hoist runs inside its own window');
+    sh.setBandLevel(entering ? 1 : 0); sh.update(205.2);
+    assert.equal(pose(slot).shown, entering, 'the headline module ends in its cell (entering) or gone (leaving)');
+    assert.equal(sh.visibleModules(), entering ? mixed : 0, 'end state matches the immediate state');
+  }
+  assert.equal(SHELF_TRANSITION_SECONDS, 5);
 }
 console.log(`PASS: shelf slots (33 of ${SHELF_SLOTS.length}, deck level empty), GLB roles/bounds/${total} tris/${file.byteLength} bytes, GLB swap and single-hoist retarget`);

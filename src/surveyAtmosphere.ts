@@ -1,6 +1,8 @@
 import type { EnergyConfiguration } from '../survey/src/shared/energy.ts';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 import { reasonDelayMs } from './resultTimeline.ts';
+import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
+import { headlineTransitionSeconds } from './siteBuilders/shelfTimeline.ts';
 import { addHudChrome } from './hudFrame.ts';
 import type { CarrierChange } from './cityChangeManager.ts';
 import type { DisplayMode } from './dayCycle.ts';
@@ -299,7 +301,7 @@ export function startSurveyAtmosphere(
         const showReason = () => {
           latest.querySelector('.resident-card-copy')!.textContent = `${result.preference}${result.effect}`;
         };
-        const transitionMs = reasonDelayMs(displayMs, globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
+        const transitionMs = reasonDelayMs(displayMs, globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false, headlineTransitionSeconds(evidence?.[0], SITE_TRANSITION_SECONDS));
         if (transitionMs === 0) showReason();
         else reasonTimer = window.setTimeout(showReason, transitionMs);
         storyTimer = window.setTimeout(showAmbient, displayMs);

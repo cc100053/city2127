@@ -142,7 +142,7 @@ export function createEventShelf(root: T.Group) {
   const presence = new Float32Array(SHELF_SLOTS.length); // authoritative 0 or 1 once settled
   let count = shelfCount(4);
   let bandLevel = 1;
-  let hoist: { slot: number; start: number; dir: 1 | -1 } | undefined;
+  let hoist: { slot: number; start: number; seconds: number; dir: 1 | -1; band?: boolean } | undefined;
   for (let i = 0; i < count; i++) presence[i] = 1;
   const matrix = new T.Matrix4(), scale = new T.Vector3(), quat = new T.Quaternion(), pos = new T.Vector3();
   const zero = new T.Matrix4().makeScale(0, 0, 0);
@@ -158,7 +158,7 @@ export function createEventShelf(root: T.Group) {
     const z = u < U_CROSS ? ENTRY_Z + (FRONT_RAIL_Z - ENTRY_Z) * t(0, U_DRIVE) : FRONT_RAIL_Z + (s.z - FRONT_RAIL_Z) * t(U_CROSS, U_SLIDE);
     return { x: x0 + (s.x - x0) * t(U_CROSS0, U_CROSS), y: LEVEL0 + (top - LEVEL0) * t(U_DRIVE, U_LIFT), z };
   };
-  const hoistProgress = (now: number) => hoist ? clamp01((now - hoist.start) / SITE_TRANSITION_SECONDS) : 1;
+  const hoistProgress = (now: number) => hoist ? clamp01((now - hoist.start) / hoist.seconds) : 1;
   let clock = 0;
   /** How far (m) a module is still out in front of its place while a band change slides it in or out; placeOne applies the same offset. */
   const slideShift = (i: number) => { const p = i >= 0 ? presence[i] * bandLevel : 1; return p > HIDDEN && p < 1 - HIDDEN ? (1 - smooth(p)) * SHELF.cell : 0; };
@@ -342,7 +342,9 @@ export function createEventShelf(root: T.Group) {
       bx = idleX + (anchor.x - idleX) * smooth(clamp01(u / .12)) * smooth(clamp01((1 - u) / TROLLEY_HOME));
       carrierB.set(engage > .01 && raw > .02 && raw < .98, bx, anchor.x, anchor.y, anchor.z, h, u >= U_DRIVE && u < U_CROSS, engage);
       setLocks(flash, mod.x, mod.y, mod.z, h);
-      if (raw >= 1) { hoist = undefined; for (let i = 0; i < presence.length; i++) presence[i] = i < count ? 1 : 0; }
+      if (raw >= 1) { if (hoist.band && hoist.dir === -1) presence[hoist.slot] = 0; // the band is leaving: nothing else may appear for the new count
+        else for (let i = 0; i < presence.length; i++) presence[i] = i < count ? 1 : 0;
+        hoist = undefined; }
     } else {
       carrierB.set(false, bx, 0, 0, 0, 0, false);
       setLocks(0, 0, 0, 0, 0);
@@ -357,17 +359,22 @@ export function createEventShelf(root: T.Group) {
     group, frame, gantry,
     setBandLevel(level: number) { if (level !== bandLevel) { bandLevel = level; bandChanged = true; } },
     /** Retarget the module count: the last module added or first removed gets the full hoist when animated; the rest snap (they slide with the band). */
-    setCount(next: number, now: number, immediate: boolean) {
+    setCount(next: number, now: number, immediate: boolean, band?: { dir: 1 | -1; delay: number; seconds: number }) {
       const before = count;
       count = Math.max(0, Math.min(SHELF_SLOTS.length, next));
       hoist = undefined;
-      if (immediate || prefersReducedMotion() || before === count) {
+      if (immediate || prefersReducedMotion() || (!band && before === count)) {
         for (let i = 0; i < presence.length; i++) presence[i] = i < count ? 1 : 0;
+      } else if (band) {
+        // Entering mixed: the last module of the new count is hoisted in after the quiet ones; leaving: the last module of the old count is hoisted out first. Everyone else slides with the band.
+        const slot = (band.dir === 1 ? count : before) - 1, keep = band.dir === 1 ? count : before;
+        for (let i = 0; i < presence.length; i++) presence[i] = i < keep ? 1 : 0;
+        hoist = { slot, start: now + band.delay, seconds: band.seconds, dir: band.dir, band: true };
       } else {
         const lo = Math.min(before, count), hi = Math.max(before, count), adding = count > before;
         const slot = adding ? count - 1 : before - 1; // the last module added, or the last one in the load order removed first
         for (let i = 0; i < presence.length; i++) presence[i] = i < lo || (adding && i < hi) ? 1 : 0; // others in the range settle at once; the headline follows the hoist (or its reverse)
-        hoist = { slot, start: now, dir: adding ? 1 : -1 };
+        hoist = { slot, start: now, seconds: SITE_TRANSITION_SECONDS, dir: adding ? 1 : -1 };
       }
       bandChanged = true;
       clock = now;
@@ -397,7 +404,7 @@ export function createEventShelf(root: T.Group) {
     },
     get count() { return count; },
     get clock() { return clock; },
-    visibleModules() { let n = 0; for (let i = 0; i < presence.length; i++) if (presence[i] * bandLevel > HIDDEN || (hoist && hoist.slot === i)) n++; return n; },
+    visibleModules() { let n = 0; for (let i = 0; i < presence.length; i++) if (hoist && hoist.slot === i ? (hoist.dir === 1 ? hoistProgress(clock) : 1 - hoistProgress(clock)) > HIDDEN : presence[i] * bandLevel > HIDDEN) n++; return n; },
     hallSlots,
   };
   (globalThis as { __eventShelf?: typeof api }).__eventShelf = (import.meta as { env?: { DEV?: boolean } }).env?.DEV ? api : undefined; // DEV review hook: drive a hoist without a live vote
