@@ -5,21 +5,25 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 from geo_helpers import Acc, cyl, obox, finish_mesh, material, blob, tube, sweep, circle_pts, ring_section
 
-ROLES = {'district_white': ((.94,.94,.90,1), None), 'district_room': ((.68,.43,.27,1), (.72,.34,.14,1)), 'district_amber': ((1,.52,.08,1), (1,.42,.04,1)), 'district_green': ((.25,.48,.18,1), None), 'district_dark': ((.065,.052,.045,1), None), 'district_glass': ((.86,.92,.95,.11), None), 'district_floor': ((.46,.30,.19,1), (.28,.12,.045,1))}
+ROLES = {'district_white': ((.94,.94,.90,1), None, .5), 'district_room': ((.68,.43,.27,1), (.85,.40,.15,1), 1.2), 'district_amber': ((1,.52,.08,1), (1,.42,.04,1), .5), 'district_green': ((.25,.48,.18,1), None, .5), 'district_dark': ((.065,.052,.045,1), None, .5), 'district_glass': ((.86,.92,.95,.16), None, .5), 'district_floor': ((.46,.30,.19,1), (.28,.12,.045,1), .5),
+         # R4: lit interiors (orange light seeps out through the glass) and people/furniture that read as people, not black silhouettes.
+         'district_glow': ((1,.62,.28,1), (1,.55,.18,1), 2.4), 'district_skin': ((.80,.57,.42,1), None, .5), 'district_cloth_a': ((.17,.30,.50,1), None, .5), 'district_cloth_b': ((.80,.28,.20,1), None, .5), 'district_wood': ((.50,.33,.20,1), None, .5)}
 
 def build(kind):
-    a={k:Acc() for k in ROLES}; w,r,amber,green,dark,glass,floor=(a[k] for k in ROLES)
+    a={k:Acc() for k in ROLES}; w,r,amber,green,dark,glass,floor,glow,skin,clA,clB,wood=(a[k] for k in ROLES)
     def box(mat,x,y,z,sx,sy,sz): obox(mat,(x,y,z),(sx,sy,sz))
     def disc(mat,x,z,radius,y,h): cyl(mat,x,z,radius,y,y+h,32)
     def person(x,y,z,scale=1):
-        # Two legs and a head keep the silhouette distinct from a window mullion.
-        for dx in [-.15,.15]: box(dark,x+dx*scale,y+.37*scale,z,.18*scale,.74*scale,.25*scale)
-        box(dark,x,y+1.05*scale,z,.5*scale,.7*scale,.28*scale)
-        cyl(dark,x,z,.22*scale,y+1.4*scale,y+1.8*scale,8)
+        # Cloth legs and torso with a skin head: reads as a resident against the lit room, not a black mullion.
+        c=clA if int(abs(x*7+z*3))%2 else clB; sc=scale
+        for dx in [-.15,.15]: box(c,x+dx*sc,y+.37*sc,z,.18*sc,.74*sc,.25*sc)
+        box(clB if c is clA else clA,x,y+1.05*sc,z,.5*sc,.7*sc,.28*sc)
+        cyl(skin,x,z,.22*sc,y+1.4*sc,y+1.8*sc,8)
     def table(x,y,z):
-        box(dark,x,y+.78,z,2.1,.16,1.1)
+        box(wood,x,y+.78,z,2.1,.16,1.1)
         for dx in [-.8,.8]:
-            for dz in [-.38,.38]: box(dark,x+dx,y+.35,z+dz,.14,.7,.14)
+            for dz in [-.38,.38]: box(wood,x+dx,y+.35,z+dz,.14,.7,.14)
+        for dz in [-.95,.95]: box(wood,x,y+.5,z+dz,.6,.1,.6); box(wood,x,y+.22,z+dz,.1,.44,.1)
     def room(x,z,y,width,depth,height):
         # Two thin central partitions leave an open, occupied band at every facade.
         box(r,x,y+(height+.2)/2,z,width-5,height-.2,.35)
@@ -27,14 +31,15 @@ def build(kind):
         box(w,x,y+.2,z,width+1,.25,depth+1)
         box(floor,x,y+.35,z,width-.7,.06,depth-.7)
         box(r,x,y+height-.16,z,width-1,.12,depth-1)
+        box(glow,x,y+height-.25,z,width-2.4,.06,depth-2.4)
         for side in [-1,1]:
             for dx in [-.34,0,.34]:
                 box(w,x+dx*width,y+height/2,z+side*(depth/2+.06),.18,height,.16)
             for dx in [-.20,.20]: person(x+dx*width,y+.38,z+side*(depth/2-1.4),1.1)
             table(x,y+.38,z+side*(depth/2-2.6))
             seated(x+width*.29,y+.38,z+side*(depth/2-2.8))
-            for h in [.25,1.1,1.95]: box(dark,x-width*.32,y+.38+h,z+side*(depth/2-2.4),1.9,.12,.35)
-            for dx in [-1,1]: box(dark,x-width*.32+dx,y+1.4,z+side*(depth/2-2.4),.12,2,.35)
+            for h in [.25,1.1,1.95]: box(wood,x-width*.32,y+.38+h,z+side*(depth/2-2.4),1.9,.12,.35)
+            for dx in [-1,1]: box(wood,x-width*.32+dx,y+1.4,z+side*(depth/2-2.4),.12,2,.35)
             box(glass,x,y+height/2,z+side*(depth/2+.3),width,height,.08)
             for dz in [-.3,0,.3]: box(w,x+side*(width/2+.06),y+height/2,z+dz*depth,.16,height,.18)
             for dz in [-.2,.2]: person(x+side*(width/2-1.4),y+.38,z+dz*depth,1.1)
@@ -42,12 +47,26 @@ def build(kind):
             box(glass,x+side*(width/2+.3),y+height/2,z,.08,height,depth)
     def seated(x,y,z):
         # A supported chair and bent legs keep this silhouette distinct from standing guests.
-        box(dark,x,y+.48,z,.65,.12,.65)
+        box(wood,x,y+.48,z,.65,.12,.65)
         for dx in [-.25,.25]:
-            for dz in [-.25,.25]: box(dark,x+dx,y+.23,z+dz,.1,.46,.1)
-        box(dark,x,y+.86,z,.46,.65,.3)
-        cyl(dark,x,z,.19,y+1.18,y+1.56,8)
-        for dx in [-.14,.14]: box(dark,x+dx,y+.3,z+.38,.16,.6,.16)
+            for dz in [-.25,.25]: box(wood,x+dx,y+.23,z+dz,.1,.46,.1)
+        box(clA,x,y+.86,z,.46,.65,.3)
+        cyl(skin,x,z,.19,y+1.18,y+1.56,8)
+        for dx in [-.14,.14]: box(clB,x+dx,y+.3,z+.38,.16,.6,.16)
+    def lift(x,z,y0,y1,ycap,wd=2.2,sz=2.0):
+        # Transparent glass shaft with a slim white frame, amber front edges and a glass capsule with a rider (reuses the SE lift glass look).
+        yc,hh=(y0+y1)/2,y1-y0
+        for dz in [-1,1]: box(glass,x,yc,z+dz*sz/2,wd,hh,.08)
+        for dx in [-1,1]: box(glass,x+dx*wd/2,yc,z,.08,hh,sz)
+        for dx in [-1,1]:
+            for dz in [-1,1]: box(w,x+dx*wd/2,yc,z+dz*sz/2,.16,hh,.16)
+        for dx in [-1,1]: box(amber,x+dx*wd/2,yc,z-sz/2-.08,.1,hh,.06)
+        for yy in range(int(y0)+8,int(y1),12): box(w,x,yy,z,wd+.2,.22,sz+.2)
+        cw,cz,ch=wd-.5,sz-.5,3.6
+        box(glass,x,ycap+ch/2,z,cw,ch,cz)
+        box(w,x,ycap+.08,z,cw+.1,.16,cz+.1); box(w,x,ycap+ch,z,cw+.1,.14,cz+.1); box(glow,x,ycap+ch-.12,z,cw-.3,.06,cz-.3)
+        box(amber,x,ycap+.25,z-cz/2-.07,cw+.1,.1,.06); box(floor,x,ycap+.19,z,cw-.1,.06,cz-.1)
+        person(x,ycap+.2,z,.9)
     def podium(): disc(w,0,0,18.5,0,2)
     def entrance_glass(radius,y0,y1):
         # Open two 2.5 m doorways in opposite directions; the lintels and thresholds sit within the old footprint.
@@ -95,11 +114,7 @@ def build(kind):
             for side in [-1,1]:
                 box(amber,0,y1-1.1,side*(wz/2-.2),wx-.5,.3,.25); box(amber,side*(wx/2-.2),y1-1.1,0,.25,.3,wz-.5)
         # Exposed +X/+Z corner faces the east review after this slot's yaw.
-        for x in [12.6,14.6]: box(dark,x,50,11, .32,96,.32)
-        box(glass,13.6,50,11,2.2,96,.10)
-        box(w,13.6,45,11,3.2,4,2); box(dark,13.6,45,12.03,2.65,3.3,.12)
-        box(amber,13.6,47.1,12.12,3.3,.2,.2)
-        for x in [12,15.2]: box(amber,x,45,12.12,.15,4,.2)
+        lift(13.6,11,2,98,43)
         for x in [-1.3,1.3]: box(w,x,2.12,13,.24,4.2,.24)
         box(amber,0,4.15,13,2.8,.18,.24)
     elif kind=='twin':
@@ -109,26 +124,22 @@ def build(kind):
             tube(glass,x,0,7.8,5,top,32)
             for y in range(12,top,8):
                 disc(w,x,0,8.5,y,1)
-                disc(floor,x,0,7.5,y+.98,.08)
+                disc(floor,x,0,7.5,y+.98,.08); cyl(glow,x,0,7.5,y-.08,y,16)
                 sweep(amber,lambda k:circle_pts(x,0,8.5,32,k),ring_section(0,.25,y+1,y+1.24),caps=(False,False),closed=True)
-                if y % 16 == 12:
-                    for ang in [0,math.pi/2,math.pi,3*math.pi/2]:
-                        person(x+6.2*math.cos(ang)-.6*math.sin(ang),y+1,6.2*math.sin(ang)+.6*math.cos(ang),1.15)
-                        table(x+5*math.cos(ang),y+1,5*math.sin(ang))
+                for ang in ([0,math.pi/2,math.pi,3*math.pi/2] if y % 16 == 12 else [3*math.pi/2]):
+                    person(x+6.2*math.cos(ang)-.6*math.sin(ang),y+1,6.2*math.sin(ang)+.6*math.cos(ang),1.15)
+                    table(x+5*math.cos(ang),y+1,5*math.sin(ang))
             for ang in [0,math.pi/2,math.pi,3*math.pi/2]: box(w,x+7.4*math.cos(ang),top/2,7.4*math.sin(ang),.8,top-.4,.8)
             disc(green,x,0,7.5,top,1)
         for y in [40,72]:
-            box(w,0,y+.2,0,15,3,7); box(r,0,y+2.2,0,14,2,6)
+            box(w,0,y+.2,0,15,3,7); box(r,0,y+2.5,0,14,2.6,.3); box(floor,0,y+1.75,0,14,.1,6.4); box(glow,0,y+3.55,0,13,.06,5.6)
             for z in [-3.05,3.05]:
-                box(dark,0,y+2.1,z,13,.4,.12)
-                for x in [-4,0,4]: box(dark,x,y+2.1,z,.18,1.8,.12)
+                box(glass,0,y+2.5,z,14,2.6,.1)
+                for x in [-6.5,-3.2,0,3.2,6.5]: box(w,x,y+2.5,z,.2,2.6,.2)
+            for x in [-4,4]: person(x,y+1.8,-1.6,1.0); table(x*.3,y+1.8,1.6)
         # Guide attaches to the camera-facing side of the left shaft.
-        box(w,-3.7,48,-6.5,1,91,1)
+        lift(-3.7,-6.5,2,94,43,2.6,2.4)
         for y in [10,45,75]: box(w,-5.3,y,-6.5,3.2,.6,.6)
-        box(dark,-3.7,48,-6.6,.35,90,.35)
-        box(w,-3.7,45,-6.5,3,4,1.8); box(dark,-3.7,45,-7.43,2.4,3.2,.12)
-        box(amber,-3.7,47.1,-7.54,3.1,.2,.2)
-        for x in [-5.2,-2.2]: box(amber,x,45,-7.54,.15,4,.2)
     elif kind=='twist':
         podium()
         for k in range(18):
@@ -144,13 +155,16 @@ def build(kind):
             for sign in [-1,1]:
                 for vx,vz in [t,n]:
                     obox(glass,(sign*vx*(side/2-.2),y+2.2,sign*vz*(side/2-.2)),(side,4.1,.08),(-vz,vx),(vx,vz))
-            if k%2==0:
-                for sign in [-1,1]:
-                    person(sign*4,y+.11,-side/2+1.2,1.0); table(sign*3,y+.11,-side/2+2.5)
+            obox(glow,(0,y+4.05,0),(side-2,.06,side-2),t,n)
+            wp=lambda u,v:(u*t[0]+v*n[0],u*t[1]+v*n[1])
+            for sign in [-1,1]:
+                px,pz=wp(sign*4,-side/2+1.4); person(px,y+.11,pz,1.0)
+                px,pz=wp(-sign*6,side/2-1.6); person(px,y+.11,pz,1.0)
+                if k%2==0: px,pz=wp(sign*3,-side/2+2.8); table(px,y+.11,pz)
         for y in [40,72]:
             disc(w,0,0,18,y,2); disc(green,0,0,17,y+2,.5); disc(amber,0,0,18,y-.3,.25)
             for x,z in [(-10,-7),(-5,-10),(2,-11),(8,-8)]: blob(green,(x,y+3,z),(1.8,1.1,1.6),sub=1)
-        box(dark,9,50,-7,.4,95,.4); box(w,9,35,-7,2,4,2); box(amber,9,37.1,-8.1,2.1,.2,.2)
+        lift(9,-7,2,98,33)
         for x in [-1.3,1.3]: box(w,x,2.02,-11,.22,4,.22)
         box(amber,0,3.98,-11,2.8,.18,.2)
         # Second entry faces +X at the south review yaw, inside the existing plinth.
@@ -161,12 +175,14 @@ def build(kind):
         disc(w,0,0,9,0,.7); disc(floor,0,0,7.2,.68,.1); disc(r,0,0,3.4,0.7,6.4)
         disc(w,0,0,12,7.1,1.2); disc(green,0,0,11.5,8.3,.3)
         disc(floor,0,0,6.2,8.58,.1); disc(r,0,0,2.8,8.6,3.7); disc(w,0,0,9,12.3,1.2); disc(green,0,0,8,13.5,1.2)
+        disc(glow,0,0,6.8,7.02,.08); disc(glow,0,0,5.8,12.22,.08)
         for y,rad in [(.7,7.1),(8.6,6.1)]:
-            if y < 2: entrance_glass(rad+.6,y,y+3.8)
-            else: tube(glass,0,0,rad+.6,y,y+3.8,32)
+            hh=6.4 if y < 2 else 3.8  # lower pillars and glass now reach the 7.1 m slab; before, they stopped 2.6 m short and floated
+            if y < 2: entrance_glass(rad+.6,y,y+hh)
+            else: tube(glass,0,0,rad+.6,y,y+hh,32)
             for k in range(12):
                 ang=k*math.pi/6; x,z=(rad+.15)*math.cos(ang),(rad+.15)*math.sin(ang)
-                box(w,x,y+1.9,z,.25,3.8,.25)
+                box(w,x,y+hh/2,z,.25,hh,.25)
                 a2=ang+math.pi/12; x2,z2=(rad-1.2)*math.cos(a2),(rad-1.2)*math.sin(a2)
                 if k%2==0: person(x2,y,z2,1.05)
                 else: table(x2,y,z2)
@@ -178,13 +194,15 @@ def build(kind):
         sweep(r,lambda k:circle_pts(0,0,4.8,32,k),ring_section(0,2,.7,4.4),caps=(False,False),closed=True)
         sweep(w,lambda k:circle_pts(0,0,10.5,32,k),ring_section(0,4.5,4.4,5.2),caps=(False,False),closed=True)
         sweep(green,lambda k:circle_pts(0,0,10,32,k),ring_section(0,4.1,5.2,5.5),caps=(False,False),closed=True)
-        disc(dark,0,0,.6,.02,8); blob(green,(0,8.30,0),(4.3,2.8,4.3),sub=2)
+        disc(wood,0,0,.6,.02,8); blob(green,(0,8.30,0),(4.3,2.8,4.3),sub=2)
         entrance_glass(10.1,.7,4.4)
+        sweep(glow,lambda k:circle_pts(0,0,9.6,32,k),ring_section(0,4.6,4.3,4.38),caps=(False,False),closed=True)
         for k in range(12):
             ang=k*math.pi/6; x,z=9.8*math.cos(ang),9.8*math.sin(ang); box(w,x,2.5,z,.3,4,.3)
             a2=ang+math.pi/12; x2,z2=8.4*math.cos(a2),8.4*math.sin(a2)
-            if k%2==0: seated(x2,.78,z2)
-            else: table(x2,.78,z2)
+            if k%3==0: seated(x2,.78,z2)
+            elif k%3==1: table(x2,.78,z2)
+            else: person(x2,.78,z2,1.05)
         sweep(amber,lambda k:circle_pts(0,0,10.55,32,k),ring_section(0,.2,4.2,4.32),caps=(False,False),closed=True)
     if kind in ('twist','terraced','twin','frame'):
         x=-10.5 if kind=='twin' else 0
@@ -195,7 +213,7 @@ def build(kind):
 def main():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     root=bpy.data.objects.new('ROOT_SE_DISTRICT_2127',None);bpy.context.scene.collection.objects.link(root)
-    mats={k:material(k,rgba,.6,emit=emit,emit_strength=.5) for k,(rgba,emit) in ROLES.items()}
+    mats={k:material(k,rgba,.6,emit=emit,emit_strength=st) for k,(rgba,emit,st) in ROLES.items()}
     total=0
     for kind in ['twist','terraced','twin','frame','double','ring']:
         variant=bpy.data.objects.new('district_'+kind,None);bpy.context.scene.collection.objects.link(variant);variant.parent=root

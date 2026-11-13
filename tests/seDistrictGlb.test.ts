@@ -16,8 +16,8 @@ for (const name of ['twist', 'terraced', 'twin', 'frame', 'double', 'ring']) {
   assert.ok(bounds.min.y >= -.02 && bounds.max.y <= (name === 'double' ? 14.72 : name === 'ring' ? 11.12 : 112.02));
   group.traverse(object => { if (!(object instanceof T.Mesh)) return; const m = object.material as T.Material; roles.add(m.name); if (m.name === 'district_glass') assert.equal(m.transparent, true); triangles += (object.geometry.index?.count ?? object.geometry.attributes.position.count) / 3; });
 }
-assert.deepEqual(roles, new Set(['district_white', 'district_room', 'district_amber', 'district_green', 'district_dark', 'district_glass', 'district_floor']));
-assert.ok(triangles < 50000);
+assert.deepEqual(roles, new Set(['district_white', 'district_room', 'district_amber', 'district_green', 'district_dark', 'district_glass', 'district_floor', 'district_glow', 'district_skin', 'district_cloth_a', 'district_cloth_b', 'district_wood']));
+assert.ok(triangles < 60000);
 const district = new ConcentrationDistrict(new T.Scene());
 district.setTarget({ tiers: { nw: 0, ne: 0, sw: 0, se: 3 } }, 0, true);
 const before = new T.Matrix4(); (district.root.getObjectByName('concentration-vertical-towers') as T.InstancedMesh).getMatrixAt(0, before);
