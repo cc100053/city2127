@@ -11,3 +11,4 @@ dist/
 asset/models/**/*.blend1
 asset/models/**/*.blend2
 asset/models/**/*.blend@
+__pycache__/

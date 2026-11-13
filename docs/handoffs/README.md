@@ -26,6 +26,7 @@
 | [SE +1 Blender 塔](se-high-blender.md) | MERGED R3（2026-11-06，owner 叫停）；9/12 對目標，`fh-frame`／`fh-crown`／`fh-lift` 未到 2，夜間 hero FPS 53–57 待查 | cc100053 |
 | [一票旅程落點](journey-landing.md) | DONE（實作）；光點落喺變化格，owner 目視驗收未做 | cc100053 |
 | [居民情景：湊](resident-minato.md) | IN_PROGRESS（2026-11-12）；NW focal 三個狀態、四種轉變嘅 DEV 演示已 merge（`?residentDemo`）；演技／口形、FPS、三種中斷同正式接入未做 | cc100053 |
+| [素材庫](asset-library.md) | IN_PROGRESS（2026-11-13）；`asset/models/LIBRARY.md` 索引＋`modules.py`＋索引測試已做；SE 模組 draft，等 owner 睇 lineup；SE 分支整合時要改用 modules | cc100053 |
 | [CI 時間餘量](ci-headroom.md) | DONE（2026-11-10）；`odaiba.test.ts` 街車淨空檢查改用分格 raycast，245 s → 45 s，檢查內容不變 | cc100053 |
 
 已完成或不再適用的74份交接及Meter截圖見 [歸檔索引](archive/README.md)。歷史下一步不會自動變成backlog；Shibuya不再開發。人類美術review／實機未測等限制保留，不因歸檔而結案。
