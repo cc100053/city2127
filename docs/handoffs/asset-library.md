@@ -1,11 +1,11 @@
 # Asset library — reusable 3D parts index
 
 - Owner: cc100053 (owner accepts library entries from lineups). Implementation: Claude.
-- Status: IN_PROGRESS. The index, enforcement test and workflow pointers are done. The SE modules are `draft` until the owner accepts the SE stage round.
+- Status: INTEGRATED (2026-11-13, owner instruction "Merge 入 main"). The SE modules stay `draft` until the owner accepts them from the lineup.
 - Branch: `feat/asset-library`
 - Base commit: `056ce514a99587798756bcfcf2a74463e7b81cf5`
-- Last verified commit: the branch head that carries this handoff (checks below ran on its tree).
-- Remote availability: `origin/feat/asset-library`
+- Last verified commit: `8653e54` (branch). Merged into main as `e1388bd`, with a tree identical to `8653e54`.
+- Remote availability: `origin/main` `e1388bd`, `origin/feat/asset-library` `8653e54`
 
 ## Session Git state
 
@@ -37,6 +37,7 @@ Rules adopted:
 - Verification status: PASSED for the scope above.
 - Equivalence: an adapted copy of the R5 builder calling `modules.py` was built in Blender 5.2 headless against the original. All six variants and 62,766 vertices matched. The faces are identical, and the maximum vertex delta is 1.1e-16 m, from the float noise of `.7 + .09`.
 - The test fails as intended on an unindexed folder (`fake-x`) and an unregistered module (`ghost`).
+- Merged main `e1388bd`: root `npm test`, `npm run build` and `git diff --check` re-run, all PASS. Main CI run 43350884050 on `e1388bd`: success.
 - Root `npm test` PASS, `npm run build` PASS, `git diff --check` PASS, `scripts/check-artifacts.sh origin/main` PASS.
 - No runtime code changed, so there was no browser check. `survey/` and `module-swap/` are untouched.
 
