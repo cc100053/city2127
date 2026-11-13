@@ -33,7 +33,7 @@ await Promise.all(Array.from({ length: 3 }, async () => {
   const page = await newCityPage(browser, { width: 1600, height: 900 }, errors);
   for (let job; (job = jobs.shift());) {
     const url = new URL(city); url.search = new URLSearchParams({ reviewTime: '20', hour: String(job.hour), meters: job.meters, shot: job.shot });
-    await captureCity(page, url.href, `${out}/${job.file}`);
+    await captureCity(page, url.href, `${out}/${job.file}`, { hideUi: true });
     console.log(job.file);
   }
 }));

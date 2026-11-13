@@ -25,7 +25,7 @@ One repeatable command for evidence captures, so rounds stop hand-writing Playwr
 
 ## Completed work
 
-- `capture.mjs` exports `launchBrowser`, `newCityPage`, `captureCity` (wait for `canvas.dataset.fps`, hide UI, settle, screenshot) and `parseArgs`; options `--size`, `--settle`, `--ui`; names without `.jpg` save PNG.
+- `capture.mjs` exports `launchBrowser`, `newCityPage`, `captureCity` (wait for `canvas.dataset.fps`, optionally hide UI, settle, screenshot) and `parseArgs`; options `--size`, `--settle`; the command keeps the UI (owner 2026-11-14), closeupSheet hides it; names without `.jpg` save PNG.
 - closeupSheet now calls the shared loader; behaviour unchanged (1600×900, 7 s settle, JPEG).
 
 ## Actual validation results
