@@ -30,7 +30,7 @@ test('commons states follow the band, retarget smoothly, hide before the exhibit
 
   runtime.setTarget({ band: 'mixed', sharedSeats: 4 }, 0, true);
   assert.deepEqual(shown(), ['mixed']);
-  assert.deepEqual(runtime.getShelfDiagnostics(), { modules: 35, visibleModules: 35, glb: false }, 'the shelf holds 35 of its 60 slots at 4 seats');
+  assert.deepEqual(runtime.getShelfDiagnostics(), { modules: 33, visibleModules: 33, glb: false }, 'the shelf holds 33 of its 60 slots at 4 seats');
   assert.deepEqual(runtime.getDiagnostics(), { band: 'mixed', targetSharedSeats: 4, visibleSharedSeats: 4, targetScreenedSeats: 4, visibleScreenedSeats: 4 });
 
   // A count change within the same band still animates for three seconds.
@@ -39,8 +39,8 @@ test('commons states follow the band, retarget smoothly, hide before the exhibit
   assert.equal(runtime.getDiagnostics().targetSharedSeats, 2);
   runtime.update(13);
   assert.deepEqual(runtime.getDiagnostics(), { band: 'mixed', targetSharedSeats: 2, visibleSharedSeats: 2, targetScreenedSeats: 6, visibleScreenedSeats: 6 });
-  assert.equal(runtime.getShelfDiagnostics().modules, 33, 'two fewer seats unload two modules (31 + seats)');
-  assert.equal(runtime.getShelfDiagnostics().visibleModules, 33);
+  assert.equal(runtime.getShelfDiagnostics().modules, 31, 'two fewer seats unload two modules (29 + seats)');
+  assert.equal(runtime.getShelfDiagnostics().visibleModules, 31);
   assert.equal(plaza.getObjectByName('event-shelf-gantry')!.children.length > 4, true, 'the roof gantry is built in code');
 
   // A band change crosses through both states, then settles on the new one only.

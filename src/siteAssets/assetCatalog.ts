@@ -5,8 +5,8 @@ export type SiteAssetMaterialPolicy = 'preserve' | 'city-roles';
 export type CityMaterialRole = 'city_glass' | 'city_trim' | 'city_future_light' | 'city_solar'
   | 'se_white' | 'se_amber' | 'se_room' | 'se_lamp' | 'se_light' | 'se_pane'
   | 'se_cream' | 'se_ceiling' | 'se_paving' | 'se_glass' | 'se_lift_glass'
-  | 'sw_frame' | 'sw_rail' | 'sw_teal' | 'sw_white' | 'sw_paving' | 'sw_dark' | 'sw_cyan' | 'sw_glass' | 'sw_room' | 'sw_floor' | 'sw_glow'
-  | 'sw_green' | 'sw_wood' | 'sw_slate' | 'sw_fabric' | 'sw_skin' | 'sw_skin_b' | 'sw_cloth_a' | 'sw_cloth_b' | 'sw_cloth_c';
+  | 'sw_frame' | 'sw_rail' | 'sw_teal' | 'sw_white' | 'sw_paving' | 'sw_dark' | 'sw_cyan' | 'sw_glow'
+  | 'sw_green' | 'sw_slate' | 'sw_joint' | 'sw_grey' | 'sw_oak' | 'sw_glow_y' | 'sw_glow_w' | 'sw_glow_c';
 
 export interface SiteAssetMetadataContract {
   readonly category: SiteAssetCategory;
@@ -78,10 +78,10 @@ export const SITE_ASSET_CATALOG: Readonly<Record<SiteAssetId, SiteAssetDefinitio
     category: 'site-layer',
     compatibleSite: 'dogenzakaSouth',
     compatibleLayer: 'plaza',
-    footprint: [67.2, 76.4], // metres: the lattice with its runway ends plus the module review row at z = -50
-    maxHeight: 40.8,
+    footprint: [72.4, 76.4], // metres: the lattice with its runway ends plus the module review row at z = -50
+    maxHeight: 41.5,
     materialPolicy: 'city-roles',
-    materialRoles: ['sw_frame', 'sw_rail', 'sw_teal', 'sw_white', 'sw_paving', 'sw_dark', 'sw_cyan', 'sw_glass', 'sw_room', 'sw_floor', 'sw_glow', 'sw_green', 'sw_wood', 'sw_slate', 'sw_fabric', 'sw_skin', 'sw_skin_b', 'sw_cloth_a', 'sw_cloth_b', 'sw_cloth_c'],
+    materialRoles: ['sw_frame', 'sw_joint', 'sw_rail', 'sw_white', 'sw_teal', 'sw_grey', 'sw_oak', 'sw_paving', 'sw_dark', 'sw_slate', 'sw_cyan', 'sw_green', 'sw_glow', 'sw_glow_y', 'sw_glow_w', 'sw_glow_c'],
   },
   'city-kit-2127': {
     id: 'city-kit-2127',

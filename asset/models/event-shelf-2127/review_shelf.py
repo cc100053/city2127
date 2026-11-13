@@ -27,10 +27,10 @@ for k in range(9):
             if k == 0 and c == 1:
                 continue
             if rng.random() < .62:
-                v = rng.choice('ABCD')
-                M.event_module(ctx, -12 + c * 12, k * 4 + (.15 if k == 0 else 0), -6 + r * 12 + .2, v)
-M.event_module(ctx, 24, 0, -4, 'H', h=7.2)  # not in a slot: hall beside the shelf for scale
-M.person(ctx, 26, 0, -14, 1, yaw=0)
+                v = rng.choice('ABCDEF')
+                M.event_module(ctx, -12 + c * 12, k * 4 + (.5 if k == 0 else 0), -6 + r * 12, v)
+M.event_module(ctx, 28, 0, -4, 'H', h=7.4)  # not in a slot: hall beside the shelf for scale
+M.person(ctx, 28, 0, -12, 1, yaw=0)
 for role, acc in ctx.a.items():
     if acc.v:
         rgba, emit, st = M.ROLES[role]

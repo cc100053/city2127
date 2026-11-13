@@ -63,7 +63,7 @@ export interface CommonsPlazaRuntime {
   update(now: number): void;
   restoreLegacy(): void;
   getDiagnostics(): CommonsPlazaDiagnostics;
-  /** The shelf's module count and which of its modules are drawn (spec: 35 at the default 4 seats). */
+  /** The shelf's module count and which of its modules are drawn (spec: 33 at the default 4 seats). */
   getShelfDiagnostics(): { readonly modules: number; readonly visibleModules: number; readonly glb: boolean };
 }
 
@@ -494,7 +494,7 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown, assets?: SiteA
   talkers('low', 3, -.2, BED + .03, -2.6, 2);
 
   // ---------- 0 mixed: the event module shelf (spec: artifacts/sw-event-shelf/spec.md) ----------
-  // 36 x 24 x 40 m lattice (9 x 6 x 10 units), 60 slots, 35 occupied at 4 seats; the GLB is metres, the group scales it. Front is stage -Z.
+  // 36 x 24 x 40 m lattice (9 x 6 x 10 units), 60 slots, 33 occupied at 4 seats; the GLB is metres, the group scales it. Front is stage -Z.
   const mixedGroup = new T.Group();
   mixedGroup.name = 'commons-state-mixed';
   mixedGroup.visible = false;
@@ -527,7 +527,7 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown, assets?: SiteA
   talkers('mixed', 11, -.9, YARD, -2.2, 3); talkers('mixed', 12, .8, YARD, -.8, 3); talkers('mixed', 13, -.3, YARD, .1, 2); talkers('mixed', 14, 1.2, YARD, 1.6, 2);
   people('mixed', [
     { x: -.9, z: -1.4, y: YARD + .27, yaw: Math.PI + .3, seated: true }, { x: .9, z: -1.6, y: YARD + .27, yaw: Math.PI - .3, seated: true },
-    walker('mixed', [-3, -4.6, YARD], [-3, -3.2, YARD], 14, 0), walker('mixed', [3, -3.0, YARD], [3, -4.7, YARD], 16, .4),
+    walker('mixed', [-3, -4.6, YARD], [-3, -3.2, YARD], 14, 0), walker('mixed', [1.2, -3.2, YARD], [1.2, -4.4, YARD], 16, .4),
     walker('mixed', [-1.4, -4.2, YARD], [-2.4, -3.0, YARD], 12, .7, true), walker('mixed', [2.2, -2.6, YARD], [1.0, -4.3, YARD], 13, .2, true),
     ...[[-.6, 2.1], [.8, 2.4]].flatMap(([x, z], i) => [0, 2, 4].map(k => { const a = k * Math.PI / 2 + .6; return { x: x + Math.sin(a) * .62, z: z + Math.cos(a) * .62, y: YARD + .3, yaw: a + Math.PI, seated: true, talk: [60 + i, k >> 1, 3] as [number, number, number] }; })),
   ]);

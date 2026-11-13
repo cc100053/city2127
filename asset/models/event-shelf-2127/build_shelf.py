@@ -5,8 +5,8 @@ Re-run headless (Blender 5.2):
 Writes event-shelf-2127.blend and .glb next to this file (glTF preset, no Meshopt/Draco).
 
 Units are METRES (three.js axes: x, y up, z; geo_helpers.B maps to Blender). The site scales the GLB by .25 (SW root is 4 m/unit).
-Nodes: SHELF_FRAME (the 36 x 24 x 40 m lattice, centred on x/z 0, front -z) and MOD_A/B/C/D/H, one lit event module each,
-laid out in a row at z = -50 for review (the site reads each by name and instances it at the 60 slots). One mesh per role,
+Nodes: SHELF_FRAME (the 36 x 24 x 40 m lattice, centred on x/z 0, front -z) and MOD_A/B/C/D/E/F/H, one rounded event module each,
+laid out in a row at z = -50 for review (the site reads each by name and instances it at the 60 slots; R2 modules are 8.6 x 8.6 x 3.2 m capsules, hall H 7.4 m). One mesh per role,
 role materials named sw_<role> (remapCityMaterials). Animated parts (gantry bridge, trolley, cables, lock lights) are code.
 """
 import os
@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(HERE), 'city-kit-2127'))
 from geo_helpers import Acc, finish_mesh, material  # noqa: E402
 import modules as M  # noqa: E402
 
-VARIANTS = {'A': dict(h=3.2), 'B': dict(h=3.2), 'C': dict(h=3.2), 'D': dict(h=3.2), 'H': dict(h=7.2)}
+VARIANTS = {'A': dict(h=3.2), 'B': dict(h=3.2), 'C': dict(h=3.2), 'D': dict(h=3.2), 'E': dict(h=3.2), 'F': dict(h=3.2), 'H': dict(h=7.4)}
 ROW_Z = -50.0
 
 
@@ -67,7 +67,7 @@ def main():
         ctx = new_ctx(100 + i)
         M.event_module(ctx, 0, 0, 0, v, **kw)
         node, report['MOD_' + v] = add_node(root, 'MOD_' + v, ctx)
-        node.location = (-24 + i * 14, ROW_Z * -1, 0)  # Blender (x, -z, y): three.js z = ROW_Z
+        node.location = (-31.5 + i * 10.5, ROW_Z * -1, 0)  # Blender (x, -z, y): three.js z = ROW_Z
     bpy.context.view_layer.update()
     blend = os.path.join(HERE, 'event-shelf-2127.blend')
     glb = os.path.join(HERE, 'event-shelf-2127.glb')

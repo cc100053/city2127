@@ -47,7 +47,7 @@ Root 用固定360px右上卡片（2026-10-04由左移右，避免遮住focal sit
 | 問題 id | Meter | 主 site（內部 socket） | low → mixed → high |
 | --- | --- | --- | --- |
 | `service-2127` | automation | デックス西（nw） | 人員主導 → 人機協作 → 自律服務 |
-| `commons-2127` | publicSharing | お台場南岸（sw，2026-11-13 自アクアシティ南搬遷） | 私密空間 → 活動モジュール棚（40 m、60 格、約 35 入格）→ 開放共享 |
+| `commons-2127` | publicSharing | お台場南岸（sw，2026-11-13 自アクアシティ南搬遷） | 私密空間 → 活動モジュール棚（40 m、60 格、約 33 入格）→ 開放共享 |
 | `energy-2127` | 獨立能源累計（不作Meter） | 沿岸能源接點；設備分佈於水庭／富士／外海 | 水庭儲能／儲能環／軌道接收翼／核能島可共存 |
 | `functions-2127` | urbanConcentration | フジテレビ東（se） | 分散機能艙 → 混合館 → 垂直集中（2026-11-01 owner 接受 SE 樣板：低亭群＋有蓋步道 → 米白退台中高樓 → 暖光垂直街道塔，Meter 琥珀色日夜可讀；[handoff](handoffs/archive/se-closeup-polish.md)。2026-11-06 +1 塔改用 Blender GLB＋可重用 prop kit，R3 對目標 9/12，owner 叫停並 merge；[handoff](handoffs/se-high-blender.md)） |
 
