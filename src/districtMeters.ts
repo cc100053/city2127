@@ -211,7 +211,7 @@ const HALO = .42;
 /** Inland sharing courts [x, z, yaw]: open ground scanned clear of landmarks, context, routes, P2 pavilions and P4 towers / pods. Court 4 moved from (50, -340) to (110, -320) when the AUTO HUB lot grew over it (R4).
  * Street network stage 2 (2026-11-04): courts 2, 5, 6 and 8 stood on the ④ boulevard's line and moved to the nearest site passing the same checks with their
  * square 15 m off its centreline (from -110, 230; -70, 180; -290, 290; 220, 0).
- * Court 6 moved from (-137, 286) to (-150, 290) for the SW event shelf lot at (-100, 312) (2026-11-13; same scan checks, 54 m from the lot centre, squares 6 m apart).
+ * Court 6 moved from (-137, 286) to (-150, 290) for the SW event shelf lot at (-100, 297; 312 before R3) (2026-11-13; same scan checks, 54 m from the lot centre, squares 6 m apart).
  * P7 ranks by estimated visible hero-frame pixels (`SCAN_COURTS=20` in tests/odaiba.test.ts lists candidates best first). */
 const COURT_SITES: readonly (readonly [number, number, number])[] = ([
   [-220, -140, .4], [-410, 120, 1.1], [-110, 250, 2.3], [110, -320, .9], [170, -360, 3.6], [-150, 290, 1.7], [-385, 290, 5.1], [-460, 290, .2], [190, 0, 2.8], [-20, 210, 4.4],

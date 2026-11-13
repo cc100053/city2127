@@ -210,7 +210,7 @@ export const gardenDecks: readonly (readonly P3[])[] = [
 export const changeSites = {
   nw:{name:'AUTO HUB',place:'デックス西',x:43,z:-300,w:16,d:24,h:32,scale:3},
   ne:{name:'PARK',place:'お台場海浜公園',x:-210,z:-135,w:10,d:10,h:8,scale:4},
-  sw:{name:'EVENT SHELF',place:'お台場南岸',x:-100,z:312,w:12,d:10,h:10,scale:4},
+  sw:{name:'EVENT SHELF',place:'お台場南岸',x:-100,z:297,w:12,d:10,h:10,scale:4},
   se:{name:'TOWER',place:'フジテレビ東',x:182,z:-38,w:14,d:14,h:46,scale:3},
 } as const;
 

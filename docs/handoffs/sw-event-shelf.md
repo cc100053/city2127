@@ -1,7 +1,7 @@
 # sw-event-shelf — SW 新旗艦：活動モジュール棚
 
 - Owner: cc100053
-- Status: R2 IMPLEMENTED — 待 owner 視覺驗收（未 merge）
+- Status: R3 IMPLEMENTED — 待 owner 視覺驗收（未 merge）
 - Branch: `feat/sw-event-shelf`（worktree：`.claude/worktrees/sw-event-shelf`，由 origin/main e13689b 切出；主 checkout 的無關未提交變更原封不動）
 - Base commit: e13689b3fd97eea312d421acac3fbe185b448ecc
 - Last verified commit: R2 commit（見 git log；測試與 build 於提交前通過）
@@ -67,6 +67,15 @@
   - 未驗證：吊桁搬運過場（hoist）未截關鍵幀（僅單元測試）；夜景 hoist 未看；reduced-motion 未手動看；−1／+1 未重截（只改了一個 walker 位置，不影響它們）。
   - 已知問題（R2）：模組 8.6 比 owner 建議的 10 小（見 spec）；導軌 4 條；半滑入格的模組在遠景只略凸出，須近鏡才清楚；地面入場模組被前景樹冠部分遮蔽；桁頂約 45 m（服務層上緣），quadrotor 路線未查；結果卡／設施文案（`surveyAtmosphere.ts`、RESIDENT_COPY、change sheet）仍寫 COMMONS，未改；change sheet 未重生成。
   - **北緣與 `DISTRICT.maxZ`（320）**（計算值，非截圖測量；site 中心 z 312）：棚身北立面 z ≈ 324.7（超出 4.7 m）、後導軌 ≈ 325.5、地台 ≈ 328（以 `lattice_frame` 的 paving 計）、屋頂軌道北端 ≈ 331.5（超出 11.5 m）；−1／+1 模型地板 13.2 × 11.2 單位（scale 4）→ 北緣 ≈ 334.4（超出約 14.4 m），綠籬 ≈ 332.8。概覽截圖未見可見的接縫或 recede 異常，但 `bayContext`／`odaibaScene` 的 district mask 在 z > 320 的行為未逐一驗證。**未處理**：搬位或縮小會違反既定地點；選項見 spec 與回報。
+
+- **R3（2026-11-13，owner 採納助手對 R2 的修改清單）**：詳見 [spec R3 節](../../artifacts/sw-event-shelf/spec.md)。
+  - 改了什麼：(1) 窗：三種低飽和窗面 `sw_pane_w/a/c`（取代 `sw_glow*`），細框、窗台、窗內扁平剪影（人、桌椅、植栽，貼在窗面，非立體）。(2) 模組：七款各有入口（門、雨篷、兩級踏階）、窗雨篷／條紋雨篷、色塊側板、分板線、屋頂設備；平面圓角 1.4 → 1.1 m。(3) 框架疏朗：去掉內部沿 z 的樑、接頭塊隔層（120 → 40）、齒條 4 m 間距，框架 8,876 → 4,476 tris。(4) 吊桁台車縮小約一半，白灰＋青，後端軌道伸出 7.5 → 2 m。(5) 三姿態：地軌延伸 10 m 至 z −32、`track` 模組前加小台車、`slide` 模組四角常亮青色鎖燈；`sw:focal` 改為 [-84,50,211] → [-100,19,288]。(6) 北緣：地塊中心 z 312 → 297，見下數字。(7) 吊桁關鍵幀：DEV 鉤子 `globalThis.__eventShelf`（僅 DEV）＋凍結 `performance.now`。
+  - 北緣實量（GLB 邊界，場地中心 z 0：z −22.17…+14.60；−1／+1 地板半深 22.4 m）：中心 297 → 棚身北立面 309.7、屋頂軌道北端 311.6、地台 311.0、−1／+1 地板北緣 319.4（≤ 320，餘 0.6 m）。R2 值：324.7／331.9／328／334.4。`tests/odaiba.test.ts` 通過、不動樹冠。
+  - 驗證（2026-11-13，本 worktree）：根 `npm test` 通過、`npm run build` 通過、`git diff --check` 通過；`tests/commonsPlaza.test.ts` 的 z 範圍對 mixed 放寬 10 m（地軌延伸）；`tests/eventShelf.test.ts`：GLB 21.9k tris、約 974 KB、單層模組高度 < 4.25 m。`qa_check` 與重新匯入核對：未另行重跑（只用 `tests/eventShelf.test.ts` 的 GLB 重新載入核對 role／bounds／tris／bytes）。`survey/`、`module-swap/` 未動、未跑。
+  - FPS（`fps.sh`，headed Chrome 1920 × 1080、dpr 1、`sw:mixed`，與 dev server 同機、dev 模式）：日 18.9–19.0、夜 19.0–19.1（首樣本 5.7 捨棄）；未與 R2 或 main 對照，無法判斷是否退步。reduced-motion 未手動看。
+  - 截圖（`~/city2127-evidence/sw-event-shelf/r3/`，不入 Git，3200 × 1800）：`focal-day`、`focal-night`、`overview`、`gantry-closeup`、`rail-hang-closeup`、`window-module-closeup`、`track-tug-closeup`、`hoist-sheet.jpg`（6 幀）、`r2-vs-r3.jpg`。
+  - 已知問題／未達：導軌仍 4 條；斜俯視中排與後排樑仍疊成密線，疏朗度不及 B 圖；窗內剪影偏粗；模組 8.6 m；右側地軌延伸與 court 6 的傘形頂在俯視重疊；半滑入格與地面入場模組在 `focal-day` 可辨但偏小；前景樹冠仍遮部分地軌；桁頂約 45 m，quadrotor 路線未查；結果卡／設施文案、change sheet 未更新；夜間 hoist 未看。
+  - 需 owner 決定：窗內剪影讀法（先前「人、傢俱不進 GLB」與本輪要求牴觸）、導軌 4／2 條、模組 8.6／7.7、地塊南移 15 m 是否接受、地軌是否接街道。
 
 ## Code findings (2026-11-13, read-only)
 

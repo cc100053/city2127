@@ -63,8 +63,9 @@ const shelfMaterial = {
   frame: std('#696a6c', undefined, 0, .8), joint: std('#8b8e92', undefined, 0, .6), rail: std('#d5dade', undefined, 0, .35), teal: std('#25a3a0'), white: std('#f1f2ef'), grey: std('#c9cdd0'), oak: std('#c8935a'),
   paving: std('#bdb9b0'), dark: std('#221d1a'), slate: std('#3d3f42'), green: std('#3f7a2e'),
   cyan: new T.MeshBasicMaterial({ color: new T.Color('#38c8ff').multiplyScalar(1.6), toneMapped: false }),
-  glow: nightLit(std('#ffd29a', '#ffb060', .6), 2.4, '#ff9a3c'), glow_y: nightLit(std('#ffe27a', '#ffd23a', 1.2), 2.2, '#ffd45a'),
-  glow_w: nightLit(std('#e4f1ff', '#cfe6ff', 1.1), 2.0, '#d8ecff'), glow_c: nightLit(std('#97e8ee', '#5fd8e6', 1.1), 2.0, '#7fe8f0'),
+  // R3 warm-glass panes: dim by day, a soft glow at night; three low-saturation tints (warm white, pale amber, cool white).
+  pane_w: nightLit(std('#d8c8a4', '#ffd29a', .14, .3), 1.5, '#ffd596'), pane_a: nightLit(std('#d1b182', '#ffbc70', .14, .3), 1.6, '#ffb060'),
+  pane_c: nightLit(std('#b9c6cf', '#d0e4ff', .12, .3), 1.3, '#d6e8ff'),
 } satisfies Record<string, T.Material>;
 export const SHELF_ROLES = Object.keys(shelfMaterial).map(k => `sw_${k}`) as CityMaterialRole[];
 const roleMap = Object.fromEntries(Object.entries(shelfMaterial).map(([k, m]) => [`sw_${k}`, m])) as Partial<Record<CityMaterialRole, T.Material>>;
@@ -193,27 +194,28 @@ export function createEventShelf(root: T.Group) {
   bridge.position.z = FRONT_RAIL_Z;
   gantry.add(bridge);
   for (const dz of [-1.7, 1.7]) mk(bridge, 2 * halfW + 3.4, 1.3, 1.5, 0, RUNWAY_TOP + 1.25, dz, shelfMaterial.white);
-  mk(bridge, 2 * halfW + 3.4, .45, 3.6, 0, RUNWAY_TOP + .5, 0, shelfMaterial.slate);
+  mk(bridge, 2 * halfW + 3.4, .45, 3.6, 0, RUNWAY_TOP + .5, 0, shelfMaterial.grey);
   for (const s of [-1, 1]) {
     mk(bridge, 2.8, 1.7, 5.6, s * halfW, RUNWAY_TOP + .85, 0, shelfMaterial.teal);
     mk(bridge, 2.8, .35, 5.6, s * halfW, RUNWAY_TOP + 1.85, 0, shelfMaterial.white);
     mk(bridge, .5, .3, 5.0, s * halfW, RUNWAY_TOP + 2.1, 0, shelfMaterial.cyan);
   }
   const GIRDER_TOP = RUNWAY_TOP + 1.9;
-  const makeTrolley = () => {
+  const makeTrolley = () => { // half the R2 size, white-grey with teal trim like the girders; the drum stays visible but quiet
     const g = new T.Group();
-    mk(g, 4.4, 1.5, 4.0, 0, GIRDER_TOP + .75, 0, shelfMaterial.slate);
-    const drum = new T.Mesh(new T.CylinderGeometry(.85, .85, 3.2, 14).rotateZ(Math.PI / 2), shelfMaterial.rail);
-    drum.position.set(0, GIRDER_TOP + 2.0, 0);
+    mk(g, 2.6, .8, 2.4, 0, GIRDER_TOP + .4, 0, shelfMaterial.white);
+    mk(g, 2.6, .25, 2.4, 0, GIRDER_TOP + .85, 0, shelfMaterial.teal);
+    const drum = new T.Mesh(new T.CylinderGeometry(.5, .5, 1.9, 14).rotateZ(Math.PI / 2), shelfMaterial.rail);
+    drum.position.set(0, GIRDER_TOP + 1.5, 0);
     drum.castShadow = true;
     g.add(drum);
-    for (const dx of [-1.75, 1.75]) { const flange = new T.Mesh(new T.CylinderGeometry(1.1, 1.1, .3, 14).rotateZ(Math.PI / 2), shelfMaterial.slate); flange.position.set(dx, GIRDER_TOP + 2.0, 0); g.add(flange); }
-    mk(g, 1.2, .3, 3.6, 0, GIRDER_TOP + 3.1, 0, shelfMaterial.cyan);
+    for (const dx of [-1.0, 1.0]) { const flange = new T.Mesh(new T.CylinderGeometry(.68, .68, .2, 14).rotateZ(Math.PI / 2), shelfMaterial.grey); flange.position.set(dx, GIRDER_TOP + 1.5, 0); g.add(flange); }
+    mk(g, .8, .2, 2.0, 0, GIRDER_TOP + 2.25, 0, shelfMaterial.cyan);
     bridge.add(g);
     return g;
   };
   const trolleyA = makeTrolley(), trolleyB = makeTrolley(); // A holds the hung showpiece module, B carries the headline hoist
-  const DRUM_Y = GIRDER_TOP + 2.0;
+  const DRUM_Y = GIRDER_TOP + 1.5;
   const ropeMaterial = shelfMaterial.rail;
   const rope = (mesh: T.Mesh, a: T.Vector3, b: T.Vector3) => {
     const d = pos.copy(b).sub(a), len = Math.max(.05, d.length());
@@ -268,8 +270,53 @@ export function createEventShelf(root: T.Group) {
     }
   };
 
+  // --- showpiece props (code): ground tracks running on toward the road, a tug coupled to the arriving module, steady cyan lock lights on the half-slid module ---
+  const props = new T.Group();
+  props.name = 'event-shelf-showpieces';
+  group.add(props);
+  const trackIdx = SHELF_SLOTS.findIndex(s => s.pose === 'track'), slideIdx = SHELF_SLOTS.findIndex(s => s.pose === 'slide');
+  const merged = (name: string, material: T.Material, parts: [number, number, number, number, number, number][]) => {
+    const geos = parts.map(([sx, sy, sz, x, y, z]) => new T.BoxGeometry(sx, sy, sz).translate(x, y, z).toNonIndexed());
+    const mesh = new T.Mesh(mergeGeometries(geos), material);
+    geos.forEach(g => g.dispose());
+    mesh.name = name; mesh.receiveShadow = true;
+    props.add(mesh);
+  };
+  const TRACK_END = -32, TRACK_START = -22, trackLen = TRACK_START - TRACK_END;
+  const railBoxes: [number, number, number, number, number, number][] = [], sleepers: [number, number, number, number, number, number][] = [], strips: [number, number, number, number, number, number][] = [];
+  for (const gx of [-12, 12]) {
+    for (const dx of [-3.6, 3.6]) railBoxes.push([.3, .18, trackLen, gx + dx, .41, (TRACK_START + TRACK_END) / 2]);
+    for (let z = TRACK_START; z >= TRACK_END; z -= 1.6) sleepers.push([8.1, .12, .34, gx, .26, z]);
+    strips.push([9.6, .1, trackLen, gx, .05, (TRACK_START + TRACK_END) / 2]);
+  }
+  merged('event-shelf-track-rails', shelfMaterial.rail, railBoxes); merged('event-shelf-track-sleepers', shelfMaterial.dark, sleepers); merged('event-shelf-track-paving', shelfMaterial.paving, strips);
+  const tug = new T.Group();
+  tug.position.set(TRACK_X, 0, TRACK_Z - SHELF.module / 2 - 2.4);
+  props.add(tug);
+  mk(tug, 3.0, 1.0, 2.4, 0, 1.0, 0, shelfMaterial.white);
+  mk(tug, 3.04, .3, 2.44, 0, .6, 0, shelfMaterial.teal);
+  mk(tug, 2.2, .7, .1, 0, 1.15, -1.22, shelfMaterial.pane_c);
+  mk(tug, .5, .2, .2, 0, 1.6, -1.1, shelfMaterial.cyan);
+  mk(tug, .25, .25, 2.6, 0, .85, 2.4, shelfMaterial.rail);
+  const slideLights = [-1, 1].flatMap(sx => [-1, 1].map(sz => {
+    const light = new T.Mesh(new T.SphereGeometry(.35, 10, 8), shelfMaterial.cyan);
+    light.userData.at = [sx * (SHELF.module / 2 + .3), sz * (SHELF.module / 2 + .3)];
+    props.add(light);
+    return light;
+  }));
+  const placeProps = (now: number) => {
+    const showTrack = trackIdx >= 0 && presence[trackIdx] * bandLevel > 1 - HIDDEN, showSlide = slideIdx >= 0 && presence[slideIdx] * bandLevel > 1 - HIDDEN;
+    tug.visible = showTrack;
+    const p = showSlide ? settled(SHELF_SLOTS[slideIdx], now) : undefined;
+    for (const light of slideLights) {
+      light.visible = !!p;
+      if (p) { const [ox, oz] = light.userData.at as [number, number]; light.position.set(p.x + ox, p.y + MODULE_H - .6, p.z + oz); }
+    }
+  };
+
   const update = (now: number) => {
     clock = now;
+    placeProps(now);
     const reduced = prefersReducedMotion();
     const idleX = reduced ? -6 : -6 + Math.sin(now * Math.PI * 2 / 9) * 3;
     // Trolley A follows the hung showpiece; its module rides the rails slowly up and down.
@@ -298,7 +345,7 @@ export function createEventShelf(root: T.Group) {
   };
   let bandChanged = true;
 
-  return {
+  const api = {
     group, frame, gantry,
     setBandLevel(level: number) { if (level !== bandLevel) { bandLevel = level; bandChanged = true; } },
     /** Retarget the module count: the last module added or first removed gets the full hoist when animated; the rest snap (they slide with the band). */
@@ -341,8 +388,11 @@ export function createEventShelf(root: T.Group) {
       buildInstances(parts);
     },
     get count() { return count; },
+    get clock() { return clock; },
     visibleModules() { let n = 0; for (let i = 0; i < presence.length; i++) if (presence[i] * bandLevel > HIDDEN || (hoist && hoist.slot === i)) n++; return n; },
     hallSlots,
   };
+  (globalThis as { __eventShelf?: typeof api }).__eventShelf = (import.meta as { env?: { DEV?: boolean } }).env?.DEV ? api : undefined; // DEV review hook: drive a hoist without a live vote
+  return api;
 }
 export type EventShelf = ReturnType<typeof createEventShelf>;

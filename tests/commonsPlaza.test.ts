@@ -65,7 +65,8 @@ test('commons states follow the band, retarget smoothly, hide before the exhibit
     group.visible = wasVisible;
     group.scale.copy(scale);
     assert.ok(box.min.x >= -changeSites.sw.w / 2 - .8 && box.max.x <= changeSites.sw.w / 2 + .8, `${group.name} leaves the lot in x`);
-    assert.ok(box.min.z >= -changeSites.sw.d / 2 - .8 && box.max.z <= changeSites.sw.d / 2 + .8, `${group.name} leaves the lot in z`);
+    const trackRun = group.name === 'commons-state-mixed' ? 2.5 : 0; // R3: the shelf's ground tracks run 10 m past the lot toward the road
+    assert.ok(box.min.z >= -changeSites.sw.d / 2 - .8 - trackRun && box.max.z <= changeSites.sw.d / 2 + .8, `${group.name} leaves the lot in z`);
   }
   assert.throws(() => runtime.setTarget({ band: 'low', sharedSeats: 9 }, 30, true), RangeError);
 

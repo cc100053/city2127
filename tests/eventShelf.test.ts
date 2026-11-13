@@ -52,7 +52,7 @@ const frameBounds = new T.Box3().setFromObject(root.getObjectByName('SHELF_FRAME
 const size = frameBounds.getSize(new T.Vector3());
 assert.ok(Math.abs(size.x - 40) < 1 && frameBounds.min.y >= -.01 && frameBounds.max.y <= 41.5, `frame ${size.x} wide, ${frameBounds.max.y} tall`);
 const hall = new T.Box3().setFromObject(root.getObjectByName('MOD_H')!), single = new T.Box3().setFromObject(root.getObjectByName('MOD_A')!);
-assert.ok(hall.getSize(new T.Vector3()).y > 7 && single.getSize(new T.Vector3()).y < 3.95, `hall is two levels (${hall.getSize(new T.Vector3()).y.toFixed(2)}), a module fits one (${single.getSize(new T.Vector3()).y.toFixed(2)})`);
+assert.ok(hall.getSize(new T.Vector3()).y > 7 && single.getSize(new T.Vector3()).y < 4.25, `hall is two levels (${hall.getSize(new T.Vector3()).y.toFixed(2)}), a module fits one (${single.getSize(new T.Vector3()).y.toFixed(2)})`);
 const gap = (12 - single.getSize(new T.Vector3()).x) / 2 - 0.65;
 assert.ok(gap >= .75, `a module keeps about a metre clear of the column faces (${gap.toFixed(2)} m)`);
 assert.ok(single.getSize(new T.Vector3()).x <= 9.3 && single.getSize(new T.Vector3()).z <= 11.5, 'a module is 8.6 m wide with 11.2 m slide rails, inside its 12 m cell');
