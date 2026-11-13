@@ -10,7 +10,7 @@ import { arc, trim } from '../src/cityRig.ts';
 const documentBefore = Object.getOwnPropertyDescriptor(globalThis, 'document');
 Object.defineProperty(globalThis, 'document', { configurable: true, value: { createElement: () => ({ width: 0, height: 0, getContext: () => ({ fillRect() {}, fillText() {} }) }) } });
 const scene = new Scene(), energy = new EnergyRuntime(scene);
-const manager = new CityChangeManager(buildSurveySites(scene, { cloneRoot: () => new Promise<Group>(() => {}) } as never), energy);
+const manager = new CityChangeManager(buildSurveySites(scene, { cloneRoot: () => new Promise<Group>(() => {}) , load: () => new Promise<never>(() => {}) } as never), energy);
 if (documentBefore) Object.defineProperty(globalThis, 'document', documentBefore); else delete (globalThis as { document?: unknown }).document;
 const full = { waterGardens: 2, receiver: 'large', flywheel: true, island: true } as const;
 manager.applyExhibitionLayout({ ...deriveExhibitionLayout({ automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 }), energy: full }, 'city-state-snapshot', 0);

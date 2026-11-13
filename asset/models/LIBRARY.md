@@ -98,6 +98,7 @@ Whole assets. Reuse a site asset elsewhere only as background context, and ask t
 | `resident-minato` | named character Minato | `build_minato.py` | resident scenes |
 | `resident-kiosk` | Minato's service kiosk | `build_kiosk.py` | Minato's scene |
 | `concentration-tower-high` | SE +1 tower shell | `build_tower.py` | site-only |
+| `se-district-2127` | SE stage towers and pods (six variants) | `build_district.py` (uses modules) | site-only shells; parts come from modules |
 | `automation-hub-upper` | automation hub upper level | imported GLB | site-only |
 | `sky-ring-architecture` | Sky Ring | imported GLB | site-only |
 | `odaiba-masterplan` | district environment | `odaiba_masterplan_v01_phase03d_generator.py` | site-only |

@@ -24,6 +24,7 @@
 | [近鏡後續／能源講解](closeup-next.md) | F1/F2、C1 INTEGRATED（C1 owner批准，24組兩秒辨認未做）；N1 能源講解 INTEGRATED（13s／日文），F3等硬件（2026-10-29） | cc100053 |
 | [Road audit](road-audit.md) | IN_PROGRESS（2026-11-04）；修路已 merge main，owner 目視驗收同餘下決定未做 | cc100053 |
 | [SE +1 Blender 塔](se-high-blender.md) | MERGED R3（2026-11-06，owner 叫停）；9/12 對目標，`fh-frame`／`fh-crown`／`fh-lift` 未到 2，夜間 hero FPS 53–57 待查 | cc100053 |
+| [SE 塔＋pod district 近鏡](se-stage-closeup-polish.md) | IN_PROGRESS。R3 日 20/30、夜 19/30，等 owner 視覺驗收。 | cc100053 |
 | [一票旅程落點](journey-landing.md) | DONE（實作）；光點落喺變化格，owner 目視驗收未做 | cc100053 |
 | [居民情景：湊](resident-minato.md) | IN_PROGRESS（2026-11-12）；NW focal 三個狀態、四種轉變嘅 DEV 演示已 merge（`?residentDemo`）；演技／口形、FPS、三種中斷同正式接入未做 | cc100053 |
 | [素材庫](asset-library.md) | DONE（2026-11-13）；`asset/models/LIBRARY.md` 索引＋`modules.py`＋索引測試已上 main；模組 polish 1 owner 收貨（accepted）；SE 分支已改用模組，SE 嗰輪仍待收貨同 merge | cc100053 |

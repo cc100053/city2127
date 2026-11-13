@@ -671,10 +671,12 @@ export function buildConcentrationTower(scene: T.Scene, _kit: Kit, assets?: Site
   }
 
   const concentrationTower = new ConcentrationTowerController({ base, pavilions, elevator, lowModules, mixedModules, highModules });
+  const concentrationDistrict = new ConcentrationDistrict(scene);
+  if (assets) void assets.load('se-district-2127').then(({ root }) => concentrationDistrict.installDistrictAssets(root)).catch(error => console.warn(error));
   return {
     id: 'centerGaiRear', root,
     layers: { towerBase: towerBaseLayer, towerUpper: towerUpperLayer, towerNeutralProps: neutralPropsLayer },
     marker: createGuestMarker(root, 'se'),
-    concentrationTower, concentrationDistrict: new ConcentrationDistrict(scene),
+    concentrationTower, concentrationDistrict,
   };
 }

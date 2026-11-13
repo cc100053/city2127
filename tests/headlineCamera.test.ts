@@ -136,3 +136,20 @@ assert.equal(tie.play([two],0),'sw:stage-rooms-east');
 assert.equal(tie.play([two],1,DISPLAY_MS-101),null);
 assert.equal(tie.play([two],2),'sw:stage-rooms-west','catch-up must not change rotation');
 assert.equal(picker.play([{socketId:'nw' as const,focal:false,district:true,points:[point('nw:street')]}],106),'nw:district','a slot outside every stage falls back to the district shot');
+
+// SE stage flights clear the foreground with an arc while preserving the endpoints and timing.
+for (const [stage, slot, lift] of [['se:stage-east', 'se:pod4', 140], ['se:stage-south', 'se:tower3', 100]] as const) {
+  const cam = new PerspectiveCamera(42), ctl = { target: new Vector3(...HERO_TARGET), enabled: true, update() {} };
+  cam.position.set(...HERO_POSITION); const flight = new HeadlineCamera(cam, ctl);
+  assert.equal(flight.play([{ socketId: 'se', focal: false, district: true, points: [point(slot)] }], 0), stage);
+  flight.update(t.flyIn); assert.ok(cam.position.distanceTo(new Vector3(...HERO_POSITION)) < 1e-8);
+  flight.update((t.flyIn + t.hold) / 2);
+  const midpoint = new Vector3(...HERO_POSITION).lerp(new Vector3(...SHOTS[stage].position), .5); midpoint.y += lift;
+  assert.ok(cam.position.distanceTo(midpoint) < 1e-8, `${stage} midpoint lift`);
+  flight.update(t.hold); assert.ok(cam.position.distanceTo(new Vector3(...SHOTS[stage].position)) < 1e-8);
+  flight.update((t.flyOut + t.done) / 2);
+  const endPose = new Vector3(...SHOTS[stage].position).lerp(new Vector3(...SHOTS[stage].target), .07);
+  const returnMid = new Vector3(...HERO_POSITION).lerp(endPose, .5); returnMid.y += lift;
+  assert.ok(cam.position.distanceTo(returnMid) < 1e-8, `${stage} return midpoint lift`);
+  flight.update(t.done); assert.ok(cam.position.distanceTo(new Vector3(...HERO_POSITION)) < 1e-8);
+}

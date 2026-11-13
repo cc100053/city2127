@@ -21,7 +21,7 @@ Object.defineProperty(globalThis, 'document', { configurable: true, value: {
   createElement: () => ({ width: 0, height: 0, getContext: () => ({ fillRect() {}, fillText() {} }) }),
 } });
 const scene = new T.Scene();
-const sites = buildSurveySites(scene, { cloneRoot: () => new Promise<T.Group>(() => {}) } as never);
+const sites = buildSurveySites(scene, { cloneRoot: () => new Promise<T.Group>(() => {}) , load: () => new Promise<never>(() => {}) } as never);
 if (documentBefore) Object.defineProperty(globalThis, 'document', documentBefore);
 else delete (globalThis as { document?: unknown }).document;
 const manager = new CityChangeManager(sites);
