@@ -6,6 +6,8 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { SharingDistrict } from '../districtMeters.ts';
 import type { ExhibitionLayout } from '../surveyView.ts';
 import { tree } from './concentrationTower.ts';
+import { createEventShelf, shelfCount, type EventShelf } from './eventShelf.ts';
+import type { SiteAssetLoaderCache } from '../siteAssets/assetLoader.ts';
 import { createGuestMarker, createSiteLayer, createSiteRoot, prefersReducedMotion, SITE_TRANSITION_SECONDS, type BuiltSite } from './siteRuntime.ts';
 
 type Band = ExhibitionLayout['bands']['sw'];
@@ -13,7 +15,6 @@ const SEAT_COUNT = 8;
 const HIDDEN = 1e-3;
 const DEFAULT_TARGET = { band: 'mixed', sharedSeats: 4 } as const;
 const SLAB = .3, BED = .36; // terrace slab top / planted bed top (low state)
-const DECK = .65; // mixed round deck top; the circle floor is .35 below it
 const smoothstep = (value: number) => value * value * (3 - 2 * value);
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 const hash = (n: number) => Math.abs(Math.sin(n * 12.9898) * 43758.5453) % 1;
@@ -62,6 +63,8 @@ export interface CommonsPlazaRuntime {
   update(now: number): void;
   restoreLegacy(): void;
   getDiagnostics(): CommonsPlazaDiagnostics;
+  /** The shelf's module count and which of its modules are drawn (spec: 35 at the default 4 seats). */
+  getShelfDiagnostics(): { readonly modules: number; readonly visibleModules: number; readonly glb: boolean };
 }
 
 type CommonsPlazaSite = BuiltSite & { readonly commonsPlaza: CommonsPlazaRuntime };
@@ -78,7 +81,7 @@ function sharedSlotLevels(sharedSeats: number): Float32Array {
 }
 
 // ponytail: the visible geometry follows the band (pods / circle / amphitheatre); this 8-slot seat counter only drives the diagnostics and its smooth 3 s retarget.
-function createCommonsPlazaRuntime(parts: Part[], frame: (now: number) => void): CommonsPlazaRuntime {
+function createCommonsPlazaRuntime(parts: Part[], frame: (now: number) => void, onSeats: (seats: number, now: number, immediate: boolean) => void, shelf: EventShelf): CommonsPlazaRuntime {
   const levels = sharedSlotLevels(DEFAULT_TARGET.sharedSeats), from = new Float32Array(levels), to = new Float32Array(levels);
   let target: CommonsPlazaTarget = DEFAULT_TARGET;
   let exhibitionTargetApplied = false;
@@ -91,6 +94,7 @@ function createCommonsPlazaRuntime(parts: Part[], frame: (now: number) => void):
     from.set(to);
     active = false;
     write();
+    onSeats(target.sharedSeats, start, true);
     frame(start);
   };
 
@@ -101,6 +105,7 @@ function createCommonsPlazaRuntime(parts: Part[], frame: (now: number) => void):
         throw new RangeError(`sharedSeats must be an integer from 0 to ${SEAT_COUNT}.`);
       }
       runtime.update(sampleAt);
+      const wasBand = target.band;
       const changed = !exhibitionTargetApplied || next.band !== target.band || next.sharedSeats !== target.sharedSeats;
       target = { band: next.band, sharedSeats: next.sharedSeats };
       exhibitionTargetApplied = true;
@@ -110,7 +115,7 @@ function createCommonsPlazaRuntime(parts: Part[], frame: (now: number) => void):
       for (const part of parts) { part.from = part.level; part.to = part.band === next.band ? 1 : 0; }
       start = now;
       if (immediate) settle(next.band);
-      else active = changed;
+      else { active = changed; onSeats(next.sharedSeats, now, next.band !== wasBand); }
       return changed;
     },
     update(now) {
@@ -134,6 +139,7 @@ function createCommonsPlazaRuntime(parts: Part[], frame: (now: number) => void):
       to.set(sharedSlotLevels(DEFAULT_TARGET.sharedSeats));
       settle('mixed');
     },
+    getShelfDiagnostics: () => ({ modules: shelf.count, visibleModules: shelf.visibleModules(), glb: shelf.frame.getObjectByName('SHELF_FRAME') !== undefined }),
     getDiagnostics() {
       let visibleSharedSeats = 0, visibleScreenedSeats = 0;
       if (exhibitionTargetApplied) {
@@ -362,7 +368,7 @@ function rib(g: T.Group, angle: number, width: number) {
 
 // ---- stage ----
 
-export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaSite {
+export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown, assets?: SiteAssetLoaderCache): CommonsPlazaSite {
   const root = createSiteRoot(scene, 'sw');
   const plazaLayer = createSiteLayer(root, siteLayerDefinition('dogenzakaSouth', 'plaza'));
   const neutralPropsLayer = createSiteLayer(root, siteLayerDefinition('dogenzakaSouth', 'commonsNeutralProps'));
@@ -487,58 +493,43 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
   ]);
   talkers('low', 3, -.2, BED + .03, -2.6, 2);
 
-  // ---------- 0 mixed: half pods, half open circle ----------
-  const DC = { x: 0, z: .1 }, RC = { x: -2.8, z: .4 }, RING_IN = 1.7, RING_OUT = 2.0, FLOOR = DECK - .35, SEAT = FLOOR + .3;
-  const mixedPods = [[4.2, -1.9, .12], [2.7, -3.3, .06], [1.8, .2, -.02], [3.9, 2.4, -.04]].map(([x, z, tilt]) => ({ x, z, yaw: FRONT - tilt, k: .85 }));
-  const divider = (t: number): [number, number] => [(1 - t) * (1 - t) * -.2 + 2 * t * (1 - t) * .9 + t * t * -.6, (1 - t) * (1 - t) * -4.3 + 2 * t * (1 - t) * .2 + t * t * 4.5];
-  const WALL = .7;
-  stateGroup('commons-state-mixed', 'mixed', 0, .6, g => {
-    // Round deck with a stepped edge: a wide foot ring under the deck disc, the deck hollowed by the sunken circle (its riser wall is the hole edge).
-    arc(g, 0, 5.6, .15, [DC.x, 0, DC.z], white);
-    const deck = new T.Shape();
-    deck.absarc(0, 0, 5.45, 0, Math.PI * 2, false);
-    const hole = new T.Path();
-    hole.absarc(RC.x - DC.x, -(RC.z - DC.z), RING_OUT, 0, Math.PI * 2, true);
-    deck.holes.push(hole);
-    mesh(g, new T.ExtrudeGeometry(deck, { depth: DECK - .15, bevelEnabled: false, curveSegments: 48 }).rotateX(-Math.PI / 2), white, DC.x, .15, DC.z);
-    // Sunken circle: floor .35 below the deck, a narrow pink-topped bench round the wall (two tiers on the back half), a round table in the middle.
-    arc(g, 0, RING_OUT + .02, FLOOR, [RC.x, 0, RC.z], white);
-    arc(g, RING_IN, RING_OUT, SEAT - FLOOR, [RC.x, FLOOR, RC.z], white);
-    arc(g, RING_IN - .02, RING_OUT, .035, [RC.x, SEAT, RC.z], sharePink);
-    arc(g, RING_OUT, RING_OUT + .18, .22, [RC.x, DECK, RC.z], white, Math.PI, Math.PI);
-    arc(g, RING_OUT, RING_OUT + .18, .035, [RC.x, DECK + .22, RC.z], sharePink, Math.PI, Math.PI);
-    mesh(g, new T.CylinderGeometry(.6, .55, .08, 28), white, RC.x, FLOOR + .38, RC.z);
-    mesh(g, new T.CylinderGeometry(.14, .2, .34, 16), white, RC.x, FLOOR + .17, RC.z);
-    for (const [dx, dz, c] of [[.25, -.15, 0], [-.3, .1, 1], [.1, .3, 2], [-.1, -.3, 3]]) box(g, [.2, .07, .14], [RC.x + dx, FLOOR + .46, RC.z + dz], [propBlue, sharePink, propYellow, shrubGreen][c], .01);
-    // Front-right pink steps (three treads) leading in from the lawn.
-    [[5.45, 5.7, DECK - .15], [5.7, 5.95, DECK - .32], [5.95, 6.2, DECK - .49]].forEach(([inner, outer, top]) => arc(g, inner, outer, top, [DC.x, 0, DC.z], sharePink, 2.0, .75));
-    // Two-tier stepped planter (1.2 wide, tiers .45 and .8 high) dividing the pod half from the open circle: 7 trees of varied height and dense shrubs spilling over both tiers.
-    const N = 16;
-    for (let i = 0; i < N; i++) {
-      const a = divider(i / N), b = divider((i + 1) / N);
-      segment(g, a, b, 1.2, .45, DECK, white, .05);
-      segment(g, a, b, .7, .35, DECK + .45, white, .04);
-      segment(g, a, b, .6, .05, DECK + .8, bedGreen, .01);
+  // ---------- 0 mixed: the event module shelf (spec: artifacts/sw-event-shelf/spec.md) ----------
+  // 36 x 24 x 40 m lattice (9 x 6 x 10 units), 60 slots, 35 occupied at 4 seats; the GLB is metres, the group scales it. Front is stage -Z.
+  const mixedGroup = new T.Group();
+  mixedGroup.name = 'commons-state-mixed';
+  mixedGroup.visible = false;
+  stage.add(mixedGroup);
+  const shelf = createEventShelf(mixedGroup);
+  addPart('mixed', 0, .6, level => { mixedGroup.visible = level > HIDDEN; mixedGroup.scale.set(1, Math.max(HIDDEN, level), 1); }, true);
+  addPart('mixed', .35, .65, level => shelf.setBandLevel(level));
+  const YARD = .04; // paving top (0.15 m) in units
+  stateGroup('commons-state-mixed-yard', 'mixed', 0, .6, g => {
+    // Forecourt greenery on the shelf's paving; hedges and small trees along the front and rear edge, trees only where the tracks are not.
+    for (let x = -4.7; x <= 4.8; x += .5) if (Math.abs(Math.abs(x) - 3) > .8) { bush(g, x, YARD, -4.85, .27, hedgeGreen, .62); bush(g, x, YARD, 3.35, .27, hedgeGreen, .62); }
+    for (const [x, z, s] of [[-4.5, -4.5, .8], [-1.7, -4.7, .7], [1.7, -4.7, .7], [4.5, -4.5, .8], [-4.7, 2.4, .75], [4.7, 2.4, .75], [-1.8, 3.0, .6], [1.8, 3.0, .6]]) tree(g, x, YARD, z, s);
+    // Lobby (shelf ground tier, centre column): three pink-topped benches and two round tables with stools.
+    for (const [x, z, yaw] of [[-.9, -1.4, .3], [.9, -1.6, -.3], [.1, 1.0, 1.57]]) {
+      const b = new T.Group();
+      b.position.set(x, YARD, z);
+      b.rotation.y = yaw;
+      box(b, [1.15, .1, .32], [0, .2, 0], white, .02);
+      for (const sx of [-.45, .45]) box(b, [.07, .17, .28], [sx, .085, 0], white, .01);
+      box(b, [1.15, .04, .34], [0, .27, 0], sharePink, .01);
+      g.add(b);
     }
-    for (let i = 0; i <= 34; i++) {
-      const [x, z] = divider(i / 34), side = i % 2 ? 1 : -1;
-      bush(g, x + side * (.5 + hash(i) * .25), DECK + .3, z, .2 + hash(i + 3) * .16, i % 3 ? shrubGreen : hedgeGreen);
-      bush(g, x - side * (.3 + hash(i + 5) * .2), DECK + .62, z + .1, .18 + hash(i + 9) * .14, i % 3 ? hedgeGreen : shrubGreen);
+    for (const [x, z] of [[-.6, 2.1], [.8, 2.4]]) {
+      mesh(g, new T.CylinderGeometry(.42, .42, .04, 20), white, x, YARD + .62, z);
+      mesh(g, new T.CylinderGeometry(.05, .08, .6, 8), white, x, YARD + .3, z);
+      for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + .6; mesh(g, new T.CylinderGeometry(.13, .13, .05, 10), white, x + Math.sin(a) * .62, YARD + .27, z + Math.cos(a) * .62); mesh(g, new T.CylinderGeometry(.02, .02, .25, 5), white, x + Math.sin(a) * .62, YARD + .13, z + Math.cos(a) * .62); }
     }
-    [[.03, .6], [.17, .85], [.33, .65], [.5, .95], [.66, .7], [.82, .85], [.96, .6]].forEach(([t, s], i) => { const [x, z] = divider(t); smallTree(g, x, DECK + .8, z, s, i % 2 ? hedgeGreen : shrubGreen); });
-    bush(g, 4.3, DECK, 3.6, .4); bush(g, 4.5, DECK, -3.0, .38); bush(g, 3.4, DECK, -3.8, .36);
-  }, true);
-  const mixedPlace = podFleet(stage, 'commons-pods-mixed', mixedPods, true, DECK);
-  addPart('mixed', .35, .65, mixedPlace);
-  const ringSeat = (angle: number, r = (RING_IN + RING_OUT) / 2 + .02) => ({ x: RC.x + Math.cos(angle) * r, z: RC.z - Math.sin(angle) * r, yaw: Math.atan2(-Math.cos(angle), Math.sin(angle)) });
-  for (let i = 0; i < 14; i++) {
-    const a = (i + .5) / 14 * Math.PI * 2 + .15, s = ringSeat(a);
-    people('mixed', [{ ...s, yaw: s.yaw + (i % 2 ? .5 : -.5), y: SEAT + .035, seated: true, big: 1.15, talk: [40 + (i >> 1), i & 1, 2] }]);
-  }
-  const stepSeat = (a: number) => ({ x: DC.x + Math.cos(a) * 5.58, z: DC.z - Math.sin(a) * 5.58, y: DECK - .15, yaw: Math.atan2(-Math.cos(a), Math.sin(a)) });
+  });
+  // Residents of the lobby and forecourt: talking groups, two walkers on each ground track (x = +-3 units), people seated on the benches.
+  talkers('mixed', 11, -.9, YARD, -2.2, 3); talkers('mixed', 12, .8, YARD, -.8, 3); talkers('mixed', 13, -.3, YARD, .1, 2); talkers('mixed', 14, 1.2, YARD, 1.6, 2);
   people('mixed', [
-    ...mixedPods.slice(0, 3).flatMap((pod, i) => [-1, 1].map(sd => ({ ...podPoint(pod, sd * .47, .46), y: DECK + POD_SEAT * pod.k, yaw: pod.yaw - sd * (Math.PI / 2 - (sd < 0 ? .75 : .45)), seated: true, big: 1.2, talk: [70 + i, sd < 0 ? 0 : 1, 2] as [number, number, number] }))),
-    ...[2.3, 2.42, 2.54].map(a => ({ ...stepSeat(a), seated: true, kid: true, big: 1.2 })),
+    { x: -.9, z: -1.4, y: YARD + .27, yaw: Math.PI + .3, seated: true }, { x: .9, z: -1.6, y: YARD + .27, yaw: Math.PI - .3, seated: true },
+    walker('mixed', [-3, -4.6, YARD], [-3, -3.2, YARD], 14, 0), walker('mixed', [3, -3.0, YARD], [3, -4.7, YARD], 16, .4),
+    walker('mixed', [-1.4, -4.2, YARD], [-2.4, -3.0, YARD], 12, .7, true), walker('mixed', [2.2, -2.6, YARD], [1.0, -4.3, YARD], 13, .2, true),
+    ...[[-.6, 2.1], [.8, 2.4]].flatMap(([x, z], i) => [0, 2, 4].map(k => { const a = k * Math.PI / 2 + .6; return { x: x + Math.sin(a) * .62, z: z + Math.cos(a) * .62, y: YARD + .3, yaw: a + Math.PI, seated: true, talk: [60 + i, k >> 1, 3] as [number, number, number] }; })),
   ]);
 
   // Canopy: a white hovering lens, shared construction for the mixed disc and the +1 roof; each state adds its own seams and emitters.
@@ -553,14 +544,7 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
     stage.add(g);
     return { group: g, scale, sx };
   };
-  const canopyLevel = { mixed: 0, high: 0 };
-  const MIX_SCALE = 2.4 / 5.2;
-  const mixedCanopy = canopy('mixed', MIX_SCALE, g => {
-    ringTorus(g, 5.2, .05, sharePink, 0, 0, 0);
-    // Four compact ring emitters directly under the rim on the camera-facing side.
-    for (const [x, z] of [[1.7, -1.7], [0, -2.3], [-1.7, -1.7], [-2.3, 0]]) ringTorus(g, .3 / MIX_SCALE, .06 / MIX_SCALE, emitRing, x / MIX_SCALE, -.28 / MIX_SCALE, z / MIX_SCALE);
-  });
-  addPart('mixed', .6, .4, level => { canopyLevel.mixed = level; });
+  const canopyLevel = { high: 0 };
   const HIGH_SCALE = 5 / 5.2, HIGH_SX = 1.15; // an ellipse 5.75 x 5.0
   const highCanopy = canopy('high', HIGH_SCALE, g => {
     // Continuous thick pink rim band (.12 high); 8 raised radial ribs; a solid bright stabiliser ring underneath.
@@ -705,12 +689,11 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
   const placed = new T.Matrix4(), quat = new T.Quaternion(), up = new T.Vector3(0, 1, 0), pos = new T.Vector3(), scl = new T.Vector3();
   const marker = createGuestMarker(root, 'sw');
   const frame = (now: number) => {
+    shelf.update(now);
     const bob = prefersReducedMotion() ? 0 : Math.sin(now * Math.PI * 2 / 6);
     const ready = stage.visible && stage.scale.y > .999;
     // Canopies lower in / lift away with their part, and bob gently once up (±.06 over the circle, ±.08 over the lot).
-    for (const [c, level, x, y, z, bobAmp] of [
-      [mixedCanopy, canopyLevel.mixed, RC.x, 2.9, RC.z - .6, .06], [highCanopy, canopyLevel.high, 0, 6.8, 0, .08],
-    ] as const) {
+    for (const [c, level, x, y, z, bobAmp] of [[highCanopy, canopyLevel.high, 0, 6.8, 0, .08]] as const) {
       c.group.visible = level > HIDDEN;
       c.group.position.set(x, y + (1 - level) * 3 + bob * bobAmp * level, z);
       c.group.scale.set(c.sx, 1, 1).multiplyScalar(Math.max(HIDDEN, smoothstep(level)) * c.scale);
@@ -734,7 +717,13 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown): CommonsPlazaS
       if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     });
   };
-  const commonsPlaza = createCommonsPlazaRuntime(parts, frame);
+  if (assets) {
+    plazaLayer.setPreparation(async () => {
+      shelf.installGlb(await assets.cloneRoot('event-shelf-2127', 'dogenzakaSouth', 'plaza'));
+    });
+    void plazaLayer.prepare(); // load now, so the first 3 s rise already shows the GLB
+  }
+  const commonsPlaza = createCommonsPlazaRuntime(parts, frame, (seats, now, immediate) => shelf.setCount(shelfCount(seats), now, immediate), shelf);
   return {
     id: 'dogenzakaSouth', root,
     layers: { plaza: plazaLayer, commonsNeutralProps: neutralPropsLayer },

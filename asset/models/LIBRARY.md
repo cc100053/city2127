@@ -77,7 +77,11 @@ Size is width × depth × height in metres.
 | `furnish` | scatter furniture vignettes + residents on a floor | `reg` (`Rect(ctx, cx, cz, w, d, ang=0)` or `Ring(ctx, cx, cz, r0, r1)`), `y, hh, items, people` | via props |
 | `glass_room` | glazed lit room, slim mullions, warm ceiling glow, planted troughs inside the glass, amber slab-edge line, furnished ≈ 1 vignette / 16 m² (3–12) | `x, z, y, width, depth, height, planters=True, edge=True`. Keep `height` near 4–5 m per floor; >8 m caps furniture at 6 | white, floor, room, glow, glass, green, amber + furnish |
 | `glass_lift` | glass shaft, white frame, amber front (−z) edges, landings every 12 m; capsule with amber frame, lit back panel (+z), one or two riders facing −z | `x, z, y0, y1, ycap, wd=2.2, sz=2.0` | glass, white, amber, glow, floor |
+| `event_module` | self-contained event module (small lit building, 4 corner couplings with cyan lock lights, `furnish` interior); front −z | `x, y, z, variant='A'` (A white + teal corner, B teal + awning, C wide side glazing, D planted roof deck, H double-height hall with mezzanine), `w=10.4, d=10.4, h=3.2` (hall `h=7.2`), `furnished=True` | white, teal, glass, room, floor, glow, rail, cyan, green + furnish roles |
+| `lattice_frame` | open structural frame: columns, beam ring per level, joint blocks, front/back guide rails at every column line, runway rails with 7 m cantilevered ends, transfer-deck rails, two ground tracks, paving plinth | `cx=0, cz=0, y0=0, cols=3, rows=2, levels=10, cell=12, floor_h=4, rail_at=None, ground_tracks=(-12, 12)` | frame, rail, white, paving |
 | `ring_doorways` | cylindrical glass wall with two 2.5 m doorways on ±x: amber door frame, white canopy, threshold, a resident at each door | `radius, y0, y1, cx=0, cz=0` | glass, white, amber |
+
+*Event shelf (2026-11-13, `feat/sw-event-shelf`, status `draft`):* `event_module` and `lattice_frame` and the roles `frame`, `rail`, `teal`, `cyan`, `paving` enter with the SW event module shelf; lineup `asset/models/event-shelf-2127/review_shelf.py`. They become `accepted` when the owner accepts the SW close-up.
 
 **Recipe `modules.ROLES`** (`accepted` 2026-11-13, SE R4/R5, polish 1): warm interior glow seen through 10 % glass, warm amber-cream floors instead of glowing salmon planes, and residents in saturated clothing so they read as people, not silhouettes, by day and night. On `feat/se-stage-closeup-polish`, SE `build_district.py` takes its `district_*` materials from this recipe. Reuse it for any lit habitable interior before you tune a new one.
 
@@ -102,6 +106,7 @@ Whole assets. Reuse a site asset elsewhere only as background context, and ask t
 | `automation-hub-upper` | automation hub upper level | imported GLB | site-only |
 | `sky-ring-architecture` | Sky Ring | imported GLB | site-only |
 | `rectenna-farm-canopy` | rectenna canopy over terrace farm (draft, not placed) | `export_glb.py` text inside the .blend | site-only |
+| `event-shelf-2127` | SW mixed flagship: 36 × 24 × 40 m lattice (`SHELF_FRAME`) and five event modules `MOD_A..D, MOD_H` (draft, placed on the SW south-shore lot) | `build_shelf.py` (uses modules `lattice_frame`, `event_module`); lineup `review_shelf.py` | site-only frame; modules reusable as event rooms |
 | `odaiba-masterplan` | district environment | `odaiba_masterplan_v01_phase03d_generator.py` | site-only |
 | `aqua-city-odaiba` | landmark context | imported GLB | context |
 | `decks-tokyo-beach` | landmark context | imported GLB | context |

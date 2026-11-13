@@ -142,7 +142,7 @@ const nonParkFeedback = exhibitionFeedback({
     { socketId: 'se', label: '機能配置', before: { functionModules: 4 }, after: { functionModules: 3 } },
   ],
 });
-assert.deepEqual(nonParkFeedback?.cityChanges.map(change => change.place), ['アクアシティ南', 'フジテレビ東']);
+assert.deepEqual(nonParkFeedback?.cityChanges.map(change => change.place), ['お台場南岸', 'フジテレビ東']);
 
 const sameBandFeedback = exhibitionFeedback({
   ...v2Proposal, beforeScores: { ...zero, environmentalPriority: 4 }, afterScores: { ...zero, environmentalPriority: 4.2 },
@@ -170,7 +170,7 @@ assert.equal(residentCards({ ...parsedInitialV2.view, guestCount: 100 }).some(ca
   'city-reset lifetime participation never implies answers in this run');
 assert.equal(residentCards(parsedV2.view).some(card => card.id === 'intro.inherited'), true);
 assert.deepEqual(baseCards.slice(-4).map(card => card.id), ['service.hybrid', 'commons.hybrid', 'climate.hybrid', 'functions.hybrid']);
-assert.deepEqual(baseCards.slice(-4).map(card => card.place), ['デックス西', 'アクアシティ南', 'お台場海浜公園', 'フジテレビ東']);
+assert.deepEqual(baseCards.slice(-4).map(card => card.place), ['デックス西', 'お台場南岸', 'お台場海浜公園', 'フジテレビ東']);
 for (const [automatedPorts, sharedSeats, coolingFins, band, expected] of [
   [0, 0, 6, 'low', ['service.human', 'commons.private', 'climate.hybrid', 'functions.distributed']],
   [6, 8, 0, 'high', ['service.autonomous', 'commons.open', 'climate.canopy', 'functions.vertical']],

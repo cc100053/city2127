@@ -271,7 +271,7 @@ const heroSightline = (site: (typeof changeSites)[keyof typeof changeSites], con
   const look = new Vector3(site.x, site.h * site.scale / 4, site.z);
   ray.set(camera.position, look.clone().sub(camera.position).normalize());
   const blocker = ray.intersectObject(city, true)[0];
-  const clear = !blocker || blocker.distance > camera.position.distanceTo(look) - 1 || (site.name === 'COMMONS PLAZA' && blocker.object.parent?.name === 'aqua-city-odaiba');
+  const clear = !blocker || blocker.distance > camera.position.distanceTo(look) - 1;
   assert.ok(clear, `${site.name} hidden from the hero pose by ${blocker?.object.name}${context}`);
 };
 for (const site of Object.values(changeSites)) {
@@ -492,7 +492,8 @@ console.log(`Odaiba: ${concentration.towers.length} vertical towers, ${concentra
 // Sharing courts: open ground, clear of context, routes, P2 pavilions and P4 towers / pods in both identities; sites stay visible.
 for (const court of sharingDistrict.courts) {
   assert.equal(offGround(court.x, court.z, 20) ?? blocked(court.x, court.z, 3, 20) ?? blocked(court.x, court.z, 10, 20), undefined, `court at ${court.x},${court.z}`);
-  assert.ok(Math.hypot(court.x - changeSites.sw.x, court.z - changeSites.sw.z) > 60, 'sharing courts clear the commons focal site');
+  // The 40 m court square stays 6 m clear of the SW focal lot (event shelf, 48 × 40 m) on at least one axis.
+  assert.ok(Math.abs(court.x - changeSites.sw.x) >= changeSites.sw.w * changeSites.sw.scale / 2 + 26 || Math.abs(court.z - changeSites.sw.z) >= changeSites.sw.d * changeSites.sw.scale / 2 + 26, 'sharing courts clear the commons focal site');
   assert.ok(concentration.towers.every(t => Math.hypot(t.x - court.x, t.z - court.z) > 48) && concentration.pods.every(p => Math.hypot(p.x - court.x, p.z - court.z) > 36), 'courts share no ground with towers / pods');
   assert.ok(serviceDistrict.bays.every(b => Math.hypot(b.x - court.x, b.z - court.z) > 54), 'courts share no ground with staffed pavilions');
 }
@@ -550,7 +551,7 @@ console.log(`Odaiba: ${sharingDistrict.courts.length} sharing courts stand on op
 const courtVisibility = sharingDistrict.courts.map(c => courtPixels(c.x, c.z, c.yaw));
 // Owner 2026-11-01 (c2 low hero): courts 1, 4, 6 and 7 fall behind landmarks or out of frame; the SW district shot shows them.
 // polish2: court 9 (-20, 210) now sits behind the enlarged Fuji frame (owner 2026-11-02: hero visibility never blocks a design).
-// Stage 2: court 5 moved off the ④ boulevard to (-137, 286), about 450 px.
+// Stage 2: court 5 moved off the ④ boulevard to (-137, 286), about 450 px; the SW event shelf then moved it to (-150, 290).
 const HERO_HIDDEN_COURTS = [1, 4, 5, 6, 7, 9];
 for (const [i, px] of courtVisibility.entries()) if (!HERO_HIDDEN_COURTS.includes(i)) assert.ok(px >= 600, `court ${i} shows only ${px.toFixed(0)} px from the hero pose`);
 console.log(`Odaiba: sharing courts show ${courtVisibility.map(px => px.toFixed(0)).join(' / ')} px of ground in the hero frame.`);

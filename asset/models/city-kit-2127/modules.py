@@ -32,6 +32,9 @@ ROLES = {
     'cloth_a': ((.17, .30, .50, 1), None, .5), 'cloth_b': ((.80, .28, .20, 1), None, .5),
     'cloth_c': ((.20, .50, .46, 1), None, .5), 'wood': ((.50, .33, .20, 1), None, .5),
     'slate': ((.20, .22, .25, 1), None, .5), 'fabric': ((.84, .60, .47, 1), None, .5),
+    # Event shelf (SW mixed, 2026-11-13): structural frame, steel rail, module teal accent, lock light, forecourt paving.
+    'frame': ((.23, .25, .27, 1), None, .5), 'rail': ((.55, .59, .63, 1), None, .5), 'teal': ((.12, .60, .60, 1), None, .5),
+    'cyan': ((.22, .78, 1, 1), (.22, .78, 1, 1), 2.0), 'paving': ((.74, .72, .68, 1), None, .5),
 }
 # Kit prop material -> module role, so baked props share the site's roles.
 KITMAP = {'kit_dark': 'slate', 'kit_white': 'white', 'kit_wood': 'wood', 'kit_fabric': 'fabric', 'kit_screen': 'glow',
@@ -321,8 +324,128 @@ def ring_doorways(ctx, radius, y0, y1, cx=0, cz=0):
         person(ctx, cx + side * (radius - .4), y0 + .16, cz + .45, 1)
 
 
+def _wedge(acc, x, y, w, z0, z1, h):
+    """Gusset prism: w wide along x at x; its lower face runs y..y, from z0 (height h) down to z1 (height 0)."""
+    pts = [(xx, yy, zz) for xx in (x - w / 2, x + w / 2) for yy, zz in ((y, z0), (y, z1), (y + h, z0))]
+    acc.solid(pts, [(0, 2, 1), (3, 4, 5), (0, 1, 4, 3), (1, 2, 5, 4), (2, 0, 5, 3)])
+
+
+def event_module(ctx, x, y, z, variant='A', w=10.4, d=10.4, h=3.2, furnished=True):
+    """Self-contained event module (a small lit building) centred on (x, z) with its floor underside at y; front is -z.
+    variant A white + teal corner panel, B teal body + awning, C white + wide side glazing + teal band, D white with a
+    planted roof deck, H double-height hall (h = 7.2 typical, mezzanine over the back half). Four corner couplings
+    (rail grey, cyan lock light on the outside). Defaults: 10.4 x 10.4 x 3.2 m in a 12 x 12 x 4 m cell. Interior: warm
+    ceiling glow, wood floor, furnish() vignettes and residents seen through the front glazing."""
+    b = lambda role, ox, oy, oz, sx, sy, sz: box(ctx, role, x + ox, y + oy, z + oz, sx, sy, sz)
+    body = 'teal' if variant == 'B' else 'white'
+    hw, hd = w / 2, d / 2
+    b('white', 0, .125, 0, w + .1, .25, d + .1)                         # floor slab
+    b('floor', 0, .28, 0, w - .5, .06, d - .5)
+    b('room', 0, h - .5, 0, w - .5, .1, d - .5)                          # warm ceiling
+    b('glow', 0, h - .56, .5, w - 3.0, .05, d - 3.0)
+    b(body, 0, h - .15, 0, w + .1, .3, d + .1)                         # roof slab
+    b('room', 0, h / 2, hd - .25, w - .5, h - .6, .1)                    # warm back wall (inside)
+    b(body, 0, h / 2, hd - .075, w - .04, h - .02, .15)                 # back wall
+    win = 1.0 if variant == 'H' else .75                                 # sill height
+    wtop = h - (.55 if variant != 'H' else .6)
+    fw = w - (2.4 if variant != 'H' else 1.6)                            # front window width
+    for sx_ in (-1, 1):                                                  # front piers
+        b('teal' if variant == 'A' and sx_ < 0 else body, sx_ * (hw - (w - fw) / 4), h / 2, -hd + .1, (w - fw) / 2, h, .2)
+    b(body, 0, (wtop + h) / 2, -hd + .1, fw, h - wtop, .2)               # header
+    b(body, 0, win / 2, -hd + .1, fw, win, .2)                           # sill wall
+    b('glass', 0, (win + wtop) / 2, -hd + .06, fw, wtop - win, .06)
+    for k in range(1, 4):
+        b('white', -fw / 2 + k * fw / 4, (win + wtop) / 2, -hd + .08, .1, wtop - win, .14)
+    b('white', 0, wtop - .06, -hd + .06, fw, .08, .16)
+    side_glass = {'A': (1.5, 2.6), 'B': (1.5, 2.6), 'C': (.7, 3.0), 'D': (1.5, 2.4), 'H': (1.2, h - 1.0)}[variant]
+    for sx_ in (-1, 1):
+        for cz_ in ((-1.6, 2.4) if variant == 'C' else (.4,)):
+            sl = 4.2 if variant == 'C' else 5.2
+            b('glass', sx_ * (hw - .06), (side_glass[0] + side_glass[1]) / 2, cz_, .06, side_glass[1] - side_glass[0], sl)
+        b(body, sx_ * (hw - .1), h / 2, 0, .2, h - .02, d - .04)                      # side walls (glass sits proud of the wall's outer face)
+    if variant == 'A':
+        b('teal', -hw + .5, h / 2, -hd - .02, 1.0, h, .08)
+    if variant == 'B':
+        b('white', 0, wtop + .15, -hd - .7, fw + .6, .12, 1.6)           # awning
+        b('rail', -fw / 2 - .2, wtop + .05, -hd - .5, .08, .1, 1.2)
+        b('rail', fw / 2 + .2, wtop + .05, -hd - .5, .08, .1, 1.2)
+    if variant == 'C':
+        b('teal', 0, .55, -hd - .03, w, .5, .08)
+    if variant == 'D':
+        b('white', 0, h + .3, -hd + .15, w, .6, .3); b('white', 0, h + .3, hd - .15, w, .6, .3)
+        b('white', -hw + .15, h + .3, 0, .3, .6, d); b('white', hw - .15, h + .3, 0, .3, .6, d)
+        b('teal', 0, h + .62, -hd + .15, w, .06, .34)
+        for dx in (-3.2, 0, 3.2):
+            b('white', dx, h + .15, .5, 2.2, .3, 2.0)
+            b('green', dx, h + .38, .5, 2.0, .15, 1.8)
+            blob(ctx.a['green'], (x + dx, y + h + .85, z + .5), (.7, .55, .7), sub=1, seed=dx + 3)
+    if variant == 'H':
+        b('floor', 0, 3.6, hd / 2 - .1, w - .5, .12, hd - .2)            # mezzanine over the back half
+        b('white', 0, 3.45, hd / 2 - .1, w - .5, .16, hd - .2)
+        b('white', 0, 4.25, 0.0, w - .5, .08, .08)
+        b('teal', -hw + .5, h / 2, -hd - .02, 1.0, h, .08)
+        b('teal', hw - .5, h / 2, -hd - .02, 1.0, h, .08)
+    for sx_ in (-1, 1):                                                  # four corner couplings + lock lights
+        for sz_ in (-1, 1):
+            for yy in (h - .3, .3):
+                b('rail', sx_ * (hw + .1), yy, sz_ * (hd + .1), .4, .4, .4)
+            b('cyan', sx_ * (hw + .1), h - .3, sz_ * (hd + .33), .22, .22, .06) if sz_ < 0 else None
+    if furnished:
+        rng_state = ctx.rng.getstate()
+        ctx.rng.seed(f'{variant}{x:.1f}{z:.1f}')
+        n = 7 if variant == 'H' else 5
+        furnish(ctx, Rect(ctx, x, z + .4, w - 1.8, d - 1.6), y + .32, h, n, 3 if variant == 'H' else 2)
+        ctx.rng.setstate(rng_state)
+
+
+def lattice_frame(ctx, cx=0, cz=0, y0=0, cols=3, rows=2, levels=10, cell=12.0, floor_h=4.0, rail_at=None, ground_tracks=(-12.0, 12.0)):
+    """Open structural frame, front -z: (cols+1)(rows+1) 0.9 m columns, a 0.7 x 0.6 m beam ring at every level top
+    (beam top = module floor of that level), grey joint blocks, full-height guide rails on the front and back faces at
+    every column line, runway rails and cantilevered ends 7 m past each end, a transfer-deck rail set on the second top
+    level, two ground tracks, and a paving plinth. Default 36 x 24 x 40 m. Roles: frame, rail, white, cyan, paving."""
+    W, D, H = cols * cell, rows * cell, levels * floor_h
+    xs = [cx - W / 2 + i * cell for i in range(cols + 1)]
+    zs = [cz - D / 2 + j * cell for j in range(rows + 1)]
+    A = ctx.a
+    obox(A['paving'], (cx, y0 + .075, cz - 3), (W + 4, .15, D + 14))
+    for xc in xs:
+        for zc in zs:
+            obox(A['frame'], (xc, y0 + H / 2 + .075, zc), (.9, H - .15, .9))
+    for k in range(1, levels + 1):
+        yb = y0 + k * floor_h - .3
+        for zc in zs:
+            obox(A['frame'], (cx, yb, zc), (W + .7, .6, .7))
+        for xc in xs:
+            obox(A['frame'], (xc, yb, cz), (.7, .58, D + .7))
+            for zc in zs:
+                obox(A['rail'], (xc, yb - .5, zc), (1.3, .4, 1.3))
+    rails = xs if rail_at is None else rail_at
+    for xc in rails:
+        for zc in (zs[0] - .45 - .125 - .12, zs[-1] + .45 + .125 + .12):
+            obox(A['rail'], (xc, y0 + H / 2 + .075, zc), (.25, H - .15, .25))
+    ext = 7.0
+    for xc in (xs[0], xs[-1]):                                   # runway beams, cantilevered 7 m each end
+        obox(A['rail'], (xc, y0 + H + .45, cz), (.5, .5, D + 2 * ext + .9))
+        for sgn in (-1, 1):
+            _wedge(A['frame'], xc, y0 + H - 2.2, .6, cz + sgn * (D / 2 + .45), cz + sgn * (D / 2 + ext - 1.5), 2.2)
+    for xc in (xs[0] - .0, xs[-1]):
+        for zc in (zs[0] - ext, zs[-1] + ext):
+            obox(A['white'], (xc, y0 + H + .35, zc), (1.0, .8, 1.2))   # end stops
+    for lane in xs[:-1]:                                           # transfer deck rails (k = levels - 1)
+        for dx in (-.9, .9):
+            obox(A['rail'], (lane + cell / 2 + dx, y0 + (levels - 1) * floor_h + .08, cz), (.15, .16, D - .8))
+    for gx in ground_tracks:                                        # two ground tracks from the lot edge through the ground tier
+        z0, z1 = cz - D / 2 - 8, cz + D / 2
+        for dx in (-1.5, 1.5):
+            obox(A['rail'], (cx + gx + dx, y0 + .2, (z0 + z1) / 2), (.16, .12, z1 - z0))
+        n = int((z1 - z0) / 1.5)
+        for i in range(n + 1):
+            obox(A['frame'], (cx + gx, y0 + .16, z0 + i * (z1 - z0) / n), (3.7, .08, .3))
+
+
 # Registry checked against LIBRARY.md by tests/assetLibrary.test.ts — add a row there for every new key.
 MODULES = {
     'kit_prop': kit_prop, 'person': person, 'seated_person': seated_person, 'furnish': furnish,
     'glass_room': glass_room, 'glass_lift': glass_lift, 'ring_doorways': ring_doorways,
+    'event_module': event_module, 'lattice_frame': lattice_frame,
 }
