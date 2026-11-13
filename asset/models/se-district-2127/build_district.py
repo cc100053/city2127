@@ -61,15 +61,21 @@ def build(kind):
     elif kind=='twin':
         podium()
         for x,top in [(-10.5,100),(10.5,84)]:
-            disc(r,x,0,3.2,5,top-5)
+            # Full-plate glass floors every 7 m around a slim service core (was one solid orange cylinder with a few tables).
+            disc(w,x,0,1.6,5,top-5)
             tube(glass,x,0,7.8,5,top,32)
-            for y in range(12,top,8):
+            y=5.0
+            while y<top-5:
                 disc(w,x,0,8.5,y,1)
                 disc(floor,x,0,7.5,y+.98,.08); cyl(glow,x,0,7.5,y-.08,y,16)
                 sweep(amber,lambda k:circle_pts(x,0,8.5,32,k),ring_section(0,.25,y+1,y+1.24),caps=(False,False),closed=True)
-                furnish(Ring(x,0,3.4,7.5),y+1.06,6.9,2 if y % 16 == 12 else 1,1)
+                for k in range(16):
+                    ang=k*math.pi/8; box(w,x+7.85*math.cos(ang),y+3.6,7.85*math.sin(ang),.16,5.2,.16)
+                furnish(Ring(x,0,2.4,7.4),y+1.06,5.0,6,4)
+                y+=7.0
             for ang in [0,math.pi/2,math.pi,3*math.pi/2]: box(w,x+7.4*math.cos(ang),top/2,7.4*math.sin(ang),.8,top-.4,.8)
             disc(green,x,0,7.5,top,1)
+            for bx,bz in [(-3.5,-2),(2.5,3),(3.5,-3.5)]: blob(green,(x+bx,top+1.9,bz),(1.7,1.1,1.5),sub=1)
         for y in [40,72]:
             box(w,0,y+.2,0,15,3,7); box(r,0,y+2.5,0,14,2.6,.3); box(floor,0,y+1.75,0,14,.1,6.4); box(glow,0,y+3.55,0,13,.06,5.6)
             for z in [-3.05,3.05]:

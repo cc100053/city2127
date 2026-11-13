@@ -1,7 +1,7 @@
 # SE 塔＋pod — district close-up polish
 
 - Owner: cc100053（視覺驗收）；Codex 統籌，Terra 實作。
-- Status: IN_PROGRESS — R3 candidate verified and scored, owner review pending
+- Status: DONE for this task — owner said 「merge」 on 2026-11-13 after the twin-cylinder polish. Integrated into main (see Twin cylinders). Further SE rounds are separate tasks.
 - Branch: `feat/se-stage-closeup-polish`
 - Base commit: `056ce514a99587798756bcfcf2a74463e7b81cf5`
 - Last verified commit: `9848a71` (R3 runtime and asset)
@@ -92,3 +92,13 @@ Library modules were polished against this task's targets (asset-library handoff
 - Headed Chrome hero `se:high` 1920×1080 DPR 1, first sample dropped, same machine and session: day 48.2–48.7 FPS, night 47.1–48.5 FPS. With the R5 GLB swapped in: day 47.6–49.1, night 46.9–48.2. The ranges overlap.
 - Root `npm test`, `npm run build`, `git diff --check` and `check-artifacts.sh` PASS.
 - Open: owner visual acceptance. Blind judging was not run this round. Twist day warmth remains a gap. The east stage still shows the focal SE +1 tower, which does not use modules.
+
+## Twin cylinders — 2026-11-13
+
+On owner instruction, the two cylinder towers behind the twist tower (`twin` variant) were polished. They had read as one solid orange cylinder (`disc(r, …, 3.2)`) with sparse furniture and floors every 8 m.
+
+- `build_district.py` `twin`: the orange core is now a slim white service core (r 1.6). Full-plate glass floors every 7 m, 16 thin glass mullions per floor, and per floor `furnish(Ring(x,0,2.4,7.4), …, 5.0, 6, 4)` (6 vignettes, 4 residents). Three green blobs on each roof. A tint trial with a pale orange core (r 2.4) read as an orange pillar again and was reverted.
+- GLB SHA256 `ee9ea5eb86128ed0c33e2c7089c86bb32439965e97a050d99908583ba990d448`, 222,724 triangles (was 172,252). `seDistrictGlb` budget raised 180k → 240k.
+- Captures at 1920×1080 (`?meters=se:8`, `shot=se:stage-south`, hour 12 and 22) in `~/city2127-evidence/se-twin/r1..r3` (local). Owner judged visually and accepted the merge.
+- Root `npm test`, `npm run build`, `git diff --check` PASS. FPS, the east stage and blind judging were NOT re-run for this change.
+- Known gap: day interiors still read pale against the target's warm lit rooms; no warm back wall; no amber lift capsule on the twins.

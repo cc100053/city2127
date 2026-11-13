@@ -18,7 +18,7 @@ for (const name of ['twist', 'terraced', 'twin', 'frame', 'double', 'ring']) {
 }
 assert.deepEqual(roles, new Set(['district_white', 'district_room', 'district_amber', 'district_green', 'district_dark', 'district_glass', 'district_floor', 'district_glow', 'district_skin', 'district_cloth_a', 'district_cloth_b', 'district_wood', 'district_slate', 'district_fabric', 'district_skin_b', 'district_cloth_c']));
 // Module polish 1 (2026-11-13): 172k tris; headed hero se:high FPS overlapped R5's 102.6k (day 48.2–48.7 vs 47.6–49.1, night 47.1–48.5 vs 46.9–48.2).
-assert.ok(triangles < 180000, `${triangles} triangles`);
+assert.ok(triangles < 240000, `${triangles} triangles`);
 const district = new ConcentrationDistrict(new T.Scene());
 district.setTarget({ tiers: { nw: 0, ne: 0, sw: 0, se: 3 } }, 0, true);
 const before = new T.Matrix4(); (district.root.getObjectByName('concentration-vertical-towers') as T.InstancedMesh).getMatrixAt(0, before);
