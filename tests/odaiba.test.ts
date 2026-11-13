@@ -568,6 +568,58 @@ if (process.env.SCAN_COURTS) {
   console.log('COURTS', out.sort((a, b) => b[0] - a[0]).map(o => o[1]).join(' | '));
 }
 
+if (process.env.SCAN_LOT) {
+  // Dev aid (place-building skill): SCAN_LOT=w,d scans the district for a clear w × d m lot (axis-aligned); SCAN_LOT=w,d,x,z probes one
+  // centre and lists every reason it fails. Unlike the court scan it also rejects survey change sites, courts, housing, towers, pods,
+  // bays and the district edge by footprint (edge gap < 6 m), and samples the whole rectangle, not its inscribed circle. Exits afterwards.
+  const [w, d, px, pz] = process.env.SCAN_LOT.split(',').map(Number), hw = w / 2, hd = d / 2, GAP = 6;
+  const { housingPrototype } = await import('../src/housingPrototype.ts');
+  const housing = housingPrototype(); housing.root.updateMatrixWorld(true);
+  const boxes: [string, number, number, number, number][] = [
+    ...Object.entries(changeSites).map(([k, s]) => [`site:${k}`, s.x - s.w * s.scale / 2, s.x + s.w * s.scale / 2, s.z - s.d * s.scale / 2, s.z + s.d * s.scale / 2] as [string, number, number, number, number]),
+    ...sharingDistrict.courts.map((c, i) => [`court${i + 1}`, c.x - 20, c.x + 20, c.z - 20, c.z + 20] as [string, number, number, number, number]),
+    ...housing.root.children.map(g => { const b = new Box3().setFromObject(g); return [g.name, b.min.x, b.max.x, b.min.z, b.max.z] as [string, number, number, number, number]; }),
+  ];
+  const discs: [string, number, number, number][] = [...concentration.towers.map(t => ['tower', t.x, t.z, 28] as [string, number, number, number]),
+    ...concentration.pods.map(p => ['pod', p.x, p.z, 16] as [string, number, number, number]), ...serviceDistrict.bays.map(b => ['bay', b.x, b.z, 34] as [string, number, number, number])];
+  const routePoints = [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades, ...actorPaths.streets, ...actorPaths.decks].flatMap(r => r.getSpacedPoints(600));
+  const samples: [number, number][] = [];
+  for (let u = -hw; u <= hw + .1; u += w / Math.ceil(w / 12)) for (let v = -hd; v <= hd + .1; v += d / Math.ceil(d / 12)) samples.push([u, v]);
+  const problems = (x: number, z: number, all: boolean) => {
+    const out: string[] = [], done = () => !all && out.length > 0;
+    if (x - hw < DISTRICT.minX || x + hw > DISTRICT.maxX || z - hd < DISTRICT.minZ || z + hd > DISTRICT.maxZ) out.push('district edge');
+    for (const [n, x0, x1, z0, z1] of boxes) if (x + hw + GAP > x0 && x - hw - GAP < x1 && z + hd + GAP > z0 && z - hd - GAP < z1) out.push(n);
+    for (const [n, cx, cz, r] of discs) if (Math.hypot(Math.max(Math.abs(cx - x) - hw, 0), Math.max(Math.abs(cz - z) - hd, 0)) < r) out.push(`${n}@${cx.toFixed(0)},${cz.toFixed(0)}`);
+    const route = routePoints.find(p => Math.abs(p.x - x) < hw + 4 && Math.abs(p.z - z) < hd + 4);
+    if (route) out.push(`route@${route.x.toFixed(0)},${route.z.toFixed(0)}`);
+    for (const [u, v] of samples) {
+      if (done()) break;
+      const why = offGround(x + u, z + v, 2) ?? [3, 12, 20].map(y => blocked(x + u, z + v, y, 6)).find(Boolean);
+      if (why) out.push(`${why}@${(x + u).toFixed(0)},${(z + v).toFixed(0)}`);
+    }
+    return [...new Set(out)];
+  };
+  const pixels = (x: number, z: number) => Math.round(courtPixels(x, z, 0, Math.sqrt(hw * hd)));
+  if (Number.isFinite(pz)) {
+    const found = problems(px, pz, true);
+    console.log('LOT', `${w}x${d} at ${px},${pz}`, found.length ? `FAIL ${found.join(' | ')}` : 'CLEAR', `hero ${pixels(px, pz)} px`);
+  } else {
+    const ok: { x: number; z: number }[] = [];
+    for (let x = DISTRICT.minX + hw; x <= DISTRICT.maxX - hw; x += 10) for (let z = DISTRICT.minZ + hd; z <= DISTRICT.maxZ - hd; z += 10) if (!problems(x, z, false).length) ok.push({ x, z });
+    const groups: { x: number; z: number }[][] = [];
+    for (const c of ok) {
+      const near = groups.filter(g => g.some(m => Math.abs(m.x - c.x) <= 10 && Math.abs(m.z - c.z) <= 10));
+      const merged = near.flat().concat(c);
+      for (const g of near) groups.splice(groups.indexOf(g), 1);
+      groups.push(merged);
+    }
+    console.log('LOTS', `${w}x${d}: ${ok.length} clear centres in ${groups.length} areas`);
+    for (const g of groups.map(g => g.map(c => ({ ...c, px: pixels(c.x, c.z) })).sort((a, b) => b.px - a.px)).sort((a, b) => b[0].px - a[0].px))
+      console.log('AREA', `${g.length} centres, x ${Math.min(...g.map(c => c.x))}..${Math.max(...g.map(c => c.x))}, z ${Math.min(...g.map(c => c.z))}..${Math.max(...g.map(c => c.z))}; best hero ${g[0].px} px at ${g[0].x},${g[0].z}`);
+  }
+  process.exit(0);
+}
+
 // P12: two full flight cycles are continuous; gathering lanes preserve person-to-person clearance.
 for (let time = 0; time <= 96; time += .25) {
   for (let i = 0; i < serviceDistrict.bays.length; i++) {

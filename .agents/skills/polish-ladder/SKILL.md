@@ -33,6 +33,7 @@ Roles on both rungs (owner 2026-11-11): **you advise** — diagnose, write specs
 
 ## Working with the Sonnet agent
 
+- When the owner judges each round (owner 2026-11-13), run each round as a fresh session per [place-building](../place-building/SKILL.md) **Rounds** instead of the resumed agent below.
 - One agent per unit, resumed with `SendMessage` every round so it keeps context. Each brief names the files to read, the round's spec, the captures to return and "commit, never merge or push".
 - A brief is a measured inventory, never an adjective. "Match the sheet" produced a thin mannequin with a tiny head; a 13-row table of proportions read off the sheet fixed it in one round.
 - The agent may hit the usage limit mid-round. On resume, its first instruction is to inspect the worktree (`git status`, last commit, evidence folder) and continue from what exists.

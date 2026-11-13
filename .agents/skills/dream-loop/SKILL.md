@@ -1,6 +1,6 @@
 ---
 name: dream-loop
-description: Build a game or app from a description so that a live screenshot matches a generated rendering. Use when the user says "dream loop" or asks for something built to a very high level of graphical fidelity.
+description: Build a game or app from a description so that a live screenshot matches a generated rendering. Use only when the user says "dream loop"; city2127 buildings and close-ups use place-building or closeup-polish.
 license: MIT
 ---
 

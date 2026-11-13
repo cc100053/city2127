@@ -7,7 +7,7 @@ description: Polish one city2127 change site's headline close-up (model, camera,
 
 Golden-sample workflow, proven on SE (2026-11-01; [handoff](../../../docs/handoffs/archive/se-closeup-polish.md), [spec rounds](../../../artifacts/se-closeup-polish/spec.md)). The deliverable is the whole causal chain at one site: the guest's option words → before → change → after, read in two seconds from the close-up.
 
-Roles: **Opus** (you) diagnoses, writes rubrics and specs, decides. **Sonnet** subagent (`model: sonnet`, `effort: high`) implements and captures. **Judge**: a fresh subagent every round, no history, scores rounds against the rubric. **Owner** alone accepts. Keep one Sonnet agent for the whole task and resume it each round, so it keeps context.
+Roles: **Opus** (you) diagnoses, writes rubrics and specs, decides. **Sonnet** subagent (`model: sonnet`, `effort: high`) implements and captures. **Judge**: a fresh subagent every round, no history, scores rounds against the rubric. **Owner** alone accepts. Keep one Sonnet agent for the whole task and resume it each round, so it keeps context. When the owner judges each round instead (owner 2026-11-13), skip steps 4 and 7's rubric and judges and run every round as a fresh session per [place-building](../place-building/SKILL.md) **Rounds**.
 
 Build route: **Blender first** (owner 2026-11-06, after SE +1: "blender seems way better than pure three.js"). Model the carrier's shell and reusable props in headless Blender and keep the procedural shape as the fallback (see **Blender route**). Keep a procedural three.js change only for small tweaks to a model that already scores well.
 
