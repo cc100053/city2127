@@ -1,0 +1,137 @@
+<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><title>變化總覽 — city2127</title>
+<style>body{font:15px/1.6 system-ui,"Noto Sans JP",sans-serif;margin:24px auto;max-width:1500px;padding:0 20px;background:#f4f3ee;color:#222}
+h1{font-size:26px}h2{font-size:21px;margin:0 0 8px}h3{font-size:16px;margin:18px 0 6px}small{color:#667;font-weight:400}code{background:#e6e4da;padding:0 4px;border-radius:3px}
+article{background:#fff;border-radius:10px;padding:18px 22px;margin:22px 0;box-shadow:0 1px 4px #0002}
+table{border-collapse:collapse;width:100%}th,td{border:1px solid #d6d4c8;padding:6px 9px;text-align:left;vertical-align:top}th{background:#eceadf;font-weight:600}
+.change{border-top:1px solid #e2e0d4;margin-top:16px}.cols{display:grid;grid-template-columns:minmax(300px,2fr) 3fr;gap:20px}
+dt{color:#667;font-size:13px;margin-top:8px}dd{margin:0}.frames{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start}
+figure{margin:0}figure img{width:100%;display:block;border-radius:4px;background:#ddd}figcaption{font-size:12px;color:#667}</style>
+<h1>變化總覽：選擇 → 變化 → 建築 → 居民</h1>
+<p>生成：2026-11-13，<code>scripts/changeSheet.ts</code>。狀態同居民來自 RESIDENT_SCENE_PLAN，日文文案來自結果卡同設施卡嘅程式，選項來自正式問卷，截圖來自 <code>scripts/closeupSheet.mjs</code>（靜態 DEV 畫面，唔係 live 過場）。佔比係模擬數字，唔係真人數據。</p>
+<p><b>點解會變：</b>每位 guest 答四題，每個選項將嗰條軸嘅 Meter 推 −1、0 或 +1。Meter 係所有人累積嘅結果；每份提案最多令一個地點行一級，優先行 guest 自己推嘅方向。所以 guest 嘅選擇唔一定等於今次嘅變化方向，結果卡第二句永遠講實際變化。</p>
+<table><tr><th>單位</th><th>佔比</th><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr>
+<tr><td><a href="#NW focal">NW focal — デックス西 AUTO HUB（−1／0／+1）</a></td><td>10.6%</td><td>收貨（旗艦 R9）</td><td>湊：DEV 演示齊，三個狀態、四種轉變（handoff）；owner 接受作演示</td><td>階段 2 收尾：演技、口形、正式接入</td></tr>
+<tr><td><a href="#NW bays">NW bays — <code>nw:stage-west</code>／<code>stage-mid</code>／district</a></td><td>19.4%</td><td>收貨（Bay R2）</td><td>未設計。提議：切返去湊同一個佈景</td><td>定 district 變化點樣接居民（owner 決定）</td></tr>
+<tr><td><a href="#SE focal">SE focal — フジテレビ東（−1／0／+1）</a></td><td>10.9%</td><td>收貨（R4；+1 塔 Blender R3，9/12）</td><td>時子：只有台詞同行動草稿</td><td>階段 2 由揀鏡頭位開始</td></tr>
+<tr><td><a href="#SE 塔">SE 塔＋pod 組件 — <code>se:stage-east</code>／<code>stage-south</code></a></td><td>19.7%</td><td>階段 1 進行中，R3 日 20/30、夜 19/30，待驗收</td><td>提議：切返去時子</td><td>階段 1</td></tr>
+<tr><td><a href="#SW rooms">SW rooms — <code>sw:stage-rooms-west</code>／<code>east</code></a></td><td>17.4%</td><td><b>未打磨</b></td><td>未有居民（共有軸）</td><td>階段 1；同時定 SW 居民</td></tr>
+<tr><td><a href="#SW focal">SW focal — アクアシティ南</a></td><td>10.5%</td><td><b>未打磨</b></td><td>未有居民</td><td>階段 1</td></tr>
+<tr><td><a href="#SW courts">SW courts — <code>sw:stage-courts-west</code>／<code>south</code></a></td><td>7.2%</td><td><b>未打磨</b></td><td>未有居民</td><td>階段 1</td></tr>
+<tr><td><a href="#能源">能源四部件</a></td><td>4.5%</td><td>早期 batch 已整合，未按 taste v2 重審</td><td>未有居民</td><td>最後；先由 owner 判斷使唔使打磨</td></tr></table>
+<article id="NW focal"><h2>NW focal — デックス西 AUTO HUB（−1／0／+1） <small>10.6%</small></h2>
+<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td>收貨（旗艦 R9）</td><td>湊：DEV 演示齊，三個狀態、四種轉變（handoff）；owner 接受作演示</td><td>階段 2 收尾：演技、口形、正式接入</td></tr></table>
+<section class="change"><h3>NW 0 → +1 <small>nw:focal，佔全部提案 5.5%</small></h3>
+<div class="cols"><dl>
+<dt>邊個選擇推向呢邊</dt><dd>日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？<br><b>「人に相談する機会は少なくても、いつでも自動で利用したい」</b></dd>
+<dt>結果卡第一句（guest 嘅選擇）</dt><dd>あなたは、自分の都合でいつでも使えるサービスを大切にしました。</dd>
+<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、この拠点では、自分の都合で使える自律サービスの端口が増えました。<br><small>地點標示：デックス西</small></dd>
+<dt>變咗之後呢度做緊乜（設施卡）</dt><dd><b>時間に縛られないサービス</b><br>自分の都合でサービスを使いたい。街には、自律サービスの端口や、配送を支える発着の場所があります。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/nw-focal__0__h12.jpg"><figcaption>0（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-focal__+1__h12.jpg"><figcaption>+1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-focal__0__h22.jpg"><figcaption>0（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-focal__+1__h22.jpg"><figcaption>+1（22:00）</figcaption></figure></div></div></section>
+<section class="change"><h3>NW 0 → -1 <small>nw:focal-low，佔全部提案 5.1%</small></h3>
+<div class="cols"><dl>
+<dt>邊個選擇推向呢邊</dt><dd>日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？<br><b>「待ち時間があっても、人に相談したい。技術はその人を支えてほしい」</b></dd>
+<dt>結果卡第一句（guest 嘅選擇）</dt><dd>あなたは、人に相談できる日常を大切にしました。</dd>
+<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、この拠点では、人に相談できる窓口が増えました。<br><small>地點標示：デックス西</small></dd>
+<dt>變咗之後呢度做緊乜（設施卡）</dt><dd><b>人に相談できる街</b><br>人と話しながら用事を済ませたい。その思いに応えるため、街には対面のサービスを支える場所があります。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/nw-focal-low__0__h12.jpg"><figcaption>0（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-focal-low__-1__h12.jpg"><figcaption>-1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-focal-low__0__h22.jpg"><figcaption>0（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-focal-low__-1__h22.jpg"><figcaption>-1（22:00）</figcaption></figure></div></div></section><h3>階段 2：デックス西 — 湊（ミナト）、52 歳、案内係</h3><table><tr><th>實際變化</th><th>台詞（字幕）</th><th>行動</th><th>得／失</th></tr><tr><td>向自律（→ +1）</td><td>真夜中でも荷物は届きます。でも、私の窓口は今日で閉まりました。</td><td>拉低窗口閘、熄燈；無人機喺頭上飛過；佢攞住平板行開</td><td>得：全日服務。失：對面嘅人</td></tr><tr><td>向人員（→ −1）</td><td>窓口に列ができています。待たせるけれど、顔を見て話せます。</td><td>企喺窗口後面，前面排咗五個人，向第一位鞠躬</td><td>得：傾到偈。失：要等</td></tr><tr><td>由自律返中間（+1 → 0）</td><td>昼だけ窓口が戻りました。夜は、機械に任せています。</td><td>將包裹交俾機械臂，轉身同訪客傾偈</td><td>得：日頭有人。失：夜晚冇</td></tr><tr><td>由人員返中間（−1 → 0）</td><td>簡単な用事は機械へ。そのぶん、困った人とゆっくり話せます。</td><td>同上</td><td>得：有時間。失：少咗見面</td></tr></table></article>
+<article id="NW bays"><h2>NW bays — <code>nw:stage-west</code>／<code>stage-mid</code>／district <small>19.4%</small></h2>
+<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td>收貨（Bay R2）</td><td>未設計。提議：切返去湊同一個佈景</td><td>定 district 變化點樣接居民（owner 決定）</td></tr></table>
+<section class="change"><h3>NW +3 → +2 <small>nw:stage-west，佔全部提案 13.9%</small></h3>
+<div class="cols"><dl>
+<dt>邊個選擇推向呢邊</dt><dd>日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？<br><b>「待ち時間があっても、人に相談したい。技術はその人を支えてほしい」</b></dd>
+<dt>結果卡第一句（guest 嘅選擇）</dt><dd>あなたは、人に相談できる日常を大切にしました。</dd>
+<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、サービス拠点と移動の構成が変わり、日々の用事を支える配置が調整されました。<br><small>地點標示：水辺のサービス拠点・移動ルート</small></dd>
+<dt>變咗之後呢度做緊乜（設施卡）</dt><dd><b>時間に縛られないサービス</b><br>自分の都合でサービスを使いたい。街には、自律サービスの端口や、配送を支える発着の場所があります。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/nw-stage-west__+3__h12.jpg"><figcaption>+3（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-stage-west__+2__h12.jpg"><figcaption>+2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-stage-west__+3__h22.jpg"><figcaption>+3（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-stage-west__+2__h22.jpg"><figcaption>+2（22:00）</figcaption></figure></div></div></section>
+<section class="change"><h3>NW -2 → -1 <small>nw:stage-mid，佔全部提案 4.1%</small></h3>
+<div class="cols"><dl>
+<dt>邊個選擇推向呢邊</dt><dd>日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？<br><b>「人に相談する機会は少なくても、いつでも自動で利用したい」</b></dd>
+<dt>結果卡第一句（guest 嘅選擇）</dt><dd>あなたは、自分の都合でいつでも使えるサービスを大切にしました。</dd>
+<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、サービス拠点と移動の構成が変わり、日々の用事を支える配置が調整されました。<br><small>地點標示：水辺のサービス拠点・移動ルート</small></dd>
+<dt>變咗之後呢度做緊乜（設施卡）</dt><dd><b>人に相談できる街</b><br>人と話しながら用事を済ませたい。その思いに応えるため、街には対面のサービスを支える場所があります。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/nw-stage-mid__-2__h12.jpg"><figcaption>-2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-stage-mid__-1__h12.jpg"><figcaption>-1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-stage-mid__-2__h22.jpg"><figcaption>-2（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-stage-mid__-1__h22.jpg"><figcaption>-1（22:00）</figcaption></figure></div></div></section></article>
+<article id="SE focal"><h2>SE focal — フジテレビ東（−1／0／+1） <small>10.9%</small></h2>
+<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td>收貨（R4；+1 塔 Blender R3，9/12）</td><td>時子：只有台詞同行動草稿</td><td>階段 2 由揀鏡頭位開始</td></tr></table>
+<section class="change"><h3>SE 0 → -1 <small>se:focal-low，佔全部提案 5.6%</small></h3>
+<div class="cols"><dl>
+<dt>邊個選擇推向呢邊</dt><dd>買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？<br><b>「少し歩いても、水辺に点在する低い建物をめぐりたい」</b></dd>
+<dt>結果卡第一句（guest 嘅選擇）</dt><dd>あなたは、水辺を歩いて用事を済ませる日常を選びました。</dd>
+<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、この拠点では、歩いて用事を済ませる低い建物が暮らしを支える構成になりました。<br><small>地點標示：フジテレビ東</small></dd>
+<dt>變咗之後呢度做緊乜（設施卡）</dt><dd><b>用事のあいだに、海辺を歩く</b><br>暮らしの用事を、街を歩きながら済ませたい。低い機能ポッドが点在し、いくつかの場所をめぐる日常を支えています。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/se-focal-low__0__h12.jpg"><figcaption>0（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-focal-low__-1__h12.jpg"><figcaption>-1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-focal-low__0__h22.jpg"><figcaption>0（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-focal-low__-1__h22.jpg"><figcaption>-1（22:00）</figcaption></figure></div></div></section>
+<section class="change"><h3>SE 0 → +1 <small>se:focal，佔全部提案 5.2%</small></h3>
+<div class="cols"><dl>
+<dt>邊個選擇推向呢邊</dt><dd>買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？<br><b>「上へ移動して、一つのタワーで用事を済ませたい」</b></dd>
+<dt>結果卡第一句（guest 嘅選擇）</dt><dd>あなたは、一つのタワーで用事を済ませる日常を選びました。</dd>
+<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、この拠点では、上下に用事をつなぐタワーが暮らしを支える構成になりました。<br><small>地點標示：フジテレビ東</small></dd>
+<dt>變咗之後呢度做緊乜（設施卡）</dt><dd><b>暮らしを、縦につなぐ</b><br>一つの場所で、いくつもの用事を済ませたい。タワーや空中のつながりが、上下に広がる日常を支えています。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/se-focal__0__h12.jpg"><figcaption>0（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-focal__+1__h12.jpg"><figcaption>+1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-focal__0__h22.jpg"><figcaption>0（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-focal__+1__h22.jpg"><figcaption>+1（22:00）</figcaption></figure></div></div></section><h3>階段 2：フジテレビ東 — 時子（トキ）、81 歳、近くの住民</h3><table><tr><th>實際變化</th><th>台詞（字幕）</th><th>行動</th><th>得／失</th></tr><tr><td>向集中（→ +1）</td><td>一つの塔で、用事が全部済みます。海辺を歩く理由は、なくなりました。</td><td>行入塔嘅升降機，暖光升上去；海邊張櫈空咗</td><td>得：方便。失：散步</td></tr><tr><td>向分散（→ −1）</td><td>店は遠くなりました。そのぶん、毎日海を見ながら歩いています。</td><td>撐住拐杖沿有蓋步道行，停低望海</td><td>得：海邊日常。失：路遠</td></tr><tr><td>由集中返中間（+1 → 0）</td><td>用事が二か所に分かれました。途中のベンチが、私の休憩所です。</td><td>坐喺半路張櫈休息，身邊放住購物袋</td><td>得：有理由出街。失：一站完成</td></tr><tr><td>由分散返中間（−1 → 0）</td><td>近くに中くらいの館ができました。雨の日は、そこで済ませます。</td><td>同上</td><td>得：落雨方便。失：少行咗</td></tr></table></article>
+<article id="SE 塔"><h2>SE 塔＋pod 組件 — <code>se:stage-east</code>／<code>stage-south</code> <small>19.7%</small></h2>
+<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td>階段 1 進行中，R3 日 20/30、夜 19/30，待驗收</td><td>提議：切返去時子</td><td>階段 1</td></tr></table>
+<section class="change"><h3>SE -1 → -2 <small>se:stage-east，佔全部提案 16.7%</small></h3>
+<div class="cols"><dl>
+<dt>邊個選擇推向呢邊</dt><dd>買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？<br><b>「少し歩いても、水辺に点在する低い建物をめぐりたい」</b></dd>
+<dt>結果卡第一句（guest 嘅選擇）</dt><dd>あなたは、水辺を歩いて用事を済ませる日常を選びました。</dd>
+<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、建物の構成が変わり、暮らしの用事を分け合う場所の配置が調整されました。<br><small>地點標示：街に点在する建物</small></dd>
+<dt>變咗之後呢度做緊乜（設施卡）</dt><dd><b>用事のあいだに、海辺を歩く</b><br>暮らしの用事を、街を歩きながら済ませたい。低い機能ポッドが点在し、いくつかの場所をめぐる日常を支えています。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/se-stage-east__-1__h12.jpg"><figcaption>-1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-stage-east__-2__h12.jpg"><figcaption>-2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-stage-east__-1__h22.jpg"><figcaption>-1（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-stage-east__-2__h22.jpg"><figcaption>-2（22:00）</figcaption></figure></div></div></section>
+<section class="change"><h3>SE -2 → -3 <small>se:stage-south，佔全部提案 2.9%</small></h3>
+<div class="cols"><dl>
+<dt>邊個選擇推向呢邊</dt><dd>買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？<br><b>「少し歩いても、水辺に点在する低い建物をめぐりたい」</b></dd>
+<dt>結果卡第一句（guest 嘅選擇）</dt><dd>あなたは、水辺を歩いて用事を済ませる日常を選びました。</dd>
+<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、建物の構成が変わり、暮らしの用事を分け合う場所の配置が調整されました。<br><small>地點標示：街に点在する建物</small></dd>
+<dt>變咗之後呢度做緊乜（設施卡）</dt><dd><b>用事のあいだに、海辺を歩く</b><br>暮らしの用事を、街を歩きながら済ませたい。低い機能ポッドが点在し、いくつかの場所をめぐる日常を支えています。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/se-stage-south__-2__h12.jpg"><figcaption>-2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-stage-south__-3__h12.jpg"><figcaption>-3（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-stage-south__-2__h22.jpg"><figcaption>-2（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-stage-south__-3__h22.jpg"><figcaption>-3（22:00）</figcaption></figure></div></div></section></article>
+<article id="SW rooms"><h2>SW rooms — <code>sw:stage-rooms-west</code>／<code>east</code> <small>17.4%</small></h2>
+<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td><b>未打磨</b></td><td>未有居民（共有軸）</td><td>階段 1；同時定 SW 居民</td></tr></table>
+<section class="change"><h3>SW +1 → +2 <small>sw:stage-rooms-west，佔全部提案 11.0%</small></h3>
+<div class="cols"><dl>
+<dt>邊個選擇推向呢邊</dt><dd>海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？<br><b>「予約せず、誰でも一緒に使える開かれた海辺」</b></dd>
+<dt>結果卡第一句（guest 嘅選擇）</dt><dd>あなたは、予約せずに誰でも使える海辺を大切にしました。</dd>
+<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、水辺や庭の構成が変わり、静かに休む場所と集まれる場所の配置が調整されました。<br><small>地點標示：水辺の居場所・庭の広場</small></dd>
+<dt>變咗之後呢度做緊乜（設施卡）</dt><dd><b>予約せずに、海辺へ</b><br>思い立ったときに、誰でも海辺で過ごしたい。開かれた座席や広場が、集まれる場所を支えています。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/sw-stage-rooms-west__+1__h12.jpg"><figcaption>+1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-rooms-west__+2__h12.jpg"><figcaption>+2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-rooms-west__+1__h22.jpg"><figcaption>+1（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-rooms-west__+2__h22.jpg"><figcaption>+2（22:00）</figcaption></figure></div></div></section>
+<section class="change"><h3>SW -2 → -3 <small>sw:stage-rooms-east，佔全部提案 6.4%</small></h3>
+<div class="cols"><dl>
+<dt>邊個選擇推向呢邊</dt><dd>海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？<br><b>「予約して、一人や親しい人と静かに過ごせる場所」</b></dd>
+<dt>結果卡第一句（guest 嘅選擇）</dt><dd>あなたは、一人や親しい人と静かに過ごす時間を大切にしました。</dd>
+<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、水辺や庭の構成が変わり、静かに休む場所と集まれる場所の配置が調整されました。<br><small>地點標示：水辺の居場所・庭の広場</small></dd>
+<dt>變咗之後呢度做緊乜（設施卡）</dt><dd><b>海辺に、自分の時間を</b><br>一人や親しい人と静かに過ごしたい。庭や囲われた小さな空間が、海辺に落ち着ける居場所をつくっています。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/sw-stage-rooms-east__-2__h12.jpg"><figcaption>-2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-rooms-east__-3__h12.jpg"><figcaption>-3（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-rooms-east__-2__h22.jpg"><figcaption>-2（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-rooms-east__-3__h22.jpg"><figcaption>-3（22:00）</figcaption></figure></div></div></section></article>
+<article id="SW focal"><h2>SW focal — アクアシティ南 <small>10.5%</small></h2>
+<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td><b>未打磨</b></td><td>未有居民</td><td>階段 1</td></tr></table>
+<section class="change"><h3>SW 0 → +1 <small>sw:focal，佔全部提案 10.5%</small></h3>
+<div class="cols"><dl>
+<dt>邊個選擇推向呢邊</dt><dd>海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？<br><b>「予約せず、誰でも一緒に使える開かれた海辺」</b></dd>
+<dt>結果卡第一句（guest 嘅選擇）</dt><dd>あなたは、予約せずに誰でも使える海辺を大切にしました。</dd>
+<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、この水辺では、予約せずに使える共有席が増えました。<br><small>地點標示：アクアシティ南</small></dd>
+<dt>變咗之後呢度做緊乜（設施卡）</dt><dd><b>予約せずに、海辺へ</b><br>思い立ったときに、誰でも海辺で過ごしたい。開かれた座席や広場が、集まれる場所を支えています。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/sw-focal__0__h12.jpg"><figcaption>0（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-focal__+1__h12.jpg"><figcaption>+1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-focal__0__h22.jpg"><figcaption>0（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-focal__+1__h22.jpg"><figcaption>+1（22:00）</figcaption></figure></div></div></section>
+<section class="change"><h3>SW 0 → -1 <small>sw:focal，佔全部提案 10.5%</small></h3>
+<div class="cols"><dl>
+<dt>邊個選擇推向呢邊</dt><dd>海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？<br><b>「予約して、一人や親しい人と静かに過ごせる場所」</b></dd>
+<dt>結果卡第一句（guest 嘅選擇）</dt><dd>あなたは、一人や親しい人と静かに過ごす時間を大切にしました。</dd>
+<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、この水辺では、静かに過ごすための囲われた席が増えました。<br><small>地點標示：アクアシティ南</small></dd>
+<dt>變咗之後呢度做緊乜（設施卡）</dt><dd><b>海辺に、自分の時間を</b><br>一人や親しい人と静かに過ごしたい。庭や囲われた小さな空間が、海辺に落ち着ける居場所をつくっています。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/sw-focal__0__h12.jpg"><figcaption>0（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-focal__-1__h12.jpg"><figcaption>-1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-focal__0__h22.jpg"><figcaption>0（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-focal__-1__h22.jpg"><figcaption>-1（22:00）</figcaption></figure></div></div></section></article>
+<article id="SW courts"><h2>SW courts — <code>sw:stage-courts-west</code>／<code>south</code> <small>7.2%</small></h2>
+<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td><b>未打磨</b></td><td>未有居民</td><td>階段 1</td></tr></table>
+<section class="change"><h3>SW +2 → +1 <small>sw:stage-courts-west，佔全部提案 4.4%</small></h3>
+<div class="cols"><dl>
+<dt>邊個選擇推向呢邊</dt><dd>海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？<br><b>「予約して、一人や親しい人と静かに過ごせる場所」</b></dd>
+<dt>結果卡第一句（guest 嘅選擇）</dt><dd>あなたは、一人や親しい人と静かに過ごす時間を大切にしました。</dd>
+<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、水辺や庭の構成が変わり、静かに休む場所と集まれる場所の配置が調整されました。<br><small>地點標示：水辺の居場所・庭の広場</small></dd>
+<dt>變咗之後呢度做緊乜（設施卡）</dt><dd><b>予約せずに、海辺へ</b><br>思い立ったときに、誰でも海辺で過ごしたい。開かれた座席や広場が、集まれる場所を支えています。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/sw-stage-courts-west__+2__h12.jpg"><figcaption>+2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-courts-west__+1__h12.jpg"><figcaption>+1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-courts-west__+2__h22.jpg"><figcaption>+2（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-courts-west__+1__h22.jpg"><figcaption>+1（22:00）</figcaption></figure></div></div></section>
+<section class="change"><h3>SW -3 → -2 <small>sw:stage-courts-south，佔全部提案 2.8%</small></h3>
+<div class="cols"><dl>
+<dt>邊個選擇推向呢邊</dt><dd>海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？<br><b>「予約せず、誰でも一緒に使える開かれた海辺」</b></dd>
+<dt>結果卡第一句（guest 嘅選擇）</dt><dd>あなたは、予約せずに誰でも使える海辺を大切にしました。</dd>
+<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、水辺や庭の構成が変わり、静かに休む場所と集まれる場所の配置が調整されました。<br><small>地點標示：水辺の居場所・庭の広場</small></dd>
+<dt>變咗之後呢度做緊乜（設施卡）</dt><dd><b>海辺に、自分の時間を</b><br>一人や親しい人と静かに過ごしたい。庭や囲われた小さな空間が、海辺に落ち着ける居場所をつくっています。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/sw-stage-courts-south__-3__h12.jpg"><figcaption>-3（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-courts-south__-2__h12.jpg"><figcaption>-2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-courts-south__-3__h22.jpg"><figcaption>-3（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-courts-south__-2__h22.jpg"><figcaption>-2（22:00）</figcaption></figure></div></div></section></article>
+<article id="能源"><h2>能源四部件 <small>4.5%</small></h2>
+<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td>早期 batch 已整合，未按 taste v2 重審</td><td>未有居民</td><td>最後；先由 owner 判斷使唔使打磨</td></tr></table>
+<section class="change"><dl><dt>邊個選擇</dt><dd>毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？<br><b>「水の音や機械が身近でも、海辺の庭で電気を蓄える暮らし」</b><br><b>「大きな機械が景色に加わっても、街の中心で電気を蓄える暮らし」</b><br><b>「海の上に受け取る面が広がっても、空から届く電気を使う暮らし」</b><br><b>「海の一部が設備の陸地に変わっても、沖の原子力施設から電気を届ける暮らし」</b></dd>
+<dt>呢啲設施做緊乜（設施卡）</dt><dd><b>海辺の庭に、電気を蓄える</b><br>外から届く電力で水をくみ上げ、落水を通して取り出す蓄電庭園です。水辺の居場所と、エネルギー設備が隣り合っています。<br><b>街の中心で、電気を蓄える</b><br>フジテレビの劇場とは別の環が、外部の電力で回転して蓄えます。劇場と公共の動線は、そのまま残っています。<br><b>海の上で、空からの電気を受け取る</b><br>海上に広がる翼は、軌道から届く電力を受け取る設備です。海の景色と空間を使う、2127年の構想です。<br><b>電気のために、海の境界が変わる</b><br>沖の原子力施設を置く島と、検修の橋が街につながっています。電気を届ける場所を確保するために、海の一部を陸地として使っています。</dd></dl><p><small>能源近鏡未有前後對照截圖。</small></p></section></article>
+</html>

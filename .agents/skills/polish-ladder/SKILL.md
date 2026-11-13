@@ -24,10 +24,11 @@ Roles on both rungs (owner 2026-11-11): **you advise** — diagnose, write specs
 
 ## Change sheet
 
-`~/city2127-evidence/change-review/index.html` is the owner's one-page review: per unit, the choice that pushes each change, the result-card sentences, what the building does, before/after frames and the resident's lines. It is generated, never edited: status and residents come from the plan, copy from `src/surveyAtmosphere.ts`, options from the live question set.
+`artifacts/change-review/index.html` is the owner's one-page review: per unit, the choice that pushes each change, the result-card sentences, what the building does, before/after frames and the resident's lines. It is committed and generated, never edited by hand: status and residents come from the plan, copy from `src/surveyAtmosphere.ts`, options from the live question set.
 
 - Regenerate with `node --experimental-strip-types scripts/changeSheet.ts` whenever the plan, the result or facility copy, or the question set changed.
 - When a model, camera or transition changed, first refresh the frames: start Vite and run `node scripts/closeupSheet.mjs <vite url>` (about ten minutes; it skips frames that exist, so delete the unit's `<shot>__*.jpg` in `~/city2127-evidence/stage-closeups/sheet/` first).
+- Commit the regenerated `artifacts/change-review/` with the change that caused it.
 - A new unit or resident needs one line in `UNITS` in `scripts/changeSheet.ts`; the script fails loudly when the plan and `UNITS` disagree.
 
 ## Working with the Sonnet agent

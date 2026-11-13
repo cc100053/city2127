@@ -15,7 +15,7 @@
 
 揀下一個單位、判斷佢喺邊一級、做完更新下面個表：[polish-ladder](../.agents/skills/polish-ladder/SKILL.md)。
 
-Owner 審閱用嘅總覽（選擇 → 變化說明 → 建築做緊乜 → 前後對照 → 居民）係生成出嚟嘅：`node --experimental-strip-types scripts/changeSheet.ts` → `~/city2127-evidence/change-review/index.html`。下面個總表同居民表就係佢嘅資料來源，改完呢份文件要重新生成。
+Owner 審閱用嘅總覽（選擇 → 變化說明 → 建築做緊乜 → 前後對照 → 居民）係生成出嚟嘅：`node --experimental-strip-types scripts/changeSheet.ts` → `artifacts/change-review/index.html`。下面個總表同居民表就係佢嘅資料來源，改完呢份文件要重新生成。
 
 ## 命題
 

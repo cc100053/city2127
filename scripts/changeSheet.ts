@@ -1,9 +1,11 @@
 // Change review sheet for the owner: per change unit, which choice pushes it, what the result card says, what the building does, before/after frames, and the resident scene.
 // Nothing is typed here twice: status and residents come from docs/RESIDENT_SCENE_PLAN.md, copy from src/surveyAtmosphere.ts, options from the live question set, frames from scripts/closeupSheet.mjs.
 // Run: node --experimental-strip-types scripts/changeSheet.ts   (re-run closeupSheet.mjs first when a model or camera changed)
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+// Writes artifacts/change-review/ (committed): index.html and 960 px copies of the frames, refreshed only when the evidence frame is newer.
+import { execFileSync } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { evidenceDir, evidenceRoot } from './evidence.mjs';
+import { evidenceRoot } from './evidence.mjs';
 import { RESIDENT_CARDS, residentResult } from '../src/surveyAtmosphere.ts';
 
 type Row = { shot: string; site: 'nw' | 'sw' | 'se' | 'ne'; from: string; to: string; share: number };
@@ -41,11 +43,22 @@ function table(text: string, heading: string) {
 const plan = readFileSync('docs/RESIDENT_SCENE_PLAN.md', 'utf8');
 const questions: { id: string; text: string; options: { id: string; label: string; effects?: Record<string, number> }[] }[] = JSON.parse(readFileSync('survey/src/survey/questions.exhibition.json', 'utf8')).questions;
 const question = (id: string) => { const q = questions.find(q => q.id === id); if (!q) throw new Error(`question set has no ${id}`); return q; };
-const frames = join(evidenceRoot, 'stage-closeups', 'sheet');
-const rows: Row[] = existsSync(join(frames, 'rows.json')) ? JSON.parse(readFileSync(join(frames, 'rows.json'), 'utf8')) : [];
+const frames = join(evidenceRoot, 'stage-closeups', 'sheet'), OUT = 'artifacts/change-review';
+mkdirSync(join(OUT, 'frames'), { recursive: true });
+// rows.json is committed beside the sheet, so a checkout without the evidence folder can still regenerate the text.
+if (existsSync(join(frames, 'rows.json'))) writeFileSync(join(OUT, 'rows.json'), readFileSync(join(frames, 'rows.json')));
+const rows: Row[] = existsSync(join(OUT, 'rows.json')) ? JSON.parse(readFileSync(join(OUT, 'rows.json'), 'utf8')) : [];
 const unitRows = table(plan, '## 變化單位總表');
 const band = (tier: string) => Number(tier) > 0 ? 2 : Number(tier) < 0 ? 0 : 1;
-const img = (r: Row, tier: string, hour: number) => `<figure><img loading="lazy" src="../stage-closeups/sheet/${r.shot.replace(':', '-')}__${tier}__h${hour}.jpg"><figcaption>${tier}（${hour}:00）</figcaption></figure>`;
+let copied = 0;
+function img(r: Row, tier: string, hour: number) {
+  const name = `${r.shot.replace(':', '-')}__${tier}__h${hour}.jpg`, src = join(frames, name), dest = join(OUT, 'frames', name);
+  if (existsSync(src) && (!existsSync(dest) || statSync(src).mtimeMs > statSync(dest).mtimeMs)) {
+    execFileSync('sips', ['-Z', '960', '-s', 'format', 'jpeg', '-s', 'formatOptions', '75', src, '--out', dest], { stdio: 'ignore' }); // macOS built-in; the frames only exist on the owner's Mac
+    copied++;
+  }
+  return `<figure><img loading="lazy" src="frames/${name}"><figcaption>${tier}（${hour}:00）</figcaption></figure>`;
+}
 
 function change(r: Row) {
   const site = SITES[r.site], q = question(site.question), up = Number(r.to) > Number(r.from);
@@ -82,7 +95,7 @@ const units = UNITS.map(u => {
 ${mine.map(change).join('\n')}${energy}${mine.length || energy ? '' : '<p><small>未有前後對照截圖：先跑 scripts/closeupSheet.mjs。</small></p>'}${story}</article>` };
 });
 
-const out = join(evidenceDir('change-review'), 'index.html');
+const out = join(OUT, 'index.html');
 writeFileSync(out, `<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><title>變化總覽 — city2127</title>
 <style>body{font:15px/1.6 system-ui,"Noto Sans JP",sans-serif;margin:24px auto;max-width:1500px;padding:0 20px;background:#f4f3ee;color:#222}
 h1{font-size:26px}h2{font-size:21px;margin:0 0 8px}h3{font-size:16px;margin:18px 0 6px}small{color:#667;font-weight:400}code{background:#e6e4da;padding:0 4px;border-radius:3px}
@@ -99,4 +112,4 @@ ${units.map((u, i) => `<tr><td><a href="#${esc(UNITS[i].plan)}">${md(u.row[0])}<
 ${units.map(u => u.html).join('\n')}
 </html>`);
 const loose = rows.filter(r => !UNITS.some(u => u.shots.test(r.shot)));
-console.log(`${units.length} units, ${rows.length} change rows → ${out}${loose.length ? `; rows in no unit: ${loose.map(r => r.shot).join(', ')}` : ''}`);
+console.log(`${units.length} units, ${rows.length} change rows, ${copied} frames refreshed → ${out}${loose.length ? `; rows in no unit: ${loose.map(r => r.shot).join(', ')}` : ''}`);

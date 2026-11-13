@@ -1,0 +1,100 @@
+[
+ {
+  "shot": "se:stage-east",
+  "site": "se",
+  "from": "-1",
+  "to": "-2",
+  "share": 0.167375
+ },
+ {
+  "shot": "nw:stage-west",
+  "site": "nw",
+  "from": "+3",
+  "to": "+2",
+  "share": 0.139375
+ },
+ {
+  "shot": "sw:stage-rooms-west",
+  "site": "sw",
+  "from": "+1",
+  "to": "+2",
+  "share": 0.109875
+ },
+ {
+  "shot": "sw:focal",
+  "site": "sw",
+  "from": "0",
+  "to": "+1",
+  "share": 0.105
+ },
+ {
+  "shot": "sw:focal",
+  "site": "sw",
+  "from": "0",
+  "to": "-1",
+  "share": 0.105
+ },
+ {
+  "shot": "sw:stage-rooms-east",
+  "site": "sw",
+  "from": "-2",
+  "to": "-3",
+  "share": 0.06375
+ },
+ {
+  "shot": "se:focal-low",
+  "site": "se",
+  "from": "0",
+  "to": "-1",
+  "share": 0.056125
+ },
+ {
+  "shot": "nw:focal",
+  "site": "nw",
+  "from": "0",
+  "to": "+1",
+  "share": 0.05525
+ },
+ {
+  "shot": "se:focal",
+  "site": "se",
+  "from": "0",
+  "to": "+1",
+  "share": 0.052375
+ },
+ {
+  "shot": "nw:focal-low",
+  "site": "nw",
+  "from": "0",
+  "to": "-1",
+  "share": 0.0505
+ },
+ {
+  "shot": "sw:stage-courts-west",
+  "site": "sw",
+  "from": "+2",
+  "to": "+1",
+  "share": 0.043625
+ },
+ {
+  "shot": "nw:stage-mid",
+  "site": "nw",
+  "from": "-2",
+  "to": "-1",
+  "share": 0.041375
+ },
+ {
+  "shot": "se:stage-south",
+  "site": "se",
+  "from": "-2",
+  "to": "-3",
+  "share": 0.029375
+ },
+ {
+  "shot": "sw:stage-courts-south",
+  "site": "sw",
+  "from": "-3",
+  "to": "-2",
+  "share": 0.028
+ }
+]
