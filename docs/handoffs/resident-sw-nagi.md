@@ -43,7 +43,7 @@
 
 2026-11-14，起點 e1a3e02（working tree 含下述 DEV 小改動，截圖 sidecar 標 dirty）。Vite DEV、無頭 Chrome 1600×900、`hour=12`／`22`、`reviewTime=40`；證據在 `~/city2127-evidence/resident-sw-nagi/survey/`（候選）與 `step3/`（最終），不入 Git。已發布的記錄層：[artifacts/resident-sw-nagi/baseline](../../artifacts/resident-sw-nagi/baseline/)（含 [contact-sheet.jpg](../../artifacts/resident-sw-nagi/baseline/contact-sheet.jpg)：上排日、下排夜，左至右 −1／0／+1）。
 
-**採用鏡位（e2）**（基準圖已用 `&nomarker` 重截）：世界座標位置 `(-88, 5.2, 262)`，目標 `(-88, 3.4, 285)`，FOV 52°。即站在右側地軌（x = −88）軸線上、地軌南端之外約 17 m、高 5.2 m，沿軌道望向棚。
+**採用鏡位（e2）**（基準圖已於縮小群像、移除橙環後重截）：世界座標位置 `(-88, 5.2, 262)`，目標 `(-88, 3.4, 285)`，FOV 52°。即站在右側地軌（x = −88）軸線上、地軌南端之外約 17 m、高 5.2 m，沿軌道望向棚。
 
 ```
 ?meters=sw:<low|mixed|high>&shot=free&pose=-88,5.2,262,-88,3.4,285&fov=52&nopanel&hour=12&reviewTime=40
@@ -62,27 +62,24 @@
 - c8（左軌軸線 x = −112）：−1 時鏡頭落進樹叢，畫面被樹冠糊掉。
 - e3／e4（同軸後退或前移）：e4 在 3 m 高下 +1 仍是整面牆；e3 離太遠。e2（5.2 m）是 +1 能看到平台的最低一檔。
 
-**人物尺度係數**（2026-11-14 於瀏覽器量度：取各狀態 `InstancedMesh` 的幾何高度乘實例矩陣的 y 縮放，世界米）：SW 的居民群像**三態一樣大**，不像 NW hub 的 ×1.0／×1.6／×2.6。
+**人物尺度係數**（瀏覽器量度，世界米；2026-11-14 owner 指示把群像縮至約 2–2.3 m）：SW 的居民群像**三態一樣大**，不像 NW hub 的 ×1.0／×1.6／×2.6。
 
-| 狀態 | 站立成人（`commons-people-stand`／`-talk`） | 座位者（`commons-people-seat`） |
+| 狀態 | 站立成人 | 座位者 |
 | --- | --- | --- |
-| −1 | 2.95 m（×1.00） | 3.71 m（pod 內座位另乘 `big` 1.2） |
-| 0 | 2.95 m（×1.00） | 3.09 m |
-| +1 | 2.95 m（×1.00） | 3.09 m |
+| 改前（`FIG` 1.15，量度值） | 2.95 m | 0／+1 為 3.09 m；−1 pod 座位 3.71 m（另乘 `big` 1.2） |
+| 改後（`FIG` .86，由比例計算，未重量） | 約 2.2 m（−1／0／+1 同） | 0／+1 約 2.3 m；−1 pod 座位約 2.8 m |
 
-**為什麼是約 2.9 m**：不是量錯，是刻意放大。`commonsPlaza.ts` 的 `FIG = 1.15`，註解寫明「adults ≈ 2.9 m… larger than life, as the targets show people」：英雄鏡頭離場址約 80 m，1.7 m 的真人比例會小得看不見，所以群像（及 NW hub 的 ×1.0–2.6）都放大。但棚的模組是真實米制（8.6 m 寬、3.2 m 高，門約 2 m 多），於是同一畫面內「放大的群像」與「真實尺寸的模組」並存，2.95 m 的人與 3.2 m 的模組幾乎等高。
-
-故鏡頭關係三態共用，不需按狀態縮放；**待 owner 決定凪的尺寸**（步驟 5 前）：(a) 凪取真人約 1.7 m，進得了模組門，但小於周邊群像；(b) 凪取群像 2.95 m，與周邊一致，但須放大模組門框或模組（動到已驗收的階段 1 模型，不建議）；(c) 拍子期間周邊群像淡出或縮小。傾向 (a)；`prompts.md` 的目標圖暫以真人比例描述凪。
+**為什麼原本是約 2.9 m**：刻意放大。`commonsPlaza.ts` 的 `FIG` 曾為 1.15，註解寫「larger than life」：英雄鏡頭離場址約 80 m，1.7 m 的真人比例會小得看不見。但棚的模組是真實米制（8.6 m 寬、3.2 m 高，門約 1.9–2.2 m，由畫面目測，未量 GLB），2.95 m 的人幾乎與模組等高，進不了門。**改動**：`FIG` 改為 .86（站立約 2.2 m），縮 25%；`sw:focal` 的 −1／+1 英雄鏡頭目測人群仍可辨（contact sheet 下排）。三態共用 `FIG`，故一併縮小；未重跑其他 site。凪建議取約 2.0–2.2 m（與群像同大，剛好進得了門）；門高須在步驟 5 前以 GLB 量實，必要時凪再取小一點。
 
 **未處理／風險**：
-- **橙色粗線已查明**：是 `guest-marker-sw`（`siteRuntime.ts` `createGuestMarker`，貼地、y 0.47 m 的圓角框環，只在該站點有變化層時由 `cityChangeManager` 每幀設為可見，英雄鏡頭下用來標出站點）。低鏡頭下它像一條橫穿畫面的粗橙帶。已加 DEV 參數 `&nomarker` 把它釘成不可見，基準圖已無此線；居民拍子期間是否隱藏它是步驟 8（Beat）的決定，須 owner 判斷（隱藏即與 hero 的站點標示不連貫，但居民鏡頭不需要它）。
+- **橙色粗線已移除**：它是 `guest-marker-sw`（`createGuestMarker`，貼地 y 0.47 m 的圓角框環）。owner 2026-11-14 指示不需要，故 `cityChangeManager.ts` 改為 `mesh.visible = false`（對所有 site；材質與新變化脈衝仍照算，日後可恢復），[ART.md](../ART.md) 的 Saffron guest marker 列同步。測試只檢查材質 `emissiveIntensity`，不受影響。
 - **樹可以移動**（owner 2026-11-14）：mixed 前院的兩叢庭樹與 −1 的庭樹都由 `commonsPlaza.ts` 的 `tree()`／`bush()` 程式生成，並非烘焙網格，位置可改。故上文「樹入畫」不再是淘汰條件；Set 時把它們移出凪與模組的路線，並確保移動後三態的前景仍清楚。+1 的階梯基座牆（約 4 m）仍是鏡位須高於 5 m 的原因，沒有因此放寬。
 - 白色小拖車（tug）可以退場（owner 2026-11-14）：步驟 6 讓它在居民拍子開始前駛離或隱藏，換凪的模組駛入。
 - 鏡位在右軌軸線，故凪的模組須是右軌（x = −88）的 showpiece（`SHOW` 的 `track`），**不是**進入時走完整吊運的 headline 模組（它由左軌 x = −112 駛入，該軸線在 −1 被樹遮住——樹既可移動，這條軸線其實也可重評）。居民拍子要的是「模組駛向她」，須在 Set 另設動畫。
 - 模組朝向：軌道沿 z 軸，模組端面朝南（朝鏡頭），門在端面左側；凪由棚側（北）走近還是由鏡頭側（南）走近，須在步驟 6 決定，後者她會背向鏡頭。
 - 只量過日景 12 時與夜景 22 時的靜止畫面，沒有量過過場中的遮擋；沒有取樣 FPS。
 
-**DEV 程式改動**（只在 `import.meta.env.DEV` 內）：`src/main.ts` 的 `cityPose` 加可選 `fov`；新增 `?shot=free&pose=px,py,pz,tx,ty,tz[&fov=]`（讓 `npm run capture` 可取任意世界座標的鏡位）；`?nopanel` 隱藏 DEV 面板；`?nomarker` 隱藏站點橙環；`window.cityScene`／`cityCamera` 供瀏覽器內量度。參數名不可用 `cam`，它已被 review 鏡頭佔用。
+**程式改動**：`commonsPlaza.ts` `FIG` 1.15→.86、`cityChangeManager.ts` 隱藏站點標示環（兩者非 DEV 專屬，影響正式畫面）。**DEV 專屬**（只在 `import.meta.env.DEV` 內）：`src/main.ts` 的 `cityPose` 加可選 `fov`；新增 `?shot=free&pose=px,py,pz,tx,ty,tz[&fov=]`（讓 `npm run capture` 可取任意世界座標的鏡位）；`?nopanel` 隱藏 DEV 面板；`window.cityScene`／`cityCamera` 供瀏覽器內量度。參數名不可用 `cam`，它已被 review 鏡頭佔用。
 
 ## Step 4 targets
 

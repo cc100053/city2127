@@ -16,7 +16,7 @@ Reuse factories/materials from `cityRig`, `odaibaScene`, `civicCore` and `distri
 | Living green | Roof gardens, crowns, pergolas, planted balconies and waterfront edges |
 | Stone / pale paving | Public terraces, courts and site grounds |
 | Civic mint / warm public light | Persistent route edges, services, berth and public-space readability |
-| Saffron guest marker | Existing local changed-site marker |
+| Saffron guest marker | Hidden (owner 2026-11-14); `createGuestMarker` and its fresh pulse remain in code |
 | Meter pulse colours | Automation blue `#3fa9ff`, sharing rose `#ff6f91`, environment green `#5fe08a`, concentration amber `#ffb347` |
 
 Persistent civic lighting and live proposal pulses have different meanings. Meter colours are allowed semantic accents; the former “saffron is the only guest accent” rule is superseded. Shared city materials never flash for a vote.

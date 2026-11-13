@@ -256,7 +256,7 @@ const SEAT_DROP = .21; // unscaled height of the thigh underside above the feet
 const personMaterial = new T.MeshStandardMaterial({ vertexColors: true, roughness: .7 });
 const shirts = ['#ffffff', '#f1e9d6', '#bcd8ee', '#f2c7b0', '#cfe6c9', '#e6d3f0'].map(c => new T.Color(c));
 const kidShirts = ['#ff8a80', '#ffd54f', '#64b5f6'].map(c => new T.Color(c));
-const FIG = 1.15; // adults stand ≈ .72 units (≈ 2.9 m at 4 m/unit): larger than life, as the targets show people
+const FIG = .86; // adults stand ≈ .54 units (≈ 2.2 m at 4 m/unit): still larger than life for the hero view, but near the 2 m doors of the real-metre shelf modules (owner 2026-11-14; was 1.15 ≈ 2.9 m)
 
 // ---- pods ----
 

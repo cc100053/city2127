@@ -220,7 +220,7 @@ export class CityChangeManager {
       const shown = Math.max(0, ...[...motions.values()].map(motion => motion.group.visible ? motion.group.scale.y : 0));
       const rose = Math.max(-Infinity, ...[...motions.values()].map(motion => motion.to ? motion.fresh : -Infinity));
       const { mesh, material } = this.sites[siteId].marker;
-      mesh.visible = shown > HIDDEN_SCALE;
+      mesh.visible = false; // owner 2026-11-14: the flat saffron site outline is not needed (it cuts across low close-ups); the pulse below stays computed in case it returns
       material.opacity = Math.min(1, shown * 3);
       const age = now - rose;
       // A change scheduled after a vote journey has not started yet (negative age): no early blink.

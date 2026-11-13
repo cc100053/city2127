@@ -233,8 +233,6 @@ try {
   if(import.meta.env.DEV && (metersParam!==null||shotPreview))import('./devMeters').then(async({devLayout})=>{
     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     const first=devLayout(metersParam??'');holo.setTiers(first.tiers);
-    // `&nomarker`: hides the flat guest-site outline ring so resident-scene surveys see the ground clean (the change manager sets `visible` every frame, so it is pinned off).
-    if(params.has('nomarker'))scene.traverse(o=>{if(o.name.startsWith('guest-marker-'))Object.defineProperty(o,'visible',{get:()=>false,set:()=>{}});});
     cityChanges!.applyExhibitionLayout(first,'city-state-snapshot',now);
     const playMeters=(meters:string,at:number)=>{
       devShot=null;
