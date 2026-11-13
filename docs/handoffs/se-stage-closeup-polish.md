@@ -73,3 +73,11 @@ Terra restored room warmth, made props and occupants darker, added seated figure
 - Three blind judges scored day 20/20/20 and night 18/19/19. The median is **20/30 day, 19/30 night**. R3 vs R2: 14 wins, zero losses and one tie in both lighting conditions. Kept R3 in full. [Scored crops](../../artifacts/se-stage-closeup-polish/r3/vs-target.jpg).
 - Day and night below 2: `ep-ring` (glazing and room warmth), `ep-services` (use and occupants), `et-setbacks` (room/terrace contrast), `et-lift` (glazed shaft and cabin definition), `et-services` (distinct room functions), `et-wayfinding` (podium entrance), `st-twins` (glazed crossings), `st-twist` (entrance and floors), `st-life` (furniture and occupants), `st-material` (warmth and amber). Night additionally misses `ep-entry` because the figure blends into the threshold. The shared twist mid-rise transform compresses residents and the lift cabin to 45% height along with the building.
 - The [close-up skill](../../.agents/skills/closeup-polish/SKILL.md) ends the three-round cycle here when the scores are below full marks. Owner can accept this candidate or name another round. Main integration is pending that visual decision.
+
+## Library adoption — 2026-11-13
+
+On owner instruction, main (`fccd94b`, asset library) was merged into this branch. `build_district.py` now calls `asset/models/city-kit-2127/modules.py` (`glass_room`, `glass_lift`, `ring_doorways`, `furnish`, `Rect`/`Ring`, residents) in place of its inline closures; only `podium` stays local. The `package.json` test-list conflict was resolved by keeping `seDistrictGlb` and `assetLibrary`. `se-district-2127` has a row in `asset/models/LIBRARY.md`, and the two committed `__pycache__/*.pyc` files are untracked.
+
+- Rebuilt GLB SHA256 `cb433a32f232d4ed534328fbdc2fd4ff4abea8720ae13865d2492925fbc351e3`, byte-identical to R5. The R5 `.blend` is kept, because the geometry is identical and only file metadata would differ.
+- Root `npm test` (including `assetLibrary` and `seDistrictGlb`), `npm run build` and `git diff --check` PASS. No browser capture was needed, since the GLB is unchanged.
+- Next: polished library modules will change this GLB when `build_district.py` is re-run. Re-capture and judge after that.

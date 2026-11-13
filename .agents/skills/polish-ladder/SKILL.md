@@ -33,6 +33,6 @@ Roles on both rungs (owner 2026-11-11): **you advise** — diagnose, write specs
 ## What the owner has already decided
 
 - Path A: the city stays subtle; the drama is residents' lives. Every result gets a resident beat; about 20 s back to hero is acceptable.
-- Gemini target images come before any modelling, and the owner picks them. Blender GLB beats procedural three.js.
+- Gemini target images come before any modelling, and the owner picks them. Blender GLB beats procedural three.js. Every modelled part is routed through [asset/models/LIBRARY.md](../../../asset/models/LIBRARY.md) (reuse, extend, new entry, site-only) so the next unit starts from it.
 - Voting and ladder rules may be reshaped to steer guests to polished showpieces.
 - Formal wiring (the 13 s reading slot, leases, A/B scheduling, iPad screens) is a product-contract change and a separate task; both rungs end at an owner-accepted DEV result.
