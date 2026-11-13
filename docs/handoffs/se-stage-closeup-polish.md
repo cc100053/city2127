@@ -1,10 +1,10 @@
 # SE 塔＋pod — district close-up polish
 
 - Owner: cc100053（視覺驗收）；Codex 統籌，Terra 實作。
-- Status: IN_PROGRESS — R2 measured and scored, Terra building R3
+- Status: IN_PROGRESS — R3 candidate verified and scored, owner review pending
 - Branch: `feat/se-stage-closeup-polish`
 - Base commit: `056ce514a99587798756bcfcf2a74463e7b81cf5`
-- Last verified commit: `d80eb33` (R1)
+- Last verified commit: `9848a71` (R3 runtime and asset)
 - Remote availability: `origin/feat/se-stage-closeup-polish`
 
 ## Session Git state
@@ -12,6 +12,7 @@
 - 2026-11-12 由 `main` `056ce514a99587798756bcfcf2a74463e7b81cf5` 開始；fetch 成功，`main...origin/main` 為 0/0。
 - 原 checkout 有修改中文件、Blender skills 同截圖。任務喺由該 commit 建立嘅獨立 clone 做。
 - Integration: NOT INTEGRATED。
+- 2026-11-13 從遠端 `0d61cd0` 重建任務副本。上次暫存副本及未提交 R3 檔案已消失，原有日間試拍保留。Fetch 後 `origin/main` 仍為 `056ce51`，base 無落後。Terra 按原 R3 修改重建，並先提交及推送檢查點 `7aa6edf`。
 
 ## Goal and acceptance criteria
 
@@ -58,6 +59,17 @@ Terra built and integrated six Blender variants under `asset/models/se-district-
 Terra changed the opaque blocks into recessed service-room backs, added separate floor bands, figures, tables, doors, thresholds, planted decks and visible lift guides. The two SE camera paths now rise over the foreground during travel, with 140 m east and 100 m south midpoint offsets. Stop poses and timing stay at the R1 values.
 
 - GLB SHA256 `8da47d36b780f9b00ae4b0779926f214e66c269803fd6ca13bc1fe6661a8e67e`, 2,136,028 bytes, 35,792 triangles. Blender QA all six PASS, zero errors. Separate Blender reimport verified six variant roots, 36 meshes, six material roles. Multi-angle random/wire checked by Terra. Retained warnings: untextured overlapping UVs, planar n-gons, hidden back-to-back faces and enclosed components.
-- Root `npm test`, `npm run build`, `git diff --check` PASS by Terra. The camera test asserts both arc midpoints and unchanged endpoints. An independent 1600×900 DEV browser run repeated the five R1 transitions with the authored arc and checked stage, live builds, settlement and hero return. The travel clears the nearby facade at the sampled 3.8 s point. Headless Chrome 3200×1800, three day/night pairs, 0 page errors. Headed hero `se:high` 1920×1080 DPR 1, warm samples: day 45.6–47.1 FPS, night 46.2–48.3 FPS.
+- Root `npm test`, `npm run build`, `git diff --check` passed for Terra and independently. The camera test asserts both arc midpoints and unchanged endpoints. An independent 1600×900 DEV browser run repeated the five R1 transitions with the authored arc and checked stage, live builds, settlement and hero return. The travel clears the nearby facade at the sampled 3.8 s point. Headless Chrome 3200×1800, three day/night pairs, 0 page errors. Headed hero `se:high` 1920×1080 DPR 1, warm samples: day 45.6–47.1 FPS, night 46.2–48.3 FPS.
 - Median against target **16/30 day and night** (day totals 16/16/16, night 16/17/16). Pairwise R2 vs R1: 11 wins, 3 losses, 1 tie both. [Scored crops](../../artifacts/se-stage-closeup-polish/r2/vs-target.jpg). Only pod separation/trim reaches 2. R1 wins ring warmth, twist and south material, which share changed rooms with the R2 wins for entries, furniture and south interior life. Keep R2 as a whole, then recover the warmth in R3 with the furnished geometry intact.
 - Next: [R3 spec](../../artifacts/se-stage-closeup-polish/spec-r3.md). Owner visual acceptance and main integration pending.
+
+## R3 — 2026-11-13
+
+Terra restored room warmth, made props and occupants darker, added seated figures and shelving, and refined the lift cabins and foreground entry. The late swap now disposes the outgoing instancing buffers and owned geometry. Source, Blender and GLB are saved on the feature branch. A coplanar trim found in the restored checkpoint was corrected in `9848a71`.
+
+- GLB SHA256 `bb585811c14bff80b9a91a21a4f53abcfbba26c395c9d0db964a60c0cff56bd5`, 2,608,868 bytes, 43,796 triangles. Six variants passed Blender game QA with zero errors. Separate Blender import verified 42 meshes and seven material roles. Remaining warnings concern untextured UVs, planar n-gons, hidden back-to-back surfaces and enclosed pieces. Multi-angle material and wire captures are in `r3/asset-qa`.
+- Root `npm test`, `npm run build` and `git diff --check` passed. Chrome served the real GLB and captured six stills at 3200×1800, 0 page errors. An independent DEV browser run checked six district transitions at 1600×900 and 48 sampled times, including the seeded east high change and both south travel directions, 0 page errors. The seed-zero +1→+2 change chooses the east stage under existing coverage because the two east pod changes outnumber the one south tower change.
+- Headed Chrome hero `se:high`, 1920×1080 DPR 1, first sample removed: day **46.0–48.7 FPS**, night **47.4–49.3 FPS**. Baseline ranges overlap. Exhibition hardware and an actual guest session remain unverified.
+- Three blind judges scored day 20/20/20 and night 18/19/19. The median is **20/30 day, 19/30 night**. R3 vs R2: 14 wins, zero losses and one tie in both lighting conditions. Kept R3 in full. [Scored crops](../../artifacts/se-stage-closeup-polish/r3/vs-target.jpg).
+- Day and night below 2: `ep-ring` (glazing and room warmth), `ep-services` (use and occupants), `et-setbacks` (room/terrace contrast), `et-lift` (glazed shaft and cabin definition), `et-services` (distinct room functions), `et-wayfinding` (podium entrance), `st-twins` (glazed crossings), `st-twist` (entrance and floors), `st-life` (furniture and occupants), `st-material` (warmth and amber). Night additionally misses `ep-entry` because the figure blends into the threshold. The shared twist mid-rise transform compresses residents and the lift cabin to 45% height along with the building.
+- The [close-up skill](../../.agents/skills/closeup-polish/SKILL.md) ends the three-round cycle here when the scores are below full marks. Owner can accept this candidate or name another round. Main integration is pending that visual decision.
