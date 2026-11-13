@@ -81,3 +81,14 @@ On owner instruction, main (`fccd94b`, asset library) was merged into this branc
 - Rebuilt GLB SHA256 `cb433a32f232d4ed534328fbdc2fd4ff4abea8720ae13865d2492925fbc351e3`, byte-identical to R5. The R5 `.blend` is kept, because the geometry is identical and only file metadata would differ.
 - Root `npm test` (including `assetLibrary` and `seDistrictGlb`), `npm run build` and `git diff --check` PASS. No browser capture was needed, since the GLB is unchanged.
 - Next: polished library modules will change this GLB when `build_district.py` is re-run. Re-capture and judge after that.
+
+## Module polish 1 — 2026-11-13
+
+Library modules were polished against this task's targets (asset-library handoff). Here, `build_district.py` takes its `district_*` materials from `modules.ROLES` (same names and order), and the twist floors furnish 6 vignettes and 4 residents instead of 3 and 2.
+
+- GLB SHA256 `0d3f339e6f7b17ed8321b227b15d5670c3f333376cf322cc53268f771884d4a1`, 10880556 bytes, 172,252 triangles (R5: 102,596). The `seDistrictGlb` budget was raised from 110k to 180k, with the FPS evidence below.
+- Same-URL captures before and after (`?meters=se:-5|5` with `shot=se:stage-east`, and `se:8` with `shot=se:stage-south`, at hour 12 and 22, 1920×1080 headless Chrome, 0 page errors). Published crops: [south day](../../artifacts/se-stage-closeup-polish/module-polish/cmp-south-towers-day-r0-r3.jpg), [south night](../../artifacts/se-stage-closeup-polish/module-polish/cmp-south-towers-night-r0-r3.jpg), [pods day](../../artifacts/se-stage-closeup-polish/module-polish/cmp-east-pods-day-r0-r3.jpg), [pods night](../../artifacts/se-stage-closeup-polish/module-polish/cmp-east-pods-night-r0-r3.jpg). Raw rounds r0–r3 are in `~/city2127-evidence/module-polish/`.
+- Read (Opus, not judged blind): the south twist reads clearly better at night, with warm gold floors and visible furniture and residents on every floor. By day it has more residents and clearer glass, but floors still read pale against the target's warm lit interiors. The pods are nearly unchanged at this distance, because their doorways face ±x, away from the east camera.
+- Headed Chrome hero `se:high` 1920×1080 DPR 1, first sample dropped, same machine and session: day 48.2–48.7 FPS, night 47.1–48.5 FPS. With the R5 GLB swapped in: day 47.6–49.1, night 46.9–48.2. The ranges overlap.
+- Root `npm test`, `npm run build`, `git diff --check` and `check-artifacts.sh` PASS.
+- Open: owner visual acceptance. Blind judging was not run this round. Twist day warmth remains a gap. The east stage still shows the focal SE +1 tower, which does not use modules.
