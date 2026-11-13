@@ -5,7 +5,7 @@
 - Branch: feat/rectenna-building-glb → main (asset-only)
 - Base commit: b92296e0553cd27b535e329416a876c756c2206b
 - Last verified commit: the commit that adds this file (asset files checked before commit)
-- Remote availability: origin/main after merge
+- Remote availability: origin/main after merge (R1 `089c601`; R2 vegetable LOD on `feat/rectenna-veg-lod`)
 
 ## Session Git state
 
@@ -34,7 +34,14 @@ The owner asked to take the dream-loop draft `.dream-loop/rectenna.blend` (gitig
 - `HexPanelGlass` membrane: transmission 1.0, IOR 1.45, roughness 0.05, base (0.92, 0.95, 0.97), Thin Film 450 nm / IOR 2.0, plus a `glTF Material Output` node with Iridescence Factor 1 (the exporter needs it to write `KHR_materials_iridescence`). The source keeps its procedural noise/Fresnel alpha.
 - Export recipe (Text `export_glb.py` in the .blend): select the four kept collections, glTF Binary, +Y up, apply modifiers, `export_gn_mesh` + `export_gpu_instances` (vegetables → `EXT_mesh_gpu_instancing`), no animation/camera/light/Draco. Two procedural graphs are flattened for the export only and then restored: the membrane Alpha is set to 1 (transmission carries see-through; three.js scales a blended material's reflections by opacity, which hid the iridescence), and the `CitrusLeaf` ColorRamp+Translucent mix becomes a flat Principled base (0.10, 0.245, 0.045). Otherwise the leaves exported white.
 
-## Actual validation results
+## R2 — vegetable LOD (2026-11-13, owner chose A+B)
+
+- A: the four `Veg_*` meshes (100–140 tris each) were replaced with flat-shaded, jittered low-poly hemispheres (21–24 tris) at the original sizes and materials. A Decimate collapse at about 26 tris was tried first and rejected: it produced spiky stars (`iterations/decimate-*.png`).
+- B: `VegScatter` density 20 → 10 /m² and `VegScatterOuter` 18 → 9 /m²; the instance scale range 1.2–1.7 → 1.4–1.9 keeps the soil covered.
+- Result (GLB JSON): vegetable instances 20,657 → 10,824; rendered triangles 2,911,892 → **557,105** (−81%), of which vegetables ≈ 0.24 M; GLB 5,275,108 → 4,839,868 bytes. The headless reimport keeps the same bounds and ramp centre (facing unchanged).
+- Evidence: `~/city2127-evidence/rectenna-veg-lod/` (`before-*`, `after-*` with near terrace and hero views in the scratch three.js 0.180 viewer, `reimport.png`, `iterations/`). FPS has not been measured.
+
+## Actual validation results (R1)
 
 - Verification status: PASSED for source/export; application NOT RUN (no consumer)
 - Date and checked worktree: 2026-11-13, worktree `city2127-rectenna` before commit, Blender 5.2.2 LTS, built-in glTF exporter
@@ -47,7 +54,7 @@ The owner asked to take the dream-loop draft `.dream-loop/rectenna.blend` (gitig
 
 ## Known issues and blockers
 
-- Rendered load is ~2.9 M triangles, ~2.6 M of it in the terrace vegetables (scatter density from the dream-loop scene). Before placing it in the city, decide whether to thin the `VegScatter` density or decimate `Veg_*`; FPS was not measured.
+- R1 rendered ~2.9 M triangles; R2 reduced this to 0.56 M (see above). FPS has not been measured.
 - In three.js, transmission adds a transmission render pass while the membrane is visible; the cost was not measured.
 - The membrane's procedural alpha variation and the leaf colour variation exist only in Blender; the GLB uses flat values.
 - In Blender's own sky World the metal reflects blue sky and reads as steel-blue; the final colour must be judged in the app.
@@ -59,4 +66,4 @@ The owner asked to take the dream-loop draft `.dream-loop/rectenna.blend` (gitig
 
 ## Next expected step
 
-Owner visual acceptance of the screenshots. If placement is wanted: choose the site and footprint, reduce vegetable density, then load via `addCityModel` on a feature branch and run VALIDATION browser/FPS checks.
+Owner visual acceptance of the R2 vegetable screenshots. If placement is wanted: choose the site and footprint, then load via `addCityModel` on a feature branch and run VALIDATION browser/FPS checks.
