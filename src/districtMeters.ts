@@ -1302,7 +1302,9 @@ export class ConcentrationDistrict {
       slotFamilies.filter(value => value === family).length, 'concentration-vertical-towers'));
     const nextPod = this.instances(variants[4], this.pods.length, 'concentration-distributed-pods');
     const nextRing = this.instances(variants[5], this.pods.length, 'concentration-distributed-pods');
-    for (const mesh of [...this.families.flat(), ...this.podMeshes, ...this.ringMeshes]) this.root.remove(mesh);
+    for (const mesh of [...this.families.flat(), ...this.podMeshes, ...this.ringMeshes]) {
+      this.root.remove(mesh); mesh.dispose(); mesh.geometry.dispose();
+    }
     this.families.splice(0, this.families.length, ...nextFamilies);
     this.podMeshes = nextPod; this.ringMeshes = nextRing;
     this.write();
