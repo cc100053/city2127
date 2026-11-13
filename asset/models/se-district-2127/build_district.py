@@ -1,33 +1,119 @@
 """Build SE district variants in metres; tower Y is authored at 100 m and normalized at runtime."""
-import math, os, sys
+import math, os, sys, random
 import bpy
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
-from geo_helpers import Acc, cyl, obox, finish_mesh, material, blob, tube, sweep, circle_pts, ring_section
+from geo_helpers import Acc, cyl, obox, finish_mesh, material, blob, tube, sweep, circle_pts, ring_section, rot
+sys.path.insert(0, os.path.join(os.path.dirname(HERE), 'city-kit-2127'))
+from build_kit import PROPS  # reuse the shared prop kit: desks, chairs, sofas, shelves, plants
 
-ROLES = {'district_white': ((.94,.94,.90,1), None, .5), 'district_room': ((.68,.43,.27,1), (.85,.40,.15,1), 1.2), 'district_amber': ((1,.52,.08,1), (1,.42,.04,1), .5), 'district_green': ((.25,.48,.18,1), None, .5), 'district_dark': ((.065,.052,.045,1), None, .5), 'district_glass': ((.86,.92,.95,.16), None, .5), 'district_floor': ((.46,.30,.19,1), (.28,.12,.045,1), .5),
+ROLES = {'district_white': ((.94,.94,.90,1), None, .5), 'district_room': ((.68,.43,.27,1), (.85,.40,.15,1), 1.2), 'district_amber': ((1,.52,.08,1), (1,.42,.04,1), .5), 'district_green': ((.25,.48,.18,1), None, .5), 'district_dark': ((.065,.052,.045,1), None, .5), 'district_glass': ((.86,.92,.95,.16), None, .5), 'district_floor': ((.46,.30,.19,1), (.62,.28,.10,1), 1.6),
          # R4: lit interiors (orange light seeps out through the glass) and people/furniture that read as people, not black silhouettes.
-         'district_glow': ((1,.62,.28,1), (1,.55,.18,1), 2.4), 'district_skin': ((.80,.57,.42,1), None, .5), 'district_cloth_a': ((.17,.30,.50,1), None, .5), 'district_cloth_b': ((.80,.28,.20,1), None, .5), 'district_wood': ((.50,.33,.20,1), None, .5)}
+         'district_glow': ((1,.62,.28,1), (1,.55,.18,1), 2.4), 'district_skin': ((.80,.57,.42,1), None, .5), 'district_cloth_a': ((.17,.30,.50,1), None, .5), 'district_cloth_b': ((.80,.28,.20,1), None, .5), 'district_wood': ((.50,.33,.20,1), None, .5),
+         'district_slate': ((.20,.22,.25,1), None, .5), 'district_fabric': ((.84,.60,.47,1), None, .5), 'district_skin_b': ((.52,.35,.26,1), None, .5), 'district_cloth_c': ((.20,.50,.46,1), None, .5)}
 
 def build(kind):
-    a={k:Acc() for k in ROLES}; w,r,amber,green,dark,glass,floor,glow,skin,clA,clB,wood=(a[k] for k in ROLES)
+    a={k:Acc() for k in ROLES}; w,r,amber,green,dark,glass,floor,glow,skin,clA,clB,wood,slate,fabric,skinB,clC=(a[k] for k in ROLES)
+    rng=random.Random(sum(map(ord,kind))*7919)  # fixed seed per variant: irregular layout, identical on every rebuild
     def box(mat,x,y,z,sx,sy,sz): obox(mat,(x,y,z),(sx,sy,sz))
     def disc(mat,x,z,radius,y,h): cyl(mat,x,z,radius,y,y+h,32)
-    def person(x,y,z,scale=1):
-        # Cloth legs and torso with a skin head: reads as a resident against the lit room, not a black mullion.
-        c=clA if int(abs(x*7+z*3))%2 else clB; sc=scale
-        for dx in [-.15,.15]: box(c,x+dx*sc,y+.37*sc,z,.18*sc,.74*sc,.25*sc)
-        box(clB if c is clA else clA,x,y+1.05*sc,z,.5*sc,.7*sc,.28*sc)
-        cyl(skin,x,z,.22*sc,y+1.4*sc,y+1.8*sc,8)
-    def table(x,y,z):
-        box(wood,x,y+.78,z,2.1,.16,1.1)
-        for dx in [-.8,.8]:
-            for dz in [-.38,.38]: box(wood,x+dx,y+.35,z+dz,.14,.7,.14)
-        for dz in [-.95,.95]: box(wood,x,y+.5,z+dz,.6,.1,.6); box(wood,x,y+.22,z+dz,.1,.44,.1)
+    class TAcc:
+        """Transforms a kit prop's geometry (three.js coords) into the district accumulator: yaw about Y, then translate."""
+        def __init__(s,t,x,y,z,yaw): s.t,s.x,s.y,s.z,s.c,s.s=t,x,y,z,math.cos(yaw),math.sin(yaw)
+        def tf(s,q): return (s.x+q[0]*s.c+q[2]*s.s, s.y+q[1], s.z-q[0]*s.s+q[2]*s.c)
+        def solid(s,verts,faces): s.t.solid([s.tf(q) for q in verts],faces)
+        def surface(s,verts,faces,want):
+            def inv(c):
+                dx,dz=c[0]-s.x,c[2]-s.z; return want((dx*s.c-dz*s.s,c[1]-s.y,dx*s.s+dz*s.c))
+            s.t.surface([s.tf(q) for q in verts],faces,lambda c:s.tf(inv(c)))
+    KITMAP={'kit_dark':slate,'kit_white':w,'kit_wood':wood,'kit_fabric':fabric,'kit_screen':glow,'kit_amber':amber,'kit_leaf_a':green,'kit_leaf_b':green,'kit_glass':glass,'kit_bark':wood,'kit_soil':dark}
+    def kit(name,x,y,z,yaw=0,fab=None):
+        class P: pass
+        p=P(); p.name=name; m=dict(KITMAP)
+        if fab is not None: m['kit_fabric']=fab
+        p.a=lambda k:TAcc(m[k],x,y,z,yaw); PROPS[name](p)
+    def lb(acc,x,y,z,lx,ly,lz,sx,sy,sz,yaw):
+        ox,oz=rot(lx,lz,yaw); obox(acc,(x+ox,y+ly,z+oz),(sx,sy,sz),(math.cos(yaw),-math.sin(yaw)),(math.sin(yaw),math.cos(yaw)))
+    def person(x,y,z,scale=1,yaw=None):
+        # Varied residents: height, clothing, skin and hair differ, arms hang at the sides, and each faces its own way.
+        yaw=rng.uniform(0,2*math.pi) if yaw is None else yaw; sc=scale*rng.uniform(.93,1.08)
+        top=rng.choice([clA,clB,clC,w,clB]); bot=rng.choice([slate,clA,wood,clC,slate]); sk=rng.choice([skin,skin,skinB])
+        for dx in [-.14,.14]: lb(bot,x,y,z,dx*sc,.37*sc,0,.17*sc,.74*sc,.22*sc,yaw)
+        lb(top,x,y,z,0,1.05*sc,0,.46*sc,.66*sc,.26*sc,yaw)
+        for dx in [-.3,.3]: lb(top,x,y,z,dx*sc,1.02*sc,0,.1*sc,.6*sc,.14*sc,yaw)
+        cyl(sk,x,z,.2*sc,y+1.38*sc,y+1.74*sc,8); cyl(rng.choice([dark,wood,slate]),x,z,.21*sc,y+1.62*sc,y+1.78*sc,8)
+    def seated_person(x,ysit,z,yaw):
+        top=rng.choice([clA,clB,clC,w]); bot=rng.choice([slate,clA,wood,clC]); sk=rng.choice([skin,skin,skinB])
+        for dx in [-.13,.13]:
+            lb(bot,x,ysit,z,dx,.08,.25,.16,.14,.5,yaw); lb(bot,x,ysit,z,dx,-.2,.5,.14,.5,.14,yaw)
+        lb(top,x,ysit,z,0,.4,0,.42,.62,.26,yaw)
+        for dx in [-.28,.28]: lb(top,x,ysit,z,dx,.38,.14,.1,.5,.12,yaw)
+        cyl(sk,x,z,.19,ysit+.7,ysit+1.06,8); cyl(rng.choice([dark,wood,slate]),x,z,.2,ysit+.95,ysit+1.1,8)
+    class Rect:
+        def __init__(s,cx,cz,w_,d,ang=0): s.cx,s.cz,s.w,s.d,s.t,s.n,s.area=cx,cz,w_,d,(math.cos(ang),math.sin(ang)),(-math.sin(ang),math.cos(ang)),w_*d; s.ang=ang
+        def at(s,u,v): return s.cx+u*s.t[0]+v*s.n[0], s.cz+u*s.t[1]+v*s.n[1]
+        def inside(s):
+            x,z=s.at(rng.uniform(-s.w/2+1.4,s.w/2-1.4),rng.uniform(-s.d/2+1.4,s.d/2-1.4))
+            return x,z,-s.ang+rng.choice([0,math.pi/2,math.pi,3*math.pi/2])+rng.uniform(-.3,.3)
+        def edge(s):
+            side=rng.randrange(4); sg=1 if side%2 else -1
+            if side<2: u,v,nu,nv=rng.uniform(-s.w/2+1.4,s.w/2-1.4),sg*(s.d/2-.9),0,-sg
+            else: u,v,nu,nv=sg*(s.w/2-.9),rng.uniform(-s.d/2+1.4,s.d/2-1.4),-sg,0
+            x,z=s.at(u,v); dx,dz=nu*s.t[0]+nv*s.n[0],nu*s.t[1]+nv*s.n[1]
+            return x,z,math.atan2(dx,dz)
+    class Ring:
+        def __init__(s,cx,cz,r0,r1): s.cx,s.cz,s.r0,s.r1,s.area=cx,cz,r0,r1,math.pi*(r1*r1-r0*r0)
+        def inside(s):
+            a_,r_=rng.uniform(0,2*math.pi),rng.uniform(s.r0+.9,s.r1-1.0)
+            return s.cx+r_*math.cos(a_),s.cz+r_*math.sin(a_),rng.uniform(0,2*math.pi)
+        def edge(s):
+            a_=rng.uniform(0,2*math.pi); r_=s.r1-.9
+            return s.cx+r_*math.cos(a_),s.cz+r_*math.sin(a_),math.atan2(-math.cos(a_),-math.sin(a_))
+    # name, clearance radius, against a wall, weight
+    CATALOG=[('workstation',1.5,False,4),('cafe',1.3,False,3),('sofa',1.3,False,2),('meeting',1.7,False,1),('bookshelf',.7,True,3),('counter',1.2,True,1),('whiteboard',.9,True,1),
+             ('cabinet',1.0,True,1),('art',.7,True,1),('planter',.6,True,1),('plant',.35,False,2),('lamp',.3,False,2),('bench',.9,False,1)]
+    def furnish(reg,y,hh,items,people):
+        """Scatter kit furniture and residents over a room floor (top at y): random spots and facings, no overlaps, people seated or standing."""
+        placed=[]
+        free=lambda x,z,r_: all(math.hypot(x-px,z-pz)>r_+pr for px,pz,pr in placed)
+        def spot(r_,edge):
+            for _ in range(16):
+                x,z,yaw=reg.edge() if edge else reg.inside()
+                if free(x,z,r_): placed.append((x,z,r_)); return x,z,yaw
+        for _ in range(items):
+            name,r_,edge,_w=rng.choices(CATALOG,[c[3] for c in CATALOG])[0]; sp=spot(r_,edge)
+            if not sp: continue
+            x,z,yaw=sp; fab=rng.choice([fabric,clA,clB,clC])
+            if name=='workstation':
+                kit('desk_monitor',x,y,z,yaw); ox,oz=rot(0,.95,yaw); kit('chair_office',x+ox,y,z+oz,yaw+math.pi)
+                if rng.random()<.8: seated_person(x+ox,y+.5,z+oz,yaw+math.pi)
+            elif name=='cafe':
+                kit('cafe_set',x,y,z,yaw)
+                if hh>3: kit('pendant_lamp',x,y+hh-1.5,z,0)
+                for sg in (-1,1):
+                    if rng.random()<.6: ox,oz=rot(sg*.8,0,yaw); seated_person(x+ox,y+.45,z+oz,yaw+(math.pi/2 if sg<0 else -math.pi/2))
+            elif name=='sofa':
+                kit('sofa',x,y,z,yaw,fab)
+                if rng.random()<.6: ox,oz=rot(rng.uniform(-.5,.5),.1,yaw); seated_person(x+ox,y+.42,z+oz,yaw)
+            elif name=='meeting':
+                kit('meeting_table',x,y,z,yaw)
+                if hh>3: kit('pendant_lamp',x,y+hh-1.5,z,0)
+                for sg,dx_ in rng.sample([(1,-.7),(1,0),(1,.7),(-1,-.7),(-1,0),(-1,.7)],3):
+                    ox,oz=rot(dx_,sg*.78,yaw); seated_person(x+ox,y+.48,z+oz,yaw+(math.pi if sg>0 else 0))
+            elif name=='bookshelf': kit('bookshelf',x,y,z,yaw)
+            elif name=='counter': kit('kitchen_counter',x,y,z,yaw)
+            elif name=='whiteboard': kit('whiteboard',x,y,z,yaw)
+            elif name=='cabinet': kit('upper_cabinet',x,y,z,yaw)
+            elif name=='art': kit('art_panel',x,y,z,yaw)
+            elif name=='planter': kit('planter_1m',x,y,z,yaw)
+            elif name=='plant': kit('potted_plant',x,y,z,yaw)
+            elif name=='lamp': kit('floor_lamp',x,y,z,yaw)
+            elif name=='bench': kit('bench',x,y,z,yaw)
+        for _ in range(people):
+            sp=spot(.45,False)
+            if sp: person(sp[0],y,sp[1],1.0)
     def room(x,z,y,width,depth,height):
-        # Two thin central partitions leave an open, occupied band at every facade.
-        box(r,x,y+(height+.2)/2,z,width-5,height-.2,.35)
-        box(r,x,y+(height+.2)/2,z,.35,height-.2,depth-5)
+        # Glazed on all four sides, lit from the ceiling; furniture is scattered at random.
         box(w,x,y+.2,z,width+1,.25,depth+1)
         box(floor,x,y+.35,z,width-.7,.06,depth-.7)
         box(r,x,y+height-.16,z,width-1,.12,depth-1)
@@ -35,24 +121,12 @@ def build(kind):
         for side in [-1,1]:
             for dx in [-.34,0,.34]:
                 box(w,x+dx*width,y+height/2,z+side*(depth/2+.06),.18,height,.16)
-            for dx in [-.20,.20]: person(x+dx*width,y+.38,z+side*(depth/2-1.4),1.1)
-            table(x,y+.38,z+side*(depth/2-2.6))
-            seated(x+width*.29,y+.38,z+side*(depth/2-2.8))
-            for h in [.25,1.1,1.95]: box(wood,x-width*.32,y+.38+h,z+side*(depth/2-2.4),1.9,.12,.35)
-            for dx in [-1,1]: box(wood,x-width*.32+dx,y+1.4,z+side*(depth/2-2.4),.12,2,.35)
             box(glass,x,y+height/2,z+side*(depth/2+.3),width,height,.08)
             for dz in [-.3,0,.3]: box(w,x+side*(width/2+.06),y+height/2,z+dz*depth,.16,height,.18)
-            for dz in [-.2,.2]: person(x+side*(width/2-1.4),y+.38,z+dz*depth,1.1)
-            table(x+side*(width/2-2.6),y+.38,z)
             box(glass,x+side*(width/2+.3),y+height/2,z,.08,height,depth)
-    def seated(x,y,z):
-        # A supported chair and bent legs keep this silhouette distinct from standing guests.
-        box(wood,x,y+.48,z,.65,.12,.65)
-        for dx in [-.25,.25]:
-            for dz in [-.25,.25]: box(wood,x+dx,y+.23,z+dz,.1,.46,.1)
-        box(clA,x,y+.86,z,.46,.65,.3)
-        cyl(skin,x,z,.19,y+1.18,y+1.56,8)
-        for dx in [-.14,.14]: box(clB,x+dx,y+.3,z+.38,.16,.6,.16)
+        n=min(9,max(3,round(math.sqrt(width*depth)/3.2)))
+        if height>8: n=4  # tall rooms are split into floors by the caller, so each floor stays lightly furnished
+        furnish(Rect(x,z,width,depth),y+.38,height,n,n//2+1)
     def lift(x,z,y0,y1,ycap,wd=2.2,sz=2.0):
         # Transparent glass shaft with a slim white frame, amber front edges and a glass capsule with a rider (reuses the SE lift glass look).
         yc,hh=(y0+y1)/2,y1-y0
@@ -106,9 +180,10 @@ def build(kind):
             for z in [-10,10]: box(w,x,3.5,z,1,3,1)
         for y0,y1,wx,wz in [(5,40,32,26),(40,72,24,20),(72,100,16,14)]:
             height=(y1-y0-3)/2
-            room(0,0,y0,wx-2,wz-2,height)
+            nf=max(1,round(height/5.5))  # real floors (about 5 m each) instead of one 16 m hall, so people and furniture read at scale
+            for base in (y0,y0+height+1.2):
+                for fl in range(nf): room(0,0,base+fl*height/nf,wx-2,wz-2,height/nf-(.2 if fl<nf-1 else 0))
             box(w,0,y0+height+.6,0,wx-.8,1.4,wz-.8)
-            room(0,0,y0+height+1.2,wx-2,wz-2,height)
             for x,z in [(-wx/3,-wz/3),(0,-wz/3),(wx/3,-wz/3)]: blob(green,(x,y1+1.8,z),(1.4,1,1.4),sub=1)
             box(w,0,y1,0,wx,1.5,wz); box(green,0,y1+1,0,wx-2,.7,wz-2)
             for side in [-1,1]:
@@ -126,9 +201,7 @@ def build(kind):
                 disc(w,x,0,8.5,y,1)
                 disc(floor,x,0,7.5,y+.98,.08); cyl(glow,x,0,7.5,y-.08,y,16)
                 sweep(amber,lambda k:circle_pts(x,0,8.5,32,k),ring_section(0,.25,y+1,y+1.24),caps=(False,False),closed=True)
-                for ang in ([0,math.pi/2,math.pi,3*math.pi/2] if y % 16 == 12 else [3*math.pi/2]):
-                    person(x+6.2*math.cos(ang)-.6*math.sin(ang),y+1,6.2*math.sin(ang)+.6*math.cos(ang),1.15)
-                    table(x+5*math.cos(ang),y+1,5*math.sin(ang))
+                furnish(Ring(x,0,3.4,7.5),y+1.06,6.9,2 if y % 16 == 12 else 1,1)
             for ang in [0,math.pi/2,math.pi,3*math.pi/2]: box(w,x+7.4*math.cos(ang),top/2,7.4*math.sin(ang),.8,top-.4,.8)
             disc(green,x,0,7.5,top,1)
         for y in [40,72]:
@@ -136,7 +209,7 @@ def build(kind):
             for z in [-3.05,3.05]:
                 box(glass,0,y+2.5,z,14,2.6,.1)
                 for x in [-6.5,-3.2,0,3.2,6.5]: box(w,x,y+2.5,z,.2,2.6,.2)
-            for x in [-4,4]: person(x,y+1.8,-1.6,1.0); table(x*.3,y+1.8,1.6)
+            furnish(Rect(0,0,14,6.4),y+1.8,2.3,2,1)
         # Guide attaches to the camera-facing side of the left shaft.
         lift(-3.7,-6.5,2,94,43,2.6,2.4)
         for y in [10,45,75]: box(w,-5.3,y,-6.5,3.2,.6,.6)
@@ -146,21 +219,13 @@ def build(kind):
             y=5+k*5; side=24-k*.35; angle=k*.097
             # The planes turn with the original stepped family.
             t=(math.cos(angle),math.sin(angle)); n=(-math.sin(angle),math.cos(angle))
-            obox(r,(0,y+2.2,0),(side-5,4.2,.3),t,n)
-            obox(r,(0,y+2.2,0),(.3,4.2,side-5),t,n)
             obox(w,(0,y+4.6,0),(side, .6,side),t,n)
             obox(floor,(0,y-.05,0),(side-2,.3,side-2),t,n)
-            for sign in [-1,1]:
-                obox(r,(sign*n[0]*side*.24,y+2.2,sign*n[1]*side*.24),(side*.55,4,.18),t,n)
             for sign in [-1,1]:
                 for vx,vz in [t,n]:
                     obox(glass,(sign*vx*(side/2-.2),y+2.2,sign*vz*(side/2-.2)),(side,4.1,.08),(-vz,vx),(vx,vz))
             obox(glow,(0,y+4.05,0),(side-2,.06,side-2),t,n)
-            wp=lambda u,v:(u*t[0]+v*n[0],u*t[1]+v*n[1])
-            for sign in [-1,1]:
-                px,pz=wp(sign*4,-side/2+1.4); person(px,y+.11,pz,1.0)
-                px,pz=wp(-sign*6,side/2-1.6); person(px,y+.11,pz,1.0)
-                if k%2==0: px,pz=wp(sign*3,-side/2+2.8); table(px,y+.11,pz)
+            furnish(Rect(0,0,side-2,side-2,angle),y+.11,4.0,3,2)
         for y in [40,72]:
             disc(w,0,0,18,y,2); disc(green,0,0,17,y+2,.5); disc(amber,0,0,18,y-.3,.25)
             for x,z in [(-10,-7),(-5,-10),(2,-11),(8,-8)]: blob(green,(x,y+3,z),(1.8,1.1,1.6),sub=1)
@@ -175,17 +240,16 @@ def build(kind):
         disc(w,0,0,9,0,.7); disc(floor,0,0,7.2,.68,.1); disc(r,0,0,3.4,0.7,6.4)
         disc(w,0,0,12,7.1,1.2); disc(green,0,0,11.5,8.3,.3)
         disc(floor,0,0,6.2,8.58,.1); disc(r,0,0,2.8,8.6,3.7); disc(w,0,0,9,12.3,1.2); disc(green,0,0,8,13.5,1.2)
+        hh_low=6.4
         disc(glow,0,0,6.8,7.02,.08); disc(glow,0,0,5.8,12.22,.08)
         for y,rad in [(.7,7.1),(8.6,6.1)]:
-            hh=6.4 if y < 2 else 3.8  # lower pillars and glass now reach the 7.1 m slab; before, they stopped 2.6 m short and floated
+            hh=hh_low if y < 2 else 3.8  # lower pillars and glass now reach the 7.1 m slab; before, they stopped 2.6 m short and floated
             if y < 2: entrance_glass(rad+.6,y,y+hh)
             else: tube(glass,0,0,rad+.6,y,y+hh,32)
             for k in range(12):
                 ang=k*math.pi/6; x,z=(rad+.15)*math.cos(ang),(rad+.15)*math.sin(ang)
                 box(w,x,y+hh/2,z,.25,hh,.25)
-                a2=ang+math.pi/12; x2,z2=(rad-1.2)*math.cos(a2),(rad-1.2)*math.sin(a2)
-                if k%2==0: person(x2,y,z2,1.05)
-                else: table(x2,y,z2)
+        furnish(Ring(0,0,3.6,7.0),.78,hh_low,4,2); furnish(Ring(0,0,3.0,6.1),8.68,3.6,3,2)
         sweep(amber,lambda k:circle_pts(0,0,9,32,k),ring_section(0,.2,12.12,12.24),caps=(False,False),closed=True);box(amber,0,2,7.2,2.5,.18,.25)
     else:
         # Annular roof as a broad rim around the planted central tree.
@@ -199,10 +263,7 @@ def build(kind):
         sweep(glow,lambda k:circle_pts(0,0,9.6,32,k),ring_section(0,4.6,4.3,4.38),caps=(False,False),closed=True)
         for k in range(12):
             ang=k*math.pi/6; x,z=9.8*math.cos(ang),9.8*math.sin(ang); box(w,x,2.5,z,.3,4,.3)
-            a2=ang+math.pi/12; x2,z2=8.4*math.cos(a2),8.4*math.sin(a2)
-            if k%3==0: seated(x2,.78,z2)
-            elif k%3==1: table(x2,.78,z2)
-            else: person(x2,.78,z2,1.05)
+        furnish(Ring(0,0,4.9,10.0),.78,3.5,5,3)
         sweep(amber,lambda k:circle_pts(0,0,10.55,32,k),ring_section(0,.2,4.2,4.32),caps=(False,False),closed=True)
     if kind in ('twist','terraced','twin','frame'):
         x=-10.5 if kind=='twin' else 0
