@@ -1,6 +1,8 @@
 import type { EnergyConfiguration } from '../survey/src/shared/energy.ts';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 import { reasonDelayMs } from './resultTimeline.ts';
+import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
+import { headlineTransitionSeconds } from './siteBuilders/shelfTimeline.ts';
 import { addHudChrome } from './hudFrame.ts';
 import type { CarrierChange } from './cityChangeManager.ts';
 import type { DisplayMode } from './dayCycle.ts';
@@ -111,7 +113,7 @@ export const RESIDENT_CARDS: Record<string, readonly [string, string]> = {
   "service.hybrid": ["普段は自動、困ったら人へ", "日常の便利さと、人に相談できる安心を組み合わせる。サービス拠点には、人と自動設備が役割を分け合う場所があります。"],
   "service.autonomous": ["時間に縛られないサービス", "自分の都合でサービスを使いたい。街には、自律サービスの端口や、配送を支える発着の場所があります。"],
   "commons.private": ["海辺に、自分の時間を", "一人や親しい人と静かに過ごしたい。庭や囲われた小さな空間が、海辺に落ち着ける居場所をつくっています。"],
-  "commons.hybrid": ["静けさと出会いのあいだ", "静かに休む日も、人と集まる日もある。庭と座席を組み合わせた場所が、二つの過ごし方をつないでいます。"],
+  "commons.hybrid": ["小さな建物を、必要な場所へ", "その日の過ごし方に合わせて、場所も変えたい。活動モジュールが棚へ運び入れられ、運び出されて、水辺の使い方を入れ替えています。"],
   "commons.open": ["予約せずに、海辺へ", "思い立ったときに、誰でも海辺で過ごしたい。開かれた座席や広場が、集まれる場所を支えています。"],
   "climate.equipment": ["設備がつくる夏の居場所", "暑い日も、海辺を歩いて過ごしたい。日差しを調整する屋根や冷却設備が、歩く道と休む場所を支えています。"],
   "climate.hybrid": ["設備と木陰が支え合う道", "涼しさを、一つの方法だけに任せない。屋根や冷却設備と植栽を組み合わせて、夏の居場所をつくっています。"],
@@ -191,9 +193,17 @@ export function residentResult(proposal: ExhibitionProposal, changes?: readonly 
       if (change.socketId === 'nw') effect = after.automatedPorts > before.automatedPorts
         ? 'この拠点では、自分の都合で使える自律サービスの端口が増えました。'
         : after.automatedPorts < before.automatedPorts ? 'この拠点では、人に相談できる窓口が増えました。' : 'この拠点のサービスの構成が変わりました。';
-      if (change.socketId === 'sw') effect = after.sharedSeats > before.sharedSeats
-        ? 'この水辺では、予約せずに使える共有席が増えました。'
-        : after.sharedSeats < before.sharedSeats ? 'この水辺では、静かに過ごすための囲われた席が増えました。' : 'この水辺の居場所の構成が変わりました。';
+      if (change.socketId === 'sw') {
+        // The mixed carrier is the event module shelf: say what it does, not a seat count (docs/RESIDENT_COPY.md, 2026-11-13).
+        const from = before.bands?.sw, to = after.bands?.sw;
+        effect = to === 'mixed' && from !== 'mixed' ? 'この水辺では、活動モジュールの棚が現れ、小さな建物が運び入れられました。'
+          : from === 'mixed' && to === 'high' ? 'この水辺では、活動モジュールが棚から運び出され、予約せずに使える共有席が増えました。'
+          : from === 'mixed' && to === 'low' ? 'この水辺では、活動モジュールが棚から運び出され、静かに過ごすための囲われた席が増えました。'
+          : to === 'mixed' ? (after.sharedSeats > before.sharedSeats ? 'この水辺では、棚に新しい活動モジュールが運び入れられました。'
+            : after.sharedSeats < before.sharedSeats ? 'この水辺では、棚から活動モジュールが運び出されました。' : 'この水辺では、棚の活動モジュールの配置が変わりました。')
+          : after.sharedSeats > before.sharedSeats ? 'この水辺では、予約せずに使える共有席が増えました。'
+          : after.sharedSeats < before.sharedSeats ? 'この水辺では、静かに過ごすための囲われた席が増えました。' : 'この水辺の居場所の構成が変わりました。';
+      }
       if (change.socketId === 'ne') effect = after.treeCount > before.treeCount
         ? 'この公園では、木陰を支える樹冠が増えました。'
         : after.coolingFins > before.coolingFins ? 'この公園では、夏の居場所を支える冷却設備が増えました。' : 'この公園では、設備と植栽が支える夏の居場所の構成が変わりました。';
@@ -299,7 +309,7 @@ export function startSurveyAtmosphere(
         const showReason = () => {
           latest.querySelector('.resident-card-copy')!.textContent = `${result.preference}${result.effect}`;
         };
-        const transitionMs = reasonDelayMs(displayMs, globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
+        const transitionMs = reasonDelayMs(displayMs, globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false, headlineTransitionSeconds(evidence?.[0], SITE_TRANSITION_SECONDS));
         if (transitionMs === 0) showReason();
         else reasonTimer = window.setTimeout(showReason, transitionMs);
         storyTimer = window.setTimeout(showAmbient, displayMs);

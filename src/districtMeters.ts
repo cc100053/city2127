@@ -211,9 +211,10 @@ const HALO = .42;
 /** Inland sharing courts [x, z, yaw]: open ground scanned clear of landmarks, context, routes, P2 pavilions and P4 towers / pods. Court 4 moved from (50, -340) to (110, -320) when the AUTO HUB lot grew over it (R4).
  * Street network stage 2 (2026-11-04): courts 2, 5, 6 and 8 stood on the ④ boulevard's line and moved to the nearest site passing the same checks with their
  * square 15 m off its centreline (from -110, 230; -70, 180; -290, 290; 220, 0).
+ * Court 6 moved from (-137, 286) to (-150, 290) for the SW event shelf lot at (-100, 297; 312 before R3) (2026-11-13; same scan checks, 54 m from the lot centre, squares 6 m apart).
  * P7 ranks by estimated visible hero-frame pixels (`SCAN_COURTS=20` in tests/odaiba.test.ts lists candidates best first). */
 const COURT_SITES: readonly (readonly [number, number, number])[] = ([
-  [-220, -140, .4], [-410, 120, 1.1], [-110, 250, 2.3], [110, -320, .9], [170, -360, 3.6], [-137, 286, 1.7], [-385, 290, 5.1], [-460, 290, .2], [190, 0, 2.8], [-20, 210, 4.4],
+  [-220, -140, .4], [-410, 120, 1.1], [-110, 250, 2.3], [110, -320, .9], [170, -360, 3.6], [-150, 290, 1.7], [-385, 290, 5.1], [-460, 290, .2], [190, 0, 2.8], [-20, 210, 4.4],
 ] as const).filter(([x, z]) => !inMega(x, z, 22)); // P1: nothing stands inside a megastructure footprint
 const COURT = 40;
 /** Garden crowns inside a private court [x, z, size], clear of the glass room and the entrance. */
@@ -246,7 +247,7 @@ export class SharingDistrict {
   private readonly plazaParasols: T.InstancedMesh;
   /** P8 design per court: private = walled garden (0) / glass winter garden (1); open = parasol plaza (0) / long-table pergola (1). */
   readonly privateDesign = COURT_SITES.map((_, i) => designOf(i, 1013, 2));
-  // Salt picked so court 2, in the COMMONS PLAZA sight line, keeps the open parasols (a solid pergola roof would hide the site).
+  // Salt picked so court 2, in the former COMMONS PLAZA sight line (the SW focal moved to the south shore, 2026-11-13), keeps the open parasols (a solid pergola roof would hide the site).
   readonly openDesign = COURT_SITES.map((_, i) => designOf(i, 1052, 2));
   /** P10 extras on open courts: drone kiosks (sharing + automation high) and blossom orchards (sharing + environment high). */
   private readonly kiosk = new SlotLevels(COURT_SITES.length);

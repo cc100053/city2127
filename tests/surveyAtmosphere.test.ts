@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { cityText, residentResult, residentCards, residentIdentity, exhibitionFeedback, exhibitionScoresText, exhibitionVoteMarks, policyText, scoresToWorldState } from '../src/surveyAtmosphere.ts';
+import { cityText, residentResult, residentCards, RESIDENT_CARDS, residentIdentity, exhibitionFeedback, exhibitionScoresText, exhibitionVoteMarks, policyText, scoresToWorldState } from '../src/surveyAtmosphere.ts';
 import { presets } from '../src/presets.ts';
 import { connectSurvey, isExhibitionView, parseSurveyEvent, supersedes, type CityView } from '../src/surveyView.ts';
 import { createWorldState } from '../src/worldState.ts';
@@ -142,7 +142,7 @@ const nonParkFeedback = exhibitionFeedback({
     { socketId: 'se', label: '機能配置', before: { functionModules: 4 }, after: { functionModules: 3 } },
   ],
 });
-assert.deepEqual(nonParkFeedback?.cityChanges.map(change => change.place), ['アクアシティ南', 'フジテレビ東']);
+assert.deepEqual(nonParkFeedback?.cityChanges.map(change => change.place), ['お台場南岸', 'フジテレビ東']);
 
 const sameBandFeedback = exhibitionFeedback({
   ...v2Proposal, beforeScores: { ...zero, environmentalPriority: 4 }, afterScores: { ...zero, environmentalPriority: 4.2 },
@@ -170,7 +170,7 @@ assert.equal(residentCards({ ...parsedInitialV2.view, guestCount: 100 }).some(ca
   'city-reset lifetime participation never implies answers in this run');
 assert.equal(residentCards(parsedV2.view).some(card => card.id === 'intro.inherited'), true);
 assert.deepEqual(baseCards.slice(-4).map(card => card.id), ['service.hybrid', 'commons.hybrid', 'climate.hybrid', 'functions.hybrid']);
-assert.deepEqual(baseCards.slice(-4).map(card => card.place), ['デックス西', 'アクアシティ南', 'お台場海浜公園', 'フジテレビ東']);
+assert.deepEqual(baseCards.slice(-4).map(card => card.place), ['デックス西', 'お台場南岸', 'お台場海浜公園', 'フジテレビ東']);
 for (const [automatedPorts, sharedSeats, coolingFins, band, expected] of [
   [0, 0, 6, 'low', ['service.human', 'commons.private', 'climate.hybrid', 'functions.distributed']],
   [6, 8, 0, 'high', ['service.autonomous', 'commons.open', 'climate.canopy', 'functions.vertical']],
@@ -190,6 +190,26 @@ assert.ok(causal.preference.includes('自動の便利さ'));
 assert.ok(causal.effect.includes('人に相談できる窓口が増え'));
 assert.equal(causal.place, 'デックス西');
 assert.ok(!causal.effect.includes('半分'), 'mixed answer never implies a mixed city');
+// SW focal: the mixed carrier is the event module shelf; −1／+1 keep the private garden and open plaza wording.
+const swFocal = (fromBand: 'low' | 'mixed' | 'high', toBand: 'low' | 'mixed' | 'high', from: number, to: number) => residentResult({ ...v2Proposal,
+  beforeLayout: { ...v2BeforeLayout, sharedSeats: from, bands: { ...v2BeforeLayout.bands, sw: fromBand } },
+  afterLayout: { ...v2AfterLayout, sharedSeats: to, bands: { ...v2AfterLayout.bands, sw: toBand } } } as never, [{ socketId: 'sw', focal: true, district: false }] as never);
+const swEffects = {
+  enterLow: swFocal('low', 'mixed', 0, 4).effect, enterHigh: swFocal('high', 'mixed', 8, 4).effect,
+  toLow: swFocal('mixed', 'low', 4, 0).effect, toHigh: swFocal('mixed', 'high', 4, 8).effect,
+  add: swFocal('mixed', 'mixed', 4, 5).effect, remove: swFocal('mixed', 'mixed', 4, 3).effect,
+  lowToHigh: swFocal('low', 'high', 0, 8).effect, highToLow: swFocal('high', 'low', 8, 0).effect,
+};
+assert.ok(swEffects.enterLow.includes('活動モジュールの棚') && swEffects.enterHigh === swEffects.enterLow);
+assert.ok(swEffects.toLow.includes('運び出され') && swEffects.toLow.includes('囲われた席'));
+assert.ok(swEffects.toHigh.includes('運び出され') && swEffects.toHigh.includes('共有席'));
+assert.ok(swEffects.add.includes('新しい活動モジュールが運び入れ') && swEffects.remove.includes('運び出され'));
+assert.ok(swEffects.lowToHigh.includes('共有席が増え') && swEffects.highToLow.includes('囲われた席が増え'), '−1／+1 keep the commons models');
+for (const text of [...Object.values(swEffects), ...RESIDENT_CARDS['commons.hybrid']]) {
+  assert.ok(!/COMMONS|コモンズ/i.test(text), `SW mixed copy names no COMMONS: ${text}`);
+  assert.ok(/^[\u3000-\u30ff\u4e00-\u9fff、。ー・ａ-ｚ]+$/.test(text), `SW mixed copy is Japanese only: ${text}`);
+}
+assert.ok(RESIDENT_CARDS['commons.hybrid'][1].includes('活動モジュール') && RESIDENT_CARDS['commons.hybrid'][1].length <= 80);
 assert.equal(residentResult(v2Proposal).kind, 'recorded', 'missing before/after evidence makes no visual claim');
 assert.equal(residentResult(v2Proposal, []).kind, 'direction');
 assert.equal(residentResult({ ...v2Proposal, beforeScores: zero, afterScores: zero }, []).kind, 'maintained');

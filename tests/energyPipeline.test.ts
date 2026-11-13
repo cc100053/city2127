@@ -64,7 +64,7 @@ for (const energyChoice of ENERGY_CHOICES) for (const a of [0, 1, 2]) for (const
       answers: session.questions.map((q, i) => ({ questionId: q.id, optionId: q.id === 'energy-2127' ? energyChoice : q.options[choices[i]].id })) });
     const parsed = eventOf(result.event);
     const changes = manager.applyExhibitionLayout(parsed.view.layout, parsed.kind, 1, parsed.view.slotSeeds);
-    manager.update(5);
+    manager.update(7); // the SW mixed band change runs 5 s
     assertModel(parsed.view);
     assert.equal(parsed.view.scores.environmentalPriority, 0);
     assert.equal(parsed.view.layout.bands.ne, 'mixed');

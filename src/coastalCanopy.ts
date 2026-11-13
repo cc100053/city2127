@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { changeSites, DISTRICT, HUB_LEGACY_LOT, inDistrict, seaward } from './layout.ts';
+import { changeSites, DISTRICT, HUB_LEGACY_LOT, SW_LEGACY_LOT, inDistrict, seaward } from './layout.ts';
 import { inWater, onStreetKit, routes } from './mobility.ts';
 import { onBayPlinth } from './automationBays.ts';
 import { recedeBeyondDistrict } from './bayContext.ts';
@@ -23,7 +23,7 @@ const drum=new T.CylinderGeometry(1,1,1,40),crown=leafyCrown(),lowCrown=leafyCro
 export function plantCanopy(scene: T.Object3D, trees: { instances: { position: number[]; scale: number; type: string }[] }, pits=false) {
   const inLot=(tree:{position:number[]},sites:{x:number;z:number;w:number;d:number;scale:number}[])=>sites.some(site=>Math.abs(tree.position[0]-site.x)<site.w*site.scale/2+9 && Math.abs(-tree.position[1]-site.z)<site.d*site.scale/2+9);
   // Each crown's pose depends on its index here, so the list is indexed against the NW lot as it was before the grown AUTO HUB plinth (R4); trees inside the real lot are then hidden in place, which leaves every other crown as it was.
-  const positions=trees.instances.filter(tree=>inDistrict(tree.position[0],-tree.position[1]) && !seaward(tree.position[0],-tree.position[1]) && !(tree.position[2]<3 && (swale(tree.position[0],-tree.position[1])<-1.1 || corridor(tree.position[0],-tree.position[1])<.2)) && !inLot(tree,Object.values({...changeSites,nw:HUB_LEGACY_LOT})));
+  const positions=trees.instances.filter(tree=>inDistrict(tree.position[0],-tree.position[1]) && !seaward(tree.position[0],-tree.position[1]) && !(tree.position[2]<3 && (swale(tree.position[0],-tree.position[1])<-1.1 || corridor(tree.position[0],-tree.position[1])<.2)) && !inLot(tree,Object.values({...changeSites,nw:HUB_LEGACY_LOT,sw:SW_LEGACY_LOT})));
   const lots=Object.values(changeSites),gone=positions.map(tree=>inLot(tree,lots) || onBayPlinth(tree.position[0],-tree.position[1],2) || (pits && onStreetKit(tree.position[0],-tree.position[1],.5)) || inWater(tree.position[0],-tree.position[1],WATER_PAD)); // bay plinths (automationBays.ts), the stage 3 water and, for ground trees, the street kit (its planters bring their own) keep their ground clear the same way
   // Instance colours already provide the leaf pigment; a second green tint crushed the lit canopy.
   const foliage=new T.InstancedMesh(crown,new T.MeshStandardMaterial({color:'#ffffff',roughness:.92}),positions.length*4);
@@ -159,7 +159,7 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
     const near=(site:{x:number;z:number;w:number;d:number;scale:number})=>Math.abs(px-site.x)<site.w*site.scale/2+16+reach && Math.abs(pz-site.z)<site.d*site.scale/2+16+reach;
     // The greedy lattice below is order dependent: a cluster skipped near a lot frees its neighbours, and that shift ran on to unrelated courts and towers.
     // So clusters are claimed against the NW lot as it was before the grown AUTO HUB plinth (R4) and only the ones inside the real lot are left unplanted.
-    if(seaward(px,pz) || Object.values({...changeSites,nw:HUB_LEGACY_LOT}).some(near))continue;
+    if(seaward(px,pz) || Object.values({...changeSites,nw:HUB_LEGACY_LOT,sw:SW_LEGACY_LOT}).some(near))continue;
     const pad=padGap(px,pz),path=pathGap(px,pz),sw=swale(px,pz),cor=corridor(px,pz);
     // Keep the terrace off pads, paths, the old pond swales (swale changes up to ~.05 per metre) and the corridor line.
     if(pad<reach+6 || path<reach+10 || sw<-1.15+reach*.05 || cor<.14+reach*.045)continue;

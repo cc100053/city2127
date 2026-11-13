@@ -13,11 +13,12 @@ A module only writes into ctx.a[<role>]; it never creates materials. Same seed +
 """
 import math
 import os
+import random
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
-from geo_helpers import blob, cyl, obox, rot  # noqa: E402
+from geo_helpers import blob, cyl, obox, rot, rrect_pts, sweep  # noqa: E402
 from build_kit import PROPS  # noqa: E402
 
 # Material recipe per role: (rgba, emission rgba or None, emission strength). From SE R4/R5, polish 1 (2026-11-13):
@@ -32,6 +33,13 @@ ROLES = {
     'cloth_a': ((.17, .30, .50, 1), None, .5), 'cloth_b': ((.80, .28, .20, 1), None, .5),
     'cloth_c': ((.20, .50, .46, 1), None, .5), 'wood': ((.50, .33, .20, 1), None, .5),
     'slate': ((.20, .22, .25, 1), None, .5), 'fabric': ((.84, .60, .47, 1), None, .5),
+    # Event shelf (SW mixed, 2026-11-13): structural frame, steel rail, module teal accent, lock light, forecourt paving.
+    'frame': ((.085, .085, .09, 1), None, .5), 'rail': ((.62, .64, .66, 1), None, .5), 'teal': ((.12, .60, .60, 1), None, .5),
+    'cyan': ((.22, .78, 1, 1), (.22, .78, 1, 1), 2.0), 'paving': ((.74, .72, .68, 1), None, .5),
+    # Event shelf R2: joint block grey, light module body grey, oak panelling. R3: three pane roles (below).
+    'joint': ((.30, .31, .32, 1), None, .5), 'grey': ((.58, .60, .61, 1), None, .5), 'oak': ((.55, .36, .19, 1), None, .5),
+    # R3: low-saturation warm-glass panes (warm white, pale amber, cool white) replace the toy-bright yellow / cyan window roles.
+    'pane_w': ((.80, .70, .52, 1), (1, .78, .50, 1), .9), 'pane_a': ((.76, .58, .36, 1), (1, .66, .30, 1), .9), 'pane_c': ((.70, .76, .80, 1), (.78, .88, 1, 1), .9),
 }
 # Kit prop material -> module role, so baked props share the site's roles.
 KITMAP = {'kit_dark': 'slate', 'kit_white': 'white', 'kit_wood': 'wood', 'kit_fabric': 'fabric', 'kit_screen': 'glow',
@@ -321,8 +329,284 @@ def ring_doorways(ctx, radius, y0, y1, cx=0, cz=0):
         person(ctx, cx + side * (radius - .4), y0 + .16, cz + .45, 1)
 
 
+def _wedge(acc, x, y, w, z0, z1, h):
+    """Gusset prism: w wide along x at x; its lower face runs y..y, from z0 (height h) down to z1 (height 0)."""
+    pts = [(xx, yy, zz) for xx in (x - w / 2, x + w / 2) for yy, zz in ((y, z0), (y, z1), (y + h, z0))]
+    acc.solid(pts, [(0, 2, 1), (3, 4, 5), (0, 1, 4, 3), (1, 2, 5, 4), (2, 0, 5, 3)])
+
+
+def _rsec(y0, y1, bt, bb, segs=2):
+    """Vertical profile for sweep(): (inset, y) points, top edge rounded by bt and bottom edge by bb (0 = sharp)."""
+    s = [math.radians(90 * j / segs) for j in range(segs + 1)]
+    top = [(bt - bt * math.sin(a), y1 - bt + bt * math.cos(a)) for a in s] if bt > 0 else [(0, y1)]
+    bot = [(bb * (1 - math.cos(a)), y0 + bb - bb * math.sin(a)) for a in s] if bb > 0 else [(0, y0)]
+    return top + bot
+
+
+def rbox(acc, cx, y0, cz, w, d, h, rp, bt=0.0, bb=0.0, n=3, segs=2, grow=0.0):
+    """Rounded block: plan corner radius rp, top/bottom edge radii bt/bb, n arc segments per corner; grow = offset outwards."""
+    sweep(acc, lambda k: rrect_pts(cx, cz, w / 2, d / 2, [rp] * 4, n, k - grow), _rsec(y0, y0 + h, bt, bb, segs))
+
+
+def rpanel(acc, face, cx, cy, cz, w, h, r, t, n=3):
+    """Thin rounded-rectangle plate. face 'z-' (front), 'z+', 'x-' or 'x+': the way it looks; (cx, cy, cz) = centre of
+    its inner face, t = thickness outwards. r <= min(w, h) / 2."""
+    pts = rrect_pts(0, 0, w / 2, h / 2, [r] * 4, n)
+    sg = -1 if face.endswith('-') else 1
+    m = len(pts)
+
+    def P(u, v, o):
+        return (cx + u, cy + v, cz + sg * o) if face[0] == 'z' else (cx + sg * o, cy + v, cz + u)
+    verts = [P(u, v, 0) for u, v in pts] + [P(u, v, t) for u, v in pts]
+    acc.solid(verts, [(i, (i + 1) % m, m + (i + 1) % m, m + i) for i in range(m)] + [tuple(range(m)), tuple(range(m, 2 * m))])
+
+
+def _fbox(ctx, role, face, cx, cy, cz, u, v, o, du, dv, dt):
+    """Box on a module face: plane coords u (along the face) / v (up) / o (outwards), size du x dv x dt (thickness dt)."""
+    sg = -1 if face.endswith('-') else 1
+    if face[0] == 'z':
+        obox(ctx.a[role], (cx + u, cy + v, cz + sg * o), (du, dv, dt))
+    else:
+        obox(ctx.a[role], (cx + sg * o, cy + v, cz + u), (dt, dv, du))
+
+
+def _silhouettes(ctx, face, x, y, z, w, h, seed):
+    """Flat dark cut-outs on a lit pane (people, a table with chairs, a plant): what you see through a window, not furniture models."""
+    rnd = random.Random(seed)
+    o, b = .115, -h / 2 + .02
+    u = -w / 2 + .6
+    while u < w / 2 - .4:
+        kind = rnd.choice(('person', 'table', 'plant', 'person'))
+        if kind == 'person' and h > .9:
+            ph = min(h * .78, 1.25)
+            _fbox(ctx, 'joint', face, x, y, z, u, b + ph * .36, o, .34, ph * .72, .03)
+            _fbox(ctx, 'joint', face, x, y, z, u, b + ph * .86, o, .2, ph * .26, .03)
+            u += 1.5
+        elif kind == 'table':
+            _fbox(ctx, 'joint', face, x, y, z, u, b + .52, o, .95, .05, .03)
+            _fbox(ctx, 'joint', face, x, y, z, u, b + .26, o, .07, .5, .03)
+            for c in (-.6, .6):
+                _fbox(ctx, 'joint', face, x, y, z, u + c, b + .3, o, .3, .6, .03)
+            u += 2.4
+        else:
+            _fbox(ctx, 'joint', face, x, y, z, u, b + .16, o, .3, .3, .03)
+            _fbox(ctx, 'joint', face, x, y, z, u, b + .55, o, .45, .55, .03)
+            u += 1.4
+
+
+def _window(ctx, face, x, y, z, w, h, role, mull=0, r=None, seed=0, sil=True, awning=None):
+    """Real-glass window on a module face: thin dark frame, warm pane with dark interior cut-outs, thin mullions, sill and an
+    optional awning slab above ('slate' / 'teal' / 'oak'). (x, y, z) = on the wall; r = corner radius."""
+    r = min(h / 2 - .02, .22) if r is None else min(r, h / 2 - .02, w / 2 - .02)
+    rpanel(ctx.a['slate'], face, x, y, z, w + .14, h + .14, r + .07, .05)
+    rpanel(ctx.a[role], face, x, y, z, w, h, r, .09)
+    if sil:
+        _silhouettes(ctx, face, x, y, z, w, h, seed)
+    for i in range(1, mull + 1):
+        _fbox(ctx, 'slate', face, x, y, z, -w / 2 + i * w / (mull + 1), 0, .12, .05, h, .06)
+    _fbox(ctx, 'grey', face, x, y, z, 0, -h / 2 - .1, .1, w + .3, .06, .2)
+    if awning:
+        _fbox(ctx, awning, face, x, y, z, 0, h / 2 + .32, .32, w + .5, .09, .62)
+        _fbox(ctx, 'slate', face, x, y, z, 0, h / 2 + .24, .1, w + .3, .1, .14)
+
+
+def _door(ctx, face, x, y, z, u, role, awning='slate'):
+    """Small entrance on a module face (sill at y): oak or slate door leaf with a lit light, canopy, and two steps down."""
+    o = .08
+    _fbox(ctx, 'joint', face, x, y, z, u, 1.05, o, 1.25, 2.1, .06)
+    _fbox(ctx, role, face, x, y, z, u, 1.05, o + .06, 1.05, 2.0, .05)
+    _fbox(ctx, 'pane_w', face, x, y, z, u, 1.3, o + .09, .55, 1.15, .03)
+    _fbox(ctx, awning, face, x, y, z, u, 2.3, .4, 1.9, .09, .85)
+    for sg in (-1, 1):
+        _fbox(ctx, 'slate', face, x, y, z, u + sg * .85, 2.15, .12, .08, .3, .08)
+    _fbox(ctx, 'grey', face, x, y, z, u, -.07, .9, 1.7, .22, .95)       # lower step
+    _fbox(ctx, 'grey', face, x, y, z, u, .02, .45, 1.55, .08, .6)        # upper step
+
+
+def _grooves(ctx, face, x, y0, y1, z, u0, u1, step):
+    """Thin vertical panel seams on a wall."""
+    u = u0
+    while u <= u1 + 1e-6:
+        _fbox(ctx, 'slate', face, x, (y0 + y1) / 2, z, u, 0, .0, .035, y1 - y0, .03)
+        u += step
+
+
+# variant -> (body, skirt, roof cap, accent panel, pane light role); pane roles: pane_w warm white, pane_a pale amber, pane_c cool white.
+EVENT_LOOKS = {'A': ('white', 'teal', 'grey', 'teal', 'pane_w'), 'B': ('teal', 'white', 'white', 'white', 'pane_a'), 'C': ('grey', 'oak', 'white', 'oak', 'pane_c'),
+               'D': ('oak', 'slate', 'white', 'teal', 'pane_a'), 'E': ('grey', 'teal', 'teal', 'white', 'pane_w'), 'F': ('white', 'oak', 'oak', 'teal', 'pane_c'),
+               'H': ('white', 'oak', 'grey', 'teal', 'pane_w')}
+
+
+def event_module(ctx, x, y, z, variant='A', w=8.6, d=8.6, h=3.2):
+    """Self-contained event module, a small building that rides the shelf (spec: artifacts/sw-event-shelf/spec.md R3).
+    Centred on (x, z), underside of the drive shoes at y, front -z, 8.6 x 8.6 x 3.2 m (hall H: h = 7.4), rounded capsule shell
+    (plan radius 1.1 m, 0.55 m edges). Programme per variant: A event hall, B cafe (striped awning), C exhibit (tall display
+    windows), D workshop (roller door, clerestory, roof garden), E lounge (porthole accent, solar roof), F study room, H double-height
+    hall. Each has an entrance with canopy and two steps, thin-framed warm-glass windows with flat interior cut-outs, an accent panel,
+    panel seams and roof plant, four drive shoes on two slide rails (x = +-3.6, 11.2 m long, carried under the module), four corner
+    couplings and four roof lifting rings. Roles: white, teal, grey, oak, slate, dark, rail, cyan, green, joint, pane_w, pane_a, pane_c."""
+    body, skirt, cap, acc, light = EVENT_LOOKS[variant]
+    A = ctx.a
+    hw, hd, ys, hs = w / 2, d / 2, y + .3, h - .3
+    RP = 1.1
+    for sx in (-1, 1):                                              # drive shoes: bogie plate + roller cap
+        for sz in (-1, 1):
+            obox(A['slate'], (x + sx * 3.6, y + .12, z + sz * 3.3), (1.0, .24, 1.9))
+            obox(A['rail'], (x + sx * 3.6, y + .27, z + sz * 3.3), (.42, .08, 1.7))
+    for sx in (-1, 1):                                               # slide rails travel with the module (cell depth 12 m minus the beams), so empty cells stay open
+        obox(A['joint'], (x + sx * 3.6, y + .15, z), (.5, .3, 11.2))
+    rbox(A[body], x, ys, z, w, d, hs, RP, bt=.55, bb=.55)                     # shell
+    rbox(A[skirt], x, ys, z, w, d, 1.15 if variant == 'F' else .7, RP, bb=.55, grow=.03)
+    rbox(A[cap], x, y + h - .62, z, w, d, .62, RP, bt=.55, grow=.03)           # roof cap
+    wy = ys + 1.5
+    fz, bz = z - hd, z + hd                                          # front / back wall planes
+    side = lambda sx_: x + sx_ * hw                                  # noqa: E731
+    S = lambda face: 'x-' if face < 0 else 'x+'                      # noqa: E731
+    sd = ord(variant)
+    if variant == 'A':                                               # event hall: wide band, door right, teal accent left
+        _window(ctx, 'z-', x - .6, wy, fz, 3.4, 1.25, light, 2, seed=sd, awning='teal')
+        _door(ctx, 'z-', x, ys, fz, 2.2, 'oak')
+        for s in (-1, 1):
+            _window(ctx, S(s), side(s), wy, z, 3.0, 1.2, light, 1, seed=sd + s)
+        rpanel(A['teal'], 'z-', x - 3.0, wy, fz, .45, 2.3, .22, .05)
+    elif variant == 'B':                                             # cafe: window under a striped awning, door left, portholes on the sides
+        _window(ctx, 'z-', x + .9, wy, fz, 3.0, 1.3, light, 2, seed=sd, awning='white')
+        for i in range(-2, 3):
+            if i % 2 == 0:
+                _fbox(ctx, 'teal', 'z-', x, wy, fz, .9 + i * .6, 1.64, .33, .6, .1, .63)
+        _door(ctx, 'z-', x, ys, fz, -2.1, 'slate', awning='white')
+        for s in (-1, 1):
+            for dz in (-1.5, 1.5):
+                _window(ctx, S(s), side(s), wy, z + dz, 1.2, 1.2, light, 0, r=.6, seed=sd + s + int(dz * 4))
+    elif variant == 'C':                                             # exhibit: two tall display windows, door right, oak accent
+        for u in (-2.0, 0):
+            _window(ctx, 'z-', x + u, ys + 1.25, fz, 1.5, 1.9, light, 1, r=.3, seed=sd + int(u * 5), awning='oak')
+        _door(ctx, 'z-', x, ys, fz, 2.2, 'slate', awning='oak')
+        for s in (-1, 1):
+            _window(ctx, S(s), side(s), ys + 1.25, z + 1.3, 1.4, 1.9, light, 0, r=.3, seed=sd + s)
+            _window(ctx, S(s), side(s), ys + 1.25, z - 1.3, 1.4, 1.9, light, 0, r=.3, seed=sd + s + 7)
+    elif variant == 'D':                                             # workshop: roller door, window, roof garden
+        _fbox(ctx, 'slate', 'z-', x, ys, fz, -1.6, 1.05, .08, 2.6, 2.1, .06)
+        for i in range(8):
+            _fbox(ctx, 'grey', 'z-', x, ys, fz, -1.6, .2 + i * .25, .12, 2.4, .04, .04)
+        _window(ctx, 'z-', x + 1.8, ys + 1.3, fz, 2.2, 1.3, light, 1, seed=sd, awning='slate')
+        for s in (-1, 1):
+            _window(ctx, S(s), side(s), ys + 1.35, z, 3.0, 1.1, light, 1, seed=sd + s)
+    elif variant == 'E':                                             # lounge: door left, window with teal awning, portholes on the sides
+        _door(ctx, 'z-', x, ys, fz, -1.8, 'oak', awning='teal')
+        _window(ctx, 'z-', x + 1.3, wy, fz, 2.8, 1.3, light, 1, seed=sd, awning='teal')
+        for s in (-1, 1):
+            for dz in (-1.6, 1.6):
+                _window(ctx, S(s), side(s), wy, z + dz, 1.1, 1.1, light, 0, r=.55, seed=sd + s + int(dz * 4))
+    elif variant == 'F':                                             # study room: long band, oak door left, teal accent right
+        _window(ctx, 'z-', x + .6, wy, fz, 3.6, 1.2, light, 3, seed=sd)
+        _door(ctx, 'z-', x, ys, fz, -2.3, 'oak', awning='oak')
+        for s in (-1, 1):
+            _window(ctx, S(s), side(s), wy, z, 3.0, 1.2, light, 1, seed=sd + s)
+        rpanel(A['teal'], 'z-', x + 3.05, wy, fz, .45, 2.3, .22, .05)
+    else:  # H
+        _window(ctx, 'z-', x - .9, y + 3.8, fz, 3.2, 4.4, light, 2, r=.5, seed=sd, sil=False)
+        _door(ctx, 'z-', x, ys, fz, 2.2, 'oak')
+        for u in (-3.1, 3.1):
+            rpanel(A['teal'], 'z-', x + u, y + 3.9, fz, .5, 5.4, .25, .06)
+        for s in (-1, 1):
+            _window(ctx, S(s), side(s), y + 3.8, z, 3.0, 3.4, light, 1, r=.5, seed=sd + s, sil=False)
+    for s_ in (-1, 1):                                               # panel seams on the side walls (the panes sit over them)
+        _grooves(ctx, S(s_), side(s_), ys + .75, y + h - .7, z, -3.0, 3.0, 1.5)
+    _window(ctx, 'z+', x, wy, bz, 2.4, 1.0, light, 0, seed=sd + 11)  # back wall, one small window
+    top = y + h
+    for sx in (-1, 1):                                               # roof: lifting rings with lugs
+        for sz in (-1, 1):
+            cyl(A['rail'], x + sx * 3.3, z + sz * 3.3, .5, top - .02, top + .16, 10)
+            cyl(A['dark'], x + sx * 3.3, z + sz * 3.3, .25, top + .1, top + .26, 8)
+            obox(A['rail'], (x + sx * 3.3 + sx * .5, top + .1, z + sz * 3.3), (.6, .22, .5))
+    for sx in (-1, 1):                                               # four corner couplings on the rounded corners (cyan lock light on the front pair)
+        for sz in (-1, 1):
+            ex, ez = sx * (hw - RP + RP * .7071 + .12), sz * (hd - RP + RP * .7071 + .12)
+            for yy in (ys + .55, y + h - .9):
+                cyl(A['joint'], x + ex, z + ez, .4, yy - .3, yy + .3, 10)
+            if sz < 0:
+                cyl(A['cyan'], x + ex * 1.02, z + ez * 1.02, .2, y + h - .9 + .3, y + h - .9 + .38, 8)
+    if variant == 'D':                                               # planted roof deck
+        for dx in (-2.6, 0, 2.6):
+            obox(A['white'], (x + dx, top + .2, z + .6), (2.0, .3, 1.8))
+            obox(A['green'], (x + dx, top + .42, z + .6), (1.8, .15, 1.6))
+            blob(A['green'], (x + dx, top + .6, z + .6), (.7, .4, .7), sub=1, seed=dx + 3)
+    elif variant in ('A', 'F'):                                      # roof plant: AC unit with louvres and a vent stack
+        obox(A['grey'], (x - 1.2, top + .32, z + 1.2), (1.8, .5, 1.2))
+        obox(A['slate'], (x - 1.2, top + .6, z + 1.2), (1.5, .1, .9))
+        cyl(A['rail'], x + 1.2, z + 1.4, .22, top, top + .7, 8)
+    elif variant == 'E':                                             # solar panels on a tilt-free rack
+        for dx in (-1.6, 1.0):
+            obox(A['dark'], (x + dx, top + .32, z + .4), (2.2, .08, 2.6))
+            obox(A['grey'], (x + dx, top + .18, z + .4), (.2, .3, 2.4))
+    elif variant == 'B':                                             # kitchen extract + planter
+        obox(A['grey'], (x + 1.6, top + .35, z + 1.0), (1.4, .55, 1.0))
+        cyl(A['rail'], x - 1.2, z + 1.3, .3, top, top + .7, 8)
+        obox(A['white'], (x - 1.0, top + .2, z - 1.0), (1.8, .3, .9))
+        blob(A['green'], (x - 1.0, top + .62, z - 1.0), (.6, .4, .4), sub=1, seed=5)
+    elif variant == 'C':                                             # skylight + AC
+        obox(A['pane_w'], (x - 1.0, top + .12, z), (2.6, .08, 1.8))
+        obox(A['grey'], (x + 1.8, top + .32, z + 1.3), (1.6, .5, 1.0))
+    elif variant == 'H':
+        obox(A['grey'], (x + 1.5, top + .32, z + 1.5), (2.4, .5, 1.6))
+        cyl(A['rail'], x - 1.5, z + 1.5, .3, top, top + 1.2, 8)
+
+
+def lattice_frame(ctx, cx=0, cz=0, y0=0, cols=3, rows=2, levels=10, cell=12.0, floor_h=4.0, col=1.3, ground_tracks=(-12.0, 12.0), gauge=7.2):
+    """Heavy dark-grey structural frame, front -z (spec R2): (cols+1)(rows+1) 1.3 m square columns, 0.9 x 0.8 m beam ring at every
+    level (beam top = module floor of that level), large chamfered joint blocks at every column/beam crossing, a light guide rail with rack teeth,
+    dark base and cyan guide strips at every column line on the front and back faces (ground to roof), two runway beams
+    (white, 1 m) cantilevered 7.5 m past each end on gusset braces with teal end stops, two ground tracks (gauge 7.2 m, +-3.6
+    from x = -12 / +12) and a paving plinth. Default 36 x 24 x 40 m. Roles: frame, joint, rail, white, teal, dark, cyan, paving."""
+    W, D, H = cols * cell, rows * cell, levels * floor_h
+    xs = [cx - W / 2 + i * cell for i in range(cols + 1)]
+    zs = [cz - D / 2 + j * cell for j in range(rows + 1)]
+    A = ctx.a
+    obox(A['paving'], (cx, y0 + .1, cz - 4), (W + 4, .2, D + 12))
+    for xc in xs:
+        for zc in zs:
+            obox(A['frame'], (xc, y0 + .2 + (H - .2) / 2, zc), (col, H - .2, col))
+            obox(A['joint'], (xc, y0 + .45, zc), (col + .5, .5, col + .5))
+    for k in range(1, levels + 1):                                  # R3: one floor-edge beam per face; no interior along-z beams
+        yb = y0 + k * floor_h - .4
+        for zc in zs:
+            obox(A['frame'], (cx, yb, zc), (W + col, .8, .9))
+        for xc in (xs[0], xs[-1]):
+            obox(A['frame'], (xc, yb, cz), (.9, .8, D + col))
+        if k % 2 == 0 or k == levels:                               # joint blocks only every other level, on the front/back columns
+            for xc in xs:
+                for zc in (zs[0], zs[-1]):
+                    rbox(A['joint'], xc, yb - .65, zc, 2.0, 2.0, 1.3, .45, n=1, segs=1)
+    zf = zs[0] - col / 2                                            # front column face; back is mirrored
+    for sg, face in ((-1, zf), (1, zs[-1] + col / 2)):
+        for xc in xs:
+            top = y0 + H + .6
+            obox(A['dark'], (xc, y0 + .2 + (H - .2) / 2, face + sg * .125), (.9, H - .2, .25))
+            obox(A['rail'], (xc, y0 + .2 + (top - y0 - .2) / 2, face + sg * .4), (.5, top - y0 - .2, .3))
+            for yy in range(4, int(H), 4):
+                obox(A['dark'], (xc, y0 + yy, face + sg * .58), (.5, .24, .1))      # rack teeth
+                obox(A['cyan'], (xc, y0 + yy + 2.0, face + sg * .57), (.07, 1.6, .06))  # guide strip segments
+    ext, ext_b = 7.5, 2.0                                           # runway beams: 7.5 m cantilever on the front (the hoist side), only 2 m at the back
+    for xc in (xs[0], xs[-1]):
+        z0, z1 = cz - D / 2 - ext - .45, cz + D / 2 + ext_b + .45
+        obox(A['white'], (xc, y0 + H + .5, (z0 + z1) / 2), (1.0, 1.0, z1 - z0))
+        for sg, e in ((-1, ext), (1, ext_b)):
+            _wedge(A['frame'], xc, y0 + H - 3.2, .8, cz + sg * (D / 2 + .65), cz + sg * (D / 2 + e - .6), 3.2)
+            obox(A['teal'], (xc, y0 + H + .55, cz + sg * (D / 2 + e + .1)), (1.5, 1.2, 1.0))
+            obox(A['cyan'], (xc, y0 + H + 1.25, cz + sg * (D / 2 + e + .1)), (.5, .2, .5))
+    for gx in ground_tracks:                                        # ground tracks from the plinth edge through the ground tier
+        z0, z1 = cz - D / 2 - 10, cz
+        for dx in (-gauge / 2, gauge / 2):
+            obox(A['rail'], (cx + gx + dx, y0 + .41, (z0 + z1) / 2), (.3, .18, z1 - z0))
+        n = int((z1 - z0) / 1.6)
+        for i in range(n + 1):
+            obox(A['dark'], (cx + gx, y0 + .26, z0 + i * (z1 - z0) / n), (gauge + .9, .12, .34))
+
+
 # Registry checked against LIBRARY.md by tests/assetLibrary.test.ts — add a row there for every new key.
 MODULES = {
     'kit_prop': kit_prop, 'person': person, 'seated_person': seated_person, 'furnish': furnish,
     'glass_room': glass_room, 'glass_lift': glass_lift, 'ring_doorways': ring_doorways,
+    'event_module': event_module, 'lattice_frame': lattice_frame,
 }

@@ -13,7 +13,8 @@ type Pose = { position: [number, number, number]; target: [number, number, numbe
 export const SHOTS: Record<ShotId, Pose> = {
   'nw:focal': { position: [212, 64, -342], target: [40, 62, -300] },
   'ne:focal': { position: [-280, 85, -245], target: [-210, 14, -135] },
-  'sw:focal': { position: [-95, 30, -15], target: [-105, 10, 60] },
+  // Event shelf (2026-11-13): low and square on the north face, the 40 m frame fills the shot with the bay behind it.
+  'sw:focal': { position: [-84, 50, 211], target: [-100, 19, 288] },
   // East pose (owner 2026-11-04): the only clear sightline that frames the full +1 tower; 0<->+1 changes.
   'se:focal': { position: [360, 45, -50], target: [182, 58, -38] },
   // Pulled back and up from the NW (owner 2026-11-05, option b) so the whole lot and the 0 tower fit, clear of the P1 beams; used when a focal change starts or ends at the low band (-1<->0).
@@ -22,7 +23,7 @@ export const SHOTS: Record<ShotId, Pose> = {
   'nw:focal-low': { position: [140, 28, -332], target: [40, 26, -300] },
   'nw:district': { position: [-30, 115, -455], target: [40, 43, -300] },
   'ne:district': { position: [-320, 110, -300], target: [-210, 14, -135] },
-  'sw:district': { position: [-108, 80, 180], target: [-105, 10, 60] },
+  'sw:district': { position: [-40, 90, 175], target: [-100, 14, 297] },
   'se:district': { position: [27, 150, -188], target: [182, 40, -38] },
   // District stages (2026-11-11): one wide authored view per cluster of slots, so a ±2/±3 change shows several slots changing together.
   'nw:stage-west': { position: [-382, 115, 150], target: [-382, 25, 0] },
