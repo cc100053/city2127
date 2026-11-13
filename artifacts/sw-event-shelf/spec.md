@@ -316,3 +316,12 @@ headline 模組 = 該 mixed 座位數的最後一個（`SHELF_SLOTS[count-1]`，
 
 ## 立即路徑
 snapshot／reset／Undo／reconnect／reduced-motion 的 `setTarget(…, immediate)` 走 `settle`，不使用吊運；模組數與 band 等於權威狀態。
+
+## 字幕與說明卡文案（R3d，2026-11-13）
+
+SW 設施不設單一總名，按狀態各說各的：−1 為私人小庭、+1 為開放廣場（沿用 COMMONS 模型與原文案），只有 mixed 為「活動モジュール棚」。理由：−1／+1 並非棚，若以「棚」作總名會與模型矛盾；而說明卡本來就按 band 選卡，無需總名。內部站名 `changeSites.sw.name` 已為 `EVENT SHELF`，地點標示「お台場南岸」不變。
+
+- 設施卡 `commons.hybrid`（ID 為內部名，沿用）：〈小さな建物を、必要な場所へ〉「その日の過ごし方に合わせて、場所も変えたい。活動モジュールが棚へ運び入れられ、運び出されて、水辺の使い方を入れ替えています。」居民視角，不稱「規劃」。
+- 結果卡第二句（`residentResult`，只在 SW 焦點為實際 carrier 時）：進 mixed＝棚が現れ小さな建物が運び入れられました；mixed→high／low＝活動モジュールが棚から運び出され、共有席／囲われた席が増えました；DEV 內增減＝新しい活動モジュールが運び入れられ／運び出されました。low↔high 沿用舊句。
+- 時機：沿用 R3c，SW 焦點變化於 10.12 s（5.12 s 起 5 s 過場結束後）出現，與吊運結束（約 10.1 s）吻合，之後閱讀約 2.9 s。
+- 未動：`LABELS.sharedSeats`（來自伺服器 `cityChanges` 契約，iPad 回饋顯示「共有席 4 → 5」）、Q2 選項文字、district 的 `DISTRICT_RESULTS.sw`、`effect.commons*`（皆屬 −1／+1 或其他水辺設施）。

@@ -68,8 +68,8 @@ function change(r: Row) {
   // The result card's own function, fed the smallest proposal that shows this change.
   const result = residentResult({
     answers: [{ questionId: q.id, optionId: option.id }], votes: {},
-    beforeLayout: { automatedPorts: 3, sharedSeats: 4, treeCount: 4, coolingFins: 4, bands: {} },
-    afterLayout: { automatedPorts: up ? 6 : 0, sharedSeats: up ? 8 : 0, treeCount: up ? 8 : 4, coolingFins: up ? 4 : 8, bands: { [r.site]: b } },
+    beforeLayout: { automatedPorts: 3, sharedSeats: [0, 4, 8][band(r.from)], treeCount: 4, coolingFins: 4, bands: { [r.site]: ['low', 'mixed', 'high'][band(r.from)] } },
+    afterLayout: { automatedPorts: up ? 6 : 0, sharedSeats: [0, 4, 8][band(r.to)], treeCount: up ? 8 : 4, coolingFins: up ? 4 : 8, bands: { [r.site]: b } },
   } as never, [{ socketId: r.site, focal, district: !focal }] as never);
   const card = RESIDENT_CARDS[site.cards[band(r.to)]];
   return `<section class="change"><h3>${r.site.toUpperCase()} ${r.from} → ${r.to} <small>${esc(r.shot)}，佔全部提案 ${(100 * r.share).toFixed(1)}%</small></h3>

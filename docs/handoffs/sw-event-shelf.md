@@ -1,7 +1,7 @@
 # sw-event-shelf — SW 新旗艦：活動モジュール棚
 
 - Owner: cc100053
-- Status: R3c（進／出 mixed 的完整吊運，5 s 過場）完成 — 待 owner 視覺驗收（未 merge）
+- Status: R3d（字幕與說明卡日文文案、文件、change sheet）完成 — 動畫已由 owner 驗收（未 merge）
 - Branch: `feat/sw-event-shelf`（worktree：`.claude/worktrees/sw-event-shelf`，由 origin/main e13689b 切出；主 checkout 的無關未提交變更原封不動）
 - Base commit: e13689b3fd97eea312d421acac3fbe185b448ecc
 - Last verified commit: R2 commit（見 git log；測試與 build 於提交前通過）
@@ -94,6 +94,15 @@
   - **逐項（如實，僅依 contact sheet 目測，只細看了 e1／e2／e4 的過場與 e2 的回 hero，e3 只當與 e1 對稱而未逐幀細看）**：(1) 吊運在 close-up 鏡頭內可見：鏡頭 4.62 s 到位，吊運 7.0–10.1 s 在畫面右下前立面上升、橫移入格，全程在框內。(2) 框架出現與吊運：框架 5.1–6.4 s 先起，模組 6.4–7.2 s 滑入，之後吊運，彼此不重疊；進入時 5.12–6.5 s 才見框架，約 1.4 s 內畫面主要是框架生長。(3) 模組穿框：單元測試通過；錄影目測無穿柱。(4) 纜索與吊桁：目測跟隨，未逐幀量測。(5) **地面入場被前景傘形樹冠遮住**（同 R3b）：入場只見由傘後駛出，未解。(6) **e4（high→mixed）：+1 的圓頂傘與階梯座席在框架生長時仍可見，到約 6.5 s 才被框架蓋過／退場**（舊 high 狀態用舊 at/span 在 2.1 s 窗口內退場），框架生長期間有明顯重疊；e2（low）重疊較少但小亭仍在框架底部可見至約 6 s。未處理。(7) 結束後閱讀：10.12–13 s ≈ 2.9 s 棚靜止（模組 hang 姿態仍緩慢升降），13.25 s 起拉回 hero，15.0 s 前完成。(8) 原因文字 SW 焦點變化於 10.12 s 出現（單元測試覆蓋 `reasonDelayMs`；真實卡片未截圖逐幀）。
   - 未驗證／未解：reduced-motion 只靠既有立即路徑與單元測試（未手動看）；snapshot／reset／Undo／reconnect 本輪未重跑 R3b 的 `immediate`／`reconnect` 腳本（只改了 `setTarget` 的非立即分支，`settle` 路徑未變）；夜景、FPS 未測（不引用數字）；headline 模組吊運速度較 R3b 慢（3.1 s 對 3.0 s，但整體 5 s 內其餘動作較快）；`low↔high` 直接切換與其他 site 仍 3 s。
   - 驗證（commit 前）：根 `npm test`、`npm run build`、`git diff --check` 全部通過（另修正 `energyPipeline.test.ts` 的等待時間 5→7 s）。`survey/`、`module-swap/` 未動（survey 只用 dev:auto）。
+
+- **R3d（2026-11-13，起點 320c13f，只動文案、文件、測試、change sheet；動畫與建模未動）**：
+  - 命名方案：SW 不設單一總名，按狀態各說各的（−1 私人小庭、+1 開放廣場沿用 COMMONS 文案，只有 mixed 為活動モジュール棚）；`changeSites.sw.name` 早已是 `EVENT SHELF`，地點標示「お台場南岸」不變。理由與文案見 [spec R3d 節](../../artifacts/sw-event-shelf/spec.md)。不牽涉 survey 契約或其他 site，所以不需停下。
+  - 盤點結果：真正仍把 SW mixed 稱作 COMMONS／共有席的使用者可見出口只有兩處——設施卡 `commons.hybrid`（原「静けさと出会いのあいだ」）與結果卡第二句（原 mixed 一律走「共有席が増えました／囲われた席が増えました」）；兩者均已改。`LABELS.sharedSeats`（「共有席」，iPad 回饋計數，來自伺服器契約）、Q2 選項、`DISTRICT_RESULTS.sw`、`effect.commons*` 屬 −1／+1 或其他水辺設施，未動。程式註解中的 COMMONS（layout.ts、districtMeters.ts）是舊地塊的歷史說明，保留。
+  - 改動：`src/surveyAtmosphere.ts`（`commons.hybrid`、`residentResult` 的 SW 分支按 `bands.sw` 前後選句）、`scripts/changeSheet.ts`（傳入 SW 前後 band 與座位，使 mixed 列顯示棚文案）、`tests/surveyAtmosphere.test.ts`（八種變化的 SW 文案斷言、全日文、不含 COMMONS／コモンズ、字數 ≤ 80）、`docs/RESIDENT_COPY.md`、`RESIDENT_SCENE_PLAN.md`（SW focal 列）、`EXHIBITION_SPEC.md`、`PROJECT.md`、spec。
+  - change sheet：`scripts/closeupSheet.mjs` 重截 `sw:focal` 六幀（舊幀仍是 COMMONS 模型，已移到 `~/city2127-evidence/stage-closeups/sheet-old-sw/`），`changeSheet.ts` 重生成 `artifacts/change-review/`（6 張 960 px jpg ＋ index.html，共約 9.4 MB 目錄，無新 PNG）。
+  - 驗證（2026-11-13）：根 `npm test`、`npm run build`、`git diff --check` 通過；`survey/`、`module-swap/` 未動。真實流程（`survey dev:auto` ＋ Vite ＋ 無頭 Chrome 1920×1080 **實時**、真實 guest UI，四票：mixed→low、low→mixed、mixed→high、high→mixed）截圖與 `flow-log.json` 在 `~/city2127-evidence/sw-event-shelf/r3d/`（不入 Git）。四個事件的結果卡原因文字皆於約 9–10.6 s 之間出現，內容與預期句一致；ambient 設施卡（−1／mixed／+1）各出現一次且標題與狀態相符；面板在畫面右側，文字不被截斷（4–5 行），不遮住棚。e2（進 mixed）10.6 s 時 headline 模組已入格，與文字出現吻合。
+  - 驗證不足：截圖是實時無頭 Chrome（低幀率），文字出現時點只取 9.0／10.6 s 兩個取樣，未精確到 10.12 s；−1／+1 的 ambient 卡畫面為全景（非 SW 近鏡）；夜景、FPS 未測；e3／e4 只靠 flow-log 文字與少量畫面核對。
+  - 已知未解：iPad 回饋 `exhibitionFeedback` 在 mixed 內仍顯示「共有席 4 → 5」（伺服器標籤契約，未動）；live 下 mixed 座位恆 4，所以 mixed 內「運び入れ／運び出し」句只在 DEV 出現（live 只出現 band 切換句）；low↔high 直接切換句仍講共有席（沒有棚）。
 
 ## Code findings (2026-11-13, read-only)
 

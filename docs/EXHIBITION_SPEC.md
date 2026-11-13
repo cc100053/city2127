@@ -70,7 +70,7 @@ E4後automation／publicSharing／urbanConcentration每軸每份提案只有一�
 | 格 | 自動化 nw | 共有 sw | 集約 se |
 | --- | --- | --- | --- |
 | 0 | 全部 mixed（60% hybrid） | 同左 | 同左 |
-| ±1 | 只換 focal：デックス西轉 high／low（端口 6／0） | 只換 focal：アクアシティ南（座位 8／0） | 只換 focal：フジテレビ東（模組 6／2） |
+| ±1 | 只換 focal：デックス西轉 high／low（端口 6／0） | 只換 focal：お台場南岸（座位 8／0；0 為活動モジュール棚） | 只換 focal：フジテレビ東（模組 6／2） |
 | ±2 | 11 個服務灣按 rank 次序轉一半（mixed 同完整之間），hybrid 30% | 6 water rooms＋10 庭院轉一半，hybrid 30% | 10 塔／26 pods 轉一半，mid-rise 30% |
 | ±3 | 其餘服務灣＋fleets／飛行器／街道 pods（即舊完整 low／high） | 完整形態 | 完整形態 |
 
@@ -80,7 +80,7 @@ Headline 近鏡 G7（2026-10-31，已 merge main，視覺及性能未驗收）�
 
 Live headline（[pickHeadline](../survey/src/shared/cityView.ts)）：先揀向今位訪客投票方向移動的 site（中間票向 0），其次揀該訪客選的能源部件有變的情況；否則沿用新到達最高格、載體變化最多、能源的次序。能源部件同時變動時，鏡頭與結果卡跟所選部件；只有 headline site 有亮 pulse／marker 同結果卡，其他變化（例如同時嘅能源門檻）靜靜過渡。
 
-Headline 近鏡（2026-10-27；時間線於 2026-10-29 修訂）：live 結果先在 hero 播完 2.62 秒 vote journey，再用 2 秒推近 headline，停定 0.5 秒後於 5.12 秒開始 3 秒場景過渡。4.62–13 秒停留，13 秒與 ambient 卡同步開始用 2 秒返回 hero；原因文字於 8.12 秒出現。**例外（owner 2026-11-13）**：SW 焦點変化（活動モジュール棚進／出 mixed）的場景過渡延長為 5 秒（`SHELF_TRANSITION_SECONDS`，只用於 SW）：5.12–10.12 秒，原因文字於 10.12 秒出現，之後約 2.9 秒閱讀，13 秒返回 hero 不變。順序見 [棚 spec](../artifacts/sw-event-shelf/spec.md#r3c)。八個 site shot（四站各 focal／district）及五個能源 shot 用常數表，保留 hero 方向及海／地標定位；focal 與 district 同時改以 district 為準。能源鏡頭與結果卡共用部件優先次序，移除設備亦看原位置。新結果從現有位置先平滑回 hero；snapshot／reset／Undo／reconnect／reduced motion／legacy／追趕中的結果立即 hero。無 headline 不推近；如接續仍在播放的近鏡，先從當前位置用 2 秒平滑返回，再保持 hero 並恢復操作。普通 standalone 及其他 DEV review 不自動播放；DEV 可用 `?shot=` 逐鏡檢查。近鏡的模型／材質打磨及真人閱讀／展示硬件驗收另作任務。
+Headline 近鏡（2026-10-27；時間線於 2026-10-29 修訂）：live 結果先在 hero 播完 2.62 秒 vote journey，再用 2 秒推近 headline，停定 0.5 秒後於 5.12 秒開始 3 秒場景過渡。4.62–13 秒停留，13 秒與 ambient 卡同步開始用 2 秒返回 hero；原因文字於 8.12 秒出現。**例外（owner 2026-11-13）**：SW 焦點変化（活動モジュール棚進／出 mixed）的場景過渡延長為 5 秒（`SHELF_TRANSITION_SECONDS`，只用於 SW）：5.12–10.12 秒，原因文字於 10.12 秒出現（SW 的說明卡按 band 與實際變化選句，見 [RESIDENT_COPY](RESIDENT_COPY.md)），之後約 2.9 秒閱讀，13 秒返回 hero 不變。順序見 [棚 spec](../artifacts/sw-event-shelf/spec.md#r3c)。八個 site shot（四站各 focal／district）及五個能源 shot 用常數表，保留 hero 方向及海／地標定位；focal 與 district 同時改以 district 為準。能源鏡頭與結果卡共用部件優先次序，移除設備亦看原位置。新結果從現有位置先平滑回 hero；snapshot／reset／Undo／reconnect／reduced motion／legacy／追趕中的結果立即 hero。無 headline 不推近；如接續仍在播放的近鏡，先從當前位置用 2 秒平滑返回，再保持 hero 並恢復操作。普通 standalone 及其他 DEV review 不自動播放；DEV 可用 `?shot=` 逐鏡檢查。近鏡的模型／材質打磨及真人閱讀／展示硬件驗收另作任務。
 
 Closeup-zoom F 候選（2026-10-30）：district 改為較闊焦點構圖、停留期間慢推 7%；SW focal 避開主要遮擋。SE／NW 焦點及 district carrier 可讀性未達驗收，詳見 [F 自評](../artifacts/closeup-zoom/final/F-review.md)，最終仍待 owner 審閱。
 
