@@ -43,7 +43,7 @@ Two kinds of session:
 
    Done when the owner has picked a target for every needed state.
 5. **Set up rounds.**
-   - Create a worktree `.claude/worktrees/<task>` on `feat/<task>` from `origin/main` (the main checkout usually holds unrelated work).
+   - Work on `feat/<task>` in the main checkout. Create a worktree `.claude/worktrees/<task>` from `origin/main` only if the owner told you to (AGENTS.md); if the main checkout holds unrelated work, ask.
    - Write the handoff from `docs/handoffs/TEMPLATE.md` with every decision: role, lot, facing, massing, mechanism, states, target paths and the owner's own words. Add a `Dev_QA.md` entry.
    - Write `artifacts/<task>/spec.md` as a target inventory (closeup-polish step 5 format), including the `## Library` table.
    - Write `## R1 brief` in the handoff.
@@ -78,7 +78,7 @@ The owner pastes this prompt into a new session:
 
 ## Time sinks seen
 
-- macOS `sed -i` takes a different flag syntax. Make in-place edits with the Edit tool or Python.
+- Never use sed (macOS in-place sed takes a different flag syntax, and the repo hook blocks it). Make edits with the Edit tool or Python.
 - Check `git fetch`'s exit code before you record that it failed: a typo in the next command once wrote "fetch failed" into a handoff.
 - The full `npm test` takes about 10 minutes. Run it once per round, in the background, and never for documentation-only changes.
 - A long-lived coordinator that watches the rounds grows until it is compacted. With the handoff as the memory, no coordinator is needed.

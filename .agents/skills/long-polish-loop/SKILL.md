@@ -18,7 +18,7 @@ Lessons from city-taste-v2 (2026-11-02 overnight, [handoff](../../../docs/handof
 
 ## Phase A — owner awake (≈ 2 h before leaving)
 
-1. **Preflight.** AGENTS.md startup. Create the night folder: `git worktree add <repo>/../city2127-<task> -b feat/<task> origin/main`, symlink `node_modules` and `survey/node_modules`, push, write `docs/handoffs/<task>.md` (PLANNED, site queue, deadline). Call `request_keep_awake` for the whole night. Done: integration branch pushed.
+1. **Preflight.** AGENTS.md startup. Create the night folder (a worktree, so only if the owner told you to use one; otherwise a `feat/<task>` branch in the main checkout): `git worktree add <repo>/../city2127-<task> -b feat/<task> origin/main`, symlink `node_modules` and `survey/node_modules`, push, write `docs/handoffs/<task>.md` (PLANNED, site queue, deadline). Call `request_keep_awake` for the whole night. Done: integration branch pushed.
 2. **Prep, in parallel.** One read-only session per site (`cwd` = night folder, own Vite port, no commits) does closeup-polish step 2 (diagnosis table, chosen pose) and step 3 up to `prompts.md`, writing to the evidence folder `<task>/<site>/`. Done: per site a pose, `baseline/` captures and `prompts.md`.
 3. **Targets.** One Sonnet agent generates every state in Gemini through Claude in Chrome ([recipe](../closeup-polish/SKILL.md#gemini-target-images)), sites in turn, into `<site>/gen/`. Show the owner a contact sheet per site; the owner picks, and for each subject answers the size question: *grow the model to the target's frame share* or *crops follow the city*. Publish picks to `artifacts/<task>/<site>/target/` with `node scripts/publish-evidence.mjs`; record the size answers in the handoff. Done: every state has an owner-picked target and a size decision.
 
@@ -40,7 +40,7 @@ The owner may leave after step 3. Nothing below waits for them.
 - A known weakness is a score below 2, never a note on a pass. Do not touch other sites' builders or poses beyond what the spec names.
 - Stop new rounds at the time in the brief; leave the branch at the last kept round, pushed, with an `## RN` handoff entry per round.
 - Per-item keep and locked regions (closeup-polish steps 5 and 7): a round never carries a lost item's regression forward when its code is separable.
-- **One writer per folder.** Only one site session edits the night folder at a time. A session reopened while another works (by the owner or the dispatcher) moves to its own worktree first (`git worktree add <repo>/../city2127-<task>-<site> feat/<task>-<site>`); never commit on another site's branch (2026-11-05: SE's dropped R7 tower edit landed on the SW branch).
+- **One writer per folder.** Only one site session edits the night folder at a time. A session reopened while another works (by the owner or the dispatcher) moves to its own worktree first, only if the owner agrees (`git worktree add <repo>/../city2127-<task>-<site> feat/<task>-<site>`); never commit on another site's branch (2026-11-05: SE's dropped R7 tower edit landed on the SW branch).
 
 ## Gates (every round)
 
