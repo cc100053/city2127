@@ -15,15 +15,15 @@ OUT = sys.argv[sys.argv.index("--") + 1] if "--" in sys.argv else "/tmp/nagi"
 os.makedirs(OUT, exist_ok=True)
 
 SIT_Z = .60  # hips height seated (hip joint .57, seat top ~.49 m)
-POSES = {
-    "stand-carry": {"upperArm.L": (-6, 0, 0), "hand.L": (90, 0, 0), "upperArm.R": (-8, 0, 0), "lowerArm.R": (-10, 0, 0), "hand.R": (90, 0, 0)},
-    "sit-tablet": {"hips": (0, 0, 0), "torso": (-8, 0, 0), "upperLeg.L": (-90, 0, 0), "upperLeg.R": (-90, 0, 0), "lowerLeg.L": (90, 0, 0), "lowerLeg.R": (90, 0, 0),
-                   "upperArm.L": (-30, 0, 0), "lowerArm.L": (-70, 0, 0), "hand.L": (80, 0, 0), "upperArm.R": (-30, 0, 0), "lowerArm.R": (-60, 0, 0), "hand.R": (90, 0, 0), "head": (14, 0, 0)},
-    "phone-up": {"upperArm.R": (-45, 0, 0), "lowerArm.R": (-95, 0, 0), "hand.R": (40, 0, 0), "upperArm.L": (-30, 0, 0), "lowerArm.L": (-50, 0, 0), "hand.L": (70, 0, 0), "head": (6, 0, 0)},
+POSES = {  # hand roll Rz = +-70 hangs the device outward at the side (carry); P = upper + lower arm pitch; P = -90 holds the device flat as a tray
+    "stand-carry": {"upperArm.L": (-4, 0, 0), "lowerArm.L": (-8, 0, 0), "hand.L": (0, 0, 70), "upperArm.R": (-4, 0, 0), "lowerArm.R": (-8, 0, 0), "hand.R": (0, 0, -70)},
+    "sit-tablet": {"torso": (-8, 0, 0), "upperLeg.L": (-90, 0, 0), "upperLeg.R": (-90, 0, 0), "lowerLeg.L": (90, 0, 0), "lowerLeg.R": (90, 0, 0),
+                   "upperArm.L": (-20, 0, 0), "lowerArm.L": (-70, 0, 0), "hand.L": (0, 0, 0), "upperArm.R": (-20, 0, 0), "lowerArm.R": (-70, 0, 0), "hand.R": (0, 0, 0), "head": (14, 0, 0)},
+    "phone-up": {"upperArm.R": (-45, 0, 0), "lowerArm.R": (-80, 0, 0), "hand.R": (0, 0, 0), "upperArm.L": (-20, 0, 0), "lowerArm.L": (-70, 0, 0), "hand.L": (0, 0, 0), "head": (6, 0, 0)},
     "walk": {"upperLeg.L": (24, 0, 0), "lowerLeg.L": (8, 0, 0), "upperLeg.R": (-22, 0, 0), "lowerLeg.R": (30, 0, 0), "upperArm.R": (22, 0, 0), "lowerArm.R": (-10, 0, 0),
-             "hand.R": (90, 0, 0), "upperArm.L": (-30, 0, 0), "lowerArm.L": (-70, 0, 0), "hand.L": (80, 0, 0), "torso": (3, 0, -8)},
-    "enter": {"upperLeg.L": (20, 0, 0), "lowerLeg.L": (6, 0, 0), "upperLeg.R": (-16, 0, 0), "lowerLeg.R": (24, 0, 0), "upperArm.L": (-38, 0, 18), "lowerArm.L": (-95, 0, 0),
-              "hand.L": (95, 0, 0), "upperArm.R": (14, 0, 0), "hand.R": (90, 0, 0), "torso": (6, 0, -14), "head": (10, 0, 10)},
+             "hand.R": (0, 0, -70), "upperArm.L": (-20, 0, 0), "lowerArm.L": (-70, 0, 0), "hand.L": (0, 0, 0), "torso": (3, 0, -8)},
+    "enter": {"upperLeg.L": (20, 0, 0), "lowerLeg.L": (6, 0, 0), "upperLeg.R": (-16, 0, 0), "lowerLeg.R": (24, 0, 0), "upperArm.L": (-38, 0, 18), "lowerArm.L": (-57, 0, 0),
+              "hand.L": (0, 0, 0), "upperArm.R": (14, 0, 0), "hand.R": (0, 0, -70), "torso": (6, 0, -14), "head": (10, 0, 10)},
 }
 
 

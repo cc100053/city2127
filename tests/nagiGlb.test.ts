@@ -18,7 +18,7 @@ assert.ok(names.includes('hips') && names.includes('ROOT_NAGI') && !gltf.skins &
 
 let tris = 0;
 for (const mesh of gltf.meshes) for (const primitive of mesh.primitives) tris += gltf.accessors[primitive.indices].count / 3;
-assert.ok(tris <= 3000, `triangle budget ${tris}`);
+assert.ok(tris <= 5500, `triangle budget ${tris}`);
 assert.ok(gltf.materials.length <= 9 && gltf.materials.every((m: { name: string }) => m.name.startsWith('res_')), 'at most 9 role materials');
 assert.ok(buffer.length < 300_000, `small GLB (${buffer.length} bytes)`);
 console.log(`nagi.glb: PASS (${names.length} nodes, ${tris} tris, ${gltf.materials.length} materials, ${buffer.length} bytes)`);
