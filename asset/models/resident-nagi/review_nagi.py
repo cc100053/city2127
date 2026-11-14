@@ -41,6 +41,8 @@ def setup():
     sh = sc.display.shading
     sh.light, sh.color_type, sh.show_object_outline, sh.show_cavity = "STUDIO", "MATERIAL", True, True
     sc.render.film_transparent = False
+    sc.view_settings.view_transform = "Standard"  # factory AgX greys the role colours; the scene shows them closer to Standard
+    sh.show_specular_highlight = False
     sc.world = bpy.data.worlds.new("w"); sc.world.color = (.84, .85, .88)
     cam = bpy.data.objects.new("cam", bpy.data.cameras.new("cam")); sc.collection.objects.link(cam); sc.camera = cam
     cam.data.type = "ORTHO"
