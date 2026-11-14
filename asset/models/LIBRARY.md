@@ -97,7 +97,7 @@ Whole assets. Reuse a site asset elsewhere only as background context, and ask t
 | --- | --- | --- | --- |
 | `city-kit-2127` | props + modules (above) | `build_kit.py`, `modules.py` | everywhere |
 | `car-family-2127` | street pod, human-driven car | `build_car.py` | traffic anywhere |
-| `car-candidates-2127` | two human-driven car candidates, `car_green` (rounded, solar roof) and `car_tech` (low, smoked glass, light bars); `car_human`'s size, origin, facing and roles (draft, not placed, awaiting owner pick) | `build_candidates.py` (reuses `build_car` helpers); review `review_candidates.py` | traffic, once picked |
+| `car-candidates-2127` | human-driven car candidates, `car_green` (warm, round, solar roof) and `car_tech` (cool, faceted, smoked glass); `car_human`'s size, origin, facing and roles. Round 1 `car-*-2127`, round 2 `car-*-2127-r2` (≤ 6,000 tris, ≤ 1.90 m wide) (draft, not placed, awaiting owner pick) | `build_candidates.py` (round 1, reuses `build_car` helpers), `build_candidates_r2.py` (round 2, reuses round 1); review `review_candidates.py [r2]` | traffic, once picked |
 | `train-2127` | guideway train | `build_train.py` | guideway only |
 | `future-tree-2127` | landmark tree (catalog `prop`) | imported GLB | any planted deck |
 | `resident-minato` | named character Minato | `build_minato.py` | resident scenes |

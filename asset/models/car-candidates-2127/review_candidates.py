@@ -1,6 +1,6 @@
 """Studio review of the candidates beside today's car_human, re-imported from their GLBs (EEVEE, pale ground, one sun).
 
-blender -b --factory-startup --python-exit-code 1 -P review_candidates.py -- <out dir> [close]
+blender -b --factory-startup --python-exit-code 1 -P review_candidates.py -- <out dir> [close] [r2]
 Writes <car>-<view>.png for car_human, car_green, car_tech; `close` adds lamp and wheel close-ups. Importing the GLBs (not the
 .blend) is the load check: it prints each variant's bounds, triangle count and material roles.
 """
@@ -15,9 +15,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 MODELS = os.path.dirname(HERE)
 args = sys.argv[sys.argv.index("--") + 1:]
 out, close = args[0], "close" in args[1:]
+suffix = "-r2" if "r2" in args[1:] else ""  # `r2`: round 2's files
 CARS = [("car_human", os.path.join(MODELS, "car-family-2127", "car-family-2127.glb")),
-        ("car_green", os.path.join(HERE, "car-green-2127.glb")),
-        ("car_tech", os.path.join(HERE, "car-tech-2127.glb"))]
+        ("car_green", os.path.join(HERE, f"car-green-2127{suffix}.glb")),
+        ("car_tech", os.path.join(HERE, f"car-tech-2127{suffix}.glb"))]
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
@@ -80,7 +81,9 @@ for mat in bpy.data.materials:
         attr = t.nodes.new("ShaderNodeVertexColor")
         attr.layer_name = "Color"
         t.links.new(attr.outputs[0], bsdf.inputs["Base Color"])
-    if base == "car_shadow":
+    if base == "car_shadow":  # r2 wires the colour attribute's alpha in; the review hides the disc either way
+        for link in [l for l in t.links if l.to_node == bsdf and l.to_socket.name in ("Alpha", "Base Color")]:
+            t.links.remove(link)
         bsdf.inputs["Alpha"].default_value = 0
         mat.surface_render_method = "BLENDED"
     if base == "car_glass":

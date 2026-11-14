@@ -387,10 +387,10 @@ def strip_y_rows(car, mesh, ts, h, lift):
             prev = pair
 
 
-def arch_trim(car, mesh):
-    """Dark liner inside each arch (hides the cabin floor) and a lip round its edge."""
+def arch_trim(car, mesh, lip_w=.05, lip_color=None):
+    """Dark liner inside each arch (hides the cabin floor) and a lip round its edge, lip_w wide (default 0.05 m)."""
     p = car.p
-    liner, lip = (.07, .072, .075, 1), (p["LOWER"] if not p["ARCH"]["sides"] else p["FRAME"])
+    liner, lip = (.07, .072, .075, 1), lip_color or (p["LOWER"] if not p["ARCH"]["sides"] else p["FRAME"])
     for zw in (-WHEEL_Z, WHEEL_Z):
         pts = car.arch_outline(zw)
         r0 = p["WHEEL"]["r"]
@@ -407,7 +407,7 @@ def arch_trim(car, mesh):
                     mesh.vert((side * .46, y, z), liner, inward),
                     mesh.vert((side * (xo - .004), y, z), liner, inward),
                     mesh.vert((side * (xo + .012), y + dy / d * .004, z + dz / d * .004), lip, outward),
-                    mesh.vert((side * (xo - .002), y + dy / d * .05, z + dz / d * .05), lip, outward),
+                    mesh.vert((side * (xo - .002), y + dy / d * lip_w, z + dz / d * lip_w), lip, outward),
                 ])
             for a, b in zip(rows, rows[1:]):
                 mesh.face((a[0], a[1], b[1], b[0]), "car_body")
@@ -513,8 +513,9 @@ def mesh_box_rot(mesh, c, s, a, color):
         mesh.face([pts[i] for i in f], "car_body")
 
 
-def interior(car, mesh):
-    """build_car's seated pair and seats, lowered by dy for the low car; a dashboard and steering wheel ahead."""
+def interior(car, mesh, rear_bench=False):
+    """build_car's seated pair and seats, lowered by dy for the low car; a dashboard and steering wheel ahead.
+    rear_bench: one boxed bench instead of the two rear cushion seats (saves ~170 triangles; r2 budget)."""
     p = car.p["INTERIOR"]
     tmp = Mesh()
     box(tmp, (0, .42, -.1), (1.2, .03, 2.6), (.3, .3, .3, 1))
@@ -524,7 +525,12 @@ def interior(car, mesh):
     people = [((.34, .41, .48, 1), (.72, .55, .42, 1), (.1, .08, .07, 1), (.2, .24, .3, 1)),
               ((.62, .32, .26, 1), (.58, .4, .28, 1), (.2, .13, .08, 1), (.08, .1, .13, 1))]
     who = 0
+    if rear_bench:
+        box(tmp, (0, .5, p["rear"]), (1.1, .17, .5), p["seat"])
+        box(tmp, (0, .86, p["rear"] - .25), (1.1, .56, .12), p["seat"])
     for x, z, sitting in ((-.38, p["front"], True), (.38, p["front"], True), (-.38, p["rear"], False), (.38, p["rear"], False)):
+        if rear_bench and not sitting:
+            continue
         seat(tmp, x, z, 1, p["seat"])
         if sitting:
             person(tmp, x, z + .02, 1, *people[who])

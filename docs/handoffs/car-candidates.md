@@ -1,7 +1,7 @@
 # car-candidates — 兩台 2127 街道車候選（Blender）
 
 - Owner: cc100053
-- Status: IN_PROGRESS — 候選可預覽，等 owner 揀外觀；未替換展示場景車輛
+- Status: IN_PROGRESS — Round 2（`-r2`）可預覽，等 owner 確認外觀；未替換展示場景車輛。Round 2 詳情見文末「Round 2」
 - Branch: `feat/car-candidates-2127`
 - Base commit: `28c03b85b656222e2008b0beb3523010f57eea38`
 - Last verified commit: 見 branch tip（驗證結果見下）
@@ -69,3 +69,47 @@ Owner 要兩台台場 2127 街道車候選，沿用 `car_human` 嘅尺寸、朝�
 ## Next expected step
 
 Owner 睇對照圖揀一台（或要求修改）。揀定之後另開 integration 步驟：`mobility.ts` 換 asset、處理材質 role／tint、放寬 tri 上限、跑 clearance 同 browser 檢查，再 merge。
+
+## Round 2（owner 2026-11-14）
+
+Owner 要求先睇參考建築再定方向；方向確認後建模。上限：每台 ≤ 6,000 tris，另存 `-r2`，保留舊候選。
+
+### 參考分析（Git 以外）
+
+- 對照圖 `~/city2127-evidence/car-candidates/ref/reference-sheet.png`；腳本 `~/city2127-evidence/car-candidates/tmp/ref_inspect.py`、`ref_render.py`、`ref_sheet.ps1`。
+- 實際開啟（`.blend` 開啟 + `.glb` 匯入，全部成功，冇開唔到嘅檔案）：`car-family-2127`、`event-shelf-2127`、`resident-kiosk`、`se-district-2127`、`fuji-tv`，另加 r1 兩台候選。
+- 觀察：街邊建築全部啞光（rough .5–.6、metal 0），方體 + 0.55 m 圓角、圓角窗配厚窗框；清玻璃（α .10–.22）後面透出暖光；燈係連續細線。真金屬只喺 Fuji TV：冷藍灰鋁 .64/.69/.73（metal .82）、鈦 .60/.65/.70（metal .92）、藍煙燻玻璃 .04/.09/.11。
+- r1 嘅問題：造型唔呼應建築；`car_tech` 近黑高光；燈冇燈殼；`.blend` 材質預覽係白色；玻璃帶車身頂點色；闊 2.01／2.04 m；9k tris。
+
+### 交付
+
+- `build_candidates_r2.py` → `car-green-2127-r2.blend/.glb`、`car-tech-2127-r2.blend/.glb`（root `ROOT_CAR_GREEN_2127_R2`／`ROOT_CAR_TECH_2127_R2`，variant 仍叫 `car_green`／`car_tech`）。用 r1 嘅 `Car`、`strip_t`、`strip_y`、`arch_trim`、`lathe`、`interior`；r1 新增參數 `interior(rear_bench=False)`、`arch_trim(lip_w=.05, lip_color=None)`，預設值令 r1 GLB byte-for-byte 不變（已重建核對）。
+- 綠能款：一條弧線由車頭經車頂落車尾，暖米白 .92/.87/.78（啞光 rough .5）＋鼠尾草綠下圍 .26/.36/.29；清玻璃 α .25 凹入 12 mm、深色窗框；太陽能格順車頂曲面；膠囊頭燈（燈殼、3 粒 LED、DRL、燈罩），膠囊尾燈＋細燈線；aero 輪蓋 5 個深色開孔、球形胎壁。
+- 科技款：折面截面（車底摺、肩線最闊、玻璃屋內傾、車頂邊摺）、傾斜平面車頭車尾、梯形切角輪拱（石墨細唇）；冷藍灰金屬 .50/.56/.62（metal .8 rough .3）＋石墨下部；藍煙燻玻璃 .05/.10/.13 α .72；黑色窗柱；冰藍細燈條＋兩組三透鏡投射燈；分段紅尾燈中間一段冰藍倒車燈；7 輻渦輪輪圈、深色內筒、剎車碟。
+- 兩台：門縫、門底縫、平貼門柄、A 柱底 camera pod。
+- `.blend` 材質：`car_body`／`car_interior`／`car_shadow` 由 Color Attribute `Col` 接入 Base Color；玻璃同燈拆去冇顏色屬性嘅 `_lit` 物件，GLB 入面得 body／interior／shadow 有 `COLOR_0`。
+
+| | 現有 car_human | car_green r2 | car_tech r2 |
+| --- | --- | --- | --- |
+| Tris | 3,776 | 5,954 | 5,920 |
+| 最闊（不含地面陰影，含 pod） | 1.85 m | 1.89 m | 1.86 m |
+| 高 × 長 | 1.91 × 4.6 | 1.56 × 4.61 | 1.36 × 4.62 |
+| GLB | 275 KB | 263 KB | 277 KB |
+
+Tris 分佈（green / tech）：車身 2,016 / 1,896，車輪 1,728 / 2,128，車廂 840 / 840，燈 698 / 544，輪拱 240 / 192，門 204 / 204，太陽能 112 / –，pod 56 / 56，陰影 60 / 60。
+
+### Round 2 驗證
+
+- `.blend` 重新開啟（唔改材質）用 EEVEE 渲染：見到設計配色，`~/city2127-evidence/car-candidates/r2-final/blend-preview/`。
+- GLB 重新匯入 Blender（`review_candidates.py -- <dir> close r2`）：bounds、貼地、roles OK。
+- `tests/carCandidates.test.ts`（r1 + r2）PASS：r2 ≤ 6,000 tris、≤ 1.90 m、玻璃／燈冇 `COLOR_0`。`assetLibrary`、`siteAssets` PASS。
+- 近照：`~/city2127-evidence/car-candidates/r2-final/closeup-sheet.png`（studio，同鏡頭同光，單張喺 `r2-final/studio/`）。
+- 台場街景：Vite DEV `?review=street&reviewTime=20`，`hour=12` 同 `hour=22`，同一 lane pose（slot 19），三台車（現有 + r2 兩台）用 GLB 原始材質：`r2-final/street-day-sheet.png`、`street-night-sheet.png`（欄：遠景、街景、前 3/4、後 3/4）。遠景上方仍有一段橫樑擋住。
+- Application verification: NOT INTEGRATED。
+
+### 未做／待評估（owner 確認外觀之後）
+
+- 正式場景材質覆蓋：runtime 會用白色 `carBody` × tint 同淺藍 `carGlass` 蓋過，候選原色會冇咗。
+- 車道淨空：r2 已控制喺 ±0.95 m 探針內，但未跑 `tests/odaiba.test.ts` 嘅實際車道檢查（未接入場景）。
+- 效能：未量 FPS；現有 `siteAssets` 對 car_family 嘅上限係 4,000 tris。
+- 夜間燈：已提高 emissive（頭 4–5、尾 3.5–4），但仍比現有 car_human 嘅腰線暗。- 全套 `npm test`（43 步逐個跑，Windows 11、Node 24.19.0）：41 PASS；`surveyMeterPipeline`、`energyPipeline` FAILED，同 round 1 一樣係 survey question loader 喺 Windows 非 ASCII 路徑嘅既有問題，同本任務無關。`npm run build`、`git diff --check` PASS。
