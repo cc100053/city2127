@@ -3,7 +3,7 @@
 [居民情景計劃](../RESIDENT_SCENE_PLAN.md)階段 2 的第三個單位（SW focal，mixed 狀態進出）。已完成 [resident-scene](../../.agents/skills/resident-scene/SKILL.md) 步驟 1–3 及步驟 4 的 prompts 草稿；尚無人物模型、佈景或 DEV 演示。
 
 - Owner: cc100053
-- Status: IN PROGRESS（步驟 5 角色模型已建成，待 owner 審閱；步驟 6 起未開始）
+- Status: IN PROGRESS（步驟 5 角色模型第五輪已獲 owner 驗收，2026-11-14；步驟 6 起未開始）
 - Branch: `feat/resident-nagi-polish`（第四輪，起點 main `28c03b8`；前三輪分支已併入 main）
 - Base commit: `4575630` 的完整 SHA 見 `git log`（起點為 main `45756308c895ca9b424a1c7e0cccb7bc217171aa`）
 - Last verified commit: 本輪提交前的 working tree（起點 e1a3e02；`npm test`、`npm run build`、`git diff --check` 通過）
@@ -14,7 +14,7 @@
 - Session starting branch and HEAD: main `45756308c895ca9b424a1c7e0cccb7bc217171aa`
 - Last fetched origin/main commit: 同上，2026-11-14 fetch 成功，本地 main 與 origin/main 無分歧
 - Local changes present at session start: 未追蹤的 `Dev_QA.md`（保留，不屬本任務）
-- Upstream integration status: NOT INTEGRATED
+- Upstream integration status: 第五輪角色已併入 main（fast-forward，2026-11-14）
 - Pending Git conflicts or synchronization blockers: NONE
 
 ## Goal and acceptance criteria
@@ -192,4 +192,4 @@ Owner 回饋「膚色仍然太暗淡，瀏海再修改」。分支 `feat/residen
 
 ## Next expected step
 
-Owner 審閱 Step 5 角色第五輪（`artifacts/resident-sw-nagi/character/`，先看 `head-vs-target.jpg`、`vs-target.jpg`）並接受或指出修改；接受後進入步驟 6 Set（棚的右軌 showpiece 模組、可動門、樹與小拖車讓位、三態同光量度）與步驟 7 動作時間線。台詞搬入 RESIDENT_COPY 前仍須 owner 批准。
+Step 5 角色第五輪已獲 owner 驗收並併入 main（2026-11-14）。下一步為步驟 6 Set（棚的右軌 showpiece 模組、可動門、樹與小拖車讓位、三態同光量度）與步驟 7 動作時間線。台詞搬入 RESIDENT_COPY 前仍須 owner 批准。
