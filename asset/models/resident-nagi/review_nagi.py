@@ -82,7 +82,7 @@ extra(sc, "peg1.8", -.9, 1.8, .45, (.35, .5, .7, 1))
 extra(sc, "peg2.2", .95, 2.2, .45, (.7, .5, .35, 1))
 # door frame: two jambs + header, 1.25 wide x 2.1 high, at x = 2.0
 for nm, x, z, sx, sz in (("jambL", 1.375, 1.05, .06, 2.1), ("jambR", 2.625, 1.05, .06, 2.1), ("header", 2.0, 2.1, 1.31, .06)):
-    j = extra(sc, nm, x, 1, .06); j.scale = (sx, .25, sz); j.location = (x, .5, z); 
+    j = extra(sc, nm, x, 1, .06); j.scale = (sx, .25, sz); j.location = (x, .5, z);
 shot(sc, cam, "lineup-front", 0, w=1800, h=900, scale=7.2, cx=1.0, cz=1.1, el=0)
 shot(sc, cam, "lineup-side", 90, w=900, h=900, scale=3.0, cx=0, cz=1.1, el=0)
 print("@@REVIEW@@", OUT)
