@@ -1,4 +1,4 @@
-"""Nagi review renders (Workbench, headless): turnaround, pose recipes and a lineup with the 1.8 m reference and the door.
+"""Nagi review renders (EEVEE soft light, headless): turnaround, pose recipes and a lineup with the 1.8 m reference and the door.
 
   Blender -b --factory-startup --python-exit-code 1 -P review_nagi.py -- OUTDIR
 Writes OUTDIR/turn-{front,q3,back}.png, pose-*.png and lineup-*.png; combine with PIL (see the handoff).
@@ -37,13 +37,16 @@ def apply(obs, pose):
 
 def setup():
     sc = bpy.context.scene
-    sc.render.engine = "BLENDER_WORKBENCH"
-    sh = sc.display.shading
-    sh.light, sh.color_type, sh.show_object_outline, sh.show_cavity = "STUDIO", "MATERIAL", True, True
+    sc.render.engine = "BLENDER_EEVEE"  # soft clay light like the character sheet; Workbench dulled the skin
+    sc.view_settings.view_transform = "Standard"  # factory AgX greys the role colours
     sc.render.film_transparent = False
-    sc.view_settings.view_transform = "Standard"  # factory AgX greys the role colours; the scene shows them closer to Standard
-    sh.show_specular_highlight = False
-    sc.world = bpy.data.worlds.new("w"); sc.world.color = (.84, .85, .88)
+    sc.world = bpy.data.worlds.new("w"); sc.world.use_nodes = True
+    bg = sc.world.node_tree.nodes["Background"]
+    bg.inputs["Color"].default_value, bg.inputs["Strength"].default_value = (.84, .85, .88, 1), .75
+    for name, energy, rot in (("key", 1.5, (50, 0, 30)), ("fill", .4, (60, 0, -70))):
+        sun = bpy.data.objects.new(name, bpy.data.lights.new(name, "SUN")); sc.collection.objects.link(sun)
+        sun.data.energy, sun.data.angle = energy, math.radians(40)
+        sun.rotation_euler = tuple(math.radians(a) for a in rot)
     cam = bpy.data.objects.new("cam", bpy.data.cameras.new("cam")); sc.collection.objects.link(cam); sc.camera = cam
     cam.data.type = "ORTHO"
     return sc, cam
@@ -75,6 +78,8 @@ root, obs = B.build()
 sc, cam = setup()
 for az, n in ((0, "front"), (35, "q3"), (180, "back"), (90, "side")):
     apply(obs, {}); shot(sc, cam, f"turn-{n}", az)
+for az, n in ((0, "front"), (35, "q3")):
+    shot(sc, cam, f"head-{n}", az, w=700, h=700, scale=.62, cz=1.78, el=4)
 for n, p in POSES.items():
     apply(obs, p); shot(sc, cam, f"pose-{n}", 25 if n != "enter" else 60, scale=2.4 if n != "sit-tablet" else 2.0, cz=1.0 if n != "sit-tablet" else .8)
 # lineup: Nagi 2.0, 1.8 m peg, door frame 1.25 x 2.1, mixed crowd height 2.2 peg

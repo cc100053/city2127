@@ -35,7 +35,7 @@
 
 ## Actual validation results
 
-- Verification status: PASSED（程式部分只有 DEV 小改動；截圖為目測，無 FPS）。第四輪（2026-11-14，`feat/resident-nagi-polish`）：根 `npm test` EXIT 0（`nagi.glb: PASS`）、`npm run build` EXIT 0、`git diff --check` 乾淨；未載入場景、未量 FPS。
+- Verification status: PASSED（程式部分只有 DEV 小改動；截圖為目測，無 FPS）。第四輪（2026-11-14，`feat/resident-nagi-polish`）：根 `npm test` EXIT 0（`nagi.glb: PASS`）、`npm run build` EXIT 0、`git diff --check` 乾淨；未載入場景、未量 FPS。第五輪（同日同分支）：根 `npm test` EXIT 0、`npm run build` EXIT 0、`git diff --check` 乾淨。
 - Commands/manual checks and results: 2026-11-14 根 `npm test` EXIT 0、`npm run build` EXIT 0、`git diff --check` 乾淨；`survey/`、`module-swap/` 未動；步驟 3 截圖見該節。階段 1 只執行 `node --experimental-strip-types scripts/changeSheet.ts`（成功，8 units、14 change rows）。`npm test`、`npm run build` 未跑；日文未經母語者校對。
 - Integrated commit and checks: NOT INTEGRATED
 
@@ -160,6 +160,18 @@ Owner 回饋「與目標圖相距甚遠，頭髮、面色等」，並准許略�
 - **量度與 QA**：5,380 tris（上限 5,500）、20 節點、9 材質、135,360 bytes；`tests/nagiGlb.test.ts` 通過。`blender-asset-qa`（render profile，單次，兩個口形同場）餘下的項目均屬已接受者：`mouth.smile` 縮放為 0 所致的各項、髖與腿各 1 對共面三角形、外套與手持裝置共 18 對背對背隱藏面、無 UV；新增一項警告為 `head` 節點未套用縮放（設計如此）。本輪未就兩個口形分別跑 QA。
 - **仍與設定圖不同之處**：設定圖為柔光渲染，檢視圖為 Workbench，整體仍較暗；瀏海為幾何尖片，不及設定圖柔和；髖部沒有設定圖的 V 形縫線；膝部沒有明顯關節段；手仍為單塊。證據：`~/city2127-evidence/resident-sw-nagi/step5-r4/`。
 
+### 第五輪（2026-11-14）：膚色與瀏海
+
+Owner 回饋「膚色仍然太暗淡，瀏海再修改」。分支 `feat/resident-nagi-polish`。對照圖：[head-vs-target.jpg](../../artifacts/resident-sw-nagi/character/head-vs-target.jpg)（頭部特寫）、[vs-target.jpg](../../artifacts/resident-sw-nagi/character/vs-target.jpg)（全身）。
+
+- **膚色**：`#f3c9b0`（較飽和的暖桃色）。第四輪的 `#f9dccb` 偏淺，在渲染中呈灰白；本輪改以飽和度而非亮度取色。
+- **檢視渲染**：`review_nagi.py` 由 Workbench 改為 EEVEE 柔光（世界光 .75、主光 1.5、補光 .4，Standard 轉換），較接近設定圖的打光；並新增 `head-front`／`head-q3` 頭部特寫。此為檢視用打光，並非場景光照。
+- **髮線**：臉部開口收窄至兩鬢之間（半寬 .118），兩側頭髮垂至耳前（底 z = 頸根上 .215），額頭髮線升高（`LINE` .385）；耳朵外移至 ±.166，露出於側髮之外；刪去舊鬢角橢球。
+- **瀏海**：改為設定圖的側分：三片寬髮片由角色右側分線向 +X 掃，一片垂向右鬢；取代第四輪的五根細尖片。
+- **臉**：眼放大（.028 × .044）；眉加粗，外端略低。
+- **量度與 QA**：5,480 tris（上限 5,500，餘 20）、20 節點、9 材質、139,588 bytes。QA 餘項與第四輪相同。
+- **仍與設定圖不同之處**：瀏海為平面髮片，頭髮整體體積與柔和度不及設定圖；髖部 V 形縫線、膝關節段、手部未做。證據：`~/city2127-evidence/resident-sw-nagi/step5-r5/`。
+
 **驗證**：`npm test`、`npm run build`、`git diff --check` 見下方「Actual validation results」更新；未量 FPS、未載入場景。
 
 ## Known issues and blockers
@@ -180,4 +192,4 @@ Owner 回饋「與目標圖相距甚遠，頭髮、面色等」，並准許略�
 
 ## Next expected step
 
-Owner 審閱 Step 5 角色第四輪（`artifacts/resident-sw-nagi/character/`，先看 `vs-target.jpg`）並接受或指出修改；接受後進入步驟 6 Set（棚的右軌 showpiece 模組、可動門、樹與小拖車讓位、三態同光量度）與步驟 7 動作時間線。台詞搬入 RESIDENT_COPY 前仍須 owner 批准。
+Owner 審閱 Step 5 角色第五輪（`artifacts/resident-sw-nagi/character/`，先看 `head-vs-target.jpg`、`vs-target.jpg`）並接受或指出修改；接受後進入步驟 6 Set（棚的右軌 showpiece 模組、可動門、樹與小拖車讓位、三態同光量度）與步驟 7 動作時間線。台詞搬入 RESIDENT_COPY 前仍須 owner 批准。

@@ -34,7 +34,7 @@ ROLES = {  # role: (rgba, roughness, emission rgba, strength)
     "res_jacket": (lin("#9aa9a2"), .9, None, 0),        # grey-green work jacket
     "res_trousers": (lin("#4a5153"), .9, None, 0),      # dark trousers
     "res_trim": (lin("#9cc3e0"), .5, lin("#9cc3e0"), .25),  # pale-blue zip line
-    "res_skin": (lin("#f9dccb"), .85, None, 0),         # warm peach, sampled from the sheet's lit cheek
+    "res_skin": (lin("#f3c9b0"), .85, None, 0),         # saturated warm peach from the sheet (paler tones read as grey-white)
     "res_hair": (lin("#383a43"), 1.0, None, 0),         # matte soft black
     "res_shoe": (lin("#f0f1f4"), .8, None, 0),           # white shoes, armhole seam, inner collar
     "res_face_dark": (lin("#15171e"), .7, None, 0),      # eyes, mouths, elbow gaps, phone body
@@ -207,11 +207,11 @@ def build():
         return -SK_R[1] * max(k, 0) ** (1 / SK_N) - off
 
     head.ellipsoid("res_skin", SK_C, SK_R, 16, 10, n=SK_N)
-    # hair cap: a closed shell over the skull; the face window (in front of the ears, below the sloping hairline) is cut with
-    # two bisects and sunk into the skull, so the hairline is a clean step and the mesh stays closed
+    # hair cap: a closed shell over the skull. The face window (between the temples, below the sloping hairline) and the cheeks
+    # below the side hair are cut with bisects and sunk into the skull, so the hairline is a clean step and the mesh stays closed
     head.ellipsoid("res_hair", (0, .012, .285), (.168, .172, .155), 20, 12, n=2.4)
     hair = ORDER.index("res_hair") + 1
-    LINE, SLOPE = .37, .45                                                          # hairline height at the forehead, drop per metre toward the ears
+    LINE, SLOPE, TEMPLE, SIDE = .385, .45, .118, .215                               # forehead hairline, its drop per metre toward the ears, half window width, side-hair bottom
 
     def cut(co, no):
         faces = [f for f in head.bm.faces if f[head.layer] == hair]
@@ -220,25 +220,29 @@ def build():
 
     cut((0, -.15, LINE), Vector((0, SLOPE, 1)).normalized())
     cut((0, 0, 0), (0, 1, 0))
+    cut((0, 0, SIDE), (0, 0, 1))
+    for sx in (1, -1):
+        cut((sx * TEMPLE, 0, 0), (1, 0, 0))
+    E = 1e-4
     for vert in {v for f in head.bm.faces if f[head.layer] == hair for v in f.verts}:
-        if vert.co.y < -1e-4 and vert.co.z + SLOPE * (vert.co.y + .15) < LINE - 1e-4:
-            vert.co = SK_C + (vert.co - SK_C) * .84
-    # fringe: flat pointed locks lying on the forehead from above the hairline, tips swept toward +X (sheet front view)
-    for fx, dx, tipz, w in ((-.092, .016, .300, .036), (-.04, .024, .318, .036), (.012, .028, .298, .036), (.064, .026, .320, .034), (.104, .012, .302, .030)):
-        top = Vector((fx, face_y(fx, .385) - .012, .385))
-        tip = Vector((fx + dx, face_y(fx + dx, tipz) - .007, tipz))
+        c = vert.co
+        if c.y < -E and (c.z < SIDE - E or (abs(c.x) < TEMPLE - E and c.z + SLOPE * (c.y + .15) < LINE - E)):
+            vert.co = SK_C + (c - SK_C) * .84
+    # fringe: side part on the character's right; three broad tufts sweep toward +X, one falls to the right temple (sheet front view)
+    for (tx, tz), (px, pz), w in (((-.050, .378), (.005, .335), .046), ((.000, .378), (.058, .318), .050), ((.055, .376), (.112, .292), .046), ((-.066, .374), (-.114, .300), .040)):
+        top = Vector((tx, face_y(tx, tz) - .006, tz))
+        tip = Vector((px, face_y(px, pz) - .010, pz))
         zc = (tip - top).normalized()
         xc = Vector((0, -1, 0)).cross(zc).normalized()
         frame = Matrix((xc, zc.cross(xc), zc)).transposed().to_4x4()
-        bmesh.ops.create_cone(head.bm, cap_ends=True, cap_tris=True, segments=6, radius1=w, radius2=.004, depth=(tip - top).length,
-                              matrix=Matrix.Translation((top + tip) / 2) @ frame @ Matrix.Diagonal((1, .38, 1, 1)))
+        bmesh.ops.create_cone(head.bm, cap_ends=True, cap_tris=True, segments=8, radius1=w, radius2=.007, depth=(tip - top).length,
+                              matrix=Matrix.Translation((top + tip) / 2) @ frame @ Matrix.Diagonal((1, .34, 1, 1)))
         head._tag("res_hair")
     for s in (1, -1):
-        head.ellipsoid("res_skin", (s * .156, .012, .245), (.020, .028, .040), 8, 6)         # ears
-        head.ellipsoid("res_hair", (s * .150, -.035, .285), (.022, .036, .062), 6, 4)        # sideburns
+        head.ellipsoid("res_skin", (s * .166, .012, .235), (.020, .028, .040), 8, 6)         # ears, clear of the side hair
         x = s * .06
-        head.ellipsoid("res_face_dark", (x, face_y(x, .25, .003), .25), (.0115, .007, .0195), 8, 6)  # tall oval eyes
-        head.box("res_hair", (x, face_y(x, .29, .002), .29), (.046, .008, .008), 0, None, segments=2)  # thin level brows
+        head.ellipsoid("res_face_dark", (x, face_y(x, .25, .003), .25), (.014, .007, .022), 8, 6)  # tall oval eyes
+        head.box("res_hair", (x, face_y(x, .29, .002), .29), (.052, .008, .011), 0, Matrix.Rotation(s * math.radians(7), 4, "Y"), segments=2)  # soft brows, outer ends lower
     head.ellipsoid("res_skin", (0, face_y(0, .208, .008), .208), (.010, .012, .015), 6, 4)       # nose
     MY, MZ = face_y(0, .162), .162
     soft = node("mouth.soft", (0, MY, 1.53 + MZ), "head")
