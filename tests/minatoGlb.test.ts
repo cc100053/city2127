@@ -10,7 +10,7 @@ const names: string[] = gltf.nodes.map((node: { name: string }) => node.name);
 const parentOf = new Map<string, string>();
 for (const node of gltf.nodes) for (const child of node.children ?? []) parentOf.set(gltf.nodes[child].name, node.name);
 
-const chain: Record<string, string> = { torso: 'hips', head: 'torso', cap: 'head', 'upperArm.L': 'torso', 'upperArm.R': 'torso', 'lowerArm.L': 'upperArm.L', 'lowerArm.R': 'upperArm.R',
+const chain: Record<string, string> = { torso: 'hips', head: 'torso', cap: 'head', 'mouth.soft': 'head', 'mouth.smile': 'head', 'upperArm.L': 'torso', 'upperArm.R': 'torso', 'lowerArm.L': 'upperArm.L', 'lowerArm.R': 'upperArm.R',
   'hand.L': 'lowerArm.L', 'hand.R': 'lowerArm.R', tablet: 'hand.L', 'upperLeg.L': 'hips', 'upperLeg.R': 'hips', 'lowerLeg.L': 'upperLeg.L', 'lowerLeg.R': 'upperLeg.R',
   'foot.L': 'lowerLeg.L', 'foot.R': 'lowerLeg.R' };
 for (const [node, parent] of Object.entries(chain)) assert.equal(parentOf.get(node), parent, `${node} hangs from ${parent}`);
@@ -19,6 +19,6 @@ assert.ok(names.includes('hips') && !gltf.skins && !gltf.animations, 'rigid part
 let tris = 0;
 for (const mesh of gltf.meshes) for (const primitive of mesh.primitives) tris += gltf.accessors[primitive.indices].count / 3;
 assert.ok(tris <= 8000, `triangle budget ${tris}`);
-assert.ok(gltf.materials.length <= 8 && gltf.materials.every((m: { name: string }) => m.name.startsWith('res_')), 'at most 8 role materials');
+assert.ok(gltf.materials.length <= 9 && gltf.materials.every((m: { name: string }) => m.name.startsWith('res_')), 'at most 9 role materials');
 assert.ok(buffer.length < 300_000, `small GLB (${buffer.length} bytes)`);
 console.log(`minato.glb: PASS (${names.length} nodes, ${tris} tris, ${gltf.materials.length} materials, ${buffer.length} bytes)`);

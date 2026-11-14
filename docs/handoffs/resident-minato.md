@@ -71,9 +71,24 @@ NOT RUN：FPS（加咗兩個 GLB、三盞燈、透明玻璃）；snapshot、rese
 - −1 湊太暗嘅真正原因係補光加過頭再加 bloom 洗白，唔係唔夠光；修法係三個狀態用同一套補光。量度：塊面平均亮度 0／−1 = 197.8／209.3（12 時）、181.2／193.3（22 時）。
 - 每個結果都要有人物一拍（owner）；district 結果點樣接居民未設計。
 
+## 角色打磨 R1（2026-11-14）：凪標準
+
+Owner 指示「把湊打磨至凪的標準；臉部稜角過多；貼近目標圖」。分支 `feat/resident-minato-polish`（起點 main `1f4e5c0`）。對照圖：[vs-target.jpg](../../artifacts/resident-minato/character/vs-target.jpg)（上：設定圖；中：本輪；下：改前）、[head-vs-target.jpg](../../artifacts/resident-minato/character/head-vs-target.jpg)（設定圖／本輪正面／本輪四分之三／改前）、[scene-states.jpg](../../artifacts/resident-minato/character/scene-states.jpg)（DEV 居民鏡位：+1、0、−1、+1 夜）。**待 owner 判斷，尚未驗收，未併入 main。**
+
+- **建模方式**：[build_minato.py](../../asset/models/resident-minato/build_minato.py) 改用凪的網格建構器（`build_nagi.Part`：超橢球、12 邊肢體、全面平滑著色、僅大於 50° 的邊保持銳利），不再逐面平光。各節點的樞軸位置、名稱、身高 1.70 m 均未改，故 `devMinato.ts` 與 `minatoTimeline.ts` 無須改動。
+- **頭**：由橢球改為圓角方塊（指數 2.6，寬 .30 m，下巴 1.28 m）；灰髮改為閉合髮殼並切出髮線（臉窗半寬 .128、鬢角底 .150、頸背 .085，皆為頭節點局部座標）；耳加大並外移。
+- **臉**：眼縮小並靠攏（±.058）；灰眉加粗、外端下垂；鼻改為六邊楔形；法令紋與眼尾紋改用膚色陰影（新角色 `res_line` `#c79a80`），不再用黑色；口形拆為 `mouth.soft`（顯示）與 `mouth.smile`（縮放 0.0001）兩個節點，與凪一致。
+- **帽**：帽冠改為扁圓超橢球（寬 .38 m）壓在帽帶上，帽舌改為下傾的圓片；頂仍為 1.70 m。
+- **身體**：外套下擺 .70 → 肩 1.27 m，圓角 .035；立領正面露出 V 形頸部；飾線改細（.008）並加下擺線；膝與肘保留深色關節；鞋改圓角方形。平板取消深色背框。
+- **顏色**：依設定圖受光面取色：外套與帽 `#222f5c`、長褲 `#1a2248`、膚 `#ecc3a6`、髮 `#9a9da6`、飾線 `#6aa5f0`。
+- **檢視**：新增 [review_minato.py](../../asset/models/resident-minato/review_minato.py)，沿用凪的 EEVEE 柔光設定（`review_nagi.py` 的渲染段落加上 `__main__` 守衛以便匯入，凪的輸出不變）。
+- **量度與 QA**：5,060 tris（測試上限 8,000）、20 節點、9 個 `res_*` 材質（[minatoGlb.test.ts](../../tests/minatoGlb.test.ts) 上限由 8 改為 9，並檢查兩個口形節點）、134,180 bytes。`blender-asset-qa`（render profile）餘項僅為 `mouth.smile` 縮放為 0 所致的各項、無 UV，以及腿與鞋、軀幹與頭之間的背對背隱藏面，與凪已接受者同類。
+- **驗證**：根 `npm test` EXIT 0、`npm run build` EXIT 0、`git diff --check` 乾淨。場景截圖以 `npm run capture`（1600×900，`?meters=nw:<2|1|0>&shot=nw:resident&hour=12|22&reviewTime=20`）取得，畫面 fps 讀數 56.9–57.4（無頭 Chrome，僅供參考，未與基準比較）。`?residentDemo` 的即時投票流程、行走與拉閘動作的逐秒畫面本輪未重跑。
+- **仍與設定圖不同之處**：設定圖帽緣壓得更低並遮住更多額頭；手為連指手套形，沒有分指；平板的握法與大小由程式姿勢決定，未改；場景中 `res_navy` 與 `res_skin` 仍有程式加的自發光，底色調亮後整體比上一版亮，是否過亮須由 owner 判斷。證據：`~/city2127-evidence/resident-minato/polish-r1/`。
+
 ## Next expected step
 
-Owner 揀：（a）執湊嘅演技同口形，或者（b）照 [resident-scene](../../.agents/skills/resident-scene/SKILL.md) 開時子（SE focal）。兩樣都唔等對方。正式接入（時間線、server、iPad）要另開任務同 owner 批。
+先等 owner 判斷角色打磨 R1（見上）；收貨後併入 main。之後 owner 揀：（a）執湊嘅演技同口形，或者（b）照 [resident-scene](../../.agents/skills/resident-scene/SKILL.md) 開時子（SE focal）。兩樣都唔等對方。正式接入（時間線、server、iPad）要另開任務同 owner 批。
 
 ## 整合
 

@@ -74,22 +74,23 @@ def extra(sc, name, x, h, w=.4, color=(.5, .5, .55, 1)):
     return ob
 
 
-root, obs = B.build()
-sc, cam = setup()
-for az, n in ((0, "front"), (35, "q3"), (180, "back"), (90, "side")):
-    apply(obs, {}); shot(sc, cam, f"turn-{n}", az)
-for az, n in ((0, "front"), (35, "q3")):
-    shot(sc, cam, f"head-{n}", az, w=700, h=700, scale=.62, cz=1.78, el=4)
-for n, p in POSES.items():
-    apply(obs, p); shot(sc, cam, f"pose-{n}", 25 if n != "enter" else 60, scale=2.4 if n != "sit-tablet" else 2.0, cz=1.0 if n != "sit-tablet" else .8)
-# lineup: Nagi 2.0, 1.8 m peg, door frame 1.25 x 2.1, mixed crowd height 2.2 peg
-apply(obs, {})
-root.location.x = 0
-extra(sc, "peg1.8", -.9, 1.8, .45, (.35, .5, .7, 1))
-extra(sc, "peg2.2", .95, 2.2, .45, (.7, .5, .35, 1))
-# door frame: two jambs + header, 1.25 wide x 2.1 high, at x = 2.0
-for nm, x, z, sx, sz in (("jambL", 1.375, 1.05, .06, 2.1), ("jambR", 2.625, 1.05, .06, 2.1), ("header", 2.0, 2.1, 1.31, .06)):
-    j = extra(sc, nm, x, 1, .06); j.scale = (sx, .25, sz); j.location = (x, .5, z);
-shot(sc, cam, "lineup-front", 0, w=1800, h=900, scale=7.2, cx=1.0, cz=1.1, el=0)
-shot(sc, cam, "lineup-side", 90, w=900, h=900, scale=3.0, cx=0, cz=1.1, el=0)
-print("@@REVIEW@@", OUT)
+if __name__ == "__main__":  # review_minato.py imports setup/shot from here
+    root, obs = B.build()
+    sc, cam = setup()
+    for az, n in ((0, "front"), (35, "q3"), (180, "back"), (90, "side")):
+        apply(obs, {}); shot(sc, cam, f"turn-{n}", az)
+    for az, n in ((0, "front"), (35, "q3")):
+        shot(sc, cam, f"head-{n}", az, w=700, h=700, scale=.62, cz=1.78, el=4)
+    for n, p in POSES.items():
+        apply(obs, p); shot(sc, cam, f"pose-{n}", 25 if n != "enter" else 60, scale=2.4 if n != "sit-tablet" else 2.0, cz=1.0 if n != "sit-tablet" else .8)
+    # lineup: Nagi 2.0, 1.8 m peg, door frame 1.25 x 2.1, mixed crowd height 2.2 peg
+    apply(obs, {})
+    root.location.x = 0
+    extra(sc, "peg1.8", -.9, 1.8, .45, (.35, .5, .7, 1))
+    extra(sc, "peg2.2", .95, 2.2, .45, (.7, .5, .35, 1))
+    # door frame: two jambs + header, 1.25 wide x 2.1 high, at x = 2.0
+    for nm, x, z, sx, sz in (("jambL", 1.375, 1.05, .06, 2.1), ("jambR", 2.625, 1.05, .06, 2.1), ("header", 2.0, 2.1, 1.31, .06)):
+        j = extra(sc, nm, x, 1, .06); j.scale = (sx, .25, sz); j.location = (x, .5, z);
+    shot(sc, cam, "lineup-front", 0, w=1800, h=900, scale=7.2, cx=1.0, cz=1.1, el=0)
+    shot(sc, cam, "lineup-side", 90, w=900, h=900, scale=3.0, cx=0, cz=1.1, el=0)
+    print("@@REVIEW@@", OUT)
