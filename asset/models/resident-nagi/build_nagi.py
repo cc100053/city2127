@@ -10,8 +10,7 @@ hips > torso > head > mouth.soft / mouth.smile ; torso > upperArm.L/R > lowerArm
 hips > upperLeg.L/R > lowerLeg.L/R > foot.L/R. Character's left (.L) is +X.
 Mouths: mouth.soft shows; mouth.smile is scaled to 0.0001 (code sets scale 1 and shrinks the other to swap).
 Rounded look: ellipsoid joints/head, bevelled jacket and hips, 12-sided limbs, smooth shading with only >50 deg edges kept crisp.
-Hands grip the devices in a tray grip (hand frame: forearm -Z, palm faces -Y, device in front of it, thumb toward the body, fingers wrapped
-round its edge). Forearm pitch P = upper + lower arm Rx; P = -90 holds the device flat on the palm (lap / chest), P = -125 tilts a phone toward
+Each hand is one rounded block glued to its device (hand frame: forearm -Z, the device sits on the -Y face; no separate fingers). Forearm pitch P = upper + lower arm Rx; P = -90 holds the device flat on the palm (lap / chest), P = -125 tilts a phone toward
 the face, and a hand roll Rz = +-70 (L +, R -) swings the device out beside the thigh for carrying. Pose recipes: `POSES` in review_nagi.py.
 Proportions from the sheet's front view as fractions of H = 2.00 m: head+hair 20 %, jacket 28 %, legs 46 %.
 """
@@ -35,7 +34,7 @@ ROLES = {  # role: (rgba, roughness, emission rgba, strength)
     "res_jacket": (lin("#8d9b92"), .9, None, 0),        # grey-green work jacket
     "res_trousers": (lin("#3d4547"), .9, None, 0),      # dark trousers
     "res_trim": (lin("#7fa8dc"), .5, lin("#7fa8dc"), .35),  # cool-blue trim line
-    "res_skin": (lin("#e3bf9f"), .85, None, 0),
+    "res_skin": (lin("#fdeadb"), .85, None, 0),
     "res_hair": (lin("#22242c"), .9, None, 0),
     "res_shoe": (lin("#e9ebf0"), .8, None, 0),           # white shoes
     "res_face_dark": (lin("#15171e"), .7, None, 0),      # eyes, mouths, joint gaps
@@ -169,9 +168,8 @@ def build():
     # ---- torso: jacket hem .97 -> shoulders 1.52 (.55), .43 wide at hem, .40 at chest, .25 deep; pivot at the waist (z 1.0)
     torso = node("torso", (0, 0, 1.0), "hips")
     torso.frustum("res_jacket", (0, 0, .245), .43, .40, .25, .55, .06, slope=.03, segments=3)  # rounded boxy bomber
-    torso.prism("res_jacket", (0, 0, .50), (0, 0, .56), .100, .094, u=12)          # standing collar, .06 tall
-    torso.ellipsoid("res_jacket", (0, 0, .56), (.100, .094, .018), 16, 6)           # rolled collar edge
-    torso.ellipsoid("res_skin", (0, -.092, .545), (.026, .014, .030), 8, 6)        # small V at the open collar
+    torso.prism("res_jacket", (0, 0, .50), (0, 0, .575), .100, .094, u=12)         # standing collar, .075 tall
+    torso.ellipsoid("res_jacket", (0, 0, .575), (.100, .094, .018), 16, 6)           # rolled collar edge
     FY = -.1265
     torso.strip("res_trim", (0, -.03), (0, .47), FY, .012)                          # zip, hem to collar (flat panel region)
     for s in (1, -1):
@@ -179,23 +177,26 @@ def build():
 
     # ---- head: pivot at neck base (1.52); skull chin 1.615, top 1.945; hair top 2.00
     head = node("head", (0, 0, 1.52), "torso")
-    head.prism("res_skin", (0, 0, 0), (0, 0, .10), .050, .050, u=12)
-    SK_C, SK_R = (0, 0, .26), (.150, .145, .165)
+    head.prism("res_skin", (0, 0, .03), (0, 0, .09), .052, .052, u=12)     # short neck, mostly inside the collar
+    SK_C, SK_R = (0, 0, .235), (.150, .145, .175)
 
     def face_y(x, z, off=0.0):
         k = 1 - (x / SK_R[0]) ** 2 - ((z - SK_C[2]) / SK_R[2]) ** 2
         return -SK_R[1] * math.sqrt(max(k, 0)) - off
 
     head.ellipsoid("res_skin", SK_C, SK_R, 16, 10)
-    head.ellipsoid("res_hair", (0, .035, .305), (.162, .162, .175), 16, 10)        # short dark hair, bulging into a fringe
+    head.ellipsoid("res_hair", (0, .035, .300), (.162, .162, .186), 16, 10)        # short dark hair
+    for fx, tipz in ((-.095, .312), (-.048, .302), (0, .298), (.048, .302), (.093, .312)):  # fringe: flat locks hanging over the forehead, swept toward +X
+        a, b = Vector((fx - .008, -.088, .375)), Vector((fx + .026, -.131, tipz))
+        head.ellipsoid("res_hair", (a + b) / 2, (.032, .014, (b - a).length / 2 + .006), 8, 6, basis(b - a))
     for s in (1, -1):
-        head.ellipsoid("res_skin", (s * .161, .008, .245), (.018, .024, .034), 6, 4)         # ears
-        head.ellipsoid("res_hair", (s * .142, -.030, .300), (.024, .040, .060), 6, 4)        # sideburns
+        head.ellipsoid("res_skin", (s * .161, .008, .222), (.018, .024, .034), 6, 4)         # ears
+        head.ellipsoid("res_hair", (s * .142, -.030, .275), (.024, .040, .060), 6, 4)        # sideburns
         x = s * .052
-        head.ellipsoid("res_face_dark", (x, face_y(x, .255, .004), .255), (.012, .008, .015), 8, 6)  # eyes
-        head.box("res_hair", (s * .056, face_y(s * .056, .292, .002), .292), (.050, .008, .012), 0, Matrix.Rotation(s * math.radians(6), 4, "Y"), segments=2)  # brows
-    head.ellipsoid("res_skin", (0, face_y(0, .215, .012), .215), (.013, .017, .024), 6, 4)       # nose
-    MY, MZ = face_y(0, .172), .172
+        head.ellipsoid("res_face_dark", (x, face_y(x, .232, .004), .232), (.012, .008, .015), 8, 6)  # eyes
+        head.box("res_hair", (s * .056, face_y(s * .056, .268, .002), .268), (.050, .008, .012), 0, Matrix.Rotation(s * math.radians(6), 4, "Y"), segments=2)  # brows
+    head.ellipsoid("res_skin", (0, face_y(0, .192, .012), .192), (.013, .017, .024), 6, 4)       # nose
+    MY, MZ = face_y(0, .150), .150
     soft = node("mouth.soft", (0, MY, 1.52 + MZ), "head")
     soft.box("res_face_dark", (0, .003, 0), (.040, .005, .006), 0)
     smile = node("mouth.smile", (0, MY, 1.52 + MZ), "head")
@@ -220,10 +221,7 @@ def build():
         wrist[side] = sh + d * .55
         hd = node(f"hand.{side}", wrist[side], f"lowerArm.{side}")
         # Tray grip, hand frame: forearm -Z, palm faces -Y (the device lies in front of it), thumb toward the body (-s X).
-        hd.box("res_skin", (0, .024, -.052), (.086, .036, .098), .014, segments=2)                # palm
-        hd.ellipsoid("res_skin", (-s * .028, .030, -.118), (.040, .020, .026), 8, 6)            # finger bases curled behind the device
-        hd.box("res_skin", (s * .052, -.004, -.075), (.024, .046, .092), .010, segments=2)       # four fingers wrapped round the device edge
-        hd.ellipsoid("res_skin", (-s * .020, -.024, -.075), (.015, .014, .042), 8, 6)           # thumb pressing the face
+        hd.box("res_skin", (0, .012, -.058), (.092, .036, .110), .016, segments=2)                # one-piece hand, glued to the device
     # devices live in the hand frame: face toward -Y, extending along -Z, edge gripped at x = s*.04
     tb = node("tablet", wrist["L"], "hand.L")
     tb.box("res_tablet", (-.045, -.012, -.140), (.17, .012, .24), .004)
