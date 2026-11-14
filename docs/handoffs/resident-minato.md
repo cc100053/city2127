@@ -73,7 +73,7 @@ NOT RUN：FPS（加咗兩個 GLB、三盞燈、透明玻璃）；snapshot、rese
 
 ## 角色打磨 R1（2026-11-14）：凪標準
 
-Owner 指示「把湊打磨至凪的標準；臉部稜角過多；貼近目標圖」。分支 `feat/resident-minato-polish`（起點 main `1f4e5c0`）。對照圖：[vs-target.jpg](../../artifacts/resident-minato/character/vs-target.jpg)（上：設定圖；中：本輪；下：改前）、[head-vs-target.jpg](../../artifacts/resident-minato/character/head-vs-target.jpg)（設定圖／本輪正面／本輪四分之三／改前）、[scene-states.jpg](../../artifacts/resident-minato/character/scene-states.jpg)（DEV 居民鏡位：+1、0、−1、+1 夜）。**待 owner 判斷，尚未驗收，未併入 main。**
+Owner 指示「把湊打磨至凪的標準；臉部稜角過多；貼近目標圖」。分支 `feat/resident-minato-polish`（起點 main `1f4e5c0`）。對照圖：[vs-target.jpg](../../artifacts/resident-minato/character/vs-target.jpg)（上：設定圖；中：本輪；下：改前）、[head-vs-target.jpg](../../artifacts/resident-minato/character/head-vs-target.jpg)（設定圖／本輪正面／本輪四分之三／改前）、[scene-states.jpg](../../artifacts/resident-minato/character/scene-states.jpg)（DEV 居民鏡位：+1、0、−1、+1 夜）。**Owner 2026-11-14 驗收，已併入 main（fast-forward）。**
 
 - **建模方式**：[build_minato.py](../../asset/models/resident-minato/build_minato.py) 改用凪的網格建構器（`build_nagi.Part`：超橢球、12 邊肢體、全面平滑著色、僅大於 50° 的邊保持銳利），不再逐面平光。各節點的樞軸位置、名稱、身高 1.70 m 均未改，故 `devMinato.ts` 與 `minatoTimeline.ts` 無須改動。
 - **頭**：由橢球改為圓角方塊（指數 2.6，寬 .30 m，下巴 1.28 m）；灰髮改為閉合髮殼並切出髮線（臉窗半寬 .128、鬢角底 .150、頸背 .085，皆為頭節點局部座標）；耳加大並外移。
@@ -88,7 +88,7 @@ Owner 指示「把湊打磨至凪的標準；臉部稜角過多；貼近目標�
 
 ## Next expected step
 
-先等 owner 判斷角色打磨 R1（見上）；收貨後併入 main。之後 owner 揀：（a）執湊嘅演技同口形，或者（b）照 [resident-scene](../../.agents/skills/resident-scene/SKILL.md) 開時子（SE focal）。兩樣都唔等對方。正式接入（時間線、server、iPad）要另開任務同 owner 批。
+角色打磨 R1 已獲 owner 驗收並併入 main（2026-11-14）。之後 owner 揀：（a）執湊嘅演技同口形，或者（b）照 [resident-scene](../../.agents/skills/resident-scene/SKILL.md) 開時子（SE focal）。兩樣都唔等對方。正式接入（時間線、server、iPad）要另開任務同 owner 批。
 
 ## 整合
 
