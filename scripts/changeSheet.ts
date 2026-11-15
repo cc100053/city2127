@@ -89,7 +89,15 @@ const units = UNITS.map(u => {
   if (u.resident && !resident) throw new Error(`RESIDENT_SCENE_PLAN has no resident heading with "${u.resident}"`);
   const story = resident ? `<h3>階段 2：${md(resident.replace(/^### \d+\. /, ''))}</h3><table><tr><th>實際變化</th><th>台詞（字幕）</th><th>行動</th><th>得／失</th></tr>${table(plan, resident).map(c => `<tr>${c.map(x => `<td>${md(x)}</td>`).join('')}</tr>`).join('')}</table>` : '';
   const energy = u.plan === '能源' ? `<section class="change"><dl><dt>相關選擇</dt><dd>${esc(question('energy-2127').text)}${question('energy-2127').options.map(o => `<br><b>「${esc(o.label)}」</b>`).join('')}</dd>
-<dt>這些設施的功能（設施卡）</dt><dd>${['energy.water', 'energy.rotor', 'energy.orbital', 'energy.rectenna', 'energy.island'].map(id => `<b>${esc(RESIDENT_CARDS[id][0])}</b><br>${esc(RESIDENT_CARDS[id][1])}`).join('<br>')}</dd></dl><p><small>能源近鏡尚無前後對照截圖。</small></p></section>` : '';
+<dt>這些設施的功能（設施卡）</dt><dd>${['energy.water', 'energy.rotor', 'energy.orbital', 'energy.rectenna', 'energy.island'].map(id => `<b>${esc(RESIDENT_CARDS[id][0])}</b><br>${esc(RESIDENT_CARDS[id][1])}`).join('<br>')}</dd></dl></section>
+<section class="change" id="rectenna-farm">
+<h3>陸上農園 — 受電テラス農園 R3 <small>建築已驗收 · Meter 觸發計法待調整</small></h3>
+<p>台場南岸的虹彩六角天幕接收軌道電力，坡道把公共步道、菜床及退台連在一起。故事設定見<a href="../../docs/BUILDING_STORIES.md#rectenna-farm">天氣圖書館</a>。以下為 R3 已驗收配置的靜態實景。</p>
+<div class="frames">
+<figure><img loading="lazy" src="rectenna-r3/focal-day.jpg" alt="日間的陸上農園全景"><figcaption>日景｜六角受電天幕覆蓋同心退台</figcaption></figure>
+<figure><img loading="lazy" src="rectenna-r3/focal-night.jpg" alt="入夜後的陸上農園全景"><figcaption>夜景｜從南岸看夜色中的天幕與農園</figcaption></figure>
+<figure><img loading="lazy" src="rectenna-r3/access.jpg" alt="從西入口步道仰望農園的退台"><figcaption>西入口｜從碎石支路經過露天菜床，再沿坡道進入農園</figcaption></figure>
+</div></section>` : '';
   return { row, html: `<article id="${esc(u.plan)}"><h2>${md(row[0])} <small>${md(row[1])}</small></h2>
 <table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr>${row.slice(2, 5).map(c => `<td>${md(c)}</td>`).join('')}</tr></table>
 <p class="intro">${md(row[5])}</p>
@@ -106,7 +114,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #d6d4c8;padding
 dt{color:#667;font-size:13px;margin-top:8px}dd{margin:0}.frames{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start}
 p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figure{margin:0}figure img{width:100%;display:block;border-radius:4px;background:#ddd}figcaption{font-size:12px;color:#667}</style>
 <h1>變化總覽：選擇 → 變化 → 建築 → 居民</h1>
-<p>生成：${new Date().toISOString().slice(0, 10)}，<code>scripts/changeSheet.ts</code>。狀態、居民與建築介紹來自 RESIDENT_SCENE_PLAN，日文文案來自結果卡與設施卡的程式，選項來自正式問卷，截圖來自 <code>scripts/closeupSheet.mjs</code>（靜態 DEV 畫面，並非 live 過場）。佔比為模擬數字，並非真人數據。</p>
+<p>生成：${new Date().toISOString().slice(0, 10)}，<code>scripts/changeSheet.ts</code>。狀態、居民與建築介紹來自 RESIDENT_SCENE_PLAN，日文文案來自結果卡與設施卡的程式，選項來自正式問卷。截圖為靜態 DEV 畫面，取自 <code>scripts/closeupSheet.mjs</code> 或個別建築驗收紀錄。佔比為模擬數字，並非真人數據。</p>
 <p><b>變化成因：</b>每位 guest 回答四題，每個選項將對應軸的 Meter 推 −1、0 或 +1。Meter 是所有人累積的結果；每份提案最多令一個地點前進一級，並優先採用 guest 自己推動的方向。因此 guest 的選擇不一定等於本次的變化方向，結果卡第二句一律說明實際變化。</p>
 <table><tr><th>單位</th><th>佔比</th><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr>
 ${units.map((u, i) => `<tr><td><a href="#${esc(UNITS[i].plan)}">${md(u.row[0])}</a></td>${u.row.slice(1, 5).map(c => `<td>${md(c)}</td>`).join('')}</tr>`).join('\n')}</table>
