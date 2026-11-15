@@ -5,7 +5,7 @@ import type { EnergyRuntime } from './energyRuntime.ts';
 import { shotTimeline, type ShotId } from './headlineCamera.ts';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 
-type Part = 'garden' | 'garden2' | 'ring' | 'wing' | 'island';
+type Part = 'garden' | 'garden2' | 'ring' | 'wing' | 'farm' | 'island';
 const CYCLE_SECONDS = 60;
 // The result card names whose voice and what changed; this caption only says how the shown part works.
 export const NARRATION: Record<Part, { title: string; steps: readonly [string, string, string] }> = {
@@ -13,6 +13,7 @@ export const NARRATION: Record<Part, { title: string; steps: readonly [string, s
   garden2: { title: '二つ目の蓄電庭園 · 揚水式', steps: [ENERGY_PHASES.a.charge, ENERGY_PHASES.a.hold, ENERGY_PHASES.a.release] },
   ring: { title: 'フジテレビ前・蓄電環 · 回転式', steps: [ENERGY_PHASES.b.charge, ENERGY_PHASES.b.hold, ENERGY_PHASES.b.release] },
   wing: { title: '沖の受電翼 · 外部からの受電', steps: ['受電 → 翼が軌道からの電力を受ける', '送電 → 岸の配電ゲートへ', '配電 → 街区の拠点から街へ'] },
+  farm: { title: '受電テラス農園 · 軌道からの受電', steps: ['受電 → 膜でマイクロ波を受ける', '変換 → 電気に変える', '配電 → 街区に電気を届ける'] },
   island: { title: '沖のエネルギー島 · 島からの送電', steps: ['発電 → 沖の島の原子力施設', '送電 → 検修橋に沿って岸へ', '配電 → 街区の拠点から街へ'] },
 };
 
@@ -23,7 +24,7 @@ export function narratedPart(shot: ShotId | null, change: CarrierChange | undefi
   if (before && after && changedPart && before[changedPart] === after[changedPart] && before.activity?.[changedPart] !== after.activity?.[changedPart]) return null;
   if (!after || !shot?.startsWith('energy:')) return null;
   const part = shot.slice(7) as Part;
-  const present = { garden: after.waterGardens > 0, garden2: after.waterGardens === 2, ring: after.flywheel, wing: after.receiver !== 'none', island: after.island };
+  const present = { garden: after.waterGardens > 0, garden2: after.waterGardens === 2, ring: after.flywheel, wing: after.receiver === 'small', farm: after.receiver === 'large', island: after.island };
   return present[part] ? part : null;
 }
 
@@ -66,7 +67,7 @@ export class EnergyNarration {
     this.cancel();
     const part = narratedPart(shot, change);
     if (!part) return;
-    this.show(part, part === 'wing' || part === 'island' ? '送電経路のイメージ' : '60秒の蓄電サイクルを短縮して表示');
+    this.show(part, part === 'wing' || part === 'farm' || part === 'island' ? '送電経路のイメージ' : '60秒の蓄電サイクルを短縮して表示');
     this.plan = narrationPlan(now, displayMs);
   }
   /** Snapshots, resets, Undo, reconnects and superseding results: hide at once and return every part to the shared clock. */
@@ -81,8 +82,8 @@ export class EnergyNarration {
     if (reducedMotion) return this.cancel();
     const local = narratedSeconds(this.plan, now), energy = this.energy();
     // After the window the offset stays, so the part continues smoothly instead of jumping back to the shared phase.
-    // Wing and island have no storage loop: their narration drives the shared distribution rail only.
-    if (energy) energy.clock = this.part === 'wing' || this.part === 'island' ? { distribution: local } : { [this.part]: local, distribution: local };
+    // Receivers and island have no storage loop: their narration drives the shared distribution rail only.
+    if (energy) energy.clock = this.part === 'wing' || this.part === 'farm' || this.part === 'island' ? { distribution: local } : { [this.part]: local, distribution: local };
     const step = narrationStep(this.plan, now);
     this.panel.hidden = step < 0;
     Array.from(this.list.children).forEach((li, i) => li.classList.toggle('active', i === step));

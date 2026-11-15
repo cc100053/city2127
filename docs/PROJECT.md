@@ -191,9 +191,13 @@ Housing H3（2026-10-27）：[三類／mixed原圖評估及正式接入選項](.
 
 `exhibition_snapshots.energy_json`為nullable；舊事件及snapshot重播沒有energy，保留原JSON／原文與idempotency。新事件在votes_json記類別、before／after_state_json保存完整新狀態；replay／Undo用同一reducer。資料一致性包括counts總和、氣候回答數與原score公式。`runStore.toProposalRecord`及viewOf讀權威layout，近期64筆不截斷持久counts。新問卷不接受舊session，Guest既有重新預約復原保留仍有效的Q1／Q2／Q4；Q3須重新選擇。開新run時沒有繼承氣候票，維持D=0的成熟混合氣候。
 
-`layout.energy`列水庭數、接收翼尺寸、環與島；root parser接受舊v2（無energy），嚴格驗證新欄位／counts／answer類別與view一致。`createCityChangeManager`建立一次EnergyRuntime，沿用energyPrototype幾何及60秒動態；standalone不建立，DEV Meter沒有energy時隱藏。Main既有約2.6秒journey＋3秒過渡保留，能源光點及lantern轉到沿岸能源接點；舊氣候歷史仍落原公園。Snapshot／Undo／reset／reconnect／reduced motion立即套用，能源設備以局部材質淡入／淡出3秒，橋面、支承與公共路高度保持，接收翼尺寸另平滑變化；材質副本按組一次建立，沿用原材質日夜發光／反射更新，沒有逐幀新資源。
+`layout.energy`列水庭數、接收翼尺寸、環與島；root parser接受舊v2（無energy），嚴格驗證新欄位／counts／answer類別與view一致。`createCityChangeManager`建立一次EnergyRuntime，沿用energyPrototype幾何及60秒動態；standalone不建立，DEV Meter沒有energy時隱藏。Main既有約2.6秒journey＋3秒過渡保留，能源光點及lantern轉到沿岸能源接點；舊氣候歷史仍落原公園。Snapshot／Undo／reset／reconnect／reduced motion立即套用，能源設備以局部材質淡入／淡出3秒，橋面、支承與公共路高度保持，材質副本按組一次建立，沿用原材質日夜發光／反射更新，沒有逐幀新資源。
 
 CityChangeManager將能源實際前後target加入CarrierChange，residentResult只以這項證據描述一個真的設備差異；無設備差異明確延續目前能源配置，缺少前後證據只確認保存。能源ambient卡只依存在設備加入。`proposal.cityChanges`仍列四個focal差異，能源前後在beforeLayout／afterLayout.energy；Monitor另外顯示能源配置，不將focal清單為空當作整座城市沒變。DEV自動答題保留三軸數值profile，能源另選／四類輪替，不把其選項塞成數值Meter。
+
+### Q3 受電テラス農園 R1（2026-11-15，待視覺評審）
+
+正式能源 runtime 以同一個 receiver 欄位切換三種狀態：低於門檻時沒有受電設備，達 20% 時是小型離岸受電翼，達 40% 時是陸上受電テラス農園。兩個門檻均至少需要兩票，分母為 Q3 能源票加四。農園重用 [GLB](../asset/models/rectenna-farm-canopy/rectenna-farm-canopy.glb)，以原比例及 π 朝向落在 (−117.75, 0, 82.4) m。小／大切換在既有 5.12–8.12 秒窗口交叉淡化。若小／大互換剛好遇上其他能源設備只改整備模式，該能源近鏡會跟到新受電設備。結果卡、設施卡及工序旁白按當前場地選用。舊 DEV `?energy` 保留研究模型，正式幾何可用 DEV `?shot=energy:farm&orbital=3` 查閱。見 [R1 交接](handoffs/rectenna-farm-placement.md)。
 
 ### 能源模型 polish 恢復續作（2026-10-25）
 

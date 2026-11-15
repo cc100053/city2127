@@ -273,6 +273,12 @@ export function pickGuestHeadline(before: ExhibitionLayout, after: ExhibitionLay
 
 export function pickHeadline(before: ExhibitionLayout, after: ExhibitionLayout, votes?: CityScores & Pick<ExhibitionVotes, 'energy'>): { socketId: ExhibitionSocketId } | { energy: true; part?: EnergyPart } | undefined {
   const guest = votes && pickGuestHeadline(before, after, votes);
+  // A receiver relocation takes the energy close-up when the guest's other equipment only changes activity.
+  if (guest && 'energy' in guest && before.energy && after.energy &&
+      before.energy.receiver !== 'none' && after.energy.receiver !== 'none' &&
+      before.energy.receiver !== after.energy.receiver && before.energy[guest.part] === after.energy[guest.part]) {
+    return { energy: true, part: 'receiver' };
+  }
   if (guest) return guest;
   const tiered = EXHIBITION_SOCKET_IDS.filter(id => before.tiers[id] !== after.tiers[id]);
   if (tiered.length) return { socketId: tiered.reduce((a, b) => Math.abs(after.tiers[b]) > Math.abs(after.tiers[a]) ? b : a) };

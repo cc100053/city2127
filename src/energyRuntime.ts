@@ -1,45 +1,77 @@
-import { Mesh, MeshStandardMaterial, type Material, type Scene } from 'three';
+import { BoxGeometry, Group, Mesh, MeshStandardMaterial, type Material, type Scene } from 'three';
+import { addCityModel } from './modelAssets.ts';
 import { energyPrototype, type EnergyClock } from './energyPrototype.ts';
 import { sameEnergyConfiguration, emptyEnergyConfiguration, type EnergyConfiguration } from '../survey/src/shared/energy.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
+
+const FARM_URL = new URL('../asset/models/rectenna-farm-canopy/rectenna-farm-canopy.glb', import.meta.url).href;
+export const FARM_CENTRE: [number, number, number] = [-117.75, 0, 82.4];
 
 /** Local fades keep bridges, supports and public paths at their authored clearances throughout a change. */
 export class EnergyRuntime {
   readonly model = energyPrototype();
   private target = emptyEnergyConfiguration();
   private readonly motions;
-  private wingFrom = 1;
-  private wingTo = 1;
+  readonly farm = new Group();
+  readonly farmReady: Promise<void>;
   /** Per-part narrated seconds (see energyNarration); empty = every part on the shared clock. */
   clock: EnergyClock = {};
   constructor(scene: Scene) {
     this.model.root.name = 'energy-city'; scene.add(this.model.root);
-    this.motions = [this.model.parts.wing, ...this.model.gardens, this.model.parts.ring, this.model.parts.island, this.model.parts.distribution, ...Object.values(this.model.activity).flat()]
-      .map(group => {
-        // Clone shared finishes once per independently fading group; never fade the city's shared materials.
-        const finishes = new Map<Material, { source: Material; material: Material; opacity: number; transparent: boolean; depthWrite: boolean }>();
-        const finish = (source: Material) => {
-          if (!finishes.has(source)) finishes.set(source, { source, material: source.clone(), opacity: source.opacity, transparent: source.transparent, depthWrite: source.depthWrite });
-          return finishes.get(source)!.material;
-        };
-        group.traverse(object => { if (object instanceof Mesh) object.material = Array.isArray(object.material) ? object.material.map(finish) : finish(object.material); });
-        return { group, finishes: [...finishes.values()], amount: 0, from: 0, to: 0, start: 0 };
-      });
+    this.farm.name = 'energy-farm';
+    this.farm.position.set(...FARM_CENTRE);
+    this.farm.rotation.y = Math.PI;
+    this.farm.visible = false;
+    this.model.root.add(this.farm);
+    this.model.parts.wing.scale.setScalar(.65);
+    this.model.parts.wing.visible = false;
+    // Extend the measured 2.4 m lower ramp edge (local y=.02) into the paved site.
+    const approach = new Mesh(new BoxGeometry(2.4, .18, 29.5), new MeshStandardMaterial({ color: '#ddd8cc', roughness: .78 }));
+    approach.name = 'rectenna-walking-approach';
+    approach.position.set(-1.28, -.073, 34.45);
+    approach.rotation.y = -.63;
+    approach.receiveShadow = true;
+    this.farm.add(approach);
+    this.motions = [this.model.parts.wing, ...this.model.gardens, this.model.parts.ring, this.model.parts.island, this.model.parts.distribution, this.farm, ...Object.values(this.model.activity).flat()]
+      .map(group => ({ group, finishes: this.finishes(group), amount: 0, from: 0, to: 0, start: 0 }));
+    this.farmReady = typeof window === 'undefined' ? Promise.resolve() :
+      addCityModel(this.farm, FARM_URL, [0, 0, 0]).then(model => {
+        const motion = this.motions[6];
+        motion.finishes.push(...this.finishes(model));
+        this.fade(motion, motion.amount);
+      }).catch(error => console.error('Could not load the rectenna farm', error));
+  }
+  private finishes(root: Group) {
+    // Each independently fading group owns its materials.
+    const finishes = new Map<Material, { source: Material; material: Material; opacity: number; transparent: boolean; depthWrite: boolean }>();
+    const finish = (source: Material) => {
+      let entry = finishes.get(source);
+      if (!entry) {
+        entry = { source, material: source.clone(), opacity: source.opacity, transparent: source.transparent, depthWrite: source.depthWrite };
+        finishes.set(source, entry);
+      }
+      return entry.material;
+    };
+    root.traverse(object => {
+      if (object instanceof Mesh) object.material = Array.isArray(object.material) ? object.material.map(finish) : finish(object.material);
+    });
+    return [...finishes.values()];
   }
   getConfiguration(): EnergyConfiguration { return { ...this.target, ...(this.target.activity ? { activity: { ...this.target.activity } } : {}) }; }
   getDiagnostics() {
     return { target: this.getConfiguration(), rotorAngle: this.model.rotor.rotation.z,
       parts: this.motions.slice(0, 6).map(({ group, amount }) => ({ visible: group.visible, scaleY: group.scale.y, opacity: amount })),
-      activity: this.motions.slice(6).map(({ group, amount }) => ({ visible: group.visible, opacity: amount })) };
+      farm: { visible: this.farm.visible, opacity: this.motions[6].amount },
+      activity: this.motions.slice(7).map(({ group, amount }) => ({ visible: group.visible, opacity: amount })) };
   }
   setTarget(next: EnergyConfiguration, now: number, immediate: boolean) {
     const before = this.getConfiguration(), changed = !sameEnergyConfiguration(before, next);
     if (!changed && !immediate) return undefined;
-    this.wingFrom = this.model.parts.wing.scale.x;
-    this.wingTo = next.receiver === 'small' ? .65 : next.receiver === 'none' ? this.wingFrom : 1;
-    if (immediate) this.wingFrom = this.wingTo;
-    this.model.configure(next); this.target = { ...next, ...(next.activity ? { activity: { ...next.activity } } : {}) };
-    this.model.parts.wing.scale.setScalar(this.wingFrom);
+    this.model.configure(next);
+    this.target = { ...next, ...(next.activity ? { activity: { ...next.activity } } : {}) };
+    this.model.parts.wing.scale.setScalar(.65);
+    this.model.parts.wing.visible = next.receiver === 'small';
+    this.farm.visible = next.receiver === 'large';
     for (const m of this.motions) {
       const to = m.group.visible ? 1 : 0;
       m.from = immediate ? to : m.amount; m.to = to; m.start = now;
@@ -64,7 +96,6 @@ export class EnergyRuntime {
       const t = reducedMotion ? 1 : Math.min(1, Math.max(0, (now - m.start) / SITE_TRANSITION_SECONDS));
       const eased = t * t * (3 - 2 * t);
       this.fade(m, m.from + (m.to - m.from) * eased);
-      if (m.group === this.model.parts.wing) m.group.scale.setScalar(this.wingFrom + (this.wingTo - this.wingFrom) * eased);
     }
   }
 }

@@ -1,7 +1,7 @@
 # rectenna-farm-placement — Q3 large receiver and terrace farm
 
 - Owner: cc100053
-- Status: PLANNED. Site and state approved, R1 ready.
+- Status: R1 CANDIDATE. Implemented on the feature branch for owner review.
 - Branch: `feat/rectenna-farm-placement` in the main checkout
 - Base and last runtime geometry checked: `9d495ebcd21268be7c195eae93c7ee62c47a6424`
 - Asset baseline: `cc73fd7` (vegetable LOD); original export `1372230`, both on origin/main.
@@ -10,7 +10,7 @@
 
 - Started on main at the base SHA above. Refreshed origin/main on 2026-11-15; divergence 0/0 before branching.
 - Pre-existing untracked `Dev_QA.md` was preserved and Q15 appended locally. Keep that file out of R1 staging unless the owner asks to publish the entire notebook.
-- Runtime integration has not started.
+- R1 started from `405c23a`; fetch succeeded, 0 ahead / 0 behind the remote task branch and 1 ahead / 0 behind `origin/main`.
 
 ## Decisions and target
 
@@ -46,6 +46,16 @@ Placement starts at unit scale and yaw π about +Y, an axis-aligned orientation 
 
 Trace the energy runtime, state/activity targeting, headline camera, asset loading and result copy together. Start with [PROJECT](../PROJECT.md), [VALIDATION](../VALIDATION.md), [asset library](../../asset/models/LIBRARY.md) and the [target inventory](../../artifacts/rectenna-farm-placement/spec.md). Use existing loading and energy paths, keep other headline and survey behavior, and run focused energy checks then the required full checks. Follow place-building for capture, commit, push and owner review. Update the change sheet when the accepted work or changed result copy requires it.
 
+## R1 (2026-11-15)
+
+- Runtime loads the supplied GLB at (−117.75, 0, 82.4) m, yaw π and unit scale, and adds a 2.4 m wide paved approach at the north landing. The ramp edge is at y=0.02 m, near (−124.86, 0.02, 59.46) m in world coordinates. R1 uses a north camera from (−115, 36, −3) m to show the canopy and planted terraces in one frame.
+- The offshore wing is fixed at its existing small size. An existing 3 s local fade on each receiver handles both directions. Only one receiver is visible after settling. The receiver relocation takes the energy headline when the other energy equipment only changes its service activity. Result and ambient copy use the actual site, and the farm's narration follows reception, conversion and distribution. The owner change sheet was regenerated.
+- Root and survey `npm test` and `npm run build` passed on the R1 working tree. `git diff --check` passed. The focused tests cover exact 20%/40% boundaries, both fade directions and the receiver camera when the other energy equipment changes service activity.
+- Live scratch SQLite, loopback survey and Chrome show the third orbital vote opening the farm, then a water-storage vote diluting the orbital share and returning to the small wing. Both results showed the correct location and effect. Undo, WebSocket reconnect and reload restored the farm, and the staff city reset cleared both receivers. Zero page errors in the scratch browser run.
+- Bounds of the original asset in the rendered city are X −149.99…−85.51, Y −0.23…33.60, Z 50.02…114.78 m. Exact mesh intersections confirmed that the adjacent `megastructures` batch intersects the rim, supports and some hex panels. The original lot probe missed that geometry. **Short row: clearance.** Kept the approved centre and original asset for review. The overhead frame shows the intersection and the approach meeting the existing path. One canopy column foot touches the edge of the new paving, with walking space alongside. The existing offshore camera includes a foreground pylon that obscures part of the small wing. Service drone sweeps and exhibition hardware remain unverified.
+- Headed Chrome on the development Mac, hero with the large receiver active, default quality at 1920 × 1080/DPR 1. After dropping the first sample at each hour as specified by `fps.sh`, day 39.4–40.1 FPS and night 39.5–39.8 FPS. See `fps.txt` for raw samples.
+- Evidence lives outside Git under `~/city2127-evidence/rectenna-farm-placement/r1/`. Day, night, overview, access, overhead, wing baseline and switch frames use Chrome at 3200 × 1800. The two switch rows use the destination camera at 5.12, 6.62 and 8.12 s. Canvas diagnostics show receiver opacities 1/0 → .5/.5 → 0/1 in both directions. `target-comparison.jpg` compares with the isolated supplied GLB and the offshore wing. The live result frames use 1600 × 900.
+
 ## Next expected step
 
-Owner starts R1 in a fresh session on this branch in `/Users/fatboy/city2127`. Owner visual acceptance is required before merge.
+Owner reviews the R1 images and the intersection shown in the plan view. Visual acceptance is required before merge.

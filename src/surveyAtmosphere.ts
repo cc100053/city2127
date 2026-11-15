@@ -102,6 +102,7 @@ type ResidentCard = { id: string; title: string; text: string; place: string };
 export const RESIDENT_CARDS: Record<string, readonly [string, string]> = {
   'energy.water': ['海辺の庭に、電気を蓄える', '外から届く電力で水をくみ上げ、落水を通して取り出す蓄電庭園です。水辺の居場所と、エネルギー設備が隣り合っています。'],
   'energy.rotor': ['街の中心で、電気を蓄える', 'フジテレビの劇場とは別の環が、外部の電力で回転して蓄えます。劇場と公共の動線は、そのまま残っています。'],
+  'energy.rectenna': ['空の電気を受け取るテラス農園', '膜で軌道からのマイクロ波を受け、電気に変えて街に届けます。膜の下では、斜路を通って段々畑を訪ねられます。'],
   'energy.orbital': ['海の上で、空からの電気を受け取る', '海上に広がる翼は、軌道から届く電力を受け取る設備です。海の景色と空間を使う、2127年の構想です。'],
   'energy.island': ['電気のために、海の境界が変わる', '沖の原子力施設を置く島と、検修の橋が街につながっています。電気を届ける場所を確保するために、海の一部を陸地として使っています。'],
   "intro.origin": ["街は、誰が決めるのか。", "これまで街のかたちは、行政や大企業が決めてきました。住民の思いで街が決まるとしたら、どうなるでしょう。"],
@@ -135,11 +136,11 @@ export function residentCards(view: ExhibitionView): ResidentCard[] {
   ];
   const places = ['nw', 'sw', 'ne', 'se'] as const;
   const energy = l.energy;
-  const energyCards = energy ? [energy.waterGardens ? 'energy.water' : '', energy.flywheel ? 'energy.rotor' : '', energy.receiver !== 'none' ? 'energy.orbital' : '', energy.island ? 'energy.island' : ''].filter(Boolean) : [];
+  const energyCards = energy ? [energy.waterGardens ? 'energy.water' : '', energy.flywheel ? 'energy.rotor' : '', energy.receiver === 'large' ? 'energy.rectenna' : energy.receiver === 'small' ? 'energy.orbital' : '', energy.island ? 'energy.island' : ''].filter(Boolean) : [];
   return [...ids, ...facilityIds].map((id, index) => ({
     id, title: RESIDENT_CARDS[id][0], text: RESIDENT_CARDS[id][1],
     place: index < ids.length ? 'お台場全景' : changeSites[places[index - ids.length]].place,
-  })).concat(energyCards.map(id => ({ id, title: RESIDENT_CARDS[id][0], text: RESIDENT_CARDS[id][1], place: id === 'energy.rotor' ? 'フジテレビ前・蓄電環' : id === 'energy.water' ? '海辺の蓄電庭園' : id === 'energy.orbital' ? '沖の受電翼' : '沖のエネルギー島' })));
+  })).concat(energyCards.map(id => ({ id, title: RESIDENT_CARDS[id][0], text: RESIDENT_CARDS[id][1], place: id === 'energy.rotor' ? 'フジテレビ前・蓄電環' : id === 'energy.water' ? '海辺の蓄電庭園' : id === 'energy.orbital' ? '沖の受電翼' : id === 'energy.rectenna' ? '受電テラス農園' : '沖のエネルギー島' })));
 }
 
 export const residentIdentity = (proposal: ExhibitionProposal) =>
@@ -221,7 +222,10 @@ export function residentResult(proposal: ExhibitionProposal, changes?: readonly 
       } else if (part === 'waterGardens') {
         place = '海辺の蓄電庭園'; effect = `海辺の蓄電庭園は${after.waterGardens === 0 ? '配置から外れました' : `${after.waterGardens}か所の配置になりました`}。`;
       } else if (part === 'receiver') {
-        place = '沖の受電翼'; effect = after.receiver === 'none' ? '海上の受電翼は配置から外れました。' : `海上の受電翼は${after.receiver === 'small' ? '小さな' : '大きな'}配置になりました。`;
+        place = (after.receiver === 'none' ? before.receiver : after.receiver) === 'large' ? '受電テラス農園' : '沖の受電翼';
+        effect = after.receiver === 'large' ? 'フジテレビ側に受電テラス農園が加わり、街に電気を届ける膜の下に、斜路で訪ねられる畑ができました。'
+          : after.receiver === 'small' ? '軌道からの電力を受ける設備は、沖の小さな受電翼になりました。'
+          : `${place}は配置から外れました。`;
       } else if (part === 'flywheel') {
         place = 'フジテレビ前・蓄電環'; effect = after.flywheel ? '劇場の前に、独立した蓄電環が加わりました。' : '劇場の前の蓄電環は配置から外れました。';
       } else {

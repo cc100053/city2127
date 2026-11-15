@@ -11,7 +11,8 @@ import { ENERGY_VOTE_SITE, lanternSpot } from '../src/voteJourney.ts';
 import { currentView } from '../survey/src/server/answerService.ts';
 import { createProposalSession, submitProposal } from '../survey/src/server/proposalService.ts';
 import { CURRENT_EXHIBITION_QUESTIONS_PATH, exhibitionFixture, ok, startServer } from '../survey/tests/surveyFixture.ts';
-import { ENERGY_CHOICES, emptyEnergyConfiguration, type EnergyChoice } from '../survey/src/shared/energy.ts';
+import { ENERGY_CHOICES, emptyEnergyCounts, energyConfiguration, emptyEnergyConfiguration, type EnergyChoice } from '../survey/src/shared/energy.ts';
+import { deriveExhibitionLayout, pickHeadline } from '../survey/src/shared/cityView.ts';
 import { headlineShot } from '../src/headlineCamera.ts';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 
@@ -49,10 +50,39 @@ const assertModel = (view: ExhibitionView) => {
   const t = view.layout.energy ?? emptyEnergyConfiguration(), m = energy.model;
   assert.deepEqual(energy.getConfiguration(), t);
   assert.equal(m.gardens[0].visible, t.waterGardens > 0); assert.equal(m.gardens[1].visible, t.waterGardens === 2);
-  assert.equal(m.parts.wing.visible, t.receiver !== 'none');
-  if (t.receiver !== 'none') assert.equal(m.parts.wing.scale.x, t.receiver === 'small' ? .65 : 1);
+  assert.equal(m.parts.wing.visible, t.receiver === 'small');
+  assert.equal(m.parts.wing.scale.x, .65);
+  assert.equal(energy.farm.visible, t.receiver === 'large');
+  assert.equal(energy.farm.scale.x, 1);
   assert.equal(m.parts.ring.visible, t.flywheel); assert.equal(m.parts.island.visible, t.island);
 };
+const receiver = (orbital: number, water = 0) =>
+  energyConfiguration({ ...emptyEnergyCounts(), 'orbital-supply': orbital, 'water-storage': water });
+assert.equal(receiver(1).receiver, 'none');
+assert.equal(receiver(2, 4).receiver, 'small'); // exactly 20%
+assert.equal(receiver(2, 5).receiver, 'none');
+assert.equal(receiver(4, 2).receiver, 'large'); // exactly 40%
+assert.equal(receiver(4, 3).receiver, 'small');
+const small = receiver(4, 3), large = receiver(4, 2);
+const neutralVotes = { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 };
+const baseline = deriveExhibitionLayout(neutralVotes);
+assert.deepEqual(pickHeadline({ ...baseline, energy: receiver(3) },
+  { ...baseline, energy: { ...receiver(3, 1), activity: { waterGardens: 1 } } },
+  { ...neutralVotes, energy: 'water-storage' }), { energy: true, part: 'receiver' });
+energy.setTarget(small, 0, true);
+for (const [from, to, shot] of [[small, large, 'energy:farm'], [large, small, 'energy:wing']] as const) {
+  const change = energy.setTarget(to, 10, false);
+  assert.deepEqual(change, { before: from, after: to });
+  assert.equal(headlineShot({ socketId: 'ne', focal: false, district: true, energy: change }), shot);
+  energy.update(11.5, false);
+  assert.equal(energy.getDiagnostics().farm.opacity, .5);
+  assert.equal(energy.getDiagnostics().parts[0].opacity, .5);
+  energy.update(13, false);
+  assert.equal(energy.farm.visible, to.receiver === 'large');
+  assert.equal(energy.model.parts.wing.visible, to.receiver === 'small');
+}
+energy.setTarget(emptyEnergyConfiguration(), 0, true);
+
 let combinations = 0;
 for (const energyChoice of ENERGY_CHOICES) for (const a of [0, 1, 2]) for (const s of [0, 1, 2]) for (const c of [0, 1, 2]) {
   const { ctx } = fixture();

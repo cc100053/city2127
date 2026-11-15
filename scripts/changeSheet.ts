@@ -89,7 +89,7 @@ const units = UNITS.map(u => {
   if (u.resident && !resident) throw new Error(`RESIDENT_SCENE_PLAN has no resident heading with "${u.resident}"`);
   const story = resident ? `<h3>階段 2：${md(resident.replace(/^### \d+\. /, ''))}</h3><table><tr><th>實際變化</th><th>台詞（字幕）</th><th>行動</th><th>得／失</th></tr>${table(plan, resident).map(c => `<tr>${c.map(x => `<td>${md(x)}</td>`).join('')}</tr>`).join('')}</table>` : '';
   const energy = u.plan === '能源' ? `<section class="change"><dl><dt>相關選擇</dt><dd>${esc(question('energy-2127').text)}${question('energy-2127').options.map(o => `<br><b>「${esc(o.label)}」</b>`).join('')}</dd>
-<dt>這些設施的功能（設施卡）</dt><dd>${['energy.water', 'energy.rotor', 'energy.orbital', 'energy.island'].map(id => `<b>${esc(RESIDENT_CARDS[id][0])}</b><br>${esc(RESIDENT_CARDS[id][1])}`).join('<br>')}</dd></dl><p><small>能源近鏡尚無前後對照截圖。</small></p></section>` : '';
+<dt>這些設施的功能（設施卡）</dt><dd>${['energy.water', 'energy.rotor', 'energy.orbital', 'energy.rectenna', 'energy.island'].map(id => `<b>${esc(RESIDENT_CARDS[id][0])}</b><br>${esc(RESIDENT_CARDS[id][1])}`).join('<br>')}</dd></dl><p><small>能源近鏡尚無前後對照截圖。</small></p></section>` : '';
   return { row, html: `<article id="${esc(u.plan)}"><h2>${md(row[0])} <small>${md(row[1])}</small></h2>
 <table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr>${row.slice(2, 5).map(c => `<td>${md(c)}</td>`).join('')}</tr></table>
 <p class="intro">${md(row[5])}</p>

@@ -232,11 +232,13 @@ try {
   // Applied after the first frame, so `now` already holds the clock (or a held `reviewTime`) rather than its initial 0.
   if(import.meta.env.DEV && (metersParam!==null||shotPreview))import('./devMeters').then(async({devLayout})=>{
     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-    const first=devLayout(metersParam??'');holo.setTiers(first.tiers);
+    await cityChanges!.energy?.farmReady;
+    const orbital=params.get('orbital');
+    const first=devLayout(metersParam??'',orbital);holo.setTiers(first.tiers);
     cityChanges!.applyExhibitionLayout(first,'city-state-snapshot',now);
-    const playMeters=(meters:string,at:number)=>{
+    const playMeters=(meters:string,at:number,orbitalVotes=orbital)=>{
       devShot=null;
-      const reduced=cameraMotion.matches,layout=devLayout(meters);holo.setTiers(layout.tiers);
+      const reduced=cameraMotion.matches,layout=devLayout(meters,orbitalVotes);holo.setTiers(layout.tiers);
       const changes=cityChanges!.applyExhibitionLayout(layout,reduced?'city-state-snapshot':'city-state-updated',reduced?at:at+(headlineCamera?shotTimeline().change:ARRIVAL_SECONDS),undefined,at);
       if(reduced)headlineCamera?.cancel();else headlineCamera?.play(changes,at);
       return changes;
@@ -245,7 +247,8 @@ try {
     if(!params.has('nopanel'))import('./devShotPanel').then(({mountShotPanel})=>mountShotPanel(first.tiers,meters=>playMeters(meters,now),(window as unknown as {cityShot:(id:string)=>void}).cityShot));
     // `&metersTo=se:high&metersAge=8.3`: seconds since the live result; held `reviewTime` previews the settled headline shot.
     const to=params.get('metersTo');
-    if(to!==null)playMeters(to,now-Number(params.get('metersAge')??1));
+    const orbitalTo=params.get('orbitalTo');
+    if(to!==null||orbitalTo!==null)playMeters(to??metersParam??'',now-Number(params.get('metersAge')??1),orbitalTo??orbital);
   });
   const journey=surveyUrl?new VoteJourney(scene,camera):null;
   // DEV `?survey=…&residentDemo`: a live NW +1 headline visits 湊 after the building change (src/devResidentDemo.ts); everything else keeps the normal timeline.
