@@ -195,7 +195,7 @@ Housing H3（2026-10-27）：[三類／mixed原圖評估及正式接入選項](.
 
 CityChangeManager將能源實際前後target加入CarrierChange，residentResult只以這項證據描述一個真的設備差異；無設備差異明確延續目前能源配置，缺少前後證據只確認保存。能源ambient卡只依存在設備加入。`proposal.cityChanges`仍列四個focal差異，能源前後在beforeLayout／afterLayout.energy；Monitor另外顯示能源配置，不將focal清單為空當作整座城市沒變。DEV自動答題保留三軸數值profile，能源另選／四類輪替，不把其選項塞成數值Meter。
 
-### Q3 受電テラス農園 R3（2026-11-15，待視覺評審）
+### Q3 受電テラス農園 R3（2026-11-15，owner 批准合併）
 
 正式能源 runtime 以同一個 receiver 欄位切換三種狀態：低於門檻時沒有受電設備，達 20% 時是小型離岸受電翼，達 40% 時是陸上受電テラス農園。兩個門檻均至少需要兩票，分母為 Q3 能源票加四。農園重用 [GLB](../asset/models/rectenna-farm-canopy/rectenna-farm-canopy.glb)，以 2× 等比例落在台場南緣 (−152, −0.15, 408) m，坡道向西接前地，再由碎石支路接回沿列車線的既有步道。西入口北側設三畦露天菜床、灌溉邊溝及疏落果樹，南側留出坡道視線。舊路面及步道朝農園的一側已收窄，外圍原有樹叢的位置沿用 R2。小／大切換在既有 5.12–8.12 秒窗口交叉淡化。若小／大互換剛好遇上其他能源設備只改整備模式，該能源近鏡會跟到新受電設備。結果卡、設施卡及工序旁白按當前場地選用。舊 DEV `?energy` 保留研究模型，正式幾何可用 DEV `?shot=energy:farm&orbital=3` 查閱。見 [農園交接](handoffs/rectenna-farm-placement.md)。
 

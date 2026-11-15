@@ -1,7 +1,7 @@
 # rectenna-farm-placement — Q3 large receiver and terrace farm
 
 - Owner: cc100053
-- Status: R3 candidate on the feature branch, pending owner review.
+- Status: Owner approved R3 integration on 2026-11-15.
 - Branch: `feat/rectenna-farm-placement` in the main checkout
 - Branch base: `9d495ebcd21268be7c195eae93c7ee62c47a6424`
 - Asset baseline: `cc73fd7` (vegetable LOD); original export `1372230`, both on origin/main.
@@ -89,6 +89,8 @@ Trace the energy runtime, state/activity targeting, headline camera, asset loadi
 
 - Headed Chrome on the development Mac, default hero at 1920 × 1080/DPR 1. In one same-session daylight comparison (three 3 s rAF windows), R2 measured 38.8–39.0 FPS and R3 measured 38.3–38.7 FPS. The separate R3 `fps.sh` run varied more: day 34.9–37.3 FPS after the first sample, night 37.6–39.0 over the last four samples (first parse invalid and one early 46.9 reading). See `fps-ab-day.jsonl` and `fps.txt`.
 
-## Next expected step
+## Integration (2026-11-15)
 
-Owner reviews the R3 entrance and the day/night canopy views. Visual acceptance is required before merge.
+Owner instructed “merge main” on 2026-11-15. The merge commit is `210e31a`, integrating R3 `28666e5` onto the verified `origin/main` base `9d495eb` without conflicts. The owner change sheet was regenerated.
+
+Root and survey tests and builds passed on the integrated code. The integrated browser smoke check exercised both Q3 receiver changes, Undo, reconnect, reload and reset with no page errors.
