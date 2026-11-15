@@ -1,7 +1,7 @@
 # rectenna-farm-placement — Q3 large receiver and terrace farm
 
 - Owner: cc100053
-- Status: R1 CANDIDATE. Implemented on the feature branch for owner review.
+- Status: R1 recorded. South-edge relocation proposed for owner review.
 - Branch: `feat/rectenna-farm-placement` in the main checkout
 - Base and last runtime geometry checked: `9d495ebcd21268be7c195eae93c7ee62c47a6424`
 - Asset baseline: `cc73fd7` (vegetable LOD); original export `1372230`, both on origin/main.
@@ -56,6 +56,17 @@ Trace the energy runtime, state/activity targeting, headline camera, asset loadi
 - Headed Chrome on the development Mac, hero with the large receiver active, default quality at 1920 × 1080/DPR 1. After dropping the first sample at each hour as specified by `fps.sh`, day 39.4–40.1 FPS and night 39.5–39.8 FPS. See `fps.txt` for raw samples.
 - Evidence lives outside Git under `~/city2127-evidence/rectenna-farm-placement/r1/`. Day, night, overview, access, overhead, wing baseline and switch frames use Chrome at 3200 × 1800. The two switch rows use the destination camera at 5.12, 6.62 and 8.12 s. Canvas diagnostics show receiver opacities 1/0 → .5/.5 → 0/1 in both directions. `target-comparison.jpg` compares with the isolated supplied GLB and the offshore wing. The live result frames use 1600 × 900.
 
+## R1 verdict and relocation study (2026-11-15)
+
+> 重新選址，應該放喺都市外圍，先比較符合菜園呢一個感覺
+
+- Study base `e263eb1` on `feat/rectenna-farm-placement`. Remote refresh succeeded, 0 ahead / 0 behind the remote branch and 2 ahead / 0 behind `origin/main` at study start.
+- Proposed centre **(X −152, Z 364) m**, on the grass beyond the south edge of the detailed district. The centre is 44 m beyond its Z=320 boundary. The original 64.5 × 64.8 m farm remains on grass in the foreground, with the city behind. The original hero ground-visibility metric yields 40 px. Use a dedicated result shot.
+- The browser preview used origin Y=−0.15 m provisionally and yaw 3.3643 rad to face the nearest sampled paving. The trial camera was (−112, 39, 458), looking at (−152, 14, 364) m. The path sample at (−174.5, −0.19, 325.03) m is about 21 m from the lower ramp edge in plan. The grade under the sampled footprint spans −0.35 to +0.47 m. Final pilotis and ramp grounding, path alignment and night framing are R2 work.
+- Point probe `CLEAR` at (−152, 364) for 64.5 × 64.8 m. The temporary probe extended the search boundary beyond the detailed district and added obstruction samples at 28 and 34 m. The real rendered scene also cleared the 66 × 66 m envelope up to 34 m in non-ground mesh and visible instance checks. No route samples entered the padded footprint below 39 m on the shared curves (1,500 samples per curve). Dynamic service sweeps and all state-specific meshes still need checking in R2.
+- The western waterfront trials put backdrop grove crowns and plinths inside the farm. The first southern and eastern trials sat across broad existing paving. The south grass site passed 21/21 grass samples with no visible instance contacts and offers a continuous green foreground.
+- Trial stills at 1600 × 900 are outside Git in `~/city2127-evidence/rectenna-farm-placement/reselection/`. `south-green.jpg` shows the proposed site with the original GLB. `south-green.json` records the provisional pose, contacts and paving sample. This study changes the handoff only. No full build, live transition or FPS run for this location.
+
 ## Next expected step
 
-Owner reviews the R1 images and the intersection shown in the plan view. Visual acceptance is required before merge.
+Owner confirms the proposed south grass site. R2 then moves the large receiver and its headline camera, grounds the farm and connects the lower ramp to the existing pavement. Update the location in the Japanese result card, verify both live directions and capture day, night and access evidence before review.
