@@ -24,17 +24,19 @@ const clip = (poly: T.Vector3[], keep: (v: T.Vector3) => number) => {
   });
   return out;
 };
-/** The convex piece of `poly` inside rectangle `r` (none: fewer than 3 points). */
-function within(poly: T.Vector3[], r: ReturnType<typeof rect>) {
+function rectSides(r: ReturnType<typeof rect>) {
   const u = (v: T.Vector3) => (v.x - r.cx) * r.ux + (v.z - r.cz) * r.uz, w = (v: T.Vector3) => -(v.x - r.cx) * r.uz + (v.z - r.cz) * r.ux;
-  return [(v: T.Vector3) => r.hu - u(v), (v: T.Vector3) => r.hu + u(v), (v: T.Vector3) => r.hv - w(v), (v: T.Vector3) => r.hv + w(v)].reduce((p, side) => p.length < 3 ? p : clip(p, side), poly);
+  return [(v: T.Vector3) => u(v) - r.hu, (v: T.Vector3) => -u(v) - r.hu, (v: T.Vector3) => w(v) - r.hv, (v: T.Vector3) => -w(v) - r.hv];
 }
-/** Convex pieces of `poly` outside rectangle `r`: outside each side in turn, inside the sides already used. */
-function outside(poly: T.Vector3[], r: ReturnType<typeof rect>) {
-  const u = (v: T.Vector3) => (v.x - r.cx) * r.ux + (v.z - r.cz) * r.uz, w = (v: T.Vector3) => -(v.x - r.cx) * r.uz + (v.z - r.cz) * r.ux;
+/** The convex piece of `poly` inside the rectangle (none: fewer than 3 points). */
+function within(poly: T.Vector3[], sides: ReturnType<typeof rectSides>) {
+  return sides.reduce((p, side) => p.length < 3 ? p : clip(p, v => -side(v)), poly);
+}
+/** Convex pieces of `poly` outside a cut, each taken after the preceding sides. */
+function outside(poly: T.Vector3[], sides: ((v: T.Vector3) => number)[]) {
   const pieces: T.Vector3[][] = [];
   let rest = poly;
-  for (const side of [(v: T.Vector3) => u(v) - r.hu, (v: T.Vector3) => -u(v) - r.hu, (v: T.Vector3) => w(v) - r.hv, (v: T.Vector3) => -w(v) - r.hv]) {
+  for (const side of sides) {
     const piece = clip(rest, side);
     if (piece.length > 2) pieces.push(piece);
     rest = clip(rest, v => -side(v));
@@ -58,10 +60,15 @@ export function repairRoads(environment: T.Object3D, landmarks: readonly Landmar
   // Seven driveway stubs: the six in the district join no street (audit 2, 3, 7, 8, 19, 21, 23, 28, 30–34); the seventh lies 1.1 km south in the receded backdrop.
   environment.getObjectByName('ROAD_ACCESS')?.removeFromParent();
   const district = rect((DISTRICT.minX + DISTRICT.maxX) / 2, (DISTRICT.minZ + DISTRICT.maxZ) / 2, 1, 0, (DISTRICT.maxX - DISTRICT.minX) / 2, (DISTRICT.maxZ - DISTRICT.minZ) / 2);
-  const keep = landmarks.map(({ boundsBlender: [min, max] }) => rect((min[0] + max[0]) / 2, -(min[1] + max[1]) / 2, 1, 0, (max[0] - min[0]) / 2 + APRON, (max[1] - min[1]) / 2 + APRON));
+  const districtSides = rectSides(district);
+  // Shave the farm-facing apron only. Oblique end cuts taper it back into the surveyed walk.
+  const farmSides = [(v: T.Vector3) => -230 + .60 * (v.z - 408) - v.x,
+    (v: T.Vector3) => 381 - v.z - .65 * (v.x + 246), (v: T.Vector3) => v.z - 455 - (v.x + 202), (v: T.Vector3) => v.x + 170];
+  const keep = landmarks.map(({ boundsBlender: [min, max] }) => rect((min[0] + max[0]) / 2, -(min[1] + max[1]) / 2, 1, 0, (max[0] - min[0]) / 2 + APRON, (max[1] - min[1]) / 2 + APRON)).map(rectSides);
   environment.updateMatrixWorld(true);
   environment.traverse(object => {
     if (!(object instanceof T.Mesh)) return;
+    const farmApron = object.name === 'SIDEWALK_NETWORK' || object.name === 'ROAD_SECONDARY';
     const flat = /^(ROAD_(MAJOR|SECONDARY)|MAJOR_ROAD_MARKINGS|SIDEWALK_NETWORK)$/.test(object.name), furniture = /^(PHASE03D_GUARDRAILS|STREETLIGHT_INSTANCES|PUBLIC_LIGHTING)$/.test(object.name);
     if (!flat && !furniture) return;
     const g = object.geometry as T.BufferGeometry, p = g.attributes.position, index = g.index, n = index?.count ?? p.count, at = (i: number) => index ? index.getX(i) : i;
@@ -74,11 +81,12 @@ export function repairRoads(environment: T.Object3D, landmarks: readonly Landmar
         else kept.push(at(i), at(i + 1), at(i + 2));
         continue;
       }
-      const pieces = outside(tri, district);
+      let pieces = outside(tri, districtSides);
       if (object.name === 'SIDEWALK_NETWORK') { // the forecourts' share of the part inside, each piece once where aprons overlap
-        let rest = [within(tri, district)].filter(q => q.length > 2);
-        for (const k of keep) { pieces.push(...rest.map(q => within(q, k)).filter(q => q.length > 2)); rest = rest.flatMap(q => outside(q, k)); }
+        let rest = [within(tri, districtSides)].filter(q => q.length > 2);
+        for (const sides of keep) { pieces.push(...rest.map(q => within(q, sides)).filter(q => q.length > 2)); rest = rest.flatMap(q => outside(q, sides)); }
       }
+      if (farmApron && tri.some(v => v.z > 340) && tri.some(v => v.z < 497) && tri.some(v => v.x > -260) && tri.some(v => v.x < -170)) pieces = pieces.flatMap(p => outside(p, farmSides));
       if (pieces.length !== 1 || pieces[0].some((v, j) => v !== tri[j])) { changed = true; mark(tri); } // a kept corner is the same vector
       for (const poly of pieces) for (let k = 1; k < poly.length - 1; k++) {
         const [a, b, c] = [poly[0], poly[k], poly[k + 1]];

@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
-import { Scene, Group, Mesh, MeshStandardMaterial, Box3, Raycaster, Vector3 } from 'three';
+import { Scene, Group, Mesh, MeshStandardMaterial, Box3, PlaneGeometry, Raycaster, Vector3 } from 'three';
 import { boatPoses, routes, WATER_PERIOD, HULL } from '../src/mobility.ts';
 import { publicLight } from '../src/cityRig.ts';
 import { CityChangeManager } from '../src/cityChangeManager.ts';
+import { repairRoads } from '../src/roadRepair.ts';
 import { EnergyRuntime } from '../src/energyRuntime.ts';
 import { buildSurveySites } from '../src/siteBuilders/index.ts';
 import { parseSurveyEvent, type ExhibitionView } from '../src/surveyView.ts';
@@ -29,6 +30,22 @@ scene.updateMatrixWorld(true);
 for (const frame of energy.model.activity.waterGardens) for (const [x, z] of [[-335, -162], [-322.8, -156.6]]) {
   const hits = new Raycaster(new Vector3(x, 2, z), new Vector3(0, -1, 0)).intersectObject(frame, true);
   assert.ok(hits.some(hit => Math.abs(hit.point.y - 1.05) < .01), 'water platform reaches the garden base in either configuration');
+}
+// Trim the apron under the column feet while keeping the through walk and its connection to the ramp.
+const sidewalk = new Mesh(new PlaneGeometry(64, 110).rotateX(-Math.PI / 2));
+sidewalk.name = 'SIDEWALK_NETWORK';
+sidewalk.position.set(-223, -.18, 411);
+const oldRoad = new Mesh(sidewalk.geometry.clone());
+oldRoad.name = 'ROAD_SECONDARY';
+oldRoad.position.copy(sidewalk.position).setY(-.25);
+const surroundings = new Group();
+surroundings.add(sidewalk, oldRoad);
+repairRoads(surroundings);
+const groundAt = (x: number, z: number, root: Group) => new Raycaster(new Vector3(x, 2, z), new Vector3(0, -1, 0)).intersectObject(root, true)[0]?.point.y;
+for (const [x, z] of [[-213, 389], [-216, 411], [-211, 433], [-199, 451]]) assert.equal(groundAt(x, z, surroundings), undefined);
+for (const [x, z] of [[-244, 389], [-233, 405], [-221, 433], [-211, 451]]) assert.ok(groundAt(x, z, surroundings) !== undefined);
+for (const [x, z] of [[-233, 405], [-224, 405], [-216, 405], [-209, 404], [-200, 408]]) {
+  assert.ok(Math.abs((groundAt(x, z, energy.farm) ?? 1) + .13) < .05, 'entrance stays connected at walking grade');
 }
 const activityBounds = (['waterGardens', 'receiver', 'island'] as const).flatMap(part => energy.model.activity[part].map(group => new Box3().setFromObject(group)));
 const waterRoutes = routes(), boatRadius = Math.hypot(HULL.x, HULL.stern);
@@ -77,6 +94,9 @@ for (const [from, to, shot] of [[small, large, 'energy:farm'], [large, small, 'e
   assert.equal(headlineShot({ socketId: 'ne', focal: false, district: true, energy: change }), shot);
   energy.update(11.5, false);
   assert.equal(energy.getDiagnostics().farm.opacity, .5);
+  const forecourt = energy.farm.getObjectByName('rectenna-entry-forecourt');
+  assert.ok(forecourt instanceof Mesh && forecourt.material instanceof MeshStandardMaterial);
+  assert.equal(forecourt.material.opacity, .5);
   assert.equal(energy.getDiagnostics().parts[0].opacity, .5);
   energy.update(13, false);
   assert.equal(energy.farm.visible, to.receiver === 'large');

@@ -1,4 +1,5 @@
-import { BoxGeometry, Group, Mesh, MeshStandardMaterial, type Material, type Scene } from 'three';
+import { Group, Mesh, MeshStandardMaterial, type Material, type Scene } from 'three';
+import { buildFarmGarden } from './rectennaGarden.ts';
 import { addCityModel } from './modelAssets.ts';
 import { energyPrototype, type EnergyClock } from './energyPrototype.ts';
 import { sameEnergyConfiguration, emptyEnergyConfiguration, type EnergyConfiguration } from '../survey/src/shared/energy.ts';
@@ -24,13 +25,7 @@ export class EnergyRuntime {
     this.model.root.add(this.farm);
     this.model.parts.wing.scale.setScalar(.65);
     this.model.parts.wing.visible = false;
-    // The 2× ramp faces the existing footway west of the farm.
-    const approach = new Mesh(new BoxGeometry(14.5, .28, 4.8), new MeshStandardMaterial({ color: '#ddd8cc', roughness: .78 }));
-    approach.name = 'rectenna-walking-approach';
-    approach.position.set(-53.25, -.0725, 0);
-    approach.rotation.z = -.055 / 14.5;
-    approach.receiveShadow = true;
-    this.farm.add(approach);
+    this.farm.add(buildFarmGarden(this.farm.position));
     this.motions = [this.model.parts.wing, ...this.model.gardens, this.model.parts.ring, this.model.parts.island, this.model.parts.distribution, this.farm, ...Object.values(this.model.activity).flat()]
       .map(group => ({ group, finishes: this.finishes(group), amount: 0, from: 0, to: 0, start: 0 }));
     this.farmReady = typeof window === 'undefined' ? Promise.resolve() :

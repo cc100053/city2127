@@ -1,9 +1,9 @@
 # rectenna-farm-placement — Q3 large receiver and terrace farm
 
 - Owner: cc100053
-- Status: R2 candidate on the feature branch, pending owner review.
+- Status: R3 candidate on the feature branch, pending owner review.
 - Branch: `feat/rectenna-farm-placement` in the main checkout
-- Base and last runtime geometry checked: `9d495ebcd21268be7c195eae93c7ee62c47a6424`
+- Branch base: `9d495ebcd21268be7c195eae93c7ee62c47a6424`
 - Asset baseline: `cc73fd7` (vegetable LOD); original export `1372230`, both on origin/main.
 
 ## Session Git state
@@ -76,6 +76,19 @@ Trace the energy runtime, state/activity targeting, headline camera, asset loadi
 
 - Headed Chrome, development Mac, 1920 × 1080, DPR 1 and default quality. Hero with the 2× farm active, discarding the first sample each hour: day 40.1–40.9 FPS and night 40.2–40.7 FPS. Raw samples are in `fps.txt`.
 
+## R3 — public garden entrance (2026-11-15)
+
+- Starting commit `67e961b`. Fetch succeeded: the local branch matched its remote (0/0) and was four commits ahead of `origin/main` (0 behind). The pre-existing untracked `Dev_QA.md` stays untouched.
+- Owner feedback relayed for R3: surrounding roads and buildings did not fit the farm, and the lawn read as one uniform surface. Build the public garden around the west entrance while keeping the 2× shell at (−152, −0.15, 408) m, the Q3 logic and the railway.
+- The existing through walk stays open. Taper the east edge of the old sidewalk and obsolete secondary surfacing over the farm frontage. Remove one legacy context block at X −211.68…−203.02, Z 384.01…394.94 m from the live entrance footprint, leaving the survey GLB intact. The local garden fades with the large receiver; the narrowed through walk remains in every configuration.
+- Walk sequence: through walk near (−234, 405) → gravel branch roughly 5 m wide → forecourt flaring north → lower ramp at (−200, 408). The north flank has three 2.6 m wide beds, bare soil, a wet irrigation edge and three fruit trees. The south flank has low grasses and stays open from the access and focal views. Reuses the scene's box and planting helpers; no GLB changes.
+
+- Chrome scene check (`clearance.json`): 8 mm difference at the sidewalk tie-in and under 1 mm between the forecourt and ramp at (−200, 408) m. Pavement probes are clear at the four west-side column feet and present at through-walk samples before, beside and after the entrance. Geometry checks found no contacts between the added garden meshes and tested context, column or grove meshes. The closest rail centreline sample was 11.67 m from the garden bounds (1,500 samples per route); no track geometry changed.
+- Root `npm test`, `npm run build` and `git diff --check` passed for R3. The scratch survey and Chrome confirmed live switching in both directions, garden opacity 1/0 at the settled result, Undo, reconnect, reload and reset, with no page errors. The focused root test checks the apron cut, walk connection and midpoint garden opacity in both directions.
+- Review evidence outside Git: `~/city2127-evidence/rectenna-farm-placement/r3/`. The 3200 × 1800 frames include the west entrance, plan, overview and day/night headline views, with no page errors. Companion images compare the same R2/R3 access pose and show both Q3 fades at 5.12, 6.62 and 8.12 s (garden opacity 0/.5/1 and 1/.5/0). The entrance is easiest to read in the ground-level and plan shots; the headline still frames the full receiver. Dynamic service sweeps and exhibition hardware remain unverified.
+
+- Headed Chrome on the development Mac, default hero at 1920 × 1080/DPR 1. In one same-session daylight comparison (three 3 s rAF windows), R2 measured 38.8–39.0 FPS and R3 measured 38.3–38.7 FPS. The separate R3 `fps.sh` run varied more: day 34.9–37.3 FPS after the first sample, night 37.6–39.0 over the last four samples (first parse invalid and one early 46.9 reading). See `fps-ab-day.jsonl` and `fps.txt`.
+
 ## Next expected step
 
-Owner reviews the moved farm. Visual acceptance is required before merge.
+Owner reviews the R3 entrance and the day/night canopy views. Visual acceptance is required before merge.
