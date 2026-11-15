@@ -97,6 +97,7 @@ Whole assets. Reuse a site asset elsewhere only as background context, and ask t
 | --- | --- | --- | --- |
 | `city-kit-2127` | props + modules (above) | `build_kit.py`, `modules.py` | everywhere |
 | `car-family-2127` | street pod, human-driven car | `build_car.py` | traffic anywhere |
+| `vehicle-refs-2127` | four vehicles from the owner's `references/*.png`: `personal-trike` (1.40 × 2.13 × 1.65 m), `tandem-ev` (1.41 × 3.65 × 1.47), `autonomous-shuttle` (2.04 × 4.65 × 2.70, sliding door closed by default: separate `shuttle_door` object flush in its opening), `amphibious-shuttle` (2.40 × 6.58 × 3.45); one `.blend`/`.glb`/`.png` each; real metres, ground z 0, nose -Y Blender (+z three.js), `car_*` roles; 24–46k tris, not budgeted (draft, not placed) | `build_vehicles.py` (reuses no builder; own primitives); check `review_vehicles.py -- <out.png>` | traffic, transit, waterfront, once picked |
 | `train-2127` | guideway train | `build_train.py` | guideway only |
 | `future-tree-2127` | landmark tree (catalog `prop`) | imported GLB | any planted deck |
 | `resident-minato` | named character Minato (1.70 m, 20 rigid nodes, built with `build_nagi.Part`) | `build_minato.py`; review `review_minato.py` | resident scenes |
