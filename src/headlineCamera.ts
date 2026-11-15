@@ -40,7 +40,7 @@ export const SHOTS: Record<ShotId, Pose> = {
   'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },
   'energy:ring': { position: [-70, 135, -170], target: [-18, 99, -24] },
   'energy:wing': { position: [56, 64, -496], target: [125, 22, -424] },
-  'energy:farm': { position: [-115, 36, -3], target: [-116, 14, 82] },
+  'energy:farm': { position: [-108, 68, 586], target: [-152, 26, 408] },
   'energy:island': { position: [-142, 66, -556], target: [-60, 4, -470] },
 };
 /** Each stage's slots; the picker flies to the stage covering most changed slots. */

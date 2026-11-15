@@ -53,6 +53,7 @@ const assertModel = (view: ExhibitionView) => {
   assert.equal(m.parts.wing.visible, t.receiver === 'small');
   assert.equal(m.parts.wing.scale.x, .65);
   assert.equal(energy.farm.visible, t.receiver === 'large');
+  assert.deepEqual(energy.farm.position.toArray(), [-152, -.15, 408]);
   assert.equal(energy.farm.scale.x, 1);
   assert.equal(m.parts.ring.visible, t.flywheel); assert.equal(m.parts.island.visible, t.island);
 };

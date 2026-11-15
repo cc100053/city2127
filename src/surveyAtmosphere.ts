@@ -223,7 +223,7 @@ export function residentResult(proposal: ExhibitionProposal, changes?: readonly 
         place = '海辺の蓄電庭園'; effect = `海辺の蓄電庭園は${after.waterGardens === 0 ? '配置から外れました' : `${after.waterGardens}か所の配置になりました`}。`;
       } else if (part === 'receiver') {
         place = (after.receiver === 'none' ? before.receiver : after.receiver) === 'large' ? '受電テラス農園' : '沖の受電翼';
-        effect = after.receiver === 'large' ? 'フジテレビ側に受電テラス農園が加わり、街に電気を届ける膜の下に、斜路で訪ねられる畑ができました。'
+        effect = after.receiver === 'large' ? 'お台場の南側に受電テラス農園が加わり、街に電気を届ける膜の下に、斜路で訪ねられる畑ができました。'
           : after.receiver === 'small' ? '軌道からの電力を受ける設備は、沖の小さな受電翼になりました。'
           : `${place}は配置から外れました。`;
       } else if (part === 'flywheel') {

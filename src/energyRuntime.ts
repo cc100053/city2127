@@ -5,7 +5,7 @@ import { sameEnergyConfiguration, emptyEnergyConfiguration, type EnergyConfigura
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 
 const FARM_URL = new URL('../asset/models/rectenna-farm-canopy/rectenna-farm-canopy.glb', import.meta.url).href;
-export const FARM_CENTRE: [number, number, number] = [-117.75, 0, 82.4];
+export const FARM_CENTRE: [number, number, number] = [-152, -.15, 408];
 
 /** Local fades keep bridges, supports and public paths at their authored clearances throughout a change. */
 export class EnergyRuntime {
@@ -20,22 +20,22 @@ export class EnergyRuntime {
     this.model.root.name = 'energy-city'; scene.add(this.model.root);
     this.farm.name = 'energy-farm';
     this.farm.position.set(...FARM_CENTRE);
-    this.farm.rotation.y = Math.PI;
     this.farm.visible = false;
     this.model.root.add(this.farm);
     this.model.parts.wing.scale.setScalar(.65);
     this.model.parts.wing.visible = false;
-    // Extend the measured 2.4 m lower ramp edge (local y=.02) into the paved site.
-    const approach = new Mesh(new BoxGeometry(2.4, .18, 29.5), new MeshStandardMaterial({ color: '#ddd8cc', roughness: .78 }));
+    // The 2× ramp faces the existing footway west of the farm.
+    const approach = new Mesh(new BoxGeometry(14.5, .28, 4.8), new MeshStandardMaterial({ color: '#ddd8cc', roughness: .78 }));
     approach.name = 'rectenna-walking-approach';
-    approach.position.set(-1.28, -.073, 34.45);
-    approach.rotation.y = -.63;
+    approach.position.set(-53.25, -.0725, 0);
+    approach.rotation.z = -.055 / 14.5;
     approach.receiveShadow = true;
     this.farm.add(approach);
     this.motions = [this.model.parts.wing, ...this.model.gardens, this.model.parts.ring, this.model.parts.island, this.model.parts.distribution, this.farm, ...Object.values(this.model.activity).flat()]
       .map(group => ({ group, finishes: this.finishes(group), amount: 0, from: 0, to: 0, start: 0 }));
     this.farmReady = typeof window === 'undefined' ? Promise.resolve() :
-      addCityModel(this.farm, FARM_URL, [0, 0, 0]).then(model => {
+      addCityModel(this.farm, FARM_URL, [0, 0, 0], 4.4115).then(model => {
+        model.scale.setScalar(2);
         const motion = this.motions[6];
         motion.finishes.push(...this.finishes(model));
         this.fade(motion, motion.amount);

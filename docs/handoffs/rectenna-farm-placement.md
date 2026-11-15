@@ -1,7 +1,7 @@
 # rectenna-farm-placement — Q3 large receiver and terrace farm
 
 - Owner: cc100053
-- Status: R1 recorded. South-edge relocation proposed for owner review.
+- Status: R2 candidate on the feature branch, pending owner review.
 - Branch: `feat/rectenna-farm-placement` in the main checkout
 - Base and last runtime geometry checked: `9d495ebcd21268be7c195eae93c7ee62c47a6424`
 - Asset baseline: `cc73fd7` (vegetable LOD); original export `1372230`, both on origin/main.
@@ -67,6 +67,15 @@ Trace the energy runtime, state/activity targeting, headline camera, asset loadi
 - The western waterfront trials put backdrop grove crowns and plinths inside the farm. The first southern and eastern trials sat across broad existing paving. The south grass site passed 21/21 grass samples with no visible instance contacts and offers a continuous green foreground.
 - Trial stills at 1600 × 900 are outside Git in `~/city2127-evidence/rectenna-farm-placement/reselection/`. `south-green.jpg` shows the proposed site with the original GLB. `south-green.json` records the provisional pose, contacts and paving sample. This study changes the handoff only. No full build, live transition or FPS run for this location.
 
+## R2 — south-edge placement (2026-11-15)
+
+- Owner accepted the 2× scale and the south-edge area, asked to give the farm clearance, and chose “保留南緣，挪開相交樹叢”. R2 starts from `943a0c2`, aligned with the task branch on origin and 3 ahead of `origin/main` at fetch.
+- The 2× building is about 129 × 130 m and 67.2 m tall. Move it 44 m further south to (−152, −0.15, 408) m. The GLB turns 4.4115 rad to face its lower ramp west. The approach joins the existing footway with a 14.5 × 4.8 m connector across the intervening lawn. The result camera looks from (−108, 68, 586) at (−152, 26, 408) m, and the Japanese result names the south side of Odaiba.
+- Move five backdrop groves to nearby grass, each carrying its own crowns, raised rim and bed. Their world-plan destinations are (−287, 516), (−110, 333), (−119, 486), (−206, 510) and (−71, 438) m. The grove meshes are still instanced.
+- R2 evidence is under `~/city2127-evidence/rectenna-farm-placement/r2/`. The live scratch survey shows the correct camera and state both ways, plus Undo, reconnect, reload and reset with zero page errors. The focused scene probe in `mesh-clearance.json` confirms the GLB world scale (2, 2, 2), all five grove destinations, zero static mesh/crown intersections and zero grove plinth bounds inside the farm radius. Shared routes sampled at 1,500 points each stay outside the padded 69 m radius below 73 m. The west paving tie-in and ramp landing were sampled for height; the approach overlaps the ramp edge. Root tests, build and diff check passed. Independent dynamic service sweeps and exhibition hardware remain unverified.
+
+- Headed Chrome, development Mac, 1920 × 1080, DPR 1 and default quality. Hero with the 2× farm active, discarding the first sample each hour: day 40.1–40.9 FPS and night 40.2–40.7 FPS. Raw samples are in `fps.txt`.
+
 ## Next expected step
 
-Owner confirms the proposed south grass site. R2 then moves the large receiver and its headline camera, grounds the farm and connects the lower ramp to the existing pavement. Update the location in the Japanese result card, verify both live directions and capture day, night and access evidence before review.
+Owner reviews the moved farm. Visual acceptance is required before merge.
