@@ -106,7 +106,7 @@ Whole assets. Reuse a site asset elsewhere only as background context, and ask t
 | `se-district-2127` | SE stage towers and pods (six variants) | `build_district.py` (uses modules) | site-only shells; parts come from modules |
 | `automation-hub-upper` | automation hub upper level | imported GLB | site-only |
 | `sky-ring-architecture` | Sky Ring | imported GLB | site-only |
-| `rectenna-farm-canopy` | rectenna canopy over terrace farm (draft, not placed) | `export_glb.py` text inside the .blend | site-only |
+| `rectenna-farm-canopy` | rectenna canopy over terrace farm (Q3 large receiver R2 candidate) | `export_glb.py` text inside the .blend | site-only |
 | `event-shelf-2127` | SW mixed flagship: 36 × 24 × 40 m lattice (`SHELF_FRAME`) and seven rounded event modules `MOD_A..F, MOD_H` (draft, placed on the SW south-shore lot) | `build_shelf.py` (uses modules `lattice_frame`, `event_module`); lineup `review_shelf.py` | site-only frame; modules reusable as event rooms |
 | `odaiba-masterplan` | district environment | `odaiba_masterplan_v01_phase03d_generator.py` | site-only |
 | `aqua-city-odaiba` | landmark context | imported GLB | context |

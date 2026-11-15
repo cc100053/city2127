@@ -193,6 +193,15 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
   plantCanopy(scene,{instances:allee},true);
 }
 
+// Surveyed backdrop grove centres and their new grass plots, in metres.
+const FARM_GROVE_MOVES = [
+  [-213.99, 471.47, -287, 516],
+  [-177.22, 425.62, -110, 333],
+  [-162.27, 470.67, -119, 486],
+  [-126.12, 446.57, -206, 510],
+  [-90.03, 411.69, -71, 438],
+] as const;
+
 /** The Odaiba backdrop beyond the district keeps its parks as one unshadowed batch of low crowns, receding with the ground it stands on.
  * r8 pass 2: the same crown count gathers into tight oval groves on white-rimmed plinths (44 m cells since r8 pass 3, eight crowns each) instead of
  * pairs dotted evenly every 26 m — open lawn between, every green mass framed by an engineered edge. */
@@ -224,9 +233,16 @@ export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
     // Only whole groves: a clipped one would leave crowns off the plinth; plinths may not overlap (r8 pass 3's denser cells).
     if(crowns.length<5 || centres.some(([cx,cz,cr])=>Math.hypot(cx-px,cz-pz)<(cr+R)*1.16))continue;
     centres.push([px,pz,R]);
+    const move = FARM_GROVE_MOVES.find(([x,z]) => Math.hypot(x-px,z-pz) < .05);
+    const gx = move?.[2] ?? px, gz = move?.[3] ?? pz;
+    const gy = move ? groundAt(gx,gz) ?? y : y;
+    if(move){
+      const translation = new T.Matrix4().makeTranslation(gx-px,gy-y,gz-pz);
+      crowns.forEach(matrix => matrix.premultiply(translation));
+    }
     matrices.push(...crowns);
-    dummy.position.set(px,y+.3,pz);dummy.scale.set(R*1.3,.6,R/1.3);dummy.rotation.set(0,yaw,0);dummy.updateMatrix();plinths.push(dummy.matrix.clone());
-    dummy.position.y=y+.62;dummy.scale.set(R*1.3-.6,.04,R/1.3-.6);dummy.updateMatrix();lawns.push(dummy.matrix.clone());
+    dummy.position.set(gx,gy+.3,gz);dummy.scale.set(R*1.3,.6,R/1.3);dummy.rotation.set(0,yaw,0);dummy.updateMatrix();plinths.push(dummy.matrix.clone());
+    dummy.position.y=gy+.62;dummy.scale.set(R*1.3-.6,.04,R/1.3-.6);dummy.updateMatrix();lawns.push(dummy.matrix.clone());
   }
   const material=new T.MeshStandardMaterial({color:'#ffffff',roughness:.95});recedeBeyondDistrict(material);
   const grove=new T.InstancedMesh(lowCrown,material,matrices.length),color=new T.Color();

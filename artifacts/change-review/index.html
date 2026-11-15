@@ -7,7 +7,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #d6d4c8;padding
 dt{color:#667;font-size:13px;margin-top:8px}dd{margin:0}.frames{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start}
 p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figure{margin:0}figure img{width:100%;display:block;border-radius:4px;background:#ddd}figcaption{font-size:12px;color:#667}</style>
 <h1>變化總覽：選擇 → 變化 → 建築 → 居民</h1>
-<p>生成：2026-11-14，<code>scripts/changeSheet.ts</code>。狀態、居民與建築介紹來自 RESIDENT_SCENE_PLAN，日文文案來自結果卡與設施卡的程式，選項來自正式問卷，截圖來自 <code>scripts/closeupSheet.mjs</code>（靜態 DEV 畫面，並非 live 過場）。佔比為模擬數字，並非真人數據。</p>
+<p>生成：2026-11-15，<code>scripts/changeSheet.ts</code>。狀態、居民與建築介紹來自 RESIDENT_SCENE_PLAN，日文文案來自結果卡與設施卡的程式，選項來自正式問卷，截圖來自 <code>scripts/closeupSheet.mjs</code>（靜態 DEV 畫面，並非 live 過場）。佔比為模擬數字，並非真人數據。</p>
 <p><b>變化成因：</b>每位 guest 回答四題，每個選項將對應軸的 Meter 推 −1、0 或 +1。Meter 是所有人累積的結果；每份提案最多令一個地點前進一級，並優先採用 guest 自己推動的方向。因此 guest 的選擇不一定等於本次的變化方向，結果卡第二句一律說明實際變化。</p>
 <table><tr><th>單位</th><th>佔比</th><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr>
 <tr><td><a href="#NW focal">NW focal — デックス西 AUTO HUB（−1／0／+1）</a></td><td>10.6%</td><td>驗收（旗艦 R9）</td><td>湊：DEV 演示齊備，三個狀態、四種轉變（handoff）；owner 接受作演示</td><td>階段 2 收尾：演技、口形、正式接入</td></tr>
@@ -141,5 +141,5 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td>早期 batch 已整合，未按 taste v2 重審</td><td>未有居民</td><td>最後；先由 owner 判斷是否需要打磨</td></tr></table>
 <p class="intro"><b>建築</b>：水庭（海邊蓄電庭園）、旋轉環（フジテレビ前蓄電環）、受電翼（海上接收軌道電力）、能源島（沖面核電島連檢修橋）。<b>用途</b>：四種電力來源及儲存方式。<b>存在理由</b>：城市需要電力；居民選擇電從何來，每一種都改變一段海邊景色。</p>
 <section class="change"><dl><dt>相關選擇</dt><dd>毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？<br><b>「水の音や機械が身近でも、海辺の庭で電気を蓄える暮らし」</b><br><b>「大きな機械が景色に加わっても、街の中心で電気を蓄える暮らし」</b><br><b>「海の上に受け取る面が広がっても、空から届く電気を使う暮らし」</b><br><b>「海の一部が設備の陸地に変わっても、沖の原子力施設から電気を届ける暮らし」</b></dd>
-<dt>這些設施的功能（設施卡）</dt><dd><b>海辺の庭に、電気を蓄える</b><br>外から届く電力で水をくみ上げ、落水を通して取り出す蓄電庭園です。水辺の居場所と、エネルギー設備が隣り合っています。<br><b>街の中心で、電気を蓄える</b><br>フジテレビの劇場とは別の環が、外部の電力で回転して蓄えます。劇場と公共の動線は、そのまま残っています。<br><b>海の上で、空からの電気を受け取る</b><br>海上に広がる翼は、軌道から届く電力を受け取る設備です。海の景色と空間を使う、2127年の構想です。<br><b>電気のために、海の境界が変わる</b><br>沖の原子力施設を置く島と、検修の橋が街につながっています。電気を届ける場所を確保するために、海の一部を陸地として使っています。</dd></dl><p><small>能源近鏡尚無前後對照截圖。</small></p></section></article>
+<dt>這些設施的功能（設施卡）</dt><dd><b>海辺の庭に、電気を蓄える</b><br>外から届く電力で水をくみ上げ、落水を通して取り出す蓄電庭園です。水辺の居場所と、エネルギー設備が隣り合っています。<br><b>街の中心で、電気を蓄える</b><br>フジテレビの劇場とは別の環が、外部の電力で回転して蓄えます。劇場と公共の動線は、そのまま残っています。<br><b>海の上で、空からの電気を受け取る</b><br>海上に広がる翼は、軌道から届く電力を受け取る設備です。海の景色と空間を使う、2127年の構想です。<br><b>空の電気を受け取るテラス農園</b><br>膜で軌道からのマイクロ波を受け、電気に変えて街に届けます。膜の下では、斜路を通って段々畑を訪ねられます。<br><b>電気のために、海の境界が変わる</b><br>沖の原子力施設を置く島と、検修の橋が街につながっています。電気を届ける場所を確保するために、海の一部を陸地として使っています。</dd></dl><p><small>能源近鏡尚無前後對照截圖。</small></p></section></article>
 </html>

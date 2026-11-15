@@ -204,7 +204,7 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
   }
 }
 
-/** Remove context-massing triangles whose centre lies in a megastructure footprint (they are replaced, not overlapped). */
+/** Remove surveyed massing where new city footprints replace it. */
 export function carveContext(environment: T.Object3D) {
   const zones = bodyFootprints(), a = new T.Vector3(), b = new T.Vector3(), c = new T.Vector3();
   environment.updateMatrixWorld(true);
@@ -216,7 +216,9 @@ export function carveContext(environment: T.Object3D) {
       a.fromBufferAttribute(p, at(i)); b.fromBufferAttribute(p, at(i + 1)); c.fromBufferAttribute(p, at(i + 2));
       [a, b, c].forEach(v => v.applyMatrix4(object.matrixWorld));
       const cx = (a.x + b.x + c.x) / 3, cz = (a.z + b.z + c.z) / 3;
-      if (!zones.some(z => inRect(z, cx, cz))) keep.push(at(i), at(i + 1), at(i + 2));
+      // One legacy block (surveyed bounds X −211.68…−203.02, Z 384.01…394.94 m) stands inside the farm entrance.
+      const farmShed = object.name === 'CTX_central_west_unknown' && cx > -212 && cx < -203 && cz > 384 && cz < 395;
+      if (!farmShed && !zones.some(z => inRect(z, cx, cz))) keep.push(at(i), at(i + 1), at(i + 2));
     }
     if (keep.length !== n) g.setIndex(keep);
   });

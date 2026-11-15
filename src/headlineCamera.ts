@@ -8,7 +8,7 @@ import { STAGE_SLOTS } from './stages.ts';
 export { FLY_IN, FLY_OUT, shotTimeline } from './resultTimeline.ts';
 
 type Site = CarrierChange['socketId'];
-export type ShotId = `${Site}:${'focal' | 'district'}` | `${'nw' | 'sw' | 'se'}:${string}` | `energy:${'garden' | 'garden2' | 'ring' | 'wing' | 'island'}`;
+export type ShotId = `${Site}:${'focal' | 'district'}` | `${'nw' | 'sw' | 'se'}:${string}` | `energy:${'garden' | 'garden2' | 'ring' | 'wing' | 'farm' | 'island'}`;
 type Pose = { position: [number, number, number]; target: [number, number, number] };
 export const SHOTS: Record<ShotId, Pose> = {
   'nw:focal': { position: [212, 64, -342], target: [40, 62, -300] },
@@ -40,6 +40,7 @@ export const SHOTS: Record<ShotId, Pose> = {
   'energy:garden2': { position: [-16, 48, -452], target: [32, 8, -392] },
   'energy:ring': { position: [-70, 135, -170], target: [-18, 99, -24] },
   'energy:wing': { position: [56, 64, -496], target: [125, 22, -424] },
+  'energy:farm': { position: [-108, 68, 586], target: [-152, 26, 408] },
   'energy:island': { position: [-142, 66, -556], target: [-60, 4, -470] },
 };
 /** Each stage's slots; the picker flies to the stage covering most changed slots. */
@@ -53,7 +54,7 @@ export function headlineShot(change: CarrierChange | undefined): ShotId | null {
   const { before, after } = change.energy;
   switch (change.energy.part ?? energyChangedPart(before, after)) {
     case 'waterGardens': return before.waterGardens === 1 && after.waterGardens === 2 ? 'energy:garden2' : 'energy:garden';
-    case 'receiver': return 'energy:wing';
+    case 'receiver': return before.receiver === after.receiver ? 'energy:wing' : (after.receiver === 'none' ? before.receiver : after.receiver) === 'large' ? 'energy:farm' : 'energy:wing';
     case 'flywheel': return 'energy:ring';
     case 'island': return 'energy:island';
     default: return null;

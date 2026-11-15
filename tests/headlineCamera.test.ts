@@ -30,7 +30,7 @@ for (const socketId of ['nw', 'ne', 'sw', 'se'] as const) {
 }
 const cases: [EnergyConfiguration, EnergyConfiguration, ShotId, string, string][] = [];
 for (const [part,value,shot,place] of [
-  ['waterGardens',1,'energy:garden','海辺の蓄電庭園'], ['receiver','large','energy:wing','沖の受電翼'],
+  ['waterGardens',1,'energy:garden','海辺の蓄電庭園'], ['receiver','large','energy:farm','受電テラス農園'],
   ['flywheel',true,'energy:ring','フジテレビ前・蓄電環'], ['island',true,'energy:island','沖のエネルギー島'],
 ] as const) {
   const before=emptyEnergyConfiguration(),after={...before,[part]:value};
@@ -64,7 +64,7 @@ assert.ok(Math.abs(reasonDelayMs(DISPLAY_MS,false,SHELF_TRANSITION_SECONDS)-1012
 assert.equal(reasonDelayMs(DISPLAY_MS-101,false),0);
 assert.equal(shotStage(3),'fly-in','the flight starts after the vote journey');
 assert.deepEqual([0,t.flyIn,t.hold,t.flyOut,t.done].map(elapsed=>shotStage(elapsed)),['journey','fly-in','hold','fly-out','done']);
-assert.equal(Object.keys(SHOTS).length,23);
+assert.equal(Object.keys(SHOTS).length,24);
 for (const [id, pose] of Object.entries(SHOTS)) {
   const p=new Vector3(...pose.position),target=new Vector3(...pose.target);
   // No elevation or heading rule (owner 2026-11-05): each building's clear sightline decides its angle; only distance is bounded.

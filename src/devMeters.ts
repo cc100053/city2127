@@ -1,12 +1,13 @@
 // DEV-only review helper for `?meters=`: values are Scale A display scores fed to the server site mapping (deriveExhibitionLayout), so captures match a real run.
 import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
+import { emptyEnergyCounts, energyConfiguration } from '../survey/src/shared/energy.ts';
 import type { ExhibitionLayout } from './surveyView.ts';
 
 const AXIS_BY_SITE = { nw: 'automation', ne: 'environmentalPriority', sw: 'publicSharing', se: 'urbanConcentration' } as const;
 const BAND_SCORE: Record<string, number> = { low: -7.5, mixed: 0, high: 7.5 };
 
 /** `nw:high,ne:-4` → layout; bands map to the ±7.5 all-low/all-high composite scores. Unknown entries throw. */
-export function devLayout(meters: string): ExhibitionLayout {
+export function devLayout(meters: string, orbitalVotes: string | null = null): ExhibitionLayout {
   const scores = { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 };
   for (const entry of meters.split(',').filter(Boolean)) {
     const [site, value] = entry.split(':');
@@ -15,7 +16,11 @@ export function devLayout(meters: string): ExhibitionLayout {
     if (!axis || !Number.isFinite(score)) throw new Error(`?meters: cannot read "${entry}"`);
     scores[axis] = score;
   }
-  return deriveExhibitionLayout(scores);
+  const layout = deriveExhibitionLayout(scores);
+  if (orbitalVotes === null) return layout;
+  const orbital = Number(orbitalVotes);
+  if (!Number.isSafeInteger(orbital) || orbital < 0) throw new Error('Expected a nonnegative orbital vote count');
+  return { ...layout, energy: energyConfiguration({ ...emptyEnergyCounts(), 'orbital-supply': orbital }) };
 }
 
 const RUNG_SCORE = [-8, -5, -2, 0, 2, 5, 8];
