@@ -10,6 +10,7 @@
 | [EXHIBITION_SPEC](EXHIBITION_SPEC.md) | 場地、產品契約、累積／變化、當前決策及尚待驗收事項 |
 | [PROJECT](PROJECT.md) | 現行模組、source/data/render flow、資源 lifecycle |
 | [RESIDENT_COPY](RESIDENT_COPY.md) | P1 日文居民文案與接入條件；P2文案／P3結果接入；設施增加仍須符合實際證據 |
+| [建築故事集](BUILDING_STORIES.md) | 逐座記錄可見造型、2127 年的用途與居民如何使用 |
 | [RESIDENT_EXPERIENCE_PLAN](RESIDENT_EXPERIENCE_PLAN.md) | 居民雙屏體驗 P1–P5 計劃、交付及驗收；P1–P3已實作，P4軟件驗證通過，P5驗收表已準備、實機未測 |
 | [RESIDENT_SCENE_PLAN](RESIDENT_SCENE_PLAN.md) | 方向 A（owner 2026-11-12 採納）：每個變化單位先打磨建築／變化，再做人物情景；單位總表、四位居民、台詞同 owner 決定。Runtime 只有 DEV 演示 |
 | [變化總覽](../artifacts/change-review/index.html) | Owner 審閱用：每個變化單位嘅選擇、變化說明、建築用途、前後對照同居民。由 `scripts/changeSheet.ts` 生成，唔好手改 |
