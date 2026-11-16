@@ -390,7 +390,8 @@ def bounds(objs):
     return lo, hi
 
 
-def preview(name, out_png, tile=(800, 534)):
+def preview(name, out_png, tile=(800, 534), floor_z=0., floor_half=60.):
+    """floor_z / floor_half: studio floor height and half size (ship-refs-2127 puts it under the keel)."""
     scene = bpy.context.scene
     scene.render.engine = "BLENDER_EEVEE"
     scene.eevee.taa_render_samples = 48
@@ -407,7 +408,8 @@ def preview(name, out_png, tile=(800, 534)):
     sun.rotation_euler = (math.radians(40), 0, math.radians(150))
     scene.collection.objects.link(sun)
     me = bpy.data.meshes.new("floor")
-    me.from_pydata([(-60, -60, 0), (60, -60, 0), (60, 60, 0), (-60, 60, 0)], [], [(0, 1, 2, 3)])
+    s, z = floor_half, floor_z
+    me.from_pydata([(-s, -s, z), (s, -s, z), (s, s, z), (-s, s, z)], [], [(0, 1, 2, 3)])
     floor = bpy.data.objects.new("floor", me)
     scene.collection.objects.link(floor)
     fm = bpy.data.materials.new("floor")
