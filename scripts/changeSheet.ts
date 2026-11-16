@@ -24,7 +24,7 @@ const UNITS = [
   { plan: 'SW rooms', shots: /^sw:stage-rooms/ },
   { plan: 'SW focal', shots: /^sw:focal/, resident: 'お台場南岸' },
   { plan: 'SW courts', shots: /^sw:(stage-courts|district)/ },
-  { plan: '能源', shots: /^energy:/ },
+  { plan: '能源', shots: /^energy:/, resident: '葵' },
 ];
 
 const esc = (s: string) => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
@@ -96,7 +96,16 @@ const units = UNITS.map(u => {
 <div class="frames">
 <figure><img loading="lazy" src="rectenna-r3/focal-day.jpg" alt="日間的陸上農園全景"><figcaption>日景｜六角受電天幕覆蓋同心退台</figcaption></figure>
 <figure><img loading="lazy" src="rectenna-r3/focal-night.jpg" alt="入夜後的陸上農園全景"><figcaption>夜景｜從南岸看夜色中的天幕與農園</figcaption></figure>
-<figure><img loading="lazy" src="rectenna-r3/access.jpg" alt="從西入口步道仰望農園的退台"><figcaption>西入口｜從碎石支路經過露天菜床，再沿坡道進入農園</figcaption></figure>
+<figure><img loading="lazy" src="rectenna-r3/access.jpg" alt="從西入口步道仰望農園的退台"><figcaption>西入口 R3｜當時的露天菜床與坡道</figcaption></figure>
+</div>
+<h3>葵與西入口 <small>DEV 實景 · 待驗收</small></h3>
+<div class="frames">
+<figure><img loading="lazy" src="../resident-aoi/west-entrance.jpg" alt="城市步道旁的碎石支路及取苗架"><figcaption>西入口｜步道、取苗架與坡道</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/entrance-plan.jpg" alt="鳥瞰步道到西坡道的接駁"><figcaption>俯視｜支路從既有步道分出</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/palm.jpg" alt="葵在菜畦旁攤開手掌"><figcaption>菜畦｜葵攤開手中的種子</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/seed-drop.jpg" alt="種子從葵掌心落向菜畦"><figcaption>落種｜鏡頭推近看手勢</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/weather-cell.jpg" alt="天幕一格轉青，薄霧落在菜畦"><figcaption>天氣圖書館｜一格天幕、一畦霧</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/night.jpg" alt="葵在入夜後的菜畦及薄霧旁"><figcaption>夜景｜菜畦局部起霧</figcaption></figure>
 </div></section>` : '';
   return { row, html: `<article id="${esc(u.plan)}"><h2>${md(row[0])} <small>${md(row[1])}</small></h2>
 <table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr>${row.slice(2, 5).map(c => `<td>${md(c)}</td>`).join('')}</tr></table>

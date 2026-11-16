@@ -97,6 +97,11 @@ for (const [from, to, shot] of [[small, large, 'energy:farm'], [large, small, 'e
   const forecourt = energy.farm.getObjectByName('rectenna-entry-forecourt');
   assert.ok(forecourt instanceof Mesh && forecourt.material instanceof MeshStandardMaterial);
   assert.equal(forecourt.material.opacity, .5);
+  const seedlings = energy.farm.getObjectByName('rectenna-seedling-rack');
+  assert.ok(seedlings);
+  seedlings.traverse(part => {
+    if (part instanceof Mesh && part.material instanceof MeshStandardMaterial) assert.equal(part.material.opacity, .5);
+  });
   assert.equal(energy.getDiagnostics().parts[0].opacity, .5);
   energy.update(13, false);
   assert.equal(energy.farm.visible, to.receiver === 'large');
