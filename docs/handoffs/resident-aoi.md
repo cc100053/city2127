@@ -1,8 +1,8 @@
 # resident-aoi — 天氣圖書館與西入口
 
 - Owner：cc100053
-- 狀態：葵的 DEV 日照版與 R3 西坡道待 owner 審閱
-- 分支：`feat/resident-aoi`，沿用本機 checkout
+- 狀態：R3 西坡道及葵的 DEV 日照版已合併至本機 main
+- 分支：本機 `main`，由 `feat/resident-aoi` 合併
 - 遠端：本分支留在本機。R1 的推送曾被自動審批阻擋，審批要求確認指定目的地的上傳範圍。
 - 基準：`1811cdf90d59a857f6820fddef3ab616eab04914`
 
@@ -64,3 +64,10 @@
 - 17 顆細粒取代緊貼成一排的種子。各粒以不同速度散落。5.68 秒落種完成後，鏡頭連續拉遠，到 7.25 秒看清天幕、菜畦及鄰樹。接着才亮板。暖光束從板下延伸，其後聚光照亮既有菜葉。
 - 無字幕 Chrome 連續播放錄得 485 張 CDP 畫面，零頁面錯誤。另以 1920 × 1080／DPR 1 定格掌心、落種及廣角亮板前後。原始證據在 `~/city2127-evidence/resident-aoi/pullback/`。[變化總覽](../../artifacts/change-review/index.html#rectenna-farm)
 - Root `npm test`、`npm run build`、`git diff --check` 通過，production bundle 排除葵的程式及模型。驗證對應本節所在的本機提交。這輪 Chrome 審閱為日間 DEV 場景。
+
+## 合併與正式觸發待辦（2026-11-16）
+
+- 本機 `main` 與 `origin/main` 合併前同為 `1811cdf`。以 `--no-ff` 將 `feat/resident-aoi`（`c00afd6`）合併為 `f505548`，合併樹與功能分支相同。保留本機 `Dev_QA.md`。
+- 下一步另行接入正式流程。陸上農園生成完成後，直接接葵攤手、撒種、拉遠與亮板。正式觸發時略過 DEV 開場約 2.8 秒的固定西入口鏡頭，建築生成鏡頭已交代場地。現行正式版未接入這段居民演出。
+- 合併後 root `npm test`、`npm run build`、`git diff --check origin/main..HEAD` 均通過。日間 Chrome 審閱沿用同一棵程式樹的無字幕錄影與定格，見上節。
+- 本輪合併與交接留在本機，未推送。
