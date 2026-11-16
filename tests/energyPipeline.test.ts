@@ -44,8 +44,18 @@ repairRoads(surroundings);
 const groundAt = (x: number, z: number, root: Group) => new Raycaster(new Vector3(x, 2, z), new Vector3(0, -1, 0)).intersectObject(root, true)[0]?.point.y;
 for (const [x, z] of [[-213, 389], [-216, 411], [-211, 433], [-199, 451]]) assert.equal(groundAt(x, z, surroundings), undefined);
 for (const [x, z] of [[-244, 389], [-233, 405], [-221, 433], [-211, 451]]) assert.ok(groundAt(x, z, surroundings) !== undefined);
-for (const [x, z] of [[-233, 405], [-224, 405], [-216, 405], [-209, 404], [-200, 408]]) {
-  assert.ok(Math.abs((groundAt(x, z, energy.farm) ?? 1) + .13) < .05, 'entrance stays connected at walking grade');
+const walkSeam = [-232.1, 405] as const;
+assert.ok(Math.abs((groundAt(...walkSeam, energy.farm) ?? 1) - (groundAt(...walkSeam, surroundings) ?? -1)) < .015,
+  'gravel meets the surveyed walk without a kerb');
+for (const [x, z] of [[-231.5, 405], [-224, 405], [-216, 404], [-209, 404], [-204, 406], [-200, 408]]) {
+  const height = groundAt(x, z, energy.farm);
+  assert.ok(height !== undefined && height >= -.18 && height < -.10, 'entrance stays connected at walking grade');
+}
+for (const [x, z] of [[-200, 408], [-201.1, 408.9], [-198.9, 407.1]]) {
+  assert.ok(Math.abs((groundAt(x, z, energy.farm) ?? 1) + .107) < .003, 'gravel meets the ramp across the diagonal sill');
+}
+for (const [x, z] of [[-237, 397], [-233, 405], [-228.5, 414]]) {
+  assert.equal(groundAt(x, z, energy.farm), undefined, 'planting and rack stay outside the through walk');
 }
 const activityBounds = (['waterGardens', 'receiver', 'island'] as const).flatMap(part => energy.model.activity[part].map(group => new Box3().setFromObject(group)));
 const waterRoutes = routes(), boatRadius = Math.hypot(HULL.x, HULL.stern);

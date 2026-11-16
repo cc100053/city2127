@@ -5,8 +5,8 @@ import { addCityModel } from './modelAssets.ts';
 import type { EnergyRuntime } from './energyRuntime.ts';
 
 const AOI_URL = new URL('../asset/models/resident-aoi/resident-aoi.glb', import.meta.url).href;
-const ENTRY = new T.Vector3(-236, 8, 387);
-const ENTRY_TARGET = new T.Vector3(-214, 3.7, 411);
+const ENTRY = new T.Vector3(-242, 6.5, 389);
+const ENTRY_TARGET = new T.Vector3(-213, 2.6, 407);
 const MEDIUM = new T.Vector3(-181.44, 4.43, 397.96);
 const CLOSE = new T.Vector3(-183.02, 4.04, 398.94);
 const BED_VIEW = new T.Vector3(-208, 12.6, 383);

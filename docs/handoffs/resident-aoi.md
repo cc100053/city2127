@@ -1,7 +1,7 @@
 # resident-aoi — 天氣圖書館與西入口
 
 - Owner：cc100053
-- 狀態：R1 實作，待 owner 審閱
+- 狀態：R2 西入口前地完成，待 owner 審閱；既有西坡道淨空待決定
 - 分支：`feat/resident-aoi`，沿用本機 checkout
 - 遠端：尚未推送。自動審批阻擋推送，要求針對目的地 `github.com/cc100053/city2127` 確認這批原始碼與資產可上傳。
 - 基準：`1811cdf90d59a857f6820fddef3ab616eab04914`
@@ -32,3 +32,12 @@
 ## 下一步
 
 由 owner 審閱西入口動線、葵的角色和落種，以及一格天幕與局部落霧。審閱後決定是否整合。
+
+
+## R2 — 西入口（2026-11-16）
+
+- 從本機 `d13ffae` 繼續。刷新 `origin` 成功，當時 `origin/main` 是 `1811cdf`，這個分支 0 behind／1 ahead，未有遠端同名分支。保留未追蹤的 `Dev_QA.md`，本輪交付留在本機。
+- 按 Gemini 最新取苗架圖，把淺色前地和碎石支路合為單一連續面層，西端貼合步道斜邊，東端對準原有 4.8 m 西坡道門檻。草地上的兩段低植栽平行步道；2.38 × 0.62 m 薄木面、細金屬腳三盤架位於支路北側。DEV 開場降低鏡位，用真實鐵路、步道和天幕構圖。Gemini 把鐵路放左並畫出獨立露天坡道，本機構圖中鐵路在右，沿用既有 R3 農園和坡道。
+- **坡道淨空受既有模型阻擋。** 實景及原始 GLB 射線顯示，外圈菜槽的底板和植栽跨過西坡道入口。自坡道口起約 12 m 的三條抽樣線均投影在外圈底板範圍；起點菜槽頂約 1.05 m、坡道頂約 −0.107 m。R2 接到坡道底端，從入口走上露台仍受阻。若要打通，須先決定是否可局部修整這段外圈菜槽、底板及植栽。
+- Root `npm test`、`npm run build`、`git diff --check` 通過。實際 Chrome 場景的直行步道六個測點都有原有步道，步道接縫抽樣高差 6 mm，坡道口三點高差 0–2 mm，抽樣通行線無取苗架或收邊植栽。Production bundle 排除葵的模組和模型。
+- 1920 × 1080／DPR 1 Chrome 實景和 sidecar 在 `~/city2127-evidence/resident-aoi/r2/`，同鏡頭前後、俯視、夜景與坡道口均無頁面錯誤。[同鏡頭及俯視對照](../../artifacts/resident-aoi/r2/entrance-comparison.jpg)、[目標圖比較](../../artifacts/resident-aoi/r2/entrance-target-comparison.jpg)、[夜景](../../artifacts/resident-aoi/r2/entrance-night.jpg)及[變化總覽](../../artifacts/change-review/index.html#rectenna-farm)已更新。驗證對應本段所在的 R2 本機提交；本輪未測展場硬件或 headed FPS。
