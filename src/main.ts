@@ -151,8 +151,9 @@ try {
   // GTAO's normal/depth prepass uses an override material without the earth curvature, so the far bay would ghost above the horizon: skip the curved sea and bay context there, and every transparent unlit overlay (boat wakes, light trails and streaks, Meter pulses: no normals, so the prepass wrote them as opaque and AO drew black bars over them).
   const aoPass=ao as unknown as {_overrideVisibility():void;_restoreVisibility():void},hideFlat=aoPass._overrideVisibility.bind(aoPass),showFlat=aoPass._restoreVisibility.bind(aoPass);
   // ponytail: the overlay list is rescanned every 120 AO frames (about 2 s), so one created later may show its AO bar until then.
+  let aoiEffects:T.Group|undefined;
   let flat:T.Object3D[]=[],overlays:T.Object3D[]=[],aoFrame=0;
-  aoPass._overrideVisibility=()=>{hideFlat();if(aoFrame++%120===0){overlays=[];scene.traverse(o=>{const m=(o as T.Mesh).material as T.Material|undefined;if(m?.transparent&&(m as T.MeshBasicMaterial).isMeshBasicMaterial)overlays.push(o);});}flat=[floor,scene.getObjectByName('bay-context'),elevator,elevatorNear.root,...overlays].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
+  aoPass._overrideVisibility=()=>{hideFlat();if(aoFrame++%120===0){overlays=[];scene.traverse(o=>{const m=(o as T.Mesh).material as T.Material|undefined;if(m?.transparent&&(m as T.MeshBasicMaterial).isMeshBasicMaterial)overlays.push(o);});}flat=[floor,scene.getObjectByName('bay-context'),elevator,elevatorNear.root,aoiEffects,...overlays].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
   aoPass._restoreVisibility=()=>{showFlat();for(const o of flat)o.visible=true;};
   const bloom=new UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.2,.7,1);composer.addPass(bloom);
   const vignette=new ShaderPass(VignetteShader);vignette.uniforms.offset.value=.9;vignette.uniforms.darkness.value=.9;composer.addPass(vignette);composer.addPass(new OutputPass());
@@ -216,9 +217,16 @@ try {
     cityElevatorNear:(on:boolean)=>elevatorNear.setActive(on)});
     if(params.has('elevatorNear'))elevatorNear.setActive(true);
     const shot=params.get('shot');
+    if(shot==='energy:aoi') {
+      const energy=cityChanges?.energy;
+      if(!surveyUrl&&energy)import('./devAoi').then(async({startAoi})=>{
+        const review=await startAoi(energy,camera,controls,params);
+        aoiEffects=review.effects;devFrame=review.frame;
+      });
+    }
     // `?meters=nw:2&shot=nw:resident`: human-scale 湊 prototype (src/devMinato.ts); its pose is not in SHOTS, which stay the production close-ups.
     // `&kiosk=x,z&cam=px,py,pz,tx,ty,tz` (kiosk stage position, camera relative to the kiosk in metres) override the default kiosk for pose surveys.
-    if(shot==='nw:resident')import('./devMinato').then(({startMinato,residentPose,KIOSK})=>{
+    else if(shot==='nw:resident')import('./devMinato').then(({startMinato,residentPose,KIOSK})=>{
       const kp=params.get('kiosk')?.split(',').map(Number),cp=params.get('cam')?.split(',').map(Number);
       const override={kiosk:kp?[kp[0],kp[1]] as [number,number]:undefined,cam:cp?{position:cp.slice(0,3),target:cp.slice(3,6)}:undefined};
       const pose=residentPose(override.kiosk??KIOSK,override.cam),at=new T.Vector3(...pose.position);

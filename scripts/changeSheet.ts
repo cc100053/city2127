@@ -24,7 +24,7 @@ const UNITS = [
   { plan: 'SW rooms', shots: /^sw:stage-rooms/ },
   { plan: 'SW focal', shots: /^sw:focal/, resident: 'お台場南岸' },
   { plan: 'SW courts', shots: /^sw:(stage-courts|district)/ },
-  { plan: '能源', shots: /^energy:/ },
+  { plan: '能源', shots: /^energy:/, resident: '葵' },
 ];
 
 const esc = (s: string) => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
@@ -96,7 +96,24 @@ const units = UNITS.map(u => {
 <div class="frames">
 <figure><img loading="lazy" src="rectenna-r3/focal-day.jpg" alt="日間的陸上農園全景"><figcaption>日景｜六角受電天幕覆蓋同心退台</figcaption></figure>
 <figure><img loading="lazy" src="rectenna-r3/focal-night.jpg" alt="入夜後的陸上農園全景"><figcaption>夜景｜從南岸看夜色中的天幕與農園</figcaption></figure>
-<figure><img loading="lazy" src="rectenna-r3/access.jpg" alt="從西入口步道仰望農園的退台"><figcaption>西入口｜從碎石支路經過露天菜床，再沿坡道進入農園</figcaption></figure>
+<figure><img loading="lazy" src="rectenna-r3/access.jpg" alt="從西入口步道仰望農園的退台"><figcaption>西入口 R3｜當時的露天菜床與坡道</figcaption></figure>
+</div>
+<h3>葵與西坡道 R3 <small>農園模型待驗收 · 居民段落為 DEV 實景</small></h3>
+<p>碎石前地接上原西坡道。兩條行走帶上坡後匯入水平平台，再轉入露台內的走道。<a href="../resident-aoi/r2/entrance-target-comparison.jpg">Gemini 目標圖與 R2 實景</a></p>
+<div class="frames">
+<figure><img loading="lazy" src="../resident-aoi/r3/west-before.jpg" alt="修改前的西坡道被外圈菜槽擋住"><figcaption>同鏡頭・修改前｜外圈底板及菜槽橫跨入口</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/r3/west-after.jpg" alt="修改後的西坡道接上碎石前地"><figcaption>同鏡頭・修改後｜打開外圈底板及菜槽</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/r3/ramp-walk.jpg" alt="沿兩條行走帶由碎石前地望向露台"><figcaption>行人視角｜碎石接縫與原有欄杆</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/r3/ramp-plan.jpg" alt="天幕下俯視西坡道及露台出口"><figcaption>俯視｜兩條行走帶通往水平平台</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/r3/terrace-landing.jpg" alt="西坡道頂部的平台、欄杆和露台走道"><figcaption>上端｜沿平台側面轉入露台</figcaption></figure>
+</div>
+<h4>葵借回那一天的陽光 <small>DEV 演示</small></h4>
+<p>細小的種子散落後，鏡頭拉遠。一格六角板亮起，暖光從板下射向原有菜畦。以下定格隱藏字幕，後兩張用同一鏡頭對照菜畦與鄰樹。</p>
+<div class="frames">
+<figure><img loading="lazy" src="../resident-aoi/pullback/palm.jpg" alt="葵攤開掌心托住舊種子"><figcaption>掌心｜葵托起種子</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/pullback/seed-drop.jpg" alt="一撮細種子散開落向菜畦邊"><figcaption>落種｜細粒散開落向菜畦</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/pullback/sun-before.jpg" alt="天幕未啟用時，菜畦和鄰樹同在自然光下"><figcaption>同鏡頭・亮板前｜菜畦及鄰樹</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/pullback/sun-after.jpg" alt="暖光從單格六角板射向菜畦，鄰樹留在自然光下"><figcaption>同鏡頭・亮板後｜本畦復現暖斜陽</figcaption></figure>
 </div></section>` : '';
   return { row, html: `<article id="${esc(u.plan)}"><h2>${md(row[0])} <small>${md(row[1])}</small></h2>
 <table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr>${row.slice(2, 5).map(c => `<td>${md(c)}</td>`).join('')}</tr></table>

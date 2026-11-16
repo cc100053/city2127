@@ -7,7 +7,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #d6d4c8;padding
 dt{color:#667;font-size:13px;margin-top:8px}dd{margin:0}.frames{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start}
 p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figure{margin:0}figure img{width:100%;display:block;border-radius:4px;background:#ddd}figcaption{font-size:12px;color:#667}</style>
 <h1>變化總覽：選擇 → 變化 → 建築 → 居民</h1>
-<p>生成：2026-11-15，<code>scripts/changeSheet.ts</code>。狀態、居民與建築介紹來自 RESIDENT_SCENE_PLAN，日文文案來自結果卡與設施卡的程式，選項來自正式問卷。截圖為靜態 DEV 畫面，取自 <code>scripts/closeupSheet.mjs</code> 或個別建築驗收紀錄。佔比為模擬數字，並非真人數據。</p>
+<p>生成：2026-11-16，<code>scripts/changeSheet.ts</code>。狀態、居民與建築介紹來自 RESIDENT_SCENE_PLAN，日文文案來自結果卡與設施卡的程式，選項來自正式問卷。截圖為靜態 DEV 畫面，取自 <code>scripts/closeupSheet.mjs</code> 或個別建築驗收紀錄。佔比為模擬數字，並非真人數據。</p>
 <p><b>變化成因：</b>每位 guest 回答四題，每個選項將對應軸的 Meter 推 −1、0 或 +1。Meter 是所有人累積的結果；每份提案最多令一個地點前進一級，並優先採用 guest 自己推動的方向。因此 guest 的選擇不一定等於本次的變化方向，結果卡第二句一律說明實際變化。</p>
 <table><tr><th>單位</th><th>佔比</th><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr>
 <tr><td><a href="#NW focal">NW focal — デックス西 AUTO HUB（−1／0／+1）</a></td><td>10.6%</td><td>驗收（旗艦 R9）</td><td>湊：DEV 演示齊備，三個狀態、四種轉變（handoff）；owner 接受作演示</td><td>階段 2 收尾：演技、口形、正式接入</td></tr>
@@ -17,7 +17,7 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <tr><td><a href="#SW rooms">SW rooms — <code>sw:stage-rooms-west</code>／<code>east</code></a></td><td>17.4%</td><td><b>未打磨</b></td><td>未有居民（共有軸）</td><td>階段 1；同時決定 SW 居民</td></tr>
 <tr><td><a href="#SW focal">SW focal — お台場南岸</a></td><td>10.5%</td><td>驗收（Meter 0／mixed 的活動モジュール棚，owner 2026-11-14；−1／+1 沿用 COMMONS 模型，不在此列）</td><td>草案 v4：凪（結果為 0 的兩種轉變），待 owner 批准（handoff）</td><td>階段 2 步驟 4：owner 在 Gemini 挑選目標圖與角色</td></tr>
 <tr><td><a href="#SW courts">SW courts — <code>sw:stage-courts-west</code>／<code>south</code></a></td><td>7.2%</td><td><b>未打磨</b></td><td>未有居民</td><td>階段 1</td></tr>
-<tr><td><a href="#能源">能源四部件</a></td><td>4.5%</td><td>早期 batch 已整合，未按 taste v2 重審</td><td>陸上農園：葵，故事方向已確定</td><td>農園的雙向動作與字幕待編定；其餘能源設施待定</td></tr></table>
+<tr><td><a href="#能源">能源四部件</a></td><td>4.5%</td><td>早期 batch 已整合，未按 taste v2 重審</td><td>陸上農園：葵的 DEV 演示待驗收（handoff）</td><td>審閱落種及單格復現日照；正式投票接入待定</td></tr></table>
 <article id="NW focal"><h2>NW focal — デックス西 AUTO HUB（−1／0／+1） <small>10.6%</small></h2>
 <table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td>驗收（旗艦 R9）</td><td>湊：DEV 演示齊備，三個狀態、四種轉變（handoff）；owner 接受作演示</td><td>階段 2 收尾：演技、口形、正式接入</td></tr></table>
 <p class="intro"><b>建築</b>：位於デックス東京ビーチ西側水邊的 AUTO HUB 服務樓（16×24 米，高 32 米）。<b>用途</b>：居民辦理包裹、手續及查詢的窗口。−1 為人手窗口，0 為日間有人、夜間機械，+1 為全自動並設無人機起降場。<b>存在理由</b>：街道服務不再由行政或大企業單方決定；居民選擇要人還是要自動，AUTO HUB 便隨之改變。</p>
@@ -138,7 +138,7 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <dt>變化後這裏的功能（設施卡）</dt><dd><b>海辺に、自分の時間を</b><br>一人や親しい人と静かに過ごしたい。庭や囲われた小さな空間が、海辺に落ち着ける居場所をつくっています。</dd>
 </dl><div class="frames"><figure><img loading="lazy" src="frames/sw-stage-courts-south__-3__h12.jpg"><figcaption>-3（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-courts-south__-2__h12.jpg"><figcaption>-2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-courts-south__-3__h22.jpg"><figcaption>-3（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-courts-south__-2__h22.jpg"><figcaption>-2（22:00）</figcaption></figure></div></div></section></article>
 <article id="能源"><h2>能源四部件 <small>4.5%</small></h2>
-<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td>早期 batch 已整合，未按 taste v2 重審</td><td>陸上農園：葵，故事方向已確定</td><td>農園的雙向動作與字幕待編定；其餘能源設施待定</td></tr></table>
+<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td>早期 batch 已整合，未按 taste v2 重審</td><td>陸上農園：葵的 DEV 演示待驗收（handoff）</td><td>審閱落種及單格復現日照；正式投票接入待定</td></tr></table>
 <p class="intro"><b>建築</b>：水庭（海邊蓄電庭園）、旋轉環（フジテレビ前蓄電環）、受電翼／受電テラス農園（接收軌道電力）、能源島（沖面核電島連檢修橋）。<b>用途</b>：四種電力來源及儲存方式。<b>存在理由</b>：城市需要電力；居民選擇電從何來，每一種都改變一段海邊景色。R3 農園已驗收，六角天幕的故事設定為天氣圖書館，可重現過去的光與霧供居民育苗。</p>
 <section class="change"><dl><dt>相關選擇</dt><dd>毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？<br><b>「水の音や機械が身近でも、海辺の庭で電気を蓄える暮らし」</b><br><b>「大きな機械が景色に加わっても、街の中心で電気を蓄える暮らし」</b><br><b>「海の上に受け取る面が広がっても、空から届く電気を使う暮らし」</b><br><b>「海の一部が設備の陸地に変わっても、沖の原子力施設から電気を届ける暮らし」</b></dd>
 <dt>這些設施的功能（設施卡）</dt><dd><b>海辺の庭に、電気を蓄える</b><br>外から届く電力で水をくみ上げ、落水を通して取り出す蓄電庭園です。水辺の居場所と、エネルギー設備が隣り合っています。<br><b>街の中心で、電気を蓄える</b><br>フジテレビの劇場とは別の環が、外部の電力で回転して蓄えます。劇場と公共の動線は、そのまま残っています。<br><b>海の上で、空からの電気を受け取る</b><br>海上に広がる翼は、軌道から届く電力を受け取る設備です。海の景色と空間を使う、2127年の構想です。<br><b>空の電気を受け取るテラス農園</b><br>膜で軌道からのマイクロ波を受け、電気に変えて街に届けます。膜の下では、斜路を通って段々畑を訪ねられます。<br><b>電気のために、海の境界が変わる</b><br>沖の原子力施設を置く島と、検修の橋が街につながっています。電気を届ける場所を確保するために、海の一部を陸地として使っています。</dd></dl></section>
@@ -148,6 +148,23 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <div class="frames">
 <figure><img loading="lazy" src="rectenna-r3/focal-day.jpg" alt="日間的陸上農園全景"><figcaption>日景｜六角受電天幕覆蓋同心退台</figcaption></figure>
 <figure><img loading="lazy" src="rectenna-r3/focal-night.jpg" alt="入夜後的陸上農園全景"><figcaption>夜景｜從南岸看夜色中的天幕與農園</figcaption></figure>
-<figure><img loading="lazy" src="rectenna-r3/access.jpg" alt="從西入口步道仰望農園的退台"><figcaption>西入口｜從碎石支路經過露天菜床，再沿坡道進入農園</figcaption></figure>
-</div></section></article>
+<figure><img loading="lazy" src="rectenna-r3/access.jpg" alt="從西入口步道仰望農園的退台"><figcaption>西入口 R3｜當時的露天菜床與坡道</figcaption></figure>
+</div>
+<h3>葵與西坡道 R3 <small>農園模型待驗收 · 居民段落為 DEV 實景</small></h3>
+<p>碎石前地接上原西坡道。兩條行走帶上坡後匯入水平平台，再轉入露台內的走道。<a href="../resident-aoi/r2/entrance-target-comparison.jpg">Gemini 目標圖與 R2 實景</a></p>
+<div class="frames">
+<figure><img loading="lazy" src="../resident-aoi/r3/west-before.jpg" alt="修改前的西坡道被外圈菜槽擋住"><figcaption>同鏡頭・修改前｜外圈底板及菜槽橫跨入口</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/r3/west-after.jpg" alt="修改後的西坡道接上碎石前地"><figcaption>同鏡頭・修改後｜打開外圈底板及菜槽</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/r3/ramp-walk.jpg" alt="沿兩條行走帶由碎石前地望向露台"><figcaption>行人視角｜碎石接縫與原有欄杆</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/r3/ramp-plan.jpg" alt="天幕下俯視西坡道及露台出口"><figcaption>俯視｜兩條行走帶通往水平平台</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/r3/terrace-landing.jpg" alt="西坡道頂部的平台、欄杆和露台走道"><figcaption>上端｜沿平台側面轉入露台</figcaption></figure>
+</div>
+<h4>葵借回那一天的陽光 <small>DEV 演示</small></h4>
+<p>細小的種子散落後，鏡頭拉遠。一格六角板亮起，暖光從板下射向原有菜畦。以下定格隱藏字幕，後兩張用同一鏡頭對照菜畦與鄰樹。</p>
+<div class="frames">
+<figure><img loading="lazy" src="../resident-aoi/pullback/palm.jpg" alt="葵攤開掌心托住舊種子"><figcaption>掌心｜葵托起種子</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/pullback/seed-drop.jpg" alt="一撮細種子散開落向菜畦邊"><figcaption>落種｜細粒散開落向菜畦</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/pullback/sun-before.jpg" alt="天幕未啟用時，菜畦和鄰樹同在自然光下"><figcaption>同鏡頭・亮板前｜菜畦及鄰樹</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/pullback/sun-after.jpg" alt="暖光從單格六角板射向菜畦，鄰樹留在自然光下"><figcaption>同鏡頭・亮板後｜本畦復現暖斜陽</figcaption></figure>
+</div></section><h3>階段 2：受電テラス農園 — 葵（アオイ）</h3><table><tr><th>實際變化</th><th>台詞（字幕）</th><th>行動</th><th>得／失</th></tr><tr><td>陸上農園 DEV 演示</td><td>あの日の陽ざしを借りて、この種をもう一度。</td><td>西入口先交代步道、碎石支路、取苗架與坡道。近鏡見葵攤手撒下一撮種子。鏡頭拉遠，看到一格六角板亮起，光束從板下延伸至本畦，鄰樹仍在當天的自然光下。</td><td>得：可借舊日日照育苗；農園佔用南岸一片土地。</td></tr></table></article>
 </html>

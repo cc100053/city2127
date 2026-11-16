@@ -101,6 +101,7 @@ Whole assets. Reuse a site asset elsewhere only as background context, and ask t
 | `train-2127` | guideway train | `build_train.py` | guideway only |
 | `future-tree-2127` | landmark tree (catalog `prop`) | imported GLB | any planted deck |
 | `resident-minato` | named character Minato (1.70 m, 20 rigid nodes, built with `build_nagi.Part`) | `build_minato.py`; review `review_minato.py` | resident scenes |
+| `resident-aoi` | named Weather Library resident (1.71 m, rigid hands and arms) | [build_aoi.py](resident-aoi/build_aoi.py); [three-angle lineup](../../artifacts/resident-aoi/character.jpg) | DEV scene candidate |
 | `resident-nagi` | named character Nagi (2.0 m, 20 rigid nodes, sit / phone / walk recipes in `review_nagi.py`) | `build_nagi.py`; lineup `review_nagi.py` | resident scenes (draft, awaiting owner review) |
 | `resident-kiosk` | Minato's service kiosk | `build_kiosk.py` | Minato's scene |
 | `concentration-tower-high` | SE +1 tower shell | `build_tower.py` | site-only |
