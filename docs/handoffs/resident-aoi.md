@@ -1,9 +1,9 @@
 # resident-aoi — 天氣圖書館與西入口
 
 - Owner：cc100053
-- 狀態：R2 西入口前地完成，待 owner 審閱；既有西坡道淨空待決定
+- 狀態：R3 西坡道打通，待 owner 審閱
 - 分支：`feat/resident-aoi`，沿用本機 checkout
-- 遠端：尚未推送。自動審批阻擋推送，要求針對目的地 `github.com/cc100053/city2127` 確認這批原始碼與資產可上傳。
+- 遠端：本分支留在本機。R1 的推送曾被自動審批阻擋，審批要求確認指定目的地的上傳範圍。
 - 基準：`1811cdf90d59a857f6820fddef3ab616eab04914`
 
 ## 起點
@@ -41,3 +41,12 @@
 - **坡道淨空受既有模型阻擋。** 實景及原始 GLB 射線顯示，外圈菜槽的底板和植栽跨過西坡道入口。自坡道口起約 12 m 的三條抽樣線均投影在外圈底板範圍；起點菜槽頂約 1.05 m、坡道頂約 −0.107 m。R2 接到坡道底端，從入口走上露台仍受阻。若要打通，須先決定是否可局部修整這段外圈菜槽、底板及植栽。
 - Root `npm test`、`npm run build`、`git diff --check` 通過。實際 Chrome 場景的直行步道六個測點都有原有步道，步道接縫抽樣高差 6 mm，坡道口三點高差 0–2 mm，抽樣通行線無取苗架或收邊植栽。Production bundle 排除葵的模組和模型。
 - 1920 × 1080／DPR 1 Chrome 實景和 sidecar 在 `~/city2127-evidence/resident-aoi/r2/`，同鏡頭前後、俯視、夜景與坡道口均無頁面錯誤。[同鏡頭及俯視對照](../../artifacts/resident-aoi/r2/entrance-comparison.jpg)、[目標圖比較](../../artifacts/resident-aoi/r2/entrance-target-comparison.jpg)、[夜景](../../artifacts/resident-aoi/r2/entrance-night.jpg)及[變化總覽](../../artifacts/change-review/index.html#rectenna-farm)已更新。驗證對應本段所在的 R2 本機提交；本輪未測展場硬件或 headed FPS。
+
+## R3 — 西坡道開口（2026-11-16）
+
+- 從本機 `feat/resident-aoi` 的 R2 `3f4eff3` 繼續。刷新成功，`origin/main` 為 `1811cdf`，本機 0 behind／2 ahead，遠端沒有同名分支。交付留在本機，保留未追蹤的 `Dev_QA.md`。
+- 在 [Blender 源檔](../../asset/models/rectenna-farm-canopy/rectenna-farm-canopy.blend) 局部裁開外圈底板、矮牆、菜槽和底座。從原有散佈點局部剔除 356 株菜苗。匯出前後比對，餘下 10,468 株的模型、位置、旋轉及比例相同。另把一棵橙樹移離露台出口約 5.5 m（城市尺度）。原西坡道保留原有幾何尺寸、中央扶手與外欄，修正西段路面的反向面。上端加 3.3 × 5.8 m 水平平台及 L 形護欄，平台側邊穿過第一層菜床接上原露台走道。鐵路、直行步道、碎石前地與取苗架沿用 R2。葵的段落繼續限 DEV，Meter、Q3、headline 及正式投票接入留待另項工作。
+- Blender 5.2.2 LTS，沿用內嵌 `export_glb.py`，輸出 Y-up、無壓縮的 [GLB](../../asset/models/rectenna-farm-canopy/rectenna-farm-canopy.glb)。最終 4,842,648 bytes、13 材質、10,468 個植栽實例，Three.js 計入實例後 549,148 三角面。原模型座標界限保持 X ±32.24、Y −0.23…33.60、Z ±32.38 m。空白 Blender 場景回讀成功，亦確認 Chrome 載入新版。
+- [GLB 射線測試](../../tests/rectennaWestRamp.test.mjs)通過 43,710 點，覆蓋兩條行走帶、水平平台、內側出口，以及門檻前沿。原坡道在城市尺度長約 26.2 m、升 2.36 m，量得 9.01% 斜率。行走面高度與預期面相差小於 2 mm，抽樣的 2.25 m 垂直淨空沒有底板、菜槽、植栽或欄杆侵入。Chrome 量得碎石與坡道交界 24 點高差 2.8–2.9 mm，六個直行步道抽樣點皆有路面，取苗架及 DEV 葵正常載入。
+- 新平台與護欄通過 Blender Asset QA 的 render profile，線框及實景也已查看。接受純色無 UV、欄杆接合處的隱藏貼面和架空平台的地面高度警告。全組檢查仍有 R2 已見的主露台板／矮牆共面報告，並保留其他坡段原有反向面，本輪範圍為西坡道。
+- Root `npm test`、`npm run build`、`git diff --check` 通過。Production bundle 排除葵。靜態 Chrome 1920 × 1080／DPR 1 實景及 sidecar 位於 `~/city2127-evidence/resident-aoi/r3/`，見[變化總覽](../../artifacts/change-review/index.html#rectenna-farm)的同鏡頭前後、坡道視角、俯視與露台出口。驗證對應本段所在的 R3 本機提交。展場硬件、headed FPS 和正式投票流程未實測。
