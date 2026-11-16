@@ -1,7 +1,7 @@
 # resident-aoi — 天氣圖書館與西入口
 
 - Owner：cc100053
-- 狀態：R3 西坡道打通，待 owner 審閱
+- 狀態：葵的 DEV 日照版與 R3 西坡道待 owner 審閱
 - 分支：`feat/resident-aoi`，沿用本機 checkout
 - 遠端：本分支留在本機。R1 的推送曾被自動審批阻擋，審批要求確認指定目的地的上傳範圍。
 - 基準：`1811cdf90d59a857f6820fddef3ab616eab04914`
@@ -20,7 +20,7 @@
 
 ## 審閱
 
-啟動 Vite 後開啟 `/?shot=energy:aoi&orbital=3&hour=12&nopanel`。重載重播，改 `hour=22` 看夜景。可定格 `&reviewTime=20&aoiTime=5.45` 檢視落種，或加 `aoiView=entry|hands|canopy` 選固定構圖、`aoiNoCaption` 隱藏字幕。相片及圖說見[變化總覽](../../artifacts/change-review/index.html#rectenna-farm)。
+啟動 Vite 後開啟 `/?shot=energy:aoi&orbital=3&hour=12&nopanel`。重載重播，改 `hour=22` 看夜景。可定格 `&reviewTime=20&aoiTime=5.45` 檢視落種，或以 `aoiTime=5.15` 與 `aoiTime=7` 配合 `aoiView=canopy` 比較同一鏡頭的日照前後。可加 `aoiView=entry|hands|canopy` 選固定構圖、`aoiNoCaption` 隱藏字幕。相片及圖說見[變化總覽](../../artifacts/change-review/index.html#rectenna-farm)。
 
 ## 驗證
 
@@ -31,7 +31,7 @@
 
 ## 下一步
 
-由 owner 審閱西入口動線、葵的角色和落種，以及一格天幕與局部落霧。審閱後決定是否整合。
+由 owner 審閱西入口動線、落種，以及單格天幕復現的暖斜陽。審閱後決定是否整合。
 
 
 ## R2 — 西入口（2026-11-16）
@@ -50,3 +50,10 @@
 - [GLB 射線測試](../../tests/rectennaWestRamp.test.mjs)通過 43,710 點，覆蓋兩條行走帶、水平平台、內側出口，以及門檻前沿。原坡道在城市尺度長約 26.2 m、升 2.36 m，量得 9.01% 斜率。行走面高度與預期面相差小於 2 mm，抽樣的 2.25 m 垂直淨空沒有底板、菜槽、植栽或欄杆侵入。Chrome 量得碎石與坡道交界 24 點高差 2.8–2.9 mm，六個直行步道抽樣點皆有路面，取苗架及 DEV 葵正常載入。
 - 新平台與護欄通過 Blender Asset QA 的 render profile，線框及實景也已查看。接受純色無 UV、欄杆接合處的隱藏貼面和架空平台的地面高度警告。全組檢查仍有 R2 已見的主露台板／矮牆共面報告，並保留其他坡段原有反向面，本輪範圍為西坡道。
 - Root `npm test`、`npm run build`、`git diff --check` 通過。Production bundle 排除葵。靜態 Chrome 1920 × 1080／DPR 1 實景及 sidecar 位於 `~/city2127-evidence/resident-aoi/r3/`，見[變化總覽](../../artifacts/change-review/index.html#rectenna-farm)的同鏡頭前後、坡道視角、俯視與露台出口。驗證對應本段所在的 R3 本機提交。展場硬件、headed FPS 和正式投票流程未實測。
+
+## 葵的日照版（2026-11-16）
+
+- 從 R3 本機提交 `5f701b6` 繼續，保留未追蹤的 `Dev_QA.md`。刷新 `origin` 後，`origin/main` 為 `1811cdf`，起點為 0 behind／3 ahead，無遠端同名分支。交付留在本機。
+- 葵向步道側微移，近鏡抬高，落種移到菜畦邊的低位。約 5.18 秒開始落種，5.68 秒落到菜畦並切至天幕與鄰樹同框。原位的單格六角板隨即亮起，約 5.83–6.65 秒把暖斜陽投在本畦。使用有陰影的聚光照亮既有菜葉與土面，鄰樹仍用城景的環境光。日文字幕為「あの日の陽ざしを借りて、この種をもう一度。」
+- 1920 × 1080／DPR 1 Chrome 固定鏡頭在 12:00 比較 5.15／7 秒（隱藏字幕）。JPEG 中菜葉取樣 x990–1031／y933–967 的平均 RGB 由 (107.7, 156.2, 76.7) 變為 (160.3, 185.8, 79.9)，鄰樹 x823–865／y737–790 每個色道變化小於 1。另留掌心、落種、22:00 夜景及擷取 sidecar。無字幕連續播放錄得 378 張 CDP 畫面，零頁面錯誤；已核對入口、落種及亮板段落。原始證據在 `~/city2127-evidence/resident-aoi/sun-final/`。
+- Root `npm test`、`npm run build`、`git diff --check` 通過；production bundle 排除葵的程式及模型。驗證對應本節所在的本機提交。交由 owner 審閱 [無字幕定格與同鏡頭對照](../../artifacts/change-review/index.html#rectenna-farm)。展場硬件及正式投票仍待獨立驗證。

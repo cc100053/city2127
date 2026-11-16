@@ -199,7 +199,7 @@ CityChangeManager將能源實際前後target加入CarrierChange，residentResult
 
 正式能源 runtime 以同一個 receiver 欄位切換三種狀態：低於門檻時沒有受電設備，達 20% 時是小型離岸受電翼，達 40% 時是陸上受電テラス農園。兩個門檻均至少需要兩票，分母為 Q3 能源票加四。農園重用 [GLB](../asset/models/rectenna-farm-canopy/rectenna-farm-canopy.glb)，以 2× 等比例落在台場南緣 (−152, −0.15, 408) m，西入口 R2 將既有鐵路旁步道、碎石支路及前地平接至原西坡道的斜向門檻。步道外側兩段低植栽沿草地收邊，通行線北側近路口設一張三盤取苗架。西坡道 R3 候選已在 GLB 局部打開外圈菜槽，並在原坡道上端以水平平台連接第一層露台走道。見[葵與西坡道交接](handoffs/resident-aoi.md#r3--西坡道開口2026-11-16)。舊路面及步道朝農園的一側已收窄，外圍原有樹叢的位置沿用 R2。小／大切換在既有 5.12–8.12 秒窗口交叉淡化。若小／大互換剛好遇上其他能源設備只改整備模式，該能源近鏡會跟到新受電設備。結果卡、設施卡及工序旁白按當前場地選用。舊 DEV `?energy` 保留研究模型，正式幾何可用 DEV `?shot=energy:farm&orbital=3` 查閱。見 [農園交接](handoffs/rectenna-farm-placement.md)。
 
-DEV 天氣圖書館用 `?shot=energy:aoi&orbital=3&hour=12&nopanel` 預覽葵從攤手到落種、單格六角板轉青、原有內側菜畦局部落霧的動作。可加 `aoiTime` 定格秒數、`aoiView=entry|hands|canopy` 審圖、`aoiNoCaption` 隱藏字幕。角色及特效掛在陸上農園組別，等待農園完全顯示才開始。正式投票無葵的居民段落。見 [葵的交接](handoffs/resident-aoi.md)。
+DEV 天氣圖書館用 `?shot=energy:aoi&orbital=3&hour=12&nopanel` 預覽葵從攤手到落種、單格六角板亮起、暖斜陽照亮原有內側菜畦的動作。可加 `aoiTime` 定格秒數、`aoiView=entry|hands|canopy` 審圖、`aoiNoCaption` 隱藏字幕。角色及特效掛在陸上農園組別，等待農園完全顯示才開始。正式投票無葵的居民段落。見 [葵的交接](handoffs/resident-aoi.md)。
 
 ### 能源模型 polish 恢復續作（2026-10-25）
 

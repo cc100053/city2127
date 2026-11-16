@@ -13,6 +13,6 @@ export function aoiPose(seconds: number) {
     sow: sow * (1 - rest),
     seeds: ease(seconds, 5.18, 5.68),
     pane: ease(seconds, 5.68, 6.45),
-    mist: ease(seconds, 6.1, 7.5),
+    sunlight: ease(seconds, 5.83, 6.65),
   };
 }

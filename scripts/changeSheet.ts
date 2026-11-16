@@ -106,10 +106,14 @@ const units = UNITS.map(u => {
 <figure><img loading="lazy" src="../resident-aoi/r3/ramp-walk.jpg" alt="沿兩條行走帶由碎石前地望向露台"><figcaption>行人視角｜碎石接縫與原有欄杆</figcaption></figure>
 <figure><img loading="lazy" src="../resident-aoi/r3/ramp-plan.jpg" alt="天幕下俯視西坡道及露台出口"><figcaption>俯視｜兩條行走帶通往水平平台</figcaption></figure>
 <figure><img loading="lazy" src="../resident-aoi/r3/terrace-landing.jpg" alt="西坡道頂部的平台、欄杆和露台走道"><figcaption>上端｜沿平台側面轉入露台</figcaption></figure>
-<figure><img loading="lazy" src="../resident-aoi/palm.jpg" alt="葵在菜畦旁攤開手掌"><figcaption>菜畦｜葵攤開手中的種子</figcaption></figure>
-<figure><img loading="lazy" src="../resident-aoi/seed-drop.jpg" alt="種子從葵掌心落向菜畦"><figcaption>落種｜鏡頭推近看手勢</figcaption></figure>
-<figure><img loading="lazy" src="../resident-aoi/weather-cell.jpg" alt="天幕一格轉青，薄霧落在菜畦"><figcaption>天氣圖書館｜一格天幕、一畦霧</figcaption></figure>
-<figure><img loading="lazy" src="../resident-aoi/night.jpg" alt="葵在入夜後的菜畦及薄霧旁"><figcaption>夜景｜菜畦局部起霧</figcaption></figure>
+</div>
+<h4>葵借回那一天的陽光 <small>DEV 演示</small></h4>
+<p>舊種子落下後，一格六角板亮起，暖斜陽落在原有菜畦。以下定格隱藏字幕，後兩張用同一鏡頭對照菜畦與鄰樹。</p>
+<div class="frames">
+<figure><img loading="lazy" src="../resident-aoi/sun/palm.jpg" alt="葵攤開掌心托住舊種子"><figcaption>掌心｜葵托起種子</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/sun/seed-drop.jpg" alt="種子離開葵的手掌落向菜畦邊"><figcaption>落種｜種子越過菜畦邊緣</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/sun/sun-before.jpg" alt="天幕未啟用時，菜畦和鄰樹同在自然光下"><figcaption>同鏡頭・亮板前｜菜畦及鄰樹</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/sun/sun-after.jpg" alt="一格六角板亮起，暖斜陽照在菜畦，鄰樹留在自然光下"><figcaption>同鏡頭・亮板後｜本畦復現暖斜陽</figcaption></figure>
 </div></section>` : '';
   return { row, html: `<article id="${esc(u.plan)}"><h2>${md(row[0])} <small>${md(row[1])}</small></h2>
 <table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr>${row.slice(2, 5).map(c => `<td>${md(c)}</td>`).join('')}</tr></table>
