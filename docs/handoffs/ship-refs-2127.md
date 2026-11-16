@@ -4,8 +4,8 @@
 - Status: IN_PROGRESS (models delivered for owner review)
 - Branch: feat/ship-refs-2127
 - Base commit: 52aa6902 (origin/main, fast-forwarded at session start)
-- Last verified commit: working tree on feat/ship-refs-2127 before the first commit (see validation)
-- Remote availability: NOT PUSHED
+- Last verified commit: d12ad06 (checks below ran on its tree)
+- Remote availability: origin/feat/ship-refs-2127 at d12ad06
 
 ## Session Git state
 
