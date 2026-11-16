@@ -12,7 +12,9 @@ export function aoiPose(seconds: number) {
     lift: lift * (1 - rest),
     sow: sow * (1 - rest),
     seeds: ease(seconds, 5.18, 5.68),
-    pane: ease(seconds, 5.68, 6.45),
-    sunlight: ease(seconds, 5.83, 6.65),
+    pullback: ease(seconds, 5.68, 7.25),
+    pane: ease(seconds, 7.25, 7.68),
+    beam: ease(seconds, 7.48, 8.12),
+    sunlight: ease(seconds, 7.91, 8.4),
   };
 }

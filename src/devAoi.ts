@@ -62,12 +62,55 @@ export async function startAoi(energy: EnergyRuntime, camera: T.PerspectiveCamer
   sunlight.shadow.camera.near = 17;
   sunlight.shadow.normalBias = .025;
   set.add(sunlight, sunlight.target);
-  const seedColor = new T.MeshStandardMaterial({ color: '#b98440', roughness: .95 });
-  const seedShape = new T.SphereGeometry(.019, 6, 4);
-  const seeds = Array.from({ length: 5 }, () => {
-    const seed = new T.Mesh(seedShape, seedColor);
-    set.add(seed);
-    return seed;
+  const beamDirection = sunlight.position.clone().sub(sunlight.target.position);
+  const shaft = new T.Mesh(
+    new T.CylinderGeometry(.22, 1.38, beamDirection.length(), 32, 1, true),
+    new T.ShaderMaterial({
+      transparent: true,
+      blending: T.AdditiveBlending,
+      depthWrite: false,
+      uniforms: { reach: { value: 0 } },
+      vertexShader: `
+        varying vec3 surfaceNormal;
+        varying vec3 eye;
+        varying float along;
+        void main() {
+          vec4 view = modelViewMatrix * vec4(position, 1.0);
+          surfaceNormal = normalMatrix * normal;
+          eye = -view.xyz;
+          along = 1.0 - uv.y;
+          gl_Position = projectionMatrix * view;
+        }
+      `,
+      fragmentShader: `
+        uniform float reach;
+        varying vec3 surfaceNormal;
+        varying vec3 eye;
+        varying float along;
+        void main() {
+          float center = max(0.0, dot(normalize(surfaceNormal), normalize(eye)));
+          float edge = smoothstep(0.0, .045, along) * (1.0 - smoothstep(.88, 1.0, along));
+          float front = smoothstep(along, along + .16, reach);
+          gl_FragColor = vec4(1.0, .60, .25, center * center * edge * front * .24);
+        }
+      `,
+    }),
+  );
+  shaft.position.copy(sunlight.position).lerp(sunlight.target.position, .5);
+  shaft.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), beamDirection.normalize());
+  shaft.renderOrder = 2;
+  effects.add(shaft);
+
+  const seedColor = new T.MeshStandardMaterial({ color: '#be934f', roughness: .95 });
+  const seedShape = new T.SphereGeometry(.0095, 6, 4);
+  const seeds = Array.from({ length: 17 }, (_, i) => {
+    const grain = new T.Mesh(seedShape, seedColor);
+    grain.scale.set(1.15, .74, .86);
+    grain.rotation.y = i * 2.4;
+    set.add(grain);
+    const radius = .016 * Math.sqrt(i);
+    const offset = new T.Vector3(Math.cos(i * 2.4) * radius, .009 + (i % 3) * .009, Math.sin(i * 2.4) * radius);
+    return { grain, offset, fallSpeed: .74 + (i % 7) * .12 };
   });
   const setPose = ({ lift, sow }: ReturnType<typeof aoiPose>) => {
     torso.rotation.x = .04 + .14 * sow;
@@ -112,32 +155,38 @@ export async function startAoi(energy: EnergyRuntime, camera: T.PerspectiveCamer
     started ??= now;
     const t = freeze ? held : now - started;
     const pose = aoiPose(t);
-    const { push, seeds: fall, pane: lit, sunlight: sun } = pose;
+    const { push, seeds: fall, pullback, pane: lit, beam, sunlight: sun } = pose;
     setPose(pose);
     pane.visible = lit > 0;
     pane.material.opacity = .95 * lit;
+    shaft.visible = beam > 0;
+    shaft.material.uniforms.reach.value = beam * 1.16;
     sunlight.intensity = 5400 * sun;
-    seeds.forEach((seed, i) => {
-      const drop = fall;
-      if (drop === 0) seed.position.copy(palm);
-      else {
-        seed.position.lerpVectors(release, landing, drop);
-        seed.position.y = T.MathUtils.lerp(release.y, landing.y, drop * drop);
+    seeds.forEach(({ grain, offset, fallSpeed }) => {
+      const drop = fall ** fallSpeed;
+      grain.position.copy(palm);
+      if (drop > 0) {
+        grain.position.lerpVectors(release, landing, drop);
+        grain.position.y = T.MathUtils.lerp(release.y, landing.y, drop * drop);
       }
-      seed.position.x += (i - 2) * (.018 + .022 * drop);
-      seed.visible = t >= 3.9 && drop < .99;
+      grain.position.addScaledVector(offset, 1 + 2.6 * drop);
+      grain.visible = t >= 3.9 && drop < .99;
     });
     fill.intensity = .2 + 5 * darkness;
     caption.hidden = params.has('aoiNoCaption') || t < 3.5 || t > 9.4;
     if (view === 'entry' || (view !== 'hands' && view !== 'canopy' && t < 2.8)) {
       camera.position.copy(ENTRY);
       controls.target.copy(ENTRY_TARGET);
-    } else if (view === 'canopy' || (fall === 1 && view !== 'hands')) {
+    } else if (view === 'canopy') {
       camera.position.copy(BED_VIEW);
       controls.target.copy(BED_TARGET);
     } else {
       camera.position.lerpVectors(MEDIUM, CLOSE, push);
       controls.target.copy(GESTURE);
+      if (view !== 'hands') {
+        camera.position.lerp(BED_VIEW, pullback);
+        controls.target.lerp(BED_TARGET, pullback);
+      }
     }
     camera.lookAt(controls.target);
   };

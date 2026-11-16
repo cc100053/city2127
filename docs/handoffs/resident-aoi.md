@@ -20,7 +20,7 @@
 
 ## 審閱
 
-啟動 Vite 後開啟 `/?shot=energy:aoi&orbital=3&hour=12&nopanel`。重載重播，改 `hour=22` 看夜景。可定格 `&reviewTime=20&aoiTime=5.45` 檢視落種，或以 `aoiTime=5.15` 與 `aoiTime=7` 配合 `aoiView=canopy` 比較同一鏡頭的日照前後。可加 `aoiView=entry|hands|canopy` 選固定構圖、`aoiNoCaption` 隱藏字幕。相片及圖說見[變化總覽](../../artifacts/change-review/index.html#rectenna-farm)。
+啟動 Vite 後開啟 `/?shot=energy:aoi&orbital=3&hour=12&nopanel`。重載重播，改 `hour=22` 看夜景。可定格 `&reviewTime=20&aoiTime=5.45` 檢視落種，或以 `aoiTime=7.25` 與 `aoiTime=8.5` 配合 `aoiView=canopy` 比較同一鏡頭的日照前後。可加 `aoiView=entry|hands|canopy` 選固定構圖、`aoiNoCaption` 隱藏字幕。相片及圖說見[變化總覽](../../artifacts/change-review/index.html#rectenna-farm)。
 
 ## 驗證
 
@@ -57,3 +57,10 @@
 - 葵向步道側微移，近鏡抬高，落種移到菜畦邊的低位。約 5.18 秒開始落種，5.68 秒落到菜畦並切至天幕與鄰樹同框。原位的單格六角板隨即亮起，約 5.83–6.65 秒把暖斜陽投在本畦。使用有陰影的聚光照亮既有菜葉與土面，鄰樹仍用城景的環境光。日文字幕為「あの日の陽ざしを借りて、この種をもう一度。」
 - 1920 × 1080／DPR 1 Chrome 固定鏡頭在 12:00 比較 5.15／7 秒（隱藏字幕）。JPEG 中菜葉取樣 x990–1031／y933–967 的平均 RGB 由 (107.7, 156.2, 76.7) 變為 (160.3, 185.8, 79.9)，鄰樹 x823–865／y737–790 每個色道變化小於 1。另留掌心、落種、22:00 夜景及擷取 sidecar。無字幕連續播放錄得 378 張 CDP 畫面，零頁面錯誤；已核對入口、落種及亮板段落。原始證據在 `~/city2127-evidence/resident-aoi/sun-final/`。
 - Root `npm test`、`npm run build`、`git diff --check` 通過；production bundle 排除葵的程式及模型。驗證對應本節所在的本機提交。交由 owner 審閱 [無字幕定格與同鏡頭對照](../../artifacts/change-review/index.html#rectenna-farm)。展場硬件及正式投票仍待獨立驗證。
+
+## 種子與拉遠鏡頭（2026-11-16）
+
+- 從本機 `2f4a2dc` 繼續。刷新後 `origin/main` 為 `1811cdf`，起點 0 behind／4 ahead。保留 `Dev_QA.md`，交付留在本機。
+- 17 顆細粒取代緊貼成一排的種子。各粒以不同速度散落。5.68 秒落種完成後，鏡頭連續拉遠，到 7.25 秒看清天幕、菜畦及鄰樹。接着才亮板。暖光束從板下延伸，其後聚光照亮既有菜葉。
+- 無字幕 Chrome 連續播放錄得 485 張 CDP 畫面，零頁面錯誤。另以 1920 × 1080／DPR 1 定格掌心、落種及廣角亮板前後。原始證據在 `~/city2127-evidence/resident-aoi/pullback/`。[變化總覽](../../artifacts/change-review/index.html#rectenna-farm)
+- Root `npm test`、`npm run build`、`git diff --check` 通過，production bundle 排除葵的程式及模型。驗證對應本節所在的本機提交。這輪 Chrome 審閱為日間 DEV 場景。

@@ -147,6 +147,9 @@ Aoi west ramp R3 (2026-11-16, local candidate): 43,710 GLB probes cover both lan
 
 Aoi archived sunlight (2026-11-16, local DEV candidate): caption-free Chrome captures at 1920 × 1080 / DPR 1 compare the palm, seed fall, and the same canopy shot before and after activation. The crop sample brightens and warms while the neighbouring tree sample stays within 1 JPEG RGB level. A CDP screencast confirms the full continuous beat with zero page errors. See the [change sheet](../artifacts/change-review/index.html#rectenna-farm) and [handoff](handoffs/resident-aoi.md#葵的日照版2026-11-16).
 
+Aoi seed scatter and pullback (2026-11-16, local DEV candidate): caption-free Chrome captures at 1920 × 1080 / DPR 1 show the separate seeds and the same wide shot before and after the roof panel activates. A CDP screencast confirms that the camera pulls back after the seeds fall, then the panel lights and the beam reaches the crop bed. Zero page errors. [Change sheet](../artifacts/change-review/index.html#rectenna-farm) · [handoff](handoffs/resident-aoi.md#種子與拉遠鏡頭2026-11-16).
+
+
 
 SE district towers and pods R1 (2026-11-12, feature branch `d80eb33`): root tests, build, whitespace check, six-variant Blender QA and separate GLB reimport pass. Headless Chrome 3200×1800 day/night, three blind judges, median 12/30 each. In headed Chrome at 1920×1080 DPR 1, hero `se:high` day 45.2–48.0 FPS and night 47.2–48.5 FPS. Five DEV result transitions reached the expected stage, completed construction and returned to hero. Nearby facades briefly obscure both straight flight paths. Exhibition hardware validation pending. [Handoff](handoffs/se-stage-closeup-polish.md).
 
