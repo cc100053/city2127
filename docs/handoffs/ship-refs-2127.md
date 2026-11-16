@@ -47,6 +47,10 @@ Contract: real metres, design waterline at z 0 (three.js y 0; underwater hull mo
 - `npm test` on Windows: `assetLibrary` PASS (25 folders) and every other test PASS except `surveyMeterPipeline` and `energyPipeline`, which fail before touching this change: the question-file path is built from a URL pathname (`C:\C:\...\%E6%96%87%E4%BB%B6\...`), a pre-existing Windows/non-ASCII path bug. The run needed a stale, git-ignored `asset/models/car-candidates-2127/__pycache__` (2026-11-14, not part of this task) moved aside temporarily; it was restored. Not verified on macOS/CI yet.
 - Application verification: NOT INTEGRATED (no runtime consumer; not placed in the scene).
 
+## Owner review rounds
+
+- Cargo ship, round 1 (2026-11-17): the owner asked for a closer match to the reference: long and low hull, raked/faceted bow, a lower forward bridge, and the positions of the four side bays and the crane. Other ships wait until the cargo ship is accepted. Changed in `cargo_ship()` (same parts, new dimensions): 68.8 → 76.0 m long, deck 7.6 → 6.4 m; the stem rakes from the deck edge at f 38 back to f 30.5 at the waterline with a sharper wedge entry (pw 1.15); a diagonal crease (f 14–26) separates the darker lower hull; chamfered bay openings 2.3–5.95 m between f −30 and 15; bridge 2.6 m tall over f 19–31; the crane sits on a chamfered plinth over the stern block with a short steep boom and a long jib reaching f −8. Removed the foredeck rail and bow hawse plates, which the reference doesn't have. New `compare_ship.py` renders the reference camera (per-ship `CAMS`). Comparison sheet (reference / before / after): `~/city2127-evidence/ship-refs-2127/cargo-r1/cargo-ship-compare.png`. `review_ships.py`: all six OK.
+
 ## Known issues and blockers
 
 - The originally requested 未来の台場を航く港湾タグボート.png and 未来の海洋調査船とレインボーブリッジ.png were absent from Downloads; the owner chose お台場の未来型消防艇.png and お台場の未来型ハーバーパトロール艇.png instead (2026-11-16). A tug and a survey ship can follow when those images arrive.
@@ -58,4 +62,4 @@ Contract: real metres, design waterline at z 0 (three.js y 0; underwater hull mo
 
 ## Next expected step
 
-Owner reviews the six previews; record per-ship feedback, adjust `build_ships.py` and rebuild. Placement in the city is a separate task.
+The owner judges cargo-ship round 1 from the comparison sheet. After acceptance, run the same comparison loop on the other five ships, one at a time: add each ship's camera to `CAMS`, edit its builder function and rebuild. Placement in the city is a separate task.
