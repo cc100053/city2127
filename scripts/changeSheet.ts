@@ -121,6 +121,17 @@ const units = UNITS.map(u => {
 ${mine.map(change).join('\n')}${energy}${mine.length || energy ? '' : '<p><small>尚無前後對照截圖：請先執行 scripts/closeupSheet.mjs。</small></p>'}${story}</article>` };
 });
 
+const drawerHousing = `<article id="drawer-housing">
+<h2>Q03-A — 車が引き出しになる住宅 <small>A 位已擺放 · 投票變化待設計</small></h2>
+<p class="intro">フジテレビ西南側。兩個共用載車艙把小車升到住戶樓層，像抽屜一樣推入外牆泊位。這一階段展示已擺放的住宅形態。</p>
+<p lang="ja">満潮で低い道が水に戻るころ、佐伯澪さんの車は外壁の引き出しに収まり、工具が三階の作業台に届きます。地上を歩く場所にしたぶん、住民は二つの昇降台を順番に使います。</p>
+<p><a href="../../docs/BUILDING_STORIES.md#drawer-housing">佐伯澪的故事</a> · <a href="../../docs/handoffs/drawer-housing-placement.md">A 位座標與驗證</a></p>
+<div class="frames">
+<figure><img loading="lazy" src="drawer-housing/day.jpg" alt="日間近鏡可見兩個已伸出的載車艙"><figcaption>日景｜兩個載車艙及住宅露台</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/night.jpg" alt="同一角度的 A 位住宅夜景"><figcaption>夜景｜同一住宅形態</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/hero.jpg" alt="住宅位於城市主視角富士框架右下方"><figcaption>城市主視角｜富士框架右下方</figcaption></figure>
+</div></article>`;
+
 const out = join(OUT, 'index.html');
 writeFileSync(out, `<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><title>變化總覽 — city2127</title>
 <style>body{font:15px/1.6 system-ui,"Noto Sans JP",sans-serif;margin:24px auto;max-width:1500px;padding:0 20px;background:#f4f3ee;color:#222}
@@ -135,6 +146,8 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <p><b>變化成因：</b>每位 guest 回答四題，每個選項將對應軸的 Meter 推 −1、0 或 +1。Meter 是所有人累積的結果；每份提案最多令一個地點前進一級，並優先採用 guest 自己推動的方向。因此 guest 的選擇不一定等於本次的變化方向，結果卡第二句一律說明實際變化。</p>
 <table><tr><th>單位</th><th>佔比</th><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr>
 ${units.map((u, i) => `<tr><td><a href="#${esc(UNITS[i].plan)}">${md(u.row[0])}</a></td>${u.row.slice(1, 5).map(c => `<td>${md(c)}</td>`).join('')}</tr>`).join('\n')}</table>
+<p><a href="#drawer-housing">Q03-A — 車が引き出しになる住宅</a>（A 位實景，投票變化待設計）</p>
+${drawerHousing}
 ${units.map(u => u.html).join('\n')}
 </html>`);
 const loose = rows.filter(r => !UNITS.some(u => u.shots.test(r.shot)));

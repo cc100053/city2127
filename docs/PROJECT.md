@@ -224,6 +224,8 @@ DEV 天氣圖書館用 `?shot=energy:aoi&orbital=3&hour=12&nopanel` 預覽葵攤
 
 人類本chat選A，後續明確保留服務館並重新選M位置。`main`初始化一次共享`housingPrototype`，選mixed、命名`housing-background`並加入scene；初始化的`update(0)`已停泊A，正式frame不呼叫住宅update，無投票參數、CarrierChange、結果卡或DB接線。Standalone／survey／DEV Meter與scaleLab均有固定背景；隔離DEV housing及energy比較保留各自基準，不重複建立住宅。Production保留固定構造，移除DEV控制import；頁面重建才重建幾何，沿用本專案一次初始化生命週期。
 
+Q03-A「車が引き出しになる住宅」在フジテレビ西南側 A 位，以固定形態載入 `housing-background`。保留透明玻璃分件排序，按材質合批不透明網格。兩個外伸載車艙為靜態。業主已決定後續接入投票，具體軸、狀態和觸發另定。[A 位交接](handoffs/drawer-housing-placement.md)
+
 原M `(-135,-175)`在低automation時穿過既有staffed pavilion的20m樓板；按人類決定將同一M構造平移至`(-165,-165)`（31.62m），服務館、P/U、數量、輪廓與材質保持。原M庭院留孔保留。U90秒循環只由`devHousing`推進；所有正式snapshot／live／Undo／reset／reconnect與reduced motion都不碰住宅。新證據與實測限制見[本批報告](../artifacts/housing-background/README.md)，舊H0–H3原圖／性能只作當時紀錄。
 
 ### G2 能源保底配置（2026-10-30；已 merge main，視覺待驗收）

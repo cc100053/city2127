@@ -104,6 +104,8 @@ Live headline 先在 hero 播 2.62 秒投票旅程，再推近變化地點，13�
 
 住宅已按方案A加入正式城市作固定背景：輕材住宅M、植物膜P及交換骨架U共存，U固定停泊A；不隨回答或Meter改變，亦不列為提案結果。M移至`(-165,-165)`避讓低自動化服務館，保留服務館及住宅數量／輪廓。[接入驗證與搬位對照](artifacts/housing-background/README.md)。
 
+Q03-A「車が引き出しになる住宅」已先以固定形態放在フジテレビ西南側 A 位，投票變化留待後續設計。[變化總覽的日夜實景](artifacts/change-review/index.html#drawer-housing)
+
 住宅DEV比較另開 `?housing=mixed&hour=12&reviewTime=24`（原hero鎖定），配置可選baseline／material／membrane／mobile／mixed，`housingView=mobile|home`看搬運特寫。移除`reviewTime`會播放90秒「多年更新壓縮示意」：生活艙與完整小屋在兩處專用接駁位置之間移動，代表數年至數十年更新。面板可重播或重設／停泊，靜態閱讀／reduced motion固定停泊A；植物與藻類不動。須與survey／meters／scaleLab／energy分開使用；production只排除比較控制與90秒播放，保留正式固定住宅。[H2證據與限制](artifacts/housing-city-h2/README.md)。
 
 `?asset-preview` 可載入本機 GLB 於原點，重新整理後換另一件；production 沒有 picker。素材標準見 [BLENDER](docs/BLENDER.md)。

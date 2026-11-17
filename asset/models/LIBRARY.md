@@ -110,6 +110,7 @@ Whole assets. Reuse a site asset elsewhere only as background context, and ask t
 | `sky-ring-architecture` | Sky Ring | imported GLB | site-only |
 | `rectenna-farm-canopy` | rectenna canopy over terrace farm (Q3 large receiver) | `export_glb.py` text inside the .blend | site-only |
 | `event-shelf-2127` | SW mixed flagship: 36 × 24 × 40 m lattice (`SHELF_FRAME`) and seven rounded event modules `MOD_A..F, MOD_H` (draft, placed on the SW south-shore lot) | `build_shelf.py` (uses modules `lattice_frame`, `event_module`); lineup `review_shelf.py` | site-only frame; modules reusable as event rooms |
+| `drawer-housing-2127` | Five-storey Q03-A drawer housing with two projecting vehicle drawers (49.25 × 25.465 × 30.073 m) | [Blender source](drawer-housing-2127/drawer-housing-2127.blend), [city lineup](../../artifacts/change-review/index.html#drawer-housing) | site-only at A, static pending vote design |
 | `odaiba-masterplan` | district environment | `odaiba_masterplan_v01_phase03d_generator.py` | site-only |
 | `aqua-city-odaiba` | landmark context | imported GLB | context |
 | `decks-tokyo-beach` | landmark context | imported GLB | context |

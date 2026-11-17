@@ -83,10 +83,10 @@ export function shrubs(parent:T.Object3D, radius:number, y:number, start:number,
   }
 }
 /** Merge every single-material mesh under `root` into one mesh per material, in root space. Signs keep their own materials. */
-export function bake(root:T.Object3D) {
+export function bake(root:T.Object3D, include: (mesh: T.Mesh) => boolean = () => true) {
   root.updateMatrixWorld(true);
   const inverse=root.matrixWorld.clone().invert(),batches=new Map<T.Material,T.BufferGeometry[]>(),meshes:T.Mesh[]=[];
-  root.traverse(obj=>{if(obj instanceof T.Mesh && !Array.isArray(obj.material)){const geometries=batches.get(obj.material)??[];geometries.push((obj.geometry.index ? obj.geometry.toNonIndexed() : obj.geometry.clone()).applyMatrix4(inverse.clone().multiply(obj.matrixWorld)));batches.set(obj.material,geometries);meshes.push(obj);}});
+  root.traverse(obj=>{if(obj instanceof T.Mesh && !Array.isArray(obj.material) && include(obj)){const geometries=batches.get(obj.material)??[];geometries.push((obj.geometry.index ? obj.geometry.toNonIndexed() : obj.geometry.clone()).applyMatrix4(inverse.clone().multiply(obj.matrixWorld)));batches.set(obj.material,geometries);meshes.push(obj);}});
   meshes.forEach(mesh=>mesh.removeFromParent());
   return [...batches].map(([material,geometries])=>{
     // Merge only attributes every piece has (e.g. surveyed GLB parts without UVs under an untextured material).
