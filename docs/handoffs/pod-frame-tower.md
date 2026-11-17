@@ -1,11 +1,11 @@
 # pod-frame-tower — 混凝土格架蛋艙塔（僅模型）
 
 - Owner: cc100053
-- Status: IN_PROGRESS（R2 已建，待業主判定）
+- Status: IN_PROGRESS（R3 已建，待業主判定）
 - Branch: `feat/pod-frame-tower`（由 `origin/main` `5d66cfa8` 開出；R1 於 R2 session 開始時 commit）
 - Base commit: `13f83e1566988a10e8798ec027c97ba10012654e`（R1 工作時的 HEAD，`codex/nw-focal-connections`）
-- Last verified commit: `c713fc9`（R2；R1 為 `9ed3e7f6`）
-- Remote availability: `origin/feat/pod-frame-tower`（R2 已 push）
+- Last verified commit: 見 `## R3` 驗證（R3 commit 於 `9c79fbc` 之上；R2 為 `c713fc9`，R1 為 `9ed3e7f6`）
+- Remote availability: `origin/feat/pod-frame-tower`（R3 已 push）
 
 ## Session Git state
 
@@ -195,6 +195,58 @@ R1 與目標的差距（依 `target-vs-model.jpg` 分析），已轉成下文 R2
 - 不改 `src/`、不接 Meter、不放入城市。
 - 不改已 accepted 的共用 `modules.ROLES` 配方；本建築的特殊外觀用 `build_pod_tower.py` 的 `OVERRIDE`，或新增 `pft` 專用 role。
 
+## R3
+
+### R2 verdict
+
+業主原話（2026-11-17）：「write r3 notes, add more detail」，其後「start r3 in a new session」。沒有其他意見，因此以上文 `## R3 notes` 的 16 項及建議次序為本輪 brief。
+
+### 工作環境
+
+- 於獨立 clone `/Users/fatboy/city2127-pod`、分支 `feat/pod-frame-tower` 進行；開始時 HEAD `9c79fbc`，與 `origin/feat/pod-frame-tower` 一致（`git fetch --prune origin` 成功）。主 checkout 未有改動。
+
+### 改動
+
+- `review_pod_tower.py`：新增透視鏡頭 `--view target3q`（35 mm、方位 47°、俯角 32°、1448 × 1086，+x 面在畫面左、正面 −z 在畫面右）及艙近景 `--view pod3q`；R3 燈光為暖陽（(1, .93, .82)、強度 5、方位 25°、仰角 45°）、天空漸變 .35、`Khronos PBR Neutral`、−0.5 EV。AgX 會把粉彩洗成灰色，所以改用 PBR Neutral。`--r2light` 可還原 R2 燈光；`--pct` 放大輸出；`@@PROBE@@` 輸出取色點的像素位置。
+- `modules.py`（全部為新增參數或新 module，預設值保持 R2 行為）：`limb` 加 `flat`；`branch_strut` 加 `web`（分叉處蹼狀曲面）、`pads`（圓盤腳座）、`limb_r`、`flat`；`egg_pod` 加 `win`、`tilt`、`rim`、`mullions`、`port`、`side_port`、`back_wall`；`grid_frame` 加 `joint_w`、`alt`、`ties`、`nodes`；`roof_farm` 加 `leaf`、`hoop`、`tufts`、`canopy`、`spill`、`flowers`、`hoop_step`、`edges`。新 module：`ell`、`disc`、`bone_arm`、`vine_curtain`、`arch_shell`、`flower_bed`，均已登記於 `LIBRARY.md`。共用 `ROLES` 未改。
+- `build_pod_tower.py`：建築專用 role `PFT_ROLES`（`concrete_b`、`concrete_t`、`leaf_c`、`vine`、`arch`、`flower_v`）；`OVERRIDE` 改混凝土為暖粉灰、`pod_y` 改為奶油色、地台及天花改為暖白發光；艙重新佈局（26 個）；5 條 `bone_arm`；4 棵格內白色支撐樹；圓形花盆平台；第 5 層外圈及第 6 層全層菜園；正面藤簾；地面層白色半蛋形拱殼、店面直櫺及花床；每部分三角面記錄（`parts`）。
+
+### 逐項自評（`target3q`，取色為 1448 × 1086 下 5 × 5 中位數）
+
+| # | 項目 | 結果 | 量度 |
+| --- | --- | --- | --- |
+| 0 | 鏡頭 | 達成 | 35 mm 透視；轉角 column 位於畫面橫向約 47 %；建築約佔畫面寬度 63 %、高度 84 %；天台可見。構圖仍比目標更俯視，天台佔畫面較多。 |
+| 1 | 燈光及調色 | 達成 | 混凝土受光面 (204, 187, 179)、樑面 (209, 193, 185)，亮度約 192；目標實際取色為 (208–229, 184–207, 178–202)。R2 已以同一燈光重算（`r2-vs-r3.jpg`）。曝光為 −0.5 EV，而非 brief 建議的 0 EV，因 0 EV 時過亮。 |
+| 2 | 艙殼顏色 | 部分達成 | 奶油色頂部 (232, 219, 192)，與目標 (245, 228, 205) 相差 9–13，在 ±15 之內；粉紅 (235, 189, 177)，與 (240, 200, 192) 相差 5–15。鼠尾草綠沒有可靠的取色點，目視可分辨。 |
+| 3 | 主窗 | 達成 | 半角 37° × 32°、上仰 14°：窗寬約 0.60 L，窗高約 0.50 H，窗中心高於艙中心約 0.1 H；4–5 條 3 cm 白色弧形直櫺；窗框管半徑 0.06 m。 |
+| 4 | 副窗 | 達成 | 長度 ≥ 5 m 的艙在 +x 端有圓窗（半徑 0.06 L，上限 0.17 H，畫在殼面上）；長度 ≥ 6 m 的 12 個艙在主窗旁另有一個小橢圓窗。 |
+| 5 | 艙內 | 達成 | 所有艙有暖光背牆（貼合艙內襯）；≥ 6 m 的艙加地氈、第二盆植物、吊燈，≥ 8 m 加書架；`pod_in` 發光 .5 → 1.1，內襯行數減半。窗內可見淺木地台、梳化、植物及住客。 |
+| 6 | 支撐的形狀 | 部分達成 | 26 / 26 個支撐有分叉蹼狀曲面、扁肢（flat .7）及圓盤腳座；新增 `bone_arm` 並用於 5 個艙（兩個大艙、粉紅懸挑艙及 +x 面兩個艙），每條 2–3 個孔。大艙主幹根部半徑 0.62 m（直徑 1.24 m，至分叉處約 0.87 m）。骨臂在遠景仍略似鏈節。 |
+| 7 | 支撐的可見度 | 未達成 | `target3q` 中懸挑艙下大多只見 1 條白色主幹，分叉多被艙身擋住；格內白色支撐樹 4 棵。目標中支撐是立面上最搶眼的白色元素，R3 仍不及。 |
+| 8 | 艙的分佈 | 達成 | 兩個大奶油艙分別在兩個立面的遠端懸挑，窗朝鏡頭；+x 面中下層有 2 個粉紅艙（一懸挑、一半入格）；正面遠端有直徑 3 m 白色花盆平台；正面格內 9 個艙為奶油 4、粉紅 3、鼠尾草綠 2。 |
+| 9 | 格架細節 | 達成 | 接縫 `concrete_j` (.42, .40, .37)、寬 6 cm；周邊 column 及外樑面每塊模板 2 × 2 個 4 cm 對拉螺栓孔；周邊 column 每道樑處有凸出 3 cm 的節點帶；`concrete_b` 比 `concrete` 暗約 6 %，隨機分配給約一半構件。 |
+| 10 | 頂層農場 | 達成 | 第 6 層取消玻璃房，全層 7 行菜畦、2 名農夫；第 5 層正面及 +x 面外圈一格寬菜畦，玻璃房內退一格，2 名農夫。從 `target3q` 只能透過格口看到，不及目標明顯。 |
+| 11 | 天台 | 部分達成 | 作物以淺綠 `leaf_c` 為主，夾雜番茄及紫、白、粉花；拱架改為深綠 4 cm 金屬管、高 3 m，每拱 8 個葉團並以頂篷連接；邊緣植物向外垂出 0.6–1.2 m。整體葉團仍偏「圓球」，且天台在畫面中過於搶眼。 |
+| 12 | 垂藤及花 | 達成 | 正面每層（第 2 層至天台）3 段 7 m 藤簾，每段跨兩格，由 2–3 片扁長葉帶組成，長 1.5–3.5 m，約 30 % 帶粉紅或白花；遇艙時自動縮短。其他立面每 5 格 3 格有短藤。 |
+| 13 | 室內暖光 | 部分達成 | 地台 (.86, .70, .50)、天花 (.95, .86, .72) 均為暖色發光；地面層店面每 1.5 m 一條直櫺，正面及 +x 面加暖光後牆。地面層在 `target3q` 中仍被 slab 及拱殼遮擋，未見得比樓上明亮；未量度玻璃房平均亮度。 |
+| 14 | 地面層拱門 | 達成 | 3 個白色半蛋形拱殼（跨度 5.5 m、高 4 m、伸出 2 m、殼厚 0.4 m、內側暖光）：正面 2 個、+x 面 1 個；基座四周有圓滑花床（白、粉、紫花），9 棵小樹，全部在 plinth 1.5 m 範圍內。 |
+| 15 | 預算 | 達成 | 349,808 三角面（上限 350k），GLB 10.9 MB。各部分：frame 10,984；rooms 及菜園 48,844；facade 95,086；ground 19,240；roof 34,676；pods 95,406；struts 34,004；bones 9,488；其他 2,080。主要 role：white 89,272、green 68,680、vine 24,444、leaf_c 15,860。為控制預算：小艙 `ni=24`、大艙 40；欄杆柱每 0.15 m 一枝且改為單面條；小艙不加小分叉；第 5、6 層菜園密度 1.25。 |
+
+### 驗證
+
+- `@@BUILD@@ tris 349808, glb 10,869,836 bytes, 26 pods`。
+- `blender-asset-qa` `qa_check.py`（concrete、concrete_b、concrete_j、white、pod_y、pod_p、vine、rail）：沒有 UV（與 R2 相同，材質不用貼圖）；兩種混凝土之間的共面重疊由 182 對減至 68 對，餘下的位於 column 內部或節點帶之內，外面看不見；`pft_white` 262 對來自窗口內側雙面 reveal（R2 已有）；floating 為刻意分開的葉帶、花點及接縫條；最低點 −0.015 m（花床）。
+- `node --experimental-strip-types tests/assetLibrary.test.ts` 通過（23 props、20 modules、26 folders）；`git diff --check` 乾淨。沒有改動 `src/`，因此未執行 `npm test` / `npm run build`。
+- 證據：`~/city2127-evidence/pod-frame-tower/r3/`：`model-target3q.png`、`model-target.png`（舊鏡頭）、`model-back.png`、`model-pod3q.png`（均為 2 倍解像度 EEVEE）、`r2-vs-r3.jpg` 及 `r2-vs-r3-pod.jpg`（R2 `c713fc9` 以 R3 燈光重算）、`target-vs-r3.jpg`、`target.webp`；`passes/` 為燈光測試及三輪比對圖。模型未放入城市，沒有瀏覽器擷圖，FPS 未量度。
+- 共做 3 輪擷圖比對，另有 10 張燈光測試圖。
+
+### 尚待處理（供 R4 參考）
+
+- 支撐的可見度（第 7 項）仍是最大差距：目標中白色骨形支撐在艙側及立面前方大面積可見；R4 可把分叉移到艙的鏡頭側，加粗肢體，並在艙前加露出的骨板。
+- 天台在 `target3q` 中佔畫面太多：目標鏡頭的俯角可能較小（約 25°），而且頂兩層菜園從側面可見。可考慮把俯角調至 25–28°。
+- 葉團仍為低細分圓球，與目標的細碎葉面相差較遠；如預算放寬，可改用葉片卡（quad cards）。
+- 背面受陰影，`model-back.png` 偏暗，只供檢查幾何。
+
 ## Next expected step
 
-業主判定 R2。若有意見，新開 session 做 R3：preflight 後在 `feat/pod-frame-tower` 上工作（主 checkout 若仍被其他分支佔用，可沿用獨立 clone `/Users/fatboy/city2127-pod`），把業主原話寫入 `## R2 verdict`，並與上文 `## R3 notes` 一併轉為最終的 R3 brief（業主意見優先）。業主接受後才合併 main。
+業主判定 R3。若有意見，新開 session 做 R4：preflight 後在 `feat/pod-frame-tower` 上工作（可沿用獨立 clone `/Users/fatboy/city2127-pod`），把業主原話寫入 `## R3 verdict`，轉為 `## R4 brief`；未達成的第 7 項及上文「尚待處理」可作參考。業主接受後才合併 main。

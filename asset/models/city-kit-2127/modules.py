@@ -626,8 +626,9 @@ def _cross(a, b):
     return (a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
 
 
-def limb(acc, pts, r0, r1, n=8):
-    """Tapered round tube along a 3D polyline pts (radius r0 at pts[0] to r1 at the end), capped: struts, arches, stems."""
+def limb(acc, pts, r0, r1, n=8, flat=1.0):
+    """Tapered round tube along a 3D polyline pts (radius r0 at pts[0] to r1 at the end), capped: struts, arches, stems.
+    flat < 1 squashes the section across the (mostly vertical) second axis: flat limbs that hug a surface."""
     verts, m = [], len(pts)
     up = (0, 1, 0)
     for i, p in enumerate(pts):
@@ -636,7 +637,7 @@ def limb(acc, pts, r0, r1, n=8):
         u = _unit(_cross(t, ref))
         w = _cross(t, u)
         r = r0 + (r1 - r0) * i / (m - 1)
-        verts += [_v(_v(p, u, r * math.cos(2 * math.pi * k / n)), w, r * math.sin(2 * math.pi * k / n)) for k in range(n)]
+        verts += [_v(_v(p, u, r * math.cos(2 * math.pi * k / n)), w, flat * r * math.sin(2 * math.pi * k / n)) for k in range(n)]
     faces = [(i * n + k, i * n + (k + 1) % n, (i + 1) * n + (k + 1) % n, (i + 1) * n + k) for i in range(m - 1) for k in range(n)]
     faces += [tuple(reversed(range(n))), tuple(range((m - 1) * n, m * n))]
     acc.solid(verts, faces)
@@ -646,53 +647,146 @@ def _bez(p0, c, p1, segs):
     return [tuple((1 - t) ** 2 * p0[k] + 2 * (1 - t) * t * c[k] + t * t * p1[k] for k in range(3)) for t in (j / segs for j in range(segs + 1))]
 
 
-def branch_strut(ctx, base, tips, r=.32, role='white', twigs=True):
+def ell(acc, c, ax, ay, az, n=10, m=6):
+    """Closed ellipsoid (UV sphere, n around, m rings) centred c with semi-axis vectors ax, ay, az (any orientation)."""
+    verts = [_v(c, ay, 1.0)]
+    for i in range(1, m):
+        b = math.pi * i / m
+        for k in range(n):
+            a = 2 * math.pi * k / n
+            q = _v(_v(c, ax, math.sin(b) * math.cos(a)), az, math.sin(b) * math.sin(a))
+            verts.append(_v(q, ay, math.cos(b)))
+    verts.append(_v(c, ay, -1.0))
+    last = len(verts) - 1
+    faces = [(0, 1 + (k + 1) % n, 1 + k) for k in range(n)]
+    for i in range(m - 2):
+        faces += [(1 + i * n + k, 1 + i * n + (k + 1) % n, 1 + (i + 1) * n + (k + 1) % n, 1 + (i + 1) * n + k) for k in range(n)]
+    faces += [(last, 1 + (m - 2) * n + k, 1 + (m - 2) * n + (k + 1) % n) for k in range(n)]
+    acc.solid(verts, faces)
+
+
+def disc(acc, c, nrm, r, t, n=16):
+    """Round pad of radius r and thickness t centred c, axis nrm (a foot or joint plate on a member face)."""
+    nrm = _unit(nrm)
+    limb(acc, [_v(c, nrm, -t / 2), _v(c, nrm, t / 2)], r, r, n)
+
+
+def branch_strut(ctx, base, tips, r=.32, role='white', twigs=True, web=False, pads=None, limb_r=.6, flat=1.0):
     """White organic tree strut: one curved trunk per base (a point on a frame face; a list of points makes a root that
     grabs several members, e.g. a column side and a beam underside) meeting at a knuckled fork, which splits into one
     curved limb per tip (3-5 pod belly points). twigs: a second-order twig leaves each limb at half length and lands
-    between its tip and the next. Radii taper r -> .7 r (trunk), .6 r -> .3 r (limbs), .3 r -> .16 r (twigs). Metres."""
+    between its tip and the next. Radii taper r -> .7 r (trunk), limb_r r -> .5 limb_r r (limbs), .3 r -> .16 r (twigs).
+    web (R3): smooth webbing between neighbouring limbs near the fork, so the fork reads as one bone-like casting.
+    pads: one face normal per base; each foot becomes a round disc 1.25 r across that face. flat < 1: flat limbs.
+    Metres."""
     a = ctx.a[role]
     bases = base if isinstance(base[0], (tuple, list)) else [base]
     mid = tuple(sum(t[k] for t in tips) / len(tips) for k in range(3))
     b0 = bases[0]
     fork = _v(b0, _sub(mid, b0), .55)
     fork = (fork[0], fork[1] - .12 * abs(mid[1] - b0[1]), fork[2])
-    for b in bases:
-        limb(a, _bez(b, _v(b, _sub(fork, b), .5), fork, 5), r, r * .7, 10)
-        blob(a, b, (r * 1.1, r * 1.1, r * 1.1), sub=1, noise=0, flat=1)       # foot pad on the member
-    blob(a, fork, (r * .95, r * .95, r * .95), sub=1, noise=0, flat=1)
+    for i, b in enumerate(bases):
+        limb(a, _bez(b, _v(b, _sub(fork, b), .5), fork, 5), r, r * .7, 10 if not web else 8)
+        if pads:
+            disc(a, b, pads[i], r * 1.25, max(.12, r * .35), 16)
+        else:
+            blob(a, b, (r * 1.1, r * 1.1, r * 1.1), sub=1, noise=0, flat=1)       # foot pad on the member
+    blob(a, fork, (r * .95, r * .95, r * .95), sub=2 if web else 1, noise=0, flat=1)
+    paths = []
     for i, t in enumerate(tips):
         c = (fork[0] + (t[0] - fork[0]) * .3, t[1] - .15 * abs(t[1] - fork[1]), fork[2] + (t[2] - fork[2]) * .3)
         path = _bez(fork, c, t, 6)
-        limb(a, path, r * .6, r * .3, 8)
+        paths.append(path)
+        limb(a, path, r * limb_r, r * limb_r * .5, 8 if not web else 6, flat)
+        blob(a, t, (r * limb_r * .7,) * 3, sub=1, noise=0, flat=1)          # rounded grip where the limb meets the pod
         if twigs and len(tips) > 1:
             o = tips[i + 1] if i + 1 < len(tips) else tips[i - 1]
             land = tuple((t[k] + o[k]) / 2 + (.12 if k == 1 else 0) for k in range(3))
             p0 = path[3]
             limb(a, _bez(p0, _v(p0, _sub(land, p0), .4), land, 4), r * .3, r * .16, 6)
+    if web:                                                          # webbing: a flat lens between each pair of limbs
+        for p, q in zip(paths, paths[1:]):
+            for j, sc in ((1, .95), (2, .8)):
+                c = tuple((p[j][k] + q[j][k]) / 2 for k in range(3))
+                gap = _sub(q[j], p[j])
+                half = math.sqrt(sum(g * g for g in gap)) / 2
+                along = _unit(_sub(c, fork))
+                side = _unit(gap)
+                nrm = _unit(_cross(along, side))
+                ell(a, c, _v((0, 0, 0), side, half + r * limb_r * .4), _v((0, 0, 0), nrm, r * .32 * sc),
+                    _v((0, 0, 0), along, r * .9 * sc), 10, 5)
 
 
-def egg_pod(ctx, x, y, z, length=8.0, height=4.4, depth=5.0, yaw=0.0, shell='pod_y', furnish_pod=True, ni=48):
+def bone_arm(ctx, p0, p1, w=1.0, t=.3, holes=3, sag=.12, up=(0, 1, 0), role='white'):
+    """Flat perforated "bone" arm (owner pod-frame image, R3): a plate w wide and t thick from p0 to p1, bowed up by
+    sag x length, pierced by `holes` oval openings (two rounded edge rails that pinch together at smooth rungs), with
+    a round joint disc at each end (radius 0.7 w). Use it to hook a column top over a pod's crown. Metres."""
+    a = ctx.a[role]
+    d = _sub(p1, p0)
+    ln = math.sqrt(sum(c * c for c in d))
+    du = _unit(d)
+    side = _unit(_cross(du, up))
+    nrm = _unit(_cross(side, du))
+    rr = t / 2
+
+    def mid(u):
+        return _v(_v(p0, d, u), nrm, sag * ln * math.sin(math.pi * u))
+    u0, u1 = .14, .86                                                # perforated stretch between the end discs
+    pinch = [u0 + (u1 - u0) * k / holes for k in range(holes + 1)]
+
+    def hw(u):                                                       # rail half-spacing: wide over holes, narrow at rungs
+        if u <= u0 or u >= u1:
+            return w * .24
+        f = (u - u0) / (u1 - u0) * holes
+        return w * .24 + (w / 2 - w * .21 - w * .24) * math.sin(math.pi * (f - int(f)))
+    us = [k / 28 for k in range(29)]
+    rw = w * .21                                                     # rail width across the plate; t thick
+    for sg in (-1, 1):
+        limb(a, [_v(mid(u), side, sg * hw(u)) for u in us], rw, rw, 8, rr / rw)
+    for u in pinch:                                                  # rungs closing each hole
+        c = mid(u)
+        ell(a, c, _v((0, 0, 0), side, w * .22 + rw), _v((0, 0, 0), nrm, rr * 1.02), _v((0, 0, 0), du, w * .2), 12, 5)
+    for u in (0.0, .07, .93, 1.0):                                    # solid neck into each end disc
+        ell(a, mid(u), _v((0, 0, 0), side, w * .3), _v((0, 0, 0), nrm, rr), _v((0, 0, 0), du, w * .3), 12, 6)
+    for e in (p0, p1):
+        disc(a, e, nrm, w * .7, t * 1.15, 20)
+
+
+def egg_pod(ctx, x, y, z, length=8.0, height=4.4, depth=5.0, yaw=0.0, shell='pod_y', furnish_pod=True, ni=48,
+            win=(58, 34), tilt=0.0, rim=.13, mullions=0, port=.14, side_port=False, back_wall=False):
     """Glossy pastel egg pod, centre (x, y, z), long axis along local x, front window looking local -z (turned by yaw):
-    wide oval glass window and a porthole at the +x end, both cut through a shell with a warm lit lining, white rims,
+    oval glass window and a porthole at the +x end, both cut through a shell with a warm lit lining, white rims,
     a floor ~0.3 h above the bottom and a small lounge (sofa, plant, lamp, resident) when furnish_pod and length >= 5.
     Egg profile: the -x end is about 12 % fuller. shell: pod_y (cream), pod_p (pink) or pod_s (sage). Roles: shell,
-    pod_in, white, glass, floor + kit props. ni: segments round the window axis (32 for pods under 6 m saves ~1/3)."""
+    pod_in, white, glass, pane_w, floor + kit props. ni: segments round the window axis (32 for pods under 6 m saves ~1/3).
+    R3 options (defaults keep R2): win = window half-angles (wide, tall) in degrees; tilt (deg) turns the window up;
+    rim = rim tube radius; mullions = white curved glazing bars (3 cm) across the glass; port = porthole radius as a
+    fraction of height (or ('L', f) for f x length); side_port = a small oval window beside the main one toward +x;
+    back_wall = a warm lit back wall behind the lounge (pods of 6 m up add a rug, a second plant and a pendant, 8 m up
+    a bookshelf), so the window shows a lit room rather than the beige lining; the lining then uses half the rows."""
     A = ctx.a
     NI, NW, NS = ni, 6, 16                                          # around, window rows, shell rows
     cy, sy = math.cos(yaw), math.sin(yaw)
+    ct, st = math.cos(math.radians(tilt)), math.sin(math.radians(tilt))
+    WA, WT = math.radians(win[0]), math.radians(win[1])
 
     def W(lx, ly, lz):                                              # local -> world (rot convention of geo_helpers.rot)
         return (x + lx * cy + lz * sy, y + ly, z - lx * sy + lz * cy)
 
-    def P(th, ph, s):
-        """Sphere direction th from the window axis (local -z), ph around it, mapped onto the egg and scaled by s."""
-        u = (math.sin(th) * math.cos(ph), math.sin(th) * math.sin(ph), -math.cos(th))
+    def egg(u, s):
         f = 1 - .12 * u[0]
         return W(u[0] * length / 2 * s, u[1] * height / 2 * f * s, u[2] * depth / 2 * f * s)
 
-    def th0(ph):                                                    # oval window: 58 deg wide, 34 deg tall
-        return 1 / math.sqrt((math.cos(ph) / math.radians(58)) ** 2 + (math.sin(ph) / math.radians(34)) ** 2)
+    def P(th, ph, s):
+        """Sphere direction th from the window axis (local -z tilted up by `tilt`), ph around it, on the egg x s."""
+        u = (math.sin(th) * math.cos(ph), math.sin(th) * math.sin(ph), -math.cos(th))
+        return egg((u[0], u[1] * ct - u[2] * st, u[1] * st + u[2] * ct), s)
+
+    def PQ(p, q, s):                                                # same, from tangent-plane coords (p, q) = tan(th) (cos, sin)
+        return P(math.atan(math.hypot(p, q)), math.atan2(q, p), s)
+
+    def th0(ph):                                                    # oval window
+        return 1 / math.sqrt((math.cos(ph) / WA) ** 2 + (math.sin(ph) / WT) ** 2)
     phs = [2 * math.pi * i / NI for i in range(NI)]
     cen = (x, y, z)
 
@@ -701,26 +795,54 @@ def egg_pod(ctx, x, y, z, length=8.0, height=4.4, depth=5.0, yaw=0.0, shell='pod
         faces = [(r * NI + i, r * NI + (i + 1) % NI, (r + 1) * NI + (i + 1) % NI, (r + 1) * NI + i)
                  for r in range(len(rows) - 1) for i in range(NI)]
         return verts, faces
-    win = [[th0(ph) * max(t, .02) / NW for ph in phs] for t in range(NW + 1)]
+    win_rows = [[th0(ph) * max(t, .02) / NW for ph in phs] for t in range(NW + 1)]
     shl = [[th0(ph) + (math.pi - .02 - th0(ph)) * t / NS for ph in phs] for t in range(NS + 1)]
-    v, f = grid(win, 1.0)
+    v, f = grid(win_rows, 1.0)
     A['glass'].surface(v, f, lambda c: _sub(c, cen))
     v, f = grid(shl, 1.0)
     A[shell].surface(v, f, lambda c: _sub(c, cen))
-    v, f = grid(shl, .93)
+    v, f = grid(shl[::2] if back_wall else shl, .93)               # lining: half the rows when the back wall hides it
     A['pod_in'].surface(v, f, lambda c: _sub(cen, c))
     ring_o = [P(th0(ph), ph, 1.0) for ph in phs]                   # white rim and reveal round the window
     ring_i = [P(th0(ph), ph, .93) for ph in phs]
-    limb(A['white'], ring_o + ring_o[:2], .13, .13, 6)
+    limb(A['white'], ring_o + ring_o[:2], rim, rim, 6)
     for i in range(NI):
         q = [ring_o[i], ring_o[(i + 1) % NI], ring_i[(i + 1) % NI], ring_i[i]]
         A['white'].surface(q, [(0, 1, 2, 3)], lambda c: _sub(c, cen))
         A['white'].surface(q, [(0, 1, 2, 3)], lambda c: _sub(cen, c))
+    for m in range(mullions):                                       # curved glazing bars at even steps across the glass
+        p0 = math.tan(WA) * (-1 + 2 * (m + 1) / (mullions + 1))
+        pts = []
+        for k in range(13):
+            q = math.tan(WT) * 1.1 * (-1 + 2 * k / 12)
+            th, ph = math.atan(math.hypot(p0, q)), math.atan2(q, p0)
+            if th < th0(ph) * .99:
+                pts.append(PQ(p0, q, 1.004))
+        if len(pts) > 2:
+            limb(A['white'], pts, .03, .03, 4)
+    def dring(c, a, b, s=1.004):                                     # loop on the shell round local direction c
+        c = _unit(c)
+        e1 = _unit(_cross(c, (0, 1, 0))) if abs(c[1]) < .9 else (1, 0, 0)
+        e2 = _cross(e1, c)
+        return [egg(_unit(_v(_v(c, e1, a * math.cos(2 * math.pi * t / 16)), e2, b * math.sin(2 * math.pi * t / 16))), s)
+                for t in range(18)]
     if length >= 5:                                                 # porthole at the +x end
-        pc, pr = W(length / 2 * .985, height * .08, 0), min(.55, height * .14)
-        port = [W(length / 2 * .985 - .02, height * .08 + pr * math.sin(2 * math.pi * t / 16), pr * math.cos(2 * math.pi * t / 16)) for t in range(18)]
-        limb(A['white'], port, .08, .08, 5)
-        A['pane_w'].surface(port[:16], [tuple(range(16))], lambda c: _sub(c, cen))
+        if isinstance(port, tuple):                                 # R3: ring drawn on the shell (no flat disc past the tip)
+            pr = min(port[1] * length, height * .17)
+            ring = dring((1, .16, 0), pr / (depth / 2 * .88), pr / (height / 2 * .88))
+            limb(A['white'], ring, .05, .05, 5)
+            A['pane_w'].surface(ring[:16], [tuple(range(16))], lambda c: _sub(c, cen))
+        else:
+            pr = min(.55, height * port)
+            port_pts = [W(length / 2 * .985 - .02, height * .08 + pr * math.sin(2 * math.pi * t / 16), pr * math.cos(2 * math.pi * t / 16)) for t in range(18)]
+            limb(A['white'], port_pts, .08, .08, 5)
+            A['pane_w'].surface(port_pts[:16], [tuple(range(16))], lambda c: _sub(c, cen))
+    if side_port:                                                   # small oval window beside the main one, toward +x
+        th = WA + math.radians(15)
+        c = (math.sin(th), math.cos(th) * st, -math.cos(th) * ct)
+        ring = dring(c, math.radians(7), math.radians(11), 1.006)
+        limb(A['white'], ring, .04, .04, 5)
+        A['pane_w'].surface(ring[:16], [tuple(range(16))], lambda c: _sub(c, cen))
     fy = -.3 * height / 2                                           # floor plate inside the lining
     k = math.sqrt(1 - (fy / (height / 2)) ** 2) * .9
     ring = [(math.cos(2 * math.pi * t / 20) * length / 2 * k, math.sin(2 * math.pi * t / 20) * depth / 2 * k) for t in range(20)]
@@ -731,33 +853,98 @@ def egg_pod(ctx, x, y, z, length=8.0, height=4.4, depth=5.0, yaw=0.0, shell='pod
         kit_prop(ctx, 'floor_lamp', *W(.28 * length, fy, .1 * depth), yaw)
         if ctx.rng.random() < .7:
             person(ctx, *W(.12 * length, fy, -.1 * depth), 1.0, yaw + math.pi)
+    if back_wall and length >= 5:                                   # warm lit back wall behind the lounge
+        bz, hw, top = depth / 2 * .5, length * .36, min(height * .62, 3.2)
+        xs = [-hw + 2 * hw * t / 10 for t in range(11)]
+
+        def lid(lx):                                                # stay 15 % inside the lining at this x
+            f = 1 - .12 * lx / (length / 2)
+            r2 = 1 - (lx / (length / 2)) ** 2 - (bz / (depth / 2 * f)) ** 2
+            return min(fy + top, .85 * math.sqrt(max(r2, 0)) * height / 2 * f)
+        q = [W(lx, fy, bz) for lx in xs] + [W(lx, max(lid(lx), fy + .3), bz) for lx in reversed(xs)]
+        A['pane_w'].surface(q, [tuple(range(22))], lambda c: (-sy, 0, -cy))   # faces the window
+        if length >= 6:                                             # props only where the room reads (pods of 6 m up)
+            if length >= 8:
+                kit_prop(ctx, 'bookshelf', *W(.12 * length, fy, bz - .3), yaw + math.pi)
+            kit_prop(ctx, 'rug', *W(-.05 * length, fy + .01, 0), yaw)
+            kit_prop(ctx, 'potted_plant', *W(-.22 * length, fy, bz - .4), yaw)
+            if height >= 4:
+                kit_prop(ctx, 'pendant_lamp', *W(0, fy + top - 1.2, -.05 * depth), yaw)
 
 
 def grid_frame(ctx, cx=0, cz=0, y0=0, cols=5, rows=4, levels=7, cell=7.0, floor_h=4.5, col=1.1, beam=.85, role='concrete',
-               beam_w=None, joint=None, joint_step=1.5):
+               beam_w=None, joint=None, joint_step=1.5, joint_w=.04, alt=None, ties=None, nodes=False):
     """Open concrete grid (owner image 2026-11-17): (cols+1)(rows+1) square columns rising 0.6 m past the roof, a perimeter
     beam ring on every column line at every level (beam top = slab top, width beam_w, default 0.8 col), a 0.45 m slab per
     level inset 0.3 m and a 0.6 m plinth. Default 35 x 28 x 31.5 m, front -z. Returns (xs, zs, slab tops).
     joint: a darker role for board-form joints, 4 cm strips standing 2 cm proud: rings round the perimeter columns and
-    vertical seams on the outer beam faces every joint_step m. Role: concrete (plinth: paving)."""
+    vertical seams on the outer beam faces every joint_step m. Role: concrete (plinth: paving).
+    R3 options: joint_w (strip width); alt = a second concrete role given at random to about half the members (columns
+    and beam runs) for a slight shade variation; ties = a dark role for 4 cm form-tie holes, 2 x 2 per board panel on the
+    outer faces of perimeter columns and beams; nodes = a band 3 cm proud round each perimeter column at every beam."""
     W, D, H = cols * cell, rows * cell, levels * floor_h
     bw = col * .8 if beam_w is None else beam_w
     xs = [cx - W / 2 + i * cell for i in range(cols + 1)]
     zs = [cz - D / 2 + j * cell for j in range(rows + 1)]
-    a = ctx.a[role]
+    a0 = ctx.a[role]
+
+    def a():                                                         # member role: alt at random when given
+        return ctx.a[alt] if alt and ctx.rng.random() < .5 else a0
     obox(ctx.a['paving'], (cx, y0 + .1, cz), (W + 3, .2, D + 3))
     for xc in xs:
         for zc in zs:
-            obox(a, (xc, y0 + (H + .6) / 2, zc), (col, H + .6, col))
+            obox(a(), (xc, y0 + (H + .6) / 2, zc), (col, H + .6, col))
     tops = [y0 + k * floor_h for k in range(1, levels + 1)]
     for yt in tops:
-        obox(a, (cx, yt - .225, cz), (W - .6, .45, D - .6))
+        dy, dl = (.01, .02) if alt else (0, 0)                       # alt: no coplanar faces between the two shades
+        obox(a0, (cx, yt - .225 - dy, cz), (W - .6, .45, D - .6))
         for zc in zs:
-            obox(a, (cx, yt - beam / 2, zc), (W, beam, bw))
+            obox(a(), (cx, yt - beam / 2, zc), (W - dl, beam, bw))
         for xc in xs:
-            obox(a, (xc, yt - beam / 2, cz), (bw, beam, D))
+            obox(a(), (xc, yt - beam / 2, cz), (bw, beam, D - dl))
+        if nodes:                                                    # node band round each perimeter column at the beam
+            for xc in xs:
+                for zc in zs:
+                    if xc in (xs[0], xs[-1]) or zc in (zs[0], zs[-1]):
+                        obox(a0, (xc, yt - beam / 2, zc), (col + .06, beam + .3, col + .06))
+    if ties:                                                         # form-tie holes: 2 x 2 per board panel, outer faces
+        tq, d = ctx.a[ties], .02
+
+        def dot(c, out):
+            du = (0, 0, d) if out[0] else (d, 0, 0)
+            q = [_v(_v(c, du, sa), (0, d, 0), sb) for sa, sb in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
+            tq.surface(q, [(0, 1, 2, 3)], lambda _c: out)
+        for xc in xs:
+            for zc in zs:
+                outs = [n for n, edge in (((-1, 0, 0), xc == xs[0]), ((1, 0, 0), xc == xs[-1]), ((0, 0, -1), zc == zs[0]),
+                                          ((0, 0, 1), zc == zs[-1])) if edge]
+                for n in outs:
+                    for k in range(int((H + .6) / joint_step)):
+                        for fu in (-.25, .25):
+                            for fv in (.28, .72):
+                                yy = y0 + (k + fv) * joint_step
+                                if any(abs(yy - (yt - beam / 2)) < beam / 2 + .15 for yt in tops):
+                                    continue
+                                c = (xc + n[0] * (col / 2 + .012) + (0 if n[0] else fu * col),
+                                     yy, zc + n[2] * (col / 2 + .012) + (fu * col if n[0] else 0))
+                                dot(c, n)
+        for yt in tops:
+            for zc, sg in ((zs[0], -1), (zs[-1], 1)):
+                for k in range(int(W / joint_step)):
+                    for fu in (.3, .7):
+                        xx = cx - W / 2 + (k + fu) * joint_step
+                        if min(abs(xx - xc) for xc in xs) > col / 2 + .2:
+                            for fv in (-.22, .22):
+                                dot((xx, yt - beam / 2 + fv * beam, zc + sg * (bw / 2 + .012)), (0, 0, sg))
+            for xc, sg in ((xs[0], -1), (xs[-1], 1)):
+                for k in range(int(D / joint_step)):
+                    for fu in (.3, .7):
+                        zz = cz - D / 2 + (k + fu) * joint_step
+                        if min(abs(zz - zc) for zc in zs) > col / 2 + .2:
+                            for fv in (-.22, .22):
+                                dot((xc + sg * (bw / 2 + .012), yt - beam / 2 + fv * beam, zz), (sg, 0, 0))
     if joint:
-        j, h, e = ctx.a[joint], col / 2 + .02, .02
+        j, h, e = ctx.a[joint], col / 2 + .02, joint_w / 2
 
         def strip(c, du, dv, out):                                   # flat quad facing `out`; du, dv half-extents
             q = [_v(_v(c, du, sa), dv, sb) for sa, sb in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
@@ -786,13 +973,19 @@ def grid_frame(ctx, cx=0, cz=0, y0=0, cols=5, rows=4, levels=7, cell=7.0, floor_
     return xs, zs, [y0] + tops
 
 
-def roof_farm(ctx, cx, cz, y, w, d, arbors=4, people=4, density=1.0, crops=1.0, ring=False, bed='wood', soil='soil'):
+def roof_farm(ctx, cx, cz, y, w, d, arbors=4, people=4, density=1.0, crops=1.0, ring=False, bed='wood', soil='soil',
+              leaf=None, hoop='white', tufts=5, canopy=False, spill=0.0, flowers=(), hoop_step=2.3, edges=True):
     """Rooftop farm on a deck top at y: soil beds in rows along x with leafy crops and orange/red fruit, a planted edge
     trough that spills over, `arbors` white hoop vine tunnels (3.2 m) running along z across the beds, and farming
     residents. density scales plants per bed (spacing 0.9 m / density), crops scales fruit per plant (0.35 x crops).
     ring: a white hoop tunnel round the whole perimeter just inside the trough; the beds then stop 4 m from the
     edge and the `arbors` tunnels sit in the middle third. bed / soil: roles of the bed box and its top (e.g. 'green'
-    and 'leaf_l' for green-dominated rows). Roles: soil, green, leaf_l, crop, white, wood + person."""
+    and 'leaf_l' for green-dominated rows). Roles: soil, green, leaf_l, crop, white, wood + person.
+    R3 options: leaf = role of every third crop plant (a pale crop green); hoop = role of the hoops (e.g. a dark green
+    metal), 4 cm tubes 3 m high; tufts = leaf tufts per hoop, laid along the whole arch; canopy = a tuft bridging each
+    pair of neighbouring hoops at the crown; spill = edge plants that hang this far (m) out and down over the trough;
+    flowers = roles for a sprinkle of flower dots along the beds; hoop_step = hoop spacing; edges=False drops the
+    trough (for a farm floor that sits inside railings)."""
     A, rng = ctx.a, ctx.rng
     m = 4.0 if ring else 1.6
     nb = max(2, int((d - 2 * m + 3.2) // 3.2))
@@ -804,47 +997,134 @@ def roof_farm(ctx, cx, cz, y, w, d, arbors=4, people=4, density=1.0, crops=1.0, 
         obox(A[soil], (cx, y + .52, bz), (bw - .2, .06, 1.3))
         for t in range(int((bw - .5) / step)):
             px = cx - (bw - .5) / 2 + t * step + rng.uniform(-.15, .15)
-            role = A['green'] if (t + b) % 3 else A['leaf_l']
+            role = A['green'] if (t + b) % 3 else A[leaf or 'leaf_l']
+            if leaf and (t + b) % 3 == 1:
+                role = A[leaf]
             blob(role, (px, y + .75, bz + rng.uniform(-.3, .3)), (.42, .3, .5), sub=1, seed=px + bz)
             k = .35 * crops
             for _ in range(int(k) + (rng.random() < k - int(k))):
                 blob(A['crop'], (px + rng.uniform(-.3, .3), y + .95, bz + rng.uniform(-.4, .4)), (.11, .11, .11), sub=1, noise=0)
-    for sx, sz, lx, lz in ((0, -1, w, .9), (0, 1, w, .9), (-1, 0, .9, d), (1, 0, .9, d)):
-        ex, ez = cx + sx * (w / 2 - .45), cz + sz * (d / 2 - .45)
-        obox(A['concrete'], (ex, y + .35, ez), (lx, .7, lz))
-        n = int(max(lx, lz) / 1.3)
-        for t in range(n):
-            f = -.5 + (t + .5) / n
-            px, pz = (ex + f * lx, ez) if sx == 0 else (ex, ez + f * lz)
-            blob(A['leaf_l' if t % 2 else 'green'], (px, y + .95, pz), (.8, .55, .8), sub=1, seed=px * 3 + pz)
+            if flowers and rng.random() < .35:
+                blob(A[rng.choice(flowers)], (px + rng.uniform(-.3, .3), y + .93, bz + rng.choice((-.62, .62))), (.09, .07, .09), sub=1, noise=0)
+    if edges:
+        for sx, sz, lx, lz in ((0, -1, w, .9), (0, 1, w, .9), (-1, 0, .9, d), (1, 0, .9, d)):
+            ex, ez = cx + sx * (w / 2 - .45), cz + sz * (d / 2 - .45)
+            obox(A['concrete'], (ex, y + .35, ez), (lx, .7, lz))
+            n = int(max(lx, lz) / 1.3)
+            for t in range(n):
+                f = -.5 + (t + .5) / n
+                px, pz = (ex + f * lx, ez) if sx == 0 else (ex, ez + f * lz)
+                blob(A['leaf_l' if t % 2 else 'green'], (px, y + .95, pz), (.8, .55, .8), sub=1, seed=px * 3 + pz)
+                if spill and t % 2 == 0:                             # trailing plants hanging out over the edge
+                    o, dn = rng.uniform(.5, 1.0) * spill, rng.uniform(.5, 1.0) * spill
+                    qx, qz = px + sx * o, pz + sz * o
+                    blob(A[leaf or 'leaf_l'], (qx, y + .5 - dn / 2, qz), (.45 if sz else .3, dn / 2 + .3, .3 if sz else .45), sub=1, seed=qx + qz)
+    rise = 3.0 if hoop != 'white' else 2.6
+    tube = .04 if hoop != 'white' else .09
 
-    def hoop(c, along, span=1.4, rise=2.6):                         # one white hoop across `along` with leaves on its crown
+    def hoop_at(c, along, span=1.4):                                # one hoop across `along` with leaves along its arch
         ux, uz = (0, 1) if along == 'x' else (1, 0)
         arc = [(c[0] + ux * span * math.cos(math.pi * t / 10), y + .6 + rise * math.sin(math.pi * t / 10), c[1] + uz * span * math.cos(math.pi * t / 10))
                for t in range(11)]
-        limb(A['white'], arc, .09, .09, 6)
-        for t in (1, 3, 5, 7, 9):                                    # vine tufts along the hoop, white still reads
-            px, py, pz = arc[t]
-            o = rng.uniform(-.5, .5)
-            blob(A['green' if t % 4 == 1 else 'leaf_l'], (px + (o if along == 'x' else 0), py + .05, pz + (o if along == 'z' else 0)),
+        limb(A[hoop], arc, tube, tube, 6)
+        for t in range(tufts):                                       # vine tufts spread along the hoop
+            f = (t + .5) / tufts * 10
+            i0 = min(int(f), 9)
+            px, py, pz = (arc[i0][kk] + (arc[i0 + 1][kk] - arc[i0][kk]) * (f - i0) for kk in range(3))
+            o = rng.uniform(-.35, .35)
+            blob(A['green' if t % 3 == 1 else (leaf or 'leaf_l')], (px + (o if along == 'x' else 0), py + .05, pz + (o if along == 'z' else 0)),
                  (.42, .32, .42), sub=1, seed=px + pz + t)
         if rng.random() < .4:
-            blob(A['crop'], (c[0], y + 2.6, c[1]), (.12, .16, .12), sub=1, noise=0)
-    for k in range(arbors):                                          # vine tunnels along z, hoops every 2.2 m
+            blob(A['crop'], (c[0], y + rise, c[1]), (.12, .16, .12), sub=1, noise=0)
+
+    def tunnel(pts, along):
+        for h, c in enumerate(pts):
+            hoop_at(c, along)
+            if canopy and h + 1 < len(pts):                          # leaves bridging this hoop and the next
+                n2 = pts[h + 1]
+                blob(A['green' if h % 2 else (leaf or 'leaf_l')], ((c[0] + n2[0]) / 2, y + .6 + rise, (c[1] + n2[1]) / 2),
+                     (.75, .3, .75), sub=1, seed=c[0] + c[1])
+    for k in range(arbors):                                          # vine tunnels along z
         ax = cx + (k - (arbors - 1) / 2) * w / 3 if ring else cx - w / 2 + 3 + k * (w - 6) / max(arbors - 1, 1)
-        n = int(d * .7 / 2.2)
-        for h in range(n + 1):
-            hoop((ax, cz - d * .35 + h * d * .7 / n), 'z')
+        n = int(d * .7 / hoop_step)
+        tunnel([(ax, cz - d * .35 + h * d * .7 / n) for h in range(n + 1)], 'z')
     if ring:                                                         # perimeter tunnel 1.1-3.9 m in from the edge
         ins = 2.5
         for along, ln, fixed in (('x', w, (-1, 1)), ('z', d, (-1, 1))):
-            n = int((ln - 2 * ins) / 2.3)
+            n = int((ln - 2 * ins) / hoop_step)
             for sg in fixed:
+                pts = []
                 for h in range(n + 1):
                     u = -(ln / 2 - ins) + h * (ln - 2 * ins) / n
-                    hoop((cx + u, cz + sg * (d / 2 - ins)) if along == 'x' else (cx + sg * (w / 2 - ins), cz + u), along)
+                    pts.append((cx + u, cz + sg * (d / 2 - ins)) if along == 'x' else (cx + sg * (w / 2 - ins), cz + u))
+                tunnel(pts, along)
     for _ in range(people):
         person(ctx, cx + rng.uniform(-w / 2 + 3, w / 2 - 3), y, cz + rng.uniform(-d / 2 + 2, d / 2 - 2))
+
+
+def vine_curtain(ctx, a, b, y, out, length=(1.5, 3.0), step=1.0, role='leaf_l', flowers=(), fl=.3, skip=None):
+    """Hanging vine curtain from a beam edge: strands every `step` m from point a to b (three.js metres, top at y),
+    each 2-3 long thin leaf ribbons (flattened ellipsoids, 36 tris) swaying down `length` m, `out` = unit outward
+    normal; a fraction fl of strands carry flower dots in `flowers` roles. skip(x, z) -> max length (m) where a strand
+    must stay short (e.g. over a pod), or None."""
+    A, rng = ctx.a, ctx.rng
+    n = max(1, int(math.hypot(b[0] - a[0], b[2] - a[2]) / step))
+    for i in range(n + 1):
+        f = i / n
+        px, pz = a[0] + (b[0] - a[0]) * f + rng.uniform(-.15, .15), a[2] + (b[2] - a[2]) * f + rng.uniform(-.15, .15)
+        ln = rng.uniform(*length)
+        if skip:
+            lim = skip(px, pz)
+            if lim is not None:
+                ln = min(ln, lim)
+        segs = max(1, round(ln / .9))
+        py, sway = y, rng.uniform(-.2, .2)
+        for g in range(segs):
+            sl = ln / segs
+            c = (px + sway * out[2] * g, py - sl / 2, pz - sway * out[0] * g)
+            ell(A[role], _v(c, out, .05 * g), (.16 + .04 * (g == 0), 0, 0) if out[0] == 0 else (0, 0, .16 + .04 * (g == 0)),
+                (0, sl / 2 + .1, 0), (0, 0, .06) if out[0] == 0 else (.06, 0, 0), 6, 4)
+            if flowers and rng.random() < fl:
+                blob(A[rng.choice(flowers)], _v(c, out, .08), (.08, .08, .08), sub=1, noise=0)
+            py -= sl
+
+
+def arch_shell(ctx, c, out, span=5.5, rise=4.0, reach=2.0, t=.4, role='white', inner='pane_w', n=14):
+    """White half-egg entrance hood: an arched vault span x rise standing on the ground at c (three.js, on the facade
+    plane), reaching `reach` m out along the unit normal `out` and tapering to 80 % at its rounded front, shell t
+    thick with a lit inner face (role inner)."""
+    A = ctx.a
+    side = (-out[2], 0, out[0])
+    rows = 6
+
+    def pt(a, r, grow):                                              # a: 0..pi round the arch; r: 0..1 out along reach
+        k = 1 - .2 * r ** 2
+        return _v(_v(_v(c, side, (span / 2 + grow) * k * math.cos(a)), (0, 1, 0), (rise + grow) * k * math.sin(a)), out, reach * r)
+    for role_, grow, flip in ((role, t / 2, 1), (inner, -t / 2, -1)):
+        verts = [pt(math.pi * i / n, j / rows, grow) for j in range(rows + 1) for i in range(n + 1)]
+        faces = [(j * (n + 1) + i, j * (n + 1) + i + 1, (j + 1) * (n + 1) + i + 1, (j + 1) * (n + 1) + i)
+                 for j in range(rows) for i in range(n)]
+        cc = _v(c, (0, 1, 0), rise * .3)
+        A[role_].surface(verts, faces, (lambda q, cc=cc: _sub(q, cc)) if flip > 0 else (lambda q, cc=cc: _sub(cc, q)))
+    rim = [pt(math.pi * i / n, 1, 0) for i in range(n + 1)]
+    limb(A[role], rim, t / 2, t / 2, 8)
+
+
+def flower_bed(ctx, c, along, length, width=1.3, grass='leaf_l', flowers=('white',), trees=1):
+    """Low rounded flower bed (a flattened grass mound) along unit `along` (xz) centred c, dotted with flower roles,
+    with `trees` small round trees (kit tree_round_s)."""
+    A, rng = ctx.a, ctx.rng
+    ax = (along[0], 0, along[1])
+    nx = (-along[1], 0, along[0])
+    ell(A[grass], _v(c, (0, 1, 0), .2), _v((0, 0, 0), ax, length / 2), (0, .32, 0), _v((0, 0, 0), nx, width / 2), 14, 5)
+    for i in range(int(length * 3)):
+        u, v = rng.uniform(-.45, .45) * length, rng.uniform(-.35, .35) * width
+        p = _v(_v(c, ax, u), nx, v)
+        blob(A[rng.choice(flowers)], (p[0], .5 + .1 * rng.random(), p[2]), (.12, .08, .12), sub=1, noise=0)
+    for i in range(trees):
+        u = (i + .5) / trees - .5
+        p = _v(c, ax, u * length * .6)
+        kit_prop(ctx, 'tree_round_s', p[0], .3, p[2], rng.uniform(0, 6.28))
 
 
 # Registry checked against LIBRARY.md by tests/assetLibrary.test.ts — add a row there for every new key.
@@ -853,4 +1133,6 @@ MODULES = {
     'glass_room': glass_room, 'glass_lift': glass_lift, 'ring_doorways': ring_doorways,
     'event_module': event_module, 'lattice_frame': lattice_frame,
     'limb': limb, 'branch_strut': branch_strut, 'egg_pod': egg_pod, 'grid_frame': grid_frame, 'roof_farm': roof_farm,
+    'bone_arm': bone_arm, 'ell': ell, 'disc': disc, 'vine_curtain': vine_curtain, 'arch_shell': arch_shell,
+    'flower_bed': flower_bed,
 }
