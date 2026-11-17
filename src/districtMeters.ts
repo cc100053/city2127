@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { arc, bake, box, chrome, cream, glass, leaf, leafyCrown, publicLight, skyGlass, solar, stone, trail, trim, warm } from './cityRig.ts';
-import { changeSites, seaward } from './layout.ts';
+import { changeSites, seaward, SOUTH_SHORE } from './layout.ts';
 import { inHeroClear, inMega } from './megaFootprints.ts';
 import { automationBays, BAY_SCALE } from './automationBays.ts';
 import { automationBlue, METER_COLORS, quadFleet } from './automationKit.ts';
@@ -214,7 +214,7 @@ const HALO = .42;
  * Court 6 moved from (-137, 286) to (-150, 290) for the SW event shelf lot at (-100, 297; 312 before R3) (2026-11-13; same scan checks, 54 m from the lot centre, squares 6 m apart).
  * P7 ranks by estimated visible hero-frame pixels (`SCAN_COURTS=20` in tests/odaiba.test.ts lists candidates best first). */
 const COURT_SITES: readonly (readonly [number, number, number])[] = ([
-  [-220, -140, .4], [-410, 120, 1.1], [-110, 250, 2.3], [110, -320, .9], [170, -360, 3.6], [-150, 290, 1.7], [-385, 290, 5.1], [-460, 290, .2], [190, 0, 2.8], [-20, 210, 4.4],
+  [-220, -140, .4], [-410, 120, 1.1], SOUTH_SHORE.northCourt, [110, -320, .9], [170, -360, 3.6], SOUTH_SHORE.westCourt, [-385, 290, 5.1], [-460, 290, .2], [190, 0, 2.8], [-20, 210, 4.4],
 ] as const).filter(([x, z]) => !inMega(x, z, 22)); // P1: nothing stands inside a megastructure footprint
 const COURT = 40;
 /** Garden crowns inside a private court [x, z, size], clear of the glass room and the entrance. */
