@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS（R2 已建，待業主判定）
 - Branch: `feat/pod-frame-tower`（由 `origin/main` `5d66cfa8` 開出；R1 於 R2 session 開始時 commit）
 - Base commit: `13f83e1566988a10e8798ec027c97ba10012654e`（R1 工作時的 HEAD，`codex/nw-focal-connections`）
-- Last verified commit: 見 `## R2` 的 R2 commit（R1：`9ed3e7f6`）
+- Last verified commit: `c713fc9`（R2；R1 為 `9ed3e7f6`）
 - Remote availability: `origin/feat/pod-frame-tower`（R2 已 push）
 
 ## Session Git state
