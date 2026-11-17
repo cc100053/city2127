@@ -314,65 +314,69 @@ function automationHubAccess(avenue: Curve, environment: T.Object3D) {
   return mesh(guides, seamLight, 'automation-hub-guide-lines', false);
 }
 
-/** Shared drive at the avenue; a separate walk takes residents to the centre of the housing frontage. */
+/** A continuous loading street around the housing, with a separate frontage walk. */
 function drawerHousingAccess(avenue: Curve, environment: T.Object3D) {
-  const { x, z, avenue: distance, bayOffsets } = DRAWER_HOUSING;
+  const { x, z, avenue: distance } = DRAWER_HOUSING;
   const { p, n, t } = frame(avenue, distance, avenue.getLength());
   const mouth = p.clone().addScaledVector(n, 2.8).setY(.237);
   const path = (...points: T.Vector3[]) => new T.CatmullRomCurve3(points);
   const at = (dx: number, y: number, dz: number) => new T.Vector3(x + dx, y, z + dz);
-  // Bend west of the concentration pod at (-103, 17), including when the Meter shows it.
+  const loop: Curve[] = [];
+  const point = (x: number, z: number) => at(x, .034, z);
+  const straight = (x0: number, z0: number, x1: number, z1: number) =>
+    loop.push(new T.LineCurve3(point(x0, z0), point(x1, z1)));
+  const turn = (x0: number, z0: number, x1: number, z1: number, x2: number, z2: number, x3: number, z3: number) =>
+    loop.push(new T.CubicBezierCurve3(point(x0, z0), point(x1, z1), point(x2, z2), point(x3, z3)));
+  // Split at the corners so the ceramic stays straight under both loading axes.
+  straight(28, -12.5, -24, -12.5);
+  turn(-24, -12.5, -29.5, -12.5, -34, -8, -34, -2);
+  straight(-34, -2, -34, 9);
+  turn(-34, 9, -34, 14.5, -29.5, 19, -24, 19);
+  straight(-24, 19, 24, 19);
+  turn(24, 19, 29.5, 19, 34, 14.5, 34, 9);
+  straight(34, 9, 34, -6.5);
+  turn(34, -6.5, 34, -9.8, 31.3, -12.5, 28, -12.5);
+  // Keep the verified approach west of the concentration pod at (-103, 17).
   const drive = path(mouth, at(-20, .23, -75), at(-20, .20, -64), at(-18, .15, -50),
-    at(-10, .09, -38), at(0, .04, -25), at(0, .04, -23));
+    at(-23, .085, -37), at(-31, .045, -27), at(-34, .034, -17), at(-34, .034, -2));
   const walk = path(mouth.clone().addScaledVector(t, 5.2).addScaledVector(n, 5),
-    at(-27, .22, -64), at(-27, .15, -48), at(-27, .055, -33), at(-23, .04, -23), at(-20, .06, -16));
-  const terrace = new T.LineCurve3(at(-20, .06, -16), at(0, .06, -16));
-  const entry = new T.LineCurve3(at(0, .06, -16), at(0, .012, -8.9));
-  const plaza = new T.LineCurve3(at(-16.5, .034, -21), at(18.5, .034, -21));
+    at(-27, .22, -64), at(-27, .15, -48), at(-30, .085, -37), at(-37, .05, -26));
+  const walkIn = path(at(-37, .05, -26), at(-31, .047, -24), at(-22, .043, -23), at(-17, .041, -16));
+  const [front, corner] = loop;
+  const walkCornerEnd = 5.5;
+  const entry = new T.LineCurve3(at(0, .041, -9.7), at(0, .041, -8.95));
   const strip = (c: Curve, a: number, b: number, y = 0, depth = 0, tile: [number, number] = [2.4, 2.4]) =>
     band(c, 0, c.getLength(), a, b, y, depth, tile);
-  const bays = bayOffsets.map(dx => new T.LineCurve3(at(dx, .038, -21), at(dx, .018, -9)));
   const frontagePaving = footway.clone();
   frontagePaving.color.set('#e4e9ed');
-  const panels = (c: Curve, half: number, depth: number) => strip(c, -half, half, 0, depth, [3, STREET_KIT.half]);
+  const panels = (c: Curve) => strip(c, -3.1, 3.1, 0, .45, [3, STREET_KIT.half]);
   environment.add(
-    mesh([panels(drive, 3.1, .48), panels(plaza, 6, .45), ...bays.map(c => panels(c, 2.8, .40))],
-      avenueCeramic, 'drawer-housing-drive', false),
-    mesh([strip(walk, -1.55, 1.55, 0, .45), strip(terrace, -1.6, 1.6, 0, .40), strip(entry, -1.7, 1.7, 0, .40)],
-      frontagePaving, 'drawer-housing-walk'));
+    mesh([panels(drive), ...loop.map(panels)], avenueCeramic, 'drawer-housing-drive', false),
+    mesh([strip(walk, -1.55, 1.55, 0, .45), strip(walkIn, -1.55, 1.55),
+      strip(front, -7.7, -3.0, .007, .4),
+      band(corner, 0, walkCornerEnd, -7.7, -3.0, .007, .4, [2.4, 2.4]), strip(entry, -1.6, 1.6, 0, .4)], frontagePaving, 'drawer-housing-walk'));
 
-  const length = drive.getLength(), split = length - 2.5;
-  const fork = drive.getPointAt(split / length);
-  const guides = bayOffsets.map((dx, i) => path(fork, at(dx * .65, .038, -23.3),
-    at(dx, .03, -18.8), bays[i].getPointAt(.97)));
-  const lineWidth = .075, lineHeight = .012;
-  const lines = [band(drive, .8, split, -lineWidth, lineWidth, lineHeight),
-    ...guides.map(c => strip(c, -lineWidth, lineWidth, lineHeight))];
-  const pools = [glowLine(drive, .8, split, -.27, .27, .008),
-    ...guides.map(c => glowLine(c, 0, c.getLength(), -.27, .27, .008))];
-
+  const approach = drive.getLength();
+  const lit = [[drive, .8, approach - 1], ...loop.map(c => [c, 0, c.getLength()] as const)] as const;
+  const lines = lit.map(([c, start, end]) => band(c, start, end, -.075, .075, .012));
+  const pools = lit.map(([c, start, end]) => glowLine(c, start, end, -.27, .27, .008));
   const edging = channelWall.clone();
   edging.polygonOffset = metal.polygonOffset;
   edging.polygonOffsetFactor = metal.polygonOffsetFactor;
   edging.polygonOffsetUnits = metal.polygonOffsetUnits;
-  const rim = (c: Curve) => strip(c, -.075, .075, .009);
-  const straightRim = (x0: number, z0: number, x1: number, z1: number) =>
-    rim(new T.LineCurve3(at(x0, .035, z0), at(x1, .035, z1)));
+  const rim = (c: Curve, o: number, start = 0, end = c.getLength()) => band(c, start, end, o - .075, o + .075, .009);
   const rims = [
-    ...[-2.99, 2.99].map(o => band(drive, .8, length - 4.7, o - .075, o + .075, .009)),
-    straightRim(-16.4, -26.9, -5.2, -26.9), straightRim(3.3, -26.9, 18.4, -26.9),
-    straightRim(-16.4, -26.9, -16.4, -15.1), straightRim(18.4, -26.9, 18.4, -15.1),
-    ...cut([[-16.4, 18.4]], bayOffsets.map(dx => [dx - 2.8, dx + 2.8]), .5)
-      .map(([a, b]) => straightRim(a, -15.1, b, -15.1)),
-    ...bayOffsets.flatMap(dx => [-2.69, 2.69].map(o =>
-      rim(new T.LineCurve3(at(dx + o, .03, -15), at(dx + o, .018, -9.1))))),
+    rim(drive, -2.99, .8, approach), rim(drive, 2.99, .8, approach - 17),
+    ...loop.flatMap((c, i) => i === 1 ? [rim(c, 2.99), rim(c, -2.99, 0, walkCornerEnd)] : [rim(c, -2.99), rim(c, 2.99)]),
+    rim(front, -7.58), rim(corner, -7.58, 0, walkCornerEnd),
   ];
   const root = new T.Group(); root.name = 'drawer-housing-frontage';
-  // Low planters flank the manoeuvring court, outside the vehicle and walking widths.
-  const beds = [at(-21, .04, -31), at(8.5, .04, -34), at(15.5, .04, -34)].map(p =>
+  const beds = [at(-11, .04, -25), at(-4, .04, -25), at(13, .04, -24)].map(p =>
     planter({ p, t: new T.Vector3(1, 0, 0), n: new T.Vector3(0, 0, -1) }, 0, 5.5, 2.4, 'broadleaf'));
-  const crossingPanels = [-11.2, -10.1, -9, -7.9, -6.8].map(dx => strip(
-    new T.LineCurve3(at(dx - .34, .067, -16), at(dx + .34, .067, -16)), -1.25, 1.25));
+  const crossingPanels = [-1.15, -.58, 0, .58, 1.15].flatMap(o => [
+    strip(new T.LineCurve3(at(o - .17, .055, -15.55), at(o + .17, .055, -15.55)), -6.05, 0),
+    strip(new T.LineCurve3(at(-34.0, .061, -24.5 + o - .16), at(-34.0, .061, -24.5 + o + .16)), 0, 4.4),
+  ]);
   root.add(mesh(crossingPanels, crossing, 'drawer-housing-crossing', false), mesh(lines, seamLight, 'drawer-housing-guides', false),
     mesh(rims, edging, 'drawer-housing-edging', false), mesh(pools, lineGlow, 'drawer-housing-line-glow', false),
     mesh(beds.map(b => b.wall), trim, 'drawer-housing-planters'), mesh(beds.map(b => b.soil), leaf, 'drawer-housing-beds'));

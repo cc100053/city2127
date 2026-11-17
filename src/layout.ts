@@ -66,9 +66,9 @@ export const BOULEVARD = {
  * Fuji frame (stadium, outer size) and a canal on the old band north-west of ④ (④ d `from`–`to`, water `offset` ± `width`/2 m left of it),
  * both edged with a 1 m white coping 0.35 m over the water. ④'s light bridge at d 124 runs on over the canal. */
 export const WATER = { pool: { x: 22, z: 118, length: 70, width: 24 }, canal: { from: 4, to: 200, offset: 30, width: 8 }, coping: 1, bridge: BOULEVARD.crossings[0] } as const;
-/** Fixed Q03-A frontage; the two staging bays line up with the R2 drawer centre lines. */
+/** Fixed Q03-A building origin and its connection to the guideway avenue. */
 export const DRAWER_HOUSING = {
-  x: -104, z: 81, avenue: 463, bayOffsets: [-9.03, 14.05],
+  x: -104, z: 81, avenue: 463,
 } as const;
 /** The kit along `streets[0]`, in metres along it: carriageway half width, verges [from, to, reach beyond the carriageway edge] on the inside
  * (right of the route, −n: toward the plaza deck) and the outside, planter gaps [from, to] (the Yurikamome piers are found in the environment),

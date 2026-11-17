@@ -174,3 +174,5 @@ Sky Ring Blender polish R4（2026-11-08）嘅候選模型、採樣淨空與待�
 Q03-A A 位（2026-11-17）：Chrome 1600 × 900／DPR 1 已檢查主視角及同鏡頭日夜近景。DEV mixed → high → low 時保持同一個住宅實例及變換。[實景](../artifacts/change-review/index.html#drawer-housing) · [取景和驗證](handoffs/drawer-housing-placement.md)。Root `npm test`、`npm run build`、`git diff --check` 通過。展覽機未測。
 
 Q03-A A 位街道候選（2026-11-17）：原近鏡射線及三角網格確認住宅與右方梯田巨構相交；A 位內平移後淨距 15.93 m。Chrome 3200 × 1800／DPR 1 比較固定日景、同角度日／夜，並看接駁及主視角。分散配置下沿路共驗證 467 個路面點；兩個載車艙維持固定。[街道候選圖集](../artifacts/change-review/index.html#drawer-housing) · [量測與交接](handoffs/drawer-housing-placement.md#a-位街道候選2026-11-17)。
+
+Q03-A 街道 R2（2026-11-17）：保留住宅與鄰樓，以 6.2 m 貼樓環道接導軌大道 ②。Mac Chrome 以 SE low／mixed／high 各掃 1,651 個近邊及路面樣點，車路 3.2 m、步道 2.3 m 淨高內零阻擋；右側車道與梯田巨構抽樣最小水平餘量 2.09 m。另驗證同角度 3200 × 1800／DPR 1 日夜與接駁俯視。[圖集](../artifacts/change-review/index.html#drawer-housing) · [方法與差異](handoffs/drawer-housing-placement.md#街道-r2--由目標反推平面2026-11-17)。
