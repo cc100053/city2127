@@ -1,7 +1,7 @@
 # Q03-A — 車が引き出しになる住宅
 
 - Owner：cc100053。
-- 狀態：A 位街道 R2 候選待業主審閱；下方保留原置入與移位兩輪記錄。業主決定日後回應投票，Meter／各態／觸發留待後續設計。
+- 狀態：A 位街道 R2 紅線修訂已合併至 `main`（`4440da51`）；下方保留原置入與移位兩輪記錄。業主決定日後回應投票，Meter／各態／觸發留待後續設計。
 - Base：`1fcc1dc409a187f880c97a14847492363261f6a6`，與 `origin/codex/nw-focal-connections` 一致，領先 `origin/main` 一個待驗收 NW 接駁提交。保留既有 `Dev_QA.md`。
 - [R2 Blender](../../asset/models/drawer-housing-2127/drawer-housing-2127.blend) · [GLB](../../asset/models/drawer-housing-2127/drawer-housing-2127.glb) · [實景](../../artifacts/change-review/index.html#drawer-housing) · [佐伯澪故事](../BUILDING_STORIES.md#drawer-housing)
 
@@ -58,7 +58,7 @@ A 位在フジテレビ西南側與アクアシティ內陸草地之間。GLB �
 - 右側匯入／退出另以 3.6 × 2.0 m 小車平面包絡測試：從正面向支路的可行走線最小曲率半徑約 7.57 m，121 個姿勢各驗證 9 個點，共 1,089 點全在陶板內。此為低速走線驗證，未模擬車輛控制。
 - Root `npm test`、`npm run build`、`git diff --check` 通過。Chrome 3200 × 1800／DPR 1 日、夜、接駁俯視與主視角截圖均無 page error；原圖、量度腳本及結果在 `~/city2127-evidence/q03-a/r2-final/`。[Gemini／R1／R2 對照](../../artifacts/change-review/drawer-housing/vs-target.jpg)。
 - 本機前景 Chrome、1920 × 1080／DPR 1，NW high 主視角去掉首筆後：日 39.1–41.7 FPS、夜 24.2–35.9 FPS（同時進行截圖，非獨佔測量；R1 無同法基線）。展覽機未測。
-- 下一步：業主審閱本分支 R2 候選；確認前保留在功能分支。
+- 業主審閱後指定紅線修訂，見下節。
 
 ## 街道 R2 紅線修訂
 
@@ -67,3 +67,5 @@ A 位在フジテレビ西南側與アクアシティ內陸草地之間。GLB �
 同角度俯視可見紅線範圍回復草地。更新後原圖及截圖側錄在 `~/city2127-evidence/q03-a/r2-remove-walks/`。
 
 Root `npm test`、`npm run build`、`git diff --check` 通過。四張固定鏡頭截圖無 page error。
+
+合併提交 `4440da51` 通過根目錄 `npm test`、`npm run build` 及整合差異空白檢查。Chrome 1600 × 900／DPR 1 確認紅線範圍已回復草地，環道接通導軌大道。俯視原圖及側錄在 `~/city2127-evidence/q03-a/main/`。
