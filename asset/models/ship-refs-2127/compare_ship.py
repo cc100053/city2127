@@ -1,6 +1,7 @@
 """Render a ship .blend from roughly the camera of its reference image, for side-by-side comparison.
 
-blender -b --factory-startup --python-exit-code 1 -P compare_ship.py -- <ship> <out.png> [<ship.blend>]
+blender -b --factory-startup --python-exit-code 1 -P compare_ship.py -- <ship> <out.png> [<ship.blend>] [--clay]
+--clay renders every part in one matte grey without emission (silhouette check).
 Opens <ship.blend> (default: the one next to this file), adds a sea plane at the waterline (z = 0) so the freeboard
 reads as in the photo, and renders one frame at the reference image's size with the camera from CAMS.
 """
@@ -23,6 +24,8 @@ CAMS = {
 
 def main():
     args = sys.argv[sys.argv.index("--") + 1:]
+    clay = "--clay" in args
+    args = [a for a in args if a != "--clay"]
     name, out = args[0], os.path.abspath(args[1])
     blend = args[2] if len(args) > 2 else os.path.join(HERE, f"{name}.blend")
     bpy.ops.wm.open_mainfile(filepath=blend)
@@ -52,6 +55,15 @@ def main():
     b.inputs["Base Color"].default_value = (.06, .16, .26, 1)
     b.inputs["Roughness"].default_value = .35
     me.materials.append(sm)
+    if clay:  # one matte grey for every part, no emission: judge the silhouette and the facets alone
+        cm = bpy.data.materials.new("clay")
+        b = next(n for n in cm.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+        b.inputs["Base Color"].default_value = (.62, .62, .62, 1)
+        b.inputs["Roughness"].default_value = .7
+        for o in scene.objects:
+            if o.type == "MESH" and o is not sea:
+                o.data.materials.clear()
+                o.data.materials.append(cm)
     loc, at, lens = CAMS[name]
     cam = bpy.data.objects.new("cmp_cam", bpy.data.cameras.new("cmp_cam"))
     scene.collection.objects.link(cam)
