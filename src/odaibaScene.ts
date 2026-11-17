@@ -2,6 +2,7 @@ import * as T from 'three';
 import { plazaDeck, updatePlaza } from './plazaDeck.ts';
 import { HOLOGRAMS } from './layout.ts';
 import { addCityModel } from './modelAssets';
+import { hydroTerrace } from './hydroTerrace.ts';
 import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
 import { civicCore, updateCivic } from './civicCore';
@@ -179,7 +180,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) receded.add(object.material); });
   receded.forEach(material => { if (wetGround.has(material.name)) openBay(material, cutGround.has(material.name)); recedeBeyondDistrict(material); });
   carveContext(environment);
-  scene.add(contextFacades(environment), bayContext(), megastructures(), floaters(), streetNetwork(environment)); // after the recede wrap: the kit's ground keeps its own shading
+  scene.add(contextFacades(environment), bayContext(), megastructures(), floaters(), streetNetwork(environment), hydroTerrace()); // after the recede wrap: the kit's ground keeps its own shading
   plantCanopy(scene,trees,true);
   plantBackdropGrove(scene,environment);
   // Sky gardens crown the tall context towers (the only CTX mesh above 30 m inside the district).

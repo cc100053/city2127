@@ -90,10 +90,14 @@ export const civicAt = ([x,y,z]:readonly number[]):P3 => [CIVIC.x+(x+75)*CIVIC.k
 // Top of the Fuji TV chrome sphere (local centre -18, 100, 23; radius 28): the air-taxi berth.
 export const SPHERE_DOCK: P3 = civicAt([-18,131,23]);
 // Water taxis: a shuttle loop along the beach and a ferry lane out to the bay (the open sea continues past the plate).
-// The loop's return leg runs about 28 m seaward of the outbound leg, so taxis passing the other way never touch.
+// The loop's return leg runs about 28–45 m seaward of the outbound leg, so taxis passing the other way never touch. Its west turn stays
+// south of the Q02-A hydro terrace (HYDRO_TERRACE, about 21 m of water to its lot) and passes its sea-facing falls.
 export const waterLoop: readonly P3[] = [
-  [-90,-.6,-385],[-200,-.6,-300],[-330,-.6,-215],[-430,-.6,-120],[-405,-.6,-181],[-295,-.6,-271],[-170,-.6,-361],[-70,-.6,-420],
+  [-90,-.6,-385],[-200,-.6,-300],[-320,-.6,-232],[-410,-.6,-228],[-440,-.6,-246],[-405,-.6,-262],[-295,-.6,-271],[-170,-.6,-361],[-70,-.6,-420],
 ];
+/** Q02-A hydro terrace (fixed background, owner 2026-11-17): centre on the west-shore sea, yaw turns the GLB front (+z) east toward the
+ *  city and its sea side (+x) south; `lot` is the 66 m plan square the boat loop and other routes keep clear of. */
+export const HYDRO_TERRACE = { x: -375, z: -170, yaw: Math.PI / 2, lot: 66 } as const;
 // The ferry heads west for the Shinagawa channel, clear of the Rainbow Bridge anchorage and Daiba approach piers.
 export const ferryLane: readonly P3[] = [[-230,-.6,-290],[-420,-.6,-470],[-760,-.6,-560],[-1250,-.6,-520]];
 // Bay cruisers [x, z, heading]: centres of straight 300 m runs on open water in front of and beyond the district, clear of the shore and piers.

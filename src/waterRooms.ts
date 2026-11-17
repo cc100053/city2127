@@ -1,9 +1,11 @@
 import * as T from 'three';
-import { DISTRICT, INTERCHANGE, northShore, shoreLaneInner } from './layout.ts';
+import { DISTRICT, HYDRO_TERRACE, INTERCHANGE, northShore, shoreLaneInner } from './layout.ts';
 import { routes } from './mobility.ts';
 
 /** Water rooms along the north shore (user decision 2026-10-01: six, evenly spread, so the shore stays calm). */
 const ROOMS = 6;
+/** Plan distance (m) from (x, z) to the Q02-A hydro terrace lot. */
+const toHydro = (x: number, z: number) => Math.hypot(Math.max(Math.abs(x - HYDRO_TERRACE.x) - HYDRO_TERRACE.lot / 2, 0), Math.max(Math.abs(z - HYDRO_TERRACE.z) - HYDRO_TERRACE.lot / 2, 0));
 /** Shared positions for the planted water rooms and their v2 privacy / commons layer. */
 export function shoreRoomBays() {
   const bays: { sx: number; sz: number; x: number; z: number; yaw: number; r: number }[] = [];
@@ -15,7 +17,7 @@ export function shoreRoomBays() {
       const t = d / length, sx = ax + (bx - ax) * t, sz = az + (bz - az) * t;
       // Local -X faces the sea (as in tidalEdge); the terrace centre sits OUT m out, clear of the tidal islets (to 28.5 m).
       const r = 12.5 + (n % 3) * 2, OUT = 46, cx = sx - Math.cos(yaw) * OUT, cz = sz + Math.sin(yaw) * OUT;
-      if (cx < DISTRICT.minX || cx > 250 || cz > DISTRICT.maxZ || boats.some(p => Math.hypot(p.x - cx, p.z - cz) < r + 24)) continue;
+      if (cx < DISTRICT.minX || cx > 250 || cz > DISTRICT.maxZ || toHydro(cx, cz) < r + 12 || boats.some(p => Math.hypot(p.x - cx, p.z - cz) < r + 24)) continue;
       bays.push({ sx, sz, x: cx, z: cz, yaw, r }); n++;
     }
   }
@@ -26,6 +28,6 @@ export function laneBeaconSites() {
   const path = routes(), inner = new T.CatmullRomCurve3(shoreLaneInner.map(p => new T.Vector3(...p)), false, 'centripetal');
   const rooms = shoreRoomBays(), boats = [path.water, path.ferry, path.ixBoat].flatMap(route => route.getSpacedPoints(300));
   const clear = (x: number, z: number) => rooms.every(r => Math.hypot(r.x - x, r.z - z) > r.r + 16)
-    && Math.hypot(INTERCHANGE.mast[0] - x, INTERCHANGE.mast[2] - z) > 40 && boats.every(p => Math.hypot(p.x - x, p.z - z) > 30);
+    && Math.hypot(INTERCHANGE.mast[0] - x, INTERCHANGE.mast[2] - z) > 40 && toHydro(x, z) > 12 && boats.every(p => Math.hypot(p.x - x, p.z - z) > 30);
   return inner.getSpacedPoints(10).slice(1, -1).filter(p => clear(p.x, p.z)).map(p => [p.x, p.z] as const);
 }
