@@ -29,6 +29,7 @@
 | [一票旅程落點](journey-landing.md) | DONE（實作）；光點落喺變化格，owner 目視驗收未做 | cc100053 |
 | [Q02-A 水の棚田素材](q02a-hydro-terrace.md) | DONE（2026-11-17）；`asset/models/q02a-hydro-terrace/` source＋GLB 已發布 main，未放入 runtime | noifex |
 | [Q02-A Three.js 水流](q02a-water-threejs.md) | PLANNED（條件式）；Q02-A 被採用先開工：GLB 靜態，水面／瀑布流動同水車轉動要喺 Three.js 做 | noifex |
+| [Q02-A 水の棚田選址](q02a-hydro-placement.md) | PLANNED（2026-11-17）；西岸海面 (−375, −170)、正面朝東、瀑布朝南，與水庭一號並存；角色待定，R1 未開始 | cc100053 |
 | [居民情景：湊](resident-minato.md) | IN_PROGRESS（2026-11-12）；NW focal 三個狀態、四種轉變嘅 DEV 演示已 merge（`?residentDemo`）；演技／口形、FPS、三種中斷同正式接入未做 | cc100053 |
 | [素材庫](asset-library.md) | DONE（2026-11-13）；`asset/models/LIBRARY.md` 索引＋`modules.py`＋索引測試已上 main；模組 polish 1 owner 收貨（accepted）；SE 分支已改用模組，SE 嗰輪仍待收貨同 merge | cc100053 |
 | [Rectenna 建物 GLB](rectenna-building.md) | DONE（2026-11-13）；dream-loop rectenna 只留建物，金屬 Space Grey、受電膜少し虹色，`asset/models/rectenna-farm-canopy/`；未擺入城市，R2 菜低多邊形＋密度減半，2.9 M → 0.56 M tris | cc100053 |
