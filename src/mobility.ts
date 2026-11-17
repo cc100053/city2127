@@ -39,7 +39,7 @@ export function trainPose(time:number,train:number,trains:number,car:number,leng
  * cruisers in metres along their run, one per `bayCruisers` entry) were searched so that 2.5 m of water stays around every hull
  * (tests/mobility.test.ts checks the whole period). */
 export const BOAT_GAP=20, CRUISER_SPEED=7.5, WATER_PERIOD=320;
-export const WATER_PHASES={loop:13.5,ferry:0,cruisers:[0,83,188,249,32,115,198,281,64,147,290,25,148,219,262,45,128,211,294,77,160,243,26,109,192]};
+export const WATER_PHASES={loop:11.25,ferry:0,cruisers:[0,83,188,249,32,115,198,281,64,147,290,25,148,219,262,45,128,211,294,77,160,243,26,109,192]};
 /** Hull half-extents (m) in plan before scaling: x across, z from stern (-) to bow (+). */
 export const HULL={x:1.95,stern:-6.35,bow:5.65};
 /** Every boat at `time`: the loop taxis (BOATS), the ferry, the interchange boat, then the bay cruisers. `scale` is the drawn scale

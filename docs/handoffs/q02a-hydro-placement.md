@@ -1,7 +1,7 @@
 # q02a-hydro-placement — Q02-A 水の棚田：選址與周邊環境
 
 - Owner: cc100053
-- Status: PLANNED（decide session 完成；R1 未開始）
+- Status: IN_PROGRESS（R1 已交付，待 owner 判定）
 - Branch: `feat/q02a-hydro-placement`（主 checkout，由 origin/main 建立）
 - Base commit: 2d9c28cdd7113f87b665e3e87d054324cc30266f
 - Last verified commit: NONE
@@ -61,8 +61,44 @@
 
 由 [PROJECT](../PROJECT.md)、[VALIDATION](../VALIDATION.md)、[asset library](../../asset/models/LIBRARY.md) 及 [target inventory](../../artifacts/q02a-hydro-placement/spec.md) 開始。沿用 `modelAssets.ts` 的載入路徑及現有步道材質，不改動能源 runtime、Meter 或問卷。按 place-building **Rounds** 完成 capture、commit、push 及 owner review。角色確定後，Meter 接線另開任務。
 
+## R1（2026-11-17）
+
+Owner 指示在 decide session 內直接完成 R1（「做埋 R1，喺呢度做」）。
+
+### 改動
+
+- `src/hydroTerrace.ts`（新）：以 `addCityModel` 載入 GLB，中心 (−375, −170)，`rotation.y = π/2`，scale 1，常駐；載入時移除 `q02a_sea`。GLB 地台頂（local y 0）置於 y = 1.2 m，即 bay 水面（實測 −0.80 m）以上 2 m；地台下加石砌護岸（至水面以下）及淺色壓頂。由 `loadOdaiba` 加入場景。
+- 步道：4 m 寬、欄杆、柱燈、雙柱橋墩，由島北緣 (−380, −139) 至北岸護岸 (−344.4, −74.2)，長 74 m，終點與護岸 rim 頂（0.45 m）齊平。
+- `src/layout.ts`：新增 `HYDRO_TERRACE`；**水上的士環線西端改道**——原外行段 (−330, −215)→(−430, −120) 正好穿過選址，改為 (−320, −232)→(−410, −228)→(−440, −246)→(−405, −262)，與島相距 ≥ 21 m，船隻在瀑布南面駛過。`src/mobility.ts`：環線長度由 955 m 變為約 870 m（週期仍為 140 s），故重新搜尋相位，`WATER_PHASES.loop` 13.5 → 11.25（11–11.5 s 視窗內全周期無船相碰）。
+- `src/waterRooms.ts`：水房及 lane beacon 選位加入島嶼地塊避讓（水房 r + 12 m，beacon 12 m）。
+- `tests/hydroTerrace.test.ts`（新，已加入 `npm test`）：全周期每艘船與地塊距離 > 10 m；水房、beacon 避開地塊且 beacon ≥ 4；步道起於島上、落在北岸線上，與潮間帶小島、亭、beacon、水房、水庭一號及其 spur 均 > 5 m；島及步道可在 Node 中建構。
+
+### Brief 逐行
+
+| Row | 結果 |
+| --- | --- |
+| 放置 | **達成。** 實測世界 bounds x −408.0…−342.9、y −2.2…33.4、z −200.9…−137.2，全在 66 m 地塊內；變電所飾邊伸向東（x −362.7），瀑布伸至南端 z −200。GLB 實載 275,076 三角面。 |
+| 海面配合 | **達成。** `q02a_sea` 已移除，無雙層水面；腳柱、蓄水池及出海瀑布底部均在 bay 水面以下（focal-day／night）。 |
+| 岸邊連接 | **部分達成（偏離）。** 原定由北岸接正門；但正門東面一帶有潮間帶小島及亭，水庭一號的 spur 亦落在 (−310, −104)。可行路線改為由島北緣（距變電所約 20 m）接北岸，`access.jpg` 可見連續路線。島上由步道至正門的鋪面沿用 GLB 原有地台，未另加。 |
+| 鄰接 | **達成。** 水庭一號（`?energy=a`）與島相隔約 18 m 水面，兩者及步道互不穿插（`neighbour.jpg`、測試）。 |
+| 背景閱讀 | **未達。** Hero 構圖內看不到本建築：decide session 所記的 3,059 px 為 lot scan 的地面可見度指標，並非 hero 鏡頭實際像素。近景日夜均可讀，夜景以池緣光帶讀出輪廓。 |
+| 效能 | **達成。** 有頭 Chrome，1920 × 1080，DPR 1，hero `meters=nw:0`，捨棄首樣本：改動前 日 45.9–47.6／夜 46.7–47.6 FPS；改動後 日 47.8–48.9／夜 47.1–49.0 FPS，無可量度下降（hero 不見本建築）。近景鏡位 headless 約 55 FPS。 |
+| Evidence | `~/city2127-evidence/q02a-hydro-placement/r1/`：`focal-day`、`focal-night`、`overview`、`access`、`neighbour`、`loop-top`、`hero`、`hero-night`，以及 `before-*` 與 `*-before-after.jpg` 對比；`fps-before.txt`／`fps-after.txt`。未有 GLB 單獨渲染對比（素材 handoff 的重匯入圖在 noifex 工作機）。 |
+
+### 附帶影響（須 owner 知悉）
+
+- 六座水房按「均勻分佈」演算法重新選位：(−173, −245)→(−142, −266)、(−249, −218)→(−220, −217)、(−380, −108)→(−412, −85)，其餘三座不變；hero 前景帶粉紅樹的水房向左移，並多見一支 lane beacon 柱（`hero-before-after.jpg`）。原六座位置在新佈局下仍全部合法，如需保持原狀，R2 可把六座位置固定。
+- 水上的士環線西端改道及相位改變（見上）。
+
+### 驗證
+
+- `node --experimental-strip-types` 個別執行 `mobility`、`energyPrototype`、`energyPipeline`、`odaiba`、`hydroTerrace` 測試：全部通過。
+- 完整 `npm test`（exit 0，含新 hydroTerrace 測試）、`npm run build`（成功，只有既有 chunk size 警告）、`git diff --check`（無輸出）：2026-11-17 於 R1 工作樹執行。survey／module-swap 未改動，未執行。
+
 ## Next expected step
 
-Owner 在新 session 貼上 R1 round prompt：
+Owner 判定 R1。下一輪（新 session）貼上：
 
-> place-building round for `q02a-hydro-placement`: main checkout `/Users/fatboy/city2127` on `feat/q02a-hydro-placement`, read `docs/handoffs/q02a-hydro-placement.md`. Owner verdict on R0: «decide session done; build R1».
+> place-building round for `q02a-hydro-placement`: main checkout `/Users/fatboy/city2127` on `feat/q02a-hydro-placement`, read `docs/handoffs/q02a-hydro-placement.md`. Owner verdict on R1: «…».
+
+待決問題：是否固定原六座水房位置；hero 看不到建築是否可接受（角色確定跟 Meter 後會有 headline 近景）；步道接北緣是否可接受，抑或要求改接正門。
