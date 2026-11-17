@@ -40,6 +40,11 @@ ROLES = {
     'joint': ((.30, .31, .32, 1), None, .5), 'grey': ((.58, .60, .61, 1), None, .5), 'oak': ((.55, .36, .19, 1), None, .5),
     # R3: low-saturation warm-glass panes (warm white, pale amber, cool white) replace the toy-bright yellow / cyan window roles.
     'pane_w': ((.80, .70, .52, 1), (1, .78, .50, 1), .9), 'pane_a': ((.76, .58, .36, 1), (1, .66, .30, 1), .9), 'pane_c': ((.70, .76, .80, 1), (.78, .88, 1, 1), .9),
+    # Pod frame tower (2026-11-17, draft): board-formed concrete grid, three pastel pod shells, warm pod lining, farm soil,
+    # light leaf and crop accents.
+    'concrete': ((.50, .49, .46, 1), None, .5), 'pod_y': ((.97, .82, .50, 1), None, .5), 'pod_p': ((.95, .62, .58, 1), None, .5),
+    'pod_s': ((.70, .82, .62, 1), None, .5), 'pod_in': ((.96, .84, .64, 1), (1, .76, .46, 1), .5),
+    'soil': ((.33, .23, .15, 1), None, .5), 'leaf_l': ((.47, .68, .24, 1), None, .5), 'crop': ((.86, .34, .16, 1), None, .5),
 }
 # Kit prop material -> module role, so baked props share the site's roles.
 KITMAP = {'kit_dark': 'slate', 'kit_white': 'white', 'kit_wood': 'wood', 'kit_fabric': 'fabric', 'kit_screen': 'glow',
@@ -604,9 +609,184 @@ def lattice_frame(ctx, cx=0, cz=0, y0=0, cols=3, rows=2, levels=10, cell=12.0, f
             obox(A['dark'], (cx + gx, y0 + .26, z0 + i * (z1 - z0) / n), (gauge + .9, .12, .34))
 
 
+def _v(a, b, s=1.0):
+    return (a[0] + b[0] * s, a[1] + b[1] * s, a[2] + b[2] * s)
+
+
+def _sub(a, b):
+    return (a[0] - b[0], a[1] - b[1], a[2] - b[2])
+
+
+def _unit(a):
+    m = math.sqrt(sum(c * c for c in a)) or 1.0
+    return (a[0] / m, a[1] / m, a[2] / m)
+
+
+def _cross(a, b):
+    return (a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
+
+
+def limb(acc, pts, r0, r1, n=8):
+    """Tapered round tube along a 3D polyline pts (radius r0 at pts[0] to r1 at the end), capped: struts, arches, stems."""
+    verts, m = [], len(pts)
+    up = (0, 1, 0)
+    for i, p in enumerate(pts):
+        t = _unit(_sub(pts[min(i + 1, m - 1)], pts[max(i - 1, 0)]))
+        ref = up if abs(t[1]) < .9 else (1, 0, 0)
+        u = _unit(_cross(t, ref))
+        w = _cross(t, u)
+        r = r0 + (r1 - r0) * i / (m - 1)
+        verts += [_v(_v(p, u, r * math.cos(2 * math.pi * k / n)), w, r * math.sin(2 * math.pi * k / n)) for k in range(n)]
+    faces = [(i * n + k, i * n + (k + 1) % n, (i + 1) * n + (k + 1) % n, (i + 1) * n + k) for i in range(m - 1) for k in range(n)]
+    faces += [tuple(reversed(range(n))), tuple(range((m - 1) * n, m * n))]
+    acc.solid(verts, faces)
+
+
+def _bez(p0, c, p1, segs):
+    return [tuple((1 - t) ** 2 * p0[k] + 2 * (1 - t) * t * c[k] + t * t * p1[k] for k in range(3)) for t in (j / segs for j in range(segs + 1))]
+
+
+def branch_strut(ctx, base, tips, r=.32, role='white'):
+    """White organic tree strut: a curved trunk from base (a frame face) forks into one curved limb per tip (pod belly
+    points). Radii taper r -> .45 r -> .3 r; a knuckle sits on the fork. 3D points in metres."""
+    a = ctx.a[role]
+    mid = tuple(sum(t[k] for t in tips) / len(tips) for k in range(3))
+    fork = _v(base, _sub(mid, base), .55)
+    fork = (fork[0], fork[1] - .12 * abs(mid[1] - base[1]), fork[2])
+    limb(a, _bez(base, _v(base, _sub(fork, base), .5), fork, 4), r, r * .7)
+    blob(a, fork, (r * .95, r * .95, r * .95), sub=1, noise=0, flat=1)
+    for t in tips:
+        c = (fork[0] + (t[0] - fork[0]) * .3, t[1] - .15 * abs(t[1] - fork[1]), fork[2] + (t[2] - fork[2]) * .3)
+        limb(a, _bez(fork, c, t, 5), r * .6, r * .3)
+
+
+def egg_pod(ctx, x, y, z, length=8.0, height=4.4, depth=5.0, yaw=0.0, shell='pod_y', furnish_pod=True):
+    """Glossy pastel egg pod, centre (x, y, z), long axis along local x, front window looking local -z (turned by yaw):
+    wide oval glass window and a porthole at the +x end, both cut through a shell with a warm lit lining, white rims,
+    a floor ~0.3 h above the bottom and a small lounge (sofa, plant, lamp, resident) when furnish_pod and length >= 5.
+    Egg profile: the -x end is about 12 % fuller. shell: pod_y (cream), pod_p (pink) or pod_s (sage). Roles: shell,
+    pod_in, white, glass, floor + kit props."""
+    A = ctx.a
+    NI, NW, NS = 48, 6, 16                                          # around, window rows, shell rows
+    cy, sy = math.cos(yaw), math.sin(yaw)
+
+    def W(lx, ly, lz):                                              # local -> world (rot convention of geo_helpers.rot)
+        return (x + lx * cy + lz * sy, y + ly, z - lx * sy + lz * cy)
+
+    def P(th, ph, s):
+        """Sphere direction th from the window axis (local -z), ph around it, mapped onto the egg and scaled by s."""
+        u = (math.sin(th) * math.cos(ph), math.sin(th) * math.sin(ph), -math.cos(th))
+        f = 1 - .12 * u[0]
+        return W(u[0] * length / 2 * s, u[1] * height / 2 * f * s, u[2] * depth / 2 * f * s)
+
+    def th0(ph):                                                    # oval window: 58 deg wide, 34 deg tall
+        return 1 / math.sqrt((math.cos(ph) / math.radians(58)) ** 2 + (math.sin(ph) / math.radians(34)) ** 2)
+    phs = [2 * math.pi * i / NI for i in range(NI)]
+    cen = (x, y, z)
+
+    def grid(rows, s):
+        verts = [P(th, ph, s) for th_row in rows for th, ph in zip(th_row, phs)]
+        faces = [(r * NI + i, r * NI + (i + 1) % NI, (r + 1) * NI + (i + 1) % NI, (r + 1) * NI + i)
+                 for r in range(len(rows) - 1) for i in range(NI)]
+        return verts, faces
+    win = [[th0(ph) * max(t, .02) / NW for ph in phs] for t in range(NW + 1)]
+    shl = [[th0(ph) + (math.pi - .02 - th0(ph)) * t / NS for ph in phs] for t in range(NS + 1)]
+    v, f = grid(win, 1.0)
+    A['glass'].surface(v, f, lambda c: _sub(c, cen))
+    v, f = grid(shl, 1.0)
+    A[shell].surface(v, f, lambda c: _sub(c, cen))
+    v, f = grid(shl, .93)
+    A['pod_in'].surface(v, f, lambda c: _sub(cen, c))
+    ring_o = [P(th0(ph), ph, 1.0) for ph in phs]                   # white rim and reveal round the window
+    ring_i = [P(th0(ph), ph, .93) for ph in phs]
+    limb(A['white'], ring_o + ring_o[:2], .13, .13, 6)
+    for i in range(NI):
+        q = [ring_o[i], ring_o[(i + 1) % NI], ring_i[(i + 1) % NI], ring_i[i]]
+        A['white'].surface(q, [(0, 1, 2, 3)], lambda c: _sub(c, cen))
+        A['white'].surface(q, [(0, 1, 2, 3)], lambda c: _sub(cen, c))
+    if length >= 5:                                                 # porthole at the +x end
+        pc, pr = W(length / 2 * .985, height * .08, 0), min(.55, height * .14)
+        port = [W(length / 2 * .985 - .02, height * .08 + pr * math.sin(2 * math.pi * t / 16), pr * math.cos(2 * math.pi * t / 16)) for t in range(18)]
+        limb(A['white'], port, .08, .08, 5)
+        A['pane_w'].surface(port[:16], [tuple(range(16))], lambda c: _sub(c, cen))
+    fy = -.3 * height / 2                                           # floor plate inside the lining
+    k = math.sqrt(1 - (fy / (height / 2)) ** 2) * .9
+    ring = [(math.cos(2 * math.pi * t / 20) * length / 2 * k, math.sin(2 * math.pi * t / 20) * depth / 2 * k) for t in range(20)]
+    sweep(A['floor'], lambda kk: [W(px, 0, pz)[0::2] for px, pz in ring], [(0, y + fy - .2), (0, y + fy)])
+    if furnish_pod and length >= 5:
+        kit_prop(ctx, 'sofa', *W(-.1 * length, fy, .18 * depth), yaw + math.pi)
+        kit_prop(ctx, 'potted_plant', *W(-.3 * length, fy, -.05 * depth), yaw)
+        kit_prop(ctx, 'floor_lamp', *W(.28 * length, fy, .1 * depth), yaw)
+        if ctx.rng.random() < .7:
+            person(ctx, *W(.12 * length, fy, -.1 * depth), 1.0, yaw + math.pi)
+
+
+def grid_frame(ctx, cx=0, cz=0, y0=0, cols=5, rows=4, levels=7, cell=7.0, floor_h=4.5, col=1.1, beam=.85, role='concrete'):
+    """Open concrete grid (owner image 2026-11-17): (cols+1)(rows+1) square columns rising 0.6 m past the roof, a perimeter
+    beam ring on every column line at every level (beam top = slab top), a 0.45 m slab per level inset 0.3 m and a
+    0.6 m plinth. Default 35 x 28 x 31.5 m, front -z. Returns (xs, zs, slab tops). Role: concrete (plinth: paving)."""
+    W, D, H = cols * cell, rows * cell, levels * floor_h
+    xs = [cx - W / 2 + i * cell for i in range(cols + 1)]
+    zs = [cz - D / 2 + j * cell for j in range(rows + 1)]
+    a = ctx.a[role]
+    obox(ctx.a['paving'], (cx, y0 + .1, cz), (W + 3, .2, D + 3))
+    for xc in xs:
+        for zc in zs:
+            obox(a, (xc, y0 + (H + .6) / 2, zc), (col, H + .6, col))
+    tops = [y0 + k * floor_h for k in range(1, levels + 1)]
+    for yt in tops:
+        obox(a, (cx, yt - .225, cz), (W - .6, .45, D - .6))
+        for zc in zs:
+            obox(a, (cx, yt - beam / 2, zc), (W, beam, col * .8))
+        for xc in xs:
+            obox(a, (xc, yt - beam / 2, cz), (col * .8, beam, D))
+    return xs, zs, [y0] + tops
+
+
+def roof_farm(ctx, cx, cz, y, w, d, arbors=4, people=4):
+    """Rooftop farm on a deck top at y: soil beds in rows along x with leafy crops and orange/red fruit, a planted edge
+    trough that spills over, `arbors` white hoop arbors (3.2 m) carrying vines across the beds, and farming residents.
+    Roles: soil, green, leaf_l, crop, white, wood + person."""
+    A, rng = ctx.a, ctx.rng
+    nb = max(2, int(d // 3.2))
+    for b in range(nb):
+        bz = cz - d / 2 + 1.6 + b * (d - 3.2) / max(nb - 1, 1)
+        obox(A['wood'], (cx, y + .25, bz), (w - 3, .5, 1.5))
+        obox(A['soil'], (cx, y + .52, bz), (w - 3.2, .06, 1.3))
+        for t in range(int((w - 3.5) / .9)):
+            px = cx - (w - 3.5) / 2 + t * .9 + rng.uniform(-.15, .15)
+            role = A['green'] if (t + b) % 3 else A['leaf_l']
+            blob(role, (px, y + .75, bz + rng.uniform(-.3, .3)), (.42, .3, .42), sub=1, seed=px + bz)
+            if rng.random() < .35:
+                blob(A['crop'], (px + .2, y + .95, bz + .25), (.11, .11, .11), sub=1, noise=0)
+    for sx, sz, lx, lz in ((0, -1, w, .9), (0, 1, w, .9), (-1, 0, .9, d), (1, 0, .9, d)):
+        ex, ez = cx + sx * (w / 2 - .45), cz + sz * (d / 2 - .45)
+        obox(A['concrete'], (ex, y + .35, ez), (lx, .7, lz))
+        n = int(max(lx, lz) / 1.3)
+        for t in range(n):
+            f = -.5 + (t + .5) / n
+            px, pz = (ex + f * lx, ez) if sx == 0 else (ex, ez + f * lz)
+            blob(A['leaf_l' if t % 2 else 'green'], (px, y + .95, pz), (.8, .55, .8), sub=1, seed=px * 3 + pz)
+    for k in range(arbors):                                          # vine tunnels: hoops every 2.2 m along z, leaves over the crown
+        ax = cx - w / 2 + 3 + k * (w - 6) / max(arbors - 1, 1)
+        n = int(d * .7 / 2.2)
+        for h in range(n + 1):
+            zz = cz - d * .35 + h * d * .7 / n
+            arc = [(ax + 1.4 * math.cos(math.pi * t / 10), y + .6 + 2.6 * math.sin(math.pi * t / 10), zz) for t in range(11)]
+            limb(A['white'], arc, .07, .07, 6)
+            for t in (2, 4, 5, 6, 8):
+                px, py, _ = arc[t]
+                blob(A['green' if (t + h) % 2 else 'leaf_l'], (px, py + .15, zz + rng.uniform(-.6, .6)), (.55, .4, .75), sub=1, seed=px + zz + t)
+            if rng.random() < .4:
+                blob(A['crop'], (ax + rng.uniform(-1, 1), y + 2.6, zz), (.12, .16, .12), sub=1, noise=0)
+    for _ in range(people):
+        person(ctx, cx + rng.uniform(-w / 2 + 3, w / 2 - 3), y, cz + rng.uniform(-d / 2 + 2, d / 2 - 2))
+
+
 # Registry checked against LIBRARY.md by tests/assetLibrary.test.ts — add a row there for every new key.
 MODULES = {
     'kit_prop': kit_prop, 'person': person, 'seated_person': seated_person, 'furnish': furnish,
     'glass_room': glass_room, 'glass_lift': glass_lift, 'ring_doorways': ring_doorways,
     'event_module': event_module, 'lattice_frame': lattice_frame,
+    'limb': limb, 'branch_strut': branch_strut, 'egg_pod': egg_pod, 'grid_frame': grid_frame, 'roof_farm': roof_farm,
 }
