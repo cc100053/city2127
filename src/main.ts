@@ -15,7 +15,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { FullScreenQuad, Pass } from 'three/addons/postprocessing/Pass.js';
 import { bake, cityRig, stone } from './cityRig';
 import { heroCamera, HERO_TARGET } from './heroCamera';
-import { DISTRICT } from './layout';
+import { DRAWER_HOUSING, DISTRICT } from './layout';
 import { createWorldState } from './worldState';
 import { displayHour, type DisplayMode, sunHeight, daylight, moodAt, withNight, nightLighting } from './dayCycle';
 import { overlay } from './overlay';
@@ -184,7 +184,7 @@ try {
     const drawerHousingUrl = new URL('../asset/models/drawer-housing-2127/drawer-housing-2127.glb', import.meta.url).href;
     void odaibaReady.then(async ready => {
       if (!ready) return;
-      const model = await addCityModel(background.root, drawerHousingUrl, [-115.375, 0, 99.68], Math.PI);
+      const model = await addCityModel(background.root, drawerHousingUrl, [DRAWER_HOUSING.x, 0, DRAWER_HOUSING.z], Math.PI);
       model.name = 'drawer-housing-2127';
       // Keep the glazing separately sortable and batch the static opaque parts.
       model.add(...bake(model, mesh => !Array.isArray(mesh.material) && !mesh.material.transparent));

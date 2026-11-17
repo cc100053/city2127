@@ -205,6 +205,22 @@ const streetKit = streetNetwork(environment);
     const y = accessSurface(x, -302.55, 'automation-hub-landing');
     assert.ok(y !== undefined && Math.abs(y - 3.6) < .025, `NW landing does not meet the plinth at x=${x}`);
   }
+  // Q03-A: the two loading branches and the pedestrian route meet the existing avenue and frontage at grade.
+  const drawerRoad = 'drawer-housing-drive', drawerWalk = 'drawer-housing-walk';
+  for (const [x, z, finishA, finishB] of [
+    [-125.73, -.39, 'street-ceramic', drawerRoad],
+    [-127.24, 6.68, 'street-footway', drawerWalk],
+    [-104, 56, drawerRoad, drawerRoad],
+    [-113.03, 71.5, drawerRoad, drawerRoad],
+    [-89.95, 71.5, drawerRoad, drawerRoad],
+    [-124, 64.9, drawerWalk, drawerWalk],
+    [-104, 71.8, drawerWalk, drawerWalk],
+    [-113.03, 65, drawerWalk, drawerRoad],
+  ] as const) {
+    const a = accessSurface(x, z, finishA), b = accessSurface(x, z, finishB);
+    assert.ok(a !== undefined && b !== undefined && Math.abs(a - b) <= .04,
+      `Q03-A paving discontinuity at ${x},${z}: ${finishA} ${a}, ${finishB} ${b}`);
+  }
   const boulevard = routes().streets[1], bl = boulevard.getLength();
   for (let d = 1; d < bl - 1; d += 2) {
     const p = boulevard.getPointAt(d / bl), t = boulevard.getTangentAt(d / bl), at = (o: number): [number, number] => [p.x + t.z * o, p.z - t.x * o], bridge = BOULEVARD.crossings.some(c => Math.abs(c - d) < 2.5);

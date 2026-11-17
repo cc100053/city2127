@@ -172,3 +172,5 @@ The focused [Guest UI browser check](../tests/guestUi.browser.mjs) PASSes in Win
 Sky Ring Blender polish R4（2026-11-08）嘅候選模型、採樣淨空與待驗證項目見 [交接](handoffs/skyring-closeup-polish.md)；舊 R5 測試及視覺接受不代表此候選通過。
 
 Q03-A A 位（2026-11-17）：Chrome 1600 × 900／DPR 1 已檢查主視角及同鏡頭日夜近景。DEV mixed → high → low 時保持同一個住宅實例及變換。[實景](../artifacts/change-review/index.html#drawer-housing) · [取景和驗證](handoffs/drawer-housing-placement.md)。Root `npm test`、`npm run build`、`git diff --check` 通過。展覽機未測。
+
+Q03-A A 位街道候選（2026-11-17）：原近鏡射線及三角網格確認住宅與右方梯田巨構相交；A 位內平移後淨距 15.93 m。Chrome 3200 × 1800／DPR 1 比較固定日景、同角度日／夜，並看接駁及主視角。分散配置下沿路共驗證 467 個路面點；兩個載車艙維持固定。[街道候選圖集](../artifacts/change-review/index.html#drawer-housing) · [量測與交接](handoffs/drawer-housing-placement.md#a-位街道候選2026-11-17)。

@@ -8,7 +8,7 @@ import { leaf, trim } from './cityRig.ts';
 import { glowTexture } from './glowTexture.ts';
 import { hash, plantCanopy } from './coastalCanopy.ts';
 import { routes, waterways } from './mobility.ts';
-import { BOULEVARD, changeSites, STREET_KIT, WATER } from './layout.ts';
+import { BOULEVARD, changeSites, DRAWER_HOUSING, STREET_KIT, WATER } from './layout.ts';
 
 /** Large pale ceramic panels: a 256 px tile with fine seams on two edges, repeated per panel in metres through the strip's uv. */
 function panelTexture() {
@@ -312,6 +312,44 @@ function automationHubAccess(avenue: Curve, environment: T.Object3D) {
   return mesh(guides, seamLight, 'automation-hub-guide-lines', false);
 }
 
+/** Shared drive at the avenue; a separate walk takes residents to the centre of the housing frontage. */
+function drawerHousingAccess(avenue: Curve, environment: T.Object3D) {
+  const { x, z, avenue: distance, bayOffsets } = DRAWER_HOUSING;
+  const { p, n, t } = frame(avenue, distance, avenue.getLength());
+  const mouth = p.clone().addScaledVector(n, 2.8).setY(.237);
+  const path = (...points: T.Vector3[]) => new T.CatmullRomCurve3(points);
+  const at = (dx: number, y: number, dz: number) => new T.Vector3(x + dx, y, z + dz);
+  // Bend west of the concentration pod at (-103, 17), including when the Meter shows it.
+  const drive = path(mouth, at(-20, .23, -75), at(-20, .20, -64), at(-18, .15, -50),
+    at(-10, .09, -38), at(0, .04, -25), at(0, .04, -23));
+  const walk = path(mouth.clone().addScaledVector(t, 5.2).addScaledVector(n, 5),
+    at(-27, .22, -64), at(-27, .15, -48), at(-27, .055, -33), at(-23, .04, -23), at(-20, .06, -16));
+  const terrace = new T.LineCurve3(at(-20, .06, -16), at(0, .06, -16));
+  const entry = new T.LineCurve3(at(0, .06, -16), at(0, .012, -8.9));
+  const plaza = new T.LineCurve3(at(-16.5, .034, -21), at(18.5, .034, -21));
+  const strip = (c: Curve, a: number, b: number, y = 0, depth = 0, tile: [number, number] = [2.4, 2.4]) =>
+    band(c, 0, c.getLength(), a, b, y, depth, tile);
+  const bays = bayOffsets.map(dx => new T.LineCurve3(at(dx, .038, -21), at(dx, .018, -9)));
+  environment.add(
+    mesh([strip(drive, -3.1, 3.1, 0, .48, [3, 2]), strip(plaza, -6, 6, 0, .45, [3, 2]),
+      ...bays.map(c => strip(c, -2.8, 2.8, 0, .40, [3, 2]))], ceramic, 'drawer-housing-drive'),
+    mesh([strip(walk, -1.55, 1.55, 0, .45), strip(terrace, -1.6, 1.6, 0, .40), strip(entry, -1.7, 1.7, 0, .40)], footway, 'drawer-housing-walk'));
+  const lines = bays.flatMap(c => [-1.3, 1.3].map(offset => strip(c, offset - .055, offset + .055, .022)));
+  for (const offset of [-2.7, 2.7]) {
+    lines.push(band(drive, 2.8, drive.getLength() - 3, offset - .055, offset + .055, .011));
+  }
+  const root = new T.Group(); root.name = 'drawer-housing-frontage';
+  // Low planters flank the manoeuvring court, outside the vehicle and walking widths.
+  const beds = [at(-21, .04, -31), at(8.5, .04, -34), at(15.5, .04, -34)].map(p =>
+    planter({ p, t: new T.Vector3(1, 0, 0), n: new T.Vector3(0, 0, -1) }, 0, 5.5, 2.4, 'broadleaf'));
+  const crossingPanels = [-11.2, -10.1, -9, -7.9, -6.8].map(dx => strip(
+    new T.LineCurve3(at(dx - .34, .067, -16), at(dx + .34, .067, -16)), -1.25, 1.25));
+  root.add(mesh(crossingPanels, crossing, 'drawer-housing-crossing', false), mesh(lines, seamLight, 'drawer-housing-guides', false),
+    mesh(beds.map(b => b.wall), trim, 'drawer-housing-planters'), mesh(beds.map(b => b.soil), leaf, 'drawer-housing-beds'));
+  plantBeds(root, beds.map(b => b.bed));
+  return root;
+}
+
 /** The kit along the street network: A on the U route (`STREET_KIT`), B on the ④ boulevard (`BOULEVARD`), and the stage 3 water (`waterGarden`). The ceramic, footways and terraces join
  * `environment` (it then stands on them); the planters, plants, rings, blades and lines come back for the scene. A's planters also keep 1.5 m
  * clear of every Yurikamome pier within the verges, found in the loaded environment. */
@@ -333,7 +371,7 @@ export function streetNetwork(environment: T.Object3D) {
   const piers = hits.map(ds => ds.sort((a, b) => a - b).reduce((out: Span[], d) => { const last = out.at(-1); if (last && d - 1.5 <= last[1]) last[1] = d + 1.5; else out.push([d - 1.5, d + 1.5]); return out; }, []));
   const root = new T.Group(); root.name = 'street-network';
   root.add(avenueStreet(u, K.from, L, [-K.half, K.half], { reach: K.inside, gaps: [...K.gaps.inside, ...piers[0]] }, { reach: K.outside, gaps: [...K.gaps.outside, ...piers[1]] }, K.crossings, () => 0),
-    boulevardStreet(boulevard, 0, boulevard.getLength(), BOULEVARD.crossings, () => 0, BOULEVARD.gaps), waterGarden(), automationHubAccess(u, environment));
+    boulevardStreet(boulevard, 0, boulevard.getLength(), BOULEVARD.crossings, () => 0, BOULEVARD.gaps), waterGarden(), automationHubAccess(u, environment), drawerHousingAccess(u, environment));
   for (const name of ['street-ceramic', 'street-footway', 'boulevard-ceramic', 'boulevard-terraces']) environment.add(root.getObjectByName(name)!);
   return root;
 }
