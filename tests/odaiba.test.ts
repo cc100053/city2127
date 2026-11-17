@@ -188,6 +188,23 @@ const streetKit = streetNetwork(environment);
   });
   for (const [x, z] of [[-290, 340], [302, -57]]) assert.ok(paved(x, z, /^ROAD_MAJOR$/), `backdrop band lost its road at ${x},${z}`);
   for (const [x, z] of [[-25, 139], [98, 54], [208, 2]]) assert.ok(onFormerStreet(x, z) && !paved(x, z, /^ROAD_/), `old band ground not recorded at ${x},${z}`);
+  const accessSurface = (x: number, z: number, name: string) =>
+    new Raycaster(new Vector3(x, 15, z), new Vector3(0, -1, 0))
+      .intersectObject(environment, true).find(hit => hit.object.name === name)?.point.y;
+  for (const [x, z, first, second] of [
+    [75.60, -278.64, 'street-ceramic', 'automation-hub-spur'],
+    [72, -301, 'automation-hub-spur', 'automation-hub-walk'],
+    [65, -340, 'automation-hub-walk', 'automation-hub-ramp'],
+    [17.1, -338, 'WATERFRONT_PROMENADE', 'automation-hub-walk'],
+    [66, -304.05, 'automation-hub-ramp', 'automation-hub-landing'],
+  ] as const) {
+    const a = accessSurface(x, z, first), b = accessSurface(x, z, second);
+    assert.ok(a !== undefined && b !== undefined && Math.abs(a - b) < .025, `NW access seam between ${first} and ${second}`);
+  }
+  for (const x of [64, 57.06]) {
+    const y = accessSurface(x, -302.55, 'automation-hub-landing');
+    assert.ok(y !== undefined && Math.abs(y - 3.6) < .025, `NW landing does not meet the plinth at x=${x}`);
+  }
   const boulevard = routes().streets[1], bl = boulevard.getLength();
   for (let d = 1; d < bl - 1; d += 2) {
     const p = boulevard.getPointAt(d / bl), t = boulevard.getTangentAt(d / bl), at = (o: number): [number, number] => [p.x + t.z * o, p.z - t.x * o], bridge = BOULEVARD.crossings.some(c => Math.abs(c - d) < 2.5);
@@ -279,6 +296,8 @@ for (const site of Object.values(changeSites)) {
   for (let x = -w / 2 - 5; x <= w / 2 + 5; x += 5) for (let z = -d / 2 - 5; z <= d / 2 + 5; z += 5) {
     ray.set(new Vector3(site.x + x, 500, site.z + z), down);
     const hit = ray.intersectObject(city, true)[0];
+    // The NW apron is deliberately in the lot's clearance margin. Its raised landing meets the hub threshold.
+    if (site === changeSites.nw && hit && /^automation-hub-(spur|walk|ramp|landing)$/.test(hit.object.name)) continue;
     assert.ok(hit && openGround.test(hit.object.name) && hit.point.y < 3, `${site.name} lot meets ${hit?.object.name ?? 'nothing'} at ${Math.round(site.x + x)},${Math.round(site.z + z)}`);
   }
   // A point a quarter of the way up the tallest variant must be in frame and not hidden behind a landmark or context block.

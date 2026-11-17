@@ -14,6 +14,7 @@
 | [變化說明卡](change-explanation.md) | PLANNED（TODO）；右上卡片直接說明「乜嘢變成乜嘢」，未定案前先用參數前後變動 | cc100053 |
 | [能源城市](energy-city.md) | E1–E4完成並發布main，CI通過；Q3獨立能源權威配置、舊氣候／歷史與正式browser通過；E5本機Mac mini 30分鐘量測與TCP復原已驗；展覽硬件／訪客待驗 | Codex；產品決策cc100053 |
 | [建築・居住](housing-city.md) | SOFTWARE COMPLETE A：owner 2026-10-27選A固定背景，M搬位，已整合main且CI通過；只餘展覽硬件／訪客／工程驗收；[證據](../../artifacts/housing-background/README.md) | Codex；產品決策cc100053 |
+| [NW focal デックス西接駁](nw-focal-connections.md) | 候選待 owner 視覺驗收，見 Gemini、變化總覽與接駁斜俯視 | cc100053 |
 | [近鏡打磨](closeup-polish.md) | S0 INTEGRATED，98/98；coordinator接受量度基準，失敗保留；worker 01a17d74；分 S0 基準 → A NE → B SW → C SE → D NW → Z 回歸；驗收同 capture 標準已定，每個 sector 要 owner 睇圖批准先 merge | cc100053 |
 | [近鏡推近／先推近後變化](closeup-zoom.md) | INTEGRATED CANDIDATE（2026-10-30 owner 指示 merge）；F／A 視覺硬門檻仍未達 | cc100053；實作Codex |
 | [每位Guest近鏡＋明顯變化](guest-agency.md) | G1–G3、G7、G2 候選已 merge main `95c70be`（CI 通過）；G5 文案、G4／G7 視覺與性能 gate、真人兩秒辨認未驗收 | cc100053 |

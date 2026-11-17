@@ -8,7 +8,7 @@ import { leaf, trim } from './cityRig.ts';
 import { glowTexture } from './glowTexture.ts';
 import { hash, plantCanopy } from './coastalCanopy.ts';
 import { routes, waterways } from './mobility.ts';
-import { BOULEVARD, STREET_KIT, WATER } from './layout.ts';
+import { BOULEVARD, changeSites, STREET_KIT, WATER } from './layout.ts';
 
 /** Large pale ceramic panels: a 256 px tile with fine seams on two edges, repeated per panel in metres through the strip's uv. */
 function panelTexture() {
@@ -55,7 +55,7 @@ type Curve = T.Curve<T.Vector3>;
 let ground = (_x: number, _z: number) => 0;
 /** Frame at `d` metres: point and left normal. */
 const frame = (c: Curve, d: number, len: number) => { const u = T.MathUtils.clamp(d / len, 0, 1), p = c.getPointAt(u), t = c.getTangentAt(u); return { p, n: new T.Vector3(t.z, 0, -t.x), t }; };
-/** Flat strip from offset a to b at height y over d0..d1 (uv in metres / `tile`), or with `h` a raised slab with its two long sides. */
+/** Strip from offset a to b at height y above the curve over d0..d1 (uv in metres / `tile`), or with `h` a raised slab with its two long sides. */
 function band(c: Curve, d0: number, d1: number, a: number, b: number, y: number, h = 0, tile: [number, number] = [1, 1]) {
   const len = c.getLength(), pos: number[] = [], uv: number[] = [], idx: number[] = [], steps = Math.max(2, Math.ceil((d1 - d0) / 2));
   const faces: [number, number, number, number][] = [[a, b, y, y]]; // [from, to, y at from, y at to]
@@ -64,7 +64,7 @@ function band(c: Curve, d0: number, d1: number, a: number, b: number, y: number,
     const base = pos.length / 3;
     for (let i = 0; i <= steps; i++) {
       const d = d0 + (d1 - d0) * i / steps, { p, n } = frame(c, d, len);
-      for (const [o, yy] of [[fa, ya], [fb, yb]] as const) { const x = p.x + n.x * o, z = p.z + n.z * o; pos.push(x, yy + ground(x, z), z); uv.push(d / tile[0], (o + (yy - y)) / tile[1]); }
+      for (const [o, yy] of [[fa, ya], [fb, yb]] as const) { const x = p.x + n.x * o, z = p.z + n.z * o; pos.push(x, p.y + yy + ground(x, z), z); uv.push(d / tile[0], (o + (yy - y)) / tile[1]); }
     }
     for (let i = 0; i < steps; i++) { const k = base + i * 2; idx.push(k, k + 2, k + 1, k + 1, k + 2, k + 3); }
   }
@@ -289,6 +289,29 @@ export function waterGarden() {
   return root;
 }
 
+/** NW access uses the open north verge on avenue ①; the pedestrian branch doubles back to the raised hub threshold. */
+function automationHubAccess(avenue: Curve, environment: T.Object3D) {
+  const { p, n } = frame(avenue, 940, avenue.getLength());
+  const mouth = p.addScaledVector(n, 3.48).setY(.237);
+  const curve = (points: [number, number, number][]) =>
+    new T.CatmullRomCurve3(points.map(point => new T.Vector3(...point)));
+  const { x, z, scale } = changeSites.nw;
+  const spur = curve([mouth.toArray(), [72, .23, -284], [71, .08, -292], [72, -.17, z + 1], [72, -.17, z - 2]]);
+  const walk = curve([[72, -.166, z], [73, -.23, -315], [71, -.25, -332],
+    [65, -.25, -340], [45, -.27, -341], [28, -.27, -340], [17, -.185, -338]]);
+  // The low plinth reaches x=64 and covers the last 6.9 m of the landing. The shared plinth ends at x=57.1.
+  const ramp = new T.LineCurve3(new T.Vector3(65, -.245, -340), new T.Vector3(66, 3.585, -304.02));
+  const landing = new T.LineCurve3(new T.Vector3(67.54, 3.59, -302.55), new T.Vector3(x + 4.7 * scale - .08, 3.59, -302.55));
+  const pave = (path: Curve, half: number, depth: number, tile: [number, number]) =>
+    band(path, 0, path.getLength(), -half, half, 0, depth, tile);
+  environment.add(mesh([pave(spur, 1.9, .44, [3, 1.75])], ceramic, 'automation-hub-spur'),
+    mesh([pave(walk, 1.55, .22, [2.4, 2.4])], footway, 'automation-hub-walk'),
+    mesh([pave(ramp, 1.55, 4, [2.4, 2.4])], footway, 'automation-hub-ramp'),
+    mesh([pave(landing, 1.55, 4, [2.4, 2.4])], footway, 'automation-hub-landing'));
+  const guides = [-1.45, 1.45].map(offset => band(spur, 1, spur.getLength() - .7, offset - .06, offset + .06, .013));
+  return mesh(guides, seamLight, 'automation-hub-guide-lines', false);
+}
+
 /** The kit along the street network: A on the U route (`STREET_KIT`), B on the ④ boulevard (`BOULEVARD`), and the stage 3 water (`waterGarden`). The ceramic, footways and terraces join
  * `environment` (it then stands on them); the planters, plants, rings, blades and lines come back for the scene. A's planters also keep 1.5 m
  * clear of every Yurikamome pier within the verges, found in the loaded environment. */
@@ -310,7 +333,7 @@ export function streetNetwork(environment: T.Object3D) {
   const piers = hits.map(ds => ds.sort((a, b) => a - b).reduce((out: Span[], d) => { const last = out.at(-1); if (last && d - 1.5 <= last[1]) last[1] = d + 1.5; else out.push([d - 1.5, d + 1.5]); return out; }, []));
   const root = new T.Group(); root.name = 'street-network';
   root.add(avenueStreet(u, K.from, L, [-K.half, K.half], { reach: K.inside, gaps: [...K.gaps.inside, ...piers[0]] }, { reach: K.outside, gaps: [...K.gaps.outside, ...piers[1]] }, K.crossings, () => 0),
-    boulevardStreet(boulevard, 0, boulevard.getLength(), BOULEVARD.crossings, () => 0, BOULEVARD.gaps), waterGarden());
+    boulevardStreet(boulevard, 0, boulevard.getLength(), BOULEVARD.crossings, () => 0, BOULEVARD.gaps), waterGarden(), automationHubAccess(u, environment));
   for (const name of ['street-ceramic', 'street-footway', 'boulevard-ceramic', 'boulevard-terraces']) environment.add(root.getObjectByName(name)!);
   return root;
 }
