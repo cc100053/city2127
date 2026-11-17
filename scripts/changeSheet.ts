@@ -121,6 +121,22 @@ const units = UNITS.map(u => {
 ${mine.map(change).join('\n')}${energy}${mine.length || energy ? '' : '<p><small>尚無前後對照截圖：請先執行 scripts/closeupSheet.mjs。</small></p>'}${story}</article>` };
 });
 
+const drawerHousing = `<article id="drawer-housing">
+<h2>Q03-A — 車が引き出しになる住宅 <small>A 位街道 R2 候選 · 投票變化待設計</small></h2>
+<p class="intro">フジテレビ西南側。兩個共用載車艙把小車升到住戶樓層，像抽屜一樣推入外牆泊位。住宅仍在 A 位，與西側梯田巨構現相隔 15.9 m。沿立面的暖米色車道從右側繞入樓隙，經背面成環，並接入導軌大道 ②。</p>
+<p lang="ja">満潮で低い道が水に戻るころ、佐伯澪さんの車は外壁の引き出しに収まり、工具が三階の作業台に届きます。地上を歩く場所にしたぶん、住民は二つの昇降台を順番に使います。</p>
+<p><a href="../../docs/BUILDING_STORIES.md#drawer-housing">佐伯澪的故事</a> · <a href="../../docs/handoffs/drawer-housing-placement.md">A 位座標與驗證</a></p>
+<div class="frames">
+<figure><img loading="lazy" src="drawer-housing/before.jpg" alt="原近鏡，右側巨構緊貼住宅"><figcaption>改前｜原日景鏡頭</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/after-same.jpg" alt="同一鏡頭，住宅與右側巨構之間見到開放地面"><figcaption>改後｜同一鏡頭，梯田巨構與住宅分開</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/vs-target.jpg" alt="同角度比較 Gemini 目標、R1 的 T 字前場和 R2 的貼樓環道"><figcaption>同角度｜Gemini、R1、R2</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/gemini-target.jpg" alt="目標圖中的貼樓暖色車道、右側彎道和前方步道"><figcaption>Gemini 目標｜貼樓車道及右側彎道</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/day.jpg" alt="日間近鏡可見兩個外伸載車艙、沿立面的陶板帶及右側彎路"><figcaption>R2 日景｜從前立面繞往樓隙</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/night.jpg" alt="同一角度的夜景，導光線沿彎道延伸"><figcaption>R2 夜景｜環道導光</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/plan.jpg" alt="俯視可見完整環道與接入導軌大道的支路"><figcaption>R2 接駁俯視｜與大道相通的環道</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/hero.jpg" alt="住宅位於城市主視角富士框架右下方"><figcaption>城市主視角｜富士框架右下方</figcaption></figure>
+</div></article>`;
+
 const out = join(OUT, 'index.html');
 writeFileSync(out, `<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><title>變化總覽 — city2127</title>
 <style>body{font:15px/1.6 system-ui,"Noto Sans JP",sans-serif;margin:24px auto;max-width:1500px;padding:0 20px;background:#f4f3ee;color:#222}
@@ -135,6 +151,8 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <p><b>變化成因：</b>每位 guest 回答四題，每個選項將對應軸的 Meter 推 −1、0 或 +1。Meter 是所有人累積的結果；每份提案最多令一個地點前進一級，並優先採用 guest 自己推動的方向。因此 guest 的選擇不一定等於本次的變化方向，結果卡第二句一律說明實際變化。</p>
 <table><tr><th>單位</th><th>佔比</th><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr>
 ${units.map((u, i) => `<tr><td><a href="#${esc(UNITS[i].plan)}">${md(u.row[0])}</a></td>${u.row.slice(1, 5).map(c => `<td>${md(c)}</td>`).join('')}</tr>`).join('\n')}</table>
+<p><a href="#drawer-housing">Q03-A — 車が引き出しになる住宅</a>（A 位街道候選，投票變化待設計）</p>
+${drawerHousing}
 ${units.map(u => u.html).join('\n')}
 </html>`);
 const loose = rows.filter(r => !UNITS.some(u => u.shots.test(r.shot)));

@@ -66,6 +66,10 @@ export const BOULEVARD = {
  * Fuji frame (stadium, outer size) and a canal on the old band north-west of ④ (④ d `from`–`to`, water `offset` ± `width`/2 m left of it),
  * both edged with a 1 m white coping 0.35 m over the water. ④'s light bridge at d 124 runs on over the canal. */
 export const WATER = { pool: { x: 22, z: 118, length: 70, width: 24 }, canal: { from: 4, to: 200, offset: 30, width: 8 }, coping: 1, bridge: BOULEVARD.crossings[0] } as const;
+/** Fixed Q03-A building origin and its connection to the guideway avenue. */
+export const DRAWER_HOUSING = {
+  x: -104, z: 81, avenue: 463,
+} as const;
 /** The kit along `streets[0]`, in metres along it: carriageway half width, verges [from, to, reach beyond the carriageway edge] on the inside
  * (right of the route, −n: toward the plaza deck) and the outside, planter gaps [from, to] (the Yurikamome piers are found in the environment),
  * light-panel crossings, and where the kit starts (a pier stands on the road at d 2–6). Reaches stop short of DECKS, the ring and arch feet,
@@ -79,7 +83,7 @@ export const STREET_KIT = {
   // the drop-off bays stand on ①'s plaza frontage, which has no planters). Outside: the ring foot, the deck's south member, the PARK lot's
   // margin, the arch foot, the AUTO HUB lot's margin, the backdrop grove plinth. (Stage 2 removed the side streets whose mouths had gaps.)
   gaps: { inside: [[186, 222], [466, 514], [520, 540], [568, 616], [890, 942], [972, 1011], [1044, 1083]],
-    outside: [[195, 216], [350, 362], [618, 636], [832, 862], [890, 942], [972, 1011], [1044, 1083], [1095, 1109]] },
+    outside: [[195, 216], [350, 362], [451, 477], [618, 636], [832, 862], [890, 942], [972, 1011], [1044, 1083], [1095, 1109]] },
   crossings: [398, 545],
 } as const;
 // polish2 (2026-11-03): the Fuji frame tower is the hero centrepiece. civicCore builds in its original metres and the whole chassis is scaled

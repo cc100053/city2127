@@ -74,6 +74,8 @@ visitor curves on actual paving and clear of buildings/sites, then samples each 
 at .25 s in low/mixed/high, hours 12/21. Every journey must actually be drawn in all six cases; seated matrices and folded legs
 remain fixed. Repeat visual checks with companion gaze/hand gestures, visitor arrival/chat/turn/return, and held day/dusk/night.
 The same loop asserts doorway people (0.62 m) and robots (0.85 m) never overlap and that no promenade walker, and at most 2 % of slow doorway frames (tight forecourt corners), strides in place; `districtMeters.test.ts` checks street cars → pods at low/mixed/high with unchanged traffic. `mobility.test.ts` runs the real traffic simulation 15 min (evening) with drawn bodies and 30 min (morning): lane bumper gaps > 1.5 m, ≤ 15 m/s, no car between stop line and far side while residents cross, crossers outside every drawn car footprint, real stops/queues/brake lamps, lag < 200 m, drop-off cars still parking; crossing bands on road and footways on paving, and both avenues' car edges on road or paving with the junction fill. `odaiba.test.ts` sweeps every lane's car body (as drawn, ends faded) along both avenues against the real landmarks, civic core and environment and requires 0.3 m clearance (fails with the old lane positions).
+NW focal デックス西接駁的幾何測試量度支路、海濱步道與斜路各接點的鋪面高差，並核對平台與兩組地台邊緣。候選證據見 [NW focal 交接](handoffs/nw-focal-connections.md)。
+
 Dated results and any integration limits belong in the [street-life handoff](handoffs/archive/street-life.md).
 
 Building interactions (round 9, 2026-10-06): `mobility.test.ts` checks arrival/wait/exit/greeting/departure/indoor stages,
@@ -170,3 +172,11 @@ Change review sheet (2026-11-13): `scripts/changeSheet.ts` joins the unit table 
 The focused [Guest UI browser check](../tests/guestUi.browser.mjs) PASSes in Windows Chrome 157.0.8103.38, 1024x900 with emulated touch and an ephemeral server/SQLite. It verifies all four questions, keyboard radio selection, selected style, disabled Next, energy 2x2 layout, no horizontal overflow, review reload/restoration and editing, no partial vote, real submission, result/handoff, both exploration API destinations and return, next guest, A/B independent drafts/queued B display, and Admin stylesheet isolation. Zero page exceptions. Captures [welcome](../artifacts/guest-ui-graphite/welcome.jpg), [energy](../artifacts/guest-ui-graphite/energy-selected.jpg) and [review](../artifacts/guest-ui-graphite/review.jpg) were visually inspected. [Browser report](../artifacts/guest-ui-graphite/report.json) and [handoff](handoffs/guest-ui-graphite.md) give exact scope and reproduction settings. Real iPad/Safari, shared 3D playback and venue-lighting comfort remain unverified. This evidence belongs to the feature branch.
 
 Sky Ring Blender polish R4（2026-11-08）嘅候選模型、採樣淨空與待驗證項目見 [交接](handoffs/skyring-closeup-polish.md)；舊 R5 測試及視覺接受不代表此候選通過。
+
+Q03-A A 位（2026-11-17）：Chrome 1600 × 900／DPR 1 已檢查主視角及同鏡頭日夜近景。DEV mixed → high → low 時保持同一個住宅實例及變換。[實景](../artifacts/change-review/index.html#drawer-housing) · [取景和驗證](handoffs/drawer-housing-placement.md)。Root `npm test`、`npm run build`、`git diff --check` 通過。展覽機未測。
+
+Q03-A A 位街道候選（2026-11-17）：原近鏡射線及三角網格確認住宅與右方梯田巨構相交；A 位內平移後淨距 15.93 m。Chrome 3200 × 1800／DPR 1 比較固定日景、同角度日／夜，並看接駁及主視角。分散配置下沿路共驗證 467 個路面點；兩個載車艙維持固定。[街道候選圖集](../artifacts/change-review/index.html#drawer-housing) · [量測與交接](handoffs/drawer-housing-placement.md#a-位街道候選2026-11-17)。
+
+Q03-A 街道 R2（2026-11-17）：保留住宅與鄰樓，以 6.2 m 貼樓環道接導軌大道 ②。Mac Chrome 以 SE low／mixed／high 各掃 1,651 個近邊及路面樣點，車路 3.2 m、步道 2.3 m 淨高內零阻擋；右側車道與梯田巨構抽樣最小水平餘量 2.09 m。另驗證同角度 3200 × 1800／DPR 1 日夜與接駁俯視。[圖集](../artifacts/change-review/index.html#drawer-housing) · [方法與差異](handoffs/drawer-housing-placement.md#街道-r2--由目標反推平面2026-11-17)。
+
+Q03-A 紅線修訂：同角度 Chrome 俯視確認住宅步道與草地斜線已移除。Root 回歸測試核對車道接縫和環道鋪面。[修訂俯視](../artifacts/change-review/drawer-housing/plan.jpg)。

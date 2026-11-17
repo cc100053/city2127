@@ -7,7 +7,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #d6d4c8;padding
 dt{color:#667;font-size:13px;margin-top:8px}dd{margin:0}.frames{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start}
 p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figure{margin:0}figure img{width:100%;display:block;border-radius:4px;background:#ddd}figcaption{font-size:12px;color:#667}</style>
 <h1>變化總覽：選擇 → 變化 → 建築 → 居民</h1>
-<p>生成：2026-11-16，<code>scripts/changeSheet.ts</code>。狀態、居民與建築介紹來自 RESIDENT_SCENE_PLAN，日文文案來自結果卡與設施卡的程式，選項來自正式問卷。截圖為靜態 DEV 畫面，取自 <code>scripts/closeupSheet.mjs</code> 或個別建築驗收紀錄。佔比為模擬數字，並非真人數據。</p>
+<p>生成：2026-11-17，<code>scripts/changeSheet.ts</code>。狀態、居民與建築介紹來自 RESIDENT_SCENE_PLAN，日文文案來自結果卡與設施卡的程式，選項來自正式問卷。截圖為靜態 DEV 畫面，取自 <code>scripts/closeupSheet.mjs</code> 或個別建築驗收紀錄。佔比為模擬數字，並非真人數據。</p>
 <p><b>變化成因：</b>每位 guest 回答四題，每個選項將對應軸的 Meter 推 −1、0 或 +1。Meter 是所有人累積的結果；每份提案最多令一個地點前進一級，並優先採用 guest 自己推動的方向。因此 guest 的選擇不一定等於本次的變化方向，結果卡第二句一律說明實際變化。</p>
 <table><tr><th>單位</th><th>佔比</th><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr>
 <tr><td><a href="#NW focal">NW focal — デックス西 AUTO HUB（−1／0／+1）</a></td><td>10.6%</td><td>驗收（旗艦 R9）</td><td>湊：DEV 演示齊備，三個狀態、四種轉變（handoff）；owner 接受作演示</td><td>階段 2 收尾：演技、口形、正式接入</td></tr>
@@ -18,6 +18,22 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <tr><td><a href="#SW focal">SW focal — お台場南岸</a></td><td>10.5%</td><td>驗收（Meter 0／mixed 的活動モジュール棚，owner 2026-11-14；−1／+1 沿用 COMMONS 模型，不在此列）</td><td>草案 v4：凪（結果為 0 的兩種轉變），待 owner 批准（handoff）</td><td>階段 2 步驟 4：owner 在 Gemini 挑選目標圖與角色</td></tr>
 <tr><td><a href="#SW courts">SW courts — <code>sw:stage-courts-west</code>／<code>south</code></a></td><td>7.2%</td><td><b>未打磨</b></td><td>未有居民</td><td>階段 1</td></tr>
 <tr><td><a href="#能源">能源四部件</a></td><td>4.5%</td><td>早期 batch 已整合，未按 taste v2 重審</td><td>陸上農園：葵的 DEV 演示待驗收（handoff）</td><td>審閱落種及單格復現日照；正式投票接入待定</td></tr></table>
+<p><a href="#drawer-housing">Q03-A — 車が引き出しになる住宅</a>（A 位街道候選，投票變化待設計）</p>
+<article id="drawer-housing">
+<h2>Q03-A — 車が引き出しになる住宅 <small>A 位街道 R2 候選 · 投票變化待設計</small></h2>
+<p class="intro">フジテレビ西南側。兩個共用載車艙把小車升到住戶樓層，像抽屜一樣推入外牆泊位。住宅仍在 A 位，與西側梯田巨構現相隔 15.9 m。沿立面的暖米色車道從右側繞入樓隙，經背面成環，並接入導軌大道 ②。</p>
+<p lang="ja">満潮で低い道が水に戻るころ、佐伯澪さんの車は外壁の引き出しに収まり、工具が三階の作業台に届きます。地上を歩く場所にしたぶん、住民は二つの昇降台を順番に使います。</p>
+<p><a href="../../docs/BUILDING_STORIES.md#drawer-housing">佐伯澪的故事</a> · <a href="../../docs/handoffs/drawer-housing-placement.md">A 位座標與驗證</a></p>
+<div class="frames">
+<figure><img loading="lazy" src="drawer-housing/before.jpg" alt="原近鏡，右側巨構緊貼住宅"><figcaption>改前｜原日景鏡頭</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/after-same.jpg" alt="同一鏡頭，住宅與右側巨構之間見到開放地面"><figcaption>改後｜同一鏡頭，梯田巨構與住宅分開</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/vs-target.jpg" alt="同角度比較 Gemini 目標、R1 的 T 字前場和 R2 的貼樓環道"><figcaption>同角度｜Gemini、R1、R2</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/gemini-target.jpg" alt="目標圖中的貼樓暖色車道、右側彎道和前方步道"><figcaption>Gemini 目標｜貼樓車道及右側彎道</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/day.jpg" alt="日間近鏡可見兩個外伸載車艙、沿立面的陶板帶及右側彎路"><figcaption>R2 日景｜從前立面繞往樓隙</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/night.jpg" alt="同一角度的夜景，導光線沿彎道延伸"><figcaption>R2 夜景｜環道導光</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/plan.jpg" alt="俯視可見完整環道與接入導軌大道的支路"><figcaption>R2 接駁俯視｜與大道相通的環道</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/hero.jpg" alt="住宅位於城市主視角富士框架右下方"><figcaption>城市主視角｜富士框架右下方</figcaption></figure>
+</div></article>
 <article id="NW focal"><h2>NW focal — デックス西 AUTO HUB（−1／0／+1） <small>10.6%</small></h2>
 <table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td>驗收（旗艦 R9）</td><td>湊：DEV 演示齊備，三個狀態、四種轉變（handoff）；owner 接受作演示</td><td>階段 2 收尾：演技、口形、正式接入</td></tr></table>
 <p class="intro"><b>建築</b>：位於デックス東京ビーチ西側水邊的 AUTO HUB 服務樓（16×24 米，高 32 米）。<b>用途</b>：居民辦理包裹、手續及查詢的窗口。−1 為人手窗口，0 為日間有人、夜間機械，+1 為全自動並設無人機起降場。<b>存在理由</b>：街道服務不再由行政或大企業單方決定；居民選擇要人還是要自動，AUTO HUB 便隨之改變。</p>

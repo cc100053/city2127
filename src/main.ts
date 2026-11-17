@@ -13,9 +13,9 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { VignetteShader } from 'three/addons/shaders/VignetteShader.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { FullScreenQuad, Pass } from 'three/addons/postprocessing/Pass.js';
-import { cityRig } from './cityRig';
+import { bake, cityRig, stone } from './cityRig';
 import { heroCamera, HERO_TARGET } from './heroCamera';
-import { DISTRICT } from './layout';
+import { DRAWER_HOUSING, DISTRICT } from './layout';
 import { createWorldState } from './worldState';
 import { displayHour, type DisplayMode, sunHeight, daylight, moodAt, withNight, nightLighting } from './dayCycle';
 import { overlay } from './overlay';
@@ -181,6 +181,18 @@ try {
   if(!housing&&!energyReview){
     // Fixed city background: votes and recovery never retarget the dwellings; the update cycle stays in DEV.
     const background=housingPrototype();background.select('mixed');background.root.name='housing-background';scene.add(background.root);
+    const drawerHousingUrl = new URL('../asset/models/drawer-housing-2127/drawer-housing-2127.glb', import.meta.url).href;
+    void odaibaReady.then(async ready => {
+      if (!ready) return;
+      const model = await addCityModel(background.root, drawerHousingUrl, [DRAWER_HOUSING.x, 0, DRAWER_HOUSING.z], Math.PI);
+      model.name = 'drawer-housing-2127';
+      // Keep the glazing separately sortable and batch the static opaque parts.
+      model.add(...bake(model, mesh => !Array.isArray(mesh.material) && !mesh.material.transparent));
+      const foundation = new T.Mesh(new T.BoxGeometry(49, .36, 19.57), stone);
+      foundation.position.set(0, -.18, -.865);
+      foundation.receiveShadow = true;
+      model.add(foundation);
+    }).catch(error => console.error('Drawer housing could not load', error));
   }
   // DEV E3 city composition: a separate design comparison, never derived from environment Meter bands.
   let devFrame:((now:number,darkness:number)=>void)|undefined;

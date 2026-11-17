@@ -8,7 +8,7 @@ import { leaf, trim } from './cityRig.ts';
 import { glowTexture } from './glowTexture.ts';
 import { hash, plantCanopy } from './coastalCanopy.ts';
 import { routes, waterways } from './mobility.ts';
-import { BOULEVARD, STREET_KIT, WATER } from './layout.ts';
+import { BOULEVARD, changeSites, DRAWER_HOUSING, STREET_KIT, WATER } from './layout.ts';
 
 /** Large pale ceramic panels: a 256 px tile with fine seams on two edges, repeated per panel in metres through the strip's uv. */
 function panelTexture() {
@@ -41,9 +41,11 @@ const crossing = new T.MeshStandardMaterial({ color: '#d6ecff', emissive: '#cfe8
 const bridgeDeck = crossing.clone(); bridgeDeck.color.set('#e8f4ff'); // B's light bridge: dimmer than the panels, so the lines laid over it stay readable
 // Ground finishes sit centimetres apart (as odaibaScene's groundLayer): each later layer gets a stronger offset so it draws over the one below.
 for (const [m, k] of [[ceramic, 1], [footway, 1], [metal, 2], [lineGlow, 2], [seamLight, 3], [railLight, 3], [bridgeLine, 3], [crossing, 4], [bridgeDeck, 2]] as const) { m.polygonOffset = true; m.polygonOffsetFactor = m.polygonOffsetUnits = -4 * k; }
+const avenueCeramic = ceramic.clone();
+avenueCeramic.color.set('#e2d7c1');
 const lightMaterials = [seamLight, railLight, bridgeLine], nightLine = new T.Color();
 // Canvas textures are made on first build, and only with a DOM: node tests build the kit untextured.
-const textured = () => { if (typeof document === 'undefined') return; ceramic.map ??= panelTexture(); footway.map ??= footTexture(); const g = halo.map ?? glowTexture(); for (const m of [halo, lineGlow, bladePool]) m.map ??= g; };
+const textured = () => { if (typeof document === 'undefined') return; ceramic.map ??= panelTexture(); avenueCeramic.map = ceramic.map; footway.map ??= footTexture(); const g = halo.map ?? glowTexture(); for (const m of [halo, lineGlow, bladePool]) m.map ??= g; };
 export function updateStreetKit(dark: number) {
   // Day: pale blue (clearly lit on the ceramic) with a faint glow band; night: about 4x the blue, well above the bloom threshold, with a full glow band under each line.
   for (const m of lightMaterials) m.color.set(m === bridgeLine ? '#8cc4ff' : '#a9d3ff').multiplyScalar(m === bridgeLine ? 1.5 : 1.3).lerp(nightLine.set(m === seamLight ? '#7fc0ff' : '#74bbff').multiplyScalar(4), dark);
@@ -55,7 +57,7 @@ type Curve = T.Curve<T.Vector3>;
 let ground = (_x: number, _z: number) => 0;
 /** Frame at `d` metres: point and left normal. */
 const frame = (c: Curve, d: number, len: number) => { const u = T.MathUtils.clamp(d / len, 0, 1), p = c.getPointAt(u), t = c.getTangentAt(u); return { p, n: new T.Vector3(t.z, 0, -t.x), t }; };
-/** Flat strip from offset a to b at height y over d0..d1 (uv in metres / `tile`), or with `h` a raised slab with its two long sides. */
+/** Strip from offset a to b at height y above the curve over d0..d1 (uv in metres / `tile`), or with `h` a raised slab with its two long sides. */
 function band(c: Curve, d0: number, d1: number, a: number, b: number, y: number, h = 0, tile: [number, number] = [1, 1]) {
   const len = c.getLength(), pos: number[] = [], uv: number[] = [], idx: number[] = [], steps = Math.max(2, Math.ceil((d1 - d0) / 2));
   const faces: [number, number, number, number][] = [[a, b, y, y]]; // [from, to, y at from, y at to]
@@ -64,7 +66,7 @@ function band(c: Curve, d0: number, d1: number, a: number, b: number, y: number,
     const base = pos.length / 3;
     for (let i = 0; i <= steps; i++) {
       const d = d0 + (d1 - d0) * i / steps, { p, n } = frame(c, d, len);
-      for (const [o, yy] of [[fa, ya], [fb, yb]] as const) { const x = p.x + n.x * o, z = p.z + n.z * o; pos.push(x, yy + ground(x, z), z); uv.push(d / tile[0], (o + (yy - y)) / tile[1]); }
+      for (const [o, yy] of [[fa, ya], [fb, yb]] as const) { const x = p.x + n.x * o, z = p.z + n.z * o; pos.push(x, p.y + yy + ground(x, z), z); uv.push(d / tile[0], (o + (yy - y)) / tile[1]); }
     }
     for (let i = 0; i < steps; i++) { const k = base + i * 2; idx.push(k, k + 2, k + 1, k + 1, k + 2, k + 3); }
   }
@@ -195,7 +197,7 @@ export function avenueStreet(c: Curve, d0: number, d1: number, carriage: [number
   // Light-panel crossings: two rows of square panels (about 1.3 m), 0.3 m apart, the outer ones 0.1 m from the carriageway edges.
   const panels: T.BufferGeometry[] = [], n = Math.round((b - a - .2 + .3) / 1.6), pw = (b - a - .2 - (n - 1) * .3) / n;
   for (const d of crossings) for (let i = 0; i < n; i++) for (const k of [-1, 1]) panels.push(band(c, d + k * (pw + .3) / 2 - pw / 2, d + k * (pw + .3) / 2 + pw / 2, a + .1 + i * (pw + .3), a + .1 + i * (pw + .3) + pw, y + .012));
-  root.add(mesh(flat, ceramic, 'street-ceramic', false), mesh(metalG, metal, 'street-edge'), mesh(seams, seamLight, 'street-seams', false), mesh(glows, lineGlow, 'street-line-glow', false), mesh(paving, footway, 'street-footway', false),
+  root.add(mesh(flat, avenueCeramic, 'street-ceramic', false), mesh(metalG, metal, 'street-edge'), mesh(seams, seamLight, 'street-seams', false), mesh(glows, lineGlow, 'street-line-glow', false), mesh(paving, footway, 'street-footway', false),
     mesh(panels, crossing, 'street-crossing', false), mesh(walls, trim, 'street-planters'), mesh(soil, leaf, 'street-beds'), mesh(rings, metal, 'street-rings'), mesh(pools, halo, 'street-ring-glow', false));
   plantBeds(root, beds);
   return root;
@@ -289,6 +291,80 @@ export function waterGarden() {
   return root;
 }
 
+/** NW access uses the open north verge on avenue ①; the pedestrian branch doubles back to the raised hub threshold. */
+function automationHubAccess(avenue: Curve, environment: T.Object3D) {
+  const { p, n } = frame(avenue, 940, avenue.getLength());
+  const mouth = p.addScaledVector(n, 3.48).setY(.237);
+  const curve = (points: [number, number, number][]) =>
+    new T.CatmullRomCurve3(points.map(point => new T.Vector3(...point)));
+  const { x, z, scale } = changeSites.nw;
+  const spur = curve([mouth.toArray(), [72, .23, -284], [71, .08, -292], [72, -.17, z + 1], [72, -.17, z - 2]]);
+  const walk = curve([[72, -.166, z], [73, -.23, -315], [71, -.25, -332],
+    [65, -.25, -340], [45, -.27, -341], [28, -.27, -340], [17, -.185, -338]]);
+  // The low plinth reaches x=64 and covers the last 6.9 m of the landing. The shared plinth ends at x=57.1.
+  const ramp = new T.LineCurve3(new T.Vector3(65, -.245, -340), new T.Vector3(66, 3.585, -304.02));
+  const landing = new T.LineCurve3(new T.Vector3(67.54, 3.59, -302.55), new T.Vector3(x + 4.7 * scale - .08, 3.59, -302.55));
+  const pave = (path: Curve, half: number, depth: number, tile: [number, number]) =>
+    band(path, 0, path.getLength(), -half, half, 0, depth, tile);
+  environment.add(mesh([pave(spur, 1.9, .44, [3, 1.75])], ceramic, 'automation-hub-spur'),
+    mesh([pave(walk, 1.55, .22, [2.4, 2.4])], footway, 'automation-hub-walk'),
+    mesh([pave(ramp, 1.55, 4, [2.4, 2.4])], footway, 'automation-hub-ramp'),
+    mesh([pave(landing, 1.55, 4, [2.4, 2.4])], footway, 'automation-hub-landing'));
+  const guides = [-1.45, 1.45].map(offset => band(spur, 1, spur.getLength() - .7, offset - .06, offset + .06, .013));
+  return mesh(guides, seamLight, 'automation-hub-guide-lines', false);
+}
+
+/** A continuous loading street around the housing. */
+function drawerHousingAccess(avenue: Curve, environment: T.Object3D) {
+  const { x, z, avenue: distance } = DRAWER_HOUSING;
+  const { p, n } = frame(avenue, distance, avenue.getLength());
+  const mouth = p.clone().addScaledVector(n, 2.8).setY(.237);
+  const path = (...points: T.Vector3[]) => new T.CatmullRomCurve3(points);
+  const at = (dx: number, y: number, dz: number) => new T.Vector3(x + dx, y, z + dz);
+  const loop: Curve[] = [];
+  const point = (x: number, z: number) => at(x, .034, z);
+  const straight = (x0: number, z0: number, x1: number, z1: number) =>
+    loop.push(new T.LineCurve3(point(x0, z0), point(x1, z1)));
+  const turn = (x0: number, z0: number, x1: number, z1: number, x2: number, z2: number, x3: number, z3: number) =>
+    loop.push(new T.CubicBezierCurve3(point(x0, z0), point(x1, z1), point(x2, z2), point(x3, z3)));
+  // Split at the corners so the ceramic stays straight under both loading axes.
+  straight(28, -12.5, -24, -12.5);
+  turn(-24, -12.5, -29.5, -12.5, -34, -8, -34, -2);
+  straight(-34, -2, -34, 9);
+  turn(-34, 9, -34, 14.5, -29.5, 19, -24, 19);
+  straight(-24, 19, 24, 19);
+  turn(24, 19, 29.5, 19, 34, 14.5, 34, 9);
+  straight(34, 9, 34, -6.5);
+  turn(34, -6.5, 34, -9.8, 31.3, -12.5, 28, -12.5);
+  // Keep the verified approach west of the concentration pod at (-103, 17).
+  const drive = path(mouth, at(-20, .23, -75), at(-20, .20, -64), at(-18, .15, -50),
+    at(-23, .085, -37), at(-31, .045, -27), at(-34, .034, -17), at(-34, .034, -2));
+  const panels = (c: Curve) => band(c, 0, c.getLength(), -3.1, 3.1, 0, .45, [3, STREET_KIT.half]);
+  environment.add(mesh([panels(drive), ...loop.map(panels)], avenueCeramic, 'drawer-housing-drive', false));
+
+  const approach = drive.getLength();
+  const lit = [[drive, .8, approach - 1], ...loop.map(c => [c, 0, c.getLength()] as const)] as const;
+  const lines = lit.map(([c, start, end]) => band(c, start, end, -.075, .075, .012));
+  const pools = lit.map(([c, start, end]) => glowLine(c, start, end, -.27, .27, .008));
+  const edging = channelWall.clone();
+  edging.polygonOffset = metal.polygonOffset;
+  edging.polygonOffsetFactor = metal.polygonOffsetFactor;
+  edging.polygonOffsetUnits = metal.polygonOffsetUnits;
+  const rim = (c: Curve, o: number, start = 0, end = c.getLength()) => band(c, start, end, o - .075, o + .075, .009);
+  const rims = [
+    rim(drive, -2.99, .8, approach), rim(drive, 2.99, .8, approach - 17),
+    ...loop.flatMap((c, i) => i === 1 ? [rim(c, 2.99), rim(c, -2.99, 0, 5.5)] : [rim(c, -2.99), rim(c, 2.99)]),
+  ];
+  const root = new T.Group(); root.name = 'drawer-housing-frontage';
+  const beds = [at(-11, .04, -25), at(-4, .04, -25), at(13, .04, -24)].map(p =>
+    planter({ p, t: new T.Vector3(1, 0, 0), n: new T.Vector3(0, 0, -1) }, 0, 5.5, 2.4, 'broadleaf'));
+  root.add(mesh(lines, seamLight, 'drawer-housing-guides', false),
+    mesh(rims, edging, 'drawer-housing-edging', false), mesh(pools, lineGlow, 'drawer-housing-line-glow', false),
+    mesh(beds.map(b => b.wall), trim, 'drawer-housing-planters'), mesh(beds.map(b => b.soil), leaf, 'drawer-housing-beds'));
+  plantBeds(root, beds.map(b => b.bed));
+  return root;
+}
+
 /** The kit along the street network: A on the U route (`STREET_KIT`), B on the ④ boulevard (`BOULEVARD`), and the stage 3 water (`waterGarden`). The ceramic, footways and terraces join
  * `environment` (it then stands on them); the planters, plants, rings, blades and lines come back for the scene. A's planters also keep 1.5 m
  * clear of every Yurikamome pier within the verges, found in the loaded environment. */
@@ -310,7 +386,7 @@ export function streetNetwork(environment: T.Object3D) {
   const piers = hits.map(ds => ds.sort((a, b) => a - b).reduce((out: Span[], d) => { const last = out.at(-1); if (last && d - 1.5 <= last[1]) last[1] = d + 1.5; else out.push([d - 1.5, d + 1.5]); return out; }, []));
   const root = new T.Group(); root.name = 'street-network';
   root.add(avenueStreet(u, K.from, L, [-K.half, K.half], { reach: K.inside, gaps: [...K.gaps.inside, ...piers[0]] }, { reach: K.outside, gaps: [...K.gaps.outside, ...piers[1]] }, K.crossings, () => 0),
-    boulevardStreet(boulevard, 0, boulevard.getLength(), BOULEVARD.crossings, () => 0, BOULEVARD.gaps), waterGarden());
+    boulevardStreet(boulevard, 0, boulevard.getLength(), BOULEVARD.crossings, () => 0, BOULEVARD.gaps), waterGarden(), automationHubAccess(u, environment), drawerHousingAccess(u, environment));
   for (const name of ['street-ceramic', 'street-footway', 'boulevard-ceramic', 'boulevard-terraces']) environment.add(root.getObjectByName(name)!);
   return root;
 }
