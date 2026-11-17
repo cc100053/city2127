@@ -61,6 +61,8 @@ Server產出`layout.energy`，root套用模型並比較實際前後target。新�
 
 受電設備 R3 沿用 Q3 票數門檻。至少兩票且比例達 20% 時使用小型離岸翼，達 40% 時使用台場南緣的受電テラス農園。農園的膜接收軌道供電，居民可從西面公共步道進入菜園，再經入口前地沿斜路到膜下梯田。Owner 於 2026-11-15 批准合併 R3。見 [農園交接](handoffs/rectenna-farm-placement.md)。
 
+Q02-A「水の棚田」（舊變電所跨上四層抽水蓄能水池）於 2026-11-17 由 owner 接受為固定背景：西岸海面 (−375, −170)，與水庭一號並存，經北岸步道到達；不屬任何選項或 Meter，角色日後另定。水上的士環線西端因此改經島南。見 [handoff](handoffs/q02a-hydro-placement.md)。
+
 ## 累積與權威 layout
 
 E4後automation／publicSharing／urbanConcentration每軸每份提案只有一票 `v ∈ {-1,0,+1}`。對第 n 份提案：`Sₙ=Sₙ₋₁+v`、`Rₙ=.75Rₙ₋₁+.25v`、`Mₙ=clamp(6(Sₙ/n+Rₙ),-12,12)`。新 run 的 S／R／M 全部零；中性票亦會更新近期記憶，不能略過。只在 server 計算；replay 與 live 使用同一 reducer：[scoreEngine](../survey/src/survey/scoreEngine.ts)。

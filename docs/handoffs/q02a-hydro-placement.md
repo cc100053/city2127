@@ -1,7 +1,7 @@
 # q02a-hydro-placement — Q02-A 水の棚田：選址與周邊環境
 
 - Owner: cc100053
-- Status: IN_PROGRESS（R1 已交付，待 owner 判定）
+- Status: DONE（owner 2026-11-17 接受 R1，合併入 main）
 - Branch: `feat/q02a-hydro-placement`（主 checkout，由 origin/main 建立）
 - Base commit: 2d9c28cdd7113f87b665e3e87d054324cc30266f
 - Last verified commit: NONE
@@ -95,10 +95,12 @@ Owner 指示在 decide session 內直接完成 R1（「做埋 R1，喺呢度做�
 - `node --experimental-strip-types` 個別執行 `mobility`、`energyPrototype`、`energyPipeline`、`odaiba`、`hydroTerrace` 測試：全部通過。
 - 完整 `npm test`（exit 0，含新 hydroTerrace 測試）、`npm run build`（成功，只有既有 chunk size 警告）、`git diff --check`（無輸出）：2026-11-17 於 R1 工作樹執行。survey／module-swap 未改動，未執行。
 
+## R1 verdict
+
+> R1 可以接受
+
+（owner，2026-11-17）R1 原樣接受，包括水房移位、hero 不可見及步道接北緣三項；按 CONTRIBUTING 以 `--no-ff` 合併入 main。
+
 ## Next expected step
 
-Owner 判定 R1。下一輪（新 session）貼上：
-
-> place-building round for `q02a-hydro-placement`: main checkout `/Users/fatboy/city2127` on `feat/q02a-hydro-placement`, read `docs/handoffs/q02a-hydro-placement.md`. Owner verdict on R1: «…».
-
-待決問題：是否固定原六座水房位置；hero 看不到建築是否可接受（角色確定跟 Meter 後會有 headline 近景）；步道接北緣是否可接受，抑或要求改接正門。
+本任務完成。角色（跟隨哪個 Meter）確定後另開任務接線；水流及水車動畫見 [q02a-water-threejs](q02a-water-threejs.md)。
