@@ -5,7 +5,7 @@
 - Branch: main（asset-only 例外；worktree `../city2127-q02a`，由 origin/main 快進）
 - Base commit: 52aa690fcd162d0a27b5bfa45f92325f989d5ca7
 - Last verified commit: 本 handoff 所在 commit（提交前喺 worktree 驗證，見下）
-- Remote availability: NOT PUSHED
+- Remote availability: origin/main（2026-11-17 用戶指示 push）
 - GitHub Issue (optional): 無
 
 ## Session Git state
@@ -64,4 +64,4 @@
 
 ## Next expected step
 
-如要放入台場城市：開 feature branch，定位置／比例／三角面預算，用 `src/modelAssets.ts` 的 `addCityModel` 載入並跑 VALIDATION 的瀏覽器檢查。另外 push main 需用戶確認。
+如要放入台場城市：開 feature branch，定位置／比例／三角面預算，用 `src/modelAssets.ts` 的 `addCityModel` 載入並跑 VALIDATION 的瀏覽器檢查。採用後嘅水流／水車動畫另見 [q02a-water-threejs](q02a-water-threejs.md)。
