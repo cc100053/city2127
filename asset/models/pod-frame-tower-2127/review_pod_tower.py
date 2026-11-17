@@ -30,9 +30,15 @@ sc.render.resolution_x, sc.render.resolution_y = 1600, 1200
 sc.render.engine = 'BLENDER_EEVEE' if '--eevee' in args else 'BLENDER_WORKBENCH'
 sc.world = bpy.data.worlds.new('w')
 sc.world.use_nodes = True
-bg = sc.world.node_tree.nodes['Background']
-bg.inputs['Color'].default_value = (.62, .74, .88, 1)
+nt = sc.world.node_tree
+bg = next(n for n in nt.nodes if n.type == 'BACKGROUND')
 bg.inputs['Strength'].default_value = .55
+tc, sep, ramp = nt.nodes.new('ShaderNodeTexCoord'), nt.nodes.new('ShaderNodeSeparateXYZ'), nt.nodes.new('ShaderNodeValToRGB')
+nt.links.new(tc.outputs['Generated'], sep.inputs[0])                     # R2: sky gradient so glossy pods catch a sheen
+nt.links.new(sep.outputs['Z'], ramp.inputs['Fac'])
+ramp.color_ramp.elements[0].position, ramp.color_ramp.elements[0].color = .45, (.80, .80, .76, 1)
+ramp.color_ramp.elements[1].position, ramp.color_ramp.elements[1].color = .75, (.42, .60, .90, 1)
+nt.links.new(ramp.outputs['Color'], bg.inputs['Color'])
 sc.world.color = (.62, .74, .88)
 sun = bpy.data.lights.new('sun', 'SUN')
 sun.energy = 4.5
@@ -46,7 +52,8 @@ gm.diffuse_color = (.80, .78, .72, 1)
 gm.node_tree.nodes['Principled BSDF'].inputs['Base Color'].default_value = (.80, .78, .72, 1)
 bpy.context.object.data.materials.append(gm)
 sc.view_settings.view_transform = 'AgX'
-sc.view_settings.look = 'AgX - Medium High Contrast'
+sc.view_settings.look = 'AgX - Punchy'                                  # R2: punchier look, -0.6 EV (R1 washed out)
+sc.view_settings.exposure = -.6
 if sc.render.engine == 'BLENDER_WORKBENCH':
     sc.display.shading.light = 'STUDIO'
     sc.display.shading.color_type = 'MATERIAL'

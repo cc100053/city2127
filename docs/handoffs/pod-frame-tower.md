@@ -1,11 +1,11 @@
 # pod-frame-tower — 混凝土格架蛋艙塔（僅模型）
 
 - Owner: cc100053
-- Status: IN_PROGRESS（R1 已建，R2 待做）
+- Status: IN_PROGRESS（R2 已建，待業主判定）
 - Branch: `feat/pod-frame-tower`（由 `origin/main` `5d66cfa8` 開出；R1 於 R2 session 開始時 commit）
 - Base commit: `13f83e1566988a10e8798ec027c97ba10012654e`（R1 工作時的 HEAD，`codex/nw-focal-connections`）
-- Last verified commit: NONE（R1 為未 commit 的工作區改動）
-- Remote availability: NOT PUSHED
+- Last verified commit: 見 `## R2` 的 R2 commit（R1：`9ed3e7f6`）
+- Remote availability: `origin/feat/pod-frame-tower`（R2 已 push）
 
 ## Session Git state
 
@@ -101,13 +101,52 @@ R1 與目標的差距（依 `target-vs-model.jpg` 分析），已轉成下文 R2
 | 9 | 欄河 | 細金屬直欄杆：扶手加間距 0.12 m 的欄杆柱，取代玻璃板 |
 | 10 | 預算 | 記錄三角面數；> 300k 時降低 blob 及 limb 細分 |
 
+## R2
+
+### R1 verdict
+
+業主原話（2026-11-17）：「analyze the different from target, hand over to new session do r2」。沒有逐項意見，因此以上文 `## R2 brief` 為本輪 brief。
+
+### 工作環境
+
+- R2 session 開始時，主 checkout 先開出 `feat/pod-frame-tower`（`origin/main` `5d66cfa8`）並 commit R1（`9ed3e7f6`）；其後另一 session 把主 checkout 切回 `codex/nw-focal-connections` 繼續 drawer-housing 工作。為免互相干擾，R2 改在獨立 clone `/Users/fatboy/city2127-pod` 進行（AGENTS.md 允許獨立 clone；並非 worktree）。主 checkout 仍留有本地分支 `feat/pod-frame-tower` @ `9ed3e7f6`，與 origin 相比只落後 R2 commit。
+- 主 checkout 是 partial clone（`blob:none`），不能直接 `git clone` 它；clone 由 GitHub 取得，R1 commit 以 bundle 匯入。
+
+### 改動
+
+- `modules.py`：`grid_frame` 新增 `beam_w`、`joint`、`joint_step`（模板接縫：周邊 column 每 1.5 m 一圈、外樑面每 1.5 m 一道，4 cm 寬、凸出 2 cm，role `concrete_j`）；`branch_strut` 支援多個 base（column 側面加樑底）及第二級小分叉（`twigs`）；`egg_pod` 新增 `ni`（小艙用 32 段）；`roof_farm` 新增 `density`、`crops`、`ring`（周邊一圈白色拱架隧道）、`bed`、`soil`。新 role `concrete_j`；`concrete`、`pod_*` 改色。以上 module 只有本建築使用。
+- `build_pod_tower.py`：column 1.45 m、樑 1.15 × 1.2 m；正面 9 個艙坐入格內；24 個艙全部有支撐；每格懸掛花槽、金屬直欄杆、垂藤、室內盆栽樹；第 6 層正面退台菜園；地面層 4.5 m 店面、三個白色拱門及基座花槽；建築本身的材質覆寫（較暗的暖色地台、艙殼粗糙度 .12 加 coat .6、樹葉及白色支撐平滑著色）。
+- `review_pod_tower.py`：天空改為漸變（令光滑艙殼有反射），look 改為 `AgX - Punchy`、曝光 −0.6 EV。R1 的算圖過曝，混凝土發白；`r1-vs-r2.jpg` 中的 R1 已用 R2 燈光重新算圖，以便公平比較。
+
+### 逐項自評（目標視角，`review_pod_tower.py --view target --eevee`）
+
+| # | 項目 | 結果 | 量度 |
+| --- | --- | --- | --- |
+| 1 | 格架 | 達成 | column 1.45 m、樑 1.15 × 1.2 m、`concrete` (.68, .66, .62)；接縫每 1.5 m，用 `concrete_j` 細條。接縫在目標視角下只隱約可見。 |
+| 2 | 蛋艙材質 | 部分達成 | 三色按 brief 設定，粗糙度 .12，coat .6。大艙及角艙有明顯高光；格內小艙高光較弱，未能確認每個艙都見到高光。AgX 下牛油黃仍偏米色。 |
+| 3 | 艙的位置 | 達成 | 正面 9 個艙坐入格內：艙底距 slab 頂 0.15 m，艙中心在格架面內 0.1 m；從目標鏡頭以光線投射量度遮擋率為 21–31 %（9 個中有 1 個為 31 %，略高於上限）。 |
+| 4 | 支撐 | 達成 | 24 / 24 個艙有支撐；每個 3–5 枝分叉，另加第二級小分叉；懸挑大艙根部半徑 0.62 m，同時抓住 column 側面及樑底。目標視角下，不少分叉位於艙底而被艙身遮住。 |
+| 5 | 每格綠化 | 達成 | 108 / 108 格有懸掛花槽（`sub=2`、平滑著色；有艙的格只在兩端放植物）；65 / 108 格（60 %）有 1.2–3 m 垂藤；33 / 108 格（31 %）玻璃後有 `tree_indoor`。 |
+| 6 | 室內 | 部分達成 | 目標視角中米色像素（色相 15–47°、飽和度 .2–.6、明度 > .45，400 × 300 取樣）由 7,948 減至 4,396，即減少 45 %，略少於一半；地台發光由 .8 降至 .45。暖光感仍不及目標。 |
+| 7 | 天台 | 達成 | 菜畦以綠色 role 為主；作物點約為 R1 的 4–5 倍（密度 1.6 倍，作物 3 倍）；周邊一圈白色拱架隧道，中央兩列；第 6 層正面左側 2 格寬退台菜園（13 × 4.6 m）。 |
+| 8 | 地面層 | 達成（有一點詮釋） | 地面層 4.5 m 高，玻璃由 0.25 m 至 slab 底 4.05 m；按「4.5 m」為樓層高度理解，另一種理解是玻璃本身 4.5 m 高。三個白色雙層拱門在目標視角可見；基座四周 15 格有花槽，入口三格留空。 |
+| 9 | 欄河 | 達成 | 99 格（沒有艙的格）設扶手、底欄及 4,554 枝欄杆柱，間距 0.12 m，role `rail`，取代玻璃板。 |
+| 10 | 預算 | 達成 | 289,846 三角面（R1 為 208,530），GLB 9.1 MB；以小艙 `ni=32` 及三角柱欄杆控制在 300k 以下。 |
+
+### 驗證
+
+- `@@BUILD@@ tris 289846, glb 9,067,592 bytes, 24 pods`；`blender-asset-qa` `qa_check.py`（concrete、concrete_j、white、pod_y、rail）：沒有 inside-out island，也沒有法線不一致；開放邊來自刻意的單面 strip、欄杆柱及窗框；`pft_white` 有 70 個退化面（limb 端蓋），影響不大。
+- `node --experimental-strip-types tests/assetLibrary.test.ts` 通過（23 props、14 modules、26 folders）；`git diff --check` 乾淨。沒有改動 `src/`，因此未執行 `npm test` / `npm run build`。
+- 證據：`~/city2127-evidence/pod-frame-tower/r2/`，包括 `model-target.png`、`model-back.png`、`model-pod.png`、`r1-vs-r2.jpg`、`target-vs-r2.jpg`、`target.webp`。全部為 Blender EEVEE 1600 × 1200 正交算圖；模型未放入城市，因此沒有瀏覽器擷圖，FPS 未量度。
+- 共做了 3 輪擷圖比對，另做一次曝光測試。
+
+### 尚待處理（供 R3 參考）
+
+- 目標視角與目標圖構圖不同：目標是轉角三分之四透視，兩個立面約各佔一半，每面約見 3 格；`--view target` 是近正面的正交鏡頭，可見 5 格。若業主同意，R3 可加一個透視的 `target3q` 鏡頭，原鏡頭則保留作逐輪比較。
+- 目標的艙窗較大、較高，並有白色窗櫺及多個小圓窗，室內暖光明顯；R2 的窗仍是低而寬的單一橢圓窗，襯裡呈大片米色。
+- 白色支撐在目標中是立面上最顯眼的元素之一；R2 的分叉多在艙底，目標視角下不夠搶眼。
+- 牛油黃在 AgX 下偏米色，若要更接近目標，需要再提高飽和度或改用另一種 view transform。
+
 ## Next expected step
 
-R2 session：
-
-1. 執行 AGENTS.md preflight。
-2. 確認沒有其他 session 正在使用主 checkout。從 `origin/main` 開 `feat/pod-frame-tower`，把 R1 檔案搬過去：新資料夾直接複製；`modules.py`、`LIBRARY.md` 的改動屬純追加，在 main 版本上重新加入。然後 commit R1。
-3. 按 R2 brief 建造，最多三輪擷圖比對。
-4. 輸出 `~/city2127-evidence/pod-frame-tower/r2/`：目標視角、背面、艙近景、`r1-vs-r2.jpg`、`target-vs-r2.jpg`。
-5. 執行 `tests/assetLibrary.test.ts` 及 `git diff --check`；若改動 `src/`，再加跑 `npm test` 及 `npm run build`。
-6. commit 並 push 分支，然後在本 handoff 加 `## R2` 一節，並以 SendUserFile 把圖片交給業主判定。
+業主判定 R2。若有意見，新開 session 做 R3：preflight 後在 `feat/pod-frame-tower` 上工作（主 checkout 若仍被其他分支佔用，可沿用獨立 clone `/Users/fatboy/city2127-pod`），把業主原話寫入 `## R2 verdict`，並轉為 `## R3 brief`。業主接受後才合併 main。
