@@ -59,3 +59,11 @@ A 位在フジテレビ西南側與アクアシティ內陸草地之間。GLB �
 - Root `npm test`、`npm run build`、`git diff --check` 通過。Chrome 3200 × 1800／DPR 1 日、夜、接駁俯視與主視角截圖均無 page error；原圖、量度腳本及結果在 `~/city2127-evidence/q03-a/r2-final/`。[Gemini／R1／R2 對照](../../artifacts/change-review/drawer-housing/vs-target.jpg)。
 - 本機前景 Chrome、1920 × 1080／DPR 1，NW high 主視角去掉首筆後：日 39.1–41.7 FPS、夜 24.2–35.9 FPS（同時進行截圖，非獨佔測量；R1 無同法基線）。展覽機未測。
 - 下一步：業主審閱本分支 R2 候選；確認前保留在功能分支。
+
+## 街道 R2 紅線修訂
+
+基準 `13f83e15`。依業主俯視圖紅線，移除住宅正面淺灰帶、轉入正面嘅小段步道及沿車道接往大道嘅淺灰步道。兩處相關橫道及正面門檻前短接點一併移除。橫穿草地嘅白色斜線係地形材質繪出，修訂只遮去紅線所指嘅一段。暖米色環道及大道車道接駁沿用 R2。住宅目前無專用鋪面步道接往大道。
+
+同角度俯視可見紅線範圍回復草地。更新後原圖及截圖側錄在 `~/city2127-evidence/q03-a/r2-remove-walks/`。
+
+Root `npm test`、`npm run build`、`git diff --check` 通過。四張固定鏡頭截圖無 page error。

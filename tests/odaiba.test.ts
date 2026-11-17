@@ -205,15 +205,16 @@ const streetKit = streetNetwork(environment);
     const y = accessSurface(x, -302.55, 'automation-hub-landing');
     assert.ok(y !== undefined && Math.abs(y - 3.6) < .025, `NW landing does not meet the plinth at x=${x}`);
   }
-  // Q03-A: the loading loop and the pedestrian route meet the existing avenue and frontage at grade.
-  const drawerRoad = 'drawer-housing-drive', drawerWalk = 'drawer-housing-walk';
+  // Q03-A: the loading loop meets the existing avenue at grade.
+  const drawerRoad = 'drawer-housing-drive';
+  assert.equal(environment.getObjectByName('drawer-housing-walk'), undefined);
+  assert.equal(streetKit.getObjectByName('drawer-housing-crossing'), undefined);
   const avenuePaving = environment.getObjectByName('street-ceramic'), drawerPaving = environment.getObjectByName(drawerRoad);
   assert.ok(avenuePaving instanceof Mesh && drawerPaving instanceof Mesh, 'Q03-A and the avenue have road surfaces');
   assert.equal(drawerPaving.material, avenuePaving.material, 'Q03-A uses the same ceramic finish as the guideway avenue');
   assert.equal(drawerPaving.receiveShadow, avenuePaving.receiveShadow, 'Q03-A and the avenue light the shared finish the same way');
   for (const [x, z, finishA, finishB] of [
     [-125.73, -.39, 'street-ceramic', drawerRoad],
-    [-127.24, 6.68, 'street-footway', drawerWalk],
     [-138, 62, drawerRoad, drawerRoad],
     [-138, 82, drawerRoad, drawerRoad],
     [-104, 100, drawerRoad, drawerRoad],
@@ -223,12 +224,8 @@ const streetKit = streetNetwork(environment);
     [-89.95, 68.5, drawerRoad, drawerRoad],
     [-140.9, 82, drawerRoad, drawerRoad],
     [-135.1, 82, drawerRoad, drawerRoad],
-    [-104, 64, drawerWalk, drawerWalk],
-    [-141, 55, drawerWalk, drawerWalk],
     [-113.03, 71.5, drawerRoad, drawerRoad],
     [-89.95, 71.5, drawerRoad, drawerRoad],
-    [-104, 71.8, drawerWalk, drawerWalk],
-    [-104, 65.45, drawerWalk, drawerRoad],
   ] as const) {
     const a = accessSurface(x, z, finishA), b = accessSurface(x, z, finishB);
     assert.ok(a !== undefined && b !== undefined && Math.abs(a - b) <= .04,

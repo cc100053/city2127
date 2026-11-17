@@ -224,7 +224,7 @@ DEV 天氣圖書館用 `?shot=energy:aoi&orbital=3&hour=12&nopanel` 預覽葵攤
 
 人類本chat選A，後續明確保留服務館並重新選M位置。`main`初始化一次共享`housingPrototype`，選mixed、命名`housing-background`並加入scene；初始化的`update(0)`已停泊A，正式frame不呼叫住宅update，無投票參數、CarrierChange、結果卡或DB接線。Standalone／survey／DEV Meter與scaleLab均有固定背景；隔離DEV housing及energy比較保留各自基準，不重複建立住宅。Production保留固定構造，移除DEV控制import；頁面重建才重建幾何，沿用本專案一次初始化生命週期。
 
-Q03-A「車が引き出しになる住宅」在フジテレビ西南側 A 位，以固定形態載入 `housing-background`。保留透明玻璃分件排序，按材質合批不透明網格。兩個外伸載車艙為靜態。A 位街道候選以 `DRAWER_HOUSING` 共用 GLB 與前場定位；`streetNetwork()` 在導軌大道 ② 的外側留出接駁口，車道與步道繞過分散配置艙體。R2 以 6.2 m 車道取代 T 字候車前場；車道沿兩個外伸艙下方橫過立面，從右側樓隙繞到背面，再由另一側回到正面。接駁和環道共用大道的暖米色陶板。4.7 m 淺灰步道沿車道外側，經標線接大道步道和前立面。業主已決定後續接入投票，具體軸、狀態和觸發另定。[A 位交接](handoffs/drawer-housing-placement.md)
+Q03-A「車が引き出しになる住宅」在フジテレビ西南側 A 位，以固定形態載入 `housing-background`。保留透明玻璃分件排序，按材質合批不透明網格。兩個外伸載車艙為靜態。A 位街道候選以 `DRAWER_HOUSING` 共用 GLB 與前場定位；`streetNetwork()` 在導軌大道 ② 的外側留出接駁口，車道繞過分散配置艙體。R2 以 6.2 m 車道取代 T 字候車前場；車道沿兩個外伸艙下方橫過立面，從右側樓隙繞到背面，再由另一側回到正面。接駁和環道共用大道的暖米色陶板。按業主標記移除住宅前方及支路旁步道、兩處橫道標線，並在地形材質內取消橫過草地的斜線。業主已決定後續接入投票，具體軸、狀態和觸發另定。[A 位交接](handoffs/drawer-housing-placement.md)
 
 原M `(-135,-175)`在低automation時穿過既有staffed pavilion的20m樓板；按人類決定將同一M構造平移至`(-165,-165)`（31.62m），服務館、P/U、數量、輪廓與材質保持。原M庭院留孔保留。U90秒循環只由`devHousing`推進；所有正式snapshot／live／Undo／reset／reconnect與reduced motion都不碰住宅。新證據與實測限制見[本批報告](../artifacts/housing-background/README.md)，舊H0–H3原圖／性能只作當時紀錄。
 

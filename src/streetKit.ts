@@ -314,10 +314,10 @@ function automationHubAccess(avenue: Curve, environment: T.Object3D) {
   return mesh(guides, seamLight, 'automation-hub-guide-lines', false);
 }
 
-/** A continuous loading street around the housing, with a separate frontage walk. */
+/** A continuous loading street around the housing. */
 function drawerHousingAccess(avenue: Curve, environment: T.Object3D) {
   const { x, z, avenue: distance } = DRAWER_HOUSING;
-  const { p, n, t } = frame(avenue, distance, avenue.getLength());
+  const { p, n } = frame(avenue, distance, avenue.getLength());
   const mouth = p.clone().addScaledVector(n, 2.8).setY(.237);
   const path = (...points: T.Vector3[]) => new T.CatmullRomCurve3(points);
   const at = (dx: number, y: number, dz: number) => new T.Vector3(x + dx, y, z + dz);
@@ -339,22 +339,8 @@ function drawerHousingAccess(avenue: Curve, environment: T.Object3D) {
   // Keep the verified approach west of the concentration pod at (-103, 17).
   const drive = path(mouth, at(-20, .23, -75), at(-20, .20, -64), at(-18, .15, -50),
     at(-23, .085, -37), at(-31, .045, -27), at(-34, .034, -17), at(-34, .034, -2));
-  const walk = path(mouth.clone().addScaledVector(t, 5.2).addScaledVector(n, 5),
-    at(-27, .22, -64), at(-27, .15, -48), at(-30, .085, -37), at(-37, .05, -26));
-  const walkIn = path(at(-37, .05, -26), at(-31, .047, -24), at(-22, .043, -23), at(-17, .041, -16));
-  const [front, corner] = loop;
-  const walkCornerEnd = 5.5;
-  const entry = new T.LineCurve3(at(0, .041, -9.7), at(0, .041, -8.95));
-  const strip = (c: Curve, a: number, b: number, y = 0, depth = 0, tile: [number, number] = [2.4, 2.4]) =>
-    band(c, 0, c.getLength(), a, b, y, depth, tile);
-  const frontagePaving = footway.clone();
-  frontagePaving.color.set('#e4e9ed');
-  const panels = (c: Curve) => strip(c, -3.1, 3.1, 0, .45, [3, STREET_KIT.half]);
-  environment.add(
-    mesh([panels(drive), ...loop.map(panels)], avenueCeramic, 'drawer-housing-drive', false),
-    mesh([strip(walk, -1.55, 1.55, 0, .45), strip(walkIn, -1.55, 1.55),
-      strip(front, -7.7, -3.0, .007, .4),
-      band(corner, 0, walkCornerEnd, -7.7, -3.0, .007, .4, [2.4, 2.4]), strip(entry, -1.6, 1.6, 0, .4)], frontagePaving, 'drawer-housing-walk'));
+  const panels = (c: Curve) => band(c, 0, c.getLength(), -3.1, 3.1, 0, .45, [3, STREET_KIT.half]);
+  environment.add(mesh([panels(drive), ...loop.map(panels)], avenueCeramic, 'drawer-housing-drive', false));
 
   const approach = drive.getLength();
   const lit = [[drive, .8, approach - 1], ...loop.map(c => [c, 0, c.getLength()] as const)] as const;
@@ -367,17 +353,12 @@ function drawerHousingAccess(avenue: Curve, environment: T.Object3D) {
   const rim = (c: Curve, o: number, start = 0, end = c.getLength()) => band(c, start, end, o - .075, o + .075, .009);
   const rims = [
     rim(drive, -2.99, .8, approach), rim(drive, 2.99, .8, approach - 17),
-    ...loop.flatMap((c, i) => i === 1 ? [rim(c, 2.99), rim(c, -2.99, 0, walkCornerEnd)] : [rim(c, -2.99), rim(c, 2.99)]),
-    rim(front, -7.58), rim(corner, -7.58, 0, walkCornerEnd),
+    ...loop.flatMap((c, i) => i === 1 ? [rim(c, 2.99), rim(c, -2.99, 0, 5.5)] : [rim(c, -2.99), rim(c, 2.99)]),
   ];
   const root = new T.Group(); root.name = 'drawer-housing-frontage';
   const beds = [at(-11, .04, -25), at(-4, .04, -25), at(13, .04, -24)].map(p =>
     planter({ p, t: new T.Vector3(1, 0, 0), n: new T.Vector3(0, 0, -1) }, 0, 5.5, 2.4, 'broadleaf'));
-  const crossingPanels = [-1.15, -.58, 0, .58, 1.15].flatMap(o => [
-    strip(new T.LineCurve3(at(o - .17, .055, -15.55), at(o + .17, .055, -15.55)), -6.05, 0),
-    strip(new T.LineCurve3(at(-34.0, .061, -24.5 + o - .16), at(-34.0, .061, -24.5 + o + .16)), 0, 4.4),
-  ]);
-  root.add(mesh(crossingPanels, crossing, 'drawer-housing-crossing', false), mesh(lines, seamLight, 'drawer-housing-guides', false),
+  root.add(mesh(lines, seamLight, 'drawer-housing-guides', false),
     mesh(rims, edging, 'drawer-housing-edging', false), mesh(pools, lineGlow, 'drawer-housing-line-glow', false),
     mesh(beds.map(b => b.wall), trim, 'drawer-housing-planters'), mesh(beds.map(b => b.soil), leaf, 'drawer-housing-beds'));
   plantBeds(root, beds.map(b => b.bed));
