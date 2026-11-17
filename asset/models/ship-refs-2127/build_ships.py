@@ -1,7 +1,8 @@
-"""ship-refs-2127: six 2127 harbour vessels modelled from the owner's reference images in references/*.png (draft, not placed).
+"""ship-refs-2127: 2127 harbour vessels modelled from the owner's reference images in references/*.png (draft, not placed):
+six reference ships plus module-carrier, a derivative of cargo-ship for the Q08-C tower.
 
 blender -b --factory-startup --python-exit-code 1 -P build_ships.py -- [sail-yacht] [robo-fireboat] [cargo-ship]
-    [rescue-patrol] [fireboat] [harbour-patrol]          (no names = all six)
+    [rescue-patrol] [fireboat] [harbour-patrol] [module-carrier]          (no names = all)
 Each ship writes, next to this file:
   <name>.blend  editable parts (hull, deckhouse, glass, rails, equipment ...) under the empty ROOT_<NAME>
   <name>.glb    glTF binary of the same parts (Y-up, modifiers applied)
@@ -36,6 +37,8 @@ REFS = {  # owner's reference image for each ship (references/)
     "rescue-patrol": "お台場の未来型救難パトロール艇.png",
     "fireboat": "お台場の未来型消防艇.png",
     "harbour-patrol": "お台場の未来型ハーバーパトロール艇.png",
+    # crop of p.9 of 2127_施設画像27枚_想像力優先版_一覧.pdf (the barge bottom right carries the room)
+    "module-carrier": "Q08-C_船で届く部屋を差し込む摩天楼.png",
 }
 
 # role -> (rgb, roughness, metallic[, alpha, emission, double-sided]); each ship overrides what differs
@@ -512,21 +515,22 @@ def robo_fireboat():
             bollard(f"robo_bollard{f:+.0f}{s:+d}", P(s * x, f, 3.0))
 
 
-def cargo_ship():
-    """Grey faceted coaster: bow block carrying the bridge and mast, four open side bays with cargo pods under a
-    continuous hatch deck, articulated crane with a spreader gripper on a raised stern block. 76 x 12.9 m, deck 6.4 m:
-    long and low. Round 2: the bow is carved from a full block by a few large planes (an inward-leaning upper facet,
-    a lower facet raking back to the waterline, a flat stem face); their knuckle runs from the stem down aft into the
-    first bay frame, and a sloped dark band under the bays carries the fold on to the stern. The bridge is cut by the
-    same upper planes, so its walls and wrap-around window band continue the bow. Bays have sloped frames, the crane
-    stands on a stern block cut by matching quarter facets."""
-    mats(ship_hull=((.62, .64, .66), .3, .75), ship_hull2=((.20, .21, .23), .4, .6), ship_deck=((.40, .41, .42), .6, .4),
-         ship_cargo=((.66, .68, .70), .35, .6), ship_glass=((.02, .05, .06), .6, 0))
-    D, B0, B1 = 6.4, 2.3, 5.7  # deck, bay floor, bay ceiling (deck slab above)
+CARGO_MATS = dict(ship_hull=((.62, .64, .66), .3, .75), ship_hull2=((.20, .21, .23), .4, .6),
+                  ship_deck=((.40, .41, .42), .6, .4), ship_cargo=((.66, .68, .70), .35, .6),
+                  ship_glass=((.02, .05, .06), .6, 0))
+CARGO_BAYS = [(4.95, 15.0), (-6.7, 3.35), (-18.35, -8.3), (-30.0, -19.95)]  # side bays, f aft .. fore
+
+
+def cargo_hull(tag, D, B0, B1, bays):
+    """The cargo ship's hull (round 2): a full block carved by large planes, side bays with sloped frames, light
+    strips. Returns the hull and the UPPER / QUARTER planes the bridge and the stern block are cut by.
+    The bow is carved from a full block by a few large planes (an inward-leaning upper facet, a lower facet raking
+    back to the waterline, a flat stem face); their knuckle runs from the stem down aft into the first bay frame, and a
+    sloped dark band under the bays carries the fold on to the stern."""
     # full block before faceting: the planes below shape the bow, the rows only have to reach past them
     rows = [(-3.0, 1.6, 26.0, -33.0, 3.0, 13.), (-1.8, 5.0, 30.0, -35.2, 4.8, 14.), (0., 5.9, 32.5, -35.8, 5.6, 14.),
             (2.0, 6.35, 35.5, -36.6, 5.9, 14.), (4.2, 6.5, 38.2, -37.7, 6.1, 13.), (D, 6.4, 38.6, -38.0, 6.0, 12.)]
-    body = hull("cargo_hull", rows, nb=4, na=8, pw=1.6)
+    body = hull(f"{tag}_hull", rows, nb=4, na=8, pw=1.6)
     K1, K2 = (1.6, 37.6, 4.2), (6.7, 14.0, 3.6)  # bow knuckle: stem to the first bay frame
     UPPER = mirror3((.5, 38.4, D), K1, K2)  # leans inboard toward the deck; the bridge walls lie in it too
     LOWER = mirror3(K1, K2, (.25, 32.0, -.6))  # rakes back and in to the waterline stem
@@ -536,9 +540,8 @@ def cargo_ship():
     facet(body, UPPER + LOWER + STEM + BAND + QUARTER)
     crease = ((12.0, 1.7), (28.0, -.3))  # side-view line: the dark lower hull rises aft to the band
     cut(body, [h_plane(1.7), fh_plane(*crease)])
-    BAYS = [(4.95, 15.0), (-6.7, 3.35), (-18.35, -8.3), (-30.0, -19.95)]
     V.boolean(body, [bay_cutter(f"bay{k}", a, b, B0, B1, .9, .5, 5.5, 8.0, 1.0, 1.6 if k == 0 else 0.)
-                     for k, (a, b) in enumerate(BAYS)])
+                     for k, (a, b) in enumerate(bays)])
     V.finish(body, None)  # boolean() re-smooths; keep the faceted panels
 
     def tone(f, h, n):
@@ -547,8 +550,72 @@ def cargo_ship():
         return "ship_hull2" if h < 1.7 and above(f, h, *crease) < 0 else None
     paint(body, lambda x, f, h, n, cur: None if cur != "ship_hull" else
           ("ship_deck" if n.z > .7 and h > D - .05 else "ship_bottom" if h < 0 else tone(f, h, n)))
+    for s in (-1, 1):
+        panel(f"{tag}_strip_bow{s:+d}", body, 29.0, 3.7, 8.0, .16, "ship_light", s)
+        panel(f"{tag}_strip_mid{s:+d}", body, -2.0, 1.0, 2.0, .14, "ship_light", s)
+        panel(f"{tag}_strip_aft{s:+d}", body, -24.0, 1.0, 2.0, .14, "ship_light", s)
+        panel(f"{tag}_strip_stern{s:+d}", body, -34.0, 3.6, 2.4, .12, "ship_light", s)
+    return body, UPPER, QUARTER
+
+
+def cargo_bridge(tag, D, upper):
+    """Low bridge: a block cut by the bow's upper planes (its walls continue the bow facets), a chevron front and a
+    raked back; a dark window band wraps the whole front and both sides. Sensor deck and mast on the roof."""
+    ht = D + 2.7
+    bridge = loft(f"{tag}_bridge", [(D - .3, plan(7.0, 30.0, 16.5, .05, .05, 1)),
+                                    (ht, plan(7.0, 30.0, 16.5, .05, .05, 1))], "ship_hull", sharp=None)
+    keep = (0., 22., D + 1.)
+    facet(bridge, upper + mirror3((0., 29.0, D), (4.5, 24.0, D), (0., 27.4, ht), keep)
+          + [plane3((-1., 16.5, D), (1., 16.5, D), (0., 17.4, ht), keep)])
+    cut(bridge, [h_plane(D + .55), h_plane(D + 2.1)])
+    paint(bridge, lambda x, f, h, n, cur: "ship_glass" if D + .55 < h < D + 2.1 and abs(n.z) < .6 else None)
+    house(f"{tag}_bridge_top", 18.6, 24.6, 2.2, ht, ht + .6, "ship_hull2", rake_f=.6, rake_r=.2, inset=.3)
+    mast(f"{tag}_mast", P(0, 20.6, ht + .6), 4.4, "ship_trim", "ship_trim", yard=2.4)
+    for s in (-1, 1):
+        cylinder(f"{tag}_beacon{s:+d}", P(s * 1.6, 23.4, ht + .17), .24, .35, UP, "ship_light", 16)
+
+
+def stern_crane(tag, D, quarter, st, hf, j2h, tiph):
+    """Stern block cut by the quarter planes and raked fore and aft, hexagonal crane pedestal out of it, raked
+    slewing house, steep main boom folding at the knuckle (f -30.6, height j2h) into a jib whose tip is over f = hf at
+    tiph, luffing and knuckle rams. Returns the jib tip and the parts that slew (everything above the pedestal)."""
+    block = loft(f"{tag}_stern_block", [(D - .3, plan(7.0, -26.0, -39.0, .05, .05, 1)),
+                                        (st, plan(7.0, -26.0, -39.0, .05, .05, 1))], "ship_hull", sharp=None)
+    keep = (0., -33., D + .7)
+    facet(block, quarter + mirror3((6.4, -30., D), (6.4, -36., D), (5.0, -33., st), keep)
+          + [plane3((-1., -26.5, D), (1., -26.5, D), (0., -30.0, st), keep),
+             plane3((-1., -38.0, D), (1., -38.0, D), (0., -37.4, st), keep)])
+    paint(block, lambda x, f, h, n, cur: "ship_deck" if n.z > .95 else None)
+    base = P(0, -33.0, st)
+    cylinder(f"{tag}_crane_pedestal", base + UP * .5, 2.5, 1.0, UP, "ship_hull2", 6, r2=2.0)
+    n0 = len(V.OBJS)
+    cylinder(f"{tag}_crane_ring", base + UP * 1.05, 1.95, .12, UP, "ship_light", 24)
+    house(f"{tag}_crane_house", -36.0, -30.6, 2.2, st + 1.1, st + 3.2, "ship_hull2", rake_f=1.2, rake_r=.3, inset=.4)
+    rbox(f"{tag}_crane_light", P(2.0, -33.6, st + 2.1), (.04, 2.4, .1), 0, "ship_light")
+    j1, j2, tip = P(0, -34.4, st + 2.6), P(0, -30.6, j2h), P(0, hf, tiph)
+    beam(f"{tag}_boom1", j1, j2, 1.6, 1.7, "ship_trim", .3)
+    beam(f"{tag}_boom2", j2, tip, 1.1, 1.2, "ship_trim", .22)
+    beam(f"{tag}_boom_light", j2 + P(.52, -1.0, -.1), tip + P(.52, 0, -.1), .05, .1, "ship_light", 0)
+    beam(f"{tag}_boom_stripe", j2 + P(0, -1.0, .5), j2 + P(0, -4.5, .45), .7, .06, "ship_safety", 0)
+    for k, p in enumerate((j1, j2, tip)):
+        cylinder(f"{tag}_crane_joint{k}", p, .65 - k * .12, 1.5, (1, 0, 0), "ship_metal", 8)
+    for s in (-1, 1):  # luffing rams from the house front to the main boom, knuckle ram above it
+        tube(f"{tag}_crane_ram{s:+d}", [P(s * .6, -30.9, st + 1.5), j1.lerp(j2, .6) + P(s * .6, 0, 0)], .22, "ship_metal")
+    tube(f"{tag}_crane_knuckle_ram", [j1.lerp(j2, .55) + P(0, 0, .7), j2 + P(0, -2.6, .6)], .16, "ship_metal")
+    return tip, V.OBJS[n0:]
+
+
+def cargo_ship():
+    """Grey faceted coaster: bow block carrying the bridge and mast, four open side bays with cargo pods under a
+    continuous hatch deck, articulated crane with a spreader gripper on a raised stern block. 76 x 12.9 m, deck 6.4 m:
+    long and low. Round 2: the hull is carved by large planes (cargo_hull); the bridge is cut by the same upper planes,
+    so its walls and wrap-around window band continue the bow. Bays have sloped frames, the crane stands on a stern
+    block cut by matching quarter facets."""
+    mats(**CARGO_MATS)
+    D, B0, B1 = 6.4, 2.3, 5.7  # deck, bay floor, bay ceiling (deck slab above)
+    body, upper, quarter = cargo_hull("cargo", D, B0, B1, CARGO_BAYS)
     pc, ph = (B0 + B1) / 2 - .05, B1 - B0 - .35  # pod centre height and pod height
-    for k, (a, b) in enumerate(BAYS):
+    for k, (a, b) in enumerate(CARGO_BAYS):
         c, ln = (a + b) / 2 - (.8 if k == 0 else 0.), b - a - (3.0 if k == 0 else 1.4)
         rbox(f"cargo_pod{k}", P(0, c, pc), (10.4, ln, ph), .4, "ship_cargo", segs=2)
         for s in (-1, 1):
@@ -563,60 +630,235 @@ def cargo_ship():
             rbox(f"cargo_track{k}{s:+d}", P(s * 3.5, c, B0 + .02), (.3, b - a - .4, .04), 0, "ship_safety")
     for k in range(12):
         rbox(f"cargo_hatch_seam{k}", P(0, -26.0 + k * 3.6, D + .01), (11.5, .1, .02), 0, "ship_trim")
-    for s in (-1, 1):
-        panel(f"cargo_strip_bow{s:+d}", body, 29.0, 3.7, 8.0, .16, "ship_light", s)
-        panel(f"cargo_strip_mid{s:+d}", body, -2.0, 1.0, 2.0, .14, "ship_light", s)
-        panel(f"cargo_strip_aft{s:+d}", body, -24.0, 1.0, 2.0, .14, "ship_light", s)
-        panel(f"cargo_strip_stern{s:+d}", body, -34.0, 3.6, 2.4, .12, "ship_light", s)
-
-    # low bridge: a block cut by the bow's upper planes (its walls continue the bow facets), a chevron front and a
-    # raked back; a dark window band wraps the whole front and both sides
-    ht = D + 2.7
-    bridge = loft("cargo_bridge", [(D - .3, plan(7.0, 30.0, 16.5, .05, .05, 1)), (ht, plan(7.0, 30.0, 16.5, .05, .05, 1))],
-                  "ship_hull", sharp=None)
-    keep = (0., 22., D + 1.)
-    facet(bridge, UPPER + mirror3((0., 29.0, D), (4.5, 24.0, D), (0., 27.4, ht), keep)
-          + [plane3((-1., 16.5, D), (1., 16.5, D), (0., 17.4, ht), keep)])
-    cut(bridge, [h_plane(D + .55), h_plane(D + 2.1)])
-    paint(bridge, lambda x, f, h, n, cur: "ship_glass" if D + .55 < h < D + 2.1 and abs(n.z) < .6 else None)
-    house("cargo_bridge_top", 18.6, 24.6, 2.2, ht, ht + .6, "ship_hull2", rake_f=.6, rake_r=.2, inset=.3)
-    mast("cargo_mast", P(0, 20.6, ht + .6), 4.4, "ship_trim", "ship_trim", yard=2.4)
-    for s in (-1, 1):
-        cylinder(f"cargo_beacon{s:+d}", P(s * 1.6, 23.4, ht + .17), .24, .35, UP, "ship_light", 16)
-
-    # stern block: the crane deck, cut by the quarter planes and raked fore and aft so it reads as part of the hull
-    st = D + 1.8
-    block = loft("cargo_stern_block", [(D - .3, plan(7.0, -26.0, -39.0, .05, .05, 1)),
-                                       (st, plan(7.0, -26.0, -39.0, .05, .05, 1))], "ship_hull", sharp=None)
-    keep = (0., -33., D + .7)
-    facet(block, QUARTER + mirror3((6.4, -30., D), (6.4, -36., D), (5.0, -33., st), keep)
-          + [plane3((-1., -26.5, D), (1., -26.5, D), (0., -30.0, st), keep),
-             plane3((-1., -38.0, D), (1., -38.0, D), (0., -37.4, st), keep)])
-    paint(block, lambda x, f, h, n, cur: "ship_deck" if n.z > .95 else None)
-
-    # crane: hexagonal pedestal out of the block, raked slewing house, steep main boom folding at the knuckle into a
-    # long jib over the second bay, luffing and knuckle rams, cable and spreader gripper
-    base, hf = P(0, -33.0, st), -8.0  # crane base on the block, hook position f
-    cylinder("cargo_crane_pedestal", base + UP * .5, 2.5, 1.0, UP, "ship_hull2", 6, r2=2.0)
-    cylinder("cargo_crane_ring", base + UP * 1.05, 1.95, .12, UP, "ship_light", 24)
-    house("cargo_crane_house", -36.0, -30.6, 2.2, st + 1.1, st + 3.2, "ship_hull2", rake_f=1.2, rake_r=.3, inset=.4)
-    rbox("cargo_crane_light", P(2.0, -33.6, st + 2.1), (.04, 2.4, .1), 0, "ship_light")
-    j1, j2, tip = P(0, -34.4, st + 2.6), P(0, -30.6, D + 7.8), P(0, hf, D + 7.2)
-    beam("cargo_boom1", j1, j2, 1.6, 1.7, "ship_trim", .3)
-    beam("cargo_boom2", j2, tip, 1.1, 1.2, "ship_trim", .22)
-    beam("cargo_boom_light", j2 + P(.52, -1.0, -.1), tip + P(.52, 0, -.1), .05, .1, "ship_light", 0)
-    beam("cargo_boom_stripe", j2 + P(0, -1.0, .5), j2 + P(0, -4.5, .45), .7, .06, "ship_safety", 0)
-    for k, p in enumerate((j1, j2, tip)):
-        cylinder(f"cargo_crane_joint{k}", p, .65 - k * .12, 1.5, (1, 0, 0), "ship_metal", 8)
-    for s in (-1, 1):  # luffing rams from the house front to the main boom, knuckle ram above it
-        tube(f"cargo_crane_ram{s:+d}", [P(s * .6, -30.9, st + 1.5), j1.lerp(j2, .6) + P(s * .6, 0, 0)], .22, "ship_metal")
-    tube("cargo_crane_knuckle_ram", [j1.lerp(j2, .55) + P(0, 0, .7), j2 + P(0, -2.6, .6)], .16, "ship_metal")
+    cargo_bridge("cargo", D, upper)
+    hf = -8.0  # hook position f: over the second bay
+    tip, _ = stern_crane("cargo", D, quarter, D + 1.8, hf, D + 7.8, D + 7.2)
     hook = tip.z - 3.0
     tube("cargo_crane_cable", [tip + P(0, 0, -.4), P(0, hf, hook + .2)], .04, "ship_trim", res=1)
     rbox("cargo_spreader", P(0, hf, hook), (3.4, .45, .35), .06, "ship_trim")
     for s in (-1, 1):
         beam(f"cargo_claw{s:+d}", P(s * 1.5, hf, hook - .1), P(s * 1.2, hf, hook - 1.1), .25, .3, "ship_trim", .03)
         beam(f"cargo_claw_tip{s:+d}", P(s * 1.2, hf, hook - 1.1), P(s * .8, hf, hook - 1.3), .25, .3, "ship_metal", .03)
+
+
+# ---------------------------------------------------------------- module carrier (Q08-C)
+
+GROUPS = []  # empties of the ship being built (movable sub-assemblies)
+
+
+def group(name, loc, objs, parent=None):
+    """Empty at loc owning objs, so a sub-assembly moves as one node (also in the GLB). Parents sit at their world
+    location with no rotation, so the inverses are plain translations."""
+    e = bpy.data.objects.new(name, None)
+    e.empty_display_size = 1.5
+    e.location = loc
+    bpy.context.scene.collection.objects.link(e)
+    if parent:
+        e.parent, e.matrix_parent_inverse = parent, Matrix.Translation(-parent.location)
+    for o in objs:
+        o.parent, o.matrix_parent_inverse = e, Matrix.Translation(-loc)
+    GROUPS.append(e)
+    return e
+
+
+def hang(ob, top):
+    """Move a vertical cable's origin to its top end, so scaling Z lengthens it downward."""
+    ob.data.transform(Matrix.Translation(-top))
+    ob.location = top
+    return ob
+
+
+def arch_cutter(name, along, u, w, h0, h1, d0, d1, role, n=8, keep=False, o=(0., 0., 0.)):
+    """Round-headed opening (u centre, width w, sill h0, crown h1) extruded along X (u = f) or F (u = x) from d0 to
+    d1, offset by o = (x, f, h): window / door cutter, or a thin glass pane when keep."""
+    r, top = w / 2, h1 - w / 2
+    prof = [(u - r, h0), (u + r, h0)] + [(u + r * math.cos(math.pi * i / n), top + r * math.sin(math.pi * i / n))
+                                         for i in range(n + 1)]
+    pt = ((lambda d, a, h: P(o[0] + d, o[1] + a, o[2] + h)) if along == "x" else
+          (lambda d, a, h: P(o[0] + a, o[1] + d, o[2] + h)))
+    bm = bmesh.new()
+    rings = [[bm.verts.new(pt(d, a, h)) for a, h in prof] for d in (d0, d1)]
+    m = len(prof)
+    for i in range(m):
+        bm.faces.new((rings[0][i], rings[0][(i + 1) % m], rings[1][(i + 1) % m], rings[1][i]))
+    bm.faces.new(rings[0])
+    bm.faces.new(rings[1][::-1])
+    return V.emit(name, bm, role, None if not keep else 30, keep=keep)
+
+
+def room_module(tag, c, W=7.2, L=9.6, H=4.6):
+    """Plug-in room for the Q08-C tower, base centre c (on its four corner castings). A silver structural cage (base
+    frame, corner posts, top ring with four lifting lugs, bottom corner castings that drop onto the ship's cradle
+    cones and the tower's cell seats) holds a white rounded shell: three arched windows a side, a glazed fore end,
+    the entrance door with canopy, step and the utility coupler panel at the aft end, a lit interior (floor, ceiling
+    light, tables, sofa) and a roof garden. W across, L fore-aft, H to the top of the cage. Returns its parts."""
+    n0 = len(V.OBJS)
+    x0, f0, z0 = c.x, -c.y, c.z
+    Q = lambda x, f, h: P(x0 + x, f0 + f, z0 + h)  # noqa: E731  module-local position
+    O = (x0, f0, z0)
+    sb, st = .35, H - .3  # shell bottom / top
+    Ws, Ls, Hs = W - .5, L - .5, st - sb
+    shell = rbox(f"{tag}_shell", Q(0, 0, (sb + st) / 2), (Ws, Ls, Hs), 1.0, "ship_white", segs=4)
+    cutters = [rbox(f"{tag}_void", Q(0, 0, (sb + st) / 2), (Ws - .5, Ls - .5, Hs - .5), .8, "ship_white", segs=2,
+                    keep=False)]
+    WIN = (-2.6, 0., 2.6)
+    for s in (-1, 1):
+        for k, f in enumerate(WIN):
+            cutters.append(arch_cutter(f"{tag}_win_cut{s:+d}{k}", "x", f, 1.9, sb + .6, sb + 3.0, s * (Ws / 2 - .6),
+                                       s * (Ws / 2 + .4), "ship_white", o=O))
+    cutters.append(arch_cutter(f"{tag}_front_cut", "f", 0., 4.2, sb + .35, sb + 3.0, Ls / 2 - .6, Ls / 2 + .4,
+                               "ship_white", o=O))
+    cutters.append(arch_cutter(f"{tag}_door_cut", "f", -1.2, 1.5, sb + .15, sb + 2.75, -Ls / 2 - .4, -Ls / 2 + .6,
+                               "ship_white", o=O))
+    for k, x in enumerate((1.3, 2.4)):
+        cutters.append(cylinder(f"{tag}_porthole_cut{k}", Q(x, -Ls / 2, sb + 2.0), .38, 1.6, (0, 1, 0), "ship_white",
+                                16, keep=False))
+    V.boolean(shell, cutters)
+    for s in (-1, 1):
+        for k, f in enumerate(WIN):
+            arch_cutter(f"{tag}_win{s:+d}{k}", "x", f, 1.9, sb + .6, sb + 3.0, s * (Ws / 2 - .32), s * (Ws / 2 - .26),
+                        "ship_roomglass", keep=True, o=O)
+    arch_cutter(f"{tag}_front_glass", "f", 0., 4.2, sb + .35, sb + 3.0, Ls / 2 - .3, Ls / 2 - .24, "ship_roomglass",
+                keep=True, o=O)
+    for x in (-1.15, 0., 1.15):  # mullions of the glazed end
+        rbox(f"{tag}_mullion{x:+.0f}", Q(x * 1.0, Ls / 2 - .2, sb + 1.6), (.08, .1, 2.5), .02, "ship_frame", segs=1)
+    rbox(f"{tag}_transom", Q(0, Ls / 2 - .2, sb + 2.2), (4.0, .1, .08), .02, "ship_frame", segs=1)
+    arch_cutter(f"{tag}_door", "f", -1.2, 1.5, sb + .15, sb + 2.75, -Ls / 2 + .3, -Ls / 2 + .36, "ship_doorglass",
+                keep=True, o=O)
+    rbox(f"{tag}_door_handle", Q(-.7, -Ls / 2 + .2, sb + 1.2), (.06, .08, .5), .02, "ship_frame", segs=1)
+    for k, x in enumerate((1.3, 2.4)):
+        cylinder(f"{tag}_porthole{k}", Q(x, -Ls / 2 + .3, sb + 2.0), .38, .06, (0, 1, 0), "ship_roomglass", 16)
+    rbox(f"{tag}_canopy", Q(-1.2, -Ls / 2 - .35, sb + 3.0), (2.4, .9, .14), .06, "ship_white", segs=2)
+    rbox(f"{tag}_step", Q(-1.2, -Ls / 2 - .45, .22), (2.0, .9, .14), .04, "ship_frame", segs=1)
+    rbox(f"{tag}_coupler", Q(1.6, -Ls / 2 - .08, sb + .9), (1.5, .2, .8), .06, "ship_trim", segs=1)
+    for k in range(3):
+        cylinder(f"{tag}_socket{k}", Q(1.15 + .45 * k, -Ls / 2 - .2, sb + .9), .12, .1, (0, 1, 0), "ship_safety", 12)
+    # interior: floor, warm ceiling light, two tables, a sofa, a plant
+    rbox(f"{tag}_floor", Q(0, 0, sb + .32), (Ws - .7, Ls - .7, .12), .1, "ship_wood", segs=1)
+    rbox(f"{tag}_ceiling_light", Q(0, 0, st - .5), (Ws - 2.4, Ls - 2.6, .06), .03, "ship_warm", segs=1)
+    for k, f in enumerate((-1.6, 1.8)):
+        cylinder(f"{tag}_table{k}", Q(.4, f, sb + .75), .6, .08, UP, "ship_wood", 20)
+        cylinder(f"{tag}_table_leg{k}", Q(.4, f, sb + .55), .08, .4, UP, "ship_frame", 8)
+    rbox(f"{tag}_sofa", Q(-1.9, .2, sb + .65), (.9, 3.0, .6), .2, "ship_blossom", segs=2)
+    ellipsoid(f"{tag}_plant", Q(2.2, 3.2, sb + 1.0), (.4, .4, .6), "ship_green", 10, 6)
+    # cage: base frame, corner posts, top ring, lugs, corner castings
+    for s in (-1, 1):
+        rbox(f"{tag}_base_side{s:+d}", Q(s * (W / 2 - .18), 0, .2), (.36, L, .4), .04, "ship_frame", segs=1)
+        rbox(f"{tag}_base_end{s:+d}", Q(0, s * (L / 2 - .18), .2), (W, .36, .4), .04, "ship_frame", segs=1)
+        rbox(f"{tag}_top_side{s:+d}", Q(s * (W / 2 - .18), 0, H - .18), (.36, L, .36), .04, "ship_frame", segs=1)
+        rbox(f"{tag}_top_end{s:+d}", Q(0, s * (L / 2 - .18), H - .18), (W, .36, .36), .04, "ship_frame", segs=1)
+        for e in (-1, 1):
+            cx, cf = s * (W / 2 - .18), e * (L / 2 - .18)
+            rbox(f"{tag}_post{s:+d}{e:+d}", Q(cx, cf, H / 2), (.36, .36, H), .05, "ship_frame", segs=1)
+            rbox(f"{tag}_casting{s:+d}{e:+d}", Q(cx, cf, .12), (.48, .48, .26), .03, "ship_trim", segs=1)
+            rbox(f"{tag}_lug{s:+d}{e:+d}", Q(cx, cf, H + .1), (.3, .44, .22), .05, "ship_safety", segs=1)
+    # roof garden in a planter on the shell
+    rbox(f"{tag}_planter", Q(0, 0, st + .05), (Ws - 1.6, Ls - 1.8, .4), .15, "ship_white", segs=2)
+    rbox(f"{tag}_soil", Q(0, 0, st + .26), (Ws - 1.9, Ls - 2.1, .04), .02, "ship_green", segs=1)
+    for k, (x, f, r) in enumerate(((-1.2, -2.2, .6), (1.3, -1.0, .5), (-.8, 2.4, .55), (1.4, 2.6, .45))):
+        ellipsoid(f"{tag}_shrub{k}", Q(x, f, st + .45), (r, r, r * .7), "ship_green", 12, 8)
+    cylinder(f"{tag}_tree_trunk", Q(.2, .5, st + .7), .1, .9, UP, "ship_wood", 8)
+    ellipsoid(f"{tag}_tree_crown", Q(.2, .5, st + 1.3), (1.0, 1.0, .6), "ship_blossom", 14, 8)
+    return V.OBJS[n0:]
+
+
+def cradle(tag, fc, D, W, L, loaded):
+    """Berth for one room on the deck (centre f = fc): low frame on the skid rails, four seat pads with twist-lock
+    cones under the module's corner castings, four cell-guide posts with flared tops that steer a lowered module onto
+    the cones, painted outline. A loaded berth adds side clamps on the base frame and the shore-power umbilical."""
+    zt = D + .45  # seat top = module base
+    for s in (-1, 1):
+        rbox(f"{tag}_frame_side{s:+d}", P(s * (W / 2 + .1), fc, D + .2), (.4, L + .8, .4), .04, "ship_trim", segs=1)
+        rbox(f"{tag}_frame_end{s:+d}", P(0, fc + s * (L / 2 + .2), D + .2), (W + .6, .4, .4), .04, "ship_trim", segs=1)
+        rbox(f"{tag}_edge{s:+d}", P(s * (W / 2 + .4), fc, D + .02), (.12, L + 1.4, .03), 0, "ship_safety", segs=1)
+        rbox(f"{tag}_edge_end{s:+d}", P(0, fc + s * (L / 2 + .7), D + .02), (W + .9, .12, .03), 0, "ship_safety", segs=1)
+        for e in (-1, 1):
+            cx, cf = s * (W / 2 - .18), fc + e * (L / 2 - .18)
+            rbox(f"{tag}_seat{s:+d}{e:+d}", P(cx, cf, D + .22), (.7, .7, .45), .05, "ship_metal", segs=1)
+            if not loaded:
+                cylinder(f"{tag}_cone{s:+d}{e:+d}", P(cx, cf, zt + .14), .2, .28, UP, "ship_safety", 12, r2=.06)
+            g = P(s * (W / 2 + .3), fc + e * (L / 2 + .3), D)
+            rbox(f"{tag}_guide{s:+d}{e:+d}", g + UP * 1.1, (.3, .3, 2.2), .04, "ship_metal", segs=1)
+            beam(f"{tag}_guide_flare{s:+d}{e:+d}", g + UP * 2.1, g + UP * 2.6 + P(s * .35, e * .35, 0), .3, .3,
+                 "ship_safety", .04)
+        if loaded:
+            for e in (-1, 1):  # hydraulic side clamps pressing the module's base frame
+                a = P(s * (W / 2 + .9), fc + e * 2.4, D)
+                rbox(f"{tag}_clamp_foot{s:+d}{e:+d}", a + UP * .25, (.6, .8, .5), .05, "ship_safety", segs=1)
+                tube(f"{tag}_clamp_ram{s:+d}{e:+d}", [a + UP * .45, P(s * (W / 2 + .02), fc + e * 2.4, zt + .25)], .1,
+                     "ship_metal")
+    if loaded:
+        u = P(W / 2 + 1.0, fc - L / 2 - .9, D)
+        rbox(f"{tag}_umbilical_box", u + UP * .45, (.8, .7, .9), .06, "ship_trim", segs=1)
+        tube(f"{tag}_umbilical", [u + UP * .8, u + P(-.6, .3, 1.1), P(1.6, fc - L / 2 - .2, zt + 1.25)], .07,
+             "ship_safety")
+
+
+def module_carrier():
+    """Q08-C: delivers plug-in rooms to the tower that slots them into its frame (PDF 2127_施設画像27枚 p.9,
+    「船で届く部屋を差し込む摩天楼」). A derivative of cargo-ship (round 2): same faceted hull, low bridge, stern
+    block and crane family. The hatch deck becomes two room berths on skid rails (fore berth loaded, aft berth = lift
+    position under the hook, empty); the four side bays now show the berths' support hold (jacking cylinders, truss).
+    The crane is raised so a room clears the cell guides, and carries a disc hook block with four slings and a
+    spreader that locks into the room's four top lugs. The room (ROOM_MODULE), the slewing crane (CRANE_SLEW) and its
+    hook gear (HOOK_GEAR) are separate nodes so they can be moved; the cable's origin is its top end."""
+    mats(**CARGO_MATS, ship_frame=((.78, .79, .80), .3, .7), ship_roomglass=((.62, .80, .84), .05, 0, .3, 0, True),
+         ship_doorglass=((.10, .16, .18), .1, 0, .75), ship_green=((.22, .45, .17), .8, 0),
+         ship_blossom=((.95, .64, .76), .7, 0), ship_wood=((.58, .40, .24), .6, 0), ship_warm=((1.0, .80, .55), .5, 0, 1, 3))
+    D, B0, B1 = 6.4, 2.3, 5.7
+    W, L, H = 7.2, 9.6, 4.6  # room: across, fore-aft, cage height
+    FA, FB = 4.0, -13.0  # berth centres: fore (loaded) and aft (lift position under the hook)
+    body, upper, quarter = cargo_hull("carrier", D, B0, B1, CARGO_BAYS)
+    for k, (a, b) in enumerate(CARGO_BAYS):  # side bays: the support hold under the berths
+        c, ln = (a + b) / 2 - (.8 if k == 0 else 0.), b - a - (3.0 if k == 0 else 1.4)
+        rbox(f"carrier_hold{k}", P(0, c, (B0 + B1) / 2), (8.2, ln + .8, B1 - B0 + .1), .2, "ship_hull2", segs=1)
+        for s in (-1, 1):
+            for j, (fa, fb) in enumerate(((c - ln / 2 + .5, c + ln / 2 - .5), (c + ln / 2 - .5, c - ln / 2 + .5))):
+                beam(f"carrier_truss{k}{s:+d}{j}", P(s * 4.35, fa, B0 + .15), P(s * 4.35, fb, B1 - .15), .22, .3,
+                     "ship_trim", .03)
+            for e in (-1, 1):
+                p = P(s * 4.75, c + e * ln * .3, B0)
+                cylinder(f"carrier_jack{k}{s:+d}{e:+d}", p + UP * 1.1, .3, 2.2, UP, "ship_safety", 12)
+                cylinder(f"carrier_jack_rod{k}{s:+d}{e:+d}", p + UP * 2.75, .13, 1.1, UP, "ship_metal", 12)
+            rbox(f"carrier_hold_light{k}{s:+d}", P(s * 4.15, c, B1 - .25), (.05, ln * .6, .08), 0, "ship_light")
+    for k in range(12):
+        rbox(f"carrier_deck_seam{k}", P(0, -26.0 + k * 3.6, D + .01), (11.5, .1, .02), 0, "ship_trim")
+    for s in (-1, 1):  # skid rails: a room slides from the fore berth to the lift position
+        rbox(f"carrier_skid{s:+d}", P(s * 2.4, (FA + FB) / 2, D + .12), (.5, FA - FB + L + 1.2, .24), .04, "ship_trim",
+             segs=1)
+        rbox(f"carrier_skid_top{s:+d}", P(s * 2.4, (FA + FB) / 2, D + .25), (.3, FA - FB + L + 1.2, .03), 0,
+             "ship_safety", segs=1)
+    cradle("carrier_berthA", FA, D, W, L, True)
+    cradle("carrier_berthB", FB, D, W, L, False)
+    cargo_bridge("carrier", D, upper)
+    st = D + 1.8
+    tip, slew = stern_crane("carrier", D, quarter, st, FB, D + 11.8, D + 11.4)
+    # hook gear at the lift height: the room's base clears the guide posts (D + 2.6) by about 0.6 m
+    lift = 2.8
+    lug = D + .45 + H + .1 + lift  # spreader / lug height when lifted
+    blk = lug + 2.2
+    cable = hang(tube("carrier_crane_cable", [tip + P(0, 0, -.4), P(0, FB, blk + .3)], .05, "ship_trim", res=1),
+                 tip + P(0, 0, -.4))
+    n0 = len(V.OBJS)
+    cylinder("carrier_hook_block", P(0, FB, blk), .8, .55, UP, "ship_trim", 16)
+    cylinder("carrier_hook_ring", P(0, FB, blk), .84, .12, UP, "ship_safety", 16)
+    for s in (-1, 1):
+        rbox(f"carrier_spreader_side{s:+d}", P(s * (W / 2 - .18), FB, lug + .45), (.3, L - .2, .35), .04, "ship_trim",
+             segs=1)
+        rbox(f"carrier_spreader_end{s:+d}", P(0, FB + s * (L / 2 - .18), lug + .45), (W - .2, .3, .35), .04,
+             "ship_trim", segs=1)
+        for e in (-1, 1):
+            cpt = P(s * (W / 2 - .18), FB + e * (L / 2 - .18), lug)
+            rbox(f"carrier_twistlock{s:+d}{e:+d}", cpt + UP * .2, (.34, .34, .3), .04, "ship_safety", segs=1)
+            tube(f"carrier_sling{s:+d}{e:+d}", [cpt + UP * .6, P(0, FB, blk - .25)], .05, "ship_safety", res=1)
+    gear = V.OBJS[n0:]
+    room = room_module("carrier_room", P(0, FA, D + .45), W, L, H)
+    crane = group("CRANE_SLEW", P(0, -33.0, st), slew + [cable])
+    group("HOOK_GEAR", P(0, FB, blk), gear, crane)
+    group("ROOM_MODULE", P(0, FA, D + .45), room)
+    # handover poses for module_handover.py (f / heights in metres, Blender coordinates via P)
+    return {"berth_fore_f": FA, "berth_lift_f": FB, "deck": D, "seat_h": D + .45, "lift_dz": lift,
+            "pivot_f": -33.0, "pivot_h": st, "room_size": [W, L, H]}
 
 
 def rescue_patrol():
@@ -784,19 +1026,24 @@ def harbour_patrol():
 
 
 SHIPS = {"sail-yacht": sail_yacht, "robo-fireboat": robo_fireboat, "cargo-ship": cargo_ship,
-         "rescue-patrol": rescue_patrol, "fireboat": fireboat, "harbour-patrol": harbour_patrol}
+         "rescue-patrol": rescue_patrol, "fireboat": fireboat, "harbour-patrol": harbour_patrol,
+         "module-carrier": module_carrier}
 
 
 def build(name):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     V.M.clear()
     V.OBJS.clear()
-    SHIPS[name]()
+    GROUPS.clear()
+    meta = SHIPS[name]() or {}
     root = bpy.data.objects.new("ROOT_" + name.upper().replace("-", "_"), None)
     root["reference_image"] = "references/" + REFS[name]
+    for k, v in meta.items():
+        root[k] = v
     bpy.context.scene.collection.objects.link(root)
-    for o in V.OBJS:
-        o.parent = root
+    for o in V.OBJS + GROUPS:  # sub-assembly empties (and their parts) keep their own parent
+        if o.parent is None:
+            o.parent = root
     for m in list(bpy.data.materials):
         if m.users == 0:
             bpy.data.materials.remove(m)
