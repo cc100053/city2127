@@ -1,7 +1,7 @@
 # Q03-A — 車が引き出しになる住宅
 
 - Owner：cc100053。
-- 狀態：A 位街道候選待業主審閱；下方保留原置入與移位兩輪記錄。業主決定日後回應投票，Meter／各態／觸發留待後續設計。
+- 狀態：A 位街道材質候選待業主審閱；下方保留原置入與移位兩輪記錄。業主決定日後回應投票，Meter／各態／觸發留待後續設計。
 - Base：`1fcc1dc409a187f880c97a14847492363261f6a6`，與 `origin/codex/nw-focal-connections` 一致，領先 `origin/main` 一個待驗收 NW 接駁提交。保留既有 `Dev_QA.md`。
 - [R2 Blender](../../asset/models/drawer-housing-2127/drawer-housing-2127.blend) · [GLB](../../asset/models/drawer-housing-2127/drawer-housing-2127.glb) · [實景](../../artifacts/change-review/index.html#drawer-housing) · [佐伯澪故事](../BUILDING_STORIES.md#drawer-housing)
 
@@ -25,3 +25,10 @@ A 位在フジテレビ西南側與アクアシティ內陸草地之間。GLB �
 - Chrome 分散配置 `?meters=se:low`：沿支路與步道中心、近邊及兩條候車線，以約 1 m 間隔驗證 467 個路面樣點，無斷面或障礙；候車線最低上方淨高 4.07 m。測試以固定包絡及路面淨空為準。
 - 根目錄 `npm test` 全套測試通過（從需開 loopback 的 survey 整合測試起，以允許本機埠的環境接續跑）；`npm run build`、`git diff --check` 和圖集連結核對通過。六張截圖及路線抽查零 page error。
 - 候選只供業主審閱。投票觸發、艙體及車輛動畫、實機效能尚未驗證。
+
+## Gemini 材質候選（2026-11-17）
+
+- 基準 `31372962`，接續 `codex/nw-focal-connections`。業主提供 [Gemini 目標圖](../../artifacts/change-review/drawer-housing/gemini-target.jpg)，以其中暖米色陶板、細金屬收邊、淡青導光和淺灰步道作為材質方向。
+- 導軌大道 ②、住宅支路和候車前場使用同一個陶板材質、貼圖及陰影接收設定。前場沿用街道套件的板縫和照明，導光由支路中心分往兩個候車位。車道、橫道與步道沿用已驗證的接駁，目標圖中的繞樓線屬概念。
+- 鋪面回歸測試核對大道與支路的材質、受光設定及接縫。另以垂直射線核對 448 個導光、光暈與收邊網格的三角形中心，全數落在鋪面。
+- 日夜近鏡使用相同鏡頭，連同接駁俯視及城市主視角更新至 [候選圖集](../../artifacts/change-review/index.html#drawer-housing)。原圖及側錄在 `~/city2127-evidence/q03-a/material-final/`，五張截圖均無 page error。根目錄 `npm test`、`npm run build`、`git diff --check` 及圖集連結核對通過。展覽機效能留待現場驗證。

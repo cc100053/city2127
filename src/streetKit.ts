@@ -41,9 +41,11 @@ const crossing = new T.MeshStandardMaterial({ color: '#d6ecff', emissive: '#cfe8
 const bridgeDeck = crossing.clone(); bridgeDeck.color.set('#e8f4ff'); // B's light bridge: dimmer than the panels, so the lines laid over it stay readable
 // Ground finishes sit centimetres apart (as odaibaScene's groundLayer): each later layer gets a stronger offset so it draws over the one below.
 for (const [m, k] of [[ceramic, 1], [footway, 1], [metal, 2], [lineGlow, 2], [seamLight, 3], [railLight, 3], [bridgeLine, 3], [crossing, 4], [bridgeDeck, 2]] as const) { m.polygonOffset = true; m.polygonOffsetFactor = m.polygonOffsetUnits = -4 * k; }
+const avenueCeramic = ceramic.clone();
+avenueCeramic.color.set('#e2d7c1');
 const lightMaterials = [seamLight, railLight, bridgeLine], nightLine = new T.Color();
 // Canvas textures are made on first build, and only with a DOM: node tests build the kit untextured.
-const textured = () => { if (typeof document === 'undefined') return; ceramic.map ??= panelTexture(); footway.map ??= footTexture(); const g = halo.map ?? glowTexture(); for (const m of [halo, lineGlow, bladePool]) m.map ??= g; };
+const textured = () => { if (typeof document === 'undefined') return; ceramic.map ??= panelTexture(); avenueCeramic.map = ceramic.map; footway.map ??= footTexture(); const g = halo.map ?? glowTexture(); for (const m of [halo, lineGlow, bladePool]) m.map ??= g; };
 export function updateStreetKit(dark: number) {
   // Day: pale blue (clearly lit on the ceramic) with a faint glow band; night: about 4x the blue, well above the bloom threshold, with a full glow band under each line.
   for (const m of lightMaterials) m.color.set(m === bridgeLine ? '#8cc4ff' : '#a9d3ff').multiplyScalar(m === bridgeLine ? 1.5 : 1.3).lerp(nightLine.set(m === seamLight ? '#7fc0ff' : '#74bbff').multiplyScalar(4), dark);
@@ -195,7 +197,7 @@ export function avenueStreet(c: Curve, d0: number, d1: number, carriage: [number
   // Light-panel crossings: two rows of square panels (about 1.3 m), 0.3 m apart, the outer ones 0.1 m from the carriageway edges.
   const panels: T.BufferGeometry[] = [], n = Math.round((b - a - .2 + .3) / 1.6), pw = (b - a - .2 - (n - 1) * .3) / n;
   for (const d of crossings) for (let i = 0; i < n; i++) for (const k of [-1, 1]) panels.push(band(c, d + k * (pw + .3) / 2 - pw / 2, d + k * (pw + .3) / 2 + pw / 2, a + .1 + i * (pw + .3), a + .1 + i * (pw + .3) + pw, y + .012));
-  root.add(mesh(flat, ceramic, 'street-ceramic', false), mesh(metalG, metal, 'street-edge'), mesh(seams, seamLight, 'street-seams', false), mesh(glows, lineGlow, 'street-line-glow', false), mesh(paving, footway, 'street-footway', false),
+  root.add(mesh(flat, avenueCeramic, 'street-ceramic', false), mesh(metalG, metal, 'street-edge'), mesh(seams, seamLight, 'street-seams', false), mesh(glows, lineGlow, 'street-line-glow', false), mesh(paving, footway, 'street-footway', false),
     mesh(panels, crossing, 'street-crossing', false), mesh(walls, trim, 'street-planters'), mesh(soil, leaf, 'street-beds'), mesh(rings, metal, 'street-rings'), mesh(pools, halo, 'street-ring-glow', false));
   plantBeds(root, beds);
   return root;
@@ -330,14 +332,41 @@ function drawerHousingAccess(avenue: Curve, environment: T.Object3D) {
   const strip = (c: Curve, a: number, b: number, y = 0, depth = 0, tile: [number, number] = [2.4, 2.4]) =>
     band(c, 0, c.getLength(), a, b, y, depth, tile);
   const bays = bayOffsets.map(dx => new T.LineCurve3(at(dx, .038, -21), at(dx, .018, -9)));
+  const frontagePaving = footway.clone();
+  frontagePaving.color.set('#e4e9ed');
+  const panels = (c: Curve, half: number, depth: number) => strip(c, -half, half, 0, depth, [3, STREET_KIT.half]);
   environment.add(
-    mesh([strip(drive, -3.1, 3.1, 0, .48, [3, 2]), strip(plaza, -6, 6, 0, .45, [3, 2]),
-      ...bays.map(c => strip(c, -2.8, 2.8, 0, .40, [3, 2]))], ceramic, 'drawer-housing-drive'),
-    mesh([strip(walk, -1.55, 1.55, 0, .45), strip(terrace, -1.6, 1.6, 0, .40), strip(entry, -1.7, 1.7, 0, .40)], footway, 'drawer-housing-walk'));
-  const lines = bays.flatMap(c => [-1.3, 1.3].map(offset => strip(c, offset - .055, offset + .055, .022)));
-  for (const offset of [-2.7, 2.7]) {
-    lines.push(band(drive, 2.8, drive.getLength() - 3, offset - .055, offset + .055, .011));
-  }
+    mesh([panels(drive, 3.1, .48), panels(plaza, 6, .45), ...bays.map(c => panels(c, 2.8, .40))],
+      avenueCeramic, 'drawer-housing-drive', false),
+    mesh([strip(walk, -1.55, 1.55, 0, .45), strip(terrace, -1.6, 1.6, 0, .40), strip(entry, -1.7, 1.7, 0, .40)],
+      frontagePaving, 'drawer-housing-walk'));
+
+  const length = drive.getLength(), split = length - 2.5;
+  const fork = drive.getPointAt(split / length);
+  const guides = bayOffsets.map((dx, i) => path(fork, at(dx * .65, .038, -23.3),
+    at(dx, .03, -18.8), bays[i].getPointAt(.97)));
+  const lineWidth = .075, lineHeight = .012;
+  const lines = [band(drive, .8, split, -lineWidth, lineWidth, lineHeight),
+    ...guides.map(c => strip(c, -lineWidth, lineWidth, lineHeight))];
+  const pools = [glowLine(drive, .8, split, -.27, .27, .008),
+    ...guides.map(c => glowLine(c, 0, c.getLength(), -.27, .27, .008))];
+
+  const edging = channelWall.clone();
+  edging.polygonOffset = metal.polygonOffset;
+  edging.polygonOffsetFactor = metal.polygonOffsetFactor;
+  edging.polygonOffsetUnits = metal.polygonOffsetUnits;
+  const rim = (c: Curve) => strip(c, -.075, .075, .009);
+  const straightRim = (x0: number, z0: number, x1: number, z1: number) =>
+    rim(new T.LineCurve3(at(x0, .035, z0), at(x1, .035, z1)));
+  const rims = [
+    ...[-2.99, 2.99].map(o => band(drive, .8, length - 4.7, o - .075, o + .075, .009)),
+    straightRim(-16.4, -26.9, -5.2, -26.9), straightRim(3.3, -26.9, 18.4, -26.9),
+    straightRim(-16.4, -26.9, -16.4, -15.1), straightRim(18.4, -26.9, 18.4, -15.1),
+    ...cut([[-16.4, 18.4]], bayOffsets.map(dx => [dx - 2.8, dx + 2.8]), .5)
+      .map(([a, b]) => straightRim(a, -15.1, b, -15.1)),
+    ...bayOffsets.flatMap(dx => [-2.69, 2.69].map(o =>
+      rim(new T.LineCurve3(at(dx + o, .03, -15), at(dx + o, .018, -9.1))))),
+  ];
   const root = new T.Group(); root.name = 'drawer-housing-frontage';
   // Low planters flank the manoeuvring court, outside the vehicle and walking widths.
   const beds = [at(-21, .04, -31), at(8.5, .04, -34), at(15.5, .04, -34)].map(p =>
@@ -345,6 +374,7 @@ function drawerHousingAccess(avenue: Curve, environment: T.Object3D) {
   const crossingPanels = [-11.2, -10.1, -9, -7.9, -6.8].map(dx => strip(
     new T.LineCurve3(at(dx - .34, .067, -16), at(dx + .34, .067, -16)), -1.25, 1.25));
   root.add(mesh(crossingPanels, crossing, 'drawer-housing-crossing', false), mesh(lines, seamLight, 'drawer-housing-guides', false),
+    mesh(rims, edging, 'drawer-housing-edging', false), mesh(pools, lineGlow, 'drawer-housing-line-glow', false),
     mesh(beds.map(b => b.wall), trim, 'drawer-housing-planters'), mesh(beds.map(b => b.soil), leaf, 'drawer-housing-beds'));
   plantBeds(root, beds.map(b => b.bed));
   return root;

@@ -122,13 +122,14 @@ ${mine.map(change).join('\n')}${energy}${mine.length || energy ? '' : '<p><small
 });
 
 const drawerHousing = `<article id="drawer-housing">
-<h2>Q03-A — 車が引き出しになる住宅 <small>A 位街道候選 · 投票變化待設計</small></h2>
-<p class="intro">フジテレビ西南側。兩個共用載車艙把小車升到住戶樓層，像抽屜一樣推入外牆泊位。住宅仍在 A 位，與西側梯田巨構現相隔 15.9 m。車道接入導軌大道 ②，兩條導光線標出候車位置；住民沿獨立步道抵達前場，在標線處橫過一條候車線。</p>
+<h2>Q03-A — 車が引き出しになる住宅 <small>A 位街道材質候選 · 投票變化待設計</small></h2>
+<p class="intro">フジテレビ西南側。兩個共用載車艙把小車升到住戶樓層，像抽屜一樣推入外牆泊位。住宅仍在 A 位，與西側梯田巨構現相隔 15.9 m。車道接入導軌大道 ②，暖米色陶板和金屬收邊延續至候車前場，淡青導光線分往兩個載車艙。住民沿淺灰步道抵達前場，在標線處橫過一條候車線。</p>
 <p lang="ja">満潮で低い道が水に戻るころ、佐伯澪さんの車は外壁の引き出しに収まり、工具が三階の作業台に届きます。地上を歩く場所にしたぶん、住民は二つの昇降台を順番に使います。</p>
 <p><a href="../../docs/BUILDING_STORIES.md#drawer-housing">佐伯澪的故事</a> · <a href="../../docs/handoffs/drawer-housing-placement.md">A 位座標與驗證</a></p>
 <div class="frames">
 <figure><img loading="lazy" src="drawer-housing/before.jpg" alt="原近鏡，右側巨構緊貼住宅"><figcaption>改前｜原日景鏡頭</figcaption></figure>
 <figure><img loading="lazy" src="drawer-housing/after-same.jpg" alt="同一鏡頭，住宅與右側巨構之間見到開放地面"><figcaption>改後｜同一鏡頭，梯田巨構與住宅分開</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/gemini-target.jpg" alt="Gemini 目標圖的暖米色陶板、金屬收邊與青色導光"><figcaption>Gemini 參考｜陶板、收邊與導光</figcaption></figure>
 <figure><img loading="lazy" src="drawer-housing/day.jpg" alt="日間近鏡可見兩個已伸出的載車艙"><figcaption>日景｜候車前場與兩個外伸載車艙</figcaption></figure>
 <figure><img loading="lazy" src="drawer-housing/night.jpg" alt="同一角度的 A 位住宅夜景"><figcaption>夜景｜導光候車線與行人橫道</figcaption></figure>
 <figure><img loading="lazy" src="drawer-housing/plan.jpg" alt="俯視車道接入導軌大道、步道及前場"><figcaption>接駁俯視｜從大道繞過既有艙體，接到住宅前場</figcaption></figure>

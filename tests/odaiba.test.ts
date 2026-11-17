@@ -207,6 +207,10 @@ const streetKit = streetNetwork(environment);
   }
   // Q03-A: the two loading branches and the pedestrian route meet the existing avenue and frontage at grade.
   const drawerRoad = 'drawer-housing-drive', drawerWalk = 'drawer-housing-walk';
+  const avenuePaving = environment.getObjectByName('street-ceramic'), drawerPaving = environment.getObjectByName(drawerRoad);
+  assert.ok(avenuePaving instanceof Mesh && drawerPaving instanceof Mesh, 'Q03-A and the avenue have road surfaces');
+  assert.equal(drawerPaving.material, avenuePaving.material, 'Q03-A uses the same ceramic finish as the guideway avenue');
+  assert.equal(drawerPaving.receiveShadow, avenuePaving.receiveShadow, 'Q03-A and the avenue light the shared finish the same way');
   for (const [x, z, finishA, finishB] of [
     [-125.73, -.39, 'street-ceramic', drawerRoad],
     [-127.24, 6.68, 'street-footway', drawerWalk],
