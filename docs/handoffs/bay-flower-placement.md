@@ -1,10 +1,10 @@
 # bay-flower-placement — Q02-B 蓮花受電：選址與放置
 
 - Owner: cc100053（owner 逐輪判定）；實作由 Claude
-- Status: ACCEPTED（R2 owner 接受 2026-11-19），待 merge 入 main
-- Branch: `feat/bay-flower-placement`（2026-11-18 由 `origin/main` 開出）
+- Status: DONE（R2 owner 接受 2026-11-19；同日 merge 入 main，integrated commit `b27c3802`，見「## Integration」）
+- Branch: `feat/bay-flower-placement`（2026-11-18 由 `origin/main` 開出；merge 後保留）
 - Base commit: `6724989bbff0ff8a0f65a9ee6e2a23f778e7ede3`
-- Last verified commit: R2（見「## R2」）
+- Last verified commit: `b27c38026efa2399eeb1711cb25e4efc35815194`（main merge）
 - Remote availability: `origin/feat/bay-flower-placement`
 
 ## Session Git state
@@ -12,7 +12,7 @@
 - Session starting branch and HEAD：`feat/question-rotation` `eff8c4de`，與 origin 同步；本 decide session 在同一節內接續，由 `origin/main` 開出本分支
 - Last fetched origin/main commit：`6724989b`，2026-11-18（fetch exit 0）
 - Local changes present at session start：未追蹤 `Dev_QA.md`（owner 本機檔），保留
-- Upstream integration status：NOT INTEGRATED
+- Upstream integration status：INTEGRATED（2026-11-19，`b27c3802` 已 push 至 `origin/main`）
 - Pending Git conflicts or synchronization blockers：NONE。`feat/question-rotation` 未 merge；本分支不含輪換程式（見「與抽題輪換的關係」）
 
 ## Goal and acceptance criteria
@@ -188,9 +188,20 @@ version4 仍有的改動（屬「機房平台保留」，非「version4 外觀�
 
 > accept, next step on new session
 
+## Integration（2026-11-19）
+
+- `git fetch --prune origin` exit 0；`origin/main` 仍為 base `6724989b`，未前進。`main` fast-forward 已是最新，`git merge --no-ff feat/bay-flower-placement` 得 merge commit `b27c3802`，無衝突。
+- Merge 結果之 tree 與 branch tip `cccd226b` 完全相同（`git diff --quiet cccd226b HEAD`），故沿用 R2 `a2c57986` 已通過之 root `npm test`，未重跑。
+- Merge 結果：root `npm run build` exit 0（只有既有 chunk 大小警告）；`git diff --check origin/main..HEAD` exit 0。
+- Push 前再 fetch，`git merge-base --is-ancestor origin/main HEAD` 通過；`git push origin main` `6724989b..b27c3802`。
+- Main CI run `44335358654`（`b27c3802`）：success（job `check`）。
+- 任務分支 `feat/bay-flower-placement` 保留（本機及 origin）。
+
 ## Next expected step
 
-新 session 按 CONTRIBUTING「Concurrent integration」merge 入 main：fetch，`main` fast-forward 至 `origin/main`，`git merge --no-ff feat/bay-flower-placement`；如 main 已前進，在 merge 結果重跑 root `npm test`、`npm run build`、`git diff --check`；push main，確認 main CI；本 handoff 記 integrated commit 及結果，Status 改 DONE。Q02-B 未入 RESIDENT_SCENE_PLAN 單元表及 change sheet（未接投票），merge 後無需重生成 change sheet。
+無（本任務 DONE）。後續屬其他任務：Q02 投票接線（`question-rotation` 階段 2.2）、近鏡、結果卡及設施卡文案、空置態／花之切換程式。Q02-B 未入 RESIDENT_SCENE_PLAN 單元表及 change sheet，接線時再按 AGENTS.md 重生成 change sheet。
+
+舊（R2 merge 步驟，已完成）：新 session 按 CONTRIBUTING「Concurrent integration」merge 入 main，Status 改 DONE。
 
 舊（R1）：Owner 判定 R1（截圖 `~/city2127-evidence/bay-flower-placement/r1/`），並答「待 owner」三題。開新 session：
 
