@@ -84,6 +84,12 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
   - Neighbours in a ring overlap sideways by several metres and were already crossing before this round: 46 pairs, every neighbour pair, at u ≈ 0.3–0.7. Narrowing the petals to 0.85 of their width did not clear it. `LAYER` now gives even petals 2.5° less opening and odd petals 2.5° more (`petal_ring()`), so each ring lies in two layers. Resulting openings: outer 0.5–5.5°, middle 7.5–12.5°, inner 15–20°. 2.2° on the middle ring still let the rims touch.
   - Seats, arms, spine ribs, root shoes and ring beams sample the petal, so they follow it with no code change.
   - Metrics: tris unchanged (93,831 / 93,015). GLB 3,529,608 / 3,510,872 bytes.
+- Bloom round 2 (owner 2026-11-18, same branch). The owner's view image was not attached; `--cam ref` stands in for the oblique front view.
+  - `OPEN` becomes outer 3° (unchanged), middle 16.5° (+6.5°) and inner 30° (+12.5°). With `LAYER` ±2.5° the openings are outer 0.5–5.5°, middle 14–19°, inner 27.5–32.5°. Tip heights are about 30.4 / 27.4 / 25.7 m.
+  - Judged in the reference view: the receiver base under the dome now shows fully, and the inner ring shows more panel. The front-row petals, mostly the outer ring, still show their backs.
+  - Middle at +8° was not taken: tips would drop to 29.2 / 26.6 / 25.7 m, leaving under 1 m between the middle and outer rings.
+  - Support arms are now `ARM_HEAD_U` / `ARM_FOOT_IN` constants. On the less-open outer petals (even k, already since bloom round 1), the arm's centreline entered the petal underside at 79 % of its length, short of its head. The outer foot moved from 3.5 m to 2.5 m inside the hinge circle. Every arm now reaches its head from below (first hit ≥ 1.0 of its length), and the foot block stays clear of the hinge-seat plate.
+  - Metrics: tris unchanged; GLB 3,529,036 / 3,510,300 bytes.
 - Inferred (not readable in the image): petal count per ring, strut layout, pontoon below water, sub-sea depth, pavilion interior terminal, beam height, the overall scale (from people by the pavilion).
 
 ## Actual validation results
@@ -137,6 +143,12 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
   - `after-ref/compare.jpg` and `beam.png`: the with-beam overall view.
 - Overlap check (a scratch Blender script; it builds every petal alone through the builder's own `petal_ring()`): 0 petal–petal overlaps. The petals were checked with their shells, rims, spine ribs and root shoes; the previous geometry had 46. Support arms (to 90 % of their length), ring-beam spans and hinge seats show 0 overlaps against other petals. Arm heads lie within 1.4 cm of their own petal's outer face, and seat pins sit on the root (0 m).
 - GLB re-import: the petal meshes (`panel`, `shell`, `frame`, `petal_rib`, `petal_shoe`, `piston`) have identical vertex hashes in the with-beam and no-beam files, and only the with-beam file has `Q02B_LightBeam`.
+- Bloom round 2 evidence, `~/city2127-evidence/bay-flower-receiver/bloom-r2/`:
+  - `before-after-nobeam-ref.jpg`; the before image comes from a copy of the bloom-round-1 file.
+  - `after-ref/compare.jpg` and `beam.png`.
+  - Overlap check: 0 petal–petal, arm–petal, beam–petal, seat–petal and arm–arm overlaps.
+  - Joints: arm heads lie within 1.4 cm of their petal, and seats sit on the roots.
+  - The petal meshes have identical vertex hashes in the with-beam and no-beam GLBs.
 - `npm run build`: passed. `git diff --cached --check`: clean.
 - `npm test` (Windows 11, Node 24.19, checkout under `OneDrive\文件`): `assetLibrary.test.ts` passes with the new row. Two local leftovers, `asset/models/ship-refs-2127` and `car-candidates-2127`, hold only git-ignored caches from other branches and fail that test unless parked; they were parked for the run and restored. `surveyMeterPipeline.test.ts` and `energyPipeline.test.ts` FAIL on this machine before any of this task's code runs: `survey/tests/surveyFixture.ts` turns a `file://` URL path into `C:\C:\…\%E6%96%87%E4%BB%B6\…` (percent-encoded non-ASCII folder name), so the question JSON is not found. Not caused by this task, not fixed here. Every other test in the `npm test` list passed when run one at a time.
 - Application verification: NOT INTEGRATED.
@@ -154,4 +166,4 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
 
 ## Next expected step
 
-The owner reviews the bloom (`bloom-r1/before-after-nobeam-ref.jpg`, `bloom-r1/before-after-nobeam-top.jpg`) and the shore-platform position (`platform-r1/`). Merge `feat/bay-flower-shore-platform` into main only once the owner confirms both.
+The owner reviews the bloom (`bloom-r2/before-after-nobeam-ref.jpg`; earlier `bloom-r1/`) and the shore-platform position (`platform-r1/`). Merge `feat/bay-flower-shore-platform` into main only once the owner confirms both.

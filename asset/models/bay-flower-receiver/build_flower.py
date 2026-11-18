@@ -32,13 +32,18 @@ S = 1.5                     # receiver scale; people by the pavilion in the imag
 # horizontal), max width, cup depth (fraction of width); lengths in units of S
 # OPEN: bloom (owner 2026-11-18), degrees each ring's petals tilt outward about their hinge. Both pitches drop by the
 # same angle, so the petal keeps its curvature; seats, arms, ribs, shoes and ring beams sample the petal and follow.
-OPEN = (3.0, 10.0, 17.5)    # outer / middle / inner ring, mean opening
+OPEN = (3.0, 16.5, 30.0)    # outer / middle / inner ring, mean opening (bloom round 2: middle +6.5°, inner +12.5°)
 # Neighbours in a ring overlap sideways and are cupped alike, so identical petals cross at the overlap. Even petals open
 # LAYER degrees less and odd ones LAYER more (every ring has an even count): each even petal lies wholly over both
-# neighbours, an inner and an outer layer as in a lotus. Openings per ring: outer 0.5–5.5°, middle 7.5–12.5°, inner
-# 15–20°. 2.5° is the smallest tried that keeps shells, rims, spine ribs and root shoes apart (the middle ring's rims
+# neighbours, an inner and an outer layer as in a lotus. Openings per ring: outer 0.5–5.5°, middle 14–19°, inner
+# 27.5–32.5°. 2.5° is the smallest tried that keeps shells, rims, spine ribs and root shoes apart (the middle ring's rims
 # still touched at 2.2°).
 LAYER = (2.5, 2.5, 2.5)
+# support arms per ring (outer / middle / inner): head position along the petal (u, on its outer face) and how far
+# inside the hinge circle the deck foot stands. The arm must reach its head from below: a curved petal lies under the
+# straight hinge-to-head line, so a shallow arm cuts the petal before its head.
+ARM_HEAD_U = (.38, .32, .26)
+ARM_FOOT_IN = (2.5, 3.5, 2.5)   # outer 3.5 → 2.5 (bloom round 2): the less-open outer petals' arms cut them at 79 %
 RINGS = tuple((n, o, r * S, y * S, L * S, a0 - op, a1 - op, W * S, c) for (n, o, r, y, L, a0, a1, W, c), op in zip((
     (18, 0.0, 15.5, 4.6, 29.0, 20, 44, 14.0, .08),
     (16, .5, 13.0, 5.8, 23.0, 40, 66, 12.0, .09),
@@ -746,9 +751,9 @@ def build():
                 pipe(A["frame"], [topf(u / 12, v * .98) for u in range(13)], .2, 5)
             petal_back_details(A, topf, botf)
             hinge_seat(A, botf(.02, 0), th)
-            head_u = (.38, .32, .26)[ri]
+            head_u = ARM_HEAD_U[ri]
             for dv in (-.3, .3):
-                foot_r = ring[2] - (2.5 if ri == 2 else 3.5)
+                foot_r = ring[2] - ARM_FOOT_IN[ri]
                 foot = (foot_r * math.cos(th + dv * .2), DECK_Y, foot_r * math.sin(th + dv * .2))
                 support_arm(A, foot, botf(head_u, dv), th)
             row.append(botf(head_u, 0))
