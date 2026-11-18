@@ -2,6 +2,7 @@ import { isEnergyChoice, type EnergyChoice } from '../shared/energy.ts';
 import { readFileSync } from 'node:fs';
 import { CITY_AXES, isCityAxis } from '../shared/citySurveyState.ts';
 import type { CityEffects, Question, QuestionOption, QuestionSet, QuestionTrigger } from '../shared/question.ts';
+import type { RotationOption, RotationQuestion, RotationSet } from '../shared/rotation.ts';
 
 export const EFFECT_MIN = -3, EFFECT_MAX = 3;
 
@@ -92,6 +93,61 @@ export function loadQuestionSetFile(path: string): QuestionSet {
     throw new QuestionSetError(`cannot read question file ${path}: ${error instanceof Error ? error.message : String(error)}`);
   }
   return parseQuestionSet(json);
+}
+
+function nullableText(value: unknown, where: string): string | null {
+  return value === null ? null : text(value, where);
+}
+
+/**
+ * Validates a question-rotation set (QUESTION_ROTATION_PLAN 1.1): three options per question, each naming
+ * its model and lot (null until built or sited); an online question needs all of them; model IDs unique.
+ */
+export function parseRotationSet(input: unknown): RotationSet {
+  if (!isObject(input) || input.kind !== 'rotation') throw new QuestionSetError('rotation set must be an object with kind "rotation"');
+  const { version, draft } = input;
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1) throw new QuestionSetError('version must be a positive integer');
+  if (typeof draft !== 'boolean') throw new QuestionSetError('draft must be a boolean');
+  if (!Array.isArray(input.questions) || input.questions.length === 0) throw new QuestionSetError('questions must be a non-empty array');
+  const questionIds = new Set<string>(), modelIds = new Set<string>();
+  const questions = input.questions.map((raw: unknown, index): RotationQuestion => {
+    if (!isObject(raw)) throw new QuestionSetError(`questions[${index}] must be an object`);
+    const id = text(raw.id, `questions[${index}].id`);
+    if (questionIds.has(id)) throw new QuestionSetError(`duplicate question id "${id}"`);
+    questionIds.add(id);
+    if (!Array.isArray(raw.options) || raw.options.length !== 3) throw new QuestionSetError(`rotation question "${id}" must have exactly three options`);
+    const optionIds = new Set<string>();
+    const options = raw.options.map((option: unknown, optionIndex): RotationOption => {
+      const where = `question "${id}" options[${optionIndex}]`;
+      if (!isObject(option)) throw new QuestionSetError(`${where} must be an object`);
+      const optionId = text(option.id, `${where}.id`);
+      if (optionIds.has(optionId)) throw new QuestionSetError(`duplicate option id "${optionId}" in question "${id}"`);
+      optionIds.add(optionId);
+      const modelId = nullableText(option.modelId, `${where}.modelId`);
+      if (modelId !== null) {
+        if (modelIds.has(modelId)) throw new QuestionSetError(`model "${modelId}" belongs to more than one option`);
+        modelIds.add(modelId);
+      }
+      return { id: optionId, label: text(option.label, `${where}.label`), modelId, lotId: nullableText(option.lotId, `${where}.lotId`) };
+    });
+    if (typeof raw.online !== 'boolean') throw new QuestionSetError(`question "${id}".online must be a boolean`);
+    if (raw.online && options.some(o => o.modelId === null || o.lotId === null))
+      throw new QuestionSetError(`online question "${id}" needs a model and lot for every option`);
+    const initial = text(raw.initial, `question "${id}".initial`);
+    if (!optionIds.has(initial)) throw new QuestionSetError(`question "${id}".initial must name one of its options`);
+    return { id, text: text(raw.text, `question "${id}".text`), online: raw.online, initial, options };
+  });
+  return { kind: 'rotation', version, draft, questions };
+}
+
+export function loadRotationSetFile(path: string): RotationSet {
+  let json: unknown;
+  try {
+    json = JSON.parse(readFileSync(path, 'utf8'));
+  } catch (error) {
+    throw new QuestionSetError(`cannot read rotation file ${path}: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  return parseRotationSet(json);
 }
 
 /** Enforces the fixed, reusable four-question schema used by exhibition algorithm v2. */

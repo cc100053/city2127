@@ -1,0 +1,242 @@
+{
+  "kind": "rotation",
+  "version": 1,
+  "draft": true,
+  "source": "Text and labels are SURVEY_V2 P-variant placeholders (questionPool.v1.json) until the plan 5.1 exhibition wording is approved. Models, lots, initial options and online flags follow docs/QUESTION_ROTATION_PLAN.md section 2; initial options are provisional (owner decision pending).",
+  "questions": [
+    {
+      "id": "Q01",
+      "text": "荷物の受け取り予定が急に変わったら、どうする？",
+      "online": true,
+      "initial": "B",
+      "options": [
+        {
+          "id": "A",
+          "label": "配達スタッフに相談する。",
+          "modelId": "automation-hub-low",
+          "lotId": "nw"
+        },
+        {
+          "id": "B",
+          "label": "AIの提案から、自分で選ぶ。",
+          "modelId": "automation-hub-mixed",
+          "lotId": "nw"
+        },
+        {
+          "id": "C",
+          "label": "AIに時間や受け取り場所を決めてもらう。",
+          "modelId": "automation-hub-high",
+          "lotId": "nw"
+        }
+      ]
+    },
+    {
+      "id": "Q02",
+      "text": "お台場に新しい自動運転の水上バスが登場した。どうする？",
+      "online": false,
+      "initial": "A",
+      "options": [
+        {
+          "id": "A",
+          "label": "使い慣れた従来の便に乗る。",
+          "modelId": "q02a-hydro-terrace",
+          "lotId": "q02-west-sea"
+        },
+        {
+          "id": "B",
+          "label": "利用者の評判を見てから試す。",
+          "modelId": "bay-flower-receiver",
+          "lotId": null
+        },
+        {
+          "id": "C",
+          "label": "早速、新しい便に乗ってみる。",
+          "modelId": "rectenna-farm-canopy",
+          "lotId": "q02-farm-south"
+        }
+      ]
+    },
+    {
+      "id": "Q03",
+      "text": "たまに使う小型の乗り物が必要になった。どうする？",
+      "online": false,
+      "initial": "A",
+      "options": [
+        {
+          "id": "A",
+          "label": "自分専用のものを持つ。",
+          "modelId": "drawer-housing-2127",
+          "lotId": "drawer-housing"
+        },
+        {
+          "id": "B",
+          "label": "同じ建物の住民と共有する。",
+          "modelId": null,
+          "lotId": "drawer-housing"
+        },
+        {
+          "id": "C",
+          "label": "地域の共有サービスを使う。",
+          "modelId": null,
+          "lotId": "drawer-housing"
+        }
+      ]
+    },
+    {
+      "id": "Q04",
+      "text": "街のAIが、あなたの好みを覚えるとしたら？",
+      "online": false,
+      "initial": "A",
+      "options": [
+        {
+          "id": "A",
+          "label": "記録してほしくない。",
+          "modelId": null,
+          "lotId": null
+        },
+        {
+          "id": "B",
+          "label": "必要なときだけ情報を使ってほしい。",
+          "modelId": null,
+          "lotId": null
+        },
+        {
+          "id": "C",
+          "label": "覚えて、便利な案内に役立ててほしい。",
+          "modelId": null,
+          "lotId": null
+        }
+      ]
+    },
+    {
+      "id": "Q05",
+      "text": "真夏のお台場を歩くなら、暑さにどう対応したい？",
+      "online": false,
+      "initial": "A",
+      "options": [
+        {
+          "id": "A",
+          "label": "涼しい時間帯に出かける。",
+          "modelId": null,
+          "lotId": null
+        },
+        {
+          "id": "B",
+          "label": "植物や木陰のある道を歩く。",
+          "modelId": null,
+          "lotId": null
+        },
+        {
+          "id": "C",
+          "label": "温度を調整できる歩道を利用する。",
+          "modelId": null,
+          "lotId": null
+        }
+      ]
+    },
+    {
+      "id": "Q06",
+      "text": "長く使った家具が古くなった。どうする？",
+      "online": false,
+      "initial": "B",
+      "options": [
+        {
+          "id": "A",
+          "label": "新しい家具に買い替える。",
+          "modelId": null,
+          "lotId": null
+        },
+        {
+          "id": "B",
+          "label": "修理して使い続ける。",
+          "modelId": "pod-frame-tower-2127",
+          "lotId": null
+        },
+        {
+          "id": "C",
+          "label": "今の家具を誰かに譲り、別の中古品を使う。",
+          "modelId": null,
+          "lotId": null
+        }
+      ]
+    },
+    {
+      "id": "Q07",
+      "text": "日用品を買うとき、どう受け取りたい？",
+      "online": false,
+      "initial": "A",
+      "options": [
+        {
+          "id": "A",
+          "label": "店へ行き、実物を見て買う。",
+          "modelId": null,
+          "lotId": null
+        },
+        {
+          "id": "B",
+          "label": "近くの受け取り拠点で受け取る。",
+          "modelId": null,
+          "lotId": null
+        },
+        {
+          "id": "C",
+          "label": "自宅まで届けてもらう。",
+          "modelId": null,
+          "lotId": null
+        }
+      ]
+    },
+    {
+      "id": "Q08",
+      "text": "お台場で休日を過ごすなら、どんな場所が使いやすい？",
+      "online": false,
+      "initial": "C",
+      "options": [
+        {
+          "id": "A",
+          "label": "いつも同じ用途で使える施設。",
+          "modelId": null,
+          "lotId": "sw"
+        },
+        {
+          "id": "B",
+          "label": "イベントによって用途が変わる施設。",
+          "modelId": null,
+          "lotId": "sw"
+        },
+        {
+          "id": "C",
+          "label": "イベントに合わせて場所も変わる施設。",
+          "modelId": "event-shelf-2127",
+          "lotId": "sw"
+        }
+      ]
+    },
+    {
+      "id": "Q09",
+      "text": "仕事が早く終わって、自由な午後ができたら何をしたい？",
+      "online": false,
+      "initial": "A",
+      "options": [
+        {
+          "id": "A",
+          "label": "買い物や用事を済ませる。",
+          "modelId": null,
+          "lotId": null
+        },
+        {
+          "id": "B",
+          "label": "友人と集まり、街で過ごす。",
+          "modelId": null,
+          "lotId": null
+        },
+        {
+          "id": "C",
+          "label": "普段できない体験を楽しむ。",
+          "modelId": null,
+          "lotId": null
+        }
+      ]
+    }
+  ]
+}

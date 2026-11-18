@@ -1,11 +1,11 @@
 # question-rotation — SURVEY_V2 抽題輪換計劃
 
 - Owner: cc100053
-- Status: IN_PROGRESS（階段 0 決定完成並寫入 SPEC；階段 1 起未實作）
-- Branch: `docs/question-rotation-plan`
+- Status: IN_PROGRESS（階段 0 完成；階段 1 純函數核心完成，server 接線及 guest 介面未做）
+- Branch: `feat/question-rotation`（2026-11-18 由 `docs/question-rotation-plan` HEAD `95c494ff` 開出；計劃文件 commit 一併帶入）
 - Base commit: `6724989bbff0ff8a0f65a9ee6e2a23f778e7ede3`（origin/main，2026-11-18）
 - Last verified commit: `7077b46d`（階段 0 決定；本次審閱補充的 commit 見 git log）
-- Remote availability: `origin/docs/question-rotation-plan`
+- Remote availability: `origin/docs/question-rotation-plan`（計劃）；`origin/feat/question-rotation`（實作）
 
 ## Session Git state
 
@@ -24,7 +24,8 @@
 - `docs/QUESTION_ROTATION_PLAN.md`（新）、`docs/README.md`（索引一行）、本檔。
 - 依賴：[question-pool](question-pool.md)（題庫）、[guest-agency](guest-agency.md)（G1／G2 現行規則）、各模型 handoff（bay-flower-receiver、pod-frame-tower、drawer-housing-placement、q02a-hydro-placement、rectenna-farm-placement、sw-event-shelf）。
 - 已改文件：`docs/EXHIBITION_SPEC.md`（新「抽題輪換」一節）、`docs/planning-team/SURVEY_V2_REVIEW.md`（R01–R05）。
-- 未改：`src/`、`survey/`、題組 JSON。
+- 階段 1 切片一（2026-11-18）：`survey/src/shared/rotation.ts`（新）、`survey/src/survey/questionLoader.ts`（`parseRotationSet`／`loadRotationSetFile`）、`survey/src/survey/questions.rotation.v1.json`（新，draft）、`survey/tests/rotation.test.ts`（新）、`survey/scripts/rotationSim.ts`（新）、`survey/package.json`（`test:rotation` 接入 `npm test`）。
+- 未改：root `src/`、現行 version4 題組、`ladderStep`、server、資料庫。
 
 ## Completed work
 
@@ -34,21 +35,47 @@
 - 2026-11-18 owner 批准階段 0 全部建議：SURVEY_V2_REVIEW R01–R05 決定記錄；EXHIBITION_SPEC 新增「抽題輪換」一節。
 - 2026-11-18 advisor 審閱後（owner 同意寫入）：雙站重疊改在換模型時處理、平手按題目固定次序；無變化率對答案分佈敏感（`skew.py`：5 題時 1.6%／2.6%／6.1%／23.8%）；新舊系統按題組版本切換，第 2–3 階段完成標準加「version4 run 外觀不變」；每題 6 種有向過場；內容工作量補 Q02 空置態及 Q06 選址；敘事原則改變記錄並加 6.7 文件同步；群眾比例少人數門檻；R04 舊能源部件逐件未定。
 
+- 2026-11-18 階段 1 切片一（純函數，未接 server）：
+  - 1.1 題組格式：`kind: "rotation"`，每題三選項各帶 `modelId`／`lotId`（未建或未選址為 null），`online` 旗標（上線須全部非 null），`initial` 起始選項；模型 ID 全組唯一。`questions.rotation.v1.json` 9 題，題目文字暫用 SURVEY_V2 P 版（`draft: true`，待 5.1）；只有 Q01 `online`；起始選項為暫定（Q01 B、Q02 A、Q03 A、Q06 B、Q08 C、其餘 A），待 owner。地塊 ID 暫用 `nw`、`sw`、`drawer-housing`、`q02-west-sea`、`q02-farm-south`，第 2.1 步 `LOTS` 定案時對齊。
+  - 1.2 `drawQuestions`：只抽 online 題，最久未變優先、平手按題組次序；少於 5 題 online 時拋 `RotationError`（現時真題組因此不能上線，屬預期）。
+  - 1.3 `rotationStep`：直接換（包括 A↔C），每份只換一題；無候選回傳 `fallback` 並指出最久未變的抽中題。**發現：** 3.2 第 3 點「優先略過預約後已被另一站換過的題」由最久未變排序自動成立（預約後被換的題 stamp 必然新過所有未被換的題），所以不需要儲存預約標記；測試覆蓋兩站同時預約的情況。
+  - 1.4（純函數部分）`foldRotation`：按 stamp（提案 sequence）依次重算；Undo＝去掉該提案再 fold，測試覆蓋。
+  - 1.5（純函數部分）`crowdShare`：計入所有有效提案的四個答案（含本人）；總數未達 `CROWD_SHARE_MIN_VOTES`（暫定 10，待 owner）時不給百分比。
+  - 1.7 模擬 gate：見下。
+
 ## Actual validation results
 
-- Verification status: PARTIAL（文件）
-- Date and checked commit/worktree: 2026-11-18，本分支
+- Verification status: PARTIAL（階段 1 純函數；server、guest 未接）
+- Date and checked commit/worktree: 2026-11-18，`feat/question-rotation`
 - Commands/manual checks and results: 文件內相對連結及引用檔案路徑逐一核對存在；座標取自 `src/layout.ts`、`src/energyRuntime.ts`。未截圖核對位置。
-- Evidence/environment: 模擬腳本見上；分佈敏感度 `~/city2127-evidence/question-rotation-sim/skew.py`
+- `survey/`：`npm test`（含新 `test:rotation`）通過、`npm run build` 通過；`git diff --check` 通過。root `src/` 未改，未跑 root 測試。
+- 正式模擬 `survey/scripts/rotationSim.ts`（正式函數，400 run × 120 假訪客，A／B 兩站同城預約後先後提交，起始選項每 run 隨機）：
+
+  | 分佈 | 5 題無變化 | 5 題模型出場（全出場 run） | 10 題無變化 | 10 題模型出場（全出場 run） |
+  | --- | --- | --- | --- | --- |
+  | 原設定＋四成個人傾向 | 1.6% | 100.0%（400/400） | 1.5% | 99.9%（388/400） |
+  | 70/20/10＋四成傾向 | 2.6% | 100.0%（400/400） | 2.7% | 99.8%（380/400） |
+  | 70/20/10，無傾向 | 5.9% | 99.9%（392/400） | 5.9% | 98.9%（282/400） |
+  | 85/10/5，無傾向 | 23.4% | 99.5%（367/400） | 23.1% | 96.8%（137/400） |
+
+  Gate 只卡上線配置（5 題、原設定）：無變化 ≤ 2% 且每 run 每個模型都出場，通過。10 題時約 3% run 有一個模型全日未出場；答案越一致越多。交 owner 判斷保底份量及是否接受 10 題時的出場缺口。
+- Evidence/environment: 玩具模擬 `~/city2127-evidence/question-rotation-sim/`；正式模擬見上，非真人答案。
 
 ## Known issues and blockers
 
-- 新 run 各題起始模型未定。
+- 新 run 各題起始模型未定（題組現填暫定值）。
+- 模擬：10 題時少數 run 有模型全日未出場（見上表），gate 未卡此配置。
+- 1.7 未以 version4 真人答案分佈重跑（未檢查本機 SQLite 是否有真人資料）。
 - 蓮花受電仍為 draft，未選址。
 - 待 owner：舊能源部件逐件去留；群眾比例少人數門檻（建議 10 票）；Q02 離場模型的變化是否播出。
 - 未核實：`buildTransition.ts` 是否處理過 −1↔+1 直接跳。
-- 審閱第 G 點（城市端預載需收到每次預約抽中的題目，加入 protocol）未寫入計劃。
+- 審閱第 G 點（城市端預載需收到每次預約抽中的題目，加入 protocol）已列入下一步第 3 點。
 
 ## Next expected step
 
-階段 1（`survey/` 抽題、換模型、群眾比例、schema 9、模擬 gate），可與階段 4 的內容製作（蓮花受電驗收及選址、Q08／Q06／Q03 新模型）並行。
+階段 1 切片二：server 接線。先讀 `survey/src/server/runStore.ts`（`runProposalLadder` fold 位置）、`context.ts`、`sessionService.ts`、`answerService.ts`、`migrations.ts`、`protocol.ts`、`twoStations.test.ts`，然後：
+1. 1.6 schema 9：草稿保存抽中題目 ID（預約時 `drawQuestions`）；提案保存 drawn 題目及答案；新增可空欄位，保留 schema 8 歷史。提交時驗證答題 ID 等於草稿的抽中題（`rotationStep` 已檢查）。
+2. 1.4 run 按題組 `kind` 分流：rotation run 用 `foldRotation`，version4 run 照舊 `ladderStep`；新增 `CityView` 變體而非擴闊 `ExhibitionCityView`（root `src/` 亦 import），改後要跑 root `npm test`／build。
+3. 1.5 protocol：結果事件帶 `RotationOutcome` 與 `crowdShare`；預約事件帶抽中題目 ID，供城市端預載（審閱第 G 點）。
+4. 之後才做 1.8 guest 介面。rotation 題組不可成為 server 預設，直至 5 題 online。
+可與階段 4 內容製作（蓮花受電驗收及選址、Q08／Q06／Q03 新模型）並行。
