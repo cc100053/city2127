@@ -4,11 +4,12 @@
 - Status: IN_PROGRESS（階段 1 survey 端完成：9 題可選用接入；階段 2 城市端只接 Q01）
 - Branch: `feat/question-rotation`（2026-11-18 由 `docs/question-rotation-plan` HEAD `95c494ff` 開出；計劃文件 commit 一併帶入）
 - Base commit: `6724989bbff0ff8a0f65a9ee6e2a23f778e7ede3`（origin/main，2026-11-18）
-- Last verified commit: 階段 2 Q01 commit（`e317b593` 之後，`feat(city): draw rotation Q01 on the NW AUTO HUB`；測試及瀏覽器在該工作樹跑）
+- Last verified commit: `9c72c82a`（階段 2 Q01；實時截圖在其未 commit 工作樹拍，sidecar 記 `e317b593` dirty；`?meters` 截圖在 `9c72c82a` 乾淨樹拍）
 - Remote availability: `origin/docs/question-rotation-plan`（計劃）；`origin/feat/question-rotation`（實作）
 
 ## Session Git state
 
+- Session starting branch and HEAD（2026-11-18 第三節，階段 2 Q01）：`feat/question-rotation`，`e317b593`，與 origin 同步，`origin/main` 無新 commit（分支領先 7）；未追蹤 `Dev_QA.md` 保留
 - Session starting branch and HEAD（2026-11-18 第二節）：`docs/question-rotation-plan`，`95c494ff`，與 origin 同步；開出 `feat/question-rotation`
 - Last fetched origin/main commit: `6724989b`，2026-11-18（分支包含之）
 - Local changes present at session start: 未追蹤 `Dev_QA.md`（owner 本機檔），保留
@@ -59,9 +60,9 @@
 - 2026-11-18 階段 2 城市端，只接 Q01：
   - 做法：輪換提案的四軸票為中性，server 的 Meter layout 不動。新 `rotationLayout(view)` 在有 `view.rotation` 時把 NW 設為 Q01 顯示選項的階（A −1、B 0、C +1；band 及端口取自 `ladderLayout`，與 version4 ±1 外觀相同）；無 `rotation`（version4）時回傳 server 的同一個 layout 物件。`main.ts` 展覽分支（實時、snapshot、重設、Undo、reduced motion）及環境卡改讀它，因此 Q01 換模型沿用現行 NW focal 流程：投票旅程 → `nw:focal`／`nw:focal-low` 近鏡 → 3 秒過場 → 結果卡。結果卡證據比對仍用 server 原 layout（兩邊皆中性），不受影響。
   - 結果卡：`residentResult` 遇 Q01 換時，NW 前後狀態取自 outcome（`from`／`to`），偏好句沿用 version4 服務三句（A `human-led`、B `human-machine`、C `autonomous`）；效果句沿用 NW 近鏡句（端口增加／窗口增加）。其他題換及保底照舊：結果卡為「思いは記録され、見えている施設の構成は維持されました。」，城市不變。
-  - 直接跳：A↔C 不經 `buildTransition.ts`，而是 `siteBuilders/automationHub.ts` 的 `retarget`：舊 band 部件降、新 band 部件升，同一個 3 秒內完成，途中 mixed 部件全程為 0（新測試）。實拍 C→A 中段為塔身下降、低層大廳屋頂升起，兩者重疊約一秒；B→C、C→A 皆無穿插或斷層的明顯問題，但屬 owner 視覺判斷。
-  - A→C 與 C→A 都用 `nw:focal-low`（任何一端為 low 即用 low 鏡）；C→A 實拍 10.5 秒時低層大廳完整入鏡。A→C 未實拍，+1 塔在 low 鏡是否被裁切未核實。
-  - 投票旅程：輪換提案四票皆為 0，光點為中性色、不著陸在 NW。未改；如 owner 要 NW 光點帶方向，可只為旅程按 Q01 答案合成 automation 票。
+  - 直接跳：A↔C 不經 `buildTransition.ts`，而是 `siteBuilders/automationHub.ts` 的 `retarget`：舊 band 部件降、新 band 部件升，同一個 3 秒內完成，途中 mixed 部件全程為 0（新測試）。結果後 6.5 秒的截圖（A→C、C→A 皆然）：+1 塔身從低層大廳的圓形頂篷中穿出，兩者同時可見。是否接受屬 owner 視覺判斷。
+  - 鏡頭：A→C 與 C→A 都用 `nw:focal-low`（任何一端為 low 即用 low 鏡）。C→A 結果後 10.5 秒低層大廳完整入鏡；**A→C 結果後 10.5 秒，+1 塔頂超出畫面上緣（被裁切）**（`meters-A-to-C-10_5s.png`）。version4 不會一步由 −1 跳到 +1，所以此情況只在輪換出現。未改鏡頭；可行修正為「目的地為 high 且兩端皆非 mixed 時用 `nw:focal`」，待 owner 決定。
+  - 投票旅程：輪換提案四票皆為 0。結果後 2.5 秒的 1600 × 900 截圖中看不到可辨認的光點；未改。如 owner 要 NW 光點帶方向，可只為旅程按 Q01 答案合成 automation 票。
 
 ## Actual validation results
 
@@ -81,7 +82,7 @@
 
   另以 seed 1、7、424242 各跑一次（不入 CI）：5 題原設定無變化 1.4%–1.6%，三次都 400/400 全出場；10 題 385–391/400。
   （以上為第一節 5 題 gate 時的紀錄。）**現行 gate（暫定，待 owner 確認）：** 上線配置 9 題、原設定，只卡無變化 ≤ 2%（1.5%，通過）；每 run 全部模型出場不再卡（9 題時 389/400），只報告。10 題時約 3% run 有一個模型全日未出場；答案越一致越多。交 owner 判斷保底份量及是否接受 10 題時的出場缺口。
-- 階段 2 Q01（2026-11-18）：root 及 `survey/` `npm test`／`npm run build`、`git diff --check` 通過（新 `rotationLayout` 測試；`rotationPipeline` 以真 server 走 B→C，再經其他題 fold 至 Q01 再被抽中後直接 C→A；`automationHub` −1↔+1）。瀏覽器 `root`＋`survey-rotation`：內置瀏覽器實時看 B→C、C→A，console 無錯誤；headless Chrome 1600 × 900 以 capture 載入器在頁面就緒後送出訪客，結果後 2.5／6.5／10.5 秒截圖，page error 0，存 `~/city2127-evidence/question-rotation/q01-city/`（`sheet.jpg` 總覽，`guest.mjs`／`cycle.sh`／`liveCapture.mjs` 為驅動腳本副本）。`npm run capture` 固定 settle 對不準實時結果（載入時間浮動約 5 秒，三次中兩次拍到結果後 14–15 秒），只留 `live-C-to-A.png` 一張成功的及 `state-A-hero.png`。version4 不變由同一物件測試保證，未拍前後對照。
+- 階段 2 Q01（2026-11-18）：root 及 `survey/` `npm test`／`npm run build`、`git diff --check` 通過（新 `rotationLayout` 測試；`rotationPipeline` 以真 server 走 B→C，再經其他題 fold 至 Q01 再被抽中後直接 C→A；`automationHub` −1↔+1）。瀏覽器 `root`＋`survey-rotation`：內置瀏覽器實時看 B→C、C→A，console 無錯誤；headless Chrome 1600 × 900 以 capture 載入器在頁面就緒後送出訪客，結果後 2.5／6.5／10.5 秒截圖，page error 0，存 `~/city2127-evidence/question-rotation/q01-city/`（`sheet.jpg` 總覽，`guest.mjs`／`cycle.sh`／`liveCapture.mjs` 為驅動腳本副本）。`npm run capture` 固定 settle 對不準實時結果（載入時間浮動約 5 秒，三次中兩次拍到結果後 14–15 秒），只留 `live-C-to-A.png` 一張成功的及 `state-A-hero.png`。另以 `npm run capture`（`9c72c82a` 乾淨樹，只開 `root`）用 DEV `?meters=nw:∓2.5&metersTo=nw:±2.5&metersAge=6.5／10.5&reviewTime=30&nopanel` 確定性地拍 A→C、C→A（同一 NW ±1 路徑，`meters-*.png`，`meters-sheet.jpg`），page error 0。version4 不變由同一物件測試保證，未拍前後對照。分支 CI：`9c72c82a` push 時為 in_progress，上一個 `e317b593` 為 success。
 - Evidence/environment: 玩具模擬 `~/city2127-evidence/question-rotation-sim/`；正式模擬見上，非真人答案。
 
 ## Known issues and blockers
@@ -93,7 +94,7 @@
 - 待 owner：舊能源部件逐件去留；群眾比例少人數門檻（建議 10 票）；Q02 離場模型的變化是否播出。
 - 已核實（2026-11-18）：Q01 −1↔+1 直接跳由 AUTO HUB `retarget` 處理（見上），不經 `buildTransition.ts`；其他題的直接跳待各自模型接入時核實。
 - 待 owner：Q01 換模型的效果句仍以「ほかの住民の声と重なり、」開頭，與 3.7「一位訪客的答案直接決定變化」不完全一致；改寫屬 5.2 文案，未改。
-- 待 owner：C→A 過場中塔身與低層大廳重疊約一秒、A→C 用 low 鏡，視覺是否接受。
+- 待 owner：A↔C 過場中段塔身穿出低層大廳頂篷；A→C 用 low 鏡致 +1 塔頂被裁切（見上），是否改鏡頭。
 - 審閱第 G 點（城市端預載需收到每次預約抽中的題目，加入 protocol）已列入下一步第 3 點。
 
 ## Next expected step
