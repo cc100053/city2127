@@ -1,0 +1,13 @@
+/* Question pool preview: reuses the guest terminal look (guestTheme.css) and adds only what it lacks. */
+.pool-preview .pool-variant { display: flex; gap: 8px; }
+.pool-preview .pool-variant button { min-width: 0; min-height: 40px; padding: 8px 14px; font-size: 14px; }
+.pool-preview .pool-steps { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0 0 26px; list-style: none; }
+.pool-preview .pool-steps button { min-width: 44px; min-height: 36px; padding: 4px 10px; font-size: 14px; }
+.pool-preview .pool-steps button.is-complete { color: var(--guest-ink); border-color: #637b70; background: #2f3d36; }
+.pool-preview .pool-steps button.is-current { color: #2c2e25; border-color: var(--guest-cyan); background: var(--guest-cyan); }
+.pool-preview .pool-meta { color: var(--guest-muted); font-size: 14px; line-height: 1.75; }
+.pool-preview .pool-city { color: #c9dcd6; }
+.pool-preview .pool-notes { margin: 0 0 12px; padding-left: 1.2em; color: var(--guest-amber); font-size: 14px; line-height: 1.75; }
+.pool-preview .pool-summary-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.pool-preview .pool-summary-row p { margin: 0 0 4px; }
+.pool-preview .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
