@@ -671,34 +671,37 @@ def disc(acc, c, nrm, r, t, n=16):
     limb(acc, [_v(c, nrm, -t / 2), _v(c, nrm, t / 2)], r, r, n)
 
 
-def branch_strut(ctx, base, tips, r=.32, role='white', twigs=True, web=False, pads=None, limb_r=.6, flat=1.0):
+def branch_strut(ctx, base, tips, r=.32, role='white', twigs=True, web=False, pads=None, limb_r=.6, flat=1.0, fork=None,
+                 web_k=1.0):
     """White organic tree strut: one curved trunk per base (a point on a frame face; a list of points makes a root that
     grabs several members, e.g. a column side and a beam underside) meeting at a knuckled fork, which splits into one
     curved limb per tip (3-5 pod belly points). twigs: a second-order twig leaves each limb at half length and lands
     between its tip and the next. Radii taper r -> .7 r (trunk), limb_r r -> .5 limb_r r (limbs), .3 r -> .16 r (twigs).
     web (R3): smooth webbing between neighbouring limbs near the fork, so the fork reads as one bone-like casting.
     pads: one face normal per base; each foot becomes a round disc 1.25 r across that face. flat < 1: flat limbs.
-    Metres."""
+    fork (R4): put the fork at this point (e.g. pushed out in front of the pod, toward the viewer, so the forks and
+    webs are not hidden behind it); web_k scales the webbing lenses and the fork knuckle. Metres."""
     a = ctx.a[role]
     bases = base if isinstance(base[0], (tuple, list)) else [base]
     mid = tuple(sum(t[k] for t in tips) / len(tips) for k in range(3))
     b0 = bases[0]
-    fork = _v(b0, _sub(mid, b0), .55)
-    fork = (fork[0], fork[1] - .12 * abs(mid[1] - b0[1]), fork[2])
+    if fork is None:
+        fork = _v(b0, _sub(mid, b0), .55)
+        fork = (fork[0], fork[1] - .12 * abs(mid[1] - b0[1]), fork[2])
     for i, b in enumerate(bases):
         limb(a, _bez(b, _v(b, _sub(fork, b), .5), fork, 5), r, r * .7, 10 if not web else 8)
         if pads:
             disc(a, b, pads[i], r * 1.25, max(.12, r * .35), 16)
         else:
             blob(a, b, (r * 1.1, r * 1.1, r * 1.1), sub=1, noise=0, flat=1)       # foot pad on the member
-    blob(a, fork, (r * .95, r * .95, r * .95), sub=2 if web else 1, noise=0, flat=1)
+    blob(a, fork, (r * .95 * web_k, r * .95 * web_k, r * .95 * web_k), sub=2 if web else 1, noise=0, flat=1)
     paths = []
     for i, t in enumerate(tips):
         c = (fork[0] + (t[0] - fork[0]) * .3, t[1] - .15 * abs(t[1] - fork[1]), fork[2] + (t[2] - fork[2]) * .3)
         path = _bez(fork, c, t, 6)
         paths.append(path)
         limb(a, path, r * limb_r, r * limb_r * .5, 8 if not web else 6, flat)
-        blob(a, t, (r * limb_r * .7,) * 3, sub=1, noise=0, flat=1)          # rounded grip where the limb meets the pod
+        blob(a, t, (r * limb_r * (.7 if web_k == 1.0 else .45),) * 3, sub=1, noise=0, flat=1)   # grip where the limb meets the pod
         if twigs and len(tips) > 1:
             o = tips[i + 1] if i + 1 < len(tips) else tips[i - 1]
             land = tuple((t[k] + o[k]) / 2 + (.12 if k == 1 else 0) for k in range(3))
@@ -713,14 +716,16 @@ def branch_strut(ctx, base, tips, r=.32, role='white', twigs=True, web=False, pa
                 along = _unit(_sub(c, fork))
                 side = _unit(gap)
                 nrm = _unit(_cross(along, side))
-                ell(a, c, _v((0, 0, 0), side, half + r * limb_r * .4), _v((0, 0, 0), nrm, r * .32 * sc),
-                    _v((0, 0, 0), along, r * .9 * sc), 10, 5)
+                ell(a, c, _v((0, 0, 0), side, half + r * limb_r * .4), _v((0, 0, 0), nrm, r * .32 * sc * min(web_k, 1.3)),
+                    _v((0, 0, 0), along, r * .9 * sc * web_k), 10, 5)
 
 
-def bone_arm(ctx, p0, p1, w=1.0, t=.3, holes=3, sag=.12, up=(0, 1, 0), role='white'):
+def bone_arm(ctx, p0, p1, w=1.0, t=.3, holes=3, sag=.12, up=(0, 1, 0), role='white', solid=False, hole_role='concrete_t'):
     """Flat perforated "bone" arm (owner pod-frame image, R3): a plate w wide and t thick from p0 to p1, bowed up by
     sag x length, pierced by `holes` oval openings (two rounded edge rails that pinch together at smooth rungs), with
-    a round joint disc at each end (radius 0.7 w). Use it to hook a column top over a pod's crown. Metres."""
+    a round joint disc at each end (radius 0.7 w). Use it to hook a column top over a pod's crown. Metres.
+    solid (R4): one smooth dog-bone plate (wide at the ends, 0.75 w at mid-span, thick rounded edge) with the holes
+    as shallow dark oval recesses in hole_role on both faces: reads as one bone from afar, never as chain links."""
     a = ctx.a[role]
     d = _sub(p1, p0)
     ln = math.sqrt(sum(c * c for c in d))
@@ -740,6 +745,29 @@ def bone_arm(ctx, p0, p1, w=1.0, t=.3, holes=3, sag=.12, up=(0, 1, 0), role='whi
         f = (u - u0) / (u1 - u0) * holes
         return w * .24 + (w / 2 - w * .21 - w * .24) * math.sin(math.pi * (f - int(f)))
     us = [k / 28 for k in range(29)]
+    if solid:
+        us = [k / 20 for k in range(21)]
+        nn, verts = 14, []                                           # dog-bone plate lofted from flat oval sections
+        for u in us:
+            half = w / 2 * (1 - .25 * math.sin(math.pi * u))
+            c = mid(u)
+            verts += [_v(_v(c, side, half * math.cos(2 * math.pi * j / nn)), nrm, rr * math.sin(2 * math.pi * j / nn))
+                      for j in range(nn)]
+        m_ = len(us)
+        faces = [(i * nn + j, i * nn + (j + 1) % nn, (i + 1) * nn + (j + 1) % nn, (i + 1) * nn + j)
+                 for i in range(m_ - 1) for j in range(nn)]
+        faces += [tuple(reversed(range(nn))), tuple(range((m_ - 1) * nn, m_ * nn))]
+        a.solid(verts, faces)
+        for j in range(holes):
+            u = u0 + (u1 - u0) * (j + .5) / holes
+            hl = (u1 - u0) / holes * ln * .32
+            hs = w / 2 * (1 - .25 * math.sin(math.pi * u)) * .45
+            for sg in (-1, 1):
+                ell(ctx.a[hole_role], _v(mid(u), nrm, sg * rr * .82), _v((0, 0, 0), side, hs), _v((0, 0, 0), nrm, rr * .25),
+                    _v((0, 0, 0), du, hl), 12, 4)
+        for e in (p0, p1):
+            disc(a, e, nrm, w * .7, t * 1.15, 20)
+        return
     rw = w * .21                                                     # rail width across the plate; t thick
     for sg in (-1, 1):
         limb(a, [_v(mid(u), side, sg * hw(u)) for u in us], rw, rw, 8, rr / rw)
@@ -974,7 +1002,7 @@ def grid_frame(ctx, cx=0, cz=0, y0=0, cols=5, rows=4, levels=7, cell=7.0, floor_
 
 
 def roof_farm(ctx, cx, cz, y, w, d, arbors=4, people=4, density=1.0, crops=1.0, ring=False, bed='wood', soil='soil',
-              leaf=None, hoop='white', tufts=5, canopy=False, spill=0.0, flowers=(), hoop_step=2.3, edges=True):
+              leaf=None, hoop='white', tufts=5, canopy=False, spill=0.0, flowers=(), hoop_step=2.3, edges=True, cards=False):
     """Rooftop farm on a deck top at y: soil beds in rows along x with leafy crops and orange/red fruit, a planted edge
     trough that spills over, `arbors` white hoop vine tunnels (3.2 m) running along z across the beds, and farming
     residents. density scales plants per bed (spacing 0.9 m / density), crops scales fruit per plant (0.35 x crops).
@@ -985,8 +1013,23 @@ def roof_farm(ctx, cx, cz, y, w, d, arbors=4, people=4, density=1.0, crops=1.0, 
     metal), 4 cm tubes 3 m high; tufts = leaf tufts per hoop, laid along the whole arch; canopy = a tuft bridging each
     pair of neighbouring hoops at the crown; spill = edge plants that hang this far (m) out and down over the trough;
     flowers = roles for a sprinkle of flower dots along the beds; hoop_step = hoop spacing; edges=False drops the
-    trough (for a farm floor that sits inside railings)."""
+    trough (for a farm floor that sits inside railings).
+    cards (R4): every plant is a leaf_clump of leaf cards instead of a lumpy ball (crops as upright rosettes, hoop
+    and canopy leaves hanging), fruit and flower dots as 24-tri ellipsoids; spill plants become leaf_strands."""
     A, rng = ctx.a, ctx.rng
+
+    def dot(role, c, r):                                              # fruit / flower dot
+        if cards:
+            ell(A[role], c, (r[0], 0, 0), (0, r[1], 0), (0, 0, r[2]), 6, 3)
+        else:
+            blob(A[role], c, r, sub=1, noise=0)
+
+    def plant(role, c, r, seed, n=14, up=False, droop=.4, size=.22):
+        if cards:
+            leaf_clump(ctx, c, r, (role,) if role != 'green' else ('green', leaf or 'leaf_l'), None if up else 'green', n,
+                       size, droop, 2 if n > 16 else 1, up)
+        else:
+            blob(role if not isinstance(role, str) else A[role], c, r, sub=1, seed=seed)
     m = 4.0 if ring else 1.6
     nb = max(2, int((d - 2 * m + 3.2) // 3.2))
     bw = w - 2 * m + 0.2 if ring else w - 3
@@ -997,15 +1040,17 @@ def roof_farm(ctx, cx, cz, y, w, d, arbors=4, people=4, density=1.0, crops=1.0, 
         obox(A[soil], (cx, y + .52, bz), (bw - .2, .06, 1.3))
         for t in range(int((bw - .5) / step)):
             px = cx - (bw - .5) / 2 + t * step + rng.uniform(-.15, .15)
-            role = A['green'] if (t + b) % 3 else A[leaf or 'leaf_l']
+            role = 'green' if (t + b) % 3 else leaf or 'leaf_l'
             if leaf and (t + b) % 3 == 1:
-                role = A[leaf]
-            blob(role, (px, y + .75, bz + rng.uniform(-.3, .3)), (.42, .3, .5), sub=1, seed=px + bz)
+                role = leaf
+            role = role if cards else A[role]
+            plant(role if not cards else ('green' if (t + b) % 3 == 0 else leaf or 'leaf_l' if (t + b) % 3 == 1 else 'leaf_l'),
+                  (px, y + .72, bz + rng.uniform(-.3, .3)), (.42, .3, .5), px + bz, 9, True, size=.38)
             k = .35 * crops
             for _ in range(int(k) + (rng.random() < k - int(k))):
-                blob(A['crop'], (px + rng.uniform(-.3, .3), y + .95, bz + rng.uniform(-.4, .4)), (.11, .11, .11), sub=1, noise=0)
+                dot('crop', (px + rng.uniform(-.3, .3), y + .95, bz + rng.uniform(-.4, .4)), (.11, .11, .11))
             if flowers and rng.random() < .35:
-                blob(A[rng.choice(flowers)], (px + rng.uniform(-.3, .3), y + .93, bz + rng.choice((-.62, .62))), (.09, .07, .09), sub=1, noise=0)
+                dot(rng.choice(flowers), (px + rng.uniform(-.3, .3), y + .93, bz + rng.choice((-.62, .62))), (.09, .07, .09))
     if edges:
         for sx, sz, lx, lz in ((0, -1, w, .9), (0, 1, w, .9), (-1, 0, .9, d), (1, 0, .9, d)):
             ex, ez = cx + sx * (w / 2 - .45), cz + sz * (d / 2 - .45)
@@ -1014,11 +1059,17 @@ def roof_farm(ctx, cx, cz, y, w, d, arbors=4, people=4, density=1.0, crops=1.0, 
             for t in range(n):
                 f = -.5 + (t + .5) / n
                 px, pz = (ex + f * lx, ez) if sx == 0 else (ex, ez + f * lz)
-                blob(A['leaf_l' if t % 2 else 'green'], (px, y + .95, pz), (.8, .55, .8), sub=1, seed=px * 3 + pz)
+                plant('leaf_l' if t % 2 else 'green', (px, y + .95, pz), (.8, .55, .8), px * 3 + pz, 22, droop=.6, size=.45)
                 if spill and t % 2 == 0:                             # trailing plants hanging out over the edge
                     o, dn = rng.uniform(.5, 1.0) * spill, rng.uniform(.5, 1.0) * spill
                     qx, qz = px + sx * o, pz + sz * o
-                    blob(A[leaf or 'leaf_l'], (qx, y + .5 - dn / 2, qz), (.45 if sz else .3, dn / 2 + .3, .3 if sz else .45), sub=1, seed=qx + qz)
+                    if cards:
+                        for _s in range(3):
+                            leaf_strand(ctx, (px + sx * (.4 + .3 * _s) + (rng.uniform(-.5, .5) if sz else 0), y + .8,
+                                              pz + sz * (.4 + .3 * _s) + (rng.uniform(-.5, .5) if sx else 0)),
+                                        dn + .5, (sx, 0, sz), leaf or 'leaf_l', .2, .2)
+                    else:
+                        blob(A[leaf or 'leaf_l'], (qx, y + .5 - dn / 2, qz), (.45 if sz else .3, dn / 2 + .3, .3 if sz else .45), sub=1, seed=qx + qz)
     rise = 3.0 if hoop != 'white' else 2.6
     tube = .04 if hoop != 'white' else .09
 
@@ -1032,18 +1083,18 @@ def roof_farm(ctx, cx, cz, y, w, d, arbors=4, people=4, density=1.0, crops=1.0, 
             i0 = min(int(f), 9)
             px, py, pz = (arc[i0][kk] + (arc[i0 + 1][kk] - arc[i0][kk]) * (f - i0) for kk in range(3))
             o = rng.uniform(-.35, .35)
-            blob(A['green' if t % 3 == 1 else (leaf or 'leaf_l')], (px + (o if along == 'x' else 0), py + .05, pz + (o if along == 'z' else 0)),
-                 (.42, .32, .42), sub=1, seed=px + pz + t)
+            plant('green' if t % 3 == 1 else (leaf or 'leaf_l'), (px + (o if along == 'x' else 0), py + .05, pz + (o if along == 'z' else 0)),
+                  (.42, .32, .42), px + pz + t, 10, droop=.8, size=.4)
         if rng.random() < .4:
-            blob(A['crop'], (c[0], y + rise, c[1]), (.12, .16, .12), sub=1, noise=0)
+            dot('crop', (c[0], y + rise, c[1]), (.12, .16, .12))
 
     def tunnel(pts, along):
         for h, c in enumerate(pts):
             hoop_at(c, along)
             if canopy and h + 1 < len(pts):                          # leaves bridging this hoop and the next
                 n2 = pts[h + 1]
-                blob(A['green' if h % 2 else (leaf or 'leaf_l')], ((c[0] + n2[0]) / 2, y + .6 + rise, (c[1] + n2[1]) / 2),
-                     (.75, .3, .75), sub=1, seed=c[0] + c[1])
+                plant('green' if h % 2 else (leaf or 'leaf_l'), ((c[0] + n2[0]) / 2, y + .6 + rise, (c[1] + n2[1]) / 2),
+                      (.75, .3, .75), c[0] + c[1], 14, droop=.9, size=.42)
     for k in range(arbors):                                          # vine tunnels along z
         ax = cx + (k - (arbors - 1) / 2) * w / 3 if ring else cx - w / 2 + 3 + k * (w - 6) / max(arbors - 1, 1)
         n = int(d * .7 / hoop_step)
@@ -1062,11 +1113,11 @@ def roof_farm(ctx, cx, cz, y, w, d, arbors=4, people=4, density=1.0, crops=1.0, 
         person(ctx, cx + rng.uniform(-w / 2 + 3, w / 2 - 3), y, cz + rng.uniform(-d / 2 + 2, d / 2 - 2))
 
 
-def vine_curtain(ctx, a, b, y, out, length=(1.5, 3.0), step=1.0, role='leaf_l', flowers=(), fl=.3, skip=None):
+def vine_curtain(ctx, a, b, y, out, length=(1.5, 3.0), step=1.0, role='leaf_l', flowers=(), fl=.3, skip=None, cards=False):
     """Hanging vine curtain from a beam edge: strands every `step` m from point a to b (three.js metres, top at y),
     each 2-3 long thin leaf ribbons (flattened ellipsoids, 36 tris) swaying down `length` m, `out` = unit outward
     normal; a fraction fl of strands carry flower dots in `flowers` roles. skip(x, z) -> max length (m) where a strand
-    must stay short (e.g. over a pod), or None."""
+    must stay short (e.g. over a pod), or None. cards (R4): each strand is a leaf_strand (stem + leaf cards)."""
     A, rng = ctx.a, ctx.rng
     n = max(1, int(math.hypot(b[0] - a[0], b[2] - a[2]) / step))
     for i in range(n + 1):
@@ -1077,6 +1128,9 @@ def vine_curtain(ctx, a, b, y, out, length=(1.5, 3.0), step=1.0, role='leaf_l', 
             lim = skip(px, pz)
             if lim is not None:
                 ln = min(ln, lim)
+        if cards:
+            leaf_strand(ctx, (px, y, pz), ln, out, role, flowers=flowers, fl=fl)
+            continue
         segs = max(1, round(ln / .9))
         py, sway = y, rng.uniform(-.2, .2)
         for g in range(segs):
@@ -1110,21 +1164,129 @@ def arch_shell(ctx, c, out, span=5.5, rise=4.0, reach=2.0, t=.4, role='white', i
     limb(A[role], rim, t / 2, t / 2, 8)
 
 
-def flower_bed(ctx, c, along, length, width=1.3, grass='leaf_l', flowers=('white',), trees=1):
+def flower_bed(ctx, c, along, length, width=1.3, grass='leaf_l', flowers=('white',), trees=1, cards=False):
     """Low rounded flower bed (a flattened grass mound) along unit `along` (xz) centred c, dotted with flower roles,
-    with `trees` small round trees (kit tree_round_s)."""
+    with `trees` small round trees (kit tree_round_s). cards (R4): flowers on leaf_clump shrubs and leafy_tree
+    trees (visible branches, broken crowns) instead of the kit lollipop trees."""
     A, rng = ctx.a, ctx.rng
     ax = (along[0], 0, along[1])
     nx = (-along[1], 0, along[0])
     ell(A[grass], _v(c, (0, 1, 0), .2), _v((0, 0, 0), ax, length / 2), (0, .32, 0), _v((0, 0, 0), nx, width / 2), 14, 5)
+    if cards:
+        for i in range(int(length / 1.2)):
+            u = (i + .5) / int(length / 1.2) - .5
+            p = _v(_v(c, ax, u * length * .85), nx, rng.uniform(-.2, .2) * width)
+            leaf_clump(ctx, (p[0], .55, p[2]), (.5, .35, .45), (grass, 'green'), 'green', 18, .3, .5, 2)
     for i in range(int(length * 3)):
         u, v = rng.uniform(-.45, .45) * length, rng.uniform(-.35, .35) * width
         p = _v(_v(c, ax, u), nx, v)
-        blob(A[rng.choice(flowers)], (p[0], .5 + .1 * rng.random(), p[2]), (.12, .08, .12), sub=1, noise=0)
+        if cards:
+            ell(A[rng.choice(flowers)], (p[0], .58 + .2 * rng.random(), p[2]), (.1, 0, 0), (0, .07, 0), (0, 0, .1), 6, 3)
+        else:
+            blob(A[rng.choice(flowers)], (p[0], .5 + .1 * rng.random(), p[2]), (.12, .08, .12), sub=1, noise=0)
     for i in range(trees):
         u = (i + .5) / trees - .5
         p = _v(c, ax, u * length * .6)
-        kit_prop(ctx, 'tree_round_s', p[0], .3, p[2], rng.uniform(0, 6.28))
+        if cards:
+            leafy_tree(ctx, (p[0], .3, p[2]), 3.2, 1.3, 'wood', (grass, 'green'), 'green', 60, .38)
+        else:
+            kit_prop(ctx, 'tree_round_s', p[0], .3, p[2], rng.uniform(0, 6.28))
+
+
+def leaf_card(acc, p, d, ln, wd, curl=.1, out=None):
+    """One leaf: a folded diamond (2 triangles) from base p along unit d, ln long and wd wide, the midrib lifted by
+    curl x ln toward out (default: up). Single-sided; give its role a double-sided material. Metres."""
+    o = out or (0, 1, 0)
+    s = _cross(d, o)
+    if sum(c * c for c in s) < 1e-6:
+        s = _cross(d, (1, 0, 0))
+    s = _unit(s)
+    nrm = _unit(_cross(s, d))
+    m = _v(_v(p, d, ln * .45), nrm, curl * ln)
+    verts = [p, _v(m, s, wd / 2), _v(p, d, ln), _v(m, s, -wd / 2)]
+    acc.surface(verts, [(0, 1, 2), (0, 2, 3)], lambda c: nrm)
+
+
+def _sph(rng, ylo=-1.0):
+    y = rng.uniform(ylo, 1)
+    a = rng.uniform(0, 2 * math.pi)
+    q = math.sqrt(max(0, 1 - y * y))
+    return (q * math.cos(a), y, q * math.sin(a))
+
+
+def leaf_clump(ctx, c, r, roles=('leaf_l',), core='green', n=36, size=.24, droop=.35, lobes=3, up=False):
+    """Plant clump that reads as foliage, not an ellipsoid (owner R3 «植物橢圓形，唔似»): `lobes` irregular sub-clumps
+    (each a small dark core, 20 tris) inside the semi-axes r = (rx, ry, rz) round c, covered by n leaf cards
+    (leaf_card, 2 tris each) in `roles` that stick out past the core so the silhouette breaks into leaves; cards on
+    the lower half droop by `droop` (hanging edges), up=True points them up instead (lettuce rosettes, crops).
+    core=None: cards only. Metres."""
+    A, rng = ctx.a, ctx.rng
+    rx, ry, rz = r
+    lb = []
+    for i in range(lobes):
+        off = (rng.uniform(-.45, .45) * rx, rng.uniform(-.25, .35) * ry, rng.uniform(-.45, .45) * rz) if i else (0, 0, 0)
+        k = rng.uniform(.6, .8)
+        lb.append((_v(c, off), (rx * k, ry * k, rz * k)))
+        if core:
+            lc, lr = lb[-1]
+            ell(A[core], lc, (lr[0] * .55, 0, 0), (0, lr[1] * .5, 0), (0, 0, lr[2] * .55), 5, 3)
+    for i in range(n):
+        lc, lr = lb[i % lobes]
+        d = _sph(rng, -.7)
+        f = rng.uniform(.45, 1.05)
+        p = (lc[0] + d[0] * lr[0] * f, lc[1] + d[1] * lr[1] * f, lc[2] + d[2] * lr[2] * f)
+        if up:
+            t = _unit((d[0] * .5 + rng.uniform(-.2, .2), 1.0, d[2] * .5 + rng.uniform(-.2, .2)))
+        else:
+            dn = droop * (1.0 if d[1] < .2 else .3)
+            t = _unit((d[0] + rng.uniform(-.35, .35), d[1] * .6 - dn + rng.uniform(-.2, .2), d[2] + rng.uniform(-.35, .35)))
+        ln = size * rng.uniform(.75, 1.3)
+        leaf_card(A[roles[i % len(roles)]], p, t, ln, ln * .5, .12, d)
+
+
+def leafy_tree(ctx, base, h=3.0, crown=1.4, trunk='wood', roles=('leaf_l', 'green'), core='green', n=70, size=.3,
+               branches=4):
+    """Small tree with visible branching: a trunk limb (r 0.06 h/3) up to 55 % of h, then `branches` limbs bending
+    out and up to crown lobes, each lobe a leaf_clump (n leaves in all), so trunk, forks and broken leaf crown read
+    instead of a lollipop ball. base (three.js), h metres tall, crown = crown radius. Replaces kit tree_round_s
+    for close-up sites."""
+    rng = ctx.rng
+    rt = .06 * h / 3 + .03
+    fork = _v(base, (rng.uniform(-.1, .1), h * .55, rng.uniform(-.1, .1)))
+    limb(ctx.a[trunk], [base, _v(base, (0, h * .3, 0)), fork], rt * 1.3, rt * .8, 6)
+    a0 = rng.uniform(0, 6.28)
+    for i in range(branches):
+        a = a0 + i * 2 * math.pi / branches + rng.uniform(-.3, .3)
+        rr = crown * rng.uniform(.45, .7)
+        tip = _v(fork, (rr * math.cos(a), h * rng.uniform(.25, .38), rr * math.sin(a)))
+        mid = _v(fork, (rr * .45 * math.cos(a), h * .12, rr * .45 * math.sin(a)))
+        limb(ctx.a[trunk], [fork, mid, tip], rt * .7, rt * .35, 5)
+        cr = crown * rng.uniform(.5, .65)
+        leaf_clump(ctx, _v(tip, (0, cr * .2, 0)), (cr, cr * .75, cr), roles, core, max(8, n // branches), size, .45, 2)
+    leaf_clump(ctx, _v(fork, (0, h * .4, 0)), (crown * .5, crown * .45, crown * .5), roles, core, max(6, n // 6), size, .3, 1)
+
+
+def leaf_strand(ctx, top, ln, out, role='vine', size=.3, step=.22, flowers=(), fl=.3, sway=.25):
+    """Hanging vine strand from top (three.js) ln metres down, leaning out along unit `out`: a thin stem with a leaf
+    card every `step` m alternating sides, hanging down and out (tips droop), dotted with flower roles at rate fl per
+    leaf pair. About 2 tris per leaf plus 8 for the stem."""
+    A, rng = ctx.a, ctx.rng
+    sx = rng.uniform(-sway, sway)
+    side = (-out[2], 0, out[0])
+
+    def at(f):
+        return _v(_v(_v(top, (0, -1, 0), ln * f), out, .25 * f * f), side, sx * f * f)
+    limb(A[role], [at(0), at(.5), at(1)], .02, .012, 3)
+    k = max(2, int(ln / step))
+    for i in range(k):
+        f = (i + .5) / k
+        p = at(f)
+        sg = 1 if i % 2 else -1
+        t = _unit(_v(_v((0, -1, 0), side, sg * rng.uniform(.5, 1.0)), out, rng.uniform(.3, .8)))
+        s = size * rng.uniform(.75, 1.25) * (1.1 - .3 * f)
+        leaf_card(A[role], p, t, s, s * .55, .15, out)
+        if flowers and i % 2 and rng.random() < fl:
+            ell(A[rng.choice(flowers)], _v(p, out, .06), (.06, 0, 0), (0, .05, 0), (0, 0, .06), 5, 3)
 
 
 # Registry checked against LIBRARY.md by tests/assetLibrary.test.ts — add a row there for every new key.
@@ -1134,5 +1296,6 @@ MODULES = {
     'event_module': event_module, 'lattice_frame': lattice_frame,
     'limb': limb, 'branch_strut': branch_strut, 'egg_pod': egg_pod, 'grid_frame': grid_frame, 'roof_farm': roof_farm,
     'bone_arm': bone_arm, 'ell': ell, 'disc': disc, 'vine_curtain': vine_curtain, 'arch_shell': arch_shell,
-    'flower_bed': flower_bed,
+    'flower_bed': flower_bed, 'leaf_card': leaf_card, 'leaf_clump': leaf_clump, 'leafy_tree': leafy_tree,
+    'leaf_strand': leaf_strand,
 }

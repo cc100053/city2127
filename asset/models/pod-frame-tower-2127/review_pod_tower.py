@@ -1,8 +1,8 @@
 """Review-only render of pod-frame-tower-2127.blend beside a 1.8 m figure (not exported).
   /Applications/Blender.app/Contents/MacOS/Blender -b pod-frame-tower-2127.blend --factory-startup --python-exit-code 1 \
       -P review_pod_tower.py -- out.png [--view target3q|target|front|back|right|pod|pod3q] [--eevee] [--r2light]
-`target3q` (R3) matches the owner image: 35 mm perspective from the corner of the front (-z) and +x faces (the +x face
-on screen left), 32 deg down, 1448 x 1086. `target` is the R1/R2 near-front orthographic view, kept for round compares.
+`target3q` matches the owner image: 35 mm perspective from the corner of the front (-z) and +x faces (the +x face
+on screen left), 1448 x 1086; R4 lowered it from 32 to 25 deg down (the roof dominated); `target3q32` keeps R3's. `target` is the R1/R2 near-front orthographic view, kept for round compares.
 R3 lighting: warm 5,000 K sun (strength 5, from the front-right, 45 deg up), blue sky gradient at .35, Khronos PBR
 Neutral at -0.5 EV (AgX greyed the pastels; sampled against the owner image with the @@PROBE@@ pixels).
 --r2light restores the R2 lighting for comparisons.
@@ -15,12 +15,12 @@ import bpy
 args = sys.argv[sys.argv.index('--') + 1:]
 out = args[0]
 view = args[args.index('--view') + 1] if '--view' in args else 'target'
-VIEWS = {'target3q': (47, 32, 84, 0), 'pod3q': (62, 16, 30, 0), 'target': (-12, 28, 140, 66), 'front': (0, 8, 140, 70), 'back': (180, 20, 140, 70), 'right': (90, 15, 140, 70),
+VIEWS = {'target3q': (47, 25, 76, 0), 'target3q32': (47, 32, 84, 0), 'pod3q': (62, 16, 30, 0), 'target': (-12, 28, 140, 66), 'front': (0, 8, 140, 70), 'back': (180, 20, 140, 70), 'right': (90, 15, 140, 70),
          'pod': (-20, 18, 60, 22)}
 az_d, el_d, d, ortho = VIEWS[view]
 az, el = math.radians(az_d), math.radians(el_d)
 sc = bpy.context.scene
-tx, ty, tz = {'pod': (-14, 12, 22), 'target3q': (1, 1, 13.5), 'pod3q': (20, -3, 19)}.get(view, (0, 0, 16))                                               # Blender target (x, -z, y)
+tx, ty, tz = {'pod': (-14, 12, 22), 'target3q': (1, 1, 15.0), 'target3q32': (1, 1, 13.5), 'pod3q': (20, -3, 19)}.get(view, (0, 0, 16))                                               # Blender target (x, -z, y)
 cam_loc = (tx + d * math.cos(el) * math.sin(az), ty + d * math.cos(el) * math.cos(az), tz + d * math.sin(el))
 bpy.ops.object.camera_add(location=cam_loc)
 cam = bpy.context.object
@@ -38,7 +38,7 @@ r2 = '--r2light' in args
 
 def opt(name, default):                                                  # tuning overrides, e.g. --exposure -.3
     return float(args[args.index(name) + 1]) if name in args else default
-sc.render.resolution_x, sc.render.resolution_y = (1448, 1086) if view in ('target3q', 'pod3q') else (1600, 1200)
+sc.render.resolution_x, sc.render.resolution_y = (1448, 1086) if view in ('target3q', 'target3q32', 'pod3q') else (1600, 1200)
 sc.render.resolution_percentage = int(opt('--pct', 100))                 # e.g. --pct 200 for close crops
 sc.render.engine = 'BLENDER_EEVEE' if '--eevee' in args else 'BLENDER_WORKBENCH'
 sc.world = bpy.data.worlds.new('w')
@@ -85,7 +85,8 @@ if sc.render.engine == 'BLENDER_WORKBENCH':
     sc.display.shading.show_shadows = True
 sc.render.filepath = out
 PROBES = {'pod_top': (22.0, 27.3, 7.0), 'pod_top_front': (-22.0, 27.6, -11.8), 'pod_pink': (20.4, 15.6, -6.4), 'col_x': (18.24, 18.0, -7.0),
-          'col_front': (10.5, 18.0, -14.74), 'beam_front': (7.0, 12.9, -14.62)}           # three.js metres
+          'col_front': (10.5, 18.0, -14.74), 'beam_front': (7.0, 12.9, -14.62), 'pod_sage': (19.0, 21.4, -7.0),
+          'pod_sage_front': (7.0, 7.4, -14.4), 'shop': (0.0, 2.0, -13.5)}           # three.js metres
 if view == 'target3q':                                                    # pixel of each probe, for colour checks
     from bpy_extras.object_utils import world_to_camera_view
     bpy.context.view_layer.update()

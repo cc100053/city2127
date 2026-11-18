@@ -12,6 +12,8 @@ One node POD_FRAME_TOWER, one mesh per role, role materials named pft_<role>.
 R2 (2026-11-17): 1.45 m columns, 1.15 x 1.2 m beams with form-joint strips; nine pods seated in front bays; every pod
 on a 3-5 limb strut with twigs; hanging planters in every bay, metal baluster railings, indoor trees; ring arbors and
 a level-6 terrace farm; 4.5 m ground storefront with three arches and plinth planters.
+R4 (2026-11-18): every plant is built from leaf cards (leaf_clump, leafy_tree, leaf_strand) instead of lumpy balls;
+strut forks stand in front of each pod's camera side; solid bone arms; a brighter lit ground-floor shop.
 """
 import math
 import os
@@ -114,21 +116,41 @@ def surf(pod, a, b, c, s=.96):
     return (x + lx * cy + lz * sy, y + ly, z - lx * sy + lz * cy)
 
 
+CAM = (.73, -.68)                                                # three.js xz direction from the tower to the target3q camera
+
+
+def local_dir(pod, wx, wz):
+    """World xz direction -> the pod's local (x, z) (inverse of the yaw used by surf)."""
+    cy, sy = math.cos(pod[6]), math.sin(pod[6])
+    return wx * cy - wz * sy, wx * sy + wz * cy
+
+
 def struts(ctx, pod):
-    """3-5 belly-and-flank tips fanned toward the first base, one webbed strut (with twigs) per pod, disc feet."""
+    """R4: the fork stands out in front of the pod's camera-side underbelly (outside its silhouette from target3q),
+    its 3-5 thick flat limbs fanning up onto the camera-facing flank and belly, webbed at the fork; the trunk runs
+    from the frame base(s) to that fork. Disc feet."""
     x, y, z, L, H, Dp, yaw, _shell, bases = pod
     n = 5 if L > 10 else 4 if L >= 7 else 3
-    bx, bz = bases[0][0][0] - x, bases[0][0][2] - z
-    cy, sy = math.cos(yaw), math.sin(yaw)
-    ph0 = math.atan2(bx * sy + bz * cy, bx * cy - bz * sy)
-    spread = math.radians(200 if n == 5 else 160 if n == 4 else 110)
+    clx, clz = local_dir(pod, *CAM)
+    bx, bz = local_dir(pod, bases[0][0][0] - x, bases[0][0][2] - z)
+    bm = math.hypot(bx, bz) or 1
+    bx, bz = bx / bm, bz / bm
+    a0 = math.atan2(clz * .7 + bz * .3, clx * .7 + bx * .3)        # mostly camera side, leaning to the base
+    spread = math.radians(150 if n == 5 else 120 if n == 4 else 90)
     tips = []
     for i in range(n):
-        ph = ph0 + spread * (i / (n - 1) - .5)
-        tips.append(surf(pod, .85 * math.cos(ph), -.25 if i % 2 else -.55, .85 * math.sin(ph)))  # belly and flanks
-    r = .62 if L > 10 else .48 if L >= 7 else .32
-    M.branch_strut(ctx, [b[0] for b in bases], tips, r=r, web=True, pads=[b[1] for b in bases], limb_r=.72, flat=.7,
-                   twigs=L >= 6)                                  # small pods: no twigs (budget)
+        ph = a0 + spread * (i / (n - 1) - .5)
+        tips.append(surf(pod, math.cos(ph), -.35 if i % 2 else -.75, math.sin(ph)))  # camera-side flank and belly
+    fx, fz = math.cos(a0) * .55 + bx * .25, math.sin(a0) * .55 + bz * .25
+    fl = (fx, -1.0, fz)                                             # local fork direction: below and in front
+    q = math.sqrt((fl[0] / (L / 2)) ** 2 + (fl[1] / (H / 2)) ** 2 + (fl[2] / (Dp / 2)) ** 2)
+    k = 1.7 / q
+    cy, sy = math.cos(yaw), math.sin(yaw)
+    lx, ly, lz = fl[0] * k, fl[1] * k, fl[2] * k
+    fork = (x + lx * cy + lz * sy, y + ly, z - lx * sy + lz * cy)
+    r = .7 if L > 10 else .55 if L >= 7 else .42
+    M.branch_strut(ctx, [b[0] for b in bases], tips, r=r, web=True, pads=[b[1] for b in bases], limb_r=.85, flat=.75,
+                   twigs=L >= 6, fork=fork, web_k=1.15)
     return n
 
 
@@ -179,29 +201,32 @@ def facade(ctx, tops):
                 seated = sg == -1 and along == 'x' and (mid, k) in SEATED_BAYS
                 po = .8 + BEAM_W / 2 + .25                          # hanging planter on the outer beam face
                 obox(A['concrete'], at(0, yt - .35, po), (span - .4, .5, .5) if along == 'x' else (.5, .5, span - .4))
-                for t in range(3):                                  # three round shrubs spilling over the lip
+                for t in range(3):                                  # R4: three leafy shrubs spilling over the lip
                     u = (t - 1) * span * (.42 if seated else .3) + rng.uniform(-.25, .25)
                     if seated and t == 1:
                         continue                                    # keep the seated pod's belly clear
-                    rr = .75 if t == 1 else .6
-                    blob(A['green' if t != 1 else 'leaf_l'], at(u, yt + .05, po + .1), (rr, .5, rr * .8), sub=2, seed=u + yt + edge)
-                blob(A['leaf_l'], at(rng.uniform(-1.5, 1.5), yt - .75, po + .05), (.5, .45, .3) if along == 'x' else (.3, .45, .5),
-                     sub=1, seed=yt * 3 + mid)
+                    rr = 1.0 if t == 1 else .85
+                    M.leaf_clump(ctx, at(u, yt + .15, po + .2), (rr, .7, rr * .85), ('leaf_l', 'green') if t == 1 else ('green', 'leaf_l'),
+                                 'green', 22, .5, .8, 2)
+                ox = (0, 0, sg) if along == 'x' else (sg, 0, 0)
+                for t in range(2):                                  # trailing stems over the planter lip
+                    M.leaf_strand(ctx, at(rng.uniform(-span / 2.5, span / 2.5), yt - .2, po + .4), rng.uniform(.9, 2.0), ox, 'leaf_l', .34, .26)
                 st['planters'] += 1
                 if not seated:
                     st['balusters'] += railing(A, at, span, yt)
                     st['rail_bays'] += 1
                     u = rng.uniform(-span / 4, span / 4)              # one shrub on the balcony behind the railing
-                    blob(A['green'], at(u, yt + .55, -.7), (.8, .55, .6), sub=1, seed=u + yt)
+                    M.leaf_clump(ctx, at(u, yt + .7, -.7), (1.0, .7, .7), ('green', 'leaf_l'), 'green', 18, .42, .5, 2)
                 if not (along == 'x' and sg == -1) and st['bays'] % 5 in (0, 1, 3):   # R3: leaf-ribbon strands, 3 bays in 5
                     st['vines'] += 1
                     u = rng.uniform(-span / 4, span / 4)
                     M.vine_curtain(ctx, at(u - 1.0, 0, po + .1), at(u + 1.0, 0, po + .1), yt - .6, (0, 0, sg) if along == 'x' else (sg, 0, 0),
-                                   length=(1.2, 3.0), step=.9, role='vine', flowers=('pod_p', 'white'), skip=pod_clear(yt))
+                                   length=(1.2, 3.0), step=.9, role='vine', flowers=('pod_p', 'white'), skip=pod_clear(yt), cards=True)
                 if st['bays'] % 10 in (1, 4, 7):                   # tree in a pot behind the glass, 3 bays in 10
                     st['trees'] += 1
                     p = at(rng.uniform(-span / 3, span / 3), yt + .38, -2.8)
-                    M.kit_prop(ctx, 'tree_indoor', p[0], p[1], p[2], rng.uniform(0, 6.28))
+                    obox(A['white'], (p[0], p[1] + .25, p[2]), (.6, .5, .6))     # R4: pot + branching leafy tree
+                    M.leafy_tree(ctx, (p[0], p[1] + .5, p[2]), 2.6, .9, 'wood', ('leaf_l', 'green'), 'green', 40, .32, 3)
     return st
 
 
@@ -229,7 +254,7 @@ def curtains(ctx, tops):
         for c in [cols[(k + i) % 4] for i in range(3)]:
             zc = ZF - BEAM_W / 2 - .3
             M.vine_curtain(ctx, (c - 3.3, 0, zc), (c + 3.3, 0, zc), yt - .6, (0, 0, -1), length=(1.5, 3.5), step=.75,
-                           role='vine', flowers=('pod_p', 'white'), skip=pod_clear(yt))
+                           role='vine', flowers=('pod_p', 'white'), skip=pod_clear(yt), cards=True)
             n += 1
     return n
 
@@ -252,7 +277,9 @@ def ground(ctx):
     for zz, xx in ((-hd + 1.8, None), (None, hw - 1.8)):             # lit shop back walls behind the front and +x glass
         q = ([(-hw + 1, .4, zz), (hw - 1, .4, zz), (hw - 1, 3.4, zz), (-hw + 1, 3.4, zz)] if zz is not None else
              [(xx, .4, -hd + 1), (xx, .4, hd - 1), (xx, 3.4, hd - 1), (xx, 3.4, -hd + 1)])
-        A['pane_w'].surface(q, [(0, 1, 2, 3)], lambda c, zz=zz: (0, 0, -1) if zz is not None else (1, 0, 0))
+        A['shop'].surface(q, [(0, 1, 2, 3)], lambda c, zz=zz: (0, 0, -1) if zz is not None else (1, 0, 0))
+    A['shop'].surface([(-hw + .2, FH - .52, -hd + .2), (hw - .2, FH - .52, -hd + .2), (hw - .2, FH - .52, hd - .2),
+                       (-hw + .2, FH - .52, hd - .2)], [(0, 1, 2, 3)], lambda c: (0, -1, 0))   # R4: lit shop ceiling
     for lines, edge, along, sg in [(XS, ZF, 'x', -1), (XS, ZB, 'x', 1), (ZS, XL, 'z', -1), (ZS, XR, 'z', 1)]:
         for bi, (a0, a1) in enumerate(zip(lines, lines[1:])):
             mid = (a0 + a1) / 2
@@ -261,7 +288,7 @@ def ground(ctx):
             if any(abs(c[0] - ac[0]) < 1 and abs(c[2] - ac[2]) < 1.5 for ac, _o in ARCHES):
                 continue
             M.flower_bed(ctx, c, (1, 0) if along == 'x' else (0, 1), 5.0, 1.2, grass='leaf_l',
-                         flowers=('white', 'pod_p', 'flower_v'), trees=1 if bi % 2 == 0 else 0)
+                         flowers=('white', 'pod_p', 'flower_v'), trees=1 if bi % 2 == 0 else 0, cards=True)
 
 
 def planter_tray(ctx, x, y, z, r=1.5):
@@ -271,8 +298,9 @@ def planter_tray(ctx, x, y, z, r=1.5):
     M.disc(A['leaf_l'], (x, y + .26, z), (0, 1, 0), r - .12, .1, 28)
     for t in range(7):
         a = t * 2 * math.pi / 7
-        blob(A['green' if t % 2 else 'leaf_l'], (x + .95 * math.cos(a), y + .6, z + .95 * math.sin(a)), (.55, .45, .55), sub=2, seed=a + x)
-    blob(A['green'], (x, y + 1.0, z), (.7, .8, .7), sub=2, seed=x)
+        M.leaf_clump(ctx, (x + .95 * math.cos(a), y + .6, z + .95 * math.sin(a)), (.55, .45, .55),
+                     ('green', 'leaf_l') if t % 2 else ('leaf_l', 'green'), 'green', 22, .34, .8, 2)
+    M.leafy_tree(ctx, (x, y + .3, z), 2.4, .9, 'wood', ('leaf_l', 'green'), 'green', 50, .34, 3)
     for t in range(5):
         a = t * 2 * math.pi / 5 + .3
         blob(A['pod_p' if t % 2 else 'white'], (x + 1.2 * math.cos(a), y + .85, z + 1.2 * math.sin(a)), (.18, .12, .18), sub=1, noise=0)
@@ -301,8 +329,8 @@ def build(ctx):
     # R3: level 5 glass steps in one bay on the front and +x faces, the outer bays farmed; level 6 is all farm
     M.glass_room(ctx, (XL + 2.5 + XR - CELL) / 2, (ZF + CELL + ZB - 2.5) / 2, tops[5], W - CELL - 2.5, D - CELL - 2.5,
                  FH - .5, planters=True, edge=False)
-    farm = dict(density=1.25, crops=2.2, bed='green', soil='leaf_l', leaf='leaf_c', flowers=('pod_p', 'white', 'flower_v'),
-                edges=False)
+    farm = dict(density=1.25, crops=1.8, bed='green', soil='leaf_l', leaf='leaf_c', flowers=('pod_p', 'white', 'flower_v'),
+                edges=False, cards=True)
     M.roof_farm(ctx, 0, ZF + 4.6, tops[5], W - 2.5, 4.6, arbors=0, people=1, **farm)
     M.roof_farm(ctx, XR - 4.2, (ZF + CELL + ZB - 1.5) / 2, tops[5], 5.6, D - CELL - 1.5, arbors=0, people=1, **farm)
     M.roof_farm(ctx, 0, 0, tops[6], W - 2.5, D - 2.5, arbors=0, people=2, **farm)
@@ -312,9 +340,9 @@ def build(ctx):
     mark('facade')
     ground(ctx)
     mark('ground')
-    M.roof_farm(ctx, 0, 0, tops[-1], W - 1.2, D - 1.2, arbors=2, people=5, density=1.6, crops=3, ring=True, bed='green',
+    M.roof_farm(ctx, 0, 0, tops[-1], W - 1.2, D - 1.2, arbors=2, people=5, density=1.6, crops=2.4, ring=True, bed='green',
                 soil='leaf_l', leaf='leaf_c', hoop='arch', tufts=8, canopy=True, spill=1.2,
-                flowers=('pod_p', 'white', 'flower_v'), hoop_step=2.6)
+                flowers=('pod_p', 'white', 'flower_v'), hoop_step=2.6, cards=True)
     mark('roof')
     st['strut_tips'] = []
     for pod in PODS:
@@ -331,7 +359,7 @@ def build(ctx):
         crown = surf(pod, 0, 1, 0, s=1.0)
         crown = (crown[0] + (pt[0] - crown[0]) * .12, crown[1] - .25, crown[2] + (pt[2] - crown[2]) * .12)
         L = pod[3]
-        M.bone_arm(ctx, pt, crown, w=1.1 if L > 10 else .85, t=.3, holes=3 if L > 8 else 2, sag=.1)
+        M.bone_arm(ctx, pt, crown, w=1.3 if L > 10 else 1.0, t=.36, holes=3 if L > 8 else 2, sag=.1, solid=True)
     mark('bones')
     planter_tray(ctx, -12.0, top(3) - .3, ZF - 2.4)
     for xa in (-10.5, 3.5, 12.0):                                   # residents at the entrances for scale
@@ -350,6 +378,7 @@ PFT_ROLES = {                                                    # R3 build-only
     'vine': ((.62, .80, .32, 1), None, .5),                      # yellow-green vine curtains
     'arch': ((.16, .24, .14, 1), None, .5),                      # dark green metal arbor hoops
     'flower_v': ((.62, .48, .80, 1), None, .5),                  # violet flowers
+    'shop': ((1, .82, .58, 1), (1, .72, .42, 1), 4.0),          # R4: ground-floor shop walls and ceiling, brightest
 }
 OVERRIDE = {**PFT_ROLES, 'floor': ((.86, .70, .50, 1), (1, .70, .42, 1), .6),   # R3: light warm wood, lit
             'room': ((.95, .86, .72, 1), (1, .82, .60, 1), 1.0),  # R3: warm white lit ceilings (was orange)
@@ -357,6 +386,7 @@ OVERRIDE = {**PFT_ROLES, 'floor': ((.86, .70, .50, 1), (1, .70, .42, 1), .6),   
             'pod_y': ((.97, .88, .70, 1), None, .5),                # R3: cream, not butter-yellow, under the warm sun
             'pod_in': ((.96, .84, .64, 1), (1, .76, .46, 1), 1.1)}  # R3: brighter lit lining
 ROUGH = {'glass': .1, 'white': .3, 'rail': .35, 'arch': .4, 'pod_y': .12, 'pod_p': .12, 'pod_s': .12}
+LEAVES = ('green', 'leaf_l', 'leaf_c', 'vine')                    # R4: leaf cards are single faces: double-sided
 SMOOTH = {'green': 80, 'leaf_l': 80, 'crop': 80, 'white': 50, 'pod_in': 60, 'leaf_c': 80, 'vine': 80, 'flower_v': 80}
 
 
@@ -378,6 +408,8 @@ def main():
             bsdf = next(n for n in mat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
             bsdf.inputs['Coat Weight'].default_value = .6
             bsdf.inputs['Coat Roughness'].default_value = .05
+        if role in LEAVES:
+            mat.use_backface_culling = False
         ob = finish_mesh('pft_' + role, acc, mat, SMOOTH.get(role, 25))
         bpy.context.scene.collection.objects.link(ob)
         ob.parent = root

@@ -1,11 +1,11 @@
 # pod-frame-tower — 混凝土格架蛋艙塔（僅模型）
 
 - Owner: cc100053
-- Status: IN_PROGRESS（R3 已建，待業主判定）
+- Status: IN_PROGRESS（R4 已建，待業主判定）
 - Branch: `feat/pod-frame-tower`（由 `origin/main` `5d66cfa8` 開出；R1 於 R2 session 開始時 commit）
 - Base commit: `13f83e1566988a10e8798ec027c97ba10012654e`（R1 工作時的 HEAD，`codex/nw-focal-connections`）
-- Last verified commit: 見 `## R3` 驗證（R3 commit 於 `9c79fbc` 之上；R2 為 `c713fc9`，R1 為 `9ed3e7f6`）
-- Remote availability: `origin/feat/pod-frame-tower`（R3 已 push）
+- Last verified commit: 見 `## R4` 驗證（R4 commit 於 `c742193` 之上；R3 為 `c742193`，R2 為 `c713fc9`，R1 為 `9ed3e7f6`）
+- Remote availability: `origin/feat/pod-frame-tower`（R4 已 push）
 
 ## Session Git state
 
@@ -247,6 +247,59 @@ R1 與目標的差距（依 `target-vs-model.jpg` 分析），已轉成下文 R2
 - 葉團仍為低細分圓球，與目標的細碎葉面相差較遠；如預算放寬，可改用葉片卡（quad cards）。
 - 背面受陰影，`model-back.png` 偏暗，只供檢查幾何。
 
+## R4
+
+### R3 verdict
+
+業主原話（2026-11-18）：「未達標加多一點，植物橢圓形，唔似。」
+
+理解：前半句指 R3 未達成及部分達成的各項要明顯加強（第 7 項支撐可見度、骨臂遠看似鏈、天台佔畫面太多、地面層不比樓上亮、鼠尾草綠沒有取色）；後半句指所有植物（花槽葉團、天台葉團、樹及草叢）都是光滑橢圓球，與目標不像。另一種理解是「加多一點」指加多植物數量；本輪以前者為準，植物則改形而非單純加量。
+
+### R4 brief（`target3q`，1448 × 1086；證據為 2 倍解像度）
+
+| # | 項目 | 量度目標 |
+| --- | --- | --- |
+| 1 | 植物形態 | 所有葉團改為葉片卡（每片 2 個三角面）組成的不規則小簇，輪廓要破碎、下垂；樹要見到樹幹及分枝；不再出現光滑橢圓球 |
+| 2 | 支撐可見度 | 每個艙的分叉點移到艙身鏡頭側之外（不被艙身遮住），`target3q` 中每個懸挑艙最少見到 3 枝白色分叉及蹼狀曲面 |
+| 3 | 骨臂 | 遠看是一塊完整骨板，不再似鏈節 |
+| 4 | 鏡頭 | `target3q` 俯角 32° → 25°，天台佔畫面減少；舊鏡頭保留為 `target3q32` 作逐輪比較 |
+| 5 | 地面層 | 地面層店面平均亮度高於樓上玻璃房 |
+| 6 | 鼠尾草綠 | 新增取色點，受光面距目標 (205, 222, 190) ±15 |
+| 7 | 預算 | ≤ 350k 三角面 |
+
+### 改動
+
+- `modules.py`：新 module `leaf_card`（摺疊菱形葉片）、`leaf_clump`（1–3 個不規則小簇、細小深色核心、外伸葉片令輪廓破碎、下半部葉片下垂；`up=True` 為向上的菜苗）、`leafy_tree`（樹幹、3–4 枝分枝、葉簇樹冠）、`leaf_strand`（幼莖加左右交錯下垂葉片的垂藤）。`roof_farm`、`vine_curtain`、`flower_bed` 新增 `cards` 選項，改用以上葉片 module，果實及花點改為 24 面小橢球；`branch_strut` 新增 `fork`（指定分叉點）及 `web_k`（蹼狀曲面比例）；`bone_arm` 新增 `solid`（一塊放樣而成的狗骨形平板，孔改為兩面的深色橢圓凹位）。全部預設值保持 R3 行為，已登記於 `LIBRARY.md`。共用 `ROLES` 未改。
+- `build_pod_tower.py`：每格花槽 3 個葉簇加 2 條垂藤；露台葉簇、藤簾、室內盆栽樹（改用 `leafy_tree` 加白色花盆）、圓形花盆平台、天台及第 5、6 層菜園、基座花床全部改用葉片；葉片 role（`green`、`leaf_l`、`leaf_c`、`vine`）材質為雙面。支撐：分叉點放在艙底鏡頭側、艙身橢球外 1.7 倍處，3–5 枝扁肢（`limb_r` .85）由下而上抓住艙的鏡頭側側面及艙底；主幹半徑：大艙 .7 m、中艙 .55 m、小艙 .42 m。5 條骨臂改為 `solid`，寬 1.0–1.3 m、厚 .36 m。新建築專用 role `shop`（暖色發光 4.0）用於地面層店面後牆及新增的發光天花。天台作物 3 → 2.4、樓層菜園 2.2 → 1.8（預算）。
+- `review_pod_tower.py`：`target3q` 俯角 25°、距離 76 m、目標點高 15 m；`target3q32` 保留 R3 鏡頭；新增取色點 `pod_sage`、`pod_sage_front`、`shop`。
+
+### 逐項自評
+
+| # | 項目 | 結果 | 量度 |
+| --- | --- | --- | --- |
+| 1 | 植物形態 | 達成（待業主判定） | 葉簇、垂藤、樹及菜苗全部由葉片卡組成，輪廓破碎並下垂；樹可見樹幹及分枝。部分葉簇的深色核心在近景仍隱約可見；天台拱架的葉片較疏，似一串串小枝。 |
+| 2 | 支撐可見度 | 部分達成 | `target3q` 中 26 個艙的分叉全部在艙身前方可見，每個見到 3–5 枝白色扁肢及蹼狀曲面（R3 大多只見 1 條主幹）。但分叉處的圓球節點仍大，由 column 橫伸出的主幹似水管，未及目標的骨形樹狀。 |
+| 3 | 骨臂 | 達成 | 放樣平板，中段收窄至 0.75 w，兩面有深色橢圓凹位；遠看為一塊骨板，不再見鏈節。 |
+| 4 | 鏡頭 | 部分達成 | 俯角改為 25°，距離 84 → 76 m（建築佔畫面比例未量度）。目測天台仍佔建築畫面約上方四分之一，與目標相比仍偏多。 |
+| 5 | 地面層 | 部分達成 | 正面圖（`model-front.png`）暖色像素平均亮度：地面層 211，第 1–3 層 183–188。`target3q` 中地面層大部分被花床、拱殼及艙遮住，仍不見得明顯較亮。 |
+| 6 | 鼠尾草綠 | 達成 | `pod_sage` (212, 230, 195)、`pod_sage_front` (216, 233, 192)，與目標 (205, 222, 190) 相差 2–11。奶油色 (225, 212, 187)、粉紅 (235, 189, 177)、混凝土 (204, 188, 179)，與 R3 相若。 |
+| 7 | 預算 | 達成 | 347,136 三角面，GLB 13.2 MB（R3 10.9 MB；葉片頂點不共用，所以檔案較大）。各部分：frame 10,984；rooms 48,672；facade 約 79k；ground 18,402；roof 53,618；pods 95,966；struts 34,004；bones 5,552；other 2,390。 |
+
+### 驗證
+
+- `@@BUILD@@ tris 347136, glb 13,210,248 bytes, 26 pods`。
+- `blender-asset-qa` `qa_check.py`（white、green、leaf_l、vine、concrete_t、shop）：沒有 UV（與前輪相同）；沒有法線反轉報告；`pft_white` 共面重疊 253 對（R3 為 262，來自窗口內側 reveal）；`pft_green` 21 對、`pft_leaf_l` 11 對為葉片卡偶然重疊；floating 為刻意分開的葉片、核心、花點及螺栓孔。
+- `node --experimental-strip-types tests/assetLibrary.test.ts` 通過（23 props、24 modules、26 folders）；`git diff --check` 乾淨。沒有改動 `src/`，因此未執行 `npm test` / `npm run build`。
+- 證據：`~/city2127-evidence/pod-frame-tower/r4/`：`model-target3q.png`（25°）、`model-target3q32.png`（R3 鏡頭）、`model-pod3q.png`、`model-back.png`、`model-front.png`（均為 2 倍解像度 EEVEE）、`r3-vs-r4.jpg`（同一 32° 鏡頭）、`r3-vs-r4-pod.jpg`、`target-vs-r4.jpg`（目標圖對照）、`target.webp`；`passes/` 為三輪比對圖。模型未放入城市，沒有瀏覽器擷圖，FPS 未量度。
+- 共做 3 輪擷圖比對。
+
+### 尚待處理（供 R5 參考）
+
+- 支撐：縮小分叉圓球節點，把由 column 橫伸的主幹改為由樑頂或下一層 slab 向上彎的骨形主幹，令整體更似白色樹。
+- 天台拱架葉片可再加密，令拱架像目標中被藤覆蓋的綠色隧道。
+- 地面層在 `target3q` 中仍被遮擋；可考慮減少地面層前方的花床樹或把店面玻璃向外移。
+- 天台佔畫面仍多；可再把俯角降至約 20°，或請業主確認目標鏡頭。
+
 ## Next expected step
 
-業主判定 R3。若有意見，新開 session 做 R4：preflight 後在 `feat/pod-frame-tower` 上工作（可沿用獨立 clone `/Users/fatboy/city2127-pod`），把業主原話寫入 `## R3 verdict`，轉為 `## R4 brief`；未達成的第 7 項及上文「尚待處理」可作參考。業主接受後才合併 main。
+業主判定 R4。若有意見，新開 session 做 R5：preflight 後在 `feat/pod-frame-tower` 上工作（可沿用獨立 clone `/Users/fatboy/city2127-pod`），把業主原話寫入 `## R4 verdict`，轉為 `## R5 brief`；上文「尚待處理」可作參考。業主接受後才合併 main。
