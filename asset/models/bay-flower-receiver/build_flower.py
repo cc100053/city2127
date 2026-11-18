@@ -42,6 +42,7 @@ SEGS = 24                   # pontoon segments
 JUNCTION_A = math.radians(142.5)  # collar pipe junction: toward the shore duct, between two inner petals
 PIPE_R, PIPE_Y = 1.5, 4.4   # sea-bed duct radius; its axis height where it runs level into the machine room
 RISER_F = 21.0              # riser position, metres seaward of the shore-station origin (past the revetment)
+SKIRT = .45                 # machine-room kick band height
 DRUM_R, DECK_Y = 17.5 * S, 2.4 * S
 DOME_R, DOME_Y = 8.0 * S, 15.0 * S
 
@@ -173,10 +174,30 @@ def petal(acc, skin, ring, theta, nu=10, nv=6):
     # panel UVs: across the petal 0..PANEL_UV[0], along it 0..PANEL_UV[1] texture tiles (2 x 2 cells per tile)
     uvs = [(j / nv * PANEL_UV[0], i / nu * PANEL_UV[1]) for i in range(nu + 1) for j in range(nv + 1)] + [(0, 0)] * nb
     surf(acc, verts, tf, tw, uvs)
-    # outer guard-plate seams follow the petal grid: 2 plates across (seam on the spine), 4 along
-    suv = [(j / nv * 2, i / nu * 4) for i in range(nu + 1) for j in range(nv + 1)]
+    # outer guard plates follow the petal grid: 2 plates across (seam on the spine), 4 along; one texture tile holds
+    # 2 x 2 plates with slightly different silver-grey tones, so the tile repeats 1 across and 2 along
+    suv = [(j / nv, i / nu * 2) for i in range(nu + 1) for j in range(nv + 1)]
     surf(skin, verts, faces, wants, suv + suv)
     return (lambda u, v: at(u, v, 1)[0]), (lambda u, v: at(u, v, -1)[0])
+
+
+def petal_back_details(A, topf, botf):
+    """Outer face of a petal: a low stiffening rib along the spine, and a root shoe bolted down where the petal sits on
+    its hinge seat."""
+    out = lambda u, v: norm(tuple(b - t for b, t in zip(botf(u, v), topf(u, v))))   # outward from the guard plates
+    rib = [add(botf(u, 0), out(u, 0), .1) for u in [.04 + .88 * k / 14 for k in range(15)]]
+    pipe(A["petal_rib"], rib, .16, 6)
+    # root shoe: a blue-grey plate 0.35 m proud of the guard plates over the first 12 % of the petal, a little wider
+    # than the root (v ±1.15), sitting between the hinge-seat cheeks
+    corners = [(u, v) for u in (0.0, .12) for v in (-1.15, 1.15)]
+    inner = [add(botf(u, v), out(u, v), -.05) for u, v in corners]
+    outer = [add(botf(u, v), out(u, v), .35) for u, v in corners]
+    vs = inner + outer                                  # 0..3 inner (u0v-, u0v+, u1v-, u1v+), 4..7 outer
+    A["petal_shoe"].solid(vs, [(0, 1, 3, 2), (4, 6, 7, 5), (0, 4, 5, 1), (2, 3, 7, 6), (0, 2, 6, 4), (1, 5, 7, 3)])
+    for u in (.03, .09):                                # four bolt heads standing off the shoe
+        for v in (-.7, .7):
+            p, o = botf(u, v), out(u, v)
+            pipe(A["piston"], [p, add(p, o, .55)], .1, 6)  # from the plate surface, through the shoe
 
 
 def drum(acc):
@@ -375,43 +396,73 @@ def side_elevation(A, box, sg, hw, FY, WT, bays):
             for j in range(ny):
                 a, b = fl + (fh - fl) * i / nf, fl + (fh - fl) * (i + 1) / nf
                 c, d = yl + (yh - yl) * j / ny, yl + (yh - yl) * (j + 1) / ny
-                box(A["pav_roof"], (a + b) / 2, (c + d) / 2, sw(.05), b - a - .04, d - c - .04, .22)  # 4 cm seams
+                box(A["pav_wall"], (a + b) / 2, (c + d) / 2, sw(.05), b - a - .04, d - c - .04, .22)  # warm, 4 cm seams
+
+    def skirting(fl, fh):                              # dark blue-grey kick band proud of the panels
+        if fh - fl > .05:
+            box(A["pav_trim"], (fl + fh) / 2, FY + SKIRT / 2, sw(.2), fh - fl, SKIRT, .12)
+
+    m, dp = .18, .5                                    # frame member width and depth (through the wall)
+
+    def frame(o0, o1, y0, y1, sill=True):
+        box(A["pav_trim"], o0 + m / 2, (y0 + y1) / 2, sw(0), m, y1 - y0, dp)
+        box(A["pav_trim"], o1 - m / 2, (y0 + y1) / 2, sw(0), m, y1 - y0, dp)
+        box(A["pav_trim"], (o0 + o1) / 2, y1 - m / 2, sw(0), o1 - o0, m, dp)
+        if sill:
+            box(A["pav_trim"], (o0 + o1) / 2, y0 + m / 2, sw(.08), o1 - o0 + .2, m, dp + .16)   # projecting sill
 
     for fa, fb, kind in bays:
         fl, fh = fa + .275, fb - .275
         if kind == "window":
-            o0, o1, y0, y1 = fl + .2, fh - .2, 3.0, 6.6
+            o0, o1, y0, y1 = fl + .2, fh - .2, 3.4, 6.6
         elif kind == "door":
             c = (fl + fh) / 2
             o0, o1, y0, y1 = c - .8, c + .8, FY, 4.4
         else:
             o0, o1, y0, y1 = fl + .25, fh - .25, 2.6, 6.8
-        panels(fl, fh, FY, y0)
+        if kind == "window":
+            # wall under the window: seamed warm panels, a recessed service hatch at the end next to the interior
+            # cabinets (low-f end), clean wall toward the pipe-end corner
+            h0, h1, hy0, hy1 = fl + .3, fl + 1.2, FY + SKIRT + .1, FY + SKIRT + 1.05
+            panels(fl, h0, FY, y0)
+            panels(h1, fh, FY, y0)
+            panels(h0, h1, FY, hy0)
+            panels(h0, h1, hy1, y0)
+            box(A["pav_core"], (h0 + h1) / 2, (hy0 + hy1) / 2, sw(-.22), h1 - h0, hy1 - hy0, .06)  # recess back
+            box(A["pav_door"], (h0 + h1) / 2, (hy0 + hy1) / 2, sw(-.12), h1 - h0 - .16, hy1 - hy0 - .16, .06)
+            frame(h0, h1, hy0, hy1, sill=False)
+            box(A["pav_trim"], (h0 + h1) / 2, hy0 + .05, sw(0), h1 - h0, .1, dp)
+            for k in range(4):                         # small louvre in the hatch leaf
+                box(A["pav_trim"], (h0 + h1) / 2, hy1 - .25 - .1 * k, sw(-.07), h1 - h0 - .4, .04, .06)
+            box(A["pav_core"], h1 - .25, (hy0 + hy1) / 2 - .1, sw(-.05), .06, .2, .08)    # handle
+            skirting(fl, fh)
+        else:
+            panels(fl, fh, FY, y0)
+            if kind == "door":
+                skirting(fl, o0)
+                skirting(o1, fh)
+            else:
+                skirting(fl, fh)
         panels(fl, o0, y0, y1)
         panels(o1, fh, y0, y1)
         panels(fl, fh, y1, WT)
-        m, dp = .18, .5                                # frame member width and depth (through the wall)
-        box(A["pav_frame"], o0 + m / 2, (y0 + y1) / 2, sw(0), m, y1 - y0, dp)
-        box(A["pav_frame"], o1 - m / 2, (y0 + y1) / 2, sw(0), m, y1 - y0, dp)
-        box(A["pav_frame"], (o0 + o1) / 2, y1 - m / 2, sw(0), o1 - o0, m, dp)
-        if kind != "door":
-            box(A["pav_frame"], (o0 + o1) / 2, y0 + m / 2, sw(.08), o1 - o0 + .2, m, dp + .16)   # projecting sill
+        frame(o0, o1, y0, y1, sill=kind != "door")
         w = o1 - o0 - 2 * m
         if kind == "window":
             box(A["pav_glass"], (o0 + o1) / 2, (y0 + y1) / 2, sw(-.05), w, y1 - y0 - 2 * m, .03)
             for q in (1 / 3, 2 / 3):
-                box(A["pav_frame"], o0 + m + w * q, (y0 + y1) / 2, sw(0), .12, y1 - y0 - 2 * m, .32)
-            box(A["pav_frame"], (o0 + o1) / 2, 5.6, sw(0), w, .12, .32)                    # transom
+                box(A["pav_trim"], o0 + m + w * q, (y0 + y1) / 2, sw(0), .12, y1 - y0 - 2 * m, .32)
+            box(A["pav_trim"], (o0 + o1) / 2, 5.6, sw(0), w, .12, .32)                     # transom
         elif kind == "door":
             box(A["pav_door"], (o0 + o1) / 2, (y0 + y1 - m) / 2, sw(-.12), w, y1 - y0 - m, .08)
             box(A["pav_core"], o1 - m - .3, 3.0, sw(-.04), .08, .35, .1)                  # handle
-            box(A["pav_frame"], (o0 + o1) / 2, y0 + .15, sw(-.07), w, .3, .02)             # kick plate
+            box(A["pav_trim"], (o0 + o1) / 2, y0 + .15, sw(-.07), w, .3, .02)              # kick plate
             box(A["pav_glow"], (o0 + o1) / 2, y1 + .25, sw(.2), .5, .12, .1)              # door light, on the panel face
         else:
             nb = int((y1 - y0 - 2 * m) / .3)
             for k in range(nb):
                 box(A["pav_louvre"], (o0 + o1) / 2, y0 + m + .15 + .3 * k, sw(0), w, .07, .42)
-            box(A["pav_frame"], (o0 + o1) / 2, (y0 + y1) / 2, sw(0), .12, y1 - y0 - 2 * m, .45)
+            box(A["pav_trim"], (o0 + o1) / 2, (y0 + y1) / 2, sw(0), .12, y1 - y0 - 2 * m, .45)
 
 
 def shore_station(A, Lp, F, Sv):
@@ -484,12 +535,16 @@ def shore_station(A, Lp, F, Sv):
             out = [arch(a0, fa), arch(a1, fa), arch(a1, fb), arch(a0, fb)]
             inn = [arch(a0, fa, .25), arch(a1, fa, .25), arch(a1, fb, .25), arch(a0, fb, .25)]
             acc.solid(out + inn, [(0, 1, 2, 3), (7, 6, 5, 4), (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)])
-    for f in cols + [rf0, rf1]:
-        pipe(A["pav_frame"], [arch(k / 16, f, -.3) for k in range(17)], .3, 6)
+    for f in cols + [rf0, rf1]:                                                       # matte silver ribs
+        pipe(A["pav_rib"], [arch(k / 16, f, -.3) for k in range(17)], .3, 6)
     for a in (3 / 12, .5, 9 / 12):
-        pipe(A["pav_frame"], [arch(a, rf0, -.15), arch(a, rf1, -.15)], .18, 6)
+        pipe(A["pav_rib"], [arch(a, rf0, -.15), arch(a, rf1, -.15)], .18, 6)
     for sg in (-1, 1):
-        box(A["pav_frame"], (rf0 + rf1) / 2, 6.3, sg * 6.55, rf1 - rf0 + .1, .5, .3)    # eave fascia
+        box(A["pav_rib"], (rf0 + rf1) / 2, 6.3, sg * 6.55, rf1 - rf0 + .1, .5, .3)      # eave fascia
+    # dark blue-grey skirting on the front parapets and the back wall (the side walls get theirs per bay)
+    for sg in (-1, 1):
+        box(A["pav_trim"], f1 + .2, FY + SKIRT / 2, sg * (cut + jamb + hw) / 2, .12, SKIRT, hw - cut - jamb)
+    box(A["pav_trim"], f0 - .3, FY + SKIRT / 2, 0, .12, SKIRT, 2 * hw)
     # behind the big windows: branch take-offs from the trunk with valves, floor flanges and control cabinets
     pipe(A["pav_frame"], [ax(7.7), ax(8.7)], PIPE_R + .25, 28)                       # tee body on the trunk
     for sg in (-1, 1):
@@ -591,6 +646,7 @@ def build():
             topf, botf = petal(A["panel"], A["shell"], ring, th)
             for v in (-1, 1):
                 pipe(A["frame"], [topf(u / 12, v * .98) for u in range(13)], .2, 5)
+            petal_back_details(A, topf, botf)
             hinge_seat(A, botf(.02, 0), th)
             head_u = (.38, .32, .26)[ri]
             for dv in (-.3, .3):
@@ -683,6 +739,30 @@ def seam_image():
     return packed("q02b_plate_seams", col, "sRGB")
 
 
+def petal_plate_image():
+    """Outer guard plates, 2 x 2 per 512 px tile: slightly different silver-grey tones, recessed-looking seams (dark
+    groove with a lit edge on one side and a shade line on the other) and fastener dots along every seam."""
+    n, h = 512, 256
+    y, x = np.mgrid[0:n, 0:n]
+    tones = np.array([[.86, .87, .89], [.79, .81, .84], [.82, .83, .86], [.76, .78, .82]])
+    col = tones[(x // h) + 2 * (y // h)].astype(float)
+    dx, dy = np.minimum(x % h, h - 1 - x % h), np.minimum(y % h, h - 1 - y % h)
+    d = np.minimum(dx, dy)
+    groove = d < 2
+    lit = ((x % h == 2) & (dx <= dy)) | ((y % h == 2) & (dy <= dx))
+    shade = ((x % h == h - 3) & (dx <= dy)) | ((y % h == h - 3) & (dy <= dx))
+    col = np.where(shade[..., None], col * .8, col)
+    col = np.where(lit[..., None], np.minimum(col * 1.12, 1.0), col)
+    col = np.where(groove[..., None], np.array([.32, .35, .40]), col)
+    dots = np.zeros((n, n), bool)
+    for c in range(16, n, 32):
+        for e in (8, h - 9, h + 8, n - 9):
+            dots |= (x - c) ** 2 + (y - e) ** 2 <= 3
+            dots |= (y - c) ** 2 + (x - e) ** 2 <= 3
+    col = np.where(dots[..., None], np.array([.52, .55, .60]), col)
+    return packed("q02b_petal_plates", col, "sRGB")
+
+
 def textured(name, img, rough, metal, uvmap="UVMap"):
     """Principled material whose base colour is img on uvmap; constant roughness/metallic."""
     mt = material(name, (.87, .88, .9, 1), rough)
@@ -726,7 +806,7 @@ def mats():
     seams = seam_image()
     return {
         "panel": panel_material(),
-        "shell": textured("q02b_petal_back_silver", seams, .25, .6),     # outer guard plates, seams along the curve
+        "shell": textured("q02b_petal_back_silver", petal_plate_image(), .3, .6),  # outer guard plates, grooved seams
         "frame": m("frame_silver", (.90, .90, .91, 1), .25, .7),         # rims, seats, arms, truss, rings, collars
         "dome": m("dome_silver_blue", (.70, .82, .97, 1), .1, .9, (.55, .72, 1, 1), .15),
         "base": textured("q02b_pontoon_segments", seams, .5, .15),      # 24 segments, seams and fasteners
@@ -738,6 +818,9 @@ def mats():
         "quay": m("quay_stone", (.50, .49, .47, 1), .85),                # shore platform
         "rock": m("revetment_rock", (.46, .45, .42, 1), .95),            # revetment boulders
         "pav_roof": m("roof_white", (.92, .93, .94, 1), .35, .3),        # machine-room roof eaves
+        "pav_rib": m("rib_matte_silver", (.80, .82, .85, 1), .5, .75),   # roof ribs, purlins, fascias; petal spine ribs
+        "pav_wall": m("wall_warm_white", (.93, .90, .84, 1), .55),       # machine-room wall panels
+        "pav_trim": m("trim_dark_bluegrey", (.17, .23, .29, 1), .45, .4),  # window frames, louvres, skirting
         "grille": m("grille_dark", (.09, .10, .12, 1), .45, .5),          # louvre slats in the collar bays
         "recess": m("recess_bluegrey", (.16, .22, .30, 1), .5, .3),        # recessed bay back wall
         "dark": m("window_band", (.04, .06, .08, 1), .25),
@@ -745,7 +828,7 @@ def mats():
         "aperture": m("aperture", (.85, .95, 1, 1), .2, 0, (.7, .9, 1, 1), 3.0),
         "sleeve": m("subsea_glass", (.6, .88, .9, .55), .06),
         "core": m("core_metal", (.26, .30, .33, 1), .35, .7),
-        "pav_glass": m("pavilion_glass", (.78, .9, .96, .35), .05),
+        "pav_glass": m("pavilion_glass", (.62, .90, .92, .35), .05),    # pale cyan glazing
         "pav_frame": m("pavilion_frame", (.92, .92, .9, 1), .4),
         "beam_core": m("beam_core", (.85, .95, 1, 1), .5, 0, (.75, .9, 1, 1), 40.0),
         "beam_glow": m("beam_glow", (.5, .78, 1, .1), .5, 0, (.45, .72, 1, 1), 2.0),
@@ -753,14 +836,14 @@ def mats():
 
 
 GROUPS = {
-    "Q02B_Receiver": ("panel", "shell", "frame", "piston", "collar", "grille", "recess", "dome", "base", "dark", "glow", "aperture"),
+    "Q02B_Receiver": ("panel", "shell", "frame", "petal_rib", "petal_shoe", "piston", "collar", "grille", "recess", "dome", "base", "dark", "glow", "aperture"),
     "Q02B_SubseaLink": ("sleeve", "core", "sub_glow", "duct", "sub_frame", "duct_seam"),
-    "Q02B_ShoreStation": ("pav_glass", "pav_frame", "pav_roof", "pav_base", "pav_core", "pav_pipe", "pav_door", "pav_louvre",
-                          "pav_glow", "rock"),
+    "Q02B_ShoreStation": ("pav_glass", "pav_frame", "pav_rib", "pav_roof", "pav_wall", "pav_trim", "pav_base", "pav_core",
+                          "pav_pipe", "pav_door", "pav_louvre", "pav_glow", "rock"),
     "Q02B_LightBeam": ("beam_core", "beam_glow"),
 }
 SHARED = {"sub_frame": "duct_ring", "sub_glow": "glow", "pav_base": "quay", "pav_core": "core", "pav_glow": "glow",
-          "pav_pipe": "duct", "piston": "core", "pav_door": "collar", "pav_louvre": "grille"}
+          "pav_pipe": "duct", "piston": "core", "pav_door": "collar", "pav_louvre": "pav_trim", "petal_rib": "pav_rib", "petal_shoe": "collar"}
 UV_ROLES = ("panel", "shell", "base")  # accumulators with a UV map (textured materials)
 
 

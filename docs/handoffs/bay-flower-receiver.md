@@ -63,7 +63,15 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
   - Roof: solid bays alternate with translucent skylight bays (bays 2 and 4 glazed between solid eave strips), with eave fascia trims; the eave pipes became fascias.
   - Behind the windows: a tee body on the trunk, branch take-offs each side with a flange, an inline gate valve with a handwheel, an elbow down to a floor flange and a valve with a handwheel on the vertical leg. Two control cabinets per side (seam, handle, three indicator lights) sit behind them. The layers read window frame (s 5.5) → vertical legs (s 3.7) → valves and cabinets (s 2.8 / 2.55).
   - New roles `pav_door` (`collar_bluegrey`) and `pav_louvre` (`grille_dark`).
-  - Metrics: with beam 77,039 tris, 30 meshes; without beam 76,223 tris, 28 meshes. Export: Blender 5.2 glTF, GLB, +Y up, no animation/camera/light, no compression.
+  - Metrics: with beam 77,039 tris, 30 meshes; without beam 76,223 tris, 28 meshes.
+- Round 10, wall under the window, room colours and petal backs (owner 2026-11-18). "The first image" was not attached and is read as last round's `room-final/after-front`.
+  - Window bays: the sill rises to 3.4 m so the wall below is 1.6 m. That wall holds a recessed service hatch (0.9 × 0.95 m: frame, blue-grey leaf 0.25 m back from the panel face, four-blade louvre, handle) at the low-f end next to the interior cabinets, and clean seamed panels toward the pipe-end corner.
+  - Skirting: a 0.45 m dark blue-grey band runs on every side bay (broken at the service doors), on the front parapets and on the back wall.
+  - Materials as real glTF materials: `rib_matte_silver` (0.80/0.82/0.85, metallic 0.75, roughness 0.5) for roof ribs, purlins and fascias; `wall_warm_white` (0.93/0.90/0.84) for wall panels; `trim_dark_bluegrey` (0.17/0.23/0.29) for window and door frames, mullions, transoms, louvres, skirting and kick plates. `pavilion_glass` is now pale cyan (0.62/0.90/0.92, alpha 0.35); room pipes stay `duct_cyan`.
+  - Petal backs: a new packed texture `q02b_petal_plates` (512², 2 × 2 plates in four silver-grey tones, 2 px dark grooves with a lit edge and a shade line, fastener dots). The `shell` UVs are halved so the layout stays 2 plates across × 4 along; the pontoon keeps `q02b_plate_seams`.
+  - Every petal also gets a low spine rib (r 0.16, `rib_matte_silver`) and a root shoe: role `petal_shoe` (`collar_bluegrey`), 0.35 m proud over the first 12 % of the petal and a little wider than the root, with four bolt heads running from the plate surface through the shoe.
+  - The inner panel grid is untouched (pixel-identical to `9e5c077`).
+  - Metrics: with beam 89,907 tris, 35 meshes; without beam 89,091 tris, 33 meshes. Export: Blender 5.2 glTF, GLB, +Y up, no animation/camera/light, no compression.
 - Inferred (not readable in the image): petal count per ring, strut layout, pontoon below water, sub-sea depth, pavilion interior terminal, beam height, the overall scale (from people by the pavilion).
 
 ## Actual validation results
@@ -101,6 +109,12 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
   - `after-ref/beam.png`, `after-ref/nobeam.png` and `compare.jpg` are the overall views.
 - GLB re-import of both files: the beam node is present only in the with-beam file. The new `pav_door` and `pav_louvre` meshes and materials came through. Panel textures still match `9e5c077` pixel for pixel, and receiver-base radii are unchanged.
 - QA: the cabinet lights were coplanar with the cabinet seams and the door light was buried in the panels; both are fixed. QA then reported "5 closed parts with normals pointing inward" in `pav_glow`. Signed volumes per island, computed in float64 about each island's centre, are all positive (18 islands), so this is a false positive on 0.07 m lights about 90 m from the origin. No machine-room part floats.
+- Round 10 evidence, `~/city2127-evidence/bay-flower-receiver/r10-final/`. Before renders come from a copy of the machine-room-round no-beam .blend; all renders use 64 samples and one shared sun.
+  - Before/after sheets: `before-after-nobeam-front.jpg` (same camera as last round's first image), `before-after-nobeam-side.jpg` (wall under the window, hatch, skirting) and `before-after-nobeam-petal.jpg` (new `--cam petal`: guard plates, spine ribs, root shoes on the seats).
+  - Overall views: `after-ref/beam.png`, `after-ref/nobeam.png` and `compare.jpg`.
+  - `glb-reimport-side` and `glb-reimport-petal` were rendered from the re-imported no-beam GLB and match.
+- GLB re-import of both files: the beam node is present only in the with-beam file. Colours, metallic, roughness and alpha of `rib_matte_silver`, `wall_warm_white`, `trim_dark_bluegrey`, `pavilion_glass` and `duct_cyan` came through as set. The petal spine-rib and root-shoe meshes are present, and the guard plates are linked to `q02b_petal_plates` on `UVMap`. Panel textures still match `9e5c077` exactly.
+- QA: the root-shoe bolts on the steeper middle and inner petals first floated; they now start at the plate surface. No non-rock part floats.
 - `npm run build`: passed. `git diff --cached --check`: clean.
 - `npm test` (Windows 11, Node 24.19, checkout under `OneDrive\文件`): `assetLibrary.test.ts` passes with the new row. Two local leftovers, `asset/models/ship-refs-2127` and `car-candidates-2127`, hold only git-ignored caches from other branches and fail that test unless parked; they were parked for the run and restored. `surveyMeterPipeline.test.ts` and `energyPipeline.test.ts` FAIL on this machine before any of this task's code runs: `survey/tests/surveyFixture.ts` turns a `file://` URL path into `C:\C:\…\%E6%96%87%E4%BB%B6\…` (percent-encoded non-ASCII folder name), so the question JSON is not found. Not caused by this task, not fixed here. Every other test in the `npm test` list passed when run one at a time.
 - Application verification: NOT INTEGRATED.
@@ -118,4 +132,4 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
 
 ## Next expected step
 
-Owner reviews the machine-room round (`room-final/after-front/nobeam.png`, `after-side/nobeam.png`, the before/after sheets); then either another shape round or a placement task (site, shoreline, beam behaviour in the app).
+Owner reviews round 10 (`r10-final/before-after-nobeam-*.jpg`) and confirms which image was meant by "the first image"; then either another shape round or a placement task (site, shoreline, beam behaviour in the app).

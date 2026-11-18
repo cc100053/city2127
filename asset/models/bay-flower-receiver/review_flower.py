@@ -1,7 +1,7 @@
 """Preview renders of the Q02-B bay flower, with and without its light beam, and a reference/model comparison.
 
 blender -b --factory-startup --python-exit-code 1 -P review_flower.py -- <out_dir> [--samples N] [--only beam|nobeam|clay]
-    [--cam ref|close|root|dome|water|waterzoom|junction|shore|front|side] [--blend <file.blend>]
+    [--cam ref|close|root|dome|water|waterzoom|junction|shore|front|side|petal] [--blend <file.blend>]
 Every camera shares the same sun and sky (set from the reference camera), so before/after renders compare like for like.
 Writes <out_dir>/beam.png, nobeam.png, clay.png (one grey, no emission, no beam: silhouette check) and
 compare.jpg (references/q02-b.jpg left, beam render right, same size). Staging (sea, sea bed, shore promenade, sky,
@@ -37,7 +37,9 @@ CAMS = {"ref": CAM, "close": ((-34.0, 70.0, 100.0), (4.0, 16.0, 0.0), 36.0),
         "shore": ((-75.5, 22.0, 14.3), (-85.5, 4.0, 50.4), 32.0),
         # machine room close-ups: --cam front (water side, oblique on the pipe entry), --cam side (door, windows)
         "front": ((-81.4, 9.0, 31.8), (-87.2, 4.0, 49.6), 35.0),
-        "side": ((-100.8, 6.0, 36.2), (-91.9, 4.5, 49.5), 32.0)}
+        "side": ((-100.8, 6.0, 36.2), (-91.9, 4.5, 49.5), 32.0),
+        # --cam petal: up under the outer ring at the pontoon edge: guard plates, spine ribs, root shoes on the seats
+        "petal": ((7.9, 3.0, 37.2), (4.0, 7.6, 22.9), 30.0)}
 
 
 def mat(name, rgba, rough=.5, alpha=None):
