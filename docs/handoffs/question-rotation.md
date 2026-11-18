@@ -4,15 +4,15 @@
 - Status: IN_PROGRESS（階段 0 完成；階段 1 純函數核心完成，server 接線及 guest 介面未做）
 - Branch: `feat/question-rotation`（2026-11-18 由 `docs/question-rotation-plan` HEAD `95c494ff` 開出；計劃文件 commit 一併帶入）
 - Base commit: `6724989bbff0ff8a0f65a9ee6e2a23f778e7ede3`（origin/main，2026-11-18）
-- Last verified commit: `7077b46d`（階段 0 決定；本次審閱補充的 commit 見 git log）
+- Last verified commit: `836a31fa`（階段 1 切片一；其後只改文件）
 - Remote availability: `origin/docs/question-rotation-plan`（計劃）；`origin/feat/question-rotation`（實作）
 
 ## Session Git state
 
-- Session starting branch and HEAD: main, `f40ffbc0e3e9b5a73da8f4a86fa75ff1190f2f09`；同日兩次 fast-forward 至 `100816b5`、`6724989b`
-- Last fetched origin/main commit: `6724989b`，2026-11-18
+- Session starting branch and HEAD（2026-11-18 第二節）：`docs/question-rotation-plan`，`95c494ff`，與 origin 同步；開出 `feat/question-rotation`
+- Last fetched origin/main commit: `6724989b`，2026-11-18（分支包含之）
 - Local changes present at session start: 未追蹤 `Dev_QA.md`（owner 本機檔），保留
-- Upstream integration status: NOT INTEGRATED
+- Upstream integration status: NOT INTEGRATED（已 push 分支，未 merge main；分支 CI 未確認）
 - Pending Git conflicts or synchronization blockers: NONE
 
 ## Goal and acceptance criteria
@@ -36,7 +36,7 @@
 - 2026-11-18 advisor 審閱後（owner 同意寫入）：雙站重疊改在換模型時處理、平手按題目固定次序；無變化率對答案分佈敏感（`skew.py`：5 題時 1.6%／2.6%／6.1%／23.8%）；新舊系統按題組版本切換，第 2–3 階段完成標準加「version4 run 外觀不變」；每題 6 種有向過場；內容工作量補 Q02 空置態及 Q06 選址；敘事原則改變記錄並加 6.7 文件同步；群眾比例少人數門檻；R04 舊能源部件逐件未定。
 
 - 2026-11-18 階段 1 切片一（純函數，未接 server）：
-  - 1.1 題組格式：`kind: "rotation"`，每題三選項各帶 `modelId`／`lotId`（未建或未選址為 null），`online` 旗標（上線須全部非 null），`initial` 起始選項；模型 ID 全組唯一。`questions.rotation.v1.json` 9 題，題目文字暫用 SURVEY_V2 P 版（`draft: true`，待 5.1）；只有 Q01 `online`；起始選項為暫定（Q01 B、Q02 A、Q03 A、Q06 B、Q08 C、其餘 A），待 owner。地塊 ID 暫用 `nw`、`sw`、`drawer-housing`、`q02-west-sea`、`q02-farm-south`，第 2.1 步 `LOTS` 定案時對齊。
+  - 1.1 題組格式：`kind: "rotation"`，每題三選項各帶 `modelId`／`lotId`（未建或未選址為 null），`online` 旗標（上線須全部非 null），`initial` 起始選項；模型 ID 全組唯一。`questions.rotation.v1.json` 9 題，題目文字暫用 SURVEY_V2 P 版（`draft: true`，待 5.1）；只有 Q01 `online`；起始選項為暫定（Q01 B、Q02 A、Q03 A、Q06 B、Q08 C、其餘 A），待 owner。地塊 ID 暫用 `nw`、`sw`、`drawer-housing`、`q02-west-sea`、`q02-farm-south`，第 2.1 步 `LOTS` 定案時對齊；Q01 模型 ID `automation-hub-low／mixed／high` 是邏輯名稱（對應現行 NW focal 三態，非 GLB 檔名），第 2.2 步對齊。
   - 1.2 `drawQuestions`：只抽 online 題，最久未變優先、平手按題組次序；少於 5 題 online 時拋 `RotationError`（現時真題組因此不能上線，屬預期）。
   - 1.3 `rotationStep`：直接換（包括 A↔C），每份只換一題；無候選回傳 `fallback` 並指出最久未變的抽中題。**發現：** 3.2 第 3 點「優先略過預約後已被另一站換過的題」由最久未變排序自動成立（預約後被換的題 stamp 必然新過所有未被換的題），所以不需要儲存預約標記；測試覆蓋兩站同時預約的情況。
   - 1.4（純函數部分）`foldRotation`：按 stamp（提案 sequence）依次重算；Undo＝去掉該提案再 fold，測試覆蓋。
@@ -47,7 +47,7 @@
 
 - Verification status: PARTIAL（階段 1 純函數；server、guest 未接）
 - Date and checked commit/worktree: 2026-11-18，`feat/question-rotation`
-- Commands/manual checks and results: 文件內相對連結及引用檔案路徑逐一核對存在；座標取自 `src/layout.ts`、`src/energyRuntime.ts`。未截圖核對位置。
+- Commands/manual checks and results: 文件內相對連結及引用檔案路徑逐一核對存在；座標取自 `src/layout.ts`、`src/energyRuntime.ts`。未截圖核對位置。VALIDATION 已加階段 1 一條記錄。
 - `survey/`：`npm test`（含新 `test:rotation`）通過、`npm run build` 通過；`git diff --check` 通過。root `src/` 未改，未跑 root 測試。
 - 正式模擬 `survey/scripts/rotationSim.ts`（正式函數，400 run × 120 假訪客，A／B 兩站同城預約後先後提交，起始選項每 run 隨機）：
 
@@ -58,7 +58,8 @@
   | 70/20/10，無傾向 | 5.9% | 99.9%（392/400） | 5.9% | 98.9%（282/400） |
   | 85/10/5，無傾向 | 23.4% | 99.5%（367/400） | 23.1% | 96.8%（137/400） |
 
-  Gate 只卡上線配置（5 題、原設定）：無變化 ≤ 2% 且每 run 每個模型都出場，通過。10 題時約 3% run 有一個模型全日未出場；答案越一致越多。交 owner 判斷保底份量及是否接受 10 題時的出場缺口。
+  另以 seed 1、7、424242 各跑一次（不入 CI）：5 題原設定無變化 1.4%–1.6%，三次都 400/400 全出場；10 題 385–391/400。
+  Gate 只卡上線配置（5 題、原設定）：無變化 ≤ 2% 且每 run 每個模型都出場，通過。**此 gate 範圍屬暫定**（計劃原文未分題數），待 owner 確認。10 題時約 3% run 有一個模型全日未出場；答案越一致越多。交 owner 判斷保底份量及是否接受 10 題時的出場缺口。
 - Evidence/environment: 玩具模擬 `~/city2127-evidence/question-rotation-sim/`；正式模擬見上，非真人答案。
 
 ## Known issues and blockers

@@ -10,7 +10,7 @@
 4. 結果卡同時顯示**群眾比例**（該題全部回答中選同一選項的百分比，包括本人）。
 5. **不採用**「播放時間比例＝票數比例」規則。
 
-模擬（`~/city2127-evidence/question-rotation-sim/swap400.py`，400 次 × 120 位假訪客，非正式 ladder、非真人）：10 題 30 個模型時，約 1.5% 訪客沒有變化；每題每日變化 11–13 次；所有模型都會出場；最長 15 位訪客內必再變；約四成變化會把少數選項放上城市。
+模擬（`~/city2127-evidence/question-rotation-sim/swap400.py`，400 次 × 120 位假訪客，非正式 ladder、非真人）：10 題 30 個模型時，約 1.5% 訪客沒有變化；每題每日變化 11–13 次；所有模型都會出場（平均計）；最長 15 位訪客內必再變；約四成變化會把少數選項放上城市。2026-11-18 以正式函數重跑（`survey/scripts/rotationSim.ts`，A／B 兩站交錯）：5 題時每 run 全部模型出場；**10 題時只有 388/400 run 全部出場**，約 3% run 有一個模型全日未出場（平均 99.9%）。
 
 **無變化率取決於訪客答案有多一致，不是規則本身的常數。** 同一規則改用不同假設重跑（`skew.py`，同目錄）：
 
@@ -133,7 +133,7 @@ Owner 批准 0.1–0.4 全部建議；R01–R05 記入 SURVEY_V2_REVIEW 決定�
 | 1.4 | 由提案 fold 出城市狀態，取代 v5 run 的 `ladderStep` | `cityView.ts` 旁新模組 | Undo／snapshot／重新連線重算一致 |
 | 1.5 | 群眾比例計算，隨結果事件送出 | `protocol.ts`、`proposalService.ts` | 測試：含本人一票、只計本 run 有效提案、未達門檻時不送百分比 |
 | 1.6 | 草稿保存抽中的題目；提案保存題目 ID 與答案 | `sessionService.ts`、`answerService.ts`；`migrations.ts` 加 schema 9（新增可空欄位，保留 schema 8 全部歷史） | 舊 run 可讀；新 run 重開後題目不變 |
-| 1.7 | 正式模擬 gate：把 `swap400.py` 改寫為 TS，直接用 1.2–1.3 的正式函數；模擬 A/B 兩站交錯提交；跑第 1 節四種分佈，如 SQLite 有 version4 真人答案亦以其分佈重跑 | `survey/scripts/rotationSim.ts`，接入 `npm test` | 原設定分佈下無變化 ≤ 2%；每個上線模型都出場（gate 以上線配置 5 題計，10 題只報告）；各分佈的無變化率寫入 handoff 並交 owner 判斷保底份量 |
+| 1.7 | 正式模擬 gate：把 `swap400.py` 改寫為 TS，直接用 1.2–1.3 的正式函數；模擬 A/B 兩站交錯提交；跑第 1 節四種分佈，如 SQLite 有 version4 真人答案亦以其分佈重跑 | `survey/scripts/rotationSim.ts`，接入 `npm test` | 原設定分佈下無變化 ≤ 2%；每個上線模型都出場（**暫定**：gate 以上線配置 5 題計，10 題只報告，待 owner 確認）；各分佈的無變化率寫入 handoff 並交 owner 判斷保底份量 |
 | 1.8 | Guest 介面顯示抽中的 4 題、結果頁顯示所選選項與群眾比例 | `guestFlow.ts`、`guestTendency.ts` | 瀏覽器檢查：預約、重新載入、A/B 雙站 |
 
 ### 階段 2 — 城市執行（root `src/`）
@@ -189,7 +189,7 @@ Owner 批准 0.1–0.4 全部建議；R01–R05 記入 SURVEY_V2_REVIEW 決定�
 | 步 | 內容 | 完成標準 |
 | --- | --- | --- |
 | 6.1 | root、`survey/`：`npm test`、`npm run build`、`git diff --check` | 全部通過 |
-| 6.2 | 模擬 gate（1.7） | 無變化 ≤ 2%，所有模型出場 |
+| 6.2 | 模擬 gate（1.7） | 按 1.7 及 owner 對 10 題出場缺口的決定 |
 | 6.3 | 瀏覽器：完整流程、A/B 雙站、Undo、reset、重新連線、reduced motion | 零 page error；截圖存 `~/city2127-evidence/question-rotation/` |
 | 6.4 | 性能：全部上線模型載入後，展覽 Mac mini 實測 FPS 與記憶體 | 只記錄實測數字 |
 | 6.5 | Owner 兩秒辨認：每個模型的近鏡 | Owner 接受 |

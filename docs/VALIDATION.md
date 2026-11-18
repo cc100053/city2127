@@ -180,3 +180,5 @@ Q03-A A 位街道候選（2026-11-17）：原近鏡射線及三角網格確認�
 Q03-A 街道 R2（2026-11-17）：保留住宅與鄰樓，以 6.2 m 貼樓環道接導軌大道 ②。Mac Chrome 以 SE low／mixed／high 各掃 1,651 個近邊及路面樣點，車路 3.2 m、步道 2.3 m 淨高內零阻擋；右側車道與梯田巨構抽樣最小水平餘量 2.09 m。另驗證同角度 3200 × 1800／DPR 1 日夜與接駁俯視。[圖集](../artifacts/change-review/index.html#drawer-housing) · [方法與差異](handoffs/drawer-housing-placement.md#街道-r2--由目標反推平面2026-11-17)。
 
 Q03-A 紅線修訂：同角度 Chrome 俯視確認住宅步道與草地斜線已移除。Root 回歸測試核對車道接縫和環道鋪面。[修訂俯視](../artifacts/change-review/drawer-housing/plan.jpg)。
+
+抽題輪換階段 1 純函數（2026-11-18，`feat/question-rotation`，未接 server）：`survey/tests/rotation.test.ts` 核對 draft 題組載入及拒絕條件、抽題（最久未變、題組次序平手、少於 5 題 online 拋錯）、直接換（含 A→C）、每份只換一題、保底、兩站同城預約、答題與抽題不符、fold 及 Undo、群眾比例門檻。`survey/scripts/rotationSim.ts` 以正式函數跑 400 run × 120 假訪客（A／B 交錯）：原設定分佈 5 題無變化 1.6%、每 run 全部模型出場（另三個 seed 1.4%–1.6%，同樣 400/400）；10 題 1.5%，388/400 run 全出場；偏斜分佈見 [handoff](handoffs/question-rotation.md#actual-validation-results)。Gate 只卡 5 題原設定（暫定，待 owner）。`survey/` `npm test`／`npm run build`、`git diff --check` 通過；root 未改，未跑。假答案，非真人。
