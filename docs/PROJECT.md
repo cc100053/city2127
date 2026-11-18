@@ -47,6 +47,7 @@ DEV 居民情景（2026-11-12，湊／NW focal）：`main.ts` 只在 `import.met
 | [siteBuilders](../src/siteBuilders/index.ts), [siteRuntime.ts](../src/siteBuilders/siteRuntime.ts), [siteAssets](../src/siteAssets/assetCatalog.ts) | Four focal site builders, additive layers, GLB bounds/cache/fallback and late-load synchronization |
 | [energyRuntime.ts](../src/energyRuntime.ts), [energyPrototype.ts](../src/energyPrototype.ts) | Server能源配置的實際模型／局部淡入與60秒動態；DEV比較重用同一幾何 |
 | [hydroTerrace.ts](../src/hydroTerrace.ts) | Q02-A 水の棚田固定背景：載入 GLB、石砌護岸島及北岸步道；`layout.HYDRO_TERRACE` 定位，水房／beacon 選位與船道避讓之 |
+| [bayFlower.ts](../src/bayFlower.ts) | Q02-B 湾の花（放置 R2）：載入 GLB 於南部公園西岸外海 `layout.BAY_FLOWER`；機房平台接步道，平台範圍內以 shader 切去護岸頂 `COAST_REVETMENT`；version4 只顯示空置態（機房平台），DEV `?bayFlower=1` 顯示花、管道及光柱 |
 | [districtMeters.ts](../src/districtMeters.ts), [devMeters.ts](../src/devMeters.ts) | District carriers, hybrid/pairing/seeded slot selection, pulse/motion; DEV-only Meter review controls |
 | [automationBays.ts](../src/automationBays.ts), [automationBayModels.ts](../src/automationBayModels.ts), [automationKit.ts](../src/automationKit.ts) | NW service bays (2026-11-04, `feat/nw-closeup-polish`, owner accepted Bay R2): bay placement and `onBayPlinth` (city trees on a bay plinth are hidden in place, like `HUB_LEGACY_LOT`); R2-metre models (staffed glazed hall + floating canopy, hybrid hall + service column + arm, 12/10-ring towers + lobby) scaled by `BAY_SCALE`; materials, `quadFleet` drones and `METER_COLORS` shared with the AUTO HUB (`automation-bay-drones`: 8 per bay with the tower) |
 | [skyRing.ts](../src/skyRing.ts) | 空の環 Sky Ring (2026-11-02, `feat/hero-sky-ring`, close-up polish R5 owner-accepted): fixed 700 m truss ring (`SKY_RING`, deck 250 m) on six V pylons, ten berths with parked pods and a lit docking edge; 240 resident voice nodes lit by `guestCount` only (standalone 120), never by vote direction or Meter. 2026-11-08 task branch R4: Blender canopy, pylon and switchback-stair candidate, widened berth and open lower truss are under visual review; the shore path is locally adjusted after a real aircraft/pylon intersection, with sampled clearance checks ([handoff](handoffs/skyring-closeup-polish.md)) |
@@ -226,6 +227,8 @@ DEV 天氣圖書館用 `?shot=energy:aoi&orbital=3&hour=12&nopanel` 預覽葵攤
 ### Q02-A 水の棚田 — 固定背景（2026-11-17）
 
 `loadOdaiba` 加入 [hydroTerrace](../src/hydroTerrace.ts)：Q02-A GLB 以原尺寸置於西岸海面 (−375, −170)，`rotation.y = π/2`（變電所正面朝東，瀑布朝南），地台頂高 1.2 m（bay 水面 −0.8 m），載入時移除 GLB 自帶海面；石砌護岸島及 74 m 步道由島北緣接北岸護岸。不跟隨任何投票或 Meter，無結果卡或資料接線。水上的士環線西端改經島南（`waterLoop`，相位 `WATER_PHASES.loop` 11.25 s），水房及 lane beacon 選位避開地塊，因此六座水房中三座位置改變。角色待定；Owner 於 2026-11-17 接受 R1。見 [handoff](handoffs/q02a-hydro-placement.md)。
+
+`loadOdaiba` 亦加入 [bayFlower](../src/bayFlower.ts)：Q02-B GLB 以原尺寸置於 (−712, −0.8, 300)，`rotation.y = 2.6088`，機房在花正東 110.3 m；模型岸邊機房整組比花的 waterline 低 0.88 m（`SHORE_DY`），鋪面頂 −0.18 m、比步道 −0.19 m 高 1 cm，並向陸地多鋪 1.5 m 壓上步道。平台範圍內的護岸頂（`service_area` 材質，y 0.12）由 `cutUnderPlatform` 在 fragment shader 中捨去。西岸遊船（`bayCruisers` 第六段）移至 (−780, 170)，相位不變。光柱不投影。version4 run 只顯示空置態（owner 2026-11-18）：`bayFlowerShown` 只在 DEV `?bayFlower=1` 時顯示 `Q02B_Receiver`、`Q02B_SubseaLink`、`Q02B_LightBeam`；機房平台、護岸切口及移走的遊船航段則在每個 run 都在。未接 Q02 投票；輪換 run 的顯示切換屬輪換分支。見 [handoff](handoffs/bay-flower-placement.md)。
 
 ### Housing A — 正式固定背景（2026-10-27）
 

@@ -166,4 +166,4 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
 
 ## Next expected step
 
-The owner reviews the bloom (`bloom-r2/before-after-nobeam-ref.jpg`; earlier `bloom-r1/`) and the shore-platform position (`platform-r1/`). Merge `feat/bay-flower-shore-platform` into main only once the owner confirms both.
+The owner reviews the bloom (`bloom-r2/before-after-nobeam-ref.jpg`; earlier `bloom-r1/`) and the shore-platform position (`platform-r1/`). Merge `feat/bay-flower-shore-platform` into main only once the owner confirms both. (Merged as PR #4, 2026-11-18. City placement continues in [bay-flower-placement](bay-flower-placement.md): lot (−712, 300) off the south park's west shore, chosen by the owner 2026-11-18.)
