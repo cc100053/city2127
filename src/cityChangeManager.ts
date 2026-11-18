@@ -161,7 +161,8 @@ export class CityChangeManager {
     const changes: CarrierChange[] = [...(energy ? [{ socketId: 'ne' as const, focal: false, district: true, energy: { ...energy, ...(headline && 'energy' in headline && headline.part ? { part: headline.part } : {}) }, ...(headline && 'energy' in headline ? { headline: true } : {}) }] : []),
       ...(Object.keys(districts) as LotSocketId[]).map(socketId => ({ socketId, focal: focal[socketId],
         district: before[socketId] !== JSON.stringify(districts[socketId]?.getConfiguration()),
-        ...(previousLayout?.bands[socketId] === 'low' || layout.bands[socketId] === 'low' ? { low: true as const } : {}),
+        // The pushed-in low shot frames the low state; a direct low→high jump (question rotation A→C) ends on the tall high state, so it keeps the focal shot.
+        ...(layout.bands[socketId] === 'low' || (previousLayout?.bands[socketId] === 'low' && layout.bands[socketId] !== 'high') ? { low: true as const } : {}),
         focalOnly: !!previousLayout && Math.max(Math.abs(previousLayout.tiers[socketId]), Math.abs(layout.tiers[socketId])) <= 1,
         ...('changedPoints' in (districts[socketId] ?? {}) ? { points: (districts[socketId] as { changedPoints: ChangedPoint[] }).changedPoints } : {}),
         ...(quiet(socketId) ? {} : { headline: true }),

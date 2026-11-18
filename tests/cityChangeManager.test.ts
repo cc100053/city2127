@@ -360,6 +360,10 @@ assert.equal(hubController.calls.at(-1)?.immediate, false);
 manager.update(29);
 close(groups.get('hubUpper')!.scale.y, .5);
 assert.ok(sites.magnetEast.marker.material.emissiveIntensity > .2);
+// A direct low→high jump (rotation Q01 A→C) ends tall, so it is not framed with the pushed-in low shot; high→low still is.
+const nwHighJump = exhibitionLayout({ bands: { nw: 'high', ne: 'low', sw: 'low', se: 'high' }, automatedPorts: 6, sharedSeats: 0, functionModules: 6 });
+assert.equal(manager.applyExhibitionLayout(nwHighJump, 'city-state-updated', 29.2).find(c => c.socketId === 'nw')?.low, undefined);
+assert.equal(manager.applyExhibitionLayout(nwLow, 'city-state-updated', 29.4).find(c => c.socketId === 'nw')?.low, true);
 
 // Server snapshots and run resets snap all four sites to their full 2127 baseline without pulses.
 manager.applyExhibitionLayout(neutral, 'run-reset', 30);
