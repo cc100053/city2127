@@ -38,7 +38,13 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
   - Inner panel grid: frames are thinner (2 px, ≈ 2 cm) and fainter (sRGB 0.53/0.59/0.66, metallic 0.7). The bright white geometric seam strips on the inner face were removed; the silver rims stay.
   - Dome: a thick silver bearing ring (2.4 m deep, 1.7 m tall, bevelled) with 16 brackets down to the collar.
   - New role `piston` uses the `core_metal` material; the shore pavilion base keeps the plain white `base_white`.
-- Metrics: 50,426 tris (beam 816), 20 meshes, 15 materials, 3 textures 256², GLB 1,838,164 bytes. Export: Blender 5.2 glTF, GLB, +Y up, no animation/camera/light, no compression.
+- Receiver-base round (owner request 2026-11-18). The owner's screenshot was not attached, so the round assumes the `dome` camera of `detail-final/after-dome`. The plain grey collar under the dome becomes `receiver_base()`:
+  - Top: the bearing ring is now 2.8 m deep and 2.0 m tall, bevelled. The 16 small bumps became 16 diagonal braces, each with a base plate on the upper band, a strut (r 0.34) and a shoe under the ring.
+  - Middle, y 9.5–17.5: the bands step in to a blue-grey back wall at r 11.9, so the bays sit 0.7 m deep. Eight equipment bays are separated by pilasters and centred on the junction angle. Even bays carry silver access covers, 3 × 2 per bay with 8 cm seams, seated in the back wall; odd bays carry 14 dark louvre slats and a mullion.
+  - Bottom: a 1.2 m service walkway at y 5.8 runs round the base, with 24 brackets below and 48 posts and two rails above.
+  - Junction: at 142.5°, toward the shore duct and between two inner petals, a wall plate holds three flanged pipes. They run over the walkway, turn down to a deck manifold, and have cyan lights at the flanges and on the manifold (8 lights in all).
+  - Materials: the new `q02b_collar_bluegrey` covers the bands and pilasters, `q02b_grille_dark` the slats and `q02b_recess_bluegrey` the back wall.
+- Metrics: 59,450 tris (beam 816), 23 meshes, 18 materials, 3 textures 256², GLB 2,178,920 bytes. Export: Blender 5.2 glTF, GLB, +Y up, no animation/camera/light, no compression.
 - Inferred (not readable in the image): petal count per ring, strut layout, pontoon below water, sub-sea depth, pavilion interior terminal, beam height, the overall scale (from people by the pavilion).
 
 ## Actual validation results
@@ -55,6 +61,12 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
   - `glb-reimport-root/nobeam.png` was rendered from the re-imported GLB and matches.
 - GLB re-import (structure-detail round): 50,426 tris, 20 meshes, 15 materials. Panel, guard plates (`shell`) and pontoon (`base`) each keep `UVMap`. Their base colours come from `q02b_panel_color`, `q02b_plate_seams` and `q02b_plate_seams`; the panel's metallic/roughness comes from `q02b_panel_mr`. The panel frame pixels dropped from 9.2 % to 3.1 % of the tile.
 - QA after the round: the sleeve/rod end caps were coplanar and are fixed. Remaining items are the same-material overlaps inside `frame` (seat parts), the mounts resting on the deck (back-to-back, hidden), and zero-area UVs on petal side strips and drum caps (intended plain colour).
+- Receiver-base round evidence, `~/city2127-evidence/bay-flower-receiver/collar-final/`. Before renders come from a copy of the structure-detail .blend; all renders use 64 samples and one shared sun.
+  - Before/after sheets: `before-after-nobeam-dome.jpg` (screenshot angle, no beam) and `before-after-nobeam-water.jpg` (low over the water).
+  - After renders: `after-waterzoom` (same water spot, long lens) shows the louvred grilles and walkway railing through the petal-root gaps. `after-junction` checks the junction from inside the cup. `after-ref/beam.png` and `compare.jpg` show the beam.
+  - `glb-reimport-dome/nobeam.png` was rendered from the re-imported GLB and matches.
+- GLB re-import (receiver-base round): 59,450 tris and 23 meshes. In the collar zone, `collar` spans r 11.9–12.65 and `recess` sits at r 11.9 (y 9.45–17.55), so the bays are recessed 0.75 m. `grille` slats sit at r 11.9–12.35 inside the recess. Cyan `glow` in the collar zone appears only at the junction (r 12.9–16.0, y 4.1–9.3). Materials `q02b_collar_bluegrey`, `q02b_grille_dark`, `q02b_recess_bluegrey` and `q02b_frame_silver` all came through, and the panel, guard-plate and pontoon textures and UVs are still present.
+- QA: the access covers first floated 5 cm off the back wall and are now seated in it. The other items are as before.
 - `npm run build`: passed. `git diff --cached --check`: clean.
 - `npm test` (Windows 11, Node 24.19, checkout under `OneDrive\文件`): `assetLibrary.test.ts` passes with the new row. Two local leftovers, `asset/models/ship-refs-2127` and `car-candidates-2127`, hold only git-ignored caches from other branches and fail that test unless parked; they were parked for the run and restored. `surveyMeterPipeline.test.ts` and `energyPipeline.test.ts` FAIL on this machine before any of this task's code runs: `survey/tests/surveyFixture.ts` turns a `file://` URL path into `C:\C:\…\%E6%96%87%E4%BB%B6\…` (percent-encoded non-ASCII folder name), so the question JSON is not found. Not caused by this task, not fixed here. Every other test in the `npm test` list passed when run one at a time.
 - Application verification: NOT INTEGRATED.
@@ -72,4 +84,4 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
 
 ## Next expected step
 
-Owner reviews the structure-detail round (`detail-final/before-after-nobeam-*.jpg`, `after-ref/beam.png`); then either another shape round or a placement task (site, shoreline, beam behaviour in the app).
+Owner reviews the receiver-base round (`collar-final/before-after-nobeam-dome.jpg`, `before-after-nobeam-water.jpg`, `after-waterzoom`) and confirms the assumed screenshot angle; then either another shape round or a placement task (site, shoreline, beam behaviour in the app).

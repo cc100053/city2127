@@ -38,6 +38,7 @@ PANEL_UV = (4.0, 8.0)       # texture tiles across / along each petal: 8 x 16 ce
 PANEL_TEX = 256             # px per tile; 2 x 2 cells with thin silver frames
 SEAM_TEX = 256              # px per guard-plate / pontoon tile: seams on the tile edges, fastener dots along them
 SEGS = 24                   # pontoon segments
+JUNCTION_A = math.radians(142.5)  # collar pipe junction: toward the shore duct, between two inner petals
 DRUM_R, DECK_Y = 17.5 * S, 2.4 * S
 DOME_R, DOME_Y = 8.0 * S, 15.0 * S
 
@@ -229,6 +230,86 @@ def support_arm(A, foot, head, th):
     obox(A["frame"], (head[0], head[1] - .25, head[2]), (.9, .6, .9), t, n)
 
 
+def arc_slab(acc, r0, r1, a0, a1, y0, y1, segs=6):
+    """Curved slab between radii r0 < r1, angles a0..a1 (rad), heights y0..y1."""
+    ring = lambda a: [(r * math.cos(a), y, r * math.sin(a)) for r, y in ((r0, y0), (r1, y0), (r1, y1), (r0, y1))]
+    verts = [p for s in range(segs + 1) for p in ring(a0 + (a1 - a0) * s / segs)]
+    faces = [(4 * s + i, 4 * s + (i + 1) % 4, 4 * (s + 1) + (i + 1) % 4, 4 * (s + 1) + i) for s in range(segs) for i in range(4)]
+    faces += [(3, 2, 1, 0), tuple(4 * segs + i for i in range(4))]
+    acc.solid(verts, faces)
+
+
+def receiver_base(A):
+    """Collar under the dome: bearing ring with braced shoes, 8 equipment bays (recessed louvred grilles alternating with
+    seamed access covers), a narrow service walkway with railing, and a pipe junction facing the shore duct."""
+    rc = DOME_R + .6                                     # collar face radius
+    y_low, y_mid0, y_mid1, y_top = DECK_Y - .2, 9.5, 17.5, DOME_Y - 1.2
+    rb = rc - .7                                         # recess back: bays sit 0.7 m deep
+    cyl(A["collar"], 0, 0, rc, y_low, y_mid0, 64)        # lower band (junction, walkway): blue-grey silver
+    cyl(A["collar"], 0, 0, rc, y_mid1, y_top, 64)        # upper band (brace plates)
+    cyl(A["recess"], 0, 0, rb, y_mid0 - .05, y_mid1 + .05, 64)
+    # bearing ring on top: deeper and taller than before, bevelled
+    r_out, depth, y0, y1 = DOME_R + 2.2, 2.8, y_top, DOME_Y + .8
+    sweep(A["frame"], lambda k: circle_pts(0, 0, r_out, 64, k),
+          [(0, y0 + .3), (.3, y0), (depth, y0), (depth, y1), (.3, y1), (0, y1 - .3)], caps=(False, False), closed=True)
+    for i in range(16):  # diagonal braces: base plate on the upper band, strut, shoe under the ring
+        a = 2 * math.pi * (i + .5) / 16
+        t, n = (-math.sin(a), math.cos(a)), (math.cos(a), math.sin(a))
+        yp = y_mid1 + .7
+        obox(A["frame"], ((rc + .14) * n[0], yp, (rc + .14) * n[1]), (1.8, 2.0, .28), t, n)
+        shoe = ((r_out - .35) * n[0], y0 - .25, (r_out - .35) * n[1])
+        obox(A["frame"], shoe, (1.2, .5, 1.2), t, n)
+        pipe(A["frame"], [((rc + .3) * n[0], yp - .4, (rc + .3) * n[1]), (shoe[0], shoe[1] - .2, shoe[2])], .34, 8)
+    # equipment bays: sector k even = access covers, odd = louvred grille; pilasters between them
+    phi = JUNCTION_A
+    pil = .5 / rc                                        # pilaster half width (rad)
+    gap = .08 / rc                                       # cover seam (rad)
+    for k in range(8):
+        a0, a1 = phi + (k - .5) * math.pi / 4, phi + (k + .5) * math.pi / 4
+        arc_slab(A["collar"], rb, rc + .05, a1 - pil, a1 + pil, y_mid0, y_mid1, 1)
+        b0, b1 = a0 + pil, a1 - pil
+        if k % 2 == 0:
+            for c in range(3):
+                c0, c1 = b0 + (b1 - b0) * c / 3 + gap / 2, b0 + (b1 - b0) * (c + 1) / 3 - gap / 2
+                for ya, yb in ((y_mid0, 13.5), (13.5, y_mid1)):
+                    arc_slab(A["frame"], rb - .03, rc + .02, c0, c1, ya + .04, yb - .04, 3)  # seated in the back wall
+        else:
+            for s in range(14):
+                ys = y_mid0 + .45 + s * (y_mid1 - y_mid0 - .9) / 13
+                arc_slab(A["grille"], rb, rb + .4, b0, b1, ys - .08, ys + .08, 6)
+            am = (b0 + b1) / 2
+            arc_slab(A["grille"], rb, rb + .45, am - .15 / rc, am + .15 / rc, y_mid0, y_mid1, 1)
+    # narrow service walkway on the lower band, brackets under it, two-rail railing
+    w_in, w_out, wy = rc, rc + 1.2, 5.8
+    sweep(A["frame"], lambda k: circle_pts(0, 0, w_out, 96, k), [(0, wy), (1.2, wy), (1.2, wy + .3), (0, wy + .3)],
+          caps=(False, False), closed=True)
+    for i in range(24):
+        a = 2 * math.pi * i / 24
+        pipe(A["frame"], [(w_in * math.cos(a), wy - 1.4, w_in * math.sin(a)),
+                          ((w_out - .15) * math.cos(a), wy, (w_out - .15) * math.sin(a))], .1, 4)
+    rr = w_out - .08
+    for i in range(48):
+        a = 2 * math.pi * i / 48
+        pipe(A["frame"], [(rr * math.cos(a), wy + .3, rr * math.sin(a)), (rr * math.cos(a), wy + 1.4, rr * math.sin(a))], .05, 4)
+    for yy in (wy + .85, wy + 1.4):
+        pipe(A["frame"], [(rr * math.cos(2 * math.pi * i / 96), yy, rr * math.sin(2 * math.pi * i / 96)) for i in range(97)],
+             .05, 4)
+    # pipe junction facing the shore duct: wall plate, three flanged pipes over the walkway, manifold on the deck
+    R, L = (math.cos(phi), math.sin(phi)), (-math.sin(phi), math.cos(phi))
+    P = lambda r, y, l: (R[0] * r + L[0] * l, y, R[1] * r + L[1] * l)
+    obox(A["frame"], P(rc + .15, 8.0, 0), (4.2, 2.8, .3), L, R)
+    yj, rd = 8.2, rc + 2.4
+    for l in (-1.25, 0.0, 1.25):
+        pipe(A["frame"], arc_path([P(rc + .2, yj, l), P(rd, yj, l), P(rd, DECK_Y + 1.0, l)], .9), .38, 10)
+        pipe(A["frame"], [P(rc + .3, yj, l), P(rc + .65, yj, l)], .62, 12)           # wall flange
+        pipe(A["frame"], [P(rd, 6.3, l), P(rd, 6.65, l)], .62, 12)                   # riser flange
+        obox(A["glow"], P(rc + .32, yj + .95, l + .45), (.22, .22, .12), L, R)       # lights by the flanges
+        obox(A["glow"], P(rd + .66, 6.47, l), (.22, .22, .1), L, R)
+    obox(A["frame"], P(rd, DECK_Y + .5, 0), (4.2, 1.0, 1.6), L, R)                   # manifold box
+    for l in (-1.6, 1.6):
+        obox(A["glow"], P(rd + .84, DECK_Y + .65, l), (.25, .25, .1), L, R)
+
+
 def build():
     A = {k: (UAcc() if k in UV_ROLES else Acc()) for roles in GROUPS.values() for k in roles}
     # ---- floating base: 24 pontoon segments (seams in the texture), joint pilasters, deck mounts, one light each
@@ -243,15 +324,7 @@ def build():
         am = a + math.pi / SEGS  # indicator light mid-segment, under the deck edge
         cyl(A["glow"], (DRUM_R + .1) * math.cos(am), (DRUM_R + .1) * math.sin(am), .22, 2.1, 2.35, 6)
     # ---- dome on its collar, meridian ribs, receiver aperture
-    cyl(A["base"], 0, 0, DOME_R + .6, DECK_Y - .2, DOME_Y, 48)
-    # thick silver bearing ring where the dome meets the collar, with 16 brackets down to the collar
-    y0, y1 = DOME_Y - .9, DOME_Y + .8
-    sweep(A["frame"], lambda k: circle_pts(0, 0, DOME_R + 1.8, 64, k),
-          [(0, y0 + .25), (.25, y0), (2.4, y0), (2.4, y1), (.25, y1), (0, y1 - .25)], caps=(False, False), closed=True)
-    for i in range(16):
-        a = 2 * math.pi * i / 16
-        t, n = (-math.sin(a), math.cos(a)), (math.cos(a), math.sin(a))
-        obox(A["frame"], ((DOME_R + 1.2) * n[0], y0 - 1.3, (DOME_R + 1.2) * n[1]), (.45, 2.6, 1.6), t, n)
+    receiver_base(A)
     sec = [(DOME_R * (1 - math.cos(math.radians(p))), DOME_Y + DOME_R * math.sin(math.radians(p))) for p in range(0, 86, 5)]
     sweep(A["dome"], lambda k: circle_pts(0, 0, DOME_R, 48, k), sec)
     for i in range(16):
@@ -455,6 +528,9 @@ def mats():
         "dome": m("dome_silver_blue", (.70, .82, .97, 1), .1, .9, (.55, .72, 1, 1), .15),
         "base": textured("q02b_pontoon_segments", seams, .5, .15),      # 24 segments, seams and fasteners
         "plain": m("base_white", (.80, .81, .82, 1), .55),
+        "collar": m("collar_bluegrey", (.50, .56, .64, 1), .32, .6),      # collar bands and bay pilasters
+        "grille": m("grille_dark", (.09, .10, .12, 1), .45, .5),          # louvre slats in the collar bays
+        "recess": m("recess_bluegrey", (.16, .22, .30, 1), .5, .3),        # recessed bay back wall
         "dark": m("window_band", (.04, .06, .08, 1), .25),
         "glow": m("light_cyan", (.25, .7, 1, 1), .4, 0, (.3, .78, 1, 1), 6.0),
         "aperture": m("aperture", (.85, .95, 1, 1), .2, 0, (.7, .9, 1, 1), 3.0),
@@ -468,7 +544,7 @@ def mats():
 
 
 GROUPS = {
-    "Q02B_Receiver": ("panel", "shell", "frame", "piston", "dome", "base", "dark", "glow", "aperture"),
+    "Q02B_Receiver": ("panel", "shell", "frame", "piston", "collar", "grille", "recess", "dome", "base", "dark", "glow", "aperture"),
     "Q02B_SubseaLink": ("sleeve", "core", "sub_frame", "sub_glow"),
     "Q02B_ShoreStation": ("pav_glass", "pav_frame", "pav_base", "pav_core", "pav_glow"),
     "Q02B_LightBeam": ("beam_core", "beam_glow"),
