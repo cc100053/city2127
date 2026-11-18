@@ -46,7 +46,7 @@
           "id": "B",
           "label": "利用者の評判を見てから試す。",
           "modelId": "bay-flower-receiver",
-          "lotId": null
+          "lotId": "q02-bay-flower"
         },
         {
           "id": "C",

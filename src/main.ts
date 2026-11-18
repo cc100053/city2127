@@ -28,6 +28,8 @@ import { bayWater, waterLights } from './bayWater';
 import { residentIdentity, scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
 import { rotationLayout } from './rotationLayout';
+import { LotRuntime } from './lotRuntime';
+import { bayFlowerShown } from './bayFlower';
 import { createCityChangeManager } from './createCityChangeManager';
 import { renderQuality } from './renderQuality';
 import { ARRIVAL_SECONDS, VoteJourney } from './voteJourney';
@@ -272,6 +274,8 @@ try {
     if(to!==null||orbitalTo!==null)playMeters(to??metersParam??'',now-Number(params.get('metersAge')??1),orbitalTo??orbital);
   });
   const journey=surveyUrl?new VoteJourney(scene,camera):null;
+  // Rotation runs: Q02's three lots show the run's Q02 option (src/lotRuntime.ts); version4 runs never engage it.
+  const lots=surveyUrl&&cityChanges?new LotRuntime(scene,cityChanges.energy,bayFlowerShown(location.search,import.meta.env.DEV)):null;
   // DEV `?survey=…&residentDemo`: a live NW +1 headline visits 湊 after the building change (src/devResidentDemo.ts); everything else keeps the normal timeline.
   let residentDemo:{start:(changeEnd:number,to:'low'|'mixed'|'high',previous:'low'|'mixed'|'high')=>void;cancel:()=>void}|null=null,nwBand:'low'|'mixed'|'high'='mixed';
   if(import.meta.env.DEV&&surveyUrl&&headlineCamera&&params.has('residentDemo'))import('./devResidentDemo').then(({startResidentDemo})=>{const demo=startResidentDemo(scene,camera,controls);residentDemo=demo;devFrame=now=>demo.frame(now,headlineCamera.active);});
@@ -304,7 +308,9 @@ try {
       // Vote journey: a live result's four votes fly to the sites first; the city transition and pulses start after the close-up settles,
       // while the carrier evidence for the resident card is computed now. Snapshots, resets, Undo and reduced motion stay immediate.
       if(kind==='city-state-updated'&&latest&&!cameraMotion.matches&&displayMs>=DISPLAY_MS-100){
-        const changes=cityChanges!.applyExhibitionLayout(layout,kind,now+(headlineCamera?shotTimeline(displayMs).change:ARRIVAL_SECONDS),view.slotSeeds,now,latest.votes);
+        const changeAt=now+(headlineCamera?shotTimeline(displayMs).change:ARRIVAL_SECONDS);
+        lots?.setQ02(view.rotation?.shown.Q02,changeAt,false);
+        const changes=cityChanges!.applyExhibitionLayout(layout,kind,changeAt,view.slotSeeds,now,latest.votes);
         // Rotation runs fly one big orb to the outcome question's site and fade the other three answers (src/voteJourney.ts playRotation).
         if(view.rotation)journey!.playRotation(latest,now);
         else journey!.play(latest.votes,latest.ordinal,now,changes[0]?.headline&&changes[0].district&&!changes[0].focalOnly?changes[0]:undefined);
@@ -318,9 +324,10 @@ try {
       }
       headlineCamera?.cancel();narration?.cancel();
       if(view.rotation)journey!.setRotationLanterns(view.recentProposals);else journey!.setLanterns(view.recentProposals);
+      lots?.setQ02(view.rotation?.shown.Q02,now,true);
       return cityChanges!.applyExhibitionLayout(layout,kind==='city-state-updated'?'city-state-snapshot':kind,now,view.slotSeeds);
     }
-    headlineCamera?.cancel();narration?.cancel();journey!.cancel();
+    headlineCamera?.cancel();narration?.cancel();journey!.cancel();lots?.setQ02(undefined,now,true);
     world.blendTo(scoresToWorldState(view.scores),now);
     if(kind==='city-state-updated')cityChanges!.applyIncrementalUpdate(view,now);
     else cityChanges!.restoreFromSnapshot(view,now);
@@ -362,7 +369,7 @@ try {
     narration?.update(now,cameraMotion.matches);explore?.update(now,cameraMotion.matches);
     if(headlineCamera?.active)voiceLabel?.update(camera,now);else voiceLabel?.hide();
     if(import.meta.env.DEV&&devShot){camera.position.set(...devShot.position);controls.target.set(...devShot.target);camera.lookAt(controls.target);}
-    cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
+    cityChanges?.update(now,dark);lots?.update(now,cameraMotion.matches);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.
     if(performance.now()-shadowDrawn>=1000/quality.shadowHz){renderer.shadowMap.needsUpdate=true;shadowDrawn=performance.now();}
     composer.render();

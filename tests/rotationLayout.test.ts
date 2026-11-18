@@ -2,7 +2,7 @@
 // version4 views pass through untouched, and a Q01 swap reads the NW focal copy.
 import assert from 'node:assert/strict';
 import { ladderLayout } from '../survey/src/shared/cityView.ts';
-import { q01Swap, rotationLayout, withQ01, Q01_NW_TIERS } from '../src/rotationLayout.ts';
+import { q01Swap, q02Swap, rotationLayout, withQ01, Q01_NW_TIERS } from '../src/rotationLayout.ts';
 import { residentCards, residentResult } from '../src/surveyAtmosphere.ts';
 import type { ExhibitionProposal, ExhibitionView } from '../src/surveyView.ts';
 
@@ -56,7 +56,14 @@ assert.match(toA.preference, /人に相談できる日常/);
 assert.match(toA.effect, /人に相談できる窓口が増えました/, 'the direct C→A jump reads as more counters');
 assert.equal(q01Swap(proposal({ kind: 'swap', questionId: 'Q02', from: 'A', to: 'B' }, 'B')), undefined, 'other questions draw no city change yet');
 assert.equal(q01Swap(proposal({ kind: 'fallback', questionId: 'Q01' }, 'B')), undefined);
-assert.equal(residentResult(proposal({ kind: 'swap', questionId: 'Q02', from: 'A', to: 'B' }, 'B'), []).kind, 'maintained');
+// Q02 swaps move the shown model between lots (src/lotRuntime.ts) with no Meter carrier, so they read their own (provisional) copy.
+const flower = residentResult(proposal({ kind: 'swap', questionId: 'Q02', from: 'A', to: 'B' }, 'B'), []);
+assert.equal(flower.kind, 'configuration');
+assert.equal(flower.place, '南部公園沖の湾の花');
+assert.match(flower.effect, /湾の花が開きました/);
+assert.deepEqual(['A', 'B', 'C'].map(to => q02Swap(proposal({ kind: 'swap', questionId: 'Q02', from: 'B', to }, to))?.to), ['A', 'B', 'C']);
+assert.equal(q02Swap(proposal({ kind: 'fallback', questionId: 'Q02' }, 'B')), undefined);
+assert.equal(residentResult(proposal({ kind: 'fallback', questionId: 'Q02' }, 'B'), []).kind, 'maintained', 'a Q02 fallback keeps the city');
 
 // Plan 2.6: the result card carries the crowd share of the outcome's question only, without a number below the threshold.
 const shared = (outcome: NonNullable<ExhibitionProposal['rotation']>['outcome'], percent?: number) => residentResult({

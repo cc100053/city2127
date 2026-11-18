@@ -8,7 +8,7 @@ import type { CarrierChange } from './cityChangeManager.ts';
 import type { DisplayMode } from './dayCycle.ts';
 import { presets, type WorldState } from './presets.ts';
 import { changeSites } from './layout.ts';
-import { q01Swap, rotationLayout } from './rotationLayout.ts';
+import { q01Swap, q02Swap, Q02_RESULTS, rotationLayout } from './rotationLayout.ts';
 import { crowdShareText } from '../survey/src/shared/rotation.ts';
 import { AXES, connectSurvey, isExhibitionView, supersedes, type CityView, type Decision, type ExhibitionProposal, type ExhibitionView, type SurveyEventKind, type SurveyView, type ExploreLook } from './surveyView.ts';
 
@@ -183,6 +183,15 @@ export function energyChangedPart(before: EnergyConfiguration, after: EnergyConf
 
 /** Evidence is the renderer's before/after targets, including visible pairings and shuffled slots. */
 export function residentResult(proposal: ExhibitionProposal, changes?: readonly CarrierChange[]) {
+  // Rotation runs: the crowd share of the outcome's question (plan 3.3, 2.6) — the "one voice among many" half of the story.
+  const outcomeShare = proposal.rotation?.shares.find(share => share.questionId === proposal.rotation!.outcome.questionId);
+  const share = outcomeShare ? { share: crowdShareText(outcomeShare) } : {};
+  // A Q02 swap moves the shown model between three lots (src/lotRuntime.ts); no Meter carrier changes, so it reads its own copy.
+  const q02 = q02Swap(proposal);
+  if (q02) {
+    const [place, effect, preference] = Q02_RESULTS[q02.to];
+    return { preference, effect, place, kind: 'configuration', ...share };
+  }
   const change = changes?.[0];
   // Rotation runs (Q01 only so far): the guest's own Q01 answer swapped the NW AUTO HUB; its layouts come from the outcome, not the neutral Meter layout.
   const swap = q01Swap(proposal);
@@ -247,9 +256,7 @@ export function residentResult(proposal: ExhibitionProposal, changes?: readonly 
       effect = '思いは住民の声に加わり、街のエネルギー設備は今の配置を受け継いでいます。';
     } else effect = direction ? '街の方向は少し動きましたが、見えている施設の構成は維持されました。' : '思いは記録され、見えている施設の構成は維持されました。';
   }
-  // Rotation runs: the crowd share of the outcome's question (plan 3.3, 2.6) — the "one voice among many" half of the story.
-  const outcomeShare = proposal.rotation?.shares.find(share => share.questionId === proposal.rotation!.outcome.questionId);
-  return { preference, effect, place, kind, ...(outcomeShare ? { share: crowdShareText(outcomeShare) } : {}) };
+  return { preference, effect, place, kind, ...share };
 }
 
 const LEGACY_HISTORY_SHOWN = 3;
