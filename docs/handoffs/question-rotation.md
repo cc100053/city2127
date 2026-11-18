@@ -1,14 +1,15 @@
 # question-rotation — SURVEY_V2 抽題輪換計劃
 
 - Owner: cc100053
-- Status: IN_PROGRESS（階段 1 survey 端完成：9 題可選用接入；階段 2 城市端接 Q01 及 Q02）
+- Status: IN_PROGRESS（階段 1 survey 端完成：9 題可選用接入；階段 2 城市端接 Q01、Q02 及 Q08 的 C）
 - Branch: `feat/question-rotation`（2026-11-18 由 `docs/question-rotation-plan` HEAD `95c494ff` 開出；計劃文件 commit 一併帶入）
 - Base commit: `6724989bbff0ff8a0f65a9ee6e2a23f778e7ede3`（origin/main，2026-11-18）
-- Last verified commit: Q02 近鏡 commit，見 Git log `feat(city): Q02 close-ups and journey landing on its lots`（實時截圖在其未 commit 工作樹拍）；之前 `dd9f45f9` Q02 城市接線，見 Git log，見 Git log `feat(city): draw rotation Q02 on its three lots`（實時截圖在其未 commit 工作樹拍，sidecar 記 `baaf2ac5` dirty）；之前 2.6 結果卡群眾比例 commit，見 Git log `feat(city): crowd share on the rotation result card`（之前 `c63a316a` 為投票旅程方案 A；之前 `0f80be71` 為 A→C 鏡頭修正；之前 `9c72c82a` 為階段 2 Q01；實時截圖在其未 commit 工作樹拍，sidecar 記 `e317b593` dirty；`?meters` 截圖在 `9c72c82a` 乾淨樹拍）
+- Last verified commit: Q08 commit，見 Git log `feat(city): rotation Q08 on the SW lot, shelf or vacant`（實時截圖在其未 commit 工作樹拍）；之前 Q02 近鏡 commit，見 Git log `feat(city): Q02 close-ups and journey landing on its lots`（實時截圖在其未 commit 工作樹拍）；之前 `dd9f45f9` Q02 城市接線，見 Git log，見 Git log `feat(city): draw rotation Q02 on its three lots`（實時截圖在其未 commit 工作樹拍，sidecar 記 `baaf2ac5` dirty）；之前 2.6 結果卡群眾比例 commit，見 Git log `feat(city): crowd share on the rotation result card`（之前 `c63a316a` 為投票旅程方案 A；之前 `0f80be71` 為 A→C 鏡頭修正；之前 `9c72c82a` 為階段 2 Q01；實時截圖在其未 commit 工作樹拍，sidecar 記 `e317b593` dirty；`?meters` 截圖在 `9c72c82a` 乾淨樹拍）
 - Remote availability: `origin/docs/question-rotation-plan`（計劃）；`origin/feat/question-rotation`（實作）
 
 ## Session Git state
 
+- Session starting branch and HEAD（2026-11-19 第六節，Q08）：`feat/question-rotation` `3bc06d7c`，與 origin 同步；`origin/main` `df59a7de`（分支已包含）。原任務為另開 `feat/q08-sw-halls` 做 A、B 新模型；owner 中途改為「只放現有模型，新模型日後自己做，不屬本任務」，故未開新分支，直接在本分支接 Q08。未追蹤 `Dev_QA.md` 保留
 - Session starting branch and HEAD（2026-11-19 第五節，Q02 城市接線）：`main` `df59a7de`（與 origin 同步）；切到 `feat/question-rotation` `ea03c428`（與 origin 同步，落後 main 7 個 commit，即 bay-flower 放置）。owner 指示「Merge 再做 Q02」：merge `origin/main` 入分支（`baaf2ac5`），只有 `package.json` 測試清單衝突（兩邊各加測試，保留兩邊）；merge 後 root `npm test` 通過。未追蹤 `Dev_QA.md` 保留
 
 - Session starting branch and HEAD（2026-11-18 第四節，2.6 結果卡群眾比例）：`feat/question-rotation`，`c63a316a`，與 origin 同步；`origin/main` 仍為 `6724989b`（分支包含之）；未追蹤 `Dev_QA.md` 保留
@@ -75,6 +76,8 @@
 
 ## Actual validation results
 
+- Q08（2026-11-19 第六節，owner「只放現有模型」，A／B 選「空地（棚淡出）」）：`commonsPlaza.ts` 新 `setVacant` override（局部 band 'vacant'：所有態收起、無居民；離開或回到 mixed 沿用已驗收的 5 秒模組棚序列；Meter band 保留於下，中性 layout 重送 mixed 不會蓋過；`restoreLegacy` 清除；診斷加 `vacant`）。`CityChangeManager.commonsPlaza` getter；`LotRuntime.setQ08`（`q08Vacant`：A／B 空置、C 模組棚；version4 未接手前不碰）；`main.ts` 實時、snapshot、version4 三處呼叫，與 `setQ02` 同位。`rotationLayout.ts` 新 `Q08_RESULTS`（暫定文案，地點「南岸の空き地」／「南岸の活動モジュール棚」）、`q08Swap`（`shelf`：棚出入與否）、`q08Result`（棚出現／外れて空き地／空き地のまま）、`q08Shot`（棚出入飛 `sw:focal`，A↔B 留 hero）。`residentResult` 先處理 Q08；原因句延遲在棚出入時用 5 秒。`voteJourney` `ROTATION_SITE_AXIS` 加 `Q08: 'publicSharing'`（大光點及燈籠落 SW，公共色）。測試及瀏覽器結果見 [VALIDATION](../VALIDATION.md)：日景 C→A、A→C、C→B，夜景 B→C、C→A，32 張 sidecar 無 page error；空置態為草地加白色地塊輪廓，周邊 district 照舊。證據 `~/city2127-evidence/question-rotation/q08-sw/`（`sheet-day.jpg`、`sheet-night.jpg`；腳本副本同目錄）。FPS、iPad、A／B 雙站未測。
+
 - Q02 近鏡及旅程著陸（2026-11-19 第五節，owner「接受，做近鏡」）：`headlineCamera.ts` 新 `q02:hydro`（取自 q02a-hydro-placement R1 focal-day 鏡位）、`q02:flower`（bay-flower-placement R1 focal-day，因本相機 42° 鏡頭拉遠 20%）、`q02:farm`（同 `energy:farm`）；`HeadlineCamera.playShot` 讓沒有 Meter 載體的 Q02 換直接指定鏡頭，時間軸不變。`voteJourney.ts` 新 `rotationSite`：Q01 沿用 NW（數值與改動前相同，version4 緩衝區摘要測試通過），Q02 按顯示模型（換＝`to`，保底＝訪客自己的 Q02 答案）落在 `LOTS` 地塊，能源色 `#75e2c2`，一個掃描環（地塊範圍 × 1.15）及一盞燈籠（環境軸槽位），snapshot 重建相同。`LOTS` 加 `size`（棚田 66、花 128、農園 129 m）。測試：`voteJourney` 新 Q02 三例、`lotRuntime` 新「三鏡都看向自己地塊」、`headlineCamera` 鏡頭數 24→27。root 及 `survey/` `npm test`／`npm run build`、`git diff --check` 通過。瀏覽器：`root`＋`survey-rotation`，capture 載入器（headless Chrome 1600 × 900）實時（不固定鏡頭）日景 `hour=12` 及夜景 `hour=21` 各拍 A→B、B→C、C→A，結果後 3／5.5／7／10／12.5 秒，32 張 sidecar 無 page error。3 秒在 hero 旅程，5.5 秒已在地塊近鏡（模型開始淡入），10 秒落定並顯示原因句及群眾比例句；三個模型日夜皆完整入鏡，結果卡在右側不遮模型。證據 `~/city2127-evidence/question-rotation/q02-closeup/`（`sheet.jpg` 為日夜落定總覽，`peek-B.jpg`、`peek-CA.jpg` 為時序；腳本副本同目錄）。FPS、iPad、A／B 雙站未測。
 
 - Q02 城市接線（2026-11-19 第五節）：新 `tests/lotRuntime.test.ts`（接入 root `npm test`）：A／B／C 各只顯示一個模型；Q02 三個 `lotId` 都在 `LOTS`，農園地塊等於 `FARM_CENTRE`；version4（無 `rotation`）不改可見度、不複製材質、不設農園 override；GLB 未載入前 snapshot 到 B，載入後花顯示、棚田仍收起；實時 B→A 於變化時間前不動、中段兩地塊透明度 0.5、3 秒後落定；reduced motion 即時；之後 version4 view 還原（棚田顯示、花空置、農園交回投票）；`EnergyRuntime.setFarmOverride` 勝過接收投票、immediate 能源更新後仍保留、交回時 3 秒淡出、version4 投票路徑不變。`rotationLayout.test.ts` 改為 Q02 換讀自己的結果卡文案，Q02 保底仍為「維持」。root 及 `survey/` `npm test`／`npm run build`、`git diff --check` 通過。瀏覽器：`root`＋`survey-rotation`（scratch DB）。腳本以 capture 載入器（headless Chrome 1600 × 900，`hour=12`）及固定俯瞰鏡頭（`cityPose`）送訪客：A→B，再經 5 位換其他題的訪客令 Q02 再被抽中後 B→C，再 5 位後 C→A。每次結果後 4／6.6／10／14 秒各一張，13 張 sidecar 皆無 page error。結果：B 時花及光柱出現、棚田整島收起；C 時農園出現、花淡出，`dataset.energy.farm.visible` 為 true；A 時農園淡出、棚田返回。結果卡分別為三句暫定文案，地點行為「南部公園沖の湾の花」「受電テラス農園」「西岸の水の棚田」，並有群眾比例少人數句。證據存 `~/city2127-evidence/question-rotation/q02-lots/`（`sheet.jpg` 為總覽；`guest.mjs`、`liveCapture.mjs` 為驅動腳本副本）。`scripts/changeSheet.ts` 重新生成只改日期，未 commit（change sheet 只列 version4）。FPS、iPad、A／B 雙站未測。
@@ -104,6 +107,8 @@
 
 ## Known issues and blockers
 
+- Q08 待 owner：空置態外觀（草地＋白色輪廓）、A↔B 不飛近鏡（留 hero，卡文「空き地のままです」）、三句暫定文案（待 5.2）。SW COMMONS −1／+1 在輪換 run 中本來就不出現（中性 layout 恆為 mixed）；version4 run 不受影響。A、B 新模型由 owner 日後另做，屆時在 `setVacant` 位置換成各自模型的顯示（A／B 各一個 LotFade 或 band），`q08Vacant` 及 `Q08_RESULTS` 改為模型文案。
+
 - 已決（owner 2026-11-19「接受，做近鏡」）：Q02-A 空置態為整島（含步道）收起，只剩海面；Q02-C 空置態沿用 version4 無農園的南緣；離場模型與出場模型在同一 3 秒內同時淡出淡入（計劃 2.4「離場模型的變化是否播出」＝同時播出，鏡頭只看出場模型）。
 - Q02 待 owner：結果卡三句及地點名為暫定（`Q02_RESULTS`，待 5.2）；三個 Q02 近鏡（日夜）及旅程能源色著陸 owner 2026-11-19 接受（`q02-closeup/sheet.jpg`；`q02:farm` 前景的空の環斜柱照舊）。輪換 run 中棚田及花的材質在首次接手後改為各自的複本（version4 run 不受影響）。
 
@@ -121,7 +126,7 @@
 
 ## Next expected step
 
-**現時（2026-11-19）：** Q01、Q02 城市已接，Q02 近鏡及旅程著陸已做。下一步（Q02 近鏡 owner 2026-11-19 已接受）：接下一題：Q08（SW 活動模組棚，地塊 `sw`）或 Q03（抽屜住宅），兩題都要先補齊其餘兩個選項的模型。Q02 文案待 5.2。
+**現時（2026-11-19 第六節）：** Q08 已接 C（模組棚），A／B 暫為空置，待 owner 看 `q08-sw/sheet-*.jpg`。之前：Q01、Q02 城市已接，Q02 近鏡及旅程著陸已做。下一步（Q02 近鏡 owner 2026-11-19 已接受）：接下一題：Q08（SW 活動模組棚，地塊 `sw`）或 Q03（抽屜住宅），兩題都要先補齊其餘兩個選項的模型。Q02 文案待 5.2。
 
 （之前的現時，保留作紀錄）
 

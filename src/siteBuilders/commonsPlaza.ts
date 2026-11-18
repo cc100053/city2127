@@ -53,6 +53,8 @@ export type CommonsPlazaTarget = {
 
 export interface CommonsPlazaDiagnostics {
   readonly band: CommonsPlazaTarget['band'];
+  /** Q08 A/B: the lot stands empty whatever `band` says. */
+  readonly vacant: boolean;
   readonly targetSharedSeats: number;
   readonly visibleSharedSeats: number;
   readonly targetScreenedSeats: number;
@@ -61,6 +63,10 @@ export interface CommonsPlazaDiagnostics {
 
 export interface CommonsPlazaRuntime {
   setTarget(target: CommonsPlazaTarget, now: number, immediate: boolean, sampleAt?: number): boolean;
+  /** Question rotation Q08 (src/lotRuntime.ts): `true` empties the lot whatever the Meter band (options A/B have no model yet),
+   *  `false` hands it back to the band; leaving or re-entering the shelf runs its accepted 5 s sequence. */
+  setVacant(vacant: boolean, now: number, immediate: boolean): void;
+  readonly vacant: boolean;
   update(now: number): void;
   restoreLegacy(): void;
   getDiagnostics(): CommonsPlazaDiagnostics;
@@ -90,8 +96,18 @@ function createCommonsPlazaRuntime(parts: Part[], frame: (now: number) => void, 
   let start = 0;
   // A band change into or out of mixed runs the shelf sequence (frame, quiet modules, headline hoist) over its own, longer clock; everything else keeps the 3 s default.
   let duration: number = SITE_TRANSITION_SECONDS, mixedMove: 1 | -1 | 0 = 0;
+  // Q08 vacancy override: no part belongs to 'vacant', so every state comes down and no residents are drawn.
+  let vacant = false;
+  const shown = (band: Band): Band | 'vacant' => vacant ? 'vacant' : band;
   const write = () => { for (const part of parts) part.apply(part.level); };
-  const settle = (band: Band) => {
+  /** Starts the move from the drawn state `was` to `next` at `now` (the shelf sequence when the shelf enters or leaves). */
+  const move = (was: Band | 'vacant', next: Band | 'vacant', now: number) => {
+    for (const part of parts) { part.from = part.level; part.to = part.band === next ? 1 : 0; }
+    start = now;
+    mixedMove = next !== was && (next === 'mixed' || was === 'mixed') ? (next === 'mixed' ? 1 : -1) : 0;
+    duration = mixedMove ? SHELF_TRANSITION_SECONDS : SITE_TRANSITION_SECONDS;
+  };
+  const settle = (band: Band | 'vacant') => {
     for (const part of parts) part.level = part.from = part.to = part.band === band ? 1 : 0;
     levels.set(to);
     from.set(to);
@@ -108,20 +124,28 @@ function createCommonsPlazaRuntime(parts: Part[], frame: (now: number) => void, 
         throw new RangeError(`sharedSeats must be an integer from 0 to ${SEAT_COUNT}.`);
       }
       runtime.update(sampleAt);
-      const wasBand = target.band;
+      const wasBand = shown(target.band);
       const changed = !exhibitionTargetApplied || next.band !== target.band || next.sharedSeats !== target.sharedSeats;
       target = { band: next.band, sharedSeats: next.sharedSeats };
       exhibitionTargetApplied = true;
       if (!changed && !immediate) return false;
       from.set(levels);
       to.set(sharedSlotLevels(next.sharedSeats));
-      for (const part of parts) { part.from = part.level; part.to = part.band === next.band ? 1 : 0; }
-      start = now;
-      mixedMove = next.band !== wasBand && (next.band === 'mixed' || wasBand === 'mixed') ? (next.band === 'mixed' ? 1 : -1) : 0;
-      duration = mixedMove ? SHELF_TRANSITION_SECONDS : SITE_TRANSITION_SECONDS;
-      if (immediate) settle(next.band);
-      else { active = changed; onSeats(next.sharedSeats, now, next.band !== wasBand && !mixedMove, mixedMove ? { dir: mixedMove, ...shelfHoist(mixedMove === 1) } : undefined); }
+      const nextBand = shown(next.band);
+      move(wasBand, nextBand, now);
+      if (immediate) settle(nextBand);
+      else { active = changed; onSeats(next.sharedSeats, now, nextBand !== wasBand && !mixedMove, mixedMove ? { dir: mixedMove, ...shelfHoist(mixedMove === 1) } : undefined); }
       return changed;
+    },
+    get vacant() { return vacant; },
+    setVacant(next, now, immediate) {
+      if (next === vacant && !immediate) return;
+      const was = shown(target.band);
+      vacant = next;
+      const band = shown(target.band);
+      move(was, band, now);
+      if (immediate) settle(band);
+      else if (band !== was) { active = true; if (mixedMove) onSeats(target.sharedSeats, now, false, { dir: mixedMove, ...shelfHoist(mixedMove === 1) }); }
     },
     update(now) {
       if (active) {
@@ -146,6 +170,7 @@ function createCommonsPlazaRuntime(parts: Part[], frame: (now: number) => void, 
     },
     restoreLegacy() {
       target = DEFAULT_TARGET;
+      vacant = false;
       exhibitionTargetApplied = false;
       to.set(sharedSlotLevels(DEFAULT_TARGET.sharedSeats));
       settle('mixed');
@@ -161,6 +186,7 @@ function createCommonsPlazaRuntime(parts: Part[], frame: (now: number) => void, 
       }
       return {
         band: target.band,
+        vacant,
         targetSharedSeats: target.sharedSeats,
         visibleSharedSeats,
         targetScreenedSeats: SEAT_COUNT - target.sharedSeats,

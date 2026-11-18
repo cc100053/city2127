@@ -2,13 +2,13 @@ import type { EnergyConfiguration } from '../survey/src/shared/energy.ts';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 import { reasonDelayMs } from './resultTimeline.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
-import { headlineTransitionSeconds } from './siteBuilders/shelfTimeline.ts';
+import { headlineTransitionSeconds, SHELF_TRANSITION_SECONDS } from './siteBuilders/shelfTimeline.ts';
 import { addHudChrome } from './hudFrame.ts';
 import type { CarrierChange } from './cityChangeManager.ts';
 import type { DisplayMode } from './dayCycle.ts';
 import { presets, type WorldState } from './presets.ts';
 import { changeSites } from './layout.ts';
-import { q01Swap, q02Swap, Q02_RESULTS, rotationLayout } from './rotationLayout.ts';
+import { q01Swap, q02Swap, q08Result, q08Swap, Q02_RESULTS, rotationLayout } from './rotationLayout.ts';
 import { crowdShareText } from '../survey/src/shared/rotation.ts';
 import { AXES, connectSurvey, isExhibitionView, supersedes, type CityView, type Decision, type ExhibitionProposal, type ExhibitionView, type SurveyEventKind, type SurveyView, type ExploreLook } from './surveyView.ts';
 
@@ -192,6 +192,9 @@ export function residentResult(proposal: ExhibitionProposal, changes?: readonly 
     const [place, effect, preference] = Q02_RESULTS[q02.to];
     return { preference, effect, place, kind: 'configuration', ...share };
   }
+  // A Q08 swap shows or empties the SW lot through the vacancy override (src/lotRuntime.ts), not the neutral Meter band.
+  const q08 = q08Swap(proposal);
+  if (q08) return { ...q08Result(q08), kind: 'configuration', ...share };
   const change = changes?.[0];
   // Rotation runs (Q01 only so far): the guest's own Q01 answer swapped the NW AUTO HUB; its layouts come from the outcome, not the neutral Meter layout.
   const swap = q01Swap(proposal);
@@ -331,7 +334,7 @@ export function startSurveyAtmosphere(
           // The share joins the reason, so the number never precedes the city's answer.
           if (result.share) latest.querySelector('.resident-card-copy')!.after(el('p', 'resident-share', `住民の声：${result.share}`));
         };
-        const transitionMs = reasonDelayMs(displayMs, globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false, headlineTransitionSeconds(evidence?.[0], SITE_TRANSITION_SECONDS));
+        const transitionMs = reasonDelayMs(displayMs, globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false, q08Swap(proposal)?.shelf ? SHELF_TRANSITION_SECONDS : headlineTransitionSeconds(evidence?.[0], SITE_TRANSITION_SECONDS));
         if (transitionMs === 0) showReason();
         else reasonTimer = window.setTimeout(showReason, transitionMs);
         storyTimer = window.setTimeout(showAmbient, displayMs);

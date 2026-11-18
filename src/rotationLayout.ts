@@ -44,3 +44,31 @@ export function q02Swap(proposal: ExhibitionProposal) {
 
 /** Q02 option → the headline shot of its lot (headlineCamera SHOTS). */
 export const Q02_SHOTS: Readonly<Record<string, ShotId>> = { A: 'q02:hydro', B: 'q02:flower', C: 'q02:farm' };
+
+/** Q08 (question rotation): its three options share the SW lot. C is the event module shelf; A and B have no model yet (owner
+ *  2026-11-19), so the lot stands vacant for them. Provisional result copy (owner copy pending, plan 5.2): option → [place, preference];
+ *  the effect depends on whether the shelf left, arrived or the lot stayed empty (q08Result). */
+export const Q08_RESULTS: Readonly<Record<string, readonly [string, string]>> = {
+  A: ['南岸の空き地', 'あなたは、いつも同じ用途で使える場所を選びました。'],
+  B: ['南岸の空き地', 'あなたは、イベントによって用途が変わる場所を選びました。'],
+  C: ['南岸の活動モジュール棚', 'あなたは、イベントに合わせて場所も変わる過ごし方を選びました。'],
+};
+
+/** A rotation proposal's Q08 swap, or undefined. `shelf` is whether the shelf enters or leaves (A↔B changes nothing visible). */
+export function q08Swap(proposal: ExhibitionProposal) {
+  const outcome = proposal.rotation?.outcome;
+  if (outcome?.kind !== 'swap' || outcome.questionId !== 'Q08' || !Q08_RESULTS[outcome.to] || !Q08_RESULTS[outcome.from]) return undefined;
+  return { from: outcome.from, to: outcome.to, shelf: (outcome.from === 'C') !== (outcome.to === 'C') };
+}
+
+/** The result card for a Q08 swap: the shelf arriving, leaving, or the lot staying empty for a hall still to come. */
+export function q08Result(swap: { from: string; to: string }) {
+  const [place, preference] = Q08_RESULTS[swap.to];
+  const effect = swap.to === 'C' ? 'お台場の南岸に、イベントに合わせて活動モジュールを運び入れる棚が現れました。'
+    : swap.from === 'C' ? 'お台場の南岸から活動モジュールの棚が外れ、新しい施設を待つ空き地になりました。'
+    : 'お台場の南岸は、新しい施設を待つ空き地のままです。';
+  return { place, effect, preference };
+}
+
+/** The Q08 headline shot: the shelf's close-up when it enters or leaves; none (stay at hero) when A↔B leaves the lot empty. */
+export const q08Shot = (swap: { shelf: boolean }): ShotId | null => swap.shelf ? 'sw:focal' : null;

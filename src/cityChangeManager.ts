@@ -70,6 +70,8 @@ export class CityChangeManager {
   private exhibitionLayout?: ExhibitionLayout;
 
   readonly energy?: EnergyRuntime;
+  /** The SW focal runtime, for question rotation Q08's vacancy override (src/lotRuntime.ts). */
+  get commonsPlaza() { return this.sites.dogenzakaSouth.commonsPlaza; }
 
   constructor(sites: BuiltSiteMap, energy?: EnergyRuntime) {
     this.sites = sites; this.energy = energy;

@@ -1,8 +1,11 @@
-// Question rotation lot runtime (QUESTION_ROTATION_PLAN 2.2), Q02 only so far: each of Q02's three models owns its own lot (LOTS in
-// layout.ts) and a rotation run shows exactly the one its Q02 option names, the other two lots standing vacant. Version4 runs never
-// engage it, so their city stays as built: the hydro terrace as fixed background, the bay flower vacant, the farm on the energy vote.
+// Question rotation lot runtime (QUESTION_ROTATION_PLAN 2.2), Q02 and Q08 so far: each of Q02's three models owns its own lot (LOTS in
+// layout.ts) and a rotation run shows exactly the one its Q02 option names, the other two lots standing vacant. Q08's three options
+// share the SW lot: C is the event module shelf, A and B have no model yet (owner 2026-11-19), so the lot stands vacant for them.
+// Version4 runs never engage it, so their city stays as built: the hydro terrace as fixed background, the bay flower vacant, the farm
+// on the energy vote, SW on its Meter band.
 import type { Object3D, Scene } from 'three';
 import { fadeFinishes, ownFinishes, type EnergyRuntime } from './energyRuntime.ts';
+import type { CommonsPlazaRuntime } from './siteBuilders/commonsPlaza.ts';
 import { BAY_FLOWER_SHOWN } from './bayFlower.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 
@@ -14,6 +17,10 @@ export function q02Models(option: string | undefined, flowerDefault = false): Q0
   if (option === 'A' || option === 'B' || option === 'C') return { hydro: option === 'A', flower: option === 'B', farm: option === 'C' };
   return { hydro: true, flower: flowerDefault, farm: undefined };
 }
+
+/** Q08 option → whether the SW lot stands vacant: A (fixed-use hall) and B (reconfigurable hall) are not built yet, C shows the
+ *  event shelf; no or an unknown option hands the lot back to the SW Meter band (false). */
+export const q08Vacant = (option: string | undefined) => option === 'A' || option === 'B';
 
 /** One lot's model fading over the shared 3-second site transition. It touches the scene only once set, and gives its meshes their
  *  own materials (ownFinishes) only once the model has loaded, so a version4 run keeps the shared materials. */
@@ -50,11 +57,13 @@ export class LotRuntime {
   private readonly hydro: LotFade;
   private readonly flower: LotFade;
   private engaged = false;
+  private q08Engaged = false;
   private readonly energy?: Pick<EnergyRuntime, 'setFarmOverride'>;
+  private readonly commons?: Pick<CommonsPlazaRuntime, 'setVacant'>;
   private readonly flowerDefault: boolean;
-  /** `flowerDefault`: the version4 bay flower state (DEV `?bayFlower=1` shows it, see bayFlowerShown). */
-  constructor(scene: Scene, energy?: Pick<EnergyRuntime, 'setFarmOverride'>, flowerDefault = false) {
-    this.energy = energy; this.flowerDefault = flowerDefault;
+  /** `flowerDefault`: the version4 bay flower state (DEV `?bayFlower=1` shows it, see bayFlowerShown); `commons` the SW focal runtime. */
+  constructor(scene: Scene, energy?: Pick<EnergyRuntime, 'setFarmOverride'>, flowerDefault = false, commons?: Pick<CommonsPlazaRuntime, 'setVacant'>) {
+    this.energy = energy; this.flowerDefault = flowerDefault; this.commons = commons;
     // Looked up until each GLB has loaded (the roots once, then only their own subtrees).
     let hydro: Object3D | undefined, flower: Object3D | undefined;
     this.hydro = new LotFade(() => {
@@ -76,6 +85,13 @@ export class LotRuntime {
     this.hydro.set(models.hydro ? 1 : 0, now, immediate);
     this.flower.set(models.flower ? 1 : 0, now, immediate);
     this.energy?.setFarmOverride(models.farm, now, immediate);
+  }
+  /** Shows the SW lot for Q08 `option` (vacant for A/B, the shelf for C) from `now` unless `immediate`; the shelf's own 5 s
+   *  sequence runs the change. Undefined after a rotation run hands SW back to its Meter band, and before one leaves it untouched. */
+  setQ08(option: string | undefined, now: number, immediate: boolean) {
+    if (option === undefined && !this.q08Engaged) return;
+    this.q08Engaged = option !== undefined || this.q08Engaged;
+    this.commons?.setVacant(q08Vacant(option), now, immediate);
   }
   getDiagnostics() { return { hydro: this.hydro.shown, flower: this.flower.shown }; }
   update(now: number, reducedMotion: boolean) {

@@ -6,7 +6,7 @@ import { Group, Mesh, MeshStandardMaterial, BoxGeometry, Scene } from 'three';
 import { LOTS } from '../src/layout.ts';
 import { FARM_CENTRE, EnergyRuntime } from '../src/energyRuntime.ts';
 import { BAY_FLOWER_SHOWN } from '../src/bayFlower.ts';
-import { LotRuntime, q02Models } from '../src/lotRuntime.ts';
+import { LotRuntime, q02Models, q08Vacant } from '../src/lotRuntime.ts';
 
 // Exactly one shown model per option; no option is the version4 city.
 for (const option of ['A', 'B', 'C']) {
@@ -87,5 +87,27 @@ for (const [option, lot] of [['A', 'q02-west-sea'], ['B', 'q02-bay-flower'], ['C
   const { target } = SHOTS[Q02_SHOTS[option]], l = LOTS[lot];
   assert.ok(Math.hypot(target[0] - l.x, target[2] - l.z) <= l.size / 2, `Q02 ${option} shot looks at its lot`);
 }
+
+// Q08 shares the SW lot: A/B (no model yet) leave it vacant, C shows the shelf; version4 never engages the override.
+assert.deepEqual(['A', 'B', 'C', undefined].map(q08Vacant), [true, true, false, false]);
+const q08set = set.questions.find((q: { id: string }) => q.id === 'Q08');
+assert.deepEqual(q08set.options.map((o: { lotId: string }) => o.lotId), ['sw', 'sw', 'sw'], 'Q08: one shared lot');
+const vacancy: [boolean, number, boolean][] = [];
+const swLots = new LotRuntime(new Scene(), undefined, false, { setVacant: (v, now, immediate) => { vacancy.push([v, now, immediate]); } });
+swLots.setQ08(undefined, 0, true);
+assert.deepEqual(vacancy, [], 'version4: SW untouched');
+swLots.setQ08('A', 1, true); swLots.setQ08('C', 5, false); swLots.setQ08(undefined, 9, true);
+assert.deepEqual(vacancy, [[true, 1, true], [false, 5, false], [false, 9, true]], 'snapshot A, live C, version4 hands SW back');
+const { q08Swap, q08Result, q08Shot } = await import('../src/rotationLayout.ts');
+const swapOf = (from: string, to: string) => q08Swap({ rotation: { outcome: { kind: 'swap', questionId: 'Q08', from, to } } } as never)!;
+assert.deepEqual([swapOf('C', 'A').shelf, swapOf('A', 'C').shelf, swapOf('A', 'B').shelf], [true, true, false]);
+assert.equal(q08Shot(swapOf('C', 'B')), 'sw:focal'); assert.equal(q08Shot(swapOf('B', 'A')), null, 'A↔B: nothing to see, stay at hero');
+assert.equal(q08Swap({ rotation: { outcome: { kind: 'swap', questionId: 'Q02', from: 'A', to: 'B' } } } as never), undefined);
+for (const [from, to] of [['C', 'A'], ['C', 'B'], ['A', 'B']]) assert.doesNotMatch(q08Result({ from, to }).effect, /現れ|できました|加わり/, `Q08 ${from}→${to} claims no new building`);
+{ const { target } = SHOTS['sw:focal']; const { changeSites } = await import('../src/layout.ts');
+  assert.ok(Math.hypot(target[0] - changeSites.sw.x, target[2] - changeSites.sw.z) < 20, 'Q08 shot looks at the SW lot'); }
+{ const { rotationSite } = await import('../src/voteJourney.ts'); const { changeSites } = await import('../src/layout.ts');
+  const site = rotationSite({ kind: 'swap', questionId: 'Q08', from: 'C', to: 'A' } as never, [])!;
+  assert.deepEqual([site.x, site.z, site.slot], [changeSites.sw.x, changeSites.sw.z, 'publicSharing'], 'Q08 orb lands on the SW lot'); }
 
 console.log('lot runtime tests passed');

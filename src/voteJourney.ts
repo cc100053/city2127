@@ -59,7 +59,7 @@ export function landingFor(axis: CityAxis, energy: boolean, landing?: JourneyLan
 type Scan = { x: number; z: number; r: number; color: T.Color; start: number };
 
 /** Rotation runs: the Meter site each question's models stand on. A question without a row (or a lot, below) has no site yet; its orb only fades. */
-export const ROTATION_SITE_AXIS: Readonly<Record<string, CityAxis>> = { Q01: 'automation' };
+export const ROTATION_SITE_AXIS: Readonly<Record<string, CityAxis>> = { Q01: 'automation', Q08: 'publicSharing' };
 /** Q02's models each own a lot (layout LOTS); its orb lands on the lot of the model the outcome shows, in the energy vote's colour. */
 export const Q02_LOTS: Readonly<Record<string, keyof typeof LOTS>> = { A: 'q02-west-sea', B: 'q02-bay-flower', C: 'q02-farm-south' };
 const Q02_COLOR = '#75e2c2';
