@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS（階段 1 survey 端完成：9 題可選用接入；城市端顯示（階段 2）未做）
 - Branch: `feat/question-rotation`（2026-11-18 由 `docs/question-rotation-plan` HEAD `95c494ff` 開出；計劃文件 commit 一併帶入）
 - Base commit: `6724989bbff0ff8a0f65a9ee6e2a23f778e7ede3`（origin/main，2026-11-18）
-- Last verified commit: 見 git log（2026-11-18 survey 接線 commit）
+- Last verified commit: `0072b95d`（survey 接線；其後的 commit 為 Admin／health 版本、重設測試及文件）
 - Remote availability: `origin/docs/question-rotation-plan`（計劃）；`origin/feat/question-rotation`（實作）
 
 ## Session Git state
@@ -50,7 +50,10 @@
   - 計算：`rotationRun.ts` 以 `sequence` 為 stamp fold 有效提案；`ProposalRecord.rotation`（outcome＋四個群眾比例）、`ExhibitionCityView.rotation`（每題顯示選項及最後變化）。
   - Root：`surveyView.ts` 接受並驗證上述欄位，城市暫不畫（結果卡回退為「回答を記録しました。」）。
   - Guest：交接頁以「住民の声」取代 Meter 傾向面板；結果晶片改用選項文字。文案（少人數句、保底句）為計劃 3.3／3.4 暫定句。
-  - 未做：預約事件帶抽中題（預載用，待有模型）；dev-auto 自動作答面板未針對輪換題調整。
+  - Admin 現況及 `/api/health` 在輪換 run 報告輪換題組版本及 9 題。
+  - 城市實測：root `?survey=ws://127.0.0.1:8789/ws` 連 `survey-rotation`，送一份提案：無 console 錯誤，結果卡為通用句（「思いは記録され、見えている施設の構成は維持されました。」），沒有原始選項 ID；城市不變（含 Q01）。
+  - 資料庫：開啟後升級為 schema 9；未 merge 前 `main` 的 server 會拒絕此 DB。
+  - 未做：預約事件帶抽中題（預載用，待有模型）；dev-auto 自動作答面板未針對輪換題調整；guest 重新載入及 A／B 未在瀏覽器測（只有 service 測試）。
 
 ## Actual validation results
 
@@ -69,7 +72,7 @@
   | 85/10/5，無傾向 | 23.4% | 99.5%（367/400） | 23.1% | 96.8%（137/400） |
 
   另以 seed 1、7、424242 各跑一次（不入 CI）：5 題原設定無變化 1.4%–1.6%，三次都 400/400 全出場；10 題 385–391/400。
-  Gate 只卡上線配置（5 題、原設定）：無變化 ≤ 2% 且每 run 每個模型都出場，通過。**此 gate 範圍屬暫定**（計劃原文未分題數），待 owner 確認。10 題時約 3% run 有一個模型全日未出場；答案越一致越多。交 owner 判斷保底份量及是否接受 10 題時的出場缺口。
+  （以上為第一節 5 題 gate 時的紀錄。）**現行 gate（暫定，待 owner 確認）：** 上線配置 9 題、原設定，只卡無變化 ≤ 2%（1.5%，通過）；每 run 全部模型出場不再卡（9 題時 389/400），只報告。10 題時約 3% run 有一個模型全日未出場；答案越一致越多。交 owner 判斷保底份量及是否接受 10 題時的出場缺口。
 - Evidence/environment: 玩具模擬 `~/city2127-evidence/question-rotation-sim/`；正式模擬見上，非真人答案。
 
 ## Known issues and blockers

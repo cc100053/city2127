@@ -136,7 +136,7 @@ export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddr
 
     if (path === '/api/health' && method === 'GET') {
       const state = currentState(ctx);
-      return sendJson<HealthData>(res, { ok: true, data: { status: 'ok', runId: state.runId, revision: state.revision, questionVersion: ctx.questions.version } });
+      return sendJson<HealthData>(res, { ok: true, data: { status: 'ok', runId: state.runId, revision: state.revision, questionVersion: ctx.rotation?.version ?? ctx.questions.version } });
     }
     if (path === '/api/city-state' && method === 'GET') return sendJson<CitySurveyState | ExhibitionState>(res, { ok: true, data: currentState(ctx) });
     if (path === '/api/city-view' && method === 'GET') return sendJson<CityView>(res, { ok: true, data: currentView(ctx) });

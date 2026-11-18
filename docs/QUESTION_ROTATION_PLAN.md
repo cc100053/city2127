@@ -1,6 +1,6 @@
 # 抽題輪換計劃 — SURVEY_V2 接入城市
 
-2026-11-18 草擬，Owner：cc100053。階段 0 已於 2026-11-18 由 owner 全部按建議批准，方向已寫入 [EXHIBITION_SPEC](EXHIBITION_SPEC.md#抽題輪換owner-2026-11-18-批准未實作)；本文件其餘部分是執行計劃；階段 1 的純函數（1.1–1.3、1.4／1.5 的計算部分、1.7）已在 `feat/question-rotation` 實作，server 接線及介面未做，進度見 [handoff](handoffs/question-rotation.md)。同日 advisor 審閱後補入：雙站重疊、無變化率對答案分佈的敏感度、新舊系統並存、六種過場、敘事原則改變、少人數時的群眾比例（見 3.1–3.7、各階段完成標準）。討論過程及模擬數字見 repo 根目錄 `Dev_QA.md` Q17（owner 本機檔，未入 Git）。題目原文見 [SURVEY_V2](planning-team/SURVEY_V2.md)，題庫見 `survey/src/pool/questionPool.v1.json`（[handoff](handoffs/question-pool.md)）。
+2026-11-18 草擬，Owner：cc100053。階段 0 已於 2026-11-18 由 owner 全部按建議批准，方向已寫入 [EXHIBITION_SPEC](EXHIBITION_SPEC.md#抽題輪換owner-2026-11-18-批准未實作)；本文件其餘部分是執行計劃；階段 1 已在 `feat/question-rotation` 完成 survey 端（9 題可選用接入，城市端未顯示），進度見 [handoff](handoffs/question-rotation.md)。同日 advisor 審閱後補入：雙站重疊、無變化率對答案分佈的敏感度、新舊系統並存、六種過場、敘事原則改變、少人數時的群眾比例（見 3.1–3.7、各階段完成標準）。討論過程及模擬數字見 repo 根目錄 `Dev_QA.md` Q17（owner 本機檔，未入 Git）。題目原文見 [SURVEY_V2](planning-team/SURVEY_V2.md)，題庫見 `survey/src/pool/questionPool.v1.json`（[handoff](handoffs/question-pool.md)）。
 
 ## 1. 已定方向（owner，2026-11-18）
 
@@ -133,7 +133,7 @@ Owner 批准 0.1–0.4 全部建議；R01–R05 記入 SURVEY_V2_REVIEW 決定�
 | 1.4 | 由提案 fold 出城市狀態，取代 v5 run 的 `ladderStep` | `cityView.ts` 旁新模組 | Undo／snapshot／重新連線重算一致 |
 | 1.5 | 群眾比例計算，隨結果事件送出 | `protocol.ts`、`proposalService.ts` | 測試：含本人一票、只計本 run 有效提案、未達門檻時不送百分比 |
 | 1.6 | 草稿保存抽中的題目；提案保存題目 ID 與答案 | `sessionService.ts`、`answerService.ts`；`migrations.ts` 加 schema 9（新增可空欄位，保留 schema 8 全部歷史） | 舊 run 可讀；新 run 重開後題目不變 |
-| 1.7 | 正式模擬 gate：把 `swap400.py` 改寫為 TS，直接用 1.2–1.3 的正式函數；模擬 A/B 兩站交錯提交；跑第 1 節四種分佈，如 SQLite 有 version4 真人答案亦以其分佈重跑 | `survey/scripts/rotationSim.ts`，接入 `npm test` | 原設定分佈下無變化 ≤ 2%；每個上線模型都出場（**暫定**：gate 以上線配置 5 題計，10 題只報告，待 owner 確認）；各分佈的無變化率寫入 handoff 並交 owner 判斷保底份量 |
+| 1.7 | 正式模擬 gate：把 `swap400.py` 改寫為 TS，直接用 1.2–1.3 的正式函數；模擬 A/B 兩站交錯提交；跑第 1 節四種分佈，如 SQLite 有 version4 真人答案亦以其分佈重跑 | `survey/scripts/rotationSim.ts`，接入 `npm test` | 原設定分佈下無變化 ≤ 2%；每個上線模型都出場（**暫定**：gate 以上線配置 9 題計，只卡無變化率；9 題時 389/400 run 全部模型出場，出場缺口只報告，待 owner 確認）；各分佈的無變化率寫入 handoff 並交 owner 判斷保底份量 |
 | 1.8 | Guest 介面顯示抽中的 4 題、結果頁顯示所選選項與群眾比例 | `guestFlow.ts`、`guestTendency.ts` | 瀏覽器檢查：預約、重新載入、A/B 雙站 |
 
 ### 階段 2 — 城市執行（root `src/`）

@@ -5,7 +5,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { currentView } from '../src/server/answerService.ts';
-import { lifecycleCommand, readLifecycle } from '../src/server/adminService.ts';
+import { currentRun, lifecycleCommand, readLifecycle } from '../src/server/adminService.ts';
 import { createProposalSession, getProposalSession, submitProposal } from '../src/server/proposalService.ts';
 import { createContext } from '../src/server/server.ts';
 import type { ExhibitionCityView } from '../src/shared/cityView.ts';
@@ -76,6 +76,16 @@ try {
   assert.equal(errorCode(createProposalSession(axes).response), 'lifecycle_blocked');
   assert.equal(view(axes).rotation, undefined);
   axes.db.close();
+
+  // Go-live path: back on the rotation set, a city reset starts a run whose next guest draws from the fresh city.
+  ctx = open('single.sqlite');
+  ok(lifecycleCommand(ctx, { command: 'reset-city', confirmation: 'RESET', expectedRevision: readLifecycle(ctx.db).revision }).response);
+  clock.ms += DISPLAY_MS;
+  const afterReset = ok(createProposalSession(ctx).response);
+  assert.deepEqual(afterReset.session.questionIds, ['Q01', 'Q02', 'Q03', 'Q04']);
+  assert.deepEqual(view(ctx).rotation?.shown, fresh.rotation?.shown);
+  assert.deepEqual(currentRun(ctx).totalQuestions, 9);
+  ctx.db.close();
 
   // Two stations reserve the same four; A swaps Q01, B (judged on A's city) skips it for Q02.
   const two = open('two.sqlite');
