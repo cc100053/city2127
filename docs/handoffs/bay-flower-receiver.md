@@ -55,7 +55,15 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
   - `shore_station()`, pipe entry: the front is a pipe portal (jambs, lintel, low parapets, open above so the interior reads). The entry has a three-layer flange with 16 bolts, two saddles with cheeks (one on the quay, one inside) and two cyan lights on the jambs.
   - `shore_station()`, inside: four standing pipe sets (flanges, valve wheels with spokes), a top header and two lit tanks.
   - Materials: new `duct_cyan`, `duct_ring`, `duct_seam`, `quay_stone`, `revetment_rock` and `roof_white`.
-  - Metrics: with beam 71,511 tris, 28 meshes; without beam 70,695 tris, 26 meshes. Export: Blender 5.2 glTF, GLB, +Y up, no animation/camera/light, no compression.
+  - Metrics: with beam 71,511 tris, 28 meshes; without beam 70,695 tris, 26 meshes.
+- Machine-room round (owner 2026-11-18). Only the room body changes; quay, revetment, duct, petals and receiver base are untouched.
+  - Front: a second hex bolt circle (12 bolts on the middle flange layer; 16 hex bolts on the outer one), an inside wall sleeve, and side gussets flanking the flange with raking struts and foot plates to the quay.
+  - Columns: they now rise to 8.45 m with foot plates, plinths and capitals, and the roof ribs bear on the capitals. A bracket from each column reaches the rib's eave leg, and a wall plate runs along each side.
+  - Side elevations (`side_elevation()`): per side, from the pipe end, one big window (frame 0.5 m deep, two mullions, transom, glass, projecting sill), one service door (frame, blue-grey leaf, handle, kick plate, cyan light) and two louvred plant bays. Every other wall area is a dark backing behind wall panels with 4 cm seams.
+  - Roof: solid bays alternate with translucent skylight bays (bays 2 and 4 glazed between solid eave strips), with eave fascia trims; the eave pipes became fascias.
+  - Behind the windows: a tee body on the trunk, branch take-offs each side with a flange, an inline gate valve with a handwheel, an elbow down to a floor flange and a valve with a handwheel on the vertical leg. Two control cabinets per side (seam, handle, three indicator lights) sit behind them. The layers read window frame (s 5.5) → vertical legs (s 3.7) → valves and cabinets (s 2.8 / 2.55).
+  - New roles `pav_door` (`collar_bluegrey`) and `pav_louvre` (`grille_dark`).
+  - Metrics: with beam 77,039 tris, 30 meshes; without beam 76,223 tris, 28 meshes. Export: Blender 5.2 glTF, GLB, +Y up, no animation/camera/light, no compression.
 - Inferred (not readable in the image): petal count per ring, strut layout, pontoon below water, sub-sea depth, pavilion interior terminal, beam height, the overall scale (from people by the pavilion).
 
 ## Actual validation results
@@ -86,6 +94,13 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
   - `after-ref/beam.png`, `after-ref/nobeam.png` (from the `-nobeam` file) and `compare.jpg` are the overall views.
 - GLB re-import of both files: the beam node is present only in the with-beam file. The new ShoreStation and SubseaLink meshes and materials came through, and the duct reaches f 4 inside the room. Panel textures still match `9e5c077` pixel for pixel; receiver-base radii are unchanged.
 - QA: the machine-room saddle cheeks, valve wheels and entry lights first floated and now touch their hosts. 17 revetment rocks stay as loose boulders on purpose.
+- Machine-room round evidence, `~/city2127-evidence/bay-flower-receiver/room-final/`. Before renders come from a copy of the shore-round no-beam .blend; all renders use 64 samples and one shared sun.
+  - `after-front/nobeam.png` looks obliquely from the water side at the pipe entry; `after-side/nobeam.png` shows the door, windows and the equipment behind them. Both come from the `-nobeam` file.
+  - `before-after-nobeam-front.jpg` and `before-after-nobeam-side.jpg` pair them with the before renders.
+  - `glb-reimport-front` and `glb-reimport-side` were rendered from the re-imported with-beam GLB and match.
+  - `after-ref/beam.png`, `after-ref/nobeam.png` and `compare.jpg` are the overall views.
+- GLB re-import of both files: the beam node is present only in the with-beam file. The new `pav_door` and `pav_louvre` meshes and materials came through. Panel textures still match `9e5c077` pixel for pixel, and receiver-base radii are unchanged.
+- QA: the cabinet lights were coplanar with the cabinet seams and the door light was buried in the panels; both are fixed. QA then reported "5 closed parts with normals pointing inward" in `pav_glow`. Signed volumes per island, computed in float64 about each island's centre, are all positive (18 islands), so this is a false positive on 0.07 m lights about 90 m from the origin. No machine-room part floats.
 - `npm run build`: passed. `git diff --cached --check`: clean.
 - `npm test` (Windows 11, Node 24.19, checkout under `OneDrive\文件`): `assetLibrary.test.ts` passes with the new row. Two local leftovers, `asset/models/ship-refs-2127` and `car-candidates-2127`, hold only git-ignored caches from other branches and fail that test unless parked; they were parked for the run and restored. `surveyMeterPipeline.test.ts` and `energyPipeline.test.ts` FAIL on this machine before any of this task's code runs: `survey/tests/surveyFixture.ts` turns a `file://` URL path into `C:\C:\…\%E6%96%87%E4%BB%B6\…` (percent-encoded non-ASCII folder name), so the question JSON is not found. Not caused by this task, not fixed here. Every other test in the `npm test` list passed when run one at a time.
 - Application verification: NOT INTEGRATED.
@@ -103,4 +118,4 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
 
 ## Next expected step
 
-Owner reviews the shore round (`shore-final/after-shore/nobeam.png`, `before-after-nobeam-shore.jpg`); then either another shape round or a placement task (site, shoreline, beam behaviour in the app).
+Owner reviews the machine-room round (`room-final/after-front/nobeam.png`, `after-side/nobeam.png`, the before/after sheets); then either another shape round or a placement task (site, shoreline, beam behaviour in the app).

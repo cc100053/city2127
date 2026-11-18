@@ -352,6 +352,68 @@ def duct(A, Lp):
             pipe(A["sub_frame"], [add(c, u, -.4), add(c, u, .4)], PIPE_R + .3, 20)
 
 
+def wheel(acc, P, r):
+    """Valve handwheel: rim of radius r and two spokes in the plane P(u, v) (P maps plane offsets to a point)."""
+    rim = [P(r * math.cos(2 * math.pi * k / 12), r * math.sin(2 * math.pi * k / 12)) for k in range(13)]
+    pipe(acc, rim, .05, 4)
+    for du, dv in ((r, 0), (0, r)):
+        pipe(acc, [P(-du, -dv), P(du, dv)], .035, 4)
+
+
+def side_elevation(A, box, sg, hw, FY, WT, bays):
+    """One side wall of the machine room, bay by bay between the columns. Every bay is a dark backing with seamed wall
+    panels round one opening: 'window' (deep frame, mullions, transom, glass, sill), 'door' (frame, blue-grey leaf,
+    handle, kick plate, light) or 'louvre' (frame and blades). sg picks the side (s = sg * hw)."""
+    sw = lambda depth: sg * (hw + depth)              # s of a layer depth metres outside the wall line
+
+    def panels(fl, fh, yl, yh):
+        if fh - fl < .05 or yh - yl < .05:
+            return
+        box(A["pav_core"], (fl + fh) / 2, (yl + yh) / 2, sw(-.1), fh - fl, yh - yl, .08)       # backing
+        nf, ny = max(1, round((fh - fl) / 1.25)), max(1, round((yh - yl) / 2.0))
+        for i in range(nf):
+            for j in range(ny):
+                a, b = fl + (fh - fl) * i / nf, fl + (fh - fl) * (i + 1) / nf
+                c, d = yl + (yh - yl) * j / ny, yl + (yh - yl) * (j + 1) / ny
+                box(A["pav_roof"], (a + b) / 2, (c + d) / 2, sw(.05), b - a - .04, d - c - .04, .22)  # 4 cm seams
+
+    for fa, fb, kind in bays:
+        fl, fh = fa + .275, fb - .275
+        if kind == "window":
+            o0, o1, y0, y1 = fl + .2, fh - .2, 3.0, 6.6
+        elif kind == "door":
+            c = (fl + fh) / 2
+            o0, o1, y0, y1 = c - .8, c + .8, FY, 4.4
+        else:
+            o0, o1, y0, y1 = fl + .25, fh - .25, 2.6, 6.8
+        panels(fl, fh, FY, y0)
+        panels(fl, o0, y0, y1)
+        panels(o1, fh, y0, y1)
+        panels(fl, fh, y1, WT)
+        m, dp = .18, .5                                # frame member width and depth (through the wall)
+        box(A["pav_frame"], o0 + m / 2, (y0 + y1) / 2, sw(0), m, y1 - y0, dp)
+        box(A["pav_frame"], o1 - m / 2, (y0 + y1) / 2, sw(0), m, y1 - y0, dp)
+        box(A["pav_frame"], (o0 + o1) / 2, y1 - m / 2, sw(0), o1 - o0, m, dp)
+        if kind != "door":
+            box(A["pav_frame"], (o0 + o1) / 2, y0 + m / 2, sw(.08), o1 - o0 + .2, m, dp + .16)   # projecting sill
+        w = o1 - o0 - 2 * m
+        if kind == "window":
+            box(A["pav_glass"], (o0 + o1) / 2, (y0 + y1) / 2, sw(-.05), w, y1 - y0 - 2 * m, .03)
+            for q in (1 / 3, 2 / 3):
+                box(A["pav_frame"], o0 + m + w * q, (y0 + y1) / 2, sw(0), .12, y1 - y0 - 2 * m, .32)
+            box(A["pav_frame"], (o0 + o1) / 2, 5.6, sw(0), w, .12, .32)                    # transom
+        elif kind == "door":
+            box(A["pav_door"], (o0 + o1) / 2, (y0 + y1 - m) / 2, sw(-.12), w, y1 - y0 - m, .08)
+            box(A["pav_core"], o1 - m - .3, 3.0, sw(-.04), .08, .35, .1)                  # handle
+            box(A["pav_frame"], (o0 + o1) / 2, y0 + .15, sw(-.07), w, .3, .02)             # kick plate
+            box(A["pav_glow"], (o0 + o1) / 2, y1 + .25, sw(.2), .5, .12, .1)              # door light, on the panel face
+        else:
+            nb = int((y1 - y0 - 2 * m) / .3)
+            for k in range(nb):
+                box(A["pav_louvre"], (o0 + o1) / 2, y0 + m + .15 + .3 * k, sw(0), w, .07, .42)
+            box(A["pav_frame"], (o0 + o1) / 2, (y0 + y1) / 2, sw(0), .12, y1 - y0 - 2 * m, .45)
+
+
 def shore_station(A, Lp, F, Sv):
     """Shore machine room on a quay: floor plate, columns, low walls, arched silver roof with glazed crown, exposed ribs;
     pipe-entry wall with a three-layer flange and saddles; standing pipe sets inside; railings and a rock revetment."""
@@ -364,15 +426,21 @@ def shore_station(A, Lp, F, Sv):
     # quay body and the room floor plate
     box(A["pav_base"], 4.05, (QY - 4.0) / 2, 0, 19.9, QY + 4.0, 30.0)
     box(A["pav_frame"], (f0 + f1) / 2, (QY + FY) / 2, 0, f1 - f0 + 2.0, FY - QY, 2 * hw + 2.0)
-    # columns and low side walls
+    # columns with feet and capitals (the ribs bear on the capitals), wall plates, side elevations
     cols = [f0, -.5, 3.0, 6.5, f1]
-    spring = 6.6
+    spring, WT, CT = 6.6, 8.0, 8.45                # gable spring, side-wall top, column top under the rib
     for f in cols:
         for s in (-hw, hw):
-            box(A["pav_frame"], f, (FY + spring) / 2, s, .55, spring - FY, .55)
-    for fa, fb in zip(cols, cols[1:]):
-        for s in (-hw, hw):
-            box(A["pav_frame"], (fa + fb) / 2, FY + .7, s, fb - fa - .55, 1.4, .3)
+            box(A["pav_frame"], f, (FY + CT) / 2, s, .55, CT - FY, .55)
+            box(A["pav_frame"], f, FY + .12, s, 1.0, .24, 1.0)              # foot plate
+            box(A["pav_frame"], f, FY + .39, s, .75, .3, .75)               # plinth
+            box(A["pav_frame"], f, CT + .11, s, .85, .22, .85)              # capital
+            sg = 1 if s > 0 else -1                                          # bracket out to the rib's eave leg
+            box(A["pav_frame"], f, 7.25, sg * (hw + .6), .3, .35, 1.3)
+    for sg in (-1, 1):
+        box(A["pav_frame"], (f0 + f1) / 2, WT + .15, sg * hw, f1 - f0 + .55, .3, .45)  # wall plate
+        side_elevation(A, box, sg, hw, FY, WT,
+                       [(f0, -.5, "louvre"), (-.5, 3.0, "louvre"), (3.0, 6.5, "door"), (6.5, f1, "window")])
     # back wall with glazed tympanum
     box(A["pav_frame"], f0 - .1, (FY + spring) / 2, 0, .3, spring - FY, 2 * hw)
     arch = lambda a, f, inset=0.0: Lp(f, 6.4 + (3.8 - inset) * math.sin(math.pi * a), -(6.5 - inset) * math.cos(math.pi * a))
@@ -387,11 +455,16 @@ def shore_station(A, Lp, F, Sv):
     ax = lambda f: Lp(f, PIPE_Y, 0)
     for fa, fb, r in ((f1 + .2, f1 + .6, PIPE_R + 1.1), (f1 + .6, f1 + .95, PIPE_R + .75), (f1 + .95, f1 + 1.25, PIPE_R + .45)):
         pipe(A["pav_frame"], [ax(fa), ax(fb)], r, 28)
-    for k in range(16):
-        a = 2 * math.pi * k / 16
-        rr = PIPE_R + .9
-        pipe(A["pav_core"], [Lp(f1 + .6, PIPE_Y + rr * math.sin(a), rr * math.cos(a)),
-                             Lp(f1 + .75, PIPE_Y + rr * math.sin(a), rr * math.cos(a))], .1, 6)
+    for cnt, rr, fa in ((16, PIPE_R + .9, f1 + .6), (12, PIPE_R + .6, f1 + .95)):  # two hex bolt circles
+        for k in range(cnt):
+            a = 2 * math.pi * (k + .5) / cnt
+            pipe(A["pav_core"], [Lp(fa - .05, PIPE_Y + rr * math.sin(a), rr * math.cos(a)),
+                                 Lp(fa + .17, PIPE_Y + rr * math.sin(a), rr * math.cos(a))], .13, 6)
+    pipe(A["pav_frame"], [ax(f1 - .7), ax(f1 - .15)], PIPE_R + .45, 28)  # wall sleeve on the inside face
+    for sg in (-1, 1):                                  # flange support: side gussets and raking struts to the quay
+        box(A["pav_frame"], f1 + .9, (FY + PIPE_Y) / 2, sg * (PIPE_R + 1.2), 1.4, PIPE_Y - FY, .25)
+        pipe(A["pav_frame"], [Lp(f1 + 2.4, QY, sg * (PIPE_R + 1.2)), Lp(f1 + 1.4, PIPE_Y - .5, sg * (PIPE_R + 1.2))], .14, 6)
+        box(A["pav_frame"], f1 + 2.4, QY + .1, sg * (PIPE_R + 1.2), .6, .2, .6)
     bot = PIPE_Y - PIPE_R
     for f, y0 in ((f1 + 2.6, QY), (7.0, FY)):          # saddle outside on the quay, and inside on the floor
         box(A["pav_frame"], f, y0 + .1, 0, 1.6, .2, 3.6)
@@ -400,18 +473,42 @@ def shore_station(A, Lp, F, Sv):
             box(A["pav_frame"], f, (bot + PIPE_Y) / 2, s, .9, PIPE_Y - bot + .2, .3)
     for s in (-cut - jamb / 2, cut + jamb / 2):         # entry lights on the portal jambs
         box(A["pav_glow"], f1 + .25, PIPE_Y + 1.2, s, .1, .3, .3)
-    # roof: shell strips (white eaves, glazed crown) with exposed ribs, eave and ridge beams
+    # roof: solid bays alternate with translucent skylight bands (eave strips stay solid); exposed ribs on every
+    # column line and both ends; purlins; eave fascia trims
     rf0, rf1, segs = f0 - 1.0, f1 + 1.0, 12
-    for k in range(segs):
-        a0, a1 = k / segs, (k + 1) / segs
-        acc = A["pav_glass"] if 3 <= k < 9 else A["pav_roof"]
-        out = [arch(a0, rf0), arch(a1, rf0), arch(a1, rf1), arch(a0, rf1)]
-        inn = [arch(a0, rf0, .25), arch(a1, rf0, .25), arch(a1, rf1, .25), arch(a0, rf1, .25)]
-        acc.solid(out + inn, [(0, 1, 2, 3), (7, 6, 5, 4), (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)])
+    stops = [rf0] + cols + [rf1]
+    for b, (fa, fb) in enumerate(zip(stops, stops[1:])):
+        for k in range(segs):
+            a0, a1 = k / segs, (k + 1) / segs
+            acc = A["pav_glass"] if b in (2, 4) and 2 <= k < 10 else A["pav_roof"]
+            out = [arch(a0, fa), arch(a1, fa), arch(a1, fb), arch(a0, fb)]
+            inn = [arch(a0, fa, .25), arch(a1, fa, .25), arch(a1, fb, .25), arch(a0, fb, .25)]
+            acc.solid(out + inn, [(0, 1, 2, 3), (7, 6, 5, 4), (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)])
     for f in cols + [rf0, rf1]:
         pipe(A["pav_frame"], [arch(k / 16, f, -.3) for k in range(17)], .3, 6)
-    for a in (0, 3 / 12, .5, 9 / 12, 1):
-        pipe(A["pav_frame"], [arch(a, rf0, -.15), arch(a, rf1, -.15)], .18 if a not in (0, 1) else .28, 6)
+    for a in (3 / 12, .5, 9 / 12):
+        pipe(A["pav_frame"], [arch(a, rf0, -.15), arch(a, rf1, -.15)], .18, 6)
+    for sg in (-1, 1):
+        box(A["pav_frame"], (rf0 + rf1) / 2, 6.3, sg * 6.55, rf1 - rf0 + .1, .5, .3)    # eave fascia
+    # behind the big windows: branch take-offs from the trunk with valves, floor flanges and control cabinets
+    pipe(A["pav_frame"], [ax(7.7), ax(8.7)], PIPE_R + .25, 28)                       # tee body on the trunk
+    for sg in (-1, 1):
+        sb, sv = sg * 3.7, sg * 2.8                    # vertical leg (front layer), inline valve
+        pipe(A["pav_pipe"], arc_path([Lp(8.2, PIPE_Y, sg * 1.2), Lp(8.2, PIPE_Y, sb), Lp(8.2, FY, sb)], .8, 6), .42, 14)
+        pipe(A["pav_frame"], [Lp(8.2, PIPE_Y, sg * 1.85), Lp(8.2, PIPE_Y, sg * 2.05)], .65, 14)
+        pipe(A["pav_frame"], [Lp(8.2, FY, sb), Lp(8.2, FY + .22, sb)], .7, 14)          # floor flange
+        box(A["pav_core"], 8.2, PIPE_Y, sv, .8, .8, .6)                                  # gate valve body
+        pipe(A["pav_core"], [Lp(8.2, PIPE_Y + .3, sv), Lp(8.2, 5.65, sv)], .08, 6)
+        wheel(A["pav_core"], lambda u, v: Lp(8.2 + u, 5.65, sv + v), .42)
+        box(A["pav_core"], 8.2, 3.0, sb, .7, .7, .7)                                     # valve on the vertical leg
+        pipe(A["pav_core"], [Lp(8.2, 3.0, sb), Lp(8.2, 3.0, sb + sg * .75)], .07, 6)
+        wheel(A["pav_core"], lambda u, v: Lp(8.2 + u, 3.0 + v, sb + sg * .75), .32)
+        for fc in (6.95, 9.3):                                                           # control cabinets (back layer)
+            box(A["pav_door"], fc, FY + 1.1, sg * 2.55, .9, 2.2, .6)
+            box(A["pav_core"], fc, FY + 1.1, sg * 2.86, .03, 1.9, .03)                    # door seam
+            box(A["pav_core"], fc + .2, FY + 1.1, sg * 2.88, .05, .3, .06)                # handle
+            for i, dy in enumerate((.85, .7, .55)):
+                box(A["pav_glow"], fc - .25 + .12 * i, FY + 1.1 + dy, sg * 2.875, .07, .07, .05)  # proud of the seam
     # inside: the duct ends in a header box; four standing pipe sets with flanges and valve wheels; top header; tanks
     box(A["pav_core"], 3.0, (FY + PIPE_Y + PIPE_R + .3) / 2, 0, 2.2, PIPE_Y + PIPE_R + .3 - FY, 3.8)
     for s in (-3.3, -1.1, 1.1, 3.3):
@@ -419,9 +516,9 @@ def shore_station(A, Lp, F, Sv):
         pipe(A["pav_pipe"], arc_path([Lp(base, FY, s), Lp(base, 6.0, s), Lp(base + 1.5, 6.0, s)], .6, 6), .4, 12)
         for y in (3.0, 5.0):
             pipe(A["pav_frame"], [Lp(base, y, s), Lp(base, y + .18, s)], .62, 12)
-        wheel = [Lp(base + .75 + .0, 4.1 + .45 * math.sin(2 * math.pi * k / 12), s + .45 * math.cos(2 * math.pi * k / 12))
-                 for k in range(13)]
-        pipe(A["pav_core"], wheel, .06, 4)
+        rim = [Lp(base + .75 + .0, 4.1 + .45 * math.sin(2 * math.pi * k / 12), s + .45 * math.cos(2 * math.pi * k / 12))
+               for k in range(13)]
+        pipe(A["pav_core"], rim, .06, 4)
         pipe(A["pav_core"], [Lp(base + .3, 4.1, s), Lp(base + .78, 4.1, s)], .08, 4)          # stem into the pipe
         for ds, dy in ((.47, 0), (0, .47)):                                                     # spokes to the rim
             pipe(A["pav_core"], [Lp(base + .75, 4.1 - dy, s - ds), Lp(base + .75, 4.1 + dy, s + ds)], .04, 4)
@@ -658,11 +755,12 @@ def mats():
 GROUPS = {
     "Q02B_Receiver": ("panel", "shell", "frame", "piston", "collar", "grille", "recess", "dome", "base", "dark", "glow", "aperture"),
     "Q02B_SubseaLink": ("sleeve", "core", "sub_glow", "duct", "sub_frame", "duct_seam"),
-    "Q02B_ShoreStation": ("pav_glass", "pav_frame", "pav_roof", "pav_base", "pav_core", "pav_pipe", "pav_glow", "rock"),
+    "Q02B_ShoreStation": ("pav_glass", "pav_frame", "pav_roof", "pav_base", "pav_core", "pav_pipe", "pav_door", "pav_louvre",
+                          "pav_glow", "rock"),
     "Q02B_LightBeam": ("beam_core", "beam_glow"),
 }
 SHARED = {"sub_frame": "duct_ring", "sub_glow": "glow", "pav_base": "quay", "pav_core": "core", "pav_glow": "glow",
-          "pav_pipe": "duct", "piston": "core"}
+          "pav_pipe": "duct", "piston": "core", "pav_door": "collar", "pav_louvre": "grille"}
 UV_ROLES = ("panel", "shell", "base")  # accumulators with a UV map (textured materials)
 
 
