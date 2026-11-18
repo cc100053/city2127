@@ -1,7 +1,7 @@
 # bay-flower-placement — Q02-B 蓮花受電：選址與放置
 
 - Owner: cc100053（owner 逐輪判定）；實作由 Claude
-- Status: IN_PROGRESS（R1 owner 接受；R2 完成，待 owner 准許 merge）
+- Status: ACCEPTED（R2 owner 接受 2026-11-19），待 merge 入 main
 - Branch: `feat/bay-flower-placement`（2026-11-18 由 `origin/main` 開出）
 - Base commit: `6724989bbff0ff8a0f65a9ee6e2a23f778e7ede3`
 - Last verified commit: R2（見「## R2」）
@@ -184,9 +184,13 @@ version4 仍有的改動（屬「機房平台保留」，非「version4 外觀�
 
 未驗證（同 R1）：行人路線是否走上平台；服務層 drone 航跡。
 
+## R2 verdict
+
+> accept, next step on new session
+
 ## Next expected step
 
-Owner 判定 R2（截圖 `~/city2127-evidence/bay-flower-placement/r2/`）；接受即按 CONTRIBUTING merge 入 main（`--no-ff`），確認 main CI。Q02-B 未入 RESIDENT_SCENE_PLAN 單元表及 change sheet（未接投票），merge 後無需重生成 change sheet。
+新 session 按 CONTRIBUTING「Concurrent integration」merge 入 main：fetch，`main` fast-forward 至 `origin/main`，`git merge --no-ff feat/bay-flower-placement`；如 main 已前進，在 merge 結果重跑 root `npm test`、`npm run build`、`git diff --check`；push main，確認 main CI；本 handoff 記 integrated commit 及結果，Status 改 DONE。Q02-B 未入 RESIDENT_SCENE_PLAN 單元表及 change sheet（未接投票），merge 後無需重生成 change sheet。
 
 舊（R1）：Owner 判定 R1（截圖 `~/city2127-evidence/bay-flower-placement/r1/`），並答「待 owner」三題。開新 session：
 
