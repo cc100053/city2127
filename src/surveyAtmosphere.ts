@@ -8,6 +8,7 @@ import type { CarrierChange } from './cityChangeManager.ts';
 import type { DisplayMode } from './dayCycle.ts';
 import { presets, type WorldState } from './presets.ts';
 import { changeSites } from './layout.ts';
+import { q01Swap, rotationLayout } from './rotationLayout.ts';
 import { AXES, connectSurvey, isExhibitionView, supersedes, type CityView, type Decision, type ExhibitionProposal, type ExhibitionView, type SurveyEventKind, type SurveyView, type ExploreLook } from './surveyView.ts';
 
 // Root-scene side of the survey server's CityView contract (survey/src/shared/cityView.ts).
@@ -125,7 +126,7 @@ export const RESIDENT_CARDS: Record<string, readonly [string, string]> = {
 };
 
 export function residentCards(view: ExhibitionView): ResidentCard[] {
-  const l = view.layout;
+  const l = rotationLayout(view);
   const ids = ['intro.origin', 'intro.identity', 'intro.lineage', 'intro.participation'];
   if (view.recentProposals.length) ids.splice(2, 0, 'intro.inherited');
   const facilityIds = [
@@ -164,6 +165,8 @@ const RESIDENT_PREFERENCES: Record<string, string> = {
   'mixed-functions': 'あなたは、高さの違う建物をめぐる日常を選びました。',
   'vertical-functions': 'あなたは、一つのタワーで用事を済ませる日常を選びました。',
 };
+/** Rotation Q01 options share the version4 service preferences (A −1, B 0, C +1 on the same NW hub). */
+const Q01_PREFERENCES: Record<string, string> = { A: 'human-led', B: 'human-machine', C: 'autonomous' };
 const RESULT_AXES = { nw: 'service-2127', sw: 'commons-2127', ne: 'cooling-2127', se: 'functions-2127' } as const;
 const DISTRICT_RESULTS = {
   nw: ['水辺のサービス拠点・移動ルート', 'サービス拠点と移動の構成が変わり、日々の用事を支える配置が調整されました。'],
@@ -180,17 +183,19 @@ export function energyChangedPart(before: EnergyConfiguration, after: EnergyConf
 /** Evidence is the renderer's before/after targets, including visible pairings and shuffled slots. */
 export function residentResult(proposal: ExhibitionProposal, changes?: readonly CarrierChange[]) {
   const change = changes?.[0];
-  const questionId = change?.energy || (!change && proposal.votes.energy) ? 'energy-2127' : change ? RESULT_AXES[change.socketId]
+  // Rotation runs (Q01 only so far): the guest's own Q01 answer swapped the NW AUTO HUB; its layouts come from the outcome, not the neutral Meter layout.
+  const swap = q01Swap(proposal);
+  const questionId = swap ? 'Q01' : change?.energy || (!change && proposal.votes.energy) ? 'energy-2127' : change ? RESULT_AXES[change.socketId]
     : Object.values(RESULT_AXES)[AXES.findIndex(axis => proposal.votes[axis] !== 0)];
   const answer = proposal.answers.find(answer => answer.questionId === questionId) ?? proposal.answers[0];
-  const preference = RESIDENT_PREFERENCES[answer?.optionId] ?? 'あなたの思いが、住民の声に加わりました。';
+  const preference = RESIDENT_PREFERENCES[swap ? Q01_PREFERENCES[swap.to] : answer?.optionId] ?? 'あなたの思いが、住民の声に加わりました。';
   let effect = '回答を記録しました。', place = 'お台場全景', kind = 'recorded';
   if (change) {
     kind = 'configuration';
     place = change.focal && !change.district ? changeSites[change.socketId].place : DISTRICT_RESULTS[change.socketId][0];
     effect = DISTRICT_RESULTS[change.socketId][1];
     if (change.focal && !change.district) {
-      const before = proposal.beforeLayout, after = proposal.afterLayout;
+      const before = swap?.before ?? proposal.beforeLayout, after = swap?.after ?? proposal.afterLayout;
       if (change.socketId === 'nw') effect = after.automatedPorts > before.automatedPorts
         ? 'この拠点では、自分の都合で使える自律サービスの端口が増えました。'
         : after.automatedPorts < before.automatedPorts ? 'この拠点では、人に相談できる窓口が増えました。' : 'この拠点のサービスの構成が変わりました。';

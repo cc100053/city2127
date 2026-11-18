@@ -61,7 +61,7 @@ export type ExhibitionProposal = {
   beforeLayout: ExhibitionLayout;
   afterLayout: ExhibitionLayout;
   cityChanges: ExhibitionCityChange[];
-  /** Question rotation runs only (survey `ProposalRotation`); the city does not draw it yet (plan phase 2). */
+  /** Question rotation runs only (survey `ProposalRotation`); the city draws Q01 swaps (src/rotationLayout.ts). */
   rotation?: ProposalRotation;
 };
 export type ExhibitionView = {

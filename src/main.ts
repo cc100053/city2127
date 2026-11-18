@@ -27,6 +27,7 @@ import { build2127 } from './odaiba2127';
 import { bayWater, waterLights } from './bayWater';
 import { residentIdentity, scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
+import { rotationLayout } from './rotationLayout';
 import { createCityChangeManager } from './createCityChangeManager';
 import { renderQuality } from './renderQuality';
 import { ARRIVAL_SECONDS, VoteJourney } from './voteJourney';
@@ -295,26 +296,27 @@ try {
   if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view,displayMs)=>{
     devShot=null;residentDemo?.cancel();explore?.interrupt();if(explore&&isExhibitionView(view))explore.voices=view.guestCount;
     if(isExhibitionView(view)){
-      const prevNw=nwBand;nwBand=view.layout.bands.nw;
+      // Rotation runs: NW shows the run's Q01 option (src/rotationLayout.ts); version4 views pass through unchanged.
+      const layout=rotationLayout(view),prevNw=nwBand;nwBand=layout.bands.nw;
       // Cancel any legacy score blend while preserving its current rendered atmosphere.
-      world.blendTo(world.state,now);ring.setVoices(view.guestCount);holo.setVoices(view.guestCount);holo.setTiers(view.layout.tiers);
+      world.blendTo(world.state,now);ring.setVoices(view.guestCount);holo.setVoices(view.guestCount);holo.setTiers(layout.tiers);
       const latest=view.latestProposal;
       // Vote journey: a live result's four votes fly to the sites first; the city transition and pulses start after the close-up settles,
       // while the carrier evidence for the resident card is computed now. Snapshots, resets, Undo and reduced motion stay immediate.
       if(kind==='city-state-updated'&&latest&&!cameraMotion.matches&&displayMs>=DISPLAY_MS-100){
-        const changes=cityChanges!.applyExhibitionLayout(view.layout,kind,now+(headlineCamera?shotTimeline(displayMs).change:ARRIVAL_SECONDS),view.slotSeeds,now,latest.votes);
+        const changes=cityChanges!.applyExhibitionLayout(layout,kind,now+(headlineCamera?shotTimeline(displayMs).change:ARRIVAL_SECONDS),view.slotSeeds,now,latest.votes);
         journey!.play(latest.votes,latest.ordinal,now,changes[0]?.headline&&changes[0].district&&!changes[0].focalOnly?changes[0]:undefined);
         // DEV demo: the headline shot is held BEAT_SECONDS longer after the building change, so 湊's visit fits before the return to hero.
         const visit=residentDemo&&changes[0]?.socketId==='nw'&&['nw:focal','nw:focal-low'].includes(headlineShot(changes[0])??'');
         const shot=headlineCamera?.play(changes,now,visit?(shotTimeline(displayMs).changeEnd+BEAT_SECONDS)*1000:displayMs)??null;
         narration?.play(shot,changes[0],now,displayMs);
         if(shot&&voiceLabel){const t=shotTimeline(displayMs);voiceLabel.show(residentIdentity(latest),SHOTS[shot].target,now+t.hold,now+(visit?t.changeEnd:t.flyOut));}
-        if(visit&&(shot==='nw:focal'||shot==='nw:focal-low'))residentDemo!.start(now+shotTimeline(displayMs).changeEnd,view.layout.bands.nw,prevNw);
+        if(visit&&(shot==='nw:focal'||shot==='nw:focal-low'))residentDemo!.start(now+shotTimeline(displayMs).changeEnd,layout.bands.nw,prevNw);
         return changes;
       }
       headlineCamera?.cancel();narration?.cancel();
       journey!.setLanterns(view.recentProposals);
-      return cityChanges!.applyExhibitionLayout(view.layout,kind==='city-state-updated'?'city-state-snapshot':kind,now,view.slotSeeds);
+      return cityChanges!.applyExhibitionLayout(layout,kind==='city-state-updated'?'city-state-snapshot':kind,now,view.slotSeeds);
     }
     headlineCamera?.cancel();narration?.cancel();journey!.cancel();
     world.blendTo(scoresToWorldState(view.scores),now);

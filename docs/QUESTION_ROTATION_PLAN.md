@@ -1,6 +1,6 @@
 # 抽題輪換計劃 — SURVEY_V2 接入城市
 
-2026-11-18 草擬，Owner：cc100053。階段 0 已於 2026-11-18 由 owner 全部按建議批准，方向已寫入 [EXHIBITION_SPEC](EXHIBITION_SPEC.md#抽題輪換owner-2026-11-18-批准未實作)；本文件其餘部分是執行計劃；階段 1 已在 `feat/question-rotation` 完成 survey 端（9 題可選用接入，城市端未顯示），進度見 [handoff](handoffs/question-rotation.md)。同日 advisor 審閱後補入：雙站重疊、無變化率對答案分佈的敏感度、新舊系統並存、六種過場、敘事原則改變、少人數時的群眾比例（見 3.1–3.7、各階段完成標準）。討論過程及模擬數字見 repo 根目錄 `Dev_QA.md` Q17（owner 本機檔，未入 Git）。題目原文見 [SURVEY_V2](planning-team/SURVEY_V2.md)，題庫見 `survey/src/pool/questionPool.v1.json`（[handoff](handoffs/question-pool.md)）。
+2026-11-18 草擬，Owner：cc100053。階段 0 已於 2026-11-18 由 owner 全部按建議批准，方向已寫入 [EXHIBITION_SPEC](EXHIBITION_SPEC.md#抽題輪換owner-2026-11-18-批准未實作)；本文件其餘部分是執行計劃；階段 1 已在 `feat/question-rotation` 完成 survey 端（9 題可選用接入）；階段 2 城市端目前只接 Q01（NW AUTO HUB 按顯示選項，直接換經現行 NW 近鏡播出），其餘題目城市未顯示，進度見 [handoff](handoffs/question-rotation.md)。同日 advisor 審閱後補入：雙站重疊、無變化率對答案分佈的敏感度、新舊系統並存、六種過場、敘事原則改變、少人數時的群眾比例（見 3.1–3.7、各階段完成標準）。討論過程及模擬數字見 repo 根目錄 `Dev_QA.md` Q17（owner 本機檔，未入 Git）。題目原文見 [SURVEY_V2](planning-team/SURVEY_V2.md)，題庫見 `survey/src/pool/questionPool.v1.json`（[handoff](handoffs/question-pool.md)）。
 
 ## 1. 已定方向（owner，2026-11-18）
 
