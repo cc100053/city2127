@@ -1,6 +1,6 @@
 # 抽題輪換計劃 — SURVEY_V2 接入城市
 
-2026-11-18 草擬，Owner：cc100053。本文件係**計劃**，未成為產品 authority；各階段獲 owner 批准後，決定先寫入 [EXHIBITION_SPEC](EXHIBITION_SPEC.md)。討論過程及模擬數字見 repo 根目錄 `Dev_QA.md` Q17（owner 本機檔，未入 Git）。題目原文見 [SURVEY_V2](planning-team/SURVEY_V2.md)，題庫見 `survey/src/pool/questionPool.v1.json`（[handoff](handoffs/question-pool.md)）。
+2026-11-18 草擬，Owner：cc100053。階段 0 已於 2026-11-18 由 owner 全部按建議批准，方向已寫入 [EXHIBITION_SPEC](EXHIBITION_SPEC.md#抽題輪換owner-2026-11-18-批准未實作)；本文件其餘部分是執行計劃，未實作。討論過程及模擬數字見 repo 根目錄 `Dev_QA.md` Q17（owner 本機檔，未入 Git）。題目原文見 [SURVEY_V2](planning-team/SURVEY_V2.md)，題庫見 `survey/src/pool/questionPool.v1.json`（[handoff](handoffs/question-pool.md)）。
 
 ## 1. 已定方向（owner，2026-11-18）
 
@@ -80,7 +80,9 @@
 
 每一步列出：做什麼、改動位置、完成標準。標 **Owner** 的步驟要 owner 決定後才往下做。
 
-### 階段 0 — 決定（文件）
+### 階段 0 — 決定（文件）— 已完成 2026-11-18
+
+Owner 批准 0.1–0.4 全部建議；R01–R05 記入 SURVEY_V2_REVIEW 決定記錄。唯一未定：新 run 各題的起始模型（之前未提出建議，留待上線前決定）。
 
 | 步 | 內容 | 完成標準 |
 | --- | --- | --- |
@@ -172,4 +174,4 @@
 
 ## 6. 尚待決定
 
-0.1–0.4 各項；蓮花受電地塊；Q06 地塊；Q05、Q07、Q09 的模型方向；Q04 是否永不上台。
+新 run 各題起始模型；蓮花受電地塊；Q06 地塊；Q05、Q07、Q09 的模型方向；Q04 是否永不上台。
