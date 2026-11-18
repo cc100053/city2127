@@ -102,11 +102,16 @@ export const waterLoop: readonly P3[] = [
 /** Q02-A hydro terrace (fixed background, owner 2026-11-17): centre on the west-shore sea, yaw turns the GLB front (+z) east toward the
  *  city and its sea side (+x) south; `lot` is the 66 m plan square the boat loop and other routes keep clear of. */
 export const HYDRO_TERRACE = { x: -375, z: -170, yaw: Math.PI / 2, lot: 66 } as const;
+/** Q02-B bay flower (owner 2026-11-18, placement R1): flower centre on the sea off the south park's west shore. yaw turns the GLB's
+ *  shore station (local (−95, 56)) to due east of the flower, where its platform meets the park promenade; `r` is the flower's plan
+ *  radius (petal tips), which boats keep `r` + 30 m clear of. */
+export const BAY_FLOWER = { x: -712, z: 300, yaw: 2.6088, r: 64 } as const;
 // The ferry heads west for the Shinagawa channel, clear of the Rainbow Bridge anchorage and Daiba approach piers.
 export const ferryLane: readonly P3[] = [[-230,-.6,-290],[-420,-.6,-470],[-760,-.6,-560],[-1250,-.6,-520]];
 // Bay cruisers [x, z, heading]: centres of straight 300 m runs on open water in front of and beyond the district, clear of the shore and piers.
+// The west-shore run (sixth) passes south-west of the bay flower (BAY_FLOWER), 116 m from its centre.
 export const bayCruisers: readonly (readonly [number,number,number])[] = [
-  [-300,-560,.9],[-120,-620,-2.2],[-560,-430,2.6],[40,-600,-.4],[-640,-300,.3],[-700,250,1.4],[-650,-40,-1.7],[-150,1420,1.2],[250,1480,-1.9],
+  [-300,-560,.9],[-120,-620,-2.2],[-560,-430,2.6],[40,-600,-.4],[-640,-300,.3],[-780,170,1.4],[-650,-40,-1.7],[-150,1420,1.2],[250,1480,-1.9],
   // Nearer the hero pose: the foreground bay reads busy with taxis, as in the 2127 target (runs checked clear of the north shore).
   [100,-470,1.93],[-160,-470,.95],[-250,-380,-.9],[-330,-420,-.6],[-40,-560,2.3],[-478,-556,1.2],[260,-620,-1.6],
   // Open water south-west of the island, upper right of the hero frame.
