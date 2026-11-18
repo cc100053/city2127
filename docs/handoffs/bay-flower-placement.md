@@ -1,10 +1,10 @@
 # bay-flower-placement — Q02-B 蓮花受電：選址與放置
 
 - Owner: cc100053（owner 逐輪判定）；實作由 Claude
-- Status: IN_PROGRESS（R1 完成，待 owner 判定）
+- Status: IN_PROGRESS（R1 owner 接受；R2 完成，待 owner 准許 merge）
 - Branch: `feat/bay-flower-placement`（2026-11-18 由 `origin/main` 開出）
 - Base commit: `6724989bbff0ff8a0f65a9ee6e2a23f778e7ede3`
-- Last verified commit: `2f519b0f`（R1）
+- Last verified commit: R2（見「## R2」）
 - Remote availability: `origin/feat/bay-flower-placement`
 
 ## Session Git state
@@ -64,7 +64,7 @@
 
 - 輪換程式在 `feat/question-rotation`（未 merge）。本分支由 main 開出，不含 `rotationLayout`／`lotRuntime`。
 - R1 以常駐方式放入（仿水の棚田先例），以便 owner 判定位置與外觀；顯示／空置切換留待輪換分支的 2.2 `lotRuntime`。
-- **待 owner（R1 判定時答）：** version4 run 是否常駐顯示蓮花？選項：(a) 常駐顯示（同水の棚田），(b) version4 只顯示空置態（機房平台），蓮花只在輪換 run 出現。計劃 3.6 要求「version4 run 外觀不變」，傾向 (b)；R1 為方便判定可加 DEV 參數 `?bayFlower=0|1`。
+- **已答（R1 verdict）：選 (b)。** 原問題：version4 run 是否常駐顯示蓮花？選項：(a) 常駐顯示（同水の棚田），(b) version4 只顯示空置態（機房平台），蓮花只在輪換 run 出現。計劃 3.6 要求「version4 run 外觀不變」，傾向 (b)；R1 為方便判定可加 DEV 參數 `?bayFlower=0|1`。
 
 ## R1 brief
 
@@ -133,8 +133,9 @@
 
 ## Actual validation results
 
-- Verification status: PASS（R1）
-- Date and checked commit/worktree: 2026-11-18，`2f519b0f`，main checkout `feat/bay-flower-placement`
+- Verification status: PASS（R2）
+- R2：2026-11-18，main checkout `feat/bay-flower-placement`（R2 commit，見 git log）；root `npm test` exit 0（`bayFlower.test.ts` 含四例顯示／空置），`npm run build` 通過，`git diff --check` 無輸出；FPS hero day 60.0／night 60.0（空置及 `?bayFlower=1` 皆同，vsync 封頂）
+- R1：2026-11-18，`2f519b0f`，main checkout `feat/bay-flower-placement`
 - Root `npm test` exit 0（含新 `bayFlower.test.ts`），`npm run build` 通過，`git diff --check` 無輸出；Blender 5.2.2 重建兩個 GLB 無錯誤
 - FPS：hero 1920 × 1080 headed Chrome，前 60.0／60.0，後 59.9／59.9（日／夜，vsync 封頂）
 - Integrated commit and checks: NOT INTEGRATED（待 owner 接受）
@@ -143,8 +144,50 @@
 
 - 見「未驗證」及「待 owner」。
 
+## R1 verdict
+
+> 接受 R1，日景光柱OK，version4 只顯示空置態
+
+## R2 brief
+
+| Item | Acceptance for review |
+| --- | --- |
+| 接受 R1 | 位置、外觀、平台接駁、遊船航段不變；`bayFlower.test.ts` 原有斷言全部保留。 |
+| 日景光柱 OK | `Q02B_LightBeam` 材質、亮度不改；只在 DEV `?bayFlower=1` 截一張確認光柱與 R1 相同。 |
+| version4 只顯示空置態 | 無參數時（即 version4 run 及 production）只顯示 `Q02B_ShoreStation`：`Q02B_Receiver`、`Q02B_SubseaLink`、`Q02B_LightBeam` 三節點 `visible = false`，海面為原本海面。DEV `?bayFlower=1` 才顯示花；production build 即使帶 `?bayFlower=1` 亦為空置。抽成純函數 `bayFlowerShown(search, dev)` 並加單元測試四例。 |
+| 截圖 | 空置態以無 `bayFlower` 參數截：`focal-day`、`focal-night`、`overview`、`platform`、`platform-night`、`portal`（機房管道端，管道收起後的外牆）；另 `dev-shown`（`?bayFlower=1`）、`hero-day`、`r1-vs-r2.jpg`。 |
+| 效能 | `fps.sh` hero 日夜，與 R1 基準比較。 |
+
+## R2（2026-11-18）
+
+改動：
+
+- `src/bayFlower.ts`：新純函數 `bayFlowerShown(search, dev)`，只在 DEV 且 `?bayFlower=1` 時回傳 true；`bayFlower()` 預設收起花、海底管道及光柱（R1 的 `?bayFlower=0` 不再需要，仍為空置）。ponytail 註解改為現時限制：整個 GLB（94k tris）仍會載入，只為顯示機房，留待輪換 runtime 直接切換而不用再載入。
+- `tests/bayFlower.test.ts`：加四例（無參數空置、`=0` 空置、DEV `=1` 顯示、production `=1` 空置）。
+- PROJECT、LIBRARY、`spec.md` 第 5 行同步。
+
+version4 仍有的改動（屬「機房平台保留」，非「version4 外觀不變」）：機房平台及其護岸切口（`cutUnderPlatform`）、西岸遊船航段 `[-700,250]` → `[-780,170]`，每個 run 都在。
+
+截圖（`~/city2127-evidence/bay-flower-placement/r2/`，3200 × 1800）：`focal-day`、`focal-night`、`overview`、`platform`、`platform-night`、`portal`、`dev-shown`、`hero-day`、`r1-vs-r2.jpg`。
+
+逐項自評：
+
+| Brief 行 | 結果 |
+| --- | --- |
+| 接受 R1 | met：位置、平台、遊船不變；R1 斷言全部通過 |
+| 日景光柱 OK | met：`dev-shown` 光柱與 R1 `focal-day` 相同 |
+| version4 只顯示空置態 | met：`focal-day`／`focal-night` 無參數，只見機房平台；四例單元測試通過 |
+| 截圖 | met。`portal`：管道收起後機房管道端只見實牆及玻璃拱，無空洞；`platform-night`：平台欄杆燈、門燈正常，無孤立的青色管道燈 |
+| 效能 | met：hero 1920 × 1080 headed Chrome，空置 day 60.0／night 60.0，`?bayFlower=1` day 60.0／night 60.0（vsync 封頂，與 R1 相同）。註：首次以 `meters=`（空值）量得 46，該 URL 進入另一 Meter 狀態，同 URL 形狀下兩態皆 60，與本改動無關 |
+
+既有、與本輪無關：夜景 `focal-night` 花右前方海面一條寬光帶，R1（有花）同位置已有，空置態仍在，應為月光／天空反射。
+
+未驗證（同 R1）：行人路線是否走上平台；服務層 drone 航跡。
+
 ## Next expected step
 
-Owner 判定 R1（截圖 `~/city2127-evidence/bay-flower-placement/r1/`），並答「待 owner」三題。開新 session：
+Owner 判定 R2（截圖 `~/city2127-evidence/bay-flower-placement/r2/`）；接受即按 CONTRIBUTING merge 入 main（`--no-ff`），確認 main CI。Q02-B 未入 RESIDENT_SCENE_PLAN 單元表及 change sheet（未接投票），merge 後無需重生成 change sheet。
+
+舊（R1）：Owner 判定 R1（截圖 `~/city2127-evidence/bay-flower-placement/r1/`），並答「待 owner」三題。開新 session：
 
 > place-building round for `bay-flower-placement`: worktree `/Users/fatboy/city2127`（main checkout，branch `feat/bay-flower-placement`）, read `docs/handoffs/bay-flower-placement.md`. Owner verdict on R1: «…».

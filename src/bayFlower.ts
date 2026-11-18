@@ -41,13 +41,20 @@ export function cutUnderPlatform(material: T.Material) {
   material.customProgramCacheKey = () => key() + '|bay-flower-cut';
 }
 
-/** Q02-B bay flower, resident for placement review: the GLB on the bay off the south park's west shore. DEV `?bayFlower=0` shows the
- *  vacant state (shore station only). ponytail: always on in every run until the rotation branch's lot runtime switches it. */
+/** Owner 2026-11-18 (R1 verdict): the version4 run shows only the vacant state; the flower appears only under DEV `?bayFlower=1`
+ *  until the rotation branch's lot runtime shows it in rotation runs. */
+export function bayFlowerShown(search: string, dev: boolean) {
+  return dev && new URLSearchParams(search).get('bayFlower') === '1';
+}
+
+/** Q02-B bay flower off the south park's west shore: the shore station on the promenade in every run; the flower, duct and beam only
+ *  when `bayFlowerShown`. ponytail: the whole GLB (94k tris) still loads just to show the station, so the rotation runtime can show
+ *  the flower without a second load. */
 export function bayFlower() {
   const root = new T.Group(); root.name = 'q02b-bay-flower';
   root.position.set(BAY_FLOWER.x, BAY_FLOWER_Y, BAY_FLOWER.z); root.rotation.y = BAY_FLOWER.yaw;
   if (typeof window === 'undefined') return root;
-  const vacant = import.meta.env.DEV && new URLSearchParams(location.search).get('bayFlower') === '0';
+  const vacant = !bayFlowerShown(location.search, import.meta.env.DEV);
   addCityModel(root, GLB_URL, [0, 0, 0]).then(model => {
     model.name = 'q02b-bay-flower-glb';
     const beam = model.getObjectByName('Q02B_LightBeam');

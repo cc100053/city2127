@@ -1,9 +1,14 @@
 import assert from 'node:assert/strict';
 import { BAY_FLOWER, bayCruisers } from '../src/layout.ts';
-import { BAY_FLOWER_Y, bayFlower, bayFlowerPlatform, bayFlowerWorld } from '../src/bayFlower.ts';
+import { BAY_FLOWER_Y, bayFlower, bayFlowerPlatform, bayFlowerShown, bayFlowerWorld } from '../src/bayFlower.ts';
 import { boatPoses, HULL, routes, WATER_PERIOD } from '../src/mobility.ts';
 
-// Q02-B bay flower (placement R1): flower centre, yaw, shore platform on the park promenade, boats clear of the petals.
+// Q02-B bay flower (placement R1–R2): flower centre, yaw, shore platform on the park promenade, boats clear of the petals, and the
+// version4 run showing only the vacant state.
+assert.equal(bayFlowerShown('', true), false, 'vacant by default');
+assert.equal(bayFlowerShown('?bayFlower=0', true), false, '?bayFlower=0 vacant');
+assert.equal(bayFlowerShown('?shot=free&bayFlower=1', true), true, 'DEV ?bayFlower=1 shows the flower');
+assert.equal(bayFlowerShown('?bayFlower=1', false), false, 'production stays vacant');
 const near = (a: number, b: number, tol: number, what: string) => assert.ok(Math.abs(a - b) <= tol, `${what}: ${a.toFixed(2)} not within ${tol} of ${b}`);
 const root = bayFlower();
 near(root.position.x, -712, 1, 'flower centre x'); near(root.position.z, 300, 1, 'flower centre z');
