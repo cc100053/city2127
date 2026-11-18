@@ -107,9 +107,11 @@ def stage(cam_name="ref"):
 
 
 def render(path, beam=True, clay=False):
-    bpy.data.objects["Q02B_LightBeam"].hide_render = not beam
-    for o in bpy.data.objects["Q02B_LightBeam"].children:
-        o.hide_render = not beam
+    node = bpy.data.objects.get("Q02B_LightBeam")  # absent in the -nobeam file
+    if node:
+        node.hide_render = not beam
+        for o in node.children:
+            o.hide_render = not beam
     if clay:
         cm = mat("clay", (.62, .62, .62, 1), .7)
         for o in bpy.data.objects:

@@ -1,7 +1,8 @@
 """Q02-B bay flower: space-solar receiver floating in Odaiba bay (owner PDF p.3, middle image; references/q02-b.jpg).
 
 blender -b --factory-startup --python-exit-code 1 -P build_flower.py
-Writes bay-flower-receiver.blend and .glb next to this file and prints the metrics as one JSON line.
+Writes bay-flower-receiver.blend/.glb (with the light beam) and bay-flower-receiver-nobeam.blend/.glb (without it)
+next to this file and prints the metrics as one JSON line.
 
 Real metres, three.js coordinates in this file (y up; geo_helpers.B maps them to Blender). Origin: flower centre at the
 design waterline y = 0. The shore station sits to -x/+z (SHORE). Exported hierarchy (stable names for the app):
@@ -437,7 +438,7 @@ def panel_images():
     Returns (base colour image, sRGB) and (metal-roughness image, non-colour: G roughness, B metallic), both packed."""
     n, c = PANEL_TEX, PANEL_TEX // 2
     x = np.arange(n)
-    edge = (x % c < 1) | (x % c > c - 2)                    # 2 px frame between cells (≈ 2 cm), toned down
+    edge = (x % c < 3) | (x % c > c - 4)                    # 6 px silver frame between cells (≈ 6 cm), material round 1
     bus = (x % (c // 4) == 0) & ~edge                       # faint busbars, 4 per cell each way
     line = edge[None, :] | edge[:, None]
     busm = (bus[None, :] | bus[:, None]) & ~line
@@ -445,10 +446,11 @@ def panel_images():
     blue = np.array([.33, .42, .52])                         # sRGB blue-grey
     tone = np.array([1.0, .96, 1.03, .98])[cell][..., None]
     col = blue * tone
-    col = np.where(busm[..., None], col * .93 + .07 * np.array([.62, .68, .75]), col)
-    col = np.where(line[..., None], np.array([.53, .59, .66]), col)
-    rough = np.where(line, .26, .30)
-    metal = np.where(line, .7, .35)
+    # owner 2026-11-18: keep the material-round-1 grid (width and contrast), not the toned-down detail-round grid
+    col = np.where(busm[..., None], col * .85 + .15 * np.array([.62, .68, .75]), col)
+    col = np.where(line[..., None], np.array([.84, .86, .88]), col)
+    rough = np.where(line, .22, .30)
+    metal = np.where(line, .95, .35)
     mr = np.stack([np.ones_like(rough), rough, metal], -1)
     return [packed(name, px, space) for name, px, space in
             (("q02b_panel_color", col, "sRGB"), ("q02b_panel_mr", mr, "Non-Color"))]
@@ -573,16 +575,24 @@ def main():
             bpy.context.scene.collection.objects.link(ob)
             ob.parent = g
             objs.append(ob)
-    blend, glb = os.path.join(HERE, ID + ".blend"), os.path.join(HERE, ID + ".glb")
-    bpy.ops.wm.save_as_mainfile(filepath=blend, compress=True)
-    for o in bpy.context.scene.objects:
-        o.select_set(True)
-    bpy.ops.export_scene.gltf(filepath=glb, export_format="GLB", use_selection=True, export_yup=True, export_apply=True,
-                              export_animations=False, export_cameras=False, export_lights=False, export_extras=False)
     tris = {o.name: sum(len(p.vertices) - 2 for p in o.data.polygons) for o in objs}
-    print("@@JSON@@" + json.dumps({"tris_total": sum(tris.values()),
-                                   "tris_beam": sum(v for k, v in tris.items() if k.startswith("Q02B_LightBeam")),
-                                   "objects": len(objs), "glb_bytes": os.path.getsize(glb), "tris": tris}))
+    out = {"tris_total": sum(tris.values()), "tris_beam": sum(v for k, v in tris.items() if k.startswith("Q02B_LightBeam")),
+           "objects": len(objs), "tris": tris}
+    # two deliverables: with the beam (ID) and without it (ID-nobeam: the Q02B_LightBeam node and its meshes removed)
+    for suffix in ("", "-nobeam"):
+        if suffix:
+            beam = bpy.data.objects["Q02B_LightBeam"]
+            for o in list(beam.children) + [beam]:
+                bpy.data.objects.remove(o, do_unlink=True)
+        blend, glb = os.path.join(HERE, ID + suffix + ".blend"), os.path.join(HERE, ID + suffix + ".glb")
+        bpy.ops.wm.save_as_mainfile(filepath=blend, compress=True)
+        for o in bpy.context.scene.objects:
+            o.select_set(True)
+        bpy.ops.export_scene.gltf(filepath=glb, export_format="GLB", use_selection=True, export_yup=True,
+                                  export_apply=True, export_animations=False, export_cameras=False, export_lights=False,
+                                  export_extras=False)
+        out["glb_bytes" + suffix.replace("-", "_")] = os.path.getsize(glb)
+    print("@@JSON@@" + json.dumps(out))
 
 
 main()

@@ -44,7 +44,10 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
   - Bottom: a 1.2 m service walkway at y 5.8 runs round the base, with 24 brackets below and 48 posts and two rails above.
   - Junction: at 142.5°, toward the shore duct and between two inner petals, a wall plate holds three flanged pipes. They run over the walkway, turn down to a deck manifold, and have cyan lights at the flanges and on the manifold (8 lights in all).
   - Materials: the new `q02b_collar_bluegrey` covers the bands and pilasters, `q02b_grille_dark` the slats and `q02b_recess_bluegrey` the back wall.
-- Metrics: 59,450 tris (beam 816), 23 meshes, 18 materials, 3 textures 256², GLB 2,178,920 bytes. Export: Blender 5.2 glTF, GLB, +Y up, no animation/camera/light, no compression.
+- Metrics: 59,450 tris (beam 816), 23 meshes, 18 materials, 3 textures 256², GLB 2,178,920 bytes.
+- Grid-restore round (owner 2026-11-18, from the owner's side-by-side `download.png`, old left and new right). The owner keeps the new version and restores the old panel grid. The builder's panel texture parameters were set back to the material-round-1 values: 6 px silver frames (sRGB 0.84/0.86/0.88), busbars mixed in at 0.15, frames metallic 0.95 and roughness 0.22. The regenerated `q02b_panel_color` and `q02b_panel_mr` match, pixel for pixel, the images packed in the `9e5c077` .blend, both in the new .blend files and after GLB re-import. The panel UVs are unchanged (4 × 8 tiles per petal); only the tapered roots narrow the cells near the hinge.
+  - The builder now writes two deliverables: `bay-flower-receiver.blend/.glb` with `Q02B_LightBeam`, and `bay-flower-receiver-nobeam.blend/.glb` with that node and its two meshes removed. `review_flower.py` renders either.
+  - Metrics: with beam 59,450 tris, 23 meshes, GLB 2,178,996 bytes; without beam 58,634 tris, 21 meshes, GLB 2,160,276 bytes. Export: Blender 5.2 glTF, GLB, +Y up, no animation/camera/light, no compression.
 - Inferred (not readable in the image): petal count per ring, strut layout, pontoon below water, sub-sea depth, pavilion interior terminal, beam height, the overall scale (from people by the pavilion).
 
 ## Actual validation results
@@ -67,6 +70,8 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
   - `glb-reimport-dome/nobeam.png` was rendered from the re-imported GLB and matches.
 - GLB re-import (receiver-base round): 59,450 tris and 23 meshes. In the collar zone, `collar` spans r 11.9–12.65 and `recess` sits at r 11.9 (y 9.45–17.55), so the bays are recessed 0.75 m. `grille` slats sit at r 11.9–12.35 inside the recess. Cyan `glow` in the collar zone appears only at the junction (r 12.9–16.0, y 4.1–9.3). Materials `q02b_collar_bluegrey`, `q02b_grille_dark`, `q02b_recess_bluegrey` and `q02b_frame_silver` all came through, and the panel, guard-plate and pontoon textures and UVs are still present.
 - QA: the access covers first floated 5 cm off the back wall and are now seated in it. The other items are as before.
+- Grid-restore round evidence, `~/city2127-evidence/bay-flower-receiver/grid-final/`: `before-after-beam-ref.jpg`, `before-after-nobeam-ref.jpg` and `before-after-nobeam-close.jpg`. All use the same cameras, sun and 64 samples. Before renders come from a copy of the receiver-base .blend; the after no-beam renders come from `bay-flower-receiver-nobeam.blend`.
+- GLB re-import of both files: the beam node is present only in the with-beam file. Collar, recess and grille radii are unchanged (12.65 / 11.9 / 11.9–12.35). The panel, guard-plate and pontoon textures and UVs are linked, and the panel textures match the `9e5c077` pixels exactly.
 - `npm run build`: passed. `git diff --cached --check`: clean.
 - `npm test` (Windows 11, Node 24.19, checkout under `OneDrive\文件`): `assetLibrary.test.ts` passes with the new row. Two local leftovers, `asset/models/ship-refs-2127` and `car-candidates-2127`, hold only git-ignored caches from other branches and fail that test unless parked; they were parked for the run and restored. `surveyMeterPipeline.test.ts` and `energyPipeline.test.ts` FAIL on this machine before any of this task's code runs: `survey/tests/surveyFixture.ts` turns a `file://` URL path into `C:\C:\…\%E6%96%87%E4%BB%B6\…` (percent-encoded non-ASCII folder name), so the question JSON is not found. Not caused by this task, not fixed here. Every other test in the `npm test` list passed when run one at a time.
 - Application verification: NOT INTEGRATED.
@@ -84,4 +89,4 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
 
 ## Next expected step
 
-Owner reviews the receiver-base round (`collar-final/before-after-nobeam-dome.jpg`, `before-after-nobeam-water.jpg`, `after-waterzoom`) and confirms the assumed screenshot angle; then either another shape round or a placement task (site, shoreline, beam behaviour in the app).
+Owner reviews the grid-restore round (`grid-final/before-after-*.jpg`); then either another shape round or a placement task (site, shoreline, beam behaviour in the app).
