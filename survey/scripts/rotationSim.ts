@@ -1,9 +1,9 @@
 // Rotation gate (QUESTION_ROTATION_PLAN 1.7): node --experimental-strip-types survey/scripts/rotationSim.ts
 // Real code: drawQuestions + rotationStep (the step foldRotation replays), 400 runs × 120 fake guests, stations A and B
 // reserving from the same city and submitting in turn. Fake answers, not real people; initial options are
-// drawn per run because the owner has not chosen them. Gate (launch configuration: five online questions,
-// original preferences): ≤ 2 % no-change and every model shown in every run. Ten questions and the skewed rows
-// are reported for the owner, not gated: at ten questions a few runs leave one model unshown all day.
+// drawn per run because the owner has not chosen them. Gate (launch configuration: all nine questions, owner
+// 2026-11-18; original preferences): ≤ 2 % no-change. Model coverage and the skewed rows are reported for the
+// owner, not gated: at nine or ten questions a few runs leave one model unshown all day.
 import { drawQuestions, initialRotation, rotationStep, type RotationSet, type RotationState } from '../src/shared/rotation.ts';
 
 let seed = 20261118; const rnd = () => (seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 2 ** 32;
@@ -49,16 +49,16 @@ function run(questions: number, prefs: readonly (readonly number[])[], lean: num
 
 let gateFailed = false;
 for (const { label, prefs, lean } of DISTRIBUTIONS) {
-  const cells = [5, 10].map(questions => {
+  const cells = [5, 9, 10].map(questions => {
     let unchanged = 0, allShown = 0, coverage = 0;
     for (let r = 0; r < RUNS; r++) {
       const result = run(questions, prefs, lean);
       unchanged += result.unchanged; coverage += result.coverage; if (result.coverage === 1) allShown++;
     }
     const rate = unchanged / RUNS;
-    if (prefs === ORIGINAL && questions === 5 && (rate > .02 || allShown < RUNS)) gateFailed = true;
+    if (prefs === ORIGINAL && questions === 9 && rate > .02) gateFailed = true;
     return `${questions}q no-change ${(100 * rate).toFixed(1)}%, models shown ${(100 * coverage / RUNS).toFixed(1)}% (all in ${allShown}/${RUNS} runs)`;
   });
   console.log(`rotation sim ${label}: ${cells.join('; ')}`);
 }
-if (gateFailed) { console.error('rotation gate failed: five questions with original preferences need ≤ 2% no-change and every model shown in every run'); process.exit(1); }
+if (gateFailed) { console.error('rotation gate failed: nine questions with original preferences need ≤ 2% no-change'); process.exit(1); }

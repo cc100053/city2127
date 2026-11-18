@@ -135,6 +135,8 @@ body.guest-page {
 .guest .guest-lean-you::before { content: ''; position: absolute; left: 50%; top: -5px; border: 3px solid transparent; border-bottom: 3px solid var(--guest-amber); transform: translateX(-50%); }
 .guest .guest-lean-row:not(.guest-lean-row--energy) { display: grid; grid-template-columns: 116px minmax(0, 1fr) 116px; align-items: center; column-gap: 12px; padding-bottom: 18px; }
 .guest .guest-lean-row:not(.guest-lean-row--energy) .guest-lean-title { grid-column: 1 / -1; }
+.guest .guest-lean-row.guest-lean-row--voice { display: block; padding-bottom: 10px; }
+.guest .guest-lean-row--voice .guest-lean-text { margin: 0; }
 .guest .guest-lean-row .guest-lean-track { grid-column: 2; grid-row: 2; margin: 0; }
 .guest .guest-lean-poles { display: contents; color: var(--guest-muted); font-size: 12px; }
 .guest .guest-lean-poles span { grid-row: 2; color: var(--guest-muted); font-size: 12px; line-height: 1.3; }

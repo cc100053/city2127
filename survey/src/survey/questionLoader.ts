@@ -101,7 +101,8 @@ function nullableText(value: unknown, where: string): string | null {
 
 /**
  * Validates a question-rotation set (QUESTION_ROTATION_PLAN 1.1): three options per question, each naming
- * its model and lot (null until built or sited); an online question needs all of them; model IDs unique.
+ * its model and lot (null until built or sited); model IDs unique. `online` is the owner's switch for drawing a
+ * question; owner 2026-11-18 put all nine online before their models exist, so it does not require them.
  */
 export function parseRotationSet(input: unknown): RotationSet {
   if (!isObject(input) || input.kind !== 'rotation') throw new QuestionSetError('rotation set must be an object with kind "rotation"');
@@ -131,8 +132,6 @@ export function parseRotationSet(input: unknown): RotationSet {
       return { id: optionId, label: text(option.label, `${where}.label`), modelId, lotId: nullableText(option.lotId, `${where}.lotId`) };
     });
     if (typeof raw.online !== 'boolean') throw new QuestionSetError(`question "${id}".online must be a boolean`);
-    if (raw.online && options.some(o => o.modelId === null || o.lotId === null))
-      throw new QuestionSetError(`online question "${id}" needs a model and lot for every option`);
     const initial = text(raw.initial, `question "${id}".initial`);
     if (!optionIds.has(initial)) throw new QuestionSetError(`question "${id}".initial must name one of its options`);
     return { id, text: text(raw.text, `question "${id}".text`), online: raw.online, initial, options };

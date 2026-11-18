@@ -7,7 +7,8 @@ import { pathToFileURL } from 'node:url';
 import type { ApiResponse, ErrorCode, HealthData } from '../shared/protocol.ts';
 import type { CitySurveyState, ExhibitionState } from '../shared/citySurveyState.ts';
 import type { CityView } from '../shared/cityView.ts';
-import { loadQuestionSetFile, validateExhibitionQuestionSet } from '../survey/questionLoader.ts';
+import { loadQuestionSetFile, parseRotationSet, validateExhibitionQuestionSet } from '../survey/questionLoader.ts';
+import { readFileSync } from 'node:fs';
 import { fail, type ServiceOutcome, type SurveyContext } from './context.ts';
 import { openDatabase } from './database.ts';
 import { restoreOrCreateRun } from './runStore.ts';
@@ -177,15 +178,21 @@ export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddr
   return { server, realtime };
 }
 
-/** Builds the runtime context: validates the question JSON, migrates and restores the database. */
+/**
+ * Builds the runtime context: validates the question JSON, migrates and restores the database. A rotation
+ * file (`kind: "rotation"`) also loads the four-axis set beside it, so runs that already hold four-axis
+ * proposals still read and refuse new guests until the city is reset.
+ */
 export function createContext(options: { dbPath: string; questionsPath: string; legacyQuestionsPath?: string; now?: () => Date }): SurveyContext {
-  const questions = validateExhibitionQuestionSet(loadQuestionSetFile(options.questionsPath));
+  const raw: unknown = JSON.parse(readFileSync(options.questionsPath, 'utf8'));
+  const rotation = typeof raw === 'object' && raw !== null && (raw as { kind?: unknown }).kind === 'rotation' ? parseRotationSet(raw) : undefined;
+  const questions = validateExhibitionQuestionSet(loadQuestionSetFile(rotation ? resolve(dirname(options.questionsPath), 'questions.exhibition.json') : options.questionsPath));
   const legacyQuestions = loadQuestionSetFile(options.legacyQuestionsPath ?? resolve(dirname(options.questionsPath), 'questions.mvp.json'));
   const db = openDatabase(options.dbPath);
   const now = options.now ?? (() => new Date());
   try { restoreOrCreateRun(db, randomUUID, now); }
   catch (error) { db.close(); throw error; }
-  return { db, questions, legacyQuestions, now, newId: randomUUID, reservationMs: RESERVATION_MS };
+  return { db, questions, ...(rotation ? { rotation } : {}), legacyQuestions, now, newId: randomUUID, reservationMs: RESERVATION_MS };
 }
 
 /** Guest A/B URLs staff type on the iPads; empty unless the server listens beyond loopback. */
@@ -205,7 +212,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const state = currentState(ctx);
   server.listen(port, host, () => {
     console.log(`Survey server on http://${host === '0.0.0.0' ? '127.0.0.1' : host}:${port}  (db ${dbPath})`);
-    console.log(`Run ${state.runId}, revision ${state.revision}, ${ctx.questions.questions.length} questions (version ${ctx.questions.version})`);
+    console.log(ctx.rotation
+      ? `Run ${state.runId}, revision ${state.revision}, rotation of ${ctx.rotation.questions.length} questions (version ${ctx.rotation.version}${ctx.rotation.draft ? ', draft' : ''})`
+      : `Run ${state.runId}, revision ${state.revision}, ${ctx.questions.questions.length} questions (version ${ctx.questions.version})`);
     console.log('Pages: /guest  /monitor  /admin (loopback only)');
     for (const url of lanGuestUrls(host, port)) console.log(`LAN Guest: ${url}`);
   });

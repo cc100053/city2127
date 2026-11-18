@@ -6,14 +6,15 @@ import {
   type RotationSet, type RotationSubmission,
 } from '../src/shared/rotation.ts';
 
-// 1.1 — the shipped draft set: nine SURVEY_V2 questions, only Q01 has all three models today.
+// 1.1 — the shipped draft set: nine SURVEY_V2 questions, all drawn (owner 2026-11-18) though only Q01 and Q02 have three models (Q02's flower receiver is unsited).
 const ROTATION_PATH = new URL('../src/survey/questions.rotation.v1.json', import.meta.url).pathname;
 const shipped = loadRotationSetFile(ROTATION_PATH);
 assert.equal(shipped.questions.length, 9);
 assert.equal(shipped.draft, true);
-assert.deepEqual(shipped.questions.filter(q => q.online).map(q => q.id), ['Q01']);
+assert.ok(shipped.questions.every(q => q.online));
+assert.deepEqual(shipped.questions.filter(q => q.options.every(o => o.modelId)).map(q => q.id), ['Q01', 'Q02']);
 assert.ok(shipped.questions.every(q => q.options.length === 3));
-assert.throws(() => drawQuestions(shipped, initialRotation(shipped)), (e: unknown) => e instanceof RotationError && /at least 5 online/.test((e as Error).message));
+assert.deepEqual(drawQuestions(shipped, initialRotation(shipped)), ['Q01', 'Q02', 'Q03', 'Q04']);
 
 const base = () => JSON.parse(readFileSync(ROTATION_PATH, 'utf8'));
 const rejects = (mutate: (json: ReturnType<typeof base>) => void, pattern: RegExp) => {
@@ -26,7 +27,6 @@ rejects(j => { j.questions[1].id = 'Q01'; }, /duplicate question id/);
 rejects(j => { j.questions[0].options.pop(); }, /exactly three options/);
 rejects(j => { j.questions[0].options[1].id = 'A'; }, /duplicate option id/);
 rejects(j => { j.questions[1].options[0].modelId = 'automation-hub-low'; }, /more than one option/);
-rejects(j => { j.questions[1].online = true; }, /online question "Q02" needs a model and lot/);
 rejects(j => { j.questions[0].initial = 'Z'; }, /initial must name one of its options/);
 rejects(j => { j.questions[0].online = 'yes'; }, /online must be a boolean/);
 rejects(j => { j.draft = undefined; }, /draft must be a boolean/);

@@ -13,7 +13,7 @@
     "dev:auto": "npm run build && node --experimental-strip-types scripts/devAutoServer.ts",
     "pool:build": "node --experimental-strip-types scripts/buildQuestionPool.ts",
     "test:pool": "node --experimental-strip-types tests/questionPool.test.ts",
-    "test:rotation": "node --experimental-strip-types tests/rotation.test.ts && node --experimental-strip-types scripts/rotationSim.ts",
+    "test:rotation": "node --experimental-strip-types tests/rotation.test.ts && node --experimental-strip-types tests/rotationFlow.test.ts && node --experimental-strip-types scripts/rotationSim.ts",
     "test:meters": "node --experimental-strip-types tests/meterContract.test.ts",
     "test:auto": "node --experimental-strip-types tests/autoAnswers.test.ts && node --experimental-strip-types tests/devSurvey.test.ts"
   },

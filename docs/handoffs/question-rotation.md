@@ -1,10 +1,10 @@
 # question-rotation — SURVEY_V2 抽題輪換計劃
 
 - Owner: cc100053
-- Status: IN_PROGRESS（階段 0 完成；階段 1 純函數核心完成，server 接線及 guest 介面未做）
+- Status: IN_PROGRESS（階段 1 survey 端完成：9 題可選用接入；城市端顯示（階段 2）未做）
 - Branch: `feat/question-rotation`（2026-11-18 由 `docs/question-rotation-plan` HEAD `95c494ff` 開出；計劃文件 commit 一併帶入）
 - Base commit: `6724989bbff0ff8a0f65a9ee6e2a23f778e7ede3`（origin/main，2026-11-18）
-- Last verified commit: `836a31fa`（階段 1 切片一；其後只改文件）
+- Last verified commit: 見 git log（2026-11-18 survey 接線 commit）
 - Remote availability: `origin/docs/question-rotation-plan`（計劃）；`origin/feat/question-rotation`（實作）
 
 ## Session Git state
@@ -43,12 +43,22 @@
   - 1.5（純函數部分）`crowdShare`：計入所有有效提案的四個答案（含本人）；總數未達 `CROWD_SHARE_MIN_VOTES`（暫定 10，待 owner）時不給百分比。
   - 1.7 模擬 gate：見下。
 
+- 2026-11-18 owner 指示「把現有 9 題接入，模型完成後再補空位」，survey 端接線（階段 1.4–1.6、1.8）：
+  - 決定：9 題全部 `online`（含 Q04），取代 5 題門檻及 Q04 暫不上台；已記入 SPEC 及計劃。題目文字仍是 SURVEY_V2 P 版 draft。
+  - 選用：`SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json`；預設仍是 version4。`.claude/launch.json`（本機、git-ignore）加了 `survey-rotation`（scratch DB，port 8789）。
+  - 資料：沿用 algorithm 2 提案管線；輪換提案存中性四軸票（Meter 不動），答案存 `answers_json`，抽中題存 `proposal_sessions.question_ids_json`；schema 9 只加 `question_kind`（'axes'／'rotation'）。一個 run 不混兩種；換題組要在 Admin 重設城市，否則 `lifecycle_blocked`。
+  - 計算：`rotationRun.ts` 以 `sequence` 為 stamp fold 有效提案；`ProposalRecord.rotation`（outcome＋四個群眾比例）、`ExhibitionCityView.rotation`（每題顯示選項及最後變化）。
+  - Root：`surveyView.ts` 接受並驗證上述欄位，城市暫不畫（結果卡回退為「回答を記録しました。」）。
+  - Guest：交接頁以「住民の声」取代 Meter 傾向面板；結果晶片改用選項文字。文案（少人數句、保底句）為計劃 3.3／3.4 暫定句。
+  - 未做：預約事件帶抽中題（預載用，待有模型）；dev-auto 自動作答面板未針對輪換題調整。
+
 ## Actual validation results
 
-- Verification status: PARTIAL（階段 1 純函數；server、guest 未接）
+- Verification status: PARTIAL（survey 端接線完成並測試；城市端未畫、iPad／A/B 實機未測）
 - Date and checked commit/worktree: 2026-11-18，`feat/question-rotation`
 - Commands/manual checks and results: 文件內相對連結及引用檔案路徑逐一核對存在；座標取自 `src/layout.ts`、`src/energyRuntime.ts`。未截圖核對位置。VALIDATION 已加階段 1 一條記錄。
-- `survey/`：`npm test`（含新 `test:rotation`）通過、`npm run build` 通過；`git diff --check` 通過。root `src/` 未改，未跑 root 測試。
+- `survey/`：`npm test`（含 `test:rotation`：rotation、rotationFlow、模擬）通過、`npm run build` 通過；root `npm test`（含新 `rotationPipeline`）、`npm run build` 通過；`git diff --check` 通過。內置瀏覽器走一次 guest 輪換流程，console 無錯誤。
+- 模擬 9 題（上線配置，gate ≤ 2%）：原設定 1.5%，389/400 run 全部模型出場；70/20/10＋傾向 2.7%；70/20/10 無傾向 6.0%；85/10/5 23.5%（202/400 全出場）。
 - 正式模擬 `survey/scripts/rotationSim.ts`（正式函數，400 run × 120 假訪客，A／B 兩站同城預約後先後提交，起始選項每 run 隨機）：
 
   | 分佈 | 5 題無變化 | 5 題模型出場（全出場 run） | 10 題無變化 | 10 題模型出場（全出場 run） |
@@ -74,7 +84,10 @@
 
 ## Next expected step
 
-階段 1 切片二：server 接線。先讀 `survey/src/server/runStore.ts`（`runProposalLadder` fold 位置）、`context.ts`、`sessionService.ts`、`answerService.ts`、`migrations.ts`、`protocol.ts`、`twoStations.test.ts`，然後：
+**現時：** 階段 2 城市端（`lotRuntime` 按 `view.rotation.shown` 顯示模型，Q01 先接 AUTO HUB 三態）；或 owner 決定把輪換設為預設並開新 run（要同步 AGENTS.md／SPEC 敘事原則，計劃 6.7）。階段 4 內容製作可並行。
+
+
+（已完成，保留作紀錄）階段 1 切片二：server 接線。先讀 `survey/src/server/runStore.ts`（`runProposalLadder` fold 位置）、`context.ts`、`sessionService.ts`、`answerService.ts`、`migrations.ts`、`protocol.ts`、`twoStations.test.ts`，然後：
 1. 1.6 schema 9：草稿保存抽中題目 ID（預約時 `drawQuestions`）；提案保存 drawn 題目及答案；新增可空欄位，保留 schema 8 歷史。提交時驗證答題 ID 等於草稿的抽中題（`rotationStep` 已檢查）。
 2. 1.4 run 按題組 `kind` 分流：rotation run 用 `foldRotation`，version4 run 照舊 `ladderStep`；新增 `CityView` 變體而非擴闊 `ExhibitionCityView`（root `src/` 亦 import），改後要跑 root `npm test`／build。
 3. 1.5 protocol：結果事件帶 `RotationOutcome` 與 `crowdShare`；預約事件帶抽中題目 ID，供城市端預載（審閱第 G 點）。

@@ -203,6 +203,9 @@ export const migrations: (string | ((db: DatabaseSync) => void))[] = [
    ALTER TABLE proposal_events ADD COLUMN display_at TEXT;`,
   // 8: optional independent energy tallies; NULL retains byte-for-byte legacy state/event replay.
   `ALTER TABLE exhibition_snapshots ADD COLUMN energy_json TEXT;`,
+  // 9: question rotation (QUESTION_ROTATION_PLAN). Existing sessions and proposals are four-axis ('axes').
+  `ALTER TABLE proposal_sessions ADD COLUMN question_kind TEXT NOT NULL DEFAULT 'axes' CHECK (question_kind IN ('axes', 'rotation'));
+   ALTER TABLE proposal_events ADD COLUMN question_kind TEXT NOT NULL DEFAULT 'axes' CHECK (question_kind IN ('axes', 'rotation'));`,
 ];
 
 export const SCHEMA_VERSION = migrations.length;

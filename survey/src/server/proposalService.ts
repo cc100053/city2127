@@ -2,7 +2,9 @@ import type { SQLOutputValue } from 'node:sqlite';
 import { CITY_AXES, type ExhibitionState, type ExhibitionVotes } from '../shared/citySurveyState.ts';
 import type { ApiResponse, ProposalData, ProposalRequest, ProposalSession, ProposalSessionData } from '../shared/protocol.ts';
 import type { ProposalAnswerRecord, ProposalRecord } from '../shared/cityView.ts';
-import { toPublicQuestion } from '../shared/question.ts';
+import { toPublicQuestion, type PublicQuestion } from '../shared/question.ts';
+import { drawQuestions, type RotationSet } from '../shared/rotation.ts';
+import { rotationActive, runQuestionKind, runRotation, withRotation, type QuestionKind } from './rotationRun.ts';
 import { validateExhibitionQuestionSet } from '../survey/questionLoader.ts';
 import { applyProposalVotes, validateExhibitionState, voteForEffects } from '../survey/scoreEngine.ts';
 import { viewOf } from './answerService.ts';
@@ -44,6 +46,17 @@ function parseProposalSession(row: Row): ProposalSession {
   };
 }
 
+const sessionKind = (row: Row): QuestionKind => str(row, 'question_kind') === 'rotation' ? 'rotation' : 'axes';
+const rotationQuestions = (set: RotationSet, ids: string[]): PublicQuestion[] => ids.map(id => {
+  const { text, options } = set.questions.find(question => question.id === id)!;
+  return { id, text, options: options.map(({ id, label }) => ({ id, label })) };
+});
+/** A rotation session still reads only while the server runs the same rotation set version. */
+const rotationSessionValid = (ctx: SurveyContext, session: ProposalSession) =>
+  !!ctx.rotation && session.questionSetVersion === ctx.rotation.version
+  && session.questionIds.every(id => ctx.rotation!.questions.some(question => question.id === id));
+const NEUTRAL_VOTES: ExhibitionVotes = { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 };
+
 function failNoExhibition(): ApiResponse<never> {
   return fail('unsupported_version', 'The active run does not use exhibition algorithm version 2.');
 }
@@ -73,18 +86,26 @@ export function createProposalSession(ctx: SurveyContext, body: unknown = {}): S
     }
     const handoff = !stations.length && lifecycle.phase === 'awaiting_exit' ? finishGuest(ctx, lifecycle) : undefined;
     if (handoff) current = currentExhibition(ctx)!;
+    // A run never mixes kinds: switching between the four-axis and rotation sets needs a city reset.
+    const runKind = runQuestionKind(ctx.db, current.runId);
+    if ((ctx.rotation && runKind === 'axes') || (!ctx.rotation && runKind === 'rotation'))
+      return { response: fail('lifecycle_blocked', 'The question set changed. Reset the city in Admin to start a new run.', current.state), event: handoff?.event };
     if (stationId || lifecycle.phase !== 'in_experience') setLifecycle(ctx, 'in_experience', 'none');
     const now = ctx.now(), createdAt = now.toISOString();
+    // Rotation draws the four stalest questions from the city as it is now (plan 3.1); stored, never redrawn.
+    const rotating = rotationActive(ctx, current.runId);
+    const questionIds = rotating ? drawQuestions(ctx.rotation!, runRotation(ctx as SurveyContext & { rotation: RotationSet }, current.runId).fold.state) : set.questions.map(question => question.id);
     const session: ProposalSession = {
-      id: ctx.newId(), runId: current.runId, questionSetVersion: set.version,
+      id: ctx.newId(), runId: current.runId, questionSetVersion: rotating ? ctx.rotation!.version : set.version,
       ...(stationId ? { stationId } : {}),
-      questionIds: set.questions.map(question => question.id), status: 'reserved', createdAt,
+      questionIds, status: 'reserved', createdAt,
       expiresAt: new Date(now.getTime() + PROPOSAL_RESERVATION_MS).toISOString(), submittedAt: null,
     };
-    ctx.db.prepare(`INSERT INTO proposal_sessions (id, run_id, question_set_version, question_ids_json, status, created_at, expires_at, station_id)
-      VALUES (?, ?, ?, ?, 'reserved', ?, ?, ?)`)
-      .run(session.id, session.runId, session.questionSetVersion, JSON.stringify(session.questionIds), session.createdAt, session.expiresAt, stationId ?? null);
-    return { response: { ok: true as const, data: { session, questions: set.questions.map(toPublicQuestion), state: current.state } }, event: handoff?.event };
+    ctx.db.prepare(`INSERT INTO proposal_sessions (id, run_id, question_set_version, question_ids_json, status, created_at, expires_at, station_id, question_kind)
+      VALUES (?, ?, ?, ?, 'reserved', ?, ?, ?, ?)`)
+      .run(session.id, session.runId, session.questionSetVersion, JSON.stringify(session.questionIds), session.createdAt, session.expiresAt, stationId ?? null, rotating ? 'rotation' : 'axes');
+    const questions = rotating ? rotationQuestions(ctx.rotation!, questionIds) : set.questions.map(toPublicQuestion);
+    return { response: { ok: true as const, data: { session, questions, state: current.state } }, event: handoff?.event };
   });
 }
 
@@ -120,6 +141,10 @@ export function getProposalSession(ctx: SurveyContext, sessionId: string): ApiRe
     if (ctx.db.prepare('SELECT u.proposal_id FROM proposal_undos u JOIN proposal_events p ON p.id = u.proposal_id WHERE p.guest_session_id = ?').get(session.id))
       return fail('proposal_undone', 'This proposal was undone by an administrator. Start a new questionnaire.', current.state);
     if (session.status === 'submitted') return fail('already_answered', 'This proposal session has already been submitted.', current.state);
+    if (sessionKind(row) === 'rotation') {
+      if (!rotationSessionValid(ctx, session)) return fail('unsupported_version', 'This session belongs to a different question set version.', current.state);
+      return { ok: true, data: { session, questions: rotationQuestions(ctx.rotation!, session.questionIds), state: current.state } };
+    }
     if (session.questionSetVersion !== ctx.questions.version
         || JSON.stringify(session.questionIds) !== JSON.stringify(ctx.questions.questions.map(question => question.id)))
       return fail('unsupported_version', 'This session belongs to a different question set version.', current.state);
@@ -178,7 +203,7 @@ function duplicateResult(ctx: SurveyContext, row: Row, request: ProposalRequest)
   }
   if (ctx.db.prepare('SELECT proposal_id FROM proposal_undos WHERE proposal_id = ?').get(request.submissionId))
     return { response: fail('proposal_undone', 'This proposal was undone by an administrator. Start a new questionnaire.', currentExhibition(ctx)?.state) };
-  const proposal = proposalRecordOf(ctx.db, row);
+  const proposal = recordOf(ctx, row);
   const wait = displayWait(ctx, proposal);
   const session = ctx.db.prepare('SELECT ended_at FROM proposal_sessions WHERE id = ?').get(proposal.guestSessionId);
   return { response: { ok: true, data: { proposal, state: savedState(row), replayed: true, ...wait,
@@ -190,6 +215,14 @@ const displayWait = (ctx: SurveyContext, proposal: ProposalRecord) =>
     displayWaitMs: Math.max(0, Date.parse(proposal.displayAt) - ctx.now().getTime()),
     displayRemainingMs: Math.max(0, Math.min(DISPLAY_MS, Date.parse(proposal.displayAt) + DISPLAY_MS - ctx.now().getTime())),
   } : {};
+
+/** A stored proposal with its rotation outcome and crowd shares when it belongs to a rotation run. */
+function recordOf(ctx: SurveyContext, row: Row): ProposalRecord {
+  const record = proposalRecordOf(ctx.db, row);
+  return sessionKind(row) === 'rotation' && ctx.rotation
+    ? withRotation(record, runRotation(ctx as SurveyContext & { rotation: RotationSet }, record.runId, num(row, 'sequence') + 1))
+    : record;
+}
 
 export function submitProposal(ctx: SurveyContext, body: unknown): ServiceOutcome<ProposalData> {
   const request = parseProposalRequest(body);
@@ -211,9 +244,11 @@ export function submitProposal(ctx: SurveyContext, body: unknown): ServiceOutcom
     }
     if (session.status === 'submitted') return { response: fail('already_answered', 'This proposal session has already been submitted.', current.state) };
     if (session.status === 'expired') return { response: fail('session_expired', 'This proposal session has expired.', current.state) };
-    const questionIds = questionSet.questions.map(question => question.id);
-    if (session.runId !== current.runId || session.questionSetVersion !== questionSet.version
-        || JSON.stringify(session.questionIds) !== JSON.stringify(questionIds))
+    const rotating = sessionKind(sessionRow) === 'rotation';
+    if (session.runId !== current.runId || (rotating
+      ? !rotationSessionValid(ctx, session) || !rotationActive(ctx, current.runId)
+      : ctx.rotation || session.questionSetVersion !== questionSet.version
+        || JSON.stringify(session.questionIds) !== JSON.stringify(questionSet.questions.map(question => question.id))))
       return { response: fail('unsupported_version', 'This proposal session belongs to a different run or question set.', current.state) };
     if (request.answers.length !== session.questionIds.length
         || request.answers.some(answer => !session.questionIds.includes(answer.questionId)))
@@ -225,9 +260,19 @@ export function submitProposal(ctx: SurveyContext, body: unknown): ServiceOutcom
       return { response: fail('lifecycle_blocked', 'This installation has already recorded a proposal for the current guest.', current.state) };
 
     const byId = new Map(request.answers.map(answer => [answer.questionId, answer.optionId]));
-    const votes: Partial<ExhibitionVotes> = {};
+    const votes: Partial<ExhibitionVotes> = rotating ? { ...NEUTRAL_VOTES } : {};
     const answers: ProposalAnswerRecord[] = [];
-    for (const question of questionSet.questions) {
+    // Rotation answers vote on no axis: the Meter stays put and the rotation fold reads the answers.
+    if (rotating) for (const id of session.questionIds) {
+      const question = ctx.rotation!.questions.find(candidate => candidate.id === id)!;
+      const option = question.options.find(candidate => candidate.id === byId.get(id));
+      if (!option) {
+        const elsewhere = session.questionIds.some(other => ctx.rotation!.questions.find(q => q.id === other)!.options.some(item => item.id === byId.get(id)));
+        return { response: fail(elsewhere ? 'option_question_mismatch' : 'unknown_option', 'An option does not belong to its question.', current.state) };
+      }
+      answers.push({ questionId: id, optionId: option.id, questionText: question.text, optionLabel: option.label });
+    }
+    for (const question of rotating ? [] : questionSet.questions) {
       const optionId = byId.get(question.id);
       const option = question.options.find(candidate => candidate.id === optionId);
       if (!option) {
@@ -256,10 +301,11 @@ export function submitProposal(ctx: SurveyContext, body: unknown): ServiceOutcom
     const next = applyProposalVotes(current.state, normalizedVotes, submittedAt);
     const requestJson = canonicalRequest(request);
     ctx.db.prepare(`INSERT INTO proposal_events (id, run_id, guest_session_id, canonical_request_json, question_set_version,
-        algorithm_version, answers_json, votes_json, revision_before, revision_after, before_state_json, after_state_json, submitted_at, station_id, display_at)
-      VALUES (?, ?, ?, ?, ?, 2, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-      .run(request.submissionId, current.runId, session.id, requestJson, questionSet.version, JSON.stringify(answers),
-        JSON.stringify(normalizedVotes), current.state.revision, next.revision, JSON.stringify(current.state), JSON.stringify(next), submittedAt, session.stationId ?? null, displayAt);
+        algorithm_version, answers_json, votes_json, revision_before, revision_after, before_state_json, after_state_json, submitted_at, station_id, display_at, question_kind)
+      VALUES (?, ?, ?, ?, ?, 2, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run(request.submissionId, current.runId, session.id, requestJson, session.questionSetVersion, JSON.stringify(answers),
+        JSON.stringify(normalizedVotes), current.state.revision, next.revision, JSON.stringify(current.state), JSON.stringify(next), submittedAt, session.stationId ?? null, displayAt,
+        rotating ? 'rotation' : 'axes');
     ctx.db.prepare("UPDATE proposal_sessions SET status = 'submitted', submitted_at = ?, experience_until = ? WHERE id = ?")
       .run(submittedAt, session.stationId ? new Date(displayMs + RESULT_LEASE_MS).toISOString() : null, session.id);
     writeExhibitionSnapshot(ctx.db, next);
@@ -269,7 +315,7 @@ export function submitProposal(ctx: SurveyContext, body: unknown): ServiceOutcom
 
     const row = ctx.db.prepare('SELECT * FROM proposal_events WHERE id = ?').get(request.submissionId);
     if (!row) throw new CorruptStateError('proposal insert did not produce a row');
-    const proposal = proposalRecordOf(ctx.db, row);
+    const proposal = recordOf(ctx, row);
     return {
       response: { ok: true, data: { proposal, state: next, replayed: false, ...displayWait(ctx, proposal) } },
       event: { type: 'city-state-updated', submissionId: proposal.id, state: next, proposal, view: viewOf(ctx, next), ...displayWait(ctx, proposal) },

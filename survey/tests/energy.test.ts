@@ -1,3 +1,4 @@
+import { SCHEMA_VERSION } from '../src/server/migrations.ts';
 import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -64,10 +65,11 @@ try {
   const oldView = currentView(ctx);
   const oldRows = ctx.db.prepare('SELECT * FROM proposal_events').all();
   // Recreate a real pre-E4 database shape, then open it with the actual migration.
-  ctx.db.exec('ALTER TABLE exhibition_snapshots DROP COLUMN energy_json; PRAGMA user_version = 7');
+  ctx.db.exec(`ALTER TABLE exhibition_snapshots DROP COLUMN energy_json; ALTER TABLE proposal_sessions DROP COLUMN question_kind;
+    ALTER TABLE proposal_events DROP COLUMN question_kind; PRAGMA user_version = 7`);
   ctx.db.close();
   ctx = createContext({ dbPath: path, questionsPath: CURRENT_EXHIBITION_QUESTIONS_PATH, now: () => new Date(clock) });
-  assert.equal(ctx.db.prepare('PRAGMA user_version').get()?.user_version, 8);
+  assert.equal(ctx.db.prepare('PRAGMA user_version').get()?.user_version, SCHEMA_VERSION);
   assert.deepEqual(currentView(ctx), oldView, 'upgrade preserves the inherited city and all old records');
   assert.deepEqual(ctx.db.prepare('SELECT * FROM proposal_events').all(), oldRows);
   assert.equal(errorCode(getProposalSession(ctx, oldDraft.session.id)), 'unsupported_version');

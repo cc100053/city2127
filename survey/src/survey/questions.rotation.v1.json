@@ -2,7 +2,7 @@
   "kind": "rotation",
   "version": 1,
   "draft": true,
-  "source": "Text and labels are SURVEY_V2 P-variant placeholders (questionPool.v1.json) until the plan 5.1 exhibition wording is approved. Models, lots, initial options and online flags follow docs/QUESTION_ROTATION_PLAN.md section 2; initial options are provisional (owner decision pending).",
+  "source": "Text and labels are SURVEY_V2 P-variant placeholders (questionPool.v1.json) until the plan 5.1 exhibition wording is approved. Owner 2026-11-18: all nine questions are drawn now, Q04 included; a site without a model stays empty until its model is done. Models, lots and initial options follow docs/QUESTION_ROTATION_PLAN.md section 2; null means not built or not sited; initial options are provisional.",
   "questions": [
     {
       "id": "Q01",
@@ -33,7 +33,7 @@
     {
       "id": "Q02",
       "text": "お台場に新しい自動運転の水上バスが登場した。どうする？",
-      "online": false,
+      "online": true,
       "initial": "A",
       "options": [
         {
@@ -59,7 +59,7 @@
     {
       "id": "Q03",
       "text": "たまに使う小型の乗り物が必要になった。どうする？",
-      "online": false,
+      "online": true,
       "initial": "A",
       "options": [
         {
@@ -85,7 +85,7 @@
     {
       "id": "Q04",
       "text": "街のAIが、あなたの好みを覚えるとしたら？",
-      "online": false,
+      "online": true,
       "initial": "A",
       "options": [
         {
@@ -111,7 +111,7 @@
     {
       "id": "Q05",
       "text": "真夏のお台場を歩くなら、暑さにどう対応したい？",
-      "online": false,
+      "online": true,
       "initial": "A",
       "options": [
         {
@@ -137,7 +137,7 @@
     {
       "id": "Q06",
       "text": "長く使った家具が古くなった。どうする？",
-      "online": false,
+      "online": true,
       "initial": "B",
       "options": [
         {
@@ -163,7 +163,7 @@
     {
       "id": "Q07",
       "text": "日用品を買うとき、どう受け取りたい？",
-      "online": false,
+      "online": true,
       "initial": "A",
       "options": [
         {
@@ -189,7 +189,7 @@
     {
       "id": "Q08",
       "text": "お台場で休日を過ごすなら、どんな場所が使いやすい？",
-      "online": false,
+      "online": true,
       "initial": "C",
       "options": [
         {
@@ -215,7 +215,7 @@
     {
       "id": "Q09",
       "text": "仕事が早く終わって、自由な午後ができたら何をしたい？",
-      "online": false,
+      "online": true,
       "initial": "A",
       "options": [
         {

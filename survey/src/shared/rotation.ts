@@ -5,7 +5,10 @@
  */
 
 export type RotationOption = { id: string; label: string; modelId: string | null; lotId: string | null };
-/** `online`: all three models accepted and placed, so the question may be drawn. `initial`: the option shown when a run starts. */
+/**
+ * `online`: the owner's switch for drawing the question (owner 2026-11-18: all nine, before every model exists;
+ * a swap to an option without a model leaves its site empty until the model is placed). `initial`: the option shown when a run starts.
+ */
 export type RotationQuestion = { id: string; text: string; online: boolean; initial: string; options: RotationOption[] };
 /** `draft`: copy is a placeholder until RESIDENT_COPY approves the exhibition wording (plan 5.1). */
 export type RotationSet = { kind: 'rotation'; version: number; draft: boolean; questions: RotationQuestion[] };
@@ -112,8 +115,12 @@ export function crowdShare(tallies: RotationTallies, questionId: string, optionI
 
 export type RotationFold = { state: RotationState; tallies: RotationTallies; outcomes: RotationOutcome[] };
 
-/** Rebuilds the city from the run's active proposals in stamp order; Undo, snapshot and reconnect all call this. */
-export function foldRotation(set: RotationSet, submissions: Iterable<RotationSubmission>): RotationFold {
+/**
+ * Rebuilds the city from the run's active proposals in stamp order; Undo, snapshot and reconnect all call this.
+ * `onStep` sees each proposal's outcome and the tallies including it, for that proposal's crowd shares.
+ */
+export function foldRotation(set: RotationSet, submissions: Iterable<RotationSubmission>,
+  onStep?: (index: number, step: { outcome: RotationOutcome; tallies: RotationTallies }) => void): RotationFold {
   let state = initialRotation(set), tallies = emptyTallies(set), last = 0;
   const outcomes: RotationOutcome[] = [];
   for (const submission of submissions) {
@@ -122,6 +129,7 @@ export function foldRotation(set: RotationSet, submissions: Iterable<RotationSub
     const step = rotationStep(set, state, submission);
     state = step.state;
     tallies = addTallies(tallies, submission.answers);
+    onStep?.(outcomes.length, { outcome: step.outcome, tallies });
     outcomes.push(step.outcome);
   }
   return { state, tallies, outcomes };
