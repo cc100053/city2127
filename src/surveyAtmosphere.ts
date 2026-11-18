@@ -237,7 +237,8 @@ export function residentResult(proposal: ExhibitionProposal, changes?: readonly 
         place = '沖のエネルギー島'; effect = after.island ? '沖に、原子力施設を置く島と検修橋が加わりました。' : '沖のエネルギー島と検修橋は配置から外れました。';
       }
     }
-    effect = `ほかの住民の声と重なり、${effect}`;
+    // Version4 changes come from many voices; a rotation swap is this guest's own answer (plan 3.7), so it takes no shared prefix.
+    if (!swap) effect = `ほかの住民の声と重なり、${effect}`;
   } else if (changes) {
     const direction = AXES.some(axis => proposal.beforeScores[axis] !== proposal.afterScores[axis]);
     kind = direction ? 'direction' : 'maintained';

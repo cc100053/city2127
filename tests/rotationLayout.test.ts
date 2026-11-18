@@ -50,6 +50,7 @@ const toC = residentResult(proposal({ kind: 'swap', questionId: 'Q01', from: 'B'
 assert.equal(toC.kind, 'configuration');
 assert.match(toC.preference, /自分の都合でいつでも使えるサービス/);
 assert.match(toC.effect, /自律サービスの端口が増えました/);
+assert.equal(toC.effect, 'この拠点では、自分の都合で使える自律サービスの端口が増えました。', 'a rotation swap is the guest\'s own answer: no shared-voices prefix');
 const toA = residentResult(proposal({ kind: 'swap', questionId: 'Q01', from: 'C', to: 'A' }, 'A'), [{ ...nwFocal[0], low: true }]);
 assert.match(toA.preference, /人に相談できる日常/);
 assert.match(toA.effect, /人に相談できる窓口が増えました/, 'the direct C→A jump reads as more counters');
