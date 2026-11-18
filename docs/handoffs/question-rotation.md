@@ -103,7 +103,7 @@
 - 新 run 各題起始模型未定（題組現填暫定值）。
 - 模擬：10 題時少數 run 有模型全日未出場（見上表），gate 未卡此配置。
 - 1.7 未以 version4 真人答案分佈重跑（未檢查本機 SQLite 是否有真人資料）。
-- 蓮花受電仍為 draft，未選址。
+- 蓮花受電已選址（owner 2026-11-18）：南部公園西岸外海 (−712, 300)，空置態為淨海面＋保留機房平台；放置在 `feat/bay-flower-placement` 按 place-building 逐輪做，未放入城市。
 - 待 owner：舊能源部件逐件去留；群眾比例少人數門檻（建議 10 票）；Q02 離場模型的變化是否播出。
 - 已核實（2026-11-18）：Q01 −1↔+1 直接跳由 AUTO HUB `retarget` 處理（見上），不經 `buildTransition.ts`；其他題的直接跳待各自模型接入時核實。
 - 已決（owner 2026-11-18）：Q01 換模型的效果句去掉「ほかの住民の声と重なり、」前綴（計劃 3.7）；version4 照舊。
@@ -112,7 +112,7 @@
 
 ## Next expected step
 
-**現時：** 階段 2 Q01 已接（`rotationLayout.ts`），輪換投票旅程方案 A 已做（`voteJourney.ts`），2.6 結果卡群眾比例已做（hologram 看板未做）。Q02 城市接線待蓮花受電在城市選址（`place-building`）及三個地塊空置態。下一步：owner 看 Q01 B→C／C→A 實拍及上列兩個待決事項；其餘題按模型完成次序接入（Q02 起需 2.1 地塊目錄及 2.2 `lotRuntime`，因三個模型各有地塊）；或 owner 決定把輪換設為預設並開新 run（要同步 AGENTS.md／SPEC 敘事原則，計劃 6.7）。階段 4 內容製作可並行。
+**現時：** 階段 2 Q01 已接（`rotationLayout.ts`），輪換投票旅程方案 A 已做（`voteJourney.ts`），2.6 結果卡群眾比例已做（hologram 看板未做）。Q02 城市接線待蓮花受電放置（`feat/bay-flower-placement` R1 起）及三個地塊空置態。下一步：owner 看 Q01 B→C／C→A 實拍及上列兩個待決事項；其餘題按模型完成次序接入（Q02 起需 2.1 地塊目錄及 2.2 `lotRuntime`，因三個模型各有地塊）；或 owner 決定把輪換設為預設並開新 run（要同步 AGENTS.md／SPEC 敘事原則，計劃 6.7）。階段 4 內容製作可並行。
 
 
 （已完成，保留作紀錄）階段 1 切片二：server 接線。先讀 `survey/src/server/runStore.ts`（`runProposalLadder` fold 位置）、`context.ts`、`sessionService.ts`、`answerService.ts`、`migrations.ts`、`protocol.ts`、`twoStations.test.ts`，然後：
