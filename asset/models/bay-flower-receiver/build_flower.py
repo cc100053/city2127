@@ -9,7 +9,7 @@ design waterline y = 0. The shore station sits to -x/+z (SHORE). Exported hierar
   Q02B_Root
     Q02B_Receiver     petals, frame, dome, floating base, lights
     Q02B_SubseaLink   glass stem under the base and the sea-bed duct to the shore
-    Q02B_ShoreStation arched glass landing pavilion where the duct comes ashore
+    Q02B_ShoreStation machine room on a short platform off the promenade, its arched pipe end facing along the shore
     Q02B_LightBeam    the beam from orbit and its flare: hide or delete it on its own
 """
 import json
@@ -30,19 +30,45 @@ BEAM_TOP = 900.0            # beam height; the app may scale Q02B_LightBeam in y
 S = 1.5                     # receiver scale; people by the pavilion in the image make the flower ≈ 120–130 m across
 # petal rings: count, angular offset (fraction of a step), hinge radius, hinge height, length, start/end pitch (deg from
 # horizontal), max width, cup depth (fraction of width); lengths in units of S
-RINGS = tuple((n, o, r * S, y * S, L * S, a0, a1, W * S, c) for n, o, r, y, L, a0, a1, W, c in (
+# OPEN: bloom (owner 2026-11-18), degrees each ring's petals tilt outward about their hinge. Both pitches drop by the
+# same angle, so the petal keeps its curvature; seats, arms, ribs, shoes and ring beams sample the petal and follow.
+OPEN = (3.0, 16.5, 30.0)    # outer / middle / inner ring, mean opening (bloom round 2: middle +6.5°, inner +12.5°)
+# Neighbours in a ring overlap sideways and are cupped alike, so identical petals cross at the overlap. Even petals open
+# LAYER degrees less and odd ones LAYER more (every ring has an even count): each even petal lies wholly over both
+# neighbours, an inner and an outer layer as in a lotus. Openings per ring: outer 0.5–5.5°, middle 14–19°, inner
+# 27.5–32.5°. 2.5° is the smallest tried that keeps shells, rims, spine ribs and root shoes apart (the middle ring's rims
+# still touched at 2.2°).
+LAYER = (2.5, 2.5, 2.5)
+# support arms per ring (outer / middle / inner): head position along the petal (u, on its outer face) and how far
+# inside the hinge circle the deck foot stands. The arm must reach its head from below: a curved petal lies under the
+# straight hinge-to-head line, so a shallow arm cuts the petal before its head.
+ARM_HEAD_U = (.38, .32, .26)
+ARM_FOOT_IN = (2.5, 3.5, 2.5)   # outer 3.5 → 2.5 (bloom round 2): the less-open outer petals' arms cut them at 79 %
+RINGS = tuple((n, o, r * S, y * S, L * S, a0 - op, a1 - op, W * S, c) for (n, o, r, y, L, a0, a1, W, c), op in zip((
     (18, 0.0, 15.5, 4.6, 29.0, 20, 44, 14.0, .08),
     (16, .5, 13.0, 5.8, 23.0, 40, 66, 12.0, .09),
     (12, .25, 10.5, 7.0, 23.0, 56, 82, 10.0, .1),
-))
+), OPEN))
+
+
+def petal_ring(ri, k):
+    """Ring parameters for petal k of ring ri, with its layer offset applied to both pitches."""
+    ring, d = RINGS[ri], LAYER[ri] * (1 if k % 2 == 0 else -1)
+    return ring[:5] + (ring[5] + d, ring[6] + d) + ring[7:]
 PANEL_UV = (4.0, 8.0)       # texture tiles across / along each petal: 8 x 16 cells, ≈ 2.6 m on the outer ring
 PANEL_TEX = 256             # px per tile; 2 x 2 cells with thin silver frames
 SEAM_TEX = 256              # px per guard-plate / pontoon tile: seams on the tile edges, fastener dots along them
 SEGS = 24                   # pontoon segments
 JUNCTION_A = math.radians(142.5)  # collar pipe junction: toward the shore duct, between two inner petals
-PIPE_R, PIPE_Y = 1.5, 4.4   # sea-bed duct radius; its axis height where it runs level into the machine room
-RISER_F = 21.0              # riser position, metres seaward of the shore-station origin (past the revetment)
+PIPE_R, PIPE_Y = 1.5, 4.4   # duct radius; its axis height where it runs level out of the machine-room front
 SKIRT = .45                 # machine-room kick band height
+# shore platform (shore frame: f seaward, s along the shore toward the reference camera; the promenade edge is f -6).
+# The machine room's long axis runs along +s, so the reference camera sees its landward side and its arched pipe end.
+QY = 1.5                    # platform top, level with the promenade
+PLAT_F, PLAT_S = (-6.0, 12.0), (-10.0, 14.0)   # platform extent: promenade edge to the seaward rail, back end to pipe end
+ROOM_F, ROOM_S = 3.0, -3.0  # machine-room axis line (f) and its local origin along the shore (room spans s -7…7)
+DROP_S, RUN_Y = 18.5, -5.0  # the duct turns down past the platform end at s DROP_S and runs along the shore at RUN_Y
+TURN_S = 34.0               # where the shore run bends toward the flower base
 DRUM_R, DECK_Y = 17.5 * S, 2.4 * S
 DOME_R, DOME_Y = 8.0 * S, 15.0 * S
 
@@ -113,16 +139,18 @@ def pipe(acc, pts, r, sides=6, caps=True):
 
 
 def arc_path(pts, rad, n=6):
-    """Polyline with each inner corner replaced by an n-step fillet of radius ~rad."""
+    """Polyline with each inner corner replaced by an n-step fillet of radius ~rad (one value, or one per corner)."""
     out = [pts[0]]
-    for a, b, c in zip(pts, pts[1:], pts[2:]):
+    rads = rad if isinstance(rad, (list, tuple)) else [rad] * (len(pts) - 2)
+    for a, b, c, rad in zip(pts, pts[1:], pts[2:], rads):
         d0, d1 = norm(tuple(y - x for x, y in zip(a, b))), norm(tuple(y - x for x, y in zip(b, c)))
         p0, p1 = add(b, d0, -rad), add(b, d1, rad)
         for i in range(n + 1):  # quadratic Bezier through the corner
             t = i / n
             out.append(tuple((1 - t) ** 2 * x + 2 * t * (1 - t) * y + t * t * z for x, y, z in zip(p0, b, p1)))
     out.append(pts[-1])
-    return out
+    # drop repeated points (a fillet as long as its segment): pipe() frames collapse on a zero-length segment
+    return [p for i, p in enumerate(out) if i == 0 or math.dist(p, out[i - 1]) > 1e-6]
 
 
 def petal(acc, skin, ring, theta, nu=10, nv=6):
@@ -334,20 +362,33 @@ def receiver_base(A):
         obox(A["glow"], P(rd + .84, DECK_Y + .65, l), (.25, .25, .1), L, R)
 
 
+def frame_at(ox, oz, F):
+    """Local frame at (ox, oz) on the waterline: Lp(f, y, s) -> three.js point, f along F, s = F turned 90° (xz)."""
+    Sv = (-F[1], F[0])
+    return (lambda f, y, s: (ox + F[0] * f + Sv[0] * s, y, oz + F[1] * f + Sv[1] * s)), F, Sv
+
+
 def shore_frame():
     """Shore-station frame: f seaward (toward the flower), s along the shore, origin at SHORE on the waterline.
     Returns Lp(f, y, s) -> three.js point, and the f / s unit vectors in the xz plane."""
     sx, sz = SHORE
     d = norm((sx, 0, sz))
-    F, Sv = (-d[0], -d[2]), (d[2], -d[0])
-    return (lambda f, y, s: (sx + F[0] * f + Sv[0] * s, y, sz + F[1] * f + Sv[1] * s)), F, Sv
+    return frame_at(sx, sz, (-d[0], -d[2]))
 
 
-def duct(A, Lp):
-    """Cyan-blue sea-bed duct: out of the stem, along the sea bed, up a large-radius riser past the revetment and level
-    into the machine-room front. Joint collars every ~7 m and at the riser elbows, thin dark seams between collars."""
-    corners = [(0, -7.0, 0), (0, -13.5, 0), Lp(RISER_F, -13.5, 0), Lp(RISER_F, PIPE_Y, 0), Lp(4.0, PIPE_Y, 0)]
-    path = arc_path(corners, 5.0, 10)
+def room_frame(Lp, Sv):
+    """Machine-room frame: its f runs along the shore (+s, toward the pipe end), its s points landward."""
+    o = Lp(ROOM_F, 0, ROOM_S)
+    return frame_at(o[0], o[2], Sv)
+
+
+def duct(A, Lp, Lr):
+    """Cyan-blue duct: up out of the stem foot, along the bay floor to the shore, along the shore under the water,
+    up past the platform end and level into the flange on the machine room's arched front (Lr: room frame).
+    Joint collars every ~7 m and at the two drop elbows, thin dark seams between collars."""
+    corners = [(0, -6.0, 0), (0, -10.0, 0), Lp(ROOM_F, RUN_Y, TURN_S), Lp(ROOM_F, RUN_Y, DROP_S),
+               Lp(ROOM_F, PIPE_Y, DROP_S), Lr(4.0, PIPE_Y, 0)]
+    path = arc_path(corners, [4.0, 14.0, 4.5, 4.5], 10)
     pipe(A["duct"], path, PIPE_R, 20)
     run, total, marks = 0.0, 0.0, []
     for a, b in zip(path, path[1:]):
@@ -365,11 +406,11 @@ def duct(A, Lp):
             pipe(A["sub_frame"], [add(c, u, -.35), add(c, u, .35)], PIPE_R + .25, 20)
         else:                             # seam between collars
             pipe(A["duct_seam"], [add(c, u, -.05), add(c, u, .05)], PIPE_R + .03, 20)
-    for k in (2, 3):                      # collars at both ends of the two riser elbows
+    for k in (3, 4):                      # collars at both ends of the two drop elbows
         cnr, prev, nxt = corners[k], corners[k - 1], corners[k + 1]
-        for o, sgn in ((prev, -1), (nxt, 1)):
+        for o in (prev, nxt):
             u = norm(tuple(x - y for x, y in zip(o, cnr)))
-            c = add(cnr, u, 5.0)
+            c = add(cnr, u, 4.9)
             pipe(A["sub_frame"], [add(c, u, -.4), add(c, u, .4)], PIPE_R + .3, 20)
 
 
@@ -466,17 +507,24 @@ def side_elevation(A, box, sg, hw, FY, WT, bays):
 
 
 def shore_station(A, Lp, F, Sv):
-    """Shore machine room on a quay: floor plate, columns, low walls, arched silver roof with glazed crown, exposed ribs;
-    pipe-entry wall with a three-layer flange and saddles; standing pipe sets inside; railings and a rock revetment."""
-    import random
-    rnd = random.Random(7)
+    """Shore machine room (room frame: f along its long axis toward the pipe end, s across): floor plate, columns, low
+    walls, arched silver roof with glazed crown, exposed ribs; pipe-entry wall with a three-layer flange and saddles;
+    standing pipe sets inside; service steps up to both side doors."""
     t, n = F, Sv                                   # obox axes: size = (along f, height, along s)
     box = lambda acc, f, y, s, sf, sy, ss: obox(acc, Lp(f, y, s), (sf, sy, ss), t, n)
-    QY, FY = 1.5, 1.8                              # quay top, room floor
+    FY = 1.8                                       # room floor (platform top QY)
     f0, f1, hw = -4.0, 10.0, 5.5                   # room back / front face, half width
-    # quay body and the room floor plate
-    box(A["pav_base"], 4.05, (QY - 4.0) / 2, 0, 19.9, QY + 4.0, 30.0)
+    # room floor plate (a 1 m apron round the walls) and a service step up to each side door
     box(A["pav_frame"], (f0 + f1) / 2, (QY + FY) / 2, 0, f1 - f0 + 2.0, FY - QY, 2 * hw + 2.0)
+    for sg in (-1, 1):
+        box(A["pav_frame"], 4.75, QY + .075, sg * (hw + 1.45), 2.6, .15, .9)                 # lower tread
+        box(A["pav_trim"], 4.75, QY + .155, sg * (hw + 1.88), 2.6, .02, .05)                  # tread nosing
+        box(A["pav_trim"], 4.75, FY - .005, sg * (hw + .97), 2.0, .02, .05)                   # apron nosing
+        for fs in (3.35, 6.15):                                                                # short grab rails
+            pts = [Lp(fs, QY + .15, sg * (hw + 1.75)), Lp(fs, FY, sg * (hw + .85))]
+            for p in pts:
+                pipe(A["pav_frame"], [p, (p[0], p[1] + .95, p[2])], .04, 6)
+            pipe(A["pav_frame"], [(p[0], p[1] + .95, p[2]) for p in pts], .04, 6)
     # columns with feet and capitals (the ribs bear on the capitals), wall plates, side elevations
     cols = [f0, -.5, 3.0, 6.5, f1]
     spring, WT, CT = 6.6, 8.0, 8.45                # gable spring, side-wall top, column top under the rib
@@ -581,31 +629,86 @@ def shore_station(A, Lp, F, Sv):
     for s in (-3.0, 3.0):
         cyl(A["pav_frame"], *(lambda p: (p[0], p[2]))(Lp(-2.4, 0, s)), 1.0, FY, FY + 3.2, 16)
         cyl(A["pav_glow"], *(lambda p: (p[0], p[2]))(Lp(-2.4, 0, s)), 1.03, FY + 2.2, FY + 2.4, 16)
-    # short railings on the quay edges (gap where the duct leaves), rock revetment on the water sides
-    def rail(pts):
-        for p in pts[::2]:
-            pipe(A["pav_frame"], [p, (p[0], p[1] + 1.05, p[2])], .05, 4)
-        for h in (.55, 1.05):
-            pipe(A["pav_frame"], [(p[0], p[1] + h, p[2]) for p in pts], .05, 4)
-    ef = 13.85
-    for s0, s1 in ((-14.8, -2.8), (2.8, 14.8)):
-        rail([Lp(ef, QY, s0 + (s1 - s0) * k / 12) for k in range(13)])
-    for s in (-14.8, 14.8):
-        rail([Lp(-5.8 + (ef + 5.8) * k / 20, QY, s) for k in range(21)])
-    for k in range(3):                                  # three rock rows stepping down into the water
-        for j in range(19):
-            s = -16.5 + 33 * j / 18 + rnd.uniform(-.4, .4)
-            if k == 2 and abs(s) < 2.4:                 # leave the riser clear
+
+
+def platform(A, Lp):
+    """Short platform jutting from the promenade into the water (shore frame). Light-grey paving tiles on a grout
+    bed, a coping kerb with a dark drip fascia on the three water edges, a slim rail with low bollard lights along
+    them (open where the duct drops past the pipe end), a small planter on the promenade side, and the rock
+    revetment at the old spacing (≈1.75 m per rock, three rows), kept clear of the duct drop."""
+    import random
+    rnd = random.Random(7)
+    (fa, fb), (sa, sb) = PLAT_F, PLAT_S
+    _, F_, S_ = shore_frame()
+    box = lambda acc, f, y, s, sf, sy, ss: obox(acc, Lp(f, y, s), (sf, sy, ss), F_, S_)
+    cp = .45                                            # coping width on the water edges
+    box(A["pav_base"], (fa + fb) / 2, (QY - .04 - 3.5) / 2, (sa + sb) / 2, fb - fa, QY - .04 + 3.5, sb - sa)  # body
+    # paving: 1.2 m tiles, 3 cm grout joints, none under the room's floor plate or the planter
+    room_f, room_s = (ROOM_F - 6.5, ROOM_F + 6.5), (ROOM_S - 5.0, ROOM_S + 11.0)
+    plant_f, plant_s = (fa + .3, fa + 2.2), (sa + 1.2, sa + 7.2)
+    inside = lambda f, s, r_f, r_s: r_f[0] < f < r_f[1] and r_s[0] < s < r_s[1]
+    nf, ns = round((fb - cp - fa) / 1.2), round((sb - sa - 2 * cp) / 1.2)
+    tf, ts = (fb - cp - fa) / nf, (sb - sa - 2 * cp) / ns
+    for i in range(nf):
+        for j in range(ns):
+            f, s = fa + tf * (i + .5), sa + cp + ts * (j + .5)
+            if inside(f, s, room_f, room_s) or inside(f, s, plant_f, plant_s):
                 continue
-            c = Lp(14.9 + 1.6 * k + rnd.uniform(-.3, .3), .5 - 1.4 * k, s)
-            blob(A["rock"], c, (rnd.uniform(.9, 1.3), rnd.uniform(.7, 1.0), rnd.uniform(.9, 1.3)), 2 if k == 0 else 1,
-                 rnd.uniform(0, 9), .22)
-        for side in (-1, 1):
-            for j in range(12):
-                f = -5.5 + 19.5 * j / 11 + rnd.uniform(-.4, .4)
-                c = Lp(f, .5 - 1.4 * k, side * (15.9 + 1.6 * k + rnd.uniform(-.3, .3)))
-                blob(A["rock"], c, (rnd.uniform(.9, 1.3), rnd.uniform(.7, 1.0), rnd.uniform(.9, 1.3)), 2 if k == 0 else 1,
-                     rnd.uniform(0, 9), .22)  # rows above water (k 0) get the finer mesh
+            box(A["pav_tile"], f, QY - .02, s, tf - .03, .04, ts - .03)
+    # coping kerb on the three water edges, dark drip fascia below it
+    for f, s, lf, ls in ((fb - cp / 2, (sa + sb) / 2, cp, sb - sa), ((fa + fb) / 2, sa + cp / 2, fb - fa, cp),
+                         ((fa + fb) / 2, sb - cp / 2, fb - fa, cp)):
+        box(A["pav_tile"], f, QY + .02, s, lf, .12, ls)
+    box(A["pav_trim"], fb + .03, QY - .3, (sa + sb) / 2, .06, .4, sb - sa + .06)
+    for s in (sa - .03, sb + .03):
+        box(A["pav_trim"], (fa + fb) / 2, QY - .3, s, fb - fa, .4, .06)
+    # slim rail on the coping: posts every ~1.5 m, a top rail and two thin rails; gap at the pipe end for the duct
+    gap = (ROOM_F - 3.0, ROOM_F + 3.0)
+
+    def rail(pts):
+        for p in pts:
+            pipe(A["pav_frame"], [p, (p[0], p[1] + 1.1, p[2])], .035, 6)
+        for h, r in ((1.1, .045), (.7, .02), (.35, .02)):
+            pipe(A["pav_frame"], [(p[0], p[1] + h, p[2]) for p in pts], r, 6)
+    y0, ef, es0, es1 = QY + .08, fb - cp / 2, sa + cp / 2, sb - cp / 2
+    rail([Lp(fa + .2 + (ef - fa - .2) * k / 12, y0, es0) for k in range(13)])
+    rail([Lp(ef, y0, es0 + (es1 - es0) * k / 16) for k in range(17)])
+    rail([Lp(ef - (ef - gap[1]) * k / 4, y0, es1) for k in range(5)])
+    rail([Lp(gap[0] - (gap[0] - fa - .2) * k / 6, y0, es1) for k in range(7)])
+    # low bollard lights just inside the rail: corners, mid-edge and both sides of the pipe gap
+    for f, s in ((ef - .7, es0 + .7), (ef - .7, (es0 + es1) / 2), (ef - .7, es1 - .7), (fa + 1.0, es0 + .7),
+                 (gap[0] - .6, es1 - .7), (gap[1] + .6, es1 - .7), (fa + 1.0, es1 - .7)):
+        cyl(A["pav_frame"], *(lambda p: (p[0], p[2]))(Lp(f, 0, s)), .14, QY, QY + .8, 12)
+        cyl(A["pav_glow"], *(lambda p: (p[0], p[2]))(Lp(f, 0, s)), .15, QY + .62, QY + .74, 12)
+        cyl(A["pav_frame"], *(lambda p: (p[0], p[2]))(Lp(f, 0, s)), .2, QY + .8, QY + .86, 12)   # cap
+    # planter on the promenade side, by the room's back end: kerb, soil, shrubs and one small tree
+    (pa, pb), (qa, qb) = plant_f, plant_s
+    for f, s, lf, ls in (((pa + pb) / 2, qa, pb - pa, .2), ((pa + pb) / 2, qb, pb - pa, .2),
+                         (pa, (qa + qb) / 2, .2, qb - qa), (pb, (qa + qb) / 2, .2, qb - qa)):
+        box(A["pav_frame"], f, QY + .2, s, lf, .4, ls)
+    box(A["pav_soil"], (pa + pb) / 2, QY + .3, (qa + qb) / 2, pb - pa - .2, .1, qb - qa - .2)
+    for k in range(7):
+        c = Lp(pa + .6 + (pb - pa - 1.2) * (k % 2), QY + .6, qa + .7 + (qb - qa - 1.4) * k / 6)
+        blob(A["pav_plant"], c, (rnd.uniform(.55, .75), rnd.uniform(.45, .6), rnd.uniform(.55, .75)), 1,
+             rnd.uniform(0, 9), .2)
+    tc = Lp((pa + pb) / 2, 0, (qa + qb) / 2)
+    cyl(A["pav_soil"], tc[0], tc[2], .11, QY + .3, QY + 2.3, 8)
+    blob(A["pav_plant"], (tc[0], QY + 2.9, tc[2]), (1.0, .9, 1.0), 2, 3.0, .2)
+    # rock revetment on the three water edges (three rows stepping down), clear of the duct drop at the pipe end
+    def rocks(k, f, s):
+        c = Lp(f, .5 - 1.4 * k, s)
+        blob(A["rock"], c, (rnd.uniform(.9, 1.3), rnd.uniform(.7, 1.0), rnd.uniform(.9, 1.3)), 2 if k == 0 else 1,
+             rnd.uniform(0, 9), .22)  # rows above water (k 0) get the finer mesh
+    for k in range(3):
+        out = .9 + 1.6 * k + rnd.uniform(-.3, .3)
+        for j in range(15):                              # seaward edge
+            rocks(k, fb + out, sa - 1.0 + (sb - sa + 2.0) * j / 14 + rnd.uniform(-.4, .4))
+        for s_edge, sg in ((sa, -1), (sb, 1)):           # both ends
+            for j in range(11):
+                f = fa + .5 + (fb - fa - .5) * j / 10 + rnd.uniform(-.4, .4)
+                if sg > 0 and abs(f - ROOM_F) < 3.0:
+                    continue
+                rocks(k, f, s_edge + sg * (.9 + 1.6 * k + rnd.uniform(-.3, .3)))
 
 
 def build():
@@ -643,14 +746,14 @@ def build():
         row = []
         for k in range(n):
             th = 2 * math.pi * (k + off) / n
-            topf, botf = petal(A["panel"], A["shell"], ring, th)
+            topf, botf = petal(A["panel"], A["shell"], petal_ring(ri, k), th)
             for v in (-1, 1):
                 pipe(A["frame"], [topf(u / 12, v * .98) for u in range(13)], .2, 5)
             petal_back_details(A, topf, botf)
             hinge_seat(A, botf(.02, 0), th)
-            head_u = (.38, .32, .26)[ri]
+            head_u = ARM_HEAD_U[ri]
             for dv in (-.3, .3):
-                foot_r = ring[2] - (2.5 if ri == 2 else 3.5)
+                foot_r = ring[2] - ARM_FOOT_IN[ri]
                 foot = (foot_r * math.cos(th + dv * .2), DECK_Y, foot_r * math.sin(th + dv * .2))
                 support_arm(A, foot, botf(head_u, dv), th)
             row.append(botf(head_u, 0))
@@ -678,8 +781,10 @@ def build():
         sweep(A["sub_glow"], lambda k: circle_pts(0, 0, 3.95, 32, k), [(0, yy - .25), (0, yy + .25)], caps=(False, False),
               want=lambda c: (c[0], 0, c[2]))
     Lp, F, Sv = shore_frame()
-    duct(A, Lp)
-    shore_station(A, Lp, F, Sv)
+    Lr, Fr, Sr = room_frame(Lp, Sv)
+    duct(A, Lp, Lr)
+    platform(A, Lp)
+    shore_station(A, Lr, Fr, Sr)
     # ---- the beam from orbit (own node)
     cyl(A["beam_core"], 0, 0, .45, top_y + .6, BEAM_TOP, 12)
     cyl(A["beam_glow"], 0, 0, 1.8, top_y + .9, BEAM_TOP - 1, 16)
@@ -815,7 +920,10 @@ def mats():
         "duct": m("duct_cyan", (.36, .66, .76, 1), .22, .55),            # sea-bed duct and the pipes in the room
         "duct_ring": m("duct_ring", (.55, .72, .80, 1), .25, .8),        # duct joint collars
         "duct_seam": m("duct_seam", (.06, .10, .13, 1), .4),             # thin seams between collars
-        "quay": m("quay_stone", (.50, .49, .47, 1), .85),                # shore platform
+        "quay": m("quay_stone", (.50, .49, .47, 1), .85),                # shore platform body, read as grout joints
+        "pav_tile": m("paving_lightgrey", (.74, .74, .72, 1), .8),       # platform paving tiles and coping
+        "pav_plant": m("planting_green", (.16, .34, .12, 1), .9),        # planter shrubs and tree crown
+        "pav_soil": m("planter_soil", (.20, .15, .11, 1), .95),          # planter soil and tree trunk
         "rock": m("revetment_rock", (.46, .45, .42, 1), .95),            # revetment boulders
         "pav_roof": m("roof_white", (.92, .93, .94, 1), .35, .3),        # machine-room roof eaves
         "pav_rib": m("rib_matte_silver", (.80, .82, .85, 1), .5, .75),   # roof ribs, purlins, fascias; petal spine ribs
@@ -839,7 +947,7 @@ GROUPS = {
     "Q02B_Receiver": ("panel", "shell", "frame", "petal_rib", "petal_shoe", "piston", "collar", "grille", "recess", "dome", "base", "dark", "glow", "aperture"),
     "Q02B_SubseaLink": ("sleeve", "core", "sub_glow", "duct", "sub_frame", "duct_seam"),
     "Q02B_ShoreStation": ("pav_glass", "pav_frame", "pav_rib", "pav_roof", "pav_wall", "pav_trim", "pav_base", "pav_core",
-                          "pav_pipe", "pav_door", "pav_louvre", "pav_glow", "rock"),
+                          "pav_pipe", "pav_door", "pav_louvre", "pav_glow", "pav_tile", "pav_plant", "pav_soil", "rock"),
     "Q02B_LightBeam": ("beam_core", "beam_glow"),
 }
 SHARED = {"sub_frame": "duct_ring", "sub_glow": "glow", "pav_base": "quay", "pav_core": "core", "pav_glow": "glow",

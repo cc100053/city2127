@@ -1,8 +1,8 @@
 # bay-flower-receiver — Q02-B bay flower space-solar receiver (draft model)
 
 - Owner: repository owner (requester); implementation by Claude
-- Status: IN_PROGRESS (shape delivered for owner review; not placed)
-- Branch: `feat/bay-flower-receiver`
+- Status: IN_PROGRESS (shore-platform round awaiting owner review of position; not placed)
+- Branch: `feat/bay-flower-shore-platform` (earlier rounds: `feat/bay-flower-receiver`, merged to main in `100816b`)
 - Base commit: `f40ffbc0e3e9b5a73da8f4a86fa75ff1190f2f09`
 - Last verified commit: the commit that adds this file (asset, scripts and checks below ran on its tree before commit)
 - Remote availability: `origin/feat/bay-flower-receiver`
@@ -72,6 +72,24 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
   - Every petal also gets a low spine rib (r 0.16, `rib_matte_silver`) and a root shoe: role `petal_shoe` (`collar_bluegrey`), 0.35 m proud over the first 12 % of the petal and a little wider than the root, with four bolt heads running from the plate surface through the shoe.
   - The inner panel grid is untouched (pixel-identical to `9e5c077`).
   - Metrics: with beam 89,907 tris, 35 meshes; without beam 89,091 tris, 33 meshes. Export: Blender 5.2 glTF, GLB, +Y up, no animation/camera/light, no compression.
+- Shore-platform round (owner 2026-11-18, branch `feat/bay-flower-shore-platform` from `origin/main` `100816b`; the owner's left reference image was not attached, so the round follows `references/q02-b.jpg` around the pavilion). Petals, panel grid, receiver base and the machine room's own material details are unchanged.
+  - Room position: `room_frame()` turns the machine room so its long axis runs along the shore (+s, toward the reference camera). The reference camera now sees its landward side and its arched pipe end together. Room axis at f 3, spanning s −7…7 (`ROOM_F`, `ROOM_S`).
+  - Duct: it leaves the flange on the arched front heading +s, runs level over the service space, then drops past the platform end at s 18.5 through two 4.5 m elbows (collars at both ends of each). Under the water it runs along the shore at y −5 to s 34, bends toward the flower on a 14 m radius, and climbs into the stem foot. `arc_path` now takes one radius per corner and drops repeated points; a fillet as long as its segment had collapsed the whole pipe.
+  - `platform()` (shore frame, f −6…12, s −10…14, top y 1.5 = promenade): body; light-grey 1.2 m tiles with 3 cm joints (none under the room's floor plate or the planter); a coping kerb on the three water edges with a dark drip fascia; a slim rail (posts, top rail, two thin rails) on the coping, open over the duct drop; seven low bollard lights; a planter (kerb, soil, seven shrubs, one small tree) on the promenade side by the room's back end. The rock revetment runs on the three water edges at the old spacing (≈ 1.6–1.9 m per rock, three rows) and stays clear of the drop.
+  - Room: service steps (tread, nosings, two grab rails) up to both side doors.
+  - New materials `paving_lightgrey`, `planting_green`, `planter_soil`. New review camera `--cam platform`. The `shore`, `front` and `side` cameras still frame the room's old position.
+  - Metrics: with beam 93,831 tris, 38 meshes; without beam 93,015 tris, 36 meshes; GLB 3,525,924 / 3,507,188 bytes.
+- Bloom round (owner 2026-11-18, same branch, on top of the shore-platform round, whose room, platform and duct are unchanged). The owner's view image was not attached; the reference camera (`--cam ref`) stands in for the oblique front view.
+  - `OPEN` tilts each ring's petals outward about their hinge, lowering both pitches by the same angle so the curvature stays: outer 3°, middle 10°, inner 17.5°. Tip heights go from 27.7/34.7/41.6 m to about 25.7/30.5/36 m, so the rings still step down from inner to outer.
+  - Neighbours in a ring overlap sideways by several metres and were already crossing before this round: 46 pairs, every neighbour pair, at u ≈ 0.3–0.7. Narrowing the petals to 0.85 of their width did not clear it. `LAYER` now gives even petals 2.5° less opening and odd petals 2.5° more (`petal_ring()`), so each ring lies in two layers. Resulting openings: outer 0.5–5.5°, middle 7.5–12.5°, inner 15–20°. 2.2° on the middle ring still let the rims touch.
+  - Seats, arms, spine ribs, root shoes and ring beams sample the petal, so they follow it with no code change.
+  - Metrics: tris unchanged (93,831 / 93,015). GLB 3,529,608 / 3,510,872 bytes.
+- Bloom round 2 (owner 2026-11-18, same branch). The owner's view image was not attached; `--cam ref` stands in for the oblique front view.
+  - `OPEN` becomes outer 3° (unchanged), middle 16.5° (+6.5°) and inner 30° (+12.5°). With `LAYER` ±2.5° the openings are outer 0.5–5.5°, middle 14–19°, inner 27.5–32.5°. Tip heights are about 30.4 / 27.4 / 25.7 m.
+  - Judged in the reference view: the receiver base under the dome now shows fully, and the inner ring shows more panel. The front-row petals, mostly the outer ring, still show their backs.
+  - Middle at +8° was not taken: tips would drop to 29.2 / 26.6 / 25.7 m, leaving under 1 m between the middle and outer rings.
+  - Support arms are now `ARM_HEAD_U` / `ARM_FOOT_IN` constants. On the less-open outer petals (even k, already since bloom round 1), the arm's centreline entered the petal underside at 79 % of its length, short of its head. The outer foot moved from 3.5 m to 2.5 m inside the hinge circle. Every arm now reaches its head from below (first hit ≥ 1.0 of its length), and the foot block stays clear of the hinge-seat plate.
+  - Metrics: tris unchanged; GLB 3,529,036 / 3,510,300 bytes.
 - Inferred (not readable in the image): petal count per ring, strut layout, pontoon below water, sub-sea depth, pavilion interior terminal, beam height, the overall scale (from people by the pavilion).
 
 ## Actual validation results
@@ -115,6 +133,22 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
   - `glb-reimport-side` and `glb-reimport-petal` were rendered from the re-imported no-beam GLB and match.
 - GLB re-import of both files: the beam node is present only in the with-beam file. Colours, metallic, roughness and alpha of `rib_matte_silver`, `wall_warm_white`, `trim_dark_bluegrey`, `pavilion_glass` and `duct_cyan` came through as set. The petal spine-rib and root-shoe meshes are present, and the guard plates are linked to `q02b_petal_plates` on `UVMap`. Panel textures still match `9e5c077` exactly.
 - QA: the root-shoe bolts on the steeper middle and inner petals first floated; they now start at the plate surface. No non-rock part floats.
+- Shore-platform round evidence, `~/city2127-evidence/bay-flower-receiver/platform-r1/`, 64 samples, one shared sun:
+  - `after-ref/compare.jpg` (reference left, with-beam render right, also copied to the asset folder), `after-ref/beam.png` and `after-ref/nobeam.png`, the latter from the `-nobeam` file.
+  - `after-platform/nobeam.png`: close-up of the arched front, flange, drop elbows and platform. `before-platform/nobeam.png` is the same camera on a copy of the round-10 file (`before-nobeam.blend`).
+  - GLB re-import of both files: with beam 93,831 tris and 38 meshes, `Q02B_LightBeam` present; without beam 93,015 tris and 36 meshes, beam absent. The three new materials came through in both.
+- Bloom round evidence, `~/city2127-evidence/bay-flower-receiver/bloom-r1/`, 64 samples, one shared sun. Before renders come from a copy of the shore-platform-round files (`before*.blend`).
+  - `before-after-nobeam-ref.jpg`: the reference camera, no beam.
+  - `before-after-nobeam-top.jpg`: new `--cam top`, straight down.
+  - `after-ref/compare.jpg` and `beam.png`: the with-beam overall view.
+- Overlap check (a scratch Blender script; it builds every petal alone through the builder's own `petal_ring()`): 0 petal–petal overlaps. The petals were checked with their shells, rims, spine ribs and root shoes; the previous geometry had 46. Support arms (to 90 % of their length), ring-beam spans and hinge seats show 0 overlaps against other petals. Arm heads lie within 1.4 cm of their own petal's outer face, and seat pins sit on the root (0 m).
+- GLB re-import: the petal meshes (`panel`, `shell`, `frame`, `petal_rib`, `petal_shoe`, `piston`) have identical vertex hashes in the with-beam and no-beam files, and only the with-beam file has `Q02B_LightBeam`.
+- Bloom round 2 evidence, `~/city2127-evidence/bay-flower-receiver/bloom-r2/`:
+  - `before-after-nobeam-ref.jpg`; the before image comes from a copy of the bloom-round-1 file.
+  - `after-ref/compare.jpg` and `beam.png`.
+  - Overlap check: 0 petal–petal, arm–petal, beam–petal, seat–petal and arm–arm overlaps.
+  - Joints: arm heads lie within 1.4 cm of their petal, and seats sit on the roots.
+  - The petal meshes have identical vertex hashes in the with-beam and no-beam GLBs.
 - `npm run build`: passed. `git diff --cached --check`: clean.
 - `npm test` (Windows 11, Node 24.19, checkout under `OneDrive\文件`): `assetLibrary.test.ts` passes with the new row. Two local leftovers, `asset/models/ship-refs-2127` and `car-candidates-2127`, hold only git-ignored caches from other branches and fail that test unless parked; they were parked for the run and restored. `surveyMeterPipeline.test.ts` and `energyPipeline.test.ts` FAIL on this machine before any of this task's code runs: `survey/tests/surveyFixture.ts` turns a `file://` URL path into `C:\C:\…\%E6%96%87%E4%BB%B6\…` (percent-encoded non-ASCII folder name), so the question JSON is not found. Not caused by this task, not fixed here. Every other test in the `npm test` list passed when run one at a time.
 - Application verification: NOT INTEGRATED.
@@ -132,4 +166,4 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
 
 ## Next expected step
 
-Owner reviews round 10 (`r10-final/before-after-nobeam-*.jpg`) and confirms which image was meant by "the first image"; then either another shape round or a placement task (site, shoreline, beam behaviour in the app).
+The owner reviews the bloom (`bloom-r2/before-after-nobeam-ref.jpg`; earlier `bloom-r1/`) and the shore-platform position (`platform-r1/`). Merge `feat/bay-flower-shore-platform` into main only once the owner confirms both.
