@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS（R1 完成，待 owner 判定）
 - Branch: `feat/bay-flower-placement`（2026-11-18 由 `origin/main` 開出）
 - Base commit: `6724989bbff0ff8a0f65a9ee6e2a23f778e7ede3`
-- Last verified commit: NONE（本節只寫文件，未改程式）
+- Last verified commit: `2f519b0f`（R1）
 - Remote availability: `origin/feat/bay-flower-placement`
 
 ## Session Git state
@@ -133,9 +133,11 @@
 
 ## Actual validation results
 
-- Verification status: NOT RUN（只有文件；地塊驗證見「選址」）
-- Date and checked commit/worktree: 2026-11-18，`origin/main` `6724989b` 上的 DEV 頁面（`feat/question-rotation` 工作樹，城市西岸部分與 main 相同）
-- Integrated commit and checks: NOT INTEGRATED
+- Verification status: PASS（R1）
+- Date and checked commit/worktree: 2026-11-18，`2f519b0f`，main checkout `feat/bay-flower-placement`
+- Root `npm test` exit 0（含新 `bayFlower.test.ts`），`npm run build` 通過，`git diff --check` 無輸出；Blender 5.2.2 重建兩個 GLB 無錯誤
+- FPS：hero 1920 × 1080 headed Chrome，前 60.0／60.0，後 59.9／59.9（日／夜，vsync 封頂）
+- Integrated commit and checks: NOT INTEGRATED（待 owner 接受）
 
 ## Known issues and blockers
 
@@ -143,6 +145,6 @@
 
 ## Next expected step
 
-Owner 開新 session，貼上 round prompt 開始 R1：
+Owner 判定 R1（截圖 `~/city2127-evidence/bay-flower-placement/r1/`），並答「待 owner」三題。開新 session：
 
-> place-building round for `bay-flower-placement`: worktree `/Users/fatboy/city2127`（main checkout，branch `feat/bay-flower-placement`）, read `docs/handoffs/bay-flower-placement.md`. Owner verdict on R0: «decide session 接受 (−712, 300)».
+> place-building round for `bay-flower-placement`: worktree `/Users/fatboy/city2127`（main checkout，branch `feat/bay-flower-placement`）, read `docs/handoffs/bay-flower-placement.md`. Owner verdict on R1: «…».
