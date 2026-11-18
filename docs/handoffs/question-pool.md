@@ -50,6 +50,12 @@ Record the planning team's nine SURVEY_V2 questions and their nine internal para
 - 2026-11-18 (user): implement the new question text and parameters as a separate pool next to the existing survey; do not change the parameter algorithm, the number of questions answered, or how the city moves — the leader decides selection (1 or 4 from the pool) and scoring.
 - SURVEY_V2.md stays the only hand-edited source; the JSON is generated.
 
+## Follow-up: preview page (2026-11-18, `feat/question-pool-preview`)
+
+- `survey/pool.html` + `survey/src/ui/poolPreview.ts`/`.css` render the pool with the guest terminal look: P/U toggle (`?v=P|U`), Q01–Q09 steps, A/B/C with reason (U also city change), notes and hypotheses, and a summary of the nine parameters with the chosen answers. In-memory only; no API call, storage or scoring.
+- `survey/tsconfig.json` gains `resolveJsonModule`; `vite.config.ts` builds `pool.html`; `server.ts` serves it at `/pool`.
+- Checked: headless Chrome screenshots of P and U at 1000 px (`~/city2127-evidence/question-pool-preview/`), `survey` test/build.
+
 ## Next expected step
 
 Leader decides how questions are drawn from the pool and how the nine parameters are scored/shown; then a new task wires the pool into the proposal flow. Owner shares the team's feedback PDF for the next survey revision.

@@ -35,7 +35,7 @@ const mime: Record<string, string> = {
   '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml',
 };
 /** Debug pages from the Vite build. /admin is loopback-only like the admin API. */
-const pages: Record<string, string> = { '/guest': 'guest.html', '/monitor': 'monitor.html', '/admin': 'admin.html' };
+const pages: Record<string, string> = { '/guest': 'guest.html', '/monitor': 'monitor.html', '/admin': 'admin.html', '/pool': 'pool.html' };
 
 class HttpError extends Error {
   readonly status: number;
