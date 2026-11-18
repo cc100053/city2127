@@ -1,7 +1,7 @@
 """Preview renders of the Q02-B bay flower, with and without its light beam, and a reference/model comparison.
 
 blender -b --factory-startup --python-exit-code 1 -P review_flower.py -- <out_dir> [--samples N] [--only beam|nobeam|clay]
-    [--cam ref|close] [--blend <file.blend>]
+    [--cam ref|close|root|dome] [--blend <file.blend>]
 Every camera shares the same sun and sky (set from the reference camera), so before/after renders compare like for like.
 Writes <out_dir>/beam.png, nobeam.png, clay.png (one grey, no emission, no beam: silhouette check) and
 compare.jpg (references/q02-b.jpg left, beam render right, same size). Staging (sea, sea bed, shore promenade, sky,
@@ -25,7 +25,10 @@ SHORE = (-95.0, 56.0)  # same as build_flower.SHORE
 # camera from the reference image's viewpoint, three.js coords: position, look-at, focal length (36 mm sensor width)
 CAM = ((-80.0, 88.0, 235.0), (-24.0, 15.0, 10.0), 38.0)
 # --cam close: low three-quarter view, near petals show their outer backs, far petals their inner panels
-CAMS = {"ref": CAM, "close": ((-34.0, 70.0, 100.0), (4.0, 16.0, 0.0), 36.0)}
+# --cam root: just above the water outside the pontoon, looking up under the petals at seats, arms and segments
+CAMS = {"ref": CAM, "close": ((-34.0, 70.0, 100.0), (4.0, 16.0, 0.0), 36.0),
+        "root": ((-16.0, 5.0, 52.0), (0.0, 8.0, 22.0), 24.0),
+        "dome": ((-18.0, 62.0, 40.0), (0.0, 22.0, 0.0), 40.0)}  # down into the cup: dome bearing ring and brackets
 
 
 def mat(name, rgba, rough=.5, alpha=None):

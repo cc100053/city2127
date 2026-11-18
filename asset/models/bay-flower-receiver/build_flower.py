@@ -21,7 +21,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
-from geo_helpers import Acc, B, circle_pts, cyl, finish_mesh, material, newell, sweep  # noqa: E402
+from geo_helpers import Acc, B, circle_pts, cyl, finish_mesh, material, newell, obox, sweep  # noqa: E402
 
 ID = "bay-flower-receiver"
 SHORE = (-95.0, 56.0)       # shore station centre (x, z)
@@ -36,6 +36,8 @@ RINGS = tuple((n, o, r * S, y * S, L * S, a0, a1, W * S, c) for n, o, r, y, L, a
 ))
 PANEL_UV = (4.0, 8.0)       # texture tiles across / along each petal: 8 x 16 cells, ≈ 2.6 m on the outer ring
 PANEL_TEX = 256             # px per tile; 2 x 2 cells with thin silver frames
+SEAM_TEX = 256              # px per guard-plate / pontoon tile: seams on the tile edges, fastener dots along them
+SEGS = 24                   # pontoon segments
 DRUM_R, DECK_Y = 17.5 * S, 2.4 * S
 DOME_R, DOME_Y = 8.0 * S, 15.0 * S
 
@@ -51,6 +53,18 @@ def norm(a):
 
 def cross(a, b):
     return (a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
+
+
+class UAcc(Acc):
+    """Acc that also carries one UV per vertex; geometry pushed without UVs sits mid-tile (plain, no seam)."""
+
+    def __init__(self):
+        super().__init__()
+        self.uv = []
+
+    def _push(self, vs, fs):
+        super()._push(vs, fs)
+        self.uv += [(.5, .5)] * (len(self.v) - len(self.uv))
 
 
 def surf(acc, verts, faces, wants, uvs=None):
@@ -124,6 +138,7 @@ def petal(acc, skin, ring, theta, nu=10, nv=6):
         (ra, ya, aa), (rb, yb, ab) = spine[i], spine[i + 1]
         rr, yy, aa = ra + (rb - ra) * f, ya + (yb - ya) * f, aa + (ab - aa) * f
         w = max(W * (math.sin(math.pi * min(u, 1) ** .7) ** .5 + .15 * (1 - u) ** 2), .12)  # almond: full to near the tip
+        w *= .25 + .75 * min(1.0, u / .5) ** 1.2  # tapered root: gaps between neighbours over the lowest quarter
         N = (-math.sin(aa) * R[0], math.cos(aa), -math.sin(aa) * R[2])
         p = (R[0] * rr + Lt[0] * v * w / 2, yy, R[2] * rr + Lt[2] * v * w / 2)
         p = add(p, N, cup * w * v * v)
@@ -154,24 +169,89 @@ def petal(acc, skin, ring, theta, nu=10, nv=6):
     # panel UVs: across the petal 0..PANEL_UV[0], along it 0..PANEL_UV[1] texture tiles (2 x 2 cells per tile)
     uvs = [(j / nv * PANEL_UV[0], i / nu * PANEL_UV[1]) for i in range(nu + 1) for j in range(nv + 1)] + [(0, 0)] * nb
     surf(acc, verts, tf, tw, uvs)
-    surf(skin, verts, faces, wants)
+    # outer guard-plate seams follow the petal grid: 2 plates across (seam on the spine), 4 along
+    suv = [(j / nv * 2, i / nu * 4) for i in range(nu + 1) for j in range(nv + 1)]
+    surf(skin, verts, faces, wants, suv + suv)
     return (lambda u, v: at(u, v, 1)[0]), (lambda u, v: at(u, v, -1)[0])
 
 
+def drum(acc):
+    """Pontoon ring with UVs: one seam-texture tile per segment around, one per 3 m up; plain deck and hull caps."""
+    nc = SEGS * 3
+    sec = [(5.0, -4.0), (1.2, -1.6), (0.0, -.6), (0.0, DECK_Y - .5), (.5, DECK_Y)]
+    verts, uvs, faces, wants, v = [], [], [], [], 0.0
+    for si, (k, y) in enumerate(sec):
+        if si:
+            v += math.hypot(k - sec[si - 1][0], y - sec[si - 1][1]) / 3.0
+        for c in range(nc + 1):
+            a = 2 * math.pi * c / nc
+            verts.append(((DRUM_R - k) * math.cos(a), y, (DRUM_R - k) * math.sin(a)))
+            uvs.append((c / nc * SEGS, v))
+    for si in range(len(sec) - 1):
+        for c in range(nc):
+            a, b = si * (nc + 1) + c, (si + 1) * (nc + 1) + c
+            faces.append((a, a + 1, b + 1, b))
+            p = verts[a]
+            wants.append((p[0], 0, p[2]))
+    for (k, y), up in ((sec[0], -1), (sec[-1], 1)):  # caps on their own vertices, mid-tile UVs
+        base = len(verts)
+        verts += [((DRUM_R - k) * math.cos(2 * math.pi * c / nc), y, (DRUM_R - k) * math.sin(2 * math.pi * c / nc))
+                  for c in range(nc)]
+        uvs += [(.5, .5)] * nc
+        faces.append(tuple(range(base, base + nc)))
+        wants.append((0, up, 0))
+    surf(acc, verts, faces, wants, uvs)
+
+
+def hinge_seat(A, hp, th):
+    """Hinge seat under a petal root at hp: deck plate, column, two cheek plates and a dark pin across the petal."""
+    t, n = (math.cos(th), math.sin(th)), (-math.sin(th), math.cos(th))  # radial, lateral
+    cx, cz = hp[0] * .985, hp[2] * .985
+    top = hp[1] - 1.0
+    obox(A["frame"], (cx, DECK_Y + .15, cz), (2.6, .3, 2.6), t, n)
+    if top - DECK_Y > .3:
+        obox(A["frame"], (cx, (DECK_Y + top) / 2, cz), (1.3, top - DECK_Y, 1.3), t, n)
+    for s in (-.85, .85):
+        obox(A["frame"], (cx + n[0] * s, top + .55, cz + n[1] * s), (1.8, 1.7, .28), t, n)
+    pin_y = top + .75
+    pipe(A["piston"], [(cx - n[0] * 1.15, pin_y, cz - n[1] * 1.15), (cx + n[0] * 1.15, pin_y, cz + n[1] * 1.15)], .32, 10)
+
+
+def support_arm(A, foot, head, th):
+    """Diagonal support arm: deck mount, dark hydraulic sleeve on the lower 45 %, silver rod, head block."""
+    t, n = (math.cos(th), math.sin(th)), (-math.sin(th), math.cos(th))
+    obox(A["frame"], (foot[0], foot[1] + .3, foot[2]), (1.6, .6, 1.6), t, n)
+    base = (foot[0], foot[1] + .6, foot[2])
+    mid = tuple(a + .45 * (b - a) for a, b in zip(base, head))
+    pipe(A["piston"], [base, mid], .42, 8)
+    rod0 = tuple(a + .12 * (b - a) for a, b in zip(base, head))  # rod starts inside the sleeve: no coplanar end caps
+    pipe(A["frame"], [rod0, head], .24, 6)
+    obox(A["frame"], (head[0], head[1] - .25, head[2]), (.9, .6, .9), t, n)
+
+
 def build():
-    A = {k: Acc() for roles in GROUPS.values() for k in roles}
-    A["panel"].uv = []
-    # ---- floating base: pontoon drum with a dark window band and a ring of cyan lights
-    sweep(A["base"], lambda k: circle_pts(0, 0, DRUM_R, 72, k),
-          [(5.0, -4.0), (1.2, -1.6), (0.0, -.6), (0.0, DECK_Y - .5), (.5, DECK_Y)])
+    A = {k: (UAcc() if k in UV_ROLES else Acc()) for roles in GROUPS.values() for k in roles}
+    # ---- floating base: 24 pontoon segments (seams in the texture), joint pilasters, deck mounts, one light each
+    drum(A["base"])
     sweep(A["dark"], lambda k: circle_pts(0, 0, DRUM_R + .06, 72, k), [(0, .5), (0, 1.5)], caps=(False, False),
           want=lambda c: (c[0], 0, c[2]))
-    for i in range(48):
-        a = 2 * math.pi * i / 48
-        x, z = (DRUM_R + .12) * math.cos(a), (DRUM_R + .12) * math.sin(a)
-        cyl(A["glow"], x, z, .28, 2.0, 2.3, 6)
+    for i in range(SEGS):
+        a = 2 * math.pi * i / SEGS
+        t, n = (-math.sin(a), math.cos(a)), (math.cos(a), math.sin(a))  # along the rim, outward
+        obox(A["frame"], ((DRUM_R + .2) * n[0], (DECK_Y - .6) / 2, (DRUM_R + .2) * n[1]), (.9, DECK_Y + .6, .55), t, n)
+        obox(A["frame"], ((DRUM_R - .9) * n[0], DECK_Y + .3, (DRUM_R - .9) * n[1]), (1.4, .6, 1.8), t, n)
+        am = a + math.pi / SEGS  # indicator light mid-segment, under the deck edge
+        cyl(A["glow"], (DRUM_R + .1) * math.cos(am), (DRUM_R + .1) * math.sin(am), .22, 2.1, 2.35, 6)
     # ---- dome on its collar, meridian ribs, receiver aperture
     cyl(A["base"], 0, 0, DOME_R + .6, DECK_Y - .2, DOME_Y, 48)
+    # thick silver bearing ring where the dome meets the collar, with 16 brackets down to the collar
+    y0, y1 = DOME_Y - .9, DOME_Y + .8
+    sweep(A["frame"], lambda k: circle_pts(0, 0, DOME_R + 1.8, 64, k),
+          [(0, y0 + .25), (.25, y0), (2.4, y0), (2.4, y1), (.25, y1), (0, y1 - .25)], caps=(False, False), closed=True)
+    for i in range(16):
+        a = 2 * math.pi * i / 16
+        t, n = (-math.sin(a), math.cos(a)), (math.cos(a), math.sin(a))
+        obox(A["frame"], ((DOME_R + 1.2) * n[0], y0 - 1.3, (DOME_R + 1.2) * n[1]), (.45, 2.6, 1.6), t, n)
     sec = [(DOME_R * (1 - math.cos(math.radians(p))), DOME_Y + DOME_R * math.sin(math.radians(p))) for p in range(0, 86, 5)]
     sweep(A["dome"], lambda k: circle_pts(0, 0, DOME_R, 48, k), sec)
     for i in range(16):
@@ -185,7 +265,7 @@ def build():
     top_y = DOME_Y + DOME_R * math.sin(math.radians(85))
     cyl(A["frame"], 0, 0, 1.9, top_y - .3, top_y + .5, 24)
     cyl(A["aperture"], 0, 0, 1.4, top_y + .5, top_y + .65, 24)
-    # ---- petals with white rims and seams; hinges and struts
+    # ---- petals with silver rims; hinge seat and two diagonal support arms under every petal
     under = []
     for ri, ring in enumerate(RINGS):
         n, off = ring[0], ring[1]
@@ -195,22 +275,28 @@ def build():
             topf, botf = petal(A["panel"], A["shell"], ring, th)
             for v in (-1, 1):
                 pipe(A["frame"], [topf(u / 12, v * .98) for u in range(13)], .2, 5)
-            for v in (-.5, 0, .5):
-                pipe(A["frame"], [topf(u / 10, v) for u in range(1, 10)], .07, 3)
-            for u in (.3, .55, .78):
-                pipe(A["frame"], [topf(u, -1 + j / 4) for j in range(9)], .07, 3)
-            h0 = topf(0, 0)
-            hb = (h0[0] * .97, DECK_Y, h0[2] * .97)  # pedestal from the deck to the petal hinge
-            pipe(A["shell"], [hb, botf(.02, 0)], .55, 8)
-            row.append(botf(.42, 0))
-            if ri < 2:  # props from the deck edge / ring beam to the petal's underside
-                foot_r = DRUM_R - 1.0 if ri == 0 else DRUM_R - 6.0
-                for dv in (-.12, .12):
-                    f = (foot_r * math.cos(th + dv), DECK_Y, foot_r * math.sin(th + dv))
-                    pipe(A["frame"], [f, botf(.45 if ri == 0 else .3, dv * 6)], .26, 5)
+            hinge_seat(A, botf(.02, 0), th)
+            head_u = (.38, .32, .26)[ri]
+            for dv in (-.3, .3):
+                foot_r = ring[2] - (2.5 if ri == 2 else 3.5)
+                foot = (foot_r * math.cos(th + dv * .2), DECK_Y, foot_r * math.sin(th + dv * .2))
+                support_arm(A, foot, botf(head_u, dv), th)
+            row.append(botf(head_u, 0))
         under.append(row)
-    for row in under[:2]:  # ring beams joining the strut heads
+    for row in under[:2]:  # ring beams joining the arm heads of the outer and middle rings
         pipe(A["frame"], row + row[:1], .3, 5)
+    # ring truss under the outer hinge circle: deck chord, hinge-height chord, zig-zag lacing and posts
+    ro, rt = RINGS[0], 72
+    lo_r, lo_y = DRUM_R - .8, DECK_Y + .3
+    hi_r, hi_y = ro[2] * .98, ro[3] - 1.3
+    low = [(lo_r * math.cos(2 * math.pi * i / rt), lo_y, lo_r * math.sin(2 * math.pi * i / rt)) for i in range(rt + 1)]
+    high = [(hi_r * math.cos(2 * math.pi * (i + .5) / rt), hi_y, hi_r * math.sin(2 * math.pi * (i + .5) / rt))
+            for i in range(rt + 1)]
+    pipe(A["frame"], low, .22, 5)
+    pipe(A["frame"], high, .22, 5)
+    for i in range(rt):
+        pipe(A["frame"], [low[i], high[i]], .13, 4)
+        pipe(A["frame"], [high[i], low[i + 1]], .13, 4)
     # ---- sub-sea link: glass stem with glowing rings, elbow, duct to the shore station
     sx, sz = SHORE
     d = norm((sx, 0, sz))
@@ -278,7 +364,7 @@ def panel_images():
     Returns (base colour image, sRGB) and (metal-roughness image, non-colour: G roughness, B metallic), both packed."""
     n, c = PANEL_TEX, PANEL_TEX // 2
     x = np.arange(n)
-    edge = (x % c < 3) | (x % c > c - 4)                    # 6 px silver frame between cells (≈ 6 cm)
+    edge = (x % c < 1) | (x % c > c - 2)                    # 2 px frame between cells (≈ 2 cm), toned down
     bus = (x % (c // 4) == 0) & ~edge                       # faint busbars, 4 per cell each way
     line = edge[None, :] | edge[:, None]
     busm = (bus[None, :] | bus[:, None]) & ~line
@@ -286,24 +372,56 @@ def panel_images():
     blue = np.array([.33, .42, .52])                         # sRGB blue-grey
     tone = np.array([1.0, .96, 1.03, .98])[cell][..., None]
     col = blue * tone
-    col = np.where(busm[..., None], col * .85 + .15 * np.array([.62, .68, .75]), col)
-    col = np.where(line[..., None], np.array([.84, .86, .88]), col)
-    rough = np.where(line, .22, .30)
-    metal = np.where(line, .95, .35)
+    col = np.where(busm[..., None], col * .93 + .07 * np.array([.62, .68, .75]), col)
+    col = np.where(line[..., None], np.array([.53, .59, .66]), col)
+    rough = np.where(line, .26, .30)
+    metal = np.where(line, .7, .35)
     mr = np.stack([np.ones_like(rough), rough, metal], -1)
-    out = []
-    for name, px, space in (("q02b_panel_color", col, "sRGB"), ("q02b_panel_mr", mr, "Non-Color")):
-        img = bpy.data.images.new(name, n, n, alpha=False)
-        img.colorspace_settings.name = space
-        img.pixels.foreach_set(np.concatenate([px, np.ones((n, n, 1))], -1).astype(np.float32).ravel())
-        img.file_format = "PNG"
-        img.pack()
-        out.append(img)
-    return out
+    return [packed(name, px, space) for name, px, space in
+            (("q02b_panel_color", col, "sRGB"), ("q02b_panel_mr", mr, "Non-Color"))]
+
+
+def packed(name, px, space):
+    n = px.shape[0]
+    img = bpy.data.images.new(name, n, n, alpha=False)
+    img.colorspace_settings.name = space
+    img.pixels.foreach_set(np.concatenate([px, np.ones((n, n, 1))], -1).astype(np.float32).ravel())
+    img.file_format = "PNG"
+    img.pack()
+    return img
+
+
+def seam_image():
+    """Silver-white plate with a 2 px grey seam on every tile edge and small fastener dots 6 px inside the seams."""
+    n = SEAM_TEX
+    y, x = np.mgrid[0:n, 0:n]
+    col = np.ones((n, n, 3)) * np.array([.87, .88, .90])
+    seam = (x < 1) | (x > n - 2) | (y < 1) | (y > n - 2)
+    dots = np.zeros((n, n), bool)
+    for cx in list(range(16, n, 32)):
+        for cy in (6, n - 7):
+            dots |= (x - cx) ** 2 + (y - cy) ** 2 <= 2.5
+            dots |= (y - cx) ** 2 + (x - cy) ** 2 <= 2.5
+    col = np.where(dots[..., None], np.array([.66, .68, .72]), col)
+    col = np.where(seam[..., None], np.array([.50, .53, .58]), col)
+    return packed("q02b_plate_seams", col, "sRGB")
+
+
+def textured(name, img, rough, metal, uvmap="UVMap"):
+    """Principled material whose base colour is img on uvmap; constant roughness/metallic."""
+    mt = material(name, (.87, .88, .9, 1), rough)
+    nt = mt.node_tree
+    bsdf = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+    bsdf.inputs["Metallic"].default_value = metal
+    uv, tex = nt.nodes.new("ShaderNodeUVMap"), nt.nodes.new("ShaderNodeTexImage")
+    uv.uv_map, tex.image = uvmap, img
+    nt.links.new(uv.outputs["UV"], tex.inputs["Vector"])
+    nt.links.new(tex.outputs["Color"], bsdf.inputs["Base Color"])
+    return mt
 
 
 def panel_material():
-    """Blue-grey solar receiver panels with silver cell frames, as glTF base colour + metallic-roughness textures."""
+    """Blue-grey solar receiver panels with fine silver cell frames, as glTF base colour + metallic-roughness textures."""
     mt = material("q02b_petal_panel", (.18, .26, .38, 1), .3)
     nt = mt.node_tree
     bsdf = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
@@ -329,12 +447,14 @@ def mats():
         bsdf = next(n for n in mt.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
         bsdf.inputs["Metallic"].default_value = metal
         return mt
+    seams = seam_image()
     return {
         "panel": panel_material(),
-        "shell": m("petal_back_silver", (.90, .91, .93, 1), .25, .6),    # outer petal faces and hinge pedestals
-        "frame": m("frame_silver", (.90, .90, .91, 1), .25, .7),         # rims, seams, struts, ring beams, collars
+        "shell": textured("q02b_petal_back_silver", seams, .25, .6),     # outer guard plates, seams along the curve
+        "frame": m("frame_silver", (.90, .90, .91, 1), .25, .7),         # rims, seats, arms, truss, rings, collars
         "dome": m("dome_silver_blue", (.70, .82, .97, 1), .1, .9, (.55, .72, 1, 1), .15),
-        "base": m("base_white", (.80, .81, .82, 1), .55),
+        "base": textured("q02b_pontoon_segments", seams, .5, .15),      # 24 segments, seams and fasteners
+        "plain": m("base_white", (.80, .81, .82, 1), .55),
         "dark": m("window_band", (.04, .06, .08, 1), .25),
         "glow": m("light_cyan", (.25, .7, 1, 1), .4, 0, (.3, .78, 1, 1), 6.0),
         "aperture": m("aperture", (.85, .95, 1, 1), .2, 0, (.7, .9, 1, 1), 3.0),
@@ -348,12 +468,14 @@ def mats():
 
 
 GROUPS = {
-    "Q02B_Receiver": ("panel", "shell", "frame", "dome", "base", "dark", "glow", "aperture"),
+    "Q02B_Receiver": ("panel", "shell", "frame", "piston", "dome", "base", "dark", "glow", "aperture"),
     "Q02B_SubseaLink": ("sleeve", "core", "sub_frame", "sub_glow"),
     "Q02B_ShoreStation": ("pav_glass", "pav_frame", "pav_base", "pav_core", "pav_glow"),
     "Q02B_LightBeam": ("beam_core", "beam_glow"),
 }
-SHARED = {"sub_frame": "frame", "sub_glow": "glow", "pav_base": "base", "pav_core": "core", "pav_glow": "glow"}
+SHARED = {"sub_frame": "frame", "sub_glow": "glow", "pav_base": "plain", "pav_core": "core", "pav_glow": "glow",
+          "piston": "core"}
+UV_ROLES = ("panel", "shell", "base")  # accumulators with a UV map (textured materials)
 
 
 def main():
