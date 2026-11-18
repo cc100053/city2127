@@ -1,18 +1,18 @@
 # pod-frame-tower — 混凝土格架蛋艙塔（僅模型）
 
 - Owner: cc100053
-- Status: IN_PROGRESS（R4 已建，待業主判定）
+- Status: ACCEPTED（業主 2026-11-18 接受 R4 並指示合併 main；模型仍為 library draft，未選址）
 - Branch: `feat/pod-frame-tower`（由 `origin/main` `5d66cfa8` 開出；R1 於 R2 session 開始時 commit）
 - Base commit: `13f83e1566988a10e8798ec027c97ba10012654e`（R1 工作時的 HEAD，`codex/nw-focal-connections`）
 - Last verified commit: 見 `## R4` 驗證（R4 commit 於 `c742193` 之上；R3 為 `c742193`，R2 為 `c713fc9`，R1 為 `9ed3e7f6`）
-- Remote availability: `origin/feat/pod-frame-tower`（R4 已 push）
+- Remote availability: `origin/feat/pod-frame-tower`（R4 已 push）；已合併入 `origin/main`（merge commit `d0701e3`）
 
 ## Session Git state
 
 - Session starting branch and HEAD: `codex/nw-focal-connections` @ `c0034611`，其後另一 session 推進至 `13f83e15`。
 - Last fetched origin/main commit: `5d66cfa84ec5df682ff0d922b8e25d6267a29011`（2026-11-17 fetch 成功）
 - Local changes present at session start: 未追蹤 `Dev_QA.md`；另一 session 曾於同一 checkout 編輯 `src/`、docs（已由其 commit）。
-- Upstream integration status: NOT INTEGRATED
+- Upstream integration status: INTEGRATED（2026-11-18，`d0701e3`，見 `## R4` 合併）
 - Pending Git conflicts or synchronization blockers: `asset/models/LIBRARY.md` 在 `codex/nw-focal-connections` 與 `origin/main` 之間有差異（drawer-housing 列），所以 R1 改動不能直接帶去以 main 為基礎的新分支。
 
 ## Goal and acceptance criteria
@@ -300,6 +300,13 @@ R1 與目標的差距（依 `target-vs-model.jpg` 分析），已轉成下文 R2
 - 地面層在 `target3q` 中仍被遮擋；可考慮減少地面層前方的花床樹或把店面玻璃向外移。
 - 天台佔畫面仍多；可再把俯角降至約 20°，或請業主確認目標鏡頭。
 
+### 合併
+
+- 業主原話（2026-11-18）：「OK merge main and push」。
+- 於獨立 clone `/Users/fatboy/city2127-pod`：`git fetch --prune origin` 成功，`main` 快進至 `origin/main` `f40ffbc`，再 `git merge --no-ff feat/pod-frame-tower` 得 `d0701e3`，沒有衝突。主 checkout 未有改動。
+- 合併結果的檢查：`npm ci`、`npm ci --prefix survey`、`npm test`、`npm run build` 全部通過（exit 0）；`git diff --check origin/main..HEAD` 乾淨。`survey/`、`module-swap/` 沒有改動，因此沒有執行該兩個 package 的檢查。
+- polish-ladder **Record** 及 change sheet：本建築未選址，亦未接入任何 change unit，因此不適用。
+
 ## Next expected step
 
-業主判定 R4。若有意見，新開 session 做 R5：preflight 後在 `feat/pod-frame-tower` 上工作（可沿用獨立 clone `/Users/fatboy/city2127-pod`），把業主原話寫入 `## R4 verdict`，轉為 `## R5 brief`；上文「尚待處理」可作參考。業主接受後才合併 main。
+模型已合併入 main，仍為 library draft。選址、Meter 角色及放入城市須另開任務；如業主再要求修改，按上文「尚待處理」另開一輪。
