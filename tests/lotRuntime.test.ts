@@ -80,4 +80,12 @@ assert.equal(energy.getDiagnostics().farm.visible, false, 'back on the vote: no 
 energy.setTarget({ ...none, receiver: 'large' }, 6, true); energy.update(6, false);
 assert.equal(energy.getDiagnostics().farm.visible, true, 'version4 vote path unchanged');
 
+// Close-ups: each Q02 option names a headline shot that frames its own lot.
+const { SHOTS } = await import('../src/headlineCamera.ts');
+const { Q02_SHOTS } = await import('../src/rotationLayout.ts');
+for (const [option, lot] of [['A', 'q02-west-sea'], ['B', 'q02-bay-flower'], ['C', 'q02-farm-south']] as const) {
+  const { target } = SHOTS[Q02_SHOTS[option]], l = LOTS[lot];
+  assert.ok(Math.hypot(target[0] - l.x, target[2] - l.z) <= l.size / 2, `Q02 ${option} shot looks at its lot`);
+}
+
 console.log('lot runtime tests passed');

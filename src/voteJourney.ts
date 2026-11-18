@@ -8,7 +8,7 @@ import type { RotationOutcome } from '../survey/src/shared/rotation.ts';
 /** −1 / 0 / +1 per axis, as the server's proposal record and the root's parsed view both carry it. */
 type Votes = Readonly<Record<CityAxis, number> & { energy?: EnergyChoice }>;
 import { METER_COLORS } from './districtMeters.ts';
-import { changeSites, HOLOGRAMS } from './layout.ts';
+import { changeSites, HOLOGRAMS, LOTS } from './layout.ts';
 import { glowTexture } from './glowTexture.ts';
 
 const SOCKET: Record<CityAxis, keyof typeof changeSites> = { automation: 'nw', publicSharing: 'sw', environmentalPriority: 'ne', urbanConcentration: 'se' };
@@ -29,15 +29,19 @@ const voteColor = (axis: CityAxis, vote: number, energy = false) => new T.Color(
 
 /** Fixed lantern spot for guest `ordinal` on `axis`: a loose halo floating above the focal site's roofs (clear of trees and podiums), so a rebuild lands in the same place. */
 export function lanternSpot(ordinal: number, axis: CityAxis, energy = false): T.Vector3 {
-  const s = voteSite(axis, energy), i = ordinal * 4 + CITY_AXES.indexOf(axis);
-  const angle = hash(i) * Math.PI * 2, radius = Math.max(s.w, s.d) * s.scale * (.4 + .7 * Math.sqrt(hash(i + .5)));
-  return new T.Vector3(s.x + Math.cos(angle) * radius, 42 + 22 * hash(i + .25), s.z + Math.sin(angle) * radius);
+  const s = voteSite(axis, energy);
+  return spotAround(s.x, s.z, Math.max(s.w, s.d) * s.scale, ordinal * 4 + CITY_AXES.indexOf(axis));
+}
+/** Hashed halo point `i` around (x, z) within `extent` (a site's plan extent, metres). */
+function spotAround(x: number, z: number, extent: number, i: number): T.Vector3 {
+  const angle = hash(i) * Math.PI * 2, radius = extent * (.4 + .7 * Math.sqrt(hash(i + .5)));
+  return new T.Vector3(x + Math.cos(angle) * radius, 42 + 22 * hash(i + .25), z + Math.sin(angle) * radius);
 }
 
 // `axis`: a version4 vote (lands, leaves its axis lantern). Rotation runs: `rotation` is the outcome question's big orb (lands on its
 // site, leaves the guest's one lantern); `fade` is one of the other answers, which joins the crowd share and fades out at its apex.
 type Flight = { axis: CityAxis; vote: number; color: T.Color; curve: T.CatmullRomCurve3; start: number; landed: boolean; ordinal: number; energy: boolean; scans: readonly Omit<Scan, 'color' | 'start'>[];
-  mode?: 'rotation' | 'fade'; outcome?: RotationOutcome };
+  mode?: 'rotation' | 'fade'; outcome?: RotationOutcome; answers?: readonly Answer[] };
 /** Where a live headline actually changed: the district slots of the guest's axis (CarrierChange.points). */
 export type JourneyLanding = { readonly socketId: string; readonly points?: readonly { readonly x: number; readonly z: number; readonly r: number }[] };
 const MAX_LANDING_SCANS = 8;
@@ -54,24 +58,39 @@ export function landingFor(axis: CityAxis, energy: boolean, landing?: JourneyLan
 }
 type Scan = { x: number; z: number; r: number; color: T.Color; start: number };
 
-/** Rotation runs: the Meter site each question's models stand on. A question without a row has no site yet; its orb only fades. */
+/** Rotation runs: the Meter site each question's models stand on. A question without a row (or a lot, below) has no site yet; its orb only fades. */
 export const ROTATION_SITE_AXIS: Readonly<Record<string, CityAxis>> = { Q01: 'automation' };
-/** The guest's four rotation answers as flights: the outcome question lands on its site (Meter colour for a swap, neutral for a fallback), the rest fade. */
-export function rotationFlights(outcome: RotationOutcome, answers: readonly { questionId: string }[]): { questionId: string; axis?: CityAxis; color: string }[] {
+/** Q02's models each own a lot (layout LOTS); its orb lands on the lot of the model the outcome shows, in the energy vote's colour. */
+export const Q02_LOTS: Readonly<Record<string, keyof typeof LOTS>> = { A: 'q02-west-sea', B: 'q02-bay-flower', C: 'q02-farm-south' };
+const Q02_COLOR = '#75e2c2';
+/** Where a rotation outcome lands: ground point, plan extent (lantern halo; the scan ring is 1.15×), swap colour and the guest's lantern slot axis. */
+export type RotationSite = { x: number; z: number; extent: number; color: string; slot: CityAxis };
+type Answer = { questionId: string; optionId?: string };
+export function rotationSite(outcome: RotationOutcome, answers: readonly Answer[]): RotationSite | undefined {
   const axis = ROTATION_SITE_AXIS[outcome.questionId];
-  const fading = answers.filter(a => !axis || a.questionId !== outcome.questionId).map(a => ({ questionId: a.questionId, color: NEUTRAL }));
-  return axis ? [{ questionId: outcome.questionId, axis, color: outcome.kind === 'swap' ? METER_COLORS[axis] : NEUTRAL }, ...fading] : fading;
+  if (axis) { const s = voteSite(axis, false); return { x: s.x, z: s.z, extent: Math.max(s.w, s.d) * s.scale, color: METER_COLORS[axis], slot: axis }; }
+  if (outcome.questionId !== 'Q02') return undefined;
+  // A fallback keeps the guest's own (already shown) Q02 answer.
+  const option = outcome.kind === 'swap' ? outcome.to : answers.find(a => a.questionId === 'Q02')?.optionId;
+  const lot = option === undefined ? undefined : LOTS[Q02_LOTS[option]];
+  return lot && { x: lot.x, z: lot.z, extent: lot.size / 2, color: Q02_COLOR, slot: 'environmentalPriority' };
+}
+/** The guest's four rotation answers as flights: the outcome question lands on its site (its colour for a swap, neutral for a fallback), the rest fade. */
+export function rotationFlights(outcome: RotationOutcome, answers: readonly Answer[]): { questionId: string; site?: RotationSite; color: string }[] {
+  const site = rotationSite(outcome, answers);
+  const fading = answers.filter(a => !site || a.questionId !== outcome.questionId).map(a => ({ questionId: a.questionId, color: NEUTRAL }));
+  return site ? [{ questionId: outcome.questionId, site, color: outcome.kind === 'swap' ? site.color : NEUTRAL }, ...fading] : fading;
 }
 /** Guest `ordinal`'s one rotation lantern, over the site of the question it swapped or fell back to; none for a question without a site. */
-export function rotationLantern(ordinal: number, outcome: RotationOutcome): { slot: number; position: T.Vector3; color: T.Color; scale: number } | undefined {
-  const axis = ROTATION_SITE_AXIS[outcome.questionId];
-  if (!axis) return undefined;
-  const swap = outcome.kind === 'swap';
-  return { slot: ((ordinal - 1) % LANTERN_GUESTS) * CITY_AXES.length + CITY_AXES.indexOf(axis), position: lanternSpot(ordinal, axis),
-    color: new T.Color(swap ? METER_COLORS[axis] : NEUTRAL), scale: swap ? 1 : .7 };
+export function rotationLantern(ordinal: number, outcome: RotationOutcome, answers: readonly Answer[] = []): { slot: number; position: T.Vector3; color: T.Color; scale: number } | undefined {
+  const site = rotationSite(outcome, answers);
+  if (!site) return undefined;
+  const swap = outcome.kind === 'swap', axisIndex = CITY_AXES.indexOf(site.slot);
+  return { slot: ((ordinal - 1) % LANTERN_GUESTS) * CITY_AXES.length + axisIndex, position: spotAround(site.x, site.z, site.extent, ordinal * 4 + axisIndex),
+    color: new T.Color(swap ? site.color : NEUTRAL), scale: swap ? 1 : .7 };
 }
 /** What `playRotation` and `setRotationLanterns` read from a rotation proposal. */
-export type RotationJourney = { ordinal: number; answers: readonly { questionId: string }[]; rotation?: { outcome: RotationOutcome } };
+export type RotationJourney = { ordinal: number; answers: readonly Answer[]; rotation?: { outcome: RotationOutcome } };
 const VOICES_BOARD = new T.Vector3(...HOLOGRAMS.panels.find(p => p.id === 'voices')!.at);
 
 export class VoteJourney {
@@ -141,14 +160,14 @@ export class VoteJourney {
     const outcome = proposal.rotation?.outcome;
     if (!outcome) return;
     // No site: no orb lands, but the guest's lantern slots are still freed, as setRotationLanterns would.
-    if (!ROTATION_SITE_AXIS[outcome.questionId]) this.addRotationLantern(proposal.ordinal, outcome);
+    if (!rotationSite(outcome, proposal.answers)) this.addRotationLantern(proposal.ordinal, outcome, proposal.answers);
     const origin = this.origin();
     rotationFlights(outcome, proposal.answers).forEach((f, i) => {
       const color = new T.Color(f.color);
-      if (f.axis) {
-        const land = landingFor(f.axis, false), site = new T.Vector3(land.x, 6, land.z), apex = origin.clone().lerp(site, .55).setY(120);
+      if (f.site) {
+        const scans = [{ x: f.site.x, z: f.site.z, r: f.site.extent * 1.15 }], site = new T.Vector3(f.site.x, 6, f.site.z), apex = origin.clone().lerp(site, .55).setY(120);
         const curve = new T.CatmullRomCurve3([origin, origin.clone().lerp(apex, .5).setY(origin.y + 40), apex, site.clone().setY(70), site]);
-        this.flights.push({ axis: f.axis, vote: 0, color, curve, start: now + i * ORB_STAGGER, landed: false, ordinal: proposal.ordinal, energy: false, scans: land.scans, mode: 'rotation', outcome });
+        this.flights.push({ axis: f.site.slot, vote: 0, color, curve, start: now + i * ORB_STAGGER, landed: false, ordinal: proposal.ordinal, energy: false, scans, mode: 'rotation', outcome, answers: proposal.answers });
         return;
       }
       const apex = origin.clone().lerp(VOICES_BOARD, .45 + .1 * i).setY(110 + 14 * i);
@@ -171,15 +190,15 @@ export class VoteJourney {
   /** Rotation runs' immediate state: one lantern per proposal, over the site of the question it swapped or fell back to. */
   setRotationLanterns(history: readonly RotationJourney[]): void {
     this.cancel(); this.clearLanterns();
-    for (const p of history.slice(-LANTERN_GUESTS)) if (p.rotation) this.addRotationLantern(p.ordinal, p.rotation.outcome);
+    for (const p of history.slice(-LANTERN_GUESTS)) if (p.rotation) this.addRotationLantern(p.ordinal, p.rotation.outcome, p.answers);
   }
 
-  private addRotationLantern(ordinal: number, outcome: RotationOutcome): void {
+  private addRotationLantern(ordinal: number, outcome: RotationOutcome, answers: readonly Answer[]): void {
     // The guest's four slots are cleared first, so the 65th guest also drops the 1st guest's lantern, wherever it stood.
     const base = ((ordinal - 1) % LANTERN_GUESTS) * CITY_AXES.length;
     for (let i = 0; i < CITY_AXES.length; i++) this.lanterns.setMatrixAt(base + i, HIDDEN);
     this.lanterns.instanceMatrix.needsUpdate = true;
-    const lantern = rotationLantern(ordinal, outcome);
+    const lantern = rotationLantern(ordinal, outcome, answers);
     if (!lantern) return;
     this.dummy.position.copy(lantern.position); this.dummy.scale.setScalar(lantern.scale); this.dummy.updateMatrix();
     this.lanterns.setMatrixAt(lantern.slot, this.dummy.matrix); this.lanterns.setColorAt(lantern.slot, lantern.color);
@@ -212,7 +231,7 @@ export class VoteJourney {
           f.landed = true;
           for (const scan of f.scans) this.scanList.push({ ...scan, color: f.color, start: f.start + FLIGHT_SECONDS });
           // shortcut: the lantern stays in the focal halo (setLanterns can rebuild it without the change points), even when the orb landed on district slots.
-          if (f.mode === 'rotation') this.addRotationLantern(f.ordinal, f.outcome!);
+          if (f.mode === 'rotation') this.addRotationLantern(f.ordinal, f.outcome!, f.answers!);
           else if (f.mode !== 'fade') this.addLantern(f.ordinal, f.axis, f.vote, f.energy);
         }
         continue;

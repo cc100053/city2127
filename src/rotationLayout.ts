@@ -3,6 +3,7 @@
 // path a version4 ladder rung uses. Views without `rotation` (version4 runs) keep the server layout untouched.
 import { ladderLayout } from '../survey/src/shared/cityView.ts';
 import type { ExhibitionLayout, ExhibitionProposal, ExhibitionView } from './surveyView.ts';
+import type { ShotId } from './headlineCamera.ts';
 
 /** Q01 option → NW focal rung: A human window (−1), B human–machine (0), C fully automated with drones (+1). */
 export const Q01_NW_TIERS: Readonly<Record<string, number>> = { A: -1, B: 0, C: 1 };
@@ -40,3 +41,6 @@ export function q02Swap(proposal: ExhibitionProposal) {
   const outcome = proposal.rotation?.outcome;
   return outcome?.kind === 'swap' && outcome.questionId === 'Q02' && Q02_RESULTS[outcome.to] ? { from: outcome.from, to: outcome.to } : undefined;
 }
+
+/** Q02 option → the headline shot of its lot (headlineCamera SHOTS). */
+export const Q02_SHOTS: Readonly<Record<string, ShotId>> = { A: 'q02:hydro', B: 'q02:flower', C: 'q02:farm' };

@@ -8,7 +8,7 @@ import { STAGE_SLOTS } from './stages.ts';
 export { FLY_IN, FLY_OUT, shotTimeline } from './resultTimeline.ts';
 
 type Site = CarrierChange['socketId'];
-export type ShotId = `${Site}:${'focal' | 'district'}` | `${'nw' | 'sw' | 'se'}:${string}` | `energy:${'garden' | 'garden2' | 'ring' | 'wing' | 'farm' | 'island'}`;
+export type ShotId = `${Site}:${'focal' | 'district'}` | `${'nw' | 'sw' | 'se'}:${string}` | `energy:${'garden' | 'garden2' | 'ring' | 'wing' | 'farm' | 'island'}` | `q02:${'hydro' | 'flower' | 'farm'}`;
 type Pose = { position: [number, number, number]; target: [number, number, number] };
 export const SHOTS: Record<ShotId, Pose> = {
   'nw:focal': { position: [212, 64, -342], target: [40, 62, -300] },
@@ -42,6 +42,12 @@ export const SHOTS: Record<ShotId, Pose> = {
   'energy:wing': { position: [56, 64, -496], target: [125, 22, -424] },
   'energy:farm': { position: [-108, 68, 586], target: [-152, 26, 408] },
   'energy:island': { position: [-142, 66, -556], target: [-60, 4, -470] },
+  // Question rotation Q02 (2026-11-19): the owner-accepted placement views — the hydro terrace from the south-east (q02a-hydro-placement
+  // R1 focal-day), the bay flower from the open sea with its shore station behind (bay-flower-placement R1 focal-day, pulled back 20 %
+  // for this camera's 42° lens) — and the farm on its energy pose.
+  'q02:hydro': { position: [-285, 45, -255], target: [-372, 12, -168] },
+  'q02:flower': { position: [-894, 70, 96], target: [-690, 12, 300] },
+  'q02:farm': { position: [-108, 68, 586], target: [-152, 26, 408] },
 };
 /** Each stage's slots; the picker flies to the stage covering most changed slots. */
 export const VIEWPOINT_COVERAGE = STAGE_SLOTS;
@@ -84,6 +90,10 @@ export class HeadlineCamera {
   get active() { return this.shot !== null || this.returning; }
   /** Returns the shot it flies to (null when it stays at, or returns to, the hero pose). */
   play(changes: readonly CarrierChange[], now: number, displayMs = DISPLAY_MS): ShotId | null {
+    return this.playShot(this.pick(changes), now, displayMs);
+  }
+  /** The shot for `changes`' headline, choosing among a district's stage viewpoints. */
+  private pick(changes: readonly CarrierChange[]): ShotId | null {
     let shot = headlineShot(changes[0]);
     const change = changes[0];
     if (change?.district && !change.focalOnly && !change.energy && change.points?.length) {
@@ -95,6 +105,11 @@ export class HeadlineCamera {
         .sort((a, b) => b.count - a.count || (this.lastUsed.get(a.id) ?? -1) - (this.lastUsed.get(b.id) ?? -1));
       shot = choices[0]?.id ?? shot;
     }
+    return shot;
+  }
+  /** Flies to `shot` on the normal result timeline (null returns to, or stays at, the hero pose); a change without a Meter carrier
+   *  (question rotation Q02) names its shot directly. */
+  playShot(shot: ShotId | null, now: number, displayMs = DISPLAY_MS): ShotId | null {
     if (displayMs < DISPLAY_MS - 100 || (!shot && !this.active)) { this.cancel(); return null; }
     if (shot && Object.hasOwn(VIEWPOINT_COVERAGE, shot)) this.lastUsed.set(shot, this.sequence++);
     this.fromPosition.copy(this.camera.position); this.fromTarget.copy(this.controls.target);

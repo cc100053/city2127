@@ -27,7 +27,7 @@ import { build2127 } from './odaiba2127';
 import { bayWater, waterLights } from './bayWater';
 import { residentIdentity, scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
-import { rotationLayout } from './rotationLayout';
+import { q02Swap, Q02_SHOTS, rotationLayout } from './rotationLayout';
 import { LotRuntime } from './lotRuntime';
 import { bayFlowerShown } from './bayFlower';
 import { createCityChangeManager } from './createCityChangeManager';
@@ -316,7 +316,9 @@ try {
         else journey!.play(latest.votes,latest.ordinal,now,changes[0]?.headline&&changes[0].district&&!changes[0].focalOnly?changes[0]:undefined);
         // DEV demo: the headline shot is held BEAT_SECONDS longer after the building change, so 湊's visit fits before the return to hero.
         const visit=residentDemo&&changes[0]?.socketId==='nw'&&['nw:focal','nw:focal-low'].includes(headlineShot(changes[0])??'');
-        const shot=headlineCamera?.play(changes,now,visit?(shotTimeline(displayMs).changeEnd+BEAT_SECONDS)*1000:displayMs)??null;
+        // A Q02 swap has no Meter carrier: the camera flies to the lot of the model it shows (src/rotationLayout.ts Q02_SHOTS).
+        const q02=q02Swap(latest);
+        const shot=(q02?headlineCamera?.playShot(Q02_SHOTS[q02.to],now,displayMs):headlineCamera?.play(changes,now,visit?(shotTimeline(displayMs).changeEnd+BEAT_SECONDS)*1000:displayMs))??null;
         narration?.play(shot,changes[0],now,displayMs);
         if(shot&&voiceLabel){const t=shotTimeline(displayMs);voiceLabel.show(residentIdentity(latest),SHOTS[shot].target,now+t.hold,now+(visit?t.changeEnd:t.flyOut));}
         if(visit&&(shot==='nw:focal'||shot==='nw:focal-low'))residentDemo!.start(now+shotTimeline(displayMs).changeEnd,layout.bands.nw,prevNw);

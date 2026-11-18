@@ -106,13 +106,15 @@ export const HYDRO_TERRACE = { x: -375, z: -170, yaw: Math.PI / 2, lot: 66 } as 
  *  shore station (local (−95, 56)) to due east of the flower, where its platform meets the park promenade; `r` is the flower's plan
  *  radius (petal tips), which boats keep `r` + 30 m clear of. */
 export const BAY_FLOWER = { x: -712, z: 300, yaw: 2.6088, r: 64 } as const;
-/** Question-rotation lots (QUESTION_ROTATION_PLAN 2.1), keyed by the rotation set's `lotId`: plan centre in world metres; `sea` lots
+/** Question-rotation lots (QUESTION_ROTATION_PLAN 2.1), keyed by the rotation set's `lotId`: plan centre and plan extent `size` (the
+ *  journey's scan ring and lantern halo) in world metres; `sea` lots
  *  stand on the bay, where SCAN_LOT (land only) does not apply. Only Q02's three lots so far (one per model); Q01 keeps the NW focal
  *  site, and Q03/Q08 lots join when those questions are drawn in the city. The farm centre matches energyRuntime's FARM_CENTRE. */
 export const LOTS = {
-  'q02-west-sea': { x: HYDRO_TERRACE.x, z: HYDRO_TERRACE.z, sea: true },
-  'q02-bay-flower': { x: BAY_FLOWER.x, z: BAY_FLOWER.z, sea: true },
-  'q02-farm-south': { x: -152, z: 408, sea: false },
+  'q02-west-sea': { x: HYDRO_TERRACE.x, z: HYDRO_TERRACE.z, size: HYDRO_TERRACE.lot, sea: true },
+  'q02-bay-flower': { x: BAY_FLOWER.x, z: BAY_FLOWER.z, size: 2 * BAY_FLOWER.r, sea: true },
+  // The farm GLB is 64.5 m square at its 2× city scale: about 129 m.
+  'q02-farm-south': { x: -152, z: 408, size: 129, sea: false },
 } as const;
 // The ferry heads west for the Shinagawa channel, clear of the Rainbow Bridge anchorage and Daiba approach piers.
 export const ferryLane: readonly P3[] = [[-230,-.6,-290],[-420,-.6,-470],[-760,-.6,-560],[-1250,-.6,-520]];

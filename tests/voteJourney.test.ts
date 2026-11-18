@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import * as T from 'three';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
-import { changeSites } from '../src/layout.ts';
+import { changeSites, LOTS } from '../src/layout.ts';
 import { METER_COLORS } from '../src/districtMeters.ts';
 import { SITE_TRANSITION_SECONDS } from '../src/siteBuilders/siteRuntime.ts';
 import { ARRIVAL_SECONDS, FLIGHT_SECONDS, landingFor, lanternSpot, rotationFlights, rotationLantern, VoteJourney } from '../src/voteJourney.ts';
@@ -91,7 +91,7 @@ const flight = (outcome: Parameters<typeof rotationFlights>[0], ordinal = 5) => 
 {
   // A swap: one Meter-colour orb to NW plus three neutral fading orbs; the scan ring rises over NW and one automation lantern stays there.
   const outcome = { kind: 'swap', questionId: 'Q01', from: 'B', to: 'C' } as const;
-  assert.deepEqual(rotationFlights(outcome, answers), [{ questionId: 'Q01', axis: 'automation', color: METER_COLORS.automation },
+  assert.deepEqual(rotationFlights(outcome, answers), [{ questionId: 'Q01', site: { x: nw.x, z: nw.z, extent: Math.max(nw.w, nw.d) * nw.scale, color: METER_COLORS.automation, slot: 'automation' }, color: METER_COLORS.automation },
     ...['Q03', 'Q05', 'Q07'].map(questionId => ({ questionId, color: neutral }))]);
   const { scene, frames } = flight(outcome);
   assert.ok(frames.some(f => f.big > 0 && f.small > 0), 'big and small orbs fly together');
@@ -120,11 +120,34 @@ const flight = (outcome: Parameters<typeof rotationFlights>[0], ordinal = 5) => 
 {
   // A question without a site (most of the nine today): four fading orbs, no big orb, no scan ring, no lantern.
   for (const outcome of [{ kind: 'swap', questionId: 'Q05', from: 'A', to: 'B' } as const, { kind: 'fallback', questionId: 'Q03' } as const]) {
-    assert.deepEqual(rotationFlights(outcome, answers).map(f => [f.questionId, f.color, f.axis]), answers.map(a => [a.questionId, neutral, undefined]));
+    assert.deepEqual(rotationFlights(outcome, answers).map(f => [f.questionId, f.color, f.site]), answers.map(a => [a.questionId, neutral, undefined]));
     assert.equal(rotationLantern(5, outcome), undefined);
     const { scene, frames } = flight(outcome);
     assert.ok(frames.every(f => f.big === 0 && f.scans === 0) && frames.some(f => f.small > 0));
     assert.equal(lit(scene).length, 0);
+  }
+}
+{
+  // Q02 (2026-11-19): the big orb lands on the lot of the model the outcome shows (a swap's `to`, a fallback's own answer), in the
+  // energy colour for a swap, with one scan ring and one lantern over that lot.
+  const q02Answers = [{ questionId: 'Q02', optionId: 'C' }, ...answers.slice(1)];
+  const energy = `#${new T.Color('#75e2c2').getHexString()}`;
+  for (const [outcome, lot, color, scale] of [
+    [{ kind: 'swap', questionId: 'Q02', from: 'A', to: 'B' } as const, LOTS['q02-bay-flower'], energy, 1],
+    [{ kind: 'swap', questionId: 'Q02', from: 'B', to: 'A' } as const, LOTS['q02-west-sea'], energy, 1],
+    [{ kind: 'fallback', questionId: 'Q02' } as const, LOTS['q02-farm-south'], neutral, .7],
+  ] as const) {
+    const [first] = rotationFlights(outcome, q02Answers);
+    assert.deepEqual([first.questionId, first.site?.x, first.site?.z], ['Q02', lot.x, lot.z]);
+    const { scene, j } = journey();
+    j.playRotation({ ordinal: 7, answers: q02Answers, rotation: { outcome } }, 0);
+    let maxScans = 0; for (let t = 0; t <= 5; t += .05) { j.update(t, 0); maxScans = Math.max(maxScans, parts(scene)[1].count); }
+    assert.equal(maxScans, 1, 'one scan ring on the lot');
+    const lanterns = lit(scene);
+    assert.deepEqual(lanterns.map(l => [l.color, l.scale]), [[color, scale]]);
+    assert.ok(Math.hypot(lanterns[0].at.x - lot.x, lanterns[0].at.z - lot.z) <= lot.size / 2 * 1.1, 'lantern over the lot');
+    const rebuilt = journey(); rebuilt.j.setRotationLanterns([{ ordinal: 7, answers: q02Answers, rotation: { outcome } }]);
+    assert.deepEqual(snap(scene).lanM, snap(rebuilt.scene).lanM, 'rebuild matches the live landing');
   }
 }
 {

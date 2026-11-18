@@ -30,7 +30,7 @@
 | 題 | 參數 | 選項 A | 選項 B | 選項 C | 地塊方式與位置 | 三態齊全 |
 | --- | --- | --- | --- | --- | --- | --- |
 | Q01 | 人間・機械への委任度 | AUTO HUB −1 人手窗口（驗收） | AUTO HUB 0 人機協作（驗收） | AUTO HUB +1 全自動＋無人機（驗收） | 同地輪換，デックス西北岸 `changeSites.nw` (43, −300) | **是** |
-| Q02 | 技術受容性 | 水の棚田 `q02a-hydro-terrace`（驗收，現為固定背景） | 蓮花受電 `bay-flower-receiver`（已驗收，選址已定，未放置；連岸邊機房平台） | 受電テラス農園 `rectenna-farm-canopy`（驗收） | 各有地塊：西岸海面 (−375, −170)／南部公園西岸外海，花中心 (−712, 300)，機房平台接西岸步道（owner 2026-11-18，`feat/bay-flower-placement` 的 `docs/handoffs/bay-flower-placement.md`）／南緣陸地 `FARM_CENTRE` (−152, 408) | 城市已接（`lotRuntime`，2026-11-19）；A、C 空置態為暫定（A 整島收起、C 沿用 version4 無農園），待 owner 驗收；無近鏡 |
+| Q02 | 技術受容性 | 水の棚田 `q02a-hydro-terrace`（驗收，現為固定背景） | 蓮花受電 `bay-flower-receiver`（已驗收，選址已定，未放置；連岸邊機房平台） | 受電テラス農園 `rectenna-farm-canopy`（驗收） | 各有地塊：西岸海面 (−375, −170)／南部公園西岸外海，花中心 (−712, 300)，機房平台接西岸步道（owner 2026-11-18，`feat/bay-flower-placement` 的 `docs/handoffs/bay-flower-placement.md`）／南緣陸地 `FARM_CENTRE` (−152, 408) | 城市已接（`lotRuntime`，2026-11-19）；A、C 空置態 owner 2026-11-19 接受（A 整島收起、C 沿用 version4 無農園），離場與出場同時淡出淡入；近鏡及旅程著陸已做（2.5），待 owner 看 |
 | Q03 | 共有志向 | 車抽屜住宅 `drawer-housing-2127`（驗收，現為固定建築） | 集合住宅共用車棚（無） | 地區共享交通樞紐＋公園轉用（無） | 同地輪換，`DRAWER_HOUSING` (−104, 81)，49 × 31 m 含前場 | 否，欠 2 |
 | Q04 | プライバシー志向 | 公共案內塔（無） | 會形成路線的地面（無） | 個人案內閘門（無） | 局部變化；SURVEY_V2 註明對城市外觀影響小 | 否，**暫不上台** |
 | Q05 | 環境調整志向 | 樹蔭與海風街區（舊環境軸部分資產，未打磨） | 植物外牆建築（住宅 P 植物膜可參考，未打磨） | 可動遮陽＋局部冷卻（舊環境軸帆／冷卻塔，未打磨） | 沿岸步道段，district 級；舊環境軸自 E4 起凍結 | 否，欠 3 |
@@ -39,7 +39,7 @@
 | Q08 | 計画・柔軟性 | 固定用途常設館（無） | 內部可重組多用途館（無） | 活動模組棚 `event-shelf-2127`（驗收，現為 SW 0 態） | 同地輪換，SW 南岸 `changeSites.sw` (−100, 297) | 否，欠 2 |
 | Q09 | 実用性・体験価値 | 公共服務設施（SE +1 塔用途接近，但外形是集中塔） | 交流文化廣場（SW COMMONS 開放廣場可參考） | 沉浸式巨型穹頂（無） | 待定 | 否，欠 2–3 |
 
-**現時三態齊全：Q01；Q02 城市已接（2026-11-19）。** Q02 三座已放入城市（蓮花 2026-11-19 merge 入 main），A、C 空置態暫定，待 owner 驗收。
+**現時三態齊全：Q01；Q02 城市已接（2026-11-19）。** Q02 三座已放入城市（蓮花 2026-11-19 merge 入 main），A、C 空置態 owner 已接受（2026-11-19），近鏡已做，待 owner 看。
 
 ### 不在新題組內的現有資產
 
@@ -144,7 +144,7 @@ Owner 批准 0.1–0.4 全部建議；R01–R05 記入 SURVEY_V2_REVIEW 決定�
 | 2.2 | 地塊執行器：每塊地塊載入所屬模型，按狀態顯示一個；各有地塊的題目切換空置態；只在新題組 run 啟用（3.6） | 新 `src/lotRuntime.ts`；接 `cityChangeManager.ts` | 測試：任何狀態下每塊地塊剛好顯示一個模型或空置態；version4 run 外觀不變。**2026-11-19 Q02 完成：** `LotRuntime` 只在 `view.rotation` 出現後接手；農園經 `EnergyRuntime.setFarmOverride`，不由外部改 `visible`；不經 `cityChangeManager` |
 | 2.3 | 模型載入：抽題在答題前已決定，答題期間預載 4 題相關模型；其餘可延後 | `modelAssets.ts` | 量度記憶體與首次切換延遲；version4 run 外觀不變 |
 | 2.4 | 換模型過場：沿用 `buildTransition.ts`，出現的模型做主角，消失的模型靜靜退場。直接換代表每題三個模型之間有 **6 種有向過場**（A→B、A→C、B→A、B→C、C→A、C→B），逐對列出；舊 ladder 只行 ±1，須核實 −1↔+1 直接跳是否曾經跑過。Q02 三模型在不同地塊，須決定離場模型的變化是否播出 | `buildTransition.ts`、`resultTimeline.ts` | 3 秒過場不變；每題 6 種過場逐對截圖無穿插或斷層；snapshot／reduced motion 即時還原；version4 run 外觀不變 |
-| 2.5 | 近鏡：每個模型一個 headline 鏡頭（日夜）；旅程光點落在換模型的地塊 | `headlineCamera.ts`、`voteJourney.ts` | `npm run capture` 每模型日夜各一張，owner 審閱；version4 run 外觀不變 |
+| 2.5 | 近鏡：每個模型一個 headline 鏡頭（日夜）；旅程光點落在換模型的地塊 | `headlineCamera.ts`、`voteJourney.ts` | `npm run capture` 每模型日夜各一張，owner 審閱；version4 run 外觀不變。**2026-11-19 Q02 已做：** `q02:hydro`／`q02:flower`／`q02:farm` 三鏡（取自放置驗收的 focal-day 鏡位及 `energy:farm`），`HeadlineCamera.playShot`；旅程按 `rotationSite` 落在顯示模型的地塊 |
 | 2.6 | 群眾比例顯示：結果卡一句、hologram「住民の声」改為題目比例 | `surveyAtmosphere.ts`、`heroHolograms.ts` | 全部日文；少人數文案；瀏覽器檢查；version4 run 外觀不變 |
 | 2.7 | 退役：SE、SW COMMONS、district 舞台、舊能源部件改為固定背景（按 0.1 決定）；只在新題組 run 生效（3.6）。舊能源部件逐件取得 owner 同意才可刪除，未同意者只轉背景 | `districtMeters.ts`、`energyRuntime.ts` 等 | 背景狀態截圖，owner 審閱；version4 run 外觀不變 |
 
