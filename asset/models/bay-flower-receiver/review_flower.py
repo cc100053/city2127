@@ -1,6 +1,8 @@
 """Preview renders of the Q02-B bay flower, with and without its light beam, and a reference/model comparison.
 
 blender -b --factory-startup --python-exit-code 1 -P review_flower.py -- <out_dir> [--samples N] [--only beam|nobeam|clay]
+    [--cam ref|close] [--blend <file.blend>]
+Every camera shares the same sun and sky (set from the reference camera), so before/after renders compare like for like.
 Writes <out_dir>/beam.png, nobeam.png, clay.png (one grey, no emission, no beam: silhouette check) and
 compare.jpg (references/q02-b.jpg left, beam render right, same size). Staging (sea, sea bed, shore promenade, sky,
 sun, camera) is added at render time only; the .blend is not saved.
@@ -22,6 +24,8 @@ REF = os.path.join(HERE, "references", "q02-b.jpg")
 SHORE = (-95.0, 56.0)  # same as build_flower.SHORE
 # camera from the reference image's viewpoint, three.js coords: position, look-at, focal length (36 mm sensor width)
 CAM = ((-80.0, 88.0, 235.0), (-24.0, 15.0, 10.0), 38.0)
+# --cam close: low three-quarter view, near petals show their outer backs, far petals their inner panels
+CAMS = {"ref": CAM, "close": ((-34.0, 70.0, 100.0), (4.0, 16.0, 0.0), 36.0)}
 
 
 def mat(name, rgba, rough=.5, alpha=None):
@@ -44,7 +48,7 @@ def quad(name, pts, m):
     return ob
 
 
-def stage():
+def stage(cam_name="ref"):
     scene = bpy.context.scene
     s = 2000.
     quad("sea", [(-s, 0, -s), (s, 0, -s), (s, 0, s), (-s, 0, s)], mat("sea", (.01, .24, .32, 1), .08, .5))
@@ -76,8 +80,8 @@ def stage():
         e = els.new(pos)
         e.color = col
     nt.links.new(ramp.outputs["Color"], bg.inputs["Color"])
-    loc, at, lens = CAM
-    sun = bpy.data.objects.new("sun", bpy.data.lights.new("sun", "SUN"))
+    loc, at, lens = CAM  # the sun always follows the reference camera, so every view shares one daylight
+    sun =bpy.data.objects.new("sun", bpy.data.lights.new("sun", "SUN"))
     sun.data.energy = 4.5
     sun.data.angle = math.radians(4)
     f = Vector((at[0] - loc[0], 0, at[2] - loc[2])).normalized()  # light from behind-right of the view, as in the image
@@ -85,7 +89,8 @@ def stage():
     travel = -f * .6 - r * .7 + Vector((0, -1.1, 0))
     sun.rotation_euler = Vector(B(travel)).to_track_quat("-Z", "Y").to_euler()
     scene.collection.objects.link(sun)
-    cam = bpy.data.objects.new("cam", bpy.data.cameras.new("cam"))
+    loc, at, lens = CAMS[cam_name]
+    cam =bpy.data.objects.new("cam", bpy.data.cameras.new("cam"))
     scene.collection.objects.link(cam)
     scene.camera = cam
     cam.data.lens = lens
@@ -128,18 +133,20 @@ def main():
     os.makedirs(out, exist_ok=True)
     samples = int(args[args.index("--samples") + 1]) if "--samples" in args else 48
     only = args[args.index("--only") + 1] if "--only" in args else None
-    bpy.ops.wm.open_mainfile(filepath=os.path.join(HERE, "bay-flower-receiver.blend"))
+    cam_name = args[args.index("--cam") + 1] if "--cam" in args else "ref"
+    blend = args[args.index("--blend") + 1] if "--blend" in args else os.path.join(HERE, "bay-flower-receiver.blend")
+    bpy.ops.wm.open_mainfile(filepath=blend)
     scene = bpy.context.scene
     scene.render.engine = "BLENDER_EEVEE"
     scene.eevee.taa_render_samples = samples
     scene.view_settings.view_transform = "Standard"
     ref = bpy.data.images.load(REF)
     scene.render.resolution_x, scene.render.resolution_y = ref.size
-    stage()
+    stage(cam_name)
     for name, beam, clay in (("beam", True, False), ("nobeam", False, False), ("clay", False, True)):
         if only in (None, name):
             render(os.path.join(out, name + ".png"), beam, clay)
-    if only in (None, "beam"):
+    if only in (None, "beam") and cam_name == "ref":
         side_by_side(REF, os.path.join(out, "beam.png"), os.path.join(out, "compare.jpg"))
 
 

@@ -17,6 +17,7 @@ import os
 import sys
 
 import bpy
+import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
@@ -33,6 +34,8 @@ RINGS = tuple((n, o, r * S, y * S, L * S, a0, a1, W * S, c) for n, o, r, y, L, a
     (16, .5, 13.0, 5.8, 23.0, 40, 66, 12.0, .09),
     (12, .25, 10.5, 7.0, 23.0, 56, 82, 10.0, .1),
 ))
+PANEL_UV = (4.0, 8.0)       # texture tiles across / along each petal: 8 x 16 cells, ≈ 2.6 m on the outer ring
+PANEL_TEX = 256             # px per tile; 2 x 2 cells with thin silver frames
 DRUM_R, DECK_Y = 17.5 * S, 2.4 * S
 DOME_R, DOME_Y = 8.0 * S, 15.0 * S
 
@@ -50,11 +53,14 @@ def cross(a, b):
     return (a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
 
 
-def surf(acc, verts, faces, wants):
-    """Open surface: face i is wound to look along wants[i] (three coords). Only vertices the faces use are kept."""
+def surf(acc, verts, faces, wants, uvs=None):
+    """Open surface: face i is wound to look along wants[i] (three coords). Only vertices the faces use are kept.
+    uvs (one per vertex) go to acc.uv, which only the textured panel accumulator has."""
     used = sorted({i for f in faces for i in f})
     remap = {old: new for new, old in enumerate(used)}
     vs = [B(verts[i]) for i in used]
+    if uvs is not None:
+        acc.uv += [uvs[i] for i in used]
     out = []
     for f, w in zip(faces, wants):
         f = tuple(remap[i] for i in f)
@@ -145,13 +151,16 @@ def petal(acc, skin, ring, theta, nu=10, nv=6):
     for j in range(nv):  # hinge edge
         faces.append((idx(0, j), idx(0, j + 1), nb + idx(0, j + 1), nb + idx(0, j)))
         wants.append((-R[0], 0, -R[2]))
-    surf(acc, verts, tf, tw)
+    # panel UVs: across the petal 0..PANEL_UV[0], along it 0..PANEL_UV[1] texture tiles (2 x 2 cells per tile)
+    uvs = [(j / nv * PANEL_UV[0], i / nu * PANEL_UV[1]) for i in range(nu + 1) for j in range(nv + 1)] + [(0, 0)] * nb
+    surf(acc, verts, tf, tw, uvs)
     surf(skin, verts, faces, wants)
     return (lambda u, v: at(u, v, 1)[0]), (lambda u, v: at(u, v, -1)[0])
 
 
 def build():
     A = {k: Acc() for roles in GROUPS.values() for k in roles}
+    A["panel"].uv = []
     # ---- floating base: pontoon drum with a dark window band and a ring of cyan lights
     sweep(A["base"], lambda k: circle_pts(0, 0, DRUM_R, 72, k),
           [(5.0, -4.0), (1.2, -1.6), (0.0, -.6), (0.0, DECK_Y - .5), (.5, DECK_Y)])
@@ -264,6 +273,56 @@ def build():
     return A
 
 
+def panel_images():
+    """One tile of receiver panel: 2 x 2 blue-grey cells in thin silver frames, faint busbars inside each cell.
+    Returns (base colour image, sRGB) and (metal-roughness image, non-colour: G roughness, B metallic), both packed."""
+    n, c = PANEL_TEX, PANEL_TEX // 2
+    x = np.arange(n)
+    edge = (x % c < 3) | (x % c > c - 4)                    # 6 px silver frame between cells (≈ 6 cm)
+    bus = (x % (c // 4) == 0) & ~edge                       # faint busbars, 4 per cell each way
+    line = edge[None, :] | edge[:, None]
+    busm = (bus[None, :] | bus[:, None]) & ~line
+    cell = (x // c)[None, :] + 2 * (x // c)[:, None]        # cell id 0..3 for a slight tone variation
+    blue = np.array([.33, .42, .52])                         # sRGB blue-grey
+    tone = np.array([1.0, .96, 1.03, .98])[cell][..., None]
+    col = blue * tone
+    col = np.where(busm[..., None], col * .85 + .15 * np.array([.62, .68, .75]), col)
+    col = np.where(line[..., None], np.array([.84, .86, .88]), col)
+    rough = np.where(line, .22, .30)
+    metal = np.where(line, .95, .35)
+    mr = np.stack([np.ones_like(rough), rough, metal], -1)
+    out = []
+    for name, px, space in (("q02b_panel_color", col, "sRGB"), ("q02b_panel_mr", mr, "Non-Color")):
+        img = bpy.data.images.new(name, n, n, alpha=False)
+        img.colorspace_settings.name = space
+        img.pixels.foreach_set(np.concatenate([px, np.ones((n, n, 1))], -1).astype(np.float32).ravel())
+        img.file_format = "PNG"
+        img.pack()
+        out.append(img)
+    return out
+
+
+def panel_material():
+    """Blue-grey solar receiver panels with silver cell frames, as glTF base colour + metallic-roughness textures."""
+    mt = material("q02b_petal_panel", (.18, .26, .38, 1), .3)
+    nt = mt.node_tree
+    bsdf = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+    col_img, mr_img = panel_images()
+    uv = nt.nodes.new("ShaderNodeUVMap")
+    uv.uv_map = "UVMap"
+    tc, tm = nt.nodes.new("ShaderNodeTexImage"), nt.nodes.new("ShaderNodeTexImage")
+    tc.image, tm.image = col_img, mr_img
+    sep = nt.nodes.new("ShaderNodeSeparateColor")
+    for t in (tc, tm):
+        nt.links.new(uv.outputs["UV"], t.inputs["Vector"])
+    nt.links.new(tc.outputs["Color"], bsdf.inputs["Base Color"])
+    nt.links.new(tm.outputs["Color"], sep.inputs["Color"])
+    nt.links.new(sep.outputs["Green"], bsdf.inputs["Roughness"])
+    nt.links.new(sep.outputs["Blue"], bsdf.inputs["Metallic"])
+    mt.diffuse_color = (.18, .26, .38, 1)
+    return mt
+
+
 def mats():
     def m(name, rgba, rough, metal=0.0, emit=None, es=1.0):
         mt = material("q02b_" + name, rgba, rough, emit, es)
@@ -271,10 +330,10 @@ def mats():
         bsdf.inputs["Metallic"].default_value = metal
         return mt
     return {
-        "panel": m("petal_panel", (.80, .85, .90, 1), .12, .65),
-        "shell": m("petal_shell", (.92, .93, .94, 1), .32),
-        "frame": m("frame_white", (.90, .90, .88, 1), .42),
-        "dome": m("dome_pearl", (.84, .88, .93, 1), .16, .55),
+        "panel": panel_material(),
+        "shell": m("petal_back_silver", (.90, .91, .93, 1), .25, .6),    # outer petal faces and hinge pedestals
+        "frame": m("frame_silver", (.90, .90, .91, 1), .25, .7),         # rims, seams, struts, ring beams, collars
+        "dome": m("dome_silver_blue", (.70, .82, .97, 1), .1, .9, (.55, .72, 1, 1), .15),
         "base": m("base_white", (.80, .81, .82, 1), .55),
         "dark": m("window_band", (.04, .06, .08, 1), .25),
         "glow": m("light_cyan", (.25, .7, 1, 1), .4, 0, (.3, .78, 1, 1), 6.0),
@@ -309,6 +368,10 @@ def main():
         g.parent = root
         for role in roles:
             ob = finish_mesh(f"{gname}_{role}", A[role], M[SHARED.get(role, role)])
+            if hasattr(A[role], "uv"):  # finish_mesh keeps vertex order, so per-vertex UVs map straight onto loops
+                layer = ob.data.uv_layers.new(name="UVMap")
+                for lp in ob.data.loops:
+                    layer.data[lp.index].uv = A[role].uv[lp.vertex_index]
             bpy.context.scene.collection.objects.link(ob)
             ob.parent = g
             objs.append(ob)
