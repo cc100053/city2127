@@ -65,6 +65,13 @@ SKIRT = .45                 # machine-room kick band height
 # shore platform (shore frame: f seaward, s along the shore toward the reference camera; the promenade edge is f -6).
 # The machine room's long axis runs along +s, so the reference camera sees its landward side and its arched pipe end.
 QY = 1.5                    # platform top, level with the promenade
+# The city's promenade at the placed lot (−712, 300) stands 0.61 m above the bay surface, not 1.5 m: the whole shore station
+# (platform, rocks, machine room) and the duct from its shore run up drop by SHORE_DY together, so the accepted room keeps
+# its proportions and the duct still meets its flange; the flower and its stem stay on the waterline (placement R1). The
+# paving ends 1 cm above the promenade, and PLAT_APRON more paving runs landward from f -6 over the city's sea-wall gap
+# onto the promenade, so the walk is continuous.
+SHORE_DY = -.88
+PLAT_APRON = 1.5
 PLAT_F, PLAT_S = (-6.0, 12.0), (-10.0, 14.0)   # platform extent: promenade edge to the seaward rail, back end to pipe end
 ROOM_F, ROOM_S = 3.0, -3.0  # machine-room axis line (f) and its local origin along the shore (room spans s -7…7)
 DROP_S, RUN_Y = 18.5, -5.0  # the duct turns down past the platform end at s DROP_S and runs along the shore at RUN_Y
@@ -386,8 +393,8 @@ def duct(A, Lp, Lr):
     """Cyan-blue duct: up out of the stem foot, along the bay floor to the shore, along the shore under the water,
     up past the platform end and level into the flange on the machine room's arched front (Lr: room frame).
     Joint collars every ~7 m and at the two drop elbows, thin dark seams between collars."""
-    corners = [(0, -6.0, 0), (0, -10.0, 0), Lp(ROOM_F, RUN_Y, TURN_S), Lp(ROOM_F, RUN_Y, DROP_S),
-               Lp(ROOM_F, PIPE_Y, DROP_S), Lr(4.0, PIPE_Y, 0)]
+    corners = [(0, -6.0, 0), (0, -10.0, 0), Lp(ROOM_F, RUN_Y + SHORE_DY, TURN_S), Lp(ROOM_F, RUN_Y + SHORE_DY, DROP_S),
+               Lp(ROOM_F, PIPE_Y + SHORE_DY, DROP_S), Lr(4.0, PIPE_Y + SHORE_DY, 0)]
     path = arc_path(corners, [4.0, 14.0, 4.5, 4.5], 10)
     pipe(A["duct"], path, PIPE_R, 20)
     run, total, marks = 0.0, 0.0, []
@@ -642,16 +649,17 @@ def platform(A, Lp):
     _, F_, S_ = shore_frame()
     box = lambda acc, f, y, s, sf, sy, ss: obox(acc, Lp(f, y, s), (sf, sy, ss), F_, S_)
     cp = .45                                            # coping width on the water edges
-    box(A["pav_base"], (fa + fb) / 2, (QY - .04 - 3.5) / 2, (sa + sb) / 2, fb - fa, QY - .04 + 3.5, sb - sa)  # body
+    fl = fa - PLAT_APRON                                # landward end of the paving, over the promenade
+    box(A["pav_base"], (fl + fb) / 2, (QY - .04 - 3.5) / 2, (sa + sb) / 2, fb - fl, QY - .04 + 3.5, sb - sa)  # body
     # paving: 1.2 m tiles, 3 cm grout joints, none under the room's floor plate or the planter
     room_f, room_s = (ROOM_F - 6.5, ROOM_F + 6.5), (ROOM_S - 5.0, ROOM_S + 11.0)
     plant_f, plant_s = (fa + .3, fa + 2.2), (sa + 1.2, sa + 7.2)
     inside = lambda f, s, r_f, r_s: r_f[0] < f < r_f[1] and r_s[0] < s < r_s[1]
-    nf, ns = round((fb - cp - fa) / 1.2), round((sb - sa - 2 * cp) / 1.2)
-    tf, ts = (fb - cp - fa) / nf, (sb - sa - 2 * cp) / ns
+    nf, ns = round((fb - cp - fl) / 1.2), round((sb - sa - 2 * cp) / 1.2)
+    tf, ts = (fb - cp - fl) / nf, (sb - sa - 2 * cp) / ns
     for i in range(nf):
         for j in range(ns):
-            f, s = fa + tf * (i + .5), sa + cp + ts * (j + .5)
+            f, s = fl + tf * (i + .5), sa + cp + ts * (j + .5)
             if inside(f, s, room_f, room_s) or inside(f, s, plant_f, plant_s):
                 continue
             box(A["pav_tile"], f, QY - .02, s, tf - .03, .04, ts - .03)
@@ -785,6 +793,8 @@ def build():
     duct(A, Lp, Lr)
     platform(A, Lp)
     shore_station(A, Lr, Fr, Sr)
+    for role in GROUPS["Q02B_ShoreStation"]:  # Blender coordinates: three.js y is z here
+        A[role].v = [(x, y, z + SHORE_DY) for x, y, z in A[role].v]
     # ---- the beam from orbit (own node)
     cyl(A["beam_core"], 0, 0, .45, top_y + .6, BEAM_TOP, 12)
     cyl(A["beam_glow"], 0, 0, 1.8, top_y + .9, BEAM_TOP - 1, 16)

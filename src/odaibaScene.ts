@@ -3,6 +3,7 @@ import { plazaDeck, updatePlaza } from './plazaDeck.ts';
 import { HOLOGRAMS } from './layout.ts';
 import { addCityModel } from './modelAssets';
 import { hydroTerrace } from './hydroTerrace.ts';
+import { bayFlower, cutUnderPlatform } from './bayFlower.ts';
 import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
 import { civicCore, updateCivic } from './civicCore';
@@ -181,8 +182,10 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   // After finishes: shared materials are re-tuned once per mesh above, which would drop an earlier wrap.
   environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) receded.add(object.material); });
   receded.forEach(material => { if (wetGround.has(material.name)) openBay(material, cutGround.has(material.name)); recedeBeyondDistrict(material); });
+  const revetment = environment.getObjectByName('COAST_REVETMENT');
+  if (revetment instanceof T.Mesh) cutUnderPlatform(revetment.material);
   carveContext(environment);
-  scene.add(contextFacades(environment), bayContext(), megastructures(), floaters(), streetNetwork(environment), hydroTerrace()); // after the recede wrap: the kit's ground keeps its own shading
+  scene.add(contextFacades(environment), bayContext(), megastructures(), floaters(), streetNetwork(environment), hydroTerrace(), bayFlower()); // after the recede wrap: the kit's ground keeps its own shading
   plantCanopy(scene,trees,true);
   plantBackdropGrove(scene,environment);
   // Sky gardens crown the tall context towers (the only CTX mesh above 30 m inside the district).
