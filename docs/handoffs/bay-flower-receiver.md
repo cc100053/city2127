@@ -1,8 +1,8 @@
 # bay-flower-receiver — Q02-B bay flower space-solar receiver (draft model)
 
 - Owner: repository owner (requester); implementation by Claude
-- Status: IN_PROGRESS (shape delivered for owner review; not placed)
-- Branch: `feat/bay-flower-receiver`
+- Status: IN_PROGRESS (shore-platform round awaiting owner review of position; not placed)
+- Branch: `feat/bay-flower-shore-platform` (earlier rounds: `feat/bay-flower-receiver`, merged to main in `100816b`)
 - Base commit: `f40ffbc0e3e9b5a73da8f4a86fa75ff1190f2f09`
 - Last verified commit: the commit that adds this file (asset, scripts and checks below ran on its tree before commit)
 - Remote availability: `origin/feat/bay-flower-receiver`
@@ -72,6 +72,13 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
   - Every petal also gets a low spine rib (r 0.16, `rib_matte_silver`) and a root shoe: role `petal_shoe` (`collar_bluegrey`), 0.35 m proud over the first 12 % of the petal and a little wider than the root, with four bolt heads running from the plate surface through the shoe.
   - The inner panel grid is untouched (pixel-identical to `9e5c077`).
   - Metrics: with beam 89,907 tris, 35 meshes; without beam 89,091 tris, 33 meshes. Export: Blender 5.2 glTF, GLB, +Y up, no animation/camera/light, no compression.
+- Shore-platform round (owner 2026-11-18, branch `feat/bay-flower-shore-platform` from `origin/main` `100816b`; the owner's left reference image was not attached, so the round follows `references/q02-b.jpg` around the pavilion). Petals, panel grid, receiver base and the machine room's own material details are unchanged.
+  - Room position: `room_frame()` turns the machine room so its long axis runs along the shore (+s, toward the reference camera). The reference camera now sees its landward side and its arched pipe end together. Room axis at f 3, spanning s −7…7 (`ROOM_F`, `ROOM_S`).
+  - Duct: it leaves the flange on the arched front heading +s, runs level over the service space, then drops past the platform end at s 18.5 through two 4.5 m elbows (collars at both ends of each). Under the water it runs along the shore at y −5 to s 34, bends toward the flower on a 14 m radius, and climbs into the stem foot. `arc_path` now takes one radius per corner and drops repeated points; a fillet as long as its segment had collapsed the whole pipe.
+  - `platform()` (shore frame, f −6…12, s −10…14, top y 1.5 = promenade): body; light-grey 1.2 m tiles with 3 cm joints (none under the room's floor plate or the planter); a coping kerb on the three water edges with a dark drip fascia; a slim rail (posts, top rail, two thin rails) on the coping, open over the duct drop; seven low bollard lights; a planter (kerb, soil, seven shrubs, one small tree) on the promenade side by the room's back end. The rock revetment runs on the three water edges at the old spacing (≈ 1.6–1.9 m per rock, three rows) and stays clear of the drop.
+  - Room: service steps (tread, nosings, two grab rails) up to both side doors.
+  - New materials `paving_lightgrey`, `planting_green`, `planter_soil`. New review camera `--cam platform`. The `shore`, `front` and `side` cameras still frame the room's old position.
+  - Metrics: with beam 93,831 tris, 38 meshes; without beam 93,015 tris, 36 meshes; GLB 3,525,924 / 3,507,188 bytes.
 - Inferred (not readable in the image): petal count per ring, strut layout, pontoon below water, sub-sea depth, pavilion interior terminal, beam height, the overall scale (from people by the pavilion).
 
 ## Actual validation results
@@ -115,6 +122,10 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
   - `glb-reimport-side` and `glb-reimport-petal` were rendered from the re-imported no-beam GLB and match.
 - GLB re-import of both files: the beam node is present only in the with-beam file. Colours, metallic, roughness and alpha of `rib_matte_silver`, `wall_warm_white`, `trim_dark_bluegrey`, `pavilion_glass` and `duct_cyan` came through as set. The petal spine-rib and root-shoe meshes are present, and the guard plates are linked to `q02b_petal_plates` on `UVMap`. Panel textures still match `9e5c077` exactly.
 - QA: the root-shoe bolts on the steeper middle and inner petals first floated; they now start at the plate surface. No non-rock part floats.
+- Shore-platform round evidence, `~/city2127-evidence/bay-flower-receiver/platform-r1/`, 64 samples, one shared sun:
+  - `after-ref/compare.jpg` (reference left, with-beam render right, also copied to the asset folder), `after-ref/beam.png` and `after-ref/nobeam.png`, the latter from the `-nobeam` file.
+  - `after-platform/nobeam.png`: close-up of the arched front, flange, drop elbows and platform. `before-platform/nobeam.png` is the same camera on a copy of the round-10 file (`before-nobeam.blend`).
+  - GLB re-import of both files: with beam 93,831 tris and 38 meshes, `Q02B_LightBeam` present; without beam 93,015 tris and 36 meshes, beam absent. The three new materials came through in both.
 - `npm run build`: passed. `git diff --cached --check`: clean.
 - `npm test` (Windows 11, Node 24.19, checkout under `OneDrive\文件`): `assetLibrary.test.ts` passes with the new row. Two local leftovers, `asset/models/ship-refs-2127` and `car-candidates-2127`, hold only git-ignored caches from other branches and fail that test unless parked; they were parked for the run and restored. `surveyMeterPipeline.test.ts` and `energyPipeline.test.ts` FAIL on this machine before any of this task's code runs: `survey/tests/surveyFixture.ts` turns a `file://` URL path into `C:\C:\…\%E6%96%87%E4%BB%B6\…` (percent-encoded non-ASCII folder name), so the question JSON is not found. Not caused by this task, not fixed here. Every other test in the `npm test` list passed when run one at a time.
 - Application verification: NOT INTEGRATED.
@@ -132,4 +143,4 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
 
 ## Next expected step
 
-Owner reviews round 10 (`r10-final/before-after-nobeam-*.jpg`) and confirms which image was meant by "the first image"; then either another shape round or a placement task (site, shoreline, beam behaviour in the app).
+The owner reviews the shore-platform preview (`platform-r1/after-ref/compare.jpg`, `platform-r1/after-platform/nobeam.png`). Merge `feat/bay-flower-shore-platform` into main only once the owner confirms the position.
