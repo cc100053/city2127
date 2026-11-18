@@ -1,7 +1,7 @@
 """Preview renders of the Q02-B bay flower, with and without its light beam, and a reference/model comparison.
 
 blender -b --factory-startup --python-exit-code 1 -P review_flower.py -- <out_dir> [--samples N] [--only beam|nobeam|clay]
-    [--cam ref|close|root|dome|water|waterzoom|junction] [--blend <file.blend>]
+    [--cam ref|close|root|dome|water|waterzoom|junction|shore] [--blend <file.blend>]
 Every camera shares the same sun and sky (set from the reference camera), so before/after renders compare like for like.
 Writes <out_dir>/beam.png, nobeam.png, clay.png (one grey, no emission, no beam: silhouette check) and
 compare.jpg (references/q02-b.jpg left, beam render right, same size). Staging (sea, sea bed, shore promenade, sky,
@@ -32,7 +32,9 @@ CAMS = {"ref": CAM, "close": ((-34.0, 70.0, 100.0), (4.0, 16.0, 0.0), 36.0),
         # --cam water: low over the water, the receiver base seen through the gaps between petal roots
         "water": ((-62.0, 6.5, 62.0), (0.0, 10.0, 0.0), 32.0),
         "waterzoom": ((-62.0, 6.5, 62.0), (0.0, 9.0, 0.0), 95.0),  # same spot, long lens on the gaps at the centre
-        "junction": ((-26.0, 34.0, 20.0), (-11.9, 7.0, 9.1), 30.0)}  # down past the inner petals onto the shore junction
+        "junction": ((-26.0, 34.0, 20.0), (-11.9, 7.0, 9.1), 30.0),  # down past the inner petals onto the shore junction
+        # --cam shore: the reference image's side of the shore station: roof, pipe entry, riser elbow, duct collars
+        "shore": ((-75.5, 22.0, 14.3), (-85.5, 4.0, 50.4), 32.0)}
 
 
 def mat(name, rgba, rough=.5, alpha=None):

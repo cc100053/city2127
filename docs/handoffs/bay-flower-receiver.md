@@ -47,7 +47,15 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
 - Metrics: 59,450 tris (beam 816), 23 meshes, 18 materials, 3 textures 256², GLB 2,178,920 bytes.
 - Grid-restore round (owner 2026-11-18, from the owner's side-by-side `download.png`, old left and new right). The owner keeps the new version and restores the old panel grid. The builder's panel texture parameters were set back to the material-round-1 values: 6 px silver frames (sRGB 0.84/0.86/0.88), busbars mixed in at 0.15, frames metallic 0.95 and roughness 0.22. The regenerated `q02b_panel_color` and `q02b_panel_mr` match, pixel for pixel, the images packed in the `9e5c077` .blend, both in the new .blend files and after GLB re-import. The panel UVs are unchanged (4 × 8 tiles per petal); only the tapered roots narrow the cells near the hinge.
   - The builder now writes two deliverables: `bay-flower-receiver.blend/.glb` with `Q02B_LightBeam`, and `bay-flower-receiver-nobeam.blend/.glb` with that node and its two meshes removed. `review_flower.py` renders either.
-  - Metrics: with beam 59,450 tris, 23 meshes, GLB 2,178,996 bytes; without beam 58,634 tris, 21 meshes, GLB 2,160,276 bytes. Export: Blender 5.2 glTF, GLB, +Y up, no animation/camera/light, no compression.
+  - Metrics: with beam 59,450 tris, 23 meshes, GLB 2,178,996 bytes; without beam 58,634 tris, 21 meshes, GLB 2,160,276 bytes.
+- Shore round (owner 2026-11-18). The owner's crop was not attached, so the round works from a crop of `references/q02-b.jpg` around the pavilion. It replaces the glass duct and the shore-parallel pavilion; the confirmed petal grid and receiver base are untouched. All shore work lives in the frame `shore_frame()`: f seaward, s along the shore, origin at SHORE.
+  - `duct()`: an opaque cyan-blue duct, r 1.5, runs from inside the stem down to the sea bed (y −13.5), out to a riser at f 21, up through 5 m fillets and level at y 4.4 into the room, ending at f 4 inside a header box. Collars (`duct_ring`, r 1.75) sit about every 7 m plus both ends of both riser elbows; dark 10 cm seams sit between collars.
+  - `shore_station()`, quay: a quay (f −5.9…14, s ±15, top y 1.5) with short two-rail railings, open where the duct leaves; a three-row rock revetment on the water sides (top row finer mesh, kept clear of the riser).
+  - `shore_station()`, room: a room floor plate; the room spans f −4…10 with s ±5.5, and its long axis faces the sea as in the image. It has five column lines, low side walls, a back wall with a glazed tympanum, and a roof arch with white eaves, a glazed crown, exposed ribs, eave beams and a ridge beam, overhanging 1 m.
+  - `shore_station()`, pipe entry: the front is a pipe portal (jambs, lintel, low parapets, open above so the interior reads). The entry has a three-layer flange with 16 bolts, two saddles with cheeks (one on the quay, one inside) and two cyan lights on the jambs.
+  - `shore_station()`, inside: four standing pipe sets (flanges, valve wheels with spokes), a top header and two lit tanks.
+  - Materials: new `duct_cyan`, `duct_ring`, `duct_seam`, `quay_stone`, `revetment_rock` and `roof_white`.
+  - Metrics: with beam 71,511 tris, 28 meshes; without beam 70,695 tris, 26 meshes. Export: Blender 5.2 glTF, GLB, +Y up, no animation/camera/light, no compression.
 - Inferred (not readable in the image): petal count per ring, strut layout, pontoon below water, sub-sea depth, pavilion interior terminal, beam height, the overall scale (from people by the pavilion).
 
 ## Actual validation results
@@ -72,6 +80,12 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
 - QA: the access covers first floated 5 cm off the back wall and are now seated in it. The other items are as before.
 - Grid-restore round evidence, `~/city2127-evidence/bay-flower-receiver/grid-final/`: `before-after-beam-ref.jpg`, `before-after-nobeam-ref.jpg` and `before-after-nobeam-close.jpg`. All use the same cameras, sun and 64 samples. Before renders come from a copy of the receiver-base .blend; the after no-beam renders come from `bay-flower-receiver-nobeam.blend`.
 - GLB re-import of both files: the beam node is present only in the with-beam file. Collar, recess and grille radii are unchanged (12.65 / 11.9 / 11.9–12.35). The panel, guard-plate and pontoon textures and UVs are linked, and the panel textures match the `9e5c077` pixels exactly.
+- Shore round evidence, `~/city2127-evidence/bay-flower-receiver/shore-final/`:
+  - `after-shore/nobeam.png` is the shore close-up from the `-nobeam` file: roof, pipe entry, riser elbow, several collars.
+  - `before-after-nobeam-shore.jpg` compares it with the grid-restore files, same camera.
+  - `after-ref/beam.png`, `after-ref/nobeam.png` (from the `-nobeam` file) and `compare.jpg` are the overall views.
+- GLB re-import of both files: the beam node is present only in the with-beam file. The new ShoreStation and SubseaLink meshes and materials came through, and the duct reaches f 4 inside the room. Panel textures still match `9e5c077` pixel for pixel; receiver-base radii are unchanged.
+- QA: the machine-room saddle cheeks, valve wheels and entry lights first floated and now touch their hosts. 17 revetment rocks stay as loose boulders on purpose.
 - `npm run build`: passed. `git diff --cached --check`: clean.
 - `npm test` (Windows 11, Node 24.19, checkout under `OneDrive\文件`): `assetLibrary.test.ts` passes with the new row. Two local leftovers, `asset/models/ship-refs-2127` and `car-candidates-2127`, hold only git-ignored caches from other branches and fail that test unless parked; they were parked for the run and restored. `surveyMeterPipeline.test.ts` and `energyPipeline.test.ts` FAIL on this machine before any of this task's code runs: `survey/tests/surveyFixture.ts` turns a `file://` URL path into `C:\C:\…\%E6%96%87%E4%BB%B6\…` (percent-encoded non-ASCII folder name), so the question JSON is not found. Not caused by this task, not fixed here. Every other test in the `npm test` list passed when run one at a time.
 - Application verification: NOT INTEGRATED.
@@ -89,4 +103,4 @@ Model Q02-B 「宇宙からの光の柱を受ける、湾の花」 from page 3 (
 
 ## Next expected step
 
-Owner reviews the grid-restore round (`grid-final/before-after-*.jpg`); then either another shape round or a placement task (site, shoreline, beam behaviour in the app).
+Owner reviews the shore round (`shore-final/after-shore/nobeam.png`, `before-after-nobeam-shore.jpg`); then either another shape round or a placement task (site, shoreline, beam behaviour in the app).

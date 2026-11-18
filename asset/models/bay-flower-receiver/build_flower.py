@@ -22,7 +22,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
-from geo_helpers import Acc, B, circle_pts, cyl, finish_mesh, material, newell, obox, sweep  # noqa: E402
+from geo_helpers import Acc, B, blob, circle_pts, cyl, finish_mesh, material, newell, obox, sweep  # noqa: E402
 
 ID = "bay-flower-receiver"
 SHORE = (-95.0, 56.0)       # shore station centre (x, z)
@@ -40,6 +40,8 @@ PANEL_TEX = 256             # px per tile; 2 x 2 cells with thin silver frames
 SEAM_TEX = 256              # px per guard-plate / pontoon tile: seams on the tile edges, fastener dots along them
 SEGS = 24                   # pontoon segments
 JUNCTION_A = math.radians(142.5)  # collar pipe junction: toward the shore duct, between two inner petals
+PIPE_R, PIPE_Y = 1.5, 4.4   # sea-bed duct radius; its axis height where it runs level into the machine room
+RISER_F = 21.0              # riser position, metres seaward of the shore-station origin (past the revetment)
 DRUM_R, DECK_Y = 17.5 * S, 2.4 * S
 DOME_R, DOME_Y = 8.0 * S, 15.0 * S
 
@@ -311,6 +313,149 @@ def receiver_base(A):
         obox(A["glow"], P(rd + .84, DECK_Y + .65, l), (.25, .25, .1), L, R)
 
 
+def shore_frame():
+    """Shore-station frame: f seaward (toward the flower), s along the shore, origin at SHORE on the waterline.
+    Returns Lp(f, y, s) -> three.js point, and the f / s unit vectors in the xz plane."""
+    sx, sz = SHORE
+    d = norm((sx, 0, sz))
+    F, Sv = (-d[0], -d[2]), (d[2], -d[0])
+    return (lambda f, y, s: (sx + F[0] * f + Sv[0] * s, y, sz + F[1] * f + Sv[1] * s)), F, Sv
+
+
+def duct(A, Lp):
+    """Cyan-blue sea-bed duct: out of the stem, along the sea bed, up a large-radius riser past the revetment and level
+    into the machine-room front. Joint collars every ~7 m and at the riser elbows, thin dark seams between collars."""
+    corners = [(0, -7.0, 0), (0, -13.5, 0), Lp(RISER_F, -13.5, 0), Lp(RISER_F, PIPE_Y, 0), Lp(4.0, PIPE_Y, 0)]
+    path = arc_path(corners, 5.0, 10)
+    pipe(A["duct"], path, PIPE_R, 20)
+    run, total, marks = 0.0, 0.0, []
+    for a, b in zip(path, path[1:]):
+        ln = math.dist(a, b)
+        u = norm(tuple(y - x for x, y in zip(a, b)))
+        while run < ln:
+            marks.append((add(a, u, run), u, total + run))
+            run += 3.5
+        run -= ln
+        total += ln
+    for i, (c, u, at) in enumerate(marks):
+        if at < 8 or at > total - 9:      # inside the stem / inside the room
+            continue
+        if i % 2 == 0:                    # joint collar every 7 m
+            pipe(A["sub_frame"], [add(c, u, -.35), add(c, u, .35)], PIPE_R + .25, 20)
+        else:                             # seam between collars
+            pipe(A["duct_seam"], [add(c, u, -.05), add(c, u, .05)], PIPE_R + .03, 20)
+    for k in (2, 3):                      # collars at both ends of the two riser elbows
+        cnr, prev, nxt = corners[k], corners[k - 1], corners[k + 1]
+        for o, sgn in ((prev, -1), (nxt, 1)):
+            u = norm(tuple(x - y for x, y in zip(o, cnr)))
+            c = add(cnr, u, 5.0)
+            pipe(A["sub_frame"], [add(c, u, -.4), add(c, u, .4)], PIPE_R + .3, 20)
+
+
+def shore_station(A, Lp, F, Sv):
+    """Shore machine room on a quay: floor plate, columns, low walls, arched silver roof with glazed crown, exposed ribs;
+    pipe-entry wall with a three-layer flange and saddles; standing pipe sets inside; railings and a rock revetment."""
+    import random
+    rnd = random.Random(7)
+    t, n = F, Sv                                   # obox axes: size = (along f, height, along s)
+    box = lambda acc, f, y, s, sf, sy, ss: obox(acc, Lp(f, y, s), (sf, sy, ss), t, n)
+    QY, FY = 1.5, 1.8                              # quay top, room floor
+    f0, f1, hw = -4.0, 10.0, 5.5                   # room back / front face, half width
+    # quay body and the room floor plate
+    box(A["pav_base"], 4.05, (QY - 4.0) / 2, 0, 19.9, QY + 4.0, 30.0)
+    box(A["pav_frame"], (f0 + f1) / 2, (QY + FY) / 2, 0, f1 - f0 + 2.0, FY - QY, 2 * hw + 2.0)
+    # columns and low side walls
+    cols = [f0, -.5, 3.0, 6.5, f1]
+    spring = 6.6
+    for f in cols:
+        for s in (-hw, hw):
+            box(A["pav_frame"], f, (FY + spring) / 2, s, .55, spring - FY, .55)
+    for fa, fb in zip(cols, cols[1:]):
+        for s in (-hw, hw):
+            box(A["pav_frame"], (fa + fb) / 2, FY + .7, s, fb - fa - .55, 1.4, .3)
+    # back wall with glazed tympanum
+    box(A["pav_frame"], f0 - .1, (FY + spring) / 2, 0, .3, spring - FY, 2 * hw)
+    arch = lambda a, f, inset=0.0: Lp(f, 6.4 + (3.8 - inset) * math.sin(math.pi * a), -(6.5 - inset) * math.cos(math.pi * a))
+    tym = [arch(k / 12, f0 - .1, .9) for k in range(13)]
+    surf(A["pav_glass"], tym, [tuple(range(13))], [(-F[0], 0, -F[1])])
+    # front: pipe-entry wall with a square cut-out the flange covers, flange, bolts, saddles
+    cut, jamb = 1.8, .8                                 # pipe portal: jambs and lintel round the cut-out
+    for sg in (-1, 1):
+        box(A["pav_frame"], f1, (FY + spring) / 2, sg * (cut + jamb / 2), .4, spring - FY, jamb)
+        box(A["pav_frame"], f1, FY + .6, sg * (cut + jamb + hw) / 2, .3, 1.2, hw - cut - jamb)   # low parapet, open above
+    box(A["pav_frame"], f1, (PIPE_Y + cut + spring) / 2, 0, .4, spring - PIPE_Y - cut, 2 * cut)
+    ax = lambda f: Lp(f, PIPE_Y, 0)
+    for fa, fb, r in ((f1 + .2, f1 + .6, PIPE_R + 1.1), (f1 + .6, f1 + .95, PIPE_R + .75), (f1 + .95, f1 + 1.25, PIPE_R + .45)):
+        pipe(A["pav_frame"], [ax(fa), ax(fb)], r, 28)
+    for k in range(16):
+        a = 2 * math.pi * k / 16
+        rr = PIPE_R + .9
+        pipe(A["pav_core"], [Lp(f1 + .6, PIPE_Y + rr * math.sin(a), rr * math.cos(a)),
+                             Lp(f1 + .75, PIPE_Y + rr * math.sin(a), rr * math.cos(a))], .1, 6)
+    bot = PIPE_Y - PIPE_R
+    for f, y0 in ((f1 + 2.6, QY), (7.0, FY)):          # saddle outside on the quay, and inside on the floor
+        box(A["pav_frame"], f, y0 + .1, 0, 1.6, .2, 3.6)
+        box(A["pav_frame"], f, (y0 + .2 + bot) / 2, 0, .9, bot - y0 - .2 + .05, 3.2)
+        for s in (-PIPE_R - .05, PIPE_R + .05):         # cheeks bite into the pipe and stand on the cradle
+            box(A["pav_frame"], f, (bot + PIPE_Y) / 2, s, .9, PIPE_Y - bot + .2, .3)
+    for s in (-cut - jamb / 2, cut + jamb / 2):         # entry lights on the portal jambs
+        box(A["pav_glow"], f1 + .25, PIPE_Y + 1.2, s, .1, .3, .3)
+    # roof: shell strips (white eaves, glazed crown) with exposed ribs, eave and ridge beams
+    rf0, rf1, segs = f0 - 1.0, f1 + 1.0, 12
+    for k in range(segs):
+        a0, a1 = k / segs, (k + 1) / segs
+        acc = A["pav_glass"] if 3 <= k < 9 else A["pav_roof"]
+        out = [arch(a0, rf0), arch(a1, rf0), arch(a1, rf1), arch(a0, rf1)]
+        inn = [arch(a0, rf0, .25), arch(a1, rf0, .25), arch(a1, rf1, .25), arch(a0, rf1, .25)]
+        acc.solid(out + inn, [(0, 1, 2, 3), (7, 6, 5, 4), (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)])
+    for f in cols + [rf0, rf1]:
+        pipe(A["pav_frame"], [arch(k / 16, f, -.3) for k in range(17)], .3, 6)
+    for a in (0, 3 / 12, .5, 9 / 12, 1):
+        pipe(A["pav_frame"], [arch(a, rf0, -.15), arch(a, rf1, -.15)], .18 if a not in (0, 1) else .28, 6)
+    # inside: the duct ends in a header box; four standing pipe sets with flanges and valve wheels; top header; tanks
+    box(A["pav_core"], 3.0, (FY + PIPE_Y + PIPE_R + .3) / 2, 0, 2.2, PIPE_Y + PIPE_R + .3 - FY, 3.8)
+    for s in (-3.3, -1.1, 1.1, 3.3):
+        base = 1.2
+        pipe(A["pav_pipe"], arc_path([Lp(base, FY, s), Lp(base, 6.0, s), Lp(base + 1.5, 6.0, s)], .6, 6), .4, 12)
+        for y in (3.0, 5.0):
+            pipe(A["pav_frame"], [Lp(base, y, s), Lp(base, y + .18, s)], .62, 12)
+        wheel = [Lp(base + .75 + .0, 4.1 + .45 * math.sin(2 * math.pi * k / 12), s + .45 * math.cos(2 * math.pi * k / 12))
+                 for k in range(13)]
+        pipe(A["pav_core"], wheel, .06, 4)
+        pipe(A["pav_core"], [Lp(base + .3, 4.1, s), Lp(base + .78, 4.1, s)], .08, 4)          # stem into the pipe
+        for ds, dy in ((.47, 0), (0, .47)):                                                     # spokes to the rim
+            pipe(A["pav_core"], [Lp(base + .75, 4.1 - dy, s - ds), Lp(base + .75, 4.1 + dy, s + ds)], .04, 4)
+    pipe(A["pav_pipe"], [Lp(2.7, 6.0, -3.9), Lp(2.7, 6.0, 3.9)], .5, 12)
+    for s in (-3.0, 3.0):
+        cyl(A["pav_frame"], *(lambda p: (p[0], p[2]))(Lp(-2.4, 0, s)), 1.0, FY, FY + 3.2, 16)
+        cyl(A["pav_glow"], *(lambda p: (p[0], p[2]))(Lp(-2.4, 0, s)), 1.03, FY + 2.2, FY + 2.4, 16)
+    # short railings on the quay edges (gap where the duct leaves), rock revetment on the water sides
+    def rail(pts):
+        for p in pts[::2]:
+            pipe(A["pav_frame"], [p, (p[0], p[1] + 1.05, p[2])], .05, 4)
+        for h in (.55, 1.05):
+            pipe(A["pav_frame"], [(p[0], p[1] + h, p[2]) for p in pts], .05, 4)
+    ef = 13.85
+    for s0, s1 in ((-14.8, -2.8), (2.8, 14.8)):
+        rail([Lp(ef, QY, s0 + (s1 - s0) * k / 12) for k in range(13)])
+    for s in (-14.8, 14.8):
+        rail([Lp(-5.8 + (ef + 5.8) * k / 20, QY, s) for k in range(21)])
+    for k in range(3):                                  # three rock rows stepping down into the water
+        for j in range(19):
+            s = -16.5 + 33 * j / 18 + rnd.uniform(-.4, .4)
+            if k == 2 and abs(s) < 2.4:                 # leave the riser clear
+                continue
+            c = Lp(14.9 + 1.6 * k + rnd.uniform(-.3, .3), .5 - 1.4 * k, s)
+            blob(A["rock"], c, (rnd.uniform(.9, 1.3), rnd.uniform(.7, 1.0), rnd.uniform(.9, 1.3)), 2 if k == 0 else 1,
+                 rnd.uniform(0, 9), .22)
+        for side in (-1, 1):
+            for j in range(12):
+                f = -5.5 + 19.5 * j / 11 + rnd.uniform(-.4, .4)
+                c = Lp(f, .5 - 1.4 * k, side * (15.9 + 1.6 * k + rnd.uniform(-.3, .3)))
+                blob(A["rock"], c, (rnd.uniform(.9, 1.3), rnd.uniform(.7, 1.0), rnd.uniform(.9, 1.3)), 2 if k == 0 else 1,
+                     rnd.uniform(0, 9), .22)  # rows above water (k 0) get the finer mesh
+
+
 def build():
     A = {k: (UAcc() if k in UV_ROLES else Acc()) for roles in GROUPS.values() for k in roles}
     # ---- floating base: 24 pontoon segments (seams in the texture), joint pilasters, deck mounts, one light each
@@ -379,50 +524,9 @@ def build():
     for yy in (-5.0, -8.0, -11.0):
         sweep(A["sub_glow"], lambda k: circle_pts(0, 0, 3.95, 32, k), [(0, yy - .25), (0, yy + .25)], caps=(False, False),
               want=lambda c: (c[0], 0, c[2]))
-    path = arc_path([(0, -9.0, 0), (0, -13.5, 0), (sx - d[0] * 9, -13.5, sz - d[2] * 9), (sx - d[0] * 4, -.5, sz - d[2] * 4),
-                     (sx - d[0] * 3.5, 1.4, sz - d[2] * 3.5)], 4.0)
-    # the core pokes 0.3 m past both sleeve ends so the end caps are not coplanar
-    ext = lambda p, q: add(p, norm(tuple(x - y for x, y in zip(p, q))), .3)
-    pipe(A["core"], [ext(path[0], path[1])] + path[1:-1] + [ext(path[-1], path[-2])], 1.1, 10)
-    pipe(A["sleeve"], path, 2.2, 16)
-    seg = [(path[i], path[i + 1]) for i in range(len(path) - 1)]
-    run = 0.0
-    for a, b in seg:
-        ln = math.dist(a, b)
-        while run < ln:
-            c = add(a, norm(tuple(y - x for x, y in zip(a, b))), run)
-            e = add(c, norm(tuple(y - x for x, y in zip(a, b))), .7)
-            pipe(A["sub_frame"], [c, e], 2.45, 16)
-            run += 9.0
-        run -= ln
-    # ---- shore station: arched glass pavilion, long axis along the shore
-    t = (d[2], 0, -d[0])  # along shore
-    PL, PW, PH, PY = 18.0, 10.0, 6.2, 1.5
-    loc = lambda a, b, h: (sx + t[0] * a + d[0] * b, h, sz + t[2] * a + d[2] * b)
-    quad = [loc(-PL / 2 - 1, -PW / 2 - 1, 0), loc(PL / 2 + 1, -PW / 2 - 1, 0), loc(PL / 2 + 1, PW / 2 + 1, 0), loc(-PL / 2 - 1, PW / 2 + 1, 0)]
-    up = [(p[0], PY, p[2]) for p in quad]
-    A["pav_base"].solid(quad + up, [(3, 2, 1, 0), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)])
-    arch = lambda a, s: loc(a, -PW / 2 * math.cos(math.pi * s), PY + .4 + PH * math.sin(math.pi * s))
-    for i in range(7):
-        a = -PL / 2 + PL * i / 6
-        pipe(A["pav_frame"], [arch(a, s / 12) for s in range(13)], .22, 6)
-    for s in (0, .2, .4, .5, .6, .8, 1):
-        pipe(A["pav_frame"], [arch(-PL / 2, s), arch(PL / 2, s)], .12, 4)
-    vs, fs, ws = [], [], []
-    for i in range(13):
-        for a in (-PL / 2, PL / 2):
-            vs.append(arch(a, i / 12))
-    for i in range(12):
-        fs.append((2 * i, 2 * i + 1, 2 * i + 3, 2 * i + 2))
-        mid = arch(0, (i + .5) / 12)
-        ws.append(norm((mid[0] - loc(0, 0, 0)[0], mid[1] - PY, mid[2] - loc(0, 0, 0)[2])))
-    surf(A["pav_glass"], vs, fs, ws)
-    for a in (-PL / 2, PL / 2):  # glazed gable ends
-        ring_ = [arch(a, s / 12) for s in range(13)]
-        surf(A["pav_glass"], ring_, [tuple(range(13))], [tuple(math.copysign(1, a) * x for x in t)])
-    tl = loc(0, -PW / 2 + 3.5, 0)  # terminal where the duct surfaces
-    cyl(A["pav_core"], tl[0], tl[2], 1.6, PY, PY + 2.6, 16)
-    cyl(A["pav_glow"], tl[0], tl[2], 1.65, PY + 1.0, PY + 1.3, 16)
+    Lp, F, Sv = shore_frame()
+    duct(A, Lp)
+    shore_station(A, Lp, F, Sv)
     # ---- the beam from orbit (own node)
     cyl(A["beam_core"], 0, 0, .45, top_y + .6, BEAM_TOP, 12)
     cyl(A["beam_glow"], 0, 0, 1.8, top_y + .9, BEAM_TOP - 1, 16)
@@ -531,6 +635,12 @@ def mats():
         "base": textured("q02b_pontoon_segments", seams, .5, .15),      # 24 segments, seams and fasteners
         "plain": m("base_white", (.80, .81, .82, 1), .55),
         "collar": m("collar_bluegrey", (.50, .56, .64, 1), .32, .6),      # collar bands and bay pilasters
+        "duct": m("duct_cyan", (.36, .66, .76, 1), .22, .55),            # sea-bed duct and the pipes in the room
+        "duct_ring": m("duct_ring", (.55, .72, .80, 1), .25, .8),        # duct joint collars
+        "duct_seam": m("duct_seam", (.06, .10, .13, 1), .4),             # thin seams between collars
+        "quay": m("quay_stone", (.50, .49, .47, 1), .85),                # shore platform
+        "rock": m("revetment_rock", (.46, .45, .42, 1), .95),            # revetment boulders
+        "pav_roof": m("roof_white", (.92, .93, .94, 1), .35, .3),        # machine-room roof eaves
         "grille": m("grille_dark", (.09, .10, .12, 1), .45, .5),          # louvre slats in the collar bays
         "recess": m("recess_bluegrey", (.16, .22, .30, 1), .5, .3),        # recessed bay back wall
         "dark": m("window_band", (.04, .06, .08, 1), .25),
@@ -547,12 +657,12 @@ def mats():
 
 GROUPS = {
     "Q02B_Receiver": ("panel", "shell", "frame", "piston", "collar", "grille", "recess", "dome", "base", "dark", "glow", "aperture"),
-    "Q02B_SubseaLink": ("sleeve", "core", "sub_frame", "sub_glow"),
-    "Q02B_ShoreStation": ("pav_glass", "pav_frame", "pav_base", "pav_core", "pav_glow"),
+    "Q02B_SubseaLink": ("sleeve", "core", "sub_glow", "duct", "sub_frame", "duct_seam"),
+    "Q02B_ShoreStation": ("pav_glass", "pav_frame", "pav_roof", "pav_base", "pav_core", "pav_pipe", "pav_glow", "rock"),
     "Q02B_LightBeam": ("beam_core", "beam_glow"),
 }
-SHARED = {"sub_frame": "frame", "sub_glow": "glow", "pav_base": "plain", "pav_core": "core", "pav_glow": "glow",
-          "piston": "core"}
+SHARED = {"sub_frame": "duct_ring", "sub_glow": "glow", "pav_base": "quay", "pav_core": "core", "pav_glow": "glow",
+          "pav_pipe": "duct", "piston": "core"}
 UV_ROLES = ("panel", "shell", "base")  # accumulators with a UV map (textured materials)
 
 
@@ -567,7 +677,7 @@ def main():
         bpy.context.scene.collection.objects.link(g)
         g.parent = root
         for role in roles:
-            ob = finish_mesh(f"{gname}_{role}", A[role], M[SHARED.get(role, role)])
+            ob = finish_mesh(f"{gname}_{role}", A[role], M[SHARED.get(role, role)], 70 if role == "rock" else 25)
             if hasattr(A[role], "uv"):  # finish_mesh keeps vertex order, so per-vertex UVs map straight onto loops
                 layer = ob.data.uv_layers.new(name="UVMap")
                 for lp in ob.data.loops:
