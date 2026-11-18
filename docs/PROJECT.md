@@ -160,6 +160,7 @@ occupancy simulation.
 | --- | --- |
 | [shared](../survey/src/shared/cityView.ts) | v1/v2 state/view/protocol contracts; authoritative policy → layout (v2: Scale A display scores since 2026-10-13, folded through the one-rung-per-proposal ladder `ladderStep` into `ladderLayout(tiers, energy?)` since 2026-10-27; `pickHeadline`) |
 | [questionLoader](../survey/src/survey/questionLoader.ts), [scoreEngine](../survey/src/survey/scoreEngine.ts), [decisionHistory](../survey/src/survey/decisionHistory.ts) | Versioned four-axis question copy (currently3), shared reducer/replay, immutable view history |
+| [questionPool](../survey/src/pool/questionPool.ts) | Question pool (2026-11-18, [handoff](handoffs/question-pool.md)): the planning team's nine SURVEY_V2 questions (P/U versions, nine parameters) as `questionPool.v1.json`, generated from [SURVEY_V2](planning-team/SURVEY_V2.md) by `npm run pool:build`; no votes, not wired into the exhibition flow |
 | [server](../survey/src/server/server.ts), [realtime](../survey/src/server/realtime.ts) | HTTP/static pages, loopback/same-origin Admin guard, snapshots/updates/reset broadcasts |
 | [database](../survey/src/server/database.ts), [migrations](../survey/src/server/migrations.ts), [runStore](../survey/src/server/runStore.ts) | SQLite schema 8, transaction/restoration, active proposal replay, seeds/counts |
 | [proposalService](../survey/src/server/proposalService.ts), [adminService](../survey/src/server/adminService.ts) | Atomic submission/idempotency, single/A/B sessions, leases/reset drain, Undo, display mode |

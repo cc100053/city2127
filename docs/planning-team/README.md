@@ -13,7 +13,7 @@
 
 ## 文件之間嘅關係
 
-- SURVEY_V2 嘅 9 個參數，同現行展覽用緊嘅 4 個 Meter（`automation`、`publicSharing`、`environmentalPriority`、`urbanConcentration`）係唔同嘅系統，未接入程式碼；唔需要一一對應。
+- SURVEY_V2 嘅 9 個參數，同現行展覽用緊嘅 4 個 Meter（`automation`、`publicSharing`、`environmentalPriority`、`urbanConcentration`）係唔同嘅系統；唔需要一一對應。SURVEY_V2 已經生成做問題池 `survey/src/pool/questionPool.v1.json`（[handoff](../handoffs/question-pool.md)），但未接入展覽流程。改完 SURVEY_V2 之後要行 `npm run pool:build --prefix survey`，否則 `survey` 嘅 test 會失敗。
 - IMAGE_PROMPTS 每個案 Q0n-A/B/C，對應 SURVEY_V2 Un 題嘅選項 A/B/C 同埋「都市の具体的な変化」。
 - 兩份 HYPOTHESES 嘅仮説，就係 SURVEY_V2 每題「関連仮説」嘅來源。
 - 舊提案 [PROPOSAL_JA](../PROPOSAL_JA.md)（同 [PDF](../PROPOSAL_JA.pdf)）描述現行 4 問／4 Meter 嘅展覽。呢個資料夾係新提案，兩者可能有矛盾；同時放入 repo 係為咗對比，唔係將任何一方定為已採用。
