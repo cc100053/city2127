@@ -3,11 +3,12 @@
 import * as T from 'three';
 import type { EnergyChoice } from '../survey/src/shared/energy.ts';
 import { CITY_AXES, type CityAxis } from '../survey/src/shared/citySurveyState.ts';
+import type { RotationOutcome } from '../survey/src/shared/rotation.ts';
 
 /** −1 / 0 / +1 per axis, as the server's proposal record and the root's parsed view both carry it. */
 type Votes = Readonly<Record<CityAxis, number> & { energy?: EnergyChoice }>;
 import { METER_COLORS } from './districtMeters.ts';
-import { changeSites } from './layout.ts';
+import { changeSites, HOLOGRAMS } from './layout.ts';
 import { glowTexture } from './glowTexture.ts';
 
 const SOCKET: Record<CityAxis, keyof typeof changeSites> = { automation: 'nw', publicSharing: 'sw', environmentalPriority: 'ne', urbanConcentration: 'se' };
@@ -33,7 +34,10 @@ export function lanternSpot(ordinal: number, axis: CityAxis, energy = false): T.
   return new T.Vector3(s.x + Math.cos(angle) * radius, 42 + 22 * hash(i + .25), s.z + Math.sin(angle) * radius);
 }
 
-type Flight = { axis: CityAxis; vote: number; color: T.Color; curve: T.CatmullRomCurve3; start: number; landed: boolean; ordinal: number; energy: boolean; scans: readonly Omit<Scan, 'color' | 'start'>[] };
+// `axis`: a version4 vote (lands, leaves its axis lantern). Rotation runs: `rotation` is the outcome question's big orb (lands on its
+// site, leaves the guest's one lantern); `fade` is one of the other answers, which joins the crowd share and fades out at its apex.
+type Flight = { axis: CityAxis; vote: number; color: T.Color; curve: T.CatmullRomCurve3; start: number; landed: boolean; ordinal: number; energy: boolean; scans: readonly Omit<Scan, 'color' | 'start'>[];
+  mode?: 'rotation' | 'fade'; outcome?: RotationOutcome };
 /** Where a live headline actually changed: the district slots of the guest's axis (CarrierChange.points). */
 export type JourneyLanding = { readonly socketId: string; readonly points?: readonly { readonly x: number; readonly z: number; readonly r: number }[] };
 const MAX_LANDING_SCANS = 8;
@@ -50,10 +54,32 @@ export function landingFor(axis: CityAxis, energy: boolean, landing?: JourneyLan
 }
 type Scan = { x: number; z: number; r: number; color: T.Color; start: number };
 
+/** Rotation runs: the Meter site each question's models stand on. A question without a row has no site yet; its orb only fades. */
+export const ROTATION_SITE_AXIS: Readonly<Record<string, CityAxis>> = { Q01: 'automation' };
+/** The guest's four rotation answers as flights: the outcome question lands on its site (Meter colour for a swap, neutral for a fallback), the rest fade. */
+export function rotationFlights(outcome: RotationOutcome, answers: readonly { questionId: string }[]): { questionId: string; axis?: CityAxis; color: string }[] {
+  const axis = ROTATION_SITE_AXIS[outcome.questionId];
+  const fading = answers.filter(a => !axis || a.questionId !== outcome.questionId).map(a => ({ questionId: a.questionId, color: NEUTRAL }));
+  return axis ? [{ questionId: outcome.questionId, axis, color: outcome.kind === 'swap' ? METER_COLORS[axis] : NEUTRAL }, ...fading] : fading;
+}
+/** Guest `ordinal`'s one rotation lantern, over the site of the question it swapped or fell back to; none for a question without a site. */
+export function rotationLantern(ordinal: number, outcome: RotationOutcome): { slot: number; position: T.Vector3; color: T.Color; scale: number } | undefined {
+  const axis = ROTATION_SITE_AXIS[outcome.questionId];
+  if (!axis) return undefined;
+  const swap = outcome.kind === 'swap';
+  return { slot: ((ordinal - 1) % LANTERN_GUESTS) * CITY_AXES.length + CITY_AXES.indexOf(axis), position: lanternSpot(ordinal, axis),
+    color: new T.Color(swap ? METER_COLORS[axis] : NEUTRAL), scale: swap ? 1 : .7 };
+}
+/** What `playRotation` and `setRotationLanterns` read from a rotation proposal. */
+export type RotationJourney = { ordinal: number; answers: readonly { questionId: string }[]; rotation?: { outcome: RotationOutcome } };
+const VOICES_BOARD = new T.Vector3(...HOLOGRAMS.panels.find(p => p.id === 'voices')!.at);
+
 export class VoteJourney {
   private readonly points: T.Points;
   private readonly positions: Float32Array;
   private readonly colors: Float32Array;
+  /** Rotation runs' one big orb (the outcome question), larger than the version4 and fading orbs. */
+  private readonly bigPoints: T.Points;
   private readonly scans: T.InstancedMesh;
   private readonly lanterns: T.InstancedMesh;
   private readonly lanternMaterial: T.MeshBasicMaterial;
@@ -82,19 +108,52 @@ export class VoteJourney {
     this.lanterns = new T.InstancedMesh(new T.SphereGeometry(1.1, 10, 6), this.lanternMaterial, LANTERNS);
     this.lanterns.frustumCulled = false; this.lanterns.name = 'meter-pulse';
     this.lanterns.setColorAt(0, this.tint.setRGB(0, 0, 0)); this.clearLanterns();
-    scene.add(this.points, this.scans, this.lanterns);
+    const big = new T.BufferGeometry();
+    big.setAttribute('position', new T.BufferAttribute(new Float32Array((TRAIL + 1) * 3), 3).setUsage(T.DynamicDrawUsage));
+    big.setAttribute('color', new T.BufferAttribute(new Float32Array((TRAIL + 1) * 3), 3).setUsage(T.DynamicDrawUsage));
+    big.setDrawRange(0, 0);
+    this.bigPoints = new T.Points(big, new T.PointsMaterial({ size: 64, map: (this.points.material as T.PointsMaterial).map, vertexColors: true, transparent: true, depthWrite: false, blending: T.AdditiveBlending }));
+    this.bigPoints.frustumCulled = false; this.bigPoints.name = 'meter-pulse';
+    scene.add(this.points, this.scans, this.lanterns, this.bigPoints);
+  }
+
+  private origin(): T.Vector3 {
+    return new T.Vector3(.86, -.78, .5).unproject(this.camera).sub(this.camera.position).setLength(420).add(this.camera.position);
   }
 
   /** Launches guest `ordinal`'s four votes from the lower-right (the stations' side of the screen); the headline axis lands on its changed slots. */
   play(votes: Votes, ordinal: number, now: number, landing?: JourneyLanding): void {
     this.cancel();
-    const origin = new T.Vector3(.86, -.78, .5).unproject(this.camera).sub(this.camera.position).setLength(420).add(this.camera.position);
+    const origin = this.origin();
     CITY_AXES.forEach((axis, i) => {
       const energy = axis === 'environmentalPriority' && !!votes.energy;
       const land = landingFor(axis, energy, landing), site = new T.Vector3(land.x, 6, land.z);
       const apex = origin.clone().lerp(site, .55).setY(120 + i * 8);
       const curve = new T.CatmullRomCurve3([origin, origin.clone().lerp(apex, .5).setY(origin.y + 40), apex, site.clone().setY(70), site]);
       this.flights.push({ axis, vote: votes[axis], color: voteColor(axis, votes[axis], energy), curve, start: now + i * ORB_STAGGER, landed: false, ordinal, energy, scans: land.scans });
+    });
+  }
+
+  /** Rotation runs: the outcome question's big orb lands on its site with the scan ring; the other answers fly as small neutral orbs
+   * that fade out at their apex over the 住民の声 board (they join the crowd share). Same origin, stagger and arrival as `play`. */
+  playRotation(proposal: RotationJourney, now: number): void {
+    this.cancel();
+    const outcome = proposal.rotation?.outcome;
+    if (!outcome) return;
+    // No site: no orb lands, but the guest's lantern slots are still freed, as setRotationLanterns would.
+    if (!ROTATION_SITE_AXIS[outcome.questionId]) this.addRotationLantern(proposal.ordinal, outcome);
+    const origin = this.origin();
+    rotationFlights(outcome, proposal.answers).forEach((f, i) => {
+      const color = new T.Color(f.color);
+      if (f.axis) {
+        const land = landingFor(f.axis, false), site = new T.Vector3(land.x, 6, land.z), apex = origin.clone().lerp(site, .55).setY(120);
+        const curve = new T.CatmullRomCurve3([origin, origin.clone().lerp(apex, .5).setY(origin.y + 40), apex, site.clone().setY(70), site]);
+        this.flights.push({ axis: f.axis, vote: 0, color, curve, start: now + i * ORB_STAGGER, landed: false, ordinal: proposal.ordinal, energy: false, scans: land.scans, mode: 'rotation', outcome });
+        return;
+      }
+      const apex = origin.clone().lerp(VOICES_BOARD, .45 + .1 * i).setY(110 + 14 * i);
+      const curve = new T.CatmullRomCurve3([origin, origin.clone().lerp(apex, .5).setY(origin.y + 40), apex]);
+      this.flights.push({ axis: 'automation', vote: 0, color, curve, start: now + i * ORB_STAGGER, landed: false, ordinal: proposal.ordinal, energy: false, scans: [], mode: 'fade' });
     });
   }
 
@@ -107,6 +166,24 @@ export class VoteJourney {
   setLanterns(history: readonly { ordinal: number; votes: Votes }[]): void {
     this.cancel(); this.clearLanterns();
     for (const { ordinal, votes } of history.slice(-LANTERN_GUESTS)) for (const axis of CITY_AXES) this.addLantern(ordinal, axis, votes[axis], axis === 'environmentalPriority' && !!votes.energy);
+  }
+
+  /** Rotation runs' immediate state: one lantern per proposal, over the site of the question it swapped or fell back to. */
+  setRotationLanterns(history: readonly RotationJourney[]): void {
+    this.cancel(); this.clearLanterns();
+    for (const p of history.slice(-LANTERN_GUESTS)) if (p.rotation) this.addRotationLantern(p.ordinal, p.rotation.outcome);
+  }
+
+  private addRotationLantern(ordinal: number, outcome: RotationOutcome): void {
+    // The guest's four slots are cleared first, so the 65th guest also drops the 1st guest's lantern, wherever it stood.
+    const base = ((ordinal - 1) % LANTERN_GUESTS) * CITY_AXES.length;
+    for (let i = 0; i < CITY_AXES.length; i++) this.lanterns.setMatrixAt(base + i, HIDDEN);
+    this.lanterns.instanceMatrix.needsUpdate = true;
+    const lantern = rotationLantern(ordinal, outcome);
+    if (!lantern) return;
+    this.dummy.position.copy(lantern.position); this.dummy.scale.setScalar(lantern.scale); this.dummy.updateMatrix();
+    this.lanterns.setMatrixAt(lantern.slot, this.dummy.matrix); this.lanterns.setColorAt(lantern.slot, lantern.color);
+    this.lanterns.instanceMatrix.needsUpdate = true; this.lanterns.instanceColor!.needsUpdate = true;
   }
 
   private clearLanterns(): void {
@@ -125,7 +202,8 @@ export class VoteJourney {
   update(now: number, darkness: number): void {
     // Lanterns are a quiet trace by day and the city's accumulated voices by night (HDR colour so bloom picks them up).
     this.lanternMaterial.color.setScalar(.35 + 2.4 * darkness); this.lanternMaterial.opacity = .55 + .45 * darkness;
-    let n = 0;
+    let n = 0, nBig = 0;
+    const bigGeometry = this.bigPoints.geometry, bigPositions = bigGeometry.attributes.position.array as Float32Array, bigColors = bigGeometry.attributes.color.array as Float32Array;
     for (const f of this.flights) {
       const raw = (now - f.start) / FLIGHT_SECONDS;
       if (raw < 0) continue;
@@ -134,24 +212,30 @@ export class VoteJourney {
           f.landed = true;
           for (const scan of f.scans) this.scanList.push({ ...scan, color: f.color, start: f.start + FLIGHT_SECONDS });
           // shortcut: the lantern stays in the focal halo (setLanterns can rebuild it without the change points), even when the orb landed on district slots.
-          this.addLantern(f.ordinal, f.axis, f.vote, f.energy);
+          if (f.mode === 'rotation') this.addRotationLantern(f.ordinal, f.outcome!);
+          else if (f.mode !== 'fade') this.addLantern(f.ordinal, f.axis, f.vote, f.energy);
         }
         continue;
       }
       const eased = raw * raw * (3 - 2 * raw);
+      const big = f.mode === 'rotation', positions = big ? bigPositions : this.positions, colors = big ? bigColors : this.colors;
+      // A fading orb holds full brightness for the first half of its climb, then dims to nothing as it reaches the apex (additive, so black is invisible).
+      const dim = f.mode === 'fade' ? Math.min(1, 2 * (1 - raw)) ** 2 : 1;
       for (let k = 0; k <= TRAIL; k++) {
         const along = eased - k * .012;
         if (along < 0) break;
         // HDR head (bloom threshold is 1) with a saturated fading tail, so the orb still reads against the bright daytime city.
-        const p = f.curve.getPoint(along), fade = k ? .85 * (1 - k / (TRAIL + 1)) ** 1.5 : 2.2;
-        this.positions.set([p.x, p.y, p.z], n * 3);
-        this.colors.set([f.color.r * fade, f.color.g * fade, f.color.b * fade], n * 3);
-        n++;
+        const p = f.curve.getPoint(along), fade = (k ? .85 * (1 - k / (TRAIL + 1)) ** 1.5 : 2.2) * dim, at = (big ? nBig : n) * 3;
+        positions.set([p.x, p.y, p.z], at);
+        colors.set([f.color.r * fade, f.color.g * fade, f.color.b * fade], at);
+        if (big) nBig++; else n++;
       }
     }
     const geometry = this.points.geometry;
     geometry.setDrawRange(0, n);
     geometry.attributes.position.needsUpdate = true; geometry.attributes.color.needsUpdate = true;
+    bigGeometry.setDrawRange(0, nBig);
+    bigGeometry.attributes.position.needsUpdate = true; bigGeometry.attributes.color.needsUpdate = true;
     for (let i = this.scanList.length - 1; i >= 0; i--) if (now - this.scanList[i].start > SCAN_SECONDS) this.scanList.splice(i, 1);
     this.scanList.slice(-12).forEach((s, i) => {
       const t = (now - s.start) / SCAN_SECONDS;

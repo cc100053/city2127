@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS（階段 1 survey 端完成：9 題可選用接入；階段 2 城市端只接 Q01）
 - Branch: `feat/question-rotation`（2026-11-18 由 `docs/question-rotation-plan` HEAD `95c494ff` 開出；計劃文件 commit 一併帶入）
 - Base commit: `6724989bbff0ff8a0f65a9ee6e2a23f778e7ede3`（origin/main，2026-11-18）
-- Last verified commit: `0f80be71`（A→C 鏡頭修正；之前 `9c72c82a` 為階段 2 Q01；實時截圖在其未 commit 工作樹拍，sidecar 記 `e317b593` dirty；`?meters` 截圖在 `9c72c82a` 乾淨樹拍）
+- Last verified commit: 輪換投票旅程（方案 A）commit，見 Git log `feat(city): rotation-only vote journey`（之前 `0f80be71` 為 A→C 鏡頭修正；之前 `9c72c82a` 為階段 2 Q01；實時截圖在其未 commit 工作樹拍，sidecar 記 `e317b593` dirty；`?meters` 截圖在 `9c72c82a` 乾淨樹拍）
 - Remote availability: `origin/docs/question-rotation-plan`（計劃）；`origin/feat/question-rotation`（實作）
 
 ## Session Git state
@@ -62,9 +62,12 @@
   - 結果卡：`residentResult` 遇 Q01 換時，NW 前後狀態取自 outcome（`from`／`to`），偏好句沿用 version4 服務三句（A `human-led`、B `human-machine`、C `autonomous`）；效果句沿用 NW 近鏡句（端口增加／窗口增加）。其他題換及保底照舊：結果卡為「思いは記録され、見えている施設の構成は維持されました。」，城市不變。
   - 直接跳：A↔C 不經 `buildTransition.ts`，而是 `siteBuilders/automationHub.ts` 的 `retarget`：舊 band 部件降、新 band 部件升，同一個 3 秒內完成，途中 mixed 部件全程為 0（新測試）。結果後 6.5 秒的截圖（A→C、C→A 皆然）：+1 塔身從低層大廳的圓形頂篷中穿出，兩者同時可見。是否接受屬 owner 視覺判斷。
   - 鏡頭：原本 A→C 與 C→A 都用 `nw:focal-low`（任何一端為 low 即用 low 鏡），A→C 落定時 +1 塔頂超出畫面上緣（`meters-A-to-C-10_5s.png`）。owner 同意修正（2026-11-18，`0f80be71`）：`cityChangeManager` 的 `low` 旗標改為「終點為 low，或由 low 轉 mixed」，所以 low→high 直接跳用 `nw:focal`。version4 每份提案只移一階，不會一步由 low 到 high，鏡頭選擇不變。修正後 A→C 塔身完整入鏡，C→A 仍用 low 鏡（`focal-*.png`、`focal-sheet.jpg`）。
-  - 投票旅程：輪換提案四票皆為 0。結果後 2.5 秒的 1600 × 900 截圖中看不到可辨認的光點；未改。如 owner 要 NW 光點帶方向，可只為旅程按 Q01 答案合成 automation 票。
+  - 投票旅程（owner 2026-11-18 選方案 A，已做）：輪換 run 不再飛四軸光點。`VoteJourney.playRotation` 讓結果題（outcome 的題目）飛一個大光點（獨立 `Points`，尺寸 64，version4 為 38）到該題地塊，沿用掃描環落地；換模型用該地塊軸的 Meter 色（Q01 → NW，automation 藍），保底為中性色（`#fff1d6`），落地但城市不變。其餘三個答案為中性小光點，飛向「住民の声」看板方向，前半段全亮，到頂點時暗至零，不落地、不留燈籠，代表加入群眾比例。題目與地塊的對應為 `ROTATION_SITE_AXIS`（現只有 `Q01: 'automation'`），日後每接一題加一行；沒有地塊的題（現時其餘 8 題）四個光點都只淡出，沒有掃描環。起點、`ORB_STAGGER`、`FLIGHT_SECONDS`、`ARRIVAL_SECONDS` 及之後的近鏡時間軸不變（大光點仍於 2.2 秒落地）。
+  - 燈籠：輪換 run 每份提案一盞，只放在結果題的地塊上（Q01 → NW 光環）；換模型為 Meter 色、原尺寸，保底為中性色、0.7 倍（與 version4 零票相同，屬本次自定，owner 可改）；無地塊的題不留燈籠。實時落地與 snapshot／Undo／重新連線的重建（`setRotationLanterns`）用同一個 `rotationLantern` 計算，結果相同；第 65 位訪客即使題目無地塊，也會清除第 1 位的燈籠位。`main.ts` 只在 `view.rotation` 時改用這兩個方法；version4 仍呼叫 `play`／`setLanterns`，輸出與改動前逐位元相同（測試以改動前 `93720bb5` 的緩衝區摘要核對）。
 
 ## Actual validation results
+
+- 輪換投票旅程方案 A（2026-11-18）：`tests/voteJourney.test.ts` 以 headless three.js 實際跑旅程（canvas stub）：version4 四組旅程（混合票、能源、district 落點、全零）八個時刻的全部緩衝區摘要等於改動前 `93720bb5` 的錄得值；Q01 換模型為一個 automation 色大光點加三個中性淡出光點，淡出光點到頂點時亮度 < 0.05，大光點於 2.2 秒落地，一個掃描環，一盞 NW automation 燈籠；Q01 保底落地、中性 0.7 倍燈籠；無地塊題（Q05 換、Q03 保底）四個淡出光點，無大光點、掃描環及燈籠；實時燈籠與 `setRotationLanterns` 重建相同，只在 NW；第 65 位訪客取代第 1 位。root 及 `survey/` `npm test`／`npm run build`、`git diff --check` 結果見 VALIDATION。瀏覽器：`root`＋`survey-rotation`，以 capture 載入器（headless Chrome 1600 × 900）在頁面就緒後送出訪客，Q01 B→C 結果後 0.5／1／1.5／2／2.5／3／3.5 秒，及一份 Q02 換（無地塊）0.5／1／1.5／2／3 秒，12 張 sidecar 皆無 page error。原尺寸查看：0.5–1.5 秒可見藍色大光點及暖白淡出光點，2 秒淡出光點已暗，3 秒 NW 掃描環可見；Q02 換只有暖白淡出光點，沒有藍色。證據存 `~/city2127-evidence/question-rotation/journey/`（`sheet.jpg` 總覽，`liveCapture.mjs` 為驅動腳本副本，偏移以 `OFFSETS` 設定）。
 
 - Verification status: PARTIAL（survey 端接線及城市端 Q01 完成並測試；其餘 8 題城市未畫；iPad／A/B 實機、FPS 未測）
 - Date and checked commit/worktree: 2026-11-18，`feat/question-rotation`
@@ -87,6 +90,8 @@
 
 ## Known issues and blockers
 
+- 輪換投票旅程：大光點落在 NW 時，於 hero 鏡頭中部分被左側建築遮擋（與 version4 NW 光點相同，深度測試）；保底燈籠的顏色及尺寸為自定，待 owner 看。
+
 - 新 run 各題起始模型未定（題組現填暫定值）。
 - 模擬：10 題時少數 run 有模型全日未出場（見上表），gate 未卡此配置。
 - 1.7 未以 version4 真人答案分佈重跑（未檢查本機 SQLite 是否有真人資料）。
@@ -99,7 +104,7 @@
 
 ## Next expected step
 
-**現時：** 階段 2 Q01 已接（`rotationLayout.ts`）。下一步：owner 看 Q01 B→C／C→A 實拍及上列兩個待決事項；其餘題按模型完成次序接入（Q02 起需 2.1 地塊目錄及 2.2 `lotRuntime`，因三個模型各有地塊）；或 owner 決定把輪換設為預設並開新 run（要同步 AGENTS.md／SPEC 敘事原則，計劃 6.7）。階段 4 內容製作可並行。
+**現時：** 階段 2 Q01 已接（`rotationLayout.ts`），輪換投票旅程方案 A 已做（`voteJourney.ts`）。下一步：owner 看 Q01 B→C／C→A 實拍及上列兩個待決事項；其餘題按模型完成次序接入（Q02 起需 2.1 地塊目錄及 2.2 `lotRuntime`，因三個模型各有地塊）；或 owner 決定把輪換設為預設並開新 run（要同步 AGENTS.md／SPEC 敘事原則，計劃 6.7）。階段 4 內容製作可並行。
 
 
 （已完成，保留作紀錄）階段 1 切片二：server 接線。先讀 `survey/src/server/runStore.ts`（`runProposalLadder` fold 位置）、`context.ts`、`sessionService.ts`、`answerService.ts`、`migrations.ts`、`protocol.ts`、`twoStations.test.ts`，然後：

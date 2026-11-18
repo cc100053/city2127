@@ -305,7 +305,9 @@ try {
       // while the carrier evidence for the resident card is computed now. Snapshots, resets, Undo and reduced motion stay immediate.
       if(kind==='city-state-updated'&&latest&&!cameraMotion.matches&&displayMs>=DISPLAY_MS-100){
         const changes=cityChanges!.applyExhibitionLayout(layout,kind,now+(headlineCamera?shotTimeline(displayMs).change:ARRIVAL_SECONDS),view.slotSeeds,now,latest.votes);
-        journey!.play(latest.votes,latest.ordinal,now,changes[0]?.headline&&changes[0].district&&!changes[0].focalOnly?changes[0]:undefined);
+        // Rotation runs fly one big orb to the outcome question's site and fade the other three answers (src/voteJourney.ts playRotation).
+        if(view.rotation)journey!.playRotation(latest,now);
+        else journey!.play(latest.votes,latest.ordinal,now,changes[0]?.headline&&changes[0].district&&!changes[0].focalOnly?changes[0]:undefined);
         // DEV demo: the headline shot is held BEAT_SECONDS longer after the building change, so 湊's visit fits before the return to hero.
         const visit=residentDemo&&changes[0]?.socketId==='nw'&&['nw:focal','nw:focal-low'].includes(headlineShot(changes[0])??'');
         const shot=headlineCamera?.play(changes,now,visit?(shotTimeline(displayMs).changeEnd+BEAT_SECONDS)*1000:displayMs)??null;
@@ -315,7 +317,7 @@ try {
         return changes;
       }
       headlineCamera?.cancel();narration?.cancel();
-      journey!.setLanterns(view.recentProposals);
+      if(view.rotation)journey!.setRotationLanterns(view.recentProposals);else journey!.setLanterns(view.recentProposals);
       return cityChanges!.applyExhibitionLayout(layout,kind==='city-state-updated'?'city-state-snapshot':kind,now,view.slotSeeds);
     }
     headlineCamera?.cancel();narration?.cancel();journey!.cancel();
