@@ -9,6 +9,7 @@ import type { DisplayMode } from './dayCycle.ts';
 import { presets, type WorldState } from './presets.ts';
 import { changeSites } from './layout.ts';
 import { q01Swap, rotationLayout } from './rotationLayout.ts';
+import { crowdShareText } from '../survey/src/shared/rotation.ts';
 import { AXES, connectSurvey, isExhibitionView, supersedes, type CityView, type Decision, type ExhibitionProposal, type ExhibitionView, type SurveyEventKind, type SurveyView, type ExploreLook } from './surveyView.ts';
 
 // Root-scene side of the survey server's CityView contract (survey/src/shared/cityView.ts).
@@ -246,7 +247,9 @@ export function residentResult(proposal: ExhibitionProposal, changes?: readonly 
       effect = '思いは住民の声に加わり、街のエネルギー設備は今の配置を受け継いでいます。';
     } else effect = direction ? '街の方向は少し動きましたが、見えている施設の構成は維持されました。' : '思いは記録され、見えている施設の構成は維持されました。';
   }
-  return { preference, effect, place, kind };
+  // Rotation runs: the crowd share of the outcome's question (plan 3.3, 2.6) — the "one voice among many" half of the story.
+  const outcomeShare = proposal.rotation?.shares.find(share => share.questionId === proposal.rotation!.outcome.questionId);
+  return { preference, effect, place, kind, ...(outcomeShare ? { share: crowdShareText(outcomeShare) } : {}) };
 }
 
 const LEGACY_HISTORY_SHOWN = 3;
@@ -318,6 +321,8 @@ export function startSurveyAtmosphere(
           el('p', 'resident-place', `街の画面：${result.place}`));
         const showReason = () => {
           latest.querySelector('.resident-card-copy')!.textContent = `${result.preference}${result.effect}`;
+          // The share joins the reason, so the number never precedes the city's answer.
+          if (result.share) latest.querySelector('.resident-card-copy')!.after(el('p', 'resident-share', `住民の声：${result.share}`));
         };
         const transitionMs = reasonDelayMs(displayMs, globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false, headlineTransitionSeconds(evidence?.[0], SITE_TRANSITION_SECONDS));
         if (transitionMs === 0) showReason();

@@ -58,4 +58,14 @@ assert.equal(q01Swap(proposal({ kind: 'swap', questionId: 'Q02', from: 'A', to: 
 assert.equal(q01Swap(proposal({ kind: 'fallback', questionId: 'Q01' }, 'B')), undefined);
 assert.equal(residentResult(proposal({ kind: 'swap', questionId: 'Q02', from: 'A', to: 'B' }, 'B'), []).kind, 'maintained');
 
+// Plan 2.6: the result card carries the crowd share of the outcome's question only, without a number below the threshold.
+const shared = (outcome: NonNullable<ExhibitionProposal['rotation']>['outcome'], percent?: number) => residentResult({
+  ...proposal(outcome, 'C'),
+  rotation: { outcome, shares: [{ questionId: 'Q02', optionId: 'B', votes: 3, total: 12, percent: 25 }, { questionId: 'Q01', optionId: 'C', votes: 6, total: 12, ...(percent === undefined ? {} : { percent }) }] },
+}, nwFocal).share;
+assert.equal(shared({ kind: 'swap', questionId: 'Q01', from: 'B', to: 'C' }, 50), '同じ暮らしを選んだ住民 50%（12人中）');
+assert.equal(shared({ kind: 'fallback', questionId: 'Q02' }, 50), '同じ暮らしを選んだ住民 25%（12人中）', 'the fallback question\'s share');
+assert.equal(shared({ kind: 'swap', questionId: 'Q01', from: 'B', to: 'C' }), 'この問いへの声は、まだ集まり始めたところです');
+assert.equal(toC.share, undefined, 'no share without one for the outcome question');
+
 console.log('rotation layout tests passed');

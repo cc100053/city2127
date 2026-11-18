@@ -113,7 +113,14 @@ export function crowdShare(tallies: RotationTallies, questionId: string, optionI
   return { questionId, optionId, votes, total, ...(total >= minVotes && total > 0 ? { percent: Math.round(100 * votes / total) } : {}) };
 }
 
-export type RotationFold = { state: RotationState; tallies: RotationTallies; outcomes: RotationOutcome[] };
+/** Plan 3.3 small-sample copy (provisional until owner confirms the threshold and wording). */
+export const VOICES_GATHERING = 'この問いへの声は、まだ集まり始めたところです';
+
+/** One crowd share as neutral copy, shared by the guest's 住民の声 panel and the city result card; no number below the threshold. */
+export const crowdShareText = (share: CrowdShare) =>
+  share.percent === undefined ? VOICES_GATHERING : `同じ暮らしを選んだ住民 ${share.percent}%（${share.total}人中）`;
+
+export type RotationFold ={ state: RotationState; tallies: RotationTallies; outcomes: RotationOutcome[] };
 
 /**
  * Rebuilds the city from the run's active proposals in stamp order; Undo, snapshot and reconnect all call this.

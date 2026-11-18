@@ -4,11 +4,12 @@
 - Status: IN_PROGRESS（階段 1 survey 端完成：9 題可選用接入；階段 2 城市端只接 Q01）
 - Branch: `feat/question-rotation`（2026-11-18 由 `docs/question-rotation-plan` HEAD `95c494ff` 開出；計劃文件 commit 一併帶入）
 - Base commit: `6724989bbff0ff8a0f65a9ee6e2a23f778e7ede3`（origin/main，2026-11-18）
-- Last verified commit: 輪換投票旅程（方案 A）commit，見 Git log `feat(city): rotation-only vote journey`（之前 `0f80be71` 為 A→C 鏡頭修正；之前 `9c72c82a` 為階段 2 Q01；實時截圖在其未 commit 工作樹拍，sidecar 記 `e317b593` dirty；`?meters` 截圖在 `9c72c82a` 乾淨樹拍）
+- Last verified commit: 2.6 結果卡群眾比例 commit，見 Git log `feat(city): crowd share on the rotation result card`（之前 `c63a316a` 為投票旅程方案 A；之前 `0f80be71` 為 A→C 鏡頭修正；之前 `9c72c82a` 為階段 2 Q01；實時截圖在其未 commit 工作樹拍，sidecar 記 `e317b593` dirty；`?meters` 截圖在 `9c72c82a` 乾淨樹拍）
 - Remote availability: `origin/docs/question-rotation-plan`（計劃）；`origin/feat/question-rotation`（實作）
 
 ## Session Git state
 
+- Session starting branch and HEAD（2026-11-18 第四節，2.6 結果卡群眾比例）：`feat/question-rotation`，`c63a316a`，與 origin 同步；`origin/main` 仍為 `6724989b`（分支包含之）；未追蹤 `Dev_QA.md` 保留
 - Session starting branch and HEAD（2026-11-18 第三節，階段 2 Q01）：`feat/question-rotation`，`e317b593`，與 origin 同步，`origin/main` 無新 commit（分支領先 7）；未追蹤 `Dev_QA.md` 保留
 - Session starting branch and HEAD（2026-11-18 第二節）：`docs/question-rotation-plan`，`95c494ff`，與 origin 同步；開出 `feat/question-rotation`
 - Last fetched origin/main commit: `6724989b`，2026-11-18（分支包含之）
@@ -65,7 +66,14 @@
   - 投票旅程（owner 2026-11-18 選方案 A，已做）：輪換 run 不再飛四軸光點。`VoteJourney.playRotation` 讓結果題（outcome 的題目）飛一個大光點（獨立 `Points`，尺寸 64，version4 為 38）到該題地塊，沿用掃描環落地；換模型用該地塊軸的 Meter 色（Q01 → NW，automation 藍），保底為中性色（`#fff1d6`），落地但城市不變。其餘三個答案為中性小光點，飛向「住民の声」看板方向，前半段全亮，到頂點時暗至零，不落地、不留燈籠，代表加入群眾比例。題目與地塊的對應為 `ROTATION_SITE_AXIS`（現只有 `Q01: 'automation'`），日後每接一題加一行；沒有地塊的題（現時其餘 8 題）四個光點都只淡出，沒有掃描環。起點、`ORB_STAGGER`、`FLIGHT_SECONDS`、`ARRIVAL_SECONDS` 及之後的近鏡時間軸不變（大光點仍於 2.2 秒落地）。
   - 燈籠：輪換 run 每份提案一盞，只放在結果題的地塊上（Q01 → NW 光環）；換模型為 Meter 色、原尺寸，保底為中性色、0.7 倍（與 version4 零票相同，屬本次自定，owner 可改）；無地塊的題不留燈籠。實時落地與 snapshot／Undo／重新連線的重建（`setRotationLanterns`）用同一個 `rotationLantern` 計算，結果相同；第 65 位訪客即使題目無地塊，也會清除第 1 位的燈籠位。`main.ts` 只在 `view.rotation` 時改用這兩個方法；version4 仍呼叫 `play`／`setLanterns`，輸出與改動前逐位元相同（測試以改動前 `93720bb5` 的緩衝區摘要核對）。
 
+- 2026-11-18 第四節，2.6 城市結果卡群眾比例：
+  - 判斷：Q02 城市接線（2.1／2.2）未做。蓮花受電模型雖已 merge 入 main（PR #4），其 handoff 仍寫「not placed」，城市內未選址；此時把 Q02 畫出會令起始選項 A 隱去已驗收的農園，換到 B 時又無模型出現，空置態亦未驗收。故改做不受阻擋的 2.6 結果卡部分。
+  - 做法：群眾比例句移至 `survey/src/shared/rotation.ts`（`VOICES_GATHERING`、`crowdShareText`），guest「住民の声」面板與城市結果卡共用同一句。`residentResult` 在輪換提案回傳 `share`：取 outcome 題目（換模型或保底題）的比例；城市卡在原因句出現時同時加一行「住民の声：同じ暮らしを選んだ住民 N%（M人中）」，未達門檻為「住民の声：この問いへの声は、まだ集まり始めたところです」。version4 提案沒有 `rotation`，結果卡不變。
+  - 未做：hologram「住民の声」看板改為題目比例（2.6 下半，屬視覺改動，待 owner 定樣式）；保底結果卡仍用通用句，未改為 3.4 的「あなたの選んだ暮らしは、すでにここにあります」（guest 端已用；城市端待 5.2 文案）。
+
 ## Actual validation results
+
+- 2.6 結果卡群眾比例（2026-11-18 第四節）：`tests/rotationLayout.test.ts` 新增：只取 outcome 題目的比例、保底題的比例、未達門檻句、無比例時不給。root 及 `survey/` `npm test`／`npm run build`、`git diff --check` 通過。內置瀏覽器 `root`＋`survey-rotation`（scratch DB），第 1 位訪客 Q01 B→C：結果卡為「…自律サービスの端口が増えました。」下一行「住民の声：この問いへの声は、まだ集まり始めたところです」，console 無錯誤；其後 4 位（Q02–Q05 換）的卡逐份重建，無殘留比例行。百分比行未在瀏覽器出現：每位只答 9 題中的 4 題，要約 25 位訪客才有一題達 10 票，由單元測試覆蓋。`scripts/changeSheet.ts` 重新生成只改日期（version4 文案不變），未 commit。
 
 - 輪換投票旅程方案 A（2026-11-18）：`tests/voteJourney.test.ts` 以 headless three.js 實際跑旅程（canvas stub）：version4 四組旅程（混合票、能源、district 落點、全零）八個時刻的全部緩衝區摘要等於改動前 `93720bb5` 的錄得值；Q01 換模型為一個 automation 色大光點加三個中性淡出光點，淡出光點到頂點時亮度 < 0.05，大光點於 2.2 秒落地，一個掃描環，一盞 NW automation 燈籠；Q01 保底落地、中性 0.7 倍燈籠；無地塊題（Q05 換、Q03 保底）四個淡出光點，無大光點、掃描環及燈籠；實時燈籠與 `setRotationLanterns` 重建相同，只在 NW；第 65 位訪客取代第 1 位。root 及 `survey/` `npm test`／`npm run build`、`git diff --check` 結果見 VALIDATION。瀏覽器：`root`＋`survey-rotation`，以 capture 載入器（headless Chrome 1600 × 900）在頁面就緒後送出訪客，Q01 B→C 結果後 0.5／1／1.5／2／2.5／3／3.5 秒，及一份 Q02 換（無地塊）0.5／1／1.5／2／3 秒，12 張 sidecar 皆無 page error。原尺寸查看：0.5–1.5 秒可見藍色大光點及暖白淡出光點，2 秒淡出光點已暗，3 秒 NW 掃描環可見；Q02 換只有暖白淡出光點，沒有藍色。證據存 `~/city2127-evidence/question-rotation/journey/`（`sheet.jpg` 總覽，`liveCapture.mjs` 為驅動腳本副本，偏移以 `OFFSETS` 設定）。
 
@@ -104,7 +112,7 @@
 
 ## Next expected step
 
-**現時：** 階段 2 Q01 已接（`rotationLayout.ts`），輪換投票旅程方案 A 已做（`voteJourney.ts`）。下一步：owner 看 Q01 B→C／C→A 實拍及上列兩個待決事項；其餘題按模型完成次序接入（Q02 起需 2.1 地塊目錄及 2.2 `lotRuntime`，因三個模型各有地塊）；或 owner 決定把輪換設為預設並開新 run（要同步 AGENTS.md／SPEC 敘事原則，計劃 6.7）。階段 4 內容製作可並行。
+**現時：** 階段 2 Q01 已接（`rotationLayout.ts`），輪換投票旅程方案 A 已做（`voteJourney.ts`），2.6 結果卡群眾比例已做（hologram 看板未做）。Q02 城市接線待蓮花受電在城市選址（`place-building`）及三個地塊空置態。下一步：owner 看 Q01 B→C／C→A 實拍及上列兩個待決事項；其餘題按模型完成次序接入（Q02 起需 2.1 地塊目錄及 2.2 `lotRuntime`，因三個模型各有地塊）；或 owner 決定把輪換設為預設並開新 run（要同步 AGENTS.md／SPEC 敘事原則，計劃 6.7）。階段 4 內容製作可並行。
 
 
 （已完成，保留作紀錄）階段 1 切片二：server 接線。先讀 `survey/src/server/runStore.ts`（`runProposalLadder` fold 位置）、`context.ts`、`sessionService.ts`、`answerService.ts`、`migrations.ts`、`protocol.ts`、`twoStations.test.ts`，然後：

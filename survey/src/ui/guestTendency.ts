@@ -5,6 +5,7 @@ import type { ExhibitionState } from '../shared/citySurveyState.ts';
 import type { ProposalAnswerRecord, ProposalRotation } from '../shared/cityView.ts';
 import { SCORE_MAX, SCORE_MIN } from '../shared/citySurveyState.ts';
 import { ENERGY_CHOICES, type EnergyChoice } from '../shared/energy.ts';
+import { crowdShareText } from '../shared/rotation.ts';
 import { el } from './debugApi.ts';
 import { optionIcon } from './guestIcons.ts';
 
@@ -96,8 +97,6 @@ export function renderTendency(state: ExhibitionState, choices: ReadonlyMap<stri
       ...(energy ? [energy] : [])));
 }
 
-/** Plan 3.3 small-sample copy (provisional until owner confirms the threshold and wording). */
-export const VOICES_GATHERING = 'この問いへの声は、まだ集まり始めたところです';
 /** Plan 3.4 fallback copy: every drawn site already shows this guest's choice (provisional). */
 export const ROTATION_ALREADY_HERE = 'あなたの選んだ暮らしは、すでにここにあります';
 
@@ -113,6 +112,6 @@ export function renderVoices(rotation: ProposalRotation, answers: readonly Propo
       const answer = answers.find(item => item.questionId === share.questionId);
       return el('li', { class: 'guest-lean-row guest-lean-row--voice' },
         el('p', { class: 'guest-lean-title' }, answer?.optionLabel ?? share.optionId),
-        el('p', { class: 'guest-lean-text' }, share.percent === undefined ? VOICES_GATHERING : `同じ暮らしを選んだ住民 ${share.percent}%（${share.total}人中）`));
+        el('p', { class: 'guest-lean-text' }, crowdShareText(share)));
     })));
 }
