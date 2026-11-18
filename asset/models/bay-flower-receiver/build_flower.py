@@ -30,11 +30,26 @@ BEAM_TOP = 900.0            # beam height; the app may scale Q02B_LightBeam in y
 S = 1.5                     # receiver scale; people by the pavilion in the image make the flower ≈ 120–130 m across
 # petal rings: count, angular offset (fraction of a step), hinge radius, hinge height, length, start/end pitch (deg from
 # horizontal), max width, cup depth (fraction of width); lengths in units of S
-RINGS = tuple((n, o, r * S, y * S, L * S, a0, a1, W * S, c) for n, o, r, y, L, a0, a1, W, c in (
+# OPEN: bloom (owner 2026-11-18), degrees each ring's petals tilt outward about their hinge. Both pitches drop by the
+# same angle, so the petal keeps its curvature; seats, arms, ribs, shoes and ring beams sample the petal and follow.
+OPEN = (3.0, 10.0, 17.5)    # outer / middle / inner ring, mean opening
+# Neighbours in a ring overlap sideways and are cupped alike, so identical petals cross at the overlap. Even petals open
+# LAYER degrees less and odd ones LAYER more (every ring has an even count): each even petal lies wholly over both
+# neighbours, an inner and an outer layer as in a lotus. Openings per ring: outer 0.5–5.5°, middle 7.5–12.5°, inner
+# 15–20°. 2.5° is the smallest tried that keeps shells, rims, spine ribs and root shoes apart (the middle ring's rims
+# still touched at 2.2°).
+LAYER = (2.5, 2.5, 2.5)
+RINGS = tuple((n, o, r * S, y * S, L * S, a0 - op, a1 - op, W * S, c) for (n, o, r, y, L, a0, a1, W, c), op in zip((
     (18, 0.0, 15.5, 4.6, 29.0, 20, 44, 14.0, .08),
     (16, .5, 13.0, 5.8, 23.0, 40, 66, 12.0, .09),
     (12, .25, 10.5, 7.0, 23.0, 56, 82, 10.0, .1),
-))
+), OPEN))
+
+
+def petal_ring(ri, k):
+    """Ring parameters for petal k of ring ri, with its layer offset applied to both pitches."""
+    ring, d = RINGS[ri], LAYER[ri] * (1 if k % 2 == 0 else -1)
+    return ring[:5] + (ring[5] + d, ring[6] + d) + ring[7:]
 PANEL_UV = (4.0, 8.0)       # texture tiles across / along each petal: 8 x 16 cells, ≈ 2.6 m on the outer ring
 PANEL_TEX = 256             # px per tile; 2 x 2 cells with thin silver frames
 SEAM_TEX = 256              # px per guard-plate / pontoon tile: seams on the tile edges, fastener dots along them
@@ -726,7 +741,7 @@ def build():
         row = []
         for k in range(n):
             th = 2 * math.pi * (k + off) / n
-            topf, botf = petal(A["panel"], A["shell"], ring, th)
+            topf, botf = petal(A["panel"], A["shell"], petal_ring(ri, k), th)
             for v in (-1, 1):
                 pipe(A["frame"], [topf(u / 12, v * .98) for u in range(13)], .2, 5)
             petal_back_details(A, topf, botf)

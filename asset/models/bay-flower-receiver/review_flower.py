@@ -42,6 +42,8 @@ CAMS = {"ref": CAM, "close": ((-34.0, 70.0, 100.0), (4.0, 16.0, 0.0), 36.0),
         # --cam platform: above the promenade on the reference camera's side of the shore platform: the room's landward
         # side, its arched pipe end, flange, the drop elbows past the platform end, paving, rail and planter
         "platform": ((-89.8, 16.0, 92.4), (-87.0, 2.5, 61.7), 30.0),
+        # --cam top: straight down on the flower (image up = -z), for the opening of the three rings
+        "top": ((0.0, 175.0, .01), (0.0, 0.0, 0.0), 35.0),
         # --cam petal: up under the outer ring at the pontoon edge: guard plates, spine ribs, root shoes on the seats
         "petal": ((7.9, 3.0, 37.2), (4.0, 7.6, 22.9), 30.0)}
 
