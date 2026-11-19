@@ -72,3 +72,32 @@ export function q08Result(swap: { from: string; to: string }) {
 
 /** The Q08 headline shot: the shelf's close-up when it enters or leaves; none (stay at hero) when A↔B leaves the lot empty. */
 export const q08Shot = (swap: { shelf: boolean }): ShotId | null => swap.shelf ? 'sw:focal' : null;
+
+/** Q03 (question rotation): its three options share the drawer housing lot. A is the drawer housing; B (shared car shelter) and C
+ *  (district mobility hub and park) have no model yet (owner 2026-11-19), so the housing fades and its loop road stays. Provisional
+ *  result copy (owner copy pending, plan 5.2): option → [place, preference]; the effect depends on whether the housing left, returned
+ *  or the lot stayed empty (q03Result). */
+export const Q03_RESULTS: Readonly<Record<string, readonly [string, string]>> = {
+  A: ['車が引き出しになる住宅', 'あなたは、自分専用の乗り物を手元に置く暮らしを選びました。'],
+  B: ['車が引き出しになる住宅の跡地', 'あなたは、同じ建物の住民と乗り物を分け合う暮らしを選びました。'],
+  C: ['車が引き出しになる住宅の跡地', 'あなたは、地域の共有サービスで乗り物を使う暮らしを選びました。'],
+};
+
+/** A rotation proposal's Q03 swap, or undefined. `housing` is whether the drawer housing enters or leaves (B↔C changes nothing visible). */
+export function q03Swap(proposal: ExhibitionProposal) {
+  const outcome = proposal.rotation?.outcome;
+  if (outcome?.kind !== 'swap' || outcome.questionId !== 'Q03' || !Q03_RESULTS[outcome.to] || !Q03_RESULTS[outcome.from]) return undefined;
+  return { from: outcome.from, to: outcome.to, housing: (outcome.from === 'A') !== (outcome.to === 'A') };
+}
+
+/** The result card for a Q03 swap: the drawer housing returning, leaving, or the lot staying empty for a facility still to come. */
+export function q03Result(swap: { from: string; to: string }) {
+  const [place, preference] = Q03_RESULTS[swap.to];
+  const effect = swap.to === 'A' ? 'お台場の西側に、車が引き出しのように収まる住宅が戻りました。'
+    : swap.from === 'A' ? 'お台場の西側から車が引き出しになる住宅が外れ、環道だけが残る空き地になりました。'
+    : 'お台場の西側の環道沿いは、新しい施設を待つ空き地のままです。';
+  return { place, effect, preference };
+}
+
+/** The Q03 headline shot: the housing's close-up when it enters or leaves; none (stay at hero) when B↔C leaves the lot empty. */
+export const q03Shot = (swap: { housing: boolean }): ShotId | null => swap.housing ? 'q03:housing' : null;

@@ -63,12 +63,17 @@ export const ROTATION_SITE_AXIS: Readonly<Record<string, CityAxis>> = { Q01: 'au
 /** Q02's models each own a lot (layout LOTS); its orb lands on the lot of the model the outcome shows, in the energy vote's colour. */
 export const Q02_LOTS: Readonly<Record<string, keyof typeof LOTS>> = { A: 'q02-west-sea', B: 'q02-bay-flower', C: 'q02-farm-south' };
 const Q02_COLOR = '#75e2c2';
+/** Lots shared by all of a question's options (layout LOTS): the orb lands there whatever the outcome, in its axis colour and lantern slot.
+ *  Q03 (drawer housing; B/C vacant for now) takes the sharing axis, the question's 共有志向 theme (provisional, owner 2026-11-19). */
+export const ROTATION_SHARED_LOTS: Readonly<Record<string, { lot: keyof typeof LOTS; axis: CityAxis }>> = { Q03: { lot: 'drawer-housing', axis: 'publicSharing' } };
 /** Where a rotation outcome lands: ground point, plan extent (lantern halo; the scan ring is 1.15×), swap colour and the guest's lantern slot axis. */
 export type RotationSite = { x: number; z: number; extent: number; color: string; slot: CityAxis };
 type Answer = { questionId: string; optionId?: string };
 export function rotationSite(outcome: RotationOutcome, answers: readonly Answer[]): RotationSite | undefined {
   const axis = ROTATION_SITE_AXIS[outcome.questionId];
   if (axis) { const s = voteSite(axis, false); return { x: s.x, z: s.z, extent: Math.max(s.w, s.d) * s.scale, color: METER_COLORS[axis], slot: axis }; }
+  const shared = ROTATION_SHARED_LOTS[outcome.questionId];
+  if (shared) { const lot = LOTS[shared.lot]; return { x: lot.x, z: lot.z, extent: lot.size / 2, color: METER_COLORS[shared.axis], slot: shared.axis }; }
   if (outcome.questionId !== 'Q02') return undefined;
   // A fallback keeps the guest's own (already shown) Q02 answer.
   const option = outcome.kind === 'swap' ? outcome.to : answers.find(a => a.questionId === 'Q02')?.optionId;

@@ -6,7 +6,7 @@ import { Group, Mesh, MeshStandardMaterial, BoxGeometry, Scene } from 'three';
 import { LOTS } from '../src/layout.ts';
 import { FARM_CENTRE, EnergyRuntime } from '../src/energyRuntime.ts';
 import { BAY_FLOWER_SHOWN } from '../src/bayFlower.ts';
-import { LotRuntime, q02Models, q08Vacant } from '../src/lotRuntime.ts';
+import { LotRuntime, q02Models, q03Housing, q08Vacant } from '../src/lotRuntime.ts';
 
 // Exactly one shown model per option; no option is the version4 city.
 for (const option of ['A', 'B', 'C']) {
@@ -64,7 +64,7 @@ assert.equal(hydro.visible, false); assert.ok(nodes.every(node => node.visible))
 // A version4 view after a rotation run restores the built city.
 lots.setQ02(undefined, 30, true); lots.update(30, false);
 assert.equal(hydro.visible, true); assert.ok(nodes.every(node => !node.visible)); assert.equal(farm.at(-1), undefined);
-assert.deepEqual(lots.getDiagnostics(), { hydro: 1, flower: 0 });
+assert.deepEqual(lots.getDiagnostics(), { hydro: 1, flower: 0, housing: 1 });
 
 // EnergyRuntime: the override wins over the receiver vote and survives an immediate energy update; undefined hands it back.
 const energy = new EnergyRuntime(new Scene());
@@ -111,3 +111,43 @@ for (const [from, to] of [['C', 'A'], ['C', 'B'], ['A', 'B']]) assert.doesNotMat
   assert.deepEqual([site.x, site.z, site.slot], [changeSites.sw.x, changeSites.sw.z, 'publicSharing'], 'Q08 orb lands on the SW lot'); }
 
 console.log('lot runtime tests passed');
+
+// Q03 shares the drawer housing lot: A shows the housing, B/C (no model yet) fade it and keep its loop road; version4 never engages it.
+assert.deepEqual(['A', 'B', 'C', undefined].map(q03Housing), [true, false, false, true]);
+const q03set = set.questions.find((q: { id: string }) => q.id === 'Q03');
+assert.deepEqual(q03set.options.map((o: { lotId: string }) => o.lotId), ['drawer-housing', 'drawer-housing', 'drawer-housing'], 'Q03: one shared lot');
+{ const { DRAWER_HOUSING } = await import('../src/layout.ts'); const lot = LOTS['drawer-housing'];
+  // The lot covers the R2 envelope (X −128.6…−79.4, Z 67.3…92.8) and its forecourt.
+  assert.ok(Math.abs(lot.x - DRAWER_HOUSING.x) < 1 && lot.z - lot.size / 2 <= 61.3 && lot.z + lot.size / 2 >= 92.8 && lot.size >= 49.25); }
+{
+  const houseScene = new Scene(), road = mesh(), housing = new Group(), stoneMaterial = new MeshStandardMaterial();
+  road.name = 'drawer-housing-drive'; houseScene.add(road);
+  const houseLots = new LotRuntime(houseScene);
+  // Version4: no rotation view, nothing touched even after the GLB loads.
+  houseLots.setQ03(undefined, 0, true); houseLots.update(0, false);
+  housing.name = 'drawer-housing-2127'; housing.add(mesh(), new Mesh(new BoxGeometry(), stoneMaterial)); houseScene.add(housing);
+  houseLots.update(1, false);
+  assert.equal(housing.visible, true); assert.equal((housing.children[1] as Mesh).material, stoneMaterial, 'version4 keeps the shared stone');
+  // A snapshot at A keeps it standing; a live A→B from t 10 is held until 10, half-faded at 11.5, gone at 13; the road stays.
+  houseLots.setQ03('A', 2, true); houseLots.update(2, false); assert.equal(housing.visible, true);
+  houseLots.setQ03('B', 10, false); houseLots.update(9, false); assert.equal(housing.visible, true);
+  houseLots.update(11.5, false);
+  assert.ok(Math.abs(((housing.children[0] as Mesh).material as MeshStandardMaterial).opacity - .5) < 1e-9, 'half-way at mid-transition');
+  houseLots.update(13, false); assert.equal(housing.visible, false); assert.equal(road.visible, true, 'the loop road stays');
+  assert.equal(houseLots.getDiagnostics().housing, 0);
+  // B→C: nothing to change; C→A returns it; a version4 view after the run restores it at once.
+  houseLots.setQ03('C', 20, false); houseLots.update(24, false); assert.equal(housing.visible, false);
+  houseLots.setQ03('A', 30, false); houseLots.update(33, false); assert.equal(housing.visible, true);
+  houseLots.setQ03('B', 40, true); houseLots.update(40, false); assert.equal(housing.visible, false, 'snapshot fades at once');
+  houseLots.setQ03(undefined, 50, true); houseLots.update(50, false); assert.equal(housing.visible, true, 'version4 restores the housing');
+  assert.equal(stoneMaterial.opacity, 1, 'the shared stone is never faded');
+}
+const { q03Swap, q03Result, q03Shot } = await import('../src/rotationLayout.ts');
+const q03Of = (from: string, to: string) => q03Swap({ rotation: { outcome: { kind: 'swap', questionId: 'Q03', from, to } } } as never)!;
+assert.deepEqual([q03Of('A', 'B').housing, q03Of('C', 'A').housing, q03Of('B', 'C').housing], [true, true, false]);
+assert.equal(q03Shot(q03Of('A', 'C')), 'q03:housing'); assert.equal(q03Shot(q03Of('C', 'B')), null, 'B↔C: nothing to see, stay at hero');
+assert.equal(q03Swap({ rotation: { outcome: { kind: 'fallback', questionId: 'Q03' } } } as never), undefined);
+for (const [from, to] of [['A', 'B'], ['A', 'C'], ['B', 'C'], ['C', 'B']]) assert.doesNotMatch(q03Result({ from, to }).effect, /現れ|できました|加わり|戻りました/, `Q03 ${from}→${to} claims no new building`);
+assert.match(q03Result({ from: 'B', to: 'A' }).effect, /戻りました/);
+{ const { target } = SHOTS['q03:housing'], lot = LOTS['drawer-housing'];
+  assert.ok(Math.hypot(target[0] - lot.x, target[2] - lot.z) <= lot.size / 2, 'Q03 shot looks at the housing lot'); }

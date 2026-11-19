@@ -1,8 +1,9 @@
-// Question rotation lot runtime (QUESTION_ROTATION_PLAN 2.2), Q02 and Q08 so far: each of Q02's three models owns its own lot (LOTS in
-// layout.ts) and a rotation run shows exactly the one its Q02 option names, the other two lots standing vacant. Q08's three options
-// share the SW lot: C is the event module shelf, A and B have no model yet (owner 2026-11-19), so the lot stands vacant for them.
-// Version4 runs never engage it, so their city stays as built: the hydro terrace as fixed background, the bay flower vacant, the farm
-// on the energy vote, SW on its Meter band.
+// Question rotation lot runtime (QUESTION_ROTATION_PLAN 2.2), Q02, Q03 and Q08 so far: each of Q02's three models owns its own lot (LOTS
+// in layout.ts) and a rotation run shows exactly the one its Q02 option names, the other two lots standing vacant. Q08's three options
+// share the SW lot: C is the event module shelf, A and B have no model yet (owner 2026-11-19), so the lot stands vacant for them. Q03's
+// share the drawer housing lot: A is the drawer housing, B and C have no model yet (owner 2026-11-19), so the housing fades and its
+// loop road stays. Version4 runs never engage it, so their city stays as built: the hydro terrace and drawer housing as fixed
+// background, the bay flower vacant, the farm on the energy vote, SW on its Meter band.
 import type { Object3D, Scene } from 'three';
 import { fadeFinishes, ownFinishes, type EnergyRuntime } from './energyRuntime.ts';
 import type { CommonsPlazaRuntime } from './siteBuilders/commonsPlaza.ts';
@@ -21,6 +22,10 @@ export function q02Models(option: string | undefined, flowerDefault = false): Q0
 /** Q08 option → whether the SW lot stands vacant: A (fixed-use hall) and B (reconfigurable hall) are not built yet, C shows the
  *  event shelf; no or an unknown option hands the lot back to the SW Meter band (false). */
 export const q08Vacant = (option: string | undefined) => option === 'A' || option === 'B';
+
+/** Q03 option → whether the drawer housing stands: B (shared car shelter) and C (mobility hub and park) are not built yet, so their
+ *  lot stands vacant around the kept loop road; A and no or an unknown option show it (the version4 city). */
+export const q03Housing = (option: string | undefined) => option !== 'B' && option !== 'C';
 
 /** One lot's model fading over the shared 3-second site transition. It touches the scene only once set, and gives its meshes their
  *  own materials (ownFinishes) only once the model has loaded, so a version4 run keeps the shared materials. */
@@ -56,7 +61,9 @@ class LotFade {
 export class LotRuntime {
   private readonly hydro: LotFade;
   private readonly flower: LotFade;
+  private readonly housing: LotFade;
   private engaged = false;
+  private q03Engaged = false;
   private q08Engaged = false;
   private readonly energy?: Pick<EnergyRuntime, 'setFarmOverride'>;
   private readonly commons?: Pick<CommonsPlazaRuntime, 'setVacant'>;
@@ -65,7 +72,7 @@ export class LotRuntime {
   constructor(scene: Scene, energy?: Pick<EnergyRuntime, 'setFarmOverride'>, flowerDefault = false, commons?: Pick<CommonsPlazaRuntime, 'setVacant'>) {
     this.energy = energy; this.flowerDefault = flowerDefault; this.commons = commons;
     // Looked up until each GLB has loaded (the roots once, then only their own subtrees).
-    let hydro: Object3D | undefined, flower: Object3D | undefined;
+    let hydro: Object3D | undefined, flower: Object3D | undefined, housing: Object3D | undefined;
     this.hydro = new LotFade(() => {
       hydro ??= scene.getObjectByName('q02a-hydro-terrace');
       return hydro && { targets: [hydro], loaded: !!hydro.getObjectByName('q02a-hydro-terrace-glb') };
@@ -75,6 +82,11 @@ export class LotRuntime {
       const nodes = BAY_FLOWER_SHOWN.map(name => flower?.getObjectByName(name));
       return nodes.every(Boolean) ? { targets: nodes as Object3D[], loaded: true } : undefined;
     }, flowerDefault ? 1 : 0);
+    // main.ts names the drawer housing (with its foundation pad) only once its GLB has loaded and baked, so a found root is complete.
+    this.housing = new LotFade(() => {
+      housing ??= scene.getObjectByName('drawer-housing-2127');
+      return housing && { targets: [housing], loaded: true };
+    }, 1);
   }
   /** Shows the Q02 lots for `option` (a rotation run's shown option), fading from `now` (held until then when ahead) unless `immediate`;
    *  undefined after a rotation run restores the version4 city, and before one leaves the scene untouched. */
@@ -93,9 +105,17 @@ export class LotRuntime {
     this.q08Engaged = option !== undefined || this.q08Engaged;
     this.commons?.setVacant(q08Vacant(option), now, immediate);
   }
-  getDiagnostics() { return { hydro: this.hydro.shown, flower: this.flower.shown }; }
+  /** Shows the drawer housing for Q03 `option` (A) or fades it, leaving its loop road (B/C), over the shared transition from `now`
+   *  unless `immediate`. Undefined after a rotation run restores the housing, and before one leaves it untouched. */
+  setQ03(option: string | undefined, now: number, immediate: boolean) {
+    if (option === undefined && !this.q03Engaged) return;
+    this.q03Engaged = true;
+    this.housing.set(q03Housing(option) ? 1 : 0, now, immediate);
+  }
+  getDiagnostics() { return { hydro: this.hydro.shown, flower: this.flower.shown, housing: this.housing.shown }; }
   update(now: number, reducedMotion: boolean) {
     this.hydro.update(now, reducedMotion);
     this.flower.update(now, reducedMotion);
+    this.housing.update(now, reducedMotion);
   }
 }

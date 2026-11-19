@@ -119,7 +119,7 @@ const flight = (outcome: Parameters<typeof rotationFlights>[0], ordinal = 5) => 
 }
 {
   // A question without a site (most of the nine today): four fading orbs, no big orb, no scan ring, no lantern.
-  for (const outcome of [{ kind: 'swap', questionId: 'Q05', from: 'A', to: 'B' } as const, { kind: 'fallback', questionId: 'Q03' } as const]) {
+  for (const outcome of [{ kind: 'swap', questionId: 'Q05', from: 'A', to: 'B' } as const, { kind: 'fallback', questionId: 'Q04' } as const]) {
     assert.deepEqual(rotationFlights(outcome, answers).map(f => [f.questionId, f.color, f.site]), answers.map(a => [a.questionId, neutral, undefined]));
     assert.equal(rotationLantern(5, outcome), undefined);
     const { scene, frames } = flight(outcome);
@@ -151,10 +151,32 @@ const flight = (outcome: Parameters<typeof rotationFlights>[0], ordinal = 5) => 
   }
 }
 {
+  // Q03 (2026-11-19): every option shares the drawer housing lot, so a swap either way and a fallback all land there; sharing colour.
+  const lot = LOTS['drawer-housing'], sharing = `#${new T.Color(METER_COLORS.publicSharing).getHexString()}`;
+  for (const [outcome, color, scale] of [
+    [{ kind: 'swap', questionId: 'Q03', from: 'A', to: 'B' } as const, sharing, 1],
+    [{ kind: 'swap', questionId: 'Q03', from: 'C', to: 'A' } as const, sharing, 1],
+    [{ kind: 'fallback', questionId: 'Q03' } as const, neutral, .7],
+  ] as const) {
+    const [first, ...rest] = rotationFlights(outcome, answers);
+    assert.deepEqual([first.questionId, first.site?.x, first.site?.z, first.site?.slot], ['Q03', lot.x, lot.z, 'publicSharing']);
+    assert.deepEqual(rest.map(f => f.questionId), ['Q01', 'Q05', 'Q07']);
+    const { scene, j } = journey();
+    j.playRotation({ ordinal: 9, answers, rotation: { outcome } }, 0);
+    let maxScans = 0; for (let t = 0; t <= 5; t += .05) { j.update(t, 0); maxScans = Math.max(maxScans, parts(scene)[1].count); }
+    assert.equal(maxScans, 1, 'one scan ring on the housing lot');
+    const lanterns = lit(scene);
+    assert.deepEqual(lanterns.map(l => [l.color, l.scale]), [[color, scale]]);
+    assert.ok(Math.hypot(lanterns[0].at.x - lot.x, lanterns[0].at.z - lot.z) <= lot.size / 2 * 1.1, 'lantern over the housing lot');
+    const rebuilt = journey(); rebuilt.j.setRotationLanterns([{ ordinal: 9, answers, rotation: { outcome } }]);
+    assert.deepEqual(snap(scene).lanM, snap(rebuilt.scene).lanM, 'rebuild matches the live landing');
+  }
+}
+{
   // Snapshot, Undo and reconnect rebuild the same lanterns the live landings left: one per proposal, only over NW, siteless ones none.
   const history = [
     { ordinal: 1, answers, rotation: { outcome: { kind: 'swap', questionId: 'Q01', from: 'B', to: 'C' } as const } },
-    { ordinal: 2, answers, rotation: { outcome: { kind: 'swap', questionId: 'Q03', from: 'A', to: 'B' } as const } },
+    { ordinal: 2, answers, rotation: { outcome: { kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' } as const } },
     { ordinal: 3, answers, rotation: { outcome: { kind: 'fallback', questionId: 'Q01' } as const } },
   ];
   const live = journey();

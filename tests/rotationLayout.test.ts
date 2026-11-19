@@ -64,6 +64,14 @@ assert.match(flower.effect, /湾の花が開きました/);
 assert.deepEqual(['A', 'B', 'C'].map(to => q02Swap(proposal({ kind: 'swap', questionId: 'Q02', from: 'B', to }, to))?.to), ['A', 'B', 'C']);
 assert.equal(q02Swap(proposal({ kind: 'fallback', questionId: 'Q02' }, 'B')), undefined);
 assert.equal(residentResult(proposal({ kind: 'fallback', questionId: 'Q02' }, 'B'), []).kind, 'maintained', 'a Q02 fallback keeps the city');
+// Q03 swaps show or fade the drawer housing on its shared lot: their own (provisional) copy; a fallback keeps the city.
+const leaves = residentResult(proposal({ kind: 'swap', questionId: 'Q03', from: 'A', to: 'C' }, 'B'), []);
+assert.equal(leaves.kind, 'configuration');
+assert.equal(leaves.place, '車が引き出しになる住宅の跡地');
+assert.match(leaves.effect, /環道だけが残る空き地/);
+assert.match(residentResult(proposal({ kind: 'swap', questionId: 'Q03', from: 'B', to: 'A' }, 'B'), []).effect, /住宅が戻りました/);
+assert.match(residentResult(proposal({ kind: 'swap', questionId: 'Q03', from: 'B', to: 'C' }, 'B'), []).effect, /空き地のままです/);
+assert.equal(residentResult(proposal({ kind: 'fallback', questionId: 'Q03' }, 'B'), []).kind, 'maintained', 'a Q03 fallback keeps the city');
 
 // Plan 2.6: the result card carries the crowd share of the outcome's question only, without a number below the threshold.
 const shared = (outcome: NonNullable<ExhibitionProposal['rotation']>['outcome'], percent?: number) => residentResult({
