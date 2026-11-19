@@ -77,7 +77,7 @@
   - 判斷：Q02 城市接線（2.1／2.2）未做。蓮花受電模型雖已 merge 入 main（PR #4），其 handoff 仍寫「not placed」，城市內未選址；此時把 Q02 畫出會令起始選項 A 隱去已驗收的農園，換到 B 時又無模型出現，空置態亦未驗收。故改做不受阻擋的 2.6 結果卡部分。
   - 做法：群眾比例句移至 `survey/src/shared/rotation.ts`（`VOICES_GATHERING`、`crowdShareText`），guest「住民の声」面板與城市結果卡共用同一句。`residentResult` 在輪換提案回傳 `share`：取 outcome 題目（換模型或保底題）的比例；城市卡在原因句出現時同時加一行「住民の声：同じ暮らしを選んだ住民 N%（M人中）」，未達門檻為「住民の声：この問いへの声は、まだ集まり始めたところです」。version4 提案沒有 `rotation`，結果卡不變。
   - 未做：hologram「住民の声」看板改為題目比例（2.6 下半，屬視覺改動，待 owner 定樣式）；保底結果卡仍用通用句，未改為 3.4 的「あなたの選んだ暮らしは、すでにここにあります」（guest 端已用；城市端待 5.2 文案）。
-- 5.4 變化總覽（2026-11-19 第十節，owner 要求）：`scripts/changeSheet.ts` 改讀 `questions.rotation.v1.json`，逐題列 9 題 × 3＝27 個版本：選項、計劃第 2 節總表的版本狀態、模型 ID、地塊、由其餘兩個選項換入時的結果卡（`residentResult` 以單次 swap 提案生成）、設施卡（只有 Q01、Q02-C、Q08-C 有；其餘標示待 5.3）、日夜截圖（Q01 用 `closeupSheet.mjs` 近鏡；Q02／Q03／Q06／Q08 用本 handoff 實時測試換入後約 10 秒的畫面，縮成 960 px JPEG 存 `artifacts/change-review/rotation/`）及居民（湊 Q01、葵 Q02-C、凪 Q08-C）。抽屜住宅及農園／葵的舊記錄併入 Q03-A、Q02-C；version4 單元改為「不在新題組內的現有資產」附錄。計劃第 2 節 Q04「暫不上台」與 owner 2026-11-18 決定矛盾，已改。`artifacts/change-review/rows.json` 及 version4 的 `frames/`（Q01 三張近鏡以外）不再被引用，未刪。
+- 5.4 變化總覽（2026-11-19 第十節，owner 要求）：`scripts/changeSheet.ts` 改讀 `questions.rotation.v1.json`，逐題列 9 題 × 3＝27 個版本：選項、計劃第 2 節總表的版本狀態、模型 ID、地塊、由其餘兩個選項換入時的結果卡（`residentResult` 以單次 swap 提案生成）、設施卡（只有 Q01、Q02-C、Q08-C 有；其餘標示待 5.3）、日夜截圖（Q01 用 `closeupSheet.mjs` 近鏡；Q02／Q03／Q06／Q08 用本 handoff 實時測試換入後約 10 秒的畫面，縮成 960 px JPEG 存 `artifacts/change-review/rotation/`）及居民（湊 Q01、葵 Q02-C、凪 Q08-C）。抽屜住宅及農園／葵的舊記錄併入 Q03-A、Q02-C；version4 單元改為「不在新題組內的現有資產」附錄。計劃第 2 節 Q04「暫不上台」與 owner 2026-11-18 決定矛盾，已改。`artifacts/change-review/rows.json` 及 version4 的 `frames/`（Q01 三張近鏡以外）不再被引用，owner 2026-11-19 指示刪除（48 張截圖及 `rows.json`；Git 歷史可還原）。
 
 ## Actual validation results
 
