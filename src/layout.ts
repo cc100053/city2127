@@ -66,6 +66,10 @@ export const BOULEVARD = {
  * Fuji frame (stadium, outer size) and a canal on the old band north-west of ④ (④ d `from`–`to`, water `offset` ± `width`/2 m left of it),
  * both edged with a 1 m white coping 0.35 m over the water. ④'s light bridge at d 124 runs on over the canal. */
 export const WATER = { pool: { x: 22, z: 118, length: 70, width: 24 }, canal: { from: 4, to: 200, offset: 30, width: 8 }, coping: 1, bridge: BOULEVARD.crossings[0] } as const;
+/** Q06-B pod-frame tower (owner 2026-11-19): on the lot freed by retiring housing U (HOUSING_SITES.mobile) from the city background,
+ *  front (GLB −z) north toward the city. Its R4 envelope is about 56 × 38 m with the pods (frame 35 × 28 m), 36 m tall; SCAN_LOT
+ *  58,46 here finds only housing U itself and a walker route by the south-west pod tip. */
+export const POD_TOWER = { x: -258, z: -75, yaw: 0 } as const;
 /** Fixed Q03-A building origin and its connection to the guideway avenue. */
 export const DRAWER_HOUSING = {
   x: -104, z: 81, avenue: 463,

@@ -15,7 +15,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { FullScreenQuad, Pass } from 'three/addons/postprocessing/Pass.js';
 import { bake, cityRig, stone } from './cityRig';
 import { heroCamera, HERO_TARGET } from './heroCamera';
-import { DRAWER_HOUSING, DISTRICT } from './layout';
+import { DRAWER_HOUSING, DISTRICT, POD_TOWER } from './layout';
 import { createWorldState } from './worldState';
 import { displayHour, type DisplayMode, sunHeight, daylight, moodAt, withNight, nightLighting } from './dayCycle';
 import { overlay } from './overlay';
@@ -184,6 +184,16 @@ try {
   if(!housing&&!energyReview){
     // Fixed city background: votes and recovery never retarget the dwellings; the update cycle stays in DEV.
     const background=housingPrototype();background.select('mixed');background.root.name='housing-background';scene.add(background.root);
+    // Housing U is retired from the city (owner 2026-11-19): its lot carries the Q06 pod-frame tower. The DEV `?housing` study keeps it.
+    background.parts.mobile.visible=false;
+    const podTowerUrl = new URL('../asset/models/pod-frame-tower-2127/pod-frame-tower-2127.glb', import.meta.url).href;
+    void odaibaReady.then(async ready => {
+      if (!ready) return;
+      const model = await addCityModel(background.root, podTowerUrl, [POD_TOWER.x, 0, POD_TOWER.z], POD_TOWER.yaw);
+      // Keep the glazing and pod shells separately sortable and batch the static opaque parts; named once complete (lotRuntime looks it up).
+      model.add(...bake(model, mesh => !Array.isArray(mesh.material) && !mesh.material.transparent));
+      model.name = 'pod-frame-tower-2127';
+    }).catch(error => console.error('Pod frame tower could not load', error));
     const drawerHousingUrl = new URL('../asset/models/drawer-housing-2127/drawer-housing-2127.glb', import.meta.url).href;
     void odaibaReady.then(async ready => {
       if (!ready) return;
