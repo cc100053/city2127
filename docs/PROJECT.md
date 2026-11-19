@@ -238,6 +238,8 @@ Q03-A「車が引き出しになる住宅」在フジテレビ西南側 A 位，
 
 Q06-B 蛋艙塔（2026-11-19，owner）：住宅 U 自城市背景撤走（`background.parts.mobile.visible=false`；DEV `?housing` 研究照舊），`pod-frame-tower-2127` GLB 以固定形態載入其地塊 `POD_TOWER` (−258, −75)，正面朝北，不透明網格合批。version4 run 及獨立預覽照舊固定；抽題輪換 run 中由 Q06 驅動（B 顯示，A／C 淡出留草地，`LotRuntime.setQ06`）。[交接](handoffs/pod-frame-tower.md)
 
+住宅 M 撤走（2026-11-19，owner）：其未打磨的高腳小屋擠在 NE PARK 及蛋艙塔近鏡內，自城市背景撤走（`background.parts.material.visible=false`，所有 run；DEV `?housing` 研究照舊）；原地留草地，未指定新用途。`SCAN_LOT` 視之為空地。
+
 原M `(-135,-175)`在低automation時穿過既有staffed pavilion的20m樓板；按人類決定將同一M構造平移至`(-165,-165)`（31.62m），服務館、P/U、數量、輪廓與材質保持。原M庭院留孔保留。U90秒循環只由`devHousing`推進；所有正式snapshot／live／Undo／reset／reconnect與reduced motion都不碰住宅。新證據與實測限制見[本批報告](../artifacts/housing-background/README.md)，舊H0–H3原圖／性能只作當時紀錄。
 
 ### G2 能源保底配置（2026-10-30；已 merge main，視覺待驗收）

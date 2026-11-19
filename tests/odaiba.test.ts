@@ -625,8 +625,8 @@ if (process.env.SCAN_LOT) {
   const boxes: [string, number, number, number, number][] = [
     ...Object.entries(changeSites).map(([k, s]) => [`site:${k}`, s.x - s.w * s.scale / 2, s.x + s.w * s.scale / 2, s.z - s.d * s.scale / 2, s.z + s.d * s.scale / 2] as [string, number, number, number, number]),
     ...sharingDistrict.courts.map((c, i) => [`court${i + 1}`, c.x - 20, c.x + 20, c.z - 20, c.z + 20] as [string, number, number, number, number]),
-    // Housing U is retired from the city (main.ts); its lot carries the Q06 pod tower, about 56 × 38 m with its pods (yaw 0).
-    ...housing.root.children.filter(g => g.name !== 'housing-mobile').map(g => { const b = new Box3().setFromObject(g); return [g.name, b.min.x, b.max.x, b.min.z, b.max.z] as [string, number, number, number, number]; }),
+    // Housings U and M are retired from the city (main.ts); U's lot carries the Q06 pod tower, about 56 × 38 m with its pods (yaw 0).
+    ...housing.root.children.filter(g => g.name !== 'housing-mobile' && g.name !== 'housing-material').map(g => { const b = new Box3().setFromObject(g); return [g.name, b.min.x, b.max.x, b.min.z, b.max.z] as [string, number, number, number, number]; }),
     ['pod-tower', POD_TOWER.x - 28.5, POD_TOWER.x + 27.3, POD_TOWER.z - 19.8, POD_TOWER.z + 18.2] as [string, number, number, number, number],
   ];
   const discs: [string, number, number, number][] = [...concentration.towers.map(t => ['tower', t.x, t.z, 28] as [string, number, number, number]),

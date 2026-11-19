@@ -9,6 +9,7 @@
 
 ## Session Git state
 
+- Session starting branch and HEAD（2026-11-19 第十一節，舊建築掃描及撤走住宅 M）：`feat/question-rotation` `19de91f3`，fetch 後與 origin 同步，無分歧。未追蹤 `Dev_QA.md` 保留
 - Session starting branch and HEAD（2026-11-19 第十節，change sheet）：`feat/question-rotation` `de401421`，fetch 後與 origin 同步，無分歧。未追蹤 `Dev_QA.md` 保留
 - Session starting branch and HEAD（2026-11-19 第九節，Q06）：`feat/question-rotation` `7343ff52`，fetch 後與 origin 同步，無分歧（`origin/main` 落後分支 24 個 commit，無新 commit）。未追蹤 `Dev_QA.md` 保留
 - Session starting branch and HEAD（2026-11-19 第八節，Q03）：`feat/question-rotation` `b98e8d53`，fetch 後與 origin 同步，無分歧。未追蹤 `Dev_QA.md` 保留
@@ -81,6 +82,8 @@
 
 ## Actual validation results
 
+- 舊建築掃描及撤走住宅 M（2026-11-19 第十一節）：以中性 layout（`?meters=nw:0`，近似輪換 run）拍 hero、俯瞰及各舊建築，證據 `~/city2127-evidence/question-rotation/old-scan/sheet.jpg`。建議：住宅 M 撤走；住宅 P 保留為背景；NE PARK（降溫軸，新題組無題，恆為 mixed）不搬，可改作 Q05 地塊；SE TOWER 及 pod 保留為背景，可作 Q09-A 地塊；四件舊能源部件在輪換 run 永不出現（題組無能源題，能源配置恆為空），刪除只關 version4，仍待 owner 逐件決定。owner 選「撤走住宅 M」：`main.ts` `background.parts.material.visible=false`（所有 run，DEV `?housing` 照舊），`SCAN_LOT` 不再把 M 當障礙；原地留草地，未指定新用途。前後對照（NE 近鏡、M 舊址、hero）`~/city2127-evidence/question-rotation/housing-m-removed/before-after.jpg`，console 無錯誤；M 舊址旁的藍色斜板不屬住宅 M，照舊保留。root `npm test`、`npm run build`、`git diff --check` 見本節 commit。FPS 未量（capture 報 38–54 fps 屬並行測試負載下，非量度）。
+
 - Q06（2026-11-19 第九節）：選址：hero 區已滿，`SCAN_LOT` 58 × 46 m 只有東南角 (229, 238) CLEAR（hero 0 px）；另有乙 (118, 295) 只容 47 × 40、丙 (−20, 370) 出 district 邊界。owner 問「應否先處理舊建築」，查住宅 M（撞 NE 站及海岸）、P（撞停機坪及街道套件）、U 後，owner 選撤走住宅 U（「好，拆住宅 U」）。`layout.POD_TOWER` (−258, −75)、`LOTS['pod-tower']`（56 m）；`main.ts` 隱藏 `housing-mobile`、載入蛋艙塔 GLB（固定背景，所有 run）。放置一輪 commit `58b76817`，owner 接受位置及近鏡，並選 A／C「塔淡出留草地」、version4「固定背景企住」。接線照 Q03：`LotRuntime.setQ06`（`q06Tower`：B 顯示、A／C 淡出）、`main.ts` 三處、`rotationLayout` `Q06_RESULTS`（暫定文案，地點「蛋形ポッドの塔」／「…の跡地」）、`q06Swap`／`q06Result`／`q06Shot`（塔出入飛 `q06:tower`，A↔C 留 hero）、`residentResult`、`ROTATION_SHARED_LOTS` Q06（環境色，暫定）、`data-lots` 加 `tower`；題組 Q06 三選項 `lotId` 為 `pod-tower`。測試及瀏覽器見 [VALIDATION](../VALIDATION.md)；證據 `~/city2127-evidence/question-rotation/q06-pod/`（`sheet-day.jpg`、`sheet-night.jpg`；`guest.mjs`、`liveCapture.mjs` 副本同目錄）。另查：`layout.ts` 空中航道（shore lane 80 m、midDecks 40 m 於 x −250 z 44）均不穿過塔包絡；DEV `?meters=` 四站全 high／全 low 的 hero、近鏡及西面截圖（`q06-pod/meters-sheet.jpg`）無相撞，page error 0（最近的 SE pod (−253, −33) 距塔背約 8 m）；故事及 explore 文案無提住宅 U；`scripts/changeSheet.ts` 重新生成只改日期，未 commit（change sheet 只列 version4 單元）。FPS、iPad、A／B 雙站未測；分支 CI 未確認。
 
 - Q03（2026-11-19 第八節，owner 選「住宅淡出，留環道」及「同 Q08：B↔C 留 hero」）：`layout.LOTS` 加 `drawer-housing`（中心 (−104, 77)，50 m，覆蓋 R2 包絡 X −128.6…−79.4、Z 67.3…92.8 及 −Z 側 6 m 前場；任務簡報的 X −140… 包絡是移位前的舊值）。`LotRuntime.setQ03`（`q03Housing`：A 顯示、B／C 淡出；version4 未接手前不碰）以 `LotFade` 淡出 `drawer-housing-2127`（連 36 cm 基座，3 秒共用過場）；streetKit 的暖米色環道、支路、前場導光及植栽不屬住宅，照舊保留。`main.ts` 實時、snapshot、version4 三處呼叫，`data-lots` 加 `housing`。`rotationLayout.ts` 新 `Q03_RESULTS`（暫定文案，地點「車が引き出しになる住宅」／「…の跡地」）、`q03Swap`（`housing`：住宅出入與否）、`q03Result`（戻りました／環道だけが残る空き地／空き地のまま）、`q03Shot`（住宅出入飛新 `q03:housing`，取自 drawer-housing R2 日景鏡位 (−158, 40, 7)→(−107, 10, 73)；B↔C 留 hero）。`voteJourney` 新 `ROTATION_SHARED_LOTS`（Q03 → `drawer-housing`，sharing 色及槽，暫定）。測試：`lotRuntime`（選項對應、三選項同地塊、地塊覆蓋包絡、version4 不接手不複製材質、實時 A→B 中段 0.5、環道保留、B→C 不動、C→A、snapshot、回 version4 還原、共用石材不被淡出、`q03Swap`／`q03Shot`／文案、鏡頭看向地塊）、`rotationLayout`（Q03 三種結果卡、保底「維持」）、`voteJourney`（Q03 換兩向及保底落地塊、一個掃描環、一盞燈籠、重建相同；原以 Q03 為「無地塊題」的兩例改用 Q04；version4 緩衝區摘要不變）、`headlineCamera` 鏡頭數 28。瀏覽器見 [VALIDATION](../VALIDATION.md)。證據 `~/city2127-evidence/question-rotation/q03-drawer/`（`sheet-day.jpg`、`sheet-night.jpg`；`guest.mjs`、`liveCapture.mjs` 副本同目錄）。FPS、iPad、A／B 雙站未測。
@@ -140,6 +143,8 @@
 - 審閱第 G 點（城市端預載需收到每次預約抽中的題目，加入 protocol）已列入下一步第 3 點。
 
 ## Next expected step
+
+**現時（2026-11-19 第十一節）：** 住宅 M 已撤走。待 owner：NE PARK 是否改作 Q05 地塊、SE TOWER 是否留作 Q09-A 地塊、舊能源部件逐件去留。其餘同第十節。
 
 **現時（2026-11-19 第十節）：** 變化總覽已改為 9 題 × 3＝27 個版本（計劃 5.4）；題目或結果卡、設施卡文案定稿後重跑 `node --experimental-strip-types scripts/changeSheet.ts` 並 commit。其餘同第九節。
 

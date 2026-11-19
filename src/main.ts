@@ -186,6 +186,8 @@ try {
     const background=housingPrototype();background.select('mixed');background.root.name='housing-background';scene.add(background.root);
     // Housing U is retired from the city (owner 2026-11-19): its lot carries the Q06 pod-frame tower. The DEV `?housing` study keeps it.
     background.parts.mobile.visible=false;
+    // Housing M leaves too (owner 2026-11-19): its unpolished stilt cabins crowded the NE PARK and pod-tower close-ups.
+    background.parts.material.visible=false;
     const podTowerUrl = new URL('../asset/models/pod-frame-tower-2127/pod-frame-tower-2127.glb', import.meta.url).href;
     void odaibaReady.then(async ready => {
       if (!ready) return;
