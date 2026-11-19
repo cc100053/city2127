@@ -32,6 +32,7 @@
 | [PROPOSAL_JA](PROPOSAL_JA.md)／[PDF](PROPOSAL_JA.pdf) | 舊企劃書：現行 4 問／4 Meter 展覽嘅日文說明 |
 | [QUESTION_CANDIDATES_JA](QUESTION_CANDIDATES_JA.md) | 舊提案（4 參數版）嘅 9 個追加質問候補（2026-10-09）；1／4／5 對應 `publicSharing`／`automation`／`environmentalPriority`，其餘係新參數 |
 | [planning-team](planning-team/README.md) | 2026-11-06 新提案：アンケート Ver.2（9 題）、交通・社會仮説、27 案圖像 prompt；可能同舊提案矛盾，並列作對比 |
+| [QUESTION_ROTATION_PLAN](QUESTION_ROTATION_PLAN.md) | 2026-11-18 執行計劃（方向已批准並寫入 SPEC；未實作）：SURVEY_V2 抽 4 題、每份提案直接換一個模型、顯示群眾比例；題目 × 模型 × 地塊總表及分階段執行步驟 |
 
 ## 完成記錄與歷史
 
