@@ -62,6 +62,10 @@ export const BOULEVARD = {
   crossings: [124, 311, 474],
   gaps: { median: [[230, 240], [244, 255]], terraces: [[252, 262]] },
 } as const;
+/** Q08-C ground-track ends and front edge of the lobby plinth, in metres from the SW lot origin. */
+export const EVENT_SHELF_FRONTAGE = { tracks: [-12, 12], trackEnd: -32, plinthEdge: -22 } as const;
+/** Inland sharing court moved east to clear the event shelf's ground tracks. */
+export const EVENT_SHELF_NEIGHBOR_COURT = [-90, 230, .608] as const;
 /** Stage 3 designed water (artifacts/street-kit-closeup-polish/network-stage3.md), replacing the landscape shader's ponds: a court pool under the
  * Fuji frame (stadium, outer size) and a canal on the old band north-west of ④ (④ d `from`–`to`, water `offset` ± `width`/2 m left of it),
  * both edged with a 1 m white coping 0.35 m over the water. ④'s light bridge at d 124 runs on over the canal. */

@@ -46,25 +46,26 @@ function frame(src: string, dest: string) {
 }
 const figure = (src: string, caption: string, alt: string) => `<figure><img loading="lazy" src="${src}" alt="${esc(alt)}"><figcaption>${esc(caption)}</figcaption></figure>`;
 
-/** Q01 shows the NW focal close-ups from closeupSheet.mjs; Q02/Q03/Q06/Q08 show the live result screen ≈10 s after the swap (the
- *  question's close-up when its model enters or leaves, hero otherwise), captured in the question-rotation handoff's live runs. */
+/** Q01 shows the NW focal close-ups; Q02/Q03/Q06 show the live result ≈10 s after the swap. */
 const Q01_TIERS: Record<string, string> = { A: 'nw-focal-low__-1', B: 'nw-focal__0', C: 'nw-focal__+1' };
 const LIVE: Record<string, (option: string) => [day: string, night: string]> = {
   Q02: o => [`q02-closeup/to-${o}-10s.png`, `q02-closeup/night-to-${o}-10s.png`],
   Q03: o => [`q03-drawer/day/to-${o}-10s.png`, `q03-drawer/night/night-to-${o}-10s.png`],
   Q06: o => [`q06-access/live-day/to-${o}-10s.png`, `q06-access/live-night/to-${o}-10s.png`],
-  Q08: o => [`q08-sw/to-${o}-11s.png`, `q08-sw/night-to-${o}-11s.png`],
 };
 function frames(question: string, option: string, label: string) {
   if (question === 'Q01') return [12, 22].map(h => {
     const name = `${Q01_TIERS[option]}__h${h}.jpg`;
     return frame(join(closeups, name), join('frames', name)) ? figure(`frames/${name}`, `近鏡（${h}:00）`, `${label}，${h}:00 近鏡`) : '';
   }).join('');
-  const sources = LIVE[question]?.(option);
+  const snapshot = question === 'Q08';
+  const sources = snapshot ? [`q08-access/snapshots/${option}-day.png`, `q08-access/snapshots/${option}-night.png`] : LIVE[question]?.(option);
   if (!sources) return '';
   return sources.map((src, i) => {
     const dest = `rotation/${question}-${option}-${i ? 'night' : 'day'}.jpg`;
-    return frame(join(live, src), dest) ? figure(dest, `實時結果（${i ? '夜' : '日'}，換入後約 10 秒）`, `${label}，${i ? '夜景' : '日景'}`) : '';
+    const light = i ? '夜' : '日';
+    const caption = snapshot ? `落定地塊（${light}景）` : `實時結果（${light}，換入後約 10 秒）`;
+    return frame(join(live, src), dest) ? figure(dest, caption, `${label}，${light}景`) : '';
   }).join('');
 }
 

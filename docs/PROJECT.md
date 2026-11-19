@@ -238,6 +238,8 @@ Q03-A「車が引き出しになる住宅」在フジテレビ西南側 A 位，
 
 Q06-B 蛋艙塔（2026-11-19，owner）：住宅 U 自城市背景撤走（`background.parts.mobile.visible=false`；DEV `?housing` 研究照舊），`pod-frame-tower-2127` GLB 以固定形態載入其地塊 `POD_TOWER` (−258, −75)，正面朝北，不透明網格合批。version4 run 及獨立預覽照舊固定；抽題輪換 run 中由 Q06 驅動（B 顯示，A／C 淡出留草地，`LotRuntime.setQ06`）。`streetKit.podTowerAccess` 由道路 ③ 外側接入陶板支路，並以連續步道接北面兩個入口和東側入口。道路、入口平台及夜間導光屬固定街道層，塔淡出後保留。[交接](handoffs/pod-frame-tower.md)
 
+Q08-C 南岸活動模組棚的固定支路沿道路 ④ 現有導光過街位接入，平台銜接兩條地軌，中央步道穿過前庭綠籬接到大堂基座。支路、平台、步道及導光屬街道層，模組棚收起後保留。相鄰的共享庭園 3 東移至 (−90, 230)，避開地軌及平台，並清出與新庭園重疊的樹叢。獨立預覽與 version4 共用這組街道鋪面。[交接](handoffs/question-rotation.md)
+
 住宅 M 撤走（2026-11-19，owner）：其未打磨的高腳小屋擠在 NE PARK 及蛋艙塔近鏡內，自城市背景撤走（`background.parts.material.visible=false`，所有 run；DEV `?housing` 研究照舊）；原地留草地，未指定新用途。`SCAN_LOT` 視之為空地。
 
 原M `(-135,-175)`在低automation時穿過既有staffed pavilion的20m樓板；按人類決定將同一M構造平移至`(-165,-165)`（31.62m），服務館、P/U、數量、輪廓與材質保持。原M庭院留孔保留。U90秒循環只由`devHousing`推進；所有正式snapshot／live／Undo／reset／reconnect與reduced motion都不碰住宅。新證據與實測限制見[本批報告](../artifacts/housing-background/README.md)，舊H0–H3原圖／性能只作當時紀錄。

@@ -542,7 +542,10 @@ export function buildCommonsPlaza(scene: T.Scene, _kit?: unknown, assets?: SiteA
   const YARD = .04; // paving top (0.15 m) in units
   stateGroup('commons-state-mixed-yard', 'mixed', 0, .6, g => {
     // Forecourt greenery on the shelf's paving; hedges and small trees along the front and rear edge, trees only where the tracks are not.
-    for (let x = -4.7; x <= 4.8; x += .5) if (Math.abs(Math.abs(x) - 3) > .8) { bush(g, x, YARD, -4.85, .27, hedgeGreen, .62); bush(g, x, YARD, 3.35, .27, hedgeGreen, .62); }
+    for (let x = -4.7; x <= 4.8; x += .5) if (Math.abs(Math.abs(x) - 3) > .8) {
+      if (Math.abs(x) > .65) bush(g, x, YARD, -4.85, .27, hedgeGreen, .62);
+      bush(g, x, YARD, 3.35, .27, hedgeGreen, .62);
+    }
     for (const [x, z, s] of [[-4.5, -4.5, .8], [-1.7, -4.7, .7], [1.7, -4.7, .7], [4.5, -4.5, .8], [-4.7, 2.4, .75], [4.7, 2.4, .75], [-1.8, 3.0, .6], [1.8, 3.0, .6]]) tree(g, x, YARD, z, s);
     // Lobby (shelf ground tier, centre column): three pink-topped benches and two round tables with stools.
     for (const [x, z, yaw] of [[-.9, -1.4, .3], [.9, -1.6, -.3], [.1, 1.0, 1.57]]) {

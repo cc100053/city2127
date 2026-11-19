@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { changeSites, DISTRICT, HUB_LEGACY_LOT, SW_LEGACY_LOT, inDistrict, seaward } from './layout.ts';
+import { changeSites, DISTRICT, EVENT_SHELF_NEIGHBOR_COURT, HUB_LEGACY_LOT, SW_LEGACY_LOT, inDistrict, seaward } from './layout.ts';
 import { inWater, onStreetKit, routes } from './mobility.ts';
 import { onBayPlinth } from './automationBays.ts';
 import { recedeBeyondDistrict } from './bayContext.ts';
@@ -147,6 +147,7 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
   const pads=buildings.map(building=>new T.Box3().setFromObject(building));
   const paths=routes(),clearPaths=[paths.guideway,...paths.promenades,...streets].flatMap(path=>path.getSpacedPoints(400));
   const ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),clusters:[number,number,number,number][]=[],hiddenAt:boolean[]=[];
+  const [courtX,courtZ,courtYaw]=EVENT_SHELF_NEIGHBOR_COURT,courtCos=Math.cos(courtYaw),courtSin=Math.sin(courtYaw);
   const landscapeAt=(x:number,z:number)=>{
     ray.set(new T.Vector3(x,300,z),down);
     const hit=ray.intersectObject(environment,true)[0];
@@ -170,7 +171,9 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
     // Denser grid (r8 pass 3): terraces may not overlap, or their coplanar lawn tiers would z-fight.
     if(clusters.some(([cx,cz,,cr])=>Math.hypot(cx-px,cz-pz)<(cr+R)*1.4))continue;
     clusters.push([px,pz,y,R]);
-    hiddenAt.push(Object.values(changeSites).some(near));
+    const dx=px-courtX,dz=pz-courtZ;
+    const courtGap=Math.hypot(Math.max(0,Math.abs(dx*courtCos-dz*courtSin)-20),Math.max(0,Math.abs(dx*courtSin+dz*courtCos)-20));
+    hiddenAt.push(Object.values(changeSites).some(near) || courtGap<reach+3);
   }
   plantClusters(scene,clusters,1,0,hiddenAt);
   // r8 pass 3: the waterfront promenades become planted allées in white planter rings (target v2's tree-lined shore walk) —

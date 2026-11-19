@@ -20,7 +20,7 @@ import { acceleratedRaycast, MeshBVH } from 'three-mesh-bvh';
 import { checkHousingCity } from './housingCityCheck.ts';
 import { onFormerStreet, repairRoads } from '../src/roadRepair.ts';
 import { streetNetwork } from '../src/streetKit.ts';
-import { BOULEVARD, POD_TOWER, STREET_KIT, WATER } from '../src/layout.ts';
+import { BOULEVARD, EVENT_SHELF_FRONTAGE, POD_TOWER, STREET_KIT, WATER } from '../src/layout.ts';
 /** A ladder target with the given rungs; the rest mixed. */
 const rungs = (t: Partial<Record<'nw' | 'ne' | 'sw' | 'se', number>>) => ({ tiers: { nw: 0, ne: 0, sw: 0, se: 0, ...t } });
 
@@ -205,6 +205,28 @@ const streetKit = streetNetwork(environment);
     const y = accessSurface(x, -302.55, 'automation-hub-landing');
     assert.ok(y !== undefined && Math.abs(y - 3.6) < .025, `NW landing does not meet the plinth at x=${x}`);
   }
+  const { x: shelfX, z: shelfZ } = changeSites.sw;
+  const { tracks, trackEnd, plinthEdge } = EVENT_SHELF_FRONTAGE;
+  const boulevard = routes().streets[1], bl = boulevard.getLength(), crossingAt = WATER.bridge / bl;
+  const crossing = boulevard.getPointAt(crossingAt), crossingTangent = boulevard.getTangentAt(crossingAt);
+  crossing.addScaledVector(new Vector3(-crossingTangent.z, 0, crossingTangent.x), 12.9);
+  const crossingRay = new Raycaster(new Vector3(crossing.x, 15, crossing.z), new Vector3(0, -1, 0));
+  const bridgeY = crossingRay.intersectObject(streetKit, true).find(hit => hit.object.name === 'boulevard-bridge')?.point.y;
+  const spurY = accessSurface(crossing.x, crossing.z, 'event-shelf-drive');
+  assert.ok(bridgeY !== undefined && spurY !== undefined && Math.abs(bridgeY - spurY) < .025, 'Q08-C spur meets the crossing deck');
+  for (const [x, z] of [[-165, 268], [-148, 265], [-130, 263], [-117.2, 263.4]]) {
+    assert.ok(paved(x, z, /^event-shelf-drive$/), `Q08-C spur has a gap at ${x},${z}`);
+  }
+  for (const dx of tracks) {
+    const y = accessSurface(shelfX + dx, shelfZ + trackEnd, 'event-shelf-forecourt');
+    assert.ok(y !== undefined && Math.abs(y - .10) < .01, 'Q08-C apron meets each track at grade');
+  }
+  for (const [dx, dz] of [[-17.2, trackEnd - 1.65], [0, trackEnd - .3]]) {
+    assert.ok(paved(shelfX + dx, shelfZ + dz, /^event-shelf-forecourt$/), 'Q08-C arrival apron is continuous');
+  }
+  const lobbyY = accessSurface(shelfX, shelfZ + plinthEdge, 'event-shelf-forecourt');
+  assert.ok(lobbyY !== undefined && Math.abs(lobbyY - .20) < .015, 'Q08-C walk meets the lobby plinth');
+  assert.ok(!paved(shelfX, shelfZ, /^event-shelf-/), 'Q08 keeps lawn on the vacant shelf footprint');
   const q06Drive = 'pod-tower-drive', q06Walk = 'pod-tower-forecourt';
   const avenue = routes().streets[0], mouthAt = POD_TOWER.avenue / avenue.getLength();
   const mouth = avenue.getPointAt(mouthAt), tangent = avenue.getTangentAt(mouthAt);
@@ -246,7 +268,6 @@ const streetKit = streetNetwork(environment);
     assert.ok(a !== undefined && b !== undefined && Math.abs(a - b) <= .04,
       `Q03-A paving discontinuity at ${x},${z}: ${finishA} ${a}, ${finishB} ${b}`);
   }
-  const boulevard = routes().streets[1], bl = boulevard.getLength();
   for (let d = 1; d < bl - 1; d += 2) {
     const p = boulevard.getPointAt(d / bl), t = boulevard.getTangentAt(d / bl), at = (o: number): [number, number] => [p.x + t.z * o, p.z - t.x * o], bridge = BOULEVARD.crossings.some(c => Math.abs(c - d) < 2.5);
     for (const o of [-8, -2.5, 2.5, 8]) assert.ok(paved(...at(o), /^boulevard-ceramic$/), `④ carriageway unpaved at d ${d} offset ${o}`);
@@ -339,6 +360,7 @@ for (const site of Object.values(changeSites)) {
     const hit = ray.intersectObject(city, true)[0];
     // The NW apron is deliberately in the lot's clearance margin. Its raised landing meets the hub threshold.
     if (site === changeSites.nw && hit && /^automation-hub-(spur|walk|ramp|landing)$/.test(hit.object.name)) continue;
+    if (site === changeSites.sw && hit?.object.name === 'event-shelf-forecourt' && hit.point.y < .21) continue;
     assert.ok(hit && openGround.test(hit.object.name) && hit.point.y < 3, `${site.name} lot meets ${hit?.object.name ?? 'nothing'} at ${Math.round(site.x + x)},${Math.round(site.z + z)}`);
   }
   // A point a quarter of the way up the tallest variant must be in frame and not hidden behind a landmark or context block.
@@ -556,6 +578,16 @@ for (const court of sharingDistrict.courts) {
   assert.ok(Math.abs(court.x - changeSites.sw.x) >= changeSites.sw.w * changeSites.sw.scale / 2 + 26 || Math.abs(court.z - changeSites.sw.z) >= changeSites.sw.d * changeSites.sw.scale / 2 + 26, 'sharing courts clear the commons focal site');
   assert.ok(concentration.towers.every(t => Math.hypot(t.x - court.x, t.z - court.z) > 48) && concentration.pods.every(p => Math.hypot(p.x - court.x, p.z - court.z) > 36), 'courts share no ground with towers / pods');
   assert.ok(serviceDistrict.bays.every(b => Math.hypot(b.x - court.x, b.z - court.z) > 54), 'courts share no ground with staffed pavilions');
+  const local = new Vector3(), origin = new Vector3(court.x, 0, court.z), angle = new Vector3(0, 1, 0);
+  for (const name of ['event-shelf-drive', 'event-shelf-forecourt']) {
+    const paving = environment.getObjectByName(name);
+    assert.ok(paving instanceof Mesh);
+    const positions = paving.geometry.attributes.position;
+    for (let i = 0; i < positions.count; i++) {
+      local.fromBufferAttribute(positions, i).sub(origin).applyAxisAngle(angle, -court.yaw);
+      assert.ok(Math.max(Math.abs(local.x), Math.abs(local.z)) > 20.5, `Q08-C access clips a sharing court at ${court.x},${court.z}`);
+    }
+  }
 }
 for (const court of sharingDistrict.courts) assert.equal(blocked(court.x, court.z, 12.5, 21.5), undefined, `drone kiosk at court ${court.x},${court.z}`);
 for (const sw of [-3, 3]) {
