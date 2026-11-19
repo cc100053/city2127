@@ -112,7 +112,7 @@ export const HYDRO_TERRACE = { x: -375, z: -170, yaw: Math.PI / 2, lot: 66 } as 
 export const BAY_FLOWER = { x: -712, z: 300, yaw: 2.6088, r: 64 } as const;
 /** Question-rotation lots (QUESTION_ROTATION_PLAN 2.1), keyed by the rotation set's `lotId`: plan centre and plan extent `size` (the
  *  journey's scan ring and lantern halo) in world metres; `sea` lots
- *  stand on the bay, where SCAN_LOT (land only) does not apply. Q02's three lots (one per model) and Q03's one shared lot; Q01 and Q08
+ *  stand on the bay, where SCAN_LOT (land only) does not apply. Q02's three lots (one per model) and Q03's and Q06's shared lots; Q01 and Q08
  *  keep their Meter focal sites (NW, SW). The farm centre matches energyRuntime's FARM_CENTRE. */
 export const LOTS = {
   'q02-west-sea': { x: HYDRO_TERRACE.x, z: HYDRO_TERRACE.z, size: HYDRO_TERRACE.lot, sea: true },
@@ -121,6 +121,8 @@ export const LOTS = {
   'q02-farm-south': { x: -152, z: 408, size: 129, sea: false },
   // Q03's three options share the drawer housing lot: its R2 envelope X −128.6…−79.4, Z 67.3…92.8 plus the 6 m forecourt on its −Z front.
   'drawer-housing': { x: DRAWER_HOUSING.x, z: 77, size: 50, sea: false },
+  // Q06's three options share the pod-frame tower lot: its R4 envelope with the pods is about 56 × 38 m.
+  'pod-tower': { x: POD_TOWER.x, z: POD_TOWER.z, size: 56, sea: false },
 } as const;
 // The ferry heads west for the Shinagawa channel, clear of the Rainbow Bridge anchorage and Daiba approach piers.
 export const ferryLane: readonly P3[] = [[-230,-.6,-290],[-420,-.6,-470],[-760,-.6,-560],[-1250,-.6,-520]];

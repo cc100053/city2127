@@ -72,6 +72,14 @@ assert.match(leaves.effect, /環道だけが残る空き地/);
 assert.match(residentResult(proposal({ kind: 'swap', questionId: 'Q03', from: 'B', to: 'A' }, 'B'), []).effect, /住宅が戻りました/);
 assert.match(residentResult(proposal({ kind: 'swap', questionId: 'Q03', from: 'B', to: 'C' }, 'B'), []).effect, /空き地のままです/);
 assert.equal(residentResult(proposal({ kind: 'fallback', questionId: 'Q03' }, 'B'), []).kind, 'maintained', 'a Q03 fallback keeps the city');
+// Q06 swaps show or fade the pod-frame tower on its shared lot: their own (provisional) copy; a fallback keeps the city.
+const towerLeaves = residentResult(proposal({ kind: 'swap', questionId: 'Q06', from: 'B', to: 'A' }, 'B'), []);
+assert.equal(towerLeaves.kind, 'configuration');
+assert.equal(towerLeaves.place, '蛋形ポッドの塔の跡地');
+assert.match(towerLeaves.effect, /芝生の空き地になりました/);
+assert.match(residentResult(proposal({ kind: 'swap', questionId: 'Q06', from: 'C', to: 'B' }, 'B'), []).effect, /塔が戻りました/);
+assert.match(residentResult(proposal({ kind: 'swap', questionId: 'Q06', from: 'A', to: 'C' }, 'B'), []).effect, /空き地のままです/);
+assert.equal(residentResult(proposal({ kind: 'fallback', questionId: 'Q06' }, 'B'), []).kind, 'maintained', 'a Q06 fallback keeps the city');
 
 // Plan 2.6: the result card carries the crowd share of the outcome's question only, without a number below the threshold.
 const shared = (outcome: NonNullable<ExhibitionProposal['rotation']>['outcome'], percent?: number) => residentResult({

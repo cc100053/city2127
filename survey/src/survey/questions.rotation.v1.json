@@ -144,19 +144,19 @@
           "id": "A",
           "label": "新しい家具に買い替える。",
           "modelId": null,
-          "lotId": null
+          "lotId": "pod-tower"
         },
         {
           "id": "B",
           "label": "修理して使い続ける。",
           "modelId": "pod-frame-tower-2127",
-          "lotId": null
+          "lotId": "pod-tower"
         },
         {
           "id": "C",
           "label": "今の家具を誰かに譲り、別の中古品を使う。",
           "modelId": null,
-          "lotId": null
+          "lotId": "pod-tower"
         }
       ]
     },

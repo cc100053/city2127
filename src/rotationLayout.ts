@@ -101,3 +101,32 @@ export function q03Result(swap: { from: string; to: string }) {
 
 /** The Q03 headline shot: the housing's close-up when it enters or leaves; none (stay at hero) when B↔C leaves the lot empty. */
 export const q03Shot = (swap: { housing: boolean }): ShotId | null => swap.housing ? 'q03:housing' : null;
+
+/** Q06 (question rotation): its three options share the pod-frame tower lot (the retired housing U site). B is the tower; A
+ *  (new-material building) and C (module recycling hub) have no model yet (owner 2026-11-19), so the tower fades to lawn.
+ *  Provisional result copy (owner copy pending, plan 5.2): option → [place, preference]; the effect depends on whether the tower left,
+ *  returned or the lot stayed empty (q06Result). */
+export const Q06_RESULTS: Readonly<Record<string, readonly [string, string]>> = {
+  A: ['蛋形ポッドの塔の跡地', 'あなたは、古くなった物を新しい物に替える暮らしを選びました。'],
+  B: ['蛋形ポッドの塔', 'あなたは、直しながら長く使い続ける暮らしを選びました。'],
+  C: ['蛋形ポッドの塔の跡地', 'あなたは、物を誰かに譲り、中古品を使い回す暮らしを選びました。'],
+};
+
+/** A rotation proposal's Q06 swap, or undefined. `tower` is whether the pod-frame tower enters or leaves (A↔C changes nothing visible). */
+export function q06Swap(proposal: ExhibitionProposal) {
+  const outcome = proposal.rotation?.outcome;
+  if (outcome?.kind !== 'swap' || outcome.questionId !== 'Q06' || !Q06_RESULTS[outcome.to] || !Q06_RESULTS[outcome.from]) return undefined;
+  return { from: outcome.from, to: outcome.to, tower: (outcome.from === 'B') !== (outcome.to === 'B') };
+}
+
+/** The result card for a Q06 swap: the pod-frame tower returning, leaving, or the lot staying empty for a facility still to come. */
+export function q06Result(swap: { from: string; to: string }) {
+  const [place, preference] = Q06_RESULTS[swap.to];
+  const effect = swap.to === 'B' ? 'お台場の西岸に、蛋形ポッドを抱えた塔が戻りました。'
+    : swap.from === 'B' ? 'お台場の西岸から蛋形ポッドの塔が外れ、芝生の空き地になりました。'
+    : 'お台場の西岸の芝生は、新しい施設を待つ空き地のままです。';
+  return { place, effect, preference };
+}
+
+/** The Q06 headline shot: the tower's close-up when it enters or leaves; none (stay at hero) when A↔C leaves the lot empty. */
+export const q06Shot = (swap: { tower: boolean }): ShotId | null => swap.tower ? 'q06:tower' : null;

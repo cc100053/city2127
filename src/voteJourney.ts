@@ -65,7 +65,11 @@ export const Q02_LOTS: Readonly<Record<string, keyof typeof LOTS>> = { A: 'q02-w
 const Q02_COLOR = '#75e2c2';
 /** Lots shared by all of a question's options (layout LOTS): the orb lands there whatever the outcome, in its axis colour and lantern slot.
  *  Q03 (drawer housing; B/C vacant for now) takes the sharing axis, the question's 共有志向 theme (provisional, owner 2026-11-19). */
-export const ROTATION_SHARED_LOTS: Readonly<Record<string, { lot: keyof typeof LOTS; axis: CityAxis }>> = { Q03: { lot: 'drawer-housing', axis: 'publicSharing' } };
+/** Q06 (pod-frame tower; A/C vacant for now) takes the environment axis, the question's 資源循環志向 theme (provisional, owner 2026-11-19). */
+export const ROTATION_SHARED_LOTS: Readonly<Record<string, { lot: keyof typeof LOTS; axis: CityAxis }>> = {
+  Q03: { lot: 'drawer-housing', axis: 'publicSharing' },
+  Q06: { lot: 'pod-tower', axis: 'environmentalPriority' },
+};
 /** Where a rotation outcome lands: ground point, plan extent (lantern halo; the scan ring is 1.15×), swap colour and the guest's lantern slot axis. */
 export type RotationSite = { x: number; z: number; extent: number; color: string; slot: CityAxis };
 type Answer = { questionId: string; optionId?: string };

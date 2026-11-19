@@ -8,7 +8,7 @@ import { STAGE_SLOTS } from './stages.ts';
 export { FLY_IN, FLY_OUT, shotTimeline } from './resultTimeline.ts';
 
 type Site = CarrierChange['socketId'];
-export type ShotId = `${Site}:${'focal' | 'district'}` | `${'nw' | 'sw' | 'se'}:${string}` | `energy:${'garden' | 'garden2' | 'ring' | 'wing' | 'farm' | 'island'}` | `q02:${'hydro' | 'flower' | 'farm'}` | 'q03:housing';
+export type ShotId = `${Site}:${'focal' | 'district'}` | `${'nw' | 'sw' | 'se'}:${string}` | `energy:${'garden' | 'garden2' | 'ring' | 'wing' | 'farm' | 'island'}` | `q02:${'hydro' | 'flower' | 'farm'}` | 'q03:housing' | 'q06:tower';
 type Pose = { position: [number, number, number]; target: [number, number, number] };
 export const SHOTS: Record<ShotId, Pose> = {
   'nw:focal': { position: [212, 64, -342], target: [40, 62, -300] },
@@ -51,6 +51,9 @@ export const SHOTS: Record<ShotId, Pose> = {
   // Question rotation Q03 (2026-11-19): the owner-accepted drawer housing R2 day view (drawer-housing-placement), from the north-west
   // across its loop road; used when the housing enters or leaves.
   'q03:housing': { position: [-158, 40, 7], target: [-107, 10, 73] },
+  // Question rotation Q06 (2026-11-19): the pod-frame tower on the retired housing U lot, from the north-east over the open lawn
+  // (owner accepted the placement close-up); used when the tower enters or leaves.
+  'q06:tower': { position: [-208, 50, -158], target: [-258, 16, -75] },
 };
 /** Each stage's slots; the picker flies to the stage covering most changed slots. */
 export const VIEWPOINT_COVERAGE = STAGE_SLOTS;

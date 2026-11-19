@@ -20,10 +20,10 @@ admin.on('dialog', dialog => dialog.accept());
 const note = (step, data = {}) => { log.push({ step, at: new Date().toISOString(), ...data }); console.log(step, JSON.stringify(data)); };
 const read = async path => (await (await display.request.get(survey + path)).json()).data;
 const screen = (page, name, timeout = 30_000) => page.waitForFunction(n => document.querySelector('#app')?.dataset.screen === n, name, { timeout });
-const WIRED = ['Q01', 'Q02', 'Q03', 'Q08'];
+const WIRED = ['Q01', 'Q02', 'Q03', 'Q06', 'Q08'];
 const BAND = { A: 'low', B: 'mixed', C: 'high' };
 
-/** Waits until the city draws `view`: guest count, Q01 NW band, Q02 lot (hydro/flower/farm), Q03 drawer housing, Q08 SW vacancy. */
+/** Waits until the city draws `view`: guest count, Q01 NW band, Q02 lot (hydro/flower/farm), Q03 drawer housing, Q06 pod tower, Q08 SW vacancy. */
 async function checkCity(view, timeout = 30_000) {
   const shown = view.rotation.shown;
   await city.waitForFunction(([count, s, band]) => {
@@ -33,7 +33,7 @@ async function checkCity(view, timeout = 30_000) {
     return document.querySelector('.causal-panel')?.dataset.guestCount === String(count)
       && sites.magnetEast.automationHub?.band === band
       && lots.hydro === (s.Q02 === 'A' ? 1 : 0) && lots.flower === (s.Q02 === 'B' ? 1 : 0) && energy.farm.visible === (s.Q02 === 'C')
-      && lots.housing === (s.Q03 === 'A' ? 1 : 0)
+      && lots.housing === (s.Q03 === 'A' ? 1 : 0) && lots.tower === (s.Q06 === 'B' ? 1 : 0)
       && sites.dogenzakaSouth.commonsPlaza?.vacant === (s.Q08 === 'A' || s.Q08 === 'B');
   }, [view.guestCount, shown, BAND[shown.Q01]], { timeout });
 }

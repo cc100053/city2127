@@ -6,7 +6,7 @@ import { Group, Mesh, MeshStandardMaterial, BoxGeometry, Scene } from 'three';
 import { LOTS } from '../src/layout.ts';
 import { FARM_CENTRE, EnergyRuntime } from '../src/energyRuntime.ts';
 import { BAY_FLOWER_SHOWN } from '../src/bayFlower.ts';
-import { LotRuntime, q02Models, q03Housing, q08Vacant } from '../src/lotRuntime.ts';
+import { LotRuntime, q02Models, q03Housing, q06Tower, q08Vacant } from '../src/lotRuntime.ts';
 
 // Exactly one shown model per option; no option is the version4 city.
 for (const option of ['A', 'B', 'C']) {
@@ -64,7 +64,7 @@ assert.equal(hydro.visible, false); assert.ok(nodes.every(node => node.visible))
 // A version4 view after a rotation run restores the built city.
 lots.setQ02(undefined, 30, true); lots.update(30, false);
 assert.equal(hydro.visible, true); assert.ok(nodes.every(node => !node.visible)); assert.equal(farm.at(-1), undefined);
-assert.deepEqual(lots.getDiagnostics(), { hydro: 1, flower: 0, housing: 1 });
+assert.deepEqual(lots.getDiagnostics(), { hydro: 1, flower: 0, housing: 1, tower: 1 });
 
 // EnergyRuntime: the override wins over the receiver vote and survives an immediate energy update; undefined hands it back.
 const energy = new EnergyRuntime(new Scene());
@@ -151,3 +151,48 @@ for (const [from, to] of [['A', 'B'], ['A', 'C'], ['B', 'C'], ['C', 'B']]) asser
 assert.match(q03Result({ from: 'B', to: 'A' }).effect, /戻りました/);
 { const { target } = SHOTS['q03:housing'], lot = LOTS['drawer-housing'];
   assert.ok(Math.hypot(target[0] - lot.x, target[2] - lot.z) <= lot.size / 2, 'Q03 shot looks at the housing lot'); }
+
+// Q06 shares the pod-frame tower lot (the retired housing U site): B shows the tower, A/C (no model yet) fade it to lawn; version4
+// never engages it.
+assert.deepEqual(['A', 'B', 'C', undefined].map(q06Tower), [false, true, false, true]);
+const q06set = set.questions.find((q: { id: string }) => q.id === 'Q06');
+assert.deepEqual(q06set.options.map((o: { lotId: string }) => o.lotId), ['pod-tower', 'pod-tower', 'pod-tower'], 'Q06: one shared lot');
+assert.equal(q06set.options[1].modelId, 'pod-frame-tower-2127');
+{ const { POD_TOWER, HOUSING_LOT } = { ...(await import('../src/layout.ts')), HOUSING_LOT: (await import('../src/housingPrototype.ts')).HOUSING_SITES.mobile };
+  const lot = LOTS['pod-tower'];
+  // The lot covers the R4 envelope with the pods (X −28.5…27.3, Z −19.8…18.2 about the origin) and stands on housing U's old site.
+  assert.deepEqual([lot.x, lot.z], [POD_TOWER.x, POD_TOWER.z]); assert.ok(lot.size >= 56);
+  assert.ok(Math.hypot(HOUSING_LOT[0] - lot.x, HOUSING_LOT[1] - lot.z) < 20, 'on the retired housing U site'); }
+{
+  const towerScene = new Scene(), tower = new Group(), shared = new MeshStandardMaterial();
+  const towerLots = new LotRuntime(towerScene);
+  // Version4: no rotation view, nothing touched even after the GLB loads.
+  towerLots.setQ06(undefined, 0, true); towerLots.update(0, false);
+  tower.name = 'pod-frame-tower-2127'; tower.add(mesh(), new Mesh(new BoxGeometry(), shared)); towerScene.add(tower);
+  towerLots.update(1, false);
+  assert.equal(tower.visible, true); assert.equal((tower.children[1] as Mesh).material, shared, 'version4 keeps the shared materials');
+  // A snapshot at B keeps it standing; a live B→A from t 10 is held until 10, half-faded at 11.5, gone at 13.
+  towerLots.setQ06('B', 2, true); towerLots.update(2, false); assert.equal(tower.visible, true);
+  towerLots.setQ06('A', 10, false); towerLots.update(9, false); assert.equal(tower.visible, true);
+  towerLots.update(11.5, false);
+  assert.ok(Math.abs(((tower.children[0] as Mesh).material as MeshStandardMaterial).opacity - .5) < 1e-9, 'half-way at mid-transition');
+  towerLots.update(13, false); assert.equal(tower.visible, false); assert.equal(towerLots.getDiagnostics().tower, 0);
+  // A→C: nothing to change; C→B returns it; a snapshot fades at once; a version4 view after the run restores it.
+  towerLots.setQ06('C', 20, false); towerLots.update(24, false); assert.equal(tower.visible, false);
+  towerLots.setQ06('B', 30, false); towerLots.update(33, false); assert.equal(tower.visible, true);
+  towerLots.setQ06('C', 40, true); towerLots.update(40, false); assert.equal(tower.visible, false, 'snapshot fades at once');
+  towerLots.setQ06(undefined, 50, true); towerLots.update(50, false); assert.equal(tower.visible, true, 'version4 restores the tower');
+  assert.equal(shared.opacity, 1, 'a shared material is never faded');
+}
+const { q06Swap, q06Result, q06Shot } = await import('../src/rotationLayout.ts');
+const q06Of = (from: string, to: string) => q06Swap({ rotation: { outcome: { kind: 'swap', questionId: 'Q06', from, to } } } as never)!;
+assert.deepEqual([q06Of('B', 'A').tower, q06Of('C', 'B').tower, q06Of('A', 'C').tower], [true, true, false]);
+assert.equal(q06Shot(q06Of('B', 'C')), 'q06:tower'); assert.equal(q06Shot(q06Of('C', 'A')), null, 'A↔C: nothing to see, stay at hero');
+assert.equal(q06Swap({ rotation: { outcome: { kind: 'fallback', questionId: 'Q06' } } } as never), undefined);
+for (const [from, to] of [['B', 'A'], ['B', 'C'], ['A', 'C'], ['C', 'A']]) assert.doesNotMatch(q06Result({ from, to }).effect, /現れ|できました|加わり|戻りました/, `Q06 ${from}→${to} claims no new building`);
+assert.match(q06Result({ from: 'A', to: 'B' }).effect, /戻りました/);
+{ const { target } = SHOTS['q06:tower'], lot = LOTS['pod-tower'];
+  assert.ok(Math.hypot(target[0] - lot.x, target[2] - lot.z) <= lot.size / 2, 'Q06 shot looks at the tower lot'); }
+{ const { rotationSite } = await import('../src/voteJourney.ts'); const lot = LOTS['pod-tower'];
+  const site = rotationSite({ kind: 'swap', questionId: 'Q06', from: 'B', to: 'C' } as never, [])!;
+  assert.deepEqual([site.x, site.z, site.slot], [lot.x, lot.z, 'environmentalPriority'], 'Q06 orb lands on the tower lot'); }

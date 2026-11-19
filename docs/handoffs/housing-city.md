@@ -7,6 +7,8 @@
 - Checkout: `/Users/fatboy/city2127`，目前main（feature `codex/housing-background`保留），base `d3152b4b4b9d0385b4fe77194ca10062e4777e5b`。Fetch重試（sandbox權限）成功，main/origin/main 0 ahead / 0 behind；保留既有untracked `.playwright-cli/`及舊feature。
 - Last progress: 2026-10-27 JST；A固定背景及M搬位已實作，root test/build與352配置共存檢查通過，production恢復流程通過；八張對照／正式原圖與DEV回歸已通過，merge `ba54961` tree與feature相同；整合後root checks PASS，main `7ea9ec0100bebd24a1e9144dde1b9006bc23995a`的CI完成success。
 
+- 2026-11-19（question-rotation，owner）：住宅 U 自城市背景撤走（`main.ts` `background.parts.mobile.visible=false`），舊址給 Q06 蛋艙塔；`housingPrototype` 代碼、DEV `?housing` 研究及 M／P 不變。見 [question-rotation](question-rotation.md)。
+
 ## Direct human authorization and boundaries
 
 - Execution：chat `01a17822-914e-7a52-a897-a34d47a68d70`，human message `01a17822-ead1-7172-b6da-d82035164927`：「[$task-relay] … continue the implementation of /Users/fatboy/city2127/docs/HOUSING_CITY_PLAN.md」。

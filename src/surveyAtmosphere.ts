@@ -8,7 +8,7 @@ import type { CarrierChange } from './cityChangeManager.ts';
 import type { DisplayMode } from './dayCycle.ts';
 import { presets, type WorldState } from './presets.ts';
 import { changeSites } from './layout.ts';
-import { q01Swap, q02Swap, q03Result, q03Swap, q08Result, q08Swap, Q02_RESULTS, rotationLayout } from './rotationLayout.ts';
+import { q01Swap, q02Swap, q03Result, q03Swap, q06Result, q06Swap, q08Result, q08Swap, Q02_RESULTS, rotationLayout } from './rotationLayout.ts';
 import { crowdShareText } from '../survey/src/shared/rotation.ts';
 import { AXES, connectSurvey, isExhibitionView, supersedes, type CityView, type Decision, type ExhibitionProposal, type ExhibitionView, type SurveyEventKind, type SurveyView, type ExploreLook } from './surveyView.ts';
 
@@ -198,6 +198,9 @@ export function residentResult(proposal: ExhibitionProposal, changes?: readonly 
   // A Q03 swap shows or fades the drawer housing on its lot (src/lotRuntime.ts).
   const q03 = q03Swap(proposal);
   if (q03) return { ...q03Result(q03), kind: 'configuration', ...share };
+  // A Q06 swap shows or fades the pod-frame tower on its lot (src/lotRuntime.ts).
+  const q06 = q06Swap(proposal);
+  if (q06) return { ...q06Result(q06), kind: 'configuration', ...share };
   const change = changes?.[0];
   // Rotation runs (Q01 only so far): the guest's own Q01 answer swapped the NW AUTO HUB; its layouts come from the outcome, not the neutral Meter layout.
   const swap = q01Swap(proposal);
