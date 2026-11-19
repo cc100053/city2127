@@ -1,7 +1,7 @@
 # SW focal — お台場南岸接駁
 
 - Owner: cc100053
-- 狀態：候選已實作，待 owner 視覺驗收。
+- 狀態：2026-11-19 按 owner 指示合入 main（`10f6644a`）。
 - 分支：`codex/sw-focal-connections`
 - Base：`52aa690fcd162d0a27b5bfa45f92325f989d5ca7`。2026-11-17 fetch 後本地 main 與 origin/main 同步。保留原有未追蹤 `Dev_QA.md`。
 - 前序：[活動モジュール棚](sw-event-shelf.md) 已由 `45756308` 整合。
@@ -18,4 +18,10 @@
 - 場景測試對照實際地形，檢查新支路兩側和中心、主路接縫、棚前交會、庭園步道到入口。日夜三態六張圖已更新到 [change review](../../artifacts/change-review/index.html#SW%20focal)。
 - 2026-11-17 Mac headless Chrome、1600 × 900、固定時間，近鏡和俯視擷取無 page error。完整支路主要喺[俯視](../../artifacts/sw-focal-connections/plan.jpg)可見。原近鏡因視角只見前景一段。東側路軌的部分枕木在新地台內，仍可見雙軌的走向。
 - 新支路屬固定場景幾何，未新增車流或行人路線。展覽機性能及 live 問卷畫面未測。
-- 下一步由 owner 比對 Gemini 目標、俯視圖和 change review 三態，驗收後整合。
+- 如需再評估畫面，可比對 Gemini 目標、俯視圖和 change review 三態。
+
+## 2026-11-19 整合
+
+- `10f6644a` 保留 NW AUTO HUB 與車抽屜住宅的既有接駁，同時加上 SW 支路。瀏覽器核對版本為包含兩條分支的 `6f8afee8`。
+- 合併版本根目錄 `npm test`、`npm run build`、`git diff --check` 通過。場景測試覆蓋 ④ 主路接縫、支路與兩庭園入口。
+- Mac headless Chrome 1600 × 900／DPR 1，以 `sw:focal` 核對 −1／0／+1 的 12:00、22:00 近鏡，共六張，無 page error。證據存於 `~/city2127-evidence/sw-focal-connections/main-integration/`。展覽機及 live 問卷畫面未測。

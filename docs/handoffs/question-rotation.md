@@ -1,18 +1,18 @@
 # question-rotation — SURVEY_V2 抽題輪換計劃
 
 - Owner: cc100053
-- Status: IN_PROGRESS（階段 0 決定完成並寫入 SPEC；階段 1 起未實作）
+- Status: 階段 0 計劃已合入 main；後續實作在 `feat/question-rotation`
 - Branch: `docs/question-rotation-plan`
 - Base commit: `6724989bbff0ff8a0f65a9ee6e2a23f778e7ede3`（origin/main，2026-11-18）
 - Last verified commit: `7077b46d`（階段 0 決定；本次審閱補充的 commit 見 git log）
-- Remote availability: `origin/docs/question-rotation-plan`
+- Remote availability: `origin/docs/question-rotation-plan`、`origin/feat/question-rotation`
 
 ## Session Git state
 
 - Session starting branch and HEAD: main, `f40ffbc0e3e9b5a73da8f4a86fa75ff1190f2f09`；同日兩次 fast-forward 至 `100816b5`、`6724989b`
 - Last fetched origin/main commit: `6724989b`，2026-11-18
 - Local changes present at session start: 未追蹤 `Dev_QA.md`（owner 本機檔），保留
-- Upstream integration status: NOT INTEGRATED
+- Upstream integration status: 計劃於 2026-11-19 由 `6f8afee8` 合入 main。輪換實作繼續在功能分支進行。
 - Pending Git conflicts or synchronization blockers: NONE
 
 ## Goal and acceptance criteria
@@ -44,11 +44,11 @@
 ## Known issues and blockers
 
 - 新 run 各題起始模型未定。
-- 蓮花受電仍為 draft，未選址。
+- 蓮花受電 R2 已驗收並放置，見 [交接](bay-flower-placement.md)。輪換接線屬後續實作。
 - 待 owner：舊能源部件逐件去留；群眾比例少人數門檻（建議 10 票）；Q02 離場模型的變化是否播出。
 - 未核實：`buildTransition.ts` 是否處理過 −1↔+1 直接跳。
 - 審閱第 G 點（城市端預載需收到每次預約抽中的題目，加入 protocol）未寫入計劃。
 
 ## Next expected step
 
-階段 1（`survey/` 抽題、換模型、群眾比例、schema 9、模擬 gate），可與階段 4 的內容製作（蓮花受電驗收及選址、Q08／Q06／Q03 新模型）並行。
+接續 `feat/question-rotation` 上的實作及該分支的交接。
