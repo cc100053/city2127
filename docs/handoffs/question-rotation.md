@@ -9,6 +9,7 @@
 
 ## Session Git state
 
+- Session starting branch and HEAD（2026-11-19 第十節，change sheet）：`feat/question-rotation` `de401421`，fetch 後與 origin 同步，無分歧。未追蹤 `Dev_QA.md` 保留
 - Session starting branch and HEAD（2026-11-19 第九節，Q06）：`feat/question-rotation` `7343ff52`，fetch 後與 origin 同步，無分歧（`origin/main` 落後分支 24 個 commit，無新 commit）。未追蹤 `Dev_QA.md` 保留
 - Session starting branch and HEAD（2026-11-19 第八節，Q03）：`feat/question-rotation` `b98e8d53`，fetch 後與 origin 同步，無分歧。未追蹤 `Dev_QA.md` 保留
 - Session starting branch and HEAD（2026-11-19 第七節，6.3 完整流程）：`feat/question-rotation` `626fd530`，與 origin 同步；`origin/main` `df59a7de`（分支已包含）。未追蹤 `Dev_QA.md` 保留
@@ -76,6 +77,7 @@
   - 判斷：Q02 城市接線（2.1／2.2）未做。蓮花受電模型雖已 merge 入 main（PR #4），其 handoff 仍寫「not placed」，城市內未選址；此時把 Q02 畫出會令起始選項 A 隱去已驗收的農園，換到 B 時又無模型出現，空置態亦未驗收。故改做不受阻擋的 2.6 結果卡部分。
   - 做法：群眾比例句移至 `survey/src/shared/rotation.ts`（`VOICES_GATHERING`、`crowdShareText`），guest「住民の声」面板與城市結果卡共用同一句。`residentResult` 在輪換提案回傳 `share`：取 outcome 題目（換模型或保底題）的比例；城市卡在原因句出現時同時加一行「住民の声：同じ暮らしを選んだ住民 N%（M人中）」，未達門檻為「住民の声：この問いへの声は、まだ集まり始めたところです」。version4 提案沒有 `rotation`，結果卡不變。
   - 未做：hologram「住民の声」看板改為題目比例（2.6 下半，屬視覺改動，待 owner 定樣式）；保底結果卡仍用通用句，未改為 3.4 的「あなたの選んだ暮らしは、すでにここにあります」（guest 端已用；城市端待 5.2 文案）。
+- 5.4 變化總覽（2026-11-19 第十節，owner 要求）：`scripts/changeSheet.ts` 改讀 `questions.rotation.v1.json`，逐題列 9 題 × 3＝27 個版本：選項、計劃第 2 節總表的版本狀態、模型 ID、地塊、由其餘兩個選項換入時的結果卡（`residentResult` 以單次 swap 提案生成）、設施卡（只有 Q01、Q02-C、Q08-C 有；其餘標示待 5.3）、日夜截圖（Q01 用 `closeupSheet.mjs` 近鏡；Q02／Q03／Q06／Q08 用本 handoff 實時測試換入後約 10 秒的畫面，縮成 960 px JPEG 存 `artifacts/change-review/rotation/`）及居民（湊 Q01、葵 Q02-C、凪 Q08-C）。抽屜住宅及農園／葵的舊記錄併入 Q03-A、Q02-C；version4 單元改為「不在新題組內的現有資產」附錄。計劃第 2 節 Q04「暫不上台」與 owner 2026-11-18 決定矛盾，已改。`artifacts/change-review/rows.json` 及 version4 的 `frames/`（Q01 三張近鏡以外）不再被引用，未刪。
 
 ## Actual validation results
 
@@ -139,7 +141,9 @@
 
 ## Next expected step
 
-**現時（2026-11-19 第九節）：** Q06 已接 B（蛋艙塔，住宅 U 舊址），A／C 暫為空置，owner 2026-11-19 接受放置及空置做法。已接題：Q01、Q02、Q03（A）、Q06（B）、Q08（C）。owner 2026-11-19 接受 Q06 日夜實拍（「Accept」）。下一步： Q04／Q05／Q07／Q09（欠模型方向），或 owner 交 Q03、Q06、Q08 的新模型後換走空置；demo 時是否只讓已接題上線仍待 owner。
+**現時（2026-11-19 第十節）：** 變化總覽已改為 9 題 × 3＝27 個版本（計劃 5.4）；題目或結果卡、設施卡文案定稿後重跑 `node --experimental-strip-types scripts/changeSheet.ts` 並 commit。其餘同第九節。
+
+**之前（2026-11-19 第九節）：** Q06 已接 B（蛋艙塔，住宅 U 舊址），A／C 暫為空置，owner 2026-11-19 接受放置及空置做法。已接題：Q01、Q02、Q03（A）、Q06（B）、Q08（C）。owner 2026-11-19 接受 Q06 日夜實拍（「Accept」）。下一步： Q04／Q05／Q07／Q09（欠模型方向），或 owner 交 Q03、Q06、Q08 的新模型後換走空置；demo 時是否只讓已接題上線仍待 owner。
 
 **現時（2026-11-19 第八節）：** Q03 已接 A（抽屜住宅），B／C 暫為空置，owner 2026-11-19 接受（日夜總覽）。已接題：Q01、Q02、Q03（A）、Q08（C）。下一步：Q06（欠選址及模型），或 owner 交 Q03 B／C、Q08 A／B 模型後換走空置；demo 時是否只讓已接題上線仍待 owner。
 

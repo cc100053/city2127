@@ -1,172 +1,106 @@
 <!doctype html><html lang="zh-Hant"><meta charset="utf-8"><title>變化總覽 — city2127</title>
 <style>body{font:15px/1.6 system-ui,"Noto Sans JP",sans-serif;margin:24px auto;max-width:1500px;padding:0 20px;background:#f4f3ee;color:#222}
-h1{font-size:26px}h2{font-size:21px;margin:0 0 8px}h3{font-size:16px;margin:18px 0 6px}small{color:#667;font-weight:400}code{background:#e6e4da;padding:0 4px;border-radius:3px}
+h1{font-size:26px}h2{font-size:21px;margin:0 0 8px}h3{font-size:16px;margin:18px 0 6px}h4{font-size:15px;margin:16px 0 6px}small{color:#667;font-weight:400}code{background:#e6e4da;padding:0 4px;border-radius:3px}
 article{background:#fff;border-radius:10px;padding:18px 22px;margin:22px 0;box-shadow:0 1px 4px #0002}
 table{border-collapse:collapse;width:100%}th,td{border:1px solid #d6d4c8;padding:6px 9px;text-align:left;vertical-align:top}th{background:#eceadf;font-weight:600}
 .change{border-top:1px solid #e2e0d4;margin-top:16px}.cols{display:grid;grid-template-columns:minmax(300px,2fr) 3fr;gap:20px}
 dt{color:#667;font-size:13px;margin-top:8px}dd{margin:0}.frames{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start}
 p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figure{margin:0}figure img{width:100%;display:block;border-radius:4px;background:#ddd}figcaption{font-size:12px;color:#667}</style>
-<h1>變化總覽：選擇 → 變化 → 建築 → 居民</h1>
-<p>生成：2026-11-17，<code>scripts/changeSheet.ts</code>。狀態、居民與建築介紹來自 RESIDENT_SCENE_PLAN，日文文案來自結果卡與設施卡的程式，選項來自正式問卷。截圖為靜態 DEV 畫面，取自 <code>scripts/closeupSheet.mjs</code> 或個別建築驗收紀錄。佔比為模擬數字，並非真人數據。</p>
-<p><b>變化成因：</b>每位 guest 回答四題，每個選項將對應軸的 Meter 推 −1、0 或 +1。Meter 是所有人累積的結果；每份提案最多令一個地點前進一級，並優先採用 guest 自己推動的方向。因此 guest 的選擇不一定等於本次的變化方向，結果卡第二句一律說明實際變化。</p>
-<table><tr><th>單位</th><th>佔比</th><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr>
-<tr><td><a href="#NW focal">NW focal — デックス西 AUTO HUB（−1／0／+1）</a></td><td>10.6%</td><td>驗收（旗艦 R9）</td><td>湊：DEV 演示齊備，三個狀態、四種轉變（handoff）；owner 接受作演示</td><td>階段 2 收尾：演技、口形、正式接入</td></tr>
-<tr><td><a href="#NW bays">NW bays — <code>nw:stage-west</code>／<code>stage-mid</code>／district</a></td><td>19.4%</td><td>驗收（Bay R2）</td><td>未設計。提議：切回湊所在的同一佈景</td><td>決定 district 變化如何接入居民（owner 決定）</td></tr>
-<tr><td><a href="#SE focal">SE focal — フジテレビ東（−1／0／+1）</a></td><td>10.9%</td><td>驗收（R4；+1 塔 Blender R3，9/12）</td><td>時子：僅有台詞與行動草稿</td><td>階段 2 由選定鏡頭位置開始</td></tr>
-<tr><td><a href="#SE 塔">SE 塔＋pod 組件 — <code>se:stage-east</code>／<code>stage-south</code></a></td><td>19.7%</td><td>階段 1 進行中，R3 日 20/30、夜 19/30，待驗收</td><td>提議：切回時子</td><td>階段 1</td></tr>
-<tr><td><a href="#SW rooms">SW rooms — <code>sw:stage-rooms-west</code>／<code>east</code></a></td><td>17.4%</td><td><b>未打磨</b></td><td>未有居民（共有軸）</td><td>階段 1；同時決定 SW 居民</td></tr>
-<tr><td><a href="#SW focal">SW focal — お台場南岸</a></td><td>10.5%</td><td>驗收（Meter 0／mixed 的活動モジュール棚，owner 2026-11-14；−1／+1 沿用 COMMONS 模型，不在此列）</td><td>草案 v4：凪（結果為 0 的兩種轉變），待 owner 批准（handoff）</td><td>階段 2 步驟 4：owner 在 Gemini 挑選目標圖與角色</td></tr>
-<tr><td><a href="#SW courts">SW courts — <code>sw:stage-courts-west</code>／<code>south</code></a></td><td>7.2%</td><td><b>未打磨</b></td><td>未有居民</td><td>階段 1</td></tr>
-<tr><td><a href="#能源">能源四部件</a></td><td>4.5%</td><td>早期 batch 已整合，未按 taste v2 重審</td><td>陸上農園：葵的 DEV 演示待驗收（handoff）</td><td>審閱落種及單格復現日照；正式投票接入待定</td></tr></table>
-<p><a href="#drawer-housing">Q03-A — 車が引き出しになる住宅</a>（A 位街道候選，投票變化待設計）</p>
-<article id="drawer-housing">
-<h2>Q03-A — 車が引き出しになる住宅 <small>A 位街道 R2 候選 · 投票變化待設計</small></h2>
-<p class="intro">フジテレビ西南側。兩個共用載車艙把小車升到住戶樓層，像抽屜一樣推入外牆泊位。住宅仍在 A 位，與西側梯田巨構現相隔 15.9 m。沿立面的暖米色車道從右側繞入樓隙，經背面成環，並接入導軌大道 ②。</p>
-<p lang="ja">満潮で低い道が水に戻るころ、佐伯澪さんの車は外壁の引き出しに収まり、工具が三階の作業台に届きます。地上を歩く場所にしたぶん、住民は二つの昇降台を順番に使います。</p>
-<p><a href="../../docs/BUILDING_STORIES.md#drawer-housing">佐伯澪的故事</a> · <a href="../../docs/handoffs/drawer-housing-placement.md">A 位座標與驗證</a></p>
-<div class="frames">
-<figure><img loading="lazy" src="drawer-housing/before.jpg" alt="原近鏡，右側巨構緊貼住宅"><figcaption>改前｜原日景鏡頭</figcaption></figure>
-<figure><img loading="lazy" src="drawer-housing/after-same.jpg" alt="同一鏡頭，住宅與右側巨構之間見到開放地面"><figcaption>改後｜同一鏡頭，梯田巨構與住宅分開</figcaption></figure>
-<figure><img loading="lazy" src="drawer-housing/vs-target.jpg" alt="同角度比較 Gemini 目標、R1 的 T 字前場和 R2 的貼樓環道"><figcaption>同角度｜Gemini、R1、R2</figcaption></figure>
-<figure><img loading="lazy" src="drawer-housing/gemini-target.jpg" alt="目標圖中的貼樓暖色車道、右側彎道和前方步道"><figcaption>Gemini 目標｜貼樓車道及右側彎道</figcaption></figure>
-<figure><img loading="lazy" src="drawer-housing/day.jpg" alt="日間近鏡可見兩個外伸載車艙、沿立面的陶板帶及右側彎路"><figcaption>R2 日景｜從前立面繞往樓隙</figcaption></figure>
-<figure><img loading="lazy" src="drawer-housing/night.jpg" alt="同一角度的夜景，導光線沿彎道延伸"><figcaption>R2 夜景｜環道導光</figcaption></figure>
-<figure><img loading="lazy" src="drawer-housing/plan.jpg" alt="俯視可見完整環道與接入導軌大道的支路"><figcaption>R2 接駁俯視｜與大道相通的環道</figcaption></figure>
-<figure><img loading="lazy" src="drawer-housing/hero.jpg" alt="住宅位於城市主視角富士框架右下方"><figcaption>城市主視角｜富士框架右下方</figcaption></figure>
-</div></article>
-<article id="NW focal"><h2>NW focal — デックス西 AUTO HUB（−1／0／+1） <small>10.6%</small></h2>
-<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td>驗收（旗艦 R9）</td><td>湊：DEV 演示齊備，三個狀態、四種轉變（handoff）；owner 接受作演示</td><td>階段 2 收尾：演技、口形、正式接入</td></tr></table>
-<p class="intro"><b>建築</b>：位於デックス東京ビーチ西側水邊的 AUTO HUB 服務樓（16×24 米，高 32 米）。<b>用途</b>：居民辦理包裹、手續及查詢的窗口。−1 為人手窗口，0 為日間有人、夜間機械，+1 為全自動並設無人機起降場。<b>存在理由</b>：街道服務不再由行政或大企業單方決定；居民選擇要人還是要自動，AUTO HUB 便隨之改變。</p>
-<section class="change"><h3>NW 0 → +1 <small>nw:focal，佔全部提案 5.5%</small></h3>
+<h1>變化總覽：9 題 × 3 選項＝27 個建築版本</h1>
+<p>生成：2026-11-19，<code>scripts/changeSheet.ts</code>。題目、選項、模型及地塊來自輪換題組 <code>questions.rotation.v1.json</code>（version 1，草稿：題目文字仍為 SURVEY_V2 暫定稿）；狀態來自 QUESTION_ROTATION_PLAN 第 2 節總表；居民來自 RESIDENT_SCENE_PLAN；日文結果卡及設施卡文案由程式生成。Q01 截圖取自 <code>scripts/closeupSheet.mjs</code>，其餘為輪換實時測試的畫面（含 guest 所見的結果卡）。</p>
+<p class="intro"><b>變化成因（抽題輪換）：</b>題組共 9 題，每題三個選項各對應一個建築版本。每位 guest 按城市狀態抽答其中 4 題，最久未變的題優先。提交時，在答案與城市現況不同的題中選出最久未變的一題，城市直接換成 guest 所選選項的版本；每份提案只換一個版本，其餘答案只計入群眾比例。若抽到的題都已顯示 guest 的選擇，則為保底，城市不變。結果卡附群眾比例，即該題選同一選項的百分比（含本人）；回答未滿 10 票時改用不含數字的句子。未有模型的選項：如地塊已定，地塊顯示空置態；如未定地塊，城市暫無變化。</p>
+<p>現況：27 個版本中，9 個有模型，6 個為空置地塊，12 個未有模型及地塊。</p>
+<table><tr><th>題</th><th>選項</th><th>建築版本（計劃總表）</th><th>類別</th></tr>
+<tr><td rowspan="3"><a href="#Q01">Q01</a><br><small>荷物の受け取り予定が急に変わったら、どうする？</small></td><td><a href="#Q01-A">A</a>「配達スタッフに相談する。」</td><td>AUTO HUB −1 人手窗口（驗收）</td><td>有模型</td></tr>
+<tr><td><a href="#Q01-B">B</a>「AIの提案から、自分で選ぶ。」</td><td>AUTO HUB 0 人機協作（驗收）</td><td>有模型</td></tr>
+<tr><td><a href="#Q01-C">C</a>「AIに時間や受け取り場所を決めてもらう。」</td><td>AUTO HUB +1 全自動＋無人機（驗收）</td><td>有模型</td></tr>
+<tr><td rowspan="3"><a href="#Q02">Q02</a><br><small>お台場に新しい自動運転の水上バスが登場した。どうする？</small></td><td><a href="#Q02-A">A</a>「使い慣れた従来の便に乗る。」</td><td>水の棚田 <code>q02a-hydro-terrace</code>（驗收，現為固定背景）</td><td>有模型</td></tr>
+<tr><td><a href="#Q02-B">B</a>「利用者の評判を見てから試す。」</td><td>蓮花受電 <code>bay-flower-receiver</code>（已驗收，選址已定，未放置；連岸邊機房平台）</td><td>有模型</td></tr>
+<tr><td><a href="#Q02-C">C</a>「早速、新しい便に乗ってみる。」</td><td>受電テラス農園 <code>rectenna-farm-canopy</code>（驗收）</td><td>有模型</td></tr>
+<tr><td rowspan="3"><a href="#Q03">Q03</a><br><small>たまに使う小型の乗り物が必要になった。どうする？</small></td><td><a href="#Q03-A">A</a>「自分専用のものを持つ。」</td><td>車抽屜住宅 <code>drawer-housing-2127</code>（驗收，現為固定建築）</td><td>有模型</td></tr>
+<tr><td><a href="#Q03-B">B</a>「同じ建物の住民と共有する。」</td><td>集合住宅共用車棚（無）</td><td>空置（地塊已定）</td></tr>
+<tr><td><a href="#Q03-C">C</a>「地域の共有サービスを使う。」</td><td>地區共享交通樞紐＋公園轉用（無）</td><td>空置（地塊已定）</td></tr>
+<tr><td rowspan="3"><a href="#Q04">Q04</a><br><small>街のAIが、あなたの好みを覚えるとしたら？</small></td><td><a href="#Q04-A">A</a>「記録してほしくない。」</td><td>公共案內塔（無）</td><td>未有模型及地塊</td></tr>
+<tr><td><a href="#Q04-B">B</a>「必要なときだけ情報を使ってほしい。」</td><td>會形成路線的地面（無）</td><td>未有模型及地塊</td></tr>
+<tr><td><a href="#Q04-C">C</a>「覚えて、便利な案内に役立ててほしい。」</td><td>個人案內閘門（無）</td><td>未有模型及地塊</td></tr>
+<tr><td rowspan="3"><a href="#Q05">Q05</a><br><small>真夏のお台場を歩くなら、暑さにどう対応したい？</small></td><td><a href="#Q05-A">A</a>「涼しい時間帯に出かける。」</td><td>樹蔭與海風街區（舊環境軸部分資產，未打磨）</td><td>未有模型及地塊</td></tr>
+<tr><td><a href="#Q05-B">B</a>「植物や木陰のある道を歩く。」</td><td>植物外牆建築（住宅 P 植物膜可參考，未打磨）</td><td>未有模型及地塊</td></tr>
+<tr><td><a href="#Q05-C">C</a>「温度を調整できる歩道を利用する。」</td><td>可動遮陽＋局部冷卻（舊環境軸帆／冷卻塔，未打磨）</td><td>未有模型及地塊</td></tr>
+<tr><td rowspan="3"><a href="#Q06">Q06</a><br><small>長く使った家具が古くなった。どうする？</small></td><td><a href="#Q06-A">A</a>「新しい家具に買い替える。」</td><td>新素材建築（住宅 M 輕材可參考）</td><td>空置（地塊已定）</td></tr>
+<tr><td><a href="#Q06-B">B</a>「修理して使い続ける。」</td><td>蛋艙塔 <code>pod-frame-tower-2127</code>（驗收 R4，2026-11-19 放於住宅 U 舊址）</td><td>有模型</td></tr>
+<tr><td><a href="#Q06-C">C</a>「今の家具を誰かに譲り、別の中古品を使う。」</td><td>模組回收＋重組據點（住宅 U 交換骨架可參考）</td><td>空置（地塊已定）</td></tr>
+<tr><td rowspan="3"><a href="#Q07">Q07</a><br><small>日用品を買うとき、どう受け取りたい？</small></td><td><a href="#Q07-A">A</a>「店へ行き、実物を見て買う。」</td><td>往商業設施的移動步道（無）</td><td>未有模型及地塊</td></tr>
+<tr><td><a href="#Q07-B">B</a>「近くの受け取り拠点で受け取る。」</td><td>鄰里收件塔（無）</td><td>未有模型及地塊</td></tr>
+<tr><td><a href="#Q07-C">C</a>「自宅まで届けてもらう。」</td><td>外牆搬運路＋自動配送中心（無；與 Q01-C 主題重疊）</td><td>未有模型及地塊</td></tr>
+<tr><td rowspan="3"><a href="#Q08">Q08</a><br><small>お台場で休日を過ごすなら、どんな場所が使いやすい？</small></td><td><a href="#Q08-A">A</a>「いつも同じ用途で使える施設。」</td><td>固定用途常設館（無）</td><td>空置（地塊已定）</td></tr>
+<tr><td><a href="#Q08-B">B</a>「イベントによって用途が変わる施設。」</td><td>內部可重組多用途館（無）</td><td>空置（地塊已定）</td></tr>
+<tr><td><a href="#Q08-C">C</a>「イベントに合わせて場所も変わる施設。」</td><td>活動模組棚 <code>event-shelf-2127</code>（驗收，現為 SW 0 態）</td><td>有模型</td></tr>
+<tr><td rowspan="3"><a href="#Q09">Q09</a><br><small>仕事が早く終わって、自由な午後ができたら何をしたい？</small></td><td><a href="#Q09-A">A</a>「買い物や用事を済ませる。」</td><td>公共服務設施（SE +1 塔用途接近，但外形是集中塔）</td><td>未有模型及地塊</td></tr>
+<tr><td><a href="#Q09-B">B</a>「友人と集まり、街で過ごす。」</td><td>交流文化廣場（SW COMMONS 開放廣場可參考）</td><td>未有模型及地塊</td></tr>
+<tr><td><a href="#Q09-C">C</a>「普段できない体験を楽しむ。」</td><td>沉浸式巨型穹頂（無）</td><td>未有模型及地塊</td></tr></table>
+<article id="Q01"><h2>Q01 荷物の受け取り予定が急に変わったら、どうする？ <small>人間・機械への委任度</small></h2>
+<table class="status"><tr><th>地塊方式與位置</th><th>城市接線／三態</th></tr><tr><td>同地輪換，デックス西北岸 <code>changeSites.nw</code> (43, −300)</td><td><b>是</b></td></tr></table>
+<h4>居民情景：デックス西 — 湊（ミナト）、52 歳、案内係</h4><p><small>狀態：湊：DEV 演示齊備，三個狀態、四種轉變（handoff）；owner 接受作演示；下一步：階段 2 收尾：演技、口形、正式接入</small></p>
+<table><tr><th>實際變化</th><th>台詞（字幕）</th><th>行動</th><th>得／失</th></tr><tr><td>向自律（→ +1）</td><td>真夜中でも荷物は届きます。でも、私の窓口は今日で閉まりました。</td><td>拉下窗口閘門、熄燈；無人機從頭上飛過；他拿著平板走開</td><td>得：全日服務。失：面對面的人</td></tr><tr><td>向人員（→ −1）</td><td>窓口に列ができています。待たせるけれど、顔を見て話せます。</td><td>站在窗口後方，前面排了五個人，向第一位鞠躬</td><td>得：能夠交談。失：要等候</td></tr><tr><td>由自律返中間（+1 → 0）</td><td>昼だけ窓口が戻りました。夜は、機械に任せています。</td><td>將包裹交給機械臂，轉身與訪客交談</td><td>得：日間有人。失：夜間無人</td></tr><tr><td>由人員返中間（−1 → 0）</td><td>簡単な用事は機械へ。そのぶん、困った人とゆっくり話せます。</td><td>同上</td><td>得：有時間。失：減少見面</td></tr></table>
+<section class="change" id="Q01-A"><h3>Q01-A <small>有模型</small></h3>
 <div class="cols"><dl>
-<dt>哪項選擇推向這一邊</dt><dd>日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？<br><b>「人に相談する機会は少なくても、いつでも自動で利用したい」</b></dd>
-<dt>結果卡第一句（guest 的選擇）</dt><dd>あなたは、自分の都合でいつでも使えるサービスを大切にしました。</dd>
-<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、この拠点では、自分の都合で使える自律サービスの端口が増えました。<br><small>地點標示：デックス西</small></dd>
-<dt>變化後這裏的功能（設施卡）</dt><dd><b>時間に縛られないサービス</b><br>自分の都合でサービスを使いたい。街には、自律サービスの端口や、配送を支える発着の場所があります。</dd>
-</dl><div class="frames"><figure><img loading="lazy" src="frames/nw-focal__0__h12.jpg"><figcaption>0（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-focal__+1__h12.jpg"><figcaption>+1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-focal__0__h22.jpg"><figcaption>0（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-focal__+1__h22.jpg"><figcaption>+1（22:00）</figcaption></figure></div></div></section>
-<section class="change"><h3>NW 0 → -1 <small>nw:focal-low，佔全部提案 5.1%</small></h3>
+<dt>選項</dt><dd><b>「配達スタッフに相談する。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>AUTO HUB −1 人手窗口（驗收）<br><small>模型 ID：<code>automation-hub-low</code>；地塊：<code>nw</code></small></dd>
+<dt>由 B 換入：結果卡</dt><dd>あなたは、人に相談できる日常を大切にしました。<br>この拠点では、人に相談できる窓口が増えました。<br><small>地點標示：デックス西</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、人に相談できる日常を大切にしました。<br>この拠点では、人に相談できる窓口が増えました。<br><small>地點標示：デックス西</small></dd>
+<dt>設施卡</dt><dd><b>人に相談できる街</b><br>人と話しながら用事を済ませたい。その思いに応えるため、街には対面のサービスを支える場所があります。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/nw-focal-low__-1__h12.jpg" alt="Q01-A「配達スタッフに相談する。」，12:00 近鏡"><figcaption>近鏡（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-focal-low__-1__h22.jpg" alt="Q01-A「配達スタッフに相談する。」，22:00 近鏡"><figcaption>近鏡（22:00）</figcaption></figure></div></div>
+</section>
+<section class="change" id="Q01-B"><h3>Q01-B <small>有模型，起始版本（暫定）</small></h3>
 <div class="cols"><dl>
-<dt>哪項選擇推向這一邊</dt><dd>日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？<br><b>「待ち時間があっても、人に相談したい。技術はその人を支えてほしい」</b></dd>
-<dt>結果卡第一句（guest 的選擇）</dt><dd>あなたは、人に相談できる日常を大切にしました。</dd>
-<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、この拠点では、人に相談できる窓口が増えました。<br><small>地點標示：デックス西</small></dd>
-<dt>變化後這裏的功能（設施卡）</dt><dd><b>人に相談できる街</b><br>人と話しながら用事を済ませたい。その思いに応えるため、街には対面のサービスを支える場所があります。</dd>
-</dl><div class="frames"><figure><img loading="lazy" src="frames/nw-focal-low__0__h12.jpg"><figcaption>0（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-focal-low__-1__h12.jpg"><figcaption>-1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-focal-low__0__h22.jpg"><figcaption>0（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-focal-low__-1__h22.jpg"><figcaption>-1（22:00）</figcaption></figure></div></div></section><h3>階段 2：デックス西 — 湊（ミナト）、52 歳、案内係</h3><table><tr><th>實際變化</th><th>台詞（字幕）</th><th>行動</th><th>得／失</th></tr><tr><td>向自律（→ +1）</td><td>真夜中でも荷物は届きます。でも、私の窓口は今日で閉まりました。</td><td>拉下窗口閘門、熄燈；無人機從頭上飛過；他拿著平板走開</td><td>得：全日服務。失：面對面的人</td></tr><tr><td>向人員（→ −1）</td><td>窓口に列ができています。待たせるけれど、顔を見て話せます。</td><td>站在窗口後方，前面排了五個人，向第一位鞠躬</td><td>得：能夠交談。失：要等候</td></tr><tr><td>由自律返中間（+1 → 0）</td><td>昼だけ窓口が戻りました。夜は、機械に任せています。</td><td>將包裹交給機械臂，轉身與訪客交談</td><td>得：日間有人。失：夜間無人</td></tr><tr><td>由人員返中間（−1 → 0）</td><td>簡単な用事は機械へ。そのぶん、困った人とゆっくり話せます。</td><td>同上</td><td>得：有時間。失：減少見面</td></tr></table></article>
-<article id="NW bays"><h2>NW bays — <code>nw:stage-west</code>／<code>stage-mid</code>／district <small>19.4%</small></h2>
-<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td>驗收（Bay R2）</td><td>未設計。提議：切回湊所在的同一佈景</td><td>決定 district 變化如何接入居民（owner 決定）</td></tr></table>
-<p class="intro"><b>建築</b>：沿岸 11 個服務灣，是 AUTO HUB 向全區的延伸。<b>用途</b>：停泊無人機、收發配送，或設人手櫃台。<b>存在理由</b>：與 AUTO HUB 同屬「人或機器」一軸，但整段岸線一同改變，約影響 19% 的結果。</p>
-<section class="change"><h3>NW +3 → +2 <small>nw:stage-west，佔全部提案 13.9%</small></h3>
+<dt>選項</dt><dd><b>「AIの提案から、自分で選ぶ。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>AUTO HUB 0 人機協作（驗收）<br><small>模型 ID：<code>automation-hub-mixed</code>；地塊：<code>nw</code></small></dd>
+<dt>由 A 換入：結果卡</dt><dd>あなたは、自動の便利さと、人に相談できる安心を選びました。<br>この拠点では、自分の都合で使える自律サービスの端口が増えました。<br><small>地點標示：デックス西</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、自動の便利さと、人に相談できる安心を選びました。<br>この拠点では、人に相談できる窓口が増えました。<br><small>地點標示：デックス西</small></dd>
+<dt>設施卡</dt><dd><b>普段は自動、困ったら人へ</b><br>日常の便利さと、人に相談できる安心を組み合わせる。サービス拠点には、人と自動設備が役割を分け合う場所があります。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/nw-focal__0__h12.jpg" alt="Q01-B「AIの提案から、自分で選ぶ。」，12:00 近鏡"><figcaption>近鏡（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-focal__0__h22.jpg" alt="Q01-B「AIの提案から、自分で選ぶ。」，22:00 近鏡"><figcaption>近鏡（22:00）</figcaption></figure></div></div>
+</section>
+<section class="change" id="Q01-C"><h3>Q01-C <small>有模型</small></h3>
 <div class="cols"><dl>
-<dt>哪項選擇推向這一邊</dt><dd>日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？<br><b>「待ち時間があっても、人に相談したい。技術はその人を支えてほしい」</b></dd>
-<dt>結果卡第一句（guest 的選擇）</dt><dd>あなたは、人に相談できる日常を大切にしました。</dd>
-<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、サービス拠点と移動の構成が変わり、日々の用事を支える配置が調整されました。<br><small>地點標示：水辺のサービス拠点・移動ルート</small></dd>
-<dt>變化後這裏的功能（設施卡）</dt><dd><b>時間に縛られないサービス</b><br>自分の都合でサービスを使いたい。街には、自律サービスの端口や、配送を支える発着の場所があります。</dd>
-</dl><div class="frames"><figure><img loading="lazy" src="frames/nw-stage-west__+3__h12.jpg"><figcaption>+3（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-stage-west__+2__h12.jpg"><figcaption>+2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-stage-west__+3__h22.jpg"><figcaption>+3（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-stage-west__+2__h22.jpg"><figcaption>+2（22:00）</figcaption></figure></div></div></section>
-<section class="change"><h3>NW -2 → -1 <small>nw:stage-mid，佔全部提案 4.1%</small></h3>
+<dt>選項</dt><dd><b>「AIに時間や受け取り場所を決めてもらう。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>AUTO HUB +1 全自動＋無人機（驗收）<br><small>模型 ID：<code>automation-hub-high</code>；地塊：<code>nw</code></small></dd>
+<dt>由 A 換入：結果卡</dt><dd>あなたは、自分の都合でいつでも使えるサービスを大切にしました。<br>この拠点では、自分の都合で使える自律サービスの端口が増えました。<br><small>地點標示：デックス西</small></dd><dt>由 B 換入：結果卡</dt><dd>あなたは、自分の都合でいつでも使えるサービスを大切にしました。<br>この拠点では、自分の都合で使える自律サービスの端口が増えました。<br><small>地點標示：デックス西</small></dd>
+<dt>設施卡</dt><dd><b>時間に縛られないサービス</b><br>自分の都合でサービスを使いたい。街には、自律サービスの端口や、配送を支える発着の場所があります。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="frames/nw-focal__+1__h12.jpg" alt="Q01-C「AIに時間や受け取り場所を決めてもらう。」，12:00 近鏡"><figcaption>近鏡（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-focal__+1__h22.jpg" alt="Q01-C「AIに時間や受け取り場所を決めてもらう。」，22:00 近鏡"><figcaption>近鏡（22:00）</figcaption></figure></div></div>
+</section></article>
+<article id="Q02"><h2>Q02 お台場に新しい自動運転の水上バスが登場した。どうする？ <small>技術受容性</small></h2>
+<table class="status"><tr><th>地塊方式與位置</th><th>城市接線／三態</th></tr><tr><td>各有地塊：西岸海面 (−375, −170)／南部公園西岸外海，花中心 (−712, 300)，機房平台接西岸步道（owner 2026-11-18，<code>feat/bay-flower-placement</code> 的 <code>docs/handoffs/bay-flower-placement.md</code>）／南緣陸地 <code>FARM_CENTRE</code> (−152, 408)</td><td>城市已接（<code>lotRuntime</code>，2026-11-19）；A、C 空置態 owner 2026-11-19 接受（A 整島收起、C 沿用 version4 無農園），離場與出場同時淡出淡入；近鏡及旅程著陸已做（2.5），owner 2026-11-19 接受</td></tr></table>
+
+<section class="change" id="Q02-A"><h3>Q02-A <small>有模型，起始版本（暫定）</small></h3>
 <div class="cols"><dl>
-<dt>哪項選擇推向這一邊</dt><dd>日々の買い物や道案内。あなたは、どんな助けがあると安心できますか？<br><b>「人に相談する機会は少なくても、いつでも自動で利用したい」</b></dd>
-<dt>結果卡第一句（guest 的選擇）</dt><dd>あなたは、自分の都合でいつでも使えるサービスを大切にしました。</dd>
-<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、サービス拠点と移動の構成が変わり、日々の用事を支える配置が調整されました。<br><small>地點標示：水辺のサービス拠点・移動ルート</small></dd>
-<dt>變化後這裏的功能（設施卡）</dt><dd><b>人に相談できる街</b><br>人と話しながら用事を済ませたい。その思いに応えるため、街には対面のサービスを支える場所があります。</dd>
-</dl><div class="frames"><figure><img loading="lazy" src="frames/nw-stage-mid__-2__h12.jpg"><figcaption>-2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-stage-mid__-1__h12.jpg"><figcaption>-1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-stage-mid__-2__h22.jpg"><figcaption>-2（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/nw-stage-mid__-1__h22.jpg"><figcaption>-1（22:00）</figcaption></figure></div></div></section></article>
-<article id="SE focal"><h2>SE focal — フジテレビ東（−1／0／+1） <small>10.9%</small></h2>
-<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td>驗收（R4；+1 塔 Blender R3，9/12）</td><td>時子：僅有台詞與行動草稿</td><td>階段 2 由選定鏡頭位置開始</td></tr></table>
-<p class="intro"><b>建築</b>：フジテレビ東側的 TOWER（14×14 米，高 46 米）。<b>用途</b>：+1 為單一高塔辦妥購物、就醫與行政；−1 為低矮機能 pod 散佈海邊；0 為高低混合。<b>存在理由</b>：回應日常事務應集中一處，還是分散街上；時子這類行動不便的居民受影響最大。</p>
-<section class="change"><h3>SE 0 → -1 <small>se:focal-low，佔全部提案 5.6%</small></h3>
+<dt>選項</dt><dd><b>「使い慣れた従来の便に乗る。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>水の棚田 <code>q02a-hydro-terrace</code>（驗收，現為固定背景）<br><small>模型 ID：<code>q02a-hydro-terrace</code>；地塊：<code>q02-west-sea</code></small></dd>
+<dt>由 B 換入：結果卡</dt><dd>あなたは、使い慣れた暮らしを大切にしました。<br>お台場の西岸の海に、水の棚田が戻りました。<br><small>地點標示：西岸の水の棚田</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、使い慣れた暮らしを大切にしました。<br>お台場の西岸の海に、水の棚田が戻りました。<br><small>地點標示：西岸の水の棚田</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><figure><img loading="lazy" src="rotation/Q02-A-day.jpg" alt="Q02-A「使い慣れた従来の便に乗る。」，日景"><figcaption>實時結果（日，換入後約 10 秒）</figcaption></figure><figure><img loading="lazy" src="rotation/Q02-A-night.jpg" alt="Q02-A「使い慣れた従来の便に乗る。」，夜景"><figcaption>實時結果（夜，換入後約 10 秒）</figcaption></figure></div></div>
+</section>
+<section class="change" id="Q02-B"><h3>Q02-B <small>有模型</small></h3>
 <div class="cols"><dl>
-<dt>哪項選擇推向這一邊</dt><dd>買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？<br><b>「少し歩いても、水辺に点在する低い建物をめぐりたい」</b></dd>
-<dt>結果卡第一句（guest 的選擇）</dt><dd>あなたは、水辺を歩いて用事を済ませる日常を選びました。</dd>
-<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、この拠点では、歩いて用事を済ませる低い建物が暮らしを支える構成になりました。<br><small>地點標示：フジテレビ東</small></dd>
-<dt>變化後這裏的功能（設施卡）</dt><dd><b>用事のあいだに、海辺を歩く</b><br>暮らしの用事を、街を歩きながら済ませたい。低い機能ポッドが点在し、いくつかの場所をめぐる日常を支えています。</dd>
-</dl><div class="frames"><figure><img loading="lazy" src="frames/se-focal-low__0__h12.jpg"><figcaption>0（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-focal-low__-1__h12.jpg"><figcaption>-1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-focal-low__0__h22.jpg"><figcaption>0（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-focal-low__-1__h22.jpg"><figcaption>-1（22:00）</figcaption></figure></div></div></section>
-<section class="change"><h3>SE 0 → +1 <small>se:focal，佔全部提案 5.2%</small></h3>
+<dt>選項</dt><dd><b>「利用者の評判を見てから試す。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>蓮花受電 <code>bay-flower-receiver</code>（已驗收，選址已定，未放置；連岸邊機房平台）<br><small>模型 ID：<code>bay-flower-receiver</code>；地塊：<code>q02-bay-flower</code></small></dd>
+<dt>由 A 換入：結果卡</dt><dd>あなたは、評判を確かめてから新しい技術を試す暮らしを選びました。<br>南部公園の沖に、宇宙からの光の柱を受ける湾の花が開きました。<br><small>地點標示：南部公園沖の湾の花</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、評判を確かめてから新しい技術を試す暮らしを選びました。<br>南部公園の沖に、宇宙からの光の柱を受ける湾の花が開きました。<br><small>地點標示：南部公園沖の湾の花</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><figure><img loading="lazy" src="rotation/Q02-B-day.jpg" alt="Q02-B「利用者の評判を見てから試す。」，日景"><figcaption>實時結果（日，換入後約 10 秒）</figcaption></figure><figure><img loading="lazy" src="rotation/Q02-B-night.jpg" alt="Q02-B「利用者の評判を見てから試す。」，夜景"><figcaption>實時結果（夜，換入後約 10 秒）</figcaption></figure></div></div>
+</section>
+<section class="change" id="Q02-C"><h3>Q02-C <small>有模型</small></h3>
 <div class="cols"><dl>
-<dt>哪項選擇推向這一邊</dt><dd>買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？<br><b>「上へ移動して、一つのタワーで用事を済ませたい」</b></dd>
-<dt>結果卡第一句（guest 的選擇）</dt><dd>あなたは、一つのタワーで用事を済ませる日常を選びました。</dd>
-<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、この拠点では、上下に用事をつなぐタワーが暮らしを支える構成になりました。<br><small>地點標示：フジテレビ東</small></dd>
-<dt>變化後這裏的功能（設施卡）</dt><dd><b>暮らしを、縦につなぐ</b><br>一つの場所で、いくつもの用事を済ませたい。タワーや空中のつながりが、上下に広がる日常を支えています。</dd>
-</dl><div class="frames"><figure><img loading="lazy" src="frames/se-focal__0__h12.jpg"><figcaption>0（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-focal__+1__h12.jpg"><figcaption>+1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-focal__0__h22.jpg"><figcaption>0（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-focal__+1__h22.jpg"><figcaption>+1（22:00）</figcaption></figure></div></div></section><h3>階段 2：フジテレビ東 — 時子（トキ）、81 歲、近くの住民</h3><table><tr><th>實際變化</th><th>台詞（字幕）</th><th>行動</th><th>得／失</th></tr><tr><td>向集中（→ +1）</td><td>一つの塔で、用事が全部済みます。海辺を歩く理由は、なくなりました。</td><td>走進塔的升降機，暖光升起；海邊的長椅空了</td><td>得：方便。失：散步</td></tr><tr><td>向分散（→ −1）</td><td>店は遠くなりました。そのぶん、毎日海を見ながら歩いています。</td><td>拄著拐杖沿有蓋步道行走，停下望海</td><td>得：海邊日常。失：路程遠</td></tr><tr><td>由集中返中間（+1 → 0）</td><td>用事が二か所に分かれました。途中のベンチが、私の休憩所です。</td><td>坐在半途的長椅休息，身旁放著購物袋</td><td>得：有理由外出。失：不能一站完成</td></tr><tr><td>由分散返中間（−1 → 0）</td><td>近くに中くらいの館ができました。雨の日は、そこで済ませます。</td><td>同上</td><td>得：雨天方便。失：步行減少</td></tr></table></article>
-<article id="SE 塔"><h2>SE 塔＋pod 組件 — <code>se:stage-east</code>／<code>stage-south</code> <small>19.7%</small></h2>
-<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td>階段 1 進行中，R3 日 20/30、夜 19/30，待驗收</td><td>提議：切回時子</td><td>階段 1</td></tr></table>
-<p class="intro"><b>建築</b>：塔與機能 pod 的群組。東面為 pod；南面為扭身塔，其後有兩座雙圓筒塔。<b>用途</b>：作為集中塔與分散 pod 之間的過渡形態，近鏡可見哪個 pod 消失、哪座塔升起。<b>存在理由</b>：這是 SE 軸在整個街區的版本，讓每一票都能在街景上看到實際變化。</p>
-<section class="change"><h3>SE -1 → -2 <small>se:stage-east，佔全部提案 16.7%</small></h3>
-<div class="cols"><dl>
-<dt>哪項選擇推向這一邊</dt><dd>買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？<br><b>「少し歩いても、水辺に点在する低い建物をめぐりたい」</b></dd>
-<dt>結果卡第一句（guest 的選擇）</dt><dd>あなたは、水辺を歩いて用事を済ませる日常を選びました。</dd>
-<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、建物の構成が変わり、暮らしの用事を分け合う場所の配置が調整されました。<br><small>地點標示：街に点在する建物</small></dd>
-<dt>變化後這裏的功能（設施卡）</dt><dd><b>用事のあいだに、海辺を歩く</b><br>暮らしの用事を、街を歩きながら済ませたい。低い機能ポッドが点在し、いくつかの場所をめぐる日常を支えています。</dd>
-</dl><div class="frames"><figure><img loading="lazy" src="frames/se-stage-east__-1__h12.jpg"><figcaption>-1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-stage-east__-2__h12.jpg"><figcaption>-2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-stage-east__-1__h22.jpg"><figcaption>-1（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-stage-east__-2__h22.jpg"><figcaption>-2（22:00）</figcaption></figure></div></div></section>
-<section class="change"><h3>SE -2 → -3 <small>se:stage-south，佔全部提案 2.9%</small></h3>
-<div class="cols"><dl>
-<dt>哪項選擇推向這一邊</dt><dd>買い物や日々の用事。あなたは、どんな街のめぐり方が好きですか？<br><b>「少し歩いても、水辺に点在する低い建物をめぐりたい」</b></dd>
-<dt>結果卡第一句（guest 的選擇）</dt><dd>あなたは、水辺を歩いて用事を済ませる日常を選びました。</dd>
-<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、建物の構成が変わり、暮らしの用事を分け合う場所の配置が調整されました。<br><small>地點標示：街に点在する建物</small></dd>
-<dt>變化後這裏的功能（設施卡）</dt><dd><b>用事のあいだに、海辺を歩く</b><br>暮らしの用事を、街を歩きながら済ませたい。低い機能ポッドが点在し、いくつかの場所をめぐる日常を支えています。</dd>
-</dl><div class="frames"><figure><img loading="lazy" src="frames/se-stage-south__-2__h12.jpg"><figcaption>-2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-stage-south__-3__h12.jpg"><figcaption>-3（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-stage-south__-2__h22.jpg"><figcaption>-2（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/se-stage-south__-3__h22.jpg"><figcaption>-3（22:00）</figcaption></figure></div></div></section></article>
-<article id="SW rooms"><h2>SW rooms — <code>sw:stage-rooms-west</code>／<code>east</code> <small>17.4%</small></h2>
-<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td><b>未打磨</b></td><td>未有居民（共有軸）</td><td>階段 1；同時決定 SW 居民</td></tr></table>
-<p class="intro"><b>建築</b>：海岸邊的 room bays（有頂小房，mixed 時為半開放）。<b>用途</b>：供人獨處、休息的海邊小空間。<b>存在理由</b>：共享軸在岸邊的一面；選擇私人，岸邊便增加圍合的小房。</p>
-<section class="change"><h3>SW +1 → +2 <small>sw:stage-rooms-west，佔全部提案 11.0%</small></h3>
-<div class="cols"><dl>
-<dt>哪項選擇推向這一邊</dt><dd>海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？<br><b>「予約せず、誰でも一緒に使える開かれた海辺」</b></dd>
-<dt>結果卡第一句（guest 的選擇）</dt><dd>あなたは、予約せずに誰でも使える海辺を大切にしました。</dd>
-<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、水辺や庭の構成が変わり、静かに休む場所と集まれる場所の配置が調整されました。<br><small>地點標示：水辺の居場所・庭の広場</small></dd>
-<dt>變化後這裏的功能（設施卡）</dt><dd><b>予約せずに、海辺へ</b><br>思い立ったときに、誰でも海辺で過ごしたい。開かれた座席や広場が、集まれる場所を支えています。</dd>
-</dl><div class="frames"><figure><img loading="lazy" src="frames/sw-stage-rooms-west__+1__h12.jpg"><figcaption>+1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-rooms-west__+2__h12.jpg"><figcaption>+2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-rooms-west__+1__h22.jpg"><figcaption>+1（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-rooms-west__+2__h22.jpg"><figcaption>+2（22:00）</figcaption></figure></div></div></section>
-<section class="change"><h3>SW -2 → -3 <small>sw:stage-rooms-east，佔全部提案 6.4%</small></h3>
-<div class="cols"><dl>
-<dt>哪項選擇推向這一邊</dt><dd>海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？<br><b>「予約して、一人や親しい人と静かに過ごせる場所」</b></dd>
-<dt>結果卡第一句（guest 的選擇）</dt><dd>あなたは、一人や親しい人と静かに過ごす時間を大切にしました。</dd>
-<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、水辺や庭の構成が変わり、静かに休む場所と集まれる場所の配置が調整されました。<br><small>地點標示：水辺の居場所・庭の広場</small></dd>
-<dt>變化後這裏的功能（設施卡）</dt><dd><b>海辺に、自分の時間を</b><br>一人や親しい人と静かに過ごしたい。庭や囲われた小さな空間が、海辺に落ち着ける居場所をつくっています。</dd>
-</dl><div class="frames"><figure><img loading="lazy" src="frames/sw-stage-rooms-east__-2__h12.jpg"><figcaption>-2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-rooms-east__-3__h12.jpg"><figcaption>-3（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-rooms-east__-2__h22.jpg"><figcaption>-2（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-rooms-east__-3__h22.jpg"><figcaption>-3（22:00）</figcaption></figure></div></div></section></article>
-<article id="SW focal"><h2>SW focal — お台場南岸 <small>10.5%</small></h2>
-<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td>驗收（Meter 0／mixed 的活動モジュール棚，owner 2026-11-14；−1／+1 沿用 COMMONS 模型，不在此列）</td><td>草案 v4：凪（結果為 0 的兩種轉變），待 owner 批准（handoff）</td><td>階段 2 步驟 4：owner 在 Gemini 挑選目標圖與角色</td></tr></table>
-<p class="intro"><b>建築</b>：お台場南岸（−100, 297）。0（mixed）為 40 m、十層、60 格的<b>活動モジュール棚</b>（吊桁＋外壁導軌，進出 mixed 時 headline 模組吊運，5 s 過場）；−1／+1 沿用原 COMMONS 的私人小庭與開放廣場模型。<b>用途</b>：−1 為私人小庭，0 為可把小型建築（活動模組）運入運出的棚，+1 為免預約的開放座位與廣場。<b>存在理由</b>：回應海邊應屬私人還是共享，mixed 的答案是「場所可以按需要換」。字幕與說明卡文案見 RESIDENT_COPY。</p>
-<section class="change"><h3>SW 0 → +1 <small>sw:focal，佔全部提案 10.5%</small></h3>
-<div class="cols"><dl>
-<dt>哪項選擇推向這一邊</dt><dd>海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？<br><b>「予約せず、誰でも一緒に使える開かれた海辺」</b></dd>
-<dt>結果卡第一句（guest 的選擇）</dt><dd>あなたは、予約せずに誰でも使える海辺を大切にしました。</dd>
-<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、この水辺では、活動モジュールが棚から運び出され、予約せずに使える共有席が増えました。<br><small>地點標示：お台場南岸</small></dd>
-<dt>變化後這裏的功能（設施卡）</dt><dd><b>予約せずに、海辺へ</b><br>思い立ったときに、誰でも海辺で過ごしたい。開かれた座席や広場が、集まれる場所を支えています。</dd>
-</dl><div class="frames"><figure><img loading="lazy" src="frames/sw-focal__0__h12.jpg"><figcaption>0（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-focal__+1__h12.jpg"><figcaption>+1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-focal__0__h22.jpg"><figcaption>0（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-focal__+1__h22.jpg"><figcaption>+1（22:00）</figcaption></figure></div></div></section>
-<section class="change"><h3>SW 0 → -1 <small>sw:focal，佔全部提案 10.5%</small></h3>
-<div class="cols"><dl>
-<dt>哪項選擇推向這一邊</dt><dd>海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？<br><b>「予約して、一人や親しい人と静かに過ごせる場所」</b></dd>
-<dt>結果卡第一句（guest 的選擇）</dt><dd>あなたは、一人や親しい人と静かに過ごす時間を大切にしました。</dd>
-<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、この水辺では、活動モジュールが棚から運び出され、静かに過ごすための囲われた席が増えました。<br><small>地點標示：お台場南岸</small></dd>
-<dt>變化後這裏的功能（設施卡）</dt><dd><b>海辺に、自分の時間を</b><br>一人や親しい人と静かに過ごしたい。庭や囲われた小さな空間が、海辺に落ち着ける居場所をつくっています。</dd>
-</dl><div class="frames"><figure><img loading="lazy" src="frames/sw-focal__0__h12.jpg"><figcaption>0（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-focal__-1__h12.jpg"><figcaption>-1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-focal__0__h22.jpg"><figcaption>0（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-focal__-1__h22.jpg"><figcaption>-1（22:00）</figcaption></figure></div></div></section><h3>階段 2：お台場南岸 — 凪（ナギ）、34 歲、配送航路編集者</h3><table><tr><th>實際變化</th><th>台詞（字幕）</th><th>行動</th><th>得／失</th></tr><tr><td>由私人小庭進入中間（−1 → 0）</td><td>庭は小さくなりました。でも、今日の仕事部屋は呼べば来ます。</td><td>她坐在小庭長椅上，膝上有平板；圍牆退去，她用手機呼叫；模組沿地軌駛近、停穩、四角閃青色鎖燈，門側面板亮起她的名字；她抱著平板走進去，窗內可見她在桌前坐下；門側面板顯示「明日：打合せ室」</td><td>得：想要時有一間房。失：自己的小庭</td></tr><tr><td>由開放廣場進入中間（+1 → 0）</td><td>広場の席は減りました。でも、雨でも静かに仕事ができます。</td><td>她在廣場的免費座位上用平板，天色轉暗，她收起平板、用手機呼叫；模組駛近鎖定，她走進去，窗內亮燈，她坐下開始工作；門側面板顯示「明日：打合せ室」</td><td>得：不怕雨、可專心。失：隨意坐下的廣場座位</td></tr></table></article>
-<article id="SW courts"><h2>SW courts — <code>sw:stage-courts-west</code>／<code>south</code> <small>7.2%</small></h2>
-<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td><b>未打磨</b></td><td>未有居民</td><td>階段 1</td></tr></table>
-<p class="intro"><b>建築</b>：內陸 40 米見方的 courts。<b>用途</b>：設圍牆的私人庭園，或設陽傘的開放共享廣場。<b>存在理由</b>：共享軸在內陸的一面；選擇開放，內陸便增加可供聚會的廣場。</p>
-<section class="change"><h3>SW +2 → +1 <small>sw:stage-courts-west，佔全部提案 4.4%</small></h3>
-<div class="cols"><dl>
-<dt>哪項選擇推向這一邊</dt><dd>海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？<br><b>「予約して、一人や親しい人と静かに過ごせる場所」</b></dd>
-<dt>結果卡第一句（guest 的選擇）</dt><dd>あなたは、一人や親しい人と静かに過ごす時間を大切にしました。</dd>
-<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、水辺や庭の構成が変わり、静かに休む場所と集まれる場所の配置が調整されました。<br><small>地點標示：水辺の居場所・庭の広場</small></dd>
-<dt>變化後這裏的功能（設施卡）</dt><dd><b>予約せずに、海辺へ</b><br>思い立ったときに、誰でも海辺で過ごしたい。開かれた座席や広場が、集まれる場所を支えています。</dd>
-</dl><div class="frames"><figure><img loading="lazy" src="frames/sw-stage-courts-west__+2__h12.jpg"><figcaption>+2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-courts-west__+1__h12.jpg"><figcaption>+1（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-courts-west__+2__h22.jpg"><figcaption>+2（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-courts-west__+1__h22.jpg"><figcaption>+1（22:00）</figcaption></figure></div></div></section>
-<section class="change"><h3>SW -3 → -2 <small>sw:stage-courts-south，佔全部提案 2.8%</small></h3>
-<div class="cols"><dl>
-<dt>哪項選擇推向這一邊</dt><dd>海辺で一時間、自由に過ごせるなら。あなたは、どんな場所で休みたいですか？<br><b>「予約せず、誰でも一緒に使える開かれた海辺」</b></dd>
-<dt>結果卡第一句（guest 的選擇）</dt><dd>あなたは、予約せずに誰でも使える海辺を大切にしました。</dd>
-<dt>結果卡第二句（變化說明）</dt><dd>ほかの住民の声と重なり、水辺や庭の構成が変わり、静かに休む場所と集まれる場所の配置が調整されました。<br><small>地點標示：水辺の居場所・庭の広場</small></dd>
-<dt>變化後這裏的功能（設施卡）</dt><dd><b>海辺に、自分の時間を</b><br>一人や親しい人と静かに過ごしたい。庭や囲われた小さな空間が、海辺に落ち着ける居場所をつくっています。</dd>
-</dl><div class="frames"><figure><img loading="lazy" src="frames/sw-stage-courts-south__-3__h12.jpg"><figcaption>-3（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-courts-south__-2__h12.jpg"><figcaption>-2（12:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-courts-south__-3__h22.jpg"><figcaption>-3（22:00）</figcaption></figure><figure><img loading="lazy" src="frames/sw-stage-courts-south__-2__h22.jpg"><figcaption>-2（22:00）</figcaption></figure></div></div></section></article>
-<article id="能源"><h2>能源四部件 <small>4.5%</small></h2>
-<table class="status"><tr><th>階段 1：建築／變化</th><th>階段 2：居民情景</th><th>下一步</th></tr><tr><td>早期 batch 已整合，未按 taste v2 重審</td><td>陸上農園：葵的 DEV 演示待驗收（handoff）</td><td>審閱落種及單格復現日照；正式投票接入待定</td></tr></table>
-<p class="intro"><b>建築</b>：水庭（海邊蓄電庭園）、旋轉環（フジテレビ前蓄電環）、受電翼／受電テラス農園（接收軌道電力）、能源島（沖面核電島連檢修橋）。<b>用途</b>：四種電力來源及儲存方式。<b>存在理由</b>：城市需要電力；居民選擇電從何來，每一種都改變一段海邊景色。R3 農園已驗收，六角天幕的故事設定為天氣圖書館，可重現過去的光與霧供居民育苗。</p>
-<section class="change"><dl><dt>相關選擇</dt><dd>毎日の電気を支える設備。あなたは、どんな海辺で暮らしたいですか？<br><b>「水の音や機械が身近でも、海辺の庭で電気を蓄える暮らし」</b><br><b>「大きな機械が景色に加わっても、街の中心で電気を蓄える暮らし」</b><br><b>「海の上に受け取る面が広がっても、空から届く電気を使う暮らし」</b><br><b>「海の一部が設備の陸地に変わっても、沖の原子力施設から電気を届ける暮らし」</b></dd>
-<dt>這些設施的功能（設施卡）</dt><dd><b>海辺の庭に、電気を蓄える</b><br>外から届く電力で水をくみ上げ、落水を通して取り出す蓄電庭園です。水辺の居場所と、エネルギー設備が隣り合っています。<br><b>街の中心で、電気を蓄える</b><br>フジテレビの劇場とは別の環が、外部の電力で回転して蓄えます。劇場と公共の動線は、そのまま残っています。<br><b>海の上で、空からの電気を受け取る</b><br>海上に広がる翼は、軌道から届く電力を受け取る設備です。海の景色と空間を使う、2127年の構想です。<br><b>空の電気を受け取るテラス農園</b><br>膜で軌道からのマイクロ波を受け、電気に変えて街に届けます。膜の下では、斜路を通って段々畑を訪ねられます。<br><b>電気のために、海の境界が変わる</b><br>沖の原子力施設を置く島と、検修の橋が街につながっています。電気を届ける場所を確保するために、海の一部を陸地として使っています。</dd></dl></section>
-<section class="change" id="rectenna-farm">
-<h3>陸上農園 — 受電テラス農園 R3 <small>建築已驗收 · Meter 觸發計法待調整</small></h3>
-<p>台場南岸的虹彩六角天幕接收軌道電力，坡道把公共步道、菜床及退台連在一起。故事設定見<a href="../../docs/BUILDING_STORIES.md#rectenna-farm">天氣圖書館</a>。以下為 R3 已驗收配置的靜態實景。</p>
+<dt>選項</dt><dd><b>「早速、新しい便に乗ってみる。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>受電テラス農園 <code>rectenna-farm-canopy</code>（驗收）<br><small>模型 ID：<code>rectenna-farm-canopy</code>；地塊：<code>q02-farm-south</code></small></dd>
+<dt>由 A 換入：結果卡</dt><dd>あなたは、新しい技術をすぐに試す暮らしを選びました。<br>お台場の南側に受電テラス農園が加わり、膜の下に斜路で訪ねられる畑ができました。<br><small>地點標示：受電テラス農園</small></dd><dt>由 B 換入：結果卡</dt><dd>あなたは、新しい技術をすぐに試す暮らしを選びました。<br>お台場の南側に受電テラス農園が加わり、膜の下に斜路で訪ねられる畑ができました。<br><small>地點標示：受電テラス農園</small></dd>
+<dt>設施卡</dt><dd><b>空の電気を受け取るテラス農園</b><br>膜で軌道からのマイクロ波を受け、電気に変えて街に届けます。膜の下では、斜路を通って段々畑を訪ねられます。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="rotation/Q02-C-day.jpg" alt="Q02-C「早速、新しい便に乗ってみる。」，日景"><figcaption>實時結果（日，換入後約 10 秒）</figcaption></figure><figure><img loading="lazy" src="rotation/Q02-C-night.jpg" alt="Q02-C「早速、新しい便に乗ってみる。」，夜景"><figcaption>實時結果（夜，換入後約 10 秒）</figcaption></figure></div></div>
+<h4>居民情景：受電テラス農園 — 葵（アオイ）</h4><p><small>狀態：陸上農園：葵的 DEV 演示待驗收（handoff）；下一步：審閱落種及單格復現日照；正式投票接入待定</small></p>
+<table><tr><th>實際變化</th><th>台詞（字幕）</th><th>行動</th><th>得／失</th></tr><tr><td>陸上農園 DEV 演示</td><td>あの日の陽ざしを借りて、この種をもう一度。</td><td>西入口先交代步道、碎石支路、取苗架與坡道。近鏡見葵攤手撒下一撮種子。鏡頭拉遠，看到一格六角板亮起，光束從板下延伸至本畦，鄰樹仍在當天的自然光下。</td><td>得：可借舊日日照育苗；農園佔用南岸一片土地。</td></tr></table><h4>受電テラス農園 R3 實景 <small>建築已驗收</small></h4>
+<p>台場南岸的虹彩六角天幕接收軌道電力，坡道把公共步道、菜床及退台連在一起。故事設定見<a href="../../docs/BUILDING_STORIES.md#rectenna-farm">天氣圖書館</a>。</p>
 <div class="frames">
 <figure><img loading="lazy" src="rectenna-r3/focal-day.jpg" alt="日間的陸上農園全景"><figcaption>日景｜六角受電天幕覆蓋同心退台</figcaption></figure>
 <figure><img loading="lazy" src="rectenna-r3/focal-night.jpg" alt="入夜後的陸上農園全景"><figcaption>夜景｜從南岸看夜色中的天幕與農園</figcaption></figure>
 <figure><img loading="lazy" src="rectenna-r3/access.jpg" alt="從西入口步道仰望農園的退台"><figcaption>西入口 R3｜當時的露天菜床與坡道</figcaption></figure>
 </div>
-<h3>葵與西坡道 R3 <small>農園模型待驗收 · 居民段落為 DEV 實景</small></h3>
+<h4>葵與西坡道 R3 <small>居民段落為 DEV 實景</small></h4>
 <p>碎石前地接上原西坡道。兩條行走帶上坡後匯入水平平台，再轉入露台內的走道。<a href="../resident-aoi/r2/entrance-target-comparison.jpg">Gemini 目標圖與 R2 實景</a></p>
 <div class="frames">
 <figure><img loading="lazy" src="../resident-aoi/r3/west-before.jpg" alt="修改前的西坡道被外圈菜槽擋住"><figcaption>同鏡頭・修改前｜外圈底板及菜槽橫跨入口</figcaption></figure>
@@ -182,5 +116,209 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <figure><img loading="lazy" src="../resident-aoi/pullback/seed-drop.jpg" alt="一撮細種子散開落向菜畦邊"><figcaption>落種｜細粒散開落向菜畦</figcaption></figure>
 <figure><img loading="lazy" src="../resident-aoi/pullback/sun-before.jpg" alt="天幕未啟用時，菜畦和鄰樹同在自然光下"><figcaption>同鏡頭・亮板前｜菜畦及鄰樹</figcaption></figure>
 <figure><img loading="lazy" src="../resident-aoi/pullback/sun-after.jpg" alt="暖光從單格六角板射向菜畦，鄰樹留在自然光下"><figcaption>同鏡頭・亮板後｜本畦復現暖斜陽</figcaption></figure>
-</div></section><h3>階段 2：受電テラス農園 — 葵（アオイ）</h3><table><tr><th>實際變化</th><th>台詞（字幕）</th><th>行動</th><th>得／失</th></tr><tr><td>陸上農園 DEV 演示</td><td>あの日の陽ざしを借りて、この種をもう一度。</td><td>西入口先交代步道、碎石支路、取苗架與坡道。近鏡見葵攤手撒下一撮種子。鏡頭拉遠，看到一格六角板亮起，光束從板下延伸至本畦，鄰樹仍在當天的自然光下。</td><td>得：可借舊日日照育苗；農園佔用南岸一片土地。</td></tr></table></article>
+</div></section></article>
+<article id="Q03"><h2>Q03 たまに使う小型の乗り物が必要になった。どうする？ <small>共有志向</small></h2>
+<table class="status"><tr><th>地塊方式與位置</th><th>城市接線／三態</th></tr><tr><td>同地輪換，<code>DRAWER_HOUSING</code> (−104, 81)，49 × 31 m 含前場（<code>LOTS['drawer-housing']</code>）</td><td>城市已接 A（<code>lotRuntime</code> <code>setQ03</code>，2026-11-19）；B、C 未有模型，owner 2026-11-19 決定暫為空置（住宅連基座 3 秒淡出，暖米色環道及接大道支路保留），住宅出入飛 <code>q03:housing</code> 近鏡、B↔C 留 hero；新模型由 owner 另行製作，不屬本任務；空置態及 B↔C 不飛近鏡 owner 2026-11-19 接受</td></tr></table>
+
+<section class="change" id="Q03-A"><h3>Q03-A <small>有模型，起始版本（暫定）</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「自分専用のものを持つ。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>車抽屜住宅 <code>drawer-housing-2127</code>（驗收，現為固定建築）<br><small>模型 ID：<code>drawer-housing-2127</code>；地塊：<code>drawer-housing</code></small></dd>
+<dt>由 B 換入：結果卡</dt><dd>あなたは、自分専用の乗り物を手元に置く暮らしを選びました。<br>お台場の西側に、車が引き出しのように収まる住宅が戻りました。<br><small>地點標示：車が引き出しになる住宅</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、自分専用の乗り物を手元に置く暮らしを選びました。<br>お台場の西側に、車が引き出しのように収まる住宅が戻りました。<br><small>地點標示：車が引き出しになる住宅</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><figure><img loading="lazy" src="rotation/Q03-A-day.jpg" alt="Q03-A「自分専用のものを持つ。」，日景"><figcaption>實時結果（日，換入後約 10 秒）</figcaption></figure><figure><img loading="lazy" src="rotation/Q03-A-night.jpg" alt="Q03-A「自分専用のものを持つ。」，夜景"><figcaption>實時結果（夜，換入後約 10 秒）</figcaption></figure></div></div>
+<h4 id="drawer-housing">車が引き出しになる住宅 R2 實景 <small>建築已驗收</small></h4>
+<p>フジテレビ西南側。兩個共用載車艙把小車升到住戶樓層，像抽屜一樣推入外牆泊位。住宅與西側梯田巨構相隔 15.9 m。沿立面的暖米色車道從右側繞入樓隙，經背面成環，並接入導軌大道 ②；住宅淡出時環道保留。</p>
+<p lang="ja">満潮で低い道が水に戻るころ、佐伯澪さんの車は外壁の引き出しに収まり、工具が三階の作業台に届きます。地上を歩く場所にしたぶん、住民は二つの昇降台を順番に使います。</p>
+<p><a href="../../docs/BUILDING_STORIES.md#drawer-housing">佐伯澪的故事</a> · <a href="../../docs/handoffs/drawer-housing-placement.md">地塊座標與驗證</a></p>
+<div class="frames">
+<figure><img loading="lazy" src="drawer-housing/gemini-target.jpg" alt="目標圖中的貼樓暖色車道、右側彎道和前方步道"><figcaption>Gemini 目標｜貼樓車道及右側彎道</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/vs-target.jpg" alt="同角度比較 Gemini 目標、R1 的 T 字前場和 R2 的貼樓環道"><figcaption>同角度｜Gemini、R1、R2</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/day.jpg" alt="日間近鏡可見兩個外伸載車艙、沿立面的陶板帶及右側彎路"><figcaption>R2 日景｜從前立面繞往樓隙</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/night.jpg" alt="同一角度的夜景，導光線沿彎道延伸"><figcaption>R2 夜景｜環道導光</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/plan.jpg" alt="俯視可見完整環道與接入導軌大道的支路"><figcaption>R2 接駁俯視｜與大道相通的環道</figcaption></figure>
+<figure><img loading="lazy" src="drawer-housing/hero.jpg" alt="住宅位於城市主視角富士框架右下方"><figcaption>城市主視角｜富士框架右下方</figcaption></figure>
+</div></section>
+<section class="change" id="Q03-B"><h3>Q03-B <small>空置（地塊已定）</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「同じ建物の住民と共有する。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>集合住宅共用車棚（無）<br><small>模型 ID：無；地塊：<code>drawer-housing</code></small></dd>
+<dt>由 A 換入：結果卡</dt><dd>あなたは、同じ建物の住民と乗り物を分け合う暮らしを選びました。<br>お台場の西側から車が引き出しになる住宅が外れ、環道だけが残る空き地になりました。<br><small>地點標示：車が引き出しになる住宅の跡地</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、同じ建物の住民と乗り物を分け合う暮らしを選びました。<br>お台場の西側の環道沿いは、新しい施設を待つ空き地のままです。<br><small>地點標示：車が引き出しになる住宅の跡地</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><figure><img loading="lazy" src="rotation/Q03-B-day.jpg" alt="Q03-B「同じ建物の住民と共有する。」，日景"><figcaption>實時結果（日，換入後約 10 秒）</figcaption></figure><figure><img loading="lazy" src="rotation/Q03-B-night.jpg" alt="Q03-B「同じ建物の住民と共有する。」，夜景"><figcaption>實時結果（夜，換入後約 10 秒）</figcaption></figure></div></div>
+</section>
+<section class="change" id="Q03-C"><h3>Q03-C <small>空置（地塊已定）</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「地域の共有サービスを使う。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>地區共享交通樞紐＋公園轉用（無）<br><small>模型 ID：無；地塊：<code>drawer-housing</code></small></dd>
+<dt>由 A 換入：結果卡</dt><dd>あなたは、地域の共有サービスで乗り物を使う暮らしを選びました。<br>お台場の西側から車が引き出しになる住宅が外れ、環道だけが残る空き地になりました。<br><small>地點標示：車が引き出しになる住宅の跡地</small></dd><dt>由 B 換入：結果卡</dt><dd>あなたは、地域の共有サービスで乗り物を使う暮らしを選びました。<br>お台場の西側の環道沿いは、新しい施設を待つ空き地のままです。<br><small>地點標示：車が引き出しになる住宅の跡地</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><figure><img loading="lazy" src="rotation/Q03-C-day.jpg" alt="Q03-C「地域の共有サービスを使う。」，日景"><figcaption>實時結果（日，換入後約 10 秒）</figcaption></figure><figure><img loading="lazy" src="rotation/Q03-C-night.jpg" alt="Q03-C「地域の共有サービスを使う。」，夜景"><figcaption>實時結果（夜，換入後約 10 秒）</figcaption></figure></div></div>
+</section></article>
+<article id="Q04"><h2>Q04 街のAIが、あなたの好みを覚えるとしたら？ <small>プライバシー志向</small></h2>
+<table class="status"><tr><th>地塊方式與位置</th><th>城市接線／三態</th></tr><tr><td>局部變化；SURVEY_V2 註明對城市外觀影響小</td><td>否，欠 3；owner 2026-11-18 決定 9 題全部上台，未有模型前城市暫無變化</td></tr></table>
+
+<section class="change" id="Q04-A"><h3>Q04-A <small>未有模型及地塊，起始版本（暫定）</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「記録してほしくない。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>公共案內塔（無）<br><small>模型 ID：無；地塊：未定</small></dd>
+<dt>結果卡</dt><dd><small>城市未接此題；文案待計劃 5.2。</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><p><small>未有實時截圖。</small></p></div></div>
+</section>
+<section class="change" id="Q04-B"><h3>Q04-B <small>未有模型及地塊</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「必要なときだけ情報を使ってほしい。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>會形成路線的地面（無）<br><small>模型 ID：無；地塊：未定</small></dd>
+<dt>結果卡</dt><dd><small>城市未接此題；文案待計劃 5.2。</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><p><small>未有實時截圖。</small></p></div></div>
+</section>
+<section class="change" id="Q04-C"><h3>Q04-C <small>未有模型及地塊</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「覚えて、便利な案内に役立ててほしい。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>個人案內閘門（無）<br><small>模型 ID：無；地塊：未定</small></dd>
+<dt>結果卡</dt><dd><small>城市未接此題；文案待計劃 5.2。</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><p><small>未有實時截圖。</small></p></div></div>
+</section></article>
+<article id="Q05"><h2>Q05 真夏のお台場を歩くなら、暑さにどう対応したい？ <small>環境調整志向</small></h2>
+<table class="status"><tr><th>地塊方式與位置</th><th>城市接線／三態</th></tr><tr><td>沿岸步道段，district 級；舊環境軸自 E4 起凍結</td><td>否，欠 3</td></tr></table>
+
+<section class="change" id="Q05-A"><h3>Q05-A <small>未有模型及地塊，起始版本（暫定）</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「涼しい時間帯に出かける。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>樹蔭與海風街區（舊環境軸部分資產，未打磨）<br><small>模型 ID：無；地塊：未定</small></dd>
+<dt>結果卡</dt><dd><small>城市未接此題；文案待計劃 5.2。</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><p><small>未有實時截圖。</small></p></div></div>
+</section>
+<section class="change" id="Q05-B"><h3>Q05-B <small>未有模型及地塊</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「植物や木陰のある道を歩く。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>植物外牆建築（住宅 P 植物膜可參考，未打磨）<br><small>模型 ID：無；地塊：未定</small></dd>
+<dt>結果卡</dt><dd><small>城市未接此題；文案待計劃 5.2。</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><p><small>未有實時截圖。</small></p></div></div>
+</section>
+<section class="change" id="Q05-C"><h3>Q05-C <small>未有模型及地塊</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「温度を調整できる歩道を利用する。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>可動遮陽＋局部冷卻（舊環境軸帆／冷卻塔，未打磨）<br><small>模型 ID：無；地塊：未定</small></dd>
+<dt>結果卡</dt><dd><small>城市未接此題；文案待計劃 5.2。</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><p><small>未有實時截圖。</small></p></div></div>
+</section></article>
+<article id="Q06"><h2>Q06 長く使った家具が古くなった。どうする？ <small>資源循環志向</small></h2>
+<table class="status"><tr><th>地塊方式與位置</th><th>城市接線／三態</th></tr><tr><td>同地輪換，<code>POD_TOWER</code> (−258, −75)，包絡約 56 × 38 m（<code>LOTS['pod-tower']</code>；owner 2026-11-19 撤走住宅 U 騰出）</td><td>城市已接 B（<code>lotRuntime</code> <code>setQ06</code>，2026-11-19）；A、C 未有模型，owner 2026-11-19 決定暫為空置（塔 3 秒淡出留草地），塔出入飛 <code>q06:tower</code> 近鏡、A↔C 留 hero；version4 中塔為固定背景；新模型由 owner 另行製作</td></tr></table>
+
+<section class="change" id="Q06-A"><h3>Q06-A <small>空置（地塊已定）</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「新しい家具に買い替える。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>新素材建築（住宅 M 輕材可參考）<br><small>模型 ID：無；地塊：<code>pod-tower</code></small></dd>
+<dt>由 B 換入：結果卡</dt><dd>あなたは、古くなった物を新しい物に替える暮らしを選びました。<br>お台場の西岸から蛋形ポッドの塔が外れ、芝生の空き地になりました。<br><small>地點標示：蛋形ポッドの塔の跡地</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、古くなった物を新しい物に替える暮らしを選びました。<br>お台場の西岸の芝生は、新しい施設を待つ空き地のままです。<br><small>地點標示：蛋形ポッドの塔の跡地</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><figure><img loading="lazy" src="rotation/Q06-A-day.jpg" alt="Q06-A「新しい家具に買い替える。」，日景"><figcaption>實時結果（日，換入後約 10 秒）</figcaption></figure><figure><img loading="lazy" src="rotation/Q06-A-night.jpg" alt="Q06-A「新しい家具に買い替える。」，夜景"><figcaption>實時結果（夜，換入後約 10 秒）</figcaption></figure></div></div>
+</section>
+<section class="change" id="Q06-B"><h3>Q06-B <small>有模型，起始版本（暫定）</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「修理して使い続ける。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>蛋艙塔 <code>pod-frame-tower-2127</code>（驗收 R4，2026-11-19 放於住宅 U 舊址）<br><small>模型 ID：<code>pod-frame-tower-2127</code>；地塊：<code>pod-tower</code></small></dd>
+<dt>由 A 換入：結果卡</dt><dd>あなたは、直しながら長く使い続ける暮らしを選びました。<br>お台場の西岸に、蛋形ポッドを抱えた塔が戻りました。<br><small>地點標示：蛋形ポッドの塔</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、直しながら長く使い続ける暮らしを選びました。<br>お台場の西岸に、蛋形ポッドを抱えた塔が戻りました。<br><small>地點標示：蛋形ポッドの塔</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><figure><img loading="lazy" src="rotation/Q06-B-day.jpg" alt="Q06-B「修理して使い続ける。」，日景"><figcaption>實時結果（日，換入後約 10 秒）</figcaption></figure><figure><img loading="lazy" src="rotation/Q06-B-night.jpg" alt="Q06-B「修理して使い続ける。」，夜景"><figcaption>實時結果（夜，換入後約 10 秒）</figcaption></figure></div></div>
+</section>
+<section class="change" id="Q06-C"><h3>Q06-C <small>空置（地塊已定）</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「今の家具を誰かに譲り、別の中古品を使う。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>模組回收＋重組據點（住宅 U 交換骨架可參考）<br><small>模型 ID：無；地塊：<code>pod-tower</code></small></dd>
+<dt>由 A 換入：結果卡</dt><dd>あなたは、物を誰かに譲り、中古品を使い回す暮らしを選びました。<br>お台場の西岸の芝生は、新しい施設を待つ空き地のままです。<br><small>地點標示：蛋形ポッドの塔の跡地</small></dd><dt>由 B 換入：結果卡</dt><dd>あなたは、物を誰かに譲り、中古品を使い回す暮らしを選びました。<br>お台場の西岸から蛋形ポッドの塔が外れ、芝生の空き地になりました。<br><small>地點標示：蛋形ポッドの塔の跡地</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><figure><img loading="lazy" src="rotation/Q06-C-day.jpg" alt="Q06-C「今の家具を誰かに譲り、別の中古品を使う。」，日景"><figcaption>實時結果（日，換入後約 10 秒）</figcaption></figure></div></div>
+</section></article>
+<article id="Q07"><h2>Q07 日用品を買うとき、どう受け取りたい？ <small>生活効率志向</small></h2>
+<table class="status"><tr><th>地塊方式與位置</th><th>城市接線／三態</th></tr><tr><td>待定</td><td>否，欠 3</td></tr></table>
+
+<section class="change" id="Q07-A"><h3>Q07-A <small>未有模型及地塊，起始版本（暫定）</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「店へ行き、実物を見て買う。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>往商業設施的移動步道（無）<br><small>模型 ID：無；地塊：未定</small></dd>
+<dt>結果卡</dt><dd><small>城市未接此題；文案待計劃 5.2。</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><p><small>未有實時截圖。</small></p></div></div>
+</section>
+<section class="change" id="Q07-B"><h3>Q07-B <small>未有模型及地塊</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「近くの受け取り拠点で受け取る。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>鄰里收件塔（無）<br><small>模型 ID：無；地塊：未定</small></dd>
+<dt>結果卡</dt><dd><small>城市未接此題；文案待計劃 5.2。</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><p><small>未有實時截圖。</small></p></div></div>
+</section>
+<section class="change" id="Q07-C"><h3>Q07-C <small>未有模型及地塊</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「自宅まで届けてもらう。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>外牆搬運路＋自動配送中心（無；與 Q01-C 主題重疊）<br><small>模型 ID：無；地塊：未定</small></dd>
+<dt>結果卡</dt><dd><small>城市未接此題；文案待計劃 5.2。</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><p><small>未有實時截圖。</small></p></div></div>
+</section></article>
+<article id="Q08"><h2>Q08 お台場で休日を過ごすなら、どんな場所が使いやすい？ <small>計画・柔軟性</small></h2>
+<table class="status"><tr><th>地塊方式與位置</th><th>城市接線／三態</th></tr><tr><td>同地輪換，SW 南岸 <code>changeSites.sw</code> (−100, 297)</td><td>城市已接 C（<code>lotRuntime</code> <code>setQ08</code>，2026-11-19）；A、B 未有模型，owner 2026-11-19 決定暫為空置（模組棚以已驗收的 5 秒序列收起，剩草地），新模型由 owner 另行製作，不屬本任務；空置態及 A↔B 不飛近鏡（留 hero）owner 2026-11-19 接受</td></tr></table>
+
+<section class="change" id="Q08-A"><h3>Q08-A <small>空置（地塊已定）</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「いつも同じ用途で使える施設。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>固定用途常設館（無）<br><small>模型 ID：無；地塊：<code>sw</code></small></dd>
+<dt>由 B 換入：結果卡</dt><dd>あなたは、いつも同じ用途で使える場所を選びました。<br>お台場の南岸は、新しい施設を待つ空き地のままです。<br><small>地點標示：南岸の空き地</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、いつも同じ用途で使える場所を選びました。<br>お台場の南岸から活動モジュールの棚が外れ、新しい施設を待つ空き地になりました。<br><small>地點標示：南岸の空き地</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><figure><img loading="lazy" src="rotation/Q08-A-day.jpg" alt="Q08-A「いつも同じ用途で使える施設。」，日景"><figcaption>實時結果（日，換入後約 10 秒）</figcaption></figure><figure><img loading="lazy" src="rotation/Q08-A-night.jpg" alt="Q08-A「いつも同じ用途で使える施設。」，夜景"><figcaption>實時結果（夜，換入後約 10 秒）</figcaption></figure></div></div>
+</section>
+<section class="change" id="Q08-B"><h3>Q08-B <small>空置（地塊已定）</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「イベントによって用途が変わる施設。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>內部可重組多用途館（無）<br><small>模型 ID：無；地塊：<code>sw</code></small></dd>
+<dt>由 A 換入：結果卡</dt><dd>あなたは、イベントによって用途が変わる場所を選びました。<br>お台場の南岸は、新しい施設を待つ空き地のままです。<br><small>地點標示：南岸の空き地</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、イベントによって用途が変わる場所を選びました。<br>お台場の南岸から活動モジュールの棚が外れ、新しい施設を待つ空き地になりました。<br><small>地點標示：南岸の空き地</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><figure><img loading="lazy" src="rotation/Q08-B-day.jpg" alt="Q08-B「イベントによって用途が変わる施設。」，日景"><figcaption>實時結果（日，換入後約 10 秒）</figcaption></figure></div></div>
+</section>
+<section class="change" id="Q08-C"><h3>Q08-C <small>有模型，起始版本（暫定）</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「イベントに合わせて場所も変わる施設。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>活動模組棚 <code>event-shelf-2127</code>（驗收，現為 SW 0 態）<br><small>模型 ID：<code>event-shelf-2127</code>；地塊：<code>sw</code></small></dd>
+<dt>由 A 換入：結果卡</dt><dd>あなたは、イベントに合わせて場所も変わる過ごし方を選びました。<br>お台場の南岸に、イベントに合わせて活動モジュールを運び入れる棚が現れました。<br><small>地點標示：南岸の活動モジュール棚</small></dd><dt>由 B 換入：結果卡</dt><dd>あなたは、イベントに合わせて場所も変わる過ごし方を選びました。<br>お台場の南岸に、イベントに合わせて活動モジュールを運び入れる棚が現れました。<br><small>地點標示：南岸の活動モジュール棚</small></dd>
+<dt>設施卡</dt><dd><b>小さな建物を、必要な場所へ</b><br>その日の過ごし方に合わせて、場所も変えたい。活動モジュールが棚へ運び入れられ、運び出されて、水辺の使い方を入れ替えています。</dd>
+</dl><div class="frames"><figure><img loading="lazy" src="rotation/Q08-C-day.jpg" alt="Q08-C「イベントに合わせて場所も変わる施設。」，日景"><figcaption>實時結果（日，換入後約 10 秒）</figcaption></figure><figure><img loading="lazy" src="rotation/Q08-C-night.jpg" alt="Q08-C「イベントに合わせて場所も変わる施設。」，夜景"><figcaption>實時結果（夜，換入後約 10 秒）</figcaption></figure></div></div>
+<h4>居民情景：お台場南岸 — 凪（ナギ）、34 歲、配送航路編集者</h4><p><small>狀態：草案 v4：凪（結果為 0 的兩種轉變），待 owner 批准（handoff）；下一步：階段 2 步驟 4：owner 在 Gemini 挑選目標圖與角色</small></p>
+<table><tr><th>實際變化</th><th>台詞（字幕）</th><th>行動</th><th>得／失</th></tr><tr><td>由私人小庭進入中間（−1 → 0）</td><td>庭は小さくなりました。でも、今日の仕事部屋は呼べば来ます。</td><td>她坐在小庭長椅上，膝上有平板；圍牆退去，她用手機呼叫；模組沿地軌駛近、停穩、四角閃青色鎖燈，門側面板亮起她的名字；她抱著平板走進去，窗內可見她在桌前坐下；門側面板顯示「明日：打合せ室」</td><td>得：想要時有一間房。失：自己的小庭</td></tr><tr><td>由開放廣場進入中間（+1 → 0）</td><td>広場の席は減りました。でも、雨でも静かに仕事ができます。</td><td>她在廣場的免費座位上用平板，天色轉暗，她收起平板、用手機呼叫；模組駛近鎖定，她走進去，窗內亮燈，她坐下開始工作；門側面板顯示「明日：打合せ室」</td><td>得：不怕雨、可專心。失：隨意坐下的廣場座位</td></tr></table></section></article>
+<article id="Q09"><h2>Q09 仕事が早く終わって、自由な午後ができたら何をしたい？ <small>実用性・体験価値</small></h2>
+<table class="status"><tr><th>地塊方式與位置</th><th>城市接線／三態</th></tr><tr><td>待定</td><td>否，欠 2–3</td></tr></table>
+
+<section class="change" id="Q09-A"><h3>Q09-A <small>未有模型及地塊，起始版本（暫定）</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「買い物や用事を済ませる。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>公共服務設施（SE +1 塔用途接近，但外形是集中塔）<br><small>模型 ID：無；地塊：未定</small></dd>
+<dt>結果卡</dt><dd><small>城市未接此題；文案待計劃 5.2。</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><p><small>未有實時截圖。</small></p></div></div>
+</section>
+<section class="change" id="Q09-B"><h3>Q09-B <small>未有模型及地塊</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「友人と集まり、街で過ごす。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>交流文化廣場（SW COMMONS 開放廣場可參考）<br><small>模型 ID：無；地塊：未定</small></dd>
+<dt>結果卡</dt><dd><small>城市未接此題；文案待計劃 5.2。</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><p><small>未有實時截圖。</small></p></div></div>
+</section>
+<section class="change" id="Q09-C"><h3>Q09-C <small>未有模型及地塊</small></h3>
+<div class="cols"><dl>
+<dt>選項</dt><dd><b>「普段できない体験を楽しむ。」</b></dd>
+<dt>建築版本（計劃總表）</dt><dd>沉浸式巨型穹頂（無）<br><small>模型 ID：無；地塊：未定</small></dd>
+<dt>結果卡</dt><dd><small>城市未接此題；文案待計劃 5.2。</small></dd>
+<dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
+</dl><div class="frames"><p><small>未有實時截圖。</small></p></div></div>
+</section></article>
+<article id="others"><h2>不在新題組內的現有資產 <small>QUESTION_ROTATION_PLAN 第 2 節</small></h2>
+<p>新 run 上線（計劃 6.6）前，version4 四題 Meter 系統照常運作，以下資產仍隨 version4 投票變化。</p>
+<table><tr><th>資產</th><th>處理建議</th></tr><tr><td>SE 塔與 pod（urbanConcentration，時子）</td><td>轉為固定背景；保留最高完成度的狀態。日後如 Q09-A 採用「集中公共服務塔」可回收</td></tr><tr><td>SW COMMONS 私人小庭／開放廣場（publicSharing −1／+1）</td><td>SW 地塊改屬 Q08 後退場；開放廣場可作 Q09-B 參考</td></tr><tr><td>NW 11 個服務灣、SE／SW district 舞台</td><td>不再隨題變化，固定為 Q01 地塊周邊的 mixed 街景</td></tr><tr><td>水庭、旋轉儲能環、核能島、小型離岸受電翼</td><td><b>逐件待 owner 決定</b>保留為固定背景或刪除；SURVEY_V2 沒有對應選項（Q02 不含核能）。未得 owner 對該件的同意前不刪除（AGENTS.md：刪除重要共用資產前須確認）</td></tr><tr><td>住宅 M／P／U（固定背景 A）</td><td>M、P 維持背景；U 於 2026-11-19 自城市撤走（地塊給 Q06 蛋艙塔，代碼留作 DEV 研究）；分別作 Q06-A、Q05-B、Q06-C 的設計參考</td></tr><tr><td>空の環、フジテレビ、軌道升降機</td><td>不隨投票，維持現狀</td></tr></table></article>
 </html>
