@@ -52,7 +52,7 @@ const Q01_TIERS: Record<string, string> = { A: 'nw-focal-low__-1', B: 'nw-focal_
 const LIVE: Record<string, (option: string) => [day: string, night: string]> = {
   Q02: o => [`q02-closeup/to-${o}-10s.png`, `q02-closeup/night-to-${o}-10s.png`],
   Q03: o => [`q03-drawer/day/to-${o}-10s.png`, `q03-drawer/night/night-to-${o}-10s.png`],
-  Q06: o => [`q06-pod/day/to-${o}-10s.png`, `q06-pod/night/night-to-${o}-10s.png`],
+  Q06: o => [`q06-access/live-day/to-${o}-10s.png`, `q06-access/live-night/to-${o}-10s.png`],
   Q08: o => [`q08-sw/to-${o}-11s.png`, `q08-sw/night-to-${o}-11s.png`],
 };
 function frames(question: string, option: string, label: string) {

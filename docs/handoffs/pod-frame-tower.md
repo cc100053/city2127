@@ -316,4 +316,4 @@ R1 與目標的差距（依 `target-vs-model.jpg` 分析），已轉成下文 R2
 
 ## Next expected step
 
-已放置並接入 Q06-B。業主如要前場道路、改材質或其他修改，按上文「尚待處理」另開一輪。
+Q06-B 已接道路 ③。陶板支路旁的步道接北面兩個入口及東面入口，保留原 R4 塔及門罩。固定道路及平台在 Q06 A／C 空置時仍可見。日夜、俯視及入口實景見 [question-rotation](question-rotation.md)。

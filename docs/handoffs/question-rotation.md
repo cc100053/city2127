@@ -4,10 +4,12 @@
 - Status: IN_PROGRESS（階段 1 survey 端完成：9 題可選用接入；階段 2 城市端接 Q01、Q02、Q08 的 C、Q03 的 A 及 Q06 的 B；6.3 完整流程桌面版通過）
 - Branch: `feat/question-rotation`（2026-11-18 由 `docs/question-rotation-plan` HEAD `95c494ff` 開出；計劃文件 commit 一併帶入）
 - Base commit: `6724989bbff0ff8a0f65a9ee6e2a23f778e7ede3`（origin/main，2026-11-18）
-- Last verified commit: Q06 commit，見 Git log `feat(city): rotation Q06 on the pod tower lot`（實時截圖及完整流程在其未 commit 工作樹跑；放置一輪為 `58b76817`）；之前 Q03 commit，見 Git log `feat(city): rotation Q03 on the drawer housing lot`（實時截圖及完整流程在其未 commit 工作樹跑）；之前 6.3 完整流程 commit，見 Git log `test(rotation): full-flow browser pass`（在其未 commit 工作樹跑，差異只是本 commit 的 `data-lots` 一行及新 runner）；之前 Q08 commit，見 Git log `feat(city): rotation Q08 on the SW lot, shelf or vacant`（實時截圖在其未 commit 工作樹拍）；之前 Q02 近鏡 commit，見 Git log `feat(city): Q02 close-ups and journey landing on its lots`（實時截圖在其未 commit 工作樹拍）；之前 `dd9f45f9` Q02 城市接線，見 Git log，見 Git log `feat(city): draw rotation Q02 on its three lots`（實時截圖在其未 commit 工作樹拍，sidecar 記 `baaf2ac5` dirty）；之前 2.6 結果卡群眾比例 commit，見 Git log `feat(city): crowd share on the rotation result card`（之前 `c63a316a` 為投票旅程方案 A；之前 `0f80be71` 為 A→C 鏡頭修正；之前 `9c72c82a` 為階段 2 Q01；實時截圖在其未 commit 工作樹拍，sidecar 記 `e317b593` dirty；`?meters` 截圖在 `9c72c82a` 乾淨樹拍）
+- Last verified commit: Q06-B 道路及入口，見 Git log `feat(city): connect the Q06 pod tower frontage`（截圖在 `e79f883a` 的工作樹拍攝）。之前 Q06 commit，見 Git log `feat(city): rotation Q06 on the pod tower lot`（實時截圖及完整流程在其未 commit 工作樹跑；放置一輪為 `58b76817`）；之前 Q03 commit，見 Git log `feat(city): rotation Q03 on the drawer housing lot`（實時截圖及完整流程在其未 commit 工作樹跑）；之前 6.3 完整流程 commit，見 Git log `test(rotation): full-flow browser pass`（在其未 commit 工作樹跑，差異只是本 commit 的 `data-lots` 一行及新 runner）；之前 Q08 commit，見 Git log `feat(city): rotation Q08 on the SW lot, shelf or vacant`（實時截圖在其未 commit 工作樹拍）；之前 Q02 近鏡 commit，見 Git log `feat(city): Q02 close-ups and journey landing on its lots`（實時截圖在其未 commit 工作樹拍）；之前 `dd9f45f9` Q02 城市接線，見 Git log，見 Git log `feat(city): draw rotation Q02 on its three lots`（實時截圖在其未 commit 工作樹拍，sidecar 記 `baaf2ac5` dirty）；之前 2.6 結果卡群眾比例 commit，見 Git log `feat(city): crowd share on the rotation result card`（之前 `c63a316a` 為投票旅程方案 A；之前 `0f80be71` 為 A→C 鏡頭修正；之前 `9c72c82a` 為階段 2 Q01；實時截圖在其未 commit 工作樹拍，sidecar 記 `e317b593` dirty；`?meters` 截圖在 `9c72c82a` 乾淨樹拍）
 - Remote availability: `origin/docs/question-rotation-plan`（計劃）；`origin/feat/question-rotation`（實作）
 
 ## Session Git state
+
+- Session starting branch and HEAD（2026-11-19，Q06-B 道路與入口）為 `feat/question-rotation` `e79f883a`，fetch 後與遠端同步。起點包含 `origin/main` `df59a7de`，分支領先 33 個 commit。未追蹤 `Dev_QA.md` 保留。
 
 - Session starting branch and HEAD（2026-11-19 第十一節，舊建築掃描及撤走住宅 M）：`feat/question-rotation` `19de91f3`，fetch 後與 origin 同步，無分歧。未追蹤 `Dev_QA.md` 保留
 - Session starting branch and HEAD（2026-11-19 第十節，change sheet）：`feat/question-rotation` `de401421`，fetch 後與 origin 同步，無分歧。未追蹤 `Dev_QA.md` 保留
@@ -119,9 +121,11 @@
 - 階段 2 Q01（2026-11-18）：root 及 `survey/` `npm test`／`npm run build`、`git diff --check` 通過（新 `rotationLayout` 測試；`rotationPipeline` 以真 server 走 B→C，再經其他題 fold 至 Q01 再被抽中後直接 C→A；`automationHub` −1↔+1）。瀏覽器 `root`＋`survey-rotation`：內置瀏覽器實時看 B→C、C→A，console 無錯誤；headless Chrome 1600 × 900 以 capture 載入器在頁面就緒後送出訪客，結果後 2.5／6.5／10.5 秒截圖，page error 0，存 `~/city2127-evidence/question-rotation/q01-city/`（`sheet.jpg` 總覽，`guest.mjs`／`cycle.sh`／`liveCapture.mjs` 為驅動腳本副本）。`npm run capture` 固定 settle 對不準實時結果（載入時間浮動約 5 秒，三次中兩次拍到結果後 14–15 秒），只留 `live-C-to-A.png` 一張成功的及 `state-A-hero.png`。另以 `npm run capture`（`9c72c82a` 乾淨樹，只開 `root`）用 DEV `?meters=nw:∓2.5&metersTo=nw:±2.5&metersAge=6.5／10.5&reviewTime=30&nopanel` 確定性地拍 A→C、C→A（同一 NW ±1 路徑，`meters-*.png`，`meters-sheet.jpg`），page error 0。version4 不變由同一物件測試保證，未拍前後對照。分支 CI：`9c72c82a` push 時為 in_progress，上一個 `e317b593` 為 success。
 - Evidence/environment: 玩具模擬 `~/city2127-evidence/question-rotation-sim/`；正式模擬見上，非真人答案。
 
+- Q06-B 道路與入口（2026-11-19，由 `e79f883a` 繼續）：`streetKit.podTowerAccess` 用道路 ③ 的陶板、步道及導光接到 R4 塔的三個現有門罩。A／C 空地保留固定路面，樓身位置留草地。獨立預覽與 version4 亦沿用這組道路與入口。驗證見 [VALIDATION](../VALIDATION.md)，變化總覽更新 Q06 日夜實時圖。證據 `~/city2127-evidence/question-rotation/q06-access/`（`ground-plan.png`、`entrance.png`、`day.png`、`night.png` 及 `live-day/`、`live-night/`）。待 owner 視覺驗收。
+
 ## Known issues and blockers
 
-- 已決（owner 2026-11-19）：住宅 U 自城市撤走，蛋艙塔放其舊址，位置及近鏡接受；Q06 A／C 空置為塔淡出留草地，A↔C 留 hero；version4 中塔為固定背景（因此 version4 外觀改變：住宅 U 不見、多了蛋艙塔，屬 owner 決定）。Q06 三句文案暫定（待 5.2）；旅程用環境色為自定；淡出中段暖色樓板較亮（共用 `fadeFinishes`），owner 2026-11-19 看過日夜實拍（`q06-pod/sheet-*.jpg`，含中段發光）後「Accept」。A、C 新模型由 owner 日後另做，屆時在 `setQ06` 加各自模型的 LotFade（同一地塊），`q06Tower` 及 `Q06_RESULTS` 改為模型文案。蛋艙塔未有前場道路或接駁。
+- 已決（owner 2026-11-19）：住宅 U 自城市撤走，蛋艙塔放其舊址，位置及近鏡接受；Q06 A／C 空置為塔淡出留草地，A↔C 留 hero；version4 中塔為固定背景（因此 version4 外觀改變：住宅 U 不見、多了蛋艙塔，屬 owner 決定）。Q06 三句文案暫定（待 5.2）；旅程用環境色為自定；淡出中段暖色樓板較亮（共用 `fadeFinishes`），owner 2026-11-19 看過日夜實拍（`q06-pod/sheet-*.jpg`，含中段發光）後「Accept」。A、C 新模型由 owner 日後另做，屆時在 `setQ06` 加各自模型的 LotFade（同一地塊），`q06Tower` 及 `Q06_RESULTS` 改為模型文案。後續已接道路 ③ 支路及北、東入口平台。塔淡出時樓身位置仍為草地，固定道路與平台保留。
 
 - 已決（owner 2026-11-19「接受」）：Q03 B／C 空置態（草地＋保留環道，前場植栽與導光照舊）、住宅淡出淡入（中段玻璃半透明）及 B↔C 留 hero 接受（`q03-drawer/sheet-*.jpg`）。三句文案仍暫定（待 5.2）；旅程用 sharing 色為自定。B、C 新模型由 owner 日後另做，屆時在 `setQ03` 加各自模型的 LotFade（須放入同一地塊並用同一支路），`q03Housing` 及 `Q03_RESULTS` 改為模型文案。
 
@@ -143,6 +147,8 @@
 - 審閱第 G 點（城市端預載需收到每次預約抽中的題目，加入 protocol）已列入下一步第 3 點。
 
 ## Next expected step
+
+**現時（2026-11-19，Q06-B 道路與入口）：** 北面兩個入口同東側入口已經由前場步道接到道路 ③。道路、平台及導光保留在 A／C 空置態。待 owner 驗收入口及支路日夜實景，其他題按第十一節續做。
 
 **現時（2026-11-19 第十一節）：** 住宅 M 已撤走。NE PARK 定為 Q05 地塊（owner 2026-11-19）；現有三態（`q05-ne/sheet.jpg`：樹數及冷卻鰭片之差，近鏡下幾乎看不出）不接線，owner 另做 Q05 A／B／C 新模型取代公園，屆時照 Q03／Q06 接 `lotRuntime`。SE TOWER 及四件舊能源部件暫不處理，標為「可讓位」（owner 2026-11-19）：新模型選址需要空間時可撤走或取代（計劃第 2 節）。其餘同第十節。
 

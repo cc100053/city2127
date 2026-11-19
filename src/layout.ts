@@ -69,7 +69,7 @@ export const WATER = { pool: { x: 22, z: 118, length: 70, width: 24 }, canal: { 
 /** Q06-B pod-frame tower (owner 2026-11-19): on the lot freed by retiring housing U (HOUSING_SITES.mobile) from the city background,
  *  front (GLB −z) north toward the city. Its R4 envelope is about 56 × 38 m with the pods (frame 35 × 28 m), 36 m tall; SCAN_LOT
  *  58,46 here finds only housing U itself and a walker route by the south-west pod tip. */
-export const POD_TOWER = { x: -258, z: -75, yaw: 0 } as const;
+export const POD_TOWER = { x: -258, z: -75, yaw: 0, avenue: 588 } as const;
 /** Fixed Q03-A building origin and its connection to the guideway avenue. */
 export const DRAWER_HOUSING = {
   x: -104, z: 81, avenue: 463,
@@ -87,7 +87,7 @@ export const STREET_KIT = {
   // the drop-off bays stand on ①'s plaza frontage, which has no planters). Outside: the ring foot, the deck's south member, the PARK lot's
   // margin, the arch foot, the AUTO HUB lot's margin, the backdrop grove plinth. (Stage 2 removed the side streets whose mouths had gaps.)
   gaps: { inside: [[186, 222], [466, 514], [520, 540], [568, 616], [890, 942], [972, 1011], [1044, 1083]],
-    outside: [[195, 216], [350, 362], [451, 477], [618, 636], [832, 862], [890, 942], [972, 1011], [1044, 1083], [1095, 1109]] },
+    outside: [[195, 216], [350, 362], [451, 477], [POD_TOWER.avenue - 8, POD_TOWER.avenue + 6], [618, 636], [832, 862], [890, 942], [972, 1011], [1044, 1083], [1095, 1109]] },
   crossings: [398, 545],
 } as const;
 // polish2 (2026-11-03): the Fuji frame tower is the hero centrepiece. civicCore builds in its original metres and the whole chassis is scaled

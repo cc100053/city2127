@@ -8,7 +8,7 @@ import { leaf, trim } from './cityRig.ts';
 import { glowTexture } from './glowTexture.ts';
 import { hash, plantCanopy } from './coastalCanopy.ts';
 import { routes, waterways } from './mobility.ts';
-import { BOULEVARD, changeSites, DRAWER_HOUSING, STREET_KIT, WATER } from './layout.ts';
+import { BOULEVARD, changeSites, DRAWER_HOUSING, POD_TOWER, STREET_KIT, WATER } from './layout.ts';
 
 /** Large pale ceramic panels: a 256 px tile with fine seams on two edges, repeated per panel in metres through the strip's uv. */
 function panelTexture() {
@@ -365,6 +365,32 @@ function drawerHousingAccess(avenue: Curve, environment: T.Object3D) {
   return root;
 }
 
+/** Fixed Q06 access from link ③ to the tower's two north hoods and east entrance. */
+function podTowerAccess(avenue: Curve, environment: T.Object3D) {
+  const { x, z, avenue: distance } = POD_TOWER;
+  const { p, n } = frame(avenue, distance, avenue.getLength());
+  const at = (dx: number, dz: number, y = .2) => new T.Vector3(x + dx, y, z + dz);
+  const mouth = p.addScaledVector(n, STREET_KIT.half - .55).setY(.237);
+  const drive = new T.CatmullRomCurve3([mouth, at(39, -3.5, .237), at(34, -13, .234),
+    at(29, -22, .2), at(22, -25, .18), at(14, -25, .18), at(-14, -25, .18)]);
+  const north = new T.LineCurve3(at(23, -17.65), at(-17, -17.65));
+  const east = new T.LineCurve3(at(21, -15.25), at(21, 6));
+  const pave = (c: Curve, a: number, b: number, lift = 0) => band(c, 0, c.getLength(), a, b, lift, 0, [2.4, 2.4]);
+  const length = drive.getLength();
+  environment.add(
+    mesh([band(drive, 0, length, -3.1, 3.1, 0, .25, [3, STREET_KIT.half])], avenueCeramic, 'pod-tower-drive', false),
+    mesh([pave(drive, 3.1, 5.7, .007), pave(north, -2.4, 2.4), pave(east, -2.12, 2)], footway, 'pod-tower-forecourt', false),
+  );
+  const guide = band(drive, 1.5, length - 1, -.075, .075, .012);
+  const glow = glowLine(drive, 1.5, length - 1, -.27, .27, .008);
+  const thresholds = [-7, 7].map(dx => new T.LineCurve3(at(dx, -15.45), at(dx, -18.6)));
+  thresholds.push(new T.LineCurve3(at(19, 3.5), at(21.7, 3.5)));
+  const root = new T.Group(); root.name = 'pod-tower-access';
+  root.add(mesh([guide, ...thresholds.map(c => pave(c, -.09, .09, .012))], seamLight, 'pod-tower-guides', false),
+    mesh([glow], lineGlow, 'pod-tower-line-glow', false));
+  return root;
+}
+
 /** The kit along the street network: A on the U route (`STREET_KIT`), B on the ④ boulevard (`BOULEVARD`), and the stage 3 water (`waterGarden`). The ceramic, footways and terraces join
  * `environment` (it then stands on them); the planters, plants, rings, blades and lines come back for the scene. A's planters also keep 1.5 m
  * clear of every Yurikamome pier within the verges, found in the loaded environment. */
@@ -386,7 +412,7 @@ export function streetNetwork(environment: T.Object3D) {
   const piers = hits.map(ds => ds.sort((a, b) => a - b).reduce((out: Span[], d) => { const last = out.at(-1); if (last && d - 1.5 <= last[1]) last[1] = d + 1.5; else out.push([d - 1.5, d + 1.5]); return out; }, []));
   const root = new T.Group(); root.name = 'street-network';
   root.add(avenueStreet(u, K.from, L, [-K.half, K.half], { reach: K.inside, gaps: [...K.gaps.inside, ...piers[0]] }, { reach: K.outside, gaps: [...K.gaps.outside, ...piers[1]] }, K.crossings, () => 0),
-    boulevardStreet(boulevard, 0, boulevard.getLength(), BOULEVARD.crossings, () => 0, BOULEVARD.gaps), waterGarden(), automationHubAccess(u, environment), drawerHousingAccess(u, environment));
+    boulevardStreet(boulevard, 0, boulevard.getLength(), BOULEVARD.crossings, () => 0, BOULEVARD.gaps), waterGarden(), automationHubAccess(u, environment), drawerHousingAccess(u, environment), podTowerAccess(u, environment));
   for (const name of ['street-ceramic', 'street-footway', 'boulevard-ceramic', 'boulevard-terraces']) environment.add(root.getObjectByName(name)!);
   return root;
 }

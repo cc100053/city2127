@@ -20,7 +20,7 @@ import { acceleratedRaycast, MeshBVH } from 'three-mesh-bvh';
 import { checkHousingCity } from './housingCityCheck.ts';
 import { onFormerStreet, repairRoads } from '../src/roadRepair.ts';
 import { streetNetwork } from '../src/streetKit.ts';
-import { BOULEVARD, STREET_KIT, WATER } from '../src/layout.ts';
+import { BOULEVARD, POD_TOWER, STREET_KIT, WATER } from '../src/layout.ts';
 /** A ladder target with the given rungs; the rest mixed. */
 const rungs = (t: Partial<Record<'nw' | 'ne' | 'sw' | 'se', number>>) => ({ tiers: { nw: 0, ne: 0, sw: 0, se: 0, ...t } });
 
@@ -205,6 +205,21 @@ const streetKit = streetNetwork(environment);
     const y = accessSurface(x, -302.55, 'automation-hub-landing');
     assert.ok(y !== undefined && Math.abs(y - 3.6) < .025, `NW landing does not meet the plinth at x=${x}`);
   }
+  const q06Drive = 'pod-tower-drive', q06Walk = 'pod-tower-forecourt';
+  const avenue = routes().streets[0], mouthAt = POD_TOWER.avenue / avenue.getLength();
+  const mouth = avenue.getPointAt(mouthAt), tangent = avenue.getTangentAt(mouthAt);
+  mouth.addScaledVector(new Vector3(tangent.z, 0, -tangent.x), STREET_KIT.half - .3);
+  for (const [x, z, first, second] of [
+    [mouth.x, mouth.z, 'street-ceramic', q06Drive],
+    [-214, -70, 'street-footway', q06Walk],
+  ] as const) {
+    const a = accessSurface(x, z, first), b = accessSurface(x, z, second);
+    assert.ok(a !== undefined && b !== undefined && Math.abs(a - b) < .025, `Q06-B ${first} does not meet ${second} at grade`);
+  }
+  for (const [dx, dz] of [[-7, -15.45], [7, -15.45], [19, 3.5]]) {
+    assert.ok(paved(POD_TOWER.x + dx, POD_TOWER.z + dz, /^pod-tower-forecourt$/), `Q06-B threshold ${dx},${dz} has no forecourt`);
+  }
+  assert.ok(!paved(POD_TOWER.x, POD_TOWER.z, /^pod-tower-/), 'Q06 keeps lawn on the vacant tower footprint');
   // Q03-A: the loading loop meets the existing avenue at grade.
   const drawerRoad = 'drawer-housing-drive';
   assert.equal(environment.getObjectByName('drawer-housing-walk'), undefined);
