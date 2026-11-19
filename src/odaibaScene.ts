@@ -19,7 +19,7 @@ import { DISTRICT, inDistrict, SEAWARD_GLSL } from './layout';
 import { bayContext, recedeBeyondDistrict } from './bayContext';
 import { publishDoorways, publishEntrances, routes, waterGLSL } from './mobility';
 import { onFormerStreet, repairRoads } from './roadRepair';
-import { streetNetwork, updateStreetKit } from './streetKit';
+import { southShoreSpur, streetNetwork, updateStreetKit } from './streetKit';
 
 // Literal paths bundle the district-detailed environment (scripts/crop-odaiba-district.py) and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
 const environmentUrl = new URL('../asset/models/odaiba-masterplan/odaiba_district_v01_environment.glb', import.meta.url).href;
@@ -213,6 +213,6 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     const merged = bake(model); model.clear(); parts.forEach(geometry => geometry.dispose());
     merged.forEach(mesh => { mesh.name = placement.id; model.add(mesh); });
   }));
-  plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name) || object.name==='plaza-deck'),[routes().streets[1]],onFormerStreet);
+  plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name) || object.name==='plaza-deck'),[routes().streets[1]],onFormerStreet,southShoreSpur(routes().streets[1]));
   publishEntrances(scene,environment);
 }

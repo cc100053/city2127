@@ -56,6 +56,13 @@ export const streets: readonly (readonly P3[])[] = [[
   [-285,0,322.4],[-229.1,0,283.6],[-179.8,0,249.3],[-130.6,0,215.1],[-80.1,0,180],[-64.9,0,169.4],[-40,0,163],[-10,0,166],[30,0,174.5],[70,0,181.5],
   [96,0,181.5],[122,0,175],[145,0,165],[162,0,146],[175,0,120],[185,0,88],[207,0,52],[230,0,16],[248,0,-8],[265,0,-27],
 ]];
+export const SOUTH_SHORE = {
+  junction: 220,
+  // The north court's entrance faces the spur; the west court opens towards the shelf.
+  northCourt: [-100, 245, .61] as const,
+  westCourt: [-150, 290, 0] as const,
+};
+
 /** Section B along `streets[1]`, in metres along it: light-bridge crossings, and the planter gaps round the glass sphere's mast and feet
  * (`skyways.ts`, sphere at −80, 180: mast and its south-west foot on the median, the other two feet just outside both terraces). */
 export const BOULEVARD = {

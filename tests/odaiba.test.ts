@@ -19,8 +19,8 @@ import { bayContext } from '../src/bayContext.ts';
 import { acceleratedRaycast, MeshBVH } from 'three-mesh-bvh';
 import { checkHousingCity } from './housingCityCheck.ts';
 import { onFormerStreet, repairRoads } from '../src/roadRepair.ts';
-import { streetNetwork } from '../src/streetKit.ts';
-import { BOULEVARD, STREET_KIT, WATER } from '../src/layout.ts';
+import { southShoreSpur, streetNetwork } from '../src/streetKit.ts';
+import { BOULEVARD, SOUTH_SHORE, STREET_KIT, WATER } from '../src/layout.ts';
 /** A ladder target with the given rungs; the rest mixed. */
 const rungs = (t: Partial<Record<'nw' | 'ne' | 'sw' | 'se', number>>) => ({ tiers: { nw: 0, ne: 0, sw: 0, se: 0, ...t } });
 
@@ -233,9 +233,36 @@ const streetKit = streetNetwork(environment);
   }
   const boulevard = routes().streets[1], bl = boulevard.getLength();
   for (let d = 1; d < bl - 1; d += 2) {
-    const p = boulevard.getPointAt(d / bl), t = boulevard.getTangentAt(d / bl), at = (o: number): [number, number] => [p.x + t.z * o, p.z - t.x * o], bridge = BOULEVARD.crossings.some(c => Math.abs(c - d) < 2.5);
+    const p = boulevard.getPointAt(d / bl), t = boulevard.getTangentAt(d / bl), at = (o: number): [number, number] => [p.x + t.z * o, p.z - t.x * o], bridge = [...BOULEVARD.crossings, SOUTH_SHORE.junction].some(c => Math.abs(c - d) < 2.5);
     for (const o of [-8, -2.5, 2.5, 8]) assert.ok(paved(...at(o), /^boulevard-ceramic$/), `④ carriageway unpaved at d ${d} offset ${o}`);
     for (const o of [-12.7, -9, 0, 9, 12.7]) assert.ok(bridge && o || paved(...at(o), /^boulevard-terraces$/), `④ terrace or median missing at d ${d} offset ${o}`);
+  }
+  const entry = boulevard.getPointAt(SOUTH_SHORE.junction / bl);
+  const tangent = boulevard.getTangentAt(SOUTH_SHORE.junction / bl);
+  const atMouth = (offset: number) => new Vector3(entry.x - tangent.z * offset, 50, entry.z + tangent.x * offset);
+  const down = new Vector3(0, -1, 0);
+  const deck = streetKit.getObjectByName('boulevard-bridge')!;
+  const seam = new Raycaster(atMouth(12.95), down);
+  const bridgeTop = seam.intersectObject(deck, true)[0]?.point.y;
+  const spurTop = seam.intersectObject(environment, true).find(hit => hit.object.name === 'south-shore-spur')?.point.y;
+  assert.ok(bridgeTop !== undefined && spurTop !== undefined && Math.abs(bridgeTop - spurTop) < .01, 'SW spur joins the boulevard at a flush seam');
+  const spur = southShoreSpur(boulevard);
+  const steps = Math.ceil(spur.getLength());
+  for (let i = 1; i < steps; i++) {
+    const point = spur.getPointAt(i / steps);
+    const direction = spur.getTangentAt(i / steps);
+    const across = new Vector3(direction.z, 0, -direction.x);
+    for (const offset of [-1.5, 0, 1.5]) {
+      const ray = new Raycaster(point.clone().setY(50).addScaledVector(across, offset), down);
+      const hits = ray.intersectObject(environment, true);
+      const road = hits.find(hit => hit.object.name === 'south-shore-spur');
+      const lawn = hits.find(hit => hit.object.name === 'TERRAIN_LOW_DENSITY');
+      assert.ok(road && lawn && road.point.y > lawn.point.y, `SW spur goes below grade at ${point.x.toFixed(1)},${point.z.toFixed(1)}`);
+    }
+  }
+  assert.ok(paved(-80, 273, /^south-shore-walks$/), 'SW spur meets the shelf apron');
+  for (const [x, z, yaw] of [SOUTH_SHORE.northCourt, SOUTH_SHORE.westCourt]) {
+    assert.ok(paved(x + 18 * Math.cos(yaw), z - 18 * Math.sin(yaw), /^south-shore-walks$/), 'SW footway reaches the garden gate and open plaza');
   }
   const street = routes().streets[0], length = street.getLength(), reach = (side: number, d: number) => (side < 0 ? STREET_KIT.inside : STREET_KIT.outside).find(([f, t]) => d >= f && d < t)![2];
   for (let d = STREET_KIT.from + 1; d < length - 1; d += 2) {
@@ -298,14 +325,14 @@ assert.ok(bay.children.length<=5, 'Bay bridges, shores and Ariake parkland batch
 city.add(environment,panels,edge,bay,streetKit);
 plantCanopy(city, JSON.parse(readFileSync(new URL('../asset/models/odaiba-masterplan/tree_instances.json', import.meta.url), 'utf8')));
 const groveStart=city.children.length;
-plantLandscapeCanopy(city,environment,landmarks,[routes().streets[1]],onFormerStreet); // as loadOdaiba
+plantLandscapeCanopy(city,environment,landmarks,[routes().streets[1]],onFormerStreet,southShoreSpur(routes().streets[1])); // as loadOdaiba
 assert.ok(city.children[groveStart] instanceof InstancedMesh && city.children[groveStart].count>100, 'Authored landscape carries coastal groves');
 for (const grove of city.children.filter(o => o instanceof InstancedMesh && o.name === 'surveyed-coastal-trunks') as InstancedMesh[]) {
   const m = new Matrix4(), c = new Vector3();
   for (let i = 0; i < grove.count; i++) { grove.getMatrixAt(i, m); c.setFromMatrixPosition(m); assert.ok(inDistrict(c.x, c.z), `tree outside the district at ${c.x.toFixed(0)},${c.z.toFixed(0)}`); }
 }
 city.updateMatrixWorld(true);
-const openGround = /^(TERRAIN|PHASE03C_LANDSCAPE|PHASE03C_PLAZA|PRIMARY_PLAZA|PHASE03C_SERVICE|SERVICE_BAY|SIDEWALK|BUILDING_PADS|WATERFRONT_PROMENADE|street-(footway|ceramic|edge|seams|line-glow)$|boulevard-(ceramic|terraces|channels|rails|seams|line-glow|bridge|bridge-lines)$)/; // the street kit's flat finishes, as the surveyed paving slab over the avenues they replace; the flat building pads the removed street paving lay over
+const openGround = /^(TERRAIN|PHASE03C_LANDSCAPE|PHASE03C_PLAZA|PRIMARY_PLAZA|PHASE03C_SERVICE|SERVICE_BAY|SIDEWALK|BUILDING_PADS|WATERFRONT_PROMENADE|street-(footway|ceramic|edge|seams|line-glow)$|boulevard-(ceramic|terraces|channels|rails|seams|line-glow|bridge|bridge-lines)$|south-shore-(spur|walks|guide-lines)$)/; // the street kit's flat finishes, as the surveyed paving slab over the avenues they replace; the flat building pads the removed street paving lay over
 const ray = new Raycaster(), down = new Vector3(0, -1, 0);
 const camera = heroCamera(1920, 1080);
 camera.updateMatrixWorld(true);

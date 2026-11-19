@@ -142,14 +142,15 @@ export function plantRoofCanopy(scene: T.Object3D, model: T.Object3D, tower=fals
 /** Coastal groves gather along structure — building edges, guideway, promenades and the water corridor — on authored landscape only, leaving open lawns between; circulation and landmark pads remain open. */
 /** `streets`: extra street centrelines groves keep clear of, as of the guideway (the ④ boulevard); `cleared`: ground the old district streets covered,
  * left open lawn (src/roadRepair.ts). */
-export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,buildings:T.Object3D[],streets:T.Curve<T.Vector3>[]=[],cleared=(_x:number,_z:number)=>false) {
+export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,buildings:T.Object3D[],streets:T.Curve<T.Vector3>[]=[],cleared=(_x:number,_z:number)=>false, lateStreet?:T.Curve<T.Vector3>) {
   environment.updateMatrixWorld(true);
   const pads=buildings.map(building=>new T.Box3().setFromObject(building));
   const paths=routes(),clearPaths=[paths.guideway,...paths.promenades,...streets].flatMap(path=>path.getSpacedPoints(400));
+  const lateStreetPoints=lateStreet?.getSpacedPoints(Math.ceil(lateStreet.getLength())) ?? [];
   const ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),clusters:[number,number,number,number][]=[],hiddenAt:boolean[]=[];
   const landscapeAt=(x:number,z:number)=>{
     ray.set(new T.Vector3(x,300,z),down);
-    const hit=ray.intersectObject(environment,true)[0];
+    const hit=ray.intersectObject(environment,true).find(candidate=>!candidate.object.name.startsWith('south-shore-'));
     return hit && hit.object instanceof T.Mesh && !Array.isArray(hit.object.material) && hit.object.material.name==='landscape' && hit.point.y<3 && !cleared(x,z) ? hit.point.y : null;
   };
   const padGap=(x:number,z:number)=>Math.min(Infinity,...pads.map(p=>Math.hypot(Math.max(p.min.x-x,0,x-p.max.x),Math.max(p.min.z-z,0,z-p.max.z))));
@@ -170,7 +171,8 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
     // Denser grid (r8 pass 3): terraces may not overlap, or their coplanar lawn tiers would z-fight.
     if(clusters.some(([cx,cz,,cr])=>Math.hypot(cx-px,cz-pz)<(cr+R)*1.4))continue;
     clusters.push([px,pz,y,R]);
-    hiddenAt.push(Object.values(changeSites).some(near));
+    // Claim the old slot first so removing SW groves does not move adjacent clusters into court 9.
+    hiddenAt.push(Object.values(changeSites).some(near) || lateStreetPoints.some(p=>Math.hypot(p.x-px,p.z-pz)<reach+4));
   }
   plantClusters(scene,clusters,1,0,hiddenAt);
   // r8 pass 3: the waterfront promenades become planted allées in white planter rings (target v2's tree-lined shore walk) —

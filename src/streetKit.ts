@@ -8,7 +8,7 @@ import { leaf, trim } from './cityRig.ts';
 import { glowTexture } from './glowTexture.ts';
 import { hash, plantCanopy } from './coastalCanopy.ts';
 import { routes, waterways } from './mobility.ts';
-import { BOULEVARD, changeSites, DRAWER_HOUSING, STREET_KIT, WATER } from './layout.ts';
+import { BOULEVARD, changeSites, DRAWER_HOUSING, SOUTH_SHORE, STREET_KIT, WATER } from './layout.ts';
 
 /** Large pale ceramic panels: a 256 px tile with fine seams on two edges, repeated per panel in metres through the strip's uv. */
 function panelTexture() {
@@ -81,7 +81,7 @@ function glowLine(c: Curve, d0: number, d1: number, a: number, b: number, y: num
 /** Vertical face across offsets a..b at `d` from y0 to y1, facing `dir` (+1 / -1) along the route (the end of a terrace run). */
 function cap(c: Curve, d: number, a: number, b: number, y0: number, y1: number, dir: number) {
   const { p, n, t } = frame(c, d, c.getLength()), pos: number[] = [];
-  for (const [o, yy] of [[a, y0], [b, y0], [a, y1], [b, y1]] as const) { const x = p.x + n.x * o, z = p.z + n.z * o; pos.push(x, yy + ground(x, z), z); }
+  for (const [o, yy] of [[a, y0], [b, y0], [a, y1], [b, y1]] as const) { const x = p.x + n.x * o, z = p.z + n.z * o; pos.push(x, p.y + yy + ground(x, z), z); }
   const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new T.Float32BufferAttribute(new Array(8).fill(0), 2)); g.setIndex([0, 1, 2, 2, 1, 3]); g.computeVertexNormals();
   const nm = g.attributes.normal; if ((nm.getX(0) * t.x + nm.getZ(0) * t.z) * dir < 0) { g.index!.array.reverse(); g.computeVertexNormals(); }
   return g;
@@ -365,6 +365,44 @@ function drawerHousingAccess(avenue: Curve, environment: T.Object3D) {
   return root;
 }
 
+const southShorePoint = (x: number, z: number, y = .085) => new T.Vector3(x, y, z);
+
+/** The southbound spur centreline also keeps the coastal groves clear of the new road. */
+export function southShoreSpur(boulevard: Curve) {
+  const { p, n } = frame(boulevard, SOUTH_SHORE.junction, boulevard.getLength());
+  const mouth = p.clone().addScaledVector(n, -12.9).setY(.247);
+  const { x, z, d, scale } = changeSites.sw, front = z - d * scale / 2;
+  return new T.CatmullRomCurve3([
+    mouth, mouth.clone().addScaledVector(n, -6), southShorePoint(-75, 226, .20),
+    southShorePoint(-70.5, 238, .24), southShorePoint(-69, 251, .51),
+    southShorePoint(-71, 261, .67), southShorePoint(-75, front - 5, .61), southShorePoint(x + 20, front - 4, .554),
+  ]);
+}
+
+/** Paved shelf apron and walks to both garden entrances. */
+function southShoreAccess(boulevard: Curve, environment: T.Object3D) {
+  const at = southShorePoint, spur = southShoreSpur(boulevard);
+  const { x, z, d, scale } = changeSites.sw, front = z - d * scale / 2;
+  // Ease the forecourt down from the east lawn's rise to the track apron and west garden.
+  const apron = new T.CatmullRomCurve3([
+    at(x + 21, front - 4, .55), at(x + 12, front - 4, .39), at(x + 6, front - 4, .24),
+    at(x, front - 4), at(x - 10, front - 4), at(x - 24, front - 4),
+  ], false, 'catmullrom', .25);
+  const [cx, cz, yaw] = SOUTH_SHORE.northCourt;
+  const gate = (reach: number) => at(cx + reach * Math.cos(yaw), cz - reach * Math.sin(yaw), .17);
+  const [wx, wz] = SOUTH_SHORE.westCourt;
+  const walks = [
+    new T.CatmullRomCurve3([at(-73, 230, .19), gate(24), gate(17)]),
+    new T.CatmullRomCurve3([at(x - 22, front - 3), at(-127, 281, .12), at(wx + 17, wz, .17)]),
+  ];
+  const road = band(spur, 0, spur.getLength(), -1.9, 1.9, 0, .65, [3, 1.75]);
+  const paving = [band(apron, 0, apron.getLength(), -4.5, 4.5, 0, .50, [2.4, 2.4]),
+    ...walks.map(walk => band(walk, 0, walk.getLength(), -1.7, 1.7, 0, .24, [2.4, 2.4]))];
+  environment.add(mesh([road], ceramic, 'south-shore-spur'), mesh(paving, footway, 'south-shore-walks'));
+  const guides = [-1.45, 1.45].map(offset => band(spur, .15, spur.getLength() - 1, offset - .035, offset + .035, .008));
+  return mesh(guides, seamLight, 'south-shore-guide-lines', false);
+}
+
 /** The kit along the street network: A on the U route (`STREET_KIT`), B on the ④ boulevard (`BOULEVARD`), and the stage 3 water (`waterGarden`). The ceramic, footways and terraces join
  * `environment` (it then stands on them); the planters, plants, rings, blades and lines come back for the scene. A's planters also keep 1.5 m
  * clear of every Yurikamome pier within the verges, found in the loaded environment. */
@@ -386,7 +424,7 @@ export function streetNetwork(environment: T.Object3D) {
   const piers = hits.map(ds => ds.sort((a, b) => a - b).reduce((out: Span[], d) => { const last = out.at(-1); if (last && d - 1.5 <= last[1]) last[1] = d + 1.5; else out.push([d - 1.5, d + 1.5]); return out; }, []));
   const root = new T.Group(); root.name = 'street-network';
   root.add(avenueStreet(u, K.from, L, [-K.half, K.half], { reach: K.inside, gaps: [...K.gaps.inside, ...piers[0]] }, { reach: K.outside, gaps: [...K.gaps.outside, ...piers[1]] }, K.crossings, () => 0),
-    boulevardStreet(boulevard, 0, boulevard.getLength(), BOULEVARD.crossings, () => 0, BOULEVARD.gaps), waterGarden(), automationHubAccess(u, environment), drawerHousingAccess(u, environment));
+    boulevardStreet(boulevard, 0, boulevard.getLength(), [...BOULEVARD.crossings, SOUTH_SHORE.junction], () => 0, BOULEVARD.gaps), waterGarden(), automationHubAccess(u, environment), drawerHousingAccess(u, environment), southShoreAccess(boulevard, environment));
   for (const name of ['street-ceramic', 'street-footway', 'boulevard-ceramic', 'boulevard-terraces']) environment.add(root.getObjectByName(name)!);
   return root;
 }

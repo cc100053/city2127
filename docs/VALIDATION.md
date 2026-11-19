@@ -180,3 +180,5 @@ Q03-A A 位街道候選（2026-11-17）：原近鏡射線及三角網格確認�
 Q03-A 街道 R2（2026-11-17）：保留住宅與鄰樓，以 6.2 m 貼樓環道接導軌大道 ②。Mac Chrome 以 SE low／mixed／high 各掃 1,651 個近邊及路面樣點，車路 3.2 m、步道 2.3 m 淨高內零阻擋；右側車道與梯田巨構抽樣最小水平餘量 2.09 m。另驗證同角度 3200 × 1800／DPR 1 日夜與接駁俯視。[圖集](../artifacts/change-review/index.html#drawer-housing) · [方法與差異](handoffs/drawer-housing-placement.md#街道-r2--由目標反推平面2026-11-17)。
 
 Q03-A 紅線修訂：同角度 Chrome 俯視確認住宅步道與草地斜線已移除。Root 回歸測試核對車道接縫和環道鋪面。[修訂俯視](../artifacts/change-review/drawer-housing/plan.jpg)。
+
+SW focal south shore access (2026-11-17, owner review pending): `tests/odaiba.test.ts` probes the surveyed terrain beneath the new spur every metre across its centre and both sides, checks the flush boulevard join and verifies that the two walks reach the sharing courts. Headless Chrome desktop day and night captures cover the three settled bands. See the [change review](../artifacts/change-review/index.html#SW%20focal), [plan](../artifacts/sw-focal-connections/plan.jpg) and [handoff](handoffs/sw-focal-connections.md).
