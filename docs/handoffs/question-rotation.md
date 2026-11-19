@@ -113,7 +113,7 @@
 
 ## Known issues and blockers
 
-- Q03 待 owner：B／C 空置態（草地＋保留環道，前場植栽與導光照舊）及住宅淡出淡入（中段玻璃半透明）待 owner 看 `q03-drawer/sheet-*.jpg`；三句文案暫定（待 5.2）；旅程用 sharing 色為自定。B、C 新模型由 owner 日後另做，屆時在 `setQ03` 加各自模型的 LotFade（須放入同一地塊並用同一支路），`q03Housing` 及 `Q03_RESULTS` 改為模型文案。
+- 已決（owner 2026-11-19「接受」）：Q03 B／C 空置態（草地＋保留環道，前場植栽與導光照舊）、住宅淡出淡入（中段玻璃半透明）及 B↔C 留 hero 接受（`q03-drawer/sheet-*.jpg`）。三句文案仍暫定（待 5.2）；旅程用 sharing 色為自定。B、C 新模型由 owner 日後另做，屆時在 `setQ03` 加各自模型的 LotFade（須放入同一地塊並用同一支路），`q03Housing` 及 `Q03_RESULTS` 改為模型文案。
 
 - 已決（owner 2026-11-19「Accept」）：Q08 空置態（草地＋白色輪廓）及 A↔B 不飛近鏡（留 hero，卡文「空き地のままです」）接受。Q08 三句文案仍為暫定（待 5.2）。SW COMMONS −1／+1 在輪換 run 中本來就不出現（中性 layout 恆為 mixed）；version4 run 不受影響。A、B 新模型由 owner 日後另做，屆時在 `setVacant` 位置換成各自模型的顯示（A／B 各一個 LotFade 或 band），`q08Vacant` 及 `Q08_RESULTS` 改為模型文案。
 
@@ -134,7 +134,7 @@
 
 ## Next expected step
 
-**現時（2026-11-19 第八節）：** Q03 已接 A（抽屜住宅），B／C 暫為空置，待 owner 看日夜總覽並接受或指示修改。已接題：Q01、Q02、Q03（A）、Q08（C）。下一步：Q06（欠選址及模型），或 owner 交 Q03 B／C、Q08 A／B 模型後換走空置；demo 時是否只讓已接題上線仍待 owner。
+**現時（2026-11-19 第八節）：** Q03 已接 A（抽屜住宅），B／C 暫為空置，owner 2026-11-19 接受（日夜總覽）。已接題：Q01、Q02、Q03（A）、Q08（C）。下一步：Q06（欠選址及模型），或 owner 交 Q03 B／C、Q08 A／B 模型後換走空置；demo 時是否只讓已接題上線仍待 owner。
 
 **現時（2026-11-19 第七節）：** 6.3 桌面版完整流程通過，可用 `survey-rotation`＋`root` 跑 demo。待 owner：demo 時是否只讓已接的 Q01、Q02、Q08 上線（現時約三分之二訪客看不到城市變化；少於 5 題 online 要先改 `MIN_ONLINE_QUESTIONS` 門檻）。之後照舊接下一題。
 
