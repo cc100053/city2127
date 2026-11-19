@@ -144,7 +144,7 @@
 
 ## Next expected step
 
-**現時（2026-11-19 第十一節）：** 住宅 M 已撤走。NE PARK 定為 Q05 地塊（owner 2026-11-19）；現有三態（`q05-ne/sheet.jpg`：樹數及冷卻鰭片之差，近鏡下幾乎看不出）不接線，owner 另做 Q05 A／B／C 新模型取代公園，屆時照 Q03／Q06 接 `lotRuntime`。待 owner：SE TOWER 是否留作 Q09-A 地塊、舊能源部件逐件去留。其餘同第十節。
+**現時（2026-11-19 第十一節）：** 住宅 M 已撤走。NE PARK 定為 Q05 地塊（owner 2026-11-19）；現有三態（`q05-ne/sheet.jpg`：樹數及冷卻鰭片之差，近鏡下幾乎看不出）不接線，owner 另做 Q05 A／B／C 新模型取代公園，屆時照 Q03／Q06 接 `lotRuntime`。SE TOWER 及四件舊能源部件暫不處理，標為「可讓位」（owner 2026-11-19）：新模型選址需要空間時可撤走或取代（計劃第 2 節）。其餘同第十節。
 
 **現時（2026-11-19 第十節）：** 變化總覽已改為 9 題 × 3＝27 個版本（計劃 5.4）；題目或結果卡、設施卡文案定稿後重跑 `node --experimental-strip-types scripts/changeSheet.ts` 並 commit。其餘同第九節。
 
