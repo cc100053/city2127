@@ -190,7 +190,7 @@ Owner 批准 0.1–0.4 全部建議；R01–R05 記入 SURVEY_V2_REVIEW 決定�
 | --- | --- | --- |
 | 6.1 | root、`survey/`：`npm test`、`npm run build`、`git diff --check` | 全部通過 |
 | 6.2 | 模擬 gate（1.7） | 按 1.7 及 owner 對 10 題出場缺口的決定 |
-| 6.3 | 瀏覽器：完整流程、A/B 雙站、Undo、reset、重新連線、reduced motion | 零 page error；截圖存 `~/city2127-evidence/question-rotation/` |
+| 6.3 | 瀏覽器：完整流程、A/B 雙站、Undo、reset、重新連線、reduced motion | 零 page error；截圖存 `~/city2127-evidence/question-rotation/`。**2026-11-19 桌面版通過**（Q01／Q02／Q08 已接配置，[`tests/rotationFullFlow.browser.mjs`](../tests/rotationFullFlow.browser.mjs)）；iPad、展覽機未測；上線模型增加後須重跑 |
 | 6.4 | 性能：全部上線模型載入後，展覽 Mac mini 實測 FPS 與記憶體 | 只記錄實測數字 |
 | 6.5 | Owner 兩秒辨認：每個模型的近鏡 | Owner 接受 |
 | 6.6 | 開新 run 上線；version4 題組及舊 run 歷史保留可讀 | Owner 批准 |
