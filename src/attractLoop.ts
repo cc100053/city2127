@@ -8,7 +8,7 @@ import { HERO_TARGET, heroSettledCamera } from './heroCamera.ts';
 
 export const IDLE_SECONDS = 10; // owner 2026-11-20 (was 90)
 export const LOOP_SECONDS = 60;
-/** One loop: drift, then 声の灯 (today's proposals as lights, Step B; until then the drift continues), then the call to action. */
+/** One loop: drift, then 声の灯 (src/voicesReplay.ts; skipped, with the drift continuing, below its guest minimum), then the call to action. The camera drifts throughout. */
 export const SEGMENTS = { drift: [0, 25], voices: [25, 50], cta: [50, 60] } as const;
 export type AttractSegment = keyof typeof SEGMENTS;
 /** Seconds to blend from wherever the camera was into the drift path. */
@@ -48,6 +48,8 @@ export function driftPosition(elapsed: number, into = new Vector3()) {
 
 type Controls = { target: Vector3; enabled: boolean };
 export type AttractCta = { update(opacity: number, voices: number): void };
+/** 声の灯 (src/voicesReplay.ts): `t` is seconds into the voices segment, or null outside it. */
+export type AttractVoices = { readonly ready: boolean; update(t: number | null, reduced: boolean): void };
 
 export class AttractLoop {
   private started: number | null = null;
@@ -59,9 +61,10 @@ export class AttractLoop {
   private camera: PerspectiveCamera;
   private controls: Controls;
   private cta: AttractCta | null;
+  private voices: AttractVoices | null;
   readonly idleSeconds: number;
-  constructor(camera: PerspectiveCamera, controls: Controls, cta: AttractCta | null, idleSeconds = IDLE_SECONDS, now = 0) {
-    this.camera = camera; this.controls = controls; this.cta = cta; this.idleSeconds = idleSeconds; this.lastActive = now;
+  constructor(camera: PerspectiveCamera, controls: Controls, cta: AttractCta | null, idleSeconds = IDLE_SECONDS, now = 0, voices: AttractVoices | null = null) {
+    this.camera = camera; this.controls = controls; this.cta = cta; this.idleSeconds = idleSeconds; this.lastActive = now; this.voices = voices;
   }
   get active() { return this.started !== null; }
   /** Seconds since the loop started, or null while waiting. */
@@ -70,7 +73,7 @@ export class AttractLoop {
   wake(now: number) {
     this.lastActive = now;
     if (this.started === null) return;
-    this.started = null; this.controls.enabled = true; this.cta?.update(0, 0);
+    this.started = null; this.controls.enabled = true; this.cta?.update(0, 0); this.voices?.update(null, false);
   }
   /** `busy`: another camera owner (headline flight, Sky Ring look) is playing. Reduced motion keeps the camera still. */
   update(now: number, busy: boolean, reduced: boolean, voices: number) {
@@ -88,6 +91,8 @@ export class AttractLoop {
       this.camera.lookAt(this.controls.target);
     }
     this.cta?.update(ctaOpacity(elapsed), voices);
+    const loop = elapsed % LOOP_SECONDS;
+    this.voices?.update(attractSegment(loop) === 'voices' && this.voices.ready ? loop - SEGMENTS.voices[0] : null, reduced);
   }
 }
 

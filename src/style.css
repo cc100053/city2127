@@ -82,3 +82,8 @@ body[data-time=night] footer,body[data-time=night] .intro{text-shadow:0 0 10px r
 .attract-cta[hidden],.attract-cta [hidden]{display:none}.attract-cta p{margin:0}
 .attract-cta-title{font-size:46px;line-height:1.25;font-weight:700;letter-spacing:.08em;color:#7ff5df;text-shadow:0 0 22px rgba(80,240,210,.55),0 0 3px rgba(80,240,210,.5)}
 .attract-cta-count{margin-top:10px!important;font-size:20px;letter-spacing:.04em}.attract-cta-hint{margin-top:8px!important;font-size:15px;letter-spacing:.06em;color:#a9d6e2}
+/* 声の灯 card (src/voicesReplay.ts): the call-to-action glass with the run's Meter curves. */
+.voices-card{min-width:600px;padding:20px 36px 18px}.voices-heading{font-size:15px;letter-spacing:.12em;color:#a9d6e2}.voices-counter{min-height:1.3em;margin-top:4px!important;font-size:30px;font-weight:700;letter-spacing:.06em;color:#7ff5df;text-shadow:0 0 16px rgba(80,240,210,.5);font-variant-numeric:tabular-nums}
+.voices-chart{display:block;width:520px;height:120px;margin:10px auto 6px;overflow:visible}.voices-zero{stroke:rgba(169,214,226,.35);stroke-dasharray:4 6}
+.voices-legend{display:flex;justify-content:center;gap:22px;font-size:14px;letter-spacing:.06em}.voices-legend span::before{content:'';display:inline-block;width:14px;height:3px;margin-right:7px;vertical-align:middle;border-radius:2px;background:var(--key)}
+.voices-lean{margin-top:10px!important;font-size:20px;font-weight:600;letter-spacing:.04em}
