@@ -1,7 +1,7 @@
 # day-replay — 「今日の台場」回顧章節
 
 - Owner: cc100053（規劃討論：Claude Code）
-- Status: PLANNED — 方向討論中，未開始實作；開工前要 owner 答覆下面嘅「待決定」
+- Status: SUPERSEDED（owner 2026-11-20）— 建築快轉會重複見到同一批模型，改由 [attract-loop](attract-loop.md) 嘅「声の灯」（今日提案光點＋Meter 曲線）取代；以下保留作參考
 - Branch: 未建立（建議 `feat/day-replay`，由最新 main 開）
 - Base commit: 未開始；規劃時 main 係 `2695823`
 - Last verified commit: NONE

@@ -36,6 +36,7 @@ import { housingPrototype } from './housingPrototype';
 import { skyRing, STANDALONE_VOICES } from './skyRing';
 import { GuestExplore } from './guestExplore';
 import { VoiceLabel } from './voiceLabel';
+import { AttractLoop, attractCta, IDLE_SECONDS } from './attractLoop';
 import type { ExploreLook } from './surveyView';
 import { heroHolograms } from './heroHolograms';
 import { spaceElevator, spaceElevatorNear } from './spaceElevator';
@@ -292,9 +293,16 @@ try {
     Object.assign(window,{cityExplore:(ordinal:number|null,target?:string)=>ordinal===null?explore.back(now):startExplore({target:exploreTarget(target),ordinal})});
     if(params.has('explore'))requestAnimationFrame(()=>requestAnimationFrame(()=>{explore.voices=ring.litVoices();startExplore({target:exploreTarget(params.get('exploreTarget')),ordinal:Number(params.get('explore'))||1},now-Number(params.get('exploreAt')??0));}));
   }
+  // Idle attract loop (owner 2026-11-20): exhibition screens only; DEV `?meters=&attract&attractIdle=5` previews it without the server, `?attract=0` turns it off.
+  const attractOn=!!headlineCamera&&params.get('attract')!=='0'&&(!!surveyUrl||(import.meta.env.DEV&&params.has('attract')));
+  const attractIdle=import.meta.env.DEV&&params.has('attractIdle')?Number(params.get('attractIdle')):IDLE_SECONDS;
+  const attract=attractOn?new AttractLoop(camera,controls,attractCta(),Number.isFinite(attractIdle)?attractIdle:IDLE_SECONDS):null;
+  let voices=surveyUrl?0:STANDALONE_VOICES;
+  if(attract){const wake=()=>attract.wake(now);renderer.domElement.addEventListener('pointerdown',wake);renderer.domElement.addEventListener('wheel',wake,{passive:true});addEventListener('keydown',wake);}
   if(surveyUrl)startSurveyAtmosphere(surveyUrl,(kind,view,displayMs)=>{
-    devShot=null;residentDemo?.cancel();explore?.interrupt();if(explore&&isExhibitionView(view))explore.voices=view.guestCount;
+    attract?.wake(now);devShot=null;residentDemo?.cancel();explore?.interrupt();if(explore&&isExhibitionView(view))explore.voices=view.guestCount;
     if(isExhibitionView(view)){
+      voices=view.guestCount;
       const prevNw=nwBand;nwBand=view.layout.bands.nw;
       // Cancel any legacy score blend while preserving its current rendered atmosphere.
       world.blendTo(world.state,now);ring.setVoices(view.guestCount);holo.setVoices(view.guestCount);holo.setTiers(view.layout.tiers);
@@ -356,6 +364,7 @@ try {
     controls.update();if(!ringReview){panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);}
     if(headlineCamera?.active&&cameraMotion.matches)headlineCamera.cancel();else headlineCamera?.update(now);
     narration?.update(now,cameraMotion.matches);explore?.update(now,cameraMotion.matches);
+    attract?.update(now,!!headlineCamera?.active||!!explore?.active||devShot!==null,cameraMotion.matches,voices);
     if(headlineCamera?.active)voiceLabel?.update(camera,now);else voiceLabel?.hide();
     if(import.meta.env.DEV&&devShot){camera.position.set(...devShot.position);controls.target.set(...devShot.target);camera.lookAt(controls.target);}
     cityChanges?.update(now,dark);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
