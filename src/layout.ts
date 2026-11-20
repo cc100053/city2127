@@ -206,11 +206,15 @@ export const midDecks: readonly (readonly P3[])[] = [
   [[-86,40,18],[-130,40.5,26],[-180,41,34],[-220,40.5,40],[-250,40,44]],
 ];
 const deckTop = PLAZA.h + .6;
+/** A plaza-local point (metres) at deck height `y`, as a world [x, y, z]. Road fix 2 (owner 2026-11-20): the walks spread `plazaAt` before
+ * the height, giving [x, z, y], so they dived to −176 m and back and showed as stray curved stubs. */
+const deckAt = (lx: number, lz: number, y: number): P3 => { const [x, z] = plazaAt(lx, lz); return [x, y, z]; };
 /** Elevated white walkways (deck top y at the points): ring plinth to the plaza, plaza to the civic core's landing, plaza to the hull apron. Walkers use them. */
 export const plazaWalks: readonly (readonly P3[])[] = [
-  [[72,16,-183],[45,13,-178],[...plazaAt(-140,-6),9],[...plazaAt(-128,-5),deckTop],[...plazaAt(-100,2),deckTop],[...plazaAt(-80,8),deckTop],[...plazaAt(-56,8),deckTop]],
-  [[...plazaAt(-26,-34),deckTop],[...plazaAt(-16,-48),deckTop],[...plazaAt(-14,-60),11],[-34,15,-66],[-50,15.5,-48],[-46,12,-28],[-40,7.5,-14],[-36,3,-2]],
-  [[...plazaAt(56,-8),deckTop],[...plazaAt(68,-10),deckTop],[...plazaAt(92,-10),12],[-176,16,-42],[-200,16,-22],[-210,11,0],[-214,6,14],[-214,3,26]],
+  [[72,16,-183],[45,13,-178],deckAt(-140,-6,9),deckAt(-128,-5,deckTop),deckAt(-100,2,deckTop),deckAt(-80,8,deckTop)],
+  // Under the Yurikamome deck (14.2 m), not through it, without the hairpin; each starts clear of the deck's planters.
+  [deckAt(-16,-48,deckTop),deckAt(-14,-60,8),[-50,8.5,-48],[-46,8,-28],[-40,6,-14],[-36,3,-2]],
+  [deckAt(68,-10,deckTop),deckAt(92,-10,12),[-176,16,-42],[-200,16,-22],[-209,11,0],[-211,6,14],[-211,3,26]],
 ];
 // Planted mid-level decks (r6 pass 3, target v2's tree-lined middle layer; 5.2 m lawn bed down the middle). Raycast-checked against the
 // environment, landmarks and Fuji chassis: clear between their docked ends, and off every survey site's line of sight from the hero pose.
