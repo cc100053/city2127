@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { loadRotationSetFile, parseRotationSet, QuestionSetError } from '../src/survey/questionLoader.ts';
 import {
-  CROWD_SHARE_MIN_VOTES, crowdShare, drawQuestions, emptyTallies, foldRotation, initialRotation, RotationError, rotationStep,
+  CROWD_SHARE_MIN_VOTES, crowdShare, drawQuestions, emptyTallies, foldRotation, hasModel, initialRotation, RotationError, rotationStep, rotationVisit,
+  swapVisible,
   type RotationSet, type RotationSubmission,
 } from '../src/shared/rotation.ts';
 
@@ -107,5 +108,45 @@ assert.deepEqual(crowdShare(full.tallies, 'q4', 'B'), { questionId: 'q4', option
 assert.deepEqual(crowdShare(full.tallies, 'q4', 'B', 3), { questionId: 'q4', optionId: 'B', votes: 2, total: 3, percent: 67 });
 assert.equal(CROWD_SHARE_MIN_VOTES, 10);
 assert.deepEqual(crowdShare(emptyTallies(set), 'q1', 'A', 0), { questionId: 'q1', optionId: 'A', votes: 0, total: 0 });
+
+// 3.4 — nothing visible changed: the fallback and the visit go to a drawn site already showing the guest's answer with a model.
+const home = initialRotation(shipped); // Q01 B, Q02 A, Q03 A, Q04 A, Q05 A, Q06 B, Q07 A, Q08 C, Q09 A
+const stale = { shown: home.shown, changedAt: { ...home.changedAt, Q01: 9, Q03: 4 } };
+assert.equal(hasModel(shipped, 'Q01', 'B'), true);
+assert.equal(hasModel(shipped, 'Q08', 'A'), false);
+assert.equal(hasModel(shipped, 'Q04', 'A'), false);
+const quiet = ['Q01', 'Q04', 'Q05', 'Q07'];
+// Every drawn site already shows the guest's answer: the stalest with a model (Q01), not the stalest overall (Q04, no model).
+const held = rotationStep(shipped, stale, { stamp: 10, drawn: quiet, answers: answer(quiet, id => home.shown[id]) });
+assert.deepEqual(held.outcome, { kind: 'fallback', questionId: 'Q01' });
+assert.equal(rotationVisit(shipped, held.state, { stamp: 10, drawn: quiet, answers: answer(quiet, id => home.shown[id]) }, held.outcome), 'Q01');
+// A fallback with no model anywhere keeps the stalest question and visits nothing.
+const bare = ['Q04', 'Q05', 'Q07', 'Q09'];
+const empty = rotationStep(shipped, home, { stamp: 1, drawn: bare, answers: answer(bare, () => 'A') });
+assert.deepEqual(empty.outcome, { kind: 'fallback', questionId: 'Q04' });
+assert.equal(rotationVisit(shipped, empty.state, { stamp: 1, drawn: bare, answers: answer(bare, () => 'A') }, empty.outcome), undefined);
+// A swap on a question without models changes nothing visible: the camera visits Q01, whose AUTO HUB already shows the answer.
+const unseen = { stamp: 10, drawn: quiet, answers: { Q01: 'B', Q04: 'B', Q05: 'A', Q07: 'A' } };
+const q04 = rotationStep(shipped, stale, unseen);
+assert.deepEqual(q04.outcome, { kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' });
+assert.equal(swapVisible(shipped, q04.outcome), false);
+assert.equal(rotationVisit(shipped, q04.state, unseen, q04.outcome), 'Q01');
+// Vacant↔vacant (Q08 A↔B) is invisible too; with no other drawn model matching, nothing is visited.
+const vacant = ['Q08', 'Q04', 'Q05', 'Q07'];
+const lot = { shown: { ...home.shown, Q08: 'A' }, changedAt: home.changedAt };
+const ab = { stamp: 2, drawn: vacant, answers: { Q08: 'B', Q04: 'B', Q05: 'B', Q07: 'B' } };
+const q08 = rotationStep(shipped, lot, ab);
+assert.deepEqual(q08.outcome, { kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' });
+assert.equal(rotationVisit(shipped, q08.state, ab, q08.outcome), undefined);
+// A model entering or leaving is a visible swap: no visit.
+const shelf = { stamp: 2, drawn: vacant, answers: { Q08: 'A', Q04: 'A', Q05: 'A', Q07: 'A' } };
+const gone = rotationStep(shipped, home, shelf);
+assert.deepEqual(gone.outcome, { kind: 'swap', questionId: 'Q08', from: 'C', to: 'A' });
+assert.equal(swapVisible(shipped, gone.outcome), true);
+assert.equal(rotationVisit(shipped, gone.state, shelf, gone.outcome), undefined);
+// The fold hands each step its visit, so snapshots and Undo rebuild the same camera stop.
+const visits: (string | undefined)[] = [];
+foldRotation(shipped, [{ ...unseen, stamp: 1 }, { ...shelf, stamp: 2 }], (_, step) => visits.push(step.visit));
+assert.deepEqual(visits, ['Q01', undefined]);
 
 console.log('rotation tests passed');

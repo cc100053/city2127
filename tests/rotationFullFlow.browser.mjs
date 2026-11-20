@@ -151,10 +151,12 @@ try {
   await checkCity(g.view); note('g4 after mid-transition reload', await cityState()); await shot(city, '04-q02-farm-after-reload');
   await ambient();
 
-  // 5. Fallback: keep every shown option; city unchanged, card says maintained.
+  // 5. Fallback: keep every shown option; city unchanged, the card visits a drawn model already showing the answer (plan 3.4).
   g = await guest(a, 'g5 fallback', { keepAll: true });
   assert.deepEqual(g.view.rotation.shown, g.before.rotation.shown);
-  await city.waitForTimeout(10_500); note('g5 fallback city', await cityState()); await shot(city, '05-fallback');
+  await city.waitForTimeout(10_500);
+  const held = await cityState(); note('g5 fallback city', held); await shot(city, '05-fallback');
+  assert.match(held.card, g.view.latestProposal.rotation.visit ? /すでにここにあります/ : /これから街に加わります/);
   await checkCity(g.view); await ambient();
 
   // 6. Swap unwired questions until Q08 is drawn, then Q08 C→A (SW vacant).

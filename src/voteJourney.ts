@@ -99,7 +99,10 @@ export function rotationLantern(ordinal: number, outcome: RotationOutcome, answe
     color: new T.Color(swap ? site.color : NEUTRAL), scale: swap ? 1 : .7 };
 }
 /** What `playRotation` and `setRotationLanterns` read from a rotation proposal. */
-export type RotationJourney = { ordinal: number; answers: readonly Answer[]; rotation?: { outcome: RotationOutcome } };
+export type RotationJourney = { ordinal: number; answers: readonly Answer[]; rotation?: { outcome: RotationOutcome; visit?: string } };
+/** Where the journey lands: a proposal that changed nothing visible but visits a site (plan 3.4) lands there in neutral, like a fallback. */
+export const journeyOutcome = (rotation: { outcome: RotationOutcome; visit?: string }): RotationOutcome =>
+  rotation.visit ? { kind: 'fallback', questionId: rotation.visit } : rotation.outcome;
 const VOICES_BOARD = new T.Vector3(...HOLOGRAMS.panels.find(p => p.id === 'voices')!.at);
 
 export class VoteJourney {
@@ -166,8 +169,8 @@ export class VoteJourney {
    * that fade out at their apex over the 住民の声 board (they join the crowd share). Same origin, stagger and arrival as `play`. */
   playRotation(proposal: RotationJourney, now: number): void {
     this.cancel();
-    const outcome = proposal.rotation?.outcome;
-    if (!outcome) return;
+    if (!proposal.rotation) return;
+    const outcome = journeyOutcome(proposal.rotation);
     // No site: no orb lands, but the guest's lantern slots are still freed, as setRotationLanterns would.
     if (!rotationSite(outcome, proposal.answers)) this.addRotationLantern(proposal.ordinal, outcome, proposal.answers);
     const origin = this.origin();
@@ -199,7 +202,7 @@ export class VoteJourney {
   /** Rotation runs' immediate state: one lantern per proposal, over the site of the question it swapped or fell back to. */
   setRotationLanterns(history: readonly RotationJourney[]): void {
     this.cancel(); this.clearLanterns();
-    for (const p of history.slice(-LANTERN_GUESTS)) if (p.rotation) this.addRotationLantern(p.ordinal, p.rotation.outcome, p.answers);
+    for (const p of history.slice(-LANTERN_GUESTS)) if (p.rotation) this.addRotationLantern(p.ordinal, journeyOutcome(p.rotation), p.answers);
   }
 
   private addRotationLantern(ordinal: number, outcome: RotationOutcome, answers: readonly Answer[]): void {

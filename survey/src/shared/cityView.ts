@@ -53,7 +53,8 @@ export type ExhibitionCityChange = {
   after: Record<string, number | string>;
 };
 /** A rotation run's proposal: the one site it swapped (or the fallback site) and the crowd share of each answer. */
-export type ProposalRotation = { outcome: RotationOutcome; shares: CrowdShare[] };
+/** `visit` (plan 3.4): nothing visibly changed, and this drawn question's site already shows the guest's answer with a model. */
+export type ProposalRotation = { outcome: RotationOutcome; shares: CrowdShare[]; visit?: string };
 /** The rotation city: which option each question's site shows and the proposal sequence that last swapped it (0: never). */
 export type RotationCity = { version: number; shown: Record<string, string>; changedAt: Record<string, number> };
 export type ProposalRecord = {

@@ -39,6 +39,10 @@ try {
   assert.equal(tamper(e => { e.view.latestProposal.votes.automation = 1; }), null);
   assert.equal(tamper(e => { e.view.rotation.changedAt = {}; }), null);
   assert.equal(tamper(e => { e.view.latestProposal.rotation.shares.pop(); }), null);
+  // Plan 3.4: a visible swap visits nothing; a visit must name one of the guest's own questions.
+  assert.equal(view.latestProposal?.rotation?.visit, undefined);
+  assert.equal(tamper(e => { e.view.latestProposal.rotation.visit = 'Q09'; }), null);
+  assert.ok(tamper(e => { e.view.latestProposal.rotation.visit = 'Q02'; }));
 
   // Q01 returns once it is the least recently changed question; the direct C→A jump then plays as NW +1 → −1.
   let latest = view, guest = 1;

@@ -130,3 +130,21 @@ export function q06Result(swap: { from: string; to: string }) {
 
 /** The Q06 headline shot: the tower's close-up when it enters or leaves; none (stay at hero) when A↔C leaves the lot empty. */
 export const q06Shot = (swap: { tower: boolean }): ShotId | null => swap.tower ? 'q06:tower' : null;
+
+/** Plan 3.4: what the guest's answer already shows at a visited site (a model that stands there): its headline shot and card place. */
+export const ROTATION_VISITS: Readonly<Record<string, Readonly<Record<string, { shot: ShotId; place: string }>>>> = {
+  Q01: { A: { shot: 'nw:focal-low', place: 'デックス西 AUTO HUB' }, B: { shot: 'nw:focal', place: 'デックス西 AUTO HUB' }, C: { shot: 'nw:focal', place: 'デックス西 AUTO HUB' } },
+  Q02: Object.fromEntries(Object.entries(Q02_RESULTS).map(([option, [place]]) => [option, { shot: Q02_SHOTS[option], place }])),
+  Q03: { A: { shot: 'q03:housing', place: Q03_RESULTS.A[0] } },
+  Q06: { B: { shot: 'q06:tower', place: Q06_RESULTS.B[0] } },
+  Q08: { C: { shot: 'sw:focal', place: Q08_RESULTS.C[0] } },
+};
+
+/** A rotation proposal that changed nothing visible but visits a site already showing the guest's answer: question, option, shot and place. */
+export function rotationVisit(proposal: ExhibitionProposal) {
+  const questionId = proposal.rotation?.visit;
+  if (!questionId) return undefined;
+  const optionId = proposal.answers.find(answer => answer.questionId === questionId)?.optionId;
+  const visit = optionId ? ROTATION_VISITS[questionId]?.[optionId] : undefined;
+  return visit && { questionId, optionId: optionId!, ...visit };
+}

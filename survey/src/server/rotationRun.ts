@@ -36,7 +36,8 @@ export function runRotation(ctx: SurveyContext & { rotation: RotationSet }, runI
   // Crowd shares for each proposal include every answer up to and including it.
   const byId = new Map<string, ProposalRotation>();
   const fold = foldRotation(ctx.rotation, submissions, (index, step) => {
-    byId.set(ids[index], { outcome: step.outcome, shares: Object.entries(submissions[index].answers).map(([q, o]) => crowdShare(step.tallies, q, o)) });
+    byId.set(ids[index], { outcome: step.outcome, ...(step.visit ? { visit: step.visit } : {}),
+      shares: Object.entries(submissions[index].answers).map(([q, o]) => crowdShare(step.tallies, q, o)) });
   });
   return { fold, byId };
 }

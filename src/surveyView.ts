@@ -147,10 +147,13 @@ function isVotes(value: unknown): value is Scores {
 const isTextRecord = (value: unknown, values: (item: unknown) => boolean): value is Record<string, unknown> =>
   isRecord(value) && Object.keys(value).length <= 64 && Object.entries(value).every(([key, item]) => isBoundedText(key, 128) && values(item));
 
-/** A rotation proposal names one of its own answers as the swapped (or fallback) site and carries one share per answer. */
+/** A rotation proposal names one of its own answers as the swapped (or fallback) site, optionally another as the visited site
+ *  (plan 3.4), and carries one share per answer. */
 function isProposalRotation(value: unknown, answers: ProposalAnswer[]): value is ProposalRotation {
-  if (!isRecord(value) || !hasExactKeys(value, ['outcome', 'shares']) || !isRecord(value.outcome) || !Array.isArray(value.shares)) return false;
+  if (!isRecord(value) || !hasExactKeys(value, ['outcome', 'shares', ...(Object.hasOwn(value, 'visit') ? ['visit'] : [])])
+    || !isRecord(value.outcome) || !Array.isArray(value.shares)) return false;
   const outcome = value.outcome, byQuestion = new Map(answers.map(answer => [answer.questionId, answer.optionId]));
+  if (Object.hasOwn(value, 'visit') && !byQuestion.has(value.visit as string)) return false;
   const outcomeValid = outcome.kind === 'swap'
     ? hasExactKeys(outcome, ['kind', 'questionId', 'from', 'to']) && isBoundedText(outcome.from, 128) && outcome.to === byQuestion.get(outcome.questionId as string) && outcome.from !== outcome.to
     : outcome.kind === 'fallback' && hasExactKeys(outcome, ['kind', 'questionId']) && byQuestion.has(outcome.questionId as string);

@@ -4,7 +4,8 @@
 // drawn per run because the owner has not chosen them. Gate (launch configuration: all nine questions, owner
 // 2026-11-18; original preferences): ≤ 2 % no-change. Model coverage and the skewed rows are reported for the
 // owner, not gated: at nine or ten questions a few runs leave one model unshown all day.
-import { drawQuestions, initialRotation, rotationStep, type RotationSet, type RotationState } from '../src/shared/rotation.ts';
+import { drawQuestions, initialRotation, rotationStep, rotationVisit, swapVisible, type RotationSet, type RotationState } from '../src/shared/rotation.ts';
+import { loadRotationSetFile } from '../src/survey/questionLoader.ts';
 
 let seed = 20261118; const rnd = () => (seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 2 ** 32;
 const pick = (weights: readonly number[]) => { let u = rnd(); for (let i = 0; i < weights.length; i++) if ((u -= weights[i]) < 0) return i; return weights.length - 1; };
@@ -60,5 +61,28 @@ for (const { label, prefs, lean } of DISTRIBUTIONS) {
     return `${questions}q no-change ${(100 * rate).toFixed(1)}%, models shown ${(100 * coverage / RUNS).toFixed(1)}% (all in ${allShown}/${RUNS} runs)`;
   });
   console.log(`rotation sim ${label}: ${cells.join('; ')}`);
+}
+// Plan 3.4, reported only: what guests see with the shipped set as built today (null modelId = no model yet), original preferences.
+{
+  const shipped = loadRotationSetFile(new URL('../src/survey/questions.rotation.v1.json', import.meta.url).pathname);
+  let visible = 0, visited = 0, recorded = 0;
+  for (let r = 0; r < RUNS; r++) {
+    const pref = shipped.questions.map(() => ORIGINAL[Math.floor(rnd() * ORIGINAL.length)]);
+    let state = initialRotation(shipped), stamp = 0;
+    for (let g = 0; g < GUESTS; g += 2) {
+      const draws = [drawQuestions(shipped, state), drawQuestions(shipped, state)];
+      for (const drawn of draws) {
+        const personal = Math.floor(rnd() * 3);
+        const answers = Object.fromEntries(drawn.map(id => [id, OPTIONS[rnd() < .4 ? personal : pick(pref[shipped.questions.findIndex(q => q.id === id)])]]));
+        const submission = { stamp: ++stamp, drawn, answers }, step = rotationStep(shipped, state, submission);
+        state = step.state;
+        if (swapVisible(shipped, step.outcome)) visible++;
+        else if (rotationVisit(shipped, state, submission, step.outcome)) visited++;
+        else recorded++;
+      }
+    }
+  }
+  const pct = (n: number) => `${(100 * n / (RUNS * GUESTS)).toFixed(1)}%`;
+  console.log(`rotation sim shipped set (models as built): visible change ${pct(visible)}, visits a model already showing the answer ${pct(visited)}, recorded only ${pct(recorded)}`);
 }
 if (gateFailed) { console.error('rotation gate failed: nine questions with original preferences need ≤ 2% no-change'); process.exit(1); }

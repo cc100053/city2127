@@ -8,8 +8,8 @@ import type { CarrierChange } from './cityChangeManager.ts';
 import type { DisplayMode } from './dayCycle.ts';
 import { presets, type WorldState } from './presets.ts';
 import { changeSites } from './layout.ts';
-import { q01Swap, q02Swap, q03Result, q03Swap, q06Result, q06Swap, q08Result, q08Swap, Q02_RESULTS, rotationLayout } from './rotationLayout.ts';
-import { crowdShareText } from '../survey/src/shared/rotation.ts';
+import { q01Swap, q02Swap, q03Result, q03Swap, q06Result, q06Swap, q08Result, q08Swap, Q02_RESULTS, Q03_RESULTS, Q06_RESULTS, Q08_RESULTS, rotationLayout, rotationVisit } from './rotationLayout.ts';
+import { ALREADY_HERE, crowdShareText, FACILITY_TO_COME } from '../survey/src/shared/rotation.ts';
 import { AXES, connectSurvey, isExhibitionView, supersedes, type CityView, type Decision, type ExhibitionProposal, type ExhibitionView, type SurveyEventKind, type SurveyView, type ExploreLook } from './surveyView.ts';
 
 // Root-scene side of the survey server's CityView contract (survey/src/shared/cityView.ts).
@@ -181,11 +181,26 @@ export function energyChangedPart(before: EnergyConfiguration, after: EnergyConf
   return (['waterGardens', 'receiver', 'flywheel', 'island'] as const).find(part => before[part] !== after[part] || before.activity?.[part] !== after.activity?.[part]) ?? null;
 }
 
+/** The preference line for a visited rotation answer (plan 3.4), from the same provisional copy its swap card uses. */
+function visitPreference(questionId: string, optionId: string) {
+  const line = questionId === 'Q01' ? RESIDENT_PREFERENCES[Q01_PREFERENCES[optionId]]
+    : questionId === 'Q02' ? Q02_RESULTS[optionId]?.[2]
+    : ({ Q03: Q03_RESULTS, Q06: Q06_RESULTS, Q08: Q08_RESULTS } as Record<string, Record<string, readonly [string, string]>>)[questionId]?.[optionId]?.[1];
+  return line ?? 'あなたの思いが、住民の声に加わりました。';
+}
+
 /** Evidence is the renderer's before/after targets, including visible pairings and shuffled slots. */
 export function residentResult(proposal: ExhibitionProposal, changes?: readonly CarrierChange[]) {
   // Rotation runs: the crowd share of the outcome's question (plan 3.3, 2.6) — the "one voice among many" half of the story.
   const outcomeShare = proposal.rotation?.shares.find(share => share.questionId === proposal.rotation!.outcome.questionId);
   const share = outcomeShare ? { share: crowdShareText(outcomeShare) } : {};
+  // Plan 3.4: nothing visibly changed, so the camera visits a site already showing one of the guest's answers; its share goes with it.
+  const visit = rotationVisit(proposal);
+  if (visit) {
+    const visitShare = proposal.rotation!.shares.find(item => item.questionId === visit.questionId);
+    return { preference: visitPreference(visit.questionId, visit.optionId), effect: `${ALREADY_HERE}。`, place: visit.place, kind: 'already-here',
+      ...(visitShare ? { share: crowdShareText(visitShare) } : {}) };
+  }
   // A Q02 swap moves the shown model between three lots (src/lotRuntime.ts); no Meter carrier changes, so it reads its own copy.
   const q02 = q02Swap(proposal);
   if (q02) {
@@ -264,6 +279,8 @@ export function residentResult(proposal: ExhibitionProposal, changes?: readonly 
     if (proposal.votes.energy) {
       effect = '思いは住民の声に加わり、街のエネルギー設備は今の配置を受け継いでいます。';
     } else effect = direction ? '街の方向は少し動きましたが、見えている施設の構成は維持されました。' : '思いは記録され、見えている施設の構成は維持されました。';
+    // Rotation runs: no model came or went and no drawn site shows the guest's answer yet (plan 3.4); say its facility is still to come.
+    if (proposal.rotation) effect = FACILITY_TO_COME;
   }
   return { preference, effect, place, kind, ...share };
 }

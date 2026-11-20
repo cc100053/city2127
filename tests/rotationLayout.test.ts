@@ -2,7 +2,8 @@
 // version4 views pass through untouched, and a Q01 swap reads the NW focal copy.
 import assert from 'node:assert/strict';
 import { ladderLayout } from '../survey/src/shared/cityView.ts';
-import { q01Swap, q02Swap, rotationLayout, withQ01, Q01_NW_TIERS } from '../src/rotationLayout.ts';
+import { q01Swap, q02Swap, rotationLayout, rotationVisit, withQ01, Q01_NW_TIERS } from '../src/rotationLayout.ts';
+import { journeyOutcome } from '../src/voteJourney.ts';
 import { residentCards, residentResult } from '../src/surveyAtmosphere.ts';
 import type { ExhibitionProposal, ExhibitionView } from '../src/surveyView.ts';
 
@@ -90,5 +91,22 @@ assert.equal(shared({ kind: 'swap', questionId: 'Q01', from: 'B', to: 'C' }, 50)
 assert.equal(shared({ kind: 'fallback', questionId: 'Q02' }, 50), '同じ暮らしを選んだ住民 25%（12人中）', 'the fallback question\'s share');
 assert.equal(shared({ kind: 'swap', questionId: 'Q01', from: 'B', to: 'C' }), 'この問いへの声は、まだ集まり始めたところです');
 assert.equal(toC.share, undefined, 'no share without one for the outcome question');
+
+// Plan 3.4: nothing visible changed, so the card and camera visit a drawn site already showing the guest's answer, with that answer's share.
+const visiting = (outcome: NonNullable<ExhibitionProposal['rotation']>['outcome'], visit: string, q01 = 'C'): ExhibitionProposal => ({
+  ...proposal(outcome, q01),
+  rotation: { outcome, visit, shares: [{ questionId: 'Q02', optionId: 'B', votes: 3, total: 12, percent: 25 }, { questionId: 'Q01', optionId: q01, votes: 6, total: 12, percent: 50 }] },
+});
+const here = residentResult(visiting({ kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' }, 'Q01'), []);
+assert.deepEqual(here, { preference: 'あなたは、自分の都合でいつでも使えるサービスを大切にしました。', effect: 'あなたの選んだ暮らしは、すでにここにあります。',
+  place: 'デックス西 AUTO HUB', kind: 'already-here', share: '同じ暮らしを選んだ住民 50%（12人中）' });
+assert.deepEqual(rotationVisit(visiting({ kind: 'fallback', questionId: 'Q02' }, 'Q02')), { questionId: 'Q02', optionId: 'B', shot: 'q02:flower', place: '南部公園沖の湾の花' });
+assert.equal(rotationVisit(visiting({ kind: 'fallback', questionId: 'Q01' }, 'Q01', 'A'))?.shot, 'nw:focal-low', 'the −1 hall is framed by the low NW shot');
+assert.match(residentResult(visiting({ kind: 'fallback', questionId: 'Q02' }, 'Q02'), []).preference, /評判を確かめてから/);
+// The journey lands where the camera goes: a visit reads as a neutral fallback on that site; without one the outcome stands.
+assert.deepEqual(journeyOutcome({ outcome: { kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' }, visit: 'Q01' }), { kind: 'fallback', questionId: 'Q01' });
+assert.deepEqual(journeyOutcome({ outcome: { kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' } }), { kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' });
+// Nothing visible and nothing to visit: the card says the facility is still to come (provisional copy).
+assert.equal(residentResult(proposal({ kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' }, 'C'), []).effect, 'あなたの声は記録されました。この暮らしを形にする施設は、これから街に加わります。');
 
 console.log('rotation layout tests passed');

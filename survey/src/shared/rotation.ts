@@ -83,13 +83,35 @@ export function rotationStep(set: RotationSet, state: RotationState, submission:
   const { drawn, answers, stamp } = submission;
   const ordered = [...drawn].sort(byStaleness(set, state));
   const candidates = ordered.filter(id => state.shown[id] !== answers[id]);
-  if (candidates.length === 0) return { state, outcome: { kind: 'fallback', questionId: ordered[0] } };
+  // Plan 3.4: the fallback visits a drawn site whose model stands there, so the camera has something to show.
+  if (candidates.length === 0) return { state, outcome: { kind: 'fallback', questionId: ordered.find(id => hasModel(set, id, state.shown[id])) ?? ordered[0] } };
   const questionId = candidates[0];
   const from = state.shown[questionId], to = answers[questionId];
   return {
     state: { shown: { ...state.shown, [questionId]: to }, changedAt: { ...state.changedAt, [questionId]: stamp } },
     outcome: { kind: 'swap', questionId, from, to },
   };
+}
+
+/** Whether option `optionId` of question `questionId` has a model in the city (null `modelId`: not built or vacant lot). */
+export function hasModel(set: RotationSet, questionId: string, optionId: string | undefined): boolean {
+  return set.questions.find(q => q.id === questionId)?.options.find(o => o.id === optionId)?.modelId != null;
+}
+
+/** A swap the city can see: a model enters or leaves (vacant↔vacant or a question without models changes nothing on screen). */
+export const swapVisible = (set: RotationSet, outcome: RotationOutcome) =>
+  outcome.kind === 'swap' && set.questions.find(q => q.id === outcome.questionId)?.options.find(o => o.id === outcome.from)?.modelId
+    !== set.questions.find(q => q.id === outcome.questionId)?.options.find(o => o.id === outcome.to)?.modelId;
+
+/**
+ * Plan 3.4: when nothing visibly changed (a fallback, or a swap with no model on either side), the drawn question whose
+ * site already shows this guest's answer with a model, stalest first; the camera visits it and the card says the guest's
+ * choice is already here. Undefined after a visible swap, or when no drawn site shows the guest's answer with a model.
+ */
+export function rotationVisit(set: RotationSet, after: RotationState, submission: RotationSubmission, outcome: RotationOutcome): string | undefined {
+  if (swapVisible(set, outcome)) return undefined;
+  const { drawn, answers } = submission;
+  return [...drawn].sort(byStaleness(set, after)).find(id => after.shown[id] === answers[id] && hasModel(set, id, answers[id]));
 }
 
 export function emptyTallies(set: RotationSet): RotationTallies {
@@ -116,18 +138,23 @@ export function crowdShare(tallies: RotationTallies, questionId: string, optionI
 /** Plan 3.3 small-sample copy (provisional until owner confirms the threshold and wording). */
 export const VOICES_GATHERING = 'この問いへの声は、まだ集まり始めたところです';
 
+/** Plan 3.4 (provisional until plan 5.2): nothing visibly changed, and the camera visits a site already showing the guest's answer. */
+export const ALREADY_HERE = 'あなたの選んだ暮らしは、すでにここにあります';
+/** Provisional: nothing visibly changed and no drawn site shows the guest's answer with a model yet (its facility is still to come). */
+export const FACILITY_TO_COME = 'あなたの声は記録されました。この暮らしを形にする施設は、これから街に加わります。';
+
 /** One crowd share as neutral copy, shared by the guest's 住民の声 panel and the city result card; no number below the threshold. */
 export const crowdShareText = (share: CrowdShare) =>
   share.percent === undefined ? VOICES_GATHERING : `同じ暮らしを選んだ住民 ${share.percent}%（${share.total}人中）`;
 
-export type RotationFold ={ state: RotationState; tallies: RotationTallies; outcomes: RotationOutcome[] };
+export type RotationFold = { state: RotationState; tallies: RotationTallies; outcomes: RotationOutcome[] };
 
 /**
  * Rebuilds the city from the run's active proposals in stamp order; Undo, snapshot and reconnect all call this.
  * `onStep` sees each proposal's outcome and the tallies including it, for that proposal's crowd shares.
  */
 export function foldRotation(set: RotationSet, submissions: Iterable<RotationSubmission>,
-  onStep?: (index: number, step: { outcome: RotationOutcome; tallies: RotationTallies }) => void): RotationFold {
+  onStep?: (index: number, step: { outcome: RotationOutcome; visit?: string; tallies: RotationTallies }) => void): RotationFold {
   let state = initialRotation(set), tallies = emptyTallies(set), last = 0;
   const outcomes: RotationOutcome[] = [];
   for (const submission of submissions) {
@@ -136,7 +163,8 @@ export function foldRotation(set: RotationSet, submissions: Iterable<RotationSub
     const step = rotationStep(set, state, submission);
     state = step.state;
     tallies = addTallies(tallies, submission.answers);
-    onStep?.(outcomes.length, { outcome: step.outcome, tallies });
+    const visit = onStep && rotationVisit(set, state, submission, step.outcome);
+    onStep?.(outcomes.length, { outcome: step.outcome, ...(visit ? { visit } : {}), tallies });
     outcomes.push(step.outcome);
   }
   return { state, tallies, outcomes };

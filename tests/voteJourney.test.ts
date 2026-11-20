@@ -76,8 +76,8 @@ function lit(scene: T.Scene) {
 // Rotation runs (option A): the outcome question's big orb flies to its site, the guest's other answers fade at their apex.
 const answers = ['Q01', 'Q03', 'Q05', 'Q07'].map(questionId => ({ questionId, optionId: 'A' }));
 const neutral = '#fff1d6', auto = `#${new T.Color(METER_COLORS.automation).getHexString()}`, nw = changeSites.nw;
-const flight = (outcome: Parameters<typeof rotationFlights>[0], ordinal = 5) => {
-  const { scene, j } = journey(), proposal = { ordinal, answers, rotation: { outcome } }, start = 10;
+const flight = (outcome: Parameters<typeof rotationFlights>[0], ordinal = 5, visit?: string) => {
+  const { scene, j } = journey(), proposal = { ordinal, answers, rotation: { outcome, ...(visit ? { visit } : {}) } }, start = 10;
   j.playRotation(proposal, start);
   const [points, scans, , big] = parts(scene), frames: { t: number; small: number; big: number; scans: number; smallPeak: number }[] = [];
   for (let t = start; t <= start + 5; t += .05) {
@@ -114,6 +114,12 @@ const flight = (outcome: Parameters<typeof rotationFlights>[0], ordinal = 5) => 
   const outcome = { kind: 'fallback', questionId: 'Q01' } as const;
   assert.equal(rotationFlights(outcome, answers)[0].color, neutral);
   const { scene, frames } = flight(outcome);
+  assert.ok(frames.some(f => f.big > 0) && Math.max(...frames.map(f => f.scans)) === 1);
+  assert.deepEqual(lit(scene).map(l => [l.color, l.scale]), [[neutral, .7]]);
+}
+{
+  // Plan 3.4: a swap with no site that visits Q01 lands at NW like a Q01 fallback (the camera's stop), with a neutral lantern.
+  const { scene, frames } = flight({ kind: 'swap', questionId: 'Q05', from: 'A', to: 'B' }, 5, 'Q01');
   assert.ok(frames.some(f => f.big > 0) && Math.max(...frames.map(f => f.scans)) === 1);
   assert.deepEqual(lit(scene).map(l => [l.color, l.scale]), [[neutral, .7]]);
 }

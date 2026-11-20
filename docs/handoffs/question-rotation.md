@@ -9,6 +9,8 @@
 
 ## Session Git state
 
+- Session starting branch and HEAD（2026-11-20，保底三層）：`feat/question-rotation` `f5fef8cc`，fetch 後與遠端同步；保留未追蹤 `Dev_QA.md`。
+
 - Session starting branch and HEAD（2026-11-19，Q08-C 道路與入口）：`feat/question-rotation` `00fc83f9`，fetch 後與遠端同步，已包含 `origin/main` `df59a7de`（領先 34 個 commit）。保留未追蹤的 `Dev_QA.md`。
 
 - Session starting branch and HEAD（2026-11-19，Q06-B 道路與入口）為 `feat/question-rotation` `e79f883a`，fetch 後與遠端同步。起點包含 `origin/main` `df59a7de`，分支領先 33 個 commit。未追蹤 `Dev_QA.md` 保留。
@@ -127,6 +129,8 @@
 
 - Q08-C 道路與入口（2026-11-19）：道路 ④ 現有導光過街位接陶板支路，地軌前共用平台接兩條地軌，3 m 中央步道穿過綠籬接到大堂基座。共享庭園 3 從 (−110, 250) 移到 (−90, 230) 並順道路 ④ 轉向，騰出地軌與鋪面，庭園位置的重疊樹叢移出渲染。A／B 空置保留固定道路及導光，樓身位置留草地。獨立預覽與 version4 共用街道改動。變化總覽更新 Q08 三態同鏡位日夜落定圖。見 [VALIDATION](../VALIDATION.md)。證據在 `~/city2127-evidence/question-rotation/q08-access/`。
 
+- 保底三層（2026-11-20，計劃 3.4）：`survey/src/shared/rotation.ts` 新 `hasModel`、`swapVisible`、`rotationVisit`；保底題優先選有模型的抽中題；`foldRotation` 每步交出 `visit`，`ProposalRotation` 加可選 `visit`（root 驗證必須是訪客自己的題）。城市：`rotationLayout.ROTATION_VISITS`（Q01 A `nw:focal-low`、B／C `nw:focal`，Q02 三鏡，Q03 A、Q06 B、Q08 C）及 `rotationVisit`；`main.ts` 探訪優先飛該鏡；`voteJourney.journeyOutcome` 令光點及燈籠落在探訪地塊（中性 0.7 倍）；`residentResult` 新 `already-here` 卡及「只記錄」句；guest 面板改看 `visit`。測試：`survey/tests/rotation.test.ts`（保底選有模型的題、無模型時不探訪、Q04 換探訪 Q01、空置換空置無可探訪、可見換不探訪、fold 交出 visit）、`rotationLayout`（卡、鏡、Q01 −1 用 low 鏡、旅程落點、只記錄句）、`voteJourney`（探訪落 NW）、`rotationPipeline`（visit 驗證）。`rotationSim.ts` 加一行真題組報告：可見 45.2%、探訪 24.6%、只記錄 30.2%。另以 scratch 腳本（不入 Git）比較規則：9 題＋「優先可見換」65.8／16.5／17.7%；只上線已接 5 題 79.4／14.4／6.2%；5 題＋優先可見 95.3／4.7／0.0%，交 owner 決定。root 及 `survey/` `npm test`／`npm run build`、`git diff --check` 通過。瀏覽器：fresh `survey-rotation`＋`root`，`tests/rotationFullFlow.browser.mjs`（第 5 步新斷言卡文）一次通過，四頁 page error 0；保底抽 Q03–Q06，探訪 Q03，鏡頭飛 `q03:housing`，卡為「…すでにここにあります。」加少人數比例句。證據 `~/city2127-evidence/question-rotation/fallback-tiers/full-flow/`（`05-fallback.png`）。FPS、iPad、夜景、Q01／Q02 探訪實拍未測。
+
 ## Known issues and blockers
 
 - 已決（owner 2026-11-19）：住宅 U 自城市撤走，蛋艙塔放其舊址，位置及近鏡接受；Q06 A／C 空置為塔淡出留草地，A↔C 留 hero；version4 中塔為固定背景（因此 version4 外觀改變：住宅 U 不見、多了蛋艙塔，屬 owner 決定）。Q06 三句文案暫定（待 5.2）；旅程用環境色為自定；淡出中段暖色樓板較亮（共用 `fadeFinishes`），owner 2026-11-19 看過日夜實拍（`q06-pod/sheet-*.jpg`，含中段發光）後「Accept」。A、C 新模型由 owner 日後另做，屆時在 `setQ06` 加各自模型的 LotFade（同一地塊），`q06Tower` 及 `Q06_RESULTS` 改為模型文案。後續已接道路 ③ 支路及北、東入口平台。塔淡出時樓身位置仍為草地，固定道路與平台保留。
@@ -151,6 +155,8 @@
 - 審閱第 G 點（城市端預載需收到每次預約抽中的題目，加入 protocol）已列入下一步第 3 點。
 
 ## Next expected step
+
+**現時（2026-11-20，保底三層）：** 已實作，未 push。待 owner：(1) 是否改換模型規則或只讓已接題上線（數字見上）；(2) 「すでにここにあります」及「只記錄」句文案；(3) 每個模型的活動動畫。完整流程已通過；下一步按 owner 對 (1) 的決定改規則或題組，並補 Q01／Q02 探訪日夜實拍。
 
 **現時（2026-11-19，Q08-C 道路與入口）：** 待 owner 由日夜俯視及入口近鏡驗收。Q08 A／B 仍等各自模型，接入時共用地塊支路及入口平台。
 

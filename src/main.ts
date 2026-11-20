@@ -27,7 +27,7 @@ import { build2127 } from './odaiba2127';
 import { bayWater, waterLights } from './bayWater';
 import { residentIdentity, scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
-import { q02Swap, q03Shot, q03Swap, q06Shot, q06Swap, q08Shot, q08Swap, Q02_SHOTS, rotationLayout } from './rotationLayout';
+import { q02Swap, q03Shot, q03Swap, q06Shot, q06Swap, q08Shot, q08Swap, Q02_SHOTS, rotationLayout, rotationVisit } from './rotationLayout';
 import { LotRuntime } from './lotRuntime';
 import { bayFlowerShown } from './bayFlower';
 import { createCityChangeManager } from './createCityChangeManager';
@@ -329,8 +329,9 @@ try {
         // DEV demo: the headline shot is held BEAT_SECONDS longer after the building change, so 湊's visit fits before the return to hero.
         const visit=residentDemo&&changes[0]?.socketId==='nw'&&['nw:focal','nw:focal-low'].includes(headlineShot(changes[0])??'');
         // Q02, Q03, Q06 and Q08 swaps have no Meter carrier: the camera flies to the lot of the model it shows (src/rotationLayout.ts Q02_SHOTS, q03Shot, q06Shot, q08Shot).
-        const q02=q02Swap(latest),q03=q03Swap(latest),q06=q06Swap(latest),q08=q08Swap(latest);
-        const shot=(q02?headlineCamera?.playShot(Q02_SHOTS[q02.to],now,displayMs):q03?headlineCamera?.playShot(q03Shot(q03),now,displayMs):q06?headlineCamera?.playShot(q06Shot(q06),now,displayMs):q08?headlineCamera?.playShot(q08Shot(q08),now,displayMs):headlineCamera?.play(changes,now,visit?(shotTimeline(displayMs).changeEnd+BEAT_SECONDS)*1000:displayMs))??null;
+        // Plan 3.4: when nothing visible changed, it visits a site already showing the guest's answer (rotationVisit) instead.
+        const q02=q02Swap(latest),q03=q03Swap(latest),q06=q06Swap(latest),q08=q08Swap(latest),seen=rotationVisit(latest);
+        const shot=(seen?headlineCamera?.playShot(seen.shot,now,displayMs):q02?headlineCamera?.playShot(Q02_SHOTS[q02.to],now,displayMs):q03?headlineCamera?.playShot(q03Shot(q03),now,displayMs):q06?headlineCamera?.playShot(q06Shot(q06),now,displayMs):q08?headlineCamera?.playShot(q08Shot(q08),now,displayMs):headlineCamera?.play(changes,now,visit?(shotTimeline(displayMs).changeEnd+BEAT_SECONDS)*1000:displayMs))??null;
         narration?.play(shot,changes[0],now,displayMs);
         if(shot&&voiceLabel){const t=shotTimeline(displayMs);voiceLabel.show(residentIdentity(latest),SHOTS[shot].target,now+t.hold,now+(visit?t.changeEnd:t.flyOut));}
         if(visit&&(shot==='nw:focal'||shot==='nw:focal-low'))residentDemo!.start(now+shotTimeline(displayMs).changeEnd,layout.bands.nw,prevNw);
