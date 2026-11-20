@@ -134,9 +134,6 @@ export const bayChannels: readonly (readonly P3[])[] = [
   [[1530,-1,860],[1370,-.6,880],[1200,-.6,910],[1060,-.6,940]],
   [[860,-3.5,1820],[700,-3.2,1860],[520,-2.4,1860],[380,-1.8,1830]],
 ];
-// Sweep: a lit transit skyway descending from the Grand Nikko ring (92 m) west past Hilton and out of the frame's lower right,
-// above the Yurikamome deck and clear of Nikko and Hilton footprints; a short white train shuttles on it (mobility).
-export const sweepway: readonly P3[] = [[-290,92,265],[-345,74,250],[-400,56,205],[-440,44,152],[-475,34,92],[-520,28,40],[-580,24,-10]];
 // Sky Ring (空の環, src/skyRing.ts): a 700 m truss ring whose deck top sits at `deck` m, a shared port above the regional air tier; the district
 // loop follows its plan below. Above the hero eye (~148 m) so it arcs across the sky; at the tier's own 160–170 m it read as a flat bar at eye level.
 export const SKY_RING = {x:-40,z:-40,rx:350,rz:350,deck:250} as const;

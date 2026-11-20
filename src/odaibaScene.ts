@@ -162,15 +162,9 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
       // World metres keep the authored terrain patches at one consistent texture scale.
       material.onBeforeCompile=shader=>{
         shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\ngrassUv=(modelMatrix*vec4(transformed,1.)).xz/32.;');
-        // Inside the district the lawns carry meandering gravel walks along a field's contours. (Stage 3: the swale ponds and corridor channel
-        // that were drawn here are gone; the designed water is streetKit's waterGarden, cut out of the ground by openBay.)
-        shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <map_fragment>',`diffuseColor.rgb *= mix(texture2D(map,grassUv).rgb,texture2D(map,grassUv*.19).rgb,.35);
-          vec2 w=grassUv*32.;
-          float inside=step(${DISTRICT.minX.toFixed(1)},w.x)*step(w.x,${DISTRICT.maxX.toFixed(1)})*step(${DISTRICT.minZ.toFixed(1)},w.y)*step(w.y,${DISTRICT.maxZ.toFixed(1)});
-          // Q03-A: suppress the diagonal gravel trace between the two aprons.
-          float drawerWalkCut=step(-161.,w.x)*step(w.x,-58.)*step(abs(w.y-(52.+.35*(w.x+60.))),5.);
-          float walk=inside*(1.-drawerWalkCut)*(1.-smoothstep(.06,.1,abs(sin(w.x*.037+cos(w.y*.029)*1.6)+sin(w.y*.033+w.x*.011))));
-          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.84,.81,.74),walk); // r8 pass 3: pale ivory walks, crisper engineered edge than tan gravel`);
+        // Road fix (owner 2026-11-20): the sine-field gravel walks drawn here are gone; they ran under buildings and flared into stars at
+        // their saddles. (Stage 3 had already removed the swale ponds; the designed water is streetKit's waterGarden, cut out by openBay.)
+        shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <map_fragment>',`diffuseColor.rgb *= mix(texture2D(map,grassUv).rgb,texture2D(map,grassUv*.19).rgb,.35);`);
       };
       material.customProgramCacheKey=()=>'coastal-grass';
     }
