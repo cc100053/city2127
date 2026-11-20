@@ -3,7 +3,7 @@
 // Runs on the loaded environment before anything samples its ground (planting, doorways, paving checks).
 import * as T from 'three';
 import { DISTRICT } from './layout.ts';
-import { inRect, rect } from './megaFootprints.ts';
+import { inMega, inRect, rect } from './megaFootprints.ts';
 
 /** A landmark's footprint as the layout gives it (Blender bounds: x, y north). */
 type Landmark = { id: string; boundsBlender: readonly (readonly number[])[] };
@@ -78,6 +78,16 @@ function outside(poly: T.Vector3[], sides: ((v: T.Vector3) => number)[]) {
   return pieces;
 }
 
+/** Drops the flat Yurikamome refinement strips between 3 and 12 m whose centre lies within 30 m of a megastructure footprint. */
+function stationWalk(mesh: T.Mesh) {
+  const g = mesh.geometry as T.BufferGeometry, p = g.attributes.position, index = g.index, n = index?.count ?? p.count, at = (i: number) => index ? index.getX(i) : i, kept: number[] = [];
+  for (let i = 0; i < n; i += 3) {
+    const tri = [0, 1, 2].map(j => new T.Vector3().fromBufferAttribute(p, at(i + j)).applyMatrix4(mesh.matrixWorld));
+    const ys = tri.map(v => v.y), flat = Math.max(...ys) - Math.min(...ys) < .05 && ys[0] > 3 && ys[0] < 12;
+    if (!(flat && inMega((tri[0].x + tri[1].x + tri[2].x) / 3, (tri[0].z + tri[1].z + tri[2].z) / 3, 30))) kept.push(at(i), at(i + 1), at(i + 2));
+  }
+  if (kept.length !== n) g.setIndex(kept);
+}
 /** Records the 4 m cells whose centres lie in triangle `t` and inside the district. */
 function mark(t: T.Vector3[]) {
   const [a, b, c] = t, side = (p: T.Vector3, q: T.Vector3, x: number, z: number) => (q.x - p.x) * (z - p.z) - (q.z - p.z) * (x - p.x);
@@ -111,6 +121,9 @@ export function repairRoads(environment: T.Object3D, landmarks: readonly Landmar
     if (!(object instanceof T.Mesh)) return;
     const farmApron = object.name === 'SIDEWALK_NETWORK' || object.name === 'ROAD_SECONDARY';
     const flat = /^(ROAD_(MAJOR|SECONDARY)|MAJOR_ROAD_MARKINGS|SIDEWALK_NETWORK)$/.test(object.name), furniture = /^(PHASE03D_GUARDRAILS|STREETLIGHT_INSTANCES|PUBLIC_LIGHTING)$/.test(object.name);
+    // The station's 8 m walkway strip ran out of the hull's sides to nothing once the hull stood over it (owner 2026-11-20): flat Yurikamome
+    // detail between 3 and 12 m near a megastructure goes; the 14.2 m deck and the station platforms stay.
+    if (object.name === 'YURIKAMOME_PHASE03C_REFINEMENT_Mesh') { stationWalk(object); return; }
     const slab = /^(BUILDING_PADS|PHASE03C_PLAZA|PRIMARY_PLAZA_ACCENTS|PHASE03C_SERVICE_AREA|SERVICE_BAY_MARKINGS)$/.test(object.name), bridge = object.name === 'PUBLIC_LINK_BRIDGES';
     if (!flat && !furniture && !slab && !bridge) return;
     const g = object.geometry as T.BufferGeometry, p = g.attributes.position, index = g.index, n = index?.count ?? p.count, at = (i: number) => index ? index.getX(i) : i;
