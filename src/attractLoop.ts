@@ -6,7 +6,7 @@ import { HERO_TARGET, heroSettledCamera } from './heroCamera.ts';
 // result; no site tour) and a 次は、あなたの声 call to action invites the next guest. Any survey event or input stops it
 // at once; the camera code that owns the event (headline flight, snapshot, explore) then takes the camera from wherever it is.
 
-export const IDLE_SECONDS = 90;
+export const IDLE_SECONDS = 10; // owner 2026-11-20 (was 90)
 export const LOOP_SECONDS = 60;
 /** One loop: drift, then 声の灯 (today's proposals as lights, Step B; until then the drift continues), then the call to action. */
 export const SEGMENTS = { drift: [0, 25], voices: [25, 50], cta: [50, 60] } as const;

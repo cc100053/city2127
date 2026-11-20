@@ -21,7 +21,7 @@
 冇觀眾投票嘅空檔，大屏幕唔好死寂：慢慢漂嘅鏡頭、「今日大家嘅聲音」、同埋邀請下一位觀眾嘅「次は、あなたの声。」。
 
 - 只喺展覽畫面（`?survey`）播；standalone 唔播；`?attract=0` 關閉。
-- 連續 `IDLE_SECONDS`（90 s）冇 survey 事件（結果、snapshot、reset、Undo、reconnect、explore）、冇 headline／explore 鏡頭、冇 pointerdown／wheel／keydown 先開始。
+- 連續 `IDLE_SECONDS`（10 s，owner 2026-11-20 由 90 s 改）冇 survey 事件（結果、snapshot、reset、Undo、reconnect、explore）、冇 headline／explore 鏡頭、冇 pointerdown／wheel／keydown 先開始。
 - 任何上述事件即刻停止：鏡頭留喺當刻位置，交返俾負責嗰個事件嘅鏡頭代碼（live 結果由 `HeadlineCamera` 喺 journey 期間由當前位置順返 hero；snapshot 等即時 hero；staff 輸入就由 OrbitControls 由當前位置接手）。
 - Reduced motion：鏡頭唔郁，只顯示呼籲字。
 - 一個循環 60 s：drift 0–25 s → 声の灯 25–50 s（Step B；未做之前繼續 drift）→ 呼籲 50–60 s（0.8 s 淡入淡出）。
@@ -38,7 +38,7 @@
 
 Step A：鏡頭以 settled hero（polar 1.42）為中心，yaw ±12°（週期 150 s，峰值約 0.5°/s），polar 只向上呼吸 0.06 rad（週期 47 s），距離不變；開始時用 4 s 由當刻姿勢 blend 入 drift 路徑，target 同時回 hero target。呼籲卡底部中間：「次は、あなたの声。」、「これまでに N の声が、この街を形づくりました。」（N=guestCount，0 時隱藏）、「iPad で、2127年の台場の暮らしを選んでください。」。
 
-DEV 預覽：`/?meters=&attract&attractIdle=5`（冇 server；N 用 standalone 數）。
+DEV 預覽：`/?meters=&attract`（`&attractIdle=5` 可再縮短）（冇 server；N 用 standalone 數）。
 
 ## Actual validation results
 
