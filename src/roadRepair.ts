@@ -19,10 +19,12 @@ export const BACKDROP_STREETS: readonly (readonly [readonly [number, number], re
   [[-262, 372], [196.8, 1069], 14], // the walk past the rectenna farm (its gravel meets it) south to the plate's end
 ];
 /** The surveyed ~90 m band ④ leaves by is a bundle of lanes that each stop somewhere else, so each of ④'s ends runs on instead as a plain
- * 24 m street (18 m carriageway, 3 m footways) along the band's axis to the shore: [exit (x, z), unit heading, length]. */
-export const BACKDROP_RUNS: readonly (readonly [readonly [number, number], readonly [number, number], number])[] = [
-  [[265, -27], [.813, -.583], 470],  // ④ east
-  [[-285, 322.4], [-.729, .685], 400], // ④ south-west, to the revetment
+ * 24 m street (18 m carriageway, 3 m footways) along the band's axis, ending in a turning circle short of the plate's edge; a short link joins
+ * the kept farm walk to the south-west run where the band used to. [exit (x, z), unit heading, length, half carriageway, footway, circle]. */
+export const BACKDROP_RUNS: readonly (readonly [readonly [number, number], readonly [number, number], number, number, number, boolean])[] = [
+  [[265, -27], [.813, -.583], 460, 9, 3, true],  // ④ east
+  [[-285, 322.4], [-.729, .685], 265, 9, 3, true], // ④ south-west, stopping short of the context blocks that stand 280 m out
+  [[-262, 362], [-.6, -.8], 40, 4, 3, false], // the farm walk's north end onto the south-west run
 ];
 const backdropSides = BACKDROP_STREETS.map(([[ax, az], [bx, bz], half]) => {
   const length = Math.hypot(bx - ax, bz - az), ux = (bx - ax) / length, uz = (bz - az) / length;
@@ -161,8 +163,16 @@ export function repairRoads(environment: T.Object3D, landmarks: readonly Landmar
     object.geometry = next; g.dispose();
   });
   const road = environment.getObjectByName('ROAD_MAJOR'), walk = environment.getObjectByName('SIDEWALK_NETWORK');
-  if (road instanceof T.Mesh && walk instanceof T.Mesh) for (const [from, heading, length] of BACKDROP_RUNS) {
-    const carriageway = new T.Mesh(strip(from, heading, length, 9, -9, .02), road.material), footways = [9, -12].map(left => new T.Mesh(strip(from, heading, length, left + 3, left, .14), walk.material));
-    for (const mesh of [carriageway, ...footways]) { mesh.name = mesh === carriageway ? 'BACKDROP_RUN' : 'BACKDROP_RUN_FOOTWAY'; mesh.receiveShadow = true; environment.add(mesh); }
+  if (road instanceof T.Mesh && walk instanceof T.Mesh) for (const [from, heading, length, half, footway, circle] of BACKDROP_RUNS) {
+    const carriageway = [new T.Mesh(strip(from, heading, length, half, -half, .02), road.material)];
+    const footways = [half, -half - footway].map(left => new T.Mesh(strip(from, heading, length, left + footway, left, .14), walk.material));
+    if (circle) { // turning circle at the far end: carriageway disc, footway ring
+      const [x, z] = [from[0] + heading[0] * length, from[1] + heading[1] * length], r = half + footway + 3;
+      const disc = new T.Mesh(new T.CircleGeometry(r - footway, 40).rotateX(-Math.PI / 2).translate(x, .02, z), road.material);
+      const ring = new T.Mesh(new T.RingGeometry(r - footway, r, 40).rotateX(-Math.PI / 2).translate(x, .14, z), walk.material);
+      carriageway.push(disc); footways.push(ring);
+    }
+    for (const mesh of carriageway) { mesh.name = 'BACKDROP_RUN'; mesh.receiveShadow = true; environment.add(mesh); }
+    for (const mesh of footways) { mesh.name = 'BACKDROP_RUN_FOOTWAY'; mesh.receiveShadow = true; environment.add(mesh); }
   }
 }
