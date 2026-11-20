@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS（實作及雲端檢查完成，待 owner 目視驗收）
 - Branch: `claude/project-thread-v54ay0`
 - Base commit: 04458f1b087d2e08e94d2ead2ceb4f246bdf935b（main，PR #8 merge 後）
-- Last verified commit: 見 PR（本文件與程式同一 commit）
+- Last verified commit: 626dfe49（PR #9）
 - Remote availability: `origin/claude/project-thread-v54ay0`
 
 ## Session Git state
