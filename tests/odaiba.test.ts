@@ -186,7 +186,22 @@ const streetKit = streetNetwork(environment);
       assert.ok(!(flat ? any && !(o.name === 'SIDEWALK_NETWORK' && footpath(cx, cz)) : inside(cx, cz)), `${o.name} left inside the district near ${cx.toFixed(0)},${cz.toFixed(0)}`);
     }
   });
-  for (const [x, z] of [[-290, 340], [302, -57]]) assert.ok(paved(x, z, /^ROAD_MAJOR$/), `backdrop band lost its road at ${x},${z}`);
+  // Road fix: surveyed slabs stay inside the district only under a built landmark, plazas and yards are gone beyond it, and no old link bridge is left.
+  const underBuilt = (x: number, z: number) => built.some(({ boundsBlender: [min, max] }: { boundsBlender: number[][] }) => x >= min[0] - 2.01 && x <= max[0] + 2.01 && -z >= min[1] - 2.01 && -z <= max[1] + 2.01);
+  environment.traverse(o => {
+    if (!(o instanceof Mesh) || !/^(BUILDING_PADS|PHASE03C_PLAZA|PRIMARY_PLAZA_ACCENTS|PHASE03C_SERVICE_AREA|SERVICE_BAY_MARKINGS|PUBLIC_LINK_BRIDGES)$/.test(o.name)) return;
+    const p = o.geometry.attributes.position, index = o.geometry.index, n = index?.count ?? p.count;
+    for (let i = 0; i < n; i += 3) {
+      let cx = 0, cz = 0;
+      for (let j = 0; j < 3; j++) { v.fromBufferAttribute(p, index ? index.getX(i + j) : i + j).applyMatrix4(o.matrixWorld); cx += v.x / 3; cz += v.z / 3; }
+      const inDistrictNow = inside(cx, cz), kept = o.name === 'PUBLIC_LINK_BRIDGES' ? !inDistrictNow : inDistrictNow ? underBuilt(cx, cz) : o.name === 'BUILDING_PADS';
+      assert.ok(kept, `${o.name} slab left near ${cx.toFixed(0)},${cz.toFixed(0)}`);
+    }
+  });
+  // Road fix B1-a: beyond the edge ④ runs on as a plain street along the old band (the band's own lanes are gone); the U's avenue and the farm walk keep their surveyed road.
+  for (const [x, z] of [[-290, 340], [302, -57], [-460, 487], [590, -260], [-274, 346]]) assert.ok(paved(x, z, /^BACKDROP_RUN/), `④ does not run on beyond the edge at ${x},${z}`);
+  for (const [x, z] of [[290, -258], [-200, 458]]) assert.ok(paved(x, z, /^(ROAD_SECONDARY|SIDEWALK_NETWORK)$/), `kept backdrop street lost at ${x},${z}`);
+  for (const [x, z] of [[420, -110], [-380, 500], [400, 400]]) assert.ok(!paved(x, z, /^(ROAD_|SIDEWALK_NETWORK$|MAJOR_ROAD_MARKINGS$)/), `old backdrop street left at ${x},${z}`);
   for (const [x, z] of [[-25, 139], [98, 54], [208, 2]]) assert.ok(onFormerStreet(x, z) && !paved(x, z, /^ROAD_/), `old band ground not recorded at ${x},${z}`);
   const accessSurface = (x: number, z: number, name: string) =>
     new Raycaster(new Vector3(x, 15, z), new Vector3(0, -1, 0))
@@ -462,7 +477,7 @@ for (const [bayIndex, bay] of serviceDistrict.bays.entries()) {
     assert.ok(foot && openGround.test(foot.object.name), `service pavilion foot on ${foot?.object.name}`);
   }
 }
-for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
+for (const route of [actorPaths.guideway, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
   const p = route.getPointAt(i / 200);
   for (const dx of [-3, 0, 3]) for (const dz of [-3, 0, 3]) {
     ray.set(p.clone().add(new Vector3(dx, 3, dz)), down);
@@ -559,7 +574,7 @@ for (const se of [-3, 0, 3]) {
   // Ends also show their pairings: high with forest crowns and drone docks, low with solar pods.
   concentration.setTarget(rungs({ se, nw: se === 3 ? 3 : 0, ne: se }), 0, true);
   concentration.root.updateMatrixWorld(true);
-  for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
+  for (const route of [actorPaths.guideway, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
     const p = route.getPointAt(i / 200);
     for (const dx of [-3, 0, 3]) for (const dz of [-3, 0, 3]) {
       ray.set(p.clone().add(new Vector3(dx, 3, dz)), down);
@@ -594,7 +609,7 @@ for (const sw of [-3, 3]) {
   // Sharing high also shows its high pairings (kiosks, orchards) in the route / site-visibility checks.
   sharingDistrict.setTarget(rungs({ sw, nw: sw === 3 ? 3 : 0, ne: sw === 3 ? 3 : 0 }), 0, true);
   sharingDistrict.root.updateMatrixWorld(true);
-  for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
+  for (const route of [actorPaths.guideway, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
     const p = route.getPointAt(i / 200);
     ray.set(p.clone().add(new Vector3(0, 3, 0)), down);
     assert.equal(ray.intersectObject(sharingDistrict.root, true).length, 0, `sharing ${sw} court blocks a pod/walker route`);
@@ -635,7 +650,7 @@ console.log(`Odaiba: ${sharingDistrict.courts.length} sharing courts stand on op
   const m = new Matrix4(), c = new Vector3(), q = new Quaternion(), sc = new Vector3();
   for (const o of city.children.filter(o => o instanceof InstancedMesh && /^(surveyed-coastal-trunks|grove-terraces)$/.test(o.name)) as InstancedMesh[])
     for (let i = 0; i < o.count; i++) { o.getMatrixAt(i, m); m.decompose(c, q, sc); if (sc.x > 0) assert.ok(!inWater(c.x, c.z, o.name === 'grove-terraces' ? Math.max(sc.x, sc.z) + 1 : 1), `${o.name} ${i} at ${c.x.toFixed(0)},${c.z.toFixed(0)} in the water`); }
-  for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades, ...actorPaths.decks, ...actorPaths.streets]) for (const p of route.getSpacedPoints(800))
+  for (const route of [actorPaths.guideway, ...actorPaths.promenades, ...actorPaths.decks, ...actorPaths.streets]) for (const p of route.getSpacedPoints(800))
     assert.ok(p.y > 6 || !inWater(p.x, p.z, 1), `a route crosses the water at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
 }
 
@@ -649,7 +664,7 @@ for (const [i, px] of courtVisibility.entries()) if (!HERO_HIDDEN_COURTS.include
 console.log(`Odaiba: sharing courts show ${courtVisibility.map(px => px.toFixed(0)).join(' / ')} px of ground in the hero frame.`);
 
 if (process.env.SCAN_COURTS) {
-  const R = Number(process.env.SCAN_COURTS), routePoints = [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades].flatMap(r => r.getSpacedPoints(400));
+  const R = Number(process.env.SCAN_COURTS), routePoints = [actorPaths.guideway, ...actorPaths.promenades].flatMap(r => r.getSpacedPoints(400));
   const out: [number, string][] = [];
   for (let x = DISTRICT.minX; x <= DISTRICT.maxX; x += 10) for (let z = DISTRICT.minZ; z <= DISTRICT.maxZ; z += 10) {
     if (concentration.towers.some(t => Math.hypot(t.x - x, t.z - z) < R + 28) || concentration.pods.some(p => Math.hypot(p.x - x, p.z - z) < R + 16)) continue;
@@ -678,7 +693,7 @@ if (process.env.SCAN_LOT) {
   ];
   const discs: [string, number, number, number][] = [...concentration.towers.map(t => ['tower', t.x, t.z, 28] as [string, number, number, number]),
     ...concentration.pods.map(p => ['pod', p.x, p.z, 16] as [string, number, number, number]), ...serviceDistrict.bays.map(b => ['bay', b.x, b.z, 34] as [string, number, number, number])];
-  const routePoints = [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades, ...actorPaths.streets, ...actorPaths.decks].flatMap(r => r.getSpacedPoints(600));
+  const routePoints = [actorPaths.guideway, ...actorPaths.promenades, ...actorPaths.streets, ...actorPaths.decks].flatMap(r => r.getSpacedPoints(600));
   const samples: [number, number][] = [];
   for (let u = -hw; u <= hw + .1; u += w / Math.ceil(w / 12)) for (let v = -hd; v <= hd + .1; v += d / Math.ceil(d / 12)) samples.push([u, v]);
   const problems = (x: number, z: number, all: boolean) => {

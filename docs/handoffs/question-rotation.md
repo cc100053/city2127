@@ -133,6 +133,8 @@
 
 - 構想地全息（2026-11-20，owner「make this with less effort… one space only」）：分支 `claude/project-thread-je3092`，由 `feat/question-rotation` `897c80d5` 開出；與 `origin/main` 合併有 6 檔衝突（`coastalCanopy`、`districtMeters`、`main`、`streetKit`、`voteJourney`、`odaiba.test`：南岸 SW 接駁兩邊各自實作），已放棄合併，道路修正未在此分支。`layout.CONCEPT_LOT` (−135, −175)，`SCAN_LOT=20,14,-135,-175` CLEAR（hero 1076 px，本分支）；新 `src/conceptHologram.ts`（格架線條、Fresnel 外殼不用、常規混合深青色 `#5fdcff`、深底看板「構想中」＋選項原文、3 秒由地面升起、飛回時淡出；加入 GTAO 排除列表）；`headlineCamera` 新 `concept:lot`（東北方 (−70, 46, −235)，避開地塊西側柱）；`rotationLayout.conceptVisit`（無探訪且無模型出入：Q01／Q02 換、Q03 住宅出入、Q06 塔出入、Q08 棚出入以外）；`main.ts` 實時結果飛該鏡並顯示全息，snapshot／重設／version4 隱藏；`surveyAtmosphere` 卡 `concept`。測試：`tests/conceptHologram.test.ts`（新，入 `npm test`：格架在包絡內、升起及淡出時序、鏡頭看向地塊）、`rotationLayout`（概念層判斷及卡文；Q02／Q03／Q06 保底及空置換空置原「維持／空き地のまま」斷言改為構想地）、`headlineCamera` 鏡頭數 30。root `npm test`、`npm run build`、`git diff --check` 通過；survey 未改。瀏覽器：fresh `survey-rotation`＋root，capture 載入器 1600 × 900，Q04 A→B→C→A 及 B，日景 `hour=12` 與夜景 `hour=21`，結果後 5.5／7／10／12.5 秒，page error 0。證據 `~/city2127-evidence/question-rotation/concept-lot/`（`sheet.jpg`；`guest.mjs`、`liveCapture.mjs` 同目錄）。未做：guest「住民の声」面板（照舊無句）、旅程光點落構想地、FPS、iPad、A／B 雙站。
 
+- 合併 main（2026-11-20，owner「suggest how to merge main」後選 A）：`claude/project-thread-je3092` merge `origin/main` `81c6d4b1`。南岸 SW：main 的南岸接駁（`southShoreSpur`、`SOUTH_SHORE`、北庭園移到 (−100, 245)）與本分支 Q08-C 棚前接駁重疊，按 owner 選擇保留本分支（`eventShelfAccess`、`EVENT_SHELF_NEIGHBOR_COURT`），`streetKit`／`coastalCanopy`／`districtMeters` 取本分支，`layout` 刪 `SOUTH_SHORE`，`odaibaScene` 不再把支路傳入植樹；`tests/odaiba.test.ts` 取本分支再套 main 四個道路修正（`10ef00dc`、`8b487e63`、`ba2d6840`、`716edace`）。`main.ts`、`voteJourney.ts` 兩邊保留（待機循環、声の灯回放＋地塊、構想地、輪換旅程；`playRotation` 及 `setRotationLanterns` 亦結束回放）。change-review：本分支已刪的 version4 截圖保持刪除，`index.html` 以 `scripts/changeSheet.ts` 重新生成（Q03／Q06 空置換空置卡改為構想地句）。文件：SPEC、PLAN、本交接取本分支，VALIDATION 兩邊保留並註明南岸檢查已被取代。驗證：root 及 `survey/` `npm test`、`npm run build`，`git diff --check` 通過；`tests/rotationFullFlow.browser.mjs` 一次通過（page error 0，證據 `~/city2127-evidence/question-rotation/main-merge/full-flow/`）；`npm run capture` SW 近鏡日夜、俯視（`main-merge/sw-sheet.jpg`、`sw-plan.png`）只有一條支路接棚前平台。已知缺口：main 的「声の灯」待機回放按 version4 四軸票數畫燈籠，輪換 run 的票數為中性，回放會全是零票燈籠，待跟進。
+
 ## Known issues and blockers
 
 - 已決（owner 2026-11-19）：住宅 U 自城市撤走，蛋艙塔放其舊址，位置及近鏡接受；Q06 A／C 空置為塔淡出留草地，A↔C 留 hero；version4 中塔為固定背景（因此 version4 外觀改變：住宅 U 不見、多了蛋艙塔，屬 owner 決定）。Q06 三句文案暫定（待 5.2）；旅程用環境色為自定；淡出中段暖色樓板較亮（共用 `fadeFinishes`），owner 2026-11-19 看過日夜實拍（`q06-pod/sheet-*.jpg`，含中段發光）後「Accept」。A、C 新模型由 owner 日後另做，屆時在 `setQ06` 加各自模型的 LotFade（同一地塊），`q06Tower` 及 `Q06_RESULTS` 改為模型文案。後續已接道路 ③ 支路及北、東入口平台。塔淡出時樓身位置仍為草地，固定道路與平台保留。
@@ -158,7 +160,9 @@
 
 ## Next expected step
 
-**現時（2026-11-20，構想地全息）：** 已實作並 push 至 `claude/project-thread-je3092`，待 owner 看日夜實拍（`concept-lot/sheet.jpg`）及決定併入 `feat/question-rotation`。全部模型就位後刪除構想地（計劃 3.4 第 3 層）。
+**現時（2026-11-20，合併 main）：** 已合併並 push 至 `claude/project-thread-je3092`；待 owner 看 SW 日夜（`main-merge/sw-sheet.jpg`）及決定是否併入 `feat/question-rotation`／main。下一步：声の灯回放改用輪換燈籠。
+
+**之前（2026-11-20，構想地全息）：** 已實作並 push 至 `claude/project-thread-je3092`，待 owner 看日夜實拍（`concept-lot/sheet.jpg`）及決定併入 `feat/question-rotation`。全部模型就位後刪除構想地（計劃 3.4 第 3 層）。
 
 **之前（2026-11-20，保底三層）：** 已實作，未 push。待 owner：(1) 是否改換模型規則或只讓已接題上線（數字見上）；(2) 「すでにここにあります」及「只記錄」句文案；(3) ~~每個模型的活動動畫~~ owner 2026-11-20 決定不另做，只用模型本身已有的動態；另 owner 會逐步補齊 9 × 3＝27 個模型，換模型規則 3.2 不改。完整流程已通過；下一步按 owner 對 (1) 的決定改規則或題組，並補 Q01／Q02 探訪日夜實拍。
 

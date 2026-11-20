@@ -73,7 +73,7 @@ function intersectsShell(craft: Mesh, transform: Matrix4) {
 }
 // Conservative envelopes cover the remaining active routes against every loaded shell.
 for (const [list, dimensions] of [
-  [[...paths.tracks, paths.sweep], [8, 8, 14]], [paths.promenades, [4, 4, 4]], [paths.streets, [10, 6, 10]],
+  [paths.tracks, [8, 8, 14]], [paths.promenades, [4, 4, 4]], [paths.streets, [10, 6, 10]],
   [[paths.water, paths.ferry, paths.ixBoat, ...paths.channels], [12, 6, 12]],
   [[paths.air, paths.approach, paths.shore, paths.ixApproach, ...paths.sky], [20, 10, 20]], [paths.decks, [4, 4, 4]],
 ] as const) {

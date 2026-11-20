@@ -39,6 +39,8 @@ megaFace.onBeforeCompile = shader => {
 };
 megaFace.customProgramCacheKey = () => 'mega-face';
 const megaJoint = new T.MeshStandardMaterial({ color: '#4b5258', roughness: .6, metalness: .3 });
+/** The dark mouth of the hull's Yurikamome tunnel, faintly lit from inside. */
+const megaPortal = new T.MeshStandardMaterial({ color: '#141b20', emissive: '#30485a', emissiveIntensity: .35, roughness: .8 });
 export const updateMegastructures = (night: number) => { megaSeam.emissiveIntensity = .6 + night * 1.6; roomGlow.value = night; };
 
 type Plant = { position: number[]; scale: number; type: string };
@@ -168,6 +170,16 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
     put(batch, material, new T.ExtrudeGeometry(shape, { depth: h, bevelEnabled: false }).rotateX(-Math.PI / 2), root.clone().multiply(new T.Matrix4().makeTranslation(0, y, 0)));
   };
   const at = (u: number, d: number, y: number) => new T.Matrix4().compose(world(u, d, y), q, new T.Vector3(1, 1, 1));
+  // Road fix A (owner 2026-11-20): both Yurikamome tracks (deck 14.2 m) pass through the hull's end bulkheads, so each end gets a lit tunnel
+  // mouth over them: [end sign, centre d, width] from where the tracks cross u = ±L2 (east d 9.7-15.8, west d 43.7-54.8).
+  const portals = [[1, 12.75, 18], [-1, 49.25, 22]] as const, portalY = [9, 23] as const;
+  const inPortal = (sgn: number, d: number, k: number) => k < 2 && portals.some(([s, c, w]) => s === sgn && Math.abs(d - c) < w / 2 + 1);
+  for (const [sgn, c, w] of portals) {
+    const u = sgn * (L2 + 2.6), h = portalY[1] - portalY[0], y = (portalY[0] + portalY[1]) / 2;
+    put(batch, megaPortal, new T.BoxGeometry(.3, h, w), at(u, c, y));
+    for (const [dy, dd, bh, bw] of [[h / 2, 0, .7, w + 1.4], [-h / 2, 0, .7, w + 1.4], [0, w / 2 + .35, h, .7], [0, -w / 2 - .35, h, .7]])
+      put(batch, megaSeam, new T.BoxGeometry(.9, bh, bw), at(u + sgn * .3, c + dd, y + dy));
+  }
   for (let k = 0; k < steps; k++) {
     const y0 = k * step, f = front(k, 0), u0 = left(k);
     slab(k, y0, 1.2, 1.6, megaSeam); // glowing lip at the foot of each face
@@ -182,8 +194,8 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
     for (const [u, sgn] of [[L2, 1], [u0, -1]] as const) {
       const d0 = dAt(k, u, 0), len = depth - d0, wall = new T.BoxGeometry(2.4, step, len);
       put(batch, megaShell, wall, at(u + sgn * 1.2, d0 + len / 2, y0 + step / 2));
-      for (let d = d0 + 6; d < depth - 2; d += 8) put(batch, megaRib, new T.BoxGeometry(1.1, step - 1, .8), at(u + sgn * 2.6, d, y0 + step / 2));
-      put(batch, megaSeam, new T.BoxGeometry(.6, step, .6), at(u + sgn * 2.6, d0 + 1, y0 + step / 2));
+      for (let d = d0 + 6; d < depth - 2; d += 8) if (!inPortal(sgn, d, k)) put(batch, megaRib, new T.BoxGeometry(1.1, step - 1, .8), at(u + sgn * 2.6, d, y0 + step / 2));
+      if (!inPortal(sgn, d0 + 1, k)) put(batch, megaSeam, new T.BoxGeometry(.6, step, .6), at(u + sgn * 2.6, d0 + 1, y0 + step / 2));
     }
     // planter deck behind the lip: low hedge bands, a tree about every 13 m
     for (const [off, w, mat, h] of [[.75, 1.5, megaShell, .5], [3.6, 2.4, megaPlant, .6], [6.6, 2, megaPlant, .6]] as const) for (let i = 0; i < f.length - 1; i++) // white deck edge, then low hedges

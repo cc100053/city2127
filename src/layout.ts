@@ -153,9 +153,6 @@ export const bayChannels: readonly (readonly P3[])[] = [
   [[1530,-1,860],[1370,-.6,880],[1200,-.6,910],[1060,-.6,940]],
   [[860,-3.5,1820],[700,-3.2,1860],[520,-2.4,1860],[380,-1.8,1830]],
 ];
-// Sweep: a lit transit skyway descending from the Grand Nikko ring (92 m) west past Hilton and out of the frame's lower right,
-// above the Yurikamome deck and clear of Nikko and Hilton footprints; a short white train shuttles on it (mobility).
-export const sweepway: readonly P3[] = [[-290,92,265],[-345,74,250],[-400,56,205],[-440,44,152],[-475,34,92],[-520,28,40],[-580,24,-10]];
 // Sky Ring (空の環, src/skyRing.ts): a 700 m truss ring whose deck top sits at `deck` m, a shared port above the regional air tier; the district
 // loop follows its plan below. Above the hero eye (~148 m) so it arcs across the sky; at the tier's own 160–170 m it read as a flat bar at eye level.
 export const SKY_RING = {x:-40,z:-40,rx:350,rz:350,deck:250} as const;
@@ -228,11 +225,15 @@ export const midDecks: readonly (readonly P3[])[] = [
   [[-86,40,18],[-130,40.5,26],[-180,41,34],[-220,40.5,40],[-250,40,44]],
 ];
 const deckTop = PLAZA.h + .6;
+/** A plaza-local point (metres) at deck height `y`, as a world [x, y, z]. Road fix 2 (owner 2026-11-20): the walks spread `plazaAt` before
+ * the height, giving [x, z, y], so they dived to −176 m and back and showed as stray curved stubs. */
+const deckAt = (lx: number, lz: number, y: number): P3 => { const [x, z] = plazaAt(lx, lz); return [x, y, z]; };
 /** Elevated white walkways (deck top y at the points): ring plinth to the plaza, plaza to the civic core's landing, plaza to the hull apron. Walkers use them. */
 export const plazaWalks: readonly (readonly P3[])[] = [
-  [[72,16,-183],[45,13,-178],[...plazaAt(-140,-6),9],[...plazaAt(-128,-5),deckTop],[...plazaAt(-100,2),deckTop],[...plazaAt(-80,8),deckTop],[...plazaAt(-56,8),deckTop]],
-  [[...plazaAt(-26,-34),deckTop],[...plazaAt(-16,-48),deckTop],[...plazaAt(-14,-60),11],[-34,15,-66],[-50,15.5,-48],[-46,12,-28],[-40,7.5,-14],[-36,3,-2]],
-  [[...plazaAt(56,-8),deckTop],[...plazaAt(68,-10),deckTop],[...plazaAt(92,-10),12],[-176,16,-42],[-200,16,-22],[-210,11,0],[-214,6,14],[-214,3,26]],
+  [[72,16,-183],[45,13,-178],deckAt(-140,-6,9),deckAt(-128,-5,deckTop),deckAt(-100,2,deckTop),deckAt(-80,8,deckTop)],
+  // Under the Yurikamome deck (14.2 m), not through it, without the hairpin; each starts clear of the deck's planters.
+  [deckAt(-16,-48,deckTop),deckAt(-14,-60,8),[-50,8.5,-48],[-46,8,-28],[-40,6,-14],[-36,3,-2]],
+  [deckAt(68,-10,deckTop),deckAt(92,-10,12),[-176,16,-42],[-200,16,-22],[-209,11,0],[-211,6,14],[-211,3,26]],
 ];
 // Planted mid-level decks (r6 pass 3, target v2's tree-lined middle layer; 5.2 m lawn bed down the middle). Raycast-checked against the
 // environment, landmarks and Fuji chassis: clear between their docked ends, and off every survey site's line of sight from the hero pose.

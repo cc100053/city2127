@@ -7,7 +7,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #d6d4c8;padding
 dt{color:#667;font-size:13px;margin-top:8px}dd{margin:0}.frames{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start}
 p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figure{margin:0}figure img{width:100%;display:block;border-radius:4px;background:#ddd}figcaption{font-size:12px;color:#667}</style>
 <h1>變化總覽：9 題 × 3 選項＝27 個建築版本</h1>
-<p>生成：2026-11-19，<code>scripts/changeSheet.ts</code>。題目、選項、模型及地塊來自輪換題組 <code>questions.rotation.v1.json</code>（version 1，草稿：題目文字仍為 SURVEY_V2 暫定稿）；狀態來自 QUESTION_ROTATION_PLAN 第 2 節總表；居民來自 RESIDENT_SCENE_PLAN；日文結果卡及設施卡文案由程式生成。Q01 截圖取自 <code>scripts/closeupSheet.mjs</code>，其餘為輪換實時測試的畫面（含 guest 所見的結果卡）。</p>
+<p>生成：2026-11-20，<code>scripts/changeSheet.ts</code>。題目、選項、模型及地塊來自輪換題組 <code>questions.rotation.v1.json</code>（version 1，草稿：題目文字仍為 SURVEY_V2 暫定稿）；狀態來自 QUESTION_ROTATION_PLAN 第 2 節總表；居民來自 RESIDENT_SCENE_PLAN；日文結果卡及設施卡文案由程式生成。Q01 截圖取自 <code>scripts/closeupSheet.mjs</code>，其餘為輪換實時測試的畫面（含 guest 所見的結果卡）。</p>
 <p class="intro"><b>變化成因（抽題輪換）：</b>題組共 9 題，每題三個選項各對應一個建築版本。每位 guest 按城市狀態抽答其中 4 題，最久未變的題優先。提交時，在答案與城市現況不同的題中選出最久未變的一題，城市直接換成 guest 所選選項的版本；每份提案只換一個版本，其餘答案只計入群眾比例。若抽到的題都已顯示 guest 的選擇，則為保底，城市不變。結果卡附群眾比例，即該題選同一選項的百分比（含本人）；回答未滿 10 票時改用不含數字的句子。未有模型的選項：如地塊已定，地塊顯示空置態；如未定地塊，城市暫無變化。</p>
 <p>現況：27 個版本中，9 個有模型，6 個為空置地塊，12 個未有模型及地塊。</p>
 <table><tr><th>題</th><th>選項</th><th>建築版本（計劃總表）</th><th>類別</th></tr>
@@ -143,7 +143,7 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <div class="cols"><dl>
 <dt>選項</dt><dd><b>「同じ建物の住民と共有する。」</b></dd>
 <dt>建築版本（計劃總表）</dt><dd>集合住宅共用車棚（無）<br><small>模型 ID：無；地塊：<code>drawer-housing</code></small></dd>
-<dt>由 A 換入：結果卡</dt><dd>あなたは、同じ建物の住民と乗り物を分け合う暮らしを選びました。<br>お台場の西側から車が引き出しになる住宅が外れ、環道だけが残る空き地になりました。<br><small>地點標示：車が引き出しになる住宅の跡地</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、同じ建物の住民と乗り物を分け合う暮らしを選びました。<br>お台場の西側の環道沿いは、新しい施設を待つ空き地のままです。<br><small>地點標示：車が引き出しになる住宅の跡地</small></dd>
+<dt>由 A 換入：結果卡</dt><dd>あなたは、同じ建物の住民と乗り物を分け合う暮らしを選びました。<br>お台場の西側から車が引き出しになる住宅が外れ、環道だけが残る空き地になりました。<br><small>地點標示：車が引き出しになる住宅の跡地</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、同じ建物の住民と乗り物を分け合う暮らしを選びました。<br>あなたの声は、この暮らしの構想に加わりました。<br><small>地點標示：アクアシティ北・構想地</small></dd>
 <dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
 </dl><div class="frames"><figure><img loading="lazy" src="rotation/Q03-B-day.jpg" alt="Q03-B「同じ建物の住民と共有する。」，日景"><figcaption>實時結果（日，換入後約 10 秒）</figcaption></figure><figure><img loading="lazy" src="rotation/Q03-B-night.jpg" alt="Q03-B「同じ建物の住民と共有する。」，夜景"><figcaption>實時結果（夜，換入後約 10 秒）</figcaption></figure></div></div>
 </section>
@@ -151,7 +151,7 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <div class="cols"><dl>
 <dt>選項</dt><dd><b>「地域の共有サービスを使う。」</b></dd>
 <dt>建築版本（計劃總表）</dt><dd>地區共享交通樞紐＋公園轉用（無）<br><small>模型 ID：無；地塊：<code>drawer-housing</code></small></dd>
-<dt>由 A 換入：結果卡</dt><dd>あなたは、地域の共有サービスで乗り物を使う暮らしを選びました。<br>お台場の西側から車が引き出しになる住宅が外れ、環道だけが残る空き地になりました。<br><small>地點標示：車が引き出しになる住宅の跡地</small></dd><dt>由 B 換入：結果卡</dt><dd>あなたは、地域の共有サービスで乗り物を使う暮らしを選びました。<br>お台場の西側の環道沿いは、新しい施設を待つ空き地のままです。<br><small>地點標示：車が引き出しになる住宅の跡地</small></dd>
+<dt>由 A 換入：結果卡</dt><dd>あなたは、地域の共有サービスで乗り物を使う暮らしを選びました。<br>お台場の西側から車が引き出しになる住宅が外れ、環道だけが残る空き地になりました。<br><small>地點標示：車が引き出しになる住宅の跡地</small></dd><dt>由 B 換入：結果卡</dt><dd>あなたは、地域の共有サービスで乗り物を使う暮らしを選びました。<br>あなたの声は、この暮らしの構想に加わりました。<br><small>地點標示：アクアシティ北・構想地</small></dd>
 <dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
 </dl><div class="frames"><figure><img loading="lazy" src="rotation/Q03-C-day.jpg" alt="Q03-C「地域の共有サービスを使う。」，日景"><figcaption>實時結果（日，換入後約 10 秒）</figcaption></figure><figure><img loading="lazy" src="rotation/Q03-C-night.jpg" alt="Q03-C「地域の共有サービスを使う。」，夜景"><figcaption>實時結果（夜，換入後約 10 秒）</figcaption></figure></div></div>
 </section></article>
@@ -216,7 +216,7 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <div class="cols"><dl>
 <dt>選項</dt><dd><b>「新しい家具に買い替える。」</b></dd>
 <dt>建築版本（計劃總表）</dt><dd>新素材建築（住宅 M 輕材可參考）<br><small>模型 ID：無；地塊：<code>pod-tower</code></small></dd>
-<dt>由 B 換入：結果卡</dt><dd>あなたは、古くなった物を新しい物に替える暮らしを選びました。<br>お台場の西岸から蛋形ポッドの塔が外れ、芝生の空き地になりました。<br><small>地點標示：蛋形ポッドの塔の跡地</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、古くなった物を新しい物に替える暮らしを選びました。<br>お台場の西岸の芝生は、新しい施設を待つ空き地のままです。<br><small>地點標示：蛋形ポッドの塔の跡地</small></dd>
+<dt>由 B 換入：結果卡</dt><dd>あなたは、古くなった物を新しい物に替える暮らしを選びました。<br>お台場の西岸から蛋形ポッドの塔が外れ、芝生の空き地になりました。<br><small>地點標示：蛋形ポッドの塔の跡地</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、古くなった物を新しい物に替える暮らしを選びました。<br>あなたの声は、この暮らしの構想に加わりました。<br><small>地點標示：アクアシティ北・構想地</small></dd>
 <dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
 </dl><div class="frames"><figure><img loading="lazy" src="rotation/Q06-A-day.jpg" alt="Q06-A「新しい家具に買い替える。」，日景"><figcaption>實時結果（日，換入後約 10 秒）</figcaption></figure><figure><img loading="lazy" src="rotation/Q06-A-night.jpg" alt="Q06-A「新しい家具に買い替える。」，夜景"><figcaption>實時結果（夜，換入後約 10 秒）</figcaption></figure></div></div>
 </section>
@@ -232,7 +232,7 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <div class="cols"><dl>
 <dt>選項</dt><dd><b>「今の家具を誰かに譲り、別の中古品を使う。」</b></dd>
 <dt>建築版本（計劃總表）</dt><dd>模組回收＋重組據點（住宅 U 交換骨架可參考）<br><small>模型 ID：無；地塊：<code>pod-tower</code></small></dd>
-<dt>由 A 換入：結果卡</dt><dd>あなたは、物を誰かに譲り、中古品を使い回す暮らしを選びました。<br>お台場の西岸の芝生は、新しい施設を待つ空き地のままです。<br><small>地點標示：蛋形ポッドの塔の跡地</small></dd><dt>由 B 換入：結果卡</dt><dd>あなたは、物を誰かに譲り、中古品を使い回す暮らしを選びました。<br>お台場の西岸から蛋形ポッドの塔が外れ、芝生の空き地になりました。<br><small>地點標示：蛋形ポッドの塔の跡地</small></dd>
+<dt>由 A 換入：結果卡</dt><dd>あなたは、物を誰かに譲り、中古品を使い回す暮らしを選びました。<br>あなたの声は、この暮らしの構想に加わりました。<br><small>地點標示：アクアシティ北・構想地</small></dd><dt>由 B 換入：結果卡</dt><dd>あなたは、物を誰かに譲り、中古品を使い回す暮らしを選びました。<br>お台場の西岸から蛋形ポッドの塔が外れ、芝生の空き地になりました。<br><small>地點標示：蛋形ポッドの塔の跡地</small></dd>
 <dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
 </dl><div class="frames"><figure><img loading="lazy" src="rotation/Q06-C-day.jpg" alt="Q06-C「今の家具を誰かに譲り、別の中古品を使う。」，日景"><figcaption>實時結果（日，換入後約 10 秒）</figcaption></figure><figure><img loading="lazy" src="rotation/Q06-C-night.jpg" alt="Q06-C「今の家具を誰かに譲り、別の中古品を使う。」，夜景"><figcaption>實時結果（夜，換入後約 10 秒）</figcaption></figure></div></div>
 </section></article>
@@ -270,7 +270,7 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <div class="cols"><dl>
 <dt>選項</dt><dd><b>「いつも同じ用途で使える施設。」</b></dd>
 <dt>建築版本（計劃總表）</dt><dd>固定用途常設館（無）<br><small>模型 ID：無；地塊：<code>sw</code></small></dd>
-<dt>由 B 換入：結果卡</dt><dd>あなたは、いつも同じ用途で使える場所を選びました。<br>お台場の南岸は、新しい施設を待つ空き地のままです。<br><small>地點標示：南岸の空き地</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、いつも同じ用途で使える場所を選びました。<br>お台場の南岸から活動モジュールの棚が外れ、新しい施設を待つ空き地になりました。<br><small>地點標示：南岸の空き地</small></dd>
+<dt>由 B 換入：結果卡</dt><dd>あなたは、いつも同じ用途で使える場所を選びました。<br>あなたの声は、この暮らしの構想に加わりました。<br><small>地點標示：アクアシティ北・構想地</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、いつも同じ用途で使える場所を選びました。<br>お台場の南岸から活動モジュールの棚が外れ、新しい施設を待つ空き地になりました。<br><small>地點標示：南岸の空き地</small></dd>
 <dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
 </dl><div class="frames"><figure><img loading="lazy" src="rotation/Q08-A-day.jpg" alt="Q08-A「いつも同じ用途で使える施設。」，日景"><figcaption>落定地塊（日景）</figcaption></figure><figure><img loading="lazy" src="rotation/Q08-A-night.jpg" alt="Q08-A「いつも同じ用途で使える施設。」，夜景"><figcaption>落定地塊（夜景）</figcaption></figure></div></div>
 </section>
@@ -278,7 +278,7 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <div class="cols"><dl>
 <dt>選項</dt><dd><b>「イベントによって用途が変わる施設。」</b></dd>
 <dt>建築版本（計劃總表）</dt><dd>內部可重組多用途館（無）<br><small>模型 ID：無；地塊：<code>sw</code></small></dd>
-<dt>由 A 換入：結果卡</dt><dd>あなたは、イベントによって用途が変わる場所を選びました。<br>お台場の南岸は、新しい施設を待つ空き地のままです。<br><small>地點標示：南岸の空き地</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、イベントによって用途が変わる場所を選びました。<br>お台場の南岸から活動モジュールの棚が外れ、新しい施設を待つ空き地になりました。<br><small>地點標示：南岸の空き地</small></dd>
+<dt>由 A 換入：結果卡</dt><dd>あなたは、イベントによって用途が変わる場所を選びました。<br>あなたの声は、この暮らしの構想に加わりました。<br><small>地點標示：アクアシティ北・構想地</small></dd><dt>由 C 換入：結果卡</dt><dd>あなたは、イベントによって用途が変わる場所を選びました。<br>お台場の南岸から活動モジュールの棚が外れ、新しい施設を待つ空き地になりました。<br><small>地點標示：南岸の空き地</small></dd>
 <dt>設施卡</dt><dd><small>待計劃 5.3。</small></dd>
 </dl><div class="frames"><figure><img loading="lazy" src="rotation/Q08-B-day.jpg" alt="Q08-B「イベントによって用途が変わる施設。」，日景"><figcaption>落定地塊（日景）</figcaption></figure><figure><img loading="lazy" src="rotation/Q08-B-night.jpg" alt="Q08-B「イベントによって用途が変わる施設。」，夜景"><figcaption>落定地塊（夜景）</figcaption></figure></div></div>
 </section>

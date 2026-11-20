@@ -52,6 +52,8 @@ Root 用固定360px右上卡片（2026-10-04由左移右，避免遮住focal sit
 | `energy-2127` | 獨立能源累計（不作Meter） | 沿岸能源接點；設備分佈於水庭／富士／外海 | 水庭儲能／儲能環／軌道受電設備／核能島可共存 |
 | `functions-2127` | urbanConcentration | フジテレビ東（se） | 分散機能艙 → 混合館 → 垂直集中（2026-11-01 owner 接受 SE 樣板：低亭群＋有蓋步道 → 米白退台中高樓 → 暖光垂直街道塔，Meter 琥珀色日夜可讀；[handoff](handoffs/archive/se-closeup-polish.md)。2026-11-06 +1 塔改用 Blender GLB＋可重用 prop kit，R3 對目標 9/12，owner 叫停並 merge；[handoff](handoffs/se-high-blender.md)） |
 
+お台場南岸的棚前地台經支路接入 ④ 主路，石板步道接到北面及西面兩個共享庭園。接駁適用於 SW 三個狀態。
+
 ### E4 Q3能源生活取捨（2026-10-24使用者確認）
 
 Q3採[能源計劃正式四選項](ENERGY_CITY_PLAN.md#e4正式接入2026-10-24)，另外三題原文／effects不變。每位居民仍一份四題提案；能源不按low/mixed/high排列。四類票獨立累計；每類至少2票且`票數×5≥能源回答總數+4`才出現；水庭／翼在`票數×5≥2×(能源回答總數+4)`時兩庭／大翼，否則一庭／小翼。環／島各最多一組；設備可共存，翼尺寸及同一庭有無互斥。這是展示門檻，並非容量或供電佔比；前四個基準席位不代表未記錄居民。設備門檻不因第一票改變；G2 另外顯示能源整備狀態（已 merge main，視覺及真人辨認仍待驗收）。
@@ -78,7 +80,7 @@ Q02-A「水の棚田」（舊變電所跨上四層抽水蓄能水池）於 2026-
 - **敘事原則改變：** 直接換模型代表一位訪客的答案決定他看到的那一個變化，「眾人之一」改由群眾比例表達。Owner 已接受。新題組上線前，上文「居民敘事」與 AGENTS.md 的 G1 原則仍然有效；上線時同步更新。
 - **新舊並存：** 新題組地塊與現行 Meter 地塊重疊（SW、車抽屜住宅、水の棚田）。地塊執行器與退役按 run 的題組版本切換，version4 run 外觀不變。
 - **全部 9 題上台（owner 2026-11-18，取代上文「至少 5 題三態齊全才上線」及「Q04 暫不上台」）：** 9 題現已全部接入抽題；未有模型的選項地塊暫時留空，模型完成後補上。survey 端已可用（`SURVEY_QUESTIONS` 選用，見 [PROJECT](PROJECT.md)），城市端尚未顯示輪換模型；預設展覽仍是 version4，切換屬 owner 決定。
-- **未定：** 新 run 各題的起始模型；蓮花受電及 Q06 地塊；Q05、Q07、Q09 的模型方向；舊能源部件逐件去留；群眾比例少人數門檻；Q02 離場模型的變化是否播出。
+- **未定：** 新 run 各題的起始模型；Q06 地塊；Q05、Q07、Q09 的模型方向；舊能源部件逐件去留；群眾比例少人數門檻；Q02 離場模型的變化是否播出。
 
 ## 累積與權威 layout
 
@@ -101,7 +103,7 @@ Headline 近鏡 G7（2026-10-31，已 merge main，視覺及性能未驗收）�
 
 Live headline（[pickHeadline](../survey/src/shared/cityView.ts)）：先揀向今位訪客投票方向移動的 site（中間票向 0），其次揀該訪客選的能源部件有變的情況；否則沿用新到達最高格、載體變化最多、能源的次序。能源部件同時變動時，鏡頭與結果卡跟所選部件；只有 headline site 有亮 pulse／marker 同結果卡，其他變化（例如同時嘅能源門檻）靜靜過渡。
 
-Headline 近鏡（2026-10-27；時間線於 2026-10-29 修訂）：live 結果先在 hero 播完 2.62 秒 vote journey，再用 2 秒推近 headline，停定 0.5 秒後於 5.12 秒開始 3 秒場景過渡。4.62–13 秒停留，13 秒與 ambient 卡同步開始用 2 秒返回 hero；原因文字於 8.12 秒出現。**例外（owner 2026-11-13）**：SW 焦點変化（活動モジュール棚進／出 mixed）的場景過渡延長為 5 秒（`SHELF_TRANSITION_SECONDS`，只用於 SW）：5.12–10.12 秒，原因文字於 10.12 秒出現（SW 的說明卡按 band 與實際變化選句，見 [RESIDENT_COPY](RESIDENT_COPY.md)），之後約 2.9 秒閱讀，13 秒返回 hero 不變。順序見 [棚 spec](../artifacts/sw-event-shelf/spec.md#r3c)。八個 site shot（四站各 focal／district）及五個能源 shot 用常數表，保留 hero 方向及海／地標定位；focal 與 district 同時改以 district 為準。能源鏡頭與結果卡共用部件優先次序，移除設備亦看原位置。新結果從現有位置先平滑回 hero；snapshot／reset／Undo／reconnect／reduced motion／legacy／追趕中的結果立即 hero。無 headline 不推近；如接續仍在播放的近鏡，先從當前位置用 2 秒平滑返回，再保持 hero 並恢復操作。普通 standalone 及其他 DEV review 不自動播放；DEV 可用 `?shot=` 逐鏡檢查。近鏡的模型／材質打磨及真人閱讀／展示硬件驗收另作任務。
+Headline 近鏡（2026-10-27；時間線於 2026-10-29 修訂）：live 結果先在 hero 播完 2.62 秒 vote journey，再用 2 秒推近 headline，停定 0.5 秒後於 5.12 秒開始 3 秒場景過渡。4.62–13 秒停留，13 秒與 ambient 卡同步開始用 2 秒返回 hero；原因文字於 8.12 秒出現。**例外（owner 2026-11-13）**：SW 焦點変化（活動モジュール棚進／出 mixed）的場景過渡延長為 5 秒（`SHELF_TRANSITION_SECONDS`，只用於 SW）：5.12–10.12 秒，原因文字於 10.12 秒出現（SW 的說明卡按 band 與實際變化選句，見 [RESIDENT_COPY](RESIDENT_COPY.md)），之後約 2.9 秒閱讀，13 秒返回 hero 不變。順序見 [棚 spec](../artifacts/sw-event-shelf/spec.md#r3c)。八個 site shot（四站各 focal／district）及五個能源 shot 用常數表，保留 hero 方向及海／地標定位；focal 與 district 同時改以 district 為準。能源鏡頭與結果卡共用部件優先次序，移除設備亦看原位置。新結果從現有位置先平滑回 hero；snapshot／reset／Undo／reconnect／reduced motion／legacy／追趕中的結果立即 hero。無 headline 不推近；如接續仍在播放的近鏡，先從當前位置用 2 秒平滑返回，再保持 hero 並恢復操作。普通 standalone 及其他 DEV review 不自動播放；DEV 可用 `?shot=` 逐鏡檢查。**閒置吸引循環（owner 2026-11-20）**：展覽畫面連續 10 秒冇 survey 事件、冇近鏡／空の環鏡頭、冇 staff 輸入時，主鏡頭以 hero 為中心慢慢漂（yaw ±12°、只向上微升、約 0.5°/s，不做 site tour），每 60 秒循環一次並於 50–60 秒顯示「次は、あなたの声。」呼籲卡；中段 25–50 秒播「声の灯」：所有投票燈先熄，再逐位觀眾由投票地點升起（約 17.5 秒播完當前 run 最近 64 位），底部卡同步畫出各軸 Meter 曲線、顯示「暮らしの声 #n」，最後一句「いちばん多かった声：「X」寄り N%」；少於 3 位觀眾就跳過、繼續漂。任何 survey 事件或輸入即時停止並由原有鏡頭規則接手；reduced motion 鏡頭不動。詳見 [attract-loop](handoffs/attract-loop.md)。近鏡的模型／材質打磨及真人閱讀／展示硬件驗收另作任務。
 
 Closeup-zoom F 候選（2026-10-30）：district 改為較闊焦點構圖、停留期間慢推 7%；SW focal 避開主要遮擋。SE／NW 焦點及 district carrier 可讀性未達驗收，詳見 [F 自評](../artifacts/closeup-zoom/final/F-review.md)，最終仍待 owner 審閱。
 
