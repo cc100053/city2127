@@ -140,6 +140,18 @@ export const ROTATION_VISITS: Readonly<Record<string, Readonly<Record<string, { 
   Q08: { C: { shot: 'sw:focal', place: Q08_RESULTS.C[0] } },
 };
 
+/**
+ * Interim (owner 2026-11-20, until every option has a model): a rotation result that shows nothing new — a swap on a question without
+ * models, vacant to vacant, or a fallback — and has no site to visit flies to the concept lot (`concept:lot`), where a hologram names the
+ * guest's option for the outcome question. Undefined for every other result.
+ */
+export function conceptVisit(proposal: ExhibitionProposal) {
+  const outcome = proposal.rotation?.outcome;
+  if (!outcome || rotationVisit(proposal) || q01Swap(proposal) || q02Swap(proposal) || q03Swap(proposal)?.housing || q06Swap(proposal)?.tower || q08Swap(proposal)?.shelf) return undefined;
+  const answer = proposal.answers.find(item => item.questionId === outcome.questionId);
+  return answer && { questionId: answer.questionId, optionId: answer.optionId, label: answer.optionLabel, shot: 'concept:lot' as ShotId };
+}
+
 /** A rotation proposal that changed nothing visible but visits a site already showing the guest's answer: question, option, shot and place. */
 export function rotationVisit(proposal: ExhibitionProposal) {
   const questionId = proposal.rotation?.visit;

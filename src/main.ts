@@ -27,8 +27,9 @@ import { build2127 } from './odaiba2127';
 import { bayWater, waterLights } from './bayWater';
 import { residentIdentity, scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
-import { q02Swap, q03Shot, q03Swap, q06Shot, q06Swap, q08Shot, q08Swap, Q02_SHOTS, rotationLayout, rotationVisit } from './rotationLayout';
+import { conceptVisit, q02Swap, q03Shot, q03Swap, q06Shot, q06Swap, q08Shot, q08Swap, Q02_SHOTS, rotationLayout, rotationVisit } from './rotationLayout';
 import { LotRuntime } from './lotRuntime';
+import { ConceptHologram } from './conceptHologram';
 import { bayFlowerShown } from './bayFlower';
 import { createCityChangeManager } from './createCityChangeManager';
 import { renderQuality } from './renderQuality';
@@ -156,7 +157,7 @@ try {
   // ponytail: the overlay list is rescanned every 120 AO frames (about 2 s), so one created later may show its AO bar until then.
   let aoiEffects:T.Group|undefined;
   let flat:T.Object3D[]=[],overlays:T.Object3D[]=[],aoFrame=0;
-  aoPass._overrideVisibility=()=>{hideFlat();if(aoFrame++%120===0){overlays=[];scene.traverse(o=>{const m=(o as T.Mesh).material as T.Material|undefined;if(m?.transparent&&(m as T.MeshBasicMaterial).isMeshBasicMaterial)overlays.push(o);});}flat=[floor,scene.getObjectByName('bay-context'),elevator,elevatorNear.root,aoiEffects,...overlays].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
+  aoPass._overrideVisibility=()=>{hideFlat();if(aoFrame++%120===0){overlays=[];scene.traverse(o=>{const m=(o as T.Mesh).material as T.Material|undefined;if(m?.transparent&&(m as T.MeshBasicMaterial).isMeshBasicMaterial)overlays.push(o);});}flat=[floor,scene.getObjectByName('bay-context'),elevator,elevatorNear.root,aoiEffects,concept?.root,...overlays].filter((o):o is T.Object3D=>!!o?.visible);for(const o of flat)o.visible=false;};
   aoPass._restoreVisibility=()=>{showFlat();for(const o of flat)o.visible=true;};
   const bloom=new UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.2,.7,1);composer.addPass(bloom);
   const vignette=new ShaderPass(VignetteShader);vignette.uniforms.offset.value=.9;vignette.uniforms.darkness.value=.9;composer.addPass(vignette);composer.addPass(new OutputPass());
@@ -288,6 +289,8 @@ try {
   const journey=surveyUrl?new VoteJourney(scene,camera):null;
   // Rotation runs: Q02's three lots, the drawer housing (Q03), the pod tower (Q06) and SW (Q08) show the run's options (src/lotRuntime.ts); version4 runs never engage it.
   const lots=surveyUrl&&cityChanges?new LotRuntime(scene,cityChanges.energy,bayFlowerShown(location.search,import.meta.env.DEV),cityChanges.commonsPlaza):null;
+  // Interim (owner 2026-11-20): an option without a model yet is shown as a hologram on one concept lot (src/conceptHologram.ts).
+  const concept=surveyUrl&&headlineCamera?new ConceptHologram(scene,SHOTS['concept:lot'].position):null;
   // DEV `?survey=…&residentDemo`: a live NW +1 headline visits 湊 after the building change (src/devResidentDemo.ts); everything else keeps the normal timeline.
   let residentDemo:{start:(changeEnd:number,to:'low'|'mixed'|'high',previous:'low'|'mixed'|'high')=>void;cancel:()=>void}|null=null,nwBand:'low'|'mixed'|'high'='mixed';
   if(import.meta.env.DEV&&surveyUrl&&headlineCamera&&params.has('residentDemo'))import('./devResidentDemo').then(({startResidentDemo})=>{const demo=startResidentDemo(scene,camera,controls);residentDemo=demo;devFrame=now=>demo.frame(now,headlineCamera.active);});
@@ -330,19 +333,21 @@ try {
         const visit=residentDemo&&changes[0]?.socketId==='nw'&&['nw:focal','nw:focal-low'].includes(headlineShot(changes[0])??'');
         // Q02, Q03, Q06 and Q08 swaps have no Meter carrier: the camera flies to the lot of the model it shows (src/rotationLayout.ts Q02_SHOTS, q03Shot, q06Shot, q08Shot).
         // Plan 3.4: when nothing visible changed, it visits a site already showing the guest's answer (rotationVisit) instead.
-        const q02=q02Swap(latest),q03=q03Swap(latest),q06=q06Swap(latest),q08=q08Swap(latest),seen=rotationVisit(latest);
-        const shot=(seen?headlineCamera?.playShot(seen.shot,now,displayMs):q02?headlineCamera?.playShot(Q02_SHOTS[q02.to],now,displayMs):q03?headlineCamera?.playShot(q03Shot(q03),now,displayMs):q06?headlineCamera?.playShot(q06Shot(q06),now,displayMs):q08?headlineCamera?.playShot(q08Shot(q08),now,displayMs):headlineCamera?.play(changes,now,visit?(shotTimeline(displayMs).changeEnd+BEAT_SECONDS)*1000:displayMs))??null;
+        // Interim (owner 2026-11-20): nothing new and nothing to visit flies to the concept lot, whose hologram names the guest's option (conceptVisit).
+        const q02=q02Swap(latest),q03=q03Swap(latest),q06=q06Swap(latest),q08=q08Swap(latest),seen=rotationVisit(latest),idea=conceptVisit(latest);
+        if(idea&&headlineCamera)concept?.show(idea.label,changeAt,now+displayMs/1000);else concept?.hide();
+        const shot=(seen?headlineCamera?.playShot(seen.shot,now,displayMs):idea?headlineCamera?.playShot(idea.shot,now,displayMs):q02?headlineCamera?.playShot(Q02_SHOTS[q02.to],now,displayMs):q03?headlineCamera?.playShot(q03Shot(q03),now,displayMs):q06?headlineCamera?.playShot(q06Shot(q06),now,displayMs):q08?headlineCamera?.playShot(q08Shot(q08),now,displayMs):headlineCamera?.play(changes,now,visit?(shotTimeline(displayMs).changeEnd+BEAT_SECONDS)*1000:displayMs))??null;
         narration?.play(shot,changes[0],now,displayMs);
         if(shot&&voiceLabel){const t=shotTimeline(displayMs);voiceLabel.show(residentIdentity(latest),SHOTS[shot].target,now+t.hold,now+(visit?t.changeEnd:t.flyOut));}
         if(visit&&(shot==='nw:focal'||shot==='nw:focal-low'))residentDemo!.start(now+shotTimeline(displayMs).changeEnd,layout.bands.nw,prevNw);
         return changes;
       }
-      headlineCamera?.cancel();narration?.cancel();
+      headlineCamera?.cancel();narration?.cancel();concept?.hide();
       if(view.rotation)journey!.setRotationLanterns(view.recentProposals);else journey!.setLanterns(view.recentProposals);
       lots?.setQ02(view.rotation?.shown.Q02,now,true);lots?.setQ03(view.rotation?.shown.Q03,now,true);lots?.setQ06(view.rotation?.shown.Q06,now,true);lots?.setQ08(view.rotation?.shown.Q08,now,true);
       return cityChanges!.applyExhibitionLayout(layout,kind==='city-state-updated'?'city-state-snapshot':kind,now,view.slotSeeds);
     }
-    headlineCamera?.cancel();narration?.cancel();journey!.cancel();lots?.setQ02(undefined,now,true);lots?.setQ03(undefined,now,true);lots?.setQ06(undefined,now,true);lots?.setQ08(undefined,now,true);
+    headlineCamera?.cancel();narration?.cancel();concept?.hide();journey!.cancel();lots?.setQ02(undefined,now,true);lots?.setQ03(undefined,now,true);lots?.setQ06(undefined,now,true);lots?.setQ08(undefined,now,true);
     world.blendTo(scoresToWorldState(view.scores),now);
     if(kind==='city-state-updated')cityChanges!.applyIncrementalUpdate(view,now);
     else cityChanges!.restoreFromSnapshot(view,now);
@@ -384,11 +389,11 @@ try {
     narration?.update(now,cameraMotion.matches);explore?.update(now,cameraMotion.matches);
     if(headlineCamera?.active)voiceLabel?.update(camera,now);else voiceLabel?.hide();
     if(import.meta.env.DEV&&devShot){camera.position.set(...devShot.position);controls.target.set(...devShot.target);camera.lookAt(controls.target);}
-    cityChanges?.update(now,dark);lots?.update(now,cameraMotion.matches);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
+    cityChanges?.update(now,dark);lots?.update(now,cameraMotion.matches);concept?.update(now);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.
     if(performance.now()-shadowDrawn>=1000/quality.shadowHz){renderer.shadowMap.needsUpdate=true;shadowDrawn=performance.now();}
     composer.render();
-    if(++frames===120){renderer.domElement.dataset.hour=hour.toFixed(2);renderer.domElement.dataset.displayMode=displayMode;renderer.domElement.dataset.time=now.toFixed(2);renderer.domElement.dataset.fps=(120000/(performance.now()-measureStart)).toFixed(1);renderer.domElement.dataset.drawCalls=String(renderer.info.render.calls);renderer.domElement.dataset.triangles=String(renderer.info.render.triangles);renderer.domElement.dataset.geometries=String(renderer.info.memory.geometries);renderer.domElement.dataset.textures=String(renderer.info.memory.textures);if(cityChanges)renderer.domElement.dataset.siteAssets=JSON.stringify(cityChanges.getDiagnostics());if(cityChanges?.energy)renderer.domElement.dataset.energy=JSON.stringify(cityChanges.energy.getDiagnostics());if(lots)renderer.domElement.dataset.lots=JSON.stringify(lots.getDiagnostics());frames=0;measureStart=performance.now();}
+    if(++frames===120){renderer.domElement.dataset.hour=hour.toFixed(2);renderer.domElement.dataset.displayMode=displayMode;renderer.domElement.dataset.time=now.toFixed(2);renderer.domElement.dataset.fps=(120000/(performance.now()-measureStart)).toFixed(1);renderer.domElement.dataset.drawCalls=String(renderer.info.render.calls);renderer.domElement.dataset.triangles=String(renderer.info.render.triangles);renderer.domElement.dataset.geometries=String(renderer.info.memory.geometries);renderer.domElement.dataset.textures=String(renderer.info.memory.textures);if(cityChanges)renderer.domElement.dataset.siteAssets=JSON.stringify(cityChanges.getDiagnostics());if(cityChanges?.energy)renderer.domElement.dataset.energy=JSON.stringify(cityChanges.energy.getDiagnostics());if(lots)renderer.domElement.dataset.lots=JSON.stringify(lots.getDiagnostics());if(concept)renderer.domElement.dataset.concept=JSON.stringify(concept.diagnostics);frames=0;measureStart=performance.now();}
   });
   window.addEventListener('resize',()=>{
     camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight);

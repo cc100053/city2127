@@ -8,7 +8,7 @@ import type { CarrierChange } from './cityChangeManager.ts';
 import type { DisplayMode } from './dayCycle.ts';
 import { presets, type WorldState } from './presets.ts';
 import { changeSites } from './layout.ts';
-import { q01Swap, q02Swap, q03Result, q03Swap, q06Result, q06Swap, q08Result, q08Swap, Q02_RESULTS, Q03_RESULTS, Q06_RESULTS, Q08_RESULTS, rotationLayout, rotationVisit } from './rotationLayout.ts';
+import { conceptVisit, q01Swap, q02Swap, q03Result, q03Swap, q06Result, q06Swap, q08Result, q08Swap, Q02_RESULTS, Q03_RESULTS, Q06_RESULTS, Q08_RESULTS, rotationLayout, rotationVisit } from './rotationLayout.ts';
 import { ALREADY_HERE, crowdShareText, FACILITY_TO_COME } from '../survey/src/shared/rotation.ts';
 import { AXES, connectSurvey, isExhibitionView, supersedes, type CityView, type Decision, type ExhibitionProposal, type ExhibitionView, type SurveyEventKind, type SurveyView, type ExploreLook } from './surveyView.ts';
 
@@ -166,6 +166,8 @@ const RESIDENT_PREFERENCES: Record<string, string> = {
   'mixed-functions': 'あなたは、高さの違う建物をめぐる日常を選びました。',
   'vertical-functions': 'あなたは、一つのタワーで用事を済ませる日常を選びました。',
 };
+/** Interim concept-lot card (owner 2026-11-20; provisional copy, plan 5.2): never claims the facility exists. */
+export const CONCEPT_JOINED = 'あなたの声は、この暮らしの構想に加わりました。', CONCEPT_PLACE = 'アクアシティ北・構想地';
 /** Rotation Q01 options share the version4 service preferences (A −1, B 0, C +1 on the same NW hub). */
 const Q01_PREFERENCES: Record<string, string> = { A: 'human-led', B: 'human-machine', C: 'autonomous' };
 const RESULT_AXES = { nw: 'service-2127', sw: 'commons-2127', ne: 'cooling-2127', se: 'functions-2127' } as const;
@@ -182,11 +184,11 @@ export function energyChangedPart(before: EnergyConfiguration, after: EnergyConf
 }
 
 /** The preference line for a visited rotation answer (plan 3.4), from the same provisional copy its swap card uses. */
-function visitPreference(questionId: string, optionId: string) {
+function visitPreference(questionId: string, optionId: string, label?: string) {
   const line = questionId === 'Q01' ? RESIDENT_PREFERENCES[Q01_PREFERENCES[optionId]]
     : questionId === 'Q02' ? Q02_RESULTS[optionId]?.[2]
     : ({ Q03: Q03_RESULTS, Q06: Q06_RESULTS, Q08: Q08_RESULTS } as Record<string, Record<string, readonly [string, string]>>)[questionId]?.[optionId]?.[1];
-  return line ?? 'あなたの思いが、住民の声に加わりました。';
+  return line ?? (label ? `あなたは「${label.replace(/[。.]$/, '')}」という暮らしを選びました。` : 'あなたの思いが、住民の声に加わりました。');
 }
 
 /** Evidence is the renderer's before/after targets, including visible pairings and shuffled slots. */
@@ -201,6 +203,9 @@ export function residentResult(proposal: ExhibitionProposal, changes?: readonly 
     return { preference: visitPreference(visit.questionId, visit.optionId), effect: `${ALREADY_HERE}。`, place: visit.place, kind: 'already-here',
       ...(visitShare ? { share: crowdShareText(visitShare) } : {}) };
   }
+  // Interim (owner 2026-11-20): nothing new to show and no site to visit, so the camera flies to the concept lot's hologram of this option.
+  const concept = conceptVisit(proposal);
+  if (concept) return { preference: visitPreference(concept.questionId, concept.optionId, concept.label), effect: CONCEPT_JOINED, place: CONCEPT_PLACE, kind: 'concept', ...share };
   // A Q02 swap moves the shown model between three lots (src/lotRuntime.ts); no Meter carrier changes, so it reads its own copy.
   const q02 = q02Swap(proposal);
   if (q02) {

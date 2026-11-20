@@ -2,10 +2,10 @@
 // version4 views pass through untouched, and a Q01 swap reads the NW focal copy.
 import assert from 'node:assert/strict';
 import { ladderLayout } from '../survey/src/shared/cityView.ts';
-import { q01Swap, q02Swap, rotationLayout, rotationVisit, withQ01, Q01_NW_TIERS, ROTATION_VISITS } from '../src/rotationLayout.ts';
+import { conceptVisit, q01Swap, q02Swap, rotationLayout, rotationVisit, withQ01, Q01_NW_TIERS, ROTATION_VISITS } from '../src/rotationLayout.ts';
 import { loadRotationSetFile } from '../survey/src/survey/questionLoader.ts';
 import { journeyOutcome } from '../src/voteJourney.ts';
-import { residentCards, residentResult } from '../src/surveyAtmosphere.ts';
+import { CONCEPT_JOINED, CONCEPT_PLACE, residentCards, residentResult } from '../src/surveyAtmosphere.ts';
 import type { ExhibitionProposal, ExhibitionView } from '../src/surveyView.ts';
 
 const zero = { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 };
@@ -65,23 +65,19 @@ assert.equal(flower.place, '南部公園沖の湾の花');
 assert.match(flower.effect, /湾の花が開きました/);
 assert.deepEqual(['A', 'B', 'C'].map(to => q02Swap(proposal({ kind: 'swap', questionId: 'Q02', from: 'B', to }, to))?.to), ['A', 'B', 'C']);
 assert.equal(q02Swap(proposal({ kind: 'fallback', questionId: 'Q02' }, 'B')), undefined);
-assert.equal(residentResult(proposal({ kind: 'fallback', questionId: 'Q02' }, 'B'), []).kind, 'maintained', 'a Q02 fallback keeps the city');
-// Q03 swaps show or fade the drawer housing on its shared lot: their own (provisional) copy; a fallback keeps the city.
+assert.equal(residentResult(proposal({ kind: 'fallback', questionId: 'Q02' }, 'B'), []).kind, 'concept', 'a Q02 fallback without a visit goes to the concept lot');
+// Q03 swaps show or fade the drawer housing on its shared lot: their own (provisional) copy (vacant to vacant: concept lot, below).
 const leaves = residentResult(proposal({ kind: 'swap', questionId: 'Q03', from: 'A', to: 'C' }, 'B'), []);
 assert.equal(leaves.kind, 'configuration');
 assert.equal(leaves.place, '車が引き出しになる住宅の跡地');
 assert.match(leaves.effect, /環道だけが残る空き地/);
 assert.match(residentResult(proposal({ kind: 'swap', questionId: 'Q03', from: 'B', to: 'A' }, 'B'), []).effect, /住宅が戻りました/);
-assert.match(residentResult(proposal({ kind: 'swap', questionId: 'Q03', from: 'B', to: 'C' }, 'B'), []).effect, /空き地のままです/);
-assert.equal(residentResult(proposal({ kind: 'fallback', questionId: 'Q03' }, 'B'), []).kind, 'maintained', 'a Q03 fallback keeps the city');
-// Q06 swaps show or fade the pod-frame tower on its shared lot: their own (provisional) copy; a fallback keeps the city.
+// Q06 swaps show or fade the pod-frame tower on its shared lot: their own (provisional) copy (vacant to vacant: concept lot, below).
 const towerLeaves = residentResult(proposal({ kind: 'swap', questionId: 'Q06', from: 'B', to: 'A' }, 'B'), []);
 assert.equal(towerLeaves.kind, 'configuration');
 assert.equal(towerLeaves.place, '蛋形ポッドの塔の跡地');
 assert.match(towerLeaves.effect, /芝生の空き地になりました/);
 assert.match(residentResult(proposal({ kind: 'swap', questionId: 'Q06', from: 'C', to: 'B' }, 'B'), []).effect, /塔が戻りました/);
-assert.match(residentResult(proposal({ kind: 'swap', questionId: 'Q06', from: 'A', to: 'C' }, 'B'), []).effect, /空き地のままです/);
-assert.equal(residentResult(proposal({ kind: 'fallback', questionId: 'Q06' }, 'B'), []).kind, 'maintained', 'a Q06 fallback keeps the city');
 
 // Plan 2.6: the result card carries the crowd share of the outcome's question only, without a number below the threshold.
 const shared = (outcome: NonNullable<ExhibitionProposal['rotation']>['outcome'], percent?: number) => residentResult({
@@ -111,7 +107,26 @@ assert.deepEqual(journeyOutcome({ outcome: { kind: 'swap', questionId: 'Q04', fr
 const shippedSet = loadRotationSetFile(new URL('../survey/src/survey/questions.rotation.v1.json', import.meta.url).pathname);
 const modelled = shippedSet.questions.flatMap(q => q.options.filter(o => o.modelId).map(o => `${q.id}:${o.id}`)).sort();
 assert.deepEqual(Object.entries(ROTATION_VISITS).flatMap(([q, options]) => Object.keys(options).map(o => `${q}:${o}`)).sort(), modelled);
-// Nothing visible and nothing to visit: the card says the facility is still to come (provisional copy).
-assert.equal(residentResult(proposal({ kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' }, 'C'), []).effect, 'あなたの声は記録されました。この暮らしを形にする施設は、これから街に加わります。');
+// Interim concept lot (owner 2026-11-20): nothing visible and nothing to visit flies to the concept lot, naming the guest's option for the
+// outcome question; visible swaps and visits never do.
+const unbuilt = (outcome: NonNullable<ExhibitionProposal['rotation']>['outcome'], optionId: string, rotationVisitId?: string): ExhibitionProposal => ({
+  ...proposal(outcome, 'C'),
+  answers: [{ questionId: outcome.questionId, optionId, questionText: '', optionLabel: '同じ建物の住民と共有する。' }, { questionId: 'Q01', optionId: 'C', questionText: '', optionLabel: '' }],
+  rotation: { outcome, shares: [], ...(rotationVisitId ? { visit: rotationVisitId } : {}) },
+});
+assert.deepEqual(conceptVisit(unbuilt({ kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' }, 'B')), { questionId: 'Q04', optionId: 'B', label: '同じ建物の住民と共有する。', shot: 'concept:lot' });
+assert.equal(conceptVisit(unbuilt({ kind: 'swap', questionId: 'Q03', from: 'B', to: 'C' }, 'C'))?.optionId, 'C', 'vacant to vacant');
+assert.equal(conceptVisit(unbuilt({ kind: 'swap', questionId: 'Q06', from: 'A', to: 'C' }, 'C'))?.optionId, 'C', 'vacant to vacant');
+assert.equal(conceptVisit(unbuilt({ kind: 'swap', questionId: 'Q08', from: 'A', to: 'B' }, 'B'))?.optionId, 'B', 'vacant to vacant');
+assert.equal(conceptVisit(unbuilt({ kind: 'fallback', questionId: 'Q05' }, 'A'))?.questionId, 'Q05', 'a fallback with nothing to visit');
+for (const visible of [{ kind: 'swap', questionId: 'Q03', from: 'A', to: 'B' }, { kind: 'swap', questionId: 'Q03', from: 'C', to: 'A' }, { kind: 'swap', questionId: 'Q06', from: 'B', to: 'C' },
+  { kind: 'swap', questionId: 'Q08', from: 'C', to: 'A' }, { kind: 'swap', questionId: 'Q02', from: 'A', to: 'B' }] as const)
+  assert.equal(conceptVisit(unbuilt(visible, visible.to)), undefined, `${visible.questionId} ${visible.from}→${visible.to} shows a model change`);
+assert.equal(conceptVisit(proposal({ kind: 'swap', questionId: 'Q01', from: 'B', to: 'C' }, 'C')), undefined, 'a Q01 swap');
+assert.equal(conceptVisit(unbuilt({ kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' }, 'B', 'Q01')), undefined, 'a visit wins');
+assert.equal(conceptVisit({ ...proposal({ kind: 'fallback', questionId: 'Q01' }, 'C'), rotation: undefined }), undefined, 'version4 proposals');
+const ideaCard = residentResult(unbuilt({ kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' }, 'B'), []);
+assert.deepEqual([ideaCard.kind, ideaCard.preference, ideaCard.effect, ideaCard.place], ['concept', 'あなたは「同じ建物の住民と共有する」という暮らしを選びました。', CONCEPT_JOINED, CONCEPT_PLACE]);
+assert.match(residentResult(unbuilt({ kind: 'swap', questionId: 'Q03', from: 'B', to: 'C' }, 'C'), []).preference, /地域の共有サービス/, 'a known option keeps its preference line');
 
 console.log('rotation layout tests passed');

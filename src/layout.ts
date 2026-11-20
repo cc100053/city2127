@@ -128,6 +128,10 @@ export const LOTS = {
   // Q06's three options share the pod-frame tower lot: its R4 envelope with the pods is about 56 × 38 m.
   'pod-tower': { x: POD_TOWER.x, z: POD_TOWER.z, size: 56, sea: false },
 } as const;
+/** Interim concept lot (owner 2026-11-20, until every rotation option has a model): a result that shows nothing new and has no site to visit
+ *  flies here and a lattice hologram names the guest's option (src/conceptHologram.ts). Lawn north of Aqua City near the retired housing M;
+ *  `SCAN_LOT=20,14,-135,-175` CLEAR (hero 1076 px). w × d × h is the hologram's envelope; `y` the lawn height. */
+export const CONCEPT_LOT = { x: -135, z: -175, y: 2, w: 20, d: 14, h: 18 } as const;
 // The ferry heads west for the Shinagawa channel, clear of the Rainbow Bridge anchorage and Daiba approach piers.
 export const ferryLane: readonly P3[] = [[-230,-.6,-290],[-420,-.6,-470],[-760,-.6,-560],[-1250,-.6,-520]];
 // Bay cruisers [x, z, heading]: centres of straight 300 m runs on open water in front of and beyond the district, clear of the shore and piers.
