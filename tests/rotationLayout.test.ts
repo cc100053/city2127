@@ -2,7 +2,8 @@
 // version4 views pass through untouched, and a Q01 swap reads the NW focal copy.
 import assert from 'node:assert/strict';
 import { ladderLayout } from '../survey/src/shared/cityView.ts';
-import { q01Swap, q02Swap, rotationLayout, rotationVisit, withQ01, Q01_NW_TIERS } from '../src/rotationLayout.ts';
+import { q01Swap, q02Swap, rotationLayout, rotationVisit, withQ01, Q01_NW_TIERS, ROTATION_VISITS } from '../src/rotationLayout.ts';
+import { loadRotationSetFile } from '../survey/src/survey/questionLoader.ts';
 import { journeyOutcome } from '../src/voteJourney.ts';
 import { residentCards, residentResult } from '../src/surveyAtmosphere.ts';
 import type { ExhibitionProposal, ExhibitionView } from '../src/surveyView.ts';
@@ -106,6 +107,10 @@ assert.match(residentResult(visiting({ kind: 'fallback', questionId: 'Q02' }, 'Q
 // The journey lands where the camera goes: a visit reads as a neutral fallback on that site; without one the outcome stands.
 assert.deepEqual(journeyOutcome({ outcome: { kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' }, visit: 'Q01' }), { kind: 'fallback', questionId: 'Q01' });
 assert.deepEqual(journeyOutcome({ outcome: { kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' } }), { kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' });
+// The server visits only options with a model; each one needs a camera stop here, and every stop names a model the set holds.
+const shippedSet = loadRotationSetFile(new URL('../survey/src/survey/questions.rotation.v1.json', import.meta.url).pathname);
+const modelled = shippedSet.questions.flatMap(q => q.options.filter(o => o.modelId).map(o => `${q.id}:${o.id}`)).sort();
+assert.deepEqual(Object.entries(ROTATION_VISITS).flatMap(([q, options]) => Object.keys(options).map(o => `${q}:${o}`)).sort(), modelled);
 // Nothing visible and nothing to visit: the card says the facility is still to come (provisional copy).
 assert.equal(residentResult(proposal({ kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' }, 'C'), []).effect, 'あなたの声は記録されました。この暮らしを形にする施設は、これから街に加わります。');
 
