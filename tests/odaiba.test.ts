@@ -186,7 +186,10 @@ const streetKit = streetNetwork(environment);
       assert.ok(!(flat ? any && !(o.name === 'SIDEWALK_NETWORK' && footpath(cx, cz)) : inside(cx, cz)), `${o.name} left inside the district near ${cx.toFixed(0)},${cz.toFixed(0)}`);
     }
   });
-  for (const [x, z] of [[-290, 340], [302, -57]]) assert.ok(paved(x, z, /^ROAD_MAJOR$/), `backdrop band lost its road at ${x},${z}`);
+  // Road fix B1-a: beyond the edge ④ runs on as a plain street along the old band (the band's own lanes are gone); the U's avenue and the farm walk keep their surveyed road.
+  for (const [x, z] of [[-290, 340], [302, -57], [-540, 562], [590, -260]]) assert.ok(paved(x, z, /^BACKDROP_RUN/), `④ does not run on beyond the edge at ${x},${z}`);
+  for (const [x, z] of [[290, -258], [-200, 458]]) assert.ok(paved(x, z, /^(ROAD_SECONDARY|SIDEWALK_NETWORK)$/), `kept backdrop street lost at ${x},${z}`);
+  for (const [x, z] of [[420, -110], [-380, 500], [400, 400]]) assert.ok(!paved(x, z, /^(ROAD_|SIDEWALK_NETWORK$|MAJOR_ROAD_MARKINGS$)/), `old backdrop street left at ${x},${z}`);
   for (const [x, z] of [[-25, 139], [98, 54], [208, 2]]) assert.ok(onFormerStreet(x, z) && !paved(x, z, /^ROAD_/), `old band ground not recorded at ${x},${z}`);
   const accessSurface = (x: number, z: number, name: string) =>
     new Raycaster(new Vector3(x, 15, z), new Vector3(0, -1, 0))

@@ -1,5 +1,5 @@
 // Road redesign (docs/handoffs/archive/road-redesign.md): the district's Phase 03D street layer predates the 2127 buildings and the street kit that
-// replaces it (src/streetKit.ts, network stages 1–2), so every surveyed street inside `DISTRICT` goes; the backdrop roads beyond stay.
+// replaces it (src/streetKit.ts, network stages 1–2), so every surveyed street inside `DISTRICT` goes; beyond it only `BACKDROP_STREETS` stay.
 // Runs on the loaded environment before anything samples its ground (planting, doorways, paving checks).
 import * as T from 'three';
 import { DISTRICT } from './layout.ts';
@@ -10,6 +10,37 @@ type Landmark = { id: string; boundsBlender: readonly (readonly number[])[] };
 /** Old street paving within this many metres of a built landmark's footprint stays as its forecourt (doorway walks and groups stand on it;
  * the network sketch's lawn / footpaths). */
 const APRON = 14;
+
+/** Backdrop streets kept beyond the district (road fix B1-a, owner 2026-11-20): only the surveyed roads that carry the 2127 streets and the
+ * farm walk on into the haze stay; every other surveyed street beyond the edge goes (it ran under context blocks and stopped at the cut).
+ * Each is a run of a surveyed road from the district edge to its end, [from, to, half width] in metres (x, z). */
+export const BACKDROP_STREETS: readonly (readonly [readonly [number, number], readonly [number, number], number])[] = [
+  [[260.7, -254.2], [508.1, -404.9], 16], // the U's guideway avenue ② north-east (carriageway and footways)
+  [[-262, 372], [196.8, 1069], 14], // the walk past the rectenna farm (its gravel meets it) south to the plate's end
+];
+/** The surveyed ~90 m band ④ leaves by is a bundle of lanes that each stop somewhere else, so each of ④'s ends runs on instead as a plain
+ * 24 m street (18 m carriageway, 3 m footways) along the band's axis to the shore: [exit (x, z), unit heading, length]. */
+export const BACKDROP_RUNS: readonly (readonly [readonly [number, number], readonly [number, number], number])[] = [
+  [[265, -27], [.813, -.583], 470],  // ④ east
+  [[-285, 322.4], [-.729, .685], 400], // ④ south-west, to the revetment
+];
+const backdropSides = BACKDROP_STREETS.map(([[ax, az], [bx, bz], half]) => {
+  const length = Math.hypot(bx - ax, bz - az), ux = (bx - ax) / length, uz = (bz - az) / length;
+  return rectSides(rect((ax + bx) / 2, (az + bz) / 2, ux, uz, length / 2 + 20, half)); // 20 m back over the edge, so each run starts at the cut
+});
+/** Flat strip `from` → `from + heading · length`, between `left` and `right` m across it (left of the heading is +), `y` m up. */
+function strip([x, z]: readonly [number, number], [ux, uz]: readonly [number, number], length: number, left: number, right: number, y: number) {
+  const corner = (along: number, across: number) => [x + ux * along - uz * across, y, z + uz * along + ux * across];
+  const a = corner(0, left), b = corner(0, right), c = corner(length, right), d = corner(length, left);
+  const g = new T.BufferGeometry();
+  g.setAttribute('position', new T.Float32BufferAttribute([...a, ...b, ...c, ...a, ...c, ...d], 3));
+  g.computeVertexNormals();
+  if (g.attributes.normal.getY(0) < 0) g.setAttribute('position', new T.Float32BufferAttribute([...a, ...c, ...b, ...a, ...d, ...c], 3));
+  g.computeVertexNormals();
+  return g;
+}
+/** True where a kept backdrop street runs. */
+const onBackdropStreet = (x: number, z: number) => backdropSides.some(sides => sides.every(side => side(new T.Vector3(x, 0, z)) <= 0));
 
 /** 4 m cells (x, z) the removed street ground covered, so groves keep the old streets as open lawn (`onFormerStreet`). */
 const formerStreets = new Set<string>(), CELL = 4, cellOf = (x: number, z: number) => `${Math.floor(x / CELL)},${Math.floor(z / CELL)}`;
@@ -77,11 +108,14 @@ export function repairRoads(environment: T.Object3D, landmarks: readonly Landmar
     for (let i = 0; i < n; i += 3) {
       const tri = [0, 1, 2].map(j => new T.Vector3().fromBufferAttribute(p, at(i + j)).applyMatrix4(object.matrixWorld));
       if (furniture) {
-        if (inRect(district, (tri[0].x + tri[1].x + tri[2].x) / 3, (tri[0].z + tri[1].z + tri[2].z) / 3)) changed = true;
+        const x = (tri[0].x + tri[1].x + tri[2].x) / 3, z = (tri[0].z + tri[1].z + tri[2].z) / 3;
+        if (inRect(district, x, z) || !onBackdropStreet(x, z)) changed = true;
         else kept.push(at(i), at(i + 1), at(i + 2));
         continue;
       }
-      let pieces = outside(tri, districtSides);
+      // Beyond the edge only the kept backdrop streets stay, each piece once where two runs overlap.
+      let pieces: T.Vector3[][] = [], beyond = outside(tri, districtSides);
+      for (const sides of backdropSides) { pieces.push(...beyond.map(q => within(q, sides)).filter(q => q.length > 2)); beyond = beyond.flatMap(q => outside(q, sides)); }
       if (object.name === 'SIDEWALK_NETWORK') { // the forecourts' share of the part inside, each piece once where aprons overlap
         let rest = [within(tri, districtSides)].filter(q => q.length > 2);
         for (const sides of keep) { pieces.push(...rest.map(q => within(q, sides)).filter(q => q.length > 2)); rest = rest.flatMap(q => outside(q, sides)); }
@@ -103,4 +137,9 @@ export function repairRoads(environment: T.Object3D, landmarks: readonly Landmar
     next.computeVertexNormals();
     object.geometry = next; g.dispose();
   });
+  const road = environment.getObjectByName('ROAD_MAJOR'), walk = environment.getObjectByName('SIDEWALK_NETWORK');
+  if (road instanceof T.Mesh && walk instanceof T.Mesh) for (const [from, heading, length] of BACKDROP_RUNS) {
+    const carriageway = new T.Mesh(strip(from, heading, length, 9, -9, .02), road.material), footways = [9, -12].map(left => new T.Mesh(strip(from, heading, length, left + 3, left, .14), walk.material));
+    for (const mesh of [carriageway, ...footways]) { mesh.name = mesh === carriageway ? 'BACKDROP_RUN' : 'BACKDROP_RUN_FOOTWAY'; mesh.receiveShadow = true; environment.add(mesh); }
+  }
 }
