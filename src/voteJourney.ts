@@ -87,7 +87,7 @@ export class VoteJourney {
 
   /** Launches guest `ordinal`'s four votes from the lower-right (the stations' side of the screen); the headline axis lands on its changed slots. */
   play(votes: Votes, ordinal: number, now: number, landing?: JourneyLanding): void {
-    this.cancel();
+    this.cancel(); this.endReplay();
     const origin = new T.Vector3(.86, -.78, .5).unproject(this.camera).sub(this.camera.position).setLength(420).add(this.camera.position);
     CITY_AXES.forEach((axis, i) => {
       const energy = axis === 'environmentalPriority' && !!votes.energy;
@@ -105,8 +105,36 @@ export class VoteJourney {
 
   /** Immediate state (snapshot, reset, Undo, reduced motion): one lantern per vote of the latest guests, with no flight. */
   setLanterns(history: readonly { ordinal: number; votes: Votes }[]): void {
-    this.cancel(); this.clearLanterns();
+    this.cancel(); this.saved = null; this.clearLanterns();
     for (const { ordinal, votes } of history.slice(-LANTERN_GUESTS)) for (const axis of CITY_AXES) this.addLantern(ordinal, axis, votes[axis], axis === 'environmentalPriority' && !!votes.energy);
+  }
+
+  private saved: Float32Array | null = null;
+  private readonly rise = new T.Vector3();
+  /** 声の灯 (attract loop): only the first `shown` guests of `history` keep their lanterns, enlarged so they read from the hero pose; the next one rises from its site. */
+  replayLanterns(history: readonly { ordinal: number; votes: Votes }[], shown: number): void {
+    if (!this.saved) this.saved = this.lanterns.instanceMatrix.array.slice() as Float32Array;
+    this.clearLanterns();
+    const landed = Math.floor(shown), rising = shown - landed;
+    history.slice(Math.max(0, landed - LANTERN_GUESTS + 1), Math.min(history.length, landed + 1)).forEach(({ ordinal, votes }, i, list) => {
+      const next = i === list.length - 1 && landed < history.length;
+      if (next && rising <= 0) return;
+      const ease = next ? rising * rising * (3 - 2 * rising) : 1;
+      for (const axis of CITY_AXES) {
+        const energy = axis === 'environmentalPriority' && !!votes.energy, site = voteSite(axis, energy), spot = lanternSpot(ordinal, axis, energy);
+        this.addLantern(ordinal, axis, votes[axis], energy);
+        this.rise.set(site.x, 4, site.z).lerp(spot, ease);
+        this.dummy.position.copy(this.rise); this.dummy.scale.setScalar((votes[axis] === 0 && !energy ? 2.2 : 3.2) * (next ? 1.6 - .6 * ease : 1)); this.dummy.updateMatrix();
+        this.lanterns.setMatrixAt(((ordinal - 1) % LANTERN_GUESTS) * CITY_AXES.length + CITY_AXES.indexOf(axis), this.dummy.matrix);
+      }
+    });
+    this.lanterns.instanceMatrix.needsUpdate = true;
+  }
+
+  /** Back to the lanterns as they were before 声の灯. */
+  endReplay(): void {
+    if (!this.saved) return;
+    this.lanterns.instanceMatrix.array.set(this.saved); this.lanterns.instanceMatrix.needsUpdate = true; this.saved = null;
   }
 
   private clearLanterns(): void {
@@ -124,7 +152,9 @@ export class VoteJourney {
 
   update(now: number, darkness: number): void {
     // Lanterns are a quiet trace by day and the city's accumulated voices by night (HDR colour so bloom picks them up).
-    this.lanternMaterial.color.setScalar(.35 + 2.4 * darkness); this.lanternMaterial.opacity = .55 + .45 * darkness;
+    // 声の灯 lifts them to a night-level glow even by day, so the replay reads from the hero pose.
+    const replay = this.saved ? 1 : 0;
+    this.lanternMaterial.color.setScalar(.35 + 2.4 * Math.max(darkness, .8 * replay)); this.lanternMaterial.opacity = .55 + .45 * Math.max(darkness, replay);
     let n = 0;
     for (const f of this.flights) {
       const raw = (now - f.start) / FLIGHT_SECONDS;

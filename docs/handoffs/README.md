@@ -10,7 +10,8 @@
 | [LAN 雙站 iPad](lan-guest-stations.md) | IN_PROGRESS；軟件已整合，單機 station A 經 LAN PASS；雙機／瞓機待第二部裝置 | cc100053 |
 | [居民體驗 P5](resident-experience-p5.md) | IN_PROGRESS；文件準備已發布，D0–D10／理解程度／長跑實機NOT RUN。先提供輸出方案及可測硬件 | Codex；展覽決策cc100053，現場操作人待指定 |
 | [描畫品質](render-quality.md) | `?quality=low` 已實作；TODO：自動品質調整（按實測 FPS 逐級降低） | cc100053 |
-| [回顧章節](day-replay.md) | PLANNED；方向已討論（轉向章節、空檔播、觀眾互動），開工前待owner答6項決定 | cc100053 |
+| [閒置吸引循環](attract-loop.md) | IN_PROGRESS；Step A（漂移鏡頭＋呼籲）已實作待驗收，Step B「声の灯」未開始 | cc100053 |
+| [回顧章節](day-replay.md) | SUPERSEDED（owner 2026-11-20）：建築快轉改為 attract-loop 嘅「声の灯」；保留作參考 | cc100053 |
 | [變化說明卡](change-explanation.md) | PLANNED（TODO）；右上卡片直接說明「乜嘢變成乜嘢」，未定案前先用參數前後變動 | cc100053 |
 | [能源城市](energy-city.md) | E1–E4完成並發布main，CI通過；Q3獨立能源權威配置、舊氣候／歷史與正式browser通過；E5本機Mac mini 30分鐘量測與TCP復原已驗；展覽硬件／訪客待驗 | Codex；產品決策cc100053 |
 | [建築・居住](housing-city.md) | SOFTWARE COMPLETE A：owner 2026-10-27選A固定背景，M搬位，已整合main且CI通過；只餘展覽硬件／訪客／工程驗收；[證據](../../artifacts/housing-background/README.md) | Codex；產品決策cc100053 |
