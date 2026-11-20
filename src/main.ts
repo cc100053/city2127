@@ -172,7 +172,9 @@ try {
   const params=new URLSearchParams(location.search);
   // `?survey` or `?survey=ws://host:port/ws`: survey policy scores drive the city state; the day/night light still runs.
   const surveyParam=params.get('survey');
-  const surveyUrl=surveyParam===null?null:/^wss?:\/\//.test(surveyParam)?surveyParam:`ws://${location.hostname}:8787/ws`;
+  // DEV `?rotation`: a question-rotation run held in the page (src/devRotationPanel.ts) stands in for the server; the panel plays any of the 27 options.
+  const localRotation=import.meta.env.DEV&&surveyParam===null&&params.has('rotation');
+  const surveyUrl=localRotation?'dev:rotation':surveyParam===null?null:/^wss?:\/\//.test(surveyParam)?surveyParam:`ws://${location.hostname}:8787/ws`;
   // `?hour=21` holds the clock at one hour, for review captures.
   const heldHour=Number(params.get('hour')??NaN),hold=heldHour>=0&&heldHour<24?heldHour:null;
   let displayMode: DisplayMode = 'auto';
@@ -282,7 +284,6 @@ try {
       return changes;
     };
     Object.assign(window,{cityMeters:(meters:string)=>playMeters(meters,now)});
-    if(!params.has('nopanel'))import('./devShotPanel').then(({mountShotPanel})=>mountShotPanel(first.tiers,meters=>playMeters(meters,now),(window as unknown as {cityShot:(id:string)=>void}).cityShot));
     // `&metersTo=se:high&metersAge=8.3`: seconds since the live result; held `reviewTime` previews the settled headline shot.
     const to=params.get('metersTo');
     const orbitalTo=params.get('orbitalTo');
@@ -316,7 +317,7 @@ try {
     if(params.has('explore'))requestAnimationFrame(()=>requestAnimationFrame(()=>{explore.voices=ring.litVoices();startExplore({target:exploreTarget(params.get('exploreTarget')),ordinal:Number(params.get('explore'))||1},now-Number(params.get('exploreAt')??0));}));
   }
   // Idle attract loop (owner 2026-11-20): exhibition screens only; DEV `?meters=&attract&attractIdle=5` previews it without the server, `?attract=0` turns it off.
-  const attractOn=!!headlineCamera&&params.get('attract')!=='0'&&(!!surveyUrl||(import.meta.env.DEV&&params.has('attract')));
+  const attractOn=!!headlineCamera&&params.get('attract')!=='0'&&((!!surveyUrl&&!localRotation)||(import.meta.env.DEV&&params.has('attract')));
   const attractIdle=import.meta.env.DEV&&params.has('attractIdle')?Number(params.get('attractIdle')):IDLE_SECONDS;
   const voicesReplay=attractOn?new VoicesReplay(journey):null;
   const attract=attractOn?new AttractLoop(camera,controls,attractCta(),Number.isFinite(attractIdle)?attractIdle:IDLE_SECONDS,0,voicesReplay):null;
@@ -364,7 +365,8 @@ try {
     world.blendTo(scoresToWorldState(view.scores),now);
     if(kind==='city-state-updated')cityChanges!.applyIncrementalUpdate(view,now);
     else cityChanges!.restoreFromSnapshot(view,now);
-  }, mode => { displayMode = mode; }, look => { if(!explore)return; if(look)startExplore(look); else explore.back(now); });
+  }, mode => { displayMode = mode; }, look => { if(!explore)return; if(look)startExplore(look); else explore.back(now); },
+    localRotation?(_url,onView,onStatus)=>{void import('./devRotationPanel').then(({mountRotationPanel})=>mountRotationPanel(onView,onStatus,(window as unknown as {cityShot:(id:string)=>void}).cityShot,!params.has('nopanel')));}:undefined);
   // Day tints per mood, then dusk and night colours laid over them by the clock.
   const dayBase=new T.Color('#d3dde0'),dayPulse=new T.Color('#accbdc'),dayStill=new T.Color('#e0e6dc');
   const topBase=new T.Color('#6e9cc6'),topPulse=new T.Color('#6a8db0'),topStill=new T.Color('#a9bcc4');

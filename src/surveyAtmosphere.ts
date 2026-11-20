@@ -300,6 +300,8 @@ export function startSurveyAtmosphere(
   apply: (kind: SurveyEventKind, view: CityView, displayMs: number) => CarrierChange[] | void,
   onDisplayMode?: (mode: DisplayMode) => void,
   onExplore?: (look: ExploreLook | null) => void,
+  // DEV `?rotation` swaps in a page-held run (src/devRotationPanel.ts) for the WebSocket.
+  connect: typeof connectSurvey = connectSurvey,
 ) {
   document.body.dataset.mode = 'survey';
   // Latest choice → policy change → city effect, then the run's history (ported from module-swap's CausalPanel).
@@ -333,7 +335,7 @@ export function startSurveyAtmosphere(
       el('p', 'resident-place', `街の画面：${card.place}`));
     storyTimer = window.setTimeout(showAmbient, 12_000);
   };
-  connectSurvey(url, (kind, view, displayMs = DISPLAY_MS) => {
+  connect(url, (kind, view, displayMs = DISPLAY_MS) => {
     if (kind !== 'city-state-snapshot' && !supersedes(current, view, kind)) return;
     const previous = current;
     current = view;
