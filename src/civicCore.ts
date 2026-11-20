@@ -486,8 +486,23 @@ export function civicCore() {
     [44.5,45,.18,25.5,trim],[44.4,44.7,.18,23.9,publicLight],
   ] as const)arc(root,inner,outer,height,[-8,y,-2],material,2.2,Math.PI*2-.5);
   // Public foyer below the forum has its own curved glazing and entry, distinct from rear staff doors.
-  arc(root,19,44,1,[-8,2,-2],stone,2.2,Math.PI*2-.5);
+  // Entrance polish (owner 2026-11-20): the foyer floor is a solid plinth down to the ground (it floated 2 m over the lawn with a bite out of
+  // its front), and three steps lead down to the paved forecourt (streetKit `landmarkForecourts`) on the bay side; the back half meets the wings.
+  arc(root,19,44,3,[-8,0,-2],stone);
+  for(const [i,r] of [44,45.4,46.8].entries())arc(root,r,r+1.4,2.25-i*.75,[-8,0,-2],stone,.15,Math.PI-.3);
   arc(root,42.8,43,18,[-8,3,-2],silverGlass,2.2,Math.PI*2-.5);
+  // The drum's opening toward the forecourt promenade (a = 1.7–2.2) is the main entrance: a glass door screen set 2 m in, a lit threshold
+  // and a slim canopy on two posts reaching out over the steps.
+  {
+    const door=1.95,at=(r:number,t=0):[number,number]=>[-8+Math.cos(door)*r+Math.sin(door)*t,-2-Math.sin(door)*r+Math.cos(door)*t];
+    arc(root,40.8,41,7,[-8,3,-2],silverGlass,1.72,.46);
+    arc(root,40.8,43,.06,[-8,3,-2],megaSeam,1.72,.46);
+    for(const t of [-6,-2,2,6]){const [x,z]=at(40.9,t);member([x,3,z],[x,10,z],.3,.3,solar);}
+    const [cx,cz]=at(49.5),[ex,ez]=at(56);
+    box(root,[24,.5,13],[cx,10.4,cz],trim,.05).rotation.y=door+Math.PI/2;
+    box(root,[24.2,.25,.3],[ex,10.2,ez],megaSeam,.05).rotation.y=door+Math.PI/2;
+    for(const t of [-10,10]){const [x,z]=at(54.5,t);member([x,0,z],[x,10.2,z],.5,.5);}
+  }
   for(let a=2.25;a<7.95;a+=.16) {
     const x=-8+Math.cos(a)*43,z=-2-Math.sin(a)*43;
     member([x,3,z],[x,21,z],.35,.35,solar);

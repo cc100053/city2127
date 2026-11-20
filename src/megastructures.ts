@@ -119,6 +119,21 @@ function ring(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
   add(megaShell, new T.BoxGeometry(plinth[0], pTop - pBot, plinth[1]), new T.Matrix4().makeTranslation(0, py, 0));
   for (const [sx, sz, w, d] of [[0, 1, plinth[0] + 1, .8], [0, -1, plinth[0] + 1, .8], [1, 0, .8, plinth[1] + 1], [-1, 0, .8, plinth[1] + 1]] as const)
     add(megaSeam, new T.BoxGeometry(w, .5, d), new T.Matrix4().makeTranslation(sx * plinth[0] / 2, .3 - centreY, sz * plinth[1] / 2));
+  // Entrance polish (owner 2026-11-20): both hoop-facing sides of the plinth are a glazed ground-floor lobby (mullions every 4 m) under a deep
+  // canopy with a lit edge, so the base reads as the hoop's entrance hall, not a blank block; the plaza walk lands before the +z lobby.
+  for (const s of [1, -1]) {
+    const face = s * plinth[1] / 2, lobby = plinth[0] - 12;
+    add(megaGlass, new T.BoxGeometry(lobby, 4.4, .4), new T.Matrix4().makeTranslation(0, 2.6 - centreY, face + s * .05));
+    for (let x = -lobby / 2; x <= lobby / 2 + .01; x += 4) add(megaRib, new T.BoxGeometry(.5, 4.4, .7), new T.Matrix4().makeTranslation(x, 2.6 - centreY, face + s * .2));
+    add(megaShell, new T.BoxGeometry(lobby + 4, .6, 5), new T.Matrix4().makeTranslation(0, 5.1 - centreY, face + s * 2.5));
+    add(megaSeam, new T.BoxGeometry(lobby + 4.2, .3, .3), new T.Matrix4().makeTranslation(0, 4.95 - centreY, face + s * 5));
+  }
+  // The plaza walk (layout `plazaWalks[0]`) ends at the bay face 17 m up, level with the hoop's inner floor: a landing runs in over the floor to the
+  // lowest planted ledge (z 18) through a lit gate frame in the face plane.
+  const gx = 4.1, gy = 17.6 - centreY;
+  add(megaShell, new T.BoxGeometry(8, .6, 7.4), new T.Matrix4().makeTranslation(gx, gy - .3, half + 3.1 - 3.7));
+  for (const dx of [-4.6, 4.6]) add(megaSeam, new T.BoxGeometry(.6, 7, .6), new T.Matrix4().makeTranslation(gx + dx, gy + 3.5, half));
+  add(megaSeam, new T.BoxGeometry(9.8, .6, .6), new T.Matrix4().makeTranslation(gx, gy + 7, half));
   void Z;
 }
 
@@ -185,7 +200,16 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
     slab(k, y0, 1.2, 1.6, megaSeam); // glowing lip at the foot of each face
     // polish2: the white slab carries the read (target: white terraced hull), one recessed glass storey under the next lip.
     const g0 = 9.5;
-    slab(k, y0 + 1.2, g0 - 1.2, 1.2, megaShell);
+    if (k === 0) { // Entrance polish (owner 2026-11-20): the street storey is a glazed shopfront, set 1.5 m back under a white fascia on columns every 6 m
+      slab(k, y0 + 1.2, 5.4, -1.5, megaGlass);
+      slab(k, y0 + 6.6, g0 - 6.6, 1.2, megaShell);
+      const column = new T.BoxGeometry(.9, 5.4, .9);
+      for (let u = u0 + 3; u < L2 - 1; u += 6) put(batch, megaRib, column, at(u, dAt(k, u, 0) - .6, y0 + 3.9));
+      // Main door where the plaza walk lands (u 53): a deep canopy with a lit front edge over the forecourt.
+      const door = 53, dd = dAt(k, door, 0);
+      put(batch, megaShell, new T.BoxGeometry(18, .5, 7), at(door, dd - 4.7, y0 + 6.9));
+      put(batch, megaSeam, new T.BoxGeometry(18.2, .3, .3), at(door, dd - 8.2, y0 + 6.75));
+    } else slab(k, y0 + 1.2, g0 - 1.2, 1.2, megaShell);
     slab(k, y0 + g0 - .5, .35, 1.5, megaSeam); // cool seam line along the top of the white slab
     slab(k, y0 + g0, step - g0, -.8, megaGlass); // glass set 0.8 m back under the slab
     const fin = new T.BoxGeometry(.5, step - g0 - .3, .7);

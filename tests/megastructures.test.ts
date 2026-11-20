@@ -30,9 +30,10 @@ const district = new ConcentrationDistrict(new Group());
 for (const t of [...district.towers, ...district.pods]) assert.ok(!FOOTPRINTS.some(r => inRect(r, t.x, t.z)) && !inMega(t.x, t.z), `district structure at ${t.x},${t.z} stands inside a megastructure`);
 // P4: the plaza deck's corners stand clear of the megastructures.
 for (const [lx, lz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) { const [x, z] = plazaAt(lx * PLAZA.hu, lz * PLAZA.hv); assert.ok(!inMega(x, z, 4), `plaza corner ${x},${z} in a megastructure`); }
-// Road fix 2: the plaza walks are [x, y, z] with decks 3–17 m up (they once dived to −176 m), and cross the Yurikamome deck (14.2 m) from below.
-for (const walk of plazaWalks) for (const [x, y, z] of walk) {
-  assert.ok(y >= 3 && y <= 17, `plaza walk point ${x},${y},${z} out of deck height`);
+// Road fix 2: the plaza walks are [x, y, z] with decks up to 17 m (they once dived to −176 m), and cross the Yurikamome deck (14.2 m) from below.
+// Entrance polish: only a walk's last point may come down to a forecourt (0.45 m); every other point stays a raised deck (≥ 3 m).
+for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
+  assert.ok(y >= (i === walk.length - 1 ? .4 : 3) && y <= 17, `plaza walk point ${x},${y},${z} out of deck height`);
   if (guideway.some(([gx, , gz]) => Math.hypot(gx - x, gz - z) < 8)) assert.ok(y < 10, `plaza walk point ${x},${y},${z} meets the guideway deck`);
 }
 console.log('megastructures ok');
