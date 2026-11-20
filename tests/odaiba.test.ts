@@ -186,6 +186,18 @@ const streetKit = streetNetwork(environment);
       assert.ok(!(flat ? any && !(o.name === 'SIDEWALK_NETWORK' && footpath(cx, cz)) : inside(cx, cz)), `${o.name} left inside the district near ${cx.toFixed(0)},${cz.toFixed(0)}`);
     }
   });
+  // Road fix: surveyed slabs stay inside the district only under a built landmark, plazas and yards are gone beyond it, and no old link bridge is left.
+  const underBuilt = (x: number, z: number) => built.some(({ boundsBlender: [min, max] }: { boundsBlender: number[][] }) => x >= min[0] - 2.01 && x <= max[0] + 2.01 && -z >= min[1] - 2.01 && -z <= max[1] + 2.01);
+  environment.traverse(o => {
+    if (!(o instanceof Mesh) || !/^(BUILDING_PADS|PHASE03C_PLAZA|PRIMARY_PLAZA_ACCENTS|PHASE03C_SERVICE_AREA|SERVICE_BAY_MARKINGS|PUBLIC_LINK_BRIDGES)$/.test(o.name)) return;
+    const p = o.geometry.attributes.position, index = o.geometry.index, n = index?.count ?? p.count;
+    for (let i = 0; i < n; i += 3) {
+      let cx = 0, cz = 0;
+      for (let j = 0; j < 3; j++) { v.fromBufferAttribute(p, index ? index.getX(i + j) : i + j).applyMatrix4(o.matrixWorld); cx += v.x / 3; cz += v.z / 3; }
+      const inDistrictNow = inside(cx, cz), kept = o.name === 'PUBLIC_LINK_BRIDGES' ? !inDistrictNow : inDistrictNow ? underBuilt(cx, cz) : o.name === 'BUILDING_PADS';
+      assert.ok(kept, `${o.name} slab left near ${cx.toFixed(0)},${cz.toFixed(0)}`);
+    }
+  });
   // Road fix B1-a: beyond the edge ④ runs on as a plain street along the old band (the band's own lanes are gone); the U's avenue and the farm walk keep their surveyed road.
   for (const [x, z] of [[-290, 340], [302, -57], [-540, 562], [590, -260]]) assert.ok(paved(x, z, /^BACKDROP_RUN/), `④ does not run on beyond the edge at ${x},${z}`);
   for (const [x, z] of [[290, -258], [-200, 458]]) assert.ok(paved(x, z, /^(ROAD_SECONDARY|SIDEWALK_NETWORK)$/), `kept backdrop street lost at ${x},${z}`);

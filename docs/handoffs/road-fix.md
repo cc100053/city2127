@@ -1,0 +1,60 @@
+# road-fix — 清除斷頭路、穿樓路與舊地台
+
+- Owner: cc100053
+- Status: IN_PROGRESS（實作及本機檢查已完成，待 owner 目視驗收及 PR／CI）
+- Branch: `claude/project-thread-rt9ere`
+- Base commit: a3b66d1095e0ed67ff7c9661c4504e221278313b（main，PR #5 merge 後）
+- Last verified commit: 見本分支最新 commit（下列驗證以提交前之工作樹執行，內容與提交相同）
+- Remote availability: NOT PUSHED（推送須 owner 同意）
+
+## Session Git state
+
+- Session starting branch and HEAD: `claude/project-thread-ermwzy`，43265310（其樹與 main a3b66d10 相同）
+- Last fetched origin/main commit: a3b66d10（2026-11-20）
+- Local changes present at session start: 未追蹤之 `Dev_QA.md`（owner 檔案，未觸碰）
+- Upstream integration status: NOT INTEGRATED
+- Pending Git conflicts or synchronization blockers: NONE
+
+## Goal and acceptance criteria
+
+Owner 以四張紅圈截圖（2026-11-20 12:43，Desktop）指出：斷頭高架、草地上的星形白路、穿過建築的路、無樓的大塊白色地台。要求全場修正，並須保護日後會出現建築的預留地。完成條件：上述各類在 hero 及各斜角不再出現；所有 Meter 變化位、住宅、能源建築及其接駁路不受影響；`npm test`、`npm run build`、`git diff --check` 通過。
+
+## In-scope files and dependencies
+
+- `src/skyways.ts`、`src/layout.ts`、`src/mobility.ts`：刪除 `sweepway`、其穿梭列車及兩條斷頭 link。
+- `src/odaibaScene.ts`：草地 shader 不再畫正弦步道。
+- `src/roadRepair.ts`：district 外只留 `BACKDROP_STREETS`，④ 兩端改為 `BACKDROP_RUNS`；清除無建築的舊地台類網格及 district 內的舊 7 m 天橋。
+- `tests/odaiba.test.ts`、`tests/skyRingClearance.test.ts`：同步斷言。
+- `docs/PROJECT.md`：資料流描述同步。
+
+## Completed work
+
+Owner 決定（2026-11-20）：A1 刪除全部 shader 步道；B1-a 清除 district 外舊街，只保留延續新街出口的道路；C1 刪除 sweepway；編號地台清單「建議照做」。
+
+1. C1：`sweepway`（原接已讓位予巨構的 Grand Nikko 環，下端伸出海面）、Nikko 環殘段 link、東北伸出海面的 front-left link 及 sweep 列車刪除。
+2. A1：草地 shader 的正弦碎石步道刪除（穿過建築、鞍點擴成星形）。
+3. B1-a：district 外舊街只保留 U 的導軌大道（東北）及受電テラス農園旁步道（農園碎石路須與之相接，`energyPipeline` 測試點不變）。舊 ~90 m 主幹道各行車線在不同位置中斷，故 ④ 兩端改為新建 24 m 延續路（18 m 車道＋兩側 3 m 行人路）沿舊主幹道軸線伸至岸邊。
+4. 地台清單：舊建築地台、廣場及其飾線、服務區、泊位標線在 district 內只保留於已建 landmark 足印（+2 m）之下；district 外地台保留於背景樓宇之下，廣場及服務區刪除。編號 3（舊 Fuji TV 地台）原建議保留為框架庭院，修剪後只剩框架腳間碎三角，故改為一併清除（Fuji 框架有自身地台）。Grand Nikko 門前 apron 中不接觸建築（足印 +3 m）的碎角刪除（編號 7）。district 內舊 7 m 天橋（B1–B3）刪除。清除之地面記入 `onFormerStreet`，樹叢保持草地，不改變樹叢、court、tower 之排列。
+
+## Actual validation results
+
+- Verification status: PASSED（本機）；owner 目視驗收 PENDING
+- Date and checked commit/worktree: 2026-11-20，本分支工作樹
+- Commands/manual checks and results: root `npm test` exit 0（含新增地台與延續路斷言；forecourt visits 2、doorway meetings 2，與修改前相同）；`npm run build` PASS（既有 >500 kB 警告）；`git diff --check` PASS。`survey/`、`module-swap/` 未改動，未重跑。
+- Evidence/environment: 開發 Mac，headless Chrome，Vite DEV。修改前 `~/city2127-evidence/road-fix/r0/`（43265310，樹同 main），修改後 `r1/`，對照 `~/city2127-evidence/road-fix/before-after.jpg`；三個 Meter 狀態之地面切面圖 `r0/ground-low.png`、`ground-high.png`、`ground-after.png`；B1-a 街口 `mockb/sheet-b1a.jpg`；Fuji 庭院比較 `r1/fuji-court.jpg`。FPS 僅見 capture sidecar（vsync 60），未作正式量度。
+- Integrated commit and checks: NOT INTEGRATED
+- Changes since verification: 本 handoff 及 PROJECT.md 文字
+
+## Known issues and blockers
+
+- Owner 圖 3 右邊細圈之物件未能以鏡頭重現及確認，待 owner 目視時指出。
+- U 北端（217.5, −369.3）原本已止於 district 邊界外，本任務未改。
+- 南岸 EVENT SHELF 專用支路及行人路在空置態時刻意無建築相接，按 owner 指示保留。
+
+## Important decisions
+
+見 Completed work 之 owner 決定；預留地（所有 Meter 位、住宅 M/P/U、車抽屜住宅、能源三座及其接駁路）不清除。
+
+## Next expected step
+
+Owner 目視驗收；同意後推送分支、開 PR、CI 通過後 merge。

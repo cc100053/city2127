@@ -86,7 +86,12 @@ function mark(t: T.Vector3[]) {
   }
 }
 /** Removes the district's surveyed streets: road, markings and paving clipped exactly at the district edge, furniture by whole triangles centred
- * inside; paving stays on the forecourts of `landmarks` (those built in the district). */
+ * inside; paving stays on the forecourts of `landmarks` (those built in the district). Road fix (owner 2026-11-20): the surveyed ground slabs
+ * (building pads, plazas and their accents, service yards and bay markings) go too wherever nothing they belonged to still stands: inside the
+ * district they stay only under a built landmark (the Fuji frame stands on its own pads; the old Fuji TV pad left only shards between
+ * its legs); beyond it pads stay under the context
+ * blocks while plazas and yards go. The old 7 m link bridges inside the district, which no longer join anything, go whole. Every Meter site,
+ * housing lot and energy building stands on its own ground, so none of them loses a slab. */
 export function repairRoads(environment: T.Object3D, landmarks: readonly Landmark[] = []) {
   // Seven driveway stubs: the six in the district join no street (audit 2, 3, 7, 8, 19, 21, 23, 28, 30–34); the seventh lies 1.1 km south in the receded backdrop.
   environment.getObjectByName('ROAD_ACCESS')?.removeFromParent();
@@ -95,33 +100,51 @@ export function repairRoads(environment: T.Object3D, landmarks: readonly Landmar
   // Shave the farm-facing apron only. Oblique end cuts taper it back into the surveyed walk.
   const farmSides = [(v: T.Vector3) => -230 + .60 * (v.z - 408) - v.x,
     (v: T.Vector3) => 381 - v.z - .65 * (v.x + 246), (v: T.Vector3) => v.z - 455 - (v.x + 202), (v: T.Vector3) => v.x + 170];
+  const footprints = landmarks.map(({ boundsBlender: [min, max] }) => rect((min[0] + max[0]) / 2, -(min[1] + max[1]) / 2, 1, 0, (max[0] - min[0]) / 2, (max[1] - min[1]) / 2));
+  const grown = (r: ReturnType<typeof rect>, by: number) => rectSides({ ...r, hu: r.hu + by, hv: r.hv + by });
+  const underLandmark = footprints.map(r => grown(r, 2)), nearLandmark = footprints.map(r => grown(r, 3));
   const keep = landmarks.map(({ boundsBlender: [min, max] }) => rect((min[0] + max[0]) / 2, -(min[1] + max[1]) / 2, 1, 0, (max[0] - min[0]) / 2 + APRON, (max[1] - min[1]) / 2 + APRON)).map(rectSides);
   environment.updateMatrixWorld(true);
   environment.traverse(object => {
     if (!(object instanceof T.Mesh)) return;
     const farmApron = object.name === 'SIDEWALK_NETWORK' || object.name === 'ROAD_SECONDARY';
     const flat = /^(ROAD_(MAJOR|SECONDARY)|MAJOR_ROAD_MARKINGS|SIDEWALK_NETWORK)$/.test(object.name), furniture = /^(PHASE03D_GUARDRAILS|STREETLIGHT_INSTANCES|PUBLIC_LIGHTING)$/.test(object.name);
-    if (!flat && !furniture) return;
+    const slab = /^(BUILDING_PADS|PHASE03C_PLAZA|PRIMARY_PLAZA_ACCENTS|PHASE03C_SERVICE_AREA|SERVICE_BAY_MARKINGS)$/.test(object.name), bridge = object.name === 'PUBLIC_LINK_BRIDGES';
+    if (!flat && !furniture && !slab && !bridge) return;
     const g = object.geometry as T.BufferGeometry, p = g.attributes.position, index = g.index, n = index?.count ?? p.count, at = (i: number) => index ? index.getX(i) : i;
     const local = object.matrixWorld.clone().invert(), kept: number[] = [], out: number[] = [];
     let changed = false;
     for (let i = 0; i < n; i += 3) {
       const tri = [0, 1, 2].map(j => new T.Vector3().fromBufferAttribute(p, at(i + j)).applyMatrix4(object.matrixWorld));
-      if (furniture) {
+      if (furniture || bridge) {
         const x = (tri[0].x + tri[1].x + tri[2].x) / 3, z = (tri[0].z + tri[1].z + tri[2].z) / 3;
-        if (inRect(district, x, z) || !onBackdropStreet(x, z)) changed = true;
+        if (inRect(district, x, z) || (furniture && !onBackdropStreet(x, z))) changed = true;
         else kept.push(at(i), at(i + 1), at(i + 2));
         continue;
+      }
+      if (slab) { // each piece once where the kept areas overlap
+        const pieces = object.name === 'BUILDING_PADS' ? outside(tri, districtSides) : [];
+        let rest = [within(tri, districtSides)].filter(q => q.length > 2);
+        for (const sides of underLandmark) { pieces.push(...rest.map(q => within(q, sides)).filter(q => q.length > 2)); rest = rest.flatMap(q => outside(q, sides)); }
+        if (pieces.length !== 1 || pieces[0].some((v, j) => v !== tri[j])) { changed = true; mark(tri); }
+        emit(pieces); continue;
       }
       // Beyond the edge only the kept backdrop streets stay, each piece once where two runs overlap.
       let pieces: T.Vector3[][] = [], beyond = outside(tri, districtSides);
       for (const sides of backdropSides) { pieces.push(...beyond.map(q => within(q, sides)).filter(q => q.length > 2)); beyond = beyond.flatMap(q => outside(q, sides)); }
       if (object.name === 'SIDEWALK_NETWORK') { // the forecourts' share of the part inside, each piece once where aprons overlap
         let rest = [within(tri, districtSides)].filter(q => q.length > 2);
-        for (const sides of keep) { pieces.push(...rest.map(q => within(q, sides)).filter(q => q.length > 2)); rest = rest.flatMap(q => outside(q, sides)); }
+        for (const [k, sides] of keep.entries()) {
+          // Apron pieces that do not reach the building (corners of the apron square left on the far side of a cut) go with the street.
+          const touches = (q: T.Vector3[]) => q.some(v => nearLandmark[k].every(side => side(v) <= 0));
+          pieces.push(...rest.map(q => within(q, sides)).filter(q => q.length > 2 && touches(q))); rest = rest.flatMap(q => outside(q, sides));
+        }
       }
       if (farmApron && tri.some(v => v.z > 340) && tri.some(v => v.z < 497) && tri.some(v => v.x > -260) && tri.some(v => v.x < -170)) pieces = pieces.flatMap(p => outside(p, farmSides));
       if (pieces.length !== 1 || pieces[0].some((v, j) => v !== tri[j])) { changed = true; mark(tri); } // a kept corner is the same vector
+      emit(pieces);
+    }
+    function emit(pieces: T.Vector3[][]) {
       for (const poly of pieces) for (let k = 1; k < poly.length - 1; k++) {
         const [a, b, c] = [poly[0], poly[k], poly[k + 1]];
         // Slivers left on a cut edge: under 5 cm from the longest side to the opposite corner.
@@ -131,7 +154,7 @@ export function repairRoads(environment: T.Object3D, landmarks: readonly Landmar
       }
     }
     if (!changed) return;
-    if (furniture) { g.setIndex(kept); return; }
+    if (furniture || bridge) { g.setIndex(kept); return; }
     const next = new T.BufferGeometry();
     next.setAttribute('position', new T.Float32BufferAttribute(out, 3));
     next.computeVertexNormals();
