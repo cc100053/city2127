@@ -452,7 +452,7 @@ for (const [bayIndex, bay] of serviceDistrict.bays.entries()) {
     assert.ok(foot && openGround.test(foot.object.name), `service pavilion foot on ${foot?.object.name}`);
   }
 }
-for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
+for (const route of [actorPaths.guideway, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
   const p = route.getPointAt(i / 200);
   for (const dx of [-3, 0, 3]) for (const dz of [-3, 0, 3]) {
     ray.set(p.clone().add(new Vector3(dx, 3, dz)), down);
@@ -549,7 +549,7 @@ for (const se of [-3, 0, 3]) {
   // Ends also show their pairings: high with forest crowns and drone docks, low with solar pods.
   concentration.setTarget(rungs({ se, nw: se === 3 ? 3 : 0, ne: se }), 0, true);
   concentration.root.updateMatrixWorld(true);
-  for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
+  for (const route of [actorPaths.guideway, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
     const p = route.getPointAt(i / 200);
     for (const dx of [-3, 0, 3]) for (const dz of [-3, 0, 3]) {
       ray.set(p.clone().add(new Vector3(dx, 3, dz)), down);
@@ -574,7 +574,7 @@ for (const sw of [-3, 3]) {
   // Sharing high also shows its high pairings (kiosks, orchards) in the route / site-visibility checks.
   sharingDistrict.setTarget(rungs({ sw, nw: sw === 3 ? 3 : 0, ne: sw === 3 ? 3 : 0 }), 0, true);
   sharingDistrict.root.updateMatrixWorld(true);
-  for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
+  for (const route of [actorPaths.guideway, ...actorPaths.promenades]) for (let i = 0; i <= 200; i++) {
     const p = route.getPointAt(i / 200);
     ray.set(p.clone().add(new Vector3(0, 3, 0)), down);
     assert.equal(ray.intersectObject(sharingDistrict.root, true).length, 0, `sharing ${sw} court blocks a pod/walker route`);
@@ -615,7 +615,7 @@ console.log(`Odaiba: ${sharingDistrict.courts.length} sharing courts stand on op
   const m = new Matrix4(), c = new Vector3(), q = new Quaternion(), sc = new Vector3();
   for (const o of city.children.filter(o => o instanceof InstancedMesh && /^(surveyed-coastal-trunks|grove-terraces)$/.test(o.name)) as InstancedMesh[])
     for (let i = 0; i < o.count; i++) { o.getMatrixAt(i, m); m.decompose(c, q, sc); if (sc.x > 0) assert.ok(!inWater(c.x, c.z, o.name === 'grove-terraces' ? Math.max(sc.x, sc.z) + 1 : 1), `${o.name} ${i} at ${c.x.toFixed(0)},${c.z.toFixed(0)} in the water`); }
-  for (const route of [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades, ...actorPaths.decks, ...actorPaths.streets]) for (const p of route.getSpacedPoints(800))
+  for (const route of [actorPaths.guideway, ...actorPaths.promenades, ...actorPaths.decks, ...actorPaths.streets]) for (const p of route.getSpacedPoints(800))
     assert.ok(p.y > 6 || !inWater(p.x, p.z, 1), `a route crosses the water at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
 }
 
@@ -629,7 +629,7 @@ for (const [i, px] of courtVisibility.entries()) if (!HERO_HIDDEN_COURTS.include
 console.log(`Odaiba: sharing courts show ${courtVisibility.map(px => px.toFixed(0)).join(' / ')} px of ground in the hero frame.`);
 
 if (process.env.SCAN_COURTS) {
-  const R = Number(process.env.SCAN_COURTS), routePoints = [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades].flatMap(r => r.getSpacedPoints(400));
+  const R = Number(process.env.SCAN_COURTS), routePoints = [actorPaths.guideway, ...actorPaths.promenades].flatMap(r => r.getSpacedPoints(400));
   const out: [number, string][] = [];
   for (let x = DISTRICT.minX; x <= DISTRICT.maxX; x += 10) for (let z = DISTRICT.minZ; z <= DISTRICT.maxZ; z += 10) {
     if (concentration.towers.some(t => Math.hypot(t.x - x, t.z - z) < R + 28) || concentration.pods.some(p => Math.hypot(p.x - x, p.z - z) < R + 16)) continue;
@@ -655,7 +655,7 @@ if (process.env.SCAN_LOT) {
   ];
   const discs: [string, number, number, number][] = [...concentration.towers.map(t => ['tower', t.x, t.z, 28] as [string, number, number, number]),
     ...concentration.pods.map(p => ['pod', p.x, p.z, 16] as [string, number, number, number]), ...serviceDistrict.bays.map(b => ['bay', b.x, b.z, 34] as [string, number, number, number])];
-  const routePoints = [actorPaths.guideway, actorPaths.sweep, ...actorPaths.promenades, ...actorPaths.streets, ...actorPaths.decks].flatMap(r => r.getSpacedPoints(600));
+  const routePoints = [actorPaths.guideway, ...actorPaths.promenades, ...actorPaths.streets, ...actorPaths.decks].flatMap(r => r.getSpacedPoints(600));
   const samples: [number, number][] = [];
   for (let u = -hw; u <= hw + .1; u += w / Math.ceil(w / 12)) for (let v = -hd; v <= hd + .1; v += d / Math.ceil(d / 12)) samples.push([u, v]);
   const problems = (x: number, z: number, all: boolean) => {

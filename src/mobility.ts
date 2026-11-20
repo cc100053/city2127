@@ -4,13 +4,13 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { WorldState } from './presets.ts';
 import { SiteAssetLoaderCache } from './siteAssets/assetLoader.ts';
 import { heroSettledCamera, heroTextZone } from './heroCamera.ts';
-import { guideway, guidewayTracks, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers, bayChannels, skyCorridors, sweepway, streets, STREET_KIT, BOULEVARD, WATER, shoreLane, interchangeApproach, interchangeBoatLane, INTERCHANGE, midDecks, gardenDecks } from './layout.ts';
+import { guideway, guidewayTracks, promenades, waterLoop, ferryLane, airLoop, sphereApproach, SPHERE_DOCK, bayCruisers, bayChannels, skyCorridors, streets, STREET_KIT, BOULEVARD, WATER, shoreLane, interchangeApproach, interchangeBoatLane, INTERCHANGE, midDecks, gardenDecks } from './layout.ts';
 
 const ease=(t:number)=>T.MathUtils.smoothstep(t,0,1);
 const curve=(points:readonly (readonly [number,number,number])[],closed=false)=>new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p)),closed,'centripetal');
 /** Every actor path in the Odaiba scene, in metres. */
 export function routes() {
-  return {guideway:curve(guideway),tracks:guidewayTracks.map(p=>curve(p)),promenades:promenades.map(p=>curve(p)),water:curve(waterLoop,true),ferry:curve(ferryLane),air:curve(airLoop,true),approach:curve(sphereApproach),sweep:curve(sweepway),
+  return {guideway:curve(guideway),tracks:guidewayTracks.map(p=>curve(p)),promenades:promenades.map(p=>curve(p)),water:curve(waterLoop,true),ferry:curve(ferryLane),air:curve(airLoop,true),approach:curve(sphereApproach),
     shore:curve(shoreLane,true),sky:skyCorridors.map(c=>curve(c)),channels:bayChannels.map(c=>curve(c)),ixApproach:curve(interchangeApproach),ixBoat:curve(interchangeBoatLane),decks:[...midDecks,...gardenDecks].map(p=>curve(p)),streets:streets.map(p=>curve(p))};
 }
 /** 0→1→0 over `period` seconds: out-and-back routes reverse instead of jumping. */
@@ -685,8 +685,6 @@ export function mobility(scene:T.Scene) {
   };
   // 2127 white trains, lightly warm/cool per train.
   const pods=trainFleet('guideway-pods',MAX_TRAINS,CARS,t=>t===0?'#f4f3ee':'#e9eef0');
-  // Sweep train: four cars shuttling on the descending skyway, pitched with the deck.
-  const SWEEP_CARS=4,SWEEP_SCALE=1.7,sweepLength=path.sweep.getLength(),sweepPods=trainFleet('sweep-pods',1,SWEEP_CARS,()=>'#f6f5f1');
   // Walkers (promenades and mid-level decks) plus the interchange transfers after them.
   const people=pedestrians(scene,MAX_WALKERS+TRANSFERS,'promenade-walkers'),walks=[...path.promenades,...path.decks],walkLength=walks.map(c=>c.getLength());
   // Facade overlays mark the inferred entries; the wall is not cut and there is no simulated interior.
@@ -775,7 +773,7 @@ export function mobility(scene:T.Scene) {
     root.updateWorldMatrix(true,true);
     body.vertexColors=true;body.roughness=.36;body.metalness=.45;body.side=T.DoubleSide;body.needsUpdate=true;
     const roles={train_body:body,train_interior:trainInterior,train_glass:trainGlass,train_seam:trainSeam,train_ring:trainRing,train_head:trainHead,train_tail:carTail,train_field:trainField,train_screen:trainScreen,train_lamp:trainLamp};
-    pods.rebuild(root,roles);sweepPods.rebuild(root,roles);
+    pods.rebuild(root,roles);
   }).catch(error=>console.warn('train-2127: keeping the box trains.',error));
   // Crossings (the street kit draws their light panels): mint edge lines either side, x scaled to the carriageway width, lit while a
   // crossing is requested.
@@ -956,11 +954,6 @@ export function mobility(scene:T.Scene) {
       const track=train%2,{u,visible}=trainPose(time,train>>1,MAX_TRAINS/2,car,trackLength[track]);
       place(path.tracks[track],u);pose.scale.setScalar(visible*(activity?amount(activity.pods,train*CARS+car):train<TRAINS?T.MathUtils.smoothstep(state.traffic*.5+.5-train*.3,0,.1):0));pods.set(train,car,pose);
     }pods.flush();
-    for(let car=0;car<SWEEP_CARS;car++){
-      // Drawn at SWEEP_SCALE so the train reads at hero distance; the shortened length spaces the cars by the same factor.
-      const {u,forward}=podPose(time+20,0,car,sweepLength/SWEEP_SCALE);
-      place(path.sweep,u,!forward);pose.rotation.x=-Math.asin(T.MathUtils.clamp(tangent.y,-1,1));pose.scale.setScalar(SWEEP_SCALE*T.MathUtils.smoothstep(state.traffic*.5+.5,0,.1));sweepPods.set(0,car,pose);
-    }sweepPods.flush();
     // Leaders first: each party's pose, then the sidesteps that let faster parties pass slower ones (stoppers veer on their own).
     const leads:{w:ReturnType<typeof walkerPose>;stop:ReturnType<typeof stops.get>;lane:number}[]=[],movers:Mover[]=[],moverOf:number[]=[];
     for(let i=0;i<MAX_WALKERS;i+=walkerParty(i).size){
