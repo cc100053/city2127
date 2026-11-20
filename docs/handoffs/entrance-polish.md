@@ -27,6 +27,7 @@ Owner 截圖（2026-11-20 23:17）圈出三處：Fuji 主樓正門及地面、�
 4. **環形底座**：兩個環面方向的底座立面加地面玻璃大堂、4 m 豎框、深雨篷及燈邊。
 5. **船身**：最底一層改為內縮玻璃商店層、白色楣板及 6 m 柱列；天橋落點（u 53）設主入口雨篷。
 6. **玻璃盒移除**（`floaters.ts`）：`ASSEMBLY`、模組動畫及其材質刪除；浮空議事球不變。
+7. **環形隧道門**（owner 2026-11-20 追加）：① 大街及 guideway 本來直穿環形東南腳實心環身（PR 6/7 遺留）。`RING_GATE`（`megaFootprints.ts`）定義斜向隧道（環內 x 30.5 至 53.5／65，高 22 m）；`megastructures.ts` 用材質副本 `carve()` 喺 shader 挖空該範圍（只限巨構本身，天橋及 Meter 用原材質不受影響，draw call 不增加，只多一個隧道燈材質），再加淺色內壁、頂板、燈帶及兩面燈框門。`tests/megastructures.test.ts` 檢查大街及路軌喺環身範圍內都留喺隧道內。
 
 ## Actual validation results
 

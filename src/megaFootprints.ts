@@ -1,6 +1,10 @@
 // Plan footprints of the P1 megastructures (metres), free of three.js so any module can import them without a cycle.
 import { CIVIC, civicAt } from './layout.ts';
 export const RING = { x: 95, z: -195, centreY: 90, outer: 105, inner: 73, depth: 45, yaw: -2.05 + .8, plinth: [60, 50] as const };
+/** Road gate (owner 2026-11-20): where avenue ① and the guideway pass through the hoop's south-east foot. Ring-local x runs from `left` to a
+ * skewed right edge (`right[0]` at the -z face, `right[1]` at +z, following the road's slant), world y 0 to `top`; the hoop is cut open there
+ * (megastructures `carved`) and lined as a tunnel. */
+export const RING_GATE = { left: 30.5, right: [53.5, 65] as const, top: 22, reach: 25 };
 export const ARCH = { a: [-9, -237] as const, b: [58, -5] as const, apex: 135 };
 // r2: front base line (-160, 20) to (-330, 95); local +x runs along it toward the left end, +z recedes from the camera. Low left end (3 terraces), 8 at the right end.
 export const HULL = { x: -260, z: 64, yaw: .4155, length: 180, depth: 90, steps: 8, step: 15, recede: 9 };

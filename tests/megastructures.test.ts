@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import { Box3, Group, Mesh, InstancedMesh } from 'three';
 import { ConcentrationDistrict } from '../src/districtMeters.ts';
 import { changeSites, guideway, PLAZA, plazaAt, plazaWalks } from '../src/layout.ts';
-import { ARCH, FOOTPRINTS, groundContacts, HULL, inMega, inRect, megastructures, RING } from '../src/megastructures.ts';
+import { ARCH, FOOTPRINTS, groundContacts, HULL, inMega, inRect, megastructures, RING, RING_GATE } from '../src/megastructures.ts';
+import { routes } from '../src/mobility.ts';
 
 // P1: the three megastructures exist, reach their table heights (±25%) and stand clear of the Meter sites (+14 m) and the civic core.
 const group = megastructures(), box = new Box3(), parts = new Map<string, Box3>();
@@ -35,5 +36,19 @@ for (const [lx, lz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) { const [x, z] = pl
 for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
   assert.ok(y >= (i === walk.length - 1 ? .4 : 3) && y <= 17, `plaza walk point ${x},${y},${z} out of deck height`);
   if (guideway.some(([gx, , gz]) => Math.hypot(gx - x, gz - z) < 8)) assert.ok(y < 10, `plaza walk point ${x},${y},${z} meets the guideway deck`);
+}
+// Road gate (owner 2026-11-20): wherever avenue ① (carriageway) or the guideway deck (light trails ±6.8 m) is inside the hoop's south-east foot,
+// it stays within the gate's walls and under its soffit.
+{
+  const c = Math.cos(RING.yaw), s = Math.sin(RING.yaw), { streets, tracks } = routes();
+  for (const [curve, half, h] of [[streets[0], 3.5, 0], ...tracks.map(t => [t, 6.8, 14.2 + 4] as const)] as const) {
+    const L = curve.getLength();
+    for (let d = 0; d <= L; d += 1) {
+      const p = curve.getPointAt(d / L), dx = p.x - RING.x, dz = p.z - RING.z, lx = dx * c - dz * s, lz = dx * s + dz * c;
+      if (Math.abs(lz) > RING.depth / 2 || lx < 15 || lx > 90) continue;
+      const right = RING_GATE.right[0] + (RING_GATE.right[1] - RING_GATE.right[0]) * (lz + RING.depth / 2) / RING.depth;
+      assert.ok(lx - half > RING_GATE.left && lx + half < right && h < RING_GATE.top, `route through the ring foot at ${p.x.toFixed(1)},${p.z.toFixed(1)} misses the road gate`);
+    }
+  }
 }
 console.log('megastructures ok');
