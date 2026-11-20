@@ -38,6 +38,10 @@ Owner 決定（2026-11-20）：A1 刪除全部 shader 步道；B1-a 清除 distr
 
 5. Owner 複查（2026-11-20）兩處：Yurikamome 車站一條 8 m 高平面行人通道在巨構船身起好後兩端伸出船身外，已刪除（`roadRepair` `stationWalk`：巨構 30 m 範圍內、3–12 m 高的平面 refinement 三角形）；兩條路軌在船身兩端牆身直接穿入，owner 選 A，在兩端 bulkhead 各加一個有燈框的深色隧道口（`megastructures.ts` `megaPortal`，東 d 3.75–21.75、西 d 38.25–60.25，高 9–23 m；口內的 bulkhead 肋條及縫線略去）。
 
+## Round 2 (owner 2026-11-20)
+
+Owner 截圖圈出三條斷開彎曲的白色高架步道：plaza deck 的 `plazaWalks`（layout.ts）把 `plazaAt` 展開在高度之前，點成了 [x, z, y]，步道潛至 −176 m 再升上來。新增 `deckAt` 修正次序；Fuji 登陸台步道改在 Yurikamome 橋面（14.2 m）之下以 8–8.5 m 穿過並去掉折返；兩條步道的首點移離 deck 花槽，ring 步道尾點移離 deck 花槽，船身步道尾段移離組裝塔。瀏覽器檢查：沿三條步道每 1/300 長度向下（3 m）無障礙；水平 ±3 m 只餘船身步道尾段一棵樹的樹冠擦邊。`tests/megastructures.test.ts` 新斷言：點高 3–17 m，近導軌處低於 10 m（舊座標會失敗）。證據 `~/city2127-evidence/road-fix2/`。
+
 ## Actual validation results
 
 - Verification status: PASSED（本機）；owner 目視驗收 PENDING
