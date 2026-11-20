@@ -36,6 +36,8 @@ Owner 決定（2026-11-20）：A1 刪除全部 shader 步道；B1-a 清除 distr
 3. B1-a：district 外舊街只保留 U 的導軌大道（東北）及受電テラス農園旁步道（農園碎石路須與之相接，`energyPipeline` 測試點不變）。舊 ~90 m 主幹道各行車線在不同位置中斷，故 ④ 兩端改為新建 24 m 延續路（18 m 車道＋兩側 3 m 行人路，`BACKDROP_RUNS`）沿舊主幹道軸線伸出，末端為掉頭圈：東段 460 m；西南段 265 m，停在 280 m 外的背景樓宇之前（原長度會越過護岸並穿過樓宇）。另以 40 m 連接路把農園步道北端接上西南延續路。沿兩段每 10 m 取樣：路面高於地形 0.37 m，無水面、樓宇或高架橋墩。
 4. 地台清單：舊建築地台、廣場及其飾線、服務區、泊位標線在 district 內只保留於已建 landmark 足印（+2 m）之下；district 外地台保留於背景樓宇之下，廣場及服務區刪除。編號 3（舊 Fuji TV 地台）原建議保留為框架庭院，修剪後只剩框架腳間碎三角，故改為一併清除（Fuji 框架有自身地台）。Grand Nikko 門前 apron 中不接觸建築（足印 +3 m）的碎角刪除（編號 7）。district 內舊 7 m 天橋（B1–B3）刪除。清除之地面記入 `onFormerStreet`，樹叢保持草地，不改變樹叢、court、tower 之排列。
 
+5. Owner 複查（2026-11-20）兩處：Yurikamome 車站一條 8 m 高平面行人通道在巨構船身起好後兩端伸出船身外，已刪除（`roadRepair` `stationWalk`：巨構 30 m 範圍內、3–12 m 高的平面 refinement 三角形）；兩條路軌在船身兩端牆身直接穿入，owner 選 A，在兩端 bulkhead 各加一個有燈框的深色隧道口（`megastructures.ts` `megaPortal`，東 d 3.75–21.75、西 d 38.25–60.25，高 9–23 m；口內的 bulkhead 肋條及縫線略去）。
+
 ## Actual validation results
 
 - Verification status: PASSED（本機）；owner 目視驗收 PENDING
@@ -47,7 +49,7 @@ Owner 決定（2026-11-20）：A1 刪除全部 shader 步道；B1-a 清除 distr
 
 ## Known issues and blockers
 
-- Owner 圖 3 右邊細圈之物件未能以鏡頭重現及確認，待 owner 目視時指出。已檢查仍存在的高架：`gardenDecks[0]` 兩端分別接 151 m 塔及 DECKS；`plazaWalks[0]` 接環形巨構底座。
+- Owner 圖 3 右邊細圈：最可能即上述路軌穿船身一處（第 5 項）；隧道口只是牆面外加的深色面板及燈框，船身本體未開洞（車廂在牆內被遮住，從外看不到）。已檢查仍存在的高架：`gardenDecks[0]` 兩端分別接 151 m 塔及 DECKS；`plazaWalks[0]` 接環形巨構底座。
 - 曾承諾的 2.5 m 格網自動 audit 未建成；以地面切面圖（三個 Meter 狀態）、延續路取樣及 `odaiba.test.ts` 新斷言代替。
 - 清除後的 district 地面記入 `onFormerStreet`，保持草地，不會長出新樹叢。
 - U 北端（217.5, −369.3）原本已止於 district 邊界外，本任務未改。
