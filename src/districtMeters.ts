@@ -1077,6 +1077,11 @@ const POD_SITES: readonly (readonly [number, number])[] = ([
   [-293, 147], [-253, -33], [-233, 47], [-218, -23], [-183, -43], [-168, -128], [-103, 17], [-53, 147], [-79, 137], [-23, 107], [7, -58], [27, 87], [77, 107], [87, 57], [97, -73], [107, -123], [107, 77], [117, 7], [137, -103], [182, 37], [217, -43], [217, 87], [237, -73], [237, 57], [247, -103], [252, 147],
 ] as const).filter(([x, z]) => !inMega(x, z, 14) && !inHeroClear(x, z));
 
+/** Ground every district Meter element may claim at some level, [x, z, radius] in metres: tower sites, the 40 m courts and the pods. Urban fill keeps off it. */
+export const METER_GROUND: readonly (readonly [number, number, number])[] = [
+  ...TOWER_SITES.map(([x, z]) => [x, z, 22] as const), ...COURT_SITES.map(([x, z]) => [x, z, 30] as const), ...POD_SITES.map(([x, z]) => [x, z, 12] as const),
+];
+
 /** Q4: one walkable vertical district or functions spread through the parks.
  * High raises slender glass towers with lit sky lobbies on open ground; low scatters low glass pavilion pods across the lawns.
  * Both are complete 2127 forms; mixed shows about half of each. Positions are traced open ground (actual-mesh checks in odaiba.test.ts). */

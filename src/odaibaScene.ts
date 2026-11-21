@@ -20,6 +20,8 @@ import { bayContext, recedeBeyondDistrict } from './bayContext';
 import { publishDoorways, publishEntrances, routes, waterGLSL } from './mobility';
 import { onFormerStreet, repairRoads } from './roadRepair';
 import { streetNetwork, updateStreetKit } from './streetKit';
+import { buildUrbanFill, planUrbanFill } from './urbanFill';
+import { METER_GROUND } from './districtMeters';
 
 // Literal paths bundle the district-detailed environment (scripts/crop-odaiba-district.py) and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
 const environmentUrl = new URL('../asset/models/odaiba-masterplan/odaiba_district_v01_environment.glb', import.meta.url).href;
@@ -114,6 +116,11 @@ function nightRooms(material: T.MeshStandardMaterial) {
   };
   material.customProgramCacheKey = () => 'night-rooms';
 }
+/** Landmark glazing: warm faint day glow, scattered lit rooms at night (`updateOdaiba`). */
+function glaze(material: T.MeshStandardMaterial) {
+  if (glazing.has(material)) return;
+  material.emissive.copy(warm); material.emissiveIntensity = dayGlow; material.roughness=.22;material.metalness=.38;nightRooms(material);glazing.add(material);
+}
 /** Retained landmark glazing glows warm, strongest at night; the civic chassis uses the shared city finishes. */
 export function updateOdaiba(night: number) {
   updateCivic(night);
@@ -180,7 +187,14 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   if (revetment instanceof T.Mesh) cutUnderPlatform(revetment.material);
   carveContext(environment);
   scene.add(contextFacades(environment), bayContext(), megastructures(), floaters(), streetNetwork(environment), hydroTerrace(), bayFlower()); // after the recede wrap: the kit's ground keeps its own shading
-  plantCanopy(scene,trees,true);
+  // Urban fill (owner 2026-11-21): city blocks on open lawn, clear of landmarks (8 m round their surveyed bounds) and Meter ground.
+  const landmarkBounds = built.map(placement => placement.boundsBlender);
+  const fill = buildUrbanFill(planUrbanFill([environment, ...scene.children], (x, z) =>
+    METER_GROUND.some(([mx, mz, r]) => Math.hypot(x - mx, z - mz) < r) ||
+    landmarkBounds.some(([[x0, y0], [x1, y1]]) => x > x0 - 8 && x < x1 + 8 && -z > y0 - 8 && -z < y1 + 8)));
+  scene.add(fill.root); glaze(fill.glass);
+  // Surveyed trees on a fill block stay in the list at zero scale (each crown's pose depends on its index); street trees join the same batch.
+  plantCanopy(scene,{instances:[...trees.instances.map(tree=>fill.covers(tree.position[0],-tree.position[1])?{...tree,scale:0}:tree),...fill.trees]},true);
   plantBackdropGrove(scene,environment);
   // Sky gardens crown the tall context towers (the only CTX mesh above 30 m inside the district).
   // Each roof garden's terraces go to the district Meters (sails/forest) and take a few residents (stroll line, standing group).
@@ -199,7 +213,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
       if (!(object instanceof T.Mesh)) return;
       for (const material of [object.material].flat() as T.MeshStandardMaterial[])
         if (curtainWalls[material.name]) { if (!material.customProgramCacheKey().startsWith('curtain')) curtainWall(material, curtainWalls[material.name]); }
-        else if (/glass|glazing|window reflection/i.test(material.name) && !glazing.has(material)) { material.emissive.copy(warm); material.emissiveIntensity = dayGlow; material.roughness=.22;material.metalness=.38;nightRooms(material);glazing.add(material); }
+        else if (/glass|glazing|window reflection/i.test(material.name)) glaze(material);
         else if (roofRetrofit[material.name]) { const [color, roughness, metalness] = roofRetrofit[material.name]; material.color.set(color); material.roughness = roughness; material.metalness = metalness; }
     });
     // One draw per finish instead of one per surveyed part (30–50 per landmark); materials stay shared, so night glazing still applies.
@@ -207,6 +221,6 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     const merged = bake(model); model.clear(); parts.forEach(geometry => geometry.dispose());
     merged.forEach(mesh => { mesh.name = placement.id; model.add(mesh); });
   }));
-  plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name) || object.name==='plaza-deck'),[routes().streets[1]],onFormerStreet);
+  plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name) || object.name==='plaza-deck'),[routes().streets[1]],(x,z)=>onFormerStreet(x,z)||fill.covers(x,z,6));
   publishEntrances(scene,environment);
 }
