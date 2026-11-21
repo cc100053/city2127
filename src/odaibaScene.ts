@@ -20,7 +20,7 @@ import { bayContext, recedeBeyondDistrict } from './bayContext';
 import { publishDoorways, publishEntrances, routes, waterGLSL } from './mobility';
 import { onFormerStreet, repairRoads } from './roadRepair';
 import { streetNetwork, updateStreetKit } from './streetKit';
-import { buildUrbanFill, planUrbanFill } from './urbanFill';
+import { backdropFabric, buildUrbanFill, planUrbanFill } from './urbanFill';
 import { METER_GROUND } from './districtMeters';
 
 // Literal paths bundle the district-detailed environment (scripts/crop-odaiba-district.py) and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
@@ -195,7 +195,8 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   scene.add(fill.root); glaze(fill.glass);
   // Surveyed trees on a fill block stay in the list at zero scale (each crown's pose depends on its index); street trees join the same batch.
   plantCanopy(scene,{instances:[...trees.instances.map(tree=>fill.covers(tree.position[0],-tree.position[1])?{...tree,scale:0}:tree),...fill.trees]},true);
-  plantBackdropGrove(scene,environment);
+  const fabric = backdropFabric(environment); scene.add(fabric.root);
+  plantBackdropGrove(scene,environment,fabric.covers);
   // Sky gardens crown the tall context towers (the only CTX mesh above 30 m inside the district).
   // Each roof garden's terraces go to the district Meters (sails/forest) and take a few residents (stroll line, standing group).
   const roofGarden=(model:T.Object3D,tower?:boolean)=>{const terraces=plantRoofCanopy(scene,model,tower);publishRoofGardens(terraces);publishRoofWalks(model,terraces);};
