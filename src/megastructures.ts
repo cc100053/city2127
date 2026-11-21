@@ -4,6 +4,7 @@ import { hash, plantCanopy, plantShrubs } from './coastalCanopy.ts';
 import { bodyFootprints, inRect } from './megaFootprints.ts';
 import { addCityModel } from './modelAssets.ts';
 import { sign, type Kit } from './cityRig.ts';
+import { lightSlopePlants, slopePlants, type SlopePlant } from './slopePlants.ts';
 
 // P1 (city-taste-v2): the three colossal megastructures of the master target — ring-on-edge building, white arch, stepped terraced hull.
 // Ground contacts and sizes are exported for the test and for carving the context massing they replace. Metres.
@@ -74,6 +75,7 @@ export const updateMegastructures = (night: number) => {
   gateLight.emissiveIntensity = .8 + night * 1.4; roomGlow.value = night;
   ringGlazing.emissiveIntensity = .06 + night * 1.05;
   transferCove.emissiveIntensity = .62 + night * 1.3;
+  lightSlopePlants(night);
 };
 
 type Plant = Parameters<typeof plantCanopy>[1]['instances'][number];
@@ -100,13 +102,46 @@ function bar(batch: Batch, material: T.Material, a: T.Vector3, b: T.Vector3, w: 
   put(batch, material, unitBox, new T.Matrix4().compose(a.clone().add(b).multiplyScalar(.5), q, new T.Vector3(w, h, d.length() + .02)));
 }
 
+// Sightline order, from the left fan and trailers through low bridge-side rosettes to the right spears.
+const RING_LEDGES = [-15.75, -4.5, 6.75, 18] as const;
+const RING_PLANTING: ReadonlyArray<ReadonlyArray<readonly [
+  angle: number, form: SlopePlant['form'], width: number, height: number, yaw?: number,
+]>> = [
+  [
+    [-148, 'fern', 5.1, 5.9], [-131, 'vine', 4, 8], [-118, 'rosette', 4.6, 3.6],
+    [-112, 'fern', 4.5, 5.8], [-99, 'rosette', 3.6, 3.2], [-90, 'rosette', 4.5, 4], [-82, 'rosette', 3.8, 4],
+    [-70, 'fern', 5, 6], [-59, 'fern', 4.4, 6.8], [-51, 'spear', 2.8, 6.7],
+    [-43, 'fern', 5.5, 7], [-34, 'rosette', 4.8, 5.6], [-26, 'fern', 5.2, 8.7],
+  ],
+  [
+    [-156, 'fern', 6, 9], [-145, 'vine', 4.5, 10], [-136, 'fern', 6.2, 8.4], [-125, 'rosette', 4.8, 3.9],
+    [-114, 'fern', 5.7, 6.4], [-106, 'rosette', 4.2, 2.7], [-70, 'rosette', 5.5, 3.2],
+    [-64, 'fern', 5.4, 6.5], [-55, 'fern', 5.5, 6.7], [-49, 'spear', 2.8, 8],
+    [-40, 'fern', 5.8, 6.7], [-32, 'spear', 3.2, 9.2], [-28, 'rosette', 4.5, 5], [-21, 'fern', 5.3, 7.6],
+  ],
+  [
+    [-160, 'fern', 6.6, 10, 1.1], [-153, 'rosette', 4, 5.2], [-144, 'vine', 5.7, 10, .45],
+    [-138, 'fern', 6, 8], [-128, 'vine', 4.3, 10.5], [-118, 'fern', 4.7, 6],
+    [-108, 'rosette', 5.8, 3.7], [-72, 'fern', 5.9, 6.8], [-67, 'rosette', 5.3, 4.4], [-59, 'fern', 6.6, 9, .65],
+    [-53, 'fern', 4.4, 6.5], [-48, 'spear', 3.3, 10], [-40, 'fern', 7.1, 10.3, 1.4],
+    [-35, 'fern', 4.6, 6.5], [-29, 'spear', 3.5, 10.8], [-24, 'fern', 5.8, 8], [-17, 'spear', 6.4, 22.8],
+  ],
+  [
+    [-163, 'fern', 8.3, 12.2, -.35], [-156, 'vine', 4.6, 10, .3], [-151, 'spear', 3.2, 7.3],
+    [-143, 'rosette', 8, 8.7, .5], [-141, 'vine', 5, 13, 1.05], [-134, 'vine', 4.6, 11.5, .3],
+    [-127, 'fern', 5.7, 6.6, 2.1], [-119, 'vine', 7.5, 12, .6], [-114, 'rosette', 6.3, 4.2, 1.9],
+    [-108, 'spear', 2.8, 8.2], [-101, 'rosette', 8.2, 5.6, .6], [-72, 'fern', 6, 6.4],
+    [-65, 'fern', 7.6, 9.7], [-60, 'rosette', 4.1, 4.6], [-53, 'fern', 6.6, 8.5], [-48, 'spear', 3, 9.5],
+    [-39, 'fern', 6, 7.8], [-34, 'fern', 5.4, 7], [-26, 'fern', 6.4, 8.3], [-21, 'spear', 4.5, 13.5],
+  ],
+];
+
 // ---- A. Ring-on-edge building: local frame, ring in XY, axis +Z, centred on the hoop; the group is turned by `yaw` and lifted to centreY.
-function ring(batch: Batch, trees: Plant[], shrubs: Shrub[], hasPilot: boolean, hasBody: boolean, hasTransfer: boolean) {
+function ring(batch: Batch, plants: SlopePlant[], hasPilot: boolean, hasBody: boolean, hasTransfer: boolean) {
   const { outer, inner, depth, plinth, centreY } = RING, half = depth / 2;
   const opening = [-.035, .163]; // Angle from the bottom of the hoop to each edge of the garden landing.
   const L = (r: number, h: number, atLanding = false) => new T.CylinderGeometry(r, r, h, 96, 1, true,
     atLanding ? opening[1] : 0, Math.PI * 2 - (atLanding ? opening[1] - opening[0] : 0)).rotateX(Math.PI / 2);
-  const place = (x: number, y: number, z: number) => { const v = new T.Vector3(x, y, z).applyAxisAngle(new T.Vector3(0, 1, 0), RING.yaw); return [RING.x + v.x, centreY + v.y, RING.z + v.z] as const; };
   const world = new T.Matrix4().compose(new T.Vector3(RING.x, centreY, RING.z), new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 1, 0), RING.yaw), new T.Vector3(1, 1, 1));
   const add = (material: T.Material, g: T.BufferGeometry, m?: T.Matrix4) => put(batch, material, g, m ? world.clone().multiply(m) : world);
   const bh = depth / 10;
@@ -138,8 +173,8 @@ function ring(batch: Batch, trees: Plant[], shrubs: Shrub[], hasPilot: boolean, 
       add(megaShell, flip(L(inner - 1.5 - (b % 2) * .8, 1.1, atLanding)), new T.Matrix4().makeTranslation(0, 0, z + bh / 2));
     }
   }
-  // Planted ledges on the lower inner arc (crowns go through the shared canopy instancer) and the service rail with three static pods.
-  for (const z of [-half + bh * 1.5, -half + bh * 4, -half + bh * 6.5, -half + bh * 9]) {
+  // Planted ledges on the lower inner arc and the service rail with three static pods.
+  for (const [ledge, z] of RING_LEDGES.entries()) {
     const atLanding = hasPilot && z > 15;
     const edges = opening.map(angle => angle - Math.PI / 2);
     const start = -Math.PI * .95, end = -Math.PI * .05;
@@ -153,30 +188,29 @@ function ring(batch: Batch, trees: Plant[], shrubs: Shrub[], hasPilot: boolean, 
       add(megaPlant, new T.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: false, curveSegments: 24 }), new T.Matrix4().makeTranslation(0, 0, z + .5).multiply(new T.Matrix4().makeScale(.97, .97, 1)));
     }
     const blocksLanding = (a: number) => (atLanding || atConcourse) && a > gap[0] - .055 && a < gap[1] + .055;
-    // Leave the ledge visible between groves. Each has one taller tree and a few smaller companions.
-    const zi = Math.round(z * 10);
-    for (const [rr, gap, lift] of [[inner - .6, 4.4, 1], [inner - 5.5, 6, .8]] as const)
-      for (let a = -Math.PI * .08, i = 0; a > -Math.PI * .92; a -= gap / rr, i++) {
-        if (blocksLanding(a)) continue;
-        const p = place(Math.cos(a) * rr, Math.sin(a) * rr + lift, z);
-        const cover = .5 + .5 * Math.cos(a * 13 + z * .36);
-        shrubs.push([p[0], p[1], p[2], 1.5 + 1.6 * cover + hash(zi + i) * .35, .75 + 1.05 * cover]);
+    const rootRadius = (inner - 9) * .97 + .55;
+    for (const [i, [degrees, form, width, height, yaw]] of RING_PLANTING[ledge].entries()) {
+      const angle = T.MathUtils.degToRad(degrees);
+      if (blocksLanding(angle)) continue;
+      const seed = 53 * ledge + i;
+      const tint = form === 'spear' ? 0xbbfff0 : ledge < 2 ? 0xc6e0ac : 0xffffff;
+      const base = new T.Vector3(Math.cos(angle) * rootRadius, Math.sin(angle) * rootRadius, z + 1.38).applyMatrix4(world);
+      const heading = form === 'fern' || form === 'vine' ? -1.58 + (yaw ?? hash(seed) - .5) * .65 : yaw ?? hash(seed) * 6.28;
+      plants.push({ form, base, width: width * (form === 'fern' ? 1.38 : 1.15), height: height * 1.32, yaw: RING.yaw + heading, tint });
+      // Underplant taller specimens with short leaf fans along the same root strip.
+      for (const delta of [-.032, .034]) {
+        const companion = angle + delta;
+        if (blocksLanding(companion)) continue;
+        plants.push({
+          form: 'rosette',
+          base: new T.Vector3(Math.cos(companion) * (rootRadius + 2.3), Math.sin(companion) * (rootRadius + 2.3), z + 1.38).applyMatrix4(world),
+          width: 2.9 + hash(seed + delta) * 2,
+          height: 2.9 + hash(seed - delta) * 1.8,
+          yaw: RING.yaw + hash(seed + 4) * 6.28,
+          tint: 0xbad5a0,
+        });
       }
-    for (let a = -Math.PI * .1 - hash(zi) * .1, c = 0; a > -Math.PI * .9; a -= (30 + hash(zi + c) * 15) / inner, c++)
-      for (let j = 0, n = 3 + Math.floor(hash(zi + c + 3) * 3); j < n; j++) {
-        const seed = zi + c * 19 + j * 7;
-        const offset = (hash(zi + c * 9 + j) - .5) * 6 / inner;
-        if (blocksLanding(a + offset)) continue;
-        const aj = a + (blocksLanding(a + 2 * offset) ? offset : 2 * offset);
-        const columnar = j <= 1 && hash(seed + 3) > .55;
-        const baseScale = j === 1 ? .81 : j === 0 ? .47 : .31;
-        const scale = baseScale + (j === 1 ? .18 : .27) * hash(seed);
-        const crownSpread = columnar ? .67 : .88 + .24 * hash(seed + 1);
-        // Root into the upper edge of the grass strip, inside its 1 m depth.
-        const r = (inner - 9) * .97 + .55;
-        const p = place(Math.cos(aj) * r, Math.sin(aj) * r, z + .8 + .4 * hash(seed + 2));
-        trees.push({ position: [p[0], -p[2], p[1]], scale, crownSpread, type: columnar ? 'columnar' : 'broadleaf' });
-      }
+    }
   }
   const railSpans = hasTransfer ? [[-Math.PI * 1.1, -Math.PI / 2 - .13], [-Math.PI / 2 + .216, Math.PI * .1]] : [[-Math.PI * 1.1, Math.PI * .1]];
   for (const [start, end] of railSpans) add(megaRib, new T.TorusGeometry(inner - 1.2, .45, 6, 64, end - start), new T.Matrix4().makeRotationZ(start));
@@ -344,15 +378,20 @@ export function carveContext(environment: T.Object3D) {
   });
 }
 
-/** The three megastructures, with the optional Blender exterior and shared planted crowns. */
+/** The three megastructures, with the optional Blender ring exterior. */
 export function megastructures(ringModels?: { entrance: T.Group; body?: T.Group; hasTransfer?: boolean }): T.Group {
   const root = new T.Group(); root.name = 'megastructures';
-  const batch: Batch = new Map(), trees: Plant[] = [], shrubs: Shrub[] = [], tops: [number, number][] = [];
-  ring(batch, trees, shrubs, Boolean(ringModels), Boolean(ringModels?.body), Boolean(ringModels?.hasTransfer)); arch(batch, tops); hull(batch, trees, shrubs);
+  const batch: Batch = new Map(), trees: Plant[] = [], shrubs: Shrub[] = [], plants: SlopePlant[] = [], tops: [number, number][] = [];
+  ring(batch, plants, Boolean(ringModels), Boolean(ringModels?.body), Boolean(ringModels?.hasTransfer)); arch(batch, tops); hull(batch, trees, shrubs);
   for (const [material, list] of batch) {
     const mesh = new T.Mesh(mergeGeometries(list), carved.get(material) ?? material); mesh.castShadow = mesh.receiveShadow = true; mesh.name = 'megastructure'; root.add(mesh); list.forEach(g => g.dispose());
   }
-  plantCanopy(root, { instances: trees }); plantShrubs(root, shrubs);
+  // R5 seeded hull planting after these ring instances. Retain its poses and pigments after removing the ring from the shared batches.
+  const treeOffset = ringModels?.hasTransfer ? 82 : 87;
+  const shrubOffset = ringModels?.hasTransfer ? 260 : ringModels ? 288 : 296;
+  plantCanopy(root, { instances: trees, seedOffset: treeOffset });
+  plantShrubs(root, shrubs, shrubOffset);
+  root.add(slopePlants(plants));
   if (ringModels) {
     if (ringModels.hasTransfer) ringModels.entrance.getObjectByName('Ring_LandingRail')?.removeFromParent();
     root.add(ringModels.entrance);

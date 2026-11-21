@@ -102,6 +102,14 @@ Size is width × depth × height in metres.
 
 **Recipe `modules.ROLES`** (`accepted` 2026-11-13, SE R4/R5, polish 1): warm interior glow seen through 10 % glass, warm amber-cream floors instead of glowing salmon planes, and residents in saturated clothing so they read as people, not silhouettes, by day and night. On `feat/se-stage-closeup-polish`, SE `build_district.py` takes its `district_*` materials from this recipe. Reuse it for any lit habitable interior before you tune a new one.
 
+## Procedural planting — Three.js
+
+| Family | Use | Size and anchor | Materials |
+| --- | --- | --- | --- |
+| `slopePlants` | Instanced pinnate ferns, upright photonic spears, broad folded rosettes and trailing vines, shaped for silhouette at Hero scale. [Runtime](../../src/slopePlants.ts) | `base` is soil contact in world metres. `width` sets radial reach, `height` sets rise or drop. `yaw` (radians) aims vines along +X before rotation. Set `tint` to white for the base palette. ≤ 2,500 triangles per plant. | Vertex-coloured foliage and separate lit stem markings; [lineup](../../artifacts/ring-glb-pilot/r6/plant-lineup.jpg). Draft, Ring R6 (2026-11-21). |
+
+`slopePlants([{ form: 'fern', base: new Vector3(x, y, z), width: 4, height: 5, yaw: 0, tint: 0xffffff }])`
+
 ## Shared geometry — `geo_helpers.py`
 
 Low-level primitives every builder uses: `Acc`, `obox`, `cyl`, `tube`, `sweep`, `blob`, `plane`, `circle_pts`, `rrect_pts`, `ring_section`, `rot`, `yawed`, `material`, `finish_mesh`. Add a primitive here only when a second builder needs it.

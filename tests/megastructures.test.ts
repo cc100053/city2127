@@ -16,7 +16,8 @@ const group = megastructures(), box = new Box3(), parts = new Map<string, Box3>(
 group.updateMatrixWorld(true);
 group.traverse(o => { if (o instanceof Mesh && !(o instanceof InstancedMesh)) { o.geometry.computeBoundingBox(); parts.set(`${o.material.color.getHexString()}${parts.size}`, box.copy(o.geometry.boundingBox!).clone()); } });
 const shell =[...parts.entries()].find(([k]) => k.startsWith('f3f2ec'))![1];
-assert.ok(group.children.length >= 4 && group.children.length <= 12, `draw calls ${group.children.length}`);
+const structureBatches = group.children.filter(part => part instanceof Mesh).length;
+assert.ok(structureBatches >= 4 && structureBatches <= 12, `structure draws ${structureBatches}`);
 // Heights: the hoop's top, the arch apex and the hull top all lie inside the shell batch's bounds.
 const within = (v: number, want: number, what: string) => assert.ok(v >= want * .75 && v <= want * 1.25, `${what} ${v.toFixed(0)} m vs ${want} m`);
 within(RING.centreY + RING.outer, 195, 'ring top'); within(ARCH.apex, 170, 'arch apex'); within(HULL.steps * HULL.step, 120, 'hull top');
@@ -142,24 +143,46 @@ assert.equal(through.length, 2, 'the two original ring bridge walks continue thr
 const hallWalk = paths.at(-1)!;
 assert.ok(hallWalk.curve.getLength() > 20, 'the local concourse walk connects the canopy and the court');
 const down = new Vector3(0, -1, 0), tangent = new Vector3(), side = new Vector3();
-const trunks = candidate.getObjectByName('surveyed-coastal-trunks');
-const soil = candidate.children.find(part => part instanceof Mesh &&
-  part.material instanceof MeshStandardMaterial && part.material.color.getHexString() === '6f9a5c');
-assert.ok(trunks instanceof InstancedMesh && soil);
-const instance = new Matrix4(), base = new Vector3(), flanks = new Set<number>();
-for (let i = 0; i < trunks.count; i++) {
-  trunks.getMatrixAt(i, instance);
-  const height = instance.elements[5];
-  if (height === 0) continue;
-  base.setFromMatrixPosition(instance);
-  const local = base.clone().sub(ringOrigin).applyAxisAngle(up, -RING.yaw);
-  if (Math.abs(local.z) >= halfDepth || Math.abs(local.x) >= RING.inner) continue;
-  flanks.add(Math.sign(local.x));
-  base.y -= height / 2;
-  const [ground] = new Raycaster(base.clone().addScaledVector(up, 3), down, 0, 3).intersectObject(soil);
-  assert.ok(ground, `ring tree at ${local.x.toFixed(2)}, ${local.z.toFixed(2)} roots into its planted ledge`);
+for (const variant of [group, megastructures({ entrance: new Group() }), installed, candidate]) {
+  const plants = variant.getObjectByName('slope-plants');
+  const soil = variant.children.find(part => part instanceof Mesh &&
+    part.material instanceof MeshStandardMaterial && part.material.color.getHexString() === '6f9a5c');
+  assert.ok(plants && soil);
+  variant.updateMatrixWorld(true);
+  const foliage = plants.children.filter(part => part instanceof InstancedMesh);
+  assert.deepEqual(foliage.map(part => part.name), ['fern', 'spear', 'rosette', 'vine']);
+  assert.equal(plants.children.length, 5, 'plant forms and stem lights are batched');
+  const roots = new Map<number, Set<number>>();
+  const instance = new Matrix4();
+  const worldToRing = new Matrix4().makeRotationY(-RING.yaw)
+    .multiply(new Matrix4().makeTranslation(-RING.x, 0, -RING.z));
+  const plantBounds = new Box3();
+  let triangles = 0;
+  for (const part of foliage) {
+    triangles += part.count * part.geometry.attributes.position.count / 3;
+    part.geometry.computeBoundingBox();
+    const footprint = part.geometry.boundingBox;
+    assert.ok(footprint);
+    for (let i = 0; i < part.count; i++) {
+      part.getMatrixAt(i, instance);
+      plantBounds.copy(footprint).applyMatrix4(instance.clone().premultiply(worldToRing));
+      assert.ok(plantBounds.max.x < RING_GATE.left || plantBounds.min.y > RING_GATE.top,
+        `${part.name} stays outside the road and Yurikamome gate envelope`);
+      const base = new Vector3().setFromMatrixPosition(instance);
+      const local = base.clone().sub(ringOrigin).applyAxisAngle(up, -RING.yaw);
+      const ledge = Math.round((local.z - 1.38) * 4) / 4;
+      const flanks = roots.get(ledge) ?? new Set<number>();
+      flanks.add(Math.sign(local.x));
+      roots.set(ledge, flanks);
+      const out = new Vector3(local.x, local.y - RING.centreY, 0).normalize().applyAxisAngle(up, RING.yaw);
+      const [ground] = new Raycaster(base.clone().addScaledVector(out, -3.2), out, 0, 3.2).intersectObject(soil);
+      assert.ok(ground, `${part.name} at ${local.x.toFixed(2)}, ${local.z.toFixed(2)} roots into its ledge`);
+    }
+  }
+  assert.equal(roots.size, 4);
+  assert.ok([...roots.values()].every(flanks => flanks.size === 2), 'vegetation follows both flanks of every ledge');
+  assert.ok(triangles < 100_000, `ledge foliage has ${triangles} triangles`);
 }
-assert.ok(flanks.has(-1) && flanks.has(1), 'trees follow both flanks of the planted arc');
 for (const [walkIndex, walk] of [...through, hallWalk].entries()) {
   const {curve, pair, length, rest} = walk;
   const check = (d: number, o: number) => {
