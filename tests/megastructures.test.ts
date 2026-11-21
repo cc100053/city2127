@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { Box3, Group, Mesh, InstancedMesh, Raycaster, Triangle, Vector3 } from 'three';
+import { Box3, Group, Matrix4, Mesh, MeshStandardMaterial, InstancedMesh, Raycaster, Triangle, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { ConcentrationDistrict } from '../src/districtMeters.ts';
 import { changeSites, guideway, PLAZA, plazaAt, plazaWalks } from '../src/layout.ts';
@@ -142,6 +142,24 @@ assert.equal(through.length, 2, 'the two original ring bridge walks continue thr
 const hallWalk = paths.at(-1)!;
 assert.ok(hallWalk.curve.getLength() > 20, 'the local concourse walk connects the canopy and the court');
 const down = new Vector3(0, -1, 0), tangent = new Vector3(), side = new Vector3();
+const trunks = candidate.getObjectByName('surveyed-coastal-trunks');
+const soil = candidate.children.find(part => part instanceof Mesh &&
+  part.material instanceof MeshStandardMaterial && part.material.color.getHexString() === '6f9a5c');
+assert.ok(trunks instanceof InstancedMesh && soil);
+const instance = new Matrix4(), base = new Vector3(), flanks = new Set<number>();
+for (let i = 0; i < trunks.count; i++) {
+  trunks.getMatrixAt(i, instance);
+  const height = instance.elements[5];
+  if (height === 0) continue;
+  base.setFromMatrixPosition(instance);
+  const local = base.clone().sub(ringOrigin).applyAxisAngle(up, -RING.yaw);
+  if (Math.abs(local.z) >= halfDepth || Math.abs(local.x) >= RING.inner) continue;
+  flanks.add(Math.sign(local.x));
+  base.y -= height / 2;
+  const [ground] = new Raycaster(base.clone().addScaledVector(up, 3), down, 0, 3).intersectObject(soil);
+  assert.ok(ground, `ring tree at ${local.x.toFixed(2)}, ${local.z.toFixed(2)} roots into its planted ledge`);
+}
+assert.ok(flanks.has(-1) && flanks.has(1), 'trees follow both flanks of the planted arc');
 for (const [walkIndex, walk] of [...through, hallWalk].entries()) {
   const {curve, pair, length, rest} = walk;
   const check = (d: number, o: number) => {

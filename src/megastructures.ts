@@ -76,7 +76,7 @@ export const updateMegastructures = (night: number) => {
   transferCove.emissiveIntensity = .62 + night * 1.3;
 };
 
-type Plant = { position: number[]; scale: number; type: string };
+type Plant = Parameters<typeof plantCanopy>[1]['instances'][number];
 type Shrub = [number, number, number, number, number];
 type Batch = Map<T.Material, T.BufferGeometry[]>;
 /** Queue a geometry (placed by `m`) under a material; everything is normalised so per-material merging always succeeds. */
@@ -153,20 +153,29 @@ function ring(batch: Batch, trees: Plant[], shrubs: Shrub[], hasPilot: boolean, 
       add(megaPlant, new T.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: false, curveSegments: 24 }), new T.Matrix4().makeTranslation(0, 0, z + .5).multiply(new T.Matrix4().makeScale(.97, .97, 1)));
     }
     const blocksLanding = (a: number) => (atLanding || atConcourse) && a > gap[0] - .055 && a < gap[1] + .055;
-    // P5: a continuous shrub band spilling over the lip and a second one mid-ledge, with irregular tree clusters (3-5 crowns every 30-45 m).
+    // Leave the ledge visible between groves. Each has one taller tree and a few smaller companions.
     const zi = Math.round(z * 10);
     for (const [rr, gap, lift] of [[inner - .6, 4.4, 1], [inner - 5.5, 6, .8]] as const)
       for (let a = -Math.PI * .08, i = 0; a > -Math.PI * .92; a -= gap / rr, i++) {
         if (blocksLanding(a)) continue;
         const p = place(Math.cos(a) * rr, Math.sin(a) * rr + lift, z);
-        shrubs.push([p[0], p[1], p[2], 2.6 + hash(zi + i) * .9, 1.5 + hash(zi + i + 5) * .6]);
+        const cover = .5 + .5 * Math.cos(a * 13 + z * .36);
+        shrubs.push([p[0], p[1], p[2], 1.5 + 1.6 * cover + hash(zi + i) * .35, .75 + 1.05 * cover]);
       }
     for (let a = -Math.PI * .1 - hash(zi) * .1, c = 0; a > -Math.PI * .9; a -= (30 + hash(zi + c) * 15) / inner, c++)
       for (let j = 0, n = 3 + Math.floor(hash(zi + c + 3) * 3); j < n; j++) {
-        const aj = a + (hash(zi + c * 9 + j) - .5) * 6 / inner;
-        if (blocksLanding(aj)) continue;
-        const r = inner - 4 - hash(zi + c * 7 + j) * 4, p = place(Math.cos(aj) * r, Math.sin(aj) * r + 1.5, z);
-        trees.push({ position: [p[0], -p[2], p[1]], scale: 1 + hash(zi + c * 5 + j) * .5, type: j === 1 ? 'columnar' : 'broadleaf' });
+        const seed = zi + c * 19 + j * 7;
+        const offset = (hash(zi + c * 9 + j) - .5) * 6 / inner;
+        if (blocksLanding(a + offset)) continue;
+        const aj = a + (blocksLanding(a + 2 * offset) ? offset : 2 * offset);
+        const columnar = j <= 1 && hash(seed + 3) > .55;
+        const baseScale = j === 1 ? .81 : j === 0 ? .47 : .31;
+        const scale = baseScale + (j === 1 ? .18 : .27) * hash(seed);
+        const crownSpread = columnar ? .67 : .88 + .24 * hash(seed + 1);
+        // Root into the upper edge of the grass strip, inside its 1 m depth.
+        const r = (inner - 9) * .97 + .55;
+        const p = place(Math.cos(aj) * r, Math.sin(aj) * r, z + .8 + .4 * hash(seed + 2));
+        trees.push({ position: [p[0], -p[2], p[1]], scale, crownSpread, type: columnar ? 'columnar' : 'broadleaf' });
       }
   }
   const railSpans = hasTransfer ? [[-Math.PI * 1.1, -Math.PI / 2 - .13], [-Math.PI / 2 + .216, Math.PI * .1]] : [[-Math.PI * 1.1, Math.PI * .1]];
