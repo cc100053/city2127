@@ -21,9 +21,9 @@ export function cellHash(i: number, j: number) {
  * cross-section — light ceramic carriageway `road` (the street kit's road language) with a pale blue `seam` line along each edge, a stone
  * `kerb`, then a `footway` band — ending in a kerb where a lot, landmark or plaza stops it. Lawn edges get the same kerb. Half widths
  * from the street centreline in metres: carriageway `roadHalf`, kerb `kerbWidth`, footway `footHalf`. Option A of the 2026-11-21 review: one
- * colour family with the street kit's roads; slabs keep the owner's mid stone (#aaa69d) so noon does not glare, the carriageway a
- * cooler grey than the footway so the two separate. */
-export const PAVING = { slab: '#aaa69d', footway: '#c0bdb5', road: '#a9acad', kerb: '#dfddd7', marking: '#f3f5f6', seam: '#9ec4e0', size: 3,
+ * colour family with the street kit's light ceramic roads (#d3d2cd, a touch darker on terrain), while the slabs keep the owner's mid stone
+ * (#aaa69d) so the large paved areas do not glare at noon. */
+export const PAVING = { slab: '#aaa69d', footway: '#bdbab2', road: '#c6c8c8', kerb: '#e2e0da', marking: '#f3f5f6', seam: '#9ec4e0', size: 3,
   roadHalf: 2.8, kerbWidth: .22, footHalf: 5.5 } as const;
 
 const canvas = typeof document === 'undefined' ? null : document.createElement('canvas');
@@ -119,27 +119,27 @@ vec3 groundFinish(vec2 p, vec3 grass, float lawn) {
   vec2 q = vec2(a, b) / ${n(P.size)}, cell = floor(q), e = (.5 - abs(fract(q) - .5)) * ${n(P.size)};
   float tint = .965 + cellHash(cell.x, cell.y) * .06 + sin(a * .021 + sin(b * .017) * 2.) * .018;
   vec3 pave = ${c(P.slab)} * tint * (1. - .16 * line(min(e.x, e.y), .025, pm, .35));
-  bool inside = p.x >= ${n(DISTRICT.minX)} && p.x <= ${n(DISTRICT.maxX)} && p.y >= ${n(DISTRICT.minZ)} && p.y <= ${n(DISTRICT.maxZ)};
-  float sa, sb, green, kerbG, open; // street centre distances, lawn, lawn-edge kerb, metres inside street ground
-  if (inside) {
-    vec2 m = texture2D(groundMask, (p - vec2(${n(GROUND_MASK.minX)}, ${n(GROUND_MASK.minZ)})) / ${n(GROUND_MASK.size)}).rg;
-    sa = abs(fract(a / ${n(PU)} + .5) - .5) * ${n(PU)}; sb = abs(fract(b / ${n(PV)} + .5) - .5) * ${n(PV)};
-    // The blurred mask ramps over about two metres: its value over its own screen gradient is a signed distance to the 0.5 edge.
-    float gr = (m.r - .5) * pm / max(fwidth(m.r), 1e-4), gs = (.5 - m.g) * pm / max(fwidth(m.g), 1e-4);
-    green = below(-gr, 0.) * lawn; kerbG = line(abs(gr + .15), .15, pm, 3.) * lawn; open = gs;
-  } else {
-    float ea = abs(fract(a / ${n(BU)}) - .5) * ${n(BU)}, eb = abs(fract(b / ${n(BV)}) - .5) * ${n(BV)};
-    sa = ${n(BU / 2)} - ea; sb = ${n(BV / 2)} - eb; open = 1e4;
-    float s = min(sa, sb), park = cellHash(floor(a / ${n(BU)}), floor(b / ${n(BV)})) < ${n(BACKDROP_PARK)} ? 1. : 0.;
-    float gr = park > .5 ? s - ${n(P.footHalf + .5)} : -1e4;
-    green = max(below(-gr, 0.), smoothstep(${n(R - 160)}, ${n(R)}, length(p))) * lawn; kerbG = line(abs(gr + .15), .15, pm, 3.) * lawn;
-  }
+  // Derivatives only in uniform control flow: sample and differentiate both the district mask and the backdrop grid, then pick.
+  float inside = p.x >= ${n(DISTRICT.minX)} && p.x <= ${n(DISTRICT.maxX)} && p.y >= ${n(DISTRICT.minZ)} && p.y <= ${n(DISTRICT.maxZ)} ? 1. : 0.;
+  vec2 m = texture2D(groundMask, clamp((p - vec2(${n(GROUND_MASK.minX)}, ${n(GROUND_MASK.minZ)})) / ${n(GROUND_MASK.size)}, 0., 1.)).rg;
+  // The blurred mask ramps over about two metres: its value over its own screen gradient is a signed distance to the 0.5 edge.
+  float mgr = (m.r - .5) * pm / max(fwidth(m.r), 1e-4), mgs = (.5 - m.g) * pm / max(fwidth(m.g), 1e-4);
+  float da = abs(fract(a / ${n(PU)} + .5) - .5) * ${n(PU)}, db = abs(fract(b / ${n(PV)} + .5) - .5) * ${n(PV)};
+  float ba = ${n(BU / 2)} - abs(fract(a / ${n(BU)}) - .5) * ${n(BU)}, bb = ${n(BV / 2)} - abs(fract(b / ${n(BV)}) - .5) * ${n(BV)};
+  float park = cellHash(floor(a / ${n(BU)}), floor(b / ${n(BV)})) < ${n(BACKDROP_PARK)} ? 1. : 0.;
+  // Antialias each source on its own continuous distance, then select (mixing the distances would smear a seam along every switch).
+  float bgr = min(ba, bb) - ${n(P.footHalf + .5)}; // + inside a backdrop park, past its footway
+  float green = mix(max(park * below(-bgr, 0.), smoothstep(${n(R - 160)}, ${n(R)}, length(p))), below(-mgr, 0.), inside) * lawn;
+  float kerbG = mix(park * line(abs(bgr + .15), .15, pm, 3.), line(abs(mgr + .15), .15, pm, 3.), inside) * lawn;
+  float sa = mix(ba, da, inside), sb = mix(bb, db, inside);
+  // Street ground: inside the district only where the mask's no-street channel allows (mgs metres in), always beyond it.
+  float roadOk = mix(1., 1. - below(mgs, ${n(P.kerbWidth)}), inside), kerbOk = mix(1., 1. - below(mgs, 0.), inside), footOk = mix(1., 1. - below(mgs, -1.5), inside);
   // Street cross-section from the centreline: carriageway, seam line, kerb, footway. A street that meets a lot ends in a kerb with the
   // footway wrapped round its end.
   float s = min(sa, sb), across = sa < sb ? sa : sb, along = sa < sb ? b : a, other = sa < sb ? sb : sa;
-  float road = below(s, ${n(P.roadHalf)}) * (1. - below(open, ${n(P.kerbWidth)}));
-  float kerb = below(s, ${n(P.roadHalf + P.kerbWidth)}) * (1. - below(open, 0.)) - road;
-  float foot = below(s, ${n(P.footHalf)}) * (1. - below(open, -1.5));
+  float road = below(s, ${n(P.roadHalf)}) * roadOk;
+  float kerb = below(s, ${n(P.roadHalf + P.kerbWidth)}) * kerbOk - road;
+  float foot = below(s, ${n(P.footHalf)}) * footOk;
   vec3 col = mix(pave, ${c(P.footway)} * (.98 + tint * .03), foot);
   col = mix(col, ${c(P.kerb)}, max(kerb, 0.));
   vec3 lane = ${c(P.road)} * (.985 + sin(along * .05 + across) * .01);
