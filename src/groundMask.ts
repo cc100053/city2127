@@ -123,7 +123,8 @@ vec3 groundFinish(vec2 p, vec3 grass, float lawn) {
   float inside = p.x >= ${n(DISTRICT.minX)} && p.x <= ${n(DISTRICT.maxX)} && p.y >= ${n(DISTRICT.minZ)} && p.y <= ${n(DISTRICT.maxZ)} ? 1. : 0.;
   vec2 m = texture2D(groundMask, clamp((p - vec2(${n(GROUND_MASK.minX)}, ${n(GROUND_MASK.minZ)})) / ${n(GROUND_MASK.size)}, 0., 1.)).rg;
   // The blurred mask ramps over about two metres: its value over its own screen gradient is a signed distance to the 0.5 edge.
-  float mgr = (m.r - .5) * pm / max(fwidth(m.r), 1e-4), mgs = (.5 - m.g) * pm / max(fwidth(m.g), 1e-4);
+  // The gradient floor (0.08 per metre, a fifth of the ramp's) keeps the 8-bit tails from reading as a near edge and speckling kerbs.
+  float mgr = (m.r - .5) * pm / max(fwidth(m.r), pm * .08), mgs = (.5 - m.g) * pm / max(fwidth(m.g), pm * .08);
   float da = abs(fract(a / ${n(PU)} + .5) - .5) * ${n(PU)}, db = abs(fract(b / ${n(PV)} + .5) - .5) * ${n(PV)};
   float ba = ${n(BU / 2)} - abs(fract(a / ${n(BU)}) - .5) * ${n(BU)}, bb = ${n(BV / 2)} - abs(fract(b / ${n(BV)}) - .5) * ${n(BV)};
   float park = cellHash(floor(a / ${n(BU)}), floor(b / ${n(BV)})) < ${n(BACKDROP_PARK)} ? 1. : 0.;
