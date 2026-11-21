@@ -20,6 +20,8 @@ import { acceleratedRaycast, MeshBVH } from 'three-mesh-bvh';
 import { checkHousingCity } from './housingCityCheck.ts';
 import { onFormerStreet, repairRoads } from '../src/roadRepair.ts';
 import { FORECOURTS, streetNetwork } from '../src/streetKit.ts';
+import { megastructures } from '../src/megastructures.ts';
+import { groundContacts, inRect } from '../src/megaFootprints.ts';
 import { BOULEVARD, EVENT_SHELF_FRONTAGE, POD_TOWER, STREET_KIT, WATER } from '../src/layout.ts';
 /** A ladder target with the given rungs; the rest mixed. */
 const rungs = (t: Partial<Record<'nw' | 'ne' | 'sw' | 'se', number>>) => ({ tiers: { nw: 0, ne: 0, sw: 0, se: 0, ...t } });
@@ -149,6 +151,26 @@ lanes.forEach((points,l)=>points.forEach(p=>{
 for(let a=0;a<lanes.length;a++)for(let b=a+1;b<lanes.length;b++)for(const p of lanes[a])for(const q of lanes[b])
   if(Math.abs(p.y-q.y)<1.5)assert.ok(Math.hypot(p.x-q.x,p.z-q.z)>.95,`Fuji lanes ${a} and ${b} meet near ${p.toArray().map(v=>v.toFixed(1))}`);
 assert.ok(fuji.spots.filter(s=>s.mode==='audience').length>80&&fuji.walks.length>=50&&fuji.rides.length===1,'Fuji keeps its audience, strollers and its escalator (the upper diagonal crossing the chrome sphere was removed in P2 r2)');
+const entry = new Vector3(...civicAt([-8+40*Math.cos(CIVIC.door),3.026,-2-40*Math.sin(CIVIC.door)]));
+const gallery = fuji.walks.find(w=>w.curve.getPoint(0).distanceTo(entry)<.01);
+assert.ok(gallery && gallery.pair, 'Fuji public gallery starts at the open foyer door and carries two walkers');
+for (let i=0;i<=120;i++) {
+  const p = gallery.curve.getPointAt(i/120), tangent = gallery.curve.getTangentAt(i/120);
+  const side = new Vector3(tangent.z,0,-tangent.x).normalize();
+  for (const offset of [-1.6,0,1.6]) {
+    const at = p.clone().addScaledVector(side,offset);
+    const hit = new Raycaster(at.clone().add(new Vector3(0,2.3,0)),downward,0,2.5).intersectObject(core,true)[0];
+    assert.ok(hit && Math.abs(hit.point.y-at.y)<.04, 'Fuji gallery has a continuous clear walking surface');
+  }
+}
+const landing = gallery.curve.getPoint(1);
+for (const [x,z] of [[55.4,-16.9],[55.4,-13],[53,-13],[51.1,-13]]) {
+  const at = new Vector3(...civicAt([x,0,z])).setY(landing.y);
+  assert.ok(support(at), 'Fuji gallery landing joins the old tread mouth at grade');
+}
+const escalator = fuji.rides[0], incline = escalator.from.distanceTo(escalator.to);
+const forumDistance = incline*(24*CIVIC.k-escalator.from.y)/(escalator.to.y-escalator.from.y);
+assert.equal(rideShown(escalator,incline,forumDistance),1,'Fuji riders stay visible through the public forum floor');
 const approach=routes().approach,clearanceRay=new Raycaster();
 for(let i=0;i<=160;i++) {
   const p=approach.getPointAt(i/160);
@@ -185,6 +207,23 @@ const built = layout.buildings.filter((p: { id: string; positionBlender: number[
 repairRoads(environment, built); // as loadOdaiba
 const streetKit = streetNetwork(environment);
 {
+  const surroundings = megastructures();
+  surroundings.updateMatrixWorld(true);
+  const solids = surroundings.children.filter(o=>o instanceof Mesh && !(o instanceof InstancedMesh));
+  environment.traverse(o=>{if (o instanceof Mesh && o.name.startsWith('YURIKAMOME_PIERS')) solids.push(o);});
+  const archFeet = groundContacts().archFeet, clearanceRay = new Raycaster(new Vector3(),downward,0,3.7);
+  for (let i=0;i<=150;i++) {
+    const p = gallery.curve.getPointAt(i/150), dir = gallery.curve.getTangentAt(i/150);
+    const side = new Vector3(dir.z,0,-dir.x).normalize();
+    for (const offset of [-4.05,-2.05,0,2.05,4.05]) {
+      const at = p.clone().addScaledVector(side,offset);
+      assert.ok(archFeet.every(foot=>!inRect(foot,at.x,at.z)), 'The full gallery width clears the arch footing');
+      clearanceRay.ray.origin.copy(at).y += 2.3;
+      assert.equal(clearanceRay.intersectObjects(solids,false).length,0, 'The gallery clears the megastructures and rail piers');
+    }
+  }
+}
+{
   const paved = (x: number, z: number, names: RegExp) => new Raycaster(new Vector3(x, 50, z), new Vector3(0, -1, 0)).intersectObject(environment, true).some(h => names.test(h.object.name));
   assert.ok(!environment.getObjectByName('ROAD_ACCESS'), 'Isolated driveway stubs are dropped');
   const v = new Vector3(), inside = (x: number, z: number) => x > DISTRICT.minX + .01 && x < DISTRICT.maxX - .01 && z > DISTRICT.minZ + .01 && z < DISTRICT.maxZ - .01;
@@ -218,7 +257,7 @@ const streetKit = streetNetwork(environment);
   const accessSurface = (x: number, z: number, name: string) =>
     new Raycaster(new Vector3(x, 15, z), new Vector3(0, -1, 0))
       .intersectObject(environment, true).find(hit => hit.object.name === name)?.point.y;
-  // Fuji's promenade guides stay above the existing paving, and the stair and forum strips sit on their own treads and slab.
+  // The avenue guides meet the foot of the new stair. A solid route continues through the foyer door.
   const fujiGuides = streetKit.getObjectByName('fuji-forecourt-guides');
   assert.ok(fujiGuides instanceof Mesh && !fujiGuides.castShadow && !fujiGuides.receiveShadow);
   streetKit.updateMatrixWorld(true);
@@ -230,10 +269,19 @@ const streetKit = streetNetwork(environment);
     const guideY = new Raycaster(new Vector3(x, 1, z), downward).intersectObject(fujiGuides)[0]?.point.y;
     assert.ok(pavingY !== undefined && guideY !== undefined && Math.abs(guideY - pavingY - .009) < .001, 'Fuji guide follows the paved approach');
   }
-  for (const [x, y, z] of [
-    ...[45.14, 46.54, 47.94].map((r, i) => [-8 + r * c, 2.25 - i * .75, -2 - r * sn]),
-    ...[-12, -6, 0, 6, 8].flatMap(x => [-20.4, -17.9].map(z => [x, 24, z])),
-  ]) {
+  const foyerGrade = CIVIC.foyerPavingY / CIVIC.k, stairRun = (CIVIC.stepEdge - 44) / 18;
+  for (let i=0;i<18;i++) {
+    const r = 44 + (i+.5)*stairRun, height = 3 + (foyerGrade-3)*(i+1)/18;
+    for (const a of [door-.08,door,door+.08]) {
+      const p = new Vector3(...civicAt([-8+r*Math.cos(a),height,-2-r*Math.sin(a)]));
+      assert.ok(support(p), 'The public stair has clear, progressively rising treads');
+    }
+  }
+  for (const r of [43.9,42.8,41.7,40.8,40]) {
+    const p = new Vector3(...civicAt([-8+r*c,3,-2-r*sn]));
+    assert.ok(support(p), 'The central opening from the stair to the foyer stays clear');
+  }
+  for (const [x, y, z] of [-12, -6, 0, 6, 8].flatMap(x => [-20.4, -17.9].map(z => [x, 24, z]))) {
     const origin = new Vector3(...civicAt([x, y + 1.8, z]));
     const hits = new Raycaster(origin, downward, 0, 2.5).intersectObject(core, true);
     const [light, floor] = hits;

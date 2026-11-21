@@ -96,7 +96,7 @@ export const STREET_KIT = {
 } as const;
 // polish2 (2026-11-03): the Fuji frame tower is the hero centrepiece. civicCore builds in its original metres and the whole chassis is scaled
 // `k` about its west-front foot (-75, 0, -12), which lands at (x, 0, z): set back off the arch foot, east of COMMONS PLAZA and the guideway.
-export const CIVIC = {k:1.35,x:-63,z:22,door:1.95,stepEdge:48.2} as const;
+export const CIVIC = {k:1.35,x:-63,z:22,door:1.95,stepEdge:53.5,foyerPavingY:.2} as const;
 /** World point of a civicCore-local point. */
 export const civicAt = ([x,y,z]:readonly number[]):P3 => [CIVIC.x+(x+75)*CIVIC.k,y*CIVIC.k,CIVIC.z+(z+12)*CIVIC.k];
 // Top of the Fuji TV chrome sphere (local centre -18, 100, 23; radius 28): the air-taxi berth.

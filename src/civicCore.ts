@@ -5,6 +5,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { megaGlass, megaSeam } from './megastructures.ts';
 import { CIVIC, civicAt } from './layout.ts';
+import { deck } from './skyways.ts';
 
 /** polish2: the chrome sphere's sky reflection dims at night (gunmetal with highlights, as the night target), set by `updateCivic`. */
 const civicSphere={material:null as T.MeshPhysicalMaterial|null};
@@ -156,10 +157,20 @@ export function civicCore(facade?: T.Group) {
     member([x,130,-12],[x,130,70],7,7);
     box(root,[.45,.45,82],[x,134.1,29],megaSeam,.05); // P7: cool seam along the top beams
   }
-  // The former podium is an open forum; the existing Aqua link lands here at Y=24.
-  box(root,[100,3,36],[-8,22.5,-14],stone);
+  // The public incline passes through a single opening cut in both overlapping forum slabs.
+  const slot = { west: 11.6, east: 30, bay: -17.35, inland: -6.65 };
+  const piercedSlab = (shape: T.Shape, y: number, depth: number, curveSegments = 1) => {
+    const hole = new T.Path().moveTo(slot.west,-slot.inland).lineTo(slot.west,-slot.bay)
+      .lineTo(slot.east,-slot.bay).lineTo(slot.east,-slot.inland).closePath();
+    shape.holes.push(hole);
+    const slab = new T.Mesh(new T.ExtrudeGeometry(shape, { depth, bevelEnabled: false, curveSegments }).rotateX(-Math.PI / 2),stone);
+    slab.position.y = y;
+    root.add(slab);
+  };
+  piercedSlab(new T.Shape().moveTo(-58,-4).lineTo(42,-4).lineTo(42,32).lineTo(-58,32).closePath(),21,3);
   for(const x of [-50,34])for(const z of [-27,0])member([x,2,z],[x,21,z],3,4);
   // Inhabited diagonals are wide public terrain, with a deep triangulated underside, not escalator banks.
+  const boarding = new T.Vector3();
   const spine=[[52,3,-12],[-54,62,-12]]; // P2 r2: the upper diagonal that crossed in front of the chrome sphere is removed
   for(let i=1;i<spine.length;i++) {
     const a=new T.Vector3(...spine[i-1]),b=new T.Vector3(...spine[i]),length=a.distanceTo(b);
@@ -179,16 +190,16 @@ export function civicCore(facade?: T.Group) {
       box(street,[.2,.14,length-4],[x,3.35,0],megaSeam,0);
     }
     for(let z=-length/2+3;z<length/2-2;z+=4)for(const x of [-2.6,.6])box(street,[.12,1.75,.12],[x,2.45,z],trim);
-    // Riders stand on the treads and climb at .5 m/s (both diagonals run upward), out of sight where the incline passes through the
-    // forum podium (slab 21–24 m), under the upper incline's truss at the turn (from 59 m) and through the sphere's transfer beam
-    // (98.75–101.25 m), with standing headroom below each.
+    // The landing meets the low end of the tread surface. Riders stay visible through the forum opening.
+    boarding.set(-1,1.58,-length / 2 + 2).applyMatrix4(street.matrix);
     const ends=[-1,1].map(e=>new T.Vector3(-1,1.6,e*(length/2-3)).applyMatrix4(street.matrix)).sort((p,q)=>p.y-q.y);
-    rides.push({from:ends[0],to:ends[1],gap:4.5,speed:.5,through:i===1 ? [[19.1,24.1],[57.1,70]] : [[96.85,101.3]]});
+    rides.push({from:ends[0],to:ends[1],gap:4.5,speed:.5,through:[[57.1,70]]});
     for(const x of [-5,5]) {
       // The bay-facing edge is a clear balustrade with a blue lit rail: the diagonal reads as a bright glazed escalator bank.
       const bay=x<0;
-      box(street,[.25,1.5,length],[x,2,0],bay ? silverGlass : membrane);
-      box(street,[.22,.2,length],[x,2.85,0],bay ? megaSeam : trim,bay ? 0 : undefined);
+      const open = bay ? 3.5 : 0;
+      box(street,[.25,1.5,length-open],[x,2,open/2],bay ? silverGlass : membrane);
+      box(street,[.22,.2,length-open],[x,2.85,open/2],bay ? megaSeam : trim,bay ? 0 : undefined);
       box(street,[.18,.18,length],[x,.9,0],publicLight);
     }
     // A slim navy-glass fascia with a lit lower edge outlines the incline, as in the target's dark escalator trim.
@@ -522,8 +533,18 @@ export function civicCore(facade?: T.Group) {
   box(root,[132,2.5,12],[-2,61,64],stone);
   // The forum becomes a linked civic landscape, with a public loop around an open light court.
   // Leave the Aqua City approach open across its full 8 m bridge envelope.
+  const forumStart = 2.2, forumEnd = forumStart + Math.PI * 2 - .5;
+  const forumSlab = new T.Shape().absarc(-8,2,45,forumStart,forumEnd,false)
+    .absarc(-8,2,19,forumEnd,forumStart,true).closePath();
+  piercedSlab(forumSlab,22,2,58);
+  for (const z of [slot.bay,slot.inland]) {
+    const mid = (slot.west + slot.east) / 2, length = slot.east - slot.west;
+    box(root,[length,1.05,.12],[mid,24.525,z],silverGlass,0);
+    box(root,[length,.11,.18],[mid,25.05,z],megaSeam,0);
+  }
+  box(root,[.12,1.05,slot.inland-slot.bay],[slot.east,24.525,-12],silverGlass,0);
   for(const [inner,outer,height,y,material] of [
-    [19,45,2,22,stone],[44.6,45,1.5,24,membrane],
+    [44.6,45,1.5,24,membrane],
     [44.5,45,.18,25.5,trim],[44.4,44.7,.18,23.9,publicLight],
   ] as const)arc(root,inner,outer,height,[-8,y,-2],material,2.2,Math.PI*2-.5);
   // The public forum meets the incline here. Inlays point across its existing slab to the visible boarding point.
@@ -532,23 +553,30 @@ export function civicCore(facade?: T.Group) {
     const blade = box(root,[1.85,.02,.23],[x,24.015,-19.15+side*.59],megaSeam,0);
     blade.rotation.y = side * .7;
   }
-  // Public foyer below the forum has its own curved glazing and entry, distinct from rear staff doors.
-  // Entrance polish (owner 2026-11-20): the foyer floor is a solid plinth down to the ground (it floated 2 m over the lawn with a bite out of
-  // its front), and three steps lead down to the paved forecourt (streetKit `landmarkForecourts`) on the bay side; the back half meets the wings.
+  // The original terraced drum flanks a finer public stair, aligned with the existing promenade.
+  const door = CIVIC.door, stairStart = door - .14, stairEnd = door + .14;
   arc(root,19,44,3,[-8,0,-2],stone);
   for (const [i,r] of [44,45.4,46.8].entries()) {
     const tread = 2.25 - i * .75;
-    arc(root,r,r+1.4,tread,[-8,0,-2],stone,.15,Math.PI-.3);
-    arc(root,r+1.02,r+1.26,.019,[-8,tread+.01,-2],megaSeam,CIVIC.door-.098,.196);
+    arc(root,r,r+1.4,tread,[-8,0,-2],stone,.15,stairStart-.15);
+    arc(root,r,r+1.4,tread,[-8,0,-2],stone,stairEnd,Math.PI-.15-stairEnd);
   }
-  arc(root,42.8,43,18,[-8,3,-2],silverGlass,2.2,Math.PI*2-.5);
+  const risers = 18, run = (CIVIC.stepEdge - 44) / risers, grade = CIVIC.foyerPavingY / CIVIC.k;
+  for (let i=0;i<risers;i++) {
+    const r = 44+i*run, tread = T.MathUtils.lerp(3,grade,(i+1)/risers);
+    arc(root,r,r+run,tread,[-8,0,-2],stone,stairStart,stairEnd-stairStart);
+    if (i % 4 === 1) arc(root,r+.26,r+.45,.016,[-8,tread+.006,-2],megaSeam,door-.093,.186);
+  }
+  // The bay arcade opens toward the concourse. The rear staff enclosure stays in its original sector.
+  const arcadeStart = Math.PI * 2 + .55;
+  arc(root,42.8,43,18,[-8,3,-2],silverGlass,2.2,arcadeStart-2.2);
   // The drum's opening toward the forecourt promenade (a = 1.7–2.2) is the main entrance: a glass door screen set 2 m in, a lit threshold
   // and a slim canopy on two posts reaching out over the steps.
   {
-    const door=CIVIC.door,at=(r:number,t=0):[number,number]=>[-8+Math.cos(door)*r+Math.sin(door)*t,-2-Math.sin(door)*r+Math.cos(door)*t];
-    arc(root,40.8,41,7,[-8,3,-2],silverGlass,1.72,.46);
-    arc(root,40.8,43,.06,[-8,3,-2],megaSeam,1.72,.46);
-    for(const t of [-6,-2,2,6]){const [x,z]=at(40.9,t);member([x,3,z],[x,10,z],.3,.3,solar);}
+    const at=(r:number,t=0):[number,number]=>[-8+Math.cos(door)*r+Math.sin(door)*t,-2-Math.sin(door)*r+Math.cos(door)*t];
+    for (const start of [1.72,2.065]) arc(root,40.8,41,7,[-8,3,-2],silverGlass,start,.115);
+    arc(root,41.75,42.05,.035,[-8,3,-2],megaSeam,1.83,.24);
+    for(const t of [-6,-4.65,4.65,6]){const [x,z]=at(40.9,t);member([x,3,z],[x,10,z],.3,.3,solar);}
     const [cx,cz]=at(49.5),[ex,ez]=at(56);
     box(root,[24,.5,13],[cx,10.4,cz],trim,.05).rotation.y=door+Math.PI/2;
     box(root,[24.2,.25,.3],[ex,10.2,ez],megaSeam,.05).rotation.y=door+Math.PI/2;
@@ -560,7 +588,7 @@ export function civicCore(facade?: T.Group) {
     }
     for(const t of [-10,10]){const [x,z]=at(54.5,t);member([x,0,z],[x,10.2,z],.5,.5);}
   }
-  for(let a=2.25;a<7.95;a+=.16) {
+  for(let a=2.25;a<arcadeStart;a+=.16) {
     const x=-8+Math.cos(a)*43,z=-2-Math.sin(a)*43;
     member([x,3,z],[x,21,z],.35,.35,solar);
     const light=box(root,[3,.15,1.4],[-8+Math.cos(a)*39,20.8,-2-Math.sin(a)*39],publicLight);
@@ -571,7 +599,7 @@ export function civicCore(facade?: T.Group) {
     if(z>-3 && (outer>20 || outer<-44))continue; // Wing ground floors keep their own production rooms.
     box(root,[6,11,.3],[x,9.2,z],i%4===2 ? broadcastLight : publicLight).rotation.y=a+Math.PI/2;
     box(root,[.6,15,.8],[-8+Math.cos(a+.095)*37,10.5,-2-Math.sin(a+.095)*37],stone).rotation.y=a+Math.PI/2;
-    standing(-8+Math.cos(a)*(40.5-(i%2)*1.6),3,-2-Math.sin(a)*(40.5-(i%2)*1.6),outward(a),'public');
+    if (a < arcadeStart) standing(-8+Math.cos(a)*(40.5-(i%2)*1.6),3,-2-Math.sin(a)*(40.5-(i%2)*1.6),outward(a),'public');
   }
   for(const a of [.15,2.25,3.15,4.7]) {
     arc(root,35,41,1.2,[-8,24,-2],leaf,a,.7);
@@ -591,7 +619,11 @@ export function civicCore(facade?: T.Group) {
   }
   // Standing crowds gather on the public forum and the elevated ring, away from benches, planting, the Aqua arrival and the incline
   // rising through the forum (x 9–20, z < -6).
-  const forum=(a:number,r:number,yaw:number)=>{const x=-8+Math.cos(a)*r,z=-2-Math.sin(a)*r;if(z>-6 || x<9 || x>20)standing(x,24,z,yaw,'public');};
+  const forum=(a:number,r:number,yaw:number)=>{
+    const x=-8+Math.cos(a)*r,z=-2-Math.sin(a)*r;
+    if (x > slot.west-1 && x < slot.east+1 && z > slot.bay-1 && z < slot.inland+1) return;
+    if(z>-6 || x<9 || x>20)standing(x,24,z,yaw,'public');
+  };
   for(let a=2.3,i=0;a<6.2;a+=.085,i++)forum(a,21.5+(i*7%5)*1.1,inward(a));
   // A second, looser outer band thickens the forum into a gathering crowd, still inside the planted ring.
   for(let a=2.36,i=0;a<6.15;a+=.115,i++)forum(a,25+(i*5%3)*.9,inward(a));
@@ -686,6 +718,40 @@ export function civicCore(facade?: T.Group) {
   }
   const sphere=new T.Mesh(new T.SphereGeometry(SR,64,40),sphereMat);sphere.position.copy(centre);sphere.name='civic-chrome-sphere';sphere.castShadow=true;
   root.add(sphere,new T.Mesh(mergeGeometries(seams),broadcastLight),new T.Mesh(mergeGeometries(cables),trim));
+  // The gallery bows seaward of the arch footing, then turns back to the existing tread mouth.
+  const gallery = new T.CatmullRomCurve3([
+    new T.Vector3(-8+Math.cos(door)*40,3.026,-2-Math.sin(door)*40),
+    new T.Vector3(-16,3.026,-40.7),new T.Vector3(-9,3.026,-43.6),
+    new T.Vector3(1,3.4,-49),new T.Vector3(16,4.15,-50.8),new T.Vector3(32,4.8,-48),
+    new T.Vector3(42,5.16,-33.5),new T.Vector3(52,boarding.y,-25),
+    new T.Vector3(55.4,boarding.y,-21),new T.Vector3(55.4,boarding.y,-17),
+  ],false,'centripetal');
+  const strip = (curve: T.Curve<T.Vector3>, width: number, depth: number, material: T.Material, lift = 0) => {
+    const part = new T.Mesh(deck(curve,width,depth,Math.ceil(curve.getLength()/.9)),material);
+    part.position.y = lift;
+    root.add(part);
+  };
+  strip(gallery,6.6,1.05,stone,-.013);
+  strip(gallery,4.8,.04,solar);
+  for (const side of [-1,1]) {
+    const edge = (start: number, offset: number) => new T.CatmullRomCurve3(Array.from({length:43},(_,i)=>{
+      const t = T.MathUtils.lerp(start,1,i/42), p = gallery.getPoint(t), dir = gallery.getTangent(t);
+      return p.addScaledVector(new T.Vector3(dir.z,0,-dir.x).normalize(),side*offset);
+    }),false,'centripetal');
+    strip(edge(0,2.34),.18,.032,megaSeam,.012);
+    const rail = edge(.27,3.2);
+    strip(rail,.13,1.06,silverGlass,1.04);
+    strip(rail,.2,.12,trim,1.08);
+  }
+  for (const t of [.42,.61,.79,.91]) {
+    const p = gallery.getPoint(t);
+    member([p.x,0,p.z],[p.x,p.y-.6,p.z],1.35,1.7);
+  }
+  const landingEnd = 58.75, landingLength = landingEnd - boarding.x + .025;
+  box(root,[landingLength,.8,8.1],[landingEnd-landingLength/2,boarding.y-.4,boarding.z-.05],stone,0);
+  box(root,[.12,1.05,8.1],[landingEnd-.09,boarding.y+.525,boarding.z-.05],silverGlass,0);
+  box(root,[landingLength,1.05,.12],[landingEnd-landingLength/2,boarding.y+.525,boarding.z+3.94],silverGlass,0);
+  walks.push({curve:gallery,crowd:'public',pair:.72,rest:[3,5]});
   const generated=new Set<T.BufferGeometry>();
   root.traverse(object=>{if(object instanceof T.Mesh && !cachedBoxes.has(object.geometry))generated.add(object.geometry);});
   const batches=bake(root);root.clear();batches.forEach(mesh=>{mesh.name='fuji-civic-chassis';root.add(mesh);});

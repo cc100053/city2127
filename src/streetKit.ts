@@ -408,7 +408,7 @@ export const FORECOURTS = {
   hull: { u: 50, d: [-46, -3], kerb: 12.5 },
 } as const;
 function landmarkForecourts(avenue: Curve, environment: T.Object3D) {
-  const y = .2, tile: [number, number] = [2.4, 2.4], paving: T.BufferGeometry[] = [], beds: ReturnType<typeof planter>[] = [];
+  const y = CIVIC.foyerPavingY, tile: [number, number] = [2.4, 2.4], paving: T.BufferGeometry[] = [], beds: ReturnType<typeof planter>[] = [];
   const line = (a: T.Vector3, b: T.Vector3) => new T.LineCurve3(a, b);
   // The surveyed lawn rises up to ~1 m round the ring and hull, so their pads follow it: a 3 m grid, each vertex `y` over the landscape below.
   const lawn: T.Object3D[] = [], ray = new T.Raycaster(), down = new T.Vector3(0, -1, 0);
@@ -446,7 +446,7 @@ function landmarkForecourts(avenue: Curve, environment: T.Object3D) {
   };
   const foot = CIVIC.stepEdge * CIVIC.k + .16;
   const guides = [-2.4, 2.4].map(t => guide(reach - .65, t, foot, t, .24));
-  for (const radius of [96, 84, 72]) for (const side of [-1, 1])
+  for (const radius of [97, 88, 77]) for (const side of [-1, 1])
     guides.push(guide(radius + 1.65, side * 1.3, radius, 0, .29));
   // Ring: its local x runs (cos yaw, −sin yaw), z (sin yaw, cos yaw).
   const ring = (lx: number, lz: number) => new T.Vector3(RING.x + lx * Math.cos(RING.yaw) + lz * Math.sin(RING.yaw), 0, RING.z - lx * Math.sin(RING.yaw) + lz * Math.cos(RING.yaw));
