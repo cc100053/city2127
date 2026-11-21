@@ -87,17 +87,15 @@ def base(a, z_front, z_back=.05, hw=HW):
         obox(a["h_frame"], (s * (hw + .008), .12, (z_back + z_front) / 2), (.016, .04, z_front - z_back - .5), X, Z)
         for zz in LUG_Z:
             obox(a["h_base"], (s * (hw + .03), .1, zz), (.06, .14, .3), X, Z)
-            obox(a["h_frame"], (s * (hw + .05), .2, zz), (.03, .12, .14), X, Z)
     for s in (-1, 1):                                                          # bearing shoes clasp the slab edge
         obox(a["h_base"], (s * 1.55, -.14, SLAB_EDGE + .07), (.5, .3, .14), X, Z)
-        obox(a["h_frame"], (s * 1.55, -.14, SLAB_EDGE + .145), (.36, .16, .012), X, Z)
     if z_front > SLAB_EDGE + .3:
         zf = z_front - .12
         prism_x(a["h_base"], [(SLAB_EDGE + .14, 0), (zf, 0), (zf - .25, -.16), (SLAB_EDGE + .3, -.3), (SLAB_EDGE + .14, -.3)],
                 -hw + .25, hw - .25)
         for s in (-1, 1):
             M.limb(a["h_frame"], [(s * 1.55, -.92, BEAM_FACE + .09), (s * 1.55, -.48, (BEAM_FACE + zf) / 2 + .1),
-                                  (s * 1.55, -.17, zf - .35)], .07, .06, 8)
+                                  (s * 1.55, -.17, zf - .35)], .07, .06, 5)
             obox(a["h_frame"], (s * 1.55, -.92, BEAM_FACE + .03), (.3, .3, .04), X, Z)       # anchor plate on the beam
 
 
@@ -110,9 +108,7 @@ def entrance(a, x=DOOR_X, w=DOOR_W, h=DOOR_H, z_wall=.05, recess=.55, wall_t=.18
     for xx in (x0 - .04, x1 + .04):                                           # reveals
         obox(a["h_shell"], (xx, (FL + yt) / 2, (z_wall + zd) / 2 + .02), (.08, h, recess + .04), X, Z)
     obox(a["h_shell"], (x, yt + .04, (z_wall + zd) / 2 + .02), (w + .16, .08, recess + .04), X, Z)
-    obox(a["in_floor"], (x, FL - .01, (z_wall + zd) / 2), (w, .02, recess), X, Z)
     obox(a["h_door"], (x, (FL + yt) / 2, zd), (w, h, .05), X, Z)                          # door leaf
-    obox(a["h_glass"], (x - w / 2 + .2, (FL + yt) / 2 + .2, zd - .03), (.1, h - .7, .01), X, Z)
     obox(a["h_frame"], (x + w / 2 - .14, 1.05, zd - .05), (.03, .4, .04), X, Z)            # handle
     po = [(x1 + .14, yt + .14), (x0 - .14, yt + .14), (x0 - .14, FL - .02), (x1 + .14, FL - .02)]
     pi = [(x1 + .02, yt + .02), (x0 - .02, yt + .02), (x0 - .02, FL - .02), (x1 + .02, FL - .02)]
@@ -122,7 +118,6 @@ def entrance(a, x=DOOR_X, w=DOOR_W, h=DOOR_H, z_wall=.05, recess=.55, wall_t=.18
         obox(a["h_lamp"], (x, yt + .175, z_wall - .3), (w * .7, .012, .08), X, Z)
     obox(a["h_deck"], (x, .1, z_wall - .2), (w + .5, .2, .44), X, Z)                      # threshold step
     obox(a["h_lamp"], (x1 + .34, 1.95, z_wall - .03), (.1, .22, .05), X, Z)
-    obox(a["h_frame"], (x0 - .32, 1.6, z_wall - .02), (.18, .12, .03), X, Z)
 
 
 def interior(a, x0, x1, z0, z1, ceil, glow_x=None, back_glow=True):
@@ -142,10 +137,10 @@ def leafy(a, x, y, z, r=.3, n=3, seed=0, bloom=True):
 
 
 # --- 1. ellipse view house ------------------------------------------------------------------------------------------
-E_A, E_BT, E_BB, E_CY, E_P, E_N = 2.15, 1.77, 2.2, 1.99, 2.5, 32     # half width, upper / lower half height
+E_A, E_BT, E_BB, E_CY, E_P, E_N = 2.15, 1.77, 2.2, 1.99, 2.5, 28     # half width, upper / lower half height
 E_WIN = (1.5, 1.25, 1.9)            # main window opening: half width, half height, centre height
 E_DOOR = -.75
-PORTS = (3.0, 6.55)                 # porthole centres along z (the front one is past the frame line)
+PORTS = (6.55,)                     # porthole centre along z, past the frame line (r0-r2 renders had a second at 3.0)
 
 
 def _eout(s, k=0.0, floor=.2):
@@ -189,8 +184,7 @@ def ellipse_view(a, rng, rnd=2):
     zn = 7.8                                                                  # nose face, 1.25 m past the frame line
     prof = [(.05, .95), (.3, 1.0), (6.2, 1.0), (6.95, .97), (7.5, .92), (zn, .86)]
     if rnd >= 2:                                                            # two recessed panel joints round the shell
-        prof = prof[:2] + [(2.38, 1.0), (2.4, .988), (2.46, .988), (2.48, 1.0),
-                           (4.78, 1.0), (4.8, .988), (4.86, .988), (4.88, 1.0)] + prof[2:]
+        prof = prof[:2] + [(4.78, 1.0), (4.8, .988), (4.86, .988), (4.88, 1.0)] + prof[2:]
     shell = Acc()
     secs = [_esec(s, z) for z, s in prof]
     secs += [_ewin(zn), _ewin(zn - .3)]                                       # the opening's lip, 0.3 m deep
@@ -198,7 +192,7 @@ def ellipse_view(a, rng, rnd=2):
     loft(shell, secs, wrap=True)
     cut = Acc()
     for zz in PORTS:                                                          # portholes go through the wall
-        disc_x(cut, 2.12, zz, .41, -2.6, 2.6, 14)
+        disc_x(cut, 2.12, zz, .41, -2.6, 2.6, 12)
     boolean_diff(shell, cut)
     _merge(a["h_shell"], shell)
     back = Acc()
@@ -209,10 +203,10 @@ def ellipse_view(a, rng, rnd=2):
     _merge(a["h_shell"], back)
     for s in (-1, 1):                                                         # porthole tubes through the wall
         for zz in PORTS:
-            ring_x(a["h_frame"], 2.12, zz, .5 if rnd >= 2 else .46, .4 if rnd < 2 else .36, s * 1.95, s * 2.28, 14)
-            disc_x(a["h_glass"], 2.12, zz, .405, s * 2.07, s * 2.09, 14)
+            ring_x(a["h_frame"], 2.12, zz, .5 if rnd >= 2 else .46, .4 if rnd < 2 else .36, s * 1.95, s * 2.28, 12)
+            disc_x(a["h_glass"], 2.12, zz, .405, s * 2.07, s * 2.09, 12)
     # brow over the main window, hugging the nose and reaching 0.4 m forward
-    ang = [math.radians(18 + 144 * i / 16) for i in range(17)]
+    ang = [math.radians(18 + 144 * i / 10) for i in range(11)]
     arc_o = [((E_WIN[0] + .36) * math.cos(t), E_WIN[2] + (E_WIN[1] + .34) * math.sin(t)) for t in ang]
     arc_i = [((E_WIN[0] + .2) * math.cos(t), E_WIN[2] + (E_WIN[1] + .18) * math.sin(t)) for t in ang]
     prism_z(a["h_shell"], arc_o + arc_i[::-1], zn - .25, zn + .4)
@@ -226,7 +220,7 @@ def ellipse_view(a, rng, rnd=2):
         obox(a["h_frame"], (.45, E_WIN[2], zn - .2), (.06, 2 * E_WIN[1] - .1, .08), X, Z)
         # viewing balcony on the chassis nose: deck, curved glass rail, planter
         zb = 7.6
-        pts = [(1.95 * math.cos(t), .2, zb + .62 * math.sin(t)) for t in [math.radians(180 * i / 10) for i in range(11)]]
+        pts = [(1.95 * math.cos(t), .2, zb + .62 * math.sin(t)) for t in [math.radians(180 * i / 7) for i in range(8)]]
         loft(a["h_deck"], [[(x, y0, z) for x, _, z in pts] + [(x * .9, y0, zb) for x, _, z in pts[::-1]] for y0 in (.12, .24)])
         for p0, p1 in zip(pts, pts[1:]):
             rail(a["h_frame"], a["h_glass"], a["h_frame"], (p0[0], .24, p0[2]), (p1[0], .24, p1[2]), h=1.0, step=9, post=.04)
@@ -290,12 +284,9 @@ def rib_vault(a, rng):
     obox(a["h_deck"], (0, .23, zf + .02), (2 * HW - .1, .06, .22), X, Z)
     ctx = M.Ctx(role_view(a), rng)
     M.kit_prop(ctx, "meeting_table", 0, FL, 4.1, math.pi / 2)
-    for zz in (3.6, 4.6):
-        M.kit_prop(ctx, "pendant_lamp", 0, 3.3 - 1.2, zz)
+    M.kit_prop(ctx, "pendant_lamp", 0, 3.3 - 1.2, 4.1)
     M.kit_prop(ctx, "kitchen_counter", 1.05, FL, .65, 0)
-    M.kit_prop(ctx, "potted_plant", -1.5, FL, 6.2)
     M.seated_person(ctx, -.68, FL + .45, 3.75, math.pi / 2)
-    M.seated_person(ctx, .68, FL + .45, 4.45, -math.pi / 2)
 
 
 # --- 3. stepped terrace house ---------------------------------------------------------------------------------------
@@ -315,9 +306,9 @@ def stepped_terrace(a, rng):
     window(a, -1.4, 1.4, ym + .02, TOP - .45, zb + .09, mull=(-.45, .45), sill=False)      # door-window to the upper deck
     rbox(a["h_shell"], 0, (zb + zm) / 2 + .05, HW, (zm - zb) / 2 + .05, ym - .26, ym, r=.2, b=.06)     # step roof = deck
     obox(a["h_deck"], (0, ym + .02, (zb + zm) / 2 + .05), (2 * HW - .3, .04, zm - zb - .1), X, Z)
-    rail(a["h_frame"], a["h_glass"], a["h_frame"], (-HW + .1, ym, zm - .02), (HW - .1, ym, zm - .02), h=1.0, step=1.4)
+    rail(a["h_frame"], a["h_glass"], a["h_frame"], (-HW + .1, ym, zm - .02), (HW - .1, ym, zm - .02), h=1.0, step=2.2)
     for s in (-1, 1):
-        rail(a["h_frame"], a["h_glass"], a["h_frame"], (s * (HW - .1), ym, zb + .1), (s * (HW - .1), ym, zm - .02), h=1.0, step=1.4)
+        rail(a["h_frame"], a["h_glass"], a["h_frame"], (s * (HW - .1), ym, zb + .1), (s * (HW - .1), ym, zm - .02), h=1.0, step=2.5)
     obox(a["h_shell"], (1.2, ym + .2, zb + .4), (1.4, .36, .4), X, Z)
     leafy(a, 1.2, ym + .45, zb + .4, .22, 3, seed=3)
     walls_xy(a["h_shell"], -HW + .18, HW - .18, .2, ym - .26, zm - .1, zm + .08, [(-1.75, 1.75, FL, ym - .4)])
@@ -325,20 +316,17 @@ def stepped_terrace(a, rng):
     # lower terrace
     base(a, zt)
     obox(a["h_deck"], (0, .23, (zm + zt) / 2), (2 * HW - .05, .06, zt - zm - .05), X, Z)
-    rail(a["h_frame"], a["h_glass"], a["h_frame"], (-HW + .06, .26, zt - .08), (HW - .06, .26, zt - .08), h=1.05, step=1.1)
+    rail(a["h_frame"], a["h_glass"], a["h_frame"], (-HW + .06, .26, zt - .08), (HW - .06, .26, zt - .08), h=1.05, step=2.2)
     for s in (-1, 1):
-        rail(a["h_frame"], a["h_glass"], a["h_frame"], (s * (HW - .06), .26, zm + .12), (s * (HW - .06), .26, zt - .08), h=1.05, step=1.2)
+        rail(a["h_frame"], a["h_glass"], a["h_frame"], (s * (HW - .06), .26, zm + .12), (s * (HW - .06), .26, zt - .08), h=1.05, step=2.5)
     ctx = M.Ctx(role_view(a), rng)
     M.kit_prop(ctx, "planter_1m", -1.45, .26, zt - .4)
-    M.kit_prop(ctx, "planter_1m", 1.45, .26, zt - .4)
     M.kit_prop(ctx, "bench", 0, .26, zm + .55)
-    M.kit_prop(ctx, "potted_plant", -1.7, .26, zm + .45)
     M.seated_person(ctx, .35, .26 + .45, zm + .6, 0)
     entrance(a)
     interior(a, -1.95, 1.95, .23, zm - .2, TOP - .35)
     M.kit_prop(ctx, "sofa", -.3, FL, 3.7)
     M.kit_prop(ctx, "floor_lamp", 1.3, FL, 4.3)
-    M.kit_prop(ctx, "bookshelf", 1.25, FL, .45)
 
 
 # --- 4. glass garden house ------------------------------------------------------------------------------------------
@@ -357,7 +345,7 @@ def glass_garden(a, rng):
     sheet = [(z, y) for z, y in prof] + [(z - .03, y - .03) for z, y in prof[::-1]]
     prism_x(a["h_blue"], sheet, xs, HW - .02)
     for xr in (xs + .05, .55, 1.25, HW - .05):                                # curved ribs
-        M.limb(a["h_frame"], [(xr, y + .03, z + .02) for z, y in prof], .045, .045, 6)
+        M.limb(a["h_frame"], [(xr, y + .03, z + .02) for z, y in prof], .045, .045, 4)
     for z, y in prof[1::2]:                                                   # glazing bars along x
         obox(a["h_frame"], ((xs + HW) / 2, y + .03, z + .02), (HW - xs, .05, .05), X, Z)
     side = [(.05, .26)] + prof + [(7.45, .26)]
@@ -377,7 +365,6 @@ def glass_garden(a, rng):
     M.kit_prop(ctx, "floor_lamp", -1.75, FL, 4.9)
     M.kit_prop(ctx, "tree_indoor", 1.3, FL, 2.0)
     M.kit_prop(ctx, "cafe_set", 1.0, FL, 4.6, math.pi / 2)
-    M.kit_prop(ctx, "potted_plant", 1.75, FL, 6.4)
     M.seated_person(ctx, 1.0, FL + .45, 4.0, 0)
 
 
@@ -446,7 +433,6 @@ def folded_roof(a, rng):
     interior(a, -1.95, 1.95, 1.0, zf - .2, 2.7, glow_x=(.2, 1.9))
     ctx = M.Ctx(role_view(a), rng)
     M.kit_prop(ctx, "potted_plant", 1.7, .26, zf + .45)
-    M.kit_prop(ctx, "bookshelf", -1.6, FL, 4.6, math.pi / 2)
     M.kit_prop(ctx, "desk_monitor", .7, FL, 4.3, math.pi)
     M.kit_prop(ctx, "chair_office", .7, FL, 3.55)
     M.kit_prop(ctx, "sofa", .5, FL, 1.7)

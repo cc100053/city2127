@@ -20,25 +20,25 @@
  "adjacent_same": [],
  "periodic_rows": [],
  "type_tris": {
-  "ellipse_view": 4936,
-  "rib_vault": 2968,
-  "stepped_terrace": 3584,
-  "glass_garden": 3536,
-  "folded_roof": 2276
+  "ellipse_view": 3592,
+  "rib_vault": 2348,
+  "stepped_terrace": 2296,
+  "glass_garden": 2936,
+  "folded_roof": 1688
  },
  "tris_by_part": {
-  "frame": 23756,
-  "commons": 36920,
-  "rail": 6348,
+  "frame": 20364,
+  "commons": 21036,
+  "rail": 5148,
   "trolley+spreader": 620,
-  "houses": 201884
+  "houses": 148416
  },
- "tris_total": 269528,
+ "tris_total": 195584,
  "materials": 67,
  "frame_clash": {},
  "house_clash": [],
  "entrance_fail": {},
  "entrances_checked": 57,
  "map": "L6  F G F R E R o F   | L S  R R\nL5  S g g E S o R S   | L E  R F\nL4  o S R G F E d G   | L F  R R\nL3  G E G v v S E o   | L R  R E\nL2  R S E g g F S E   | L S  R G\nL1  F G R E S o E F   | L R  R F\nL0  S R G o G S R S   | L F  R S",
- "glb_bytes": 4519720
+ "glb_bytes": 3574024
 }

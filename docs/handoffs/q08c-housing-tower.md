@@ -90,9 +90,9 @@ Per-type triangles: ellipse 4,936, rib vault 2,968, stepped 3,584, glass garden 
 
 ## Known issues and gaps
 
-- **Budget.** 269.5k triangles, against 8C v2's self-set ≈ 150k that was never agreed. Needs the owner's decision. Possible cuts if needed: fewer commons props and people (37k), lighter rails, lower-poly furniture.
+- **Budget.** Resolved: owner set < 200k (2026-11-21); now 195,584 (see Reduction round).
 - **Look.** The model is stylised and flat. The target's sweeping crown arches that merge into the rail are still five round loops. The target's dense greenery spilling from the pods and its pearlescent shells are not reached.
-- **Programme.** The 8C boat and pier route from v1/v2 was dropped. The rail delivers a house straight to the delivery bay. Say if the waterside unloading should come back.
+- **Programme.** The 8C boat and pier route from v1/v2 was dropped; owner confirmed 2026-11-21 not to add it back. The top rail delivers houses.
 - **Hanging house.** It is always `ellipse_view`, chosen because the slings clear its shell; it is not part of the draw.
 - **Local tests.** `npm test` cannot pass on this clone until the ignored leftover folders are removed (owner's call) and the Windows path bug is fixed. Both are outside this task.
 
@@ -101,6 +101,19 @@ Per-type triangles: ellipse 4,936, rib vault 2,968, stepped 3,584, glass garden 
 - **New asset folder.** The work went into a new folder and node prefix (`Q08H_`). The 8C v2 stays in its stash and evidence copy for comparison.
 - **Seed.** Default seed 2127; `--seed N` changes it. The output file name carries the seed only when it differs from the default.
 - **House contract.** All five houses enter from the corridor side (local −z); the clay `house_back` view shows the entrance. Side houses use the same meshes, turned ±90°.
+
+## Reduction round (2026-11-21, owner: under 200k, seed 2127, same placement, no pier)
+
+Counted as the sum over placed instances in the reimported final GLB (`check_glb.py`): 269,528 → **195,584** tris; GLB 4,519,720 → 3,574,024 bytes. The placement map and open bays are unchanged; frame clashes 0, house clashes 0, entrances 57/57, `check_glb.py` PASS.
+
+| Part | Before | After | Main cuts |
+| --- | --- | --- | --- |
+| Houses (57 + 1 hanging) | 201,884 | 148,416 | ellipse 4,936 → 3,592 (back porthole pair hidden behind the column removed, 28-point shell, one shell joint, lighter brow and balcony rail, 12-segment portholes); rib vault 2,968 → 2,348 (one pendant, one diner, no corner pot); stepped 3,584 → 2,296 (hidden bookshelf and extra pot removed, one planter, wider rail posts); glass garden 3,536 → 2,936 (lighter curved ribs, no front pot); folded roof 2,276 → 1,688 (hidden bookshelf removed). All types: one block per lift lug and slab shoe, 5-sided brackets, entrance without vestibule floor strip, door slit and number plate |
+| Commons | 36,920 | 21,036 | side terraces keep benches, with planters and café sets only on the two big levels (trees dropped); pocket gardens one planter plus a low shrub box instead of `tree_indoor`; no shrub clusters in the double-height garden; two trees instead of three on level 5; lighter roof trees |
+| Frame | 23,756 | 20,364 | one-segment rounded corners on columns, node collars and slabs |
+| Rail | 6,348 | 5,148 | 10-sided loops |
+
+Kept: each type's roof outline, main window frames, entrances, balconies and the furniture seen through glass (sofa, floor lamp, dining table, café table, indoor tree, desk). The 270k version is kept at `~/city2127-evidence/q08c-housing/pre-reduce-270k/` (and in commit `4fd555b3`). Same-camera comparison: `compare-reduce-270k-vs-195k.jpg` (main day, front day, main night; left before, right after); close-up spot checks: `compare-reduce-closeups.jpg` and `after-195k/{ellipse_view,stepped_terrace,glass_garden}/`.
 
 ## Next expected step
 

@@ -86,7 +86,7 @@ def build_frame(a):
     rbox(a["t_pave"], 0, 0, x1 + 2.2, z1 + 1.2, 0, .15, r=1.0, b=.04)
     for x in XS:
         for z in ZS:
-            rbox(w, x, z, COL / 2, COL / 2, .15, Y_ROOF + 1.1, r=.4, b=.05)
+            rbox(w, x, z, COL / 2, COL / 2, .15, Y_ROOF + 1.1, r=.4, b=.05, n=1)
     for l in range(NL + 1):
         y = yl(l)
         if l == 3:                                                           # the sky garden's double-height void
@@ -94,7 +94,7 @@ def build_frame(a):
             for xa, xb in ((-x1 - .55, VOID[0]), (VOID[1], x1 + .55)):
                 rbox(w, (xa + xb) / 2, (3.0 + z1 + .55) / 2, (xb - xa) / 2, (z1 + .55 - 3.0) / 2, y - SLAB, y, r=.3, b=.08)
         else:
-            rbox(w, 0, 0, x1 + .55, z1 + .55, y - SLAB, y, r=.5, b=.08, n=2)
+            rbox(w, 0, 0, x1 + .55, z1 + .55, y - SLAB, y, r=.5, b=.08, n=1)
         for z in (z0, z1):
             for i in range(8):
                 beam_x(w, XS[i] + COL / 2, XS[i + 1] - COL / 2, y - 1.1, y - SLAB + .01, z, .5)
@@ -103,7 +103,7 @@ def build_frame(a):
                 beam_z(w, ZS[j] + COL / 2, ZS[j + 1] - COL / 2, y - 1.1, y - SLAB + .01, x, .5)
         if l < NL:
             for x in XS:                                                       # node collars on the front columns
-                rbox(w, x, z1, .75, .75, y - 1.25, y + .3, r=.4, b=.15, n=2)
+                rbox(w, x, z1, .75, .75, y - 1.25, y + .3, r=.4, b=.15, n=1)
     cx0, cx1, cz0, cz1 = CORE
     lx0, lx1, lz = LOBBY
     for xa, xb, za, zb in ((cx0, lx0, cz0, cz1), (lx1, cx1, cz0, cz1), (lx0, lx1, cz0, lz)):
@@ -141,10 +141,10 @@ def pocket_garden(a, ctx, slot, rng):
     obox(T["t_deck"], (0, .03, 3.1), (4.6, .06, 5.9), X, Z)
     rail(T["t_rail"], T["t_glass"], T["t_rail"], (-2.35, .06, 6.4), (2.35, .06, 6.4), h=1.1, step=1.2)
     tctx = M.Ctx(role_view(T), rng)
-    M.kit_prop(tctx, "planter_1m", -1.5, .06, 5.9)
     M.kit_prop(tctx, "planter_1m", 1.4, .06, 5.9)
     M.kit_prop(tctx, "bench", .1, .06, 4.6, math.pi)
-    M.kit_prop(tctx, "tree_indoor", -1.6, .06, 3.0)
+    rbox(T["t_white"], -1.6, 3.0, .45, .45, .06, .5, r=.15, b=.04, n=1)          # shrub box (cheaper than tree_indoor)
+    H.leafy(T, -1.6, .75, 3.0, .32, 3, seed=slot[1] + slot[2])
     if rng.random() < .6:
         M.person(tctx, .8, .06, 3.4)
 
@@ -159,7 +159,6 @@ def sky_gardens(a, ctx, rng):
         M.kit_prop(ctx, "bench", x, y2 + .06, 7.9, math.pi)
     for x in (-5.0, 5.0):
         M.kit_prop(ctx, "planter_1m", x, y2 + .06, 8.7)
-        M.kit_prop(ctx, "shrub_cluster", x, y2 + .06, 4.4)
     M.kit_prop(ctx, "cafe_set", .2, y2 + .06, 5.0)
     for x, z in ((-.6, 6.6), (1.8, 4.2), (2.4, 8.2)):
         M.person(ctx, x, y2 + .06, z)
@@ -170,7 +169,7 @@ def sky_gardens(a, ctx, rng):
         edge_rail(a, 3.3, 9.3, x, y3, along_x=False)
     # single-height garden on level 5, bays 1-2
     obox(a["t_deck"], (-12, y5 + .03, 6.2), (11.4, .06, 6.4), X, Z)
-    for x in (-16.5, -12.0, -7.5):
+    for x in (-16.5, -7.5):
         M.kit_prop(ctx, "tree_indoor", x, y5 + .06, 8.4)
     for x in (-14.2, -9.6):
         M.kit_prop(ctx, "cafe_set", x, y5 + .06, 6.2)
@@ -193,9 +192,8 @@ def side_terraces(a, ctx, rng):
             obox(a["t_deck"], (sx * 21, y + .03, -1.3), (5.6, .06, 3.2), X, Z)
             edge_rail(a, -2.7, 2.7, xe, y, along_x=False)
             M.kit_prop(ctx, "bench", sx * 22.8, y + .06, -1.5, -sx * math.pi / 2)
-            M.kit_prop(ctx, "planter_1m", sx * 21, y + .06, -2.6)
             if big:
-                M.kit_prop(ctx, "tree_indoor", sx * 19.6, y + .06, -1.9)
+                M.kit_prop(ctx, "planter_1m", sx * 21, y + .06, -2.6)
                 M.kit_prop(ctx, "cafe_set", sx * 21.2, y + .06, -.6, math.pi / 2)
                 M.person(ctx, sx * 20.5, y + .06, -1.0)
 
@@ -256,7 +254,7 @@ def roof_garden(a, ctx, rng):
             blob(a["leaf" if k % 3 else "bloom"], (cx + rng.uniform(-1.3, 1.3), Y_ROOF + 1.05, -1 + rng.uniform(-3.6, 3.6)),
                  (rng.uniform(.6, 1.0), .5, rng.uniform(.6, 1.0)), sub=1, seed=i * 10 + k, noise=.15)
     for x in (-6.0, 6.0):
-        M.leafy_tree(ctx, (x, Y_ROOF, 5.5), h=4.2, crown=1.8, n=32, size=.38)
+        M.leafy_tree(ctx, (x, Y_ROOF, 5.5), h=4.2, crown=1.8, n=24, size=.42)
     obox(a["t_core"], (0, Y_ROOF + 1.6, -1.0), (6.8, 3.2, 3.0), X, Z)        # lift overrun
 
 
@@ -281,8 +279,8 @@ def build_rail(a):
         obox(a["t_dark"], (1.0, GY + .82, GZ + s * .4), (57, .14, .2), X, Z)
         obox(a["t_rail"], (1.0, GY + .93, GZ + s * .4), (57, .08, .1), X, Z)
     for x in (-24, -12, 0, 12, 24):
-        M.limb(a["t_white"], M._bez((x, Y_ROOF + 1.0, z1), (x, Y_ROOF + 5.0, z1 + .5), (x, GY - .6, GZ - .4), 12), .85, .6, 14)
-        M.limb(a["t_white"], loop_curve(x), .8, .55, 14)
+        M.limb(a["t_white"], M._bez((x, Y_ROOF + 1.0, z1), (x, Y_ROOF + 5.0, z1 + .5), (x, GY - .6, GZ - .4), 12), .85, .6, 10)
+        M.limb(a["t_white"], loop_curve(x), .8, .55, 10)
     secs = []
     for xi in range(9):
         x = -24 + 6 * xi
