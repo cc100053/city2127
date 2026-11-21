@@ -145,6 +145,38 @@ Kept: each type's roof outline, main window frames, entrances, balconies and the
   - `compare-sculpt-closeups.jpg`: rows ellipse, rib vault, stepped; columns before, after, before clay, after clay.
   - `compare-sculpt-tower.jpg`: left before, right after; main day, main clay, front day, main night.
 
+## Side middle slots (2026-11-21, owner: the column of benches and rails at the centre of the side view)
+
+- **Constraint check.**
+  - The sides' middle bays (x ±18..24, z −3..3) hold no lift or core; the lifts are in the core lobby.
+  - On every level, the front 2.6 m of the bay is the only corridor that reaches the front corner house's door (F_0 / F_7).
+  - The columns leave 4.8 m, and a pod is 4.4 m wide, so a pod there cuts the corner house off.
+  - The owner chose "one of the two per level".
+- **Programme (`layout.SIDE_MIDDLE`, `TERRACE_LEVELS`).**
+  - Public terraces stay on levels 1 and 4 only. On the other levels without a slot the bay is a plain corridor landing with a slab-edge rail.
+  - Left middle: level 0 house, level 2 empty slot, level 3 house, level 5 empty slot.
+  - Right middle: level 2 house, level 3 empty slot, level 5 house.
+  - On those levels the corner front bay becomes a small garden: F0_0, F2_0, F3_0, F5_0, F2_7, F3_7, F5_7.
+  - The middle-bay houses are drawn after the main draw with their own rng (`seed * 7 + 1`) and the same neighbour rule. Every other front bay keeps its seed-2127 result (`test_layout.py` checks this).
+  - Seed 2127 result: L0_1 glass garden, L3_1 ellipse, R2_1 ellipse, R5_1 glass garden.
+- **Empty slots** (L2_1, L5_1, R3_1 and the delivery bay F4_6) show:
+  - steel guide rails, a yellow footprint and a slim yellow frame of the 4.4 × 3.8 × 6.4 m pod envelope;
+  - a docking plate on the corridor side;
+  - amber mouth lamps and a gate bar.
+- **Hoisting.**
+  - The front rail line moved to z 14.3, so the hanging back face sits at 11.6, clear of every front house (max reach 11.25).
+  - Side rails at x ±29.4 on arched loops serve the side slots: hanging back face at 26.7; side houses reach 26.25 at most.
+  - The build reports this as `hoist.clear = true`.
+- **Checks.**
+  - `build_housing_tower.py`: frame clashes 0, house clashes 0, entrances 55/55 (the middle-bay houses enter from the side corridor).
+  - `check_glb.py`: PASS, 198,502 tris, 39 materials, 3,703,676 bytes.
+  - No people in the GLB or the `.blend`.
+  - `python test_layout.py`: OK.
+- **Evidence.**
+  - `~/city2127-evidence/q08c-housing/pre-slots-198k/`: the previous version.
+  - `slots/before|after/` (side, main: day, clay; after also night).
+  - `compare-side-slots.jpg`: left before, right after; side day, side clay, main day.
+
 ## Next expected step
 
 The owner reviews the sheets and renders. Then: agree the triangle budget, decide on the boat/pier route, and push `feat/q08c-housing-tower`. City placement (`addCityModel`, lot, browser checks, FPS) is a separate task.

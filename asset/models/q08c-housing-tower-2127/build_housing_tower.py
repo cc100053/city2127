@@ -50,9 +50,11 @@ Y_ROOF = G + NL * LV                         # 41
 COL, SLAB = 1.2, .35
 CORE = (-15.4, 15.4, -8.6, .4)               # core x0, x1, z0, z1
 LOBBY = (-3.2, 3.2, -2.4)                    # lift lobby notch in the core front: x0, x1, back z
-GY, GZ = 46.0, 13.6                          # rail beam centre height and line
+GY, GZ = 46.0, 14.3                          # rail beam centre height and line (14.3: clear of every front house)
 DELIVERY = ("F", 4, 6)
 HANG_Z = GZ - 2.7                            # back face of the hanging house: its lugs straddle the rail line
+SIDE_HANG_X = 26.7                           # side slots: back face of a house hanging at the side rail
+SIDE_RAIL_X = SIDE_HANG_X + 2.7              # side rails' line (+-)
 VOID = (-6.0, 6.0)                           # level-3 slab opening over the sky garden (front bays 3, 4)
 
 
@@ -68,7 +70,7 @@ def slot_xform(slot):
     face, l, i = slot
     if face == "F":
         return (bay_x(i), yl(l), 3.0), 0.0
-    return ((-18.0 if face == "L" else 18.0), yl(l), -6.0), (-90.0 if face == "L" else 90.0)
+    return ((-18.0 if face == "L" else 18.0), yl(l), -6.0 if i == 0 else 0.0), (-90.0 if face == "L" else 90.0)
 
 
 def beam_x(acc, x0, x1, y0, y1, z, hd):
@@ -175,26 +177,56 @@ def sky_gardens(a, ctx, rng):
     edge_rail(a, -17.7, -6.3, 9.45, y5)
 
 
-def side_terraces(a, ctx, rng):
-    """The sides' middle bays: the front corridor runs out to the end houses; behind it, a public terrace on every
-    level (benches and planters; the two big ones on levels 1 and 4 add trees and people)."""
+def side_middles(a, ctx, landings):
+    """The sides' middle bays that do not hold a slot: public terraces on LY.TERRACE_LEVELS (deck, bench, planter,
+    café table, slab-edge rail) and plain corridor landings elsewhere (slab-edge rail only). The front corridor runs
+    through both to the front corner house."""
     for l in range(NL):
         y = yl(l)
-        big = l in (1, 4)
-        for sx in (-1, 1):
-            xe = sx * 24.45
-            obox(a["t_deck"], (sx * 21, y + .03, -1.3), (5.6, .06, 3.2), X, Z)
-            edge_rail(a, -2.7, 2.7, xe, y, along_x=False)
-            M.kit_prop(ctx, "bench", sx * 22.8, y + .06, -1.5, -sx * math.pi / 2)
-            if big:
+        for side, sx in (("L", -1), ("R", 1)):
+            if l in LY.TERRACE_LEVELS:
+                obox(a["t_deck"], (sx * 21, y + .03, -1.3), (5.6, .06, 3.2), X, Z)
+                M.kit_prop(ctx, "bench", sx * 22.8, y + .06, -1.5, -sx * math.pi / 2)
                 M.kit_prop(ctx, "planter_1m", sx * 21, y + .06, -2.6)
                 M.kit_prop(ctx, "cafe_set", sx * 21.2, y + .06, -.6, math.pi / 2)
+            elif (side, l, 1) not in landings:
+                continue
+            edge_rail(a, -2.7, 2.7, sx * 24.45, y, along_x=False)
 
 
-def corridors(a):
+def empty_slot(a, slot):
+    """A house slot kept free: steel guide rails, a yellow footprint and a slim yellow frame of the pod envelope
+    (4.4 x 3.8 x 6.4 m), a dark docking plate with an amber strip on the corridor side, amber lamps at the mouth and a
+    yellow-and-dark gate bar across the slab edge."""
+    (cx, y, cz), yaw = slot_xform(slot)
+    T = H.Turned(a, cx, y, cz, math.radians(yaw))
+    for s in (-1, 1):
+        obox(T["t_rail"], (s * 1.5, .06, 3.3), (.16, .12, 6.2), X, Z)
+        obox(T["t_yellow"], (s * 2.2, .012, 3.3), (.1, .024, 6.4), X, Z)
+        obox(T["t_amber"], (s * 2.25, .3, 6.35), (.22, .22, .08), X, Z)
+        obox(T["t_dark"], (s * 1.6, .55, 6.42), (.08, 1.1, .08), X, Z)
+    for z in (.1, 6.45):
+        obox(T["t_yellow"], (0, .012, z), (4.4, .024, .1), X, Z)
+    obox(T["t_dark"], (0, .45, .25), (1.2, .9, .2), X, Z)
+    obox(T["t_amber"], (0, .75, .36), (.5, .12, .02), X, Z)
+    w, top, z0, z1 = 2.18, 3.75, .3, 6.4                                       # the pod envelope, drawn as a slim frame
+    for sx in (-1, 1):
+        for z in (z0, z1):
+            obox(T["t_yellow"], (sx * w, (.06 + top) / 2, z), (.06, top - .06, .06), X, Z)
+        obox(T["t_yellow"], (sx * w, top, (z0 + z1) / 2), (.06, .06, z1 - z0), X, Z)
+    for z in (z0, z1):
+        obox(T["t_yellow"], (0, top, z), (2 * w, .06, .06), X, Z)
+    for k in range(4):                                                         # gate bar in yellow and dark bands
+        obox(T["t_yellow" if k % 2 == 0 else "t_dark"], (-1.2 + .8 * k, 1.05, 6.42), (.8, .1, .08), X, Z)
+
+
+def corridors(a, mid_slots):
+    """Front and side corridors; on a level whose side middle bay is a slot the front corridor stops at x = +-18."""
     for l in range(NL):
         y = yl(l)
-        obox(a["t_corr"], (0, y + .01, 1.7), (48.0, .02, 2.6), X, Z)
+        x0 = -18.0 if ("L", l, 1) in mid_slots else -24.0
+        x1 = 18.0 if ("R", l, 1) in mid_slots else 24.0
+        obox(a["t_corr"], ((x0 + x1) / 2, y + .01, 1.7), (x1 - x0, .02, 2.6), X, Z)
         for sx in (-1, 1):
             obox(a["t_corr"], (sx * 16.7, y + .01, -4.1), (2.6, .02, 9.0), X, Z)
             obox(a["t_lamp"], (sx * 16.7, y + LV - SLAB - .02, -4.1), (.12, .03, 8.6), X, Z)
@@ -251,15 +283,6 @@ def roof_garden(a, ctx, rng):
     obox(a["t_core"], (0, Y_ROOF + 1.6, -1.0), (6.8, 3.2, 3.0), X, Z)        # lift overrun
 
 
-def delivery_bay(a):
-    cx, y = bay_x(6), yl(4)
-    for s in (-1, 1):
-        obox(a["t_rail"], (cx + s * 1.5, y + .06, 6.2), (.16, .12, 6.4), X, Z)
-        obox(a["t_yellow"], (cx + s * 2.3, y + .01, 6.2), (.12, .02, 6.4), X, Z)
-        obox(a["t_amber"], (cx + s * 2.3, y + .3, 9.3), (.22, .22, .08), X, Z)
-    obox(a["t_yellow"], (cx, y + .01, 9.25), (4.4, .02, .3), X, Z)
-
-
 # --- rail, trolley, spreader -----------------------------------------------------------------------------------------
 def loop_curve(x, n=16):
     return M._bez((x, Y_ROOF + 1.0, -3.0), (x, GY + 4.0, 3.0), (x, GY + .5, GZ - .2), n)
@@ -267,10 +290,18 @@ def loop_curve(x, n=16):
 
 def build_rail(a):
     z1 = ZS[-1]
-    rbox(a["t_white"], 1.0, GZ, 28.5, .65, GY - .75, GY + .75, r=.5, b=.25, n=3, segs=2)
+    rbox(a["t_white"], 0, GZ, SIDE_RAIL_X + .7, .65, GY - .75, GY + .75, r=.5, b=.25, n=3, segs=2)
     for s in (-1, 1):
-        obox(a["t_dark"], (1.0, GY + .82, GZ + s * .4), (57, .14, .2), X, Z)
-        obox(a["t_rail"], (1.0, GY + .93, GZ + s * .4), (57, .08, .1), X, Z)
+        obox(a["t_dark"], (0, GY + .82, GZ + s * .4), (2 * SIDE_RAIL_X + .8, .14, .2), X, Z)
+        obox(a["t_rail"], (0, GY + .93, GZ + s * .4), (2 * SIDE_RAIL_X + .8, .08, .1), X, Z)
+    for sx in (-1, 1):                                                         # side rails: the side slots' hoist line
+        xr, za, zb = sx * SIDE_RAIL_X, -8.0, GZ - .6
+        rbox(a["t_white"], xr, (za + zb) / 2, .6, (zb - za) / 2, GY - .7, GY + .7, r=.45, b=.2, n=2, segs=1)
+        for s in (-1, 1):
+            obox(a["t_rail"], (xr + s * .38, GY + .76, (za + zb) / 2), (.1, .08, zb - za), X, Z)
+        for z in (-6.0, 3.0):
+            M.limb(a["t_white"], M._bez((sx * 24, Y_ROOF + 1.0, z), (sx * 26.5, GY + 3.0, z), (xr, GY - .5, z), 10), .7, .5, 8)
+        obox(a["t_yellow"], (xr, GY + 1.0, za - .1), (1.1, .5, .3), X, Z)
     for x in (-24, -12, 0, 12, 24):
         M.limb(a["t_white"], M._bez((x, Y_ROOF + 1.0, z1), (x, Y_ROOF + 5.0, z1 + .5), (x, GY - .6, GZ - .4), 12), .85, .6, 10)
         M.limb(a["t_white"], loop_curve(x), .8, .55, 10)
@@ -283,8 +314,7 @@ def build_rail(a):
     for k in range(17):
         x = -24 + 3 * k
         M.limb(a["h_frame"], [(x, y - .72, z) for _, y, z in loop_curve(x, 12)[1:-1]], .05, .05, 4)
-    for x in (-27.6, 29.6):
-        obox(a["t_yellow"], (x, GY + 1.05, GZ), (.4, .5, 1.2), X, Z)
+
     for x in XS:                                                               # hoist guides on the front columns
         obox(a["t_rail"], (x, (G + Y_ROOF) / 2, z1 + COL / 2 + .05), (.22, Y_ROOF - G, .1), X, Z)
 
@@ -376,6 +406,8 @@ def main():
     scene.collection.children.link(prev_col)
     rng = random.Random(SEED)
     assign, opened = LY.place(SEED)
+    assign, opened, corner_gardens, empty_slots, landings = LY.side_middle(SEED, assign, opened)
+    mid_slots = {s for s in assign if s[2] == 1 and s[0] != "F"} | empty_slots
 
     root = bpy.data.objects.new("Q08H_HousingTower", None)
     root.empty_display_size = 4
@@ -389,14 +421,15 @@ def main():
     for role in M.ROLES:
         com["in_" + role]
     ctx = M.Ctx(role_view(com), rng)
-    corridors(com)
+    corridors(com, mid_slots)
     lifts(com, ctx)
     lobby(com)
     sky_gardens(com, ctx, rng)
-    side_terraces(com, ctx, rng)
-    delivery_bay(com)
+    side_middles(com, ctx, landings)
+    for s in sorted(empty_slots | {DELIVERY}):
+        empty_slot(com, s)
     roof_garden(com, ctx, rng)
-    for s in sorted(opened):
+    for s in sorted(opened | corner_gardens):
         pocket_garden(com, ctx, s, rng)
     add_obj("Q08H_Commons", build_mesh("q08h_commons", com), asset_col, root)
     rl = Accs()
@@ -430,6 +463,12 @@ def main():
     add_obj("Q08H_Spreader", build_mesh("q08h_spreader", sp), asset_col, root, (hx, sp_y, GZ))
 
     rep = checks([frame["t_white"], frame["t_core"]], hobs + [hang])
+    reach = {}                                                                  # max reach of each type past its slot line
+    for k, me in meshes.items():
+        reach[k] = max(-v.co[1] for v in me.vertices)                          # Blender -Y = local +z
+    hoist = {"front_line_z": HANG_Z, "max_front_house_z": round(3.0 + max(reach.values()), 3),
+             "side_line_x": SIDE_HANG_X, "max_side_house_x": round(18.0 + max(reach.values()), 3)}
+    hoist["clear"] = hoist["max_front_house_z"] < HANG_Z - .05 and hoist["max_side_house_x"] < SIDE_HANG_X - .05
     counts = {}
     for k in assign.values():
         counts[k] = counts.get(k, 0) + 1
@@ -444,7 +483,11 @@ def main():
               "tris_total": sum(by_part.values()), "materials": len(bpy.data.materials),
               "frame_clash": rep["frame_clash"], "house_clash": rep["house_clash"],
               "entrance_fail": {k: v for k, v in rep["entrance"].items() if not v["ok"]},
-              "entrances_checked": len(rep["entrance"]), "map": LY.front_map(assign, opened)}
+              "entrances_checked": len(rep["entrance"]), "hoist": hoist,
+              "side_middle_houses": sorted("%s%d_%d=%s" % (s + (assign[s],)) for s in assign if s[0] != "F" and s[2] == 1),
+              "empty_slots": sorted("%s%d_%d" % s for s in empty_slots | {DELIVERY}),
+              "corner_gardens": sorted("%s%d_%d" % s for s in corner_gardens),
+              "map": LY.front_map(assign, opened | corner_gardens)}
 
     S.context(prev_col)
     S.setup_light(scene)

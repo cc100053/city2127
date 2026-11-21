@@ -16,5 +16,23 @@ for seed in (2127, 8, 1, 99):
         assert s[0] == "F" and sum(o[1] == s[1] for o in o1) == 1, s
     print(seed, st["houses"], "houses", st["open"], "open", st["counts"])
 assert L.place(2127)[0] != L.place(8)[0], "different seeds should differ"
-print(L.front_map(*L.place(2127)))
+for seed in (2127, 8):
+    a0, o0 = L.place(seed)
+    a, o, gardens, empty, landings = L.side_middle(seed, a0, o0)
+    assert (a, o, gardens, empty) == L.side_middle(seed, a0, o0)[:4], "side middle must reproduce"
+    for side, prog in L.SIDE_MIDDLE.items():
+        for l in range(L.NL):
+            mid, corner = (side, l, 1), ("F", l, L.CORNER[side])
+            if l in prog:                     # the landing goes to the middle slot: no house in the corner bay
+                assert corner in gardens and corner not in a, (seed, corner)
+                assert (mid in a) == (prog[l] == "house") and (mid in empty) == (prog[l] == "empty"), (seed, mid)
+            else:                             # terrace or plain landing: the corner bay keeps its draw
+                assert mid not in a and mid not in empty and corner not in gardens, (seed, mid)
+                assert (corner in a) == (corner in a0), (seed, corner)
+    assert {k: v for k, v in a.items() if k[0] == "F" and k[2] not in (0, L.FRONT_BAYS - 1)} == \
+        {k: v for k, v in a0.items() if k[0] == "F" and k[2] not in (0, L.FRONT_BAYS - 1)}, "inner bays keep the draw"
+    assert not L.stats(a, o)["adjacent_same"], (seed, L.stats(a, o)["adjacent_same"])
+a0, o0 = L.place(2127)
+a, o, *_ = L.side_middle(2127, a0, o0)
+print(L.front_map(a, o))
 print("OK")

@@ -1,21 +1,20 @@
 {
  "seed": 2127,
- "houses": 57,
+ "houses": 55,
  "hanging": "ellipse_view",
  "open_bays": [
   "F0_3",
   "F1_5",
-  "F3_7",
   "F4_0",
   "F5_5",
   "F6_6"
  ],
  "counts": {
   "folded_roof": 11,
-  "ellipse_view": 11,
-  "rib_vault": 12,
-  "glass_garden": 9,
-  "stepped_terrace": 14
+  "ellipse_view": 12,
+  "rib_vault": 11,
+  "glass_garden": 10,
+  "stepped_terrace": 11
  },
  "adjacent_same": [],
  "periodic_rows": [],
@@ -28,17 +27,45 @@
  },
  "tris_by_part": {
   "frame": 20364,
-  "commons": 19496,
-  "rail": 5148,
+  "commons": 22976,
+  "rail": 6068,
   "trolley+spreader": 620,
-  "houses": 152268
+  "houses": 148474
  },
- "tris_total": 197896,
+ "tris_total": 198502,
  "materials": 68,
  "frame_clash": {},
  "house_clash": [],
  "entrance_fail": {},
- "entrances_checked": 57,
- "map": "L6  F G F R E R o F   | L S  R R\nL5  S g g E S o R S   | L E  R F\nL4  o S R G F E d G   | L F  R R\nL3  G E G v v S E o   | L R  R E\nL2  R S E g g F S E   | L S  R G\nL1  F G R E S o E F   | L R  R F\nL0  S R G o G S R S   | L F  R S",
- "glb_bytes": 3470272
+ "entrances_checked": 55,
+ "hoist": {
+  "front_line_z": 11.600000000000001,
+  "max_front_house_z": 11.25,
+  "side_line_x": 26.7,
+  "max_side_house_x": 26.25,
+  "clear": true
+ },
+ "side_middle_houses": [
+  "L0_1=glass_garden",
+  "L3_1=ellipse_view",
+  "R2_1=ellipse_view",
+  "R5_1=glass_garden"
+ ],
+ "empty_slots": [
+  "F4_6",
+  "L2_1",
+  "L5_1",
+  "R3_1"
+ ],
+ "corner_gardens": [
+  "F0_0",
+  "F2_0",
+  "F2_7",
+  "F3_0",
+  "F3_7",
+  "F5_0",
+  "F5_7"
+ ],
+ "map": "L6  F G F R E R o F   | L back S mid - | R mid - back R\nL5  o g g E S o R o   | L back E mid _ | R mid G back F\nL4  o S R G F E d G   | L back F mid t | R mid t back R\nL3  o E G v v S E o   | L back R mid E | R mid _ back E\nL2  o S E g g F S o   | L back S mid _ | R mid E back G\nL1  F G R E S o E F   | L back R mid t | R mid t back F\nL0  o R G o G S R S   | L back F mid G | R mid - back S",
+ "glb_bytes": 3703676
 }
