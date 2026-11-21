@@ -7,7 +7,7 @@ import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { leaf, paint, sage, trim } from './cityRig.ts';
 import { hash } from './coastalCanopy.ts';
-import { BACKDROP_PARK, cellHash } from './groundMask.ts';
+import { BACKDROP_PARK, cellHash, paveMaterial } from './groundMask.ts';
 import { changeSites, CONCEPT_LOT, DISTRICT, inDistrict, LOTS, URBAN_FILL } from './layout.ts';
 import { inHeroClear, inMega } from './megaFootprints.ts';
 import { recedeBeyondDistrict } from './bayContext.ts';
@@ -92,6 +92,8 @@ export function planUrbanFill(solids: T.Object3D[], reserved: (x: number, z: num
 const body = paint('#eceae3', .62), lot = paint('#e6e1d6', .72), street = paint('#d6d2c8', .8);
 const glass = new T.MeshStandardMaterial({ color: '#8fa9b8', roughness: .22, metalness: .38, name: 'urban-fill-glass' });
 street.name = 'urban-fill-street'; lot.name = 'urban-fill-lot';
+// The block's street and lot plinths carry the ground shader's paving and street cross-section (groundMask.ts).
+paveMaterial(street, 'street'); paveMaterial(lot, 'lot');
 // Paving lies centimetres over the lawn: pull it forward in depth like the street kit's ground, lots over streets.
 for (const [m, k] of [[street, 1], [lot, 2]] as const) { m.polygonOffset = true; m.polygonOffsetFactor = m.polygonOffsetUnits = -4 * k; }
 

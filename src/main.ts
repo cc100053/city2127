@@ -21,6 +21,7 @@ import { displayHour, type DisplayMode, sunHeight, daylight, moodAt, withNight, 
 import { overlay } from './overlay';
 import { addCityModel } from './modelAssets';
 import { loadOdaiba, updateOdaiba } from './odaibaScene';
+import { paveUnderStructures } from './groundMask';
 import { updateFloaters } from './floaters';
 import { updateHoverBeds } from './plazaDeck';
 import { build2127 } from './odaiba2127';
@@ -115,7 +116,9 @@ try {
   // Hero holograms: the same count feeds the 住民の声 panel; its four Meter bars follow the layout's rungs.
   const holo=heroHolograms(scene,renderer.capabilities.getMaxAnisotropy());holo.setVoices(STANDALONE_VOICES);
   const elevator=spaceElevator(scene),elevatorNear=spaceElevatorNear(scene,elevator);
-  const odaibaReady=loadOdaiba(scene,water).then(()=>true).catch(error=>{const message=document.createElement('p');message.className='error';message.textContent='Odaiba could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);return false;});
+  // Models that arrive after the district (lot GLBs) get their paved apron on the first two diagnostics passes (groundMask.ts).
+  let odaibaLoaded=false,groundRepaints=0;
+  const odaibaReady=loadOdaiba(scene,water).then(()=>odaibaLoaded=true).catch(error=>{const message=document.createElement('p');message.className='error';message.textContent='Odaiba could not load. Reload to try again. '+(error instanceof Error ? error.message : String(error));document.body.appendChild(message);console.error(error);return false;});
   if(import.meta.env.DEV && new URLSearchParams(location.search).has('asset-preview')){
     const input=document.createElement('input');input.type='file';input.accept='.glb,model/gltf-binary';input.className='asset-preview';input.title='Preview a Blender GLB in the city scene';input.setAttribute('aria-label','Preview a Blender GLB');
     document.body.appendChild(input);
@@ -409,7 +412,7 @@ try {
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.
     if(performance.now()-shadowDrawn>=1000/quality.shadowHz){renderer.shadowMap.needsUpdate=true;shadowDrawn=performance.now();}
     composer.render();
-    if(++frames===120){renderer.domElement.dataset.hour=hour.toFixed(2);renderer.domElement.dataset.displayMode=displayMode;renderer.domElement.dataset.time=now.toFixed(2);renderer.domElement.dataset.fps=(120000/(performance.now()-measureStart)).toFixed(1);renderer.domElement.dataset.drawCalls=String(renderer.info.render.calls);renderer.domElement.dataset.triangles=String(renderer.info.render.triangles);renderer.domElement.dataset.geometries=String(renderer.info.memory.geometries);renderer.domElement.dataset.textures=String(renderer.info.memory.textures);if(cityChanges)renderer.domElement.dataset.siteAssets=JSON.stringify(cityChanges.getDiagnostics());if(cityChanges?.energy)renderer.domElement.dataset.energy=JSON.stringify(cityChanges.energy.getDiagnostics());if(lots)renderer.domElement.dataset.lots=JSON.stringify(lots.getDiagnostics());if(concept)renderer.domElement.dataset.concept=JSON.stringify(concept.diagnostics);frames=0;measureStart=performance.now();}
+    if(++frames===120){if(odaibaLoaded&&groundRepaints<2){groundRepaints++;paveUnderStructures(scene);}renderer.domElement.dataset.hour=hour.toFixed(2);renderer.domElement.dataset.displayMode=displayMode;renderer.domElement.dataset.time=now.toFixed(2);renderer.domElement.dataset.fps=(120000/(performance.now()-measureStart)).toFixed(1);renderer.domElement.dataset.drawCalls=String(renderer.info.render.calls);renderer.domElement.dataset.triangles=String(renderer.info.render.triangles);renderer.domElement.dataset.geometries=String(renderer.info.memory.geometries);renderer.domElement.dataset.textures=String(renderer.info.memory.textures);if(cityChanges)renderer.domElement.dataset.siteAssets=JSON.stringify(cityChanges.getDiagnostics());if(cityChanges?.energy)renderer.domElement.dataset.energy=JSON.stringify(cityChanges.energy.getDiagnostics());if(lots)renderer.domElement.dataset.lots=JSON.stringify(lots.getDiagnostics());if(concept)renderer.domElement.dataset.concept=JSON.stringify(concept.diagnostics);frames=0;measureStart=performance.now();}
   });
   window.addEventListener('resize',()=>{
     camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight);
