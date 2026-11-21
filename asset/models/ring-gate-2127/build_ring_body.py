@@ -12,7 +12,7 @@ import bmesh
 import bpy
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parent))
+sys.path[:0] = [str(HERE), str(HERE.parent)]
 from geo_helpers import Acc, finish_mesh, material
 
 CENTRE, INNER, OUTER, HALF = 90, 73, 105, 22.5
@@ -135,7 +135,25 @@ def triangulate_caps(mesh):
     bm.free()
 
 
+def transfer_cut(role):
+    # The floor and walls line this shallow recess. Neither facade nor the traffic throat is opened.
+    from build_ring_transfer import OUTLINE, slab
+    acc = Acc()
+    spread = {'ceramic': 0, 'graphite': .0008, 'glazing': .0016, 'shadow_glazing': .0024}[role]
+    outline = [(3.45 + (x - 3.45) * (1.018 + spread), 3.5 + (z - 3.5) * (1.037 + spread)) for x, z in OUTLINE]
+    slab(acc, outline, 17.12 - spread * 9, 24.48 + spread * 9)
+    cutter = finish_mesh(f'Concourse_cut_{role}', acc, material(f'cutter_concourse_{role}', (0, 0, 0, 1)))
+    bpy.context.scene.collection.objects.link(cutter)
+    cutter.display_type = 'WIRE'
+    cutter.hide_render = True
+    cutter.hide_set(True)
+    return cutter
+
+
 def main():
+    transfer = '--transfer' in sys.argv
+    if transfer:
+        from build_ring_transfer import build_transfer
     for obj in list(bpy.data.objects):
         bpy.data.objects.remove(obj, do_unlink=True)
     scene = bpy.context.scene
@@ -146,6 +164,8 @@ def main():
         'shoulders': ((-30, 30), (150, 210)),
         'crown': ((30, 150),),
     }
+    if transfer:
+        sections = {'lower': sections['lower']}
     for name, arcs in sections.items():
         collection = bpy.data.collections.new(f'Ring_{name}')
         scene.collection.children.link(collection)
@@ -164,13 +184,24 @@ def main():
                 cut = obj.modifiers.new('R1_skew_tunnel', 'BOOLEAN')
                 cut.operation, cut.solver, cut.object = 'DIFFERENCE', 'EXACT', cutter
                 cut.use_self = True
+                if transfer:
+                    recess = obj.modifiers.new('Concourse_recess', 'BOOLEAN')
+                    recess.operation, recess.solver = 'DIFFERENCE', 'EXACT'
+                    recess.object = transfer_cut(role)
+                    recess.use_self = True
                 obj.modifiers.new('Triangulate_cut_faces', 'TRIANGULATE').min_vertices = 5
                 cutter.hide_set(True)
             triangulate_caps(obj.data)
+    if transfer:
+        build_transfer(collection)
+        for obj in collection.objects:
+            if obj.name.startswith('Concourse_'):
+                triangulate_caps(obj.data)
     bpy.context.preferences.filepaths.save_version = 0
-    assert bpy.ops.wm.save_as_mainfile(filepath=str(HERE / 'ring-body-2127.blend')) == {'FINISHED'}
+    source = 'ring-transfer-2127.blend' if transfer else 'ring-body-2127.blend'
+    assert bpy.ops.wm.save_as_mainfile(filepath=str(HERE / source)) == {'FINISHED'}
     for name in sections:
-        path = HERE / f'ring-{name}-2127.glb'
+        path = HERE / ('ring-transfer-2127.glb' if transfer else f'ring-{name}-2127.glb')
         assert bpy.ops.export_scene.gltf(filepath=str(path), collection=f'Ring_{name}', export_format='GLB',
                                          export_yup=True, export_apply=True, export_animations=False,
                                          export_cameras=False, export_lights=False) == {'FINISHED'}

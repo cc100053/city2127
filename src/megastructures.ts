@@ -3,6 +3,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { hash, plantCanopy, plantShrubs } from './coastalCanopy.ts';
 import { bodyFootprints, inRect } from './megaFootprints.ts';
 import { addCityModel } from './modelAssets.ts';
+import { sign, type Kit } from './cityRig.ts';
 
 // P1 (city-taste-v2): the three colossal megastructures of the master target — ring-on-edge building, white arch, stepped terraced hull.
 // Ground contacts and sizes are exported for the test and for carving the context massing they replace. Metres.
@@ -45,7 +46,12 @@ const megaPortal = new T.MeshStandardMaterial({ color: '#141b20', emissive: '#30
 /** Tunnel lights in the ring's road gate (outside the carve, so its own finish). */
 const gateLight = new T.MeshStandardMaterial({ color: '#fff4dc', emissive: '#fff1d0', emissiveIntensity: .8, roughness: .4 });
 const ringGlazing = new T.MeshStandardMaterial({ color: '#6c8895', emissive: '#c59262', emissiveIntensity: .06, roughness: .22, metalness: .26 });
-const ringFinishes = new Map([['ring_wayfinding', megaSeam], ['ring_cove', gateLight], ['ring_glazing', ringGlazing]]);
+const transferCove = gateLight.clone();
+transferCove.color.set('#f1cf9d'); transferCove.emissive.set('#ffc77d');
+const ringFinishes = new Map([
+  ['ring_wayfinding', megaSeam], ['ring_cove', gateLight], ['ring_glazing', ringGlazing],
+  ['transfer_wayfinding', megaSeam], ['transfer_cove', transferCove],
+]);
 /** The megastructures' own copies of the shared finishes: same look, but the hoop is cut open over the road gate (`RING_GATE`, a skewed box in
  * ring-local plan). Skyways and Meter pieces keep the exported originals, so nothing else is carved; the merge swaps in these copies. */
 const carved = new Map<T.Material, T.Material>();
@@ -67,6 +73,7 @@ export const updateMegastructures = (night: number) => {
   megaSeam.emissiveIntensity = .6 + night * 1.6; (carvedSeam as T.MeshStandardMaterial).emissiveIntensity = megaSeam.emissiveIntensity;
   gateLight.emissiveIntensity = .8 + night * 1.4; roomGlow.value = night;
   ringGlazing.emissiveIntensity = .06 + night * 1.05;
+  transferCove.emissiveIntensity = .62 + night * 1.3;
 };
 
 type Plant = { position: number[]; scale: number; type: string };
@@ -94,7 +101,7 @@ function bar(batch: Batch, material: T.Material, a: T.Vector3, b: T.Vector3, w: 
 }
 
 // ---- A. Ring-on-edge building: local frame, ring in XY, axis +Z, centred on the hoop; the group is turned by `yaw` and lifted to centreY.
-function ring(batch: Batch, trees: Plant[], shrubs: Shrub[], hasPilot: boolean, hasBody: boolean) {
+function ring(batch: Batch, trees: Plant[], shrubs: Shrub[], hasPilot: boolean, hasBody: boolean, hasTransfer: boolean) {
   const { outer, inner, depth, plinth, centreY } = RING, half = depth / 2;
   const opening = [-.035, .163]; // Angle from the bottom of the hoop to each edge of the garden landing.
   const L = (r: number, h: number, atLanding = false) => new T.CylinderGeometry(r, r, h, 96, 1, true,
@@ -136,13 +143,16 @@ function ring(batch: Batch, trees: Plant[], shrubs: Shrub[], hasPilot: boolean, 
     const atLanding = hasPilot && z > 15;
     const edges = opening.map(angle => angle - Math.PI / 2);
     const start = -Math.PI * .95, end = -Math.PI * .05;
-    const sections = atLanding ? [[start, edges[0]], [edges[1], end]] : [[start, end]];
+    // Open the two inner ledges where the concourse and its court pass through.
+    const atConcourse = hasTransfer && (z === 6.75 || z === -4.5);
+    const gap = atConcourse ? [-Math.PI / 2 - .14, -Math.PI / 2 + .24] : edges;
+    const sections = atLanding || atConcourse ? [[start, gap[0]], [gap[1], end]] : [[start, end]];
     for (const [a, b] of sections) {
       const shape = new T.Shape(); shape.absarc(0, 0, inner, a, b, false); shape.absarc(0, 0, inner - 9, b, a, true);
       add(megaShell, new T.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: false, curveSegments: 24 }), new T.Matrix4().makeTranslation(0, 0, z - .5));
       add(megaPlant, new T.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: false, curveSegments: 24 }), new T.Matrix4().makeTranslation(0, 0, z + .5).multiply(new T.Matrix4().makeScale(.97, .97, 1)));
     }
-    const blocksLanding = (a: number) => atLanding && a > edges[0] - .05 && a < edges[1] + .05;
+    const blocksLanding = (a: number) => (atLanding || atConcourse) && a > gap[0] - .055 && a < gap[1] + .055;
     // P5: a continuous shrub band spilling over the lip and a second one mid-ledge, with irregular tree clusters (3-5 crowns every 30-45 m).
     const zi = Math.round(z * 10);
     for (const [rr, gap, lift] of [[inner - .6, 4.4, 1], [inner - 5.5, 6, .8]] as const)
@@ -159,8 +169,8 @@ function ring(batch: Batch, trees: Plant[], shrubs: Shrub[], hasPilot: boolean, 
         trees.push({ position: [p[0], -p[2], p[1]], scale: 1 + hash(zi + c * 5 + j) * .5, type: j === 1 ? 'columnar' : 'broadleaf' });
       }
   }
-  const rail = new T.TorusGeometry(inner - 1.2, .45, 6, 64, Math.PI * 1.2);
-  add(megaRib, rail, new T.Matrix4().makeRotationZ(-Math.PI * 1.1).setPosition(0, 0, 0));
+  const railSpans = hasTransfer ? [[-Math.PI * 1.1, -Math.PI / 2 - .13], [-Math.PI / 2 + .216, Math.PI * .1]] : [[-Math.PI * 1.1, Math.PI * .1]];
+  for (const [start, end] of railSpans) add(megaRib, new T.TorusGeometry(inner - 1.2, .45, 6, 64, end - start), new T.Matrix4().makeRotationZ(start));
   for (const a of [-1.2, -.9, -2]) add(megaShell, new T.BoxGeometry(5, 2.2, 3.2), new T.Matrix4().makeRotationZ(a - Math.PI / 2).setPosition(Math.cos(a) * (inner - 2.4), Math.sin(a) * (inner - 2.4), 0));
   // Plinth carrying the hoop base, below ground by 15 m, with a seam frame where it meets the ground.
   const pTop = 6, pBot = -15, py = (pTop + pBot) / 2 - centreY;
@@ -326,23 +336,25 @@ export function carveContext(environment: T.Object3D) {
 }
 
 /** The three megastructures, with the optional Blender exterior and shared planted crowns. */
-export function megastructures(ringModels?: { entrance: T.Group; body?: T.Group }): T.Group {
+export function megastructures(ringModels?: { entrance: T.Group; body?: T.Group; hasTransfer?: boolean }): T.Group {
   const root = new T.Group(); root.name = 'megastructures';
   const batch: Batch = new Map(), trees: Plant[] = [], shrubs: Shrub[] = [], tops: [number, number][] = [];
-  ring(batch, trees, shrubs, Boolean(ringModels), Boolean(ringModels?.body)); arch(batch, tops); hull(batch, trees, shrubs);
+  ring(batch, trees, shrubs, Boolean(ringModels), Boolean(ringModels?.body), Boolean(ringModels?.hasTransfer)); arch(batch, tops); hull(batch, trees, shrubs);
   for (const [material, list] of batch) {
     const mesh = new T.Mesh(mergeGeometries(list), carved.get(material) ?? material); mesh.castShadow = mesh.receiveShadow = true; mesh.name = 'megastructure'; root.add(mesh); list.forEach(g => g.dispose());
   }
   plantCanopy(root, { instances: trees }); plantShrubs(root, shrubs);
   if (ringModels) {
+    if (ringModels.hasTransfer) ringModels.entrance.getObjectByName('Ring_LandingRail')?.removeFromParent();
     root.add(ringModels.entrance);
     if (ringModels.body) root.add(ringModels.body);
   }
   return root;
 }
 
-const ringBodyUrls = [
-  new URL('../asset/models/ring-gate-2127/ring-lower-2127.glb', import.meta.url).href,
+const lowerUrl = new URL('../asset/models/ring-gate-2127/ring-lower-2127.glb', import.meta.url).href;
+const transferUrl = new URL('../asset/models/ring-gate-2127/ring-transfer-2127.glb', import.meta.url).href;
+const ringUpperUrls = [
   new URL('../asset/models/ring-gate-2127/ring-shoulders-2127.glb', import.meta.url).href,
   new URL('../asset/models/ring-gate-2127/ring-crown-2127.glb', import.meta.url).href,
 ];
@@ -363,7 +375,13 @@ export async function loadMegastructures(): Promise<T.Group> {
   body.name = 'ring-body-2127';
   const [entrance, sections] = await Promise.allSettled([
     loadRingPart(entranceUrl, new T.Group()),
-    Promise.all(ringBodyUrls.map(url => loadRingPart(url, body))),
+    Promise.all([
+      loadRingPart(transferUrl, body).catch(error => {
+        console.warn('Ring concourse could not load. Keeping the R2 lower shell.', error);
+        return loadRingPart(lowerUrl, body);
+      }),
+      ...ringUpperUrls.map(url => loadRingPart(url, body)),
+    ]),
   ]);
   if (entrance.status === 'rejected') {
     console.warn('Ring entrance model could not load. Using the procedural ring and entrance.', entrance.reason);
@@ -374,5 +392,21 @@ export async function loadMegastructures(): Promise<T.Group> {
     console.warn('Ring shell could not load. Using the procedural shell with the Blender entrance.', sections.reason);
     return megastructures({ entrance: entrance.value });
   }
-  return megastructures({ entrance: entrance.value, body });
+  const [lower] = sections.value;
+  const transfer = lower.getObjectByName('Concourse_floor') ? lower : undefined;
+  if (transfer) {
+    transfer.name = 'ring-transfer-2127';
+    const kit: Kit = { signs: [], windows: [], random: Math.random };
+    for (const [text, z, yaw] of [
+      ['乗換ホール', 13.76, 0], ['空中庭園', 4.96, 0], ['乗換・広場', 4.31, Math.PI], ['広場', 13.43, Math.PI],
+    ] as const) {
+      const panel = new T.Group();
+      panel.position.set(4.1354, 21.52, z);
+      panel.rotation.y = yaw;
+      sign(panel, kit, text, 0, 0, 0, 3.6, .54, '#263d48', '#dcf3ff');
+      panel.traverse(o => { if (o instanceof T.Mesh) o.castShadow = false; });
+      transfer.add(panel);
+    }
+  }
+  return megastructures({ entrance: entrance.value, body, hasTransfer: Boolean(transfer) });
 }

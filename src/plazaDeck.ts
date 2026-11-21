@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { arc, bake, box, leaf, paint } from './cityRig.ts';
 import { hash, plantClusters, plantShrubs } from './coastalCanopy.ts';
-import { megaGlass, megaRib, megaSeam, megaShell } from './megastructures.ts';
+import { megaGlass, megaRib, megaSeam, megaShell, RING } from './megastructures.ts';
 import { publishRoofGardens } from './districtMeters.ts';
 import { publishOccupants, publishRoofWalks, type Spot, type Walk } from './occupants.ts';
 import { AIR_AT, PLAZA, plazaAt, plazaWalks, VOICES_AT } from './layout.ts';
@@ -51,16 +51,32 @@ function lampPools(root: T.Object3D) {
 }
 const column = new T.CylinderGeometry(1, 1, 1, 10);
 type P3 = readonly [number, number, number];
-const pts = (list: readonly P3[]) => new T.CatmullRomCurve3(list.map(p => new T.Vector3(...p)), false, 'centripetal');
+const plazaWalkCurve = (list: readonly P3[]) => new T.CatmullRomCurve3(list.map(p => new T.Vector3(...p)), false, 'centripetal');
 const top = PLAZA.h + .25;
 
-function walkway(root: T.Object3D, curve: T.Curve<T.Vector3>) {
+/** A continuous stroll from the garden court through the hall and out onto the existing bridge. */
+function ringTransferWalk(bridge: T.CatmullRomCurve3) {
+  const up = new T.Vector3(0, 1, 0), origin = new T.Vector3(RING.x, 0, RING.z);
+  const seam = bridge.getPoint(0), local = seam.clone().sub(origin).applyAxisAngle(up, -RING.yaw);
+  const point = (y: number, z: number) => new T.Vector3(local.x, y, z).applyAxisAngle(up, RING.yaw).add(origin);
+  const threshold = point(17.6, 22.5);
+  const route = new T.CurvePath<T.Vector3>();
+  route.add(new T.LineCurve3(point(17.6, -5.3), threshold));
+  route.add(new T.LineCurve3(threshold, seam));
+  route.add(bridge);
+  return route;
+}
+
+function walkway(root: T.Object3D, curve: T.Curve<T.Vector3>, transfer: boolean) {
   const length = curve.getLength(), samples = Math.ceil(length / 3);
   // White 9 m top slab on a grey fascia and underside whose upper 1.2 m is a darker shadow band, so the white separates from the pale ground.
   const slab = new T.Mesh(deck(curve, 9, .3, samples), megaShell); root.add(slab);
   const under = new T.Mesh(deck(curve, 8.7, 1.5, samples), fascia); under.position.y = -.3; root.add(under);
   const dark = new T.Mesh(deck(curve, 8.76, 1.2, samples), shadow); dark.position.y = -.3; root.add(dark);
-  const lawn = new T.Mesh(deck(curve, 2.2, .3, samples), leaf); lawn.position.y = .3; root.add(lawn); // planted strip down the deck, as the garden decks
+  if (!transfer) {
+    const lawn = new T.Mesh(deck(curve, 2.2, .3, samples), leaf);
+    lawn.position.y = .3; root.add(lawn);
+  }
   for (const side of [-4.5, 4.5]) root.add(new T.Mesh(offsetTube(curve, side, .05, .42, false), walkSeam));
   for (let d = 15; d < length - 8; d += 30) {
     const p = curve.getPointAt(d / length);
@@ -82,7 +98,7 @@ function mast(root: T.Object3D, [x, z]: readonly [number, number], y: number, w:
 }
 
 /** The plaza deck (one baked group, ~9 draws), its planted terraces and people, the masts and the elevated walkways. */
-export function plazaDeck(scene: T.Object3D, panels: readonly { id: string; at: readonly number[]; w: number; h: number; face: readonly number[] }[] = []) {
+export function plazaDeck(scene: T.Object3D, panels: readonly { id: string; at: readonly number[]; w: number; h: number; face: readonly number[] }[] = [], ringTransfer = false) {
   const root = new T.Group(); root.name = 'plaza-deck';
   const g = new T.Group(); g.position.set(PLAZA.x, 0, PLAZA.z); g.rotation.y = PLAZA.yaw; root.add(g);
   const { hu, hv, h, east } = PLAZA, mid = (hu - east) / 2, span = hu + east; // the deck runs local x -east..hu
@@ -150,9 +166,20 @@ export function plazaDeck(scene: T.Object3D, panels: readonly { id: string; at: 
     for (let j = 0; j < 4; j++) spots.push({ at: new T.Vector3(x + Math.cos(j * 1.6) * .8, top, z + Math.sin(j * 1.6) * .8), yaw: 0, mode: 'talk', crowd: kinds[(k + j) % 3] });
   });
   for (const lz of [-30, -12, 18, 32]) walks.push({ curve: line(Math.PI, .9, 1.7, lz), crowd: kinds[walks.length % 3], pair: lz > 0 ? .45 : undefined, rest: [3, 10] });
-  for (const points of plazaWalks) {
-    const curve = pts(points); walkway(root, curve);
-    for (const pair of [2.2, 0]) walks.push({ curve, crowd: 'public', pair: pair || undefined, rest: [5, 15] }); // strollers on each walkway
+  for (const [index, points] of plazaWalks.entries()) {
+    const bridge = plazaWalkCurve(points), transfer = index === 0 && ringTransfer;
+    walkway(root, bridge, transfer);
+    const curve = transfer ? ringTransferWalk(bridge) : bridge;
+    for (const pair of [2.2, 0]) walks.push({ curve, crowd: 'public', pair: pair || undefined, rest: [5, 15] });
+  }
+  if (ringTransfer) {
+    // Reuse the occupant fleet's seated and walking poses for the waiting area.
+    const toWorld = (x: number, z: number) => new T.Vector3(x, 17.6, z)
+      .applyAxisAngle(new T.Vector3(0, 1, 0), RING.yaw).add(new T.Vector3(RING.x, 0, RING.z));
+    for (const [x, z] of [[-3.88, 10.75], [11.4, 10.75]]) {
+      spots.push({ at: toWorld(x, z), yaw: RING.yaw, mode: 'talk', crowd: 'public', seated: true });
+    }
+    walks.push({ curve: new T.LineCurve3(toWorld(5.25, 20.7), toWorld(5.25, -4.7)), crowd: 'public', rest: [2, 4] });
   }
   publishOccupants({ walks, spots });
   const generated = new Set<T.BufferGeometry>();

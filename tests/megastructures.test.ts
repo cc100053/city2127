@@ -6,6 +6,10 @@ import { ConcentrationDistrict } from '../src/districtMeters.ts';
 import { changeSites, guideway, PLAZA, plazaAt, plazaWalks } from '../src/layout.ts';
 import { ARCH, FOOTPRINTS, groundContacts, HULL, inMega, inRect, megastructures, RING, RING_GATE } from '../src/megastructures.ts';
 import { routes } from '../src/mobility.ts';
+import { occupants, strollPose } from '../src/occupants.ts';
+import { plazaDeck } from '../src/plazaDeck.ts';
+import odaibaLayout from '../src/odaiba-layout.json' with {type: 'json'};
+import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
 
 // P1: the three megastructures exist, reach their table heights (±25%) and stand clear of the Meter sites (+14 m) and the civic core.
 const group = megastructures(), box = new Box3(), parts = new Map<string, Box3>();
@@ -90,7 +94,9 @@ for (const degrees of [-140, -110, -80, -50, -20, 10, 40, 70, 100, 130, 160, 190
   const ray = new Raycaster(new Vector3(0, RING.centreY, 0).addScaledVector(radial, RING.outer + 4), radial.negate(), 0, 5);
   assert.ok(ray.intersectObject(body).length > 0, `outer rim visible at ${degrees}°`);
 }
-const ringTriangles = [...pilotTriangles, ...exteriorTriangles];
+const { scene: transfer, triangles: transferTriangles } = await parseRingAsset('ring-transfer');
+assert.ok(transferTriangles.length > sections[0].triangles.length && transferTriangles.length < 24_000);
+const ringTriangles = [...pilotTriangles, ...exteriorTriangles, ...transferTriangles];
 const halfDepth = RING.depth / 2;
 for (let z = -halfDepth - 6; z < halfDepth + 6; z += .5) {
   const f = Math.max(0, Math.min(1, (z + halfDepth) / RING.depth));
@@ -119,5 +125,55 @@ for (const z of [15, 18, 22.5, landing.z - .05]) {
   const [floor] = down.intersectObject(installed);
   const expectedHeight = z <= 22.5 ? 17.6 : 17.6 - .58 * (z - 22.5) / 3.15;
   assert.ok(floor && Math.abs(floor.point.y - expectedHeight) < .03, `garden floor joins the bridge at local depth ${z}`);
+}
+// Install the same lower variant and procedural ledge cuts as the live app.
+const transferBody = body.clone();
+transferBody.remove(transferBody.children[0]);
+transferBody.add(transfer);
+const candidate = megastructures({ entrance: pilot.clone(), body: transferBody, hasTransfer: true });
+assert.ok(!candidate.getObjectByName('Ring_LandingRail') && installed.getObjectByName('Ring_LandingRail'), 'opening the R3 threshold leaves the R2 barrier available');
+const firstWalk = occupants().walks.length;
+const plaza = plazaDeck(new Group(), [], true);
+candidate.add(plaza);
+candidate.updateMatrixWorld(true);
+const paths = occupants().walks.slice(firstWalk);
+const through = paths.filter(({curve}) => curve.getPointAt(1).distanceTo(new Vector3(...plazaWalks[0].at(-1)!)) < .01);
+assert.equal(through.length, 2, 'the two original ring bridge walks continue through the hall to the garden');
+const hallWalk = paths.at(-1)!;
+assert.ok(hallWalk.curve.getLength() > 20, 'the local concourse walk connects the canopy and the court');
+const down = new Vector3(0, -1, 0), tangent = new Vector3(), side = new Vector3();
+for (const [walkIndex, walk] of [...through, hallWalk].entries()) {
+  const {curve, pair, length, rest} = walk;
+  const check = (d: number, o: number) => {
+    const p = curve.getPointAt(d / length);
+    curve.getTangentAt(d / length, tangent);
+    side.set(-tangent.z, 0, tangent.x).normalize();
+    p.addScaledVector(side, o);
+    const label = `walk ${walkIndex}/${o.toFixed(2)} at ${p.toArray().map(n => n.toFixed(2)).join(',')}`;
+    const [floor] = new Raycaster(p.clone().addScaledVector(up, .27), down, 0, .54).intersectObject(candidate);
+    const inNewFloor = walk === hallWalk || d < 27;
+    assert.ok(floor && Math.abs(floor.point.y - p.y) <= (inNewFloor ? .06 : .16), `continuous floor beneath ${label}, got ${floor?.point.y}`);
+    const head = new Raycaster(p.clone().addScaledVector(up, .13), up, 0, 2.08);
+    assert.equal(head.intersectObject(candidate).length, 0, `2.2 m of head clearance above ${label}`);
+  };
+  for (let d = .12; d < length - .1; d += .32) for (const lane of pair ? [-pair, pair] : [0]) {
+    for (const edge of [-.36, 0, .36]) check(d, lane + edge);
+  }
+  const stamps = Array.from({length: 600}, (_, i) => strollPose(i, walkIndex, length, rest));
+  assert.ok(stamps.some(s => s.d < 3 && s.resting < 0) && stamps.some(s => s.d > length - 4 && s.resting < 0), 'existing gait visits both ends of the route');
+  assert.ok(stamps.every((s, i) => !i || Math.abs(s.d - stamps[i - 1].d) <= 1.101), 'resident does not teleport at a joint or turn');
+}
+// Compare the actual sloped court edge to the retained DECKS facade along the full width.
+const decksPlacement = odaibaLayout.buildings.find(b => b.id === 'decks-tokyo-beach');
+assert.ok(decksPlacement);
+const decksBytes = Uint8Array.from(readFileSync(new URL('../asset/models/decks-tokyo-beach/decks-tokyo-beach.glb', import.meta.url)));
+const {scene: decks} = await loader.parseAsync(decksBytes.buffer, '');
+placeOdaibaModel(decks, decksPlacement);
+const courtFloor = transfer.getObjectByName('Concourse_floor');
+assert.ok(courtFloor);
+for (let x = -7.9; x <= 14.8; x += .32) {
+  const [floorEdge] = new Raycaster(toWorld(new Vector3(x, 17.4, -13)), towardsGarden.clone().negate(), 0, 13).intersectObject(courtFloor);
+  const [facade] = new Raycaster(toWorld(new Vector3(x, 17.4, 1)), towardsGarden, 0, 35).intersectObject(decks);
+  assert.ok(floorEdge && facade && floorEdge.distance + facade.distance >= 14.18, `court floor keeps 18 cm clear of DECKS at local x=${x.toFixed(2)}`);
 }
 console.log('megastructures ok');

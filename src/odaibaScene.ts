@@ -189,7 +189,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   // Each roof garden's terraces go to the district Meters (sails/forest) and take a few residents (stroll line, standing group).
   const roofGarden=(model:T.Object3D,tower?:boolean)=>{const terraces=plantRoofCanopy(scene,model,tower);publishRoofGardens(terraces);publishRoofWalks(model,terraces);};
   environment.traverse(object=>{if(object instanceof T.Mesh && object.name.startsWith('CTX_') && new T.Box3().setFromObject(object).max.y>30)roofGarden(object,true);});
-  scene.add(plazaDeck(scene, HOLOGRAMS.panels)); // P4: the Aqua City lot is the civic plaza deck
+  scene.add(plazaDeck(scene, HOLOGRAMS.panels, Boolean(structures.getObjectByName('ring-transfer-2127')))); // P4: the Aqua City lot is the civic plaza deck
   await Promise.all(built.map(async placement => {
     if(placement.id==='fuji-tv'){const core=civicCore();scene.add(core);publishOccupants(core.occupants);return;}
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);

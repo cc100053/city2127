@@ -32,6 +32,7 @@ FINISHES = {
     'cove': (WARM, .50, WARM, .45),
 }
 A = {role: Acc() for role in FINISHES}
+LANDING_RAIL = {role: Acc() for role in ('graphite', 'ceramic')}
 
 
 def loft(role, rows):
@@ -121,10 +122,10 @@ def frontage():
 def garden():
     # Ramp straight off the 17 m plaza bridge into the cut in the planted ledge.
     loft('ceramic', [[(x, y, z) for x, y in ((-.15, 16.88), (8.35, 16.88), (8.35, top), (-.15, top))]
-                     for z, top in ((13.8, 17.6), (22.5, 17.6), (25.65, 17.02))])
-    obox(A['graphite'], (4.1, 18.45, 14.06), (8.30, .20, .22))
+                     for z, top in ((13.8, 17.6), (22.5, 17.6), (26.1, 17.6 - .58 * 3.6 / 3.15))])
+    obox(LANDING_RAIL['graphite'], (4.1, 18.45, 14.06), (8.30, .20, .22))
     for x in (.15, 2.78, 5.42, 8.05):
-        obox(A['ceramic'], (x, 18.0, 14.06), (.15, .92, .18))
+        obox(LANDING_RAIL['ceramic'], (x, 18.0, 14.06), (.15, .92, .18))
     kit = {role: Acc() for role in ROLES}
     kit.update(white=A['ceramic'], pane_w=A['graphite'])
     span, rise, reach, wall = 13.4, 7.05, 7.2, .62
@@ -145,9 +146,15 @@ bpy.context.scene.unit_settings.system = 'METRIC'
 tunnel()
 frontage()
 garden()
-for role, (base, roughness, emissive, strength) in FINISHES.items():
-    finish = material(f'ring_{role}', base, roughness, emissive, strength)
-    obj = finish_mesh(f'Ring_{role.title()}', A[role], finish)
+finishes = {role: material(f'ring_{role}', *finish) for role, finish in FINISHES.items()}
+rail = bpy.data.objects.new('Ring_LandingRail', None)
+bpy.context.collection.objects.link(rail)
+for name, role, acc, parent in [
+    *((f'Ring_{role.title()}', role, acc, None) for role, acc in A.items()),
+    *((f'LandingRail_{role}', role, acc, rail) for role, acc in LANDING_RAIL.items()),
+]:
+    obj = finish_mesh(name, acc, finishes[role])
+    obj.parent = parent
     mesh = bmesh.new()
     mesh.from_mesh(obj.data)
     bmesh.ops.triangulate(mesh, faces=[face for face in mesh.faces if len(face.verts) > 4])
