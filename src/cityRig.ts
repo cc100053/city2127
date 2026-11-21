@@ -59,11 +59,11 @@ export const chrome=new T.MeshPhysicalMaterial({color:'#f1f4f6',metalness:.92,ro
 // Clear glass sphere: the chrome mirror, thinned so masts and cradles show through; dims with the night like every mirror.
 export const skyGlass=chrome.clone();skyGlass.color.set('#f4f8fa');skyGlass.transparent=true;skyGlass.opacity=.7;skyGlass.depthWrite=false;
 export const mirrors:T.MeshStandardMaterial[]=[chrome,skyGlass];
-const rounded = new Map<string, RoundedBoxGeometry>();
+const boxes = new Map<string, T.BufferGeometry>();
 export function box(parent:T.Object3D, size:[number,number,number], position:[number,number,number], material:T.Material, radius=.18) {
   const key = [...size,radius].join(',');
-  if (!rounded.has(key)) rounded.set(key,new RoundedBoxGeometry(...size,2,Math.min(radius,.055,...size.map(v=>v/2))));
-  const mesh = new T.Mesh(rounded.get(key),material); mesh.position.set(...position); mesh.castShadow=true; mesh.receiveShadow=true; parent.add(mesh); return mesh;
+  if (!boxes.has(key)) boxes.set(key, radius === 0 ? new T.BoxGeometry(...size) : new RoundedBoxGeometry(...size,2,Math.min(radius,.055,...size.map(v=>v/2))));
+  const mesh = new T.Mesh(boxes.get(key),material); mesh.position.set(...position); mesh.castShadow=true; mesh.receiveShadow=true; parent.add(mesh); return mesh;
 }
 /** Flat-topped ring, arc or disc (inner=0) standing on `position`. Angles run from +X towards -Z. */
 export function arc(parent:T.Object3D, inner:number, outer:number, height:number, position:[number,number,number], material:T.Material, start=0, length=Math.PI*2) {

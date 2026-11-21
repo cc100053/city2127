@@ -104,7 +104,19 @@ for (const placement of layout.buildings) {
   console.log(`Odaiba: ${roofs.reduce((n,r)=>n+r.walks.length,0)} roof strolls and ${roofs.reduce((n,r)=>n+r.spots.length,0)} roof residents keep to open roof, clear of planting, meadows and sail posts.`);
 }
 assert.equal(triangles, 339919, 'All eight complete GLBs retain reviewed geometry');
-const core=civicCore();city.add(core);
+const facadeBytes = readFileSync(new URL('../asset/models/fuji-civic-facade/fuji-civic-facade.glb', import.meta.url));
+const { scene: facade } = await new GLTFLoader().parseAsync(facadeBytes.buffer.slice(facadeBytes.byteOffset, facadeBytes.byteOffset + facadeBytes.byteLength), '');
+const core = civicCore(facade);
+const fallback = civicCore();
+assert.equal(core.userData.facade, 'blender');
+assert.equal(fallback.userData.facade, 'procedural');
+assert.deepEqual(core.occupants, fallback.occupants, 'The curtain wall does not move staff, routes or the public escalator');
+const coreTriangles = core.children.reduce((total, object) => {
+  assert.ok(object instanceof Mesh);
+  return total + (object.geometry.index?.count ?? object.geometry.getAttribute('position').count) / 3;
+}, 0);
+assert.ok(coreTriangles <= 1_000_000, `Fuji civic core stays within the pilot triangle budget (got ${coreTriangles})`);
+city.add(core);
 landmarks.push(core);
 const coreBounds=new Box3().setFromObject(core);
 assert.ok(coreBounds.min.y>=-7 && coreBounds.max.y<195, 'Civic chassis (polish2: 1.35× frame) stays below the sphere approach tier'); // the district loop at 164–176 m runs ~350 m out

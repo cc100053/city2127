@@ -1,6 +1,6 @@
 # Blender asset and export standards
 
-Current scope: Odaiba 2127. These are manual asset handoff standards; [Git coordination](CONTRIBUTING.md), [architecture](PROJECT.md) and [ART](ART.md) govern integration. Shibuya's old asset backlog is closed. `odaibaScene` loads six landmark GLBs and the derived district environment; `civicCore` replaces the rendered Fuji TV form. Park uses the future-tree GLB. Module-swap's eight pairs are legacy demonstrator assets.
+Current scope: Odaiba 2127. These are manual asset handoff standards; [Git coordination](CONTRIBUTING.md), [architecture](PROJECT.md) and [ART](ART.md) govern integration. Shibuya's old asset backlog is closed. `odaibaScene` loads six landmark GLBs and the derived district environment; `civicCore` replaces the surveyed Fuji TV form; its R1 two-wing curtain wall loads a [separate Blender GLB](handoffs/fuji-civic-facade.md) with the earlier procedural wall as fallback. Park uses the future-tree GLB. Module-swap's eight pairs are legacy demonstrator assets.
 
 ## Codex and Blender connection (2026-09-23)
 

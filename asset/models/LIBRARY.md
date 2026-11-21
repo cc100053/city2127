@@ -147,6 +147,7 @@ Whole assets. Reuse a site asset elsewhere only as background context, and ask t
 | `divercity-office-tower` | landmark context | imported GLB | context |
 | `divercity-tokyo-plaza` | landmark context | imported GLB | context |
 | `fuji-tv` | landmark context | imported GLB | context |
+| `fuji-civic-facade` | Civic Core two-wing curtain wall, recessed panes, acoustic panels and production coves. 39,924 triangles / five material roles, civic-local metres before the 1.35× placement. | [build_facade.py](fuji-civic-facade/build_facade.py), editable `.blend` and runtime `.glb` | site-only window openings follow the Fuji floor heights and footprint |
 | `grand-nikko-tokyo-daiba` | landmark context | imported GLB | context |
 | `hilton-tokyo-odaiba` | landmark context | imported GLB | context |
 | `telecom-center` | landmark context | imported GLB | context |

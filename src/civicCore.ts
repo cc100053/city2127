@@ -1,6 +1,7 @@
 import * as T from 'three';
-import { arc, bake, box, chrome, mirrors, leaf, leafyCrown, membrane, publicLight as cityLight, solar as citySolar, stone as cityStone, trim as cityTrim } from './cityRig.ts';
+import { arc, bake, box as rigBox, chrome, mirrors, leaf, leafyCrown, membrane, publicLight as cityLight, solar as citySolar, stone as cityStone, trim as cityTrim } from './cityRig.ts';
 import type { Ride, Spot, Walk } from './occupants.ts';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { megaGlass, megaSeam } from './megastructures.ts';
 import { CIVIC, civicAt } from './layout.ts';
@@ -8,9 +9,14 @@ import { CIVIC, civicAt } from './layout.ts';
 /** polish2: the chrome sphere's sky reflection dims at night (gunmetal with highlights, as the night target), set by `updateCivic`. */
 const civicSphere={material:null as T.MeshPhysicalMaterial|null};
 export const updateCivic=(night:number)=>{if(civicSphere.material)civicSphere.material.envMapIntensity=1.1-night*.7;};
-/** Occupied media headquarters within Fuji's civic chassis, retaining the sphere berth and site alignment. Metres. Its people are not
- * baked: `occupants` lists them (staff, audience, forum crowds, strollers and escalator riders) for `publishOccupants` to animate. */
-export function civicCore() {
+export async function loadCivicFacade() {
+  const url = new URL('../asset/models/fuji-civic-facade/fuji-civic-facade.glb', import.meta.url).href;
+  try { return (await new GLTFLoader().loadAsync(url)).scene; }
+  catch (error) { console.warn('Fuji civic facade: using procedural fallback', error); }
+}
+
+/** Occupied media headquarters, in metres. The static shell is baked and `publishOccupants` animates the published routes. */
+export function civicCore(facade?: T.Group) {
   const root=new T.Group();root.name='fuji-civic-chassis';
   const spots:Spot[]=[],walks:Walk[]=[],rides:Ride[]=[];
   // Building-local finishes (still one batch each): warm cream frame and slabs, and dark charcoal furniture, people and hangers,
@@ -23,7 +29,9 @@ export function civicCore() {
   const publicLight=cityLight.clone();publicLight.color.set('#e4e8ea');publicLight.emissive.set('#ffd29c');publicLight.emissiveIntensity=1;
   const K=CIVIC.k,f=(v:number)=>v.toFixed(3); // shader positions are world metres, so the room cells and theatre shell follow the polish2 scale
   publicLight.onBeforeCompile=shader=>{
-    shader.uniforms.roomLight={get value(){const night=Math.min(1,Math.max(0,(cityLight.emissiveIntensity-.15)/1.3));return T.MathUtils.lerp(.3,1.15+cityLight.emissiveIntensity*.55,night);}}; // polish2: rooms glow at night only, so the frame reads white by dayshader.uniforms.roomNight={get value(){return Math.min(1,Math.max(0,(cityLight.emissiveIntensity-.15)/1.3));}};
+    const nightLevel=()=>T.MathUtils.clamp((cityLight.emissiveIntensity-.15)/1.3,0,1);
+    shader.uniforms.roomNight={get value(){return nightLevel();}};
+    shader.uniforms.roomLight={get value(){return T.MathUtils.lerp(.3,1.15+cityLight.emissiveIntensity*.55,nightLevel());}};
     // Each ~5×6 m room cell gets its own light level, and upward-facing floors glow less than ceilings and screens,
     // so stacked workrooms read as separate occupied rooms with depth instead of one flat lit slab.
     shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vRoomPos;\nvarying float vRoomUp;')
@@ -62,6 +70,34 @@ export function civicCore() {
       diffuseColor.a*=mix(1.2,.12,abs(dot(normal,normalize(vViewPosition))));`);
   };
   silverGlass.customProgramCacheKey=()=>'fuji-silver-glass';
+  const finishes = new Map<string, T.Material>([
+    ['fuji_ceramic', trim], ['fuji_graphite', solar], ['fuji_clear', silverGlass],
+    ['fuji_warm', publicLight], ['fuji_studio', broadcastLight],
+  ]);
+  const facadeMeshes = new Map<T.Mesh, T.Material>();
+  const foundFinishes = new Set<T.Material>();
+  let invalidFacade = false;
+  facade?.traverse(object => {
+    if (!(object instanceof T.Mesh)) return;
+    const finish = Array.isArray(object.material) ? undefined : finishes.get(object.material.name);
+    if (!finish) { invalidFacade = true; return; }
+    facadeMeshes.set(object, finish);
+    foundFinishes.add(finish);
+  });
+  const facadeReady = !!facade && !invalidFacade && foundFinishes.size === finishes.size;
+  if (facadeReady) {
+    for (const [mesh, finish] of facadeMeshes) mesh.material = finish;
+    root.add(facade);
+  } else if (facade) console.warn('Fuji civic facade: incomplete material roles, using procedural fallback');
+
+  const detailFinishes = new Set<T.Material>([solar, publicLight, broadcastLight]);
+  const cachedBoxes = new Set<T.BufferGeometry>();
+  const box: typeof rigBox = (parent, size, position, finish, radius) => {
+    const mesh = rigBox(parent, size, position, finish, detailFinishes.has(finish) && Math.min(...size) <= .25 ? 0 : radius);
+    cachedBoxes.add(mesh.geometry);
+    return mesh;
+  };
+
   const member=(a:number[],b:number[],width:number,depth=width,material:T.Material=trim)=>{
     const from=new T.Vector3(...a),to=new T.Vector3(...b),delta=to.clone().sub(from);
     const mesh=box(root,[width,delta.length(),depth],from.clone().add(to).multiplyScalar(.5).toArray(),material,.05);
@@ -197,14 +233,18 @@ export function civicCore() {
       // Acoustic walls have recessed vertical service seams; the public edge remains transparent.
       for(let dx=-width/2+7;dx<width/2-5;dx+=4)
         box(root,[.16,h-1,.25],[x+dx,y+1.2+h/2,34.35],solar);
-      box(root,[width-1,h,.18],[x,y+1.2+h/2,-2.6],silverGlass);
-      // Ceramic floor edges break up the tall glass bays; shallow terraces remain inside the wing footprint.
+      // The mezzanine ledge still supports the planted corners and stays aligned with the facade's horizontal rails.
       box(root,[width,1.05,3.2],[x,y+9.2,-1.2],trim);
-      box(root,[width-1,.25,.25],[x,y+8.55,-2.9],publicLight);
-      box(root,[width-2,1.3,.16],[x,y+10.1,-2.7],silverGlass);
+      if (!facadeReady) {
+        box(root,[width-1,h,.18],[x,y+1.2+h/2,-2.6],silverGlass);
+        box(root,[width-1,.25,.25],[x,y+8.55,-2.9],publicLight);
+        box(root,[width-2,1.3,.16],[x,y+10.1,-2.7],silverGlass);
+      }
       for(const side of [-1,1]) {
-        box(root,[.18,h,36],[x+side*(width/2-.5),y+1.2+h/2,15],silverGlass);
-        for(let z=0;z<33;z+=10)box(root,[.22,h,.3],[x+side*(width/2-.4),y+1.2+h/2,z],trim);
+        if (!facadeReady) {
+          box(root,[.18,h,36],[x+side*(width/2-.5),y+1.2+h/2,15],silverGlass);
+          for(let z=0;z<33;z+=10)box(root,[.22,h,.3],[x+side*(width/2-.4),y+1.2+h/2,z],trim);
+        }
         if(y===3)continue; // the ground floor flanks meet the public foyer
         // Proud ceramic band with a lit soffit and planter at the mezzanine line, so the flanks stack as terraced floors.
         box(root,[1.5,1.05,36],[x+side*(width/2+.25),y+9.2,15],trim);
@@ -216,9 +256,10 @@ export function civicCore() {
         }
       }
       for(let dx=-width/2+1;dx<width/2;dx+=4) {
-        // Cream mullions every 8 m, slim ones between: a finer glazed rhythm over the lit rooms.
-        if((dx+width/2-1)%8===0)box(root,[.22,h,.3],[x+dx,y+1.2+h/2,-2.8],trim);
-        else box(root,[.1,h,.16],[x+dx,y+1.2+h/2,-2.75],solar); // dark curtain-wall frames between the cream piers
+        if (!facadeReady) {
+          const ceramic = (dx+width/2-1)%8===0;
+          box(root,ceramic ? [.22,h,.3] : [.1,h,.16],[x+dx,y+1.2+h/2,ceramic ? -2.8 : -2.75],ceramic ? trim : solar);
+        }
         // Warm ceiling panels and inset workstation screens make the occupied depth legible.
         box(root,[2.8,.12,8],[x+dx+1.4,y+h+.85,8],publicLight);
       }
@@ -630,8 +671,9 @@ export function civicCore() {
   const sphere=new T.Mesh(new T.SphereGeometry(SR,64,40),sphereMat);sphere.position.copy(centre);sphere.name='civic-chrome-sphere';sphere.castShadow=true;
   root.add(sphere,new T.Mesh(mergeGeometries(seams),broadcastLight),new T.Mesh(mergeGeometries(cables),trim));
   const generated=new Set<T.BufferGeometry>();
-  root.traverse(object=>{if(object instanceof T.Mesh && object.geometry.type!=='RoundedBoxGeometry')generated.add(object.geometry);});
+  root.traverse(object=>{if(object instanceof T.Mesh && !cachedBoxes.has(object.geometry))generated.add(object.geometry);});
   const batches=bake(root);root.clear();batches.forEach(mesh=>{mesh.name='fuji-civic-chassis';root.add(mesh);});
+  root.userData.facade = facadeReady ? 'blender' : 'procedural';
   generated.forEach(geometry=>geometry.dispose()); // Cached box geometry remains shared with the rest of the city.
   // polish2: the whole chassis is scaled about its west-front foot (layout CIVIC); people and rides follow, seated people keep their .48 m seat drop.
   root.scale.setScalar(CIVIC.k);root.position.set(...civicAt([0,0,0]));
