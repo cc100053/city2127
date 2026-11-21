@@ -43,7 +43,7 @@ Two kinds of session:
 
    Done when the owner has picked a target for every needed state.
 5. **Set up rounds.**
-   - Work on `feat/<task>` in the main checkout. Create a worktree `.claude/worktrees/<task>` from `origin/main` only if the owner told you to (AGENTS.md); if the main checkout holds unrelated work, ask.
+   - Work on `feat/<task>` in the main checkout; if it holds another session's work, create a worktree `../city2127-<task>` from `origin/main` (AGENTS.md) and remove it when the task is done.
    - Write the handoff from `docs/handoffs/TEMPLATE.md` with every decision: role, lot, facing, massing, mechanism, states, target paths and the owner's own words. Add a `Dev_QA.md` entry.
    - Write `artifacts/<task>/spec.md` as a target inventory (closeup-polish step 5 format), including the `## Library` table.
    - Write `## R1 brief` in the handoff.

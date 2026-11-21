@@ -1,6 +1,6 @@
 # Collaboration and Git workflow
 
-Three contributors work in independent local clones. Each task has one named owner and a task-specific `docs/handoffs/<task-id>.md` copied from the [template](handoffs/TEMPLATE.md). Record primary ownership areas and coordinate before overlapping edits to a module or binary asset; contributors may work across areas. GitHub Issues are optional indexes. Worktrees, PRs, external reviewers, CODEOWNERS and PR templates are not required.
+Three contributors work in independent local clones; within one clone, parallel tasks use their own worktrees (AGENTS.md, owner 2026-11-21). Each task has one named owner and a task-specific `docs/handoffs/<task-id>.md` copied from the [template](handoffs/TEMPLATE.md). Record primary ownership areas and coordinate before overlapping edits to a module or binary asset; contributors may work across areas. GitHub Issues are optional indexes. PRs, external reviewers, CODEOWNERS and PR templates are not required.
 
 Read [AGENTS.md](../AGENTS.md), the task handoff, [PROJECT.md](PROJECT.md) and [VALIDATION.md](VALIDATION.md) before changing relevant behavior. An assignment authorizes its scope under AGENTS.md; explicit restrictions in that assignment take precedence.
 
