@@ -95,7 +95,7 @@ for (const degrees of [-140, -110, -80, -50, -20, 10, 40, 70, 100, 130, 160, 190
   assert.ok(ray.intersectObject(body).length > 0, `outer rim visible at ${degrees}°`);
 }
 const { scene: transfer, triangles: transferTriangles } = await parseRingAsset('ring-transfer');
-assert.ok(transferTriangles.length > sections[0].triangles.length && transferTriangles.length < 24_000);
+assert.ok(transferTriangles.length > sections[0].triangles.length && transferTriangles.length < 34_000);
 const ringTriangles = [...pilotTriangles, ...exteriorTriangles, ...transferTriangles];
 const halfDepth = RING.depth / 2;
 for (let z = -halfDepth - 6; z < halfDepth + 6; z += .5) {
@@ -176,4 +176,19 @@ for (let x = -7.9; x <= 14.8; x += .32) {
   const [facade] = new Raycaster(toWorld(new Vector3(x, 17.4, 1)), towardsGarden, 0, 35).intersectObject(decks);
   assert.ok(floorEdge && facade && floorEdge.distance + facade.distance >= 14.18, `court floor keeps 18 cm clear of DECKS at local x=${x.toFixed(2)}`);
 }
-console.log('megastructures ok');
+// Use the exported crown and shrub vertices at their full heights, including the cut-back bed.
+let minCanopyGap = Infinity;
+for (const name of ['Concourse_kit_leaf_a', 'Concourse_kit_leaf_b']) {
+  const foliage = transfer.getObjectByName(name);
+  assert.ok(foliage instanceof Mesh);
+  const verts = foliage.geometry.getAttribute('position');
+  for (let i = 0; i < verts.count; i++) {
+    const point = transfer.worldToLocal(foliage.localToWorld(new Vector3().fromBufferAttribute(verts, i)));
+    assert.ok(Math.abs(point.x - landing.x) >= 2.7, 'foliage leaves the 5.4 m sign and walking corridor clear');
+    if (point.z > 4.3) continue;
+    const [facade] = new Raycaster(toWorld(new Vector3(point.x, point.y, 1)), towardsGarden, 0, 35).intersectObject(decks);
+    if (facade) minCanopyGap = Math.min(minCanopyGap, facade.distance - (1 - point.z));
+  }
+}
+assert.ok(Number.isFinite(minCanopyGap) && minCanopyGap >= .18, `planting setback from DECKS: ${minCanopyGap.toFixed(3)} m`);
+console.log(`megastructures ok (planting setback from DECKS: ${minCanopyGap.toFixed(3)} m along the ring axis)`);

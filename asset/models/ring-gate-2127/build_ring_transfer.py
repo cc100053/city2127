@@ -1,4 +1,4 @@
-"""R3 lower-ring concourse fit-out, in +Y up ring-local metres."""
+"""Lower-ring concourse fit-out, in +Y up ring-local metres."""
 from math import hypot, pi
 import sys
 from pathlib import Path
@@ -6,7 +6,7 @@ from pathlib import Path
 import bpy
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'city-kit-2127'))
-from build_kit import COLORS, Prop, bench, planter_1m, tree
+from build_kit import Prop, bench, planter_1m, shrub_cluster, tree, tree_indoor
 from geo_helpers import Acc, finish_mesh, material, obox, rot, rrect_pts, sweep
 
 FLOOR, FRONT, REAR = 17.6, 13.8, 4.5
@@ -31,6 +31,8 @@ FINISHES = {
     'wayfinding': ((.62, .86, .94, 1), .38, (.62, .86, .94, 1), .65),
     'cove': ((.93, .76, .52, 1), .50, (.93, .76, .52, 1), .45),
     'soil': ((.18, .16, .10, 1), .9, None, 0),
+    'kit_leaf_a': ((.23, .39, .16, 1), .84, None, 0),
+    'kit_leaf_b': ((.34, .48, .21, 1), .84, None, 0),
 }
 KIT_ROLES = {'kit_white': 'ceramic', 'kit_dark': 'graphite', 'kit_wood': 'timber',
              'kit_soil': 'soil', 'kit_bark': 'timber'}
@@ -43,15 +45,15 @@ def build_transfer(collection):
     def box(role, x, y, z, w, h, d):
         obox(parts[role], (x, y, z), (w, h, d))
 
-    def prop(builder, x, y, z, yaw=0):
+    def prop(builder, x, y, z, yaw=0, scale=1):
         kit = Prop(builder.__name__)
         builder(kit)
         for role, acc in kit.acc.items():
-            dst = parts.setdefault(KIT_ROLES.get(role, role), Acc())
+            dst = parts[KIT_ROLES.get(role, role)]
             verts = []
             for vx, vz, vy in acc.v:  # Acc stores Blender x, -z, y.
                 dx, dz = rot(vx, -vz, yaw)
-                verts.append((x + dx, -z - dz, y + vy))
+                verts.append((x + dx * scale, -z - dz * scale, y + vy * scale))
             dst._push(verts, acc.f)
 
     # One floor through both doors. Stone inlay leaves the middle clear.
@@ -98,11 +100,25 @@ def build_transfer(collection):
     for x in (-5.8, -3.88, -1.96, 9.48, 11.4, 13.32):
         prop(bench, x, FLOOR, 10.58)
         prop(bench, x, FLOOR, 7.65, pi)
-    for x in (-6.7, -.9, 8.5, 13.7):
+    for x in (-.9, 8.5):
         prop(planter_1m, x, FLOOR, 5.45)
+    for x, yaw in ((-6.7, .6), (13.7, -1.2)):
+        prop(tree_indoor, x, FLOOR, 5.65, yaw, .72)
+    for x in (-.66, 8.9):
+        prop(planter_1m, x, FLOOR, 12.55, scale=1.1)
 
     # The court is open to the ring bore. The planting and rear rail meet the setback.
-    for lo, hi, centre_z, depth, skew in ((-7.6, 1.0, -1.8, 1.73, -.25), (7.35, 14.49, -3.65, 2.55, 0)):
+    beds = (
+        (-7.6, 1.0, -1.8, 1.73, -.25,
+         ((-4.56, -1.24, .85, .48), (-.94, -2.43, .56, -1.03)),
+         ((-6.1, -.82, .72, -.3), (-3.48, -.72, .94, .45), (-2.85, -2.64, .82, -.8),
+          (-1.62, -1.46, .74, .9))),
+        (7.35, 14.49, -3.65, 2.55, 0,
+         ((8.93, -2.98, .62, 1.4), (12.28, -4.3, .94, -.4)),
+         ((8.76, -4.48, .84, .7), (10.19, -4.85, .94, -.47), (10.64, -2.69, .96, -.15),
+          (11.76, -2.13, .8, 1.17), (13.44, -3.08, .71, -1.1))),
+    )
+    for lo, hi, centre_z, depth, skew, trees, shrubs in beds:
         x = (lo + hi) / 2
 
         def outline(k):
@@ -112,8 +128,10 @@ def build_transfer(collection):
         sweep(parts['ceramic'], outline, [(0, FLOOR - .015), (0, FLOOR + .47), (.12, FLOOR + .53),
                                          (.26, FLOOR + .53), (.29, FLOOR + .38), (.29, FLOOR + .03)])
         sweep(parts['soil'], outline, [(.27, FLOOR + .28), (.27, FLOOR + .43)])
-        for tx in (lo + 1.85, hi - 1.85):
-            prop(tree(.92, 4), tx, FLOOR + .41, centre_z + (tx - x) * skew)
+        for tx, tz, size, yaw in trees:
+            prop(tree(size, 5), tx, FLOOR + .41, tz, yaw)
+        for sx, sz, size, yaw in shrubs:
+            prop(shrub_cluster, sx, FLOOR + .39, sz, yaw, size)
         prop(bench, x, FLOOR, centre_z + depth + .35)
 
     rail = ((LEFT + .09, 4.25), (LEFT + .09, -3.21), (4.7, -6.665), (RIGHT - .09, -6.665), (RIGHT - .09, 4.25))
@@ -127,9 +145,7 @@ def build_transfer(collection):
         box('cove', x, 18.434, -6.57, 1.52, .03, .04)
 
     for role, acc in parts.items():
-        args = FINISHES.get(role)
-        finish = (material(f'transfer_{role}', *args) if args else
-                  material(f'transfer_{role}', COLORS[role][0]))
+        finish = material(f'transfer_{role}', *FINISHES[role])
         obj = finish_mesh(f'Concourse_{role}', acc, finish)
         collection.objects.link(obj)
     bpy.context.view_layer.update()
