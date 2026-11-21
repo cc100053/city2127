@@ -1,5 +1,7 @@
 # 居民體驗計劃 — 2127 台場
 
+> **2026-11-21：version4 四題／四個 Meter 版本已永久退役，現行唯一版本係九題抽題輪換（[SPEC](EXHIBITION_SPEC.md#抽題輪換唯一現行版本)）。** 本文件講 Meter、分數或 ladder 嘅部分只係歷史記錄。
+
 日期：2026-10-02。Owner：Codex。**P1–P3 已實作；P4 軟件驗證已通過，P5 尚待實機驗收。** P2接入證據見 [階段交接](handoffs/archive/resident-experience-p2.md)；P3排程／carrier證據見 [P3交接](handoffs/archive/resident-experience-p3.md)；本文件保留P4／P5計劃，不代表實際裝置驗收已完成。產品契約以 [SPEC](EXHIBITION_SPEC.md) 為準；文案唯一來源是 [RESIDENT_COPY](RESIDENT_COPY.md)，接手入口是 [handoff](handoffs/archive/resident-experience-plan.md)。
 
 ## 目標與已確認方向

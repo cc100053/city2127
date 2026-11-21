@@ -1,5 +1,7 @@
 # 台場2127 — 建築・居住多樣性計劃
 
+> **2026-11-21：version4 四題／四個 Meter 版本已永久退役，現行唯一版本係九題抽題輪換（[SPEC](EXHIBITION_SPEC.md#抽題輪換唯一現行版本)）。** 本文件講 Meter、分數或 ladder 嘅部分只係歷史記錄。
+
 2026-10-26（H3評估更新2026-10-27）。產品決策：cc100053；規劃整理／實作 owner：Codex。狀態：**H0／H1 已簽收，H1b 靜態次設計及 H2 動態已通過軟件及 coordinator review；H3評估已通過coordinator review，方案A已由人類選定，正式固定背景已實作並通過本機驗證**。本計劃按Claude review修訂；H0的基準／候選位置／設計矩陣／預算提案及本機檢查已由cc100053於2026-10-26在實作chat確認，見 [H0證據](../artifacts/housing-city-h0/README.md)。H1／H1b 已新增隔離 DEV 住宅比較，H2 已加入90秒多年更新壓縮循環；正式問卷及展覽資料未修改。現行行為以 [EXHIBITION_SPEC](EXHIBITION_SPEC.md) 為準，實際驗證與下一步見 [任務交接](handoffs/housing-city.md)。
 
 ## 目標與範圍
