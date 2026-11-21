@@ -38,6 +38,8 @@ Documentation-only changes require local Markdown file/anchor checks, tracked-ta
 
 ## Evidence storage
 
+On macOS, launch Chrome for capture or browser tests from Terminal or through Codex's per-command approval flow. The shared [capture launcher](../scripts/capture.mjs) checks for Codex's macOS command sandbox before starting Chrome, since Chrome can abort during macOS application registration. This also applies to review scripts that call `launchBrowser()`.
+
 Owner decision 2026-11-03: screenshots and round evidence are two layers.
 
 - **Evidence** (raw captures, rounds, crops, Gemini candidates, logs): outside Git in `$CITY2127_EVIDENCE_ROOT/<task>/`, default `~/city2127-evidence/`. Every worktree on one Mac shares that absolute path, so sessions hand evidence over without pushing it. Browser runners write there through `scripts/evidence.mjs`; `CITY2127_EVIDENCE_DIR` still overrides one run. Fixed captures: `npm run capture -- [--size=WxH] [--settle=s] <url> <task/round/name> ...` (a `?…` url goes to `$CITY2127_URL`, default `http://127.0.0.1:5173/`) reuses one headless Chrome for every pair, keeps the UI on screen, and writes a `.json` sidecar beside each image with the URL, commit, branch, dirty-tree flag, viewport and canvas diagnostics; `scripts/closeupSheet.mjs` shares its loader and hides the UI for its sheet.
