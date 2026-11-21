@@ -1,11 +1,40 @@
 # ring-glb-pilot — 直立環形巨構
 
 - Owner — Codex。視覺驗收由 cc100053 決定。
-- Status — R3 候選待業主審圖，整合由業主決定。
+- Status — R4 候選待業主審圖，整合由業主決定。
 - Branch — `codex/ring-glb-pilot`。
 - Remote — `origin/codex/ring-glb-pilot`，供審圖。
 - Base — `6239fa813857e3a321c8f4a8189af2d4e5113159`。
-- Implementation — R3 `1cfe3321d5444ab262d5043a3b70200752f21cdc`，R2 `5d80004d5a04d9427e276213016b85adde98ae3d`，R1 `0bbb94da91a885a53f233afa3db760c3eefb504e`.
+- Implementation — R4 `865cd5058e6d4b01f48c0dab37b67911ee08e4fc`，R3 `1cfe3321d5444ab262d5043a3b70200752f21cdc`，R2 `5d80004d5a04d9427e276213016b85adde98ae3d`，R1 `0bbb94da91a885a53f233afa3db760c3eefb504e`.
+
+## Round 4
+
+2026-11-21 從 R3 審圖提交 `930ce96e90b8cfb3f9e6fa87b09c75f7a26cbcb6` 接手。Fetch 後候選分支與遠端為 0 / 0，相對 `origin/main` 6 ahead / 8 behind，共同基準 `6239fa81`。沿用主 checkout、同一候選分支及本機未追蹤的 `Dev_QA.md`。R3 候選 CI 已通過。[CI 記錄](https://github.com/cc100053/city2127/actions/runs/44868492459)
+
+| 審圖 | 12:00 | 21:00 |
+| --- | --- | --- |
+| R3／R4 同鏡位，大堂及兩個花床近鏡 | [日間對照](../../artifacts/ring-glb-pilot/r4/compare-day.jpg) | [夜間對照](../../artifacts/ring-glb-pilot/r4/compare-night.jpg) |
+| 廣場橋 → 大堂入口 | [日間](../../artifacts/ring-glb-pilot/r4/01-entry-day.jpg) | [夜間](../../artifacts/ring-glb-pilot/r4/01-entry-night.jpg) |
+| 大堂 → 花園門 | [日間](../../artifacts/ring-glb-pilot/r4/02-hall-day.jpg) | [夜間](../../artifacts/ring-glb-pilot/r4/02-hall-night.jpg) |
+| 居民眼高，左花床 | [日間](../../artifacts/ring-glb-pilot/r4/left-day.jpg) | [夜間](../../artifacts/ring-glb-pilot/r4/left-night.jpg) |
+| 居民眼高，右花床 | [日間](../../artifacts/ring-glb-pilot/r4/right-day.jpg) | [夜間](../../artifacts/ring-glb-pilot/r4/right-night.jpg) |
+| 花園回望大堂 | [日間](../../artifacts/ring-glb-pilot/r4/03-garden-day.jpg) | [夜間](../../artifacts/ring-glb-pilot/r4/03-garden-night.jpg) |
+| R3／R4 主遠景 | [日夜同板](../../artifacts/ring-glb-pilot/r4/compare-hero.jpg) | |
+
+### 植栽
+
+- 兩床各兩棵高低錯落的既有 kit 樹。左床留出西角收邊，四叢矮灌木沿床內分成幾組。右床較深，五叢矮灌木填補樹冠下及座椅後方。植物採用下環自己的兩款霧面葉色。
+- 大堂靠內兩側換為較高的盆栽，兩道門內側用低花槽接續庭園的植栽尺度，候座位置沿用 R3。重用 `city-kit-2127` 的 `tree`、`shrub_cluster`、`tree_indoor` 及 `planter_1m`，在下環 GLB 按材質合批。[建模器](../../asset/models/ring-gate-2127/build_ring_transfer.py) · [下環 GLB](../../asset/models/ring-gate-2127/ring-transfer-2127.glb)
+
+### 驗證
+
+- Blender 5.2.2 game-profile QA 通過，無浮離或共面閃爍。純色材質跳過 UV 查核。保留樓板、花槽及矮灌木落土位置的隱藏背靠背接面，環腳深入地面約 15 m。已檢視分件、線框及 Chrome 日夜材質。空場景重匯得到 32,038 三角面、14 個網格及材質、1,034,204 bytes，無外部貼圖。由實作提交的獨立暫存副本重建，GLB 逐位元組相同。
+- 匯出 GLB 驗證 5.4 m 中央帶的植栽淨空，枝葉與 DECKS 實際外牆沿環身軸線最少相距 1.723 m。保留庭園樓板收角、步行路線 2.2 m 頭頂淨空，以及道路 ① 和 Yurikamome 的原包絡檢查。與 R3 比對，四個下環外殼網格、連續樓面及導向線的匯出頂點與索引逐位元組相同。[GLB 測試](../../tests/megastructures.test.ts)
+- Chrome 在兩條已接通的居民路線以 1.65 m 眼高、約每 0.45 m 取樣，涵蓋雙人路線兩側。每個時段 558 條射線均先命中目標指示牌。日夜各錄到一名可見居民至少移動 11.3 m，步態同步更新，零 page error。
+- 根目錄 `npm test`、`npm run build`、`git diff --check` 通過。正式 build 在 12:00／21:00 載入入口、下環、雙肩及冠部 GLB 均回應 HTTP 200。夜間模擬下環回應 404，確認載入 R2 下段並持續渲染。三個頁面均零 page error。Apple M6／Chrome 157 headless／ANGLE Metal、1080p／DPR 1，正式主遠景每頁各取一個 120 幀窗口，依次為 59.9、60.0、60.0 FPS。
+- R4 圖片在乾淨的實作提交上以 3200 × 1800／DPR 1 擷取，時間及鏡位與 R3 對照相同。兩個花床近鏡的 R3 基準於接手時重拍。原圖、參數、Blender QA、正式 build 及走路記錄見 `~/city2127-evidence/ring-glb-pilot/r4/`。
+
+下一步由業主審圖及決定整合。展覽機實測仍待安排。
 
 ## Round 3
 
