@@ -6,7 +6,7 @@ import { hydroTerrace } from './hydroTerrace.ts';
 import { bayFlower, cutUnderPlatform } from './bayFlower.ts';
 import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
-import { civicCore, loadCivicFacade, loadCivicSphere, updateCivic } from './civicCore';
+import { civicCore, loadCivicFacade, updateCivic } from './civicCore';
 import { floaters } from './floaters';
 import { bodyFootprints, carveContext, inRect, loadMegastructures, updateMegastructures } from './megastructures';
 import { publishOccupants, publishRoofWalks } from './occupants';
@@ -156,11 +156,10 @@ function openBay(material: T.Material, bay = true) {
 export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   const grass=new T.TextureLoader().load(new URL('../asset/textures/coastal-grass.png',import.meta.url).href);
   grass.colorSpace=T.SRGBColorSpace;grass.wrapS=grass.wrapT=T.RepeatWrapping;grass.anisotropy=8;
-  const [environment, structures, facade, sphere] = await Promise.all([
+  const [environment, structures, facade] = await Promise.all([
     addCityModel(scene, environmentUrl, [0, 0, 0]),
     loadMegastructures(),
     loadCivicFacade(),
-    loadCivicSphere(),
   ]);
   environment.name = 'odaiba-environment';
   const receded = new Set<T.Material>();
@@ -214,7 +213,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   environment.traverse(object=>{if(object instanceof T.Mesh && object.name.startsWith('CTX_') && new T.Box3().setFromObject(object).max.y>30)roofGarden(object,true);});
   scene.add(plazaDeck(scene, HOLOGRAMS.panels, Boolean(structures.getObjectByName('ring-transfer-2127')))); // P4: the Aqua City lot is the civic plaza deck
   await Promise.all(built.map(async placement => {
-    if(placement.id==='fuji-tv'){const core=civicCore(facade, sphere);scene.add(core);publishOccupants(core.occupants);return;}
+    if(placement.id==='fuji-tv'){const core=civicCore(facade);scene.add(core);publishOccupants(core.occupants);return;}
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);
     model.name = placement.id;
     placeOdaibaModel(model, placement);

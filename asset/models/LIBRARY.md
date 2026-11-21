@@ -148,7 +148,6 @@ Whole assets. Reuse a site asset elsewhere only as background context, and ask t
 | `divercity-tokyo-plaza` | landmark context | imported GLB | context |
 | `fuji-tv` | landmark context | imported GLB | context |
 | `fuji-civic-facade` | Civic Core two-wing curtain wall, recessed panes, acoustic panels and production coves. 39,924 triangles / five material roles, civic-local metres before the 1.35× placement. | [build_facade.py](fuji-civic-facade/build_facade.py), editable `.blend` and runtime `.glb` | site-only window openings follow the Fuji floor heights and footprint |
-| `fuji-civic-sphere` | Fuji theatre R2 candidate. Ø56 m silver skin at (−18, 100, 23), bay-side recessed observation strip, two rear upper hangers and two lower cradles with stepped collars. 12,400 triangles, five untextured finish roles, civic-local metres. | [build_sphere.py](fuji-civic-sphere/build_sphere.py), editable [.blend](fuji-civic-sphere/fuji-civic-sphere.blend) and [GLB](fuji-civic-sphere/fuji-civic-sphere.glb), [review](../../docs/handoffs/fuji-civic-facade.md#r2-銀球與承托) | site-only; the skin follows the Fuji theatre and the bearings fit its fixed rear beams and decks |
 | `grand-nikko-tokyo-daiba` | landmark context | imported GLB | context |
 | `hilton-tokyo-odaiba` | landmark context | imported GLB | context |
 | `telecom-center` | landmark context | imported GLB | context |

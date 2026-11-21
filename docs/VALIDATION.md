@@ -91,9 +91,7 @@ use explicit `nw:-12/0/12` for 0/3/6 automated ports (band shorthand `low/high` 
 
 ## Performance evidence
 
-富士大樓幕牆 R1（owner 已接受，`19432b63`）：Blender QA 無錯誤，GLB 重匯入 39,924 面，Three.js 整棟 2,184,776 → 931,724 面、10 材質批次。根 `npm test`、`npm run build`、`git diff --check` 通過。開發 Mac／Chrome 157 headless／1920×1080 DPR 1，固定 `reviewTime=20`，日夜主鏡及近鏡各一，GLB 200、零頁面錯誤；模擬 GLB 404 回退可見。主鏡 6 秒短測日 53.8 → 58.8 FPS、夜 56.2 → 58.9 FPS，展覽機與長跑未量。[實測交接](handoffs/fuji-civic-facade.md)。
-
-富士大樓 R2 銀球與承托（視覺候選，`1469bbdf`）：Blender 5.2.2 QA 零錯誤，12,400 三角面 GLB 重匯通過。根測試和建置通過，實際網格通過 22 m 機翼進場淨空檢查並維持泊位高度。整棟 931,724 → 913,920 三角面、10 材質批次；開發 Mac（Apple M6、Chrome 157 headless、1920×1080 DPR 1）主遠景與海側近鏡日夜同鏡位對照均成功載入，零 page error，球殼 GLB 404 可回退。主鏡一般幀日／夜 1,411／1,412 次 draw call，約 20.551M 面。同一會話每條件一次 6 秒複測，日 58.3 → 56.7 FPS、夜 58.8 → 57.3 FPS。展覽機與長跑待測。[驗證及畫面](handoffs/fuji-civic-facade.md#r2-銀球與承托)。
+富士大樓幕牆 R1（owner 已選定，`19432b63`）：Blender QA 無錯誤，GLB 重匯入 39,924 面，Three.js 整棟 2,184,776 → 931,724 面、10 材質批次。根 `npm test`、`npm run build`、`git diff --check` 通過。開發 Mac／Chrome 157 headless／1920×1080 DPR 1，固定 `reviewTime=20`，日夜主鏡及近鏡各一，GLB 200、零頁面錯誤；模擬 GLB 404 回退可見。主鏡 6 秒短測日 53.8 → 58.8 FPS、夜 56.2 → 58.9 FPS，展覽機與長跑未量。[實測交接](handoffs/fuji-civic-facade.md)。
 
 Measure current Odaiba on the stated real GPU, ideally the exhibition machine at 1920×1080. State pixel ratio, actual viewport, camera/hour/mode, frame sampling interval, draw calls/triangles and console/network results. Mesh counts, source file size, headless/software FPS and old Shibuya 60 FPS are not equivalent to a current measurement. Do not claim Windows or another workstation was tested from Mac evidence.
 
