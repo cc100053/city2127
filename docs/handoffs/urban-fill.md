@@ -2,9 +2,9 @@
 
 - Owner: rex
 - Status: IN_PROGRESS (awaiting owner visual review)
-- Branch: claude/project-thread-8fkqrt
+- Branch: claude/project-thread-sio952 (R4 paving; R1–R3 merged via PR #10 from claude/project-thread-8fkqrt)
 - Base commit: 6239fa8 (origin/main, PR #9 merged)
-- Last verified commit: 98aef7c
+- Last verified commit: ce0b795 (R4)
 - Remote availability: origin/claude/project-thread-8fkqrt
 
 ## Session Git state
@@ -53,12 +53,19 @@ Acceptance is the owner's visual review plus an FPS check on the Mac (`scripts/f
   stone kerb; slabs follow the boulevard grid (no joints cutting across streets) with a per-slab tint and a slow drift; every grid street
   gets a cross-section (cool ceramic carriageway `PAVING.road` with pale blue seam lines, kerb, footway band to `footHalf`, centre dashes,
   zebra crossings on junction approaches) and ends in a kerb with the footway wrapped round where a lot, landmark or plaza stops it.
-  Lines are at least a pixel wide with contrast scaled to their true width and fade with distance (no shimmer). `paveMaterial` lays the
+  Lines are at least a pixel wide with contrast scaled to their true width and fade with distance. `paveMaterial` lays the
   same finish on the fill blocks' street and lot plinths, so built blocks and painted ground share one network. Palette = review option A
-  (street kit's ceramic road family); the slab keeps the owner's #aaa69d. Zero extra draw calls (hero 1335, obliqueSE 1971, same as main).
+  (light ceramic carriageway #c6c8c8 in the street kit's road family); the slab keeps the owner's #aaa69d. Zero extra draw calls (hero 1335, obliqueSE 1971, same as main).
 
 ## Actual validation results
 
+- R4 (2026-11-21, ce0b795, Mac, worktree `../city2127-paving`): root `npm test`, `npm run build`, `git diff --check` PASS. Headless Chrome
+  1600×900 `npm run capture`, `~/city2127-evidence/paving-refine/` r0-before (main 166ed7f served from an export; its sidecars name the
+  ring-pilot commit of the checkout that ran the script) and r3 (committed HEAD): hero day/night, obliques SE/W (W also night), street S,
+  low junction, low lawn kerb, backdrop E, district edge, aerial S. Draw calls identical to main (hero 1335, obliqueSE 1971, obliqueW 1929).
+  Headless FPS is capped at 60 in every view (no signal); `scripts/fps.sh` does not exist and headed FPS was NOT RUN. Distance shimmer was
+  judged from stills only (no moving-camera check). Known, pre-existing: a tone step and mismatched street grids where the district meets
+  the backdrop (same on main).
 - Verification status: PARTIAL
 - Date and checked commit: 2026-11-21, 98aef7c (cloud container; R3 shots top/aerialS/midW/hero day)
 - Root `npm test`, `npm run build`, `git diff --check`: PASS.
