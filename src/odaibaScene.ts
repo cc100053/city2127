@@ -176,7 +176,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
         // their saddles. (Stage 3 had already removed the swale ponds; the designed water is streetKit's waterGarden, cut out by openBay.)
         // Urban ground (owner 2026-11-21): paving and block streets by default, grass only where the ground mask is green (groundMask.ts).
         shader.uniforms.groundMask={value:groundMaskTexture};
-        shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>\nvarying vec2 grassUv;\n${groundGLSL()}`).replace('#include <map_fragment>',`diffuseColor.rgb = groundFinish(grassUv*32., diffuseColor.rgb * mix(texture2D(map,grassUv).rgb,texture2D(map,grassUv*.19).rgb,.35));`);
+        shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>\nvarying vec2 grassUv;\n${groundGLSL()}`).replace('#include <map_fragment>',`diffuseColor.rgb = groundFinish(grassUv*32., diffuseColor.rgb * mix(texture2D(map,grassUv).rgb,texture2D(map,grassUv*.19).rgb,.35), 1.);`);
       };
       material.customProgramCacheKey=()=>'coastal-grass';
     }

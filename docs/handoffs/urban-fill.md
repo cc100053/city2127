@@ -48,6 +48,15 @@ Acceptance is the owner's visual review plus an FPS check on the Mac (`scripts/f
 - District fill: 6 merged meshes, ~2.7k triangles; backdrop fabric: 3 merged unshadowed meshes, ~12.3k triangles. Surveyed trees on fill blocks
   stay in the canopy list at zero scale (crown poses are index-dependent).
 
+- R4 paving refinement (2026-11-21, branch `claude/project-thread-sio952`, owner: joins, colours and road edges were rough): the mask is
+  blurred once after painting (~1.2 m) and the shader reads its ramp as a signed distance, so lawn edges are smooth curves with a 0.3 m
+  stone kerb; slabs follow the boulevard grid (no joints cutting across streets) with a per-slab tint and a slow drift; every grid street
+  gets a cross-section (cool ceramic carriageway `PAVING.road` with pale blue seam lines, kerb, footway band to `footHalf`, centre dashes,
+  zebra crossings on junction approaches) and ends in a kerb with the footway wrapped round where a lot, landmark or plaza stops it.
+  Lines are at least a pixel wide with contrast scaled to their true width and fade with distance (no shimmer). `paveMaterial` lays the
+  same finish on the fill blocks' street and lot plinths, so built blocks and painted ground share one network. Palette = review option A
+  (street kit's ceramic road family); the slab keeps the owner's #aaa69d. Zero extra draw calls (hero 1335, obliqueSE 1971, same as main).
+
 ## Actual validation results
 
 - Verification status: PARTIAL
