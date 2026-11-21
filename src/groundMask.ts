@@ -18,7 +18,8 @@ export function cellHash(i: number, j: number) {
   return ((h ^ (h >>> 15)) >>> 0) / 4294967296;
 }
 /** Paved ground: slab tone, slab size (m) and the painted block streets on the boulevard grid (`URBAN_FILL`), half width in metres. */
-export const PAVING = { slab: '#d8d3c7', street: '#c3c4c0', size: 3, streetHalf: 4 } as const;
+// Owner 2026-11-21: the first tone (#d8d3c7) glared at noon; a mid concrete grey with darker asphalt streets.
+export const PAVING = { slab: '#aaa69d', street: '#8f908d', size: 3, streetHalf: 4 } as const;
 
 const canvas = typeof document === 'undefined' ? null : document.createElement('canvas');
 if (canvas) canvas.width = canvas.height = GROUND_MASK.px;
