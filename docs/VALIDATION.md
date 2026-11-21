@@ -91,6 +91,8 @@ use explicit `nw:-12/0/12` for 0/3/6 automated ports (band shorthand `low/high` 
 
 ## Performance evidence
 
+富士大樓幕牆 R1（視覺候選，`19432b63`）：Blender QA 無錯誤，GLB 重匯入 39,924 面，Three.js 整棟 2,184,776 → 931,724 面、10 材質批次。根 `npm test`、`npm run build`、`git diff --check` 通過。開發 Mac／Chrome 157 headless／1920×1080 DPR 1，固定 `reviewTime=20`，日夜主鏡及近鏡各一，GLB 200、零頁面錯誤；模擬 GLB 404 回退可見。主鏡 6 秒短測日 53.8 → 58.8 FPS、夜 56.2 → 58.9 FPS，展覽機與長跑未量。[實測交接](handoffs/fuji-civic-facade.md)。
+
 Measure current Odaiba on the stated real GPU, ideally the exhibition machine at 1920×1080. State pixel ratio, actual viewport, camera/hour/mode, frame sampling interval, draw calls/triangles and console/network results. Mesh counts, source file size, headless/software FPS and old Shibuya 60 FPS are not equivalent to a current measurement. Do not claim Windows or another workstation was tested from Mac evidence.
 
 Opening origin card (2026-10-19, `feat/intro-origin-card` from `5e2fc3a`): ambient resident cards now open with `intro.origin` 「街は、誰が決めるのか。」 before `intro.identity`; READMEs gain an about-the-work section. Root `npm test`/`npm run build`, `git diff --check` PASS; scratch-DB headless Google Chrome 1280×720 `?survey=…&hour=16`: rotation origin → identity → lineage → participation → four facility cards → origin at 12 s each, both sentences fit the card ([screenshot](../artifacts/intro-origin/intro-origin.png), second cycle). The first card is in the DOM at ~8 s but is not painted while the scene is still loading (pre-existing, also true of identity before). Physical display NOT RUN; [handoff](handoffs/archive/intro-origin-card.md).
