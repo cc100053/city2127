@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { Box3, Group, InstancedMesh, Matrix4, Mesh, Quaternion, Raycaster, Scene, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
-import { changeSites, skyBridges, inDistrict, DISTRICT, CIVIC, civicAt } from '../src/layout.ts';
+import { changeSites, skyBridges, inDistrict, DISTRICT, CIVIC, SPHERE_DOCK, civicAt } from '../src/layout.ts';
 import { heroCamera, heroSettledCamera } from '../src/heroCamera.ts';
 import { pavilionFlight, plazaPose, routes, mobility, publishDoorways, publishEntrances, forecourtVisits, promenadeBenches, visitPose, entranceJourneys, entrancePose, laneOffset, CARRIAGEWAY, inWater } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
@@ -104,18 +104,40 @@ for (const placement of layout.buildings) {
   console.log(`Odaiba: ${roofs.reduce((n,r)=>n+r.walks.length,0)} roof strolls and ${roofs.reduce((n,r)=>n+r.spots.length,0)} roof residents keep to open roof, clear of planting, meadows and sail posts.`);
 }
 assert.equal(triangles, 339919, 'All eight complete GLBs retain reviewed geometry');
-const facadeBytes = readFileSync(new URL('../asset/models/fuji-civic-facade/fuji-civic-facade.glb', import.meta.url));
-const { scene: facade } = await new GLTFLoader().parseAsync(facadeBytes.buffer.slice(facadeBytes.byteOffset, facadeBytes.byteOffset + facadeBytes.byteLength), '');
-const core = civicCore(facade);
-const fallback = civicCore();
+const loadCivicGlb = async (part: 'facade' | 'sphere') => {
+  const bytes = readFileSync(new URL(`../asset/models/fuji-civic-${part}/fuji-civic-${part}.glb`, import.meta.url));
+  return (await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '')).scene;
+};
+const [facade, sphere] = await Promise.all([loadCivicGlb('facade'), loadCivicGlb('sphere')]);
+const skin = sphere.getObjectByName('Theatre_skin');
+assert.ok(skin);
+const skinBounds = new Box3().setFromObject(skin, true);
+const sphereCentre = new Vector3(-18, 100, 23);
+assert.ok(skinBounds.getCenter(new Vector3()).distanceTo(sphereCentre) < .06, 'The opening leaves the overall envelope centred');
+assert.ok(skinBounds.getSize(new Vector3()).distanceTo(new Vector3(56, 56, 56)) < .18,
+  'The opening leaves the Ø56 m envelope, allowing for the missing patch and latitude sampling');
+skin.traverse(object => {
+  if (!(object instanceof Mesh)) return;
+  const positions = object.geometry.getAttribute('position'), point = new Vector3();
+  for (let i = 0; i < positions.count; i++) {
+    assert.ok(point.fromBufferAttribute(positions, i).applyMatrix4(object.matrixWorld).distanceTo(sphereCentre) <= 28.001,
+      'The skin does not project past the original 28 m radius');
+  }
+});
+
+const fallback = civicCore(facade.clone());
+const core = civicCore(facade, sphere);
 assert.equal(core.userData.facade, 'blender');
-assert.equal(fallback.userData.facade, 'procedural');
-assert.deepEqual(core.occupants, fallback.occupants, 'The curtain wall does not move staff, routes or the public escalator');
-const coreTriangles = core.children.reduce((total, object) => {
+assert.equal(core.userData.sphere, 'blender');
+assert.equal(fallback.userData.facade, 'blender');
+assert.equal(fallback.userData.sphere, 'procedural');
+assert.deepEqual(core.occupants, fallback.occupants, 'The new skin and bearings preserve occupants and circulation');
+const triangleCount = (model: Group) => model.children.reduce((total, object) => {
   assert.ok(object instanceof Mesh);
   return total + (object.geometry.index?.count ?? object.geometry.getAttribute('position').count) / 3;
 }, 0);
-assert.ok(coreTriangles <= 1_000_000, `Fuji civic core stays within the pilot triangle budget (got ${coreTriangles})`);
+const coreTriangles = triangleCount(core);
+assert.ok(coreTriangles <= 1_000_000 && coreTriangles <= triangleCount(fallback), `The silver sphere stays within the R1 triangle count (got ${coreTriangles})`);
 city.add(core);
 landmarks.push(core);
 const coreBounds=new Box3().setFromObject(core);
@@ -124,6 +146,22 @@ assert.ok(core.children.length<=10, 'Static civic chassis batches by shared mate
 assert.ok(core.children.every(object=>object instanceof Mesh && !Array.isArray(object.material)), 'No per-member draws');
 // Actual chassis must preserve the bay approach and berth, including a 22 m aircraft wing envelope.
 core.updateMatrixWorld(true);
+const gapRay = new Raycaster(new Vector3(...civicAt([8, 102, -10])), new Vector3(0, -1, 0), 0, 3 * CIVIC.k);
+assert.equal(gapRay.intersectObject(core, true).length, 0, 'The old landing has left a clear bay-side gap');
+// From the bay, a ray crosses the recessed pane and reaches the existing lit stage.
+const bayEye = new Vector3(-38, 139, -84);
+const stageScreen = new Vector3(...civicAt([-24, 98, 34.46]));
+const viewThroughShell = new Raycaster(bayEye, stageScreen.clone().sub(bayEye).normalize());
+const windowHits = viewThroughShell.intersectObject(core, true);
+assert.ok(windowHits.some(hit => hit.object instanceof Mesh && !Array.isArray(hit.object.material) &&
+  hit.object.material.transparent && hit.object.material.opacity === .2 && hit.point.z < stageScreen.z - 20),
+  'Bay sightline crosses real recessed glazing');
+const stageHit = windowHits.find(hit => hit.object instanceof Mesh && !Array.isArray(hit.object.material) && !hit.object.material.transparent);
+assert.ok(stageHit && stageHit.point.distanceTo(stageScreen) < .08, 'The bay view reaches the existing broadcast screen');
+const poleRay = new Raycaster(new Vector3(...SPHERE_DOCK), new Vector3(0, -1, 0));
+const pole = poleRay.intersectObject(core, true)[0];
+assert.ok(pole && Math.abs(pole.distance - 3 * CIVIC.k) < .001, 'The north pole keeps its original clearance below the berth datum');
+console.log(`Fuji: ${triangleCount(fallback)} → ${coreTriangles} triangles, ${core.children.length} material batches.`);
 // Occupied production floors in both wings need real support and standing headroom after material batching.
 for(const x of [-55,41])for(const y of [24,43,64,83,102]) {
   const at=new Vector3(...civicAt([x,y+4,18])),floorRay=new Raycaster(at,new Vector3(0,-1,0),0,4*CIVIC.k);

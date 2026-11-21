@@ -9,14 +9,39 @@ import { CIVIC, civicAt } from './layout.ts';
 /** polish2: the chrome sphere's sky reflection dims at night (gunmetal with highlights, as the night target), set by `updateCivic`. */
 const civicSphere={material:null as T.MeshPhysicalMaterial|null};
 export const updateCivic=(night:number)=>{if(civicSphere.material)civicSphere.material.envMapIntensity=1.1-night*.7;};
-export async function loadCivicFacade() {
-  const url = new URL('../asset/models/fuji-civic-facade/fuji-civic-facade.glb', import.meta.url).href;
-  try { return (await new GLTFLoader().loadAsync(url)).scene; }
-  catch (error) { console.warn('Fuji civic facade: using procedural fallback', error); }
+async function loadCivicAsset(url: URL, part: string) {
+  try { return (await new GLTFLoader().loadAsync(url.href)).scene; }
+  catch (error) { console.warn(`Fuji civic ${part}: using procedural fallback`, error); }
+}
+
+export const loadCivicFacade = () => loadCivicAsset(
+  new URL('../asset/models/fuji-civic-facade/fuji-civic-facade.glb', import.meta.url), 'facade');
+export const loadCivicSphere = () => loadCivicAsset(
+  new URL('../asset/models/fuji-civic-sphere/fuji-civic-sphere.glb', import.meta.url), 'sphere');
+
+function applyCivicFinishes(asset: T.Group | undefined, finishes: Map<string, T.Material>, root: T.Group, part: string) {
+  if (!asset) return false;
+  const meshes = new Map<T.Mesh, T.Material>();
+  const found = new Set<T.Material>();
+  let invalid = false;
+  asset.traverse(object => {
+    if (!(object instanceof T.Mesh)) return;
+    const finish = Array.isArray(object.material) ? undefined : finishes.get(object.material.name);
+    if (!finish) { invalid = true; return; }
+    meshes.set(object, finish);
+    found.add(finish);
+  });
+  if (invalid || found.size !== finishes.size) {
+    console.warn(`Fuji civic ${part}: incomplete material roles, using procedural fallback`);
+    return false;
+  }
+  for (const [mesh, finish] of meshes) mesh.material = finish;
+  root.add(asset);
+  return true;
 }
 
 /** Occupied media headquarters, in metres. The static shell is baked and `publishOccupants` animates the published routes. */
-export function civicCore(facade?: T.Group) {
+export function civicCore(facade?: T.Group, sphereAsset?: T.Group) {
   const root=new T.Group();root.name='fuji-civic-chassis';
   const spots:Spot[]=[],walks:Walk[]=[],rides:Ride[]=[];
   // Building-local finishes (still one batch each): warm cream frame and slabs, and dark charcoal furniture, people and hangers,
@@ -70,25 +95,10 @@ export function civicCore(facade?: T.Group) {
       diffuseColor.a*=mix(1.2,.12,abs(dot(normal,normalize(vViewPosition))));`);
   };
   silverGlass.customProgramCacheKey=()=>'fuji-silver-glass';
-  const finishes = new Map<string, T.Material>([
+  const facadeReady = applyCivicFinishes(facade, new Map<string, T.Material>([
     ['fuji_ceramic', trim], ['fuji_graphite', solar], ['fuji_clear', silverGlass],
     ['fuji_warm', publicLight], ['fuji_studio', broadcastLight],
-  ]);
-  const facadeMeshes = new Map<T.Mesh, T.Material>();
-  const foundFinishes = new Set<T.Material>();
-  let invalidFacade = false;
-  facade?.traverse(object => {
-    if (!(object instanceof T.Mesh)) return;
-    const finish = Array.isArray(object.material) ? undefined : finishes.get(object.material.name);
-    if (!finish) { invalidFacade = true; return; }
-    facadeMeshes.set(object, finish);
-    foundFinishes.add(finish);
-  });
-  const facadeReady = !!facade && !invalidFacade && foundFinishes.size === finishes.size;
-  if (facadeReady) {
-    for (const [mesh, finish] of facadeMeshes) mesh.material = finish;
-    root.add(facade);
-  } else if (facade) console.warn('Fuji civic facade: incomplete material roles, using procedural fallback');
+  ]), root, 'facade');
 
   const detailFinishes = new Set<T.Material>([solar, publicLight, broadcastLight]);
   const cachedBoxes = new Set<T.BufferGeometry>();
@@ -208,9 +218,6 @@ export function civicCore(facade?: T.Group) {
       member([p.x,p.y-7,p.z],[q.x,q.y-1,q.z],1,1.2);
     }
   }
-  const transferA=new T.Vector3(14,100,-12),transferB=new T.Vector3(-18,100,-1);
-  const transfer=box(root,[7,2.5,transferA.distanceTo(transferB)],transferA.clone().add(transferB).multiplyScalar(.5).toArray(),stone);
-  transfer.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),transferB.sub(transferA).normalize());
   // Two production wings sit behind the independent public diagonal, leaving the sphere and central void open.
   // Sealed studio boxes occupy the rear; glazed workrooms and collaboration galleries face the bay.
   for(const [x,width] of [[-56,22],[40,38]]) {
@@ -390,9 +397,26 @@ export function civicCore(facade?: T.Group) {
     box(root,[8,.7,4],[x,8.4,63],stone);
     for(const dx of [-2,2])box(root,[.35,3,.7],[x+dx,4.5,60],solar);
   }
+  // The chrome shell and its collars share one mirror finish in both paths.
+  const sphereMat=civicSphere.material=chrome.clone();sphereMat.color.set('#f2f4f5');sphereMat.roughness=.14;sphereMat.metalness=1;sphereMat.clearcoat=0;sphereMat.emissive.set('#2a3440'); // never dimmed with the night: a faint reflected city light keeps it a lit sphere, not a hole
+
+  // Chrome needs contrast to read: a small equirect gradient (deep sky, white horizon band, dark ground) on this one material.
+  const stops:[number,string][]=[[0,'#dfe9f1'],[.35,'#eef3f6'],[.5,'#ffffff'],[.56,'#e8e4dc'],[.8,'#b9b6ae'],[1,'#8d8a83']],envData=new Uint8Array(4*64*32),c0=new T.Color(),c1=new T.Color();
+  for(let y=0;y<32;y++){
+    const t=1-y/31,k=stops.findIndex(([at])=>at>=t),[a0,h0]=stops[Math.max(0,k-1)],[a1,h1]=stops[Math.max(0,k)],f=a1>a0?(t-a0)/(a1-a0):0;
+    c0.set(h0).lerp(c1.set(h1),f);
+    for(let x=0;x<64;x++)envData.set([c0.r*255,c0.g*255,c0.b*255,255].map(Math.round),(y*64+x)*4);
+  }
+  const env=new T.DataTexture(envData,64,32);env.needsUpdate=true;env.mapping=T.EquirectangularReflectionMapping;env.colorSpace=T.SRGBColorSpace;sphereMat.envMap=env;sphereMat.envMapIntensity=1.1;
+  const sphereReady = applyCivicFinishes(sphereAsset, new Map<string, T.Material>([
+    ['fuji_silver', sphereMat], ['fuji_ceramic', trim], ['fuji_graphite', solar],
+    ['fuji_clear', silverGlass], ['fuji_studio', broadcastLight],
+  ]), root, 'sphere');
+  if (sphereReady) sphereMat.roughness = .17;
+
   // The suspended sphere is a broadcast theatre: a clear upper auditorium over a solid acoustic bowl.
   const chamber=new T.Group();chamber.position.set(-18,100,23);root.add(chamber);
-  const skin=new T.Mesh(new T.SphereGeometry(24,48,24,0,Math.PI*2,0,Math.PI*.7),silverGlass);chamber.add(skin);
+  if (!sphereReady) chamber.add(new T.Mesh(new T.SphereGeometry(24,48,24,0,Math.PI*2,0,Math.PI*.7),silverGlass));
   // An inner stage-wash shell closes the auditorium behind its glazing, so stage and rig light read against it, not the rear wing;
   // the room-light shader fades it from violet at the rig to navy in the dome.
   const shell=new T.SphereGeometry(23.2,40,12,0,Math.PI*2,Math.PI*.24,Math.PI*.46),shellIndex=shell.index!;
@@ -496,27 +520,34 @@ export function civicCore(facade?: T.Group) {
   for(const z of [-4,5,10])box(chamber,[29,.45,.45],[0,10,z],solar);
   arc(chamber,10,15,.8,[0,16,0],stone);
   arc(chamber,11,14,.5,[0,16.8,0],leaf);
-  for(let i=0;i<12;i++) {
-    const rib=new T.Mesh(new T.TorusGeometry(24,.16,5,64),glass); // navy glazing bars outline the clear sphere
-    rib.rotation.y=i*Math.PI/12;chamber.add(rib);
+  // Keep the old ring, hangers and inner glazing together for the procedural fallback.
+  if (!sphereReady) {
+    // The old upper diagonal left this disconnected landing in front of the silver shell.
+    const transferA=new T.Vector3(14,100,-12),transferB=new T.Vector3(-18,100,-1);
+    const transfer=box(root,[7,2.5,transferA.distanceTo(transferB)],transferA.clone().add(transferB).multiplyScalar(.5).toArray(),stone);
+    transfer.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),transferB.sub(transferA).normalize());
+    for(let i=0;i<12;i++) {
+      const rib=new T.Mesh(new T.TorusGeometry(24,.16,5,64),glass); // navy glazing bars outline the clear sphere
+      rib.rotation.y=i*Math.PI/12;chamber.add(rib);
+    }
+    for(const y of [-8,4,16,20]) {
+      const rib=new T.Mesh(new T.TorusGeometry(Math.sqrt(576-y*y),.16,5,64),glass);
+      rib.position.y=y;rib.rotation.x=Math.PI/2;chamber.add(rib);
+    }
+    const ring=new T.Mesh(new T.TorusGeometry(29,2.4,8,80),trim);
+    ring.position.set(-18,94,23);ring.rotation.y=.58;root.add(ring);
+    const ringInset=new T.Mesh(new T.TorusGeometry(29,.45,5,80),broadcastLight); // blue edge light under the ring
+    ringInset.position.copy(ring.position);ringInset.position.z-=2.2;ringInset.rotation.copy(ring.rotation);root.add(ringInset);
+    // Suspension follows a visible load path from the top transfer beam to the chamber's lower cradle.
+    for(const x of [-40,4]) {
+      member([x,130,-12],[x,130,70],3,4);
+      for(const z of [6,40])member([x,130,z],[x,85,z],.65,.65);
+    }
+    for(const z of [6,40])member([-40,85,z],[4,85,z],2,3);
+    member([-42.26,94,38.89],[-40,85,40],1.5,2);
+    member([6.26,94,7.11],[4,85,6],1.5,2);
+    member([-68,62,70],[-34,82,23],3,4);member([64,62,70],[-2,82,23],3,4);
   }
-  for(const y of [-8,4,16,20]) {
-    const rib=new T.Mesh(new T.TorusGeometry(Math.sqrt(576-y*y),.16,5,64),glass);
-    rib.position.y=y;rib.rotation.x=Math.PI/2;chamber.add(rib);
-  }
-  const ring=new T.Mesh(new T.TorusGeometry(29,2.4,8,80),trim);
-  ring.position.set(-18,94,23);ring.rotation.y=.58;root.add(ring);
-  const ringInset=new T.Mesh(new T.TorusGeometry(29,.45,5,80),broadcastLight); // blue edge light under the ring
-  ringInset.position.copy(ring.position);ringInset.position.z-=2.2;ringInset.rotation.copy(ring.rotation);root.add(ringInset);
-  // Suspension follows a visible load path from the top transfer beam to the chamber's lower cradle.
-  for(const x of [-40,4]) {
-    member([x,130,-12],[x,130,70],3,4);
-    for(const z of [6,40])member([x,130,z],[x,85,z],.65,.65);
-  }
-  for(const z of [6,40])member([-40,85,z],[4,85,z],2,3);
-  member([-42.26,94,38.89],[-40,85,40],1.5,2);
-  member([6.26,94,7.11],[4,85,6],1.5,2);
-  member([-68,62,70],[-34,82,23],3,4);member([64,62,70],[-2,82,23],3,4);
   // Elevated public continuity through the chassis: one bay-facing ring floor and a rear transfer deck.
   arc(root,25,34,2,[-18,61,23],stone,Math.PI*.05,Math.PI*1.8);
   box(root,[132,2.5,12],[-2,61,64],stone);
@@ -649,31 +680,23 @@ export function civicCore(facade?: T.Group) {
       grove(-18+Math.cos(angle)*31.5,64.1,23-Math.sin(angle)*31.5,i);
     }
   }
-  // P2: one polished chrome sphere (Ø 56 m, hides the theatre inside) hangs in the frame, held by four tension members. Baked with the rest, in its own mirror batch.
-  const sphereMat=civicSphere.material=chrome.clone();sphereMat.color.set('#f2f4f5');sphereMat.roughness=.14;sphereMat.metalness=1;sphereMat.clearcoat=0;sphereMat.emissive.set('#2a3440'); // never dimmed with the night: a faint reflected city light keeps it a lit sphere, not a hole
-
-  // Chrome needs contrast to read: a small equirect gradient (deep sky, white horizon band, dark ground) on this one material.
-  const stops:[number,string][]=[[0,'#dfe9f1'],[.35,'#eef3f6'],[.5,'#ffffff'],[.56,'#e8e4dc'],[.8,'#b9b6ae'],[1,'#8d8a83']],envData=new Uint8Array(4*64*32),c0=new T.Color(),c1=new T.Color();
-  for(let y=0;y<32;y++){
-    const t=1-y/31,k=stops.findIndex(([at])=>at>=t),[a0,h0]=stops[Math.max(0,k-1)],[a1,h1]=stops[Math.max(0,k)],f=a1>a0?(t-a0)/(a1-a0):0;
-    c0.set(h0).lerp(c1.set(h1),f);
-    for(let x=0;x<64;x++)envData.set([c0.r*255,c0.g*255,c0.b*255,255].map(Math.round),(y*64+x)*4);
+  if (!sphereReady) {
+    const SR=28,seams:T.BufferGeometry[]=[],cables:T.BufferGeometry[]=[],centre=chamber.position;
+    const prep=(g:T.BufferGeometry,m:T.Matrix4)=>{const f=g.toNonIndexed();f.deleteAttribute('uv');f.applyMatrix4(m);return f;};
+    for(let i=0;i<12;i++)seams.push(prep(new T.TorusGeometry(SR+.08,.1,4,64),new T.Matrix4().makeRotationY(i*Math.PI/12).setPosition(centre)));
+    seams.push(prep(new T.TorusGeometry(SR+.12,.3,4,64),new T.Matrix4().makeRotationX(Math.PI/2).setPosition(centre)));
+    for(const [cx,cy,cz] of [[-68,130,-12],[64,62,-12],[-68,62,70],[64,130,70]]){
+      const to=new T.Vector3(cx,cy,cz),d=to.clone().sub(centre),dir=d.clone().normalize(),from=centre.clone().addScaledVector(dir,SR-.5);
+      const len=to.distanceTo(from);cables.push(prep(new T.CylinderGeometry(.22,.22,len,5),new T.Matrix4().compose(from.clone().add(to).multiplyScalar(.5),new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),dir),new T.Vector3(1,1,1))));
+    }
+    const sphere=new T.Mesh(new T.SphereGeometry(SR,64,40),sphereMat);sphere.position.copy(centre);sphere.name='civic-chrome-sphere';sphere.castShadow=true;
+    root.add(sphere,new T.Mesh(mergeGeometries(seams),broadcastLight),new T.Mesh(mergeGeometries(cables),trim));
   }
-  const env=new T.DataTexture(envData,64,32);env.needsUpdate=true;env.mapping=T.EquirectangularReflectionMapping;env.colorSpace=T.SRGBColorSpace;sphereMat.envMap=env;sphereMat.envMapIntensity=1.1;
-  const SR=28,seams:T.BufferGeometry[]=[],cables:T.BufferGeometry[]=[],centre=new T.Vector3(-18,100,23);
-  const prep=(g:T.BufferGeometry,m:T.Matrix4)=>{const f=g.toNonIndexed();f.deleteAttribute('uv');f.applyMatrix4(m);return f;};
-  for(let i=0;i<12;i++)seams.push(prep(new T.TorusGeometry(SR+.08,.1,4,64),new T.Matrix4().makeRotationY(i*Math.PI/12).setPosition(centre)));
-  seams.push(prep(new T.TorusGeometry(SR+.12,.3,4,64),new T.Matrix4().makeRotationX(Math.PI/2).setPosition(centre)));
-  for(const [cx,cy,cz] of [[-68,130,-12],[64,62,-12],[-68,62,70],[64,130,70]]){
-    const to=new T.Vector3(cx,cy,cz),d=to.clone().sub(centre),dir=d.clone().normalize(),from=centre.clone().addScaledVector(dir,SR-.5);
-    const len=to.distanceTo(from);cables.push(prep(new T.CylinderGeometry(.22,.22,len,5),new T.Matrix4().compose(from.clone().add(to).multiplyScalar(.5),new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),dir),new T.Vector3(1,1,1))));
-  }
-  const sphere=new T.Mesh(new T.SphereGeometry(SR,64,40),sphereMat);sphere.position.copy(centre);sphere.name='civic-chrome-sphere';sphere.castShadow=true;
-  root.add(sphere,new T.Mesh(mergeGeometries(seams),broadcastLight),new T.Mesh(mergeGeometries(cables),trim));
   const generated=new Set<T.BufferGeometry>();
   root.traverse(object=>{if(object instanceof T.Mesh && !cachedBoxes.has(object.geometry))generated.add(object.geometry);});
   const batches=bake(root);root.clear();batches.forEach(mesh=>{mesh.name='fuji-civic-chassis';root.add(mesh);});
   root.userData.facade = facadeReady ? 'blender' : 'procedural';
+  root.userData.sphere = sphereReady ? 'blender' : 'procedural';
   generated.forEach(geometry=>geometry.dispose()); // Cached box geometry remains shared with the rest of the city.
   // polish2: the whole chassis is scaled about its west-front foot (layout CIVIC); people and rides follow, seated people keep their .48 m seat drop.
   root.scale.setScalar(CIVIC.k);root.position.set(...civicAt([0,0,0]));
