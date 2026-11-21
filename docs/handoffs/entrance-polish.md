@@ -1,10 +1,10 @@
 # entrance-polish — 主樓正門、環形底座、船身前庭
 
 - Owner: cc100053
-- Status: IN_PROGRESS（實作及雲端檢查完成，待 owner 目視驗收）
+- Status: DONE（owner 2026-11-21 要求合併入 main）
 - Branch: `claude/project-thread-v54ay0`
 - Base commit: 04458f1b087d2e08e94d2ead2ceb4f246bdf935b（main，PR #8 merge 後）
-- Last verified commit: 626dfe49（PR #9）
+- Last verified commit: ae88154e（PR #9，CI 綠）
 - Remote availability: `origin/claude/project-thread-v54ay0`
 
 ## Session Git state
@@ -31,7 +31,7 @@ Owner 截圖（2026-11-20 23:17）圈出三處：Fuji 主樓正門及地面、�
 
 ## Actual validation results
 
-- Verification status: PASSED（雲端）；owner 目視驗收 PENDING
+- Verification status: PASSED（雲端）；owner 已睇圖並要求合併
 - Commands/manual checks and results: root `npm test` exit 0（先裝 `survey/` 依賴）；`npm run build` PASS；`git diff --check` PASS。`survey/`、`module-swap/` 未改動。
 - Evidence/environment: 雲端容器 headless Chromium（SwiftShader，1280×720，hour=12），`?review=street` + `window.cityPose` 同一 session 拍攝；前後對照 `/mnt/project-files/entrance-roads/`（before.jpg、after.jpg）。FPS 未量（軟件渲染無參考價值），請在開發 Mac 用 `scripts/fps.sh` 量一次 hero。
 
@@ -43,4 +43,4 @@ Owner 截圖（2026-11-20 23:17）圈出三處：Fuji 主樓正門及地面、�
 
 ## Next expected step
 
-Owner 目視驗收；如有修改，下一輪由本文件開始。
+已合併。FPS 仍未量，請喺開發 Mac 用 `scripts/fps.sh` 量 hero；如再修改，由本文件開始。
