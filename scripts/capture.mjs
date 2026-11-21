@@ -10,6 +10,9 @@ import { pathToFileURL } from 'node:url';
 import { evidenceDir } from './evidence.mjs';
 
 export async function launchBrowser() {
+  if (process.env.CODEX_SANDBOX === 'seatbelt') {
+    throw new Error('Chrome capture cannot start in the Codex macOS sandbox. Run this capture from macOS Terminal or request approval for this command in Codex.');
+  }
   const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH ?? '/opt/homebrew/lib/node_modules/@playwright/cli/node_modules/playwright/index.mjs').href);
   return chromium.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true });
 }
@@ -58,6 +61,8 @@ if (process.argv[2] === '--self-test') {
     { url: 'http://127.0.0.1:5174/?hour=22', dir: 'nw/r3', file: 'night.jpg' },
   ]);
   for (const bad of [[], ['?x'], ['nw/day', '?x'], ['?x', 'day'], ['?x', '../day'], ['?x', '/abs/day'], ['--size=0x9', '?x', 'a/b'], ['--ui', '?x', 'a/b']]) assert.throws(() => parseArgs(bad), bad.join(' '));
+  process.env.CODEX_SANDBOX = 'seatbelt';
+  await assert.rejects(launchBrowser, /Chrome capture cannot start in the Codex macOS sandbox/);
   console.log('capture self-test PASS');
 } else if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const { opts, jobs } = parseArgs(process.argv.slice(2), process.env.CITY2127_URL);

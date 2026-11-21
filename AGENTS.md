@@ -65,6 +65,8 @@ Clarify before going beyond the assignment: a major architectural rewrite, a cha
 
 ## Commands
 
+On macOS, run Chrome capture and browser test commands through Codex's per-command approval flow so headless Chrome can register with the desktop session. See [VALIDATION](docs/VALIDATION.md#evidence-storage).
+
 Use Node.js 24+; this project has been run with Node 26. Tests execute TypeScript directly with Node's type stripping, without a test framework; each package's `package.json` lists its scripts.
 
 ```sh
