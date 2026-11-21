@@ -8,7 +8,7 @@ import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
 import { civicCore, updateCivic } from './civicCore';
 import { floaters } from './floaters';
-import { bodyFootprints, carveContext, inRect, megastructures, updateMegastructures } from './megastructures';
+import { bodyFootprints, carveContext, inRect, loadMegastructures, updateMegastructures } from './megastructures';
 import { publishOccupants, publishRoofWalks } from './occupants';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
 import { facadeClimate, publishRoofGardens, towerGlow, towerNight } from './districtMeters';
@@ -156,7 +156,10 @@ function openBay(material: T.Material, bay = true) {
 export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   const grass=new T.TextureLoader().load(new URL('../asset/textures/coastal-grass.png',import.meta.url).href);
   grass.colorSpace=T.SRGBColorSpace;grass.wrapS=grass.wrapT=T.RepeatWrapping;grass.anisotropy=8;
-  const environment = await addCityModel(scene, environmentUrl, [0, 0, 0]);
+  const [environment, structures] = await Promise.all([
+    addCityModel(scene, environmentUrl, [0, 0, 0]),
+    loadMegastructures(),
+  ]);
   environment.name = 'odaiba-environment';
   const receded = new Set<T.Material>();
   environment.traverse(object => {
@@ -191,7 +194,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   const revetment = environment.getObjectByName('COAST_REVETMENT');
   if (revetment instanceof T.Mesh) cutUnderPlatform(revetment.material);
   carveContext(environment);
-  scene.add(contextFacades(environment), bayContext(), megastructures(), floaters(), streetNetwork(environment), hydroTerrace(), bayFlower()); // after the recede wrap: the kit's ground keeps its own shading
+  scene.add(contextFacades(environment), bayContext(), structures, floaters(), streetNetwork(environment), hydroTerrace(), bayFlower()); // after the recede wrap: the kit's ground keeps its own shading
   // Urban fill (owner 2026-11-21): city blocks on open lawn, clear of landmarks (8 m round their surveyed bounds) and Meter ground.
   const landmarkBounds = built.map(placement => placement.boundsBlender);
   const fillCells = planUrbanFill([environment, ...scene.children], (x, z) =>
@@ -207,7 +210,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   // Each roof garden's terraces go to the district Meters (sails/forest) and take a few residents (stroll line, standing group).
   const roofGarden=(model:T.Object3D,tower?:boolean)=>{const terraces=plantRoofCanopy(scene,model,tower);publishRoofGardens(terraces);publishRoofWalks(model,terraces);};
   environment.traverse(object=>{if(object instanceof T.Mesh && object.name.startsWith('CTX_') && new T.Box3().setFromObject(object).max.y>30)roofGarden(object,true);});
-  scene.add(plazaDeck(scene, HOLOGRAMS.panels)); // P4: the Aqua City lot is the civic plaza deck
+  scene.add(plazaDeck(scene, HOLOGRAMS.panels, Boolean(structures.getObjectByName('ring-transfer-2127')))); // P4: the Aqua City lot is the civic plaza deck
   await Promise.all(built.map(async placement => {
     if(placement.id==='fuji-tv'){const core=civicCore();scene.add(core);publishOccupants(core.occupants);return;}
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);

@@ -20,7 +20,7 @@ const drum=new T.CylinderGeometry(1,1,1,40),crown=leafyCrown(),lowCrown=leafyCro
 /** Reuse the surveyed planting locations; layered crowns replace the tiny blockout cones.
  * r8 pass 2: surveyed `waterfront` trees become palms (tall slim trunk, flat radiating crown — target v2's seaside palms), and with
  * `pits` every ground tree stands in a crisp white raised planter ring instead of loose on the lawn (2127 engineered edge, same volume). */
-export function plantCanopy(scene: T.Object3D, trees: { instances: { position: number[]; scale: number; type: string }[] }, pits=false) {
+export function plantCanopy(scene: T.Object3D, trees: { instances: { position: number[]; scale: number; type: string }[]; seedOffset?: number }, pits=false) {
   const inLot=(tree:{position:number[]},sites:{x:number;z:number;w:number;d:number;scale:number}[])=>sites.some(site=>Math.abs(tree.position[0]-site.x)<site.w*site.scale/2+9 && Math.abs(-tree.position[1]-site.z)<site.d*site.scale/2+9);
   // Each crown's pose depends on its index here, so the list is indexed against the NW lot as it was before the grown AUTO HUB plinth (R4); trees inside the real lot are then hidden in place, which leaves every other crown as it was.
   const positions=trees.instances.filter(tree=>inDistrict(tree.position[0],-tree.position[1]) && !seaward(tree.position[0],-tree.position[1]) && !(tree.position[2]<3 && (swale(tree.position[0],-tree.position[1])<-1.1 || corridor(tree.position[0],-tree.position[1])<.2)) && !inLot(tree,Object.values({...changeSites,nw:HUB_LEGACY_LOT,sw:SW_LEGACY_LOT})));
@@ -31,10 +31,11 @@ export function plantCanopy(scene: T.Object3D, trees: { instances: { position: n
   const planted=pits?positions.filter((tree,i)=>tree.position[2]<3 && !gone[i]):[];
   const rims=new T.InstancedMesh(drum,trim,planted.length),beds=new T.InstancedMesh(drum,leaf,planted.length);
   const dummy=new T.Object3D(),color=new T.Color();
-  positions.forEach((tree,i)=>{
+  positions.forEach((tree,index)=>{
+    const i=index+(trees.seedOffset??0);
     const [x,y,z]=tree.position,s=tree.scale,palm=tree.type==='waterfront',h=(tree.type==='columnar'?10:palm?9.5:7)*s;
-    if(gone[i]){dummy.position.set(x,z,-y);dummy.scale.setScalar(0);dummy.rotation.set(0,0,0);dummy.updateMatrix();trunks.setMatrixAt(i,dummy.matrix);for(let j=0;j<4;j++){foliage.setMatrixAt(i*4+j,dummy.matrix);foliage.setColorAt(i*4+j,color);}return;}
-    dummy.position.set(x,z+h*.35,-y);dummy.scale.set(palm?s*.55:s,h*.7,palm?s*.55:s);dummy.rotation.set(0,0,0);dummy.updateMatrix();trunks.setMatrixAt(i,dummy.matrix);
+    if(gone[index]){dummy.position.set(x,z,-y);dummy.scale.setScalar(0);dummy.rotation.set(0,0,0);dummy.updateMatrix();trunks.setMatrixAt(index,dummy.matrix);for(let j=0;j<4;j++){foliage.setMatrixAt(index*4+j,dummy.matrix);foliage.setColorAt(index*4+j,color);}return;}
+    dummy.position.set(x,z+h*.35,-y);dummy.scale.set(palm?s*.55:s,h*.7,palm?s*.55:s);dummy.rotation.set(0,0,0);dummy.updateMatrix();trunks.setMatrixAt(index,dummy.matrix);
     for(let j=0;j<4;j++){
       const a=j*(palm?Math.PI/2:2.4)+i;
       if(palm){
@@ -45,11 +46,11 @@ export function plantCanopy(scene: T.Object3D, trees: { instances: { position: n
         dummy.position.set(x+Math.cos(a)*1.9*s,z+h+(j%2)*1.2,-y+Math.sin(a)*1.9*s);
         dummy.scale.set(3.4*s,(tree.type==='columnar'?4.4:2.9)*s,3*s);dummy.rotation.set(.1*i,a,.15*j);
       }
-      dummy.updateMatrix();foliage.setMatrixAt(i*4+j,dummy.matrix);
+      dummy.updateMatrix();foliage.setMatrixAt(index*4+j,dummy.matrix);
       // P5: no pink — `cherry` and about one tree in eleven take the light spring green; other crowns pick deep / mid / olive by hash.
       if(palm)color.setHSL(.24+(j%2)*.01,.34,.3+(j%3)*.02);
       else{const [h,sa,l]=tree.type==='cherry' || i%11===5?[.27,.45,.44]:GREENS[(i*3+j+(i>>2))%3];color.setHSL(h+(i%5)*.004,sa,l+(i%7)*.01+(j%2)*.03);}
-      foliage.setColorAt(i*4+j,color);
+      foliage.setColorAt(index*4+j,color);
     }
   });
   planted.forEach((tree,i)=>{
@@ -66,17 +67,19 @@ export function plantCanopy(scene: T.Object3D, trees: { instances: { position: n
 /** P5: continuous low shrub bands — bumpy squashed crowns, one instance each. [x, y, z, radius, height] (y = base).
  * Calls on the same `scene` merge into one instanced mesh (one draw for every roof garden). */
 type Shrub=[number,number,number,number,number];
-const shrubPool=new WeakMap<T.Object3D,{mesh:T.InstancedMesh;list:Shrub[]}>();
-export function plantShrubs(scene:T.Object3D,add:Shrub[]){
+const shrubPool=new WeakMap<T.Object3D,{mesh:T.InstancedMesh;list:Shrub[];seedOffset:number}>();
+export function plantShrubs(scene:T.Object3D,add:Shrub[],seedOffset=0){
   if(!add.length)return;
   const old=shrubPool.get(scene),list=[...old?.list??[],...add];
   if(old){old.mesh.removeFromParent();old.mesh.material instanceof T.Material&&old.mesh.material.dispose();old.mesh.dispose();}
   const mesh=new T.InstancedMesh(lowCrown,new T.MeshStandardMaterial({color:'#ffffff',roughness:.92}),list.length),d=new T.Object3D(),c=new T.Color();
-  list.forEach(([x,y,z,r,h],i)=>{
-    d.position.set(x,y+h*.4,z);d.rotation.set(0,hash(i)*6.3,0);d.scale.set(r,h,r*(.85+hash(i+9)*.3));d.updateMatrix();mesh.setMatrixAt(i,d.matrix);
-    const [hh,sa,l]=i%7===3?[.27,.45,.42]:GREENS[i%3];c.setHSL(hh+hash(i+3)*.015,sa,l+hash(i+5)*.07);mesh.setColorAt(i,c);
+  const offset=old?.seedOffset??seedOffset;
+  list.forEach(([x,y,z,r,h],index)=>{
+    const i=index+offset;
+    d.position.set(x,y+h*.4,z);d.rotation.set(0,hash(i)*6.3,0);d.scale.set(r,h,r*(.85+hash(i+9)*.3));d.updateMatrix();mesh.setMatrixAt(index,d.matrix);
+    const [hh,sa,l]=i%7===3?[.27,.45,.42]:GREENS[i%3];c.setHSL(hh+hash(i+3)*.015,sa,l+hash(i+5)*.07);mesh.setColorAt(index,c);
   });
-  mesh.name='shrub-bands';mesh.receiveShadow=true;scene.add(mesh);shrubPool.set(scene,{mesh,list});
+  mesh.name='shrub-bands';mesh.receiveShadow=true;scene.add(mesh);shrubPool.set(scene,{mesh,list,seedOffset:offset});
 }
 
 /** r8 (user: 2127 form, same green volume): green gathers in dense clusters on engineered two-step terraces — a wide white-rimmed

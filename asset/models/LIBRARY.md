@@ -102,6 +102,14 @@ Size is width × depth × height in metres.
 
 **Recipe `modules.ROLES`** (`accepted` 2026-11-13, SE R4/R5, polish 1): warm interior glow seen through 10 % glass, warm amber-cream floors instead of glowing salmon planes, and residents in saturated clothing so they read as people, not silhouettes, by day and night. On `feat/se-stage-closeup-polish`, SE `build_district.py` takes its `district_*` materials from this recipe. Reuse it for any lit habitable interior before you tune a new one.
 
+## Procedural planting — Three.js
+
+| Family | Use | Size and anchor | Materials |
+| --- | --- | --- | --- |
+| `slopePlants` | Instanced pinnate ferns, upright photonic spears, broad folded rosettes and trailing vines, shaped for silhouette at Hero scale. [Runtime](../../src/slopePlants.ts) | `base` is soil contact in world metres. `width` sets radial reach, `height` sets rise or drop. `yaw` (radians) aims vines along +X before rotation. Set `tint` to white for the base palette. ≤ 2,500 triangles per plant. | Vertex-coloured foliage and separate lit stem markings; [lineup](../../artifacts/ring-glb-pilot/r6/plant-lineup.jpg). Draft, Ring R6 (2026-11-21). |
+
+`slopePlants([{ form: 'fern', base: new Vector3(x, y, z), width: 4, height: 5, yaw: 0, tint: 0xffffff }])`
+
 ## Shared geometry — `geo_helpers.py`
 
 Low-level primitives every builder uses: `Acc`, `obox`, `cyl`, `tube`, `sweep`, `blob`, `plane`, `circle_pts`, `rrect_pts`, `ring_section`, `rot`, `yawed`, `material`, `finish_mesh`. Add a primitive here only when a second builder needs it.
@@ -126,6 +134,7 @@ Whole assets. Reuse a site asset elsewhere only as background context, and ask t
 | `se-district-2127` | SE stage towers and pods (six variants) | `build_district.py` (uses modules) | site-only shells; parts come from modules |
 | `automation-hub-upper` | automation hub upper level | imported GLB | site-only |
 | `sky-ring-architecture` | Sky Ring | imported GLB | site-only |
+| `ring-gate-2127` | Vertical ring: skewed transfer portal and garden entrance (R1), reusable lower, shoulder and crown arc sections (R2), and a public concourse and garden court set into the lower segment (R3). R4 adds layered planting to the court and hall. All in ring-local metres. | `build_ring_gate.py` (kit `arch_shell`); `build_ring_body.py` (use `-- --transfer` for the concourse); `build_ring_transfer.py` (kit `bench`, `planter_1m`, `tree`, `tree_indoor`, `shrub_cluster`) | site-only envelope and transfer floor follow the ring's taper, skew tunnel and shared garden bridge datum (draft) |
 | `rectenna-farm-canopy` | rectenna canopy over terrace farm (Q3 large receiver) | `export_glb.py` text inside the .blend | site-only |
 | `q02a-hydro-terrace` | Q02-A facility (image `Q02-A_imag_v2`): old substation straddled by four offset pumped-storage water-terrace pools with waterfalls, 7.6 m turbine wheels and generator houses, sunken basin and weir to the sea; 64.8 × 65.1 m, 32.2 m above ground (basin/sea to −3.4 m), origin ground centre, front −Y Blender (+z three.js), sea +X; ≈ 300k tris, 23 materials; GLB is static with flat colours, procedural water and wheel rotation live only in the .blend (draft; R1 places it as fixed background on the west-shore sea at (−375, −170), `src/hydroTerrace.ts`, which drops its `q02a_sea` strip at load) | `build_hydro_terrace.py` (own primitives, no kit) | site-only |
 | `pod-frame-tower-2127` | Pod frame tower from the owner image (2026-11-17): 35 × 28 m concrete grid (1.45 m columns), ground + 6 floors of 4.5 m, roof farm with perimeter arbors to ≈ 35 m, 26 egg pods (cream, pink, sage) up to 13.5 m long, nine seated in front bays, all on webbed branching struts, five with bone arms, reaching ≈ 6 m past the frame; farmed levels 5–6, vine curtains, entrance hoods; front −z, ≈ 347k tris (draft R4; placed 2026-11-19 on the retired housing U lot, `POD_TOWER` in `src/layout.ts`, question-rotation Q06-B) | `build_pod_tower.py` (uses modules `grid_frame`, `glass_room`, `egg_pod`, `branch_strut`, `bone_arm`, `roof_farm`, `vine_curtain`, `arch_shell`, `flower_bed`, `leaf_clump`, `leafy_tree`, `leaf_strand`); review `review_pod_tower.py` | site-only massing; pods and frame are modules |
