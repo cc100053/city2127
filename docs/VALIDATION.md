@@ -117,6 +117,9 @@ ANGLE Metal), Vite DEV, 1920×1080 viewport, deviceScaleFactor 1 (renderer pixel
 
 ## Current evidence and open acceptance
 
+直立環形巨構 R3（2026-11-21，`codex/ring-glb-pilot` 候選，實作 `1cfe3321`）：根目錄 `npm test`／`npm run build`／`git diff --check`、Blender game-profile QA、空場景重匯及正式 build 資源載入／回退通過。[實際三角面測試](../tests/megastructures.test.ts) 覆蓋道路 ①、Yurikamome、橋端至庭園樓面、兩條接續步行線及室內往返。完整城市 Chrome 算得庭園板與 DECKS 最窄相距 0.342 m，36 個地面／頭頂探點通過。Apple M6／Chrome 157／ANGLE Metal、1080p／DPR 1 固定主遠景三個 120 幀窗口，R3 日景 60.0 FPS、夜景 59.5–60.0 FPS。展覽機未測；[日夜審圖、R2 對照及完整方法](handoffs/ring-glb-pilot.md#round-3)。
+
+
 直立環形巨構 GLB 試作（2026-11-21，`0bbb94da`）：root `npm test`、`npm run build`、`git diff --check`、Blender 5.2.2 game QA 及空場景重匯通過。測試核對實際 GLB 隧道淨空、6 m 闊花園入口、坡面高度和接入後行人淨空。開發 Mac 以 Chrome 157 擷取 3200×1800 日夜近鏡，正式 build 驗證 GLB 200 及模擬 404 後程序入口均能渲染，冇 page error。[試作交接及效能紀錄](handoffs/ring-glb-pilot.md)
 
 直立環形巨構 R2（2026-11-21，`5d80004d`）：三段環身及 R1 入口均通過 Blender 重匯；環身 game QA 通過。四份 GLB 實際三角面核對道路／Yurikamome 隧道、6 m 花園入口、步行淨空及橋端坡面。根目錄 `npm test`、`npm run build` 和 `git diff --check` 通過。Apple M6／Chrome 157 headless（Metal）1080p／DPR 1 固定主鏡，各取三個 120 幀窗口，R2 日 58.5–60.0 FPS／夜 60.0 FPS；一般幀較 R1 增加 22 次 draw calls。四張 3200 × 1800 日夜主鏡及斜側近鏡無 page error，展覽機待測。[審圖、回退測試及效能紀錄](handoffs/ring-glb-pilot.md#round-2)

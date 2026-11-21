@@ -1,11 +1,53 @@
 # ring-glb-pilot — 直立環形巨構
 
 - Owner — Codex。視覺驗收由 cc100053 決定。
-- Status — R2 候選待業主審圖，整合由業主決定。
+- Status — R3 候選待業主審圖，整合由業主決定。
 - Branch — `codex/ring-glb-pilot`。
 - Remote — `origin/codex/ring-glb-pilot`，供審圖。
 - Base — `6239fa813857e3a321c8f4a8189af2d4e5113159`。
-- Implementation — R2 `5d80004d5a04d9427e276213016b85adde98ae3d`，R1 `0bbb94da91a885a53f233afa3db760c3eefb504e`.
+- Implementation — R3 `1cfe3321d5444ab262d5043a3b70200752f21cdc`，R2 `5d80004d5a04d9427e276213016b85adde98ae3d`，R1 `0bbb94da91a885a53f233afa3db760c3eefb504e`.
+
+## Round 3
+
+2026-11-21 從 R2 審圖提交 `68340a8bb43c736236bf426834f7e820191532ed` 接手。Fetch 後本機與遠端候選 0 / 0，與 `origin/main` 4 ahead / 0 behind，基準為 `6239fa81`。沿用主 checkout、同一分支，保留未追蹤的 `Dev_QA.md`。
+
+| 審圖 | 12:00 | 21:00 |
+| --- | --- | --- |
+| 廣場橋 → R1 簷篷 | [日間](../../artifacts/ring-glb-pilot/r3/01-entry-day.jpg) | [夜間](../../artifacts/ring-glb-pilot/r3/01-entry-night.jpg) |
+| 轉乘大堂 → 花園出口 | [日間](../../artifacts/ring-glb-pilot/r3/02-hall-day.jpg) | [夜間](../../artifacts/ring-glb-pilot/r3/02-hall-night.jpg) |
+| 露天花園回望大堂 | [日間](../../artifacts/ring-glb-pilot/r3/03-garden-day.jpg) | [夜間](../../artifacts/ring-glb-pilot/r3/03-garden-night.jpg) |
+| 主遠景 R2 → R3 | [日間對照](../../artifacts/ring-glb-pilot/r3/compare-hero-day.jpg) | [夜間對照](../../artifacts/ring-glb-pilot/r3/compare-hero-night.jpg) |
+
+Chrome 以 3200 × 1800、DPR 1 擷取，八張均無 page error。主遠景同 R2 用同一相機與 `reviewTime=20`。三組近鏡固定在 `reviewTime=0 / 17.25 / 29.5`，依次看到同一位藍衣、紅背囊居民由橋端走入大堂再到庭園。原圖、拍攝參數、Blender 圖及原始診斷存於 `~/city2127-evidence/ring-glb-pilot/r3/`。截圖在提交前擷取，sidecar 如實記錄來源與修改狀態。
+
+### 接駁方案與模型
+
+由既有廣場橋頭經 R1 簷篷斜面，接入標高 17.6 m 的平層公共大堂，再穿過另一道門到露天庭園。入口原斜面延伸 0.45 m，以覆蓋橋端斜角。大堂約 23 m 闊、9 m 深，有兩側候座、暖色天花燈槽、冷白門線／地面導向，以及「乗換ホール」「空中庭園」「広場」標示。兩段行人淨通道闊約 5.5 m。初稿庭園左角抵入 DECKS 外牆，最終沿實際斜牆將樓板、欄杆及左花床收角，保留原住客動線。道路 ① 同 Yurikamome 仍從東南隧道經過。
+
+- [下環大堂來源](../../asset/models/ring-gate-2127/ring-transfer-2127.blend)、[GLB](../../asset/models/ring-gate-2127/ring-transfer-2127.glb) 及 [建模](../../asset/models/ring-gate-2127/build_ring_transfer.py)。由 Blender 5.2.2 以 `blender -b --factory-startup --python-exit-code 1 -P asset/models/ring-gate-2127/build_ring_body.py -- --transfer` 重建。沿用 R2 下環，Exact Boolean 切出室內樓面凹位，保留原匯出的雙肩、冠部與 R2 下環作回退。庭園樹、花槽同長椅重用 city-kit-2127。
+- [R1 入口來源](../../asset/models/ring-gate-2127/ring-gate-2127.blend) 將門前欄杆拆成 `Ring_LandingRail` 節點，由同目錄 `build_ring_gate.py` 重建。有完整 R3 資產先拆欄杆、打開兩段內側種植帶、鋪通橋面同延伸居民路線。R3 GLB 載入失敗改用完整 R2 下環與欄杆，其他必要模型失敗沿用上一輪的逐級回退。
+- `plazaDeck` 沿用 `occupants` 的單人及並排行走，兩條原橋路線接到庭園，另加一條局部往返同兩個候座位置。角色沿原有晝夜出現率與步態更新。DEV `?review=ring` 可以用更近的視距審閱室內。
+
+### 驗證
+
+- Blender 5.2.2 game-profile QA 通過（純色及自發光材質，停用 UV 檢查）。兩份 GLB 使用米制、環心投影為原點、glTF +Y 向上且 +Z 朝廣場。空場景重匯確認 R3 下環 21,502 三角面、14 個網格／材質、745,716 bytes、尺寸約 181.35 × 68.09 × 45 m；R1 入口 4,480 三角面、7 個網格及 5 種材質、172,852 bytes。兩份均無貼圖或壓縮解碼器。從實作提交抽出的獨立目錄重建，兩份 GLB 與已提交檔案逐位元組相同。已檢視 Blender 材質、分件和線框。QA 的背靠背面位於樓板、花床、零件接觸面與原隧道的隱藏接縫；保留閉合零件。下環達地面下約 15 m，符合 R2 基座。
+- [淨空測試](../../tests/megastructures.test.ts) 使用匯出三角面核對道路 ① 與 Yurikamome 原包絡、R1 入口標高、橋端至庭園的兩條接續步行線與局部往返。行人取樣中心及兩側，全段驗證地面連續與至少 2.2 m 頭頂淨空；另以實際 DECKS GLB 驗證收角樓板全寬預留至少 18 cm。Chrome 完整場景另驗橋、大堂、庭園 36 個地面／頭頂點，71 點量得庭園板邊與 DECKS 最窄相距 0.342 m。實際居民 instance 錄到 3.55 m 位移，步態相位同步更新。
+- 根目錄 `npm test`、`npm run build`、`git diff --check` 通過。Vite 保留既有 JSON import attributes 與大型 chunk 提示。
+
+### 1080p 主遠景
+
+Apple M6、Chrome 157.0.8103.79 headless（ANGLE Metal）、1920 × 1080／DPR 1、預設畫質。DEV 主鏡固定 `reviewTime=20`，首次 FPS 診斷後暖機 5 秒，再取三個 120 幀窗口。R2 效能基準由同一 build 模擬 R3 GLB 404 得出，所以仍包含改造後的 R1 橋端重疊段及拆件欄杆。上面審圖對照使用 R2 當輪原圖。
+
+| 時段 | R2（FPS） | R3（FPS） | 一般幀 draws（R2 → R3） |
+| --- | ---: | ---: | ---: |
+| 12:00 | 56.2–60.0 | 60.0 | 1,349 → 1,381 |
+| 21:00 | 60.0 | 59.5–60.0 | 1,350 → 1,382 |
+
+一般幀增加 21,680 個渲染三角面。讀數接近 60 FPS 上限，為開發機短時段實測。
+
+正式 build 於 21:00 以原主鏡驗證四份 R3 展示 GLB 均回應 HTTP 200。分別模擬大堂、冠部及入口三個資源 404，確認對應退回 R2 下環、有 Blender 入口的程序環身、或全程序版本。成功頁及三個回退頁各取一個 120 幀窗口，均為 60.0 FPS、零 page error；三組回退各只出現預期的 404 資源錯誤與提示。原始資料見本機 `r3/performance.json`。
+
+下一步由業主審圖同決定整合。下環步行接駁現已接通，月台登車流程及展覽機實測尚未納入本輪。
 
 ## Round 2
 
