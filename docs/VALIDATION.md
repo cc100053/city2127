@@ -1,5 +1,7 @@
 # Validation procedures and evidence index — Odaiba
 
+> **2026-11-21: the version4 four-question / four-Meter exhibition is retired; the nine-question rotation is the only product ([SPEC](EXHIBITION_SPEC.md#抽題輪換唯一現行版本)).** Meter checks and evidence below are historical records of legacy code.
+
 Current procedures, 2026-10-02. Product acceptance comes from [EXHIBITION_SPEC](EXHIBITION_SPEC.md); implementation from [PROJECT](PROJECT.md). Shibuya is closed history, with no future work or acceptance backlog. Earlier screenshots/FPS do not establish current Odaiba results.
 
 ## Automated checks for the current prototype

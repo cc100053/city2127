@@ -128,6 +128,12 @@ export const LOTS = {
   // Q06's three options share the pod-frame tower lot: its R4 envelope with the pods is about 56 × 38 m.
   'pod-tower': { x: POD_TOWER.x, z: POD_TOWER.z, size: 56, sea: false },
 } as const;
+/** Urban fill (owner 2026-11-21: too much bare lawn to read as a city): street blocks on a grid aligned with the ④ boulevard (`axis`, from its
+ *  east exit `origin`), `pitch` metres per block along/across it with `street` metres of paving between lots. A block is built only where its
+ *  whole cell is open landscape (src/urbanFill.ts checks ground, landmarks, Meter sites and lots). `zones`: world rects [minX, maxX, minZ, maxZ],
+ *  R1 (2026-11-21) filled the lawn south of the guideway; R2 the whole district. `backdrop`: the coarser low-detail fabric beyond it. */
+export const URBAN_FILL = { origin: [265, -27], axis: [.813, -.583], pitch: [44, 40], street: 8, zones: [[DISTRICT.minX, DISTRICT.maxX, DISTRICT.minZ, DISTRICT.maxZ]],
+  backdrop: { pitch: [64, 56], street: 12, radius: 1450 } } as const;
 /** Interim concept lot (owner 2026-11-20, until every rotation option has a model): a result that shows nothing new and has no site to visit
  *  flies here and a lattice hologram names the guest's option (src/conceptHologram.ts). Lawn north of Aqua City near the retired housing M;
  *  `SCAN_LOT=20,14,-135,-175` CLEAR (hero 1076 px). w × d × h is the hologram's envelope; `y` the lawn height. */

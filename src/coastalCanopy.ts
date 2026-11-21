@@ -139,7 +139,8 @@ export function plantRoofCanopy(scene: T.Object3D, model: T.Object3D, tower=fals
   return clusters;
 }
 
-/** Coastal groves gather along structure — building edges, guideway, promenades and the water corridor — on authored landscape only, leaving open lawns between; circulation and landmark pads remain open. */
+/** Returns the grove terraces [x, z, ground y, radius] (the ground mask keeps lawn round them).
+ * Coastal groves gather along structure — building edges, guideway, promenades and the water corridor — on authored landscape only, leaving open lawns between; circulation and landmark pads remain open. */
 /** `streets`: extra street centrelines groves keep clear of, as of the guideway (the ④ boulevard); `cleared`: ground the old district streets covered,
  * left open lawn (src/roadRepair.ts). */
 export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,buildings:T.Object3D[],streets:T.Curve<T.Vector3>[]=[],cleared=(_x:number,_z:number)=>false) {
@@ -194,6 +195,7 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
     }
   }
   plantCanopy(scene,{instances:allee},true);
+  return clusters;
 }
 
 // Surveyed backdrop grove centres and their new grass plots, in metres.
@@ -205,10 +207,11 @@ const FARM_GROVE_MOVES = [
   [-90.03, 411.69, -71, 438],
 ] as const;
 
-/** The Odaiba backdrop beyond the district keeps its parks as one unshadowed batch of low crowns, receding with the ground it stands on.
+/** `cleared`: backdrop city fabric (src/urbanFill.ts) the groves keep off.
+ * The Odaiba backdrop beyond the district keeps its parks as one unshadowed batch of low crowns, receding with the ground it stands on.
  * r8 pass 2: the same crown count gathers into tight oval groves on white-rimmed plinths (44 m cells since r8 pass 3, eight crowns each) instead of
  * pairs dotted evenly every 26 m — open lawn between, every green mass framed by an engineered edge. */
-export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
+export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D,cleared=(_x:number,_z:number)=>false) {
   environment.updateMatrixWorld(true);
   const bounds=new T.Box3().setFromObject(environment),ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),matrices:T.Matrix4[]=[],plinths:T.Matrix4[]=[],lawns:T.Matrix4[]=[],centres:[number,number,number][]=[],dummy=new T.Object3D();
   const groundAt=(x:number,z:number)=>{
@@ -220,7 +223,7 @@ export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
   // r9 pass 2: 36 m cells and a smaller open-lawn field, so the backdrop reads as dense parkland (target v2) rather than dotted groves.
   for(let x=bounds.min.x;x<bounds.max.x;x+=36)for(let z=bounds.min.z;z<bounds.max.z;z+=36){
     const px=x+Math.sin(z*1.7+x)*12,pz=z+Math.cos(x*1.3-z)*12;
-    if(inDistrict(px,pz) || seaward(px,pz) || Math.sin(px*.019+Math.sin(pz*.021)*2)+Math.cos(pz*.027)<-.8)continue;
+    if(inDistrict(px,pz) || seaward(px,pz) || cleared(px,pz) || Math.sin(px*.019+Math.sin(pz*.021)*2)+Math.cos(pz*.027)<-.8)continue;
     const y=groundAt(px,pz);
     if(y===null)continue;
     const yaw=Math.sin(px*.37+pz*.11)*3,R=11+(Math.sin(px*.7+pz)+1)*2,c=Math.cos(yaw),sn=Math.sin(yaw);
@@ -229,7 +232,7 @@ export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
       // Ring of six on the rim tier, two taller at the heart.
       const f=j<6?.68:.22,a=j<6?j/6*Math.PI*2:j*Math.PI,lx=Math.cos(a)*f*R*1.3,lz=Math.sin(a)*f*R/1.3;
       const tx=px+lx*c+lz*sn,tz=pz-lx*sn+lz*c,ty=groundAt(tx,tz);
-      if(ty===null || inDistrict(tx,tz) || seaward(tx,tz))continue;
+      if(ty===null || inDistrict(tx,tz) || seaward(tx,tz) || cleared(tx,tz))continue;
       const s=(j<6?4.2:5.6)+(Math.sin(x*3.1+z+j)+1)*1.1;
       dummy.position.set(tx,ty+.6+s*.9,tz);dummy.scale.set(s,s*.85,s);dummy.rotation.set(0,a,0);dummy.updateMatrix();crowns.push(dummy.matrix.clone());
     }

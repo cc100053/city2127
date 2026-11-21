@@ -1,5 +1,7 @@
 # 居民情景計劃（方向 A）
 
+> **2026-11-21：version4 四題／四個 Meter 版本已永久退役，現行唯一版本係九題抽題輪換（[SPEC](EXHIBITION_SPEC.md#抽題輪換唯一現行版本)）。** 本文件講 Meter、分數或 ladder 嘅部分只係歷史記錄。
+
 2026-11-12，owner 採納。取代未入 Git 的 `RESIDENT_VOICES_DRAFT`。背景見 repo 根目錄 `Dev_QA.md` Q10–Q11（owner 本機檔，未入 Git）。日文為產品文案候選，中文為編輯說明。台詞批准後才搬入 [RESIDENT_COPY](RESIDENT_COPY.md)；正式 runtime 接入之前，此處所有人物情景都只是 DEV 演示。
 
 ## 方向

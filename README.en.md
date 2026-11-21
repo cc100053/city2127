@@ -1,5 +1,7 @@
 # 2127 — Frozen Intersection
 
+> **2026-11-21: the nine-question rotation (9 questions × 3 models) is the only exhibition version.** The version4 four-question / four-Meter version is retired; Meter tools and notes below are legacy code. Start a run with `SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json` (the server default is still the old file).
+
 ## About the work
 
 "Who will decide what a city looks like in 100 years?" Cities have usually been shaped by governments and large corporations rather than by the people who live in them. What if the residents decided the future 100 years from now? This exhibition explores that possibility. Each visitor answers questions about daily life as one resident of Odaiba in 2127; their voice accumulates with other residents' voices into the city the next visitor inherits. No single answer decides the city alone. The opening city card `intro.origin` introduces the world with the same question (see [RESIDENT_COPY](docs/RESIDENT_COPY.md)).

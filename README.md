@@ -2,6 +2,8 @@
 
 **語言 / Languages / 言語：** [繁體中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
 
+> **2026-11-21：展覽唯一現行版本係九題抽題輪換（9 題 × 3 模型）。** 舊 version4 四題／四個 Meter 版本已退役；下面講 Meter 嘅 DEV 工具同說明只屬 legacy code。開新 run 時 survey server 要用 `SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json`（預設仍係舊檔）。
+
 ## 作品概念
 
 「100年後嘅城市，由誰決定？」過去，城市多數由政府或財團決定，而唔係住喺城市入面嘅住民。假如100年後嘅未來由住民決定，會係點樣？本展覽藉此機會嘗試檢討呢個可能性：觀眾以2127年台場一位住民嘅身份回答日常生活嘅偏好，每一個聲音同其他住民嘅聲音累積，塑造下一位觀眾繼承嘅城市。一個人嘅答案唔會單獨決定城市。大屏幕開場卡 `intro.origin` 用同一個問題導入世界觀（見 [RESIDENT_COPY](docs/RESIDENT_COPY.md)）。

@@ -1,6 +1,6 @@
 # アンケート Ver.2 審査表（決裁用）
 
-2026-11-06 作成。対象：[SURVEY_V2](SURVEY_V2.md)（以下 V2）。照合したのは [IMAGE_PROMPTS](IMAGE_PROMPTS.md)、現行展示（[EXHIBITION_SPEC](../EXHIBITION_SPEC.md)、`survey/src/survey/questions.exhibition.json` version 4）、[AGENTS.md](../../AGENTS.md) の物語方針、旧提案 [PROPOSAL_JA](../PROPOSAL_JA.md)／[QUESTION_CANDIDATES_JA](../QUESTION_CANDIDATES_JA.md)。
+2026-11-06 作成。対象：[SURVEY_V2](SURVEY_V2.md)（以下 V2）。照合したのは [IMAGE_PROMPTS](IMAGE_PROMPTS.md)、現行展示（[EXHIBITION_SPEC](../EXHIBITION_SPEC.md)、`survey/src/survey/questions.exhibition.json` version 4）、[AGENTS.md](../../AGENTS.md) の物語方針、旧提案 [PROPOSAL_JA](../history/PROPOSAL_JA.md)／[QUESTION_CANDIDATES_JA](../history/QUESTION_CANDIDATES_JA.md)。
 
 **使い方：** 各項目の「回答」に、選択肢の記号と一言の理由を書く（チャットで「R03: B、理由…」と答えてもよい）。回答と理由は日付付きで決定記録に書き写す。（推奨）は AI の提案にすぎない。根拠は repo 内の文書だけで、企画チームが口頭で決めたことは反映されていない。根拠に反する事情があれば、それを優先する。
 

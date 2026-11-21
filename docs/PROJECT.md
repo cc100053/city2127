@@ -9,10 +9,10 @@ The single exhibition venue is the **Odaiba waterfront in 2127**. Shibuya is a c
 | Package | Current responsibility |
 | --- | --- |
 | Root `src/` | Vite / TypeScript / Three.js WebGL 2 exhibition city; standalone and `?survey` |
-| `survey/` | Four-question v2 proposal API, reducer, authoritative layout, SQLite schema 9, WebSocket, Guest / Monitor / loopback Admin; opt-in question rotation (below) |
+| `survey/` | Proposal API, SQLite schema 9, WebSocket, Guest / Monitor / loopback Admin. The product is the nine-question rotation (below); the version4 four-question reducer and Meter layout are retired legacy, still the server default `SURVEY_QUESTIONS` until switched |
 | `module-swap/` | Preserved standalone / legacy v1 four-lot demonstrator; rejects v2 and is not the exhibition city |
 
-Desktop-only presentation, with normal renderer resize. Do not add adaptive camera/mobile acceptance. Ambient people, vehicles, drones and aerial routes are allowed. Low/zero/high Meter values all depict mature 2127 alternatives. No deployment workflow is configured.
+Desktop-only presentation, with normal renderer resize. Do not add adaptive camera/mobile acceptance. Ambient people, vehicles, drones and aerial routes are allowed. Every rotation option (A/B/C) depicts a mature 2127 alternative; the four-Meter version is retired (owner 2026-11-21). No deployment workflow is configured.
 
 Resident [P1 copy](RESIDENT_COPY.md) is wired by [P2](handoffs/archive/resident-experience-p2.md). Guest handles questions/background, choices, review, save/wait/retry, shared station/ordinal identity and the look-up prompt; results have no answer/score/facility tables. The existing single-revision conflict review still displays scores for recovery. Question-set version **4** (energy E4, 2026-10-24) is independent of algorithm/CityView v2 and SQLite schema8; P2 introduced version3 copy. Older reserved drafts are rejected by the existing version guard, then valid choices can be carried into a fresh reservation; A/B ends its own obsolete reservation through the existing endpoint first. Stored version2 proposals retain their original question/option copy and remain idempotently recoverable after upgrade.
 
@@ -97,6 +97,8 @@ DEV-only `?energy=baseline|a|b|c|mixed`（配合`hour`／`reviewTime`）提供E3
 Standalone uses day-cycle activity and does not create the v2 district layer. `?survey` connects to `ws://<current-host>:8787/ws`, or the explicit ws/wss URL supplied as its value. Legacy v1 retains the 10 s atmosphere path. V2 uses the server layout and seeds directly, without blending scores into global atmosphere.
 
 ## Four sites and district behavior
+
+> **Retired (version4 / Meters, owner 2026-11-21).** The nine-question rotation is the only product. This section maps legacy code that still runs; do not plan new work around Meter axes, tiers, district carriers or Meter ground. Rotation lots: Q01 NW, Q02 three lots, Q03 drawer housing, Q06 pod tower, Q08 SW, plus the concept lot (`LOTS`, `CONCEPT_LOT` in `src/layout.ts`).
 
 | Wire socket / axis | Odaiba position (x,z), scale | Runtime |
 | --- | --- | --- |

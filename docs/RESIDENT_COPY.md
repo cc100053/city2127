@@ -1,5 +1,7 @@
 # 2127 居民文案 — P1
 
+> **2026-11-21：version4 四題／四個 Meter 版本已永久退役，現行唯一版本係九題抽題輪換（[SPEC](EXHIBITION_SPEC.md#抽題輪換唯一現行版本)）。** 本文件講 Meter、分數或 ladder 嘅部分只係歷史記錄。
+
 日期：2026-10-02。Owner：Codex。**P1 文案已完成；2026-10-02由 [P2](handoffs/archive/resident-experience-p2.md) 接入runtime。** 下文保留P1原交付與P2/P3條件；當前接入／驗證以P2交接為準。 產品方向見 [SPEC](EXHIBITION_SPEC.md)，交接見 [resident-copy-p1](handoffs/archive/resident-copy-p1.md)。以下日文是接入用產品文案，中文是編輯／實作說明。
 
 ## E4正式Q3與能源文案（2026-10-24）

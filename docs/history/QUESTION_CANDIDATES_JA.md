@@ -1,6 +1,8 @@
 # 質問候補（たたき台）
 
-> **旧提案（4パラメータ版）の資料。** 2026-10-09 作成、2026-11-06 に repo へ追加。[PROPOSAL_JA](PROPOSAL_JA.md)「6. 問いの設計／追加の問いの候補」が参照する9候補で、現行展覽の4問・4 Meter（`automation`／`publicSharing`／`environmentalPriority`／`urbanConcentration`）に足す前提で書かれている。新提案は [planning-team](planning-team/README.md)（[アンケート Ver.2](planning-team/SURVEY_V2.md)）。
+> **歴史資料（2026-11-21 に docs/history/ へ移動）。** version4（4問・4 Meter）は退役し、現行の展示は9問の抽題輪換のみ。
+
+> **旧提案（4パラメータ版）の資料。** 2026-10-09 作成、2026-11-06 に repo へ追加。[PROPOSAL_JA](PROPOSAL_JA.md)「6. 問いの設計／追加の問いの候補」が参照する9候補で、現行展覽の4問・4 Meter（`automation`／`publicSharing`／`environmentalPriority`／`urbanConcentration`）に足す前提で書かれている。新提案は [planning-team](../planning-team/README.md)（[アンケート Ver.2](../planning-team/SURVEY_V2.md)）。
 >
 > | 候補 | パラメータ候補 | 旧4パラメータとの対応 |
 > | --- | --- | --- |
