@@ -64,7 +64,7 @@ DEV 居民情景（2026-11-12，湊／NW focal）：`main.ts` 只在 `import.met
 
 ## Scene, geometry and rendering
 
-直立環形巨構第一輪（2026-11-21，候選）：`loadOdaiba` 平行載入地形同 [環形入口 GLB](../asset/models/ring-gate-2127/ring-gate-2127.glb)。`loadMegastructures` 沿 `RING` 嘅地面原點及角度放置模型，將導光、燈槽同玻璃接上 `updateMegastructures`。模型局部取代隧道內襯、廣場側肋骨同花園門框，斜面平台接原有天橋，最低層花槽喺入口留空。GLB 載入失敗會顯示原有程序入口。孔徑、道路、軌道同居民路線沿用現有資料。見 [試作交接](handoffs/ring-glb-pilot.md)。
+2026-11-21 直立環形巨構 R2 候選：`loadOdaiba` 平行載入地形和建築，`loadMegastructures` 沿 `RING` 的地面原點及角度放置三段環身 GLB（下環、兩肩、冠部），連接 [R1 入口 GLB](../asset/models/ring-gate-2127/ring-gate-2127.glb)。沿用程序庭園露台、基座及其與原有橋面、道路、Yurikamome 和居民路線的接點。外殼各段按材質合批，`updateMegastructures` 統一調節入口冷白導光、暖色燈槽及亮窗。任一環身檔載入失敗會回到 R1 的程序外殼與 Blender 入口；入口檔失敗會回到全程序版本。見 [模型及驗證交接](handoffs/ring-glb-pilot.md#round-2)。
 
 Coordinates are **metres, Y-up**. `DISTRICT` covers the 720 × 680 m hero area. The derived `odaiba_district_v01_environment.glb` retains connected ground/roads and quieter background context outside the hero; the former 150 m dissolve-to-island is superseded. Telecom Center is not loaded as a separate landmark. [crop script](../scripts/crop-odaiba-district.py) produces the environment from the preserved masterplan source.
 
