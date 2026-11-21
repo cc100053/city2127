@@ -176,7 +176,7 @@ export function civicCore(facade?: T.Group) {
     for(const x of [-2.6,.6]) {
       box(street,[.1,1.7,length-4],[x,2.45,0],silverGlass); // clear panes keep the riders and pale treads visible from the bay
       box(street,[.16,.16,length-4],[x,1.65,0],broadcastLight);
-      box(street,[.2,.14,length-4],[x,3.35,0],broadcastLight);
+      box(street,[.2,.14,length-4],[x,3.35,0],megaSeam,0);
     }
     for(let z=-length/2+3;z<length/2-2;z+=4)for(const x of [-2.6,.6])box(street,[.12,1.75,.12],[x,2.45,z],trim);
     // Riders stand on the treads and climb at .5 m/s (both diagonals run upward), out of sight where the incline passes through the
@@ -188,7 +188,7 @@ export function civicCore(facade?: T.Group) {
       // The bay-facing edge is a clear balustrade with a blue lit rail: the diagonal reads as a bright glazed escalator bank.
       const bay=x<0;
       box(street,[.25,1.5,length],[x,2,0],bay ? silverGlass : membrane);
-      box(street,[.22,.2,length],[x,2.85,0],bay ? broadcastLight : trim);
+      box(street,[.22,.2,length],[x,2.85,0],bay ? megaSeam : trim,bay ? 0 : undefined);
       box(street,[.18,.18,length],[x,.9,0],publicLight);
     }
     // A slim navy-glass fascia with a lit lower edge outlines the incline, as in the target's dark escalator trim.
@@ -526,22 +526,38 @@ export function civicCore(facade?: T.Group) {
     [19,45,2,22,stone],[44.6,45,1.5,24,membrane],
     [44.5,45,.18,25.5,trim],[44.4,44.7,.18,23.9,publicLight],
   ] as const)arc(root,inner,outer,height,[-8,y,-2],material,2.2,Math.PI*2-.5);
+  // The public forum meets the incline here. Inlays point across its existing slab to the visible boarding point.
+  for (const z of [-20.4,-17.9]) box(root,[22,.02,.17],[-2,24.015,z],megaSeam,0);
+  for (const x of [-9,1,10]) for (const side of [-1,1]) {
+    const blade = box(root,[1.85,.02,.23],[x,24.015,-19.15+side*.59],megaSeam,0);
+    blade.rotation.y = side * .7;
+  }
   // Public foyer below the forum has its own curved glazing and entry, distinct from rear staff doors.
   // Entrance polish (owner 2026-11-20): the foyer floor is a solid plinth down to the ground (it floated 2 m over the lawn with a bite out of
   // its front), and three steps lead down to the paved forecourt (streetKit `landmarkForecourts`) on the bay side; the back half meets the wings.
   arc(root,19,44,3,[-8,0,-2],stone);
-  for(const [i,r] of [44,45.4,46.8].entries())arc(root,r,r+1.4,2.25-i*.75,[-8,0,-2],stone,.15,Math.PI-.3);
+  for (const [i,r] of [44,45.4,46.8].entries()) {
+    const tread = 2.25 - i * .75;
+    arc(root,r,r+1.4,tread,[-8,0,-2],stone,.15,Math.PI-.3);
+    arc(root,r+1.02,r+1.26,.019,[-8,tread+.01,-2],megaSeam,CIVIC.door-.098,.196);
+  }
   arc(root,42.8,43,18,[-8,3,-2],silverGlass,2.2,Math.PI*2-.5);
   // The drum's opening toward the forecourt promenade (a = 1.7–2.2) is the main entrance: a glass door screen set 2 m in, a lit threshold
   // and a slim canopy on two posts reaching out over the steps.
   {
-    const door=1.95,at=(r:number,t=0):[number,number]=>[-8+Math.cos(door)*r+Math.sin(door)*t,-2-Math.sin(door)*r+Math.cos(door)*t];
+    const door=CIVIC.door,at=(r:number,t=0):[number,number]=>[-8+Math.cos(door)*r+Math.sin(door)*t,-2-Math.sin(door)*r+Math.cos(door)*t];
     arc(root,40.8,41,7,[-8,3,-2],silverGlass,1.72,.46);
     arc(root,40.8,43,.06,[-8,3,-2],megaSeam,1.72,.46);
     for(const t of [-6,-2,2,6]){const [x,z]=at(40.9,t);member([x,3,z],[x,10,z],.3,.3,solar);}
     const [cx,cz]=at(49.5),[ex,ez]=at(56);
     box(root,[24,.5,13],[cx,10.4,cz],trim,.05).rotation.y=door+Math.PI/2;
     box(root,[24.2,.25,.3],[ex,10.2,ez],megaSeam,.05).rotation.y=door+Math.PI/2;
+    for (const t of [-3,3]) {
+      const [x,z] = at(49.5,t);
+      box(root,[.25,.06,12.75],[x,10.13,z],megaSeam,0).rotation.y=door+Math.PI/2;
+      const [fx,fz] = at(41.7,t);
+      box(root,[.19,.02,3.7],[fx,3.025,fz],megaSeam,0).rotation.y=door+Math.PI/2;
+    }
     for(const t of [-10,10]){const [x,z]=at(54.5,t);member([x,0,z],[x,10.2,z],.5,.5);}
   }
   for(let a=2.25;a<7.95;a+=.16) {

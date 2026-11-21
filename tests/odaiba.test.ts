@@ -19,7 +19,7 @@ import { bayContext } from '../src/bayContext.ts';
 import { acceleratedRaycast, MeshBVH } from 'three-mesh-bvh';
 import { checkHousingCity } from './housingCityCheck.ts';
 import { onFormerStreet, repairRoads } from '../src/roadRepair.ts';
-import { streetNetwork } from '../src/streetKit.ts';
+import { FORECOURTS, streetNetwork } from '../src/streetKit.ts';
 import { BOULEVARD, EVENT_SHELF_FRONTAGE, POD_TOWER, STREET_KIT, WATER } from '../src/layout.ts';
 /** A ladder target with the given rungs; the rest mixed. */
 const rungs = (t: Partial<Record<'nw' | 'ne' | 'sw' | 'se', number>>) => ({ tiers: { nw: 0, ne: 0, sw: 0, se: 0, ...t } });
@@ -218,6 +218,29 @@ const streetKit = streetNetwork(environment);
   const accessSurface = (x: number, z: number, name: string) =>
     new Raycaster(new Vector3(x, 15, z), new Vector3(0, -1, 0))
       .intersectObject(environment, true).find(hit => hit.object.name === name)?.point.y;
+  // Fuji's promenade guides stay above the existing paving, and the stair and forum strips sit on their own treads and slab.
+  const fujiGuides = streetKit.getObjectByName('fuji-forecourt-guides');
+  assert.ok(fujiGuides instanceof Mesh && !fujiGuides.castShadow && !fujiGuides.receiveShadow);
+  streetKit.updateMatrixWorld(true);
+  const { door, reach: entranceReach } = FORECOURTS.civic, c = Math.cos(door), sn = Math.sin(door);
+  const foot = CIVIC.stepEdge * CIVIC.k;
+  for (let r = foot + .3; r < entranceReach - .7; r += 1) for (const across of [-2.4, 2.4]) {
+    const [x, , z] = civicAt([-8 + (r * c + across * sn) / CIVIC.k, 0, -2 + (-r * sn + across * c) / CIVIC.k]);
+    const pavingY = accessSurface(x, z, 'landmark-forecourts');
+    const guideY = new Raycaster(new Vector3(x, 1, z), downward).intersectObject(fujiGuides)[0]?.point.y;
+    assert.ok(pavingY !== undefined && guideY !== undefined && Math.abs(guideY - pavingY - .009) < .001, 'Fuji guide follows the paved approach');
+  }
+  for (const [x, y, z] of [
+    ...[45.14, 46.54, 47.94].map((r, i) => [-8 + r * c, 2.25 - i * .75, -2 - r * sn]),
+    ...[-12, -6, 0, 6, 8].flatMap(x => [-20.4, -17.9].map(z => [x, 24, z])),
+  ]) {
+    const origin = new Vector3(...civicAt([x, y + 1.8, z]));
+    const hits = new Raycaster(origin, downward, 0, 2.5).intersectObject(core, true);
+    const [light, floor] = hits;
+    assert.ok(light && floor && Math.abs(floor.point.y - y * CIVIC.k) < .005 &&
+      light.point.y > floor.point.y && light.point.y - floor.point.y < .04,
+      `Fuji inlay at ${x},${z} stays flush and has clear headroom`);
+  }
   for (const [x, z, first, second] of [
     [75.60, -278.64, 'street-ceramic', 'automation-hub-spur'],
     [72, -301, 'automation-hub-spur', 'automation-hub-walk'],
