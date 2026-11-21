@@ -16,14 +16,14 @@ import { plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy 
 import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
 import { CONCEPT_LOT, changeSites, DISTRICT, inDistrict, LOTS, PLAZA, promenades, SEAWARD_GLSL, URBAN_FILL } from './layout';
-import { FOOTPRINTS, HERO_CLEAR } from './megaFootprints';
+import { HERO_CLEAR } from './megaFootprints';
 import { fillWorld, type FillCell } from './urbanFill';
 import { bayContext, recedeBeyondDistrict } from './bayContext';
 import { inWater, publishDoorways, publishEntrances, routes, waterGLSL } from './mobility';
 import { onFormerStreet, repairRoads } from './roadRepair';
 import { streetNetwork, updateStreetKit } from './streetKit';
 import { backdropFabric, buildUrbanFill, planUrbanFill } from './urbanFill';
-import { greenShare, groundGLSL, groundMaskTexture, paintGroundMask } from './groundMask';
+import { builtRoots, greenShare, groundGLSL, groundMaskTexture, paintGroundMask, paveUnderStructures } from './groundMask';
 import { METER_GROUND } from './districtMeters';
 
 // Literal paths bundle the district-detailed environment (scripts/crop-odaiba-district.py) and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
@@ -230,12 +230,16 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   }));
   const groves = plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name) || object.name==='plaza-deck'),[routes().streets[1]],(x,z)=>onFormerStreet(x,z)||fill.covers(x,z,6));
   publishEntrances(scene,environment);
-  paintDistrictGround(fillCells, groves, landmarkBounds);
+  paintDistrictGround(fillCells, groves);
+  Object.keys(buildingUrls).forEach(id => builtRoots.add(id));
+  paveUnderStructures(scene);
+  console.info(`[ground] district lawn share (land only) ${(greenShare((x, z) => inDistrict(x, z) && !inWater(x, z, 0)) * 100).toFixed(1)} %`);
+
 }
 
 /** Ground mask (owner 2026-11-21): lawn only in parks, grove terraces, promenade and water belts; everything else paves (groundMask.ts).
  * Block streets stay off lots, landmarks, plazas, megastructure feet and the ground district elements stand on. */
-function paintDistrictGround(cells: FillCell[], groves: readonly (readonly number[])[], landmarks: number[][][]) {
+function paintDistrictGround(cells: FillCell[], groves: readonly (readonly number[])[]) {
   paintGroundMask(g => {
     // Beyond the district the shader paves the backdrop blocks itself (groundMask.ts `groundGLSL`); this mask is read inside it only.
     const [ux, uz] = URBAN_FILL.axis, hu = URBAN_FILL.pitch[0] / 2 - URBAN_FILL.street / 2, hv = URBAN_FILL.pitch[1] / 2 - URBAN_FILL.street / 2;
@@ -245,15 +249,19 @@ function paintDistrictGround(cells: FillCell[], groves: readonly (readonly numbe
       else if (c.kind === 'court') g.rect('green', x, z, ux, uz, hu * .45, hv * .45); // courtyard garden
       else if (c.kind === 'sports') g.rect('green', x, z, ux, uz, hu * .8, hv * .8);
     }
-    for (const [x, z, , r] of groves) g.circle('green', x, z, r * 2 + 6);
+    // Grove lawns and the NE park are parks: streets reach their edge and stop with a kerb (they cross only the thin promenade and water
+    // belts and the planted medians, which the shader lets them run through).
+    for (const [x, z, , r] of groves) { g.circle('green', x, z, r * 2 + 6); g.circle('noStreet', x, z, r * 2 + 6); }
     for (const path of promenades) g.band('green', path.map(([x, , z]) => ({ x, z })), 30);
-    const park = changeSites.ne; g.circle('green', park.x, park.z, 75);
+    const park = changeSites.ne; g.circle('green', park.x, park.z, 75); g.circle('noStreet', park.x, park.z, 75);
     g.where('green', (x, z) => inWater(x, z, 14) && !inWater(x, z, 0));
+    g.where('noStreet', (x, z) => inWater(x, z, 14)); // no street runs into a pool: it stops at the lawn ring
     for (const l of Object.values(LOTS)) if (!l.sea) g.rect('noStreet', l.x, l.z, 1, 0, l.size / 2 + 8, l.size / 2 + 8);
     for (const s of Object.values(changeSites)) g.rect('noStreet', s.x, s.z, 1, 0, s.w * s.scale / 2 + 10, s.d * s.scale / 2 + 10);
     g.rect('noStreet', CONCEPT_LOT.x, CONCEPT_LOT.z, 1, 0, CONCEPT_LOT.w / 2 + 8, CONCEPT_LOT.d / 2 + 8);
-    for (const [[x0, y0], [x1, y1]] of landmarks) g.rect('noStreet', (x0 + x1) / 2, -(y0 + y1) / 2, 1, 0, (x1 - x0) / 2 + 6, (y1 - y0) / 2 + 6);
-    for (const r of [...FOOTPRINTS, ...HERO_CLEAR]) g.rect('noStreet', r.cx, r.cz, r.ux, r.uz, r.hu + 6, r.hv + 6);
+    // Landmarks stop the streets by their real footprint (`paveUnderStructures`, built channel), not their axis-aligned survey box.
+    // Megastructures stop streets at their real feet (built channel); their FOOTPRINTS rects include the open ground under the spans.
+    for (const r of HERO_CLEAR) g.rect('noStreet', r.cx, r.cz, r.ux, r.uz, r.hu + 6, r.hv + 6);
     g.rect('noStreet', PLAZA.x, PLAZA.z, Math.cos(PLAZA.yaw), -Math.sin(PLAZA.yaw), PLAZA.hu + 8, PLAZA.hv + 8);
     for (const [x, z, r] of METER_GROUND) g.circle('noStreet', x, z, r);
     // Linear parks: every third cross street (across the boulevard) carries a 20 m planted median, a green spine through
@@ -263,5 +271,4 @@ function paintDistrictGround(cells: FillCell[], groves: readonly (readonly numbe
       return inDistrict(x, z) && Math.abs(k - Math.round(k)) * URBAN_FILL.pitch[0] * 3 < 10;
     }, 'noStreet');
   });
-  console.info(`[ground] district lawn share (land only) ${(greenShare((x, z) => inDistrict(x, z) && !inWater(x, z, 0)) * 100).toFixed(1)} %`);
 }

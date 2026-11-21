@@ -29,14 +29,20 @@ export const PAVING = { slab: '#aaa69d', footway: '#bdbab2', road: '#c6c8c8', ke
 const canvas = typeof document === 'undefined' ? null : document.createElement('canvas');
 if (canvas) canvas.width = canvas.height = GROUND_MASK.px;
 if (canvas && import.meta.env?.DEV) (globalThis as { groundMaskCanvas?: HTMLCanvasElement }).groundMaskCanvas = canvas; // dev: inspect the mask
-const ctx = canvas?.getContext('2d', { willReadFrequently: true }) ?? null;
+const ctx = canvas?.getContext('2d') ?? null;
+// Painting happens on `raw`; the texture canvas gets a softened copy (see `publish`).
+const raw = typeof document === 'undefined' ? null : document.createElement('canvas');
+if (raw) raw.width = raw.height = GROUND_MASK.px;
+const rctx = raw?.getContext('2d', { willReadFrequently: true }) ?? null;
 /** The mask texture, empty (all paved, streets everywhere) until `paintGroundMask` runs. */
 export const groundMaskTexture = canvas ? new T.CanvasTexture(canvas) : new T.Texture();
 groundMaskTexture.colorSpace = T.NoColorSpace; groundMaskTexture.flipY = false; groundMaskTexture.minFilter = groundMaskTexture.magFilter = T.LinearFilter; groundMaskTexture.generateMipmaps = false;
 
 const S = GROUND_MASK.px / GROUND_MASK.size, px = (x: number) => (x - GROUND_MASK.minX) * S, pz = (z: number) => (z - GROUND_MASK.minZ) * S;
-type Channel = 'green' | 'noStreet';
-const style = (c: Channel) => c === 'green' ? 'rgb(255,0,0)' : 'rgb(0,255,0)';
+/** `built`: the ground under and round standing structures (`paveUnderStructures`): never lawn, and streets stop short of it. */
+type Channel = 'green' | 'noStreet' | 'built';
+const CHANNEL = { green: 0, noStreet: 1, built: 2 } as const;
+const style = (c: Channel) => ['rgb(255,0,0)', 'rgb(0,255,0)', 'rgb(0,0,255)'][CHANNEL[c]];
 export type GroundPainter = {
   circle(c: Channel, x: number, z: number, r: number): void;
   /** Rect centred (x, z) with half sizes `hu` along (ux, uz) and `hv` across it. */
@@ -46,8 +52,11 @@ export type GroundPainter = {
   where(c: Channel, test: (x: number, z: number) => boolean, unless?: Channel): void;
 };
 
-/** Paints the mask (both channels additive) and uploads it. */
+let lastDraw: ((g: GroundPainter) => void) | null = null;
+/** Paints the mask (channels additive) and uploads it. */
 export function paintGroundMask(draw: (g: GroundPainter) => void) {
+  lastDraw = draw;
+  const ctx = rctx;
   if (!ctx) return;
   // Start opaque: a canvas keeps colour premultiplied, so channels written into transparent pixels (`where`) would be lost.
   ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, GROUND_MASK.px, GROUND_MASK.px);
@@ -63,7 +72,7 @@ export function paintGroundMask(draw: (g: GroundPainter) => void) {
       points.forEach((p, i) => i ? ctx.lineTo(px(p.x), pz(p.z)) : ctx.moveTo(px(p.x), pz(p.z))); ctx.stroke();
     },
     where(c, test, unless) {
-      const n = GROUND_MASK.px, step = 2, image = ctx.getImageData(0, 0, n, n), k = c === 'green' ? 0 : 1, skip = unless === undefined ? -1 : unless === 'green' ? 0 : 1;
+      const n = GROUND_MASK.px, step = 2, image = ctx.getImageData(0, 0, n, n), k = CHANNEL[c], skip = unless === undefined ? -1 : CHANNEL[unless];
       for (let j = 0; j < n; j += step) for (let i = 0; i < n; i += step) {
         if (skip >= 0 && image.data[(j * n + i) * 4 + skip] > 127) continue;
         if (!test(GROUND_MASK.minX + (i + step / 2) / S, GROUND_MASK.minZ + (j + step / 2) / S)) continue;
@@ -73,23 +82,105 @@ export function paintGroundMask(draw: (g: GroundPainter) => void) {
     },
   };
   draw(g);
-  // Soften once (about 1.2 m): painted rects and the 2 px `where` blocks would otherwise show as stair steps where the shader thresholds
-  // the mask at one half; the shader also reads the blurred ramp as a distance for its kerbs.
-  const copy = document.createElement('canvas'); copy.width = copy.height = GROUND_MASK.px; copy.getContext('2d')!.drawImage(ctx.canvas, 0, 0);
-  ctx.globalCompositeOperation = 'copy'; ctx.filter = 'blur(1.5px)'; ctx.drawImage(copy, 0, 0); ctx.filter = 'none'; ctx.globalCompositeOperation = 'source-over';
+  // Built ground: the occupied metre cells as an image, and a disc of the apron radius on each edge cell (their union keeps diagonal walls
+  // smooth); one path.
+  if (builtImage) { ctx.imageSmoothingEnabled = false; ctx.drawImage(builtImage, 0, 0, GROUND_MASK.px, GROUND_MASK.px); }
+  if (builtCells.length) {
+    ctx.fillStyle = style('built'); ctx.beginPath();
+    for (let k = 0; k < builtCells.length; k += 2) { const x = px(builtCells[k]), z = pz(builtCells[k + 1]); ctx.moveTo(x + BUILT_APRON * S, z); ctx.arc(x, z, BUILT_APRON * S, 0, Math.PI * 2); }
+    ctx.fill();
+  }
+  // Soften once (about 1.2 m) into the texture canvas: painted rects and the 2 px `where` blocks would otherwise show as stair steps where
+  // the shader thresholds the mask at one half; the shader also reads the blurred ramp as a distance for its kerbs.
+  if (ctx && raw && canvas) {
+    const out = canvas.getContext('2d')!;
+    out.globalCompositeOperation = 'copy'; out.filter = 'blur(1.5px)'; out.drawImage(raw, 0, 0); out.filter = 'none'; out.globalCompositeOperation = 'source-over';
+  }
   groundMaskTexture.needsUpdate = true;
 }
 
 /** Share of mask pixels inside `inside` (x, z) that are green, for the ratio report. */
 export function greenShare(inside: (x: number, z: number) => boolean) {
-  if (!ctx) return NaN;
-  const n = GROUND_MASK.px, data = ctx.getImageData(0, 0, n, n).data;
+  if (!rctx) return NaN;
+  const n = GROUND_MASK.px, data = rctx.getImageData(0, 0, n, n).data;
   let all = 0, green = 0;
   for (let j = 0; j < n; j += 2) for (let i = 0; i < n; i += 2) {
     if (!inside(GROUND_MASK.minX + i / S, GROUND_MASK.minZ + j / S)) continue;
-    all++; if (data[(j * n + i) * 4] > 127) green++;
+    all++; if (data[(j * n + i) * 4] > 127 && data[(j * n + i) * 4 + 2] < 128) green++;
   }
   return green / all;
+}
+
+/** Paved apron round every standing structure, metres: no lawn up to the walls, and painted streets end this far out. */
+const BUILT_APRON = 4;
+/** Centres (x, z pairs) of the edge cells of the 1 m cells structures stand on, and all of those cells as a blue image. */
+let builtCells: number[] = [], builtImage: HTMLCanvasElement | null = null;
+/** Structures that stand on the district ground (owner 2026-11-21 review): retained landmarks (`builtRoots`, set by odaibaScene), the civic
+ * chassis, the megastructure feet, the context massing, the district elements (pavilions, drone ports, towers, courts) and the rotation lot models. Inside one,
+ * people and vehicles are skipped and only parts within 2.5 m of the ground count, so flying drones and roofs never reach the mask. */
+const BUILT = /^CTX_|-district$|-2127$|^fuji-civic-chassis$|^megastructures$/, NOT_BUILT = /people|pedestrian|walker|resident|crowd|occupant|vehicle|car|taxi|drone-flight|service-drones|aircraft|boat|glow|label|pulse/i;
+export const builtRoots = new Set<string>();
+const GROUND_FINISH = new Set(['landscape', 'water', 'road', 'sidewalk', 'road_marking', 'plaza', 'service_area', 'pool-water']);
+/** Ground mask, built channel (owner 2026-11-21 review: buildings stood on lawn, and the axis-aligned landmark boxes left big plain
+ * squares at the wrong angle): every triangle of a standing structure that comes within 2.5 m of the ground, projected to plan, so the
+ * real footprint at its real angle (walls as their outline, plinths and decks filled) plus `BUILT_APRON` is paved and streets stop at it.
+ * Run once the city has loaded (and again for models that arrive later); repaints the last mask with the footprints. */
+export function paveUnderStructures(scene: T.Object3D) {
+  if (!lastDraw) return;
+  const N = GROUND_MASK.size, grid = new Uint8Array(N * N), v = [new T.Vector3(), new T.Vector3(), new T.Vector3()], m = new T.Matrix4(), w = new T.Matrix4();
+  const mark = (x: number, z: number) => { const i = Math.floor(x - GROUND_MASK.minX), j = Math.floor(z - GROUND_MASK.minZ); if (i >= 0 && j >= 0 && i < N && j < N) grid[j * N + i] = 1; };
+  /** Marks every metre cell a plan triangle covers: its edges walked at half a metre (walls project to lines), its inside by cell centres. */
+  const raster = (ax: number, az: number, bx: number, bz: number, cx: number, cz: number) => {
+    for (const [x0, z0, x1, z1] of [[ax, az, bx, bz], [bx, bz, cx, cz], [cx, cz, ax, az]]) {
+      const n = Math.ceil(Math.hypot(x1 - x0, z1 - z0) * 2) || 1;
+      for (let t = 0; t <= n; t++) mark(x0 + (x1 - x0) * t / n, z0 + (z1 - z0) * t / n);
+    }
+    const area = (bx - ax) * (cz - az) - (cx - ax) * (bz - az);
+    if (Math.abs(area) < 2) return;
+    for (let z = Math.floor(Math.min(az, bz, cz)) + .5; z < Math.max(az, bz, cz); z++) for (let x = Math.floor(Math.min(ax, bx, cx)) + .5; x < Math.max(ax, bx, cx); x++) {
+      const e0 = (bx - ax) * (z - az) - (x - ax) * (bz - az), e1 = (cx - bx) * (z - bz) - (x - bx) * (cz - bz), e2 = (ax - cx) * (z - cz) - (x - cx) * (az - cz);
+      if ((e0 >= 0 && e1 >= 0 && e2 >= 0) || (e0 <= 0 && e1 <= 0 && e2 <= 0)) mark(x, z);
+    }
+  };
+  const inMask = (x: number, z: number) => x > GROUND_MASK.minX && x < GROUND_MASK.minX + GROUND_MASK.size && z > GROUND_MASK.minZ && z < GROUND_MASK.minZ + GROUND_MASK.size;
+  const visit = (o: T.Object3D, built: boolean) => {
+    if (!o.visible || (built && NOT_BUILT.test(o.name))) return;
+    built ||= BUILT.test(o.name) || builtRoots.has(o.name);
+    if (built && o instanceof T.Mesh && !(o instanceof T.SkinnedMesh)) {
+      const material = [o.material].flat()[0] as T.Material | undefined, geometry = o.geometry as T.BufferGeometry, position = geometry.getAttribute('position');
+      if (!position || (material && (GROUND_FINISH.has(material.name) || material.transparent))) return;
+      const index = geometry.getIndex(), count = index ? index.count : position.count, instances = o instanceof T.InstancedMesh ? o.count : 1;
+      if (instances > 400 || count * instances > 3e6) return;
+      // A post or lamp (plan under 2 m) needs no apron: measure the low part first, then rasterize it.
+      let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity;
+      const low: number[] = [];
+      for (let k = 0; k < instances; k++) {
+        if (o instanceof T.InstancedMesh) { o.getMatrixAt(k, m); w.multiplyMatrices(o.matrixWorld, m); } else w.copy(o.matrixWorld);
+        for (let t = 0; t < count; t += 3) {
+          for (let c = 0; c < 3; c++) v[c].fromBufferAttribute(position, index ? index.getX(t + c) : t + c).applyMatrix4(w);
+          if (Math.min(v[0].y, v[1].y, v[2].y) > 2.5 || Math.max(v[0].y, v[1].y, v[2].y) < -2 || !inMask(v[0].x, v[0].z)) continue;
+          low.push(v[0].x, v[0].z, v[1].x, v[1].z, v[2].x, v[2].z);
+          x0 = Math.min(x0, v[0].x, v[1].x, v[2].x); x1 = Math.max(x1, v[0].x, v[1].x, v[2].x); z0 = Math.min(z0, v[0].z, v[1].z, v[2].z); z1 = Math.max(z1, v[0].z, v[1].z, v[2].z);
+        }
+      }
+      if (Math.max(x1 - x0, z1 - z0) > 2) for (let t = 0; t < low.length; t += 6) raster(low[t], low[t + 1], low[t + 2], low[t + 3], low[t + 4], low[t + 5]);
+    }
+    o.children.forEach(child => visit(child, built));
+  };
+  scene.updateMatrixWorld(true);
+  scene.children.forEach(child => visit(child, false));
+  builtCells = [];
+  builtImage = document.createElement('canvas'); builtImage.width = builtImage.height = N;
+  const bctx = builtImage.getContext('2d')!, image = bctx.createImageData(N, N);
+  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+    const k = j * N + i; image.data[k * 4 + 3] = 255;
+    if (!grid[k]) continue;
+    image.data[k * 4 + 2] = 255;
+    if (i === 0 || j === 0 || i === N - 1 || j === N - 1 || !grid[k - 1] || !grid[k + 1] || !grid[k - N] || !grid[k + N]) builtCells.push(GROUND_MASK.minX + i + .5, GROUND_MASK.minZ + j + .5);
+  }
+  bctx.putImageData(image, 0, 0);
+  paintGroundMask(lastDraw);
+  return builtCells.length / 2;
 }
 
 const [OX, OZ] = URBAN_FILL.origin, [UX, UZ] = URBAN_FILL.axis, [PU, PV] = URBAN_FILL.pitch, [BU, BV] = URBAN_FILL.backdrop.pitch;
@@ -121,7 +212,9 @@ vec3 groundFinish(vec2 p, vec3 grass, float lawn) {
   vec3 pave = ${c(P.slab)} * tint * (1. - .16 * line(min(e.x, e.y), .025, pm, .35));
   // Derivatives only in uniform control flow: sample and differentiate both the district mask and the backdrop grid, then pick.
   float inside = p.x >= ${n(DISTRICT.minX)} && p.x <= ${n(DISTRICT.maxX)} && p.y >= ${n(DISTRICT.minZ)} && p.y <= ${n(DISTRICT.maxZ)} ? 1. : 0.;
-  vec2 m = texture2D(groundMask, clamp((p - vec2(${n(GROUND_MASK.minX)}, ${n(GROUND_MASK.minZ)})) / ${n(GROUND_MASK.size)}, 0., 1.)).rg;
+  vec3 mk = texture2D(groundMask, clamp((p - vec2(${n(GROUND_MASK.minX)}, ${n(GROUND_MASK.minZ)})) / ${n(GROUND_MASK.size)}, 0., 1.)).rgb;
+  // Built ground (structures and their apron) is never lawn and never street.
+  vec2 m = vec2(min(mk.r, 1. - mk.b), max(mk.g, mk.b));
   // The blurred mask ramps over about two metres: its value over its own screen gradient is a signed distance to the 0.5 edge.
   // The gradient floor (0.08 per metre, a fifth of the ramp's) keeps the 8-bit tails from reading as a near edge and speckling kerbs.
   float mgr = (m.r - .5) * pm / max(fwidth(m.r), pm * .08), mgs = (.5 - m.g) * pm / max(fwidth(m.g), pm * .08);
@@ -141,6 +234,11 @@ vec3 groundFinish(vec2 p, vec3 grass, float lawn) {
   float road = below(s, ${n(P.roadHalf)}) * roadOk;
   float kerb = below(s, ${n(P.roadHalf + P.kerbWidth)}) * kerbOk - road;
   float foot = below(s, ${n(P.footHalf)}) * footOk;
+  // Streets run on through district lawns (owner review: no road may stop dead at a lawn): the lawn gives way to the footway and takes a
+  // kerb along it. Backdrop parks already sit between their streets.
+  float lawnIn = below(-mgr, 0.) * lawn * inside, cut = foot * inside;
+  kerbG = max(kerbG * (1. - cut), line(abs(s - ${n(P.footHalf + .15)}), .15, pm, 3.) * footOk * lawnIn);
+  green *= 1. - cut;
   vec3 col = mix(pave, ${c(P.footway)} * (.98 + tint * .03), foot);
   col = mix(col, ${c(P.kerb)}, max(kerb, 0.));
   vec3 lane = ${c(P.road)} * (.985 + sin(along * .05 + across) * .01);
