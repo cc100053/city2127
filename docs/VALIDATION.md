@@ -117,6 +117,8 @@ ANGLE Metal), Vite DEV, 1920×1080 viewport, deviceScaleFactor 1 (renderer pixel
 
 ## Current evidence and open acceptance
 
+直立環形巨構 R5 候選 `f1fd0933` 於 2026-11-21 通過根目錄 `npm test`、`npm run build` 及 `git diff --check`。[幾何測試](../tests/megastructures.test.ts) 核對環內兩側樹根接入種植帶，並重跑道路 ①、Yurikamome 同下環接駁淨空。Chrome 日夜各 558 條居民視線先命中門牌，正式 build 的日夜載入及夜間 R2 回退通過。[原鏡位日夜對照、紅圈裁圖及驗證記錄](handoffs/ring-glb-pilot.md#round-5)
+
 直立環形巨構 R4（2026-11-21，`codex/ring-glb-pilot` 候選，實作 `865cd505`）：根目錄測試、正式 build、Blender game-profile QA 及空場景 GLB 重匯通過。用匯出枝葉驗證 5.4 m 中央帶，沿環身軸線與 DECKS 最小距離 1.723 m。Chrome 日夜各從實際居民路線查核 558 條門牌視線，並驗證正式 build 載入及 R2 回退。[日夜近鏡、R3／R4 對照及完整驗證](handoffs/ring-glb-pilot.md#round-4)。
 
 直立環形巨構 R3（2026-11-21，`codex/ring-glb-pilot` 候選，實作 `1cfe3321`）：根目錄 `npm test`／`npm run build`／`git diff --check`、Blender game-profile QA、空場景重匯及正式 build 資源載入／回退通過。[實際三角面測試](../tests/megastructures.test.ts) 覆蓋道路 ①、Yurikamome、橋端至庭園樓面、兩條接續步行線及室內往返。完整城市 Chrome 算得庭園板與 DECKS 最窄相距 0.342 m，36 個地面／頭頂探點通過。Apple M6／Chrome 157／ANGLE Metal、1080p／DPR 1 固定主遠景三個 120 幀窗口，R3 日景 60.0 FPS、夜景 59.5–60.0 FPS。展覽機未測；[日夜審圖、R2 對照及完整方法](handoffs/ring-glb-pilot.md#round-3)。

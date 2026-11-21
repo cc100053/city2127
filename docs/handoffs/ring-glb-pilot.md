@@ -1,11 +1,31 @@
 # ring-glb-pilot — 直立環形巨構
 
 - Owner — Codex。視覺驗收由 cc100053 決定。
-- Status — R4 候選待業主審圖，整合由業主決定。
+- Status — R5 候選待業主審圖，整合由業主決定。
 - Branch — `codex/ring-glb-pilot`。
 - Remote — `origin/codex/ring-glb-pilot`，供審圖。
 - Base — `6239fa813857e3a321c8f4a8189af2d4e5113159`。
-- Implementation — R4 `865cd5058e6d4b01f48c0dab37b67911ee08e4fc`，R3 `1cfe3321d5444ab262d5043a3b70200752f21cdc`，R2 `5d80004d5a04d9427e276213016b85adde98ae3d`，R1 `0bbb94da91a885a53f233afa3db760c3eefb504e`.
+- Implementation — R5 `f1fd0933`，R4 `865cd5058e6d4b01f48c0dab37b67911ee08e4fc`，R3 `1cfe3321d5444ab262d5043a3b70200752f21cdc`，R2 `5d80004d5a04d9427e276213016b85adde98ae3d`，R1 `0bbb94da91a885a53f233afa3db760c3eefb504e`.
+
+## Round 5
+
+2026-11-21 由 R4 審圖提交 `3de8460c` 接手。Fetch 後本機候選與遠端為 0 / 0，相對 `origin/main` 為 8 ahead / 8 behind，共同基準 `6239fa81`。沿用主 checkout、同一候選分支，保留本機未追蹤的 `Dev_QA.md`。[R4 候選 CI](https://github.com/cc100053/city2127/actions/runs/44870540215)
+
+- [R4／R5 Hero 原鏡位對照，12:00／21:00](../../artifacts/ring-glb-pilot/r5/compare-hero.jpg)
+- [紅圈範圍裁圖，12:00／21:00](../../artifacts/ring-glb-pilot/r5/compare-planting.jpg)
+
+CodeGraph 追到 `megastructures.ts` 的四道下環內側種植帶。用 Chrome 暫時隱藏該段程序樹冠及灌木，確認消失範圍與業主圈選吻合。沿用 `coastalCanopy.ts` 的合批植栽、造型及材質。每簇一棵較高主樹，搭配較低的伴生樹，交錯開展的闊冠及收窄的柱形樹冠。樹幹植入種植帶上緣，灌木沿坡面聚散，留出可辨認的帶面及空隙。環身、橋、道路 ①、Yurikamome、大堂與兩個庭園花床沿用 R4。
+
+`npm run capture` 以原 Hero 鏡位、3200 × 1800／DPR 1、`reviewTime=20` 擷取 R5。R4 採用 `865cd505` 當輪同設定原圖。裁圖取兩個時段同一原圖座標 x 330–950、y 710–1230，保留斜坡與前橋的關係。R5 原圖在提交前擷取，sidecar 記錄了 R4 基準及 dirty 狀態。兩張 R5 原圖均零 page error。
+
+### 驗證
+
+- 實作 `f1fd0933` 的根目錄 `npm test`、`npm run build`、`git diff --check` 均通過。
+- [幾何測試](../../tests/megastructures.test.ts) 以樹幹實例底部對實際種植面發射射線，核對兩側樹根都有落土。道路 ①、Yurikamome、橋至庭園的連續樓面及居民 2.2 m 頭頂淨空均通過。比較四種資產載入組合，環外的巨構植栽實例矩陣及顏色與 R4 相同。
+- Chrome 以 1.65 m 眼高沿兩條接駁路線取樣，日夜各 558 條視線均先命中指定門牌。兩時段各記錄到一名可見居民連同步態移動至少 11.1 m。零 page error。
+- 正式 build 在 12:00／21:00 均載入入口、大堂下環、雙肩及冠部 GLB。夜間模擬大堂下環 404，R2 下環正常接手。Apple M6／Chrome 157 headless／ANGLE Metal、1920 × 1080／DPR 1，三頁各取一個 120 幀窗口，均為 60.0 FPS，零 page error。日夜一般幀分別為 1,381／1,382 draws，與 R4 正式版紀錄相同。
+
+原圖、sidecar、辨認來源用的遮罩圖及檢查記錄存於 `~/city2127-evidence/ring-glb-pilot/r5/`。下一步由業主按原 Hero 鏡位審圖及決定整合，展覽機實測待安排。
 
 ## Round 4
 
