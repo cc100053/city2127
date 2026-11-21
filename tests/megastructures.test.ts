@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
-import { Box3, Group, Mesh, InstancedMesh } from 'three';
+import { readFileSync } from 'node:fs';
+import { Box3, Group, Mesh, InstancedMesh, Raycaster, Triangle, Vector3 } from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { ConcentrationDistrict } from '../src/districtMeters.ts';
 import { changeSites, guideway, PLAZA, plazaAt, plazaWalks } from '../src/layout.ts';
 import { ARCH, FOOTPRINTS, groundContacts, HULL, inMega, inRect, megastructures, RING, RING_GATE } from '../src/megastructures.ts';
@@ -50,5 +52,46 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
       assert.ok(lx - half > RING_GATE.left && lx + half < right && h < RING_GATE.top, `route through the ring foot at ${p.x.toFixed(1)},${p.z.toFixed(1)} misses the road gate`);
     }
   }
+}
+
+// Test the actual exported triangles in ring-local metres against the tunnel and garden walk keep-outs.
+const glb = Uint8Array.from(readFileSync(new URL('../asset/models/ring-gate-2127/ring-gate-2127.glb', import.meta.url)));
+const { scene: pilot } = await new GLTFLoader().parseAsync(glb.buffer, '');
+pilot.updateMatrixWorld(true);
+const pilotTriangles: Triangle[] = [];
+pilot.traverse(part => {
+  if (!(part instanceof Mesh)) return;
+  const { geometry, matrixWorld } = part, positions = geometry.getAttribute('position');
+  const index = geometry.getIndex();
+  const at = (i: number) => new Vector3().fromBufferAttribute(positions, index?.getX(i) ?? i).applyMatrix4(matrixWorld);
+  for (let i = 0; i < (index?.count ?? positions.count); i += 3) pilotTriangles.push(new Triangle(at(i), at(i + 1), at(i + 2)));
+});
+assert.ok(pilotTriangles.length > 0 && pilotTriangles.length < 6000, 'ring pilot contains bounded geometry');
+const halfDepth = RING.depth / 2;
+for (let z = -halfDepth - 6; z < halfDepth + 6; z += .5) {
+  const f = Math.max(0, Math.min(1, (z + halfDepth) / RING.depth));
+  const right = RING_GATE.right[0] + (RING_GATE.right[1] - RING_GATE.right[0]) * f;
+  const clearance = new Box3(new Vector3(RING_GATE.left + .3, .1, z), new Vector3(right - .3, RING_GATE.top - .25, z + .5));
+  assert.ok(!pilotTriangles.some(triangle => clearance.intersectsTriangle(triangle)), `GLB tunnel is obstructed at local depth ${z}`);
+}
+const landing = new Vector3(...plazaWalks[0][0]).sub(new Vector3(RING.x, 0, RING.z)).applyAxisAngle(new Vector3(0, 1, 0), -RING.yaw);
+const gardenClearance = new Box3(new Vector3(landing.x - 3, 17.7, 14.3), new Vector3(landing.x + 3, 20.1, landing.z + 1.8));
+assert.ok(!pilotTriangles.some(triangle => gardenClearance.intersectsTriangle(triangle)), 'GLB garden entrance has a 6 m wide pedestrian opening');
+const ringOrigin = new Vector3(RING.x, 0, RING.z), up = new Vector3(0, 1, 0);
+const toWorld = (point: Vector3) => point.applyAxisAngle(up, RING.yaw).add(ringOrigin);
+pilot.position.copy(ringOrigin);
+pilot.rotation.y = RING.yaw;
+const installed = megastructures(pilot);
+installed.updateMatrixWorld(true);
+const towardsGarden = new Vector3(0, 0, -1).applyAxisAngle(up, RING.yaw);
+for (const x of [landing.x - 2.8, landing.x, landing.x + 2.8]) for (const y of [17.8, 19, 20.1]) {
+  const ray = new Raycaster(toWorld(new Vector3(x, y, landing.z + 1)), towardsGarden, 0, landing.z + 1 - 14.3);
+  assert.equal(ray.intersectObject(installed).length, 0, `installed ring blocks the garden landing at x=${x.toFixed(1)}, y=${y}`);
+}
+for (const z of [15, 18, 22.5, landing.z - .05]) {
+  const down = new Raycaster(toWorld(new Vector3(landing.x, 20, z)), new Vector3(0, -1, 0));
+  const [floor] = down.intersectObject(pilot);
+  const expectedHeight = z <= 22.5 ? 17.6 : 17.6 - .58 * (z - 22.5) / 3.15;
+  assert.ok(floor && Math.abs(floor.point.y - expectedHeight) < .03, `garden floor joins the bridge at local depth ${z}`);
 }
 console.log('megastructures ok');

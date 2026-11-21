@@ -2,6 +2,7 @@ import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { hash, plantCanopy, plantShrubs } from './coastalCanopy.ts';
 import { bodyFootprints, inRect } from './megaFootprints.ts';
+import { addCityModel } from './modelAssets.ts';
 
 // P1 (city-taste-v2): the three colossal megastructures of the master target — ring-on-edge building, white arch, stepped terraced hull.
 // Ground contacts and sizes are exported for the test and for carving the context massing they replace. Metres.
@@ -43,6 +44,8 @@ const megaJoint = new T.MeshStandardMaterial({ color: '#4b5258', roughness: .6, 
 const megaPortal = new T.MeshStandardMaterial({ color: '#141b20', emissive: '#30485a', emissiveIntensity: .35, roughness: .8 });
 /** Tunnel lights in the ring's road gate (outside the carve, so its own finish). */
 const gateLight = new T.MeshStandardMaterial({ color: '#fff4dc', emissive: '#fff1d0', emissiveIntensity: .8, roughness: .4 });
+const ringGlazing = new T.MeshStandardMaterial({ color: '#6c8895', emissive: '#c59262', emissiveIntensity: .06, roughness: .22, metalness: .26 });
+const ringPilotMaterials = new Map([['ring_wayfinding', megaSeam], ['ring_cove', gateLight], ['ring_glazing', ringGlazing]]);
 /** The megastructures' own copies of the shared finishes: same look, but the hoop is cut open over the road gate (`RING_GATE`, a skewed box in
  * ring-local plan). Skyways and Meter pieces keep the exported originals, so nothing else is carved; the merge swaps in these copies. */
 const carved = new Map<T.Material, T.Material>();
@@ -63,6 +66,7 @@ carve(megaShell, 'shell'); carve(megaRib, 'rib'); carve(megaGlass, 'mega-glass')
 export const updateMegastructures = (night: number) => {
   megaSeam.emissiveIntensity = .6 + night * 1.6; (carvedSeam as T.MeshStandardMaterial).emissiveIntensity = megaSeam.emissiveIntensity;
   gateLight.emissiveIntensity = .8 + night * 1.4; roomGlow.value = night;
+  ringGlazing.emissiveIntensity = .06 + night * 1.05;
 };
 
 type Plant = { position: number[]; scale: number; type: string };
@@ -90,8 +94,11 @@ function bar(batch: Batch, material: T.Material, a: T.Vector3, b: T.Vector3, w: 
 }
 
 // ---- A. Ring-on-edge building: local frame, ring in XY, axis +Z, centred on the hoop; the group is turned by `yaw` and lifted to centreY.
-function ring(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
-  const { outer, inner, depth, plinth, centreY } = RING, half = depth / 2, L = (r: number, h: number) => new T.CylinderGeometry(r, r, h, 96, 1, true).rotateX(Math.PI / 2);
+function ring(batch: Batch, trees: Plant[], shrubs: Shrub[], hasPilot: boolean) {
+  const { outer, inner, depth, plinth, centreY } = RING, half = depth / 2;
+  const opening = [-.035, .163]; // Angle from the bottom of the hoop to each edge of the garden landing.
+  const L = (r: number, h: number, atLanding = false) => new T.CylinderGeometry(r, r, h, 96, 1, true,
+    atLanding ? opening[1] : 0, Math.PI * 2 - (atLanding ? opening[1] - opening[0] : 0)).rotateX(Math.PI / 2);
   const place = (x: number, y: number, z: number) => { const v = new T.Vector3(x, y, z).applyAxisAngle(new T.Vector3(0, 1, 0), RING.yaw); return [RING.x + v.x, centreY + v.y, RING.z + v.z] as const; };
   const world = new T.Matrix4().compose(new T.Vector3(RING.x, centreY, RING.z), new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 1, 0), RING.yaw), new T.Vector3(1, 1, 1));
   const add = (material: T.Material, g: T.BufferGeometry, m?: T.Matrix4) => put(batch, material, g, m ? world.clone().multiply(m) : world);
@@ -110,26 +117,44 @@ function ring(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
   for (let i = 0; i < 60; i++) {
     const a = i / 60 * Math.PI * 2, rz = new T.Matrix4().makeRotationZ(a);
     add(megaRib, rib, rz.clone().setPosition(Math.cos(a) * (outer + .6), Math.sin(a) * (outer + .6), 0));
-    for (const s of [1, -1]) if (i % 2 === 0) add(megaRib, fin, rz.clone().setPosition(Math.cos(a) * (inner + outer) / 2, Math.sin(a) * (inner + outer) / 2, s * (half + 1.3)));
+    if (i % 2 === 0) for (const s of [1, -1]) {
+      // The plaza-facing ribs in this arc are replaced by the pilot's stepped facade.
+      if (hasPilot && s === 1 && i >= 46 && i <= 54) continue;
+      add(megaRib, fin, rz.clone().setPosition(Math.cos(a) * (inner + outer) / 2, Math.sin(a) * (inner + outer) / 2, s * (half + 1.3)));
+    }
   }
   const bands = 10, bh = depth / bands;
   for (let b = 0; b < bands; b++) {
     const z = -half + (b + .5) * bh;
-    add(megaGlass, flip(L(inner, bh - 1.1)), new T.Matrix4().makeTranslation(0, 0, z));
-    add(megaShell, flip(L(inner - 1.5 - (b % 2) * .8, 1.1)), new T.Matrix4().makeTranslation(0, 0, z + bh / 2));
+    const atLanding = hasPilot && z > 15;
+    add(megaGlass, flip(L(inner, bh - 1.1, atLanding)), new T.Matrix4().makeTranslation(0, 0, z));
+    add(megaShell, flip(L(inner - 1.5 - (b % 2) * .8, 1.1, atLanding)), new T.Matrix4().makeTranslation(0, 0, z + bh / 2));
   }
   // Planted ledges on the lower inner arc (crowns go through the shared canopy instancer) and the service rail with three static pods.
   for (const z of [-half + bh * 1.5, -half + bh * 4, -half + bh * 6.5, -half + bh * 9]) {
-    const shape = new T.Shape(); shape.absarc(0, 0, inner, -Math.PI * .95, -Math.PI * .05, false); shape.absarc(0, 0, inner - 9, -Math.PI * .05, -Math.PI * .95, true);
-    add(megaShell, new T.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: false, curveSegments: 24 }), new T.Matrix4().makeTranslation(0, 0, z - .5));
-    add(megaPlant, new T.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: false, curveSegments: 24 }), new T.Matrix4().makeTranslation(0, 0, z + .5).multiply(new T.Matrix4().makeScale(.97, .97, 1)));
+    const atLanding = hasPilot && z > 15;
+    const edges = opening.map(angle => angle - Math.PI / 2);
+    const start = -Math.PI * .95, end = -Math.PI * .05;
+    const sections = atLanding ? [[start, edges[0]], [edges[1], end]] : [[start, end]];
+    for (const [a, b] of sections) {
+      const shape = new T.Shape(); shape.absarc(0, 0, inner, a, b, false); shape.absarc(0, 0, inner - 9, b, a, true);
+      add(megaShell, new T.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: false, curveSegments: 24 }), new T.Matrix4().makeTranslation(0, 0, z - .5));
+      add(megaPlant, new T.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: false, curveSegments: 24 }), new T.Matrix4().makeTranslation(0, 0, z + .5).multiply(new T.Matrix4().makeScale(.97, .97, 1)));
+    }
+    const blocksLanding = (a: number) => atLanding && a > edges[0] - .05 && a < edges[1] + .05;
     // P5: a continuous shrub band spilling over the lip and a second one mid-ledge, with irregular tree clusters (3-5 crowns every 30-45 m).
     const zi = Math.round(z * 10);
     for (const [rr, gap, lift] of [[inner - .6, 4.4, 1], [inner - 5.5, 6, .8]] as const)
-      for (let a = -Math.PI * .08, i = 0; a > -Math.PI * .92; a -= gap / rr, i++) { const p = place(Math.cos(a) * rr, Math.sin(a) * rr + lift, z); shrubs.push([p[0], p[1], p[2], 2.6 + hash(zi + i) * .9, 1.5 + hash(zi + i + 5) * .6]); }
+      for (let a = -Math.PI * .08, i = 0; a > -Math.PI * .92; a -= gap / rr, i++) {
+        if (blocksLanding(a)) continue;
+        const p = place(Math.cos(a) * rr, Math.sin(a) * rr + lift, z);
+        shrubs.push([p[0], p[1], p[2], 2.6 + hash(zi + i) * .9, 1.5 + hash(zi + i + 5) * .6]);
+      }
     for (let a = -Math.PI * .1 - hash(zi) * .1, c = 0; a > -Math.PI * .9; a -= (30 + hash(zi + c) * 15) / inner, c++)
       for (let j = 0, n = 3 + Math.floor(hash(zi + c + 3) * 3); j < n; j++) {
-        const aj = a + (hash(zi + c * 9 + j) - .5) * 6 / inner, r = inner - 4 - hash(zi + c * 7 + j) * 4, p = place(Math.cos(aj) * r, Math.sin(aj) * r + 1.5, z);
+        const aj = a + (hash(zi + c * 9 + j) - .5) * 6 / inner;
+        if (blocksLanding(aj)) continue;
+        const r = inner - 4 - hash(zi + c * 7 + j) * 4, p = place(Math.cos(aj) * r, Math.sin(aj) * r + 1.5, z);
         trees.push({ position: [p[0], -p[2], p[1]], scale: 1 + hash(zi + c * 5 + j) * .5, type: j === 1 ? 'columnar' : 'broadleaf' });
       }
   }
@@ -151,7 +176,8 @@ function ring(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
     add(megaSeam, new T.BoxGeometry(lobby + 4.2, .3, .3), new T.Matrix4().makeTranslation(0, 4.95 - centreY, face + s * 5));
   }
   // The plaza walk (layout `plazaWalks[0]`) ends at the bay face 17 m up, level with the hoop's inner floor: a landing runs in over the floor to the
-  // lowest planted ledge (z 18) through a lit gate frame in the face plane.
+  // lowest planted ledge (z 18). The pilot supplies its own landing and tunnel lining.
+  if (hasPilot) return;
   const gx = 4.1, gy = 17.6 - centreY;
   add(megaShell, new T.BoxGeometry(8, .6, 7.4), new T.Matrix4().makeTranslation(gx, gy - .3, half + 3.1 - 3.7));
   for (const dx of [-4.6, 4.6]) add(megaSeam, new T.BoxGeometry(.6, 7, .6), new T.Matrix4().makeTranslation(gx + dx, gy + 3.5, half));
@@ -300,13 +326,31 @@ export function carveContext(environment: T.Object3D) {
 }
 
 /** The three megastructures, one merged mesh per finish plus the planted crowns. */
-export function megastructures(): T.Group {
+export function megastructures(ringPilot?: T.Group): T.Group {
   const root = new T.Group(); root.name = 'megastructures';
   const batch: Batch = new Map(), trees: Plant[] = [], shrubs: Shrub[] = [], tops: [number, number][] = [];
-  ring(batch, trees, shrubs); arch(batch, tops); hull(batch, trees, shrubs);
+  ring(batch, trees, shrubs, Boolean(ringPilot)); arch(batch, tops); hull(batch, trees, shrubs);
   for (const [material, list] of batch) {
     const mesh = new T.Mesh(mergeGeometries(list), carved.get(material) ?? material); mesh.castShadow = mesh.receiveShadow = true; mesh.name = 'megastructure'; root.add(mesh); list.forEach(g => g.dispose());
   }
   plantCanopy(root, { instances: trees }); plantShrubs(root, shrubs);
+  if (ringPilot) root.add(ringPilot);
   return root;
+}
+
+export async function loadMegastructures(): Promise<T.Group> {
+  const url = new URL('../asset/models/ring-gate-2127/ring-gate-2127.glb', import.meta.url).href;
+  const ringPilot = await addCityModel(new T.Group(), url, [RING.x, 0, RING.z], RING.yaw).catch(error => {
+    console.warn('Ring entrance model could not load. Using the procedural entrance.', error);
+    return undefined;
+  });
+  if (ringPilot) {
+    ringPilot.name = 'ring-gate-2127';
+    ringPilot.traverse(part => {
+      if (!(part instanceof T.Mesh) || Array.isArray(part.material)) return;
+      const material = ringPilotMaterials.get(part.material.name);
+      if (material) part.material = material;
+    });
+  }
+  return megastructures(ringPilot);
 }
