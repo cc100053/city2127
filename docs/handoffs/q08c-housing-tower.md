@@ -1,11 +1,11 @@
 # q08c-housing-tower — Q08-C 8C 重做：五款住宅隨機配置的摩天樓框架（Blender）
 
 - Owner: repository owner (requester of this task)
-- Status: IN_PROGRESS — the local model is ready for owner review; not placed, not pushed.
+- Status: IN_PROGRESS. Pushed for owner and team review in PR #11 (https://github.com/cc100053/city2127/pull/11, base `main`); not placed in the city.
 - Branch: `feat/q08c-housing-tower`, from `main` `166ed7ff0ffc9fdc01b06416d49082c70974a20d`.
 - Base commit: `166ed7ff0ffc9fdc01b06416d49082c70974a20d`
 - Last verified commit: the local commit that adds this file (checks ran on its worktree, see below).
-- Remote availability: NOT PUSHED (owner: 「先在本機完成，等我看過再上傳 GitHub」).
+- Remote availability: `origin/feat/q08c-housing-tower` (pushed 2026-11-21; model commit `a148332f`), PR #11 to `main`.
 
 ## Session Git state
 
@@ -216,6 +216,13 @@ Kept: each type's roof outline, main window frames, entrances, balconies and the
   - `pre-empty-198k/`: the previous version.
   - `empty/{side,main}_{day,guide,clay}.png`.
   - `compare-empty-slots.jpg`: rows side day (before | after), side guide | main guide, side clay (before | after).
+
+## Push (2026-11-21, owner: upload to cc100053/city2127)
+
+- `origin` is https://github.com/cc100053/city2127.git.
+- The branch pushed 5 task commits (`4fd555b3` .. `a148332f`) touching only `asset/models/q08c-housing-tower-2127/`, `asset/models/LIBRARY.md` and this handoff. Evidence renders and backups stay outside Git in `~/city2127-evidence/q08c-housing/`.
+- The pushed `.glb` is the empty-slot, no-people version: 189,574 tris, 3,186,660 bytes, SHA256 `592CD4AA…C2CDEB`.
+- PR #11 targets `main`, which was 4 docs/capture commits ahead with no overlapping files. The PR was opened through the GitHub API because the `gh` CLI is not installed.
 
 ## Next expected step
 
