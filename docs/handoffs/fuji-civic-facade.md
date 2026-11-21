@@ -1,10 +1,10 @@
-# Fuji Civic Core — 幕牆 R1
+# Fuji Civic Core — 打磨驗收
 
 - Owner: Codex
 - Branch: `codex/fuji-facade-pilot`
 - Base: `2ab01ea77125fbd8c54e5c8dc9f1ec79a3d97ac8`
-- Status: owner 已選定 R1 作為基準（2026-11-22）；第 3 步待開始
-- 已驗證實作：`19432b6360eecbf58181ec69d6a3235a0bf82280`
+- Status: owner 已選定 R1 作為基準（2026-11-22）。R3 夜間導光候選待 owner 驗收
+- R1 已驗證實作：`19432b6360eecbf58181ec69d6a3235a0bf82280`
 - 遠端分支：`origin/codex/fuji-facade-pilot`
 
 ## 基準和改造範圍
@@ -25,10 +25,26 @@
 - Apple M6／Chrome 157.0.8103.79 headless／ANGLE Metal，1920×1080、DPR 1，`reviewTime=20` 固定日夜畫面。正常 GLB 四個畫面均回應 HTTP 200，零 page error；模擬 GLB 404 會顯示原幕牆，零 page error。主鏡一般渲染幀 23.09M → 20.59M 三角面，draw calls 日 1,411、夜 1,412。每個條件取一次 6 秒 rAF 短測，日 53.8 → 58.8 FPS，夜 56.2 → 58.9 FPS，接近 60 FPS 上限，未量展覽機或長跑。
 - 近鏡可見窗框、隔音板細縫、燈槽和仍透出的工作室。成套截圖及 JSON 在 `~/city2127-evidence/fuji-civic-facade/r1`。紀錄：[原版近鏡夜景](../../artifacts/fuji-civic-facade/r1/before-wing-night.jpg)、[R1 近鏡夜景](../../artifacts/fuji-civic-facade/r1/after-wing-night.jpg)、[R1 近鏡日景](../../artifacts/fuji-civic-facade/r1/after-wing-day.jpg)、[R1 主鏡夜景](../../artifacts/fuji-civic-facade/r1/after-hero-night.jpg)。
 
-## 下一輪
+## R1 恢復紀錄
 
 Owner 比較 R1 與 R2 後選定 R1。驗收分支已回退 R2，恢復 `4423a9f2` 的程式碼與資產。R2 實作和對照圖保留在 Git 紀錄 `1469bbdf`／`1ed891f7`。
 
 回退後比較 `4423a9f2`，差異全在文件。根 `npm test`、`npm run build` 及 `git diff --check` 通過。Chrome 157 在 1920×1080、`hour=21&reviewTime=20` 檢查主鏡及銀球近鏡，幕牆 GLB 回應 200、零 page error。截圖與 sidecar 在 `~/city2127-evidence/fuji-civic-facade/r1-restored/`。
 
 第 3 步從恢復的 R1 接續，範圍為從前庭到斜扶梯的夜間導光。沿用 R1 銀球、承托、雙翼幕牆、球頂泊位、航線和現有通行動線。展覽機尚待量度。
+
+## R3 夜間導光候選
+
+2026-11-22 由專用工作樹 `/private/tmp/city2127-fuji-polish` 接續。Fetch 後 `311ee9cf` 與遠端驗收分支差異 0／0，`origin/main` 為 `2ab01ea7`，驗收分支超前 5 個提交。回退版與 `4423a9f2` 的程式碼和資產相同。
+
+- 大道 ① 的步道沿原有前庭鋪面，以兩條冷白藍導線和三組朝向大堂的箭嘴標出入口。導線止於原有梯腳；三層梯級標出踏邊，雨篷底及門檻兩側照出入口深度。
+- 公共平台以薄燈條及箭嘴標出斜扶梯穿出平台的位置，扶手沿既有斜度延續冷白藍光。導引使用現有街道及建築日夜調光。R1 幕牆、銀球、承托、泊位、航線及既有公眾與員工動線沿用。
+- 整棟樓沿用十個材質批次。載入幕牆 GLB 時由 931,724 增至 932,264 個三角面，程序回退時由 950,120 增至 950,660 個三角面。兩種幕牆的世界包圍盒及住民位置、步行曲線、扶梯騎乘路徑與 R1 逐項相同。前庭另併為一個 108 三角面批次，不投影，沿用現有材質。全案合計增加 648 個三角面。
+
+同鏡夜景中，R3 的大道導線和平台箭嘴分別指向入口及斜扶梯，級燈標出梯邊，斜扶手更清晰。高架軌道從總覽鏡位遮住部分梯級，另選入口斜角鏡位覆核雨篷、門檻及完整三層級燈。原圖及含 URL、commit、工作樹狀態的 sidecar 在 `~/city2127-evidence/fuji-civic-facade/r3-baseline/` 與 `r3-final/`。[夜景前後對照](../../artifacts/fuji-civic-facade/r3/night-comparison.jpg) · [同鏡日景](../../artifacts/fuji-civic-facade/r3/access-day.jpg) · [同鏡夜景](../../artifacts/fuji-civic-facade/r3/access-night.jpg) · [入口夜景](../../artifacts/fuji-civic-facade/r3/foyer-night.jpg) · [主鏡夜景](../../artifacts/fuji-civic-facade/r3/hero-night.jpg)。
+
+已驗證實作為 `32bcdd8d8c821a5340c96737439c251613df47e3`。根目錄 `npm test`、`npm run build` 及 `git diff --check` 通過。Odaiba 測試以真場景射線核對 84 個前庭樣點和 13 個梯級／平台樣點，既有住民腳位及頭部、航線和球頂泊位的淨空檢查亦通過。Chrome 七張 R3 日夜圖零頁面錯誤，擷取期間的 runtime 程式碼與已驗證提交一致。
+
+Apple M6／Chrome 157.0.8103.79 headless（ANGLE Metal），主鏡 1920×1080／DPR 1，固定 12:00／21:00 與 `reviewTime=20`。R1 和 R3 各取三段 6 秒 rAF 樣本的中位數。日景 59.3 → 59.0 FPS，夜景 59.5 → 59.2 FPS。一般渲染幀日／夜各增加 2 次 draw call 及 1,296 個提交的三角面，R3 為 1,413／1,414 calls。包含陰影更新的夜間樣本由 1,895 增至 1,897 calls，三角面由 25,537,815 增至 25,539,651。幕牆 GLB 日夜均回應 HTTP 200，零頁面錯誤。原始樣本見兩個證據目錄的 `hero-perf.json`。展覽機與長時間運行待測。
+
+下一步由 owner 比較 R1／R3 再決定是否接受第 3 步。
