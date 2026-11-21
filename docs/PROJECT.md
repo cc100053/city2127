@@ -67,7 +67,7 @@ DEV 居民情景（2026-11-12，湊／NW focal）：`main.ts` 只在 `import.met
 
 2026-11-21 直立環形巨構 R2 候選：`loadOdaiba` 平行載入地形和建築，`loadMegastructures` 沿 `RING` 的地面原點及角度放置三段環身 GLB（下環、兩肩、冠部），連接 [R1 入口 GLB](../asset/models/ring-gate-2127/ring-gate-2127.glb)。沿用程序庭園露台、基座及其與原有橋面、道路、Yurikamome 和居民路線的接點。外殼各段按材質合批，`updateMegastructures` 統一調節入口冷白導光、暖色燈槽及亮窗。任一環身檔載入失敗會回到 R1 的程序外殼與 Blender 入口；入口檔失敗會回到全程序版本。見 [模型及驗證交接](handoffs/ring-glb-pilot.md#round-2)。
 
-在 2026-11-21 的 R5 候選，`megastructures.ts` 在四道下環內側種植帶配置高低樹群，由 `coastalCanopy.ts` 用既有樹冠和灌木批次渲染。樹群植入帶面上緣，較窄的柱形樹冠和較寬闊冠交錯。沿用各個回退版本的入口缺口及 R4 大堂、庭園 GLB。[R5 交接](handoffs/ring-glb-pilot.md#round-5)
+2026-11-21 直立環形巨構 R6 候選：`megastructures.ts` 沿下環四道種植帶逐株配置羽狀蕨、尖葉高莖、折葉叢及垂藤。新共用的 [slopePlants](../src/slopePlants.ts) 依植種合批，莖脈的微光由 `updateMegastructures` 隨日夜調整。各環身回退沿用該版本的入口缺口。階梯巨構原樹群及灌木沿用 R5 的實例序位生成姿態與色彩。[R6 對照及交接](handoffs/ring-glb-pilot.md#round-6)
 
 Coordinates are **metres, Y-up**. `DISTRICT` covers the 720 × 680 m hero area. The derived `odaiba_district_v01_environment.glb` retains connected ground/roads and quieter background context outside the hero; the former 150 m dissolve-to-island is superseded. Telecom Center is not loaded as a separate landmark. [crop script](../scripts/crop-odaiba-district.py) produces the environment from the preserved masterplan source.
 

@@ -1,11 +1,43 @@
 # ring-glb-pilot — 直立環形巨構
 
 - Owner — Codex。視覺驗收由 cc100053 決定。
-- Status — R5 候選待業主審圖，整合由業主決定。
+- Status — R6 候選待業主審圖，整合由業主決定。
 - Branch — `codex/ring-glb-pilot`。
 - Remote — `origin/codex/ring-glb-pilot`，供審圖。
 - Base — `6239fa813857e3a321c8f4a8189af2d4e5113159`。
-- Implementation — R5 `f1fd0933`，R4 `865cd5058e6d4b01f48c0dab37b67911ee08e4fc`，R3 `1cfe3321d5444ab262d5043a3b70200752f21cdc`，R2 `5d80004d5a04d9427e276213016b85adde98ae3d`，R1 `0bbb94da91a885a53f233afa3db760c3eefb504e`.
+- Implementation — R6 `dadffcc2`，R5 `f1fd0933`，R4 `865cd5058e6d4b01f48c0dab37b67911ee08e4fc`，R3 `1cfe3321d5444ab262d5043a3b70200752f21cdc`，R2 `5d80004d5a04d9427e276213016b85adde98ae3d`，R1 `0bbb94da91a885a53f233afa3db760c3eefb504e`.
+
+## Round 6
+
+2026-11-21 由 R5 審圖提交 `a9142f226de474ce11ae18c549e6e9dcc5b13f92` 接手。沿用主 checkout、原候選分支及本機未追蹤的 `Dev_QA.md`。啟動時候選與遠端為 0 / 0，`origin/main` 為 `c804fe89231fb7d7083df2348fde5e7cc74270be`，候選相差 10 ahead / 12 behind。恢復工作後再 fetch，候選與遠端仍為 0 / 0，`origin/main` 為 `f177157682d1f33357210f0a4106857b77f71650`，候選相差 10 ahead / 19 behind。共同基準 `6239fa81`。
+
+- [R5／R6 全幅 Hero 同鏡位，12:00／21:00](../../artifacts/ring-glb-pilot/r6/compare-hero.jpg)
+- [R5／R6 日夜同座標裁圖](../../artifacts/ring-glb-pilot/r6/compare-planting.jpg)
+- [R5／Gemini／R6 日景同區對照](../../artifacts/ring-glb-pilot/r6/compare-gemini.jpg)
+- [Gemini 全幅審閱圖](../../artifacts/ring-glb-pilot/r6/gemini-original.jpg) · [送出的提示、原對話及下載檔雜湊](../../artifacts/ring-glb-pilot/r6/gemini-prompt.md) · [四種植株模型](../../artifacts/ring-glb-pilot/r6/plant-lineup.jpg)
+
+### 從 Gemini 圖落到場景
+
+Gemini 的 Create image 收到 R5 Hero 日景原圖及同圖裁切。採用首張輸出，因為放回整幅 Hero 仍見到左側扇葉、中央低葉叢及右側高莖的輪廓。四道原種植帶在 `RING_PLANTING` 逐株落位，沿用各版本的入口缺口。實裝 191 株、五個渲染批次，莖脈的點光隨原日夜更新。
+
+| 概念圖可見特徵 | 實裝 |
+| --- | --- |
+| 左坡扇葉由可見主莖分叉，垂葉越過斜坡前緣 | 羽狀複葉及折面主脈，蕨葉轉向環前，八組垂葉掛在種植帶前緣 |
+| 近白橋有向外展開的寬葉叢，左右高低有間隔 | 大小相間的折葉叢沿較低弧段接續，較矮的伴生植株根位退入帶面 |
+| 右坡青綠層疊向上收成長尖葉，葉脈有斷續青光 | 較寬蕨葉與疏落尖葉交錯，右側最高植株在深色環壁前，光只落在莖脈 |
+| 前方白橋、大堂和庭園留有通行口，後方 DECKS 仍見 | 沿用四道原種植帶、前橋及 R4 接駁；保留台階邊與部份留空帶面，底部垂藤及右坡覆蓋比 Gemini 圖疏 |
+
+採用 Three.js 植株實例與既有日夜材質更新，沿用現場種植帶及環身 GLB。新植株已收入資產庫，狀態為 draft。[植株程式](../../src/slopePlants.ts) · [環內配置](../../src/megastructures.ts) · [資產庫](../../asset/models/LIBRARY.md#procedural-planting--threejs)
+
+### 驗證
+
+- 實作 `dadffcc29e010a1e9d00f2ac636fe97b232ca9fe` 的根目錄 `npm test`、`npm run build`、`git diff --check` 通過。
+- [幾何測試](../../tests/megastructures.test.ts) 在程序環、R1、R2、R4 四種載入組合，用實際種植面確認每株落土、四帶兩側均有植栽及道路 ①／Yurikamome 淨空。橋至庭園的連續樓面、2.2 m 頭頂淨空及 R4 庭園植栽沿環軸距 DECKS 1.723 m 的檢查通過。四種組合的階梯巨構原有 154 棵樹及 390 叢灌木，實例矩陣與色彩與 R5 相同。
+- 本機 Chrome 日夜各從居民眼高沿兩條路線抽樣 558 條視線，均先命中指定門牌。兩個時段各見到一名居民同步步態移動至少 10.0 m。零 page error。
+- 正式 build 的 12:00／21:00 頁面均成功載入入口、大堂下環、雙肩及冠部 GLB；夜間模擬大堂下環回應 404 後，退回 R2 下環並完成渲染。Apple M6／Chrome 157.0.8103.79 headless／ANGLE Metal、1920 × 1080／DPR 1，三個頁面各取一個 120 幀窗口，均為 60.0 FPS，零 page error。正常日夜樣本為 1,391／1,392 draws。
+- 拍攝保留 UI 及原 Hero 鏡位，3200 × 1800／DPR 1、`reviewTime=20`，日夜零 page error。原圖裁切 x 330–950、y 710–1230；Gemini 全圖按相同比例對位。R6 sidecar 記錄 R5 基準及擷取時的工作樹改動。Gemini 下載原檔、提示、擷取 sidecar 及瀏覽器記錄均存於 `~/city2127-evidence/ring-glb-pilot/r6/`。
+
+候選推送至 `origin/codex/ring-glb-pilot`。下一步由業主按 Hero 對照審圖並決定整合，展覽機實測待安排。
 
 ## Round 5
 
@@ -25,7 +57,9 @@ CodeGraph 追到 `megastructures.ts` 的四道下環內側種植帶。用 Chrome
 - Chrome 以 1.65 m 眼高沿兩條接駁路線取樣，日夜各 558 條視線均先命中指定門牌。兩時段各記錄到一名可見居民連同步態移動至少 11.1 m。零 page error。
 - 正式 build 在 12:00／21:00 均載入入口、大堂下環、雙肩及冠部 GLB。夜間模擬大堂下環 404，R2 下環正常接手。Apple M6／Chrome 157 headless／ANGLE Metal、1920 × 1080／DPR 1，三頁各取一個 120 幀窗口，均為 60.0 FPS，零 page error。日夜一般幀分別為 1,381／1,382 draws，與 R4 正式版紀錄相同。
 
-原圖、sidecar、辨認來源用的遮罩圖及檢查記錄存於 `~/city2127-evidence/ring-glb-pilot/r5/`。下一步由業主按原 Hero 鏡位審圖及決定整合，展覽機實測待安排。
+原圖、sidecar、辨認來源用的遮罩圖及檢查記錄存於 `~/city2127-evidence/ring-glb-pilot/r5/`。
+
+業主否決 R5：「唔收貨. 佢啲植物全部都好似波波咁樣，其實唔係好睇得出係植物。」指定由 Gemini 自由設計植種、形態、配置次序及疏密，再把生成圖的植物逐一做進場景。
 
 ## Round 4
 
