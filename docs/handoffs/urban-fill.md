@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS (awaiting owner visual review)
 - Branch: claude/project-thread-sio952 (R4 paving; R1–R3 merged via PR #10 from claude/project-thread-8fkqrt)
 - Base commit: 6239fa8 (origin/main, PR #9 merged)
-- Last verified commit: ce0b795 (R4)
+- Last verified commit: b183c32 (R5)
 - Remote availability: origin/claude/project-thread-8fkqrt
 
 ## Session Git state
@@ -57,6 +57,16 @@ Acceptance is the owner's visual review plus an FPS check on the Mac (`scripts/f
   same finish on the fill blocks' street and lot plinths, so built blocks and painted ground share one network. Palette = review option A
   (light ceramic carriageway #c6c8c8 in the street kit's road family); the slab keeps the owner's #aaa69d. Zero extra draw calls (hero 1335, obliqueSE 1971, same as main).
 
+- R5 (2026-11-21, owner review of R4 with annotated shots): (1) the big plain squares were noStreet boxes, axis-aligned landmark survey
+  bounds and the megastructure FOOTPRINTS (which include the ground under the spans), not model floors; both are gone from the mask.
+  (2) A third mask channel, built (`paveUnderStructures` in `groundMask.ts`): the low part (within 2.5 m of the ground) of every standing
+  structure — retained landmarks (`builtRoots`), the civic chassis, megastructure feet, context massing `CTX_*`, the `*-district`
+  elements (pavilions, drone ports, towers, courts) and the `*-2127` lot models — rasterized on a 1 m grid with a 4 m apron: never lawn,
+  streets stop there with a kerb. Runs at the end of `loadOdaiba` and on the first two 120-frame diagnostics passes for late models
+  (about 0.1 s each). (3) Streets now run on through promenade belts and the planted medians (lawn gives way to the footway with a kerb);
+  grove lawns, the NE park and pools with their 14 m lawn ring are noStreet, so streets end at them with a kerb instead of slicing them.
+  District land lawn share 17.8–20.2 % (varies with what has loaded). Draw calls unchanged (hero 1335, obliqueW 1929, obliqueSE 1971).
+
 ## Actual validation results
 
 - R4 (2026-11-21, ce0b795, Mac, worktree `../city2127-paving`): root `npm test`, `npm run build`, `git diff --check` PASS. Headless Chrome
@@ -66,6 +76,8 @@ Acceptance is the owner's visual review plus an FPS check on the Mac (`scripts/f
   Headless FPS is capped at 60 in every view (no signal); `scripts/fps.sh` does not exist and headed FPS was NOT RUN. Distance shimmer was
   judged from stills only (no moving-camera check). Known, pre-existing: a tone step and mismatched street grids where the district meets
   the backdrop (same on main).
+- R5 (b183c32): root `npm test`, `npm run build`, `git diff --check` PASS; captures `paving-refine/r4/` on committed HEAD (hero, obliques W/SE,
+  W night, low kerb, low junction); headless FPS capped at 60, headed FPS NOT RUN.
 - Verification status: PARTIAL
 - Date and checked commit: 2026-11-21, 98aef7c (cloud container; R3 shots top/aerialS/midW/hero day)
 - Root `npm test`, `npm run build`, `git diff --check`: PASS.
