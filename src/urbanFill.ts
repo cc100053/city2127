@@ -7,6 +7,7 @@ import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { leaf, paint, sage, trim } from './cityRig.ts';
 import { hash } from './coastalCanopy.ts';
+import { BACKDROP_PARK, cellHash } from './groundMask.ts';
 import { changeSites, CONCEPT_LOT, DISTRICT, inDistrict, LOTS, URBAN_FILL } from './layout.ts';
 import { inHeroClear, inMega } from './megaFootprints.ts';
 import { recedeBeyondDistrict } from './bayContext.ts';
@@ -215,7 +216,7 @@ export function backdropFabric(environment: T.Object3D) {
   // ponytail: one unaccelerated ray per cell centre, four more for the cells that pass (~7k rays at load); add a BVH if the plate grows.
   for (let i = Math.floor(-2 * R / BU); i * BU < 2 * R; i++) for (let j = Math.floor(-2 * R / BV); j * BV < 2 * R; j++) {
     const a = (i + .5) * BU, b = (j + .5) * BV, { x, z } = fillWorld(a, b);
-    if (Math.hypot(x, z) > R || hash(i * 3.7 + j * 9.1 + 5) < .16) continue;
+    if (Math.hypot(x, z) > R || cellHash(i, j) < BACKDROP_PARK) continue; // a park block: the ground shader lays its lawn (groundMask.ts)
     const corners = [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([s, t]) => fillWorld(a + s * BU / 2, b + t * BV / 2));
     if (corners.some(p => p.x > DISTRICT.minX - near && p.x < DISTRICT.maxX + near && p.z > DISTRICT.minZ - near && p.z < DISTRICT.maxZ + near) || [{ x, z }, ...corners].some(p => fillReserved(p.x, p.z))) continue;
     const g = groundAt(x, z);

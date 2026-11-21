@@ -139,7 +139,8 @@ export function plantRoofCanopy(scene: T.Object3D, model: T.Object3D, tower=fals
   return clusters;
 }
 
-/** Coastal groves gather along structure — building edges, guideway, promenades and the water corridor — on authored landscape only, leaving open lawns between; circulation and landmark pads remain open. */
+/** Returns the grove terraces [x, z, ground y, radius] (the ground mask keeps lawn round them).
+ * Coastal groves gather along structure — building edges, guideway, promenades and the water corridor — on authored landscape only, leaving open lawns between; circulation and landmark pads remain open. */
 /** `streets`: extra street centrelines groves keep clear of, as of the guideway (the ④ boulevard); `cleared`: ground the old district streets covered,
  * left open lawn (src/roadRepair.ts). */
 export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,buildings:T.Object3D[],streets:T.Curve<T.Vector3>[]=[],cleared=(_x:number,_z:number)=>false) {
@@ -194,6 +195,7 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
     }
   }
   plantCanopy(scene,{instances:allee},true);
+  return clusters;
 }
 
 // Surveyed backdrop grove centres and their new grass plots, in metres.

@@ -15,12 +15,15 @@ import { facadeClimate, publishRoofGardens, towerGlow, towerNight } from './dist
 import { plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
 import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
-import { DISTRICT, inDistrict, SEAWARD_GLSL } from './layout';
+import { CONCEPT_LOT, changeSites, DISTRICT, inDistrict, LOTS, PLAZA, promenades, SEAWARD_GLSL, URBAN_FILL } from './layout';
+import { FOOTPRINTS, HERO_CLEAR } from './megaFootprints';
+import { fillWorld, type FillCell } from './urbanFill';
 import { bayContext, recedeBeyondDistrict } from './bayContext';
-import { publishDoorways, publishEntrances, routes, waterGLSL } from './mobility';
+import { inWater, publishDoorways, publishEntrances, routes, waterGLSL } from './mobility';
 import { onFormerStreet, repairRoads } from './roadRepair';
 import { streetNetwork, updateStreetKit } from './streetKit';
 import { backdropFabric, buildUrbanFill, planUrbanFill } from './urbanFill';
+import { greenShare, groundGLSL, groundMaskTexture, paintGroundMask } from './groundMask';
 import { METER_GROUND } from './districtMeters';
 
 // Literal paths bundle the district-detailed environment (scripts/crop-odaiba-district.py) and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
@@ -171,7 +174,9 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
         shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\ngrassUv=(modelMatrix*vec4(transformed,1.)).xz/32.;');
         // Road fix (owner 2026-11-20): the sine-field gravel walks drawn here are gone; they ran under buildings and flared into stars at
         // their saddles. (Stage 3 had already removed the swale ponds; the designed water is streetKit's waterGarden, cut out by openBay.)
-        shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <map_fragment>',`diffuseColor.rgb *= mix(texture2D(map,grassUv).rgb,texture2D(map,grassUv*.19).rgb,.35);`);
+        // Urban ground (owner 2026-11-21): paving and block streets by default, grass only where the ground mask is green (groundMask.ts).
+        shader.uniforms.groundMask={value:groundMaskTexture};
+        shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>\nvarying vec2 grassUv;\n${groundGLSL()}`).replace('#include <map_fragment>',`diffuseColor.rgb = groundFinish(grassUv*32., diffuseColor.rgb * mix(texture2D(map,grassUv).rgb,texture2D(map,grassUv*.19).rgb,.35));`);
       };
       material.customProgramCacheKey=()=>'coastal-grass';
     }
@@ -189,9 +194,10 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   scene.add(contextFacades(environment), bayContext(), megastructures(), floaters(), streetNetwork(environment), hydroTerrace(), bayFlower()); // after the recede wrap: the kit's ground keeps its own shading
   // Urban fill (owner 2026-11-21): city blocks on open lawn, clear of landmarks (8 m round their surveyed bounds) and Meter ground.
   const landmarkBounds = built.map(placement => placement.boundsBlender);
-  const fill = buildUrbanFill(planUrbanFill([environment, ...scene.children], (x, z) =>
+  const fillCells = planUrbanFill([environment, ...scene.children], (x, z) =>
     METER_GROUND.some(([mx, mz, r]) => Math.hypot(x - mx, z - mz) < r) ||
-    landmarkBounds.some(([[x0, y0], [x1, y1]]) => x > x0 - 8 && x < x1 + 8 && -z > y0 - 8 && -z < y1 + 8)));
+    landmarkBounds.some(([[x0, y0], [x1, y1]]) => x > x0 - 8 && x < x1 + 8 && -z > y0 - 8 && -z < y1 + 8));
+  const fill = buildUrbanFill(fillCells);
   scene.add(fill.root); glaze(fill.glass);
   // Surveyed trees on a fill block stay in the list at zero scale (each crown's pose depends on its index); street trees join the same batch.
   plantCanopy(scene,{instances:[...trees.instances.map(tree=>fill.covers(tree.position[0],-tree.position[1])?{...tree,scale:0}:tree),...fill.trees]},true);
@@ -222,6 +228,40 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     const merged = bake(model); model.clear(); parts.forEach(geometry => geometry.dispose());
     merged.forEach(mesh => { mesh.name = placement.id; model.add(mesh); });
   }));
-  plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name) || object.name==='plaza-deck'),[routes().streets[1]],(x,z)=>onFormerStreet(x,z)||fill.covers(x,z,6));
+  const groves = plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name) || object.name==='plaza-deck'),[routes().streets[1]],(x,z)=>onFormerStreet(x,z)||fill.covers(x,z,6));
   publishEntrances(scene,environment);
+  paintDistrictGround(fillCells, groves, landmarkBounds);
+}
+
+/** Ground mask (owner 2026-11-21): lawn only in parks, grove terraces, promenade and water belts; everything else paves (groundMask.ts).
+ * Block streets stay off lots, landmarks, plazas, megastructure feet and the ground district elements stand on. */
+function paintDistrictGround(cells: FillCell[], groves: readonly (readonly number[])[], landmarks: number[][][]) {
+  paintGroundMask(g => {
+    // Beyond the district the shader paves the backdrop blocks itself (groundMask.ts `groundGLSL`); this mask is read inside it only.
+    const [ux, uz] = URBAN_FILL.axis, hu = URBAN_FILL.pitch[0] / 2 - URBAN_FILL.street / 2, hv = URBAN_FILL.pitch[1] / 2 - URBAN_FILL.street / 2;
+    for (const c of cells) {
+      const { x, z } = fillWorld(c.a, c.b);
+      if (c.kind === 'park' || c.kind === 'farm') g.rect('green', x, z, ux, uz, hu, hv);
+      else if (c.kind === 'court') g.rect('green', x, z, ux, uz, hu * .45, hv * .45); // courtyard garden
+      else if (c.kind === 'sports') g.rect('green', x, z, ux, uz, hu * .8, hv * .8);
+    }
+    for (const [x, z, , r] of groves) g.circle('green', x, z, r * 2 + 6);
+    for (const path of promenades) g.band('green', path.map(([x, , z]) => ({ x, z })), 30);
+    const park = changeSites.ne; g.circle('green', park.x, park.z, 75);
+    g.where('green', (x, z) => inWater(x, z, 14) && !inWater(x, z, 0));
+    for (const l of Object.values(LOTS)) if (!l.sea) g.rect('noStreet', l.x, l.z, 1, 0, l.size / 2 + 8, l.size / 2 + 8);
+    for (const s of Object.values(changeSites)) g.rect('noStreet', s.x, s.z, 1, 0, s.w * s.scale / 2 + 10, s.d * s.scale / 2 + 10);
+    g.rect('noStreet', CONCEPT_LOT.x, CONCEPT_LOT.z, 1, 0, CONCEPT_LOT.w / 2 + 8, CONCEPT_LOT.d / 2 + 8);
+    for (const [[x0, y0], [x1, y1]] of landmarks) g.rect('noStreet', (x0 + x1) / 2, -(y0 + y1) / 2, 1, 0, (x1 - x0) / 2 + 6, (y1 - y0) / 2 + 6);
+    for (const r of [...FOOTPRINTS, ...HERO_CLEAR]) g.rect('noStreet', r.cx, r.cz, r.ux, r.uz, r.hu + 6, r.hv + 6);
+    g.rect('noStreet', PLAZA.x, PLAZA.z, Math.cos(PLAZA.yaw), -Math.sin(PLAZA.yaw), PLAZA.hu + 8, PLAZA.hv + 8);
+    for (const [x, z, r] of METER_GROUND) g.circle('noStreet', x, z, r);
+    // Linear parks: every third cross street (across the boulevard) carries a 20 m planted median, a green spine through
+    // the paving. Painted last and kept off lots, landmarks and plazas.
+    g.where('green', (x, z) => {
+      const dx = x - URBAN_FILL.origin[0], dz = z - URBAN_FILL.origin[1], a = dx * ux + dz * uz, k = a / (URBAN_FILL.pitch[0] * 3);
+      return inDistrict(x, z) && Math.abs(k - Math.round(k)) * URBAN_FILL.pitch[0] * 3 < 10;
+    }, 'noStreet');
+  });
+  console.info(`[ground] district lawn share (land only) ${(greenShare((x, z) => inDistrict(x, z) && !inWater(x, z, 0)) * 100).toFixed(1)} %`);
 }

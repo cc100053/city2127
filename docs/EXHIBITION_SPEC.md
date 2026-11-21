@@ -135,7 +135,7 @@ District 直接讀 tier；DEV `?meters`／carrier 測試用 `deriveExhibitionLay
 
 ## 城市可見變化
 
-> **已退役（version4／Meter，2026-11-21）。** 九題版本每份提案只換一個地塊嘅模型（見〈抽題輪換〉）；下面 district carriers、Meter 光點同 slot 描述只係歷史。散喺地面嘅 Meter 塔位、court、pod 位喺九題版本永遠空置，當普通城市地面規劃。
+> **已退役（version4／Meter，2026-11-21）。** 九題版本每份提案只換一個地塊嘅模型（見〈抽題輪換〉）；下面 district carriers、Meter 光點同 slot 描述只係歷史。九題版本嘅投票對 Meter 軸係中性，所以 district 元素（塔、court、pod 等）永遠凍結喺 tier 0（mixed）做固定背景；佢哋本身嘅 footprint 要避開，但唔再為其他 tier 留地，空嘅位當普通城市地面規劃。
 
 四個 site 是視覺焦點，**三個現行Meter與繼承氣候配置可影響整個 district**（2026-10-01 決策，P0–P12 已整合）；不再受原 MVP「只改四地塊」限制。
 
