@@ -115,6 +115,36 @@ Counted as the sum over placed instances in the reimported final GLB (`check_glb
 
 Kept: each type's roof outline, main window frames, entrances, balconies and the furniture seen through glass (sofa, floor lamp, dining table, café table, indoor tree, desk). The 270k version is kept at `~/city2127-evidence/q08c-housing/pre-reduce-270k/` (and in commit `4fd555b3`). Same-camera comparison: `compare-reduce-270k-vs-195k.jpg` (main day, front day, main night; left before, right after); close-up spot checks: `compare-reduce-closeups.jpg` and `after-195k/{ellipse_view,stepped_terrace,glass_garden}/`.
 
+## Sculpt round (2026-11-21, owner: no people, three sculpted types, seed 2127, < 200k)
+
+- **People removed.** The builders no longer create any (`seated_person`, `person`, the preview promenade crowd and the review scale figure are gone). The reimported GLB and the `.blend` use no `in_skin` / `in_cloth_*` material and hold no person or figure object; the pre-sculpt GLB, used as a control, still shows five such materials. Furniture and plants are kept.
+- **Ellipse view house (`rnd=3`).**
+  - The shell section drops its right shoulder (`E_SKEW` 0.55), so the crown leans left.
+  - A pearl-pink lip band (`_shell_band`, material `h_pearl`) wraps from the left flank over the crown to the right flank. It thins from 0.34 to 0.12 m and has a slanted front edge: 0.45 m past the nose on the left, 0.35 m short of it on the right.
+  - The band starts at z 7.1. Its first try started at 6.8 and covered the side porthole.
+  - The elliptical window now sits at the back of a 0.55 m reveal.
+- **Rib vault house.**
+  - A leaning Bézier section, steep on the left with its crown near x −0.8, falling long to a low wall on the right.
+  - Four white ribs fan from one knuckle at the front-left foot (`RV_PIVOT`). Glazing bars run between them, and the front glazing bars radiate from the same corner.
+  - The portal sits at z 6.8–7.15, clear of the node collars.
+- **Stepped terrace house.**
+  - The living step's roof sweeps out as an upper curved terrace bulging left.
+  - A thicker lower curved terrace bulges right on two brackets from the beam face, with a deep fascia past the slab edge.
+  - Both curved edges are planter troughs with soil, leaves and a glass guard. Bench and café table on the lower terrace.
+- **Unchanged.** Glass garden and folded roof, seed 2127 placement, frame, rail and hanging house; no pier.
+- **Checks (2026-11-21, uncommitted worktree on `f71bb99c`).**
+  - `build_housing_tower.py`: frame clashes 0, house clashes 0, entrances 57/57, placement map unchanged.
+  - `check_glb.py`: PASS, 197,896 tris expanded per placed instance. Houses 152,268, commons 19,496, frame 20,364, rail 5,148, trolley + spreader 620. 39 materials, 3,470,272 bytes.
+  - Per type: ellipse 3,486, rib vault 2,684, stepped 2,464, glass garden 2,796, folded roof 1,688.
+- **Review method.** The same fallback for Dream Loop as before: Blender render → compare → fix → re-render, with fixed `house`, `main` and `front` cameras.
+  - Round a1 showed a dark chassis strip under the stepped terrace (the chassis was cut back to 5.4 m), a chair outside the trough (moved) and a pale band on the ellipse (made pinker and thicker).
+  - Final views confirmed the porthole and the far-view silhouettes.
+- **Evidence** (`~/city2127-evidence/q08c-housing/`).
+  - `pre-sculpt-195k/` holds the previous `.blend`, `.glb` and report.
+  - `sculpt/before|a1|after/<type>/` (beauty, clay, clay_back), `sculpt/tower/`, `sculpt/tower-before/` (main clay), `sculpt/lineup/`.
+  - `compare-sculpt-closeups.jpg`: rows ellipse, rib vault, stepped; columns before, after, before clay, after clay.
+  - `compare-sculpt-tower.jpg`: left before, right after; main day, main clay, front day, main night.
+
 ## Next expected step
 
 The owner reviews the sheets and renders. Then: agree the triangle budget, decide on the boat/pier route, and push `feat/q08c-housing-tower`. City placement (`addCityModel`, lot, browser checks, FPS) is a separate task.

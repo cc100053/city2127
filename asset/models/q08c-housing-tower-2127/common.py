@@ -228,6 +228,7 @@ def make_materials():
         "h_door": mat("house_door", (.22, .28, .32, 1), .4, .3),
         "h_lamp": mat("house_lamp", (1, .86, .62, 1), .4, emit=(1, .72, .4, 1), strength=3.0),
         "h_roof": mat("house_roof", (.20, .23, .26, 1), .45, .2),
+        "h_pearl": mat("house_shell_pearl", (.95, .80, .78, 1), .22, .35),
     })
     for role, (rgba, emit, strength) in M.ROLES.items():           # accepted interior recipe (LIBRARY: modules.ROLES)
         MATS["in_" + role] = mat("in_" + role, rgba, .6, emit=emit, strength=strength, culling=rgba[3] >= 1)

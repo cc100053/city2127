@@ -105,20 +105,8 @@ def mock_bays(col, n=1, step=6.0):
     return add_obj("PV_MockBay", build_mesh("pv_mock_bay", a), col)
 
 
-def ground_figure(col, x, z, y=0.0):
-    """1.8 m scale figure."""
-    m = material("pv_figure", (.18, .22, .30, 1), .7)
-    f = Acc()
-    cyl(f, x, z, .17, y, y + .85, 10)
-    cyl(f, x, z, .22, y + .85, y + 1.5, 10, r_top=.19)
-    blob(f, (x, y + 1.66, z), (.12, .14, .12), sub=1, noise=0, flat=1)
-    ob = finish_mesh("PV_Figure", f, m)
-    col.objects.link(ob)
-    return ob
-
-
 def context(col, seed=8):
-    """Water, promenade with a sea wall, lawns, trees, people and a distant city ring."""
+    """Water, promenade with a sea wall, lawns, trees and a distant city ring (no people: owner 2026-11-21)."""
     rng = random.Random(seed)
     mats = {
         "pv_water": material("pv_water", (.07, .26, .40, 1), .06),
@@ -130,11 +118,6 @@ def context(col, seed=8):
         "pv_bark": material("pv_bark", (.22, .15, .10, 1), .9),
         "pv_city": material("pv_city", (.88, .88, .86, 1), .5),
         "pv_cityg": material("pv_cityg", (.40, .55, .62, 1), .2, (1, .75, .45, 1), .0),
-        "pv_dark": material("pv_dark", (.06, .06, .07, 1), .8),
-        "pv_c1": material("pv_c1", (.85, .85, .82, 1), .8),
-        "pv_c2": material("pv_c2", (.10, .18, .40, 1), .8),
-        "pv_c3": material("pv_c3", (.55, .25, .15, 1), .8),
-        "pv_skin": material("pv_skin", (.65, .45, .33, 1), .7),
     }
     from geo_helpers import Acc
     a = {k: Acc() for k in mats}
@@ -149,12 +132,6 @@ def context(col, seed=8):
         h = rng.uniform(3.5, 6)
         cyl(a["pv_bark"], x, z, .18, 0, h * .5, 8)
         blob(a["pv_bloom" if i % 3 == 0 else "pv_tree"], (x, h * .72, z), (h * .32, h * .28, h * .32), sub=2, seed=i, noise=.2)
-    for i in range(18):
-        x, z = rng.uniform(-30, 30), rng.uniform(13, 19)
-        s = rng.uniform(.95, 1.05)
-        cyl(a["pv_dark"], x, z, .15 * s, 0, .85 * s, 8)
-        cyl(a[rng.choice(["pv_c1", "pv_c2", "pv_c3"])], x, z, .2 * s, .85 * s, 1.45 * s, 10, r_top=.17 * s)
-        blob(a["pv_skin"], (x, 1.62 * s, z), (.12 * s,) * 3, sub=1, noise=0, flat=1)
     for i in range(16):
         ang = rng.uniform(math.radians(200), math.radians(340))
         r = rng.uniform(230, 320)

@@ -145,8 +145,6 @@ def pocket_garden(a, ctx, slot, rng):
     M.kit_prop(tctx, "bench", .1, .06, 4.6, math.pi)
     rbox(T["t_white"], -1.6, 3.0, .45, .45, .06, .5, r=.15, b=.04, n=1)          # shrub box (cheaper than tree_indoor)
     H.leafy(T, -1.6, .75, 3.0, .32, 3, seed=slot[1] + slot[2])
-    if rng.random() < .6:
-        M.person(tctx, .8, .06, 3.4)
 
 
 def sky_gardens(a, ctx, rng):
@@ -160,8 +158,6 @@ def sky_gardens(a, ctx, rng):
     for x in (-5.0, 5.0):
         M.kit_prop(ctx, "planter_1m", x, y2 + .06, 8.7)
     M.kit_prop(ctx, "cafe_set", .2, y2 + .06, 5.0)
-    for x, z in ((-.6, 6.6), (1.8, 4.2), (2.4, 8.2)):
-        M.person(ctx, x, y2 + .06, z)
     edge_rail(a, VOID[0] + .3, VOID[1] - .3, 9.45, y2)
     y3 = yl(3)                                                                 # rails round the level-3 opening
     edge_rail(a, VOID[0] + .2, VOID[1] - .2, 3.1, y3)
@@ -176,8 +172,6 @@ def sky_gardens(a, ctx, rng):
     M.kit_prop(ctx, "bench", -12, y5 + .06, 4.2)
     for x in (-17.0, -7.0):
         M.kit_prop(ctx, "planter_1m", x, y5 + .06, 4.0, math.pi / 2)
-    M.person(ctx, -11.0, y5 + .06, 6.8)
-    M.person(ctx, -15.6, y5 + .06, 5.0)
     edge_rail(a, -17.7, -6.3, 9.45, y5)
 
 
@@ -195,7 +189,6 @@ def side_terraces(a, ctx, rng):
             if big:
                 M.kit_prop(ctx, "planter_1m", sx * 21, y + .06, -2.6)
                 M.kit_prop(ctx, "cafe_set", sx * 21.2, y + .06, -.6, math.pi / 2)
-                M.person(ctx, sx * 20.5, y + .06, -1.0)
 
 
 def corridors(a):
