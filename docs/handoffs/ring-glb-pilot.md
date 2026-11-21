@@ -1,11 +1,22 @@
 # ring-glb-pilot — 直立環形巨構
 
 - Owner — Codex。視覺驗收由 cc100053 決定。
-- Status — R6 候選待業主審圖，整合由業主決定。
+- Status — R6 已依業主指示整合 main，展覽機待測。
 - Branch — `codex/ring-glb-pilot`。
-- Remote — `origin/codex/ring-glb-pilot`，供審圖。
+- Remote — `origin/main`，原候選保留於 `origin/codex/ring-glb-pilot`。
 - Base — `6239fa813857e3a321c8f4a8189af2d4e5113159`。
 - Implementation — R6 `dadffcc2`，R5 `f1fd0933`，R4 `865cd5058e6d4b01f48c0dab37b67911ee08e4fc`，R3 `1cfe3321d5444ab262d5043a3b70200752f21cdc`，R2 `5d80004d5a04d9427e276213016b85adde98ae3d`，R1 `0bbb94da91a885a53f233afa3db760c3eefb504e`.
+
+## Main 整合（2026-11-21）
+
+業主指示合併。由候選 `a4b8e8360090618773263edff13de6797ceefb6c` 接手，候選與其遠端為 0 / 0，最新 `origin/main` 為 `2a5d842c920d2df76142aa377265cd88d2b2f5b5`，雙方各有 12／27 個獨有提交。主 checkout 快轉本機 main 後以雙親提交 `ca3b866361b24403058a512aa204974d782c3f10` 整合。未追蹤的 `Dev_QA.md` 仍在原位，SHA-256 與整合前相同。
+
+唯一衝突在 `loadOdaiba` 的場景組裝。先載入 R6 環身，將同一組場景傳入 main 的街廓佈置，再按實際載入的下環版本接通居民步道。合併保留 main 的鋪面、街廓、遠景及樹位處理。環形 GLB、R6 植株及大堂步道檔與候選一致。
+
+- 整合提交通過根目錄 `npm test`、`npm run build`、`git diff --check` 及圖片記錄檢查。
+- Chrome 以 3200 × 1800／DPR 1、`reviewTime=20` 擷取 12:00／21:00 原 Hero 鏡位，確認 R6 環內植栽及 main 鋪面同場呈現，兩張均零 page error。居民日夜各 558 條視線均先命中指定門牌，兩個時段均有居民行走及正常步態。
+- 正式 build 日夜均成功載入四份環形 GLB，夜間模擬轉乘大堂的 GLB 404 後載入 R2 下環。Apple M6／Chrome 157.0.8103.79 headless／ANGLE Metal、1920 × 1080／DPR 1，每個頁面各取一個 120 幀窗口，依次為 56.9、54.3 及 50.0 FPS，零 page error。
+- 原圖、sidecar、測試及瀏覽器記錄存於 `~/city2127-evidence/ring-glb-pilot/integration/`。展覽機未測。
 
 ## Round 6
 
@@ -37,7 +48,7 @@ Gemini 的 Create image 收到 R5 Hero 日景原圖及同圖裁切。採用首�
 - 正式 build 的 12:00／21:00 頁面均成功載入入口、大堂下環、雙肩及冠部 GLB；夜間模擬大堂下環回應 404 後，退回 R2 下環並完成渲染。Apple M6／Chrome 157.0.8103.79 headless／ANGLE Metal、1920 × 1080／DPR 1，三個頁面各取一個 120 幀窗口，均為 60.0 FPS，零 page error。正常日夜樣本為 1,391／1,392 draws。
 - 拍攝保留 UI 及原 Hero 鏡位，3200 × 1800／DPR 1、`reviewTime=20`，日夜零 page error。原圖裁切 x 330–950、y 710–1230；Gemini 全圖按相同比例對位。R6 sidecar 記錄 R5 基準及擷取時的工作樹改動。Gemini 下載原檔、提示、擷取 sidecar 及瀏覽器記錄均存於 `~/city2127-evidence/ring-glb-pilot/r6/`。
 
-候選推送至 `origin/codex/ring-glb-pilot`。下一步由業主按 Hero 對照審圖並決定整合，展覽機實測待安排。
+候選推送至 `origin/codex/ring-glb-pilot` 供審圖，後續依業主指示整合。
 
 ## Round 5
 

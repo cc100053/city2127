@@ -121,6 +121,8 @@ ANGLE Metal), Vite DEV, 1920×1080 viewport, deviceScaleFactor 1 (renderer pixel
 
 ## Current evidence and open acceptance
 
+直立環形巨構 R6（2026-11-21，main 整合 `ca3b8663`）：根目錄測試、build、差異及圖檔檢查通過。合併後重新擷取原 Hero 日夜，覆核居民接駁門牌視線與正式 GLB 載入／R2 回退。展覽機未測。[整合記錄](handoffs/ring-glb-pilot.md)
+
 直立環形巨構 R6 候選 `dadffcc2`（2026-11-21）：根目錄 `npm test`、`npm run build`、`git diff --check` 通過。實際種植面測試覆蓋四個載入版本、四道下環種植帶及道路 ①／Yurikamome 淨空。Chrome 日夜共 1,116 條居民視線均先命中門牌，正式 build 的日夜載入及夜間 R2 回退通過。開發 Mac 1080p／DPR 1 的三個 120 幀窗口為 60.0 FPS。展覽機未測。[Gemini 目標、日夜對照及完整驗證](handoffs/ring-glb-pilot.md#round-6)
 
 直立環形巨構 R5 候選 `f1fd0933` 於 2026-11-21 通過根目錄 `npm test`、`npm run build` 及 `git diff --check`。[幾何測試](../tests/megastructures.test.ts) 核對環內兩側樹根接入種植帶，並重跑道路 ①、Yurikamome 同下環接駁淨空。Chrome 日夜各 558 條居民視線先命中門牌，正式 build 的日夜載入及夜間 R2 回退通過。[原鏡位日夜對照、紅圈裁圖及驗證記錄](handoffs/ring-glb-pilot.md#round-5)
