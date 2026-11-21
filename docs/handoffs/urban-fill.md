@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS (awaiting owner visual review)
 - Branch: claude/project-thread-8fkqrt
 - Base commit: 6239fa8 (origin/main, PR #9 merged)
-- Last verified commit: 0e4176f
+- Last verified commit: 98aef7c
 - Remote availability: origin/claude/project-thread-8fkqrt
 
 ## Session Git state
@@ -51,7 +51,7 @@ Acceptance is the owner's visual review plus an FPS check on the Mac (`scripts/f
 ## Actual validation results
 
 - Verification status: PARTIAL
-- Date and checked commit: 2026-11-21, 0e4176f (cloud container)
+- Date and checked commit: 2026-11-21, 98aef7c (cloud container; R3 shots top/aerialS/midW/hero day)
 - Root `npm test`, `npm run build`, `git diff --check`: PASS.
 - Cloud headless Chromium (SwiftShader, `?meters&hour=12|21&reviewTime=40&quality=low`, 1600×900): hero day/night, aerials S/E/N, mid views W/NE;
   no page errors. Sheets in the project files `grass-fill/`.
@@ -59,6 +59,7 @@ Acceptance is the owner's visual review plus an FPS check on the Mac (`scripts/f
 
 ## Known gaps / next step
 
-- The hero frame barely changes: its lawn pockets (owner zones 1–3) are HERO_CLEAR, Meter or lot ground. Needs its own owner decision.
+- The hero frame keeps its foreground lawn (promenade belt, HERO_CLEAR); owner to judge.
+- Paving tone `PAVING.slab` may need a darker value on the exhibition display (reads bright at noon in SwiftShader).
 - Backdrop blocks are plain boxes with roof greens; no night windows (they read dark at night).
 - Owner runs `scripts/fps.sh` before/after on the Mac.
