@@ -12,3 +12,4 @@ On 2026-11-21 at 14:49 JST, the R5 ring isolation script called the shared `laun
 - `node scripts/capture.mjs --self-test` passed, including the sandbox guard assertion. The actual sandboxed capture command exited 1 with the new terminal message and did not produce a new macOS Chrome crash report.
 - An approved invocation of the capture CLI rendered the main city at 12:00, 1600 × 900, DPR 1. The screenshot and sidecar were written, and the sidecar reported zero page errors. The test closed Chrome and its loopback preview. Rendering performance was outside this check.
 - Root `npm test`, `npm run build` and `git diff --check` passed in the independent checkout. Survey and module-swap source were unchanged.
+- Verified implementation `d4928825` and integration `20aca780`. The merge tree matched the validated task tree and the capture self-test and integrated whitespace check passed. The task branch is available on `origin`.
