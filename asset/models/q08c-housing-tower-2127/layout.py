@@ -32,8 +32,9 @@ RESERVED = {
 # Sides' middle bays (owner 2026-11-21): on every level the middle bay and the same level's front corner bay share
 # one corridor landing (the corner house's door can only be reached through it; the columns leave 4.8 m, a house is
 # 4.4 m wide), so a level gives the landing to one of them. Public terraces stay on TERRACE_LEVELS; on the levels
-# listed in SIDE_MIDDLE the middle bay becomes a house slot ("house": drawn, "empty": kept free for a delivery) and
-# the front corner bay becomes a small garden; on the remaining levels it is a plain corridor landing.
+# listed in SIDE_MIDDLE the middle bay becomes a house slot ("house": drawn, "empty": kept free for a delivery). Beside
+# an empty middle slot the front corner bay is an empty slot too (the pair shares the landing: whichever is filled
+# first takes it); beside a middle house the corner bay is blocked (no corridor). Elsewhere it is a plain landing.
 TERRACE_LEVELS = (1, 4)
 SIDE_MIDDLE = {"L": {0: "house", 2: "empty", 3: "house", 5: "empty"}, "R": {2: "house", 3: "empty", 5: "house"}}
 CORNER = {"L": 0, "R": FRONT_BAYS - 1}
@@ -75,19 +76,20 @@ def place(seed, types=TYPES, open_rate=OPEN_RATE):
 
 
 def side_middle(seed, assign, opened):
-    """Apply SIDE_MIDDLE after the main draw (so the rest of the facade keeps its seed result): corner bays on those
-    levels become gardens, "house" middle slots are drawn with the same neighbour rule. Returns
-    (assign, opened, corner_gardens, empty_slots, landings)."""
+    """Apply SIDE_MIDDLE after the main draw (so the rest of the facade keeps its seed result). Corner bays on those
+    levels lose their house: beside an empty middle slot they become empty slots, beside a middle house they are
+    blocked. "house" middle slots are drawn with the same neighbour rule. Returns
+    (assign, opened, blocked_corners, empty_slots, landings); empty_slots holds the middle and corner pair slots."""
     rng = random.Random(seed * 7 + 1)
     assign, opened = dict(assign), set(opened)
-    gardens, empty, landings = set(), set(), set()
+    blocked, empty, landings = set(), set(), set()
     for side, prog in SIDE_MIDDLE.items():
         for l in range(NL):
             if l in prog:
                 c = ("F", l, CORNER[side])
                 assign.pop(c, None)
                 opened.discard(c)
-                gardens.add(c)
+                (empty if prog[l] == "empty" else blocked).add(c)
             elif l not in TERRACE_LEVELS:
                 landings.add((side, l, 1))
     used = {t: 0 for t in TYPES}
@@ -104,7 +106,7 @@ def side_middle(seed, assign, opened):
             t = rng.choices(allowed, [1 / (1 + used[t]) ** 2 for t in allowed])[0]
             assign[s] = t
             used[t] += 1
-    return assign, opened, gardens, empty, landings
+    return assign, opened, blocked, empty, landings
 
 
 def stats(assign, opened):

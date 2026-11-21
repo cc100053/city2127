@@ -1,6 +1,8 @@
 """Render the housing tower .blend from the fixed preview cameras, by day and by night, and as a clay model.
 
-blender -b <q08c-housing-tower-2127[-s<seed>].blend> --factory-startup --python-exit-code 1 -P review_tower.py -- <out_dir> [main,front,side] [day,night,clay]
+blender -b <q08c-housing-tower-2127[-s<seed>].blend> --factory-startup --python-exit-code 1 -P review_tower.py -- <out_dir> [main,front,side] [day,night,clay,guide]
+"guide" = day light with the preview-only Q08H_Guides (cyan pod outline at the hoist line and an arrow into each empty
+slot); the other modes hide them.
 Camera "main" repeats the 8C reference framing (front-left, high, 1100 x 825) used for v1/v2.
 """
 import os
@@ -18,7 +20,10 @@ cams = (args[1] if len(args) > 1 else "main,front,side").split(",")
 modes = (args[2] if len(args) > 2 else "day,night").split(",")
 os.makedirs(out, exist_ok=True)
 scene = bpy.context.scene
+guides = bpy.data.collections.get("Q08H_Guides")
 for mode in modes:
+    if guides:                                     # "guide": day light plus the review-only slide-in guides
+        guides.hide_render = mode != "guide"
     if mode == "clay":
         S.clay(scene)
     else:

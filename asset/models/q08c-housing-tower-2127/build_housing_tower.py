@@ -50,11 +50,13 @@ Y_ROOF = G + NL * LV                         # 41
 COL, SLAB = 1.2, .35
 CORE = (-15.4, 15.4, -8.6, .4)               # core x0, x1, z0, z1
 LOBBY = (-3.2, 3.2, -2.4)                    # lift lobby notch in the core front: x0, x1, back z
-GY, GZ = 46.0, 14.3                          # rail beam centre height and line (14.3: clear of every front house)
+GY, GZ = 46.0, 14.65                         # rail beam centre height and line: a hanging pod (back fittings
+                                             # 0.6 m behind its back face) clears every front house's reach
 DELIVERY = ("F", 4, 6)
 HANG_Z = GZ - 2.7                            # back face of the hanging house: its lugs straddle the rail line
-SIDE_HANG_X = 26.7                           # side slots: back face of a house hanging at the side rail
+SIDE_HANG_X = 27.0                           # side slots: back face of a house hanging at the side rail
 SIDE_RAIL_X = SIDE_HANG_X + 2.7              # side rails' line (+-)
+POD_TOP_Y = GY - 1.75 - 4.3                  # highest pod base: hoisted up under the trolley and its spreader
 VOID = (-6.0, 6.0)                           # level-3 slab opening over the sky garden (front bays 3, 4)
 
 
@@ -136,17 +138,11 @@ def edge_rail(a, x0, x1, z, y, along_x=True):
         rail(a["t_rail"], a["t_glass"], a["t_rail"], (z, y, x0), (z, y, x1), h=1.1, step=1.5)
 
 
-def pocket_garden(a, ctx, slot, rng):
-    """An open bay left by the draw: deck, planters, a bench and a small tree behind the slab-edge rail."""
+def blocked_bay(a, slot):
+    """A front corner bay with no corridor (its side middle bay holds a house): bare slab, slab-edge safety rail."""
     (cx, y, cz), yaw = slot_xform(slot)
     T = H.Turned(a, cx, y, cz, math.radians(yaw))
-    obox(T["t_deck"], (0, .03, 3.1), (4.6, .06, 5.9), X, Z)
-    rail(T["t_rail"], T["t_glass"], T["t_rail"], (-2.35, .06, 6.4), (2.35, .06, 6.4), h=1.1, step=1.2)
-    tctx = M.Ctx(role_view(T), rng)
-    M.kit_prop(tctx, "planter_1m", 1.4, .06, 5.9)
-    M.kit_prop(tctx, "bench", .1, .06, 4.6, math.pi)
-    rbox(T["t_white"], -1.6, 3.0, .45, .45, .06, .5, r=.15, b=.04, n=1)          # shrub box (cheaper than tree_indoor)
-    H.leafy(T, -1.6, .75, 3.0, .32, 3, seed=slot[1] + slot[2])
+    rail(T["t_rail"], T["t_glass"], T["t_rail"], (-2.35, 0, 6.45), (2.35, 0, 6.45), h=1.1, step=1.2)
 
 
 def sky_gardens(a, ctx, rng):
@@ -195,33 +191,32 @@ def side_middles(a, ctx, landings):
 
 
 def empty_slot(a, slot):
-    """A house slot kept free: steel guide rails, a yellow footprint and a slim yellow frame of the pod envelope
-    (4.4 x 3.8 x 6.4 m), a dark docking plate with an amber strip on the corridor side, amber lamps at the mouth and a
-    yellow-and-dark gate bar across the slab edge."""
+    """A true empty slot: bare slab with two guide rails set flush in it (1.2 cm), running from the corridor edge to
+    the slab edge. The loading opening has no rail, gate or fittings, so a pod slides straight in from outside."""
     (cx, y, cz), yaw = slot_xform(slot)
     T = H.Turned(a, cx, y, cz, math.radians(yaw))
     for s in (-1, 1):
-        obox(T["t_rail"], (s * 1.5, .06, 3.3), (.16, .12, 6.2), X, Z)
-        obox(T["t_yellow"], (s * 2.2, .012, 3.3), (.1, .024, 6.4), X, Z)
-        obox(T["t_amber"], (s * 2.25, .3, 6.35), (.22, .22, .08), X, Z)
-        obox(T["t_dark"], (s * 1.6, .55, 6.42), (.08, 1.1, .08), X, Z)
-    for z in (.1, 6.45):
-        obox(T["t_yellow"], (0, .012, z), (4.4, .024, .1), X, Z)
-    obox(T["t_dark"], (0, .45, .25), (1.2, .9, .2), X, Z)
-    obox(T["t_amber"], (0, .75, .36), (.5, .12, .02), X, Z)
-    w, top, z0, z1 = 2.18, 3.75, .3, 6.4                                       # the pod envelope, drawn as a slim frame
+        obox(T["t_rail"], (s * 1.5, .006, 3.3), (.16, .012, 6.5), X, Z)
+
+
+def guides(a, slot):
+    """Review-only: a cyan pod outline hanging at the hoist line outside the slot and an arrow into the opening."""
+    (cx, y, cz), yaw = slot_xform(slot)
+    T = H.Turned(a, cx, y, cz, math.radians(yaw))
+    out = slot_out(slot)
+    z0, z1, w, top = out + .05, out + 7.9, 2.2, 3.8
     for sx in (-1, 1):
         for z in (z0, z1):
-            obox(T["t_yellow"], (sx * w, (.06 + top) / 2, z), (.06, top - .06, .06), X, Z)
-        obox(T["t_yellow"], (sx * w, top, (z0 + z1) / 2), (.06, .06, z1 - z0), X, Z)
-    for z in (z0, z1):
-        obox(T["t_yellow"], (0, top, z), (2 * w, .06, .06), X, Z)
-    for k in range(4):                                                         # gate bar in yellow and dark bands
-        obox(T["t_yellow" if k % 2 == 0 else "t_dark"], (-1.2 + .8 * k, 1.05, 6.42), (.8, .1, .08), X, Z)
+            obox(T["g_ghost"], (sx * w, top / 2, z), (.06, top, .06), X, Z)
+            obox(T["g_ghost"], (0, (0, top)[(sx + 1) // 2], z), (2 * w, .06, .06), X, Z)
+        for yy in (0, top):
+            obox(T["g_ghost"], (sx * w, yy, (z0 + z1) / 2), (.06, .06, z1 - z0), X, Z)
+    obox(T["g_arrow"], (0, 1.9, out - .6), (.3, .3, out - 6.0), X, Z)
+    loft(T["g_arrow"], [[(-.75, yy, 7.6), (.75, yy, 7.6), (0, yy, 6.6)] for yy in (1.72, 2.08)])
 
 
 def corridors(a, mid_slots):
-    """Front and side corridors; on a level whose side middle bay is a slot the front corridor stops at x = +-18."""
+    """Front and side corridors; on a level whose side middle bay holds a house the front corridor stops at x = +-18."""
     for l in range(NL):
         y = yl(l)
         x0 = -18.0 if ("L", l, 1) in mid_slots else -24.0
@@ -340,8 +335,88 @@ def build_spreader(a, drop):
     for sx in (-1, 1):
         for zz in H.LUG_Z:
             z = zz - 2.7
-            obox(a["t_yellow"], (sx * 2.45, -.2, z), (.4, .14, .16), X, Z)
-            obox(a["t_dark"], (sx * 2.31, -.2 - drop / 2, z), (.035, drop, .035), X, Z)
+            obox(a["t_yellow"], (sx * 2.38, -.2, z), (.4, .14, .16), X, Z)
+            obox(a["t_dark"], (sx * 2.21, -.2 - drop / 2, z), (.035, drop, .035), X, Z)
+
+
+def slot_out(slot):
+    """How far a pod hangs outside its slot (local +z) at the hoist line before it slides in."""
+    return HANG_Z - 3.0 if slot[0] == "F" else SIDE_HANG_X - 18.0
+
+
+def slot_matrix(slot, out=0.0, up=0.0):
+    (x, y, z), yaw = slot_xform(slot)
+    r = math.radians(yaw)
+    p = (x + math.sin(r) * out, y + up, z + math.cos(r) * out)
+    return Matrix.Translation(C.B(p)) @ Matrix.Rotation(r, 4, "Z")
+
+
+def sweep_check(slots, meshes, obstacle_objs, step=.25, drop_step=.75, lift=.03, home=.01, own=()):
+    """Move every pod type along its real delivery path into each empty slot: lowered at the hoist line from the
+    highest hoisted position (POD_TOP_Y) to the slot's level, then slid horizontally into the opening, 3 cm above the
+    slab and its flush rails, to 1 cm short of home (at home the slab-edge shoes and chassis touch the frame by design;
+    the placed houses' clash check uses the same allowance). Each position is tested against the frame, commons, rail
+    and every placed house (BVH overlap); `own` names the objects of a delivery already under way for that slot."""
+    v, f, each = [], [], []
+    for ob in obstacle_objs:
+        mw = ob.matrix_world
+        b = len(v)
+        ov = [mw @ q.co for q in ob.data.vertices]
+        of = [tuple(p.vertices) for p in ob.data.polygons]
+        each.append((ob.name, BVHTree.FromPolygons(ov, of)))
+        v += ov
+        f += [tuple(b + i for i in p) for p in of]
+    obst = BVHTree.FromPolygons(v, f)
+
+    def who(t):
+        return [n for n, b in each if t.overlap(b)]
+    geo = {k: ([q.co.copy() for q in me.vertices], [tuple(p.vertices) for p in me.polygons]) for k, me in meshes.items()}
+    out = {}
+    for slot in slots:
+        res, top = {}, POD_TOP_Y - yl(slot[1])
+        skip = own if slot == DELIVERY else ()
+        tree = obst if not skip else BVHTree.FromPolygons(*_merge_world([o for o in obstacle_objs if o.name not in skip]))
+        for kind, (vs, fs) in geo.items():
+            hits = []
+            o = slot_out(slot)
+            k = 0
+            while top - k * drop_step > lift:                                    # vertical drop at the hoist line
+                mw = slot_matrix(slot, o, top - k * drop_step)
+                t = BVHTree.FromPolygons([mw @ q for q in vs], fs)
+                if t.overlap(tree):
+                    hits.append(("drop", round(top - k * drop_step, 2), who(t)))
+                k += 1
+            n = int(o / step)
+            for i in range(n + 1):                                               # horizontal slide into the slot
+                d = home + (o - home) * (1 - i / n)
+                mw = slot_matrix(slot, d, lift)
+                t = BVHTree.FromPolygons([mw @ q for q in vs], fs)
+                if t.overlap(tree):
+                    hits.append(("slide", round(d, 2), who(t)))
+            res[kind] = hits[:3]
+        out["%s%d_%d" % slot] = {"clear": not any(res.values()), "hits": {k: h for k, h in res.items() if h}}
+    return out
+
+
+def _merge_world(objs):
+    v, f = [], []
+    for ob in objs:
+        b = len(v)
+        v += [ob.matrix_world @ q.co for q in ob.data.vertices]
+        f += [tuple(b + i for i in p.vertices) for p in ob.data.polygons]
+    return v, f
+
+
+def pod_envelope(meshes, z_line=6.75):
+    """What of the five pod types passes the frame line while sliding in (final local z < z_line, the node collars'
+    outer face), in local metres, against the opening: columns leave +-2.4 m, node collars +-2.25 m below 0.3 m and
+    above 3.75 m, the beam soffit is at 3.9 m. Wider or taller parts (shell band, eaves, terraces) stop outside it."""
+    pts = [(q.co[0], q.co[2], -q.co[1]) for me in meshes.values() for q in me.vertices]
+    inner = [p for p in pts if p[2] < z_line and p[1] > 0]
+    mid = [abs(p[0]) for p in inner if .3 < p[1] < 3.75]
+    band = [abs(p[0]) for p in inner if p[1] <= .3 or p[1] >= 3.75]
+    return {"width_between_collar_heights": round(2 * max(mid), 3), "width_at_collar_heights": round(2 * max(band), 3),
+            "height": round(max(p[1] for p in inner), 3)}
 
 
 # --- checks --------------------------------------------------------------------------------------------------------------
@@ -406,8 +481,9 @@ def main():
     scene.collection.children.link(prev_col)
     rng = random.Random(SEED)
     assign, opened = LY.place(SEED)
-    assign, opened, corner_gardens, empty_slots, landings = LY.side_middle(SEED, assign, opened)
-    mid_slots = {s for s in assign if s[2] == 1 and s[0] != "F"} | empty_slots
+    assign, opened, blocked, empty_slots, landings = LY.side_middle(SEED, assign, opened)
+    mid_slots = {s for s in assign if s[2] == 1 and s[0] != "F"}
+    empty_slots = empty_slots | opened | {DELIVERY}                            # every bay without a house is a slot
 
     root = bpy.data.objects.new("Q08H_HousingTower", None)
     root.empty_display_size = 4
@@ -426,11 +502,11 @@ def main():
     lobby(com)
     sky_gardens(com, ctx, rng)
     side_middles(com, ctx, landings)
-    for s in sorted(empty_slots | {DELIVERY}):
+    for s in sorted(empty_slots):
         empty_slot(com, s)
     roof_garden(com, ctx, rng)
-    for s in sorted(opened | corner_gardens):
-        pocket_garden(com, ctx, s, rng)
+    for s in sorted(blocked):
+        blocked_bay(com, s)
     add_obj("Q08H_Commons", build_mesh("q08h_commons", com), asset_col, root)
     rl = Accs()
     build_rail(rl)
@@ -463,6 +539,17 @@ def main():
     add_obj("Q08H_Spreader", build_mesh("q08h_spreader", sp), asset_col, root, (hx, sp_y, GZ))
 
     rep = checks([frame["t_white"], frame["t_core"]], hobs + [hang])
+    obstacles = [o for o in asset_col.objects if o.type == "MESH"]
+    sweep = sweep_check(sorted(empty_slots), meshes, obstacles, own=("Q08H_House_Delivery", "Q08H_Spreader", "Q08H_Trolley"))
+    env = pod_envelope(meshes)
+    opening = {"between_columns": round(BAY - COL, 2), "between_node_collars": round(BAY - 1.5, 2),
+               "slab_to_beam_soffit": round(LV - 1.1, 2), "slab_to_slab_soffit": round(LV - SLAB, 2), "pod": env}
+    gd = Accs()
+    for s in sorted(empty_slots):
+        guides(gd, s)
+    gcol = bpy.data.collections.new("Q08H_Guides")
+    prev_col.children.link(gcol)
+    add_obj("PV_Guides", build_mesh("pv_guides", gd), gcol)
     reach = {}                                                                  # max reach of each type past its slot line
     for k, me in meshes.items():
         reach[k] = max(-v.co[1] for v in me.vertices)                          # Blender -Y = local +z
@@ -485,9 +572,10 @@ def main():
               "entrance_fail": {k: v for k, v in rep["entrance"].items() if not v["ok"]},
               "entrances_checked": len(rep["entrance"]), "hoist": hoist,
               "side_middle_houses": sorted("%s%d_%d=%s" % (s + (assign[s],)) for s in assign if s[0] != "F" and s[2] == 1),
-              "empty_slots": sorted("%s%d_%d" % s for s in empty_slots | {DELIVERY}),
-              "corner_gardens": sorted("%s%d_%d" % s for s in corner_gardens),
-              "map": LY.front_map(assign, opened | corner_gardens)}
+              "empty_slots": sorted("%s%d_%d" % s for s in empty_slots),
+              "blocked_corners": sorted("%s%d_%d" % s for s in blocked),
+              "opening": opening, "slide_in": sweep, "slide_in_all_clear": all(v["clear"] for v in sweep.values()),
+              "map": LY.front_map(assign, opened | blocked | empty_slots)}
 
     S.context(prev_col)
     S.setup_light(scene)

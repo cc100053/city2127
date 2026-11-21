@@ -177,6 +177,46 @@ Kept: each type's roof outline, main window frames, entrances, balconies and the
   - `slots/before|after/` (side, main: day, clay; after also night).
   - `compare-side-slots.jpg`: left before, right after; side day, side clay, main day.
 
+## True empty slots (2026-11-21, owner: every bay without a house is an empty slot; pods slide in from outside)
+
+- **Scope.**
+  - These bays became bare empty slots: the open bays (F0_3, F1_5, F4_0, F5_5, F6_6), the side middle empty slots (L2_1, L5_1, R3_1), the delivery bay (F4_6), and the corner bays paired with an empty middle slot (F2_0, F5_0, F3_7). Each pair shares one landing, so whichever is filled first takes it.
+  - Each slot has no furniture, planters, gate, lamps, footprint paint, envelope frame or slab-edge rail. Only the frame and two guide rails set flush in the slab (1.2 cm) remain.
+  - The pods' bearing shoes and brackets carry them on the slab edge and the beam face.
+  - Kept as designated public space: the sky gardens, the level-3 void and the side terraces on levels 1 and 4.
+  - Blocked: the corner bays beside a middle house (F0_0, F3_0, F2_7, F5_7) have no corridor. They are bare too, but keep their slab-edge safety rail.
+  - Rails also stay on the corridors, the void and every occupied house's balcony.
+- **Fixes found by the path check.**
+  - The pod's lift lugs moved from |x| 2.28 to 2.24 m, inside the 2.25 m gap between the front node collars; the spreader slings followed.
+  - The rib vault's fan knuckle moved from (−2.08, 0.3, 6.62) to (−1.9, 0.42, 6.4). It had reached |x| 2.38 m at collar height and cleared the collar only through its chamfer.
+  - The hoist lines moved out because the pod's entrance hood and step sit 0.6 m behind its back face:
+    - front rail `GZ` 14.65; the hanging back face moved from 11.6 to 11.95 m, against the front houses' 11.25 m reach;
+    - side `SIDE_HANG_X` 27.0 against the side houses' 26.25 m reach.
+- **Path check (`sweep_check`, in the build report `slide_in`).** For each of the 12 empty slots and each of the five pod types:
+  - lower the pod at the hoist line from its highest hoisted position (under the trolley and spreader) to the slot's level in 0.75 m steps;
+  - slide it horizontally, 3 cm above the slab, in 0.25 m steps to 1 cm short of home (at home the shoes and chassis touch the frame by design; placed houses use the same allowance);
+  - BVH-test every position against the frame, commons, rails and every placed house. For F4_6 its own hanging pod, spreader and trolley are excluded.
+  - Result: all clear (`slide_in_all_clear: true`).
+- **Opening (`opening` in the report).**
+
+  | Measure | Pod | Opening |
+  | --- | --- | --- |
+  | Width between column faces | 4.60 m | 4.8 m |
+  | Width at the node collars' heights (y ≤ 0.3 or ≥ 3.75) | 4.48 m | 4.5 m |
+  | Height | 3.82 m | 3.9 m (beam soffit) |
+
+  Wider or taller parts (shell band, eaves, terraces) stop outside the frame line.
+- **Checks.**
+  - `build_housing_tower.py`: frame clashes 0, house clashes 0, entrances 55/55.
+  - `check_glb.py`: PASS, 189,574 tris, 39 materials, 3,186,660 bytes.
+  - No people in the GLB or the `.blend`.
+  - `test_layout.py`: OK.
+- **Review guides.** `Q08H_Guides` sits in the preview collection and is never exported: a cyan pod outline at each slot's hoist line and an arrow into the opening. `review_tower.py ... guide` shows it.
+- **Evidence.**
+  - `pre-empty-198k/`: the previous version.
+  - `empty/{side,main}_{day,guide,clay}.png`.
+  - `compare-empty-slots.jpg`: rows side day (before | after), side guide | main guide, side clay (before | after).
+
 ## Next expected step
 
 The owner reviews the sheets and renders. Then: agree the triangle budget, decide on the boat/pier route, and push `feat/q08c-housing-tower`. City placement (`addCityModel`, lot, browser checks, FPS) is a separate task.

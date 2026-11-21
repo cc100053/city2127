@@ -87,7 +87,7 @@ def base(a, z_front, z_back=.05, hw=HW):
     for s in (-1, 1):
         obox(a["h_frame"], (s * (hw + .008), .12, (z_back + z_front) / 2), (.016, .04, z_front - z_back - .5), X, Z)
         for zz in LUG_Z:
-            obox(a["h_base"], (s * (hw + .03), .1, zz), (.06, .14, .3), X, Z)
+            obox(a["h_base"], (s * (hw + .01), .1, zz), (.06, .14, .3), X, Z)          # inside the 2.25 m collar gap
     for s in (-1, 1):                                                          # bearing shoes clasp the slab edge
         obox(a["h_base"], (s * 1.55, -.14, SLAB_EDGE + .07), (.5, .3, .14), X, Z)
     if z_front > SLAB_EDGE + .3:
@@ -294,7 +294,7 @@ def _merge(dst, src):
 # --- 2. rib vault house ---------------------------------------------------------------------------------------------
 RV_L, RV_R = (-2.15, .25), (2.15, 1.25)            # vault feet: glazed to the floor on the left, a low wall on the right
 RV_ZF = 6.8                                        # vault front (past the collars), portal to 7.15
-RV_PIVOT = (-2.08, .3, 6.62)                      # the ribs' common foot, front-left
+RV_PIVOT = (-1.9, .42, 6.4)                       # the ribs' common foot, front-left, inside the collar gap
 
 
 def _bez(p0, c1, c2, p1, t):
@@ -332,14 +332,14 @@ def rib_vault(a, rng):
     xl, xr = rib[0][0], rib[-1][0]
     px, py, pz = RV_PIVOT
 
-    def fan(z_end, k):
-        return [(x, y, pz + (z_end - pz) * ((x - xl) / (xr - xl)) ** .8) for x, y in rib]
+    def fan(z_end, k):                                                        # from the knuckle, then on the vault
+        return [(px, py, pz)] + [(x, y, pz + (z_end - pz) * ((x - xl) / (xr - xl)) ** .8) for x, y in rib[1:]]
     ends = [5.0, 3.3, 1.7, .4]
     for z_end in ends:                                                        # structural ribs from the one foot
         M.limb(a["h_shell"], fan(z_end, 1), .1, .07, 5)
     for z_a, z_b in zip([pz] + ends, ends):                                   # glazing bars between the ribs
         M.limb(a["h_frame"], fan((z_a + z_b) / 2, 1), .025, .025, 4)
-    M.ell(a["h_shell"], (px, py + .05, pz), (.32, 0, 0), (0, .22, 0), (0, 0, .32), 8, 5)    # the ribs' knuckle
+    M.ell(a["h_shell"], (px, py, pz), (.26, 0, 0), (0, .2, 0), (0, 0, .26), 8, 5)          # the ribs' knuckle
     zg = RV_ZF + .15                                                          # front glazing in the portal
     front = _rv_prof(off=-.06)
     prism_z(a["h_pink"], front + [(RV_R[0] - .06, FL), (RV_L[0] + .1, FL)], zg - .01, zg + .01)
