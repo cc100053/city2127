@@ -6,7 +6,7 @@ import { bodyFootprints, inRect } from './megaFootprints.ts';
 // P1 (city-taste-v2): the three colossal megastructures of the master target — ring-on-edge building, white arch, stepped terraced hull.
 // Ground contacts and sizes are exported for the test and for carving the context massing they replace. Metres.
 export * from './megaFootprints.ts';
-import { ARCH, HULL, RING } from './megaFootprints.ts';
+import { ARCH, HULL, RING, RING_GATE } from './megaFootprints.ts';
 
 /** Finishes shared by all three pieces; the seam glows with the night. */
 export const megaShell = new T.MeshStandardMaterial({ color: '#f3f2ec', roughness: .5, metalness: .08 });
@@ -41,7 +41,29 @@ megaFace.customProgramCacheKey = () => 'mega-face';
 const megaJoint = new T.MeshStandardMaterial({ color: '#4b5258', roughness: .6, metalness: .3 });
 /** The dark mouth of the hull's Yurikamome tunnel, faintly lit from inside. */
 const megaPortal = new T.MeshStandardMaterial({ color: '#141b20', emissive: '#30485a', emissiveIntensity: .35, roughness: .8 });
-export const updateMegastructures = (night: number) => { megaSeam.emissiveIntensity = .6 + night * 1.6; roomGlow.value = night; };
+/** Tunnel lights in the ring's road gate (outside the carve, so its own finish). */
+const gateLight = new T.MeshStandardMaterial({ color: '#fff4dc', emissive: '#fff1d0', emissiveIntensity: .8, roughness: .4 });
+/** The megastructures' own copies of the shared finishes: same look, but the hoop is cut open over the road gate (`RING_GATE`, a skewed box in
+ * ring-local plan). Skyways and Meter pieces keep the exported originals, so nothing else is carved; the merge swaps in these copies. */
+const carved = new Map<T.Material, T.Material>();
+function carve(base: T.MeshStandardMaterial, key: string) {
+  const m = base.clone(), c = Math.cos(RING.yaw), s = Math.sin(RING.yaw), f = (v: number) => v.toFixed(4), [r0, r1] = RING_GATE.right;
+  m.onBeforeCompile = (shader, renderer) => {
+    base.onBeforeCompile(shader, renderer);
+    shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 gateP;').replace('#include <project_vertex>', '#include <project_vertex>\ngateP = (modelMatrix * vec4(transformed, 1.)).xyz;');
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 gateP;').replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
+    { vec2 g = gateP.xz - vec2(${f(RING.x)}, ${f(RING.z)}); float lx = dot(g, vec2(${f(c)}, ${f(-s)})), lz = dot(g, vec2(${f(s)}, ${f(c)}));
+      if (abs(lz) < ${f(RING_GATE.reach)} && lx > ${f(RING_GATE.left)} && lx < mix(${f(r0)}, ${f(r1)}, (lz + ${f(RING.depth / 2)}) / ${f(RING.depth)}) && gateP.y < ${f(RING_GATE.top)}) discard; }`);
+  };
+  m.customProgramCacheKey = () => key + '-gate';
+  carved.set(base, m); return m;
+}
+const carvedSeam = carve(megaSeam, 'seam');
+carve(megaShell, 'shell'); carve(megaRib, 'rib'); carve(megaGlass, 'mega-glass'); carve(megaFace, 'mega-face');
+export const updateMegastructures = (night: number) => {
+  megaSeam.emissiveIntensity = .6 + night * 1.6; (carvedSeam as T.MeshStandardMaterial).emissiveIntensity = megaSeam.emissiveIntensity;
+  gateLight.emissiveIntensity = .8 + night * 1.4; roomGlow.value = night;
+};
 
 type Plant = { position: number[]; scale: number; type: string };
 type Shrub = [number, number, number, number, number];
@@ -119,6 +141,38 @@ function ring(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
   add(megaShell, new T.BoxGeometry(plinth[0], pTop - pBot, plinth[1]), new T.Matrix4().makeTranslation(0, py, 0));
   for (const [sx, sz, w, d] of [[0, 1, plinth[0] + 1, .8], [0, -1, plinth[0] + 1, .8], [1, 0, .8, plinth[1] + 1], [-1, 0, .8, plinth[1] + 1]] as const)
     add(megaSeam, new T.BoxGeometry(w, .5, d), new T.Matrix4().makeTranslation(sx * plinth[0] / 2, .3 - centreY, sz * plinth[1] / 2));
+  // Entrance polish (owner 2026-11-20): both hoop-facing sides of the plinth are a glazed ground-floor lobby (mullions every 4 m) under a deep
+  // canopy with a lit edge, so the base reads as the hoop's entrance hall, not a blank block; the plaza walk lands before the +z lobby.
+  for (const s of [1, -1]) {
+    const face = s * plinth[1] / 2, lobby = plinth[0] - 12;
+    add(megaGlass, new T.BoxGeometry(lobby, 4.4, .4), new T.Matrix4().makeTranslation(0, 2.6 - centreY, face + s * .05));
+    for (let x = -lobby / 2; x <= lobby / 2 + .01; x += 4) add(megaRib, new T.BoxGeometry(.5, 4.4, .7), new T.Matrix4().makeTranslation(x, 2.6 - centreY, face + s * .2));
+    add(megaShell, new T.BoxGeometry(lobby + 4, .6, 5), new T.Matrix4().makeTranslation(0, 5.1 - centreY, face + s * 2.5));
+    add(megaSeam, new T.BoxGeometry(lobby + 4.2, .3, .3), new T.Matrix4().makeTranslation(0, 4.95 - centreY, face + s * 5));
+  }
+  // The plaza walk (layout `plazaWalks[0]`) ends at the bay face 17 m up, level with the hoop's inner floor: a landing runs in over the floor to the
+  // lowest planted ledge (z 18) through a lit gate frame in the face plane.
+  const gx = 4.1, gy = 17.6 - centreY;
+  add(megaShell, new T.BoxGeometry(8, .6, 7.4), new T.Matrix4().makeTranslation(gx, gy - .3, half + 3.1 - 3.7));
+  for (const dx of [-4.6, 4.6]) add(megaSeam, new T.BoxGeometry(.6, 7, .6), new T.Matrix4().makeTranslation(gx + dx, gy + 3.5, half));
+  add(megaSeam, new T.BoxGeometry(9.8, .6, .6), new T.Matrix4().makeTranslation(gx, gy + 7, half));
+  // Road gate (owner 2026-11-20): avenue ① and the guideway run through the south-east foot. The carve opens the hoop over `RING_GATE`; here the
+  // tunnel is lined (pale walls and soffit, just outside the carve), strip-lit along its length, and framed on both faces by lit posts and a lintel.
+  const { left, right: [r0, r1], top } = RING_GATE, gy0 = -centreY, skew = Math.atan2(r1 - r0, depth), wallLen = Math.hypot(r1 - r0, depth);
+  add(megaRib, new T.BoxGeometry(1, top, depth + 1), new T.Matrix4().makeTranslation(left - .55, gy0 + top / 2, 0));
+  add(megaRib, new T.BoxGeometry(1, top, wallLen + 1), new T.Matrix4().makeRotationY(skew).setPosition((r0 + r1) / 2 + .56, gy0 + top / 2, 0));
+  const soffit = new T.Shape([new T.Vector2(left - 1, -half - .5), new T.Vector2(r0 + 1, -half - .5), new T.Vector2(r1 + 1, half + .5), new T.Vector2(left - 1, half + .5)]);
+  add(megaShell, new T.ExtrudeGeometry(soffit, { depth: 1, bevelEnabled: false }).rotateX(Math.PI / 2), new T.Matrix4().makeTranslation(0, gy0 + top + 1.05, 0));
+  for (const t of [.12, .37, .63, .88]) {
+    const a = left + (r0 - left) * t, b = left + (r1 - left) * t;
+    add(gateLight, new T.BoxGeometry(.5, .2, Math.hypot(b - a, depth)), new T.Matrix4().makeRotationY(Math.atan2(b - a, depth)).setPosition((a + b) / 2, gy0 + top - .15, 0));
+  }
+  for (const [x, rot] of [[left + .1, 0], [(r0 + r1) / 2 - .1, skew]] as const) add(gateLight, new T.BoxGeometry(.2, .35, (rot ? wallLen : depth) - 2), new T.Matrix4().makeRotationY(rot).setPosition(x, gy0 + 3.2, 0));
+  for (const sz of [-1, 1]) {
+    const edge = sz < 0 ? r0 : r1, fz = sz * (half + .7);
+    for (const x of [left - 1.3, edge + 1.3]) add(megaSeam, new T.BoxGeometry(1.4, top + 1.6, 1.4), new T.Matrix4().makeTranslation(x, gy0 + (top + 1.6) / 2, fz));
+    add(megaSeam, new T.BoxGeometry(edge - left + 4, 1.4, 1.4), new T.Matrix4().makeTranslation((left + edge) / 2, gy0 + top + .9, fz));
+  }
   void Z;
 }
 
@@ -185,7 +239,16 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
     slab(k, y0, 1.2, 1.6, megaSeam); // glowing lip at the foot of each face
     // polish2: the white slab carries the read (target: white terraced hull), one recessed glass storey under the next lip.
     const g0 = 9.5;
-    slab(k, y0 + 1.2, g0 - 1.2, 1.2, megaShell);
+    if (k === 0) { // Entrance polish (owner 2026-11-20): the street storey is a glazed shopfront, set 1.5 m back under a white fascia on columns every 6 m
+      slab(k, y0 + 1.2, 5.4, -1.5, megaGlass);
+      slab(k, y0 + 6.6, g0 - 6.6, 1.2, megaShell);
+      const column = new T.BoxGeometry(.9, 5.4, .9);
+      for (let u = u0 + 3; u < L2 - 1; u += 6) put(batch, megaRib, column, at(u, dAt(k, u, 0) - .6, y0 + 3.9));
+      // Main door where the plaza walk lands (u 53): a deep canopy with a lit front edge over the forecourt.
+      const door = 53, dd = dAt(k, door, 0);
+      put(batch, megaShell, new T.BoxGeometry(18, .5, 7), at(door, dd - 4.7, y0 + 6.9));
+      put(batch, megaSeam, new T.BoxGeometry(18.2, .3, .3), at(door, dd - 8.2, y0 + 6.75));
+    } else slab(k, y0 + 1.2, g0 - 1.2, 1.2, megaShell);
     slab(k, y0 + g0 - .5, .35, 1.5, megaSeam); // cool seam line along the top of the white slab
     slab(k, y0 + g0, step - g0, -.8, megaGlass); // glass set 0.8 m back under the slab
     const fin = new T.BoxGeometry(.5, step - g0 - .3, .7);
@@ -242,7 +305,7 @@ export function megastructures(): T.Group {
   const batch: Batch = new Map(), trees: Plant[] = [], shrubs: Shrub[] = [], tops: [number, number][] = [];
   ring(batch, trees, shrubs); arch(batch, tops); hull(batch, trees, shrubs);
   for (const [material, list] of batch) {
-    const mesh = new T.Mesh(mergeGeometries(list), material); mesh.castShadow = mesh.receiveShadow = true; mesh.name = 'megastructure'; root.add(mesh); list.forEach(g => g.dispose());
+    const mesh = new T.Mesh(mergeGeometries(list), carved.get(material) ?? material); mesh.castShadow = mesh.receiveShadow = true; mesh.name = 'megastructure'; root.add(mesh); list.forEach(g => g.dispose());
   }
   plantCanopy(root, { instances: trees }); plantShrubs(root, shrubs);
   return root;

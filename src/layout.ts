@@ -228,12 +228,15 @@ const deckTop = PLAZA.h + .6;
 /** A plaza-local point (metres) at deck height `y`, as a world [x, y, z]. Road fix 2 (owner 2026-11-20): the walks spread `plazaAt` before
  * the height, giving [x, z, y], so they dived to −176 m and back and showed as stray curved stubs. */
 const deckAt = (lx: number, lz: number, y: number): P3 => { const [x, z] = plazaAt(lx, lz); return [x, y, z]; };
-/** Elevated white walkways (deck top y at the points): ring plinth to the plaza, plaza to the civic core's landing, plaza to the hull apron. Walkers use them. */
+/** Elevated white walkways (deck top y at the points): the ring's garden gate to the plaza, plaza to the civic core's forecourt, plaza to the hull's
+ * forecourt. Walkers use them. Entrance polish (owner 2026-11-20): the civic and hull walks ramp down onto paved forecourts (streetKit
+ * `landmarkForecourts`) instead of stopping in the air over the lawn; the ring walk lands through a lit gate onto the hoop's lowest garden. */
 export const plazaWalks: readonly (readonly P3[])[] = [
-  [[72,16,-183],[45,13,-178],deckAt(-140,-6,9),deckAt(-128,-5,deckTop),deckAt(-100,2,deckTop),deckAt(-80,8,deckTop)],
+  // Ring: docks at the hoop's garden gate 17 m up (megastructures.ts `ring`), level with the hoop's inner floor.
+  [[72,17,-183],[45,13,-178],deckAt(-140,-6,9),deckAt(-128,-5,deckTop),deckAt(-100,2,deckTop),deckAt(-80,8,deckTop)],
   // Under the Yurikamome deck (14.2 m), not through it, without the hairpin; each starts clear of the deck's planters.
-  [deckAt(-16,-48,deckTop),deckAt(-14,-60,8),[-50,8.5,-48],[-46,8,-28],[-40,6,-14],[-36,3,-2]],
-  [deckAt(68,-10,deckTop),deckAt(92,-10,12),[-176,16,-42],[-200,16,-22],[-209,11,0],[-211,6,14],[-211,3,26]],
+  [deckAt(-16,-48,deckTop),deckAt(-14,-60,8),[-50,8.5,-48],[-46,8,-28],[-40,6,-14],[-34,3,-3],[-27,.45,3]],
+  [deckAt(68,-10,deckTop),deckAt(92,-10,12),[-176,16,-42],[-200,16,-22],[-209,11,0],[-211,6,14],[-213,3.1,23],[-216,.45,31]],
 ];
 // Planted mid-level decks (r6 pass 3, target v2's tree-lined middle layer; 5.2 m lawn bed down the middle). Raycast-checked against the
 // environment, landmarks and Fuji chassis: clear between their docked ends, and off every survey site's line of sight from the hero pose.

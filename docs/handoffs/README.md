@@ -25,6 +25,7 @@
 | [Hero 霧與光層次](hero-atmosphere.md) | IN_PROGRESS（2026-11-02）；R1 高度霧／夜間窗燈層次／夜空地平線，R2 水面燈光倒影，等 owner 目視 | cc100053 |
 | [近鏡後續／能源講解](closeup-next.md) | F1/F2、C1 INTEGRATED（C1 owner批准，24組兩秒辨認未做）；N1 能源講解 INTEGRATED（13s／日文），F3等硬件（2026-10-29） | cc100053 |
 | [清除斷頭路與舊地台](road-fix.md) | IN_PROGRESS（2026-11-20）；A1/B1-a/C1 及地台清單已實作，本機測試通過，待 owner 目視及 PR | cc100053 |
+| [主樓正門、環形底座、船身前庭](entrance-polish.md) | DONE（2026-11-21，PR #9）；前庭、天橋落點、底座大堂、船身商店層、環形隧道門，玻璃盒移除 | cc100053 |
 | [Road audit](road-audit.md) | IN_PROGRESS（2026-11-04）；修路已 merge main，owner 目視驗收同餘下決定未做 | cc100053 |
 | [SE +1 Blender 塔](se-high-blender.md) | MERGED R3（2026-11-06，owner 叫停）；9/12 對目標，`fh-frame`／`fh-crown`／`fh-lift` 未到 2，夜間 hero FPS 53–57 待查 | cc100053 |
 | [SW 活動モジュール棚](sw-event-shelf.md) | IMPLEMENTED，待 owner 視覺驗收（2026-11-13）；棚 GLB 與接入已完成，分支 `feat/sw-event-shelf` 未 merge | cc100053 |
